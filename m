@@ -1,165 +1,128 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171211130452.10363-1-luiz.dentz@gmail.com>
-References: <20171211130452.10363-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 12 Dec 2017 09:54:05 -0200
-Message-ID: <CABBYNZLC5EmQqa25mPEuM-Cwcpcdta4P3sRBv3dfSsR9ZhfO8Q@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shell: Add exists callback
+In-Reply-To: <20171208124057.32162-1-lukasz.rymanowski@codecoup.pl>
+References: <20171208124057.32162-1-lukasz.rymanowski@codecoup.pl>
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Date: Tue, 12 Dec 2017 08:49:06 +0100
+Message-ID: <CAExxLLAkVuj9gi70FVPsLjjDMdgQx_X-HFc9qeEhs7LyyiVu_A@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add support to advertise when connected
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+hi,
 
-On Mon, Dec 11, 2017 at 11:04 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On 8 December 2017 at 13:40, =C5=81ukasz Rymanowski
+<lukasz.rymanowski@codecoup.pl> wrote:
+> So far, kernel did not allow to advertise when there was a connection
+> established. With this patch kernel does allow it if controller
+> supports it.
 >
-> This adds a callback to check if the menu exists at runtime.
+> If controller supports non-connectable advertising when connected, then
+> only non-connectable advertising instances will be advertised.
+>
+> Signed-off-by: =C5=81ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
 > ---
->  src/shared/shell.c | 58 ++++++++++++++++++++++++++++++++----------------------
->  src/shared/shell.h |  4 ++++
->  2 files changed, 39 insertions(+), 23 deletions(-)
+>  net/bluetooth/hci_request.c | 55 +++++++++++++++++++++++++++++++++++++--=
+------
+>  1 file changed, 46 insertions(+), 9 deletions(-)
 >
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index f20c74901..3aa49597c 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -145,6 +145,17 @@ static void cmd_menu(int argc, char *argv[])
->         shell_print_menu();
+> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+> index abc0f3224dd1..f0ab3a772949 100644
+> --- a/net/bluetooth/hci_request.c
+> +++ b/net/bluetooth/hci_request.c
+> @@ -919,6 +919,43 @@ static bool adv_use_rpa(struct hci_dev *hdev, uint32=
+_t flags)
+>         return true;
 >  }
 >
-> +static bool cmd_menu_exists(const struct bt_shell_menu *menu)
+> +static bool is_advertising_allowed(struct hci_dev *hdev, bool connectabl=
+e)
 > +{
-> +       /* Skip menu command if not on main menu or if there are no
-> +        * submenus.
+> +       /* If there is no connection we are OK to advertise. */
+> +       if (hci_conn_num(hdev, LE_LINK) =3D=3D 0)
+> +               return true;
+> +
+> +       /* Check le_states if there is any connection in slave role. */
+> +       if (hdev->conn_hash.le_num_slave > 0) {
+> +               /* Slave connection state and non connectable mode bit 20=
+. */
+> +               if (!connectable && !(hdev->le_states[2] & 0x10))
+> +                       return false;
+> +
+> +               /* Slave connection state and connectable mode bit 38
+> +                * and scannable bit 21.
+> +                */
+> +               if (connectable && (!(hdev->le_states[4] & 0x01) ||
+> +                                   !(hdev->le_states[2] & 0x40)))
+> +                       return false;
+> +       }
+> +
+> +       /* Check le_states if there is any connection in master role. */
+> +       if (hci_conn_num(hdev, LE_LINK) !=3D hdev->conn_hash.le_num_slave=
+) {
+> +               /* Master connection state and non connectable mode bit 1=
+8. */
+> +               if (!connectable && !(hdev->le_states[2] & 0x02))
+> +                       return false;
+> +
+> +               /* Master connection state and connectable mode bit 35 an=
+d
+> +                * scannable 19.
+> +                */
+> +               if (connectable && (!(hdev->le_states[4] & 0x10) ||
+> +                                   !(hdev->le_states[2] & 0x08)))
+> +                       return false;
+> +       }
+> +
+> +       return true;
+> +}
+> +
+>  void __hci_req_enable_advertising(struct hci_request *req)
+>  {
+>         struct hci_dev *hdev =3D req->hdev;
+> @@ -927,7 +964,15 @@ void __hci_req_enable_advertising(struct hci_request=
+ *req)
+>         bool connectable;
+>         u32 flags;
+>
+> -       if (hci_conn_num(hdev, LE_LINK) > 0)
+> +       flags =3D get_adv_instance_flags(hdev, hdev->cur_adv_instance);
+> +
+> +       /* If the "connectable" instance flag was not set, then choose be=
+tween
+> +        * ADV_IND and ADV_NONCONN_IND based on the global connectable se=
+tting.
 > +        */
-> +       if (menu != data.main || queue_isempty(data.submenus))
-> +               return false;
+> +       connectable =3D (flags & MGMT_ADV_FLAG_CONNECTABLE) ||
+> +                     mgmt_get_connectable(hdev);
 > +
-> +       return true;
-> +}
-> +
->  static void cmd_back(int argc, char *argv[])
->  {
->         if (data.menu == data.main) {
-> @@ -157,10 +168,21 @@ static void cmd_back(int argc, char *argv[])
->         shell_print_menu();
->  }
+> +       if (!is_advertising_allowed(hdev, connectable))
+>                 return;
 >
-> +static bool cmd_back_exists(const struct bt_shell_menu *menu)
-> +{
-> +       /* Skip back command if on main menu */
-> +       if (menu == data.main)
-> +               return false;
-> +
-> +       return true;
-> +}
-> +
->  static const struct bt_shell_menu_entry default_menu[] = {
-> -       { "back",         NULL,       cmd_back, "Return to main menu" },
-> +       { "back",         NULL,       cmd_back, "Return to main menu", NULL,
-> +                                                       NULL, cmd_back_exists },
->         { "menu",         "<name>",   cmd_menu, "Select submenu",
-> -                                                       menu_generator },
-> +                                                       menu_generator, NULL,
-> +                                                       cmd_menu_exists},
->         { "version",      NULL,       cmd_version, "Display version" },
->         { "quit",         NULL,       cmd_quit, "Quit program" },
->         { "exit",         NULL,       cmd_quit, "Quit program" },
-> @@ -169,22 +191,6 @@ static const struct bt_shell_menu_entry default_menu[] = {
->         { }
->  };
+>         if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+> @@ -940,14 +985,6 @@ void __hci_req_enable_advertising(struct hci_request=
+ *req)
+>          */
+>         hci_dev_clear_flag(hdev, HCI_LE_ADV);
 >
-> -static bool command_isskipped(const char *cmd)
-> -{
-> -       /* Skip menu command if not on main menu or if there are no
-> -        * submenus.
+> -       flags =3D get_adv_instance_flags(hdev, hdev->cur_adv_instance);
+> -
+> -       /* If the "connectable" instance flag was not set, then choose be=
+tween
+> -        * ADV_IND and ADV_NONCONN_IND based on the global connectable se=
+tting.
 > -        */
-> -       if (!strcmp(cmd, "menu") &&
-> -               (data.menu != data.main || queue_isempty(data.submenus)))
-> -               return true;
+> -       connectable =3D (flags & MGMT_ADV_FLAG_CONNECTABLE) ||
+> -                     mgmt_get_connectable(hdev);
 > -
-> -       /* Skip back command if on main menu */
-> -       if (data.menu == data.main && !strcmp(cmd, "back"))
-> -               return true;
-> -
-> -       return false;
-> -}
-> -
->  static void shell_print_menu(void)
->  {
->         const struct bt_shell_menu_entry *entry;
-> @@ -211,7 +217,7 @@ static void shell_print_menu(void)
->         }
->
->         for (entry = default_menu; entry->cmd; entry++) {
-> -               if (command_isskipped(entry->cmd))
-> +               if (entry->exists && !entry->exists(data.menu))
->                         continue;
->
->                 print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
-> @@ -490,16 +496,22 @@ done:
->  static char *find_cmd(const char *text,
->                         const struct bt_shell_menu_entry *entry, int *index)
->  {
-> -       const char *cmd;
-> +       const struct bt_shell_menu_entry *tmp;
->         int len;
->
->         len = strlen(text);
->
-> -       while ((cmd = entry[*index].cmd)) {
-> +       while ((tmp = &entry[*index])) {
->                 (*index)++;
->
-> -               if (!strncmp(cmd, text, len) && !command_isskipped(cmd))
-> -                       return strdup(cmd);
-> +               if (!tmp->cmd)
-> +                       break;
-> +
-> +               if (tmp->exists && !tmp->exists(data.menu))
-> +                       continue;
-> +
-> +               if (!strncmp(tmp->cmd, text, len))
-> +                       return strdup(tmp->cmd);
->         }
->
->         return NULL;
-> diff --git a/src/shared/shell.h b/src/shared/shell.h
-> index 2b9e918d6..5f86ed61e 100644
-> --- a/src/shared/shell.h
-> +++ b/src/shared/shell.h
-> @@ -31,11 +31,14 @@
->  #define COLOR_BOLDWHITE        "\x1B[1;37m"
->  #define COLOR_HIGHLIGHT        "\x1B[1;39m"
->
-> +struct bt_shell_menu;
-> +
->  typedef void (*bt_shell_menu_cb_t)(int argc, char *argv[]);
->  typedef char * (*bt_shell_menu_gen_t)(const char *text, int state);
->  typedef void (*bt_shell_menu_disp_t) (char **matches, int num_matches,
->                                                         int max_length);
->  typedef void (*bt_shell_prompt_input_func) (const char *input, void *user_data);
-> +typedef bool (*bt_shell_menu_exists_t) (const struct bt_shell_menu *menu);
->
->  struct bt_shell_menu_entry {
->         const char *cmd;
-> @@ -44,6 +47,7 @@ struct bt_shell_menu_entry {
->         const char *desc;
->         bt_shell_menu_gen_t gen;
->         bt_shell_menu_disp_t disp;
-> +       bt_shell_menu_exists_t exists;
->  };
->
->  struct bt_shell_menu {
+>         /* Set require_privacy to true only when non-connectable
+>          * advertising is used. In that case it is fine to use a
+>          * non-resolvable private address.
 > --
-> 2.13.6
+> 2.14.1
+>
 
-Applied.
-
-
--- 
-Luiz Augusto von Dentz
+ping
