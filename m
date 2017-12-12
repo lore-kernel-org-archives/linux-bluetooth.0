@@ -1,46 +1,36 @@
-Return-Path: <david@lechnology.com>
-From: David Lechner <david@lechnology.com>
-To: devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org
-Cc: David Lechner <david@lechnology.com>,
-	Rob Herring <robh+dt@kernel.org>,
+Return-Path: <robherring2@gmail.com>
+Date: Tue, 12 Dec 2017 14:09:31 -0600
+From: Rob Herring <robh@kernel.org>
+To: David Lechner <david@lechnology.com>
+Cc: devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	Mark Rutland <mark.rutland@arm.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	netdev@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 0/3] Bluetooth: hci_ll: Get BD address from NVMEM 
-Date: Tue, 12 Dec 2017 15:59:15 -0600
-Message-Id: <1513115958-23761-1-git-send-email-david@lechnology.com>
+Subject: Re: [PATCH v2 2/3] dt-bindings: Add optional nvmem BD address
+ bindings to ti,wlink-st
+Message-ID: <20171212200931.mnlmdwimu4ldmzin@rob-hp-laptop>
+References: <1512701860-8321-1-git-send-email-david@lechnology.com>
+ <1512701860-8321-3-git-send-email-david@lechnology.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1512701860-8321-3-git-send-email-david@lechnology.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This series adds supporting getting the BD address from a NVMEM provider
-for "LL" HCI controllers (Texas Instruments).
+On Thu, Dec 07, 2017 at 08:57:39PM -0600, David Lechner wrote:
+> This adds optional nvmem consumer properties to the ti,wlink-st device tree
+> bindings to allow specifying the BD address.
+> 
+> Signed-off-by: David Lechner <david@lechnology.com>
+> ---
+> 
+> v2 changes:
+> * Renamed "mac-address" to "bd-address"
+> * Fixed typos in example
+> * Specify byte order of "bd-address"
+> 
+>  Documentation/devicetree/bindings/net/ti,wilink-st.txt | 5 +++++
+>  1 file changed, 5 insertions(+)
 
-v3 changes:
-* Additional comments on why swapping bytes is needed.
-* Fixed comment style and trailing whitespace.
-* Rework error handling for nvmem cell code.
-
-v2 changes:
-* Fixed typos in dt-bindings
-* Use "bd-address" instead of "mac-address"
-* Updated dt-bindings to specify the byte order of "bd-address"
-* New patch "Bluetooth: hci_ll: add support for setting public address"
-* Dropped patch "Bluetooth: hci_ll: add constant for vendor-specific command"
-  that is already in bluetooth-next
-* Rework error handling
-* Use bdaddr_t, bacmp and other bluetooth utils
-
-David Lechner (3):
-  Bluetooth: hci_ll: add support for setting public address
-  dt-bindings: Add optional nvmem BD address bindings to ti,wlink-st
-  Bluetooth: hci_ll: Add optional nvmem BD address source
-
- .../devicetree/bindings/net/ti,wilink-st.txt       |  5 ++
- drivers/bluetooth/hci_ll.c                         | 77 ++++++++++++++++++++++
- 2 files changed, 82 insertions(+)
-
--- 
-2.7.4
+Reviewed-by: Rob Herring <robh@kernel.org>
