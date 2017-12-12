@@ -1,258 +1,165 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171211145839.19573-2-sbrown@cortland.com>
-References: <20171211145839.19573-1-sbrown@cortland.com> <20171211145839.19573-2-sbrown@cortland.com>
+In-Reply-To: <20171211130452.10363-1-luiz.dentz@gmail.com>
+References: <20171211130452.10363-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 12 Dec 2017 09:54:51 -0200
-Message-ID: <CABBYNZLzsZXx2qmQaj-iFEVbHskdak3oQM+x=igmAivUFNZYzw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] mesh: Segmentation fails in gatt.c:pipe_write()
-To: Steve Brown <sbrown@cortland.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 12 Dec 2017 09:54:05 -0200
+Message-ID: <CABBYNZLC5EmQqa25mPEuM-Cwcpcdta4P3sRBv3dfSsR9ZhfO8Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shell: Add exists callback
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+Hi,
 
-On Mon, Dec 11, 2017 at 12:58 PM,  <sbrown@cortland.com> wrote:
-> From: Steve Brown <sbrown@cortland.com>
+On Mon, Dec 11, 2017 at 11:04 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> If the first command output in a new connection exceeds 20 bytes,
-> mesh_gatt_write sets the SAR to FIRST as the write_mtu is initially 0
-> and the default is GATT_MTU-3 (20).
->
-> When pipe_write gets called, a new larger write_mtu has been set, but
-> the SAR is still set to FIRST. It's assumed that data->gatt_len >
-> max_len. However, it's not which causes lots of bogus output.
->
+> This adds a callback to check if the menu exists at runtime.
 > ---
+>  src/shared/shell.c | 58 ++++++++++++++++++++++++++++++++----------------------
+>  src/shared/shell.h |  4 ++++
+>  2 files changed, 39 insertions(+), 23 deletions(-)
 >
-> At Luiz' suggestion.
->
-> 1. The WriteValue code has been removed
-> 2. The SAR logic has been moved to pipe_write
->
-> It was tested against the zephyr mesh_shell and a small mtu to test the
-> segmentation logic.
-> ---
->  mesh/gatt.c | 141 ++++++++----------------------------------------------------
->  1 file changed, 18 insertions(+), 123 deletions(-)
->
-> diff --git a/mesh/gatt.c b/mesh/gatt.c
-> index 197291e67..9116a9de1 100644
-> --- a/mesh/gatt.c
-> +++ b/mesh/gatt.c
-> @@ -102,27 +102,6 @@ static void write_data_free(void *user_data)
->         free(data);
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index f20c74901..3aa49597c 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -145,6 +145,17 @@ static void cmd_menu(int argc, char *argv[])
+>         shell_print_menu();
 >  }
 >
-> -static void write_setup(DBusMessageIter *iter, void *user_data)
-> -{
-> -       struct write_data *data = user_data;
-> -       struct iovec *iov = &data->iov;
-> -       DBusMessageIter array, dict;
-> -
-> -       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
-> -       dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-> -                                               &iov->iov_base, iov->iov_len);
-> -       dbus_message_iter_close_container(iter, &array);
-> -
-> -       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-> -                                       DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-> -                                       DBUS_TYPE_STRING_AS_STRING
-> -                                       DBUS_TYPE_VARIANT_AS_STRING
-> -                                       DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-> -                                       &dict);
-> -
-> -       dbus_message_iter_close_container(iter, &dict);
-> -}
-> -
->  uint16_t mesh_gatt_sar(uint8_t **pkt, uint16_t size)
->  {
->         const uint8_t *data = *pkt;
-> @@ -192,11 +171,12 @@ static bool pipe_write(struct io *io, void *user_data)
->         struct write_data *data = user_data;
->         struct iovec iov[2];
->         uint8_t sar;
-> -       uint8_t max_len = write_mtu - 4;
-> +       uint8_t max_len;
->
->         if (data == NULL)
->                 return true;
->
-> +       max_len = write_mtu ? write_mtu - 3 - 1 : GATT_MTU - 3 - 1;
->         print_byte_array("GATT-TX:\t", data->gatt_data, data->gatt_len);
->
->         sar = data->gatt_data[0];
-> @@ -204,6 +184,14 @@ static bool pipe_write(struct io *io, void *user_data)
->         data->iov.iov_base = data->gatt_data + 1;
->         data->iov.iov_len--;
->
-> +       sar = data->gatt_data[0] & GATT_TYPE_MASK;
-> +       data->gatt_len--;
-> +
-> +       if (data->gatt_len > max_len) {
-> +               sar |= GATT_SAR_FIRST;
-> +               data->iov.iov_len = max_len;
-> +       }
-> +
->         iov[0].iov_base = &sar;
->         iov[0].iov_len = sizeof(sar);
->
-> @@ -245,73 +233,6 @@ static bool pipe_write(struct io *io, void *user_data)
->         }
->  }
->
-> -static void write_reply(DBusMessage *message, void *user_data)
-> -{
-> -       struct write_data *data = user_data;
-> -       struct write_data *tmp;
-> -       uint8_t *dptr = data->gatt_data;
-> -       uint8_t max_len = GATT_MTU - 3;
-> -       uint8_t max_seg = GATT_MTU - 4;
-> -       DBusError error;
-> -
-> -       dbus_error_init(&error);
-> -
-> -       if (dbus_set_error_from_message(&error, message) == TRUE) {
-> -               bt_shell_printf("Failed to write: %s\n", error.name);
-> -               dbus_error_free(&error);
-> -               return;
-> -       }
-> -
-> -       if (data == NULL)
-> -               return;
-> -
-> -       switch (data->gatt_data[0] & GATT_SAR_MASK) {
-> -               case GATT_SAR_FIRST:
-> -               case GATT_SAR_CONTINUE:
-> -                       tmp = g_new0(struct write_data, 1);
-> -                       if (!data)
-> -                               return;
-> -
-> -                       *tmp = *data;
-> -                       tmp->gatt_data = g_malloc(data->gatt_len);
-> -
-> -                       if (!tmp->gatt_data) {
-> -                               g_free(tmp);
-> -                               return;
-> -                       }
-> -
-> -                       tmp->gatt_data[0] = dptr[0];
-> -                       data = tmp;
-> -                       memcpy(data->gatt_data + 1, dptr + max_len,
-> -                                       data->gatt_len - max_seg);
-> -                       data->gatt_len -= max_seg;
-> -                       data->gatt_data[0] &= GATT_TYPE_MASK;
-> -                       data->iov.iov_base = data->gatt_data;
-> -                       if (max_len < data->gatt_len) {
-> -                               data->iov.iov_len = max_len;
-> -                               data->gatt_data[0] |= GATT_SAR_CONTINUE;
-> -                       } else {
-> -                               data->iov.iov_len = data->gatt_len;
-> -                               data->gatt_data[0] |= GATT_SAR_LAST;
-> -                       }
-> -
-> -                       break;
-> -
-> -               default:
-> -                       if(data->cb)
-> -                               data->cb(message, data->user_data);
-> -                       return;
-> -       }
-> -
-> -       if (g_dbus_proxy_method_call(data->proxy, "WriteValue", write_setup,
-> -                               write_reply, data, write_data_free) == FALSE) {
-> -               bt_shell_printf("Failed to write\n");
-> -               write_data_free(data);
-> -               return;
-> -       }
-> -
-> -}
-> -
->  static void write_io_destroy(void)
->  {
->         io_destroy(write_io);
-> @@ -361,12 +282,8 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
->
->         if (dbus_set_error_from_message(&error, message) == TRUE) {
->                 dbus_error_free(&error);
-> -               if (g_dbus_proxy_method_call(data->proxy, "WriteValue",
-> -                               write_setup, write_reply, data,
-> -                               write_data_free) == FALSE) {
-> -                       bt_shell_printf("Failed to write\n");
-> -                       write_data_free(data);
-> -               }
-> +               bt_shell_printf("Failed to write\n");
-> +               write_data_free(data);
->                 return;
->         }
->
-> @@ -402,8 +319,6 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
->                         GDBusReturnFunction cb, void *user_data)
->  {
->         struct write_data *data;
-> -       DBusMessageIter iter;
-> -       uint8_t max_len;
->
->         if (!buf || !len)
->                 return false;
-> @@ -415,17 +330,11 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
->         if (!data)
->                 return false;
->
-> -       max_len = write_mtu ? write_mtu - 3 : GATT_MTU - 3;
-> -
->         /* TODO: should keep in queue in case we need to cancel write? */
->
->         data->gatt_len = len;
->         data->gatt_data = g_memdup(buf, len);
->         data->gatt_data[0] &= GATT_TYPE_MASK;
-> -       if (max_len < len) {
-> -               len = max_len;
-> -               data->gatt_data[0] |= GATT_SAR_FIRST;
-> -       }
->         data->iov.iov_base = data->gatt_data;
->         data->iov.iov_len = len;
->         data->proxy = proxy;
-> @@ -435,27 +344,13 @@ bool mesh_gatt_write(GDBusProxy *proxy, uint8_t *buf, uint16_t len,
->         if (write_io)
->                 return pipe_write(write_io, data);
->
-> -       if (g_dbus_proxy_get_property(proxy, "WriteAcquired", &iter)) {
-> -               if (g_dbus_proxy_method_call(proxy, "AcquireWrite",
-> -                                       acquire_setup, acquire_write_reply,
-> -                                       data, NULL) == FALSE) {
-> -                       bt_shell_printf("Failed to AcquireWrite\n");
-> -                       write_data_free(data);
-> -                       return false;
-> -               }
-> -       } else {
-> -               if (g_dbus_proxy_method_call(data->proxy, "WriteValue",
-> -                               write_setup, write_reply, data,
-> -                               write_data_free) == FALSE) {
-> -                       bt_shell_printf("Failed to write\n");
-> -                       write_data_free(data);
-> -                       return false;
-> -               }
-> -               print_byte_array("GATT-TX: ", buf, len);
-> -               bt_shell_printf("Attempting to write %s\n",
-> -                                               g_dbus_proxy_get_path(proxy));
-> +       if (g_dbus_proxy_method_call(proxy, "AcquireWrite",
-> +                               acquire_setup, acquire_write_reply,
-> +                               data, NULL) == FALSE) {
-> +               bt_shell_printf("Failed to AcquireWrite\n");
-> +               write_data_free(data);
+> +static bool cmd_menu_exists(const struct bt_shell_menu *menu)
+> +{
+> +       /* Skip menu command if not on main menu or if there are no
+> +        * submenus.
+> +        */
+> +       if (menu != data.main || queue_isempty(data.submenus))
 > +               return false;
->         }
-> -
->         return true;
+> +
+> +       return true;
+> +}
+> +
+>  static void cmd_back(int argc, char *argv[])
+>  {
+>         if (data.menu == data.main) {
+> @@ -157,10 +168,21 @@ static void cmd_back(int argc, char *argv[])
+>         shell_print_menu();
 >  }
 >
+> +static bool cmd_back_exists(const struct bt_shell_menu *menu)
+> +{
+> +       /* Skip back command if on main menu */
+> +       if (menu == data.main)
+> +               return false;
+> +
+> +       return true;
+> +}
+> +
+>  static const struct bt_shell_menu_entry default_menu[] = {
+> -       { "back",         NULL,       cmd_back, "Return to main menu" },
+> +       { "back",         NULL,       cmd_back, "Return to main menu", NULL,
+> +                                                       NULL, cmd_back_exists },
+>         { "menu",         "<name>",   cmd_menu, "Select submenu",
+> -                                                       menu_generator },
+> +                                                       menu_generator, NULL,
+> +                                                       cmd_menu_exists},
+>         { "version",      NULL,       cmd_version, "Display version" },
+>         { "quit",         NULL,       cmd_quit, "Quit program" },
+>         { "exit",         NULL,       cmd_quit, "Quit program" },
+> @@ -169,22 +191,6 @@ static const struct bt_shell_menu_entry default_menu[] = {
+>         { }
+>  };
+>
+> -static bool command_isskipped(const char *cmd)
+> -{
+> -       /* Skip menu command if not on main menu or if there are no
+> -        * submenus.
+> -        */
+> -       if (!strcmp(cmd, "menu") &&
+> -               (data.menu != data.main || queue_isempty(data.submenus)))
+> -               return true;
+> -
+> -       /* Skip back command if on main menu */
+> -       if (data.menu == data.main && !strcmp(cmd, "back"))
+> -               return true;
+> -
+> -       return false;
+> -}
+> -
+>  static void shell_print_menu(void)
+>  {
+>         const struct bt_shell_menu_entry *entry;
+> @@ -211,7 +217,7 @@ static void shell_print_menu(void)
+>         }
+>
+>         for (entry = default_menu; entry->cmd; entry++) {
+> -               if (command_isskipped(entry->cmd))
+> +               if (entry->exists && !entry->exists(data.menu))
+>                         continue;
+>
+>                 print_menu(entry->cmd, entry->arg ? : "", entry->desc ? : "");
+> @@ -490,16 +496,22 @@ done:
+>  static char *find_cmd(const char *text,
+>                         const struct bt_shell_menu_entry *entry, int *index)
+>  {
+> -       const char *cmd;
+> +       const struct bt_shell_menu_entry *tmp;
+>         int len;
+>
+>         len = strlen(text);
+>
+> -       while ((cmd = entry[*index].cmd)) {
+> +       while ((tmp = &entry[*index])) {
+>                 (*index)++;
+>
+> -               if (!strncmp(cmd, text, len) && !command_isskipped(cmd))
+> -                       return strdup(cmd);
+> +               if (!tmp->cmd)
+> +                       break;
+> +
+> +               if (tmp->exists && !tmp->exists(data.menu))
+> +                       continue;
+> +
+> +               if (!strncmp(tmp->cmd, text, len))
+> +                       return strdup(tmp->cmd);
+>         }
+>
+>         return NULL;
+> diff --git a/src/shared/shell.h b/src/shared/shell.h
+> index 2b9e918d6..5f86ed61e 100644
+> --- a/src/shared/shell.h
+> +++ b/src/shared/shell.h
+> @@ -31,11 +31,14 @@
+>  #define COLOR_BOLDWHITE        "\x1B[1;37m"
+>  #define COLOR_HIGHLIGHT        "\x1B[1;39m"
+>
+> +struct bt_shell_menu;
+> +
+>  typedef void (*bt_shell_menu_cb_t)(int argc, char *argv[]);
+>  typedef char * (*bt_shell_menu_gen_t)(const char *text, int state);
+>  typedef void (*bt_shell_menu_disp_t) (char **matches, int num_matches,
+>                                                         int max_length);
+>  typedef void (*bt_shell_prompt_input_func) (const char *input, void *user_data);
+> +typedef bool (*bt_shell_menu_exists_t) (const struct bt_shell_menu *menu);
+>
+>  struct bt_shell_menu_entry {
+>         const char *cmd;
+> @@ -44,6 +47,7 @@ struct bt_shell_menu_entry {
+>         const char *desc;
+>         bt_shell_menu_gen_t gen;
+>         bt_shell_menu_disp_t disp;
+> +       bt_shell_menu_exists_t exists;
+>  };
+>
+>  struct bt_shell_menu {
 > --
-> 2.11.0
+> 2.13.6
 
-Applied just this one.
+Applied.
+
 
 -- 
 Luiz Augusto von Dentz
