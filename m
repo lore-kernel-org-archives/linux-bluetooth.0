@@ -1,46 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/3] shared/shell: Add submenu description
-Date: Tue, 12 Dec 2017 10:41:20 -0200
-Message-Id: <20171212124122.10816-1-luiz.dentz@gmail.com>
+Date: Tue, 12 Dec 2017 14:40:02 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 3/3] client: Add description for submenus
+Message-ID: <20171212124002.GA19685@x1c.home>
+References: <20171212121419.4850-1-luiz.dentz@gmail.com>
+ <20171212121419.4850-3-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171212121419.4850-3-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-This adds a field for submenu description.
----
- src/shared/shell.c | 3 ++-
- src/shared/shell.h | 1 +
- 2 files changed, 3 insertions(+), 1 deletion(-)
+On Tue, Dec 12, 2017, Luiz Augusto von Dentz wrote:
+> This adds proper descriptions for each submenu.
+> ---
+>  mesh/config-client.c | 1 +
+>  mesh/onoff-model.c   | 1 +
+>  2 files changed, 2 insertions(+)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 3aa49597c..b4fdf7043 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -208,7 +208,8 @@ static void shell_print_menu(void)
- 						submenu = submenu->next) {
- 			struct bt_shell_menu *menu = submenu->data;
- 
--			print_submenu(menu->name, "Submenu");
-+			print_submenu(menu->name, menu->desc ? menu->desc :
-+								"Submenu");
- 		}
- 	}
- 
-diff --git a/src/shared/shell.h b/src/shared/shell.h
-index 5f86ed61e..8b8b1f634 100644
---- a/src/shared/shell.h
-+++ b/src/shared/shell.h
-@@ -52,6 +52,7 @@ struct bt_shell_menu_entry {
- 
- struct bt_shell_menu {
- 	const char *name;
-+	const char *desc;
- 	const struct bt_shell_menu_entry entries[];
- };
- 
--- 
-2.13.6
+I think you meant this one to have "mesh:" as prefix instead of
+"client:".
 
+Johan
