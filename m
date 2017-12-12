@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] client: Add description for submenus
-Date: Tue, 12 Dec 2017 10:14:19 -0200
-Message-Id: <20171212121419.4850-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/3] client: Add description for submenus
+Date: Tue, 12 Dec 2017 10:14:18 -0200
+Message-Id: <20171212121419.4850-2-luiz.dentz@gmail.com>
 In-Reply-To: <20171212121419.4850-1-luiz.dentz@gmail.com>
 References: <20171212121419.4850-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,34 +13,37 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 This adds proper descriptions for each submenu.
 ---
- mesh/config-client.c | 1 +
- mesh/onoff-model.c   | 1 +
- 2 files changed, 2 insertions(+)
+ client/main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/mesh/config-client.c b/mesh/config-client.c
-index 3d618b6a6..aad6525c2 100644
---- a/mesh/config-client.c
-+++ b/mesh/config-client.c
-@@ -613,6 +613,7 @@ static void cmd_get_ttl(int argc, char *argv[])
+diff --git a/client/main.c b/client/main.c
+index f3369e89a..5af4c97d8 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2202,6 +2202,7 @@ static void cmd_set_advertise_timeout(int argc, char *argv[])
  
- static const struct bt_shell_menu cfg_menu = {
- 	.name = "config",
-+	.desc = "Configuration Model Submenu",
+ static const struct bt_shell_menu advertise_menu = {
+ 	.name = "advertise",
++	.desc = "Advertising Management Submenu",
  	.entries = {
- 	{"target",		"<unicast>",			cmd_set_node,
- 						"Set target node to configure"},
-diff --git a/mesh/onoff-model.c b/mesh/onoff-model.c
-index fc0d64617..dbbe69706 100644
---- a/mesh/onoff-model.c
-+++ b/mesh/onoff-model.c
-@@ -259,6 +259,7 @@ static void cmd_set(int argc, char *argv[])
+ 	{ "set-uuids", "[uuid1 uuid2 ...]",
+ 			cmd_set_advertise_uuids, "Set advertise uuids" },
+@@ -2226,6 +2227,7 @@ static const struct bt_shell_menu advertise_menu = {
  
- static const struct bt_shell_menu onoff_menu = {
- 	.name = "onoff",
-+	.desc = "On/Off Model Submenu",
+ static const struct bt_shell_menu scan_menu = {
+ 	.name = "scan",
++	.desc = "Scan Filters Submenu",
  	.entries = {
- 	{"target",		"<unicast>",			cmd_set_node,
- 						"Set node to configure"},
+ 	{ "set-filter-uuids", "[uuid1 uuid2 ...]", cmd_set_scan_filter_uuids,
+ 				"Set scan filter uuids" },
+@@ -2246,6 +2248,7 @@ static const struct bt_shell_menu scan_menu = {
+ 
+ static const struct bt_shell_menu gatt_menu = {
+ 	.name = "gatt",
++	.desc = "Generic Attribute Submenu",
+ 	.entries = {
+ 	{ "list-attributes", "[dev]", cmd_list_attributes, "List attributes",
+ 							dev_generator },
 -- 
 2.13.6
 
