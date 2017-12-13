@@ -1,68 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [RFC 4/4] client: Print LEAddress type in show and info commands
+Subject: Re: [RFC 1/4] Add LEAddressType property for Adapter1 and Device1
+ interfaces
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <3027942.EkYWvo1UAH@ix>
-Date: Wed, 13 Dec 2017 09:50:53 +0100
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <36FCBB0F-0017-4A81-85FE-C0E9AEC565C8@holtmann.org>
+In-Reply-To: <20171211103837.25150-1-szymon.janc@codecoup.pl>
+Date: Wed, 13 Dec 2017 09:47:07 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <76FA8EB0-63F0-45E2-BE1A-DCC06DA1C7ED@holtmann.org>
 References: <20171211103837.25150-1-szymon.janc@codecoup.pl>
- <20171211103837.25150-4-szymon.janc@codecoup.pl>
- <CABBYNZK+5JGmazDyGM771=RZhkYKbnDMFupZWk+23k4u6z06LQ@mail.gmail.com>
- <3027942.EkYWvo1UAH@ix>
 To: Szymon Janc <szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
->>> ---
->>> 
->>> client/main.c | 2 ++
->>> 1 file changed, 2 insertions(+)
->>> 
->>> diff --git a/client/main.c b/client/main.c
->>> index f3369e89a..a1d941e30 100644
->>> --- a/client/main.c
->>> +++ b/client/main.c
->>> @@ -872,6 +872,7 @@ static void cmd_show(int argc, char *argv[])
->>> 
->>>        print_property(proxy, "Powered");
->>>        print_property(proxy, "Discoverable");
->>>        print_property(proxy, "Pairable");
->>> 
->>> +       print_property(proxy, "LEAddressType");
->>> 
->>>        print_uuids(proxy);
->>>        print_property(proxy, "Modalias");
->>>        print_property(proxy, "Discovering");
->>> 
->>> @@ -1447,6 +1448,7 @@ static void cmd_info(int argc, char *argv[])
->>> 
->>>        print_property(proxy, "Blocked");
->>>        print_property(proxy, "Connected");
->>>        print_property(proxy, "LegacyPairing");
->>> 
->>> +       print_property(proxy, "LEAddressType");
->>> 
->>>        print_uuids(proxy);
->>>        print_property(proxy, "Modalias");
->>>        print_property(proxy, "ManufacturerData");
->>> 
->>> --
->>> 2.14.3
->> 
->> Another alternative to adding the LE specific type would be to add it
->> as Manufacturer string so we can add the information of OUI if public
->> or add the information of "Static Random", "Resolvable Random", etc.
+> This provides information about LE Identity Address Type used. This
+> information is needed for L2CAP sockets and for PTS testing purposes.
+> ---
+> doc/adapter-api.txt | 9 +++++++++
+> doc/device-api.txt  | 9 +++++++++
+> 2 files changed, 18 insertions(+)
 > 
-> I'd keep it simple - this should simply match to address type that needs to be 
-> passed when connecting L2CAP socket.
+> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+> index d852aa6b9..b5abdda39 100644
+> --- a/doc/adapter-api.txt
+> +++ b/doc/adapter-api.txt
+> @@ -149,6 +149,15 @@ Properties	string Address [readonly]
+> 
+> 			The Bluetooth device address.
+> 
+> +		string LEAddressType [readonly, optional]
+> +
+> +			The Bluetooth device LE Identity Address Type. This is
+> +			present only if LE is supported by adapter.
+> +
+> +			Possible values:
+> +				"public" - Public address
+> +				"static" - Static Random address
+> +
 
-frankly, I prefer the capability to establish the L2CAP connection via D-Bus and return the socket fd that way as well. The D-Bus object types for devices do not really match any L2CAP socket address anyway. So if people want to establish a L2CAP connection oriented channel, they should be able to do that right from the D-Bus object manager they already in. We did the same for BR/EDR with the profile-api.txt and that should be a similar approach here.
+actually just call this AddressType and have it default to public for dual-mode and BR/EDR controllers. In case of single-mode LE controller that really uses a static address name it “random”. The static part will be in the address itself.
+
+> 		string Name [readonly]
+> 
+> 			The Bluetooth system name (pretty hostname).
+> diff --git a/doc/device-api.txt b/doc/device-api.txt
+> index 8b69c2ef3..dfeca305c 100644
+> --- a/doc/device-api.txt
+> +++ b/doc/device-api.txt
+> @@ -124,6 +124,15 @@ Properties	string Address [readonly]
+> 
+> 			The Bluetooth device address of the remote device.
+> 
+> +		string LEAddressType [readonly, optional]
+> +
+> +			The Bluetooth device LE Identity Address Type. This is
+> +			present only if device supports LE.
+> +
+> +			Possible values:
+> +				"public" - Public address
+> +				"static" - Static Random address
+> +
+
+And this is the same as above.
 
 Regards
 
