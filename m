@@ -1,58 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20171212124122.10816-1-luiz.dentz@gmail.com>
-References: <20171212124122.10816-1-luiz.dentz@gmail.com>
+In-Reply-To: <20171212125832.13440-1-sbrown@cortland.com>
+References: <20171212125832.13440-1-sbrown@cortland.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 13 Dec 2017 10:28:20 -0200
-Message-ID: <CABBYNZJVBWhD3eqD1W91VvqOz_xw4iBdY9v+um0=+x01DDEauw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] shared/shell: Add submenu description
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 13 Dec 2017 10:27:57 -0200
+Message-ID: <CABBYNZLt5ELEco4UnV8SZMLtPGpC9hRRkbHbpqrLqTEAPDns5A@mail.gmail.com>
+Subject: Re: [PATCH V2 0/8] mesh: Add configuration commands to meshctl
+To: Steve Brown <sbrown@cortland.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Gix, Brian" <brian.gix@intel.com>,
+        "Stotland, Inga" <inga.stotland@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Brian, Inga,
 
-On Tue, Dec 12, 2017 at 10:41 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, Dec 12, 2017 at 10:58 AM,  <sbrown@cortland.com> wrote:
+> From: Steve Brown <sbrown@cortland.com>
 >
-> This adds a field for submenu description.
-> ---
->  src/shared/shell.c | 3 ++-
->  src/shared/shell.h | 1 +
->  2 files changed, 3 insertions(+), 1 deletion(-)
+> This work was done in conjunction with Zephyr pull request.
+> https://github.com/zephyrproject-rtos/zephyr/pull/5322
 >
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index 3aa49597c..b4fdf7043 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -208,7 +208,8 @@ static void shell_print_menu(void)
->                                                 submenu = submenu->next) {
->                         struct bt_shell_menu *menu = submenu->data;
+> Steve Brown (8):
+>   mesh: meshctl: Change command names to <cmd>-<get/set>
+>   mesh: meshctl: Add add/get Subscribe
+>   mesh: meshctl: Add set heartbeat command
+>   mesh: meshctl: Add get app keys command
+>   mesh: meshctl: Add get publish command
+>   mesh: meshctl: Add set/get proxy command
+>   mesh: meshctl: Add get/set identity
+>   mesh: meshctl: Add get/set relay command
 >
-> -                       print_submenu(menu->name, "Submenu");
-> +                       print_submenu(menu->name, menu->desc ? menu->desc :
-> +                                                               "Submenu");
->                 }
->         }
->
-> diff --git a/src/shared/shell.h b/src/shared/shell.h
-> index 5f86ed61e..8b8b1f634 100644
-> --- a/src/shared/shell.h
-> +++ b/src/shared/shell.h
-> @@ -52,6 +52,7 @@ struct bt_shell_menu_entry {
->
->  struct bt_shell_menu {
->         const char *name;
-> +       const char *desc;
->         const struct bt_shell_menu_entry entries[];
->  };
+>  mesh/config-client.c | 452 ++++++++++++++++++++++++++++++++++++++++++++++++---
+>  mesh/net.c           |  20 ++-
+>  2 files changed, 447 insertions(+), 25 deletions(-)
 >
 > --
-> 2.13.6
+> 2.11.0
 
-Applied.
+Can you guys take a look at this? I intend to push them later today.
 
 
 -- 
