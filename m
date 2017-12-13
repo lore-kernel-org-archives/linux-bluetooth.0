@@ -2,33 +2,34 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v2 3/4] device: Add support for AddressType property
-Date: Wed, 13 Dec 2017 14:51:09 +0100
-Message-Id: <20171213135110.27167-3-szymon.janc@codecoup.pl>
+Subject: [PATCH v2 2/4] adapter: Add support for AddressType property
+Date: Wed, 13 Dec 2017 14:51:08 +0100
+Message-Id: <20171213135110.27167-2-szymon.janc@codecoup.pl>
 In-Reply-To: <20171213135110.27167-1-szymon.janc@codecoup.pl>
 References: <20171213135110.27167-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/device.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ src/adapter.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 9f9c47807..72f18b309 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -727,6 +727,22 @@ static gboolean dev_property_get_address(const GDBusPropertyTable *property,
+diff --git a/src/adapter.c b/src/adapter.c
+index 7ac3d20a1..0a25ae27e 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2539,6 +2539,23 @@ static gboolean property_get_address(const GDBusPropertyTable *property,
  	return TRUE;
  }
  
 +static gboolean property_get_address_type(const GDBusPropertyTable *property,
 +					DBusMessageIter *iter, void *user_data)
 +{
-+	struct btd_device *device = user_data;
++	struct btd_adapter *adapter = user_data;
 +	const char *str;
 +
-+	if (device->le && device->bdaddr_type == BDADDR_LE_RANDOM)
++	if ((adapter->current_settings & MGMT_SETTING_LE) &&
++				(adapter->bdaddr_type == BDADDR_LE_RANDOM))
 +		str = "random";
 +	else
 +		str = "public";
@@ -38,26 +39,17 @@ index 9f9c47807..72f18b309 100644
 +	return TRUE;
 +}
 +
- static gboolean dev_property_get_name(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
+ static gboolean property_get_name(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *user_data)
  {
-@@ -2607,6 +2623,7 @@ static const GDBusMethodTable device_methods[] = {
+@@ -3079,6 +3096,7 @@ static const GDBusMethodTable adapter_methods[] = {
  
- static const GDBusPropertyTable device_properties[] = {
- 	{ "Address", "s", dev_property_get_address },
+ static const GDBusPropertyTable adapter_properties[] = {
+ 	{ "Address", "s", property_get_address },
 +	{ "AddressType", "s", property_get_address_type },
- 	{ "Name", "s", dev_property_get_name, NULL, dev_property_exists_name },
- 	{ "Alias", "s", dev_property_get_alias, dev_property_set_alias },
- 	{ "Class", "u", dev_property_get_class, NULL,
-@@ -3850,6 +3867,8 @@ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
- 
- 	g_dbus_emit_property_changed(dbus_conn, device->path,
- 						DEVICE_INTERFACE, "Address");
-+	g_dbus_emit_property_changed(dbus_conn, device->path,
-+					DEVICE_INTERFACE, "AddressType");
- }
- 
- void device_set_bredr_support(struct btd_device *device)
+ 	{ "Name", "s", property_get_name },
+ 	{ "Alias", "s", property_get_alias, property_set_alias },
+ 	{ "Class", "u", property_get_class },
 -- 
 2.14.3
 
