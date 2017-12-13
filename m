@@ -1,70 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] client: Fix printing of array properties
-Date: Wed, 13 Dec 2017 14:28:31 +0100
-Message-Id: <20171213132831.24740-1-szymon.janc@codecoup.pl>
+From: Amitkumar Karwar <amitkarwar@gmail.com>
+To: Kalle Valo <kvalo@codeaurora.org>, marcel@holtmann.org
+Cc: linux-wireless@vger.kernel.org,
+        Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+        Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: [v5 8/8] rsi: sdio changes to support BT
+Date: Wed, 13 Dec 2017 18:12:57 +0530
+Message-Id: <1513168977-2121-9-git-send-email-amitkarwar@gmail.com>
+In-Reply-To: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
+References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-        ServiceData Key: 00001234-0000-1000-8000-00805f9b34fb
-        ServiceData Value:
-"3D     RSSI: -76
-        TxPower: -7
----
- client/main.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
 
-diff --git a/client/main.c b/client/main.c
-index f3369e89a..a4b8b0fe5 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -184,7 +184,7 @@ static void print_fixed_iter(const char *label, const char *name,
- 			return;
+Queue number is correctly updated for BT traffic. Also, kzalloc
+instead of kmalloc is used for Rx packet allocation.
+
+Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+---
+ drivers/net/wireless/rsi/rsi_91x_sdio.c     | 2 ++
+ drivers/net/wireless/rsi/rsi_91x_sdio_ops.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio.c b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+index 5722736..beb18d0 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+@@ -763,6 +763,8 @@ static int rsi_sdio_host_intf_write_pkt(struct rsi_hw *adapter,
+ 	int status;
  
- 		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_printf((void *)valbool, len * sizeof(*valbool));
-+		bt_shell_hexdump((void *)valbool, len * sizeof(*valbool));
+ 	queueno = ((pkt[1] >> 4) & 0xf);
++	if (queueno == RSI_BT_MGMT_Q || queueno == RSI_BT_DATA_Q)
++		queueno = RSI_BT_Q;
  
- 		break;
- 	case DBUS_TYPE_UINT32:
-@@ -194,7 +194,7 @@ static void print_fixed_iter(const char *label, const char *name,
- 			return;
+ 	num_blocks = len / block_size;
  
- 		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_printf((void *)valu32, len * sizeof(*valu32));
-+		bt_shell_hexdump((void *)valu32, len * sizeof(*valu32));
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+index 26abe51..83652bd 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+@@ -103,7 +103,7 @@ static int rsi_process_pkt(struct rsi_common *common)
  
- 		break;
- 	case DBUS_TYPE_UINT16:
-@@ -204,7 +204,7 @@ static void print_fixed_iter(const char *label, const char *name,
- 			return;
+ 	rcv_pkt_len = (num_blks * 256);
  
- 		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_printf((void *)valu16, len * sizeof(*valu16));
-+		bt_shell_hexdump((void *)valu16, len * sizeof(*valu16));
- 
- 		break;
- 	case DBUS_TYPE_INT16:
-@@ -214,7 +214,7 @@ static void print_fixed_iter(const char *label, const char *name,
- 			return;
- 
- 		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_printf((void *)vals16, len * sizeof(*vals16));
-+		bt_shell_hexdump((void *)vals16, len * sizeof(*vals16));
- 
- 		break;
- 	case DBUS_TYPE_BYTE:
-@@ -224,7 +224,7 @@ static void print_fixed_iter(const char *label, const char *name,
- 			return;
- 
- 		bt_shell_printf("%s%s:\n", label, name);
--		bt_shell_printf((void *)byte, len * sizeof(*byte));
-+		bt_shell_hexdump((void *)byte, len * sizeof(*byte));
- 
- 		break;
- 	default:
+-	common->rx_data_pkt = kmalloc(rcv_pkt_len, GFP_KERNEL);
++	common->rx_data_pkt = kzalloc(rcv_pkt_len, GFP_KERNEL);
+ 	if (!common->rx_data_pkt) {
+ 		rsi_dbg(ERR_ZONE, "%s: Failed in memory allocation\n",
+ 			__func__);
 -- 
-2.14.3
+2.7.4
 
