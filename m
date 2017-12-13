@@ -1,40 +1,39 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [PATCH v4] Bluetooth: hci_ll: Add optional nvmem BD address
- source
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1513122852-5135-2-git-send-email-david@lechnology.com>
-Date: Wed, 13 Dec 2017 09:22:11 +0100
-Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
-Message-Id: <A32D2F8C-AE13-4774-AE0E-60547167669F@holtmann.org>
-References: <1513122852-5135-1-git-send-email-david@lechnology.com>
- <1513122852-5135-2-git-send-email-david@lechnology.com>
-To: David Lechner <david@lechnology.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <david@lechnology.com>
+From: David Lechner <david@lechnology.com>
+To: devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
+Cc: David Lechner <david@lechnology.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: hci_ll: add "ti,cc2560" compatible string
+Date: Tue, 12 Dec 2017 18:29:31 -0600
+Message-Id: <1513124971-23717-3-git-send-email-david@lechnology.com>
+In-Reply-To: <1513124971-23717-1-git-send-email-david@lechnology.com>
+References: <1513124971-23717-1-git-send-email-david@lechnology.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+This adds the "ti,cc2560" compatible string for a TI CC2560 chip.
 
-> This adds an optional nvmem consumer to get a BD address from an external
-> source. The BD address is then set in the Bluetooth chip after the
-> firmware has been loaded.
-> 
-> This has been tested working with a TI CC2560A chip (in a LEGO MINDSTORMS
-> EV3).
-> 
-> Signed-off-by: David Lechner <david@lechnology.com>
-> ---
-> drivers/bluetooth/hci_ll.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 61 insertions(+)
+Signed-off-by: David Lechner <david@lechnology.com>
+---
+ drivers/bluetooth/hci_ll.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 9de106f..1b4417a 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -842,6 +842,7 @@ static void hci_ti_remove(struct serdev_device *serdev)
+ }
+ 
+ static const struct of_device_id hci_ti_of_match[] = {
++	{ .compatible = "ti,cc2560" },
+ 	{ .compatible = "ti,wl1271-st" },
+ 	{ .compatible = "ti,wl1273-st" },
+ 	{ .compatible = "ti,wl1281-st" },
+-- 
+2.7.4
