@@ -2,66 +2,69 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 1/4] Add AddressType property for Adapter1 and Device1 interfaces
-Date: Wed, 13 Dec 2017 14:36:35 +0100
-Message-Id: <20171213133638.25852-1-szymon.janc@codecoup.pl>
+Subject: [PATCH] client: Fix printing of array properties
+Date: Wed, 13 Dec 2017 14:28:31 +0100
+Message-Id: <20171213132831.24740-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This provides information about address type being used.  It is needed
-for L2CAP sockets and PTS testing purposes.
+        ServiceData Key: 00001234-0000-1000-8000-00805f9b34fb
+        ServiceData Value:
+"3D     RSSI: -76
+        TxPower: -7
 ---
- doc/adapter-api.txt | 12 ++++++++++++
- doc/device-api.txt  | 13 +++++++++++++
- 2 files changed, 25 insertions(+)
+ client/main.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index d852aa6b9..0533b674a 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -149,6 +149,18 @@ Properties	string Address [readonly]
+diff --git a/client/main.c b/client/main.c
+index f3369e89a..a4b8b0fe5 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -184,7 +184,7 @@ static void print_fixed_iter(const char *label, const char *name,
+ 			return;
  
- 			The Bluetooth device address.
+ 		bt_shell_printf("%s%s:\n", label, name);
+-		bt_shell_printf((void *)valbool, len * sizeof(*valbool));
++		bt_shell_hexdump((void *)valbool, len * sizeof(*valbool));
  
-+		string AddressType [readonly]
-+
-+			The Bluetooth  Address Type. For dual-mode and BR/EDR
-+			only adapter this defaults to "public". Single mode LE
-+			adapters may have either value. With privacy enabled
-+			this contains type of Identity Address and not type of
-+			address used for connection.
-+
-+			Possible values:
-+				"public" - Public address
-+				"random" - Random address
-+
- 		string Name [readonly]
+ 		break;
+ 	case DBUS_TYPE_UINT32:
+@@ -194,7 +194,7 @@ static void print_fixed_iter(const char *label, const char *name,
+ 			return;
  
- 			The Bluetooth system name (pretty hostname).
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 8b69c2ef3..1b448eef1 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -124,6 +124,19 @@ Properties	string Address [readonly]
+ 		bt_shell_printf("%s%s:\n", label, name);
+-		bt_shell_printf((void *)valu32, len * sizeof(*valu32));
++		bt_shell_hexdump((void *)valu32, len * sizeof(*valu32));
  
- 			The Bluetooth device address of the remote device.
+ 		break;
+ 	case DBUS_TYPE_UINT16:
+@@ -204,7 +204,7 @@ static void print_fixed_iter(const char *label, const char *name,
+ 			return;
  
-+		string AddressType [readonly]
-+
-+			The Bluetooth device Address Type. For dual-mode and
-+			BR/EDR only devices this defaults to "public". Single
-+			mode LE devices may have either value. If remote device
-+			uses privacy than before pairing this represents address
-+			type used for connection and Identity Address after
-+			pairing.
-+
-+			Possible values:
-+				"public" - Public address
-+				"random" - Random address
-+
- 		string Name [readonly, optional]
+ 		bt_shell_printf("%s%s:\n", label, name);
+-		bt_shell_printf((void *)valu16, len * sizeof(*valu16));
++		bt_shell_hexdump((void *)valu16, len * sizeof(*valu16));
  
- 			The Bluetooth remote name. This value can not be
+ 		break;
+ 	case DBUS_TYPE_INT16:
+@@ -214,7 +214,7 @@ static void print_fixed_iter(const char *label, const char *name,
+ 			return;
+ 
+ 		bt_shell_printf("%s%s:\n", label, name);
+-		bt_shell_printf((void *)vals16, len * sizeof(*vals16));
++		bt_shell_hexdump((void *)vals16, len * sizeof(*vals16));
+ 
+ 		break;
+ 	case DBUS_TYPE_BYTE:
+@@ -224,7 +224,7 @@ static void print_fixed_iter(const char *label, const char *name,
+ 			return;
+ 
+ 		bt_shell_printf("%s%s:\n", label, name);
+-		bt_shell_printf((void *)byte, len * sizeof(*byte));
++		bt_shell_hexdump((void *)byte, len * sizeof(*byte));
+ 
+ 		break;
+ 	default:
 -- 
 2.14.3
 
