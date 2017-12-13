@@ -1,61 +1,59 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20171212124122.10816-1-luiz.dentz@gmail.com>
+References: <20171212124122.10816-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/9] monitor: Detect string format
-Date: Wed, 13 Dec 2017 10:36:47 -0200
-Message-Id: <20171213123655.24277-1-luiz.dentz@gmail.com>
+Date: Wed, 13 Dec 2017 10:28:20 -0200
+Message-ID: <CABBYNZJVBWhD3eqD1W91VvqOz_xw4iBdY9v+um0=+x01DDEauw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] shared/shell: Add submenu description
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-User may enter UUID in string format other then 128 bits.
----
- monitor/uuid.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+On Tue, Dec 12, 2017 at 10:41 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds a field for submenu description.
+> ---
+>  src/shared/shell.c | 3 ++-
+>  src/shared/shell.h | 1 +
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index 3aa49597c..b4fdf7043 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -208,7 +208,8 @@ static void shell_print_menu(void)
+>                                                 submenu = submenu->next) {
+>                         struct bt_shell_menu *menu = submenu->data;
+>
+> -                       print_submenu(menu->name, "Submenu");
+> +                       print_submenu(menu->name, menu->desc ? menu->desc :
+> +                                                               "Submenu");
+>                 }
+>         }
+>
+> diff --git a/src/shared/shell.h b/src/shared/shell.h
+> index 5f86ed61e..8b8b1f634 100644
+> --- a/src/shared/shell.h
+> +++ b/src/shared/shell.h
+> @@ -52,6 +52,7 @@ struct bt_shell_menu_entry {
+>
+>  struct bt_shell_menu {
+>         const char *name;
+> +       const char *desc;
+>         const struct bt_shell_menu_entry entries[];
+>  };
+>
+> --
+> 2.13.6
 
-diff --git a/monitor/uuid.c b/monitor/uuid.c
-index 9839d03be..bc638a2f3 100644
---- a/monitor/uuid.c
-+++ b/monitor/uuid.c
-@@ -27,6 +27,7 @@
- #endif
- 
- #include <stdio.h>
-+#include <stdlib.h>
- #include <string.h>
- 
- #include "uuid.h"
-@@ -735,12 +736,28 @@ const char *uuid32_to_str(uint32_t uuid)
- const char *uuidstr_to_str(const char *uuid)
- {
- 	uint32_t val;
-+	size_t len;
- 	int i;
- 
- 	if (!uuid)
- 		return NULL;
- 
--	if (strlen(uuid) != 36)
-+	len = strlen(uuid);
-+
-+	if (len < 36) {
-+		char *endptr = NULL;
-+
-+		val = strtol(uuid, &endptr, 0);
-+		if (!endptr || *endptr != '\0')
-+			return NULL;
-+
-+		if (val > UINT16_MAX)
-+			return uuid32_to_str(val);
-+
-+		return uuid16_to_str(val);
-+	}
-+
-+	if (len != 36)
- 		return NULL;
- 
- 	for (i = 0; uuid128_table[i].str; i++) {
+Applied.
+
+
 -- 
-2.13.6
-
+Luiz Augusto von Dentz
