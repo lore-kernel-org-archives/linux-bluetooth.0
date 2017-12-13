@@ -1,46 +1,47 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <lukasz.rymanowski@codecoup.pl>
 MIME-Version: 1.0
-In-Reply-To: <20171212125832.13440-1-sbrown@cortland.com>
-References: <20171212125832.13440-1-sbrown@cortland.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 13 Dec 2017 10:27:57 -0200
-Message-ID: <CABBYNZLt5ELEco4UnV8SZMLtPGpC9hRRkbHbpqrLqTEAPDns5A@mail.gmail.com>
-Subject: Re: [PATCH V2 0/8] mesh: Add configuration commands to meshctl
-To: Steve Brown <sbrown@cortland.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Gix, Brian" <brian.gix@intel.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>
+In-Reply-To: <FAED1DA6-7C0F-47A0-AA07-C392AB43AF67@holtmann.org>
+References: <20171208124057.32162-1-lukasz.rymanowski@codecoup.pl> <FAED1DA6-7C0F-47A0-AA07-C392AB43AF67@holtmann.org>
+From: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Date: Wed, 13 Dec 2017 10:51:55 +0100
+Message-ID: <CAExxLLDKspz53LsjtmCOnwPS+Ds=RKEyxftH5nOk-h-tkE+abg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add support to advertise when connected
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian, Inga,
+Hi Marcel
 
-On Tue, Dec 12, 2017 at 10:58 AM,  <sbrown@cortland.com> wrote:
-> From: Steve Brown <sbrown@cortland.com>
+On 13 December 2017 at 09:42, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Lukasz,
 >
-> This work was done in conjunction with Zephyr pull request.
-> https://github.com/zephyrproject-rtos/zephyr/pull/5322
+>> So far, kernel did not allow to advertise when there was a connection
+>> established. With this patch kernel does allow it if controller
+>> supports it.
+>>
+>> If controller supports non-connectable advertising when connected, then
+>> only non-connectable advertising instances will be advertised.
+>>
+>> Signed-off-by: =C5=81ukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
+>> ---
+>> net/bluetooth/hci_request.c | 55 +++++++++++++++++++++++++++++++++++++--=
+------
+>> 1 file changed, 46 insertions(+), 9 deletions(-)
 >
-> Steve Brown (8):
->   mesh: meshctl: Change command names to <cmd>-<get/set>
->   mesh: meshctl: Add add/get Subscribe
->   mesh: meshctl: Add set heartbeat command
->   mesh: meshctl: Add get app keys command
->   mesh: meshctl: Add get publish command
->   mesh: meshctl: Add set/get proxy command
->   mesh: meshctl: Add get/set identity
->   mesh: meshctl: Add get/set relay command
->
->  mesh/config-client.c | 452 ++++++++++++++++++++++++++++++++++++++++++++++++---
->  mesh/net.c           |  20 ++-
->  2 files changed, 447 insertions(+), 25 deletions(-)
->
-> --
-> 2.11.0
+> patch has been applied to bluetooth-next tree.
 
-Can you guys take a look at this? I intend to push them later today.
+Thanks
+>
+> I also assume that we will be getting mgmt-tester patches to verify the b=
+ehavior.
 
+:) yup, will do.
 
--- 
-Luiz Augusto von Dentz
+>
+> Regards
+>
+> Marcel
+>
+
+=C5=81ukasz
