@@ -2,69 +2,34 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
-Subject: Re: [RFC 1/4] Add LEAddressType property for Adapter1 and Device1
- interfaces
+Subject: Re: [PATCH] Bluetooth: Add support to advertise when connected
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20171211103837.25150-1-szymon.janc@codecoup.pl>
-Date: Wed, 13 Dec 2017 09:47:07 +0100
+In-Reply-To: <20171208124057.32162-1-lukasz.rymanowski@codecoup.pl>
+Date: Wed, 13 Dec 2017 09:42:35 +0100
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <76FA8EB0-63F0-45E2-BE1A-DCC06DA1C7ED@holtmann.org>
-References: <20171211103837.25150-1-szymon.janc@codecoup.pl>
-To: Szymon Janc <szymon.janc@codecoup.pl>
+Message-Id: <FAED1DA6-7C0F-47A0-AA07-C392AB43AF67@holtmann.org>
+References: <20171208124057.32162-1-lukasz.rymanowski@codecoup.pl>
+To: =?utf-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Lukasz,
 
-> This provides information about LE Identity Address Type used. This
-> information is needed for L2CAP sockets and for PTS testing purposes.
+> So far, kernel did not allow to advertise when there was a connection
+> established. With this patch kernel does allow it if controller
+> supports it.
+> 
+> If controller supports non-connectable advertising when connected, then
+> only non-connectable advertising instances will be advertised.
+> 
+> Signed-off-by: Łukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
 > ---
-> doc/adapter-api.txt | 9 +++++++++
-> doc/device-api.txt  | 9 +++++++++
-> 2 files changed, 18 insertions(+)
-> 
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index d852aa6b9..b5abdda39 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -149,6 +149,15 @@ Properties	string Address [readonly]
-> 
-> 			The Bluetooth device address.
-> 
-> +		string LEAddressType [readonly, optional]
-> +
-> +			The Bluetooth device LE Identity Address Type. This is
-> +			present only if LE is supported by adapter.
-> +
-> +			Possible values:
-> +				"public" - Public address
-> +				"static" - Static Random address
-> +
+> net/bluetooth/hci_request.c | 55 +++++++++++++++++++++++++++++++++++++--------
+> 1 file changed, 46 insertions(+), 9 deletions(-)
 
-actually just call this AddressType and have it default to public for dual-mode and BR/EDR controllers. In case of single-mode LE controller that really uses a static address name it “random”. The static part will be in the address itself.
+patch has been applied to bluetooth-next tree.
 
-> 		string Name [readonly]
-> 
-> 			The Bluetooth system name (pretty hostname).
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index 8b69c2ef3..dfeca305c 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -124,6 +124,15 @@ Properties	string Address [readonly]
-> 
-> 			The Bluetooth device address of the remote device.
-> 
-> +		string LEAddressType [readonly, optional]
-> +
-> +			The Bluetooth device LE Identity Address Type. This is
-> +			present only if device supports LE.
-> +
-> +			Possible values:
-> +				"public" - Public address
-> +				"static" - Static Random address
-> +
-
-And this is the same as above.
+I also assume that we will be getting mgmt-tester patches to verify the behavior.
 
 Regards
 
