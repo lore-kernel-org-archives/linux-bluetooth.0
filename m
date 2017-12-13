@@ -6,308 +6,289 @@ Cc: linux-wireless@vger.kernel.org,
         Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
         linux-bluetooth@vger.kernel.org,
         Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Subject: [v5 6/8] rsi: handle BT traffic in driver
-Date: Wed, 13 Dec 2017 18:12:55 +0530
-Message-Id: <1513168977-2121-7-git-send-email-amitkarwar@gmail.com>
+Subject: [v5 5/8] Bluetooth: btrsi: add new rsi bluetooth driver
+Date: Wed, 13 Dec 2017 18:12:54 +0530
+Message-Id: <1513168977-2121-6-git-send-email-amitkarwar@gmail.com>
 In-Reply-To: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
 References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
 
-BT frames are passed through coex and hal modules to BUS.
-After firmware is loaded, based on the operating mode CARD
-READY frame comes for each protocol. When BT card ready is
-received, BT attach is called.
-Protocol operations are exchanged between the modules
-at initialization time.
+Redpine bluetooth driver is a thin driver which depends on
+'rsi_91x' driver for transmitting and receiving packets
+to/from device. It creates hci interface when attach() is
+called from 'rsi_91x' module.
 
-Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
 Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
 Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
 ---
-v5: Same as v3, v4
-v3: bt_ops need not be present structure g_proto_ops. It is removed.
-v2: WLAN module depends on BT module. Updated in Kconfig
+v5: Addressed review comments from Marcel.
+    Removed reduntant switch case code from rsi_hci_recv_pkt()
+    Changed bt_cb(skb)->pkt_type to hci_skb_pkt_type(skb)
+    Removed reduntant '\n' from BT_ERR and redundant BT_INFO messages
+    Changed u8 *pkt to const u8 *pkt in rsi_hci_recv_pkt()
+v4: Removed rsi_hci.h file. Made the functions static(Marcel)
+v3: Made BT_RSI module by default off(Marcel)
+    Removed redundant exported function rsi_get_hci_ops()(Marcel)
+v2: Addressed review comments from Marcel
+    Removed unnecessary 'depends on BT && BT_RFOMM' line in Kconfig
+    Removed redundant BT_INFO messages
+    h_adapter initialization and declaration in a single line.
+    Removed unnecessary error checks for HCI_RUNNING and fsm_state
+    Allocated new skb with skb_realloc_headroom() API if headroom is not sufficient
+    Used get_unaligned_le16 helpers
+    Moved a structure and union from header file to btrsi.c file
 ---
- drivers/net/wireless/rsi/Kconfig            |  2 +-
- drivers/net/wireless/rsi/rsi_91x_coex.c     |  4 ++-
- drivers/net/wireless/rsi/rsi_91x_core.c     | 16 ++++++++----
- drivers/net/wireless/rsi/rsi_91x_hal.c      | 39 +++++++++++++++++++++++++++++
- drivers/net/wireless/rsi/rsi_91x_main.c     | 31 +++++++++++++++++++++++
- drivers/net/wireless/rsi/rsi_91x_sdio_ops.c |  1 +
- drivers/net/wireless/rsi/rsi_common.h       |  1 +
- drivers/net/wireless/rsi/rsi_hal.h          | 10 ++++++++
- drivers/net/wireless/rsi/rsi_main.h         |  3 +++
- 9 files changed, 100 insertions(+), 7 deletions(-)
+ drivers/bluetooth/Kconfig  |  11 +++
+ drivers/bluetooth/Makefile |   2 +
+ drivers/bluetooth/btrsi.c  | 188 +++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/rsi_header.h |   4 +-
+ 4 files changed, 204 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/bluetooth/btrsi.c
 
-diff --git a/drivers/net/wireless/rsi/Kconfig b/drivers/net/wireless/rsi/Kconfig
-index 7c5e4ca..ad72c80 100644
---- a/drivers/net/wireless/rsi/Kconfig
-+++ b/drivers/net/wireless/rsi/Kconfig
-@@ -13,7 +13,7 @@ if WLAN_VENDOR_RSI
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 60e1c7d..33d7514 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -378,4 +378,15 @@ config BT_QCOMSMD
+ 	  Say Y here to compile support for HCI over Qualcomm SMD into the
+ 	  kernel or say M to compile as a module.
  
- config RSI_91X
- 	tristate "Redpine Signals Inc 91x WLAN driver support"
--	depends on MAC80211
-+	depends on MAC80211 && BT_RSI
- 	---help---
- 	  This option enabes support for RSI 1x1 devices.
- 	  Select M (recommended), if you have a RSI 1x1 wireless module.
-diff --git a/drivers/net/wireless/rsi/rsi_91x_coex.c b/drivers/net/wireless/rsi/rsi_91x_coex.c
-index 914a0c5..f502cf9 100644
---- a/drivers/net/wireless/rsi/rsi_91x_coex.c
-+++ b/drivers/net/wireless/rsi/rsi_91x_coex.c
-@@ -48,8 +48,10 @@ static void rsi_coex_sched_tx_pkts(struct rsi_coex_ctrl_block *coex_cb)
- 			break;
- 		}
++config BT_RSI
++	tristate "Redpine HCI support"
++	default n
++	help
++	  Redpine BT driver.
++	  This driver handles BT traffic from upper layers and pass
++	  to the RSI_91x coex module for further scheduling to device
++
++	  Say Y here to compile support for HCI over Redpine into the
++	  kernel or say M to compile as a module.
++
+ endmenu
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 4e4e44d..712af83a 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -28,6 +28,8 @@ obj-$(CONFIG_BT_QCA)		+= btqca.o
  
--		if (coex_q == RSI_COEX_Q_BT)
-+		if (coex_q == RSI_COEX_Q_BT) {
- 			skb = skb_dequeue(&coex_cb->coex_tx_qs[RSI_COEX_Q_BT]);
-+			rsi_send_bt_pkt(coex_cb->priv, skb);
-+		}
- 	}
- }
+ obj-$(CONFIG_BT_HCIUART_NOKIA)	+= hci_nokia.o
  
-diff --git a/drivers/net/wireless/rsi/rsi_91x_core.c b/drivers/net/wireless/rsi/rsi_91x_core.c
-index d0d2201..046ace8 100644
---- a/drivers/net/wireless/rsi/rsi_91x_core.c
-+++ b/drivers/net/wireless/rsi/rsi_91x_core.c
-@@ -17,6 +17,7 @@
- #include "rsi_mgmt.h"
- #include "rsi_common.h"
- #include "rsi_hal.h"
-+#include "rsi_coex.h"
++obj-$(CONFIG_BT_RSI)		+= btrsi.o
++
+ btmrvl-y			:= btmrvl_main.o
+ btmrvl-$(CONFIG_DEBUG_FS)	+= btmrvl_debugfs.o
  
- /**
-  * rsi_determine_min_weight_queue() - This function determines the queue with
-@@ -301,14 +302,19 @@ void rsi_core_qos_processor(struct rsi_common *common)
- 			mutex_unlock(&common->tx_lock);
- 			break;
- 		}
--
--		if (q_num == MGMT_SOFT_Q) {
--			status = rsi_send_mgmt_pkt(common, skb);
--		} else if (q_num == MGMT_BEACON_Q) {
-+		if (q_num == MGMT_BEACON_Q) {
- 			status = rsi_send_pkt_to_bus(common, skb);
- 			dev_kfree_skb(skb);
- 		} else {
--			status = rsi_send_data_pkt(common, skb);
-+			if (common->coex_mode > 1) {
-+				status = rsi_coex_send_pkt(common, skb,
-+							   RSI_WLAN_Q);
-+			} else {
-+				if (q_num == MGMT_SOFT_Q)
-+					status = rsi_send_mgmt_pkt(common, skb);
-+				else
-+					status = rsi_send_data_pkt(common, skb);
-+			}
- 		}
- 
- 		if (status) {
-diff --git a/drivers/net/wireless/rsi/rsi_91x_hal.c b/drivers/net/wireless/rsi/rsi_91x_hal.c
-index 8b30448..883dba1 100644
---- a/drivers/net/wireless/rsi/rsi_91x_hal.c
-+++ b/drivers/net/wireless/rsi/rsi_91x_hal.c
-@@ -15,6 +15,7 @@
-  */
- 
- #include <linux/firmware.h>
+diff --git a/drivers/bluetooth/btrsi.c b/drivers/bluetooth/btrsi.c
+new file mode 100644
+index 0000000..c9e92cc
+--- /dev/null
++++ b/drivers/bluetooth/btrsi.c
+@@ -0,0 +1,188 @@
++/**
++ * Copyright (c) 2017 Redpine Signals Inc.
++ *
++ * Permission to use, copy, modify, and/or distribute this software for any
++ * purpose with or without fee is hereby granted, provided that the above
++ * copyright notice and this permission notice appear in all copies.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
++ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
++ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
++ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
++ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++ */
++#include <linux/version.h>
++#include <linux/module.h>
++#include <linux/kernel.h>
 +#include <net/bluetooth/bluetooth.h>
- #include "rsi_mgmt.h"
- #include "rsi_hal.h"
- #include "rsi_sdio.h"
-@@ -24,6 +25,7 @@
- static struct ta_metadata metadata_flash_content[] = {
- 	{"flash_content", 0x00010000},
- 	{"rsi/rs9113_wlan_qspi.rps", 0x00010000},
-+	{"rsi/rs9113_wlan_bt_dual_mode.rps", 0x00010000},
- };
- 
- int rsi_send_pkt_to_bus(struct rsi_common *common, struct sk_buff *skb)
-@@ -357,6 +359,43 @@ int rsi_send_mgmt_pkt(struct rsi_common *common,
- 	return status;
- }
- 
-+int rsi_send_bt_pkt(struct rsi_common *common, struct sk_buff *skb)
-+{
-+	int status = -EINVAL;
-+	u8 header_size = 0;
-+	struct rsi_bt_desc *bt_desc;
-+	u8 queueno = ((skb->data[1] >> 4) & 0xf);
-+
-+	if (queueno == RSI_BT_MGMT_Q) {
-+		status = rsi_send_pkt_to_bus(common, skb);
-+		if (status)
-+			rsi_dbg(ERR_ZONE, "%s: Failed to write bt mgmt pkt\n",
-+				__func__);
-+		goto out;
-+	}
-+	header_size = FRAME_DESC_SZ;
-+	if (header_size > skb_headroom(skb)) {
-+		rsi_dbg(ERR_ZONE, "%s: Not enough headroom\n", __func__);
-+		status = -ENOSPC;
-+		goto out;
-+	}
-+	skb_push(skb, header_size);
-+	memset(skb->data, 0, header_size);
-+	bt_desc = (struct rsi_bt_desc *)skb->data;
-+
-+	rsi_set_len_qno(&bt_desc->len_qno, (skb->len - FRAME_DESC_SZ),
-+			RSI_BT_DATA_Q);
-+	bt_desc->bt_pkt_type = cpu_to_le16(bt_cb(skb)->pkt_type);
-+
-+	status = rsi_send_pkt_to_bus(common, skb);
-+	if (status)
-+		rsi_dbg(ERR_ZONE, "%s: Failed to write bt pkt\n", __func__);
-+
-+out:
-+	dev_kfree_skb(skb);
-+	return status;
-+}
-+
- int rsi_prepare_beacon(struct rsi_common *common, struct sk_buff *skb)
- {
- 	struct rsi_hw *adapter = (struct rsi_hw *)common->priv;
-diff --git a/drivers/net/wireless/rsi/rsi_91x_main.c b/drivers/net/wireless/rsi/rsi_91x_main.c
-index 7dce533..375b725 100644
---- a/drivers/net/wireless/rsi/rsi_91x_main.c
-+++ b/drivers/net/wireless/rsi/rsi_91x_main.c
-@@ -18,6 +18,7 @@
- 
- #include <linux/module.h>
- #include <linux/firmware.h>
++#include <net/bluetooth/hci_core.h>
++#include <linux/unaligned/le_byteshift.h>
 +#include <linux/rsi_header.h>
- #include "rsi_mgmt.h"
- #include "rsi_common.h"
- #include "rsi_coex.h"
-@@ -35,6 +36,12 @@ u32 rsi_zone_enabled = /* INFO_ZONE |
- 			0;
- EXPORT_SYMBOL_GPL(rsi_zone_enabled);
- 
-+static struct rsi_proto_ops g_proto_ops = {
-+	.coex_send_pkt = rsi_coex_send_pkt,
-+	.get_host_intf = rsi_get_host_intf,
-+	.set_bt_context = rsi_set_bt_context,
++#include <net/genetlink.h>
++
++#define RSI_HEADROOM_FOR_BT_HAL	16
++#define RSI_FRAME_DESC_SIZE	16
++
++static struct rsi_hci_adapter {
++	void *priv;
++	struct rsi_proto_ops *proto_ops;
++	struct hci_dev *hdev;
 +};
 +
- /**
-  * rsi_dbg() - This function outputs informational messages.
-  * @zone: Zone of interest for output message.
-@@ -144,6 +151,7 @@ int rsi_read_pkt(struct rsi_common *common, u8 *rx_pkt, s32 rcv_pkt_len)
- 	u32 index, length = 0, queueno = 0;
- 	u16 actual_length = 0, offset;
- 	struct sk_buff *skb = NULL;
-+	u8 bt_pkt_type;
- 
- 	index = 0;
- 	do {
-@@ -183,6 +191,22 @@ int rsi_read_pkt(struct rsi_common *common, u8 *rx_pkt, s32 rcv_pkt_len)
- 			rsi_mgmt_pkt_recv(common, (frame_desc + offset));
- 			break;
- 
-+		case RSI_BT_MGMT_Q:
-+		case RSI_BT_DATA_Q:
-+#define BT_RX_PKT_TYPE_OFST	14
-+#define BT_CARD_READY_IND	0x89
-+			bt_pkt_type = frame_desc[offset + BT_RX_PKT_TYPE_OFST];
-+			if (bt_pkt_type == BT_CARD_READY_IND) {
-+				rsi_dbg(INFO_ZONE, "BT Card ready recvd\n");
-+				if (rsi_bt_ops.attach(common, &g_proto_ops))
-+					rsi_dbg(ERR_ZONE,
-+						"Failed to attach BT module\n");
-+			} else {
-+				rsi_bt_ops.recv_pkt(common->bt_adapter,
-+						    frame_desc + offset);
-+			}
-+			break;
-+
- 		default:
- 			rsi_dbg(ERR_ZONE, "%s: pkt from invalid queue: %d\n",
- 				__func__,   queueno);
-@@ -230,6 +254,13 @@ enum rsi_host_intf rsi_get_host_intf(void *priv)
- 	return common->priv->rsi_host_intf;
- }
- 
-+void rsi_set_bt_context(void *priv, void *bt_context)
++static int rsi_hci_open(struct hci_dev *hdev)
 +{
-+	struct rsi_common *common = (struct rsi_common *)priv;
-+
-+	common->bt_adapter = bt_context;
++	return 0;
 +}
 +
- /**
-  * rsi_91x_init() - This function initializes os interface operations.
-  * @void: Void.
-diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
-index 9fbc0ef..26abe51 100644
---- a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
-+++ b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
-@@ -16,6 +16,7 @@
-  */
- 
- #include <linux/firmware.h>
-+#include <linux/rsi_header.h>
- #include "rsi_sdio.h"
- #include "rsi_common.h"
- 
-diff --git a/drivers/net/wireless/rsi/rsi_common.h b/drivers/net/wireless/rsi/rsi_common.h
-index 1d8af41..4616585 100644
---- a/drivers/net/wireless/rsi/rsi_common.h
-+++ b/drivers/net/wireless/rsi/rsi_common.h
-@@ -62,6 +62,7 @@ static inline int rsi_create_kthread(struct rsi_common *common,
- 				     u8 *name)
- {
- 	init_completion(&thread->completion);
-+	atomic_set(&thread->thread_done, 0);
- 	thread->task = kthread_run(func_ptr, common, "%s", name);
- 	if (IS_ERR(thread->task))
- 		return (int)PTR_ERR(thread->task);
-diff --git a/drivers/net/wireless/rsi/rsi_hal.h b/drivers/net/wireless/rsi/rsi_hal.h
-index a09d36b..e712223 100644
---- a/drivers/net/wireless/rsi/rsi_hal.h
-+++ b/drivers/net/wireless/rsi/rsi_hal.h
-@@ -145,8 +145,18 @@ struct rsi_data_desc {
- 	u8 sta_id;
- } __packed;
- 
-+struct rsi_bt_desc {
-+	__le16 len_qno;
-+	__le16 reserved1;
-+	__le32 reserved2;
-+	__le32 reserved3;
-+	__le16 reserved4;
-+	__le16 bt_pkt_type;
-+} __packed;
++static int rsi_hci_close(struct hci_dev *hdev)
++{
++	return 0;
++}
 +
- int rsi_hal_device_init(struct rsi_hw *adapter);
- int rsi_prepare_beacon(struct rsi_common *common, struct sk_buff *skb);
- int rsi_send_pkt_to_bus(struct rsi_common *common, struct sk_buff *skb);
-+int rsi_send_bt_pkt(struct rsi_common *common, struct sk_buff *skb);
- 
- #endif
-diff --git a/drivers/net/wireless/rsi/rsi_main.h b/drivers/net/wireless/rsi/rsi_main.h
-index e1c1dc8..69a604e 100644
---- a/drivers/net/wireless/rsi/rsi_main.h
-+++ b/drivers/net/wireless/rsi/rsi_main.h
-@@ -290,6 +290,8 @@ struct rsi_common {
- 	bool p2p_enabled;
- 	struct timer_list roc_timer;
- 	struct ieee80211_vif *roc_vif;
++static int rsi_hci_flush(struct hci_dev *hdev)
++{
++	return 0;
++}
 +
-+	void *bt_adapter;
++static int rsi_hci_send_pkt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct rsi_hci_adapter *h_adapter = hci_get_drvdata(hdev);
++	struct sk_buff *new_skb = NULL;
++
++	switch (hci_skb_pkt_type(skb)) {
++	case HCI_COMMAND_PKT:
++		hdev->stat.cmd_tx++;
++		break;
++	case HCI_ACLDATA_PKT:
++		hdev->stat.acl_tx++;
++		break;
++	case HCI_SCODATA_PKT:
++		hdev->stat.sco_tx++;
++		break;
++	}
++
++	if (skb_headroom(skb) < RSI_HEADROOM_FOR_BT_HAL) {
++		/* Insufficient skb headroom - allocate a new skb */
++		new_skb = skb_realloc_headroom(skb, RSI_HEADROOM_FOR_BT_HAL);
++		if (unlikely(!new_skb))
++			return -ENOMEM;
++		bt_cb(new_skb)->pkt_type = hci_skb_pkt_type(skb);
++		kfree_skb(skb);
++		skb = new_skb;
++	}
++
++	return h_adapter->proto_ops->coex_send_pkt(h_adapter->priv, skb,
++						   RSI_BT_Q);
++}
++
++static int rsi_hci_recv_pkt(void *priv, const u8 *pkt)
++{
++	struct rsi_hci_adapter *h_adapter = priv;
++	struct hci_dev *hdev = h_adapter->hdev;
++	struct sk_buff *skb;
++	int pkt_len = get_unaligned_le16(pkt) & 0x0fff;
++
++	skb = dev_alloc_skb(pkt_len);
++	if (!skb)
++		return -ENOMEM;
++
++	memcpy(skb->data, pkt + RSI_FRAME_DESC_SIZE, pkt_len);
++	skb_put(skb, pkt_len);
++	h_adapter->hdev->stat.byte_rx += skb->len;
++
++	hci_skb_pkt_type(skb) = pkt[14];
++
++	return hci_recv_frame(hdev, skb);
++}
++
++static int rsi_hci_attach(void *priv, struct rsi_proto_ops *ops)
++{
++	struct rsi_hci_adapter *h_adapter = NULL;
++	struct hci_dev *hdev;
++	int err = 0;
++
++	h_adapter = kzalloc(sizeof(*h_adapter), GFP_KERNEL);
++	if (!h_adapter)
++		return -ENOMEM;
++
++	h_adapter->priv = priv;
++	ops->set_bt_context(priv, h_adapter);
++	h_adapter->proto_ops = ops;
++
++	hdev = hci_alloc_dev();
++	if (!hdev) {
++		BT_ERR("Failed to alloc HCI device");
++		goto err;
++	}
++
++	h_adapter->hdev = hdev;
++
++	if (ops->get_host_intf(priv) == RSI_HOST_INTF_SDIO)
++		hdev->bus = HCI_SDIO;
++	else
++		hdev->bus = HCI_USB;
++
++	hci_set_drvdata(hdev, h_adapter);
++	hdev->dev_type = HCI_PRIMARY;
++	hdev->open = rsi_hci_open;
++	hdev->close = rsi_hci_close;
++	hdev->flush = rsi_hci_flush;
++	hdev->send = rsi_hci_send_pkt;
++
++	err = hci_register_dev(hdev);
++	if (err < 0) {
++		BT_ERR("HCI registration failed with errcode %d", err);
++		hci_free_dev(hdev);
++		goto err;
++	}
++
++	return 0;
++err:
++	h_adapter->hdev = NULL;
++	kfree(h_adapter);
++	return -EINVAL;
++}
++
++static void rsi_hci_detach(void *priv)
++{
++	struct rsi_hci_adapter *h_adapter = priv;
++	struct hci_dev *hdev;
++
++	if (!h_adapter)
++		return;
++
++	hdev = h_adapter->hdev;
++	if (hdev) {
++		hci_unregister_dev(hdev);
++		hci_free_dev(hdev);
++		h_adapter->hdev = NULL;
++	}
++
++	kfree(h_adapter);
++}
++
++const struct rsi_mod_ops rsi_bt_ops = {
++	.attach	= rsi_hci_attach,
++	.detach	= rsi_hci_detach,
++	.recv_pkt = rsi_hci_recv_pkt,
++};
++EXPORT_SYMBOL(rsi_bt_ops);
++
++static int rsi_91x_bt_module_init(void)
++{
++	return 0;
++}
++
++static void rsi_91x_bt_module_exit(void)
++{
++	return;
++}
++
++module_init(rsi_91x_bt_module_init);
++module_exit(rsi_91x_bt_module_exit);
++MODULE_AUTHOR("Redpine Signals Inc");
++MODULE_DESCRIPTION("RSI BT driver");
++MODULE_SUPPORTED_DEVICE("RSI-BT");
++MODULE_LICENSE("Dual BSD/GPL");
+diff --git a/include/linux/rsi_header.h b/include/linux/rsi_header.h
+index 737ab4e..040f07b 100644
+--- a/include/linux/rsi_header.h
++++ b/include/linux/rsi_header.h
+@@ -49,6 +49,8 @@ struct rsi_proto_ops {
+ struct rsi_mod_ops {
+ 	int (*attach)(void *priv, struct rsi_proto_ops *ops);
+ 	void (*detach)(void *priv);
+-	int (*recv_pkt)(void *priv, u8 *msg);
++	int (*recv_pkt)(void *priv, const u8 *msg);
  };
- 
- struct eepromrw_info {
-@@ -363,5 +365,6 @@ struct rsi_host_intf_ops {
- };
- 
- enum rsi_host_intf rsi_get_host_intf(void *priv);
-+void rsi_set_bt_context(void *priv, void *bt_context);
- 
++
++extern const struct rsi_mod_ops rsi_bt_ops;
  #endif
 -- 
 2.7.4
