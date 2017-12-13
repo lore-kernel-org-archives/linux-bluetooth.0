@@ -1,52 +1,32 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: John Klug <ski.brimson@gmail.com>
-Date: Wed, 13 Dec 2017 18:13:09 -0600
-Message-ID: <CADU0Vqxge=ESPPT3YWPt9VCRZCCX=VM5AHBYVnVQsKP3_mveiA@mail.gmail.com>
-Subject: Profile1 close question
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.1 \(3445.4.7\))
+Subject: Re: [PATCH v1] Bluetooth: introduce DEFINE_SHOW_ATTRIBUTE() macro
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20171122211546.5682-1-andriy.shevchenko@linux.intel.com>
+Date: Wed, 13 Dec 2017 20:21:07 +0100
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
+Message-Id: <6B41E55E-5F67-4BE8-A69B-D82740080D40@holtmann.org>
+References: <20171122211546.5682-1-andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The file descriptor that is placed as a parameter to the NewConnection
-callback does not close the connection when it is called with the OS's
-close.  This is using Bluez 5.47 on Linux.
+Hi Andy,
 
-Bluetoothctl still shows the connection as being up, as does the remote.
+> This macro deduplicates a lot of similar code across the hci_debugfs.c
+> module. Targeting to be moved to seq_file.h eventually.
+> 
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+> net/bluetooth/hci_debugfs.c | 184 +++++---------------------------------------
+> 1 file changed, 18 insertions(+), 166 deletions(-)
 
-What method should one use to close the connection?
+patch has been applied to bluetooth-next tree.
 
-I am using Python and GObject Introspection.
+Regards
 
-Before connection:
-rw.py   3983 root    0u      CHR      136,3      0t0     6 /dev/pts/3
-rw.py   3983 root    1u      CHR      136,3      0t0     6 /dev/pts/3
-rw.py   3983 root    2u      CHR      136,3      0t0     6 /dev/pts/3
-rw.py   3983 root    3u     unix 0xceaf54a0      0t0 22976 type=STREAM
-rw.py   3983 root    4u  a_inode        0,9        0     7 [eventfd]
-rw.py   3983 root    5u  a_inode        0,9        0     7 [eventfd]
-
-After Connection:
-NewConnection(/org/bluez/hci0/dev_BC_44_86_56_6B_95, 8)
-
-rw.py   3983 root    0u      CHR      136,3      0t0     6 /dev/pts/3
-rw.py   3983 root    1u      CHR      136,3      0t0     6 /dev/pts/3
-rw.py   3983 root    2u      CHR      136,3      0t0     6 /dev/pts/3
-rw.py   3983 root    3u     unix 0xceaf54a0      0t0 22976 type=STREAM
-rw.py   3983 root    4u  a_inode        0,9        0     7 [eventfd]
-rw.py   3983 root    5u  a_inode        0,9        0     7 [eventfd]
-rw.py   3983 root    8u     sock        0,7      0t0 23050 protocol: RFCOMM
-
-After Close:
-rw.py   3983 root    0u      CHR      136,3      0t0     6 /dev/pts/3
-rw.py   3983 root    1u      CHR      136,3      0t0     6 /dev/pts/3
-rw.py   3983 root    2u      CHR      136,3      0t0     6 /dev/pts/3
-rw.py   3983 root    3u     unix 0xceaf54a0      0t0 22976 type=STREAM
-rw.py   3983 root    4u  a_inode        0,9        0     7 [eventfd]
-rw.py   3983 root    5u  a_inode        0,9        0     7 [eventfd]
-
-
-Device BC:44:86:56:6B:95
-...
-Connected: yes
+Marcel
