@@ -1,33 +1,110 @@
-Return-Path: <kvalo@codeaurora.org>
-From: Kalle Valo <kvalo@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Amitkumar Karwar <amitkarwar@gmail.com>,  linux-wireless <linux-wireless@vger.kernel.org>,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  "open list\:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Subject: Re: [v4 5/8] Bluetooth: btrsi: add new rsi bluetooth driver
-References: <1512554197-19664-1-git-send-email-amitkarwar@gmail.com>
-	<1512554197-19664-6-git-send-email-amitkarwar@gmail.com>
-	<282AE144-205D-4FF2-B28C-3E348D227342@holtmann.org>
-	<CAEhWJFnsPa2aP4_4X4ObY-2RnjYPTQ_mpJLqEd-d=FPE8EjqmQ@mail.gmail.com>
-	<92506E80-6329-4A53-BCB2-060AF1A1A396@holtmann.org>
-Date: Thu, 14 Dec 2017 14:16:40 +0200
-In-Reply-To: <92506E80-6329-4A53-BCB2-060AF1A1A396@holtmann.org> (Marcel
-	Holtmann's message of "Wed, 13 Dec 2017 14:47:14 +0100")
-Message-ID: <87r2rxmrmf.fsf@kamboji.qca.qualcomm.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 11/11] client: Make scan:clear clear individual fields
+Date: Thu, 14 Dec 2017 10:03:00 -0200
+Message-Id: <20171214120300.20018-11-luiz.dentz@gmail.com>
+In-Reply-To: <20171214120300.20018-1-luiz.dentz@gmail.com>
+References: <20171214120300.20018-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann <marcel@holtmann.org> writes:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
->> Thanks for your review.
->> We have addressed these comments and submitted v5.
->
-> minor comment from my side, but otherwise looks good to me. Due to the
-> dependency, I think this should go via wireless-drivers tree.
->
-> Kalle, I think it is up to you to take the whole set.
+This reintroduces the option to clear individual fields which was
+removed when redesining the commands which now read the fields when
+no arguments are provided.
+---
+ client/main.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 56 insertions(+), 5 deletions(-)
 
-Ok, thanks.. But please note that I haven't had a chance to review the
-wireless part yet.
-
+diff --git a/client/main.c b/client/main.c
+index 3fd2c96cc..802b841e2 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1409,18 +1409,68 @@ static void clear_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
+ 	dbus_message_iter_close_container(iter, &dict);
+ }
+ 
+-static void cmd_scan_filter_clear(int argc, char *argv[])
++static void filter_clear_uuids(void)
+ {
+-	/* set default values for all options */
+-	filter.rssi = DISTANCE_VAL_INVALID;
+-	filter.pathloss = DISTANCE_VAL_INVALID;
+ 	g_strfreev(filter.uuids);
+ 	filter.uuids = NULL;
+ 	filter.uuids_len = 0;
++}
++
++static void filter_clear_rssi(void)
++{
++	filter.rssi = DISTANCE_VAL_INVALID;
++}
++
++static void filter_clear_pathloss(void)
++{
++	filter.pathloss = DISTANCE_VAL_INVALID;
++}
++
++static void filter_clear_transport(void)
++{
+ 	g_free(filter.transport);
+ 	filter.transport = NULL;
++}
++
++static void filter_clear_duplicate(void)
++{
+ 	filter.duplicate = false;
++}
++
++static const struct filter_clear {
++	const char *name;
++	void (*clear) (void);
++} filter_clear[] = {
++	{ "uuids", filter_clear_uuids },
++	{ "rssi", filter_clear_rssi },
++	{ "pathloss", filter_clear_pathloss },
++	{ "transport", filter_clear_transport },
++	{ "duplicate-data", filter_clear_duplicate },
++	{}
++};
++
++static void cmd_scan_filter_clear(int argc, char *argv[])
++{
++	const struct filter_clear *fc;
++	bool all = false;
++
++	if (argc < 2 || !strlen(argv[1]))
++		all = true;
+ 
++	for (fc = filter_clear; fc && fc->name; fc++) {
++		if (all || !strcmp(fc->name, argv[1])) {
++			fc->clear();
++			if (!all)
++				goto done;
++		}
++	}
++
++	if (!all) {
++		bt_shell_printf("Invalid argument %s\n", argv[1]);
++		return;
++	}
++
++done:
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
+ 
+@@ -2273,7 +2323,8 @@ static const struct bt_shell_menu scan_menu = {
+ 	{ "duplicate-data", "[on/off]", cmd_scan_filter_duplicate_data,
+ 				"Set/Get duplicate data filter",
+ 				mode_generator },
+-	{ "clear", NULL, cmd_scan_filter_clear,
++	{ "clear", "[uuids/rssi/pathloss/transport/duplicate-data]",
++				cmd_scan_filter_clear,
+ 				"Clears discovery filter." },
+ 	{ } },
+ };
 -- 
-Kalle Valo
+2.13.6
+
