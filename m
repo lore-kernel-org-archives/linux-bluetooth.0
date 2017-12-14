@@ -1,60 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Steve Brown <sbrown@cortland.com>
-Message-ID: <1513293681.4409.12.camel@ewol.com>
-Subject: meshctl: publish db entry malformed for 2d model of an element
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 14 Dec 2017 16:21:21 -0700
+MIME-Version: 1.0
+In-Reply-To: <1530610.7dBsjPVAZJ@ix>
+References: <CADU0Vqxge=ESPPT3YWPt9VCRZCCX=VM5AHBYVnVQsKP3_mveiA@mail.gmail.com>
+ <CADU0VqxBm3dv3oMsvMLqQ_h0EqwQpekJsVT6RkZZ_buiK_db_w@mail.gmail.com> <1530610.7dBsjPVAZJ@ix>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 14 Dec 2017 14:08:21 -0200
+Message-ID: <CABBYNZ+8h5Q7HCevDAxOAC7RUaOvY9qK1sM_NGNt5RzLXSahJA@mail.gmail.com>
+Subject: Re: Profile1 close question
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: John Klug <ski.brimson@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The entries for the second model of an element appear malformed.
+Hi John,
 
-This with the current head (813b8e6737ba0c43255979b09a089c44b757a556)
+On Thu, Dec 14, 2017 at 1:35 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> Hi John,
+>
+> On Thursday, 14 December 2017 16:21:32 CET John Klug wrote:
+>> What is holding the connection open is bluetoothd.
+>>
+>> After closing the file descriptor for RFCOMM, there are two file
+>> descriptors in the Bluetooth daemon that are left:
+>>
+>> bluetooth 1406 root   18u     sock        0,7      0t0 26587 protocol:
+>> RFCOMM bluetooth 1406 root   19u     sock        0,7      0t0 26602
+>> protocol: RFCOMM
+>>
+>> By terminating the application these go away, but what if I wish to
+>> keep the daemon running?  How do I tell the Bluetooth daemon to close
+>> the RFCOMM sockets?
+>
+> I think you need to shutdown() socket.
 
-The commands were:
+Yep, shutdown must be used since bluetoothd keeps a reference in case
+it has to disconnect and to keep track of the service state. We should
+perhaps document that we expect the user application to shutdown the
+fd in case it want it to be disconnected.
 
-add-appkey 1
-bind 0 1 1000
-bind 0 1 1001
-set-pub 0100 c000 1 0 1001
-set-pub 0100 c000 1 0 1000
-back
-mesh-info
-
-Steve
-
-        "elements":[
-          {
-            "elementIndex":0,
-            "unicastAddress":"0100",
-            "models":[
-              {
-                "modelId":"1000",
-                "bind":[
-                  1
-                ],
-                "publish":{
-                  "address":"c000",
-                  "index":"0001",
-                  "ttl":255
-                }
-              },
-              {
-                "modelId":"1001",
-                "bind":[
-                  1
-                ]
-              },
-              {
-                "modelId":"1001",
-                "publish":{
-                  "address":"c000",
-                  "index":"0001",
-                  "ttl":255
-                }
-              }
-            ]
-          },
-          {
+-- 
+Luiz Augusto von Dentz
