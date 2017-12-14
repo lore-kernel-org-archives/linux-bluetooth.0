@@ -1,69 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH V2 00/10] Initial code for BTP client
-Date: Thu, 14 Dec 2017 10:12:30 +0100
-Message-ID: <1622233.3RcYCl6drf@ix>
-In-Reply-To: <20171208140348.30342-1-szymon.janc@codecoup.pl>
-References: <20171208140348.30342-1-szymon.janc@codecoup.pl>
+Subject: Re: [PATCH] client: Fix printing of array properties
+Date: Thu, 14 Dec 2017 09:25:00 +0100
+Message-ID: <25650192.ySbRX1kfQ5@ix>
+In-Reply-To: <20171213132831.24740-1-szymon.janc@codecoup.pl>
+References: <20171213132831.24740-1-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday, 8 December 2017 15:03:39 CET Szymon Janc wrote:
-> Hi,
+On Wednesday, 13 December 2017 14:28:31 CET Szymon Janc wrote:
+>         ServiceData Key: 00001234-0000-1000-8000-00805f9b34fb
+>         ServiceData Value:
+> "3D     RSSI: -76
+>         TxPower: -7
+> ---
+>  client/main.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 > 
-> Changes in V2:
->  - adapter index is simply mapped to queue length
->  - added support for reseting (removing all bonding) adapter
->  - fixes for issues reported by valgrind
+> diff --git a/client/main.c b/client/main.c
+> index f3369e89a..a4b8b0fe5 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -184,7 +184,7 @@ static void print_fixed_iter(const char *label, const
+> char *name, return;
 > 
+>  		bt_shell_printf("%s%s:\n", label, name);
+> -		bt_shell_printf((void *)valbool, len * sizeof(*valbool));
+> +		bt_shell_hexdump((void *)valbool, len * sizeof(*valbool));
 > 
-> Cover letter from V1:
-> This adds initial code for BTP client. BTP stands for Bluetooth Tester
-> Protocol and aims at automated testing of BT stack. BTP is binary
-> protocol and is already implemented in Zephyr Project. This adds
-> similar client to BlueZ tree. BTP specification is available at [1].
+>  		break;
+>  	case DBUS_TYPE_UINT32:
+> @@ -194,7 +194,7 @@ static void print_fixed_iter(const char *label, const
+> char *name, return;
 > 
-> Notable thing about this serie is that it doesn't use glib, gdbus or
-> utils from src/shared folder. Instead it makes use of Embedded Linux
-> Library which is available at [2].
+>  		bt_shell_printf("%s%s:\n", label, name);
+> -		bt_shell_printf((void *)valu32, len * sizeof(*valu32));
+> +		bt_shell_hexdump((void *)valu32, len * sizeof(*valu32));
 > 
-> Comments are welcome.
+>  		break;
+>  	case DBUS_TYPE_UINT16:
+> @@ -204,7 +204,7 @@ static void print_fixed_iter(const char *label, const
+> char *name, return;
 > 
-> BR
-> Szymon Janc
+>  		bt_shell_printf("%s%s:\n", label, name);
+> -		bt_shell_printf((void *)valu16, len * sizeof(*valu16));
+> +		bt_shell_hexdump((void *)valu16, len * sizeof(*valu16));
 > 
-> [1]
-> https://github.com/zephyrproject-rtos/zephyr/blob/master/tests/bluetooth/te
-> ster/btp_spec.txt [2] https://git.kernel.org/pub/scm/libs/ell/ell.git/
+>  		break;
+>  	case DBUS_TYPE_INT16:
+> @@ -214,7 +214,7 @@ static void print_fixed_iter(const char *label, const
+> char *name, return;
 > 
-> Szymon Janc (10):
->   shared/btp: Add initial code for library
->   tools/btpclient: Add initial code
->   shared/btp: Add definitions for GAP service
->   tools/btpclient: Add initial support for GAP service
->   tools/btpclient: Add initial support for read controller info command
->   tools/btpclient: Get initial values for adapter setttings
->   tools/btpclient: Add support for tracking mutable adapter settings
->   tools/btpclient: Add support for configuring adapter settings
->   tools/btpclient: Store devices per adapter
->   tools/btpclient: Add support for reseting adapter
+>  		bt_shell_printf("%s%s:\n", label, name);
+> -		bt_shell_printf((void *)vals16, len * sizeof(*vals16));
+> +		bt_shell_hexdump((void *)vals16, len * sizeof(*vals16));
 > 
->  .gitignore        |   1 +
->  Makefile.tools    |   8 +
->  configure.ac      |  11 +
->  src/shared/btp.c  | 383 +++++++++++++++++++++++
->  src/shared/btp.h  | 320 ++++++++++++++++++++
->  tools/btpclient.c | 884
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++ 6 files changed,
-> 1607 insertions(+)
->  create mode 100644 src/shared/btp.c
->  create mode 100644 src/shared/btp.h
->  create mode 100644 tools/btpclient.c
+>  		break;
+>  	case DBUS_TYPE_BYTE:
+> @@ -224,7 +224,7 @@ static void print_fixed_iter(const char *label, const
+> char *name, return;
+> 
+>  		bt_shell_printf("%s%s:\n", label, name);
+> -		bt_shell_printf((void *)byte, len * sizeof(*byte));
+> +		bt_shell_hexdump((void *)byte, len * sizeof(*byte));
+> 
+>  		break;
+>  	default:
 
-This serie is now applied.
+Applied.
 
 -- 
 pozdrawiam
