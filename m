@@ -2,9 +2,9 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: sbrown@cortland.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Steve Brown <sbrown@cortland.com>
-Subject: [PATCH V3 9/9] mesh: meshctl: Add Company ID parameter to pub-set and pub-get
-Date: Fri, 15 Dec 2017 06:46:06 +0000
-Message-Id: <20171215064606.15051-10-sbrown@cortland.com>
+Subject: [PATCH V3 8/9] mesh: meshctl: Add get/set relay
+Date: Fri, 15 Dec 2017 06:46:05 +0000
+Message-Id: <20171215064606.15051-9-sbrown@cortland.com>
 In-Reply-To: <20171215064606.15051-1-sbrown@cortland.com>
 References: <20171215064606.15051-1-sbrown@cortland.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,86 +12,76 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Steve Brown <sbrown@cortland.com>
 
-Add a CID parameter to both commands similar to bind.
-Correct the prior assumption that a model id > 0xffff
-was a vendor model.
+Sets the relay state in node 0100 to 1
 
-pub-set 0100 c000 1 0 0 1000
-03 0001 00c0 01 00 ff 00 00 0010
+[config: Target = 0100]# relay-set 1 0 0
 
-pub-set 0100 c000 1 0 0 1000 1
-03 0001 00c0 01 00 ff 00 00 0100 0010
+Node 0100 Relay state: 0x01 count: 0 steps: 0
+
+Fetches the relay state of node 0100
+
+[config: Target = 0100]# relay-get
+
+Node 0100 Relay state: 0x01 count: 0 steps: 0
 ---
- mesh/config-client.c | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ mesh/config-client.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 diff --git a/mesh/config-client.c b/mesh/config-client.c
-index 0118b1853..0f197e322 100644
+index f4012ad02..0118b1853 100644
 --- a/mesh/config-client.c
 +++ b/mesh/config-client.c
-@@ -780,7 +780,7 @@ static void cmd_set_pub(int argc, char *argv[])
- 	n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_SET, msg);
+@@ -167,6 +167,14 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+ 				get_le16(data + 1), data[3],
+ 				mesh_status_str(data[0]));
  
- 	parm_cnt = read_input_parameters(argc, argv);
--	if (parm_cnt != 6) {
-+	if (parm_cnt != 6 && parm_cnt != 7) {
- 		bt_shell_printf("Bad arguments\n");
- 		return;
- 	}
-@@ -800,8 +800,8 @@ static void cmd_set_pub(int argc, char *argv[])
- 	/* Publish retransmit count & interval steps */
- 	msg[n++] = parms[4];
- 	/* Model Id */
--	if (parms[5] > 0xffff) {
--		put_le16(parms[5] >> 16, msg + n);
-+	if (parm_cnt == 7) {
-+		put_le16(parms[6], msg + n);
- 		put_le16(parms[5], msg + n + 2);
- 		n += 4;
- 	} else {
-@@ -827,7 +827,7 @@ static void cmd_get_pub(int argc, char *argv[])
- 	n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_GET, msg);
++	case OP_CONFIG_RELAY_STATUS:
++		if (len != 2)
++			return true;
++		bt_shell_printf("Node %4.4x Relay state: 0x%02x"
++				" count: %d steps: %d\n",
++				src, data[0], data[1]>>5, data[1] & 0x1f);
++		break;
++
+ 	case OP_CONFIG_PROXY_STATUS:
+ 		if (len != 1)
+ 			return true;
+@@ -705,6 +713,35 @@ static void cmd_get_proxy(int argc, char *argv[])
+ 	cmd_default(OP_CONFIG_PROXY_GET);
+ }
  
- 	parm_cnt = read_input_parameters(argc, argv);
--	if (parm_cnt != 2) {
-+	if (parm_cnt != 2 && parm_cnt != 3) {
- 		bt_shell_printf("Bad arguments: %s\n", argv[1]);
- 		return;
- 	}
-@@ -836,8 +836,8 @@ static void cmd_get_pub(int argc, char *argv[])
- 	put_le16(parms[0], msg + n);
- 	n += 2;
- 	/* Model Id */
--	if (parms[1] > 0xffff) {
--		put_le16(parms[1] >> 16, msg + n);
-+	if (parm_cnt == 3) {
-+		put_le16(parms[2], msg + n);
- 		put_le16(parms[1], msg + n + 2);
- 		n += 4;
- 	} else {
-@@ -1012,8 +1012,11 @@ static const struct bt_shell_menu cfg_menu = {
- 	{"ttl-get",		NULL,			cmd_get_ttl,
- 						"Get default TTL"},
- 	{"pub-set", "<ele_addr> <pub_addr> <app_idx> "
--			"<period (step|res)> <re-xmt (count|per)> <model>",
--				cmd_set_pub,	"Set publication"},
-+			"<per (step|res)> <re-xmt (cnt|per)> <mod id> "
-+			"[cid]",
-+			cmd_set_pub,	"\n\t\t\t\t\t\t  Set publication"},
-+	{"pub-get", "<ele_addr> <mod id> [cid]",		cmd_get_pub,
-+						"Get publication"},
- 	{"proxy-set",		"<proxy>",		cmd_set_proxy,
- 						"Set proxy state"},
- 	{"proxy-get",		NULL,			cmd_get_proxy,
-@@ -1027,8 +1030,6 @@ static const struct bt_shell_menu cfg_menu = {
- 						"Set relay"},
- 	{"relay-get",		NULL,			cmd_get_relay,
- 						"Get relay"},
--	{"pub-get", "<ele_addr> <model>",		cmd_get_pub,
--						"Get publication"},
- 	{"hb-pub-set", "<pub_addr> <count> <period> <features> <net_idx>",
- 				cmd_set_hb,     "Set heartbeati publish"},
- 	{"sub-add", "<ele_addr> <sub_addr> <model id>",
++static void cmd_set_relay(int argc, char *argv[])
++{
++	uint16_t n;
++	uint8_t msg[2 + 2 + 4];
++	int parm_cnt;
++
++	if (!verify_config_target(target))
++		return;
++
++	n = mesh_opcode_set(OP_CONFIG_RELAY_SET, msg);
++
++	parm_cnt = read_input_parameters(argc, argv);
++	if (parm_cnt != 3) {
++		bt_shell_printf("bad arguments\n");
++		return;
++	}
++
++	msg[n++] = parms[0];
++	msg[n++] = (parms[1] << 5) | parms[2];
++
++	if (!config_send(msg, n))
++		bt_shell_printf("Failed to send \"SET RELAY\"\n");
++}
++
++static void cmd_get_relay(int argc, char *argv[])
++{
++	cmd_default(OP_CONFIG_RELAY_GET);
++}
++
+ static void cmd_set_ttl(int argc, char *argv[])
+ {
+ 	uint16_t n;
 -- 
 2.11.0
 
