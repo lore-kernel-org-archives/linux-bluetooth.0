@@ -1,63 +1,214 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Steve Brown <sbrown@cortland.com>
-Message-ID: <1513343774.18172.44.camel@ewol.com>
-Subject: [RFC] mesh: meshctl: Fix duplicate modelId's in json database
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Fri, 15 Dec 2017 06:16:14 -0700
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/3] clien: Only set the discovery filter when necessary
+Date: Fri, 15 Dec 2017 09:54:00 -0200
+Message-Id: <20171215115400.21161-3-luiz.dentz@gmail.com>
+In-Reply-To: <20171215115400.21161-1-luiz.dentz@gmail.com>
+References: <20171215115400.21161-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In parse_configuration_models(), it's not an issue whether the calls
-succeed or fail. If the entries appear in the model object they are
-processed, if not they aren't.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Only set the discovery filter when the user wants execute the scan
+command.
 ---
+ client/main.c | 101 ++++++++++++++++++++++++++--------------------------------
+ 1 file changed, 45 insertions(+), 56 deletions(-)
 
-The calling sequence is
-
-prov_db_node_set_model_pub()
-  get_jmodel_obj()
-    parse_configuration_models()
-    
-There seems to be a problem in parse_configuration_models(). In the
-loop looking for the model that matches the target_id, if the first
-model matches, the model object is returned and the function exits.
-
-If the loop has to iterate, it next calls parse_bindings(). That
-function checks if the binding already exists and because it
-does, exits false with jmodel set to null.
-
-The consequence is the addition of a second modelId object with the
-same model id.
-
-It's not clear why the function exits when it finds the model with the
-matching model id and before calling parse_bindings(), etc. I'd think
-that the test should go after those calls.
-
-I'm still not sure I completely understand how all this works. It would
-also seem that the parse_xxx() functions get called for models up to
-the one that matches, but not after.
-
-diff --git a/mesh/prov-db.c b/mesh/prov-db.c
-index 04803a5c8..cc3bc8224 100644
---- a/mesh/prov-db.c
-+++ b/mesh/prov-db.c
-@@ -411,13 +411,10 @@ static bool parse_configuration_models(struct mesh_node *node, int ele_idx,
- 		}
+diff --git a/client/main.c b/client/main.c
+index 53e03f56f..272f4dc9d 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1097,31 +1097,6 @@ static void start_discovery_reply(DBusMessage *message, void *user_data)
+ 	bt_shell_printf("Discovery %s\n", enable == TRUE ? "started" : "stopped");
+ }
  
- 		json_object_object_get_ex(jmodel, "bind", &jarray);
--		if (jarray && !parse_bindings(node, ele_idx, model_id, jarray))
--			return false;
-+		parse_bindings(node, ele_idx, model_id, jarray);
- 
- 		json_object_object_get_ex(jmodel, "publish", &jvalue);
+-static void cmd_scan(int argc, char *argv[])
+-{
+-	dbus_bool_t enable;
+-	const char *method;
 -
--		if (jvalue && !parse_model_pub(node, ele_idx, model_id, jvalue))
--			return false;
-+		parse_model_pub(node, ele_idx, model_id, jvalue);
+-	if (!parse_argument(argc, argv, NULL, NULL, &enable, NULL))
+-		return;
+-
+-	if (check_default_ctrl() == FALSE)
+-		return;
+-
+-	if (enable == TRUE)
+-		method = "StartDiscovery";
+-	else
+-		method = "StopDiscovery";
+-
+-	if (g_dbus_proxy_method_call(default_ctrl->proxy, method,
+-				NULL, start_discovery_reply,
+-				GUINT_TO_POINTER(enable), NULL) == FALSE) {
+-		bt_shell_printf("Failed to %s discovery\n",
+-					enable == TRUE ? "start" : "stop");
+-		return;
+-	}
+-}
+-
+ static void append_variant(DBusMessageIter *iter, int type, void *val)
+ {
+ 	DBusMessageIter value;
+@@ -1211,13 +1186,18 @@ static void dict_append_array(DBusMessageIter *dict, const char *key, int type,
+ 
+ #define	DISTANCE_VAL_INVALID	0x7FFF
+ 
+-struct set_discovery_filter_args {
++static struct set_discovery_filter_args {
+ 	char *transport;
+ 	dbus_uint16_t rssi;
+ 	dbus_int16_t pathloss;
+ 	char **uuids;
+ 	size_t uuids_len;
+ 	dbus_bool_t duplicate;
++	bool set;
++} filter = {
++	.rssi = DISTANCE_VAL_INVALID,
++	.pathloss = DISTANCE_VAL_INVALID,
++	.set = true,
+ };
+ 
+ static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
+@@ -1264,17 +1244,14 @@ static void set_discovery_filter_reply(DBusMessage *message, void *user_data)
+ 		return;
  	}
  
- 	return true;
++	filter.set = true;
++
+ 	bt_shell_printf("SetDiscoveryFilter success\n");
+ }
+ 
+-static struct set_discovery_filter_args filter = {
+-	.rssi = DISTANCE_VAL_INVALID,
+-	.pathloss = DISTANCE_VAL_INVALID,
+-};
+-
+-static void cmd_set_scan_filter_commit(void)
++static void set_discovery_filter(void)
+ {
+-	if (check_default_ctrl() == FALSE)
++	if (check_default_ctrl() == FALSE || filter.set)
+ 		return;
+ 
+ 	if (g_dbus_proxy_method_call(default_ctrl->proxy, "SetDiscoveryFilter",
+@@ -1283,6 +1260,34 @@ static void cmd_set_scan_filter_commit(void)
+ 		bt_shell_printf("Failed to set discovery filter\n");
+ 		return;
+ 	}
++
++	filter.set = true;
++}
++
++static void cmd_scan(int argc, char *argv[])
++{
++	dbus_bool_t enable;
++	const char *method;
++
++	if (!parse_argument(argc, argv, NULL, NULL, &enable, NULL))
++		return;
++
++	if (check_default_ctrl() == FALSE)
++		return;
++
++	if (enable == TRUE) {
++		set_discovery_filter();
++		method = "StartDiscovery";
++	} else
++		method = "StopDiscovery";
++
++	if (g_dbus_proxy_method_call(default_ctrl->proxy, method,
++				NULL, start_discovery_reply,
++				GUINT_TO_POINTER(enable), NULL) == FALSE) {
++		bt_shell_printf("Failed to %s discovery\n",
++					enable == TRUE ? "start" : "stop");
++		return;
++	}
+ }
+ 
+ static void cmd_scan_filter_uuids(int argc, char *argv[])
+@@ -1312,7 +1317,7 @@ static void cmd_scan_filter_uuids(int argc, char *argv[])
+ 	filter.uuids_len = g_strv_length(filter.uuids);
+ 
+ commit:
+-	cmd_set_scan_filter_commit();
++	filter.set = false;
+ }
+ 
+ static void cmd_scan_filter_rssi(int argc, char *argv[])
+@@ -1326,7 +1331,7 @@ static void cmd_scan_filter_rssi(int argc, char *argv[])
+ 	filter.pathloss = DISTANCE_VAL_INVALID;
+ 	filter.rssi = atoi(argv[1]);
+ 
+-	cmd_set_scan_filter_commit();
++	filter.set = false;
+ }
+ 
+ static void cmd_scan_filter_pathloss(int argc, char *argv[])
+@@ -1341,7 +1346,7 @@ static void cmd_scan_filter_pathloss(int argc, char *argv[])
+ 	filter.rssi = DISTANCE_VAL_INVALID;
+ 	filter.pathloss = atoi(argv[1]);
+ 
+-	cmd_set_scan_filter_commit();
++	filter.set = false;
+ }
+ 
+ static void cmd_scan_filter_transport(int argc, char *argv[])
+@@ -1356,7 +1361,7 @@ static void cmd_scan_filter_transport(int argc, char *argv[])
+ 	g_free(filter.transport);
+ 	filter.transport = g_strdup(argv[1]);
+ 
+-	cmd_set_scan_filter_commit();
++	filter.set = false;
+ }
+ 
+ static void cmd_scan_filter_duplicate_data(int argc, char *argv[])
+@@ -1376,20 +1381,7 @@ static void cmd_scan_filter_duplicate_data(int argc, char *argv[])
+ 		return;
+ 	}
+ 
+-	cmd_set_scan_filter_commit();
+-}
+-
+-static void clear_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
+-{
+-	DBusMessageIter dict;
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+-				DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+-				DBUS_TYPE_STRING_AS_STRING
+-				DBUS_TYPE_VARIANT_AS_STRING
+-				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+-
+-	dbus_message_iter_close_container(iter, &dict);
++	filter.set = false;
+ }
+ 
+ static void filter_clear_uuids(void)
+@@ -1443,6 +1435,7 @@ static void cmd_scan_filter_clear(int argc, char *argv[])
+ 	for (fc = filter_clear; fc && fc->name; fc++) {
+ 		if (all || !strcmp(fc->name, argv[1])) {
+ 			fc->clear();
++			filter.set = false;
+ 			if (!all)
+ 				goto done;
+ 		}
+@@ -1457,11 +1450,7 @@ done:
+ 	if (check_default_ctrl() == FALSE)
+ 		return;
+ 
+-	if (g_dbus_proxy_method_call(default_ctrl->proxy, "SetDiscoveryFilter",
+-		clear_discovery_filter_setup, set_discovery_filter_reply,
+-		NULL, NULL) == FALSE) {
+-		bt_shell_printf("Failed to clear discovery filter\n");
+-	}
++	set_discovery_filter();
+ }
+ 
+ static struct GDBusProxy *find_device(int argc, char *argv[])
+-- 
+2.13.6
 
