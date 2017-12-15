@@ -1,74 +1,88 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20171214120300.20018-1-luiz.dentz@gmail.com>
-References: <20171214120300.20018-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 15 Dec 2017 09:53:29 -0200
-Message-ID: <CABBYNZ+Jhcm6P4eSiFyKN2zKUgQWtzWNkuiTrcLtA77MGR5Dig@mail.gmail.com>
-Subject: Re: [PATCH v2 01/11] monitor: Detect string format
+From: Steve Brown <sbrown@cortland.com>
+Message-ID: <1513336488.18172.20.camel@ewol.com>
+Subject: Re: meshctl: publish db entry malformed for 2d model of an element
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Steve Brown <sbrown@cortland.com>
+Date: Fri, 15 Dec 2017 04:14:48 -0700
+In-Reply-To: <1513293681.4409.12.camel@ewol.com>
+References: <1513293681.4409.12.camel@ewol.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Thu, 2017-12-14 at 16:21 -0700, Steve Brown wrote:
+> The entries for the second model of an element appear malformed.
+> 
+> This with the current head (813b8e6737ba0c43255979b09a089c44b757a556)
+> 
+> The commands were:
+> 
+> add-appkey 1
+> bind 0 1 1000
+> bind 0 1 1001
+> set-pub 0100 c000 1 0 1001
+> set-pub 0100 c000 1 0 1000
+> back
+> mesh-info
+> 
+> Steve
+> 
+>         "elements":[
+>           {
+>             "elementIndex":0,
+>             "unicastAddress":"0100",
+>             "models":[
+>               {
+>                 "modelId":"1000",
+>                 "bind":[
+>                   1
+>                 ],
+>                 "publish":{
+>                   "address":"c000",
+>                   "index":"0001",
+>                   "ttl":255
+>                 }
+>               },
+>               {
+>                 "modelId":"1001",
+>                 "bind":[
+>                   1
+>                 ]
+>               },
+>               {
+>                 "modelId":"1001",
+>                 "publish":{
+>                   "address":"c000",
+>                   "index":"0001",
+>                   "ttl":255
+>                 }
+>               }
+>             ]
+>           },
+>           {
 
-On Thu, Dec 14, 2017 at 10:02 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> User may enter UUID in string format other then 128 bits.
-> ---
->  monitor/uuid.c | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
->
-> diff --git a/monitor/uuid.c b/monitor/uuid.c
-> index 9839d03be..bc638a2f3 100644
-> --- a/monitor/uuid.c
-> +++ b/monitor/uuid.c
-> @@ -27,6 +27,7 @@
->  #endif
->
->  #include <stdio.h>
-> +#include <stdlib.h>
->  #include <string.h>
->
->  #include "uuid.h"
-> @@ -735,12 +736,28 @@ const char *uuid32_to_str(uint32_t uuid)
->  const char *uuidstr_to_str(const char *uuid)
->  {
->         uint32_t val;
-> +       size_t len;
->         int i;
->
->         if (!uuid)
->                 return NULL;
->
-> -       if (strlen(uuid) != 36)
-> +       len = strlen(uuid);
-> +
-> +       if (len < 36) {
-> +               char *endptr = NULL;
-> +
-> +               val = strtol(uuid, &endptr, 0);
-> +               if (!endptr || *endptr != '\0')
-> +                       return NULL;
-> +
-> +               if (val > UINT16_MAX)
-> +                       return uuid32_to_str(val);
-> +
-> +               return uuid16_to_str(val);
-> +       }
-> +
-> +       if (len != 36)
->                 return NULL;
->
->         for (i = 0; uuid128_table[i].str; i++) {
-> --
-> 2.13.6
+The calling sequence is
 
-Patches 1-9 have been applied.
+prov_db_node_set_model_pub()
+  get_jmodel_obj()
+    parse_configuration_models()
+    
+There seems to be a problem in parse_configuration_models(). In the
+loop looking for the model that matches the target_id, if the first
+model matches, the model object is returned and the function exits.
+
+If the loop has to iterate, it next calls parse_bindings(). That
+function looks to see if the binding already exists and because it
+does, exits false with jmodel set to null.
+
+The consequence is the addition of a second modelId object for the same
+ model id.
+
+I'm not familiar with the code and am not sure how to fix this.
+
+Steve
 
 
--- 
-Luiz Augusto von Dentz
+
