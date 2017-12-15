@@ -1,52 +1,31 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Sat, 16 Dec 2017 16:49:32 +0100
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: sbrown@cortland.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH V3 7/9] mesh: meshctl: Add get/set identity
-Message-ID: <20171216154932.GA21312@x1c>
-References: <20171215064606.15051-1-sbrown@cortland.com>
- <20171215064606.15051-8-sbrown@cortland.com>
+Return-Path: <robherring2@gmail.com>
+Date: Fri, 15 Dec 2017 17:05:58 -0600
+From: Rob Herring <robh@kernel.org>
+To: David Lechner <david@lechnology.com>
+Cc: devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] dt-bindings: net: add TI CC2560 Bluetooth chip
+Message-ID: <20171215230558.7vngwc66y2smvdrq@rob-hp-laptop>
+References: <1513124971-23717-1-git-send-email-david@lechnology.com>
+ <1513124971-23717-2-git-send-email-david@lechnology.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20171215064606.15051-8-sbrown@cortland.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1513124971-23717-2-git-send-email-david@lechnology.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+On Tue, Dec 12, 2017 at 06:29:30PM -0600, David Lechner wrote:
+> This adds a compatible string for the Texas Instruments CC2560 Bluetooth
+> chip to the existing TI WiLink shared transport bindings. These chips are
+> similar enough that the same bindings work for both. The file is renamed
+> to ti-bluetooth.txt to make it more generic.
+> 
+> Signed-off-by: David Lechner <david@lechnology.com>
+> ---
+>  .../bindings/net/{ti,wilink-st.txt => ti-bluetooth.txt}     | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
+>  rename Documentation/devicetree/bindings/net/{ti,wilink-st.txt => ti-bluetooth.txt} (78%)
 
-On Fri, Dec 15, 2017, sbrown@cortland.com wrote:
-> +	case OP_NODE_IDENTITY_STATUS:
-> +		if (len != 4)
-> +			return true;
-> +		bt_shell_printf("Network index 0x%04x has "
-> +				"Node Identity state 0x%02x %s\n",
-> +				get_le16(data + 1), data[3],
-> +				mesh_status_str(data[0]));
-> +
->  	case OP_CONFIG_PROXY_STATUS:
-
-This throws the following compilation error for me:
-
-mesh/config-client.c: In function ‘client_msg_recvd’:
-mesh/config-client.c:165:3: error: this statement may fall through [-Werror=implicit-fallthrough=]
-   bt_shell_printf("Network index 0x%04x has "
-   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     "Node Identity state 0x%02x %s\n",
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     get_le16(data + 1), data[3],
-     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     mesh_status_str(data[0]));
-     ~~~~~~~~~~~~~~~~~~~~~~~~~
-mesh/config-client.c:170:2: note: here
-  case OP_CONFIG_RELAY_STATUS:
-  ^~~~
-cc1: all warnings being treated as errors
-
-The above looks like a valid error, i.e. it seems there's a missing
-break or return statement in your patch.
-
-You might want to upgrade to a newer gcc version if you're not getting
-these errors. At least version 7.2.1 from Fedora 27 give me these.
-
-Johan
+Reviewed-by: Rob Herring <robh@kernel.org>
