@@ -1,88 +1,69 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Steve Brown <sbrown@cortland.com>
-Message-ID: <1513336488.18172.20.camel@ewol.com>
-Subject: Re: meshctl: publish db entry malformed for 2d model of an element
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Steve Brown <sbrown@cortland.com>
-Date: Fri, 15 Dec 2017 04:14:48 -0700
-In-Reply-To: <1513293681.4409.12.camel@ewol.com>
-References: <1513293681.4409.12.camel@ewol.com>
+Message-ID: <1513321068.4409.15.camel@ewol.com>
+Subject: Re: [PATCH V2 1/8] mesh: meshctl: Change command names to
+ <cmd>-<get/set>
+To: "Stotland, Inga" <inga.stotland@intel.com>,
+        "sbrown@cortland.com" <sbrown@cortland.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 14 Dec 2017 23:57:48 -0700
+In-Reply-To: <1513304088.3023.39.camel@intel.com>
+References: <20171212125832.13440-1-sbrown@cortland.com>
+         <20171212125832.13440-2-sbrown@cortland.com>
+         <1513238880.3023.18.camel@intel.com> <1513242768.11292.10.camel@ewol.com>
+         <1513304088.3023.39.camel@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2017-12-14 at 16:21 -0700, Steve Brown wrote:
-> The entries for the second model of an element appear malformed.
-> 
-> This with the current head (813b8e6737ba0c43255979b09a089c44b757a556)
-> 
-> The commands were:
-> 
-> add-appkey 1
-> bind 0 1 1000
-> bind 0 1 1001
-> set-pub 0100 c000 1 0 1001
-> set-pub 0100 c000 1 0 1000
-> back
-> mesh-info
-> 
-> Steve
-> 
->         "elements":[
->           {
->             "elementIndex":0,
->             "unicastAddress":"0100",
->             "models":[
->               {
->                 "modelId":"1000",
->                 "bind":[
->                   1
->                 ],
->                 "publish":{
->                   "address":"c000",
->                   "index":"0001",
->                   "ttl":255
->                 }
->               },
->               {
->                 "modelId":"1001",
->                 "bind":[
->                   1
->                 ]
->               },
->               {
->                 "modelId":"1001",
->                 "publish":{
->                   "address":"c000",
->                   "index":"0001",
->                   "ttl":255
->                 }
->               }
->             ]
->           },
->           {
+Hi Inga,
 
-The calling sequence is
+On Fri, 2017-12-15 at 02:14 +0000, Stotland, Inga wrote:
+> Hi Steve,
+> 
+> On Thu, 2017-12-14 at 02:12 -0700, Steve Brown wrote:
+> > Hi Inga,
+> > On Thu, 2017-12-14 at 08:08 +0000, Stotland, Inga wrote:
+> > > Hi Steve,
+> > > 
+> > > On Tue, 2017-12-12 at 12:58 +0000, sbrown@cortland.com wrote:
+> > > > From: Steve Brown <sbrown@cortland.com>
+> > > > 
+> > > > Fix lines over 80 chars
+> > > > Move cmd_default()
+> > > > Add parameter to pub-set to control retransmit count
+> > > > ---
+> > > >  
+> > > 
+> > > Since you are modifying pub-set command, could you please fix it
+> > > to
+> > > correctly indicate SIG and vendor models, similarly to "bind"
+> > > command
+> > > (adding an optional "cid" parameter for vendor models).
+> > > 
+> > > Regards,
+> > > 
+> > > Inga Stotland
+> > 
+> > It looks like the pub command already assumes it's a vendor model
+> > if
+> > the model id is > 0xffff. Is that a correct assumption?
+> > 
+> > If it is, should I make the same change to bind and remove the
+> > optional
+> > parameter?
+> > 
+> > Steve
+> > 
+> The check for model id is > 0xffff is not entirely correct since it
+> does not account for a case when CID is 0x0000.
+> 
+> Regards,
+> 
+> Inga
 
-prov_db_node_set_model_pub()
-  get_jmodel_obj()
-    parse_configuration_models()
-    
-There seems to be a problem in parse_configuration_models(). In the
-loop looking for the model that matches the target_id, if the first
-model matches, the model object is returned and the function exits.
-
-If the loop has to iterate, it next calls parse_bindings(). That
-function looks to see if the binding already exists and because it
-does, exits false with jmodel set to null.
-
-The consequence is the addition of a second modelId object for the same
- model id.
-
-I'm not familiar with the code and am not sure how to fix this.
+I made the changes/corrections you requested and sent V3.
 
 Steve
-
-
 
