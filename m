@@ -2,9 +2,9 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: sbrown@cortland.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Steve Brown <sbrown@cortland.com>
-Subject: [PATCH V3 2/9] mesh: meshctl: Add add/get subscribe
-Date: Fri, 15 Dec 2017 06:45:59 +0000
-Message-Id: <20171215064606.15051-3-sbrown@cortland.com>
+Subject: [PATCH V3 1/9] mesh: meshctl: Change command names to <cmd>-<get/set>
+Date: Fri, 15 Dec 2017 06:45:58 +0000
+Message-Id: <20171215064606.15051-2-sbrown@cortland.com>
 In-Reply-To: <20171215064606.15051-1-sbrown@cortland.com>
 References: <20171215064606.15051-1-sbrown@cortland.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,168 +12,172 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Steve Brown <sbrown@cortland.com>
 
-Adds a subscription for group address c000 to
-model 1000 in element 0100.
-
-[config: Target = 0100]# sub-add 0100 c000 1000
-
-Subscription changed for node 0100 status: Success
-ModelId 1000
-Element Addr:   0100
-Subscr Addr:    c000
-
-Gets the current subscription list for model 1000
-on element 0100.
-
-[config: Target = 0100]# sub-get 0100 1000
-
-Subscription list for node 0100 length: 7 status: Success
-Element Addr:   0100
-Model ID:       1000
-Subscr Addr:    c000
+Fix lines over 80 chars
+Move cmd_default()
+Add parameter to pub-set to control retransmit count
 ---
- mesh/config-client.c | 107 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 107 insertions(+)
+ mesh/config-client.c | 78 +++++++++++++++++++++++++++-------------------------
+ 1 file changed, 41 insertions(+), 37 deletions(-)
 
 diff --git a/mesh/config-client.c b/mesh/config-client.c
-index 51adf2c52..aa7414cc3 100644
+index 3d618b6a6..51adf2c52 100644
 --- a/mesh/config-client.c
 +++ b/mesh/config-client.c
-@@ -61,6 +61,7 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
- 	uint8_t ele_idx;
- 	struct mesh_publication pub;
- 	int n;
-+	uint16_t i;
+@@ -170,9 +170,9 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+ 		if (len != 12 && len != 14)
+ 			return true;
  
- 	if (mesh_opcode_get(data, len, &opcode, &n)) {
- 		len -= n;
-@@ -220,6 +221,43 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
- 			prov_db_node_set_model_pub(node, ele_idx, mod_id,
+-		bt_shell_printf("\nSet publication for node %4.4x status: %s\n", src,
+-				data[0] == MESH_STATUS_SUCCESS ? "Success" :
+-						mesh_status_str(data[0]));
++		bt_shell_printf("\nSet publication for node %4.4x status: %s\n",
++				src, data[0] == MESH_STATUS_SUCCESS ?
++				"Success" : mesh_status_str(data[0]));
+ 
+ 		if (data[0] != MESH_STATUS_SUCCESS)
+ 			return true;
+@@ -189,6 +189,7 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+ 		pub.ttl = data[7];
+ 		pub.period = data[8];
+ 		n = (data[8] & 0x3f);
++		bt_shell_printf("Publication address: 0x%04x\n", pub.u.addr16);
+ 		switch (data[8] >> 6) {
+ 		case 0:
+ 			bt_shell_printf("Period: %d ms\n", n * 100);
+@@ -206,7 +207,8 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+ 
+ 		pub.retransmit = data[9];
+ 		bt_shell_printf("Retransmit count: %d\n", data[9] >> 5);
+-		bt_shell_printf("Retransmit Interval Steps: %d\n", data[9] & 0x1f);
++		bt_shell_printf("Retransmit Interval Steps: %d\n",
++				data[9] & 0x1f);
+ 
+ 		ele_idx = ele_addr - node_get_primary(node);
+ 
+@@ -219,6 +221,7 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
  				     node_model_pub_get(node, ele_idx, mod_id));
  		break;
+ 	}
 +
-+	/* Per Mesh Profile 4.3.2.19 */
-+	case OP_CONFIG_MODEL_SUB_STATUS:
-+		bt_shell_printf("\nSubscription changed"
-+				" for node %4.4x status: %s\n", src,
-+				data[0] == MESH_STATUS_SUCCESS ? "Success" :
-+						mesh_status_str(data[0]));
+ 	return true;
+ }
+ 
+@@ -287,6 +290,23 @@ static bool config_send(uint8_t *buf, uint16_t len)
+ 
+ }
+ 
++static void cmd_default(uint32_t opcode)
++{
++	uint16_t n;
++	uint8_t msg[32];
 +
-+		if (data[0] != MESH_STATUS_SUCCESS)
-+			return true;
++	if (IS_UNASSIGNED(target)) {
++		bt_shell_printf("Destination not set\n");
++		return;
++	}
 +
-+		bt_shell_printf("Element Addr:\t%4.4x\n", get_le16(data + 1));
-+		bt_shell_printf("Subscr Addr:\t%4.4x\n", get_le16(data + 3));
-+		bt_shell_printf("Model ID:\t%4.4x\n", get_le16(data + 5));
-+		break;
++	n = mesh_opcode_set(opcode, msg);
 +
-+		/* TODO */
-+		/* Save subscription info in database */
++	if (!config_send(msg, n))
++		bt_shell_printf("Failed to send command (opcode 0x%x)\n",
++								opcode);
++}
 +
-+	/* Per Mesh Profile 4.3.2.27 */
-+	case OP_CONFIG_MODEL_SUB_LIST:
-+
-+		bt_shell_printf("\nSubscription list for node %4.4x "
-+				"length: %u status: %s\n", src, len,
-+				data[0] == MESH_STATUS_SUCCESS ? "Success" :
-+						mesh_status_str(data[0]));
-+
-+		if (data[0] != MESH_STATUS_SUCCESS)
-+			return true;
-+
-+		bt_shell_printf("Element Addr:\t%4.4x\n", get_le16(data + 1));
-+		bt_shell_printf("Model ID:\t%4.4x\n", get_le16(data + 3));
-+
-+		for (i = 5; i < len; i += 2)
-+			bt_shell_printf("Subscr Addr:\t%4.4x\n",
-+					get_le16(data + i));
-+		break;
+ static void cmd_get_composition(int argc, char *argv[])
+ {
+ 	uint16_t n;
+@@ -556,7 +576,7 @@ static void cmd_set_pub(int argc, char *argv[])
+ 	n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_SET, msg);
+ 
+ 	parm_cnt = read_input_parameters(argc, argv);
+-	if (parm_cnt != 5) {
++	if (parm_cnt != 6) {
+ 		bt_shell_printf("Bad arguments\n");
+ 		return;
+ 	}
+@@ -574,14 +594,14 @@ static void cmd_set_pub(int argc, char *argv[])
+ 	/* Publish period  step count and step resolution */
+ 	msg[n++] = parms[3];
+ 	/* Publish retransmit count & interval steps */
+-	msg[n++] = (1 << 5) + 2;
++	msg[n++] = parms[4];
+ 	/* Model Id */
+-	if (parms[4] > 0xffff) {
+-		put_le16(parms[4] >> 16, msg + n);
+-		put_le16(parms[4], msg + n + 2);
++	if (parms[5] > 0xffff) {
++		put_le16(parms[5] >> 16, msg + n);
++		put_le16(parms[5], msg + n + 2);
+ 		n += 4;
+ 	} else {
+-		put_le16(parms[4], msg + n);
++		put_le16(parms[5], msg + n);
+ 		n += 2;
  	}
  
- 	return true;
-@@ -609,6 +647,71 @@ static void cmd_set_pub(int argc, char *argv[])
+@@ -589,23 +609,6 @@ static void cmd_set_pub(int argc, char *argv[])
  		bt_shell_printf("Failed to send \"SET MODEL PUBLICATION\"\n");
  }
  
-+static void cmd_sub_add(int argc, char *argv[])
-+{
-+	uint16_t n;
-+	uint8_t msg[32];
-+	int parm_cnt;
-+
-+	if (IS_UNASSIGNED(target)) {
-+		bt_shell_printf("Destination not set\n");
-+		return;
-+	}
-+
-+	n = mesh_opcode_set(OP_CONFIG_MODEL_SUB_ADD, msg);
-+
-+	parm_cnt = read_input_parameters(argc, argv);
-+	if (parm_cnt != 3) {
-+		bt_shell_printf("Bad arguments: %s\n", argv[1]);
-+		return;
-+	}
-+
-+	/* Per Mesh Profile 4.3.2.19 */
-+	/* Element Address */
-+	put_le16(parms[0], msg + n);
-+	n += 2;
-+	/* Subscription Address */
-+	put_le16(parms[1], msg + n);
-+	n += 2;
-+	/* SIG Model ID */
-+	put_le16(parms[2], msg + n);
-+	n += 2;
-+
-+	if (!config_send(msg, n))
-+		bt_shell_printf("Failed to send \"ADD SUBSCRIPTION\"\n");
-+}
-+
-+static void cmd_sub_get(int argc, char *argv[])
-+{
-+	uint16_t n;
-+	uint8_t msg[32];
-+	int parm_cnt;
-+
-+	if (IS_UNASSIGNED(target)) {
-+		bt_shell_printf("Destination not set\n");
-+		return;
-+	}
-+
-+	n = mesh_opcode_set(OP_CONFIG_MODEL_SUB_GET, msg);
-+
-+	parm_cnt = read_input_parameters(argc, argv);
-+	if (parm_cnt != 2) {
-+		bt_shell_printf("Bad arguments: %s\n", argv[1]);
-+		return;
-+	}
-+
-+	/* Per Mesh Profile 4.3.2.27 */
-+	/* Element Address */
-+	put_le16(parms[0], msg + n);
-+	n += 2;
-+	/* Model ID */
-+	put_le16(parms[1], msg + n);
-+	n += 2;
-+
-+	if (!config_send(msg, n))
-+		bt_shell_printf("Failed to send \"GET SUB GET\"\n");
-+}
-+
+-static void cmd_default(uint32_t opcode)
+-{
+-	uint16_t n;
+-	uint8_t msg[32];
+-
+-	if (IS_UNASSIGNED(target)) {
+-		bt_shell_printf("Destination not set\n");
+-		return;
+-	}
+-
+-	n = mesh_opcode_set(opcode, msg);
+-
+-	if (!config_send(msg, n))
+-		bt_shell_printf("Failed to send command (opcode 0x%x)\n",
+-								opcode);
+-}
+-
  static void cmd_get_ttl(int argc, char *argv[])
  {
  	cmd_default(OP_CONFIG_DEFAULT_TTL_GET);
-@@ -638,6 +741,10 @@ static const struct bt_shell_menu cfg_menu = {
- 	{"pub-set", "<ele_addr> <pub_addr> <app_idx> "
- 			"<period (step|res)> <re-xmt (count|per)> <model>",
+@@ -614,27 +617,28 @@ static void cmd_get_ttl(int argc, char *argv[])
+ static const struct bt_shell_menu cfg_menu = {
+ 	.name = "config",
+ 	.entries = {
+-	{"target",		"<unicast>",			cmd_set_node,
++	{"target",		"<unicast>",		cmd_set_node,
+ 						"Set target node to configure"},
+-	{"get-composition",	"[<page_num>]",		cmd_get_composition,
++	{"composition-get",	"[<page_num>]",		cmd_get_composition,
+ 						"Get Composition Data"},
+-	{"add-netkey",		"<net_idx>",			cmd_add_net_key,
++	{"netkey-add",		"<net_idx>",		cmd_add_net_key,
+ 						"Add network key"},
+-	{"del-netkey",		"<net_idx>",			cmd_del_net_key,
++	{"netkey-del",		"<net_idx>",		cmd_del_net_key,
+ 						"Delete network key"},
+-	{"add-appkey",		"<app_idx>",			cmd_add_app_key,
++	{"appkey-add",		"<app_idx>",		cmd_add_app_key,
+ 						"Add application key"},
+-	{"del-appkey",		"<app_idx>",			cmd_del_app_key,
++	{"appkey-del",		"<app_idx>",		cmd_del_app_key,
+ 						"Delete application key"},
+ 	{"bind",		"<ele_idx> <app_idx> <mod_id> [cid]",
+ 				cmd_bind,	"Bind app key to a model"},
+-	{"set-ttl",		"<ttl>",			cmd_set_ttl,
++	{"ttl-set",		"<ttl>",		cmd_set_ttl,
+ 						"Set default TTL"},
+-	{"get-ttl",		NULL,			cmd_get_ttl,
++	{"ttl-get",		NULL,			cmd_get_ttl,
+ 						"Get default TTL"},
+-	{"set-pub", "<ele_addr> <pub_addr> <app_idx> "
+-						"<period (step|res)> <model>",
++	{"pub-set", "<ele_addr> <pub_addr> <app_idx> "
++			"<period (step|res)> <re-xmt (count|per)> <model>",
  				cmd_set_pub,	"Set publication"},
-+	{"sub-add", "<ele_addr> <sub_addr> <model id>",
-+				cmd_sub_add,    "Subscription add"},
-+	{"sub-get", "<ele_addr> <model id>",
-+				cmd_sub_get,    "Subscription get"},
- 
++
  	{} },
  };
+ 
 -- 
 2.11.0
 
