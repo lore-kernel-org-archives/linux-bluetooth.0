@@ -2,9 +2,9 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: sbrown@cortland.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Steve Brown <sbrown@cortland.com>
-Subject: [PATCH V4 4/9] mesh: meshctl: Add get app keys
-Date: Sun, 17 Dec 2017 10:52:44 +0000
-Message-Id: <20171217105249.7592-5-sbrown@cortland.com>
+Subject: [PATCH V4 6/9] mesh: meshctl: Add set/get proxy
+Date: Sun, 17 Dec 2017 10:52:46 +0000
+Message-Id: <20171217105249.7592-7-sbrown@cortland.com>
 In-Reply-To: <20171217105249.7592-1-sbrown@cortland.com>
 References: <20171217105249.7592-1-sbrown@cortland.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,95 +12,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Steve Brown <sbrown@cortland.com>
 
-List application keys of model 1000 in element 0100.
+Set the current proxy state of node 0100
+Setting the proxy state to 0 will disconnect
+the GATT proxy connection.
 
-[config: Target = 0100]# app-get 0100 1000
+[config: Target = 0100]# proxy-set 1
 
-Model App Key list for node 0100 length: 7 status: Success
-Element Addr:   0100
-Model ID:       1000
-Model App Key:  0001
+Node 0100 Proxy state: 0x01
+
+Get the current proxy state of element 0100
+
+[config: Target = 0100]# proxy-get
+
+Node 0100 Proxy state: 0x01
 ---
- mesh/config-client.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 51 insertions(+), 1 deletion(-)
+ mesh/config-client.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/mesh/config-client.c b/mesh/config-client.c
-index 901ebe946..80c7fd80d 100644
+index 92fca5a8b..38fbd68a2 100644
 --- a/mesh/config-client.c
 +++ b/mesh/config-client.c
-@@ -259,6 +259,24 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
- 					get_le16(data + i));
+@@ -159,6 +159,13 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+ 			prov_db_add_binding(node, addr - src, mod_id, app_idx);
  		break;
  
-+	/* Per Mesh Profile 4.3.2.50 */
-+	case OP_MODEL_APP_LIST:
-+		bt_shell_printf("\nModel App Key list for node %4.4x "
-+				"length: %u status: %s\n", src, len,
-+				data[0] == MESH_STATUS_SUCCESS ? "Success" :
-+						mesh_status_str(data[0]));
-+
-+		if (data[0] != MESH_STATUS_SUCCESS)
++	case OP_CONFIG_PROXY_STATUS:
++		if (len != 1)
 +			return true;
-+
-+		bt_shell_printf("Element Addr:\t%4.4x\n", get_le16(data + 1));
-+		bt_shell_printf("Model ID:\t%4.4x\n", get_le16(data + 3));
-+
-+		for (i = 5; i < len; i += 2)
-+			bt_shell_printf("Model App Key:\t%4.4x\n",
-+					get_le16(data + i));
++		bt_shell_printf("Node %4.4x Proxy state: 0x%02x\n",
++				src, data[0]);
 +		break;
 +
- 	/* Per Mesh Profile 4.3.2.63 */
- 	case OP_CONFIG_HEARTBEAT_PUB_STATUS:
- 		bt_shell_printf("\nSet heartbeat for node %4.4x status: %s\n",
-@@ -730,6 +748,37 @@ static void cmd_sub_get(int argc, char *argv[])
- 		bt_shell_printf("Failed to send \"GET SUB GET\"\n");
+ 	case OP_CONFIG_DEFAULT_TTL_STATUS:
+ 		if (len != 1)
+ 			return true;
+@@ -612,6 +619,35 @@ static void cmd_bind(int argc, char *argv[])
+ 		bt_shell_printf("Failed to send \"MODEL APP BIND\"\n");
  }
  
-+static void cmd_get_app(int argc, char *argv[])
++static void cmd_set_proxy(int argc, char *argv[])
 +{
 +	uint16_t n;
-+	uint8_t msg[32];
++	uint8_t msg[2 + 1 + 4];
 +	int parm_cnt;
 +
-+	if (IS_UNASSIGNED(target)) {
-+		bt_shell_printf("Destination not set\n");
++	if (!verify_config_target(target))
 +		return;
-+	}
 +
-+	n = mesh_opcode_set(OP_MODEL_APP_GET, msg);
++	n = mesh_opcode_set(OP_CONFIG_PROXY_SET, msg);
 +
 +	parm_cnt = read_input_parameters(argc, argv);
-+	if (parm_cnt != 2) {
-+		bt_shell_printf("Bad arguments: %s\n", argv[1]);
++	if (parm_cnt != 1) {
++		bt_shell_printf("bad arguments");
 +		return;
 +	}
 +
-+	/* Per Mesh Profile 4.3.2.49 */
-+	/* Element Address */
-+	put_le16(parms[0], msg + n);
-+	n += 2;
-+	/* Model ID */
-+	put_le16(parms[1], msg + n);
-+	n += 2;
++	msg[n++] = parms[0];
++	msg[n++] = parms[1];
 +
 +	if (!config_send(msg, n))
-+		bt_shell_printf("Failed to send \"GET APP GET\"\n");
++		bt_shell_printf("Failed to send \"SET PROXY\"\n");
 +}
 +
- static void cmd_set_hb(int argc, char *argv[])
++static void cmd_get_proxy(int argc, char *argv[])
++{
++	cmd_default(OP_CONFIG_PROXY_GET);
++}
++
+ static void cmd_set_ttl(int argc, char *argv[])
  {
  	uint16_t n;
-@@ -806,7 +855,8 @@ static const struct bt_shell_menu cfg_menu = {
- 				cmd_sub_add,    "Subscription add"},
- 	{"sub-get", "<ele_addr> <model id>",
- 				cmd_sub_get,    "Subscription get"},
--
-+	{"app-get", "<ele_addr> <model id>",
-+				cmd_get_app,    "Get App Keys"},
- 	{} },
- };
- 
+@@ -887,6 +923,10 @@ static const struct bt_shell_menu cfg_menu = {
+ 				cmd_set_pub,	"Set publication"},
+ 	{"pub-get", "<ele_addr> <model>",               cmd_get_pub,
+ 						"Get publication"},
++	{"proxy-set",           "<proxy>",              cmd_set_proxy,
++						"Set proxy state"},
++	{"proxy-get",           NULL,                   cmd_get_proxy,
++						"Get proxy state"},
+ 	{"hb-pub-set", "<pub_addr> <count> <period> <features> <net_idx>",
+ 				cmd_set_hb,     "Set heartbeati publish"},
+ 	{"sub-add", "<ele_addr> <sub_addr> <model id>",
 -- 
 2.11.0
 
