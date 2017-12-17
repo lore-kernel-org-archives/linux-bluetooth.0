@@ -2,9 +2,9 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: sbrown@cortland.com
 To: linux-bluetooth@vger.kernel.org
 Cc: Steve Brown <sbrown@cortland.com>
-Subject: [PATCH V4 9/9] mesh: meshctl: Add Company ID parameter to pub-set and pub-get
-Date: Sun, 17 Dec 2017 10:52:49 +0000
-Message-Id: <20171217105249.7592-10-sbrown@cortland.com>
+Subject: [PATCH V4 5/9] mesh: meshctl: Add get publish
+Date: Sun, 17 Dec 2017 10:52:45 +0000
+Message-Id: <20171217105249.7592-6-sbrown@cortland.com>
 In-Reply-To: <20171217105249.7592-1-sbrown@cortland.com>
 References: <20171217105249.7592-1-sbrown@cortland.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,75 +12,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Steve Brown <sbrown@cortland.com>
 
-Add a CID parameter to both commands similar to bind.
-Correct the prior assumption that a model id > 0xffff
-was a vendor model.
+Get the publish address for model 1001 in element 0100
 
-pub-set 0100 c000 1 0 0 1000
-03 0001 00c0 01 00 ff 00 00 0010
+[config: Target = 0100]# pub-get 0100 1001
 
-pub-set 0100 c000 1 0 0 1000 1
-03 0001 00c0 01 00 ff 00 00 0100 0010
+Set publication for node 0100 status: Success
+Publication address: 0xc000
+Period: 0 ms
+Retransmit count: 0
+Retransmit Interval Steps: 0
 ---
- mesh/config-client.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ mesh/config-client.c | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
 diff --git a/mesh/config-client.c b/mesh/config-client.c
-index 3987c981a..fc6b3dc5d 100644
+index 80c7fd80d..92fca5a8b 100644
 --- a/mesh/config-client.c
 +++ b/mesh/config-client.c
-@@ -781,7 +781,7 @@ static void cmd_set_pub(int argc, char *argv[])
- 	n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_SET, msg);
+@@ -683,6 +683,42 @@ static void cmd_set_pub(int argc, char *argv[])
+ 		bt_shell_printf("Failed to send \"SET MODEL PUBLICATION\"\n");
+ }
  
- 	parm_cnt = read_input_parameters(argc, argv);
--	if (parm_cnt != 6) {
-+	if (parm_cnt != 6 && parm_cnt != 7) {
- 		bt_shell_printf("Bad arguments\n");
- 		return;
- 	}
-@@ -801,8 +801,8 @@ static void cmd_set_pub(int argc, char *argv[])
- 	/* Publish retransmit count & interval steps */
- 	msg[n++] = parms[4];
- 	/* Model Id */
--	if (parms[5] > 0xffff) {
--		put_le16(parms[5] >> 16, msg + n);
-+	if (parm_cnt == 7) {
-+		put_le16(parms[6], msg + n);
- 		put_le16(parms[5], msg + n + 2);
- 		n += 4;
- 	} else {
-@@ -828,7 +828,7 @@ static void cmd_get_pub(int argc, char *argv[])
- 	n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_GET, msg);
- 
- 	parm_cnt = read_input_parameters(argc, argv);
--	if (parm_cnt != 2) {
-+	if (parm_cnt != 2 && parm_cnt != 3) {
- 		bt_shell_printf("Bad arguments: %s\n", argv[1]);
- 		return;
- 	}
-@@ -837,8 +837,8 @@ static void cmd_get_pub(int argc, char *argv[])
- 	put_le16(parms[0], msg + n);
- 	n += 2;
- 	/* Model Id */
--	if (parms[1] > 0xffff) {
--		put_le16(parms[1] >> 16, msg + n);
-+	if (parm_cnt == 3) {
-+		put_le16(parms[2], msg + n);
- 		put_le16(parms[1], msg + n + 2);
- 		n += 4;
- 	} else {
-@@ -1014,8 +1014,9 @@ static const struct bt_shell_menu cfg_menu = {
- 	{"ttl-get",		NULL,			cmd_get_ttl,
- 						"Get default TTL"},
++static void cmd_get_pub(int argc, char *argv[])
++{
++	uint16_t n;
++	uint8_t msg[32];
++	int parm_cnt;
++
++	if (IS_UNASSIGNED(target)) {
++		bt_shell_printf("Destination not set\n");
++		return;
++	}
++
++	n = mesh_opcode_set(OP_CONFIG_MODEL_PUB_GET, msg);
++
++	parm_cnt = read_input_parameters(argc, argv);
++	if (parm_cnt != 2) {
++		bt_shell_printf("Bad arguments: %s\n", argv[1]);
++		return;
++	}
++
++	/* Element Address */
++	put_le16(parms[0], msg + n);
++	n += 2;
++	/* Model Id */
++	if (parms[1] > 0xffff) {
++		put_le16(parms[1] >> 16, msg + n);
++		put_le16(parms[1], msg + n + 2);
++		n += 4;
++	} else {
++		put_le16(parms[1], msg + n);
++		n += 2;
++	}
++
++	if (!config_send(msg, n))
++		bt_shell_printf("Failed to send \"GET MODEL PUBLICATION\"\n");
++}
++
+ static void cmd_sub_add(int argc, char *argv[])
+ {
+ 	uint16_t n;
+@@ -849,6 +885,8 @@ static const struct bt_shell_menu cfg_menu = {
  	{"pub-set", "<ele_addr> <pub_addr> <app_idx> "
--			"<period (step|res)> <re-xmt (count|per)> <model>",
--				cmd_set_pub,	"Set publication"},
-+			"<per (step|res)> <re-xmt (cnt|per)> <mod id> "
-+			"[cid]",
-+			cmd_set_pub,	"\n\t\t\t\t\t\t  Set publication"},
- 	{"pub-get", "<ele_addr> <model>",               cmd_get_pub,
- 						"Get publication"},
- 	{"proxy-set",           "<proxy>",              cmd_set_proxy,
+ 			"<period (step|res)> <re-xmt (count|per)> <model>",
+ 				cmd_set_pub,	"Set publication"},
++	{"pub-get", "<ele_addr> <model>",               cmd_get_pub,
++						"Get publication"},
+ 	{"hb-pub-set", "<pub_addr> <count> <period> <features> <net_idx>",
+ 				cmd_set_hb,     "Set heartbeati publish"},
+ 	{"sub-add", "<ele_addr> <sub_addr> <model id>",
 -- 
 2.11.0
 
