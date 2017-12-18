@@ -1,111 +1,77 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh:meshctl: make model parsing more manageable
-Date: Mon, 18 Dec 2017 12:35:51 -0800
-Message-Id: <20171218203551.6142-1-inga.stotland@intel.com>
+Date: Mon, 18 Dec 2017 17:53:56 +0100 (CET)
+From: Roy Sigurd Karlsbakk <roy@karlsbakk.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-ID: <392812518.130143.1513616036626.JavaMail.zimbra@karlsbakk.net>
+In-Reply-To: <CABBYNZJgMgNdKEk+8ZKrKGqYJ11xD2Cve4WuiLe5jhktj5tFrg@mail.gmail.com>
+References: <50287825.52691.1513592889715.JavaMail.zimbra@karlsbakk.net> <CABBYNZKh_7MEVktwcEtRjm_+98FTfNJiM96R1dOuFCO3mg6KkA@mail.gmail.com> <1436200831.125917.1513614254229.JavaMail.zimbra@karlsbakk.net> <CABBYNZJgMgNdKEk+8ZKrKGqYJ11xD2Cve4WuiLe5jhktj5tFrg@mail.gmail.com>
+Subject: Re: Setting a static pin to allow pairing
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Extract functionality for finding an existing model from
-parse_configuration_models() into new function find_configured_model().
-This removes confusing logic from overloaded implementation of
-parse_configuration_models().
----
- mesh/prov-db.c | 54 ++++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 42 insertions(+), 12 deletions(-)
+>>>> I'm trying to setup a raspberry pi as a bluetooth host allowing pairin=
+g from a
+>>>> phone, but with a predefined pincode, and I can't find any docs on how=
+ to do
+>>>> this. I find some on how to do this interactively, but then, this isn'=
+t meant
+>>>> to be used like that, more like a "blackbox". I've tried to google thi=
+s quite a
+>>>> bit and reading the docs, but I can't find much. Any idea how to do th=
+is?
+>>>
+>>> With SSP, introduced in Bluetooth 2.1, there is no longer a need to
+>>> have predefined pincode. In case that you don't have any means to
+>>> confirm you should be able to use "NoInputNoOutput", you can check how
+>>> this is done in bluetoothctl:
+>>
+>> Perhaps I'm overseeing something, but I don't quite understand how SSP w=
+ill
+>> help. I'm more concerned about unauthorized bluetooth clients pairing wi=
+th this
+>> than MITM-attacks. I want pairing to be fairly simple, but I need a way =
+to
+>> identify the client.
+>=20
+> Authorization is a separate concept, usually services will require
+> certain security level which when not met may cause the pairing
+> process to kick in, authorization may happen regardless of that if the
+> device is not trusted. In other words, Paired property tells if the
+> device if the device has been authenticated and a link-key exists and
+> Trusted tell if the device can connect without being authorized by the
+> agent, the 2 properties acts completely independent.
+>=20
+> For instance, this is how we handle authorization in bluetoothctl:
+>=20
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/client/agent.c#n2=
+42
+>=20
+> Note that RequestAuthorization is for authorizing a new pairing not a
+> new connection, which is done by AuthorizeService:
+>=20
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/agent-api.txt=
+#n161
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/agent-api.txt=
+#n174
+>=20
+> In both cases the device object is given so you can identify who is
+> pairing/connecting.
 
-diff --git a/mesh/prov-db.c b/mesh/prov-db.c
-index 04803a5c8..8a7b47f6e 100644
---- a/mesh/prov-db.c
-+++ b/mesh/prov-db.c
-@@ -371,14 +371,49 @@ static bool parse_bindings(struct mesh_node *node, int ele_idx,
- 	return true;
- }
- 
--static bool parse_configuration_models(struct mesh_node *node, int ele_idx,
--		json_object *jmodels, uint32_t target_id, json_object **jtarget)
-+static json_object* find_configured_model(struct mesh_node *node, int ele_idx,
-+				       json_object *jmodels, uint32_t target_id)
- {
- 	int model_cnt;
- 	int i;
- 
--	if (jtarget)
--		*jtarget = NULL;
-+	model_cnt = json_object_array_length(jmodels);
-+
-+	for (i = 0; i < model_cnt; ++i) {
-+		json_object *jmodel;
-+		json_object *jvalue;
-+		char *str;
-+		int len;
-+		uint32_t model_id;
-+
-+		jmodel = json_object_array_get_idx(jmodels, i);
-+
-+		json_object_object_get_ex(jmodel, "modelId", &jvalue);
-+		str = (char *)json_object_get_string(jvalue);
-+
-+		len = strlen(str);
-+
-+		if (len != 4 && len != 8)
-+			return NULL;
-+
-+		if (sscanf(str, "%08x", &model_id) != 1)
-+			return NULL;
-+
-+		if (len == 4)
-+			model_id += 0xffff0000;
-+
-+		if (model_id == target_id)
-+			return jmodel;
-+	}
-+
-+	return NULL;
-+}
-+
-+static bool parse_configuration_models(struct mesh_node *node, int ele_idx,
-+							json_object *jmodels)
-+{
-+	int model_cnt;
-+	int i;
- 
- 	model_cnt = json_object_array_length(jmodels);
- 
-@@ -405,11 +440,6 @@ static bool parse_configuration_models(struct mesh_node *node, int ele_idx,
- 		if (len == 4)
- 			model_id += 0xffff0000;
- 
--		if (jtarget && model_id == target_id) {
--			*jtarget = jmodel;
--			return true;
--		}
--
- 		json_object_object_get_ex(jmodel, "bind", &jarray);
- 		if (jarray && !parse_bindings(node, ele_idx, model_id, jarray))
- 			return false;
-@@ -468,7 +498,7 @@ static bool parse_configuration_elements(struct mesh_node *node,
- 		if (!jmodels)
- 			continue;
- 
--		if(!parse_configuration_models(node, index, jmodels, 0, NULL))
-+		if(!parse_configuration_models(node, index, jmodels))
- 			return false;
- 	}
- 	return true;
-@@ -1011,8 +1041,8 @@ static json_object *get_jmodel_obj(struct mesh_node *node, uint8_t ele_idx,
- 		jmodels = json_object_new_array();
- 		json_object_object_add(jelement, "models", jmodels);
- 	} else {
--		parse_configuration_models(node, ele_idx, jmodels,
--							model_id, &jmodel);
-+		jmodel = find_configured_model(node, ele_idx, jmodels,
-+								model_id);
- 	}
- 
- 	if (!jmodel) {
--- 
-2.13.6
+I see - thanks. This is all pretty new to me. Do you know how I can use blu=
+etoothectl or similar tools to script up authorisation with the client with=
+out digging deeply into the API?
 
+Vennlig hilsen
+
+roy
+--
+Roy Sigurd Karlsbakk
+(+47) 98013356
+http://blogg.karlsbakk.net/
+GPG Public key: http://karlsbakk.net/roysigurdkarlsbakk.pubkey.txt
+--
+Hi=C3=B0 g=C3=B3=C3=B0a skaltu =C3=AD stein h=C3=B6ggva, hi=C3=B0 illa =C3=
+=AD snj=C3=B3 rita.
