@@ -1,74 +1,123 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] Add AddressType property for Adapter1 and Device1 interfaces
-Date: Tue, 19 Dec 2017 13:00:39 +0100
-Message-ID: <1898759.IM56CrD3XN@ix>
-In-Reply-To: <20171213135110.27167-1-szymon.janc@codecoup.pl>
-References: <20171213135110.27167-1-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <20171218203551.6142-1-inga.stotland@intel.com>
+References: <20171218203551.6142-1-inga.stotland@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 19 Dec 2017 09:46:34 -0200
+Message-ID: <CABBYNZKA4XnssReMakV3dTGxMydX1O+j+qeLciVJqhyFenkGuw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] mesh:meshctl: make model parsing more manageable
+To: Inga Stotland <inga.stotland@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday, 13 December 2017 14:51:07 CET Szymon Janc wrote:
-> This provides information about address type being used.  It is needed
-> for L2CAP sockets and PTS testing purposes.
-> ---
->  doc/adapter-api.txt | 12 ++++++++++++
->  doc/device-api.txt  | 13 +++++++++++++
->  2 files changed, 25 insertions(+)
-> 
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index d852aa6b9..0533b674a 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -149,6 +149,18 @@ Properties	string Address [readonly]
-> 
->  			The Bluetooth device address.
-> 
-> +		string AddressType [readonly]
-> +
-> +			The Bluetooth  Address Type. For dual-mode and BR/EDR
-> +			only adapter this defaults to "public". Single mode LE
-> +			adapters may have either value. With privacy enabled
-> +			this contains type of Identity Address and not type of
-> +			address used for connection.
-> +
-> +			Possible values:
-> +				"public" - Public address
-> +				"random" - Random address
-> +
->  		string Name [readonly]
-> 
->  			The Bluetooth system name (pretty hostname).
-> diff --git a/doc/device-api.txt b/doc/device-api.txt
-> index 8b69c2ef3..1b448eef1 100644
-> --- a/doc/device-api.txt
-> +++ b/doc/device-api.txt
-> @@ -124,6 +124,19 @@ Properties	string Address [readonly]
-> 
->  			The Bluetooth device address of the remote device.
-> 
-> +		string AddressType [readonly]
-> +
-> +			The Bluetooth device Address Type. For dual-mode and
-> +			BR/EDR only devices this defaults to "public". Single
-> +			mode LE devices may have either value. If remote device
-> +			uses privacy than before pairing this represents address
-> +			type used for connection and Identity Address after
-> +			pairing.
-> +
-> +			Possible values:
-> +				"public" - Public address
-> +				"random" - Random address
-> +
->  		string Name [readonly, optional]
-> 
->  			The Bluetooth remote name. This value can not be
+Hi Inga,
 
-Applied.
+On Mon, Dec 18, 2017 at 6:35 PM, Inga Stotland <inga.stotland@intel.com> wrote:
+> Extract functionality for finding an existing model from
+> parse_configuration_models() into new function find_configured_model().
+> This removes confusing logic from overloaded implementation of
+> parse_configuration_models().
+> ---
+>  mesh/prov-db.c | 54 ++++++++++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 42 insertions(+), 12 deletions(-)
+>
+> diff --git a/mesh/prov-db.c b/mesh/prov-db.c
+> index 04803a5c8..8a7b47f6e 100644
+> --- a/mesh/prov-db.c
+> +++ b/mesh/prov-db.c
+> @@ -371,14 +371,49 @@ static bool parse_bindings(struct mesh_node *node, int ele_idx,
+>         return true;
+>  }
+>
+> -static bool parse_configuration_models(struct mesh_node *node, int ele_idx,
+> -               json_object *jmodels, uint32_t target_id, json_object **jtarget)
+> +static json_object* find_configured_model(struct mesh_node *node, int ele_idx,
+> +                                      json_object *jmodels, uint32_t target_id)
+>  {
+>         int model_cnt;
+>         int i;
+>
+> -       if (jtarget)
+> -               *jtarget = NULL;
+> +       model_cnt = json_object_array_length(jmodels);
+> +
+> +       for (i = 0; i < model_cnt; ++i) {
+> +               json_object *jmodel;
+> +               json_object *jvalue;
+> +               char *str;
+> +               int len;
+> +               uint32_t model_id;
+> +
+> +               jmodel = json_object_array_get_idx(jmodels, i);
+> +
+> +               json_object_object_get_ex(jmodel, "modelId", &jvalue);
+> +               str = (char *)json_object_get_string(jvalue);
+> +
+> +               len = strlen(str);
+> +
+> +               if (len != 4 && len != 8)
+> +                       return NULL;
+> +
+> +               if (sscanf(str, "%08x", &model_id) != 1)
+> +                       return NULL;
+> +
+> +               if (len == 4)
+> +                       model_id += 0xffff0000;
+> +
+> +               if (model_id == target_id)
+> +                       return jmodel;
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +static bool parse_configuration_models(struct mesh_node *node, int ele_idx,
+> +                                                       json_object *jmodels)
+> +{
+> +       int model_cnt;
+> +       int i;
+>
+>         model_cnt = json_object_array_length(jmodels);
+>
+> @@ -405,11 +440,6 @@ static bool parse_configuration_models(struct mesh_node *node, int ele_idx,
+>                 if (len == 4)
+>                         model_id += 0xffff0000;
+>
+> -               if (jtarget && model_id == target_id) {
+> -                       *jtarget = jmodel;
+> -                       return true;
+> -               }
+> -
+>                 json_object_object_get_ex(jmodel, "bind", &jarray);
+>                 if (jarray && !parse_bindings(node, ele_idx, model_id, jarray))
+>                         return false;
+> @@ -468,7 +498,7 @@ static bool parse_configuration_elements(struct mesh_node *node,
+>                 if (!jmodels)
+>                         continue;
+>
+> -               if(!parse_configuration_models(node, index, jmodels, 0, NULL))
+> +               if(!parse_configuration_models(node, index, jmodels))
+>                         return false;
+>         }
+>         return true;
+> @@ -1011,8 +1041,8 @@ static json_object *get_jmodel_obj(struct mesh_node *node, uint8_t ele_idx,
+>                 jmodels = json_object_new_array();
+>                 json_object_object_add(jelement, "models", jmodels);
+>         } else {
+> -               parse_configuration_models(node, ele_idx, jmodels,
+> -                                                       model_id, &jmodel);
+> +               jmodel = find_configured_model(node, ele_idx, jmodels,
+> +                                                               model_id);
+>         }
+>
+>         if (!jmodel) {
+> --
+> 2.13.6
+
+While this looks fine I would suggest we start putting these pieces in
+a shared library if we really intend these to be reused.
 
 -- 
-pozdrawiam
-Szymon Janc
+Luiz Augusto von Dentz
