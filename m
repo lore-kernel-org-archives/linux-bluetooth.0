@@ -1,28 +1,112 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 19 Dec 2017 13:53:57 -0500 (EST)
-Message-Id: <20171219.135357.1672171430548778321.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2017-12-18
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20171218102721.GA17768@x1c>
-References: <20171218102721.GA17768@x1c>
+Message-ID: <1513706789.4409.9.camel@cortland.com>
+Subject: Re: [PATCH BlueZ] gatt: Mark AcquireWrite and AcquireNotify as
+ stable
+From: Steve Brown <sbrown@cortland.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Date: Tue, 19 Dec 2017 13:06:29 -0500
+In-Reply-To: <20171219170601.24722-1-luiz.dentz@gmail.com>
+References: <20171219170601.24722-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Mon, 18 Dec 2017 11:27:21 +0100
+Hi Luiz,
 
-> Here's the first bluetooth-next pull request for the 4.16 kernel.
+On Tue, 2017-12-19 at 15:06 -0200, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
->  - hci_ll: multiple cleanups & fixes
->  - Remove Gustavo Padovan from the MAINTAINERS file
->  - Support BLE Adversing while connected (if the controller can do it)
->  - DT updates for TI chips
->  - Various other smaller cleanups & fixes
+> AcquireWrite and AcquireNofify are required by meshctl.
+> ---
+>  doc/gatt-api.txt  |  4 ++--
+>  src/gatt-client.c | 10 ++++------
+>  2 files changed, 6 insertions(+), 8 deletions(-)
 > 
-> Please let me know if there are any issues pulling. Thanks.
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index 8a367783c..ccf3a8b6d 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -91,7 +91,7 @@ Methods		array{byte} ReadValue(dict
+> options)
+>  					 org.bluez.Error.NotAuthoriz
+> ed
+>  					 org.bluez.Error.NotSupporte
+> d
+>  
+> -		fd, uint16 AcquireWrite(dict options) [experimental,
+> optional]
+> +		fd, uint16 AcquireWrite(dict options) [optional]
+>  
+>  			Acquire file descriptor and MTU for writing.
+> Usage of
+>  			WriteValue will be locked causing it to
+> return
+> @@ -120,7 +120,7 @@ Methods		array{byte} ReadValue(dict
+> options)
+>  			Possible Errors: org.bluez.Error.Failed
+>  					 org.bluez.Error.NotSupporte
+> d
+>  
+> -		fd, uint16 AcquireNotify(dict options)
+> [experimental, optional]
+> +		fd, uint16 AcquireNotify(dict options) [optional]
+>  
+>  			Acquire file descriptor and MTU for notify.
+> Usage of
+>  			StartNotify will be locked causing it to
+> return
+> diff --git a/src/gatt-client.c b/src/gatt-client.c
+> index 6d5bbfa02..2f01867dc 100644
+> --- a/src/gatt-client.c
+> +++ b/src/gatt-client.c
+> @@ -1612,11 +1612,9 @@ static const GDBusPropertyTable
+> characteristic_properties[] = {
+>  					characteristic_notifying_exi
+> sts },
+>  	{ "Flags", "as", characteristic_get_flags, NULL, NULL },
+>  	{ "WriteAcquired", "b", characteristic_get_write_acquired,
+> NULL,
+> -				characteristic_write_acquired_exists
+> ,
+> -				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> +				characteristic_write_acquired_exists
+> },
+>  	{ "NotifyAcquired", "b", characteristic_get_notify_acquired,
+> NULL,
+> -				characteristic_notify_acquired_exist
+> s,
+> -				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+> +				characteristic_notify_acquired_exist
+> s },
+>  	{ }
+>  };
+>  
+> @@ -1628,12 +1626,12 @@ static const GDBusMethodTable
+> characteristic_methods[] = {
+>  						{ "options", "a{sv}"
+> }),
+>  					NULL,
+>  					characteristic_write_value)
+> },
+> -	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("AcquireWrite",
+> +	{ GDBUS_ASYNC_METHOD("AcquireWrite",
+>  					GDBUS_ARGS({ "options",
+> "a{sv}" }),
+>  					GDBUS_ARGS({ "fd", "h" },
+>  						{ "mtu", "q" }),
+>  					characteristic_acquire_write
+> ) },
+> -	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("AcquireNotify",
+> +	{ GDBUS_ASYNC_METHOD("AcquireNotify",
+>  					GDBUS_ARGS({ "options",
+> "a{sv}" }),
+>  					GDBUS_ARGS({ "fd", "h" },
+>  						{ "mtu", "q" }),
 
-Pulled, thanks Johan.
+Successfully provisioned a node without -E.
+
+Thanks,
+Steve
+
