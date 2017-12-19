@@ -1,26 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 19 Dec 2017 20:25:20 +0100
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] gatt: Mark AcquireWrite and AcquireNotify as stable
-Message-ID: <20171219192520.GA13151@x1c>
-References: <20171219170601.24722-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171219170601.24722-1-luiz.dentz@gmail.com>
+Date: Tue, 19 Dec 2017 13:53:57 -0500 (EST)
+Message-Id: <20171219.135357.1672171430548778321.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2017-12-18
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20171218102721.GA17768@x1c>
+References: <20171218102721.GA17768@x1c>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Mon, 18 Dec 2017 11:27:21 +0100
 
-On Tue, Dec 19, 2017, Luiz Augusto von Dentz wrote:
-> AcquireWrite and AcquireNofify are required by meshctl.
-> ---
->  doc/gatt-api.txt  |  4 ++--
->  src/gatt-client.c | 10 ++++------
->  2 files changed, 6 insertions(+), 8 deletions(-)
+> Here's the first bluetooth-next pull request for the 4.16 kernel.
+> 
+>  - hci_ll: multiple cleanups & fixes
+>  - Remove Gustavo Padovan from the MAINTAINERS file
+>  - Support BLE Adversing while connected (if the controller can do it)
+>  - DT updates for TI chips
+>  - Various other smaller cleanups & fixes
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-Applied. Thanks.
-
-Johan
+Pulled, thanks Johan.
