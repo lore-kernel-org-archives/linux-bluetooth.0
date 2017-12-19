@@ -1,36 +1,26 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: sbrown@cortland.com
-To: linux-bluetooth@vger.kernel.org
-Cc: Steve Brown <sbrown@cortland.com>
-Subject: [PATCH] mesh: meshctl: Make composition-get argument optional
-Date: Tue, 19 Dec 2017 16:27:59 -0500
-Message-Id: <20171219212759.19918-1-sbrown@cortland.com>
+Date: Tue, 19 Dec 2017 20:25:20 +0100
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] gatt: Mark AcquireWrite and AcquireNotify as stable
+Message-ID: <20171219192520.GA13151@x1c>
+References: <20171219170601.24722-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20171219170601.24722-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Steve Brown <sbrown@cortland.com>
+Hi Luiz,
 
-It can't be both optional and required.
+On Tue, Dec 19, 2017, Luiz Augusto von Dentz wrote:
+> AcquireWrite and AcquireNofify are required by meshctl.
+> ---
+>  doc/gatt-api.txt  |  4 ++--
+>  src/gatt-client.c | 10 ++++------
+>  2 files changed, 6 insertions(+), 8 deletions(-)
 
-[config: Target = 0100]# composition-get 0
-Unable to parse optional command arguments
----
- mesh/config-client.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied. Thanks.
 
-diff --git a/mesh/config-client.c b/mesh/config-client.c
-index fc6b3dc5d..f280441cc 100644
---- a/mesh/config-client.c
-+++ b/mesh/config-client.c
-@@ -997,7 +997,7 @@ static const struct bt_shell_menu cfg_menu = {
- 	.entries = {
- 	{"target",		"<unicast>",		cmd_set_node,
- 						"Set target node to configure"},
--	{"composition-get",	"[<page_num>]",		cmd_get_composition,
-+	{"composition-get",	"[page_num]",		cmd_get_composition,
- 						"Get Composition Data"},
- 	{"netkey-add",		"<net_idx>",		cmd_add_net_key,
- 						"Add network key"},
--- 
-2.14.1
-
+Johan
