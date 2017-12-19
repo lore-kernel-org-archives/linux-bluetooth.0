@@ -1,112 +1,38 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1513706789.4409.9.camel@cortland.com>
-Subject: Re: [PATCH BlueZ] gatt: Mark AcquireWrite and AcquireNotify as
- stable
-From: Steve Brown <sbrown@cortland.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date: Tue, 19 Dec 2017 13:06:29 -0500
-In-Reply-To: <20171219170601.24722-1-luiz.dentz@gmail.com>
-References: <20171219170601.24722-1-luiz.dentz@gmail.com>
+Return-Path: <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <5F8872D1-8947-4AA0-9F73-808D8A9D4440@holtmann.org>
+References: <20171219124059.4466-1-luiz.dentz@gmail.com> <20171219124059.4466-3-luiz.dentz@gmail.com>
+ <5F8872D1-8947-4AA0-9F73-808D8A9D4440@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 19 Dec 2017 15:38:32 -0200
+Message-ID: <CABBYNZ+ym8zn_DJL_-re4VqJRw3w_UtSaw2waUEjmmRdjcFAhg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 3/4] lib: Introduce bt_appeartostr
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
-On Tue, 2017-12-19 at 15:06 -0200, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> AcquireWrite and AcquireNofify are required by meshctl.
-> ---
->  doc/gatt-api.txt  |  4 ++--
->  src/gatt-client.c | 10 ++++------
->  2 files changed, 6 insertions(+), 8 deletions(-)
-> 
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index 8a367783c..ccf3a8b6d 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -91,7 +91,7 @@ Methods		array{byte} ReadValue(dict
-> options)
->  					 org.bluez.Error.NotAuthoriz
-> ed
->  					 org.bluez.Error.NotSupporte
-> d
->  
-> -		fd, uint16 AcquireWrite(dict options) [experimental,
-> optional]
-> +		fd, uint16 AcquireWrite(dict options) [optional]
->  
->  			Acquire file descriptor and MTU for writing.
-> Usage of
->  			WriteValue will be locked causing it to
-> return
-> @@ -120,7 +120,7 @@ Methods		array{byte} ReadValue(dict
-> options)
->  			Possible Errors: org.bluez.Error.Failed
->  					 org.bluez.Error.NotSupporte
-> d
->  
-> -		fd, uint16 AcquireNotify(dict options)
-> [experimental, optional]
-> +		fd, uint16 AcquireNotify(dict options) [optional]
->  
->  			Acquire file descriptor and MTU for notify.
-> Usage of
->  			StartNotify will be locked causing it to
-> return
-> diff --git a/src/gatt-client.c b/src/gatt-client.c
-> index 6d5bbfa02..2f01867dc 100644
-> --- a/src/gatt-client.c
-> +++ b/src/gatt-client.c
-> @@ -1612,11 +1612,9 @@ static const GDBusPropertyTable
-> characteristic_properties[] = {
->  					characteristic_notifying_exi
-> sts },
->  	{ "Flags", "as", characteristic_get_flags, NULL, NULL },
->  	{ "WriteAcquired", "b", characteristic_get_write_acquired,
-> NULL,
-> -				characteristic_write_acquired_exists
-> ,
-> -				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> +				characteristic_write_acquired_exists
-> },
->  	{ "NotifyAcquired", "b", characteristic_get_notify_acquired,
-> NULL,
-> -				characteristic_notify_acquired_exist
-> s,
-> -				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> +				characteristic_notify_acquired_exist
-> s },
->  	{ }
->  };
->  
-> @@ -1628,12 +1626,12 @@ static const GDBusMethodTable
-> characteristic_methods[] = {
->  						{ "options", "a{sv}"
-> }),
->  					NULL,
->  					characteristic_write_value)
-> },
-> -	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("AcquireWrite",
-> +	{ GDBUS_ASYNC_METHOD("AcquireWrite",
->  					GDBUS_ARGS({ "options",
-> "a{sv}" }),
->  					GDBUS_ARGS({ "fd", "h" },
->  						{ "mtu", "q" }),
->  					characteristic_acquire_write
-> ) },
-> -	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("AcquireNotify",
-> +	{ GDBUS_ASYNC_METHOD("AcquireNotify",
->  					GDBUS_ARGS({ "options",
-> "a{sv}" }),
->  					GDBUS_ARGS({ "fd", "h" },
->  						{ "mtu", "q" }),
+On Tue, Dec 19, 2017 at 3:29 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> This adds bt_appeartostr which can decode the appearance code to a
+>> human readable string.
+>> ---
+>> lib/bluetooth.c | 87 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> lib/bluetooth.h |  1 +
+>> 2 files changed, 88 insertions(+)
+>>
+>> diff --git a/lib/bluetooth.c b/lib/bluetooth.c
+>> index 3276b68a5..75d94dbfa 100644
+>> --- a/lib/bluetooth.c
+>> +++ b/lib/bluetooth.c
+>
+> I really do not want to extend libbluetooth.so anymore with new functionality. If you want to do some things in src/shared/ then fine, but nothing is going to move into lib/ anymore.
 
-Successfully provisioned a node without -E.
+Fair enough, I guess I will put these under shared/util.h then.
 
-Thanks,
-Steve
 
+-- 
+Luiz Augusto von Dentz
