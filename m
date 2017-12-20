@@ -11,22 +11,23 @@ Cc: linux-usb@vger.kernel.org,
 	Matthias Kaehlcke <mka@chromium.org>,
 	Brian Norris <briannorris@chromium.org>,
 	Daniel Drake <drake@endlessm.com>
-Subject: [PATCH 2/2] usb: quirks: Add reset-resume quirk for Dell DW1820 QCA Rome Bluetooth
-Date: Wed, 20 Dec 2017 19:00:08 +0800
-Message-Id: <20171220110008.11856-2-kai.heng.feng@canonical.com>
-In-Reply-To: <20171220110008.11856-1-kai.heng.feng@canonical.com>
-References: <20171220110008.11856-1-kai.heng.feng@canonical.com>
+Subject: [PATCH 1/2] Revert "Bluetooth: btusb: fix QCA Rome suspend/resume"
+Date: Wed, 20 Dec 2017 19:00:07 +0800
+Message-Id: <20171220110008.11856-1-kai.heng.feng@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit ("fd865802c66bc451dc515ed89360f84376ce1a56 Bluetooth: btusb: fix
-QCA Rome suspend/resume") enables reset_resume in btusb_probe(). This
-makes the device resets during btusb_open(), firmware loading gets
-interrupted as a result.
+This reverts commit fd865802c66bc451dc515ed89360f84376ce1a56.
 
-We still want to reset the device to solve the original issue, but we
-should do it before btusb_open().
+This commit causes a regression on some QCA ROME chips. The USB device
+reset happens in btusb_open(), hence firmware loading gets interrupted.
 
-Hence, add reset-resume quirk in usb core intead of btusb.
+Furthermore, this commit stops working after commit
+("a0085f2510e8976614ad8f766b209448b385492f Bluetooth: btusb: driver to
+enable the usb-wakeup feature"). Reset-resume quirk only gets enabled in
+btusb_suspend() when it's not a wakeup source.
+
+If we really want to reset the USB device, we need to do it before
+btusb_open(). Let's handle it in drivers/usb/core/quirks.c.
 
 Cc: stable@vger.kernel.org
 Cc: Leif Liddy <leif.linux@gmail.com>
@@ -36,22 +37,29 @@ Cc: Daniel Drake <drake@endlessm.com>
 Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
 
 ---
- drivers/usb/core/quirks.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/usb/core/quirks.c b/drivers/usb/core/quirks.c
-index a10b346b9777..96951104c45b 100644
---- a/drivers/usb/core/quirks.c
-+++ b/drivers/usb/core/quirks.c
-@@ -197,6 +197,9 @@ static const struct usb_device_id usb_quirk_list[] = {
- 	{ USB_DEVICE(0x0b05, 0x17e0), .driver_info =
- 			USB_QUIRK_IGNORE_REMOTE_WAKEUP },
+Daniel, Cc you because this also affects your original quirk patch for
+Realtek btusb.
+
+ drivers/bluetooth/btusb.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f7120c9eb9bd..da353c4acdc7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3117,12 +3117,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_QCA_ROME) {
+ 		data->setup_on_usb = btusb_setup_qca;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
+-
+-		/* QCA Rome devices lose their updated firmware over suspend,
+-		 * but the USB hub doesn't notice any status change.
+-		 * Explicitly request a device reset on resume.
+-		 */
+-		set_bit(BTUSB_RESET_RESUME, &data->flags);
+ 	}
  
-+	/* QCA Rome Bluetooth in Dell DW1820 wireless module */
-+	{ USB_DEVICE(0x0cf3, 0xe007), .driver_info = USB_QUIRK_RESET_RESUME },
-+
- 	/* Action Semiconductor flash disk */
- 	{ USB_DEVICE(0x10d6, 0x2200), .driver_info =
- 			USB_QUIRK_STRING_FETCH_255 },
+ #ifdef CONFIG_BT_HCIBTUSB_RTL
 -- 
 2.14.1
