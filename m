@@ -2,356 +2,184 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [RFC 8/8] Bluetooth: Implement extended LE Connection
-Date: Wed, 20 Dec 2017 11:44:37 +0530
-Message-Id: <1513750477-8438-8-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [RFC 6/8] Bluetooth: Process extended ADV report event
+Date: Wed, 20 Dec 2017 11:44:35 +0530
+Message-Id: <1513750477-8438-6-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1513750477-8438-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1513750477-8438-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This implements extended LE craete connection and enhanced
-LE conn complete event and use it only if user has set PHY
-either 2M or CODED
+This patch enables Extended ADV report event if extended scanning
+is supported in the controller and user has set PHY configuration
+as either 2M or CODED.
 
-< HCI Command: LE Extended Create Connection (0x08|0x0043) plen 26
-        Filter policy: White list is not used (0x00)
-        Own address type: Public (0x00)
-        Peer address type: Random (0x01)
-        Peer address: DB:7E:2E:1D:85:E8 (Static)
-        Initiating PHYs: 0x01
-        Entry 0: LE 1M
-          Scan interval: 60.000 msec (0x0060)
-          Scan window: 60.000 msec (0x0060)
-          Min connection interval: 50.00 msec (0x0028)
-          Max connection interval: 70.00 msec (0x0038)
-          Connection latency: 0 (0x0000)
-          Supervision timeout: 420 msec (0x002a)
-          Min connection length: 0.000 msec (0x0000)
-          Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4
-      LE Extended Create Connection (0x08|0x0043) ncmd 2
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 31
-      LE Enhanced Connection Complete (0x0a)
-        Status: Success (0x00)
-        Handle: 3585
-        Role: Master (0x00)
-        Peer address type: Random (0x01)
-        Peer address: DB:7E:2E:1D:85:E8 (Static)
-        Local resolvable private address: 00:00:00:00:00:00 (Non-Resolvable)
-        Peer resolvable private address: 00:00:00:00:00:00 (Non-Resolvable)
-        Connection interval: 67.50 msec (0x0036)
-        Connection latency: 0 (0x0000)
-        Supervision timeout: 420 msec (0x002a)
-        Master clock accuracy: 0x00
-@ MGMT Event: Device Connected (0x000b) plen 40
-        LE Address: DB:7E:2E:1D:85:E8 (Static)
-        Flags: 0x00000000
-        Data length: 27
-        Name (complete): Designer Mouse
-        Appearance: Mouse (0x03c2)
-        Flags: 0x05
-          LE Limited Discoverable Mode
-          BR/EDR Not Supported
-        16-bit Service UUIDs (complete): 1 entry
-          Human Interface Device (0x1812)
+> HCI Event: LE Meta Event (0x3e) plen 53
+      LE Extended Advertising Report (0x0d)
+        Num reports: 1
+        Entry 0
+          Event type: 0x0013
+            Props: 0x0013
+              Connectable
+              Scannable
+              Use legacy advertising PDUs
+            Data status: Complete
+          Legacy PDU Type: ADV_IND (0x0013)
+          Address type: Random (0x01)
+          Address: DB:7E:2E:1A:85:E8 (Static)
+          Primary PHY: LE 1M
+          Secondary PHY: LE 1M
+          SID: 0x00
+          TX power: 0 dBm
+          RSSI: -90 dBm (0xa6)
+          Periodic advertising invteral: 0.00 msec (0x0000)
+          Direct address type: Public (0x00)
+          Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
+          Data length: 0x1b
+        0f 09 44 65 73 69 67 6e 65 72 20 4d 6f 75 73 65  ..Designer Mouse
+        03 19 c2 03 02 01 05 03 03 12 18                 ...........
 
 Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- include/net/bluetooth/hci.h      |  36 ++++++++++++++
- include/net/bluetooth/hci_core.h |   5 ++
- net/bluetooth/hci_conn.c         | 105 ++++++++++++++++++++++++++++++++-------
- net/bluetooth/hci_core.c         |   6 +++
- net/bluetooth/hci_event.c        |  47 ++++++++++++++++++
- 5 files changed, 181 insertions(+), 18 deletions(-)
+ include/net/bluetooth/hci.h | 31 +++++++++++++++++++++++++
+ net/bluetooth/hci_core.c    |  6 +++++
+ net/bluetooth/hci_event.c   | 55 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 92 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 2182d4c..193e152 100644
+index 497b24e..2182d4c 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -1546,6 +1546,27 @@ struct hci_cp_le_set_ext_scan_enable {
-         __le16	period;
+@@ -1933,6 +1933,20 @@ struct hci_ev_le_conn_complete {
+ #define LE_ADV_SCAN_IND		0x02
+ #define LE_ADV_NONCONN_IND	0x03
+ #define LE_ADV_SCAN_RSP		0x04
++#define LE_ADV_INVALID		0x05
++
++/* Legacy event types in extended adv report */
++#define LE_LEGACY_ADV_IND		0x0013
++#define LE_LEGACY_ADV_DIRECT_IND 	0x0015
++#define LE_LEGACY_ADV_SCAN_IND		0x0012
++#define LE_LEGACY_NONCONN_IND		0x0010
++#define LE_LEGACY_SCAN_RSP_ADV		0x001b
++#define LE_LEGACY_SCAN_RSP_ADV_SCAN	0x001a
++
++/* Extended Advertising event types */
++#define LE_EXT_ADV_NON_CONN_IND		0x0000
++#define LE_EXT_ADV_CONN_IND		0x0001
++#define LE_EXT_ADV_SCAN_IND		0x0002
+ 
+ #define ADDR_LE_DEV_PUBLIC	0x00
+ #define ADDR_LE_DEV_RANDOM	0x01
+@@ -1997,6 +2011,23 @@ struct hci_ev_le_direct_adv_info {
+ 	__s8	 rssi;
  } __packed;
  
-+#define HCI_OP_LE_EXT_CREATE_CONN    0x2043
-+struct hci_cp_le_ext_create_conn {
-+        __u8      filter_policy;
-+        __u8      own_addr_type;
-+        __u8      peer_addr_type;
-+        bdaddr_t  peer_addr;
-+        __u8      phys;
-+        __u8      data[0];
-+} __packed;
-+
-+struct hci_cp_le_ext_conn_param {
-+        __le16 scan_interval;
-+        __le16 scan_window;
-+        __le16 conn_interval_min;
-+        __le16 conn_interval_max;
-+        __le16 conn_latency;
-+        __le16 supervision_timeout;
-+        __le16 min_ce_len;
-+        __le16 max_ce_len;
-+} __packed;
-+
- /* ---- HCI Events ---- */
- #define HCI_EV_INQUIRY_COMPLETE		0x01
- 
-@@ -2028,6 +2049,21 @@ struct hci_ev_le_ext_adv_report {
- 	__u8	 data[0];
- } __packed;
- 
-+#define HCI_EV_LE_ENHANCED_CONN_COMPLETE    0x0a
-+struct hci_ev_le_enh_conn_complete {
-+        __u8      status;
-+        __le16    handle;
-+        __u8      role;
-+        __u8      bdaddr_type;
-+        bdaddr_t  bdaddr;
-+        bdaddr_t  local_rpa;
-+        bdaddr_t  peer_rpa;
-+        __le16    interval;
-+        __le16    latency;
-+        __le16    supervision_timeout;
-+        __u8      clk_accurancy;
++#define HCI_EV_LE_EXT_ADV_REPORT    0x0d
++struct hci_ev_le_ext_adv_report {
++	__le16 	 evt_type;
++	__u8	 bdaddr_type;
++	bdaddr_t bdaddr;
++	__u8	 primary_phy;
++	__u8	 secondary_phy;
++	__u8	 sid;
++	__u8	 tx_power;
++	__s8	 rssi;
++	__le16 	 interval;
++	__u8  	 direct_addr_type;
++	bdaddr_t direct_addr;
++	__u8  	 length;
++	__u8	 data[0];
 +} __packed;
 +
  /* Internal events generated by Bluetooth stack */
  #define HCI_EV_STACK_INTERNAL	0xfd
  struct hci_ev_stack_internal {
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5036ab6..36086a8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1170,6 +1170,11 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define use_ext_scan(dev) ((scan_2m(dev) || scan_coded(dev)) && \
- 			   (dev->commands[37] & 0x20 && dev->commands[37] & 0x40))
- 
-+/* If user has set PHY as either 2M or CODED and extended connection is supported
-+ * by the controller then use extended connection
-+ */
-+#define use_ext_conn(dev) ((scan_2m(dev) || scan_coded(dev)) && \
-+			   (dev)->commands[37] & 0x80)
- 
- /* ----- HCI protocols ----- */
- #define HCI_PROTO_DEFER             0x01
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index a968253..d117467 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -751,7 +751,6 @@ static bool conn_use_rpa(struct hci_conn *conn)
- static void hci_req_add_le_create_conn(struct hci_request *req,
- 				       struct hci_conn *conn)
- {
--	struct hci_cp_le_create_conn cp;
- 	struct hci_dev *hdev = conn->hdev;
- 	u8 own_addr_type;
- 
-@@ -762,25 +761,95 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
- 				      &own_addr_type))
- 		return;
- 
--	memset(&cp, 0, sizeof(cp));
--
--	/* Set window to be the same value as the interval to enable
--	 * continuous scanning.
-+	/* Use ext connection if user has selected either 2M or CODED and
-+	 *  controller supports extended create connection command.
- 	 */
--	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
--	cp.scan_window = cp.scan_interval;
-+	if (use_ext_conn(hdev)) {
-+		struct hci_cp_le_ext_create_conn *cp;
-+		struct hci_cp_le_ext_conn_param *p;
-+		u8 data[sizeof(*cp) + sizeof(*p) * 3];
-+		u8 init_phys;
-+		u32 plen;
- 
--	bacpy(&cp.peer_addr, &conn->dst);
--	cp.peer_addr_type = conn->dst_type;
--	cp.own_address_type = own_addr_type;
--	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
--	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
--	cp.conn_latency = cpu_to_le16(conn->le_conn_latency);
--	cp.supervision_timeout = cpu_to_le16(conn->le_supv_timeout);
--	cp.min_ce_len = cpu_to_le16(0x0000);
--	cp.max_ce_len = cpu_to_le16(0x0000);
--
--	hci_req_add(req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
-+		cp = (void *) data;
-+		p = (void *) cp->data;
-+
-+		memset(cp, 0, sizeof(*cp));
-+
-+		bacpy(&cp->peer_addr, &conn->dst);
-+		cp->peer_addr_type = conn->dst_type;
-+		cp->own_addr_type = own_addr_type;
-+
-+		if (scan_1m(hdev))
-+			cp->phys |= LE_SCAN_PHY_1M;
-+
-+		if (scan_2m(hdev))
-+			cp->phys |= LE_SCAN_PHY_2M;
-+
-+		if (scan_coded(hdev))
-+			cp->phys |= LE_SCAN_PHY_CODED;
-+
-+		init_phys = cp->phys;
-+
-+		plen = sizeof(*cp);
-+
-+		/* Use same param for all PHYs */
-+		while (init_phys) {
-+			u16 min_interval, max_interval, supv_timeout;
-+
-+			if (!(init_phys & 0x01)) {
-+				init_phys >>= 0x01;
-+				continue;
-+			}
-+
-+			memset(p, 0, sizeof(*p));
-+
-+			/* Set window to be the same value as the interval to
-+			 * enable continuous scanning.
-+			 */
-+
-+			min_interval = conn->le_conn_min_interval;
-+			max_interval = conn->le_conn_max_interval;
-+			supv_timeout = conn->le_supv_timeout;
-+
-+			p->scan_interval = cpu_to_le16(hdev->le_scan_interval);
-+			p->scan_window = p->scan_interval;
-+			p->conn_interval_min = cpu_to_le16(min_interval);
-+			p->conn_interval_max = cpu_to_le16(max_interval);
-+			p->conn_latency = cpu_to_le16(conn->le_conn_latency);
-+			p->supervision_timeout = cpu_to_le16(supv_timeout);
-+			p->min_ce_len = cpu_to_le16(0x0000);
-+			p->max_ce_len = cpu_to_le16(0x0000);
-+
-+			p++;
-+			plen += sizeof(*p);
-+			init_phys >>= 1;
-+		}
-+
-+		hci_req_add(req, HCI_OP_LE_EXT_CREATE_CONN, plen, data);
-+	} else {
-+		struct hci_cp_le_create_conn cp;
-+
-+		memset(&cp, 0, sizeof(cp));
-+
-+		/* Set window to be the same value as the interval to enable
-+		 * continuous scanning.
-+		 */
-+		cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
-+		cp.scan_window = cp.scan_interval;
-+
-+		bacpy(&cp.peer_addr, &conn->dst);
-+		cp.peer_addr_type = conn->dst_type;
-+		cp.own_address_type = own_addr_type;
-+		cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
-+		cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
-+		cp.conn_latency = cpu_to_le16(conn->le_conn_latency);
-+		cp.supervision_timeout = cpu_to_le16(conn->le_supv_timeout);
-+		cp.min_ce_len = cpu_to_le16(0x0000);
-+		cp.max_ce_len = cpu_to_le16(0x0000);
-+
-+		hci_req_add(req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
-+	}
- 
- 	conn->state = BT_CONNECT;
- 	clear_bit(HCI_CONN_SCANNING, &conn->flags);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 13f5ec1..8c49cc9 100644
+index f42f5b3..13f5ec1 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -714,6 +714,12 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
- 		if (hdev->commands[37] & 0x20 && hdev->commands[37] & 0x40)
- 			events[1] |= 0x10;        /* LE Extended adv report */
+@@ -708,6 +708,12 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+ 		if (hdev->commands[35] & (0x20 | 0x40))
+ 			events[1] |= 0x08;        /* LE PHY Update Complete */
  
-+		/* If the controller supports the LE Extended connection
-+		 *  enable the corresponding event.
++		/* If the controller supports the LE Set Scan param and
++		 * LE Set Scan enable commands, enable the corresponding event.
 +		 */
-+		if (hdev->commands[37] & 0x80)
-+			events[1] |= 0x02;       /* LE Enhanced conn complete */
++		if (hdev->commands[37] & 0x20 && hdev->commands[37] & 0x40)
++			events[1] |= 0x10;        /* LE Extended adv report */
 +
  		hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
  			    events);
  
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5256e84..1ecd2ce 100644
+index 10539f5..f6d475e 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -2057,6 +2057,31 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, u8 status)
+@@ -5058,6 +5058,57 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
  	hci_dev_unlock(hdev);
  }
  
-+static void hci_cs_le_ext_create_conn(struct hci_dev *hdev, u8 status)
++static u8 convert_ext_evt_type(u16 evt_type)
 +{
-+	struct hci_cp_le_ext_create_conn *cp;
++	switch (evt_type) {
++	case LE_LEGACY_ADV_IND:
++	case LE_EXT_ADV_CONN_IND:
++		return LE_ADV_IND;
++	case LE_LEGACY_ADV_DIRECT_IND:
++		return LE_ADV_DIRECT_IND;
++	case LE_LEGACY_ADV_SCAN_IND:
++	case LE_EXT_ADV_SCAN_IND:
++		return LE_ADV_SCAN_IND;
++	case LE_LEGACY_NONCONN_IND:
++	case LE_EXT_ADV_NON_CONN_IND:
++		return LE_ADV_NONCONN_IND;
++	case LE_LEGACY_SCAN_RSP_ADV:
++	case LE_LEGACY_SCAN_RSP_ADV_SCAN:
++		return LE_ADV_SCAN_RSP;
++	}
 +
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++	BT_ERR_RATELIMITED("Unknown advertising packet type: 0x%02x",
++				   evt_type);
 +
-+	/* All connection failure handling is taken care of by the
-+	 * hci_le_conn_failed function which is triggered by the HCI
-+	 * request completion callbacks used for connecting.
-+	 */
-+	if (status)
-+		return;
++	return LE_ADV_INVALID;
++}
 +
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_EXT_CREATE_CONN);
-+	if (!cp)
-+		return;
++static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	u8 num_reports = skb->data[0];
++	void *ptr = &skb->data[1];
 +
 +	hci_dev_lock(hdev);
 +
-+	cs_le_create_conn(hdev, &cp->peer_addr, cp->peer_addr_type,
-+			  cp->own_addr_type, cp->filter_policy);
++	while (num_reports--) {
++		struct hci_ev_le_ext_adv_report *ev = ptr;
++		u8 legacy_evt_type;
++		u16 evt_type;
++
++		evt_type = __le16_to_cpu(ev->evt_type);
++		legacy_evt_type = convert_ext_evt_type(evt_type);
++		if (legacy_evt_type != LE_ADV_INVALID) {
++			process_adv_report(hdev, legacy_evt_type, &ev->bdaddr,
++					   ev->bdaddr_type, NULL, 0, ev->rssi,
++					   ev->data, ev->length);
++		}
++
++		ptr += sizeof(*ev) + ev->length + 1;
++	}
 +
 +	hci_dev_unlock(hdev);
 +}
 +
- static void hci_cs_le_read_remote_features(struct hci_dev *hdev, u8 status)
- {
- 	struct hci_cp_le_read_remote_features *cp;
-@@ -3254,6 +3279,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb,
- 		hci_cs_le_start_enc(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_LE_EXT_CREATE_CONN:
-+		hci_cs_le_ext_create_conn(hdev, ev->status);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
- 		break;
-@@ -4755,6 +4784,20 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			     le16_to_cpu(ev->supervision_timeout));
- }
- 
-+static void hci_le_enh_conn_complete_evt(struct hci_dev *hdev,
-+					 struct sk_buff *skb)
-+{
-+	struct hci_ev_le_enh_conn_complete *ev = (void *) skb->data;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
-+
-+	le_conn_complete_evt(hdev, ev->status, &ev->bdaddr, ev->bdaddr_type,
-+			     ev->role, le16_to_cpu(ev->handle),
-+			     le16_to_cpu(ev->interval),
-+			     le16_to_cpu(ev->latency),
-+			     le16_to_cpu(ev->supervision_timeout));
-+}
-+
- static void hci_le_conn_update_complete_evt(struct hci_dev *hdev,
+ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev,
  					    struct sk_buff *skb)
  {
-@@ -5366,6 +5409,10 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_le_ext_adv_report_evt(hdev, skb);
+@@ -5290,6 +5341,10 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_le_direct_adv_report_evt(hdev, skb);
  		break;
  
-+	case HCI_EV_LE_ENHANCED_CONN_COMPLETE:
-+		hci_le_enh_conn_complete_evt(hdev, skb);
++	case HCI_EV_LE_EXT_ADV_REPORT:
++		hci_le_ext_adv_report_evt(hdev, skb);
 +		break;
 +
  	default:
