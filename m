@@ -2,242 +2,357 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [RFC 7/8] Bluetooth: Introduce helpers for le conn status and complete
-Date: Wed, 20 Dec 2017 11:44:36 +0530
-Message-Id: <1513750477-8438-7-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [RFC 3/8] Bluetooth: Implement Set PHY Confguration command
+Date: Wed, 20 Dec 2017 11:44:32 +0530
+Message-Id: <1513750477-8438-3-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1513750477-8438-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1513750477-8438-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is done so that the helpers can be used for extended conn
-implementation which will be done in subsequent patch.
+This enables user to set default phys which will be set
+to the controller which inturn use those PHYs in all subsequent
+connections. Also host will use the same in scanning as well.
+
+This patch also implements PHY Changed event which will be
+triggered whenever default PHYs change.
+
+This also adds PHY_CONFIGURATION to mgmt settings which set
+in the supported settings if controller supports 2M or CODED,
+and set in current settings if either 2M or CODED is selected
+as the default PHYs
 
 Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- net/bluetooth/hci_event.c | 111 +++++++++++++++++++++++++++-------------------
- 1 file changed, 66 insertions(+), 45 deletions(-)
+ include/net/bluetooth/hci.h  |   5 ++
+ include/net/bluetooth/mgmt.h |  17 +++++
+ net/bluetooth/hci_event.c    |  57 ++++++++++++++++
+ net/bluetooth/mgmt.c         | 154 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 233 insertions(+)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 54273ad..79d6d51 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -214,6 +214,7 @@ enum {
+ 	HCI_MGMT_DEV_CLASS_EVENTS,
+ 	HCI_MGMT_LOCAL_NAME_EVENTS,
+ 	HCI_MGMT_OOB_DATA_EVENTS,
++	HCI_MGMT_PHY_CHANGED_EVENTS,
+ };
+ 
+ /*
+@@ -1515,6 +1516,10 @@ struct hci_cp_le_set_default_phy {
+ 	__u8    rx_phys;
+ } __packed;
+ 
++#define HCI_LE_SET_PHY_1M		0x01
++#define HCI_LE_SET_PHY_2M		0x02
++#define HCI_LE_SET_PHY_CODED		0x04
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
+ 
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 23c0e12..cbfe7e4 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -101,6 +101,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_PRIVACY		0x00002000
+ #define MGMT_SETTING_CONFIGURATION	0x00004000
+ #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
++#define MGMT_SETTING_PHY_CONFIGURATION  0x00010000
+ 
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+@@ -618,6 +619,17 @@ struct mgmt_rp_get_phy_confguration {
+ #define MGMT_PHY_LE_CODED_TX		0x0010
+ #define MGMT_PHY_LE_CODED_RX		0x0020
+ 
++#define MGMT_PHY_LE_TX_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_2M_TX | \
++			     MGMT_PHY_LE_CODED_TX)
++#define MGMT_PHY_LE_RX_MASK (MGMT_PHY_LE_1M_RX | MGMT_PHY_LE_2M_RX | \
++			     MGMT_PHY_LE_CODED_RX)
++
++#define MGMT_OP_SET_PHY_CONFIGURATION	0x0045
++#define MGMT_SET_PHY_CONFIGURATION_SIZE		2
++struct mgmt_cp_set_phy_confguration {
++	__u16	default_phys;
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+@@ -838,3 +850,8 @@ struct mgmt_ev_ext_info_changed {
+ 	__le16	eir_len;
+ 	__u8	eir[0];
+ } __packed;
++
++#define MGMT_EV_PHY_CONFIGURATION_CHANGED	0x0026
++struct mgmt_ev_phy_configuration_changed {
++	__le16	selected_phys;
++} __packed;
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f6d475e..5256e84 100644
+index cd3bbb7..931376f 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1997,55 +1997,63 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
+@@ -1041,6 +1041,59 @@ static void hci_cc_le_set_random_addr(struct hci_dev *hdev, struct sk_buff *skb)
  	hci_dev_unlock(hdev);
  }
  
--static void hci_cs_le_create_conn(struct hci_dev *hdev, u8 status)
-+static void cs_le_create_conn(struct hci_dev *hdev, bdaddr_t *peer_addr,
-+			      u8 peer_addr_type, u8 own_address_type,
-+			      u8 filter_policy)
- {
--	struct hci_cp_le_create_conn *cp;
- 	struct hci_conn *conn;
- 
--	BT_DBG("%s status 0x%2.2x", hdev->name, status);
--
--	/* All connection failure handling is taken care of by the
--	 * hci_le_conn_failed function which is triggered by the HCI
--	 * request completion callbacks used for connecting.
--	 */
--	if (status)
--		return;
--
--	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_CREATE_CONN);
--	if (!cp)
--		return;
--
--	hci_dev_lock(hdev);
--
--	conn = hci_conn_hash_lookup_le(hdev, &cp->peer_addr,
--				       cp->peer_addr_type);
-+	conn = hci_conn_hash_lookup_le(hdev, peer_addr,
-+				       peer_addr_type);
- 	if (!conn)
--		goto unlock;
-+		return;
- 
- 	/* Store the initiator and responder address information which
- 	 * is needed for SMP. These values will not change during the
- 	 * lifetime of the connection.
- 	 */
--	conn->init_addr_type = cp->own_address_type;
--	if (cp->own_address_type == ADDR_LE_DEV_RANDOM)
-+	conn->init_addr_type = own_address_type;
-+	if (own_address_type == ADDR_LE_DEV_RANDOM)
- 		bacpy(&conn->init_addr, &hdev->random_addr);
- 	else
- 		bacpy(&conn->init_addr, &hdev->bdaddr);
- 
--	conn->resp_addr_type = cp->peer_addr_type;
--	bacpy(&conn->resp_addr, &cp->peer_addr);
-+	conn->resp_addr_type = peer_addr_type;
-+	bacpy(&conn->resp_addr, peer_addr);
- 
- 	/* We don't want the connection attempt to stick around
- 	 * indefinitely since LE doesn't have a page timeout concept
- 	 * like BR/EDR. Set a timer for any connection that doesn't use
- 	 * the white list for connecting.
- 	 */
--	if (cp->filter_policy == HCI_LE_USE_PEER_ADDR)
-+	if (filter_policy == HCI_LE_USE_PEER_ADDR)
- 		queue_delayed_work(conn->hdev->workqueue,
- 				   &conn->le_conn_timeout,
- 				   conn->conn_timeout);
-+}
-+
-+static void hci_cs_le_create_conn(struct hci_dev *hdev, u8 status)
++static void hci_cc_le_set_default_phy(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	struct hci_cp_le_create_conn *cp;
++	__u8 status = *((__u8 *) skb->data);
++	struct hci_cp_le_set_default_phy *cp;
 +
 +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
 +
-+	/* All connection failure handling is taken care of by the
-+	 * hci_le_conn_failed function which is triggered by the HCI
-+	 * request completion callbacks used for connecting.
-+	 */
 +	if (status)
 +		return;
 +
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_CREATE_CONN);
++	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_DEFAULT_PHY);
 +	if (!cp)
 +		return;
 +
 +	hci_dev_lock(hdev);
 +
-+	cs_le_create_conn(hdev, &cp->peer_addr, cp->peer_addr_type,
-+			  cp->own_address_type, cp->filter_policy);
- 
--unlock:
- 	hci_dev_unlock(hdev);
- }
- 
-@@ -4572,16 +4580,16 @@ static void hci_disconn_phylink_complete_evt(struct hci_dev *hdev,
- }
- #endif
- 
--static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-+static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
-+				 bdaddr_t *bdaddr, u8 bdaddr_type, u8 role,
-+				 u16 handle, u16 interval, u16 latency,
-+				 u16 supervision_timeout)
- {
--	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
- 	struct hci_conn_params *params;
- 	struct hci_conn *conn;
- 	struct smp_irk *irk;
- 	u8 addr_type;
- 
--	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
--
- 	hci_dev_lock(hdev);
- 
- 	/* All controllers implicitly stop advertising in the event of a
-@@ -4591,13 +4599,13 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	conn = hci_lookup_le_connect(hdev);
- 	if (!conn) {
--		conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr, ev->role);
-+		conn = hci_conn_add(hdev, LE_LINK, bdaddr, role);
- 		if (!conn) {
- 			bt_dev_err(hdev, "no memory for new connection");
- 			goto unlock;
- 		}
- 
--		conn->dst_type = ev->bdaddr_type;
-+		conn->dst_type = bdaddr_type;
- 
- 		/* If we didn't have a hci_conn object previously
- 		 * but we're in master role this must be something
-@@ -4608,8 +4616,8 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		 * initiator address based on the HCI_PRIVACY flag.
- 		 */
- 		if (conn->out) {
--			conn->resp_addr_type = ev->bdaddr_type;
--			bacpy(&conn->resp_addr, &ev->bdaddr);
-+			conn->resp_addr_type = bdaddr_type;
-+			bacpy(&conn->resp_addr, bdaddr);
- 			if (hci_dev_test_flag(hdev, HCI_PRIVACY)) {
- 				conn->init_addr_type = ADDR_LE_DEV_RANDOM;
- 				bacpy(&conn->init_addr, &hdev->rpa);
-@@ -4633,8 +4641,8 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		else
- 			bacpy(&conn->resp_addr, &hdev->bdaddr);
- 
--		conn->init_addr_type = ev->bdaddr_type;
--		bacpy(&conn->init_addr, &ev->bdaddr);
-+		conn->init_addr_type = bdaddr_type;
-+		bacpy(&conn->init_addr, bdaddr);
- 
- 		/* For incoming connections, set the default minimum
- 		 * and maximum connection interval. They will be used
-@@ -4660,8 +4668,8 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		conn->dst_type = irk->addr_type;
- 	}
- 
--	if (ev->status) {
--		hci_le_conn_failed(conn, ev->status);
-+	if (status) {
-+		hci_le_conn_failed(conn, status);
- 		goto unlock;
- 	}
- 
-@@ -4680,17 +4688,17 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		mgmt_device_connected(hdev, conn, 0, NULL, 0);
- 
- 	conn->sec_level = BT_SECURITY_LOW;
--	conn->handle = __le16_to_cpu(ev->handle);
-+	conn->handle = handle;
- 	conn->state = BT_CONFIG;
- 
--	conn->le_conn_interval = le16_to_cpu(ev->interval);
--	conn->le_conn_latency = le16_to_cpu(ev->latency);
--	conn->le_supv_timeout = le16_to_cpu(ev->supervision_timeout);
-+	conn->le_conn_interval = interval;
-+	conn->le_conn_latency = latency;
-+	conn->le_supv_timeout = supervision_timeout;
- 
- 	hci_debugfs_create_conn(conn);
- 	hci_conn_add_sysfs(conn);
- 
--	if (!ev->status) {
-+	if (!status) {
- 		/* The remote features procedure is defined for master
- 		 * role only. So only in case of an initiated connection
- 		 * request the remote features.
-@@ -4712,10 +4720,10 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			hci_conn_hold(conn);
- 		} else {
- 			conn->state = BT_CONNECTED;
--			hci_connect_cfm(conn, ev->status);
-+			hci_connect_cfm(conn, status);
- 		}
- 	} else {
--		hci_connect_cfm(conn, ev->status);
-+		hci_connect_cfm(conn, status);
- 	}
- 
- 	params = hci_pend_le_action_lookup(&hdev->pend_le_conns, &conn->dst,
-@@ -4734,6 +4742,19 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
++	/* Clear previous PHY flags */
++	hci_dev_clear_flag(hdev, HCI_LE_PHY_1M_TX);
++	hci_dev_clear_flag(hdev, HCI_LE_PHY_1M_RX);
++	hci_dev_clear_flag(hdev, HCI_LE_PHY_2M_TX);
++	hci_dev_clear_flag(hdev, HCI_LE_PHY_2M_RX);
++	hci_dev_clear_flag(hdev, HCI_LE_PHY_CODED_TX);
++	hci_dev_clear_flag(hdev, HCI_LE_PHY_CODED_RX);
 +
-+	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
++	if (cp->all_phys & 0x01) {
++		hci_dev_set_flag(hdev, HCI_LE_PHY_1M_TX);
++	} else {
++		if (cp->tx_phys & HCI_LE_SET_PHY_1M)
++			hci_dev_set_flag(hdev, HCI_LE_PHY_1M_TX);
 +
-+	le_conn_complete_evt(hdev, ev->status, &ev->bdaddr, ev->bdaddr_type,
-+			     ev->role, le16_to_cpu(ev->handle),
-+			     le16_to_cpu(ev->interval),
-+			     le16_to_cpu(ev->latency),
-+			     le16_to_cpu(ev->supervision_timeout));
++		if (cp->tx_phys & HCI_LE_SET_PHY_2M)
++			hci_dev_set_flag(hdev, HCI_LE_PHY_2M_TX);
++
++		if (cp->tx_phys & HCI_LE_SET_PHY_CODED)
++			hci_dev_set_flag(hdev, HCI_LE_PHY_CODED_TX);
++	}
++
++	if (cp->all_phys & 0x02) {
++		hci_dev_set_flag(hdev, HCI_LE_PHY_1M_RX);
++	} else {
++		if (cp->rx_phys & HCI_LE_SET_PHY_1M)
++			hci_dev_set_flag(hdev, HCI_LE_PHY_1M_RX);
++
++		if (cp->rx_phys & HCI_LE_SET_PHY_2M)
++			hci_dev_set_flag(hdev, HCI_LE_PHY_2M_RX);
++
++		if (cp->rx_phys & HCI_LE_SET_PHY_CODED)
++			hci_dev_set_flag(hdev, HCI_LE_PHY_CODED_RX);
++	}
++
++	hci_dev_unlock(hdev);
 +}
 +
- static void hci_le_conn_update_complete_evt(struct hci_dev *hdev,
- 					    struct sk_buff *skb)
+ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
  {
+ 	__u8 *sent, status = *((__u8 *) skb->data);
+@@ -3039,6 +3092,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_write_ssp_debug_mode(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_SET_DEFAULT_PHY:
++		hci_cc_le_set_default_phy(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
+ 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3bc574d..0a5e87b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -648,6 +648,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 		settings |= MGMT_SETTING_SECURE_CONN;
+ 		settings |= MGMT_SETTING_PRIVACY;
+ 		settings |= MGMT_SETTING_STATIC_ADDRESS;
++		if (hdev->le_features[1] & HCI_LE_PHY_2M ||
++		    hdev->le_features[1] & HCI_LE_PHY_CODED)
++			settings |= MGMT_SETTING_PHY_CONFIGURATION;
+ 	}
+ 
+ 	if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
+@@ -722,6 +725,12 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 			settings |= MGMT_SETTING_STATIC_ADDRESS;
+ 	}
+ 
++	if (hci_dev_test_flag(hdev, HCI_LE_PHY_2M_TX) ||
++	    hci_dev_test_flag(hdev, HCI_LE_PHY_2M_RX) ||
++	    hci_dev_test_flag(hdev, HCI_LE_PHY_CODED_TX) ||
++	    hci_dev_test_flag(hdev, HCI_LE_PHY_CODED_RX))
++		settings |= MGMT_SETTING_PHY_CONFIGURATION;
++
+ 	return settings;
+ }
+ 
+@@ -3260,6 +3269,150 @@ static int get_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ 				 &rp, sizeof(rp));
+ }
+ 
++static int phy_configuration_changed(struct hci_dev *hdev, struct sock *skip)
++{
++	struct mgmt_ev_phy_configuration_changed ev;
++
++	memset(&ev, 0, sizeof(ev));
++
++	ev.selected_phys = cpu_to_le16(get_selected_phys(hdev));
++
++	return mgmt_limited_event(MGMT_EV_PHY_CONFIGURATION_CHANGED, hdev, &ev,
++				  sizeof(ev), HCI_MGMT_PHY_CHANGED_EVENTS,
++				  skip);
++}
++
++static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
++				     u16 opcode, struct sk_buff *skb)
++{
++	struct mgmt_cp_set_phy_confguration *cp;
++	struct mgmt_pending_cmd *cmd;
++
++	BT_DBG("status 0x%02x", status);
++
++	hci_dev_lock(hdev);
++
++	cmd = pending_find(MGMT_OP_SET_PHY_CONFIGURATION, hdev);
++	if (!cmd)
++		goto unlock;
++
++	cp = cmd->param;
++
++	if (status) {
++		mgmt_cmd_status(cmd->sk, hdev->id,
++				MGMT_OP_SET_PHY_CONFIGURATION,
++				mgmt_status(status));
++	} else {
++		mgmt_cmd_complete(cmd->sk, hdev->id,
++				  MGMT_OP_SET_PHY_CONFIGURATION, 0,
++				  cp, sizeof(*cp));
++
++		phy_configuration_changed(hdev, cmd->sk);
++		new_settings(hdev, cmd->sk);
++	}
++
++	mgmt_pending_remove(cmd);
++
++unlock:
++	hci_dev_unlock(hdev);
++}
++
++static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
++				 void *data, u16 len)
++{
++	struct mgmt_cp_set_phy_confguration *cp = data;
++	struct hci_cp_le_set_default_phy cp_phy;
++	struct mgmt_pending_cmd *cmd;
++	struct hci_request req;
++	u16 default_phys, supported_phys, selected_phys;
++	u8 status;
++	int err;
++
++	BT_DBG("sock %p %s", sk, hdev->name);
++
++	status = mgmt_le_support(hdev);
++	if (status)
++		return mgmt_cmd_status(sk, hdev->id,
++				       MGMT_OP_SET_PHY_CONFIGURATION, status);
++
++	supported_phys = get_supported_phys(hdev);
++	default_phys = __le16_to_cpu(cp->default_phys);
++
++	if (default_phys & ~supported_phys)
++		return mgmt_cmd_status(sk, hdev->id,
++				       MGMT_OP_SET_PHY_CONFIGURATION,
++				       MGMT_STATUS_INVALID_PARAMS);
++
++	selected_phys = get_selected_phys(hdev);
++
++	if (default_phys == selected_phys)
++		return mgmt_cmd_complete(sk, hdev->id,
++					 MGMT_OP_SET_PHY_CONFIGURATION,
++					 0, cp, sizeof(*cp));
++
++	hci_dev_lock(hdev);
++
++	if (!hdev_is_powered(hdev)) {
++		err = mgmt_cmd_status(sk, hdev->id,
++				      MGMT_OP_SET_PHY_CONFIGURATION,
++				      MGMT_STATUS_REJECTED);
++		goto unlock;
++	}
++
++	if (pending_find(MGMT_OP_SET_PHY_CONFIGURATION, hdev)) {
++		err = mgmt_cmd_status(sk, hdev->id,
++				      MGMT_OP_SET_PHY_CONFIGURATION,
++				      MGMT_STATUS_BUSY);
++		goto unlock;
++	}
++
++	cmd = mgmt_pending_add(sk, MGMT_OP_SET_PHY_CONFIGURATION, hdev, data,
++			       len);
++	if (!cmd) {
++		err = -ENOMEM;
++		goto unlock;
++	}
++
++	hci_req_init(&req, hdev);
++
++	memset(&cp_phy, 0, sizeof(cp_phy));
++
++	if (!(default_phys & MGMT_PHY_LE_TX_MASK))
++		cp_phy.all_phys |= 0x01;
++
++	if (!(default_phys & MGMT_PHY_LE_RX_MASK))
++		cp_phy.all_phys |= 0x02;
++
++	if (default_phys & MGMT_PHY_LE_1M_TX)
++		cp_phy.tx_phys |= HCI_LE_SET_PHY_1M;
++
++	if (default_phys & MGMT_PHY_LE_2M_TX)
++		cp_phy.tx_phys |= HCI_LE_SET_PHY_2M;
++
++	if (default_phys & MGMT_PHY_LE_CODED_TX)
++		cp_phy.tx_phys |= HCI_LE_SET_PHY_CODED;
++
++	if (default_phys & MGMT_PHY_LE_1M_RX)
++		cp_phy.rx_phys |= HCI_LE_SET_PHY_1M;
++
++	if (default_phys & MGMT_PHY_LE_2M_RX)
++		cp_phy.rx_phys |= HCI_LE_SET_PHY_2M;
++
++	if (default_phys & MGMT_PHY_LE_CODED_RX)
++		cp_phy.rx_phys |= HCI_LE_SET_PHY_CODED;
++
++	hci_req_add(&req, HCI_OP_LE_SET_DEFAULT_PHY, sizeof(cp_phy), &cp_phy);
++
++	err = hci_req_run_skb(&req, set_default_phy_complete);
++	if (err < 0)
++		mgmt_pending_remove(cmd);
++
++unlock:
++	hci_dev_unlock(hdev);
++
++	return err;
++}
++
+ static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
+ 				         u16 opcode, struct sk_buff *skb)
+ {
+@@ -6620,6 +6773,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 						HCI_MGMT_UNTRUSTED },
+ 	{ set_appearance,	   MGMT_SET_APPEARANCE_SIZE },
+ 	{ get_phy_configuration,   MGMT_GET_PHY_CONFIGURATION_SIZE },
++	{ set_phy_configuration,   MGMT_SET_PHY_CONFIGURATION_SIZE },
+ };
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
 -- 
 2.7.4
 
