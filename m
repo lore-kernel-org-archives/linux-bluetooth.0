@@ -1,39 +1,57 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1513767640.4409.86.camel@cortland.com>
-Subject: Re-provisioning & Re-configuring a node
-From: Steve Brown <sbrown@cortland.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Wed, 20 Dec 2017 06:00:40 -0500
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <kai.heng.feng@canonical.com>
+From: Kai-Heng Feng <kai.heng.feng@canonical.com>
+To: gregkh@linuxfoundation.org,
+	marcel@holtmann.org
+Cc: linux-usb@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	stable@vger.kernel.org,
+	Leif Liddy <leif.linux@gmail.com>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Brian Norris <briannorris@chromium.org>,
+	Daniel Drake <drake@endlessm.com>
+Subject: [PATCH 2/2] usb: quirks: Add reset-resume quirk for Dell DW1820 QCA Rome Bluetooth
+Date: Wed, 20 Dec 2017 19:00:08 +0800
+Message-Id: <20171220110008.11856-2-kai.heng.feng@canonical.com>
+In-Reply-To: <20171220110008.11856-1-kai.heng.feng@canonical.com>
+References: <20171220110008.11856-1-kai.heng.feng@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently, if a node's uuid is already known to meshctl, an attempt to
-provision it results in the error "Already provisioned."
+Commit ("fd865802c66bc451dc515ed89360f84376ce1a56 Bluetooth: btusb: fix
+QCA Rome suspend/resume") enables reset_resume in btusb_probe(). This
+makes the device resets during btusb_open(), firmware loading gets
+interrupted as a result.
 
-I'd like to solicit comments on whether it would be useful to restore
-the prior provisioning (primary unicast address and keys) and
-configuration of a known unprovisioned node instead of considering it
-an error.
+We still want to reset the device to solve the original issue, but we
+should do it before btusb_open().
 
-The motivation is to minimize the number of meshctl commands that have
-to be input to provision and configure a mesh after a power cycle or
-firmware flash. For example, it takes 2 commands to minimally configure
-an element and another 2 commands to configure each of its models. Each
-node of the 52840 onoff sample has 4 elements each with 2 models. 
-That's 24 commands per node. A minimal mesh of three of these would
-require the accurate typing of over 70 commands to get it back to where
-it was.
+Hence, add reset-resume quirk in usb core intead of btusb.
 
-This isn't meant as an alternative to persistent storage of
-configuration and state in a node, rather an aid in prototyping or
-developing an application.
+Cc: stable@vger.kernel.org
+Cc: Leif Liddy <leif.linux@gmail.com>
+Cc: Matthias Kaehlcke <mka@chromium.org>
+Cc: Brian Norris <briannorris@chromium.org>
+Cc: Daniel Drake <drake@endlessm.com>
+Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
 
-Steve
+---
+ drivers/usb/core/quirks.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-
-
-
-
-
+diff --git a/drivers/usb/core/quirks.c b/drivers/usb/core/quirks.c
+index a10b346b9777..96951104c45b 100644
+--- a/drivers/usb/core/quirks.c
++++ b/drivers/usb/core/quirks.c
+@@ -197,6 +197,9 @@ static const struct usb_device_id usb_quirk_list[] = {
+ 	{ USB_DEVICE(0x0b05, 0x17e0), .driver_info =
+ 			USB_QUIRK_IGNORE_REMOTE_WAKEUP },
+ 
++	/* QCA Rome Bluetooth in Dell DW1820 wireless module */
++	{ USB_DEVICE(0x0cf3, 0xe007), .driver_info = USB_QUIRK_RESET_RESUME },
++
+ 	/* Action Semiconductor flash disk */
+ 	{ USB_DEVICE(0x10d6, 0x2200), .driver_info =
+ 			USB_QUIRK_STRING_FETCH_255 },
+-- 
+2.14.1
