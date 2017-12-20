@@ -1,67 +1,118 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20171220104019.14849-1-szymon.janc@codecoup.pl>
-References: <20171220104019.14849-1-szymon.janc@codecoup.pl>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 20 Dec 2017 10:51:52 -0200
-Message-ID: <CABBYNZL7USd-t3s59Ci1gafcpXJ3LmL2JBPawAhL2ES7HXcJ0g@mail.gmail.com>
-Subject: Re: [PATCH] gdbus: Fix crash on proxy remove
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 4/4] monitor: Use bt_appear_to_str
+Date: Wed, 20 Dec 2017 10:17:51 -0200
+Message-Id: <20171220121751.8238-4-luiz.dentz@gmail.com>
+In-Reply-To: <20171220121751.8238-1-luiz.dentz@gmail.com>
+References: <20171220121751.8238-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Dec 20, 2017 at 8:40 AM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
-> If proxy was freed due to interface being removed remaining references
-> are left with NULL client pointer. We need to cancel pending calls that
-> require client when getting reply.
->
-> This fix following crash:
-> bluetoothd[2773]: src/gatt-database.c:proxy_removed_cb() Proxy removed - removing service: /test/app/hci0/service2
-> bluetoothd[2773]: src/gatt-database.c:gatt_db_service_removed() Local GATT service removed
-> bluetoothd[2773]: src/adapter.c:adapter_service_remove() /org/bluez/hci0
-> bluetoothd[2773]: src/adapter.c:remove_uuid() sending remove uuid command for index 0
-> bluetoothd[2773]: src/sdpd-service.c:remove_record_from_server() Removing record with handle 0x10008
-> bluetoothd[2773]: src/gatt-database.c:client_disconnect_cb() Client disconnected
-> ==2773== Invalid read of size 8
-> ==2773==    at 0x485220: proxy_added (client.c:288)
-> ==2773==    by 0x485220: get_all_properties_reply (client.c:316)
-> ==2773==    by 0x515A041: ??? (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.6)
-> ==2773==    by 0x515DA60: dbus_connection_dispatch (in /lib/x86_64-linux-gnu/libdbus-1.so.3.14.6)
-> ==2773==    by 0x47F2BF: message_dispatch (mainloop.c:72)
-> ==2773==    by 0x4E84049: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
-> ==2773==    by 0x4E843EF: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
-> ==2773==    by 0x4E84711: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4800.2)
-> ==2773==    by 0x40B51F: main (main.c:770)
-> ==2773==  Address 0x88 is not stack'd, malloc'd or (recently) free'd
-> ---
->  gdbus/client.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/gdbus/client.c b/gdbus/client.c
-> index ec9b63823..ab4059697 100644
-> --- a/gdbus/client.c
-> +++ b/gdbus/client.c
-> @@ -449,6 +449,12 @@ static void proxy_free(gpointer data)
->         if (proxy->client) {
->                 GDBusClient *client = proxy->client;
->
-> +               if (proxy->get_all_call != NULL) {
-> +                       dbus_pending_call_cancel(proxy->get_all_call);
-> +                       dbus_pending_call_unref(proxy->get_all_call);
-> +                       proxy->get_all_call = NULL;
-> +               }
-> +
->                 if (client->proxy_removed)
->                         client->proxy_removed(proxy, client->user_data);
->
-> --
-> 2.14.3
+Remove appearance table used to decode appearance.
+---
+ monitor/packet.c | 84 ++------------------------------------------------------
+ 1 file changed, 2 insertions(+), 82 deletions(-)
 
-Applied, thanks.
-
+diff --git a/monitor/packet.c b/monitor/packet.c
+index a9f2ab5f2..bd28ec4a5 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -1081,90 +1081,10 @@ static void print_dev_class(const uint8_t *dev_class)
+ 				"  Unknown service class (0x%2.2x)", mask);
+ }
+ 
+-static const struct {
+-	uint16_t val;
+-	bool generic;
+-	const char *str;
+-} appearance_table[] = {
+-	{    0, true,  "Unknown"		},
+-	{   64, true,  "Phone"			},
+-	{  128, true,  "Computer"		},
+-	{  192, true,  "Watch"			},
+-	{  193, false, "Sports Watch"		},
+-	{  256, true,  "Clock"			},
+-	{  320, true,  "Display"		},
+-	{  384, true,  "Remote Control"		},
+-	{  448, true,  "Eye-glasses"		},
+-	{  512, true,  "Tag"			},
+-	{  576, true,  "Keyring"		},
+-	{  640, true,  "Media Player"		},
+-	{  704, true,  "Barcode Scanner"	},
+-	{  768, true,  "Thermometer"		},
+-	{  769, false, "Thermometer: Ear"	},
+-	{  832, true,  "Heart Rate Sensor"	},
+-	{  833, false, "Heart Rate Belt"	},
+-	{  896, true,  "Blood Pressure"		},
+-	{  897, false, "Blood Pressure: Arm"	},
+-	{  898, false, "Blood Pressure: Wrist"	},
+-	{  960, true,  "Human Interface Device"	},
+-	{  961, false, "Keyboard"		},
+-	{  962, false, "Mouse"			},
+-	{  963, false, "Joystick"		},
+-	{  964, false, "Gamepad"		},
+-	{  965, false, "Digitizer Tablet"	},
+-	{  966, false, "Card Reader"		},
+-	{  967, false, "Digital Pen"		},
+-	{  968, false, "Barcode Scanner"	},
+-	{ 1024, true,  "Glucose Meter"		},
+-	{ 1088, true,  "Running Walking Sensor"			},
+-	{ 1089, false, "Running Walking Sensor: In-Shoe"	},
+-	{ 1090, false, "Running Walking Sensor: On-Shoe"	},
+-	{ 1091, false, "Running Walking Sensor: On-Hip"		},
+-	{ 1152, true,  "Cycling"				},
+-	{ 1153, false, "Cycling: Cycling Computer"		},
+-	{ 1154, false, "Cycling: Speed Sensor"			},
+-	{ 1155, false, "Cycling: Cadence Sensor"		},
+-	{ 1156, false, "Cycling: Power Sensor"			},
+-	{ 1157, false, "Cycling: Speed and Cadence Sensor"	},
+-	{ 1216, true,  "Undefined"				},
+-
+-	{ 3136, true,  "Pulse Oximeter"				},
+-	{ 3137, false, "Pulse Oximeter: Fingertip"		},
+-	{ 3138, false, "Pulse Oximeter: Wrist Worn"		},
+-	{ 3200, true,  "Weight Scale"				},
+-	{ 3264, true,  "Undefined"				},
+-
+-	{ 5184, true,  "Outdoor Sports Activity"		},
+-	{ 5185, false, "Location Display Device"		},
+-	{ 5186, false, "Location and Navigation Display Device"	},
+-	{ 5187, false, "Location Pod"				},
+-	{ 5188, false, "Location and Navigation Pod"		},
+-	{ 5248, true,  "Undefined"				},
+-	{ }
+-};
+-
+ static void print_appearance(uint16_t appearance)
+ {
+-	const char *str = NULL;
+-	int i, type = 0;
+-
+-	for (i = 0; appearance_table[i].str; i++) {
+-		if (appearance_table[i].generic) {
+-			if (appearance < appearance_table[i].val)
+-				break;
+-			type = i;
+-		}
+-
+-		if (appearance_table[i].val == appearance) {
+-			str = appearance_table[i].str;
+-			break;
+-		}
+-	}
+-
+-	if (!str)
+-		str = appearance_table[type].str;
+-
+-	print_field("Appearance: %s (0x%4.4x)", str, appearance);
++	print_field("Appearance: %s (0x%4.4x)", bt_appear_to_str(appearance),
++								appearance);
+ }
+ 
+ static void print_num_broadcast_retrans(uint8_t num_retrans)
 -- 
-Luiz Augusto von Dentz
+2.13.6
+
