@@ -1,102 +1,42 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 1/2] android/tester: Clarify default properties match names
-Date: Thu, 21 Dec 2017 21:44:12 +0100
-Message-Id: <20171221204413.20998-1-szymon.janc@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <briannorris@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <CAD8Lp47CEnQmDEwGDLZPpUcSS0Azf1ZO2zeuffYyDtwga2+Dqw@mail.gmail.com>
+References: <20171220110008.11856-1-kai.heng.feng@canonical.com>
+ <20171220185308.GA176644@google.com> <CAD8Lp47CEnQmDEwGDLZPpUcSS0Azf1ZO2zeuffYyDtwga2+Dqw@mail.gmail.com>
+From: Brian Norris <briannorris@chromium.org>
+Date: Thu, 21 Dec 2017 09:31:43 -0800
+Message-ID: <CA+ASDXPnSqm4qswPBtfd_yKvaXV1+Vd-SsGe+2=dL-wKTzRuAA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Revert "Bluetooth: btusb: fix QCA Rome suspend/resume"
+To: Daniel Drake <drake@endlessm.com>
+Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Linux USB Mailing List <linux-usb@vger.kernel.org>,
+	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, stable@vger.kernel.org,
+	Leif Liddy <leif.linux@gmail.com>, Matthias Kaehlcke <mka@chromium.org>,
+	Guenter Roeck <linux@roeck-us.net>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/tester-bluetooth.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+On Thu, Dec 21, 2017 at 3:43 AM, Daniel Drake <drake@endlessm.com> wrote:
+> On Wed, Dec 20, 2017 at 6:53 PM, Brian Norris <briannorris@chromium.org> wrote:
+>>
+>> On Wed, Dec 20, 2017 at 07:00:07PM +0800, Kai-Heng Feng wrote:
+>> > This commit causes a regression on some QCA ROME chips. The USB device
+>> > reset happens in btusb_open(), hence firmware loading gets interrupted.
+>>
+>> Oh, did you really confirm that's the root of the problem? I was only
+>> hypothesizing, with some informed observation and code review; but I
+>> didn't fully convince myself. If so, that's interesting.
+>
+> I have the same doubt. Can you explain how/why firmware uploading and
+> btusb_open() overlap, and how this is avoided with your patch?
+> If they do overlap, is that not a bug in the stack that should be fixed instead?
+> If the fix belongs in btusb and this BTUSB_RESET_RESUME thing really
+> is problematic, should it be totally removed instead?
 
-diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-index 22077a064..bab6dc952 100644
---- a/android/tester-bluetooth.c
-+++ b/android/tester-bluetooth.c
-@@ -231,7 +231,7 @@ static bt_property_t prop_emu_default_set[] = {
- 	{ BT_PROPERTY_UUIDS, sizeof(emu_uuids_val), &emu_uuids_val },
- };
- 
--static bt_property_t prop_emu_remote_bles_default_set[] = {
-+static bt_property_t prop_emu_remote_ble_default_set[] = {
- 	{ BT_PROPERTY_BDADDR, sizeof(emu_remote_bdaddr_val),
- 						&emu_remote_bdaddr_val },
- 	{ BT_PROPERTY_TYPE_OF_DEVICE, sizeof(emu_remote_tod_ble_val),
-@@ -240,7 +240,7 @@ static bt_property_t prop_emu_remote_bles_default_set[] = {
- 						&emu_remote_ble_rssi_val },
- };
- 
--static bt_property_t prop_emu_remotes_default_set[] = {
-+static bt_property_t prop_emu_remote_bredr_default_set[] = {
- 	{ BT_PROPERTY_BDADDR, sizeof(emu_remote_bdaddr_val),
- 						&emu_remote_bdaddr_val },
- 	{ BT_PROPERTY_TYPE_OF_DEVICE, sizeof(emu_remote_type_val),
-@@ -648,7 +648,7 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
--		CALLBACK_DEVICE_FOUND(prop_emu_remote_bles_default_set, 3),
-+		CALLBACK_DEVICE_FOUND(prop_emu_remote_ble_default_set, 3),
- 		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STOPPED),
-@@ -996,7 +996,7 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
--		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-+		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
- 		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STOPPED),
-@@ -1019,7 +1019,7 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
--		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-+		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
- 		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STOPPED),
-@@ -1044,7 +1044,7 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
--		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-+		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
- 		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STOPPED),
-@@ -1068,7 +1068,7 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
--		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-+		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
- 		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STOPPED),
-@@ -1126,7 +1126,7 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
--		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-+		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
- 		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STOPPED),
-@@ -1152,7 +1152,7 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STARTED),
--		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-+		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
- 		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
- 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
- 							BT_DISCOVERY_STOPPED),
--- 
-2.14.3
+To be clear: this is a regression in mainline and should definitely be
+fixed by reverting it. The path forward for patch 2/2 should be
+determined by a better understanding of where the real problem is.
 
+Brian
