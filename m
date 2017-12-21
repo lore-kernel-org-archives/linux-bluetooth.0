@@ -1,87 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/6] tools/btpclient: Add device found event
-Date: Thu, 21 Dec 2017 17:47:18 +0100
-Message-Id: <20171221164720.20925-4-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ 2/6] tools/btpclient: Move string to address conversion to helper
+Date: Thu, 21 Dec 2017 17:47:16 +0100
+Message-Id: <20171221164720.20925-2-grzegorz.kolodziejczyk@codecoup.pl>
 In-Reply-To: <20171221164720.20925-1-grzegorz.kolodziejczyk@codecoup.pl>
 References: <20171221164720.20925-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds device found event handler. It's called when rssi
-property of device changes and new device interface is added.
+This patch makes local helper with string to address conversion.
 ---
- tools/btpclient.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ tools/btpclient.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index 095c5ea3e..c0ad03b68 100644
+index 9ea624995..27e5a498e 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
-@@ -399,6 +399,37 @@ failed:
- 	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
- }
+@@ -52,6 +52,12 @@ static struct btp *btp;
  
-+static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
+ static bool gap_service_registered;
+ 
++static inline uint8_t str2addr(const char *str, uint8_t *addr)
 +{
-+	struct btp_device_found_ev ev;
-+	const char *str;
-+
-+	if (!l_dbus_proxy_get_property(proxy, "Address", "s", &str) ||
-+					(str2addr(str, ev.address) != 6))
-+		return;
-+
-+	if (!l_dbus_proxy_get_property(proxy, "AddressType", "s", &str))
-+		return;
-+
-+	ev.address_type = strcmp(str, "public") ? BTP_GAP_ADDR_RANDOM :
-+							BTP_GAP_ADDR_PUBLIC;
-+
-+	if (!l_dbus_proxy_get_property(proxy, "RSSI", "n", &ev.rssi))
-+		return;
-+
-+	/* TODO Temporary set all flags */
-+	ev.flags = (BTP_EV_GAP_DEVICE_FOUND_FLAG_RSSI |
-+					BTP_EV_GAP_DEVICE_FOUND_FLAG_AD |
-+					BTP_EV_GAP_DEVICE_FOUND_FLAG_SR);
-+
-+	/* TODO Add eir to device found event */
-+	ev.eir_len = 0;
-+
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_FOUND,
-+						BTP_INDEX_NON_CONTROLLER,
-+						sizeof(ev) + ev.eir_len, &ev);
++	return sscanf(str,"%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &addr[5], &addr[4],
++					&addr[3], &addr[2], &addr[1], &addr[0]);
 +}
 +
- static void register_gap_service(void)
+ static struct btp_adapter *find_adapter_by_proxy(struct l_dbus_proxy *proxy)
  {
- 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_SUPPORTED_COMMANDS,
-@@ -661,6 +692,8 @@ static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+ 	const struct l_queue_entry *entry;
+@@ -171,9 +177,7 @@ static void btp_gap_read_info(uint8_t index, const void *param, uint16_t length,
+ 	if (!l_dbus_proxy_get_property(adapter->proxy, "Address", "s", &str))
+ 		goto failed;
  
- 		l_queue_push_tail(adapter->devices, device);
+-	if (sscanf(str,"%hhx:%hhx:%hhx:%hhx:%hhx:%hhx",
+-			&rp.address[5], &rp.address[4], &rp.address[3],
+-			&rp.address[2], &rp.address[1], &rp.address[0]) != 6)
++	if (str2addr(str, rp.address) != 6)
+ 		goto failed;
  
-+		btp_gap_device_found_ev(proxy);
-+
- 		return;
- 	}
- 
-@@ -782,6 +815,15 @@ static void property_changed(struct l_dbus_proxy *proxy, const char *name,
- 			update_current_settings(adapter, new_settings);
- 
- 		return;
-+	} else if (!strcmp(interface, "org.bluez.Device1")) {
-+		if (!strcmp(name, "RSSI")) {
-+			uint16_t rssi;
-+
-+			if (!l_dbus_message_get_arguments(msg, "n", &rssi))
-+				return;
-+
-+			btp_gap_device_found_ev(proxy);
-+		}
- 	}
- }
- 
+ 	if (!l_dbus_proxy_get_property(adapter->proxy, "Name", "s", &str)) {
 -- 
 2.13.6
 
