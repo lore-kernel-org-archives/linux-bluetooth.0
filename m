@@ -1,50 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/6] tools/btpclient: Add advertising proxy to adapter
-Date: Thu, 21 Dec 2017 17:47:17 +0100
-Message-Id: <20171221164720.20925-3-grzegorz.kolodziejczyk@codecoup.pl>
-In-Reply-To: <20171221164720.20925-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20171221164720.20925-1-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ 1/6] shared/btp: define gap device found flags as bit mask
+Date: Thu, 21 Dec 2017 17:47:15 +0100
+Message-Id: <20171221164720.20925-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Advertising manager proxy is required to handle advertise related
-operations in adapter context.
+This patch modifies gap device found flags to be bit masks as in other
+defined flags groups in btp.
 ---
- tools/btpclient.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ src/shared/btp.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tools/btpclient.c b/tools/btpclient.c
-index 27e5a498e..095c5ea3e 100644
---- a/tools/btpclient.c
-+++ b/tools/btpclient.c
-@@ -36,6 +36,7 @@
- 
- struct btp_adapter {
- 	struct l_dbus_proxy *proxy;
-+	struct l_dbus_proxy *ad_proxy;
- 	uint8_t index;
- 	uint32_t supported_settings;
+diff --git a/src/shared/btp.h b/src/shared/btp.h
+index 5044de822..7b1f48817 100644
+--- a/src/shared/btp.h
++++ b/src/shared/btp.h
+@@ -241,9 +241,9 @@ struct btp_new_settings_ev {
  	uint32_t current_settings;
-@@ -659,6 +660,17 @@ static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
- 		device->proxy = proxy;
+ } __packed;
  
- 		l_queue_push_tail(adapter->devices, device);
-+
-+		return;
-+	}
-+
-+	if (!strcmp(interface, "org.bluez.LEAdvertisingManager1")) {
-+		struct btp_adapter *adapter;
-+
-+		adapter = find_adapter_by_path(path);
-+
-+		adapter->ad_proxy = proxy;
-+
- 		return;
- 	}
- }
+-#define BTP_EV_GAP_DEVICE_FOUND_FLAG_RSSI	0x00
+-#define BTP_EV_GAP_DEVICE_FOUND_FLAG_AD		0x01
+-#define BTP_EV_GAP_DEVICE_FOUND_FLAG_SR		0x02
++#define BTP_EV_GAP_DEVICE_FOUND_FLAG_RSSI	0x01
++#define BTP_EV_GAP_DEVICE_FOUND_FLAG_AD		0x02
++#define BTP_EV_GAP_DEVICE_FOUND_FLAG_SR		0x04
+ 
+ #define BTP_EV_GAP_DEVICE_FOUND			0x81
+ struct btp_device_found_ev {
 -- 
 2.13.6
 
