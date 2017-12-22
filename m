@@ -1,109 +1,81 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/tester: Clarify default properties match names
-Date: Fri, 22 Dec 2017 10:27:41 +0100
-Message-ID: <4885605.Vzfp4LaIp6@ix>
-In-Reply-To: <20171221204413.20998-1-szymon.janc@codecoup.pl>
-References: <20171221204413.20998-1-szymon.janc@codecoup.pl>
+Subject: [PATCH BlueZ 8/8] tools/obexctl: Add generator for session/transfer
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <6f0b4053-4936-8d8c-3095-d6326d9a0e93@jp.fujitsu.com>
+Message-ID: <34060e99-cbde-82ee-e962-0bb931e73f6c@jp.fujitsu.com>
+Date: Fri, 22 Dec 2017 16:36:05 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <6f0b4053-4936-8d8c-3095-d6326d9a0e93@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thursday, 21 December 2017 21:44:12 CET Szymon Janc wrote:
-> ---
->  android/tester-bluetooth.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
-> 
-> diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-> index 22077a064..bab6dc952 100644
-> --- a/android/tester-bluetooth.c
-> +++ b/android/tester-bluetooth.c
-> @@ -231,7 +231,7 @@ static bt_property_t prop_emu_default_set[] = {
->  	{ BT_PROPERTY_UUIDS, sizeof(emu_uuids_val), &emu_uuids_val },
->  };
-> 
-> -static bt_property_t prop_emu_remote_bles_default_set[] = {
-> +static bt_property_t prop_emu_remote_ble_default_set[] = {
->  	{ BT_PROPERTY_BDADDR, sizeof(emu_remote_bdaddr_val),
->  						&emu_remote_bdaddr_val },
->  	{ BT_PROPERTY_TYPE_OF_DEVICE, sizeof(emu_remote_tod_ble_val),
-> @@ -240,7 +240,7 @@ static bt_property_t prop_emu_remote_bles_default_set[]
-> = { &emu_remote_ble_rssi_val },
->  };
-> 
-> -static bt_property_t prop_emu_remotes_default_set[] = {
-> +static bt_property_t prop_emu_remote_bredr_default_set[] = {
->  	{ BT_PROPERTY_BDADDR, sizeof(emu_remote_bdaddr_val),
->  						&emu_remote_bdaddr_val },
->  	{ BT_PROPERTY_TYPE_OF_DEVICE, sizeof(emu_remote_type_val),
-> @@ -648,7 +648,7 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> -		CALLBACK_DEVICE_FOUND(prop_emu_remote_bles_default_set, 3),
-> +		CALLBACK_DEVICE_FOUND(prop_emu_remote_ble_default_set, 3),
->  		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STOPPED),
-> @@ -996,7 +996,7 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> -		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-> +		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
->  		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STOPPED),
-> @@ -1019,7 +1019,7 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> -		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-> +		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
->  		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STOPPED),
-> @@ -1044,7 +1044,7 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> -		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-> +		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
->  		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STOPPED),
-> @@ -1068,7 +1068,7 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> -		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-> +		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
->  		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STOPPED),
-> @@ -1126,7 +1126,7 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> -		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-> +		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
->  		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STOPPED),
-> @@ -1152,7 +1152,7 @@ static struct test_case test_cases[] = {
->  		ACTION_SUCCESS(bt_start_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STARTED),
-> -		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
-> +		CALLBACK_DEVICE_FOUND(prop_emu_remote_bredr_default_set, 3),
->  		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
->  		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
->  							BT_DISCOVERY_STOPPED),
+---
+ tools/obexctl.c | 42 +++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 35 insertions(+), 7 deletions(-)
 
-Applied.
-
+diff --git a/tools/obexctl.c b/tools/obexctl.c
+index 38f0fd506..3f9e5ddc0 100644
+--- a/tools/obexctl.c
++++ b/tools/obexctl.c
+@@ -83,6 +83,27 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ 	bt_shell_set_prompt(PROMPT_OFF);
+ }
+ 
++static char *generic_generator(const char *text, int state, GList *source)
++{
++	static int index = 0;
++
++	if (!state) {
++		index = 0;
++	}
++
++	return g_dbus_proxy_path_lookup(source, &index, text);
++}
++
++static char *session_generator(const char *text, int state)
++{
++	return generic_generator(text, state, sessions);
++}
++
++static char *transfer_generator(const char *text, int state)
++{
++	return generic_generator(text, state, transfers);
++}
++
+ static void connect_reply(DBusMessage *message, void *user_data)
+ {
+ 	DBusError error;
+@@ -1785,14 +1806,21 @@ static const struct bt_shell_menu main_menu = {
+ 	.name = "main",
+ 	.entries = {
+ 	{ "connect",      "<dev> [uuid]", cmd_connect, "Connect session" },
+-	{ "disconnect",   "[session]", cmd_disconnect, "Disconnect session" },
++	{ "disconnect",   "[session]", cmd_disconnect, "Disconnect session",
++						session_generator },
+ 	{ "list",         NULL,       cmd_list, "List available sessions" },
+-	{ "show",         "[session]", cmd_show, "Session information" },
+-	{ "select",       "<session>", cmd_select, "Select default session" },
+-	{ "info",         "<object>", cmd_info, "Object information" },
+-	{ "cancel",       "<transfer>", cmd_cancel, "Cancel transfer" },
+-	{ "suspend",      "<transfer>", cmd_suspend, "Suspend transfer" },
+-	{ "resume",       "<transfer>", cmd_resume, "Resume transfer" },
++	{ "show",         "[session]", cmd_show, "Session information",
++						session_generator },
++	{ "select",       "<session>", cmd_select, "Select default session",
++						session_generator },
++	{ "info",         "<object>", cmd_info, "Object information",
++						transfer_generator },
++	{ "cancel",       "<transfer>", cmd_cancel, "Cancel transfer",
++						transfer_generator },
++	{ "suspend",      "<transfer>", cmd_suspend, "Suspend transfer",
++						transfer_generator },
++	{ "resume",       "<transfer>", cmd_resume, "Resume transfer",
++						transfer_generator },
+ 	{ "send",         "<file>",   cmd_send, "Send file" },
+ 	{ "pull",	  "<file>",   cmd_pull,
+ 					"Pull Vobject & stores in file" },
 -- 
-pozdrawiam
-Szymon Janc
+2.14.1
+
