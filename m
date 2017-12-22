@@ -1,89 +1,115 @@
-Return-Path: <stefan.wahren@i2se.com>
-Date: Fri, 22 Dec 2017 20:57:22 +0100 (CET)
-From: Stefan Wahren <stefan.wahren@i2se.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Loic Poulain <loic.poulain@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>, Eric Anholt <eric@anholt.net>,
-	linux-rpi-kernel@lists.infradead.org,
-	linux-bluetooth@vger.kernel.org
-Message-ID: <692799368.42471.1513972642978@email.1und1.de>
-Subject: Bluetooth: hci_bcm: Unable to handle kernel NULL pointer
- dereference in Linux 4.15rc4
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 5/5] tools/btpclient: Add set connectable command
+Date: Fri, 22 Dec 2017 15:17:09 +0100
+Message-Id: <20171222141709.29008-5-grzegorz.kolodziejczyk@codecoup.pl>
+In-Reply-To: <20171222141709.29008-1-grzegorz.kolodziejczyk@codecoup.pl>
+References: <20171222141709.29008-1-grzegorz.kolodziejczyk@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch adds set connectable command for btp client.
+---
+ tools/btpclient.c | 64 ++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 51 insertions(+), 13 deletions(-)
 
-i'm working on Bluetooth support for Raspberry Pi Zero W (BCM43438) [1]. After enabling the driver and the DT stuff, i will get a NULL pointer dereference during boot of Linux 4.15-rc4:
+diff --git a/tools/btpclient.c b/tools/btpclient.c
+index ca2e241fe..13fd22457 100644
+--- a/tools/btpclient.c
++++ b/tools/btpclient.c
+@@ -120,6 +120,7 @@ static void btp_gap_read_commands(uint8_t index, const void *param,
+ 	commands |= (1 << BTP_OP_GAP_READ_COTROLLER_INFO);
+ 	commands |= (1 << BTP_OP_GAP_RESET);
+ 	commands |= (1 << BTP_OP_GAP_SET_POWERED);
++	commands |= (1 << BTP_OP_GAP_SET_CONNECTABLE);
+ 	commands |= (1 << BTP_OP_GAP_SET_DISCOVERABLE);
+ 	commands |= (1 << BTP_OP_GAP_SET_BONDABLE);
+ 	commands |= (1 << BTP_OP_GAP_START_DISCOVERY);
+@@ -335,6 +336,53 @@ failed:
+ 	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
+ }
+ 
++static void update_current_settings(struct btp_adapter *adapter,
++							uint32_t new_settings)
++{
++	struct btp_new_settings_ev ev;
++
++	adapter->current_settings = new_settings;
++
++	ev.current_settings = L_CPU_TO_LE32(adapter->current_settings);
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_NEW_SETTINGS, adapter->index,
++							sizeof(ev), &ev);
++}
++
++static void btp_gap_set_connectable(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	struct btp_adapter *adapter = find_adapter_by_index(index);
++	const struct btp_gap_set_connectable_cp *cp = param;
++	uint8_t status = BTP_ERROR_FAIL;
++	uint32_t new_settings;
++
++	if (length < sizeof(*cp))
++		goto failed;
++
++	if (!adapter) {
++		status = BTP_ERROR_INVALID_INDEX;
++		goto failed;
++	}
++
++	new_settings = adapter->current_settings;
++
++	if (cp->connectable)
++		new_settings |= 1 << BTP_GAP_SETTING_CONNECTABLE;
++	else
++		new_settings &= ~(1 << BTP_GAP_SETTING_CONNECTABLE);
++
++	update_current_settings(adapter, new_settings);
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_CONNECTABLE, index,
++					sizeof(new_settings), &new_settings);
++
++	return;
++
++failed:
++	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
++}
++
+ static void btp_gap_set_discoverable(uint8_t index, const void *param,
+ 					uint16_t length, void *user_data)
+ {
+@@ -672,6 +720,9 @@ static void register_gap_service(void)
+ 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_POWERED,
+ 					btp_gap_set_powered, NULL, NULL);
+ 
++	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_CONNECTABLE,
++					btp_gap_set_connectable, NULL, NULL);
++
+ 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_DISCOVERABLE,
+ 					btp_gap_set_discoverable, NULL, NULL);
+ 
+@@ -979,19 +1030,6 @@ static void proxy_removed(struct l_dbus_proxy *proxy, void *user_data)
+ 	}
+ }
+ 
+-static void update_current_settings(struct btp_adapter *adapter,
+-							uint32_t new_settings)
+-{
+-	struct btp_new_settings_ev ev;
+-
+-	adapter->current_settings = new_settings;
+-
+-	ev.current_settings = L_CPU_TO_LE32(adapter->current_settings);
+-
+-	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_NEW_SETTINGS, adapter->index,
+-							sizeof(ev), &ev);
+-}
+-
+ static void property_changed(struct l_dbus_proxy *proxy, const char *name,
+ 				struct l_dbus_message *msg, void *user_data)
+ {
+-- 
+2.13.6
 
-[   14.934216] Bluetooth: HCI UART driver ver 2.3
-[   14.934231] Bluetooth: HCI UART protocol H4 registered
-[   14.934912] hci_uart_bcm serial0-0: BCM irq: -22
-[   14.935147] uart-pl011 20201000.serial: no DMA platform data
-[   14.948218] Unable to handle kernel NULL pointer dereference at virtual address 00000000
-[   14.948238] pgd = a8969859
-[   14.948247] [00000000] *pgd=00000000
-[   14.948272] Internal error: Oops: 5 [#1] ARM
-[   14.948279] Modules linked in: hci_uart(+) btbcm bcm2835_rng rng_core
-[   14.948323] CPU: 0 PID: 149 Comm: kworker/u3:1 Tainted: G        W        4.15.0-rc4+ #4
-[   14.948327] Hardware name: BCM2835
-[   14.948363] Workqueue: hci0 hci_cmd_work
-[   14.948499] PC is at hci_uart_tx_wakeup+0x20/0xfc [hci_uart]
-[   14.948560] LR is at hci_uart_send_frame+0x64/0x78 [hci_uart]
-[   14.948570] pc : [<bf018074>]    lr : [<bf019448>]    psr: 20000013
-[   14.948579] sp : d8df9e90  ip : d8df9ea8  fp : d8df9ea4
-[   14.948585] r10: 00000000  r9 : 00000000  r8 : d96e8700
-[   14.948594] r7 : c0c14a40  r6 : d97d3000  r5 : d96e8c48  r4 : d96e8c10
-[   14.948601] r3 : 00000000  r2 : 20000013  r1 : d97ae540  r0 : d96e8c10
-[   14.948613] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
-[   14.948623] Control: 00c5387d  Table: 19748008  DAC: 00000051
-[   14.948641] Process kworker/u3:1 (pid: 149, stack limit = 0x0b8b6dd4)
-[   14.948654] Stack: (0xd8df9e90 to 0xd8dfa000)
-[   14.948668] 9e80:                                     d97ae540 d96e8c10 d8df9ec4 d8df9ea8
-[   14.948689] 9ea0: bf019448 bf018060 d97ae540 d97d3000 d97ae540 d97d3000 d8df9ee4 d8df9ec8
-[   14.948707] 9ec0: c0687a6c bf0193f0 c0596408 c0592050 d97d3700 d97ae540 d8df9f0c d8df9ee8
-[   14.948724] 9ee0: c0687b4c c06879d4 00000000 d8df9ef4 d8df9f44 d8e04a80 d97d3700 d8edb000
-[   14.948742] 9f00: d8df9f44 d8df9f10 c0133e78 c0687acc d8edb000 c0c14a40 c0c14a40 d8e04a80
-[   14.948760] 9f20: d8edb000 d8edb000 c0c14a40 c0c14a40 d8edb014 d8e04a98 d8df9f7c d8df9f48
-[   14.948778] 9f40: c0134d0c c0133c80 d8ee05d8 d8e04a80 c0134a2c d8ee05c0 d8ee0540 d8defea4
-[   14.948796] 9f60: d8ee05d8 d8e04a80 c0134a2c 00000000 d8df9fac d8df9f80 c0139768 c0134a38
-[   14.948811] 9f80: d8df8000 d8ee0540 c013962c 00000000 00000000 00000000 00000000 00000000
-[   14.948827] 9fa0: 00000000 d8df9fb0 c0107e88 c0139638 00000000 00000000 00000000 00000000
-[   14.948841] 9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-[   14.948856] 9fe0: 00000000 00000000 00000000 00000000 00000013 00000000 912f0073 00001877
-[   14.949017] [<bf018074>] (hci_uart_tx_wakeup [hci_uart]) from [<bf019448>] (hci_uart_send_frame+0x64/0x78 [hci_uart])
-[   14.949103] [<bf019448>] (hci_uart_send_frame [hci_uart]) from [<c0687a6c>] (hci_send_frame+0xa4/0xf8)
-[   14.949134] [<c0687a6c>] (hci_send_frame) from [<c0687b4c>] (hci_cmd_work+0x8c/0x120)
-[   14.949166] [<c0687b4c>] (hci_cmd_work) from [<c0133e78>] (process_one_work+0x204/0x380)
-[   14.949194] [<c0133e78>] (process_one_work) from [<c0134d0c>] (worker_thread+0x2e0/0x450)
-[   14.949228] [<c0134d0c>] (worker_thread) from [<c0139768>] (kthread+0x13c/0x158)
-[   14.949270] [<c0139768>] (kthread) from [<c0107e88>] (ret_from_fork+0x14/0x2c)
-[   14.949290] Code: e8bd4000 e1a04000 e2805038 e5903058 (e5932000) 
-[   14.949310] ---[ end trace e0ebe7d9031c01b2 ]---
-[   15.155799] Bluetooth: HCI UART protocol Broadcom registered
-[   16.435744] brcmfmac: brcmf_fw_map_chip_to_name: using brcm/brcmfmac43430-sdio.bin for chip 0x00a9a6(43430) rev 0x000001
-[   16.649373] brcmfmac mmc1:0001:1: Direct firmware load for brcm/brcmfmac43430-sdio.clm_blob failed with error -2
-[   16.651160] brcmfmac: brcmf_c_preinit_dcmds: Firmware version = wl0: Aug  7 2017 00:46:29 version 7.45.41.46 (r666254 CY) FWID 01-f8a78378
-[   18.023283] EXT4-fs (mmcblk0p2): re-mounted. Opts: (null)
-[   21.041766] systemd-journald[97]: Received request to flush runtime journal from PID 1
-[   25.446589] Bluetooth: hci0: BCM: failed to write update baudrate (-110)
-[   25.474412] Bluetooth: hci0: Failed to set baudrate
-[   35.686592] Bluetooth: hci0: BCM: Reset failed (-110)
-
-Here are the relevant config settings:
-
-CONFIG_BT_BCM=m
-CONFIG_BT_HCIUART=m
-CONFIG_BT_HCIUART_SERDEV=y
-CONFIG_BT_HCIUART_H4=y
-CONFIG_BT_HCIUART_BCM=y
-CONFIG_SERIAL_DEV_BUS=y
-CONFIG_SERIAL_DEV_CTRL_TTYPORT=y
-CONFIG_TTY_PRINTK=y
-
-It looks like the issue exists on RPI3 too [2].
-
-[1] - https://github.com/lategoodbye/rpi-zero/commits/bcm2835-rpi-zero-w-bt
-[2] - https://bugzilla.redhat.com/show_bug.cgi?id=1520099
