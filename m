@@ -1,10 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ 8/8] tools/obexctl: Add generator for session/transfer
+Subject: [PATCH BlueZ 7/8] tools/bluetooth-player: Add generator for
+ player/item
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <6f0b4053-4936-8d8c-3095-d6326d9a0e93@jp.fujitsu.com>
-Message-ID: <34060e99-cbde-82ee-e962-0bb931e73f6c@jp.fujitsu.com>
-Date: Fri, 22 Dec 2017 16:36:05 +0900
+Message-ID: <c449d7fa-3c4f-cf6f-4141-f06a8f5eeb5e@jp.fujitsu.com>
+Date: Fri, 22 Dec 2017 16:36:00 +0900
 MIME-Version: 1.0
 In-Reply-To: <6f0b4053-4936-8d8c-3095-d6326d9a0e93@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,15 +13,15 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/obexctl.c | 42 +++++++++++++++++++++++++++++++++++-------
- 1 file changed, 35 insertions(+), 7 deletions(-)
+ tools/bluetooth-player.c | 36 +++++++++++++++++++++++++++++++-----
+ 1 file changed, 31 insertions(+), 5 deletions(-)
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index 38f0fd506..3f9e5ddc0 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -83,6 +83,27 @@ static void disconnect_handler(DBusConnection *connection, void *user_data)
- 	bt_shell_set_prompt(PROMPT_OFF);
+diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+index 4fbae0c0a..3dc7dc985 100644
+--- a/tools/bluetooth-player.c
++++ b/tools/bluetooth-player.c
+@@ -75,6 +75,27 @@ static bool check_default_player(void)
+ 	return TRUE;
  }
  
 +static char *generic_generator(const char *text, int state, GList *source)
@@ -34,48 +35,48 @@ index 38f0fd506..3f9e5ddc0 100644
 +	return g_dbus_proxy_path_lookup(source, &index, text);
 +}
 +
-+static char *session_generator(const char *text, int state)
++static char *player_generator(const char *text, int state)
 +{
-+	return generic_generator(text, state, sessions);
++	return generic_generator(text, state, players);
 +}
 +
-+static char *transfer_generator(const char *text, int state)
++static char *item_generator(const char *text, int state)
 +{
-+	return generic_generator(text, state, transfers);
++	return generic_generator(text, state, items);
 +}
 +
- static void connect_reply(DBusMessage *message, void *user_data)
+ static void play_reply(DBusMessage *message, void *user_data)
  {
  	DBusError error;
-@@ -1785,14 +1806,21 @@ static const struct bt_shell_menu main_menu = {
+@@ -909,9 +930,12 @@ static const struct bt_shell_menu main_menu = {
  	.name = "main",
  	.entries = {
- 	{ "connect",      "<dev> [uuid]", cmd_connect, "Connect session" },
--	{ "disconnect",   "[session]", cmd_disconnect, "Disconnect session" },
-+	{ "disconnect",   "[session]", cmd_disconnect, "Disconnect session",
-+						session_generator },
- 	{ "list",         NULL,       cmd_list, "List available sessions" },
--	{ "show",         "[session]", cmd_show, "Session information" },
--	{ "select",       "<session>", cmd_select, "Select default session" },
--	{ "info",         "<object>", cmd_info, "Object information" },
--	{ "cancel",       "<transfer>", cmd_cancel, "Cancel transfer" },
--	{ "suspend",      "<transfer>", cmd_suspend, "Suspend transfer" },
--	{ "resume",       "<transfer>", cmd_resume, "Resume transfer" },
-+	{ "show",         "[session]", cmd_show, "Session information",
-+						session_generator },
-+	{ "select",       "<session>", cmd_select, "Select default session",
-+						session_generator },
-+	{ "info",         "<object>", cmd_info, "Object information",
-+						transfer_generator },
-+	{ "cancel",       "<transfer>", cmd_cancel, "Cancel transfer",
-+						transfer_generator },
-+	{ "suspend",      "<transfer>", cmd_suspend, "Suspend transfer",
-+						transfer_generator },
-+	{ "resume",       "<transfer>", cmd_resume, "Resume transfer",
-+						transfer_generator },
- 	{ "send",         "<file>",   cmd_send, "Send file" },
- 	{ "pull",	  "<file>",   cmd_pull,
- 					"Pull Vobject & stores in file" },
+ 	{ "list",         NULL,       cmd_list, "List available players" },
+-	{ "show",         "[player]", cmd_show, "Player information" },
+-	{ "select",       "<player>", cmd_select, "Select default player" },
+-	{ "play",         "[item]",   cmd_play, "Start playback" },
++	{ "show",         "[player]", cmd_show, "Player information",
++							player_generator},
++	{ "select",       "<player>", cmd_select, "Select default player",
++							player_generator},
++	{ "play",         "[item]",   cmd_play, "Start playback",
++							item_generator},
+ 	{ "pause",        NULL,       cmd_pause, "Pause playback" },
+ 	{ "stop",         NULL,       cmd_stop, "Stop playback" },
+ 	{ "next",         NULL,       cmd_next, "Jump to next item" },
+@@ -933,8 +957,10 @@ static const struct bt_shell_menu main_menu = {
+ 					"List items of current folder" },
+ 	{ "search",     "<string>",   cmd_search,
+ 					"Search items containing string" },
+-	{ "queue",       "<item>",    cmd_queue, "Add item to playlist queue" },
+-	{ "show-item",   "<item>",    cmd_show_item, "Show item information" },
++	{ "queue",       "<item>",    cmd_queue, "Add item to playlist queue",
++							item_generator},
++	{ "show-item",   "<item>",    cmd_show_item, "Show item information",
++							item_generator},
+ 	{} },
+ };
+ 
 -- 
 2.14.1
 
