@@ -1,11 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ 7/8] tools/bluetooth-player: Add generator for
- player/item
+Subject: [PATCH BlueZ 6/8] client: Use g_dbus_proxy_path_lookup()
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <6f0b4053-4936-8d8c-3095-d6326d9a0e93@jp.fujitsu.com>
-Message-ID: <c449d7fa-3c4f-cf6f-4141-f06a8f5eeb5e@jp.fujitsu.com>
-Date: Fri, 22 Dec 2017 16:36:00 +0900
+Message-ID: <93d4cf2f-484d-7729-896f-76679046989d@jp.fujitsu.com>
+Date: Fri, 22 Dec 2017 16:35:55 +0900
 MIME-Version: 1.0
 In-Reply-To: <6f0b4053-4936-8d8c-3095-d6326d9a0e93@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
@@ -13,70 +12,44 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/bluetooth-player.c | 36 +++++++++++++++++++++++++++++++-----
- 1 file changed, 31 insertions(+), 5 deletions(-)
+ client/gatt.c | 19 ++-----------------
+ 1 file changed, 2 insertions(+), 17 deletions(-)
 
-diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-index 4fbae0c0a..3dc7dc985 100644
---- a/tools/bluetooth-player.c
-+++ b/tools/bluetooth-player.c
-@@ -75,6 +75,27 @@ static bool check_default_player(void)
- 	return TRUE;
+diff --git a/client/gatt.c b/client/gatt.c
+index cdf14363c..c0f789c34 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -444,28 +444,13 @@ GDBusProxy *gatt_select_attribute(GDBusProxy *parent, const char *arg)
+ 
+ static char *attribute_generator(const char *text, int state, GList *source)
+ {
+-	static int index, len;
+-	GList *list;
++	static int index;
+ 
+ 	if (!state) {
+ 		index = 0;
+-		len = strlen(text);
+ 	}
+ 
+-	for (list = g_list_nth(source, index); list;
+-						list = g_list_next(list)) {
+-		GDBusProxy *proxy = list->data;
+-		const char *path;
+-
+-		index++;
+-
+-		path = g_dbus_proxy_get_path(proxy);
+-
+-		if (!strncmp(path, text, len))
+-			return strdup(path);
+-        }
+-
+-	return NULL;
++	return g_dbus_proxy_path_lookup(source, &index, text);
  }
  
-+static char *generic_generator(const char *text, int state, GList *source)
-+{
-+	static int index = 0;
-+
-+	if (!state) {
-+		index = 0;
-+	}
-+
-+	return g_dbus_proxy_path_lookup(source, &index, text);
-+}
-+
-+static char *player_generator(const char *text, int state)
-+{
-+	return generic_generator(text, state, players);
-+}
-+
-+static char *item_generator(const char *text, int state)
-+{
-+	return generic_generator(text, state, items);
-+}
-+
- static void play_reply(DBusMessage *message, void *user_data)
- {
- 	DBusError error;
-@@ -909,9 +930,12 @@ static const struct bt_shell_menu main_menu = {
- 	.name = "main",
- 	.entries = {
- 	{ "list",         NULL,       cmd_list, "List available players" },
--	{ "show",         "[player]", cmd_show, "Player information" },
--	{ "select",       "<player>", cmd_select, "Select default player" },
--	{ "play",         "[item]",   cmd_play, "Start playback" },
-+	{ "show",         "[player]", cmd_show, "Player information",
-+							player_generator},
-+	{ "select",       "<player>", cmd_select, "Select default player",
-+							player_generator},
-+	{ "play",         "[item]",   cmd_play, "Start playback",
-+							item_generator},
- 	{ "pause",        NULL,       cmd_pause, "Pause playback" },
- 	{ "stop",         NULL,       cmd_stop, "Stop playback" },
- 	{ "next",         NULL,       cmd_next, "Jump to next item" },
-@@ -933,8 +957,10 @@ static const struct bt_shell_menu main_menu = {
- 					"List items of current folder" },
- 	{ "search",     "<string>",   cmd_search,
- 					"Search items containing string" },
--	{ "queue",       "<item>",    cmd_queue, "Add item to playlist queue" },
--	{ "show-item",   "<item>",    cmd_show_item, "Show item information" },
-+	{ "queue",       "<item>",    cmd_queue, "Add item to playlist queue",
-+							item_generator},
-+	{ "show-item",   "<item>",    cmd_show_item, "Show item information",
-+							item_generator},
- 	{} },
- };
- 
+ char *gatt_attribute_generator(const char *text, int state)
 -- 
 2.14.1
 
