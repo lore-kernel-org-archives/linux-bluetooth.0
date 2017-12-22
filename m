@@ -1,271 +1,90 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/5] tools/btpclient: Add start, stop discovery commands
-Date: Fri, 22 Dec 2017 15:17:08 +0100
-Message-Id: <20171222141709.29008-4-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH v2 3/5] tools/btpclient: Add device found event
+Date: Fri, 22 Dec 2017 15:17:07 +0100
+Message-Id: <20171222141709.29008-3-grzegorz.kolodziejczyk@codecoup.pl>
 In-Reply-To: <20171222141709.29008-1-grzegorz.kolodziejczyk@codecoup.pl>
 References: <20171222141709.29008-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds start and stop discovery command for btp client.
+This patch adds device found event handler. It's called when rssi
+property of device changes and new device interface is added.
 ---
- tools/btpclient.c | 227 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 227 insertions(+)
+ tools/btpclient.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index e830947b1..ca2e241fe 100644
+index 23e1080f5..e830947b1 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
-@@ -122,6 +122,8 @@ static void btp_gap_read_commands(uint8_t index, const void *param,
- 	commands |= (1 << BTP_OP_GAP_SET_POWERED);
- 	commands |= (1 << BTP_OP_GAP_SET_DISCOVERABLE);
- 	commands |= (1 << BTP_OP_GAP_SET_BONDABLE);
-+	commands |= (1 << BTP_OP_GAP_START_DISCOVERY);
-+	commands |= (1 << BTP_OP_GAP_STOP_DISCOVERY);
- 
- 	commands = L_CPU_TO_LE16(commands);
- 
-@@ -399,6 +401,225 @@ failed:
+@@ -399,6 +399,40 @@ failed:
  	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
  }
  
-+static void start_discovery_reply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
++static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
 +{
-+	struct btp_adapter *adapter = find_adapter_by_proxy(proxy);
++	struct btp_device_found_ev ev;
++	const char *str;
++	int16_t rssi;
 +
-+	if (!adapter) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, BTP_INDEX_NON_CONTROLLER,
-+								BTP_ERROR_FAIL);
++	if (!l_dbus_proxy_get_property(proxy, "Address", "s", &str) ||
++						str2addr(str, ev.address))
 +		return;
-+	}
 +
-+	if (l_dbus_message_is_error(result)) {
-+		const char *name, *desc;
-+
-+		l_dbus_message_get_error(result, &name, &desc);
-+		l_error("Failed to start discovery (%s), %s", name, desc);
-+
-+		btp_send_error(btp, BTP_GAP_SERVICE, adapter->index,
-+								BTP_ERROR_FAIL);
++	if (!l_dbus_proxy_get_property(proxy, "AddressType", "s", &str))
 +		return;
-+	}
 +
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_START_DISCOVERY,
-+						adapter->index, 0, NULL);
++	ev.address_type = strcmp(str, "public") ? BTP_GAP_ADDR_RANDOM :
++							BTP_GAP_ADDR_PUBLIC;
++
++	if (!l_dbus_proxy_get_property(proxy, "RSSI", "n", &rssi))
++		return;
++
++	ev.rssi = rssi;
++
++	/* TODO Temporary set all flags */
++	ev.flags = (BTP_EV_GAP_DEVICE_FOUND_FLAG_RSSI |
++					BTP_EV_GAP_DEVICE_FOUND_FLAG_AD |
++					BTP_EV_GAP_DEVICE_FOUND_FLAG_SR);
++
++	/* TODO Add eir to device found event */
++	ev.eir_len = 0;
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_FOUND,
++						BTP_INDEX_NON_CONTROLLER,
++						sizeof(ev) + ev.eir_len, &ev);
 +}
 +
-+static void set_discovery_filter_setup(struct l_dbus_message *message,
-+							void *user_data)
-+{
-+	uint8_t flags = L_PTR_TO_UINT(user_data);
-+	struct l_dbus_message_builder *builder;
-+
-+	if ((flags & BTP_GAP_DISCOVERY_FLAG_LE) ||
-+					(flags & BTP_GAP_DISCOVERY_FLAG_BREDR))
-+	{
-+		l_info("Failed to start discovery - no transport set");
-+		return;
-+	}
-+
-+	builder = l_dbus_message_builder_new(message);
-+
-+	l_dbus_message_builder_enter_array(builder, "{sv}");
-+	l_dbus_message_builder_enter_dict(builder, "sv");
-+
-+	/* Be in observer mode or in general mode (default in Bluez) */
-+	if (flags & BTP_GAP_DISCOVERY_FLAG_OBSERVATION) {
-+		l_dbus_message_builder_append_basic(builder, 's', "Transport");
-+		l_dbus_message_builder_enter_variant(builder, "s");
-+
-+		if (flags & (BTP_GAP_DISCOVERY_FLAG_LE |
-+						BTP_GAP_DISCOVERY_FLAG_BREDR))
-+			l_dbus_message_builder_append_basic(builder, 's',
-+									"auto");
-+		else if (flags & BTP_GAP_DISCOVERY_FLAG_LE)
-+			l_dbus_message_builder_append_basic(builder, 's', "le");
-+		else if (flags & BTP_GAP_DISCOVERY_FLAG_BREDR)
-+			l_dbus_message_builder_append_basic(builder, 's',
-+								"bredr");
-+
-+		l_dbus_message_builder_leave_variant(builder);
-+	}
-+
-+	l_dbus_message_builder_leave_dict(builder);
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	/* TODO add passive, limited discovery */
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
-+static void set_discovery_filter_reply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_proxy(proxy);
-+
-+	if (!adapter) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, BTP_INDEX_NON_CONTROLLER,
-+								BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	if (l_dbus_message_is_error(result)) {
-+		const char *name, *desc;
-+
-+		l_dbus_message_get_error(result, &name, &desc);
-+		l_error("Failed to set discovery filter (%s), %s", name, desc);
-+
-+		btp_send_error(btp, BTP_GAP_SERVICE, adapter->index,
-+								BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	l_dbus_proxy_method_call(adapter->proxy, "StartDiscovery", NULL,
-+					start_discovery_reply, NULL, NULL);
-+}
-+
-+static void btp_gap_start_discovery(uint8_t index, const void *param,
-+					uint16_t length, void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	const struct btp_gap_start_discovery_cp *cp = param;
-+	bool prop;
-+
-+	if (!adapter) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, index,
-+						BTP_ERROR_INVALID_INDEX);
-+		return;
-+	}
-+
-+	/* Adapter needs to be powered to start discovery */
-+	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b", &prop) ||
-+									!prop) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, index, BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	l_dbus_proxy_method_call(adapter->proxy, "SetDiscoveryFilter",
-+						set_discovery_filter_setup,
-+						set_discovery_filter_reply,
-+						L_UINT_TO_PTR(cp->flags), NULL);
-+}
-+
-+static void clear_discovery_filter_setup(struct l_dbus_message *message,
-+							void *user_data)
-+{
-+	struct l_dbus_message_builder *builder;
-+
-+	builder = l_dbus_message_builder_new(message);
-+
-+	/* Clear discovery filter setup */
-+	l_dbus_message_builder_enter_array(builder, "{sv}");
-+	l_dbus_message_builder_enter_dict(builder, "sv");
-+	l_dbus_message_builder_leave_dict(builder);
-+	l_dbus_message_builder_leave_array(builder);
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
-+static void clear_discovery_filter_reaply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_proxy(proxy);
-+
-+	if (!adapter) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, BTP_INDEX_NON_CONTROLLER,
-+								BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	if (l_dbus_message_is_error(result)) {
-+		const char *name, *desc;
-+
-+		l_dbus_message_get_error(result, &name, &desc);
-+		l_error("Failed to set discovery filter (%s), %s", name, desc);
-+
-+		btp_send_error(btp, BTP_GAP_SERVICE, adapter->index,
-+								BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_STOP_DISCOVERY,
-+						adapter->index, 0, NULL);
-+}
-+
-+static void stop_discovery_reply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_proxy(proxy);
-+
-+	if (!adapter) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, BTP_INDEX_NON_CONTROLLER,
-+								BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	if (l_dbus_message_is_error(result)) {
-+		const char *name;
-+
-+		l_dbus_message_get_error(result, &name, NULL);
-+		l_error("Failed to stop discovery (%s)", name);
-+
-+		btp_send_error(btp, BTP_GAP_SERVICE, adapter->index,
-+								BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	l_dbus_proxy_method_call(adapter->proxy, "SetDiscoveryFilter",
-+						clear_discovery_filter_setup,
-+						clear_discovery_filter_reaply,
-+						NULL, NULL);
-+}
-+
-+static void btp_gap_stop_discovery(uint8_t index, const void *param,
-+					uint16_t length, void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	bool prop;
-+
-+	if (!adapter) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, index,
-+						BTP_ERROR_INVALID_INDEX);
-+		return;
-+	}
-+
-+	/* Adapter needs to be powered to be able to remove devices */
-+	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b", &prop) ||
-+									!prop) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, index, BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	l_dbus_proxy_method_call(adapter->proxy, "StopDiscovery", NULL,
-+					stop_discovery_reply, NULL, NULL);
-+}
-+
- static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
+ static void register_gap_service(void)
  {
- 	struct btp_device_found_ev ev;
-@@ -456,6 +677,12 @@ static void register_gap_service(void)
+ 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_SUPPORTED_COMMANDS,
+@@ -661,6 +695,8 @@ static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
  
- 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_BONDABLE,
- 					btp_gap_set_bondable, NULL, NULL);
+ 		l_queue_push_tail(adapter->devices, device);
+ 
++		btp_gap_device_found_ev(proxy);
 +
-+	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_START_DISCOVERY,
-+					btp_gap_start_discovery, NULL, NULL);
+ 		return;
+ 	}
+ 
+@@ -784,6 +820,15 @@ static void property_changed(struct l_dbus_proxy *proxy, const char *name,
+ 			update_current_settings(adapter, new_settings);
+ 
+ 		return;
++	} else if (!strcmp(interface, "org.bluez.Device1")) {
++		if (!strcmp(name, "RSSI")) {
++			int16_t rssi;
 +
-+	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_STOP_DISCOVERY,
-+					btp_gap_stop_discovery, NULL, NULL);
++			if (!l_dbus_message_get_arguments(msg, "n", &rssi))
++				return;
++
++			btp_gap_device_found_ev(proxy);
++		}
+ 	}
  }
  
- static void btp_core_read_commands(uint8_t index, const void *param,
 -- 
 2.13.6
 
