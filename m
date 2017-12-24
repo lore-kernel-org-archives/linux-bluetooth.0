@@ -1,26 +1,34 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 25 Dec 2017 21:06:31 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: sbrown@cortland.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] mesh: meshctl: Correct display security
-Message-ID: <20171225190631.GA10438@x1c.home>
-References: <20171222102954.14960-1-sbrown@cortland.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20171222102954.14960-1-sbrown@cortland.com>
+Reply-To: ironyman13@gmail.com
+From: changyu li <ironyman13@gmail.com>
+Date: Sun, 24 Dec 2017 01:42:26 -0500
+Message-ID: <CALEhDxQULJEJJO+gFvy6jK-sfKHcxa0gOJqn_r5AOZHr_O2pJA@mail.gmail.com>
+Subject: Question about HOG input devices
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Steve,
+Hi,
 
-On Fri, Dec 22, 2017, sbrown@cortland.com wrote:
-> The case of a security command without an argument is not handled
-> and throws a segv.
-> ---
->  mesh/main.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+I would like to be able to configure my Bluetooth HOG mouse but its
+GATT characteristic used for configuration has no DBus interface
+associated with it.
 
-Applied. Thanks.
+HOG services are not "external" and are marked as claimed in
+add_gatt_service. This prevents the characteristic from being
+exported.
 
-Johan
+  if (!profile->external) {
+    /* Mark the service as claimed by the existing profile. */
+    gatt_db_service_set_claimed(attr, true);
+  }
+
+So I have a few questions,
+
+1. What does external mean?
+2. Is there another way to access the characteristic and configure the device?
+3. If not, can we make the input-hog profile external?
+
+Thank you
