@@ -1,74 +1,65 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-Reply-To: ironyman13@gmail.com
-In-Reply-To: <CABBYNZKk_D1mMAgWGCFB8WtTdWPPf01i4uBqd=8rSPf-fZde=Q@mail.gmail.com>
-References: <CALEhDxQULJEJJO+gFvy6jK-sfKHcxa0gOJqn_r5AOZHr_O2pJA@mail.gmail.com>
- <CABBYNZKk_D1mMAgWGCFB8WtTdWPPf01i4uBqd=8rSPf-fZde=Q@mail.gmail.com>
-From: changyu li <ironyman13@gmail.com>
-Date: Tue, 26 Dec 2017 23:48:36 -0500
-Message-ID: <CALEhDxR_PhncvFb-Woq_KQYu8ymSJ022uiu+HGtVAmaqgFgZYQ@mail.gmail.com>
-Subject: Re: Question about HOG input devices
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 2/2] usb: quirks: Add reset-resume quirk for Dell DW1820
+ QCA Rome Bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20171220110008.11856-2-kai.heng.feng@canonical.com>
+Date: Tue, 26 Dec 2017 22:01:46 +0100
+Cc: linux-usb@vger.kernel.org,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        stable <stable@vger.kernel.org>,
+        Leif Liddy <leif.linux@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Brian Norris <briannorris@chromium.org>,
+        Daniel Drake <drake@endlessm.com>
+Message-Id: <FC2D8E58-CA2D-4115-9E62-DF6D69A483CF@holtmann.org>
+References: <20171220110008.11856-1-kai.heng.feng@canonical.com>
+ <20171220110008.11856-2-kai.heng.feng@canonical.com>
+To: Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Greg,
 
-I'm not customizing the report handling, rather customizing what
-report is generated (if any is generated at all) from the mouse for
-some keys. This is accomplished by sending a write request to some
-attribute to the device, which is rather easy to do if it were not for
-the restriction. Isn't it reasonable to expose some characteristics
-used for configuration?
+> Commit ("fd865802c66bc451dc515ed89360f84376ce1a56 Bluetooth: btusb: fix
+> QCA Rome suspend/resume") enables reset_resume in btusb_probe(). This
+> makes the device resets during btusb_open(), firmware loading gets
+> interrupted as a result.
+> 
+> We still want to reset the device to solve the original issue, but we
+> should do it before btusb_open().
+> 
+> Hence, add reset-resume quirk in usb core intead of btusb.
+> 
+> Cc: stable@vger.kernel.org
+> Cc: Leif Liddy <leif.linux@gmail.com>
+> Cc: Matthias Kaehlcke <mka@chromium.org>
+> Cc: Brian Norris <briannorris@chromium.org>
+> Cc: Daniel Drake <drake@endlessm.com>
+> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> 
+> ---
+> drivers/usb/core/quirks.c | 3 +++
+> 1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/usb/core/quirks.c b/drivers/usb/core/quirks.c
+> index a10b346b9777..96951104c45b 100644
+> --- a/drivers/usb/core/quirks.c
+> +++ b/drivers/usb/core/quirks.c
+> @@ -197,6 +197,9 @@ static const struct usb_device_id usb_quirk_list[] = {
+> 	{ USB_DEVICE(0x0b05, 0x17e0), .driver_info =
+> 			USB_QUIRK_IGNORE_REMOTE_WAKEUP },
+> 
+> +	/* QCA Rome Bluetooth in Dell DW1820 wireless module */
+> +	{ USB_DEVICE(0x0cf3, 0xe007), .driver_info = USB_QUIRK_RESET_RESUME },
+> +
 
-If I must create a driver for this, what kind do you mean? Do you mean
-something like the wiimote driver in drivers/hid? Is there a way to
-get the bluetooth socket associated with HID device (I have to send a
-write request after all)?
+can I get an ACK from you to take this patch through bluetooth-next tree? Or are you planning to take it?
 
-Thank you
+Regards
 
-On Tue, Dec 26, 2017 at 8:20 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On 24 Dec 2017 04:45, "changyu li" <ironyman13@gmail.com> wrote:
->
-> Hi,
->
-> I would like to be able to configure my Bluetooth HOG mouse but its
-> GATT characteristic used for configuration has no DBus interface
-> associated with it.
->
-> HOG services are not "external" and are marked as claimed in
-> add_gatt_service. This prevents the characteristic from being
-> exported.
->
->
-> It is no external to prevent leaking user input over D-Bus, so it is working
-> as intended. If you want to customize the report handling you will need to
-> create a kernel driver.
->
->
->   if (!profile->external) {
->     /* Mark the service as claimed by the existing profile. */
->     gatt_db_service_set_claimed(attr, true);
->   }
->
-> So I have a few questions,
->
-> 1. What does external mean?
-> 2. Is there another way to access the characteristic and configure the
-> device?
-> 3. If not, can we make the input-hog profile external?
->
-> Thank you
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
+Marcel
