@@ -1,11 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH 3/3] Bluetooth: Avoid WARN splat due to missing GPIOLIB
+Subject: Re: [PATCH 2/3] Bluetooth: hci_bcm: Streamline runtime PM code
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <9ef8be4ef80c38b693e5755c738a88de9c907944.1514143015.git.lukas@wunner.de>
-Date: Tue, 26 Dec 2017 21:57:25 +0100
+In-Reply-To: <1958f497c2710a67d3549122ee7bd71a69b0dd6c.1514143015.git.lukas@wunner.de>
+Date: Tue, 26 Dec 2017 21:57:23 +0100
 Cc: Johan Hedberg <johan.hedberg@gmail.com>,
         Mika Westerberg <mika.westerberg@linux.intel.com>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
@@ -17,47 +17,38 @@ Cc: Johan Hedberg <johan.hedberg@gmail.com>,
         Ronald Tschalaer <ronald@innovation.ch>,
         "Peter Y. Chuang" <peteryuchuang@gmail.com>,
         linux-bluetooth@vger.kernel.org
-Message-Id: <6C0DCEC6-5E52-480C-B291-3671E57B6765@holtmann.org>
+Message-Id: <FD1727A3-BAAE-41ED-A2FD-50C5A756F4C6@holtmann.org>
 References: <5e3106d673c3c41bf92c91f1f43bf30682511366.1514143015.git.lukas@wunner.de>
- <9ef8be4ef80c38b693e5755c738a88de9c907944.1514143015.git.lukas@wunner.de>
+ <1958f497c2710a67d3549122ee7bd71a69b0dd6c.1514143015.git.lukas@wunner.de>
 To: Lukas Wunner <lukas@wunner.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lukas,
 
-> Loading hci_bcm with CONFIG_GPIOLIB=n results in the following splat
-> when calling gpiod_to_irq() from bcm_get_resources():
+> This driver seeks to force the Bluetooth device on for the duration of
+> 5 seconds when the Bluetooth device has woken the host and after a
+> complete packet has been received.  It does that by calling:
 > 
->    WARNING: CPU: 0 PID: 1006 at ./include/linux/gpio/consumer.h:450 bcm_get_resources+0x50/0x80
->    CPU: 0 PID: 1006 Comm: kworker/u8:4 Tainted: G       A         4.15.0-rc4custom+ #4
->    Hardware name: Apple Inc. MacBook8,1/Mac-BE0E8AC46FE800CC, BIOS MB81.88Z.0168.B00.1708080033 08/08/2017
->    Call Trace:
->    bcm_serdev_probe+0x8b/0xc0
->    driver_probe_device+0x202/0x310
->    __driver_attach+0x85/0x90
->    ? driver_probe_device+0x310/0x310
->    bus_for_each_dev+0x57/0x80
->    async_run_entry_fn+0x2c/0xd0
->    process_one_work+0x1d2/0x3d0
->    worker_thread+0x26/0x3c0
->    ? process_one_work+0x3d0/0x3d0
->    kthread+0x10c/0x130
->    ? kthread_create_on_node+0x40/0x40
->    ret_from_fork+0x1f/0x30
+>    pm_runtime_get();
+>    pm_runtime_mark_last_busy();
+>    pm_runtime_put_autosuspend();
 > 
-> We could call gpiod_to_irq() only if IS_ENABLED(CONFIG_GPIOLIB) but
-> without GPIOLIB, the driver's power saving features can't be used,
-> so selecting GPIOLIB seems more appropriate.
+> The same can be achieved more succinctly with:
 > 
-> The same issue is present in hci_intel.c and hci_nokia.c, fix those up
-> as well.
+>    pm_request_resume();
 > 
-> Reported-by: Max Shavrick <mxms@me.com>
+> That's because after runtime resuming the device, rpm_resume() invokes
+> pm_runtime_mark_last_busy() followed by rpm_idle(), which will cause
+> the device to be suspended after expiration of the autosuspend_delay.
+> 
+> No functional change intended.
+> 
+> Cc: Frédéric Danis <frederic.danis.oss@gmail.com>
 > Signed-off-by: Lukas Wunner <lukas@wunner.de>
 > ---
-> drivers/bluetooth/Kconfig | 3 +++
-> 1 file changed, 3 insertions(+)
+> drivers/bluetooth/hci_bcm.c | 11 +++--------
+> 1 file changed, 3 insertions(+), 8 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
