@@ -1,40 +1,56 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <foo00@h08.hostsharing.net>
+Date: Wed, 27 Dec 2017 15:17:55 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Frederic Danis <frederic.danis.oss@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>,
+	Leif Liddy <leif.liddy@gmail.com>,
+	Daniel Roschka <danielroschka@phoenitydawn.de>,
+	Ronald Tschalaer <ronald@innovation.ch>,
+	"Peter Y. Chuang" <peteryuchuang@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: hci_bcm: Support Apple GPIO handling
+Message-ID: <20171227141755.GA3197@wunner.de>
+References: <5e3106d673c3c41bf92c91f1f43bf30682511366.1514143015.git.lukas@wunner.de>
+ <6E039068-0B7D-4E69-B0BB-A240FAE12089@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHU4CUJn-w2WNDu35YP-CxW5HK7xhVvuvkgRShfdZvDLReDwWA@mail.gmail.com>
-References: <20171226035508.30625-1-ahmeds2000x@gmail.com> <20171226035508.30625-2-ahmeds2000x@gmail.com>
- <CABBYNZLmr7RJjoebXCgHSjqeUoeTdu1EmiQeBi_Ba-yyhojAFw@mail.gmail.com>
- <CABBYNZKOpW6rbptUrAMyAN6Su3rU+13z4P0+7CVghCRmjCmOUQ@mail.gmail.com>
- <CAHU4CU+3yOG1em1daEevrCjovxO28UO1ZTsm9y39n_TQWqmYig@mail.gmail.com> <CAHU4CUJn-w2WNDu35YP-CxW5HK7xhVvuvkgRShfdZvDLReDwWA@mail.gmail.com>
-From: Ahmed Alsharif <ahmeds2000x@gmail.com>
-Date: Wed, 27 Dec 2017 17:29:04 +0100
-Message-ID: <CAHU4CUK=rz=HynZ9wSXib433a9tx3rSUqes1Wev2C7hfVcfbzA@mail.gmail.com>
-Subject: Fwd: [PATCH BlueZ 1/1] Fix bug in characteristic_start_notify.
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <6E039068-0B7D-4E69-B0BB-A240FAE12089@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi again,
+Hi Frederic,
 
-On Tue, Dec 26, 2017 at 5:22 PM, Ahmed Alsharif <ahmeds2000x@gmail.com> wrote:
-> Hi Luiz,
->
-> On Tue, Dec 26, 2017 at 2:18 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> Hi Ahmed,
->> Note that StartNotify is intended to work offline, so when it connects it
->> will subscribe which seem this would prevent that to happen.
->
-> Thanks for the clarification, this does indeed prevent that from
-> happening, sorry for the silly mistake on my side.
+On Tue, Dec 26, 2017 at 09:50:30PM +0100, Marcel Holtmann wrote:
+> > +static int bcm_gpio_set_device_wake(struct bcm_device *dev, bool awake)
+> > +{
+> > +	int err = 0;
+> > +
+> > +	if (x86_apple_machine)
+> > +		err = bcm_apple_set_low_power(dev, !awake);
+> > +	else if (dev->device_wakeup)
+> > +		gpiod_set_value(dev->device_wakeup, awake);
+> > +	else
+> > +		return 0;
+> > +
+> > +	bt_dev_dbg(dev, "%s, delaying 15 ms", awake ? "resume" : "suspend");
+> > +	mdelay(15);
+> 
+> Any chance for a comment here on why a delay of 15ms is needed?
 
-I'm interested in hearing your thoughts on the following:
-Isn't it a bit inconsistent, that when a device is connected, and a
-characteristic is already notifying, no error is returned when trying
-to subscribe to it again (bluez-5.43 and below used to actually return
-an "Already notifying" error), but when a device is not connected, an
-InProgress error is returned? This means that an InProgress error just
-tells us that a device is not connected, which only adds ambiguity I
-think.
+The delay was introduced by your commit 118612fb9165 ("Bluetooth:
+hci_bcm: Add suspend/resume PM functions").
 
-Cheers:)
+Could you provide a rationale for it?  Perhaps 15 ms is the time
+after which the controller auto-suspends following deassertion of
+the device wake pin (which forces it into "on" state AFAIUI)?
+
+Is there public documentation on this controller? I've tried to
+search for it but my google-fu is failing me.
+
+Thanks,
+
+Lukas
