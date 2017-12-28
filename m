@@ -1,93 +1,74 @@
-Return-Path: <linus.walleij@linaro.org>
+Return-Path: <leif.linux@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1514453177.7000.320.camel@linux.intel.com>
-References: <5e3106d673c3c41bf92c91f1f43bf30682511366.1514143015.git.lukas@wunner.de>
- <9ef8be4ef80c38b693e5755c738a88de9c907944.1514143015.git.lukas@wunner.de>
- <1514450477.7000.302.camel@linux.intel.com> <20171228091805.GA1559@wunner.de> <1514453177.7000.320.camel@linux.intel.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 28 Dec 2017 13:29:30 +0100
-Message-ID: <CACRpkdb=Wj9dEfu7YEfQCA94MdBNQmp5UwHOgRsTZX=bf5d-Hw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Bluetooth: Avoid WARN splat due to missing GPIOLIB
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Frederic Danis <frederic.danis.oss@gmail.com>, Loic Poulain <loic.poulain@linaro.org>,
-	Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>,
-	Daniel Roschka <danielroschka@phoenitydawn.de>, Ronald Tschalaer <ronald@innovation.ch>,
-	"Peter Y. Chuang" <peteryuchuang@gmail.com>, linux-bluetooth@vger.kernel.org
+In-Reply-To: <20171227125204.GE3373@kroah.com>
+References: <20171220110008.11856-1-kai.heng.feng@canonical.com>
+ <20171220110008.11856-2-kai.heng.feng@canonical.com> <FC2D8E58-CA2D-4115-9E62-DF6D69A483CF@holtmann.org>
+ <20171227125204.GE3373@kroah.com>
+From: Leif Liddy <leif.linux@gmail.com>
+Date: Thu, 28 Dec 2017 12:59:35 +0100
+Message-ID: <CAAbRKOsWziTSP6f3UGo7-qsQfzpVZ0YnckxmG=TZVNJwvL-+Wg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] usb: quirks: Add reset-resume quirk for Dell DW1820
+ QCA Rome Bluetooth
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	linux-usb@vger.kernel.org,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, stable <stable@vger.kernel.org>,
+	Matthias Kaehlcke <mka@chromium.org>, Brian Norris <briannorris@chromium.org>,
+	Daniel Drake <drake@endlessm.com>
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Dec 28, 2017 at 10:26 AM, Andy Shevchenko
-<andriy.shevchenko@linux.intel.com> wrote:
-> On Thu, 2017-12-28 at 10:18 +0100, Lukas Wunner wrote:
->> On Thu, Dec 28, 2017 at 10:41:17AM +0200, Andy Shevchenko wrote:
->> > On Tue, 2017-12-26 at 17:07 +0200, Lukas Wunner wrote:
->> > > Loading hci_bcm with CONFIG_GPIOLIB=n results in the following
->> > > splat
->> > > when calling gpiod_to_irq() from bcm_get_resources():
->> > >
->> > >     WARNING: CPU: 0 PID: 1006 at
->> > > ./include/linux/gpio/consumer.h:450
->> > > bcm_get_resources+0x50/0x80
->> > >     CPU: 0 PID: 1006 Comm: kworker/u8:4 Tainted:
->> > > G       A         4.15.0-rc4custom+ #4
->> > >     Hardware name: Apple Inc. MacBook8,1/Mac-BE0E8AC46FE800CC,
->> > > BIOS
->> > > MB81.88Z.0168.B00.1708080033 08/08/2017
->> > >     Call Trace:
->> > >     bcm_serdev_probe+0x8b/0xc0
->> > >     driver_probe_device+0x202/0x310
->> > >     __driver_attach+0x85/0x90
->> > >     ? driver_probe_device+0x310/0x310
->> > >     bus_for_each_dev+0x57/0x80
->> > >     async_run_entry_fn+0x2c/0xd0
->> > >     process_one_work+0x1d2/0x3d0
->> > >     worker_thread+0x26/0x3c0
->> > >     ? process_one_work+0x3d0/0x3d0
->> > >     kthread+0x10c/0x130
->> > >     ? kthread_create_on_node+0x40/0x40
->> > >     ret_from_fork+0x1f/0x30
->> > >
->> > > We could call gpiod_to_irq() only if IS_ENABLED(CONFIG_GPIOLIB)
->> > > but
->> > > without GPIOLIB, the driver's power saving features can't be used,
->> > > so selecting GPIOLIB seems more appropriate.
->> > >
->> > > The same issue is present in hci_intel.c and hci_nokia.c, fix
->> > > those up
->> > > as well.
->> > >
->
->> > > + select GPIOLIB
+Perhaps targeting all QCA Rome chipsets in the original patch was a
+bit overkill.
+I'll try adding the quirk USB_QUIRK_RESET_RESUME for my device
+(0cf3:e300) in usb core and will report back.
+
+-Leif Liddy
+
+https://bugzilla.kernel.org/show_bug.cgi?id=193571
+
+On Wed, Dec 27, 2017 at 1:52 PM, Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+> On Tue, Dec 26, 2017 at 10:01:46PM +0100, Marcel Holtmann wrote:
+>> Hi Greg,
+>>
+>> > Commit ("fd865802c66bc451dc515ed89360f84376ce1a56 Bluetooth: btusb: fix
+>> > QCA Rome suspend/resume") enables reset_resume in btusb_probe(). This
+>> > makes the device resets during btusb_open(), firmware loading gets
+>> > interrupted as a result.
 >> >
->> > This is wrong solution. GPIOLIB is meant for GPIO providers, not
->> > consumers.
+>> > We still want to reset the device to solve the original issue, but we
+>> > should do it before btusb_open().
 >> >
->> > That's why after I did BT support for Intel MID (commit d4d96990)
->> > the necessity of exporting gpiod_add_lookup_table() had been arisen
->> > (commit 020e0b1c8f19f).
+>> > Hence, add reset-resume quirk in usb core intead of btusb.
+>> >
+>> > Cc: stable@vger.kernel.org
+>> > Cc: Leif Liddy <leif.linux@gmail.com>
+>> > Cc: Matthias Kaehlcke <mka@chromium.org>
+>> > Cc: Brian Norris <briannorris@chromium.org>
+>> > Cc: Daniel Drake <drake@endlessm.com>
+>> > Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+>> >
+>> > ---
+>> > drivers/usb/core/quirks.c | 3 +++
+>> > 1 file changed, 3 insertions(+)
+>> >
+>> > diff --git a/drivers/usb/core/quirks.c b/drivers/usb/core/quirks.c
+>> > index a10b346b9777..96951104c45b 100644
+>> > --- a/drivers/usb/core/quirks.c
+>> > +++ b/drivers/usb/core/quirks.c
+>> > @@ -197,6 +197,9 @@ static const struct usb_device_id usb_quirk_list[] = {
+>> >     { USB_DEVICE(0x0b05, 0x17e0), .driver_info =
+>> >                     USB_QUIRK_IGNORE_REMOTE_WAKEUP },
+>> >
+>> > +   /* QCA Rome Bluetooth in Dell DW1820 wireless module */
+>> > +   { USB_DEVICE(0x0cf3, 0xe007), .driver_info = USB_QUIRK_RESET_RESUME },
+>> > +
 >>
->> Hm okay, Documentation/gpio/consumer.txt says:
->>
->>     Guidelines for GPIOs consumers
->>     ==============================
->>
->>     Drivers that can't work without standard GPIO calls should have
->>     Kconfig entries that depend on GPIOLIB.
->>
->> So a "depends on GPIOLIB" would be more appropriate, right?
+>> can I get an ACK from you to take this patch through bluetooth-next tree? Or are you planning to take it?
 >
-> Yes, but still wrong for this certain driver. It *can* work w/o GPIOLIB.
-> Now you have done unnecessary dependency for that case.
-
-No I think it should use depends on GPIOLIB.
-
-The reason is that the driver uses unconditional devm_gpiod_get(),
-not devm_gpiod_get_optional().
-
-The only thing you achieve if you do not have a GPIOLIB is a driver
-that always exits probe with an error.
-
-Yours,
-Linus Walleij
+> It's not in my queue at all, so I didn't even have the chance to take it
+> :)
+>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
