@@ -1,44 +1,53 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1514492592.7000.476.camel@linux.intel.com>
-Subject: Re: [PATCH v2] Bluetooth: Replace dependency on SERIAL_DEV_BUS by
- selection
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        "loic . poulain @ gmail . com" <loic.poulain@gmail.com>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "arnd.bergmann" <arnd.bergmann@linaro.org>,
-        Rob Herring <robh@kernel.org>
-Date: Thu, 28 Dec 2017 22:23:12 +0200
-In-Reply-To: <1514491453.7000.470.camel@linux.intel.com>
-References: <20171228195503.4283-1-andriy.shevchenko@linux.intel.com>
-         <1514491453.7000.470.camel@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 2/2] usb: quirks: Add reset-resume quirk for Dell DW1820
+ QCA Rome Bluetooth
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20171220110008.11856-2-kai.heng.feng@canonical.com>
+Date: Thu, 28 Dec 2017 21:15:43 +0100
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-usb@vger.kernel.org,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        stable <stable@vger.kernel.org>,
+        Leif Liddy <leif.linux@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Brian Norris <briannorris@chromium.org>,
+        Daniel Drake <drake@endlessm.com>
+Message-Id: <446583FE-6E63-47A0-921B-6FF2EC9C452C@holtmann.org>
+References: <20171220110008.11856-1-kai.heng.feng@canonical.com>
+ <20171220110008.11856-2-kai.heng.feng@canonical.com>
+To: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2017-12-28 at 22:04 +0200, Andy Shevchenko wrote:
-> On Thu, 2017-12-28 at 21:55 +0200, Andy Shevchenko wrote:
-> > The change restores build behaviour for old configurations when user
-> > didn't know and thus didn't select SERIAL_DEV_BUS explicitly for
-> > given
-> > HCI modules, such as hci_bcm.
-> > 
+Hi Kai-Heng,
+
+> Commit ("fd865802c66bc451dc515ed89360f84376ce1a56 Bluetooth: btusb: fix
+> QCA Rome suspend/resume") enables reset_resume in btusb_probe(). This
+> makes the device resets during btusb_open(), firmware loading gets
+> interrupted as a result.
 > 
-> +Cc: Arnd, Rob.
+> We still want to reset the device to solve the original issue, but we
+> should do it before btusb_open().
 > 
+> Hence, add reset-resume quirk in usb core intead of btusb.
+> 
+> Cc: stable@vger.kernel.org
+> Cc: Leif Liddy <leif.linux@gmail.com>
+> Cc: Matthias Kaehlcke <mka@chromium.org>
+> Cc: Brian Norris <briannorris@chromium.org>
+> Cc: Daniel Drake <drake@endlessm.com>
+> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> 
+> ---
+> drivers/usb/core/quirks.c | 3 +++
+> 1 file changed, 3 insertions(+)
 
+patch has been applied to bluetooth-next tree.
 
-> > +	select SERIAL_DEV_CTRL_TTYPORT if ACPI
-> > +	select SERIAL_DEV_BUS
+Regards
 
-It wouldn't work if BT_HCIUART=m (due to first line in above excerpt).
-
-So, for now I'm lack of ideas.
-
--- 
-Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Intel Finland Oy
+Marcel
