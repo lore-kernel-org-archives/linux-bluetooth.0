@@ -1,39 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Iain Hibbert <plunky@netbsd.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Iain Hibbert <plunky@netbsd.org>
-Subject: [PATCH] don't use == in /bin/sh script (bash-specific)
-Date: Thu, 28 Dec 2017 23:05:03 +0000
-Message-Id: <20171228230503.21610-1-plunky@netbsd.org>
+Message-ID: <1514492592.7000.476.camel@linux.intel.com>
+Subject: Re: [PATCH v2] Bluetooth: Replace dependency on SERIAL_DEV_BUS by
+ selection
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        "loic . poulain @ gmail . com" <loic.poulain@gmail.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "arnd.bergmann" <arnd.bergmann@linaro.org>,
+        Rob Herring <robh@kernel.org>
+Date: Thu, 28 Dec 2017 22:23:12 +0200
+In-Reply-To: <1514491453.7000.470.camel@linux.intel.com>
+References: <20171228195503.4283-1-andriy.shevchenko@linux.intel.com>
+         <1514491453.7000.470.camel@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- configure.ac | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Thu, 2017-12-28 at 22:04 +0200, Andy Shevchenko wrote:
+> On Thu, 2017-12-28 at 21:55 +0200, Andy Shevchenko wrote:
+> > The change restores build behaviour for old configurations when user
+> > didn't know and thus didn't select SERIAL_DEV_BUS explicitly for
+> > given
+> > HCI modules, such as hci_bcm.
+> > 
+> 
+> +Cc: Arnd, Rob.
+> 
 
-diff --git a/configure.ac b/configure.ac
-index a7d936c0f..7baf9bbce 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -216,7 +216,7 @@ AC_ARG_ENABLE(mesh, AC_HELP_STRING([--enable-mesh],
- 		[enable Mesh profile support]), [enable_mesh=${enableval}])
- AM_CONDITIONAL(MESH, test "${enable_mesh}" = "yes")
- 
--if (test "${enable_mesh}" == "yes"); then
-+if (test "${enable_mesh}" = "yes"); then
- 	PKG_CHECK_MODULES(JSONC, json-c, dummy=yes,
- 				AC_MSG_ERROR(json-c is required))
- 	AC_SUBST(JSON_CFLAGS)
-@@ -259,7 +259,7 @@ AC_ARG_ENABLE(client, AC_HELP_STRING([--disable-client],
- 		[disable command line client]), [enable_client=${enableval}])
- AM_CONDITIONAL(CLIENT, test "${enable_client}" != "no")
- 
--if (test "${enable_client}" != "no" || test "${enable_mesh}" == "yes"); then
-+if (test "${enable_client}" != "no" || test "${enable_mesh}" = "yes"); then
-         AC_CHECK_HEADERS(readline/readline.h, enable_readline=yes,
-                 AC_MSG_ERROR(readline header files are required))
- fi
+
+> > +	select SERIAL_DEV_CTRL_TTYPORT if ACPI
+> > +	select SERIAL_DEV_BUS
+
+It wouldn't work if BT_HCIUART=m (due to first line in above excerpt).
+
+So, for now I'm lack of ideas.
+
 -- 
-2.15.1
-
+Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Intel Finland Oy
