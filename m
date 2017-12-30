@@ -1,38 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Ahmed Alsharif <ahmeds2000x@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-From: mortadelo@gmx-topmail.de
-Subject: A2DP: simple-agent vs bluetoothctl
-Message-ID: <79b36674-39ec-8d96-8515-4c0ef79e45ee@gmx.net>
-Date: Sun, 31 Dec 2017 11:44:40 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Cc: Ahmed Alsharif <ahmeds2000x@gmail.com>
+Subject: [PATCH BlueZ 1/1] remove InProgress error from StartNotify() The error is only returned when the device is not connected, even though StartNotify is supposed to work in that case as well.
+Date: Sat, 30 Dec 2017 11:07:02 +0100
+Message-Id: <20171230100702.14124-2-ahmeds2000x@gmail.com>
+In-Reply-To: <20171230100702.14124-1-ahmeds2000x@gmail.com>
+References: <20171230100702.14124-1-ahmeds2000x@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ doc/gatt-api.txt  | 1 -
+ src/gatt-client.c | 9 +++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-I'm currently playing with A2DP in Raspbian Stretch (i.e. Bluez
-5.43-2+rpt2+deb9u2). I understand that there has been an architectural
-rework in BT pairing, connetion acceptance etc. handling. Whereas in
-earlier versions of BlueZ, the script 'simple-agent' was provided for a
-scripted (possibly unattended) pairing and connection handling, this
-script is no more available. 'bluetoothctl' is the actual replacement.
-
-My problem with 'bluetoothctl' is that, due to its interactive
-character, it is hard to impossible to use in scripts. 'simple-agent'
-(the previous version), however, seems to have become somewhat
-unpredictable in current Bluez. I haven't managed to implement a
-consistent and predictable flow of pairing -set trust - connect anymore
-with 'simple-agent'. Typically (but not consistently), the pairing would
-not be set to 'Trusted=true'.
-
-What is the current philosophy behind pairing and connection management?
-Is 'simple-agent' still supposed to work, and I'm using it wrong, or is
-'bluetoothctl' the way to go? If the latter, will it ever be scriptable?
-
-
-Thanks and kind regards, Michael
-
-
-
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index ccf3a8b6d..681b1bd8f 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -162,7 +162,6 @@ Methods		array{byte} ReadValue(dict options)
+ 
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.NotPermitted
+-					 org.bluez.Error.InProgress
+ 					 org.bluez.Error.NotSupported
+ 
+ 		void StopNotify()
+diff --git a/src/gatt-client.c b/src/gatt-client.c
+index 2f01867dc..5efbaa5ed 100644
+--- a/src/gatt-client.c
++++ b/src/gatt-client.c
+@@ -1521,12 +1521,13 @@ static DBusMessage *characteristic_start_notify(DBusConnection *conn,
+ 				chrc->props & BT_GATT_CHRC_PROP_INDICATE))
+ 		return btd_error_not_supported(msg);
+ 
+-	/* Each client can only have one active notify session. */
++	/*
++	 * Each client can only have one active notify session. If the client
++	 * already has one, we just return with no error.
++	 */
+ 	client = queue_find(chrc->notify_clients, match_notify_sender, sender);
+ 	if (client)
+-		return client->notify_id ?
+-				g_dbus_create_reply(msg, DBUS_TYPE_INVALID) :
+-				btd_error_in_progress(msg);
++		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ 
+ 	client = notify_client_create(chrc, sender);
+ 	if (!client)
+-- 
+2.11.0
 
