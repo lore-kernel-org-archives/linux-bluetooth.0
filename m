@@ -1,39 +1,38 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Leif Liddy <leif.linux@gmail.com>
-To: linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kai.heng.feng@canonical.com,
-        stable@vger.kernel.org, mka@chromium.org, briannorris@chromium.org,
-        drake@endlessm.com
-Cc: Leif Liddy <leif.linux@gmail.com>
-Subject: [PATCH] usb: quirks: Add reset-resume quirk for QCA6174 Rome Bluetooth
-Date: Sun, 31 Dec 2017 18:13:35 +0100
-Message-Id: <20171231171335.12020-1-leif.linux@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+From: mortadelo@gmx-topmail.de
+Subject: A2DP: simple-agent vs bluetoothctl
+Message-ID: <79b36674-39ec-8d96-8515-4c0ef79e45ee@gmx.net>
+Date: Sun, 31 Dec 2017 11:44:40 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a rework of reverted commit fd865802c66bc451dc515ed89360f84376ce1a56
-The issue is that some QCA Rome bluetooth controllers stop functioning upon resume from suspend.
-These devices seem to be losing power during suspend. This patch will enable
-reset_resume in usb core (instead of btusb) and will target the specific device 0x0cf3:0xe300
+Hi,
 
-Signed-off-by: Leif Liddy <leif.linux@gmail.com>
----
- drivers/usb/core/quirks.c | 3 +++
- 1 file changed, 3 insertions(+)
+I'm currently playing with A2DP in Raspbian Stretch (i.e. Bluez
+5.43-2+rpt2+deb9u2). I understand that there has been an architectural
+rework in BT pairing, connetion acceptance etc. handling. Whereas in
+earlier versions of BlueZ, the script 'simple-agent' was provided for a
+scripted (possibly unattended) pairing and connection handling, this
+script is no more available. 'bluetoothctl' is the actual replacement.
 
-diff --git a/drivers/usb/core/quirks.c b/drivers/usb/core/quirks.c
-index a10b346b9777..d94e6658d054 100644
---- a/drivers/usb/core/quirks.c
-+++ b/drivers/usb/core/quirks.c
-@@ -248,6 +248,9 @@ static const struct usb_device_id usb_quirk_list[] = {
- 	/* INTEL VALUE SSD */
- 	{ USB_DEVICE(0x8086, 0xf1a5), .driver_info = USB_QUIRK_RESET_RESUME },
- 
-+	/* QCA Rome Bluetooth in QCA6174 wireless module */
-+	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = USB_QUIRK_RESET_RESUME },
-+
- 	{ }  /* terminating entry must be last */
- };
- 
--- 
-2.14.3
+My problem with 'bluetoothctl' is that, due to its interactive
+character, it is hard to impossible to use in scripts. 'simple-agent'
+(the previous version), however, seems to have become somewhat
+unpredictable in current Bluez. I haven't managed to implement a
+consistent and predictable flow of pairing -set trust - connect anymore
+with 'simple-agent'. Typically (but not consistently), the pairing would
+not be set to 'Trusted=true'.
+
+What is the current philosophy behind pairing and connection management?
+Is 'simple-agent' still supposed to work, and I'm using it wrong, or is
+'bluetoothctl' the way to go? If the latter, will it ever be scriptable?
+
+
+Thanks and kind regards, Michael
+
+
+
+
