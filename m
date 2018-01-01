@@ -1,106 +1,38 @@
-Return-Path: <martin.blumenstingl@googlemail.com>
-From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-To: robh+dt@kernel.org,
-	devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org
-Cc: mark.rutland@arm.com,
-	marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	gregkh@linuxfoundation.org,
-	jslaby@suse.com,
-	johan@kernel.org,
-	linux-amlogic@lists.infradead.org,
-	Larry.Finger@lwfinger.net,
-	carlo@endlessm.com,
-	drake@endlessm.com,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Subject: [RFC v2 0/9] Realtek Bluetooth serdev support (H5 protocol)
-Date: Mon,  1 Jan 2018 21:42:08 +0100
-Message-Id: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
+Return-Path: <linus.walleij@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <20171229095135.GA25623@wunner.de>
+References: <5e3106d673c3c41bf92c91f1f43bf30682511366.1514143015.git.lukas@wunner.de>
+ <9ef8be4ef80c38b693e5755c738a88de9c907944.1514143015.git.lukas@wunner.de>
+ <1514450477.7000.302.camel@linux.intel.com> <20171228091805.GA1559@wunner.de>
+ <1514453177.7000.320.camel@linux.intel.com> <CACRpkdb=Wj9dEfu7YEfQCA94MdBNQmp5UwHOgRsTZX=bf5d-Hw@mail.gmail.com>
+ <1514464858.7000.334.camel@linux.intel.com> <CACRpkdYRojbfCC_b9vO0MquvLeenru0rrYNv7WzMg3d3b=iF+g@mail.gmail.com>
+ <20171229095135.GA25623@wunner.de>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 1 Jan 2018 16:23:12 +0100
+Message-ID: <CACRpkda1uzW2A=13tobpNrNNgTmv-ri6kb628TYS7rv3xPsx4A@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: Avoid WARN splat due to missing GPIOLIB
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Frederic Danis <frederic.danis.oss@gmail.com>, Loic Poulain <loic.poulain@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>,
+	Daniel Roschka <danielroschka@phoenitydawn.de>, Ronald Tschalaer <ronald@innovation.ch>,
+	"Peter Y. Chuang" <peteryuchuang@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+On Fri, Dec 29, 2017 at 10:51 AM, Lukas Wunner <lukas@wunner.de> wrote:
 
-I am sending this series because I want to get feedback.
-please don't expect it to be perfect (yet). especially since it's
-touching parts of the kernel I've not worked with before.
+> By the way, what is the rationale for this rule that consumers shall
+> depend on rather than select GPIOLIB?
 
-my goal was NOT to use the user-space initialization tool for the
-Bluetooth part of one of my devices (which uses a Realtek RTL8723BS).
-my hope was that I only had to hook up serdev support to hci_h5 and
-re-use the setup function provided by btrtl. unfortunately it wasn't
-that easy.
+I think consumers should depend on GPIOLIB and producers
+should select GPIOLIB.
 
-there are no datasheets for the RTL8723BS or RTL8723DS out there.
-however, there are some userspace tools which go through the whole
-initialization process - this is what I used as reference:
-- RTL8723BS Bluetooth sources from [0]
-- RTL8723DS Bluetooth sources from [1]
+Alas, I suck at Kconfig, people have expressed that it is terse,
+ambigous (to the point of not using regular grammar) and so
+on, I am just as confused as the next developer.
 
-These modules require a firmware and a config file (both don't seem
-to be compatible with what we have in linux-firmware at the moment).
-
-since it's an RFC I also have some questions:
-- who can help testing that I didn't break any USB based Realtek
-  Bluetooth chips? I only have UART (embedded into the SDIO RTL8723BS
-  and RTL8723DS) ones
-- what about the Bluetooth firmware and config blobs? how to get them
-  into the linux-firmware tree? maybe Larry Finger can help here :)
-- what are <your name here> comments about this series?
-
-
-Changes since RFC v1 at [2]:
-- fixed compile error in PATCH #1 if CONFIG_SERIAL_DEV_BUS is disabled
-  (spotted by Intel's kbuild test robot - many thanks!)
-- renamed "disable-gpios" to "enable-gpios" in the dt-bindings and
-  hci_h5 patches
-- added a "realtek,config-data" property to devicetree which can be used
-  to provide the "config"-blob. I did not find a way to auto-generate
-  that blob. a similar property is described by "marvell-bt-8xxx.txt".
-  This affects the dt-bindings (Documentation) patch and introduces a
-  new patch for btrtl.c.
-- guard against the vendor_setup callback being NULL (thanks Marcel
-  Holtmann for suggesting this in the review of RFC 1) in the hci_h5
-  patch
-- added comments where the msleep() times are coming from in the hci_h5
-  patch
-- dropped an unnecessary msleep() after sending the "change baudrate"
-  command (thanks Marcel Holtmann for spotting this)
-- entirely drop HCI_UART_INIT_PENDING instead of just ignoring it in
-  hci_serdev
-
-
-[0] https://github.com/lwfinger/rtl8723bs_bt
-[1] https://github.com/NextThingCo/rtl8723ds_bt
-[2] https://www.spinics.net/lists/linux-bluetooth/msg72862.html
-
-
-Martin Blumenstingl (9):
-  serdev: implement parity configuration
-  dt-bindings: net: bluetooth: add support for Realtek Bluetooth chips
-  Bluetooth: btrtl: add MODULE_FIRMWARE declarations
-  Bluetooth: btrtl: split the device initialization into smaller parts
-  Bluetooth: btrtl: add support for retrieving the UART settings
-  Bluetooth: btrtl: add support for the RTL8723BS and RTL8723DS chips
-  bluetooth: btrtl: load the config blob from devicetree when available
-  Bluetooth: drop HCI_UART_INIT_PENDING support
-  Bluetooth: hci_h5: add support for Realtek UART Bluetooth modules
-
- .../devicetree/bindings/net/realtek-bluetooth.txt  |  41 ++
- drivers/bluetooth/Kconfig                          |   1 +
- drivers/bluetooth/btrtl.c                          | 461 ++++++++++++++++-----
- drivers/bluetooth/btrtl.h                          |  46 ++
- drivers/bluetooth/hci_h5.c                         | 206 ++++++++-
- drivers/bluetooth/hci_ldisc.c                      |  38 --
- drivers/bluetooth/hci_serdev.c                     |   3 -
- drivers/bluetooth/hci_uart.h                       |   4 +-
- drivers/tty/serdev/core.c                          |  12 +
- drivers/tty/serdev/serdev-ttyport.c                |  21 +
- include/linux/serdev.h                             |   5 +
- 11 files changed, 678 insertions(+), 160 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.txt
-
--- 
-2.15.1
+Yours,
+Linus Walleij
