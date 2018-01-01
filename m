@@ -16,108 +16,78 @@ Cc: mark.rutland@arm.com,
 	carlo@endlessm.com,
 	drake@endlessm.com,
 	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Subject: [RFC v2 7/9] bluetooth: btrtl: load the config blob from devicetree when available
-Date: Mon,  1 Jan 2018 21:42:15 +0100
-Message-Id: <20180101204217.26165-8-martin.blumenstingl@googlemail.com>
+Subject: [RFC v2 6/9] Bluetooth: btrtl: add support for the RTL8723BS and RTL8723DS chips
+Date: Mon,  1 Jan 2018 21:42:14 +0100
+Message-Id: <20180101204217.26165-7-martin.blumenstingl@googlemail.com>
 In-Reply-To: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
 References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some Realtek bluetooth devices need a "config" blob. The btrtl driver
-currently only allows loading this config blob via the request_firmware
-mechanism.
+The Realtek RTL8723BS and RTL8723DS chipsets are SDIO wifi chips. They
+also contain a Bluetooth module which is connected via UART to the host.
 
-The UART Bluetooth chips use this config blob to specify the baudrate,
-whether flow control is used and some other unknown bits. This means
-that the config blob is board-specific - thus loading it via
-request_firmware means that the rootfs is tied to a specific board.
-
-The UART Bluetooth chips are implemented through serdev. This means
-there is also a devicetree node which describes the Bluetooth chip.
-Thus we can also load the blob from the devicetree node to keep the
-filesystem independent of any board configuration data. In the future
-this could be extended to support ACPI as well (in case that's needed).
-
-Parse the devicetree node if it exists and obtain the config blob from
-there. Otherwise fall back to using the "old" request_firmware
-mechanism.
+Realtek's userspace initialization tool (rtk_hciattach) differentiates
+these two via the HCI version and revision returned by the
+HCI_OP_READ_LOCAL_VERSION command.
+Additionally we apply these checks only the for UART devices. Everything
+else is assumed to be a "RTL8723B" which was originally supported by the
+driver (communicating via USB).
 
 Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 ---
- drivers/bluetooth/btrtl.c | 43 +++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 41 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btrtl.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 25e9743643f5..1494269cf4d7 100644
+index b6e8da4b73f8..25e9743643f5 100644
 --- a/drivers/bluetooth/btrtl.c
 +++ b/drivers/bluetooth/btrtl.c
-@@ -18,6 +18,7 @@
- #include <linux/module.h>
- #include <linux/firmware.h>
- #include <asm/unaligned.h>
-+#include <linux/of.h>
- #include <linux/usb.h>
- 
- #include <net/bluetooth/bluetooth.h>
-@@ -379,6 +380,41 @@ void btrtl_free(struct btrtl_device_info *btrtl_dev)
- }
- EXPORT_SYMBOL_GPL(btrtl_free);
- 
-+static int rtl_load_config_from_dt(struct hci_dev *hdev,
-+				   struct btrtl_device_info *btrtl_dev)
-+{
-+	struct device_node *np = hdev->dev.parent->of_node;
-+	int ret, config_len;
+@@ -418,9 +418,33 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
+ 		has_rom_version = false;
+ 		break;
+ 	case RTL_ROM_LMP_8723B:
+-		fw_name = "rtl_bt/rtl8723b_fw.bin";
+-		cfg_name = "rtl_bt/rtl8723b_config.bin";
++		/* all variants support reading the ROM version */
+ 		has_rom_version = true;
 +
-+	if (!of_device_is_available(np))
-+		return -ENOENT;
-+
-+	if (!of_find_property(np, "realtek,config-data", NULL))
-+		return -ENOENT;
-+
-+	config_len = of_property_count_u8_elems(np, "realtek,config-data");
-+	if (config_len <= 0)
-+		return -ENOENT;
-+
-+	btrtl_dev->cfg_data = kzalloc(config_len, GFP_KERNEL);
-+	if (!btrtl_dev->cfg_data)
-+		return -ENOMEM;
-+
-+	ret = of_property_read_u8_array(np, "realtek,config-data",
-+					btrtl_dev->cfg_data, config_len);
-+	if (ret) {
-+		kfree(btrtl_dev->cfg_data);
-+		return ret;
-+	}
-+
-+	btrtl_dev->cfg_len = config_len;
-+
-+	bt_dev_dbg(hdev, "rtl: using config data with len %d from DT",
-+		   config_len);
-+
-+	return 0;
-+}
-+
- struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
- {
- 	struct btrtl_device_info *btrtl_dev;
-@@ -480,12 +516,15 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
- 		goto err_free;
- 	}
- 
--	if (cfg_name) {
-+	/* try loading the config blob from device-tree first: */
-+	ret = rtl_load_config_from_dt(hdev, btrtl_dev);
-+	/* fall back to loading the config via request_firmware: */
-+	if (ret && cfg_name) {
- 		btrtl_dev->cfg_len = rtl_load_file(hdev, cfg_name,
- 						   &btrtl_dev->cfg_data);
- 		if (cfg_needed && btrtl_dev->cfg_len <= 0) {
- 			bt_dev_err(hdev,
--				   "mandatory config file %s not found\n",
-+				   "mandatory config blob not found in %s or DT\n",
- 				   cfg_name);
- 			ret = btrtl_dev->fw_len;
- 			goto err_free;
++		/*
++		 * RTL8723 devices exist in different variants:
++		 * - RTL8723BS (SDIO chip with UART Bluetooth)
++		 * - RTL8723DS (SDIO chip with UART Bluetooth)
++		 * - for backwards-compatibility everything else is assumed to
++		 *   be an RTL8723B communicating over USB
++		 *
++		 * Only UART devices really need the config because that
++		 * contains the UART speed / flow control settings.
++		 */
++		if (hdev->bus == HCI_UART && resp->hci_ver == 6 &&
++		    le16_to_cpu(resp->hci_rev) == 0xb) {
++			fw_name = "rtl_bt/rtl8723bs_fw.bin";
++			cfg_name = "rtl_bt/rtl8723bs_config.bin";
++			cfg_needed = true;
++		} else if (hdev->bus == HCI_UART && resp->hci_ver == 8 &&
++			   le16_to_cpu(resp->hci_rev) == 0xd) {
++			fw_name = "rtl_bt/rtl8723ds_fw.bin";
++			cfg_name = "rtl_bt/rtl872ds_config.bin";
++			cfg_needed = true;
++		} else {
++			fw_name = "rtl_bt/rtl8723b_fw.bin";
++			cfg_name = "rtl_bt/rtl8723b_config.bin";
++		}
+ 		break;
+ 	case RTL_ROM_LMP_8821A:
+ 		fw_name = "rtl_bt/rtl8821a_fw.bin";
+@@ -637,6 +661,10 @@ MODULE_LICENSE("GPL");
+ MODULE_FIRMWARE("rtl_bt/rtl8723a_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723b_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723b_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8723bs_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8723bs_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8821a_fw.bin");
 -- 
 2.15.1
