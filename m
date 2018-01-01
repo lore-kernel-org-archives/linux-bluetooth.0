@@ -1,34 +1,64 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH] usb: quirks: Add reset-resume quirk for QCA6174 Rome
- Bluetooth
-To: Leif Liddy <leif.linux@gmail.com>, linux-usb@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kai.heng.feng@canonical.com, stable@vger.kernel.org,
-        mka@chromium.org, briannorris@chromium.org, drake@endlessm.com
-References: <20171231171335.12020-1-leif.linux@gmail.com>
-From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Message-ID: <7d8d2984-deeb-a34e-80fa-09e824312e6c@cogentembedded.com>
-Date: Mon, 1 Jan 2018 12:51:20 +0300
 MIME-Version: 1.0
-In-Reply-To: <20171231171335.12020-1-leif.linux@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <79b36674-39ec-8d96-8515-4c0ef79e45ee@gmx.net>
+References: <79b36674-39ec-8d96-8515-4c0ef79e45ee@gmx.net>
+From: Ahmed Alsharif <ahmeds2000x@gmail.com>
+Date: Mon, 1 Jan 2018 02:41:19 +0100
+Message-ID: <CAHU4CU+PBowrTEqahB_BJWi=E0PuhFGscpD+e68ZUBakOFzCcQ@mail.gmail.com>
+Subject: Re: A2DP: simple-agent vs bluetoothctl
+To: mortadelo@gmx-topmail.de
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello!
+On Dec 31, 2017 11:44, <mortadelo@gmx-topmail.de> wrote:
+>
+> Hi,
+>
+> I'm currently playing with A2DP in Raspbian Stretch (i.e. Bluez
+> 5.43-2+rpt2+deb9u2). I understand that there has been an architectural
+> rework in BT pairing, connetion acceptance etc. handling. Whereas in
+> earlier versions of BlueZ, the script 'simple-agent' was provided for a
+> scripted (possibly unattended) pairing and connection handling, this
+> script is no more available. 'bluetoothctl' is the actual replacement.
+>
+> ....
+>
+> What is the current philosophy behind pairing and connection management?
+> Is 'simple-agent' still supposed to work, and I'm using it wrong, or is
+> 'bluetoothctl' the way to go? If the latter, will it ever be scriptable?
+>
+>
+> Thanks and kind regards, Michael
 
-On 12/31/2017 8:13 PM, Leif Liddy wrote:
+Hi,
 
-> This is a rework of reverted commit fd865802c66bc451dc515ed89360f84376ce1a56
+You can use bluetoothctl non-interactively in the following way:
 
-    You need to also specify the commit summry enclosed in (""). Alos, 12 
-digits of SHA1 is enough.
+#  $ bluetoothctl << __EOL__
+#  > connect xx:xx:xx:xx:xx:xx
+#  > __EOL__
 
-> The issue is that some QCA Rome bluetooth controllers stop functioning upon resume from suspend.
-> These devices seem to be losing power during suspend. This patch will enable
-> reset_resume in usb core (instead of btusb) and will target the specific device 0x0cf3:0xe300
-> 
-> Signed-off-by: Leif Liddy <leif.linux@gmail.com>
-[...]
+connect and trust seem to work fine this way, but pair doesn't. If
+you're okay with using python, checkout this library:
+https://github.com/nullp0tr/bluew. I'm also planning to add a
+non-interactive bluetoothctl alternative to it, but you can easily
+write a 3 liner with it that does what you need (disclaimer: I wrote
+it).
 
-MBR, Sergei
+> My problem with 'bluetoothctl' is that, due to its interactive
+> character, it is hard to impossible to use in scripts. 'simple-agent'
+> (the previous version), however, seems to have become somewhat
+> unpredictable in current Bluez. I haven't managed to implement a
+> consistent and predictable flow of pairing -set trust - connect anymore
+> with 'simple-agent'. Typically (but not consistently), the pairing would
+> not be set to 'Trusted=true'.
+
+Overall simple-agent should still work. Examples/code snippets of your
+current 'flow', and the errors returned would help in finding the
+problem.
+
+
+Cheers,
+Ahmed Alsharif.
