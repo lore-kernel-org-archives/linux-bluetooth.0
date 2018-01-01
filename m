@@ -16,70 +16,118 @@ Cc: mark.rutland@arm.com,
 	carlo@endlessm.com,
 	drake@endlessm.com,
 	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Subject: [RFC v2 2/9] dt-bindings: net: bluetooth: add support for Realtek Bluetooth chips
-Date: Mon,  1 Jan 2018 21:42:10 +0100
-Message-Id: <20180101204217.26165-3-martin.blumenstingl@googlemail.com>
+Subject: [RFC v2 1/9] serdev: implement parity configuration
+Date: Mon,  1 Jan 2018 21:42:09 +0100
+Message-Id: <20180101204217.26165-2-martin.blumenstingl@googlemail.com>
 In-Reply-To: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
 References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds the documentation for Bluetooth functionality of the Realtek
-RTL8723BS and RTL8723DS.
-Both are SDIO wifi chips with an additional Bluetooth module which is
-connected via UART to the host.
+Some Bluetooth modules (for example the ones found in Realtek RTL8723BS
+and RTL8723DS) want to communicate with the host with even parity
+enabled.
+Add a new function and the corresponding internal callbacks so parity
+can be configured. This supports enabling and disabling parity as well
+as setting the type to odd or even.
 
 Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 ---
- .../devicetree/bindings/net/realtek-bluetooth.txt  | 41 ++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+ drivers/tty/serdev/core.c           | 12 ++++++++++++
+ drivers/tty/serdev/serdev-ttyport.c | 21 +++++++++++++++++++++
+ include/linux/serdev.h              |  5 +++++
+ 3 files changed, 38 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
-new file mode 100644
-index 000000000000..1491329c4cd1
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
-@@ -0,0 +1,41 @@
-+Realtek Bluetooth Chips
-+-----------------------
+diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+index 1bef39828ca7..d327b02980f5 100644
+--- a/drivers/tty/serdev/core.c
++++ b/drivers/tty/serdev/core.c
+@@ -225,6 +225,18 @@ void serdev_device_set_flow_control(struct serdev_device *serdev, bool enable)
+ }
+ EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
+ 
++void serdev_device_set_parity(struct serdev_device *serdev, bool enable,
++			      bool odd)
++{
++	struct serdev_controller *ctrl = serdev->ctrl;
 +
-+This documents the binding structure and common properties for serial
-+attached Realtek devices.
++	if (!ctrl || !ctrl->ops->set_parity)
++		return;
 +
-+Serial attached Realtek devices shall be a child node of the host UART
-+device the slave device is attached to. See ../serial/slave-device.txt
-+for more information
++	ctrl->ops->set_parity(ctrl, enable, odd);
++}
++EXPORT_SYMBOL_GPL(serdev_device_set_parity);
 +
-+Required properties:
-+- compatible: should contain one of the following:
-+    * "realtek,rtl8723bs-bluetooth"
-+    * "realtek,rtl8723ds-bluetooth"
+ void serdev_device_wait_until_sent(struct serdev_device *serdev, long timeout)
+ {
+ 	struct serdev_controller *ctrl = serdev->ctrl;
+diff --git a/drivers/tty/serdev/serdev-ttyport.c b/drivers/tty/serdev/serdev-ttyport.c
+index 247788a16f0b..36bed86e5c96 100644
+--- a/drivers/tty/serdev/serdev-ttyport.c
++++ b/drivers/tty/serdev/serdev-ttyport.c
+@@ -190,6 +190,26 @@ static void ttyport_set_flow_control(struct serdev_controller *ctrl, bool enable
+ 	tty_set_termios(tty, &ktermios);
+ }
+ 
++static void ttyport_set_parity(struct serdev_controller *ctrl, bool enable,
++			       bool odd)
++{
++	struct serport *serport = serdev_controller_get_drvdata(ctrl);
++	struct tty_struct *tty = serport->tty;
++	struct ktermios ktermios = tty->termios;
 +
-+Optional properties:
-+- realtek,config-data: Bluetooth chipset configuration data which is
-+			needed for communication (it typically contains
-+			board specific settings like the baudrate and
-+			whether flow-control is used).
-+			This is an array of u8 values.
-+- enable-gpios: GPIO specifier, used to enable/disable the BT module
-+- reset-gpios: GPIO specifier, used to reset the BT module
++	if (enable)
++		ktermios.c_cflag |= PARENB;
++	else
++		ktermios.c_cflag &= ~PARENB;
 +
++	if (odd)
++		ktermios.c_cflag |= PARODD;
++	else
++		ktermios.c_cflag &= ~PARODD;
 +
-+Example:
++	tty_set_termios(tty, &ktermios);
++}
 +
-+&uart {
-+	...
-+
-+	bluetooth {
-+		compatible = "realtek,rtl8723bs-bluetooth";
-+		enable-gpios = <&gpio 20 GPIO_ACTIVE_HIGH>;
-+		reset-gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
-+		realtek,config-data = /bits/ 8 <
-+			0x55 0xab 0x23 0x87 0x29 0x00 0xf4 0x00 0x01 0x01 0xf6 0x00
-+			0x02 0x81 0x00 0xfa 0x00 0x02 0x12 0x80 0x0c 0x00 0x10 0x02
-+			0x80 0x92 0x04 0x50 0xc5 0xea 0x19 0xe1 0x1b 0xfd 0xaf 0x5f
-+			0x01 0xa4 0x0b 0xd9 0x00 0x01 0x0f 0xe4 0x00 0x01 0x08>;
-+	};
-+};
+ static void ttyport_wait_until_sent(struct serdev_controller *ctrl, long timeout)
+ {
+ 	struct serport *serport = serdev_controller_get_drvdata(ctrl);
+@@ -227,6 +247,7 @@ static const struct serdev_controller_ops ctrl_ops = {
+ 	.open = ttyport_open,
+ 	.close = ttyport_close,
+ 	.set_flow_control = ttyport_set_flow_control,
++	.set_parity = ttyport_set_parity,
+ 	.set_baudrate = ttyport_set_baudrate,
+ 	.wait_until_sent = ttyport_wait_until_sent,
+ 	.get_tiocm = ttyport_get_tiocm,
+diff --git a/include/linux/serdev.h b/include/linux/serdev.h
+index d609e6dc5bad..07f2d4d4e88c 100644
+--- a/include/linux/serdev.h
++++ b/include/linux/serdev.h
+@@ -86,6 +86,7 @@ struct serdev_controller_ops {
+ 	int (*open)(struct serdev_controller *);
+ 	void (*close)(struct serdev_controller *);
+ 	void (*set_flow_control)(struct serdev_controller *, bool);
++	void (*set_parity)(struct serdev_controller *, bool, bool);
+ 	unsigned int (*set_baudrate)(struct serdev_controller *, unsigned int);
+ 	void (*wait_until_sent)(struct serdev_controller *, long);
+ 	int (*get_tiocm)(struct serdev_controller *);
+@@ -195,6 +196,7 @@ int serdev_device_open(struct serdev_device *);
+ void serdev_device_close(struct serdev_device *);
+ unsigned int serdev_device_set_baudrate(struct serdev_device *, unsigned int);
+ void serdev_device_set_flow_control(struct serdev_device *, bool);
++void serdev_device_set_parity(struct serdev_device *, bool, bool);
+ int serdev_device_write_buf(struct serdev_device *, const unsigned char *, size_t);
+ void serdev_device_wait_until_sent(struct serdev_device *, long);
+ int serdev_device_get_tiocm(struct serdev_device *);
+@@ -237,6 +239,9 @@ static inline unsigned int serdev_device_set_baudrate(struct serdev_device *sdev
+ 	return 0;
+ }
+ static inline void serdev_device_set_flow_control(struct serdev_device *sdev, bool enable) {}
++static inline void serdev_device_set_parity(struct serdev_device *sdev,
++					    bool enable,
++					    bool odd) {}
+ static inline int serdev_device_write_buf(struct serdev_device *serdev,
+ 					  const unsigned char *buf,
+ 					  size_t count)
 -- 
 2.15.1
