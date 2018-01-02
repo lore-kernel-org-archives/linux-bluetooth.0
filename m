@@ -1,210 +1,75 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [RFC v2 8/9] Bluetooth: drop HCI_UART_INIT_PENDING support
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180101204217.26165-9-martin.blumenstingl@googlemail.com>
-Date: Tue, 2 Jan 2018 12:04:40 +0100
-Cc: Rob Herring <robh+dt@kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-serial@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>,
-        linux-amlogic@lists.infradead.org,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        Carlo Caione <carlo@endlessm.com>,
-        Daniel Drake <drake@endlessm.com>
-Message-Id: <5F8922BB-5A97-43B1-88D5-591EB76FF787@holtmann.org>
-References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
- <20180101204217.26165-9-martin.blumenstingl@googlemail.com>
-To: Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-serial-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: A2DP: simple-agent vs bluetoothctl
+To: Ahmed Alsharif <ahmeds2000x@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <79b36674-39ec-8d96-8515-4c0ef79e45ee@gmx.net>
+ <CAHU4CU+PBowrTEqahB_BJWi=E0PuhFGscpD+e68ZUBakOFzCcQ@mail.gmail.com>
+ <27274c2e-4558-3a27-5fc8-e09b9eae9ad4@gmx.net>
+ <CAHU4CUJVSpdSqct4Cpc7Ko9PnMs9RH=K0ZkM7Y4EQzqToJELSw@mail.gmail.com>
+From: mortadelo@gmx-topmail.de
+Message-ID: <f3a7f5a0-1b0c-21b6-a6be-4d552c713151@gmx.net>
+Date: Tue, 2 Jan 2018 12:02:00 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAHU4CUJVSpdSqct4Cpc7Ko9PnMs9RH=K0ZkM7Y4EQzqToJELSw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi Ahmed,
 
-> The three-wire (H5) protocol is the only protocol which uses
-> HCI_UART_INIT_PENDING.
-> Unfortunately the benefits of using this flag are currently unknown. It
-> was added in commit 9f2aee848fe6 ("Bluetooth: Add delayed init sequence
-> support for UART controllers"). In my experiments (with the
-> "rtk_hciattach" tool - a customized version of hciattach for Realtek
-> chipsets) I started the tool before and after this patch while the
-> Bluetooth chipset was disabled (by pulling it's enable GPIO LOW). In
-> both cases hci0 was not created - thus HCI_UART_INIT_PENDING is not
-> required in that case.
-> 
-> Removing this code also has another benefit: hci_serdev.c does not
-> support the delayed initialization / registration. Thus the protocol
-> implementation (hci_h5) never receives any data with this check still
-> in place. For the H5 protocol this means that the initialization never
-> completes (because the sync response never arrives). Even if the
-> initialization would succeed later on the drivers would call
-> hci_uart_init_ready() which schedules the registration which is
-> currently not implemented by hci_serdev.c.
-> 
-> Removing the HCI_UART_INIT_PENDING check makes the code easier to read
-> and also fixes the initalization of devices (implemented with the serdev
-> library) which use the H5 protocol.
-> 
-> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Please se my answers inline.
 
-I really like Johan to ack this one, but generally I am fine with removing unneeded code.
+Thanks, Michael
 
-We might also want to look at hciattach to btattach code and make sure it gets removed there as well. I am not even sure anybody used hciattach with H:5 ever.
+Am 02.01.2018 um 04:10 schrieb Ahmed Alsharif:
+>> This setup used to work more or less flawlessly with Raspbian Jessie.
+>> With Stretch, however, I'm seeing a variety of behaviors from "pairing
+>> rejected" over "paired, but not trusted" to "working OK" (rare). This
+>> inconsistent behavior lets me believe that the BT device is missing
+>> initialization into a predictable state (pairable, discoverable, any
+>> other?) before the script is called. I'm currently playing with explicit
+>> initialization sequences using 'bluetoothctl', but I'm also wondering
+>> how this used to work with Raspbian Jessie before.
+> From what I can tell raspbian jessie had bluez-5.23, try downgrading
+> to it from your current version, either by installing the exact
+> version from your package manager, or by cloning the bluez repository,
+> checking out the commit from that release ,building, and then running
+> it. That way you can tell whether it's the newer versions of bluez
+> that are causing the issue.
 
-> ---
-> drivers/bluetooth/hci_h5.c     |  3 ---
-> drivers/bluetooth/hci_ldisc.c  | 38 --------------------------------------
-> drivers/bluetooth/hci_serdev.c |  3 ---
-> drivers/bluetooth/hci_uart.h   |  4 +---
-> 4 files changed, 1 insertion(+), 47 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> index 6a8d0d06aba7..6cfc2f276250 100644
-> --- a/drivers/bluetooth/hci_h5.c
-> +++ b/drivers/bluetooth/hci_h5.c
-> @@ -210,8 +210,6 @@ static int h5_open(struct hci_uart *hu)
-> 
-> 	h5->tx_win = H5_TX_WIN_MAX;
-> 
-> -	set_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags);
-> -
-> 	/* Send initial sync request */
-> 	h5_link_control(hu, sync, sizeof(sync));
-> 	mod_timer(&h5->timer, jiffies + H5_SYNC_TIMEOUT);
-> @@ -316,7 +314,6 @@ static void h5_handle_internal_rx(struct hci_uart *hu)
-> 			h5->tx_win = (data[2] & 0x07);
-> 		BT_DBG("Three-wire init complete. tx_win %u", h5->tx_win);
-> 		h5->state = H5_ACTIVE;
-> -		hci_uart_init_ready(hu);
-> 		return;
-> 	} else if (memcmp(data, sleep_req, 2) == 0) {
-> 		BT_DBG("Peer went to sleep");
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index c823914b3a80..5dd3e1bebfe4 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -195,39 +195,6 @@ static void hci_uart_write_work(struct work_struct *work)
-> 	clear_bit(HCI_UART_SENDING, &hu->tx_state);
-> }
-> 
-> -static void hci_uart_init_work(struct work_struct *work)
-> -{
-> -	struct hci_uart *hu = container_of(work, struct hci_uart, init_ready);
-> -	int err;
-> -	struct hci_dev *hdev;
-> -
-> -	if (!test_and_clear_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
-> -		return;
-> -
-> -	err = hci_register_dev(hu->hdev);
-> -	if (err < 0) {
-> -		BT_ERR("Can't register HCI device");
-> -		hdev = hu->hdev;
-> -		hu->hdev = NULL;
-> -		hci_free_dev(hdev);
-> -		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
-> -		hu->proto->close(hu);
-> -		return;
-> -	}
-> -
-> -	set_bit(HCI_UART_REGISTERED, &hu->flags);
-> -}
-> -
-> -int hci_uart_init_ready(struct hci_uart *hu)
-> -{
-> -	if (!test_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
-> -		return -EALREADY;
-> -
-> -	schedule_work(&hu->init_ready);
-> -
-> -	return 0;
-> -}
-> -
-> /* ------- Interface to HCI layer ------ */
-> /* Initialize device */
-> static int hci_uart_open(struct hci_dev *hdev)
-> @@ -490,7 +457,6 @@ static int hci_uart_tty_open(struct tty_struct *tty)
-> 	hu->alignment = 1;
-> 	hu->padding = 0;
-> 
-> -	INIT_WORK(&hu->init_ready, hci_uart_init_work);
-> 	INIT_WORK(&hu->write_work, hci_uart_write_work);
-> 
-> 	percpu_init_rwsem(&hu->proto_lock);
-> @@ -653,9 +619,6 @@ static int hci_uart_register_dev(struct hci_uart *hu)
-> 	else
-> 		hdev->dev_type = HCI_PRIMARY;
-> 
-> -	if (test_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
-> -		return 0;
-> -
-> 	if (hci_register_dev(hdev) < 0) {
-> 		BT_ERR("Can't register HCI device");
-> 		hu->hdev = NULL;
-> @@ -699,7 +662,6 @@ static int hci_uart_set_flags(struct hci_uart *hu, unsigned long flags)
-> 	unsigned long valid_flags = BIT(HCI_UART_RAW_DEVICE) |
-> 				    BIT(HCI_UART_RESET_ON_INIT) |
-> 				    BIT(HCI_UART_CREATE_AMP) |
-> -				    BIT(HCI_UART_INIT_PENDING) |
-> 				    BIT(HCI_UART_EXT_CONFIG) |
-> 				    BIT(HCI_UART_VND_DETECT);
-> 
-> diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
-> index e0e6461b9200..fe67eb6d4278 100644
-> --- a/drivers/bluetooth/hci_serdev.c
-> +++ b/drivers/bluetooth/hci_serdev.c
-> @@ -333,9 +333,6 @@ int hci_uart_register_device(struct hci_uart *hu,
-> 	else
-> 		hdev->dev_type = HCI_PRIMARY;
-> 
-> -	if (test_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags))
-> -		return 0;
-> -
-> 	if (hci_register_dev(hdev) < 0) {
-> 		BT_ERR("Can't register HCI device");
-> 		err = -ENODEV;
-> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-> index 66e8c68e4607..47e755ff4092 100644
-> --- a/drivers/bluetooth/hci_uart.h
-> +++ b/drivers/bluetooth/hci_uart.h
-> @@ -53,7 +53,7 @@
-> #define HCI_UART_RAW_DEVICE	0
-> #define HCI_UART_RESET_ON_INIT	1
-> #define HCI_UART_CREATE_AMP	2
-> -#define HCI_UART_INIT_PENDING	3
-> +/* 3 is unused - was HCI_UART_INIT_PENDING */
+I was finally able to isolate and address the problem(s). It was
+actually a coincidence of several factors:
+- Missing initialization of the BT device (as I already suspected):
+It ws a matter of luck whether the device was in pairing mode or not.
+I'm still wondering how this worked in the former Raspbian Jessie setup
+(which isn't available anymore to me).
 
-#define HCI_UART_INIT_PENDING	3	/* unused */
+- Timing/synchronization issue:
+'simple-agent' was/is started from within '.profile'of the 'pi' user
+which - in turn - is automatically logged in / started at boot by the
+system. I realize that 'bluetoothd' takes some 30 secs after boot to
+become operational (on my Raspberry Pi 1). If I try to pair before, it
+fails. This also explains why (this part of) the problem didn't show up
+when I manually started the script from within the booted system.
 
-I prefer it this way since it is easier on the eyes.
+- Missing status output of 'simple-agent' in autostart mode:
+When 'simple-agent'is started from '.profile', whose console - in turn -
+is auto-started when the system boots, its status oupt put (e.g. 'Agent
+registered') is not visible. This makes debugging more challenging...
 
-> #define HCI_UART_EXT_CONFIG	4
-> #define HCI_UART_VND_DETECT	5
-> 
-> @@ -83,7 +83,6 @@ struct hci_uart {
-> 	unsigned long		flags;
-> 	unsigned long		hdev_flags;
-> 
-> -	struct work_struct	init_ready;
-> 	struct work_struct	write_work;
-> 
-> 	const struct hci_uart_proto *proto;
-> @@ -115,7 +114,6 @@ int hci_uart_register_device(struct hci_uart *hu, const struct hci_uart_proto *p
-> void hci_uart_unregister_device(struct hci_uart *hu);
-> 
-> int hci_uart_tx_wakeup(struct hci_uart *hu);
-> -int hci_uart_init_ready(struct hci_uart *hu);
-> void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed);
-> void hci_uart_set_flow_control(struct hci_uart *hu, bool enable);
-> void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
 
-Regards
-
-Marcel
-
+I have fixed the problem by initializing the BT device via a bash script
+which calls 'bluetoothctl - power on - discoverable on - pairable on' in
+the way how you told me (here document). This bash script is called in
+'.profile' before 'simple-agent'is called, which has the pleasant
+side-effect that the bash script (i.e. 'bluetoothctl') waits for
+'bluetoothd' to become operational. So I'm getting an implicit
+synchronization.
+>> The most common behavior is "paired, but not trusted", which yields the
+>> following errors in syslog:
+>> Jan  1 12:40:53 Raspi-2 bluetoothd[615]: Authentication attempt without
+>> agent
+> Are you using the exact simple-agent script you attached or a
+> variation of it? the one you attached seems to be registering an
+> agent, whereas this is saying it isn't.
+Now obsolete.
