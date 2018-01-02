@@ -1,40 +1,41 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <27274c2e-4558-3a27-5fc8-e09b9eae9ad4@gmx.net>
-References: <79b36674-39ec-8d96-8515-4c0ef79e45ee@gmx.net> <CAHU4CU+PBowrTEqahB_BJWi=E0PuhFGscpD+e68ZUBakOFzCcQ@mail.gmail.com>
- <27274c2e-4558-3a27-5fc8-e09b9eae9ad4@gmx.net>
-From: Ahmed Alsharif <ahmeds2000x@gmail.com>
-Date: Tue, 2 Jan 2018 04:10:06 +0100
-Message-ID: <CAHU4CUJVSpdSqct4Cpc7Ko9PnMs9RH=K0ZkM7Y4EQzqToJELSw@mail.gmail.com>
-Subject: Re: A2DP: simple-agent vs bluetoothctl
-To: mortadelo@gmx-topmail.de
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <acelan@gmail.com>
+Sender: AceLan Kao <acelan@gmail.com>
+From: AceLan Kao <acelan.kao@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Add support for 0cf3:e010
+Date: Tue,  2 Jan 2018 10:41:11 +0800
+Message-Id: <1514860871-8962-1-git-send-email-acelan.kao@canonical.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> This setup used to work more or less flawlessly with Raspbian Jessie.
-> With Stretch, however, I'm seeing a variety of behaviors from "pairing
-> rejected" over "paired, but not trusted" to "working OK" (rare). This
-> inconsistent behavior lets me believe that the BT device is missing
-> initialization into a predictable state (pairable, discoverable, any
-> other?) before the script is called. I'm currently playing with explicit
-> initialization sequences using 'bluetoothctl', but I'm also wondering
-> how this used to work with Raspbian Jessie before.
+Device 0cf3:e010 is one of the QCA ROME family.
 
->From what I can tell raspbian jessie had bluez-5.23, try downgrading
-to it from your current version, either by installing the exact
-version from your package manager, or by cloning the bluez repository,
-checking out the commit from that release ,building, and then running
-it. That way you can tell whether it's the newer versions of bluez
-that are causing the issue.
+T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=03 Dev#=  4 Spd=12  MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e010 Rev=00.01
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
->
-> The most common behavior is "paired, but not trusted", which yields the
-> following errors in syslog:
-> Jan  1 12:40:53 Raspi-2 bluetoothd[615]: Authentication attempt without
-> agent
+Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Are you using the exact simple-agent script you attached or a
-variation of it? the one you attached seems to be registering an
-agent, whereas this is saying it isn't.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f7120c9..9136edb 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -263,6 +263,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	/* QCA ROME chipset */
+ 	{ USB_DEVICE(0x0cf3, 0xe007), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe009), .driver_info = BTUSB_QCA_ROME },
++	{ USB_DEVICE(0x0cf3, 0xe010), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe300), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe301), .driver_info = BTUSB_QCA_ROME },
+ 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME },
+-- 
+2.7.4
