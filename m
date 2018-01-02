@@ -1,58 +1,40 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v3 1/5] tools/btpclient: Move string to address conversion to helper
-Date: Tue, 02 Jan 2018 10:20:40 +0100
-Message-ID: <2627495.QPqhXRdf5u@ix>
-In-Reply-To: <1514466678-32582-1-git-send-email-kolodziejczyk.grzegorz.wroc@gmail.com>
-References: <1514466678-32582-1-git-send-email-kolodziejczyk.grzegorz.wroc@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <27274c2e-4558-3a27-5fc8-e09b9eae9ad4@gmx.net>
+References: <79b36674-39ec-8d96-8515-4c0ef79e45ee@gmx.net> <CAHU4CU+PBowrTEqahB_BJWi=E0PuhFGscpD+e68ZUBakOFzCcQ@mail.gmail.com>
+ <27274c2e-4558-3a27-5fc8-e09b9eae9ad4@gmx.net>
+From: Ahmed Alsharif <ahmeds2000x@gmail.com>
+Date: Tue, 2 Jan 2018 04:10:06 +0100
+Message-ID: <CAHU4CUJVSpdSqct4Cpc7Ko9PnMs9RH=K0ZkM7Y4EQzqToJELSw@mail.gmail.com>
+Subject: Re: A2DP: simple-agent vs bluetoothctl
+To: mortadelo@gmx-topmail.de
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+> This setup used to work more or less flawlessly with Raspbian Jessie.
+> With Stretch, however, I'm seeing a variety of behaviors from "pairing
+> rejected" over "paired, but not trusted" to "working OK" (rare). This
+> inconsistent behavior lets me believe that the BT device is missing
+> initialization into a predictable state (pairable, discoverable, any
+> other?) before the script is called. I'm currently playing with explicit
+> initialization sequences using 'bluetoothctl', but I'm also wondering
+> how this used to work with Raspbian Jessie before.
 
-On Thursday, 28 December 2017 14:11:14 CET Grzegorz Kolodziejczyk wrote:
-> From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-> 
-> This patch makes local helper with string to address conversion.
-> ---
->  tools/btpclient.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/tools/btpclient.c b/tools/btpclient.c
-> index 9ea6249..2cb5719 100644
-> --- a/tools/btpclient.c
-> +++ b/tools/btpclient.c
-> @@ -52,6 +52,12 @@ static struct btp *btp;
-> 
->  static bool gap_service_registered;
-> 
-> +static bool str2addr(const char *str, uint8_t *addr)
-> +{
-> +	return sscanf(str,"%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &addr[5], &addr[4],
-> +				&addr[3], &addr[2], &addr[1], &addr[0]) == 6;
-> +}
-> +
->  static struct btp_adapter *find_adapter_by_proxy(struct l_dbus_proxy
-> *proxy) {
->  	const struct l_queue_entry *entry;
-> @@ -171,9 +177,7 @@ static void btp_gap_read_info(uint8_t index, const void
-> *param, uint16_t length, if (!l_dbus_proxy_get_property(adapter->proxy,
-> "Address", "s", &str)) goto failed;
-> 
-> -	if (sscanf(str,"%hhx:%hhx:%hhx:%hhx:%hhx:%hhx",
-> -			&rp.address[5], &rp.address[4], &rp.address[3],
-> -			&rp.address[2], &rp.address[1], &rp.address[0]) != 6)
-> +	if (!str2addr(str, rp.address))
->  		goto failed;
-> 
->  	if (!l_dbus_proxy_get_property(adapter->proxy, "Name", "s", &str)) {
+>From what I can tell raspbian jessie had bluez-5.23, try downgrading
+to it from your current version, either by installing the exact
+version from your package manager, or by cloning the bluez repository,
+checking out the commit from that release ,building, and then running
+it. That way you can tell whether it's the newer versions of bluez
+that are causing the issue.
 
-All patches applied (note that I fixed couple code style issues), thanks.
+>
+> The most common behavior is "paired, but not trusted", which yields the
+> following errors in syslog:
+> Jan  1 12:40:53 Raspi-2 bluetoothd[615]: Authentication attempt without
+> agent
 
--- 
-pozdrawiam
-Szymon Janc
+Are you using the exact simple-agent script you attached or a
+variation of it? the one you attached seems to be registering an
+agent, whereas this is saying it isn't.
