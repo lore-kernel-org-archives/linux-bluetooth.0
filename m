@@ -1,72 +1,58 @@
-Return-Path: <kai.heng.feng@canonical.com>
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH 1/2] Revert "Bluetooth: btusb: fix QCA Rome
- suspend/resume"
-From: Kai Heng Feng <kai.heng.feng@canonical.com>
-In-Reply-To: <CAD8Lp47CEnQmDEwGDLZPpUcSS0Azf1ZO2zeuffYyDtwga2+Dqw@mail.gmail.com>
-Date: Tue, 2 Jan 2018 18:06:30 +0800
-Cc: Brian Norris <briannorris@chromium.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Linux USB Mailing List <linux-usb@vger.kernel.org>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
- Linux Kernel <linux-kernel@vger.kernel.org>,
- stable@vger.kernel.org,
- Leif Liddy <leif.linux@gmail.com>,
- Matthias Kaehlcke <mka@chromium.org>,
- Guenter Roeck <linux@roeck-us.net>
-Message-Id: <26F3D10E-A72A-400D-BD07-1F4AFF109417@canonical.com>
-References: <20171220110008.11856-1-kai.heng.feng@canonical.com>
- <20171220185308.GA176644@google.com>
- <CAD8Lp47CEnQmDEwGDLZPpUcSS0Azf1ZO2zeuffYyDtwga2+Dqw@mail.gmail.com>
-To: Daniel Drake <drake@endlessm.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v3 1/5] tools/btpclient: Move string to address conversion to helper
+Date: Tue, 02 Jan 2018 10:20:40 +0100
+Message-ID: <2627495.QPqhXRdf5u@ix>
+In-Reply-To: <1514466678-32582-1-git-send-email-kolodziejczyk.grzegorz.wroc@gmail.com>
+References: <1514466678-32582-1-git-send-email-kolodziejczyk.grzegorz.wroc@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Grzegorz,
 
+On Thursday, 28 December 2017 14:11:14 CET Grzegorz Kolodziejczyk wrote:
+> From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+> 
+> This patch makes local helper with string to address conversion.
+> ---
+>  tools/btpclient.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/btpclient.c b/tools/btpclient.c
+> index 9ea6249..2cb5719 100644
+> --- a/tools/btpclient.c
+> +++ b/tools/btpclient.c
+> @@ -52,6 +52,12 @@ static struct btp *btp;
+> 
+>  static bool gap_service_registered;
+> 
+> +static bool str2addr(const char *str, uint8_t *addr)
+> +{
+> +	return sscanf(str,"%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &addr[5], &addr[4],
+> +				&addr[3], &addr[2], &addr[1], &addr[0]) == 6;
+> +}
+> +
+>  static struct btp_adapter *find_adapter_by_proxy(struct l_dbus_proxy
+> *proxy) {
+>  	const struct l_queue_entry *entry;
+> @@ -171,9 +177,7 @@ static void btp_gap_read_info(uint8_t index, const void
+> *param, uint16_t length, if (!l_dbus_proxy_get_property(adapter->proxy,
+> "Address", "s", &str)) goto failed;
+> 
+> -	if (sscanf(str,"%hhx:%hhx:%hhx:%hhx:%hhx:%hhx",
+> -			&rp.address[5], &rp.address[4], &rp.address[3],
+> -			&rp.address[2], &rp.address[1], &rp.address[0]) != 6)
+> +	if (!str2addr(str, rp.address))
+>  		goto failed;
+> 
+>  	if (!l_dbus_proxy_get_property(adapter->proxy, "Name", "s", &str)) {
 
-> On 21 Dec 2017, at 7:43 PM, Daniel Drake <drake@endlessm.com> wrote:
->=20
-> On Wed, Dec 20, 2017 at 6:53 PM, Brian Norris =
-<briannorris@chromium.org> wrote:
->>=20
->> On Wed, Dec 20, 2017 at 07:00:07PM +0800, Kai-Heng Feng wrote:
->>> This commit causes a regression on some QCA ROME chips. The USB =
-device
->>> reset happens in btusb_open(), hence firmware loading gets =
-interrupted.
->>=20
->> Oh, did you really confirm that's the root of the problem? I was only
->> hypothesizing, with some informed observation and code review; but I
->> didn't fully convince myself. If so, that's interesting.
->=20
-> I have the same doubt. Can you explain how/why firmware uploading and
-> btusb_open() overlap, and how this is avoided with your patch?
+All patches applied (note that I fixed couple code style issues), thanks.
 
-QCA ROME chip uploads its firmware inside btusb_open().
-
-The behavior is like below:
-- btusb_probe()
-- btusb_open()
-- btusb_suspend(), reset_resume gets set.
-- btusb_open() again, hub resets the device, then the issue happens.
-
-I didn=E2=80=99t dig really deep for the issue, I simply tried usb core =
-quirks, it reset
-the USB device before btusb_probe().
-
-It might be that using the USB quirk only papers over the real issue.
-
-> If they do overlap, is that not a bug in the stack that should be =
-fixed instead?
-> If the fix belongs in btusb and this BTUSB_RESET_RESUME thing really
-> is problematic, should it be totally removed instead?
-
-I think so. That=E2=80=99s why I need some insight from the original =
-patch author.
-
-Kai-Heng
-
->=20
-> Daniel
+-- 
+pozdrawiam
+Szymon Janc
