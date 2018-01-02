@@ -1,100 +1,48 @@
-Return-Path: <carlo@endlessm.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFBinCBB=SmviOMRHGDH6vzjTjV-mrtQEc8nBUhDbJGs9SBpgw@mail.gmail.com>
-References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
- <20180101204217.26165-8-martin.blumenstingl@googlemail.com>
- <563D6F9F-8495-40D4-BE56-5338ED2B9B99@holtmann.org> <CAL9uMOEMDup4hRkxD-tM8R0YirGs5uQi31AjJUnFCPNMKUdRHg@mail.gmail.com>
- <E8E39477-CF1A-4A3E-84C5-830E182C2266@holtmann.org> <CAL9uMOH0N-4jgQncmPjK-KyU0vY9Q0ZnHYSAGgz3z3ywzc8Avw@mail.gmail.com>
- <CAFBinCBB=SmviOMRHGDH6vzjTjV-mrtQEc8nBUhDbJGs9SBpgw@mail.gmail.com>
-From: Carlo Caione <carlo@endlessm.com>
-Date: Tue, 2 Jan 2018 23:06:34 +0000
-Message-ID: <CAL9uMOFyfr_qGf5BeTojkMeWeH8LqPoKj=LrdgEMB2wmhGBxmA@mail.gmail.com>
-Subject: Re: [RFC v2 7/9] bluetooth: btrtl: load the config blob from
- devicetree when available
-To: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Rob Herring <robh+dt@kernel.org>,
-	devicetree <devicetree@vger.kernel.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
-	Mark Rutland <mark.rutland@arm.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, gregkh@linuxfoundation.org, jslaby@suse.com,
-	johan@kernel.org, linux-amlogic@lists.infradead.org,
-	Larry.Finger@lwfinger.net, Daniel Drake <drake@endlessm.com>
+From: Ahmed Alsharif <ahmeds2000x@gmail.com>
+Date: Tue, 2 Jan 2018 22:49:37 +0100
+Message-ID: <CAHU4CUJxjE=7J6KybKcxqBo6MGvA4+g5-6b+ktwSM82B_r9BDA@mail.gmail.com>
+Subject: Pairing when already paired results in a hang
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jan 2, 2018 at 9:46 PM, Martin Blumenstingl
-<martin.blumenstingl@googlemail.com> wrote:
-> Hi Carlo,
+Hey,
 
-Hi Martin,
+I've noticed that when using the Pair() method on a device already
+paired, it hangs indefinitely (never returns a reply), or potentially
+returns an AuthenticationCancelled error, when the device disappears.
+The comments in the pair_device(...) function say something about an
+SMP bug, and the comments in adapter_bonding_attempt(...) also mention
+a bug about some LE pairing requests never timing out.
+I'm not really sure if the behavior I mentioned has something to do
+with the bug/bugs from the comments or not, so I'm wondering if
+there's a reason for not checking if the device is paired already or
+not, before proceeding with the pairing?
 
-> On Tue, Jan 2, 2018 at 12:31 PM, Carlo Caione <carlo@endlessm.com> wrote:
->> On Tue, Jan 2, 2018 at 11:19 AM, Marcel Holtmann <marcel@holtmann.org> w=
-rote:
->>> Hi Carlo,
->>>
->>>>>> Some Realtek bluetooth devices need a "config" blob. The btrtl drive=
-r
->>>>>> currently only allows loading this config blob via the request_firmw=
-are
->>>>>> mechanism.
->>>>>>
->>>>>> The UART Bluetooth chips use this config blob to specify the baudrat=
-e,
->>>>>> whether flow control is used and some other unknown bits. This means
->>>>>> that the config blob is board-specific - thus loading it via
->>>>>> request_firmware means that the rootfs is tied to a specific board.
->>>>>>
->>>>>> The UART Bluetooth chips are implemented through serdev. This means
->>>>>> there is also a devicetree node which describes the Bluetooth chip.
->>>>>> Thus we can also load the blob from the devicetree node to keep the
->>>>>> filesystem independent of any board configuration data. In the futur=
-e
->>>>>> this could be extended to support ACPI as well (in case that's neede=
-d).
->>>>>>
->>>>>> Parse the devicetree node if it exists and obtain the config blob fr=
-om
->>>>>> there. Otherwise fall back to using the "old" request_firmware
->>>>>> mechanism.
->>>>>
->>>>> where are these config blobs coming from? I think we also need to giv=
-e people a helping hand on how to add them to DT. I still wonder if the onl=
-y pieces we are using are the UART config, then maybe skipping the config b=
-lob and allowing for clear named values in DT might be better.
->>>>
->>>> What about x86 platforms where we do not have DT (I didn't check but I
->>>> don't think that the UART config in that case is shipped in the ACPI
->>>> tables)?
->>>
->>> if we have this hardware in x86 systems, then I would really like to se=
-e ACPI table dumps. Some pieces might need hardcoding based on ACPI ID.
->>
->> Yes, we have, especially on cherry-trail SoCs. In [0] the DSDT of a
->> cherry-trail laptop shipping the rtl8723bs (device OBDA8723).
->>
->> [0] https://gist.github.com/carlocaione/82bff95ababb67dd33f52a86e94ce3ff
-> so this shows that the UART settings (initial baudrate, HW flow
-> control, etc.) are part of the DSDT
-> however, the actual config blob is not
->
-> the description of this patch explains: "Parse the devicetree node ...
-> [or] ... fall back to using the "old" request_firmware mechanism."
-> do you have any other solution in mind?
+The following patch stops the indefinite hang for me on second pairing
+attempts, and still achieves the side effects of pairing, e.g.
+connecting. I'm not 100% sure however that this isn't causing
+different problems.
 
-As Marcel suggested we can assume that the information in the DSDT is
-correct so that we can get rid of the config blob also for x86
-platforms (assuming that the only useful information in the config
-blobs is the UART configuration).
+--- a/src/device.c
++++ b/src/device.c
+@@ -2490,6 +2490,11 @@ static DBusMessage *pair_device(DBusConnection
+*conn, DBusMessage *msg,
+        if (state->bonded)
+                return btd_error_already_exists(msg);
 
-Adding the ACPI support on top of your patches is (hopefully) trivial,
-just follow what was done for hci_bcm.c, basically adding a new _HID
-and reading the configuration for GPIOs and UART, all the rest should
-be transparent for serdev.
++       if (state->paired) {
++               device->bredr_state.paired = false;
++               device->le_state.paired = false;
++       }
++
+        sender = dbus_message_get_sender(msg);
 
-I'll test your patches on the hardware I have.
+        agent = agent_get(sender);
+
 
 Cheers,
-
---=20
-Carlo Caione  |  +44.7384.69.16.04  |  Endless
+Ahmed Alsharif.
