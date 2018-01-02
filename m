@@ -1,47 +1,39 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: David Lechner <david@lechnology.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Sebastian Reichel <sre@kernel.org>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Bjorn Andersson <bjorn.andersson@linaro.org>,
-	Tobias Regnery <tobias.regnery@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hciuart: add nvmem dependency
-Date: Tue,  2 Jan 2018 11:50:30 +0100
-Message-Id: <20180102105044.1436954-1-arnd@arndb.de>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for 0cf3:e010
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1514860871-8962-1-git-send-email-acelan.kao@canonical.com>
+Date: Tue, 2 Jan 2018 11:50:12 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <BAD24711-F260-485E-89D8-C9E3896EF17E@holtmann.org>
+References: <1514860871-8962-1-git-send-email-acelan.kao@canonical.com>
+To: AceLan Kao <acelan.kao@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the hci support is built-in, but mvmem is a loadable module, we
-get a link failure:
+Hi AceLan,
 
-drivers/bluetooth/hci_ll.o: In function `hci_ti_probe':
-hci_ll.c:(.text+0x226): undefined reference to `nvmem_cell_get'
-hci_ll.c:(.text+0x238): undefined reference to `nvmem_cell_read'
-hci_ll.c:(.text+0x244): undefined reference to `nvmem_cell_put'
 
-This adds another Kconfig dependency to enforce valid configurations.
+> Device 0cf3:e010 is one of the QCA ROME family.
+> 
+> T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=03 Dev#=  4 Spd=12  MxCh= 0
+> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0cf3 ProdID=e010 Rev=00.01
+> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> 
+> Signed-off-by: AceLan Kao <acelan.kao@canonical.com>
+> ---
+> drivers/bluetooth/btusb.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-Fixes: 0e58d0cdb3eb ("Bluetooth: hci_ll: Add optional nvmem BD address source")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/bluetooth/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 41932f0e68d0..d816ce9e23a7 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -77,6 +77,7 @@ config BT_HCIBTSDIO
- config BT_HCIUART
- 	tristate "HCI UART driver"
- 	depends on SERIAL_DEV_BUS || !SERIAL_DEV_BUS
-+	depends on NVMEM || !NVMEM
- 	depends on TTY
- 	help
- 	  Bluetooth HCI UART driver.
--- 
-2.9.0
+Regards
+
+Marcel
