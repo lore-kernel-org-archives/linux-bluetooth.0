@@ -1,44 +1,70 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-serial-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: hciuart: add nvmem dependency
+Subject: Re: [RFC v2 1/9] serdev: implement parity configuration
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180102105044.1436954-1-arnd@arndb.de>
-Date: Tue, 2 Jan 2018 12:18:11 +0100
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        David Lechner <david@lechnology.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Tobias Regnery <tobias.regnery@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <6F6439FB-6B46-4EC0-B826-9E12D04D60DD@holtmann.org>
-References: <20180102105044.1436954-1-arnd@arndb.de>
-To: Arnd Bergmann <arnd@arndb.de>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180101204217.26165-2-martin.blumenstingl@googlemail.com>
+Date: Tue, 2 Jan 2018 12:16:41 +0100
+Cc: devicetree <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-serial@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>,
+        linux-amlogic@lists.infradead.org,
+        Larry Finger <Larry.Finger@lwfinger.net>,
+        Carlo Caione <carlo@endlessm.com>,
+        Daniel Drake <drake@endlessm.com>
+Message-Id: <4FDCB65A-641A-4134-BAF1-4A777012FDE7@holtmann.org>
+References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
+ <20180101204217.26165-2-martin.blumenstingl@googlemail.com>
+To: Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Rob Herring <robh+dt@kernel.org>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arnd,
+Hi Martin,
 
-> When the hci support is built-in, but mvmem is a loadable module, we
-> get a link failure:
+> Some Bluetooth modules (for example the ones found in Realtek RTL8723BS
+> and RTL8723DS) want to communicate with the host with even parity
+> enabled.
+> Add a new function and the corresponding internal callbacks so parity
+> can be configured. This supports enabling and disabling parity as well
+> as setting the type to odd or even.
 > 
-> drivers/bluetooth/hci_ll.o: In function `hci_ti_probe':
-> hci_ll.c:(.text+0x226): undefined reference to `nvmem_cell_get'
-> hci_ll.c:(.text+0x238): undefined reference to `nvmem_cell_read'
-> hci_ll.c:(.text+0x244): undefined reference to `nvmem_cell_put'
-> 
-> This adds another Kconfig dependency to enforce valid configurations.
-> 
-> Fixes: 0e58d0cdb3eb ("Bluetooth: hci_ll: Add optional nvmem BD address source")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 > ---
-> drivers/bluetooth/Kconfig | 1 +
-> 1 file changed, 1 insertion(+)
+> drivers/tty/serdev/core.c           | 12 ++++++++++++
+> drivers/tty/serdev/serdev-ttyport.c | 21 +++++++++++++++++++++
+> include/linux/serdev.h              |  5 +++++
+> 3 files changed, 38 insertions(+)
+> 
+> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+> index 1bef39828ca7..d327b02980f5 100644
+> --- a/drivers/tty/serdev/core.c
+> +++ b/drivers/tty/serdev/core.c
+> @@ -225,6 +225,18 @@ void serdev_device_set_flow_control(struct serdev_device *serdev, bool enable)
+> }
+> EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
+> 
+> +void serdev_device_set_parity(struct serdev_device *serdev, bool enable,
+> +			      bool odd)
+> +{
+> +	struct serdev_controller *ctrl = serdev->ctrl;
+> +
+> +	if (!ctrl || !ctrl->ops->set_parity)
+> +		return;
+> +
+> +	ctrl->ops->set_parity(ctrl, enable, odd);
+> +}
+> +EXPORT_SYMBOL_GPL(serdev_device_set_parity);
+> +
 
-patch has been applied to bluetooth-next tree.
+this really needs Rob’s ACK before I take the patch.
 
 Regards
 
 Marcel
+
