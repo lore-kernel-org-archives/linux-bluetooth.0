@@ -1,69 +1,61 @@
-Return-Path: <carlo@endlessm.com>
-MIME-Version: 1.0
-In-Reply-To: <E8E39477-CF1A-4A3E-84C5-830E182C2266@holtmann.org>
-References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
- <20180101204217.26165-8-martin.blumenstingl@googlemail.com>
- <563D6F9F-8495-40D4-BE56-5338ED2B9B99@holtmann.org> <CAL9uMOEMDup4hRkxD-tM8R0YirGs5uQi31AjJUnFCPNMKUdRHg@mail.gmail.com>
- <E8E39477-CF1A-4A3E-84C5-830E182C2266@holtmann.org>
-From: Carlo Caione <carlo@endlessm.com>
-Date: Tue, 2 Jan 2018 11:31:06 +0000
-Message-ID: <CAL9uMOH0N-4jgQncmPjK-KyU0vY9Q0ZnHYSAGgz3z3ywzc8Avw@mail.gmail.com>
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
 Subject: Re: [RFC v2 7/9] bluetooth: btrtl: load the config blob from
  devicetree when available
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Rob Herring <robh+dt@kernel.org>,
-	devicetree <devicetree@vger.kernel.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
-	Mark Rutland <mark.rutland@arm.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, gregkh@linuxfoundation.org, jslaby@suse.com,
-	johan@kernel.org, linux-amlogic@lists.infradead.org,
-	Larry.Finger@lwfinger.net, Daniel Drake <drake@endlessm.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAL9uMOEMDup4hRkxD-tM8R0YirGs5uQi31AjJUnFCPNMKUdRHg@mail.gmail.com>
+Date: Tue, 2 Jan 2018 12:19:27 +0100
+Cc: Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-serial@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        gregkh@linuxfoundation.org, jslaby@suse.com, johan@kernel.org,
+        linux-amlogic@lists.infradead.org, Larry.Finger@lwfinger.net,
+        Daniel Drake <drake@endlessm.com>
+Message-Id: <E8E39477-CF1A-4A3E-84C5-830E182C2266@holtmann.org>
+References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
+ <20180101204217.26165-8-martin.blumenstingl@googlemail.com>
+ <563D6F9F-8495-40D4-BE56-5338ED2B9B99@holtmann.org>
+ <CAL9uMOEMDup4hRkxD-tM8R0YirGs5uQi31AjJUnFCPNMKUdRHg@mail.gmail.com>
+To: Carlo Caione <carlo@endlessm.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jan 2, 2018 at 11:19 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Carlo,
->
->>>> Some Realtek bluetooth devices need a "config" blob. The btrtl driver
->>>> currently only allows loading this config blob via the request_firmwar=
-e
->>>> mechanism.
->>>>
->>>> The UART Bluetooth chips use this config blob to specify the baudrate,
->>>> whether flow control is used and some other unknown bits. This means
->>>> that the config blob is board-specific - thus loading it via
->>>> request_firmware means that the rootfs is tied to a specific board.
->>>>
->>>> The UART Bluetooth chips are implemented through serdev. This means
->>>> there is also a devicetree node which describes the Bluetooth chip.
->>>> Thus we can also load the blob from the devicetree node to keep the
->>>> filesystem independent of any board configuration data. In the future
->>>> this could be extended to support ACPI as well (in case that's needed)=
-.
->>>>
->>>> Parse the devicetree node if it exists and obtain the config blob from
->>>> there. Otherwise fall back to using the "old" request_firmware
->>>> mechanism.
->>>
->>> where are these config blobs coming from? I think we also need to give =
-people a helping hand on how to add them to DT. I still wonder if the only =
-pieces we are using are the UART config, then maybe skipping the config blo=
-b and allowing for clear named values in DT might be better.
->>
->> What about x86 platforms where we do not have DT (I didn't check but I
->> don't think that the UART config in that case is shipped in the ACPI
->> tables)?
->
-> if we have this hardware in x86 systems, then I would really like to see =
-ACPI table dumps. Some pieces might need hardcoding based on ACPI ID.
+Hi Carlo,
 
-Yes, we have, especially on cherry-trail SoCs. In [0] the DSDT of a
-cherry-trail laptop shipping the rtl8723bs (device OBDA8723).
+>>> Some Realtek bluetooth devices need a "config" blob. The btrtl driver
+>>> currently only allows loading this config blob via the request_firmware
+>>> mechanism.
+>>> 
+>>> The UART Bluetooth chips use this config blob to specify the baudrate,
+>>> whether flow control is used and some other unknown bits. This means
+>>> that the config blob is board-specific - thus loading it via
+>>> request_firmware means that the rootfs is tied to a specific board.
+>>> 
+>>> The UART Bluetooth chips are implemented through serdev. This means
+>>> there is also a devicetree node which describes the Bluetooth chip.
+>>> Thus we can also load the blob from the devicetree node to keep the
+>>> filesystem independent of any board configuration data. In the future
+>>> this could be extended to support ACPI as well (in case that's needed).
+>>> 
+>>> Parse the devicetree node if it exists and obtain the config blob from
+>>> there. Otherwise fall back to using the "old" request_firmware
+>>> mechanism.
+>> 
+>> where are these config blobs coming from? I think we also need to give people a helping hand on how to add them to DT. I still wonder if the only pieces we are using are the UART config, then maybe skipping the config blob and allowing for clear named values in DT might be better.
+> 
+> What about x86 platforms where we do not have DT (I didn't check but I
+> don't think that the UART config in that case is shipped in the ACPI
+> tables)?
 
-[0] https://gist.github.com/carlocaione/82bff95ababb67dd33f52a86e94ce3ff
+if we have this hardware in x86 systems, then I would really like to see ACPI table dumps. Some pieces might need hardcoding based on ACPI ID.
 
-Cheers,
+Regards
 
---=20
-Carlo Caione  |  +44.7384.69.16.04  |  Endless
+Marcel
+
