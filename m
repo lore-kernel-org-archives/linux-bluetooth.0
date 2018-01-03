@@ -1,55 +1,58 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Disable autosuspend on QCA Rome devices
-Date: Thu,  4 Jan 2018 09:51:54 +0100
-Message-Id: <20180104085154.31377-1-hdegoede@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <CAHU4CUJxjE=7J6KybKcxqBo6MGvA4+g5-6b+ktwSM82B_r9BDA@mail.gmail.com>
+References: <CAHU4CUJxjE=7J6KybKcxqBo6MGvA4+g5-6b+ktwSM82B_r9BDA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 3 Jan 2018 19:25:22 -0200
+Message-ID: <CABBYNZKeWT+vXc-o3tDkMJbeZJRdz2Qx6WOc-mDU2RX6Z3o0VQ@mail.gmail.com>
+Subject: Re: Pairing when already paired results in a hang
+To: Ahmed Alsharif <ahmeds2000x@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit fd865802c66b ("Bluetooth: btusb: fix QCA Rome suspend/resume") fixes
-a suspend/resume problem on QCA devices by doing a full reset on resume,
-reloading the firmware.
+Hi Ahmed,
 
-A similar problem happens when using runtime-pm / autosuspend, when this is
-enabled by the user the QCA Rome device stops working. Reloading the
-firmware after a runtime suspend is not really an option since the latency
-caused by this is unacceptable.
+On Tue, Jan 2, 2018 at 7:49 PM, Ahmed Alsharif <ahmeds2000x@gmail.com> wrote:
+> Hey,
+>
+> I've noticed that when using the Pair() method on a device already
+> paired, it hangs indefinitely (never returns a reply), or potentially
+> returns an AuthenticationCancelled error, when the device disappears.
+> The comments in the pair_device(...) function say something about an
+> SMP bug, and the comments in adapter_bonding_attempt(...) also mention
+> a bug about some LE pairing requests never timing out.
+> I'm not really sure if the behavior I mentioned has something to do
+> with the bug/bugs from the comments or not, so I'm wondering if
+> there's a reason for not checking if the device is paired already or
+> not, before proceeding with the pairing?
+>
+> The following patch stops the indefinite hang for me on second pairing
+> attempts, and still achieves the side effects of pairing, e.g.
+> connecting. I'm not 100% sure however that this isn't causing
+> different problems.
+>
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -2490,6 +2490,11 @@ static DBusMessage *pair_device(DBusConnection
+> *conn, DBusMessage *msg,
+>         if (state->bonded)
+>                 return btd_error_already_exists(msg);
+>
+> +       if (state->paired) {
+> +               device->bredr_state.paired = false;
+> +               device->le_state.paired = false;
+> +       }
+> +
 
-To fix the runtime-pm issues, this commit disables runtime-pm on QCA Rome
-HCIs, by getting (and not releasing) an usb autopm reference on the btusb
-interface.
+Id say it is not a good idea to invalidate the current pairing upfront
+as the remote could be offline this could cause some side effects,
+besides we would need to clear the storage as well, perhaps the
+current logic is to try the new pairing first but there could be
+something preventing the new pairing to happen if it already exists so
+we need to check if there is a new pairing ongoing.
 
-BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/btusb.c | 7 +++++++
- 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 808c249845db..6ed3a0e5b8f6 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3122,8 +3122,15 @@ static int btusb_probe(struct usb_interface *intf,
- 		/* QCA Rome devices lose their updated firmware over suspend,
- 		 * but the USB hub doesn't notice any status change.
- 		 * Explicitly request a device reset on resume.
-+		 * And disable runtime pm by getting a pm reference, the USB
-+		 * core will drop our reference on disconnect.
- 		 */
- 		set_bit(BTUSB_RESET_RESUME, &data->flags);
-+		err = usb_autopm_get_interface(data->intf);
-+		if (err < 0) {
-+			BT_ERR("failed to get pm reference %d", err);
-+			goto out_free_dev;
-+		}
- 	}
- 
- #ifdef CONFIG_BT_HCIBTUSB_RTL
 -- 
-2.14.3
-
+Luiz Augusto von Dentz
