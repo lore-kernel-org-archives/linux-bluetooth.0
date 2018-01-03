@@ -1,85 +1,108 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [RFC v2 1/9] serdev: implement parity configuration
+Subject: Re: [PATCH v2 03/10] Bluetooth: hci_bcm: Enable runtime PM despite
+ absence of IRQ
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAFBinCD=iuE+ho22kihCFG=AJV5t+JtjRww8PLuq-cAJ2RkAHQ@mail.gmail.com>
-Date: Wed, 3 Jan 2018 13:37:29 +0100
-Cc: devicetree <devicetree@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-serial@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
+In-Reply-To: <20180102233648.GA15299@wunner.de>
+Date: Wed, 3 Jan 2018 13:34:00 +0100
+Cc: Hans de Goede <hdegoede@redhat.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>,
-        linux-amlogic@lists.infradead.org,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        Carlo Caione <carlo@endlessm.com>,
-        Daniel Drake <drake@endlessm.com>,
-        ulrich.hecht+renesas@gmail.com
-Message-Id: <046E5A40-D66C-4965-B8D4-E5CE6B44571F@holtmann.org>
-References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
- <20180101204217.26165-2-martin.blumenstingl@googlemail.com>
- <4FDCB65A-641A-4134-BAF1-4A777012FDE7@holtmann.org>
- <CAFBinCCq9mYBhzoL1XBVQNGxALg8oK5GB7Md9HJf_mchEMu3-A@mail.gmail.com>
- <CAFBinCD=iuE+ho22kihCFG=AJV5t+JtjRww8PLuq-cAJ2RkAHQ@mail.gmail.com>
-To: Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        Rob Herring <robh+dt@kernel.org>
-Sender: linux-serial-owner@vger.kernel.org
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Frederic Danis <frederic.danis.oss@gmail.com>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>,
+        Daniel Roschka <danielroschka@phoenitydawn.de>,
+        Ronald Tschalaer <ronald@innovation.ch>,
+        "Peter Y. Chuang" <peteryuchuang@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <FDB414A4-5E3E-40B9-B725-CEB0ADC01A5E@holtmann.org>
+References: <cover.1514916630.git.lukas@wunner.de>
+ <36e7c22493235863c2ab9dd9d7aa382a3fc15675.1514916630.git.lukas@wunner.de>
+ <ffd03fb7-6caa-8128-03ba-fc4cb63328ea@redhat.com>
+ <20180102233648.GA15299@wunner.de>
+To: Lukas Wunner <lukas@wunner.de>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi Lukas,
 
->>>> Some Bluetooth modules (for example the ones found in Realtek RTL8723BS
->>>> and RTL8723DS) want to communicate with the host with even parity
->>>> enabled.
->>>> Add a new function and the corresponding internal callbacks so parity
->>>> can be configured. This supports enabling and disabling parity as well
->>>> as setting the type to odd or even.
->>>> 
->>>> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
->>>> ---
->>>> drivers/tty/serdev/core.c           | 12 ++++++++++++
->>>> drivers/tty/serdev/serdev-ttyport.c | 21 +++++++++++++++++++++
->>>> include/linux/serdev.h              |  5 +++++
->>>> 3 files changed, 38 insertions(+)
->>>> 
->>>> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
->>>> index 1bef39828ca7..d327b02980f5 100644
->>>> --- a/drivers/tty/serdev/core.c
->>>> +++ b/drivers/tty/serdev/core.c
->>>> @@ -225,6 +225,18 @@ void serdev_device_set_flow_control(struct serdev_device *serdev, bool enable)
->>>> }
->>>> EXPORT_SYMBOL_GPL(serdev_device_set_flow_control);
->>>> 
->>>> +void serdev_device_set_parity(struct serdev_device *serdev, bool enable,
->>>> +                           bool odd)
->>>> +{
->>>> +     struct serdev_controller *ctrl = serdev->ctrl;
->>>> +
->>>> +     if (!ctrl || !ctrl->ops->set_parity)
->>>> +             return;
->>>> +
->>>> +     ctrl->ops->set_parity(ctrl, enable, odd);
->>>> +}
->>>> +EXPORT_SYMBOL_GPL(serdev_device_set_parity);
->>>> +
+>>> Currently runtime PM is only enabled if a valid host wake IRQ was found.
 >>> 
->>> this really needs Rob’s ACK before I take the patch.
->> sure
+>>> However it is used in ways which seem unrelated to host wake:
+>>> E.g., runtime PM is used to force the Bluetooth device on for 5 sec
+>>> after a complete packet has been received.
+>>> 
+>>> Afford this functionality to devices which lack an IRQ by moving the
+>>> code to enable runtime PM from bcm_request_irq() to bcm_setup().
 >> 
->> I could even live with a NACK in case these two bool parameters are
->> considered to be ugly
->> in that case I would propose an enum with three values: DISABLED,
->> EVEN, ODD so the arguments would look like this:
->> void serdev_device_set_parity(struct serdev_device *serdev, enum parity)
-> I just discovered: such a patch was already posted by Ulrich Hecht: [0]
+>> Hmm, this seems to not make much sense. If runtime_pm is not enabled
+>> (no host wake irq) then the device never runtime suspends, so there
+>> is no need to force the device on when we're sending / after a
+>> complete packet has been received.
+>> 
+>> That you give "after a complete packet has been received" as condition
+>> example illustrates nicely why I believe this commit is a bad idea,
+>> if say a bluetooth keyboard wants to send a keypress HID report after
+>> the runtime pm timeout has elapsed, how are we going to receive that
+>> report since we're runtime suspended and there is no host wake irq
+>> to tell us to wakeup the UART and enable receiving on it again?
 > 
+> The host UART on MacBooks apparently never runtime suspends, so this
+> couldn't have been observed during testing:
 > 
-> [0] https://patchwork.kernel.org/patch/9903787/
+> They use either 8250_lpss.c (which has no runtime PM callbacks)
+> or 8250_dw.c (which disables the clock during runtime suspend,
+> but the MacBooks use a fixed rate clock which can't be disabled).
+> Moreover intel_lpss_suspend() excludes the UART from being put
+> into reset.
+> 
+> But the objection is valid so I withdraw this patch.
+> 
+> On MacBooks the host wake pin is ORed with the wake pin of the trackpad
+> and keyboard and goes into the SMC.  I think it is only meant to be
+> used to wake the system from sleep and not to provide an interrupt
+> at runtime.  In theory we could request the SMC's GPE but we couldn't
+> tell if the interrupt was sent by the trackpad/keyboard or by the
+> Bluetooth controller, or was caused by something else entirely.
+> 
+> So it's probably better not to use runtime PM at all.  Let me rework
+> patch [10/10] and remove this hunk:
+> 
+> +	/* Macs wire the host wake pin to the System Management Controller,
+> +	 * which handles wakeup independently of the operating system.
+> +	 */
+> +	if (x86_apple_machine) {
+> +		err = 0;
+> +		goto unlock;
+> +	}
+> +
+> 
+> I notice that command 0xfc27 is used to write the sleep_params.
+> Does anyone know the command to read them so that we can check the
+> defaults Apple is using and find out if they can be optimized?
 
-any idea what the status of this one is? It would be good if we get an ACK from Rob and you just include it in your patch series. I do not see it currently in Linus’ tree or net-next. If it goes via a different path to Linus, we will have a bit of a problem getting this all merged for the next kernel.
+the Read Sleepmode Param is 0xfc28 and requires no parameters. You can check monitor/broadcom.c for a bunch of these commands since btmon will decode them for you if possible. Might want to actually post the btmon log of the init sequence here for reference (just blacklist the module and load it manually after starting btmon).
+
+I thought that I created a Broadcom specific init that reads most of the standard values so we have them for reference in the btmon logs. However it seems I have not done that for Sleepmode Param at the moment.
+
+>> I don't see how runtime pm can work without a host-wake IRQ,
+>> so IMHO this commit is wrong. Tip when testing this, make sure
+>> that you don't have the bluetooth config panel of e.g. gnome3
+>> open as that continuously scans for new devices, so runtime pm
+>> never kicks in. I've had a bad configured host IRQ pin on some
+>> ASUS laptops using serdev bcm bt and the only way a bt keyboard
+>> would work reliable was to keep the config panel open...
+> 
+> I don't have one of these MacBooks, I'm submitting patches on
+> behalf of others, but I'm told that having the gnome panel open
+> leads to choppy audio on these machines.  Is that normal?
+> The Bluetooth controllers are fixed to a baudrate of 3 Mbit
+> on these machines.
+
+They need to run btmon and see what is actually going on.
 
 Regards
 
