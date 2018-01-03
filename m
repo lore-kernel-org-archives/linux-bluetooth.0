@@ -1,74 +1,87 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1515006492.7000.639.camel@linux.intel.com>
-Subject: Re: [PATCH v2 09/10] Bluetooth: hci_bcm: Handle errors properly
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Frederic Danis <frederic.danis.oss@gmail.com>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>,
-        Daniel Roschka <danielroschka@phoenitydawn.de>,
-        Ronald Tschalaer <ronald@innovation.ch>,
-        "Peter Y. Chuang" <peteryuchuang@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date: Wed, 03 Jan 2018 21:08:12 +0200
-In-Reply-To: <20180103185422.GA17983@wunner.de>
-References: <cover.1514916630.git.lukas@wunner.de>
-         <a91a911d570345ea15935f3db8ddd66aa8986661.1514916630.git.lukas@wunner.de>
-         <1514995722.7000.578.camel@linux.intel.com>
-         <20180103185422.GA17983@wunner.de>
+Return-Path: <robh+dt@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <CAFBinCBNro18Ak3h1fHFpAioDzimh5KcUeOE8PjQr_CCkAs7PA@mail.gmail.com>
+References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
+ <20180101204217.26165-3-martin.blumenstingl@googlemail.com>
+ <2A1D60F1-F86F-4A2B-A43A-F3419506DE99@holtmann.org> <CAFBinCBNro18Ak3h1fHFpAioDzimh5KcUeOE8PjQr_CCkAs7PA@mail.gmail.com>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Wed, 3 Jan 2018 13:07:28 -0600
+Message-ID: <CAL_JsqLRkicv0p8ur==mq3bCp6Sn7b41M+CoFYx_qrhcdsY9Qg@mail.gmail.com>
+Subject: Re: [RFC v2 2/9] dt-bindings: net: bluetooth: add support for Realtek
+ Bluetooth chips
+To: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, devicetree <devicetree@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
+	Mark Rutland <mark.rutland@arm.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>, linux-amlogic@lists.infradead.org,
+	Larry Finger <Larry.Finger@lwfinger.net>, Carlo Caione <carlo@endlessm.com>,
+	Daniel Drake <drake@endlessm.com>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2018-01-03 at 19:54 +0100, Lukas Wunner wrote:
-> On Wed, Jan 03, 2018 at 06:08:42PM +0200, Andy Shevchenko wrote:
-> > On Tue, 2018-01-02 at 20:08 +0100, Lukas Wunner wrote:
-> > > +	int err = 0;
-> > 
-> > Obviously redundant assignment.
-> 
-> No, you need to look at it in the context of patch [10/10], which
-> changes
-> the following portion of bcm_gpio_set_power():
+On Tue, Jan 2, 2018 at 3:10 PM, Martin Blumenstingl
+<martin.blumenstingl@googlemail.com> wrote:
+> Hi Marcel,
+>
+> On Tue, Jan 2, 2018 at 12:16 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Martin,
+>>
+>>> This adds the documentation for Bluetooth functionality of the Realtek
+>>> RTL8723BS and RTL8723DS.
+>>> Both are SDIO wifi chips with an additional Bluetooth module which is
+>>> connected via UART to the host.
+>>>
+>>> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+>>> ---
+>>> .../devicetree/bindings/net/realtek-bluetooth.txt  | 41 ++++++++++++++++++++++
+>>> 1 file changed, 41 insertions(+)
+>>> create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+>>> new file mode 100644
+>>> index 000000000000..1491329c4cd1
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+>>> @@ -0,0 +1,41 @@
+>>> +Realtek Bluetooth Chips
+>>> +-----------------------
+>>> +
+>>> +This documents the binding structure and common properties for serial
+>>> +attached Realtek devices.
+>>> +
+>>> +Serial attached Realtek devices shall be a child node of the host UART
+>>> +device the slave device is attached to. See ../serial/slave-device.txt
+>>> +for more information
+>>> +
+>>> +Required properties:
+>>> +- compatible: should contain one of the following:
+>>> +    * "realtek,rtl8723bs-bluetooth"
+>>> +    * "realtek,rtl8723ds-bluetooth"
+>>> +
+>>> +Optional properties:
+>>> +- realtek,config-data: Bluetooth chipset configuration data which is
+>>> +                     needed for communication (it typically contains
+>>> +                     board specific settings like the baudrate and
+>>> +                     whether flow-control is used).
+>>> +                     This is an array of u8 values.
+>>
+>> any chance we can at least include the basic format of these config blobs. And I prefer at least an ACK from Rob here.
+> with including the basic format you mean a description that the config
+> blob should start with 0x55 0xab 0x23 0x87 (which translates to:
+> 0x8723ab55)?
 
-Then why this assignment here?
+That and the size if it is fixed (or fixed per compatible). Also,
+would be useful to state what are the defaults if not present.
 
-Move it to related patch.
+If it is all documented somewhere else, a pointer to that is fine.
 
-> 
-> -	gpiod_set_value(dev->shutdown, powered);
-> +	if (x86_apple_machine)
-> +		err = bcm_apple_set_power(dev, powered);
-> +	else
-> +		gpiod_set_value(dev->shutdown, powered);
-> +	if (err)
-> +		goto err_clk_disable;
-> 
-> I need to set err = 0 in case the gpiod_set_value() code path is
-> chosen.
-> 
-> Of course I could only declare "int err;" in this patch and change it
-> to
-> "int err = 0;" in the next patch, but then I would expect an objection
-> along the lines of:  You're changing code you've just added in the
-> prior
-> patch, this is silly.
+> I think all non-trivial dt-binding patches should be ACKed by the DT
+> maintainers, so waiting for Rob's ACK is perfectly fine for me
+>
+>>> +- enable-gpios: GPIO specifier, used to enable/disable the BT module
+>>> +- reset-gpios: GPIO specifier, used to reset the BT module
 
-Nope. Assignment belongs to when code really needs it. It overrides
-ping-ponging style in this case I suppose.
+These should state active high or low.
 
-> Long term the gpio API will be changed such that gpiod_set_value()
-> returns a negative errno or 0 (instead of void), as we're already
-> doing for gpiod_get_value().  *Then* I can change this to declare
-> "int err;" and set "err = gpiod_set_value(...)".
-
-It's a good roadmap, though out of scope of the current approach AFAICS.
-
--- 
-Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Intel Finland Oy
+Rob
