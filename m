@@ -1,57 +1,64 @@
-Return-Path: <foo00@h08.hostsharing.net>
-Date: Wed, 3 Jan 2018 14:22:21 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Frederic Danis <frederic.danis.oss@gmail.com>,
-	Loic Poulain <loic.poulain@linaro.org>, Max Shavrick <mxms@me.com>,
-	Leif Liddy <leif.liddy@gmail.com>,
-	Daniel Roschka <danielroschka@phoenitydawn.de>,
-	Ronald Tschalaer <ronald@innovation.ch>,
-	"Peter Y. Chuang" <peteryuchuang@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 03/10] Bluetooth: hci_bcm: Enable runtime PM despite
- absence of IRQ
-Message-ID: <20180103132221.GA17027@wunner.de>
+Return-Path: <andriy.shevchenko@linux.intel.com>
+Message-ID: <1514984939.7000.571.camel@linux.intel.com>
+Subject: Re: [PATCH v2 06/10] Bluetooth: hci_bcm: Silence IRQ printk
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Lukas Wunner <lukas@wunner.de>, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>, Frederic Danis
+ <frederic.danis.oss@gmail.com>, Loic Poulain <loic.poulain@linaro.org>,
+ Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>, Leif Liddy
+ <leif.liddy@gmail.com>,  Daniel Roschka <danielroschka@phoenitydawn.de>,
+ Ronald Tschalaer <ronald@innovation.ch>, "Peter Y. Chuang"
+ <peteryuchuang@gmail.com>, linux-bluetooth@vger.kernel.org
+Date: Wed, 03 Jan 2018 15:08:59 +0200
+In-Reply-To: <ae2d4efbe3ffbaf8b979f1b8a192cbb17d97499d.1514916630.git.lukas@wunner.de>
 References: <cover.1514916630.git.lukas@wunner.de>
- <36e7c22493235863c2ab9dd9d7aa382a3fc15675.1514916630.git.lukas@wunner.de>
- <ffd03fb7-6caa-8128-03ba-fc4cb63328ea@redhat.com>
- <20180102233648.GA15299@wunner.de>
- <FDB414A4-5E3E-40B9-B725-CEB0ADC01A5E@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <FDB414A4-5E3E-40B9-B725-CEB0ADC01A5E@holtmann.org>
+	 <ae2d4efbe3ffbaf8b979f1b8a192cbb17d97499d.1514916630.git.lukas@wunner.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jan 03, 2018 at 01:34:00PM +0100, Marcel Holtmann wrote:
-> > I notice that command 0xfc27 is used to write the sleep_params.
-> > Does anyone know the command to read them so that we can check the
-> > defaults Apple is using and find out if they can be optimized?
+On Tue, 2018-01-02 at 20:08 +0100, Lukas Wunner wrote:
+> The host wake IRQ is optional, but if none is found, "BCM irq: -22" is
+> logged which may irritate users.  This is really a debug message, so
+> use
+> dev_dbg() instead of dev_info().  If users are interested in the IRQ,
+> they can always consult /proc/interrupts.
+
+I object to do in the way how it's done in this patch. See below.
+
 > 
-> the Read Sleepmode Param is 0xfc28 and requires no parameters. You can
-> check monitor/broadcom.c for a bunch of these commands since btmon will
-> decode them for you if possible. Might want to actually post the btmon
-> log of the init sequence here for reference (just blacklist the module
-> and load it manually after starting btmon).
+> Cc: Frédéric Danis <frederic.danis.oss@gmail.com>
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> ---
+>  drivers/bluetooth/hci_bcm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> I thought that I created a Broadcom specific init that reads most of
-> the standard values so we have them for reference in the btmon logs.
-> However it seems I have not done that for Sleepmode Param at the moment.
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 01d0943b7bbb..632939d413df 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -798,7 +798,7 @@ static int bcm_get_resources(struct bcm_device
+> *dev)
+>  		dev->irq = gpiod_to_irq(gpio);
+>  	}
+>  
+> -	dev_info(dev->dev, "BCM irq: %d\n", dev->irq);
+> +	dev_dbg(dev->dev, "BCM irq: %d\n", dev->irq);
 
-Thanks!
+Perhaps, instead you may add same check
 
-I've now been able to dig up v1.6 of the Laird SD40 firmware datasheet.
+if (dev->irq > 0)
+ dev_info(...);
+else
+ dev_info(..., "BCM irq not in use\n");
 
-There's an incongruence between the datasheet and struct bcm_set_sleep_mode
-(as declared in drivers/bluetooth/btbcm.h and hci_bcm.c) wherein the order
-of pulsed_host_wake and break_to_host is reversed.
+?
 
-The datasheet is dated Oct 2015, so fairly recent, making it appear more
-likely that the datasheet is correct and our code is wrong?
+>  	return 0;
+>  }
+>  
 
-Kind regards,
-
-Lukas
+-- 
+Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Intel Finland Oy
