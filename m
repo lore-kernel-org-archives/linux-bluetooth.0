@@ -2,11 +2,10 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH v2 02/10] Bluetooth: hci_bcm: Mandate presence of shutdown
- and device wake GPIO
+Subject: Re: [PATCH v2 10/10] Bluetooth: hci_bcm: Support Apple GPIO handling
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <326876dfe41874a7346339a3f6d0c54f25dceee5.1514916630.git.lukas@wunner.de>
-Date: Wed, 3 Jan 2018 13:55:04 +0100
+In-Reply-To: <477d9c5294b1d1df06942cd1c30238d91d900253.1514916630.git.lukas@wunner.de>
+Date: Wed, 3 Jan 2018 13:55:02 +0100
 Cc: Johan Hedberg <johan.hedberg@gmail.com>,
         Mika Westerberg <mika.westerberg@linux.intel.com>,
         Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
@@ -17,119 +16,173 @@ Cc: Johan Hedberg <johan.hedberg@gmail.com>,
         Daniel Roschka <danielroschka@phoenitydawn.de>,
         Ronald Tschalaer <ronald@innovation.ch>,
         "Peter Y. Chuang" <peteryuchuang@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Uwe Kleine-Koenig <u.kleine-koenig@pengutronix.de>
-Message-Id: <16842431-46D3-48B0-9EE7-AC66ABF8DDD9@holtmann.org>
+        linux-bluetooth@vger.kernel.org
+Message-Id: <208078A2-704E-4C75-94D1-20EDCEEC5674@holtmann.org>
 References: <cover.1514916630.git.lukas@wunner.de>
- <326876dfe41874a7346339a3f6d0c54f25dceee5.1514916630.git.lukas@wunner.de>
+ <477d9c5294b1d1df06942cd1c30238d91d900253.1514916630.git.lukas@wunner.de>
 To: Lukas Wunner <lukas@wunner.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lukas,
 
-> Commit 0395ffc1ee05 ("Bluetooth: hci_bcm: Add PM for BCM devices")
-> amended this driver to request a shutdown and device wake GPIO on probe,
-> but mandated that only one of them need to be present:
+> Enable Bluetooth on the following Macs which provide custom ACPI methods
+> to toggle the GPIOs for device wake and shutdown instead of accessing
+> the pins directly:
 > 
-> 	/* Make sure at-least one of the GPIO is defined and that
-> 	 * a name is specified for this instance
-> 	 */
-> 	if ((!dev->device_wakeup && !dev->shutdown) || !dev->name) {
-> 		dev_err(&pdev->dev, "invalid platform data\n");
-> 		return -EINVAL;
-> 	}
+>    MacBook8,1     2015  12"
+>    MacBook9,1     2016  12"
+>    MacBook10,1    2017  12"
+>    MacBookPro13,1 2016  13"
+>    MacBookPro13,2 2016  13" with Touch Bar
+>    MacBookPro13,3 2016  15" with Touch Bar
+>    MacBookPro14,1 2017  13"
+>    MacBookPro14,2 2017  13" with Touch Bar
+>    MacBookPro14,3 2017  15" with Touch Bar
 > 
-> However the same commit added a call to bcm_gpio_set_power() to the
-> ->probe hook, which unconditionally accesses *both* GPIOs.  Luckily,
-> the resulting NULL pointer deref was never reported, suggesting there's
-> no machine where either GPIO is missing.
+> On the MacBook8,1 Bluetooth is muxed with a second device (a debug port
+> on the SSD) under the control of PCH GPIO 36.  Because serdev cannot
+> deal with multiple slaves yet, it is currently necessary to patch the
+> DSDT and remove the SSDC device.
 > 
-> Commit 8a92056837fd ("Bluetooth: hci_bcm: Add (runtime)pm support to the
-> serdev driver") removed the check whether at least one of the GPIOs is
-> present without specifying a reason.
+> The custom ACPI methods are called:
 > 
-> Because commit 62aaefa7d038 ("Bluetooth: hci_bcm: improve use of gpios
-> API") refactored the driver to use devm_gpiod_get_optional() instead of
-> devm_gpiod_get(), one is now tempted to believe that the driver doesn't
-> require *any* of the two GPIOs.
+>    BTLP (Low Power) takes one argument, toggles device wake GPIO
+>    BTPU (Power Up) tells SMC to drive shutdown GPIO high
+>    BTPD (Power Down) tells SMC to drive shutdown GPIO low
+>    BTRS (Reset) calls BTPD followed by BTPU
+>    BTRB unknown, not present on all MacBooks
 > 
-> Which is wrong, the driver still requires both GPIOs to avoid a NULL
-> pointer deref.  To this end, establish the status quo ante and request
-> the GPIOs with devm_gpiod_get() again.  Bail out of ->probe if either
-> of them is missing.
+> Search for the BTLP, BTPU and BTPD methods on ->probe and cache them in
+> struct bcm_device if the machine is a Mac.
 > 
-> Oddly enough, whereas bcm_gpio_set_power() accesses the device wake pin
-> unconditionally, bcm_suspend_device() and bcm_resume_device() do check
-> for its presence before accessing it.  Those checks are superfluous,
-> so remove them.
+> Additionally, set the init_speed based on a custom device property
+> provided by Apple in lieu of _CRS resources.  The Broadcom UART's speed
+> is fixed on Apple Macs:  Any attempt to change it results in Bluetooth
+> status code 0x0c and bcm_set_baudrate() thus always returns -EBUSY.
+> By setting only the init_speed and leaving oper_speed at zero, we can
+> achieve that the host UART's speed is adjusted but the Broadcom UART's
+> speed is left as is.
 > 
+> The host wake pin goes into the SMC which handles it independently
+> of the OS, so there's no IRQ for it.
+> 
+> Thanks to Ronald Tschalär who did extensive debugging and testing of
+> this patch and contributed fixes.
+> 
+> ACPI snippet containing the custom methods and device properties
+> (taken from a MacBook8,1):
+> 
+>    Method (BTLP, 1, Serialized)
+>    {
+>        If (LEqual (Arg0, 0x00))
+>        {
+>            Store (0x01, GD54) /* set PCH GPIO 54 direction to input */
+>        }
+> 
+>        If (LEqual (Arg0, 0x01))
+>        {
+>            Store (0x00, GD54) /* set PCH GPIO 54 direction to output */
+>            Store (0x00, GP54) /* set PCH GPIO 54 value to low */
+>        }
+>    }
+> 
+>    Method (BTPU, 0, Serialized)
+>    {
+>        Store (0x01, \_SB.PCI0.LPCB.EC.BTPC)
+>        Sleep (0x0A)
+>    }
+> 
+>    Method (BTPD, 0, Serialized)
+>    {
+>        Store (0x00, \_SB.PCI0.LPCB.EC.BTPC)
+>        Sleep (0x0A)
+>    }
+> 
+>    Method (BTRS, 0, Serialized)
+>    {
+>        BTPD ()
+>        BTPU ()
+>    }
+> 
+>    Method (_DSM, 4, NotSerialized)  // _DSM: Device-Specific Method
+>    {
+>        If (LEqual (Arg0, ToUUID ("a0b5b7c6-1318-441c-b0c9-fe695eaf949b")))
+>        {
+>            Store (Package (0x08)
+>                {
+>                    "baud",
+>                    Buffer (0x08)
+>                    { 0xC0, 0xC6, 0x2D, 0x00, 0x00, 0x00, 0x00, 0x00 },
+> 
+>                    "parity",
+>                    Buffer (0x08)
+>                    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+> 
+>                    "dataBits",
+>                    Buffer (0x08)
+>                    { 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
+> 
+>                    "stopBits",
+>                    Buffer (0x08)
+>                    { 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
+>                }, Local0)
+>            DTGP (Arg0, Arg1, Arg2, Arg3, RefOf (Local0))
+>            Return (Local0)
+>        }
+>        Return (0x00)
+>    }
+> 
+> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=110901
+> Reported-by: Leif Liddy <leif.liddy@gmail.com>
+> Cc: Mika Westerberg <mika.westerberg@linux.intel.com>
+> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > Cc: Frédéric Danis <frederic.danis.oss@gmail.com>
 > Cc: Loic Poulain <loic.poulain@linaro.org>
 > Cc: Hans de Goede <hdegoede@redhat.com>
-> Cc: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Cc: Linus Walleij <linus.walleij@linaro.org>
+> Tested-by: Max Shavrick <mxms@me.com>                     [MacBook8,1]
+> Tested-by: Leif Liddy <leif.liddy@gmail.com>              [MacBook9,1]
+> Tested-by: Daniel Roschka <danielroschka@phoenitydawn.de> [MacBookPro13,2]
+> Tested-by: Ronald Tschalär <ronald@innovation.ch>         [MacBookPro13,3]
+> Tested-by: Peter Y. Chuang <peteryuchuang@gmail.com>      [MacBookPro14,1]
+> Signed-off-by: Ronald Tschalär <ronald@innovation.ch>
 > Signed-off-by: Lukas Wunner <lukas@wunner.de>
 > ---
-> drivers/bluetooth/hci_bcm.c | 24 +++++++++---------------
-> 1 file changed, 9 insertions(+), 15 deletions(-)
+> Changes since v1:
+>  add DSDT excerpt to the commit message,
+>  drop ternary operators for readability,
+>  return -EIO instead of -EFAULT if ACPI method calls fail,
+>  return -EOPNOTSUPP in inline stubs,
+>  use network subsystem comment style. (Marcel, Hans, Andy)
+>  Also, to accommodate to mandatory presence of the two GPIOs as per
+>  patch [2/10], rename bcm_apple_probe() to bcm_apple_get_resources()
+>  and call it from bcm_get_resources() instead of bcm_acpi_probe().
+> 
+> drivers/bluetooth/hci_bcm.c | 76 +++++++++++++++++++++++++++++++++++++++++++--
+> 1 file changed, 74 insertions(+), 2 deletions(-)
 > 
 > diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index 1fc604a0d870..4294d9df1d4d 100644
+> index ad6b7c35eb8e..4e0ba38d39d2 100644
 > --- a/drivers/bluetooth/hci_bcm.c
 > +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -572,11 +572,9 @@ static int bcm_suspend_device(struct device *dev)
-> 	}
-> 
-> 	/* Suspend the device */
-> -	if (bdev->device_wakeup) {
-> -		gpiod_set_value(bdev->device_wakeup, false);
-> -		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
-> -		mdelay(15);
-> -	}
-> +	gpiod_set_value(bdev->device_wakeup, false);
-> +	bt_dev_dbg(bdev, "suspend, delaying 15 ms");
-> +	mdelay(15);
-> 
-> 	return 0;
-> }
-> @@ -587,11 +585,9 @@ static int bcm_resume_device(struct device *dev)
-> 
-> 	bt_dev_dbg(bdev, "");
-> 
-> -	if (bdev->device_wakeup) {
-> -		gpiod_set_value(bdev->device_wakeup, true);
-> -		bt_dev_dbg(bdev, "resume, delaying 15 ms");
-> -		mdelay(15);
-> -	}
-> +	gpiod_set_value(bdev->device_wakeup, true);
-> +	bt_dev_dbg(bdev, "resume, delaying 15 ms");
-> +	mdelay(15);
-> 
-> 	/* When this executes, the device has woken up already */
-> 	if (bdev->is_suspended && bdev->hu) {
-> @@ -774,14 +770,12 @@ static int bcm_get_resources(struct bcm_device *dev)
-> 
-> 	dev->clk = devm_clk_get(dev->dev, NULL);
-> 
-> -	dev->device_wakeup = devm_gpiod_get_optional(dev->dev,
-> -						     "device-wakeup",
-> -						     GPIOD_OUT_LOW);
-> +	dev->device_wakeup = devm_gpiod_get(dev->dev, "device-wakeup",
-> +							     GPIOD_OUT_LOW);
+> @@ -29,6 +29,7 @@
+> #include <linux/acpi.h>
+> #include <linux/of.h>
+> #include <linux/property.h>
+> +#include <linux/platform_data/x86/apple.h>
+> #include <linux/platform_device.h>
+> #include <linux/clk.h>
+> #include <linux/gpio/consumer.h>
+> @@ -75,6 +76,9 @@
+>  * @hu: pointer to HCI UART controller struct,
+>  *	used to enable flow control during runtime suspend and system sleep
+>  * @is_suspended: whether flow control is currently enabled
+> + * @btlp: Apple ACPI method to toggle BT_WAKE pin ("BlueTooth Low Power")
+> + * @btpu: Apple ACPI method to drive BT_REG_ON pin high ("BlueTooth Power Up")
+> + * @btpd: Apple ACPI method to drive BT_REG_ON pin low ("BlueTooth Power Down”)
+>  */
 
-I prefer that we keep netdev indentation style.
-
-> 	if (IS_ERR(dev->device_wakeup))
-> 		return PTR_ERR(dev->device_wakeup);
-> 
-> -	dev->shutdown = devm_gpiod_get_optional(dev->dev, "shutdown",
-> -						GPIOD_OUT_LOW);
-> +	dev->shutdown = devm_gpiod_get(dev->dev, "shutdown", GPIOD_OUT_LOW);
-> 	if (IS_ERR(dev->shutdown))
-> 		return PTR_ERR(dev->shutdown);
+unless the Apple ACPI table really use the string “BlueTooth”, I prefer that we use the proper “Bluetooth” string here.
 
 Regards
 
