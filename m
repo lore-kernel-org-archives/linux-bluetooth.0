@@ -1,58 +1,134 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <martin.blumenstingl@googlemail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHU4CUJxjE=7J6KybKcxqBo6MGvA4+g5-6b+ktwSM82B_r9BDA@mail.gmail.com>
-References: <CAHU4CUJxjE=7J6KybKcxqBo6MGvA4+g5-6b+ktwSM82B_r9BDA@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 3 Jan 2018 19:25:22 -0200
-Message-ID: <CABBYNZKeWT+vXc-o3tDkMJbeZJRdz2Qx6WOc-mDU2RX6Z3o0VQ@mail.gmail.com>
-Subject: Re: Pairing when already paired results in a hang
-To: Ahmed Alsharif <ahmeds2000x@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAL9uMOFyfr_qGf5BeTojkMeWeH8LqPoKj=LrdgEMB2wmhGBxmA@mail.gmail.com>
+References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
+ <20180101204217.26165-8-martin.blumenstingl@googlemail.com>
+ <563D6F9F-8495-40D4-BE56-5338ED2B9B99@holtmann.org> <CAL9uMOEMDup4hRkxD-tM8R0YirGs5uQi31AjJUnFCPNMKUdRHg@mail.gmail.com>
+ <E8E39477-CF1A-4A3E-84C5-830E182C2266@holtmann.org> <CAL9uMOH0N-4jgQncmPjK-KyU0vY9Q0ZnHYSAGgz3z3ywzc8Avw@mail.gmail.com>
+ <CAFBinCBB=SmviOMRHGDH6vzjTjV-mrtQEc8nBUhDbJGs9SBpgw@mail.gmail.com> <CAL9uMOFyfr_qGf5BeTojkMeWeH8LqPoKj=LrdgEMB2wmhGBxmA@mail.gmail.com>
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Wed, 3 Jan 2018 21:50:22 +0100
+Message-ID: <CAFBinCAFsDRpp=4We1hQPiutM1Q0MrqebPLyS3e2_e+JcBoSmg@mail.gmail.com>
+Subject: Re: [RFC v2 7/9] bluetooth: btrtl: load the config blob from
+ devicetree when available
+To: Carlo Caione <carlo@endlessm.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Rob Herring <robh+dt@kernel.org>,
+	devicetree <devicetree@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
+	Mark Rutland <mark.rutland@arm.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, gregkh@linuxfoundation.org, jslaby@suse.com,
+	johan@kernel.org, linux-amlogic@lists.infradead.org,
+	Larry.Finger@lwfinger.net, Daniel Drake <drake@endlessm.com>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ahmed,
+Hi Carlo,
 
-On Tue, Jan 2, 2018 at 7:49 PM, Ahmed Alsharif <ahmeds2000x@gmail.com> wrote:
-> Hey,
+On Wed, Jan 3, 2018 at 12:06 AM, Carlo Caione <carlo@endlessm.com> wrote:
+> On Tue, Jan 2, 2018 at 9:46 PM, Martin Blumenstingl
+> <martin.blumenstingl@googlemail.com> wrote:
+>> Hi Carlo,
 >
-> I've noticed that when using the Pair() method on a device already
-> paired, it hangs indefinitely (never returns a reply), or potentially
-> returns an AuthenticationCancelled error, when the device disappears.
-> The comments in the pair_device(...) function say something about an
-> SMP bug, and the comments in adapter_bonding_attempt(...) also mention
-> a bug about some LE pairing requests never timing out.
-> I'm not really sure if the behavior I mentioned has something to do
-> with the bug/bugs from the comments or not, so I'm wondering if
-> there's a reason for not checking if the device is paired already or
-> not, before proceeding with the pairing?
+> Hi Martin,
 >
-> The following patch stops the indefinite hang for me on second pairing
-> attempts, and still achieves the side effects of pairing, e.g.
-> connecting. I'm not 100% sure however that this isn't causing
-> different problems.
+>> On Tue, Jan 2, 2018 at 12:31 PM, Carlo Caione <carlo@endlessm.com> wrote=
+:
+>>> On Tue, Jan 2, 2018 at 11:19 AM, Marcel Holtmann <marcel@holtmann.org> =
+wrote:
+>>>> Hi Carlo,
+>>>>
+>>>>>>> Some Realtek bluetooth devices need a "config" blob. The btrtl driv=
+er
+>>>>>>> currently only allows loading this config blob via the request_firm=
+ware
+>>>>>>> mechanism.
+>>>>>>>
+>>>>>>> The UART Bluetooth chips use this config blob to specify the baudra=
+te,
+>>>>>>> whether flow control is used and some other unknown bits. This mean=
+s
+>>>>>>> that the config blob is board-specific - thus loading it via
+>>>>>>> request_firmware means that the rootfs is tied to a specific board.
+>>>>>>>
+>>>>>>> The UART Bluetooth chips are implemented through serdev. This means
+>>>>>>> there is also a devicetree node which describes the Bluetooth chip.
+>>>>>>> Thus we can also load the blob from the devicetree node to keep the
+>>>>>>> filesystem independent of any board configuration data. In the futu=
+re
+>>>>>>> this could be extended to support ACPI as well (in case that's need=
+ed).
+>>>>>>>
+>>>>>>> Parse the devicetree node if it exists and obtain the config blob f=
+rom
+>>>>>>> there. Otherwise fall back to using the "old" request_firmware
+>>>>>>> mechanism.
+>>>>>>
+>>>>>> where are these config blobs coming from? I think we also need to gi=
+ve people a helping hand on how to add them to DT. I still wonder if the on=
+ly pieces we are using are the UART config, then maybe skipping the config =
+blob and allowing for clear named values in DT might be better.
+>>>>>
+>>>>> What about x86 platforms where we do not have DT (I didn't check but =
+I
+>>>>> don't think that the UART config in that case is shipped in the ACPI
+>>>>> tables)?
+>>>>
+>>>> if we have this hardware in x86 systems, then I would really like to s=
+ee ACPI table dumps. Some pieces might need hardcoding based on ACPI ID.
+>>>
+>>> Yes, we have, especially on cherry-trail SoCs. In [0] the DSDT of a
+>>> cherry-trail laptop shipping the rtl8723bs (device OBDA8723).
+>>>
+>>> [0] https://gist.github.com/carlocaione/82bff95ababb67dd33f52a86e94ce3f=
+f
+>> so this shows that the UART settings (initial baudrate, HW flow
+>> control, etc.) are part of the DSDT
+>> however, the actual config blob is not
+>>
+>> the description of this patch explains: "Parse the devicetree node ...
+>> [or] ... fall back to using the "old" request_firmware mechanism."
+>> do you have any other solution in mind?
 >
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -2490,6 +2490,11 @@ static DBusMessage *pair_device(DBusConnection
-> *conn, DBusMessage *msg,
->         if (state->bonded)
->                 return btd_error_already_exists(msg);
->
-> +       if (state->paired) {
-> +               device->bredr_state.paired = false;
-> +               device->le_state.paired = false;
-> +       }
-> +
+> As Marcel suggested we can assume that the information in the DSDT is
+> correct so that we can get rid of the config blob also for x86
+> platforms (assuming that the only useful information in the config
+> blobs is the UART configuration).
+in my tests I tried to send only the firmware without the config to my
+RTL8723BS. unfortunately the last firmware chunk (sent to the
+controller) times out in that case (even if I set a proper baudrate
+before or if I specify no baudrate at all and keep the serdev at
+115200)
+have you tested this (=3D uploading the firmware without the config
+blob) on your x86 board before?
 
-Id say it is not a good idea to invalidate the current pairing upfront
-as the remote could be offline this could cause some side effects,
-besides we would need to clear the storage as well, perhaps the
-current logic is to try the new pairing first but there could be
-something preventing the new pairing to happen if it already exists so
-we need to check if there is a new pairing ongoing.
+so far the following solutions for the config blob were discussed:
+1) put the config blob in userspace (/lib/firmware/...) -> not good
+because it makes the rootfs board-specific
+2) auto-generate the config blob -> didn't work for me, last firmware
+chunk times out (just as if I had no config at all)
+3) putting the config blob in DT -> possible but not very nice to read
+
+I had another idea:
+what if we mix solution 1) and 2)?
+the idea: load the config blob from userspace (/lib/firmware/...) and
+update it's settings with the values we got from devicetree-properties
+/ DSDT
+I have not tested this yet, but I just want to hear everyone's (at
+least Marcel, Rob and Carlo) opinion on that
+(this would also allow us to fully auto-generate the config blob in
+the future once we figure out how to do that)
+
+> Adding the ACPI support on top of your patches is (hopefully) trivial,
+> just follow what was done for hci_bcm.c, basically adding a new _HID
+> and reading the configuration for GPIOs and UART, all the rest should
+> be transparent for serdev.
+thanks for the reference to hci_bcm.c - I will have a look at this for
+the next version
+one question: "_HID" would be OBDA8723 in our case?
+
+> I'll test your patches on the hardware I have.
+great, thank you!
 
 
--- 
-Luiz Augusto von Dentz
+Regards
+Martin
