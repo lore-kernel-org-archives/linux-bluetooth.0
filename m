@@ -1,79 +1,74 @@
-Return-Path: <martin.blumenstingl@googlemail.com>
-MIME-Version: 1.0
-In-Reply-To: <CAMZdPi9KkPZvuvrNgfGmRksJnR0cFti8P5XC-HTFeUfkFbCZ_g@mail.gmail.com>
-References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
- <20180101204217.26165-9-martin.blumenstingl@googlemail.com>
- <5F8922BB-5A97-43B1-88D5-591EB76FF787@holtmann.org> <CAFBinCAxUmxivp_PWkoydha84LbJi-GGv6Uhs6cKR+D_8c8QCw@mail.gmail.com>
- <CAMZdPi9KkPZvuvrNgfGmRksJnR0cFti8P5XC-HTFeUfkFbCZ_g@mail.gmail.com>
-From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Date: Wed, 3 Jan 2018 21:30:15 +0100
-Message-ID: <CAFBinCCnRM2JhozueaenqGdcu3PJ0aXom+Rt__e6YQy85B=fEA@mail.gmail.com>
-Subject: Re: [RFC v2 8/9] Bluetooth: drop HCI_UART_INIT_PENDING support
-To: Loic Poulain <loic.poulain@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>, devicetree <devicetree@vger.kernel.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
-	Mark Rutland <mark.rutland@arm.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
-	Johan Hovold <johan@kernel.org>, linux-amlogic@lists.infradead.org,
-	Larry Finger <Larry.Finger@lwfinger.net>, Carlo Caione <carlo@endlessm.com>,
-	Daniel Drake <drake@endlessm.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <1515006492.7000.639.camel@linux.intel.com>
+Subject: Re: [PATCH v2 09/10] Bluetooth: hci_bcm: Handle errors properly
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Frederic Danis <frederic.danis.oss@gmail.com>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>,
+        Daniel Roschka <danielroschka@phoenitydawn.de>,
+        Ronald Tschalaer <ronald@innovation.ch>,
+        "Peter Y. Chuang" <peteryuchuang@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Date: Wed, 03 Jan 2018 21:08:12 +0200
+In-Reply-To: <20180103185422.GA17983@wunner.de>
+References: <cover.1514916630.git.lukas@wunner.de>
+         <a91a911d570345ea15935f3db8ddd66aa8986661.1514916630.git.lukas@wunner.de>
+         <1514995722.7000.578.camel@linux.intel.com>
+         <20180103185422.GA17983@wunner.de>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+On Wed, 2018-01-03 at 19:54 +0100, Lukas Wunner wrote:
+> On Wed, Jan 03, 2018 at 06:08:42PM +0200, Andy Shevchenko wrote:
+> > On Tue, 2018-01-02 at 20:08 +0100, Lukas Wunner wrote:
+> > > +	int err = 0;
+> > 
+> > Obviously redundant assignment.
+> 
+> No, you need to look at it in the context of patch [10/10], which
+> changes
+> the following portion of bcm_gpio_set_power():
 
-On Wed, Jan 3, 2018 at 6:14 PM, Loic Poulain <loic.poulain@linaro.org> wrote:
-> Hi Martin,
->
-> On 2 January 2018 at 22:06, Martin Blumenstingl
-> <martin.blumenstingl@googlemail.com> wrote:
->> Hi Marcel,
->>
->> thank you for looking into this latest version!
->>
->> On Tue, Jan 2, 2018 at 12:04 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->>> Hi Martin,
->>>
->>>> The three-wire (H5) protocol is the only protocol which uses
->>>> HCI_UART_INIT_PENDING.
->>>> Unfortunately the benefits of using this flag are currently unknown. It
->>>> was added in commit 9f2aee848fe6 ("Bluetooth: Add delayed init sequence
->>>> support for UART controllers"). In my experiments (with the
->>>> "rtk_hciattach" tool - a customized version of hciattach for Realtek
->>>> chipsets) I started the tool before and after this patch while the
->>>> Bluetooth chipset was disabled (by pulling it's enable GPIO LOW). In
->>>> both cases hci0 was not created - thus HCI_UART_INIT_PENDING is not
->>>> required in that case.
->>>>
->>>> Removing this code also has another benefit: hci_serdev.c does not
->>>> support the delayed initialization / registration. Thus the protocol
->>>> implementation (hci_h5) never receives any data with this check still
->>>> in place. For the H5 protocol this means that the initialization never
->>>> completes (because the sync response never arrives). Even if the
->>>> initialization would succeed later on the drivers would call
->>>> hci_uart_init_ready() which schedules the registration which is
->>>> currently not implemented by hci_serdev.c.
->>>>
->>>> Removing the HCI_UART_INIT_PENDING check makes the code easier to read
->>>> and also fixes the initalization of devices (implemented with the serdev
->>>> library) which use the H5 protocol.
->>>>
->>>> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
->
-> I think the original goal is to perform H5 init peacefully.
-> The H5 protocol needs to be open in order to send/receive H5 link
-> packets during the H5 initialization/synchronization step.
-> During this stage, driver prevents upper stack to send any HCI packet
-> by delaying the HCI device registration.
-thank you for this explanation
-do you have a test-case (manual list of steps, a scripts, etc.) which
-I can use to compare the old and new behavior?
+Then why this assignment here?
 
-based on your explanation this would mean that we should add
-HCI_UART_INIT_PENDING support to the serdev code rather than removing
-it
+Move it to related patch.
 
+> 
+> -	gpiod_set_value(dev->shutdown, powered);
+> +	if (x86_apple_machine)
+> +		err = bcm_apple_set_power(dev, powered);
+> +	else
+> +		gpiod_set_value(dev->shutdown, powered);
+> +	if (err)
+> +		goto err_clk_disable;
+> 
+> I need to set err = 0 in case the gpiod_set_value() code path is
+> chosen.
+> 
+> Of course I could only declare "int err;" in this patch and change it
+> to
+> "int err = 0;" in the next patch, but then I would expect an objection
+> along the lines of:  You're changing code you've just added in the
+> prior
+> patch, this is silly.
 
-Regards
-Martin
+Nope. Assignment belongs to when code really needs it. It overrides
+ping-ponging style in this case I suppose.
+
+> Long term the gpio API will be changed such that gpiod_set_value()
+> returns a negative errno or 0 (instead of void), as we're already
+> doing for gpiod_get_value().  *Then* I can change this to declare
+> "int err;" and set "err = gpiod_set_value(...)".
+
+It's a good roadmap, though out of scope of the current approach AFAICS.
+
+-- 
+Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Intel Finland Oy
