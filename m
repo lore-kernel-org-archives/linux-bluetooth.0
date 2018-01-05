@@ -1,63 +1,127 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: btusb: Disable autosuspend on QCA Rome devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180104085154.31377-1-hdegoede@redhat.com>
-Date: Fri, 5 Jan 2018 15:31:45 +0100
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <FB7F6620-96C0-4539-B05D-96FA104CC166@holtmann.org>
-References: <20180104085154.31377-1-hdegoede@redhat.com>
-To: Hans de Goede <hdegoede@redhat.com>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH] monitor: Add support for reading multpli btsnoop files
+Date: Fri,  5 Jan 2018 12:54:13 +0100
+Message-Id: <20180105115413.3546-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hans,
+This allows to read concatenated btsnoop files that were previously
+created with btmon -w -l options. The output looks like if this was
+one btsnoop file.
+---
+ monitor/control.c |  4 ----
+ monitor/main.c    | 38 +++++++++++++++++++++++++++++++++-----
+ 2 files changed, 33 insertions(+), 9 deletions(-)
 
-> Commit fd865802c66b ("Bluetooth: btusb: fix QCA Rome suspend/resume") fixes
-> a suspend/resume problem on QCA devices by doing a full reset on resume,
-> reloading the firmware.
-> 
-> A similar problem happens when using runtime-pm / autosuspend, when this is
-> enabled by the user the QCA Rome device stops working. Reloading the
-> firmware after a runtime suspend is not really an option since the latency
-> caused by this is unacceptable.
-> 
-> To fix the runtime-pm issues, this commit disables runtime-pm on QCA Rome
-> HCIs, by getting (and not releasing) an usb autopm reference on the btusb
-> interface.
-> 
-> BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
-> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
-> ---
-> drivers/bluetooth/btusb.c | 7 +++++++
-> 1 file changed, 7 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 808c249845db..6ed3a0e5b8f6 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3122,8 +3122,15 @@ static int btusb_probe(struct usb_interface *intf,
-> 		/* QCA Rome devices lose their updated firmware over suspend,
-> 		 * but the USB hub doesn't notice any status change.
-> 		 * Explicitly request a device reset on resume.
-> +		 * And disable runtime pm by getting a pm reference, the USB
-> +		 * core will drop our reference on disconnect.
-> 		 */
-> 		set_bit(BTUSB_RESET_RESUME, &data->flags);
-> +		err = usb_autopm_get_interface(data->intf);
-> +		if (err < 0) {
-> +			BT_ERR("failed to get pm reference %d", err);
-> +			goto out_free_dev;
-> +		}
-> 	}
-
-is this still needed after commit 7d06d5895c159f6 that reverts this entry and adds a core USB quirk? See bluetooth-next tree for reference.
-
-Regards
-
-Marcel
+diff --git a/monitor/control.c b/monitor/control.c
+index 6b69f3575..1c7f1ee1a 100644
+--- a/monitor/control.c
++++ b/monitor/control.c
+@@ -1454,8 +1454,6 @@ void control_reader(const char *path)
+ 		break;
+ 	}
+ 
+-	open_pager();
+-
+ 	switch (format) {
+ 	case BTSNOOP_FORMAT_HCI:
+ 	case BTSNOOP_FORMAT_UART:
+@@ -1488,8 +1486,6 @@ void control_reader(const char *path)
+ 		break;
+ 	}
+ 
+-	close_pager();
+-
+ 	btsnoop_unref(btsnoop_file);
+ }
+ 
+diff --git a/monitor/main.c b/monitor/main.c
+index 3755d01ae..5e566201e 100644
+--- a/monitor/main.c
++++ b/monitor/main.c
+@@ -43,6 +43,7 @@
+ #include "analyze.h"
+ #include "ellisys.h"
+ #include "control.h"
++#include "display.h"
+ 
+ static void signal_callback(int signum, void *user_data)
+ {
+@@ -98,10 +99,24 @@ static const struct option main_options[] = {
+ 	{ }
+ };
+ 
++static char **reader_paths = NULL;
++static size_t reader_paths_cnt = 0;
++
++static void append_reader_path(char *path)
++{
++	char **paths;
++
++	paths = reallocarray(reader_paths, reader_paths_cnt + 1, sizeof(char *));
++	if (!paths)
++		return;
++
++	reader_paths = paths;
++	reader_paths[reader_paths_cnt++] = path;
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	unsigned long filter_mask = 0;
+-	const char *reader_path = NULL;
+ 	const char *writer_path = NULL;
+ 	const char *analyze_path = NULL;
+ 	const char *ellisys_server = NULL;
+@@ -139,7 +154,12 @@ int main(int argc, char *argv[])
+ 			}
+ 			break;
+ 		case 'r':
+-			reader_path = optarg;
++			append_reader_path(optarg);
++
++			/* check if more paths were provided */
++			while (optind < argc && *argv[optind] != '-')
++				append_reader_path(argv[optind++]);
++
+ 			break;
+ 		case 'w':
+ 			writer_path = optarg;
+@@ -233,8 +253,9 @@ int main(int argc, char *argv[])
+ 		return EXIT_FAILURE;
+ 	}
+ 
+-	if (reader_path && analyze_path) {
++	if (reader_paths && analyze_path) {
+ 		fprintf(stderr, "Display and analyze can't be combined\n");
++		free(reader_paths);
+ 		return EXIT_FAILURE;
+ 	}
+ 
+@@ -255,11 +276,18 @@ int main(int argc, char *argv[])
+ 		return EXIT_SUCCESS;
+ 	}
+ 
+-	if (reader_path) {
++	if (reader_paths) {
++		size_t i;
++
+ 		if (ellisys_server)
+ 			ellisys_enable(ellisys_server, ellisys_port);
+ 
+-		control_reader(reader_path);
++		open_pager();
++		for (i = 0; i < reader_paths_cnt; i++)
++			control_reader(reader_paths[i]);
++		close_pager();
++
++		free(reader_paths);
+ 		return EXIT_SUCCESS;
+ 	}
+ 
+-- 
+2.14.3
 
