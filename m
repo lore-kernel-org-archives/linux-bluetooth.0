@@ -1,139 +1,87 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [RFC v2 7/9] bluetooth: btrtl: load the config blob from
- devicetree when available
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1F394D8B-CFB8-48BA-BC6B-15D1EE51DB08@holtmann.org>
-Date: Fri, 5 Jan 2018 21:44:32 +0100
-Cc: Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-serial@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>,
-        linux-amlogic@lists.infradead.org,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        Daniel Drake <drake@endlessm.com>
-Message-Id: <41669609-3E28-473D-8616-71B9D0EEDCDF@holtmann.org>
-References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
- <20180101204217.26165-8-martin.blumenstingl@googlemail.com>
- <563D6F9F-8495-40D4-BE56-5338ED2B9B99@holtmann.org>
- <CAL9uMOEMDup4hRkxD-tM8R0YirGs5uQi31AjJUnFCPNMKUdRHg@mail.gmail.com>
- <E8E39477-CF1A-4A3E-84C5-830E182C2266@holtmann.org>
- <CAL9uMOH0N-4jgQncmPjK-KyU0vY9Q0ZnHYSAGgz3z3ywzc8Avw@mail.gmail.com>
- <CAFBinCBB=SmviOMRHGDH6vzjTjV-mrtQEc8nBUhDbJGs9SBpgw@mail.gmail.com>
- <CAL9uMOFyfr_qGf5BeTojkMeWeH8LqPoKj=LrdgEMB2wmhGBxmA@mail.gmail.com>
- <CAFBinCAFsDRpp=4We1hQPiutM1Q0MrqebPLyS3e2_e+JcBoSmg@mail.gmail.com>
- <CAL9uMOGkZefjD_JNxjf4yJ0ATFtOG5Cm_XQq1fy0VQDjiMFBmg@mail.gmail.com>
- <EC216531-81EC-4EE8-BAC4-C6954C222092@holtmann.org>
- <1F394D8B-CFB8-48BA-BC6B-15D1EE51DB08@holtmann.org>
-To: Carlo Caione <carlo@endlessm.com>
-Sender: linux-serial-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+From: Alfonso Acosta <alfonso.acosta@gmail.com>
+Date: Fri, 5 Jan 2018 20:41:11 +0100
+Message-ID: <CAFmMashE1ReOhQFe9OD2BrXooNGz_Gxa9gHLYfB+BgHLQsT5HA@mail.gmail.com>
+Subject: Overhead reduction in LE connection establishment
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Carlo,
+Hi there,
 
->>>>> As Marcel suggested we can assume that the information in the DSDT is
->>>>> correct so that we can get rid of the config blob also for x86
->>>>> platforms (assuming that the only useful information in the config
->>>>> blobs is the UART configuration).
->>>> in my tests I tried to send only the firmware without the config to my
->>>> RTL8723BS. unfortunately the last firmware chunk (sent to the
->>>> controller) times out in that case (even if I set a proper baudrate
->>>> before or if I specify no baudrate at all and keep the serdev at
->>>> 115200)
->>> 
->>> What's in the config blobs besides UART configuration?
->> 
->> is anybody writing a rtlfw.c tool (like nokfw.c) so that we can print out what we actually have in these config files?
->> 
->>> It's odd because reading into hciattach_rtk.c it seems that the config
->>> file is actually only used by the userspace tools (hciattach) to
->>> retrieve the UART configuration and nothing else, whereas in the
->>> kernel driver the config blob is appended to the firmware.
->> 
->> Frankly, I am inclined to not use the config file even for DT based system and just allow specifying the UART settings via normal DT properties like we do for Broadcom and others.
-> 
-> so I googled for a few config files and this is what this turns into:
-> 
-> Analyzing rtl8723d_config_1000000_noflow.dms
-> Signature:   0x8723ab55
-> Data length: 41
-> len=1   offset=f4,{ 01 }
-> len=2   offset=f6,{ 81 00 }
-> len=2   offset=fa,{ 12 80 }
-> len=16  offset=0c,{ 04 50 00 00 50 c5 ea 19 e1 1b fd af 5b 01 a4 0b }
-> len=1   offset=d9,{ 0f }
-> len=1   offset=e4,{ 08 }
-> Analyzing rtl8723d_config.dms
-> Signature:   0x8723ab55
-> Data length: 41
-> len=1   offset=f4,{ 01 }
-> len=2   offset=f6,{ 81 00 }
-> len=2   offset=fa,{ 12 80 }
-> len=16  offset=0c,{ 02 80 92 04 50 c5 ea 19 e1 1b fd af 5f 01 a4 0b }
-> len=1   offset=d9,{ 0f }
-> len=1   offset=e4,{ 08 }
-> Analyzing rtl8822b_config.bin
-> Signature:   0x8723ab55
-> Data length: 8
-> len=1   offset=d9,{ 0f }
-> len=1   offset=e4,{ 08 }
-> 
-> The first two are some UART based ones and the last one is USB based.
-> 
-> So the 0x3c offset seems to be the BD_ADDR and 0x0c offset is the UART configuration. It would be good to know which settings the other ones control.
-> 
-> Also the 16 octet UART config blob seems to be decoded like this:
-> 
-> 	uart_config {
-> 		le32 baudrate;
-> 		u8[8] reserved1;
-> 		u8 flowctl;
-> 		u8[3] reserved2;
-> 	}
-> 
-> Actually hciattach_rtk just takes the baud rate and and hardware flow control bit out of this file. That is clearly two things that are better written in plain text in the DT file.
+TL;DR: I have observed that BlueZ does some operations which incur in
+extra latency when connecting to a bonded peripheral. I would like to
+know if it's possible to remove those operations through configuration
+or, if maintainers are open for it, provide some patches to remove
+them.
 
-so this is actually some funny stuff if you start to understand it.
+I have a BLE peripheral with a button. The button state (key pressed /
+key released) is associated to a custom characteristic (i.e. it's not
+HID). The state is conveyed through ATT notifications to a central
+running BlueZ (5.47, using dbus gatt api) with which it=E2=80=99s bonded.
 
-Analyzing rtl8723b_config.dms
-Signature: 0x8723ab55
-Data len:  38
-len=8   offset=00f4,{ 01 00 00 00 05 50 00 00 }
-len=16  offset=000c,{ 02 80 92 04 50 c5 ea 19 e1 1b f1 af 5f 01 a4 0b },UART_CONFIG
-len=1   offset=0027,{ 63 }
-len=1   offset=00fe,{ 01 }
-Analyzing rtl8723d_config_1000000_noflow.dms
-Signature: 0x8723ab55
-Data len:  41
-len=1   offset=00f4,{ 01 }
-len=2   offset=00f6,{ 81 00 }
-len=2   offset=00fa,{ 12 80 }
-len=16  offset=000c,{ 04 50 00 00 50 c5 ea 19 e1 1b fd af 5b 01 a4 0b },UART_CONFIG
-len=1   offset=00d9,{ 0f }
-len=1   offset=00e4,{ 08 }
+In order to save battery, the peripheral is normally disconnected and
+only starts advertising when the key is pressed. The central is always
+attempting to connect. Once the connection is established, the
+key-press in conveyed to the central as a notification (the central
+calls StartNotify() as soon as a connection is established).
 
-Seems like Realtek really defines memory offsets in this file and they can be defined in various different ways.
+For the application=E2=80=99s purpose, it=E2=80=99s critical that the notif=
+ication is
+recieved with the minimum latency.
 
-So 00f4,{ 01 00 00 00 05 50 00 00 } defines the whole PCM settings for interface 1 and 2. And 00f4,{ 01 } + 00f6,{ 81 00 } + 00fa,{ 12 80 } is the same PCM settings, but with only pieces of it defined.
+However, between the connection establishment and the notification, I
+see that BlueZ does some operations which incur in extra latency.
 
-This also means a 000c,{ 04 50 00 00 50 } for just setting the baud rate is as valid if flow control defaults to off and all other values are actual defaults. So code inside hciattach_rtk.c is also kind faulty on how it handles the flow control bit. It works if the config files all have offset 000c in it, but if not, then they are going funky.
+To guide the conversation, here is a btmon dump showing what happens
+in the central right after a connection is established with the
+peripheral: https://pastebin.com/tQMgwK7v
 
-Since these are efuse settings, I really wonder if there is just a HCI vendor command to read out the defaults and we use that to compare. And what I would really like to know is what these settings are suppose to change. Since even for USB, we are actually not even applying them.
+My goal is to minimize the time between #6 and #18
 
-Anyway, I am certain that for Realtek UART devices, we just want to specify max-speed DT property like we do with the others. And then maybe a flow-control DT property to control that one (following what nfcmrvl.txt does). We can use the rtlfw tool that I wrote to extract the values from Realtek provided config files. Frankly the PCM settings we have to deal with as well at some point. But that is also missing for Broadcom and others.
+At #7 there is an MTU exchange request, which, for this particular
+peripheral is not really necessary since I know it only supports 23
+bytes. Is there a way to disable that? After reading the gatt client
+initialization code, it seems that no exchange is attempted if the MTU
+of the central is also 23 bytes, but I don=E2=80=99t know if the default MT=
+U
+is configurable. Is it?
 
-Also if there is no config file, we should be able to just assume no flow control, 115200 baud rate and H:5 as protocol. That means that almost all chips will just work. They are just slow since we do not deal with the max-speed setting.
+At #9 and #12 there are reads for the device name and device
+appearance. I have managed to disable those by lanching bluetoothd
+with --noplugin=3Ddeviceinfo,gap . So, it's not an issue anymore.
 
-At the end of the day, this is the same as for Broadcom and ACPI vs DT. This should be no different. The only bit nasty part is that this is H:5 as protocol and we have not really abstracted that one nicely to just have a tiny hci_rtl.c for vendor specific pieces.
+At #14 there is an ATT write to the CCC descriptor of the
+button-status attribute, in order to enable notifications (maybe as a
+consequence of invoking StartNotify() in the central). But, why is
+this needed for a bonded peripheral? If I interpret the standard
+properly, CCC descriptor values should be cached and restored across
+connections among bonded devices (section "3.3.3.3 Client
+Characteristic Configuration" "The Client Characteristic Configuration
+descriptor value shall be persistent across connections for bonded
+devices."). I, however, can't find a ccc file in the peripheral cache,
+as described here
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/settings-storag=
+e.txt?h=3D5.47#n46
+.
 
-Regards
+At #17 the central starts discovering the primary services. Why is
+this necessary? Shouldn=E2=80=99t they be simply recovered from the cache?
+(According to the standard "For clients that have a trusted
+relationship (i.e. bond) with the server, the attribute cache is valid
+across connections."). I have verified that the cache already
+contained all the primary services. However, after looking at the code
+(shared/gatt-client.c ) it seems primary service discovery
+(bt_gatt_discover_all_primary_services()) is always invoked :S
 
-Marcel
+Finally, at #18, I get the notification from the peripheral.
 
+ I am happy to try to provide some patches if we agree that at least
+some of these operations are not necessary and there is no way to
+disable them through configuration.
+
+Thanks in advance,
+
+Alfonso Acosta
