@@ -1,78 +1,430 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] monitor: Add support for limiting btsnoop files size
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1827472.lXlVGyKfTn@ix>
-Date: Fri, 5 Jan 2018 16:23:45 +0100
+Return-Path: <szymon.janc@codecoup.pl>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <200D19DD-9B57-41CC-BD8D-C42F83559AD1@holtmann.org>
-References: <20180104140702.16321-1-szymon.janc@codecoup.pl>
- <872F3BD6-566A-423B-ADC2-48CACDED2DD5@holtmann.org> <1827472.lXlVGyKfTn@ix>
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] monitor: Add support for limiting btsnoop files size
+Date: Fri, 05 Jan 2018 16:11:10 +0100
+Message-ID: <1827472.lXlVGyKfTn@ix>
+In-Reply-To: <872F3BD6-566A-423B-ADC2-48CACDED2DD5@holtmann.org>
+References: <20180104140702.16321-1-szymon.janc@codecoup.pl> <872F3BD6-566A-423B-ADC2-48CACDED2DD5@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Marcel,
 
->>> This adds new option -l (--limit) which allows to limit maximum
->>> size of writen btsnoop file. After limit is reached new btsnoop
->>> file will be created. To distinguish file postfix in for of
->>> _DATE_TIME is added to path provided with -w option. For convenience
->>> KkMm modifiers are also supported.
->>> 
->>> This is especially useful on unattended systems for tiding btmon
->>> with log rotation.
->>> 
->>> Example result of running btmon -w test.bin -l 10k
->>> test.log_2018-01-04_14:55:06_694638
->>> test.log_2018-01-04_14:56:15_933158
->>> test.log_2018-01-04_14:57:20_741201
->>> test.log_2018-01-04_14:58:13_280835
->>> test.log_2018-01-04_14:59:02_183569
->>> test.log_2018-01-04_15:00:05_352733
->>> test.log_2018-01-04_15:00:54_475147
->>> test.log_2018-01-04_15:01:57_183352
->> 
->> this is the quick and dirty approach. However a bit cleaner one would be
->> that we actually add information to each file where the next one can be
->> found. And preferably also which one was the previous one. I realize that
->> any kind of renaming kills this, so maybe this needs to be based on some
->> sort of hash that we include in each file as a identification header. And
->> then the reader needs to figure this out by itself and maybe try some
->> patterns to find the file or as proposed by Luiz, you give a glob matching
->> number of files and we ensure they are all sorted correctly.
->> 
->> In addition to this, maybe a round-robin schema is also useful, so that
->> earlier logs get overwritten. Something like "use max 10M and split over 10
->> files” is generally more useful then some uncontrolled rotation. So
->> suffixes of *.1, *.2 etc are normally easier to deal with.
->> 
->> Also in that context, introducing compressed log files would be interesting
->> feature as well. I would be curious if compressing these actually has a big
->> impact. I would assume with audio data it might actually safe a lot. If you
->> rotate and compress, then this becomes really useful.
-> 
-> I want to keep this as simple as possible since this is intended to work with 
-> log rotation systems, not be used directly by human. The main goal was to 
-> avoid need of restarting btmon when switching btsnoop file (to avoid loosing 
-> traces). Compression, removing old etc is job of logrotate, not btmon. I 
-> choose date-time for suffixes not only for human convenience but also for 
-> (reasonable) level of uniqueness eg in case of btmon restart (I could shorten 
-> it and skip usecs to keep it a bit simpler).
+On Friday, 5 January 2018 15:47:26 CET Marcel Holtmann wrote:
+> Hi Szymon,
+>=20
+> > This adds new option -l (--limit) which allows to limit maximum
+> > size of writen btsnoop file. After limit is reached new btsnoop
+> > file will be created. To distinguish file postfix in for of
+> > _DATE_TIME is added to path provided with -w option. For convenience
+> > KkMm modifiers are also supported.
+> >=20
+> > This is especially useful on unattended systems for tiding btmon
+> > with log rotation.
+> >=20
+> > Example result of running btmon -w test.bin -l 10k
+> > test.log_2018-01-04_14:55:06_694638
+> > test.log_2018-01-04_14:56:15_933158
+> > test.log_2018-01-04_14:57:20_741201
+> > test.log_2018-01-04_14:58:13_280835
+> > test.log_2018-01-04_14:59:02_183569
+> > test.log_2018-01-04_15:00:05_352733
+> > test.log_2018-01-04_15:00:54_475147
+> > test.log_2018-01-04_15:01:57_183352
+>=20
+> this is the quick and dirty approach. However a bit cleaner one would be
+> that we actually add information to each file where the next one can be
+> found. And preferably also which one was the previous one. I realize that
+> any kind of renaming kills this, so maybe this needs to be based on some
+> sort of hash that we include in each file as a identification header. And
+> then the reader needs to figure this out by itself and maybe try some
+> patterns to find the file or as proposed by Luiz, you give a glob matching
+> number of files and we ensure they are all sorted correctly.
+>=20
+> In addition to this, maybe a round-robin schema is also useful, so that
+> earlier logs get overwritten. Something like "use max 10M and split over =
+10
+> files=E2=80=9D is generally more useful then some uncontrolled rotation. =
+So
+> suffixes of *.1, *.2 etc are normally easier to deal with.
+>=20
+> Also in that context, introducing compressed log files would be interesti=
+ng
+> feature as well. I would be curious if compressing these actually has a b=
+ig
+> impact. I would assume with audio data it might actually safe a lot. If y=
+ou
+> rotate and compress, then this becomes really useful.
 
-it is debatable that it is the job of log rotate. I think when you bring in external log rotating software, then you bring in a lot of overhead. I rather have this all in btmon and all self contained. Like for example the journal does it.
+I want to keep this as simple as possible since this is intended to work wi=
+th=20
+log rotation systems, not be used directly by human. The main goal was to=20
+avoid need of restarting btmon when switching btsnoop file (to avoid loosin=
+g=20
+traces). Compression, removing old etc is job of logrotate, not btmon. I=20
+choose date-time for suffixes not only for human convenience but also for=20
+(reasonable) level of uniqueness eg in case of btmon restart (I could short=
+en=20
+it and skip usecs to keep it a bit simpler).
 
-I think we should really think this through first. I prefer to have some hash entries in the file that points to n-1 and n+1 files of the set. That way later on they can also be combined or split up again if needed. So that part needs some solving. And as you noted before, we really want correct packet counting. So this is really useful for that as well.
 
-Compressing can obviously done independent, but I think that once we are rotating that is something that is needed. Of course I fully realize that spawning a process or a thread then is needed here. And I dislike doing both of these. Then again, in theory with a POLLOUT and proper IO channel priority this can be done nicely as well. What I am saying is that once we extend btmon, lets think this all through to come up with something clean (which might means changes) since otherwise btmon is the next hcidump. Hacks stay hacks and make things unmaintainable.
+> > ---
+> > monitor/control.c    | 55
+> > ++++++++++++++++++++++++++++++++++++++++++++++++++-- monitor/control.h =
+ =20
+> > |  2 +-
+> > monitor/main.c       | 35 +++++++++++++++++++++++++++++++--
+> > src/shared/btsnoop.c | 17 ----------------
+> > src/shared/btsnoop.h | 17 ++++++++++++++++
+> > tools/btsnoop.c      | 17 ----------------
+> > 6 files changed, 104 insertions(+), 39 deletions(-)
+> >=20
+> > diff --git a/monitor/control.c b/monitor/control.c
+> > index 1cd79ca5d..6b69f3575 100644
+> > --- a/monitor/control.c
+> > +++ b/monitor/control.c
+> > @@ -32,6 +32,7 @@
+> > #include <unistd.h>
+> > #include <stdlib.h>
+> > #include <string.h>
+> > +#include <time.h>
+> > #include <sys/time.h>
+> > #include <sys/socket.h>
+> > #include <sys/un.h>
+> > @@ -59,6 +60,10 @@ static struct btsnoop *btsnoop_file =3D NULL;
+> > static bool hcidump_fallback =3D false;
+> > static bool decode_control =3D true;
+> >=20
+> > +static size_t writer_limit =3D 0;
+> > +static size_t writer_size =3D BTSNOOP_HDR_SIZE;
+> > +static const char *writer_path =3D NULL;
+> > +
+> > struct control_data {
+> >=20
+> > 	uint16_t channel;
+> > 	int fd;
+> >=20
+> > @@ -908,6 +913,47 @@ void control_message(uint16_t opcode, const void
+> > *data, uint16_t size)>=20
+> > 	}
+> >=20
+> > }
+> >=20
+> > +static const char *get_real_path(const char *path)
+> > +{
+> > +	static char real_path[FILENAME_MAX];
+> > +	struct timeval tv;
+> > +	struct tm tm;
+> > +
+> > +	if (!writer_limit)
+> > +		return path;
+> > +
+> > +	memset(&tv, 0, sizeof(tv));
+> > +
+> > +	gettimeofday(&tv, NULL);
+> > +	localtime_r(&tv.tv_sec, &tm);
+> > +
+> > +	snprintf(real_path, FILENAME_MAX,
+> > +			"%s_%04d-%02d-%02d_%02d:%02d:%02d_%06lu", path,
+> > +			tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
+> > +			tm.tm_hour, tm.tm_min, tm.tm_sec, tv.tv_usec);
+> > +
+> > +	real_path[FILENAME_MAX - 1] =3D '\0';
+> > +
+> > +	return real_path;
+> > +}
+> > +
+> > +static void rotate_btsnoop_file(ssize_t pktlen)
+> > +{
+> > +	if (!writer_limit)
+> > +		return;
+> > +
+> > +	writer_size +=3D BTSNOOP_PKT_SIZE + pktlen;
+> > +
+> > +	if (writer_size <=3D writer_limit)
+> > +		return;
+> > +
+> > +	writer_size =3D BTSNOOP_HDR_SIZE + BTSNOOP_PKT_SIZE + pktlen;
+> > +
+> > +	btsnoop_unref(btsnoop_file);
+> > +	btsnoop_file =3D btsnoop_create(get_real_path(writer_path),
+> > +							BTSNOOP_FORMAT_MONITOR);
+> > +}
+> > +
+> > static void data_callback(int fd, uint32_t events, void *user_data)
+> > {
+> >=20
+> > 	struct control_data *data =3D user_data;
+> >=20
+> > @@ -974,6 +1020,8 @@ static void data_callback(int fd, uint32_t events,
+> > void *user_data)>=20
+> > 							data->buf, pktlen);
+> > 		=09
+> > 			break;
+> > 	=09
+> > 		case HCI_CHANNEL_MONITOR:
+> > +			rotate_btsnoop_file(pktlen);
+> > +
+> >=20
+> > 			btsnoop_write_hci(btsnoop_file, tv, index, opcode, 0,
+> > 		=09
+> > 							data->buf, pktlen);
+> > 		=09
+> > 			ellisys_inject_hci(tv, index, opcode,
+> >=20
+> > @@ -1371,10 +1419,13 @@ int control_tty(const char *path, unsigned int
+> > speed)>=20
+> > 	return 0;
+> >=20
+> > }
+> >=20
+> > -bool control_writer(const char *path)
+> > +bool control_writer(const char *path, size_t limit)
+> > {
+> > -	btsnoop_file =3D btsnoop_create(path, BTSNOOP_FORMAT_MONITOR);
+> > +	writer_path =3D path;
+> > +	writer_limit =3D limit;
+> >=20
+> > +	btsnoop_file =3D btsnoop_create(get_real_path(writer_path),
+> > +							BTSNOOP_FORMAT_MONITOR);
+> >=20
+> > 	return !!btsnoop_file;
+> >=20
+> > }
+> >=20
+> > diff --git a/monitor/control.h b/monitor/control.h
+> > index 630a852e4..dec19d1d4 100644
+> > --- a/monitor/control.h
+> > +++ b/monitor/control.h
+> > @@ -24,7 +24,7 @@
+> >=20
+> > #include <stdint.h>
+> >=20
+> > -bool control_writer(const char *path);
+> > +bool control_writer(const char *path, size_t limit);
+> > void control_reader(const char *path);
+> > void control_server(const char *path);
+> > int control_tty(const char *path, unsigned int speed);
+> > diff --git a/monitor/main.c b/monitor/main.c
+> > index 3e61a4661..3755d01ae 100644
+> > --- a/monitor/main.c
+> > +++ b/monitor/main.c
+> > @@ -31,6 +31,7 @@
+> > #include <stdlib.h>
+> > #include <string.h>
+> > #include <getopt.h>
+> > +#include <limits.h>
+> > #include <sys/un.h>
+> >=20
+> > #include "src/shared/mainloop.h"
+> > @@ -61,6 +62,7 @@ static void usage(void)
+> >=20
+> > 	printf("options:\n"
+> > =09
+> > 		"\t-r, --read <file>      Read traces in btsnoop format\n"
+> > 		"\t-w, --write <file>     Save traces in btsnoop format\n"
+> >=20
+> > +		"\t-l, --limit <bytes>    Rotate btsnoop files\n"
+> >=20
+> > 		"\t-a, --analyze <file>   Analyze traces in btsnoop format\n"
+> > 		"\t-s, --server <socket>  Start monitor server socket\n"
+> > 		"\t-p, --priority <level> Show only priority or lower\n"
+> >=20
+> > @@ -80,6 +82,7 @@ static const struct option main_options[] =3D {
+> >=20
+> > 	{ "tty-speed", required_argument, NULL, 'B' },
+> > 	{ "read",    required_argument, NULL, 'r' },
+> > 	{ "write",   required_argument, NULL, 'w' },
+> >=20
+> > +	{ "limit",   required_argument, NULL, 'l' },
+> >=20
+> > 	{ "analyze", required_argument, NULL, 'a' },
+> > 	{ "server",  required_argument, NULL, 's' },
+> > 	{ "priority",required_argument, NULL, 'p' },
+> >=20
+> > @@ -108,6 +111,8 @@ int main(int argc, char *argv[])
+> >=20
+> > 	const char *str;
+> > 	int exit_status;
+> > 	sigset_t mask;
+> >=20
+> > +	size_t writer_limit =3D 0;
+> > +	char *endptr;
+> >=20
+> > 	mainloop_init();
+> >=20
+> > @@ -117,7 +122,7 @@ int main(int argc, char *argv[])
+> >=20
+> > 		int opt;
+> > 		struct sockaddr_un addr;
+> >=20
+> > -		opt =3D getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:vh",
+> > +		opt =3D getopt_long(argc, argv, "d:r:w:l:a:s:p:i:tTSAE:vh",
+> >=20
+> > 						main_options, NULL);
+> > 	=09
+> > 		if (opt < 0)
+> > 	=09
+> > 			break;
+> >=20
+> > @@ -139,6 +144,32 @@ int main(int argc, char *argv[])
+> >=20
+> > 		case 'w':
+> > 			writer_path =3D optarg;
+> > 			break;
+> >=20
+> > +		case 'l':
+> > +			str =3D optarg;
+> > +			writer_limit =3D strtoul(str, &endptr, 10);
+> > +
+> > +			if (writer_limit =3D=3D ULONG_MAX) {
+> > +				fprintf(stderr, "Invalid limit value\n");
+> > +				return EXIT_FAILURE;
+> > +			}
+> > +
+> > +			if (*endptr !=3D '\0') {
+> > +				if (*endptr =3D=3D 'K' || *endptr =3D=3D 'k') {
+> > +					writer_limit *=3D 1024;
+> > +				} else if (*endptr =3D=3D 'M' || *endptr =3D=3D 'm') {
+> > +					writer_limit *=3D 1024 * 1024;
+> > +				} else {
+> > +					fprintf(stderr, "Invalid limit value\n");
+> > +					return EXIT_FAILURE;
+> > +				}
+> > +			}
+> > +
+> > +			/* avoid creating too small files */
+> > +			if (writer_limit < 1024) {
+> > +				fprintf(stderr, "Too small limit value\n");
+> > +				return EXIT_FAILURE;
+> > +			}
+> > +			break;
+> >=20
+> > 		case 'a':
+> > 			analyze_path =3D optarg;
+> > 			break;
+> >=20
+> > @@ -232,7 +263,7 @@ int main(int argc, char *argv[])
+> >=20
+> > 		return EXIT_SUCCESS;
+> > =09
+> > 	}
+> >=20
+> > -	if (writer_path && !control_writer(writer_path)) {
+> > +	if (writer_path && !control_writer(writer_path, writer_limit)) {
+> >=20
+> > 		printf("Failed to open '%s'\n", writer_path);
+> > 		return EXIT_FAILURE;
+> > =09
+> > 	}
+> >=20
+> > diff --git a/src/shared/btsnoop.c b/src/shared/btsnoop.c
+> > index e20d1b382..17e3faf2a 100644
+> > --- a/src/shared/btsnoop.c
+> > +++ b/src/shared/btsnoop.c
+> > @@ -35,23 +35,6 @@
+> >=20
+> > #include "src/shared/btsnoop.h"
+> >=20
+> > -struct btsnoop_hdr {
+> > -	uint8_t		id[8];		/* Identification Pattern */
+> > -	uint32_t	version;	/* Version Number =3D 1 */
+> > -	uint32_t	type;		/* Datalink Type */
+> > -} __attribute__ ((packed));
+> > -#define BTSNOOP_HDR_SIZE (sizeof(struct btsnoop_hdr))
+> > -
+> > -struct btsnoop_pkt {
+> > -	uint32_t	size;		/* Original Length */
+> > -	uint32_t	len;		/* Included Length */
+> > -	uint32_t	flags;		/* Packet Flags */
+> > -	uint32_t	drops;		/* Cumulative Drops */
+> > -	uint64_t	ts;		/* Timestamp microseconds */
+> > -	uint8_t		data[0];	/* Packet Data */
+> > -} __attribute__ ((packed));
+> > -#define BTSNOOP_PKT_SIZE (sizeof(struct btsnoop_pkt))
+> > -
+> > static const uint8_t btsnoop_id[] =3D { 0x62, 0x74, 0x73, 0x6e,
+> >=20
+> > 				      0x6f, 0x6f, 0x70, 0x00 };
+> >=20
+> > diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
+> > index 3df8998a3..011aa1d68 100644
+> > --- a/src/shared/btsnoop.h
+> > +++ b/src/shared/btsnoop.h
+> > @@ -91,6 +91,23 @@ struct btsnoop_opcode_index_info {
+> > #define BTSNOOP_PRIORITY_INFO		6
+> > #define BTSNOOP_PRIORITY_DEBUG		7
+> >=20
+> > +struct btsnoop_hdr {
+> > +	uint8_t		id[8];		/* Identification Pattern */
+> > +	uint32_t	version;	/* Version Number =3D 1 */
+> > +	uint32_t	type;		/* Datalink Type */
+> > +} __attribute__ ((packed));
+> > +#define BTSNOOP_HDR_SIZE (sizeof(struct btsnoop_hdr))
+> > +
+> > +struct btsnoop_pkt {
+> > +	uint32_t	size;		/* Original Length */
+> > +	uint32_t	len;		/* Included Length */
+> > +	uint32_t	flags;		/* Packet Flags */
+> > +	uint32_t	drops;		/* Cumulative Drops */
+> > +	uint64_t	ts;		/* Timestamp microseconds */
+> > +	uint8_t		data[0];	/* Packet Data */
+> > +} __attribute__ ((packed));
+> > +#define BTSNOOP_PKT_SIZE (sizeof(struct btsnoop_pkt))
+> > +
+> > struct btsnoop_opcode_user_logging {
+> >=20
+> > 	uint8_t  priority;
+> > 	uint8_t  ident_len;
+> >=20
+> > diff --git a/tools/btsnoop.c b/tools/btsnoop.c
+> > index 3eb8082dd..465938961 100644
+> > --- a/tools/btsnoop.c
+> > +++ b/tools/btsnoop.c
+> > @@ -41,23 +41,6 @@
+> >=20
+> > #include "src/shared/btsnoop.h"
+> >=20
+> > -struct btsnoop_hdr {
+> > -	uint8_t		id[8];		/* Identification Pattern */
+> > -	uint32_t	version;	/* Version Number =3D 1 */
+> > -	uint32_t	type;		/* Datalink Type */
+> > -} __attribute__ ((packed));
+> > -#define BTSNOOP_HDR_SIZE (sizeof(struct btsnoop_hdr))
+> > -
+> > -struct btsnoop_pkt {
+> > -	uint32_t	size;		/* Original Length */
+> > -	uint32_t	len;		/* Included Length */
+> > -	uint32_t	flags;		/* Packet Flags */
+> > -	uint32_t	drops;		/* Cumulative Drops */
+> > -	uint64_t	ts;		/* Timestamp microseconds */
+> > -	uint8_t		data[0];	/* Packet Data */
+> > -} __attribute__ ((packed));
+> > -#define BTSNOOP_PKT_SIZE (sizeof(struct btsnoop_pkt))
+> > -
+> > static const uint8_t btsnoop_id[] =3D { 0x62, 0x74, 0x73, 0x6e,
+> >=20
+> > 				      0x6f, 0x6f, 0x70, 0x00 };
+>=20
+> This change seems unrelated. So lets avoid this. And initially I didn=E2=
+=80=99t want
+> the file headers and details exposed. They were suppose to be all accessed
+> via functions. If we want to unify this, then I need to have a second look
+> at it.
 
-I also want to some level that bt_shell can be used within btmon and making it scrollable and searchable. So that you have an input interface (as simple as vi for example) that allows you to enable/disable filters and options. But I also want to get away from readline or ncurses and drive the terminal by ourselves. Or even better if we get something along the lines of tig etc.
+It is needed for proper counting of written bytes. But I can simply do copy=
+ of=20
+those in btmon (just like it is done in btsnoop and hcidump..).
 
-Just on that note, you also want a writer only btmon as it seems. Since the dual write to file and decode is pretty much useless. Also the overall decoding capability consume a lot of extra memory. A writer only btmon would be tiny. So we might actually consider doing just that first. I am struggling a bit with a good name for that, but maybe btmon-daemon, btmon-logger or something along these lines.
 
-Regards
+> Regards
+>=20
+> Marcel
 
-Marcel
 
+=2D-=20
+pozdrawiam
+Szymon Janc
