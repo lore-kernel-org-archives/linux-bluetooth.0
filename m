@@ -1,127 +1,71 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
+MIME-Version: 1.0
+From: AceLan Kao <acelan.kao@canonical.com>
+Date: Fri, 5 Jan 2018 14:41:52 +0800
+Message-ID: <CAFv23Qk1zv-Otg_EJXndfiXgxzO2O44JTbV12SJyZapjPwPwaw@mail.gmail.com>
+Subject: Intel BT[8087:0025] leads to system auto resume from S3 randomly
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] monitor: Add support for reading multpli btsnoop files
-Date: Fri,  5 Jan 2018 12:54:13 +0100
-Message-Id: <20180105115413.3546-1-szymon.janc@codecoup.pl>
+Cc: Ethan Hsieh <ethan.hsieh@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to read concatenated btsnoop files that were previously
-created with btmon -w -l options. The output looks like if this was
-one btsnoop file.
----
- monitor/control.c |  4 ----
- monitor/main.c    | 38 +++++++++++++++++++++++++++++++++-----
- 2 files changed, 33 insertions(+), 9 deletions(-)
+Hi all,
 
-diff --git a/monitor/control.c b/monitor/control.c
-index 6b69f3575..1c7f1ee1a 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -1454,8 +1454,6 @@ void control_reader(const char *path)
- 		break;
- 	}
- 
--	open_pager();
--
- 	switch (format) {
- 	case BTSNOOP_FORMAT_HCI:
- 	case BTSNOOP_FORMAT_UART:
-@@ -1488,8 +1486,6 @@ void control_reader(const char *path)
- 		break;
- 	}
- 
--	close_pager();
--
- 	btsnoop_unref(btsnoop_file);
- }
- 
-diff --git a/monitor/main.c b/monitor/main.c
-index 3755d01ae..5e566201e 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -43,6 +43,7 @@
- #include "analyze.h"
- #include "ellisys.h"
- #include "control.h"
-+#include "display.h"
- 
- static void signal_callback(int signum, void *user_data)
- {
-@@ -98,10 +99,24 @@ static const struct option main_options[] = {
- 	{ }
- };
- 
-+static char **reader_paths = NULL;
-+static size_t reader_paths_cnt = 0;
-+
-+static void append_reader_path(char *path)
-+{
-+	char **paths;
-+
-+	paths = reallocarray(reader_paths, reader_paths_cnt + 1, sizeof(char *));
-+	if (!paths)
-+		return;
-+
-+	reader_paths = paths;
-+	reader_paths[reader_paths_cnt++] = path;
-+}
-+
- int main(int argc, char *argv[])
- {
- 	unsigned long filter_mask = 0;
--	const char *reader_path = NULL;
- 	const char *writer_path = NULL;
- 	const char *analyze_path = NULL;
- 	const char *ellisys_server = NULL;
-@@ -139,7 +154,12 @@ int main(int argc, char *argv[])
- 			}
- 			break;
- 		case 'r':
--			reader_path = optarg;
-+			append_reader_path(optarg);
-+
-+			/* check if more paths were provided */
-+			while (optind < argc && *argv[optind] != '-')
-+				append_reader_path(argv[optind++]);
-+
- 			break;
- 		case 'w':
- 			writer_path = optarg;
-@@ -233,8 +253,9 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
- 	}
- 
--	if (reader_path && analyze_path) {
-+	if (reader_paths && analyze_path) {
- 		fprintf(stderr, "Display and analyze can't be combined\n");
-+		free(reader_paths);
- 		return EXIT_FAILURE;
- 	}
- 
-@@ -255,11 +276,18 @@ int main(int argc, char *argv[])
- 		return EXIT_SUCCESS;
- 	}
- 
--	if (reader_path) {
-+	if (reader_paths) {
-+		size_t i;
-+
- 		if (ellisys_server)
- 			ellisys_enable(ellisys_server, ellisys_port);
- 
--		control_reader(reader_path);
-+		open_pager();
-+		for (i = 0; i < reader_paths_cnt; i++)
-+			control_reader(reader_paths[i]);
-+		close_pager();
-+
-+		free(reader_paths);
- 		return EXIT_SUCCESS;
- 	}
- 
--- 
-2.14.3
+We found an issue that when system enters S3, it stays in S3 for a few
+seconds, and somehow it resumes automatically.
+And we try below quirk which can prevent it from waking up.
 
+drivers/usb/core/quirks.c
+@@ -208,11 +208,11 @@ static const struct usb_device_id usb_quirk_list[] = {
+                        USB_QUIRK_DISCONNECT_SUSPEND },
+        { USB_DEVICE(0x12d1, 0x15c3), .driver_info =
+                        USB_QUIRK_DISCONNECT_SUSPEND },
++        { USB_DEVICE(0x8087, 0x0025), .driver_info =
++                        USB_QUIRK_DISCONNECT_SUSPEND },
+
+Here are some findings from the system.
+
+$ lsusb
+Bus 001 Device 004: ID 8087:0025 Intel Corp.
+
+$ lspci -nn
+00:14.0 USB controller [0c03]: Intel Corporation Device [8086:a36d] (rev 01)
+
+Jan 4 04:20:37 u-OptiPlex-7060 kernel:
+[ 0.144060] v2 Added device:4b [\_SB_.PCI0.XHC_] parent PNP0A08:00 sta=0xf
+[ 0.171066] pci 0000:00:14.0: [8086:a36d] type 00 class 0x0c0330
+[ 0.171099] pci 0000:00:14.0: reg 0x10: [mem 0x71420000-0x7142ffff 64bit]
+[ 0.171200] pci 0000:00:14.0: PME# supported from D3hot D3cold
+[ 3.680297] xhci_hcd 0000:00:14.0: xHCI Host Controller
+[ 3.680301] xhci_hcd 0000:00:14.0: new USB bus registered, assigned bus number 1
+[ 3.681509] xhci_hcd 0000:00:14.0: hcc params 0x20007fc1 hci version
+0x110 quirks 0x00009810
+[ 3.681515] xhci_hcd 0000:00:14.0: cache line size of 64 is not supported
+[ 3.681621] usb usb1: SerialNumber: 0000:00:14.0
+[ 3.681989] xhci_hcd 0000:00:14.0: xHCI Host Controller
+[ 3.681992] xhci_hcd 0000:00:14.0: new USB bus registered, assigned bus number 2
+[ 3.681993] xhci_hcd 0000:00:14.0: Host supports USB 3.1 Enhanced SuperSpeed
+[ 3.682026] usb usb2: SerialNumber: 0000:00:14.0
+
+===> Suspend
+[31.783177] PM: Syncing filesystems ... done.
+[31.784733] PM: Preparing system for sleep (mem)
+[31.785444] Freezing user space processes ... (elapsed 0.001 seconds) done.
+[31.786486] OOM killer disabled.
+[31.786487] Freezing remaining freezable tasks ... (elapsed 0.001 seconds) done.
+[31.787597] PM: Suspending system (mem)
+[31.787631] Suspending console(s) (use no_console_suspend to debug)
+
+===> Device resumes automatically
+[32.911466] wakeup_source_report_event: name:device:4b, event_count:1
+[32.911467] wakeup_source_activate: name:device:4b, active_count:1
+[32.911471] wakeup_source_report_event: name:0000:00:14.0, event_count:1
+[32.911471] wakeup_source_activate: name:0000:00:14.0, active_count:1
+[33.231056] PM: Finishing wakeup.
+
+Any ideas? Or anything we can try?
+Thanks.
+
+Best regards,
+AceLan Kao.
