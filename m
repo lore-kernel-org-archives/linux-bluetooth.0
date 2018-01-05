@@ -1,103 +1,76 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [RFC v2 7/9] bluetooth: btrtl: load the config blob from
- devicetree when available
+Subject: Re: [PATCH] monitor: Add support for limiting btsnoop files size
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <EC216531-81EC-4EE8-BAC4-C6954C222092@holtmann.org>
-Date: Fri, 5 Jan 2018 17:15:48 +0100
-Cc: Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-serial@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>,
-        linux-amlogic@lists.infradead.org,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        Daniel Drake <drake@endlessm.com>
-Message-Id: <1F394D8B-CFB8-48BA-BC6B-15D1EE51DB08@holtmann.org>
-References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
- <20180101204217.26165-8-martin.blumenstingl@googlemail.com>
- <563D6F9F-8495-40D4-BE56-5338ED2B9B99@holtmann.org>
- <CAL9uMOEMDup4hRkxD-tM8R0YirGs5uQi31AjJUnFCPNMKUdRHg@mail.gmail.com>
- <E8E39477-CF1A-4A3E-84C5-830E182C2266@holtmann.org>
- <CAL9uMOH0N-4jgQncmPjK-KyU0vY9Q0ZnHYSAGgz3z3ywzc8Avw@mail.gmail.com>
- <CAFBinCBB=SmviOMRHGDH6vzjTjV-mrtQEc8nBUhDbJGs9SBpgw@mail.gmail.com>
- <CAL9uMOFyfr_qGf5BeTojkMeWeH8LqPoKj=LrdgEMB2wmhGBxmA@mail.gmail.com>
- <CAFBinCAFsDRpp=4We1hQPiutM1Q0MrqebPLyS3e2_e+JcBoSmg@mail.gmail.com>
- <CAL9uMOGkZefjD_JNxjf4yJ0ATFtOG5Cm_XQq1fy0VQDjiMFBmg@mail.gmail.com>
- <EC216531-81EC-4EE8-BAC4-C6954C222092@holtmann.org>
-To: Carlo Caione <carlo@endlessm.com>
-Sender: linux-serial-owner@vger.kernel.org
+In-Reply-To: <1827472.lXlVGyKfTn@ix>
+Date: Fri, 5 Jan 2018 16:23:45 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <200D19DD-9B57-41CC-BD8D-C42F83559AD1@holtmann.org>
+References: <20180104140702.16321-1-szymon.janc@codecoup.pl>
+ <872F3BD6-566A-423B-ADC2-48CACDED2DD5@holtmann.org> <1827472.lXlVGyKfTn@ix>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Carlo,
+Hi Szymon,
 
->>>> As Marcel suggested we can assume that the information in the DSDT is
->>>> correct so that we can get rid of the config blob also for x86
->>>> platforms (assuming that the only useful information in the config
->>>> blobs is the UART configuration).
->>> in my tests I tried to send only the firmware without the config to my
->>> RTL8723BS. unfortunately the last firmware chunk (sent to the
->>> controller) times out in that case (even if I set a proper baudrate
->>> before or if I specify no baudrate at all and keep the serdev at
->>> 115200)
+>>> This adds new option -l (--limit) which allows to limit maximum
+>>> size of writen btsnoop file. After limit is reached new btsnoop
+>>> file will be created. To distinguish file postfix in for of
+>>> _DATE_TIME is added to path provided with -w option. For convenience
+>>> KkMm modifiers are also supported.
+>>> 
+>>> This is especially useful on unattended systems for tiding btmon
+>>> with log rotation.
+>>> 
+>>> Example result of running btmon -w test.bin -l 10k
+>>> test.log_2018-01-04_14:55:06_694638
+>>> test.log_2018-01-04_14:56:15_933158
+>>> test.log_2018-01-04_14:57:20_741201
+>>> test.log_2018-01-04_14:58:13_280835
+>>> test.log_2018-01-04_14:59:02_183569
+>>> test.log_2018-01-04_15:00:05_352733
+>>> test.log_2018-01-04_15:00:54_475147
+>>> test.log_2018-01-04_15:01:57_183352
 >> 
->> What's in the config blobs besides UART configuration?
+>> this is the quick and dirty approach. However a bit cleaner one would be
+>> that we actually add information to each file where the next one can be
+>> found. And preferably also which one was the previous one. I realize that
+>> any kind of renaming kills this, so maybe this needs to be based on some
+>> sort of hash that we include in each file as a identification header. And
+>> then the reader needs to figure this out by itself and maybe try some
+>> patterns to find the file or as proposed by Luiz, you give a glob matching
+>> number of files and we ensure they are all sorted correctly.
+>> 
+>> In addition to this, maybe a round-robin schema is also useful, so that
+>> earlier logs get overwritten. Something like "use max 10M and split over 10
+>> files” is generally more useful then some uncontrolled rotation. So
+>> suffixes of *.1, *.2 etc are normally easier to deal with.
+>> 
+>> Also in that context, introducing compressed log files would be interesting
+>> feature as well. I would be curious if compressing these actually has a big
+>> impact. I would assume with audio data it might actually safe a lot. If you
+>> rotate and compress, then this becomes really useful.
 > 
-> is anybody writing a rtlfw.c tool (like nokfw.c) so that we can print out what we actually have in these config files?
-> 
->> It's odd because reading into hciattach_rtk.c it seems that the config
->> file is actually only used by the userspace tools (hciattach) to
->> retrieve the UART configuration and nothing else, whereas in the
->> kernel driver the config blob is appended to the firmware.
-> 
-> Frankly, I am inclined to not use the config file even for DT based system and just allow specifying the UART settings via normal DT properties like we do for Broadcom and others.
+> I want to keep this as simple as possible since this is intended to work with 
+> log rotation systems, not be used directly by human. The main goal was to 
+> avoid need of restarting btmon when switching btsnoop file (to avoid loosing 
+> traces). Compression, removing old etc is job of logrotate, not btmon. I 
+> choose date-time for suffixes not only for human convenience but also for 
+> (reasonable) level of uniqueness eg in case of btmon restart (I could shorten 
+> it and skip usecs to keep it a bit simpler).
 
-so I googled for a few config files and this is what this turns into:
+it is debatable that it is the job of log rotate. I think when you bring in external log rotating software, then you bring in a lot of overhead. I rather have this all in btmon and all self contained. Like for example the journal does it.
 
-Analyzing rtl8723d_config_1000000_noflow.dms
-Signature:   0x8723ab55
-Data length: 41
-len=1   offset=f4,{ 01 }
-len=2   offset=f6,{ 81 00 }
-len=2   offset=fa,{ 12 80 }
-len=16  offset=0c,{ 04 50 00 00 50 c5 ea 19 e1 1b fd af 5b 01 a4 0b }
-len=1   offset=d9,{ 0f }
-len=1   offset=e4,{ 08 }
-Analyzing rtl8723d_config.dms
-Signature:   0x8723ab55
-Data length: 41
-len=1   offset=f4,{ 01 }
-len=2   offset=f6,{ 81 00 }
-len=2   offset=fa,{ 12 80 }
-len=16  offset=0c,{ 02 80 92 04 50 c5 ea 19 e1 1b fd af 5f 01 a4 0b }
-len=1   offset=d9,{ 0f }
-len=1   offset=e4,{ 08 }
-Analyzing rtl8822b_config.bin
-Signature:   0x8723ab55
-Data length: 8
-len=1   offset=d9,{ 0f }
-len=1   offset=e4,{ 08 }
+I think we should really think this through first. I prefer to have some hash entries in the file that points to n-1 and n+1 files of the set. That way later on they can also be combined or split up again if needed. So that part needs some solving. And as you noted before, we really want correct packet counting. So this is really useful for that as well.
 
-The first two are some UART based ones and the last one is USB based.
+Compressing can obviously done independent, but I think that once we are rotating that is something that is needed. Of course I fully realize that spawning a process or a thread then is needed here. And I dislike doing both of these. Then again, in theory with a POLLOUT and proper IO channel priority this can be done nicely as well. What I am saying is that once we extend btmon, lets think this all through to come up with something clean (which might means changes) since otherwise btmon is the next hcidump. Hacks stay hacks and make things unmaintainable.
 
-So the 0x3c offset seems to be the BD_ADDR and 0x0c offset is the UART configuration. It would be good to know which settings the other ones control.
+I also want to some level that bt_shell can be used within btmon and making it scrollable and searchable. So that you have an input interface (as simple as vi for example) that allows you to enable/disable filters and options. But I also want to get away from readline or ncurses and drive the terminal by ourselves. Or even better if we get something along the lines of tig etc.
 
-Also the 16 octet UART config blob seems to be decoded like this:
-
-	uart_config {
-		le32 baudrate;
-		u8[8] reserved1;
-		u8 flowctl;
-		u8[3] reserved2;
-	}
-
-Actually hciattach_rtk just takes the baud rate and and hardware flow control bit out of this file. That is clearly two things that are better written in plain text in the DT file.
+Just on that note, you also want a writer only btmon as it seems. Since the dual write to file and decode is pretty much useless. Also the overall decoding capability consume a lot of extra memory. A writer only btmon would be tiny. So we might actually consider doing just that first. I am struggling a bit with a good name for that, but maybe btmon-daemon, btmon-logger or something along these lines.
 
 Regards
 
