@@ -1,43 +1,49 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: bpa10x: make array 'req' static, shrinks
- object size
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180106161514.18308-1-colin.king@canonical.com>
-Date: Sat, 6 Jan 2018 17:42:59 +0100
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <5236E589-503D-4845-B4BF-EAD9EF4461B0@holtmann.org>
-References: <20180106161514.18308-1-colin.king@canonical.com>
-To: Colin King <colin.king@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <colin.king@canonical.com>
+From: Colin King <colin.king@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: btintel: make array 'param' static, shrinks object size
+Date: Sat,  6 Jan 2018 16:23:28 +0000
+Message-Id: <20180106162328.18625-1-colin.king@canonical.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Colin,
+From: Colin Ian King <colin.king@canonical.com>
 
-> Don't populate the const read-only array 'req' on the stack but instead
-> make it static. Makes the object code smaller by over 40 bytes:
-> 
-> Before:
->   text	   data	    bss	    dec	    hex	filename
->   8497	   3408	    128	  12033	   2f01	linux/drivers/bluetooth/bpa10x.o
-> 
-> After:
->   text	   data	    bss	    dec	    hex	filename
->   8366	   3496	    128	  11990	   2ed6	linux/drivers/bluetooth/bpa10x.o
-> 
-> (gcc version 7.2.0 x86_64)
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
-> drivers/bluetooth/bpa10x.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+Don't populate the const read-only array 'param' on the stack but instead
+make it static. Makes the object code smaller by nearly 20 bytes:
 
-patch has been applied to bluetooth-next tree.
+Before:
+   text	   data	    bss	    dec	    hex	filename
+  11605	   2629	     64	  14298	   37da	linux/drivers/bluetooth/btintel.o
 
-Regards
+After:
+   text	   data	    bss	    dec	    hex	filename
+  11531	   2685	     64	  14280	   37c8	linux/drivers/bluetooth/btintel.o
 
-Marcel
+(gcc version 7.2.0 x86_64)
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/bluetooth/btintel.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 4459555c9d88..07f00e422e85 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -75,7 +75,7 @@ EXPORT_SYMBOL_GPL(btintel_check_bdaddr);
+ 
+ int btintel_enter_mfg(struct hci_dev *hdev)
+ {
+-	const u8 param[] = { 0x01, 0x00 };
++	static const u8 param[] = { 0x01, 0x00 };
+ 	struct sk_buff *skb;
+ 
+ 	skb = __hci_cmd_sync(hdev, 0xfc11, 2, param, HCI_CMD_TIMEOUT);
+-- 
+2.15.1
