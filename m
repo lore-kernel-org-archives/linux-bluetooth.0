@@ -1,63 +1,46 @@
 Return-Path: <lukas@wunner.de>
-Message-Id: <2eb37dcf928e7f4be3f8f23e9f8ad0ceeb50f192.1515348092.git.lukas@wunner.de>
+Message-Id: <96c5a958f65f82433088fb136adb5555e2cfd8e8.1515348092.git.lukas@wunner.de>
 In-Reply-To: <cover.1515348092.git.lukas@wunner.de>
 References: <cover.1515348092.git.lukas@wunner.de>
 From: Lukas Wunner <lukas@wunner.de>
 Date: Sun, 7 Jan 2018 20:16:32 +0100
-Subject: [PATCH v3 07/13] Bluetooth: hci_bcm: Document struct bcm_device
+Subject: [PATCH v3 06/13] Bluetooth: hci_bcm: Invalidate IRQ on request
+ failure
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>
 Cc: Mika Westerberg <mika.westerberg@linux.intel.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Frederic Danis <frederic.danis.oss@gmail.com>, Loic Poulain <loic.poulain@linaro.org>, Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>, Daniel Roschka <danielroschka@phoenitydawn.de>, Ronald Tschalaer <ronald@innovation.ch>, "Peter Y. Chuang" <peteryuchuang@gmail.com>, linux-bluetooth@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+If devm_request_irq() fails, the driver bails out of bcm_request_irq()
+but continues to ->setup the device (because the IRQ is optional).
+
+The driver subsequently calls devm_free_irq(), enable_irq_wake() and
+disable_irq_wake() on the IRQ even though requesting it failed.
+
+Avoid by invalidating the IRQ on request failure.
+
+Cc: Frédéric Danis <frederic.danis.oss@gmail.com>
 Signed-off-by: Lukas Wunner <lukas@wunner.de>
 ---
- drivers/bluetooth/hci_bcm.c | 27 +++++++++++++++++++++++++--
- 1 file changed, 25 insertions(+), 2 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index b5f8008758bc..888dcec56bc2 100644
+index 991d429246f7..b5f8008758bc 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -52,7 +52,30 @@
+@@ -216,8 +216,10 @@ static int bcm_request_irq(struct bcm_data *bcm)
+ 			       bdev->irq_active_low ? IRQF_TRIGGER_FALLING :
+ 						      IRQF_TRIGGER_RISING,
+ 			       "host_wake", bdev);
+-	if (err)
++	if (err) {
++		bdev->irq = err;
+ 		goto unlock;
++	}
  
- #define BCM_AUTOSUSPEND_DELAY	5000 /* default autosleep delay */
- 
--/* device driver resources */
-+/**
-+ * struct bcm_device - device driver resources
-+ * @serdev_hu: HCI UART controller struct
-+ * @list: bcm_device_list node
-+ * @dev: physical UART slave
-+ * @name: device name logged by bt_dev_*() functions
-+ * @device_wakeup: BT_WAKE pin,
-+ *	assert = Bluetooth device must wake up or remain awake,
-+ *	deassert = Bluetooth device may sleep when sleep criteria are met
-+ * @shutdown: BT_REG_ON pin,
-+ *	power up or power down Bluetooth device internal regulators
-+ * @clk: clock used by Bluetooth device
-+ * @clk_enabled: whether @clk is prepared and enabled
-+ * @init_speed: default baudrate of Bluetooth device;
-+ *	the host UART is initially set to this baudrate so that
-+ *	it can configure the Bluetooth device for @oper_speed
-+ * @oper_speed: preferred baudrate of Bluetooth device;
-+ *	set to 0 if @init_speed is already the preferred baudrate
-+ * @irq: interrupt triggered by HOST_WAKE_BT pin
-+ * @irq_active_low: whether @irq is active low
-+ * @hu: pointer to HCI UART controller struct,
-+ *	used to enable flow control during runtime suspend and system sleep
-+ * @is_suspended: whether flow control is currently enabled
-+ */
- struct bcm_device {
- 	/* Must be the first member, hci_serdev.c expects this. */
- 	struct hci_uart		serdev_hu;
-@@ -74,7 +97,7 @@ struct bcm_device {
- 
- #ifdef CONFIG_PM
- 	struct hci_uart		*hu;
--	bool			is_suspended; /* suspend/resume flag */
-+	bool			is_suspended;
- #endif
- };
+ 	device_init_wakeup(bdev->dev, true);
  
 -- 
 2.15.1
