@@ -1,79 +1,97 @@
-Return-Path: <lukas@wunner.de>
-Message-Id: <cover.1515348092.git.lukas@wunner.de>
-From: Lukas Wunner <lukas@wunner.de>
-Date: Sun, 7 Jan 2018 20:16:32 +0100
-Subject: [PATCH v3 00/13] Bluetooth on 2015+ MacBook (Pro)
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Mika Westerberg <mika.westerberg@linux.intel.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Frederic Danis <frederic.danis.oss@gmail.com>, Loic Poulain <loic.poulain@linaro.org>, Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>, Daniel Roschka <danielroschka@phoenitydawn.de>, Ronald Tschalaer <ronald@innovation.ch>, "Peter Y. Chuang" <peteryuchuang@gmail.com>, linux-bluetooth@vger.kernel.org, Sue White <sue.white@lairdtech.com>, Ilya Faenson <ifaenson@broadcom.com>
+In-Reply-To: <CABBYNZLfhge87-FWv_Pj6Da-NFdJU8EUV_ytzG_50u9FAxB=iw@mail.gmail.com>
+References: <CAFmMashE1ReOhQFe9OD2BrXooNGz_Gxa9gHLYfB+BgHLQsT5HA@mail.gmail.com>
+ <CABBYNZLfhge87-FWv_Pj6Da-NFdJU8EUV_ytzG_50u9FAxB=iw@mail.gmail.com>
+From: Alfonso Acosta <alfonso.acosta@gmail.com>
+Date: Sun, 7 Jan 2018 17:48:19 +0100
+Message-ID: <CAFmMashO+g9qkd+-8WybQaDfC+AhJk_NM9a3O_9wkQpiwPuVkg@mail.gmail.com>
+Subject: Re: Overhead reduction in LE connection establishment
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Enable UART-attached Bluetooth on 2015+ Macs, v3.
+Hi Luiz,
 
-The series has grown to 13 patches because bugs in the driver keep
-cropping up.
+Thanks a lot for the detailed answer.
 
-Changes since v2:
+>> At #7 there is an MTU exchange request, which, for this particular
+>> peripheral is not really necessary since I know it only supports 23
+>> bytes. Is there a way to disable that? After reading the gatt client
+>> initialization code, it seems that no exchange is attempted if the MTU
+>> of the central is also 23 bytes, but I don=E2=80=99t know if the default=
+ MTU
+>> is configurable. Is it?
+>
+> In theory the stacks does not have to hold on to the same MTU on every
+> connection, this is important especially for devices where services
+> can be registered dynamically
 
-- In patch [01/13] ("Mandate presence of shutdown and device wake GPIO"):
-  Keep netdev indentation style. (Marcel)
+Yes, I understand that. That's why I was asking whether there was a
+way to configure the default MTU of the central. Setting it to 23
+should prevent the exchange from happening.
 
-- New patch [04/13] to fix an IRQ race on ->close.
+This is admittedly a workaround. The configuration should probably be
+per device/connection, and I think would be useful for use-cases other
+than mine. BlueZ tries to use the maximum ATT MTU (517), but that may
+not be desirable in high-noise environments in which you want to have
+small MTUs to mitigate the effect of retransmissions.
 
-- New patch [05/13] to fix an unbalanced pm_runtime_disable(). (Andy)
+> so what you are asking probably require
+> a blacklist of devices that don't require MTU negotiation which is
+> something hard to maintain.
 
-- New patch [06/13] to invalidate the IRQ if requesting it failed.
-
-- New patch [08/13] to add callbacks to toggle GPIOs.
-  This makes the subsequent addition of Mac support less intrusive.
-  Replaces patch "Add helper to toggle device wake GPIO" in v2. (Andy)
-
-- In patch [09/13] ("Handle errors properly"):
-  Drop redundant assignment. (Andy)
-
-- In patch [10/13] ("Support Apple GPIO handling"):
-  Don't enable runtime PM on Macs for lack of usable host wake IRQ (Hans),
-  s/BlueTooth/Bluetooth/ in kerneldoc. (Marcel)
-
-- Move patch "Silence IRQ printk" to end of series as it's merely
-  a cleanup and no longer necessary for Mac support.
-
-- New patch [12/13] to use msleep() instead of mdelay()
-  after toggling device wake pin. (Andy)
-
-- New patch [13/13] to fix sleep mode struct ordering.
-
-- Drop incorrect patch "Enable runtime PM despite absence of IRQ". (Hans)
-
-Link to v2:
-https://marc.info/?l=linux-bluetooth&m=151492012812029&w=4
-
-Thanks,
-
-Lukas
+Not necessarily. We could add the MTU to the device info file (much
+like it's done for the connection parameters
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/settings-storag=
+e.txt#n287).
 
 
-Lukas Wunner (12):
-  Bluetooth: hci_bcm: Mandate presence of shutdown and device wake GPIO
-  Bluetooth: hci_bcm: Clean up unnecessary #ifdef
-  Bluetooth: hci_bcm: Fix race on close
-  Bluetooth: hci_bcm: Fix unbalanced pm_runtime_disable()
-  Bluetooth: hci_bcm: Invalidate IRQ on request failure
-  Bluetooth: hci_bcm: Document struct bcm_device
-  Bluetooth: hci_bcm: Add callbacks to toggle GPIOs
-  Bluetooth: hci_bcm: Handle errors properly
-  Bluetooth: hci_bcm: Support Apple GPIO handling
-  Bluetooth: hci_bcm: Silence IRQ printk
-  Bluetooth: hci_bcm: Sleep instead of spinning
-  Bluetooth: btbcm: Fix sleep mode struct ordering
+>> Finally, at #18, I get the notification from the peripheral.
+>
+> And here is the real explanation why we do all this, GATT/ATT
+> notification do no share the same queue as request/response, so all of
+> this shall not stop your peripheral to send the notification upfront
+> regardless if there are any requests outstanding, so perhaps the
+> problem is really the peripheral which expects the central to be quiet
+> while it notifies?
 
-Ronald Tschalär (1):
-  Bluetooth: hci_bcm: Validate IRQ before using it
+Really good point! I will double check the device's firmware, which
+fortunately I have full control of. It may even be that the device
+doesn't either respect CCC persistence (which validates why BlueZ
+doesn't trust the persistence-handling of devices :) ).
 
- drivers/bluetooth/btbcm.h   |   2 +-
- drivers/bluetooth/hci_bcm.c | 227 ++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 189 insertions(+), 40 deletions(-)
+Let's assume I get the peripheral to send the first notification right
+after the encryption is established. Even if I call StartNotify()
+right after the characteristic object is created, won't I risk missing
+the notification if StartNotify() isn't called and served before the
+notification is received?
 
--- 
-2.15.1
+>From what I have observed, the D-Bus GattCharacteristic objects are
+destroyed regularly (at least across bluetoothd restarts), they only
+seem to be re-created when doing service-discovery and the Notifying
+property is not persisted across creations.
+
+
+>>  I am happy to try to provide some patches if we agree that at least
+>> some of these operations are not necessary and there is no way to
+>> disable them through configuration.
+>
+> Except if you want to maintain database of devices with various
+> invalid behaviors I don't think we can do much better, especially
+> because GATT/ATT on the OSes like iOS and Android do come with drivers
+> in a form of applications which does things in their own way we have
+> to deal with these nuances smartly or end up reproducing the same
+> procedures each and every app does which imo is not maintainable.
+
+I agree that creating a blacklist database is probably unfeasible at
+this point, at least without breaking unintentionally breaking
+compatibility with faulty devices which slip through the cracks (which
+I understand we want to avoid).
+
+However, we could use add another option to the info file, say
+"RespectsBondingPersistence" which indicates whether attributes and
+CCC values are properly persisted across connection with bonded
+devices.
