@@ -1,94 +1,115 @@
 Return-Path: <lukas@wunner.de>
-Message-Id: <7f1a284e725960d632a57a8729614926722e0c8d.1515348092.git.lukas@wunner.de>
+Message-Id: <2275aa55098a3df1da75064d10993251004c9fd3.1515348092.git.lukas@wunner.de>
 In-Reply-To: <cover.1515348092.git.lukas@wunner.de>
 References: <cover.1515348092.git.lukas@wunner.de>
 From: Lukas Wunner <lukas@wunner.de>
 Date: Sun, 7 Jan 2018 20:16:32 +0100
-Subject: [PATCH v3 02/13] Bluetooth: hci_bcm: Validate IRQ before using it
+Subject: [PATCH v3 01/13] Bluetooth: hci_bcm: Mandate presence of shutdown and
+ device wake GPIO
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>
 Cc: Mika Westerberg <mika.westerberg@linux.intel.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Frederic Danis <frederic.danis.oss@gmail.com>, Loic Poulain <loic.poulain@linaro.org>, Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>, Daniel Roschka <danielroschka@phoenitydawn.de>, Ronald Tschalaer <ronald@innovation.ch>, "Peter Y. Chuang" <peteryuchuang@gmail.com>, linux-bluetooth@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ronald Tschalär <ronald@innovation.ch>
+Commit 0395ffc1ee05 ("Bluetooth: hci_bcm: Add PM for BCM devices")
+amended this driver to request a shutdown and device wake GPIO on probe,
+but mandated that only one of them need to be present:
 
-The ->close, ->suspend and ->resume hooks assume presence of a valid IRQ
-if the device is wakeup capable.  However it's entirely possible that
-wakeup was enabled by some other entity besides this driver and in this
-case the user will get a WARN splat if no valid IRQ was found.  Avoid by
-checking if the IRQ is valid, i.e. > 0.
+	/* Make sure at-least one of the GPIO is defined and that
+	 * a name is specified for this instance
+	 */
+	if ((!dev->device_wakeup && !dev->shutdown) || !dev->name) {
+		dev_err(&pdev->dev, "invalid platform data\n");
+		return -EINVAL;
+	}
 
-Case in point:  On recent MacBook Pros, the Bluetooth device lacks an
-IRQ (because host wakeup is handled by the SMC, independently of the
-operating system), but it does possess a _PRW method (which specifies
-the SMC's GPE as wake event).  The ACPI core therefore automatically
-marks the physical Bluetooth device wakeup capable upon binding it to
-its ACPI companion:
+However the same commit added a call to bcm_gpio_set_power() to the
+->probe hook, which unconditionally accesses *both* GPIOs.  Luckily,
+the resulting NULL pointer deref was never reported, suggesting there's
+no machine where either GPIO is missing.
 
-device_set_wakeup_capable+0x96/0xb0
-acpi_bind_one+0x28a/0x310
-acpi_platform_notify+0x20/0xa0
-device_add+0x215/0x690
-serdev_device_add+0x57/0xf0
-acpi_serdev_add_device+0xc9/0x110
-acpi_ns_walk_namespace+0x131/0x280
-acpi_walk_namespace+0xf5/0x13d
-serdev_controller_add+0x6f/0x110
-serdev_tty_port_register+0x98/0xf0
-tty_port_register_device_attr_serdev+0x3a/0x70
-uart_add_one_port+0x268/0x500
-serial8250_register_8250_port+0x32e/0x490
-dw8250_probe+0x46c/0x720
-platform_drv_probe+0x35/0x90
-driver_probe_device+0x300/0x450
-bus_for_each_drv+0x67/0xb0
-__device_attach+0xde/0x160
-bus_probe_device+0x9c/0xb0
-device_add+0x448/0x690
-platform_device_add+0x10e/0x260
-mfd_add_device+0x392/0x4c0
-mfd_add_devices+0xb1/0x110
-intel_lpss_probe+0x2a9/0x610 [intel_lpss]
-intel_lpss_pci_probe+0x7a/0xa8 [intel_lpss_pci]
+Commit 8a92056837fd ("Bluetooth: hci_bcm: Add (runtime)pm support to the
+serdev driver") removed the check whether at least one of the GPIOs is
+present without specifying a reason.
 
-Signed-off-by: Ronald Tschalär <ronald@innovation.ch>
-[lukas: fix up ->suspend and ->resume as well, add commit message]
+Because commit 62aaefa7d038 ("Bluetooth: hci_bcm: improve use of gpios
+API") refactored the driver to use devm_gpiod_get_optional() instead of
+devm_gpiod_get(), one is now tempted to believe that the driver doesn't
+require *any* of the two GPIOs.
+
+Which is wrong, the driver still requires both GPIOs to avoid a NULL
+pointer deref.  To this end, establish the status quo ante and request
+the GPIOs with devm_gpiod_get() again.  Bail out of ->probe if either
+of them is missing.
+
+Oddly enough, whereas bcm_gpio_set_power() accesses the device wake pin
+unconditionally, bcm_suspend_device() and bcm_resume_device() do check
+for its presence before accessing it.  Those checks are superfluous,
+so remove them.
+
+Cc: Frédéric Danis <frederic.danis.oss@gmail.com>
+Cc: Loic Poulain <loic.poulain@linaro.org>
+Cc: Hans de Goede <hdegoede@redhat.com>
+Cc: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>
 Signed-off-by: Lukas Wunner <lukas@wunner.de>
 ---
- drivers/bluetooth/hci_bcm.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 24 +++++++++---------------
+ 1 file changed, 9 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 7d059b35c63a..d9f71ed26667 100644
+index 1fc604a0d870..7d059b35c63a 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -377,7 +377,7 @@ static int bcm_close(struct hci_uart *hu)
- 		pm_runtime_disable(bdev->dev);
- 		pm_runtime_set_suspended(bdev->dev);
- 
--		if (device_can_wakeup(bdev->dev)) {
-+		if (bdev->irq > 0) {
- 			devm_free_irq(bdev->dev, bdev->irq, bdev);
- 			device_init_wakeup(bdev->dev, false);
- 		}
-@@ -623,7 +623,7 @@ static int bcm_suspend(struct device *dev)
- 	if (pm_runtime_active(dev))
- 		bcm_suspend_device(dev);
- 
--	if (device_may_wakeup(dev)) {
-+	if (device_may_wakeup(dev) && bdev->irq > 0) {
- 		error = enable_irq_wake(bdev->irq);
- 		if (!error)
- 			bt_dev_dbg(bdev, "BCM irq: enabled");
-@@ -653,7 +653,7 @@ static int bcm_resume(struct device *dev)
- 	if (!bdev->hu)
- 		goto unlock;
- 
--	if (device_may_wakeup(dev)) {
-+	if (device_may_wakeup(dev) && bdev->irq > 0) {
- 		disable_irq_wake(bdev->irq);
- 		bt_dev_dbg(bdev, "BCM irq: disabled");
+@@ -572,11 +572,9 @@ static int bcm_suspend_device(struct device *dev)
  	}
+ 
+ 	/* Suspend the device */
+-	if (bdev->device_wakeup) {
+-		gpiod_set_value(bdev->device_wakeup, false);
+-		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
+-		mdelay(15);
+-	}
++	gpiod_set_value(bdev->device_wakeup, false);
++	bt_dev_dbg(bdev, "suspend, delaying 15 ms");
++	mdelay(15);
+ 
+ 	return 0;
+ }
+@@ -587,11 +585,9 @@ static int bcm_resume_device(struct device *dev)
+ 
+ 	bt_dev_dbg(bdev, "");
+ 
+-	if (bdev->device_wakeup) {
+-		gpiod_set_value(bdev->device_wakeup, true);
+-		bt_dev_dbg(bdev, "resume, delaying 15 ms");
+-		mdelay(15);
+-	}
++	gpiod_set_value(bdev->device_wakeup, true);
++	bt_dev_dbg(bdev, "resume, delaying 15 ms");
++	mdelay(15);
+ 
+ 	/* When this executes, the device has woken up already */
+ 	if (bdev->is_suspended && bdev->hu) {
+@@ -774,14 +770,12 @@ static int bcm_get_resources(struct bcm_device *dev)
+ 
+ 	dev->clk = devm_clk_get(dev->dev, NULL);
+ 
+-	dev->device_wakeup = devm_gpiod_get_optional(dev->dev,
+-						     "device-wakeup",
+-						     GPIOD_OUT_LOW);
++	dev->device_wakeup = devm_gpiod_get(dev->dev, "device-wakeup",
++					    GPIOD_OUT_LOW);
+ 	if (IS_ERR(dev->device_wakeup))
+ 		return PTR_ERR(dev->device_wakeup);
+ 
+-	dev->shutdown = devm_gpiod_get_optional(dev->dev, "shutdown",
+-						GPIOD_OUT_LOW);
++	dev->shutdown = devm_gpiod_get(dev->dev, "shutdown", GPIOD_OUT_LOW);
+ 	if (IS_ERR(dev->shutdown))
+ 		return PTR_ERR(dev->shutdown);
+ 
 -- 
 2.15.1
