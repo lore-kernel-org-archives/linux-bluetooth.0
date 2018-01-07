@@ -1,37 +1,209 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <martin.blumenstingl@googlemail.com>
 MIME-Version: 1.0
-From: Austin Morton <austinpmorton@gmail.com>
-Date: Sun, 7 Jan 2018 16:12:16 -0500
-Message-ID: <CAPWKHJRVP-MwzKTvL5moRa9f=WbT-qqNAH_y=tJ_B-TzXjNcYw@mail.gmail.com>
-Subject: [PATCH] sbc: improve compatibility with ARM Cortex-M
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <41669609-3E28-473D-8616-71B9D0EEDCDF@holtmann.org>
+References: <20180101204217.26165-1-martin.blumenstingl@googlemail.com>
+ <20180101204217.26165-8-martin.blumenstingl@googlemail.com>
+ <563D6F9F-8495-40D4-BE56-5338ED2B9B99@holtmann.org> <CAL9uMOEMDup4hRkxD-tM8R0YirGs5uQi31AjJUnFCPNMKUdRHg@mail.gmail.com>
+ <E8E39477-CF1A-4A3E-84C5-830E182C2266@holtmann.org> <CAL9uMOH0N-4jgQncmPjK-KyU0vY9Q0ZnHYSAGgz3z3ywzc8Avw@mail.gmail.com>
+ <CAFBinCBB=SmviOMRHGDH6vzjTjV-mrtQEc8nBUhDbJGs9SBpgw@mail.gmail.com>
+ <CAL9uMOFyfr_qGf5BeTojkMeWeH8LqPoKj=LrdgEMB2wmhGBxmA@mail.gmail.com>
+ <CAFBinCAFsDRpp=4We1hQPiutM1Q0MrqebPLyS3e2_e+JcBoSmg@mail.gmail.com>
+ <CAL9uMOGkZefjD_JNxjf4yJ0ATFtOG5Cm_XQq1fy0VQDjiMFBmg@mail.gmail.com>
+ <EC216531-81EC-4EE8-BAC4-C6954C222092@holtmann.org> <1F394D8B-CFB8-48BA-BC6B-15D1EE51DB08@holtmann.org>
+ <41669609-3E28-473D-8616-71B9D0EEDCDF@holtmann.org>
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date: Sun, 7 Jan 2018 21:07:33 +0100
+Message-ID: <CAFBinCBasb-WkLngxL2RAk9YMihC437ZgPKSkOd7Fm0RHG_aTw@mail.gmail.com>
+Subject: Re: [RFC v2 7/9] bluetooth: btrtl: load the config blob from
+ devicetree when available
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Carlo Caione <carlo@endlessm.com>, Rob Herring <robh+dt@kernel.org>,
+	devicetree <devicetree@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
+	Mark Rutland <mark.rutland@arm.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>, linux-amlogic@lists.infradead.org,
+	Larry Finger <Larry.Finger@lwfinger.net>, Daniel Drake <drake@endlessm.com>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Specifically test the compiler for the feature required to use the
-smuad/smlad instructions when determining if we can build with ARMV6
-primitive support rather than guessing based on thumb version.
-__ARM_FEATURE_SIMD32 is defined in section 9.5.1 of the "ARM C
-Language Extensions 2.1" specification published by ARM.
+Hi Marcel,
 
-Signed-off-by: Austin Morton <austinpmorton@gmail.com>
----
- sbc/sbc_primitives_armv6.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+thank you for digging into this!
 
-diff --git a/sbc/sbc_primitives_armv6.h b/sbc/sbc_primitives_armv6.h
-index 6a9efe5..4a9b53d 100644
---- a/sbc/sbc_primitives_armv6.h
-+++ b/sbc/sbc_primitives_armv6.h
-@@ -41,7 +41,7 @@
- #if !defined(SBC_HIGH_PRECISION) && (SCALE_OUT_BITS == 15) && \
-  defined(__GNUC__) && defined(SBC_HAVE_ARMV6) && \
-  defined(__ARM_EABI__) && !defined(__ARM_NEON__) && \
-- (!defined(__thumb__) || defined(__thumb2__))
-+ defined(__ARM_FEATURE_SIMD32)
+On Fri, Jan 5, 2018 at 9:44 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Carlo,
+>
+>>>>>> As Marcel suggested we can assume that the information in the DSDT i=
+s
+>>>>>> correct so that we can get rid of the config blob also for x86
+>>>>>> platforms (assuming that the only useful information in the config
+>>>>>> blobs is the UART configuration).
+>>>>> in my tests I tried to send only the firmware without the config to m=
+y
+>>>>> RTL8723BS. unfortunately the last firmware chunk (sent to the
+>>>>> controller) times out in that case (even if I set a proper baudrate
+>>>>> before or if I specify no baudrate at all and keep the serdev at
+>>>>> 115200)
+>>>>
+>>>> What's in the config blobs besides UART configuration?
+>>>
+>>> is anybody writing a rtlfw.c tool (like nokfw.c) so that we can print o=
+ut what we actually have in these config files?
+>>>
+>>>> It's odd because reading into hciattach_rtk.c it seems that the config
+>>>> file is actually only used by the userspace tools (hciattach) to
+>>>> retrieve the UART configuration and nothing else, whereas in the
+>>>> kernel driver the config blob is appended to the firmware.
+>>>
+>>> Frankly, I am inclined to not use the config file even for DT based sys=
+tem and just allow specifying the UART settings via normal DT properties li=
+ke we do for Broadcom and others.
+>>
+>> so I googled for a few config files and this is what this turns into:
+>>
+>> Analyzing rtl8723d_config_1000000_noflow.dms
+>> Signature:   0x8723ab55
+>> Data length: 41
+>> len=3D1   offset=3Df4,{ 01 }
+>> len=3D2   offset=3Df6,{ 81 00 }
+>> len=3D2   offset=3Dfa,{ 12 80 }
+>> len=3D16  offset=3D0c,{ 04 50 00 00 50 c5 ea 19 e1 1b fd af 5b 01 a4 0b =
+}
+>> len=3D1   offset=3Dd9,{ 0f }
+>> len=3D1   offset=3De4,{ 08 }
+>> Analyzing rtl8723d_config.dms
+>> Signature:   0x8723ab55
+>> Data length: 41
+>> len=3D1   offset=3Df4,{ 01 }
+>> len=3D2   offset=3Df6,{ 81 00 }
+>> len=3D2   offset=3Dfa,{ 12 80 }
+>> len=3D16  offset=3D0c,{ 02 80 92 04 50 c5 ea 19 e1 1b fd af 5f 01 a4 0b =
+}
+>> len=3D1   offset=3Dd9,{ 0f }
+>> len=3D1   offset=3De4,{ 08 }
+>> Analyzing rtl8822b_config.bin
+>> Signature:   0x8723ab55
+>> Data length: 8
+>> len=3D1   offset=3Dd9,{ 0f }
+>> len=3D1   offset=3De4,{ 08 }
+>>
+>> The first two are some UART based ones and the last one is USB based.
+>>
+>> So the 0x3c offset seems to be the BD_ADDR and 0x0c offset is the UART c=
+onfiguration. It would be good to know which settings the other ones contro=
+l.
+this matches my findings from the hciattach_rtk tool for rtl8723bs_bt
+and rtl8723ds_bt
 
- #define SBC_BUILD_WITH_ARMV6_SUPPORT
+>> Also the 16 octet UART config blob seems to be decoded like this:
+>>
+>>       uart_config {
+>>               le32 baudrate;
+>>               u8[8] reserved1;
+>>               u8 flowctl;
+>>               u8[3] reserved2;
+>>       }
+>>
+I could not find this in any of the rtl8723bs_bt or rtl8723ds_bt sources
+so thank you for sharing this (even though this descriptin is missing
+a few bytes)!
 
--- 
-2.15.1.windows.2
+>> Actually hciattach_rtk just takes the baud rate and and hardware flow co=
+ntrol bit out of this file. That is clearly two things that are better writ=
+ten in plain text in the DT file.
+this matches my findings apart from that hciattach_rtk also appends
+the config blob to the "firmware patch" that is being uploaded to the
+device
+if you are brave you can have a look at [0]
+
+> so this is actually some funny stuff if you start to understand it.
+>
+> Analyzing rtl8723b_config.dms
+> Signature: 0x8723ab55
+> Data len:  38
+> len=3D8   offset=3D00f4,{ 01 00 00 00 05 50 00 00 }
+> len=3D16  offset=3D000c,{ 02 80 92 04 50 c5 ea 19 e1 1b f1 af 5f 01 a4 0b=
+ },UART_CONFIG
+> len=3D1   offset=3D0027,{ 63 }
+> len=3D1   offset=3D00fe,{ 01 }
+> Analyzing rtl8723d_config_1000000_noflow.dms
+> Signature: 0x8723ab55
+> Data len:  41
+> len=3D1   offset=3D00f4,{ 01 }
+> len=3D2   offset=3D00f6,{ 81 00 }
+> len=3D2   offset=3D00fa,{ 12 80 }
+> len=3D16  offset=3D000c,{ 04 50 00 00 50 c5 ea 19 e1 1b fd af 5b 01 a4 0b=
+ },UART_CONFIG
+> len=3D1   offset=3D00d9,{ 0f }
+> len=3D1   offset=3D00e4,{ 08 }
+>
+> Seems like Realtek really defines memory offsets in this file and they ca=
+n be defined in various different ways.
+wow, that is interesting - I was wondering why they called it "offset"
+instead of "config_id" (or something similar)
+
+> So 00f4,{ 01 00 00 00 05 50 00 00 } defines the whole PCM settings for in=
+terface 1 and 2. And 00f4,{ 01 } + 00f6,{ 81 00 } + 00fa,{ 12 80 } is the s=
+ame PCM settings, but with only pieces of it defined.
+>
+> This also means a 000c,{ 04 50 00 00 50 } for just setting the baud rate =
+is as valid if flow control defaults to off and all other values are actual=
+ defaults. So code inside hciattach_rtk.c is also kind faulty on how it han=
+dles the flow control bit. It works if the config files all have offset 000=
+c in it, but if not, then they are going funky.
+>
+> Since these are efuse settings, I really wonder if there is just a HCI ve=
+ndor command to read out the defaults and we use that to compare. And what =
+I would really like to know is what these settings are suppose to change. S=
+ince even for USB, we are actually not even applying them.
+the idea with the vendor command to read out existing memory is interesting
+
+based on the code in "btrtl.c" it seems that we are applying the
+settings from the config blob.
+we are simply appending it at the end of the "firmware patch", see [1]
+
+> Anyway, I am certain that for Realtek UART devices, we just want to speci=
+fy max-speed DT property like we do with the others. And then maybe a flow-=
+control DT property to control that one (following what nfcmrvl.txt does). =
+We can use the rtlfw tool that I wrote to extract the values from Realtek p=
+rovided config files. Frankly the PCM settings we have to deal with as well=
+ at some point. But that is also missing for Broadcom and others.
+just to make sure I understand you correctly: would you generate the
+config blob in-memory (in a function in btrtl.c) and hardcode all
+unknown bits (the reserved bits in the UART config entry for example)
+or would you mandate that a config blob is present (so
+request_firmware can fetch it) for "high-speed" operation?
+
+for PCM: I cannot test that anyways since the Amlogic platform does
+not have audio support yet
+
+> Also if there is no config file, we should be able to just assume no flow=
+ control, 115200 baud rate and H:5 as protocol. That means that almost all =
+chips will just work. They are just slow since we do not deal with the max-=
+speed setting.
+my problem so far was that uploading the firmware patch without
+appending a config blob (see [1]) broke the UART communication (it was
+not 115200 baud as before, and I also tried other speeds such as
+1500000 and 1000000 baud - neither worked)
+however, extracting the existing values from the efuse using a vendor
+command might give a hint why (maybe they are fallling back to some
+exotic baudrate in that case, etc...)
+
+> At the end of the day, this is the same as for Broadcom and ACPI vs DT. T=
+his should be no different. The only bit nasty part is that this is H:5 as =
+protocol and we have not really abstracted that one nicely to just have a t=
+iny hci_rtl.c for vendor specific pieces.
+yes, you already suggested that I should start making that re-usable
+(this is still on my TODO-list)
+
+
+Regards
+Martin
+
+
+[0] https://github.com/NextThingCo/rtl8723ds_bt/blob/master/rtk_hciattach/h=
+ciattach_rtk.c#L2742
+[1] https://elixir.free-electrons.com/linux/v4.14.11/source/drivers/bluetoo=
+th/btrtl.c#L377
