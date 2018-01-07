@@ -1,37 +1,69 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Adam Pigg <adam@piggz.co.uk>
-Date: Sun, 7 Jan 2018 22:52:21 +0000
-Message-ID: <CANFkB1weoWSOw7OUktNZsn7dLFR9A+qJEY3jDMHx3ug_wsc=OQ@mail.gmail.com>
-Subject: Bluez on a modern (ish) Android kernel
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: Austin Morton <austinpmorton@gmail.com>
+Date: Sun, 7 Jan 2018 16:17:20 -0500
+Message-ID: <CAPWKHJSraT_wG9FDtarTXQuWN=1pymf5dMbmwdgz8EQp_JPaMg@mail.gmail.com>
+Subject: [PATCH] sbc: fix endian detection on arm-none-eabi
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+The gcc-arm-none-eabi toolchain defines its byte order constants with a single
+preceding underscore rather than two.
+Additionally, the macros do not get defined unless <sys/param.h> is included.
 
-I was wondering if bluez5 works with the qualcomm BT devices often
-found in Android phones?
+Signed-off-by: Austin Morton <austinpmorton@gmail.com>
+---
+ sbc/sbc.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-Specifically, im porting SailfishOS to a phone with a Qualcomm BT
-adaptor.  BT mostly works, but I have to modify the kernel to add the
-hci_smd driver.  This driver appears to have been abandoned a few
-years ago.
+diff --git a/sbc/sbc.c b/sbc/sbc.c
+index 606f11c..d3f5948 100644
+--- a/sbc/sbc.c
++++ b/sbc/sbc.c
+@@ -35,6 +35,7 @@
+ #include <stdlib.h>
+ #include <stdbool.h>
+ #include <sys/types.h>
++#include <sys/param.h>
+ #include <limits.h>
 
-My kernel version is 3.18, and the chipset is msm8953,
+ #include "sbc_math.h"
+@@ -70,7 +71,8 @@
+ #define A2DP_ALLOCATION_SNR (1 << 1)
+ #define A2DP_ALLOCATION_LOUDNESS (1 << 0)
 
-With the hci_smd driver, BT works most of the time, but I do get
-reboots sometimes when initiating a call from my car kit, and my
-instinct is to blame the hci_smd driver which I had to add.  The
-backtrace for a crash is https://bpaste.net/show/3644d521584b.
+-#if __BYTE_ORDER == __LITTLE_ENDIAN
++#if (defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN) || \
++ (defined(_BYTE_ORDER) && _BYTE_ORDER == _LITTLE_ENDIAN)
 
-So...
-is the hci_smd driver the only way for bluez to communicate with the adaptor?
-how does bluedroid work without it?
-are there any alternatives to this driver?
-is the driver ok, and mt problem is elsewhere?
+ struct a2dp_sbc {
+  uint8_t channel_mode:4;
+@@ -82,7 +84,8 @@ struct a2dp_sbc {
+  uint8_t max_bitpool;
+ } __attribute__ ((packed));
 
-Cheers
+-#elif __BYTE_ORDER == __BIG_ENDIAN
++#elif (defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN) || \
++ (defined(_BYTE_ORDER) && _BYTE_ORDER == _BIG_ENDIAN)
 
-Adam
+ struct a2dp_sbc {
+  uint8_t frequency:4;
+@@ -1024,9 +1027,11 @@ static void sbc_set_defaults(sbc_t *sbc,
+unsigned long flags)
+  sbc->subbands = SBC_SB_8;
+  sbc->blocks = SBC_BLK_16;
+  sbc->bitpool = 32;
+-#if __BYTE_ORDER == __LITTLE_ENDIAN
++#if (defined(__BYTE_ORDER) && __BYTE_ORDER == __LITTLE_ENDIAN) || \
++ (defined(_BYTE_ORDER) && _BYTE_ORDER == _LITTLE_ENDIAN)
+  sbc->endian = SBC_LE;
+-#elif __BYTE_ORDER == __BIG_ENDIAN
++#elif (defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN) || \
++ (defined(_BYTE_ORDER) && _BYTE_ORDER == _BIG_ENDIAN)
+  sbc->endian = SBC_BE;
+ #else
+ #error "Unknown byte order"
+-- 
+2.15.1.windows.2
