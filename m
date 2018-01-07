@@ -1,132 +1,136 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: btusb: Disable autosuspend on QCA Rome devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <db68266f-0d52-3ba1-3d19-fb89777b474f@redhat.com>
-Date: Sun, 7 Jan 2018 01:24:05 +0100
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <19EFBBC0-2F34-46B6-A488-545565357C97@holtmann.org>
-References: <20180104085154.31377-1-hdegoede@redhat.com>
- <FB7F6620-96C0-4539-B05D-96FA104CC166@holtmann.org>
- <35fce5b6-9094-e778-b234-23570a8efc98@redhat.com>
- <db68266f-0d52-3ba1-3d19-fb89777b474f@redhat.com>
-To: Hans de Goede <hdegoede@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <CAFmMashE1ReOhQFe9OD2BrXooNGz_Gxa9gHLYfB+BgHLQsT5HA@mail.gmail.com>
+References: <CAFmMashE1ReOhQFe9OD2BrXooNGz_Gxa9gHLYfB+BgHLQsT5HA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sat, 6 Jan 2018 22:23:07 -0200
+Message-ID: <CABBYNZLfhge87-FWv_Pj6Da-NFdJU8EUV_ytzG_50u9FAxB=iw@mail.gmail.com>
+Subject: Re: Overhead reduction in LE connection establishment
+To: Alfonso Acosta <alfonso.acosta@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hans,
+Hi Alfonso,
 
->>>> Commit fd865802c66b ("Bluetooth: btusb: fix QCA Rome suspend/resume") fixes
->>>> a suspend/resume problem on QCA devices by doing a full reset on resume,
->>>> reloading the firmware.
->>>> 
->>>> A similar problem happens when using runtime-pm / autosuspend, when this is
->>>> enabled by the user the QCA Rome device stops working. Reloading the
->>>> firmware after a runtime suspend is not really an option since the latency
->>>> caused by this is unacceptable.
->>>> 
->>>> To fix the runtime-pm issues, this commit disables runtime-pm on QCA Rome
->>>> HCIs, by getting (and not releasing) an usb autopm reference on the btusb
->>>> interface.
->>>> 
->>>> BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
->>>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->>>> ---
->>>> drivers/bluetooth/btusb.c | 7 +++++++
->>>> 1 file changed, 7 insertions(+)
->>>> 
->>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>>> index 808c249845db..6ed3a0e5b8f6 100644
->>>> --- a/drivers/bluetooth/btusb.c
->>>> +++ b/drivers/bluetooth/btusb.c
->>>> @@ -3122,8 +3122,15 @@ static int btusb_probe(struct usb_interface *intf,
->>>>         /* QCA Rome devices lose their updated firmware over suspend,
->>>>          * but the USB hub doesn't notice any status change.
->>>>          * Explicitly request a device reset on resume.
->>>> +         * And disable runtime pm by getting a pm reference, the USB
->>>> +         * core will drop our reference on disconnect.
->>>>          */
->>>>         set_bit(BTUSB_RESET_RESUME, &data->flags);
->>>> +        err = usb_autopm_get_interface(data->intf);
->>>> +        if (err < 0) {
->>>> +            BT_ERR("failed to get pm reference %d", err);
->>>> +            goto out_free_dev;
->>>> +        }
->>>>     }
->>> 
->>> is this still needed after commit 7d06d5895c159f6 that reverts this entry and adds a core USB quirk? See bluetooth-next tree for reference.
->> Yes something like this is still needed, the reporter of the bug looses
->> bluetooth coonectivity due to runtime-pm / usb-autosuspend which is not
->> influenced by the RESET_RESUME quirk either way.
->> I assume the original commit was reverted and replaced with a usb-core
->> quirk because the original commit was applying the RESET_RESUME behavior
->> to all qca models, while only some are affected ?
->> I will ask the reporter for the usb-id of the QCA Rome on his laptop and
->> see if this is the same one as which has been added to
->> drivers/usb/core/quirks.c now.
-> 
-> Ok, so looking a bit further into this, the usb-core has this:
-> 
-> static int autosuspend_check(struct usb_device *udev)
-> {
-> 	...
->                        /* Don't allow autosuspend if the device will need
->                         * a reset-resume and any of its interface drivers
->                         * doesn't include support or needs remote wakeup.
->                         */
->                        if (udev->quirks & USB_QUIRK_RESET_RESUME) {
->                                struct usb_driver *driver;
-> 
->                                driver = to_usb_driver(intf->dev.driver);
->                                if (!driver->reset_resume ||
->                                                intf->needs_remote_wakeup)
->                                        return -EOPNOTSUPP;
->                        }
-> 	...
-> 
-> So setting the USB_QUIRK_RESET_RESUME instead of using the DIY code btusb
-> used to have will also disable USB autosuspend since the btusb driver
-> does not have a reset_resume callback.  So it may be necessary to add
-> more qca USB ids to drivers/usb/core/quirks.c with an USB_QUIRK_RESET_RESUME
-> entry, but otherwise this patch should not be necessary.
-> 
-> 2 Questions:
-> 
-> 1) Why was only the one USB id added to drivers/usb/core/quirks.c
-> where as before we were doing this for all known QCA HCIs ?
-> 
-> 2) Since btusb.c's own RESET_RESUME handling is broken, shouldn't we
-> remove it completely (so also for realtek devices) and instead add all
-> blacklist entries which set .driver_info = BTUSB_REALTEK to
-> drivers/usb/core/quirks.c with an USB_QUIRK_RESET_RESUME
-> entry?
-> 
-> 
-> Hmm, this will likely boil down to adding lots of semi-duplicate entries
-> to drivers/usb/core/quirks.c I think that it would be better to do
-> the following in btusb.c:
-> 
->        if (id->driver_info & BTUSB_QCA_ROME) {
-> 		...
-> 	         /* QCA Rome devices lose their updated firmware over suspend,
->        	  * but the USB hub doesn't notice any status change.
-> 	          * Explicitly request a device reset on resume.
-> 		  */
-> 		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
-> 	}
-> 
-> And the same for driver_info & BTUSB_REALTEK ?
-> 
-> And then remove the DIY reset_resume handling completely. If you agree that
-> that is the best way forward, then I can submit a patch doing that.
+On Fri, Jan 5, 2018 at 5:41 PM, Alfonso Acosta <alfonso.acosta@gmail.com> w=
+rote:
+> Hi there,
+>
+> TL;DR: I have observed that BlueZ does some operations which incur in
+> extra latency when connecting to a bonded peripheral. I would like to
+> know if it's possible to remove those operations through configuration
+> or, if maintainers are open for it, provide some patches to remove
+> them.
+>
+> I have a BLE peripheral with a button. The button state (key pressed /
+> key released) is associated to a custom characteristic (i.e. it's not
+> HID). The state is conveyed through ATT notifications to a central
+> running BlueZ (5.47, using dbus gatt api) with which it=E2=80=99s bonded.
+>
+> In order to save battery, the peripheral is normally disconnected and
+> only starts advertising when the key is pressed. The central is always
+> attempting to connect. Once the connection is established, the
+> key-press in conveyed to the central as a notification (the central
+> calls StartNotify() as soon as a connection is established).
+>
+> For the application=E2=80=99s purpose, it=E2=80=99s critical that the not=
+ification is
+> recieved with the minimum latency.
+>
+> However, between the connection establishment and the notification, I
+> see that BlueZ does some operations which incur in extra latency.
+>
+> To guide the conversation, here is a btmon dump showing what happens
+> in the central right after a connection is established with the
+> peripheral: https://pastebin.com/tQMgwK7v
+>
+> My goal is to minimize the time between #6 and #18
+>
+> At #7 there is an MTU exchange request, which, for this particular
+> peripheral is not really necessary since I know it only supports 23
+> bytes. Is there a way to disable that? After reading the gatt client
+> initialization code, it seems that no exchange is attempted if the MTU
+> of the central is also 23 bytes, but I don=E2=80=99t know if the default =
+MTU
+> is configurable. Is it?
 
-then lets give this a try and I might have to take the two patches out of bluetooth-next which are adding USB core quirks.
+In theory the stacks does not have to hold on to the same MTU on every
+connection, this is important especially for devices where services
+can be registered dynamically, so what you are asking probably require
+a blacklist of devices that don't require MTU negotiation which is
+something hard to maintain.
 
-Regards
+> At #9 and #12 there are reads for the device name and device
+> appearance. I have managed to disable those by lanching bluetoothd
+> with --noplugin=3Ddeviceinfo,gap . So, it's not an issue anymore.
 
-Marcel
+Again the stacks can change the name and appearance depending on the
+services, therefore we read this on every connection.
 
+> At #14 there is an ATT write to the CCC descriptor of the
+> button-status attribute, in order to enable notifications (maybe as a
+> consequence of invoking StartNotify() in the central). But, why is
+> this needed for a bonded peripheral? If I interpret the standard
+> properly, CCC descriptor values should be cached and restored across
+> connections among bonded devices (section "3.3.3.3 Client
+> Characteristic Configuration" "The Client Characteristic Configuration
+> descriptor value shall be persistent across connections for bonded
+> devices."). I, however, can't find a ccc file in the peripheral cache,
+> as described here
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/settings-stor=
+age.txt?h=3D5.47#n46
+> .
+
+The reasons for reprograming the CCC are normally related to faulty
+devices which did not maintain state of CCC, and in some case when
+they had been flashed.
+
+> At #17 the central starts discovering the primary services. Why is
+> this necessary? Shouldn=E2=80=99t they be simply recovered from the cache=
+?
+> (According to the standard "For clients that have a trusted
+> relationship (i.e. bond) with the server, the attribute cache is valid
+> across connections."). I have verified that the cache already
+> contained all the primary services. However, after looking at the code
+> (shared/gatt-client.c ) it seems primary service discovery
+> (bt_gatt_discover_all_primary_services()) is always invoked :S
+
+BlueZ does cache validation of the services, again this is due to
+faulty devices which does not indicate changes on service changed as
+they may have been flashed or something like that.
+
+> Finally, at #18, I get the notification from the peripheral.
+
+And here is the real explanation why we do all this, GATT/ATT
+notification do no share the same queue as request/response, so all of
+this shall not stop your peripheral to send the notification upfront
+regardless if there are any requests outstanding, so perhaps the
+problem is really the peripheral which expects the central to be quiet
+while it notifies?
+
+>  I am happy to try to provide some patches if we agree that at least
+> some of these operations are not necessary and there is no way to
+> disable them through configuration.
+
+Except if you want to maintain database of devices with various
+invalid behaviors I don't think we can do much better, especially
+because GATT/ATT on the OSes like iOS and Android do come with drivers
+in a form of applications which does things in their own way we have
+to deal with these nuances smartly or end up reproducing the same
+procedures each and every app does which imo is not maintainable.
+
+> Thanks in advance,
+>
+> Alfonso Acosta
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Luiz Augusto von Dentz
