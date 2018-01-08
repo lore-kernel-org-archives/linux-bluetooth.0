@@ -1,53 +1,108 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZLiwnG6W424ps-b6+pX8xA5okufaZc1c9A232W7MQNnMQ@mail.gmail.com>
-References: <CAFmMashE1ReOhQFe9OD2BrXooNGz_Gxa9gHLYfB+BgHLQsT5HA@mail.gmail.com>
- <CY4PR02MB2231273076CC0D335C86346782130@CY4PR02MB2231.namprd02.prod.outlook.com>
- <CAFmMasjrc7yh0GTjok8wK6L587a_tG-7kJ8kj_Jnj1taTX75hg@mail.gmail.com> <CABBYNZLiwnG6W424ps-b6+pX8xA5okufaZc1c9A232W7MQNnMQ@mail.gmail.com>
-From: Alfonso Acosta <alfonso.acosta@gmail.com>
-Date: Mon, 8 Jan 2018 16:03:19 +0100
-Message-ID: <CAFmMasjteTShTqXbNtkFY2GjAMA-PnS_kXBfOYMbMAPz1iVQmQ@mail.gmail.com>
-Subject: Re: Overhead reduction in LE connection establishment
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Jamie Mccrae <Jamie.Mccrae@lairdtech.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-ID: <1515418113.7000.791.camel@linux.intel.com>
+Subject: Re: [PATCH v3 00/13] Bluetooth on 2015+ MacBook (Pro)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Lukas Wunner <lukas@wunner.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+        Frederic Danis <frederic.danis.oss@gmail.com>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>,
+        Daniel Roschka <danielroschka@phoenitydawn.de>,
+        Ronald Tschalaer <ronald@innovation.ch>,
+        "Peter Y. Chuang" <peteryuchuang@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Sue White <sue.white@lairdtech.com>,
+        Ilya Faenson <ifaenson@broadcom.com>
+Date: Mon, 08 Jan 2018 15:28:33 +0200
+In-Reply-To: <cover.1515348092.git.lukas@wunner.de>
+References: <cover.1515348092.git.lukas@wunner.de>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz and Jamie,
+On Sun, 2018-01-07 at 20:16 +0100, Lukas Wunner wrote:
+> Enable UART-attached Bluetooth on 2015+ Macs, v3.
+> 
+> The series has grown to 13 patches because bugs in the driver keep
+> cropping up.
+> 
+> Changes since v2:
+> 
+> - In patch [01/13] ("Mandate presence of shutdown and device wake
+> GPIO"):
+>   Keep netdev indentation style. (Marcel)
+> 
+> - New patch [04/13] to fix an IRQ race on ->close.
+> 
+> - New patch [05/13] to fix an unbalanced pm_runtime_disable(). (Andy)
+> 
+> - New patch [06/13] to invalidate the IRQ if requesting it failed.
+> 
+> - New patch [08/13] to add callbacks to toggle GPIOs.
+>   This makes the subsequent addition of Mac support less intrusive.
+>   Replaces patch "Add helper to toggle device wake GPIO" in v2. (Andy)
+> 
+> - In patch [09/13] ("Handle errors properly"):
+>   Drop redundant assignment. (Andy)
+> 
+> - In patch [10/13] ("Support Apple GPIO handling"):
+>   Don't enable runtime PM on Macs for lack of usable host wake IRQ
+> (Hans),
+>   s/BlueTooth/Bluetooth/ in kerneldoc. (Marcel)
+> 
+> - Move patch "Silence IRQ printk" to end of series as it's merely
+>   a cleanup and no longer necessary for Mac support.
+> 
+> - New patch [12/13] to use msleep() instead of mdelay()
+>   after toggling device wake pin. (Andy)
+> 
+> - New patch [13/13] to fix sleep mode struct ordering.
+> 
+> - Drop incorrect patch "Enable runtime PM despite absence of IRQ".
+> (Hans)
+> 
 
->> The only reason is: very high expectations of battery life. I recall
->> we played with the slave latency in the past, but we will reevaluate
->> and see if it's a feasible option. Thanks for the suggestion.
+I didn't test this myself (yet), the code looks more or less fine to me,
+ FWIW, 
 
-I found another reason why the slave latency doesn't fully solve the
-problem. The peripheral is not advertising all the time (only on a
-key-press to save battery). Thus, a large slave latency doesn't help
-when (re-)connecting to the central (e.g. in a cold boot or reboot)
-point at which we also expect the first notification latency to be
-low.
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
-In fact, unless I can get to deliver the notification before BlueZ
-does its post-connection operations (MTU exchange, CCCD write etc ...)
-, a large slave latency will probably make things worse. Which leads
-me to the question below ...
+> Link to v2:
+> https://marc.info/?l=linux-bluetooth&m=151492012812029&w=4
+> 
+> Thanks,
+> 
+> Lukas
+> 
+> 
+> Lukas Wunner (12):
+>   Bluetooth: hci_bcm: Mandate presence of shutdown and device wake
+> GPIO
+>   Bluetooth: hci_bcm: Clean up unnecessary #ifdef
+>   Bluetooth: hci_bcm: Fix race on close
+>   Bluetooth: hci_bcm: Fix unbalanced pm_runtime_disable()
+>   Bluetooth: hci_bcm: Invalidate IRQ on request failure
+>   Bluetooth: hci_bcm: Document struct bcm_device
+>   Bluetooth: hci_bcm: Add callbacks to toggle GPIOs
+>   Bluetooth: hci_bcm: Handle errors properly
+>   Bluetooth: hci_bcm: Support Apple GPIO handling
+>   Bluetooth: hci_bcm: Silence IRQ printk
+>   Bluetooth: hci_bcm: Sleep instead of spinning
+>   Bluetooth: btbcm: Fix sleep mode struct ordering
+> 
+> Ronald Tschalär (1):
+>   Bluetooth: hci_bcm: Validate IRQ before using it
+> 
+>  drivers/bluetooth/btbcm.h   |   2 +-
+>  drivers/bluetooth/hci_bcm.c | 227
+> ++++++++++++++++++++++++++++++++++++--------
+>  2 files changed, 189 insertions(+), 40 deletions(-)
+> 
 
-> We do
-> however only reload the device attributes once connecting, to avoid
-> heavy io at startup, so if you are restarting bluetoothd it won't
-> restore the objects right away.
-
-This reflects what I see.
-
-Then isn't  StartNotify() racy when connecting to bonded peripherals
-for the first time after bluetoothd starts?
-
-More specifically, won't the D-Bus API miss notifications when:
-1. We have a characteristic in a bonded peripheral for which
-notifications when enabled in the CCCD in a prior connection to the
-central (BlueZ)
-2. Notifications are sent form the peripheral after the connection is
-established (without waiting for a CCCD write, which should be
-acceptable if the peripheral is bonded)
-2. It's the first connection to the peripheral since bluetoothd started
+-- 
+Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Intel Finland Oy
