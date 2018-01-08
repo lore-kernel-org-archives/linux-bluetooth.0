@@ -1,47 +1,62 @@
-Return-Path: <foo00@h08.hostsharing.net>
-Date: Mon, 8 Jan 2018 05:06:58 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Frederic Danis <frederic.danis.oss@gmail.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>,
-	Leif Liddy <leif.liddy@gmail.com>,
-	Daniel Roschka <danielroschka@phoenitydawn.de>,
-	Ronald Tschalaer <ronald@innovation.ch>,
-	"Peter Y. Chuang" <peteryuchuang@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 09/13] Bluetooth: hci_bcm: Handle errors properly
-Message-ID: <20180108040658.GA13972@wunner.de>
-References: <cover.1515348092.git.lukas@wunner.de>
- <4cf1ba614b554d096448d3705e95140fac346193.1515348092.git.lukas@wunner.de>
+Return-Path: <chia-lin.kao@canonical.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <4cf1ba614b554d096448d3705e95140fac346193.1515348092.git.lukas@wunner.de>
+In-Reply-To: <DD31674B-4AE6-4759-9986-0F0736EDBCE3@holtmann.org>
+References: <CAFv23Qk1zv-Otg_EJXndfiXgxzO2O44JTbV12SJyZapjPwPwaw@mail.gmail.com>
+ <DD31674B-4AE6-4759-9986-0F0736EDBCE3@holtmann.org>
+From: AceLan Kao <acelan.kao@canonical.com>
+Date: Mon, 8 Jan 2018 09:24:37 +0800
+Message-ID: <CAFv23Qm88ANgnj+rsddYXMYwN0fv86kwVJxdPNN1goXUKA_fYQ@mail.gmail.com>
+Subject: Re: Intel BT[8087:0025] leads to system auto resume from S3 randomly
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, Ethan Hsieh <ethan.hsieh@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jan 07, 2018 at 08:16:32PM +0100, Lukas Wunner wrote:
-> @@ -406,8 +440,10 @@ static int bcm_close(struct hci_uart *hu)
->  			device_init_wakeup(bdev->dev, false);
->  		}
->  
-> -		bcm_gpio_set_power(bdev, false);
-> -		if (bdev->irq > 0) {
-> +		err = bcm_gpio_set_power(bdev, false);
-> +		if (err) {
-> +			bt_dev_err(hu->hdev, "Failed to power down");
-> +		} else if (bdev->irq > 0) {
->  			pm_runtime_disable(bdev->dev);
->  			pm_runtime_set_suspended(bdev->dev);
->  		}
+Hi Marcel,
 
-Hm, I realize I've botched this (again):  If a valid IRQ was found
-but bcm_gpio_set_power() fails here, then the pm_runtime_enable()
-in bcm_request_irq() isn't balanced. :-(
+The issue is the system automatically wakes up from S3.
+We tried to figure out the issue and found that BT is suspicious
+that's how the workaround comes from.
+Also, we found that if we connect the BT antenna, the system will be
+waken up more quickly.
 
-So pm_runtime_disable() needs to be called even if err != 0
-(but only if bdev->irq > 0).
+I know the quirk will disable the ability to wake up the system from
+remote, but I have no idea how to debug it further.
+Is there any way I could try to check if we really got a wake up
+packet or we keep receiving random packets and trigger the wake up
+process?
+Thanks.
 
-Lukas
+Best regards,
+AceLan Kao.
+
+2018-01-05 22:59 GMT+08:00 Marcel Holtmann <marcel@holtmann.org>:
+> Hi AceLan,
+>
+>> We found an issue that when system enters S3, it stays in S3 for a few
+>> seconds, and somehow it resumes automatically.
+>> And we try below quirk which can prevent it from waking up.
+>>
+>> drivers/usb/core/quirks.c
+>> @@ -208,11 +208,11 @@ static const struct usb_device_id usb_quirk_list[]=
+ =3D {
+>>                        USB_QUIRK_DISCONNECT_SUSPEND },
+>>        { USB_DEVICE(0x12d1, 0x15c3), .driver_info =3D
+>>                        USB_QUIRK_DISCONNECT_SUSPEND },
+>> +        { USB_DEVICE(0x8087, 0x0025), .driver_info =3D
+>> +                        USB_QUIRK_DISCONNECT_SUSPEND },
+>>
+>> Here are some findings from the system.
+>>
+>> $ lsusb
+>> Bus 001 Device 004: ID 8087:0025 Intel Corp.
+>
+> can we be a bit more specific here on what is going on and triage this a =
+bit more. I have not heard of our hardware needing such a broad quirk. Also=
+ disconnecting on suspend means that we loose the support for remote wakeup=
+ and I am pretty sure that we do not want that.
+>
+> Regards
+>
+> Marcel
+>
