@@ -1,5 +1,5 @@
 Return-Path: <foo00@h08.hostsharing.net>
-Date: Mon, 8 Jan 2018 05:27:01 +0100
+Date: Mon, 8 Jan 2018 05:06:58 +0100
 From: Lukas Wunner <lukas@wunner.de>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>
@@ -13,25 +13,35 @@ Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
 	Ronald Tschalaer <ronald@innovation.ch>,
 	"Peter Y. Chuang" <peteryuchuang@gmail.com>,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 07/13] Bluetooth: hci_bcm: Document struct bcm_device
-Message-ID: <20180108042701.GB13972@wunner.de>
+Subject: Re: [PATCH v3 09/13] Bluetooth: hci_bcm: Handle errors properly
+Message-ID: <20180108040658.GA13972@wunner.de>
 References: <cover.1515348092.git.lukas@wunner.de>
- <2eb37dcf928e7f4be3f8f23e9f8ad0ceeb50f192.1515348092.git.lukas@wunner.de>
+ <4cf1ba614b554d096448d3705e95140fac346193.1515348092.git.lukas@wunner.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <2eb37dcf928e7f4be3f8f23e9f8ad0ceeb50f192.1515348092.git.lukas@wunner.de>
+In-Reply-To: <4cf1ba614b554d096448d3705e95140fac346193.1515348092.git.lukas@wunner.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 On Sun, Jan 07, 2018 at 08:16:32PM +0100, Lukas Wunner wrote:
-> + * @hu: pointer to HCI UART controller struct,
-> + *	used to enable flow control during runtime suspend and system sleep
-> + * @is_suspended: whether flow control is currently enabled
+> @@ -406,8 +440,10 @@ static int bcm_close(struct hci_uart *hu)
+>  			device_init_wakeup(bdev->dev, false);
+>  		}
+>  
+> -		bcm_gpio_set_power(bdev, false);
+> -		if (bdev->irq > 0) {
+> +		err = bcm_gpio_set_power(bdev, false);
+> +		if (err) {
+> +			bt_dev_err(hu->hdev, "Failed to power down");
+> +		} else if (bdev->irq > 0) {
+>  			pm_runtime_disable(bdev->dev);
+>  			pm_runtime_set_suspended(bdev->dev);
+>  		}
 
-Botched this as well unfortunately, it should read "used to *disable*
-flow control".
+Hm, I realize I've botched this (again):  If a valid IRQ was found
+but bcm_gpio_set_power() fails here, then the pm_runtime_enable()
+in bcm_request_irq() isn't balanced. :-(
 
-I didn't realize that the semantics of hci_uart_set_flow_control()
-are reversed and that "false" actually *enables* flow control.
-(What's the rationale for that anyway?)
+So pm_runtime_disable() needs to be called even if err != 0
+(but only if bdev->irq > 0).
 
 Lukas
