@@ -1,45 +1,37 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jamie Mccrae <Jamie.Mccrae@lairdtech.com>
-To: Alfonso Acosta <alfonso.acosta@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Overhead reduction in LE connection establishment
-Date: Mon, 8 Jan 2018 08:05:31 +0000
-Message-ID: <CY4PR02MB2231273076CC0D335C86346782130@CY4PR02MB2231.namprd02.prod.outlook.com>
-References: <CAFmMashE1ReOhQFe9OD2BrXooNGz_Gxa9gHLYfB+BgHLQsT5HA@mail.gmail.com>
-In-Reply-To: <CAFmMashE1ReOhQFe9OD2BrXooNGz_Gxa9gHLYfB+BgHLQsT5HA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <foo00@h08.hostsharing.net>
+Date: Mon, 8 Jan 2018 05:27:01 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Frederic Danis <frederic.danis.oss@gmail.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>,
+	Leif Liddy <leif.liddy@gmail.com>,
+	Daniel Roschka <danielroschka@phoenitydawn.de>,
+	Ronald Tschalaer <ronald@innovation.ch>,
+	"Peter Y. Chuang" <peteryuchuang@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 07/13] Bluetooth: hci_bcm: Document struct bcm_device
+Message-ID: <20180108042701.GB13972@wunner.de>
+References: <cover.1515348092.git.lukas@wunner.de>
+ <2eb37dcf928e7f4be3f8f23e9f8ad0ceeb50f192.1515348092.git.lukas@wunner.de>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <2eb37dcf928e7f4be3f8f23e9f8ad0ceeb50f192.1515348092.git.lukas@wunner.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGksDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+SGkgdGhlcmUsDQo+DQo+VEw7RFI6
-IEkgaGF2ZSBvYnNlcnZlZCB0aGF0IEJsdWVaIGRvZXMgc29tZSBvcGVyYXRpb25zIHdoaWNoIGlu
-Y3VyIGluIGV4dHJhIGxhdGVuY3kgd2hlbiBjb25uZWN0aW5nIHRvIGEgYm9uZGVkIHBlcmlwaGVy
-YWwuIEkgd291bGQgbGlrZSB0byBrbm93IGlmIGl0J3MgcG9zc2libGUgdG8gcmVtb3ZlIHRob3Nl
-IG9wZXJhdGlvbnMgdGhyb3VnaCBjb25maWd1cmF0aW9uIG9yLCBpZiBtYWludGFpbmVycyBhcmUg
-b3BlbiBmb3IgaXQsIHByb3ZpZGUgc29tZSBwYXRjaGVzIHRvIHJlbW92ZSB0aGVtLg0KPg0KPkkg
-aGF2ZSBhIEJMRSBwZXJpcGhlcmFsIHdpdGggYSBidXR0b24uIFRoZSBidXR0b24gc3RhdGUgKGtl
-eSBwcmVzc2VkIC8ga2V5IHJlbGVhc2VkKSBpcyBhc3NvY2lhdGVkIHRvIGEgY3VzdG9tIGNoYXJh
-Y3RlcmlzdGljIChpLmUuIGl0J3Mgbm90IEhJRCkuIFRoZSBzdGF0ZSBpcyBjb252ZXllZCB0aHJv
-dWdoIEFUVCBub3RpZmljYXRpb25zIHRvIGEgY2VudHJhbCBydW5uaW5nIEJsdWVaICg1LjQ3LCB1
-c2luZyBkYnVzIGdhdHQgYXBpKSB3aXRoIHdoaWNoIGl04oCZcyBib25kZWQuDQo+DQo+SW4gb3Jk
-ZXIgdG8gc2F2ZSBiYXR0ZXJ5LCB0aGUgcGVyaXBoZXJhbCBpcyBub3JtYWxseSBkaXNjb25uZWN0
-ZWQgYW5kIG9ubHkgc3RhcnRzIGFkdmVydGlzaW5nIHdoZW4gdGhlIGtleSBpcyBwcmVzc2VkLiBU
-aGUgY2VudHJhbCBpcyBhbHdheXMgYXR0ZW1wdGluZyB0byBjb25uZWN0LiBPbmNlIHRoZSBjb25u
-ZWN0aW9uIGlzIGVzdGFibGlzaGVkLCB0aGUga2V5LXByZXNzIGluIGNvbnZleWVkIHRvIHRoZSBj
-ZW50cmFsIGFzIGEgbm90aWZpY2F0aW9uICh0aGUgY2VudHJhbCBjYWxscyBTdGFydE5vdGlmeSgp
-IGFzIHNvb24gYXMgYSBjb25uZWN0aW9uIGlzIGVzdGFibGlzaGVkKS4NCj4NCj5Gb3IgdGhlIGFw
-cGxpY2F0aW9u4oCZcyBwdXJwb3NlLCBpdOKAmXMgY3JpdGljYWwgdGhhdCB0aGUgbm90aWZpY2F0
-aW9uIGlzIHJlY2lldmVkIHdpdGggdGhlIG1pbmltdW0gbGF0ZW5jeS4NCg0KSXMgdGhlcmUgYW55
-IHJlYXNvbiB3aHkgeW91IHdpc2ggdG8gaGF2ZSB0aGUgYnV0dG9uIGluIGEgZGlzY29ubmVjdGVk
-IHN0YXRlIHdoZW4gaW5hY3RpdmUgb3ZlciBoYXZpbmcgaXQgaW4gYSBjb25uZWN0ZWQgc3RhdGUg
-YnV0IHdpdGggYSBoaWdoIGNvbm5lY3Rpb24gaW50ZXJ2YWwgYW5kIGEgbGFyZ2Ugc2xhdmUgbGF0
-ZW5jeT8gQSBoaWdoIHNsYXZlIGxhdGVuY3kgbWVhbnMgaXQgY2FuIHN0YXkgaW4gc2xlZXAgbW9k
-ZSBpZiB0aGVyZSBpcyBub3RoaW5nIHRvIHJlcG9ydCBiYWNrIHRvIHRoZSBjZW50cmFsIGRldmlj
-ZSBmb3IgYSBzcGVjaWZpZWQgbnVtYmVyIG9mIHBhY2tldHMgc28gaXMgcGVyZmVjdCBmb3IgYmF0
-dGVyeSBwb3dlcmVkIGRldmljZXMuIFVzaW5nIHRoaXMgbWV0aG9kIG1lYW5zIHlvdSBkb24ndCBo
-YXZlIHRoZSBzbG93ZG93biBpbiBlc3RhYmxpc2hpbmcgYSBjb25uZWN0aW9uIG9yIGV4Y2hhbmdp
-bmcgR0FUVCB0YWJsZSBpbmZvcm1hdGlvbiBiZWNhdXNlIHRoZSBjb25uZWN0aW9uIGlzIGxpdmUs
-IGFuZCBJIHRoaW5rIGlzIHByZWZlcmFibGUgdG8gYnVyZGVuaW5nIHRoZSBCbHVlWiBtYWludGFp
-bmVycyB3aXRoIG1haW50YWluaW5nIGEgYmxhY2tsaXN0IHdoaWNoLCBpbiBteSBtaW5kLCByZWFs
-bHkgc2hvdWxkbid0IGJlIGEgcGFydCBvZiBCbHVlWi4NCg0KVGhhbmtzLA0KSmFtaWUNCg==
+On Sun, Jan 07, 2018 at 08:16:32PM +0100, Lukas Wunner wrote:
+> + * @hu: pointer to HCI UART controller struct,
+> + *	used to enable flow control during runtime suspend and system sleep
+> + * @is_suspended: whether flow control is currently enabled
+
+Botched this as well unfortunately, it should read "used to *disable*
+flow control".
+
+I didn't realize that the semantics of hci_uart_set_flow_control()
+are reversed and that "false" actually *enables* flow control.
+(What's the rationale for that anyway?)
+
+Lukas
