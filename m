@@ -1,62 +1,64 @@
 Return-Path: <lukas@wunner.de>
-Message-Id: <f7b70fea2d381d3e4e20d5837da6ac734a2f61f1.1515593773.git.lukas@wunner.de>
+Message-Id: <c380484e80761e94dc0e601666c5be10f2228f29.1515593773.git.lukas@wunner.de>
 In-Reply-To: <cover.1515593773.git.lukas@wunner.de>
 References: <cover.1515593773.git.lukas@wunner.de>
 From: Lukas Wunner <lukas@wunner.de>
 Date: Wed, 10 Jan 2018 16:32:10 +0100
-Subject: [PATCH v4 13/13] Bluetooth: btbcm: Fix sleep mode struct ordering
+Subject: [PATCH v4 12/13] Bluetooth: hci_bcm: Sleep instead of spinning
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>
 Cc: Mika Westerberg <mika.westerberg@linux.intel.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Frederic Danis <frederic.danis.oss@gmail.com>, Loic Poulain <loic.poulain@linaro.org>, Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>, Daniel Roschka <danielroschka@phoenitydawn.de>, Ronald Tschalaer <ronald@innovation.ch>, "Peter Y. Chuang" <peteryuchuang@gmail.com>, linux-bluetooth@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to the documentation for Laird SD40 radio modules (which use
-the BCM4329 chipset), the order of the Enable_BREAK_To_Host and
-Pulsed_HOST_WAKE parameters in the sleep mode struct is reversed
-vis-à-vis our struct declaration.  See page 46 of this PDF:
+The driver calls mdelay(15) in the ->suspend, ->resume, ->runtime_suspend
+and ->runtime_resume hook, however spinning for such a long period of
+time is discouraged as per Documentation/timers/timers-howto.txt.
 
-http://cdn.lairdtech.com/home/brandworld/files/Application%20Note%20-%2040%20Series%20Bluetooth.pdf
+The use of mdelay() seems unnecessary, it is allowed to sleep in the
+system sleep and runtime PM hooks (with the exception of ->suspend_noirq
+and ->resume_noirq) and the driver itself also does not rely on a
+non-sleeping ->runtime_resume as the only place where a synchronous
+resume is performed, in bcm_dequeue(), is called from a work item in
+hci_ldisc.c and hci_serdev.c.
 
-The documentation is dated Oct 2015, so fairly recent, making it appear
-more likely that the documentation is correct and our code is wrong.
-Amend our code to be in congruence with the documentation.
+So replace the mdelay(15) with msleep(15).
 
-Cc: Sue White <sue.white@lairdtech.com>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Note that the delay is inserted after asserting or deasserting the
+device wake pin, but in bcm_gpio_set_power() that pin is asserted or
+deasserted *without* observing a delay.  It is thus unclear if the delay
+is necessary at all.  It is likewise unclear why it is exactly 15 ms,
+the commit introducing it, 118612fb9165 ("Bluetooth: hci_bcm: Add
+suspend/resume PM functions"), does not provide a rationale.
+
+Cc: Frédéric Danis <frederic.danis.oss@gmail.com>
+Suggested-and-reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 Signed-off-by: Lukas Wunner <lukas@wunner.de>
 ---
- drivers/bluetooth/btbcm.h   | 2 +-
- drivers/bluetooth/hci_bcm.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index d9e6b41658e5..cfe6ad4cc621 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -44,8 +44,8 @@ struct bcm_set_sleep_mode {
- 	__u8 tristate_control;
- 	__u8 usb_auto_sleep;
- 	__u8 usb_resume_timeout;
--	__u8 pulsed_host_wake;
- 	__u8 break_to_host;
-+	__u8 pulsed_host_wake;
- } __packed;
- 
- struct bcm_set_pcm_int_params {
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 461364a00b20..64800cd2796c 100644
+index 0929a264bffa..461364a00b20 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -300,8 +300,8 @@ static const struct bcm_set_sleep_mode default_sleep_params = {
- 	/* Irrelevant USB flags */
- 	.usb_auto_sleep = 0,
- 	.usb_resume_timeout = 0,
-+	.break_to_host = 0,
- 	.pulsed_host_wake = 0,
--	.break_to_host = 0
- };
+@@ -656,7 +656,7 @@ static int bcm_suspend_device(struct device *dev)
+ 	}
  
- static int bcm_setup_sleep(struct hci_uart *hu)
+ 	bt_dev_dbg(bdev, "suspend, delaying 15 ms");
+-	mdelay(15);
++	msleep(15);
+ 
+ 	return 0;
+ }
+@@ -675,7 +675,7 @@ static int bcm_resume_device(struct device *dev)
+ 	}
+ 
+ 	bt_dev_dbg(bdev, "resume, delaying 15 ms");
+-	mdelay(15);
++	msleep(15);
+ 
+ 	/* When this executes, the device has woken up already */
+ 	if (bdev->is_suspended && bdev->hu) {
 -- 
 2.15.1
