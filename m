@@ -1,118 +1,94 @@
 Return-Path: <lukas@wunner.de>
-Message-Id: <eb7a7f859b1d453d3b48f9c297724fafffa88457.1515593773.git.lukas@wunner.de>
-In-Reply-To: <cover.1515593773.git.lukas@wunner.de>
-References: <cover.1515593773.git.lukas@wunner.de>
+Message-Id: <cover.1515593773.git.lukas@wunner.de>
 From: Lukas Wunner <lukas@wunner.de>
 Date: Wed, 10 Jan 2018 16:32:10 +0100
-Subject: [PATCH v4 01/13] Bluetooth: hci_bcm: Mandate presence of shutdown and
- device wake GPIO
+Subject: [PATCH v4 00/13] Bluetooth on 2015+ MacBook (Pro)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>
 Cc: Mika Westerberg <mika.westerberg@linux.intel.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Frederic Danis <frederic.danis.oss@gmail.com>, Loic Poulain <loic.poulain@linaro.org>, Hans de Goede <hdegoede@redhat.com>, Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>, Daniel Roschka <danielroschka@phoenitydawn.de>, Ronald Tschalaer <ronald@innovation.ch>, "Peter Y. Chuang" <peteryuchuang@gmail.com>, linux-bluetooth@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit 0395ffc1ee05 ("Bluetooth: hci_bcm: Add PM for BCM devices")
-amended this driver to request a shutdown and device wake GPIO on probe,
-but mandated that only one of them need to be present:
+Enable UART-attached Bluetooth on 2015+ MacBook (Pro), v4.
 
-	/* Make sure at-least one of the GPIO is defined and that
-	 * a name is specified for this instance
-	 */
-	if ((!dev->device_wakeup && !dev->shutdown) || !dev->name) {
-		dev_err(&pdev->dev, "invalid platform data\n");
-		return -EINVAL;
-	}
+I forgot to include a changelog in each individual patch in v3,
+I'm making up for it now by listing the changes since both, v3 and v2.
 
-However the same commit added a call to bcm_gpio_set_power() to the
-->probe hook, which unconditionally accesses *both* GPIOs.  Luckily,
-the resulting NULL pointer deref was never reported, suggesting there's
-no machine where either GPIO is missing.
+Changes since v3:
 
-Commit 8a92056837fd ("Bluetooth: hci_bcm: Add (runtime)pm support to the
-serdev driver") removed the check whether at least one of the GPIOs is
-present without specifying a reason.
+- In patch [07/13] ("Document struct bcm_device"):
+  s/enable flow control/disable flow control/ to account for inverse
+  semantics of hci_uart_set_flow_control().
 
-Because commit 62aaefa7d038 ("Bluetooth: hci_bcm: improve use of gpios
-API") refactored the driver to use devm_gpiod_get_optional() instead of
-devm_gpiod_get(), one is now tempted to believe that the driver doesn't
-require *any* of the two GPIOs.
+- In patch [05/13] and [09/13] ("Handle errors properly"):
+  Fix corner case where an unbalanced pm_runtime_disable() could occur.
 
-Which is wrong, the driver still requires both GPIOs to avoid a NULL
-pointer deref.  To this end, establish the status quo ante and request
-the GPIOs with devm_gpiod_get() again.  Bail out of ->probe if either
-of them is missing.
+- In patch [10/13] ("Support Apple GPIO handling"):
+  Style fix: Unroll bcm_apple_get_resources() inline stub. (Andy)
 
-Oddly enough, whereas bcm_gpio_set_power() accesses the device wake pin
-unconditionally, bcm_suspend_device() and bcm_resume_device() do check
-for its presence before accessing it.  Those checks are superfluous,
-so remove them.
-
-Cc: Frédéric Danis <frederic.danis.oss@gmail.com>
-Cc: Loic Poulain <loic.poulain@linaro.org>
-Cc: Hans de Goede <hdegoede@redhat.com>
-Cc: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
----
 Changes since v2:
+
+- In patch [01/13] ("Mandate presence of shutdown and device wake GPIO"):
   Keep netdev indentation style. (Marcel)
 
- drivers/bluetooth/hci_bcm.c | 24 +++++++++---------------
- 1 file changed, 9 insertions(+), 15 deletions(-)
+- New patch [04/13] to fix an IRQ race on ->close.
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 1fc604a0d870..7d059b35c63a 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -572,11 +572,9 @@ static int bcm_suspend_device(struct device *dev)
- 	}
- 
- 	/* Suspend the device */
--	if (bdev->device_wakeup) {
--		gpiod_set_value(bdev->device_wakeup, false);
--		bt_dev_dbg(bdev, "suspend, delaying 15 ms");
--		mdelay(15);
--	}
-+	gpiod_set_value(bdev->device_wakeup, false);
-+	bt_dev_dbg(bdev, "suspend, delaying 15 ms");
-+	mdelay(15);
- 
- 	return 0;
- }
-@@ -587,11 +585,9 @@ static int bcm_resume_device(struct device *dev)
- 
- 	bt_dev_dbg(bdev, "");
- 
--	if (bdev->device_wakeup) {
--		gpiod_set_value(bdev->device_wakeup, true);
--		bt_dev_dbg(bdev, "resume, delaying 15 ms");
--		mdelay(15);
--	}
-+	gpiod_set_value(bdev->device_wakeup, true);
-+	bt_dev_dbg(bdev, "resume, delaying 15 ms");
-+	mdelay(15);
- 
- 	/* When this executes, the device has woken up already */
- 	if (bdev->is_suspended && bdev->hu) {
-@@ -774,14 +770,12 @@ static int bcm_get_resources(struct bcm_device *dev)
- 
- 	dev->clk = devm_clk_get(dev->dev, NULL);
- 
--	dev->device_wakeup = devm_gpiod_get_optional(dev->dev,
--						     "device-wakeup",
--						     GPIOD_OUT_LOW);
-+	dev->device_wakeup = devm_gpiod_get(dev->dev, "device-wakeup",
-+					    GPIOD_OUT_LOW);
- 	if (IS_ERR(dev->device_wakeup))
- 		return PTR_ERR(dev->device_wakeup);
- 
--	dev->shutdown = devm_gpiod_get_optional(dev->dev, "shutdown",
--						GPIOD_OUT_LOW);
-+	dev->shutdown = devm_gpiod_get(dev->dev, "shutdown", GPIOD_OUT_LOW);
- 	if (IS_ERR(dev->shutdown))
- 		return PTR_ERR(dev->shutdown);
- 
+- New patch [05/13] to fix an unbalanced pm_runtime_disable(). (Andy)
+
+- New patch [06/13] to invalidate the IRQ if requesting it failed.
+
+- New patch [08/13] to add callbacks to toggle GPIOs.
+  This makes the subsequent addition of Mac support less intrusive.
+  Replaces patch "Add helper to toggle device wake GPIO" in v2. (Andy)
+
+- In patch [09/13] ("Handle errors properly"):
+  Drop redundant assignment. (Andy)
+
+- In patch [10/13] ("Support Apple GPIO handling"):
+  Don't enable runtime PM on Macs for lack of usable host wake IRQ (Hans),
+  s/BlueTooth/Bluetooth/ in kerneldoc. (Marcel)
+
+- Move patch "Silence IRQ printk" to end of series as it's merely
+  a cleanup and no longer necessary for Mac support.
+
+- New patch [12/13] to use msleep() instead of mdelay()
+  after toggling device wake pin. (Andy)
+
+- New patch [13/13] to fix sleep mode struct ordering.
+
+- Drop incorrect patch "Enable runtime PM despite absence of IRQ". (Hans)
+
+Link to v3:
+https://www.spinics.net/lists/linux-bluetooth/msg73705.html
+
+Link to v2:
+https://www.spinics.net/lists/linux-bluetooth/msg73628.html
+
+Thanks,
+
+Lukas
+
+
+Lukas Wunner (12):
+  Bluetooth: hci_bcm: Mandate presence of shutdown and device wake GPIO
+  Bluetooth: hci_bcm: Clean up unnecessary #ifdef
+  Bluetooth: hci_bcm: Fix race on close
+  Bluetooth: hci_bcm: Fix unbalanced pm_runtime_disable()
+  Bluetooth: hci_bcm: Invalidate IRQ on request failure
+  Bluetooth: hci_bcm: Document struct bcm_device
+  Bluetooth: hci_bcm: Add callbacks to toggle GPIOs
+  Bluetooth: hci_bcm: Handle errors properly
+  Bluetooth: hci_bcm: Support Apple GPIO handling
+  Bluetooth: hci_bcm: Silence IRQ printk
+  Bluetooth: hci_bcm: Sleep instead of spinning
+  Bluetooth: btbcm: Fix sleep mode struct ordering
+
+Ronald Tschalär (1):
+  Bluetooth: hci_bcm: Validate IRQ before using it
+
+ drivers/bluetooth/btbcm.h   |   2 +-
+ drivers/bluetooth/hci_bcm.c | 228 ++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 190 insertions(+), 40 deletions(-)
+
 -- 
 2.15.1
