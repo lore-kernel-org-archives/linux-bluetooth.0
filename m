@@ -1,82 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH v3 00/13] Bluetooth on 2015+ MacBook (Pro)
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1515418113.7000.791.camel@linux.intel.com>
-Date: Wed, 10 Jan 2018 15:03:42 +0100
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        Mika Westerberg <mika.westerberg@linux.intel.com>,
-        Frederic Danis <frederic.danis.oss@gmail.com>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Max Shavrick <mxms@me.com>, Leif Liddy <leif.liddy@gmail.com>,
-        Daniel Roschka <danielroschka@phoenitydawn.de>,
-        Ronald Tschalaer <ronald@innovation.ch>,
-        "Peter Y. Chuang" <peteryuchuang@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Sue White <sue.white@lairdtech.com>,
-        Ilya Faenson <ifaenson@broadcom.com>
-Message-Id: <892C25BB-FD53-4AEF-98E3-7DE45B40F05A@holtmann.org>
-References: <cover.1515348092.git.lukas@wunner.de>
- <1515418113.7000.791.camel@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Lukas Wunner <lukas@wunner.de>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 2/3] tools/btpclient: Add connect, disconnect commands
+Date: Wed, 10 Jan 2018 14:14:21 +0100
+Message-ID: <1937636.eWU8Ucivx0@ix>
+In-Reply-To: <20180110122527.GA30141@x1c.lan>
+References: <20180109154521.30947-1-grzegorz.kolodziejczyk@codecoup.pl> <2315889.ORn3k3E786@ix> <20180110122527.GA30141@x1c.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukas,
+Hi Johan,
 
->> Enable UART-attached Bluetooth on 2015+ Macs, v3.
->> 
->> The series has grown to 13 patches because bugs in the driver keep
->> cropping up.
->> 
->> Changes since v2:
->> 
->> - In patch [01/13] ("Mandate presence of shutdown and device wake
->> GPIO"):
->>  Keep netdev indentation style. (Marcel)
->> 
->> - New patch [04/13] to fix an IRQ race on ->close.
->> 
->> - New patch [05/13] to fix an unbalanced pm_runtime_disable(). (Andy)
->> 
->> - New patch [06/13] to invalidate the IRQ if requesting it failed.
->> 
->> - New patch [08/13] to add callbacks to toggle GPIOs.
->>  This makes the subsequent addition of Mac support less intrusive.
->>  Replaces patch "Add helper to toggle device wake GPIO" in v2. (Andy)
->> 
->> - In patch [09/13] ("Handle errors properly"):
->>  Drop redundant assignment. (Andy)
->> 
->> - In patch [10/13] ("Support Apple GPIO handling"):
->>  Don't enable runtime PM on Macs for lack of usable host wake IRQ
->> (Hans),
->>  s/BlueTooth/Bluetooth/ in kerneldoc. (Marcel)
->> 
->> - Move patch "Silence IRQ printk" to end of series as it's merely
->>  a cleanup and no longer necessary for Mac support.
->> 
->> - New patch [12/13] to use msleep() instead of mdelay()
->>  after toggling device wake pin. (Andy)
->> 
->> - New patch [13/13] to fix sleep mode struct ordering.
->> 
->> - Drop incorrect patch "Enable runtime PM despite absence of IRQ".
->> (Hans)
->> 
+On Wednesday, 10 January 2018 13:25:27 CET Johan Hedberg wrote:
+> Hi Szymon,
 > 
-> I didn't test this myself (yet), the code looks more or less fine to me,
-> FWIW, 
+> On Wed, Jan 10, 2018, Szymon Janc wrote:
+> > On Wednesday, 10 January 2018 12:24:56 CET Johan Hedberg wrote:
+> > > On Wed, Jan 10, 2018, Szymon Janc wrote:
+> > > > On Tuesday, 9 January 2018 16:45:20 CET Grzegorz Kolodziejczyk wrote:
+> > > > > +static bool addr2str(const uint8_t *addr, char *str)
+> > > > > +{
+> > > > > +	return sprintf(str, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX",
+> > > > > +			addr[0], addr[1], addr[2], addr[3], addr[4], addr[5])
+> > > > > +			== 17;
+> > > > > +}
+> > > > 
+> > > > Use snprintf.
+> > > 
+> > > Why isn't this tool using the address conversion helpers from
+> > > lib/bluetooth.c?
+> > 
+> > This is BTP address and has different byte order.
 > 
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> Hmm... I'm a bit confused now. I thought BTP is little endian like HCI
+> and most Bluetooth protocols. At least that's what it says here:
+> 
+> https://github.com/zephyrproject-rtos/zephyr/blob/master/tests/bluetooth/tes
+> ter/btp_spec.txt#L58
+> 
+> What am I missing? :)
 
-can we get a v4 with the known fixes?
+Yes, you're correct. This needs fixing, although we would have to link against 
+libbluetooth only for those sprintf wrappers.. (especially that those use 
+insecure variant of printf).
 
-Regards
+-- 
+pozdrawiam
+Szymon Janc
 
-Marcel
 
