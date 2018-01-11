@@ -1,27 +1,186 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Thu, 11 Jan 2018 13:58:56 -0500 (EST)
-Message-Id: <20180111.135856.456733085099767843.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2018-01-11
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20180111082434.GA12753@x1c.lan>
-References: <20180111082434.GA12753@x1c.lan>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [RFC] adapter: Add CreateDevice method
+Date: Thu, 11 Jan 2018 12:04:23 +0100
+Message-Id: <20180111110423.14498-1-szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Thu, 11 Jan 2018 10:24:34 +0200
+This allows to create Device1 object without discovery. This is needed for
+some of qualification tests where there is no general discovery upfront
+and we need to do connection to device with provided address.
 
-> Here's likely the last bluetooth-next pull request for the 4.16 kernel.
-> 
->  - Added support for Bluetooth on 2015+ MacBook (Pro)
->  - Fix to QCA Rome suspend/resume handling
->  - Two new QCA_ROME USB IDs in btusb
->  - A few other minor fixes
-> 
-> Please let me know if there are any issues pulling. Thanks.
+Another usecase is for scenario where scanning happen on one controller but
+connection handling on another.
 
-Pulled, thanks Johan.
+Implementation wide this results in new temporary device object being created
+that if unused will be cleanup just like it would be if found during discovery
+session.
+
+This patch implements bare minimum properties needed for connection - address
+and address type. If needed eg. for non-NFC based OOB it could be extended with
+more options.
+---
+ doc/adapter-api.txt | 29 ++++++++++++++++
+ src/adapter.c       | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 125 insertions(+)
+
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 0533b674a..c8f3ce26e 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -145,6 +145,35 @@ Methods		void StartDiscovery()
+ 
+ 			Possible errors: None
+ 
++		void CreateDevice(dict properties) [experimental]
++
++			Creates new temporary device with defined properties.
++
++			Parameters that may be set in the filter dictionary
++			include the following:
++
++			string Address
++
++				The Bluetooth device address of the remote
++				device. This parameter is mandatory.
++
++			string AddressType
++
++				The Bluetooth device Address Type. This is
++				address type that should be used for initial
++				connection. If this parameter is not present
++				BR/EDR device is created.
++
++				Possible values:
++					"public" - Public address
++					"random" - Random address
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++					 org.bluez.Error.NotSupported
++					 org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++
+ Properties	string Address [readonly]
+ 
+ 			The Bluetooth device address.
+diff --git a/src/adapter.c b/src/adapter.c
+index 0a25ae27e..0d18b58aa 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3080,6 +3080,99 @@ static DBusMessage *get_discovery_filters(DBusConnection *conn,
+ 	return reply;
+ }
+ 
++static DBusMessage *create_device(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	struct btd_adapter *adapter = user_data;
++	DBusMessageIter iter, subiter, dictiter, value;
++	uint8_t addr_type = BDADDR_BREDR;
++	bdaddr_t addr = *BDADDR_ANY;
++	struct btd_device *device;
++
++	DBG("sender %s", dbus_message_get_sender(msg));
++
++	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
++		return btd_error_not_ready(msg);
++
++	dbus_message_iter_init(msg, &iter);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY ||
++	    dbus_message_iter_get_element_type(&iter) != DBUS_TYPE_DICT_ENTRY)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_recurse(&iter, &subiter);
++	do {
++		int type = dbus_message_iter_get_arg_type(&subiter);
++		char *key;
++		char *str;
++
++		if (type == DBUS_TYPE_INVALID)
++			break;
++
++		dbus_message_iter_recurse(&subiter, &dictiter);
++
++		dbus_message_iter_get_basic(&dictiter, &key);
++		if (!dbus_message_iter_next(&dictiter))
++			return btd_error_invalid_args(msg);
++
++		if (dbus_message_iter_get_arg_type(&dictiter) !=
++							DBUS_TYPE_VARIANT)
++			return btd_error_invalid_args(msg);
++
++		dbus_message_iter_recurse(&dictiter, &value);
++
++		if (!strcmp(key, "Address")) {
++			if (dbus_message_iter_get_arg_type(&value) !=
++							DBUS_TYPE_STRING)
++				return btd_error_invalid_args(msg);
++
++			dbus_message_iter_get_basic(&value, &str);
++
++			if (str2ba(str, &addr) < 0 )
++				return btd_error_invalid_args(msg);
++		} else if (!strcmp(key, "AddressType")) {
++			if (dbus_message_iter_get_arg_type(&value) !=
++							DBUS_TYPE_STRING)
++				return btd_error_invalid_args(msg);
++
++			dbus_message_iter_get_basic(&value, &str);
++
++
++			if (!strcmp(str, "public"))
++				addr_type = BDADDR_LE_PUBLIC;
++			else if (!strcmp(str, "random"))
++				addr_type = BDADDR_LE_RANDOM;
++			else
++				return btd_error_invalid_args(msg);
++		} else {
++			return btd_error_invalid_args(msg);
++		}
++
++		dbus_message_iter_next(&subiter);
++	} while (true);
++
++	if (!bacmp(&addr, BDADDR_ANY))
++		return btd_error_invalid_args(msg);
++
++	device = btd_adapter_find_device(adapter, &addr, addr_type);
++	if (device)
++		return btd_error_already_exists(msg);
++
++
++	device = adapter_create_device(adapter, &addr, addr_type);
++	if (!device)
++		return btd_error_failed(msg, "Failed to create device");
++
++	device_update_last_seen(device, addr_type);
++	btd_device_set_temporary(device, true);
++
++	if (!adapter->temp_devices_timeout)
++		adapter->temp_devices_timeout = g_timeout_add_seconds(
++						TEMP_DEV_TIMEOUT,
++						remove_temp_devices, adapter);
++
++	return dbus_message_new_method_return(msg);
++}
++
+ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
+ 	{ GDBUS_METHOD("SetDiscoveryFilter",
+@@ -3091,6 +3184,9 @@ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_METHOD("GetDiscoveryFilters", NULL,
+ 			GDBUS_ARGS({ "filters", "as" }),
+ 			get_discovery_filters) },
++	{ GDBUS_EXPERIMENTAL_METHOD("CreateDevice",
++				GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
++				create_device) },
+ 	{ }
+ };
+ 
+-- 
+2.14.3
+
