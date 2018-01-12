@@ -2,309 +2,416 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 3/3] monitor: Add support for reading btsnoop sets
-Date: Fri, 12 Jan 2018 15:25:46 +0100
-Message-Id: <20180112142546.31424-3-szymon.janc@codecoup.pl>
-In-Reply-To: <20180112142546.31424-1-szymon.janc@codecoup.pl>
-References: <20180112142546.31424-1-szymon.janc@codecoup.pl>
+Subject: [PATCH 1/3] tools: Add initial code for btmon-logger
+Date: Fri, 12 Jan 2018 15:25:44 +0100
+Message-Id: <20180112142546.31424-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to combine multiple btsnoop files for decoding. Files need
-to be from same set (share same ID) and sequence numbers must be without
-gaps. First file doesn't have to have sequence 0.
+This is intended for use for automted logging or unatrended systems.
+It doesn't contain any packet decoding functionality which results
+in much smaller binary.
 ---
- monitor/control.c | 139 +++++++++++++++++++++++++++++++++++++++++++++++++-----
- monitor/control.h |   2 +-
- monitor/main.c    |  20 ++++++--
- monitor/packet.c  |   1 +
- 4 files changed, 145 insertions(+), 17 deletions(-)
+ .gitignore           |   1 +
+ Makefile.tools       |   6 +
+ tools/btmon-logger.c | 359 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 366 insertions(+)
+ create mode 100644 tools/btmon-logger.c
 
-diff --git a/monitor/control.c b/monitor/control.c
-index 1cd79ca5d..98abbe0ad 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -45,6 +45,7 @@
- #include "lib/mgmt.h"
+diff --git a/.gitignore b/.gitignore
+index 47808059b..33ec66048 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -118,6 +118,7 @@ tools/btconfig
+ tools/btmgmt
+ tools/btsnoop
+ tools/btpclient
++tools/btmon-logger
+ peripheral/btsensor
+ monitor/btmon
+ emulator/btvirt
+diff --git a/Makefile.tools b/Makefile.tools
+index 651ff00ca..1accfb4f0 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -62,6 +62,12 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+ 				monitor/tty.h
+ monitor_btmon_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-mainloop.la @UDEV_LIBS@
++				
++
++noinst_PROGRAMS += tools/btmon-logger
++
++tools_btmon_logger_SOURCES = tools/btmon-logger.c
++tools_btmon_logger_LDADD = src/libshared-mainloop.la
+ endif
  
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- #include "src/shared/btsnoop.h"
- #include "src/shared/mainloop.h"
- 
-@@ -1378,18 +1379,14 @@ bool control_writer(const char *path)
- 	return !!btsnoop_file;
- }
- 
--void control_reader(const char *path)
-+static void parse_snoop(struct btsnoop *btsnoop)
- {
- 	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
- 	uint16_t pktlen;
- 	uint32_t format;
- 	struct timeval tv;
- 
--	btsnoop_file = btsnoop_open(path, BTSNOOP_FLAG_PKLG_SUPPORT);
--	if (!btsnoop_file)
--		return;
--
--	format = btsnoop_get_format(btsnoop_file);
-+	format = btsnoop_get_format(btsnoop);
- 
- 	switch (format) {
- 	case BTSNOOP_FORMAT_HCI:
-@@ -1403,8 +1400,6 @@ void control_reader(const char *path)
- 		break;
- 	}
- 
--	open_pager();
--
- 	switch (format) {
- 	case BTSNOOP_FORMAT_HCI:
- 	case BTSNOOP_FORMAT_UART:
-@@ -1412,7 +1407,7 @@ void control_reader(const char *path)
- 		while (1) {
- 			uint16_t index, opcode;
- 
--			if (!btsnoop_read_hci(btsnoop_file, &tv, &index,
-+			if (!btsnoop_read_hci(btsnoop, &tv, &index,
- 							&opcode, buf, &pktlen))
- 				break;
- 
-@@ -1428,7 +1423,7 @@ void control_reader(const char *path)
- 		while (1) {
- 			uint16_t frequency;
- 
--			if (!btsnoop_read_phy(btsnoop_file, &tv, &frequency,
-+			if (!btsnoop_read_phy(btsnoop, &tv, &frequency,
- 								buf, &pktlen))
- 				break;
- 
-@@ -1436,10 +1431,132 @@ void control_reader(const char *path)
- 		}
- 		break;
- 	}
+ if TESTING
+diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
+new file mode 100644
+index 000000000..fe5f101b4
+--- /dev/null
++++ b/tools/btmon-logger.c
+@@ -0,0 +1,359 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2017  Codecoup
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <limits.h>
++#include <string.h>
++#include <time.h>
++#include <getopt.h>
++#include <unistd.h>
++#include <sys/socket.h>
++
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++#include "lib/mgmt.h"
++
++#include "src/shared/util.h"
++#include "src/shared/mainloop.h"
++#include "src/shared/btsnoop.h"
++
++struct btsnoop_hdr {
++	uint8_t		id[8];		/* Identification Pattern */
++	uint32_t	version;	/* Version Number = 1 */
++	uint32_t	type;		/* Datalink Type */
++} __attribute__ ((packed));
++#define BTSNOOP_HDR_SIZE (sizeof(struct btsnoop_hdr))
++
++struct btsnoop_pkt {
++	uint32_t	size;		/* Original Length */
++	uint32_t	len;		/* Included Length */
++	uint32_t	flags;		/* Packet Flags */
++	uint32_t	drops;		/* Cumulative Drops */
++	uint64_t	ts;		/* Timestamp microseconds */
++	uint8_t		data[0];	/* Packet Data */
++} __attribute__ ((packed));
++#define BTSNOOP_PKT_SIZE (sizeof(struct btsnoop_pkt))
++
++static const char *path = ".";
++static const char *prefix = "hci";
++static bool suffix_date = false;
++static size_t write_limit = 0;
++static size_t write_size = 0;
++static int mgmt_index = -1;
++
++static int monitor_sk = -1;
++static struct btsnoop *btsnoop_file = NULL;
++
++static bool create_btsnoop(void)
++{
++	static char real_path[FILENAME_MAX];
++
++	if (suffix_date) {
++		struct timeval tv;
++		struct tm tm;
++
++		memset(&tv, 0, sizeof(tv));
++
++		gettimeofday(&tv, NULL);
++		localtime_r(&tv.tv_sec, &tm);
++
++		snprintf(real_path, FILENAME_MAX,
++				"%s/%s_%04d-%02d-%02d_%02d:%02d:%02d.btsnoop",
++				path, prefix, tm.tm_year + 1900, tm.tm_mon + 1,
++				tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
++
++	} else {
++		static unsigned int cnt = 0;
++
++		snprintf(real_path, sizeof(real_path), "%s/%s_%u.btsnoop",
++							path, prefix, cnt++);
++	}
++
++	btsnoop_file = btsnoop_create(real_path, BTSNOOP_FORMAT_MONITOR);
++	if(!btsnoop_file) {
++		fprintf(stderr, "Failed to create btsnoop file, exiting.\n");
++		return false;
++	}
++
++	return true;
 +}
 +
-+struct snoop_data
++static void rotate_btsnoop(uint16_t pktlen)
 +{
-+	struct btsnoop *snoop;
-+	uint32_t seq;
-+};
++	write_size += BTSNOOP_PKT_SIZE + pktlen;
 +
-+static void snoop_data_free(void *data)
-+{
-+	struct snoop_data *snoop_data = data;
++	if (write_size <= write_limit)
++		return;
 +
-+	btsnoop_unref(snoop_data->snoop);
-+	free(snoop_data);
++	write_size = BTSNOOP_HDR_SIZE + BTSNOOP_PKT_SIZE + pktlen;
++
++	btsnoop_unref(btsnoop_file);
++
++	if (!create_btsnoop())
++		mainloop_quit();
 +}
 +
-+static bool match_snoop_by_seq(const void *data, const void *match_data)
++static void data_callback(int fd, uint32_t events, void *user_data)
 +{
-+	const struct snoop_data *snoop_data = data;
-+	uint32_t seq = PTR_TO_UINT(match_data);
++	uint8_t buf[BTSNOOP_MAX_PACKET_SIZE];
++	unsigned char control[64];
++	struct mgmt_hdr hdr;
++	struct msghdr msg;
++	struct iovec iov[2];
 +
-+	return snoop_data->seq == seq;
-+}
-+
-+void control_reader(struct queue *paths)
-+{
-+	const struct queue_entry *entry;
-+	struct snoop_data *data;
-+	struct btsnoop *snoop;
-+	struct queue *snoops;
-+	uint8_t id[16];
-+	bool first = true;
-+	uint32_t i;
-+
-+	/* if 1 file is provided we don't check for set and seq and sort */
-+	if (queue_length(paths) == 1) {
-+		snoop = btsnoop_open(queue_pop_head(paths),
-+						BTSNOOP_FLAG_PKLG_SUPPORT);
-+		if (snoop) {
-+			open_pager();
-+			parse_snoop(queue_pop_head(paths));
-+			close_pager();
-+		}
-+
++	if (events & (EPOLLERR | EPOLLHUP)) {
++		mainloop_remove_fd(monitor_sk);
 +		return;
 +	}
 +
-+	snoops = queue_new();
++	iov[0].iov_base = &hdr;
++	iov[0].iov_len = MGMT_HDR_SIZE;
++	iov[1].iov_base = buf;
++	iov[1].iov_len = sizeof(buf);
 +
-+	/* get all snoop files with seq and verify set ID */
-+	for (entry = queue_get_entries(paths); entry; entry = entry->next) {
-+		unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
-+		struct btsnoop_opcode_set_id *pkt = (void *)buf;
-+		struct timeval tv;
-+		uint16_t index;
-+		uint16_t opcode;
-+		uint16_t len;
++	memset(&msg, 0, sizeof(msg));
++	msg.msg_iov = iov;
++	msg.msg_iovlen = 2;
++	msg.msg_control = control;
++	msg.msg_controllen = sizeof(control);
 +
-+		snoop = btsnoop_open(entry->data, BTSNOOP_FLAG_PKLG_SUPPORT);
-+		if (!snoop) {
-+			fprintf(stderr, "Failed to open %s\n",
-+							(char *) entry->data);
-+			goto done;
-+		}
++	while (1) {
++		struct cmsghdr *cmsg;
++		struct timeval *tv = NULL;
++		struct timeval ctv;
++		uint16_t opcode, index, pktlen;
++		ssize_t len;
 +
-+		if (!btsnoop_read_hci(snoop, &tv, &index, &opcode, buf, &len)) {
-+			fprintf(stderr, "Failed to to read seq for %s\n",
-+							(char *) entry->data);
-+			goto done;
-+		}
++		len = recvmsg(monitor_sk, &msg, MSG_DONTWAIT);
++		if (len < 0)
++			break;
 +
-+		if (opcode != BTSNOOP_OPCODE_SET_ID) {
-+			fprintf(stderr, "Set ID missing for %s\n",
-+						(char *) entry->data);
-+			goto done;
-+		}
++		if (len < MGMT_HDR_SIZE)
++			break;
 +
-+		if (len != sizeof (*pkt)) {
-+			fprintf(stderr, "Invalid Set ID size for %s\n",
-+						(char *) entry->data);
-+			goto done;
-+		}
++		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
++					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++			if (cmsg->cmsg_level != SOL_SOCKET)
++				continue;
 +
-+		if (first) {
-+			memcpy(id, pkt->id, sizeof(id));
-+			first = false;
-+		} else {
-+			if (memcmp(id, pkt->id, sizeof(id))) {
-+				fprintf(stderr, "Set ID mismatch for %s\n",
-+							(char *) entry->data);
-+				goto done;
++			if (cmsg->cmsg_type == SCM_TIMESTAMP) {
++				memcpy(&ctv, CMSG_DATA(cmsg), sizeof(ctv));
++				tv = &ctv;
 +			}
 +		}
 +
-+		data = new0(struct snoop_data, 1);
-+		data->snoop = snoop;
-+		data->seq = le32_to_cpu(pkt->seq);
++		opcode = le16_to_cpu(hdr.opcode);
++		index  = le16_to_cpu(hdr.index);
++		pktlen = le16_to_cpu(hdr.len);
 +
-+		queue_push_tail(snoops, data);
++		if (mgmt_index >= 0 && mgmt_index != index)
++			continue;
++
++		if (write_limit)
++			rotate_btsnoop(pktlen);
++
++		btsnoop_write_hci(btsnoop_file, tv, index, opcode, 0, buf,
++									pktlen);
++	}
++}
++
++static int open_socket(uint16_t channel)
++{
++	struct sockaddr_hci addr;
++	int fd, opt = 1;
++
++	fd = socket(AF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC, BTPROTO_HCI);
++	if (fd < 0) {
++		perror("Failed to open channel");
++		return -1;
 +	}
 +
-+	open_pager();
++	memset(&addr, 0, sizeof(addr));
++	addr.hci_family = AF_BLUETOOTH;
++	addr.hci_dev = HCI_DEV_NONE;
++	addr.hci_channel = channel;
 +
-+	first = true;
-+	for (i = 0; i < UINT32_MAX; i++) {
-+		data = queue_remove_if(snoops, match_snoop_by_seq,
-+								UINT_TO_PTR(i));
++	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		perror("Failed to bind channel");
++		close(fd);
++		return -1;
++	}
 +
-+		if (data) {
-+			first = false;
-+			parse_snoop(data->snoop);
-+			snoop_data_free(data);
-+			continue;
-+		}
++	if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMP, &opt, sizeof(opt)) < 0) {
++		perror("Failed to enable timestamps");
++		close(fd);
++		return -1;
++	}
 +
-+		if (!queue_isempty(snoops))
-+			printf("File with next sequence %u missing, stopping\n",
-+									i);
++	if (setsockopt(fd, SOL_SOCKET, SO_PASSCRED, &opt, sizeof(opt)) < 0) {
++		perror("Failed to enable credentials");
++		close(fd);
++		return -1;
++	}
 +
++	return fd;
++}
++
++static bool open_monitor_channel(void)
++{
++	monitor_sk = open_socket(HCI_CHANNEL_MONITOR);
++	if (monitor_sk < 0)
++		return false;
++
++	mainloop_add_fd(monitor_sk, EPOLLIN, data_callback, NULL, NULL);
++
++	return true;
++}
++
++static void signal_callback(int signum, void *user_data)
++{
++	switch (signum) {
++	case SIGINT:
++	case SIGTERM:
++		mainloop_quit();
 +		break;
 +	}
- 
- 	close_pager();
- 
--	btsnoop_unref(btsnoop_file);
-+done:
-+	queue_destroy(snoops, snoop_data_free);
- }
- 
- int control_tracing(void)
-diff --git a/monitor/control.h b/monitor/control.h
-index 630a852e4..85a7913b0 100644
---- a/monitor/control.h
-+++ b/monitor/control.h
-@@ -25,7 +25,7 @@
- #include <stdint.h>
- 
- bool control_writer(const char *path);
--void control_reader(const char *path);
-+void control_reader(struct queue *paths);
- void control_server(const char *path);
- int control_tty(const char *path, unsigned int speed);
- int control_tracing(void);
-diff --git a/monitor/main.c b/monitor/main.c
-index 3e61a4661..0102103df 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -33,6 +33,7 @@
- #include <getopt.h>
- #include <sys/un.h>
- 
-+#include "src/shared/queue.h"
- #include "src/shared/mainloop.h"
- #include "src/shared/tty.h"
- 
-@@ -97,8 +98,8 @@ static const struct option main_options[] = {
- 
- int main(int argc, char *argv[])
- {
-+	struct queue *reader_paths = queue_new();
- 	unsigned long filter_mask = 0;
--	const char *reader_path = NULL;
- 	const char *writer_path = NULL;
- 	const char *analyze_path = NULL;
- 	const char *ellisys_server = NULL;
-@@ -134,7 +135,12 @@ int main(int argc, char *argv[])
- 			}
- 			break;
- 		case 'r':
--			reader_path = optarg;
-+			queue_push_tail(reader_paths, optarg);
++}
 +
-+			/* check if more paths were provided */
-+			while (optind < argc && *argv[optind] != '-')
-+				queue_push_tail(reader_paths, argv[optind++]);
++static void usage(void)
++{
++	printf("btmon-logger - Bluetooth monitor\n"
++		"Usage:\n");
++	printf("\tbtmon-logger [options]\n");
++	printf("options:\n"
++		"\t-p, --path <path>      Save traces in specified path\n"
++		"\t-P, --prefix <name>    Prefix filenames (defaults: \"hci\"\n"
++		"\t-d, --date             Suffix filenames with date\n"
++		"\t-l, --limit <limit>    Limit btsnoop file size (rotate)\n"
++		"\t-i, --index <num>      Log only specified controller\n"
++		"\t-v, --version          Show version\n"
++		"\t-h, --help             Show help options\n");
++}
 +
- 			break;
- 		case 'w':
- 			writer_path = optarg;
-@@ -202,7 +208,7 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
- 	}
- 
--	if (reader_path && analyze_path) {
-+	if (!queue_isempty(reader_paths) && analyze_path) {
- 		fprintf(stderr, "Display and analyze can't be combined\n");
- 		return EXIT_FAILURE;
- 	}
-@@ -224,14 +230,18 @@ int main(int argc, char *argv[])
- 		return EXIT_SUCCESS;
- 	}
- 
--	if (reader_path) {
-+	if (!queue_isempty(reader_paths)) {
- 		if (ellisys_server)
- 			ellisys_enable(ellisys_server, ellisys_port);
- 
--		control_reader(reader_path);
-+		control_reader(reader_paths);
-+		queue_destroy(reader_paths, NULL);
++static const struct option main_options[] = {
++	{ "path",	required_argument,	NULL, 'p' },
++	{ "prefix",	required_argument,	NULL, 'P' },
++	{ "date",	no_argument,		NULL, 'd' },
++	{ "limit",	required_argument,	NULL, 'l' },
++	{ "index",	required_argument,	NULL, 'i' },
++	{ "version",	no_argument,		NULL, 'v' },
++	{ "help",	no_argument,		NULL, 'h' },
++	{ }
++};
 +
- 		return EXIT_SUCCESS;
- 	}
- 
-+	queue_destroy(reader_paths, NULL);
++int main(int argc, char *argv[])
++{
++	sigset_t mask;
++	char *endptr;
++	int ret;
 +
- 	if (writer_path && !control_writer(writer_path)) {
- 		printf("Failed to open '%s'\n", writer_path);
- 		return EXIT_FAILURE;
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b800a2d75..08397c40d 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -44,6 +44,7 @@
- #include "lib/hci_lib.h"
- 
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- #include "src/shared/btsnoop.h"
- #include "display.h"
- #include "bt.h"
++	mainloop_init();
++
++	while (true) {
++		int opt;
++
++		opt = getopt_long(argc, argv, "p:P:dl:iLvh", main_options,
++									NULL);
++		if (opt < 0)
++			break;
++
++		switch (opt) {
++		case 'p':
++			path = optarg;
++			if (strlen(path) > PATH_MAX) {
++				fprintf(stderr, "Too long path\n");
++				return EXIT_FAILURE;
++			}
++			break;
++		case 'P':
++			prefix = optarg;
++			break;
++		case 'd':
++			suffix_date = true;
++			break;
++		case 'l':
++			write_limit = strtoul(optarg, &endptr, 10);
++
++			if (write_limit == ULONG_MAX) {
++				fprintf(stderr, "Invalid limit\n");
++				return EXIT_FAILURE;
++			}
++
++			if (*endptr != '\0') {
++				if (*endptr == 'K' || *endptr == 'k') {
++					write_limit *= 1024;
++				} else if (*endptr == 'M' || *endptr == 'm') {
++					write_limit *= 1024 * 1024;
++				} else {
++					fprintf(stderr, "Invalid limit\n");
++					return EXIT_FAILURE;
++				}
++			}
++
++			/* limit this to reasonable size */
++			if (write_limit < 4096) {
++				fprintf(stderr, "Too small limit value\n");
++				return EXIT_FAILURE;
++			}
++			break;
++		case 'i':
++			mgmt_index = atoi(optarg);
++			break;
++		case 'v':
++			printf("%s\n", VERSION);
++			return EXIT_SUCCESS;
++		case 'h':
++			usage();
++			return EXIT_SUCCESS;
++		default:
++			return EXIT_FAILURE;
++		}
++	}
++
++	if (argc - optind > 0) {
++		fprintf(stderr, "Invalid command line parameters\n");
++		return EXIT_FAILURE;
++	}
++
++	if (!open_monitor_channel() || !create_btsnoop())
++		return EXIT_FAILURE;
++
++	sigemptyset(&mask);
++	sigaddset(&mask, SIGINT);
++	sigaddset(&mask, SIGTERM);
++
++	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
++
++	printf("Bluetooth monitor ver %s\n", VERSION);
++
++	ret = mainloop_run();
++
++	btsnoop_unref(btsnoop_file);
++
++	return ret;
++}
 -- 
 2.14.3
 
