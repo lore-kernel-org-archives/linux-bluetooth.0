@@ -1,46 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ 2/2] tools/obexctl: Fix display of size/bandwidth on
- completion
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <abac898f-8f93-7a35-06b7-d23186895818@jp.fujitsu.com>
-Message-ID: <3ee3463d-6514-c8d5-4c06-d0af798b9cb5@jp.fujitsu.com>
-Date: Fri, 12 Jan 2018 15:25:35 +0900
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: [PATCH BlueZ 1/2] obexd: Emit file information for client
+Message-ID: <abac898f-8f93-7a35-06b7-d23186895818@jp.fujitsu.com>
+Date: Fri, 12 Jan 2018 15:23:40 +0900
 MIME-Version: 1.0
-In-Reply-To: <abac898f-8f93-7a35-06b7-d23186895818@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Outputs the wrong size and bandwidth on completion of transfer as below:
+When running obexctl and then starting to transfer a file, obexctl does
+not retrieve the "Size" property. Thus it outputs the huge remaining time
+as below:
 
-  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Transferred: 5339965 (@32KB/s 00:01)
-  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Transferred: 5372726 (@32KB/s 00:00)
-  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Transferred: 0 (@18446744073704178KB/s 00:00)
-  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Status: complete
+  [NEW] Transfer /org/bluez/obex/server/session1/transfer0
+  [CHG] Transfer /org/bluez/obex/server/session1/transfer0 Status: active
+  [CHG] Transfer /org/bluez/obex/server/session1/transfer0 Transferred: 32683 (@32KB/s 4286681714:4294967273)
+  [CHG] Transfer /org/bluez/obex/server/session1/transfer0 Transferred: 65444 (@32KB/s 428259:59)
+
+This change makes obexd emit the file information including the "Size"
+property, since obexctl may output the huge remaining time first if
+obexctl calls g_dbus_proxy_refresh_property(). As the result, obexctl can
+retrieve the "Size" property and the info command of obexctl can output
+the filename of the transferring file.
 ---
- tools/obexctl.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ obexd/src/manager.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index 05bbd3e84..ca139f050 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -1862,6 +1862,14 @@ static void print_transferred(struct transfer_data *data, const char *str,
- 	int seconds, minutes;
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index 78b138c85..6c83479f4 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -533,10 +533,15 @@ void manager_cleanup(void)
  
- 	dbus_message_iter_get_basic(iter, &valu64);
+ void manager_emit_transfer_started(struct obex_transfer *transfer)
+ {
++	const GDBusPropertyTable *property;
 +
-+	/*
-+	 * Use the file size to output the proper size/speed since obexd emits
-+	 * zero as the current transferred size on completion of transfer.
-+	 */
-+	if (valu64 == 0)
-+		valu64 = data->size;
-+
- 	speed = valu64 - data->transferred;
- 	data->transferred = valu64;
+ 	transfer->status = TRANSFER_STATUS_ACTIVE;
  
+-	g_dbus_emit_property_changed(connection, transfer->path,
+-					TRANSFER_INTERFACE, "Status");
++	for (property = transfer_properties;
++				property && property->name; property++)
++		g_dbus_emit_property_changed(connection, transfer->path,
++						TRANSFER_INTERFACE,
++						property->name);
+ }
+ 
+ static void emit_transfer_completed(struct obex_transfer *transfer,
 -- 
 2.14.1
 
