@@ -1,114 +1,750 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 4/4] tools/btpclient: Add connected, disconnected event
-Date: Fri, 12 Jan 2018 15:10:12 +0100
-Message-Id: <20180112141012.28113-4-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ v2 2/4] tools/btpclient: Add start, stop advertising commands
+Date: Fri, 12 Jan 2018 15:10:10 +0100
+Message-Id: <20180112141012.28113-2-grzegorz.kolodziejczyk@codecoup.pl>
 In-Reply-To: <20180112141012.28113-1-grzegorz.kolodziejczyk@codecoup.pl>
 References: <20180112141012.28113-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds conntected, disconnected events for btp client.
+This patch adds start and stop advertising commands for btp client.
 ---
- tools/btpclient.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+ tools/btpclient.c | 651 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 650 insertions(+), 1 deletion(-)
 
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index 7492872c0..c0ecb3f06 100644
+index a8a65fd51..3fb94b7f9 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
-@@ -212,6 +212,26 @@ static struct btp_device *find_device_by_address(struct btp_adapter *adapter,
- 	return NULL;
- }
+@@ -34,6 +34,19 @@
  
-+static bool match_proxies(const void *proxy_a, const void *proxy_b)
-+{
-+	return proxy_a == proxy_b;
-+}
+ #include "src/shared/btp.h"
+ 
++#define AD_PATH "/org/bluez/advertising"
++#define AD_IFACE "org.bluez.LEAdvertisement1"
 +
-+static struct btp_adapter *find_adapter_by_dev_proxy(struct l_dbus_proxy *proxy)
-+{
-+	const struct l_queue_entry *entry;
++/* List of assigned numbers for advetising data and scan response */
++#define AD_TYPE_FLAGS				0x01
++#define AD_TYPE_INCOMPLETE_UUID16_SERVICE_LIST	0x02
++#define AD_TYPE_SHORT_NAME			0x08
++#define AD_TYPE_SERVICE_DATA_UUID16		0x16
++#define AD_TYPE_APPEARANCE			0x19
++#define AD_TYPE_MANUFACTURER_DATA		0xff
 +
-+	for (entry = l_queue_get_entries(adapters); entry;
-+							entry = entry->next) {
-+		struct btp_adapter *adapter = entry->data;
++static struct l_dbus *dbus;
 +
-+		if (l_queue_find(adapter->devices, match_proxies, proxy))
-+			return adapter;
-+	}
+ struct btp_adapter {
+ 	struct l_dbus_proxy *proxy;
+ 	struct l_dbus_proxy *ad_proxy;
+@@ -53,12 +66,61 @@ static struct btp *btp;
+ 
+ static bool gap_service_registered;
+ 
++struct ad_data {
++	uint8_t data[25];
++	uint8_t len;
++};
 +
-+	return NULL;
-+}
++struct service_data {
++	char *uuid;
++	struct ad_data data;
++};
 +
- static void btp_gap_read_commands(uint8_t index, const void *param,
- 					uint16_t length, void *user_data)
++struct manufacturer_data {
++	uint16_t id;
++	struct ad_data data;
++};
++
++static struct ad {
++	bool registered;
++	char *type;
++	char *local_name;
++	uint16_t local_appearance;
++	uint16_t duration;
++	uint16_t timeout;
++	struct l_queue *uuids;
++	struct l_queue *services;
++	struct l_queue *manufacturers;
++	bool tx_power;
++	bool name;
++	bool appearance;
++} ad = {
++	.local_appearance = UINT16_MAX,
++};
++
+ static bool str2addr(const char *str, uint8_t *addr)
  {
-@@ -1507,6 +1527,49 @@ static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
- 						sizeof(ev) + ev.eir_len, &ev);
+ 	return sscanf(str, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &addr[5], &addr[4],
+ 				&addr[3], &addr[2], &addr[1], &addr[0]) == 6;
  }
  
-+static void btp_gap_device_connection_ev(struct l_dbus_proxy *proxy,
-+								bool connected)
++static char *dupuuid2str(const uint8_t *uuid, uint8_t len)
 +{
-+	struct btp_adapter *adapter;
-+	const char *str_addr, *str_addr_type;
-+	uint8_t address_type;
++	switch (len) {
++	case 16:
++		return l_strdup_printf("%hhx%hhx", uuid[0], uuid[1]);
++	case 128:
++		return l_strdup_printf("%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx%hhx"
++					"%hhx%hhx%hhx%hhx%hhx%hhx%hhx", uuid[0],
++					uuid[1], uuid[2], uuid[3], uuid[4],
++					uuid[5], uuid[6], uuid[6], uuid[8],
++					uuid[7], uuid[10], uuid[11], uuid[12],
++					uuid[13], uuid[14], uuid[15]);
++	default:
++		return NULL;
++	}
++}
 +
+ static struct btp_adapter *find_adapter_by_proxy(struct l_dbus_proxy *proxy)
+ {
+ 	const struct l_queue_entry *entry;
+@@ -123,6 +185,8 @@ static void btp_gap_read_commands(uint8_t index, const void *param,
+ 	commands |= (1 << BTP_OP_GAP_SET_CONNECTABLE);
+ 	commands |= (1 << BTP_OP_GAP_SET_DISCOVERABLE);
+ 	commands |= (1 << BTP_OP_GAP_SET_BONDABLE);
++	commands |= (1 << BTP_OP_GAP_START_ADVERTISING);
++	commands |= (1 << BTP_OP_GAP_STOP_ADVERTISING);
+ 	commands |= (1 << BTP_OP_GAP_START_DISCOVERY);
+ 	commands |= (1 << BTP_OP_GAP_STOP_DISCOVERY);
+ 
+@@ -234,6 +298,46 @@ static void remove_device_reply(struct l_dbus_proxy *proxy,
+ 	l_queue_remove(adapter->devices, device);
+ }
+ 
++static void unreg_advertising_setup(struct l_dbus_message *message,
++								void *user_data)
++{
++	struct l_dbus_message_builder *builder;
 +
-+	adapter = find_adapter_by_dev_proxy(proxy);
++	builder = l_dbus_message_builder_new(message);
++	l_dbus_message_builder_append_basic(builder, 'o', AD_PATH);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++}
++
++static void unreg_advertising_reply(struct l_dbus_proxy *proxy,
++						struct l_dbus_message *result,
++						void *user_data)
++{
++	const char *path = l_dbus_proxy_get_path(proxy);
++	struct btp_adapter *adapter = find_adapter_by_path(path);
 +
 +	if (!adapter)
 +		return;
 +
-+	if (!l_dbus_proxy_get_property(proxy, "Address", "s", &str_addr))
++	if (l_dbus_message_is_error(result)) {
++		const char *name;
++
++		l_dbus_message_get_error(result, &name, NULL);
++
++		l_error("Failed to stop advertising %s (%s)",
++					l_dbus_proxy_get_path(proxy), name);
 +		return;
++	}
 +
++	if (!l_dbus_object_remove_interface(dbus, AD_PATH, AD_IFACE))
++		l_info("Unable to remove ad instance");
++	if (!l_dbus_object_remove_interface(dbus, AD_PATH,
++						L_DBUS_INTERFACE_PROPERTIES))
++		l_info("Unable to remove propety instance");
++	if (!l_dbus_unregister_interface(dbus, AD_IFACE))
++		l_info("Unable to unregister ad interface");
++}
 +
-+	if (!l_dbus_proxy_get_property(proxy, "AddressType", "s",
-+								&str_addr_type))
+ static void btp_gap_reset(uint8_t index, const void *param, uint16_t length,
+ 								void *user_data)
+ {
+@@ -264,6 +368,16 @@ static void btp_gap_reset(uint8_t index, const void *param, uint16_t length,
+ 						NULL);
+ 	}
+ 
++	if (adapter->ad_proxy)
++		if (!l_dbus_proxy_method_call(adapter->ad_proxy,
++						"UnregisterAdvertisement",
++						unreg_advertising_setup,
++						unreg_advertising_reply,
++						NULL, NULL)) {
++			status = BTP_ERROR_FAIL;
++			goto failed;
++		}
++
+ 	/* TODO for we assume all went well */
+ 	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_RESET, index, 0, NULL);
+ 	return;
+@@ -449,6 +563,529 @@ failed:
+ 	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
+ }
+ 
++static void ad_cleanup_service(void *service)
++{
++	struct service_data *s = service;
++
++	l_free(s->uuid);
++	l_free(s);
++}
++
++static void ad_cleanup()
++{
++	l_free(ad.local_name);
++	l_queue_destroy(ad.uuids, l_free);
++	l_queue_destroy(ad.services, ad_cleanup_service);
++	l_queue_destroy(ad.manufacturers, l_free);
++}
++
++static struct l_dbus_message *ad_release_call(struct l_dbus *dbus,
++						struct l_dbus_message *message,
++						void *user_data)
++{
++	struct l_dbus_message *reply;
++
++	l_dbus_unregister_object(dbus, AD_PATH);
++	l_dbus_unregister_interface(dbus, AD_IFACE);
++
++	reply = l_dbus_message_new_method_return(message);
++	l_dbus_message_set_arguments(reply, "");
++
++	ad_cleanup();
++
++	return reply;
++}
++
++static bool ad_type_getter(struct l_dbus *dbus, struct l_dbus_message *message,
++				struct l_dbus_message_builder *builder,
++				void *user_data)
++{
++	l_dbus_message_builder_append_basic(builder, 's', ad.type);
++
++	return true;
++}
++
++static bool ad_serviceuuids_getter(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct l_queue_entry *entry;
++
++	if (l_queue_isempty(ad.uuids))
++		return false;
++
++	l_dbus_message_builder_enter_array(builder, "s");
++
++	for (entry = l_queue_get_entries(ad.uuids); entry; entry = entry->next)
++		l_dbus_message_builder_append_basic(builder, 's', entry->data);
++
++	l_dbus_message_builder_leave_array(builder);
++
++	return true;
++}
++
++static bool ad_servicedata_getter(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct l_queue_entry *entry;
++	size_t i;
++
++	if (l_queue_isempty(ad.services))
++		return false;
++
++	l_dbus_message_builder_enter_array(builder, "{sv}");
++
++	for (entry = l_queue_get_entries(ad.services); entry;
++							entry = entry->next) {
++		struct service_data *sd = entry->data;
++
++		l_dbus_message_builder_enter_dict(builder, "sv");
++		l_dbus_message_builder_append_basic(builder, 's', sd->uuid);
++		l_dbus_message_builder_enter_variant(builder, "ay");
++		l_dbus_message_builder_enter_array(builder, "y");
++
++		for (i = 0; i < sd->data.len; i++)
++			l_dbus_message_builder_append_basic(builder, 'y',
++							&(sd->data.data[i]));
++
++		l_dbus_message_builder_leave_array(builder);
++		l_dbus_message_builder_leave_variant(builder);
++		l_dbus_message_builder_leave_dict(builder);
++	}
++	l_dbus_message_builder_leave_array(builder);
++
++	return true;
++}
++
++static bool ad_manufacturerdata_getter(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct l_queue_entry *entry;
++	size_t i;
++
++	if (l_queue_isempty(ad.manufacturers))
++		return false;
++
++	l_dbus_message_builder_enter_array(builder, "{qv}");
++
++	for (entry = l_queue_get_entries(ad.manufacturers); entry;
++							entry = entry->next) {
++		struct manufacturer_data *md = entry->data;
++
++		l_dbus_message_builder_enter_dict(builder, "qv");
++		l_dbus_message_builder_append_basic(builder, 'q', &md->id);
++		l_dbus_message_builder_enter_variant(builder, "ay");
++		l_dbus_message_builder_enter_array(builder, "y");
++
++		for (i = 0; i < md->data.len; i++)
++			l_dbus_message_builder_append_basic(builder, 'y',
++							&(md->data.data[i]));
++
++		l_dbus_message_builder_leave_array(builder);
++		l_dbus_message_builder_leave_variant(builder);
++		l_dbus_message_builder_leave_dict(builder);
++	}
++	l_dbus_message_builder_leave_array(builder);
++
++	return true;
++}
++
++static bool ad_includes_getter(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	l_dbus_message_builder_enter_array(builder, "s");
++
++	if (!(ad.tx_power || ad.name || ad.appearance))
++		return false;
++
++	if (ad.tx_power) {
++		const char *str = "tx-power";
++
++		l_dbus_message_builder_append_basic(builder, 's', &str);
++	}
++
++	if (ad.name) {
++		const char *str = "local-name";
++
++		l_dbus_message_builder_append_basic(builder, 's', &str);
++	}
++
++	if (ad.appearance) {
++		const char *str = "appearance";
++
++		l_dbus_message_builder_append_basic(builder, 's', &str);
++	}
++
++	l_dbus_message_builder_leave_array(builder);
++
++	return true;
++}
++
++static bool ad_localname_getter(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	if (!ad.local_name)
++		return false;
++
++	l_dbus_message_builder_append_basic(builder, 's', ad.local_name);
++
++	return true;
++}
++
++static bool ad_appearance_getter(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	if (!ad.local_appearance)
++		return false;
++
++	l_dbus_message_builder_append_basic(builder, 'q', &ad.local_appearance);
++
++	return true;
++}
++
++static bool ad_duration_getter(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	if (!ad.duration)
++		return false;
++
++	l_dbus_message_builder_append_basic(builder, 'q', &ad.duration);
++
++	return true;
++}
++
++static bool ad_timeout_getter(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	if (!ad.timeout)
++		return false;
++
++	l_dbus_message_builder_append_basic(builder, 'q', &ad.timeout);
++
++	return true;
++}
++
++static void setup_ad_interface(struct l_dbus_interface *interface)
++{
++	l_dbus_interface_method(interface, "Release",
++						L_DBUS_METHOD_FLAG_NOREPLY,
++						ad_release_call, "", "");
++	l_dbus_interface_property(interface, "Type", 0, "s", ad_type_getter,
++									NULL);
++	l_dbus_interface_property(interface, "ServiceUUIDs", 0, "as",
++						ad_serviceuuids_getter, NULL);
++	l_dbus_interface_property(interface, "ServiceData", 0, "a{sv}",
++						ad_servicedata_getter, NULL);
++	l_dbus_interface_property(interface, "ManufacturerServiceData", 0,
++					"a{qv}", ad_manufacturerdata_getter,
++					NULL);
++	l_dbus_interface_property(interface, "Includes", 0, "as",
++						ad_includes_getter, NULL);
++	l_dbus_interface_property(interface, "LocalName", 0, "s",
++						ad_localname_getter, NULL);
++	l_dbus_interface_property(interface, "Appearance", 0, "q",
++						ad_appearance_getter, NULL);
++	l_dbus_interface_property(interface, "Duration", 0, "q",
++						ad_duration_getter, NULL);
++	l_dbus_interface_property(interface, "Timeout", 0, "q",
++						ad_timeout_getter, NULL);
++}
++
++static void start_advertising_reply(struct l_dbus_proxy *proxy,
++						struct l_dbus_message *result,
++						void *user_data)
++{
++	const char *path = l_dbus_proxy_get_path(proxy);
++	struct btp_adapter *adapter = find_adapter_by_path(path);
++	uint32_t new_settings;
++
++	if (!adapter) {
++		btp_send_error(btp, BTP_GAP_SERVICE, BTP_INDEX_NON_CONTROLLER,
++								BTP_ERROR_FAIL);
 +		return;
++	}
 +
-+	address_type = strcmp(str_addr_type, "public") ? BTP_GAP_ADDR_RANDOM :
-+							BTP_GAP_ADDR_PUBLIC;
++	if (l_dbus_message_is_error(result)) {
++		const char *name, *desc;
 +
-+	if (connected) {
-+		struct btp_gap_device_connected_ev ev;
++		l_dbus_message_get_error(result, &name, &desc);
++		l_error("Failed to start advertising (%s), %s", name, desc);
 +
-+		str2addr(str_addr, ev.address);
-+		ev.address_type = address_type;
++		btp_send_error(btp, BTP_GAP_SERVICE, adapter->index,
++								BTP_ERROR_FAIL);
++		return;
++	}
 +
-+		btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_CONNECTED,
-+					adapter->index, sizeof(ev), &ev);
-+	} else {
-+		struct btp_gap_device_disconnected_ev ev;
++	new_settings = adapter->current_settings;
++	new_settings |= BTP_GAP_SETTING_ADVERTISING;
++	update_current_settings(adapter, new_settings);
 +
-+		str2addr(str_addr, ev.address);
-+		ev.address_type = address_type;
++	ad.registered = true;
 +
-+		btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_DISCONNECTED,
-+					adapter->index, sizeof(ev), &ev);
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_START_ADVERTISING,
++					adapter->index, sizeof(new_settings),
++					&new_settings);
++}
++
++static void create_advertising_data(uint8_t adv_data_len, const uint8_t *data)
++{
++	const uint8_t *ad_data;
++	uint8_t ad_type, ad_len;
++	uint8_t remaining_data_len = adv_data_len;
++
++	while (remaining_data_len) {
++		ad_type = data[adv_data_len - remaining_data_len];
++		ad_len = data[adv_data_len - remaining_data_len + 1];
++		ad_data = &data[adv_data_len - remaining_data_len + 2];
++
++		switch (ad_type) {
++		case AD_TYPE_INCOMPLETE_UUID16_SERVICE_LIST:
++		{
++			char *uuid = dupuuid2str(ad_data, 16);
++			l_queue_push_tail(ad.uuids, uuid);
++
++			break;
++		}
++		case AD_TYPE_SHORT_NAME:
++			ad.local_name = malloc(ad_len + 1);
++			memcpy(ad.local_name, ad_data, ad_len);
++			ad.local_name[ad_len] = '\0';
++
++			break;
++		case AD_TYPE_SERVICE_DATA_UUID16:
++		{
++			struct service_data *sd;
++
++			sd = l_new(struct service_data, 1);
++			sd->uuid = dupuuid2str(ad_data, 16);
++			sd->data.len = ad_len - 2;
++			memcpy(sd->data.data, ad_data + 2, sd->data.len);
++
++			l_queue_push_tail(ad.services, sd);
++
++			break;
++		}
++		case AD_TYPE_APPEARANCE:
++			memcpy(&ad.local_appearance, ad_data, ad_len);
++
++			break;
++		case AD_TYPE_MANUFACTURER_DATA:
++		{
++			struct manufacturer_data *md;
++
++			md = l_new(struct manufacturer_data, 1);
++			/* The first 2 octets contain the Company Identifier
++			 * Code followed by additional manufacturer specific
++			 * data.
++			 */
++			memcpy(&md->id, ad_data, 2);
++			md->data.len = ad_len - 2;
++			memcpy(md->data.data, ad_data + 2, md->data.len);
++
++			l_queue_push_tail(ad.manufacturers, md);
++
++			break;
++		}
++		default:
++			l_info("Unsupported advertising data type");
++
++			break;
++		}
++		/* Advertising entity data len + advertising entity header
++		 * (type, len)
++		 */
++		remaining_data_len -= ad_len + 2;
 +	}
 +}
 +
- static void register_gap_service(void)
- {
- 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_SUPPORTED_COMMANDS,
-@@ -1910,6 +1973,13 @@ static void property_changed(struct l_dbus_proxy *proxy, const char *name,
- 				return;
++static void create_scan_response(uint8_t scan_rsp_len, const uint8_t *data)
++{
++	/* TODO */
++}
++
++static void start_advertising_setup(struct l_dbus_message *message,
++							void *user_data)
++{
++	struct l_dbus_message_builder *builder;
++
++	builder = l_dbus_message_builder_new(message);
++	l_dbus_message_builder_append_basic(builder, 'o', AD_PATH);
++	l_dbus_message_builder_enter_array(builder, "{sv}");
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_leave_dict(builder);
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++}
++
++static void btp_gap_start_advertising(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	struct btp_adapter *adapter = find_adapter_by_index(index);
++	const struct btp_gap_start_adv_cp *cp = param;
++	uint8_t status = BTP_ERROR_FAIL;
++	bool prop;
++
++	if (!adapter) {
++		status = BTP_ERROR_INVALID_INDEX;
++		goto failed;
++	}
++
++	/* Adapter needs to be powered to be able to remove devices */
++	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b", &prop) ||
++							!prop || ad.registered)
++		goto failed;
++
++	if (!l_dbus_register_interface(dbus, AD_IFACE, setup_ad_interface, NULL,
++									false)) {
++		l_info("Unable to register ad interface");
++		goto failed;
++	}
++
++	if (!l_dbus_object_add_interface(dbus, AD_PATH, AD_IFACE, NULL)) {
++		l_info("Unable to instantiate ad interface");
++
++		if (!l_dbus_unregister_interface(dbus, AD_IFACE))
++			l_info("Unable to unregister ad interface");
++
++		goto failed;
++	}
++
++	if (!l_dbus_object_add_interface(dbus, AD_PATH,
++						L_DBUS_INTERFACE_PROPERTIES,
++						NULL)) {
++		l_info("Unable to instantiate the properties interface");
++
++		if (!l_dbus_object_remove_interface(dbus, AD_PATH, AD_IFACE))
++			l_info("Unable to remove ad instance");
++		if (!l_dbus_unregister_interface(dbus, AD_IFACE))
++			l_info("Unable to unregister ad interface");
++
++		goto failed;
++	}
++
++	ad.uuids = l_queue_new();
++	ad.services = l_queue_new();
++	ad.manufacturers = l_queue_new();
++
++	if (adapter->current_settings & BTP_GAP_SETTING_CONNECTABLE)
++		ad.type = l_strdup("peripheral");
++	else
++		ad.type = l_strdup("broadcast");
++
++	if (cp->adv_data_len > 0)
++		create_advertising_data(cp->adv_data_len, cp->data);
++	if (cp->scan_rsp_len > 0)
++		create_scan_response(cp->scan_rsp_len,
++						cp->data + cp->scan_rsp_len);
++
++	if (!l_dbus_proxy_method_call(adapter->ad_proxy,
++							"RegisterAdvertisement",
++							start_advertising_setup,
++							start_advertising_reply,
++							NULL, NULL)) {
++		if (!l_dbus_object_remove_interface(dbus, AD_PATH, AD_IFACE))
++			l_info("Unable to remove ad instance");
++		if (!l_dbus_unregister_interface(dbus, AD_IFACE))
++			l_info("Unable to unregister ad interface");
++
++		goto failed;
++	}
++
++	return;
++
++failed:
++	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
++}
++
++static void stop_advertising_reply(struct l_dbus_proxy *proxy,
++						struct l_dbus_message *result,
++						void *user_data)
++{
++	const char *path = l_dbus_proxy_get_path(proxy);
++	struct btp_adapter *adapter = find_adapter_by_path(path);
++	uint32_t new_settings;
++
++	if (!adapter)
++		return;
++
++	if (l_dbus_message_is_error(result)) {
++		const char *name;
++
++		l_dbus_message_get_error(result, &name, NULL);
++
++		l_error("Failed to stop advertising %s (%s)",
++					l_dbus_proxy_get_path(proxy), name);
++		return;
++	}
++
++	if (!l_dbus_object_remove_interface(dbus, AD_PATH, AD_IFACE))
++		l_info("Unable to remove ad instance");
++	if (!l_dbus_object_remove_interface(dbus, AD_PATH,
++						L_DBUS_INTERFACE_PROPERTIES))
++		l_info("Unable to remove propety instance");
++	if (!l_dbus_unregister_interface(dbus, AD_IFACE))
++		l_info("Unable to unregister ad interface");
++
++	new_settings = adapter->current_settings;
++	new_settings &= ~BTP_GAP_SETTING_ADVERTISING;
++	update_current_settings(adapter, new_settings);
++
++	ad_cleanup();
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_STOP_ADVERTISING,
++					adapter->index, sizeof(new_settings),
++					&new_settings);
++}
++
++static void btp_gap_stop_advertising(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	struct btp_adapter *adapter = find_adapter_by_index(index);
++	uint8_t status = BTP_ERROR_FAIL;
++	bool prop;
++
++	if (!adapter) {
++		status = BTP_ERROR_INVALID_INDEX;
++		goto failed;
++	}
++
++	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b", &prop) ||
++							!prop || !ad.registered)
++		goto failed;
++
++	if (adapter->ad_proxy) {
++		if (!l_dbus_proxy_method_call(adapter->ad_proxy,
++						"UnregisterAdvertisement",
++						unreg_advertising_setup,
++						stop_advertising_reply,
++						NULL, NULL)) {
++			status = BTP_ERROR_FAIL;
++			goto failed;
++		}
++	}
++
++	return;
++
++failed:
++	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
++}
++
+ static void start_discovery_reply(struct l_dbus_proxy *proxy,
+ 						struct l_dbus_message *result,
+ 						void *user_data)
+@@ -728,6 +1365,12 @@ static void register_gap_service(void)
+ 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_BONDABLE,
+ 					btp_gap_set_bondable, NULL, NULL);
  
- 			btp_gap_device_found_ev(proxy);
-+		} else if (!strcmp(name, "Connected")) {
-+			bool prop;
++	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_START_ADVERTISING,
++					btp_gap_start_advertising, NULL, NULL);
 +
-+			if (!l_dbus_message_get_arguments(msg, "b", &prop))
-+				return;
++	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_STOP_ADVERTISING,
++					btp_gap_stop_advertising, NULL, NULL);
 +
-+			btp_gap_device_connection_ev(proxy, prop);
- 		}
- 	}
+ 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_START_DISCOVERY,
+ 					btp_gap_start_discovery, NULL, NULL);
+ 
+@@ -1124,6 +1767,12 @@ static void client_ready(struct l_dbus_client *client, void *user_data)
+ 					BTP_INDEX_NON_CONTROLLER, 0, NULL);
  }
+ 
++static void ready_callback(void *user_data)
++{
++	if (!l_dbus_object_manager_enable(dbus))
++		l_info("Unable to register the ObjectManager");
++}
++
+ static void usage(void)
+ {
+ 	l_info("btpclient - Bluetooth tester");
+@@ -1148,7 +1797,6 @@ int main(int argc, char *argv[])
+ {
+ 	struct l_dbus_client *client;
+ 	struct l_signal *signal;
+-	struct l_dbus *dbus;
+ 	sigset_t mask;
+ 	int opt;
+ 
+@@ -1192,6 +1840,7 @@ int main(int argc, char *argv[])
+ 	signal = l_signal_create(&mask, signal_handler, NULL, NULL);
+ 
+ 	dbus = l_dbus_new_default(L_DBUS_SYSTEM_BUS);
++	l_dbus_set_ready_handler(dbus, ready_callback, NULL, NULL);
+ 	client = l_dbus_client_new(dbus, "org.bluez", "/org/bluez");
+ 
+ 	l_dbus_client_set_connect_handler(client, client_connected, NULL, NULL);
 -- 
 2.13.6
 
