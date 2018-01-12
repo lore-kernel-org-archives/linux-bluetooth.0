@@ -1,136 +1,241 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 2/3] tools/btmon-logger: Add support for chainning snoop files
-Date: Fri, 12 Jan 2018 15:25:45 +0100
-Message-Id: <20180112142546.31424-2-szymon.janc@codecoup.pl>
-In-Reply-To: <20180112142546.31424-1-szymon.janc@codecoup.pl>
-References: <20180112142546.31424-1-szymon.janc@codecoup.pl>
+Subject: [PATCH BlueZ v2 3/4] tools/btpclient: Add connect, disconnect commands
+Date: Fri, 12 Jan 2018 15:10:11 +0100
+Message-Id: <20180112141012.28113-3-grzegorz.kolodziejczyk@codecoup.pl>
+In-Reply-To: <20180112141012.28113-1-grzegorz.kolodziejczyk@codecoup.pl>
+References: <20180112141012.28113-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to generate split btsnoop file (eg for log rotation). To
-achieve that new opcode is added to btsnoop file format. This opcode
-contains random Set ID and sequence number which are used to identyfing
-files and set. This special opcode is always first opcode in btsnoop
-file that is part of a set.
+This patch adds start and stop connect, disconnect commands for btp
+client.
 ---
- src/shared/btsnoop.h |  6 ++++++
- tools/btmon-logger.c | 37 +++++++++++++++++++++++++++++++------
- 2 files changed, 37 insertions(+), 6 deletions(-)
+ tools/btpclient.c | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
 
-diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
-index 3df8998a3..a26d0a147 100644
---- a/src/shared/btsnoop.h
-+++ b/src/shared/btsnoop.h
-@@ -53,6 +53,7 @@
- #define BTSNOOP_OPCODE_CTRL_CLOSE	15
- #define BTSNOOP_OPCODE_CTRL_COMMAND	16
- #define BTSNOOP_OPCODE_CTRL_EVENT	17
-+#define BTSNOOP_OPCODE_SET_ID		18
- 
- #define BTSNOOP_MAX_PACKET_SIZE		(1486 + 4)
- 
-@@ -96,6 +97,11 @@ struct btsnoop_opcode_user_logging {
- 	uint8_t  ident_len;
- } __attribute__((packed));
- 
-+struct btsnoop_opcode_set_id {
-+	uint8_t id[16];
-+	uint32_t seq;
-+} __attribute__((packed));
-+
- struct btsnoop;
- 
- struct btsnoop *btsnoop_open(const char *path, unsigned long flags);
-diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
-index fe5f101b4..dc69db518 100644
---- a/tools/btmon-logger.c
-+++ b/tools/btmon-logger.c
-@@ -33,6 +33,7 @@
- #include <getopt.h>
- #include <unistd.h>
- #include <sys/socket.h>
-+#include <sys/random.h>
- 
- #include "lib/bluetooth.h"
- #include "lib/hci.h"
-@@ -69,6 +70,9 @@ static int mgmt_index = -1;
- static int monitor_sk = -1;
- static struct btsnoop *btsnoop_file = NULL;
- 
-+static uint8_t set_random_id[16];
-+static uint32_t set_seq = 0;
-+
- static bool create_btsnoop(void)
- {
- 	static char real_path[FILENAME_MAX];
-@@ -88,10 +92,8 @@ static bool create_btsnoop(void)
- 				tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
- 
- 	} else {
--		static unsigned int cnt = 0;
--
- 		snprintf(real_path, sizeof(real_path), "%s/%s_%u.btsnoop",
--							path, prefix, cnt++);
-+							path, prefix, set_seq);
- 	}
- 
- 	btsnoop_file = btsnoop_create(real_path, BTSNOOP_FORMAT_MONITOR);
-@@ -100,6 +102,24 @@ static bool create_btsnoop(void)
- 		return false;
- 	}
- 
-+	if (write_limit) {
-+		struct btsnoop_opcode_set_id op;
-+		struct timeval tv;
-+		uint32_t flags;
-+
-+		memset(&tv, 0, sizeof(tv));
-+
-+		memcpy(&op.id, set_random_id, sizeof(op.id));
-+		op.seq = cpu_to_le32(set_seq);
-+
-+		flags = (MGMT_INDEX_NONE << 16) | BTSNOOP_OPCODE_SET_ID;
-+
-+		btsnoop_write(btsnoop_file, &tv, flags, 0, &op, sizeof(op));
-+
-+		set_seq++;
-+		write_size = BTSNOOP_HDR_SIZE + BTSNOOP_PKT_SIZE + sizeof(op);
-+	}
-+
- 	return true;
+diff --git a/tools/btpclient.c b/tools/btpclient.c
+index 3fb94b7f9..7492872c0 100644
+--- a/tools/btpclient.c
++++ b/tools/btpclient.c
+@@ -104,6 +104,13 @@ static bool str2addr(const char *str, uint8_t *addr)
+ 				&addr[3], &addr[2], &addr[1], &addr[0]) == 6;
  }
  
-@@ -110,12 +130,14 @@ static void rotate_btsnoop(uint16_t pktlen)
- 	if (write_size <= write_limit)
- 		return;
++static bool addr2str(const uint8_t *addr, char *str)
++{
++	return snprintf(str, 18, "%02hhX:%02hhX:%02hhX:%02hhX:%02hhX:%02hhX",
++			addr[5], addr[4], addr[3], addr[2], addr[1], addr[0])
++			== 17;
++}
++
+ static char *dupuuid2str(const uint8_t *uuid, uint8_t len)
+ {
+ 	switch (len) {
+@@ -121,6 +128,17 @@ static char *dupuuid2str(const uint8_t *uuid, uint8_t len)
+ 	}
+ }
  
--	write_size = BTSNOOP_HDR_SIZE + BTSNOOP_PKT_SIZE + pktlen;
--
- 	btsnoop_unref(btsnoop_file);
++static bool match_dev_addr_type(const char *addr_type_str, uint8_t addr_type)
++{
++	if (addr_type == BTP_GAP_ADDR_PUBLIC && strcmp(addr_type_str, "public"))
++		return false;
++
++	if (addr_type == BTP_GAP_ADDR_RANDOM && strcmp(addr_type_str, "random"))
++		return false;
++
++	return true;
++}
++
+ static struct btp_adapter *find_adapter_by_proxy(struct l_dbus_proxy *proxy)
+ {
+ 	const struct l_queue_entry *entry;
+@@ -166,6 +184,34 @@ static struct btp_adapter *find_adapter_by_path(const char *path)
+ 	return NULL;
+ }
  
--	if (!create_btsnoop())
-+	if (!create_btsnoop()) {
- 		mainloop_quit();
++static struct btp_device *find_device_by_address(struct btp_adapter *adapter,
++							const uint8_t *addr,
++							uint8_t addr_type)
++{
++	const struct l_queue_entry *entry;
++	const char *str;
++	char addr_str[18];
++
++	if (!addr2str(addr, addr_str))
++		return NULL;
++
++	for (entry = l_queue_get_entries(adapter->devices); entry;
++							entry = entry->next) {
++		struct btp_device *device = entry->data;
++
++		l_dbus_proxy_get_property(device->proxy, "Address", "s", &str);
++		if (strcmp(str, addr_str))
++			continue;
++
++		l_dbus_proxy_get_property(device->proxy, "AddressType", "s",
++									&str);
++		if (match_dev_addr_type(str, addr_type))
++			return device;
++	}
++
++	return NULL;
++}
++
+ static void btp_gap_read_commands(uint8_t index, const void *param,
+ 					uint16_t length, void *user_data)
+ {
+@@ -189,6 +235,8 @@ static void btp_gap_read_commands(uint8_t index, const void *param,
+ 	commands |= (1 << BTP_OP_GAP_STOP_ADVERTISING);
+ 	commands |= (1 << BTP_OP_GAP_START_DISCOVERY);
+ 	commands |= (1 << BTP_OP_GAP_STOP_DISCOVERY);
++	commands |= (1 << BTP_OP_GAP_CONNECT);
++	commands |= (1 << BTP_OP_GAP_DISCONNECT);
+ 
+ 	commands = L_CPU_TO_LE16(commands);
+ 
+@@ -1304,6 +1352,127 @@ static void btp_gap_stop_discovery(uint8_t index, const void *param,
+ 					stop_discovery_reply, NULL, NULL);
+ }
+ 
++static void connect_reply(struct l_dbus_proxy *proxy,
++				struct l_dbus_message *result, void *user_data)
++{
++	uint8_t adapter_index = L_PTR_TO_UINT(user_data);
++	struct btp_adapter *adapter = find_adapter_by_index(adapter_index);
++
++	if (!adapter) {
++		btp_send_error(btp, BTP_GAP_SERVICE, BTP_INDEX_NON_CONTROLLER,
++								BTP_ERROR_FAIL);
 +		return;
 +	}
 +
-+	write_size += BTSNOOP_PKT_SIZE + pktlen;
++	if (l_dbus_message_is_error(result)) {
++		const char *name, *desc;
++
++		l_dbus_message_get_error(result, &name, &desc);
++		l_error("Failed to connect (%s), %s", name, desc);
++
++		btp_send_error(btp, BTP_GAP_SERVICE, adapter_index,
++								BTP_ERROR_FAIL);
++		return;
++	}
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_CONNECT, adapter_index, 0,
++									NULL);
++}
++
++static void btp_gap_connect(uint8_t index, const void *param, uint16_t length,
++								void *user_data)
++{
++	struct btp_adapter *adapter = find_adapter_by_index(index);
++	const struct btp_gap_connect_cp *cp = param;
++	struct btp_device *device;
++	bool prop;
++	uint8_t status = BTP_ERROR_FAIL;
++
++	if (!adapter) {
++		status = BTP_ERROR_INVALID_INDEX;
++		goto failed;
++	}
++
++	/* Adapter needs to be powered to be able to connect */
++	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b", &prop) ||
++									!prop)
++		goto failed;
++
++	device = find_device_by_address(adapter, cp->address, cp->address_type);
++
++	if (!device)
++		goto failed;
++
++	l_dbus_proxy_method_call(device->proxy, "Connect", NULL, connect_reply,
++					L_UINT_TO_PTR(adapter->index), NULL);
++
++	return;
++
++failed:
++	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
++}
++
++static void disconnect_reply(struct l_dbus_proxy *proxy,
++				struct l_dbus_message *result, void *user_data)
++{
++	uint8_t adapter_index = L_PTR_TO_UINT(user_data);
++	struct btp_adapter *adapter = find_adapter_by_index(adapter_index);
++
++	if (!adapter) {
++		btp_send_error(btp, BTP_GAP_SERVICE, BTP_INDEX_NON_CONTROLLER,
++								BTP_ERROR_FAIL);
++		return;
++	}
++
++	if (l_dbus_message_is_error(result)) {
++		const char *name, *desc;
++
++		l_dbus_message_get_error(result, &name, &desc);
++		l_error("Failed to disconnect (%s), %s", name, desc);
++
++		btp_send_error(btp, BTP_GAP_SERVICE, adapter_index,
++								BTP_ERROR_FAIL);
++		return;
++	}
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_DISCONNECT, adapter_index, 0,
++									NULL);
++}
++
++static void btp_gap_disconnect(uint8_t index, const void *param,
++					uint16_t length, void *user_data)
++{
++	struct btp_adapter *adapter = find_adapter_by_index(index);
++	const struct btp_gap_disconnect_cp *cp = param;
++	uint8_t status = BTP_ERROR_FAIL;
++	struct btp_device *device;
++	bool prop;
++
++	if (!adapter) {
++		status = BTP_ERROR_INVALID_INDEX;
++		goto failed;
++	}
++
++	/* Adapter needs to be powered to be able to connect */
++	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b", &prop) ||
++									!prop)
++		goto failed;
++
++	device = find_device_by_address(adapter, cp->address, cp->address_type);
++
++	if (!device)
++		goto failed;
++
++	l_dbus_proxy_method_call(device->proxy, "Disconnect", NULL,
++					disconnect_reply,
++					L_UINT_TO_PTR(adapter->index), NULL);
++
++	return;
++
++failed:
++	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
++}
++
+ static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
+ {
+ 	struct btp_device_found_ev ev;
+@@ -1376,6 +1545,12 @@ static void register_gap_service(void)
+ 
+ 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_STOP_DISCOVERY,
+ 					btp_gap_stop_discovery, NULL, NULL);
++
++	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_CONNECT, btp_gap_connect,
++								NULL, NULL);
++
++	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_DISCONNECT,
++						btp_gap_disconnect, NULL, NULL);
  }
  
- static void data_callback(int fd, uint32_t events, void *user_data)
-@@ -340,6 +362,9 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
- 	}
- 
-+	if (write_limit)
-+		getrandom(set_random_id, sizeof(set_random_id), 0);
-+
- 	if (!open_monitor_channel() || !create_btsnoop())
- 		return EXIT_FAILURE;
- 
+ static void btp_core_read_commands(uint8_t index, const void *param,
 -- 
-2.14.3
+2.13.6
 
