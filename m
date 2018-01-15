@@ -2,309 +2,114 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v2 3/3] monitor: Add support for reading btsnoop sets
-Date: Mon, 15 Jan 2018 12:56:43 +0100
-Message-Id: <20180115115643.23924-3-szymon.janc@codecoup.pl>
+Subject: [PATCH v2 2/3] tools/btmon-logger: Add support for chainning snoop files
+Date: Mon, 15 Jan 2018 12:56:42 +0100
+Message-Id: <20180115115643.23924-2-szymon.janc@codecoup.pl>
 In-Reply-To: <20180115115643.23924-1-szymon.janc@codecoup.pl>
 References: <20180115115643.23924-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to combine multiple btsnoop files for decoding. Files need
-to be from same set (share same ID) and sequence numbers must be without
-gaps. First file doesn't have to have sequence 0.
+This allows to generate split btsnoop file (eg for log rotation). To
+achieve that new opcode is added to btsnoop file format. This opcode
+contains random Set ID and sequence number which are used to identyfing
+files and set. This special opcode is always first opcode in btsnoop
+file that is part of a set.
 ---
- monitor/control.c | 139 +++++++++++++++++++++++++++++++++++++++++++++++++-----
- monitor/control.h |   2 +-
- monitor/main.c    |  20 ++++++--
- monitor/packet.c  |   1 +
- 4 files changed, 145 insertions(+), 17 deletions(-)
+ src/shared/btsnoop.h |  6 ++++++
+ tools/btmon-logger.c | 26 +++++++++++++++++++++++---
+ 2 files changed, 29 insertions(+), 3 deletions(-)
 
-diff --git a/monitor/control.c b/monitor/control.c
-index 1cd79ca5d..a1a2415b9 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -45,6 +45,7 @@
- #include "lib/mgmt.h"
+diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
+index 3df8998a3..a26d0a147 100644
+--- a/src/shared/btsnoop.h
++++ b/src/shared/btsnoop.h
+@@ -53,6 +53,7 @@
+ #define BTSNOOP_OPCODE_CTRL_CLOSE	15
+ #define BTSNOOP_OPCODE_CTRL_COMMAND	16
+ #define BTSNOOP_OPCODE_CTRL_EVENT	17
++#define BTSNOOP_OPCODE_SET_ID		18
  
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- #include "src/shared/btsnoop.h"
- #include "src/shared/mainloop.h"
+ #define BTSNOOP_MAX_PACKET_SIZE		(1486 + 4)
  
-@@ -1378,18 +1379,14 @@ bool control_writer(const char *path)
- 	return !!btsnoop_file;
- }
+@@ -96,6 +97,11 @@ struct btsnoop_opcode_user_logging {
+ 	uint8_t  ident_len;
+ } __attribute__((packed));
  
--void control_reader(const char *path)
-+static void parse_snoop(struct btsnoop *btsnoop)
- {
- 	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
- 	uint16_t pktlen;
- 	uint32_t format;
- 	struct timeval tv;
- 
--	btsnoop_file = btsnoop_open(path, BTSNOOP_FLAG_PKLG_SUPPORT);
--	if (!btsnoop_file)
--		return;
--
--	format = btsnoop_get_format(btsnoop_file);
-+	format = btsnoop_get_format(btsnoop);
- 
- 	switch (format) {
- 	case BTSNOOP_FORMAT_HCI:
-@@ -1403,8 +1400,6 @@ void control_reader(const char *path)
- 		break;
- 	}
- 
--	open_pager();
--
- 	switch (format) {
- 	case BTSNOOP_FORMAT_HCI:
- 	case BTSNOOP_FORMAT_UART:
-@@ -1412,7 +1407,7 @@ void control_reader(const char *path)
- 		while (1) {
- 			uint16_t index, opcode;
- 
--			if (!btsnoop_read_hci(btsnoop_file, &tv, &index,
-+			if (!btsnoop_read_hci(btsnoop, &tv, &index,
- 							&opcode, buf, &pktlen))
- 				break;
- 
-@@ -1428,7 +1423,7 @@ void control_reader(const char *path)
- 		while (1) {
- 			uint16_t frequency;
- 
--			if (!btsnoop_read_phy(btsnoop_file, &tv, &frequency,
-+			if (!btsnoop_read_phy(btsnoop, &tv, &frequency,
- 								buf, &pktlen))
- 				break;
- 
-@@ -1436,10 +1431,132 @@ void control_reader(const char *path)
- 		}
- 		break;
- 	}
-+}
-+
-+struct snoop_data
-+{
-+	struct btsnoop *snoop;
-+	uint32_t seq;
-+};
-+
-+static void snoop_data_free(void *data)
-+{
-+	struct snoop_data *snoop_data = data;
-+
-+	btsnoop_unref(snoop_data->snoop);
-+	free(snoop_data);
-+}
-+
-+static bool match_snoop_by_seq(const void *data, const void *match_data)
-+{
-+	const struct snoop_data *snoop_data = data;
-+	uint32_t seq = PTR_TO_UINT(match_data);
-+
-+	return snoop_data->seq == seq;
-+}
-+
-+void control_reader(struct queue *paths)
-+{
-+	const struct queue_entry *entry;
-+	struct snoop_data *data;
-+	struct btsnoop *snoop;
-+	struct queue *snoops;
++struct btsnoop_opcode_set_id {
 +	uint8_t id[16];
-+	bool first = true;
-+	uint32_t i;
++	uint32_t seq;
++} __attribute__((packed));
 +
-+	/* if 1 file is provided we don't check for set and seq and sort */
-+	if (queue_length(paths) == 1) {
-+		snoop = btsnoop_open(queue_pop_head(paths),
-+						BTSNOOP_FLAG_PKLG_SUPPORT);
-+		if (snoop) {
-+			open_pager();
-+			parse_snoop(snoop);
-+			close_pager();
-+		}
-+
-+		return;
-+	}
-+
-+	snoops = queue_new();
-+
-+	/* get all snoop files with seq and verify set ID */
-+	for (entry = queue_get_entries(paths); entry; entry = entry->next) {
-+		unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
-+		struct btsnoop_opcode_set_id *pkt = (void *)buf;
-+		struct timeval tv;
-+		uint16_t index;
-+		uint16_t opcode;
-+		uint16_t len;
-+
-+		snoop = btsnoop_open(entry->data, BTSNOOP_FLAG_PKLG_SUPPORT);
-+		if (!snoop) {
-+			fprintf(stderr, "Failed to open %s\n",
-+							(char *) entry->data);
-+			goto done;
-+		}
-+
-+		if (!btsnoop_read_hci(snoop, &tv, &index, &opcode, buf, &len)) {
-+			fprintf(stderr, "Failed to to read seq for %s\n",
-+							(char *) entry->data);
-+			goto done;
-+		}
-+
-+		if (opcode != BTSNOOP_OPCODE_SET_ID) {
-+			fprintf(stderr, "Set ID missing for %s\n",
-+						(char *) entry->data);
-+			goto done;
-+		}
-+
-+		if (len != sizeof (*pkt)) {
-+			fprintf(stderr, "Invalid Set ID size for %s\n",
-+						(char *) entry->data);
-+			goto done;
-+		}
-+
-+		if (first) {
-+			memcpy(id, pkt->id, sizeof(id));
-+			first = false;
-+		} else {
-+			if (memcmp(id, pkt->id, sizeof(id))) {
-+				fprintf(stderr, "Set ID mismatch for %s\n",
-+							(char *) entry->data);
-+				goto done;
-+			}
-+		}
-+
-+		data = new0(struct snoop_data, 1);
-+		data->snoop = snoop;
-+		data->seq = be32_to_cpu(pkt->seq);
-+
-+		queue_push_tail(snoops, data);
-+	}
-+
-+	open_pager();
-+
-+	first = true;
-+	for (i = 0; i < UINT32_MAX; i++) {
-+		data = queue_remove_if(snoops, match_snoop_by_seq,
-+								UINT_TO_PTR(i));
-+
-+		if (data) {
-+			first = false;
-+			parse_snoop(data->snoop);
-+			snoop_data_free(data);
-+			continue;
-+		}
-+
-+		if (!queue_isempty(snoops))
-+			printf("File with next sequence %u missing, stopping\n",
-+									i);
-+
-+		break;
-+	}
+ struct btsnoop;
  
- 	close_pager();
+ struct btsnoop *btsnoop_open(const char *path, unsigned long flags);
+diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
+index cd02f611b..f0d47f820 100644
+--- a/tools/btmon-logger.c
++++ b/tools/btmon-logger.c
+@@ -35,6 +35,7 @@
+ #include <getopt.h>
+ #include <unistd.h>
+ #include <sys/socket.h>
++#include <sys/random.h>
  
--	btsnoop_unref(btsnoop_file);
-+done:
-+	queue_destroy(snoops, snoop_data_free);
+ #include "lib/bluetooth.h"
+ #include "lib/hci.h"
+@@ -69,6 +70,9 @@ static size_t write_size = 0;
+ 
+ static struct btsnoop *btsnoop_file = NULL;
+ 
++static uint8_t set_random_id[16];
++static uint32_t set_seq = 0;
++
+ static bool create_btsnoop(void)
+ {
+ 	static char real_path[FILENAME_MAX];
+@@ -86,10 +90,8 @@ static bool create_btsnoop(void)
+ 				path, prefix, tm.tm_year + 1900, tm.tm_mon + 1,
+ 				tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+ 	} else {
+-		static unsigned int cnt = 0;
+-
+ 		snprintf(real_path, sizeof(real_path), "%s/%s_%u.btsnoop",
+-							path, prefix, cnt++);
++							path, prefix, set_seq);
+ 	}
+ 
+ 	btsnoop_file = btsnoop_create(real_path, BTSNOOP_FORMAT_MONITOR);
+@@ -98,6 +100,21 @@ static bool create_btsnoop(void)
+ 
+ 	write_size = BTSNOOP_HDR_SIZE;
+ 
++	if (write_limit) {
++		struct btsnoop_opcode_set_id op;
++		uint32_t flags;
++
++		memcpy(&op.id, set_random_id, sizeof(op.id));
++		op.seq = cpu_to_be32(set_seq);
++
++		flags = (MGMT_INDEX_NONE << 16) | BTSNOOP_OPCODE_SET_ID;
++
++		btsnoop_write(btsnoop_file, &tv, flags, 0, &op, sizeof(op));
++
++		set_seq++;
++		write_size += BTSNOOP_PKT_SIZE + sizeof(op);
++	}
++
+ 	return true;
  }
  
- int control_tracing(void)
-diff --git a/monitor/control.h b/monitor/control.h
-index 630a852e4..85a7913b0 100644
---- a/monitor/control.h
-+++ b/monitor/control.h
-@@ -25,7 +25,7 @@
- #include <stdint.h>
- 
- bool control_writer(const char *path);
--void control_reader(const char *path);
-+void control_reader(struct queue *paths);
- void control_server(const char *path);
- int control_tty(const char *path, unsigned int speed);
- int control_tracing(void);
-diff --git a/monitor/main.c b/monitor/main.c
-index 3e61a4661..0102103df 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -33,6 +33,7 @@
- #include <getopt.h>
- #include <sys/un.h>
- 
-+#include "src/shared/queue.h"
- #include "src/shared/mainloop.h"
- #include "src/shared/tty.h"
- 
-@@ -97,8 +98,8 @@ static const struct option main_options[] = {
- 
- int main(int argc, char *argv[])
- {
-+	struct queue *reader_paths = queue_new();
- 	unsigned long filter_mask = 0;
--	const char *reader_path = NULL;
- 	const char *writer_path = NULL;
- 	const char *analyze_path = NULL;
- 	const char *ellisys_server = NULL;
-@@ -134,7 +135,12 @@ int main(int argc, char *argv[])
- 			}
- 			break;
- 		case 'r':
--			reader_path = optarg;
-+			queue_push_tail(reader_paths, optarg);
-+
-+			/* check if more paths were provided */
-+			while (optind < argc && *argv[optind] != '-')
-+				queue_push_tail(reader_paths, argv[optind++]);
-+
- 			break;
- 		case 'w':
- 			writer_path = optarg;
-@@ -202,7 +208,7 @@ int main(int argc, char *argv[])
+@@ -324,6 +341,9 @@ int main(int argc, char *argv[])
  		return EXIT_FAILURE;
  	}
  
--	if (reader_path && analyze_path) {
-+	if (!queue_isempty(reader_paths) && analyze_path) {
- 		fprintf(stderr, "Display and analyze can't be combined\n");
- 		return EXIT_FAILURE;
- 	}
-@@ -224,14 +230,18 @@ int main(int argc, char *argv[])
- 		return EXIT_SUCCESS;
- 	}
- 
--	if (reader_path) {
-+	if (!queue_isempty(reader_paths)) {
- 		if (ellisys_server)
- 			ellisys_enable(ellisys_server, ellisys_port);
- 
--		control_reader(reader_path);
-+		control_reader(reader_paths);
-+		queue_destroy(reader_paths, NULL);
++	if (write_limit)
++		getrandom(set_random_id, sizeof(set_random_id), 0);
 +
- 		return EXIT_SUCCESS;
- 	}
- 
-+	queue_destroy(reader_paths, NULL);
-+
- 	if (writer_path && !control_writer(writer_path)) {
- 		printf("Failed to open '%s'\n", writer_path);
+ 	if (!open_monitor_channel() || !create_btsnoop())
  		return EXIT_FAILURE;
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b800a2d75..08397c40d 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -44,6 +44,7 @@
- #include "lib/hci_lib.h"
  
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- #include "src/shared/btsnoop.h"
- #include "display.h"
- #include "bt.h"
 -- 
 2.14.3
 
