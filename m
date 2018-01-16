@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/8] client: Rename set-service to service
-Date: Tue, 16 Jan 2018 17:24:50 -0200
-Message-Id: <20180116192456.12186-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] shared/shell: Introduce bt_shell_{get,set}_env
+Date: Tue, 16 Jan 2018 17:24:49 -0200
+Message-Id: <20180116192456.12186-2-luiz.dentz@gmail.com>
 In-Reply-To: <20180116192456.12186-1-luiz.dentz@gmail.com>
 References: <20180116192456.12186-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,64 +11,124 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Make the command return the current value if no parameters:
-
-[bluetooth]# service 0x1820 00 00 00
-[bluetooth]# service
-	UUID: Internet Protocol Support (0x1820)
-  00 00 00                                         ...
+These function can be used to share environment variable accross
+different files.
 ---
- client/advertising.c | 9 +++++----
- client/main.c        | 4 ++--
- 2 files changed, 7 insertions(+), 6 deletions(-)
+ src/shared/shell.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/shell.h |  3 +++
+ 2 files changed, 66 insertions(+)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 5174417a8..974462124 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -498,15 +498,16 @@ void ad_advertise_service(DBusConnection *conn, int argc, char *argv[])
- 	unsigned int i;
- 	struct ad_data *data;
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 6cdea1c7e..09f7896c6 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -56,6 +56,11 @@
  
--	ad_clear_service();
--
--	if (argc < 2)
-+	if (argc < 2 || !strlen(argv[1])) {
-+		print_uuid(ad.service.uuid);
-+		bt_shell_hexdump(ad.service.data.data, ad.service.data.len);
- 		return;
-+	}
+ static GMainLoop *main_loop;
  
- 	ad.service.uuid = g_strdup(argv[1]);
- 	data = &ad.service.data;
++struct bt_shell_env {
++	char *name;
++	void *value;
++};
++
+ static struct {
+ 	struct io *input;
  
--	for (i = 1; i < (unsigned int) argc; i++) {
-+	for (i = 2; i < (unsigned int) argc; i++) {
- 		long int val;
- 		char *endptr = NULL;
+@@ -66,6 +71,8 @@ static struct {
+ 	const struct bt_shell_menu *menu;
+ 	const struct bt_shell_menu *main;
+ 	struct queue *submenus;
++
++	struct queue *envs;
+ } data;
  
-diff --git a/client/main.c b/client/main.c
-index d13dabdd0..9d68be62f 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2196,7 +2196,7 @@ static void cmd_advertise_uuids(int argc, char *argv[])
- 	ad_advertise_uuids(dbus_conn, argc, argv);
+ static void shell_print_menu(void);
+@@ -759,6 +766,14 @@ static void rl_cleanup(void)
+ 	rl_callback_handler_remove();
  }
  
--static void cmd_set_advertise_service(int argc, char *argv[])
-+static void cmd_advertise_service(int argc, char *argv[])
++static void env_destroy(void *data)
++{
++	struct bt_shell_env *env = data;
++
++	free(env->name);
++	free(env);
++}
++
+ void bt_shell_run(void)
  {
- 	ad_advertise_service(dbus_conn, argc, argv);
+ 	struct io *signal;
+@@ -775,6 +790,11 @@ void bt_shell_run(void)
+ 	g_main_loop_unref(main_loop);
+ 	main_loop = NULL;
+ 
++	if (data.envs) {
++		queue_destroy(data.envs, env_destroy);
++		data.envs = NULL;
++	}
++
+ 	rl_cleanup();
  }
-@@ -2289,7 +2289,7 @@ static const struct bt_shell_menu advertise_menu = {
- 	.entries = {
- 	{ "uuids", "[uuid1 uuid2 ...]", cmd_advertise_uuids,
- 			"Set advertise uuids" },
--	{ "set-service", "[uuid] [data=xx xx ...]", cmd_set_advertise_service,
-+	{ "service", "[uuid] [data=xx xx ...]", cmd_advertise_service,
- 			"Set advertise service data" },
- 	{ "set-manufacturer", "[id] [data=xx xx ...]",
- 			cmd_set_advertise_manufacturer,
+ 
+@@ -849,3 +869,46 @@ bool bt_shell_detach(void)
+ 
+ 	return true;
+ }
++
++static bool match_env(const void *data, const void *user_data)
++{
++	const struct bt_shell_env *env = data;
++	const char *name = user_data;
++
++	return !strcmp(env->name, name);
++}
++
++void bt_shell_set_env(const char *name, void *value)
++{
++	struct bt_shell_env *env;
++
++	if (!data.envs) {
++		data.envs = queue_new();
++		goto done;
++	}
++
++	env = queue_remove_if(data.envs, match_env, (void *) name);
++	if (env)
++		env_destroy(env);
++
++done:
++	env = new0(struct bt_shell_env, 1);
++	env->name = strdup(name);
++	env->value = value;
++
++	queue_push_tail(data.envs, env);
++}
++
++void *bt_shell_get_env(const char *name)
++{
++	const struct bt_shell_env *env;
++
++	if (!data.envs)
++		return NULL;
++
++	env = queue_find(data.envs, match_env, name);
++	if (!env)
++		return NULL;
++
++	return env->name;
++}
+diff --git a/src/shared/shell.h b/src/shared/shell.h
+index 8b8b1f634..359629896 100644
+--- a/src/shared/shell.h
++++ b/src/shared/shell.h
+@@ -87,4 +87,7 @@ int bt_shell_release_prompt(const char *input);
+ bool bt_shell_attach(int fd);
+ bool bt_shell_detach(void);
+ 
++void bt_shell_set_env(const char *name, void *value);
++void *bt_shell_get_env(const char *name);
++
+ void bt_shell_cleanup(void);
 -- 
 2.14.3
 
