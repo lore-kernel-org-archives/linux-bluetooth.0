@@ -1,139 +1,175 @@
-Return-Path: <szymon.janc@codecoup.pl>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] tools: Add initial code for btmon-logger
-Date: Tue, 16 Jan 2018 15:15:16 +0100
-Message-ID: <7086609.337NVEs3t0@ix>
-In-Reply-To: <F0C80F8E-0CEA-4FEA-92C8-65005D188020@holtmann.org>
-References: <20180112142546.31424-1-szymon.janc@codecoup.pl> <3417178.fibeJ9uDTt@ix> <F0C80F8E-0CEA-4FEA-92C8-65005D188020@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH 2/2] shared/btp: Use bdaddr_t for storing address
+Date: Tue, 16 Jan 2018 15:03:33 +0100
+Message-Id: <20180116140333.10745-2-szymon.janc@codecoup.pl>
+In-Reply-To: <20180116140333.10745-1-szymon.janc@codecoup.pl>
+References: <20180116140333.10745-1-szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This is more convenient as it allows to use common helpers for address
+comparison and convertion.
+---
+ src/shared/btp.c  |  1 +
+ src/shared/btp.h  | 30 +++++++++++++++---------------
+ tools/btpclient.c |  4 ++--
+ 3 files changed, 18 insertions(+), 17 deletions(-)
 
-On Monday, 15 January 2018 16:08:30 CET Marcel Holtmann wrote:
-> Hi Szymon,
->=20
-> >>> This is intended for use for automted logging or unatrended systems.
-> >>> It doesn't contain any packet decoding functionality which results
-> >>> in much smaller binary.
-> >>> ---
-> >>> .gitignore           |   1 +
-> >>> Makefile.tools       |   6 +
-> >>> tools/btmon-logger.c | 359
-> >>> +++++++++++++++++++++++++++++++++++++++++++++++++++ 3 files changed, =
-366
-> >>> insertions(+)
-> >>> create mode 100644 tools/btmon-logger.c
-> >>>=20
-> >>> diff --git a/.gitignore b/.gitignore
-> >>> index 47808059b..33ec66048 100644
-> >>> --- a/.gitignore
-> >>> +++ b/.gitignore
-> >>> @@ -118,6 +118,7 @@ tools/btconfig
-> >>> tools/btmgmt
-> >>> tools/btsnoop
-> >>> tools/btpclient
-> >>> +tools/btmon-logger
-> >>> peripheral/btsensor
-> >>> monitor/btmon
-> >>> emulator/btvirt
-> >>> diff --git a/Makefile.tools b/Makefile.tools
-> >>> index 651ff00ca..1accfb4f0 100644
-> >>> --- a/Makefile.tools
-> >>> +++ b/Makefile.tools
-> >>> @@ -62,6 +62,12 @@ monitor_btmon_SOURCES =3D monitor/main.c monitor/b=
-t.h \
-> >>>=20
-> >>> 				monitor/tty.h
-> >>>=20
-> >>> monitor_btmon_LDADD =3D lib/libbluetooth-internal.la \
-> >>>=20
-> >>> 				src/libshared-mainloop.la @UDEV_LIBS@
-> >>>=20
-> >>> +
-> >>> +
-> >>=20
-> >> one empty line.
-> >>=20
-> >>> +noinst_PROGRAMS +=3D tools/btmon-logger
-> >>> +
-> >>> +tools_btmon_logger_SOURCES =3D tools/btmon-logger.c
-> >>> +tools_btmon_logger_LDADD =3D src/libshared-mainloop.la
-> >>> endif
-> >>>=20
-> >>> if TESTING
-> >>> diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
-> >>> new file mode 100644
-> >>> index 000000000..fe5f101b4
-> >>> --- /dev/null
-> >>> +++ b/tools/btmon-logger.c
-> >>> @@ -0,0 +1,359 @@
-> >>> +/*
-> >>> + *
-> >>> + *  BlueZ - Bluetooth protocol stack for Linux
-> >>> + *
-> >>> + *  Copyright (C) 2017  Codecoup
-> >>=20
-> >> Lets assume that some of the code is copied from existing btmon sources
-> >> and
-> >> so lets keep Intel copyright in place as well :)
-> >>=20
-> >>> + *
-> >>> + *
-> >>> + *  This program is free software; you can redistribute it and/or
-> >>> modify
-> >>> + *  it under the terms of the GNU General Public License as published
-> >>> by
-> >>> + *  the Free Software Foundation; either version 2 of the License, or
-> >>> + *  (at your option) any later version.
-> >>> + *
-> >>> + *  This program is distributed in the hope that it will be useful,
-> >>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> >>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> >>> + *  GNU General Public License for more details.
-> >>> + *
-> >>> + *  You should have received a copy of the GNU General Public License
-> >>> + *  along with this program; if not, write to the Free Software
-> >>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA=20
-> >>> 02110-1301
-> >>> USA + *
-> >>> + */
-> >>> +
-> >>> +#ifdef HAVE_CONFIG_H
-> >>> +#include <config.h>
-> >>> +#endif
-> >>> +
-> >>> +#include <stdio.h>
-> >>> +#include <stdlib.h>
-> >>> +#include <limits.h>
-> >>> +#include <string.h>
-> >>> +#include <time.h>
-> >>> +#include <getopt.h>
-> >>> +#include <unistd.h>
-> >>> +#include <sys/socket.h>
-> >>> +
-> >>> +#include "lib/bluetooth.h"
-> >>> +#include "lib/hci.h"
-> >>> +#include "lib/mgmt.h=E2=80=9D
-> >>=20
-> >> the mgmt.h should not be needed.
-> >=20
-> > This is needed for struct mgmt_hdr definition.
->=20
-> hmmm. That seems like an odd dependency and I think we need to get rid of
-> it. I know that the headers are alike, but that is more a coincidence than
-> something that should bleed through in the code.
+diff --git a/src/shared/btp.c b/src/shared/btp.c
+index d981621a8..77622671c 100644
+--- a/src/shared/btp.c
++++ b/src/shared/btp.c
+@@ -28,6 +28,7 @@
+ 
+ #include <ell/ell.h>
+ 
++#include "lib/bluetooth.h"
+ #include "src/shared/btp.h"
+ 
+ #define BTP_MTU 512
+diff --git a/src/shared/btp.h b/src/shared/btp.h
+index 7b1f48817..0b605be18 100644
+--- a/src/shared/btp.h
++++ b/src/shared/btp.h
+@@ -97,7 +97,7 @@ struct btp_gap_read_index_rp {
+ 
+ #define BTP_OP_GAP_READ_COTROLLER_INFO		0x03
+ struct btp_gap_read_info_rp {
+-	uint8_t address[6];
++	bdaddr_t address;
+ 	uint32_t supported_settings;
+ 	uint32_t current_settings;
+ 	uint8_t cod[3];
+@@ -190,13 +190,13 @@ struct btp_gap_start_discovery_cp {
+ #define BTP_OP_GAP_CONNECT			0x0e
+ struct btp_gap_connect_cp {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ } __packed;
+ 
+ #define BTP_OP_GAP_DISCONNECT			0x0f
+ struct btp_gap_disconnect_cp {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ } __packed;
+ 
+ #define BTP_GAP_IOCAPA_DISPLAY_ONLY		0x00
+@@ -213,26 +213,26 @@ struct btp_gap_set_io_capa_cp {
+ #define BTP_OP_GAP_PAIR				0x11
+ struct btp_gap_pair_cp {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ } __packed;
+ 
+ #define BTP_OP_GAP_UNPAIR			0x12
+ struct btp_gap_unpair_cp {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ } __packed;
+ 
+ #define BTP_OP_GAP_PASSKEY_ENTRY_RSP		0x13
+ struct btp_gap_passkey_entry_rsp_cp {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ 	uint32_t passkey;
+ } __packed;
+ 
+ #define BTP_OP_GAP_PASSKEY_CONFIRM_RSP		0x14
+ struct btp_gap_passkey_confirm_rsp_cp {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ 	uint8_t match;
+ } __packed;
+ 
+@@ -247,7 +247,7 @@ struct btp_new_settings_ev {
+ 
+ #define BTP_EV_GAP_DEVICE_FOUND			0x81
+ struct btp_device_found_ev {
+-	uint8_t address[6];
++	bdaddr_t address;
+ 	uint8_t address_type;
+ 	int8_t rssi;
+ 	uint8_t flags;
+@@ -258,41 +258,41 @@ struct btp_device_found_ev {
+ #define BTP_EV_GAP_DEVICE_CONNECTED		0x82
+ struct btp_gap_device_connected_ev {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ } __packed;
+ 
+ #define BTP_EV_GAP_DEVICE_DISCONNECTED		0x83
+ struct btp_gap_device_disconnected_ev {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ } __packed;
+ 
+ #define BTP_EV_GAP_PASSKEY_DISPLAY		0x84
+ struct btp_gap_passkey_display_ev {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ 	uint32_t passkey;
+ } __packed;
+ 
+ #define BTP_EV_GAP_PASSKEY_REQUEST		0x85
+ struct btp_gap_passkey_req_ev {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ } __packed;
+ 
+ #define BTP_EV_GAP_PASSKEY_CONFIRM		0x86
+ struct btp_gap_passkey_confirm_ev {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ 	uint32_t passkey;
+ } __packed;
+ 
+ #define BTP_EV_GAP_IDENTITY_RESOLVED		0x87
+ struct btp_gap_identity_resolved_ev {
+ 	uint8_t address_type;
+-	uint8_t address[6];
++	bdaddr_t address;
+ 	uint8_t identity_address_type;
+-	uint8_t identity_address[6];
++	bdaddr_t identity_address;
+ } __packed;
+ 
+ struct btp;
+diff --git a/tools/btpclient.c b/tools/btpclient.c
+index 4d4475a07..8d5545015 100644
+--- a/tools/btpclient.c
++++ b/tools/btpclient.c
+@@ -177,7 +177,7 @@ static void btp_gap_read_info(uint8_t index, const void *param, uint16_t length,
+ 		goto failed;
+ 
+ 
+-	if (str2ba(str, (bdaddr_t *)rp.address) < 0)
++	if (str2ba(str, &rp.address) < 0)
+ 		goto failed;
+ 
+ 	if (!l_dbus_proxy_get_property(adapter->proxy, "Name", "s", &str)) {
+@@ -670,7 +670,7 @@ static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
+ 	int16_t rssi;
+ 
+ 	if (!l_dbus_proxy_get_property(proxy, "Address", "s", &str) ||
+-						str2ba(str, (bdaddr_t *)ev.address) < 0)
++						str2ba(str, &ev.address) < 0)
+ 		return;
+ 
+ 	if (!l_dbus_proxy_get_property(proxy, "AddressType", "s", &str))
+-- 
+2.14.3
 
-So how do I move this forward? Should we have separate lib/mgmt_monitor.h w=
-ith=20
-those? Or just simple src/shared/monitor.c that would wrap this and allows =
-to=20
-handle monitoring on top of provided sk (it would be quite simple I suppose=
-)?=20
-
-=2D-=20
-pozdrawiam
-Szymon Janc
