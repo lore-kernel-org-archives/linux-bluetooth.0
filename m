@@ -1,198 +1,139 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <szymon.janc@codecoup.pl>
 From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] adapter: Add CreateDevice method
-Date: Tue, 16 Jan 2018 15:15:54 +0100
-Message-ID: <2951607.rb9Mzus4Iv@ix>
-In-Reply-To: <20180111110423.14498-1-szymon.janc@codecoup.pl>
-References: <20180111110423.14498-1-szymon.janc@codecoup.pl>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] tools: Add initial code for btmon-logger
+Date: Tue, 16 Jan 2018 15:15:16 +0100
+Message-ID: <7086609.337NVEs3t0@ix>
+In-Reply-To: <F0C80F8E-0CEA-4FEA-92C8-65005D188020@holtmann.org>
+References: <20180112142546.31424-1-szymon.janc@codecoup.pl> <3417178.fibeJ9uDTt@ix> <F0C80F8E-0CEA-4FEA-92C8-65005D188020@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-On Thursday, 11 January 2018 12:04:23 CET Szymon Janc wrote:
-> This allows to create Device1 object without discovery. This is needed for
-> some of qualification tests where there is no general discovery upfront
-> and we need to do connection to device with provided address.
-> 
-> Another usecase is for scenario where scanning happen on one controller but
-> connection handling on another.
-> 
-> Implementation wide this results in new temporary device object being
-> created that if unused will be cleanup just like it would be if found
-> during discovery session.
-> 
-> This patch implements bare minimum properties needed for connection -
-> address and address type. If needed eg. for non-NFC based OOB it could be
-> extended with more options.
-> ---
->  doc/adapter-api.txt | 29 ++++++++++++++++
->  src/adapter.c       | 96
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++ 2 files changed, 125
-> insertions(+)
-> 
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 0533b674a..c8f3ce26e 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -145,6 +145,35 @@ Methods		void StartDiscovery()
-> 
->  			Possible errors: None
-> 
-> +		void CreateDevice(dict properties) [experimental]
-> +
-> +			Creates new temporary device with defined properties.
-> +
-> +			Parameters that may be set in the filter dictionary
-> +			include the following:
-> +
-> +			string Address
-> +
-> +				The Bluetooth device address of the remote
-> +				device. This parameter is mandatory.
-> +
-> +			string AddressType
-> +
-> +				The Bluetooth device Address Type. This is
-> +				address type that should be used for initial
-> +				connection. If this parameter is not present
-> +				BR/EDR device is created.
-> +
-> +				Possible values:
-> +					"public" - Public address
-> +					"random" - Random address
-> +
-> +			Possible errors: org.bluez.Error.InvalidArguments
-> +					 org.bluez.Error.AlreadyExists
-> +					 org.bluez.Error.NotSupported
-> +					 org.bluez.Error.NotReady
-> +					 org.bluez.Error.Failed
-> +
->  Properties	string Address [readonly]
-> 
->  			The Bluetooth device address.
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 0a25ae27e..0d18b58aa 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -3080,6 +3080,99 @@ static DBusMessage
-> *get_discovery_filters(DBusConnection *conn, return reply;
->  }
-> 
-> +static DBusMessage *create_device(DBusConnection *conn,
-> +					DBusMessage *msg, void *user_data)
-> +{
-> +	struct btd_adapter *adapter = user_data;
-> +	DBusMessageIter iter, subiter, dictiter, value;
-> +	uint8_t addr_type = BDADDR_BREDR;
-> +	bdaddr_t addr = *BDADDR_ANY;
-> +	struct btd_device *device;
-> +
-> +	DBG("sender %s", dbus_message_get_sender(msg));
-> +
-> +	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
-> +		return btd_error_not_ready(msg);
-> +
-> +	dbus_message_iter_init(msg, &iter);
-> +	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY ||
-> +	    dbus_message_iter_get_element_type(&iter) != DBUS_TYPE_DICT_ENTRY)
-> +		return btd_error_invalid_args(msg);
-> +
-> +	dbus_message_iter_recurse(&iter, &subiter);
-> +	do {
-> +		int type = dbus_message_iter_get_arg_type(&subiter);
-> +		char *key;
-> +		char *str;
-> +
-> +		if (type == DBUS_TYPE_INVALID)
-> +			break;
-> +
-> +		dbus_message_iter_recurse(&subiter, &dictiter);
-> +
-> +		dbus_message_iter_get_basic(&dictiter, &key);
-> +		if (!dbus_message_iter_next(&dictiter))
-> +			return btd_error_invalid_args(msg);
-> +
-> +		if (dbus_message_iter_get_arg_type(&dictiter) !=
-> +							DBUS_TYPE_VARIANT)
-> +			return btd_error_invalid_args(msg);
-> +
-> +		dbus_message_iter_recurse(&dictiter, &value);
-> +
-> +		if (!strcmp(key, "Address")) {
-> +			if (dbus_message_iter_get_arg_type(&value) !=
-> +							DBUS_TYPE_STRING)
-> +				return btd_error_invalid_args(msg);
-> +
-> +			dbus_message_iter_get_basic(&value, &str);
-> +
-> +			if (str2ba(str, &addr) < 0 )
-> +				return btd_error_invalid_args(msg);
-> +		} else if (!strcmp(key, "AddressType")) {
-> +			if (dbus_message_iter_get_arg_type(&value) !=
-> +							DBUS_TYPE_STRING)
-> +				return btd_error_invalid_args(msg);
-> +
-> +			dbus_message_iter_get_basic(&value, &str);
-> +
-> +
-> +			if (!strcmp(str, "public"))
-> +				addr_type = BDADDR_LE_PUBLIC;
-> +			else if (!strcmp(str, "random"))
-> +				addr_type = BDADDR_LE_RANDOM;
-> +			else
-> +				return btd_error_invalid_args(msg);
-> +		} else {
-> +			return btd_error_invalid_args(msg);
-> +		}
-> +
-> +		dbus_message_iter_next(&subiter);
-> +	} while (true);
-> +
-> +	if (!bacmp(&addr, BDADDR_ANY))
-> +		return btd_error_invalid_args(msg);
-> +
-> +	device = btd_adapter_find_device(adapter, &addr, addr_type);
-> +	if (device)
-> +		return btd_error_already_exists(msg);
-> +
-> +
-> +	device = adapter_create_device(adapter, &addr, addr_type);
-> +	if (!device)
-> +		return btd_error_failed(msg, "Failed to create device");
-> +
-> +	device_update_last_seen(device, addr_type);
-> +	btd_device_set_temporary(device, true);
-> +
-> +	if (!adapter->temp_devices_timeout)
-> +		adapter->temp_devices_timeout = g_timeout_add_seconds(
-> +						TEMP_DEV_TIMEOUT,
-> +						remove_temp_devices, adapter);
-> +
-> +	return dbus_message_new_method_return(msg);
-> +}
-> +
->  static const GDBusMethodTable adapter_methods[] = {
->  	{ GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
->  	{ GDBUS_METHOD("SetDiscoveryFilter",
-> @@ -3091,6 +3184,9 @@ static const GDBusMethodTable adapter_methods[] = {
->  	{ GDBUS_METHOD("GetDiscoveryFilters", NULL,
->  			GDBUS_ARGS({ "filters", "as" }),
->  			get_discovery_filters) },
-> +	{ GDBUS_EXPERIMENTAL_METHOD("CreateDevice",
-> +				GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
-> +				create_device) },
->  	{ }
->  };
+On Monday, 15 January 2018 16:08:30 CET Marcel Holtmann wrote:
+> Hi Szymon,
+>=20
+> >>> This is intended for use for automted logging or unatrended systems.
+> >>> It doesn't contain any packet decoding functionality which results
+> >>> in much smaller binary.
+> >>> ---
+> >>> .gitignore           |   1 +
+> >>> Makefile.tools       |   6 +
+> >>> tools/btmon-logger.c | 359
+> >>> +++++++++++++++++++++++++++++++++++++++++++++++++++ 3 files changed, =
+366
+> >>> insertions(+)
+> >>> create mode 100644 tools/btmon-logger.c
+> >>>=20
+> >>> diff --git a/.gitignore b/.gitignore
+> >>> index 47808059b..33ec66048 100644
+> >>> --- a/.gitignore
+> >>> +++ b/.gitignore
+> >>> @@ -118,6 +118,7 @@ tools/btconfig
+> >>> tools/btmgmt
+> >>> tools/btsnoop
+> >>> tools/btpclient
+> >>> +tools/btmon-logger
+> >>> peripheral/btsensor
+> >>> monitor/btmon
+> >>> emulator/btvirt
+> >>> diff --git a/Makefile.tools b/Makefile.tools
+> >>> index 651ff00ca..1accfb4f0 100644
+> >>> --- a/Makefile.tools
+> >>> +++ b/Makefile.tools
+> >>> @@ -62,6 +62,12 @@ monitor_btmon_SOURCES =3D monitor/main.c monitor/b=
+t.h \
+> >>>=20
+> >>> 				monitor/tty.h
+> >>>=20
+> >>> monitor_btmon_LDADD =3D lib/libbluetooth-internal.la \
+> >>>=20
+> >>> 				src/libshared-mainloop.la @UDEV_LIBS@
+> >>>=20
+> >>> +
+> >>> +
+> >>=20
+> >> one empty line.
+> >>=20
+> >>> +noinst_PROGRAMS +=3D tools/btmon-logger
+> >>> +
+> >>> +tools_btmon_logger_SOURCES =3D tools/btmon-logger.c
+> >>> +tools_btmon_logger_LDADD =3D src/libshared-mainloop.la
+> >>> endif
+> >>>=20
+> >>> if TESTING
+> >>> diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
+> >>> new file mode 100644
+> >>> index 000000000..fe5f101b4
+> >>> --- /dev/null
+> >>> +++ b/tools/btmon-logger.c
+> >>> @@ -0,0 +1,359 @@
+> >>> +/*
+> >>> + *
+> >>> + *  BlueZ - Bluetooth protocol stack for Linux
+> >>> + *
+> >>> + *  Copyright (C) 2017  Codecoup
+> >>=20
+> >> Lets assume that some of the code is copied from existing btmon sources
+> >> and
+> >> so lets keep Intel copyright in place as well :)
+> >>=20
+> >>> + *
+> >>> + *
+> >>> + *  This program is free software; you can redistribute it and/or
+> >>> modify
+> >>> + *  it under the terms of the GNU General Public License as published
+> >>> by
+> >>> + *  the Free Software Foundation; either version 2 of the License, or
+> >>> + *  (at your option) any later version.
+> >>> + *
+> >>> + *  This program is distributed in the hope that it will be useful,
+> >>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> >>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> >>> + *  GNU General Public License for more details.
+> >>> + *
+> >>> + *  You should have received a copy of the GNU General Public License
+> >>> + *  along with this program; if not, write to the Free Software
+> >>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA=20
+> >>> 02110-1301
+> >>> USA + *
+> >>> + */
+> >>> +
+> >>> +#ifdef HAVE_CONFIG_H
+> >>> +#include <config.h>
+> >>> +#endif
+> >>> +
+> >>> +#include <stdio.h>
+> >>> +#include <stdlib.h>
+> >>> +#include <limits.h>
+> >>> +#include <string.h>
+> >>> +#include <time.h>
+> >>> +#include <getopt.h>
+> >>> +#include <unistd.h>
+> >>> +#include <sys/socket.h>
+> >>> +
+> >>> +#include "lib/bluetooth.h"
+> >>> +#include "lib/hci.h"
+> >>> +#include "lib/mgmt.h=E2=80=9D
+> >>=20
+> >> the mgmt.h should not be needed.
+> >=20
+> > This is needed for struct mgmt_hdr definition.
+>=20
+> hmmm. That seems like an odd dependency and I think we need to get rid of
+> it. I know that the headers are alike, but that is more a coincidence than
+> something that should bleed through in the code.
 
-Any feedback on this?
+So how do I move this forward? Should we have separate lib/mgmt_monitor.h w=
+ith=20
+those? Or just simple src/shared/monitor.c that would wrap this and allows =
+to=20
+handle monitoring on top of provided sk (it would be quite simple I suppose=
+)?=20
 
-
--- 
+=2D-=20
 pozdrawiam
 Szymon Janc
-
-
