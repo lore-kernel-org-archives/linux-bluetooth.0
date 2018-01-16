@@ -1,225 +1,91 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Trevor Sutter <TSutter@efji.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: L2CAP refcount underflow during disconnect
+Date: Tue, 16 Jan 2018 15:40:26 +0000
+Message-ID: <CBD21621126AF744AA6D654F9A938607477372F7@EFJDFWMB01.EFJDFW.local>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <2951607.rb9Mzus4Iv@ix>
-References: <20180111110423.14498-1-szymon.janc@codecoup.pl> <2951607.rb9Mzus4Iv@ix>
-From: =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?=
-        <grzegorz.kolodziejczyk@codecoup.pl>
-Date: Tue, 16 Jan 2018 17:42:51 +0100
-Message-ID: <CALevQMbaizjkEOfKGP+aEPNXgh1EPYpZes=itE_mUTMeU=T7Zw@mail.gmail.com>
-Subject: Re: [RFC] adapter: Add CreateDevice method
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+I am using Linux(v4.12.0)/blueZ(v5.46), running on an embedded device(OMAP-=
+L138).
+During pairing/connecting, I started to see some warnings in my dmesg logs =
+as follows:
 
-2018-01-16 15:15 GMT+01:00 Szymon Janc <szymon.janc@codecoup.pl>:
-> Hi,
->
-> On Thursday, 11 January 2018 12:04:23 CET Szymon Janc wrote:
->> This allows to create Device1 object without discovery. This is needed f=
-or
->> some of qualification tests where there is no general discovery upfront
->> and we need to do connection to device with provided address.
->>
->> Another usecase is for scenario where scanning happen on one controller =
-but
->> connection handling on another.
->>
->> Implementation wide this results in new temporary device object being
->> created that if unused will be cleanup just like it would be if found
->> during discovery session.
->>
->> This patch implements bare minimum properties needed for connection -
->> address and address type. If needed eg. for non-NFC based OOB it could b=
-e
->> extended with more options.
->> ---
->>  doc/adapter-api.txt | 29 ++++++++++++++++
->>  src/adapter.c       | 96
->> +++++++++++++++++++++++++++++++++++++++++++++++++++++ 2 files changed, 1=
-25
->> insertions(+)
->>
->> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
->> index 0533b674a..c8f3ce26e 100644
->> --- a/doc/adapter-api.txt
->> +++ b/doc/adapter-api.txt
->> @@ -145,6 +145,35 @@ Methods          void StartDiscovery()
->>
->>                       Possible errors: None
->>
->> +             void CreateDevice(dict properties) [experimental]
->> +
->> +                     Creates new temporary device with defined properti=
-es.
->> +
->> +                     Parameters that may be set in the filter dictionar=
-y
->> +                     include the following:
->> +
->> +                     string Address
->> +
->> +                             The Bluetooth device address of the remote
->> +                             device. This parameter is mandatory.
->> +
->> +                     string AddressType
->> +
->> +                             The Bluetooth device Address Type. This is
->> +                             address type that should be used for initi=
-al
->> +                             connection. If this parameter is not prese=
-nt
->> +                             BR/EDR device is created.
->> +
->> +                             Possible values:
->> +                                     "public" - Public address
->> +                                     "random" - Random address
->> +
->> +                     Possible errors: org.bluez.Error.InvalidArguments
->> +                                      org.bluez.Error.AlreadyExists
->> +                                      org.bluez.Error.NotSupported
->> +                                      org.bluez.Error.NotReady
->> +                                      org.bluez.Error.Failed
->> +
->>  Properties   string Address [readonly]
->>
->>                       The Bluetooth device address.
->> diff --git a/src/adapter.c b/src/adapter.c
->> index 0a25ae27e..0d18b58aa 100644
->> --- a/src/adapter.c
->> +++ b/src/adapter.c
->> @@ -3080,6 +3080,99 @@ static DBusMessage
->> *get_discovery_filters(DBusConnection *conn, return reply;
->>  }
->>
->> +static DBusMessage *create_device(DBusConnection *conn,
->> +                                     DBusMessage *msg, void *user_data)
->> +{
->> +     struct btd_adapter *adapter =3D user_data;
->> +     DBusMessageIter iter, subiter, dictiter, value;
->> +     uint8_t addr_type =3D BDADDR_BREDR;
->> +     bdaddr_t addr =3D *BDADDR_ANY;
->> +     struct btd_device *device;
->> +
->> +     DBG("sender %s", dbus_message_get_sender(msg));
->> +
->> +     if (!(adapter->current_settings & MGMT_SETTING_POWERED))
->> +             return btd_error_not_ready(msg);
->> +
->> +     dbus_message_iter_init(msg, &iter);
->> +     if (dbus_message_iter_get_arg_type(&iter) !=3D DBUS_TYPE_ARRAY ||
->> +         dbus_message_iter_get_element_type(&iter) !=3D DBUS_TYPE_DICT_=
-ENTRY)
->> +             return btd_error_invalid_args(msg);
->> +
->> +     dbus_message_iter_recurse(&iter, &subiter);
->> +     do {
->> +             int type =3D dbus_message_iter_get_arg_type(&subiter);
->> +             char *key;
->> +             char *str;
->> +
->> +             if (type =3D=3D DBUS_TYPE_INVALID)
->> +                     break;
->> +
->> +             dbus_message_iter_recurse(&subiter, &dictiter);
->> +
->> +             dbus_message_iter_get_basic(&dictiter, &key);
->> +             if (!dbus_message_iter_next(&dictiter))
->> +                     return btd_error_invalid_args(msg);
->> +
->> +             if (dbus_message_iter_get_arg_type(&dictiter) !=3D
->> +                                                     DBUS_TYPE_VARIANT)
->> +                     return btd_error_invalid_args(msg);
->> +
->> +             dbus_message_iter_recurse(&dictiter, &value);
->> +
->> +             if (!strcmp(key, "Address")) {
->> +                     if (dbus_message_iter_get_arg_type(&value) !=3D
->> +                                                     DBUS_TYPE_STRING)
->> +                             return btd_error_invalid_args(msg);
->> +
->> +                     dbus_message_iter_get_basic(&value, &str);
->> +
->> +                     if (str2ba(str, &addr) < 0 )
->> +                             return btd_error_invalid_args(msg);
->> +             } else if (!strcmp(key, "AddressType")) {
->> +                     if (dbus_message_iter_get_arg_type(&value) !=3D
->> +                                                     DBUS_TYPE_STRING)
->> +                             return btd_error_invalid_args(msg);
->> +
->> +                     dbus_message_iter_get_basic(&value, &str);
->> +
->> +
->> +                     if (!strcmp(str, "public"))
->> +                             addr_type =3D BDADDR_LE_PUBLIC;
->> +                     else if (!strcmp(str, "random"))
->> +                             addr_type =3D BDADDR_LE_RANDOM;
->> +                     else
->> +                             return btd_error_invalid_args(msg);
->> +             } else {
->> +                     return btd_error_invalid_args(msg);
->> +             }
->> +
->> +             dbus_message_iter_next(&subiter);
->> +     } while (true);
->> +
->> +     if (!bacmp(&addr, BDADDR_ANY))
->> +             return btd_error_invalid_args(msg);
->> +
->> +     device =3D btd_adapter_find_device(adapter, &addr, addr_type);
->> +     if (device)
->> +             return btd_error_already_exists(msg);
->> +
->> +
->> +     device =3D adapter_create_device(adapter, &addr, addr_type);
->> +     if (!device)
->> +             return btd_error_failed(msg, "Failed to create device");
->> +
->> +     device_update_last_seen(device, addr_type);
->> +     btd_device_set_temporary(device, true);
->> +
->> +     if (!adapter->temp_devices_timeout)
->> +             adapter->temp_devices_timeout =3D g_timeout_add_seconds(
->> +                                             TEMP_DEV_TIMEOUT,
->> +                                             remove_temp_devices, adapt=
-er);
->> +
->> +     return dbus_message_new_method_return(msg);
->> +}
->> +
->>  static const GDBusMethodTable adapter_methods[] =3D {
->>       { GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery=
-) },
->>       { GDBUS_METHOD("SetDiscoveryFilter",
->> @@ -3091,6 +3184,9 @@ static const GDBusMethodTable adapter_methods[] =
-=3D {
->>       { GDBUS_METHOD("GetDiscoveryFilters", NULL,
->>                       GDBUS_ARGS({ "filters", "as" }),
->>                       get_discovery_filters) },
->> +     { GDBUS_EXPERIMENTAL_METHOD("CreateDevice",
->> +                             GDBUS_ARGS({ "properties", "a{sv}" }), NUL=
-L,
->> +                             create_device) },
->>       { }
->>  };
->
-> Any feedback on this?
-I've used it internally in btpclient and it works well. +1 from me.
->
->
-> --
-> pozdrawiam
-> Szymon Janc
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+WARNING: CPU: 0 PID: 824 at lib/refcount.c:184 0xc01c7e84
+refcount_t: underflow; use-after-free.
 
-pozdrawiam,
-Grzegorz Ko=C5=82odziejczyk
+Investigation showed that this is a mismanaged refcount to an L2CAP channel=
+, and it occurs when shutting down an l2cap connection.
+Stack traces show the following:
+
+l2cap_disconnect_req() -> l2cap_chan_del() -> chan->ops->teardown()[l2cap_s=
+ock_teardown_cb]
+
+l2cap_sock_teardown_cb() sets SOCK_ZAPPED and calls sk->sk_state_change(sk)=
+, waking up the wait queue associated with this socket (in this case, the t=
+hread is owned by bluetoothd).
+
+There is a race condition here when a thread that is waiting on this queue =
+wants to release this socket.
+
+At this point, the refcount is 3. I see one of two scenarios.
+
+1.
+                - The call to l2cap_chan_del returns and calls chan->ops->c=
+lose()[l2cap_sock_close_cb] which returns since the socket is not yet an or=
+phan.
+                - A reference to the channel is put (one is held right befo=
+re calling l2cap_chan_del())(refcount =3D 2).
+                - Immediately after, a thread that was waiting on the wait =
+queue calls l2cap_sock_release() putting a ref to the channel (refcount =3D=
+ 1)
+                  and putting the last ref to the socket, releasing another=
+ ref to the channel (refcount =3D 0).
+
+2.
+                - Before the call to teardown returns, a thread that was wa=
+iting on the wait queue get scheduled and calls l2cap_sock_release() puttin=
+g a ref to the channel (refcount =3D 2)
+                  and putting the last ref to the socket, releasing another=
+ ref to the channel (refcount =3D 1).
+                - Then, the call to l2cap_chan_del returns and calls chan->=
+ops->close()[l2cap_sock_close_cb] which will put a ref to the channel since=
+ the socket is orphaned now refcount =3D 0).
+                - A reference to the channel is put (one is held right befo=
+re calling l2cap_chan_del()) (refcount =3D -1).
+
+It does not seem like this is causing any undesirable behavior, but it shou=
+ld probably be addressed. What I am considering now is to place a check for=
+ the SOCK_DEAD
+flag in l2cap_sock_close_cb.
+
+                static void l2cap_sock_close_cb(struct l2cap_chan *chan)
+                {
+                                struct sock *sk =3D chan->data;
+
++                             if(!sock_flag(sk, SOCK_DEAD))
+                                                l2cap_sock_kill(sk);
+                }
+
+This will prevent l2cap_sock_kill from getting called twice. I am not extre=
+mely knowledgeable when it comes to inner workings of l2cap/blueZ.
+I would appreciate any suggestions or feedback on this proposed fix.
+
+Note: This is my first time using a mailing list. Please feel free to corre=
+ct any broken conventions/give feedback for improving future posts.
+
+Thank you,
+Trevor Sutter
+This e-mail transmission, and any documents, files or previous e-mail messa=
+ges attached to it, may contain confidential information. If you are not th=
+e intended recipient, or a person responsible for delivering it to the inte=
+nded recipient, you are hereby notified that any disclosure, distribution, =
+review, copy or use of any of the information contained in or attached to t=
+his message is STRICTLY PROHIBITED. If you have received this transmission =
+in error, please immediately notify us by reply e-mail, and destroy the ori=
+ginal transmission and its attachments without reading them or saving them =
+to disk. Thank you.
+
