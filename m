@@ -1,230 +1,46 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Stotland, Inga" <inga.stotland@intel.com>
-To: "sbrown@cortland.com" <sbrown@cortland.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH V2] mesh: meshctl: Add set heartbeat subscription command
-Date: Thu, 18 Jan 2018 02:08:24 +0000
-Message-ID: <1516241300.6797.6.camel@intel.com>
-References: <20180117124432.14612-1-sbrown@cortland.com>
-In-Reply-To: <20180117124432.14612-1-sbrown@cortland.com>
-Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-W1FYApKCI2vohPQ4vzZN"
+Return-Path: <joerg.krause@embedded.rocks>
+From: =?UTF-8?q?J=C3=B6rg=20Krause?= <joerg.krause@embedded.rocks>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	=?UTF-8?q?J=C3=B6rg=20Krause?= <joerg.krause@embedded.rocks>
+Subject: [PATCH RESEND] Bluetooth: btbcm: Add entry for BCM4343A0 UART bluetooth
+Date: Thu, 18 Jan 2018 00:27:06 +0100
+Message-Id: <20180117232706.25077-1-joerg.krause@embedded.rocks>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-W1FYApKCI2vohPQ4vzZN
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi Steve,
-
-On Wed, 2018-01-17 at 07:44 -0500, Steve Brown wrote:
-> [config: Target =3D 0100]# hb-sub-set 0077 0100 2
->=20
-> Heartbeat subscription status for node 0100 status: Success
-> Source:		0077
-> Destination:	0100
-> Period:		01
-> Count:		00
-> Min Hops:	7f
-> Max Hops:	00
-> ---
->  mesh/config-client.c | 63
-> ++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 59 insertions(+), 4 deletions(-)
->=20
-> diff --git a/mesh/config-client.c b/mesh/config-client.c
-> index f280441cc..6c8c7ee87 100644
-> --- a/mesh/config-client.c
-> +++ b/mesh/config-client.c
-> @@ -303,7 +303,8 @@ static bool client_msg_recvd(uint16_t src,
-> uint8_t *data,
-> =20
->  	/* Per Mesh Profile 4.3.2.63 */
->  	case OP_CONFIG_HEARTBEAT_PUB_STATUS:
-> -		bt_shell_printf("\nSet heartbeat for node %4.4x
-> status: %s\n",
-> +		bt_shell_printf("\nHeartbeat publication status for
-> "
-> +				"node %4.4x status: %s\n",
->  				src,
->  				data[0] =3D=3D MESH_STATUS_SUCCESS ?
-> "Success" :
->  						mesh_status_str(data
-> [0]));
-> @@ -318,6 +319,25 @@ static bool client_msg_recvd(uint16_t src,
-> uint8_t *data,
->  		bt_shell_printf("Features:\t%4.4x\n", get_le16(data
-> + 6));
->  		bt_shell_printf("Net_Idx:\t%4.4x\n", get_le16(data +
-> 8));
->  		break;
-> +
-> +	/* Per Mesh Profile 4.3.2.66 */
-> +	case OP_CONFIG_HEARTBEAT_SUB_STATUS:
-> +		bt_shell_printf("\nHeartbeat subscription status for
-> "
-> +				"node %4.4x status: %s\n",
-> +				src,
-> +				data[0] =3D=3D MESH_STATUS_SUCCESS ?
-> "Success" :
-> +						mesh_status_str(data
-> [0]));
-> +
-> +		if (data[0] !=3D MESH_STATUS_SUCCESS)
-> +			return true;
-> +
-> +		bt_shell_printf("Source:\t\t%4.4x\n", get_le16(data
-> + 1));
-> +		bt_shell_printf("Destination:\t%4.4x\n",
-> get_le16(data + 3));
-> +		bt_shell_printf("Period:\t\t%2.2x\n", data[5]);
-> +		bt_shell_printf("Count:\t\t%2.2x\n", data[6]);
-> +		bt_shell_printf("Min Hops:\t%2.2x\n", data[7]);
-> +		bt_shell_printf("Max Hops:\t%2.2x\n", data[8]);
-> +		break;
->  	}
-> =20
->  	return true;
-> @@ -946,7 +966,7 @@ static void cmd_get_app(int argc, char *argv[])
->  		bt_shell_printf("Failed to send \"GET APP GET\"\n");
->  }
-> =20
-> -static void cmd_set_hb(int argc, char *argv[])
-> +static void cmd_hb_pub_set(int argc, char *argv[])
->  {
->  	uint16_t n;
->  	uint8_t msg[32];
-> @@ -983,7 +1003,40 @@ static void cmd_set_hb(int argc, char *argv[])
->  	n +=3D 2;
-> =20
->  	if (!config_send(msg, n))
-> -		bt_shell_printf("Failed to send \"SET HEARTBEAT
-> PUBLICATION\"\n");
-> +		bt_shell_printf("Failed to send \"SET HEARTBEAT
-> PUBLISH\"\n");
-> +}
-> +
-> +static void cmd_hb_sub_set(int argc, char *argv[])
-> +{
-> +	uint16_t n;
-> +	uint8_t msg[32];
-> +	int parm_cnt;
-> +
-> +	if (IS_UNASSIGNED(target)) {
-> +		bt_shell_printf("Destination not set\n");
-> +		return;
-> +	}
-> +
-> +	n =3D mesh_opcode_set(OP_CONFIG_HEARTBEAT_SUB_SET, msg);
-> +
-> +	parm_cnt =3D read_input_parameters(argc, argv);
-> +	if (parm_cnt !=3D 3) {
-> +		bt_shell_printf("Bad arguments: %s\n", argv[1]);
-> +		return;
-> +	}
-> +
-> +	/* Per Mesh Profile 4.3.2.65 */
-> +	/* Source address */
-> +	put_le16(parms[0], msg + n);
-> +	n +=3D 2;
-> +	/* Destination address */
-> +	put_le16(parms[1], msg + n);
-> +	n +=3D 2;
-> +	/* Period log */
-> +	msg[n++] =3D parms[2];
-> +
-> +	if (!config_send(msg, n))
-> +		bt_shell_printf("Failed to send \"SET HEARTBEAT
-> SUBSCRIBE\"\n");
->  }
-> =20
->  static void cmd_get_ttl(int argc, char *argv[])
-> @@ -1033,7 +1086,9 @@ static const struct bt_shell_menu cfg_menu =3D {
->  	{"relay-
-> get",           NULL,                   cmd_get_relay,
->  						"Get relay"},
->  	{"hb-pub-set", "<pub_addr> <count> <period> <features>
-> <net_idx>",
-> -				cmd_set_hb,     "Set heartbeati
-> publish"},
-> +				cmd_hb_pub_set,     "Set heartbeat
-> publish"},
-> +	{"hb-sub-set", "<src_addr> <dst_addr> <period>",
-> +				cmd_hb_sub_set,     "Set heartbeat
-> subscribe"},
->  	{"sub-add", "<ele_addr> <sub_addr> <model id>",
->  				cmd_sub_add,    "Subscription add"},
->  	{"sub-get", "<ele_addr> <model id>",
-
-This looks fine.
-
-Thanks,
-Inga
---=-W1FYApKCI2vohPQ4vzZN
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-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
-Zg5mBVQoBK5apmk2/QnKNb/XBUyu62quyTXRahXz2KXRqznXj++7MiP2dYTRzC1XMK1lAgMBAAGj
-ggIxMIICLTAdBgNVHQ4EFgQUzeWQY29S+1e6mTvizPBEGBE3JGUwHwYDVR0jBBgwFoAU2kEjnFqP
-ca9Xgz4g0+Nl2wzLC9swZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5jb20vcmVw
-b3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEIu
-Y3JsMIGfBggrBgEFBQcBAQSBkjCBjzAiBggrBgEFBQcwAYYWaHR0cDovL29jc3AuaW50ZWwuY29t
-LzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRlbC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0
-ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEIuY3J0MAsGA1Ud
-DwQEAwIHgDA8BgkrBgEEAYI3FQcELzAtBiUrBgEEAYI3FQiGw4x1hJnlUYP9gSiFjp9TgpHACWeB
-3r05lfBDAgFkAgEJMB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsGAQQBgjcV
-CgQcMBowCgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBLBgNVHREERDBCoCcGCisGAQQBgjcUAgOg
-GQwXaW5nYS5zdG90bGFuZEBpbnRlbC5jb22BF2luZ2Euc3RvdGxhbmRAaW50ZWwuY29tMA0GCSqG
-SIb3DQEBBQUAA4IBAQCoG+97GZuQEwQnuWIVQWcpVw1Ym/kJEGjRAiB8JMflkvaemGuUV/xS2ccg
-o4V80bU6Ee3jhFp3DH8aiO068JigsTZRDt172E7E/p187o2M6FicC63aUgWW/FZfEaOXuky/8jdz
-9oaWcDIwFm+L6vpSQrE5Wbk5sCX04SvRlJ6X/+KAWJGE5sU9lA4XB0yJapCCoVyNZln3H3PdSXC2
-rdOl2HSUdGOvmIwNkaSLLaVgUjz6mFzzRi/64tOfROIQSEdBYNStKYCixc2KP/sWL6LtfW+sQVLZ
-r+HHDskuWTuEbYxFinLxC1gayzk80cz9z4qMg5bQJWyClLIwh4qpnUpoMYICFzCCAhMCAQEwgZAw
-eTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBDbGFyYTEaMBgGA1UE
-ChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3Vp
-bmcgQ0EgNEICEzMAAE9zKgiM3IZosrQAAAAAT3MwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzEL
-BgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE4MDExODAyMDgyMFowIwYJKoZIhvcNAQkEMRYE
-FHiBJnHLVwquNtj3e84HXysJ4Q9dMA0GCSqGSIb3DQEBAQUABIIBAET5HobPDT2GfSWUPslhIbPH
-GgNGGebeKXURL/qiDCuWvLA7G6ITQAvgGozY/rtJJc0pqLdhhAEiBba1jW/gxsEJFb+vGlnocm29
-GvKybnPVIWP50ULM4lqNS3sL/5cRE0wiLaYpJJKY3U354AVgYqfXJKNF4Pa4aw64gzl8RA631/PF
-wQMvoZYpStn0YjhfNwTZriztQTy1Bn308GMh59PC/6oPuZwUPbzskPpRg8zhhuYgNNRYEEg8e4db
-Q29PwC/8JLv03609Nyn9XeD8xX1Zsu9fOUJWtDarWZDT19XY09W0l2nyIY83C+RlP8UNMi31u1Df
-e45RCsiohr1h3e0AAAAAAAA=
-
-
---=-W1FYApKCI2vohPQ4vzZN--
+UkVTRU5EIGJlY2F1c2Ugb2YgbWlzc2luZyB0aGUgY29ycmVjdCBDY3MuIE9yaWdpbmFsIHBhdGNo
+IGlzIFswXS4KClRoaXMgcGF0Y2ggYWRkcyB0aGUgZGV2aWNlIElEIGZvciB0aGUgYmx1ZXRvb3Ro
+IGNoaXAgdXNlZCBpbiB0aGUKQU1QQUsgQVA2MjEyIFdpRmkrQmx1ZXRvb3RoIG1vZHVsZS4gVGhl
+IEFQNjIxMiBpcyB1c2VkIG9uIHNldmVyYWwKQmFuYW5hUGkgYm9hcmRzLCBlLmcuIE0yLVVsdHJh
+LgoKVGhlIEFQNjIxMiBpcyBhIGNvbWJvIG1vZHVsZSwgd2hlcmUgdGhlIFdpRmkgY2hpcCBpcyBp
+ZGVudGlmaWVkIGFzCkJDTTQzNDMwQTAgd2hlcmVhcyB0aGUgQmx1ZXRvb3RoIGNoaXAgaWRlbnRp
+ZmllcyBpdHNlbGYgYXMgNDM0M0EwLiBOb3RlLAp0aGUgbWlzc2luZyAnMCcgYmVmb3JlIHRoZSAn
+QTAnLgoKVGhlIEFQNjIxMiBuZWVkcyBhIGZpcm13YXJlIGJsb2IuIExvYWRpbmcgdGhlIHByb3Zp
+ZGVkIGZpcm13YXJlIGZpbGUKZnJvbSB0aGUgQmFuYW5hUGkgdmVuZG9yLCB0aGUgYWRhcHRlciBu
+YW1lIGlzIHByaW50ZWQgYXMKJ0JDTTQzNDNBMCAyNk1IeiBBUDYyMTJfQ0wxLTAwNjEnOgoKJycn
+CmhjaTA6CVR5cGU6IFByaW1hcnkgIEJ1czogVUFSVAoJQkQgQWRkcmVzczogNDM6NDM6QTA6MTI6
+MUY6QUMgIEFDTCBNVFU6IDEwMjE6OCAgU0NPIE1UVTogNjQ6MQoJVVAgUlVOTklORwoJUlggYnl0
+ZXM6MzA3NiBhY2w6MCBzY286MCBldmVudHM6Mjc4IGVycm9yczowCglUWCBieXRlczozOTcyNiBh
+Y2w6MCBzY286MCBjb21tYW5kczoyNzkgZXJyb3JzOjAKCUZlYXR1cmVzOiAweGJmIDB4ZmUgMHhj
+ZiAweGZlIDB4ZGIgMHhmZiAweDdiIDB4ODcKCVBhY2tldCB0eXBlOiBETTEgRE0zIERNNSBESDEg
+REgzIERINSBIVjEgSFYyIEhWMwoJTGluayBwb2xpY3k6IFJTV0lUQ0ggU05JRkYKCUxpbmsgbW9k
+ZTogU0xBVkUgQUNDRVBUCglOYW1lOiAnQkNNNDM0M0EwIDI2TUh6IEFQNjIxMl9DTDEtMDA2MScK
+CUNsYXNzOiAweDAwMDAwMAoJU2VydmljZSBDbGFzc2VzOiBVbnNwZWNpZmllZAoJRGV2aWNlIENs
+YXNzOiBNaXNjZWxsYW5lb3VzLAoJSENJIFZlcnNpb246IDQuMSAoMHg3KSAgUmV2aXNpb246IDB4
+ZjIKCUxNUCBWZXJzaW9uOiA0LjEgKDB4NykgIFN1YnZlcnNpb246IDB4MjEyMgoJTWFudWZhY3R1
+cmVyOiBCcm9hZGNvbSBDb3Jwb3JhdGlvbiAoMTUpCicnJwoKWzBdIGh0dHBzOi8vd3d3LnNwaW5p
+Y3MubmV0L2xpc3RzL2xpbnV4LWJsdWV0b290aC9tc2c3MTg3Ni5odG1sCgpTaWduZWQtb2ZmLWJ5
+OiBKw7ZyZyBLcmF1c2UgPGpvZXJnLmtyYXVzZUBlbWJlZGRlZC5yb2Nrcz4KLS0tCiBkcml2ZXJz
+L2JsdWV0b290aC9idGJjbS5jIHwgMSArCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykK
+CmRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idGJjbS5jIGIvZHJpdmVycy9ibHVldG9v
+dGgvYnRiY20uYwppbmRleCBjYzRiZGVmYTY2NDguLjQ2ODRiZTI0N2QyOCAxMDA2NDQKLS0tIGEv
+ZHJpdmVycy9ibHVldG9vdGgvYnRiY20uYworKysgYi9kcml2ZXJzL2JsdWV0b290aC9idGJjbS5j
+CkBAIC0zMjYsNiArMzI2LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCB7CiAJeyAweDQxMGUsICJC
+Q000MzM0MUIwIgl9LAkvKiAwMDIuMDAxLjAxNCAqLwogCXsgMHg0NDA2LCAiQkNNNDMyNEIzIgl9
+LAkvKiAwMDIuMDA0LjAwNiAqLwogCXsgMHg2MTBjLCAiQkNNNDM1NCIJfSwJLyogMDAzLjAwMS4w
+MTIgKi8KKwl7IDB4MjEyMiwgIkJDTTQzNDNBMCIJfSwJLyogMDAxLjAwMS4wMzQgKi8KIAl7IDB4
+MjIwOSwgIkJDTTQzNDMwQTEiICB9LAkvKiAwMDEuMDAyLjAwOSAqLwogCXsgfQogfTsKLS0gCjIu
+MTUuMQoK
