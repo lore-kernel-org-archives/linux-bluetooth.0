@@ -1,39 +1,128 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 198043] Bluetooth mgmt api set powered causes kernel race
- condition
-Date: Wed, 17 Jan 2018 13:11:59 +0000
-Message-ID: <bug-198043-62941-OUr1VxBPIG@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-198043-62941@https.bugzilla.kernel.org/>
-References: <bug-198043-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
+From: Steve Brown <sbrown@cortland.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: inga.stotland@intel.com, Steve Brown <sbrown@cortland.com>
+Subject: [PATCH V2] mesh: meshctl: Add set heartbeat subscription command
+Date: Wed, 17 Jan 2018 07:44:32 -0500
+Message-Id: <20180117124432.14612-1-sbrown@cortland.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=198043
+[config: Target = 0100]# hb-sub-set 0077 0100 2
 
---- Comment #2 from luc (l.perneel@luperco.com) ---
-OK found the cause, but it is solved in the upcoming 4.15 kernel.
-Patch can be found in:
-https://patchwork.kernel.org/patch/9963977/
+Heartbeat subscription status for node 0100 status: Success
+Source:		0077
+Destination:	0100
+Period:		01
+Count:		00
+Min Hops:	7f
+Max Hops:	00
+---
+ mesh/config-client.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 59 insertions(+), 4 deletions(-)
 
-In short: the  function hci_send_monitor_ctrl_event (in hci_sock.c) takes the
-read_lock.
-Then it calls hci_send_to_channel which also takes the read_lock.
-If now between the two read lock takes, a write lock is entered on another cpu
-(and thus the waiting writer flag is set), the second take will decrease again
-its counter (not entering the lock) and wait until the writer finished.
-However, as the same thread took it already, it will never decrease to zero.
-At the end both cpus are spinlocking waiting on each other for ever.
-On a dual core system, this actually means you are dead.
-(in fact you loose two cores when this happen on whatever system, and each next
-bluetooth request can lockup another core until the system is dead).
-
-I will fix my 4.9 kernel, but I hope this nasty bug is backported towards older
-kernels.
-
+diff --git a/mesh/config-client.c b/mesh/config-client.c
+index f280441cc..6c8c7ee87 100644
+--- a/mesh/config-client.c
++++ b/mesh/config-client.c
+@@ -303,7 +303,8 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+ 
+ 	/* Per Mesh Profile 4.3.2.63 */
+ 	case OP_CONFIG_HEARTBEAT_PUB_STATUS:
+-		bt_shell_printf("\nSet heartbeat for node %4.4x status: %s\n",
++		bt_shell_printf("\nHeartbeat publication status for "
++				"node %4.4x status: %s\n",
+ 				src,
+ 				data[0] == MESH_STATUS_SUCCESS ? "Success" :
+ 						mesh_status_str(data[0]));
+@@ -318,6 +319,25 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+ 		bt_shell_printf("Features:\t%4.4x\n", get_le16(data + 6));
+ 		bt_shell_printf("Net_Idx:\t%4.4x\n", get_le16(data + 8));
+ 		break;
++
++	/* Per Mesh Profile 4.3.2.66 */
++	case OP_CONFIG_HEARTBEAT_SUB_STATUS:
++		bt_shell_printf("\nHeartbeat subscription status for "
++				"node %4.4x status: %s\n",
++				src,
++				data[0] == MESH_STATUS_SUCCESS ? "Success" :
++						mesh_status_str(data[0]));
++
++		if (data[0] != MESH_STATUS_SUCCESS)
++			return true;
++
++		bt_shell_printf("Source:\t\t%4.4x\n", get_le16(data + 1));
++		bt_shell_printf("Destination:\t%4.4x\n", get_le16(data + 3));
++		bt_shell_printf("Period:\t\t%2.2x\n", data[5]);
++		bt_shell_printf("Count:\t\t%2.2x\n", data[6]);
++		bt_shell_printf("Min Hops:\t%2.2x\n", data[7]);
++		bt_shell_printf("Max Hops:\t%2.2x\n", data[8]);
++		break;
+ 	}
+ 
+ 	return true;
+@@ -946,7 +966,7 @@ static void cmd_get_app(int argc, char *argv[])
+ 		bt_shell_printf("Failed to send \"GET APP GET\"\n");
+ }
+ 
+-static void cmd_set_hb(int argc, char *argv[])
++static void cmd_hb_pub_set(int argc, char *argv[])
+ {
+ 	uint16_t n;
+ 	uint8_t msg[32];
+@@ -983,7 +1003,40 @@ static void cmd_set_hb(int argc, char *argv[])
+ 	n += 2;
+ 
+ 	if (!config_send(msg, n))
+-		bt_shell_printf("Failed to send \"SET HEARTBEAT PUBLICATION\"\n");
++		bt_shell_printf("Failed to send \"SET HEARTBEAT PUBLISH\"\n");
++}
++
++static void cmd_hb_sub_set(int argc, char *argv[])
++{
++	uint16_t n;
++	uint8_t msg[32];
++	int parm_cnt;
++
++	if (IS_UNASSIGNED(target)) {
++		bt_shell_printf("Destination not set\n");
++		return;
++	}
++
++	n = mesh_opcode_set(OP_CONFIG_HEARTBEAT_SUB_SET, msg);
++
++	parm_cnt = read_input_parameters(argc, argv);
++	if (parm_cnt != 3) {
++		bt_shell_printf("Bad arguments: %s\n", argv[1]);
++		return;
++	}
++
++	/* Per Mesh Profile 4.3.2.65 */
++	/* Source address */
++	put_le16(parms[0], msg + n);
++	n += 2;
++	/* Destination address */
++	put_le16(parms[1], msg + n);
++	n += 2;
++	/* Period log */
++	msg[n++] = parms[2];
++
++	if (!config_send(msg, n))
++		bt_shell_printf("Failed to send \"SET HEARTBEAT SUBSCRIBE\"\n");
+ }
+ 
+ static void cmd_get_ttl(int argc, char *argv[])
+@@ -1033,7 +1086,9 @@ static const struct bt_shell_menu cfg_menu = {
+ 	{"relay-get",           NULL,                   cmd_get_relay,
+ 						"Get relay"},
+ 	{"hb-pub-set", "<pub_addr> <count> <period> <features> <net_idx>",
+-				cmd_set_hb,     "Set heartbeati publish"},
++				cmd_hb_pub_set,     "Set heartbeat publish"},
++	{"hb-sub-set", "<src_addr> <dst_addr> <period>",
++				cmd_hb_sub_set,     "Set heartbeat subscribe"},
+ 	{"sub-add", "<ele_addr> <sub_addr> <model id>",
+ 				cmd_sub_add,    "Subscription add"},
+ 	{"sub-get", "<ele_addr> <model id>",
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.14.1
+
