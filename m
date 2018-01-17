@@ -1,46 +1,59 @@
-Return-Path: <joerg.krause@embedded.rocks>
-From: =?UTF-8?q?J=C3=B6rg=20Krause?= <joerg.krause@embedded.rocks>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	=?UTF-8?q?J=C3=B6rg=20Krause?= <joerg.krause@embedded.rocks>
-Subject: [PATCH RESEND] Bluetooth: btbcm: Add entry for BCM4343A0 UART bluetooth
-Date: Thu, 18 Jan 2018 00:27:06 +0100
-Message-Id: <20180117232706.25077-1-joerg.krause@embedded.rocks>
+Return-Path: <alex.aring@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CABBYNZJjOEandxFeqbnei3bWpsNetWTbnna+7zGi5FofzcS59g@mail.gmail.com>
+References: <CGME20180117034755epcas5p1437f6831b91eb594a1106f0960204b81@epcas5p1.samsung.com>
+ <1516160848-471-1-git-send-email-yi2010.guo@samsung.com> <CABBYNZJjOEandxFeqbnei3bWpsNetWTbnna+7zGi5FofzcS59g@mail.gmail.com>
+From: Alexander Aring <alex.aring@gmail.com>
+Date: Wed, 17 Jan 2018 12:37:25 -0500
+Message-ID: <CAB_54W6dSUbybTyWq+Bap0KqCLZGcgSbrJrFGLY_VLPHOC9DJw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix disconnect bug in 6lowpan
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Guo Yi <yi2010.guo@samsung.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-UkVTRU5EIGJlY2F1c2Ugb2YgbWlzc2luZyB0aGUgY29ycmVjdCBDY3MuIE9yaWdpbmFsIHBhdGNo
-IGlzIFswXS4KClRoaXMgcGF0Y2ggYWRkcyB0aGUgZGV2aWNlIElEIGZvciB0aGUgYmx1ZXRvb3Ro
-IGNoaXAgdXNlZCBpbiB0aGUKQU1QQUsgQVA2MjEyIFdpRmkrQmx1ZXRvb3RoIG1vZHVsZS4gVGhl
-IEFQNjIxMiBpcyB1c2VkIG9uIHNldmVyYWwKQmFuYW5hUGkgYm9hcmRzLCBlLmcuIE0yLVVsdHJh
-LgoKVGhlIEFQNjIxMiBpcyBhIGNvbWJvIG1vZHVsZSwgd2hlcmUgdGhlIFdpRmkgY2hpcCBpcyBp
-ZGVudGlmaWVkIGFzCkJDTTQzNDMwQTAgd2hlcmVhcyB0aGUgQmx1ZXRvb3RoIGNoaXAgaWRlbnRp
-ZmllcyBpdHNlbGYgYXMgNDM0M0EwLiBOb3RlLAp0aGUgbWlzc2luZyAnMCcgYmVmb3JlIHRoZSAn
-QTAnLgoKVGhlIEFQNjIxMiBuZWVkcyBhIGZpcm13YXJlIGJsb2IuIExvYWRpbmcgdGhlIHByb3Zp
-ZGVkIGZpcm13YXJlIGZpbGUKZnJvbSB0aGUgQmFuYW5hUGkgdmVuZG9yLCB0aGUgYWRhcHRlciBu
-YW1lIGlzIHByaW50ZWQgYXMKJ0JDTTQzNDNBMCAyNk1IeiBBUDYyMTJfQ0wxLTAwNjEnOgoKJycn
-CmhjaTA6CVR5cGU6IFByaW1hcnkgIEJ1czogVUFSVAoJQkQgQWRkcmVzczogNDM6NDM6QTA6MTI6
-MUY6QUMgIEFDTCBNVFU6IDEwMjE6OCAgU0NPIE1UVTogNjQ6MQoJVVAgUlVOTklORwoJUlggYnl0
-ZXM6MzA3NiBhY2w6MCBzY286MCBldmVudHM6Mjc4IGVycm9yczowCglUWCBieXRlczozOTcyNiBh
-Y2w6MCBzY286MCBjb21tYW5kczoyNzkgZXJyb3JzOjAKCUZlYXR1cmVzOiAweGJmIDB4ZmUgMHhj
-ZiAweGZlIDB4ZGIgMHhmZiAweDdiIDB4ODcKCVBhY2tldCB0eXBlOiBETTEgRE0zIERNNSBESDEg
-REgzIERINSBIVjEgSFYyIEhWMwoJTGluayBwb2xpY3k6IFJTV0lUQ0ggU05JRkYKCUxpbmsgbW9k
-ZTogU0xBVkUgQUNDRVBUCglOYW1lOiAnQkNNNDM0M0EwIDI2TUh6IEFQNjIxMl9DTDEtMDA2MScK
-CUNsYXNzOiAweDAwMDAwMAoJU2VydmljZSBDbGFzc2VzOiBVbnNwZWNpZmllZAoJRGV2aWNlIENs
-YXNzOiBNaXNjZWxsYW5lb3VzLAoJSENJIFZlcnNpb246IDQuMSAoMHg3KSAgUmV2aXNpb246IDB4
-ZjIKCUxNUCBWZXJzaW9uOiA0LjEgKDB4NykgIFN1YnZlcnNpb246IDB4MjEyMgoJTWFudWZhY3R1
-cmVyOiBCcm9hZGNvbSBDb3Jwb3JhdGlvbiAoMTUpCicnJwoKWzBdIGh0dHBzOi8vd3d3LnNwaW5p
-Y3MubmV0L2xpc3RzL2xpbnV4LWJsdWV0b290aC9tc2c3MTg3Ni5odG1sCgpTaWduZWQtb2ZmLWJ5
-OiBKw7ZyZyBLcmF1c2UgPGpvZXJnLmtyYXVzZUBlbWJlZGRlZC5yb2Nrcz4KLS0tCiBkcml2ZXJz
-L2JsdWV0b290aC9idGJjbS5jIHwgMSArCiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKykK
-CmRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idGJjbS5jIGIvZHJpdmVycy9ibHVldG9v
-dGgvYnRiY20uYwppbmRleCBjYzRiZGVmYTY2NDguLjQ2ODRiZTI0N2QyOCAxMDA2NDQKLS0tIGEv
-ZHJpdmVycy9ibHVldG9vdGgvYnRiY20uYworKysgYi9kcml2ZXJzL2JsdWV0b290aC9idGJjbS5j
-CkBAIC0zMjYsNiArMzI2LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCB7CiAJeyAweDQxMGUsICJC
-Q000MzM0MUIwIgl9LAkvKiAwMDIuMDAxLjAxNCAqLwogCXsgMHg0NDA2LCAiQkNNNDMyNEIzIgl9
-LAkvKiAwMDIuMDA0LjAwNiAqLwogCXsgMHg2MTBjLCAiQkNNNDM1NCIJfSwJLyogMDAzLjAwMS4w
-MTIgKi8KKwl7IDB4MjEyMiwgIkJDTTQzNDNBMCIJfSwJLyogMDAxLjAwMS4wMzQgKi8KIAl7IDB4
-MjIwOSwgIkJDTTQzNDMwQTEiICB9LAkvKiAwMDEuMDAyLjAwOSAqLwogCXsgfQogfTsKLS0gCjIu
-MTUuMQoK
+Hi,
+
+2018-01-17 7:15 GMT-05:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+> Hi,
+>
+> On Wed, Jan 17, 2018 at 1:47 AM, Guo Yi <yi2010.guo@samsung.com> wrote:
+>> This patch fix the bluetooth 6lowpan disconnect fail bug.
+>>
+>> The type of the same address type have different define value in HCI layer
+>> and L2CAP layer.That makes disconnect fail due to wrong network type.User
+>> will not be able to disconnect from console with the network type that used
+>> in connect.
+>>
+>> This patch add a var lookup_type, and covert the channel address type to
+>> HCI address type. By these means, user can disconnect successfuly.
+>>
+>> Signed-off-by: Guo Yi <yi2010.guo@samsung.com>
+>
+> While this fix seems alright the debugfs interface was never meant for
+> production, in fact we are working on a replacement:
+>
+
+Is the new API fixing the issue that the 6LoWPAN device creation is
+done by iproute e.g.:
+
+ip link add link wpan0 name lowpan0 type lowpan
+
+or is there a special bluetooth API call needed, like the current case
+with debugfs.
+I know hcis are not netdevs, but it bothers me that we running into
+two different worlds on how to deal with that and it just requires
+"more" special bluetooth specific handling in user space applications.
+Later more "netdev" capable link layers will maybe support 6LoWPAN and
+then bluetooth might the only subsystem where different handling is
+needed to do such job like that.
+
+We maybe need to support a special handling in "ip link add" to map to
+bluetooth instead moving that to people in user space?
+
+- Alex
