@@ -1,83 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] tools/btpclient: Use address convertion function from libbluetooth
-Date: Wed, 17 Jan 2018 11:30:22 +0100
-Message-ID: <2733837.P37tabTlIk@ix>
-In-Reply-To: <20180116140333.10745-1-szymon.janc@codecoup.pl>
-References: <20180116140333.10745-1-szymon.janc@codecoup.pl>
+Subject: Re: [PATCH BlueZ v2 1/2] obexd: Emit file information for client
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20a39652-482a-9fde-6d44-0a8147f156fe@jp.fujitsu.com>
+ <CABBYNZ+QaVYh-B08ixqHi=WxZDhj1bshBLgkJOO2NzKEbVuvKA@mail.gmail.com>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <110905d3-6883-315a-3a18-3e32a249d5c7@jp.fujitsu.com>
+Date: Wed, 17 Jan 2018 16:37:04 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CABBYNZ+QaVYh-B08ixqHi=WxZDhj1bshBLgkJOO2NzKEbVuvKA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday, 16 January 2018 15:03:32 CET Szymon Janc wrote:
-> There is no need for internal helper.
-> ---
->  Makefile.tools    |  2 +-
->  tools/btpclient.c | 12 ++++--------
->  2 files changed, 5 insertions(+), 9 deletions(-)
-> 
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 651ff00ca..71d083e71 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -450,5 +450,5 @@ noinst_PROGRAMS += tools/btpclient
-> 
->  tools_btpclient_SOURCES = tools/btpclient.c src/shared/btp.c
-> src/shared/btp.h tools_btpclient_CFLAGS = $(AM_CFLAGS) @ELL_CFLAGS@
-> -tools_btpclient_LDADD = @ELL_LIBS@
-> +tools_btpclient_LDADD = @ELL_LIBS@ lib/libbluetooth-internal.la
->  endif
-> diff --git a/tools/btpclient.c b/tools/btpclient.c
-> index 806403f6a..4d4475a07 100644
-> --- a/tools/btpclient.c
-> +++ b/tools/btpclient.c
-> @@ -32,6 +32,7 @@
-> 
->  #include <ell/ell.h>
-> 
-> +#include "lib/bluetooth.h"
->  #include "src/shared/btp.h"
-> 
->  struct btp_adapter {
-> @@ -53,12 +54,6 @@ static struct btp *btp;
-> 
->  static bool gap_service_registered;
-> 
-> -static bool str2addr(const char *str, uint8_t *addr)
-> -{
-> -	return sscanf(str, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &addr[5], &addr[4],
-> -				&addr[3], &addr[2], &addr[1], &addr[0]) == 6;
-> -}
-> -
->  static struct btp_adapter *find_adapter_by_proxy(struct l_dbus_proxy
-> *proxy) {
->  	const struct l_queue_entry *entry;
-> @@ -181,7 +176,8 @@ static void btp_gap_read_info(uint8_t index, const void
-> *param, uint16_t length, if (!l_dbus_proxy_get_property(adapter->proxy,
-> "Address", "s", &str)) goto failed;
-> 
-> -	if (!str2addr(str, rp.address))
-> +
-> +	if (str2ba(str, (bdaddr_t *)rp.address) < 0)
->  		goto failed;
-> 
->  	if (!l_dbus_proxy_get_property(adapter->proxy, "Name", "s", &str)) {
-> @@ -674,7 +670,7 @@ static void btp_gap_device_found_ev(struct l_dbus_proxy
-> *proxy) int16_t rssi;
-> 
->  	if (!l_dbus_proxy_get_property(proxy, "Address", "s", &str) ||
-> -						!str2addr(str, ev.address))
-> +						str2ba(str, (bdaddr_t *)ev.address) < 0)
->  		return;
-> 
->  	if (!l_dbus_proxy_get_property(proxy, "AddressType", "s", &str))
+Hi Luiz,
 
-Applied.
+>> And the info command only prints out the Session/Status/Size/Transferred
+>> properties and does not print out the others as below:
+>>
+>>   # info /org/bluez/obex/server/session1/transfer0
+>>   Transfer /org/bluez/obex/server/session1/transfer0
+>>           Session: /org/bluez/obex/server/session1
+>>           Status: active
+>>           Size: 18446744073709551614
+>>           Transferred: 262010
+>>   [CHG] Transfer /org/bluez/obex/server/session1/transfer0 Transferred: 294771 (@32KB/s 428259:52)
+> 
+> I think the idea was to omit the Size in case the header has not been
+> read, or is not available, though perhaps that needs fixing in both
+> obexd really omit if the size is 0 and perhaps disable progress if the
+> size is unknown. The documentation already indicates Size is optional
+> but the implementation does not add a exists callback, but Im not sure
+> why that would appear as the value above instead of 0.
 
--- 
-pozdrawiam
-Szymon Janc
+It seems that the value is OBJECT_SIZE_DELETE (-2). When I tentatively
+removed OBJECT_SIZE_DELETE at obex_session_start(), the info command
+printed out 0 as the Size property. So I think that obexd may emit the
+Size property after starting a session and before getting a file size.
+I will try to dig this behavior.
 
+
+Regards,
+Eramoto
 
