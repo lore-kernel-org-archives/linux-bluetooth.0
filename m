@@ -1,74 +1,94 @@
-Return-Path: <chia-lin.kao@canonical.com>
+Return-Path: <jhovold@gmail.com>
+Sender: Johan Hovold <jhovold@gmail.com>
+Date: Thu, 18 Jan 2018 13:23:55 +1100
+From: Johan Hovold <johan@kernel.org>
+To: Ulrich Hecht <ulrich.hecht+renesas@gmail.com>
+Cc: linux-serial@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, robh@kernel.org,
+	martin.blumenstingl@googlemail.com, johan@kernel.org,
+	marcel@holtmann.org, gregkh@linuxfoundation.org,
+	magnus.damm@gmail.com, laurent.pinchart@ideasonboard.com,
+	wsa@the-dreams.de, geert@linux-m68k.org
+Subject: Re: [PATCH] serdev: add method to set parity
+Message-ID: <20180118022355.GA3286@localhost>
+References: <1516203739-4705-1-git-send-email-ulrich.hecht+renesas@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFv23Qm88ANgnj+rsddYXMYwN0fv86kwVJxdPNN1goXUKA_fYQ@mail.gmail.com>
-References: <CAFv23Qk1zv-Otg_EJXndfiXgxzO2O44JTbV12SJyZapjPwPwaw@mail.gmail.com>
- <DD31674B-4AE6-4759-9986-0F0736EDBCE3@holtmann.org> <CAFv23Qm88ANgnj+rsddYXMYwN0fv86kwVJxdPNN1goXUKA_fYQ@mail.gmail.com>
-From: AceLan Kao <acelan.kao@canonical.com>
-Date: Thu, 18 Jan 2018 10:37:55 +0800
-Message-ID: <CAFv23QkYbZUSywK-YMDj_M0f8E6VT7rtjS-P5hMngQt3QFryzg@mail.gmail.com>
-Subject: Re: Intel BT[8087:0025] leads to system auto resume from S3 randomly
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org, Ethan Hsieh <ethan.hsieh@canonical.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1516203739-4705-1-git-send-email-ulrich.hecht+renesas@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-More findings.
-It's required to connect to some bt devices before entering S3 to
-trigger the auto wake.
+On Wed, Jan 17, 2018 at 04:42:19PM +0100, Ulrich Hecht wrote:
+> Adds serdev_device_set_parity() and an implementation for ttyport.
 
-Below are the devices we tried, pair with headset or sending files to
-other pc, and then enter S3,
-it'll sometimes wake up automatically.
+Perhaps you can mention that the interface uses an enum and the three
+settings that you add here.
 
-Headset: Sony Ericsson MH100 Bluetooth Stereo Headset
-Bluetooth Keyboard: BLUETOOTH MULTI-DEVICE KEYBOARD K480
+> Signed-off-by: Ulrich Hecht <ulrich.hecht+renesas@gmail.com>
+> ---
+> Broken out of the "[PATCH 0/6] serdev multiplexing support" series
+> because this kind of functionality is apparently also required
+> for "[RFC v2 0/9] Realtek Bluetooth serdev support (H5 protocol)",
+> which contains an earlier revision of this patch.
 
-2018-01-08 9:24 GMT+08:00 AceLan Kao <acelan.kao@canonical.com>:
-> Hi Marcel,
->
-> The issue is the system automatically wakes up from S3.
-> We tried to figure out the issue and found that BT is suspicious
-> that's how the workaround comes from.
-> Also, we found that if we connect the BT antenna, the system will be
-> waken up more quickly.
->
-> I know the quirk will disable the ability to wake up the system from
-> remote, but I have no idea how to debug it further.
-> Is there any way I could try to check if we really got a wake up
-> packet or we keep receiving random packets and trigger the wake up
-> process?
-> Thanks.
->
-> Best regards,
-> AceLan Kao.
->
-> 2018-01-05 22:59 GMT+08:00 Marcel Holtmann <marcel@holtmann.org>:
->> Hi AceLan,
->>
->>> We found an issue that when system enters S3, it stays in S3 for a few
->>> seconds, and somehow it resumes automatically.
->>> And we try below quirk which can prevent it from waking up.
->>>
->>> drivers/usb/core/quirks.c
->>> @@ -208,11 +208,11 @@ static const struct usb_device_id usb_quirk_list[=
-] =3D {
->>>                        USB_QUIRK_DISCONNECT_SUSPEND },
->>>        { USB_DEVICE(0x12d1, 0x15c3), .driver_info =3D
->>>                        USB_QUIRK_DISCONNECT_SUSPEND },
->>> +        { USB_DEVICE(0x8087, 0x0025), .driver_info =3D
->>> +                        USB_QUIRK_DISCONNECT_SUSPEND },
->>>
->>> Here are some findings from the system.
->>>
->>> $ lsusb
->>> Bus 001 Device 004: ID 8087:0025 Intel Corp.
->>
->> can we be a bit more specific here on what is going on and triage this a=
- bit more. I have not heard of our hardware needing such a broad quirk. Als=
-o disconnecting on suspend means that we loose the support for remote wakeu=
-p and I am pretty sure that we do not want that.
->>
->> Regards
->>
->> Marcel
->>
+Thanks for submitting this separately.
+
+>  drivers/tty/serdev/core.c           | 12 ++++++++++++
+>  drivers/tty/serdev/serdev-ttyport.c | 18 ++++++++++++++++++
+>  include/linux/serdev.h              | 10 ++++++++++
+>  3 files changed, 40 insertions(+)
+> 
+> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+> index 5dc88f6..1f25896 100644
+> --- a/drivers/tty/serdev/core.c
+> +++ b/drivers/tty/serdev/core.c
+> @@ -290,6 +290,18 @@ int serdev_device_set_tiocm(struct serdev_device *serdev, int set, int clear)
+>  }
+>  EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
+>  
+> +int serdev_device_set_parity(struct serdev_device *serdev,
+> +			     enum serdev_parity parity)
+> +{
+> +	struct serdev_controller *ctrl = serdev->ctrl;
+> +
+> +	if (!ctrl || !ctrl->ops->set_parity)
+> +		return -ENOTSUPP;
+> +
+> +	return ctrl->ops->set_parity(ctrl, parity);
+> +}
+> +EXPORT_SYMBOL_GPL(serdev_device_set_parity);
+
+Please place the parity functions (and fields) after the set_flow
+equivalents so that we keep the line-setting functionality grouped
+together.
+
+> +static int ttyport_set_parity(struct serdev_controller *ctrl,
+> +			      enum serdev_parity parity)
+> +{
+> +	struct serport *serport = serdev_controller_get_drvdata(ctrl);
+> +	struct tty_struct *tty = serport->tty;
+> +	struct ktermios ktermios = tty->termios;
+> +
+> +	ktermios.c_cflag &= ~(PARENB | PARODD);
+
+You should also clear CMSPAR.
+
+> +	if (parity != SERDEV_PARITY_NONE) {
+> +		ktermios.c_cflag |= PARENB;
+> +		if (parity == SERDEV_PARITY_ODD)
+> +			ktermios.c_cflag |= PARODD;
+> +	}
+> +
+> +	return tty_set_termios(tty, &ktermios);
+
+Note that tty_set_termios() always return 0. You need to verify that you
+got what you requested by looking at the termios after the function
+returns (and possibly return -EINVAL). Not all drivers support (all)
+parity modes.
+
+Note that we currently do not implement proper error handling for flow
+control, but that should be fixed.
+
+Looks good otherwise.
+
+Thanks,
+Johan
