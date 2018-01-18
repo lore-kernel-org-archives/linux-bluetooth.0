@@ -2,89 +2,60 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [RFC] adapter: Add CreateDevice method
+Subject: Re: [PATCH RESEND] Bluetooth: btbcm: Add entry for BCM4343A0 UART
+ bluetooth
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180111110423.14498-1-szymon.janc@codecoup.pl>
-Date: Thu, 18 Jan 2018 10:40:04 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <EC7FA4A5-2523-4D7F-8C0C-4CD61EDFB6A5@holtmann.org>
-References: <20180111110423.14498-1-szymon.janc@codecoup.pl>
-To: Szymon Janc <szymon.janc@codecoup.pl>
+In-Reply-To: <20180118092155.3595-1-joerg.krause@embedded.rocks>
+Date: Thu, 18 Jan 2018 10:25:00 +0100
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>
+Message-Id: <98813AEE-B05E-4170-A75A-BEE7D99DCF62@holtmann.org>
+References: <20180118092155.3595-1-joerg.krause@embedded.rocks>
+To: =?utf-8?Q?J=C3=B6rg_Krause?= <joerg.krause@embedded.rocks>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Joerg,
 
-> This allows to create Device1 object without discovery. This is needed for
-> some of qualification tests where there is no general discovery upfront
-> and we need to do connection to device with provided address.
+> RESEND using Content-Transfer-Encoding: 8bit instead of base64.
 > 
-> Another usecase is for scenario where scanning happen on one controller but
-> connection handling on another.
+> This patch adds the device ID for the bluetooth chip used in the
+> AMPAK AP6212 WiFi+Bluetooth module. The AP6212 is used on several
+> BananaPi boards, e.g. M2-Ultra.
 > 
-> Implementation wide this results in new temporary device object being created
-> that if unused will be cleanup just like it would be if found during discovery
-> session.
-
-so what are the rules around the cleanup? On next discovery it is gone again, then that might needs to be mentioned.
-
+> The AP6212 is a combo module, where the WiFi chip is identified as
+> BCM43430A0 whereas the Bluetooth chip identifies itself as 4343A0. Note,
+> the missing '0' before the 'A0'.
 > 
-> This patch implements bare minimum properties needed for connection - address
-> and address type. If needed eg. for non-NFC based OOB it could be extended with
-> more options.
+> The AP6212 needs a firmware blob. Loading the provided firmware file
+> from the BananaPi vendor, the adapter name is printed as
+> 'BCM4343A0 26MHz AP6212_CL1-0061':
+> 
+> '''
+> hci0:	Type: Primary  Bus: UART
+> 	BD Address: 43:43:A0:12:1F:AC  ACL MTU: 1021:8  SCO MTU: 64:1
+> 	UP RUNNING
+> 	RX bytes:3076 acl:0 sco:0 events:278 errors:0
+> 	TX bytes:39726 acl:0 sco:0 commands:279 errors:0
+> 	Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
+> 	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+> 	Link policy: RSWITCH SNIFF
+> 	Link mode: SLAVE ACCEPT
+> 	Name: 'BCM4343A0 26MHz AP6212_CL1-0061'
+> 	Class: 0x000000
+> 	Service Classes: Unspecified
+> 	Device Class: Miscellaneous,
+> 	HCI Version: 4.1 (0x7)  Revision: 0xf2
+> 	LMP Version: 4.1 (0x7)  Subversion: 0x2122
+> 	Manufacturer: Broadcom Corporation (15)
+> '''
+> 
+> Signed-off-by: Jörg Krause <joerg.krause@embedded.rocks>
 > ---
-> doc/adapter-api.txt | 29 ++++++++++++++++
-> src/adapter.c       | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 125 insertions(+)
-> 
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 0533b674a..c8f3ce26e 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -145,6 +145,35 @@ Methods		void StartDiscovery()
-> 
-> 			Possible errors: None
-> 
-> +		void CreateDevice(dict properties) [experimental]
-> +
-> +			Creates new temporary device with defined properties.
+> drivers/bluetooth/btbcm.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-Why is this not returning the device object path that gets created? Seems a waste time cycles to wait for a device showing up later.
-
-> +
-> +			Parameters that may be set in the filter dictionary
-> +			include the following:
-> +
-> +			string Address
-> +
-> +				The Bluetooth device address of the remote
-> +				device. This parameter is mandatory.
-> +
-> +			string AddressType
-> +
-> +				The Bluetooth device Address Type. This is
-> +				address type that should be used for initial
-> +				connection. If this parameter is not present
-> +				BR/EDR device is created.
-> +
-> +				Possible values:
-> +					"public" - Public address
-> +					"random" - Random address
-> +
-> +			Possible errors: org.bluez.Error.InvalidArguments
-> +					 org.bluez.Error.AlreadyExists
-> +					 org.bluez.Error.NotSupported
-> +					 org.bluez.Error.NotReady
-> +					 org.bluez.Error.Failed
-> +
-
-Now what I wonder is that in case of LE, this should actually trigger a quick scan for that device so that you get advertising data and other information about the device. We are missing a kernel API for such a targeted case and that might need fixing as well.
-
-In case of BR/EDR, this might should trigger a connection and SDP discovery.
-
-Otherwise this is not an API and just a hack to create a device path object. So you are essentially just doing an “InjectDevice” instead of anything real.
-
-That said, using a DiscoverDevice() method name might be more accurate.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
