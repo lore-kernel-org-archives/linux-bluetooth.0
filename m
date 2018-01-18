@@ -1,65 +1,149 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH RESEND] Bluetooth: btbcm: Add entry for BCM4343A0 UART
- bluetooth
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180117232706.25077-1-joerg.krause@embedded.rocks>
-Date: Thu, 18 Jan 2018 08:45:59 +0100
-Cc: linux-bluetooth@vger.kernel.org,
-        "Gustavo F. Padovan" <gustavo@padovan.org>
-Message-Id: <C5CA8B97-C593-4B0F-9D73-EF9DAFA4B782@holtmann.org>
-References: <20180117232706.25077-1-joerg.krause@embedded.rocks>
-To: =?utf-8?Q?J=C3=B6rg_Krause?= <joerg.krause@embedded.rocks>
+Subject: Re: [PATCH BlueZ] shared/shell: Introduce bt_shell_{get,set}_env
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20180116192456.12186-1-luiz.dentz@gmail.com>
+ <20180116192456.12186-2-luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <e8f6d900-7863-25f2-8a74-ed3d7a1e9e42@jp.fujitsu.com>
+Date: Thu, 18 Jan 2018 14:35:29 +0900
+MIME-Version: 1.0
+In-Reply-To: <20180116192456.12186-2-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joerg,
+Hi Luiz,
 
-> RESEND because of missing the correct Ccs. Original patch is [0].
+On 01/17/2018 04:24 AM, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> This patch adds the device ID for the bluetooth chip used in the
-> AMPAK AP6212 WiFi+Bluetooth module. The AP6212 is used on several
-> BananaPi boards, e.g. M2-Ultra.
-> 
-> The AP6212 is a combo module, where the WiFi chip is identified as
-> BCM43430A0 whereas the Bluetooth chip identifies itself as 4343A0. Note,
-> the missing '0' before the 'A0'.
-> 
-> The AP6212 needs a firmware blob. Loading the provided firmware file
-> from the BananaPi vendor, the adapter name is printed as
-> 'BCM4343A0 26MHz AP6212_CL1-0061':
-> 
-> '''
-> hci0:	Type: Primary  Bus: UART
-> 	BD Address: 43:43:A0:12:1F:AC  ACL MTU: 1021:8  SCO MTU: 64:1
-> 	UP RUNNING
-> 	RX bytes:3076 acl:0 sco:0 events:278 errors:0
-> 	TX bytes:39726 acl:0 sco:0 commands:279 errors:0
-> 	Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
-> 	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-> 	Link policy: RSWITCH SNIFF
-> 	Link mode: SLAVE ACCEPT
-> 	Name: 'BCM4343A0 26MHz AP6212_CL1-0061'
-> 	Class: 0x000000
-> 	Service Classes: Unspecified
-> 	Device Class: Miscellaneous,
-> 	HCI Version: 4.1 (0x7)  Revision: 0xf2
-> 	LMP Version: 4.1 (0x7)  Subversion: 0x2122
-> 	Manufacturer: Broadcom Corporation (15)
-> '''
-> 
-> [0] https://www.spinics.net/lists/linux-bluetooth/msg71876.html
-> 
-> Signed-off-by: Jörg Krause <joerg.krause@embedded.rocks>
+> These function can be used to share environment variable accross
+> different files.
 > ---
-> drivers/bluetooth/btbcm.c | 1 +
-> 1 file changed, 1 insertion(+)
+>  src/shared/shell.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/shell.h |  3 +++
+>  2 files changed, 66 insertions(+)
+> 
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index 6cdea1c7e..09f7896c6 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -56,6 +56,11 @@
+>  
+>  static GMainLoop *main_loop;
+>  
+> +struct bt_shell_env {
+> +	char *name;
+> +	void *value;
+> +};
+> +
+>  static struct {
+>  	struct io *input;
+>  
+> @@ -66,6 +71,8 @@ static struct {
+>  	const struct bt_shell_menu *menu;
+>  	const struct bt_shell_menu *main;
+>  	struct queue *submenus;
+> +
+> +	struct queue *envs;
+>  } data;
+>  
+>  static void shell_print_menu(void);
+> @@ -759,6 +766,14 @@ static void rl_cleanup(void)
+>  	rl_callback_handler_remove();
+>  }
+>  
+> +static void env_destroy(void *data)
+> +{
+> +	struct bt_shell_env *env = data;
+> +
+> +	free(env->name);
+> +	free(env);
+> +}
+> +
+>  void bt_shell_run(void)
+>  {
+>  	struct io *signal;
+> @@ -775,6 +790,11 @@ void bt_shell_run(void)
+>  	g_main_loop_unref(main_loop);
+>  	main_loop = NULL;
+>  
+> +	if (data.envs) {
+> +		queue_destroy(data.envs, env_destroy);
+> +		data.envs = NULL;
+> +	}
+> +
+>  	rl_cleanup();
+>  }
+>  
+> @@ -849,3 +869,46 @@ bool bt_shell_detach(void)
+>  
+>  	return true;
+>  }
+> +
+> +static bool match_env(const void *data, const void *user_data)
+> +{
+> +	const struct bt_shell_env *env = data;
+> +	const char *name = user_data;
+> +
+> +	return !strcmp(env->name, name);
+> +}
+> +
+> +void bt_shell_set_env(const char *name, void *value)
+> +{
+> +	struct bt_shell_env *env;
+> +
+> +	if (!data.envs) {
+> +		data.envs = queue_new();
+> +		goto done;
+> +	}
+> +
+> +	env = queue_remove_if(data.envs, match_env, (void *) name);
+> +	if (env)
+> +		env_destroy(env);
+> +
+> +done:
+> +	env = new0(struct bt_shell_env, 1);
+> +	env->name = strdup(name);
+> +	env->value = value;
+> +
+> +	queue_push_tail(data.envs, env);
+> +}
+> +
+> +void *bt_shell_get_env(const char *name)
+> +{
+> +	const struct bt_shell_env *env;
+> +
+> +	if (!data.envs)
+> +		return NULL;
+> +
+> +	env = queue_find(data.envs, match_env, name);
+> +	if (!env)
+> +		return NULL;
+> +
+> +	return env->name;
+> +}
 
-can you use git-send-email so that I get a patch that is not base64 encoded. Otherwise I can not apply it.
+I think that it is better to return the env or the env->value so that we
+can use the env->value in a caller, otherwise this function shall return
+boolean type because it checks if the passed name exist.
 
-Regards
 
-Marcel
+Regards,
+Eramoto
+
+> diff --git a/src/shared/shell.h b/src/shared/shell.h
+> index 8b8b1f634..359629896 100644
+> --- a/src/shared/shell.h
+> +++ b/src/shared/shell.h
+> @@ -87,4 +87,7 @@ int bt_shell_release_prompt(const char *input);
+>  bool bt_shell_attach(int fd);
+>  bool bt_shell_detach(void);
+>  
+> +void bt_shell_set_env(const char *name, void *value);
+> +void *bt_shell_get_env(const char *name);
+> +
+>  void bt_shell_cleanup(void);
+>
 
