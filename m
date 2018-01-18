@@ -1,71 +1,133 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] device: Fix Connect and ConnectProfile returing InProgress error
-Date: Thu, 18 Jan 2018 17:37:53 +0100
-Message-Id: <20180118163753.9084-1-szymon.janc@codecoup.pl>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [RFC] adapter: Add CreateDevice method
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <2439708.yFJDkdrmWr@ix>
+Date: Thu, 18 Jan 2018 12:00:16 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4F9E055A-AA22-4595-87F9-9A96788D23DE@holtmann.org>
+References: <20180111110423.14498-1-szymon.janc@codecoup.pl>
+ <740C529E-266F-4791-96A8-80E65ADD163D@holtmann.org>
+ <A8D2C45F-7004-407A-A071-6FE72310A2E7@holtmann.org> <2439708.yFJDkdrmWr@ix>
+To: Szymon Janc <szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Calling Connect or ConnectProfile for device without resolved services
-results in doing SDP browse first. After search is complete code was
-suppose to continue with profile connection but was always returning
-"InProgress" error due to browsing request not being cleared yet.
----
- src/device.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+Hi Szymon,
 
-diff --git a/src/device.c b/src/device.c
-index 72f18b309..1acecce33 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -2230,6 +2230,7 @@ static void browse_request_complete(struct browse_req *req, uint8_t type,
- {
- 	struct btd_device *dev = req->device;
- 	DBusMessage *reply = NULL;
-+	DBusMessage *msg;
- 
- 	if (req->type != type)
- 		return;
-@@ -2266,19 +2267,31 @@ static void browse_request_complete(struct browse_req *req, uint8_t type,
- 		goto done;
- 	}
- 
--	if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE, "Connect"))
--		reply = dev_connect(dbus_conn, req->msg, dev);
--	else if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE,
-+	/* if successfully resolved services we need to free browsing request
-+	 * before passing message back to connect functions, otherwise
-+	 * device->browse is set and "InProgress" error is returned instead
-+	 * of actually connecting services
-+	 */
-+	msg = dbus_message_ref(req->msg);
-+	browse_request_free(req);
-+	req = NULL;
-+
-+	if (dbus_message_is_method_call(msg, DEVICE_INTERFACE, "Connect"))
-+		reply = dev_connect(dbus_conn, msg, dev);
-+	else if (dbus_message_is_method_call(msg, DEVICE_INTERFACE,
- 							"ConnectProfile"))
--		reply = connect_profile(dbus_conn, req->msg, dev);
-+		reply = connect_profile(dbus_conn, msg, dev);
- 	else
--		reply = g_dbus_create_reply(req->msg, DBUS_TYPE_INVALID);
-+		reply = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-+
-+	dbus_message_unref(msg);
- 
- done:
- 	if (reply)
- 		g_dbus_send_message(dbus_conn, reply);
- 
--	browse_request_free(req);
-+	if (req)
-+		browse_request_free(req);
- }
- 
- static void device_set_svc_refreshed(struct btd_device *device, bool value)
--- 
-2.14.3
+>>>>>> This allows to create Device1 object without discovery. This is needed
+>>>>>> for
+>>>>>> some of qualification tests where there is no general discovery upfront
+>>>>>> and we need to do connection to device with provided address.
+>>>>>> 
+>>>>>> Another usecase is for scenario where scanning happen on one controller
+>>>>>> but
+>>>>>> connection handling on another.
+>>>>>> 
+>>>>>> Implementation wide this results in new temporary device object being
+>>>>>> created that if unused will be cleanup just like it would be if found
+>>>>>> during discovery session.
+>>>>> 
+>>>>> so what are the rules around the cleanup? On next discovery it is gone
+>>>>> again, then that might needs to be mentioned.
+>>>> 
+>>>> Those are same rules so it will be gone only if it is left temporary (ie
+>>>> Connect() or Pair() was never called). I'll document that.
+>>>> 
+>>>>>> This patch implements bare minimum properties needed for connection -
+>>>>>> address and address type. If needed eg. for non-NFC based OOB it could
+>>>>>> be
+>>>>>> extended with more options.
+>>>>>> ---
+>>>>>> doc/adapter-api.txt | 29 ++++++++++++++++
+>>>>>> src/adapter.c       | 96
+>>>>>> +++++++++++++++++++++++++++++++++++++++++++++++++++++ 2 files changed,
+>>>>>> 125 insertions(+)
+>>>>>> 
+>>>>>> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+>>>>>> index 0533b674a..c8f3ce26e 100644
+>>>>>> --- a/doc/adapter-api.txt
+>>>>>> +++ b/doc/adapter-api.txt
+>>>>>> @@ -145,6 +145,35 @@ Methods		void StartDiscovery()
+>>>>>> 
+>>>>>> 			Possible errors: None
+>>>>>> 
+>>>>>> +		void CreateDevice(dict properties) [experimental]
+>>>>>> +
+>>>>>> +			Creates new temporary device with defined properties.
+>>>>> 
+>>>>> Why is this not returning the device object path that gets created?
+>>>>> Seems a
+>>>>> waste time cycles to wait for a device showing up later.
+>>>> 
+>>>> I was thinking about that too. I'll make it return object path.
+>>>> 
+>>>>>> +
+>>>>>> +			Parameters that may be set in the filter dictionary
+>>>>>> +			include the following:
+>>>>>> +
+>>>>>> +			string Address
+>>>>>> +
+>>>>>> +				The Bluetooth device address of the remote
+>>>>>> +				device. This parameter is mandatory.
+>>>>>> +
+>>>>>> +			string AddressType
+>>>>>> +
+>>>>>> +				The Bluetooth device Address Type. This is
+>>>>>> +				address type that should be used for initial
+>>>>>> +				connection. If this parameter is not present
+>>>>>> +				BR/EDR device is created.
+>>>>>> +
+>>>>>> +				Possible values:
+>>>>>> +					"public" - Public address
+>>>>>> +					"random" - Random address
+>>>>>> +
+>>>>>> +			Possible errors: org.bluez.Error.InvalidArguments
+>>>>>> +					 org.bluez.Error.AlreadyExists
+>>>>>> +					 org.bluez.Error.NotSupported
+>>>>>> +					 org.bluez.Error.NotReady
+>>>>>> +					 org.bluez.Error.Failed
+>>>>>> +
+>>>>> 
+>>>>> Now what I wonder is that in case of LE, this should actually trigger a
+>>>>> quick scan for that device so that you get advertising data and other
+>>>>> information about the device. We are missing a kernel API for such a
+>>>>> targeted case and that might need fixing as well.
+>>>>> 
+>>>>> In case of BR/EDR, this might should trigger a connection and SDP
+>>>>> discovery.
+>>>>> 
+>>>>> Otherwise this is not an API and just a hack to create a device path
+>>>>> object. So you are essentially just doing an “InjectDevice” instead of
+>>>>> anything real.
+>>>> 
+>>>> Maybe we should just implicitly make it connect to device? That would
+>>>> keep
+>>>> things simple and wouldn't require any additional kernel work. If connect
+>>>> failed we remove device.
+>>> 
+>>> that would work as well and since for LE we always scan first, we get the
+>>> advertising data as well. Now the question is if just call it
+>>> DiscoverDevice instead. I am reluctant to call it ConnectDevice since
+>>> that is a bit overlapping with Device.Connect. And CreateDevice is bad as
+>>> well since this is temporary connection in most cases.
+>> actually just trying to connect really only works for BR/EDR. With LE that
+>> would not help us with non-connectable devices. So I am leaning towards
+>> DiscoverDevice that does BR/EDR connect and SDP. And on LE it does an
+>> active scan for that specific device. No connection attempt required on LE.
+> 
+> This is explicitly meant for connectable devices so I'd now bother with non-
+> connectable devices as those are by definition discovered with observation 
+> procedure. 
+> 
+> I'm now thinking on method name (was going initially with ConnectDevice but 
+> you already mentioned that you don't like it:P)
+
+maybe ConnectDevice() is fine if it behaves _exactly_ like Device.Connect() does. And of course the relation is clearly stated in the documentation.
+
+Regards
+
+Marcel
 
