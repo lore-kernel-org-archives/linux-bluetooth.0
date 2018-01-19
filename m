@@ -1,153 +1,80 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] advertising: Fix crash when if client invalidate property
-Date: Fri, 19 Jan 2018 11:37:07 -0200
-Message-Id: <20180119133707.18249-1-luiz.dentz@gmail.com>
+Subject: Re: [PATCH] device: Fix Connect and ConnectProfile returing InProgress error
+Date: Fri, 19 Jan 2018 14:33:35 +0100
+Message-ID: <1653790.0KfTnuoApE@ix>
+In-Reply-To: <20180118163753.9084-1-szymon.janc@codecoup.pl>
+References: <20180118163753.9084-1-szymon.janc@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thursday, 18 January 2018 17:37:53 CET Szymon Janc wrote:
+> Calling Connect or ConnectProfile for device without resolved services
+> results in doing SDP browse first. After search is complete code was
+> suppose to continue with profile connection but was always returning
+> "InProgress" error due to browsing request not being cleared yet.
+> ---
+>  src/device.c | 25 +++++++++++++++++++------
+>  1 file changed, 19 insertions(+), 6 deletions(-)
+> 
+> diff --git a/src/device.c b/src/device.c
+> index 72f18b309..1acecce33 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -2230,6 +2230,7 @@ static void browse_request_complete(struct browse_req
+> *req, uint8_t type, {
+>  	struct btd_device *dev = req->device;
+>  	DBusMessage *reply = NULL;
+> +	DBusMessage *msg;
+> 
+>  	if (req->type != type)
+>  		return;
+> @@ -2266,19 +2267,31 @@ static void browse_request_complete(struct
+> browse_req *req, uint8_t type, goto done;
+>  	}
+> 
+> -	if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE, "Connect"))
+> -		reply = dev_connect(dbus_conn, req->msg, dev);
+> -	else if (dbus_message_is_method_call(req->msg, DEVICE_INTERFACE,
+> +	/* if successfully resolved services we need to free browsing request
+> +	 * before passing message back to connect functions, otherwise
+> +	 * device->browse is set and "InProgress" error is returned instead
+> +	 * of actually connecting services
+> +	 */
+> +	msg = dbus_message_ref(req->msg);
+> +	browse_request_free(req);
+> +	req = NULL;
+> +
+> +	if (dbus_message_is_method_call(msg, DEVICE_INTERFACE, "Connect"))
+> +		reply = dev_connect(dbus_conn, msg, dev);
+> +	else if (dbus_message_is_method_call(msg, DEVICE_INTERFACE,
+>  							"ConnectProfile"))
+> -		reply = connect_profile(dbus_conn, req->msg, dev);
+> +		reply = connect_profile(dbus_conn, msg, dev);
+>  	else
+> -		reply = g_dbus_create_reply(req->msg, DBUS_TYPE_INVALID);
+> +		reply = g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+> +
+> +	dbus_message_unref(msg);
+> 
+>  done:
+>  	if (reply)
+>  		g_dbus_send_message(dbus_conn, reply);
+> 
+> -	browse_request_free(req);
+> +	if (req)
+> +		browse_request_free(req);
+>  }
+> 
+>  static void device_set_svc_refreshed(struct btd_device *device, bool value)
 
-If a property is invalidated the iter is set to NULL which should be
-checked and properly reset.
----
- src/advertising.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+Applied.
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 94a8c4050..f00db86bd 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -203,6 +203,9 @@ static bool parse_type(DBusMessageIter *iter, struct btd_adv_client *client)
- {
- 	const char *msg_type;
- 
-+	if (!iter)
-+		return true;
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
- 		return false;
- 
-@@ -226,6 +229,11 @@ static bool parse_service_uuids(DBusMessageIter *iter,
- {
- 	DBusMessageIter ariter;
- 
-+	if (!iter) {
-+		bt_ad_clear_service_uuid(client->data);
-+		return true;
-+	}
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return false;
- 
-@@ -262,6 +270,11 @@ static bool parse_solicit_uuids(DBusMessageIter *iter,
- {
- 	DBusMessageIter ariter;
- 
-+	if (!iter) {
-+		bt_ad_clear_solicit_uuid(client->data);
-+		return true;
-+	}
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return false;
- 
-@@ -298,6 +311,11 @@ static bool parse_manufacturer_data(DBusMessageIter *iter,
- {
- 	DBusMessageIter entries;
- 
-+	if (!iter) {
-+		bt_ad_clear_manufacturer_data(client->data);
-+		return true;
-+	}
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return false;
- 
-@@ -353,6 +371,11 @@ static bool parse_service_data(DBusMessageIter *iter,
- {
- 	DBusMessageIter entries;
- 
-+	if (!iter) {
-+		bt_ad_clear_service_data(client->data);
-+		return true;
-+	}
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return false;
- 
-@@ -422,11 +445,19 @@ static bool parse_includes(DBusMessageIter *iter,
- {
- 	DBusMessageIter entries;
- 
-+	if (!iter) {
-+		client->flags = 0;
-+		return true;
-+	}
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return false;
- 
- 	dbus_message_iter_recurse(iter, &entries);
- 
-+	/* Reset flags before parsing */
-+	client->flags = 0;
-+
- 	while (dbus_message_iter_get_arg_type(&entries) == DBUS_TYPE_STRING) {
- 		const char *str;
- 		struct adv_include *inc;
-@@ -456,6 +487,12 @@ static bool parse_local_name(DBusMessageIter *iter,
- {
- 	const char *name;
- 
-+	if (!iter) {
-+		free(client->name);
-+		client->name = NULL;
-+		return true;
-+	}
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
- 		return false;
- 
-@@ -475,6 +512,11 @@ static bool parse_local_name(DBusMessageIter *iter,
- static bool parse_appearance(DBusMessageIter *iter,
- 					struct btd_adv_client *client)
- {
-+	if (!iter) {
-+		client->appearance = 0;
-+		return true;
-+	}
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
- 		return false;
- 
-@@ -491,6 +533,11 @@ static bool parse_appearance(DBusMessageIter *iter,
- static bool parse_duration(DBusMessageIter *iter,
- 					struct btd_adv_client *client)
- {
-+	if (!iter) {
-+		client->duration = 0;
-+		return true;
-+	}
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
- 		return false;
- 
-@@ -516,6 +563,13 @@ static gboolean client_timeout(void *user_data)
- static bool parse_timeout(DBusMessageIter *iter,
- 					struct btd_adv_client *client)
- {
-+	if (!iter) {
-+		client->timeout = 0;
-+		g_source_remove(client->to_id);
-+		client->to_id = 0;
-+		return true;
-+	}
-+
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
- 		return false;
- 
 -- 
-2.14.3
+pozdrawiam
+Szymon Janc
+
 
