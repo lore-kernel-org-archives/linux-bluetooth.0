@@ -1,124 +1,153 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20180116192456.12186-1-luiz.dentz@gmail.com>
-References: <20180116192456.12186-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 19 Jan 2018 11:46:21 -0200
-Message-ID: <CABBYNZJ+FwAR5mQiPikndpwPzhGi1_tcszWFWxBtpr02MPe+KA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/8] client: Rename set-uuids to uuids
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] advertising: Fix crash when if client invalidate property
+Date: Fri, 19 Jan 2018 11:37:07 -0200
+Message-Id: <20180119133707.18249-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Jan 16, 2018 at 5:24 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Make the command return the current value if no parameters:
->
-> [bluetooth]# uuids 0x1820
-> [bluetooth]# uuids
-> UUID: Internet Protocol Support (0x1820
-> ---
->  client/advertising.c | 39 ++++++++++++++++++++++++++++++++++++---
->  client/main.c        |  6 +++---
->  2 files changed, 39 insertions(+), 6 deletions(-)
->
-> diff --git a/client/advertising.c b/client/advertising.c
-> index f0fd3599e..5174417a8 100644
-> --- a/client/advertising.c
-> +++ b/client/advertising.c
-> @@ -32,6 +32,7 @@
->  #include <string.h>
->
->  #include "gdbus/gdbus.h"
-> +#include "src/shared/util.h"
->  #include "src/shared/shell.h"
->  #include "advertising.h"
->
-> @@ -434,15 +435,47 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager)
->         }
->  }
->
-> +static void print_uuid(const char *uuid)
-> +{
-> +       const char *text;
-> +
-> +       text = bt_uuidstr_to_str(uuid);
-> +       if (text) {
-> +               char str[26];
-> +               unsigned int n;
-> +
-> +               str[sizeof(str) - 1] = '\0';
-> +
-> +               n = snprintf(str, sizeof(str), "%s", text);
-> +               if (n > sizeof(str) - 1) {
-> +                       str[sizeof(str) - 2] = '.';
-> +                       str[sizeof(str) - 3] = '.';
-> +                       if (str[sizeof(str) - 4] == ' ')
-> +                               str[sizeof(str) - 4] = '.';
-> +
-> +                       n = sizeof(str) - 1;
-> +               }
-> +
-> +               bt_shell_printf("\tUUID: %s(%s)\n", str, uuid);
-> +       } else
-> +               bt_shell_printf("\tUUID: (%s)\n", uuid);
-> +}
-> +
->  void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[])
->  {
-> +       if (argc < 2 || !strlen(argv[1])) {
-> +               char **uuid;
-> +
-> +               for (uuid = ad.uuids; uuid && *uuid; uuid++)
-> +                       print_uuid(*uuid);
-> +
-> +               return;
-> +       }
-> +
->         g_strfreev(ad.uuids);
->         ad.uuids = NULL;
->         ad.uuids_len = 0;
->
-> -       if (argc < 2 || !strlen(argv[1]))
-> -               return;
-> -
->         ad.uuids = g_strdupv(&argv[1]);
->         if (!ad.uuids) {
->                 bt_shell_printf("Failed to parse input\n");
-> diff --git a/client/main.c b/client/main.c
-> index a52599deb..d13dabdd0 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -2191,7 +2191,7 @@ static char *ad_generator(const char *text, int state)
->         return argument_generator(text, state, ad_arguments);
->  }
->
-> -static void cmd_set_advertise_uuids(int argc, char *argv[])
-> +static void cmd_advertise_uuids(int argc, char *argv[])
->  {
->         ad_advertise_uuids(dbus_conn, argc, argv);
->  }
-> @@ -2287,8 +2287,8 @@ static const struct bt_shell_menu advertise_menu = {
->         .name = "advertise",
->         .desc = "Advertise Options Submenu",
->         .entries = {
-> -       { "set-uuids", "[uuid1 uuid2 ...]",
-> -                       cmd_set_advertise_uuids, "Set advertise uuids" },
-> +       { "uuids", "[uuid1 uuid2 ...]", cmd_advertise_uuids,
-> +                       "Set advertise uuids" },
->         { "set-service", "[uuid] [data=xx xx ...]", cmd_set_advertise_service,
->                         "Set advertise service data" },
->         { "set-manufacturer", "[id] [data=xx xx ...]",
-> --
-> 2.14.3
+If a property is invalidated the iter is set to NULL which should be
+checked and properly reset.
+---
+ src/advertising.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
-Applied.
-
-
+diff --git a/src/advertising.c b/src/advertising.c
+index 94a8c4050..f00db86bd 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -203,6 +203,9 @@ static bool parse_type(DBusMessageIter *iter, struct btd_adv_client *client)
+ {
+ 	const char *msg_type;
+ 
++	if (!iter)
++		return true;
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
+ 		return false;
+ 
+@@ -226,6 +229,11 @@ static bool parse_service_uuids(DBusMessageIter *iter,
+ {
+ 	DBusMessageIter ariter;
+ 
++	if (!iter) {
++		bt_ad_clear_service_uuid(client->data);
++		return true;
++	}
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+ 		return false;
+ 
+@@ -262,6 +270,11 @@ static bool parse_solicit_uuids(DBusMessageIter *iter,
+ {
+ 	DBusMessageIter ariter;
+ 
++	if (!iter) {
++		bt_ad_clear_solicit_uuid(client->data);
++		return true;
++	}
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+ 		return false;
+ 
+@@ -298,6 +311,11 @@ static bool parse_manufacturer_data(DBusMessageIter *iter,
+ {
+ 	DBusMessageIter entries;
+ 
++	if (!iter) {
++		bt_ad_clear_manufacturer_data(client->data);
++		return true;
++	}
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+ 		return false;
+ 
+@@ -353,6 +371,11 @@ static bool parse_service_data(DBusMessageIter *iter,
+ {
+ 	DBusMessageIter entries;
+ 
++	if (!iter) {
++		bt_ad_clear_service_data(client->data);
++		return true;
++	}
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+ 		return false;
+ 
+@@ -422,11 +445,19 @@ static bool parse_includes(DBusMessageIter *iter,
+ {
+ 	DBusMessageIter entries;
+ 
++	if (!iter) {
++		client->flags = 0;
++		return true;
++	}
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+ 		return false;
+ 
+ 	dbus_message_iter_recurse(iter, &entries);
+ 
++	/* Reset flags before parsing */
++	client->flags = 0;
++
+ 	while (dbus_message_iter_get_arg_type(&entries) == DBUS_TYPE_STRING) {
+ 		const char *str;
+ 		struct adv_include *inc;
+@@ -456,6 +487,12 @@ static bool parse_local_name(DBusMessageIter *iter,
+ {
+ 	const char *name;
+ 
++	if (!iter) {
++		free(client->name);
++		client->name = NULL;
++		return true;
++	}
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
+ 		return false;
+ 
+@@ -475,6 +512,11 @@ static bool parse_local_name(DBusMessageIter *iter,
+ static bool parse_appearance(DBusMessageIter *iter,
+ 					struct btd_adv_client *client)
+ {
++	if (!iter) {
++		client->appearance = 0;
++		return true;
++	}
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
+ 		return false;
+ 
+@@ -491,6 +533,11 @@ static bool parse_appearance(DBusMessageIter *iter,
+ static bool parse_duration(DBusMessageIter *iter,
+ 					struct btd_adv_client *client)
+ {
++	if (!iter) {
++		client->duration = 0;
++		return true;
++	}
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
+ 		return false;
+ 
+@@ -516,6 +563,13 @@ static gboolean client_timeout(void *user_data)
+ static bool parse_timeout(DBusMessageIter *iter,
+ 					struct btd_adv_client *client)
+ {
++	if (!iter) {
++		client->timeout = 0;
++		g_source_remove(client->to_id);
++		client->to_id = 0;
++		return true;
++	}
++
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
+ 		return false;
+ 
 -- 
-Luiz Augusto von Dentz
+2.14.3
+
