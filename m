@@ -1,168 +1,137 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/8] tools/btpclient: Add pair, unpair commands
-Date: Fri, 19 Jan 2018 17:41:31 +0100
-Message-Id: <20180119164133.16767-6-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ 5/8] tools/btpclient: Cleanup advertising data on reset
+Date: Fri, 19 Jan 2018 17:41:30 +0100
+Message-Id: <20180119164133.16767-5-grzegorz.kolodziejczyk@codecoup.pl>
 In-Reply-To: <20180119164133.16767-1-grzegorz.kolodziejczyk@codecoup.pl>
 References: <20180119164133.16767-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds pair and unpair commands for btp client.
+This patch adds advertising data cleanup routine to reset command if
+registered.
 ---
- tools/btpclient.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 124 insertions(+)
+ tools/btpclient.c | 71 ++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 39 insertions(+), 32 deletions(-)
 
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index 53c0d4c05..9d44fba41 100644
+index c5f88e673..53c0d4c05 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
-@@ -304,6 +304,8 @@ static void btp_gap_read_commands(uint8_t index, const void *param,
- 	commands |= (1 << BTP_OP_GAP_CONNECT);
- 	commands |= (1 << BTP_OP_GAP_DISCONNECT);
- 	commands |= (1 << BTP_OP_GAP_SET_IO_CAPA);
-+	commands |= (1 << BTP_OP_GAP_PAIR);
-+	commands |= (1 << BTP_OP_GAP_UNPAIR);
+@@ -413,6 +413,37 @@ static void remove_device_reply(struct l_dbus_proxy *proxy,
+ 	l_queue_remove(adapter->devices, device);
+ }
  
- 	commands = L_CPU_TO_LE16(commands);
++static void update_current_settings(struct btp_adapter *adapter,
++							uint32_t new_settings)
++{
++	struct btp_new_settings_ev ev;
++
++	adapter->current_settings = new_settings;
++
++	ev.current_settings = L_CPU_TO_LE32(adapter->current_settings);
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_NEW_SETTINGS, adapter->index,
++							sizeof(ev), &ev);
++}
++
++static void ad_cleanup_service(void *service)
++{
++	struct service_data *s = service;
++
++	l_free(s->uuid);
++	l_free(s);
++}
++
++static void ad_cleanup(void)
++{
++	l_free(ad.local_name);
++	l_queue_destroy(ad.uuids, l_free);
++	l_queue_destroy(ad.services, ad_cleanup_service);
++	l_queue_destroy(ad.manufacturers, l_free);
++
++	memset(&ad, 0, sizeof(ad));
++}
++
+ static void unreg_advertising_setup(struct l_dbus_message *message,
+ 								void *user_data)
+ {
+@@ -430,6 +461,7 @@ static void unreg_advertising_reply(struct l_dbus_proxy *proxy,
+ {
+ 	const char *path = l_dbus_proxy_get_path(proxy);
+ 	struct btp_adapter *adapter = find_adapter_by_path(path);
++	uint32_t new_settings;
  
-@@ -1875,6 +1877,122 @@ failed:
+ 	if (!adapter)
+ 		return;
+@@ -451,6 +483,12 @@ static void unreg_advertising_reply(struct l_dbus_proxy *proxy,
+ 		l_info("Unable to remove propety instance");
+ 	if (!l_dbus_unregister_interface(dbus, AD_IFACE))
+ 		l_info("Unable to unregister ad interface");
++
++	new_settings = adapter->current_settings;
++	new_settings &= ~BTP_GAP_SETTING_ADVERTISING;
++	update_current_settings(adapter, new_settings);
++
++	ad_cleanup();
+ }
+ 
+ static void unreg_agent_setup(struct l_dbus_message *message, void *user_data)
+@@ -520,7 +558,7 @@ static void btp_gap_reset(uint8_t index, const void *param, uint16_t length,
+ 						NULL);
+ 	}
+ 
+-	if (adapter->ad_proxy)
++	if (adapter->ad_proxy && ad.registered)
+ 		if (!l_dbus_proxy_method_call(adapter->ad_proxy,
+ 						"UnregisterAdvertisement",
+ 						unreg_advertising_setup,
+@@ -613,19 +651,6 @@ failed:
  	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
  }
  
-+static void pair_reply(struct l_dbus_proxy *proxy,
-+				struct l_dbus_message *result, void *user_data)
-+{
-+	uint8_t adapter_index = L_PTR_TO_UINT(user_data);
-+	struct btp_adapter *adapter = find_adapter_by_index(adapter_index);
-+
-+	if (!adapter)
-+		return;
-+
-+	if (l_dbus_message_is_error(result)) {
-+		const char *name, *desc;
-+
-+		l_dbus_message_get_error(result, &name, &desc);
-+		l_error("Failed to pair (%s), %s", name, desc);
-+
-+		return;
-+	}
-+}
-+
-+static void btp_gap_pair(uint8_t index, const void *param, uint16_t length,
-+								void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	const struct btp_gap_pair_cp *cp = param;
-+	uint8_t status = BTP_ERROR_FAIL;
-+	struct btp_device *device;
-+	bool prop;
-+
-+	if (!adapter) {
-+		status = BTP_ERROR_INVALID_INDEX;
-+		goto failed;
-+	}
-+
-+	/* Adapter needs to be powered to be able to pair */
-+	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b", &prop) ||
-+									!prop)
-+		goto failed;
-+
-+	device = find_device_by_address(adapter, &cp->address,
-+							cp->address_type);
-+
-+	if (!device)
-+		goto failed;
-+
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_PAIR, adapter->index, 0,
-+									NULL);
-+
-+	l_dbus_proxy_method_call(device->proxy, "Pair", NULL, pair_reply,
-+					L_UINT_TO_PTR(adapter->index), NULL);
-+
-+	return;
-+
-+failed:
-+	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
-+}
-+
-+static void unpair_reply(struct l_dbus_proxy *proxy,
-+				struct l_dbus_message *result, void *user_data)
-+{
-+	uint8_t adapter_index = L_PTR_TO_UINT(user_data);
-+	struct btp_adapter *adapter = find_adapter_by_index(adapter_index);
-+
-+	if (!adapter) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, BTP_INDEX_NON_CONTROLLER,
-+								BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	if (l_dbus_message_is_error(result)) {
-+		const char *name, *desc;
-+
-+		l_dbus_message_get_error(result, &name, &desc);
-+		l_error("Failed to unpair (%s), %s", name, desc);
-+
-+		btp_send_error(btp, BTP_GAP_SERVICE, adapter_index,
-+								BTP_ERROR_FAIL);
-+		return;
-+	}
-+
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_UNPAIR, adapter_index, 0, NULL);
-+}
-+
-+static void btp_gap_unpair(uint8_t index, const void *param, uint16_t length,
-+								void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	const struct btp_gap_pair_cp *cp = param;
-+	uint8_t status = BTP_ERROR_FAIL;
-+	struct btp_device *device;
-+	bool prop;
-+
-+	if (!adapter) {
-+		status = BTP_ERROR_INVALID_INDEX;
-+		goto failed;
-+	}
-+
-+	/* Adapter needs to be powered to be able to unpair */
-+	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b", &prop) ||
-+									!prop)
-+		goto failed;
-+
-+	device = find_device_by_address(adapter, &cp->address,
-+							cp->address_type);
-+
-+	if (!device)
-+		goto failed;
-+
-+	l_dbus_proxy_method_call(device->proxy, "Unpair", NULL, unpair_reply,
-+					L_UINT_TO_PTR(adapter->index), NULL);
-+
-+	return;
-+
-+failed:
-+	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
-+}
-+
- static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
+-static void update_current_settings(struct btp_adapter *adapter,
+-							uint32_t new_settings)
+-{
+-	struct btp_new_settings_ev ev;
+-
+-	adapter->current_settings = new_settings;
+-
+-	ev.current_settings = L_CPU_TO_LE32(adapter->current_settings);
+-
+-	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_NEW_SETTINGS, adapter->index,
+-							sizeof(ev), &ev);
+-}
+-
+ static void btp_gap_set_connectable(uint8_t index, const void *param,
+ 					uint16_t length, void *user_data)
  {
- 	struct btp_device_found_ev ev;
-@@ -1999,6 +2117,12 @@ static void register_gap_service(void)
- 
- 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_SET_IO_CAPA,
- 				btp_gap_set_io_capabilities, NULL, NULL);
-+
-+	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_PAIR, btp_gap_pair, NULL,
-+									NULL);
-+
-+	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_UNPAIR, btp_gap_unpair,
-+								NULL, NULL);
+@@ -726,24 +751,6 @@ failed:
+ 	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
  }
  
- static void btp_core_read_commands(uint8_t index, const void *param,
+-static void ad_cleanup_service(void *service)
+-{
+-	struct service_data *s = service;
+-
+-	l_free(s->uuid);
+-	l_free(s);
+-}
+-
+-static void ad_cleanup(void)
+-{
+-	l_free(ad.local_name);
+-	l_queue_destroy(ad.uuids, l_free);
+-	l_queue_destroy(ad.services, ad_cleanup_service);
+-	l_queue_destroy(ad.manufacturers, l_free);
+-
+-	memset(&ad, 0, sizeof(ad));
+-}
+-
+ static void ad_init(void)
+ {
+ 	ad.uuids = l_queue_new();
 -- 
 2.13.6
 
