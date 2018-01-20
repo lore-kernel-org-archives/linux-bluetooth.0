@@ -1,136 +1,118 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1516486000.11220.9.camel@iki.fi>
-References: <CAMoM21GBuUJu=JDOyJc+dgNHccMw=ckwRYtMwJP-j0xuXE-pDQ@mail.gmail.com>
- <1516478795.11220.8.camel@iki.fi> <CAMoM21ExUmytoG8LOSmhhL5iubqLx02r3Cn0zmujisk9Et0ZJA@mail.gmail.com>
- <1516486000.11220.9.camel@iki.fi>
-From: =?UTF-8?B?VMWRa8OpcyBBdHRpbGE=?= <attitokes@gmail.com>
-Date: Sun, 21 Jan 2018 11:54:06 +0200
-Message-ID: <CAMoM21H84=3W03S2fotyEFFbMut95_=8q-NbwkGjzgdAUZe2NQ@mail.gmail.com>
+Message-ID: <1516486000.11220.9.camel@iki.fi>
 Subject: Re: Raspberry Pi 3 / BCM43438 + HSP profile + PulseAudio
-To: Tanu Kaskinen <tanuk@iki.fi>
+From: Tanu Kaskinen <tanuk@iki.fi>
+To: =?UTF-8?Q?T=C5=91k=C3=A9s?= Attila <attitokes@gmail.com>
 Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Date: Sun, 21 Jan 2018 00:06:40 +0200
+In-Reply-To: <CAMoM21ExUmytoG8LOSmhhL5iubqLx02r3Cn0zmujisk9Et0ZJA@mail.gmail.com>
+References: <CAMoM21GBuUJu=JDOyJc+dgNHccMw=ckwRYtMwJP-j0xuXE-pDQ@mail.gmail.com>
+         <1516478795.11220.8.camel@iki.fi>
+         <CAMoM21ExUmytoG8LOSmhhL5iubqLx02r3Cn0zmujisk9Et0ZJA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jan 21, 2018 at 12:06 AM, Tanu Kaskinen <tanuk@iki.fi> wrote:
-> On Sat, 2018-01-20 at 22:39 +0200, T=C5=91k=C3=A9s Attila wrote:
->> Hi Tanu,
->>
->> On Sat, Jan 20, 2018 at 10:06 PM, Tanu Kaskinen <tanuk@iki.fi> wrote:
->> > On Sat, 2018-01-20 at 10:35 +0200, T=C5=91k=C3=A9s Attila wrote:
->> > > Hi Everyone,
->> > >
->> > > I'm trying to use a Bluetooth speaker with Raspberry Pi 3 in HSP mod=
-e
->> > > with PulseAudio.
->> > >
->> > > Based on the information I found on the web (blogs / forums / mailin=
-g
->> > > list archives), apparently, HSP does not really works with the
->> > > Rasberry Pi's built in BCM43438 chip. I didn't found the exact reaso=
-n
->> > > yet. Some people suggest it may be a problem with the BCM43438
->> > > firmware or with the kernel driver. A2DP, and HSP with USB Bluetooth
->> > > dongles are reported to be working fine. (The most complete
->> > > description I found about the problem is:
->> > > http://youness.net/raspberry-pi/bluetooth-headset-raspberry-pi-3-ad2=
-p-hsp)
->> > >
->> > > I think it would be useful to get clear picture about the problem. A=
-nd
->> > > maybe we could try to fix it.
->> > >
->> > > Does anyone managed to figure out what exactly the problem is?
->> > >
->> > > I started investigating the issue, but didn't got any result yet. I
->> > > didn't had too much experience with the Linux's Bluetooth stack, so
->> > > some help with the further investigation would be useful.
->> > >
->> > > ----
->> > >
->> > > Bellow are some details of my investigation.
->> > >
->> > > Hardware: Raspberry Pi 3 + JBL GO! Bluetooth speaker
->> > >
->> > > Kernel: raspberrypi 4.14.14-v7
->> > > BlueZ: 5.43
->> > > PulseAudio: 11.1
->> > >
->> > > Summary:
->> > > - BCM43438's driver is sucessfuly loaded, it's firmware is uploaded =
-successfully
->> > > - the Bluetooth speaker gets detected and the pairing / connection w=
-orks fine
->> > > - PulseAudio detects the speaker as a card
->> > > - both the headset_head_unit and a2dp_sink profiles are shown by
->> > > `pacmd list-cards` and can be set with `pacmd set-card-profile`
->> > > - with the a2dp_sink profile, the audio playback works fine (tested
->> > > with `paplay`)
->> > > - with the headset_head_unit profile, `paplay` gets stuck at start a
->> > > no audio is played (`parecord` does the same)
->> > >
->> > > I started booth BlueZ and PulseAudio in debug mode, but found nothin=
-g
->> > > obviuosly wrong (at least for me :P) in the logs. Also did a HCI dum=
-p.
->> > >
->> > > Linking the following logs (uploaded to PasteBin; they are too long
->> > > inline them):
->> > > - the Blootoothd's log - https://pastebin.com/WC17Ze0r
->> > > - the PlulseAudio's log - https://pastebin.com/jUjqjuhC
->> > > - the output of the PA commands - https://pastebin.com/wvRzdTEx
->> > > - the output of some BL Tools (sdptool / bluetoothctl / hciconfig) -
->> > > https://pastebin.com/Ax7XYr94
->> > > - the HCI dump -https://pastebin.com/zqhqKu57
->> > >
->> > > SCO dump did not managed to get.
->> > >
->> > > I executed the following steps:
->> > > (the steps are marked in the log files too):
->> > > - start Blootoothd
->> > > - start PulseAudio
->> > > - powered on the Bloothooth speaker
->> > > - tried to play some audio
->> > > $ pacmd list cards
->> > > $ pacmd set-card-profile 1 headset_head_unit
->> > > $ paplay -v -d bluez_sink.78_44_05_4B_4F_FF.headset_head_unit
->> > > /tmp/h2g2.ogg (gets stuck)
->> > > $ pacmd set-card-profile 1 a2dp_sink
->> > > $ paplay -v -d bluez_sink.78_44_05_4B_4F_FF.a2dp_sink /tmp/h2g2.ogg =
-(works)
->> >
->> > HSP playback getting stuck is a fairly common problem (affecting
->> > multiple bluetooth adapters from different vendors). Solutions for the
->> > problem are known for a few adapters, but not this one. The issue is
->> > documented here (the "HSP problem: the bluetooth sink and source are
->> > created, but no audio is being transmitted" section):
->> >
->> > https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/Use=
-r/Bluetooth/#index8h3
->> >
->> > As you can read there, the underlying problem in the known cases is
->> > either that firmware is missing or the SCO audio routing is wrong in
->> > the adapter. Changing the routing requires (at least in the known
->> > cases) a vendor-specific magic command. I don't know how to figure out
->> > the correct command. On one Broadcom chip this does the trick: "hcitoo=
-l
->> > cmd 0x3F 0x01C 0x01 0x02 0x00 0x01 0x01", but I don't know how likely
->> > that is to work on a different chip.
->>
->> I just sent that HCI command right now and guess what, it worked :).
->> Both paplay an parecord are working fine with the HSP profile now.
->
-> Awesome! I'll update the wiki page.
+On Sat, 2018-01-20 at 22:39 +0200, Tőkés Attila wrote:
+> Hi Tanu,
+> 
+> On Sat, Jan 20, 2018 at 10:06 PM, Tanu Kaskinen <tanuk@iki.fi> wrote:
+> > On Sat, 2018-01-20 at 10:35 +0200, Tőkés Attila wrote:
+> > > Hi Everyone,
+> > > 
+> > > I'm trying to use a Bluetooth speaker with Raspberry Pi 3 in HSP mode
+> > > with PulseAudio.
+> > > 
+> > > Based on the information I found on the web (blogs / forums / mailing
+> > > list archives), apparently, HSP does not really works with the
+> > > Rasberry Pi's built in BCM43438 chip. I didn't found the exact reason
+> > > yet. Some people suggest it may be a problem with the BCM43438
+> > > firmware or with the kernel driver. A2DP, and HSP with USB Bluetooth
+> > > dongles are reported to be working fine. (The most complete
+> > > description I found about the problem is:
+> > > http://youness.net/raspberry-pi/bluetooth-headset-raspberry-pi-3-ad2p-hsp)
+> > > 
+> > > I think it would be useful to get clear picture about the problem. And
+> > > maybe we could try to fix it.
+> > > 
+> > > Does anyone managed to figure out what exactly the problem is?
+> > > 
+> > > I started investigating the issue, but didn't got any result yet. I
+> > > didn't had too much experience with the Linux's Bluetooth stack, so
+> > > some help with the further investigation would be useful.
+> > > 
+> > > ----
+> > > 
+> > > Bellow are some details of my investigation.
+> > > 
+> > > Hardware: Raspberry Pi 3 + JBL GO! Bluetooth speaker
+> > > 
+> > > Kernel: raspberrypi 4.14.14-v7
+> > > BlueZ: 5.43
+> > > PulseAudio: 11.1
+> > > 
+> > > Summary:
+> > > - BCM43438's driver is sucessfuly loaded, it's firmware is uploaded successfully
+> > > - the Bluetooth speaker gets detected and the pairing / connection works fine
+> > > - PulseAudio detects the speaker as a card
+> > > - both the headset_head_unit and a2dp_sink profiles are shown by
+> > > `pacmd list-cards` and can be set with `pacmd set-card-profile`
+> > > - with the a2dp_sink profile, the audio playback works fine (tested
+> > > with `paplay`)
+> > > - with the headset_head_unit profile, `paplay` gets stuck at start a
+> > > no audio is played (`parecord` does the same)
+> > > 
+> > > I started booth BlueZ and PulseAudio in debug mode, but found nothing
+> > > obviuosly wrong (at least for me :P) in the logs. Also did a HCI dump.
+> > > 
+> > > Linking the following logs (uploaded to PasteBin; they are too long
+> > > inline them):
+> > > - the Blootoothd's log - https://pastebin.com/WC17Ze0r
+> > > - the PlulseAudio's log - https://pastebin.com/jUjqjuhC
+> > > - the output of the PA commands - https://pastebin.com/wvRzdTEx
+> > > - the output of some BL Tools (sdptool / bluetoothctl / hciconfig) -
+> > > https://pastebin.com/Ax7XYr94
+> > > - the HCI dump -https://pastebin.com/zqhqKu57
+> > > 
+> > > SCO dump did not managed to get.
+> > > 
+> > > I executed the following steps:
+> > > (the steps are marked in the log files too):
+> > > - start Blootoothd
+> > > - start PulseAudio
+> > > - powered on the Bloothooth speaker
+> > > - tried to play some audio
+> > > $ pacmd list cards
+> > > $ pacmd set-card-profile 1 headset_head_unit
+> > > $ paplay -v -d bluez_sink.78_44_05_4B_4F_FF.headset_head_unit
+> > > /tmp/h2g2.ogg (gets stuck)
+> > > $ pacmd set-card-profile 1 a2dp_sink
+> > > $ paplay -v -d bluez_sink.78_44_05_4B_4F_FF.a2dp_sink /tmp/h2g2.ogg (works)
+> > 
+> > HSP playback getting stuck is a fairly common problem (affecting
+> > multiple bluetooth adapters from different vendors). Solutions for the
+> > problem are known for a few adapters, but not this one. The issue is
+> > documented here (the "HSP problem: the bluetooth sink and source are
+> > created, but no audio is being transmitted" section):
+> > 
+> > https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/Bluetooth/#index8h3
+> > 
+> > As you can read there, the underlying problem in the known cases is
+> > either that firmware is missing or the SCO audio routing is wrong in
+> > the adapter. Changing the routing requires (at least in the known
+> > cases) a vendor-specific magic command. I don't know how to figure out
+> > the correct command. On one Broadcom chip this does the trick: "hcitool
+> > cmd 0x3F 0x01C 0x01 0x02 0x00 0x01 0x01", but I don't know how likely
+> > that is to work on a different chip.
+> 
+> I just sent that HCI command right now and guess what, it worked :).
+> Both paplay an parecord are working fine with the HSP profile now.
 
-Ok, Thanks! I posted the solution to the two related GitHub issues +
-some forums / blog posts, so hope it will reach anyone interested in
-this.
+Awesome! I'll update the wiki page.
 
->
-> --
-> Tanu
->
-> https://liberapay.com/tanuk
-> https://www.patreon.com/tanuk
+-- 
+Tanu
+
+https://liberapay.com/tanuk
+https://www.patreon.com/tanuk
