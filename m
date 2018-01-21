@@ -1,534 +1,174 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	Lukas Wunner <lukas@wunner.de>
-Subject: [PATCH 1/2] Bluetooth: hci_bcm: Remove platform_device support
-Date: Sun, 21 Jan 2018 22:46:44 +0100
-Message-Id: <20180121214645.15004-1-hdegoede@redhat.com>
+Return-Path: <attitokes@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <6E3D045D-0353-4D65-BBA8-75C369620677@holtmann.org>
+References: <CAMoM21GBuUJu=JDOyJc+dgNHccMw=ckwRYtMwJP-j0xuXE-pDQ@mail.gmail.com>
+ <1516478795.11220.8.camel@iki.fi> <CAMoM21ExUmytoG8LOSmhhL5iubqLx02r3Cn0zmujisk9Et0ZJA@mail.gmail.com>
+ <1516486000.11220.9.camel@iki.fi> <CAMoM21H84=3W03S2fotyEFFbMut95_=8q-NbwkGjzgdAUZe2NQ@mail.gmail.com>
+ <6E3D045D-0353-4D65-BBA8-75C369620677@holtmann.org>
+From: =?UTF-8?B?QXR0aWxhIFTFkWvDqXM=?= <attitokes@gmail.com>
+Date: Sun, 21 Jan 2018 21:22:55 +0200
+Message-ID: <CAMoM21G-HzSysjMoZ2gDQVAHi7M_cY7a6wpPx4zmMMXUY+Hc7Q@mail.gmail.com>
+Subject: Re: Raspberry Pi 3 / BCM43438 + HSP profile + PulseAudio
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Tanu Kaskinen <tanuk@iki.fi>, Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now that ACPI and DT devices are both enumerated as serdevs, we can
-remove platform_device support and the bcm_device_list lookup hack.
+Hi Marcel,
 
-This also removes any races between suspend/resume and hci-uart binding,
-also making the suspend/resume code a lot simpler.
 
-This commit leaves manually binding to an uart using btattach supported
-(without irq/gpio and thus suspend/resume support, as before).
+On Sun, Jan 21, 2018 at 2:21 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Tokes,
+>
+>>>>>> I'm trying to use a Bluetooth speaker with Raspberry Pi 3 in HSP mode
+>>>>>> with PulseAudio.
+>>>>>>
+>>>>>> Based on the information I found on the web (blogs / forums / mailing
+>>>>>> list archives), apparently, HSP does not really works with the
+>>>>>> Rasberry Pi's built in BCM43438 chip. I didn't found the exact reason
+>>>>>> yet. Some people suggest it may be a problem with the BCM43438
+>>>>>> firmware or with the kernel driver. A2DP, and HSP with USB Bluetooth
+>>>>>> dongles are reported to be working fine. (The most complete
+>>>>>> description I found about the problem is:
+>>>>>> http://youness.net/raspberry-pi/bluetooth-headset-raspberry-pi-3-ad2p-hsp)
+>>>>>>
+>>>>>> I think it would be useful to get clear picture about the problem. And
+>>>>>> maybe we could try to fix it.
+>>>>>>
+>>>>>> Does anyone managed to figure out what exactly the problem is?
+>>>>>>
+>>>>>> I started investigating the issue, but didn't got any result yet. I
+>>>>>> didn't had too much experience with the Linux's Bluetooth stack, so
+>>>>>> some help with the further investigation would be useful.
+>>>>>>
+>>>>>> ----
+>>>>>>
+>>>>>> Bellow are some details of my investigation.
+>>>>>>
+>>>>>> Hardware: Raspberry Pi 3 + JBL GO! Bluetooth speaker
+>>>>>>
+>>>>>> Kernel: raspberrypi 4.14.14-v7
+>>>>>> BlueZ: 5.43
+>>>>>> PulseAudio: 11.1
+>>>>>>
+>>>>>> Summary:
+>>>>>> - BCM43438's driver is sucessfuly loaded, it's firmware is uploaded successfully
+>>>>>> - the Bluetooth speaker gets detected and the pairing / connection works fine
+>>>>>> - PulseAudio detects the speaker as a card
+>>>>>> - both the headset_head_unit and a2dp_sink profiles are shown by
+>>>>>> `pacmd list-cards` and can be set with `pacmd set-card-profile`
+>>>>>> - with the a2dp_sink profile, the audio playback works fine (tested
+>>>>>> with `paplay`)
+>>>>>> - with the headset_head_unit profile, `paplay` gets stuck at start a
+>>>>>> no audio is played (`parecord` does the same)
+>>>>>>
+>>>>>> I started booth BlueZ and PulseAudio in debug mode, but found nothing
+>>>>>> obviuosly wrong (at least for me :P) in the logs. Also did a HCI dump.
+>>>>>>
+>>>>>> Linking the following logs (uploaded to PasteBin; they are too long
+>>>>>> inline them):
+>>>>>> - the Blootoothd's log - https://pastebin.com/WC17Ze0r
+>>>>>> - the PlulseAudio's log - https://pastebin.com/jUjqjuhC
+>>>>>> - the output of the PA commands - https://pastebin.com/wvRzdTEx
+>>>>>> - the output of some BL Tools (sdptool / bluetoothctl / hciconfig) -
+>>>>>> https://pastebin.com/Ax7XYr94
+>>>>>> - the HCI dump -https://pastebin.com/zqhqKu57
+>>>>>>
+>>>>>> SCO dump did not managed to get.
+>>>>>>
+>>>>>> I executed the following steps:
+>>>>>> (the steps are marked in the log files too):
+>>>>>> - start Blootoothd
+>>>>>> - start PulseAudio
+>>>>>> - powered on the Bloothooth speaker
+>>>>>> - tried to play some audio
+>>>>>> $ pacmd list cards
+>>>>>> $ pacmd set-card-profile 1 headset_head_unit
+>>>>>> $ paplay -v -d bluez_sink.78_44_05_4B_4F_FF.headset_head_unit
+>>>>>> /tmp/h2g2.ogg (gets stuck)
+>>>>>> $ pacmd set-card-profile 1 a2dp_sink
+>>>>>> $ paplay -v -d bluez_sink.78_44_05_4B_4F_FF.a2dp_sink /tmp/h2g2.ogg (works)
+>>>>>
+>>>>> HSP playback getting stuck is a fairly common problem (affecting
+>>>>> multiple bluetooth adapters from different vendors). Solutions for the
+>>>>> problem are known for a few adapters, but not this one. The issue is
+>>>>> documented here (the "HSP problem: the bluetooth sink and source are
+>>>>> created, but no audio is being transmitted" section):
+>>>>>
+>>>>> https://www.freedesktop.org/wiki/Software/PulseAudio/Documentation/User/Bluetooth/#index8h3
+>>>>>
+>>>>> As you can read there, the underlying problem in the known cases is
+>>>>> either that firmware is missing or the SCO audio routing is wrong in
+>>>>> the adapter. Changing the routing requires (at least in the known
+>>>>> cases) a vendor-specific magic command. I don't know how to figure out
+>>>>> the correct command. On one Broadcom chip this does the trick: "hcitool
+>>>>> cmd 0x3F 0x01C 0x01 0x02 0x00 0x01 0x01", but I don't know how likely
+>>>>> that is to work on a different chip.
+>>>>
+>>>> I just sent that HCI command right now and guess what, it worked :).
+>>>> Both paplay an parecord are working fine with the HSP profile now.
+>>>
+>>> Awesome! I'll update the wiki page.
+>>
+>> Ok, Thanks! I posted the solution to the two related GitHub issues +
+>> some forums / blog posts, so hope it will reach anyone interested in
+>> this.
+>
+> I would be more interested in someone adding this kind of PCM routing configuration to DT and also adopting the hci_bcm.c driver to use it and send the appropriate commands.
 
-Cc: Lukas Wunner <lukas@wunner.de>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/hci_bcm.c | 260 +++++---------------------------------------
- 1 file changed, 28 insertions(+), 232 deletions(-)
+I could take a look on adding the new functionality to hci_bcm.c. I'm
+not really familiar with the Linux kernel development, so be aware
+that this will take some time.
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 64800cd2796c..61f73cc4c05e 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -30,7 +30,6 @@
- #include <linux/of.h>
- #include <linux/property.h>
- #include <linux/platform_data/x86/apple.h>
--#include <linux/platform_device.h>
- #include <linux/clk.h>
- #include <linux/gpio/consumer.h>
- #include <linux/tty.h>
-@@ -80,9 +79,6 @@
-  *	set to 0 if @init_speed is already the preferred baudrate
-  * @irq: interrupt triggered by HOST_WAKE_BT pin
-  * @irq_active_low: whether @irq is active low
-- * @hu: pointer to HCI UART controller struct,
-- *	used to disable flow control during runtime suspend and system sleep
-- * @is_suspended: whether flow control is currently disabled
-  */
- struct bcm_device {
- 	/* Must be the first member, hci_serdev.c expects this. */
-@@ -107,25 +103,14 @@ struct bcm_device {
- 	u32			oper_speed;
- 	int			irq;
- 	bool			irq_active_low;
--
--#ifdef CONFIG_PM
--	struct hci_uart		*hu;
--	bool			is_suspended;
--#endif
- };
- 
- /* generic bcm uart resources */
- struct bcm_data {
- 	struct sk_buff		*rx_skb;
- 	struct sk_buff_head	txq;
--
--	struct bcm_device	*dev;
- };
- 
--/* List of BCM BT UART devices */
--static DEFINE_MUTEX(bcm_device_lock);
--static LIST_HEAD(bcm_device_list);
--
- static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
- {
- 	if (hu->serdev)
-@@ -183,27 +168,6 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
- 	return 0;
- }
- 
--/* bcm_device_exists should be protected by bcm_device_lock */
--static bool bcm_device_exists(struct bcm_device *device)
--{
--	struct list_head *p;
--
--#ifdef CONFIG_PM
--	/* Devices using serdev always exist */
--	if (device && device->hu && device->hu->serdev)
--		return true;
--#endif
--
--	list_for_each(p, &bcm_device_list) {
--		struct bcm_device *dev = list_entry(p, struct bcm_device, list);
--
--		if (device == dev)
--			return true;
--	}
--
--	return false;
--}
--
- static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
- {
- 	int err;
-@@ -249,21 +213,17 @@ static irqreturn_t bcm_host_wake(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--static int bcm_request_irq(struct bcm_data *bcm)
-+static int bcm_request_irq(struct hci_uart *hu)
- {
--	struct bcm_device *bdev = bcm->dev;
-+	struct bcm_device *bdev;
- 	int err;
- 
--	mutex_lock(&bcm_device_lock);
--	if (!bcm_device_exists(bdev)) {
--		err = -ENODEV;
--		goto unlock;
--	}
-+	if (!hu->serdev)
-+		return -ENODEV;
- 
--	if (bdev->irq <= 0) {
--		err = -EOPNOTSUPP;
--		goto unlock;
--	}
-+	bdev = serdev_device_get_drvdata(hu->serdev);
-+	if (bdev->irq <= 0)
-+		return -EOPNOTSUPP;
- 
- 	err = devm_request_irq(bdev->dev, bdev->irq, bcm_host_wake,
- 			       bdev->irq_active_low ? IRQF_TRIGGER_FALLING :
-@@ -271,7 +231,7 @@ static int bcm_request_irq(struct bcm_data *bcm)
- 			       "host_wake", bdev);
- 	if (err) {
- 		bdev->irq = err;
--		goto unlock;
-+		return err;
- 	}
- 
- 	device_init_wakeup(bdev->dev, true);
-@@ -282,10 +242,7 @@ static int bcm_request_irq(struct bcm_data *bcm)
- 	pm_runtime_set_active(bdev->dev);
- 	pm_runtime_enable(bdev->dev);
- 
--unlock:
--	mutex_unlock(&bcm_device_lock);
--
--	return err;
-+	return 0;
- }
- 
- static const struct bcm_set_sleep_mode default_sleep_params = {
-@@ -306,11 +263,11 @@ static const struct bcm_set_sleep_mode default_sleep_params = {
- 
- static int bcm_setup_sleep(struct hci_uart *hu)
- {
--	struct bcm_data *bcm = hu->priv;
-+	struct bcm_device *bdev = serdev_device_get_drvdata(hu->serdev);
- 	struct sk_buff *skb;
- 	struct bcm_set_sleep_mode sleep_params = default_sleep_params;
- 
--	sleep_params.host_wake_active = !bcm->dev->irq_active_low;
-+	sleep_params.host_wake_active = !bdev->irq_active_low;
- 
- 	skb = __hci_cmd_sync(hu->hdev, 0xfc27, sizeof(sleep_params),
- 			     &sleep_params, HCI_INIT_TIMEOUT);
-@@ -326,7 +283,7 @@ static int bcm_setup_sleep(struct hci_uart *hu)
- 	return 0;
- }
- #else
--static inline int bcm_request_irq(struct bcm_data *bcm) { return 0; }
-+static inline int bcm_request_irq(struct hci_uart *hu) { return 0; }
- static inline int bcm_setup_sleep(struct hci_uart *hu) { return 0; }
- #endif
- 
-@@ -356,7 +313,6 @@ static int bcm_set_diag(struct hci_dev *hdev, bool enable)
- static int bcm_open(struct hci_uart *hu)
- {
- 	struct bcm_data *bcm;
--	struct list_head *p;
- 	int err;
- 
- 	bt_dev_dbg(hu->hdev, "hu %p", hu);
-@@ -369,54 +325,23 @@ static int bcm_open(struct hci_uart *hu)
- 
- 	hu->priv = bcm;
- 
--	mutex_lock(&bcm_device_lock);
--
- 	if (hu->serdev) {
-+		struct bcm_device *bdev = serdev_device_get_drvdata(hu->serdev);
-+
- 		err = serdev_device_open(hu->serdev);
- 		if (err)
- 			goto err_free;
- 
--		bcm->dev = serdev_device_get_drvdata(hu->serdev);
--		goto out;
--	}
--
--	if (!hu->tty->dev)
--		goto out;
--
--	list_for_each(p, &bcm_device_list) {
--		struct bcm_device *dev = list_entry(p, struct bcm_device, list);
--
--		/* Retrieve saved bcm_device based on parent of the
--		 * platform device (saved during device probe) and
--		 * parent of tty device used by hci_uart
--		 */
--		if (hu->tty->dev->parent == dev->dev->parent) {
--			bcm->dev = dev;
--#ifdef CONFIG_PM
--			dev->hu = hu;
--#endif
--			break;
--		}
--	}
--
--out:
--	if (bcm->dev) {
--		hu->init_speed = bcm->dev->init_speed;
--		hu->oper_speed = bcm->dev->oper_speed;
--		err = bcm_gpio_set_power(bcm->dev, true);
-+		hu->init_speed = bdev->init_speed;
-+		hu->oper_speed = bdev->oper_speed;
-+		err = bcm_gpio_set_power(bdev, true);
- 		if (err)
--			goto err_unset_hu;
-+			goto err_free;
- 	}
- 
--	mutex_unlock(&bcm_device_lock);
- 	return 0;
- 
--err_unset_hu:
--#ifdef CONFIG_PM
--	bcm->dev->hu = NULL;
--#endif
- err_free:
--	mutex_unlock(&bcm_device_lock);
- 	hu->priv = NULL;
- 	kfree(bcm);
- 	return err;
-@@ -430,20 +355,10 @@ static int bcm_close(struct hci_uart *hu)
- 
- 	bt_dev_dbg(hu->hdev, "hu %p", hu);
- 
--	/* Protect bcm->dev against removal of the device or driver */
--	mutex_lock(&bcm_device_lock);
--
- 	if (hu->serdev) {
- 		serdev_device_close(hu->serdev);
- 		bdev = serdev_device_get_drvdata(hu->serdev);
--	} else if (bcm_device_exists(bcm->dev)) {
--		bdev = bcm->dev;
--#ifdef CONFIG_PM
--		bdev->hu = NULL;
--#endif
--	}
- 
--	if (bdev) {
- 		if (IS_ENABLED(CONFIG_PM) && bdev->irq > 0) {
- 			devm_free_irq(bdev->dev, bdev->irq, bdev);
- 			device_init_wakeup(bdev->dev, false);
-@@ -456,7 +371,6 @@ static int bcm_close(struct hci_uart *hu)
- 		else
- 			pm_runtime_set_suspended(bdev->dev);
- 	}
--	mutex_unlock(&bcm_device_lock);
- 
- 	skb_queue_purge(&bcm->txq);
- 	kfree_skb(bcm->rx_skb);
-@@ -479,7 +393,6 @@ static int bcm_flush(struct hci_uart *hu)
- 
- static int bcm_setup(struct hci_uart *hu)
- {
--	struct bcm_data *bcm = hu->priv;
- 	char fw_name[64];
- 	const struct firmware *fw;
- 	unsigned int speed;
-@@ -538,7 +451,7 @@ static int bcm_setup(struct hci_uart *hu)
- 	if (err)
- 		return err;
- 
--	if (!bcm_request_irq(bcm))
-+	if (!bcm_request_irq(hu))
- 		err = bcm_setup_sleep(hu);
- 
- 	return err;
-@@ -580,12 +493,9 @@ static int bcm_recv(struct hci_uart *hu, const void *data, int count)
- 		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
- 		bcm->rx_skb = NULL;
- 		return err;
--	} else if (!bcm->rx_skb) {
-+	} else if (!bcm->rx_skb && hu->serdev) {
- 		/* Delay auto-suspend when receiving completed packet */
--		mutex_lock(&bcm_device_lock);
--		if (bcm->dev && bcm_device_exists(bcm->dev))
--			pm_request_resume(bcm->dev->dev);
--		mutex_unlock(&bcm_device_lock);
-+		pm_request_resume(&hu->serdev->dev);
- 	}
- 
- 	return count;
-@@ -610,10 +520,8 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
- 	struct sk_buff *skb = NULL;
- 	struct bcm_device *bdev = NULL;
- 
--	mutex_lock(&bcm_device_lock);
--
--	if (bcm_device_exists(bcm->dev)) {
--		bdev = bcm->dev;
-+	if (hu->serdev) {
-+		bdev = serdev_device_get_drvdata(hu->serdev);
- 		pm_runtime_get_sync(bdev->dev);
- 		/* Shall be resumed here */
- 	}
-@@ -625,8 +533,6 @@ static struct sk_buff *bcm_dequeue(struct hci_uart *hu)
- 		pm_runtime_put_autosuspend(bdev->dev);
- 	}
- 
--	mutex_unlock(&bcm_device_lock);
--
- 	return skb;
- }
- 
-@@ -638,20 +544,12 @@ static int bcm_suspend_device(struct device *dev)
- 
- 	bt_dev_dbg(bdev, "");
- 
--	if (!bdev->is_suspended && bdev->hu) {
--		hci_uart_set_flow_control(bdev->hu, true);
--
--		/* Once this returns, driver suspends BT via GPIO */
--		bdev->is_suspended = true;
--	}
-+	hci_uart_set_flow_control(&bdev->serdev_hu, true);
- 
- 	/* Suspend the device */
- 	err = bdev->set_device_wakeup(bdev, false);
- 	if (err) {
--		if (bdev->is_suspended && bdev->hu) {
--			bdev->is_suspended = false;
--			hci_uart_set_flow_control(bdev->hu, false);
--		}
-+		hci_uart_set_flow_control(&bdev->serdev_hu, false);
- 		return -EBUSY;
- 	}
- 
-@@ -678,11 +576,7 @@ static int bcm_resume_device(struct device *dev)
- 	msleep(15);
- 
- 	/* When this executes, the device has woken up already */
--	if (bdev->is_suspended && bdev->hu) {
--		bdev->is_suspended = false;
--
--		hci_uart_set_flow_control(bdev->hu, false);
--	}
-+	hci_uart_set_flow_control(&bdev->serdev_hu, false);
- 
- 	return 0;
- }
-@@ -695,18 +589,7 @@ static int bcm_suspend(struct device *dev)
- 	struct bcm_device *bdev = dev_get_drvdata(dev);
- 	int error;
- 
--	bt_dev_dbg(bdev, "suspend: is_suspended %d", bdev->is_suspended);
--
--	/*
--	 * When used with a device instantiated as platform_device, bcm_suspend
--	 * can be called at any time as long as the platform device is bound,
--	 * so it should use bcm_device_lock to protect access to hci_uart
--	 * and device_wake-up GPIO.
--	 */
--	mutex_lock(&bcm_device_lock);
--
--	if (!bdev->hu)
--		goto unlock;
-+	bt_dev_dbg(bdev, "");
- 
- 	if (pm_runtime_active(dev))
- 		bcm_suspend_device(dev);
-@@ -717,9 +600,6 @@ static int bcm_suspend(struct device *dev)
- 			bt_dev_dbg(bdev, "BCM irq: enabled");
- 	}
- 
--unlock:
--	mutex_unlock(&bcm_device_lock);
--
- 	return 0;
- }
- 
-@@ -729,18 +609,7 @@ static int bcm_resume(struct device *dev)
- 	struct bcm_device *bdev = dev_get_drvdata(dev);
- 	int err = 0;
- 
--	bt_dev_dbg(bdev, "resume: is_suspended %d", bdev->is_suspended);
--
--	/*
--	 * When used with a device instantiated as platform_device, bcm_resume
--	 * can be called at any time as long as platform device is bound,
--	 * so it should use bcm_device_lock to protect access to hci_uart
--	 * and device_wake-up GPIO.
--	 */
--	mutex_lock(&bcm_device_lock);
--
--	if (!bdev->hu)
--		goto unlock;
-+	bt_dev_dbg(bdev, "");
- 
- 	if (device_may_wakeup(dev) && bdev->irq > 0) {
- 		disable_irq_wake(bdev->irq);
-@@ -748,10 +617,6 @@ static int bcm_resume(struct device *dev)
- 	}
- 
- 	err = bcm_resume_device(dev);
--
--unlock:
--	mutex_unlock(&bcm_device_lock);
--
- 	if (!err) {
- 		pm_runtime_disable(dev);
- 		pm_runtime_set_active(dev);
-@@ -1002,57 +867,6 @@ static int bcm_of_probe(struct bcm_device *bdev)
- 	return 0;
- }
- 
--static int bcm_probe(struct platform_device *pdev)
--{
--	struct bcm_device *dev;
--	int ret;
--
--	dev = devm_kzalloc(&pdev->dev, sizeof(*dev), GFP_KERNEL);
--	if (!dev)
--		return -ENOMEM;
--
--	dev->dev = &pdev->dev;
--	dev->irq = platform_get_irq(pdev, 0);
--
--	if (has_acpi_companion(&pdev->dev)) {
--		ret = bcm_acpi_probe(dev);
--		if (ret)
--			return ret;
--	}
--
--	ret = bcm_get_resources(dev);
--	if (ret)
--		return ret;
--
--	platform_set_drvdata(pdev, dev);
--
--	dev_info(&pdev->dev, "%s device registered.\n", dev->name);
--
--	/* Place this instance on the device list */
--	mutex_lock(&bcm_device_lock);
--	list_add_tail(&dev->list, &bcm_device_list);
--	mutex_unlock(&bcm_device_lock);
--
--	ret = bcm_gpio_set_power(dev, false);
--	if (ret)
--		dev_err(&pdev->dev, "Failed to power down\n");
--
--	return 0;
--}
--
--static int bcm_remove(struct platform_device *pdev)
--{
--	struct bcm_device *dev = platform_get_drvdata(pdev);
--
--	mutex_lock(&bcm_device_lock);
--	list_del(&dev->list);
--	mutex_unlock(&bcm_device_lock);
--
--	dev_info(&pdev->dev, "%s device unregistered.\n", dev->name);
--
--	return 0;
--}
--
- static const struct hci_uart_proto bcm_proto = {
- 	.id		= HCI_UART_BCM,
- 	.name		= "Broadcom",
-@@ -1100,16 +914,6 @@ static const struct dev_pm_ops bcm_pm_ops = {
- 	SET_RUNTIME_PM_OPS(bcm_suspend_device, bcm_resume_device, NULL)
- };
- 
--static struct platform_driver bcm_driver = {
--	.probe = bcm_probe,
--	.remove = bcm_remove,
--	.driver = {
--		.name = "hci_bcm",
--		.acpi_match_table = ACPI_PTR(bcm_acpi_match),
--		.pm = &bcm_pm_ops,
--	},
--};
--
- static int bcm_serdev_probe(struct serdev_device *serdev)
- {
- 	struct bcm_device *bcmdev;
-@@ -1120,9 +924,6 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
- 		return -ENOMEM;
- 
- 	bcmdev->dev = &serdev->dev;
--#ifdef CONFIG_PM
--	bcmdev->hu = &bcmdev->serdev_hu;
--#endif
- 	bcmdev->serdev_hu.serdev = serdev;
- 	serdev_device_set_drvdata(serdev, bcmdev);
- 
-@@ -1172,10 +973,6 @@ static struct serdev_device_driver bcm_serdev_driver = {
- 
- int __init bcm_init(void)
- {
--	/* For now, we need to keep both platform device
--	 * driver (ACPI generated) and serdev driver (DT).
--	 */
--	platform_driver_register(&bcm_driver);
- 	serdev_device_driver_register(&bcm_serdev_driver);
- 
- 	return hci_uart_register_proto(&bcm_proto);
-@@ -1183,7 +980,6 @@ int __init bcm_init(void)
- 
- int __exit bcm_deinit(void)
- {
--	platform_driver_unregister(&bcm_driver);
- 	serdev_device_driver_unregister(&bcm_serdev_driver);
- 
- 	return hci_uart_unregister_proto(&bcm_proto);
--- 
-2.14.3
+>
+> Sending hcitool cmd is like injecting commands. That is a hack. It is not a solution. So commenting that you need some hcitool to hack the hardware setup, that is just wrong. Get this merged into the driver and have it configurable via DT.
+
+Yes, I know its not the best solution, but it fixes the problem and
+this is more important for most of the people, than having the "right"
+solution. That's why I posted it to GitHub, etc.
+
+>
+> Also if you have a recent enough btmon installed, then it might actually decode the Broadcom commands for you. Can you give it a try and see what it says.
+>
+
+Actually, I found a document today with the vendor specific HCI
+commands for the Cypress CYW4329/CYW4330 chip
+(http://www.cypress.com/file/298311/download). Its not the same chip,
+by I guess the commands will be similar for all the Cypress / Broadcom
+chips.
+
+According to this document the HCI command
+hcitool cmd 0x3F 0x01C 0x01 0x02 0x00 0x01 0x01
+
+translates to:
+
+command = 0x01C (Write_SCO_PCM_Int_Param)
+   SCO_Routing = 0x01 (Transport)
+   PCM_Interface_Rate = 0x02 (512 KBps)
+   Frame_Type = 0x00 (Short)
+   Sync_Mode = 0x01 (Master)
+   Clock_Mode = 0x01 (Master)
+
+btmon (5.43) does not seems to know to decode the command. It outputs this:
+
+$ sudo btmon -s /org/bluez/hci0
+...
+@ RAW Open: hcitool (privileged) version 2.22            {0x0003} 16.534966
+@ RAW Close: hcitool
+{0x0003} 16.534997
+@ RAW Open: hcitool (privileged) version 2.22            {0x0003}
+[hci0] 16.535043
+< HCI Command: Vendor (0x3f|0x001c) plen 5             [hci0] 16.535162
+        01 02 00 01 01                                   .....
+> HCI Event: Command Complete (0x0e) plen 4          [hci0] 16.535566
+      Vendor (0x3f|0x001c) ncmd 1
+        Status: Success (0x00)
+@ RAW Close: hcitool
+
+> Regards
+>
+> Marcel
+>
+
+Thanks,
+Attila
