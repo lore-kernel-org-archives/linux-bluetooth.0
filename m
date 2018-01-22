@@ -1,132 +1,79 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAB_54W6dSUbybTyWq+Bap0KqCLZGcgSbrJrFGLY_VLPHOC9DJw@mail.gmail.com>
+References: <CGME20180117034755epcas5p1437f6831b91eb594a1106f0960204b81@epcas5p1.samsung.com>
+ <1516160848-471-1-git-send-email-yi2010.guo@samsung.com> <CABBYNZJjOEandxFeqbnei3bWpsNetWTbnna+7zGi5FofzcS59g@mail.gmail.com>
+ <CAB_54W6dSUbybTyWq+Bap0KqCLZGcgSbrJrFGLY_VLPHOC9DJw@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] shared/shell: Introduce bt_shell_{get,set}_env
-Date: Mon, 22 Jan 2018 14:46:19 -0200
-Message-Id: <20180122164619.11881-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 22 Jan 2018 11:00:43 -0200
+Message-ID: <CABBYNZL9Xc5619AYf7Lqm3CPRG=ALQp9bLqbBKnJXVN6Bn0_Kg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix disconnect bug in 6lowpan
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: Guo Yi <yi2010.guo@samsung.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	David Miller <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Alex,
 
-These function can be used to share environment variable accross
-different files.
----
- src/shared/shell.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/shell.h |  3 +++
- 2 files changed, 66 insertions(+)
+On Wed, Jan 17, 2018 at 3:37 PM, Alexander Aring <alex.aring@gmail.com> wrote:
+> Hi,
+>
+> 2018-01-17 7:15 GMT-05:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>> Hi,
+>>
+>> On Wed, Jan 17, 2018 at 1:47 AM, Guo Yi <yi2010.guo@samsung.com> wrote:
+>>> This patch fix the bluetooth 6lowpan disconnect fail bug.
+>>>
+>>> The type of the same address type have different define value in HCI layer
+>>> and L2CAP layer.That makes disconnect fail due to wrong network type.User
+>>> will not be able to disconnect from console with the network type that used
+>>> in connect.
+>>>
+>>> This patch add a var lookup_type, and covert the channel address type to
+>>> HCI address type. By these means, user can disconnect successfuly.
+>>>
+>>> Signed-off-by: Guo Yi <yi2010.guo@samsung.com>
+>>
+>> While this fix seems alright the debugfs interface was never meant for
+>> production, in fact we are working on a replacement:
+>>
+>
+> Is the new API fixing the issue that the 6LoWPAN device creation is
+> done by iproute e.g.:
+>
+> ip link add link wpan0 name lowpan0 type lowpan
+>
+> or is there a special bluetooth API call needed, like the current case
+> with debugfs.
+> I know hcis are not netdevs, but it bothers me that we running into
+> two different worlds on how to deal with that and it just requires
+> "more" special bluetooth specific handling in user space applications.
+> Later more "netdev" capable link layers will maybe support 6LoWPAN and
+> then bluetooth might the only subsystem where different handling is
+> needed to do such job like that.
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 6cdea1c7e..52a7e2e6d 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -56,6 +56,11 @@
- 
- static GMainLoop *main_loop;
- 
-+struct bt_shell_env {
-+	char *name;
-+	void *value;
-+};
-+
- static struct {
- 	struct io *input;
- 
-@@ -66,6 +71,8 @@ static struct {
- 	const struct bt_shell_menu *menu;
- 	const struct bt_shell_menu *main;
- 	struct queue *submenus;
-+
-+	struct queue *envs;
- } data;
- 
- static void shell_print_menu(void);
-@@ -759,6 +766,14 @@ static void rl_cleanup(void)
- 	rl_callback_handler_remove();
- }
- 
-+static void env_destroy(void *data)
-+{
-+	struct bt_shell_env *env = data;
-+
-+	free(env->name);
-+	free(env);
-+}
-+
- void bt_shell_run(void)
- {
- 	struct io *signal;
-@@ -775,6 +790,11 @@ void bt_shell_run(void)
- 	g_main_loop_unref(main_loop);
- 	main_loop = NULL;
- 
-+	if (data.envs) {
-+		queue_destroy(data.envs, env_destroy);
-+		data.envs = NULL;
-+	}
-+
- 	rl_cleanup();
- }
- 
-@@ -849,3 +869,46 @@ bool bt_shell_detach(void)
- 
- 	return true;
- }
-+
-+static bool match_env(const void *data, const void *user_data)
-+{
-+	const struct bt_shell_env *env = data;
-+	const char *name = user_data;
-+
-+	return !strcmp(env->name, name);
-+}
-+
-+void bt_shell_set_env(const char *name, void *value)
-+{
-+	struct bt_shell_env *env;
-+
-+	if (!data.envs) {
-+		data.envs = queue_new();
-+		goto done;
-+	}
-+
-+	env = queue_remove_if(data.envs, match_env, (void *) name);
-+	if (env)
-+		env_destroy(env);
-+
-+done:
-+	env = new0(struct bt_shell_env, 1);
-+	env->name = strdup(name);
-+	env->value = value;
-+
-+	queue_push_tail(data.envs, env);
-+}
-+
-+void *bt_shell_get_env(const char *name)
-+{
-+	const struct bt_shell_env *env;
-+
-+	if (!data.envs)
-+		return NULL;
-+
-+	env = queue_find(data.envs, match_env, name);
-+	if (!env)
-+		return NULL;
-+
-+	return env->value;
-+}
-diff --git a/src/shared/shell.h b/src/shared/shell.h
-index 8b8b1f634..359629896 100644
---- a/src/shared/shell.h
-+++ b/src/shared/shell.h
-@@ -87,4 +87,7 @@ int bt_shell_release_prompt(const char *input);
- bool bt_shell_attach(int fd);
- bool bt_shell_detach(void);
- 
-+void bt_shell_set_env(const char *name, void *value);
-+void *bt_shell_get_env(const char *name);
-+
- void bt_shell_cleanup(void);
+Keep in mind that the transport on Bluetooth happens to be in a
+different layer, so you are basically suggesting that the kernel
+maintain a L2CAP connection, similar to TCP, which has several
+security implications.
+
+> We maybe need to support a special handling in "ip link add" to map to
+> bluetooth instead moving that to people in user space?
+
+Afaik ip tool cannot support any tunnel interface since the kernel
+cleanup any socket opened when the tool exit. Btw, with the patches
+above bluetoothd would take care of adding/removing the links
+automatically so at least this step will not be necessary. Other ip
+commands should work though.
+
+> - Alex
+
+
+
 -- 
-2.14.3
-
+Luiz Augusto von Dentz
