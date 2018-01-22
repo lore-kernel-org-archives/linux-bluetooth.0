@@ -1,54 +1,42 @@
-Return-Path: <hdegoede@redhat.com>
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
 Subject: Re: [PATCH 1/2] Bluetooth: hci_bcm: Remove platform_device support
-To: Marcel Holtmann <marcel@holtmann.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180121214645.15004-1-hdegoede@redhat.com>
+Date: Mon, 22 Jan 2018 03:24:18 +0100
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
- Lukas Wunner <lukas@wunner.de>
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-acpi@vger.kernel.org, Lukas Wunner <lukas@wunner.de>
+Message-Id: <0EA71635-F2C7-4908-B4DE-F87328A148D0@holtmann.org>
 References: <20180121214645.15004-1-hdegoede@redhat.com>
- <0EA71635-F2C7-4908-B4DE-F87328A148D0@holtmann.org>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <769dd32b-425e-3002-50b5-0d3c707706d4@redhat.com>
-Date: Mon, 22 Jan 2018 09:23:24 +0100
-MIME-Version: 1.0
-In-Reply-To: <0EA71635-F2C7-4908-B4DE-F87328A148D0@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+To: Hans de Goede <hdegoede@redhat.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Hans,
 
-On 22-01-18 03:24, Marcel Holtmann wrote:
-> Hi Hans,
+> Now that ACPI and DT devices are both enumerated as serdevs, we can
+> remove platform_device support and the bcm_device_list lookup hack.
 > 
->> Now that ACPI and DT devices are both enumerated as serdevs, we can
->> remove platform_device support and the bcm_device_list lookup hack.
->>
->> This also removes any races between suspend/resume and hci-uart binding,
->> also making the suspend/resume code a lot simpler.
->>
->> This commit leaves manually binding to an uart using btattach supported
->> (without irq/gpio and thus suspend/resume support, as before).
->>
->> Cc: Lukas Wunner <lukas@wunner.de>
->> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->> ---
->> drivers/bluetooth/hci_bcm.c | 260 +++++---------------------------------------
->> 1 file changed, 28 insertions(+), 232 deletions(-)
+> This also removes any races between suspend/resume and hci-uart binding,
+> also making the suspend/resume code a lot simpler.
 > 
-> so I was under the assumption platforms like Intel Edison still only do platform data. See commit 212d71833315c65644efc46223db61dee7b3c68e. Has that changed?
+> This commit leaves manually binding to an uart using btattach supported
+> (without irq/gpio and thus suspend/resume support, as before).
+> 
+> Cc: Lukas Wunner <lukas@wunner.de>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> drivers/bluetooth/hci_bcm.c | 260 +++++---------------------------------------
+> 1 file changed, 28 insertions(+), 232 deletions(-)
 
-Ugh, I was not aware of that and the whole code to match the tty with
-the platform_device on btattach is such a mess and I was actually quite
-happy to be able to delete this.
+so I was under the assumption platforms like Intel Edison still only do platform data. See commit 212d71833315c65644efc46223db61dee7b3c68e. Has that changed?
 
-Andy, I see that you added support for bcm bluetooth over a tty using
-platform_data instead of ACPI enumeration. Can you change the code
-instantiating the device to instead instantiate a serdev, so that we
-kill the platform device support in hci_bcm.c and so that users don't
-need to do a btattach, but instead the kernel will do the attach itself
-and things will just work ?
+Regards
 
-Regards,
+Marcel
 
-Hans
