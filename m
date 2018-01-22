@@ -1,116 +1,105 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1516671220.15252.5.camel@linux.intel.com>
-Subject: Bluetooth: hci_intel: Update firmware filename for Intel 9x60 and
- later
-From: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: amit.k.bag@intel.com, tedd.an@intel.com
-Date: Mon, 22 Jan 2018 17:33:40 -0800
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH 1/2] Bluetooth: hci_bcm: Remove platform_device support
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+ linux-serial@vger.kernel.org,
+ ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+ Lukas Wunner <lukas@wunner.de>
+References: <20180121214645.15004-1-hdegoede@redhat.com>
+ <0EA71635-F2C7-4908-B4DE-F87328A148D0@holtmann.org>
+ <769dd32b-425e-3002-50b5-0d3c707706d4@redhat.com>
+ <1516614127.7000.1152.camel@linux.intel.com>
+ <0160ba20-9dc9-9921-ab12-3ac58b33e9ae@redhat.com>
+ <1516620806.7000.1165.camel@linux.intel.com>
+ <0cae9024-887a-45f7-7710-1684f9c0e54e@redhat.com>
+ <059DCBBD-4966-4531-9E2D-8A369FC400A7@holtmann.org>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <5007c009-5d20-d0d4-5f2a-dc1825c6f131@redhat.com>
+Date: Mon, 22 Jan 2018 21:56:13 +0100
+MIME-Version: 1.0
+In-Reply-To: <059DCBBD-4966-4531-9E2D-8A369FC400A7@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
-Bluetooth: hci_intel: Update firmware filename for Intel 9x60 and later
+Hi,
 
-The format of Intel Bluetooth firmware for bootloader product is
-ibt-<hw_variant>-<device_revision_id>.sfi and .ddc.
+On 22-01-18 20:57, Marcel Holtmann wrote:
+> Hi Hans,
+> 
+>>>>>> Andy, I see that you added support for bcm bluetooth over a tty
+>>>>>> using
+>>>>>> platform_data instead of ACPI enumeration. Can you change the code
+>>>>>> instantiating the device to instead instantiate a serdev, so that
+>>>>>> we
+>>>>>> kill the platform device support in hci_bcm.c and so that users
+>>>>>> don't
+>>>>>> need to do a btattach, but instead the kernel will do the attach
+>>>>>> itself
+>>>>>> and things will just work ?
+>>>>>
+>>>>> I'm sorry, I can't do this soon, other more priority tasks in a
+>>>>> pocket.
+>>>>>
+>>>>> The instantiation of the driver is happened in
+>>>>> arch/x86/platform/intel-
+>>>>> mid/device_libs/platform_bt.c
+>>>>>
+>>>>> I would help with review of any patches till I would able to look at
+>>>>> it
+>>>>> myself.
+>>>>
+>>>> If I manage to come up with patches do you have hardware and time to
+>>>> test?
+>>> Yes and I would find half an hour for sure.
+>>
+>> That is great, thank you, but ...
+>>
+>>>> First point of order to get this working as serdev I think is to
+>>>> modify drivers/tty/serdev/core.c a and then the
+>>>> serdev_controller_add()
+>>>> function to somehow recognize the serial port in question, so
+>>>> something akin to the of_serdev_register_devices(ctrl) /
+>>>> acpi_serdev_register_devices(ctrl) functions for platform_devs,
+>>>> assuming
+>>>> the tty-parent-dev on the Edison SOM is a platform_dev ?
+>>> tty parent is PCI device there.
+>>>> Anyways it looks like this will be really hard to do without access
+>>>> to the hardware.
+>>> I can do a BAT.
+>>
+>> Right, sorry I was not clear, when I was talking about hardware
+>> access I was not (not only) referring to testing.
+>>
+>> The problem is that to figure out how to hook all this together
+>> will require poking around on the hardware, looking in sysfs, finding
+>> some id we can use in a pci_serdev_register_devices() to add to
+>> drivers/tty/serdev/core.c so that it only turns the serial port on
+>> the Edison into a serdev and not somewhere else, etc.
+>>
+>> But thinking about this more, I too have higher priority items on
+>> my TODO list, so as much as I would like to see this cleaned up,
+>> lets shelf this for now until you have time to look into this.
+>>
+>> When you do find time, if you've any questions I'm happy to help.
+> 
+> so the serial port is driven by drivers/tty/serial/8250/8250_mid.c and using PCI_DEVICE_ID_INTEL_TNG_UART 0x1191 to match the driver. So it is exposed as PCI device. While of course more than one UART port uses 0x1191. This one seems to be mapped to pci_get_domain_bus_and_slot(0, 0, PCI_DEVFN(4, 1)) actually.
+> 
+> What I think is that we need to do is some sort of x86_match_cpu like arch/x86/platform/intel-mid/device_libs/platform_bt.c does. But then again, that is also what the Apple Broadcom support does to choose the different ACPI procedures.
+> 
+> I have an Edison board on my desk and can quickly boot any patch you want me to test. Or grab data from sysfs or dmesg.
 
-But for the 9x60 SKU, there are three variants of FW, which cannot be
-differenticate just with hw_variant and device_revision_id.
-So, to pick the appropriate FW file for 9x60 SKU, three fields,
-hw_variant, hw_revision, and fw_revision, needs to be used rather than
-hw_variant and device_revision_id.
+I'm sorry, I started looking at removing the platform code because
+I already spend a lot of time looking at the hci_bcm code to make
+the power-management work with serdev devices instantiated from
+ACPI, when writing the patch-set for that I added removing the
+remaining cruft to my todo list...
 
-Format will be like this:
-ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi and .ddc
+But I don't have time / don't want to make time given other priorities
+to also look into the Edison stuff, which seems non-trivial to fix.
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
----
- drivers/bluetooth/hci_intel.c | 56 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 49 insertions(+), 7 deletions(-)
+Regards,
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index aad07e4..a3a4ea8 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -708,16 +708,43 @@ static int intel_setup(struct hci_uart *hu)
- 	}
- 
- 	/* With this Intel bootloader only the hardware variant and device
--	 * revision information are used to select the right firmware.
-+	 * revision information are used to select the right firmware for SfP
-+	 * and WsP.
- 	 *
- 	 * The firmware filename is ibt-<hw_variant>-<dev_revid>.sfi.
- 	 *
- 	 * Currently the supported hardware variants are:
- 	 *   11 (0x0b) for iBT 3.0 (LnP/SfP)
-+	 *   12 (0x0c) for iBT3.5 (WsP)
-+	 *
-+	 * For ThP/JfP and for future SKU's, the FW name varies based on HW
-+	 * variant, HW revision and FW revision, as these are dependent on CNVi
-+	 * and RF Combination.
-+	 *
-+	 *   18 (0x12) for iBT3.5 (Pulsar/ThP)
-+	 *
-+	 * The firmware file name for these will be
-+	 * ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi.
-+	 *
- 	 */
--	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
--		le16_to_cpu(ver.hw_variant),
--		le16_to_cpu(params->dev_revid));
-+	switch (ver.hw_variant) {
-+	case 0x0b:      /* SfP */
-+	case 0x0c:      /* WsP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(params->dev_revid));
-+		break;
-+	case 0x12:      /* ThP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.sfi",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(ver.hw_revision),
-+			 le16_to_cpu(ver.fw_revision));
-+		break;
-+	default:
-+		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-+			   ver.hw_variant);
-+		return -EINVAL;
-+	}
- 
- 	err = request_firmware(&fw, fwname, &hdev->dev);
- 	if (err < 0) {
-@@ -730,9 +757,24 @@ static int intel_setup(struct hci_uart *hu)
- 	bt_dev_info(hdev, "Found device firmware: %s", fwname);
- 
- 	/* Save the DDC file name for later */
--	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.ddc",
--		le16_to_cpu(ver.hw_variant),
--		le16_to_cpu(params->dev_revid));
-+	switch (ver.hw_variant) {
-+	case 0x0b:      /* SfP */
-+	case 0x0c:      /* WsP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.ddc",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(params->dev_revid));
-+	break;
-+	case 0x12:      /* ThP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.ddc",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(ver.hw_revision),
-+			 le16_to_cpu(ver.fw_revision));
-+		break;
-+	default:
-+		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-+			   ver.hw_variant);
-+		return -EINVAL;
-+	}
- 
- 	kfree_skb(skb);
- 
--- 
-2.7.4
-
+Hans
