@@ -1,134 +1,60 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-serial-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: Bluetooth: hci_intel: Update firmware filename for Intel 9x60 and
- later
+Subject: Re: [PATCH v2] serdev: add method to set parity
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1516671220.15252.5.camel@linux.intel.com>
-Date: Tue, 23 Jan 2018 09:20:40 +0100
-Cc: linux-bluetooth@vger.kernel.org, amit.k.bag@intel.com,
-        tedd.an@intel.com
-Message-Id: <9B59984D-DAC9-43D3-BECD-5525DECC915E@holtmann.org>
-References: <1516671220.15252.5.camel@linux.intel.com>
-To: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1516643792-22840-1-git-send-email-ulrich.hecht+renesas@gmail.com>
+Date: Tue, 23 Jan 2018 09:16:56 +0100
+Cc: linux-renesas-soc@vger.kernel.org, linux-serial@vger.kernel.org,
+        Johan Hovold <johan@kernel.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Rob Herring <robh@kernel.org>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        magnus.damm@gmail.com, laurent.pinchart@ideasonboard.com,
+        wsa@the-dreams.de, geert@linux-m68k.org
+Message-Id: <73650B8B-31E8-4578-BEF9-13ED1217E8B7@holtmann.org>
+References: <1516643792-22840-1-git-send-email-ulrich.hecht+renesas@gmail.com>
+To: Ulrich Hecht <ulrich.hecht+renesas@gmail.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+Hi Ulrich,
 
-
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> Bluetooth: hci_intel: Update firmware filename for Intel 9x60 and later
-
-something went wrong here. I prefer using git format-patch and git send-email.
-
+> Adds serdev_device_set_parity() and an implementation for ttyport.
+> The interface uses an enum with the values SERIAL_PARITY_NONE,
+> SERIAL_PARITY_EVEN and SERIAL_PARITY_ODD.
 > 
-> The format of Intel Bluetooth firmware for bootloader product is
-> ibt-<hw_variant>-<device_revision_id>.sfi and .ddc.
-> 
-> But for the 9x60 SKU, there are three variants of FW, which cannot be
-> differenticate just with hw_variant and device_revision_id.
-> So, to pick the appropriate FW file for 9x60 SKU, three fields,
-> hw_variant, hw_revision, and fw_revision, needs to be used rather than
-> hw_variant and device_revision_id.
-> 
-> Format will be like this:
-> ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi and .ddc
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> Signed-off-by: Ulrich Hecht <ulrich.hecht+renesas@gmail.com>
+> Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.co.uk>
 > ---
->  drivers/bluetooth/hci_intel.c | 56 +++++++++++++++++++++++++++++++++++++------
->  1 file changed, 49 insertions(+), 7 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-> index aad07e4..a3a4ea8 100644
-> --- a/drivers/bluetooth/hci_intel.c
-> +++ b/drivers/bluetooth/hci_intel.c
-> @@ -708,16 +708,43 @@ static int intel_setup(struct hci_uart *hu)
->  	}
->  
->  	/* With this Intel bootloader only the hardware variant and device
-> -	 * revision information are used to select the right firmware.
-> +	 * revision information are used to select the right firmware for SfP
-> +	 * and WsP.
->  	 *
->  	 * The firmware filename is ibt-<hw_variant>-<dev_revid>.sfi.
->  	 *
->  	 * Currently the supported hardware variants are:
->  	 *   11 (0x0b) for iBT 3.0 (LnP/SfP)
-> +	 *   12 (0x0c) for iBT3.5 (WsP)
+> Hi!
+> 
+> This revision addresses Johan's comments (see below for details) and adds
+> Sebastian's Reviewed-by tag. Thank you for your reviews!
+> 
+> CU
+> Uli
+> 
+> 
+> Changes since v1:
+> - added Reviewed-by tag
+> - expanded commit message
+> - shuffled stuff around to keep line-setting bits together
+> - clear CMSPAR
+> - (hopefully) detect errors correctly by checking tty->termios after call
+>  to tty_set_termios().
+> 
+> 
+> drivers/tty/serdev/core.c           | 12 ++++++++++++
+> drivers/tty/serdev/serdev-ttyport.c | 24 ++++++++++++++++++++++++
+> include/linux/serdev.h              | 10 ++++++++++
+> 3 files changed, 46 insertions(+)
 
-iBT 3.5 please (with a space in between).
-
-> +	 *
-> +	 * For ThP/JfP and for future SKU's, the FW name varies based on HW
-> +	 * variant, HW revision and FW revision, as these are dependent on CNVi
-> +	 * and RF Combination.
-> +	 *
-> +	 *   18 (0x12) for iBT3.5 (Pulsar/ThP)
-
-Actually lets list ThP and JfP here. Pulsar is not meaningful.
-
-> +	 *
-> +	 * The firmware file name for these will be
-> +	 * ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi.
-> +	 *
->  	 */
-> -	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
-> -		le16_to_cpu(ver.hw_variant),
-> -		le16_to_cpu(params->dev_revid));
-> +	switch (ver.hw_variant) {
-> +	case 0x0b:      /* SfP */
-> +	case 0x0c:      /* WsP */
-> +		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
-> +			 le16_to_cpu(ver.hw_variant),
-> +			 le16_to_cpu(params->dev_revid));
-> +		break;
-> +	case 0x12:      /* ThP */
-> +		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.sfi",
-> +			 le16_to_cpu(ver.hw_variant),
-> +			 le16_to_cpu(ver.hw_revision),
-> +			 le16_to_cpu(ver.fw_revision));
-> +		break;
-> +	default:
-> +		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-> +			   ver.hw_variant);
-> +		return -EINVAL;
-> +	}
->  
->  	err = request_firmware(&fw, fwname, &hdev->dev);
->  	if (err < 0) {
-> @@ -730,9 +757,24 @@ static int intel_setup(struct hci_uart *hu)
->  	bt_dev_info(hdev, "Found device firmware: %s", fwname);
->  
->  	/* Save the DDC file name for later */
-> -	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.ddc",
-> -		le16_to_cpu(ver.hw_variant),
-> -		le16_to_cpu(params->dev_revid));
-> +	switch (ver.hw_variant) {
-> +	case 0x0b:      /* SfP */
-> +	case 0x0c:      /* WsP */
-> +		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.ddc",
-> +			 le16_to_cpu(ver.hw_variant),
-> +			 le16_to_cpu(params->dev_revid));
-> +	break;
-
-Missing tab here.
-
-> +	case 0x12:      /* ThP */
-> +		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.ddc",
-> +			 le16_to_cpu(ver.hw_variant),
-> +			 le16_to_cpu(ver.hw_revision),
-> +			 le16_to_cpu(ver.fw_revision));
-> +		break;
-> +	default:
-> +		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-> +			   ver.hw_variant);
-> +		return -EINVAL;
-> +	}
->  
->  	kfree_skb(skb);
+patch has been applied to bluetooth-next tree.
 
 Regards
 
