@@ -1,111 +1,68 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Tedd Ho-Jeong An <tedd.an@linux.intel.com>, tedd.an@intel.com,
-        amit.k.bag@intel.com
-Subject: [PATCH 1/5] Bluetooth: hci_intel: Update firmware filename for Intel 9x60 and later
-Date: Tue, 23 Jan 2018 19:17:45 -0800
-Message-Id: <1516763869-12411-1-git-send-email-tedd.an@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <fntoth@gmail.com>
+From: Ferry Toth <fntoth@gmail.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Hans de Goede <hdegoede@redhat.com>, "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, Bluez mailing list <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org, ACPI Devel Maling List <linux-acpi@vger.kernel.org>, Lukas Wunner <lukas@wunner.de>
+Subject: Re: [PATCH 1/2] Bluetooth: hci_bcm: Remove platform_device support
+Date: Wed, 24 Jan 2018 00:49:05 +0100
+Message-ID: <2372310.Qjp4y9WXno@chromium>
+In-Reply-To: <1516623321.7000.1175.camel@linux.intel.com>
+References: <20180121214645.15004-1-hdegoede@redhat.com> <83ACB297-D092-4512-AC5B-3AF1137BE194@holtmann.org> <1516623321.7000.1175.camel@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The format of Intel Bluetooth firmware for bootloader product is
-ibt-<hw_variant>-<device_revision_id>.sfi and .ddc.
+Op maandag 22 januari 2018 13:15:21 CET schreef Andy Shevchenko:
+> On Mon, 2018-01-22 at 13:01 +0100, Marcel Holtmann wrote:
+> > > > > Anyways it looks like this will be really hard to do without
+> > > > > access
+> > > > > to the hardware.
+> > > > 
+> > > > I can do a BAT.
+> > > 
+> > > Right, sorry I was not clear, when I was talking about hardware
+> > > access I was not (not only) referring to testing.
+> > > 
+> > > The problem is that to figure out how to hook all this together
+> > > will require poking around on the hardware, looking in sysfs,
+> > > finding
+> > > some id we can use in a pci_serdev_register_devices() to add to
+> > > drivers/tty/serdev/core.c so that it only turns the serial port on
+> > > the Edison into a serdev and not somewhere else, etc.
+> > > 
+> > > But thinking about this more, I too have higher priority items on
+> > > my TODO list, so as much as I would like to see this cleaned up,
+> > > lets shelf this for now until you have time to look into this.
+> > > 
+> > > When you do find time, if you've any questions I'm happy to help.
+> > 
+> > so in theory the Edison board has SFI. Problem is just that I am not
+> > sure the SFI on the board is fully correct and contains enough
+> > information to identify the serial port correctly.
+> 
+> Unfortunately SFI was so badly designed that board (hard coded) data is
+> needed.
+> 
+> > If no one is willing to help port this over to serdev, then one option
+> > is just to rip it out and see who complains.
+> 
+> Me in the first place. + I guess at least couple of users as of my
+> knowledge. + Undefined amount of swindled users of Edison who is trying
+> or already did a switch to vanilla kernel.
+> 
+> >  Or include a version that is trying its best and see who reports
+> > 
+> > issues and who helps to fix it. I am now regretting that I accepted
+> > the Edison support in the first place, but sadly serdev was not yet
+> > fully baked at that point.
+> 
+> +Cc: Ferry, who might be interested in the helping with it.
 
-But for the 9x60 SKU, there are three variants of FW, which cannot be
-differenticate just with hw_variant and device_revision_id.
-So, to pick the appropriate FW file for 9x60 SKU, three fields,
-hw_variant, hw_revision, and fw_revision, needs to be used rather than
-hw_variant and device_revision_id.
+I would be glad to help. Keep in mind I'm not a kernel developer and need 
+someone to hold my hand. All this in my free time of course, but can 
+spend a few evenings per week.
 
-Format will be like this:
-ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi and .ddc
+Nevertheless I have an Edison dual booting 4.15.0-rc8 with poky pyro user 
+space. So I can easily apply patches and test.
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
----
- drivers/bluetooth/hci_intel.c | 56 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 49 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index aad07e4..9758684 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -708,16 +708,43 @@ static int intel_setup(struct hci_uart *hu)
- 	}
- 
- 	/* With this Intel bootloader only the hardware variant and device
--	 * revision information are used to select the right firmware.
-+	 * revision information are used to select the right firmware for SfP
-+	 * and WsP.
- 	 *
- 	 * The firmware filename is ibt-<hw_variant>-<dev_revid>.sfi.
- 	 *
- 	 * Currently the supported hardware variants are:
- 	 *   11 (0x0b) for iBT 3.0 (LnP/SfP)
-+	 *   12 (0x0c) for iBT 3.5 (WsP)
-+	 *
-+	 * For ThP/JfP and for future SKU's, the FW name varies based on HW
-+	 * variant, HW revision and FW revision, as these are dependent on CNVi
-+	 * and RF Combination.
-+	 *
-+	 *   18 (0x12) for iBT3.5 (ThP/JfP)
-+	 *
-+	 * The firmware file name for these will be
-+	 * ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi.
-+	 *
- 	 */
--	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
--		le16_to_cpu(ver.hw_variant),
--		le16_to_cpu(params->dev_revid));
-+	switch (ver.hw_variant) {
-+	case 0x0b:      /* SfP */
-+	case 0x0c:      /* WsP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(params->dev_revid));
-+		break;
-+	case 0x12:      /* ThP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.sfi",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(ver.hw_revision),
-+			 le16_to_cpu(ver.fw_revision));
-+		break;
-+	default:
-+		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-+			   ver.hw_variant);
-+		return -EINVAL;
-+	}
- 
- 	err = request_firmware(&fw, fwname, &hdev->dev);
- 	if (err < 0) {
-@@ -730,9 +757,24 @@ static int intel_setup(struct hci_uart *hu)
- 	bt_dev_info(hdev, "Found device firmware: %s", fwname);
- 
- 	/* Save the DDC file name for later */
--	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.ddc",
--		le16_to_cpu(ver.hw_variant),
--		le16_to_cpu(params->dev_revid));
-+	switch (ver.hw_variant) {
-+	case 0x0b:      /* SfP */
-+	case 0x0c:      /* WsP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.ddc",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(params->dev_revid));
-+		break;
-+	case 0x12:      /* ThP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.ddc",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(ver.hw_revision),
-+			 le16_to_cpu(ver.fw_revision));
-+		break;
-+	default:
-+		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-+			   ver.hw_variant);
-+		return -EINVAL;
-+	}
- 
- 	kfree_skb(skb);
- 
 -- 
-2.7.4
-
+Ferry Toth
