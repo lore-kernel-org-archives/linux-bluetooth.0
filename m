@@ -3,112 +3,189 @@ From: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Tedd Ho-Jeong An <tedd.an@linux.intel.com>, amit.k.bag@intel.com,
         tedd.an@intel.com
-Subject: [v2 3/5] Bluetooth: btintel: Use boot parameter from firmware file
-Date: Wed, 24 Jan 2018 09:19:19 -0800
-Message-Id: <1516814361-16945-3-git-send-email-tedd.an@linux.intel.com>
+Subject: [v2 2/5] Bluetooth: btintel: Create common function for Intel Reset
+Date: Wed, 24 Jan 2018 09:19:18 -0800
+Message-Id: <1516814361-16945-2-git-send-email-tedd.an@linux.intel.com>
 In-Reply-To: <1516814361-16945-1-git-send-email-tedd.an@linux.intel.com>
 References: <1516814361-16945-1-git-send-email-tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Each RAM SKU has a different boot parameter which is used in
-HCI_Intel_Reset command after downloading the firmware.
-The boot parameter is embedded in the firmware data and to support
-multiple SKUs, driver reads the boot parameter while downloading
-the firmware instead of using static values per SKU.
+The Intel_Reset command is used to reset the device after downloading
+the firmware and this is Intel generic command used in both USB and
+UART.
 
 Signed-off-by: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
 ---
- drivers/bluetooth/btusb.c     | 21 +++++++++++++++++++--
- drivers/bluetooth/hci_intel.c | 22 ++++++++++++++++++++--
- 2 files changed, 39 insertions(+), 4 deletions(-)
+ drivers/bluetooth/btintel.c   | 20 ++++++++++++++++++++
+ drivers/bluetooth/btintel.h   | 15 +++++++++++++++
+ drivers/bluetooth/btusb.c     | 15 +++++++--------
+ drivers/bluetooth/hci_intel.c | 15 +++++++--------
+ 4 files changed, 49 insertions(+), 16 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 07f00e4..c8aaed1 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -569,6 +569,26 @@ struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
+ }
+ EXPORT_SYMBOL_GPL(btintel_regmap_init);
+ 
++int btintel_send_intel_reset(struct hci_dev *hdev, u32 boot_param)
++{
++	struct intel_reset params = { 0x00, 0x01, 0x00, 0x01, 0x00000000 };
++	struct sk_buff *skb;
++
++	params.boot_param = cpu_to_le32(boot_param);
++
++	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(params), &params,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Failed to send Intel Reset command");
++		return PTR_ERR(skb);
++	}
++
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btintel_send_intel_reset);
++
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 1e8955a..2235705 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -69,6 +69,14 @@ struct intel_secure_send_result {
+ 	__u8     status;
+ } __packed;
+ 
++struct intel_reset {
++	__u8     reset_type;
++	__u8     patch_enable;
++	__u8     ddc_reload;
++	__u8     boot_option;
++	__le32   boot_param;
++} __packed;
++
+ #if IS_ENABLED(CONFIG_BT_INTEL)
+ 
+ int btintel_check_bdaddr(struct hci_dev *hdev);
+@@ -89,6 +97,7 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver);
+ 
+ struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
+ 				   u16 opcode_write);
++int btintel_send_intel_reset(struct hci_dev *hdev, u32 boot_param);
+ 
+ #else
+ 
+@@ -165,4 +174,10 @@ static inline struct regmap *btintel_regmap_init(struct hci_dev *hdev,
+ {
+ 	return ERR_PTR(-EINVAL);
+ }
++
++static inline int btintel_send_intel_reset(struct hci_dev *hdev,
++					   u32 reset_param)
++{
++	return -EOPNOTSUPP;
++}
+ #endif
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 93db5b9..2a7d6907 100644
+index 29977eb..93db5b9 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -2024,8 +2024,11 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+@@ -2009,8 +2009,6 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ {
+-	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
+-					  0x00, 0x08, 0x04, 0x00 };
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	struct sk_buff *skb;
+ 	struct intel_version ver;
+@@ -2018,6 +2016,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	const struct firmware *fw;
+ 	const u8 *fw_ptr;
+ 	u32 frag_len;
++	u32 boot_param;
+ 	char fwname[64];
+ 	ktime_t calltime, delta, rettime;
+ 	unsigned long long duration;
+@@ -2025,6 +2024,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
  
  	BT_DBG("%s", hdev->name);
  
--	/* The default boot parameter */
--	boot_param = 0x00040800;
-+	/* Set the default boot parameter to 0x0 and it is updated to
-+	 * SKU specific boot parameter after reading Intel_Write_Boot_Params
-+	 * command while downloading the firmware.
-+	 */
-+	boot_param = 0x00000000;
- 
++	/* The default boot parameter */
++	boot_param = 0x00040800;
++
  	calltime = ktime_get();
  
-@@ -2269,6 +2272,20 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	while (fw_ptr - fw->data < fw->size) {
- 		struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
+ 	/* Read the Intel version information to determine if the device
+@@ -2341,12 +2343,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
  
-+		/* Each SKU has a different reset parameter to use in the
-+		 * HCI_Intel_Reset command and it is embedded in the firmware
-+		 * data. So, instead of using static value per SKU, check
-+		 * the firmware data and save it for later use.
-+		 */
-+		if (cmd->opcode == 0xfc0e) {
-+			/* The boot parameter is the first 32-bit value
-+			 * and rest of 3 octets are reserved.
-+			 */
-+			boot_param = get_unaligned_le32(fw_ptr + sizeof(*cmd));
-+
-+			bt_dev_dbg(hdev, "boot_param=0x%x", boot_param);
-+		}
-+
- 		frag_len += sizeof(*cmd) + cmd->plen;
+ 	set_bit(BTUSB_BOOTING, &data->flags);
  
- 		/* The parameter length of the secure send command requires
+-	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param), reset_param,
+-			     HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb))
+-		return PTR_ERR(skb);
+-
+-	kfree_skb(skb);
++	err = btintel_send_intel_reset(hdev, boot_param);
++	if (err)
++		return err;
+ 
+ 	/* The bootloader will not indicate when the device is ready. This
+ 	 * is done by the operational firmware sending bootup notification.
 diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index acac48d..6f02f65 100644
+index 9758684..acac48d 100644
 --- a/drivers/bluetooth/hci_intel.c
 +++ b/drivers/bluetooth/hci_intel.c
-@@ -33,6 +33,7 @@
- #include <linux/acpi.h>
- #include <linux/interrupt.h>
- #include <linux/pm_runtime.h>
-+#include <asm/unaligned.h>
+@@ -540,8 +540,6 @@ static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
  
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -562,8 +563,11 @@ static int intel_setup(struct hci_uart *hu)
+ static int intel_setup(struct hci_uart *hu)
+ {
+-	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
+-					  0x00, 0x08, 0x04, 0x00 };
+ 	struct intel_data *intel = hu->priv;
+ 	struct hci_dev *hdev = hu->hdev;
+ 	struct sk_buff *skb;
+@@ -552,6 +550,7 @@ static int intel_setup(struct hci_uart *hu)
+ 	const u8 *fw_ptr;
+ 	char fwname[64];
+ 	u32 frag_len;
++	u32 boot_param;
+ 	ktime_t calltime, delta, rettime;
+ 	unsigned long long duration;
+ 	unsigned int init_speed, oper_speed;
+@@ -563,6 +562,9 @@ static int intel_setup(struct hci_uart *hu)
  	hu->hdev->set_diag = btintel_set_diag;
  	hu->hdev->set_bdaddr = btintel_set_bdaddr;
  
--	/* Default boot parameter */
--	boot_param = 0x00040800;
-+	/* Set the default boot parameter to 0x0 and it is updated to
-+	 * SKU specific boot parameter after reading Intel_Write_Boot_Params
-+	 * command while downloading the firmware.
-+	 */
-+	boot_param = 0x00000000;
- 
++	/* Default boot parameter */
++	boot_param = 0x00040800;
++
  	calltime = ktime_get();
  
-@@ -824,6 +828,20 @@ static int intel_setup(struct hci_uart *hu)
- 	while (fw_ptr - fw->data < fw->size) {
- 		struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
+ 	if (hu->init_speed)
+@@ -911,12 +913,9 @@ static int intel_setup(struct hci_uart *hu)
  
-+		/* Each SKU has a different reset parameter to use in the
-+		 * HCI_Intel_Reset command and it is embedded in the firmware
-+		 * data. So, instead of using static value per SKU, check
-+		 * the firmware data and save it for later use.
-+		 */
-+		if (cmd->opcode == 0xfc0e) {
-+			/* The boot parameter is the first 32-bit value
-+			 * and rest of 3 octets are reserved.
-+			 */
-+			boot_param = get_unaligned_le32(fw_ptr + sizeof(*cmd));
-+
-+			bt_dev_dbg(hdev, "boot_param=0x%x", boot_param);
-+		}
-+
- 		frag_len += sizeof(*cmd) + cmd->plen;
+ 	set_bit(STATE_BOOTING, &intel->flags);
  
- 		bt_dev_dbg(hdev, "Patching %td/%zu", (fw_ptr - fw->data),
+-	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param), reset_param,
+-			     HCI_CMD_TIMEOUT);
+-	if (IS_ERR(skb))
+-		return PTR_ERR(skb);
+-
+-	kfree_skb(skb);
++	err = btintel_send_intel_reset(hdev, boot_param);
++	if (err)
++		return err;
+ 
+ 	/* The bootloader will not indicate when the device is ready. This
+ 	 * is done by the operational firmware sending bootup notification.
 -- 
 2.7.4
 
