@@ -1,39 +1,206 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <C2BC44D770753C45AAAC42695FB5BE02012572ED98@SLC-EXMB01.CORP.SRELAY.COM>
-References: <C2BC44D770753C45AAAC42695FB5BE02012572ED98@SLC-EXMB01.CORP.SRELAY.COM>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 24 Jan 2018 08:54:47 -0200
-Message-ID: <CABBYNZK1WdS3+FobE_V6AdAfKGVDqt3wT5JoevkzONvdfJMpEQ@mail.gmail.com>
-Subject: Re: apple keyboard
-To: Thomas Green <TGreen2@sorenson.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 2/5] Bluetooth: btintel: Create common function for Intel
+ Reset
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1516763869-12411-2-git-send-email-tedd.an@linux.intel.com>
+Date: Wed, 24 Jan 2018 08:34:50 +0100
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        "An, Tedd" <tedd.an@intel.com>, amit.k.bag@intel.com
+Message-Id: <4D435416-67E7-40F8-B1BB-E3D916CBF416@holtmann.org>
+References: <1516763869-12411-1-git-send-email-tedd.an@linux.intel.com>
+ <1516763869-12411-2-git-send-email-tedd.an@linux.intel.com>
+To: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thomas,
+Hi Tedd,
 
-On Tue, Jan 23, 2018 at 8:55 PM, Thomas Green <TGreen2@sorenson.com> wrote:
-> All,
->
-> I have a Bluetooth apple keyboard that I'm trying to use.  The keyboard pairs and connects just fine, but the custom apple driver hid_apple.ko is never loaded.  I can
->
-> modprobe hid_apple
->
-> and it loads and works fine.  Where in the driver initialization code should I look to find out why the available driver isn't being loaded automatically?  I'm on bluez 5.48
+> The Intel_Reset command is used to reset the device after downloading
+> the firmware and this is Intel generic command used in both USB and
+> UART.
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+> ---
+> drivers/bluetooth/btintel.c   | 20 ++++++++++++++++++++
+> drivers/bluetooth/btintel.h   | 15 +++++++++++++++
+> drivers/bluetooth/btusb.c     | 15 +++++++--------
+> drivers/bluetooth/hci_intel.c | 15 +++++++--------
+> 4 files changed, 49 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index 07f00e4..067df4e 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -569,6 +569,26 @@ struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
+> }
+> EXPORT_SYMBOL_GPL(btintel_regmap_init);
+> 
+> +int btintel_send_intel_reset(struct hci_dev *hdev, u32 boot_param)
+> +{
+> +	struct sk_buff *skb;
+> +	struct intel_reset params = { 0x00, 0x01, 0x00, 0x01, 0x00000000 };
 
-What model? We need to check if the pid/vid is really matching the
-driver, this should be available in dmesg when the hid device appears.
-Perhaps apple has changed the pid/vid when discovered over Bluetooth.
+flip these two around please.
 
-> Tom
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +
+> +	params.boot_param = cpu_to_le32(boot_param);
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(params), &params,
+> +			     HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		bt_dev_err(hdev, "Failed to send Intel Reset command");
+> +		return PTR_ERR(skb);
+> +	}
+> +
+> +	kfree_skb(skb);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(btintel_send_intel_reset);
+> +
+> MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+> MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+> MODULE_VERSION(VERSION);
+> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+> index 1e8955a..3ef2db7 100644
+> --- a/drivers/bluetooth/btintel.h
+> +++ b/drivers/bluetooth/btintel.h
+> @@ -69,6 +69,14 @@ struct intel_secure_send_result {
+> 	__u8     status;
+> } __packed;
+> 
+> +struct intel_reset {
+> +	__u8     reset_type;
+> +	__u8     patch_enable;
+> +	__u8     ddc_reload;
+> +	__u8     boot_option;
+> +	__u32    boot_param;
 
+And this has to be __le32 btw.
 
+> +} __packed;
+> +
+> #if IS_ENABLED(CONFIG_BT_INTEL)
+> 
+> int btintel_check_bdaddr(struct hci_dev *hdev);
+> @@ -89,6 +97,7 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver);
+> 
+> struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
+> 				   u16 opcode_write);
+> +int btintel_send_intel_reset(struct hci_dev *hdev, u32 boot_param);
+> 
+> #else
+> 
+> @@ -165,4 +174,10 @@ static inline struct regmap *btintel_regmap_init(struct hci_dev *hdev,
+> {
+> 	return ERR_PTR(-EINVAL);
+> }
+> +
+> +static inline int btintel_send_intel_reset(struct hci_dev *hdev,
+> +					   u32 reset_param)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> #endif
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 29977eb..93db5b9 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2009,8 +2009,6 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+> 
+> static int btusb_setup_intel_new(struct hci_dev *hdev)
+> {
+> -	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
+> -					  0x00, 0x08, 0x04, 0x00 };
+> 	struct btusb_data *data = hci_get_drvdata(hdev);
+> 	struct sk_buff *skb;
+> 	struct intel_version ver;
+> @@ -2018,6 +2016,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 	const struct firmware *fw;
+> 	const u8 *fw_ptr;
+> 	u32 frag_len;
+> +	u32 boot_param;
+> 	char fwname[64];
+> 	ktime_t calltime, delta, rettime;
+> 	unsigned long long duration;
+> @@ -2025,6 +2024,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 
+> 	BT_DBG("%s", hdev->name);
+> 
+> +	/* The default boot parameter */
+> +	boot_param = 0x00040800;
+> +
+> 	calltime = ktime_get();
+> 
+> 	/* Read the Intel version information to determine if the device
+> @@ -2341,12 +2343,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+> 
+> 	set_bit(BTUSB_BOOTING, &data->flags);
+> 
+> -	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param), reset_param,
+> -			     HCI_INIT_TIMEOUT);
+> -	if (IS_ERR(skb))
+> -		return PTR_ERR(skb);
+> -
+> -	kfree_skb(skb);
+> +	err = btintel_send_intel_reset(hdev, boot_param);
+> +	if (err)
+> +		return err;
+> 
+> 	/* The bootloader will not indicate when the device is ready. This
+> 	 * is done by the operational firmware sending bootup notification.
+> diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+> index 9758684..acac48d 100644
+> --- a/drivers/bluetooth/hci_intel.c
+> +++ b/drivers/bluetooth/hci_intel.c
+> @@ -540,8 +540,6 @@ static int intel_set_baudrate(struct hci_uart *hu, unsigned int speed)
+> 
+> static int intel_setup(struct hci_uart *hu)
+> {
+> -	static const u8 reset_param[] = { 0x00, 0x01, 0x00, 0x01,
+> -					  0x00, 0x08, 0x04, 0x00 };
+> 	struct intel_data *intel = hu->priv;
+> 	struct hci_dev *hdev = hu->hdev;
+> 	struct sk_buff *skb;
+> @@ -552,6 +550,7 @@ static int intel_setup(struct hci_uart *hu)
+> 	const u8 *fw_ptr;
+> 	char fwname[64];
+> 	u32 frag_len;
+> +	u32 boot_param;
+> 	ktime_t calltime, delta, rettime;
+> 	unsigned long long duration;
+> 	unsigned int init_speed, oper_speed;
+> @@ -563,6 +562,9 @@ static int intel_setup(struct hci_uart *hu)
+> 	hu->hdev->set_diag = btintel_set_diag;
+> 	hu->hdev->set_bdaddr = btintel_set_bdaddr;
+> 
+> +	/* Default boot parameter */
+> +	boot_param = 0x00040800;
+> +
+> 	calltime = ktime_get();
+> 
+> 	if (hu->init_speed)
+> @@ -911,12 +913,9 @@ static int intel_setup(struct hci_uart *hu)
+> 
+> 	set_bit(STATE_BOOTING, &intel->flags);
+> 
+> -	skb = __hci_cmd_sync(hdev, 0xfc01, sizeof(reset_param), reset_param,
+> -			     HCI_CMD_TIMEOUT);
+> -	if (IS_ERR(skb))
+> -		return PTR_ERR(skb);
+> -
+> -	kfree_skb(skb);
+> +	err = btintel_send_intel_reset(hdev, boot_param);
+> +	if (err)
+> +		return err;
+> 
+> 	/* The bootloader will not indicate when the device is ready. This
+> 	 * is done by the operational firmware sending bootup notification.
 
--- 
-Luiz Augusto von Dentz
+Regards
+
+Marcel
+
