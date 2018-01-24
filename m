@@ -3,81 +3,48 @@ From: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Tedd Ho-Jeong An <tedd.an@linux.intel.com>, tedd.an@intel.com,
         amit.k.bag@intel.com
-Subject: [PATCH 5/5] Bluetooth: btintel: Create common function for firmware download
-Date: Tue, 23 Jan 2018 19:17:49 -0800
-Message-Id: <1516763869-12411-5-git-send-email-tedd.an@linux.intel.com>
+Subject: [PATCH 3/5] Bluetooth: btintel: Use boot parameter from firmware file
+Date: Tue, 23 Jan 2018 19:17:47 -0800
+Message-Id: <1516763869-12411-3-git-send-email-tedd.an@linux.intel.com>
 In-Reply-To: <1516763869-12411-1-git-send-email-tedd.an@linux.intel.com>
 References: <1516763869-12411-1-git-send-email-tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The firmware download flow for RAM SKU is same for both USB and UART
-and this patch creates a common function for both driver.
+Each RAM SKU has a different boot parameter which is used in
+HCI_Intel_Reset command after downloading the firmware.
+The boot parameter is embedded in the firmware data and to support
+multiple SKUs, driver reads the boot parameter while downloading
+the firmware instead of using static values per SKU.
 
 Signed-off-by: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
 ---
- drivers/bluetooth/btintel.c   | 85 +++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h   | 10 ++++-
- drivers/bluetooth/btusb.c     | 77 ++-------------------------------------
- drivers/bluetooth/hci_intel.c | 84 ++----------------------------------------
- 4 files changed, 100 insertions(+), 156 deletions(-)
+ drivers/bluetooth/btusb.c     | 22 ++++++++++++++++++++--
+ drivers/bluetooth/hci_intel.c | 23 +++++++++++++++++++++--
+ 2 files changed, 41 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 46f0e3e..81c39e3 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -24,6 +24,7 @@
- #include <linux/module.h>
- #include <linux/firmware.h>
- #include <linux/regmap.h>
-+#include <asm/unaligned.h>
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 93db5b9..979d530 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2024,8 +2024,11 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
  
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -640,6 +641,90 @@ int btintel_read_boot_params(struct hci_dev *hdev,
- }
- EXPORT_SYMBOL_GPL(btintel_read_boot_params);
+ 	BT_DBG("%s", hdev->name);
  
-+int btintel_download_firmware(struct hci_dev *hdev, const struct firmware *fw,
-+			      u32 *boot_param)
-+{
-+	int err;
-+	const u8 *fw_ptr;
-+	u32 frag_len;
-+
-+	/* Start the firmware download transaction with the Init fragment
-+	 * represented by the 128 bytes of CSS header.
+-	/* The default boot parameter */
+-	boot_param = 0x00040800;
++	/* Set the default boot parameter to 0x0 and it is updated to
++	 * SKU specific boot parameter after reading Intel_Write_Boot_Params
++	 * command while downloading the firmware.
 +	 */
-+	err = btintel_secure_send(hdev, 0x00, 128, fw->data);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to send firmware header (%d)", err);
-+		goto done;
-+	}
-+
-+	/* Send the 256 bytes of public key information from the firmware
-+	 * as the PKey fragment.
-+	 */
-+	err = btintel_secure_send(hdev, 0x03, 256, fw->data + 128);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to send firmware pkey (%d)", err);
-+		goto done;
-+	}
-+
-+	/* Send the 256 bytes of signature information from the firmware
-+	 * as the Sign fragment.
-+	 */
-+	err = btintel_secure_send(hdev, 0x02, 256, fw->data + 388);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "Failed to send firmware signature (%d)", err);
-+		goto done;
-+	}
-+
-+	fw_ptr = fw->data + 644;
-+	frag_len = 0;
-+
-+	while (fw_ptr - fw->data < fw->size) {
-+		struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
-+
++	boot_param = 0x00000000;
+ 
+ 	calltime = ktime_get();
+ 
+@@ -2269,6 +2272,21 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	while (fw_ptr - fw->data < fw->size) {
+ 		struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
+ 
 +		/* Each SKU has a different reset parameter to use in the
 +		 * HCI_Intel_Reset command and it is embedded in the firmware
 +		 * data. So, instead of using static value per SKU, check
@@ -88,276 +55,62 @@ index 46f0e3e..81c39e3 100644
 +			/* The boot parameter is the first 32-bit value
 +			 * and rest of 3 octets are reserved.
 +			 */
-+			*boot_param = get_unaligned_le32(fw_ptr + sizeof(*cmd));
++			boot_param = get_unaligned_le32(fw_ptr + sizeof(*cmd));
 +
-+			bt_dev_dbg(hdev, "boot_param=0x%x", *boot_param);
++			bt_dev_dbg(hdev, "boot_param=0x%x", boot_param);
 +		}
 +
-+		frag_len += sizeof(*cmd) + cmd->plen;
-+
-+		/* The parameter length of the secure send command requires
-+		 * a 4 byte alignment. It happens so that the firmware file
-+		 * contains proper Intel_NOP commands to align the fragments
-+		 * as needed.
-+		 *
-+		 * Send set of commands with 4 byte alignment from the
-+		 * firmware data buffer as a single Data fragement.
-+		 */
-+		if (!(frag_len % 4)) {
-+			err = btintel_secure_send(hdev, 0x01, frag_len, fw_ptr);
-+			if (err < 0) {
-+				bt_dev_err(hdev,
-+					   "Failed to send firmware data (%d)",
-+					   err);
-+				goto done;
-+			}
-+
-+			fw_ptr += frag_len;
-+			frag_len = 0;
-+		}
-+	}
-+
-+done:
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(btintel_download_firmware);
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 28727b2..d2f355b 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -100,7 +100,8 @@ struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
- int btintel_send_intel_reset(struct hci_dev *hdev, u32 boot_param);
- int btintel_read_boot_params(struct hci_dev *hdev,
- 			     struct intel_boot_params *params);
--
-+int btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
-+			      u32 *boot_param);
- #else
+ 		frag_len += sizeof(*cmd) + cmd->plen;
  
- static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-@@ -188,4 +189,11 @@ static inline int btintel_read_boot_params(struct hci_dev *hdev,
- {
- 	return -EOPNOTSUPP;
- }
-+
-+static inline int btintel_download_firmware(struct hci_dev *dev,
-+					    const struct firmware *fw,
-+					    u32 *boot_param);
-+{
-+	return -EOPNOTSUPP;
-+}
- #endif
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 808c245..2a55380 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2013,8 +2013,6 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	struct intel_version ver;
- 	struct intel_boot_params params;
- 	const struct firmware *fw;
--	const u8 *fw_ptr;
--	u32 frag_len;
- 	u32 boot_param;
- 	char fwname[64];
- 	ktime_t calltime, delta, rettime;
-@@ -2201,79 +2199,10 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 
- 	set_bit(BTUSB_DOWNLOADING, &data->flags);
- 
--	/* Start the firmware download transaction with the Init fragment
--	 * represented by the 128 bytes of CSS header.
--	 */
--	err = btintel_secure_send(hdev, 0x00, 128, fw->data);
--	if (err < 0) {
--		BT_ERR("%s: Failed to send firmware header (%d)",
--		       hdev->name, err);
--		goto done;
--	}
--
--	/* Send the 256 bytes of public key information from the firmware
--	 * as the PKey fragment.
--	 */
--	err = btintel_secure_send(hdev, 0x03, 256, fw->data + 128);
--	if (err < 0) {
--		BT_ERR("%s: Failed to send firmware public key (%d)",
--		       hdev->name, err);
--		goto done;
--	}
--
--	/* Send the 256 bytes of signature information from the firmware
--	 * as the Sign fragment.
--	 */
--	err = btintel_secure_send(hdev, 0x02, 256, fw->data + 388);
--	if (err < 0) {
--		BT_ERR("%s: Failed to send firmware signature (%d)",
--		       hdev->name, err);
-+	/* Start firmware downloading and get boot parameter */
-+	err = btintel_download_firmware(hdev, fw, &boot_param);
-+	if (err < 0)
- 		goto done;
--	}
--
--	fw_ptr = fw->data + 644;
--	frag_len = 0;
--
--	while (fw_ptr - fw->data < fw->size) {
--		struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
--
--		/* Each SKU has a different reset parameter to use in the
--		 * HCI_Intel_Reset command and it is embedded in the firmware
--		 * data. So, instead of using static value per SKU, check
--		 * the firmware data and save it for later use.
--		 */
--		if (cmd->opcode == 0xfc0e) {
--
--			/* The boot parameter is the first 32-bit value
--			 * and rest of 3 octets are reserved.
--			 */
--			boot_param = get_unaligned_le32(fw_ptr + sizeof(*cmd));
--
--			bt_dev_dbg(hdev, "boot_param=0x%x", boot_param);
--		}
--
--		frag_len += sizeof(*cmd) + cmd->plen;
--
--		/* The parameter length of the secure send command requires
--		 * a 4 byte alignment. It happens so that the firmware file
--		 * contains proper Intel_NOP commands to align the fragments
--		 * as needed.
--		 *
--		 * Send set of commands with 4 byte alignment from the
--		 * firmware data buffer as a single Data fragement.
--		 */
--		if (!(frag_len % 4)) {
--			err = btintel_secure_send(hdev, 0x01, frag_len, fw_ptr);
--			if (err < 0) {
--				BT_ERR("%s: Failed to send firmware data (%d)",
--				       hdev->name, err);
--				goto done;
--			}
--
--			fw_ptr += frag_len;
--			frag_len = 0;
--		}
--	}
- 
- 	set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
- 
+ 		/* The parameter length of the secure send command requires
 diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index f83b9da..7c166e3 100644
+index acac48d..2053d73 100644
 --- a/drivers/bluetooth/hci_intel.c
 +++ b/drivers/bluetooth/hci_intel.c
-@@ -33,7 +33,6 @@
+@@ -33,6 +33,7 @@
  #include <linux/acpi.h>
  #include <linux/interrupt.h>
  #include <linux/pm_runtime.h>
--#include <asm/unaligned.h>
++#include <asm/unaligned.h>
  
  #include <net/bluetooth/bluetooth.h>
  #include <net/bluetooth/hci_core.h>
-@@ -548,9 +547,7 @@ static int intel_setup(struct hci_uart *hu)
- 	struct intel_boot_params params;
- 	struct list_head *p;
- 	const struct firmware *fw;
--	const u8 *fw_ptr;
- 	char fwname[64];
--	u32 frag_len;
- 	u32 boot_param;
- 	ktime_t calltime, delta, rettime;
- 	unsigned long long duration;
-@@ -761,85 +758,10 @@ static int intel_setup(struct hci_uart *hu)
+@@ -562,8 +563,11 @@ static int intel_setup(struct hci_uart *hu)
+ 	hu->hdev->set_diag = btintel_set_diag;
+ 	hu->hdev->set_bdaddr = btintel_set_bdaddr;
  
- 	set_bit(STATE_DOWNLOADING, &intel->flags);
+-	/* Default boot parameter */
+-	boot_param = 0x00040800;
++	/* Set the default boot parameter to 0x0 and it is updated to
++	 * SKU specific boot parameter after reading Intel_Write_Boot_Params
++	 * command while downloading the firmware.
++	 */
++	boot_param = 0x00000000;
  
--	/* Start the firmware download transaction with the Init fragment
--	 * represented by the 128 bytes of CSS header.
--	 */
--	err = btintel_secure_send(hdev, 0x00, 128, fw->data);
--	if (err < 0) {
--		bt_dev_err(hdev, "Failed to send firmware header (%d)", err);
--		goto done;
--	}
--
--	/* Send the 256 bytes of public key information from the firmware
--	 * as the PKey fragment.
--	 */
--	err = btintel_secure_send(hdev, 0x03, 256, fw->data + 128);
--	if (err < 0) {
--		bt_dev_err(hdev, "Failed to send firmware public key (%d)",
--			   err);
--		goto done;
--	}
--
--	/* Send the 256 bytes of signature information from the firmware
--	 * as the Sign fragment.
--	 */
--	err = btintel_secure_send(hdev, 0x02, 256, fw->data + 388);
--	if (err < 0) {
--		bt_dev_err(hdev, "Failed to send firmware signature (%d)",
--			   err);
-+	/* Start firmware downloading and get boot parameter */
-+	err = btintel_download_firmware(hdev, fw, &boot_param);
-+	if (err < 0)
- 		goto done;
--	}
--
--	fw_ptr = fw->data + 644;
--	frag_len = 0;
--
--	while (fw_ptr - fw->data < fw->size) {
--		struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
--
--		/* Each SKU has a different reset parameter to use in the
--		 * HCI_Intel_Reset command and it is embedded in the firmware
--		 * data. So, instead of using static value per SKU, check
--		 * the firmware data and save it for later use.
--		 */
--		if (cmd->opcode == 0xfc0e) {
--
--			/* The boot parameter is the first 32-bit value
--			 * and rest of 3 octets are reserved.
--			 */
--			boot_param = get_unaligned_le32(fw_ptr + sizeof(*cmd));
--
--			bt_dev_dbg(hdev, "boot_param=0x%x", boot_param);
--		}
--
--		frag_len += sizeof(*cmd) + cmd->plen;
--
--		bt_dev_dbg(hdev, "Patching %td/%zu", (fw_ptr - fw->data),
--			   fw->size);
--
--		/* The parameter length of the secure send command requires
--		 * a 4 byte alignment. It happens so that the firmware file
--		 * contains proper Intel_NOP commands to align the fragments
--		 * as needed.
--		 *
--		 * Send set of commands with 4 byte alignment from the
--		 * firmware data buffer as a single Data fragement.
--		 */
--		if (frag_len % 4)
--			continue;
--
--		/* Send each command from the firmware data buffer as
--		 * a single Data fragment.
--		 */
--		err = btintel_secure_send(hdev, 0x01, frag_len, fw_ptr);
--		if (err < 0) {
--			bt_dev_err(hdev, "Failed to send firmware data (%d)",
--				   err);
--			goto done;
--		}
--
--		fw_ptr += frag_len;
--		frag_len = 0;
--	}
+ 	calltime = ktime_get();
  
- 	set_bit(STATE_FIRMWARE_LOADED, &intel->flags);
+@@ -824,6 +828,21 @@ static int intel_setup(struct hci_uart *hu)
+ 	while (fw_ptr - fw->data < fw->size) {
+ 		struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
  
++		/* Each SKU has a different reset parameter to use in the
++		 * HCI_Intel_Reset command and it is embedded in the firmware
++		 * data. So, instead of using static value per SKU, check
++		 * the firmware data and save it for later use.
++		 */
++		if (cmd->opcode == 0xfc0e) {
++
++			/* The boot parameter is the first 32-bit value
++			 * and rest of 3 octets are reserved.
++			 */
++			boot_param = get_unaligned_le32(fw_ptr + sizeof(*cmd));
++
++			bt_dev_dbg(hdev, "boot_param=0x%x", boot_param);
++		}
++
+ 		frag_len += sizeof(*cmd) + cmd->plen;
+ 
+ 		bt_dev_dbg(hdev, "Patching %td/%zu", (fw_ptr - fw->data),
 -- 
 2.7.4
 
