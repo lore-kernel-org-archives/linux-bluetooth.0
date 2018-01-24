@@ -1,37 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Thomas Green <TGreen2@Sorenson.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: apple keyboard
-Date: Wed, 24 Jan 2018 15:52:12 +0000
-Message-ID: <C2BC44D770753C45AAAC42695FB5BE02012572F009@SLC-EXMB01.CORP.SRELAY.COM>
-References: <C2BC44D770753C45AAAC42695FB5BE02012572ED98@SLC-EXMB01.CORP.SRELAY.COM>
- <CABBYNZK1WdS3+FobE_V6AdAfKGVDqt3wT5JoevkzONvdfJMpEQ@mail.gmail.com>
-In-Reply-To: <CABBYNZK1WdS3+FobE_V6AdAfKGVDqt3wT5JoevkzONvdfJMpEQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] obexd: Fix property Size of server transfer
+Date: Wed, 24 Jan 2018 11:09:30 -0200
+Message-Id: <20180124130930.1539-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PkhpIFRob21hcywNCj4NCj5PbiBUdWUsIEphbiAyMywgMjAxOCBhdCA4OjU1IFBNLCBUaG9tYXMg
-R3JlZW4gPFRHcmVlbjJAc29yZW5zb24uY29tPiB3cm90ZToNCj4+IEFsbCwNCj4+DQo+PiBJIGhh
-dmUgYSBCbHVldG9vdGggYXBwbGUga2V5Ym9hcmQgdGhhdCBJJ20gdHJ5aW5nIHRvIHVzZS4gIFRo
-ZSANCj4+IGtleWJvYXJkIHBhaXJzIGFuZCBjb25uZWN0cyBqdXN0IGZpbmUsIGJ1dCB0aGUgY3Vz
-dG9tIGFwcGxlIGRyaXZlciANCj4+IGhpZF9hcHBsZS5rbyBpcyBuZXZlciBsb2FkZWQuICBJIGNh
-bg0KPj4NCj4+IG1vZHByb2JlIGhpZF9hcHBsZQ0KPj4NCj4+IGFuZCBpdCBsb2FkcyBhbmQgd29y
-a3MgZmluZS4gIFdoZXJlIGluIHRoZSBkcml2ZXIgaW5pdGlhbGl6YXRpb24gY29kZSANCj4+IHNo
-b3VsZCBJIGxvb2sgdG8gZmluZCBvdXQgd2h5IHRoZSBhdmFpbGFibGUgZHJpdmVyIGlzbid0IGJl
-aW5nIGxvYWRlZCANCj4+IGF1dG9tYXRpY2FsbHk/ICBJJ20gb24gYmx1ZXogNS40OA0KPg0KPldo
-YXQgbW9kZWw/IFdlIG5lZWQgdG8gY2hlY2sgaWYgdGhlIHBpZC92aWQgaXMgcmVhbGx5IG1hdGNo
-aW5nIHRoZSBkcml2ZXIsIHRoaXMgc2hvdWxkIGJlIGF2YWlsYWJsZSBpbiBkbWVzZyB3aGVuIHRo
-ZSBoaWQgZGV2aWNlIGFwcGVhcnMuDQo+UGVyaGFwcyBhcHBsZSBoYXMgY2hhbmdlZCB0aGUgcGlk
-L3ZpZCB3aGVuIGRpc2NvdmVyZWQgb3ZlciBCbHVldG9vdGguDQoNCk1vZGxlIE5vLiBBMTMxNA0K
-QXMgSSB0cmFjZSB0aGUgY29kZSB0aHJvdWdoIHRoZSBzZXQgdXAgSSBzZWUgdGhhdCB0aGUgYnVz
-IGlzIDB4NSwgdmVuZG9yIElEIGlzIDB4NWFjIGRldmljZSBpZCBpcyAweDI1NS4NClNvLCBpdCBt
-YXRjaGVzIHRoZSBlbnRyeSAgaW4gaGlkLWNvcmUuYywgaGlkX2hhdmVfc3BlY2lhbF9kcml2ZXIg
-VVNCX0RFVklDRV9JRF9BUFBMRV9BTFVfV0lSRUxFU1NfMjAxMV9BTlNJDQoNCj4NCj4+IFRvbQ0K
-PiA+LS0NCj4gPlRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1
-bnN1YnNjcmliZSANCj4gPmxpbnV4LWJsdWV0b290aCIgaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdl
-IHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgDQo+PiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0
-ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCj4NCj4NCj4NCj4t
-LQ0KPkx1aXogQXVndXN0byB2b24gRGVudHoNCg==
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+OBJECT_SIZE_DELETE is shall not be consider a valid size.
+---
+ obexd/src/manager.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index 78b138c85..70265e445 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -377,7 +377,8 @@ static gboolean transfer_size_exists(const GDBusPropertyTable *property,
+ 	struct obex_transfer *transfer = data;
+ 	struct obex_session *session = transfer->session;
+ 
+-	return session->size != OBJECT_SIZE_UNKNOWN;
++	return (session->size != OBJECT_SIZE_UNKNOWN &&
++				session->size != OBJECT_SIZE_DELETE);
+ }
+ 
+ static gboolean transfer_get_size(const GDBusPropertyTable *property,
+@@ -386,7 +387,8 @@ static gboolean transfer_get_size(const GDBusPropertyTable *property,
+ 	struct obex_transfer *transfer = data;
+ 	struct obex_session *session = transfer->session;
+ 
+-	if (session->size == OBJECT_SIZE_UNKNOWN)
++	if (session->size == OBJECT_SIZE_UNKNOWN ||
++				session->size == OBJECT_SIZE_DELETE)
+ 		return FALSE;
+ 
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT64, &session->size);
+-- 
+2.14.3
+
