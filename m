@@ -1,43 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <C2BC44D770753C45AAAC42695FB5BE02012572ED98@SLC-EXMB01.CORP.SRELAY.COM>
+References: <C2BC44D770753C45AAAC42695FB5BE02012572ED98@SLC-EXMB01.CORP.SRELAY.COM>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] obexd: Fix property Size of server transfer
-Date: Wed, 24 Jan 2018 11:09:30 -0200
-Message-Id: <20180124130930.1539-1-luiz.dentz@gmail.com>
+Date: Wed, 24 Jan 2018 08:54:47 -0200
+Message-ID: <CABBYNZK1WdS3+FobE_V6AdAfKGVDqt3wT5JoevkzONvdfJMpEQ@mail.gmail.com>
+Subject: Re: apple keyboard
+To: Thomas Green <TGreen2@sorenson.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Thomas,
 
-OBJECT_SIZE_DELETE is shall not be consider a valid size.
----
- obexd/src/manager.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+On Tue, Jan 23, 2018 at 8:55 PM, Thomas Green <TGreen2@sorenson.com> wrote:
+> All,
+>
+> I have a Bluetooth apple keyboard that I'm trying to use.  The keyboard pairs and connects just fine, but the custom apple driver hid_apple.ko is never loaded.  I can
+>
+> modprobe hid_apple
+>
+> and it loads and works fine.  Where in the driver initialization code should I look to find out why the available driver isn't being loaded automatically?  I'm on bluez 5.48
 
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index 78b138c85..70265e445 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -377,7 +377,8 @@ static gboolean transfer_size_exists(const GDBusPropertyTable *property,
- 	struct obex_transfer *transfer = data;
- 	struct obex_session *session = transfer->session;
- 
--	return session->size != OBJECT_SIZE_UNKNOWN;
-+	return (session->size != OBJECT_SIZE_UNKNOWN &&
-+				session->size != OBJECT_SIZE_DELETE);
- }
- 
- static gboolean transfer_get_size(const GDBusPropertyTable *property,
-@@ -386,7 +387,8 @@ static gboolean transfer_get_size(const GDBusPropertyTable *property,
- 	struct obex_transfer *transfer = data;
- 	struct obex_session *session = transfer->session;
- 
--	if (session->size == OBJECT_SIZE_UNKNOWN)
-+	if (session->size == OBJECT_SIZE_UNKNOWN ||
-+				session->size == OBJECT_SIZE_DELETE)
- 		return FALSE;
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT64, &session->size);
+What model? We need to check if the pid/vid is really matching the
+driver, this should be available in dmesg when the hid device appears.
+Perhaps apple has changed the pid/vid when discovered over Bluetooth.
+
+> Tom
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.14.3
-
+Luiz Augusto von Dentz
