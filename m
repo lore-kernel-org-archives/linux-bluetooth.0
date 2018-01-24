@@ -1,111 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Tedd Ho-Jeong An <tedd.an@linux.intel.com>, amit.k.bag@intel.com,
-        tedd.an@intel.com
-Subject: [v2 1/5] Bluetooth: hci_intel: Update firmware filename for Intel 9x60 and later
-Date: Wed, 24 Jan 2018 09:19:17 -0800
-Message-Id: <1516814361-16945-1-git-send-email-tedd.an@linux.intel.com>
+From: Thomas Green <TGreen2@Sorenson.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: apple keyboard
+Date: Wed, 24 Jan 2018 15:52:12 +0000
+Message-ID: <C2BC44D770753C45AAAC42695FB5BE02012572F009@SLC-EXMB01.CORP.SRELAY.COM>
+References: <C2BC44D770753C45AAAC42695FB5BE02012572ED98@SLC-EXMB01.CORP.SRELAY.COM>
+ <CABBYNZK1WdS3+FobE_V6AdAfKGVDqt3wT5JoevkzONvdfJMpEQ@mail.gmail.com>
+In-Reply-To: <CABBYNZK1WdS3+FobE_V6AdAfKGVDqt3wT5JoevkzONvdfJMpEQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The format of Intel Bluetooth firmware for bootloader product is
-ibt-<hw_variant>-<device_revision_id>.sfi and .ddc.
-
-But for the 9x60 SKU, there are three variants of FW, which cannot be
-differenticate just with hw_variant and device_revision_id.
-So, to pick the appropriate FW file for 9x60 SKU, three fields,
-hw_variant, hw_revision, and fw_revision, needs to be used rather than
-hw_variant and device_revision_id.
-
-Format will be like this:
-ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi and .ddc
-
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
----
- drivers/bluetooth/hci_intel.c | 56 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 49 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index aad07e4..9758684 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -708,16 +708,43 @@ static int intel_setup(struct hci_uart *hu)
- 	}
- 
- 	/* With this Intel bootloader only the hardware variant and device
--	 * revision information are used to select the right firmware.
-+	 * revision information are used to select the right firmware for SfP
-+	 * and WsP.
- 	 *
- 	 * The firmware filename is ibt-<hw_variant>-<dev_revid>.sfi.
- 	 *
- 	 * Currently the supported hardware variants are:
- 	 *   11 (0x0b) for iBT 3.0 (LnP/SfP)
-+	 *   12 (0x0c) for iBT 3.5 (WsP)
-+	 *
-+	 * For ThP/JfP and for future SKU's, the FW name varies based on HW
-+	 * variant, HW revision and FW revision, as these are dependent on CNVi
-+	 * and RF Combination.
-+	 *
-+	 *   18 (0x12) for iBT3.5 (ThP/JfP)
-+	 *
-+	 * The firmware file name for these will be
-+	 * ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi.
-+	 *
- 	 */
--	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
--		le16_to_cpu(ver.hw_variant),
--		le16_to_cpu(params->dev_revid));
-+	switch (ver.hw_variant) {
-+	case 0x0b:      /* SfP */
-+	case 0x0c:      /* WsP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(params->dev_revid));
-+		break;
-+	case 0x12:      /* ThP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.sfi",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(ver.hw_revision),
-+			 le16_to_cpu(ver.fw_revision));
-+		break;
-+	default:
-+		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-+			   ver.hw_variant);
-+		return -EINVAL;
-+	}
- 
- 	err = request_firmware(&fw, fwname, &hdev->dev);
- 	if (err < 0) {
-@@ -730,9 +757,24 @@ static int intel_setup(struct hci_uart *hu)
- 	bt_dev_info(hdev, "Found device firmware: %s", fwname);
- 
- 	/* Save the DDC file name for later */
--	snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.ddc",
--		le16_to_cpu(ver.hw_variant),
--		le16_to_cpu(params->dev_revid));
-+	switch (ver.hw_variant) {
-+	case 0x0b:      /* SfP */
-+	case 0x0c:      /* WsP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.ddc",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(params->dev_revid));
-+		break;
-+	case 0x12:      /* ThP */
-+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.ddc",
-+			 le16_to_cpu(ver.hw_variant),
-+			 le16_to_cpu(ver.hw_revision),
-+			 le16_to_cpu(ver.fw_revision));
-+		break;
-+	default:
-+		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-+			   ver.hw_variant);
-+		return -EINVAL;
-+	}
- 
- 	kfree_skb(skb);
- 
--- 
-2.7.4
-
+PkhpIFRob21hcywNCj4NCj5PbiBUdWUsIEphbiAyMywgMjAxOCBhdCA4OjU1IFBNLCBUaG9tYXMg
+R3JlZW4gPFRHcmVlbjJAc29yZW5zb24uY29tPiB3cm90ZToNCj4+IEFsbCwNCj4+DQo+PiBJIGhh
+dmUgYSBCbHVldG9vdGggYXBwbGUga2V5Ym9hcmQgdGhhdCBJJ20gdHJ5aW5nIHRvIHVzZS4gIFRo
+ZSANCj4+IGtleWJvYXJkIHBhaXJzIGFuZCBjb25uZWN0cyBqdXN0IGZpbmUsIGJ1dCB0aGUgY3Vz
+dG9tIGFwcGxlIGRyaXZlciANCj4+IGhpZF9hcHBsZS5rbyBpcyBuZXZlciBsb2FkZWQuICBJIGNh
+bg0KPj4NCj4+IG1vZHByb2JlIGhpZF9hcHBsZQ0KPj4NCj4+IGFuZCBpdCBsb2FkcyBhbmQgd29y
+a3MgZmluZS4gIFdoZXJlIGluIHRoZSBkcml2ZXIgaW5pdGlhbGl6YXRpb24gY29kZSANCj4+IHNo
+b3VsZCBJIGxvb2sgdG8gZmluZCBvdXQgd2h5IHRoZSBhdmFpbGFibGUgZHJpdmVyIGlzbid0IGJl
+aW5nIGxvYWRlZCANCj4+IGF1dG9tYXRpY2FsbHk/ICBJJ20gb24gYmx1ZXogNS40OA0KPg0KPldo
+YXQgbW9kZWw/IFdlIG5lZWQgdG8gY2hlY2sgaWYgdGhlIHBpZC92aWQgaXMgcmVhbGx5IG1hdGNo
+aW5nIHRoZSBkcml2ZXIsIHRoaXMgc2hvdWxkIGJlIGF2YWlsYWJsZSBpbiBkbWVzZyB3aGVuIHRo
+ZSBoaWQgZGV2aWNlIGFwcGVhcnMuDQo+UGVyaGFwcyBhcHBsZSBoYXMgY2hhbmdlZCB0aGUgcGlk
+L3ZpZCB3aGVuIGRpc2NvdmVyZWQgb3ZlciBCbHVldG9vdGguDQoNCk1vZGxlIE5vLiBBMTMxNA0K
+QXMgSSB0cmFjZSB0aGUgY29kZSB0aHJvdWdoIHRoZSBzZXQgdXAgSSBzZWUgdGhhdCB0aGUgYnVz
+IGlzIDB4NSwgdmVuZG9yIElEIGlzIDB4NWFjIGRldmljZSBpZCBpcyAweDI1NS4NClNvLCBpdCBt
+YXRjaGVzIHRoZSBlbnRyeSAgaW4gaGlkLWNvcmUuYywgaGlkX2hhdmVfc3BlY2lhbF9kcml2ZXIg
+VVNCX0RFVklDRV9JRF9BUFBMRV9BTFVfV0lSRUxFU1NfMjAxMV9BTlNJDQoNCj4NCj4+IFRvbQ0K
+PiA+LS0NCj4gPlRvIHVuc3Vic2NyaWJlIGZyb20gdGhpcyBsaXN0OiBzZW5kIHRoZSBsaW5lICJ1
+bnN1YnNjcmliZSANCj4gPmxpbnV4LWJsdWV0b290aCIgaW4gdGhlIGJvZHkgb2YgYSBtZXNzYWdl
+IHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcgDQo+PiBNb3JlIG1ham9yZG9tbyBpbmZvIGF0
+ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZvLmh0bWwNCj4NCj4NCj4NCj4t
+LQ0KPkx1aXogQXVndXN0byB2b24gRGVudHoNCg==
