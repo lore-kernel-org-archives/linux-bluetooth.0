@@ -1,45 +1,59 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Vincent Petry <pvince81@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Apparent bluez 5.48 regression: Headphones fail to reconnect after
- suspend/resume
-Message-ID: <d74ae042-eec6-e4bb-45f9-904631fe642b@gmail.com>
-Date: Thu, 25 Jan 2018 07:44:33 +0100
+Subject: Re: [PATCH BlueZ] obexd: Fix property Size of server transfer
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20180124130930.1539-1-luiz.dentz@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <79ff061a-46ad-a0b9-70f6-16d407b9170f@jp.fujitsu.com>
+Date: Thu, 25 Jan 2018 13:43:57 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180124130930.1539-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Luiz,
 
-I just joined the mailing list so can't directly reply to old messages,
-so sending with same title.
+Thanks for your great work.
 
-I'm experiencing the same issue as Robert here
-https://www.spinics.net/lists/linux-bluetooth/msg73824.html, happening
-on the same laptop Dell XPS 13 but with different sub-model 9333, but on
-openSUSE Tumbleweed.
-
-It looks like the bluez component is in a wrong state when either
-loading btusb with modprobe later on or resuming from suspend. The
-workaround is to restart the systemd bluetooth daemon. I suspect that
-plugging in USB bluetooth dongles would also have the same issue but I
-don't have one to test.
-
-It used to work correctly before the upgrade from 5.47 to 5.48.
-
-See my original report here for details:
-https://bugzilla.suse.com/show_bug.cgi?id=1076898
-Robert's report https://bugzilla.redhat.com/show_bug.cgi?id=1534857,
-also confirmed by a third person.
-
-Please let us know if this is reproducible on your side or whether it's
-an isolated case specific to our Dell hardware.
-
-Thanks,
-
-Vincent Petry
+After applying this patch, on my box obexctl retrieves the Size property
+correctly even if it is run before starting to transfer a file.
 
 
+Regards,
+Eramoto
 
+On 01/24/2018 10:09 PM, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> OBJECT_SIZE_DELETE is shall not be consider a valid size.
+> ---
+>  obexd/src/manager.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+> index 78b138c85..70265e445 100644
+> --- a/obexd/src/manager.c
+> +++ b/obexd/src/manager.c
+> @@ -377,7 +377,8 @@ static gboolean transfer_size_exists(const GDBusPropertyTable *property,
+>  	struct obex_transfer *transfer = data;
+>  	struct obex_session *session = transfer->session;
+>  
+> -	return session->size != OBJECT_SIZE_UNKNOWN;
+> +	return (session->size != OBJECT_SIZE_UNKNOWN &&
+> +				session->size != OBJECT_SIZE_DELETE);
+>  }
+>  
+>  static gboolean transfer_get_size(const GDBusPropertyTable *property,
+> @@ -386,7 +387,8 @@ static gboolean transfer_get_size(const GDBusPropertyTable *property,
+>  	struct obex_transfer *transfer = data;
+>  	struct obex_session *session = transfer->session;
+>  
+> -	if (session->size == OBJECT_SIZE_UNKNOWN)
+> +	if (session->size == OBJECT_SIZE_UNKNOWN ||
+> +				session->size == OBJECT_SIZE_DELETE)
+>  		return FALSE;
+>  
+>  	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT64, &session->size);
+> 
 
