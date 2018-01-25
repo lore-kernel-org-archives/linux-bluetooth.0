@@ -1,40 +1,40 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/5] tools/btpclient: Add passkey confirm ev and passkey confirm rsp cmd
-Date: Thu, 25 Jan 2018 16:53:33 +0100
-Message-Id: <20180125155333.12734-5-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ 4/5] tools/btpclient: Add passkey entry cmd and passkey display event
+Date: Thu, 25 Jan 2018 16:53:32 +0100
+Message-Id: <20180125155333.12734-4-grzegorz.kolodziejczyk@codecoup.pl>
 In-Reply-To: <20180125155333.12734-1-grzegorz.kolodziejczyk@codecoup.pl>
 References: <20180125155333.12734-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds passkey confirm command handler and passkey confirm
-event.
+This patch adds passkey entry command handler and passkey display event.
 ---
- tools/btpclient.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 96 insertions(+), 4 deletions(-)
+ tools/btpclient.c | 92 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
 
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index 00c4e5fac..5320003f9 100644
+index 95d369b51..00c4e5fac 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
-@@ -1700,12 +1700,42 @@ static struct l_dbus_message *ag_request_confirmation_call(struct l_dbus *dbus,
+@@ -1655,11 +1655,44 @@ static struct l_dbus_message *ag_display_passkey_call(struct l_dbus *dbus,
  						struct l_dbus_message *message,
  						void *user_data)
  {
--	struct l_dbus_message *reply;
-+	struct btp_gap_passkey_confirm_ev ev;
++	struct btp_gap_passkey_display_ev ev;
 +	struct btp_device *device;
 +	struct btp_adapter *adapter;
+ 	struct l_dbus_message *reply;
 +	const char *path, *str_addr, *str_addr_type;
 +	uint32_t passkey;
++	uint16_t entered;
  
--	reply = l_dbus_message_new_method_return(message);
--	l_dbus_message_set_arguments(reply, "");
-+	l_dbus_message_get_arguments(message, "ou", &path, &passkey);
+ 	reply = l_dbus_message_new_method_return(message);
+ 	l_dbus_message_set_arguments(reply, "");
  
--	return reply;
++	l_dbus_message_get_arguments(message, "ouq", &path, &passkey, &entered);
++
 +	device = find_device_by_path(path);
 +
 +	if (!l_dbus_proxy_get_property(device->proxy, "Address", "s", &str_addr)
@@ -42,7 +42,7 @@ index 00c4e5fac..5320003f9 100644
 +		&str_addr_type)) {
 +		l_info("Cannot get device properties");
 +
-+		return NULL;
++		return reply;
 +	}
 +
 +	ev.passkey = L_CPU_TO_LE32(passkey);
@@ -50,27 +50,24 @@ index 00c4e5fac..5320003f9 100644
 +							BTP_GAP_ADDR_RANDOM :
 +							BTP_GAP_ADDR_PUBLIC;
 +	if (str2ba(str_addr, &ev.address) < 0) {
-+		l_info("Incorrect device address");
++		l_info("Incorrect device addres");
 +
-+		return NULL;
++		return reply;
 +	}
 +
 +	adapter = find_adapter_by_device(device);
 +
-+	ag.pending_req = l_dbus_message_ref(message);
-+
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_PASSKEY_CONFIRM,
++	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_PASSKEY_DISPLAY,
 +					adapter->index, sizeof(ev), &ev);
 +
-+	return NULL;
+ 	return reply;
  }
  
- static struct l_dbus_message *ag_authorize_service_call(struct l_dbus *dbus,
-@@ -2286,6 +2316,65 @@ failed:
+@@ -2197,6 +2230,62 @@ failed:
  	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
  }
  
-+static void passkey_confirm_rsp_reply(struct l_dbus_message *result,
++static void passkey_entry_rsp_reply(struct l_dbus_message *result,
 +								void *user_data)
 +{
 +	struct btp_adapter *adapter = user_data;
@@ -79,7 +76,7 @@ index 00c4e5fac..5320003f9 100644
 +		const char *name, *desc;
 +
 +		l_dbus_message_get_error(result, &name, &desc);
-+		l_error("Failed to confirm passkey (%s), %s", name, desc);
++		l_error("Failed to reply with passkey (%s), %s", name, desc);
 +
 +		btp_send_error(btp, BTP_GAP_SERVICE, adapter->index,
 +								BTP_ERROR_FAIL);
@@ -88,17 +85,18 @@ index 00c4e5fac..5320003f9 100644
 +
 +	l_dbus_message_unref(ag.pending_req);
 +
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_PASSKEY_CONFIRM_RSP,
++	btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_PASSKEY_ENTRY_RSP,
 +						adapter->index, 0, NULL);
 +}
 +
-+static void btp_gap_confirm_entry_rsp(uint8_t index, const void *param,
++static void btp_gap_passkey_entry_rsp(uint8_t index, const void *param,
 +					uint16_t length, void *user_data)
 +{
-+	const struct btp_gap_passkey_confirm_rsp_cp *cp = param;
++	const struct btp_gap_passkey_entry_rsp_cp *cp = param;
 +	struct btp_adapter *adapter = find_adapter_by_index(index);
-+	struct l_dbus_message *reply;
++	struct l_dbus_message_builder *builder;
 +	uint8_t status = BTP_ERROR_FAIL;
++	uint32_t passkey = L_CPU_TO_LE32(cp->passkey);
 +	bool prop;
 +
 +	if (!adapter) {
@@ -106,21 +104,17 @@ index 00c4e5fac..5320003f9 100644
 +		goto failed;
 +	}
 +
-+	/* Adapter needs to be powered to be able to confirm passkey */
++	/* Adapter needs to be powered to be able to response with passkey */
 +	if (!l_dbus_proxy_get_property(adapter->proxy, "Powered", "b", &prop) ||
 +						!prop || !ag.pending_req)
 +		goto failed;
 +
-+	if (cp->match) {
-+		reply = l_dbus_message_new_method_return(ag.pending_req);
-+		l_dbus_message_set_arguments(reply, "");
-+	} else {
-+		reply = l_dbus_message_new_error(ag.pending_req,
-+						"org.bluez.Error.Rejected",
-+						"Passkey missmatch");
-+	}
++	builder = l_dbus_message_builder_new(ag.pending_req);
++	l_dbus_message_builder_append_basic(builder, 'u', &passkey);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
 +
-+	l_dbus_send_with_reply(dbus, ag.pending_req, passkey_confirm_rsp_reply,
++	l_dbus_send_with_reply(dbus, ag.pending_req, passkey_entry_rsp_reply,
 +								adapter, NULL);
 +
 +	return;
@@ -132,13 +126,13 @@ index 00c4e5fac..5320003f9 100644
  static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
  {
  	struct btp_device_found_ev ev;
-@@ -2419,6 +2508,9 @@ static void register_gap_service(void)
+@@ -2327,6 +2416,9 @@ static void register_gap_service(void)
  
- 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_PASSKEY_ENTRY_RSP,
- 					btp_gap_passkey_entry_rsp, NULL, NULL);
+ 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_UNPAIR, btp_gap_unpair,
+ 								NULL, NULL);
 +
-+	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_PASSKEY_CONFIRM_RSP,
-+					btp_gap_confirm_entry_rsp, NULL, NULL);
++	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_PASSKEY_ENTRY_RSP,
++					btp_gap_passkey_entry_rsp, NULL, NULL);
  }
  
  static void btp_core_read_commands(uint8_t index, const void *param,
