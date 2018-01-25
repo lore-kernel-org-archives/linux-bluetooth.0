@@ -1,59 +1,118 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] obexd: Fix property Size of server transfer
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20180124130930.1539-1-luiz.dentz@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <79ff061a-46ad-a0b9-70f6-16d407b9170f@jp.fujitsu.com>
-Date: Thu, 25 Jan 2018 13:43:57 +0900
+Return-Path: <fengguang.wu@intel.com>
+Date: Thu, 25 Jan 2018 12:37:13 +0800
+From: kbuild test robot <fengguang.wu@intel.com>
+To: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+Cc: kbuild-all@01.org, linux-bluetooth@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>
+Subject: [bluetooth-next:master 8/8] drivers/bluetooth/btintel.c:689:24:
+ sparse: restricted __le16 degrades to integer
+Message-ID: <201801251210.Q8lWcors%fengguang.wu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180124130930.1539-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+head:   0bd4ded3287d4ecb9443fca7f86d45d2235f6ebc
+commit: 0bd4ded3287d4ecb9443fca7f86d45d2235f6ebc [8/8] Bluetooth: btintel: Create common function for firmware download
+reproduce:
+        # apt-get install sparse
+        git checkout 0bd4ded3287d4ecb9443fca7f86d45d2235f6ebc
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
 
-Thanks for your great work.
 
-After applying this patch, on my box obexctl retrieves the Size property
-correctly even if it is run before starting to transfer a file.
+sparse warnings: (new ones prefixed by >>)
 
+>> drivers/bluetooth/btintel.c:689:24: sparse: restricted __le16 degrades to integer
 
-Regards,
-Eramoto
+vim +689 drivers/bluetooth/btintel.c
 
-On 01/24/2018 10:09 PM, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> OBJECT_SIZE_DELETE is shall not be consider a valid size.
-> ---
->  obexd/src/manager.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-> index 78b138c85..70265e445 100644
-> --- a/obexd/src/manager.c
-> +++ b/obexd/src/manager.c
-> @@ -377,7 +377,8 @@ static gboolean transfer_size_exists(const GDBusPropertyTable *property,
->  	struct obex_transfer *transfer = data;
->  	struct obex_session *session = transfer->session;
->  
-> -	return session->size != OBJECT_SIZE_UNKNOWN;
-> +	return (session->size != OBJECT_SIZE_UNKNOWN &&
-> +				session->size != OBJECT_SIZE_DELETE);
->  }
->  
->  static gboolean transfer_get_size(const GDBusPropertyTable *property,
-> @@ -386,7 +387,8 @@ static gboolean transfer_get_size(const GDBusPropertyTable *property,
->  	struct obex_transfer *transfer = data;
->  	struct obex_session *session = transfer->session;
->  
-> -	if (session->size == OBJECT_SIZE_UNKNOWN)
-> +	if (session->size == OBJECT_SIZE_UNKNOWN ||
-> +				session->size == OBJECT_SIZE_DELETE)
->  		return FALSE;
->  
->  	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT64, &session->size);
-> 
+   643	
+   644	int btintel_download_firmware(struct hci_dev *hdev, const struct firmware *fw,
+   645				      u32 *boot_param)
+   646	{
+   647		int err;
+   648		const u8 *fw_ptr;
+   649		u32 frag_len;
+   650	
+   651		/* Start the firmware download transaction with the Init fragment
+   652		 * represented by the 128 bytes of CSS header.
+   653		 */
+   654		err = btintel_secure_send(hdev, 0x00, 128, fw->data);
+   655		if (err < 0) {
+   656			bt_dev_err(hdev, "Failed to send firmware header (%d)", err);
+   657			goto done;
+   658		}
+   659	
+   660		/* Send the 256 bytes of public key information from the firmware
+   661		 * as the PKey fragment.
+   662		 */
+   663		err = btintel_secure_send(hdev, 0x03, 256, fw->data + 128);
+   664		if (err < 0) {
+   665			bt_dev_err(hdev, "Failed to send firmware pkey (%d)", err);
+   666			goto done;
+   667		}
+   668	
+   669		/* Send the 256 bytes of signature information from the firmware
+   670		 * as the Sign fragment.
+   671		 */
+   672		err = btintel_secure_send(hdev, 0x02, 256, fw->data + 388);
+   673		if (err < 0) {
+   674			bt_dev_err(hdev, "Failed to send firmware signature (%d)", err);
+   675			goto done;
+   676		}
+   677	
+   678		fw_ptr = fw->data + 644;
+   679		frag_len = 0;
+   680	
+   681		while (fw_ptr - fw->data < fw->size) {
+   682			struct hci_command_hdr *cmd = (void *)(fw_ptr + frag_len);
+   683	
+   684			/* Each SKU has a different reset parameter to use in the
+   685			 * HCI_Intel_Reset command and it is embedded in the firmware
+   686			 * data. So, instead of using static value per SKU, check
+   687			 * the firmware data and save it for later use.
+   688			 */
+ > 689			if (cmd->opcode == 0xfc0e) {
+   690	
+   691				/* The boot parameter is the first 32-bit value
+   692				 * and rest of 3 octets are reserved.
+   693				 */
+   694				*boot_param = get_unaligned_le32(fw_ptr + sizeof(*cmd));
+   695	
+   696				bt_dev_dbg(hdev, "boot_param=0x%x", *boot_param);
+   697			}
+   698	
+   699			frag_len += sizeof(*cmd) + cmd->plen;
+   700	
+   701			/* The parameter length of the secure send command requires
+   702			 * a 4 byte alignment. It happens so that the firmware file
+   703			 * contains proper Intel_NOP commands to align the fragments
+   704			 * as needed.
+   705			 *
+   706			 * Send set of commands with 4 byte alignment from the
+   707			 * firmware data buffer as a single Data fragement.
+   708			 */
+   709			if (!(frag_len % 4)) {
+   710				err = btintel_secure_send(hdev, 0x01, frag_len, fw_ptr);
+   711				if (err < 0) {
+   712					bt_dev_err(hdev,
+   713						   "Failed to send firmware data (%d)",
+   714						   err);
+   715					goto done;
+   716				}
+   717	
+   718				fw_ptr += frag_len;
+   719				frag_len = 0;
+   720			}
+   721		}
+   722	
+   723	done:
+   724		return err;
+   725	}
+   726	EXPORT_SYMBOL_GPL(btintel_download_firmware);
+   727	
 
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
