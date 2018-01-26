@@ -1,62 +1,42 @@
-Return-Path: <arndbergmann@gmail.com>
-MIME-Version: 1.0
-Sender: arndbergmann@gmail.com
-In-Reply-To: <EBF0FA29-819E-4419-84D1-9CE22E8AE0A5@holtmann.org>
-References: <20180126130652.3499127-1-arnd@arndb.de> <EBF0FA29-819E-4419-84D1-9CE22E8AE0A5@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 26 Jan 2018 17:06:44 +0100
-Message-ID: <CAK8P3a1-b+wPsYhTUF9GLcpDqfo3R1SCCiOKn=hP6YwB+tCu5Q@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btintel: remove extraneous semicolon
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, Tedd Ho-Jeong An <tedd.an@linux.intel.com>,
-	Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Jia-Ju Bai <baijiaju1990@gmail.com>
+To: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [PATCH] bluetooth: btmrvl_main: Replace GFP_ATOMIC with GFP_KERNEL in btmrvl_send_sync_cmd
+Date: Fri, 26 Jan 2018 23:57:01 +0800
+Message-Id: <1516982221-8524-1-git-send-email-baijiaju1990@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jan 26, 2018 at 4:22 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Arnd,
->
->> The newly added btintel_download_firmware() dummy helper definition is
->> incorrect, causing a build error when CONFIG_BT_INTEL is disabled:
->>
->> In file included from drivers/bluetooth/hci_ldisc.c:49:0:
->> drivers/bluetooth/btintel.h:196:1: error: expected identifier or '(' bef=
-ore '{' token
->> drivers/bluetooth/btintel.h:193:19: error: 'btintel_download_firmware' d=
-eclared 'static' but never defined [-Werror=3Dunused-function]
->>
->> Removing the semicolon makes it work again.
->>
->> Fixes: 0bd4ded3287d ("Bluetooth: btintel: Create common function for fir=
-mware download")
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->> ---
->> drivers/bluetooth/btintel.h | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
->> index 01728e212267..41c642cc523f 100644
->> --- a/drivers/bluetooth/btintel.h
->> +++ b/drivers/bluetooth/btintel.h
->> @@ -192,7 +192,7 @@ static inline int btintel_read_boot_params(struct hc=
-i_dev *hdev,
->>
->> static inline int btintel_download_firmware(struct hci_dev *dev,
->>                                           const struct firmware *fw,
->> -                                         u32 *boot_param);
->> +                                         u32 *boot_param)
->> {
->>       return -EOPNOTSUPP;
->> }
->
-> didn=E2=80=99t I fix this before sending the pull request? Can you check =
-against
-> net-next tree that this is still an issue?
+After checking all possible call chains to btmrvl_send_sync_cmd(), 
+my tool finds that this function is never called in atomic context, 
+namely never in an interrupt handler or holding a spinlock. 
+And it calls wait_event_interruptible_timeout() after bt_skb_alloc(), 
+so it indicates that btmrvl_send_sync_cmd() 
+can call function which can sleep.
+Thus GFP_ATOMIC is not necessary, and it can be replaced with GFP_KERNEL.
 
-It's fixed in net-next. I looked at linux-next, which apparently had an
-older version of the commit when Stephen pulled the tree into today's
-linux-next, through bluetooth-next.git#master.
+This is found by a static analysis tool named DCNS written by myself.
 
-         Arnd
+Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+---
+ drivers/bluetooth/btmrvl_main.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index b280d46..f6c694a 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -183,7 +183,7 @@ static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 opcode,
+ 		return -EFAULT;
+ 	}
+ 
+-	skb = bt_skb_alloc(HCI_COMMAND_HDR_SIZE + len, GFP_ATOMIC);
++	skb = bt_skb_alloc(HCI_COMMAND_HDR_SIZE + len, GFP_KERNEL);
+ 	if (!skb) {
+ 		BT_ERR("No free skb");
+ 		return -ENOMEM;
+-- 
+1.7.9.5
+
