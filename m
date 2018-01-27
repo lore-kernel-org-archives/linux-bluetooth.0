@@ -1,25 +1,51 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Sriram V <vshrirama@gmail.com>
-Date: Sat, 27 Jan 2018 22:56:36 +0530
-Message-ID: <CAH9_wRP6ENEa8MmsuqD4R-TR=SpJdaoi22BLHM8A4LNGPP29Fg@mail.gmail.com>
-Subject: Purpose of line discipline in bt drivers
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <baijiaju1990@gmail.com>
+From: Jia-Ju Bai <baijiaju1990@gmail.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: [PATCH] bluetooth: hci_ath: Replace mdelay with msleep in ath_wakeup_ar3k
+Date: Sat, 27 Jan 2018 18:17:38 +0800
+Message-Id: <1517048258-23798-1-git-send-email-baijiaju1990@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+ath_wakeup_ar3k() is never called from atomic context.
 
-I am facing broken audio issues when using the broadcom bt chip
-especially when it comes back from suspend. While debugging the issue,
+It is only called by ath_hci_uart_work() that is only called in 
+ath_open() via INIT_WORK().
+All of the above functions do not enter atomic context along the way.
 
-What is the purpose of doing a registering a ldisc in the driver using
-the call tty_register_ldisc call() in Bluetooth drivers which deal
-with power management.
+Despite never getting called from atomic context, ath_wakeup_ar3k() calls
+mdelay() for busy wait.
+That is not necessary and can be replaced with msleep to avoid busy wait.
 
-I am referring to the below driver:
-https://android.googlesource.com/kernel/bcm/+/android-4.4w_r6/drivers/misc/bcm-bt-lpm.c
+This is found by a static analysis tool named DCNS written by myself.
 
-Thanks for your help.
-Sriram
+Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
+---
+ drivers/bluetooth/hci_ath.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+index 14ae7ee..d568fbd 100644
+--- a/drivers/bluetooth/hci_ath.c
++++ b/drivers/bluetooth/hci_ath.c
+@@ -71,12 +71,12 @@ static int ath_wakeup_ar3k(struct tty_struct *tty)
+ 	/* Clear RTS first */
+ 	tty->driver->ops->tiocmget(tty);
+ 	tty->driver->ops->tiocmset(tty, 0x00, TIOCM_RTS);
+-	mdelay(20);
++	msleep(20);
+ 
+ 	/* Set RTS, wake up board */
+ 	tty->driver->ops->tiocmget(tty);
+ 	tty->driver->ops->tiocmset(tty, TIOCM_RTS, 0x00);
+-	mdelay(20);
++	msleep(20);
+ 
+ 	status = tty->driver->ops->tiocmget(tty);
+ 	return status;
+-- 
+1.7.9.5
