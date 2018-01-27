@@ -1,68 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] gdbus: Fix replying to messages marked with NOREPLY flag
-Date: Sun, 28 Jan 2018 11:50:29 -0200
-Message-Id: <20180128135030.18468-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: Purpose of line discipline in bt drivers
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAH9_wRP6ENEa8MmsuqD4R-TR=SpJdaoi22BLHM8A4LNGPP29Fg@mail.gmail.com>
+Date: Sat, 27 Jan 2018 22:28:51 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <839A14D6-376D-49B2-83AC-D3631BB065CE@holtmann.org>
+References: <CAH9_wRP6ENEa8MmsuqD4R-TR=SpJdaoi22BLHM8A4LNGPP29Fg@mail.gmail.com>
+To: Sriram V <vshrirama@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Sriram,
 
-When a sender flags a D-Bus message as not expecting a reply, it is
-against D-Bus policy to send a reply — sending one can result in an
-error as reported in:
+> I am facing broken audio issues when using the broadcom bt chip
+> especially when it comes back from suspend. While debugging the issue,
+> 
+> What is the purpose of doing a registering a ldisc in the driver using
+> the call tty_register_ldisc call() in Bluetooth drivers which deal
+> with power management.
+> 
+> I am referring to the below driver:
+> https://android.googlesource.com/kernel/bcm/+/android-4.4w_r6/drivers/misc/bcm-bt-lpm.c
 
-https://bugzilla.kernel.org/show_bug.cgi?id=198453
----
- gdbus/object.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+contact Broadcom about that driver or ask the Android team. It is not an upstream driver. Upstream uses hci_bcm.c which include proper power management and not some hacked up "stab you in the back” driver to make some userspace Bluetooth stack have access to hardware low power feature.
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 5c8ad7a55..e572c9f01 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -1421,6 +1421,10 @@ DBusMessage *g_dbus_create_error_valist(DBusMessage *message, const char *name,
- {
- 	char str[1024];
- 
-+	/* Check if the message can be replied */
-+	if (dbus_message_get_no_reply(message))
-+		return NULL;
-+
- 	if (format)
- 		vsnprintf(str, sizeof(str), format, args);
- 	else
-@@ -1449,6 +1453,10 @@ DBusMessage *g_dbus_create_reply_valist(DBusMessage *message,
- {
- 	DBusMessage *reply;
- 
-+	/* Check if the message can be replied */
-+	if (dbus_message_get_no_reply(message))
-+		return NULL;
-+
- 	reply = dbus_message_new_method_return(message);
- 	if (reply == NULL)
- 		return NULL;
-@@ -1571,14 +1579,9 @@ gboolean g_dbus_send_reply_valist(DBusConnection *connection,
- {
- 	DBusMessage *reply;
- 
--	reply = dbus_message_new_method_return(message);
--	if (reply == NULL)
--		return FALSE;
--
--	if (dbus_message_append_args_valist(reply, type, args) == FALSE) {
--		dbus_message_unref(reply);
-+	reply = g_dbus_create_reply_valist(message, type, args);
-+	if (!reply)
- 		return FALSE;
--	}
- 
- 	return g_dbus_send_message(connection, reply);
- }
--- 
-2.14.3
+Regards
+
+Marcel
 
