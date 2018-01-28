@@ -1,129 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CACXFvW3-S-Ko6HLcD4nVaqL+vpMkYEKVHJKaWpje+R66g5RuRQ@mail.gmail.com>
-References: <CACXFvW2fOcYsJA1xV2QctbRUGCv0aLQ=PUbZ7icSq_KPjvaawg@mail.gmail.com>
- <CABBYNZ+5=LJnyDSC3MH15AQDJbPrP0F+ChitODqcfmfgOG3oxQ@mail.gmail.com> <CACXFvW3-S-Ko6HLcD4nVaqL+vpMkYEKVHJKaWpje+R66g5RuRQ@mail.gmail.com>
-From: David Wiberg <dwiberg@gmail.com>
-Date: Sun, 28 Jan 2018 19:32:17 +0100
-Message-ID: <CACXFvW2ky+0JbMp65JqP60hsSWDk0b+JOzKpC=Bw1BQE98gkeg@mail.gmail.com>
-Subject: Re: Potential ATT_MTU problem when changing device
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] gdbus: Fail to send NULL messages
+Date: Sun, 28 Jan 2018 11:50:30 -0200
+Message-Id: <20180128135030.18468-2-luiz.dentz@gmail.com>
+In-Reply-To: <20180128135030.18468-1-luiz.dentz@gmail.com>
+References: <20180128135030.18468-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2018-01-26 10:20 GMT+01:00 David Wiberg <dwiberg@gmail.com>:
-> Hi Luiz,
->
-> 2018-01-25 20:28 GMT+01:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
->> Hi David,
->>
->> On Thu, Jan 25, 2018 at 3:08 PM, David Wiberg <dwiberg@gmail.com> wrote:
->>> Hello all,
->>>
->>> I'm running a BlueZ based GATT server where I encounter issues when I
->>> switch clients. From looking at logs it seems like the issue is
->>> related to ATT_MTU value. The scenario looks like this:
->>> 1a. Client A connects and sends an Exchange MTU Request which
->>> increases ATT_MTU from the default.
->>> 1b. Client A reads/writes some data.
->>> 1c. Client A disconnects.
->>> 2a. Client B connects.
->>> 2b. Client B performs a service discovery.
->>> 2c. Service discovery reaches a point where BlueZ sends an attribute
->>> list of length 8 (frame length 67 bytes)
->>
->> This is really weird, it means we are not respecting the default MTU
->> but usually the bt_gatt_client instance would trigger the MTU exchange
->> anyway if the MTU is not 23 which is usually the case as the kernel
->> reports MTU of 672 bytes for L2CAP by default:
->>
->> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/device.c?id=0da72fee044f96e7e6a4715dc7aab48eb8c1d5cb#n4794
->>
->>> 3. Communication seem to stop.
->>>
->>> I have taken a log of this (see below). The bluetoothd version used
->>> while taking the log is 5.41. I have tried running 5.48 manually but
->>> didn't notice any difference with regards to this.
->>>
->>> While trying to understand the issue I noticed that BlueZ 5.42
->>> Changelog mentioned "Fix issue with setting correct ATT default MTU
->>> value" which tracks back to a mailing list post
->>> (https://marc.info/?l=linux-bluetooth&m=147346392907270&w=4) which
->>> seem similar to my scenario. The main difference I have seen is that
->>> Client B doesn't perform the Exchange MTU procedure.
->>
->> Quite many things have been fixed since 5.42, for instance there is this patch:
->>
->> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=0da72fee044f96e7e6a4715dc7aab48eb8c1d5cb
->>
->
-> This seem to be the commit related coupled to the mailing list post I
-> mentioned, and it seemed promising.
->
->> Perhaps you should try with 5.48 first to see if there is any change
->> affecting this behavior.
->>
->
-> I did try building and running 5.48 and got a log which was identical
-> except for times and changed ordering of a "Number of Completed
-> Packets" event which I guess is irrelevant.
->
-> When testing 5.48 I configured it with: "../bluez-5.48/configure
-> --prefix=/home/david/bluez --disable-cups
-> --host=arm-poky-linux-gnueabi
-> --with-sysroot=/opt/poky/2.2.2/sysroots/cortexa9hf-neon-poky-linux-gnueabi
-> --disable-systemd --enable-deprecated --enable-debug --enable-static".
-> I performed the installation manually by copying the "bluetoothd"
-> binary since I'm cross-compiling for a remote target. It didn't seem
-> like it, but can you confirm that there are no other BlueZ libraries
-> which the "bluetoothd" binary uses which I need to update as well?
->
->>> Does the above analysis seem correct or is there something else which
->>> I might have missed?
->>>
->>> I'm a Bluetooth/BlueZ beginner so any pointers are appreciated.
->>>
->>> Bonus question: How can I enable the DBG prints for all modules when
->>> running bluetoothd? It seems like I only get output from some of the
->>> modules (e.g. adapter.c and device.c) but not from others (e.g.
->>> nothing related to attributes).
->>
->> bluetoothd -d should enable debug for every plugin if that is what you
->> are looking for.
->
-> Ok, I've been running "bluetoothd -d -n" and tried adding DBG prints
-> to the functions which I thought were involved in setting up and
-> handling GATT communication but I haven't gotten any outputs from
-> those (which probably indicates I'm looking at the wrong place). As an
-> example I added a DBG statement when entering device_attach_att in
-> device.c. Do you know where MTU handling is performed for a new client
-> connection which can help me debug the issue?
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Short update: After some more debugging I have found out that the
-issue doesn't seem to be within BlueZ but within Qt.
+This should make it safe to call g_dbus_send_message with a NULL
+message which is more likely to happen now that g_dbus_create_reply
+returns NULL when the message is marked with NO_REPLY flag.
+---
+ gdbus/object.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Longer update: While trying to understand the issue I was able to
-reproduce it on one of two Linux virtual machines. The "bad" VM runs
-kernel version 4.4 while the "good" VM runs an older 3.13 kernel. When
-running my Qt based application (same version of Qt on both machines)
-the behavior differs quite a lot between these two machines (same
-BlueZ version).
+diff --git a/gdbus/object.c b/gdbus/object.c
+index e572c9f01..617ab5eda 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -1502,6 +1502,9 @@ gboolean g_dbus_send_message(DBusConnection *connection, DBusMessage *message)
+ {
+ 	dbus_bool_t result = FALSE;
+ 
++	if (!message)
++		return FALSE;
++
+ 	if (dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_METHOD_CALL)
+ 		dbus_message_set_no_reply(message, TRUE);
+ 	else if (dbus_message_get_type(message) == DBUS_MESSAGE_TYPE_SIGNAL) {
+-- 
+2.14.3
 
-On the good/old VM I get much more debug prints from bluetoothd. For
-example I see "gatt_debug() MTU exchange complete..." messages for
-both Client A and Client B and everything seems to work. On the
-new/bad VM I don't get these messages. It turns out that Qt duplicates
-some of the BlueZ functionality and has its own handling of e.g.
-ATT_MTU exchange using its own sockets. Patching Qt allowed me to
-confirm that the issue actually was due to wrong ATT_MTU handling.
-
-What I haven't understood however is why the behavior differs. I
-haven't seen anything within Qt which explains this (but I might have
-missed something). If anyone has time to share any ideas regarding
-this I would be grateful.
-
-Thanks for reading and sorry for the noise.
-
-/ David
