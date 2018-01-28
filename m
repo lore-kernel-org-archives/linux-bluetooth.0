@@ -1,11 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOwdT4=_T4zXX-S0c5h+siL9Pa2DoNAAFB+fK4gTaPqKnP5N5w@mail.gmail.com>
-References: <CAOwdT4=_T4zXX-S0c5h+siL9Pa2DoNAAFB+fK4gTaPqKnP5N5w@mail.gmail.com>
-From: "Gabriel A. Zorrilla" <gaz082@gmail.com>
-Date: Sun, 28 Jan 2018 16:44:40 -0300
-Message-ID: <CAOwdT4nAa7JLf1465Mrb64JPk91DgcjRcFqet750obeeEjVxLw@mail.gmail.com>
-Subject: Fwd: lescan stops after 10-15 minutes (bluez 5.48)
+From: "Gabriel A. Zorrilla" <gabriel@zorrilla.me>
+Date: Sun, 28 Jan 2018 16:22:47 -0300
+Message-ID: <CAOwdT4=_T4zXX-S0c5h+siL9Pa2DoNAAFB+fK4gTaPqKnP5N5w@mail.gmail.com>
+Subject: lescan stops after 10-15 minutes (bluez 5.48)
 To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
