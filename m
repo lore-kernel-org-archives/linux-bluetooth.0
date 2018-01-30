@@ -1,103 +1,38 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/5] tools: btpclient: Clear advertising data on reset
-Date: Wed, 31 Jan 2018 10:09:13 +0100
-Message-ID: <5642552.UvG7uKk54W@ix>
-In-Reply-To: <20180125155333.12734-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20180125155333.12734-1-grzegorz.kolodziejczyk@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <kai.heng.feng@canonical.com>
+From: Kai Heng Feng <kai.heng.feng@canonical.com>
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Paired bluetooth keyboards lead to system auto resume from S3 when
+ WoL enabled for e1000e
+Message-Id: <E17B265A-7432-4BAB-8B92-3A7FB3B1B09F@canonical.com>
+Date: Tue, 30 Jan 2018 16:07:03 +0800
+Cc: Mathias Nyman <mathias.nyman@linux.intel.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ "Fujinaka, Todd" <todd.fujinaka@intel.com>,
+ Ethan Hsieh <ethan.hsieh@canonical.com>
+To: Linux USB Mailing List <linux-usb@vger.kernel.org>,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+ linux-nics@intel.com
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi,
 
-On Thursday, 25 January 2018 16:53:29 CET Grzegorz Kolodziejczyk wrote:
-> Advertising data should be cleared on gap reset command.
-> ---
->  tools/btpclient.c | 40 +++++++++++++++++++++-------------------
->  1 file changed, 21 insertions(+), 19 deletions(-)
-> 
-> diff --git a/tools/btpclient.c b/tools/btpclient.c
-> index 3c88f1496..bdc404dd9 100644
-> --- a/tools/btpclient.c
-> +++ b/tools/btpclient.c
-> @@ -390,6 +390,24 @@ static void unreg_advertising_setup(struct
-> l_dbus_message *message, l_dbus_message_builder_destroy(builder);
->  }
-> 
-> +static void ad_cleanup_service(void *service)
-> +{
-> +	struct service_data *s = service;
-> +
-> +	l_free(s->uuid);
-> +	l_free(s);
-> +}
-> +
-> +static void ad_cleanup(void)
-> +{
-> +	l_free(ad.local_name);
-> +	l_queue_destroy(ad.uuids, l_free);
-> +	l_queue_destroy(ad.services, ad_cleanup_service);
-> +	l_queue_destroy(ad.manufacturers, l_free);
-> +
-> +	memset(&ad, 0, sizeof(ad));
-> +}
-> +
->  static void unreg_advertising_reply(struct l_dbus_proxy *proxy,
->  						struct l_dbus_message *result,
->  						void *user_data)
-> @@ -417,6 +435,8 @@ static void unreg_advertising_reply(struct l_dbus_proxy
-> *proxy, l_info("Unable to remove propety instance");
->  	if (!l_dbus_unregister_interface(dbus, AD_IFACE))
->  		l_info("Unable to unregister ad interface");
-> +
-> +	ad_cleanup();
->  }
-> 
->  static void btp_gap_reset(uint8_t index, const void *param, uint16_t
-> length, @@ -449,7 +469,7 @@ static void btp_gap_reset(uint8_t index, const
-> void *param, uint16_t length, NULL);
->  	}
-> 
-> -	if (adapter->ad_proxy)
-> +	if (adapter->ad_proxy && ad.registered)
->  		if (!l_dbus_proxy_method_call(adapter->ad_proxy,
->  						"UnregisterAdvertisement",
->  						unreg_advertising_setup,
-> @@ -646,24 +666,6 @@ failed:
->  	btp_send_error(btp, BTP_GAP_SERVICE, index, status);
->  }
-> 
-> -static void ad_cleanup_service(void *service)
-> -{
-> -	struct service_data *s = service;
-> -
-> -	l_free(s->uuid);
-> -	l_free(s);
-> -}
-> -
-> -static void ad_cleanup(void)
-> -{
-> -	l_free(ad.local_name);
-> -	l_queue_destroy(ad.uuids, l_free);
-> -	l_queue_destroy(ad.services, ad_cleanup_service);
-> -	l_queue_destroy(ad.manufacturers, l_free);
-> -
-> -	memset(&ad, 0, sizeof(ad));
-> -}
-> -
->  static void ad_init(void)
->  {
->  	ad.uuids = l_queue_new();
+This is actually a continuation of [1] with more findings.
+The machine in question is a CFL desktop. The auto resume roughly
+happens in 5 ~ 10 mins.
 
+After further digging, I found out that the e1000e and XHCI always
+shares the same wakeup count in /sys/kernel/debug/wakeup_sources,
+so I did some experiment on e1000e.
 
-All patches applied (2/5 v2), thanks.
+Here=E2=80=99s the tricky finding, disable WoL for e1000e can stop the =
+erratic
+behaviour - the machine no longer auto resume. One caveat though -
+I can no longer wake up the system by pressing the BT keyboard.
 
--- 
-pozdrawiam
-Szymon Janc
+No idea where to file the bug so include all three subsystems.
 
+[1] https://www.spinics.net/lists/linux-bluetooth/msg73683.html
 
+Kai-Heng=
