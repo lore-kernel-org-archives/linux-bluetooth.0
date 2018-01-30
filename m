@@ -1,38 +1,80 @@
-Return-Path: <kai.heng.feng@canonical.com>
-From: Kai Heng Feng <kai.heng.feng@canonical.com>
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Paired bluetooth keyboards lead to system auto resume from S3 when
- WoL enabled for e1000e
-Message-Id: <E17B265A-7432-4BAB-8B92-3A7FB3B1B09F@canonical.com>
-Date: Tue, 30 Jan 2018 16:07:03 +0800
-Cc: Mathias Nyman <mathias.nyman@linux.intel.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- "Fujinaka, Todd" <todd.fujinaka@intel.com>,
- Ethan Hsieh <ethan.hsieh@canonical.com>
-To: Linux USB Mailing List <linux-usb@vger.kernel.org>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
- linux-nics@intel.com
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: "Gabriel A. Zorrilla" <gaz082@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: lescan stops after 10-15 minutes (bluez 5.48)
+Date: Tue, 30 Jan 2018 08:22:02 +0100
+Message-ID: <4613542.BahWgUgcc4@ix>
+In-Reply-To: <CAOwdT4m+qk-=w4qhXrP5R+MNAr1VsqgQ-mEKyiGdTXGLzMC5iA@mail.gmail.com>
+References: <CAOwdT4=_T4zXX-S0c5h+siL9Pa2DoNAAFB+fK4gTaPqKnP5N5w@mail.gmail.com> <5325267.NxmNQnImGX@ix> <CAOwdT4m+qk-=w4qhXrP5R+MNAr1VsqgQ-mEKyiGdTXGLzMC5iA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-This is actually a continuation of [1] with more findings.
-The machine in question is a CFL desktop. The auto resume roughly
-happens in 5 ~ 10 mins.
+On Monday, 29 January 2018 14:16:30 CET Gabriel A. Zorrilla wrote:
+> Hi Symon,
+> 
+> This started because some Node-Red detect BLE devices but after a few
+> minutes they stop getting input. Then started to diagnose BLE with
+> hcitools and the outcome was the same so started to believe a kernel
+> or controller issue.
+> 
+> If there is an example of how this API works i'll be charmed to test it.
 
-After further digging, I found out that the e1000e and XHCI always
-shares the same wakeup count in /sys/kernel/debug/wakeup_sources,
-so I did some experiment on e1000e.
+You can check test-discovery under test/ folder in bluez tree.
+(And please don't top-post:)
 
-Here=E2=80=99s the tricky finding, disable WoL for e1000e can stop the =
-erratic
-behaviour - the machine no longer auto resume. One caveat though -
-I can no longer wake up the system by pressing the BT keyboard.
+> On Mon, Jan 29, 2018 at 6:16 AM, Szymon Janc <szymon.janc@codecoup.pl> 
+wrote:
+> > Hi Gabriel,
+> > 
+> > On Sunday, 28 January 2018 20:22:47 CET Gabriel A. Zorrilla wrote:
+> >> Hello there. I'm really desperate here. I'm trying to work with BLE in
+> >> my Pi3. When i do:
+> >> 
+> >> sudo hcitools lescan (with or without -duplicates) the Pi scans
+> >> normally then stops after about 10-15 minutes.
+> >> 
+> >> Here I made some btmon dumps:
+> >> without duplicates: http://termbin.com/ox3z
+> >> with duplicates: http://termbin.com/6nnn
+> >> 
+> >> * Pi3
+> >> * Raspbian with 4.9.66-v7+ kernel.
+> >> * Embedded bluetooth.
+> >> * Compilled bluez 5.48
+> >> 
+> >> Don't know what extra info you would need to diagnose this. Perhaps
+> >> it's a common bug in the Pi3 Raspbian distro, but cant find
+> >> information about this on the web. Been googling for a week.
+> >> 
+> >> I really want to make this work, so dont hesitate in asking me some
+> >> tests and such.
+> >> 
+> >> Thanks and regards,
+> > 
+> > You don't want to mix using HCI directly and bluetoothd. Bluetoothd will
+> > interfere with you accessing controller and this is most likely what you
+> > are seeing.
+> > 
+> > Is there a reason for you to use hcitool lescan instead of D-Bus APIs?
+> > 
+> > --
+> > pozdrawiam
+> > Szymon Janc
+> > 
+> > 
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+> > in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-No idea where to file the bug so include all three subsystems.
 
-[1] https://www.spinics.net/lists/linux-bluetooth/msg73683.html
+-- 
+pozdrawiam
+Szymon Janc
 
-Kai-Heng=
+
