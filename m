@@ -1,59 +1,87 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <93990bf7-f452-b47f-70c1-9370f2b860cd@jp.fujitsu.com>
-References: <93990bf7-f452-b47f-70c1-9370f2b860cd@jp.fujitsu.com>
+In-Reply-To: <20180128135030.18468-1-luiz.dentz@gmail.com>
+References: <20180128135030.18468-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 31 Jan 2018 09:35:53 -0200
-Message-ID: <CABBYNZ+3YU-=zAujpmt=Ykq_7Hr5WxBn5Jkn3dLqEeV8QYK1kg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] tools/obexctl: Retrieve updated Size property once
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 31 Jan 2018 09:33:18 -0200
+Message-ID: <CABBYNZJCb6K4d13j+_5geWEy6iUPYVbuwEdeP1X5m=cxLCib7A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] gdbus: Fix replying to messages marked with
+ NOREPLY flag
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+Hi,
 
-On Fri, Jan 26, 2018 at 6:14 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Since obexd may have updated the Size property, obexctl retrieves it
-> once so that it can output more proper transfer information.
+On Sun, Jan 28, 2018 at 11:50 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> When a sender flags a D-Bus message as not expecting a reply, it is
+> against D-Bus policy to send a reply =E2=80=94 sending one can result in =
+an
+> error as reported in:
+>
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D198453
 > ---
->  tools/obexctl.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  gdbus/object.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
 >
-> diff --git a/tools/obexctl.c b/tools/obexctl.c
-> index 05bbd3e84..777221d2f 100644
-> --- a/tools/obexctl.c
-> +++ b/tools/obexctl.c
-> @@ -1888,6 +1888,13 @@ static void transfer_property_changed(GDBusProxy *proxy, const char *name,
->         str = proxy_description(proxy, "Transfer", COLORED_CHG);
+> diff --git a/gdbus/object.c b/gdbus/object.c
+> index 5c8ad7a55..e572c9f01 100644
+> --- a/gdbus/object.c
+> +++ b/gdbus/object.c
+> @@ -1421,6 +1421,10 @@ DBusMessage *g_dbus_create_error_valist(DBusMessag=
+e *message, const char *name,
+>  {
+>         char str[1024];
 >
->         if (strcmp(name, "Transferred") == 0) {
-> +               /*
-> +                * Since the Size property may have been updated at the start
-> +                * of the transfer, it is retrieved so that the transfer
-> +                * information can be output more proper.
-> +                */
-> +               if (data->transferred == 0)
-> +                       g_dbus_proxy_refresh_property(proxy, "Size");
-
-Usually we don't have to refresh property manually like this, so I
-wonder if there is something else going on, perhaps the daemon is not
-emitting PropertiesChanged when it should.
-
->                 print_transferred(data, str, iter);
->                 goto done;
->         }
+> +       /* Check if the message can be replied */
+> +       if (dbus_message_get_no_reply(message))
+> +               return NULL;
+> +
+>         if (format)
+>                 vsnprintf(str, sizeof(str), format, args);
+>         else
+> @@ -1449,6 +1453,10 @@ DBusMessage *g_dbus_create_reply_valist(DBusMessag=
+e *message,
+>  {
+>         DBusMessage *reply;
+>
+> +       /* Check if the message can be replied */
+> +       if (dbus_message_get_no_reply(message))
+> +               return NULL;
+> +
+>         reply =3D dbus_message_new_method_return(message);
+>         if (reply =3D=3D NULL)
+>                 return NULL;
+> @@ -1571,14 +1579,9 @@ gboolean g_dbus_send_reply_valist(DBusConnection *=
+connection,
+>  {
+>         DBusMessage *reply;
+>
+> -       reply =3D dbus_message_new_method_return(message);
+> -       if (reply =3D=3D NULL)
+> -               return FALSE;
+> -
+> -       if (dbus_message_append_args_valist(reply, type, args) =3D=3D FAL=
+SE) {
+> -               dbus_message_unref(reply);
+> +       reply =3D g_dbus_create_reply_valist(message, type, args);
+> +       if (!reply)
+>                 return FALSE;
+> -       }
+>
+>         return g_dbus_send_message(connection, reply);
+>  }
 > --
-> 2.14.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.14.3
+
+
+Pushed.
 
 
 
--- 
+--=20
 Luiz Augusto von Dentz
