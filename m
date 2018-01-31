@@ -1,87 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Thomas Green <TGreen2@sorenson.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: More keyboard issues
+Date: Wed, 31 Jan 2018 10:29:16 +0100
+Message-ID: <5252185.UFqE8F7bMa@ix>
+In-Reply-To: <C2BC44D770753C45AAAC42695FB5BE02012572F769@SLC-EXMB01.CORP.SRELAY.COM>
+References: <C2BC44D770753C45AAAC42695FB5BE02012572F769@SLC-EXMB01.CORP.SRELAY.COM>
 MIME-Version: 1.0
-In-Reply-To: <20180128135030.18468-1-luiz.dentz@gmail.com>
-References: <20180128135030.18468-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 31 Jan 2018 09:33:18 -0200
-Message-ID: <CABBYNZJCb6K4d13j+_5geWEy6iUPYVbuwEdeP1X5m=cxLCib7A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] gdbus: Fix replying to messages marked with
- NOREPLY flag
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Sun, Jan 28, 2018 at 11:50 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> When a sender flags a D-Bus message as not expecting a reply, it is
-> against D-Bus policy to send a reply =E2=80=94 sending one can result in =
-an
-> error as reported in:
->
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D198453
-> ---
->  gdbus/object.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
->
-> diff --git a/gdbus/object.c b/gdbus/object.c
-> index 5c8ad7a55..e572c9f01 100644
-> --- a/gdbus/object.c
-> +++ b/gdbus/object.c
-> @@ -1421,6 +1421,10 @@ DBusMessage *g_dbus_create_error_valist(DBusMessag=
-e *message, const char *name,
->  {
->         char str[1024];
->
-> +       /* Check if the message can be replied */
-> +       if (dbus_message_get_no_reply(message))
-> +               return NULL;
-> +
->         if (format)
->                 vsnprintf(str, sizeof(str), format, args);
->         else
-> @@ -1449,6 +1453,10 @@ DBusMessage *g_dbus_create_reply_valist(DBusMessag=
-e *message,
->  {
->         DBusMessage *reply;
->
-> +       /* Check if the message can be replied */
-> +       if (dbus_message_get_no_reply(message))
-> +               return NULL;
-> +
->         reply =3D dbus_message_new_method_return(message);
->         if (reply =3D=3D NULL)
->                 return NULL;
-> @@ -1571,14 +1579,9 @@ gboolean g_dbus_send_reply_valist(DBusConnection *=
-connection,
->  {
->         DBusMessage *reply;
->
-> -       reply =3D dbus_message_new_method_return(message);
-> -       if (reply =3D=3D NULL)
-> -               return FALSE;
-> -
-> -       if (dbus_message_append_args_valist(reply, type, args) =3D=3D FAL=
-SE) {
-> -               dbus_message_unref(reply);
-> +       reply =3D g_dbus_create_reply_valist(message, type, args);
-> +       if (!reply)
->                 return FALSE;
-> -       }
->
->         return g_dbus_send_message(connection, reply);
->  }
-> --
-> 2.14.3
+On Saturday, 27 January 2018 01:20:21 CET Thomas Green wrote:
+> Hi all,
+> 
+> I'm testing more keyboards with 5.48 and have found issues with two other
+> keyboards.  In this case the problem is during pairing.  The two keyboards
+> in question are the SIIG AAZ2448 and the ANKER A7221.   The current issue
+> is that during pairing of these two keyboards we are given a PIN code
+> display, so I enter it on the keyboard and nothing happens, and eventually
+> the pairing times out.
+> 
+> [bluetooth]# pair 20:73:03:A4:18:4D
+> Attempting to pair with 20:73:03:A4:18:4D
+> [CHG] Device 20:73:03:A4:18:4D Connected: yes
+> [agent] PIN code: 851841
+> [Anker A7721]#
+> [  282.174342] WARNING: at net/bluetooth/hci_conn.c:322
+> hci_conn_timeout+0x44/0x198() Failed to pair:
+> org.bluez.Error.AuthenticationTimeout
+> [Anker A7721]#
+> 
+> This happens about 95% of the time.  The other 5% the pairing completes and
+> everything works fine.
+> 
+> I could attach btmon output and output from running bluetoothd -d -n, but
+> nothing interesting happens from the time the pincode is displayed and the
+> timeout occurs.
+> 
+> Where do I begin to look for why the pincode isn't being transmitted back
+> from the keyboards?  Why is it inconsistent?
+> 
+> As an interesting side note the Apple keyboard that I'm having the driver
+> loading trouble uses the same pairing mechanism and it works well every
+> time. (and all of these keyboards worked fine in 4.101)
+
+Get full btmon logs first, ideally from the moment you power on BT adapter.
+
+-- 
+pozdrawiam
+Szymon Janc
 
 
-Pushed.
-
-
-
---=20
-Luiz Augusto von Dentz
