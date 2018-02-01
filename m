@@ -2,62 +2,58 @@ Return-Path: <kvalo@codeaurora.org>
 From: Kalle Valo <kvalo@codeaurora.org>
 To: Amitkumar Karwar <amitkarwar@gmail.com>
 Cc: marcel@holtmann.org,  linux-wireless@vger.kernel.org,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  linux-bluetooth@vger.kernel.org,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Subject: Re: [v5 6/8] rsi: handle BT traffic in driver
+Subject: Re: [v5 4/8] rsi: add coex support
 References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
-	<1513168977-2121-7-git-send-email-amitkarwar@gmail.com>
-Date: Thu, 01 Feb 2018 09:10:31 +0200
-In-Reply-To: <1513168977-2121-7-git-send-email-amitkarwar@gmail.com>
-	(Amitkumar Karwar's message of "Wed, 13 Dec 2017 18:12:55 +0530")
-Message-ID: <87efm5mbh4.fsf@purkki.adurom.net>
+	<1513168977-2121-5-git-send-email-amitkarwar@gmail.com>
+Date: Thu, 01 Feb 2018 09:08:00 +0200
+In-Reply-To: <1513168977-2121-5-git-send-email-amitkarwar@gmail.com>
+	(Amitkumar Karwar's message of "Wed, 13 Dec 2017 18:12:53 +0530")
+Message-ID: <87inbhmblb.fsf@purkki.adurom.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Amitkumar Karwar <amitkarwar@gmail.com> writes:
 
-> From: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
 >
-> BT frames are passed through coex and hal modules to BUS.
-> After firmware is loaded, based on the operating mode CARD
-> READY frame comes for each protocol. When BT card ready is
-> received, BT attach is called.
-> Protocol operations are exchanged between the modules
-> at initialization time.
+> With BT support, driver has to handle two streams of data
+> (i.e. wlan and BT). Actual coex implementation is in firmware.
+> Coex module just schedule the packets to firmware by taking them
+> from the corresponding paths.
 >
-> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+> Structures for module and protocol operations are introduced for
+> this purpose. Protocol operations structure is global structure
+> which can be shared among different modules. Initialization of
+> coex and operating mode values is moved to rsi_91x_init().
+>
 > Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
 > Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
-> ---
-> v5: Same as v3, v4
-> v3: bt_ops need not be present structure g_proto_ops. It is removed.
-> v2: WLAN module depends on BT module. Updated in Kconfig
-> ---
->  drivers/net/wireless/rsi/Kconfig            |  2 +-
->  drivers/net/wireless/rsi/rsi_91x_coex.c     |  4 ++-
->  drivers/net/wireless/rsi/rsi_91x_core.c     | 16 ++++++++----
->  drivers/net/wireless/rsi/rsi_91x_hal.c      | 39 +++++++++++++++++++++++++++++
->  drivers/net/wireless/rsi/rsi_91x_main.c     | 31 +++++++++++++++++++++++
->  drivers/net/wireless/rsi/rsi_91x_sdio_ops.c |  1 +
->  drivers/net/wireless/rsi/rsi_common.h       |  1 +
->  drivers/net/wireless/rsi/rsi_hal.h          | 10 ++++++++
->  drivers/net/wireless/rsi/rsi_main.h         |  3 +++
->  9 files changed, 100 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/net/wireless/rsi/Kconfig b/drivers/net/wireless/rsi/Kconfig
-> index 7c5e4ca..ad72c80 100644
-> --- a/drivers/net/wireless/rsi/Kconfig
-> +++ b/drivers/net/wireless/rsi/Kconfig
-> @@ -13,7 +13,7 @@ if WLAN_VENDOR_RSI
->  
->  config RSI_91X
->  	tristate "Redpine Signals Inc 91x WLAN driver support"
-> -	depends on MAC80211
-> +	depends on MAC80211 && BT_RSI
 
-I think this is evil, now the wlan driver cannot be enabled unless the
-bluetooth driver is enabled. And if I'm understanding correctly it won't
-even show up in the menuconfig. A much nicer approach would be that
-btcoex is just disabled in the wlan driver if BT_RSI is disabled.
+[...]
+
+> +static void rsi_coex_sched_tx_pkts(struct rsi_coex_ctrl_block *coex_cb)
+> +{
+> +	enum rsi_coex_queues coex_q;
+> +	struct sk_buff *skb;
+> +
+> +	while (1) {
+> +		coex_q = rsi_coex_determine_coex_q(coex_cb);
+> +		rsi_dbg(INFO_ZONE, "queue = %d\n", coex_q);
+> +
+> +		if (coex_q == RSI_COEX_Q_INVALID) {
+> +			rsi_dbg(DATA_TX_ZONE, "No more pkt\n");
+> +			break;
+> +		}
+> +
+> +		if (coex_q == RSI_COEX_Q_BT)
+> +			skb = skb_dequeue(&coex_cb->coex_tx_qs[RSI_COEX_Q_BT]);
+> +	}
+> +}
+
+Neverending loops are dangerous in kernel. Can you put a limit so that
+if there's a bug the loop will not run forever?
 
 -- 
 Kalle Valo
