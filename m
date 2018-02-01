@@ -1,35 +1,49 @@
-Return-Path: <kvalo@codeaurora.org>
-From: Kalle Valo <kvalo@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Amitkumar Karwar <amitkarwar@gmail.com>,  linux-wireless@vger.kernel.org,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  linux-bluetooth@vger.kernel.org,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Subject: Re: [v5 5/8] Bluetooth: btrsi: add new rsi bluetooth driver
+Return-Path: <linux-wireless-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [v5 7/8] rsi: add module parameter operating mode
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <87a7wtmbf0.fsf@purkki.adurom.net>
+Date: Thu, 1 Feb 2018 09:20:39 +0100
+Cc: Amitkumar Karwar <amitkarwar@gmail.com>,
+        linux-wireless@vger.kernel.org,
+        Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+        Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+Message-Id: <6E3DC959-D3C0-4638-A94B-5F800A3A89DC@holtmann.org>
 References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
-	<1513168977-2121-6-git-send-email-amitkarwar@gmail.com>
-	<117694D2-5C98-4C40-BF02-FC1EDBF41FE8@holtmann.org>
-	<87mv0tmc0e.fsf@purkki.adurom.net>
-	<9578979D-0F76-4178-B14D-3C5699039DEB@holtmann.org>
-Date: Thu, 01 Feb 2018 10:34:50 +0200
-In-Reply-To: <9578979D-0F76-4178-B14D-3C5699039DEB@holtmann.org> (Marcel
-	Holtmann's message of "Thu, 1 Feb 2018 09:16:14 +0100")
-Message-ID: <87inbhm7kl.fsf@kamboji.qca.qualcomm.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+ <1513168977-2121-8-git-send-email-amitkarwar@gmail.com>
+ <87a7wtmbf0.fsf@purkki.adurom.net>
+To: Kalle Valo <kvalo@codeaurora.org>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Marcel Holtmann <marcel@holtmann.org> writes:
+Hi Kalle,
 
->>> Acked-by: Marcel Holtmann <marcel@holtmann.org>
->>> Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
+>> Operating mode determines the support for other protocols.
+>> This is made as module parameter for better usage.
 >> 
->> So how should we handle the logistics, should all these go via
->> wireless-drivers-next tree or what's the plan?
->
-> I think they should go via wireless-drivers-next and once you send
-> Dave a pull request, I pull back from net-next into bluetooth-next and
-> we should be good. Any required fixup for Bluetooth we will do then
-> via my tree.
+>> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+>> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+> 
+> [...]
+> 
+>> +/* Default operating mode is wlan STA + BT */
+>> +static u16 dev_oper_mode = DEV_OPMODE_STA_BT_DUAL;
+>> +module_param(dev_oper_mode, ushort, 0444);
+>> +MODULE_PARM_DESC(dev_oper_mode,
+>> +		 "1[Wi-Fi], 4[BT], 8[BT LE], 5[Wi-Fi STA + BT classic]\n"
+>> +		 "9[Wi-Fi STA + BT LE], 13[Wi-Fi STA + BT classic + BT LE]\n"
+>> +		 "6[AP + BT classic], 14[AP + BT classic + BT LE]");
+> 
+> I really wish that we have nl80211 interface for configuring btcoex. We
+> have been talking about that for years but nobody has implemented it :(
 
-Ok, that sounds good to me.
+the Bluetooth subsystem and Wireless subsystem can handle that perfectly between themselves. Involving userspace is utterly pointless. First step should be that the Wireless subsystem has an option to inform its actively used frequencies to the Bluetooth subsystem. It then could adjust AFP channel mapping.
 
--- 
-Kalle Valo
+Regards
+
+Marcel
