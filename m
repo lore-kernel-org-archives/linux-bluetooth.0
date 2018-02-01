@@ -1,54 +1,41 @@
-Return-Path: <linux-wireless-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [v5 5/8] Bluetooth: btrsi: add new rsi bluetooth driver
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <87mv0tmc0e.fsf@purkki.adurom.net>
-Date: Thu, 1 Feb 2018 09:16:14 +0100
-Cc: Amitkumar Karwar <amitkarwar@gmail.com>,
-        linux-wireless@vger.kernel.org,
-        Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-        Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Message-Id: <9578979D-0F76-4178-B14D-3C5699039DEB@holtmann.org>
+Return-Path: <kvalo@codeaurora.org>
+From: Kalle Valo <kvalo@codeaurora.org>
+To: Amitkumar Karwar <amitkarwar@gmail.com>
+Cc: marcel@holtmann.org,  linux-wireless@vger.kernel.org,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  linux-bluetooth@vger.kernel.org,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+Subject: Re: [v5 7/8] rsi: add module parameter operating mode
 References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
- <1513168977-2121-6-git-send-email-amitkarwar@gmail.com>
- <117694D2-5C98-4C40-BF02-FC1EDBF41FE8@holtmann.org>
- <87mv0tmc0e.fsf@purkki.adurom.net>
-To: Kalle Valo <kvalo@codeaurora.org>
-Sender: linux-wireless-owner@vger.kernel.org
+	<1513168977-2121-8-git-send-email-amitkarwar@gmail.com>
+Date: Thu, 01 Feb 2018 09:11:47 +0200
+In-Reply-To: <1513168977-2121-8-git-send-email-amitkarwar@gmail.com>
+	(Amitkumar Karwar's message of "Wed, 13 Dec 2017 18:12:56 +0530")
+Message-ID: <87a7wtmbf0.fsf@purkki.adurom.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kalle,
+Amitkumar Karwar <amitkarwar@gmail.com> writes:
 
->>> Redpine bluetooth driver is a thin driver which depends on
->>> 'rsi_91x' driver for transmitting and receiving packets
->>> to/from device. It creates hci interface when attach() is
->>> called from 'rsi_91x' module.
->>> 
->>> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
->>> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
->>> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
-> 
-> [...]
-> 
->>> +module_init(rsi_91x_bt_module_init);
->>> +module_exit(rsi_91x_bt_module_exit);
->>> +MODULE_AUTHOR("Redpine Signals Inc");
->>> +MODULE_DESCRIPTION("RSI BT driver");
->>> +MODULE_SUPPORTED_DEVICE("RSI-BT");
->>> +MODULE_LICENSE("Dual BSD/GPL”);
->> 
->> Acked-by: Marcel Holtmann <marcel@holtmann.org>
->> Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
-> 
-> So how should we handle the logistics, should all these go via
-> wireless-drivers-next tree or what's the plan?
+> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>
+> Operating mode determines the support for other protocols.
+> This is made as module parameter for better usage.
+>
+> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
 
-I think they should go via wireless-drivers-next and once you send Dave a pull request, I pull back from net-next into bluetooth-next and we should be good. Any required fixup for Bluetooth we will do then via my tree.
+[...]
 
-Regards
+> +/* Default operating mode is wlan STA + BT */
+> +static u16 dev_oper_mode = DEV_OPMODE_STA_BT_DUAL;
+> +module_param(dev_oper_mode, ushort, 0444);
+> +MODULE_PARM_DESC(dev_oper_mode,
+> +		 "1[Wi-Fi], 4[BT], 8[BT LE], 5[Wi-Fi STA + BT classic]\n"
+> +		 "9[Wi-Fi STA + BT LE], 13[Wi-Fi STA + BT classic + BT LE]\n"
+> +		 "6[AP + BT classic], 14[AP + BT classic + BT LE]");
 
-Marcel
+I really wish that we have nl80211 interface for configuring btcoex. We
+have been talking about that for years but nobody has implemented it :(
+
+-- 
+Kalle Valo
