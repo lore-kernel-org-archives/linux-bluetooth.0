@@ -1,49 +1,47 @@
-Return-Path: <kvalo@codeaurora.org>
-From: Kalle Valo <kvalo@codeaurora.org>
-To: Amitkumar Karwar <amitkarwar@gmail.com>
-Cc: marcel@holtmann.org,  linux-wireless@vger.kernel.org,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  linux-bluetooth@vger.kernel.org,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Subject: Re: [v5 4/8] rsi: add coex support
-References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
-	<1513168977-2121-5-git-send-email-amitkarwar@gmail.com>
-Date: Thu, 01 Feb 2018 08:56:14 +0200
-In-Reply-To: <1513168977-2121-5-git-send-email-amitkarwar@gmail.com>
-	(Amitkumar Karwar's message of "Wed, 13 Dec 2017 18:12:53 +0530")
-Message-ID: <87r2q5mc4x.fsf@purkki.adurom.net>
+Return-Path: <gregkh@linuxfoundation.org>
+Date: Thu, 1 Feb 2018 07:42:30 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: John Stultz <john.stultz@linaro.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Rob Herring <rob.herring@linaro.org>,
+	Johan Hovold <johan@kernel.org>,
+	Ronald Tschalaer <ronald@innovation.ch>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Backport d73e17281665 to v4.15 stable
+Message-ID: <20180201064230.GA15417@kroah.com>
+References: <CALAqxLVTff-XX7bbQ8a1Pihqe=QW1HDMKST3F3okCV8jY+wGqw@mail.gmail.com>
+ <CALAqxLW9gzcBrwy3TWB5x_OpKtcLTe7P8PX4KeUgvibbAaMX_A@mail.gmail.com>
+ <20171116213045.GA17506@wunner.de>
+ <20171116214504.GB17506@wunner.de>
+ <CALAqxLX-qp=rc8P7ynGrUwWHgP2EBAwoEES-aOOuehtnJSDR+A@mail.gmail.com>
+ <f181189de5fd4c75da4708425df99e70abc6a127.1510875912.git.lukas@wunner.de>
+ <25BE9D66-9609-42D0-8A83-E15758FA3A1B@holtmann.org>
+ <CALAqxLXeN3fF_ZUVeKLEYnDy25bd0+D7DgK3eLA3rVv3dEv6qQ@mail.gmail.com>
+ <CALAqxLWbh=pmbZEfa03LvOTxBD7bnPVNdHs-os5xZjvhkSWT2Q@mail.gmail.com>
+ <20180201055052.GA19082@wunner.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180201055052.GA19082@wunner.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Amitkumar Karwar <amitkarwar@gmail.com> writes:
+On Thu, Feb 01, 2018 at 06:50:52AM +0100, Lukas Wunner wrote:
+> Dear Greg,
+> 
+> when you refill the patch queue for v4.15 stable one of these days,
+> please consider adding
+> 
+>     commit d73e172816652772114827abaa2dbc053eecbbd7
+>     Author: Lukas Wunner <lukas@wunner.de>
+>     Date:   Fri Nov 17 00:54:53 2017 +0100
+>     
+>     Bluetooth: hci_serdev: Init hci_uart proto_lock to avoid oops
+> 
+> to fix a boot crash on certain machines with UART-attached Bluetooth
+> which was kindly reported by John Stultz.  The patch unfortunately
+> lacked a Fixes: or Cc: stable tag.  It landed in Linus' tree 7 hours ago.
 
-> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
->
-> With BT support, driver has to handle two streams of data
-> (i.e. wlan and BT). Actual coex implementation is in firmware.
-> Coex module just schedule the packets to firmware by taking them
-> from the corresponding paths.
->
-> Structures for module and protocol operations are introduced for
-> this purpose. Protocol operations structure is global structure
-> which can be shared among different modules. Initialization of
-> coex and operating mode values is moved to rsi_91x_init().
->
-> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
-> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+Now queued up, thanks.
 
-[...]
-
-> @@ -270,6 +271,7 @@ struct rsi_common {
->  	u8 obm_ant_sel_val;
->  	int tx_power;
->  	u8 ant_in_use;
-> +	struct semaphore tx_bus_lock;
-
-Do you really need to use semaphore? I think nowadays the preference is
-to use something other than semaphores.
-
-Also calling it tx_bus_lock is IMHO misleading, tx_bus_sema would be
-nicer.
-
--- 
-Kalle Valo
+greg k-h
