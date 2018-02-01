@@ -1,69 +1,51 @@
-Return-Path: <mirza.krak@gmail.com>
+Return-Path: <kvalo@codeaurora.org>
+From: Kalle Valo <kvalo@codeaurora.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Amitkumar Karwar <amitkarwar@gmail.com>,  linux-wireless@vger.kernel.org,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  linux-bluetooth@vger.kernel.org,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+Subject: Re: [v5 7/8] rsi: add module parameter operating mode
+References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
+	<1513168977-2121-8-git-send-email-amitkarwar@gmail.com>
+	<87a7wtmbf0.fsf@purkki.adurom.net>
+	<6E3DC959-D3C0-4638-A94B-5F800A3A89DC@holtmann.org>
+Date: Thu, 01 Feb 2018 10:36:15 +0200
+In-Reply-To: <6E3DC959-D3C0-4638-A94B-5F800A3A89DC@holtmann.org> (Marcel
+	Holtmann's message of "Thu, 1 Feb 2018 09:20:39 +0100")
+Message-ID: <87efm5m7i8.fsf@kamboji.qca.qualcomm.com>
 MIME-Version: 1.0
-From: Mirza Krak <mirza.krak@gmail.com>
-Date: Thu, 1 Feb 2018 10:58:28 +0100
-Message-ID: <CALw8SCWyD8-AVtqKvPZeNQuyLfvvdLe7ZtRWuh9KH09WNDDHuA@mail.gmail.com>
-Subject: High CPU load when using USB Bluetooth on 4.14.15-rt13 kernel
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, linux-rt-users@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi.
+Marcel Holtmann <marcel@holtmann.org> writes:
 
-As I mentioned in the subject I am running a 4.14.15-rt13 kernel. The
-hardware is a RK3288 SoC and this combination is producing a heavy CPU
-load when an USB Bluetooth controller is simply powered on without the
-need of connecting to any device.
+> Hi Kalle,
+>
+>>> Operating mode determines the support for other protocols.
+>>> This is made as module parameter for better usage.
+>>> 
+>>> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>>> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+>>> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+>> 
+>> [...]
+>> 
+>>> +/* Default operating mode is wlan STA + BT */
+>>> +static u16 dev_oper_mode = DEV_OPMODE_STA_BT_DUAL;
+>>> +module_param(dev_oper_mode, ushort, 0444);
+>>> +MODULE_PARM_DESC(dev_oper_mode,
+>>> +		 "1[Wi-Fi], 4[BT], 8[BT LE], 5[Wi-Fi STA + BT classic]\n"
+>>> +		 "9[Wi-Fi STA + BT LE], 13[Wi-Fi STA + BT classic + BT LE]\n"
+>>> +		 "6[AP + BT classic], 14[AP + BT classic + BT LE]");
+>> 
+>> I really wish that we have nl80211 interface for configuring btcoex. We
+>> have been talking about that for years but nobody has implemented it :(
+>
+> the Bluetooth subsystem and Wireless subsystem can handle that
+> perfectly between themselves. Involving userspace is utterly
+> pointless. First step should be that the Wireless subsystem has an
+> option to inform its actively used frequencies to the Bluetooth
+> subsystem. It then could adjust AFP channel mapping.
 
-I am running bluez5 (5.46).
+Yeah, that would be much better.
 
-This is what it looks like:
-
-    92     2 root     RW       0   0%  20% [irq/45-dwc2_hso]
-    91     2 root     RW       0   0%  11% [irq/45-ff540000]
-
-Above is the USB interrupts of the controller where the USB bluetooth
-device is connected and it is simply power on without doing anything.
-
-Turning the controller off:
-
-    [bluetooth]# power off
-    Changing power off succeeded
-    [CHG] Controller 00:15:83:EA:73:23 Powered: no
-    [CHG] Controller 00:15:83:EA:73:23 Discovering: no
-    [CHG] Controller 00:15:83:EA:73:23 Class: 0x000000
-
-And the CPU load is down to minimal:
-
-   92     2 root     SW       0   0%   2% [irq/45-dwc2_hso]
-   91     2 root     SW       0   0%   2% [irq/45-ff540000]
-
-I have tried two different USB Bluetooth devices:
-
-    Bus 001 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-Bluetooth Dongle (HCI mode)
-
-    Bus 001 Device 005: ID 0a5c:4500 Broadcom Corp. BCM2046B1 USB 2.0
-Hub (part of BCM2046 Bluetooth)
-
-With the same result. I have also tried running a WLAN USB device and
-this does not produce any high CPU load. So fairly isolated to USB
-Bluetooth.
-
-I have tried running a 4.14.15 vanilla kernel, and this does not have
-this problem which means that it is the following combo
-
-    RT + USB Bluetooth
-
-That seem to the problem.
-
-Before I start digging deep in to the stacks I wanted to post my
-problem to the community to see if someone is having a similar problem
-on a different hardware or if you have any pointers on how to further
-debug this.
-
---=20
-Med V=C3=A4nliga H=C3=A4lsningar / Best Regards
-
-Mirza Krak
+-- 
+Kalle Valo
