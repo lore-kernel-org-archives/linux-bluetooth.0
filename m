@@ -1,48 +1,45 @@
-Return-Path: <kvalo@codeaurora.org>
-From: Kalle Valo <kvalo@codeaurora.org>
-To: Amitkumar Karwar <amitkarwar@gmail.com>
-Cc: marcel@holtmann.org,  linux-wireless@vger.kernel.org,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  linux-bluetooth@vger.kernel.org,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Subject: Re: [v5 1/8] rsi: add rx control block to handle rx packets in USB
-References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
-	<1513168977-2121-2-git-send-email-amitkarwar@gmail.com>
-Date: Thu, 01 Feb 2018 08:30:09 +0200
-In-Reply-To: <1513168977-2121-2-git-send-email-amitkarwar@gmail.com>
-	(Amitkumar Karwar's message of "Wed, 13 Dec 2017 18:12:50 +0530")
-Message-ID: <87372lnrwu.fsf@purkki.adurom.net>
+Return-Path: <foo00@h08.hostsharing.net>
+Date: Thu, 1 Feb 2018 06:50:52 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: John Stultz <john.stultz@linaro.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Rob Herring <rob.herring@linaro.org>,
+	Johan Hovold <johan@kernel.org>,
+	Ronald Tschalaer <ronald@innovation.ch>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Backport d73e17281665 to v4.15 stable
+Message-ID: <20180201055052.GA19082@wunner.de>
+References: <CALAqxLVTff-XX7bbQ8a1Pihqe=QW1HDMKST3F3okCV8jY+wGqw@mail.gmail.com>
+ <CALAqxLW9gzcBrwy3TWB5x_OpKtcLTe7P8PX4KeUgvibbAaMX_A@mail.gmail.com>
+ <20171116213045.GA17506@wunner.de>
+ <20171116214504.GB17506@wunner.de>
+ <CALAqxLX-qp=rc8P7ynGrUwWHgP2EBAwoEES-aOOuehtnJSDR+A@mail.gmail.com>
+ <f181189de5fd4c75da4708425df99e70abc6a127.1510875912.git.lukas@wunner.de>
+ <25BE9D66-9609-42D0-8A83-E15758FA3A1B@holtmann.org>
+ <CALAqxLXeN3fF_ZUVeKLEYnDy25bd0+D7DgK3eLA3rVv3dEv6qQ@mail.gmail.com>
+ <CALAqxLWbh=pmbZEfa03LvOTxBD7bnPVNdHs-os5xZjvhkSWT2Q@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CALAqxLWbh=pmbZEfa03LvOTxBD7bnPVNdHs-os5xZjvhkSWT2Q@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Amitkumar Karwar <amitkarwar@gmail.com> writes:
+Dear Greg,
 
-> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
->
-> Rx bluetooth endpoint shall be added in further patches. Rx control
-> block is introduced here to handle Rx packets properly. Separate
-> function is written to initialize the RX control blocks.
->
-> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
-> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+when you refill the patch queue for v4.15 stable one of these days,
+please consider adding
 
-[...]
+    commit d73e172816652772114827abaa2dbc053eecbbd7
+    Author: Lukas Wunner <lukas@wunner.de>
+    Date:   Fri Nov 17 00:54:53 2017 +0100
+    
+    Bluetooth: hci_serdev: Init hci_uart proto_lock to avoid oops
 
-> +static int rsi_usb_init_rx(struct rsi_hw *adapter)
-> +{
-> +	struct rsi_91x_usbdev *dev = (struct rsi_91x_usbdev *)adapter->rsi_dev;
-> +	struct rx_usb_ctrl_block *rx_cb;
-> +	u8 idx;
-> +
-> +	for (idx = 0; idx < MAX_RX_URBS; idx++) {
-> +		rx_cb = &dev->rx_cb[idx];
-> +
-> +		rx_cb->rx_buffer = kzalloc(RSI_USB_BUF_SIZE * 2,
-> +					   GFP_KERNEL | GFP_DMA);
+to fix a boot crash on certain machines with UART-attached Bluetooth
+which was kindly reported by John Stultz.  The patch unfortunately
+lacked a Fixes: or Cc: stable tag.  It landed in Linus' tree 7 hours ago.
 
-Do you really need GFP_DMA? From the documentation:
+Thanks!
 
- "GFP_DMA exists for historical reasons and should be avoided where
-  possible."
-
--- 
-Kalle Valo
+Lukas
