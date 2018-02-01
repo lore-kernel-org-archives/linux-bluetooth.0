@@ -1,29 +1,69 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <mirza.krak@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1517301601-7159-3-git-send-email-amit.k.bag@intel.com>
-References: <1517301601-7159-1-git-send-email-amit.k.bag@intel.com> <1517301601-7159-3-git-send-email-amit.k.bag@intel.com>
-From: Josh Boyer <jwboyer@kernel.org>
-Date: Thu, 1 Feb 2018 08:26:25 -0500
-Message-ID: <CA+5PVA7+9MgzjzaQgrqf+j+PAYkeoE_eL-aMeQyX0O3PtH3rpg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] linux-firmware: Add firmware file for Intel Bluetooth,9560
-To: Amit K Bag <amit.k.bag@intel.com>
-Cc: Linux Firmware <linux-firmware@kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        amit.k.bag@linux.intel.com
+From: Mirza Krak <mirza.krak@gmail.com>
+Date: Thu, 1 Feb 2018 10:58:28 +0100
+Message-ID: <CALw8SCWyD8-AVtqKvPZeNQuyLfvvdLe7ZtRWuh9KH09WNDDHuA@mail.gmail.com>
+Subject: High CPU load when using USB Bluetooth on 4.14.15-rt13 kernel
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, linux-rt-users@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Amit K. Bag wrote:
-> This patch updates the firmware file for Intel Bluetooth 9560
-> Also it is known as Intel JeffersonPeak (JfP).
->
-> FW Build: REL0201
->
-> Release Version: 20.30.0.1
->
-> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+Hi.
 
-Applied all three and pushed out.
+As I mentioned in the subject I am running a 4.14.15-rt13 kernel. The
+hardware is a RK3288 SoC and this combination is producing a heavy CPU
+load when an USB Bluetooth controller is simply powered on without the
+need of connecting to any device.
 
-josh
+I am running bluez5 (5.46).
+
+This is what it looks like:
+
+    92     2 root     RW       0   0%  20% [irq/45-dwc2_hso]
+    91     2 root     RW       0   0%  11% [irq/45-ff540000]
+
+Above is the USB interrupts of the controller where the USB bluetooth
+device is connected and it is simply power on without doing anything.
+
+Turning the controller off:
+
+    [bluetooth]# power off
+    Changing power off succeeded
+    [CHG] Controller 00:15:83:EA:73:23 Powered: no
+    [CHG] Controller 00:15:83:EA:73:23 Discovering: no
+    [CHG] Controller 00:15:83:EA:73:23 Class: 0x000000
+
+And the CPU load is down to minimal:
+
+   92     2 root     SW       0   0%   2% [irq/45-dwc2_hso]
+   91     2 root     SW       0   0%   2% [irq/45-ff540000]
+
+I have tried two different USB Bluetooth devices:
+
+    Bus 001 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd
+Bluetooth Dongle (HCI mode)
+
+    Bus 001 Device 005: ID 0a5c:4500 Broadcom Corp. BCM2046B1 USB 2.0
+Hub (part of BCM2046 Bluetooth)
+
+With the same result. I have also tried running a WLAN USB device and
+this does not produce any high CPU load. So fairly isolated to USB
+Bluetooth.
+
+I have tried running a 4.14.15 vanilla kernel, and this does not have
+this problem which means that it is the following combo
+
+    RT + USB Bluetooth
+
+That seem to the problem.
+
+Before I start digging deep in to the stacks I wanted to post my
+problem to the community to see if someone is having a similar problem
+on a different hardware or if you have any pointers on how to further
+debug this.
+
+--=20
+Med V=C3=A4nliga H=C3=A4lsningar / Best Regards
+
+Mirza Krak
