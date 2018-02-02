@@ -1,58 +1,98 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Amit K Bag <amit.k.bag@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: tedd.an@intel.com, jaya.p.g@intel.com,
-        ravishankar.srivatsa@intel.com, Amit K Bag <amit.k.bag@intel.com>
-Subject: [PATCH] Bluetooth: btusb: Add support for Intel Bluetooth device 22560 [8087:0026]
-Date: Fri,  2 Feb 2018 17:11:36 +0530
-Message-Id: <1517571696-32239-1-git-send-email-amit.k.bag@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <frederic.danis.oss@gmail.com>
+Subject: Re: [v3,2/2] ACPI / scan: Fix enumeration for special UART devices
+To: Graeme Gregory <graeme.gregory@linaro.org>
+Cc: robh@kernel.org, marcel@holtmann.org, sre@kernel.org,
+ loic.poulain@gmail.com, johan@kernel.org, lukas@wunner.de,
+ hdegoede@redhat.com, rafael@kernel.org, greg@kroah.com,
+ linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-acpi@vger.kernel.org
+References: <1507710734-32520-3-git-send-email-frederic.danis.oss@gmail.com>
+ <20180131142100.GE26342@xora-haswell>
+From: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
+Message-ID: <4eb3d357-bf54-2360-f547-d0c6fbbc8396@gmail.com>
+Date: Fri, 2 Feb 2018 11:03:38 +0100
+MIME-Version: 1.0
+In-Reply-To: <20180131142100.GE26342@xora-haswell>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
----
- drivers/bluetooth/btusb.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Hi Graeme,
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 2a55380ad730..37082a833ca6 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -339,6 +339,7 @@ static const struct usb_device_id blacklist_table[] = {
- 
- 	/* Intel Bluetooth devices */
- 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW },
-+	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW },
- 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
- 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
- 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
-@@ -2057,6 +2058,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	case 0x0c:	/* WsP */
- 	case 0x11:	/* JfP */
- 	case 0x12:	/* ThP */
-+	case 0x13:	/* Quasar */
-+	case 0x14:	/* Quasar */
- 		break;
- 	default:
- 		BT_ERR("%s: Unsupported Intel hardware variant (%u)",
-@@ -2149,6 +2152,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 		break;
- 	case 0x11:	/* JfP */
- 	case 0x12:	/* ThP */
-+	case 0x13:      /* Quasar */
-+	case 0x14:      /* Quasar */
- 		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.sfi",
- 			 le16_to_cpu(ver.hw_variant),
- 			 le16_to_cpu(ver.hw_revision),
-@@ -2180,6 +2185,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 		break;
- 	case 0x11:	/* JfP */
- 	case 0x12:	/* ThP */
-+	case 0x13:      /* Quasar */
-+	case 0x14:      /* Quasar */
- 		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.ddc",
- 			 le16_to_cpu(ver.hw_variant),
- 			 le16_to_cpu(ver.hw_revision),
+Le 31/01/2018 à 15:21, Graeme Gregory a écrit :
+> On Wed, Oct 11, 2017 at 10:32:14AM +0200, Frédéric Danis wrote:
+>> UART devices is expected to be enumerated by SerDev subsystem.
+>>
+>> During ACPI scan, serial devices behind SPI, I2C or UART buses are not
+>> enumerated, allowing them to be enumerated by their respective parents.
+>>
+>> Rename *spi_i2c_slave* to *serial_bus_slave* as this will be used for serial
+>> devices on serial buses (SPI, I2C or UART).
+>>
+>> On Macs an empty ResourceTemplate is returned for uart slaves.
+>> Instead the device properties "baud", "parity", "dataBits", "stopBits" are
+>> provided. Add a check for "baud" in acpi_is_serial_bus_slave().
+>>
+> This patch appears to break UART probing in ACPI on xgene based
+> plaforms.
+>
+> The appropriate chunks of DSDT.
+>
+>      Device (_SB.AHBC)
+>      {
+>          OperationRegion (SRST, SystemMemory, 0x1F2AC000, 0x04)
+>          OperationRegion (CLKE, SystemMemory, 0x1F2AC004, 0x04)
+>          OperationRegion (SRRM, SystemMemory, 0x1F2AD070, 0x04)
+>          OperationRegion (RD2F, SystemMemory, 0x1F2AE014, 0x04)
+>
+>      ...
+>
+>          Device (UAR0)
+>          {
+>              Name (_HID, "APMC0D08")  // _HID: Hardware ID
+>              Name (_DDN, "UAR0")  // _DDN: DOS Device Name
+>              Name (_UID, "UAR0")  // _UID: Unique ID
+>              Name (_STR, Unicode ("APM88xxxx UART0 Controller"))  // _STR: Description String
+>              Name (_ADR, 0x1C021000)  // _ADR: Address
+>              Name (_CID, "NS16550A")  // _CID: Compatible ID
+>
+>      ...
+>
+>              Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+>              {
+>                  Memory32Fixed (ReadWrite,
+>                      0x1C021000,         // Address Base
+>                      0x00000100,         // Address Length
+>                      )
+>                  UartSerialBusV2 (0x00002580, DataBitsEight, StopBitsOne,
+>                      0x00, LittleEndian, ParityTypeNone, FlowControlHardware,
+>                      0x0010, 0x0010, "UAR0",
+>                      0x00, ResourceConsumer, , Exclusive,
+>                      )
+>                  Interrupt (ResourceProducer, Level, ActiveHigh, Exclusive, ,, )
+>                  {
+>                      0x0000006D,
+>                  }
+>              })
+
+This seems to be related to 
+https://bugzilla.redhat.com/show_bug.cgi?id=1531140
+Am I correct?
+
+The SerDev support should allow UART to appear as tty device if not used 
+by an underlying component (cf. tty_port_register_device_attr() in 
+drivers/tty/tty_port.c).
+
+AFAIU, there is no internal device attached to this serial port.
+Is it possible to get complete ACPI DSDT?
+
+Is SerDev enabled on this device?
+Boot logs with SerDev debug traces enabled can be useful to understand 
+what happens.
+
+Regards,
+
+Fred
+
 -- 
-2.7.4
-
+Frédéric Danis                       Embedded Linux Consultant
+frederic.danis.oss@gmail.com
