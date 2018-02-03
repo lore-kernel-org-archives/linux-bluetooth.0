@@ -1,29 +1,93 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: btusb: Add support for Intel Bluetooth device
- 22560 [8087:0026]
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1517623922-32654-1-git-send-email-tedd.an@linux.intel.com>
-Date: Sun, 4 Feb 2018 15:07:30 +0100
-Cc: linux-bluetooth@vger.kernel.org,
-        Tedd Ho-Jeong An <tedd.an@intel.com>, amit.k.bag@intel.com
-Message-Id: <57F07B6B-1CE5-4D82-BB19-FFA3452D454B@holtmann.org>
-References: <1517623922-32654-1-git-send-email-tedd.an@linux.intel.com>
-To: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+From: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Tedd Ho-Jeong An <tedd.an@intel.com>, amit.k.bag@intel.com
+Subject: [PATCH] Bluetooth: btusb: Add support for Intel Bluetooth device 22560 [8087:0026]
+Date: Fri,  2 Feb 2018 18:12:02 -0800
+Message-Id: <1517623922-32654-1-git-send-email-tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-> The Bluetooth device 22560 (also known as HarrisonPeak) device from Intel
-> use the same firmware loading mechanism as previous generation, so include
-> new USB product ID and whitelist the hardware variant.
+The Bluetooth device 22560 (also known as HarrisonPeak) device from Intel
+use the same firmware loading mechanism as previous generation, so include
+new USB product ID and whitelist the hardware variant.
 
-lets include QnJ and IcP also in the description. Or maybe send a separate patch to add QnJ and IcP support.
+T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 16 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=0026 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 
-Regards
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btusb.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Marcel
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2a55380..098967c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -339,6 +339,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 
+ 	/* Intel Bluetooth devices */
+ 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW },
++	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW },
+ 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+ 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
+ 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
+@@ -2057,6 +2058,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	case 0x0c:	/* WsP */
+ 	case 0x11:	/* JfP */
+ 	case 0x12:	/* ThP */
++	case 0x13:	/* HrP */
++	case 0x14:	/* QnJ, IcP */
+ 		break;
+ 	default:
+ 		BT_ERR("%s: Unsupported Intel hardware variant (%u)",
+@@ -2149,6 +2152,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		break;
+ 	case 0x11:	/* JfP */
+ 	case 0x12:	/* ThP */
++	case 0x13:	/* HrP */
++	case 0x14:	/* QnJ, IcP */
+ 		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.sfi",
+ 			 le16_to_cpu(ver.hw_variant),
+ 			 le16_to_cpu(ver.hw_revision),
+@@ -2180,6 +2185,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		break;
+ 	case 0x11:	/* JfP */
+ 	case 0x12:	/* ThP */
++	case 0x13:	/* HrP */
++	case 0x14:	/* QnJ, IcP */
+ 		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.ddc",
+ 			 le16_to_cpu(ver.hw_variant),
+ 			 le16_to_cpu(ver.hw_revision),
+-- 
+2.7.4
 
