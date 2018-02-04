@@ -5,24 +5,36 @@ Cc: johan.hedberg@gmail.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Maxim Zhukov <mussitantesmortem@gmail.com>
-Subject: [PATCH v2 0/5] lite fixes for ath3k
-Date: Mon,  5 Feb 2018 00:09:42 +0300
-Message-Id: <20180204210947.31002-1-mussitantesmortem@gmail.com>
-In-Reply-To: <20180204205934.12117-4-mussitantesmortem@gmail.com>
+Subject: [PATCH 5/5] drivers: bluetooth: ath3k: fix checkpatch warning
+Date: Mon,  5 Feb 2018 00:06:23 +0300
+Message-Id: <20180204210623.29734-5-mussitantesmortem@gmail.com>
+In-Reply-To: <20180204210623.29734-1-mussitantesmortem@gmail.com>
 References: <20180204205934.12117-4-mussitantesmortem@gmail.com>
+ <20180204210623.29734-1-mussitantesmortem@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sorry for the last series of patches
+This patch fixed warning:
+ WARNING: Prefer using '"%s...", __func__' to using 'ath3k_disconnect', this function's name, in a string
+ #568: FILE: drivers/bluetooth/ath3k.c:568:
+ +	BT_DBG("ath3k_disconnect intf %p", intf);
 
-Maxim Zhukov (5):
-  drivers: bluetooth: ath3k: replace hardcode numbers with define
-  drivers: bluetooth: ath3k: do not init variables
-  drivers: bluetooth: ath3k: remove blank line after if
-  drivers: bluetooth: ath3k: Fix warning: quoted string split across lines
-  drivers: bluetooth: ath3k: fix checkpatch warning
+Signed-off-by: Maxim Zhukov <mussitantesmortem@gmail.com>
+---
+ drivers/bluetooth/ath3k.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- drivers/bluetooth/ath3k.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 8fe5ec4bb342..3d7a5c149af3 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -569,7 +569,7 @@ static int ath3k_probe(struct usb_interface *intf,
+ 
+ static void ath3k_disconnect(struct usb_interface *intf)
+ {
+-	BT_DBG("ath3k_disconnect intf %p", intf);
++	BT_DBG("%s intf %p", __func__, intf);
+ }
+ 
+ static struct usb_driver ath3k_driver = {
 -- 
 2.16.1
