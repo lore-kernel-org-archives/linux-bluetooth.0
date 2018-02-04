@@ -5,42 +5,42 @@ Cc: johan.hedberg@gmail.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Maxim Zhukov <mussitantesmortem@gmail.com>
-Subject: [PATCH 2/5] drivers: bluetooth: ath3k: do not init variables
-Date: Sun,  4 Feb 2018 23:59:31 +0300
-Message-Id: <20180204205934.12117-2-mussitantesmortem@gmail.com>
-In-Reply-To: <20180204205934.12117-1-mussitantesmortem@gmail.com>
-References: <20180204205934.12117-1-mussitantesmortem@gmail.com>
+Subject: [PATCH 1/5] drivers: bluetooth: ath3k: replace hardcode numbers with define
+Date: Sun,  4 Feb 2018 23:59:30 +0300
+Message-Id: <20180204205934.12117-1-mussitantesmortem@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Do not need to initialize variables, because further on the code they
-fall into the snprintf.
+Replaced the numbers with a readable define.
 
 Signed-off-by: Maxim Zhukov <mussitantesmortem@gmail.com>
 ---
- drivers/bluetooth/ath3k.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/ath3k.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 0a5cfea44529..b16c01a0b6d4 100644
+index 204afe66de92..0a5cfea44529 100644
 --- a/drivers/bluetooth/ath3k.c
 +++ b/drivers/bluetooth/ath3k.c
-@@ -399,7 +399,7 @@ static int ath3k_set_normal_mode(struct usb_device *udev)
- static int ath3k_load_patch(struct usb_device *udev)
- {
- 	unsigned char fw_state;
--	char filename[ATH3K_NAME_LEN] = {0};
-+	char filename[ATH3K_NAME_LEN];
- 	const struct firmware *firmware;
- 	struct ath3k_version fw_version;
- 	__u32 pt_rom_version, pt_build_version;
-@@ -452,7 +452,7 @@ static int ath3k_load_patch(struct usb_device *udev)
- static int ath3k_load_syscfg(struct usb_device *udev)
- {
- 	unsigned char fw_state;
--	char filename[ATH3K_NAME_LEN] = {0};
-+	char filename[ATH3K_NAME_LEN];
- 	const struct firmware *firmware;
- 	struct ath3k_version fw_version;
- 	int clk_value, ret;
+@@ -227,15 +227,16 @@ static int ath3k_load_firmware(struct usb_device *udev,
+ 		return -ENOMEM;
+ 	}
+ 
+-	memcpy(send_buf, firmware->data, 20);
++	memcpy(send_buf, firmware->data, FW_HDR_SIZE);
+ 	err = usb_control_msg(udev, pipe, USB_REQ_DFU_DNLOAD, USB_TYPE_VENDOR,
+-			      0, 0, send_buf, 20, USB_CTRL_SET_TIMEOUT);
++			      0, 0, send_buf, FW_HDR_SIZE,
++			      USB_CTRL_SET_TIMEOUT);
+ 	if (err < 0) {
+ 		BT_ERR("Can't change to loading configuration err");
+ 		goto error;
+ 	}
+-	sent += 20;
+-	count -= 20;
++	sent += FW_HDR_SIZE;
++	count -= FW_HDR_SIZE;
+ 
+ 	pipe = usb_sndbulkpipe(udev, 0x02);
+ 
 -- 
 2.16.1
