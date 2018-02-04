@@ -1,46 +1,29 @@
-Return-Path: <mussitantesmortem@gmail.com>
-From: Maxim Zhukov <mussitantesmortem@gmail.com>
-To: marcel@holtmann.org
-Cc: johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Maxim Zhukov <mussitantesmortem@gmail.com>
-Subject: [PATCH 1/5] drivers: bluetooth: ath3k: replace hardcode numbers with define
-Date: Sun,  4 Feb 2018 23:59:30 +0300
-Message-Id: <20180204205934.12117-1-mussitantesmortem@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for Intel Bluetooth device
+ 22560 [8087:0026]
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1517623922-32654-1-git-send-email-tedd.an@linux.intel.com>
+Date: Sun, 4 Feb 2018 15:07:30 +0100
+Cc: linux-bluetooth@vger.kernel.org,
+        Tedd Ho-Jeong An <tedd.an@intel.com>, amit.k.bag@intel.com
+Message-Id: <57F07B6B-1CE5-4D82-BB19-FFA3452D454B@holtmann.org>
+References: <1517623922-32654-1-git-send-email-tedd.an@linux.intel.com>
+To: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replaced the numbers with a readable define.
+Hi Tedd,
 
-Signed-off-by: Maxim Zhukov <mussitantesmortem@gmail.com>
----
- drivers/bluetooth/ath3k.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+> The Bluetooth device 22560 (also known as HarrisonPeak) device from Intel
+> use the same firmware loading mechanism as previous generation, so include
+> new USB product ID and whitelist the hardware variant.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 204afe66de92..0a5cfea44529 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -227,15 +227,16 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 		return -ENOMEM;
- 	}
- 
--	memcpy(send_buf, firmware->data, 20);
-+	memcpy(send_buf, firmware->data, FW_HDR_SIZE);
- 	err = usb_control_msg(udev, pipe, USB_REQ_DFU_DNLOAD, USB_TYPE_VENDOR,
--			      0, 0, send_buf, 20, USB_CTRL_SET_TIMEOUT);
-+			      0, 0, send_buf, FW_HDR_SIZE,
-+			      USB_CTRL_SET_TIMEOUT);
- 	if (err < 0) {
- 		BT_ERR("Can't change to loading configuration err");
- 		goto error;
- 	}
--	sent += 20;
--	count -= 20;
-+	sent += FW_HDR_SIZE;
-+	count -= FW_HDR_SIZE;
- 
- 	pipe = usb_sndbulkpipe(udev, 0x02);
- 
--- 
-2.16.1
+lets include QnJ and IcP also in the description. Or maybe send a separate patch to add QnJ and IcP support.
+
+Regards
+
+Marcel
+
