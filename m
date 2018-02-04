@@ -1,41 +1,40 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Vincent Petry <pvince81@googlemail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Cannot use any submenu in bluetoothctl since bluez 5.48
-Message-ID: <1135e315-5170-76b4-2c91-b0ab7a24cf5b@gmail.com>
-Date: Mon, 5 Feb 2018 07:57:21 +0100
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <mussitantesmortem@gmail.com>
+From: Maxim Zhukov <mussitantesmortem@gmail.com>
+To: marcel@holtmann.org
+Cc: johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Maxim Zhukov <mussitantesmortem@gmail.com>
+Subject: [PATCH v2 5/5] drivers: bluetooth: ath3k: fix checkpatch warning
+Date: Mon,  5 Feb 2018 00:09:47 +0300
+Message-Id: <20180204210947.31002-6-mussitantesmortem@gmail.com>
+In-Reply-To: <20180204210947.31002-1-mussitantesmortem@gmail.com>
+References: <20180204205934.12117-4-mussitantesmortem@gmail.com>
+ <20180204210947.31002-1-mussitantesmortem@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+This patch fixed warning:
+ WARNING: Prefer using '"%s...", __func__' to using 'ath3k_disconnect', this function's name, in a string
+ #568: FILE: drivers/bluetooth/ath3k.c:568:
+ +	BT_DBG("ath3k_disconnect intf %p", intf);
 
-It appears that since bluez 5.48, the gatt commands and others have been
-moved into a submenu in the bluetoothctl shell.
+Signed-off-by: Maxim Zhukov <mussitantesmortem@gmail.com>
+---
+ drivers/bluetooth/ath3k.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm struggling to find a way to access the gatt commands. In the past I
-could just type "list-attributes" but now it says "Invalid command".
-
-None of the following commands work:
-
-- gatt
-- gatt help
-- help gatt
-- list-attributes
-
-I had a quick look at the source code and I have the feeling that there
-is actually no way to access these commands.
-
-If there is a way already, please make it easier and more intuitive to find.
-
-My env:
-- openSUSE Tumbleweed snapshot 20180130
-- bluez 5.48
-- kernel 4.14.15-1-default
-
-Thanks,
-
-Vincent
-
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 8fe5ec4bb342..3d7a5c149af3 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -569,7 +569,7 @@ static int ath3k_probe(struct usb_interface *intf,
+ 
+ static void ath3k_disconnect(struct usb_interface *intf)
+ {
+-	BT_DBG("ath3k_disconnect intf %p", intf);
++	BT_DBG("%s intf %p", __func__, intf);
+ }
+ 
+ static struct usb_driver ath3k_driver = {
+-- 
+2.16.1
