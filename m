@@ -1,80 +1,132 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAAu3APYyQ5b1kDhFaJVZMCpYXvtz6R+sF5mv=juxVAPzbD0vqQ@mail.gmail.com>
-References: <CAAu3APYyQ5b1kDhFaJVZMCpYXvtz6R+sF5mv=juxVAPzbD0vqQ@mail.gmail.com>
-From: Barry Byford <31baz66@gmail.com>
-Date: Mon, 5 Feb 2018 17:30:43 +0000
-Message-ID: <CAAu3APYbiWyzOAVgf8cYBr9hKCPNbKwY+8oz=0KEsNfYHP0VrQ@mail.gmail.com>
-Subject: Re: btvirt not working
-To: Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/4] shared/shell: Introduce bt_shell_{get,set}_env
+Date: Mon,  5 Feb 2018 10:48:15 -0200
+Message-Id: <20180205124818.23566-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-A little more investigating on this and the issue seems to be on the
-Raspberry Pi 3 hardware.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Does anyone have any ideas as to why this is an issue on the RPi?
+These function can be used to share environment variable accross
+different files.
+---
+ src/shared/shell.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/shell.h |  3 +++
+ 2 files changed, 66 insertions(+)
 
-On 1 February 2018 at 23:24, Barry Byford <31baz66@gmail.com> wrote:
-> Hello,
->
-> I am trying to get the adapter emulator working for BLE but I am
-> having some issues:
->
-> pi@RPi3:~/bluez/bluez-5.43 $ sudo ./emulator/btvirt -l2
-> Bluetooth emulator ver 5.43
-> Failed to open Virtual HCI device
->
-> If I select BR/ER only then it works:
->
-> pi@RPi3:~/bluez/bluez-5.43 $ sudo emulator/btvirt -B -l2
-> Bluetooth emulator ver 5.43
->
-> As in another terminal I can see the extra adapters:
->
-> pi@RPi3:~ $ bluetoothctl list
-> [NEW] Controller 00:AA:01:01:00:24 RPi3 #3 [default]
-> [NEW] Controller 00:AA:01:00:00:23 RPi3 #2
-> [NEW] Controller B8:27:EB:22:57:E0 RPi3
->
-> I have also tried with just LE only controller:
->
-> pi@RPi3:~/bluez/bluez-5.43 $ sudo emulator/btvirt -L -l2
-> Bluetooth emulator ver 5.43
-> Failed to open Virtual HCI device
->
-> The btmon trace for this is:
->
-> pi@RPi3:~ $ sudo btmon
-> Bluetooth monitor ver 5.43
-> = Note: Linux version 4.9.59-v7+ (armv7l)
->                                                         0.220518
-> = Note: Bluetooth subsystem version 2.22
->                                                         0.220527
-> = New Index: B8:27:EB:22:57:E0 (Primary,UART,hci0)
->                                                  [hci0] 0.220531
-> = Open Index: B8:27:EB:22:57:E0
->                                                  [hci0] 0.220533
-> = Index Info: B8:27:EB:22:57:E0 (Broadcom Corporation)
->                                                  [hci0] 0.220535
-> @ MGMT Open: bluetoothd (privileged) version 1.14
->                                                {0x0001} 0.220539
-> @ MGMT Open: btmon (privileged) version 1.14
->                                                {0x0002} 0.220807
-> = New Index: 00:00:00:00:00:00 (Primary,Virtual,hci1)
->                                                  [hci1] 6.103687
-> = Open Index: 00:00:00:00:00:00
->                                                  [hci1] 6.103726
-> < HCI Command: Reset (0x03|0x0003) plen 0
->                                                  [hci1] 6.103875
-> = Close Index: 00:00:00:00:00:00
->                                                 [hci1] 16.676567
-> = Delete Index: 00:00:00:00:00:00
->                                                 [hci1] 16.676627
->
-> Any suggestions as to what the issue might be?
-> Or what to try next?
->
-> Thanks,
-> Barry
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index f1b85f202..f724c9881 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -56,6 +56,11 @@
+ 
+ static GMainLoop *main_loop;
+ 
++struct bt_shell_env {
++	char *name;
++	void *value;
++};
++
+ static struct {
+ 	struct io *input;
+ 
+@@ -66,6 +71,8 @@ static struct {
+ 	const struct bt_shell_menu *menu;
+ 	const struct bt_shell_menu *main;
+ 	struct queue *submenus;
++
++	struct queue *envs;
+ } data;
+ 
+ static void shell_print_menu(void);
+@@ -759,6 +766,14 @@ static void rl_cleanup(void)
+ 	rl_callback_handler_remove();
+ }
+ 
++static void env_destroy(void *data)
++{
++	struct bt_shell_env *env = data;
++
++	free(env->name);
++	free(env);
++}
++
+ void bt_shell_run(void)
+ {
+ 	struct io *signal;
+@@ -775,6 +790,11 @@ void bt_shell_run(void)
+ 	g_main_loop_unref(main_loop);
+ 	main_loop = NULL;
+ 
++	if (data.envs) {
++		queue_destroy(data.envs, env_destroy);
++		data.envs = NULL;
++	}
++
+ 	rl_cleanup();
+ }
+ 
+@@ -849,3 +869,46 @@ bool bt_shell_detach(void)
+ 
+ 	return true;
+ }
++
++static bool match_env(const void *data, const void *user_data)
++{
++	const struct bt_shell_env *env = data;
++	const char *name = user_data;
++
++	return !strcmp(env->name, name);
++}
++
++void bt_shell_set_env(const char *name, void *value)
++{
++	struct bt_shell_env *env;
++
++	if (!data.envs) {
++		data.envs = queue_new();
++		goto done;
++	}
++
++	env = queue_remove_if(data.envs, match_env, (void *) name);
++	if (env)
++		env_destroy(env);
++
++done:
++	env = new0(struct bt_shell_env, 1);
++	env->name = strdup(name);
++	env->value = value;
++
++	queue_push_tail(data.envs, env);
++}
++
++void *bt_shell_get_env(const char *name)
++{
++	const struct bt_shell_env *env;
++
++	if (!data.envs)
++		return NULL;
++
++	env = queue_find(data.envs, match_env, name);
++	if (!env)
++		return NULL;
++
++	return env->value;
++}
+diff --git a/src/shared/shell.h b/src/shared/shell.h
+index 8b8b1f634..359629896 100644
+--- a/src/shared/shell.h
++++ b/src/shared/shell.h
+@@ -87,4 +87,7 @@ int bt_shell_release_prompt(const char *input);
+ bool bt_shell_attach(int fd);
+ bool bt_shell_detach(void);
+ 
++void bt_shell_set_env(const char *name, void *value);
++void *bt_shell_get_env(const char *name);
++
+ void bt_shell_cleanup(void);
+-- 
+2.14.3
+
