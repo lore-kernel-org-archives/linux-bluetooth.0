@@ -1,65 +1,93 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Vincent Petry <pvince81@googlemail.com>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ] shared/shell: Print out help if using invalid command
-Message-ID: <360f80ad-6ec6-e285-b560-94404ee30bb6@jp.fujitsu.com>
-Date: Tue, 6 Feb 2018 14:27:29 +0900
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Tedd Ho-Jeong An <tedd.an@intel.com>, amit.k.bag@intel.com
+Subject: [v2] Bluetooth: btusb: Add support for Intel Bluetooth device 22560 [8087:0026]
+Date: Mon,  5 Feb 2018 14:20:36 -0800
+Message-Id: <1517869236-30523-1-git-send-email-tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Because Vincent Petry kindly reported that it is hard to use a command
-in a submenu, clients are changed to print out help messages as below
-when an invalid command is used.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-  [bluetooth]# list-attributes
-  Invalid command in menu main: list-attributes
+The Intel Bluetooth device 22560 family (HarrisonPeak, QnJ, and IcyPeak)
+use the same firmware loading mechanism as previous generation,
+so include new USB product ID and whitelist the hardware variant.
 
-  Use "help" for a list of available commands in a menu.
-  Use "menu <submenu>" if you want to enter any submenu.
-  Use "back" if you want to return to menu main.
+T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 16 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=0026 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
- src/shared/shell.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btusb.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index f1b85f202..47c048122 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -191,6 +191,15 @@ static const struct bt_shell_menu_entry default_menu[] = {
- 	{ }
- };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2a55380..098967c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -339,6 +339,7 @@ static const struct usb_device_id blacklist_table[] = {
  
-+static void shell_print_help(void)
-+{
-+	print_text(COLOR_HIGHLIGHT,
-+		"\n"
-+		"Use \"help\" for a list of available commands in a menu.\n"
-+		"Use \"menu <submenu>\" if you want to enter any submenu.\n"
-+		"Use \"back\" if you want to return to menu main.");
-+}
-+
- static void shell_print_menu(void)
- {
- 	const struct bt_shell_menu_entry *entry;
-@@ -341,8 +350,12 @@ static void shell_exec(int argc, char *argv[])
- 		return;
- 
- 	if (menu_exec(default_menu, argc, argv) == -ENOENT) {
--		if (menu_exec(data.menu->entries, argc, argv) == -ENOENT)
--			print_text(COLOR_HIGHLIGHT, "Invalid command");
-+		if (menu_exec(data.menu->entries, argc, argv) == -ENOENT) {
-+			print_text(COLOR_HIGHLIGHT,
-+					"Invalid command in menu %s: %s",
-+					data.menu->name , argv[0]);
-+			shell_print_help();
-+		}
- 	}
- }
- 
+ 	/* Intel Bluetooth devices */
+ 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW },
++	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW },
+ 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+ 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
+ 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
+@@ -2057,6 +2058,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	case 0x0c:	/* WsP */
+ 	case 0x11:	/* JfP */
+ 	case 0x12:	/* ThP */
++	case 0x13:	/* HrP */
++	case 0x14:	/* QnJ, IcP */
+ 		break;
+ 	default:
+ 		BT_ERR("%s: Unsupported Intel hardware variant (%u)",
+@@ -2149,6 +2152,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		break;
+ 	case 0x11:	/* JfP */
+ 	case 0x12:	/* ThP */
++	case 0x13:	/* HrP */
++	case 0x14:	/* QnJ, IcP */
+ 		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.sfi",
+ 			 le16_to_cpu(ver.hw_variant),
+ 			 le16_to_cpu(ver.hw_revision),
+@@ -2180,6 +2185,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 		break;
+ 	case 0x11:	/* JfP */
+ 	case 0x12:	/* ThP */
++	case 0x13:	/* HrP */
++	case 0x14:	/* QnJ, IcP */
+ 		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.ddc",
+ 			 le16_to_cpu(ver.hw_variant),
+ 			 le16_to_cpu(ver.hw_revision),
 -- 
-2.14.1
+2.7.4
 
