@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] shared/shell: Add tab completion for argument values
-Date: Mon,  5 Feb 2018 10:48:17 -0200
-Message-Id: <20180205124818.23566-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/4] client: Don't set generators for modes
+Date: Mon,  5 Feb 2018 10:48:18 -0200
+Message-Id: <20180205124818.23566-4-luiz.dentz@gmail.com>
 In-Reply-To: <20180205124818.23566-1-luiz.dentz@gmail.com>
 References: <20180205124818.23566-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,118 +11,95 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-In case a command don't have a generator parse its argument string and
-generate a list of possible values.
+Commands that already have all values set on the argument string don't
+need to add a generator since bt_shell can now auto complete them.
 ---
- src/shared/shell.c | 78 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 73 insertions(+), 5 deletions(-)
+ client/main.c | 26 +++++++-------------------
+ 1 file changed, 7 insertions(+), 19 deletions(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 69f303b51..2958a66b5 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -518,8 +518,76 @@ static char *cmd_generator(const char *text, int state)
- 	return find_cmd(text, data.menu->entries, &index);
+diff --git a/client/main.c b/client/main.c
+index 85803f1a3..a6adb70d2 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -65,12 +65,6 @@ static GDBusProxy *default_dev;
+ static GDBusProxy *default_attr;
+ static GList *ctrl_list;
+ 
+-static const char *mode_arguments[] = {
+-	"on",
+-	"off",
+-	NULL
+-};
+-
+ static const char *agent_arguments[] = {
+ 	"on",
+ 	"off",
+@@ -2156,11 +2150,6 @@ static char *argument_generator(const char *text, int state,
+ 	return NULL;
  }
  
-+static wordexp_t args;
-+
-+static char *arg_generator(const char *text, int state)
-+{
-+	static unsigned int index, len;
-+	const char *arg;
-+
-+	if (!state) {
-+		index = 0;
-+		len = strlen(text);
-+	}
-+
-+	while (index < args.we_wordc) {
-+		arg = args.we_wordv[index];
-+		index++;
-+
-+		if (!strncmp(arg, text, len))
-+			return strdup(arg);
-+	}
-+
-+	return NULL;
-+}
-+
-+static char **args_completion(const struct bt_shell_menu_entry *entry, int argc,
-+							const char *text)
-+{
-+	char **matches = NULL;
-+	char *str;
-+	int index;
-+
-+	index = text[0] == '\0' ? argc - 1 : argc - 2;
-+	if (index < 0)
-+		return NULL;
-+
-+	if (!entry->arg)
-+		goto done;
-+
-+	str = strdup(entry->arg);
-+
-+	if (parse_args(str, &args, "<>[]", WRDE_NOCMD))
-+		goto done;
-+
-+	/* Check if argument is valid */
-+	if ((unsigned) index > args.we_wordc - 1)
-+		goto done;
-+
-+	/* Check if there are multiple values */
-+	if (!strrchr(entry->arg, '/'))
-+		goto done;
-+
-+	/* Split values separated by / */
-+	str = g_strdelimit(args.we_wordv[index], "/", ' ');
-+
-+	if (wordexp(str, &args, WRDE_NOCMD))
-+		goto done;
-+
-+	rl_completion_display_matches_hook = NULL;
-+	matches = rl_completion_matches(text, arg_generator);
-+
-+done:
-+	if (!matches && text[0] == '\0')
-+		bt_shell_printf("Usage: %s %s\n", entry->cmd,
-+					entry->arg ? entry->arg : "");
-+
-+	wordfree(&args);
-+	return matches;
-+}
-+
- static char **menu_completion(const struct bt_shell_menu_entry *entry,
--				const char *text, char *input_cmd)
-+				const char *text, int argc, char *input_cmd)
+-static char *mode_generator(const char *text, int state)
+-{
+-	return argument_generator(text, state, mode_arguments);
+-}
+-
+ static char *capability_generator(const char *text, int state)
  {
- 	char **matches = NULL;
- 
-@@ -528,9 +596,7 @@ static char **menu_completion(const struct bt_shell_menu_entry *entry,
- 			continue;
- 
- 		if (!entry->gen) {
--			if (text[0] == '\0')
--				bt_shell_printf("Usage: %s %s\n", entry->cmd,
--						entry->arg ? entry->arg : "");
-+			matches = args_completion(entry, argc, text);
- 			break;
- 		}
- 
-@@ -555,9 +621,11 @@ static char **shell_completion(const char *text, int start, int end)
- 		if (wordexp(rl_line_buffer, &w, WRDE_NOCMD))
- 			return NULL;
- 
--		matches = menu_completion(default_menu, text, w.we_wordv[0]);
-+		matches = menu_completion(default_menu, text, w.we_wordc,
-+							w.we_wordv[0]);
- 		if (!matches)
- 			matches = menu_completion(data.menu->entries, text,
-+							w.we_wordc,
- 							w.we_wordv[0]);
- 
- 		wordfree(&w);
+ 	return argument_generator(text, state, agent_arguments);
+@@ -2321,7 +2310,7 @@ static const struct bt_shell_menu advertise_menu = {
+ 			"Set advertise manufacturer data" },
+ 	{ "tx-power", "[on/off]", cmd_advertise_tx_power,
+ 			"Enable/disable TX power to be advertised",
+-							mode_generator },
++							NULL },
+ 	{ "name", "[on/off/name]", cmd_advertise_name,
+ 			"Enable/disable local name to be advertised" },
+ 	{ "appearance", "[value]", cmd_advertise_appearance,
+@@ -2347,7 +2336,7 @@ static const struct bt_shell_menu scan_menu = {
+ 				"Set/Get transport filter" },
+ 	{ "duplicate-data", "[on/off]", cmd_scan_filter_duplicate_data,
+ 				"Set/Get duplicate data filter",
+-				mode_generator },
++				NULL },
+ 	{ "clear", "[uuids/rssi/pathloss/transport/duplicate-data]",
+ 				cmd_scan_filter_clear,
+ 				"Clears discovery filter.",
+@@ -2377,7 +2366,7 @@ static const struct bt_shell_menu gatt_menu = {
+ 	{ "release-notify", NULL, cmd_release_notify,
+ 					"Release Notify file descriptor" },
+ 	{ "notify",       "<on/off>", cmd_notify, "Notify attribute value",
+-							mode_generator },
++							NULL },
+ 	{ "register-application", "[UUID ...]", cmd_register_app,
+ 						"Register profile to connect" },
+ 	{ "unregister-application", NULL, cmd_unregister_app,
+@@ -2417,13 +2406,13 @@ static const struct bt_shell_menu main_menu = {
+ 	{ "reset-alias",  NULL,       cmd_reset_alias,
+ 					"Reset controller alias" },
+ 	{ "power",        "<on/off>", cmd_power, "Set controller power",
+-							mode_generator },
++							NULL },
+ 	{ "pairable",     "<on/off>", cmd_pairable,
+ 					"Set controller pairable mode",
+-							mode_generator },
++							NULL },
+ 	{ "discoverable", "<on/off>", cmd_discoverable,
+ 					"Set controller discoverable mode",
+-							mode_generator },
++							NULL },
+ 	{ "agent",        "<on/off/capability>", cmd_agent,
+ 				"Enable/disable agent with given capability",
+ 							capability_generator},
+@@ -2433,8 +2422,7 @@ static const struct bt_shell_menu main_menu = {
+ 				"Enable/disable advertising with given type",
+ 							ad_generator},
+ 	{ "set-alias",    "<alias>",  cmd_set_alias, "Set device alias" },
+-	{ "scan",         "<on/off>", cmd_scan, "Scan for devices",
+-							mode_generator },
++	{ "scan",         "<on/off>", cmd_scan, "Scan for devices", NULL },
+ 	{ "info",         "[dev]",    cmd_info, "Device information",
+ 							dev_generator },
+ 	{ "pair",         "[dev]",    cmd_pair, "Pair with device",
 -- 
 2.14.3
 
