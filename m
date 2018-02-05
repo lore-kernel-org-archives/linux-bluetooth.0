@@ -1,68 +1,127 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] gdbus: Fix replying to messages marked with NOREPLY flag
-Date: Mon,  5 Feb 2018 10:47:43 -0200
-Message-Id: <20180205124748.23291-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <900b876a-6a72-b6a4-69fd-10db545d46fb@jp.fujitsu.com>
+References: <1135e315-5170-76b4-2c91-b0ab7a24cf5b@gmail.com> <900b876a-6a72-b6a4-69fd-10db545d46fb@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 5 Feb 2018 10:19:14 -0200
+Message-ID: <CABBYNZ+6kKN-zpxNuDYJjZ2o0-9_aZ1-tKr9rrLR9_OZ0WLwMQ@mail.gmail.com>
+Subject: Re: Cannot use any submenu in bluetoothctl since bluez 5.48
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: Vincent Petry <pvince81@googlemail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Eramoto,
 
-When a sender flags a D-Bus message as not expecting a reply, it is
-against D-Bus policy to send a reply — sending one can result in an
-error as reported in:
+On Mon, Feb 5, 2018 at 6:21 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Hi Vincent,
+>
+> On 02/05/2018 03:57 PM, Vincent Petry wrote:
+>> Hello,
+>>
+>> It appears that since bluez 5.48, the gatt commands and others have been
+>> moved into a submenu in the bluetoothctl shell.
+>>
+>> I'm struggling to find a way to access the gatt commands. In the past I
+>> could just type "list-attributes" but now it says "Invalid command".
+>>
+>> None of the following commands work:
+>>
+>> - gatt
+>> - gatt help
+>> - help gatt
+>> - list-attributes
+>>
+>> I had a quick look at the source code and I have the feeling that there
+>> is actually no way to access these commands.
+>>
+>> If there is a way already, please make it easier and more intuitive to find.
+>>
+>
+> You can input "menu gatt" to enter gatt submenu and can use available commands
+> in gatt submenu (e.g. "list-attributes"). If you want to return to main menu,
+> you input "back". Then you can use available commands in main menu or enter
+> another submenu.
+>
+> When inputting an invalid command, we may be able to add the messages like
+>
+>   [bluetooth]# gatt
+>   Invalid command: gatt
+>
+>   Use "help" for a list of available commands in a menu.
+>   Use "menu <submenu>" if you want to enter any submenu.
+>   Use "back" if you want to return to main menu.
+>
+> with the following patch.
+>
+> ---
+>  src/shared/shell.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index f1b85f202..fad421ef1 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -335,6 +335,16 @@ static int menu_exec(const struct bt_shell_menu_entry *entry,
+>         return -ENOENT;
+>  }
+>
+> +static void help_messages(char *arg)
+> +{
+> +       print_text(COLOR_HIGHLIGHT,
+> +               "Invalid command: %s\n\n"
+> +               "Use \"help\" for a list of available commands in a menu.\n"
+> +               "Use \"menu <submenu>\" if you want to enter any submenu.\n"
+> +               "Use \"back\" if you want to return to main menu.",
+> +               arg);
+> +}
+> +
+>  static void shell_exec(int argc, char *argv[])
+>  {
+>         if (!data.menu || !argv[0])
+> @@ -342,7 +352,7 @@ static void shell_exec(int argc, char *argv[])
+>
+>         if (menu_exec(default_menu, argc, argv) == -ENOENT) {
+>                 if (menu_exec(data.menu->entries, argc, argv) == -ENOENT)
+> -                       print_text(COLOR_HIGHLIGHT, "Invalid command");
+> +                       help_messages(argv[0]);
+>         }
+>  }
+>
+> --
+> 2.14.1
 
-https://bugzilla.kernel.org/show_bug.cgi?id=198453
----
- gdbus/object.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+Sounds good to me, do you care to send this as a proper patch?
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 5c8ad7a55..e572c9f01 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -1421,6 +1421,10 @@ DBusMessage *g_dbus_create_error_valist(DBusMessage *message, const char *name,
- {
- 	char str[1024];
- 
-+	/* Check if the message can be replied */
-+	if (dbus_message_get_no_reply(message))
-+		return NULL;
-+
- 	if (format)
- 		vsnprintf(str, sizeof(str), format, args);
- 	else
-@@ -1449,6 +1453,10 @@ DBusMessage *g_dbus_create_reply_valist(DBusMessage *message,
- {
- 	DBusMessage *reply;
- 
-+	/* Check if the message can be replied */
-+	if (dbus_message_get_no_reply(message))
-+		return NULL;
-+
- 	reply = dbus_message_new_method_return(message);
- 	if (reply == NULL)
- 		return NULL;
-@@ -1571,14 +1579,9 @@ gboolean g_dbus_send_reply_valist(DBusConnection *connection,
- {
- 	DBusMessage *reply;
- 
--	reply = dbus_message_new_method_return(message);
--	if (reply == NULL)
--		return FALSE;
--
--	if (dbus_message_append_args_valist(reply, type, args) == FALSE) {
--		dbus_message_unref(reply);
-+	reply = g_dbus_create_reply_valist(message, type, args);
-+	if (!reply)
- 		return FALSE;
--	}
- 
- 	return g_dbus_send_message(connection, reply);
- }
+>
+> Regards,
+> Eramoto
+>
+>> My env:
+>> - openSUSE Tumbleweed snapshot 20180130
+>> - bluez 5.48
+>> - kernel 4.14.15-1-default
+>>
+>> Thanks,
+>>
+>> Vincent
+>>
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.14.3
-
+Luiz Augusto von Dentz
