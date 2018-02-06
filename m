@@ -1,73 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 6 Feb 2018 15:52:22 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [bug report] missing bounds check reading firmware
-Message-ID: <20180206125222.GB9445@mwanda>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <360f80ad-6ec6-e285-b560-94404ee30bb6@jp.fujitsu.com>
+References: <360f80ad-6ec6-e285-b560-94404ee30bb6@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 6 Feb 2018 10:04:19 -0200
+Message-ID: <CABBYNZJ_MzE_W4kmRSk212cd-DbV7ckXrtbP2t7qvJVCnw_-Lg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/shell: Print out help if using invalid command
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Vincent Petry <pvince81@googlemail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi BT devs,
+Hi Eramoto,
 
-This looks like it only has a small impact...
+On Tue, Feb 6, 2018 at 3:27 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Because Vincent Petry kindly reported that it is hard to use a command
+> in a submenu, clients are changed to print out help messages as below
+> when an invalid command is used.
+>
+>   [bluetooth]# list-attributes
+>   Invalid command in menu main: list-attributes
+>
+>   Use "help" for a list of available commands in a menu.
+>   Use "menu <submenu>" if you want to enter any submenu.
+>   Use "back" if you want to return to menu main.
+> ---
+>  src/shared/shell.c | 17 +++++++++++++++--
+>  1 file changed, 15 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index f1b85f202..47c048122 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -191,6 +191,15 @@ static const struct bt_shell_menu_entry default_menu[] = {
+>         { }
+>  };
+>
+> +static void shell_print_help(void)
+> +{
+> +       print_text(COLOR_HIGHLIGHT,
+> +               "\n"
+> +               "Use \"help\" for a list of available commands in a menu.\n"
+> +               "Use \"menu <submenu>\" if you want to enter any submenu.\n"
+> +               "Use \"back\" if you want to return to menu main.");
+> +}
+> +
+>  static void shell_print_menu(void)
+>  {
+>         const struct bt_shell_menu_entry *entry;
+> @@ -341,8 +350,12 @@ static void shell_exec(int argc, char *argv[])
+>                 return;
+>
+>         if (menu_exec(default_menu, argc, argv) == -ENOENT) {
+> -               if (menu_exec(data.menu->entries, argc, argv) == -ENOENT)
+> -                       print_text(COLOR_HIGHLIGHT, "Invalid command");
+> +               if (menu_exec(data.menu->entries, argc, argv) == -ENOENT) {
+> +                       print_text(COLOR_HIGHLIGHT,
+> +                                       "Invalid command in menu %s: %s",
+> +                                       data.menu->name , argv[0]);
+> +                       shell_print_help();
+> +               }
+>         }
+>  }
+>
+> --
+> 2.14.1
 
-	drivers/bluetooth/bt3c_cs.c:491 bt3c_load_firmware()
-	warn: overflowed symbol reused:  'size'
+Applied.
 
-drivers/bluetooth/bt3c_cs.c
-   467          /* Load */
-   468          while (count) {
-   469                  if (ptr[0] != 'S') {
-   470                          BT_ERR("Bad address in firmware");
-   471                          err = -EFAULT;
-   472                          goto error;
-   473                  }
-   474  
-   475                  memset(b, 0, sizeof(b));
-   476                  memcpy(b, ptr + 2, 2);
-   477                  if (kstrtoul(b, 16, &size) < 0)
-                                             ^^^^
-Smatch marks this as untrusted
 
-   478                          return -EINVAL;
-   479  
-   480                  memset(b, 0, sizeof(b));
-   481                  memcpy(b, ptr + 4, 8);
-   482                  if (kstrtoul(b, 16, &addr) < 0)
-   483                          return -EINVAL;
-   484  
-   485                  memset(b, 0, sizeof(b));
-   486                  memcpy(b, ptr + (size * 2) + 2, 2);
-                                  ^^^^^^^^^^^^^^^^^^^^
-We could be copying from anywhere
-
-   487                  if (kstrtoul(b, 16, &fcs) < 0)
-   488                          return -EINVAL;
-   489  
-   490                  memset(b, 0, sizeof(b));
-   491                  for (tmp = 0, i = 0; i < size; i++) {
-   492                          memcpy(b, ptr + (i * 2) + 2, 2);
-   493                          tmp += simple_strtol(b, NULL, 16);
-   494                  }
-   495  
-   496                  if (((tmp + fcs) & 0xff) != 0xff) {
-   497                          BT_ERR("Checksum error in firmware");
-   498                          err = -EILSEQ;
-   499                          goto error;
-   500                  }
-   501  
-   502                  if (ptr[1] == '3') {
-   503                          bt3c_address(iobase, addr);
-   504  
-   505                          memset(b, 0, sizeof(b));
-   506                          for (i = 0; i < (size - 4) / 2; i++) {
-   507                                  memcpy(b, ptr + (i * 4) + 12, 4);
-   508                                  tmp = simple_strtoul(b, NULL, 16);
-   509                                  bt3c_put(iobase, tmp);
-   510                          }
-   511                  }
-
-regards,
-dan carpenter
+-- 
+Luiz Augusto von Dentz
