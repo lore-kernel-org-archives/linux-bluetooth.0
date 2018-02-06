@@ -1,73 +1,142 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <360f80ad-6ec6-e285-b560-94404ee30bb6@jp.fujitsu.com>
-References: <360f80ad-6ec6-e285-b560-94404ee30bb6@jp.fujitsu.com>
+In-Reply-To: <20180205124818.23566-1-luiz.dentz@gmail.com>
+References: <20180205124818.23566-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 6 Feb 2018 10:04:19 -0200
-Message-ID: <CABBYNZJ_MzE_W4kmRSk212cd-DbV7ckXrtbP2t7qvJVCnw_-Lg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/shell: Print out help if using invalid command
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Vincent Petry <pvince81@googlemail.com>
+Date: Tue, 6 Feb 2018 10:03:04 -0200
+Message-ID: <CABBYNZLSBFNWiRuiA5iqnbC0DngG+iD2Q=HCYtMjzR=5kA1_aw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/4] shared/shell: Introduce bt_shell_{get,set}_env
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+Hi,
 
-On Tue, Feb 6, 2018 at 3:27 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Because Vincent Petry kindly reported that it is hard to use a command
-> in a submenu, clients are changed to print out help messages as below
-> when an invalid command is used.
+On Mon, Feb 5, 2018 at 10:48 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
->   [bluetooth]# list-attributes
->   Invalid command in menu main: list-attributes
->
->   Use "help" for a list of available commands in a menu.
->   Use "menu <submenu>" if you want to enter any submenu.
->   Use "back" if you want to return to menu main.
+> These function can be used to share environment variable accross
+> different files.
 > ---
->  src/shared/shell.c | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
+>  src/shared/shell.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/shell.h |  3 +++
+>  2 files changed, 66 insertions(+)
 >
 > diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index f1b85f202..47c048122 100644
+> index f1b85f202..f724c9881 100644
 > --- a/src/shared/shell.c
 > +++ b/src/shared/shell.c
-> @@ -191,6 +191,15 @@ static const struct bt_shell_menu_entry default_menu[] = {
->         { }
->  };
+> @@ -56,6 +56,11 @@
 >
-> +static void shell_print_help(void)
-> +{
-> +       print_text(COLOR_HIGHLIGHT,
-> +               "\n"
-> +               "Use \"help\" for a list of available commands in a menu.\n"
-> +               "Use \"menu <submenu>\" if you want to enter any submenu.\n"
-> +               "Use \"back\" if you want to return to menu main.");
-> +}
+>  static GMainLoop *main_loop;
+>
+> +struct bt_shell_env {
+> +       char *name;
+> +       void *value;
+> +};
 > +
->  static void shell_print_menu(void)
->  {
->         const struct bt_shell_menu_entry *entry;
-> @@ -341,8 +350,12 @@ static void shell_exec(int argc, char *argv[])
->                 return;
+>  static struct {
+>         struct io *input;
 >
->         if (menu_exec(default_menu, argc, argv) == -ENOENT) {
-> -               if (menu_exec(data.menu->entries, argc, argv) == -ENOENT)
-> -                       print_text(COLOR_HIGHLIGHT, "Invalid command");
-> +               if (menu_exec(data.menu->entries, argc, argv) == -ENOENT) {
-> +                       print_text(COLOR_HIGHLIGHT,
-> +                                       "Invalid command in menu %s: %s",
-> +                                       data.menu->name , argv[0]);
-> +                       shell_print_help();
-> +               }
->         }
+> @@ -66,6 +71,8 @@ static struct {
+>         const struct bt_shell_menu *menu;
+>         const struct bt_shell_menu *main;
+>         struct queue *submenus;
+> +
+> +       struct queue *envs;
+>  } data;
+>
+>  static void shell_print_menu(void);
+> @@ -759,6 +766,14 @@ static void rl_cleanup(void)
+>         rl_callback_handler_remove();
 >  }
 >
+> +static void env_destroy(void *data)
+> +{
+> +       struct bt_shell_env *env = data;
+> +
+> +       free(env->name);
+> +       free(env);
+> +}
+> +
+>  void bt_shell_run(void)
+>  {
+>         struct io *signal;
+> @@ -775,6 +790,11 @@ void bt_shell_run(void)
+>         g_main_loop_unref(main_loop);
+>         main_loop = NULL;
+>
+> +       if (data.envs) {
+> +               queue_destroy(data.envs, env_destroy);
+> +               data.envs = NULL;
+> +       }
+> +
+>         rl_cleanup();
+>  }
+>
+> @@ -849,3 +869,46 @@ bool bt_shell_detach(void)
+>
+>         return true;
+>  }
+> +
+> +static bool match_env(const void *data, const void *user_data)
+> +{
+> +       const struct bt_shell_env *env = data;
+> +       const char *name = user_data;
+> +
+> +       return !strcmp(env->name, name);
+> +}
+> +
+> +void bt_shell_set_env(const char *name, void *value)
+> +{
+> +       struct bt_shell_env *env;
+> +
+> +       if (!data.envs) {
+> +               data.envs = queue_new();
+> +               goto done;
+> +       }
+> +
+> +       env = queue_remove_if(data.envs, match_env, (void *) name);
+> +       if (env)
+> +               env_destroy(env);
+> +
+> +done:
+> +       env = new0(struct bt_shell_env, 1);
+> +       env->name = strdup(name);
+> +       env->value = value;
+> +
+> +       queue_push_tail(data.envs, env);
+> +}
+> +
+> +void *bt_shell_get_env(const char *name)
+> +{
+> +       const struct bt_shell_env *env;
+> +
+> +       if (!data.envs)
+> +               return NULL;
+> +
+> +       env = queue_find(data.envs, match_env, name);
+> +       if (!env)
+> +               return NULL;
+> +
+> +       return env->value;
+> +}
+> diff --git a/src/shared/shell.h b/src/shared/shell.h
+> index 8b8b1f634..359629896 100644
+> --- a/src/shared/shell.h
+> +++ b/src/shared/shell.h
+> @@ -87,4 +87,7 @@ int bt_shell_release_prompt(const char *input);
+>  bool bt_shell_attach(int fd);
+>  bool bt_shell_detach(void);
+>
+> +void bt_shell_set_env(const char *name, void *value);
+> +void *bt_shell_get_env(const char *name);
+> +
+>  void bt_shell_cleanup(void);
 > --
-> 2.14.1
+> 2.14.3
 
 Applied.
 
