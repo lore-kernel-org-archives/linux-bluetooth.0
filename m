@@ -1,118 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH] advertising: Configure discoverable flag based on adapter
- settings
-To: Szymon Janc <szymon.janc@codecoup.pl>
-References: <20180206104306.14895-1-szymon.janc@codecoup.pl>
-CC: <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <d8f7306b-a4b0-20c2-6423-ff1215a34ea9@jp.fujitsu.com>
-Date: Wed, 7 Feb 2018 10:24:13 +0900
-MIME-Version: 1.0
-In-Reply-To: <20180206104306.14895-1-szymon.janc@codecoup.pl>
-Content-Type: text/plain; charset="utf-8"
+From: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Tedd Ho Jeong An <tedd.an@intel.com>
+Subject: [PATCH BlueZ 2/2] tester: Enable LE Generate DHKey Complete event
+Date: Tue,  6 Feb 2018 13:03:57 -0800
+Message-Id: <1517951037-2970-2-git-send-email-tedd.an@linux.intel.com>
+In-Reply-To: <1517951037-2970-1-git-send-email-tedd.an@linux.intel.com>
+References: <1517951037-2970-1-git-send-email-tedd.an@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Tedd Ho Jeong An <tedd.an@intel.com>
 
-On 02/06/2018 07:43 PM, Szymon Janc wrote:
-> Until now advertising as peripheral was always setting General Discoverable
-> flag set. With this patch this is set based on adapter discoverable setting.
-> ---
->  src/adapter.c     |  9 +++++++++
->  src/adapter.h     |  1 +
->  src/advertising.c | 19 +++++++++++++++++--
->  src/advertising.h |  1 +
->  4 files changed, 28 insertions(+), 2 deletions(-)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 50cf46b11..5070c0f09 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -543,6 +543,7 @@ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
->  		g_dbus_emit_property_changed(dbus_conn, adapter->path,
->  					ADAPTER_INTERFACE, "Discoverable");
->  		store_adapter_info(adapter);
-> +		btd_adv_manager_refresh(adapter->adv_manager);
->  	}
->  
->  	if (changed_mask & MGMT_SETTING_BONDABLE) {
-> @@ -4108,6 +4109,14 @@ bool btd_adapter_get_connectable(struct btd_adapter *adapter)
->  	return false;
->  }
->  
-> +bool btd_adapter_get_discoverable(struct btd_adapter *adapter)
-> +{
-> +	if (adapter->current_settings & MGMT_SETTING_DISCOVERABLE)
-> +		return true;
-> +
-> +	return false;
-> +}
-> +
->  struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter)
->  {
->  	if (!adapter)
-> diff --git a/src/adapter.h b/src/adapter.h
-> index a85327cd1..e619a5be9 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -74,6 +74,7 @@ void adapter_foreach(adapter_cb func, gpointer user_data);
->  bool btd_adapter_get_pairable(struct btd_adapter *adapter);
->  bool btd_adapter_get_powered(struct btd_adapter *adapter);
->  bool btd_adapter_get_connectable(struct btd_adapter *adapter);
-> +bool btd_adapter_get_discoverable(struct btd_adapter *adapter);
->  
->  struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter);
->  
-> diff --git a/src/advertising.c b/src/advertising.c
-> index 94a8c4050..637445189 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -622,8 +622,12 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
->  
->  	DBG("Refreshing advertisement: %s", client->path);
->  
-> -	if (client->type == AD_TYPE_PERIPHERAL)
-> -		flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
-> +	if (client->type == AD_TYPE_PERIPHERAL) {
-> +		flags = MGMT_ADV_FLAG_CONNECTABLE;
-> +
-> +		if (btd_adapter_get_discoverable(client->manager->adapter))
-> +			flags |= MGMT_ADV_FLAG_DISCOV;
-> +	}
->  
->  	flags |= client->flags;
->  
-> @@ -1104,3 +1108,14 @@ void btd_adv_manager_destroy(struct btd_adv_manager *manager)
->  
->  	manager_destroy(manager);
->  }
-> +void btd_adv_manager_refresh(struct btd_adv_manager *manager)
-> +{
-> +	const struct queue_entry *entry;
-> +
-> +	for (entry = queue_get_entries(manager->clients); entry;
-> +							entry = entry->next) {
-> +		struct btd_adv_client *client = entry->data;
-> +
-> +		refresh_adv(client, NULL);
-> +	}
-> +}
+This patch adds LE Generate DHKey Complete event for
+LE Event Mask list for 'LE Generate DHKey'.
+---
+ tools/hci-tester.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I think that it is more safe to use queue_foreach() instead of for loop.
-
-
-Regards,
-Eramoto
-
-> diff --git a/src/advertising.h b/src/advertising.h
-> index b783cf075..d98c4b864 100644
-> --- a/src/advertising.h
-> +++ b/src/advertising.h
-> @@ -22,3 +22,4 @@ struct btd_adv_manager;
->  
->  struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter);
->  void btd_adv_manager_destroy(struct btd_adv_manager *manager);
-> +void btd_adv_manager_refresh(struct btd_adv_manager *manager);
-> 
+diff --git a/tools/hci-tester.c b/tools/hci-tester.c
+index 1e9ce4e..7873e7a 100644
+--- a/tools/hci-tester.c
++++ b/tools/hci-tester.c
+@@ -550,6 +550,7 @@ static void setup_le_generate_dhkey(const void *test_data)
+ 
+ 	memset(lsem.mask, 0, 8);
+ 	lsem.mask[0] |= 0x80;	/* LE Read Local P-256 Public Key Complete */
++	lsem.mask[1] |= 0x01;	/* LE Generate DHKey Complete */
+ 
+ 	bt_hci_send(user->hci_ut, BT_HCI_CMD_LE_SET_EVENT_MASK,
+ 					&lsem, sizeof(lsem), NULL, NULL, NULL);
+-- 
+2.7.4
 
