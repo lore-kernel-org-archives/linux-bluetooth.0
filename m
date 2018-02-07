@@ -1,40 +1,129 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] bluetooth: btmrvl_main: Replace GFP_ATOMIC with
- GFP_KERNEL in btmrvl_send_sync_cmd
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1516982221-8524-1-git-send-email-baijiaju1990@gmail.com>
-Date: Wed, 7 Feb 2018 09:55:44 +0100
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <C39D859D-E8B7-4805-94F7-28FEFCACEEEC@holtmann.org>
-References: <1516982221-8524-1-git-send-email-baijiaju1990@gmail.com>
-To: Jia-Ju Bai <baijiaju1990@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] advertising: Configure discoverable flag based on adapter settings
+Date: Wed, 07 Feb 2018 09:46:25 +0100
+Message-ID: <1698030.qWPfoGvGzI@ix>
+In-Reply-To: <d8f7306b-a4b0-20c2-6423-ff1215a34ea9@jp.fujitsu.com>
+References: <20180206104306.14895-1-szymon.janc@codecoup.pl> <d8f7306b-a4b0-20c2-6423-ff1215a34ea9@jp.fujitsu.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jia-Ju,
+Hi,
 
-> After checking all possible call chains to btmrvl_send_sync_cmd(), 
-> my tool finds that this function is never called in atomic context, 
-> namely never in an interrupt handler or holding a spinlock. 
-> And it calls wait_event_interruptible_timeout() after bt_skb_alloc(), 
-> so it indicates that btmrvl_send_sync_cmd() 
-> can call function which can sleep.
-> Thus GFP_ATOMIC is not necessary, and it can be replaced with GFP_KERNEL.
+On Wednesday, 7 February 2018 02:24:13 CET ERAMOTO Masaya wrote:
+> Hi Szymon,
 > 
-> This is found by a static analysis tool named DCNS written by myself.
+> On 02/06/2018 07:43 PM, Szymon Janc wrote:
+> > Until now advertising as peripheral was always setting General
+> > Discoverable
+> > flag set. With this patch this is set based on adapter discoverable
+> > setting. ---
+> > 
+> >  src/adapter.c     |  9 +++++++++
+> >  src/adapter.h     |  1 +
+> >  src/advertising.c | 19 +++++++++++++++++--
+> >  src/advertising.h |  1 +
+> >  4 files changed, 28 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index 50cf46b11..5070c0f09 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -543,6 +543,7 @@ static void settings_changed(struct btd_adapter
+> > *adapter, uint32_t settings)> 
+> >  		g_dbus_emit_property_changed(dbus_conn, adapter->path,
+> >  		
+> >  					ADAPTER_INTERFACE, "Discoverable");
+> >  		
+> >  		store_adapter_info(adapter);
+> > 
+> > +		btd_adv_manager_refresh(adapter->adv_manager);
+> > 
+> >  	}
+> >  	
+> >  	if (changed_mask & MGMT_SETTING_BONDABLE) {
+> > 
+> > @@ -4108,6 +4109,14 @@ bool btd_adapter_get_connectable(struct btd_adapter
+> > *adapter)> 
+> >  	return false;
+> >  
+> >  }
+> > 
+> > +bool btd_adapter_get_discoverable(struct btd_adapter *adapter)
+> > +{
+> > +	if (adapter->current_settings & MGMT_SETTING_DISCOVERABLE)
+> > +		return true;
+> > +
+> > +	return false;
+> > +}
+> > +
+> > 
+> >  struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter
+> >  *adapter) {
+> >  
+> >  	if (!adapter)
+> > 
+> > diff --git a/src/adapter.h b/src/adapter.h
+> > index a85327cd1..e619a5be9 100644
+> > --- a/src/adapter.h
+> > +++ b/src/adapter.h
+> > @@ -74,6 +74,7 @@ void adapter_foreach(adapter_cb func, gpointer
+> > user_data);> 
+> >  bool btd_adapter_get_pairable(struct btd_adapter *adapter);
+> >  bool btd_adapter_get_powered(struct btd_adapter *adapter);
+> >  bool btd_adapter_get_connectable(struct btd_adapter *adapter);
+> > 
+> > +bool btd_adapter_get_discoverable(struct btd_adapter *adapter);
+> > 
+> >  struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter
+> >  *adapter);> 
+> > diff --git a/src/advertising.c b/src/advertising.c
+> > index 94a8c4050..637445189 100644
+> > --- a/src/advertising.c
+> > +++ b/src/advertising.c
+> > @@ -622,8 +622,12 @@ static int refresh_adv(struct btd_adv_client *client,
+> > mgmt_request_func_t func)> 
+> >  	DBG("Refreshing advertisement: %s", client->path);
+> > 
+> > -	if (client->type == AD_TYPE_PERIPHERAL)
+> > -		flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
+> > +	if (client->type == AD_TYPE_PERIPHERAL) {
+> > +		flags = MGMT_ADV_FLAG_CONNECTABLE;
+> > +
+> > +		if (btd_adapter_get_discoverable(client->manager->adapter))
+> > +			flags |= MGMT_ADV_FLAG_DISCOV;
+> > +	}
+> > 
+> >  	flags |= client->flags;
+> > 
+> > @@ -1104,3 +1108,14 @@ void btd_adv_manager_destroy(struct btd_adv_manager
+> > *manager)> 
+> >  	manager_destroy(manager);
+> >  
+> >  }
+> > 
+> > +void btd_adv_manager_refresh(struct btd_adv_manager *manager)
+> > +{
+> > +	const struct queue_entry *entry;
+> > +
+> > +	for (entry = queue_get_entries(manager->clients); entry;
+> > +							entry = entry->next) {
+> > +		struct btd_adv_client *client = entry->data;
+> > +
+> > +		refresh_adv(client, NULL);
+> > +	}
+> > +}
 > 
-> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
-> ---
-> drivers/bluetooth/btmrvl_main.c |    2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> I think that it is more safe to use queue_foreach() instead of for loop.
 
-patch has been applied to bluetooth-next tree.
+Why? refresh_adv() doesn't modify queue.
 
-Regards
+-- 
+pozdrawiam
+Szymon Janc
 
-Marcel
+
