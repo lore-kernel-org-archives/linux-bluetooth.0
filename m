@@ -1,53 +1,151 @@
-Return-Path: <mirza.krak@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] advertising: Configure discoverable flag based on adapter settings
+Date: Wed, 07 Feb 2018 10:16:24 +0100
+Message-ID: <9372288.pMbemWvDQW@ix>
+In-Reply-To: <CABBYNZJwcLS_awySWZxpvQ2ZJxLppQv4Z-xaum6uwM569-NGog@mail.gmail.com>
+References: <20180206104306.14895-1-szymon.janc@codecoup.pl> <1698030.qWPfoGvGzI@ix> <CABBYNZJwcLS_awySWZxpvQ2ZJxLppQv4Z-xaum6uwM569-NGog@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180201190150.GA868@jcartwri.amer.corp.natinst.com>
-References: <CALw8SCWyD8-AVtqKvPZeNQuyLfvvdLe7ZtRWuh9KH09WNDDHuA@mail.gmail.com>
- <20180201190150.GA868@jcartwri.amer.corp.natinst.com>
-From: Mirza Krak <mirza.krak@gmail.com>
-Date: Wed, 7 Feb 2018 10:34:02 +0100
-Message-ID: <CALw8SCUL2+zWt=88wk4LckToCz75VVGSmK-ai3KoUNxWiLx2tQ@mail.gmail.com>
-Subject: Re: High CPU load when using USB Bluetooth on 4.14.15-rt13 kernel
-To: Julia Cartwright <julia@ni.com>
-Cc: linux-bluetooth@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-	linux-rt-users@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 1 February 2018 at 20:01, Julia Cartwright <julia@ni.com> wrote:
-> On Thu, Feb 01, 2018 at 10:58:28AM +0100, Mirza Krak wrote:
->> Hi.
->
-> Hello Mirza.
->
-> [..]
->> I have tried running a 4.14.15 vanilla kernel, and this does not have
->> this problem which means that it is the following combo
->>
->>     RT + USB Bluetooth
->>
->> That seem to the problem.
->>
->> Before I start digging deep in to the stacks I wanted to post my
->> problem to the community to see if someone is having a similar problem
->> on a different hardware or if you have any pointers on how to further
->> debug this.
->
-> One suggestion I would have would be to re-do your testing on mainline
-> v4.14.15 booted with the 'threadirqs' kernel command line parameter.
->
-> The reason being that without this option, interrupts aren't threaded in
-> mainline, so it very well could be that your hardware is still
-> misbehaving, however it's execution time just isn't being accounted for
-> in the same way.
+Hi Luiz,
 
-Thank you for the hint.
+On Wednesday, 7 February 2018 10:14:33 CET Luiz Augusto von Dentz wrote:
+> Hi Szymon, Eramoto,
+> 
+> On Wed, Feb 7, 2018 at 6:46 AM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> > Hi,
+> > 
+> > On Wednesday, 7 February 2018 02:24:13 CET ERAMOTO Masaya wrote:
+> >> Hi Szymon,
+> >> 
+> >> On 02/06/2018 07:43 PM, Szymon Janc wrote:
+> >> > Until now advertising as peripheral was always setting General
+> >> > Discoverable
+> >> > flag set. With this patch this is set based on adapter discoverable
+> >> > setting. ---
+> >> > 
+> >> >  src/adapter.c     |  9 +++++++++
+> >> >  src/adapter.h     |  1 +
+> >> >  src/advertising.c | 19 +++++++++++++++++--
+> >> >  src/advertising.h |  1 +
+> >> >  4 files changed, 28 insertions(+), 2 deletions(-)
+> >> > 
+> >> > diff --git a/src/adapter.c b/src/adapter.c
+> >> > index 50cf46b11..5070c0f09 100644
+> >> > --- a/src/adapter.c
+> >> > +++ b/src/adapter.c
+> >> > @@ -543,6 +543,7 @@ static void settings_changed(struct btd_adapter
+> >> > *adapter, uint32_t settings)>
+> >> > 
+> >> >             g_dbus_emit_property_changed(dbus_conn, adapter->path,
+> >> >             
+> >> >                                     ADAPTER_INTERFACE, "Discoverable");
+> >> >             
+> >> >             store_adapter_info(adapter);
+> >> > 
+> >> > +           btd_adv_manager_refresh(adapter->adv_manager);
+> >> > 
+> >> >     }
+> >> >     
+> >> >     if (changed_mask & MGMT_SETTING_BONDABLE) {
+> >> > 
+> >> > @@ -4108,6 +4109,14 @@ bool btd_adapter_get_connectable(struct
+> >> > btd_adapter
+> >> > *adapter)>
+> >> > 
+> >> >     return false;
+> >> >  
+> >> >  }
+> >> > 
+> >> > +bool btd_adapter_get_discoverable(struct btd_adapter *adapter)
+> >> > +{
+> >> > +   if (adapter->current_settings & MGMT_SETTING_DISCOVERABLE)
+> >> > +           return true;
+> >> > +
+> >> > +   return false;
+> >> > +}
+> >> > +
+> >> > 
+> >> >  struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter
+> >> >  *adapter) {
+> >> >  
+> >> >     if (!adapter)
+> >> > 
+> >> > diff --git a/src/adapter.h b/src/adapter.h
+> >> > index a85327cd1..e619a5be9 100644
+> >> > --- a/src/adapter.h
+> >> > +++ b/src/adapter.h
+> >> > @@ -74,6 +74,7 @@ void adapter_foreach(adapter_cb func, gpointer
+> >> > user_data);>
+> >> > 
+> >> >  bool btd_adapter_get_pairable(struct btd_adapter *adapter);
+> >> >  bool btd_adapter_get_powered(struct btd_adapter *adapter);
+> >> >  bool btd_adapter_get_connectable(struct btd_adapter *adapter);
+> >> > 
+> >> > +bool btd_adapter_get_discoverable(struct btd_adapter *adapter);
+> >> > 
+> >> >  struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter
+> >> >  *adapter);>
+> >> > 
+> >> > diff --git a/src/advertising.c b/src/advertising.c
+> >> > index 94a8c4050..637445189 100644
+> >> > --- a/src/advertising.c
+> >> > +++ b/src/advertising.c
+> >> > @@ -622,8 +622,12 @@ static int refresh_adv(struct btd_adv_client
+> >> > *client,
+> >> > mgmt_request_func_t func)>
+> >> > 
+> >> >     DBG("Refreshing advertisement: %s", client->path);
+> >> > 
+> >> > -   if (client->type == AD_TYPE_PERIPHERAL)
+> >> > -           flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
+> >> > +   if (client->type == AD_TYPE_PERIPHERAL) {
+> >> > +           flags = MGMT_ADV_FLAG_CONNECTABLE;
+> >> > +
+> >> > +           if (btd_adapter_get_discoverable(client->manager->adapter))
+> >> > +                   flags |= MGMT_ADV_FLAG_DISCOV;
+> >> > +   }
+> >> > 
+> >> >     flags |= client->flags;
+> >> > 
+> >> > @@ -1104,3 +1108,14 @@ void btd_adv_manager_destroy(struct
+> >> > btd_adv_manager
+> >> > *manager)>
+> >> > 
+> >> >     manager_destroy(manager);
+> >> >  
+> >> >  }
+> >> > 
+> >> > +void btd_adv_manager_refresh(struct btd_adv_manager *manager)
+> >> > +{
+> >> > +   const struct queue_entry *entry;
+> >> > +
+> >> > +   for (entry = queue_get_entries(manager->clients); entry;
+> >> > +                                                   entry =
+> >> > entry->next) {
+> >> > +           struct btd_adv_client *client = entry->data;
+> >> > +
+> >> > +           refresh_adv(client, NULL);
+> >> > +   }
+> >> > +}
+> >> 
+> >> I think that it is more safe to use queue_foreach() instead of for loop.
+> > 
+> > Why? refresh_adv() doesn't modify queue.
+> 
+> In this specific case it is more a matter of taste but I lean toward
+> using queue_foreach as much as possible as code may change.
 
-Adding "threadirq" on the mainline kernel exposed the CPU load and I
-guess that this is not a RT problem then.
+Fair enough. I'll send V2.
 
-Thank you once again.
+-- 
+pozdrawiam
+Szymon Janc
 
---=20
-Med V=C3=A4nliga H=C3=A4lsningar / Best Regards
 
-Mirza Krak
