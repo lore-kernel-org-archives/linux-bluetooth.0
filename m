@@ -1,78 +1,77 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Thomas Green <TGreen2@Sorenson.com>
-To: Szymon Janc <szymon.janc@codecoup.pl>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: More keyboard issues
-Date: Wed, 7 Feb 2018 19:48:13 +0000
-Message-ID: <C2BC44D770753C45AAAC42695FB5BE020125730EF4@SLC-EXMB01.CORP.SRELAY.COM>
-References: <C2BC44D770753C45AAAC42695FB5BE02012572F769@SLC-EXMB01.CORP.SRELAY.COM>
- <5252185.UFqE8F7bMa@ix>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] core: Fixes order InterfaceAdded
+Date: Wed,  7 Feb 2018 15:56:16 +0200
+Message-Id: <20180207135616.6090-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Was this helpful to you?
+Registering on the callback of MGMT_OP_READ_ADV_FEATURES causes
+InterfacesAdded to be reschedule after the device objects which causes
+tools such as PulseAudio to consider it invalid.
 
-Tom
+Fixes https://bugzilla.redhat.com/show_bug.cgi?id=1534857
+---
+ src/advertising.c | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
 
------Original Message-----
-From: Thomas Green=20
-Sent: Thursday, February 01, 2018 10:48 AM
-To: 'Szymon Janc' <szymon.janc@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: RE: More keyboard issues
+diff --git a/src/advertising.c b/src/advertising.c
+index 94a8c4050..970c3d87b 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -1032,14 +1032,6 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+ 	if (manager->max_ads == 0)
+ 		return;
+ 
+-	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+-					adapter_get_path(manager->adapter),
+-					LE_ADVERTISING_MGR_IFACE, methods,
+-					NULL, properties, manager, NULL)) {
+-		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
+-		return;
+-	}
+-
+ 	/* Reset existing instances */
+ 	if (feat->num_instances)
+ 		remove_advertising(manager, 0);
+@@ -1061,19 +1053,29 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter)
+ 	}
+ 
+ 	manager->mgmt_index = btd_adapter_get_index(adapter);
++	manager->clients = queue_new();
++	manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
++
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++					adapter_get_path(manager->adapter),
++					LE_ADVERTISING_MGR_IFACE, methods,
++					NULL, properties, manager, NULL)) {
++		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
++		goto fail;
++	}
+ 
+ 	if (!mgmt_send(manager->mgmt, MGMT_OP_READ_ADV_FEATURES,
+ 				manager->mgmt_index, 0, NULL,
+ 				read_adv_features_callback, manager, NULL)) {
+ 		error("Failed to read advertising features");
+-		manager_destroy(manager);
+-		return NULL;
++		goto fail;
+ 	}
+ 
+-	manager->clients = queue_new();
+-	manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
+-
+ 	return manager;
++
++fail:
++	manager_destroy(manager);
++	return NULL;
+ }
+ 
+ struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter)
+-- 
+2.14.3
 
-Szymon,
-
-Thanks for the reply,
->Hi,
->
->On Saturday, 27 January 2018 01:20:21 CET Thomas Green wrote:
->> Hi all,
->>
->> I'm testing more keyboards with 5.48 and have found issues with two=20
->> other keyboards.  In this case the problem is during pairing.  The two k=
-eyboards
->> in question are the SIIG AAZ2448 and the ANKER A7221.   The current issu=
-e
->> is that during pairing of these two keyboards we are given a PIN code=20
->> display, so I enter it on the keyboard and nothing happens, and=20
->> eventually the pairing times out.
->>=20
->> [bluetooth]# pair 20:73:03:A4:18:4D
->> Attempting to pair with 20:73:03:A4:18:4D [CHG] Device=20
->> 20:73:03:A4:18:4D Connected: yes [agent] PIN code: 851841 [Anker=20
->> A7721]# [  282.174342] WARNING: at net/bluetooth/hci_conn.c:322
->> hci_conn_timeout+0x44/0x198() Failed to pair:
->> org.bluez.Error.AuthenticationTimeout
->> [Anker A7721]#
->>=20
->> This happens about 95% of the time.  The other 5% the pairing=20
->> completes and everything works fine.
->>=20
->> I could attach btmon output and output from running bluetoothd -d -n,=20
->> but nothing interesting happens from the time the pincode is=20
->> displayed and the timeout occurs.
->>=20
->> Where do I begin to look for why the pincode isn't being transmitted=20
->> back from the keyboards?  Why is it inconsistent?
->>=20
->> As an interesting side note the Apple keyboard that I'm having the=20
->> driver loading trouble uses the same pairing mechanism and it works=20
->> well every time. (and all of these keyboards worked fine in 4.101)
->
->Get full btmon logs first, ideally from the moment you power on BT adapter=
-.
->
->--
->pozdrawiam
->Szymon Janc
->
->
-
-The log file is attached to this email....
-
-Tom
