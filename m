@@ -1,258 +1,78 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [RFC] adapter: Add support for Limited Discoverable mode
-Date: Thu,  8 Feb 2018 12:10:29 +0100
-Message-Id: <20180208111029.523-1-szymon.janc@codecoup.pl>
+From: Thomas Green <TGreen2@Sorenson.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: More keyboard issues
+Date: Wed, 7 Feb 2018 19:48:13 +0000
+Message-ID: <C2BC44D770753C45AAAC42695FB5BE020125730EF4@SLC-EXMB01.CORP.SRELAY.COM>
+References: <C2BC44D770753C45AAAC42695FB5BE02012572F769@SLC-EXMB01.CORP.SRELAY.COM>
+ <5252185.UFqE8F7bMa@ix>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to set adapter in Limited Discoverable mode for up to 60
-seconds. Any registered advertising instances flags are updated as
-well.
----
- doc/adapter-api.txt |  20 ++++++++
- src/adapter.c       | 131 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/adapter.h       |   1 +
- src/advertising.c   |   4 +-
- 4 files changed, 155 insertions(+), 1 deletion(-)
+Hi Szymon,
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index 0533b674a..ea50eeb72 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -225,6 +225,26 @@ Properties	string Address [readonly]
- 
- 			For any new adapter this settings defaults to false.
- 
-+		boolean LimitedDiscoverable [readwrite, experimental]
-+
-+			Switch an adapter to limited discoverable or
-+			non-discoverable to either make it visible or hide it.
-+			This is a global setting and should only be used by the
-+			settings application.
-+
-+			Adapter can be in limited discoverable mode for up to
-+			60 seconds. DiscoverableTimeout is honored but capped to
-+			60 seconds limit.
-+
-+			In case the adapter is switched off or already
-+			general discoverable, setting this value will fail.
-+
-+			When changing the Powered property the new state of
-+			this property will be updated via a PropertiesChanged
-+			signal.
-+
-+			For any new adapter this settings defaults to false.
-+
- 		boolean Pairable [readwrite]
- 
- 			Switch an adapter to pairable or non-pairable. This is
-diff --git a/src/adapter.c b/src/adapter.c
-index 5070c0f09..3898156e3 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -97,6 +97,8 @@
- #define DISTANCE_VAL_INVALID	0x7FFF
- #define PATHLOSS_MAX		137
- 
-+#define LIMITED_TIMEOUT (60)
-+
- static DBusConnection *dbus_conn = NULL;
- 
- static bool kernel_conn_control = false;
-@@ -205,6 +207,7 @@ struct btd_adapter {
- 	char *modalias;			/* device id (modalias) */
- 	bool stored_discoverable;	/* stored discoverable mode */
- 	uint32_t discoverable_timeout;	/* discoverable time(sec) */
-+	bool limited;			/* if limited discoverable */
- 	uint32_t pairable_timeout;	/* pairable time(sec) */
- 
- 	char *current_alias;		/* current adapter name alias */
-@@ -540,6 +543,22 @@ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
- 					ADAPTER_INTERFACE, "Connectable");
- 
- 	if (changed_mask & MGMT_SETTING_DISCOVERABLE) {
-+		if (adapter->limited) {
-+			bool discoverable;
-+			bool powered;
-+
-+			discoverable = adapter->current_settings &
-+						MGMT_SETTING_DISCOVERABLE;
-+			powered = adapter->current_settings &
-+							MGMT_SETTING_POWERED;
-+
-+			adapter->limited = discoverable && powered;
-+
-+			g_dbus_emit_property_changed(dbus_conn, adapter->path,
-+							ADAPTER_INTERFACE,
-+							"LimitedDiscoverable");
-+		}
-+
- 		g_dbus_emit_property_changed(dbus_conn, adapter->path,
- 					ADAPTER_INTERFACE, "Discoverable");
- 		store_adapter_info(adapter);
-@@ -2830,6 +2849,107 @@ static void property_set_discoverable(const GDBusPropertyTable *property,
- 	property_set_mode(adapter, MGMT_SETTING_DISCOVERABLE, iter, id);
- }
- 
-+static gboolean property_get_limited(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+	dbus_bool_t enable;
-+
-+	enable = adapter->limited &&
-+			(adapter->current_settings & MGMT_SETTING_DISCOVERABLE);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &enable);
-+
-+	return TRUE;
-+}
-+
-+static void set_limited(struct btd_adapter *adapter, bool enable,
-+						GDBusPendingPropertySet id)
-+{
-+	struct property_set_data *data;
-+	struct mgmt_cp_set_discoverable cp;
-+	void *param;
-+	uint16_t opcode, len;
-+	uint8_t mode;
-+
-+	memset(&cp, 0, sizeof(cp));
-+
-+	if (enable) {
-+		if (kernel_conn_control)
-+			set_mode(adapter, MGMT_OP_SET_CONNECTABLE, 0x01);
-+
-+		cp.val = 0x02;
-+		if (adapter->discoverable_timeout)
-+			cp.timeout = htobs(MIN(adapter->discoverable_timeout,
-+							LIMITED_TIMEOUT));
-+		else
-+			cp.timeout = htobs(LIMITED_TIMEOUT);
-+
-+		opcode = MGMT_OP_SET_DISCOVERABLE;
-+		param = &cp;
-+		len = sizeof(cp);
-+	} else {
-+		if (kernel_conn_control) {
-+			mode = 0x00;
-+			opcode = MGMT_OP_SET_CONNECTABLE;
-+			param = &mode;
-+			len = sizeof(mode);
-+		} else {
-+			cp.val = 0x00;
-+			opcode = MGMT_OP_SET_DISCOVERABLE;
-+			param = &cp;
-+			len = sizeof(cp);
-+		}
-+	}
-+
-+	DBG("sending %s command for index %u", mgmt_opstr(opcode),
-+							adapter->dev_id);
-+
-+	data = g_new0(struct property_set_data, 1);
-+	data->adapter = adapter;
-+	data->id = id;
-+
-+	if (mgmt_send(adapter->mgmt, opcode, adapter->dev_id, len, param,
-+				property_set_mode_complete, data, g_free) > 0)
-+		return;
-+
-+	g_free(data);
-+	btd_error(adapter->dev_id, "Failed to set mode for index %u",
-+							adapter->dev_id);
-+
-+	g_dbus_pending_property_error(id, ERROR_INTERFACE ".Failed", NULL);
-+}
-+
-+static void property_set_limited(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter,
-+				GDBusPendingPropertySet id, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+	dbus_bool_t enable;
-+
-+	if (!(adapter->current_settings & MGMT_SETTING_POWERED)) {
-+		g_dbus_pending_property_error(id, ERROR_INTERFACE ".Failed",
-+								"Not Powered");
-+		return;
-+	}
-+
-+	dbus_message_iter_get_basic(iter, &enable);
-+
-+	if (adapter->limited == !!enable) {
-+		g_dbus_pending_property_success(id);
-+		return;
-+	}
-+
-+	if (enable && (adapter->current_settings & MGMT_SETTING_DISCOVERABLE)) {
-+		g_dbus_pending_property_error(id, ERROR_INTERFACE ".Failed",
-+						"General Discoverable");
-+		return;
-+	}
-+
-+	adapter->limited = true;
-+	set_limited(adapter, enable, id);
-+}
-+
- static gboolean property_get_discoverable_timeout(
- 					const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
-@@ -3101,6 +3221,8 @@ static const GDBusPropertyTable adapter_properties[] = {
- 	{ "Powered", "b", property_get_powered, property_set_powered },
- 	{ "Discoverable", "b", property_get_discoverable,
- 					property_set_discoverable },
-+	{ "LimitedDiscoverable", "b", property_get_limited,
-+		property_set_limited, NULL, G_DBUS_PROPERTY_FLAG_EXPERIMENTAL},
- 	{ "DiscoverableTimeout", "u", property_get_discoverable_timeout,
- 					property_set_discoverable_timeout },
- 	{ "Pairable", "b", property_get_pairable, property_set_pairable },
-@@ -4117,6 +4239,15 @@ bool btd_adapter_get_discoverable(struct btd_adapter *adapter)
- 	return false;
- }
- 
-+bool btd_adapter_get_limited(struct btd_adapter *adapter)
-+{
-+	if ((adapter->current_settings & MGMT_SETTING_DISCOVERABLE) &&
-+			adapter->limited)
-+		return true;
-+
-+	return false;
-+}
-+
- struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter)
- {
- 	if (!adapter)
-diff --git a/src/adapter.h b/src/adapter.h
-index e619a5be9..1ddf26576 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -75,6 +75,7 @@ bool btd_adapter_get_pairable(struct btd_adapter *adapter);
- bool btd_adapter_get_powered(struct btd_adapter *adapter);
- bool btd_adapter_get_connectable(struct btd_adapter *adapter);
- bool btd_adapter_get_discoverable(struct btd_adapter *adapter);
-+bool btd_adapter_get_limited(struct btd_adapter *adapter);
- 
- struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter);
- 
-diff --git a/src/advertising.c b/src/advertising.c
-index 0af9f02d6..3dba1465d 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -625,7 +625,9 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
- 	if (client->type == AD_TYPE_PERIPHERAL) {
- 		flags = MGMT_ADV_FLAG_CONNECTABLE;
- 
--		if (btd_adapter_get_discoverable(client->manager->adapter))
-+		if (btd_adapter_get_limited(client->manager->adapter))
-+			flags |= MGMT_ADV_FLAG_LIMITED_DISCOV;
-+		else if (btd_adapter_get_discoverable(client->manager->adapter))
- 			flags |= MGMT_ADV_FLAG_DISCOV;
- 	}
- 
--- 
-2.14.3
+Was this helpful to you?
 
+Tom
+
+-----Original Message-----
+From: Thomas Green=20
+Sent: Thursday, February 01, 2018 10:48 AM
+To: 'Szymon Janc' <szymon.janc@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: RE: More keyboard issues
+
+Szymon,
+
+Thanks for the reply,
+>Hi,
+>
+>On Saturday, 27 January 2018 01:20:21 CET Thomas Green wrote:
+>> Hi all,
+>>
+>> I'm testing more keyboards with 5.48 and have found issues with two=20
+>> other keyboards.  In this case the problem is during pairing.  The two k=
+eyboards
+>> in question are the SIIG AAZ2448 and the ANKER A7221.   The current issu=
+e
+>> is that during pairing of these two keyboards we are given a PIN code=20
+>> display, so I enter it on the keyboard and nothing happens, and=20
+>> eventually the pairing times out.
+>>=20
+>> [bluetooth]# pair 20:73:03:A4:18:4D
+>> Attempting to pair with 20:73:03:A4:18:4D [CHG] Device=20
+>> 20:73:03:A4:18:4D Connected: yes [agent] PIN code: 851841 [Anker=20
+>> A7721]# [  282.174342] WARNING: at net/bluetooth/hci_conn.c:322
+>> hci_conn_timeout+0x44/0x198() Failed to pair:
+>> org.bluez.Error.AuthenticationTimeout
+>> [Anker A7721]#
+>>=20
+>> This happens about 95% of the time.  The other 5% the pairing=20
+>> completes and everything works fine.
+>>=20
+>> I could attach btmon output and output from running bluetoothd -d -n,=20
+>> but nothing interesting happens from the time the pincode is=20
+>> displayed and the timeout occurs.
+>>=20
+>> Where do I begin to look for why the pincode isn't being transmitted=20
+>> back from the keyboards?  Why is it inconsistent?
+>>=20
+>> As an interesting side note the Apple keyboard that I'm having the=20
+>> driver loading trouble uses the same pairing mechanism and it works=20
+>> well every time. (and all of these keyboards worked fine in 4.101)
+>
+>Get full btmon logs first, ideally from the moment you power on BT adapter=
+.
+>
+>--
+>pozdrawiam
+>Szymon Janc
+>
+>
+
+The log file is attached to this email....
+
+Tom
