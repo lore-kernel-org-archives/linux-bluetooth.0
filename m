@@ -1,77 +1,140 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+From: Jim Veneskey <bluetooth@bigorc.com>
+Date: Wed, 7 Feb 2018 08:48:26 -0500
+Message-ID: <CAJaHWiM2iuj5m==6SZwNYy0LD0OMREPtZZg5wfLuB6S4R32icg@mail.gmail.com>
+Subject: Testing SPP profiles
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Fixes order InterfaceAdded
-Date: Wed,  7 Feb 2018 15:52:56 +0200
-Message-Id: <20180207135256.5221-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
+I am attempting to test SPP profiles - both inbound and outbound
+connections using a Laird WB50N module.  This is an embedded device
+running Linux and the firmware includes BlueZ version 5.43
 
-Registering on the callback of MGMT_OP_READ_ADV_FEATURES causes
-InterfacesAdded to be reschedule after the device objects which causes
-tools such as PulseAudio to consider it invalid.
+I am attempting to configure SPP via these commands:
 
-Fixes https://bugzilla.kernel.org/show_bug.cgi?id=197941
----
- src/advertising.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+###
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 94a8c4050..970c3d87b 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -1032,14 +1032,6 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
- 	if (manager->max_ads == 0)
- 		return;
- 
--	if (!g_dbus_register_interface(btd_get_dbus_connection(),
--					adapter_get_path(manager->adapter),
--					LE_ADVERTISING_MGR_IFACE, methods,
--					NULL, properties, manager, NULL)) {
--		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
--		return;
--	}
--
- 	/* Reset existing instances */
- 	if (feat->num_instances)
- 		remove_advertising(manager, 0);
-@@ -1061,19 +1053,29 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter)
- 	}
- 
- 	manager->mgmt_index = btd_adapter_get_index(adapter);
-+	manager->clients = queue_new();
-+	manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
-+
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-+					adapter_get_path(manager->adapter),
-+					LE_ADVERTISING_MGR_IFACE, methods,
-+					NULL, properties, manager, NULL)) {
-+		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
-+		goto fail;
-+	}
- 
- 	if (!mgmt_send(manager->mgmt, MGMT_OP_READ_ADV_FEATURES,
- 				manager->mgmt_index, 0, NULL,
- 				read_adv_features_callback, manager, NULL)) {
- 		error("Failed to read advertising features");
--		manager_destroy(manager);
--		return NULL;
-+		goto fail;
- 	}
- 
--	manager->clients = queue_new();
--	manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
--
- 	return manager;
-+
-+fail:
-+	manager_destroy(manager);
-+	return NULL;
- }
- 
- struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter)
--- 
-2.14.3
+# /usr/bin/nohup /usr/libexec/bluetooth/bluetoothd &
+# nohup: appending output to nohup.out
 
+# bluetoothctl
+[NEW] Controller D0:12:6B:0B:E7:E8 BlueZ 5.43 [default]
+[NEW] Device B0:05:94:F3:4F:F9 ubuntu-0
+[NEW] Device 00:16:A4:0B:F3:84 LAIRD BT900
+[bluetooth]# discoverable on
+Changing discoverable on succeeded
+[CHG] Controller D0:12:6B:0B:E7:E8 Discoverable: yes
+[bluetooth]# pairable on
+Changing pairable on succeeded
+[bluetooth]# agent
+Missing on/off/capability argument
+[bluetooth]# agent on
+Agent registered
+[bluetooth]# default-agent
+Default agent request successful
+[bluetooth]# quit
+Agent unregistered
+[DEL] Controller D0:12:6B:0B:E7:E8 BlueZ 5.43 [default]
+
+(note sure if the above was required or not)
+
+#
+# hciconfig hci0 piscan
+# hciconfig hci0
+hci0:   Type: Primary  Bus: UART
+        BD Address: D0:12:6B:0B:E7:E8  ACL MTU: 310:10  SCO MTU: 64:8
+        UP RUNNING PSCAN ISCAN
+        RX bytes:2449 acl:0 sco:0 events:72 errors:0
+        TX bytes:2532 acl:0 sco:0 commands:72 errors:0
+
+# sdptool add --channel=3 SP
+# rfcomm watch /dev/rfcomm0 3
+Waiting for connection on channel 3
+
+
+###
+
+At this point, if I query the device from a nearby linux box - I see this:
+
+###
+
+biff@dellthing:~$ sdptool browse D0:12:6B:0B:E7:E8
+Browsing D0:12:6B:0B:E7:E8 ...
+Service RecHandle: 0x10000
+Service Class ID List:
+  "PnP Information" (0x1200)
+Profile Descriptor List:
+  "PnP Information" (0x1200)
+    Version: 0x0103
+
+Browsing D0:12:6B:0B:E7:E8 ...
+Service Search failed: Invalid argument
+Service Name: Generic Access Profile
+Service Provider: BlueZ
+Service RecHandle: 0x10001
+Service Class ID List:
+  "Generic Access" (0x1800)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 31
+  "ATT" (0x0007)
+    uint16: 0x0001
+    uint16: 0x0005
+
+Service Name: Generic Attribute Profile
+Service Provider: BlueZ
+Service RecHandle: 0x10002
+Service Class ID List:
+  "Generic Attribute" (0x1801)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 31
+  "ATT" (0x0007)
+    uint16: 0x0006
+    uint16: 0x0009
+
+Service Name: AVRCP CT
+Service RecHandle: 0x10003
+Service Class ID List:
+  "AV Remote" (0x110e)
+  "AV Remote Controller" (0x110f)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 23
+  "AVCTP" (0x0017)
+    uint16: 0x0103
+Profile Descriptor List:
+  "AV Remote" (0x110e)
+    Version: 0x0106
+
+Service Name: AVRCP TG
+Service RecHandle: 0x10004
+Service Class ID List:
+  "AV Remote Target" (0x110c)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 23
+  "AVCTP" (0x0017)
+    uint16: 0x0103
+Profile Descriptor List:
+  "AV Remote" (0x110e)
+    Version: 0x0105
+
+###
+
+
+No sign of any SPP support.
+
+I'm obviously missing something, but many google searches later I have
+nothing to show for it.  (I also searched this mailing list archives -
+very little discussion on SPP)
+
+If this is documented someplace, I'd appreciate a pointer to it.
+
+thanks!
+
+Jim
