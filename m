@@ -1,140 +1,99 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Jim Veneskey <bluetooth@bigorc.com>
-Date: Wed, 7 Feb 2018 08:48:26 -0500
-Message-ID: <CAJaHWiM2iuj5m==6SZwNYy0LD0OMREPtZZg5wfLuB6S4R32icg@mail.gmail.com>
-Subject: Testing SPP profiles
+From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH v2] advertising: Configure discoverable flag based on adapter settings
+Date: Wed,  7 Feb 2018 11:02:24 +0100
+Message-Id: <20180207100224.7523-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-I am attempting to test SPP profiles - both inbound and outbound
-connections using a Laird WB50N module.  This is an embedded device
-running Linux and the firmware includes BlueZ version 5.43
+Until now advertising as peripheral was always setting General Discoverable
+flag set. With this patch this is set based on adapter discoverable setting.
+---
+ src/adapter.c     |  9 +++++++++
+ src/adapter.h     |  1 +
+ src/advertising.c | 14 ++++++++++++--
+ src/advertising.h |  1 +
+ 4 files changed, 23 insertions(+), 2 deletions(-)
 
-I am attempting to configure SPP via these commands:
+diff --git a/src/adapter.c b/src/adapter.c
+index 50cf46b11..5070c0f09 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -543,6 +543,7 @@ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
+ 		g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 					ADAPTER_INTERFACE, "Discoverable");
+ 		store_adapter_info(adapter);
++		btd_adv_manager_refresh(adapter->adv_manager);
+ 	}
+ 
+ 	if (changed_mask & MGMT_SETTING_BONDABLE) {
+@@ -4108,6 +4109,14 @@ bool btd_adapter_get_connectable(struct btd_adapter *adapter)
+ 	return false;
+ }
+ 
++bool btd_adapter_get_discoverable(struct btd_adapter *adapter)
++{
++	if (adapter->current_settings & MGMT_SETTING_DISCOVERABLE)
++		return true;
++
++	return false;
++}
++
+ struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter)
+ {
+ 	if (!adapter)
+diff --git a/src/adapter.h b/src/adapter.h
+index a85327cd1..e619a5be9 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -74,6 +74,7 @@ void adapter_foreach(adapter_cb func, gpointer user_data);
+ bool btd_adapter_get_pairable(struct btd_adapter *adapter);
+ bool btd_adapter_get_powered(struct btd_adapter *adapter);
+ bool btd_adapter_get_connectable(struct btd_adapter *adapter);
++bool btd_adapter_get_discoverable(struct btd_adapter *adapter);
+ 
+ struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter);
+ 
+diff --git a/src/advertising.c b/src/advertising.c
+index 94a8c4050..0af9f02d6 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -622,8 +622,12 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
+ 
+ 	DBG("Refreshing advertisement: %s", client->path);
+ 
+-	if (client->type == AD_TYPE_PERIPHERAL)
+-		flags = MGMT_ADV_FLAG_CONNECTABLE | MGMT_ADV_FLAG_DISCOV;
++	if (client->type == AD_TYPE_PERIPHERAL) {
++		flags = MGMT_ADV_FLAG_CONNECTABLE;
++
++		if (btd_adapter_get_discoverable(client->manager->adapter))
++			flags |= MGMT_ADV_FLAG_DISCOV;
++	}
+ 
+ 	flags |= client->flags;
+ 
+@@ -1104,3 +1108,9 @@ void btd_adv_manager_destroy(struct btd_adv_manager *manager)
+ 
+ 	manager_destroy(manager);
+ }
++
++void btd_adv_manager_refresh(struct btd_adv_manager *manager)
++{
++	queue_foreach(manager->clients, (queue_foreach_func_t)refresh_adv,
++									NULL);
++}
+diff --git a/src/advertising.h b/src/advertising.h
+index b783cf075..d98c4b864 100644
+--- a/src/advertising.h
++++ b/src/advertising.h
+@@ -22,3 +22,4 @@ struct btd_adv_manager;
+ 
+ struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter);
+ void btd_adv_manager_destroy(struct btd_adv_manager *manager);
++void btd_adv_manager_refresh(struct btd_adv_manager *manager);
+-- 
+2.14.3
 
-###
-
-# /usr/bin/nohup /usr/libexec/bluetooth/bluetoothd &
-# nohup: appending output to nohup.out
-
-# bluetoothctl
-[NEW] Controller D0:12:6B:0B:E7:E8 BlueZ 5.43 [default]
-[NEW] Device B0:05:94:F3:4F:F9 ubuntu-0
-[NEW] Device 00:16:A4:0B:F3:84 LAIRD BT900
-[bluetooth]# discoverable on
-Changing discoverable on succeeded
-[CHG] Controller D0:12:6B:0B:E7:E8 Discoverable: yes
-[bluetooth]# pairable on
-Changing pairable on succeeded
-[bluetooth]# agent
-Missing on/off/capability argument
-[bluetooth]# agent on
-Agent registered
-[bluetooth]# default-agent
-Default agent request successful
-[bluetooth]# quit
-Agent unregistered
-[DEL] Controller D0:12:6B:0B:E7:E8 BlueZ 5.43 [default]
-
-(note sure if the above was required or not)
-
-#
-# hciconfig hci0 piscan
-# hciconfig hci0
-hci0:   Type: Primary  Bus: UART
-        BD Address: D0:12:6B:0B:E7:E8  ACL MTU: 310:10  SCO MTU: 64:8
-        UP RUNNING PSCAN ISCAN
-        RX bytes:2449 acl:0 sco:0 events:72 errors:0
-        TX bytes:2532 acl:0 sco:0 commands:72 errors:0
-
-# sdptool add --channel=3 SP
-# rfcomm watch /dev/rfcomm0 3
-Waiting for connection on channel 3
-
-
-###
-
-At this point, if I query the device from a nearby linux box - I see this:
-
-###
-
-biff@dellthing:~$ sdptool browse D0:12:6B:0B:E7:E8
-Browsing D0:12:6B:0B:E7:E8 ...
-Service RecHandle: 0x10000
-Service Class ID List:
-  "PnP Information" (0x1200)
-Profile Descriptor List:
-  "PnP Information" (0x1200)
-    Version: 0x0103
-
-Browsing D0:12:6B:0B:E7:E8 ...
-Service Search failed: Invalid argument
-Service Name: Generic Access Profile
-Service Provider: BlueZ
-Service RecHandle: 0x10001
-Service Class ID List:
-  "Generic Access" (0x1800)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 31
-  "ATT" (0x0007)
-    uint16: 0x0001
-    uint16: 0x0005
-
-Service Name: Generic Attribute Profile
-Service Provider: BlueZ
-Service RecHandle: 0x10002
-Service Class ID List:
-  "Generic Attribute" (0x1801)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 31
-  "ATT" (0x0007)
-    uint16: 0x0006
-    uint16: 0x0009
-
-Service Name: AVRCP CT
-Service RecHandle: 0x10003
-Service Class ID List:
-  "AV Remote" (0x110e)
-  "AV Remote Controller" (0x110f)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 23
-  "AVCTP" (0x0017)
-    uint16: 0x0103
-Profile Descriptor List:
-  "AV Remote" (0x110e)
-    Version: 0x0106
-
-Service Name: AVRCP TG
-Service RecHandle: 0x10004
-Service Class ID List:
-  "AV Remote Target" (0x110c)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 23
-  "AVCTP" (0x0017)
-    uint16: 0x0103
-Profile Descriptor List:
-  "AV Remote" (0x110e)
-    Version: 0x0105
-
-###
-
-
-No sign of any SPP support.
-
-I'm obviously missing something, but many google searches later I have
-nothing to show for it.  (I also searched this mailing list archives -
-very little discussion on SPP)
-
-If this is documented someplace, I'd appreciate a pointer to it.
-
-thanks!
-
-Jim
