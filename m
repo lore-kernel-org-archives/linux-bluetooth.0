@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] core: Fixes order InterfaceAdded
-Date: Wed,  7 Feb 2018 15:56:16 +0200
-Message-Id: <20180207135616.6090-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] core: Fixes order InterfaceAdded
+Date: Wed,  7 Feb 2018 15:52:56 +0200
+Message-Id: <20180207135256.5221-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -13,7 +13,7 @@ Registering on the callback of MGMT_OP_READ_ADV_FEATURES causes
 InterfacesAdded to be reschedule after the device objects which causes
 tools such as PulseAudio to consider it invalid.
 
-Fixes https://bugzilla.redhat.com/show_bug.cgi?id=1534857
+Fixes https://bugzilla.kernel.org/show_bug.cgi?id=197941
 ---
  src/advertising.c | 28 +++++++++++++++-------------
  1 file changed, 15 insertions(+), 13 deletions(-)
