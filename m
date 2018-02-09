@@ -1,45 +1,50 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ v2 4/4] tools/obexctl: Fix display of size on completion
+Subject: [PATCH BlueZ v2 3/4] tools/obexctl: Fix retrieving non-existent
+ iterator
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <8df3e799-c7a3-3f49-32dd-2e5c4cabc9ff@jp.fujitsu.com>
-Message-ID: <ee85eca2-51f3-98f7-4ba8-bf38241eeb0e@jp.fujitsu.com>
-Date: Fri, 9 Feb 2018 18:12:38 +0900
+Message-ID: <5c6c0bd4-3680-deb3-23af-32f54d5217cd@jp.fujitsu.com>
+Date: Fri, 9 Feb 2018 18:12:15 +0900
 MIME-Version: 1.0
 In-Reply-To: <8df3e799-c7a3-3f49-32dd-2e5c4cabc9ff@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Outputs zero as the transferred size on completion of transfer as below:
+If transfer is completed with one time file transfer,
+transfer_property_changed() is called with the iter argument, which is
+NULL, as below:
 
-  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Transferred: 5339965 (@32KB/s 00:01)
-  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Transferred: 5372726 (@32KB/s 00:00)
-  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Transferred: 0 (@18446744073704178KB/s 00:00)
-  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Status: complete
+  #0  transfer_property_changed (proxy=<optimized out>, name=<optimized out>, iter=0x0, user_data=0x5555557b9060) at tools/obexctl.c:1896
+  #1  0x000055555556e3cf in properties_changed (conn=<optimized out>, msg=<optimized out>, user_data=0x5555557c8300) at gdbus/client.c:433
+  #2  0x000055555556c830 in signal_filter (connection=0x5555557c65a0, message=0x5555557ccea0, user_data=0x5555557cdbf0) at gdbus/watch.c:407
+  #3  0x000055555556c291 in message_filter (connection=0x5555557c65a0, message=0x5555557ccea0, user_data=<optimized out>) at gdbus/watch.c:557
+  #4  0x00007ffff7888661 in dbus_connection_dispatch () from /lib/x86_64-linux-gnu/libdbus-1.so.3
+  #5  0x000055555556b010 in message_dispatch (data=0x5555557c65a0) at gdbus/mainloop.c:72
+  #6  0x00007ffff7b0be25 in g_main_context_dispatch () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+  #7  0x00007ffff7b0c1f0 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+  #8  0x00007ffff7b0c502 in g_main_loop_run () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+  #9  0x0000555555577594 in bt_shell_run () at src/shared/shell.c:833
+  #10 0x000055555556516d in main (argc=<optimized out>, argv=<optimized out>) at tools/obexctl.c:2116
 ---
- tools/obexctl.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tools/obexctl.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/tools/obexctl.c b/tools/obexctl.c
-index 4e46c7541..2ef1c044e 100644
+index 05bbd3e84..4e46c7541 100644
 --- a/tools/obexctl.c
 +++ b/tools/obexctl.c
-@@ -1862,6 +1862,14 @@ static void print_transferred(struct transfer_data *data, const char *str,
- 	int seconds, minutes;
+@@ -1885,6 +1885,9 @@ static void transfer_property_changed(GDBusProxy *proxy, const char *name,
+ 	struct transfer_data *data = user_data;
+ 	char *str;
  
- 	dbus_message_iter_get_basic(iter, &valu64);
++	if (iter == NULL)
++		return;
 +
-+	/*
-+	 * Use the file size to output the proper size/speed since obexd resets
-+	 * the current transferred size to zero on completion of transfer.
-+	 */
-+	if (valu64 == 0)
-+		valu64 = data->size;
-+
- 	speed = valu64 - data->transferred;
- 	data->transferred = valu64;
+ 	str = proxy_description(proxy, "Transfer", COLORED_CHG);
  
+ 	if (strcmp(name, "Transferred") == 0) {
 -- 
 2.14.1
 
