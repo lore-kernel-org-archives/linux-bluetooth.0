@@ -1,93 +1,90 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ v2 1/4] obexd: Use emitting function wrapped for
- transfer
-Message-ID: <8df3e799-c7a3-3f49-32dd-2e5c4cabc9ff@jp.fujitsu.com>
-Date: Fri, 9 Feb 2018 18:10:57 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20180207135616.6090-1-luiz.dentz@gmail.com>
+References: <20180207135616.6090-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 9 Feb 2018 06:59:07 -0200
+Message-ID: <CABBYNZKc=AVyfLQto7j5bxBETaO_+Cn+Assr=McU7h6WAqzcQg@mail.gmail.com>
+Subject: Re: [PATCH v2] core: Fixes order InterfaceAdded
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Also replaces emit_transfer_progress() with the new wrapper function
-because the total/transferred arguments have not been used since commit
-a5c2b6e8 ("obexd: Align client and server spec of org.bluez.obex.Transfer1")
-and g_dbus_emit_property_changed_full() checks if the path argument is
-NULL.
----
- obexd/src/manager.c | 26 ++++++++++----------------
- obexd/src/manager.h |  2 ++
- 2 files changed, 12 insertions(+), 16 deletions(-)
+Hi,
 
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index 70265e445..7ae8d7f83 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -533,12 +533,18 @@ void manager_cleanup(void)
- 	dbus_connection_unref(connection);
- }
- 
-+void manager_emit_transfer_property(struct obex_transfer *transfer,
-+								char *name)
-+{
-+	g_dbus_emit_property_changed(connection, transfer->path,
-+					TRANSFER_INTERFACE, name);
-+}
-+
- void manager_emit_transfer_started(struct obex_transfer *transfer)
- {
- 	transfer->status = TRANSFER_STATUS_ACTIVE;
- 
--	g_dbus_emit_property_changed(connection, transfer->path,
--					TRANSFER_INTERFACE, "Status");
-+	manager_emit_transfer_property(transfer, "Status");
- }
- 
- static void emit_transfer_completed(struct obex_transfer *transfer,
-@@ -550,18 +556,7 @@ static void emit_transfer_completed(struct obex_transfer *transfer,
- 	transfer->status = success ? TRANSFER_STATUS_COMPLETE :
- 						TRANSFER_STATUS_ERROR;
- 
--	g_dbus_emit_property_changed(connection, transfer->path,
--					TRANSFER_INTERFACE, "Status");
--}
--
--static void emit_transfer_progress(struct obex_transfer *transfer,
--					uint32_t total, uint32_t transferred)
--{
--	if (transfer->path == NULL)
--		return;
--
--	g_dbus_emit_property_changed(connection, transfer->path,
--					TRANSFER_INTERFACE, "Transferred");
-+	manager_emit_transfer_property(transfer, "Status");
- }
- 
- static void transfer_free(struct obex_transfer *transfer)
-@@ -783,8 +778,7 @@ void manager_unregister_session(struct obex_session *os)
- 
- void manager_emit_transfer_progress(struct obex_transfer *transfer)
- {
--	emit_transfer_progress(transfer, transfer->session->size,
--						transfer->session->offset);
-+	manager_emit_transfer_property(transfer, "Transferred");
- }
- 
- void manager_emit_transfer_completed(struct obex_transfer *transfer)
-diff --git a/obexd/src/manager.h b/obexd/src/manager.h
-index d9781b201..d709af5a8 100644
---- a/obexd/src/manager.h
-+++ b/obexd/src/manager.h
-@@ -33,6 +33,8 @@ void manager_unregister_session(struct obex_session *os);
- 
- struct obex_transfer *manager_register_transfer(struct obex_session *os);
- void manager_unregister_transfer(struct obex_transfer *transfer);
-+void manager_emit_transfer_property(struct obex_transfer *transfer,
-+								char *name);
- void manager_emit_transfer_started(struct obex_transfer *transfer);
- void manager_emit_transfer_progress(struct obex_transfer *transfer);
- void manager_emit_transfer_completed(struct obex_transfer *transfer);
+On Wed, Feb 7, 2018 at 11:56 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Registering on the callback of MGMT_OP_READ_ADV_FEATURES causes
+> InterfacesAdded to be reschedule after the device objects which causes
+> tools such as PulseAudio to consider it invalid.
+>
+> Fixes https://bugzilla.redhat.com/show_bug.cgi?id=1534857
+> ---
+>  src/advertising.c | 28 +++++++++++++++-------------
+>  1 file changed, 15 insertions(+), 13 deletions(-)
+>
+> diff --git a/src/advertising.c b/src/advertising.c
+> index 94a8c4050..970c3d87b 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -1032,14 +1032,6 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+>         if (manager->max_ads == 0)
+>                 return;
+>
+> -       if (!g_dbus_register_interface(btd_get_dbus_connection(),
+> -                                       adapter_get_path(manager->adapter),
+> -                                       LE_ADVERTISING_MGR_IFACE, methods,
+> -                                       NULL, properties, manager, NULL)) {
+> -               error("Failed to register " LE_ADVERTISING_MGR_IFACE);
+> -               return;
+> -       }
+> -
+>         /* Reset existing instances */
+>         if (feat->num_instances)
+>                 remove_advertising(manager, 0);
+> @@ -1061,19 +1053,29 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter)
+>         }
+>
+>         manager->mgmt_index = btd_adapter_get_index(adapter);
+> +       manager->clients = queue_new();
+> +       manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
+> +
+> +       if (!g_dbus_register_interface(btd_get_dbus_connection(),
+> +                                       adapter_get_path(manager->adapter),
+> +                                       LE_ADVERTISING_MGR_IFACE, methods,
+> +                                       NULL, properties, manager, NULL)) {
+> +               error("Failed to register " LE_ADVERTISING_MGR_IFACE);
+> +               goto fail;
+> +       }
+>
+>         if (!mgmt_send(manager->mgmt, MGMT_OP_READ_ADV_FEATURES,
+>                                 manager->mgmt_index, 0, NULL,
+>                                 read_adv_features_callback, manager, NULL)) {
+>                 error("Failed to read advertising features");
+> -               manager_destroy(manager);
+> -               return NULL;
+> +               goto fail;
+>         }
+>
+> -       manager->clients = queue_new();
+> -       manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
+> -
+>         return manager;
+> +
+> +fail:
+> +       manager_destroy(manager);
+> +       return NULL;
+>  }
+>
+>  struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter)
+> --
+> 2.14.3
+
+Applied.
+
+
 -- 
-2.14.1
-
+Luiz Augusto von Dentz
