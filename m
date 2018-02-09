@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/gatt-client: Reset callbacks when unregistering
-Date: Fri,  9 Feb 2018 12:53:14 +0200
-Message-Id: <20180209105315.24862-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] shared/gatt-client: Reset callbacks when unregistering
+Date: Fri,  9 Feb 2018 12:53:15 +0200
+Message-Id: <20180209105315.24862-3-luiz.dentz@gmail.com>
 In-Reply-To: <20180209105315.24862-1-luiz.dentz@gmail.com>
 References: <20180209105315.24862-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
