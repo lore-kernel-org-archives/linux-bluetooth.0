@@ -1,79 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1511938373-22396-2-git-send-email-jaganathx.kanakkassery@intel.com>
-References: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1511938373-22396-2-git-send-email-jaganathx.kanakkassery@intel.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 9 Feb 2018 11:05:55 -0200
-Message-ID: <CABBYNZLux4Lg9iKxdbBuxQ2OKZqnfFMrbJDTPOkebERToV9Jrw@mail.gmail.com>
-Subject: Re: [PATCH 1/4 v4] doc/mgmt-api: Add support for Get PHY
- Configuration command
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/gatt-client: Reset callbacks when unregistering
+Date: Fri,  9 Feb 2018 12:53:14 +0200
+Message-Id: <20180209105315.24862-2-luiz.dentz@gmail.com>
+In-Reply-To: <20180209105315.24862-1-luiz.dentz@gmail.com>
+References: <20180209105315.24862-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Nov 29, 2017 at 4:52 AM, Jaganath Kanakkassery
-<jaganath.k.os@gmail.com> wrote:
-> ---
->  doc/mgmt-api.txt | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
->
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 8e7de14..c07c48c 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -2871,6 +2871,7 @@ Read Extended Controller Information Command
->                 13      Privacy
->                 14      Controller Configuration
->                 15      Static Address
-> +               16      PHY configuration
->
->         The EIR_Data field contains information about class of device,
->         local name and other values. Not all of them might be present. For
-> @@ -2916,6 +2917,33 @@ Set Appearance Command
->                                 Invalid Parameters
->                                 Invalid Index
->
-> +Get PHY Configuration Command
-> +==========================
-> +
-> +       Command Code:           0x0043
-> +       Controller Index:       <controller id>
-> +       Command Parameters:
-> +       Return Parameters:      Supported_phys (2 Octet)
-> +                               Selected_phys (2 Octet)
-> +
-> +       This command is used to retrieve the supported PHYs and currently
-> +       selected PHYs.
-> +
-> +       Supported_phys and Selected_phys is a bitmask with the following bits.
-> +               0       LE 1M TX
-> +               1       LE 1M RX
-> +               2       LE 2M TX
-> +               3       LE 2M RX
-> +               4       LE CODED TX
-> +               5       LE CODED RX
-> +
-> +       LE 1M TX and LE 1M RX would be supported by default.
-> +
-> +       This command is only available for LE capable controllers.
-> +       It will return Not Supported otherwise.
-> +
-> +       Possible errors:        Not Supported
-> +                               Invalid Index
->
->  Command Complete Event
->  ======================
-> --
-> 2.7.4
+If user application is unregistering a notification handler its
+callbacks shall not be called even CCC write is still holding a
+reference to notify_data.
+---
+ src/shared/gatt-client.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Are you still working on this, these perhaps we should integrate and
-start working on setting 2M whenever available.
-
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 8083ff719..1285c37ef 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -1212,7 +1212,9 @@ static void complete_notify_request(void *data)
+ 	struct notify_data *notify_data = data;
+ 
+ 	notify_data->att_id = 0;
+-	notify_data->callback(0, notify_data->user_data);
++
++	if (notify_data->callback)
++		notify_data->callback(0, notify_data->user_data);
+ }
+ 
+ static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
+@@ -3157,6 +3159,10 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+ 	/* Remove data if it has been queued */
+ 	queue_remove(notify_data->chrc->reg_notify_queue, notify_data);
+ 
++	/* Reset callbacks */
++	notify_data->callback = NULL;
++	notify_data->notify = NULL;
++
+ 	complete_unregister_notify(notify_data);
+ 	return true;
+ }
 -- 
-Luiz Augusto von Dentz
+2.14.3
+
