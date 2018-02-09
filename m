@@ -1,77 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] core: Fixes order InterfaceAdded
-Date: Fri,  9 Feb 2018 12:53:13 +0200
-Message-Id: <20180209105315.24862-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 4/4] tools/obexctl: Fix display of size on completion
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <8df3e799-c7a3-3f49-32dd-2e5c4cabc9ff@jp.fujitsu.com>
+Message-ID: <ee85eca2-51f3-98f7-4ba8-bf38241eeb0e@jp.fujitsu.com>
+Date: Fri, 9 Feb 2018 18:12:38 +0900
+MIME-Version: 1.0
+In-Reply-To: <8df3e799-c7a3-3f49-32dd-2e5c4cabc9ff@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Outputs zero as the transferred size on completion of transfer as below:
 
-Registering on the callback of MGMT_OP_READ_ADV_FEATURES causes
-InterfacesAdded to be reschedule after the device objects which causes
-tools such as PulseAudio to consider it invalid.
-
-Fixes https://bugzilla.redhat.com/show_bug.cgi?id=1534857
+  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Transferred: 5339965 (@32KB/s 00:01)
+  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Transferred: 5372726 (@32KB/s 00:00)
+  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Transferred: 0 (@18446744073704178KB/s 00:00)
+  [CHG] Transfer /org/bluez/obex/server/session3/transfer2 Status: complete
 ---
- src/advertising.c | 28 +++++++++++++++-------------
- 1 file changed, 15 insertions(+), 13 deletions(-)
+ tools/obexctl.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 94a8c4050..970c3d87b 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -1032,14 +1032,6 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
- 	if (manager->max_ads == 0)
- 		return;
+diff --git a/tools/obexctl.c b/tools/obexctl.c
+index 4e46c7541..2ef1c044e 100644
+--- a/tools/obexctl.c
++++ b/tools/obexctl.c
+@@ -1862,6 +1862,14 @@ static void print_transferred(struct transfer_data *data, const char *str,
+ 	int seconds, minutes;
  
--	if (!g_dbus_register_interface(btd_get_dbus_connection(),
--					adapter_get_path(manager->adapter),
--					LE_ADVERTISING_MGR_IFACE, methods,
--					NULL, properties, manager, NULL)) {
--		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
--		return;
--	}
--
- 	/* Reset existing instances */
- 	if (feat->num_instances)
- 		remove_advertising(manager, 0);
-@@ -1061,19 +1053,29 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter)
- 	}
- 
- 	manager->mgmt_index = btd_adapter_get_index(adapter);
-+	manager->clients = queue_new();
-+	manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
+ 	dbus_message_iter_get_basic(iter, &valu64);
 +
-+	if (!g_dbus_register_interface(btd_get_dbus_connection(),
-+					adapter_get_path(manager->adapter),
-+					LE_ADVERTISING_MGR_IFACE, methods,
-+					NULL, properties, manager, NULL)) {
-+		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
-+		goto fail;
-+	}
- 
- 	if (!mgmt_send(manager->mgmt, MGMT_OP_READ_ADV_FEATURES,
- 				manager->mgmt_index, 0, NULL,
- 				read_adv_features_callback, manager, NULL)) {
- 		error("Failed to read advertising features");
--		manager_destroy(manager);
--		return NULL;
-+		goto fail;
- 	}
- 
--	manager->clients = queue_new();
--	manager->supported_flags = MGMT_ADV_FLAG_LOCAL_NAME;
--
- 	return manager;
++	/*
++	 * Use the file size to output the proper size/speed since obexd resets
++	 * the current transferred size to zero on completion of transfer.
++	 */
++	if (valu64 == 0)
++		valu64 = data->size;
 +
-+fail:
-+	manager_destroy(manager);
-+	return NULL;
- }
+ 	speed = valu64 - data->transferred;
+ 	data->transferred = valu64;
  
- struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter)
 -- 
-2.14.3
+2.14.1
 
