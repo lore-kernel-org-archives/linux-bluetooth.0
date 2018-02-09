@@ -1,52 +1,79 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1511938373-22396-2-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1511938373-22396-2-git-send-email-jaganathx.kanakkassery@intel.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] unit/test-ecc: Fix uninitialised values
-Date: Fri,  9 Feb 2018 15:10:28 +0200
-Message-Id: <20180209131028.16874-1-luiz.dentz@gmail.com>
+Date: Fri, 9 Feb 2018 11:05:55 -0200
+Message-ID: <CABBYNZLux4Lg9iKxdbBuxQ2OKZqnfFMrbJDTPOkebERToV9Jrw@mail.gmail.com>
+Subject: Re: [PATCH 1/4 v4] doc/mgmt-api: Add support for Get PHY
+ Configuration command
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Jaganath,
 
-Conditional jump or move depends on uninitialised value(s)
-   at 0x40208C: test_sample (test-ecc.c:106)
-   by 0x4022AB: test_invalid_pub (test-ecc.c:272)
-   by 0x406DA2: run_callback (tester.c:415)
-   by 0x4E83576: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
-   by 0x4E86B76: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5400.3)
-   by 0x4E86F1F: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
-   by 0x4E87231: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5400.3)
-   by 0x408245: tester_run (tester.c:830)
-   by 0x401CC3: main (test-ecc.c:291)
+On Wed, Nov 29, 2017 at 4:52 AM, Jaganath Kanakkassery
+<jaganath.k.os@gmail.com> wrote:
+> ---
+>  doc/mgmt-api.txt | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+>
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 8e7de14..c07c48c 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -2871,6 +2871,7 @@ Read Extended Controller Information Command
+>                 13      Privacy
+>                 14      Controller Configuration
+>                 15      Static Address
+> +               16      PHY configuration
+>
+>         The EIR_Data field contains information about class of device,
+>         local name and other values. Not all of them might be present. For
+> @@ -2916,6 +2917,33 @@ Set Appearance Command
+>                                 Invalid Parameters
+>                                 Invalid Index
+>
+> +Get PHY Configuration Command
+> +==========================
+> +
+> +       Command Code:           0x0043
+> +       Controller Index:       <controller id>
+> +       Command Parameters:
+> +       Return Parameters:      Supported_phys (2 Octet)
+> +                               Selected_phys (2 Octet)
+> +
+> +       This command is used to retrieve the supported PHYs and currently
+> +       selected PHYs.
+> +
+> +       Supported_phys and Selected_phys is a bitmask with the following bits.
+> +               0       LE 1M TX
+> +               1       LE 1M RX
+> +               2       LE 2M TX
+> +               3       LE 2M RX
+> +               4       LE CODED TX
+> +               5       LE CODED RX
+> +
+> +       LE 1M TX and LE 1M RX would be supported by default.
+> +
+> +       This command is only available for LE capable controllers.
+> +       It will return Not Supported otherwise.
+> +
+> +       Possible errors:        Not Supported
+> +                               Invalid Index
+>
+>  Command Complete Event
+>  ======================
+> --
+> 2.7.4
 
-Conditional jump or move depends on uninitialised value(s)
-   at 0x4020D6: test_sample (test-ecc.c:113)
-   by 0x4022AB: test_invalid_pub (test-ecc.c:272)
-   by 0x406DA2: run_callback (tester.c:415)
-   by 0x4E83576: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
-   by 0x4E86B76: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5400.3)
-   by 0x4E86F1F: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
-   by 0x4E87231: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5400.3)
-   by 0x408245: tester_run (tester.c:830)
-   by 0x401CC3: main (test-ecc.c:291)
----
- unit/test-ecc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Are you still working on this, these perhaps we should integrate and
+start working on setting 2M whenever available.
 
-diff --git a/unit/test-ecc.c b/unit/test-ecc.c
-index 98400a253..e0f9723fc 100644
---- a/unit/test-ecc.c
-+++ b/unit/test-ecc.c
-@@ -91,7 +91,7 @@ static int test_sample(uint8_t priv_a[32], uint8_t priv_b[32],
- 				uint8_t pub_a[64], uint8_t pub_b[64],
- 				uint8_t dhkey[32])
- {
--	uint8_t dhkey_a[32], dhkey_b[32];
-+	uint8_t dhkey_a[32] = {}, dhkey_b[32] = {};
- 	int fails = 0;
- 
- 	ecdh_shared_secret(pub_b, priv_a, dhkey_a);
 -- 
-2.14.3
-
+Luiz Augusto von Dentz
