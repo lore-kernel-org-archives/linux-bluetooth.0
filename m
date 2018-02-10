@@ -1,79 +1,33 @@
-Return-Path: <morisset.hugues@gmail.com>
-Subject: Re: Bose Quiet Comfort 35 Remaining Battery Reporting
-From: Hugues <morisset.hugues@gmail.com>
-To: Sebastian Reichel <sre@kernel.org>,
- Linux-Bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Marcel Holtmann <marcel@holtmann.org>
-References: <20170213055504.kworoylsusadecl7@earth>
- <1415ce15-3e92-3695-4d83-aac96e442ec1@gmail.com>
-Message-ID: <9c7adf82-d6b2-6f2f-b954-728f4bacee7c@gmail.com>
-Date: Sun, 11 Feb 2018 14:22:46 +0100
-MIME-Version: 1.0
-In-Reply-To: <1415ce15-3e92-3695-4d83-aac96e442ec1@gmail.com>
-Content-Type: text/plain; charset=windows-1252
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH] Bluetooth: Fix incorrect bits for LE states
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180209172602.20250-1-lukasz.rymanowski@codecoup.pl>
+Date: Sat, 10 Feb 2018 21:08:47 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4438159A-1EB9-481C-8897-043C462260AB@holtmann.org>
+References: <20180209172602.20250-1-lukasz.rymanowski@codecoup.pl>
+To: =?utf-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-Sebastian code works great!
-But how can I proceed so the remaining battery is exposed over upower?
+Hi Lukasz,
 
-	Greping through pulseaudio sources
-(git://anongit.freedesktop.org/pulseaudio/pulseaudio) for 'battery'
-doesn't return anything, so anything about battery power seems unlikely
-to be merged into pulseaudio.
-
-	upower already expose batteries from bluez through dbus
-(git://anongit.freedesktop.org/upower:src/linux/up-device-bluez.c)
-
-So is it possible to do the AT commands at the bluez level and expose
-the infos through dbus, so upower expose it to the rest of the system?
-
-Thanks,
-Hugues
-
-On 02/24/2017 12:01 PM, Hugues wrote:
-> Hello,
-> Thanks a lot!
-> I tried to connect to the headset through dbus to make the AT commands,
-> but failed.
-> So what's the services/program where this should be implemented so it
-> can be exposed on dbus and picked up by the Desktop Environment?
+> This patch fixes incorrect checks for LE states.
+> Issues found when doing mgmt tests for scenario
+> when Linux Kernel should do connectable advertising
+> while connected.
 > 
-> Regards,
-> Hugues
-> 
-> On 02/13/2017 06:55 AM, Sebastian Reichel wrote:
->> Hi,
->>
->> FWIW I was also interested in battery level of my Bose QC35 and
->> checked this some time ago. That time I only checked the low
->> energy stuff, since the Android application seems to know the
->> battery status with only LE being connected.
->>
->> Marcel Holtman wrote:
->>>> This headset do have dual mode, I searched around using gatttool ant the
->>>> gatt specification but I find nothing about Battery Level
->>>> (org.bluetooth.characteristic.battery_level.xml) or Battery Service
->>>> (org.bluetooth.service.battery_service.xml).
->>
->> Bose QC35 does not expose battery status through standard battery_level
->> characteristic. There is a proprietary primary service 0xfebe (which
->> is assigned to Bose) with a couple of custom services. I assume battery
->> level can be read through them, but the required commands are unknown.
->>
->>>> How could I read what's in the Apple HFP extensions?
->>>
->>> Start with this one. It describes the extra HFP AT commands that iOS uses:
->>>
->>> https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf
->>
->> Thanks for the documentation link! That is actually implemented for
->> the Bose QC35. Here is a quick hack providing battery status info
->> in pulseaudio log:
->>
->> https://github.com/sre/pulseaudio/commit/d66b66d20e9bc73e6d0ca89283cf2b5675304b00
->>
->> -- Sebastian
->>
-> 
+> Signed-off-by: Łukasz Rymanowski <lukasz.rymanowski@codecoup.pl>
+> ---
+> net/bluetooth/hci_request.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
