@@ -1,60 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180209105315.24862-3-luiz.dentz@gmail.com>
-References: <20180209105315.24862-1-luiz.dentz@gmail.com> <20180209105315.24862-3-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Feb 2018 09:28:53 -0200
-Message-ID: <CABBYNZJRchu9iCXjMjoZP6wwU1e2Sgnbh91tyUvqzAPJ62pXoA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/2] shared/gatt-client: Reset callbacks when unregistering
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: sudeepta bhuyan <sudeepta.bhuyan@gmail.com>
+Date: Mon, 12 Feb 2018 16:52:16 +0530
+Message-ID: <CA+TC0NqnhXH=jxSoV-XhkDJ05S7evYJhW28peD4LPAnSRn3spw@mail.gmail.com>
+Subject: hciattach alternative to change default address after upgrading to
+ BlueZ 5.47
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello all,
 
-On Fri, Feb 9, 2018 at 8:53 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If user application is unregistering a notification handler its
-> callbacks shall not be called even CCC write is still holding a
-> reference to notify_data.
-> ---
->  src/shared/gatt-client.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 8083ff719..1285c37ef 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -1212,7 +1212,9 @@ static void complete_notify_request(void *data)
->         struct notify_data *notify_data = data;
->
->         notify_data->att_id = 0;
-> -       notify_data->callback(0, notify_data->user_data);
-> +
-> +       if (notify_data->callback)
-> +               notify_data->callback(0, notify_data->user_data);
->  }
->
->  static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
-> @@ -3157,6 +3159,10 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
->         /* Remove data if it has been queued */
->         queue_remove(notify_data->chrc->reg_notify_queue, notify_data);
->
-> +       /* Reset callbacks */
-> +       notify_data->callback = NULL;
-> +       notify_data->notify = NULL;
-> +
->         complete_unregister_notify(notify_data);
->         return true;
->  }
-> --
-> 2.14.3
+Prior to upgrading BlueZ to 5.47 in my project, I was using hciattach
+to set the UART device's address before starting bluetoothd.
 
-Applied.
+hciattach /dev/ttyS2 bcm43xx flow nosleep xx:xx:xx:xx:xx
 
+However since hciattach is deprecated in newer BlueZ, I am now using
+btattach instead to do the same. But btattach does not provide an
+option to set the bluetooth address of the device.
 
--- 
-Luiz Augusto von Dentz
+What is the standard procedure to set the bluetooth address of the
+UART device using newer BlueZ tools?
+
+Thanks,
+Sudeepta
