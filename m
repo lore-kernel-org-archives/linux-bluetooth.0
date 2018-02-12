@@ -1,36 +1,74 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: hciattach alternative to change default address after upgrading
- to BlueZ 5.47
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CA+TC0NqnhXH=jxSoV-XhkDJ05S7evYJhW28peD4LPAnSRn3spw@mail.gmail.com>
-Date: Mon, 12 Feb 2018 15:08:28 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B26A4952-B5DC-47BB-B45B-5D95FAEE6D98@holtmann.org>
-References: <CA+TC0NqnhXH=jxSoV-XhkDJ05S7evYJhW28peD4LPAnSRn3spw@mail.gmail.com>
-To: sudeepta bhuyan <sudeepta.bhuyan@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAFGVEfDdoP17uEBvU3FoYj5FV2cF5ig4nYxgEy_ofV==ihoYWA@mail.gmail.com>
+References: <CAFGVEfDdoP17uEBvU3FoYj5FV2cF5ig4nYxgEy_ofV==ihoYWA@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 12 Feb 2018 09:59:45 -0200
+Message-ID: <CABBYNZKqy=YQghqNa4Wj-55C+1Dx+uPce1ERm-1EFP0z4ri21g@mail.gmail.com>
+Subject: Re: Configuring scan behaviour of bluez
+To: Matthias Schuh <m.schuh.jr@googlemail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sudeepta,
+Hi Matthias,
 
-> Prior to upgrading BlueZ to 5.47 in my project, I was using hciattach
-> to set the UART device's address before starting bluetoothd.
-> 
-> hciattach /dev/ttyS2 bcm43xx flow nosleep xx:xx:xx:xx:xx
-> 
-> However since hciattach is deprecated in newer BlueZ, I am now using
-> btattach instead to do the same. But btattach does not provide an
-> option to set the bluetooth address of the device.
-> 
-> What is the standard procedure to set the bluetooth address of the
-> UART device using newer BlueZ tools?
+On Thu, Feb 8, 2018 at 11:14 AM, Matthias Schuh
+<m.schuh.jr@googlemail.com> wrote:
+> Dear bluez-mailingslist,
+>
+> thanks for taking the time to read this:
+>
+> Setup:
+>
+> bluez-5.48, kernel 4.14.16
+>
+> bluetoothctl and btmgmt to scan, setup and configure bt 4.2 enabled sensor nodes
+>
+> The requirement is to keep up uninterrupted scanning as long as
+> possible, since the sensor nodes dynamically modify their Manufacturer
+> Data enhancing it with sensor information.
+>
+> In general turning on discovery via bluetoothctl  "scan on" delivers:
+>
+> - Information on devices in the vincinity
+> - Updates of devices that changed their manufacturer payload
+>
+> Monitoring the scan activity via btmgmt delivers the following loop behaviour:
+>
+> - After issueing "scan on" via bluetoothctl shows:  "hci0 type 7 discovering on"
+> - After exactly 10 seconds I get the info: "hci0 type7 discovering off"
+> - After exactly 5 seconds I get the info: "hci0 type 7 discovering on"
+>
+> Analyzing the packages I scan with wireshark I noticed that I'm
+> missing out on several broadcast from the sensor nodes. One
+> explanation is that discovery seems to be automatically turned off in
+> the described interval. This interval is the same on different
+> bluetooth hardware so i guess this is somehow defined by bluez.
 
-there is btmgmt public-addr command that will work if your driver supports hdev->set_bdaddr. For Broadcom chips that should be fully supported.
+This is because by default BlueZ employs an interleaved scanning so
+both LE and BR/EDR devices can be found if you don't want that you
+will need to use discovery filters (bluetoothctl> menu scan).
 
-Regards
+> In the official documentation I could not find any clue on how to
+> influence this behaviour.
+> Is there a way to define these  interval parameters?
 
-Marcel
+You can find the documentation here about the discovery filters here:
 
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n48
+
+>
+> Thanks ahead and all the best,
+>
+> Matthias
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
