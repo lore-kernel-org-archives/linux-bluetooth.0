@@ -1,61 +1,60 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <2425F01E-DE0C-4A43-B68D-900BABFE24B6@holtmann.org>
-References: <20180209131028.16874-1-luiz.dentz@gmail.com> <2425F01E-DE0C-4A43-B68D-900BABFE24B6@holtmann.org>
+In-Reply-To: <20180209105315.24862-3-luiz.dentz@gmail.com>
+References: <20180209105315.24862-1-luiz.dentz@gmail.com> <20180209105315.24862-3-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Feb 2018 09:29:26 -0200
-Message-ID: <CABBYNZLKBqNqKWind5a_TJtPhT2=TaKx00OAkLoRyiJeuaLbYQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] unit/test-ecc: Fix uninitialised values
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 12 Feb 2018 09:28:53 -0200
+Message-ID: <CABBYNZJRchu9iCXjMjoZP6wwU1e2Sgnbh91tyUvqzAPJ62pXoA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] shared/gatt-client: Reset callbacks when unregistering
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Fri, Feb 9, 2018 at 12:41 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Luiz,
+On Fri, Feb 9, 2018 at 8:53 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
->> Conditional jump or move depends on uninitialised value(s)
->>  at 0x40208C: test_sample (test-ecc.c:106)
->>  by 0x4022AB: test_invalid_pub (test-ecc.c:272)
->>  by 0x406DA2: run_callback (tester.c:415)
->>  by 0x4E83576: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
->>  by 0x4E86B76: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5400.3)
->>  by 0x4E86F1F: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
->>  by 0x4E87231: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5400.3)
->>  by 0x408245: tester_run (tester.c:830)
->>  by 0x401CC3: main (test-ecc.c:291)
->>
->> Conditional jump or move depends on uninitialised value(s)
->>  at 0x4020D6: test_sample (test-ecc.c:113)
->>  by 0x4022AB: test_invalid_pub (test-ecc.c:272)
->>  by 0x406DA2: run_callback (tester.c:415)
->>  by 0x4E83576: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
->>  by 0x4E86B76: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5400.3)
->>  by 0x4E86F1F: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
->>  by 0x4E87231: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5400.3)
->>  by 0x408245: tester_run (tester.c:830)
->>  by 0x401CC3: main (test-ecc.c:291)
->> ---
->> unit/test-ecc.c | 2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/unit/test-ecc.c b/unit/test-ecc.c
->> index 98400a253..e0f9723fc 100644
->> --- a/unit/test-ecc.c
->> +++ b/unit/test-ecc.c
->> @@ -91,7 +91,7 @@ static int test_sample(uint8_t priv_a[32], uint8_t priv_b[32],
->>                               uint8_t pub_a[64], uint8_t pub_b[64],
->>                               uint8_t dhkey[32])
->> {
->> -     uint8_t dhkey_a[32], dhkey_b[32];
->> +     uint8_t dhkey_a[32] = {}, dhkey_b[32] = {};
->>       int fails = 0;
+> If user application is unregistering a notification handler its
+> callbacks shall not be called even CCC write is still holding a
+> reference to notify_data.
+> ---
+>  src/shared/gatt-client.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 >
-> does an explicit memset also fixes this?
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index 8083ff719..1285c37ef 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -1212,7 +1212,9 @@ static void complete_notify_request(void *data)
+>         struct notify_data *notify_data = data;
+>
+>         notify_data->att_id = 0;
+> -       notify_data->callback(0, notify_data->user_data);
+> +
+> +       if (notify_data->callback)
+> +               notify_data->callback(0, notify_data->user_data);
+>  }
+>
+>  static bool notify_data_write_ccc(struct notify_data *notify_data, bool enable,
+> @@ -3157,6 +3159,10 @@ bool bt_gatt_client_unregister_notify(struct bt_gatt_client *client,
+>         /* Remove data if it has been queued */
+>         queue_remove(notify_data->chrc->reg_notify_queue, notify_data);
+>
+> +       /* Reset callbacks */
+> +       notify_data->callback = NULL;
+> +       notify_data->notify = NULL;
+> +
+>         complete_unregister_notify(notify_data);
+>         return true;
+>  }
+> --
+> 2.14.3
 
-Applied after changing it to use memsets.
+Applied.
+
 
 -- 
 Luiz Augusto von Dentz
