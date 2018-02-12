@@ -1,74 +1,114 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFGVEfDdoP17uEBvU3FoYj5FV2cF5ig4nYxgEy_ofV==ihoYWA@mail.gmail.com>
-References: <CAFGVEfDdoP17uEBvU3FoYj5FV2cF5ig4nYxgEy_ofV==ihoYWA@mail.gmail.com>
+In-Reply-To: <CABBYNZJGfBP5YoRx_phB-ayMpOx420fw4pQhR8Yy0N05hXnKwA@mail.gmail.com>
+References: <8df3e799-c7a3-3f49-32dd-2e5c4cabc9ff@jp.fujitsu.com> <CABBYNZJGfBP5YoRx_phB-ayMpOx420fw4pQhR8Yy0N05hXnKwA@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Feb 2018 09:59:45 -0200
-Message-ID: <CABBYNZKqy=YQghqNa4Wj-55C+1Dx+uPce1ERm-1EFP0z4ri21g@mail.gmail.com>
-Subject: Re: Configuring scan behaviour of bluez
-To: Matthias Schuh <m.schuh.jr@googlemail.com>
+Date: Mon, 12 Feb 2018 09:48:35 -0200
+Message-ID: <CABBYNZK37iBQYDn40qd94JGasvWh7c1D0ixikwJQALaXksRq5A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 1/4] obexd: Use emitting function wrapped for transfer
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Matthias,
+Hi Eramoto,
 
-On Thu, Feb 8, 2018 at 11:14 AM, Matthias Schuh
-<m.schuh.jr@googlemail.com> wrote:
-> Dear bluez-mailingslist,
+On Mon, Feb 12, 2018 at 8:24 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Eramoto,
 >
-> thanks for taking the time to read this:
+> On Fri, Feb 9, 2018 at 7:10 AM, ERAMOTO Masaya
+> <eramoto.masaya@jp.fujitsu.com> wrote:
+>> Also replaces emit_transfer_progress() with the new wrapper function
+>> because the total/transferred arguments have not been used since commit
+>> a5c2b6e8 ("obexd: Align client and server spec of org.bluez.obex.Transfer1")
+>> and g_dbus_emit_property_changed_full() checks if the path argument is
+>> NULL.
+>> ---
+>>  obexd/src/manager.c | 26 ++++++++++----------------
+>>  obexd/src/manager.h |  2 ++
+>>  2 files changed, 12 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+>> index 70265e445..7ae8d7f83 100644
+>> --- a/obexd/src/manager.c
+>> +++ b/obexd/src/manager.c
+>> @@ -533,12 +533,18 @@ void manager_cleanup(void)
+>>         dbus_connection_unref(connection);
+>>  }
+>>
+>> +void manager_emit_transfer_property(struct obex_transfer *transfer,
+>> +                                                               char *name)
+>> +{
+>> +       g_dbus_emit_property_changed(connection, transfer->path,
+>> +                                       TRANSFER_INTERFACE, name);
+>> +}
 >
-> Setup:
+> We better put a check if the transfer->path is not NULL, otherwise looks good.
 >
-> bluez-5.48, kernel 4.14.16
->
-> bluetoothctl and btmgmt to scan, setup and configure bt 4.2 enabled sensor nodes
->
-> The requirement is to keep up uninterrupted scanning as long as
-> possible, since the sensor nodes dynamically modify their Manufacturer
-> Data enhancing it with sensor information.
->
-> In general turning on discovery via bluetoothctl  "scan on" delivers:
->
-> - Information on devices in the vincinity
-> - Updates of devices that changed their manufacturer payload
->
-> Monitoring the scan activity via btmgmt delivers the following loop behaviour:
->
-> - After issueing "scan on" via bluetoothctl shows:  "hci0 type 7 discovering on"
-> - After exactly 10 seconds I get the info: "hci0 type7 discovering off"
-> - After exactly 5 seconds I get the info: "hci0 type 7 discovering on"
->
-> Analyzing the packages I scan with wireshark I noticed that I'm
-> missing out on several broadcast from the sensor nodes. One
-> explanation is that discovery seems to be automatically turned off in
-> the described interval. This interval is the same on different
-> bluetooth hardware so i guess this is somehow defined by bluez.
+>>  void manager_emit_transfer_started(struct obex_transfer *transfer)
+>>  {
+>>         transfer->status = TRANSFER_STATUS_ACTIVE;
+>>
+>> -       g_dbus_emit_property_changed(connection, transfer->path,
+>> -                                       TRANSFER_INTERFACE, "Status");
+>> +       manager_emit_transfer_property(transfer, "Status");
+>>  }
+>>
+>>  static void emit_transfer_completed(struct obex_transfer *transfer,
+>> @@ -550,18 +556,7 @@ static void emit_transfer_completed(struct obex_transfer *transfer,
+>>         transfer->status = success ? TRANSFER_STATUS_COMPLETE :
+>>                                                 TRANSFER_STATUS_ERROR;
+>>
+>> -       g_dbus_emit_property_changed(connection, transfer->path,
+>> -                                       TRANSFER_INTERFACE, "Status");
+>> -}
+>> -
+>> -static void emit_transfer_progress(struct obex_transfer *transfer,
+>> -                                       uint32_t total, uint32_t transferred)
+>> -{
+>> -       if (transfer->path == NULL)
+>> -               return;
+>> -
+>> -       g_dbus_emit_property_changed(connection, transfer->path,
+>> -                                       TRANSFER_INTERFACE, "Transferred");
+>> +       manager_emit_transfer_property(transfer, "Status");
+>>  }
+>>
+>>  static void transfer_free(struct obex_transfer *transfer)
+>> @@ -783,8 +778,7 @@ void manager_unregister_session(struct obex_session *os)
+>>
+>>  void manager_emit_transfer_progress(struct obex_transfer *transfer)
+>>  {
+>> -       emit_transfer_progress(transfer, transfer->session->size,
+>> -                                               transfer->session->offset);
+>> +       manager_emit_transfer_property(transfer, "Transferred");
+>>  }
+>>
+>>  void manager_emit_transfer_completed(struct obex_transfer *transfer)
+>> diff --git a/obexd/src/manager.h b/obexd/src/manager.h
+>> index d9781b201..d709af5a8 100644
+>> --- a/obexd/src/manager.h
+>> +++ b/obexd/src/manager.h
+>> @@ -33,6 +33,8 @@ void manager_unregister_session(struct obex_session *os);
+>>
+>>  struct obex_transfer *manager_register_transfer(struct obex_session *os);
+>>  void manager_unregister_transfer(struct obex_transfer *transfer);
+>> +void manager_emit_transfer_property(struct obex_transfer *transfer,
+>> +                                                               char *name);
+>>  void manager_emit_transfer_started(struct obex_transfer *transfer);
+>>  void manager_emit_transfer_progress(struct obex_transfer *transfer);
+>>  void manager_emit_transfer_completed(struct obex_transfer *transfer);
+>> --
+>> 2.14.1
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-This is because by default BlueZ employs an interleaved scanning so
-both LE and BR/EDR devices can be found if you don't want that you
-will need to use discovery filters (bluetoothctl> menu scan).
-
-> In the official documentation I could not find any clue on how to
-> influence this behaviour.
-> Is there a way to define these  interval parameters?
-
-You can find the documentation here about the discovery filters here:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n48
-
->
-> Thanks ahead and all the best,
->
-> Matthias
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
