@@ -1,81 +1,61 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20180212104030.10653-1-zhukov@mercurydevelopment.com>
-References: <20180212104030.10653-1-zhukov@mercurydevelopment.com>
+In-Reply-To: <2425F01E-DE0C-4A43-B68D-900BABFE24B6@holtmann.org>
+References: <20180209131028.16874-1-luiz.dentz@gmail.com> <2425F01E-DE0C-4A43-B68D-900BABFE24B6@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Feb 2018 09:47:33 -0200
-Message-ID: <CABBYNZJsCg_c9zdKc_MG9Caf=r7rVz39pfv=hmkO1E96z_8JBA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/gatt-db: Fix declaration attributes permission
-To: Konstantin Zhukov <zhukov@mercurydevelopment.com>
+Date: Mon, 12 Feb 2018 09:29:26 -0200
+Message-ID: <CABBYNZLKBqNqKWind5a_TJtPhT2=TaKx00OAkLoRyiJeuaLbYQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] unit/test-ecc: Fix uninitialised values
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Konstantin,
+Hi,
 
-On Mon, Feb 12, 2018 at 8:40 AM, Konstantin Zhukov
-<zhukov@mercurydevelopment.com> wrote:
-> According to Bluetooth Core specification v4.2 (Vol. 3, part G,
-> section 3.1), service declararion attributes should have only READ
-> permission. The same obligation has charateristic declaration and
-> include service declaration attributes.
+On Fri, Feb 9, 2018 at 12:41 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
 >
-> Without this permission connected clients could corrupt GATT database
-> by writing to declaration attributes. After thatm service discovery
-> fails in other clients.
-> ---
->  src/shared/gatt-db.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
+>> Conditional jump or move depends on uninitialised value(s)
+>>  at 0x40208C: test_sample (test-ecc.c:106)
+>>  by 0x4022AB: test_invalid_pub (test-ecc.c:272)
+>>  by 0x406DA2: run_callback (tester.c:415)
+>>  by 0x4E83576: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
+>>  by 0x4E86B76: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5400.3)
+>>  by 0x4E86F1F: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
+>>  by 0x4E87231: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5400.3)
+>>  by 0x408245: tester_run (tester.c:830)
+>>  by 0x401CC3: main (test-ecc.c:291)
+>>
+>> Conditional jump or move depends on uninitialised value(s)
+>>  at 0x4020D6: test_sample (test-ecc.c:113)
+>>  by 0x4022AB: test_invalid_pub (test-ecc.c:272)
+>>  by 0x406DA2: run_callback (tester.c:415)
+>>  by 0x4E83576: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
+>>  by 0x4E86B76: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.5400.3)
+>>  by 0x4E86F1F: ??? (in /usr/lib64/libglib-2.0.so.0.5400.3)
+>>  by 0x4E87231: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.5400.3)
+>>  by 0x408245: tester_run (tester.c:830)
+>>  by 0x401CC3: main (test-ecc.c:291)
+>> ---
+>> unit/test-ecc.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/unit/test-ecc.c b/unit/test-ecc.c
+>> index 98400a253..e0f9723fc 100644
+>> --- a/unit/test-ecc.c
+>> +++ b/unit/test-ecc.c
+>> @@ -91,7 +91,7 @@ static int test_sample(uint8_t priv_a[32], uint8_t priv_b[32],
+>>                               uint8_t pub_a[64], uint8_t pub_b[64],
+>>                               uint8_t dhkey[32])
+>> {
+>> -     uint8_t dhkey_a[32], dhkey_b[32];
+>> +     uint8_t dhkey_a[32] = {}, dhkey_b[32] = {};
+>>       int fails = 0;
 >
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 2487584f3..814e79bed 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -115,6 +115,12 @@ struct gatt_db_service {
->         struct gatt_db_attribute **attributes;
->  };
->
-> +static void set_attribute_data(struct gatt_db_attribute *attribute,
-> +                                               gatt_db_read_t read_func,
-> +                                               gatt_db_write_t write_func,
-> +                                               uint32_t permissions,
-> +                                               void *user_data);
-> +
->  static void pending_read_result(struct pending_read *p, int err,
->                                         const uint8_t *data, size_t length)
->  {
-> @@ -387,6 +393,8 @@ static struct gatt_db_service *gatt_db_service_create(const bt_uuid_t *uuid,
->                 return NULL;
->         }
->
-> +       set_attribute_data(service->attributes[0], NULL, NULL, BT_ATT_PERM_READ, NULL);
-> +
->         return service;
->  }
->
-> @@ -718,6 +726,8 @@ service_insert_characteristic(struct gatt_db_service *service,
->         if (!service->attributes[i])
->                 return NULL;
->
-> +       set_attribute_data(service->attributes[i], NULL, NULL, BT_ATT_PERM_READ, NULL);
-> +
->         i++;
->
->         service->attributes[i] = new_attribute(service, handle, uuid, NULL, 0);
-> @@ -929,7 +939,7 @@ service_insert_included(struct gatt_db_service *service, uint16_t handle,
->          *
->          * TODO handle permissions
->          */
-> -       set_attribute_data(service->attributes[index], NULL, NULL, 0, NULL);
-> +       set_attribute_data(service->attributes[index], NULL, NULL, BT_ATT_PERM_READ, NULL);
->
->         return attribute_update(service, index);
->  }
-> --
-> 2.14.1
+> does an explicit memset also fixes this?
 
-Applied after changing it to not use a forward declaration, thanks.
+Applied after changing it to use memsets.
 
 -- 
 Luiz Augusto von Dentz
