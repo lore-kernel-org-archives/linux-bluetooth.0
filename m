@@ -1,11 +1,11 @@
 Return-Path: <amitkarwar@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87inbhmblb.fsf@purkki.adurom.net>
+In-Reply-To: <87r2q5mc4x.fsf@purkki.adurom.net>
 References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
- <1513168977-2121-5-git-send-email-amitkarwar@gmail.com> <87inbhmblb.fsf@purkki.adurom.net>
+ <1513168977-2121-5-git-send-email-amitkarwar@gmail.com> <87r2q5mc4x.fsf@purkki.adurom.net>
 From: Amitkumar Karwar <amitkarwar@gmail.com>
-Date: Tue, 13 Feb 2018 16:10:47 +0530
-Message-ID: <CAEhWJF=qx=M=mWr6csb=SOMu3pK6mGH4K6h6-idhc_HiAj2LHA@mail.gmail.com>
+Date: Tue, 13 Feb 2018 16:09:25 +0530
+Message-ID: <CAEhWJF=iF4Gy65O3vUNtBrKcXBMpSnCuZgvpCDvuObkgf4zuaA@mail.gmail.com>
 Subject: Re: [v5 4/8] rsi: add coex support
 To: Kalle Valo <kvalo@codeaurora.org>
 Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless <linux-wireless@vger.kernel.org>,
@@ -16,7 +16,7 @@ Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless <linux-wireless@vger.k
 Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Feb 1, 2018 at 12:38 PM, Kalle Valo <kvalo@codeaurora.org> wrote:
+On Thu, Feb 1, 2018 at 12:26 PM, Kalle Valo <kvalo@codeaurora.org> wrote:
 > Amitkumar Karwar <amitkarwar@gmail.com> writes:
 >
 >> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
@@ -37,29 +37,23 @@ On Thu, Feb 1, 2018 at 12:38 PM, Kalle Valo <kvalo@codeaurora.org> wrote:
 >
 > [...]
 >
->> +static void rsi_coex_sched_tx_pkts(struct rsi_coex_ctrl_block *coex_cb)
->> +{
->> +     enum rsi_coex_queues coex_q;
->> +     struct sk_buff *skb;
->> +
->> +     while (1) {
->> +             coex_q = rsi_coex_determine_coex_q(coex_cb);
->> +             rsi_dbg(INFO_ZONE, "queue = %d\n", coex_q);
->> +
->> +             if (coex_q == RSI_COEX_Q_INVALID) {
->> +                     rsi_dbg(DATA_TX_ZONE, "No more pkt\n");
->> +                     break;
->> +             }
->> +
->> +             if (coex_q == RSI_COEX_Q_BT)
->> +                     skb = skb_dequeue(&coex_cb->coex_tx_qs[RSI_COEX_Q_BT]);
->> +     }
->> +}
+>> @@ -270,6 +271,7 @@ struct rsi_common {
+>>       u8 obm_ant_sel_val;
+>>       int tx_power;
+>>       u8 ant_in_use;
+>> +     struct semaphore tx_bus_lock;
 >
-> Neverending loops are dangerous in kernel. Can you put a limit so that
-> if there's a bug the loop will not run forever?
+> Do you really need to use semaphore? I think nowadays the preference is
+> to use something other than semaphores.
 
-I will get rid of while(1) in v6 patch series.
+We used semaphore here, as USB/SDIO bus write operations could be
+blocking/waiting. I will check if spinlock suits here in follow up
+patch. It will need some testing.
+
+> Also calling it tx_bus_lock is IMHO misleading, tx_bus_sema would be
+> nicer.
+
+Sure. I will rename the variable
 
 Regards,
 Amitkumar
