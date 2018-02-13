@@ -1,43 +1,148 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/4] tools/btpclient: Fix ad property manufacturer data name
-Date: Tue, 13 Feb 2018 09:15:20 +0100
-Message-ID: <2532752.SEh91lMQ4G@ix>
-In-Reply-To: <20180212160102.31451-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20180212160102.31451-1-grzegorz.kolodziejczyk@codecoup.pl>
+Return-Path: <briannorris@chromium.org>
+Date: Mon, 12 Feb 2018 18:24:56 -0800
+From: Brian Norris <briannorris@chromium.org>
+To: Hans de Goede <hdegoede@redhat.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-acpi@vger.kernel.org, stable@vger.kernel.org,
+	Leif Liddy <leif.linux@gmail.com>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Daniel Drake <drake@endlessm.com>,
+	Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	matadeen@qti.qualcomm.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: btusb: Restore QCA Rome suspend/resume fix
+ with a "rewritten" version
+Message-ID: <20180213022455.GA151190@rodete-desktop-imager.corp.google.com>
+References: <20180108094416.4789-1-hdegoede@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180108094416.4789-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi,
 
-On Monday, 12 February 2018 17:00:59 CET Grzegorz Kolodziejczyk wrote:
-> This patch fixes wrong naming of advertising instance data property.
-> ---
->  tools/btpclient.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Jan 08, 2018 at 10:44:16AM +0100, Hans de Goede wrote:
+> Commit 7d06d5895c15 ("Revert "Bluetooth: btusb: fix QCA...suspend/resume"")
+> removed the setting of the BTUSB_RESET_RESUME quirk for QCA Rome devices,
+> instead favoring adding USB_QUIRK_RESET_RESUME quirks in usb/core/quirks.c.
 > 
-> diff --git a/tools/btpclient.c b/tools/btpclient.c
-> index 097732eb8..61bde820e 100644
-> --- a/tools/btpclient.c
-> +++ b/tools/btpclient.c
-> @@ -971,7 +971,7 @@ static void setup_ad_interface(struct l_dbus_interface
-> *interface) ad_serviceuuids_getter, NULL);
->  	l_dbus_interface_property(interface, "ServiceData", 0, "a{sv}",
->  						ad_servicedata_getter, NULL);
-> -	l_dbus_interface_property(interface, "ManufacturerServiceData", 0,
-> +	l_dbus_interface_property(interface, "ManufacturerData", 0,
->  					"a{qv}", ad_manufacturerdata_getter,
->  					NULL);
->  	l_dbus_interface_property(interface, "Includes", 0, "as",
+> This was done because the DIY BTUSB_RESET_RESUME reset-resume handling
+> has several issues (see the original commit message). An added advantage
+> of moving over to the USB-core reset-resume handling is that it also
+> disables autosuspend for these devices, which is similarly broken on these.
 
-Patches 1 and 2 are now applied, thanks.
+Wait, is autosuspend actually broken for all QCA Rome chipsets? I don't
+think so -- I'm using one now. Thus, this is a poor solution, which
+negatively affects my systems. However, I see that this patch was
+applied regardless...
 
--- 
-pozdrawiam
-Szymon Janc
+What justifications was found for this anyway? AIUI, this is a platform
+bug, and not entirely a chipset bug. Why should all users of this
+chipset be penalized?
 
+Brian
 
+> But there are 2 issues with this approach:
+> 1) It leaves the broken DIY BTUSB_RESET_RESUME code in place for Realtek
+>    devices.
+> 2) Sofar only 2 of the 10 QCA devices known to the btusb code have been
+>    added to usb/core/quirks.c and if we fix the Realtek case the same way
+>    we need to add an additional 14 entries. So in essence we need to
+>    duplicate a large part of the usb_device_id table in btusb.c in
+>    usb/core/quirks.c and manually keep them in sync.
+> 
+> This commit instead restores setting a reset-resume quirk for QCA devices
+> in the btusb.c code, avoiding the duplicate usb_device_id table problem.
+> 
+> This commit avoids the problems with the original DIY BTUSB_RESET_RESUME
+> code by simply setting the USB_QUIRK_RESET_RESUME quirk directly on the
+> usb_device.
+> 
+> This commit also moves the BTUSB_REALTEK case over to directly setting the
+> USB_QUIRK_RESET_RESUME on the usb_device and removes the now unused
+> BTUSB_RESET_RESUME code.
+> 
+> BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
+> Fixes: 7d06d5895c15 ("Revert "Bluetooth: btusb: fix QCA...suspend/resume"")
+> Cc: stable@vger.kernel.org
+> Cc: Leif Liddy <leif.linux@gmail.com>
+> Cc: Matthias Kaehlcke <mka@chromium.org>
+> Cc: Brian Norris <briannorris@chromium.org>
+> Cc: Daniel Drake <drake@endlessm.com>
+> Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> Note:
+> 1) Once this has been merged, the 2 commits adding QCA device entries to
+> drivers/usb/core/quirks.c should be reverted or dropped from bluetooth-next.
+> 2) I don't have any of the affected devices, please test
+> ---
+>  drivers/bluetooth/btusb.c | 22 ++++++++++------------
+>  1 file changed, 10 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 4764100a5888..c4689f03220f 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -23,6 +23,7 @@
+>  
+>  #include <linux/module.h>
+>  #include <linux/usb.h>
+> +#include <linux/usb/quirks.h>
+>  #include <linux/firmware.h>
+>  #include <linux/of_device.h>
+>  #include <linux/of_irq.h>
+> @@ -388,9 +389,8 @@ static const struct usb_device_id blacklist_table[] = {
+>  #define BTUSB_FIRMWARE_LOADED	7
+>  #define BTUSB_FIRMWARE_FAILED	8
+>  #define BTUSB_BOOTING		9
+> -#define BTUSB_RESET_RESUME	10
+> -#define BTUSB_DIAG_RUNNING	11
+> -#define BTUSB_OOB_WAKE_ENABLED	12
+> +#define BTUSB_DIAG_RUNNING	10
+> +#define BTUSB_OOB_WAKE_ENABLED	11
+>  
+>  struct btusb_data {
+>  	struct hci_dev       *hdev;
+> @@ -3118,6 +3118,12 @@ static int btusb_probe(struct usb_interface *intf,
+>  	if (id->driver_info & BTUSB_QCA_ROME) {
+>  		data->setup_on_usb = btusb_setup_qca;
+>  		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
+> +
+> +		/* QCA Rome devices lose their updated firmware over suspend,
+> +		 * but the USB hub doesn't notice any status change.
+> +		 * explicitly request a device reset on resume.
+> +		 */
+> +		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
+>  	}
+>  
+>  #ifdef CONFIG_BT_HCIBTUSB_RTL
+> @@ -3128,7 +3134,7 @@ static int btusb_probe(struct usb_interface *intf,
+>  		 * but the USB hub doesn't notice any status change.
+>  		 * Explicitly request a device reset on resume.
+>  		 */
+> -		set_bit(BTUSB_RESET_RESUME, &data->flags);
+> +		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
+>  	}
+>  #endif
+>  
+> @@ -3297,14 +3303,6 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+>  		enable_irq(data->oob_wake_irq);
+>  	}
+>  
+> -	/* Optionally request a device reset on resume, but only when
+> -	 * wakeups are disabled. If wakeups are enabled we assume the
+> -	 * device will stay powered up throughout suspend.
+> -	 */
+> -	if (test_bit(BTUSB_RESET_RESUME, &data->flags) &&
+> -	    !device_may_wakeup(&data->udev->dev))
+> -		data->udev->reset_resume = 1;
+> -
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.14.3
+> 
