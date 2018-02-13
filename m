@@ -1,57 +1,55 @@
-Return-Path: <kvalo@codeaurora.org>
-From: Kalle Valo <kvalo@codeaurora.org>
-To: Amitkumar Karwar <amitkarwar@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,  linux-wireless <linux-wireless@vger.kernel.org>,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  "open list\:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
-Subject: Re: [v5 4/8] rsi: add coex support
-References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
-	<1513168977-2121-5-git-send-email-amitkarwar@gmail.com>
-	<87r2q5mc4x.fsf@purkki.adurom.net>
-	<CAEhWJF=iF4Gy65O3vUNtBrKcXBMpSnCuZgvpCDvuObkgf4zuaA@mail.gmail.com>
-Date: Tue, 13 Feb 2018 17:37:51 +0200
-In-Reply-To: <CAEhWJF=iF4Gy65O3vUNtBrKcXBMpSnCuZgvpCDvuObkgf4zuaA@mail.gmail.com>
-	(Amitkumar Karwar's message of "Tue, 13 Feb 2018 16:09:25 +0530")
-Message-ID: <87r2po6gts.fsf@kamboji.qca.qualcomm.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <amitkarwar@gmail.com>
+From: Amitkumar Karwar <amitkarwar@gmail.com>
+To: Kalle Valo <kvalo@codeaurora.org>,
+	marcel@holtmann.org
+Cc: linux-wireless@vger.kernel.org,
+	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: [v6 8/8] rsi: sdio changes to support BT
+Date: Tue, 13 Feb 2018 17:31:44 +0530
+Message-Id: <1518523304-3424-9-git-send-email-amitkarwar@gmail.com>
+In-Reply-To: <1518523304-3424-1-git-send-email-amitkarwar@gmail.com>
+References: <1518523304-3424-1-git-send-email-amitkarwar@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Amitkumar Karwar <amitkarwar@gmail.com> writes:
+From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
 
-> On Thu, Feb 1, 2018 at 12:26 PM, Kalle Valo <kvalo@codeaurora.org> wrote:
->> Amitkumar Karwar <amitkarwar@gmail.com> writes:
->>
->>> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
->>>
->>> With BT support, driver has to handle two streams of data
->>> (i.e. wlan and BT). Actual coex implementation is in firmware.
->>> Coex module just schedule the packets to firmware by taking them
->>> from the corresponding paths.
->>>
->>> Structures for module and protocol operations are introduced for
->>> this purpose. Protocol operations structure is global structure
->>> which can be shared among different modules. Initialization of
->>> coex and operating mode values is moved to rsi_91x_init().
->>>
->>> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
->>> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
->>> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
->>
->> [...]
->>
->>> @@ -270,6 +271,7 @@ struct rsi_common {
->>>       u8 obm_ant_sel_val;
->>>       int tx_power;
->>>       u8 ant_in_use;
->>> +     struct semaphore tx_bus_lock;
->>
->> Do you really need to use semaphore? I think nowadays the preference is
->> to use something other than semaphores.
->
-> We used semaphore here, as USB/SDIO bus write operations could be
-> blocking/waiting. I will check if spinlock suits here in follow up
-> patch. It will need some testing.
+Queue number is correctly updated for BT traffic. Also, kzalloc
+instead of kmalloc is used for Rx packet allocation.
 
-I was more thinking about using a mutex.
+Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+---
+ drivers/net/wireless/rsi/rsi_91x_sdio.c     | 2 ++
+ drivers/net/wireless/rsi/rsi_91x_sdio_ops.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio.c b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+index 5722736..beb18d0 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+@@ -763,6 +763,8 @@ static int rsi_sdio_host_intf_write_pkt(struct rsi_hw *adapter,
+ 	int status;
+ 
+ 	queueno = ((pkt[1] >> 4) & 0xf);
++	if (queueno == RSI_BT_MGMT_Q || queueno == RSI_BT_DATA_Q)
++		queueno = RSI_BT_Q;
+ 
+ 	num_blocks = len / block_size;
+ 
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+index 169c981..6e74261 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+@@ -103,7 +103,7 @@ static int rsi_process_pkt(struct rsi_common *common)
+ 
+ 	rcv_pkt_len = (num_blks * 256);
+ 
+-	common->rx_data_pkt = kmalloc(rcv_pkt_len, GFP_KERNEL);
++	common->rx_data_pkt = kzalloc(rcv_pkt_len, GFP_KERNEL);
+ 	if (!common->rx_data_pkt) {
+ 		rsi_dbg(ERR_ZONE, "%s: Failed in memory allocation\n",
+ 			__func__);
 -- 
-Kalle Valo
+2.7.4
