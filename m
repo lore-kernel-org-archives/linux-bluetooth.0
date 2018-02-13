@@ -1,56 +1,57 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Austin Riffle <ARiffle@efji.com>
-To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Subject: GAP and GATT always added to sdp records
-Date: Tue, 13 Feb 2018 20:22:25 +0000
-Message-ID: <4C851F03BEE04A418B7A2D283DDCAB5D47F28210@EFJDFWMB01.EFJDFW.local>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <kvalo@codeaurora.org>
+From: Kalle Valo <kvalo@codeaurora.org>
+To: Amitkumar Karwar <amitkarwar@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,  linux-wireless <linux-wireless@vger.kernel.org>,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  "open list\:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+Subject: Re: [v5 4/8] rsi: add coex support
+References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
+	<1513168977-2121-5-git-send-email-amitkarwar@gmail.com>
+	<87r2q5mc4x.fsf@purkki.adurom.net>
+	<CAEhWJF=iF4Gy65O3vUNtBrKcXBMpSnCuZgvpCDvuObkgf4zuaA@mail.gmail.com>
+Date: Tue, 13 Feb 2018 17:37:51 +0200
+In-Reply-To: <CAEhWJF=iF4Gy65O3vUNtBrKcXBMpSnCuZgvpCDvuObkgf4zuaA@mail.gmail.com>
+	(Amitkumar Karwar's message of "Tue, 13 Feb 2018 16:09:25 +0530")
+Message-ID: <87r2po6gts.fsf@kamboji.qca.qualcomm.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+Amitkumar Karwar <amitkarwar@gmail.com> writes:
 
-I'm developing a Bluetooth solution using BlueZ 5.46 on kernel 4.12.0, and =
-I'm using a TI Wilink chip for both BR/EDR and BLE. My plan is to initially=
- release software with support for only BR/EDR, and then at a later point r=
-elease software which supports BLE.
+> On Thu, Feb 1, 2018 at 12:26 PM, Kalle Valo <kvalo@codeaurora.org> wrote:
+>> Amitkumar Karwar <amitkarwar@gmail.com> writes:
+>>
+>>> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>>>
+>>> With BT support, driver has to handle two streams of data
+>>> (i.e. wlan and BT). Actual coex implementation is in firmware.
+>>> Coex module just schedule the packets to firmware by taking them
+>>> from the corresponding paths.
+>>>
+>>> Structures for module and protocol operations are introduced for
+>>> this purpose. Protocol operations structure is global structure
+>>> which can be shared among different modules. Initialization of
+>>> coex and operating mode values is moved to rsi_91x_init().
+>>>
+>>> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>>> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+>>> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+>>
+>> [...]
+>>
+>>> @@ -270,6 +271,7 @@ struct rsi_common {
+>>>       u8 obm_ant_sel_val;
+>>>       int tx_power;
+>>>       u8 ant_in_use;
+>>> +     struct semaphore tx_bus_lock;
+>>
+>> Do you really need to use semaphore? I think nowadays the preference is
+>> to use something other than semaphores.
+>
+> We used semaphore here, as USB/SDIO bus write operations could be
+> blocking/waiting. I will check if spinlock suits here in follow up
+> patch. It will need some testing.
 
-I have not yet enabled BLE (knowingly), however, during testing I noticed t=
-hat other devices are seeing my device advertise both GAP and GATT UUID's t=
-hrough SDP. I am starting bluetoothd as follows:
+I was more thinking about using a mutex.
 
-/usr/libexec/bluetooth/bluetoothd --noplugin=3D*
-
-I also do have bredr only marked in main.conf.
-
-Tracing through the bluetoothd source, this is what I see:
-
-...
-adapter_register
-btd_gatt_database_new
-register_core_services
-populate_gap_service/populate_gatt_service  **These add GAP_UUID and GATT_U=
-UID to the SDP records
-
-If any of these steps fail, the adapter fails to register, and these steps =
-are required to be called. I realize that not marking the flag "G_DBUS_FLAG=
-_ENABLE_EXPERIMENTAL" prevents any advertising, but I would really like to =
-avoid putting GATT/GAP into my SDP records as they are not supported in any=
- meaningful way on my device.
-
-Does BlueZ really force all adapters to advertise these services? Or is the=
-re a "nice" way to stop these from being added?
-
-I'm guessing I could go around bluetoothd's back and use sdp_lib to remove =
-them, but I'm not sure what unintended consequences that may have.
-This e-mail transmission, and any documents, files or previous e-mail messa=
-ges attached to it, may contain confidential information. If you are not th=
-e intended recipient, or a person responsible for delivering it to the inte=
-nded recipient, you are hereby notified that any disclosure, distribution, =
-review, copy or use of any of the information contained in or attached to t=
-his message is STRICTLY PROHIBITED. If you have received this transmission =
-in error, please immediately notify us by reply e-mail, and destroy the ori=
-ginal transmission and its attachments without reading them or saving them =
-to disk. Thank you.
-
+-- 
+Kalle Valo
