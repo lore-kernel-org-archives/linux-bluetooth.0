@@ -1,114 +1,72 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <6b59ff69-6805-597a-814e-8813c9922d03@jp.fujitsu.com>
-References: <6b59ff69-6805-597a-814e-8813c9922d03@jp.fujitsu.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 14 Feb 2018 09:42:46 -0200
-Message-ID: <CABBYNZLaL-JUATYMSJV2SjNk4ApeF3mZfSDTsdSGkMY9d1=m2A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] obexd: Fix null response name
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] adapter: Fix initializing GATT server for BR/EDR only controllers
+Date: Wed, 14 Feb 2018 13:41:33 +0200
+Message-Id: <20180214114133.5349-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Feb 14, 2018 at 5:20 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Prints out "<unknown>" string if there is no response name as below:
->
->   obexd[8117]: obexd/src/obex.c:cmd_connect()
->   obexd[8117]: CONNECT(0x0), (null)(0xffffffff)
-> ---
->  obexd/src/obex.c | 59 ++++----------------------------------------------------
->  1 file changed, 4 insertions(+), 55 deletions(-)
->
-> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-> index ed219d3e7..2850d3a37 100644
-> --- a/obexd/src/obex.c
-> +++ b/obexd/src/obex.c
-> @@ -82,58 +82,12 @@ static struct {
->         { 0xFF,                 NULL            },
->  };
->
-> -/* Possible Response */
-> -static struct {
-> -       int rsp;
-> -       const char *name;
-> -} obex_response[] = {
-> -       { G_OBEX_RSP_CONTINUE,                  "CONTINUE"              },
-> -       { G_OBEX_RSP_SUCCESS,                   "SUCCESS"               },
-> -       { G_OBEX_RSP_CREATED,                   "CREATED"               },
-> -       { G_OBEX_RSP_ACCEPTED,                  "ACCEPTED"              },
-> -       { G_OBEX_RSP_NON_AUTHORITATIVE,         "NON_AUTHORITATIVE"     },
-> -       { G_OBEX_RSP_NO_CONTENT,                "NO_CONTENT"            },
-> -       { G_OBEX_RSP_RESET_CONTENT,             "RESET_CONTENT"         },
-> -       { G_OBEX_RSP_PARTIAL_CONTENT,           "PARTIAL_CONTENT"       },
-> -       { G_OBEX_RSP_MULTIPLE_CHOICES,          "MULTIPLE_CHOICES"      },
-> -       { G_OBEX_RSP_MOVED_PERMANENTLY,         "MOVED_PERMANENTLY"     },
-> -       { G_OBEX_RSP_MOVED_TEMPORARILY,         "MOVED_TEMPORARILY"     },
-> -       { G_OBEX_RSP_SEE_OTHER,                 "SEE_OTHER"             },
-> -       { G_OBEX_RSP_NOT_MODIFIED,              "NOT_MODIFIED"          },
-> -       { G_OBEX_RSP_USE_PROXY,                 "USE_PROXY"             },
-> -       { G_OBEX_RSP_BAD_REQUEST,               "BAD_REQUEST"           },
-> -       { G_OBEX_RSP_UNAUTHORIZED,              "UNAUTHORIZED"          },
-> -       { G_OBEX_RSP_PAYMENT_REQUIRED,          "PAYMENT_REQUIRED"      },
-> -       { G_OBEX_RSP_FORBIDDEN,                 "FORBIDDEN"             },
-> -       { G_OBEX_RSP_NOT_FOUND,                 "NOT_FOUND"             },
-> -       { G_OBEX_RSP_METHOD_NOT_ALLOWED,        "METHOD_NOT_ALLOWED"    },
-> -       { G_OBEX_RSP_NOT_ACCEPTABLE,            "NOT_ACCEPTABLE"        },
-> -       { G_OBEX_RSP_PROXY_AUTH_REQUIRED,       "PROXY_AUTH_REQUIRED"   },
-> -       { G_OBEX_RSP_REQUEST_TIME_OUT,          "REQUEST_TIME_OUT"      },
-> -       { G_OBEX_RSP_CONFLICT,                  "CONFLICT"              },
-> -       { G_OBEX_RSP_GONE,                      "GONE"                  },
-> -       { G_OBEX_RSP_LENGTH_REQUIRED,           "LENGTH_REQUIRED"       },
-> -       { G_OBEX_RSP_PRECONDITION_FAILED,       "PRECONDITION_FAILED"   },
-> -       { G_OBEX_RSP_REQ_ENTITY_TOO_LARGE,      "REQ_ENTITY_TOO_LARGE"  },
-> -       { G_OBEX_RSP_REQ_URL_TOO_LARGE,         "REQ_URL_TOO_LARGE"     },
-> -       { G_OBEX_RSP_UNSUPPORTED_MEDIA_TYPE,    "UNSUPPORTED_MEDIA_TYPE"},
-> -       { G_OBEX_RSP_INTERNAL_SERVER_ERROR,     "INTERNAL_SERVER_ERROR" },
-> -       { G_OBEX_RSP_NOT_IMPLEMENTED,           "NOT_IMPLEMENTED"       },
-> -       { G_OBEX_RSP_BAD_GATEWAY,               "BAD_GATEWAY"           },
-> -       { G_OBEX_RSP_SERVICE_UNAVAILABLE,       "SERVICE_UNAVAILABLE"   },
-> -       { G_OBEX_RSP_GATEWAY_TIMEOUT,           "GATEWAY_TIMEOUT"       },
-> -       { G_OBEX_RSP_VERSION_NOT_SUPPORTED,     "VERSION_NOT_SUPPORTED" },
-> -       { G_OBEX_RSP_DATABASE_FULL,             "DATABASE_FULL"         },
-> -       { G_OBEX_RSP_DATABASE_LOCKED,           "DATABASE_LOCKED"       },
-> -       { 0xFF,                                 NULL                    },
-> -};
-> -
->  static gboolean handle_async_io(void *object, int flags, int err,
->                                                 void *user_data);
->
-> -static void print_event(int cmd, int rsp)
-> +static void print_event(int cmd, uint8_t rsp)
->  {
-> -       const char *cmdstr = NULL, *rspstr = NULL;
-> +       const char *cmdstr = NULL;
->         int i;
->         static int lastcmd;
->
-> @@ -148,13 +102,8 @@ static void print_event(int cmd, int rsp)
->                 cmdstr = obex_command[i].name;
->         }
->
-> -       for (i = 0; obex_response[i].rsp != 0xFF; i++) {
-> -               if (obex_response[i].rsp != rsp)
-> -                       continue;
-> -               rspstr = obex_response[i].name;
-> -       }
-> -
-> -       obex_debug("%s(0x%x), %s(0x%x)", cmdstr, cmd, rspstr, rsp);
-> +       obex_debug("%s(0x%x), %s(0x%x)", cmdstr, cmd,
-> +                                               g_obex_strerror(rsp), rsp);
->  }
->
->  static void os_set_response(struct obex_session *os, int err)
-> --
-> 2.14.1
+Controller that do not support LE bearer shall not use GATT server for
+anything.
+---
+ src/adapter.c | 14 ++++++++------
+ src/main.conf |  2 +-
+ 2 files changed, 9 insertions(+), 7 deletions(-)
 
-Applied, thanks.
-
+diff --git a/src/adapter.c b/src/adapter.c
+index bd5c1e150..8b785dcfd 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7745,6 +7745,12 @@ static int adapter_register(struct btd_adapter *adapter)
+ 		agent_unref(agent);
+ 	}
+ 
++	/* Don't start GATT database and advertising managers on
++	 * non-LE controllers.
++	 */
++	if (!(adapter->supported_settings & MGMT_SETTING_LE))
++		goto load;
++
+ 	adapter->database = btd_gatt_database_new(adapter);
+ 	if (!adapter->database) {
+ 		btd_error(adapter->dev_id,
+@@ -7753,18 +7759,14 @@ static int adapter_register(struct btd_adapter *adapter)
+ 		return -EINVAL;
+ 	}
+ 
+-	/* Don't start advertising managers on non-LE controllers. */
+-	if (adapter->supported_settings & MGMT_SETTING_LE)
+-		adapter->adv_manager = btd_adv_manager_new(adapter);
+-	else
+-		btd_info(adapter->dev_id,
+-			"LEAdvertisingManager skipped, LE unavailable");
++	adapter->adv_manager = btd_adv_manager_new(adapter);
+ 
+ 	db = btd_gatt_database_get_db(adapter->database);
+ 	adapter->db_id = gatt_db_register(db, services_modified,
+ 							services_modified,
+ 							adapter, NULL);
+ 
++load:
+ 	load_config(adapter);
+ 	fix_storage(adapter);
+ 	load_drivers(adapter);
+diff --git a/src/main.conf b/src/main.conf
+index 21986b386..b3f8bb274 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -42,7 +42,7 @@
+ # Restricts all controllers to the specified transport. Default value
+ # is "dual", i.e. both BR/EDR and LE enabled (when supported by the HW).
+ # Possible values: "dual", "bredr", "le"
+-#ControllerMode = dual
++ControllerMode = bredr
+ 
+ # Enables Multi Profile Specification support. This allows to specify if
+ # system supports only Multiple Profiles Single Device (MPSD) configuration
 -- 
-Luiz Augusto von Dentz
+2.14.3
+
