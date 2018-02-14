@@ -1,72 +1,78 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <4C851F03BEE04A418B7A2D283DDCAB5D47F28210@EFJDFWMB01.EFJDFW.local>
+References: <4C851F03BEE04A418B7A2D283DDCAB5D47F28210@EFJDFWMB01.EFJDFW.local>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] adapter: Fix initializing GATT server for BR/EDR only controllers
-Date: Wed, 14 Feb 2018 13:41:33 +0200
-Message-Id: <20180214114133.5349-1-luiz.dentz@gmail.com>
+Date: Wed, 14 Feb 2018 08:49:22 -0200
+Message-ID: <CABBYNZLLqrO511-KgbY2rir7EXWKh=yefvE0KHCn+m+rEHXk8Q@mail.gmail.com>
+Subject: Re: GAP and GATT always added to sdp records
+To: Austin Riffle <ARiffle@efji.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Austin,
 
-Controller that do not support LE bearer shall not use GATT server for
-anything.
----
- src/adapter.c | 14 ++++++++------
- src/main.conf |  2 +-
- 2 files changed, 9 insertions(+), 7 deletions(-)
+On Tue, Feb 13, 2018 at 6:22 PM, Austin Riffle <ARiffle@efji.com> wrote:
+> Hello
+>
+> I'm developing a Bluetooth solution using BlueZ 5.46 on kernel 4.12.0, an=
+d I'm using a TI Wilink chip for both BR/EDR and BLE. My plan is to initial=
+ly release software with support for only BR/EDR, and then at a later point=
+ release software which supports BLE.
+>
+> I have not yet enabled BLE (knowingly), however, during testing I noticed=
+ that other devices are seeing my device advertise both GAP and GATT UUID's=
+ through SDP. I am starting bluetoothd as follows:
+>
+> /usr/libexec/bluetooth/bluetoothd --noplugin=3D*
+>
+> I also do have bredr only marked in main.conf.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index bd5c1e150..8b785dcfd 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7745,6 +7745,12 @@ static int adapter_register(struct btd_adapter *adapter)
- 		agent_unref(agent);
- 	}
- 
-+	/* Don't start GATT database and advertising managers on
-+	 * non-LE controllers.
-+	 */
-+	if (!(adapter->supported_settings & MGMT_SETTING_LE))
-+		goto load;
-+
- 	adapter->database = btd_gatt_database_new(adapter);
- 	if (!adapter->database) {
- 		btd_error(adapter->dev_id,
-@@ -7753,18 +7759,14 @@ static int adapter_register(struct btd_adapter *adapter)
- 		return -EINVAL;
- 	}
- 
--	/* Don't start advertising managers on non-LE controllers. */
--	if (adapter->supported_settings & MGMT_SETTING_LE)
--		adapter->adv_manager = btd_adv_manager_new(adapter);
--	else
--		btd_info(adapter->dev_id,
--			"LEAdvertisingManager skipped, LE unavailable");
-+	adapter->adv_manager = btd_adv_manager_new(adapter);
- 
- 	db = btd_gatt_database_get_db(adapter->database);
- 	adapter->db_id = gatt_db_register(db, services_modified,
- 							services_modified,
- 							adapter, NULL);
- 
-+load:
- 	load_config(adapter);
- 	fix_storage(adapter);
- 	load_drivers(adapter);
-diff --git a/src/main.conf b/src/main.conf
-index 21986b386..b3f8bb274 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -42,7 +42,7 @@
- # Restricts all controllers to the specified transport. Default value
- # is "dual", i.e. both BR/EDR and LE enabled (when supported by the HW).
- # Possible values: "dual", "bredr", "le"
--#ControllerMode = dual
-+ControllerMode = bredr
- 
- # Enables Multi Profile Specification support. This allows to specify if
- # system supports only Multiple Profiles Single Device (MPSD) configuration
--- 
-2.14.3
+That should have prevented any GATT functionality, so perhaps there is
+bug handling this configuration.
 
+> Tracing through the bluetoothd source, this is what I see:
+>
+> ...
+> adapter_register
+
+Looks like a bug indeed.
+
+> btd_gatt_database_new
+> register_core_services
+> populate_gap_service/populate_gatt_service  **These add GAP_UUID and GATT=
+_UUID to the SDP records
+>
+> If any of these steps fail, the adapter fails to register, and these step=
+s are required to be called. I realize that not marking the flag "G_DBUS_FL=
+AG_ENABLE_EXPERIMENTAL" prevents any advertising, but I would really like t=
+o avoid putting GATT/GAP into my SDP records as they are not supported in a=
+ny meaningful way on my device.
+>
+> Does BlueZ really force all adapters to advertise these services? Or is t=
+here a "nice" way to stop these from being added?
+>
+> I'm guessing I could go around bluetoothd's back and use sdp_lib to remov=
+e them, but I'm not sure what unintended consequences that may have.
+> This e-mail transmission, and any documents, files or previous e-mail mes=
+sages attached to it, may contain confidential information. If you are not =
+the intended recipient, or a person responsible for delivering it to the in=
+tended recipient, you are hereby notified that any disclosure, distribution=
+, review, copy or use of any of the information contained in or attached to=
+ this message is STRICTLY PROHIBITED. If you have received this transmissio=
+n in error, please immediately notify us by reply e-mail, and destroy the o=
+riginal transmission and its attachments without reading them or saving the=
+m to disk. Thank you.
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Luiz Augusto von Dentz
