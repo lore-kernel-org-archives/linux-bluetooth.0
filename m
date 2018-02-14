@@ -1,125 +1,114 @@
-Return-Path: <sre@kernel.org>
-Date: Wed, 14 Feb 2018 13:37:22 +0100
-From: Sebastian Reichel <sre@kernel.org>
-To: Hugues <morisset.hugues@gmail.com>
-Cc: Linux-Bluetooth <linux-bluetooth@vger.kernel.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Bose Quiet Comfort 35 Remaining Battery Reporting
-Message-ID: <20180214123722.ybz54w3wsbmdhhgo@earth.universe>
-References: <20170213055504.kworoylsusadecl7@earth>
- <1415ce15-3e92-3695-4d83-aac96e442ec1@gmail.com>
- <9c7adf82-d6b2-6f2f-b954-728f4bacee7c@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2k3ufpjo2lhufmoq"
-In-Reply-To: <9c7adf82-d6b2-6f2f-b954-728f4bacee7c@gmail.com>
+In-Reply-To: <6b59ff69-6805-597a-814e-8813c9922d03@jp.fujitsu.com>
+References: <6b59ff69-6805-597a-814e-8813c9922d03@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 14 Feb 2018 09:42:46 -0200
+Message-ID: <CABBYNZLaL-JUATYMSJV2SjNk4ApeF3mZfSDTsdSGkMY9d1=m2A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] obexd: Fix null response name
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Eramoto,
 
---2k3ufpjo2lhufmoq
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Wed, Feb 14, 2018 at 5:20 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Prints out "<unknown>" string if there is no response name as below:
+>
+>   obexd[8117]: obexd/src/obex.c:cmd_connect()
+>   obexd[8117]: CONNECT(0x0), (null)(0xffffffff)
+> ---
+>  obexd/src/obex.c | 59 ++++----------------------------------------------------
+>  1 file changed, 4 insertions(+), 55 deletions(-)
+>
+> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+> index ed219d3e7..2850d3a37 100644
+> --- a/obexd/src/obex.c
+> +++ b/obexd/src/obex.c
+> @@ -82,58 +82,12 @@ static struct {
+>         { 0xFF,                 NULL            },
+>  };
+>
+> -/* Possible Response */
+> -static struct {
+> -       int rsp;
+> -       const char *name;
+> -} obex_response[] = {
+> -       { G_OBEX_RSP_CONTINUE,                  "CONTINUE"              },
+> -       { G_OBEX_RSP_SUCCESS,                   "SUCCESS"               },
+> -       { G_OBEX_RSP_CREATED,                   "CREATED"               },
+> -       { G_OBEX_RSP_ACCEPTED,                  "ACCEPTED"              },
+> -       { G_OBEX_RSP_NON_AUTHORITATIVE,         "NON_AUTHORITATIVE"     },
+> -       { G_OBEX_RSP_NO_CONTENT,                "NO_CONTENT"            },
+> -       { G_OBEX_RSP_RESET_CONTENT,             "RESET_CONTENT"         },
+> -       { G_OBEX_RSP_PARTIAL_CONTENT,           "PARTIAL_CONTENT"       },
+> -       { G_OBEX_RSP_MULTIPLE_CHOICES,          "MULTIPLE_CHOICES"      },
+> -       { G_OBEX_RSP_MOVED_PERMANENTLY,         "MOVED_PERMANENTLY"     },
+> -       { G_OBEX_RSP_MOVED_TEMPORARILY,         "MOVED_TEMPORARILY"     },
+> -       { G_OBEX_RSP_SEE_OTHER,                 "SEE_OTHER"             },
+> -       { G_OBEX_RSP_NOT_MODIFIED,              "NOT_MODIFIED"          },
+> -       { G_OBEX_RSP_USE_PROXY,                 "USE_PROXY"             },
+> -       { G_OBEX_RSP_BAD_REQUEST,               "BAD_REQUEST"           },
+> -       { G_OBEX_RSP_UNAUTHORIZED,              "UNAUTHORIZED"          },
+> -       { G_OBEX_RSP_PAYMENT_REQUIRED,          "PAYMENT_REQUIRED"      },
+> -       { G_OBEX_RSP_FORBIDDEN,                 "FORBIDDEN"             },
+> -       { G_OBEX_RSP_NOT_FOUND,                 "NOT_FOUND"             },
+> -       { G_OBEX_RSP_METHOD_NOT_ALLOWED,        "METHOD_NOT_ALLOWED"    },
+> -       { G_OBEX_RSP_NOT_ACCEPTABLE,            "NOT_ACCEPTABLE"        },
+> -       { G_OBEX_RSP_PROXY_AUTH_REQUIRED,       "PROXY_AUTH_REQUIRED"   },
+> -       { G_OBEX_RSP_REQUEST_TIME_OUT,          "REQUEST_TIME_OUT"      },
+> -       { G_OBEX_RSP_CONFLICT,                  "CONFLICT"              },
+> -       { G_OBEX_RSP_GONE,                      "GONE"                  },
+> -       { G_OBEX_RSP_LENGTH_REQUIRED,           "LENGTH_REQUIRED"       },
+> -       { G_OBEX_RSP_PRECONDITION_FAILED,       "PRECONDITION_FAILED"   },
+> -       { G_OBEX_RSP_REQ_ENTITY_TOO_LARGE,      "REQ_ENTITY_TOO_LARGE"  },
+> -       { G_OBEX_RSP_REQ_URL_TOO_LARGE,         "REQ_URL_TOO_LARGE"     },
+> -       { G_OBEX_RSP_UNSUPPORTED_MEDIA_TYPE,    "UNSUPPORTED_MEDIA_TYPE"},
+> -       { G_OBEX_RSP_INTERNAL_SERVER_ERROR,     "INTERNAL_SERVER_ERROR" },
+> -       { G_OBEX_RSP_NOT_IMPLEMENTED,           "NOT_IMPLEMENTED"       },
+> -       { G_OBEX_RSP_BAD_GATEWAY,               "BAD_GATEWAY"           },
+> -       { G_OBEX_RSP_SERVICE_UNAVAILABLE,       "SERVICE_UNAVAILABLE"   },
+> -       { G_OBEX_RSP_GATEWAY_TIMEOUT,           "GATEWAY_TIMEOUT"       },
+> -       { G_OBEX_RSP_VERSION_NOT_SUPPORTED,     "VERSION_NOT_SUPPORTED" },
+> -       { G_OBEX_RSP_DATABASE_FULL,             "DATABASE_FULL"         },
+> -       { G_OBEX_RSP_DATABASE_LOCKED,           "DATABASE_LOCKED"       },
+> -       { 0xFF,                                 NULL                    },
+> -};
+> -
+>  static gboolean handle_async_io(void *object, int flags, int err,
+>                                                 void *user_data);
+>
+> -static void print_event(int cmd, int rsp)
+> +static void print_event(int cmd, uint8_t rsp)
+>  {
+> -       const char *cmdstr = NULL, *rspstr = NULL;
+> +       const char *cmdstr = NULL;
+>         int i;
+>         static int lastcmd;
+>
+> @@ -148,13 +102,8 @@ static void print_event(int cmd, int rsp)
+>                 cmdstr = obex_command[i].name;
+>         }
+>
+> -       for (i = 0; obex_response[i].rsp != 0xFF; i++) {
+> -               if (obex_response[i].rsp != rsp)
+> -                       continue;
+> -               rspstr = obex_response[i].name;
+> -       }
+> -
+> -       obex_debug("%s(0x%x), %s(0x%x)", cmdstr, cmd, rspstr, rsp);
+> +       obex_debug("%s(0x%x), %s(0x%x)", cmdstr, cmd,
+> +                                               g_obex_strerror(rsp), rsp);
+>  }
+>
+>  static void os_set_response(struct obex_session *os, int err)
+> --
+> 2.14.1
 
-Hi Hugues,
+Applied, thanks.
 
-I agree, that this should be handled in bluez instead of pulseaudio.
-I only implemented the proof of concept in pulseaudio, since it was
-not easily possible in bluez and easy to do in pulseaudio. I think
-some restructuring of bluez/pulseaudio rfcomm handling is required,
-but I don't plan to take care of this.
-
--- Sebastian
-
-On Sun, Feb 11, 2018 at 02:22:46PM +0100, Hugues wrote:
-> Hello,
-> Sebastian code works great!
-> But how can I proceed so the remaining battery is exposed over upower?
->=20
-> 	Greping through pulseaudio sources
-> (git://anongit.freedesktop.org/pulseaudio/pulseaudio) for 'battery'
-> doesn't return anything, so anything about battery power seems unlikely
-> to be merged into pulseaudio.
->=20
-> 	upower already expose batteries from bluez through dbus
-> (git://anongit.freedesktop.org/upower:src/linux/up-device-bluez.c)
->=20
-> So is it possible to do the AT commands at the bluez level and expose
-> the infos through dbus, so upower expose it to the rest of the system?
->=20
-> Thanks,
-> Hugues
->=20
-> On 02/24/2017 12:01 PM, Hugues wrote:
-> > Hello,
-> > Thanks a lot!
-> > I tried to connect to the headset through dbus to make the AT commands,
-> > but failed.
-> > So what's the services/program where this should be implemented so it
-> > can be exposed on dbus and picked up by the Desktop Environment?
-> >=20
-> > Regards,
-> > Hugues
-> >=20
-> > On 02/13/2017 06:55 AM, Sebastian Reichel wrote:
-> >> Hi,
-> >>
-> >> FWIW I was also interested in battery level of my Bose QC35 and
-> >> checked this some time ago. That time I only checked the low
-> >> energy stuff, since the Android application seems to know the
-> >> battery status with only LE being connected.
-> >>
-> >> Marcel Holtman wrote:
-> >>>> This headset do have dual mode, I searched around using gatttool ant=
- the
-> >>>> gatt specification but I find nothing about Battery Level
-> >>>> (org.bluetooth.characteristic.battery_level.xml) or Battery Service
-> >>>> (org.bluetooth.service.battery_service.xml).
-> >>
-> >> Bose QC35 does not expose battery status through standard battery_level
-> >> characteristic. There is a proprietary primary service 0xfebe (which
-> >> is assigned to Bose) with a couple of custom services. I assume battery
-> >> level can be read through them, but the required commands are unknown.
-> >>
-> >>>> How could I read what's in the Apple HFP extensions?
-> >>>
-> >>> Start with this one. It describes the extra HFP AT commands that iOS =
-uses:
-> >>>
-> >>> https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines=
-=2Epdf
-> >>
-> >> Thanks for the documentation link! That is actually implemented for
-> >> the Bose QC35. Here is a quick hack providing battery status info
-> >> in pulseaudio log:
-> >>
-> >> https://github.com/sre/pulseaudio/commit/d66b66d20e9bc73e6d0ca89283cf2=
-b5675304b00
-> >>
-> >> -- Sebastian
-> >>
-> >=20
->=20
-
---2k3ufpjo2lhufmoq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlqELX8ACgkQ2O7X88g7
-+poGhw/+NjBTTCBhJ+ZReSV8FkEkHRkilnGO3iJ9XzS8aFxwFnvlAvxX6Xf7/ZvW
-jWDoxyNiaqeRgAFMDtPjcKWLpORy3FGON85DAO8p3JlrXD8YkYPDsSP71b2w0nC2
-0rPWNKTDi/BlJV5gavBzQMZ9YNh2wkTUmSWvIvv8ZTaiZrOBSMzoV+PFQkgXotCU
-0cUFk5wfBVCQH3uKajeVnWOjmkKqIHSVjKSjmQL4Kt4tAqDtYGn5sc5n/S51xbso
-lwi6qhT6k8SWBeIFdibYS5J7T04S8918JC2twqpyVLhjDv8hsofaxGmWovluj81H
-yegvY2Uza7lsFbjMTP+MYV88I6s1ffNgih31wfiRiGrnUcHl1AO2aoBQUUfvdFMd
-LD8RvHXpDirV1m9FhWMMW4fJqmWDGsrwyYBwgRIJwvOCqEuQ6Duw9L85yjjRSCrs
-3ISrZbcoOlDDEaKg81tEA0hHGATo+WmThMqEKgA0c9zwC/ijwkMePltQ5qCpK3af
-2svD38wHpT7SyncTNB0PNSq/m53SIlRI5iH0C4DRToKj0Avj+k6G+y29nOWl6pc+
-igPR8wAgFg8MWEKrwbpZZFR6UI3t3M2MzDQot67693omdGeJAIPwv9rJzhrTMHZb
-YO08sH/3sf7SBQa7OrynGyxlGJFLeuOjK7vJlhhWRFH26yTdY5w=
-=K6AK
------END PGP SIGNATURE-----
-
---2k3ufpjo2lhufmoq--
+-- 
+Luiz Augusto von Dentz
