@@ -1,82 +1,110 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: udev USB autosupend whitelist (was Re: [PATCH] Bluetooth: btusb:
- Restore QCA Rome suspend/resume fix with a "rewritten" version)
-To: Brian Norris <briannorris@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
- stable@vger.kernel.org, Leif Liddy <leif.linux@gmail.com>,
- Matthias Kaehlcke <mka@chromium.org>, Daniel Drake <drake@endlessm.com>,
- Kai-Heng Feng <kai.heng.feng@canonical.com>, matadeen@qti.qualcomm.com,
- linux-kernel@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>
-References: <20180108094416.4789-1-hdegoede@redhat.com>
- <20180213022455.GA151190@rodete-desktop-imager.corp.google.com>
- <8cd918fd-bf6f-70ac-e561-e7deffa695f0@redhat.com>
- <20180216022721.GA69988@rodete-desktop-imager.corp.google.com>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <0a13d0f3-8e0d-74df-df9c-2bf0622a9fb6@redhat.com>
-Date: Fri, 16 Feb 2018 09:26:37 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: [PATCH BlueZ 7/7] client: Add clear command for advertise
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
+Message-ID: <6556ea7a-9717-3148-309c-e72824ae281a@jp.fujitsu.com>
+Date: Fri, 16 Feb 2018 14:51:48 +0900
 MIME-Version: 1.0
-In-Reply-To: <20180216022721.GA69988@rodete-desktop-imager.corp.google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Adds the clear command to advertise-related commands to clear individual
+fields or whole of advertise configuration.
+---
+ client/main.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 70 insertions(+)
 
-Going a bit off-topic here, so changed the subject.
-I will reply on topic in another mail.
+diff --git a/client/main.c b/client/main.c
+index 288ed032f..38df75828 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2314,6 +2314,74 @@ static void cmd_advertise_timeout(int argc, char *argv[])
+ 	ad_advertise_timeout(dbus_conn, &value);
+ }
+ 
++static void ad_clear_uuids(void)
++{
++	ad_disable_uuids(dbus_conn);
++}
++
++static void ad_clear_service(void)
++{
++	ad_disable_service(dbus_conn);
++}
++
++static void ad_clear_manufacturer(void)
++{
++	ad_disable_manufacturer(dbus_conn);
++}
++
++static void ad_clear_tx_power(void)
++{
++	dbus_bool_t powered = false;
++
++	ad_advertise_tx_power(dbus_conn, &powered);
++}
++
++static void ad_clear_name(void)
++{
++	ad_advertise_name(dbus_conn, false);
++}
++
++static void ad_clear_appearance(void)
++{
++	ad_advertise_appearance(dbus_conn, false);
++}
++
++static void ad_clear_duration(void)
++{
++	long int value = 0;
++
++	ad_advertise_duration(dbus_conn, &value);
++}
++
++static void ad_clear_timeout(void)
++{
++	long int value = 0;
++
++	ad_advertise_timeout(dbus_conn, &value);
++}
++
++static const struct clear_entry ad_clear[] = {
++	{ "uuids",		ad_clear_uuids },
++	{ "service",		ad_clear_service },
++	{ "manufacturer",	ad_clear_manufacturer },
++	{ "tx-power",		ad_clear_tx_power },
++	{ "name",		ad_clear_name },
++	{ "appearance",		ad_clear_appearance },
++	{ "duration",		ad_clear_duration },
++	{ "timeout",		ad_clear_timeout },
++	{}
++};
++
++static void cmd_ad_clear(int argc, char *argv[])
++{
++	bool all = false;
++
++	if (argc < 2 || !strlen(argv[1]))
++		all = true;
++
++	data_clear(ad_clear, all ? "all" : argv[1]);
++}
++
+ static const struct bt_shell_menu advertise_menu = {
+ 	.name = "advertise",
+ 	.desc = "Advertise Options Submenu",
+@@ -2336,6 +2404,8 @@ static const struct bt_shell_menu advertise_menu = {
+ 			"Set/Get advertise duration" },
+ 	{ "timeout", "[seconds]", cmd_advertise_timeout,
+ 			"Set/Get advertise timeout" },
++	{ "clear", "[uuids/service/manufacturer/config-name...]", cmd_ad_clear,
++			"Clear advertise config" },
+ 	{ } },
+ };
+ 
+-- 
+2.14.1
 
-On 16-02-18 03:27, Brian Norris wrote:
-> Hi Hans,
-> 
-> On Tue, Feb 13, 2018 at 12:25:55PM +0100, Hans de Goede wrote:
->> On 13-02-18 03:24, Brian Norris wrote:
->>> On Mon, Jan 08, 2018 at 10:44:16AM +0100, Hans de Goede wrote:
->>>> Commit 7d06d5895c15 ("Revert "Bluetooth: btusb: fix QCA...suspend/resume"")
->>>> removed the setting of the BTUSB_RESET_RESUME quirk for QCA Rome devices,
->>>> instead favoring adding USB_QUIRK_RESET_RESUME quirks in usb/core/quirks.c.
->>>>
->>>> This was done because the DIY BTUSB_RESET_RESUME reset-resume handling
->>>> has several issues (see the original commit message). An added advantage
->>>> of moving over to the USB-core reset-resume handling is that it also
->>>> disables autosuspend for these devices, which is similarly broken on these.
->>>
->>> Wait, is autosuspend actually broken for all QCA Rome chipsets? I don't
->>> think so -- I'm using one now.
->>
->> And have you manually enabled USB autosuspend for it, or are you
->> running something which might have done so, e.g. powertop --auto-tune ?
->>
->> Because if you did not do that then you're already not using autosuspend
->> for your QCA devices and this patch will change nothing.
-> 
-> I use a set of udev rules that manually whitelist devices for
-> autosuspend. You can see it here:
-> 
-> https://chromium.googlesource.com/chromiumos/platform2/+/43728a93f6de137006c6b92fbb2a7cc4f353c9bf/power_manager/udev/gen_autosuspend_rules.py#83
-> 
-> You'll find at least one Rome chip in there.
-
-Oh, that is a very interesting link for the work I've been doing to
-improve Linux power-consumption in general:
-
-https://fedoraproject.org/wiki/Changes/ImprovedLaptopBatteryLife
-
-I was actually planning on at least doing such a list for WWAN modems,
-for btusb my approach has been to just enable it everywhere
-(except for QCA devices as I got bugreports for those).
-
-Note that I plan to eventually submit this whitelist to the
-udev rules which are part of systemd upstream, so if chromeos
-is using systemd too, this is something to be aware of for you.
-
-Question, is the white-listing of the root and rate-limiting
-hubs really necessary? I thought these have this enabled by default?
-
-Also any caveats here I should be aware of?
-
-Regards,
-
-Hans
