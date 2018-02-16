@@ -1,66 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+From: Steve Brown <sbrown@cortland.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Set auth method to just works for no mitm and displayonly
-Date: Fri, 16 Feb 2018 14:30:07 +0100
-Message-Id: <20180216133007.5224-1-grzegorz.kolodziejczyk@codecoup.pl>
+Cc: Steve Brown <sbrown@cortland.com>
+Subject: [PATCH 2/2] mesh: node: Correct minor errors
+Date: Fri, 16 Feb 2018 07:20:01 -0500
+Message-Id: <20180216122001.6923-2-sbrown@cortland.com>
+In-Reply-To: <20180216122001.6923-1-sbrown@cortland.com>
+References: <20180216122001.6923-1-sbrown@cortland.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Don't bother user space with no input capabilities with confirmation
-request.
-
-> ACL Data RX: Handle 3585 flags 0x02 dlen 11
-      SMP: Pairing Request (0x01) len 6
-        IO capability: KeyboardDisplay (0x04)
-        OOB data: Authentication data not present (0x00)
-        Authentication requirement: Bonding, No MITM, Legacy, No Keypresses (0x01)
-        Max encryption key size: 16
-        Initiator key distribution: EncKey IdKey Sign (0x07)
-        Responder key distribution: EncKey IdKey Sign (0x07)
-> HCI Event: LE Meta Event (0x3e) plen 12
-      LE Read Remote Used Features (0x04)
-        Status: Unsupported Remote Feature / Unsupported LMP Feature (0x1a)
-        Handle: 3585
-        Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-< ACL Data TX: Handle 3585 flags 0x00 dlen 16
-        LE L2CAP: Connection Parameter Update Request (0x12) ident 1 len 8
-        Min interval: 24
-        Max interval: 40
-        Slave latency: 0
-        Timeout multiplier: 2000
-@ MGMT Event: User Confirmation Request (0x000f) plen 12
-        LE Address: 4E:29:AB:D8:25:39 (Resolvable)
-        Confirm hint: 0x01
-        Value: 0x00000000
-< ACL Data TX: Handle 3585 flags 0x00 dlen 11
-      SMP: Pairing Response (0x02) len 6
-        IO capability: DisplayOnly (0x00)
-        OOB data: Authentication data not present (0x00)
-        Authentication requirement: Bonding, No MITM, Legacy, No Keypresses (0x01)
-        Max encryption key size: 16
-        Initiator key distribution: EncKey IdKey Sign (0x07)
-        Responder key distribution: EncKey Sign (0x05)
-
-Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+Correct length computation in node_parse_composition()
+Correct return value in node_set_model()
+  An existing node is not an error
 ---
- net/bluetooth/smp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ mesh/node.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index ede1a68098f1..cac56153b7b5 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -893,7 +893,8 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+diff --git a/mesh/node.c b/mesh/node.c
+index fc8898c49..9ff741962 100644
+--- a/mesh/node.c
++++ b/mesh/node.c
+@@ -417,7 +417,7 @@ bool node_parse_composition(struct mesh_node *node, uint8_t *data, uint16_t len)
  
- 	/* Don't bother user space with no IO capabilities */
- 	if (smp->method == JUST_CFM &&
--	    hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT)
-+	    (hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT ||
-+	    hcon->io_capability == HCI_IO_DISPLAY_ONLY))
- 		smp->method = JUST_WORKS;
+ 		m = *data++;
+ 		v = *data++;
+-		len -= 4;
++		len -= 2;
  
- 	/* If Just Works, Continue with Zero TK */
+ 		while (len >= 2 && m--) {
+ 			mod_id = get_le16(data);
+@@ -691,7 +691,7 @@ bool node_set_model(struct mesh_node *node, uint8_t ele_idx, uint32_t id)
+ 	l = g_list_find_custom(ele->models, GUINT_TO_POINTER(id),
+ 				match_model_id);
+ 	if (l)
+-		return false;
++		return true;
+ 
+ 	model = g_malloc0(sizeof(struct mesh_model));
+ 	if (!model)
 -- 
-2.13.6
+2.14.1
 
