@@ -1,11 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ 6/7] client: Introduce
- ad_disable_{uuids,service,manufacturer}
+Subject: [PATCH BlueZ 5/7] client: Introduce data_clear() calling ->clear()
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
-Message-ID: <6dd38981-a3d2-2b53-1337-8a4465dd041a@jp.fujitsu.com>
-Date: Fri, 16 Feb 2018 14:51:37 +0900
+Message-ID: <ba142fa4-c7ae-aded-93c8-169ac4121d62@jp.fujitsu.com>
+Date: Fri, 16 Feb 2018 14:51:29 +0900
 MIME-Version: 1.0
 In-Reply-To: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
@@ -13,104 +12,82 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/advertising.c | 39 ++++++++++++++++++++++++++++++++++++---
- client/advertising.h |  3 +++
- 2 files changed, 39 insertions(+), 3 deletions(-)
+ client/main.c | 39 ++++++++++++++++++++++++++++-----------
+ 1 file changed, 28 insertions(+), 11 deletions(-)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index f1b08c0b6..3cfc318ba 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -507,6 +507,13 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager)
- 	}
+diff --git a/client/main.c b/client/main.c
+index 8fc76a6de..288ed032f 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1405,10 +1405,12 @@ static void filter_clear_duplicate(void)
+ 	filter.duplicate = false;
  }
  
-+static void ad_clear_uuids(void)
-+{
-+	g_strfreev(ad.uuids);
-+	ad.uuids = NULL;
-+	ad.uuids_len = 0;
+-static const struct filter_clear {
++struct clear_entry {
+ 	const char *name;
+ 	void (*clear) (void);
+-} filter_clear[] = {
++};
++
++static const struct clear_entry filter_clear[] = {
+ 	{ "uuids", filter_clear_uuids },
+ 	{ "rssi", filter_clear_rssi },
+ 	{ "pathloss", filter_clear_pathloss },
+@@ -1437,29 +1439,44 @@ static char *filter_clear_generator(const char *text, int state)
+ 	return NULL;
+ }
+ 
+-static void cmd_scan_filter_clear(int argc, char *argv[])
++static gboolean data_clear(const struct clear_entry *entry_table,
++							const char *name)
+ {
+-	const struct filter_clear *fc;
++	const struct clear_entry *entry;
+ 	bool all = false;
+ 
+-	if (argc < 2 || !strlen(argv[1]))
++	if (!name || !strlen(name) || !strcmp("all", name))
+ 		all = true;
+ 
+-	for (fc = filter_clear; fc && fc->name; fc++) {
+-		if (all || !strcmp(fc->name, argv[1])) {
+-			fc->clear();
+-			filter.set = false;
++	for (entry = entry_table; entry && entry->name; entry++) {
++		if (all || !strcmp(entry->name, name)) {
++			entry->clear();
+ 			if (!all)
+ 				goto done;
+ 		}
+ 	}
+ 
+ 	if (!all) {
+-		bt_shell_printf("Invalid argument %s\n", argv[1]);
+-		return;
++		bt_shell_printf("Invalid argument %s\n", name);
++		return FALSE;
+ 	}
+ 
+ done:
++	return TRUE;
 +}
 +
- void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[])
- {
- 	if (argc < 2 || !strlen(argv[1])) {
-@@ -514,9 +521,7 @@ void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[])
++static void cmd_scan_filter_clear(int argc, char *argv[])
++{
++	bool all = false;
++
++	if (argc < 2 || !strlen(argv[1]))
++		all = true;
++
++	if (!data_clear(filter_clear, all ? "all" : argv[1]))
++		return;
++
++	filter.set = false;
++
+ 	if (check_default_ctrl() == FALSE)
  		return;
- 	}
  
--	g_strfreev(ad.uuids);
--	ad.uuids = NULL;
--	ad.uuids_len = 0;
-+	ad_clear_uuids();
- 
- 	ad.uuids = g_strdupv(&argv[1]);
- 	if (!ad.uuids) {
-@@ -529,6 +534,15 @@ void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[])
- 	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceUUIDs");
- }
- 
-+void ad_disable_uuids(DBusConnection *conn)
-+{
-+	if (!ad.uuids)
-+		return;
-+
-+	ad_clear_uuids();
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceUUIDs");
-+}
-+
- static void ad_clear_service(void)
- {
- 	g_free(ad.service.uuid);
-@@ -578,6 +592,15 @@ void ad_advertise_service(DBusConnection *conn, int argc, char *argv[])
- 	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceData");
- }
- 
-+void ad_disable_service(DBusConnection *conn)
-+{
-+	if (!ad.service.uuid)
-+		return;
-+
-+	ad_clear_service();
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceData");
-+}
-+
- static void ad_clear_manufacturer(void)
- {
- 	memset(&ad.manufacturer, 0, sizeof(ad.manufacturer));
-@@ -634,6 +657,16 @@ void ad_advertise_manufacturer(DBusConnection *conn, int argc, char *argv[])
- 							"ManufacturerData");
- }
- 
-+void ad_disable_manufacturer(DBusConnection *conn)
-+{
-+	if (!ad.manufacturer.id && !ad.manufacturer.data.len)
-+		return;
-+
-+	ad_clear_manufacturer();
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
-+							"ManufacturerData");
-+}
-+
- void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value)
- {
- 	if (!value) {
-diff --git a/client/advertising.h b/client/advertising.h
-index 13e076438..b73d33b13 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -25,8 +25,11 @@ void ad_register(DBusConnection *conn, GDBusProxy *manager, const char *type);
- void ad_unregister(DBusConnection *conn, GDBusProxy *manager);
- 
- void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[]);
-+void ad_disable_uuids(DBusConnection *conn);
- void ad_advertise_service(DBusConnection *conn, int argc, char *argv[]);
-+void ad_disable_service(DBusConnection *conn);
- void ad_advertise_manufacturer(DBusConnection *conn, int argc, char *argv[]);
-+void ad_disable_manufacturer(DBusConnection *conn);
- void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value);
- void ad_advertise_name(DBusConnection *conn, bool value);
- void ad_advertise_appearance(DBusConnection *conn, bool value);
 -- 
 2.14.1
 
