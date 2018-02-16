@@ -1,38 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ 2/7] client: Not output ad service info if no uuid sets
+Subject: [PATCH BlueZ 1/7] client: Fix null output for ad service uuid
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
-Message-ID: <e2d7e444-0f79-44fe-9ad9-fb93d06d5270@jp.fujitsu.com>
-Date: Fri, 16 Feb 2018 14:51:08 +0900
+Message-ID: <47445278-d6cf-d79c-f645-8d4d88a213b7@jp.fujitsu.com>
+Date: Fri, 16 Feb 2018 14:51:03 +0900
 MIME-Version: 1.0
 In-Reply-To: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+If getting the advertise service information without setting, outputs
+null as UUID as below:
+
+  [bluetooth]# service
+  UUID: ((null))
 ---
- client/advertising.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ client/advertising.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/client/advertising.c b/client/advertising.c
-index 80a48652c..e500a2e86 100644
+index b9b9a7371..80a48652c 100644
 --- a/client/advertising.c
 +++ b/client/advertising.c
-@@ -541,8 +541,11 @@ void ad_advertise_service(DBusConnection *conn, int argc, char *argv[])
- 	struct ad_data *data;
+@@ -131,7 +131,7 @@ static void print_uuid(const char *uuid)
  
- 	if (argc < 2 || !strlen(argv[1])) {
--		print_uuid(ad.service.uuid);
--		bt_shell_hexdump(ad.service.data.data, ad.service.data.len);
-+		if (ad.service.uuid) {
-+			print_uuid(ad.service.uuid);
-+			bt_shell_hexdump(ad.service.data.data,
-+						ad.service.data.len);
-+		}
- 		return;
- 	}
+ 		bt_shell_printf("UUID: %s(%s)\n", str, uuid);
+ 	} else
+-		bt_shell_printf("UUID: (%s)\n", uuid);
++		bt_shell_printf("UUID: (%s)\n", uuid ? uuid : "");
+ }
  
+ static void print_ad_uuids(void)
 -- 
 2.14.1
 
