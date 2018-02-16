@@ -1,29 +1,28 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 16 Feb 2018 20:03:33 +0200
+Date: Fri, 16 Feb 2018 20:02:11 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] adapter: Fix initializing GATT server for BR/EDR only
- controllers
-Message-ID: <20180216180333.GB29745@x1c>
-References: <20180214135815.18250-1-luiz.dentz@gmail.com>
+Subject: Re: [PATCH v3] adapter: Add ConnectDevice method
+Message-ID: <20180216180211.GA29745@x1c>
+References: <20180212215946.30909-1-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180214135815.18250-1-luiz.dentz@gmail.com>
+In-Reply-To: <20180212215946.30909-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Szymon,
 
-On Wed, Feb 14, 2018, Luiz Augusto von Dentz wrote:
-> Controller that do not support LE bearer shall not use GATT server for
-> anything.
-> ---
-> v2: Add check for main_opts.mode and remove change to main.conf
-> 
->  src/adapter.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
+On Mon, Feb 12, 2018, Szymon Janc wrote:
+> +	} else {
+> +		dev->pending = create_pending_list(dev, NULL);
+>  
+> -		dev->pending = g_slist_append(dev->pending, service);
+> +		DBG("BLAH %d", g_slist_length(dev->pending));
 
-Applied. Thanks.
+Seems like something you forgot to remove? :)
+
+Otherwise the patch seems fine to me.
 
 Johan
