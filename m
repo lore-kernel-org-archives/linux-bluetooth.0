@@ -1,77 +1,63 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: Set auth method to just works for no mitm and
- displayonly
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180216133007.5224-1-grzegorz.kolodziejczyk@codecoup.pl>
-Date: Fri, 16 Feb 2018 16:54:21 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <97C7B48A-90EF-4327-8327-79F62358592F@holtmann.org>
-References: <20180216133007.5224-1-grzegorz.kolodziejczyk@codecoup.pl>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <amitkarwar@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <87r2po6gts.fsf@kamboji.qca.qualcomm.com>
+References: <1513168977-2121-1-git-send-email-amitkarwar@gmail.com>
+ <1513168977-2121-5-git-send-email-amitkarwar@gmail.com> <87r2q5mc4x.fsf@purkki.adurom.net>
+ <CAEhWJF=iF4Gy65O3vUNtBrKcXBMpSnCuZgvpCDvuObkgf4zuaA@mail.gmail.com> <87r2po6gts.fsf@kamboji.qca.qualcomm.com>
+From: Amitkumar Karwar <amitkarwar@gmail.com>
+Date: Fri, 16 Feb 2018 20:16:02 +0530
+Message-ID: <CAEhWJFmdr-PU5=8nO73km--fR+L8gTtP+qqpy4M47QqSGzabEQ@mail.gmail.com>
+Subject: Re: [v5 4/8] rsi: add coex support
+To: Kalle Valo <kvalo@codeaurora.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless <linux-wireless@vger.kernel.org>,
+	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+On Tue, Feb 13, 2018 at 9:07 PM, Kalle Valo <kvalo@codeaurora.org> wrote:
+> Amitkumar Karwar <amitkarwar@gmail.com> writes:
+>
+>> On Thu, Feb 1, 2018 at 12:26 PM, Kalle Valo <kvalo@codeaurora.org> wrote:
+>>> Amitkumar Karwar <amitkarwar@gmail.com> writes:
+>>>
+>>>> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>>>>
+>>>> With BT support, driver has to handle two streams of data
+>>>> (i.e. wlan and BT). Actual coex implementation is in firmware.
+>>>> Coex module just schedule the packets to firmware by taking them
+>>>> from the corresponding paths.
+>>>>
+>>>> Structures for module and protocol operations are introduced for
+>>>> this purpose. Protocol operations structure is global structure
+>>>> which can be shared among different modules. Initialization of
+>>>> coex and operating mode values is moved to rsi_91x_init().
+>>>>
+>>>> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>>>> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+>>>> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+>>>
+>>> [...]
+>>>
+>>>> @@ -270,6 +271,7 @@ struct rsi_common {
+>>>>       u8 obm_ant_sel_val;
+>>>>       int tx_power;
+>>>>       u8 ant_in_use;
+>>>> +     struct semaphore tx_bus_lock;
+>>>
+>>> Do you really need to use semaphore? I think nowadays the preference is
+>>> to use something other than semaphores.
+>>
+>> We used semaphore here, as USB/SDIO bus write operations could be
+>> blocking/waiting. I will check if spinlock suits here in follow up
+>> patch. It will need some testing.
+>
+> I was more thinking about using a mutex.
 
-> Don't bother user space with no input capabilities with confirmation
-> request.
-> 
->> ACL Data RX: Handle 3585 flags 0x02 dlen 11
->      SMP: Pairing Request (0x01) len 6
->        IO capability: KeyboardDisplay (0x04)
->        OOB data: Authentication data not present (0x00)
->        Authentication requirement: Bonding, No MITM, Legacy, No Keypresses (0x01)
->        Max encryption key size: 16
->        Initiator key distribution: EncKey IdKey Sign (0x07)
->        Responder key distribution: EncKey IdKey Sign (0x07)
->> HCI Event: LE Meta Event (0x3e) plen 12
->      LE Read Remote Used Features (0x04)
->        Status: Unsupported Remote Feature / Unsupported LMP Feature (0x1a)
->        Handle: 3585
->        Features: 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-> < ACL Data TX: Handle 3585 flags 0x00 dlen 16
->        LE L2CAP: Connection Parameter Update Request (0x12) ident 1 len 8
->        Min interval: 24
->        Max interval: 40
->        Slave latency: 0
->        Timeout multiplier: 2000
-> @ MGMT Event: User Confirmation Request (0x000f) plen 12
->        LE Address: 4E:29:AB:D8:25:39 (Resolvable)
->        Confirm hint: 0x01
->        Value: 0x00000000
-> < ACL Data TX: Handle 3585 flags 0x00 dlen 11
->      SMP: Pairing Response (0x02) len 6
->        IO capability: DisplayOnly (0x00)
->        OOB data: Authentication data not present (0x00)
->        Authentication requirement: Bonding, No MITM, Legacy, No Keypresses (0x01)
->        Max encryption key size: 16
->        Initiator key distribution: EncKey IdKey Sign (0x07)
->        Responder key distribution: EncKey Sign (0x05)
-> 
-> Signed-off-by: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-> ---
-> net/bluetooth/smp.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index ede1a68098f1..cac56153b7b5 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -893,7 +893,8 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
-> 
-> 	/* Don't bother user space with no IO capabilities */
-> 	if (smp->method == JUST_CFM &&
-> -	    hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT)
-> +	    (hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT ||
-> +	    hcon->io_capability == HCI_IO_DISPLAY_ONLY))
-> 		smp->method = JUST_WORKS;
+Right. mutex would be better option. I will submit updated version
+with this change
 
-I leave this up to Johan to decide if this is our desired behavior or not, but if we go ahead with that, then the comment above also needs changing. And it also needs to be a more elaborate comment explaining the reasoning.
-
-Regards
-
-Marcel
-
+Regards,
+Amitkumar Karwar
