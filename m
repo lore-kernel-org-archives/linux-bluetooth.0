@@ -1,10 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ 5/7] client: Introduce data_clear() calling ->clear()
+Subject: [PATCH BlueZ 4/7] client: Improve help messages for advertise
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
-Message-ID: <ba142fa4-c7ae-aded-93c8-169ac4121d62@jp.fujitsu.com>
-Date: Fri, 16 Feb 2018 14:51:29 +0900
+Message-ID: <fda21ee4-48eb-2626-d184-8e95d119e3f1@jp.fujitsu.com>
+Date: Fri, 16 Feb 2018 14:51:21 +0900
 MIME-Version: 1.0
 In-Reply-To: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,82 +12,40 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/main.c | 39 ++++++++++++++++++++++++++++-----------
- 1 file changed, 28 insertions(+), 11 deletions(-)
+ client/main.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/client/main.c b/client/main.c
-index 8fc76a6de..288ed032f 100644
+index a6adb70d2..8fc76a6de 100644
 --- a/client/main.c
 +++ b/client/main.c
-@@ -1405,10 +1405,12 @@ static void filter_clear_duplicate(void)
- 	filter.duplicate = false;
- }
- 
--static const struct filter_clear {
-+struct clear_entry {
- 	const char *name;
- 	void (*clear) (void);
--} filter_clear[] = {
-+};
-+
-+static const struct clear_entry filter_clear[] = {
- 	{ "uuids", filter_clear_uuids },
- 	{ "rssi", filter_clear_rssi },
- 	{ "pathloss", filter_clear_pathloss },
-@@ -1437,29 +1439,44 @@ static char *filter_clear_generator(const char *text, int state)
- 	return NULL;
- }
- 
--static void cmd_scan_filter_clear(int argc, char *argv[])
-+static gboolean data_clear(const struct clear_entry *entry_table,
-+							const char *name)
- {
--	const struct filter_clear *fc;
-+	const struct clear_entry *entry;
- 	bool all = false;
- 
--	if (argc < 2 || !strlen(argv[1]))
-+	if (!name || !strlen(name) || !strcmp("all", name))
- 		all = true;
- 
--	for (fc = filter_clear; fc && fc->name; fc++) {
--		if (all || !strcmp(fc->name, argv[1])) {
--			fc->clear();
--			filter.set = false;
-+	for (entry = entry_table; entry && entry->name; entry++) {
-+		if (all || !strcmp(entry->name, name)) {
-+			entry->clear();
- 			if (!all)
- 				goto done;
- 		}
- 	}
- 
- 	if (!all) {
--		bt_shell_printf("Invalid argument %s\n", argv[1]);
--		return;
-+		bt_shell_printf("Invalid argument %s\n", name);
-+		return FALSE;
- 	}
- 
- done:
-+	return TRUE;
-+}
-+
-+static void cmd_scan_filter_clear(int argc, char *argv[])
-+{
-+	bool all = false;
-+
-+	if (argc < 2 || !strlen(argv[1]))
-+		all = true;
-+
-+	if (!data_clear(filter_clear, all ? "all" : argv[1]))
-+		return;
-+
-+	filter.set = false;
-+
- 	if (check_default_ctrl() == FALSE)
- 		return;
- 
+@@ -2302,19 +2302,19 @@ static const struct bt_shell_menu advertise_menu = {
+ 	.desc = "Advertise Options Submenu",
+ 	.entries = {
+ 	{ "uuids", "[uuid1 uuid2 ...]", cmd_advertise_uuids,
+-			"Set advertise uuids" },
++			"Set/Get advertise uuids" },
+ 	{ "service", "[uuid] [data=xx xx ...]", cmd_advertise_service,
+-			"Set advertise service data" },
++			"Set/Get advertise service data" },
+ 	{ "manufacturer", "[id] [data=xx xx ...]",
+ 			cmd_advertise_manufacturer,
+-			"Set advertise manufacturer data" },
++			"Set/Get advertise manufacturer data" },
+ 	{ "tx-power", "[on/off]", cmd_advertise_tx_power,
+-			"Enable/disable TX power to be advertised",
++			"Show/Enable/Disable TX power to be advertised",
+ 							NULL },
+ 	{ "name", "[on/off/name]", cmd_advertise_name,
+-			"Enable/disable local name to be advertised" },
+-	{ "appearance", "[value]", cmd_advertise_appearance,
+-			"Set custom appearance to be advertised" },
++			"Configure local name to be advertised" },
++	{ "appearance", "[on/off/value]", cmd_advertise_appearance,
++			"Configure custom appearance to be advertised" },
+ 	{ "duration", "[seconds]", cmd_advertise_duration,
+ 			"Set/Get advertise duration" },
+ 	{ "timeout", "[seconds]", cmd_advertise_timeout,
 -- 
 2.14.1
 
