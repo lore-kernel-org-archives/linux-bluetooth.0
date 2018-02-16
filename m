@@ -1,110 +1,116 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ 7/7] client: Add clear command for advertise
+Subject: [PATCH BlueZ 6/7] client: Introduce
+ ad_disable_{uuids,service,manufacturer}
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
-Message-ID: <6556ea7a-9717-3148-309c-e72824ae281a@jp.fujitsu.com>
-Date: Fri, 16 Feb 2018 14:51:48 +0900
+Message-ID: <6dd38981-a3d2-2b53-1337-8a4465dd041a@jp.fujitsu.com>
+Date: Fri, 16 Feb 2018 14:51:37 +0900
 MIME-Version: 1.0
 In-Reply-To: <1b7b4b83-e67a-c23a-8da3-9b86cc0b275e@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds the clear command to advertise-related commands to clear individual
-fields or whole of advertise configuration.
 ---
- client/main.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+ client/advertising.c | 39 ++++++++++++++++++++++++++++++++++++---
+ client/advertising.h |  3 +++
+ 2 files changed, 39 insertions(+), 3 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index 288ed032f..38df75828 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2314,6 +2314,74 @@ static void cmd_advertise_timeout(int argc, char *argv[])
- 	ad_advertise_timeout(dbus_conn, &value);
+diff --git a/client/advertising.c b/client/advertising.c
+index f1b08c0b6..3cfc318ba 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -507,6 +507,13 @@ void ad_unregister(DBusConnection *conn, GDBusProxy *manager)
+ 	}
  }
  
 +static void ad_clear_uuids(void)
 +{
-+	ad_disable_uuids(dbus_conn);
++	g_strfreev(ad.uuids);
++	ad.uuids = NULL;
++	ad.uuids_len = 0;
 +}
 +
-+static void ad_clear_service(void)
-+{
-+	ad_disable_service(dbus_conn);
-+}
-+
-+static void ad_clear_manufacturer(void)
-+{
-+	ad_disable_manufacturer(dbus_conn);
-+}
-+
-+static void ad_clear_tx_power(void)
-+{
-+	dbus_bool_t powered = false;
-+
-+	ad_advertise_tx_power(dbus_conn, &powered);
-+}
-+
-+static void ad_clear_name(void)
-+{
-+	ad_advertise_name(dbus_conn, false);
-+}
-+
-+static void ad_clear_appearance(void)
-+{
-+	ad_advertise_appearance(dbus_conn, false);
-+}
-+
-+static void ad_clear_duration(void)
-+{
-+	long int value = 0;
-+
-+	ad_advertise_duration(dbus_conn, &value);
-+}
-+
-+static void ad_clear_timeout(void)
-+{
-+	long int value = 0;
-+
-+	ad_advertise_timeout(dbus_conn, &value);
-+}
-+
-+static const struct clear_entry ad_clear[] = {
-+	{ "uuids",		ad_clear_uuids },
-+	{ "service",		ad_clear_service },
-+	{ "manufacturer",	ad_clear_manufacturer },
-+	{ "tx-power",		ad_clear_tx_power },
-+	{ "name",		ad_clear_name },
-+	{ "appearance",		ad_clear_appearance },
-+	{ "duration",		ad_clear_duration },
-+	{ "timeout",		ad_clear_timeout },
-+	{}
-+};
-+
-+static void cmd_ad_clear(int argc, char *argv[])
-+{
-+	bool all = false;
-+
-+	if (argc < 2 || !strlen(argv[1]))
-+		all = true;
-+
-+	data_clear(ad_clear, all ? "all" : argv[1]);
-+}
-+
- static const struct bt_shell_menu advertise_menu = {
- 	.name = "advertise",
- 	.desc = "Advertise Options Submenu",
-@@ -2336,6 +2404,8 @@ static const struct bt_shell_menu advertise_menu = {
- 			"Set/Get advertise duration" },
- 	{ "timeout", "[seconds]", cmd_advertise_timeout,
- 			"Set/Get advertise timeout" },
-+	{ "clear", "[uuids/service/manufacturer/config-name...]", cmd_ad_clear,
-+			"Clear advertise config" },
- 	{ } },
- };
+ void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[])
+ {
+ 	if (argc < 2 || !strlen(argv[1])) {
+@@ -514,9 +521,7 @@ void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[])
+ 		return;
+ 	}
  
+-	g_strfreev(ad.uuids);
+-	ad.uuids = NULL;
+-	ad.uuids_len = 0;
++	ad_clear_uuids();
+ 
+ 	ad.uuids = g_strdupv(&argv[1]);
+ 	if (!ad.uuids) {
+@@ -529,6 +534,15 @@ void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[])
+ 	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceUUIDs");
+ }
+ 
++void ad_disable_uuids(DBusConnection *conn)
++{
++	if (!ad.uuids)
++		return;
++
++	ad_clear_uuids();
++	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceUUIDs");
++}
++
+ static void ad_clear_service(void)
+ {
+ 	g_free(ad.service.uuid);
+@@ -578,6 +592,15 @@ void ad_advertise_service(DBusConnection *conn, int argc, char *argv[])
+ 	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceData");
+ }
+ 
++void ad_disable_service(DBusConnection *conn)
++{
++	if (!ad.service.uuid)
++		return;
++
++	ad_clear_service();
++	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceData");
++}
++
+ static void ad_clear_manufacturer(void)
+ {
+ 	memset(&ad.manufacturer, 0, sizeof(ad.manufacturer));
+@@ -634,6 +657,16 @@ void ad_advertise_manufacturer(DBusConnection *conn, int argc, char *argv[])
+ 							"ManufacturerData");
+ }
+ 
++void ad_disable_manufacturer(DBusConnection *conn)
++{
++	if (!ad.manufacturer.id && !ad.manufacturer.data.len)
++		return;
++
++	ad_clear_manufacturer();
++	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
++							"ManufacturerData");
++}
++
+ void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value)
+ {
+ 	if (!value) {
+diff --git a/client/advertising.h b/client/advertising.h
+index 13e076438..b73d33b13 100644
+--- a/client/advertising.h
++++ b/client/advertising.h
+@@ -25,8 +25,11 @@ void ad_register(DBusConnection *conn, GDBusProxy *manager, const char *type);
+ void ad_unregister(DBusConnection *conn, GDBusProxy *manager);
+ 
+ void ad_advertise_uuids(DBusConnection *conn, int argc, char *argv[]);
++void ad_disable_uuids(DBusConnection *conn);
+ void ad_advertise_service(DBusConnection *conn, int argc, char *argv[]);
++void ad_disable_service(DBusConnection *conn);
+ void ad_advertise_manufacturer(DBusConnection *conn, int argc, char *argv[]);
++void ad_disable_manufacturer(DBusConnection *conn);
+ void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value);
+ void ad_advertise_name(DBusConnection *conn, bool value);
+ void ad_advertise_appearance(DBusConnection *conn, bool value);
 -- 
 2.14.1
 
