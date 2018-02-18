@@ -1,68 +1,295 @@
-Return-Path: <kai.heng.feng@canonical.com>
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: btusb: Restore QCA Rome suspend/resume fix
- with a "rewritten" version
-From: Kai-Heng Feng <kai.heng.feng@canonical.com>
-In-Reply-To: <1a08612e-2531-3711-ec0f-a867e86d0009@redhat.com>
-Date: Sun, 18 Feb 2018 16:13:13 +0800
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Brian Norris <briannorris@chromium.org>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Bluez mailing list <linux-bluetooth@vger.kernel.org>,
- linux-serial@vger.kernel.org,
- ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
- stable <stable@vger.kernel.org>,
- Leif Liddy <leif.linux@gmail.com>,
- Matthias Kaehlcke <mka@chromium.org>,
- Daniel Drake <drake@endlessm.com>,
- matadeen@qti.qualcomm.com,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Guenter Roeck <linux@roeck-us.net>
-Message-Id: <AC3BE596-68BD-4D15-B06A-B529F9559C13@canonical.com>
-References: <20180108094416.4789-1-hdegoede@redhat.com>
- <20180213022455.GA151190@rodete-desktop-imager.corp.google.com>
- <8cd918fd-bf6f-70ac-e561-e7deffa695f0@redhat.com>
- <20180216022721.GA69988@rodete-desktop-imager.corp.google.com>
- <345b0de8-1a23-d2f8-bc56-507eadf7faa7@redhat.com>
- <6B37F6AC-1103-4FCF-A5DC-4BA236A7B11B@holtmann.org>
- <1a08612e-2531-3711-ec0f-a867e86d0009@redhat.com>
-To: Hans de Goede <hdegoede@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Inga Stotland <inga.stotland@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 1/1 v2] Add initial doc describing Bluetooth Mesh API
+Date: Sat, 17 Feb 2018 22:48:19 -0800
+Message-Id: <20180218064819.23459-2-inga.stotland@intel.com>
+In-Reply-To: <20180218064819.23459-1-inga.stotland@intel.com>
+References: <20180218064819.23459-1-inga.stotland@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+---
+ doc/mesh-api.txt | 269 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 269 insertions(+)
+ create mode 100644 doc/mesh-api.txt
 
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+new file mode 100644
+index 000000000..87311faba
+--- /dev/null
++++ b/doc/mesh-api.txt
+@@ -0,0 +1,269 @@
++Bluetooth Mesh Socket API
++*************************
++
++Copyright (C) 2018 Intel Corporation. All rights reserved.
++
++This document decribes the data format that is used for communication with
++the kernel via Bluetooth Mesh socket. The data that are passed over this
++type of a socket is specific to Bluetooth Mesh Profile.
++
++The Bluetooth Mesh socket is implemented as part of PF_BLUETOOTH family
++and can be created by opening a raw HCI socket with hci_channel set to
++HCI_CHANNEL_BTMESH. The mesh socket requires the creating process to have
++CAP_NET_ADMIN capability.
++
++===================================================
++Packet Structure: user space to/from kernel (Tx/Rx)
++===================================================
++
++Each packet to or from the Over-the-Air interface is sent between the user
++space and the kernel must be of nonzero length, and start with the AD_Type,
++followed by a variable amount of additional payload.
++
++	0               8
++	+---------------+------------------------------------
++	|  AD_Type      | Mesh Packet
++	+---------------+------------------------------------
++
++AD_Type (1 octet -- Defined by the Bluetooth SIG)
++=================
++
++Provisioning:	0x29 -	The payload contains a Mesh Provisioning message
++Network:		0x2A -	The payload contains a Mesh Data Packet
++Beacon:		0x2B -	The payload contains a Mesh Beacon
++
++The AD_Type values correspond to AD types introduced in Mesh Profile
++specification. The API is designed to support additional types.
++
++
++A packet with empty (Zero-Length) payload may be sent over the socket in case
++when only Control ancillary data is needed (e.g., Flush or Scan, defined below).
++
++===============
++Socket Options
++===============
++
++HCI Mesh Scan Filter
++====================
++	Code:	0x05
++
++	Filter_Id		(1 octet)
++	Duplicates		(1 octet)
++	Filter			(variable length)
++
++Read/write socket option used to setup scan filters for mesh specific packets.
++First octet of filter must include at least the AD_Type but may be longer to
++include NIDs or other known data.
++
++HCI Mesh Default Tx Power
++=========================
++	Code:	0x06
++
++	Tx_Power		(1 octet)
++
++Read/write socket option for setting default Tx power.
++
++HCI Mesh Default Cahnnel Map
++============================
++	Code:	0x07
++
++	Chan_map		(1 octet)
++
++Read/write socket option for setting default channel map.
++
++HCI Mesh Accuracy
++=================
++	Code:	0x08
++
++	Accuracy		(1 octet)
++
++Read-only socket option to obtain the value of the smallest number of
++milliseconds that a Mesh Friendship Offer Window can be, for guaranteed
++Poll Response transmission within that window.
++
++==================
++Tx Ancillary Data
++==================
++
++The information about which timing settings to use when sending a mesh
++packet is contained in mandatory ancillary data accompanying the
++payload. Exactly one of the following (mutually exclusive) ancillary
++data types must be present with nonzero length Tx payload:
++
++Mesh Transmit Info
++===================
++
++cmsg_level     cmsg_type             cmsg_data[]
++--------------------------------------------------
++SOL_BLUETOOTH  BTMESH_TX_INFO        Parameters
++
++	Code:	0x01
++	Parameters:
++		Count			(1 octet)
++		Interval:		(2 octets)
++		Min_Random_Delay:	(1 octet)
++		Max_Random_Delay:	(1 octet)
++
++The retransmission parameters for a regular outgoing mesh message.
++
++Count is the total number of times to Tx. A Zero means Tx Until Canceled.
++
++Interval is the number of milliseconds between each Tx.
++
++Random Delay is milliseconds added before first Tx.
++
++Mesh Poll Transmit Info
++=======================
++
++cmsg_level     cmsg_type              cmsg_data[]
++---------------------------------------------------
++SOL_BLUETOOTH  BTMESH_POLL_TX_INFO    Parameters
++
++	Code:	0x02
++	Parameters:
++		Scan_Delay		(1 octet)
++		Scan_Duration		(1 octet)
++		Filter_Ids[2]		(2 octets)
++		Min_Random_Delay:	(1 octet)
++		Max_Random_Delay:	(1 octet)
++
++Scan_Delay describes the wait period to begin scanning after the Poll message
++is sent.
++
++Filter_Ids contain IDs of two filters that account for two possible values of
++IV Update bit in expected Poll response.
++
++Random Delay is milliseconds added before Tx.
++
++Mesh Poll Response Transmit Info
++================================
++
++cmsg_level     cmsg_type                cmsg_data[]
++-----------------------------------------------------
++SOL_BLUETOOTH  BTMESH_POLL_RSP_TX_INFO  Parameters
++
++	Code:	0x03
++	Parameters:
++		Instant		(4 octets)
++		Delay		(1 octet)
++
++The timing parameters for sending a friend poll response.
++
++Instant is a 4-octet opaque value that corresponds to the instant an
++associated incoming mesh message was recieved, for timing purposes.
++
++Delay defines number of milliseconds after the corresponding Instant
++to wait before sending this Tx.
++
++____________________________________________________________________
++
++The following ancillary types are optional with nonzero length Tx payload:
++
++Transmit Power
++==============
++
++cmsg_level     cmsg_type             cmsg_data[]
++---------------------------------------------------------------
++SOL_BLUETOOTH  BTMESH_TX_POWER_INFO  Parameters
++
++	Code:	0x04
++	Parameters:
++		Tx_Power	(1 octet)
++
++Transmit power setting can be used for finer control on the outbound messages.
++If not present, use default value (builtin or configured as socket options).
++
++Transmit Channel
++================
++cmsg_level     cmsg_type               cmsg_data[]
++---------------------------------------------------------------
++SOL_BLUETOOTH  BTMESH_TX_CHANNEL_INFO  Parameters
++
++	Code:	0x05
++	Parameters:
++		Tx_Channel	(1 octet)
++
++The presence of this option specifies transmit channel and allows
++for better control, e.g., to respond on the same
++channel as the one on which incoming message has been received.
++If not present, the default value will be used (builtin or configured as
++socket options).
++
++
++Additional the ancillary data portion may contain Control type information.
++
++The following are Control ancillary data types, that me be sent with or
++without payloads:
++
++Scan
++=======
++cmsg_level     cmsg_type             cmsg_data[]
++---------------------------------------------------------------
++SOL_BLUETOOTH  BTMESH_SCAN           Parameters
++
++	Code:	0x06
++	Parameters:
++		Filter_Ids[]	(variable)
++
++To enable/disable scanning of Mesh packets.
++
++If Filter_Ids array is nonzero length, start scanning with the specified
++filters (filters are initialized via socket options mechanism). This array
++replaces any prior filters.
++
++If no filter IDs are present (i.e., zero array length), stop scanning.
++
++
++Flush
++=======
++cmsg_level     cmsg_type             cmsg_data[]
++---------------------------------------------------------------
++SOL_BLUETOOTH  BTMESH_TX_FLUSH           Parameters
++
++	Code:	0x06
++	Parameters:
++		Pattern		(variable)
++
++Cancel and Flush all the pending Tx mesh packets that match the specified
++pattern, including the AD Type.
++
++If only the AD Type is present, all outgoing packets of that type will
++be flushed.
++
++If no pattern is present (i.e., zero pattern length), flush all pending Tx
++packets.
++
++
++=================
++Rx Ancillary Data
++=================
++
++Receive Message Info
++====================
++
++cmsg_level     cmsg_type             cmsg_data[]
++------------------------------------------------------------------------
++SOL_BLUETOOTH  BTMESH_RECV_MSG_INFO  (Recv Message Info Parameters)
++
++	Code:	0x04
++	Parameters:
++		Instant		(4 octets)
++		Channel		(1 octet)
++		RSSI		(1 octet)
++
++
++Instant is an opaque 4-octet value that can be included in
++BTMESH_POLL_RSP_TX_INFO ancilary data to accurately time Poll
++Response delays
++
++Channel indicates which channel packet received on or Zero if unknown
++
++RSSI indicates the signal strength of the received packet
++
++--------------------------------------------------------------------------
++
++The socket API follows "best effort" approach for user space / kernel interface:
++there is no asynchronous feedback on status of the data sent over the socket.
++
++All multi-octet fields are in little-endian byte order (least significant byte
++first).
+-- 
+2.13.6
 
-> On 16 Feb 2018, at 8:10 PM, Hans de Goede <hdegoede@redhat.com> wrote:
->=20
->=20
-> Ok, I've asked the reporter of:
->=20
-> https://bugzilla.redhat.com/show_bug.cgi?id=3D1514836
->=20
-> Which is how I got involved in this to provide DMI data and
-> I will whip up a patch for his machine and ask him to test
-> and once that is done submit upstream. This is the only machine
-> I'm aware of though and looking at the history of this I think
-> there will be others.
-
-I have one machine needs the quirk. I=E2=80=99ll also send a patch to
-match its DMI.
-
-Kai-Heng
-
->=20
->> I addition we can add a module option to btusb.ko that allows us to =
-force this flag to be set. That way testing this is easy on a vendor =
-kernel. A bunch of the btusb quirks (and also core quirks) can be tested =
-via module options or debugfs.
->=20
-> Yes a module option for this is a good idea.
->=20
-> Regards,
->=20
-> Hans
->=20
->=20
