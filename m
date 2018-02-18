@@ -1,106 +1,55 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJzH+bpA-QXMCZLdDABDDZA6R1F4R+nTttKFx41JFAGnrOfaFw@mail.gmail.com>
-References: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1511938373-22396-3-git-send-email-jaganathx.kanakkassery@intel.com> <CAJzH+bpA-QXMCZLdDABDDZA6R1F4R+nTttKFx41JFAGnrOfaFw@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 19 Feb 2018 10:47:17 +0200
-Message-ID: <CABBYNZJfov2M5egFaokJuYdrTZAqU48Xy7rE4Zv21=j8fw0FJg@mail.gmail.com>
-Subject: Re: [PATCH 2/4 v4] doc/mgmt-api: Add support for Set Phy
- Configuration command
-To: Jaganath K <jaganath.k.os@gmail.com>
-Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: Problem with re-loading hci_uart.ko on RPi3
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1941091231.91372.1518962068876@email.1und1.de>
+Date: Sun, 18 Feb 2018 20:07:37 +0100
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Eric Anholt <eric@anholt.net>, mzoran@crowfest.net
+Message-Id: <414BD031-1C2F-4E27-BBB4-BEB9F71B099F@holtmann.org>
+References: <E4785C91-043A-4FF5-BFCA-5FADAFF81EE5@holtmann.org>
+ <1941091231.91372.1518962068876@email.1und1.de>
+To: Stefan Wahren <stefan.wahren@i2se.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Stefan,
 
-On Fri, Feb 16, 2018 at 5:40 AM, Jaganath K <jaganath.k.os@gmail.com> wrote:
-> Hi Marcel,
->
->
-> On Wed, Nov 29, 2017 at 12:22 PM, Jaganath Kanakkassery
-> <jaganath.k.os@gmail.com> wrote:
->> This also adds PHY Configuration Changed Event.
->> ---
->>  doc/mgmt-api.txt | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 52 insertions(+)
->>
->> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
->> index c07c48c..628ff18 100644
->> --- a/doc/mgmt-api.txt
->> +++ b/doc/mgmt-api.txt
->> @@ -2940,9 +2940,46 @@ Get PHY Configuration Command
->>         LE 1M TX and LE 1M RX would be supported by default.
->>
->>         This command is only available for LE capable controllers.
->> +        It will return Not Supported otherwise.
->> +
->> +        Possible errors:        Not Supported
->> +                               Invalid Index
->> +
->> +Set PHY Configuration Command
->> +=============================
->> +
->> +       Command Code:           0x0044
->> +       Controller Index:       <controller id>
->> +       Command Parameters:     Default_phys (2 Octet)
->> +       Return Parameters:
->> +
->> +       This command is used to set the default phy to the controller.
->> +
->> +       This will be stored and used for all the subsequent scanning
->> +       and connection initiation.
->> +
->> +       The list of supported PHYs can be retrieved via the
->> +       Get PHY Configuration command. Selecting unsupported PHYs will
->> +       result in an Invalid Parameters error.
->> +
->> +       This can be called at any point to change the preferred PHYs.
->> +
->> +       Default_phy is a bitmask with the following bits.
->> +               0       LE 1M TX
->> +               1       LE 1M RX
->> +               2       LE 2M TX
->> +               3       LE 2M RX
->> +               4       LE CODED TX
->> +               5       LE CODED RX
->> +
->> +       This command generates a Command Complete event on success
->> +       or a Command Status event on failure.
->> +
->> +       This command is only available for LE capable controllers.
->>         It will return Not Supported otherwise.
->>
->>         Possible errors:        Not Supported
->> +                               Invalid Parameters
->>                                 Invalid Index
->>
->
-> I think there is a limitation with current API proposal, user cannot do extended
-> scanning in only 1M (to scan secondary channel in 1M) since with 1M we will
-> switch to legacy scanning.
+>> so with a 4.15 kernel, the Bluetooth chip on the RPi3 is fully supported via DT and serdev. The only problem still present is that when you rmmod hci_uart and then modprobe hci_uart again it will be stuck.
+>> 
+>> = New Index: 00:00:00:00:00:00 (Primary,UART,hci0)
+>> = Open Index: 00:00:00:00:00:00
+>> = Index Info: 00:00:00:00:00:00 (Broadcom Corporation)
+>> < HCI Command: Broadcom Update UART Baud Rate (0x3f|0x0018) plen 6
+>>        Encoded baud rate: Not used (0x0000)
+>>        Explicit baud rate: 2000000 Mbps
+>> < HCI Command: Reset (0x03|0x0003) plen 0
+>> = Close Index: 00:00:00:00:00:00
+>> = Delete Index: 00:00:00:00:00:00
+>> 
+>> Seems like something with the initial baud rate is wrong. When booting the hardware it is suppose to be set to 115200 Mbps, but it seems to be never reset after unloading the module. It stays at 2000000 Mbps. So when sending the Update UART Baud Rate initial command, it gets send at 115200 Mbps, but in reality the Bluetooth chip is still at 2000000 Mbps. So do we have to pull some reset GPIO to get this back into the original setting? Maybe this is just because the GPIOs are not yet exposed on the RPi3 as of now.
+> 
+> The datasheet says the default baudrate is at 115.200 Kbaud, but it also support automatic baudrate detection. So a reset via GPIO should enforce this baudrate.
 
-Why do we have to switch to legacy scanning for 1M? It seems it would
-be possible to use extended scanning whenever it is supported
-regardless of the PHY, or perhaps the spec imposes limitations to
-certain PHYs? Coded perhaps?
+the only thing I wonder is if the BT_ON GPIO will full hard reset the device so that it needs the firmware again or just soft reset it. But unless we have that GPIO exposed, it is hard to tell.
 
-> I think we need two more flags eg: 1MTX-SEC & 1MRX-SEC, if set we will
-> use extended scanning in !M.
->
-> Plz let me know your opinion.
->
-> Thanks,
-> Jaganath
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> Is there any update to get the GPIO expander work upstream?
+> 
+> The latest version of the GPIO expander patch series is here [1]. Unfortunately not merged yet.
 
+Is there any feedback on it. Looks super straight forward to me.
 
+> I plan to provide bluetooth support for RPi Zero W. Is there anything missing from driver side?
 
--- 
-Luiz Augusto von Dentz
+I think just the DT part fo the RPi Zero W should be missing. However it seems when adding Apple support, we broke the RPi support. I have a patch for it that will make it work again. Not having the “shutdown” and “device-wakeup” GPIOs makes it fail the resource setup. So when you test the DT changes, test them with a 4.15 kernel and not 4.16-rc1.
+
+>> One option is of course to keep the max-speed in the DT at 115200 Mbps. It would work, but seriously slow down the transport. Maybe this should be done until we get access to the GPIOs.
+
+So I am convinced when we run on hardware that has no GPIO resources exposed (as it is with RPi right now), we should limit the operational speed to the initialization speed. And then my problem actually goes away. It also forces people to get the GPIOs exposed or they have to stick with a slower HCI transport.
+
+Regards
+
+Marcel
+
