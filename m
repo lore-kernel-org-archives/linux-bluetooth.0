@@ -1,42 +1,106 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] adapter: Fix not clearing connectable setting on power off
-Date: Mon, 19 Feb 2018 10:21:57 +0100
-Message-ID: <2144190.8ubbku3NdT@ix>
-In-Reply-To: <20180216191749.GA4619@x1c>
-References: <20180208154638.15196-1-szymon.janc@codecoup.pl> <20180216191749.GA4619@x1c>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CAJzH+bpA-QXMCZLdDABDDZA6R1F4R+nTttKFx41JFAGnrOfaFw@mail.gmail.com>
+References: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1511938373-22396-3-git-send-email-jaganathx.kanakkassery@intel.com> <CAJzH+bpA-QXMCZLdDABDDZA6R1F4R+nTttKFx41JFAGnrOfaFw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 19 Feb 2018 10:47:17 +0200
+Message-ID: <CABBYNZJfov2M5egFaokJuYdrTZAqU48Xy7rE4Zv21=j8fw0FJg@mail.gmail.com>
+Subject: Re: [PATCH 2/4 v4] doc/mgmt-api: Add support for Set Phy
+ Configuration command
+To: Jaganath K <jaganath.k.os@gmail.com>
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Jaganath,
 
-On Friday, 16 February 2018 20:17:49 CET Johan Hedberg wrote:
-> Hi Szymon,
-> 
-> On Thu, Feb 08, 2018, Szymon Janc wrote:
-> > +	/* if timeout was set kernel clears discoverable on its own */
-> > +	if (!adapter->discoverable_timeout)
-> > +		return;
-> 
-> Isn't this condition inverted? I.e. you want to call Set Connectable if
-> the timeout is 0?
+On Fri, Feb 16, 2018 at 5:40 AM, Jaganath K <jaganath.k.os@gmail.com> wrote:
+> Hi Marcel,
+>
+>
+> On Wed, Nov 29, 2017 at 12:22 PM, Jaganath Kanakkassery
+> <jaganath.k.os@gmail.com> wrote:
+>> This also adds PHY Configuration Changed Event.
+>> ---
+>>  doc/mgmt-api.txt | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 52 insertions(+)
+>>
+>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+>> index c07c48c..628ff18 100644
+>> --- a/doc/mgmt-api.txt
+>> +++ b/doc/mgmt-api.txt
+>> @@ -2940,9 +2940,46 @@ Get PHY Configuration Command
+>>         LE 1M TX and LE 1M RX would be supported by default.
+>>
+>>         This command is only available for LE capable controllers.
+>> +        It will return Not Supported otherwise.
+>> +
+>> +        Possible errors:        Not Supported
+>> +                               Invalid Index
+>> +
+>> +Set PHY Configuration Command
+>> +=============================
+>> +
+>> +       Command Code:           0x0044
+>> +       Controller Index:       <controller id>
+>> +       Command Parameters:     Default_phys (2 Octet)
+>> +       Return Parameters:
+>> +
+>> +       This command is used to set the default phy to the controller.
+>> +
+>> +       This will be stored and used for all the subsequent scanning
+>> +       and connection initiation.
+>> +
+>> +       The list of supported PHYs can be retrieved via the
+>> +       Get PHY Configuration command. Selecting unsupported PHYs will
+>> +       result in an Invalid Parameters error.
+>> +
+>> +       This can be called at any point to change the preferred PHYs.
+>> +
+>> +       Default_phy is a bitmask with the following bits.
+>> +               0       LE 1M TX
+>> +               1       LE 1M RX
+>> +               2       LE 2M TX
+>> +               3       LE 2M RX
+>> +               4       LE CODED TX
+>> +               5       LE CODED RX
+>> +
+>> +       This command generates a Command Complete event on success
+>> +       or a Command Status event on failure.
+>> +
+>> +       This command is only available for LE capable controllers.
+>>         It will return Not Supported otherwise.
+>>
+>>         Possible errors:        Not Supported
+>> +                               Invalid Parameters
+>>                                 Invalid Index
+>>
+>
+> I think there is a limitation with current API proposal, user cannot do extended
+> scanning in only 1M (to scan secondary channel in 1M) since with 1M we will
+> switch to legacy scanning.
 
-No, the check is correct but comment should be better I suppose.
+Why do we have to switch to legacy scanning for 1M? It seems it would
+be possible to use extended scanning whenever it is supported
+regardless of the PHY, or perhaps the spec imposes limitations to
+certain PHYs? Coded perhaps?
 
-The thing is that with timeout enabled kernel will clear only discoverable 
-flag leaving connectabled enabled. If timeout is not set both flags are 
-persistent over power toggle (which is OK). So intention of this patch is to 
-fix 'dangling' connectable flag in case of powering off discoverable adapter 
-with timeout set.
+> I think we need two more flags eg: 1MTX-SEC & 1MRX-SEC, if set we will
+> use extended scanning in !M.
+>
+> Plz let me know your opinion.
+>
+> Thanks,
+> Jaganath
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-I'll send V2 with udpated comment.
+
 
 -- 
-pozdrawiam
-Szymon Janc
-
-
+Luiz Augusto von Dentz
