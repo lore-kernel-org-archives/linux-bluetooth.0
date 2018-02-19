@@ -1,35 +1,131 @@
-Return-Path: <frederic.danis.oss@gmail.com>
-Subject: Re: Problem with re-loading hci_uart.ko on RPi3
-To: Marcel Holtmann <marcel@holtmann.org>,
- Stefan Wahren <stefan.wahren@i2se.com>
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
- Eric Anholt <eric@anholt.net>, mzoran@crowfest.net
-References: <E4785C91-043A-4FF5-BFCA-5FADAFF81EE5@holtmann.org>
- <1941091231.91372.1518962068876@email.1und1.de>
- <414BD031-1C2F-4E27-BBB4-BEB9F71B099F@holtmann.org>
-From: =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
-Message-ID: <76f76129-dd3e-2d17-635d-18a563d12aa8@gmail.com>
-Date: Mon, 19 Feb 2018 11:10:07 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <414BD031-1C2F-4E27-BBB4-BEB9F71B099F@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CAExxLLCUc0W7n6w-Beh7e5dOd7aGOAvG5Dcw4fEozCAX7nBMyw@mail.gmail.com>
+References: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1511938373-22396-3-git-send-email-jaganathx.kanakkassery@intel.com>
+ <CAJzH+bpA-QXMCZLdDABDDZA6R1F4R+nTttKFx41JFAGnrOfaFw@mail.gmail.com>
+ <CABBYNZJfov2M5egFaokJuYdrTZAqU48Xy7rE4Zv21=j8fw0FJg@mail.gmail.com>
+ <CAJzH+brcoCP1BpKL=VDmfvNk-7ZK8heVjvOaVyN4xiW3K6ChGw@mail.gmail.com> <CAExxLLCUc0W7n6w-Beh7e5dOd7aGOAvG5Dcw4fEozCAX7nBMyw@mail.gmail.com>
+From: Jaganath K <jaganath.k.os@gmail.com>
+Date: Mon, 19 Feb 2018 15:39:06 +0530
+Message-ID: <CAJzH+bok8hZ5y3VjTS3Hx9gqPYMJ3_9bcuqZJr9-agD3tqCOTg@mail.gmail.com>
+Subject: Re: [PATCH 2/4 v4] doc/mgmt-api: Add support for Set Phy
+ Configuration command
+To: =?UTF-8?Q?=C5=81ukasz_Rymanowski?= <lukasz.rymanowski@codecoup.pl>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Lukasz,
 
-Le 18/02/2018 à 20:07, Marcel Holtmann a écrit :
+On Mon, Feb 19, 2018 at 3:28 PM, =C5=81ukasz Rymanowski
+<lukasz.rymanowski@codecoup.pl> wrote:
+> Hi Jaganath,
 >
->>> One option is of course to keep the max-speed in the DT at 115200 Mbps. It would work, but seriously slow down the transport. Maybe this should be done until we get access to the GPIOs.
-> So I am convinced when we run on hardware that has no GPIO resources exposed (as it is with RPi right now), we should limit the operational speed to the initialization speed. And then my problem actually goes away. It also forces people to get the GPIOs exposed or they have to stick with a slower HCI transport.
+> On 19 February 2018 at 10:25, Jaganath K <jaganath.k.os@gmail.com> wrote:
+>> Hi Luiz,
+>>
+>>
+>> On Mon, Feb 19, 2018 at 2:17 PM, Luiz Augusto von Dentz
+>> <luiz.dentz@gmail.com> wrote:
+>>> Hi Jaganath,
+>>>
+>>> On Fri, Feb 16, 2018 at 5:40 AM, Jaganath K <jaganath.k.os@gmail.com> w=
+rote:
+>>>> Hi Marcel,
+>>>>
+>>>>
+>>>> On Wed, Nov 29, 2017 at 12:22 PM, Jaganath Kanakkassery
+>>>> <jaganath.k.os@gmail.com> wrote:
+>>>>> This also adds PHY Configuration Changed Event.
+>>>>> ---
+>>>>>  doc/mgmt-api.txt | 52 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>>>>>  1 file changed, 52 insertions(+)
+>>>>>
+>>>>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+>>>>> index c07c48c..628ff18 100644
+>>>>> --- a/doc/mgmt-api.txt
+>>>>> +++ b/doc/mgmt-api.txt
+>>>>> @@ -2940,9 +2940,46 @@ Get PHY Configuration Command
+>>>>>         LE 1M TX and LE 1M RX would be supported by default.
+>>>>>
+>>>>>         This command is only available for LE capable controllers.
+>>>>> +        It will return Not Supported otherwise.
+>>>>> +
+>>>>> +        Possible errors:        Not Supported
+>>>>> +                               Invalid Index
+>>>>> +
+>>>>> +Set PHY Configuration Command
+>>>>> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D
+>>>>> +
+>>>>> +       Command Code:           0x0044
+>>>>> +       Controller Index:       <controller id>
+>>>>> +       Command Parameters:     Default_phys (2 Octet)
+>>>>> +       Return Parameters:
+>>>>> +
+>>>>> +       This command is used to set the default phy to the controller=
+.
+>>>>> +
+>>>>> +       This will be stored and used for all the subsequent scanning
+>>>>> +       and connection initiation.
+>>>>> +
+>>>>> +       The list of supported PHYs can be retrieved via the
+>>>>> +       Get PHY Configuration command. Selecting unsupported PHYs wil=
+l
+>>>>> +       result in an Invalid Parameters error.
+>>>>> +
+>>>>> +       This can be called at any point to change the preferred PHYs.
+>>>>> +
+>>>>> +       Default_phy is a bitmask with the following bits.
+>>>>> +               0       LE 1M TX
+>>>>> +               1       LE 1M RX
+>>>>> +               2       LE 2M TX
+>>>>> +               3       LE 2M RX
+>>>>> +               4       LE CODED TX
+>>>>> +               5       LE CODED RX
+>>>>> +
+>>>>> +       This command generates a Command Complete event on success
+>>>>> +       or a Command Status event on failure.
+>>>>> +
+>>>>> +       This command is only available for LE capable controllers.
+>>>>>         It will return Not Supported otherwise.
+>>>>>
+>>>>>         Possible errors:        Not Supported
+>>>>> +                               Invalid Parameters
+>>>>>                                 Invalid Index
+>>>>>
+>>>>
+>>>> I think there is a limitation with current API proposal, user cannot d=
+o extended
+>>>> scanning in only 1M (to scan secondary channel in 1M) since with 1M we=
+ will
+>>>> switch to legacy scanning.
+>>>
+>>> Why do we have to switch to legacy scanning for 1M? It seems it would
+>>> be possible to use extended scanning whenever it is supported
+>>> regardless of the PHY, or perhaps the spec imposes limitations to
+>>> certain PHYs? Coded perhaps?
+>>>
+>>
+>> The idea is to enable application to use legacy scanning even if
+>> controller supports
+>> extended. (ie if application dont want extended features to be used)
+>> and unlike advertising
+>> legacy scanning can not be emulated using extended scanning.
+>
+> Bluetooth controller which is doing extended scanning will report legacy
+> advertisings as well. It will just use Extended Advertising Report
+> Event for this purpose and Linux Kernel should handle it.
+>
 
-We may also reset to initialization speed on module unload.
-This will allow multiple tests on the hardware, even if it does not have 
-GPIOs exposed.
+Yes, but the idea here is more on perspective of power savings
+where in application dont want to scan on secondary channels itself and
+API should support it.
 
-Regards,
-
-Fred
-
--- 
-Frédéric Danis                       Embedded Linux Consultant
-frederic.danis.oss@gmail.com
+Thanks,
+Jaganath
