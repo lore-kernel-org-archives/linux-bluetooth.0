@@ -1,148 +1,86 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [RFC] Bluetooth: btusb: Use DMI matching for QCA reset_resume
- quirking
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Bluez mailing list <linux-bluetooth@vger.kernel.org>,
- stable <stable@vger.kernel.org>, Brian Norris <briannorris@chromium.org>,
- Kai-Heng Feng <kai.heng.feng@canonical.com>
-References: <20180219143729.15985-1-hdegoede@redhat.com>
- <20180219143729.15985-2-hdegoede@redhat.com>
- <606AE5C9-7663-4285-A01B-32E2CAA0DE7F@holtmann.org>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <f71254af-d831-211e-31d5-ee55cb18dd31@redhat.com>
-Date: Mon, 19 Feb 2018 17:37:06 +0100
-MIME-Version: 1.0
-In-Reply-To: <606AE5C9-7663-4285-A01B-32E2CAA0DE7F@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/shell: Add non-interactive mode
+Date: Mon, 19 Feb 2018 17:49:52 +0200
+Message-Id: <20180219154952.24339-2-luiz.dentz@gmail.com>
+In-Reply-To: <20180219154952.24339-1-luiz.dentz@gmail.com>
+References: <20180219154952.24339-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 19-02-18 16:33, Marcel Holtmann wrote:
-> Hi Hans,
-> 
->> Commit 61f5acea8737 ("Bluetooth: btusb: Restore QCA Rome suspend/resume fix
->> with a "rewritten" version") applied the USB_QUIRK_RESET_RESUME to all QCA
->> btusb devices. But it turns out that the resume problems are not caused by
->> the QCA Rome chipset, on most platforms it resumes fine. The resume
->> problems are actually a platform problem (likely the platform cutting all
->> power when suspended).
->>
->> The USB_QUIRK_RESET_RESUME quirk also disable runtime suspend, so by
->> matching on usb-ids, we're causing all boards with these chips to use extra
->> power, to fix resume problems which only happen on some boards.
->>
->> This commit fixes this by applying the quirk based on DMI matching instead
->> of on usb-ids, so that we match the platform and not the chipset.
-> 
-> just for the record, can we include the /sys/kernel/debug/usb/devices for that device here.
+This detects if any command was given as parameter, execute it and
+exit disabling all other outputs:
 
-Will do.
+bluetoothctl list
+Controller 00:1B:DC:07:31:88 Vudentz's T460s #1 [default]
+Controller B8:8A:60:D8:17:D7 BlueZ-1
+---
+ src/shared/shell.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
->> Fixes: 61f5acea8737 ("Bluetooth: btusb: Restore QCA Rome suspend/resume..")
->> Cc: stable@vger.kernel.org
->> Cc: Brian Norris <briannorris@chromium.org>
->> Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>
->> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->> ---
->> drivers/bluetooth/btusb.c | 26 ++++++++++++++++++++------
->> 1 file changed, 20 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index 2a55380ad730..a6023667f3b4 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -21,6 +21,7 @@
->>   *
->>   */
->>
->> +#include <linux/dmi.h>
->> #include <linux/module.h>
->> #include <linux/usb.h>
->> #include <linux/usb/quirks.h>
->> @@ -379,6 +380,22 @@ static const struct usb_device_id blacklist_table[] = {
->> 	{ }	/* Terminating entry */
->> };
->>
->> +/*
->> + * The btusb build into some devices needs to be reset on resume, this is a
-> 
-> Actually “btusb” is a driver name. So “Bluetooth USB modules”
-> 
->> + * problem with the platform (likely shutting off all power) not with the
->> + * btusb chip itself. So we use a DMI list to match known broken platforms.
-> 
-> Here s/btusb/module/
-> 
->> + */
->> +static const struct dmi_system_id btusb_plat_needs_reset_resume_list[] = {
-> 
-> I prefer to use _table instead of _list. Also drop the _plat_ part since that seems obvious.
-> 
->> +	{
->> +		/* Lenovo yoga 920 */
-> 
-> Use “Yoga" please.
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 12330ff53..01a62074f 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -55,6 +55,9 @@
+ 			cmd, (int)(CMD_LENGTH - strlen(cmd)), "", desc)
+ 
+ static GMainLoop *main_loop;
++static int exec_argc;
++static char **exec_argv;
++static bool interactive;
+ 
+ struct bt_shell_env {
+ 	char *name;
+@@ -373,6 +376,9 @@ void bt_shell_printf(const char *fmt, ...)
+ 	char *saved_line;
+ 	int saved_point;
+ 
++	if (!interactive)
++		return;
++
+ 	save_input = !RL_ISSTATE(RL_STATE_DONE);
+ 
+ 	if (save_input) {
+@@ -784,6 +790,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 	} else
+ 		snprintf(optstr, sizeof(optstr), "+hv");
+ 
++	exec_argc = --argc;
++	exec_argv = &argv[1];
++
+ 	while ((c = getopt_long(argc, argv, optstr, options, &index)) != -1) {
+ 		switch (c) {
+ 		case 'v':
+@@ -876,7 +885,7 @@ bool bt_shell_add_submenu(const struct bt_shell_menu *menu)
+ 
+ void bt_shell_set_prompt(const char *string)
+ {
+-	if (!main_loop)
++	if (!main_loop || !interactive)
+ 		return;
+ 
+ 	rl_set_prompt(string);
+@@ -899,6 +908,16 @@ bool bt_shell_attach(int fd)
+ 	if (data.input)
+ 		return false;
+ 
++	if (exec_argc > 0) {
++		interactive = true;
++		shell_exec(exec_argc, exec_argv);
++		interactive = false;
++
++		g_main_loop_quit(main_loop);
++
++		return false;
++	}
++
+ 	io = io_new(fd);
+ 
+ 	io_set_read_handler(io, input_read, NULL, NULL);
+-- 
+2.14.3
 
-I will fix all of the above.
-
-> And I would include “(QCA Rome device VID:PID)” so that we have a record of some sorts.
-> 
->> +		.matches = {
->> +			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
->> +			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo YOGA 920”),
-> 
-> No DMI_EXACT_MATCH?
-
-The DMI data actually has:
-
-"Lenovo YOGA 920-13IKB"
-
-I'm not using DMI_EXACT_MATCH on purpose here, I think Lenovo
-might change the "-13IKB" part and I don't expect them to fix
-this bug on newer revisions.
-
-Regards,
-
-Hans
-
-
-> 
->> +		},
->> +	},
->> +	{}
->> +};
->> +
->> #define BTUSB_MAX_ISOC_FRAMES	10
->>
->> #define BTUSB_INTR_RUNNING	0
->> @@ -2945,6 +2962,9 @@ static int btusb_probe(struct usb_interface *intf,
->> 	hdev->send   = btusb_send_frame;
->> 	hdev->notify = btusb_notify;
->>
->> +	if (dmi_check_system(btusb_plat_needs_reset_resume_list))
->> +		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
->> +
->> #ifdef CONFIG_PM
->> 	err = btusb_config_oob_wake(hdev);
->> 	if (err)
->> @@ -3031,12 +3051,6 @@ static int btusb_probe(struct usb_interface *intf,
->> 	if (id->driver_info & BTUSB_QCA_ROME) {
->> 		data->setup_on_usb = btusb_setup_qca;
->> 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
->> -
->> -		/* QCA Rome devices lose their updated firmware over suspend,
->> -		 * but the USB hub doesn't notice any status change.
->> -		 * explicitly request a device reset on resume.
->> -		 */
->> -		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
->> 	}
-> 
-> It is all cosmetic. So otherwise this looks good.
-> 
-> Regards
-> 
-> Marcel
-> 
