@@ -1,78 +1,100 @@
 Return-Path: <hdegoede@redhat.com>
-Subject: Re: udev USB autosupend whitelist (was Re: [PATCH] Bluetooth: btusb:
- Restore QCA Rome suspend/resume fix with a "rewritten" version)
-To: Brian Norris <briannorris@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
- stable@vger.kernel.org, Leif Liddy <leif.linux@gmail.com>,
- Matthias Kaehlcke <mka@chromium.org>, Daniel Drake <drake@endlessm.com>,
- Kai-Heng Feng <kai.heng.feng@canonical.com>, matadeen@qti.qualcomm.com,
- linux-kernel@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>,
- Benson Leung <bleung@chromium.org>
-References: <20180108094416.4789-1-hdegoede@redhat.com>
- <20180213022455.GA151190@rodete-desktop-imager.corp.google.com>
- <8cd918fd-bf6f-70ac-e561-e7deffa695f0@redhat.com>
- <20180216022721.GA69988@rodete-desktop-imager.corp.google.com>
- <0a13d0f3-8e0d-74df-df9c-2bf0622a9fb6@redhat.com>
- <20180216164924.GA72213@rodete-desktop-imager.corp.google.com>
 From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <28da6a0a-cda6-82f1-9200-4a0bb30c0663@redhat.com>
-Date: Mon, 19 Feb 2018 15:59:42 +0100
-MIME-Version: 1.0
-In-Reply-To: <20180216164924.GA72213@rodete-desktop-imager.corp.google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Hans de Goede <hdegoede@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	stable@vger.kernel.org,
+	Brian Norris <briannorris@chromium.org>,
+	Kai-Heng Feng <kai.heng.feng@canonical.com>
+Subject: [RFC] Bluetooth: btusb: Use DMI matching for QCA reset_resume quirking
+Date: Mon, 19 Feb 2018 15:37:29 +0100
+Message-Id: <20180219143729.15985-2-hdegoede@redhat.com>
+In-Reply-To: <20180219143729.15985-1-hdegoede@redhat.com>
+References: <20180219143729.15985-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Commit 61f5acea8737 ("Bluetooth: btusb: Restore QCA Rome suspend/resume fix
+with a "rewritten" version") applied the USB_QUIRK_RESET_RESUME to all QCA
+btusb devices. But it turns out that the resume problems are not caused by
+the QCA Rome chipset, on most platforms it resumes fine. The resume
+problems are actually a platform problem (likely the platform cutting all
+power when suspended).
 
-On 16-02-18 17:49, Brian Norris wrote:
-> + Benson (and there are probably others that know better answers)
-> 
-> Hi,
-> 
-> On Fri, Feb 16, 2018 at 09:26:37AM +0100, Hans de Goede wrote:
->> Going a bit off-topic here, so changed the subject.
->> I will reply on topic in another mail.
->>
->> On 16-02-18 03:27, Brian Norris wrote:
->>> I use a set of udev rules that manually whitelist devices for
->>> autosuspend. You can see it here:
->>>
->>> https://chromium.googlesource.com/chromiumos/platform2/+/43728a93f6de137006c6b92fbb2a7cc4f353c9bf/power_manager/udev/gen_autosuspend_rules.py#83
->>>
->>> You'll find at least one Rome chip in there.
->>
->> Oh, that is a very interesting link for the work I've been doing to
->> improve Linux power-consumption in general:
->>
->> https://fedoraproject.org/wiki/Changes/ImprovedLaptopBatteryLife
->>
->> I was actually planning on at least doing such a list for WWAN modems,
->> for btusb my approach has been to just enable it everywhere
->> (except for QCA devices as I got bugreports for those).
->>
->> Note that I plan to eventually submit this whitelist to the
->> udev rules which are part of systemd upstream, so if chromeos
->> is using systemd too, this is something to be aware of for you.
-> 
-> Chrome OS does not currently use systemd, but thanks for the heads up.
-> 
->> Question, is the white-listing of the root and rate-limiting
->> hubs really necessary? I thought these have this enabled by default?
-> 
-> This list is old and maintained by several of my team, originating from
-> quite a ways back (i.e., much older kernels). It's quite possible that
-> some of it is redundant today.
+The USB_QUIRK_RESET_RESUME quirk also disable runtime suspend, so by
+matching on usb-ids, we're causing all boards with these chips to use extra
+power, to fix resume problems which only happen on some boards.
 
-Ok, I double checked and it seems that explicitly setting power/control
-to auto for any USB hub is not necessary as they all default to auto
-now.
+This commit fixes this by applying the quirk based on DMI matching instead
+of on usb-ids, so that we match the platform and not the chipset.
 
-So FWIW you may want to consider removing this.
+Fixes: 61f5acea8737 ("Bluetooth: btusb: Restore QCA Rome suspend/resume..")
+Cc: stable@vger.kernel.org
+Cc: Brian Norris <briannorris@chromium.org>
+Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/btusb.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-Regards,
-
-Hans
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2a55380ad730..a6023667f3b4 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -21,6 +21,7 @@
+  *
+  */
+ 
++#include <linux/dmi.h>
+ #include <linux/module.h>
+ #include <linux/usb.h>
+ #include <linux/usb/quirks.h>
+@@ -379,6 +380,22 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ }	/* Terminating entry */
+ };
+ 
++/*
++ * The btusb build into some devices needs to be reset on resume, this is a
++ * problem with the platform (likely shutting off all power) not with the
++ * btusb chip itself. So we use a DMI list to match known broken platforms.
++ */
++static const struct dmi_system_id btusb_plat_needs_reset_resume_list[] = {
++	{
++		/* Lenovo yoga 920 */
++		.matches = {
++			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
++			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo YOGA 920"),
++		},
++	},
++	{}
++};
++
+ #define BTUSB_MAX_ISOC_FRAMES	10
+ 
+ #define BTUSB_INTR_RUNNING	0
+@@ -2945,6 +2962,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 	hdev->send   = btusb_send_frame;
+ 	hdev->notify = btusb_notify;
+ 
++	if (dmi_check_system(btusb_plat_needs_reset_resume_list))
++		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
++
+ #ifdef CONFIG_PM
+ 	err = btusb_config_oob_wake(hdev);
+ 	if (err)
+@@ -3031,12 +3051,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_QCA_ROME) {
+ 		data->setup_on_usb = btusb_setup_qca;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
+-
+-		/* QCA Rome devices lose their updated firmware over suspend,
+-		 * but the USB hub doesn't notice any status change.
+-		 * explicitly request a device reset on resume.
+-		 */
+-		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
+ 	}
+ 
+ #ifdef CONFIG_BT_HCIBTUSB_RTL
+-- 
+2.14.3
