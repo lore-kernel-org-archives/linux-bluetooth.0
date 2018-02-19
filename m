@@ -2,309 +2,347 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v3 3/3] monitor: Add support for reading btsnoop sets
-Date: Mon, 19 Feb 2018 14:46:08 +0100
-Message-Id: <20180219134608.14189-3-szymon.janc@codecoup.pl>
-In-Reply-To: <20180219134608.14189-1-szymon.janc@codecoup.pl>
-References: <20180219134608.14189-1-szymon.janc@codecoup.pl>
+Subject: [PATCH v4] adapter: Add ConnectDevice method
+Date: Mon, 19 Feb 2018 14:40:19 +0100
+Message-Id: <20180219134019.22218-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to combine multiple btsnoop files for decoding. Files need
-to be from same set (share same ID) and sequence numbers must be without
-gaps. First file doesn't have to have sequence 0.
----
- monitor/control.c | 139 +++++++++++++++++++++++++++++++++++++++++++++++++-----
- monitor/control.h |   2 +-
- monitor/main.c    |  20 ++++++--
- monitor/packet.c  |   1 +
- 4 files changed, 145 insertions(+), 17 deletions(-)
+This allows to connect device without doing general discovery. This is
+needed for some of qualification tests where there is no general
+discovery upfront and we need to do connection to device with provided
+address.
 
-diff --git a/monitor/control.c b/monitor/control.c
-index 1cd79ca5d..a1a2415b9 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -45,6 +45,7 @@
- #include "lib/mgmt.h"
+Another usecase is for scenario where scanning happen on one controller
+but connection handling on another.
+
+New device object is announced only if physical connection was
+successful. On success this method returns path to created device
+object. After ConnectProfile return bluetoothd continue with
+services discovery and profile connection.
+
+This patch implements bare minimum properties needed for connection -
+address and address type. If needed eg. for non-NFC based OOB it could
+be extended with more options.
+---
+ doc/adapter-api.txt |  38 +++++++++++
+ src/adapter.c       | 183 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/device.c        |  30 +++++----
+ 3 files changed, 237 insertions(+), 14 deletions(-)
+
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 0533b674a..d14d0ca50 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -145,6 +145,44 @@ Methods		void StartDiscovery()
  
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- #include "src/shared/btsnoop.h"
- #include "src/shared/mainloop.h"
+ 			Possible errors: None
  
-@@ -1378,18 +1379,14 @@ bool control_writer(const char *path)
- 	return !!btsnoop_file;
++		object ConnectDevice(dict properties) [experimental]
++
++			This method connects to device without need of
++			performing General Discovery. Connection mechanism is
++			similar to Connect method from Device1 interface with
++			exception that this method returns success when physical
++			connection is established. After this method returns,
++			services discovery will continue and any supported
++			profile will be connected. There is no need for calling
++			Connect on Device1 after this call. If connection was
++			successful this method returns object path to created
++			device object.
++
++			Parameters that may be set in the filter dictionary
++			include the following:
++
++			string Address
++
++				The Bluetooth device address of the remote
++				device. This parameter is mandatory.
++
++			string AddressType
++
++				The Bluetooth device Address Type. This is
++				address type that should be used for initial
++				connection. If this parameter is not present
++				BR/EDR device is created.
++
++				Possible values:
++					"public" - Public address
++					"random" - Random address
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++					 org.bluez.Error.NotSupported
++					 org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++
+ Properties	string Address [readonly]
+ 
+ 			The Bluetooth device address.
+diff --git a/src/adapter.c b/src/adapter.c
+index fcb102411..4d28df89d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -59,6 +59,7 @@
+ #include "src/shared/att.h"
+ #include "src/shared/gatt-db.h"
+ 
++#include "btio/btio.h"
+ #include "hcid.h"
+ #include "sdpd.h"
+ #include "adapter.h"
+@@ -3074,6 +3075,185 @@ static DBusMessage *get_discovery_filters(DBusConnection *conn,
+ 	return reply;
  }
  
--void control_reader(const char *path)
-+static void parse_snoop(struct btsnoop *btsnoop)
- {
- 	unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
- 	uint16_t pktlen;
- 	uint32_t format;
- 	struct timeval tv;
- 
--	btsnoop_file = btsnoop_open(path, BTSNOOP_FLAG_PKLG_SUPPORT);
--	if (!btsnoop_file)
--		return;
--
--	format = btsnoop_get_format(btsnoop_file);
-+	format = btsnoop_get_format(btsnoop);
- 
- 	switch (format) {
- 	case BTSNOOP_FORMAT_HCI:
-@@ -1403,8 +1400,6 @@ void control_reader(const char *path)
- 		break;
- 	}
- 
--	open_pager();
--
- 	switch (format) {
- 	case BTSNOOP_FORMAT_HCI:
- 	case BTSNOOP_FORMAT_UART:
-@@ -1412,7 +1407,7 @@ void control_reader(const char *path)
- 		while (1) {
- 			uint16_t index, opcode;
- 
--			if (!btsnoop_read_hci(btsnoop_file, &tv, &index,
-+			if (!btsnoop_read_hci(btsnoop, &tv, &index,
- 							&opcode, buf, &pktlen))
- 				break;
- 
-@@ -1428,7 +1423,7 @@ void control_reader(const char *path)
- 		while (1) {
- 			uint16_t frequency;
- 
--			if (!btsnoop_read_phy(btsnoop_file, &tv, &frequency,
-+			if (!btsnoop_read_phy(btsnoop, &tv, &frequency,
- 								buf, &pktlen))
- 				break;
- 
-@@ -1436,10 +1431,132 @@ void control_reader(const char *path)
- 		}
- 		break;
- 	}
-+}
-+
-+struct snoop_data
-+{
-+	struct btsnoop *snoop;
-+	uint32_t seq;
++struct device_connect_data {
++	struct btd_adapter *adapter;
++	bdaddr_t dst;
++	uint8_t dst_type;
++	DBusMessage *msg;
 +};
 +
-+static void snoop_data_free(void *data)
++static void device_browse_cb(struct btd_device *dev, int err, void *user_data)
 +{
-+	struct snoop_data *snoop_data = data;
++	DBG("err %d (%s)", err, strerror(-err));
 +
-+	btsnoop_unref(snoop_data->snoop);
-+	free(snoop_data);
++	if (!err)
++		btd_device_connect_services(dev, NULL);
 +}
 +
-+static bool match_snoop_by_seq(const void *data, const void *match_data)
++static void device_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
 +{
-+	const struct snoop_data *snoop_data = data;
-+	uint32_t seq = PTR_TO_UINT(match_data);
++	struct device_connect_data *data = user_data;
++	struct btd_adapter *adapter = data->adapter;
++	struct btd_device *device;
++	const char *path;
 +
-+	return snoop_data->seq == seq;
-+}
++	DBG("%s", gerr ? gerr->message : "");
 +
-+void control_reader(struct queue *paths)
-+{
-+	const struct queue_entry *entry;
-+	struct snoop_data *data;
-+	struct btsnoop *snoop;
-+	struct queue *snoops;
-+	uint8_t id[16];
-+	bool first = true;
-+	uint32_t i;
++	if (gerr)
++		goto failed;
 +
-+	/* if 1 file is provided we don't check for set and seq and sort */
-+	if (queue_length(paths) == 1) {
-+		snoop = btsnoop_open(queue_pop_head(paths),
-+						BTSNOOP_FLAG_PKLG_SUPPORT);
-+		if (snoop) {
-+			open_pager();
-+			parse_snoop(snoop);
-+			close_pager();
-+		}
++	/* object might already exist due to mgmt socket event */
++	device = btd_adapter_get_device(adapter, &data->dst, data->dst_type);
++	if (!device)
++		goto failed;
 +
-+		return;
++	path = device_get_path(device);
++
++	g_dbus_send_reply(dbus_conn, data->msg, DBUS_TYPE_OBJECT_PATH, &path,
++							DBUS_TYPE_INVALID);
++
++	/* continue with service discovery and connection */
++	btd_device_set_temporary(device, false);
++	device_update_last_seen(device, data->dst_type);
++
++	if (data->dst_type != BDADDR_BREDR){
++		g_io_channel_set_close_on_unref(io, FALSE);
++		device_attach_att(device, io);
 +	}
 +
-+	snoops = queue_new();
++	device_discover_services(device);
++	device_wait_for_svc_complete(device, device_browse_cb, NULL);
 +
-+	/* get all snoop files with seq and verify set ID */
-+	for (entry = queue_get_entries(paths); entry; entry = entry->next) {
-+		unsigned char buf[BTSNOOP_MAX_PACKET_SIZE];
-+		struct btsnoop_opcode_set_id *pkt = (void *)buf;
-+		struct timeval tv;
-+		uint16_t index;
-+		uint16_t opcode;
-+		uint16_t len;
++	g_io_channel_unref(io);
++	dbus_message_unref(data->msg);
++	free(data);
++	return;
 +
-+		snoop = btsnoop_open(entry->data, BTSNOOP_FLAG_PKLG_SUPPORT);
-+		if (!snoop) {
-+			fprintf(stderr, "Failed to open %s\n",
-+							(char *) entry->data);
-+			goto done;
-+		}
++failed:
++	g_dbus_send_error(dbus_conn, data->msg, "org.bluez.Failed", NULL);
++	g_io_channel_unref(io);
++	dbus_message_unref(data->msg);
++	free(data);
++}
 +
-+		if (!btsnoop_read_hci(snoop, &tv, &index, &opcode, buf, &len)) {
-+			fprintf(stderr, "Failed to to read seq for %s\n",
-+							(char *) entry->data);
-+			goto done;
-+		}
++static void device_connect(struct btd_adapter *adapter, const bdaddr_t *dst,
++					uint8_t dst_type, DBusMessage *msg)
++{
++	struct device_connect_data *data;
++	GIOChannel *io;
 +
-+		if (opcode != BTSNOOP_OPCODE_SET_ID) {
-+			fprintf(stderr, "Set ID missing for %s\n",
-+						(char *) entry->data);
-+			goto done;
-+		}
++	data = new0(struct device_connect_data, 1);
++	data->adapter = adapter;
++	bacpy(&data->dst, dst);
++	data->dst_type = dst_type;
++	data->msg = dbus_message_ref(msg);
 +
-+		if (len != sizeof (*pkt)) {
-+			fprintf(stderr, "Invalid Set ID size for %s\n",
-+						(char *) entry->data);
-+			goto done;
-+		}
++	if (dst_type == BDADDR_BREDR)
++		io = bt_io_connect(device_connect_cb, data, NULL, NULL,
++				BT_IO_OPT_SOURCE_BDADDR, &adapter->bdaddr,
++				BT_IO_OPT_SOURCE_TYPE, BDADDR_BREDR,
++				BT_IO_OPT_DEST_BDADDR, dst,
++				BT_IO_OPT_DEST_TYPE, BDADDR_BREDR,
++				BT_IO_OPT_PSM, SDP_PSM,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_INVALID);
++	else
++		io = bt_io_connect(device_connect_cb, data, NULL, NULL,
++				BT_IO_OPT_SOURCE_BDADDR, &adapter->bdaddr,
++				BT_IO_OPT_SOURCE_TYPE, adapter->bdaddr_type,
++				BT_IO_OPT_DEST_BDADDR, dst,
++				BT_IO_OPT_DEST_TYPE, dst_type,
++				BT_IO_OPT_CID, ATT_CID,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
++				BT_IO_OPT_INVALID);
 +
-+		if (first) {
-+			memcpy(id, pkt->id, sizeof(id));
-+			first = false;
++	if (!io) {
++		g_dbus_send_message(dbus_conn,
++				btd_error_failed(msg, "Connect failed"));
++		dbus_message_unref(data->msg);
++		free(data);
++	}
++}
++
++static DBusMessage *connect_device(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	struct btd_adapter *adapter = user_data;
++	DBusMessageIter iter, subiter, dictiter, value;
++	uint8_t addr_type = BDADDR_BREDR;
++	bdaddr_t addr = *BDADDR_ANY;
++
++	DBG("sender %s", dbus_message_get_sender(msg));
++
++	if (!(adapter->current_settings & MGMT_SETTING_POWERED))
++		return btd_error_not_ready(msg);
++
++	dbus_message_iter_init(msg, &iter);
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY ||
++	    dbus_message_iter_get_element_type(&iter) != DBUS_TYPE_DICT_ENTRY)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_recurse(&iter, &subiter);
++	while (true) {
++		int type = dbus_message_iter_get_arg_type(&subiter);
++		char *key;
++		char *str;
++
++		if (type == DBUS_TYPE_INVALID)
++			break;
++
++		dbus_message_iter_recurse(&subiter, &dictiter);
++
++		dbus_message_iter_get_basic(&dictiter, &key);
++		if (!dbus_message_iter_next(&dictiter))
++			return btd_error_invalid_args(msg);
++
++		if (dbus_message_iter_get_arg_type(&dictiter) !=
++							DBUS_TYPE_VARIANT)
++			return btd_error_invalid_args(msg);
++
++		dbus_message_iter_recurse(&dictiter, &value);
++
++		if (!strcmp(key, "Address")) {
++			if (dbus_message_iter_get_arg_type(&value) !=
++							DBUS_TYPE_STRING)
++				return btd_error_invalid_args(msg);
++
++			dbus_message_iter_get_basic(&value, &str);
++
++			if (str2ba(str, &addr) < 0 )
++				return btd_error_invalid_args(msg);
++		} else if (!strcmp(key, "AddressType")) {
++			if (dbus_message_iter_get_arg_type(&value) !=
++							DBUS_TYPE_STRING)
++				return btd_error_invalid_args(msg);
++
++			dbus_message_iter_get_basic(&value, &str);
++
++
++			if (!strcmp(str, "public"))
++				addr_type = BDADDR_LE_PUBLIC;
++			else if (!strcmp(str, "random"))
++				addr_type = BDADDR_LE_RANDOM;
++			else
++				return btd_error_invalid_args(msg);
 +		} else {
-+			if (memcmp(id, pkt->id, sizeof(id))) {
-+				fprintf(stderr, "Set ID mismatch for %s\n",
-+							(char *) entry->data);
-+				goto done;
-+			}
++			return btd_error_invalid_args(msg);
 +		}
 +
-+		data = new0(struct snoop_data, 1);
-+		data->snoop = snoop;
-+		data->seq = be32_to_cpu(pkt->seq);
-+
-+		queue_push_tail(snoops, data);
++		dbus_message_iter_next(&subiter);
 +	}
 +
-+	open_pager();
++	if (!bacmp(&addr, BDADDR_ANY))
++		return btd_error_invalid_args(msg);
 +
-+	first = true;
-+	for (i = 0; i < UINT32_MAX; i++) {
-+		data = queue_remove_if(snoops, match_snoop_by_seq,
-+								UINT_TO_PTR(i));
++	if (btd_adapter_find_device(adapter, &addr, addr_type))
++		return btd_error_already_exists(msg);
 +
-+		if (data) {
-+			first = false;
-+			parse_snoop(data->snoop);
-+			snoop_data_free(data);
-+			continue;
++	device_connect(adapter, &addr, addr_type, msg);
++	return NULL;
++}
++
+ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
+ 	{ GDBUS_METHOD("SetDiscoveryFilter",
+@@ -3085,6 +3265,9 @@ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_METHOD("GetDiscoveryFilters", NULL,
+ 			GDBUS_ARGS({ "filters", "as" }),
+ 			get_discovery_filters) },
++	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("ConnectDevice",
++				GDBUS_ARGS({ "properties", "a{sv}" }), NULL,
++				connect_device) },
+ 	{ }
+ };
+ 
+diff --git a/src/device.c b/src/device.c
+index 1acecce33..f91fc74db 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1749,10 +1749,14 @@ int btd_device_connect_services(struct btd_device *dev, GSList *services)
+ 	if (!dev->bredr_state.svc_resolved)
+ 		return -ENOENT;
+ 
+-	for (l = services; l; l = g_slist_next(l)) {
+-		struct btd_service *service = l->data;
++	if (services) {
++		for (l = services; l; l = g_slist_next(l)) {
++			struct btd_service *service = l->data;
+ 
+-		dev->pending = g_slist_append(dev->pending, service);
++			dev->pending = g_slist_append(dev->pending, service);
 +		}
-+
-+		if (!queue_isempty(snoops))
-+			printf("File with next sequence %u missing, stopping\n",
-+									i);
-+
-+		break;
-+	}
++	} else {
++		dev->pending = create_pending_list(dev, NULL);
+ 	}
  
- 	close_pager();
+ 	return connect_next(dev);
+@@ -2331,6 +2335,15 @@ static void device_svc_resolved(struct btd_device *dev, uint8_t browse_type,
+ 		dev->pending_paired = false;
+ 	}
  
--	btsnoop_unref(btsnoop_file);
-+done:
-+	queue_destroy(snoops, snoop_data_free);
++	if (!dev->temporary)
++		store_device_info(dev);
++
++	if (bdaddr_type != BDADDR_BREDR && err == 0)
++		store_services(dev);
++
++	if (req)
++		browse_request_complete(req, browse_type, bdaddr_type, err);
++
+ 	while (dev->svc_callbacks) {
+ 		struct svc_callback *cb = dev->svc_callbacks->data;
+ 
+@@ -2343,17 +2356,6 @@ static void device_svc_resolved(struct btd_device *dev, uint8_t browse_type,
+ 							dev->svc_callbacks);
+ 		g_free(cb);
+ 	}
+-
+-	if (!dev->temporary)
+-		store_device_info(dev);
+-
+-	if (bdaddr_type != BDADDR_BREDR && err == 0)
+-		store_services(dev);
+-
+-	if (!req)
+-		return;
+-
+-	browse_request_complete(req, browse_type, bdaddr_type, err);
  }
  
- int control_tracing(void)
-diff --git a/monitor/control.h b/monitor/control.h
-index 630a852e4..85a7913b0 100644
---- a/monitor/control.h
-+++ b/monitor/control.h
-@@ -25,7 +25,7 @@
- #include <stdint.h>
- 
- bool control_writer(const char *path);
--void control_reader(const char *path);
-+void control_reader(struct queue *paths);
- void control_server(const char *path);
- int control_tty(const char *path, unsigned int speed);
- int control_tracing(void);
-diff --git a/monitor/main.c b/monitor/main.c
-index 3e61a4661..0102103df 100644
---- a/monitor/main.c
-+++ b/monitor/main.c
-@@ -33,6 +33,7 @@
- #include <getopt.h>
- #include <sys/un.h>
- 
-+#include "src/shared/queue.h"
- #include "src/shared/mainloop.h"
- #include "src/shared/tty.h"
- 
-@@ -97,8 +98,8 @@ static const struct option main_options[] = {
- 
- int main(int argc, char *argv[])
- {
-+	struct queue *reader_paths = queue_new();
- 	unsigned long filter_mask = 0;
--	const char *reader_path = NULL;
- 	const char *writer_path = NULL;
- 	const char *analyze_path = NULL;
- 	const char *ellisys_server = NULL;
-@@ -134,7 +135,12 @@ int main(int argc, char *argv[])
- 			}
- 			break;
- 		case 'r':
--			reader_path = optarg;
-+			queue_push_tail(reader_paths, optarg);
-+
-+			/* check if more paths were provided */
-+			while (optind < argc && *argv[optind] != '-')
-+				queue_push_tail(reader_paths, argv[optind++]);
-+
- 			break;
- 		case 'w':
- 			writer_path = optarg;
-@@ -202,7 +208,7 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
- 	}
- 
--	if (reader_path && analyze_path) {
-+	if (!queue_isempty(reader_paths) && analyze_path) {
- 		fprintf(stderr, "Display and analyze can't be combined\n");
- 		return EXIT_FAILURE;
- 	}
-@@ -224,14 +230,18 @@ int main(int argc, char *argv[])
- 		return EXIT_SUCCESS;
- 	}
- 
--	if (reader_path) {
-+	if (!queue_isempty(reader_paths)) {
- 		if (ellisys_server)
- 			ellisys_enable(ellisys_server, ellisys_port);
- 
--		control_reader(reader_path);
-+		control_reader(reader_paths);
-+		queue_destroy(reader_paths, NULL);
-+
- 		return EXIT_SUCCESS;
- 	}
- 
-+	queue_destroy(reader_paths, NULL);
-+
- 	if (writer_path && !control_writer(writer_path)) {
- 		printf("Failed to open '%s'\n", writer_path);
- 		return EXIT_FAILURE;
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b800a2d75..08397c40d 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -44,6 +44,7 @@
- #include "lib/hci_lib.h"
- 
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- #include "src/shared/btsnoop.h"
- #include "display.h"
- #include "bt.h"
+ static struct bonding_req *bonding_request_new(DBusMessage *msg,
 -- 
 2.14.3
 
