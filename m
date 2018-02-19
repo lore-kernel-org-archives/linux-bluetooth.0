@@ -1,105 +1,42 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] adapter: Fix not clearing connectable setting on power off
+Date: Mon, 19 Feb 2018 10:21:57 +0100
+Message-ID: <2144190.8ubbku3NdT@ix>
+In-Reply-To: <20180216191749.GA4619@x1c>
+References: <20180208154638.15196-1-szymon.janc@codecoup.pl> <20180216191749.GA4619@x1c>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJfov2M5egFaokJuYdrTZAqU48Xy7rE4Zv21=j8fw0FJg@mail.gmail.com>
-References: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1511938373-22396-3-git-send-email-jaganathx.kanakkassery@intel.com>
- <CAJzH+bpA-QXMCZLdDABDDZA6R1F4R+nTttKFx41JFAGnrOfaFw@mail.gmail.com> <CABBYNZJfov2M5egFaokJuYdrTZAqU48Xy7rE4Zv21=j8fw0FJg@mail.gmail.com>
-From: Jaganath K <jaganath.k.os@gmail.com>
-Date: Mon, 19 Feb 2018 14:55:40 +0530
-Message-ID: <CAJzH+brcoCP1BpKL=VDmfvNk-7ZK8heVjvOaVyN4xiW3K6ChGw@mail.gmail.com>
-Subject: Re: [PATCH 2/4 v4] doc/mgmt-api: Add support for Set Phy
- Configuration command
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
+
+On Friday, 16 February 2018 20:17:49 CET Johan Hedberg wrote:
+> Hi Szymon,
+> 
+> On Thu, Feb 08, 2018, Szymon Janc wrote:
+> > +	/* if timeout was set kernel clears discoverable on its own */
+> > +	if (!adapter->discoverable_timeout)
+> > +		return;
+> 
+> Isn't this condition inverted? I.e. you want to call Set Connectable if
+> the timeout is 0?
+
+No, the check is correct but comment should be better I suppose.
+
+The thing is that with timeout enabled kernel will clear only discoverable 
+flag leaving connectabled enabled. If timeout is not set both flags are 
+persistent over power toggle (which is OK). So intention of this patch is to 
+fix 'dangling' connectable flag in case of powering off discoverable adapter 
+with timeout set.
+
+I'll send V2 with udpated comment.
+
+-- 
+pozdrawiam
+Szymon Janc
 
 
-On Mon, Feb 19, 2018 at 2:17 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Jaganath,
->
-> On Fri, Feb 16, 2018 at 5:40 AM, Jaganath K <jaganath.k.os@gmail.com> wrote:
->> Hi Marcel,
->>
->>
->> On Wed, Nov 29, 2017 at 12:22 PM, Jaganath Kanakkassery
->> <jaganath.k.os@gmail.com> wrote:
->>> This also adds PHY Configuration Changed Event.
->>> ---
->>>  doc/mgmt-api.txt | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>>  1 file changed, 52 insertions(+)
->>>
->>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
->>> index c07c48c..628ff18 100644
->>> --- a/doc/mgmt-api.txt
->>> +++ b/doc/mgmt-api.txt
->>> @@ -2940,9 +2940,46 @@ Get PHY Configuration Command
->>>         LE 1M TX and LE 1M RX would be supported by default.
->>>
->>>         This command is only available for LE capable controllers.
->>> +        It will return Not Supported otherwise.
->>> +
->>> +        Possible errors:        Not Supported
->>> +                               Invalid Index
->>> +
->>> +Set PHY Configuration Command
->>> +=============================
->>> +
->>> +       Command Code:           0x0044
->>> +       Controller Index:       <controller id>
->>> +       Command Parameters:     Default_phys (2 Octet)
->>> +       Return Parameters:
->>> +
->>> +       This command is used to set the default phy to the controller.
->>> +
->>> +       This will be stored and used for all the subsequent scanning
->>> +       and connection initiation.
->>> +
->>> +       The list of supported PHYs can be retrieved via the
->>> +       Get PHY Configuration command. Selecting unsupported PHYs will
->>> +       result in an Invalid Parameters error.
->>> +
->>> +       This can be called at any point to change the preferred PHYs.
->>> +
->>> +       Default_phy is a bitmask with the following bits.
->>> +               0       LE 1M TX
->>> +               1       LE 1M RX
->>> +               2       LE 2M TX
->>> +               3       LE 2M RX
->>> +               4       LE CODED TX
->>> +               5       LE CODED RX
->>> +
->>> +       This command generates a Command Complete event on success
->>> +       or a Command Status event on failure.
->>> +
->>> +       This command is only available for LE capable controllers.
->>>         It will return Not Supported otherwise.
->>>
->>>         Possible errors:        Not Supported
->>> +                               Invalid Parameters
->>>                                 Invalid Index
->>>
->>
->> I think there is a limitation with current API proposal, user cannot do extended
->> scanning in only 1M (to scan secondary channel in 1M) since with 1M we will
->> switch to legacy scanning.
->
-> Why do we have to switch to legacy scanning for 1M? It seems it would
-> be possible to use extended scanning whenever it is supported
-> regardless of the PHY, or perhaps the spec imposes limitations to
-> certain PHYs? Coded perhaps?
->
-
-The idea is to enable application to use legacy scanning even if
-controller supports
-extended. (ie if application dont want extended features to be used)
-and unlike advertising
-legacy scanning can not be emulated using extended scanning.
-
-Thanks,
-Jaganath
