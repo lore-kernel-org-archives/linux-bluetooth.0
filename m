@@ -1,140 +1,80 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] shared/shell: Add non-interactive mode
-Date: Tue, 20 Feb 2018 16:47:29 +0200
-Message-Id: <20180220144731.28583-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <kvalo@codeaurora.org>
+From: Kalle Valo <kvalo@codeaurora.org>
+To: David Miller <davem@davemloft.net>, Johannes Berg <johannes@sipsolutions.net>
+Cc: marcel@holtmann.org,  linux-wireless@vger.kernel.org,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,  linux-bluetooth@vger.kernel.org,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>, Amitkumar Karwar <amitkarwar@gmail.com>
+Subject: Re: [v7 3/8] rsi: add header file rsi_91x
+References: <1519046379-10068-1-git-send-email-amitkarwar@gmail.com>
+	<1519046379-10068-4-git-send-email-amitkarwar@gmail.com>
+Date: Tue, 20 Feb 2018 15:14:14 +0200
+In-Reply-To: <1519046379-10068-4-git-send-email-amitkarwar@gmail.com>
+	(Amitkumar Karwar's message of "Mon, 19 Feb 2018 18:49:34 +0530")
+Message-ID: <87o9kjiz15.fsf@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Dave and Johannes,
 
-This detects if any command was given as parameter, execute it and
-exit disabling all other outputs:
+a question to both of you below:
 
-bluetoothctl list
-Controller 00:1B:DC:07:31:88 Vudentz's T460s #1 [default]
-Controller B8:8A:60:D8:17:D7 BlueZ-1
+Amitkumar Karwar <amitkarwar@gmail.com> writes:
 
-It is also possible to run interactive command with use of timeout
-option:
+> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+>
+> The common parameters used by wlan and bt modules are add
+> to a new header file "rsi_91x.h" defined in 'include/net'
+>
+> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+> ---
+> v7: Same as v6
+> v6: Renamed rsi_header.h to rsi_91x.h and moved to include/net
+>     from include/linux(Kalle)
+> v5: Same as earlier versions
 
-bluetoothctl --timeout=10 advertise on
-Agent registered
-[CHG] Controller 00:1B:DC:07:31:88 SupportedInstances: 0x04
-[CHG] Controller 00:1B:DC:07:31:88 ActiveInstances: 0x01
-Advertising object registered
-Tx Power: off
-Name: off
-Apperance: off
----
- src/shared/shell.c | 37 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 35 insertions(+), 2 deletions(-)
+[...]
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 12330ff53..8ce3935c8 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -62,6 +62,10 @@ struct bt_shell_env {
- };
- 
- static struct {
-+	int argc;
-+	char **argv;
-+	bool nint;
-+	int nint_to;
- 	struct io *input;
- 
- 	bool saved_prompt;
-@@ -373,6 +377,9 @@ void bt_shell_printf(const char *fmt, ...)
- 	char *saved_line;
- 	int saved_point;
- 
-+	if (!data.input)
-+		return;
-+
- 	save_input = !RL_ISSTATE(RL_STATE_DONE);
- 
- 	if (save_input) {
-@@ -747,6 +754,7 @@ static void rl_init(void)
- static const struct option main_options[] = {
- 	{ "version",	no_argument, 0, 'v' },
- 	{ "help",	no_argument, 0, 'h' },
-+	{ "timeout",	required_argument, 0, 't' },
- };
- 
- static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
-@@ -762,7 +770,8 @@ static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
- 	for (i = 0; opt && opt->options[i].name; i++)
- 		printf("\t--%s \t%s\n", opt->options[i].name, opt->help[i]);
- 
--	printf("\t--version \tDisplay version\n"
-+	printf("\t--timeout \t\tTimeout in seconds for non-interactive mode\n"
-+		"\t--version \tDisplay version\n"
- 		"\t--help \t\tDisplay help\n");
- }
- 
-@@ -794,6 +803,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 			usage(argc, argv, opt);
- 			exit(EXIT_SUCCESS);
- 			return;
-+		case 't':
-+			data.nint_to = atoi(optarg);
-+			break;
- 		default:
- 			if (c != opt->options[index - offset].val) {
- 				usage(argc, argv, opt);
-@@ -805,6 +817,10 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 		}
- 	}
- 
-+	data.argc = argc - optind;
-+	data.argv = argv + optind;
-+	data.nint = (data.argc > 0);
-+
- 	main_loop = g_main_loop_new(NULL, FALSE);
- 
- 	rl_init();
-@@ -876,7 +892,7 @@ bool bt_shell_add_submenu(const struct bt_shell_menu *menu)
- 
- void bt_shell_set_prompt(const char *string)
- {
--	if (!main_loop)
-+	if (!main_loop || data.nint)
- 		return;
- 
- 	rl_set_prompt(string);
-@@ -891,6 +907,13 @@ static bool input_read(struct io *io, void *user_data)
- 	return true;
- }
- 
-+static gboolean shell_quit(void *data)
-+{
-+	g_main_loop_quit(main_loop);
-+
-+	return FALSE;
-+}
-+
- bool bt_shell_attach(int fd)
- {
- 	struct io *io;
-@@ -906,6 +929,16 @@ bool bt_shell_attach(int fd)
- 
- 	data.input = io;
- 
-+	if (data.nint) {
-+		shell_exec(data.argc, data.argv);
-+
-+		if (!data.nint_to) {
-+			bt_shell_detach();
-+			g_main_loop_quit(main_loop);
-+		} else
-+			g_timeout_add_seconds(data.nint_to, shell_quit, NULL);
-+	}
-+
- 	return true;
- }
- 
+> --- /dev/null
+> +++ b/include/net/rsi_91x.h
+> @@ -0,0 +1,34 @@
+> +/**
+> + * Copyright (c) 2017 Redpine Signals Inc.
+> + *
+> + * Permission to use, copy, modify, and/or distribute this software for any
+> + * purpose with or without fee is hereby granted, provided that the above
+> + * copyright notice and this permission notice appear in all copies.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+> + * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+> + * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+> + * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+> + * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+> + * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+> + * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+> + */
+> +
+> +#ifndef __RSI_HEADER_H__
+> +#define __RSI_HEADER_H__
+> +
+> +/* HAL queue information */
+> +#define RSI_COEX_Q			0x0
+> +#define RSI_BT_Q			0x2
+> +#define RSI_WLAN_Q                      0x3
+> +#define RSI_WIFI_MGMT_Q                 0x4
+> +#define RSI_WIFI_DATA_Q                 0x5
+> +#define RSI_BT_MGMT_Q			0x6
+> +#define RSI_BT_DATA_Q			0x7
+> +
+> +enum rsi_host_intf {
+> +	RSI_HOST_INTF_SDIO = 0,
+> +	RSI_HOST_INTF_USB
+> +};
+> +
+> +#endif
+
+Are you guys ok to have this header file shared by rsi wireless and
+bluetooth driver in include/net?
+
 -- 
-2.14.3
-
+Kalle Valo
