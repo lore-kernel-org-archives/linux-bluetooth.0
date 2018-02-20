@@ -1,40 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] advertising: Fix setting discoverable flag only for peripheral
-Date: Tue, 20 Feb 2018 16:13:58 +0100
-Message-Id: <20180220151358.20781-1-szymon.janc@codecoup.pl>
+MIME-Version: 1.0
+In-Reply-To: <20180219154952.24339-1-luiz.dentz@gmail.com>
+References: <20180219154952.24339-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 20 Feb 2018 16:58:30 +0200
+Message-ID: <CABBYNZ+v30qq6-ve96wCeTvidfSP6A5C0+h=bJZ1cDQ=T3-REg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] device: Fix probing service twice
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-General Discoverable mode can also be set for non-connectable
-advertising. This was affecting GAP/DISC/GENM/BV-03-C qualification
-testcase.
----
- src/advertising.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+Hi,
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 38d2a2d1f..6e227d4d1 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -622,12 +622,11 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
- 
- 	DBG("Refreshing advertisement: %s", client->path);
- 
--	if (client->type == AD_TYPE_PERIPHERAL) {
-+	if (client->type == AD_TYPE_PERIPHERAL)
- 		flags = MGMT_ADV_FLAG_CONNECTABLE;
- 
--		if (btd_adapter_get_discoverable(client->manager->adapter))
--			flags |= MGMT_ADV_FLAG_DISCOV;
--	}
-+	if (btd_adapter_get_discoverable(client->manager->adapter))
-+		flags |= MGMT_ADV_FLAG_DISCOV;
- 
- 	flags |= client->flags;
- 
+On Mon, Feb 19, 2018 at 5:49 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> If there is already a service for a given profile there is no point in
+> probing it again.
+> ---
+>  src/device.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/src/device.c b/src/device.c
+> index 1acecce33..0da4184f6 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -4202,6 +4202,7 @@ static struct btd_service *probe_service(struct btd_device *device,
+>                                                 struct btd_profile *profile,
+>                                                 GSList *uuids)
+>  {
+> +       GSList *l;
+>         struct btd_service *service;
+>
+>         if (profile->device_probe == NULL)
+> @@ -4210,6 +4211,10 @@ static struct btd_service *probe_service(struct btd_device *device,
+>         if (!device_match_profile(device, profile, uuids))
+>                 return NULL;
+>
+> +       l = find_service_with_profile(device->services, profile);
+> +       if (l)
+> +               return l->data;
+> +
+>         service = service_create(device, profile);
+>
+>         if (service_probe(service)) {
+> --
+> 2.14.3
+
+Applied, thanks.
+
+
 -- 
-2.14.3
-
+Luiz Augusto von Dentz
