@@ -1,63 +1,131 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] shared/shell: Fix history display with no saved prompt
-Date: Tue, 20 Feb 2018 12:09:40 +0100
-Message-Id: <20180220110940.6293-1-szymon.janc@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hdegoede@redhat.com>
+From: Hans de Goede <hdegoede@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Hans de Goede <hdegoede@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	stable@vger.kernel.org,
+	Brian Norris <briannorris@chromium.org>,
+	Kai-Heng Feng <kai.heng.feng@canonical.com>
+Subject: [PATCH] Bluetooth: btusb: Use DMI matching for QCA reset_resume quirking
+Date: Tue, 20 Feb 2018 09:06:18 +0100
+Message-Id: <20180220080618.7054-2-hdegoede@redhat.com>
+In-Reply-To: <20180220080618.7054-1-hdegoede@redhat.com>
+References: <20180220080618.7054-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Prompt needs to be restored always since default prompt is provided.
-This fix issues with history line being clobbered by offset of prompt
-length.
+Commit 61f5acea8737 ("Bluetooth: btusb: Restore QCA Rome suspend/resume fix
+with a "rewritten" version") applied the USB_QUIRK_RESET_RESUME to all QCA
+USB Bluetooth modules. But it turns out that the resume problems are not
+caused by the QCA Rome chipset, on most platforms it resumes fine. The
+resume problems are actually a platform problem (likely the platform
+cutting all power when suspended).
 
-[bluetooth]# connect 9C:5C:F9:AB:C5:82
-Attempting to connect to 9C:5C:F9:AB:C5:82
-[bluetooth]# disconnect 9C:5C:F9:AB:C5:82
-Attempting to disconnect from 9C:5C:F9:AB:C5:82
-Failed to connect: org.bluez.Error.Failed
-Successful disconnected
-[bluetooth]# discoverable on
-Changing discoverable on succeeded
-[CHG] Controller 5C:E0:C5:34:AE:1C Discoverable: yes
-[bluetooth]# disconnect discoverable on
+The USB_QUIRK_RESET_RESUME quirk also disables runtime suspend, so by
+matching on usb-ids, we're causing all boards with these chips to use extra
+power, to fix resume problems which only happen on some boards.
 
-after pressing up-down
-[bluetooth]# disconnect dis5C:F9:AB:C5:82
+This commit fixes this by applying the quirk based on DMI matching instead
+of on usb-ids, so that we match the platform and not the chipset.
+
+Here is the /sys/kernel/debug/usb/devices for the Bluetooth module:
+
+T:  Bus=01 Lev=01 Prnt=01 Port=07 Cnt=04 Dev#=  5 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e300 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
+Fixes: 61f5acea8737 ("Bluetooth: btusb: Restore QCA Rome suspend/resume..")
+Cc: stable@vger.kernel.org
+Cc: Brian Norris <briannorris@chromium.org>
+Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Reported-and-tested-by: Kevin Fenzi <kevin@scrye.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- src/shared/shell.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ drivers/bluetooth/btusb.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 12330ff53..0ac492886 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -378,11 +378,9 @@ void bt_shell_printf(const char *fmt, ...)
- 	if (save_input) {
- 		saved_point = rl_point;
- 		saved_line = rl_copy_text(0, rl_end);
--		if (!data.saved_prompt) {
--			rl_save_prompt();
--			rl_replace_line("", 0);
--			rl_redisplay();
--		}
-+		rl_save_prompt();
-+		rl_replace_line("", 0);
-+		rl_redisplay();
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 2a55380ad730..a4b62f0a93cc 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -21,6 +21,7 @@
+  *
+  */
+ 
++#include <linux/dmi.h>
+ #include <linux/module.h>
+ #include <linux/usb.h>
+ #include <linux/usb/quirks.h>
+@@ -379,6 +380,22 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ }	/* Terminating entry */
+ };
+ 
++/*
++ * The Bluetooth USB module build into some devices needs to be reset on resume,
++ * this is a problem with the platform (likely shutting off all power) not with
++ * the module itself. So we use a DMI list to match known broken platforms.
++ */
++static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
++	{
++		/* Lenovo Yoga 920 (QCA Rome device 0cf3:e300) */
++		.matches = {
++			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
++			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo YOGA 920"),
++		},
++	},
++	{}
++};
++
+ #define BTUSB_MAX_ISOC_FRAMES	10
+ 
+ #define BTUSB_INTR_RUNNING	0
+@@ -2945,6 +2962,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 	hdev->send   = btusb_send_frame;
+ 	hdev->notify = btusb_notify;
+ 
++	if (dmi_check_system(btusb_needs_reset_resume_table))
++		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
++
+ #ifdef CONFIG_PM
+ 	err = btusb_config_oob_wake(hdev);
+ 	if (err)
+@@ -3031,12 +3051,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_QCA_ROME) {
+ 		data->setup_on_usb = btusb_setup_qca;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
+-
+-		/* QCA Rome devices lose their updated firmware over suspend,
+-		 * but the USB hub doesn't notice any status change.
+-		 * explicitly request a device reset on resume.
+-		 */
+-		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
  	}
  
- 	va_start(args, fmt);
-@@ -390,8 +388,7 @@ void bt_shell_printf(const char *fmt, ...)
- 	va_end(args);
- 
- 	if (save_input) {
--		if (!data.saved_prompt)
--			rl_restore_prompt();
-+		rl_restore_prompt();
- 		rl_replace_line(saved_line, 0);
- 		rl_point = saved_point;
- 		rl_forced_update_display();
+ #ifdef CONFIG_BT_HCIBTUSB_RTL
 -- 
 2.14.3
-
