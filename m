@@ -1,71 +1,191 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 21 Feb 2018 12:35:40 +0100
-From: Rafael Vuijk <r.vuijk@sownet.nl>
-To: Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: [PATCH] ieee802154: assembly of 6LoWPAN fragments improvement
-Message-ID: <20180221113540.GA54319@Rafael-Mac.intra.sownet.nl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <arend.vanspriel@broadcom.com>
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+To: Kalle Valo <kvalo@codeaurora.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-wireless@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Arend van Spriel <arend.vanspriel@broadcom.com>
+Subject: [PATCH 2/3] mwifiex: support sysfs initiated device coredump
+Date: Wed, 21 Feb 2018 11:50:19 +0100
+Message-Id: <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
+In-Reply-To: <1519210220-22437-1-git-send-email-arend.vanspriel@broadcom.com>
+References: <1519210220-22437-1-git-send-email-arend.vanspriel@broadcom.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
+it is possible to initiate a device coredump from user-space. This
+patch adds support for it adding the .coredump() driver callback.
+As there is no longer a need to initiate it through debugfs remove
+that code.
 
-We have tested the 6LoWPAN modules in the Linux kernel and came to some issue regarding fragmentation. We have seen aborted SCP transfers ("message authentication code incorrect") and tested TCP transfers as well and saw corruption on fragment-sized intervals. The current fragment assembling functions do not check enough for corrupted L2 packets that might slip through L2 CRC check. (in our case IEEE802.15.4 which has only 16-bit CRC).
-As a result, overlapping fragments due to offset corruption are not detected and assembled incorrectly. Part of packets may have old data. At TCP-level, there is only a simple TCP-checksum which is not enough in this case as the corruption occurs frequently (once every few minutes).
+Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+---
+ drivers/net/wireless/marvell/mwifiex/debugfs.c | 31 +-------------------------
+ drivers/net/wireless/marvell/mwifiex/pcie.c    | 19 ++++++++++++++--
+ drivers/net/wireless/marvell/mwifiex/sdio.c    | 13 +++++++++++
+ drivers/net/wireless/marvell/mwifiex/usb.c     | 14 ++++++++++++
+ 4 files changed, 45 insertions(+), 32 deletions(-)
 
-After quickly analysing the code we saw some potential issues and created a patch that adds additional overlap checks and simplifies some conditional statements. After running tests again, TCP corruption was not seen again. The test was performed with SCP and keeps transferring large files now without error.
-
-Rafael Vuijk
-
-Signed-off-by: Rafael Vuijk <r.vuijk@sownet.nl>
---- ./net/ieee802154/6lowpan/reassembly.c	2018-02-20 11:10:06.000000000 +0100
-+++ ./net/ieee802154/6lowpan/reassembly.c	2018-02-21 09:13:29.000000000 +0100
-@@ -140,23 +140,14 @@ static int lowpan_frag_queue(struct lowp
- 	offset = lowpan_802154_cb(skb)->d_offset << 3;
- 	end = lowpan_802154_cb(skb)->d_size;
+diff --git a/drivers/net/wireless/marvell/mwifiex/debugfs.c b/drivers/net/wireless/marvell/mwifiex/debugfs.c
+index db2872d..0745393 100644
+--- a/drivers/net/wireless/marvell/mwifiex/debugfs.c
++++ b/drivers/net/wireless/marvell/mwifiex/debugfs.c
+@@ -154,34 +154,6 @@
+ }
  
-+	if (fq->q.len == 0)
-+		fq->q.len = end;
-+	if (fq->q.len != end)
-+		goto err;
+ /*
+- * Proc device dump read handler.
+- *
+- * This function is called when the 'device_dump' file is opened for
+- * reading.
+- * This function dumps driver information and firmware memory segments
+- * (ex. DTCM, ITCM, SQRAM etc.) for
+- * debugging.
+- */
+-static ssize_t
+-mwifiex_device_dump_read(struct file *file, char __user *ubuf,
+-			 size_t count, loff_t *ppos)
+-{
+-	struct mwifiex_private *priv = file->private_data;
+-
+-	/* For command timeouts, USB firmware will automatically emit
+-	 * firmware dump events, so we don't implement device_dump().
+-	 * For user-initiated dumps, we trigger it ourselves.
+-	 */
+-	if (priv->adapter->iface_type == MWIFIEX_USB)
+-		mwifiex_send_cmd(priv, HostCmd_CMD_FW_DUMP_EVENT,
+-				 HostCmd_ACT_GEN_SET, 0, NULL, true);
+-	else
+-		priv->adapter->if_ops.device_dump(priv->adapter);
+-
+-	return 0;
+-}
+-
+-/*
+  * Proc getlog file read handler.
+  *
+  * This function is called when the 'getlog' file is opened for reading
+@@ -980,7 +952,6 @@
+ MWIFIEX_DFS_FILE_READ_OPS(info);
+ MWIFIEX_DFS_FILE_READ_OPS(debug);
+ MWIFIEX_DFS_FILE_READ_OPS(getlog);
+-MWIFIEX_DFS_FILE_READ_OPS(device_dump);
+ MWIFIEX_DFS_FILE_OPS(regrdwr);
+ MWIFIEX_DFS_FILE_OPS(rdeeprom);
+ MWIFIEX_DFS_FILE_OPS(memrw);
+@@ -1011,7 +982,7 @@
+ 	MWIFIEX_DFS_ADD_FILE(getlog);
+ 	MWIFIEX_DFS_ADD_FILE(regrdwr);
+ 	MWIFIEX_DFS_ADD_FILE(rdeeprom);
+-	MWIFIEX_DFS_ADD_FILE(device_dump);
 +
- 	/* Is this the final fragment? */
- 	if (offset + skb->len == end) {
--		/* If we already have some bits beyond end
--		 * or have different end, the segment is corrupted.
--		 */
--		if (end < fq->q.len ||
--		    ((fq->q.flags & INET_FRAG_LAST_IN) && end != fq->q.len))
--			goto err;
- 		fq->q.flags |= INET_FRAG_LAST_IN;
--		fq->q.len = end;
--	} else {
--		if (end > fq->q.len) {
--			/* Some bits beyond end -> corruption. */
--			if (fq->q.flags & INET_FRAG_LAST_IN)
--				goto err;
--			fq->q.len = end;
--		}
- 	}
+ 	MWIFIEX_DFS_ADD_FILE(memrw);
+ 	MWIFIEX_DFS_ADD_FILE(hscfg);
+ 	MWIFIEX_DFS_ADD_FILE(histogram);
+diff --git a/drivers/net/wireless/marvell/mwifiex/pcie.c b/drivers/net/wireless/marvell/mwifiex/pcie.c
+index 97a6199..0959526 100644
+--- a/drivers/net/wireless/marvell/mwifiex/pcie.c
++++ b/drivers/net/wireless/marvell/mwifiex/pcie.c
+@@ -320,6 +320,20 @@ static void mwifiex_pcie_shutdown(struct pci_dev *pdev)
+ 	return;
+ }
  
- 	/* Find out which fragments are in front and at the back of us
-@@ -179,6 +170,13 @@ static int lowpan_frag_queue(struct lowp
- 	}
- 
- found:
-+	/* Current fragment overlaps with previous fragment? */
-+	if (prev && (lowpan_802154_cb(prev)->d_offset << 3) + prev->len > offset)
-+		goto err;
-+	/* Current fragment overlaps with next fragment? */
-+	if (next && offset + skb->len > lowpan_802154_cb(next)->d_offset << 3)
-+		goto err;
++static int mwifiex_pcie_coredump(struct device *dev)
++{
++	struct pci_dev *pdev;
++	struct pcie_service_card *card;
 +
- 	/* Insert this fragment in the chain of fragments. */
- 	skb->next = next;
- 	if (!next)
-
---
-
++	pdev = container_of(dev, struct pci_dev, dev);
++	card = pci_get_drvdata(pdev);
++
++	if (!test_and_set_bit(MWIFIEX_IFACE_WORK_DEVICE_DUMP,
++			      &card->work_flags))
++		schedule_work(&card->work);
++	return 0;
++}
++
+ static const struct pci_device_id mwifiex_ids[] = {
+ 	{
+ 		PCIE_VENDOR_ID_MARVELL, PCIE_DEVICE_ID_MARVELL_88W8766P,
+@@ -415,11 +429,12 @@ static SIMPLE_DEV_PM_OPS(mwifiex_pcie_pm_ops, mwifiex_pcie_suspend,
+ 	.id_table = mwifiex_ids,
+ 	.probe    = mwifiex_pcie_probe,
+ 	.remove   = mwifiex_pcie_remove,
+-#ifdef CONFIG_PM_SLEEP
+ 	.driver   = {
++		.coredump = mwifiex_pcie_coredump,
++#ifdef CONFIG_PM_SLEEP
+ 		.pm = &mwifiex_pcie_pm_ops,
+-	},
+ #endif
++	},
+ 	.shutdown = mwifiex_pcie_shutdown,
+ 	.err_handler = &mwifiex_pcie_err_handler,
+ };
+diff --git a/drivers/net/wireless/marvell/mwifiex/sdio.c b/drivers/net/wireless/marvell/mwifiex/sdio.c
+index a828801..24b9ff3 100644
+--- a/drivers/net/wireless/marvell/mwifiex/sdio.c
++++ b/drivers/net/wireless/marvell/mwifiex/sdio.c
+@@ -466,6 +466,18 @@ static int mwifiex_sdio_suspend(struct device *dev)
+ 	return ret;
+ }
+ 
++static int mwifiex_sdio_coredump(struct device *dev)
++{
++	struct sdio_func *func = dev_to_sdio_func(dev);
++	struct sdio_mmc_card *card;
++
++	card = sdio_get_drvdata(func);
++	if (!test_and_set_bit(MWIFIEX_IFACE_WORK_DEVICE_DUMP,
++			      &card->work_flags))
++		schedule_work(&card->work);
++	return 0;
++}
++
+ /* Device ID for SD8786 */
+ #define SDIO_DEVICE_ID_MARVELL_8786   (0x9116)
+ /* Device ID for SD8787 */
+@@ -515,6 +527,7 @@ static int mwifiex_sdio_suspend(struct device *dev)
+ 	.remove = mwifiex_sdio_remove,
+ 	.drv = {
+ 		.owner = THIS_MODULE,
++		.coredump = mwifiex_sdio_coredump,
+ 		.pm = &mwifiex_sdio_pm_ops,
+ 	}
+ };
+diff --git a/drivers/net/wireless/marvell/mwifiex/usb.c b/drivers/net/wireless/marvell/mwifiex/usb.c
+index 4bc2448..83815f6 100644
+--- a/drivers/net/wireless/marvell/mwifiex/usb.c
++++ b/drivers/net/wireless/marvell/mwifiex/usb.c
+@@ -653,6 +653,17 @@ static void mwifiex_usb_disconnect(struct usb_interface *intf)
+ 	usb_put_dev(interface_to_usbdev(intf));
+ }
+ 
++static int mwifiex_usb_coredump(struct device *dev)
++{
++	struct usb_interface *intf = to_usb_interface(dev);
++	struct usb_card_rec *card = usb_get_intfdata(intf);
++
++	mwifiex_send_cmd(mwifiex_get_priv(card->adapter, MWIFIEX_BSS_ROLE_ANY),
++			 HostCmd_CMD_FW_DUMP_EVENT, HostCmd_ACT_GEN_SET, 0,
++			 NULL, true);
++	return 0;
++}
++
+ static struct usb_driver mwifiex_usb_driver = {
+ 	.name = "mwifiex_usb",
+ 	.probe = mwifiex_usb_probe,
+@@ -661,6 +672,9 @@ static void mwifiex_usb_disconnect(struct usb_interface *intf)
+ 	.suspend = mwifiex_usb_suspend,
+ 	.resume = mwifiex_usb_resume,
+ 	.soft_unbind = 1,
++	.drvwrap.driver = {
++		.coredump = mwifiex_usb_coredump,
++	},
+ };
+ 
+ static int mwifiex_write_data_sync(struct mwifiex_adapter *adapter, u8 *pbuf,
+-- 
+1.9.1
