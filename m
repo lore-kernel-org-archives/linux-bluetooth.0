@@ -1,52 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <!&!AAAAAAAAAAAYAAAAAAAAALU38OAXUzdNq7ufILcZbxfCgAAAEAAAACHTzNQYXF1JtETGiT760e0BAAAAAA==@tiscali.it>
-References: <!&!AAAAAAAAAAAYAAAAAAAAALU38OAXUzdNq7ufILcZbxfCgAAAEAAAACHTzNQYXF1JtETGiT760e0BAAAAAA==@tiscali.it>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 21 Feb 2018 16:22:31 +0200
-Message-ID: <CABBYNZLvGY+pmHr7RSShCK_Gw9ZXf2G1nYibdg+7+Z=SBQy=AQ@mail.gmail.com>
-Subject: Re: HSP issue
-To: AETERNAICT <info.aeterna@tiscali.it>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 5/8] client: Don't auto register agent on non-interactive mode
+Date: Wed, 21 Feb 2018 16:14:53 +0200
+Message-Id: <20180221141456.6656-5-luiz.dentz@gmail.com>
+In-Reply-To: <20180221141456.6656-1-luiz.dentz@gmail.com>
+References: <20180221141456.6656-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Francesco,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Feb 21, 2018 at 4:12 PM, AETERNAICT <info.aeterna@tiscali.it> wrote:
-> Hi,
->
-> I'm testing bluetooth headphone on ubuntu mate 16.04 with Odroid C2 ARM
-> board computer.
->
-> Anyone have HSP/HFP source/sink working under bluez5.37, Pulseaudio11, ofono
-> 1.17?
->
-> A2DP profile of bluetooth headphone works correctly (sound is perfect), but
-> HSF/HFP profile doesn't work.
-> The audio is discontinuous and audio microphone is absent.
+There is no use to register an agent when on non-interactive mode.
+---
+ client/main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-This sometimes indicates that the audio routing of the chip is wrong,
-but apparently, you do get some audio so perhaps it is just dropping
-frames left and right. For the microphone, I trust that you have
-selected it as input.
-
-> Here hardware setup:
-> Odroid C2 Arm computer
-> http://www.hardkernel.com/main/products/prdt_info.php?g_code=G145457216438
-> BT dongle https://www.adafruit.com/product/1327
-> Headphone http://peltorcomms.3m.com/Admin/files/20121001030809.pdf
->
-> Best regards,
-> Francesco
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/client/main.c b/client/main.c
+index 38df75828..962f3383b 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -520,7 +520,8 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+ 		if (!agent_manager) {
+ 			agent_manager = proxy;
+ 
+-			if (auto_register_agent)
++			if (auto_register_agent &&
++					!bt_shell_get_env("NON_INTERACTIVE"))
+ 				agent_register(dbus_conn, agent_manager,
+ 							auto_register_agent);
+ 		}
 -- 
-Luiz Augusto von Dentz
+2.14.3
+
