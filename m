@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/8] shared/shell: Set NON_INTERACTIVE env
-Date: Wed, 21 Feb 2018 16:14:52 +0200
-Message-Id: <20180221141456.6656-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/8] tools/obexctl: Only enable attach input when connected
+Date: Wed, 21 Feb 2018 16:14:51 +0200
+Message-Id: <20180221141456.6656-3-luiz.dentz@gmail.com>
 In-Reply-To: <20180221141456.6656-1-luiz.dentz@gmail.com>
 References: <20180221141456.6656-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,26 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This sets NON_INTERACTIVE environment variable which applications can
-then use to query under what mode they are running.
 ---
- src/shared/shell.c | 3 +++
- 1 file changed, 3 insertions(+)
+ tools/obexctl.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 0f6d613bd..85657c250 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -818,6 +818,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 	data.argv = argv + optind;
- 	data.mode = (data.argc > 0);
+diff --git a/tools/obexctl.c b/tools/obexctl.c
+index 2ef1c044e..b6333842e 100644
+--- a/tools/obexctl.c
++++ b/tools/obexctl.c
+@@ -75,11 +75,13 @@ struct transfer_data {
  
-+	if (data.mode)
-+		bt_shell_set_env("NON_INTERACTIVE", &data.mode);
-+
- 	main_loop = g_main_loop_new(NULL, FALSE);
+ static void connect_handler(DBusConnection *connection, void *user_data)
+ {
++	bt_shell_attach(fileno(stdin));
+ 	bt_shell_set_prompt(PROMPT_ON);
+ }
  
- 	rl_init();
+ static void disconnect_handler(DBusConnection *connection, void *user_data)
+ {
++	bt_shell_detach();
+ 	bt_shell_set_prompt(PROMPT_OFF);
+ }
+ 
+@@ -2111,7 +2113,6 @@ int main(int argc, char *argv[])
+ 	bt_shell_init(argc, argv, NULL);
+ 	bt_shell_set_menu(&main_menu);
+ 	bt_shell_set_prompt(PROMPT_OFF);
+-	bt_shell_attach(fileno(stdin));
+ 
+ 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SESSION, NULL, NULL);
+ 
 -- 
 2.14.3
 
