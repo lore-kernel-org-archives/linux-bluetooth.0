@@ -1,98 +1,58 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: [PATCH] ieee802154: assembly of 6LoWPAN fragments improvement
-To: Rafael Vuijk <r.vuijk@sownet.nl>,
-        Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>
-Cc: linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-References: <20180221113540.GA54319@Rafael-Mac.intra.sownet.nl>
-From: Stefan Schmidt <stefan@osg.samsung.com>
-Message-ID: <60c224d2-17e5-eaf8-2d1b-763ae4cd92db@osg.samsung.com>
-Date: Wed, 21 Feb 2018 17:31:07 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: HSP issue
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        AETERNAICT <info.aeterna@tiscali.it>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <!&!AAAAAAAAAAAYAAAAAAAAALU38OAXUzdNq7ufILcZbxfCgAAAEAAAACHTzNQYXF1JtETGiT760e0BAAAAAA==@tiscali.it>
+ <CABBYNZLvGY+pmHr7RSShCK_Gw9ZXf2G1nYibdg+7+Z=SBQy=AQ@mail.gmail.com>
+From: Harald Schmitt <linux@hschmitt.de>
+Message-ID: <59f75e0e-2d94-1fa6-28c7-8aeb964108ad@hschmitt.de>
+Date: Wed, 21 Feb 2018 16:15:29 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180221113540.GA54319@Rafael-Mac.intra.sownet.nl>
+In-Reply-To: <CABBYNZLvGY+pmHr7RSShCK_Gw9ZXf2G1nYibdg+7+Z=SBQy=AQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
-
-
-First of all thanks for digging into the problem and actually submitting your fix back upstream, very much appreciated. :)
-
-On 02/21/2018 12:35 PM, Rafael Vuijk wrote:
-> Hi,
+Am 21.02.2018 um 15:22 schrieb Luiz Augusto von Dentz:
+> Hi Francesco,
 >
-> We have tested the 6LoWPAN modules in the Linux kernel and came to some issue regarding fragmentation. We have seen aborted SCP transfers ("message authentication code incorrect") and tested TCP transfers as well and saw corruption on fragment-sized intervals. The current fragment assembling functions do not check enough for corrupted L2 packets that might slip through L2 CRC check. (in our case IEEE802.15.4 which has only 16-bit CRC).
-> As a result, overlapping fragments due to offset corruption are not detected and assembled incorrectly. Part of packets may have old data. At TCP-level, there is only a simple TCP-checksum which is not enough in this case as the corruption occurs frequently (once every few minutes).
+> On Wed, Feb 21, 2018 at 4:12 PM, AETERNAICT <info.aeterna@tiscali.it> wrote:
+>> Hi,
+>>
+>> I'm testing bluetooth headphone on ubuntu mate 16.04 with Odroid C2 ARM
+>> board computer.
+>>
+>> Anyone have HSP/HFP source/sink working under bluez5.37, Pulseaudio11, ofono
+>> 1.17?
+>>
+>> A2DP profile of bluetooth headphone works correctly (sound is perfect), but
+>> HSF/HFP profile doesn't work.
+>> The audio is discontinuous and audio microphone is absent.
+> This sometimes indicates that the audio routing of the chip is wrong,
+> but apparently, you do get some audio so perhaps it is just dropping
+> frames left and right. For the microphone, I trust that you have
+> selected it as input.
+I just can share my observations with Jolla's SailfishOS which uses
+ofono 1.20, bluez 5.47, pulseaudio 8 (with backported HSP/HFP). If the
+carkit initiates the bluetooth connection phoning works correctly
+(HSP/HFP) but media playback uses the phone speaker (a2dp) if the
+connection is initated from the phone it is the other way round.
+You can see what they did at https://git.merproject.org
 >
-> After quickly analysing the code we saw some potential issues and created a patch that adds additional overlap checks and simplifies some conditional statements. After running tests again, TCP corruption was not seen again. The test was performed with SCP and keeps transferring large files now without error.
+>> Here hardware setup:
+>> Odroid C2 Arm computer
+>> http://www.hardkernel.com/main/products/prdt_info.php?g_code=G145457216438
+>> BT dongle https://www.adafruit.com/product/1327
+>> Headphone http://peltorcomms.3m.com/Admin/files/20121001030809.pdf
+>>
+>> Best regards,
+>> Francesco
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-> Rafael Vuijk
+>
 
-For a real patch submission you would remove the "Hi" and "Rafael Vuijik" parts here as they will end up in the commits message.
-Please also make sure your lines wrap at 72 characters so the commit message is easily readable in the various git tools.
-
-
-Coming the the technical part now. Can you describe your test setup a bit more? Do you only have CONFIG_6LOWPAN enabled or also some of the
-CONFIG_6LOWPAN_NHC* options?
-The traffic patterns is simple scp file transfer between to nodes? Noisy network with other nodes on the same channel?
-
-The reason I ask is that I would like to reproduce this problem here and add it to my test scenario.
-
-> Signed-off-by: Rafael Vuijk <r.vuijk@sownet.nl>
-> --- ./net/ieee802154/6lowpan/reassembly.c	2018-02-20 11:10:06.000000000 +0100
-> +++ ./net/ieee802154/6lowpan/reassembly.c	2018-02-21 09:13:29.000000000 +0100
-> @@ -140,23 +140,14 @@ static int lowpan_frag_queue(struct lowp
->  	offset = lowpan_802154_cb(skb)->d_offset << 3;
->  	end = lowpan_802154_cb(skb)->d_size;
->  
-> +	if (fq->q.len == 0)
-> +		fq->q.len = end;
-> +	if (fq->q.len != end)
-> +		goto err;
-> +
->  	/* Is this the final fragment? */
->  	if (offset + skb->len == end) {
-> -		/* If we already have some bits beyond end
-> -		 * or have different end, the segment is corrupted.
-> -		 */
-> -		if (end < fq->q.len ||
-> -		    ((fq->q.flags & INET_FRAG_LAST_IN) && end != fq->q.len))
-> -			goto err;
->  		fq->q.flags |= INET_FRAG_LAST_IN;
-> -		fq->q.len = end;
-> -	} else {
-> -		if (end > fq->q.len) {
-> -			/* Some bits beyond end -> corruption. */
-> -			if (fq->q.flags & INET_FRAG_LAST_IN)
-> -				goto err;
-> -			fq->q.len = end;
-> -		}
->  	}
->  
-
-I might need to look at the context of this code, but I assume the hunks above are the simplifications your refer to?
-
-
->  	/* Find out which fragments are in front and at the back of us
-> @@ -179,6 +170,13 @@ static int lowpan_frag_queue(struct lowp
->  	}
->  
->  found:
-> +	/* Current fragment overlaps with previous fragment? */
-> +	if (prev && (lowpan_802154_cb(prev)->d_offset << 3) + prev->len > offset)
-> +		goto err;
-> +	/* Current fragment overlaps with next fragment? */
-> +	if (next && offset + skb->len > lowpan_802154_cb(next)->d_offset << 3)
-> +		goto err;
-> +
->  	/* Insert this fragment in the chain of fragments. */
->  	skb->next = next;
->  	if (!next)
-
-And this hunk is the actual fragment overlap check.
-
-To me this looks like to distinguished things to fix and thus being fixed in two separate commits.
-
-regards
-Stefan Schmidt
