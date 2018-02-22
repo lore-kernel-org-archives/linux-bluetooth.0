@@ -1,123 +1,106 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Date: Fri, 23 Feb 2018 00:10:07 +0100
-From: Rafael Vuijk <r.vuijk@sownet.nl>
-To: Stefan Schmidt <stefan@osg.samsung.com>
-Cc: Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] ieee802154: assembly of 6LoWPAN fragments improvement
-Message-ID: <20180222212407.GA82995@Rafael-Mac.intra.sownet.nl>
-References: <20180221113540.GA54319@Rafael-Mac.intra.sownet.nl>
- <60c224d2-17e5-eaf8-2d1b-763ae4cd92db@osg.samsung.com>
+Return-Path: <briannorris@chromium.org>
+Date: Thu, 22 Feb 2018 11:35:49 -0800
+From: Brian Norris <briannorris@chromium.org>
+To: Arend van Spriel <arend.vanspriel@broadcom.com>
+Cc: Kalle Valo <kvalo@codeaurora.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 2/3] mwifiex: support sysfs initiated device coredump
+Message-ID: <20180222193547.GA78462@rodete-desktop-imager.corp.google.com>
+References: <1519210220-22437-1-git-send-email-arend.vanspriel@broadcom.com>
+ <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
+ <20180221225903.GA42395@rodete-desktop-imager.corp.google.com>
+ <5A8EB4F4.2030103@broadcom.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <60c224d2-17e5-eaf8-2d1b-763ae4cd92db@osg.samsung.com>
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <5A8EB4F4.2030103@broadcom.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Feb 21, 2018 at 05:31:07PM +0100, Stefan Schmidt wrote:
-> Hello.
+Hi Arend,
+
+On Thu, Feb 22, 2018 at 01:17:56PM +0100, Arend van Spriel wrote:
+> On 2/21/2018 11:59 PM, Brian Norris wrote:
+> > On Wed, Feb 21, 2018 at 11:50:19AM +0100, Arend van Spriel wrote:
+> > > Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
+> > > it is possible to initiate a device coredump from user-space. This
+> > > patch adds support for it adding the .coredump() driver callback.
+> > > As there is no longer a need to initiate it through debugfs remove
+> > > that code.
+> > > 
+> > > Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> > > ---
+> > >   drivers/net/wireless/marvell/mwifiex/debugfs.c | 31 +-------------------------
+> > >   drivers/net/wireless/marvell/mwifiex/pcie.c    | 19 ++++++++++++++--
+> > >   drivers/net/wireless/marvell/mwifiex/sdio.c    | 13 +++++++++++
+> > >   drivers/net/wireless/marvell/mwifiex/usb.c     | 14 ++++++++++++
+> > >   4 files changed, 45 insertions(+), 32 deletions(-)
+> > 
+> > The documentation doesn't really say [1], but is the coredump supposed
+> > to happen synchronously? Because the mwifiex implementation is
+> > asynchronous, whereas it looks like the brcmfmac one is synchronous.
 > 
+> Well, that depends on the eye of the beholder I guess. From user-space
+> perspective it is asynchronous regardless. A write access to the coredump
+> sysfs file eventually results in a uevent when the devcoredump entry is
+> created, ie. after driver has made a dev_coredump API call. Whether the
+> driver does that synchronously or asynchronously is irrelevant as far as
+> user-space is concerned.
+
+Is it really? The driver infrastructure seems to guarantee that the
+entirety of a driver's ->coredump() will complete before returning from
+the write. So it might be reasonable for some user to assume (based on
+implementation details, e.g., of brcmfmac) that the devcoredump will be
+ready by the time the write() syscall returns, absent documentation that
+says otherwise. But then, that's not how mwifiex works right now, so
+they might be surprised if they switch drivers.
+
+Anyway, *I'm* already personally used to these dumps being asynchronous,
+and writing tooling to listen for the uevent instead. But that doesn't
+mean everyone will be.
+
+Also, due to the differences in async/sync, mwifiex doesn't really
+provide you much chance for error handling, because most errors would be
+asynchronous. So brcmfmac's "coredump" has more chance for user programs
+to error-check than mwifiex's (due to the asynchronous nature) [1].
+
+BTW, I push on this mostly because this is migrating from a debugfs
+feature (that is easy to hand-wave off as not really providing a
+consistent/stable API, etc., etc.) to a documented sysfs feature. If it
+were left to rot in debugfs, I probably wouldn't be as bothered ;)
+
+> > Brian
+> > 
+> > [1] In fact, the ABI documentation really just describes kernel
+> > internals, rather than documenting any user-facing details, from what I
+> > can tell.
 > 
-> First of all thanks for digging into the problem and actually submitting your fix back upstream, very much appreciated. :)
-It's my first patch this way, so I try to do it right somewhat :) For now, using mutt to make Majordomo happy too.
-> 
-> On 02/21/2018 12:35 PM, Rafael Vuijk wrote:
-> > Hi,
-> >
-> > We have tested the 6LoWPAN modules in the Linux kernel and came to some issue regarding fragmentation. We have seen aborted SCP transfers ("message authentication code incorrect") and tested TCP transfers as well and saw corruption on fragment-sized intervals. The current fragment assembling functions do not check enough for corrupted L2 packets that might slip through L2 CRC check. (in our case IEEE802.15.4 which has only 16-bit CRC).
-> > As a result, overlapping fragments due to offset corruption are not detected and assembled incorrectly. Part of packets may have old data. At TCP-level, there is only a simple TCP-checksum which is not enough in this case as the corruption occurs frequently (once every few minutes).
-> >
-> > After quickly analysing the code we saw some potential issues and created a patch that adds additional overlap checks and simplifies some conditional statements. After running tests again, TCP corruption was not seen again. The test was performed with SCP and keeps transferring large files now without error.
-> >
-> > Rafael Vuijk
-> 
-> For a real patch submission you would remove the "Hi" and "Rafael Vuijik" parts here as they will end up in the commits message.
-> Please also make sure your lines wrap at 72 characters so the commit message is easily readable in the various git tools.
-Sure :)
-> 
-> 
-> Coming the the technical part now. Can you describe your test setup a bit more? Do you only have CONFIG_6LOWPAN enabled or also some of the
-> CONFIG_6LOWPAN_NHC* options?
+> You are right. Clearly I did not reach the end my learning curve here. I
+> assumed referring to the existing dev_coredump facility was sufficient, but
+> maybe it is worth a patch to be more explicit and mention the uevent
+> behavior. Also dev_coredump facility may be disabled upon which the trigger
+> will have no effect in sysfs. In the kernel the data passed by the driver is
+> simply freed by dev_coredump facility.
 
-I had all options enabled, even experimental. Loaded modules were: mrf24j40,mac802154,nhc_udp,ieee802154_6lowpan,nhc_routing,nhc_mobility,nhc_fragment,nhc_dest,nhc_hop,nhc_ipv6. But for the test I did not enable encryption, as it did not seem help much in this case.
+Is there any other documentation for the coredump feature? I don't
+really see much.
 
-> The traffic patterns is simple scp file transfer between to nodes? Noisy network with other nodes on the same channel?
+Brian
 
-The test was indeed a simple SCP transfer from remote to local between two machines equipped with the MRF24J40MC module (connected via SPI), the other machines (testbed) were RPi3's equipped with MRF24J40MA (no PA/LNA). The RPi3's were not doing anything and couldn't use them for this patch since it ran a too old kernel (the corruption did occur on those as well though).
-Link-local addresses were used for the test.
-There was a Wi-Fi router nearby though. Also, I tried interfering a channel or two away, which was noticable in throughput and I think also seemed to influence the rate this occurred.
+[1] Oh wait, but I see that while ->coredump() has an integer return
+code...the caller ignores it:
 
-I have also read one post of someone with an issue with this radio chip, but I don't know if that it a real issue for this. It's an ok chip. At least it has a separate RX and TX buffer, which some don't even have.
+static ssize_t coredump_store(struct device *dev, struct device_attribute *attr,
+			    const char *buf, size_t count)
+{
+	device_lock(dev);
+	if (dev->driver->coredump)
+		dev->driver->coredump(dev);
+	device_unlock(dev);
 
-> The reason I ask is that I would like to reproduce this problem here and add it to my test scenario.
+	return count;
+}
+static DEVICE_ATTR_WO(coredump);
 
-It would be nice if you have the same chip or that it occurs in other setups as well.
-
-> > Signed-off-by: Rafael Vuijk <r.vuijk@sownet.nl>
-> > --- ./net/ieee802154/6lowpan/reassembly.c	2018-02-20 11:10:06.000000000 +0100
-> > +++ ./net/ieee802154/6lowpan/reassembly.c	2018-02-21 09:13:29.000000000 +0100
-> > @@ -140,23 +140,14 @@ static int lowpan_frag_queue(struct lowp
-> >  	offset = lowpan_802154_cb(skb)->d_offset << 3;
-> >  	end = lowpan_802154_cb(skb)->d_size;
-> >  
-> > +	if (fq->q.len == 0)
-> > +		fq->q.len = end;
-> > +	if (fq->q.len != end)
-> > +		goto err;
-> > +
-> >  	/* Is this the final fragment? */
-> >  	if (offset + skb->len == end) {
-> > -		/* If we already have some bits beyond end
-> > -		 * or have different end, the segment is corrupted.
-> > -		 */
-> > -		if (end < fq->q.len ||
-> > -		    ((fq->q.flags & INET_FRAG_LAST_IN) && end != fq->q.len))
-> > -			goto err;
-> >  		fq->q.flags |= INET_FRAG_LAST_IN;
-> > -		fq->q.len = end;
-> > -	} else {
-> > -		if (end > fq->q.len) {
-> > -			/* Some bits beyond end -> corruption. */
-> > -			if (fq->q.flags & INET_FRAG_LAST_IN)
-> > -				goto err;
-> > -			fq->q.len = end;
-> > -		}
-> >  	}
-> >  
-> 
-> I might need to look at the context of this code, but I assume the hunks above are the simplifications your refer to?
-
-That's correct. It makes sure the total assembled fragment length is set once and other fragments contain the same length as well.
-
-> 
-> >  	/* Find out which fragments are in front and at the back of us
-> > @@ -179,6 +170,13 @@ static int lowpan_frag_queue(struct lowp
-> >  	}
-> >  
-> >  found:
-> > +	/* Current fragment overlaps with previous fragment? */
-> > +	if (prev && (lowpan_802154_cb(prev)->d_offset << 3) + prev->len > offset)
-> > +		goto err;
-> > +	/* Current fragment overlaps with next fragment? */
-> > +	if (next && offset + skb->len > lowpan_802154_cb(next)->d_offset << 3)
-> > +		goto err;
-> > +
-> >  	/* Insert this fragment in the chain of fragments. */
-> >  	skb->next = next;
-> >  	if (!next)
-> 
-> And this hunk is the actual fragment overlap check.
-
-Yes.
-
-> To me this looks like to distinguished things to fix and thus being fixed in two separate commits.
-
-That makes sense. That'd be 1/2 v2 and 2/2 v2 or so?
-I should split up my own commits more often too ;) (bad habit)
- 
-> regards
-> Stefan Schmidt
-
-regards,
-Rafael
+Is that a bug or a feature?
