@@ -1,89 +1,59 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <arend.vanspriel@broadcom.com>
+Subject: Re: [PATCH 2/3] mwifiex: support sysfs initiated device coredump
+To: Brian Norris <briannorris@chromium.org>
+References: <1519210220-22437-1-git-send-email-arend.vanspriel@broadcom.com>
+ <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
+ <20180221225903.GA42395@rodete-desktop-imager.corp.google.com>
+Cc: Kalle Valo <kvalo@codeaurora.org>, Marcel Holtmann <marcel@holtmann.org>,
+ linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+Message-ID: <5A8EB4F4.2030103@broadcom.com>
+Date: Thu, 22 Feb 2018 13:17:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJ1auJu85NWTVDx+OaLwfe6x8jbBKW0NKz7WSMKBpXPPg@mail.gmail.com>
-References: <20180222092055.22493-1-andrzej.kaczmarek@codecoup.pl> <CABBYNZJ1auJu85NWTVDx+OaLwfe6x8jbBKW0NKz7WSMKBpXPPg@mail.gmail.com>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Date: Thu, 22 Feb 2018 13:20:08 +0100
-Message-ID: <CADAkoF6n2dhjuTodCmFZjPV=sX-SJv31Q6VdyVMkWxqvgOHAFw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/3] Receiving monitor data stream over RTT
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20180221225903.GA42395@rodete-desktop-imager.corp.google.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On 2/21/2018 11:59 PM, Brian Norris wrote:
+> On Wed, Feb 21, 2018 at 11:50:19AM +0100, Arend van Spriel wrote:
+>> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
+>> it is possible to initiate a device coredump from user-space. This
+>> patch adds support for it adding the .coredump() driver callback.
+>> As there is no longer a need to initiate it through debugfs remove
+>> that code.
+>>
+>> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+>> ---
+>>   drivers/net/wireless/marvell/mwifiex/debugfs.c | 31 +-------------------------
+>>   drivers/net/wireless/marvell/mwifiex/pcie.c    | 19 ++++++++++++++--
+>>   drivers/net/wireless/marvell/mwifiex/sdio.c    | 13 +++++++++++
+>>   drivers/net/wireless/marvell/mwifiex/usb.c     | 14 ++++++++++++
+>>   4 files changed, 45 insertions(+), 32 deletions(-)
+>
+> The documentation doesn't really say [1], but is the coredump supposed
+> to happen synchronously? Because the mwifiex implementation is
+> asynchronous, whereas it looks like the brcmfmac one is synchronous.
 
-On Thu, Feb 22, 2018 at 12:14 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Andrzej,
->
-> On Thu, Feb 22, 2018 at 11:20 AM, Andrzej Kaczmarek
-> <andrzej.kaczmarek@codecoup.pl> wrote:
->> Hi,
->>
->> Here's patch series which adds support for receiving monitor data stream over
->> Segger RTT channel. This allows to stream data from embedded device without
->> need to spare a UART for monitor data and is also much faster. It is now
->> supported by Apache Mynewt (NimBLE stack), but I believe it can be also added
->> to other RTOS-es like Zephyr Project.
->>
->> RTT is handled natively by talking to J-Link via libjlinkarm.so. Since there
->> is no public documentation for this library, interface was done mostly by
->> trial and error so it may be lacking something - I tried it with few Cortex-M
->> devices and it works smoothly.
->>
->> Both J-Link and RTT needs few configuration parameters to work so I combined
->> them into two command line options:
->>   -J --jlink <device>,<interface>,<speed>,<serialno>
->>   -R --rtt <address>,<area>,<buffer>
->>
->> <device> - one of devices supported by J-Link (no default)
->> <interface> - only 'swd' supported for now (default: swd)
->> <speed> - interface speed (default: 1000)
->> <serialno> - emu serial number or 0 if not used (detault: 0)
->> <address> - RTT control block address (default: 0)
->> <area> - RTT control block search area length (default: 0)
->> <buffer> - RTT buffer name with monitor data stream (default: monitor)
->
-> Given that the device has no default I suppose it is not able to
-> auto-detect it, wouldn't it be possible to add support for that? At
-> least the tools for flashing, etc, do seems to be able to detect when
-> using a j-tag.
+Well, that depends on the eye of the beholder I guess. From user-space 
+perspective it is asynchronous regardless. A write access to the 
+coredump sysfs file eventually results in a uevent when the devcoredump 
+entry is created, ie. after driver has made a dev_coredump API call. 
+Whether the driver does that synchronously or asynchronously is 
+irrelevant as far as user-space is concerned.
 
-I'm not sure if it is any different over JTAG, but I don't think
-J-Link can autodetect device over SWD (which I only implemented now) -
-you need to specify at least core in order to be able to connect to
-target.
+> Brian
+>
+> [1] In fact, the ABI documentation really just describes kernel
+> internals, rather than documenting any user-facing details, from what I
+> can tell.
 
->>
->> Andrzej Kaczmarek (3):
->>   monitor: Extract TTY data processing to separate function
->>   monitor: Add interface for J-Link library
->>   monitor: Add support for reading over J-Link RTT
->>
->>  Makefile.tools    |   3 +-
->>  monitor/control.c |  87 +++++++++++++----
->>  monitor/control.h |   1 +
->>  monitor/jlink.c   | 282 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  monitor/jlink.h   |  27 ++++++
->>  monitor/main.c    |  30 +++++-
->>  6 files changed, 409 insertions(+), 21 deletions(-)
->>  create mode 100644 monitor/jlink.c
->>  create mode 100644 monitor/jlink.h
->>
->> --
->> 2.16.2
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+You are right. Clearly I did not reach the end my learning curve here. I 
+assumed referring to the existing dev_coredump facility was sufficient, 
+but maybe it is worth a patch to be more explicit and mention the uevent 
+behavior. Also dev_coredump facility may be disabled upon which the 
+trigger will have no effect in sysfs. In the kernel the data passed by 
+the driver is simply freed by dev_coredump facility.
 
-Best regards,
-Andrzej
+Regards,
+Arend
