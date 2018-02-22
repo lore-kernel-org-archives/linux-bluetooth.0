@@ -2,346 +2,74 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH BlueZ 2/3] monitor: Add interface for J-Link library
-Date: Thu, 22 Feb 2018 10:20:54 +0100
-Message-Id: <20180222092055.22493-3-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH BlueZ 1/3] monitor: Extract TTY data processing to separate function
+Date: Thu, 22 Feb 2018 10:20:53 +0100
+Message-Id: <20180222092055.22493-2-andrzej.kaczmarek@codecoup.pl>
 In-Reply-To: <20180222092055.22493-1-andrzej.kaczmarek@codecoup.pl>
 References: <20180222092055.22493-1-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds simple interface to libjlinkarm.so which will be used to read
-data from RTT buffer. It was mostly made by trial and error since there
-is no public documentation for this library so it may lack something,
-but seems to work fine with few Cortex-M devices I tried.
 ---
- monitor/jlink.c | 282 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- monitor/jlink.h |  27 ++++++
- 2 files changed, 309 insertions(+)
- create mode 100644 monitor/jlink.c
- create mode 100644 monitor/jlink.h
+ monitor/control.c | 37 +++++++++++++++++++++----------------
+ 1 file changed, 21 insertions(+), 16 deletions(-)
 
-diff --git a/monitor/jlink.c b/monitor/jlink.c
-new file mode 100644
-index 000000000..5470c2db8
---- /dev/null
-+++ b/monitor/jlink.c
-@@ -0,0 +1,282 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Codecoup
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <dlfcn.h>
-+#include <errno.h>
-+#include <stdio.h>
-+#include <stdint.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+
-+#include "jlink.h"
-+
-+#define RTT_CONTROL_START		0
-+#define RTT_CONTROL_STOP		1
-+#define RTT_CONTROL_GET_DESC		2
-+#define RTT_CONTROL_GET_NUM_BUF		3
-+#define RTT_CONTROL_GET_STAT		4
-+
-+#define RTT_DIRECTION_UP		0
-+#define RTT_DIRECTION_DOWN		1
-+
-+static const char * const jlink_so_name[] = {
-+	"/usr/lib/libjlinkarm.so",
-+	"/usr/lib/libjlinkarm.so.6",
-+	"/opt/SEGGER/JLink/libjlinkarm.so",
-+	"/opt/SEGGER/JLink/libjlinkarm.so.6",
-+};
-+
-+struct rtt_desc {
-+	uint32_t index;
-+	uint32_t dummy;
-+	char name[32];
-+	uint32_t size;
-+	uint32_t flags;
-+};
-+
-+static struct rtt_desc rtt_desc;
-+
-+typedef int (*jlink_emu_selectbyusbsn_func) (unsigned int sn);
-+typedef int (*jlink_open_func) (void);
-+typedef int (*jlink_execcommand_func) (char *in, char *out, int size);
-+typedef int (*jlink_tif_select_func) (int);
-+typedef void (*jlink_setspeed_func) (long int speed);
-+typedef int (*jlink_connect_func) (void);
-+typedef unsigned int (*jlink_getsn_func) (void);
-+typedef void (*jlink_emu_getproductname_func) (char *out, int size);
-+typedef int (*jlink_rtterminal_control_func) (int cmd, void *data);
-+typedef int (*jlink_rtterminal_read_func) (int cmd, char *buf, int size);
-+
-+struct jlink {
-+	jlink_emu_selectbyusbsn_func emu_selectbyusbsn;
-+	jlink_open_func open;
-+	jlink_execcommand_func execcommand;
-+	jlink_tif_select_func tif_select;
-+	jlink_setspeed_func setspeed;
-+	jlink_connect_func connect;
-+	jlink_getsn_func getsn;
-+	jlink_emu_getproductname_func emu_getproductname;
-+	jlink_rtterminal_control_func rtterminal_control;
-+	jlink_rtterminal_read_func rtterminal_read;
-+};
-+
-+static struct jlink jlink;
-+
-+#ifndef NELEM
-+#define NELEM(x) (sizeof(x) / sizeof((x)[0]))
-+#endif
-+
-+int jlink_init(void)
+diff --git a/monitor/control.c b/monitor/control.c
+index 1cd79ca5d..98f414be9 100644
+--- a/monitor/control.c
++++ b/monitor/control.c
+@@ -1262,23 +1262,8 @@ static bool tty_parse_header(uint8_t *hdr, uint8_t len, struct timeval **tv,
+ 	return true;
+ }
+ 
+-static void tty_callback(int fd, uint32_t events, void *user_data)
++static void process_data(struct control_data *data)
+ {
+-	struct control_data *data = user_data;
+-	ssize_t len;
+-
+-	if (events & (EPOLLERR | EPOLLHUP)) {
+-		mainloop_remove_fd(data->fd);
+-		return;
+-	}
+-
+-	len = read(data->fd, data->buf + data->offset,
+-					sizeof(data->buf) - data->offset);
+-	if (len < 0)
+-		return;
+-
+-	data->offset += len;
+-
+ 	while (data->offset >= sizeof(struct tty_hdr)) {
+ 		struct tty_hdr *hdr = (struct tty_hdr *) data->buf;
+ 		uint16_t pktlen, opcode, data_len;
+@@ -1318,6 +1303,26 @@ static void tty_callback(int fd, uint32_t events, void *user_data)
+ 	}
+ }
+ 
++static void tty_callback(int fd, uint32_t events, void *user_data)
 +{
-+	void *so;
-+	unsigned int i;
++	struct control_data *data = user_data;
++	ssize_t len;
 +
-+	for (i = 0; i < NELEM(jlink_so_name); i++) {
-+		so = dlopen(jlink_so_name[i], RTLD_LAZY);
-+		if (so)
-+			break;
++	if (events & (EPOLLERR | EPOLLHUP)) {
++		mainloop_remove_fd(data->fd);
++		return;
 +	}
 +
-+	if (!so)
-+		return -EIO;
++	len = read(data->fd, data->buf + data->offset,
++					sizeof(data->buf) - data->offset);
++	if (len < 0)
++		return;
 +
-+	jlink.emu_selectbyusbsn = dlsym(so, "JLINK_EMU_SelectByUSBSN");
-+	jlink.open = dlsym(so, "JLINK_Open");
-+	jlink.execcommand = dlsym(so, "JLINK_ExecCommand");
-+	jlink.tif_select = dlsym(so, "JLINK_TIF_Select");
-+	jlink.setspeed = dlsym(so, "JLINK_SetSpeed");
-+	jlink.connect = dlsym(so, "JLINK_Connect");
-+	jlink.getsn = dlsym(so, "JLINK_GetSN");
-+	jlink.emu_getproductname = dlsym(so, "JLINK_EMU_GetProductName");
-+	jlink.rtterminal_control = dlsym(so, "JLINK_RTTERMINAL_Control");
-+	jlink.rtterminal_read = dlsym(so, "JLINK_RTTERMINAL_Read");
++	data->offset += len;
 +
-+	if (!jlink.emu_selectbyusbsn || !jlink.open || !jlink.execcommand ||
-+			!jlink.tif_select || !jlink.setspeed ||
-+			!jlink.connect || !jlink.getsn ||
-+			!jlink.emu_getproductname ||
-+			!jlink.rtterminal_control || !jlink.rtterminal_read)
-+		return -EIO;
-+
-+	return 0;
++	process_data(data);
 +}
 +
-+int jlink_connect(char *cfg)
-+{
-+	const char *device = NULL;
-+	int tif = 1;
-+	unsigned int speed = 1000;
-+	unsigned int serial_no = 0;
-+	char *tok;
-+	char buf[64];
-+
-+	tok = strtok(cfg, ",");
-+	device = tok;
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto connect;
-+	if (strlen(tok)) {
-+		if (!strcasecmp("swd", tok))
-+			tif = 1;
-+		else
-+			return -EINVAL;
-+	}
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto connect;
-+	if (strlen(tok))
-+		speed = atoi(tok);
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto connect;
-+	if (strlen(tok))
-+		serial_no = atoi(tok);
-+
-+connect:
-+	if (serial_no)
-+		if (jlink.emu_selectbyusbsn(serial_no) < 0) {
-+			fprintf(stderr, "Failed to select emu by SN\n");
-+			return -ENODEV;
-+		}
-+
-+	if (jlink.open() < 0) {
-+		fprintf(stderr, "Failed to open J-Link\n");
-+		return -ENODEV;
-+	}
-+
-+	snprintf(buf, sizeof(buf), "device=%s", device);
-+	if (jlink.execcommand(buf, NULL, 0) < 0) {
-+		fprintf(stderr, "Failed to select target device\n");
-+		return -ENODEV;
-+	}
-+
-+	if (jlink.tif_select(tif) < 0) {
-+		fprintf(stderr, "Failed to select target interface\n");
-+		return -ENODEV;
-+	}
-+
-+	jlink.setspeed(speed);
-+
-+	if (jlink.connect() < 0) {
-+		fprintf(stderr, "Failed to open target\n");
-+		return -EIO;
-+	}
-+
-+	serial_no = jlink.getsn();
-+	jlink.emu_getproductname(buf, sizeof(buf));
-+
-+	printf("Connected to %s (S/N: %u)\n", buf, serial_no);
-+
-+	return 0;
-+}
-+
-+int jlink_start_rtt(char *cfg)
-+{
-+	unsigned int address = 0;
-+	unsigned int area_size = 0;
-+	const char *buffer = "monitor";
-+	char *tok;
-+	char cmd[64];
-+	int rtt_dir;
-+	int count;
-+	int i;
-+
-+	if (!cfg)
-+		goto find_rttcb;
-+
-+	tok = strtok(cfg, ",");
-+	if (strlen(tok)) {
-+		address = strtol(tok, NULL, 0);
-+		area_size = 0x1000;
-+	}
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto find_rttcb;
-+	if (strlen(tok))
-+		area_size = strtol(tok, NULL, 0);
-+
-+	tok = strtok(NULL, ",");
-+	if (!tok)
-+		goto find_rttcb;
-+	if (strlen(tok))
-+		buffer = tok;
-+
-+find_rttcb:
-+	if (address || area_size) {
-+		if (!area_size)
-+			snprintf(cmd, sizeof(cmd), "SetRTTAddr 0x%x", address);
-+		else
-+			snprintf(cmd, sizeof(cmd),
-+						"SetRTTSearchRanges 0x%x 0x%x",
-+						address, area_size);
-+
-+		if (jlink.execcommand(cmd, NULL, 0) < 0)
-+			return -EIO;
-+	}
-+
-+	if (jlink.rtterminal_control(RTT_CONTROL_START, NULL) < 0) {
-+		fprintf(stderr, "Failed to initialize RTT\n");
-+		return -1;
-+	}
-+
-+	/* RTT may need some time to find control block so we need to wait */
-+	do {
-+		usleep(100);
-+		rtt_dir = RTT_DIRECTION_UP;
-+		count = jlink.rtterminal_control(RTT_CONTROL_GET_NUM_BUF,
-+								&rtt_dir);
-+	} while (count < 0);
-+
-+	for (i = 0; i < count; i++) {
-+		memset(&rtt_desc, 0, sizeof(rtt_desc));
-+		rtt_desc.index = i;
-+
-+		if (jlink.rtterminal_control(RTT_CONTROL_GET_DESC,
-+								&rtt_desc) < 0)
-+			continue;
-+
-+		if (rtt_desc.size > 0 && !strcmp(buffer, rtt_desc.name))
-+			break;
-+	}
-+
-+	if (i == count)
-+		return -ENODEV;
-+
-+	printf("Using RTT up buffer #%d (size: %d)\n", i, rtt_desc.size);
-+
-+	return 0;
-+}
-+
-+int jlink_rtt_read(void *buf, size_t size)
-+{
-+	return jlink.rtterminal_read(rtt_desc.index, buf, size);
-+}
-diff --git a/monitor/jlink.h b/monitor/jlink.h
-new file mode 100644
-index 000000000..d7c76704c
---- /dev/null
-+++ b/monitor/jlink.h
-@@ -0,0 +1,27 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Codecoup
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+int jlink_init(void);
-+int jlink_connect(char *cfg);
-+int jlink_start_rtt(char *cfg);
-+int jlink_rtt_read(void *buf, size_t size);
+ int control_tty(const char *path, unsigned int speed)
+ {
+ 	struct control_data *data;
 -- 
 2.16.2
 
