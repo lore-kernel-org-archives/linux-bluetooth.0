@@ -1,77 +1,149 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180222092055.22493-1-andrzej.kaczmarek@codecoup.pl>
-References: <20180222092055.22493-1-andrzej.kaczmarek@codecoup.pl>
+In-Reply-To: <20180221141456.6656-1-luiz.dentz@gmail.com>
+References: <20180221141456.6656-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 22 Feb 2018 13:14:39 +0200
-Message-ID: <CABBYNZJ1auJu85NWTVDx+OaLwfe6x8jbBKW0NKz7WSMKBpXPPg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/3] Receiving monitor data stream over RTT
-To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 22 Feb 2018 11:56:23 +0200
+Message-ID: <CABBYNZKjEsTsgpi6E1LCNTjBSCTdu=vJLgizyC1qDZ+tJW4_sA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/8] shared/shell: Add non-interactive mode
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi,
 
-On Thu, Feb 22, 2018 at 11:20 AM, Andrzej Kaczmarek
-<andrzej.kaczmarek@codecoup.pl> wrote:
-> Hi,
+On Wed, Feb 21, 2018 at 4:14 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Here's patch series which adds support for receiving monitor data stream over
-> Segger RTT channel. This allows to stream data from embedded device without
-> need to spare a UART for monitor data and is also much faster. It is now
-> supported by Apache Mynewt (NimBLE stack), but I believe it can be also added
-> to other RTOS-es like Zephyr Project.
+> This detects if any command was given as parameter, execute it and
+> exit disabling all other outputs:
 >
-> RTT is handled natively by talking to J-Link via libjlinkarm.so. Since there
-> is no public documentation for this library, interface was done mostly by
-> trial and error so it may be lacking something - I tried it with few Cortex-M
-> devices and it works smoothly.
+> bluetoothctl list
+> Controller 00:1B:DC:07:31:88 Vudentz's T460s #1 [default]
+> Controller B8:8A:60:D8:17:D7 BlueZ-1
 >
-> Both J-Link and RTT needs few configuration parameters to work so I combined
-> them into two command line options:
->   -J --jlink <device>,<interface>,<speed>,<serialno>
->   -R --rtt <address>,<area>,<buffer>
+> It is also possible to run interactive command with use of timeout
+> option:
 >
-> <device> - one of devices supported by J-Link (no default)
-> <interface> - only 'swd' supported for now (default: swd)
-> <speed> - interface speed (default: 1000)
-> <serialno> - emu serial number or 0 if not used (detault: 0)
-> <address> - RTT control block address (default: 0)
-> <area> - RTT control block search area length (default: 0)
-> <buffer> - RTT buffer name with monitor data stream (default: monitor)
+> bluetoothctl --timeout=10 advertise on
+> Agent registered
+> [CHG] Controller 00:1B:DC:07:31:88 SupportedInstances: 0x04
+> [CHG] Controller 00:1B:DC:07:31:88 ActiveInstances: 0x01
+> Advertising object registered
+> Tx Power: off
+> Name: off
+> Apperance: off
+> ---
+>  src/shared/shell.c | 37 +++++++++++++++++++++++++++++++++++--
+>  1 file changed, 35 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index 0ac492886..0f6d613bd 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -62,6 +62,10 @@ struct bt_shell_env {
+>  };
+>
+>  static struct {
+> +       int argc;
+> +       char **argv;
+> +       bool mode;
+> +       int timeout;
+>         struct io *input;
+>
+>         bool saved_prompt;
+> @@ -373,6 +377,9 @@ void bt_shell_printf(const char *fmt, ...)
+>         char *saved_line;
+>         int saved_point;
+>
+> +       if (!data.input)
+> +               return;
+> +
+>         save_input = !RL_ISSTATE(RL_STATE_DONE);
+>
+>         if (save_input) {
+> @@ -744,6 +751,7 @@ static void rl_init(void)
+>  static const struct option main_options[] = {
+>         { "version",    no_argument, 0, 'v' },
+>         { "help",       no_argument, 0, 'h' },
+> +       { "timeout",    required_argument, 0, 't' },
+>  };
+>
+>  static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
+> @@ -759,7 +767,8 @@ static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
+>         for (i = 0; opt && opt->options[i].name; i++)
+>                 printf("\t--%s \t%s\n", opt->options[i].name, opt->help[i]);
+>
+> -       printf("\t--version \tDisplay version\n"
+> +       printf("\t--timeout \t\tTimeout in seconds for non-interactive mode\n"
+> +               "\t--version \tDisplay version\n"
+>                 "\t--help \t\tDisplay help\n");
+>  }
+>
+> @@ -791,6 +800,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+>                         usage(argc, argv, opt);
+>                         exit(EXIT_SUCCESS);
+>                         return;
+> +               case 't':
+> +                       data.timeout = atoi(optarg);
+> +                       break;
+>                 default:
+>                         if (c != opt->options[index - offset].val) {
+>                                 usage(argc, argv, opt);
+> @@ -802,6 +814,10 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+>                 }
+>         }
+>
+> +       data.argc = argc - optind;
+> +       data.argv = argv + optind;
+> +       data.mode = (data.argc > 0);
+> +
+>         main_loop = g_main_loop_new(NULL, FALSE);
+>
+>         rl_init();
+> @@ -873,7 +889,7 @@ bool bt_shell_add_submenu(const struct bt_shell_menu *menu)
+>
+>  void bt_shell_set_prompt(const char *string)
+>  {
+> -       if (!main_loop)
+> +       if (!main_loop || data.mode)
+>                 return;
+>
+>         rl_set_prompt(string);
+> @@ -888,6 +904,13 @@ static bool input_read(struct io *io, void *user_data)
+>         return true;
+>  }
+>
+> +static gboolean shell_quit(void *data)
+> +{
+> +       g_main_loop_quit(main_loop);
+> +
+> +       return FALSE;
+> +}
+> +
+>  bool bt_shell_attach(int fd)
+>  {
+>         struct io *io;
+> @@ -903,6 +926,16 @@ bool bt_shell_attach(int fd)
+>
+>         data.input = io;
+>
+> +       if (data.mode) {
+> +               shell_exec(data.argc, data.argv);
+> +
+> +               if (!data.timeout) {
+> +                       bt_shell_detach();
+> +                       g_main_loop_quit(main_loop);
+> +               } else
+> +                       g_timeout_add_seconds(data.timeout, shell_quit, NULL);
+> +       }
+> +
+>         return true;
+>  }
 
-Given that the device has no default I suppose it is not able to
-auto-detect it, wouldn't it be possible to add support for that? At
-least the tools for flashing, etc, do seems to be able to detect when
-using a j-tag.
-
->
-> Andrzej Kaczmarek (3):
->   monitor: Extract TTY data processing to separate function
->   monitor: Add interface for J-Link library
->   monitor: Add support for reading over J-Link RTT
->
->  Makefile.tools    |   3 +-
->  monitor/control.c |  87 +++++++++++++----
->  monitor/control.h |   1 +
->  monitor/jlink.c   | 282 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  monitor/jlink.h   |  27 ++++++
->  monitor/main.c    |  30 +++++-
->  6 files changed, 409 insertions(+), 21 deletions(-)
->  create mode 100644 monitor/jlink.c
->  create mode 100644 monitor/jlink.h
->
-> --
-> 2.16.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
+Applied.
 
 -- 
 Luiz Augusto von Dentz
