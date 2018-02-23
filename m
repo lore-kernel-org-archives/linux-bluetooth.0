@@ -2,128 +2,184 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH 1/2] monitor: Add support PHY management commands and event
-Date: Fri, 23 Feb 2018 16:38:37 +0530
-Message-Id: <1519384128-2016-3-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH 01/11] Bluetooth: Introduce helpers for LE set scan start and complete
+Date: Fri, 23 Feb 2018 16:38:36 +0530
+Message-Id: <1519384128-2016-2-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1519384128-2016-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1519384128-2016-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- monitor/packet.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+Introduce a helper hci_req_start_scan() which starts an LE
+scan and call it from passive_Scan() and active_scan().
+There is not functionality change in this patch.
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b800a2d..e3b5ab7 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -97,6 +97,7 @@
- #define COLOR_UNKNOWN_ADDRESS_TYPE	COLOR_WHITE_BG
- #define COLOR_UNKNOWN_DEVICE_FLAG	COLOR_WHITE_BG
- #define COLOR_UNKNOWN_ADV_FLAG		COLOR_WHITE_BG
-+#define COLOR_UNKNOWN_PHY		COLOR_WHITE_BG
- 
- #define COLOR_PHY_PACKET		COLOR_BLUE
- 
-@@ -10611,6 +10612,7 @@ static const struct {
- 	{ 13, "Privacy"			},
- 	{ 14, "Controller Configuration"},
- 	{ 15, "Static Address"		},
-+	{ 16, "PHY Configuration"	},
- 	{ }
- };
- 
-@@ -11905,6 +11907,54 @@ static void mgmt_set_apperance_cmd(const void *data, uint16_t size)
- 	print_appearance(appearance);
+This is basically done to enable extended scanning if the
+controller supports which will be done in the subsequent
+patch
+
+Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+---
+ net/bluetooth/hci_event.c   | 37 ++++++++++++++++-------------
+ net/bluetooth/hci_request.c | 58 +++++++++++++++++++--------------------------
+ 2 files changed, 46 insertions(+), 49 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index cd3bbb7..e034ced 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1126,24 +1126,11 @@ static void store_pending_adv_report(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 	d->last_adv_data_len = len;
  }
  
-+static const struct {
-+	uint8_t bit;
-+	const char *str;
-+} mgmt_phy_table[] = {
-+	{  0, "1MTX"	},
-+	{  1, "1MRX"	},
-+	{  2, "2MTX"	},
-+	{  3, "2MRX"	},
-+	{  4, "CODEDTX"	},
-+	{  5, "CODEDRX"	},
-+	{ }
-+};
-+
-+static void mgmt_print_phys(const char *label, uint16_t phys)
-+{
-+	uint16_t mask = phys;
-+	int i;
-+
-+	print_field("%s: 0x%4.4x", label, phys);
-+
-+	for (i = 0; mgmt_phy_table[i].str; i++) {
-+		if (phys & (1 << mgmt_phy_table[i].bit)) {
-+			print_field("  %s", mgmt_phy_table[i].str);
-+			mask &= ~(1 << mgmt_phy_table[i].bit);
-+		}
-+	}
-+
-+	if (mask)
-+		print_text(COLOR_UNKNOWN_PHY, "  Unknown PHYs"
-+							" (0x%8.8x)", mask);
-+}
-+
-+static void mgmt_get_phy_rsp(const void *data, uint16_t size)
-+{
-+	uint16_t supported_phys = get_le16(data);
-+	uint16_t selected_phys = get_le16(data + 2);
-+
-+	mgmt_print_phys("Supported PHYs", supported_phys);
-+	mgmt_print_phys("Selected PHYs", selected_phys);
-+}
-+
-+static void mgmt_set_phy_cmd(const void *data, uint16_t size)
-+{
-+	uint16_t default_phys = get_le16(data);
-+
-+	mgmt_print_phys("Default PHYs", default_phys);
-+}
-+
- struct mgmt_data {
- 	uint16_t opcode;
- 	const char *str;
-@@ -12118,6 +12168,12 @@ static const struct mgmt_data mgmt_command_table[] = {
- 	{ 0x0043, "Set Appearance",
- 				mgmt_set_apperance_cmd, 2, true,
- 				mgmt_null_rsp, 0, true },
-+	{ 0x0044, "Get PHY Configuration",
-+				mgmt_null_cmd, 0, true,
-+				mgmt_get_phy_rsp, 4, true },
-+	{ 0x0045, "Set PHY Configuration",
-+				mgmt_set_phy_cmd, 2, true,
-+				mgmt_null_rsp, 0, true },
- 	{ }
- };
+-static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+-				      struct sk_buff *skb)
++static void le_set_scan_enable_complete(struct hci_dev *hdev, u8 enable)
+ {
+-	struct hci_cp_le_set_scan_enable *cp;
+-	__u8 status = *((__u8 *) skb->data);
+-
+-	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+-
+-	if (status)
+-		return;
+-
+-	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_SCAN_ENABLE);
+-	if (!cp)
+-		return;
+-
+ 	hci_dev_lock(hdev);
  
-@@ -12496,6 +12552,13 @@ static void mgmt_ext_controller_info_changed_evt(const void *data, uint16_t size
- 	print_eir(data + 2, size - 2, false);
+-	switch (cp->enable) {
++	switch (enable) {
+ 	case LE_SCAN_ENABLE:
+ 		hci_dev_set_flag(hdev, HCI_LE_SCAN);
+ 		if (hdev->le_scan_type == LE_SCAN_ACTIVE)
+@@ -1189,13 +1176,31 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 
+ 	default:
+ 		bt_dev_err(hdev, "use of reserved LE_Scan_Enable param %d",
+-			   cp->enable);
++			   enable);
+ 		break;
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
  }
  
-+static void mgmt_phy_changed_evt(const void *data, uint16_t size)
++static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
++				      struct sk_buff *skb)
 +{
-+	uint16_t selected_phys = get_le16(data);
++	struct hci_cp_le_set_scan_enable *cp;
++	__u8 status = *((__u8 *) skb->data);
 +
-+	mgmt_print_phys("Selected PHYs", selected_phys);
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_SCAN_ENABLE);
++	if (!cp)
++		return;
++
++	le_set_scan_enable_complete(hdev, cp->enable);
 +}
 +
- static const struct mgmt_data mgmt_event_table[] = {
- 	{ 0x0001, "Command Complete",
- 			mgmt_command_complete_evt, 3, false },
-@@ -12571,6 +12634,8 @@ static const struct mgmt_data mgmt_event_table[] = {
- 			mgmt_advertising_removed_evt, 1, true },
- 	{ 0x0025, "Extended Controller Information Changed",
- 			mgmt_ext_controller_info_changed_evt, 2, false },
-+	{ 0x0026, "PHY Configuration Changed",
-+			mgmt_phy_changed_evt, 2, true },
- 	{ }
- };
+ static void hci_cc_le_read_white_list_size(struct hci_dev *hdev,
+ 					   struct sk_buff *skb)
+ {
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 66c0781..d9d07c4 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -783,10 +783,30 @@ static bool scan_use_rpa(struct hci_dev *hdev)
+ 	return hci_dev_test_flag(hdev, HCI_PRIVACY);
+ }
+ 
+-void hci_req_add_le_passive_scan(struct hci_request *req)
++static void hci_req_start_scan(struct hci_request *req, u8 type, u16 interval,
++			       u16 window, u8 own_addr_type, u8 filter_policy)
+ {
+ 	struct hci_cp_le_set_scan_param param_cp;
+ 	struct hci_cp_le_set_scan_enable enable_cp;
++
++	memset(&param_cp, 0, sizeof(param_cp));
++	param_cp.type = type;
++	param_cp.interval = cpu_to_le16(interval);
++	param_cp.window = cpu_to_le16(window);
++	param_cp.own_address_type = own_addr_type;
++	param_cp.filter_policy = filter_policy;
++	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
++		    &param_cp);
++
++	memset(&enable_cp, 0, sizeof(enable_cp));
++	enable_cp.enable = LE_SCAN_ENABLE;
++	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
++	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
++		    &enable_cp);
++}
++
++void hci_req_add_le_passive_scan(struct hci_request *req)
++{
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 own_addr_type;
+ 	u8 filter_policy;
+@@ -820,20 +840,8 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	    (hdev->le_features[0] & HCI_LE_EXT_SCAN_POLICY))
+ 		filter_policy |= 0x02;
+ 
+-	memset(&param_cp, 0, sizeof(param_cp));
+-	param_cp.type = LE_SCAN_PASSIVE;
+-	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
+-	param_cp.window = cpu_to_le16(hdev->le_scan_window);
+-	param_cp.own_address_type = own_addr_type;
+-	param_cp.filter_policy = filter_policy;
+-	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
+-		    &param_cp);
+-
+-	memset(&enable_cp, 0, sizeof(enable_cp));
+-	enable_cp.enable = LE_SCAN_ENABLE;
+-	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
+-	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+-		    &enable_cp);
++	hci_req_start_scan(req, LE_SCAN_PASSIVE, hdev->le_scan_interval,
++			   hdev->le_scan_window, own_addr_type, filter_policy);
+ }
+ 
+ static u8 get_cur_adv_instance_scan_rsp_len(struct hci_dev *hdev)
+@@ -2026,8 +2034,6 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ {
+ 	uint16_t interval = opt;
+ 	struct hci_dev *hdev = req->hdev;
+-	struct hci_cp_le_set_scan_param param_cp;
+-	struct hci_cp_le_set_scan_enable enable_cp;
+ 	u8 own_addr_type;
+ 	int err;
+ 
+@@ -2066,22 +2072,8 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ 	if (err < 0)
+ 		own_addr_type = ADDR_LE_DEV_PUBLIC;
+ 
+-	memset(&param_cp, 0, sizeof(param_cp));
+-	param_cp.type = LE_SCAN_ACTIVE;
+-	param_cp.interval = cpu_to_le16(interval);
+-	param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
+-	param_cp.own_address_type = own_addr_type;
+-
+-	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
+-		    &param_cp);
+-
+-	memset(&enable_cp, 0, sizeof(enable_cp));
+-	enable_cp.enable = LE_SCAN_ENABLE;
+-	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
+-
+-	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+-		    &enable_cp);
+-
++	hci_req_start_scan(req, LE_SCAN_ACTIVE, interval, DISCOV_LE_SCAN_WIN,
++			   own_addr_type, 0);
+ 	return 0;
+ }
  
 -- 
 2.7.4
