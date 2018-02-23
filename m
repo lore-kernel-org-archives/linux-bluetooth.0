@@ -1,126 +1,118 @@
-Return-Path: <arend.vanspriel@broadcom.com>
-Subject: Re: [PATCH 2/3] mwifiex: support sysfs initiated device coredump
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Restore QCA Rome suspend/resume fix
+ with a "rewritten" version
 To: Brian Norris <briannorris@chromium.org>
-References: <1519210220-22437-1-git-send-email-arend.vanspriel@broadcom.com>
- <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
- <20180221225903.GA42395@rodete-desktop-imager.corp.google.com>
- <5A8EB4F4.2030103@broadcom.com>
- <20180222193547.GA78462@rodete-desktop-imager.corp.google.com>
-Cc: Kalle Valo <kvalo@codeaurora.org>, Marcel Holtmann <marcel@holtmann.org>,
- linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Johannes Berg <johannes@sipsolutions.net>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Message-ID: <5A8FEF68.5080900@broadcom.com>
-Date: Fri, 23 Feb 2018 11:39:36 +0100
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+ linux-serial@vger.kernel.org,
+ ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+ stable <stable@vger.kernel.org>, Leif Liddy <leif.linux@gmail.com>,
+ Matthias Kaehlcke <mka@chromium.org>, Daniel Drake <drake@endlessm.com>,
+ Kai-Heng Feng <kai.heng.feng@canonical.com>, matadeen@qti.qualcomm.com,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Guenter Roeck <linux@roeck-us.net>
+References: <20180108094416.4789-1-hdegoede@redhat.com>
+ <20180213022455.GA151190@rodete-desktop-imager.corp.google.com>
+ <8cd918fd-bf6f-70ac-e561-e7deffa695f0@redhat.com>
+ <20180216022721.GA69988@rodete-desktop-imager.corp.google.com>
+ <345b0de8-1a23-d2f8-bc56-507eadf7faa7@redhat.com>
+ <6B37F6AC-1103-4FCF-A5DC-4BA236A7B11B@holtmann.org>
+ <1a08612e-2531-3711-ec0f-a867e86d0009@redhat.com>
+ <20180216175955.GA80944@rodete-desktop-imager.corp.google.com>
+ <a846c1ac-7dea-a30a-4133-32eac606d101@redhat.com>
+ <20180223031216.GA230265@rodete-desktop-imager.corp.google.com>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <a6090910-7941-b194-c094-7ce3ef047974@redhat.com>
+Date: Fri, 23 Feb 2018 08:14:28 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180222193547.GA78462@rodete-desktop-imager.corp.google.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20180223031216.GA230265@rodete-desktop-imager.corp.google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-+ Johannes (for devcoredump documentation question).
+Hi,
 
-On 2/22/2018 8:35 PM, Brian Norris wrote:
-> Hi Arend,
->
-> On Thu, Feb 22, 2018 at 01:17:56PM +0100, Arend van Spriel wrote:
->> On 2/21/2018 11:59 PM, Brian Norris wrote:
->>> On Wed, Feb 21, 2018 at 11:50:19AM +0100, Arend van Spriel wrote:
->>>> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
->>>> it is possible to initiate a device coredump from user-space. This
->>>> patch adds support for it adding the .coredump() driver callback.
->>>> As there is no longer a need to initiate it through debugfs remove
->>>> that code.
+On 23-02-18 04:12, Brian Norris wrote:
+> Hi Hans,
+> 
+> Sorry if I'm a little slow to follow up here. This hasn't been my
+> top priority...
+> 
+> On Mon, Feb 19, 2018 at 11:17:24AM +0100, Hans de Goede wrote:
+>> On 16-02-18 18:59, Brian Norris wrote:
+>>> On Fri, Feb 16, 2018 at 01:10:20PM +0100, Hans de Goede wrote:
+>>>> Ok, I've asked the reporter of:
 >>>>
->>>> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
->>>> ---
->>>>    drivers/net/wireless/marvell/mwifiex/debugfs.c | 31 +-------------------------
->>>>    drivers/net/wireless/marvell/mwifiex/pcie.c    | 19 ++++++++++++++--
->>>>    drivers/net/wireless/marvell/mwifiex/sdio.c    | 13 +++++++++++
->>>>    drivers/net/wireless/marvell/mwifiex/usb.c     | 14 ++++++++++++
->>>>    4 files changed, 45 insertions(+), 32 deletions(-)
+>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1514836
 >>>
->>> The documentation doesn't really say [1], but is the coredump supposed
->>> to happen synchronously? Because the mwifiex implementation is
->>> asynchronous, whereas it looks like the brcmfmac one is synchronous.
->>
->> Well, that depends on the eye of the beholder I guess. From user-space
->> perspective it is asynchronous regardless. A write access to the coredump
->> sysfs file eventually results in a uevent when the devcoredump entry is
->> created, ie. after driver has made a dev_coredump API call. Whether the
->> driver does that synchronously or asynchronously is irrelevant as far as
->> user-space is concerned.
->
-> Is it really? The driver infrastructure seems to guarantee that the
-> entirety of a driver's ->coredump() will complete before returning from
-> the write. So it might be reasonable for some user to assume (based on
-> implementation details, e.g., of brcmfmac) that the devcoredump will be
-> ready by the time the write() syscall returns, absent documentation that
-> says otherwise. But then, that's not how mwifiex works right now, so
-> they might be surprised if they switch drivers.
-
-Ok. I already agreed that the uevent behavior should be documented. The 
-error handling you are bringing up below was something I realized as 
-well. I am not familiar with mwifiex to determine what it can say about 
-the coredump succeeding before scheduling the work.
-
-> Anyway, *I'm* already personally used to these dumps being asynchronous,
-> and writing tooling to listen for the uevent instead. But that doesn't
-> mean everyone will be.
->
-> Also, due to the differences in async/sync, mwifiex doesn't really
-> provide you much chance for error handling, because most errors would be
-> asynchronous. So brcmfmac's "coredump" has more chance for user programs
-> to error-check than mwifiex's (due to the asynchronous nature) [1].
->
-> BTW, I push on this mostly because this is migrating from a debugfs
-> feature (that is easy to hand-wave off as not really providing a
-> consistent/stable API, etc., etc.) to a documented sysfs feature. If it
-> were left to rot in debugfs, I probably wouldn't be as bothered ;)
-
-I appreciate it. The documentation is not in the stable ABI folder yet 
-so I welcome any and all improvements. Might learn a thing or two from it.
-
->>> Brian
+>>> Are you even sure that this reporter is seeing the original symptom at
+>>> all (BT loses power, and therefore firmware)? Their report shows them
+>>> running 4.15, which had this commit:
 >>>
->>> [1] In fact, the ABI documentation really just describes kernel
->>> internals, rather than documenting any user-facing details, from what I
->>> can tell.
+>>> fd865802c66b Bluetooth: btusb: fix QCA Rome suspend/resume
+>>>
+>>> which is admittedly completely broken. It breaks even perfectly working
+>>> BT/USB devices, like mine. That's where I first complained, and we got
+>>> this into 4.16-rc1:
+>>>
+>>> 7d06d5895c15 Revert "Bluetooth: btusb: fix QCA Rome suspend/resume"
+>>>
+>>> Isn't it possible your reporter has no further problem, and none if this
+>>> is actually important to them? I'd just caution you to be careful before
+>>> assuming you need to add blacklist info for their DMI...
 >>
->> You are right. Clearly I did not reach the end my learning curve here. I
->> assumed referring to the existing dev_coredump facility was sufficient, but
->> maybe it is worth a patch to be more explicit and mention the uevent
->> behavior. Also dev_coredump facility may be disabled upon which the trigger
->> will have no effect in sysfs. In the kernel the data passed by the driver is
->> simply freed by dev_coredump facility.
->
-> Is there any other documentation for the coredump feature? I don't
-> really see much.
+>> Thanks, that is a good question. His problems only started when I
+>> enabled usb-autosuspend by default for btusb devices and he got things
+>> working by adding "btusb.enable_autosuspend=n" on the kernel commandline,
+>> so he was not hitting the firmware loading race introduced by
+>> fd865802c66b and runtime suspend/resume is really broken for him.
+> 
+> Hmm? I'm not sure I completely follow here when you say "he was not
+> hitting the firmware loading race". If things were functioning fine with
+> system suspend (but not with autosuspend), then he's not seeing the
+> controller (quoting commit fd865802c66b) "losing power during suspend".
 
-Any other than the code itself you mean? I am not sure. Maybe Johannes 
-knows.
+He was running a kernel with the original "fd865802c66b Bluetooth: btusb:
+fix QCA Rome suspend/resume" commit, which fixes regular suspend for
+devices which are "losing power during suspend", but does nothing for
+runtime-suspend.
 
-> Brian
->
-> [1] Oh wait, but I see that while ->coredump() has an integer return
-> code...the caller ignores it:
->
-> static ssize_t coredump_store(struct device *dev, struct device_attribute *attr,
-> 			    const char *buf, size_t count)
-> {
-> 	device_lock(dev);
-> 	if (dev->driver->coredump)
-> 		dev->driver->coredump(dev);
-> 	device_unlock(dev);
->
-> 	return count;
-> }
-> static DEVICE_ATTR_WO(coredump);
->
-> Is that a bug or a feature?
+He ran tests both with and without runtime-pm enabled with that same kernel
+and he needed to disable runtime-pm to get working bluetooth.
 
-Yeah. Let's call it a bug. Just not sure what to go for. Return the 
-error or change coredump callback to void return type.
+> So, that would suggest he could only be seeing the race (as I was), and
+> that his machine does not deserve a RESET_RESUME quirk?
+
+I hope my above answer helps to clarify why I believe the quirk is
+necessary on his machine.
 
 Regards,
-Arend
+
+Hans
+
+
+> 
+> Or maybe I'm really misunderstanding.
+> 
+>>> As I read it, you need to investigate who are the "numerous reported
+>>> instances" that generated commit fd865802c66b in the first place. That's
+>>> where this mess started, IIUC. >
+>>> But otherwise, yes, option 3 sounds OK. FWIW, my systems are ARM based
+>>> and don't have DMI data, so option 2 wouldn't work.
+>>
+>> Right I think we all agree that the new plan now is to go back to
+>> QCA behaving normally wrt (runtime) suspend/resume and then set the
+>> USB-core RESET_RESUME quirk (which does not have the firmware
+>> loading race) based on a DMI blacklist.
+>>
+>> I only have the one report for which I will write a patch implementing
+>> this new policy soonish. And Kai-Heng Feng has another report which
+>> might even be the machine. I certainly would not be surprised if it
+>> is another Lenovo machine.
+> 
+> It seems like you folks moved forward on that one. Thanks.
+> 
+> Brian
+> 
