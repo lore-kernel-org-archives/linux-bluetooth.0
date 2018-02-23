@@ -1,46 +1,94 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH 00/11] Ext scan/connect and PHY Configuration
-Date: Fri, 23 Feb 2018 16:38:35 +0530
-Message-Id: <1519384128-2016-1-git-send-email-jaganathx.kanakkassery@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <johannes@sipsolutions.net>
+Message-ID: <1519383062.2231.5.camel@sipsolutions.net>
+Subject: Re: [PATCH 2/3] mwifiex: support sysfs initiated device coredump
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Arend van Spriel <arend.vanspriel@broadcom.com>, Brian Norris
+	 <briannorris@chromium.org>
+Cc: Kalle Valo <kvalo@codeaurora.org>, Marcel Holtmann
+ <marcel@holtmann.org>,  linux-wireless@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org,  linux-kernel@vger.kernel.org, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>
+Date: Fri, 23 Feb 2018 11:51:02 +0100
+In-Reply-To: <5A8FEF68.5080900@broadcom.com> (sfid-20180223_113938_578183_0B4B09C3)
+References: <1519210220-22437-1-git-send-email-arend.vanspriel@broadcom.com>
+	 <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
+	 <20180221225903.GA42395@rodete-desktop-imager.corp.google.com>
+	 <5A8EB4F4.2030103@broadcom.com>
+	 <20180222193547.GA78462@rodete-desktop-imager.corp.google.com>
+	 <5A8FEF68.5080900@broadcom.com> (sfid-20180223_113938_578183_0B4B09C3)
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The patch set implements extended scanning and conection and use it
-based on the controller support.
+Hey,
 
-This also implements PHY configuration mgmt commands and events
-to set defualt PHY and PHYs to be used for scan and connect.
+Hadn't really followed this discussion much due to other fires
+elsewhere :-)
 
-One downside of this approch is user cannot force kernel to use
-legacy comands if controller is 5.0.
+On Fri, 2018-02-23 at 11:39 +0100, Arend van Spriel wrote:
 
-Jaganath Kanakkassery (11):
-  Bluetooth: Introduce helpers for LE set scan start and complete
-  Bluetooth: Use extended scanning if controller supports
-  Bluetooth: Process extended ADV report event
-  Bluetooth: Introduce helpers for le conn status and complete
-  Bluetooth: Use extended LE Connection if supported
-  Bluetooth: Define PHY flags in hdev and set 1M as default
-  Bluetooth: Implement Get PHY Configuration mgmt command
-  Bluetooth: Implement Set PHY Confguration command
-  Bluetooth: Set Scan PHYs based on selected PHYs by user
-  Bluetooth: Handle extended ADV PDU types
-  Bluetooth: Use selected PHYs in extended connect
+> > > Well, that depends on the eye of the beholder I guess. From user-space
+> > > perspective it is asynchronous regardless. A write access to the coredump
+> > > sysfs file eventually results in a uevent when the devcoredump entry is
+> > > created, ie. after driver has made a dev_coredump API call. Whether the
+> > > driver does that synchronously or asynchronously is irrelevant as far as
+> > > user-space is concerned.
+> > 
+> > Is it really? The driver infrastructure seems to guarantee that the
+> > entirety of a driver's ->coredump() will complete before returning from
+> > the write. So it might be reasonable for some user to assume (based on
+> > implementation details, e.g., of brcmfmac) that the devcoredump will be
+> > ready by the time the write() syscall returns, absent documentation that
+> > says otherwise. But then, that's not how mwifiex works right now, so
+> > they might be surprised if they switch drivers.
 
- include/net/bluetooth/hci.h      | 110 ++++++++++++
- include/net/bluetooth/hci_core.h |  15 ++
- include/net/bluetooth/mgmt.h     |  31 ++++
- net/bluetooth/hci_conn.c         | 103 +++++++++--
- net/bluetooth/hci_core.c         |  17 ++
- net/bluetooth/hci_event.c        | 371 ++++++++++++++++++++++++++++++++-------
- net/bluetooth/hci_request.c      | 156 +++++++++++-----
- net/bluetooth/hci_sock.c         |   1 +
- net/bluetooth/mgmt.c             | 231 ++++++++++++++++++++++++
- 9 files changed, 914 insertions(+), 121 deletions(-)
+I can see how you might want to have that kind of behaviour, but you'd
+have to jump through some hoops to see if the coredump you saw is
+actually the right one - you probably want an asynchronous coredump
+"collector" and then wait for it to show up (with some reasonable
+timeout) on the actual filesystem, not on sysfs?
 
--- 
-2.7.4
+Otherwise you have to trawl sysfs for the right coredump I guess, which
+too is possible.
 
+> > > You are right. Clearly I did not reach the end my learning curve here. I
+> > > assumed referring to the existing dev_coredump facility was sufficient, but
+> > > maybe it is worth a patch to be more explicit and mention the uevent
+> > > behavior. Also dev_coredump facility may be disabled upon which the trigger
+> > > will have no effect in sysfs. In the kernel the data passed by the driver is
+> > > simply freed by dev_coredump facility.
+> > 
+> > Is there any other documentation for the coredump feature? I don't
+> > really see much.
+> 
+> Any other than the code itself you mean? I am not sure. Maybe Johannes 
+> knows.
+
+There isn't really, it originally was really simple, but then somebody
+(Kees perhaps?) requested a way to turn it off forever for security or
+privacy concerns and it became more complicated.
+
+> > static ssize_t coredump_store(struct device *dev, struct device_attribute *attr,
+> > 			    const char *buf, size_t count)
+> > {
+> > 	device_lock(dev);
+> > 	if (dev->driver->coredump)
+> > 		dev->driver->coredump(dev);
+> > 	device_unlock(dev);
+> > 
+> > 	return count;
+> > }
+> > static DEVICE_ATTR_WO(coredump);
+> > 
+> > Is that a bug or a feature?
+> 
+> Yeah. Let's call it a bug. Just not sure what to go for. Return the 
+> error or change coredump callback to void return type.
+
+I'm not sure it matters all that much - the underlying devcoredump
+calls all have no return value (void), and given the above complexities
+with the ability to turn off devcoredumping entirely you cannot rely on
+this return value to tell you if a dump was created or not, at least
+not without much more infrastructure work.
+
+johannes
