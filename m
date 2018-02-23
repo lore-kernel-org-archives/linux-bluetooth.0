@@ -1,30 +1,56 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Sriram V <vshrirama@gmail.com>
-Date: Sun, 25 Feb 2018 16:23:25 +0530
-Message-ID: <CAH9_wROtNmXdCzPRZZYup9ObiGapCd=Ku9hTX=eP=cKWtkGMcQ@mail.gmail.com>
-Subject: Bluetooth sleep.
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <amitkarwar@gmail.com>
+From: Amitkumar Karwar <amitkarwar@gmail.com>
+To: Kalle Valo <kvalo@codeaurora.org>,
+	marcel@holtmann.org
+Cc: linux-wireless@vger.kernel.org,
+	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+	linux-bluetooth@vger.kernel.org,
+	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Subject: [v8 8/8] rsi: sdio changes to support BT
+Date: Fri, 23 Feb 2018 19:24:58 +0530
+Message-Id: <1519394098-24220-9-git-send-email-amitkarwar@gmail.com>
+In-Reply-To: <1519394098-24220-1-git-send-email-amitkarwar@gmail.com>
+References: <1519394098-24220-1-git-send-email-amitkarwar@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
 
-I am using a BCM4339 chip. I am using android. I play audio. Pause the
-audio. let the device go to sleep.
+Queue number is correctly updated for BT traffic. Also, kzalloc
+instead of kmalloc is used for Rx packet allocation.
 
-Meanwhile, I find that my BT Headset goes power off/goes to low power
-mode due to inactivity. As a result of which when i wake up from
-sleep. I don't see the  BT connection active. which results in the
-audio being routed to the in-built speaker.
+Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+---
+ drivers/net/wireless/rsi/rsi_91x_sdio.c     | 2 ++
+ drivers/net/wireless/rsi/rsi_91x_sdio_ops.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-I wanted to check if this is a problem with bcm or the headset or both?
-
-I think there should be some communication between bcm and the headset
-in the background to keep the connection alive. is my understanding
-correct?
-
-
-Thanks,
-sriram
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio.c b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+index 5722736..beb18d0 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+@@ -763,6 +763,8 @@ static int rsi_sdio_host_intf_write_pkt(struct rsi_hw *adapter,
+ 	int status;
+ 
+ 	queueno = ((pkt[1] >> 4) & 0xf);
++	if (queueno == RSI_BT_MGMT_Q || queueno == RSI_BT_DATA_Q)
++		queueno = RSI_BT_Q;
+ 
+ 	num_blocks = len / block_size;
+ 
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+index 169c981..6e74261 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+@@ -103,7 +103,7 @@ static int rsi_process_pkt(struct rsi_common *common)
+ 
+ 	rcv_pkt_len = (num_blks * 256);
+ 
+-	common->rx_data_pkt = kmalloc(rcv_pkt_len, GFP_KERNEL);
++	common->rx_data_pkt = kzalloc(rcv_pkt_len, GFP_KERNEL);
+ 	if (!common->rx_data_pkt) {
+ 		rsi_dbg(ERR_ZONE, "%s: Failed in memory allocation\n",
+ 			__func__);
+-- 
+2.7.4
