@@ -15,31 +15,47 @@ Cc: Lukas Wunner <lukas@wunner.de>,
 	linux-rpi-kernel@lists.infradead.org,
 	devicetree@vger.kernel.org,
 	Stefan Wahren <stefan.wahren@i2se.com>
-Subject: [PATCH 0/4] ARM: bcm2835-rpi-zero-w: Enable Bluetooth support
-Date: Sun, 25 Feb 2018 15:10:51 +0100
-Message-Id: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
+Subject: [PATCH 3/4] ARM: dts: bcm2835-rpi-zero-w: Add bcm43438 serial slave
+Date: Sun, 25 Feb 2018 15:10:54 +0100
+Message-Id: <1519567855-26105-4-git-send-email-stefan.wahren@i2se.com>
+In-Reply-To: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
+References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This small patch series enable the on-board Bluetooth support on the
-Raspberry Pi Zero W.
+Add BCM43438 (bluetooth) as a serdev slave device of uart0 (pl011/ttyAMA0).
+This allows to automatically insert the bcm43438 to the bluetooth
+subsystem instead of relying on patched userspace helpers (hciattach).
 
-I suggest that the hci_bcm patch (regression fix) goes into bluetooth-fixes.
+In order to keep a debug UART we need to switch to uart1.
 
-Note: For Bluetooth support it necessary to have a firmware located at:
-
-/lib/firmware/brcm/BCM43430A1.hcd
-
-Stefan Wahren (4):
-  Bluetooth: hci_bcm: Make shutdown and device wake GPIO optional
-  ARM: dts: bcm283x: Apply pull settings to Zero W relevant groups
-  ARM: dts: bcm2835-rpi-zero-w: Add bcm43438 serial slave
-  ARM: bcm2385_defconfig: Enable BT support for BCM43438
-
+Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+---
  arch/arm/boot/dts/bcm2835-rpi-zero-w.dts | 14 +++++++++++++-
- arch/arm/boot/dts/bcm283x.dtsi           |  3 +++
- arch/arm/configs/bcm2835_defconfig       |  4 ++++
- drivers/bluetooth/hci_bcm.c              |  8 +++++---
- 4 files changed, 25 insertions(+), 4 deletions(-)
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
+diff --git a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
+index cf53436..b7f79f1 100644
+--- a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
++++ b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
+@@ -131,6 +131,18 @@
+ 
+ &uart0 {
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&uart0_gpio14>;
++	pinctrl-0 = <&uart0_gpio32 &uart0_ctsrts_gpio30>;
++	status = "okay";
++
++	bluetooth {
++		compatible = "brcm,bcm43438-bt";
++		max-speed = <2000000>;
++		shutdown-gpios = <&gpio 45 GPIO_ACTIVE_HIGH>;
++	};
++};
++
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_gpio14>;
+ 	status = "okay";
+ };
 -- 
 2.7.4
