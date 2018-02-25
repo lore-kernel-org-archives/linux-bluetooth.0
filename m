@@ -1,66 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH 3/4] ARM: dts: bcm2835-rpi-zero-w: Add bcm43438 serial
- slave
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1519567855-26105-4-git-send-email-stefan.wahren@i2se.com>
-Date: Sun, 25 Feb 2018 21:17:12 +0100
-Cc: Loic Poulain <loic.poulain@gmail.com>,
-        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Eric Anholt <eric@anholt.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        Phil Elwell <phil@raspberrypi.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-rpi-kernel@lists.infradead.org, devicetree@vger.kernel.org
-Message-Id: <84F7E645-59B4-4618-8C91-A5CD654E16A6@holtmann.org>
-References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
- <1519567855-26105-4-git-send-email-stefan.wahren@i2se.com>
-To: Stefan Wahren <stefan.wahren@i2se.com>
+Date: Sun, 25 Feb 2018 20:34:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Steve Brown <sbrown@cortland.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] mesh: prov-db: Correct json database parsing
+Message-ID: <20180225183431.GB14209@x1c.home>
+References: <20180216122001.6923-1-sbrown@cortland.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180216122001.6923-1-sbrown@cortland.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan,
+Hi Steve,
 
-> Add BCM43438 (bluetooth) as a serdev slave device of uart0 (pl011/ttyAMA0).
-> This allows to automatically insert the bcm43438 to the bluetooth
-> subsystem instead of relying on patched userspace helpers (hciattach).
-> 
-> In order to keep a debug UART we need to switch to uart1.
-> 
-> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+On Fri, Feb 16, 2018, Steve Brown wrote:
+>     "composition": {
+>         "cid": "0002",
+>         "pid": "0010",
+>         "vid": "0001",
+>         "crpl": "000a",
+>         "features": {
+>             "relay": false,
+>             "proxy": true,
+>             "friend": false,
+>             "lowPower": false
+>         },
+>         "elements": [
+>             {
+>                 "elementIndex": 0,
+>                 "location": "0001",
+>                 "models": ["0000", "0001", "1001"]
+>             }
+>         ]
+>     },
 > ---
-> arch/arm/boot/dts/bcm2835-rpi-zero-w.dts | 14 +++++++++++++-
-> 1 file changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
-> index cf53436..b7f79f1 100644
-> --- a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
-> +++ b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
-> @@ -131,6 +131,18 @@
-> 
-> &uart0 {
-> 	pinctrl-names = "default";
-> -	pinctrl-0 = <&uart0_gpio14>;
-> +	pinctrl-0 = <&uart0_gpio32 &uart0_ctsrts_gpio30>;
-> +	status = "okay";
-> +
-> +	bluetooth {
-> +		compatible = "brcm,bcm43438-bt";
-> +		max-speed = <2000000>;
-> +		shutdown-gpios = <&gpio 45 GPIO_ACTIVE_HIGH>;
-> +	};
-> +};
+>  mesh/prov-db.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
 
-is the shutdown GPIO working as expected with this hardware. So even module unload and reload works fine? Meaning we are getting back to the 115200 default baud rate on the UART? Or is this actually the device-wakeup GPIO?
+Both patches in this set have been applied. Thanks.
 
-Regards
-
-Marcel
-
+Johan
