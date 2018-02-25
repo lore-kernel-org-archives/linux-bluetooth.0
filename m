@@ -15,42 +15,47 @@ Cc: Lukas Wunner <lukas@wunner.de>,
 	linux-rpi-kernel@lists.infradead.org,
 	devicetree@vger.kernel.org,
 	Stefan Wahren <stefan.wahren@i2se.com>
-Subject: [PATCH 4/4] ARM: bcm2385_defconfig: Enable BT support for BCM43438
-Date: Sun, 25 Feb 2018 15:10:55 +0100
-Message-Id: <1519567855-26105-5-git-send-email-stefan.wahren@i2se.com>
+Subject: [PATCH 1/4] Bluetooth: hci_bcm: Make shutdown and device wake GPIO optional
+Date: Sun, 25 Feb 2018 15:10:52 +0100
+Message-Id: <1519567855-26105-2-git-send-email-stefan.wahren@i2se.com>
 In-Reply-To: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
 References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Raspberry Pi Zero W has an onboard BT chip (BCM43438). So enable the
-necessary HCI UART driver (requires serial device bus).
+According to the devicetree binding the shutdown and device wake
+GPIOs are optional. Since commit 3e81a4ca51a1 ("Bluetooth: hci_bcm:
+Mandate presence of shutdown and device wake GPIO") this driver
+won't probe anymore on Raspberry Pi 3 and Zero W (no device wake GPIO
+connected). So fix this regression by reverting this commit partially.
 
+Cc: Lukas Wunner <lukas@wunner.de>
+Fixes: 3e81a4ca51a1 ("Bluetooth: hci_bcm: Mandate presence of shutdown and device wake GPIO")
 Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
 ---
- arch/arm/configs/bcm2835_defconfig | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm/configs/bcm2835_defconfig b/arch/arm/configs/bcm2835_defconfig
-index 43dab48..8682b15 100644
---- a/arch/arm/configs/bcm2835_defconfig
-+++ b/arch/arm/configs/bcm2835_defconfig
-@@ -49,6 +49,9 @@ CONFIG_IP_PNP=y
- CONFIG_IP_PNP_DHCP=y
- CONFIG_NETWORK_SECMARK=y
- CONFIG_NETFILTER=y
-+CONFIG_BT=y
-+CONFIG_BT_HCIUART=m
-+CONFIG_BT_HCIUART_BCM=y
- CONFIG_CFG80211=y
- CONFIG_MAC80211=y
- CONFIG_DEVTMPFS=y
-@@ -74,6 +77,7 @@ CONFIG_SERIAL_8250_SHARE_IRQ=y
- CONFIG_SERIAL_8250_BCM2835AUX=y
- CONFIG_SERIAL_AMBA_PL011=y
- CONFIG_SERIAL_AMBA_PL011_CONSOLE=y
-+CONFIG_SERIAL_DEV_BUS=y
- CONFIG_TTY_PRINTK=y
- CONFIG_I2C_CHARDEV=y
- CONFIG_I2C_BCM2835=y
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 0438a64..f8728eb 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -922,12 +922,14 @@ static int bcm_get_resources(struct bcm_device *dev)
+ 
+ 	dev->clk = devm_clk_get(dev->dev, NULL);
+ 
+-	dev->device_wakeup = devm_gpiod_get(dev->dev, "device-wakeup",
+-					    GPIOD_OUT_LOW);
++	dev->device_wakeup = devm_gpiod_get_optional(dev->dev,
++						     "device-wakeup",
++						     GPIOD_OUT_LOW);
+ 	if (IS_ERR(dev->device_wakeup))
+ 		return PTR_ERR(dev->device_wakeup);
+ 
+-	dev->shutdown = devm_gpiod_get(dev->dev, "shutdown", GPIOD_OUT_LOW);
++	dev->shutdown = devm_gpiod_get_optional(dev->dev, "shutdown",
++						GPIOD_OUT_LOW);
+ 	if (IS_ERR(dev->shutdown))
+ 		return PTR_ERR(dev->shutdown);
+ 
 -- 
 2.7.4
