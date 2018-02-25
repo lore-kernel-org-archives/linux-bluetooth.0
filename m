@@ -1,60 +1,60 @@
-Return-Path: <foo00@h08.hostsharing.net>
-Date: Sun, 25 Feb 2018 16:15:05 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Stefan Wahren <stefan.wahren@i2se.com>
-Cc: Loic Poulain <loic.poulain@gmail.com>,
-	=?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
+Return-Path: <stefan.wahren@i2se.com>
+From: Stefan Wahren <stefan.wahren@i2se.com>
+To: Loic Poulain <loic.poulain@gmail.com>,
+	=?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis.oss@gmail.com>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	Eric Anholt <eric@anholt.net>, Rob Herring <robh+dt@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
+	Eric Anholt <eric@anholt.net>,
+	Rob Herring <robh+dt@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>
+Cc: Lukas Wunner <lukas@wunner.de>,
 	Phil Elwell <phil@raspberrypi.org>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH 1/4] Bluetooth: hci_bcm: Make shutdown and device wake
- GPIO optional
-Message-ID: <20180225151505.GA17726@wunner.de>
+	linux-rpi-kernel@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	Stefan Wahren <stefan.wahren@i2se.com>
+Subject: [PATCH 2/4] ARM: dts: bcm283x: Apply pull settings to Zero W relevant groups
+Date: Sun, 25 Feb 2018 15:10:53 +0100
+Message-Id: <1519567855-26105-3-git-send-email-stefan.wahren@i2se.com>
+In-Reply-To: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
 References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
- <1519567855-26105-2-git-send-email-stefan.wahren@i2se.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1519567855-26105-2-git-send-email-stefan.wahren@i2se.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Feb 25, 2018 at 03:10:52PM +0100, Stefan Wahren wrote:
-> According to the devicetree binding the shutdown and device wake
-> GPIOs are optional. Since commit 3e81a4ca51a1 ("Bluetooth: hci_bcm:
-> Mandate presence of shutdown and device wake GPIO") this driver
-> won't probe anymore on Raspberry Pi 3 and Zero W (no device wake GPIO
-> connected). So fix this regression by reverting this commit partially.
+Instead of keeping the firmware's pull settings, we better apply
+them via the devicetree pin control. Start with the RPi Zero W relevant
+first to keep the effort low.
 
-Okay when submitting 3e81a4ca51a1 I missed that gpiod_set_value()
-becomes a no-op if the gpio_desc is NULL, I thought it would oops.
+Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+---
+ arch/arm/boot/dts/bcm283x.dtsi | 3 +++
+ 1 file changed, 3 insertions(+)
 
-
-> -	dev->device_wakeup = devm_gpiod_get(dev->dev, "device-wakeup",
-> -					    GPIOD_OUT_LOW);
-> +	dev->device_wakeup = devm_gpiod_get_optional(dev->dev,
-> +						     "device-wakeup",
-> +						     GPIOD_OUT_LOW);
-
-The "device-wakeup" would still fit within 80 chars on the preceding line.
-Otherwise this is
-
-Reviewed-by: Lukas Wunner <lukas@wunner.de>
-
-Thanks,
-
-Lukas
-
->  	if (IS_ERR(dev->device_wakeup))
->  		return PTR_ERR(dev->device_wakeup);
->  
-> -	dev->shutdown = devm_gpiod_get(dev->dev, "shutdown", GPIOD_OUT_LOW);
-> +	dev->shutdown = devm_gpiod_get_optional(dev->dev, "shutdown",
-> +						GPIOD_OUT_LOW);
->  	if (IS_ERR(dev->shutdown))
->  		return PTR_ERR(dev->shutdown);
->  
+diff --git a/arch/arm/boot/dts/bcm283x.dtsi b/arch/arm/boot/dts/bcm283x.dtsi
+index 8d9a0df..1a50b67 100644
+--- a/arch/arm/boot/dts/bcm283x.dtsi
++++ b/arch/arm/boot/dts/bcm283x.dtsi
+@@ -223,6 +223,7 @@
+ 			gpclk2_gpio43: gpclk2_gpio43 {
+ 				brcm,pins = <43>;
+ 				brcm,function = <BCM2835_FSEL_ALT0>;
++				brcm,pull = <BCM2835_PUD_OFF>;
+ 			};
+ 
+ 			i2c0_gpio0: i2c0_gpio0 {
+@@ -335,10 +336,12 @@
+ 			uart0_ctsrts_gpio30: uart0_ctsrts_gpio30 {
+ 				brcm,pins = <30 31>;
+ 				brcm,function = <BCM2835_FSEL_ALT3>;
++				brcm,pull = <BCM2835_PUD_UP BCM2835_PUD_OFF>;
+ 			};
+ 			uart0_gpio32: uart0_gpio32 {
+ 				brcm,pins = <32 33>;
+ 				brcm,function = <BCM2835_FSEL_ALT3>;
++				brcm,pull = <BCM2835_PUD_OFF BCM2835_PUD_UP>;
+ 			};
+ 			uart0_gpio36: uart0_gpio36 {
+ 				brcm,pins = <36 37>;
+-- 
+2.7.4
