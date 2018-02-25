@@ -1,39 +1,60 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Sun, 25 Feb 2018 20:31:51 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Set auth method to just works for no mitm and
- displayonly
-Message-ID: <20180225183151.GA14209@x1c.home>
-References: <20180216133007.5224-1-grzegorz.kolodziejczyk@codecoup.pl>
- <97C7B48A-90EF-4327-8327-79F62358592F@holtmann.org>
+Return-Path: <foo00@h08.hostsharing.net>
+Date: Sun, 25 Feb 2018 16:15:05 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Stefan Wahren <stefan.wahren@i2se.com>
+Cc: Loic Poulain <loic.poulain@gmail.com>,
+	=?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Eric Anholt <eric@anholt.net>, Rob Herring <robh+dt@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Phil Elwell <phil@raspberrypi.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rpi-kernel@lists.infradead.org, devicetree@vger.kernel.org
+Subject: Re: [PATCH 1/4] Bluetooth: hci_bcm: Make shutdown and device wake
+ GPIO optional
+Message-ID: <20180225151505.GA17726@wunner.de>
+References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
+ <1519567855-26105-2-git-send-email-stefan.wahren@i2se.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <97C7B48A-90EF-4327-8327-79F62358592F@holtmann.org>
+In-Reply-To: <1519567855-26105-2-git-send-email-stefan.wahren@i2se.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Sun, Feb 25, 2018 at 03:10:52PM +0100, Stefan Wahren wrote:
+> According to the devicetree binding the shutdown and device wake
+> GPIOs are optional. Since commit 3e81a4ca51a1 ("Bluetooth: hci_bcm:
+> Mandate presence of shutdown and device wake GPIO") this driver
+> won't probe anymore on Raspberry Pi 3 and Zero W (no device wake GPIO
+> connected). So fix this regression by reverting this commit partially.
 
-On Fri, Feb 16, 2018, Marcel Holtmann wrote:
-> > --- a/net/bluetooth/smp.c
-> > +++ b/net/bluetooth/smp.c
-> > @@ -893,7 +893,8 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
-> > 
-> > 	/* Don't bother user space with no IO capabilities */
-> > 	if (smp->method == JUST_CFM &&
-> > -	    hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT)
-> > +	    (hcon->io_capability == HCI_IO_NO_INPUT_OUTPUT ||
-> > +	    hcon->io_capability == HCI_IO_DISPLAY_ONLY))
-> > 		smp->method = JUST_WORKS;
-> 
-> I leave this up to Johan to decide if this is our desired behavior or
-> not, but if we go ahead with that, then the comment above also needs
-> changing. And it also needs to be a more elaborate comment explaining
-> the reasoning.
+Okay when submitting 3e81a4ca51a1 I missed that gpiod_set_value()
+becomes a no-op if the gpio_desc is NULL, I thought it would oops.
 
-The change looks ok to me, however I agree that the code comment needs
-updating. Grzegorz, please fix that and send a v2.
 
-Johan
+> -	dev->device_wakeup = devm_gpiod_get(dev->dev, "device-wakeup",
+> -					    GPIOD_OUT_LOW);
+> +	dev->device_wakeup = devm_gpiod_get_optional(dev->dev,
+> +						     "device-wakeup",
+> +						     GPIOD_OUT_LOW);
+
+The "device-wakeup" would still fit within 80 chars on the preceding line.
+Otherwise this is
+
+Reviewed-by: Lukas Wunner <lukas@wunner.de>
+
+Thanks,
+
+Lukas
+
+>  	if (IS_ERR(dev->device_wakeup))
+>  		return PTR_ERR(dev->device_wakeup);
+>  
+> -	dev->shutdown = devm_gpiod_get(dev->dev, "shutdown", GPIOD_OUT_LOW);
+> +	dev->shutdown = devm_gpiod_get_optional(dev->dev, "shutdown",
+> +						GPIOD_OUT_LOW);
+>  	if (IS_ERR(dev->shutdown))
+>  		return PTR_ERR(dev->shutdown);
+>  
