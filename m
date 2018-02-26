@@ -2,234 +2,87 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH BlueZ 3/3] monitor: Add support for reading over J-Link
- RTT
+Subject: Re: Problem with re-loading hci_uart.ko on RPi3
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180222092055.22493-4-andrzej.kaczmarek@codecoup.pl>
-Date: Mon, 26 Feb 2018 14:59:40 +0100
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <949CB102-30F7-4001-808B-D117C2B47FD8@holtmann.org>
-References: <20180222092055.22493-1-andrzej.kaczmarek@codecoup.pl>
- <20180222092055.22493-4-andrzej.kaczmarek@codecoup.pl>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+In-Reply-To: <cd554013-24f1-eb73-f7af-8500141c0f44@i2se.com>
+Date: Mon, 26 Feb 2018 14:59:26 +0100
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Eric Anholt <eric@anholt.net>,
+        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <18BCD856-1823-4B79-BA77-BFD2663C236E@holtmann.org>
+References: <E4785C91-043A-4FF5-BFCA-5FADAFF81EE5@holtmann.org>
+ <1941091231.91372.1518962068876@email.1und1.de>
+ <414BD031-1C2F-4E27-BBB4-BEB9F71B099F@holtmann.org>
+ <76f76129-dd3e-2d17-635d-18a563d12aa8@gmail.com>
+ <f94056a0-ece7-c579-6b7d-d6589079d9e6@i2se.com>
+ <E39D4C6D-90AC-426A-BA98-02EE4F78E14C@holtmann.org>
+ <1290800239.153918.1519064893302@email.1und1.de>
+ <25DCE32D-EDDA-40AC-B75C-133F1338A5D9@holtmann.org>
+ <1332560657.154293.1519066383196@email.1und1.de>
+ <68D82C47-F3AE-4E03-A687-A13F4F927310@holtmann.org>
+ <2139019758.47998.1519309583130@email.1und1.de>
+ <A5A8F452-4D46-4608-91B7-94AD2D84EB2A@holtmann.org>
+ <1803977951.61304.1519322745731@email.1und1.de>
+ <AF2188B2-D523-42B1-A402-D95B2CE1C056@holtmann.org>
+ <1442521357.52785.1519393221115@email.1und1.de>
+ <EFCB8D8B-6C3E-49B7-99AD-4F6273ECA9F8@holtmann.org>
+ <cd554013-24f1-eb73-f7af-8500141c0f44@i2se.com>
+To: Stefan Wahren <stefan.wahren@i2se.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Stefan,
 
-> This patch adds support for reading data over J-Link RTT. It can be
-> used as replacement for TTY when reading from embedded devices since
-> it's much faster and does block a UART. Data format is the same as
-> for TTY. At the moment monitor over RTT is only supported by Apache
-> Mynewt project.
-> 
-> Reading data is done by polling RTT every 1 msec since there is no
-> blocking API to read something from RTT buffer.
+>>>>>>> After enabling bluetooth scanning i will see these error messages periodically:
+>>>>>>> 
+>>>>>>> [  815.939839] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>>> [  831.302476] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>>> [  847.303953] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>>> [  863.305284] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>>> [  879.306838] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>> I really need to hook up the error messages into the btmon output since then we can trace where these are coming from. Anyway, can you btmon -w trace.log from before loading the module and this error showing up.
+>>>>> I attached the log. According to dmesg this error happend only once during the trace.
+>>>> I will add bt_dev_err tracing to be include in btmon and that way we can figure out where that error happens. Or do you have a trace.log and dmesg -T where we can correlate it based on time.
+>>> Please look at this attachment and the following output (issue appears every 16 seconds after enabling scanning even if i use a baudrate of 115200):
+>>> 
+>>> 2018-02-23T14:12:52,454443+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:13:08,454601+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:13:24,453167+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:13:40,453414+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:13:56,453859+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:14:12,453864+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:14:28,453966+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:14:44,455381+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:15:00,452972+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:15:16,453733+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:15:32,453318+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:15:48,453495+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:16:04,452430+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:16:20,452531+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:16:36,452813+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 2018-02-23T14:16:52,453043+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>> 
+>>> I also noticed a different issue (only tested 4.15 yet), sometimes if i try to unload "modprobe -r hci_uart" the command blocks forever. There is no crash just the command hangs.
+>> so it seems that this matched up to the set scan enable command.
+> Hm, i only enabled the scanning once. Does bluetoothctl send this command periodically every 16 seconds?
 
-have you check with top or something that you are not causing massive load on your system by polling every 1 msec. And frankly such interfaces are horrible. How is the RTT actually exposed? Is that via HID reports or what. Have you tried usbmon and see if you see packets when using the library.
+yes, it does interleaved scanning on LE and then BR/EDR. Hence the switch from LE Set Scan Enable to Inquiry etc.
 
+>> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2        #415 [hci0] 2018-02-23 14:12:52.478963
+>>         Scanning: Disabled (0x00)
+>>         Filter duplicates: Disabled (0x00)
+>>> HCI Event: Command Complete (0x0e) plen 4                   #416 [hci0] 2018-02-23 14:12:52.483769
+>>       LE Set Scan Enable (0x08|0x000c) ncmd 1
+>>         Status: Success (0x00)
+>> 
+>> Does this happen with all baud rates or just with 115200?
 > 
-> To enable reading from RTT, J-Link and RTT configuration needs to be
-> passed via command line:
-> -J --jlink <device>,<interface>,<speed>,<serialno>
-> -R --rtt <address>,<area>,<buffer>
-> 
-> <device> - one of devices supported by J-Link (no default)
-> <interface> - only 'swd' supported for now (default: swd)
-> <speed> - interface speed (default: 1000)
-> <serialno> - emu serial number or 0 if not used (detault: 0)
-> <address> - RTT control block address (default: 0)
-> <area> - RTT control block search area length (default: 0)
-> <buffer> - RTT buffer name with monitor data stream (default: monitor)
-> 
-> Parameters with default values can be omitted.
-> 
-> For example, to read from default nRF52 device and look for RTT buffer
-> with default name over entire RAM area use:
-> btmon -J nrf52 -R 0x20000000,0x10000
-> ---
-> Makefile.tools    |  3 ++-
-> monitor/control.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> monitor/control.h |  1 +
-> monitor/main.c    | 30 ++++++++++++++++++++++++++----
-> 4 files changed, 79 insertions(+), 5 deletions(-)
-> 
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 71d083e71..7466633bb 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -59,9 +59,10 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
-> 				monitor/analyze.h monitor/analyze.c \
-> 				monitor/intel.h monitor/intel.c \
-> 				monitor/broadcom.h monitor/broadcom.c \
-> +				monitor/jlink.h monitor/jlink.c \
-> 				monitor/tty.h
-> monitor_btmon_LDADD = lib/libbluetooth-internal.la \
-> -				src/libshared-mainloop.la @UDEV_LIBS@
-> +				src/libshared-mainloop.la @UDEV_LIBS@ -ldl
-> endif
-> 
-> if TESTING
-> diff --git a/monitor/control.c b/monitor/control.c
-> index 98f414be9..73462be42 100644
-> --- a/monitor/control.c
-> +++ b/monitor/control.c
-> @@ -54,6 +54,7 @@
-> #include "ellisys.h"
-> #include "tty.h"
-> #include "control.h"
-> +#include "jlink.h"
-> 
-> static struct btsnoop *btsnoop_file = NULL;
-> static bool hcidump_fallback = false;
-> @@ -1376,6 +1377,55 @@ int control_tty(const char *path, unsigned int speed)
-> 	return 0;
-> }
-> 
-> +static void rtt_callback(int id, void *user_data)
-> +{
-> +	struct control_data *data = user_data;
-> +	ssize_t len;
-> +
-> +	do {
-> +		len = jlink_rtt_read(data->buf + data->offset,
-> +					sizeof(data->buf) - data->offset);
-> +		data->offset += len;
-> +		process_data(data);
-> +	} while (len > 0);
-> +
-> +	if (mainloop_modify_timeout(id, 1) < 0)
-> +		mainloop_exit_failure();
-> +}
-> +
-> +int control_rtt(char *jlink, char *rtt)
-> +{
-> +	struct control_data *data;
-> +
-> +	if (jlink_init() < 0) {
-> +		fprintf(stderr, "Failed to initialize J-Link library\n");
-> +		return -EIO;
-> +	}
-> +
-> +	if (jlink_connect(jlink) < 0) {
-> +		fprintf(stderr, "Failed to connect to target device\n");
-> +		return -ENODEV;
-> +	}
-> +
-> +	if (jlink_start_rtt(rtt) < 0) {
-> +		fprintf(stderr, "Failed to initialize RTT\n");
-> +		return -ENODEV;
-> +	}
-> +
-> +	printf("--- RTT opened ---\n”);
+> I've seen this at 115200 and 2000000 baud.
 
-What is this? Debugging code?
+This could be well our issue. I need to check if I can reproduce it.
 
-> +
-> +	data = new0(struct control_data, 1);
-> +	data->channel = HCI_CHANNEL_MONITOR;
-> +	data->fd = -1;
-> +
-> +	if (mainloop_add_timeout(1, rtt_callback, data, free_data) < 0) {
-> +		free(data);
-> +		return -EIO;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> bool control_writer(const char *path)
-> {
-> 	btsnoop_file = btsnoop_create(path, BTSNOOP_FORMAT_MONITOR);
-> diff --git a/monitor/control.h b/monitor/control.h
-> index 630a852e4..c315eb7db 100644
-> --- a/monitor/control.h
-> +++ b/monitor/control.h
-> @@ -28,6 +28,7 @@ bool control_writer(const char *path);
-> void control_reader(const char *path);
-> void control_server(const char *path);
-> int control_tty(const char *path, unsigned int speed);
-> +int control_rtt(char *jlink, char *rtt);
-> int control_tracing(void);
-> void control_disable_decoding(void);
-> 
-> diff --git a/monitor/main.c b/monitor/main.c
-> index 3e61a4661..27132e3c3 100644
-> --- a/monitor/main.c
-> +++ b/monitor/main.c
-> @@ -72,6 +72,10 @@ static void usage(void)
-> 		"\t-S, --sco              Dump SCO traffic\n"
-> 		"\t-A, --a2dp             Dump A2DP stream traffic\n"
-> 		"\t-E, --ellisys [ip]     Send Ellisys HCI Injection\n"
-> +		"\t-R  --rtt <device>,[<interface>],[<speed>],[<serialno>]\n"
-> +		"\t                       Read data from RTT\n"
-> +		"\t-C  --rtt-cb [<address>],[<area>],[<name>]\n"
-> +		"\t                       RTT control block parameters\n"
-> 		"\t-h, --help             Show help options\n");
-> }
-> 
-> @@ -89,6 +93,8 @@ static const struct option main_options[] = {
-> 	{ "sco",     no_argument,	NULL, 'S' },
-> 	{ "a2dp",    no_argument,	NULL, 'A' },
-> 	{ "ellisys", required_argument, NULL, 'E' },
-> +	{ "jlink",   required_argument, NULL, 'J' },
-> +	{ "rtt",     required_argument, NULL, 'R' },
-> 	{ "todo",    no_argument,       NULL, '#' },
-> 	{ "version", no_argument,       NULL, 'v' },
-> 	{ "help",    no_argument,       NULL, 'h' },
-> @@ -106,6 +112,8 @@ int main(int argc, char *argv[])
-> 	unsigned int tty_speed = B115200;
-> 	unsigned short ellisys_port = 0;
-> 	const char *str;
-> +	char *jlink = NULL;
-> +	char *rtt = NULL;
-> 	int exit_status;
-> 	sigset_t mask;
-> 
-> @@ -117,7 +125,7 @@ int main(int argc, char *argv[])
-> 		int opt;
-> 		struct sockaddr_un addr;
-> 
-> -		opt = getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:vh",
-> +		opt = getopt_long(argc, argv, "d:r:w:a:s:p:i:tTSAE:J:R:vh",
-> 						main_options, NULL);
-> 		if (opt < 0)
-> 			break;
-> @@ -182,6 +190,12 @@ int main(int argc, char *argv[])
-> 			ellisys_server = optarg;
-> 			ellisys_port = 24352;
-> 			break;
-> +		case 'J':
-> +			jlink = optarg;
-> +			break;
-> +		case 'R':
-> +			rtt = optarg;
-> +			break;
-> 		case '#':
-> 			packet_todo();
-> 			lmp_todo();
-> @@ -240,11 +254,19 @@ int main(int argc, char *argv[])
-> 	if (ellisys_server)
-> 		ellisys_enable(ellisys_server, ellisys_port);
-> 
-> -	if (!tty && control_tracing() < 0)
-> +	if (tty && jlink)
-> 		return EXIT_FAILURE;
-> 
-> -	if (tty && control_tty(tty, tty_speed) < 0)
-> -		return EXIT_FAILURE;
-> +	if (tty) {
-> +		if (control_tty(tty, tty_speed) < 0)
-> +			return EXIT_FAILURE;
-> +	} else if (jlink) {
-> +		if (control_rtt(jlink, rtt) < 0)
-> +			return EXIT_FAILURE;
-> +	} else {
-> +		if (control_tracing() < 0)
-> +			return EXIT_FAILURE;
-> +	}
-
-This is getting to complicated and needs a cleanup first.
+I assume you use bluetoothctl for enabling scanning. Wonder what happens if you do it only on LE. So “menu scan” and then “transport le”. I think it is really just the switch from LE to BR/EDR where this happens.
 
 Regards
 
