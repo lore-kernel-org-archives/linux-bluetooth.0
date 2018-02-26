@@ -1,82 +1,418 @@
-Return-Path: <stefan.wahren@i2se.com>
-Subject: Re: Problem with re-loading hci_uart.ko on RPi3
-To: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Eric Anholt <eric@anholt.net>,
- =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
- Bluez mailing list <linux-bluetooth@vger.kernel.org>
-References: <E4785C91-043A-4FF5-BFCA-5FADAFF81EE5@holtmann.org>
- <1941091231.91372.1518962068876@email.1und1.de>
- <414BD031-1C2F-4E27-BBB4-BEB9F71B099F@holtmann.org>
- <76f76129-dd3e-2d17-635d-18a563d12aa8@gmail.com>
- <f94056a0-ece7-c579-6b7d-d6589079d9e6@i2se.com>
- <E39D4C6D-90AC-426A-BA98-02EE4F78E14C@holtmann.org>
- <1290800239.153918.1519064893302@email.1und1.de>
- <25DCE32D-EDDA-40AC-B75C-133F1338A5D9@holtmann.org>
- <1332560657.154293.1519066383196@email.1und1.de>
- <68D82C47-F3AE-4E03-A687-A13F4F927310@holtmann.org>
- <2139019758.47998.1519309583130@email.1und1.de>
- <A5A8F452-4D46-4608-91B7-94AD2D84EB2A@holtmann.org>
- <1803977951.61304.1519322745731@email.1und1.de>
- <AF2188B2-D523-42B1-A402-D95B2CE1C056@holtmann.org>
- <1442521357.52785.1519393221115@email.1und1.de>
- <EFCB8D8B-6C3E-49B7-99AD-4F6273ECA9F8@holtmann.org>
-From: Stefan Wahren <stefan.wahren@i2se.com>
-Message-ID: <cd554013-24f1-eb73-f7af-8500141c0f44@i2se.com>
-Date: Mon, 26 Feb 2018 10:36:31 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 1/3] tools: Add initial code for btmon-logger
+Date: Mon, 26 Feb 2018 09:19:19 +0100
+Message-ID: <35341977.FDiZz3oEAx@ix>
+In-Reply-To: <20180219134608.14189-1-szymon.janc@codecoup.pl>
+References: <20180219134608.14189-1-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
-In-Reply-To: <EFCB8D8B-6C3E-49B7-99AD-4F6273ECA9F8@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Monday, 19 February 2018 14:46:06 CET Szymon Janc wrote:
+> This is intended for use for automated logging or unatrended systems.
+> It doesn't contain any packet decoding functionality which results
+> in much smaller binary.
+> ---
+>  .gitignore           |   1 +
+>  Makefile.tools       |   5 +
+>  tools/btmon-logger.c | 350
+> +++++++++++++++++++++++++++++++++++++++++++++++++++ 3 files changed, 356
+> insertions(+)
+>  create mode 100644 tools/btmon-logger.c
+> 
+> diff --git a/.gitignore b/.gitignore
+> index 47808059b..33ec66048 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -118,6 +118,7 @@ tools/btconfig
+>  tools/btmgmt
+>  tools/btsnoop
+>  tools/btpclient
+> +tools/btmon-logger
+>  peripheral/btsensor
+>  monitor/btmon
+>  emulator/btvirt
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 71d083e71..ba4b9b7d7 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -62,6 +62,11 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+>  				monitor/tty.h
+>  monitor_btmon_LDADD = lib/libbluetooth-internal.la \
+>  				src/libshared-mainloop.la @UDEV_LIBS@
+> +
+> +noinst_PROGRAMS += tools/btmon-logger
+> +
+> +tools_btmon_logger_SOURCES = tools/btmon-logger.c lib/monitor.h
+> +tools_btmon_logger_LDADD = src/libshared-mainloop.la
+>  endif
+> 
+>  if TESTING
+> diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
+> new file mode 100644
+> index 000000000..9787e6b03
+> --- /dev/null
+> +++ b/tools/btmon-logger.c
+> @@ -0,0 +1,350 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2017-2018  Codecoup
+> + *  Copyright (C) 2011-2014  Intel Corporation
+> + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 
+> USA + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <limits.h>
+> +#include <string.h>
+> +#include <time.h>
+> +#include <getopt.h>
+> +#include <unistd.h>
+> +#include <sys/socket.h>
+> +
+> +#include "lib/bluetooth.h"
+> +#include "lib/hci.h"
+> +
+> +#include "src/shared/util.h"
+> +#include "src/shared/mainloop.h"
+> +#include "src/shared/btsnoop.h"
+> +
+> +#define MONITOR_INDEX_NONE 0xffff
+> +
+> +struct monitor_hdr {
+> +	uint16_t opcode;
+> +	uint16_t index;
+> +	uint16_t len;
+> +} __attribute__ ((packed));
+> +
+> +struct btsnoop_hdr {
+> +	uint8_t		id[8];		/* Identification Pattern */
+> +	uint32_t	version;	/* Version Number = 1 */
+> +	uint32_t	type;		/* Datalink Type */
+> +} __attribute__ ((packed));
+> +#define BTSNOOP_HDR_SIZE (sizeof(struct btsnoop_hdr))
+> +
+> +struct btsnoop_pkt {
+> +	uint32_t	size;		/* Original Length */
+> +	uint32_t	len;		/* Included Length */
+> +	uint32_t	flags;		/* Packet Flags */
+> +	uint32_t	drops;		/* Cumulative Drops */
+> +	uint64_t	ts;		/* Timestamp microseconds */
+> +	uint8_t		data[0];	/* Packet Data */
+> +} __attribute__ ((packed));
+> +#define BTSNOOP_PKT_SIZE (sizeof(struct btsnoop_pkt))
+> +
+> +static const char *path = ".";
+> +static const char *prefix = "hci";
+> +static bool suffix_date = false;
+> +static size_t write_limit = 0;
+> +static size_t write_size = 0;
+> +
+> +static struct btsnoop *btsnoop_file = NULL;
+> +
+> +static bool create_btsnoop(void)
+> +{
+> +	static char real_path[FILENAME_MAX];
+> +	struct timeval tv;
+> +
+> +	gettimeofday(&tv, NULL);
+> +
+> +	if (suffix_date) {
+> +		struct tm tm;
+> +
+> +		localtime_r(&tv.tv_sec, &tm);
+> +
+> +		snprintf(real_path, FILENAME_MAX,
+> +				"%s/%s_%04d-%02d-%02d_%02d:%02d:%02d.btsnoop",
+> +				path, prefix, tm.tm_year + 1900, tm.tm_mon + 1,
+> +				tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+> +	} else {
+> +		static unsigned int cnt = 0;
+> +
+> +		snprintf(real_path, sizeof(real_path), "%s/%s_%u.btsnoop",
+> +							path, prefix, cnt++);
+> +	}
+> +
+> +	btsnoop_file = btsnoop_create(real_path, BTSNOOP_FORMAT_MONITOR);
+> +	if(!btsnoop_file)
+> +		return false;
+> +
+> +	write_size = BTSNOOP_HDR_SIZE;
+> +
+> +	return true;
+> +}
+> +
+> +static void rotate_btsnoop(uint16_t pktlen)
+> +{
+> +	write_size += BTSNOOP_PKT_SIZE + pktlen;
+> +
+> +	if (write_size <= write_limit)
+> +		return;
+> +
+> +	btsnoop_unref(btsnoop_file);
+> +
+> +	if (!create_btsnoop()) {
+> +		fprintf(stderr, "Failed to create btsnoop file, exiting.\n");
+> +		mainloop_quit();
+> +		return;
+> +	}
+> +
+> +	write_size += BTSNOOP_PKT_SIZE + pktlen;
+> +}
+> +
+> +static void data_callback(int fd, uint32_t events, void *user_data)
+> +{
+> +	uint8_t buf[BTSNOOP_MAX_PACKET_SIZE];
+> +	unsigned char control[64];
+> +	struct monitor_hdr hdr;
+> +	struct msghdr msg;
+> +	struct iovec iov[2];
+> +
+> +	if (events & (EPOLLERR | EPOLLHUP)) {
+> +		mainloop_remove_fd(fd);
+> +		return;
+> +	}
+> +
+> +	iov[0].iov_base = &hdr;
+> +	iov[0].iov_len = sizeof(hdr);
+> +	iov[1].iov_base = buf;
+> +	iov[1].iov_len = sizeof(buf);
+> +
+> +	memset(&msg, 0, sizeof(msg));
+> +	msg.msg_iov = iov;
+> +	msg.msg_iovlen = 2;
+> +	msg.msg_control = control;
+> +	msg.msg_controllen = sizeof(control);
+> +
+> +	while (1) {
+> +		struct cmsghdr *cmsg;
+> +		struct timeval *tv = NULL;
+> +		struct timeval ctv;
+> +		uint16_t opcode, index, pktlen;
+> +		ssize_t len;
+> +
+> +		len = recvmsg(fd, &msg, MSG_DONTWAIT);
+> +		if (len < 0)
+> +			break;
+> +
+> +		if (len < (ssize_t) sizeof(hdr))
+> +			break;
+> +
+> +		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
+> +					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
+> +			if (cmsg->cmsg_level != SOL_SOCKET)
+> +				continue;
+> +
+> +			if (cmsg->cmsg_type == SCM_TIMESTAMP) {
+> +				memcpy(&ctv, CMSG_DATA(cmsg), sizeof(ctv));
+> +				tv = &ctv;
+> +			}
+> +		}
+> +
+> +		opcode = le16_to_cpu(hdr.opcode);
+> +		index  = le16_to_cpu(hdr.index);
+> +		pktlen = le16_to_cpu(hdr.len);
+> +
+> +		if (write_limit)
+> +			rotate_btsnoop(pktlen);
+> +
+> +		btsnoop_write_hci(btsnoop_file, tv, index, opcode, 0, buf,
+> +									pktlen);
+> +	}
+> +}
+> +
+> +static bool open_monitor_channel(void)
+> +{
+> +	struct sockaddr_hci addr;
+> +	int fd, opt = 1;
+> +
+> +	fd = socket(AF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC, BTPROTO_HCI);
+> +	if (fd < 0) {
+> +		perror("Failed to open monitor channel");
+> +		return false;
+> +	}
+> +
+> +	memset(&addr, 0, sizeof(addr));
+> +	addr.hci_family = AF_BLUETOOTH;
+> +	addr.hci_dev = HCI_DEV_NONE;
+> +	addr.hci_channel = HCI_CHANNEL_MONITOR;
+> +
+> +	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+> +		perror("Failed to bind monitor channel");
+> +		close(fd);
+> +		return false;
+> +	}
+> +
+> +	if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMP, &opt, sizeof(opt)) < 0) {
+> +		perror("Failed to enable timestamps");
+> +		close(fd);
+> +		return false;
+> +	}
+> +
+> +	if (setsockopt(fd, SOL_SOCKET, SO_PASSCRED, &opt, sizeof(opt)) < 0) {
+> +		perror("Failed to enable credentials");
+> +		close(fd);
+> +		return false;
+> +	}
+> +
+> +	mainloop_add_fd(fd, EPOLLIN, data_callback, NULL, NULL);
+> +
+> +	return true;
+> +}
+> +
+> +static void signal_callback(int signum, void *user_data)
+> +{
+> +	switch (signum) {
+> +	case SIGINT:
+> +	case SIGTERM:
+> +		mainloop_quit();
+> +		break;
+> +	}
+> +}
+> +
+> +static void usage(void)
+> +{
+> +	printf("btmon-logger - Bluetooth monitor\n"
+> +		"Usage:\n");
+> +	printf("\tbtmon-logger [options]\n");
+> +	printf("options:\n"
+> +		"\t-p, --path <path>      Save traces in specified path\n"
+> +		"\t-P, --prefix <name>    Prefix filenames (defaults: \"hci\"\n"
+> +		"\t-d, --date             Suffix filenames with date\n"
+> +		"\t-l, --limit <limit>    Limit btsnoop file size (rotate)\n"
+> +		"\t-v, --version          Show version\n"
+> +		"\t-h, --help             Show help options\n");
+> +}
+> +
+> +static const struct option main_options[] = {
+> +	{ "path",	required_argument,	NULL, 'p' },
+> +	{ "prefix",	required_argument,	NULL, 'P' },
+> +	{ "date",	no_argument,		NULL, 'd' },
+> +	{ "limit",	required_argument,	NULL, 'l' },
+> +	{ "version",	no_argument,		NULL, 'v' },
+> +	{ "help",	no_argument,		NULL, 'h' },
+> +	{ }
+> +};
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	sigset_t mask;
+> +	char *endptr;
+> +	int ret;
+> +
+> +	mainloop_init();
+> +
+> +	while (true) {
+> +		int opt;
+> +
+> +		opt = getopt_long(argc, argv, "p:P:dl:Lvh", main_options,
+> +									NULL);
+> +		if (opt < 0)
+> +			break;
+> +
+> +		switch (opt) {
+> +		case 'p':
+> +			path = optarg;
+> +			if (strlen(path) > PATH_MAX) {
+> +				fprintf(stderr, "Too long path\n");
+> +				return EXIT_FAILURE;
+> +			}
+> +			break;
+> +		case 'P':
+> +			prefix = optarg;
+> +			break;
+> +		case 'd':
+> +			suffix_date = true;
+> +			break;
+> +		case 'l':
+> +			write_limit = strtoul(optarg, &endptr, 10);
+> +
+> +			if (write_limit == ULONG_MAX) {
+> +				fprintf(stderr, "Invalid limit\n");
+> +				return EXIT_FAILURE;
+> +			}
+> +
+> +			if (*endptr != '\0') {
+> +				if (*endptr == 'K' || *endptr == 'k') {
+> +					write_limit *= 1024;
+> +				} else if (*endptr == 'M' || *endptr == 'm') {
+> +					write_limit *= 1024 * 1024;
+> +				} else {
+> +					fprintf(stderr, "Invalid limit\n");
+> +					return EXIT_FAILURE;
+> +				}
+> +			}
+> +
+> +			/* limit this to reasonable size */
+> +			if (write_limit < 4096) {
+> +				fprintf(stderr, "Too small limit value\n");
+> +				return EXIT_FAILURE;
+> +			}
+> +			break;
+> +		case 'v':
+> +			printf("%s\n", VERSION);
+> +			return EXIT_SUCCESS;
+> +		case 'h':
+> +			usage();
+> +			return EXIT_SUCCESS;
+> +		default:
+> +			return EXIT_FAILURE;
+> +		}
+> +	}
+> +
+> +	if (argc - optind > 0) {
+> +		fprintf(stderr, "Invalid command line parameters\n");
+> +		return EXIT_FAILURE;
+> +	}
+> +
+> +	if (!open_monitor_channel() || !create_btsnoop())
+> +		return EXIT_FAILURE;
+> +
+> +	sigemptyset(&mask);
+> +	sigaddset(&mask, SIGINT);
+> +	sigaddset(&mask, SIGTERM);
+> +
+> +	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
+> +
+> +	printf("Bluetooth monitor ver %s\n", VERSION);
+> +
+> +	ret = mainloop_run();
+> +
+> +	btsnoop_unref(btsnoop_file);
+> +
+> +	return ret;
+> +}
 
-Am 26.02.2018 um 09:13 schrieb Marcel Holtmann:
-> Hi Stefan,
->
->>>>>> After enabling bluetooth scanning i will see these error messages periodically:
->>>>>>
->>>>>> [  815.939839] Bluetooth: hci0: last event is not cmd complete (0x0f)
->>>>>> [  831.302476] Bluetooth: hci0: last event is not cmd complete (0x0f)
->>>>>> [  847.303953] Bluetooth: hci0: last event is not cmd complete (0x0f)
->>>>>> [  863.305284] Bluetooth: hci0: last event is not cmd complete (0x0f)
->>>>>> [  879.306838] Bluetooth: hci0: last event is not cmd complete (0x0f)
->>>>> I really need to hook up the error messages into the btmon output since then we can trace where these are coming from. Anyway, can you btmon -w trace.log from before loading the module and this error showing up.
->>>> I attached the log. According to dmesg this error happend only once during the trace.
->>> I will add bt_dev_err tracing to be include in btmon and that way we can figure out where that error happens. Or do you have a trace.log and dmesg -T where we can correlate it based on time.
->> Please look at this attachment and the following output (issue appears every 16 seconds after enabling scanning even if i use a baudrate of 115200):
->>
->> 2018-02-23T14:12:52,454443+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:13:08,454601+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:13:24,453167+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:13:40,453414+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:13:56,453859+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:14:12,453864+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:14:28,453966+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:14:44,455381+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:15:00,452972+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:15:16,453733+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:15:32,453318+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:15:48,453495+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:16:04,452430+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:16:20,452531+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:16:36,452813+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->> 2018-02-23T14:16:52,453043+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
->>
->> I also noticed a different issue (only tested 4.15 yet), sometimes if i try to unload "modprobe -r hci_uart" the command blocks forever. There is no crash just the command hangs.
-> so it seems that this matched up to the set scan enable command.
-Hm, i only enabled the scanning once. Does bluetoothctl send this 
-command periodically every 16 seconds?
->
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2        #415 [hci0] 2018-02-23 14:12:52.478963
->          Scanning: Disabled (0x00)
->          Filter duplicates: Disabled (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                   #416 [hci0] 2018-02-23 14:12:52.483769
->        LE Set Scan Enable (0x08|0x000c) ncmd 1
->          Status: Success (0x00)
->
-> Does this happen with all baud rates or just with 115200?
 
-I've seen this at 115200 and 2000000 baud.
+Any comments on this?
 
-Stefan
+-- 
+pozdrawiam
+Szymon Janc
+
+
