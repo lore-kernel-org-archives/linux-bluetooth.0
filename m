@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 04/14] shared/shell: Do not quit immediatelly on noninteractive mode
-Date: Mon, 26 Feb 2018 17:53:26 +0200
-Message-Id: <20180226155336.25875-5-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 02/14] shared/shell: Fix not reseting optind
+Date: Mon, 26 Feb 2018 17:53:24 +0200
+Message-Id: <20180226155336.25875-3-luiz.dentz@gmail.com>
 In-Reply-To: <20180226155336.25875-1-luiz.dentz@gmail.com>
 References: <20180226155336.25875-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,28 +11,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The command handler shall be able to tell when it is done by calling
-bt_shell_noninteractive_quit.
+Not reseting optind may crash the tool if getopt and variants are
+called a second time.
 ---
- src/shared/shell.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ src/shared/shell.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/src/shared/shell.c b/src/shared/shell.c
-index e82307d6f..eae4ffbdd 100644
+index 9ecb4c7be..0653c0ea1 100644
 --- a/src/shared/shell.c
 +++ b/src/shared/shell.c
-@@ -951,10 +951,7 @@ bool bt_shell_attach(int fd)
- 	if (data.mode) {
- 		shell_exec(data.argc, data.argv);
+@@ -817,6 +817,7 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
  
--		if (!data.timeout) {
--			bt_shell_detach();
--			mainloop_quit();
--		} else
-+		if (data.timeout)
- 			timeout_add(data.timeout * 1000, shell_quit, NULL,
- 								NULL);
- 	}
+ 	data.argc = argc - optind;
+ 	data.argv = argv + optind;
++	optind = 0;
+ 	data.mode = (data.argc > 0);
+ 
+ 	if (data.mode)
 -- 
 2.14.3
 
