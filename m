@@ -1,71 +1,82 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Mon, 26 Feb 2018 12:43:07 +0100
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2018-02-26
-Message-ID: <20180226114307.GA10612@x1c>
+Return-Path: <stefan.wahren@i2se.com>
+Subject: Re: Problem with re-loading hci_uart.ko on RPi3
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Eric Anholt <eric@anholt.net>,
+ =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
+ Bluez mailing list <linux-bluetooth@vger.kernel.org>
+References: <E4785C91-043A-4FF5-BFCA-5FADAFF81EE5@holtmann.org>
+ <1941091231.91372.1518962068876@email.1und1.de>
+ <414BD031-1C2F-4E27-BBB4-BEB9F71B099F@holtmann.org>
+ <76f76129-dd3e-2d17-635d-18a563d12aa8@gmail.com>
+ <f94056a0-ece7-c579-6b7d-d6589079d9e6@i2se.com>
+ <E39D4C6D-90AC-426A-BA98-02EE4F78E14C@holtmann.org>
+ <1290800239.153918.1519064893302@email.1und1.de>
+ <25DCE32D-EDDA-40AC-B75C-133F1338A5D9@holtmann.org>
+ <1332560657.154293.1519066383196@email.1und1.de>
+ <68D82C47-F3AE-4E03-A687-A13F4F927310@holtmann.org>
+ <2139019758.47998.1519309583130@email.1und1.de>
+ <A5A8F452-4D46-4608-91B7-94AD2D84EB2A@holtmann.org>
+ <1803977951.61304.1519322745731@email.1und1.de>
+ <AF2188B2-D523-42B1-A402-D95B2CE1C056@holtmann.org>
+ <1442521357.52785.1519393221115@email.1und1.de>
+ <EFCB8D8B-6C3E-49B7-99AD-4F6273ECA9F8@holtmann.org>
+From: Stefan Wahren <stefan.wahren@i2se.com>
+Message-ID: <cd554013-24f1-eb73-f7af-8500141c0f44@i2se.com>
+Date: Mon, 26 Feb 2018 10:36:31 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="YZ5djTAD1cGYuMQK"
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <EFCB8D8B-6C3E-49B7-99AD-4F6273ECA9F8@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcel,
 
---YZ5djTAD1cGYuMQK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Am 26.02.2018 um 09:13 schrieb Marcel Holtmann:
+> Hi Stefan,
+>
+>>>>>> After enabling bluetooth scanning i will see these error messages periodically:
+>>>>>>
+>>>>>> [  815.939839] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>> [  831.302476] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>> [  847.303953] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>> [  863.305284] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>> [  879.306838] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>> I really need to hook up the error messages into the btmon output since then we can trace where these are coming from. Anyway, can you btmon -w trace.log from before loading the module and this error showing up.
+>>>> I attached the log. According to dmesg this error happend only once during the trace.
+>>> I will add bt_dev_err tracing to be include in btmon and that way we can figure out where that error happens. Or do you have a trace.log and dmesg -T where we can correlate it based on time.
+>> Please look at this attachment and the following output (issue appears every 16 seconds after enabling scanning even if i use a baudrate of 115200):
+>>
+>> 2018-02-23T14:12:52,454443+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:13:08,454601+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:13:24,453167+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:13:40,453414+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:13:56,453859+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:14:12,453864+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:14:28,453966+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:14:44,455381+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:15:00,452972+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:15:16,453733+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:15:32,453318+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:15:48,453495+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:16:04,452430+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:16:20,452531+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:16:36,452813+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>> 2018-02-23T14:16:52,453043+0100 Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>
+>> I also noticed a different issue (only tested 4.15 yet), sometimes if i try to unload "modprobe -r hci_uart" the command blocks forever. There is no crash just the command hangs.
+> so it seems that this matched up to the set scan enable command.
+Hm, i only enabled the scanning once. Does bluetoothctl send this 
+command periodically every 16 seconds?
+>
+> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2        #415 [hci0] 2018-02-23 14:12:52.478963
+>          Scanning: Disabled (0x00)
+>          Filter duplicates: Disabled (0x00)
+>> HCI Event: Command Complete (0x0e) plen 4                   #416 [hci0] 2018-02-23 14:12:52.483769
+>        LE Set Scan Enable (0x08|0x000c) ncmd 1
+>          Status: Success (0x00)
+>
+> Does this happen with all baud rates or just with 115200?
 
-Hi Dave,
+I've seen this at 115200 and 2000000 baud.
 
-Here are a two Bluetooth driver fixes for the 4.16 kernel.
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
----
-The following changes since commit 9cb9c07d6b0c5fd97d83b8ab14d7e308ba4b612f:
-
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net (2018-02-23 15:14:17 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to ab2f336cb7e629de74d8af06bcaf6b15e4230e19:
-
-  Bluetooth: hci_bcm: Make shutdown and device wake GPIO optional (2018-02-25 21:08:28 +0100)
-
-----------------------------------------------------------------
-Hans de Goede (1):
-      Bluetooth: btusb: Use DMI matching for QCA reset_resume quirking
-
-Stefan Wahren (1):
-      Bluetooth: hci_bcm: Make shutdown and device wake GPIO optional
-
- drivers/bluetooth/btusb.c   | 25 +++++++++++++++++++------
- drivers/bluetooth/hci_bcm.c |  7 ++++---
- 2 files changed, 23 insertions(+), 9 deletions(-)
-
---YZ5djTAD1cGYuMQK
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJak/LLAAoJECQj9vv5qNQSpnYQAKfc8+UH6vgD59bJe4S/ZKXK
-Fuo3GJPNev4si6fVZMiEY1I/X504JWNd5Zrk36U7jMcCBcwwixyGoFlTFrDa5rDF
-x54eyI25GVbt/mmyEGU0Lb9J3DcjOtfeCs0M8lXvEjU1jeayF2rFa+2UoJEO+fN1
-U5I+XoD0Ownrks/BEsmPrZMTF+1PJAhyEDD8F4qp4/Im7oCNzFDXF2EcNdfyH58W
-ok73nuvgbuM5UT55bDglwMxPtk++pv+srf/NIpHykfF8GveTXbucdYI0QiH2rvPC
-lG8S15h//MwRGw3Pbwh0CMN2tCwJ+v0SEkzXA8j34kaPYF8SJENHOev1TEcMpFTI
-rZEgenCME56UZwLmWlFkhIo7sK4y7/44P+mrwdqlObPbXm5T+w546Utofb7WeXD/
-lOUS4eVL/DXkCgabRnrx7RePtAO9C+mxo0XS881DTzkaxgeOAoyD7fL5vHC6leun
-xfFUSP5nkOQkEzoMBpKEz37YVKLbiYVXwOelzq9tGdbJ6rhTCkjhdTQzkdaaR6iq
-/w/XTRbMsJjL4GX1FIQtJRVf6UlB66dIO5HhAmLYIpX/3PbkrQSePeq149gOFUDN
-Z4eUuXtyZ/YSSF0yQfp/pCU94ONxJatpou+h3pxIvbXcrfJmNDFdSaVrmm9B0aFv
-IcVDwkkkT3Ree2nYT3+I
-=utKz
------END PGP SIGNATURE-----
-
---YZ5djTAD1cGYuMQK--
+Stefan
