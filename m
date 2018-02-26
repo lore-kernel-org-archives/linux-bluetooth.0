@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 03/14] shared/shell: Fix timeout parameter
-Date: Mon, 26 Feb 2018 17:53:25 +0200
-Message-Id: <20180226155336.25875-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 04/14] shared/shell: Do not quit immediatelly on noninteractive mode
+Date: Mon, 26 Feb 2018 17:53:26 +0200
+Message-Id: <20180226155336.25875-5-luiz.dentz@gmail.com>
 In-Reply-To: <20180226155336.25875-1-luiz.dentz@gmail.com>
 References: <20180226155336.25875-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Fix help message and add proper optstr modifier so both -t/--timeout
-work properly.
+The command handler shall be able to tell when it is done by calling
+bt_shell_noninteractive_quit.
 ---
- src/shared/shell.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/shared/shell.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
 diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 0653c0ea1..e82307d6f 100644
+index e82307d6f..eae4ffbdd 100644
 --- a/src/shared/shell.c
 +++ b/src/shared/shell.c
-@@ -768,7 +768,7 @@ static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
- 	for (i = 0; opt && opt->options[i].name; i++)
- 		printf("\t--%s \t%s\n", opt->options[i].name, opt->help[i]);
+@@ -951,10 +951,7 @@ bool bt_shell_attach(int fd)
+ 	if (data.mode) {
+ 		shell_exec(data.argc, data.argv);
  
--	printf("\t--timeout \t\tTimeout in seconds for non-interactive mode\n"
-+	printf("\t--timeout \tTimeout in seconds for non-interactive mode\n"
- 		"\t--version \tDisplay version\n"
- 		"\t--help \t\tDisplay help\n");
- }
-@@ -787,9 +787,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 	if (opt) {
- 		memcpy(options + offset, opt->options,
- 				sizeof(struct option) * opt->optno);
--		snprintf(optstr, sizeof(optstr), "+hv%s", opt->optstr);
-+		snprintf(optstr, sizeof(optstr), "+hvt:%s", opt->optstr);
- 	} else
--		snprintf(optstr, sizeof(optstr), "+hv");
-+		snprintf(optstr, sizeof(optstr), "+hvt:");
- 
- 	while ((c = getopt_long(argc, argv, optstr, options, &index)) != -1) {
- 		switch (c) {
+-		if (!data.timeout) {
+-			bt_shell_detach();
+-			mainloop_quit();
+-		} else
++		if (data.timeout)
+ 			timeout_add(data.timeout * 1000, shell_quit, NULL,
+ 								NULL);
+ 	}
 -- 
 2.14.3
 
