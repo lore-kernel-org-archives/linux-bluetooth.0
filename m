@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 01/14] shared/shell: Add bt_shell_{noninteractive_}quit
-Date: Mon, 26 Feb 2018 17:53:23 +0200
-Message-Id: <20180226155336.25875-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 13/14] shared/shell: Fix parsing of mandatory arguments
+Date: Mon, 26 Feb 2018 17:53:35 +0200
+Message-Id: <20180226155336.25875-14-luiz.dentz@gmail.com>
 In-Reply-To: <20180226155336.25875-1-luiz.dentz@gmail.com>
 References: <20180226155336.25875-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,53 +11,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The functions can be used to tell the shell to stop running.
+In certain cases the arguments may no start with the mandatory commands
+such as when the command handler expects getopt arguments first.
 ---
- src/shared/shell.c | 16 ++++++++++++++++
- src/shared/shell.h |  3 +++
- 2 files changed, 19 insertions(+)
+ src/shared/shell.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 6cc797cdb..9ecb4c7be 100644
+index c90d28a9f..9ae5af79e 100644
 --- a/src/shared/shell.c
 +++ b/src/shared/shell.c
-@@ -866,6 +866,22 @@ void bt_shell_run(void)
- 	data.init = false;
- }
+@@ -291,11 +291,22 @@ static int cmd_exec(const struct bt_shell_menu_entry *entry,
+ 	}
  
-+void bt_shell_quit(int status)
-+{
-+	if (status == EXIT_SUCCESS)
-+		mainloop_exit_success();
-+	else
-+		mainloop_exit_failure();
-+}
-+
-+void bt_shell_noninteractive_quit(int status)
-+{
-+	if (!data.mode || data.timeout)
-+		return;
-+
-+	bt_shell_quit(status);
-+}
-+
- bool bt_shell_set_menu(const struct bt_shell_menu *menu)
- {
- 	if (!menu)
-diff --git a/src/shared/shell.h b/src/shared/shell.h
-index 359629896..10747c955 100644
---- a/src/shared/shell.h
-+++ b/src/shared/shell.h
-@@ -68,6 +68,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt);
+ 	len = man - entry->arg;
+-	man = strndup(entry->arg, len + 1);
++	if (entry->arg[0] == '<')
++		man = strndup(entry->arg, len + 1);
++	else {
++		/* Find where mandatory arguments start */
++		opt = strrchr(entry->arg, '<');
++		/* Skip if mandatory arguments are not in the right format */
++		if (!opt || opt > man) {
++			opt = strdup(entry->arg);
++			goto optional;
++		}
++		man = strndup(opt, man - opt + 1);
++	}
  
- void bt_shell_run(void);
+ 	if (parse_args(man, &w, "<>", flags) < 0) {
+ 		print_text(COLOR_HIGHLIGHT,
+-				"Unable to parse mandatory command arguments");
++			"Unable to parse mandatory command arguments: %s", man );
+ 		return -EINVAL;
+ 	}
  
-+void bt_shell_quit(int status);
-+void bt_shell_noninteractive_quit(int status);
-+
- bool bt_shell_set_menu(const struct bt_shell_menu *menu);
+@@ -312,7 +323,7 @@ static int cmd_exec(const struct bt_shell_menu_entry *entry,
+ optional:
+ 	if (parse_args(opt, &w, "[]", flags) < 0) {
+ 		print_text(COLOR_HIGHLIGHT,
+-				"Unable to parse optional command arguments");
++			"Unable to parse optional command arguments: %s", opt);
+ 		return -EINVAL;
+ 	}
  
- bool bt_shell_add_submenu(const struct bt_shell_menu *menu);
 -- 
 2.14.3
 
