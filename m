@@ -1,51 +1,125 @@
-Return-Path: <eric@anholt.net>
-From: Eric Anholt <eric@anholt.net>
-To: Stefan Wahren <stefan.wahren@i2se.com>, Loic Poulain
- <loic.poulain@gmail.com>, =?utf-8?B?RnLDqWTDqXJpYw==?= Danis
- <frederic.danis.oss@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, Rob Herring <robh+dt@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>
-Cc: Lukas Wunner <lukas@wunner.de>, Phil Elwell <phil@raspberrypi.org>, Florian Fainelli <f.fainelli@gmail.com>, linux-bluetooth@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-rpi-kernel@lists.infradead.org, devicetree@vger.kernel.org, Stefan Wahren <stefan.wahren@i2se.com>
-Subject: Re: [PATCH 4/4] ARM: bcm2385_defconfig: Enable BT support for BCM43438
-In-Reply-To: <1519567855-26105-5-git-send-email-stefan.wahren@i2se.com>
-References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com> <1519567855-26105-5-git-send-email-stefan.wahren@i2se.com>
-Date: Mon, 26 Feb 2018 15:31:48 -0800
-Message-ID: <87o9kbjpjv.fsf@anholt.net>
+Return-Path: <arend.vanspriel@broadcom.com>
+Subject: Re: [PATCH 2/3] mwifiex: support sysfs initiated device coredump
+To: Brian Norris <briannorris@chromium.org>,
+ Johannes Berg <johannes@sipsolutions.net>
+References: <1519210220-22437-1-git-send-email-arend.vanspriel@broadcom.com>
+ <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
+ <20180221225903.GA42395@rodete-desktop-imager.corp.google.com>
+ <5A8EB4F4.2030103@broadcom.com>
+ <20180222193547.GA78462@rodete-desktop-imager.corp.google.com>
+ <5A8FEF68.5080900@broadcom.com> <1519383062.2231.5.camel@sipsolutions.net>
+ <CA+ASDXNogjhRvB_yGO7t4um5KbkJiMVLeed6TTe7um59aS3vDg@mail.gmail.com>
+Cc: Kalle Valo <kvalo@codeaurora.org>, Marcel Holtmann <marcel@holtmann.org>,
+ linux-wireless@vger.kernel.org,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+ Linux Kernel <linux-kernel@vger.kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+Message-ID: <5A948942.6090102@broadcom.com>
+Date: Mon, 26 Feb 2018 23:25:06 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+In-Reply-To: <CA+ASDXNogjhRvB_yGO7t4um5KbkJiMVLeed6TTe7um59aS3vDg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
-
-Stefan Wahren <stefan.wahren@i2se.com> writes:
-
-> The Raspberry Pi Zero W has an onboard BT chip (BCM43438). So enable the
-> necessary HCI UART driver (requires serial device bus).
+On 2/26/2018 11:06 PM, Brian Norris wrote:
+> Hi,
 >
-> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+> On Fri, Feb 23, 2018 at 2:51 AM, Johannes Berg
+> <johannes@sipsolutions.net> wrote:
+>> On Fri, 2018-02-23 at 11:39 +0100, Arend van Spriel wrote:
+>>
+>>>>> Well, that depends on the eye of the beholder I guess. From user-space
+>>>>> perspective it is asynchronous regardless. A write access to the coredump
+>>>>> sysfs file eventually results in a uevent when the devcoredump entry is
+>>>>> created, ie. after driver has made a dev_coredump API call. Whether the
+>>>>> driver does that synchronously or asynchronously is irrelevant as far as
+>>>>> user-space is concerned.
+>>>>
+>>>> Is it really? The driver infrastructure seems to guarantee that the
+>>>> entirety of a driver's ->coredump() will complete before returning from
+>>>> the write. So it might be reasonable for some user to assume (based on
+>>>> implementation details, e.g., of brcmfmac) that the devcoredump will be
+>>>> ready by the time the write() syscall returns, absent documentation that
+>>>> says otherwise. But then, that's not how mwifiex works right now, so
+>>>> they might be surprised if they switch drivers.
+>>
+>> I can see how you might want to have that kind of behaviour, but you'd
+>> have to jump through some hoops to see if the coredump you saw is
+>> actually the right one - you probably want an asynchronous coredump
+>> "collector" and then wait for it to show up (with some reasonable
+>> timeout) on the actual filesystem, not on sysfs?
+>>
+>> Otherwise you have to trawl sysfs for the right coredump I guess, which
+>> too is possible.
+>
+> It's not that I want that interface. It's that I want the *lack* of
+> such an interface to be guaranteed in the documentation. When the
+> questions like "where? when?" are not answered in the doc, users are
+> totally allowed to speculate ;) Perhaps the "where" can be deferred to
+> other documentation (which should probably exist someday), but the
+> "when" should be listed as "eventually; or not at all; listen for a
+> uevent."
 
-Applied patches 2-4 to bcm2835-dt-next and bcm2835-defconfig-next.
-Thanks!
+Agree. Will extend/improve the ABI documentation.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+>>>>> You are right. Clearly I did not reach the end my learning curve here. I
+>>>>> assumed referring to the existing dev_coredump facility was sufficient, but
+>>>>> maybe it is worth a patch to be more explicit and mention the uevent
+>>>>> behavior. Also dev_coredump facility may be disabled upon which the trigger
+>>>>> will have no effect in sysfs. In the kernel the data passed by the driver is
+>>>>> simply freed by dev_coredump facility.
+>>>>
+>>>> Is there any other documentation for the coredump feature? I don't
+>>>> really see much.
+>>>
+>>> Any other than the code itself you mean? I am not sure. Maybe Johannes
+>>> knows.
+>>
+>> There isn't really, it originally was really simple, but then somebody
+>> (Kees perhaps?) requested a way to turn it off forever for security or
+>> privacy concerns and it became more complicated.
+>
+> Then I don't think when adding a new sysfs ABI, we should be deferring
+> to "existing dev_coredump facility [documentation]" (which doesn't
+> exist). And just a few words about the user-facing interface would be
+> nice for the documentation. There previously wasn't any official way
+> to trigger a dump from userspace -- only from random debugfs files, I
+> think, or from unspecified device failures.
 
------BEGIN PGP SIGNATURE-----
+That was my main motivation to have this. The debugfs method did not 
+feel quite right as there is no kconfig dependency between dev_coredump 
+and debugfs. Now I discussed with Johannes about adding code into the 
+dev_coredump facility, but that seemed to add a lot of complexity. So I 
+looking into the device driver core and found it to be the simpler solution.
 
-iQIzBAEBCgAdFiEE/JuuFDWp9/ZkuCBXtdYpNtH8nugFAlqUmOQACgkQtdYpNtH8
-nugtQRAAmiPGH0pBTkoT6m5JIyciCezgb1YEKC9KmYo+V8Vw5d43JadadIxRKrIJ
-zMZTz9EkePEUGXnLCXcPBLsIKPMLIgYj5aZH6K3BEdLzA7s8fqYLtQb3hF6Jkzwd
-HA7A6DnLUXimN3kBuRgb5vME8rPDhSYZsvDUDAFAdxIcol04vlvmbNHEdgrBnZWG
-0o9Q1GUrl/RF8Z4ySdQSpi3/FA42+D8G+/ScnShKQIvamoA/VMK9ZDYbkyK3jx38
-EXqGplTiznuiSCD1dq8mZWOC9hR9hDEFPZrxdQVdZgtA+11gXGp51fl4VyR6wDmw
-GR5uHMtYmJ3LP22gND1FqC6r2qNJLLqt4kyQjQ4JDgDnsyXFPunaRsh3//k3WqL9
-LEx10YXewSf+J6VKyAjC5B8RxtkNlt87MZpKJHzc+cVtc+atwZYJMnNrS/j60Qsk
-jJN00uKNJPQmKRnmgsLoQC2KaWNwR39ndnBgpYF5oHf1U0aGyQZ5wcQ7nFX1wNNY
-MiXLahYfOzeTr0UHb+BbnQBKNmOPSJ6L/P8ujh57+M/6sinZWuO0tzqOPmvzP8KU
-GLBdxI2NpXPejAx3jvXcovyzUvCofgVCtuWirODHRzRqdIRhTlqK//I3YN4mLHH5
-F2zIzz1vDA0sGrviYXjNYxgQbkb8RpJi9eWsnXpJknPC/H5zspo=
-=K0n+
------END PGP SIGNATURE-----
---=-=-=--
+>>>> static ssize_t coredump_store(struct device *dev, struct device_attribute *attr,
+>>>>                          const char *buf, size_t count)
+>>>> {
+>>>>      device_lock(dev);
+>>>>      if (dev->driver->coredump)
+>>>>              dev->driver->coredump(dev);
+>>>>      device_unlock(dev);
+>>>>
+>>>>      return count;
+>>>> }
+>>>> static DEVICE_ATTR_WO(coredump);
+>>>>
+>>>> Is that a bug or a feature?
+>>>
+>>> Yeah. Let's call it a bug. Just not sure what to go for. Return the
+>>> error or change coredump callback to void return type.
+>>
+>> I'm not sure it matters all that much - the underlying devcoredump
+>> calls all have no return value (void), and given the above complexities
+>> with the ability to turn off devcoredumping entirely you cannot rely on
+>> this return value to tell you if a dump was created or not, at least
+>> not without much more infrastructure work.
+>
+> Then perhaps it makes sense to remove the return code before you
+> create users of it.
+
+Yup. Will sent out a patch for that as well.
+
+Thanks,
+Arend
