@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 09/14] shared/mainloop-glib: Fix calling g_main_loop_quit with NULL
-Date: Mon, 26 Feb 2018 17:53:31 +0200
-Message-Id: <20180226155336.25875-10-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 12/14] shared/shell: Add bt_shell_usage
+Date: Mon, 26 Feb 2018 17:53:34 +0200
+Message-Id: <20180226155336.25875-13-luiz.dentz@gmail.com>
 In-Reply-To: <20180226155336.25875-1-luiz.dentz@gmail.com>
 References: <20180226155336.25875-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,67 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This produces warnings such as:
-
-(process:5122): GLib-CRITICAL **: g_main_loop_quit: assertion 'loop != NULL' failed
+bt_shell_usage can be used to print the usage of the current command
+in execution.
 ---
- src/shared/mainloop-glib.c | 3 +++
- 1 file changed, 3 insertions(+)
+ src/shared/shell.c | 14 ++++++++++++++
+ src/shared/shell.h |  1 +
+ 2 files changed, 15 insertions(+)
 
-diff --git a/src/shared/mainloop-glib.c b/src/shared/mainloop-glib.c
-index 1bbac5d11..8436969bb 100644
---- a/src/shared/mainloop-glib.c
-+++ b/src/shared/mainloop-glib.c
-@@ -47,6 +47,9 @@ void mainloop_init(void)
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index cd46532fe..c90d28a9f 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -76,6 +76,7 @@ static struct {
+ 	const struct bt_shell_menu *menu;
+ 	const struct bt_shell_menu *main;
+ 	struct queue *submenus;
++	const struct bt_shell_menu_entry *exec;
  
- void mainloop_quit(void)
- {
-+	if (!main_loop)
-+		return;
+ 	struct queue *envs;
+ } data;
+@@ -325,9 +326,13 @@ optional:
+ 	wordfree(&w);
+ 
+ exec:
++	data.exec = entry;
 +
- 	g_main_loop_quit(main_loop);
+ 	if (entry->func)
+ 		entry->func(argc, argv);
+ 
++	data.exec = NULL;
++
+ 	return 0;
+ 
+ fail:
+@@ -451,6 +456,15 @@ void bt_shell_hexdump(const unsigned char *buf, size_t len)
+ 	util_hexdump(' ', buf, len, print_string, NULL);
  }
  
++void bt_shell_usage()
++{
++	if (!data.exec)
++		return;
++
++	bt_shell_printf("Usage: %s %s\n", data.exec->cmd,
++					data.exec->arg ? data.exec->arg : "");
++}
++
+ void bt_shell_prompt_input(const char *label, const char *msg,
+ 			bt_shell_prompt_input_func func, void *user_data)
+ {
+diff --git a/src/shared/shell.h b/src/shared/shell.h
+index 10747c955..33c31f35b 100644
+--- a/src/shared/shell.h
++++ b/src/shared/shell.h
+@@ -82,6 +82,7 @@ void bt_shell_set_prompt(const char *string);
+ void bt_shell_printf(const char *fmt,
+ 				...) __attribute__((format(printf, 1, 2)));
+ void bt_shell_hexdump(const unsigned char *buf, size_t len);
++void bt_shell_usage(void);
+ 
+ void bt_shell_prompt_input(const char *label, const char *msg,
+ 			bt_shell_prompt_input_func func, void *user_data);
 -- 
 2.14.3
 
