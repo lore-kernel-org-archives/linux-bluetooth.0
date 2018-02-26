@@ -1,72 +1,51 @@
-Return-Path: <briannorris@chromium.org>
+Return-Path: <eric@anholt.net>
+From: Eric Anholt <eric@anholt.net>
+To: Stefan Wahren <stefan.wahren@i2se.com>, Loic Poulain
+ <loic.poulain@gmail.com>, =?utf-8?B?RnLDqWTDqXJpYw==?= Danis
+ <frederic.danis.oss@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, Rob Herring <robh+dt@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>
+Cc: Lukas Wunner <lukas@wunner.de>, Phil Elwell <phil@raspberrypi.org>, Florian Fainelli <f.fainelli@gmail.com>, linux-bluetooth@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-rpi-kernel@lists.infradead.org, devicetree@vger.kernel.org, Stefan Wahren <stefan.wahren@i2se.com>
+Subject: Re: [PATCH 4/4] ARM: bcm2385_defconfig: Enable BT support for BCM43438
+In-Reply-To: <1519567855-26105-5-git-send-email-stefan.wahren@i2se.com>
+References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com> <1519567855-26105-5-git-send-email-stefan.wahren@i2se.com>
+Date: Mon, 26 Feb 2018 15:31:48 -0800
+Message-ID: <87o9kbjpjv.fsf@anholt.net>
 MIME-Version: 1.0
-In-Reply-To: <a6090910-7941-b194-c094-7ce3ef047974@redhat.com>
-References: <20180108094416.4789-1-hdegoede@redhat.com> <20180213022455.GA151190@rodete-desktop-imager.corp.google.com>
- <8cd918fd-bf6f-70ac-e561-e7deffa695f0@redhat.com> <20180216022721.GA69988@rodete-desktop-imager.corp.google.com>
- <345b0de8-1a23-d2f8-bc56-507eadf7faa7@redhat.com> <6B37F6AC-1103-4FCF-A5DC-4BA236A7B11B@holtmann.org>
- <1a08612e-2531-3711-ec0f-a867e86d0009@redhat.com> <20180216175955.GA80944@rodete-desktop-imager.corp.google.com>
- <a846c1ac-7dea-a30a-4133-32eac606d101@redhat.com> <20180223031216.GA230265@rodete-desktop-imager.corp.google.com>
- <a6090910-7941-b194-c094-7ce3ef047974@redhat.com>
-From: Brian Norris <briannorris@chromium.org>
-Date: Mon, 26 Feb 2018 18:29:08 -0800
-Message-ID: <CA+ASDXOGhi4t2R5qrbXHTFkjtzvUL=qHxkJqku4XKJ6u8Wr+cg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Restore QCA Rome suspend/resume fix
- with a "rewritten" version
-To: Hans de Goede <hdegoede@redhat.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Bluez mailing list <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
-	ACPI Devel Maling List <linux-acpi@vger.kernel.org>, stable <stable@vger.kernel.org>,
-	Leif Liddy <leif.linux@gmail.com>, Matthias Kaehlcke <mka@chromium.org>,
-	Daniel Drake <drake@endlessm.com>, Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	Matadeen Mishra <matadeen@qti.qualcomm.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Guenter Roeck <linux@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Feb 22, 2018 at 11:14 PM, Hans de Goede <hdegoede@redhat.com> wrote:
-> On 23-02-18 04:12, Brian Norris wrote:
->> Hmm? I'm not sure I completely follow here when you say "he was not
->> hitting the firmware loading race". If things were functioning fine with
->> system suspend (but not with autosuspend), then he's not seeing the
->> controller (quoting commit fd865802c66b) "losing power during suspend".
+--=-=-=
+Content-Type: text/plain
+
+Stefan Wahren <stefan.wahren@i2se.com> writes:
+
+> The Raspberry Pi Zero W has an onboard BT chip (BCM43438). So enable the
+> necessary HCI UART driver (requires serial device bus).
 >
->
-> He was running a kernel with the original "fd865802c66b Bluetooth: btusb:
-> fix QCA Rome suspend/resume" commit, which fixes regular suspend for
-> devices which are "losing power during suspend", but does nothing for
-> runtime-suspend.
->
-> He ran tests both with and without runtime-pm enabled with that same kernel
-> and he needed to disable runtime-pm to get working bluetooth.
+> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
 
-Did he ever test with commit fd865802c66b reverted?
+Applied patches 2-4 to bcm2835-dt-next and bcm2835-defconfig-next.
+Thanks!
 
-My symptoms were exactly the same as you described. BT was broken as
-of v4.14 if I had runtime suspend enabled. Things were fine if I
-either (a) reverted the patch or (b) disabled runtime suspend. I
-obviously preferred (a), which is why I continued to complain :)
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Did your tester ever try (a)? If not, then I don't think you've really
-ensured that he really needed a "fixed" version; he may not have
-needed the patch at all.
+-----BEGIN PGP SIGNATURE-----
 
-Or an alternative question: did that system work on an older Fedora
-release (and presumably an older kernel)? If so, then he probably also
-did not need that patch.
-
->> So, that would suggest he could only be seeing the race (as I was), and
->> that his machine does not deserve a RESET_RESUME quirk?
->
->
-> I hope my above answer helps to clarify why I believe the quirk is
-> necessary on his machine.
-
-I'm sorry, but no it doesn't. If anything, it suggests to me even more
-that it may not have been necessary.
-
-But hey, I'm not personally going to notice if random Lenovo laptops
-are wasting power.
-
-Brian
+iQIzBAEBCgAdFiEE/JuuFDWp9/ZkuCBXtdYpNtH8nugFAlqUmOQACgkQtdYpNtH8
+nugtQRAAmiPGH0pBTkoT6m5JIyciCezgb1YEKC9KmYo+V8Vw5d43JadadIxRKrIJ
+zMZTz9EkePEUGXnLCXcPBLsIKPMLIgYj5aZH6K3BEdLzA7s8fqYLtQb3hF6Jkzwd
+HA7A6DnLUXimN3kBuRgb5vME8rPDhSYZsvDUDAFAdxIcol04vlvmbNHEdgrBnZWG
+0o9Q1GUrl/RF8Z4ySdQSpi3/FA42+D8G+/ScnShKQIvamoA/VMK9ZDYbkyK3jx38
+EXqGplTiznuiSCD1dq8mZWOC9hR9hDEFPZrxdQVdZgtA+11gXGp51fl4VyR6wDmw
+GR5uHMtYmJ3LP22gND1FqC6r2qNJLLqt4kyQjQ4JDgDnsyXFPunaRsh3//k3WqL9
+LEx10YXewSf+J6VKyAjC5B8RxtkNlt87MZpKJHzc+cVtc+atwZYJMnNrS/j60Qsk
+jJN00uKNJPQmKRnmgsLoQC2KaWNwR39ndnBgpYF5oHf1U0aGyQZ5wcQ7nFX1wNNY
+MiXLahYfOzeTr0UHb+BbnQBKNmOPSJ6L/P8ujh57+M/6sinZWuO0tzqOPmvzP8KU
+GLBdxI2NpXPejAx3jvXcovyzUvCofgVCtuWirODHRzRqdIRhTlqK//I3YN4mLHH5
+F2zIzz1vDA0sGrviYXjNYxgQbkb8RpJi9eWsnXpJknPC/H5zspo=
+=K0n+
+-----END PGP SIGNATURE-----
+--=-=-=--
