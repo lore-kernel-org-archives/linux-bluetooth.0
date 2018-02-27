@@ -1,34 +1,56 @@
-Return-Path: <kvalo@codeaurora.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Subject: Re: [3/3] btmrvl: support sysfs initiated firmware coredump
-From: Kalle Valo <kvalo@codeaurora.org>
-In-Reply-To: <1519210220-22437-4-git-send-email-arend.vanspriel@broadcom.com>
-References: <1519210220-22437-4-git-send-email-arend.vanspriel@broadcom.com>
-To: Arend Van Spriel <arend.vanspriel@broadcom.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Arend van Spriel <arend.vanspriel@broadcom.com>
-Message-Id: <20180227144639.C5F1E607B9@smtp.codeaurora.org>
-Date: Tue, 27 Feb 2018 14:46:39 +0000 (UTC)
+Return-Path: <amitkarwar@gmail.com>
+From: Amitkumar Karwar <amitkarwar@gmail.com>
+To: Kalle Valo <kvalo@codeaurora.org>,
+	marcel@holtmann.org
+Cc: linux-wireless@vger.kernel.org,
+	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+	linux-bluetooth@vger.kernel.org,
+	Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Subject: [v9 8/8] rsi: sdio changes to support BT
+Date: Tue, 27 Feb 2018 19:56:18 +0530
+Message-Id: <1519741578-12640-9-git-send-email-amitkarwar@gmail.com>
+In-Reply-To: <1519741578-12640-1-git-send-email-amitkarwar@gmail.com>
+References: <1519741578-12640-1-git-send-email-amitkarwar@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Arend Van Spriel <arend.vanspriel@broadcom.com> wrote:
+From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
 
-> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
-> it is possible to initiate a device coredump from user-space. This
-> patch adds support for it in btmrvl_sdio adding the .coredump()
-> driver callback. This makes dump through debugfs obsolete so removing
-> it.
-> 
-> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+Queue number is correctly updated for BT traffic. Also, kzalloc
+instead of kmalloc is used for Rx packet allocation.
 
-This is for bluetooth tree, dropping from my queue.
+Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+---
+ drivers/net/wireless/rsi/rsi_91x_sdio.c     | 2 ++
+ drivers/net/wireless/rsi/rsi_91x_sdio_ops.c | 2 +-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-Patch set to Not Applicable.
-
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio.c b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+index 5722736..beb18d0 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio.c
+@@ -763,6 +763,8 @@ static int rsi_sdio_host_intf_write_pkt(struct rsi_hw *adapter,
+ 	int status;
+ 
+ 	queueno = ((pkt[1] >> 4) & 0xf);
++	if (queueno == RSI_BT_MGMT_Q || queueno == RSI_BT_DATA_Q)
++		queueno = RSI_BT_Q;
+ 
+ 	num_blocks = len / block_size;
+ 
+diff --git a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+index 169c981..6e74261 100644
+--- a/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
++++ b/drivers/net/wireless/rsi/rsi_91x_sdio_ops.c
+@@ -103,7 +103,7 @@ static int rsi_process_pkt(struct rsi_common *common)
+ 
+ 	rcv_pkt_len = (num_blks * 256);
+ 
+-	common->rx_data_pkt = kmalloc(rcv_pkt_len, GFP_KERNEL);
++	common->rx_data_pkt = kzalloc(rcv_pkt_len, GFP_KERNEL);
+ 	if (!common->rx_data_pkt) {
+ 		rsi_dbg(ERR_ZONE, "%s: Failed in memory allocation\n",
+ 			__func__);
 -- 
-https://patchwork.kernel.org/patch/10231923/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+2.7.4
