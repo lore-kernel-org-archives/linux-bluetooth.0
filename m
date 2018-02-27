@@ -1,65 +1,93 @@
-Return-Path: <bjorn.andersson@linaro.org>
-From: Bjorn Andersson <bjorn.andersson@linaro.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Andy Gross <andy.gross@linaro.org>,
-	David Brown <david.brown@linaro.org>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-soc@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: btqcomsmd: Fix channel open check
-Date: Tue, 27 Feb 2018 16:17:38 -0800
-Message-Id: <20180228001738.11131-1-bjorn.andersson@linaro.org>
+Return-Path: <stefan.wahren@i2se.com>
+Date: Tue, 27 Feb 2018 19:51:19 +0100 (CET)
+From: Stefan Wahren <stefan.wahren@i2se.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Lukas Wunner <lukas@wunner.de>, Rob Herring <robh+dt@kernel.org>,
+	Eric Anholt <eric@anholt.net>,
+	Johan Hedberg <johan.hedberg@gmail.com>, devicetree@vger.kernel.org,
+	Loic Poulain <loic.poulain@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	linux-rpi-kernel@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Phil Elwell <phil@raspberrypi.org>,
+	=?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Message-ID: <879698373.164009.1519757479655@email.1und1.de>
+In-Reply-To: <9D6209F2-5389-4F4E-844D-6A8683044F88@holtmann.org>
+References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
+ <1519567855-26105-4-git-send-email-stefan.wahren@i2se.com>
+ <84F7E645-59B4-4618-8C91-A5CD654E16A6@holtmann.org>
+ <648118289.71086.1519593373795@email.1und1.de>
+ <9D6209F2-5389-4F4E-844D-6A8683044F88@holtmann.org>
+Subject: Re: [PATCH 3/4] ARM: dts: bcm2835-rpi-zero-w: Add bcm43438 serial
+ slave
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-rpmsg_create_ept() returns NULL on error and as such
-qcom_wcnss_open_channel() does the same. Clarify this in the
-kernel-doc and correct the error checks in btqcomsmd.
+Hi Marcel,
 
-Fixes: 1511cc750c3d ("Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver")
-Cc: stable@vger.kernel.org
-Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
----
- drivers/bluetooth/btqcomsmd.c | 8 ++++----
- drivers/soc/qcom/wcnss_ctrl.c | 2 ++
- 2 files changed, 6 insertions(+), 4 deletions(-)
+> Marcel Holtmann <marcel@holtmann.org> hat am 25. Februar 2018 um 22:38 geschrieben:
+> 
+> 
+> Hi Stefan,
+> 
+> >>> Add BCM43438 (bluetooth) as a serdev slave device of uart0 (pl011/ttyAMA0).
+> >>> This allows to automatically insert the bcm43438 to the bluetooth
+> >>> subsystem instead of relying on patched userspace helpers (hciattach).
+> >>> 
+> >>> In order to keep a debug UART we need to switch to uart1.
+> >>> 
+> >>> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+> >>> ---
+> >>> arch/arm/boot/dts/bcm2835-rpi-zero-w.dts | 14 +++++++++++++-
+> >>> 1 file changed, 13 insertions(+), 1 deletion(-)
+> >>> 
+> >>> diff --git a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
+> >>> index cf53436..b7f79f1 100644
+> >>> --- a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
+> >>> +++ b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
+> >>> @@ -131,6 +131,18 @@
+> >>> 
+> >>> &uart0 {
+> >>> 	pinctrl-names = "default";
+> >>> -	pinctrl-0 = <&uart0_gpio14>;
+> >>> +	pinctrl-0 = <&uart0_gpio32 &uart0_ctsrts_gpio30>;
+> >>> +	status = "okay";
+> >>> +
+> >>> +	bluetooth {
+> >>> +		compatible = "brcm,bcm43438-bt";
+> >>> +		max-speed = <2000000>;
+> >>> +		shutdown-gpios = <&gpio 45 GPIO_ACTIVE_HIGH>;
+> >>> +	};
+> >>> +};
+> >> 
+> >> is the shutdown GPIO working as expected with this hardware. So even module unload and reload works fine?
+> > 
+> > Yes, unload and reload works fine. 
+> > 
+> >> Meaning we are getting back to the 115200 default baud rate on the UART?
+> > 
+> > I assume that, because reload works as expected. 
+> 
+> awesome. That is good news.
+> 
+> Since you said that the GPIO expander driver for the RPi 3 has been accepted, did you test it there as well?
 
-diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-index 2c9a5fc9137d..24f702927875 100644
---- a/drivers/bluetooth/btqcomsmd.c
-+++ b/drivers/bluetooth/btqcomsmd.c
-@@ -151,13 +151,13 @@ static int btqcomsmd_probe(struct platform_device *pdev)
- 
- 	btq->acl_channel = qcom_wcnss_open_channel(wcnss, "APPS_RIVA_BT_ACL",
- 						   btqcomsmd_acl_callback, btq);
--	if (IS_ERR(btq->acl_channel))
--		return PTR_ERR(btq->acl_channel);
-+	if (!btq->acl_channel)
-+		return -ENOENT;
- 
- 	btq->cmd_channel = qcom_wcnss_open_channel(wcnss, "APPS_RIVA_BT_CMD",
- 						   btqcomsmd_cmd_callback, btq);
--	if (IS_ERR(btq->cmd_channel))
--		return PTR_ERR(btq->cmd_channel);
-+	if (!btq->cmd_channel)
-+		return -ENOENT;
- 
- 	/* The local-bd-address property is usually injected by the
- 	 * bootloader which has access to the allocated BD address.
-diff --git a/drivers/soc/qcom/wcnss_ctrl.c b/drivers/soc/qcom/wcnss_ctrl.c
-index d008e5b82db4..e968559b0fc4 100644
---- a/drivers/soc/qcom/wcnss_ctrl.c
-+++ b/drivers/soc/qcom/wcnss_ctrl.c
-@@ -275,6 +275,8 @@ static int wcnss_download_nv(struct wcnss_ctrl *wcnss, bool *expect_cbc)
-  * @wcnss:	wcnss handle, retrieved from drvdata
-  * @name:	SMD channel name
-  * @cb:		callback to handle incoming data on the channel
-+ *
-+ * Return: rpmsg_endpoint object on success, NULL on error
-  */
- struct rpmsg_endpoint *qcom_wcnss_open_channel(void *wcnss, const char *name, rpmsg_rx_cb_t cb, void *priv)
- {
--- 
-2.16.2
+Currently not 
+
+> If so, then it would be good to get a patch that also provides shutdown-gpios for RPi 3.
+
+Sure, but not before this weekend.
+
+> 
+> Regards
+> 
+> Marcel
+> 
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
