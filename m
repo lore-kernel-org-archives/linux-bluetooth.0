@@ -1,72 +1,87 @@
-Return-Path: <amitkarwar@gmail.com>
-From: Amitkumar Karwar <amitkarwar@gmail.com>
-To: Kalle Valo <kvalo@codeaurora.org>,
-	marcel@holtmann.org
-Cc: linux-wireless@vger.kernel.org,
-	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [v9 0/8] rsi: add bluetooth and coex support
-Date: Tue, 27 Feb 2018 19:56:10 +0530
-Message-Id: <1519741578-12640-1-git-send-email-amitkarwar@gmail.com>
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Restore QCA Rome suspend/resume fix
+ with a "rewritten" version
+To: Brian Norris <briannorris@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+ linux-serial@vger.kernel.org,
+ ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+ stable <stable@vger.kernel.org>, Leif Liddy <leif.linux@gmail.com>,
+ Matthias Kaehlcke <mka@chromium.org>, Daniel Drake <drake@endlessm.com>,
+ Kai-Heng Feng <kai.heng.feng@canonical.com>,
+ Matadeen Mishra <matadeen@qti.qualcomm.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Guenter Roeck <linux@roeck-us.net>
+References: <20180108094416.4789-1-hdegoede@redhat.com>
+ <20180213022455.GA151190@rodete-desktop-imager.corp.google.com>
+ <8cd918fd-bf6f-70ac-e561-e7deffa695f0@redhat.com>
+ <20180216022721.GA69988@rodete-desktop-imager.corp.google.com>
+ <345b0de8-1a23-d2f8-bc56-507eadf7faa7@redhat.com>
+ <6B37F6AC-1103-4FCF-A5DC-4BA236A7B11B@holtmann.org>
+ <1a08612e-2531-3711-ec0f-a867e86d0009@redhat.com>
+ <20180216175955.GA80944@rodete-desktop-imager.corp.google.com>
+ <a846c1ac-7dea-a30a-4133-32eac606d101@redhat.com>
+ <20180223031216.GA230265@rodete-desktop-imager.corp.google.com>
+ <a6090910-7941-b194-c094-7ce3ef047974@redhat.com>
+ <CA+ASDXOGhi4t2R5qrbXHTFkjtzvUL=qHxkJqku4XKJ6u8Wr+cg@mail.gmail.com>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <cdf043ef-b7d5-61f9-b8ea-7e75cb22485f@redhat.com>
+Date: Tue, 27 Feb 2018 15:07:34 +0100
+MIME-Version: 1.0
+In-Reply-To: <CA+ASDXOGhi4t2R5qrbXHTFkjtzvUL=qHxkJqku4XKJ6u8Wr+cg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+Hi,
 
-This patch series adds new bluetooth driver and coex enhancments
-in existing wlan driver for RSI chipsets.
-As per our architecture, both wlan and bluetooth drivers talk
-over same SDIO interface to device. Separate endpoint will be
-used in case of USB interface.
+On 27-02-18 03:29, Brian Norris wrote:
+> On Thu, Feb 22, 2018 at 11:14 PM, Hans de Goede <hdegoede@redhat.com> wrote:
+>> On 23-02-18 04:12, Brian Norris wrote:
+>>> Hmm? I'm not sure I completely follow here when you say "he was not
+>>> hitting the firmware loading race". If things were functioning fine with
+>>> system suspend (but not with autosuspend), then he's not seeing the
+>>> controller (quoting commit fd865802c66b) "losing power during suspend".
+>>
+>>
+>> He was running a kernel with the original "fd865802c66b Bluetooth: btusb:
+>> fix QCA Rome suspend/resume" commit, which fixes regular suspend for
+>> devices which are "losing power during suspend", but does nothing for
+>> runtime-suspend.
+>>
+>> He ran tests both with and without runtime-pm enabled with that same kernel
+>> and he needed to disable runtime-pm to get working bluetooth.
+> 
+> Did he ever test with commit fd865802c66b reverted?
+> 
+> My symptoms were exactly the same as you described. BT was broken as
+> of v4.14 if I had runtime suspend enabled. Things were fine if I
+> either (a) reverted the patch or (b) disabled runtime suspend. I
+> obviously preferred (a), which is why I continued to complain :)
+> 
+> Did your tester ever try (a)? If not, then I don't think you've really
+> ensured that he really needed a "fixed" version; he may not have
+> needed the patch at all.
+> 
+> Or an alternative question: did that system work on an older Fedora
+> release (and presumably an older kernel)? If so, then he probably also
+> did not need that patch.
+> 
+>>> So, that would suggest he could only be seeing the race (as I was), and
+>>> that his machine does not deserve a RESET_RESUME quirk?
+>>
+>>
+>> I hope my above answer helps to clarify why I believe the quirk is
+>> necessary on his machine.
+> 
+> I'm sorry, but no it doesn't. If anything, it suggests to me even more
+> that it may not have been necessary.
 
-Change in v9: "#ifdef CONFIG_RSI_COEX" check moved from 6/8 to 4/6
-              to resolve kbuild test robot reported error
-Change in v8: 4/8, 5/8 are modified
-Change in v7: 4/8 is modified
-Changes in v6: 1/8, 3/8, 4/8, 5/8, 6/8 are modified
-Changes in v5: 5/8 is modified
-Changes in v4: 5/8 is modified
-Changes in v3: 4/8, 5/8 and 6/8 patches are modified
-Changes in v2: 2/8, 5/8 and 6/8 patches are modified
+Ok, I've started another test-kernel build for the reporter this time
+without any quirks at all and I've asked him to test.
 
-Prameela Rani Garnepudi (6):
-  rsi: add rx control block to handle rx packets in USB
-  rsi: add header file rsi_91x
-  rsi: add coex support
-  Bluetooth: btrsi: add new rsi bluetooth driver
-  rsi: add module parameter operating mode
-  rsi: sdio changes to support BT
+Regards,
 
-Siva Rebbagondla (2):
-  rsi: add bluetooth rx endpoint
-  rsi: handle BT traffic in driver
-
- drivers/bluetooth/Kconfig                   |  12 ++
- drivers/bluetooth/Makefile                  |   2 +
- drivers/bluetooth/btrsi.c                   | 188 ++++++++++++++++++++++++++++
- drivers/net/wireless/rsi/Kconfig            |   9 ++
- drivers/net/wireless/rsi/Makefile           |   1 +
- drivers/net/wireless/rsi/rsi_91x_coex.c     | 179 ++++++++++++++++++++++++++
- drivers/net/wireless/rsi/rsi_91x_core.c     |  20 ++-
- drivers/net/wireless/rsi/rsi_91x_hal.c      |  56 +++++++--
- drivers/net/wireless/rsi/rsi_91x_main.c     | 129 ++++++++++++++++++-
- drivers/net/wireless/rsi/rsi_91x_mgmt.c     |   2 +-
- drivers/net/wireless/rsi/rsi_91x_sdio.c     |  13 +-
- drivers/net/wireless/rsi/rsi_91x_sdio_ops.c |   5 +-
- drivers/net/wireless/rsi/rsi_91x_usb.c      | 124 +++++++++++++-----
- drivers/net/wireless/rsi/rsi_91x_usb_ops.c  |  35 ++++--
- drivers/net/wireless/rsi/rsi_coex.h         |  37 ++++++
- drivers/net/wireless/rsi/rsi_common.h       |   5 +-
- drivers/net/wireless/rsi/rsi_hal.h          |  21 ++++
- drivers/net/wireless/rsi/rsi_main.h         |  21 ++--
- drivers/net/wireless/rsi/rsi_mgmt.h         |   3 +
- drivers/net/wireless/rsi/rsi_usb.h          |  16 ++-
- include/net/rsi_91x.h                       |  56 +++++++++
- 21 files changed, 852 insertions(+), 82 deletions(-)
- create mode 100644 drivers/bluetooth/btrsi.c
- create mode 100644 drivers/net/wireless/rsi/rsi_91x_coex.c
- create mode 100644 drivers/net/wireless/rsi/rsi_coex.h
- create mode 100644 include/net/rsi_91x.h
-
--- 
-2.7.4
+Hans
