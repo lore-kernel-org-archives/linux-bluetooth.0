@@ -1,4 +1,4 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <kvalo@codeaurora.org>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Subject: Re: [3/3] btmrvl: support sysfs initiated firmware coredump
@@ -6,14 +6,12 @@ From: Kalle Valo <kvalo@codeaurora.org>
 In-Reply-To: <1519210220-22437-4-git-send-email-arend.vanspriel@broadcom.com>
 References: <1519210220-22437-4-git-send-email-arend.vanspriel@broadcom.com>
 To: Arend Van Spriel <arend.vanspriel@broadcom.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arend van Spriel <arend.vanspriel@broadcom.com>
-Message-Id: <20180227144639.DB9426070A@smtp.codeaurora.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Arend van Spriel <arend.vanspriel@broadcom.com>
+Message-Id: <20180227144639.C5F1E607B9@smtp.codeaurora.org>
 Date: Tue, 27 Feb 2018 14:46:39 +0000 (UTC)
-Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Arend Van Spriel <arend.vanspriel@broadcom.com> wrote:
