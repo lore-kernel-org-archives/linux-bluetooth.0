@@ -1,93 +1,40 @@
-Return-Path: <stefan.wahren@i2se.com>
-Date: Tue, 27 Feb 2018 19:51:19 +0100 (CET)
-From: Stefan Wahren <stefan.wahren@i2se.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Lukas Wunner <lukas@wunner.de>, Rob Herring <robh+dt@kernel.org>,
-	Eric Anholt <eric@anholt.net>,
-	Johan Hedberg <johan.hedberg@gmail.com>, devicetree@vger.kernel.org,
-	Loic Poulain <loic.poulain@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-rpi-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Phil Elwell <phil@raspberrypi.org>,
-	=?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Message-ID: <879698373.164009.1519757479655@email.1und1.de>
-In-Reply-To: <9D6209F2-5389-4F4E-844D-6A8683044F88@holtmann.org>
-References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
- <1519567855-26105-4-git-send-email-stefan.wahren@i2se.com>
- <84F7E645-59B4-4618-8C91-A5CD654E16A6@holtmann.org>
- <648118289.71086.1519593373795@email.1und1.de>
- <9D6209F2-5389-4F4E-844D-6A8683044F88@holtmann.org>
-Subject: Re: [PATCH 3/4] ARM: dts: bcm2835-rpi-zero-w: Add bcm43438 serial
- slave
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 3/3] btmrvl: support sysfs initiated firmware coredump
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1519210220-22437-4-git-send-email-arend.vanspriel@broadcom.com>
+Date: Tue, 27 Feb 2018 19:26:02 +0100
+Cc: Kalle Valo <kvalo@codeaurora.org>, linux-wireless@vger.kernel.org,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Message-Id: <F1346A83-77FD-42B9-8F36-ACA45381CF03@holtmann.org>
+References: <1519210220-22437-1-git-send-email-arend.vanspriel@broadcom.com>
+ <1519210220-22437-4-git-send-email-arend.vanspriel@broadcom.com>
+To: Arend van Spriel <arend.vanspriel@broadcom.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Arend,
 
-> Marcel Holtmann <marcel@holtmann.org> hat am 25. Februar 2018 um 22:38 geschrieben:
+> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
+> it is possible to initiate a device coredump from user-space. This
+> patch adds support for it in btmrvl_sdio adding the .coredump()
+> driver callback. This makes dump through debugfs obsolete so removing
+> it.
 > 
-> 
-> Hi Stefan,
-> 
-> >>> Add BCM43438 (bluetooth) as a serdev slave device of uart0 (pl011/ttyAMA0).
-> >>> This allows to automatically insert the bcm43438 to the bluetooth
-> >>> subsystem instead of relying on patched userspace helpers (hciattach).
-> >>> 
-> >>> In order to keep a debug UART we need to switch to uart1.
-> >>> 
-> >>> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
-> >>> ---
-> >>> arch/arm/boot/dts/bcm2835-rpi-zero-w.dts | 14 +++++++++++++-
-> >>> 1 file changed, 13 insertions(+), 1 deletion(-)
-> >>> 
-> >>> diff --git a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
-> >>> index cf53436..b7f79f1 100644
-> >>> --- a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
-> >>> +++ b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
-> >>> @@ -131,6 +131,18 @@
-> >>> 
-> >>> &uart0 {
-> >>> 	pinctrl-names = "default";
-> >>> -	pinctrl-0 = <&uart0_gpio14>;
-> >>> +	pinctrl-0 = <&uart0_gpio32 &uart0_ctsrts_gpio30>;
-> >>> +	status = "okay";
-> >>> +
-> >>> +	bluetooth {
-> >>> +		compatible = "brcm,bcm43438-bt";
-> >>> +		max-speed = <2000000>;
-> >>> +		shutdown-gpios = <&gpio 45 GPIO_ACTIVE_HIGH>;
-> >>> +	};
-> >>> +};
-> >> 
-> >> is the shutdown GPIO working as expected with this hardware. So even module unload and reload works fine?
-> > 
-> > Yes, unload and reload works fine. 
-> > 
-> >> Meaning we are getting back to the 115200 default baud rate on the UART?
-> > 
-> > I assume that, because reload works as expected. 
-> 
-> awesome. That is good news.
-> 
-> Since you said that the GPIO expander driver for the RPi 3 has been accepted, did you test it there as well?
+> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> ---
+> drivers/bluetooth/btmrvl_debugfs.c | 31 -------------------------------
+> drivers/bluetooth/btmrvl_drv.h     |  2 --
+> drivers/bluetooth/btmrvl_main.c    |  6 ------
+> drivers/bluetooth/btmrvl_sdio.c    | 18 ++++++++++++------
+> 4 files changed, 12 insertions(+), 45 deletions(-)
 
-Currently not 
+patch has been applied to bluetooth-next tree.
 
-> If so, then it would be good to get a patch that also provides shutdown-gpios for RPi 3.
+Regards
 
-Sure, but not before this weekend.
-
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+Marcel
