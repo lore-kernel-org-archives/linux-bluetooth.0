@@ -1,87 +1,87 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Restore QCA Rome suspend/resume fix
- with a "rewritten" version
-To: Brian Norris <briannorris@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Bluez mailing list <linux-bluetooth@vger.kernel.org>,
- linux-serial@vger.kernel.org,
- ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
- stable <stable@vger.kernel.org>, Leif Liddy <leif.linux@gmail.com>,
- Matthias Kaehlcke <mka@chromium.org>, Daniel Drake <drake@endlessm.com>,
- Kai-Heng Feng <kai.heng.feng@canonical.com>,
- Matadeen Mishra <matadeen@qti.qualcomm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Guenter Roeck <linux@roeck-us.net>
-References: <20180108094416.4789-1-hdegoede@redhat.com>
- <20180213022455.GA151190@rodete-desktop-imager.corp.google.com>
- <8cd918fd-bf6f-70ac-e561-e7deffa695f0@redhat.com>
- <20180216022721.GA69988@rodete-desktop-imager.corp.google.com>
- <345b0de8-1a23-d2f8-bc56-507eadf7faa7@redhat.com>
- <6B37F6AC-1103-4FCF-A5DC-4BA236A7B11B@holtmann.org>
- <1a08612e-2531-3711-ec0f-a867e86d0009@redhat.com>
- <20180216175955.GA80944@rodete-desktop-imager.corp.google.com>
- <a846c1ac-7dea-a30a-4133-32eac606d101@redhat.com>
- <20180223031216.GA230265@rodete-desktop-imager.corp.google.com>
- <a6090910-7941-b194-c094-7ce3ef047974@redhat.com>
- <CA+ASDXOGhi4t2R5qrbXHTFkjtzvUL=qHxkJqku4XKJ6u8Wr+cg@mail.gmail.com>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <cdf043ef-b7d5-61f9-b8ea-7e75cb22485f@redhat.com>
-Date: Tue, 27 Feb 2018 15:07:34 +0100
-MIME-Version: 1.0
-In-Reply-To: <CA+ASDXOGhi4t2R5qrbXHTFkjtzvUL=qHxkJqku4XKJ6u8Wr+cg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 3/4 v4] doc/mgmt-api: Add advertising phys support to
+ flags
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1511938373-22396-4-git-send-email-jaganathx.kanakkassery@intel.com>
+Date: Tue, 27 Feb 2018 14:11:22 +0100
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Message-Id: <53CB0FBB-5A49-4056-BD0E-10A8D34BA5D7@holtmann.org>
+References: <1511938373-22396-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1511938373-22396-4-git-send-email-jaganathx.kanakkassery@intel.com>
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Jaganath,
 
-On 27-02-18 03:29, Brian Norris wrote:
-> On Thu, Feb 22, 2018 at 11:14 PM, Hans de Goede <hdegoede@redhat.com> wrote:
->> On 23-02-18 04:12, Brian Norris wrote:
->>> Hmm? I'm not sure I completely follow here when you say "he was not
->>> hitting the firmware loading race". If things were functioning fine with
->>> system suspend (but not with autosuspend), then he's not seeing the
->>> controller (quoting commit fd865802c66b) "losing power during suspend".
->>
->>
->> He was running a kernel with the original "fd865802c66b Bluetooth: btusb:
->> fix QCA Rome suspend/resume" commit, which fixes regular suspend for
->> devices which are "losing power during suspend", but does nothing for
->> runtime-suspend.
->>
->> He ran tests both with and without runtime-pm enabled with that same kernel
->> and he needed to disable runtime-pm to get working bluetooth.
+> ---
+> doc/mgmt-api.txt | 24 ++++++++++++++++++++++++
+> 1 file changed, 24 insertions(+)
 > 
-> Did he ever test with commit fd865802c66b reverted?
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 628ff18..e7453ea 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -2504,6 +2504,9 @@ Read Advertising Features Command
+> 		4	Add TX Power field to Adv_Data
+> 		5	Add Appearance field to Scan_Rsp
+> 		6	Add Local Name in Scan_Rsp
+> +		7	Secondary Channel with LE 1M
+> +		8	Secondary Channel with LE 2M
+> +		9	Secondary Channel with LE Coded
 > 
-> My symptoms were exactly the same as you described. BT was broken as
-> of v4.14 if I had runtime suspend enabled. Things were fine if I
-> either (a) reverted the patch or (b) disabled runtime suspend. I
-> obviously preferred (a), which is why I continued to complain :)
+> 	The Flags bit 0 indicates support for connectable advertising
+> 	and for switching to connectable advertising independent of the
+> @@ -2553,6 +2556,15 @@ Read Advertising Features Command
+> 	space is limited a short version or no name information. The
+> 	Local Name will be added at the end of the scan response data.
 > 
-> Did your tester ever try (a)? If not, then I don't think you've really
-> ensured that he really needed a "fixed" version; he may not have
-> needed the patch at all.
+> +	The Flags bit 7 indicates support for advertising in secondary
+> +	channel in LE 1M PHY.
+> +
+> +	The Flags bit 8 indicates support for advertising in secondary
+> +	channel in LE 2M PHY. Primary channel would be on 1M.
+> +
+> +	The Flags bit 9 indicates support for advertising in secondary
+> +	channel in LE CODED PHY.
+> +
+> 	The valid range for Instance identifiers is 1-254. The value 0
+> 	is reserved for internal use and the value 255 is reserved for
+> 	future extensions. However the Max_Instances value for indicating
+> @@ -2613,6 +2625,9 @@ Add Advertising Command
+> 		4	Add TX Power field to Adv_Data
+> 		5	Add Appearance field to Scan_Rsp
+> 		6	Add Local Name in Scan_Rsp
+> +		7	Secondary Channel with LE 1M
+> +		8	Secondary Channel with LE 2M
+> +		9	Secondary Channel with LE Coded
 > 
-> Or an alternative question: did that system work on an older Fedora
-> release (and presumably an older kernel)? If so, then he probably also
-> did not need that patch.
+> 	When the connectable flag is set, then the controller will use
+> 	undirected connectable advertising. The value of the connectable
+> @@ -2640,6 +2655,15 @@ Add Advertising Command
+> 	supported to provide less air traffic for devices implementing
+> 	broadcaster role.
 > 
->>> So, that would suggest he could only be seeing the race (as I was), and
->>> that his machine does not deserve a RESET_RESUME quirk?
->>
->>
->> I hope my above answer helps to clarify why I believe the quirk is
->> necessary on his machine.
-> 
-> I'm sorry, but no it doesn't. If anything, it suggests to me even more
-> that it may not have been necessary.
+> +	Secondary channel flags can be used to advertise in secondary
+> +	channel with the corresponding PHYs. These flag bits are mutually
+> +	exclusive and setting multiple will result in Invalid Parameter
+> +	error. Choosing LE 1M and LE 2M will result in using extended
+> +	advertising with the primary channel being 1M and secondary channel
 
-Ok, I've started another test-kernel build for the reporter this time
-without any quirks at all and I've asked him to test.
+I think this needs to be phrased differencing.
 
-Regards,
+Choosing either LE 1M or LE 2M will result in using extended advertising on the primary channel with LE 1M and the respectively LE 1M or LE 2M on the secondary channel. Choosing LE Coded will result in using extended advertising on the primary and secondary channels.
 
-Hans
+> +	with the respective PHY. Choosing LE Coded will result in extended
+> +	advertising with both primary and secondary channel in LE Coded.
+> +	Choosing none of these flags will result in legacy advertising.
+> +
+
+Regards
+
+Marcel
+
