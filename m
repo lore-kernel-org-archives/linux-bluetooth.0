@@ -1,22 +1,36 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Tue, 27 Feb 2018 10:55:33 -0500 (EST)
-Message-Id: <20180227.105533.1480399449629367201.davem@davemloft.net>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth 2018-02-26
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20180226114307.GA10612@x1c>
-References: <20180226114307.GA10612@x1c>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Subject: Re: [3/3] btmrvl: support sysfs initiated firmware coredump
+From: Kalle Valo <kvalo@codeaurora.org>
+In-Reply-To: <1519210220-22437-4-git-send-email-arend.vanspriel@broadcom.com>
+References: <1519210220-22437-4-git-send-email-arend.vanspriel@broadcom.com>
+To: Arend Van Spriel <arend.vanspriel@broadcom.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arend van Spriel <arend.vanspriel@broadcom.com>
+Message-Id: <20180227144639.DB9426070A@smtp.codeaurora.org>
+Date: Tue, 27 Feb 2018 14:46:39 +0000 (UTC)
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Mon, 26 Feb 2018 12:43:07 +0100
+Arend Van Spriel <arend.vanspriel@broadcom.com> wrote:
 
-> Here are a two Bluetooth driver fixes for the 4.16 kernel.
+> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
+> it is possible to initiate a device coredump from user-space. This
+> patch adds support for it in btmrvl_sdio adding the .coredump()
+> driver callback. This makes dump through debugfs obsolete so removing
+> it.
 > 
-> Please let me know if there are any issues pulling. Thanks.
+> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
 
-Pulled, thanks Johan.
+This is for bluetooth tree, dropping from my queue.
+
+Patch set to Not Applicable.
+
+-- 
+https://patchwork.kernel.org/patch/10231923/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
