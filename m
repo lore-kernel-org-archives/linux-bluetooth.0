@@ -2,75 +2,89 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v6 3/4] doc/mgmt-api: Add advertising phys support to flags
-Date: Wed, 28 Feb 2018 17:37:47 +0530
-Message-Id: <1519819668-7664-3-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v6 2/4] doc/mgmt-api: Add support for Set Phy Configuration command
+Date: Wed, 28 Feb 2018 17:37:46 +0530
+Message-Id: <1519819668-7664-2-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1519819668-7664-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1519819668-7664-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This also adds PHY Configuration Changed Event.
 ---
- doc/mgmt-api.txt | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ doc/mgmt-api.txt | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 89cc49a..7973b62 100644
+index 6ad28dc..89cc49a 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
-@@ -2504,6 +2504,9 @@ Read Advertising Features Command
- 		4	Add TX Power field to Adv_Data
- 		5	Add Appearance field to Scan_Rsp
- 		6	Add Local Name in Scan_Rsp
-+		7	Secondary Channel with LE 1M
-+		8	Secondary Channel with LE 2M
-+		9	Secondary Channel with LE Coded
+@@ -2940,9 +2940,46 @@ Get PHY Configuration Command
+ 	LE 1M TX and LE 1M RX would be supported by default.
  
- 	The Flags bit 0 indicates support for connectable advertising
- 	and for switching to connectable advertising independent of the
-@@ -2553,6 +2556,15 @@ Read Advertising Features Command
- 	space is limited a short version or no name information. The
- 	Local Name will be added at the end of the scan response data.
- 
-+	The Flags bit 7 indicates support for advertising in secondary
-+	channel in LE 1M PHY.
+ 	This command is only available for LE capable controllers.
++        It will return Not Supported otherwise.
 +
-+	The Flags bit 8 indicates support for advertising in secondary
-+	channel in LE 2M PHY. Primary channel would be on 1M.
++        Possible errors:	Not Supported
++				Invalid Index
 +
-+	The Flags bit 9 indicates support for advertising in secondary
-+	channel in LE CODED PHY.
++Set PHY Configuration Command
++=============================
 +
- 	The valid range for Instance identifiers is 1-254. The value 0
- 	is reserved for internal use and the value 255 is reserved for
- 	future extensions. However the Max_Instances value for indicating
-@@ -2613,6 +2625,9 @@ Add Advertising Command
- 		4	Add TX Power field to Adv_Data
- 		5	Add Appearance field to Scan_Rsp
- 		6	Add Local Name in Scan_Rsp
-+		7	Secondary Channel with LE 1M
-+		8	Secondary Channel with LE 2M
-+		9	Secondary Channel with LE Coded
- 
- 	When the connectable flag is set, then the controller will use
- 	undirected connectable advertising. The value of the connectable
-@@ -2640,6 +2655,16 @@ Add Advertising Command
- 	supported to provide less air traffic for devices implementing
- 	broadcaster role.
- 
-+	Secondary channel flags can be used to advertise in secondary
-+	channel with the corresponding PHYs. These flag bits are mutually
-+	exclusive and setting multiple will result in Invalid Parameter
-+	error. Choosing either LE 1M or LE 2M will result in using
-+	extended advertising on the primary channel with LE 1M and the
-+	respectively LE 1M or LE 2M on the secondary channel. Choosing
-+	LE Coded will result in using extended advertising on the primary
-+	and secondary channels with LE Coded. Choosing none of these flags
-+	will result in legacy advertising.
++	Command Code:		0x0044
++	Controller Index:	<controller id>
++	Command Parameters: 	Default_phys (2 Octet)
++	Return Parameters:
 +
- 	The Duration parameter configures the length of an Instance. The
- 	value is in seconds.
++	This command is used to set the default phy to the controller.
++
++	This will be stored and used for all the subsequent scanning
++	and connection initiation.
++
++	The list of supported PHYs can be retrieved via the
++	Get PHY Configuration command. Selecting unsupported PHYs will
++	result in an Invalid Parameters	error.
++
++	This can be called at any point to change the preferred PHYs.
++
++	Default_phys is a bitmask with the following bits.
++		0	LE 1M TX
++		1	LE 1M RX
++		2	LE 2M TX
++		3	LE 2M RX
++		4	LE CODED TX
++		5	LE CODED RX
++
++	This command generates a Command Complete event on success
++	or a Command Status event on failure.
++
++	This command is only available for LE capable controllers.
+ 	It will return Not Supported otherwise.
  
+ 	Possible errors:	Not Supported
++				Invalid Parameters
+ 				Invalid Index
+ 
+ Command Complete Event
+@@ -3810,3 +3847,18 @@ Extended Controller Information Changed Event
+ 
+ 	The event will only be sent to management sockets other than the
+ 	one through which the change was triggered.
++
++PHY Configuration Changed Event
++===============================
++
++	Event Code:		0x0026
++	Controller Index:	<controller id>
++	Event Parameters:	Selected_phys (2 Octets)
++
++	This event indicates that default PHYs have been updated.
++
++	This event will only be used after Set PHY Configuration
++	command has been used at least once.
++
++	The event will only be sent to management sockets other than the
++	one through which the change was triggered.
 -- 
 2.7.4
 
