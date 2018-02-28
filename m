@@ -1,88 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CAOASepNEyEgQaxrqN1dbmEjqVzm8+VZABt-Gcx=jBCHJ-CAM+w@mail.gmail.com>
-References: <CAOASepNEyEgQaxrqN1dbmEjqVzm8+VZABt-Gcx=jBCHJ-CAM+w@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 28 Feb 2018 10:04:00 +0200
-Message-ID: <CABBYNZKpHsbMaQFR8X2LfKapbjUeCdppb=YkTB7UnUS6cV1-UA@mail.gmail.com>
-Subject: Re: Clarification on Characteristic Flags
-To: Nathaniel McCallum <npmccallum@redhat.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: [v5 PATCH 3/3] doc/mgmt-api: Add advertising phys support to flags
+Date: Wed, 28 Feb 2018 13:19:11 +0530
+Message-Id: <1519804151-4850-3-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1519804151-4850-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1519804151-4850-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nathaniel,
+---
+ doc/mgmt-api.txt | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-On Tue, Feb 27, 2018 at 7:01 PM, Nathaniel McCallum
-<npmccallum@redhat.com> wrote:
-> The documentation in doc/gatt-api.txt specifies a number of flags that
-> control the security of the operations.[0] These flags contain no
-> documentation besides a reference to the Core Bluetooth Specification.
->
-> Unfortunately, the Core Specification has now changed and the
-> references no longer apply to the most recent documents. Further, even
-> if the references were correct, the documentation is also rather
-> opaque and presumes a lot of knowledge about Bluetooth to understand
-> the actual properties. An application developer cannot be presumed to
-> have this knowledge.
-
-The Core Specification documents Characteristic properties, and
-authentication and authorization requirements, which we combined into
-flags. The whole point is to make it trivial for the application to
-describe these requirements, but we apparently failed given your
-response.
-
-> Additionally, some of the flags (I think secure-read and secure-write)
-> don't appear to have any corollary in the specification. Nor is it
-> clear what behavior they actually implement.
-
-commit bf370f3bd6b00af545cb6f3d5a9b8e37a3642d3f
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Fri Apr 29 13:16:56 2016 +0300
-
-    doc/gatt-api: Add secure flags
-
-    This add secure-{read,write} which shall be used by servers that want
-    to restrict attribute access to secure connection only (BT_SECURITY_FIPS)
-
-Perhaps we should introduce a documentation about it in the doc as
-well, though this may change if SC were considered not secure anymore.
-
-> The combination of unclear documentation and critical security
-> properties is compounded by the unclear relationship between the
-> flags. For example, how should the following three flags be used
-> together: write, authenticated-signed-writes,
-> encrypt-authenticated-write? Does this mean that the unsigned writes,
-> signed writes and signed-and-encrypted writes are allowed and any one
-> of them may be chosen (leading to potential disclosure of sensitive
-> information)? Or does it mean that writes are allowed if they are
-> signed and encrypted?
-
-Usually, you would only add one write and one read access flag, so
-with above example that would mean _any_ of the above access would be
-allowed. It most likely makes sense to be as restrictive as possible
-with flags, meaning you only add flags for the exact access type you
-need. Perhaps adding an example as such would make the documentation
-clearer?
-
-> Would it be possible to get some clear documentation on not only how
-> to use these flags but what security properties emerge from their use
-> in various combinations? I would hate for security issues to arise
-> because developers are using this API incorrectly. Thanks!
-
-Absolutely, better documentation means that we expend less time trying
-to explain aspects of the API. Btw, we also welcome contributions so
-if you have the time to a patch for the documentation it would be
-really great.
-
-> [0]: https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n227
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 628ff18..0ded97d 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -2504,6 +2504,9 @@ Read Advertising Features Command
+ 		4	Add TX Power field to Adv_Data
+ 		5	Add Appearance field to Scan_Rsp
+ 		6	Add Local Name in Scan_Rsp
++		7	Secondary Channel with LE 1M
++		8	Secondary Channel with LE 2M
++		9	Secondary Channel with LE Coded
+ 
+ 	The Flags bit 0 indicates support for connectable advertising
+ 	and for switching to connectable advertising independent of the
+@@ -2553,6 +2556,15 @@ Read Advertising Features Command
+ 	space is limited a short version or no name information. The
+ 	Local Name will be added at the end of the scan response data.
+ 
++	The Flags bit 7 indicates support for advertising in secondary
++	channel in LE 1M PHY.
++
++	The Flags bit 8 indicates support for advertising in secondary
++	channel in LE 2M PHY. Primary channel would be on 1M.
++
++	The Flags bit 9 indicates support for advertising in secondary
++	channel in LE CODED PHY.
++
+ 	The valid range for Instance identifiers is 1-254. The value 0
+ 	is reserved for internal use and the value 255 is reserved for
+ 	future extensions. However the Max_Instances value for indicating
+@@ -2613,6 +2625,9 @@ Add Advertising Command
+ 		4	Add TX Power field to Adv_Data
+ 		5	Add Appearance field to Scan_Rsp
+ 		6	Add Local Name in Scan_Rsp
++		7	Secondary Channel with LE 1M
++		8	Secondary Channel with LE 2M
++		9	Secondary Channel with LE Coded
+ 
+ 	When the connectable flag is set, then the controller will use
+ 	undirected connectable advertising. The value of the connectable
+@@ -2640,6 +2655,16 @@ Add Advertising Command
+ 	supported to provide less air traffic for devices implementing
+ 	broadcaster role.
+ 
++	Secondary channel flags can be used to advertise in secondary
++	channel with the corresponding PHYs. These flag bits are mutually
++	exclusive and setting multiple will result in Invalid Parameter
++	error. Choosing either LE 1M or LE 2M will result in using
++	extended advertising on the primary channel with LE 1M and the
++	respectively LE 1M or LE 2M on the secondary channel. Choosing
++	LE Coded will result in using extended advertising on the primary
++	and secondary channels with LE Coded. Choosing none of these flags
++	will result in legacy advertising.
++
+ 	The Duration parameter configures the length of an Instance. The
+ 	value is in seconds.
+ 
 -- 
-Luiz Augusto von Dentz
+2.7.4
+
