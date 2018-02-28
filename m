@@ -1,51 +1,63 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ 0/9] Commonalize functions appending to dbus message
-Message-ID: <1183089a-69de-d3bd-9531-a5179086a129@jp.fujitsu.com>
-Date: Wed, 28 Feb 2018 16:33:00 +0900
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH] Bluetooth: btqcomsmd: Fix channel open check
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180228001738.11131-1-bjorn.andersson@linaro.org>
+Date: Wed, 28 Feb 2018 07:25:18 +0100
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Andy Gross <andy.gross@linaro.org>,
+        David Brown <david.brown@linaro.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-soc@vger.kernel.org,
+        stable@vger.kernel.org
+Message-Id: <1498F44F-02AE-4384-9227-0BABE3F4764E@holtmann.org>
+References: <20180228001738.11131-1-bjorn.andersson@linaro.org>
+To: Bjorn Andersson <bjorn.andersson@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-To improve maintainability, this patch set introduces common functions
-for appending to dbus message.
+Hi Bjorn,
 
-ERAMOTO Masaya (9):
-  gdbus: Introduce functions appending to dbus message
-  obexd: Use g_dbus_dict_append_entry()
-  obexd: Remove unused source/header files for dbus
-  client: Use g_dbus_dict_append_*()
-  mesh: Use g_dbus_dict_append_{entry,array}()
-  tools/obexctl: Use g_dbus_dict_append_entry()
-  tools/bluetooth-player: Use g_dbus_dict_append_entry()
-  unit/test-gdbus-client: Use g_dbus_dict_append_entry()
-  dbus-common: Remove unused functions due to use of g_dbus_dict_append_*()
+> rpmsg_create_ept() returns NULL on error and as such
+> qcom_wcnss_open_channel() does the same. Clarify this in the
+> kernel-doc and correct the error checks in btqcomsmd.
+> 
+> Fixes: 1511cc750c3d ("Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+> ---
+> drivers/bluetooth/btqcomsmd.c | 8 ++++----
+> drivers/soc/qcom/wcnss_ctrl.c | 2 ++
+> 2 files changed, 6 insertions(+), 4 deletions(-)
 
- Makefile.obexd            |   1 -
- client/advertising.c      |  58 ++------------------
- client/main.c             | 100 +++-------------------------------
- gdbus/client.c            | 135 +++++++++++++++++++++++++++++++++-------------
- gdbus/gdbus.h             |   9 ++++
- mesh/main.c               | 100 +++-------------------------------
- obexd/client/dbus.c       |  94 --------------------------------
- obexd/client/dbus.h       |  48 -----------------
- obexd/client/ftp.c        |   7 ++-
- obexd/client/map.c        |   6 +--
- obexd/client/session.c    |   1 -
- obexd/client/transfer.c   |   1 -
- obexd/plugins/bluetooth.c |  40 ++------------
- src/dbus-common.c         |  85 +----------------------------
- src/dbus-common.h         |   6 ---
- src/device.c              |   3 +-
- tools/bluetooth-player.c  |  38 ++-----------
- tools/obexctl.c           |  36 +------------
- unit/test-gdbus-client.c  |  38 ++-----------
- 19 files changed, 146 insertions(+), 660 deletions(-)
- delete mode 100644 obexd/client/dbus.c
- delete mode 100644 obexd/client/dbus.h
+I think you better split this into two separate patches so they can go via its subsystems independently.
 
--- 
-2.14.1
+> 
+> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+> index 2c9a5fc9137d..24f702927875 100644
+> --- a/drivers/bluetooth/btqcomsmd.c
+> +++ b/drivers/bluetooth/btqcomsmd.c
+> @@ -151,13 +151,13 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+> 
+> 	btq->acl_channel = qcom_wcnss_open_channel(wcnss, "APPS_RIVA_BT_ACL",
+> 						   btqcomsmd_acl_callback, btq);
+> -	if (IS_ERR(btq->acl_channel))
+> -		return PTR_ERR(btq->acl_channel);
+> +	if (!btq->acl_channel)
+> +		return -ENOENT;
+> 
+> 	btq->cmd_channel = qcom_wcnss_open_channel(wcnss, "APPS_RIVA_BT_CMD",
+> 						   btqcomsmd_cmd_callback, btq);
+> -	if (IS_ERR(btq->cmd_channel))
+> -		return PTR_ERR(btq->cmd_channel);
+> +	if (!btq->cmd_channel)
+> +		return -ENOENT;
 
+Any reason not to fix qcom_wcnss_open_channel to use PTR_ERR?
+
+Regards
+
+Marcel
