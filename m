@@ -2,52 +2,45 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v6 2/4] doc/mgmt-api: Add support for Set Phy Configuration command
-Date: Wed, 28 Feb 2018 17:37:46 +0530
-Message-Id: <1519819668-7664-2-git-send-email-jaganathx.kanakkassery@intel.com>
-In-Reply-To: <1519819668-7664-1-git-send-email-jaganathx.kanakkassery@intel.com>
-References: <1519819668-7664-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v6 1/4] doc/mgmt-api: Add support for Get PHY Configuration command
+Date: Wed, 28 Feb 2018 17:37:45 +0530
+Message-Id: <1519819668-7664-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This also adds PHY Configuration Changed Event.
 ---
- doc/mgmt-api.txt | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ doc/mgmt-api.txt | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 6ad28dc..89cc49a 100644
+index 8e7de14..6ad28dc 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
-@@ -2940,9 +2940,46 @@ Get PHY Configuration Command
- 	LE 1M TX and LE 1M RX would be supported by default.
+@@ -2871,6 +2871,7 @@ Read Extended Controller Information Command
+ 		13	Privacy
+ 		14	Controller Configuration
+ 		15	Static Address
++		16	PHY configuration
  
- 	This command is only available for LE capable controllers.
-+        It will return Not Supported otherwise.
+ 	The EIR_Data field contains information about class of device,
+ 	local name and other values. Not all of them might be present. For
+@@ -2916,6 +2917,33 @@ Set Appearance Command
+ 				Invalid Parameters
+ 				Invalid Index
+ 
++Get PHY Configuration Command
++==========================
 +
-+        Possible errors:	Not Supported
-+				Invalid Index
-+
-+Set PHY Configuration Command
-+=============================
-+
-+	Command Code:		0x0044
++	Command Code:		0x0043
 +	Controller Index:	<controller id>
-+	Command Parameters: 	Default_phys (2 Octet)
-+	Return Parameters:
++	Command Parameters:
++	Return Parameters:	Supported_phys (2 Octet)
++				Selected_phys (2 Octet)
 +
-+	This command is used to set the default phy to the controller.
++	This command is used to retrieve the supported PHYs and currently
++	selected PHYs.
 +
-+	This will be stored and used for all the subsequent scanning
-+	and connection initiation.
-+
-+	The list of supported PHYs can be retrieved via the
-+	Get PHY Configuration command. Selecting unsupported PHYs will
-+	result in an Invalid Parameters	error.
-+
-+	This can be called at any point to change the preferred PHYs.
-+
-+	Default_phys is a bitmask with the following bits.
++	Supported_phys and Selected_phys is a bitmask with the following bits.
 +		0	LE 1M TX
 +		1	LE 1M RX
 +		2	LE 2M TX
@@ -55,36 +48,16 @@ index 6ad28dc..89cc49a 100644
 +		4	LE CODED TX
 +		5	LE CODED RX
 +
-+	This command generates a Command Complete event on success
-+	or a Command Status event on failure.
++	LE 1M TX and LE 1M RX would be supported by default.
 +
 +	This command is only available for LE capable controllers.
- 	It will return Not Supported otherwise.
- 
- 	Possible errors:	Not Supported
-+				Invalid Parameters
- 				Invalid Index
++	It will return Not Supported otherwise.
++
++	Possible errors:	Not Supported
++				Invalid Index
  
  Command Complete Event
-@@ -3810,3 +3847,18 @@ Extended Controller Information Changed Event
- 
- 	The event will only be sent to management sockets other than the
- 	one through which the change was triggered.
-+
-+PHY Configuration Changed Event
-+===============================
-+
-+	Event Code:		0x0026
-+	Controller Index:	<controller id>
-+	Event Parameters:	Selected_phys (2 Octets)
-+
-+	This event indicates that default PHYs have been updated.
-+
-+	This event will only be used after Set PHY Configuration
-+	command has been used at least once.
-+
-+	The event will only be sent to management sockets other than the
-+	one through which the change was triggered.
+ ======================
 -- 
 2.7.4
 
