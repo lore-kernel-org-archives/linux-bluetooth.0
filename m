@@ -7,61 +7,25 @@ Cc: Hans de Goede <hdegoede@redhat.com>,
 	Kai-Heng Feng <kai.heng.feng@canonical.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	stable@vger.kernel.org,
-	Brian Norris <briannorris@chromium.org>
-Subject: [PATCH] Bluetooth: btusb: Remove Yoga 920 from the btusb_needs_reset_resume_table
-Date: Wed, 28 Feb 2018 11:57:50 +0100
-Message-Id: <20180228105750.6491-2-hdegoede@redhat.com>
-In-Reply-To: <20180228105750.6491-1-hdegoede@redhat.com>
-References: <20180228105750.6491-1-hdegoede@redhat.com>
+	linux-acpi@vger.kernel.org
+Subject: [PATCH 0/1] Bluetooth: btusb: Remove Yoga 920 from the btusb_needs_reset_resume_table
+Date: Wed, 28 Feb 2018 11:57:49 +0100
+Message-Id: <20180228105750.6491-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit 55a9c95d70ab ("Bluetooth: btusb: Use DMI matching for QCA
-reset_resume quirking"), added the Lenovo Yoga 920 to the
-btusb_needs_reset_resume_table.
+Hi All,
 
-Testing has shown that this is a false positive and the problems where
-caused by issues with the initial fix: commit fd865802c66b ("Bluetooth:
-btusb: fix QCA Rome suspend/resume"), which has already been reverted.
+So Brian Norris was right and the problems on the Yoga 920 have been
+caused all along by the initial QCA Rome suspend/resume fix issues.
 
-So the QCA Rome BT in the Yoga 920 does not need a reset-resume quirk at
-all and this commit removes it from the btusb_needs_reset_resume_table.
+So we can remove the Yoga 920 from the btusb_needs_reset_resume_table,
+note after this the table is empty.
 
-Note that after this commit the btusb_needs_reset_resume_table is now
-empty. It is kept around on purpose, since this whole series of commits
-started for a reason and there are actually broken platforms around,
-which need to be added to it.
+I've decided to keep the empty table around to make adding new entries
+easier. Kai-Heng AFAIK you said that you have at least one model laptop
+which does really need the reset-resume quirk for QCA? Can you submit
+a patch adding this model to the btusb_needs_reset_resume_table please?
 
-BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
-Fixes: 55a9c95d70ab ("Bluetooth: btusb: Use DMI matching for QCA ...")
-Cc: stable@vger.kernel.org
-Cc: Brian Norris <briannorris@chromium.org>
-Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>
-Tested-by: Kevin Fenzi <kevin@scrye.com>
-Suggested-by: Brian Norris <briannorris@chromium.org>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/btusb.c | 7 -------
- 1 file changed, 7 deletions(-)
+Regards,
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a4b62f0a93cc..418550eb1522 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -386,13 +386,6 @@ static const struct usb_device_id blacklist_table[] = {
-  * the module itself. So we use a DMI list to match known broken platforms.
-  */
- static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
--	{
--		/* Lenovo Yoga 920 (QCA Rome device 0cf3:e300) */
--		.matches = {
--			DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
--			DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo YOGA 920"),
--		},
--	},
- 	{}
- };
- 
--- 
-2.14.3
+Hans
