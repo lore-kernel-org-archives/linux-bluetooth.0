@@ -1,128 +1,109 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 9/9] tools/btpclient: Add connect device command
-Date: Wed, 28 Feb 2018 13:41:29 +0100
-Message-Id: <20180228124129.25851-9-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ 8/9] tools/btpclient: Add identity resolve event
+Date: Wed, 28 Feb 2018 13:41:28 +0100
+Message-Id: <20180228124129.25851-8-grzegorz.kolodziejczyk@codecoup.pl>
 In-Reply-To: <20180228124129.25851-1-grzegorz.kolodziejczyk@codecoup.pl>
 References: <20180228124129.25851-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for connect device command.
+This patch adds identity resolve event handler.
 ---
- tools/btpclient.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
+ tools/btpclient.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 50 insertions(+), 1 deletion(-)
 
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index d1d64d068..5bf2d922f 100644
+index 3b53b8fc8..d1d64d068 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
-@@ -1550,12 +1550,81 @@ static void connect_reply(struct l_dbus_proxy *proxy,
- 									NULL);
+@@ -66,6 +66,8 @@ struct btp_adapter {
+ 
+ struct btp_device {
+ 	struct l_dbus_proxy *proxy;
++	uint8_t address_type;
++	bdaddr_t address;
+ };
+ 
+ static struct l_queue *adapters;
+@@ -2520,6 +2522,34 @@ static void btp_gap_device_connection_ev(struct l_dbus_proxy *proxy,
+ 	}
  }
  
-+struct connect_device_data {
-+	bdaddr_t addr;
-+	uint8_t addr_type;
-+};
-+
-+static void connect_device_destroy(void *connect_device_data)
++static void btp_identity_resolved_ev(struct l_dbus_proxy *proxy)
 +{
-+	l_free(connect_device_data);
-+}
++	struct btp_device *dev = find_device_by_proxy(proxy);
++	struct btp_adapter *adapter = find_adapter_by_device(dev);
++	struct btp_gap_identity_resolved_ev ev;
++	char *str_addr, *str_addr_type;
++	uint8_t identity_address_type;
 +
-+static void connect_device_reply(struct l_dbus_proxy *proxy,
-+						struct l_dbus_message *result,
-+						void *user_data)
-+{
-+	struct btp_adapter *adapter = find_adapter_by_proxy(proxy);
-+
-+	if (!adapter) {
-+		btp_send_error(btp, BTP_GAP_SERVICE, BTP_INDEX_NON_CONTROLLER,
-+								BTP_ERROR_FAIL);
++	if (!l_dbus_proxy_get_property(proxy, "Address", "s", &str_addr))
 +		return;
-+	}
 +
-+	if (l_dbus_message_is_error(result)) {
-+		const char *name, *desc;
-+
-+		l_dbus_message_get_error(result, &name, &desc);
-+		l_error("Failed to connect device (%s), %s", name, desc);
-+
++	if (!l_dbus_proxy_get_property(proxy, "AddressType", "s",
++								&str_addr_type))
 +		return;
-+	}
++
++	identity_address_type = strcmp(str_addr_type, "public") ?
++				BTP_GAP_ADDR_RANDOM : BTP_GAP_ADDR_PUBLIC;
++
++	str2ba(str_addr, &ev.identity_address);
++	ev.identity_address_type = identity_address_type;
++
++	memcpy(&ev.address, &dev->address, sizeof(ev.address));
++	ev.address_type = dev->address_type;
++
++	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_IDENTITY_RESOLVED,
++					adapter->index, sizeof(ev), &ev);
 +}
 +
-+static void connect_device_setup(struct l_dbus_message *message,
-+								void *user_data)
-+{
-+	struct connect_device_data *cdd = user_data;
-+	struct l_dbus_message_builder *builder;
-+	char str_addr[18];
-+
-+	ba2str(&cdd->addr, str_addr);
-+
-+	builder = l_dbus_message_builder_new(message);
-+
-+	l_dbus_message_builder_enter_array(builder, "{sv}");
-+
-+	l_dbus_message_builder_enter_dict(builder, "sv");
-+	l_dbus_message_builder_append_basic(builder, 's', "Address");
-+	l_dbus_message_builder_enter_variant(builder, "s");
-+	l_dbus_message_builder_append_basic(builder, 's', str_addr);
-+	l_dbus_message_builder_leave_variant(builder);
-+	l_dbus_message_builder_leave_dict(builder);
-+
-+	l_dbus_message_builder_enter_dict(builder, "sv");
-+	l_dbus_message_builder_append_basic(builder, 's', "AddressType");
-+	l_dbus_message_builder_enter_variant(builder, "s");
-+	if (cdd->addr_type == BTP_GAP_ADDR_RANDOM)
-+		l_dbus_message_builder_append_basic(builder, 's', "random");
-+	else
-+		l_dbus_message_builder_append_basic(builder, 's', "public");
-+	l_dbus_message_builder_leave_variant(builder);
-+	l_dbus_message_builder_leave_dict(builder);
-+
-+	l_dbus_message_builder_leave_array(builder);
-+
-+	l_dbus_message_builder_finalize(builder);
-+	l_dbus_message_builder_destroy(builder);
-+}
-+
- static void btp_gap_connect(uint8_t index, const void *param, uint16_t length,
- 								void *user_data)
+ static void register_gap_service(void)
  {
- 	struct btp_adapter *adapter = find_adapter_by_index(index);
- 	const struct btp_gap_connect_cp *cp = param;
- 	struct btp_device *device;
-+	struct connect_device_data *cdd;
- 	bool prop;
- 	uint8_t status = BTP_ERROR_FAIL;
+ 	btp_register(btp, BTP_GAP_SERVICE, BTP_OP_GAP_READ_SUPPORTED_COMMANDS,
+@@ -2809,7 +2839,7 @@ static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+ 	if (!strcmp(interface, "org.bluez.Device1")) {
+ 		struct btp_adapter *adapter;
+ 		struct btp_device *device;
+-		char *str;
++		char *str, *str_addr, *str_addr_type;
  
-@@ -1572,6 +1641,22 @@ static void btp_gap_connect(uint8_t index, const void *param, uint16_t length,
- 	device = find_device_by_address(adapter, &cp->address,
- 							cp->address_type);
+ 		if (!l_dbus_proxy_get_property(proxy, "Adapter", "o", &str))
+ 			return;
+@@ -2825,6 +2855,20 @@ static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
  
-+	if (!device) {
-+		cdd = l_new(struct connect_device_data, 1);
-+		memcpy(&cdd->addr, &cp->address, sizeof(cdd->addr));
-+		cdd->addr_type = cp->address_type;
-+
-+		l_dbus_proxy_method_call(adapter->proxy, "ConnectDevice",
-+							connect_device_setup,
-+							connect_device_reply,
-+							cdd,
-+							connect_device_destroy);
-+
-+		btp_send(btp, BTP_GAP_SERVICE, BTP_OP_GAP_CONNECT,
-+						adapter->index, 0, NULL);
-+		return;
-+	}
-+
- 	if (!device)
- 		goto failed;
+ 		btp_gap_device_found_ev(proxy);
  
++		if (!l_dbus_proxy_get_property(proxy, "Address", "s",
++								&str_addr))
++			return;
++
++		if (!l_dbus_proxy_get_property(proxy, "AddressType", "s",
++								&str_addr_type))
++			return;
++
++		device->address_type = strcmp(str_addr_type, "public") ?
++							BTP_GAP_ADDR_RANDOM :
++							BTP_GAP_ADDR_PUBLIC;
++		if (!str2ba(str_addr, &device->address))
++			return;
++
+ 		return;
+ 	}
+ 
+@@ -2956,6 +3000,11 @@ static void property_changed(struct l_dbus_proxy *proxy, const char *name,
+ 				return;
+ 
+ 			btp_gap_device_connection_ev(proxy, prop);
++		} else if (!strcmp(name, "AddressType")) {
++			/* Addres property change came first along with address
++			 * type.
++			 */
++			btp_identity_resolved_ev(proxy);
+ 		}
+ 	}
+ }
 -- 
 2.13.6
 
