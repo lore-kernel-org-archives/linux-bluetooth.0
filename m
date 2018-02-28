@@ -1,97 +1,109 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Restore QCA Rome suspend/resume fix
- with a "rewritten" version
-From: Hans de Goede <hdegoede@redhat.com>
-To: Brian Norris <briannorris@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Bluez mailing list <linux-bluetooth@vger.kernel.org>,
- linux-serial@vger.kernel.org,
- ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
- stable <stable@vger.kernel.org>, Leif Liddy <leif.linux@gmail.com>,
- Matthias Kaehlcke <mka@chromium.org>, Daniel Drake <drake@endlessm.com>,
- Kai-Heng Feng <kai.heng.feng@canonical.com>,
- Matadeen Mishra <matadeen@qti.qualcomm.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Guenter Roeck <linux@roeck-us.net>
-References: <20180108094416.4789-1-hdegoede@redhat.com>
- <20180213022455.GA151190@rodete-desktop-imager.corp.google.com>
- <8cd918fd-bf6f-70ac-e561-e7deffa695f0@redhat.com>
- <20180216022721.GA69988@rodete-desktop-imager.corp.google.com>
- <345b0de8-1a23-d2f8-bc56-507eadf7faa7@redhat.com>
- <6B37F6AC-1103-4FCF-A5DC-4BA236A7B11B@holtmann.org>
- <1a08612e-2531-3711-ec0f-a867e86d0009@redhat.com>
- <20180216175955.GA80944@rodete-desktop-imager.corp.google.com>
- <a846c1ac-7dea-a30a-4133-32eac606d101@redhat.com>
- <20180223031216.GA230265@rodete-desktop-imager.corp.google.com>
- <a6090910-7941-b194-c094-7ce3ef047974@redhat.com>
- <CA+ASDXOGhi4t2R5qrbXHTFkjtzvUL=qHxkJqku4XKJ6u8Wr+cg@mail.gmail.com>
- <cdf043ef-b7d5-61f9-b8ea-7e75cb22485f@redhat.com>
-Message-ID: <1711ebe8-8d1a-7d96-bcbe-17238988557a@redhat.com>
-Date: Wed, 28 Feb 2018 11:54:34 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [v5 PATCH 2/3] doc/mgmt-api: Add support for Set Phy
+ Configuration command
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+References: <1519804151-4850-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1519804151-4850-2-git-send-email-jaganathx.kanakkassery@intel.com>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Message-ID: <9d9ea6b6-8aa3-cf59-50e7-d09a5fa5cf20@jp.fujitsu.com>
+Date: Wed, 28 Feb 2018 17:26:31 +0900
 MIME-Version: 1.0
-In-Reply-To: <cdf043ef-b7d5-61f9-b8ea-7e75cb22485f@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <1519804151-4850-2-git-send-email-jaganathx.kanakkassery@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Jaganath,
 
-On 27-02-18 15:07, Hans de Goede wrote:
-> Hi,
+On 02/28/2018 04:49 PM, Jaganath Kanakkassery wrote:
+> This also adds PHY Configuration Changed Event.
+> ---
+>  doc/mgmt-api.txt | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 52 insertions(+)
 > 
-> On 27-02-18 03:29, Brian Norris wrote:
->> On Thu, Feb 22, 2018 at 11:14 PM, Hans de Goede <hdegoede@redhat.com> wrote:
->>> On 23-02-18 04:12, Brian Norris wrote:
->>>> Hmm? I'm not sure I completely follow here when you say "he was not
->>>> hitting the firmware loading race". If things were functioning fine with
->>>> system suspend (but not with autosuspend), then he's not seeing the
->>>> controller (quoting commit fd865802c66b) "losing power during suspend".
->>>
->>>
->>> He was running a kernel with the original "fd865802c66b Bluetooth: btusb:
->>> fix QCA Rome suspend/resume" commit, which fixes regular suspend for
->>> devices which are "losing power during suspend", but does nothing for
->>> runtime-suspend.
->>>
->>> He ran tests both with and without runtime-pm enabled with that same kernel
->>> and he needed to disable runtime-pm to get working bluetooth.
->>
->> Did he ever test with commit fd865802c66b reverted?
->>
->> My symptoms were exactly the same as you described. BT was broken as
->> of v4.14 if I had runtime suspend enabled. Things were fine if I
->> either (a) reverted the patch or (b) disabled runtime suspend. I
->> obviously preferred (a), which is why I continued to complain :)
->>
->> Did your tester ever try (a)? If not, then I don't think you've really
->> ensured that he really needed a "fixed" version; he may not have
->> needed the patch at all.
->>
->> Or an alternative question: did that system work on an older Fedora
->> release (and presumably an older kernel)? If so, then he probably also
->> did not need that patch.
->>
->>>> So, that would suggest he could only be seeing the race (as I was), and
->>>> that his machine does not deserve a RESET_RESUME quirk?
->>>
->>>
->>> I hope my above answer helps to clarify why I believe the quirk is
->>> necessary on his machine.
->>
->> I'm sorry, but no it doesn't. If anything, it suggests to me even more
->> that it may not have been necessary.
-> 
-> Ok, I've started another test-kernel build for the reporter this time
-> without any quirks at all and I've asked him to test.
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index c07c48c..628ff18 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -2940,9 +2940,46 @@ Get PHY Configuration Command
+>  	LE 1M TX and LE 1M RX would be supported by default.
+>  
+>  	This command is only available for LE capable controllers.
+> +        It will return Not Supported otherwise.
+> +
+> +        Possible errors:        Not Supported
 
-You were right, the Yoga 920 works fine without any quirks, thank you
-for being persistent on getting this tested properly.
+nitpick: better to use tab instead of whitespaces
 
-I will submit a patch dropping the Yoga 920 from the
-btusb_needs_reset_resume_table.
+
+> +				Invalid Index
+> +
+> +Set PHY Configuration Command
+> +=============================
+> +
+> +	Command Code:		0x0044
+> +	Controller Index:	<controller id>
+> +	Command Parameters: 	Default_phys (2 Octet)
+> +	Return Parameters:
+> +
+> +	This command is used to set the default phy to the controller.
+> +
+> +	This will be stored and used for all the subsequent scanning
+> +	and connection initiation.
+> +
+> +	The list of supported PHYs can be retrieved via the
+> +	Get PHY Configuration command. Selecting unsupported PHYs will
+> +	result in an Invalid Parameters	error.
+> +
+> +	This can be called at any point to change the preferred PHYs.
+> +
+> +	Default_phy is a bitmask with the following bits.
+
+s/Default_phy/Default_phys/
+
 
 Regards,
+Eramoto
 
-Hans
+
+> +		0	LE 1M TX
+> +		1	LE 1M RX
+> +		2	LE 2M TX
+> +		3	LE 2M RX
+> +		4	LE CODED TX
+> +		5	LE CODED RX
+> +
+> +	This command generates a Command Complete event on success
+> +	or a Command Status event on failure.
+> +
+> +	This command is only available for LE capable controllers.
+>  	It will return Not Supported otherwise.
+>  
+>  	Possible errors:	Not Supported
+> +				Invalid Parameters
+>  				Invalid Index
+>  
+>  Command Complete Event
+> @@ -3810,3 +3847,18 @@ Extended Controller Information Changed Event
+>  
+>  	The event will only be sent to management sockets other than the
+>  	one through which the change was triggered.
+> +
+> +PHY Configuration Changed Event
+> +===============================
+> +
+> +	Event Code:		0x0026
+> +	Controller Index:	<controller id>
+> +	Event Parameters:	Selected_phys (2 Octets)
+> +
+> +	This event indicates that default PHYs have been updated.
+> +
+> +	This event will only be used after Set PHY Configuration
+> +	command has been used at least once.
+> +
+> +	The event will only be sent to management sockets other than the
+> +	one through which the change was triggered.
+> 
+
