@@ -1,82 +1,108 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/9] tools/btpclient: Check if dev is connected in device found ev routine
-Date: Wed, 28 Feb 2018 13:41:26 +0100
-Message-Id: <20180228124129.25851-6-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ 7/9] tools/btpclient: Add solicit uuid16 service list support for ad
+Date: Wed, 28 Feb 2018 13:41:27 +0100
+Message-Id: <20180228124129.25851-7-grzegorz.kolodziejczyk@codecoup.pl>
 In-Reply-To: <20180228124129.25851-1-grzegorz.kolodziejczyk@codecoup.pl>
 References: <20180228124129.25851-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Device may be connected while device found event is generated thus thus
-btp should generate additional device connected event also.
+This patch adds support to get/set solicit uuid16 service list in
+advertising data.
 ---
- tools/btpclient.c | 32 +++++++++++++++++++++++---------
- 1 file changed, 23 insertions(+), 9 deletions(-)
+ tools/btpclient.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
 diff --git a/tools/btpclient.c b/tools/btpclient.c
-index 92fa742ce..006d8acbe 100644
+index 006d8acbe..3b53b8fc8 100644
 --- a/tools/btpclient.c
 +++ b/tools/btpclient.c
-@@ -2396,24 +2396,30 @@ failed:
+@@ -45,6 +45,7 @@
+ #define AD_TYPE_INCOMPLETE_UUID16_SERVICE_LIST	0x02
+ #define AD_TYPE_SHORT_NAME			0x08
+ #define AD_TYPE_TX_POWER			0x0a
++#define AD_TYPE_SOLICIT_UUID16_SERVICE_LIST	0x14
+ #define AD_TYPE_SERVICE_DATA_UUID16		0x16
+ #define AD_TYPE_APPEARANCE			0x19
+ #define AD_TYPE_MANUFACTURER_DATA		0xff
+@@ -98,6 +99,7 @@ static struct ad {
+ 	struct l_queue *uuids;
+ 	struct l_queue *services;
+ 	struct l_queue *manufacturers;
++	struct l_queue *solicits;
+ 	bool tx_power;
+ 	bool name;
+ 	bool appearance;
+@@ -443,6 +445,7 @@ static void ad_cleanup(void)
+ 	l_queue_destroy(ad.uuids, l_free);
+ 	l_queue_destroy(ad.services, ad_cleanup_service);
+ 	l_queue_destroy(ad.manufacturers, l_free);
++	l_queue_destroy(ad.solicits, l_free);
  
- static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
- {
-+	struct btp_device *device = find_device_by_proxy(proxy);
-+	struct btp_adapter *adapter = find_adapter_by_device(device);
- 	struct btp_device_found_ev ev;
--	const char *str;
-+	struct btp_gap_device_connected_ev ev_conn;
-+	const char *str, *addr_str;
- 	int16_t rssi;
-+	uint8_t address_type;
-+	bool connected;
+ 	memset(&ad, 0, sizeof(ad));
+ }
+@@ -756,6 +759,7 @@ static void ad_init(void)
+ 	ad.uuids = l_queue_new();
+ 	ad.services = l_queue_new();
+ 	ad.manufacturers = l_queue_new();
++	ad.solicits = l_queue_new();
  
--	if (!l_dbus_proxy_get_property(proxy, "Address", "s", &str) ||
--						str2ba(str, &ev.address) < 0)
-+	if (!l_dbus_proxy_get_property(proxy, "Address", "s", &addr_str) ||
-+					str2ba(addr_str, &ev.address) < 0)
- 		return;
- 
- 	if (!l_dbus_proxy_get_property(proxy, "AddressType", "s", &str))
- 		return;
- 
--	ev.address_type = strcmp(str, "public") ? BTP_GAP_ADDR_RANDOM :
-+	address_type = strcmp(str, "public") ? BTP_GAP_ADDR_RANDOM :
- 							BTP_GAP_ADDR_PUBLIC;
-+	ev.address_type = address_type;
- 
- 	if (!l_dbus_proxy_get_property(proxy, "RSSI", "n", &rssi))
--		return;
--
--	ev.rssi = rssi;
-+		ev.rssi = 0x81;
-+	else
-+		ev.rssi = rssi;
- 
- 	/* TODO Temporary set all flags */
- 	ev.flags = (BTP_EV_GAP_DEVICE_FOUND_FLAG_RSSI |
-@@ -2423,9 +2429,17 @@ static void btp_gap_device_found_ev(struct l_dbus_proxy *proxy)
- 	/* TODO Add eir to device found event */
- 	ev.eir_len = 0;
- 
--	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_FOUND,
--						BTP_INDEX_NON_CONTROLLER,
-+	btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_FOUND, adapter->index,
- 						sizeof(ev) + ev.eir_len, &ev);
-+
-+	if (l_dbus_proxy_get_property(proxy, "Connected", "b", &connected) &&
-+								connected) {
-+		ev_conn.address_type = address_type;
-+		str2ba(addr_str, &ev_conn.address);
-+
-+		btp_send(btp, BTP_GAP_SERVICE, BTP_EV_GAP_DEVICE_CONNECTED,
-+				adapter->index, sizeof(ev_conn), &ev_conn);
-+	}
+ 	ad.local_appearance = UINT16_MAX;
+ }
+@@ -876,6 +880,27 @@ static bool ad_manufacturerdata_getter(struct l_dbus *dbus,
+ 	return true;
  }
  
- static void btp_gap_device_connection_ev(struct l_dbus_proxy *proxy,
++static bool ad_solicituuids_getter(struct l_dbus *dbus,
++					struct l_dbus_message *message,
++					struct l_dbus_message_builder *builder,
++					void *user_data)
++{
++	const struct l_queue_entry *entry;
++
++	if (l_queue_isempty(ad.solicits))
++		return false;
++
++	l_dbus_message_builder_enter_array(builder, "s");
++
++	for (entry = l_queue_get_entries(ad.solicits); entry;
++							entry = entry->next)
++		l_dbus_message_builder_append_basic(builder, 's', entry->data);
++
++	l_dbus_message_builder_leave_array(builder);
++
++	return true;
++}
++
+ static bool ad_includes_getter(struct l_dbus *dbus,
+ 					struct l_dbus_message *message,
+ 					struct l_dbus_message_builder *builder,
+@@ -975,6 +1000,8 @@ static void setup_ad_interface(struct l_dbus_interface *interface)
+ 	l_dbus_interface_property(interface, "ManufacturerData", 0,
+ 					"a{qv}", ad_manufacturerdata_getter,
+ 					NULL);
++	l_dbus_interface_property(interface, "SolicitUUIDs", 0, "as",
++						ad_solicituuids_getter, NULL);
+ 	l_dbus_interface_property(interface, "Includes", 0, "as",
+ 						ad_includes_getter, NULL);
+ 	l_dbus_interface_property(interface, "LocalName", 0, "s",
+@@ -1089,6 +1116,14 @@ static void create_advertising_data(uint8_t adv_data_len, const uint8_t *data)
+ 
+ 			break;
+ 		}
++		case AD_TYPE_SOLICIT_UUID16_SERVICE_LIST:
++		{
++			char *uuid = dupuuid2str(ad_data, 16);
++
++			l_queue_push_tail(ad.solicits, uuid);
++
++			break;
++		}
+ 		default:
+ 			l_info("Unsupported advertising data type");
+ 
 -- 
 2.13.6
 
