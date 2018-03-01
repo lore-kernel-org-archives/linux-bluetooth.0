@@ -1,11 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ v2 9/9] dbus-common: Remove unused functions due to use
- of g_dbus_dict_append_*()
+Subject: [PATCH BlueZ v2 8/9] unit/test-gdbus-client: Use
+ g_dbus_dict_append_entry()
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
-Message-ID: <98a67a81-4fb7-39d5-d5ee-a378476f8fd1@jp.fujitsu.com>
-Date: Thu, 1 Mar 2018 13:27:42 +0900
+Message-ID: <fba6c6dc-fd47-3932-ba39-1b7c6c3fc363@jp.fujitsu.com>
+Date: Thu, 1 Mar 2018 13:27:38 +0900
 MIME-Version: 1.0
 In-Reply-To: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
@@ -13,18 +13,16 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/dbus-common.c | 85 ++-----------------------------------------------------
- src/dbus-common.h |  6 ----
- src/device.c      |  3 +-
- 3 files changed, 4 insertions(+), 90 deletions(-)
+ unit/test-gdbus-client.c | 38 +++-----------------------------------
+ 1 file changed, 3 insertions(+), 35 deletions(-)
 
-diff --git a/src/dbus-common.c b/src/dbus-common.c
-index adb0a7a4e..6e2097a2d 100644
---- a/src/dbus-common.c
-+++ b/src/dbus-common.c
-@@ -41,97 +41,16 @@
- 
- static DBusConnection *connection = NULL;
+diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
+index dd17c00f7..a2c88f309 100644
+--- a/unit/test-gdbus-client.c
++++ b/unit/test-gdbus-client.c
+@@ -178,39 +178,6 @@ static void client_connect_disconnect(const void *data)
+ 								context);
+ }
  
 -static void append_variant(DBusMessageIter *iter, int type, void *val)
 -{
@@ -38,38 +36,8 @@ index adb0a7a4e..6e2097a2d 100644
 -	dbus_message_iter_close_container(iter, &value);
 -}
 -
--static void append_array_variant(DBusMessageIter *iter, int type, void *val,
--							int n_elements)
--{
--	DBusMessageIter variant, array;
--	char type_sig[2] = { type, '\0' };
--	char array_sig[3] = { DBUS_TYPE_ARRAY, type, '\0' };
--
--	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT,
--						array_sig, &variant);
--
--	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
--						type_sig, &array);
--
--	if (dbus_type_is_fixed(type) == TRUE) {
--		dbus_message_iter_append_fixed_array(&array, type, val,
--							n_elements);
--	} else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
--		const char ***str_array = val;
--		int i;
--
--		for (i = 0; i < n_elements; i++)
--			dbus_message_iter_append_basic(&array, type,
--							&((*str_array)[i]));
--	}
--
--	dbus_message_iter_close_container(&variant, &array);
--
--	dbus_message_iter_close_container(iter, &variant);
--}
--
--void dict_append_basic(DBusMessageIter *dict, int key_type, const void *key,
--						int type, void *val)
+-static void dict_append_entry(DBusMessageIter *dict, const char *key, int type,
+-								void *val)
 -{
 -	DBusMessageIter entry;
 -
@@ -82,78 +50,27 @@ index adb0a7a4e..6e2097a2d 100644
 -	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
 -							NULL, &entry);
 -
--	dbus_message_iter_append_basic(&entry, key_type, key);
+-	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
 -
 -	append_variant(&entry, type, val);
 -
 -	dbus_message_iter_close_container(dict, &entry);
--
 -}
 -
- void dict_append_entry(DBusMessageIter *dict,
- 			const char *key, int type, void *val)
+ static gboolean get_dict(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
  {
--	dict_append_basic(dict, DBUS_TYPE_STRING, &key, type, val);
--}
--
--void dict_append_basic_array(DBusMessageIter *dict, int key_type,
--					const void *key, int type, void *val,
--					int n_elements)
--{
--	DBusMessageIter entry;
--
--	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
--						NULL, &entry);
--
--	dbus_message_iter_append_basic(&entry, key_type, key);
--
--	append_array_variant(&entry, type, val, n_elements);
--
--	dbus_message_iter_close_container(dict, &entry);
-+	g_dbus_dict_append_entry(dict, key, type, val);
- }
+@@ -223,8 +190,9 @@ static gboolean get_dict(const GDBusPropertyTable *property,
+ 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+ 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
  
- void dict_append_array(DBusMessageIter *dict, const char *key, int type,
- 			void *val, int n_elements)
- {
--	dict_append_basic_array(dict, DBUS_TYPE_STRING, &key, type, val,
--								n_elements);
-+	g_dbus_dict_append_array(dict, key, type, val, n_elements);
- }
+-	dict_append_entry(&dict, "String", DBUS_TYPE_STRING, &string);
+-	dict_append_entry(&dict, "Boolean", DBUS_TYPE_BOOLEAN, &boolean);
++	g_dbus_dict_append_entry(&dict, "String", DBUS_TYPE_STRING, &string);
++	g_dbus_dict_append_entry(&dict, "Boolean",
++					DBUS_TYPE_BOOLEAN, &boolean);
  
- void set_dbus_connection(DBusConnection *conn)
-diff --git a/src/dbus-common.h b/src/dbus-common.h
-index 2e7d51e84..fbf4acd28 100644
---- a/src/dbus-common.h
-+++ b/src/dbus-common.h
-@@ -21,14 +21,8 @@
-  *
-  */
- 
--void dict_append_basic(DBusMessageIter *dict, int key_type, const void *key,
--						int type, void *val);
- void dict_append_entry(DBusMessageIter *dict,
- 			const char *key, int type, void *val);
--
--void dict_append_basic_array(DBusMessageIter *dict, int key_type,
--					const void *key, int type, void *val,
--					int n_elements);
- void dict_append_array(DBusMessageIter *dict, const char *key, int type,
- 			void *val, int n_elements);
- 
-diff --git a/src/device.c b/src/device.c
-index 1b84040dd..8eb99e4bd 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1199,7 +1199,8 @@ static void append_manufacturer_data(void *data, void *user_data)
- 	struct bt_ad_manufacturer_data *md = data;
- 	DBusMessageIter *dict = user_data;
- 
--	dict_append_basic_array(dict, DBUS_TYPE_UINT16, &md->manufacturer_id,
-+	g_dbus_dict_append_basic_array(dict,
-+				DBUS_TYPE_UINT16, &md->manufacturer_id,
- 				DBUS_TYPE_BYTE, &md->data, md->len);
- }
+ 	dbus_message_iter_close_container(iter, &dict);
  
 -- 
 2.14.1
