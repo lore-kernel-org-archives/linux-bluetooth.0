@@ -1,54 +1,160 @@
-Return-Path: <kai.heng.feng@canonical.com>
-From: Kai-Heng Feng <kai.heng.feng@canonical.com>
-To: marcel@holtmann.org
-Cc: johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kai-Heng Feng <kai.heng.feng@canonical.com>,
-	stable@vger.kernel.org,
-	Brian Norris <briannorris@chromium.org>,
-	Hans de Goede <hdegoede@redhat.com>
-Subject: [PATCH] Bluetooth: btusb: Add Dell OptiPlex 3060 to btusb_needs_reset_resume_table
-Date: Thu,  1 Mar 2018 13:42:52 +0800
-Message-Id: <20180301054252.16007-1-kai.heng.feng@canonical.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: [PATCH BlueZ v2 9/9] dbus-common: Remove unused functions due to use
+ of g_dbus_dict_append_*()
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
+Message-ID: <98a67a81-4fb7-39d5-d5ee-a378476f8fd1@jp.fujitsu.com>
+Date: Thu, 1 Mar 2018 13:27:42 +0900
+MIME-Version: 1.0
+In-Reply-To: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The issue can be reproduced before commit fd865802c66b ("Bluetooth:
-btusb: fix QCA Rome suspend/resume") gets introduced, so the reset
-resume quirk is still needed for this system.
-
-T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
-D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e007 Rev=00.01
-C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-
-Cc: stable@vger.kernel.org
-Cc: Brian Norris <briannorris@chromium.org>
-Cc: Hans de Goede <hdegoede@redhat.com>
-Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
 ---
- drivers/bluetooth/btusb.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ src/dbus-common.c | 85 ++-----------------------------------------------------
+ src/dbus-common.h |  6 ----
+ src/device.c      |  3 +-
+ 3 files changed, 4 insertions(+), 90 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c5cebf53eae5..e98fb5343a00 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -389,6 +389,13 @@ static const struct usb_device_id blacklist_table[] = {
-  * the module itself. So we use a DMI list to match known broken platforms.
+diff --git a/src/dbus-common.c b/src/dbus-common.c
+index adb0a7a4e..6e2097a2d 100644
+--- a/src/dbus-common.c
++++ b/src/dbus-common.c
+@@ -41,97 +41,16 @@
+ 
+ static DBusConnection *connection = NULL;
+ 
+-static void append_variant(DBusMessageIter *iter, int type, void *val)
+-{
+-	DBusMessageIter value;
+-	char sig[2] = { type, '\0' };
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
+-
+-	dbus_message_iter_append_basic(&value, type, val);
+-
+-	dbus_message_iter_close_container(iter, &value);
+-}
+-
+-static void append_array_variant(DBusMessageIter *iter, int type, void *val,
+-							int n_elements)
+-{
+-	DBusMessageIter variant, array;
+-	char type_sig[2] = { type, '\0' };
+-	char array_sig[3] = { DBUS_TYPE_ARRAY, type, '\0' };
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT,
+-						array_sig, &variant);
+-
+-	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
+-						type_sig, &array);
+-
+-	if (dbus_type_is_fixed(type) == TRUE) {
+-		dbus_message_iter_append_fixed_array(&array, type, val,
+-							n_elements);
+-	} else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
+-		const char ***str_array = val;
+-		int i;
+-
+-		for (i = 0; i < n_elements; i++)
+-			dbus_message_iter_append_basic(&array, type,
+-							&((*str_array)[i]));
+-	}
+-
+-	dbus_message_iter_close_container(&variant, &array);
+-
+-	dbus_message_iter_close_container(iter, &variant);
+-}
+-
+-void dict_append_basic(DBusMessageIter *dict, int key_type, const void *key,
+-						int type, void *val)
+-{
+-	DBusMessageIter entry;
+-
+-	if (type == DBUS_TYPE_STRING) {
+-		const char *str = *((const char **) val);
+-		if (str == NULL)
+-			return;
+-	}
+-
+-	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
+-							NULL, &entry);
+-
+-	dbus_message_iter_append_basic(&entry, key_type, key);
+-
+-	append_variant(&entry, type, val);
+-
+-	dbus_message_iter_close_container(dict, &entry);
+-
+-}
+-
+ void dict_append_entry(DBusMessageIter *dict,
+ 			const char *key, int type, void *val)
+ {
+-	dict_append_basic(dict, DBUS_TYPE_STRING, &key, type, val);
+-}
+-
+-void dict_append_basic_array(DBusMessageIter *dict, int key_type,
+-					const void *key, int type, void *val,
+-					int n_elements)
+-{
+-	DBusMessageIter entry;
+-
+-	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
+-						NULL, &entry);
+-
+-	dbus_message_iter_append_basic(&entry, key_type, key);
+-
+-	append_array_variant(&entry, type, val, n_elements);
+-
+-	dbus_message_iter_close_container(dict, &entry);
++	g_dbus_dict_append_entry(dict, key, type, val);
+ }
+ 
+ void dict_append_array(DBusMessageIter *dict, const char *key, int type,
+ 			void *val, int n_elements)
+ {
+-	dict_append_basic_array(dict, DBUS_TYPE_STRING, &key, type, val,
+-								n_elements);
++	g_dbus_dict_append_array(dict, key, type, val, n_elements);
+ }
+ 
+ void set_dbus_connection(DBusConnection *conn)
+diff --git a/src/dbus-common.h b/src/dbus-common.h
+index 2e7d51e84..fbf4acd28 100644
+--- a/src/dbus-common.h
++++ b/src/dbus-common.h
+@@ -21,14 +21,8 @@
+  *
   */
- static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
-+	{
-+		/* Dell OptiPlex 3060 (QCA ROME device 0cf3:e007) */
-+		.matches = {
-+			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc."),
-+			DMI_MATCH(DMI_PRODUCT_NAME, "OptiPlex 3060"),
-+		},
-+	},
- 	{}
- };
+ 
+-void dict_append_basic(DBusMessageIter *dict, int key_type, const void *key,
+-						int type, void *val);
+ void dict_append_entry(DBusMessageIter *dict,
+ 			const char *key, int type, void *val);
+-
+-void dict_append_basic_array(DBusMessageIter *dict, int key_type,
+-					const void *key, int type, void *val,
+-					int n_elements);
+ void dict_append_array(DBusMessageIter *dict, const char *key, int type,
+ 			void *val, int n_elements);
+ 
+diff --git a/src/device.c b/src/device.c
+index 1b84040dd..8eb99e4bd 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1199,7 +1199,8 @@ static void append_manufacturer_data(void *data, void *user_data)
+ 	struct bt_ad_manufacturer_data *md = data;
+ 	DBusMessageIter *dict = user_data;
+ 
+-	dict_append_basic_array(dict, DBUS_TYPE_UINT16, &md->manufacturer_id,
++	g_dbus_dict_append_basic_array(dict,
++				DBUS_TYPE_UINT16, &md->manufacturer_id,
+ 				DBUS_TYPE_BYTE, &md->data, md->len);
+ }
  
 -- 
-2.15.1
+2.14.1
+
