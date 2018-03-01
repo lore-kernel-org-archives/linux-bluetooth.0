@@ -1,10 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ v2 6/9] tools/obexctl: Use g_dbus_dict_append_entry()
+Subject: [PATCH BlueZ v2 5/9] mesh: Use g_dbus_dict_append_{entry,array}()
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
-Message-ID: <01dc7c1c-3d47-978b-e439-16baf9734b3e@jp.fujitsu.com>
-Date: Thu, 1 Mar 2018 13:27:29 +0900
+Message-ID: <0fbd1d37-f983-81df-ae5e-b70fecfadd48@jp.fujitsu.com>
+Date: Thu, 1 Mar 2018 13:27:26 +0900
 MIME-Version: 1.0
 In-Reply-To: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,15 +12,15 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/obexctl.c | 36 ++----------------------------------
- 1 file changed, 2 insertions(+), 34 deletions(-)
+ mesh/main.c | 100 +++++-------------------------------------------------------
+ 1 file changed, 8 insertions(+), 92 deletions(-)
 
-diff --git a/tools/obexctl.c b/tools/obexctl.c
-index c62ae8711..9af2a925e 100644
---- a/tools/obexctl.c
-+++ b/tools/obexctl.c
-@@ -123,39 +123,6 @@ static void connect_reply(DBusMessage *message, void *user_data)
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+diff --git a/mesh/main.c b/mesh/main.c
+index 3a35fab8a..d96de75db 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -1412,93 +1412,6 @@ static void cmd_power(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_FAILURE);
  }
  
 -static void append_variant(DBusMessageIter *iter, int type, void *val)
@@ -35,6 +35,36 @@ index c62ae8711..9af2a925e 100644
 -	dbus_message_iter_close_container(iter, &value);
 -}
 -
+-static void append_array_variant(DBusMessageIter *iter, int type, void *val,
+-							int n_elements)
+-{
+-	DBusMessageIter variant, array;
+-	char type_sig[2] = { type, '\0' };
+-	char array_sig[3] = { DBUS_TYPE_ARRAY, type, '\0' };
+-
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT,
+-						array_sig, &variant);
+-
+-	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
+-						type_sig, &array);
+-
+-	if (dbus_type_is_fixed(type) == TRUE) {
+-		dbus_message_iter_append_fixed_array(&array, type, val,
+-							n_elements);
+-	} else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
+-		const char ***str_array = val;
+-		int i;
+-
+-		for (i = 0; i < n_elements; i++)
+-			dbus_message_iter_append_basic(&array, type,
+-							&((*str_array)[i]));
+-	}
+-
+-	dbus_message_iter_close_container(&variant, &array);
+-
+-	dbus_message_iter_close_container(iter, &variant);
+-}
+-
 -static void dict_append_entry(DBusMessageIter *dict, const char *key,
 -							int type, void *val)
 -{
@@ -42,6 +72,7 @@ index c62ae8711..9af2a925e 100644
 -
 -	if (type == DBUS_TYPE_STRING) {
 -		const char *str = *((const char **) val);
+-
 -		if (str == NULL)
 -			return;
 -	}
@@ -56,18 +87,61 @@ index c62ae8711..9af2a925e 100644
 -	dbus_message_iter_close_container(dict, &entry);
 -}
 -
- struct connect_args {
- 	char *dev;
- 	char *target;
-@@ -187,7 +154,8 @@ static void connect_setup(DBusMessageIter *iter, void *user_data)
- 	if (args->target == NULL)
- 		goto done;
+-static void dict_append_basic_array(DBusMessageIter *dict, int key_type,
+-					const void *key, int type, void *val,
+-					int n_elements)
+-{
+-	DBusMessageIter entry;
+-
+-	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
+-						NULL, &entry);
+-
+-	dbus_message_iter_append_basic(&entry, key_type, key);
+-
+-	append_array_variant(&entry, type, val, n_elements);
+-
+-	dbus_message_iter_close_container(dict, &entry);
+-}
+-
+-static void dict_append_array(DBusMessageIter *dict, const char *key, int type,
+-						void *val, int n_elements)
+-{
+-	dict_append_basic_array(dict, DBUS_TYPE_STRING, &key, type, val,
+-								n_elements);
+-}
+-
+ #define	DISTANCE_VAL_INVALID	0x7FFF
  
--	dict_append_entry(&dict, "Target", DBUS_TYPE_STRING, &args->target);
-+	g_dbus_dict_append_entry(&dict, "Target",
-+					DBUS_TYPE_STRING, &args->target);
+ struct set_discovery_filter_args {
+@@ -1521,21 +1434,24 @@ static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
+ 				DBUS_TYPE_VARIANT_AS_STRING
+ 				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
  
- done:
+-	dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING, &args->uuids,
++	g_dbus_dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING,
++							&args->uuids,
+ 							args->uuids_len);
+ 
+ 	if (args->pathloss != DISTANCE_VAL_INVALID)
+-		dict_append_entry(&dict, "Pathloss", DBUS_TYPE_UINT16,
++		g_dbus_dict_append_entry(&dict, "Pathloss", DBUS_TYPE_UINT16,
+ 						&args->pathloss);
+ 
+ 	if (args->rssi != DISTANCE_VAL_INVALID)
+-		dict_append_entry(&dict, "RSSI", DBUS_TYPE_INT16, &args->rssi);
++		g_dbus_dict_append_entry(&dict, "RSSI", DBUS_TYPE_INT16,
++						&args->rssi);
+ 
+ 	if (args->transport != NULL)
+-		dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
++		g_dbus_dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
+ 						&args->transport);
+ 	if (args->duplicate)
+-		dict_append_entry(&dict, "DuplicateData", DBUS_TYPE_BOOLEAN,
++		g_dbus_dict_append_entry(&dict, "DuplicateData",
++						DBUS_TYPE_BOOLEAN,
+ 						&args->duplicate);
+ 
  	dbus_message_iter_close_container(iter, &dict);
 -- 
 2.14.1
