@@ -1,65 +1,45 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
-References: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 1 Mar 2018 12:27:26 +0200
-Message-ID: <CABBYNZJDWCFg3SWT-RzkYHGzvZQrgWxubcYyMxiS+gvD5hAEDg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/9] Commonalize functions appending to dbus message
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH] Bluetooth: btusb: Add Dell OptiPlex 3060 to
+ btusb_needs_reset_resume_table
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180301054252.16007-1-kai.heng.feng@canonical.com>
+Date: Thu, 1 Mar 2018 08:43:59 +0100
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org, Brian Norris <briannorris@chromium.org>,
+        Hans de Goede <hdegoede@redhat.com>
+Message-Id: <80186954-EDE1-4DBA-8ED6-055BC53FD1C5@holtmann.org>
+References: <20180301054252.16007-1-kai.heng.feng@canonical.com>
+To: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+Hi Kai-Heng,
 
-On Thu, Mar 1, 2018 at 6:22 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> To improve maintainability, this patch set introduces common functions
-> for appending to dbus message.
->
-> Changes since v1:
->  - Rebase on top of upstream branch (where its HEAD is 6523d168)
->
-> ERAMOTO Masaya (9):
->   gdbus: Introduce functions appending to dbus message
->   obexd: Use g_dbus_dict_append_entry()
->   obexd: Remove unused source/header files for dbus
->   client: Use g_dbus_dict_append_*()
->   mesh: Use g_dbus_dict_append_{entry,array}()
->   tools/obexctl: Use g_dbus_dict_append_entry()
->   tools/bluetooth-player: Use g_dbus_dict_append_entry()
->   unit/test-gdbus-client: Use g_dbus_dict_append_entry()
->   dbus-common: Remove unused functions due to use of g_dbus_dict_append_*()
->
->  Makefile.obexd            |   1 -
->  client/advertising.c      |  58 ++------------------
->  client/main.c             | 100 +++-------------------------------
->  gdbus/client.c            | 135 +++++++++++++++++++++++++++++++++-------------
->  gdbus/gdbus.h             |   9 ++++
->  mesh/main.c               | 100 +++-------------------------------
->  obexd/client/dbus.c       |  94 --------------------------------
->  obexd/client/dbus.h       |  48 -----------------
->  obexd/client/ftp.c        |   7 ++-
->  obexd/client/map.c        |   6 +--
->  obexd/client/session.c    |   1 -
->  obexd/client/transfer.c   |   1 -
->  obexd/plugins/bluetooth.c |  40 ++------------
->  src/dbus-common.c         |  85 +----------------------------
->  src/dbus-common.h         |   6 ---
->  src/device.c              |   3 +-
->  tools/bluetooth-player.c  |  38 ++-----------
->  tools/obexctl.c           |  36 +------------
->  unit/test-gdbus-client.c  |  38 ++-----------
->  19 files changed, 146 insertions(+), 660 deletions(-)
->  delete mode 100644 obexd/client/dbus.c
->  delete mode 100644 obexd/client/dbus.h
->
-> --
-> 2.14.1
+> The issue can be reproduced before commit fd865802c66b ("Bluetooth:
+> btusb: fix QCA Rome suspend/resume") gets introduced, so the reset
+> resume quirk is still needed for this system.
+> 
+> T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
+> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0cf3 ProdID=e007 Rev=00.01
+> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> 
+> Cc: stable@vger.kernel.org
+> Cc: Brian Norris <briannorris@chromium.org>
+> Cc: Hans de Goede <hdegoede@redhat.com>
+> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> ---
+> drivers/bluetooth/btusb.c | 7 +++++++
+> 1 file changed, 7 insertions(+)
 
-Applied, thanks.
+patch has been applied to bluetooth-stable tree.
 
--- 
-Luiz Augusto von Dentz
+Regards
+
+Marcel
