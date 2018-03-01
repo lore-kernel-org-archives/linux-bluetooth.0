@@ -1,59 +1,65 @@
-Return-Path: <arend.vanspriel@broadcom.com>
-Subject: Re: [PATCH 1/2] cfg80211: Add support to enable or disable btcoex
-To: Kalle Valo <kvalo@codeaurora.org>
-References: <1519927170-11920-1-git-send-email-tamizhr@codeaurora.org>
- <5A9856CE.8000005@broadcom.com> <87po4ndpos.fsf@purkki.adurom.net>
-Cc: Tamizh chelvam <tamizhr@codeaurora.org>, johannes@sipsolutions.net,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-wireless <linux-wireless@vger.kernel.org>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Message-ID: <5A991D2B.60303@broadcom.com>
-Date: Fri, 2 Mar 2018 10:45:15 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87po4ndpos.fsf@purkki.adurom.net>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
+References: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 1 Mar 2018 12:27:26 +0200
+Message-ID: <CABBYNZJDWCFg3SWT-RzkYHGzvZQrgWxubcYyMxiS+gvD5hAEDg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 0/9] Commonalize functions appending to dbus message
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-+ Marcel
+Hi Eramoto,
 
-On 3/2/2018 6:14 AM, Kalle Valo wrote:
-> Arend van Spriel <arend.vanspriel@broadcom.com> writes:
+On Thu, Mar 1, 2018 at 6:22 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> To improve maintainability, this patch set introduces common functions
+> for appending to dbus message.
 >
->> On 3/1/2018 6:59 PM, Tamizh chelvam wrote:
->>> From: Tamizh chelvam <tamizhr@codeaurora.org>
->>>
->>> This patch introduces NL80211_CMD_SET_BTCOEX command and
->>> NL80211_ATTR_BTCOEX_OP attribute to enable or disable btcoex.
->>
->> What kind of btcoex are we talking about here? Is it signalling
->> between wlan and bt to get access to the shared RF.
+> Changes since v1:
+>  - Rebase on top of upstream branch (where its HEAD is 6523d168)
 >
-> Yes, at least that's how I understand this.
+> ERAMOTO Masaya (9):
+>   gdbus: Introduce functions appending to dbus message
+>   obexd: Use g_dbus_dict_append_entry()
+>   obexd: Remove unused source/header files for dbus
+>   client: Use g_dbus_dict_append_*()
+>   mesh: Use g_dbus_dict_append_{entry,array}()
+>   tools/obexctl: Use g_dbus_dict_append_entry()
+>   tools/bluetooth-player: Use g_dbus_dict_append_entry()
+>   unit/test-gdbus-client: Use g_dbus_dict_append_entry()
+>   dbus-common: Remove unused functions due to use of g_dbus_dict_append_*()
 >
->> Why would it require user-space interaction? Are there no options for
->> wlan to detect bt is in use, ie. bt hci is setup, and vice versa. Can
->> it be indicated in platform data or device tree. Trying to understand
->> the use-case here.
+>  Makefile.obexd            |   1 -
+>  client/advertising.c      |  58 ++------------------
+>  client/main.c             | 100 +++-------------------------------
+>  gdbus/client.c            | 135 +++++++++++++++++++++++++++++++++-------------
+>  gdbus/gdbus.h             |   9 ++++
+>  mesh/main.c               | 100 +++-------------------------------
+>  obexd/client/dbus.c       |  94 --------------------------------
+>  obexd/client/dbus.h       |  48 -----------------
+>  obexd/client/ftp.c        |   7 ++-
+>  obexd/client/map.c        |   6 +--
+>  obexd/client/session.c    |   1 -
+>  obexd/client/transfer.c   |   1 -
+>  obexd/plugins/bluetooth.c |  40 ++------------
+>  src/dbus-common.c         |  85 +----------------------------
+>  src/dbus-common.h         |   6 ---
+>  src/device.c              |   3 +-
+>  tools/bluetooth-player.c  |  38 ++-----------
+>  tools/obexctl.c           |  36 +------------
+>  unit/test-gdbus-client.c  |  38 ++-----------
+>  19 files changed, 146 insertions(+), 660 deletions(-)
+>  delete mode 100644 obexd/client/dbus.c
+>  delete mode 100644 obexd/client/dbus.h
 >
-> One use case is being able to disable btcoex in case of problems or to
-> test if it's btcoex related. I think during the last five years the need
-> for this interface has come every once in a while.
+> --
+> 2.14.1
 
-Well, you would want to disable btcoex *and* bt to verify wlan is 
-working properly on its own. And similarly disable btcoex *and* wlan to 
-verify bt works properly.
+Applied, thanks.
 
-Now I do recall a thread between you and Marcel. Looked it up and it was 
-this thread [1], but did not see a follow-up on it. I suspect it 
-involves more than just an enable/disable state. That may be fine for 
-devices in which BT and WLAN are integrated and coordination of RF use 
-is done on the device. The "btcoex subsystem" thread seems to aim for 
-more like providing the coordination logic so independent BT device and 
-WLAN device can still use the same RF. So before adopting the api in 
-nl80211 it would be good to revive that thread.
-
-Regards,
-Arend
-
-[1] https://www.spinics.net/lists/linux-wireless/msg133333.html
+-- 
+Luiz Augusto von Dentz
