@@ -1,248 +1,129 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ v2 3/9] obexd: Remove unused source/header files for
- dbus
+Subject: [PATCH BlueZ v2 2/9] obexd: Use g_dbus_dict_append_entry()
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
-Message-ID: <05201035-ed06-7b0d-bc49-e7ae47032cc4@jp.fujitsu.com>
-Date: Thu, 1 Mar 2018 13:27:16 +0900
+Message-ID: <fc4adfac-aaea-c758-1686-1d826d5c83f7@jp.fujitsu.com>
+Date: Thu, 1 Mar 2018 13:27:10 +0900
 MIME-Version: 1.0
 In-Reply-To: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Due to using g_dbus_emit_property_changed() and g_dbus_get_properties(),
-obex_dbus_signal_property_changed() is unused since commit 96063756
-("obex-client: Rename org.bluez.obex.Transfer to Transfer1"), and
-OBC_PROPERTIES_ARRAY_SIGNATURE macro is unused since commit 3eadc034
-("obex-client: Make use of g_dbus_get_properties to get transfer properties").
 ---
- Makefile.obexd          |  1 -
- obexd/client/dbus.c     | 94 -------------------------------------------------
- obexd/client/dbus.h     | 48 -------------------------
- obexd/client/ftp.c      |  1 -
- obexd/client/map.c      |  1 -
- obexd/client/session.c  |  1 -
- obexd/client/transfer.c |  1 -
- 7 files changed, 147 deletions(-)
- delete mode 100644 obexd/client/dbus.c
- delete mode 100644 obexd/client/dbus.h
+ obexd/client/ftp.c        |  6 +++---
+ obexd/client/map.c        |  5 +++--
+ obexd/plugins/bluetooth.c | 40 +++-------------------------------------
+ 3 files changed, 9 insertions(+), 42 deletions(-)
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 2e33cbc72..5959f2292 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -76,7 +76,6 @@ obexd_src_obexd_SOURCES = $(btio_sources) $(gobex_sources) \
- 			obexd/client/map-event.h obexd/client/map-event.c \
- 			obexd/client/transfer.h obexd/client/transfer.c \
- 			obexd/client/transport.h obexd/client/transport.c \
--			obexd/client/dbus.h obexd/client/dbus.c \
- 			obexd/client/driver.h obexd/client/driver.c \
- 			obexd/src/map_ap.h
- obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
-diff --git a/obexd/client/dbus.c b/obexd/client/dbus.c
-deleted file mode 100644
-index bfe5c4974..000000000
---- a/obexd/client/dbus.c
-+++ /dev/null
-@@ -1,94 +0,0 @@
--/*
-- *
-- *  OBEX Client
-- *
-- *  Copyright (C) 2008-2011  Intel Corporation. All rights reserved.
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License version 2 as
-- *  published by the Free Software Foundation.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <glib.h>
--
--#include "gdbus/gdbus.h"
--
--#include "obexd/src/log.h"
--#include "dbus.h"
--
--static void append_variant(DBusMessageIter *iter,
--				int type, void *value)
+diff --git a/obexd/client/ftp.c b/obexd/client/ftp.c
+index 3628657d3..f4923b304 100644
+--- a/obexd/client/ftp.c
++++ b/obexd/client/ftp.c
+@@ -115,7 +115,7 @@ static void xml_element(GMarkupParseContext *ctxt,
+ 			DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_VARIANT_AS_STRING
+ 			DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+ 
+-	obex_dbus_dict_append(&dict, "Type", DBUS_TYPE_STRING, &element);
++	g_dbus_dict_append_entry(&dict, "Type", DBUS_TYPE_STRING, &element);
+ 
+ 	/* FIXME: User, Group, Other permission must be reviewed */
+ 
+@@ -125,10 +125,10 @@ static void xml_element(GMarkupParseContext *ctxt,
+ 		if (g_str_equal("Size", key) == TRUE) {
+ 			guint64 size;
+ 			size = g_ascii_strtoll(values[i], NULL, 10);
+-			obex_dbus_dict_append(&dict, key, DBUS_TYPE_UINT64,
++			g_dbus_dict_append_entry(&dict, key, DBUS_TYPE_UINT64,
+ 								&size);
+ 		} else
+-			obex_dbus_dict_append(&dict, key, DBUS_TYPE_STRING,
++			g_dbus_dict_append_entry(&dict, key, DBUS_TYPE_STRING,
+ 								&values[i]);
+ 	}
+ 
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 4c6d67629..d1c897677 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -231,8 +231,9 @@ static void folder_element(GMarkupParseContext *ctxt, const char *element,
+ 
+ 	for (i = 0, key = names[i]; key; key = names[++i]) {
+ 		if (strcasecmp("name", key) == 0)
+-			obex_dbus_dict_append(&dict, "Name", DBUS_TYPE_STRING,
+-								&values[i]);
++			g_dbus_dict_append_entry(&dict, "Name",
++							DBUS_TYPE_STRING,
++							&values[i]);
+ 	}
+ 
+ 	dbus_message_iter_close_container(iter, &dict);
+diff --git a/obexd/plugins/bluetooth.c b/obexd/plugins/bluetooth.c
+index d6028d114..ba1e0a99a 100644
+--- a/obexd/plugins/bluetooth.c
++++ b/obexd/plugins/bluetooth.c
+@@ -231,40 +231,6 @@ static void profile_free(void *data)
+ 	g_free(profile);
+ }
+ 
+-static void append_variant(DBusMessageIter *iter, int type, void *val)
 -{
--	char sig[2];
--	DBusMessageIter valueiter;
+-	DBusMessageIter value;
+-	char sig[2] = { type, '\0' };
 -
--	sig[0] = type;
--	sig[1] = 0;
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
 -
--	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT,
--						sig, &valueiter);
+-	dbus_message_iter_append_basic(&value, type, val);
 -
--	dbus_message_iter_append_basic(&valueiter, type, value);
--
--	dbus_message_iter_close_container(iter, &valueiter);
+-	dbus_message_iter_close_container(iter, &value);
 -}
 -
--void obex_dbus_dict_append(DBusMessageIter *dict,
--			const char *key, int type, void *value)
+-
+-static void dict_append_entry(DBusMessageIter *dict,
+-			const char *key, int type, void *val)
 -{
--	DBusMessageIter keyiter;
+-	DBusMessageIter entry;
 -
 -	if (type == DBUS_TYPE_STRING) {
--		const char *str = *((const char **) value);
+-		const char *str = *((const char **) val);
 -		if (str == NULL)
 -			return;
 -	}
 -
 -	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
--							NULL, &keyiter);
+-							NULL, &entry);
 -
--	dbus_message_iter_append_basic(&keyiter, DBUS_TYPE_STRING, &key);
+-	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
 -
--	append_variant(&keyiter, type, value);
+-	append_variant(&entry, type, val);
 -
--	dbus_message_iter_close_container(dict, &keyiter);
+-	dbus_message_iter_close_container(dict, &entry);
 -}
 -
--int obex_dbus_signal_property_changed(DBusConnection *conn,
--					const char *path,
--					const char *interface,
--					const char *name,
--					int type, void *value)
--{
--	DBusMessage *signal;
--	DBusMessageIter iter;
--
--	signal = dbus_message_new_signal(path, interface, "PropertyChanged");
--	if (signal == NULL) {
--		error("Unable to allocate new %s.PropertyChanged signal",
--				interface);
--		return -1;
--	}
--
--	dbus_message_iter_init_append(signal, &iter);
--
--	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
--
--	append_variant(&iter, type, value);
--
--	return g_dbus_send_message(conn, signal);
--}
-diff --git a/obexd/client/dbus.h b/obexd/client/dbus.h
-deleted file mode 100644
-index 6136bf58e..000000000
---- a/obexd/client/dbus.h
-+++ /dev/null
-@@ -1,48 +0,0 @@
--/*
-- *
-- *  OBEX Client
-- *
-- *  Copyright (C) 2008-2011  Intel Corporation. All rights reserved.
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License version 2 as
-- *  published by the Free Software Foundation.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifndef __OBEX_DBUS_H
--#define __OBEX_DBUS_H
--
--#ifdef __cplusplus
--extern "C" {
--#endif
--
--#include <dbus/dbus.h>
--
--/* Essentially a{sv} */
--#define OBC_PROPERTIES_ARRAY_SIGNATURE DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING \
--					DBUS_TYPE_STRING_AS_STRING \
--					DBUS_TYPE_VARIANT_AS_STRING \
--					DBUS_DICT_ENTRY_END_CHAR_AS_STRING
--
--void obex_dbus_dict_append(DBusMessageIter *dict, const char *key, int type,
--				void *value);
--
--int obex_dbus_signal_property_changed(DBusConnection *conn, const char *path,
--					const char *interface, const char *name,
--					int type, void *value);
--
--#ifdef __cplusplus
--}
--#endif
--
--#endif /* __OBEX_DBUS_H */
-diff --git a/obexd/client/ftp.c b/obexd/client/ftp.c
-index f4923b304..d799821b1 100644
---- a/obexd/client/ftp.c
-+++ b/obexd/client/ftp.c
-@@ -31,7 +31,6 @@
- #include "gdbus/gdbus.h"
- 
- #include "obexd/src/log.h"
--#include "dbus.h"
- #include "transfer.h"
- #include "session.h"
- #include "driver.h"
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index d1c897677..3e581c8ee 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -40,7 +40,6 @@
- 
- #include "obexd/src/log.h"
- #include "obexd/src/map_ap.h"
--#include "dbus.h"
- #include "map-event.h"
- 
- #include "map.h"
-diff --git a/obexd/client/session.c b/obexd/client/session.c
-index 5f981bf54..4eda255d1 100644
---- a/obexd/client/session.c
-+++ b/obexd/client/session.c
-@@ -40,7 +40,6 @@
- #include "gobex/gobex.h"
- 
- #include "obexd/src/log.h"
--#include "dbus.h"
- #include "transfer.h"
- #include "session.h"
- #include "driver.h"
-diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
-index 092e72fe2..b53dffa21 100644
---- a/obexd/client/transfer.c
-+++ b/obexd/client/transfer.c
-@@ -41,7 +41,6 @@
- #include "gobex/gobex.h"
- 
- #include "obexd/src/log.h"
--#include "dbus.h"
- #include "transfer.h"
- 
- #define TRANSFER_INTERFACE "org.bluez.obex.Transfer1"
+ static int register_profile(struct bluetooth_profile *profile)
+ {
+ 	DBusMessage *msg;
+@@ -303,7 +269,7 @@ static int register_profile(struct bluetooth_profile *profile)
+ 					DBUS_TYPE_VARIANT_AS_STRING
+ 					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
+ 					&opt);
+-	dict_append_entry(&opt, "AutoConnect", DBUS_TYPE_BOOLEAN,
++	g_dbus_dict_append_entry(&opt, "AutoConnect", DBUS_TYPE_BOOLEAN,
+ 								&auto_connect);
+ 	if (profile->driver->record) {
+ 		if (profile->driver->port != 0)
+@@ -315,8 +281,8 @@ static int register_profile(struct bluetooth_profile *profile)
+ 			xml = g_markup_printf_escaped(profile->driver->record,
+ 						profile->driver->channel,
+ 						profile->driver->name);
+-		dict_append_entry(&opt, "ServiceRecord", DBUS_TYPE_STRING,
+-								&xml);
++		g_dbus_dict_append_entry(&opt, "ServiceRecord",
++						DBUS_TYPE_STRING, &xml);
+ 		g_free(xml);
+ 	}
+ 	dbus_message_iter_close_container(&iter, &opt);
 -- 
 2.14.1
 
