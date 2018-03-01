@@ -1,233 +1,248 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ v2 4/9] client: Use g_dbus_dict_append_*()
+Subject: [PATCH BlueZ v2 3/9] obexd: Remove unused source/header files for
+ dbus
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
-Message-ID: <63aa6943-8e19-9795-396b-b0e31588f5f9@jp.fujitsu.com>
-Date: Thu, 1 Mar 2018 13:27:21 +0900
+Message-ID: <05201035-ed06-7b0d-bc49-e7ae47032cc4@jp.fujitsu.com>
+Date: Thu, 1 Mar 2018 13:27:16 +0900
 MIME-Version: 1.0
 In-Reply-To: <b4b7e77f-8575-36ec-62ef-b879c20f64f2@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Due to using g_dbus_emit_property_changed() and g_dbus_get_properties(),
+obex_dbus_signal_property_changed() is unused since commit 96063756
+("obex-client: Rename org.bluez.obex.Transfer to Transfer1"), and
+OBC_PROPERTIES_ARRAY_SIGNATURE macro is unused since commit 3eadc034
+("obex-client: Make use of g_dbus_get_properties to get transfer properties").
 ---
- client/advertising.c |  58 ++----------------------------
- client/main.c        | 100 +++++----------------------------------------------
- 2 files changed, 11 insertions(+), 147 deletions(-)
+ Makefile.obexd          |  1 -
+ obexd/client/dbus.c     | 94 -------------------------------------------------
+ obexd/client/dbus.h     | 48 -------------------------
+ obexd/client/ftp.c      |  1 -
+ obexd/client/map.c      |  1 -
+ obexd/client/session.c  |  1 -
+ obexd/client/transfer.c |  1 -
+ 7 files changed, 147 deletions(-)
+ delete mode 100644 obexd/client/dbus.c
+ delete mode 100644 obexd/client/dbus.h
 
-diff --git a/client/advertising.c b/client/advertising.c
-index a0e6906e3..b2965ceb6 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -237,59 +237,6 @@ static gboolean get_uuids(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
--static void append_array_variant(DBusMessageIter *iter, int type, void *val,
--							int n_elements)
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 2e33cbc72..5959f2292 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -76,7 +76,6 @@ obexd_src_obexd_SOURCES = $(btio_sources) $(gobex_sources) \
+ 			obexd/client/map-event.h obexd/client/map-event.c \
+ 			obexd/client/transfer.h obexd/client/transfer.c \
+ 			obexd/client/transport.h obexd/client/transport.c \
+-			obexd/client/dbus.h obexd/client/dbus.c \
+ 			obexd/client/driver.h obexd/client/driver.c \
+ 			obexd/src/map_ap.h
+ obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
+diff --git a/obexd/client/dbus.c b/obexd/client/dbus.c
+deleted file mode 100644
+index bfe5c4974..000000000
+--- a/obexd/client/dbus.c
++++ /dev/null
+@@ -1,94 +0,0 @@
+-/*
+- *
+- *  OBEX Client
+- *
+- *  Copyright (C) 2008-2011  Intel Corporation. All rights reserved.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License version 2 as
+- *  published by the Free Software Foundation.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
+-
+-#ifdef HAVE_CONFIG_H
+-#include <config.h>
+-#endif
+-
+-#include <glib.h>
+-
+-#include "gdbus/gdbus.h"
+-
+-#include "obexd/src/log.h"
+-#include "dbus.h"
+-
+-static void append_variant(DBusMessageIter *iter,
+-				int type, void *value)
 -{
--	DBusMessageIter variant, array;
--	char type_sig[2] = { type, '\0' };
--	char array_sig[3] = { DBUS_TYPE_ARRAY, type, '\0' };
+-	char sig[2];
+-	DBusMessageIter valueiter;
+-
+-	sig[0] = type;
+-	sig[1] = 0;
 -
 -	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT,
--						array_sig, &variant);
+-						sig, &valueiter);
 -
--	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
--						type_sig, &array);
+-	dbus_message_iter_append_basic(&valueiter, type, value);
 -
--	if (dbus_type_is_fixed(type) == TRUE) {
--		dbus_message_iter_append_fixed_array(&array, type, val,
--							n_elements);
--	} else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
--		const char ***str_array = val;
--		int i;
--
--		for (i = 0; i < n_elements; i++)
--			dbus_message_iter_append_basic(&array, type,
--							&((*str_array)[i]));
--	}
--
--	dbus_message_iter_close_container(&variant, &array);
--
--	dbus_message_iter_close_container(iter, &variant);
+-	dbus_message_iter_close_container(iter, &valueiter);
 -}
 -
--static void dict_append_basic_array(DBusMessageIter *dict, int key_type,
--					const void *key, int type, void *val,
--					int n_elements)
+-void obex_dbus_dict_append(DBusMessageIter *dict,
+-			const char *key, int type, void *value)
 -{
--	DBusMessageIter entry;
--
--	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
--						NULL, &entry);
--
--	dbus_message_iter_append_basic(&entry, key_type, key);
--
--	append_array_variant(&entry, type, val, n_elements);
--
--	dbus_message_iter_close_container(dict, &entry);
--}
--
--static void dict_append_array(DBusMessageIter *dict, const char *key, int type,
--				void *val, int n_elements)
--{
--	dict_append_basic_array(dict, DBUS_TYPE_STRING, &key, type, val,
--								n_elements);
--}
--
- static gboolean service_data_exists(const GDBusPropertyTable *property,
- 								void *data)
- {
-@@ -305,7 +252,7 @@ static gboolean get_service_data(const GDBusPropertyTable *property,
- 
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
- 
--	dict_append_array(&dict, ad.service.uuid, DBUS_TYPE_BYTE, &val,
-+	g_dbus_dict_append_array(&dict, ad.service.uuid, DBUS_TYPE_BYTE, &val,
- 								data->len);
- 
- 	dbus_message_iter_close_container(iter, &dict);
-@@ -328,7 +275,8 @@ static gboolean get_manufacturer_data(const GDBusPropertyTable *property,
- 
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{qv}", &dict);
- 
--	dict_append_basic_array(&dict, DBUS_TYPE_UINT16, &ad.manufacturer.id,
-+	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_UINT16,
-+					&ad.manufacturer.id,
- 					DBUS_TYPE_BYTE, &val, data->len);
- 
- 	dbus_message_iter_close_container(iter, &dict);
-diff --git a/client/main.c b/client/main.c
-index f186a3124..a83010b48 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1111,93 +1111,6 @@ static void start_discovery_reply(DBusMessage *message, void *user_data)
- 	/* Leave the discovery running even on noninteractive mode */
- }
- 
--static void append_variant(DBusMessageIter *iter, int type, void *val)
--{
--	DBusMessageIter value;
--	char sig[2] = { type, '\0' };
--
--	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT, sig, &value);
--
--	dbus_message_iter_append_basic(&value, type, val);
--
--	dbus_message_iter_close_container(iter, &value);
--}
--
--static void append_array_variant(DBusMessageIter *iter, int type, void *val,
--							int n_elements)
--{
--	DBusMessageIter variant, array;
--	char type_sig[2] = { type, '\0' };
--	char array_sig[3] = { DBUS_TYPE_ARRAY, type, '\0' };
--
--	dbus_message_iter_open_container(iter, DBUS_TYPE_VARIANT,
--						array_sig, &variant);
--
--	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
--						type_sig, &array);
--
--	if (dbus_type_is_fixed(type) == TRUE) {
--		dbus_message_iter_append_fixed_array(&array, type, val,
--							n_elements);
--	} else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
--		const char ***str_array = val;
--		int i;
--
--		for (i = 0; i < n_elements; i++)
--			dbus_message_iter_append_basic(&array, type,
--							&((*str_array)[i]));
--	}
--
--	dbus_message_iter_close_container(&variant, &array);
--
--	dbus_message_iter_close_container(iter, &variant);
--}
--
--static void dict_append_entry(DBusMessageIter *dict, const char *key,
--							int type, void *val)
--{
--	DBusMessageIter entry;
+-	DBusMessageIter keyiter;
 -
 -	if (type == DBUS_TYPE_STRING) {
--		const char *str = *((const char **) val);
--
+-		const char *str = *((const char **) value);
 -		if (str == NULL)
 -			return;
 -	}
 -
 -	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
--							NULL, &entry);
+-							NULL, &keyiter);
 -
--	dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING, &key);
+-	dbus_message_iter_append_basic(&keyiter, DBUS_TYPE_STRING, &key);
 -
--	append_variant(&entry, type, val);
+-	append_variant(&keyiter, type, value);
 -
--	dbus_message_iter_close_container(dict, &entry);
+-	dbus_message_iter_close_container(dict, &keyiter);
 -}
 -
--static void dict_append_basic_array(DBusMessageIter *dict, int key_type,
--					const void *key, int type, void *val,
--					int n_elements)
+-int obex_dbus_signal_property_changed(DBusConnection *conn,
+-					const char *path,
+-					const char *interface,
+-					const char *name,
+-					int type, void *value)
 -{
--	DBusMessageIter entry;
+-	DBusMessage *signal;
+-	DBusMessageIter iter;
 -
--	dbus_message_iter_open_container(dict, DBUS_TYPE_DICT_ENTRY,
--						NULL, &entry);
+-	signal = dbus_message_new_signal(path, interface, "PropertyChanged");
+-	if (signal == NULL) {
+-		error("Unable to allocate new %s.PropertyChanged signal",
+-				interface);
+-		return -1;
+-	}
 -
--	dbus_message_iter_append_basic(&entry, key_type, key);
+-	dbus_message_iter_init_append(signal, &iter);
 -
--	append_array_variant(&entry, type, val, n_elements);
+-	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
 -
--	dbus_message_iter_close_container(dict, &entry);
+-	append_variant(&iter, type, value);
+-
+-	return g_dbus_send_message(conn, signal);
 -}
+diff --git a/obexd/client/dbus.h b/obexd/client/dbus.h
+deleted file mode 100644
+index 6136bf58e..000000000
+--- a/obexd/client/dbus.h
++++ /dev/null
+@@ -1,48 +0,0 @@
+-/*
+- *
+- *  OBEX Client
+- *
+- *  Copyright (C) 2008-2011  Intel Corporation. All rights reserved.
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License version 2 as
+- *  published by the Free Software Foundation.
+- *
+- *  This program is distributed in the hope that it will be useful,
+- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+- *  GNU General Public License for more details.
+- *
+- *  You should have received a copy of the GNU General Public License
+- *  along with this program; if not, write to the Free Software
+- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+- *
+- */
 -
--static void dict_append_array(DBusMessageIter *dict, const char *key, int type,
--						void *val, int n_elements)
--{
--	dict_append_basic_array(dict, DBUS_TYPE_STRING, &key, type, val,
--								n_elements);
+-#ifndef __OBEX_DBUS_H
+-#define __OBEX_DBUS_H
+-
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-#include <dbus/dbus.h>
+-
+-/* Essentially a{sv} */
+-#define OBC_PROPERTIES_ARRAY_SIGNATURE DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING \
+-					DBUS_TYPE_STRING_AS_STRING \
+-					DBUS_TYPE_VARIANT_AS_STRING \
+-					DBUS_DICT_ENTRY_END_CHAR_AS_STRING
+-
+-void obex_dbus_dict_append(DBusMessageIter *dict, const char *key, int type,
+-				void *value);
+-
+-int obex_dbus_signal_property_changed(DBusConnection *conn, const char *path,
+-					const char *interface, const char *name,
+-					int type, void *value);
+-
+-#ifdef __cplusplus
 -}
+-#endif
 -
- #define	DISTANCE_VAL_INVALID	0x7FFF
+-#endif /* __OBEX_DBUS_H */
+diff --git a/obexd/client/ftp.c b/obexd/client/ftp.c
+index f4923b304..d799821b1 100644
+--- a/obexd/client/ftp.c
++++ b/obexd/client/ftp.c
+@@ -31,7 +31,6 @@
+ #include "gdbus/gdbus.h"
  
- static struct set_discovery_filter_args {
-@@ -1225,22 +1138,25 @@ static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
- 				DBUS_TYPE_VARIANT_AS_STRING
- 				DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict);
+ #include "obexd/src/log.h"
+-#include "dbus.h"
+ #include "transfer.h"
+ #include "session.h"
+ #include "driver.h"
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index d1c897677..3e581c8ee 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -40,7 +40,6 @@
  
--	dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING, &args->uuids,
-+	g_dbus_dict_append_array(&dict, "UUIDs", DBUS_TYPE_STRING,
-+							&args->uuids,
- 							args->uuids_len);
+ #include "obexd/src/log.h"
+ #include "obexd/src/map_ap.h"
+-#include "dbus.h"
+ #include "map-event.h"
  
- 	if (args->pathloss != DISTANCE_VAL_INVALID)
--		dict_append_entry(&dict, "Pathloss", DBUS_TYPE_UINT16,
-+		g_dbus_dict_append_entry(&dict, "Pathloss", DBUS_TYPE_UINT16,
- 						&args->pathloss);
+ #include "map.h"
+diff --git a/obexd/client/session.c b/obexd/client/session.c
+index 5f981bf54..4eda255d1 100644
+--- a/obexd/client/session.c
++++ b/obexd/client/session.c
+@@ -40,7 +40,6 @@
+ #include "gobex/gobex.h"
  
- 	if (args->rssi != DISTANCE_VAL_INVALID)
--		dict_append_entry(&dict, "RSSI", DBUS_TYPE_INT16, &args->rssi);
-+		g_dbus_dict_append_entry(&dict, "RSSI", DBUS_TYPE_INT16,
-+						&args->rssi);
+ #include "obexd/src/log.h"
+-#include "dbus.h"
+ #include "transfer.h"
+ #include "session.h"
+ #include "driver.h"
+diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
+index 092e72fe2..b53dffa21 100644
+--- a/obexd/client/transfer.c
++++ b/obexd/client/transfer.c
+@@ -41,7 +41,6 @@
+ #include "gobex/gobex.h"
  
- 	if (args->transport != NULL)
--		dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
-+		g_dbus_dict_append_entry(&dict, "Transport", DBUS_TYPE_STRING,
- 						&args->transport);
+ #include "obexd/src/log.h"
+-#include "dbus.h"
+ #include "transfer.h"
  
- 	if (args->duplicate)
--		dict_append_entry(&dict, "DuplicateData", DBUS_TYPE_BOOLEAN,
-+		g_dbus_dict_append_entry(&dict, "DuplicateData",
-+						DBUS_TYPE_BOOLEAN,
- 						&args->duplicate);
- 
- 	dbus_message_iter_close_container(iter, &dict);
+ #define TRANSFER_INTERFACE "org.bluez.obex.Transfer1"
 -- 
 2.14.1
 
