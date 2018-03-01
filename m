@@ -1,45 +1,60 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-serial-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: btusb: Add Dell OptiPlex 3060 to
+Subject: Re: [PATCH] Bluetooth: btusb: Remove Yoga 920 from the
  btusb_needs_reset_resume_table
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180301054252.16007-1-kai.heng.feng@canonical.com>
-Date: Thu, 1 Mar 2018 08:43:59 +0100
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org, Brian Norris <briannorris@chromium.org>,
-        Hans de Goede <hdegoede@redhat.com>
-Message-Id: <80186954-EDE1-4DBA-8ED6-055BC53FD1C5@holtmann.org>
-References: <20180301054252.16007-1-kai.heng.feng@canonical.com>
-To: Kai-Heng Feng <kai.heng.feng@canonical.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180228105750.6491-2-hdegoede@redhat.com>
+Date: Thu, 1 Mar 2018 08:43:35 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-serial@vger.kernel.org,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        stable <stable@vger.kernel.org>,
+        Brian Norris <briannorris@chromium.org>
+Message-Id: <2F0ACD89-F225-479A-A65E-2F84E60781D3@holtmann.org>
+References: <20180228105750.6491-1-hdegoede@redhat.com>
+ <20180228105750.6491-2-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Kai-Heng,
+Hi Hans,
 
-> The issue can be reproduced before commit fd865802c66b ("Bluetooth:
-> btusb: fix QCA Rome suspend/resume") gets introduced, so the reset
-> resume quirk is still needed for this system.
+> Commit 55a9c95d70ab ("Bluetooth: btusb: Use DMI matching for QCA
+> reset_resume quirking"), added the Lenovo Yoga 920 to the
+> btusb_needs_reset_resume_table.
 > 
-> T:  Bus=01 Lev=01 Prnt=01 Port=13 Cnt=01 Dev#=  4 Spd=12  MxCh= 0
-> D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=e007 Rev=00.01
-> C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> Testing has shown that this is a false positive and the problems where
+> caused by issues with the initial fix: commit fd865802c66b ("Bluetooth:
+> btusb: fix QCA Rome suspend/resume"), which has already been reverted.
 > 
+> So the QCA Rome BT in the Yoga 920 does not need a reset-resume quirk at
+> all and this commit removes it from the btusb_needs_reset_resume_table.
+> 
+> Note that after this commit the btusb_needs_reset_resume_table is now
+> empty. It is kept around on purpose, since this whole series of commits
+> started for a reason and there are actually broken platforms around,
+> which need to be added to it.
+> 
+> BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
+> Fixes: 55a9c95d70ab ("Bluetooth: btusb: Use DMI matching for QCA ...")
 > Cc: stable@vger.kernel.org
 > Cc: Brian Norris <briannorris@chromium.org>
-> Cc: Hans de Goede <hdegoede@redhat.com>
-> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> Tested-by: Kevin Fenzi <kevin@scrye.com>
+> Suggested-by: Brian Norris <briannorris@chromium.org>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 > ---
-> drivers/bluetooth/btusb.c | 7 +++++++
-> 1 file changed, 7 insertions(+)
+> drivers/bluetooth/btusb.c | 7 -------
+> 1 file changed, 7 deletions(-)
 
 patch has been applied to bluetooth-stable tree.
 
 Regards
 
 Marcel
+
