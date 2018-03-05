@@ -1,49 +1,71 @@
-Return-Path: <loic.poulain@linaro.org>
-From: Loic Poulain <loic.poulain@linaro.org>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	stefan.wahren@i2se.com,
-	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH] Bluetooth: hci_bcm: use gpiod cansleep version
-Date: Mon,  5 Mar 2018 19:02:35 +0100
-Message-Id: <1520272955-5023-1-git-send-email-loic.poulain@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH] device: Fix bearer selection with single mode controller
+Date: Mon,  5 Mar 2018 17:16:35 +0100
+Message-Id: <20180305161635.25898-1-szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some GPIO controller drivers request sleepable context and so can't
-be accessed from IRQ context. Using gpiod_set/get_value accessors
-with such controller leads to a kernel warning since they are
-reserved for atomic context (according to the documentation).
+If remote device is dual mode and advertises without "BR/EDR flag
+not supported" set than device is marked as supporting BR/EDR
+even if controller is doing LE only. This results in bluetoothd
+trying to connect over BR/EDR since this is prefered transport
+if none is connected.
 
-Use the postfixed _cansleep version instead, indicating that context
-is safe for sleeping if necessary. Note that this is the case here
-since we never toggle the gpio neither from IRQ nor from a spinlocked
-section.
-
-Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+Fix this by checking if adapter supports specified technology
+before doing heuristic transport selection.
 ---
- drivers/bluetooth/hci_bcm.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/adapter.c | 8 ++++++++
+ src/adapter.h | 1 +
+ src/device.c  | 2 +-
+ 3 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 0438a64..bb5b006 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -903,13 +903,13 @@ static inline int bcm_apple_get_resources(struct bcm_device *dev)
- 
- static int bcm_gpio_set_device_wakeup(struct bcm_device *dev, bool awake)
- {
--	gpiod_set_value(dev->device_wakeup, awake);
-+	gpiod_set_value_cansleep(dev->device_wakeup, awake);
- 	return 0;
+diff --git a/src/adapter.c b/src/adapter.c
+index 0fc9f840e..67dd20b79 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4326,6 +4326,14 @@ bool btd_adapter_get_discoverable(struct btd_adapter *adapter)
+ 	return false;
  }
  
- static int bcm_gpio_set_shutdown(struct bcm_device *dev, bool powered)
++bool btd_adapter_get_bredr(struct btd_adapter *adapter)
++{
++	if (adapter->current_settings & MGMT_SETTING_BREDR)
++		return true;
++
++	return false;
++}
++
+ struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter)
  {
--	gpiod_set_value(dev->shutdown, powered);
-+	gpiod_set_value_cansleep(dev->shutdown, powered);
- 	return 0;
- }
+ 	if (!adapter)
+diff --git a/src/adapter.h b/src/adapter.h
+index e619a5be9..016d3d75b 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -75,6 +75,7 @@ bool btd_adapter_get_pairable(struct btd_adapter *adapter);
+ bool btd_adapter_get_powered(struct btd_adapter *adapter);
+ bool btd_adapter_get_connectable(struct btd_adapter *adapter);
+ bool btd_adapter_get_discoverable(struct btd_adapter *adapter);
++bool btd_adapter_get_bredr(struct btd_adapter *adapter);
  
+ struct btd_gatt_database *btd_adapter_get_database(struct btd_adapter *adapter);
+ 
+diff --git a/src/device.c b/src/device.c
+index 8eb99e4bd..b86a35c81 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1863,7 +1863,7 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
+ 	 * Prefer BR/EDR if time is the same since it might be from an
+ 	 * advertisement with BR/EDR flag set.
+ 	 */
+-	if (bredr_last <= le_last)
++	if (bredr_last <= le_last && btd_adapter_get_bredr(dev->adapter))
+ 		return BDADDR_BREDR;
+ 
+ 	return dev->bdaddr_type;
 -- 
-2.7.4
+2.14.3
+
