@@ -1,34 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Tue, 6 Mar 2018 09:47:16 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] device: Fix bearer selection with single mode controller
-Message-ID: <20180306074716.GA2732@x1c.lan>
-References: <20180305161635.25898-1-szymon.janc@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180305161635.25898-1-szymon.janc@codecoup.pl>
+From: Inga Stotland <inga.stotland@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Add sample JSON files to EXTRA_DIST
+Date: Mon,  5 Mar 2018 12:08:21 -0800
+Message-Id: <20180305200821.21546-1-inga.stotland@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+This adds mesh/local_node.json and mesh/prov_db.json samples
+to be included with dist tarball.
+---
+ Makefile.tools | 2 ++
+ 1 file changed, 2 insertions(+)
 
-On Mon, Mar 05, 2018, Szymon Janc wrote:
-> If remote device is dual mode and advertises without "BR/EDR flag
-> not supported" set than device is marked as supporting BR/EDR
-> even if controller is doing LE only. This results in bluetoothd
-> trying to connect over BR/EDR since this is prefered transport
-> if none is connected.
-> 
-> Fix this by checking if adapter supports specified technology
-> before doing heuristic transport selection.
-> ---
->  src/adapter.c | 8 ++++++++
->  src/adapter.h | 1 +
->  src/device.c  | 2 +-
->  3 files changed, 10 insertions(+), 1 deletion(-)
+diff --git a/Makefile.tools b/Makefile.tools
+index 71d083e71..c2d81a884 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -32,6 +32,8 @@ mesh_meshctl_SOURCES = mesh/main.c \
+ mesh_meshctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
+ 				lib/libbluetooth-internal.la \
+ 				@GLIB_LIBS@ @DBUS_LIBS@ -ljson-c -lreadline
++
++EXTRA_DIST += mesh/local_node.json mesh/prov_db.json
+ endif
+ 
+ if MONITOR
+-- 
+2.13.6
 
-Applied. Thanks.
-
-Johan
