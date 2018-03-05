@@ -1,32 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
+From: David Frey <dpfrey@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Add sample JSON files to EXTRA_DIST
-Date: Mon,  5 Mar 2018 12:08:21 -0800
-Message-Id: <20180305200821.21546-1-inga.stotland@intel.com>
+Cc: David Frey <dpfrey@gmail.com>
+Subject: [PATCH BlueZ 1/1] Remove obsolete Debian notes from HACKING
+Date: Mon,  5 Mar 2018 12:01:16 -0800
+Message-Id: <20180305200116.32291-2-dpfrey@gmail.com>
+In-Reply-To: <20180305200116.32291-1-dpfrey@gmail.com>
+References: <20180305200116.32291-1-dpfrey@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds mesh/local_node.json and mesh/prov_db.json samples
-to be included with dist tarball.
+The HACKING document says that Debian's automake version doesn't satisfy
+the automake >= 1.10 requirement, but this is no longer true. The
+automake version in Debian 8 (oldstable) is 1.14 and the version in
+Debian 9 (stable) is 1.15.
 ---
- Makefile.tools | 2 ++
- 1 file changed, 2 insertions(+)
+ HACKING | 11 +----------
+ 1 file changed, 1 insertion(+), 10 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 71d083e71..c2d81a884 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -32,6 +32,8 @@ mesh_meshctl_SOURCES = mesh/main.c \
- mesh_meshctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
- 				lib/libbluetooth-internal.la \
- 				@GLIB_LIBS@ @DBUS_LIBS@ -ljson-c -lreadline
-+
-+EXTRA_DIST += mesh/local_node.json mesh/prov_db.json
- endif
+diff --git a/HACKING b/HACKING
+index 87762f1e0..e10986fcb 100644
+--- a/HACKING
++++ b/HACKING
+@@ -5,16 +5,7 @@ Build tools requirements
+ ========================
  
- if MONITOR
+ When building and testing directly from the repository it is important to
+-have at least automake version 1.10 or later installed. All modern
+-distributions should default to the latest version, but it seems that
+-Debian's default is still an earlier version:
+-
+-  Check version
+-    # dpkg -l '*automake*'
+-
+-  Install new version
+-    # apt-get install automake1.10
+-    # update-alternatives --config automake
++have at least automake version 1.10 or later installed.
+ 
+ 
+ Working with the source code repository
 -- 
-2.13.6
+2.11.0
 
