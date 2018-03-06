@@ -1,119 +1,26 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Tue, 6 Mar 2018 09:48:50 +0200
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: Inga Stotland <inga.stotland@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] mesh: Add sample JSON files to EXTRA_DIST
+Message-ID: <20180306074850.GC2732@x1c.lan>
+References: <20180305200821.21546-1-inga.stotland@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180228121824.17256-1-luiz.dentz@gmail.com>
-References: <20180228121824.17256-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 6 Mar 2018 10:45:53 +0200
-Message-ID: <CABBYNZLv51HZBO+9Xj7HBEv6p82Vu=J=V9YG9vBKSj4xriRHpw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] advertising: Fix creating another mgmt instance
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180305200821.21546-1-inga.stotland@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Inga,
 
-On Wed, Feb 28, 2018 at 2:18 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> adapter already instanciate a instance of mgmt so just reuse that
-> instead of creating a new one.
+On Mon, Mar 05, 2018, Inga Stotland wrote:
+> This adds mesh/local_node.json and mesh/prov_db.json samples
+> to be included with dist tarball.
 > ---
->  src/adapter.c     |  2 +-
->  src/advertising.c | 15 ++++++++-------
->  src/advertising.h |  3 ++-
->  3 files changed, 11 insertions(+), 9 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 0fc9f840e..9f084da5e 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -7973,7 +7973,7 @@ static int adapter_register(struct btd_adapter *adapter)
->                 return -EINVAL;
->         }
->
-> -       adapter->adv_manager = btd_adv_manager_new(adapter);
-> +       adapter->adv_manager = btd_adv_manager_new(adapter, adapter->mgmt);
->
->         db = btd_gatt_database_get_db(adapter->database);
->         adapter->db_id = gatt_db_register(db, services_modified,
-> diff --git a/src/advertising.c b/src/advertising.c
-> index 38d2a2d1f..5c9ae6236 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -17,8 +17,6 @@
->   *
->   */
->
-> -#include "advertising.h"
-> -
->  #include <stdint.h>
->  #include <stdbool.h>
->  #include <errno.h>
-> @@ -39,6 +37,7 @@
->  #include "src/shared/mgmt.h"
->  #include "src/shared/queue.h"
->  #include "src/shared/util.h"
-> +#include "advertising.h"
->
->  #define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
->  #define LE_ADVERTISEMENT_IFACE "org.bluez.LEAdvertisement1"
-> @@ -1046,14 +1045,15 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
->                 remove_advertising(manager, 0);
->  }
->
-> -static struct btd_adv_manager *manager_create(struct btd_adapter *adapter)
-> +static struct btd_adv_manager *manager_create(struct btd_adapter *adapter,
-> +                                               struct mgmt *mgmt)
->  {
->         struct btd_adv_manager *manager;
->
->         manager = new0(struct btd_adv_manager, 1);
->         manager->adapter = adapter;
->
-> -       manager->mgmt = mgmt_new_default();
-> +       manager->mgmt = mgmt_ref(mgmt);
->
->         if (!manager->mgmt) {
->                 error("Failed to access management interface");
-> @@ -1087,14 +1087,15 @@ fail:
->         return NULL;
->  }
->
-> -struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter)
-> +struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter,
-> +                                                       struct mgmt *mgmt)
->  {
->         struct btd_adv_manager *manager;
->
-> -       if (!adapter)
-> +       if (!adapter || !mgmt)
->                 return NULL;
->
-> -       manager = manager_create(adapter);
-> +       manager = manager_create(adapter, mgmt);
->         if (!manager)
->                 return NULL;
->
-> diff --git a/src/advertising.h b/src/advertising.h
-> index d98c4b864..50d86674b 100644
-> --- a/src/advertising.h
-> +++ b/src/advertising.h
-> @@ -20,6 +20,7 @@
->  struct btd_adapter;
->  struct btd_adv_manager;
->
-> -struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter);
-> +struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter,
-> +                                                       struct mgmt *mgmt);
->  void btd_adv_manager_destroy(struct btd_adv_manager *manager);
->  void btd_adv_manager_refresh(struct btd_adv_manager *manager);
-> --
-> 2.14.3
+>  Makefile.tools | 2 ++
+>  1 file changed, 2 insertions(+)
 
-Applied.
+Applied. Thanks.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
