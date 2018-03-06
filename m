@@ -1,386 +1,399 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] Fix storage for adapters without public address
-Date: Tue,  6 Mar 2018 14:28:07 +0100
-Message-Id: <20180306132807.6149-1-szymon.janc@codecoup.pl>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH v3 1/3] tools: Add initial code for btmon-logger
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <6699189.7jNOSx0g8N@ix>
+Date: Tue, 6 Mar 2018 10:07:28 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A5042E95-6CE6-4DB3-BDB6-5EEF80BCF556@holtmann.org>
+References: <20180219134608.14189-1-szymon.janc@codecoup.pl>
+ <BDF34253-B808-488A-A198-9B2A2E0A27B3@holtmann.org> <6699189.7jNOSx0g8N@ix>
+To: Szymon Janc <szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since those have adapter folder prefixed with "static-" this needs
-to be taken into account when storing data.
----
- src/adapter.c | 26 +++++++++---------
- src/adapter.h |  1 +
- src/device.c  | 87 +++++++++++++++++++++++++++--------------------------------
- 3 files changed, 54 insertions(+), 60 deletions(-)
+Hi Szymon,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index eddfd4c25..6d7d61504 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -432,7 +432,7 @@ static uint8_t get_mode(const char *mode)
- 		return MODE_UNKNOWN;
- }
- 
--static const char *adapter_dir(struct btd_adapter *adapter)
-+const char *btd_adapter_get_storage_dir(struct btd_adapter *adapter)
- {
- 	static char dir[25];
- 
-@@ -484,7 +484,7 @@ static void store_adapter_info(struct btd_adapter *adapter)
- 							adapter->stored_alias);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/settings",
--						adapter_dir(adapter));
-+					btd_adapter_get_storage_dir(adapter));
- 
- 	create_file(filename, S_IRUSR | S_IWUSR);
- 
-@@ -3562,7 +3562,7 @@ static int load_irk(struct btd_adapter *adapter, uint8_t *irk)
- 	int ret;
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/identity",
--						adapter_dir(adapter));
-+					btd_adapter_get_storage_dir(adapter));
- 
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
-@@ -4003,7 +4003,8 @@ static void load_devices(struct btd_adapter *adapter)
- 	DIR *dir;
- 	struct dirent *entry;
- 
--	snprintf(dirname, PATH_MAX, STORAGEDIR "/%s", adapter_dir(adapter));
-+	snprintf(dirname, PATH_MAX, STORAGEDIR "/%s",
-+					btd_adapter_get_storage_dir(adapter));
- 
- 	dir = opendir(dirname);
- 	if (!dir) {
-@@ -4030,7 +4031,8 @@ static void load_devices(struct btd_adapter *adapter)
- 			continue;
- 
- 		snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
--					adapter_dir(adapter), entry->d_name);
-+					btd_adapter_get_storage_dir(adapter),
-+					entry->d_name);
- 
- 		key_file = g_key_file_new();
- 		g_key_file_load_from_file(key_file, filename, 0, NULL);
-@@ -5634,7 +5636,7 @@ static void load_config(struct btd_adapter *adapter)
- 	key_file = g_key_file_new();
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/settings",
--						adapter_dir(adapter));
-+					btd_adapter_get_storage_dir(adapter));
- 
- 	if (stat(filename, &st) < 0) {
- 		convert_config(adapter, filename, key_file);
-@@ -7285,7 +7287,7 @@ static void store_link_key(struct btd_adapter *adapter,
- 	ba2str(device_get_address(device), device_addr);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
--					adapter_dir(adapter), device_addr);
-+			btd_adapter_get_storage_dir(adapter), device_addr);
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
- 
-@@ -7375,7 +7377,7 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	ba2str(peer, device_addr);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
--					adapter_dir(adapter), device_addr);
-+			btd_adapter_get_storage_dir(adapter), device_addr);
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
- 
-@@ -7504,7 +7506,7 @@ static void store_csrk(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	ba2str(peer, device_addr);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
--					adapter_dir(adapter), device_addr);
-+			btd_adapter_get_storage_dir(adapter), device_addr);
- 
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
-@@ -7575,7 +7577,7 @@ static void store_irk(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	ba2str(peer, device_addr);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
--					adapter_dir(adapter), device_addr);
-+			btd_adapter_get_storage_dir(adapter), device_addr);
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
- 
-@@ -7663,7 +7665,7 @@ static void store_conn_param(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	DBG("");
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
--					adapter_dir(adapter), device_addr);
-+			btd_adapter_get_storage_dir(adapter), device_addr);
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
- 
-@@ -8242,7 +8244,7 @@ static void remove_keys(struct btd_adapter *adapter,
- 	ba2str(device_get_address(device), device_addr);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
--					adapter_dir(adapter), device_addr);
-+			btd_adapter_get_storage_dir(adapter), device_addr);
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
- 
-diff --git a/src/adapter.h b/src/adapter.h
-index 016d3d75b..d0a5253bd 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -95,6 +95,7 @@ struct btd_device *btd_adapter_find_device(struct btd_adapter *adapter,
- const char *adapter_get_path(struct btd_adapter *adapter);
- const bdaddr_t *btd_adapter_get_address(struct btd_adapter *adapter);
- uint8_t btd_adapter_get_address_type(struct btd_adapter *adapter);
-+const char *btd_adapter_get_storage_dir(struct btd_adapter *adapter);
- int adapter_set_name(struct btd_adapter *adapter, const char *name);
- 
- int adapter_service_add(struct btd_adapter *adapter, sdp_record_t *rec);
-diff --git a/src/device.c b/src/device.c
-index b86a35c81..8af77dbc8 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -369,7 +369,6 @@ static gboolean store_device_info_cb(gpointer user_data)
- 	struct btd_device *device = user_data;
- 	GKeyFile *key_file;
- 	char filename[PATH_MAX];
--	char adapter_addr[18];
- 	char device_addr[18];
- 	char *str;
- 	char class[9];
-@@ -378,10 +377,10 @@ static gboolean store_device_info_cb(gpointer user_data)
- 
- 	device->store_id = 0;
- 
--	ba2str(btd_adapter_get_address(device->adapter), adapter_addr);
- 	ba2str(&device->bdaddr, device_addr);
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", adapter_addr,
--			device_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
-+				btd_adapter_get_storage_dir(device->adapter),
-+				device_addr);
- 
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
-@@ -491,7 +490,7 @@ static void store_device_info(struct btd_device *device)
- void device_store_cached_name(struct btd_device *dev, const char *name)
- {
- 	char filename[PATH_MAX];
--	char s_addr[18], d_addr[18];
-+	char d_addr[18];
- 	GKeyFile *key_file;
- 	char *data;
- 	gsize length = 0;
-@@ -502,9 +501,9 @@ void device_store_cached_name(struct btd_device *dev, const char *name)
- 		return;
- 	}
- 
--	ba2str(btd_adapter_get_address(dev->adapter), s_addr);
- 	ba2str(&dev->bdaddr, d_addr);
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", s_addr, d_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
-+			btd_adapter_get_storage_dir(dev->adapter), d_addr);
- 	create_file(filename, S_IRUSR | S_IWUSR);
- 
- 	key_file = g_key_file_new();
-@@ -1996,9 +1995,8 @@ static DBusMessage *disconnect_profile(DBusConnection *conn, DBusMessage *msg,
- 
- static void store_services(struct btd_device *device)
- {
--	struct btd_adapter *adapter = device->adapter;
- 	char filename[PATH_MAX];
--	char src_addr[18], dst_addr[18];
-+	char dst_addr[18];
- 	uuid_t uuid;
- 	char *prim_uuid;
- 	GKeyFile *key_file;
-@@ -2017,11 +2015,11 @@ static void store_services(struct btd_device *device)
- 	if (prim_uuid == NULL)
- 		return;
- 
--	ba2str(btd_adapter_get_address(adapter), src_addr);
- 	ba2str(&device->bdaddr, dst_addr);
- 
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes", src_addr,
--								dst_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes",
-+				btd_adapter_get_storage_dir(device->adapter),
-+				dst_addr);
- 	key_file = g_key_file_new();
- 
- 	for (l = device->primaries; l; l = l->next) {
-@@ -2187,9 +2185,8 @@ static void store_service(struct gatt_db_attribute *attr, void *user_data)
- 
- static void store_gatt_db(struct btd_device *device)
- {
--	struct btd_adapter *adapter = device->adapter;
- 	char filename[PATH_MAX];
--	char src_addr[18], dst_addr[18];
-+	char dst_addr[18];
- 	GKeyFile *key_file;
- 	char *data;
- 	gsize length = 0;
-@@ -2204,11 +2201,11 @@ static void store_gatt_db(struct btd_device *device)
- 	if (!gatt_cache_is_enabled(device))
- 		return;
- 
--	ba2str(btd_adapter_get_address(adapter), src_addr);
- 	ba2str(&device->bdaddr, dst_addr);
- 
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", src_addr,
--								dst_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
-+				btd_adapter_get_storage_dir(device->adapter),
-+				dst_addr);
- 	create_file(filename, S_IRUSR | S_IWUSR);
- 
- 	key_file = g_key_file_new();
-@@ -3738,8 +3735,7 @@ struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
- 				const char *address, GKeyFile *key_file)
- {
- 	struct btd_device *device;
--	const bdaddr_t *src;
--	char srcaddr[18];
-+	const char *src_dir;
- 
- 	DBG("address %s", address);
- 
-@@ -3747,13 +3743,12 @@ struct btd_device *device_create_from_storage(struct btd_adapter *adapter,
- 	if (device == NULL)
- 		return NULL;
- 
--	src = btd_adapter_get_address(adapter);
--	ba2str(src, srcaddr);
--
- 	convert_info(device, key_file);
- 
--	load_info(device, srcaddr, address, key_file);
--	load_att_info(device, srcaddr, address);
-+	src_dir = btd_adapter_get_storage_dir(adapter);
-+
-+	load_info(device, src_dir, address, key_file);
-+	load_att_info(device, src_dir, address);
- 
- 	return device;
- }
-@@ -3762,8 +3757,7 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 				const bdaddr_t *bdaddr, uint8_t bdaddr_type)
- {
- 	struct btd_device *device;
--	const bdaddr_t *sba;
--	char src[18], dst[18];
-+	char dst[18];
- 	char *str;
- 
- 	ba2str(bdaddr, dst);
-@@ -3780,10 +3774,8 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 	else
- 		device->le = true;
- 
--	sba = btd_adapter_get_address(adapter);
--	ba2str(sba, src);
--
--	str = load_cached_name(device, src, dst);
-+	str = load_cached_name(device, btd_adapter_get_storage_dir(adapter),
-+									dst);
- 	if (str) {
- 		strcpy(device->name, str);
- 		g_free(str);
-@@ -3795,7 +3787,7 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- char *btd_device_get_storage_path(struct btd_device *device,
- 				const char *filename)
- {
--	char srcaddr[18], dstaddr[18];
-+	char dstaddr[18];
- 
- 	if (device_address_is_private(device)) {
- 		warn("Refusing storage path for private addressed device %s",
-@@ -3803,14 +3795,16 @@ char *btd_device_get_storage_path(struct btd_device *device,
- 		return NULL;
- 	}
- 
--	ba2str(btd_adapter_get_address(device->adapter), srcaddr);
- 	ba2str(&device->bdaddr, dstaddr);
- 
- 	if (!filename)
--		return g_strdup_printf(STORAGEDIR "/%s/%s", srcaddr, dstaddr);
-+		return g_strdup_printf(STORAGEDIR "/%s/%s",
-+				btd_adapter_get_storage_dir(device->adapter),
-+				dstaddr);
- 
--	return g_strdup_printf(STORAGEDIR "/%s/%s/%s", srcaddr, dstaddr,
--							filename);
-+	return g_strdup_printf(STORAGEDIR "/%s/%s/%s",
-+				btd_adapter_get_storage_dir(device->adapter),
-+				dstaddr, filename);
- }
- 
- void btd_device_device_set_name(struct btd_device *device, const char *name)
-@@ -4007,8 +4001,6 @@ static void delete_folder_tree(const char *dirname)
- 
- static void device_remove_stored(struct btd_device *device)
- {
--	const bdaddr_t *src = btd_adapter_get_address(device->adapter);
--	char adapter_addr[18];
- 	char device_addr[18];
- 	char filename[PATH_MAX];
- 	GKeyFile *key_file;
-@@ -4033,15 +4025,16 @@ static void device_remove_stored(struct btd_device *device)
- 	if (device->blocked)
- 		device_unblock(device, TRUE, FALSE);
- 
--	ba2str(src, adapter_addr);
- 	ba2str(&device->bdaddr, device_addr);
- 
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s", adapter_addr,
--			device_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s",
-+				btd_adapter_get_storage_dir(device->adapter),
-+				device_addr);
- 	delete_folder_tree(filename);
- 
--	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", adapter_addr,
--			device_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
-+				btd_adapter_get_storage_dir(device->adapter),
-+				device_addr);
- 
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
-@@ -4875,8 +4868,8 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 	uint16_t mtu;
- 	uint16_t cid;
- 	struct btd_gatt_database *database;
--	const bdaddr_t *src, *dst;
--	char srcaddr[18], dstaddr[18];
-+	const bdaddr_t *dst;
-+	char dstaddr[18];
- 
- 	bt_io_get(io, &gerr, BT_IO_OPT_SEC_LEVEL, &sec_level,
- 						BT_IO_OPT_IMTU, &mtu,
-@@ -4928,14 +4921,12 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
- 
- 	database = btd_adapter_get_database(dev->adapter);
- 
--	src = btd_adapter_get_address(dev->adapter);
--	ba2str(src, srcaddr);
--
- 	dst = device_get_address(dev);
- 	ba2str(dst, dstaddr);
- 
- 	if (gatt_db_isempty(dev->db))
--		load_gatt_db(dev, srcaddr, dstaddr);
-+		load_gatt_db(dev, btd_adapter_get_storage_dir(dev->adapter),
-+								dstaddr);
- 
- 	gatt_client_init(dev);
- 	gatt_server_init(dev, btd_gatt_database_get_db(database));
--- 
-2.14.3
+>>> This is intended for use for automated logging or unatrended systems.
+>> 
+>> unattended.
+>> 
+>>> It doesn't contain any packet decoding functionality which results
+>>> in much smaller binary.
+>>> ---
+>>> .gitignore           |   1 +
+>>> Makefile.tools       |   5 +
+>>> tools/btmon-logger.c | 350
+>>> +++++++++++++++++++++++++++++++++++++++++++++++++++ 3 files changed, 356
+>>> insertions(+)
+>>> create mode 100644 tools/btmon-logger.c
+>>> 
+>>> diff --git a/.gitignore b/.gitignore
+>>> index 47808059b..33ec66048 100644
+>>> --- a/.gitignore
+>>> +++ b/.gitignore
+>>> @@ -118,6 +118,7 @@ tools/btconfig
+>>> tools/btmgmt
+>>> tools/btsnoop
+>>> tools/btpclient
+>>> +tools/btmon-logger
+>>> peripheral/btsensor
+>>> monitor/btmon
+>>> emulator/btvirt
+>>> diff --git a/Makefile.tools b/Makefile.tools
+>>> index 71d083e71..ba4b9b7d7 100644
+>>> --- a/Makefile.tools
+>>> +++ b/Makefile.tools
+>>> @@ -62,6 +62,11 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+>>> 
+>>> 				monitor/tty.h
+>>> 
+>>> monitor_btmon_LDADD = lib/libbluetooth-internal.la \
+>>> 
+>>> 				src/libshared-mainloop.la @UDEV_LIBS@
+>>> 
+>>> +
+>>> +noinst_PROGRAMS += tools/btmon-logger
+>>> +
+>> 
+>> We can keep it initially noinst here, but what is longer term plan. Give it
+>> its own configure switch or make it available when btmon is enabled. I
+>> think we need to treat this as a service and also provide a systemd unit
+>> file for it.
+>> 
+>> If we do it via systemd unit files, then we can give the right path as
+>> current dir and take all the privileges and other path access away since
+>> nothing else is needed. Actually too bad that systemd can not start us with
+>> the monitor socket opened, because then we could run without any extra
+>> privileges. Anyhow, we should drop CAP_NET_RAW once we open the monitor
+>> socket.
+> 
+> I wasn't sure initially on how this will be handled but I'm fine with 
+> configure switch (--btmon-service ?) and adding systemd service file.
+
+--enable-logger or --enable-monitor-service
+
+> 
+>>> +tools_btmon_logger_SOURCES = tools/btmon-logger.c lib/monitor.h
+>>> +tools_btmon_logger_LDADD = src/libshared-mainloop.la
+>>> endif
+>>> 
+>>> if TESTING
+>>> diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
+>>> new file mode 100644
+>>> index 000000000..9787e6b03
+>>> --- /dev/null
+>>> +++ b/tools/btmon-logger.c
+>>> @@ -0,0 +1,350 @@
+>>> +/*
+>>> + *
+>>> + *  BlueZ - Bluetooth protocol stack for Linux
+>>> + *
+>>> + *  Copyright (C) 2017-2018  Codecoup
+>>> + *  Copyright (C) 2011-2014  Intel Corporation
+>>> + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+>>> + *
+>>> + *
+>>> + *  This program is free software; you can redistribute it and/or modify
+>>> + *  it under the terms of the GNU General Public License as published by
+>>> + *  the Free Software Foundation; either version 2 of the License, or
+>>> + *  (at your option) any later version.
+>>> + *
+>>> + *  This program is distributed in the hope that it will be useful,
+>>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>>> + *  GNU General Public License for more details.
+>>> + *
+>>> + *  You should have received a copy of the GNU General Public License
+>>> + *  along with this program; if not, write to the Free Software
+>>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301
+>>> USA + *
+>>> + */
+>>> +
+>>> +#ifdef HAVE_CONFIG_H
+>>> +#include <config.h>
+>>> +#endif
+>>> +
+>>> +#include <stdio.h>
+>>> +#include <stdlib.h>
+>>> +#include <limits.h>
+>>> +#include <string.h>
+>>> +#include <time.h>
+>>> +#include <getopt.h>
+>>> +#include <unistd.h>
+>>> +#include <sys/socket.h>
+>>> +
+>>> +#include "lib/bluetooth.h"
+>>> +#include "lib/hci.h"
+>>> +
+>>> +#include "src/shared/util.h"
+>>> +#include "src/shared/mainloop.h"
+>>> +#include "src/shared/btsnoop.h"
+>>> +
+>>> +#define MONITOR_INDEX_NONE 0xffff
+>>> +
+>>> +struct monitor_hdr {
+>>> +	uint16_t opcode;
+>>> +	uint16_t index;
+>>> +	uint16_t len;
+>>> +} __attribute__ ((packed));
+>>> +
+>>> +struct btsnoop_hdr {
+>>> +	uint8_t		id[8];		/* Identification Pattern */
+>>> +	uint32_t	version;	/* Version Number = 1 */
+>>> +	uint32_t	type;		/* Datalink Type */
+>>> +} __attribute__ ((packed));
+>>> +#define BTSNOOP_HDR_SIZE (sizeof(struct btsnoop_hdr))
+>>> +
+>>> +struct btsnoop_pkt {
+>>> +	uint32_t	size;		/* Original Length */
+>>> +	uint32_t	len;		/* Included Length */
+>>> +	uint32_t	flags;		/* Packet Flags */
+>>> +	uint32_t	drops;		/* Cumulative Drops */
+>>> +	uint64_t	ts;		/* Timestamp microseconds */
+>>> +	uint8_t		data[0];	/* Packet Data */
+>>> +} __attribute__ ((packed));
+>>> +#define BTSNOOP_PKT_SIZE (sizeof(struct btsnoop_pkt))
+>>> +
+>>> +static const char *path = ".";
+>>> +static const char *prefix = "hci";
+>>> +static bool suffix_date = false;
+>>> +static size_t write_limit = 0;
+>>> +static size_t write_size = 0;
+>>> +
+>>> +static struct btsnoop *btsnoop_file = NULL;
+>>> +
+>>> +static bool create_btsnoop(void)
+>>> +{
+>>> +	static char real_path[FILENAME_MAX];
+>>> +	struct timeval tv;
+>>> +
+>>> +	gettimeofday(&tv, NULL);
+>>> +
+>>> +	if (suffix_date) {
+>>> +		struct tm tm;
+>>> +
+>>> +		localtime_r(&tv.tv_sec, &tm);
+>>> +
+>>> +		snprintf(real_path, FILENAME_MAX,
+>>> +				"%s/%s_%04d-%02d-%02d_%02d:%02d:%02d.btsnoop",
+>>> +				path, prefix, tm.tm_year + 1900, tm.tm_mon + 1,
+>>> +				tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+>>> +	} else {
+>>> +		static unsigned int cnt = 0;
+>>> +
+>>> +		snprintf(real_path, sizeof(real_path), "%s/%s_%u.btsnoop",
+>>> +							path, prefix, cnt++);
+>>> +	}
+>>> +
+>>> +	btsnoop_file = btsnoop_create(real_path, BTSNOOP_FORMAT_MONITOR);
+>>> +	if(!btsnoop_file)
+>> 
+>> Missing space.
+>> 
+>>> +		return false;
+>>> +
+>>> +	write_size = BTSNOOP_HDR_SIZE;
+>>> +
+>>> +	return true;
+>>> +}
+>> 
+>> And I have the feeling that it would be best to put that code all in
+>> src/shared/btsnoop.c so that we have a more generic rotate function and
+>> don’t have to play tricks with the struct btsnoop pointer.
+> 
+> OK. I'll see on how this works out.
+> 
+>>> +
+>>> +static void rotate_btsnoop(uint16_t pktlen)
+>>> +{
+>>> +	write_size += BTSNOOP_PKT_SIZE + pktlen;
+>>> +
+>>> +	if (write_size <= write_limit)
+>>> +		return;
+>>> +
+>>> +	btsnoop_unref(btsnoop_file);
+>>> +
+>>> +	if (!create_btsnoop()) {
+>>> +		fprintf(stderr, "Failed to create btsnoop file, exiting.\n");
+>>> +		mainloop_quit();
+>>> +		return;
+>>> +	}
+>>> +
+>>> +	write_size += BTSNOOP_PKT_SIZE + pktlen;
+>>> +}
+>>> +
+>>> +static void data_callback(int fd, uint32_t events, void *user_data)
+>>> +{
+>>> +	uint8_t buf[BTSNOOP_MAX_PACKET_SIZE];
+>>> +	unsigned char control[64];
+>>> +	struct monitor_hdr hdr;
+>>> +	struct msghdr msg;
+>>> +	struct iovec iov[2];
+>>> +
+>>> +	if (events & (EPOLLERR | EPOLLHUP)) {
+>>> +		mainloop_remove_fd(fd);
+>>> +		return;
+>>> +	}
+>>> +
+>>> +	iov[0].iov_base = &hdr;
+>>> +	iov[0].iov_len = sizeof(hdr);
+>>> +	iov[1].iov_base = buf;
+>>> +	iov[1].iov_len = sizeof(buf);
+>>> +
+>>> +	memset(&msg, 0, sizeof(msg));
+>>> +	msg.msg_iov = iov;
+>>> +	msg.msg_iovlen = 2;
+>>> +	msg.msg_control = control;
+>>> +	msg.msg_controllen = sizeof(control);
+>>> +
+>>> +	while (1) {
+>>> +		struct cmsghdr *cmsg;
+>>> +		struct timeval *tv = NULL;
+>>> +		struct timeval ctv;
+>>> +		uint16_t opcode, index, pktlen;
+>>> +		ssize_t len;
+>>> +
+>>> +		len = recvmsg(fd, &msg, MSG_DONTWAIT);
+>>> +		if (len < 0)
+>>> +			break;
+>>> +
+>>> +		if (len < (ssize_t) sizeof(hdr))
+>>> +			break;
+>>> +
+>>> +		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
+>>> +					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
+>>> +			if (cmsg->cmsg_level != SOL_SOCKET)
+>>> +				continue;
+>>> +
+>>> +			if (cmsg->cmsg_type == SCM_TIMESTAMP) {
+>>> +				memcpy(&ctv, CMSG_DATA(cmsg), sizeof(ctv));
+>>> +				tv = &ctv;
+>>> +			}
+>>> +		}
+>>> +
+>>> +		opcode = le16_to_cpu(hdr.opcode);
+>>> +		index  = le16_to_cpu(hdr.index);
+>>> +		pktlen = le16_to_cpu(hdr.len);
+>>> +
+>>> +		if (write_limit)
+>>> +			rotate_btsnoop(pktlen);
+>> 
+>> Sounds rather pointless to do a check here for write_limit and then check
+>> everything else in the function. Which is still wrongly named since it is a
+>> maybe_rotate_btsnoop what is actually happening. Fold it all into one place
+>> and name it accordingly.
+>>> +
+>>> +		btsnoop_write_hci(btsnoop_file, tv, index, opcode, 0, buf,
+>>> +									pktlen);
+>>> +	}
+>>> +}
+>>> +
+>>> +static bool open_monitor_channel(void)
+>>> +{
+>>> +	struct sockaddr_hci addr;
+>>> +	int fd, opt = 1;
+>>> +
+>>> +	fd = socket(AF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC, BTPROTO_HCI);
+>>> +	if (fd < 0) {
+>>> +		perror("Failed to open monitor channel");
+>>> +		return false;
+>>> +	}
+>>> +
+>>> +	memset(&addr, 0, sizeof(addr));
+>>> +	addr.hci_family = AF_BLUETOOTH;
+>>> +	addr.hci_dev = HCI_DEV_NONE;
+>>> +	addr.hci_channel = HCI_CHANNEL_MONITOR;
+>>> +
+>>> +	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+>>> +		perror("Failed to bind monitor channel");
+>>> +		close(fd);
+>>> +		return false;
+>>> +	}
+>>> +
+>>> +	if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMP, &opt, sizeof(opt)) < 0) {
+>>> +		perror("Failed to enable timestamps");
+>>> +		close(fd);
+>>> +		return false;
+>>> +	}
+>>> +
+>>> +	if (setsockopt(fd, SOL_SOCKET, SO_PASSCRED, &opt, sizeof(opt)) < 0) {
+>>> +		perror("Failed to enable credentials");
+>>> +		close(fd);
+>>> +		return false;
+>>> +	}
+>>> +
+>>> +	mainloop_add_fd(fd, EPOLLIN, data_callback, NULL, NULL);
+>>> +
+>>> +	return true;
+>>> +}
+>>> +
+>>> +static void signal_callback(int signum, void *user_data)
+>>> +{
+>>> +	switch (signum) {
+>>> +	case SIGINT:
+>>> +	case SIGTERM:
+>>> +		mainloop_quit();
+>>> +		break;
+>>> +	}
+>>> +}
+>>> +
+>>> +static void usage(void)
+>>> +{
+>>> +	printf("btmon-logger - Bluetooth monitor\n"
+>>> +		"Usage:\n");
+>>> +	printf("\tbtmon-logger [options]\n");
+>>> +	printf("options:\n"
+>>> +		"\t-p, --path <path>      Save traces in specified path\n”
+>> 
+>> Should be current path if nothing is provided.
+> 
+> OK.
+> 
+>> 
+>>> +		"\t-P, --prefix <name>    Prefix filenames (defaults: \"hci\"\n”
+>> 
+>> that part is generally called basename. And default basename should be
+>> hci.log actually.
+>>> +		"\t-d, --date             Suffix filenames with date\n”
+>> 
+>> As discussed, I do not like the idea of a data suffix at all. That seems all
+>> pointless to be for no gain. You are trying to make something human
+>> readable which is clearly not. If people want to extra ranges from a set of
+>> log traces, then btmon (or btsnoop utility) can gain that functionality.
+>> However here, I prefer that we do a simple path/basename.1 style.
+>> 
+>> Also path/basename will be the current file and all other numeration will be
+>> increased and thus files moved along. Same as what logrotate and others are
+>> actually doing. I kind dislike breaking with known way how others are
+>> handled.
+> 
+> So it should be initialy 
+> path/basename.log
+> 
+> and then goes to
+> path/basename.log -> path/basename.log.1
+> 
+> and then
+> path/basename.log -> path/basename.log.1
+> path/basename.log.1 -> path/basename.log.2
+
+Except this is
+
+path/basename.log.1 -> path/basename.log.2
+path/basename.log -> path/basename.log.1
+
+> ?
+
+So now we can discuss how useful this is when you get a tarball of files. It is clearly what most rotating logging systems do. If you wanted to read them now they would be in the wrong order.
+
+We could argue this doesn’t matter since once you reach basename.log.10, the ascii sorting that the shell does with a basename.log.* glob matching would be wrong anyway and we would have to open all the files headers to figure out the sorting order of them.
+
+So maybe it is actually better to just start basename.log.1, basename.log.2 etc. when rotation is active. Otherwise stay with basename.log.
+
+Regards
+
+Marcel
 
