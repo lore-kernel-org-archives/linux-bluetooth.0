@@ -1,11 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180119133707.18249-1-luiz.dentz@gmail.com>
-References: <20180119133707.18249-1-luiz.dentz@gmail.com>
+In-Reply-To: <20180228121824.17256-1-luiz.dentz@gmail.com>
+References: <20180228121824.17256-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 6 Mar 2018 10:53:48 +0200
-Message-ID: <CABBYNZL+SpiTSHHS4R2wkKFc4dhRm89P+hba=9NTRoz1kKizCA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] advertising: Fix crash when if client invalidate property
+Date: Tue, 6 Mar 2018 10:45:53 +0200
+Message-ID: <CABBYNZLv51HZBO+9Xj7HBEv6p82Vu=J=V9YG9vBKSj4xriRHpw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] advertising: Fix creating another mgmt instance
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,149 +13,102 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Fri, Jan 19, 2018 at 3:37 PM, Luiz Augusto von Dentz
+On Wed, Feb 28, 2018 at 2:18 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> If a property is invalidated the iter is set to NULL which should be
-> checked and properly reset.
+> adapter already instanciate a instance of mgmt so just reuse that
+> instead of creating a new one.
 > ---
->  src/advertising.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 54 insertions(+)
+>  src/adapter.c     |  2 +-
+>  src/advertising.c | 15 ++++++++-------
+>  src/advertising.h |  3 ++-
+>  3 files changed, 11 insertions(+), 9 deletions(-)
 >
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 0fc9f840e..9f084da5e 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -7973,7 +7973,7 @@ static int adapter_register(struct btd_adapter *adapter)
+>                 return -EINVAL;
+>         }
+>
+> -       adapter->adv_manager = btd_adv_manager_new(adapter);
+> +       adapter->adv_manager = btd_adv_manager_new(adapter, adapter->mgmt);
+>
+>         db = btd_gatt_database_get_db(adapter->database);
+>         adapter->db_id = gatt_db_register(db, services_modified,
 > diff --git a/src/advertising.c b/src/advertising.c
-> index 94a8c4050..f00db86bd 100644
+> index 38d2a2d1f..5c9ae6236 100644
 > --- a/src/advertising.c
 > +++ b/src/advertising.c
-> @@ -203,6 +203,9 @@ static bool parse_type(DBusMessageIter *iter, struct btd_adv_client *client)
+> @@ -17,8 +17,6 @@
+>   *
+>   */
+>
+> -#include "advertising.h"
+> -
+>  #include <stdint.h>
+>  #include <stdbool.h>
+>  #include <errno.h>
+> @@ -39,6 +37,7 @@
+>  #include "src/shared/mgmt.h"
+>  #include "src/shared/queue.h"
+>  #include "src/shared/util.h"
+> +#include "advertising.h"
+>
+>  #define LE_ADVERTISING_MGR_IFACE "org.bluez.LEAdvertisingManager1"
+>  #define LE_ADVERTISEMENT_IFACE "org.bluez.LEAdvertisement1"
+> @@ -1046,14 +1045,15 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+>                 remove_advertising(manager, 0);
+>  }
+>
+> -static struct btd_adv_manager *manager_create(struct btd_adapter *adapter)
+> +static struct btd_adv_manager *manager_create(struct btd_adapter *adapter,
+> +                                               struct mgmt *mgmt)
 >  {
->         const char *msg_type;
+>         struct btd_adv_manager *manager;
 >
-> +       if (!iter)
-> +               return true;
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
->                 return false;
+>         manager = new0(struct btd_adv_manager, 1);
+>         manager->adapter = adapter;
 >
-> @@ -226,6 +229,11 @@ static bool parse_service_uuids(DBusMessageIter *iter,
+> -       manager->mgmt = mgmt_new_default();
+> +       manager->mgmt = mgmt_ref(mgmt);
+>
+>         if (!manager->mgmt) {
+>                 error("Failed to access management interface");
+> @@ -1087,14 +1087,15 @@ fail:
+>         return NULL;
+>  }
+>
+> -struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter)
+> +struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter,
+> +                                                       struct mgmt *mgmt)
 >  {
->         DBusMessageIter ariter;
+>         struct btd_adv_manager *manager;
 >
-> +       if (!iter) {
-> +               bt_ad_clear_service_uuid(client->data);
-> +               return true;
-> +       }
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
->                 return false;
+> -       if (!adapter)
+> +       if (!adapter || !mgmt)
+>                 return NULL;
 >
-> @@ -262,6 +270,11 @@ static bool parse_solicit_uuids(DBusMessageIter *iter,
->  {
->         DBusMessageIter ariter;
+> -       manager = manager_create(adapter);
+> +       manager = manager_create(adapter, mgmt);
+>         if (!manager)
+>                 return NULL;
 >
-> +       if (!iter) {
-> +               bt_ad_clear_solicit_uuid(client->data);
-> +               return true;
-> +       }
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
->                 return false;
+> diff --git a/src/advertising.h b/src/advertising.h
+> index d98c4b864..50d86674b 100644
+> --- a/src/advertising.h
+> +++ b/src/advertising.h
+> @@ -20,6 +20,7 @@
+>  struct btd_adapter;
+>  struct btd_adv_manager;
 >
-> @@ -298,6 +311,11 @@ static bool parse_manufacturer_data(DBusMessageIter *iter,
->  {
->         DBusMessageIter entries;
->
-> +       if (!iter) {
-> +               bt_ad_clear_manufacturer_data(client->data);
-> +               return true;
-> +       }
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
->                 return false;
->
-> @@ -353,6 +371,11 @@ static bool parse_service_data(DBusMessageIter *iter,
->  {
->         DBusMessageIter entries;
->
-> +       if (!iter) {
-> +               bt_ad_clear_service_data(client->data);
-> +               return true;
-> +       }
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
->                 return false;
->
-> @@ -422,11 +445,19 @@ static bool parse_includes(DBusMessageIter *iter,
->  {
->         DBusMessageIter entries;
->
-> +       if (!iter) {
-> +               client->flags = 0;
-> +               return true;
-> +       }
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
->                 return false;
->
->         dbus_message_iter_recurse(iter, &entries);
->
-> +       /* Reset flags before parsing */
-> +       client->flags = 0;
-> +
->         while (dbus_message_iter_get_arg_type(&entries) == DBUS_TYPE_STRING) {
->                 const char *str;
->                 struct adv_include *inc;
-> @@ -456,6 +487,12 @@ static bool parse_local_name(DBusMessageIter *iter,
->  {
->         const char *name;
->
-> +       if (!iter) {
-> +               free(client->name);
-> +               client->name = NULL;
-> +               return true;
-> +       }
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_STRING)
->                 return false;
->
-> @@ -475,6 +512,11 @@ static bool parse_local_name(DBusMessageIter *iter,
->  static bool parse_appearance(DBusMessageIter *iter,
->                                         struct btd_adv_client *client)
->  {
-> +       if (!iter) {
-> +               client->appearance = 0;
-> +               return true;
-> +       }
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
->                 return false;
->
-> @@ -491,6 +533,11 @@ static bool parse_appearance(DBusMessageIter *iter,
->  static bool parse_duration(DBusMessageIter *iter,
->                                         struct btd_adv_client *client)
->  {
-> +       if (!iter) {
-> +               client->duration = 0;
-> +               return true;
-> +       }
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
->                 return false;
->
-> @@ -516,6 +563,13 @@ static gboolean client_timeout(void *user_data)
->  static bool parse_timeout(DBusMessageIter *iter,
->                                         struct btd_adv_client *client)
->  {
-> +       if (!iter) {
-> +               client->timeout = 0;
-> +               g_source_remove(client->to_id);
-> +               client->to_id = 0;
-> +               return true;
-> +       }
-> +
->         if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
->                 return false;
->
+> -struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter);
+> +struct btd_adv_manager *btd_adv_manager_new(struct btd_adapter *adapter,
+> +                                                       struct mgmt *mgmt);
+>  void btd_adv_manager_destroy(struct btd_adv_manager *manager);
+>  void btd_adv_manager_refresh(struct btd_adv_manager *manager);
 > --
 > 2.14.3
 
