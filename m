@@ -1,176 +1,148 @@
-Return-Path: <stefan.wahren@i2se.com>
-Date: Wed, 7 Mar 2018 12:28:28 +0100 (CET)
-From: Stefan Wahren <stefan.wahren@i2se.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Lukas Wunner <lukas@wunner.de>, Rob Herring <robh+dt@kernel.org>,
-	Eric Anholt <eric@anholt.net>,
-	Johan Hedberg <johan.hedberg@gmail.com>, devicetree@vger.kernel.org,
-	Loic Poulain <loic.poulain@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-rpi-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Phil Elwell <phil@raspberrypi.org>,
-	=?UTF-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Message-ID: <438185389.274708.1520422108782@email.1und1.de>
-In-Reply-To: <9D6209F2-5389-4F4E-844D-6A8683044F88@holtmann.org>
-References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
- <1519567855-26105-4-git-send-email-stefan.wahren@i2se.com>
- <84F7E645-59B4-4618-8C91-A5CD654E16A6@holtmann.org>
- <648118289.71086.1519593373795@email.1und1.de>
- <9D6209F2-5389-4F4E-844D-6A8683044F88@holtmann.org>
-Subject: Re: [PATCH 3/4] ARM: dts: bcm2835-rpi-zero-w: Add bcm43438 serial
- slave
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <23d54c9a-2fe2-33cb-8516-323aaa7185ba@jp.fujitsu.com>
+References: <23d54c9a-2fe2-33cb-8516-323aaa7185ba@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 7 Mar 2018 11:30:10 +0200
+Message-ID: <CABBYNZLVwq5ZZ-+9C=UTVdUyurhXCGuzsKx7CAU0N+-vYuk3qw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] shared/shell: Fix memory leak when parsing args
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Eramoto,
 
-> Marcel Holtmann <marcel@holtmann.org> hat am 25. Februar 2018 um 22:38 geschrieben:
-> 
-> 
-> Hi Stefan,
-> 
-> >>> Add BCM43438 (bluetooth) as a serdev slave device of uart0 (pl011/ttyAMA0).
-> >>> This allows to automatically insert the bcm43438 to the bluetooth
-> >>> subsystem instead of relying on patched userspace helpers (hciattach).
-> >>> 
-> >>> In order to keep a debug UART we need to switch to uart1.
-> >>> 
-> >>> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
-> >>> ---
-> >>> arch/arm/boot/dts/bcm2835-rpi-zero-w.dts | 14 +++++++++++++-
-> >>> 1 file changed, 13 insertions(+), 1 deletion(-)
-> >>> 
-> >>> diff --git a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
-> >>> index cf53436..b7f79f1 100644
-> >>> --- a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
-> >>> +++ b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
-> >>> @@ -131,6 +131,18 @@
-> >>> 
-> >>> &uart0 {
-> >>> 	pinctrl-names = "default";
-> >>> -	pinctrl-0 = <&uart0_gpio14>;
-> >>> +	pinctrl-0 = <&uart0_gpio32 &uart0_ctsrts_gpio30>;
-> >>> +	status = "okay";
-> >>> +
-> >>> +	bluetooth {
-> >>> +		compatible = "brcm,bcm43438-bt";
-> >>> +		max-speed = <2000000>;
-> >>> +		shutdown-gpios = <&gpio 45 GPIO_ACTIVE_HIGH>;
-> >>> +	};
-> >>> +};
-> >> 
-> >> is the shutdown GPIO working as expected with this hardware. So even module unload and reload works fine?
-> > 
-> > Yes, unload and reload works fine. 
-> > 
-> >> Meaning we are getting back to the 115200 default baud rate on the UART?
-> > 
-> > I assume that, because reload works as expected. 
-> 
-> awesome. That is good news.
-> 
-> Since you said that the GPIO expander driver for the RPi 3 has been accepted, did you test it there as well? If so, then it would be good to get a patch that also provides shutdown-gpios for RPi 3.
+On Mon, Mar 5, 2018 at 10:41 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> When running the command having mandatory arguments, memory leak occurs
+> as below:
+>
+>   1 bytes in 1 blocks are definitely lost in loss record 2 of 184
+>      at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+>      by 0x5679C99: strdup (strdup.c:42)
+>      by 0x13A976: cmd_exec (shell.c:327)
+>      by 0x13A976: menu_exec (shell.c:375)
+>      by 0x13AEA4: shell_exec (shell.c:418)
+>      by 0x13BBF1: rl_handler (shell.c:563)
+>      by 0x53C8D72: rl_callback_read_char (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x13ACE0: input_read (shell.c:1018)
+>      by 0x13C90A: watch_callback (io-glib.c:170)
+>      by 0x4E86E24: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>      by 0x4E871EF: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>      by 0x4E87501: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>      by 0x13D244: mainloop_run (mainloop-glib.c:73)
+>
+>   7 bytes in 1 blocks are definitely lost in loss record 12 of 184
+>      at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+>      by 0x5679C99: strdup (strdup.c:42)
+>      by 0x139EEA: strdelimit (util.c:991)
+>      by 0x13B66A: args_completion (shell.c:668)
+>      by 0x13B66A: menu_completion (shell.c:695)
+>      by 0x13B836: shell_completion (shell.c:723)
+>      by 0x53B98B6: ??? (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x53B9A99: rl_complete_internal (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x53B02EE: _rl_dispatch_subseq (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x53B07B5: readline_internal_char (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x53C8F84: rl_callback_read_char (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x13ACE0: input_read (shell.c:1018)
+>      by 0x13C90A: watch_callback (io-glib.c:170)
+>
+>   9 bytes in 1 blocks are definitely lost in loss record 21 of 184
+>      at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+>      by 0x5679C99: strdup (strdup.c:42)
+>      by 0x13B53F: args_completion (shell.c:654)
+>      by 0x13B53F: menu_completion (shell.c:695)
+>      by 0x13B836: shell_completion (shell.c:723)
+>      by 0x53B98B6: ??? (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x53B9A99: rl_complete_internal (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x53B02EE: _rl_dispatch_subseq (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x53B07B5: readline_internal_char (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x53C8F84: rl_callback_read_char (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x13ACE0: input_read (shell.c:1018)
+>      by 0x13C90A: watch_callback (io-glib.c:170)
+>      by 0x4E86E24: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>
+>   9 bytes in 1 blocks are definitely lost in loss record 22 of 184
+>      at 0x4C2FB0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+>      by 0x5679CE9: strndup (strndup.c:43)
+>      by 0x13A9EB: cmd_exec (shell.c:301)
+>      by 0x13A9EB: menu_exec (shell.c:375)
+>      by 0x13AEA4: shell_exec (shell.c:418)
+>      by 0x13BBF1: rl_handler (shell.c:563)
+>      by 0x53C8D72: rl_callback_read_char (in /lib/x86_64-linux-gnu/libreadline.so.7.0)
+>      by 0x13ACE0: input_read (shell.c:1018)
+>      by 0x13C90A: watch_callback (io-glib.c:170)
+>      by 0x4E86E24: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>      by 0x4E871EF: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>      by 0x4E87501: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.5400.1)
+>      by 0x13D244: mainloop_run (mainloop-glib.c:73)
+> ---
+>  src/shared/shell.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index fc4c9b5a5..f962f21e8 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -313,9 +313,12 @@ static int cmd_exec(const struct bt_shell_menu_entry *entry,
+>         if (parse_args(man, &w, "<>", flags) < 0) {
+>                 print_text(COLOR_HIGHLIGHT,
+>                         "Unable to parse mandatory command arguments: %s", man );
+> +               free(man);
+>                 return -EINVAL;
+>         }
+>
+> +       free(man);
+> +
+>         /* Check if there are enough arguments */
+>         if ((unsigned) argc - 1 < w.we_wordc) {
+>                 print_text(COLOR_HIGHLIGHT, "Missing %s argument",
+> @@ -330,9 +333,12 @@ optional:
+>         if (parse_args(opt, &w, "[]", flags) < 0) {
+>                 print_text(COLOR_HIGHLIGHT,
+>                         "Unable to parse optional command arguments: %s", opt);
+> +               free(opt);
+>                 return -EINVAL;
+>         }
+>
+> +       free(opt);
+> +
+>         /* Check if there are too many arguments */
+>         if ((unsigned) argc - 1 > w.we_wordc && !w.we_offs) {
+>                 print_text(COLOR_HIGHLIGHT, "Too many arguments: %d > %zu",
+> @@ -649,7 +655,7 @@ static char **args_completion(const struct bt_shell_menu_entry *entry, int argc,
+>                 return NULL;
+>
+>         if (!entry->arg)
+> -               goto done;
+> +               goto end;
+>
+>         str = strdup(entry->arg);
+>
+> @@ -664,6 +670,8 @@ static char **args_completion(const struct bt_shell_menu_entry *entry, int argc,
+>         if (!strrchr(entry->arg, '/'))
+>                 goto done;
+>
+> +       free(str);
+> +
+>         /* Split values separated by / */
+>         str = strdelimit(args.we_wordv[index], "/", ' ');
+>
+> @@ -674,6 +682,8 @@ static char **args_completion(const struct bt_shell_menu_entry *entry, int argc,
+>         matches = rl_completion_matches(text, arg_generator);
+>
+>  done:
+> +       free(str);
+> +end:
+>         if (!matches && text[0] == '\0')
+>                 bt_shell_printf("Usage: %s %s\n", entry->cmd,
+>                                         entry->arg ? entry->arg : "");
+> --
+> 2.14.1
 
-after applying Loic's patch and the necessary patch for the RPi 3 dts file (see below), i will get this output:
+Applied, thanks.
 
-[    4.873246] Bluetooth: HCI UART driver ver 2.3
-[    4.873260] Bluetooth: HCI UART protocol H4 registered
-[    4.873265] Bluetooth: HCI UART protocol Three-wire (H5) registered
-[    4.873751] Bluetooth: HCI UART protocol Broadcom registered
-[    4.877279] uart-pl011 3f201000.serial: no DMA platform data
-[    6.952382] Bluetooth: hci0: command 0xfc18 tx timeout
-[   15.192298] Bluetooth: hci0: BCM: failed to write update baudrate (-110)
-[   15.192312] Bluetooth: hci0: Failed to set baudrate
-[   15.316415] Bluetooth: hci0: BCM: chip id 94
-[   15.318567] Bluetooth: hci0: BCM: features 0x2e
-[   15.341538] Bluetooth: hci0: BCM43430A1
-[   15.341560] Bluetooth: hci0: BCM43430A1 (001.002.009) build 0000
-[   19.112670] Bluetooth: hci0: BCM (001.002.009) build 0360
-[  274.713732] Bluetooth: hci0: command 0x0c14 tx timeout
-[  274.714085] Bluetooth: hci0: Frame reassembly failed (-84)
-[  317.275941] Bluetooth: hci0: last event is not cmd complete (0x0f)
-
-I don't see these errors on RPi Zero W. Maybe the reason for this is the lack of hardware flowcontrol on RPi 3. Or some of the downstream patches on BlueZ must be adapted for the kernel [1].
-
-Btw the bcm43438 is detected even after unloading and reloading the driver. But the timeout occurs also on driver reload. Reducing the baudrate to 115200 doesn't help here.
-
-Sorry in case this patch gets corrupted by my webmailer.
-
-Stefan
-
-[1] - https://gist.github.com/pelwell/c8230c48ea24698527cd
-
-diff --git a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
-index 0b31d99..3e87ed0 100644
---- a/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
-+++ b/arch/arm/boot/dts/bcm2837-rpi-3-b.dts
-@@ -20,9 +20,14 @@
- 
- 	leds {
- 		act {
--			gpios = <&gpio 47 GPIO_ACTIVE_HIGH>;
-+			gpios = <&expgpio 2 GPIO_ACTIVE_HIGH>;
- 		};
- 	};
-+
-+	wifi_pwrseq: wifi-pwrseq {
-+		compatible = "mmc-pwrseq-simple";
-+		reset-gpios = <&expgpio 1 GPIO_ACTIVE_HIGH>;
-+	};
- };
- 
- &firmware {
-@@ -42,6 +47,10 @@
- 	};
- };
- 
-+&hdmi {
-+	hpd-gpios = <&expgpio 4 GPIO_ACTIVE_LOW>;
-+};
-+
- /* uart0 communicates with the BT module */
- &uart0 {
- 	pinctrl-names = "default";
-@@ -51,6 +60,7 @@
- 	bluetooth {
- 		compatible = "brcm,bcm43438-bt";
- 		max-speed = <2000000>;
-+		shutdown-gpios = <&expgpio 0 GPIO_ACTIVE_HIGH>;
- 	};
- };
- 
-@@ -63,11 +73,19 @@
- 
- /* SDHCI is used to control the SDIO for wireless */
- &sdhci {
-+	#address-cells = <1>;
-+	#size-cells = <0>;
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&emmc_gpio34>;
- 	status = "okay";
- 	bus-width = <4>;
- 	non-removable;
-+	mmc-pwrseq = <&wifi_pwrseq>;
-+
-+	brcmf: wifi@1 {
-+		reg = <1>;
-+		compatible = "brcm,bcm4329-fmac";
-+	};
- };
- 
- /* SDHOST is used to drive the SD card */
-
-> 
-> Regards
-> 
-> Marcel
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+-- 
+Luiz Augusto von Dentz
