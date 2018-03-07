@@ -1,26 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 7 Mar 2018 10:06:31 +0200
+Date: Wed, 7 Mar 2018 10:04:41 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Szymon Janc <szymon.janc@codecoup.pl>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] device: Fix missing Paired property change on non-bonded
- device
-Message-ID: <20180307080631.GB28595@x1c>
-References: <20180306141514.7413-1-szymon.janc@codecoup.pl>
+Subject: Re: [PATCH] Fix storage for adapters without public address
+Message-ID: <20180307080441.GA28595@x1c>
+References: <20180306132807.6149-1-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180306141514.7413-1-szymon.janc@codecoup.pl>
+In-Reply-To: <20180306132807.6149-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
 On Tue, Mar 06, 2018, Szymon Janc wrote:
-> If device is paired but not bonded than Paired property should be
-> also updated when device is disconnected.
+> Since those have adapter folder prefixed with "static-" this needs
+> to be taken into account when storing data.
 > ---
->  src/device.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
+>  src/adapter.c | 26 +++++++++---------
+>  src/adapter.h |  1 +
+>  src/device.c  | 87 +++++++++++++++++++++++++++--------------------------------
+>  3 files changed, 54 insertions(+), 60 deletions(-)
 
 Applied. Thanks.
 
