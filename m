@@ -1,34 +1,16 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Bag, Amit K" <amit.k.bag@intel.com>
-To: "linux-firmware@kernel.org" <linux-firmware@kernel.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: FW: [PATCH] linux-firmware:Update firmware patch for Intel
- Bluetooth 7265 (D1)
-Date: Thu, 8 Mar 2018 05:54:24 +0000
-Message-ID: <EFE6F46E14A5F445949D76A8CAC2240056A04763@PGSMSX103.gar.corp.intel.com>
-References: <1520487050-11082-1-git-send-email-amit.k.bag@intel.com>
-In-Reply-To: <1520487050-11082-1-git-send-email-amit.k.bag@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Amit K Bag <amit.k.bag@intel.com>
+To: linux-firmware@kernel.org
+Cc: linux-bluetooth@vger.kernel.org, tedd.an@intel.com,
+        sukumar.ghorai@intel.com, Amit K Bag <amit.k.bag@intel.com>
+Subject: [PATCH] linux-firmware:Update firmware patch for Intel Bluetooth 7265 (D1)
+Date: Thu,  8 Mar 2018 11:00:50 +0530
+Message-Id: <1520487050-11082-1-git-send-email-amit.k.bag@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-
-Please ignore my previous patch as the commit message is not proper. 
-Sorry for the inconvenience. Please take this patch and upstream it.
-
-Thanks & Regards,
-Amit Bag
-
------Original Message-----
-From: Bag, Amit K 
-Sent: Thursday, March 08, 2018 11:01 AM
-To: linux-firmware@kernel.org
-Cc: linux-bluetooth@vger.kernel.org; An, Tedd <tedd.an@intel.com>; Ghorai, Sukumar <sukumar.ghorai@intel.com>; Bag, Amit K <amit.k.bag@intel.com>
-Subject: [PATCH] linux-firmware:Update firmware patch for Intel Bluetooth 7265 (D1)
-
-This patch updates the firmware file for Intel Bluetooth 7265 Also it is known as Intel stonePeak(STPD1).
+This patch updates the firmware file for Intel Bluetooth 7265
+Also it is known as Intel stonePeak(STPD1).
 
 FW Build: REL_51_00001
 
@@ -52,7 +34,10 @@ index c8ec8e0f77da..64ca9353aa63 100644
  Version: LnP/SfP_REL0432
  File: intel/ibt-11-5.sfi
 diff --git a/intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq b/intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq
-index 92bbfd18ac8e4a40579697d6e41eb476288dfd69..e445f24b37d500cf10c85da97e4af92baecf798f 100644 GIT binary patch delta 24552 zcmaL930zZG_Beju%fd@ol8}V3dlM2sQHhF5U1~tA)}?}5ZEIVwty{OCqM+6UWD{9^
+index 92bbfd18ac8e4a40579697d6e41eb476288dfd69..e445f24b37d500cf10c85da97e4af92baecf798f 100644
+GIT binary patch
+delta 24552
+zcmaL930zZG_Beju%fd@ol8}V3dlM2sQHhF5U1~tA)}?}5ZEIVwty{OCqM+6UWD{9^
 zYMoYFTu`ueX}@Zt)oHMHM)}z>xYU44gVWmBshvQh)9I-E&wVeEF#q582cMgF-(Al+
 z_uO;OJ@?#q=oY=nONUXl52YpzVvsOOB^%KY7H63<1tE;BGQ`Z^ovREL%R)2cF3TC4
 zYrU(GPcMxd9)^tbrv+ipXk=Uf<r{@9D-JLiwU|RZx$w?(w3zv_%-&6s95leeRJts7
@@ -688,6 +673,6 @@ zok2c;TXwXZooX<%Q{(I*0tT*luJyzeG3oCf<%t-1avoQ7a*w#ieT=V(IW>>leCm;!
 zOUL<|xDV%X6(2rQ<NScHNjg1`+kX0yn$suvnqeQ!<7z+J!&QH*lAMJ*uzMXH)IhGd
 Han1h&c8BE_
 
---
+-- 
 2.7.4
 
