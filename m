@@ -1,143 +1,206 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH 3/4] ARM: dts: bcm2835-rpi-zero-w: Add bcm43438 serial
- slave
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <698451580.263856.1520467358497@email.1und1.de>
-Date: Thu, 8 Mar 2018 13:06:40 +0100
-Cc: Eric Anholt <eric@anholt.net>, Lukas Wunner <lukas@wunner.de>,
-        Rob Herring <robh+dt@kernel.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        linux-rpi-kernel@lists.infradead.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Phil Elwell <phil@raspberrypi.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        Linux Bluetooth mailing list
-        <linux-bluetooth@vger.kernel.org>,
-        Loic Poulain <loic.poulain@gmail.com>,
-        linux-arm-kernel@lists.infradead.org
-Message-Id: <4355FBA2-CC3F-4BFA-A446-5068033D07ED@holtmann.org>
-References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
- <1519567855-26105-4-git-send-email-stefan.wahren@i2se.com>
- <84F7E645-59B4-4618-8C91-A5CD654E16A6@holtmann.org>
- <648118289.71086.1519593373795@email.1und1.de>
- <9D6209F2-5389-4F4E-844D-6A8683044F88@holtmann.org>
- <438185389.274708.1520422108782@email.1und1.de>
- <03B9ACBE-3ACA-40C4-9DA2-6A57D1AD96E0@holtmann.org>
- <2071508922.276811.1520426568577@email.1und1.de> <87sh9bvh3r.fsf@anholt.net>
- <D48AB207-F7F4-46D8-AC65-EC5CF76A6084@holtmann.org>
- <87muzjfr8l.fsf@anholt.net> <698451580.263856.1520467358497@email.1und1.de>
-To: Stefan Wahren <stefan.wahren@i2se.com>
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: [PATCH 7/7] Bluetooth: Implement secondary advertising on different PHYs
+Date: Thu,  8 Mar 2018 17:09:36 +0530
+Message-Id: <1520509176-17569-10-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1520509176-17569-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1520509176-17569-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Stefan,
+This patch adds support for advertising in primary and secondary
+channel on different PHYs. User can add the phy preference in
+the flag based on which phy type will be added in extended
+advertising parameter would be set.
 
->>>>>>>>>>> Add BCM43438 (bluetooth) as a serdev slave device of uart0 (pl011/ttyAMA0).
->>>>>>>>>>> This allows to automatically insert the bcm43438 to the bluetooth
->>>>>>>>>>> subsystem instead of relying on patched userspace helpers (hciattach).
->>>>>>>>>>> 
->>>>>>>>>>> In order to keep a debug UART we need to switch to uart1.
->>>>>>>>>>> 
->>>>>>>>>>> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
->>>>>>>>>>> ---
->>>>>>>>>>> arch/arm/boot/dts/bcm2835-rpi-zero-w.dts | 14 +++++++++++++-
->>>>>>>>>>> 1 file changed, 13 insertions(+), 1 deletion(-)
->>>>>>>>>>> 
->>>>>>>>>>> diff --git a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
->>>>>>>>>>> index cf53436..b7f79f1 100644
->>>>>>>>>>> --- a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
->>>>>>>>>>> +++ b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
->>>>>>>>>>> @@ -131,6 +131,18 @@
->>>>>>>>>>> 
->>>>>>>>>>> &uart0 {
->>>>>>>>>>> 	pinctrl-names = "default";
->>>>>>>>>>> -	pinctrl-0 = <&uart0_gpio14>;
->>>>>>>>>>> +	pinctrl-0 = <&uart0_gpio32 &uart0_ctsrts_gpio30>;
->>>>>>>>>>> +	status = "okay";
->>>>>>>>>>> +
->>>>>>>>>>> +	bluetooth {
->>>>>>>>>>> +		compatible = "brcm,bcm43438-bt";
->>>>>>>>>>> +		max-speed = <2000000>;
->>>>>>>>>>> +		shutdown-gpios = <&gpio 45 GPIO_ACTIVE_HIGH>;
->>>>>>>>>>> +	};
->>>>>>>>>>> +};
->>>>>>>>>> 
->>>>>>>>>> is the shutdown GPIO working as expected with this hardware. So even module unload and reload works fine?
->>>>>>>>> 
->>>>>>>>> Yes, unload and reload works fine. 
->>>>>>>>> 
->>>>>>>>>> Meaning we are getting back to the 115200 default baud rate on the UART?
->>>>>>>>> 
->>>>>>>>> I assume that, because reload works as expected. 
->>>>>>>> 
->>>>>>>> awesome. That is good news.
->>>>>>>> 
->>>>>>>> Since you said that the GPIO expander driver for the RPi 3 has been accepted, did you test it there as well? If so, then it would be good to get a patch that also provides shutdown-gpios for RPi 3.
->>>>>>> 
->>>>>>> after applying Loic's patch and the necessary patch for the RPi 3 dts file (see below), i will get this output:
->>>>>>> 
->>>>>>> [    4.873246] Bluetooth: HCI UART driver ver 2.3
->>>>>>> [    4.873260] Bluetooth: HCI UART protocol H4 registered
->>>>>>> [    4.873265] Bluetooth: HCI UART protocol Three-wire (H5) registered
->>>>>>> [    4.873751] Bluetooth: HCI UART protocol Broadcom registered
->>>>>>> [    4.877279] uart-pl011 3f201000.serial: no DMA platform data
->>>>>>> [    6.952382] Bluetooth: hci0: command 0xfc18 tx timeout
->>>>>>> [   15.192298] Bluetooth: hci0: BCM: failed to write update baudrate (-110)
->>>>>>> [   15.192312] Bluetooth: hci0: Failed to set baudrate
->>>>>>> [   15.316415] Bluetooth: hci0: BCM: chip id 94
->>>>>>> [   15.318567] Bluetooth: hci0: BCM: features 0x2e
->>>>>>> [   15.341538] Bluetooth: hci0: BCM43430A1
->>>>>>> [   15.341560] Bluetooth: hci0: BCM43430A1 (001.002.009) build 0000
->>>>>>> [   19.112670] Bluetooth: hci0: BCM (001.002.009) build 0360
->>>>>>> [  274.713732] Bluetooth: hci0: command 0x0c14 tx timeout
->>>>>>> [  274.714085] Bluetooth: hci0: Frame reassembly failed (-84)
->>>>>>> [  317.275941] Bluetooth: hci0: last event is not cmd complete (0x0f)
->>>>>>> 
->>>>>>> I don't see these errors on RPi Zero W. Maybe the reason for this is the lack of hardware flowcontrol on RPi 3. Or some of the downstream patches on BlueZ must be adapted for the kernel [1].
->>>>>>> 
->>>>>>> Btw the bcm43438 is detected even after unloading and reloading the driver. But the timeout occurs also on driver reload. Reducing the baudrate to 115200 doesn't help here.
->>>>>> 
->>>>>> maybe it needs some time after switching the hardware on. Have you tried to sleep for a bit at the end of bcm_gpio_set_power?
->>>>> 
->>>>> I will try, but this could also be an "issue" of the gpio expander
->>>>> driver. AFAIK the expander is connected via I2C to the GPU. In case
->>>>> the mailbox reply come before the I2C command has been handled by the
->>>>> GPIO expander, we are running out of sync.
->>>> 
->>>> The mailbox command for setting GPIO state is synchronous in terms of
->>>> sending the i2c command to the GPIO expander HW.
->>> 
->>> does that mean the driver does this correctly and really waits for the
->>> completion. Or does the GPIO expander might return to quickly and
->>> returns a false sense of GPIO state. I think it would be good a sleep
->>> of 50ms after the GPIO makes a difference. Maybe the GPIO expander
->>> driver needs to take this into account.
->> 
->> It seems unlikely that you can get to I2C stop before the GPIO expander
->> HW has changed the state of the output.
->> 
->>> Reality is that once the Bluetooth driver toggled the GPIO, it goes
->>> onto initializing the chip. One other reason might be that no device
->>> wakeup GPIO is wired here, that the chip actually needs some time
->>> before it is all good to go.
->> 
->> This seems much more likely to me.  The spec for bcm43438 is easily
->> googleable and has a power-on timing diagram.
-> 
-> after applying this patch [1] the RPi 3 specific probing errors disappear.
-> 
-> But this is only a quick hack. The proper solution would be to extend hci_h5 in order to support the BCM43438.
+@ MGMT Command: Add Advertising (0x003e) plen 11
+        Instance: 1
+        Flags: 0x00000200
+          Advertise in CODED on Secondary channel
+        Duration: 0
+        Timeout: 0
+        Advertising data length: 0
+        Scan response length: 0
+< HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 2
+        Extended advertising: Disabled (0x00)
+        Number of sets: Disable all sets (0x00)
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Advertising Enable (0x08|0x0039) ncmd 2
+        Status: Success (0x00)
+< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
+        Handle: 0x00
+        Properties: 0x0000
+        Min advertising interval: 1280.000 msec (0x0800)
+        Max advertising interval: 1280.000 msec (0x0800)
+        Channel map: 37, 38, 39 (0x07)
+        Own address type: Random (0x01)
+        Peer address type: Public (0x00)
+        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
+        TX power: 127 dbm (0x7f)
+        Primary PHY: LE Coded (0x03)
+        Secondary max skip: 0x00
+        Secondary PHY: LE Coded (0x03)
+        SID: 0x00
+        Scan request notifications: Disabled (0x00)
 
-a lot of people are running everything in H:4 since it is a lot simpler. And since it is all wired so closely, you normally do not have bit error even on high speeds. However at the end of the day it is still an UART and running it without flow control is a bit funky.
+Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+---
+ include/net/bluetooth/hci.h  |  4 ++++
+ include/net/bluetooth/mgmt.h |  6 ++++++
+ net/bluetooth/hci_request.c  | 39 +++++++++++++++++++++++++++++++--------
+ net/bluetooth/mgmt.c         | 18 +++++++++++++++---
+ 4 files changed, 56 insertions(+), 11 deletions(-)
 
-I looked a little bit in hci_h5.c and I don’t think it is worth trying to hack serdev support into it. It looks easy on the front, but it feels so hackish. I need to check what it takes to write a plain serdev 3-Wire UART driver that can drive serdev based Broadcom devices directly. Then we might be able to easily extend it with vendor support similar to how we do it in btusb.c.
-
-Regards
-
-Marcel
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index f7d53ab..6eb9cb2 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -406,6 +406,8 @@ enum {
+ #define HCI_LE_SLAVE_FEATURES		0x08
+ #define HCI_LE_PING			0x10
+ #define HCI_LE_DATA_LEN_EXT		0x20
++#define HCI_LE_PHY_2M			0x01
++#define HCI_LE_PHY_CODED		0x08
+ #define HCI_LE_EXT_ADV			0x10
+ #define HCI_LE_EXT_SCAN_POLICY		0x80
+ #define HCI_LE_PHY_2M			0x01
+@@ -1594,6 +1596,8 @@ struct hci_cp_le_set_ext_adv_params {
+ } __packed;
+ 
+ #define HCI_ADV_PHY_1M		0X01
++#define HCI_ADV_PHY_2M		0x02
++#define HCI_ADV_PHY_CODED	0x03
+ 
+ struct hci_rp_le_set_ext_adv_params {
+ 	__u8  status;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 7c8c68cc..0f1993e 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -562,6 +562,12 @@ struct mgmt_rp_add_advertising {
+ #define MGMT_ADV_FLAG_TX_POWER		BIT(4)
+ #define MGMT_ADV_FLAG_APPEARANCE	BIT(5)
+ #define MGMT_ADV_FLAG_LOCAL_NAME	BIT(6)
++#define MGMT_ADV_FLAG_SEC_1M 		BIT(7)
++#define MGMT_ADV_FLAG_SEC_2M 		BIT(8)
++#define MGMT_ADV_FLAG_SEC_CODED 	BIT(9)
++
++#define MGMT_ADV_FLAG_SEC_MASK	(MGMT_ADV_FLAG_SEC_1M | MGMT_ADV_FLAG_SEC_2M | \
++				 MGMT_ADV_FLAG_SEC_CODED)
+ 
+ #define MGMT_OP_REMOVE_ADVERTISING	0x003F
+ struct mgmt_cp_remove_advertising {
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index ec4fced..d6e5f18 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1548,6 +1548,7 @@ void __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	u32 flags;
+ 	bdaddr_t random_addr;
+ 	u8 own_addr_type;
++	bool secondary_adv;
+ 	/* In ext adv set param interval is 3 octets */
+ 	const u8 adv_interval[3] = { 0x00, 0x08, 0x00 };
+ 
+@@ -1573,20 +1574,42 @@ void __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	memcpy(cp.min_interval, adv_interval, sizeof(cp.min_interval));
+ 	memcpy(cp.max_interval, adv_interval, sizeof(cp.max_interval));
+ 
+-	if (connectable)
+-		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
+-	else if (get_adv_instance_scan_rsp_len(hdev, instance))
+-		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_SCAN_IND);
+-	else
+-		cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
++	secondary_adv = (flags & MGMT_ADV_FLAG_SEC_MASK);
++
++	if (connectable) {
++		if (secondary_adv)
++			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_CONN_IND);
++		else
++			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
++	} else if (get_adv_instance_scan_rsp_len(hdev, instance)) {
++		if (secondary_adv)
++			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_SCAN_IND);
++		else
++			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_SCAN_IND);
++	} else {
++		if (secondary_adv)
++			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_NON_CONN_IND);
++		else
++			cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
++	}
+ 
+ 	cp.own_addr_type = own_addr_type;
+ 	cp.channel_map = hdev->le_adv_channel_map;
+ 	cp.tx_power = 127;
+-	cp.primary_phy = HCI_ADV_PHY_1M;
+-	cp.secondary_phy = HCI_ADV_PHY_1M;
+ 	cp.handle = 0;
+ 
++	if (flags & MGMT_ADV_FLAG_SEC_2M) {
++		cp.primary_phy = HCI_ADV_PHY_1M;
++		cp.secondary_phy = HCI_ADV_PHY_2M;
++	} else if (flags & MGMT_ADV_FLAG_SEC_CODED) {
++		cp.primary_phy = HCI_ADV_PHY_CODED;
++		cp.secondary_phy = HCI_ADV_PHY_CODED;
++	} else {
++		/* In all other cases use 1M */
++		cp.primary_phy = HCI_ADV_PHY_1M;
++		cp.secondary_phy = HCI_ADV_PHY_1M;
++	}
++
+ 	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
+ 
+ 	if (own_addr_type == ADDR_LE_DEV_RANDOM &&
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2639346..084b4f5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6208,6 +6208,16 @@ static u32 get_supported_adv_flags(struct hci_dev *hdev)
+ 	flags |= MGMT_ADV_FLAG_APPEARANCE;
+ 	flags |= MGMT_ADV_FLAG_LOCAL_NAME;
+ 
++	if (ext_adv_capable(hdev)) {
++		flags |= MGMT_ADV_FLAG_SEC_1M;
++
++		if (hdev->le_features[1] & HCI_LE_PHY_2M)
++			flags |= MGMT_ADV_FLAG_SEC_2M;
++
++		if (hdev->le_features[1] & HCI_LE_PHY_CODED)
++			flags |= MGMT_ADV_FLAG_SEC_CODED;
++	}
++
+ 	if (hdev->adv_tx_power != HCI_TX_POWER_INVALID)
+ 		flags |= MGMT_ADV_FLAG_TX_POWER;
+ 
+@@ -6416,7 +6426,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 	struct mgmt_cp_add_advertising *cp = data;
+ 	struct mgmt_rp_add_advertising rp;
+ 	u32 flags;
+-	u32 supported_flags;
++	u32 supported_flags, phy_flags;
+ 	u8 status;
+ 	u16 timeout, duration;
+ 	unsigned int prev_instance_cnt = hdev->adv_instance_cnt;
+@@ -6446,10 +6456,12 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 	duration = __le16_to_cpu(cp->duration);
+ 
+ 	/* The current implementation only supports a subset of the specified
+-	 * flags.
++	 * flags. Also need to check mutual exclusiveness of sec flags.
+ 	 */
+ 	supported_flags = get_supported_adv_flags(hdev);
+-	if (flags & ~supported_flags)
++	phy_flags = flags & MGMT_ADV_FLAG_SEC_MASK;
++	if (flags & ~supported_flags ||
++	    ((phy_flags && (phy_flags ^ (phy_flags & -phy_flags)))))
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 
+-- 
+2.7.4
 
