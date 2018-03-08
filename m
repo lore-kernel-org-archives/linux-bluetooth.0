@@ -1,96 +1,150 @@
-Return-Path: <foo00@h08.hostsharing.net>
-Date: Thu, 8 Mar 2018 11:56:24 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Stefan Wahren <stefan.wahren@i2se.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Eric Anholt <eric@anholt.net>,
-	Rob Herring <robh+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	linux-rpi-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Phil Elwell <phil@raspberrypi.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	=?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
-	devicetree <devicetree@vger.kernel.org>,
-	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
-	Loic Poulain <loic.poulain@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christoph Gysin <christoph.gysin@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
 Subject: Re: [PATCH 3/4] ARM: dts: bcm2835-rpi-zero-w: Add bcm43438 serial
  slave
-Message-ID: <20180308105624.GA2316@wunner.de>
-References: <84F7E645-59B4-4618-8C91-A5CD654E16A6@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAMZdPi9mTVFOc_MSg_9btM8h3vaynv247jMWPne+jCV1MMYjcA@mail.gmail.com>
+Date: Thu, 8 Mar 2018 11:41:44 +0100
+Cc: Stefan Wahren <stefan.wahren@i2se.com>,
+        Eric Anholt <eric@anholt.net>, Lukas Wunner <lukas@wunner.de>,
+        Rob Herring <robh+dt@kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        linux-rpi-kernel@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Phil Elwell <phil@raspberrypi.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        Linux Bluetooth mailing list
+        <linux-bluetooth@vger.kernel.org>,
+        Loic Poulain <loic.poulain@gmail.com>,
+        linux-arm-kernel@lists.infradead.org
+Message-Id: <43B700F7-1174-4CE8-B831-D8897A5E1DD5@holtmann.org>
+References: <1519567855-26105-1-git-send-email-stefan.wahren@i2se.com>
+ <1519567855-26105-4-git-send-email-stefan.wahren@i2se.com>
+ <84F7E645-59B4-4618-8C91-A5CD654E16A6@holtmann.org>
  <648118289.71086.1519593373795@email.1und1.de>
  <9D6209F2-5389-4F4E-844D-6A8683044F88@holtmann.org>
  <438185389.274708.1520422108782@email.1und1.de>
  <03B9ACBE-3ACA-40C4-9DA2-6A57D1AD96E0@holtmann.org>
- <2071508922.276811.1520426568577@email.1und1.de>
- <87sh9bvh3r.fsf@anholt.net>
+ <2071508922.276811.1520426568577@email.1und1.de> <87sh9bvh3r.fsf@anholt.net>
  <D48AB207-F7F4-46D8-AC65-EC5CF76A6084@holtmann.org>
- <87muzjfr8l.fsf@anholt.net>
- <698451580.263856.1520467358497@email.1und1.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <698451580.263856.1520467358497@email.1und1.de>
+ <87muzjfr8l.fsf@anholt.net> <698451580.263856.1520467358497@email.1und1.de>
+ <CAMZdPi9mTVFOc_MSg_9btM8h3vaynv247jMWPne+jCV1MMYjcA@mail.gmail.com>
+To: Loic Poulain <loic.poulain@linaro.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 08, 2018 at 01:02:38AM +0100, Stefan Wahren wrote:
-> > >>>>> after applying Loic's patch and the necessary patch for the
-> > >>>>> RPi 3 dts file (see below), i will get this output:
-> > >>>>> 
-> > >>>>> [    4.873246] Bluetooth: HCI UART driver ver 2.3
-> > >>>>> [    4.873260] Bluetooth: HCI UART protocol H4 registered
-> > >>>>> [    4.873265] Bluetooth: HCI UART protocol Three-wire (H5) registered
-> > >>>>> [    4.873751] Bluetooth: HCI UART protocol Broadcom registered
-> > >>>>> [    4.877279] uart-pl011 3f201000.serial: no DMA platform data
-> > >>>>> [    6.952382] Bluetooth: hci0: command 0xfc18 tx timeout
-> > >>>>> [   15.192298] Bluetooth: hci0: BCM: failed to write update baudrate (-110)
-> > >>>>> [   15.192312] Bluetooth: hci0: Failed to set baudrate
-> > >>>>> [   15.316415] Bluetooth: hci0: BCM: chip id 94
-> > >>>>> [   15.318567] Bluetooth: hci0: BCM: features 0x2e
-> > >>>>> [   15.341538] Bluetooth: hci0: BCM43430A1
-> > >>>>> [   15.341560] Bluetooth: hci0: BCM43430A1 (001.002.009) build 0000
-> > >>>>> [   19.112670] Bluetooth: hci0: BCM (001.002.009) build 0360
-> > >>>>> [  274.713732] Bluetooth: hci0: command 0x0c14 tx timeout
-> > >>>>> [  274.714085] Bluetooth: hci0: Frame reassembly failed (-84)
-> > >>>>> [  317.275941] Bluetooth: hci0: last event is not cmd complete (0x0f)
-> > >>>>> 
-> > >>>>> I don't see these errors on RPi Zero W. Maybe the reason for
-> > >>>>> this is the lack of hardware flowcontrol on RPi 3.
-> > >>>> 
-> > >>>> maybe it needs some time after switching the hardware on. Have
-> > >>>> you tried to sleep for a bit at the end of bcm_gpio_set_power?
->  
-> after applying this patch [1] the RPi 3 specific probing errors disappear.
+Hi Loic,
+
+>>>>>>>>>>>> Add BCM43438 (bluetooth) as a serdev slave device of uart0 (pl011/ttyAMA0).
+>>>>>>>>>>>> This allows to automatically insert the bcm43438 to the bluetooth
+>>>>>>>>>>>> subsystem instead of relying on patched userspace helpers (hciattach).
+>>>>>>>>>>>> 
+>>>>>>>>>>>> In order to keep a debug UART we need to switch to uart1.
+>>>>>>>>>>>> 
+>>>>>>>>>>>> Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+>>>>>>>>>>>> ---
+>>>>>>>>>>>> arch/arm/boot/dts/bcm2835-rpi-zero-w.dts | 14 +++++++++++++-
+>>>>>>>>>>>> 1 file changed, 13 insertions(+), 1 deletion(-)
+>>>>>>>>>>>> 
+>>>>>>>>>>>> diff --git a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
+>>>>>>>>>>>> index cf53436..b7f79f1 100644
+>>>>>>>>>>>> --- a/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
+>>>>>>>>>>>> +++ b/arch/arm/boot/dts/bcm2835-rpi-zero-w.dts
+>>>>>>>>>>>> @@ -131,6 +131,18 @@
+>>>>>>>>>>>> 
+>>>>>>>>>>>> &uart0 {
+>>>>>>>>>>>>    pinctrl-names = "default";
+>>>>>>>>>>>> -   pinctrl-0 = <&uart0_gpio14>;
+>>>>>>>>>>>> +   pinctrl-0 = <&uart0_gpio32 &uart0_ctsrts_gpio30>;
+>>>>>>>>>>>> +   status = "okay";
+>>>>>>>>>>>> +
+>>>>>>>>>>>> +   bluetooth {
+>>>>>>>>>>>> +           compatible = "brcm,bcm43438-bt";
+>>>>>>>>>>>> +           max-speed = <2000000>;
+>>>>>>>>>>>> +           shutdown-gpios = <&gpio 45 GPIO_ACTIVE_HIGH>;
+>>>>>>>>>>>> +   };
+>>>>>>>>>>>> +};
+>>>>>>>>>>> 
+>>>>>>>>>>> is the shutdown GPIO working as expected with this hardware. So even module unload and reload works fine?
+>>>>>>>>>> 
+>>>>>>>>>> Yes, unload and reload works fine.
+>>>>>>>>>> 
+>>>>>>>>>>> Meaning we are getting back to the 115200 default baud rate on the UART?
+>>>>>>>>>> 
+>>>>>>>>>> I assume that, because reload works as expected.
+>>>>>>>>> 
+>>>>>>>>> awesome. That is good news.
+>>>>>>>>> 
+>>>>>>>>> Since you said that the GPIO expander driver for the RPi 3 has been accepted, did you test it there as well? If so, then it would be good to get a patch that also provides shutdown-gpios for RPi 3.
+>>>>>>>> 
+>>>>>>>> after applying Loic's patch and the necessary patch for the RPi 3 dts file (see below), i will get this output:
+>>>>>>>> 
+>>>>>>>> [    4.873246] Bluetooth: HCI UART driver ver 2.3
+>>>>>>>> [    4.873260] Bluetooth: HCI UART protocol H4 registered
+>>>>>>>> [    4.873265] Bluetooth: HCI UART protocol Three-wire (H5) registered
+>>>>>>>> [    4.873751] Bluetooth: HCI UART protocol Broadcom registered
+>>>>>>>> [    4.877279] uart-pl011 3f201000.serial: no DMA platform data
+>>>>>>>> [    6.952382] Bluetooth: hci0: command 0xfc18 tx timeout
+>>>>>>>> [   15.192298] Bluetooth: hci0: BCM: failed to write update baudrate (-110)
+>>>>>>>> [   15.192312] Bluetooth: hci0: Failed to set baudrate
+>>>>>>>> [   15.316415] Bluetooth: hci0: BCM: chip id 94
+>>>>>>>> [   15.318567] Bluetooth: hci0: BCM: features 0x2e
+>>>>>>>> [   15.341538] Bluetooth: hci0: BCM43430A1
+>>>>>>>> [   15.341560] Bluetooth: hci0: BCM43430A1 (001.002.009) build 0000
+>>>>>>>> [   19.112670] Bluetooth: hci0: BCM (001.002.009) build 0360
+>>>>>>>> [  274.713732] Bluetooth: hci0: command 0x0c14 tx timeout
+>>>>>>>> [  274.714085] Bluetooth: hci0: Frame reassembly failed (-84)
+>>>>>>>> [  317.275941] Bluetooth: hci0: last event is not cmd complete (0x0f)
+>>>>>>>> 
+>>>>>>>> I don't see these errors on RPi Zero W. Maybe the reason for this is the lack of hardware flowcontrol on RPi 3. Or some of the downstream patches on BlueZ must be adapted for the kernel [1].
+>>>>>>>> 
+>>>>>>>> Btw the bcm43438 is detected even after unloading and reloading the driver. But the timeout occurs also on driver reload. Reducing the baudrate to 115200 doesn't help here.
+>>>>>>> 
+>>>>>>> maybe it needs some time after switching the hardware on. Have you tried to sleep for a bit at the end of bcm_gpio_set_power?
+>>>>>> 
+>>>>>> I will try, but this could also be an "issue" of the gpio expander
+>>>>>> driver. AFAIK the expander is connected via I2C to the GPU. In case
+>>>>>> the mailbox reply come before the I2C command has been handled by the
+>>>>>> GPIO expander, we are running out of sync.
+>>>>> 
+>>>>> The mailbox command for setting GPIO state is synchronous in terms of
+>>>>> sending the i2c command to the GPIO expander HW.
+>>>> 
+>>>> does that mean the driver does this correctly and really waits for the
+>>>> completion. Or does the GPIO expander might return to quickly and
+>>>> returns a false sense of GPIO state. I think it would be good a sleep
+>>>> of 50ms after the GPIO makes a difference. Maybe the GPIO expander
+>>>> driver needs to take this into account.
+>>> 
+>>> It seems unlikely that you can get to I2C stop before the GPIO expander
+>>> HW has changed the state of the output.
+>>> 
+>>>> Reality is that once the Bluetooth driver toggled the GPIO, it goes
+>>>> onto initializing the chip. One other reason might be that no device
+>>>> wakeup GPIO is wired here, that the chip actually needs some time
+>>>> before it is all good to go.
+>>> 
+>>> This seems much more likely to me.  The spec for bcm43438 is easily
+>>> googleable and has a power-on timing diagram.
+>> 
+>> after applying this patch [1] the RPi 3 specific probing errors disappear.
+>> 
+>> But this is only a quick hack. The proper solution would be to extend hci_h5 in order to support the BCM43438.
+>> 
+>> [1] - https://github.com/lategoodbye/rpi-zero/commit/ed5900296dfb7aec7f467477440751e7367a1881
 > 
-> But this is only a quick hack. The proper solution would be to extend
-> hci_h5 in order to support the BCM43438.
-> 
-> [1] - https://github.com/lategoodbye/rpi-zero/commit/ed5900296dfb7aec7f467477440751e7367a1881
+> I think this patch is perfectly acceptable, this is an hardware timing
+> the driver has to handle. For sure H5 would improve robustness…
 
-Users of the MacBookPro13,1 and MacBookPro14,1 are reporting similar
-timeouts when the Bluetooth controller is reset on ->setup.
+don’t we have a helper function like wait for 15 msec or CTS ?
 
-These are the models without touchbar.  The models with touchbar
-(MBP13,2, MBP13,3, MBP14,2, MBP14,3) as well as the 12" MacBooks
-(MB8,1, MB9,1, MB10,1) do not suffer from this issue.
+I know it is not much time that we spend sleeping here, but other hardware does not need it and thus we most likely shouldn’t force a delay on them because of one hardware without hardware flow control.
 
-Christoph Gysin (+cc) reports that applying your patch on 4.16-rc4 gets
-Bluetooth working on his MBP13,1:
-https://github.com/Dunedan/mbp-2016-linux/issues/29#issuecomment-371434970
+Regards
 
-For some reason, not toggling the device_wake pin in bcm_gpio_set_power()
-also fixed the issue for those users.  They did complain about stuttering
-audio though.
+Marcel
 
-Users of the touchbar models reported that stuttering audio only occurs
-when the GNOME Bluetooth control panel is open. Closing it made the
-stuttering audio go away.  But apparently on the non-touchbar models,
-the stuttering persisted regardless.  Both the stuttering audio as well as
-the timeouts on ->setup might be explained by a lack of hardware flow
-control on those models.  The chipset (and thus the UART) is identical
-on the touchbar versus non-touchbar models.  It would seem odd if Apple
-did not wire CTS consistently on all models.
-
-Thanks,
-
-Lukas
