@@ -1,86 +1,81 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ] tools/bluetooth-player: Merge cmd_play{,_item}()
-Message-ID: <776845cc-b63f-15f3-283f-877c875db234@jp.fujitsu.com>
-Date: Fri, 9 Mar 2018 21:10:02 +0900
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: [PATCH 4/4 v1] btmgmt: Add support for setting PHY in add-adv
+Date: Fri,  9 Mar 2018 12:55:54 +0530
+Message-Id: <1520580354-2185-4-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1520580354-2185-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1520580354-2185-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Also adds item generator for the change-folder command.
 ---
- tools/bluetooth-player.c | 38 ++++++++++++++------------------------
- 1 file changed, 14 insertions(+), 24 deletions(-)
+ lib/mgmt.h     |  3 +++
+ tools/btmgmt.c | 15 +++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-index 75650a722..441a934cc 100644
---- a/tools/bluetooth-player.c
-+++ b/tools/bluetooth-player.c
-@@ -115,15 +115,21 @@ static void play_reply(DBusMessage *message, void *user_data)
- 	return bt_shell_noninteractive_quit(EXIT_FAILURE);
- }
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 7a25e17..ec6a380 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -506,6 +506,9 @@ struct mgmt_rp_add_advertising {
+ #define MGMT_ADV_FLAG_TX_POWER		(1 << 4)
+ #define MGMT_ADV_FLAG_APPEARANCE	(1 << 5)
+ #define MGMT_ADV_FLAG_LOCAL_NAME	(1 << 6)
++#define MGMT_ADV_FLAG_SEC_1M		(1 << 7)
++#define MGMT_ADV_FLAG_SEC_2M		(1 << 8)
++#define MGMT_ADV_FLAG_SEC_CODED		(1 << 9)
  
--static void cmd_play_item(int argc, char *argv[])
-+static void cmd_play(int argc, char *argv[])
- {
- 	GDBusProxy *proxy;
+ #define MGMT_OP_REMOVE_ADVERTISING	0x003F
+ struct mgmt_cp_remove_advertising {
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 5ad534f..3c6b543 100755
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -3802,6 +3802,9 @@ static const char *adv_flags_str[] = {
+ 				"tx-power",
+ 				"scan-rsp-appearance",
+ 				"scan-rsp-local-name",
++				"Secondary-channel-1M",
++				"Secondary-channel-2M",
++				"Secondary-channel-CODED",
+ };
  
--	proxy = g_dbus_proxy_lookup(items, NULL, argv[1],
-+	if (argc > 1) {
-+		proxy = g_dbus_proxy_lookup(items, NULL, argv[1],
- 						BLUEZ_MEDIA_ITEM_INTERFACE);
--	if (proxy == NULL) {
--		bt_shell_printf("Item %s not available\n", argv[1]);
--		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		if (proxy == NULL) {
-+			bt_shell_printf("Item %s not available\n", argv[1]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+	} else {
-+		if (!check_default_player())
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		proxy = default_player;
- 	}
- 
- 	if (g_dbus_proxy_method_call(proxy, "Play", NULL, play_reply,
-@@ -132,24 +138,7 @@ static void cmd_play_item(int argc, char *argv[])
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
--	bt_shell_printf("Attempting to play %s\n", argv[1]);
--}
--
--static void cmd_play(int argc, char *argv[])
--{
--	if (argc > 1)
--		return cmd_play_item(argc, argv);
--
--	if (!check_default_player())
--		return bt_shell_noninteractive_quit(EXIT_FAILURE);
--
--	if (g_dbus_proxy_method_call(default_player, "Play", NULL, play_reply,
--							NULL, NULL) == FALSE) {
--		bt_shell_printf("Failed to play\n");
--		return bt_shell_noninteractive_quit(EXIT_FAILURE);
--	}
--
--	bt_shell_printf("Attempting to play\n");
-+	bt_shell_printf("Attempting to play %s\n", argv[1] ? : "");
- }
- 
- static void pause_reply(DBusMessage *message, void *user_data)
-@@ -963,7 +952,8 @@ static const struct bt_shell_menu main_menu = {
- 	{ "scan",         "<alltracks/group/off>", cmd_scan,
- 						"Set scan mode"},
- 	{ "change-folder", "<item>",  cmd_change_folder,
--						"Change current folder" },
-+						"Change current folder",
-+							item_generator},
- 	{ "list-items", "[start] [end]",  cmd_list_items,
- 					"List items of current folder" },
- 	{ "search",     "<string>",   cmd_search,
+ static const char *adv_flags2str(uint32_t flags)
+@@ -4016,6 +4019,7 @@ static void add_adv_usage(void)
+ 		"\t -s, --scan-rsp <data>     Scan Response Data bytes\n"
+ 		"\t -t, --timeout <timeout>   Timeout in seconds\n"
+ 		"\t -D, --duration <duration> Duration in seconds\n"
++		"\t -P, --phy <phy>           Phy type, Specify 1M/2M/CODED\n"
+ 		"\t -c, --connectable         \"connectable\" flag\n"
+ 		"\t -g, --general-discov      \"general-discoverable\" flag\n"
+ 		"\t -l, --limited-discov      \"limited-discoverable\" flag\n"
+@@ -4034,6 +4038,7 @@ static struct option add_adv_options[] = {
+ 	{ "scan-rsp",		1, 0, 's' },
+ 	{ "timeout",		1, 0, 't' },
+ 	{ "duration",		1, 0, 'D' },
++	{ "phy",		1, 0, 'P' },
+ 	{ "connectable",	0, 0, 'c' },
+ 	{ "general-discov",	0, 0, 'g' },
+ 	{ "limited-discov",	0, 0, 'l' },
+@@ -4187,6 +4192,16 @@ static void cmd_add_adv(struct mgmt *mgmt, uint16_t index,
+ 		case 'a':
+ 			flags |= MGMT_ADV_FLAG_APPEARANCE;
+ 			break;
++		case 'P':
++			if (strcasecmp(optarg, "1M") == 0)
++				flags |= MGMT_ADV_FLAG_SEC_1M;
++			else if (strcasecmp(optarg, "2M") == 0)
++				flags |= MGMT_ADV_FLAG_SEC_2M;
++			else if (strcasecmp(optarg, "CODED") == 0)
++				flags |= MGMT_ADV_FLAG_SEC_CODED;
++			else
++				goto done;
++			break;
+ 		case 'h':
+ 			success = true;
+ 			/* fall through */
 -- 
-2.14.1
+2.7.4
 
