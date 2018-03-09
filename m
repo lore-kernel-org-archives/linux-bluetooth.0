@@ -1,95 +1,105 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/3] client: Fix reading long values
-Date: Fri,  9 Mar 2018 16:29:05 +0100
-Message-Id: <20180309152907.16347-1-grzegorz.kolodziejczyk@codecoup.pl>
+MIME-Version: 1.0
+In-Reply-To: <776845cc-b63f-15f3-283f-877c875db234@jp.fujitsu.com>
+References: <776845cc-b63f-15f3-283f-877c875db234@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 9 Mar 2018 14:58:19 +0200
+Message-ID: <CABBYNZJkF_qJ-93PEAg_-QYboHqVt-E3KWb=mR_Q-sewh8cCpA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] tools/bluetooth-player: Merge cmd_play{,_item}()
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-While value has more than single MTU can carry long read procedure will
-be triggered. In such cases offset need to bo considered while getting
-value from storage.
----
- client/gatt.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 47 insertions(+), 2 deletions(-)
+Hi Eramoto,
 
-diff --git a/client/gatt.c b/client/gatt.c
-index 8c818d8c1..7a6035ac1 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -1412,6 +1412,39 @@ static const GDBusPropertyTable chrc_properties[] = {
- 	{ }
- };
- 
-+static int parse_offset(DBusMessageIter *iter, uint16_t *offset)
-+{
-+	DBusMessageIter dict;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-+		return -EINVAL;
-+
-+	dbus_message_iter_recurse(iter, &dict);
-+
-+	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
-+		const char *key;
-+		DBusMessageIter value, entry;
-+		int var;
-+
-+		dbus_message_iter_recurse(&dict, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
-+
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		var = dbus_message_iter_get_arg_type(&value);
-+		if (strcasecmp(key, "offset") == 0) {
-+			if (var != DBUS_TYPE_UINT16)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, offset);
-+		}
-+
-+		dbus_message_iter_next(&dict);
-+	}
-+
-+	return 0;
-+}
-+
- static DBusMessage *read_value(DBusMessage *msg, uint8_t *value,
- 						uint16_t value_len)
- {
-@@ -1433,8 +1466,14 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
- 							void *user_data)
- {
- 	struct chrc *chrc = user_data;
-+	DBusMessageIter iter;
-+	uint16_t offset = 0;
-+
-+	dbus_message_iter_init(msg, &iter);
-+
-+	parse_offset(&iter, &offset);
- 
--	return read_value(msg, chrc->value, chrc->value_len);
-+	return read_value(msg, &chrc->value[offset], chrc->value_len - offset);
- }
- 
- static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len)
-@@ -1785,8 +1824,14 @@ static DBusMessage *desc_read_value(DBusConnection *conn, DBusMessage *msg,
- 							void *user_data)
- {
- 	struct desc *desc = user_data;
-+	DBusMessageIter iter;
-+	uint16_t offset = 0;
-+
-+	dbus_message_iter_init(msg, &iter);
-+
-+	parse_offset(&iter, &offset);
- 
--	return read_value(msg, desc->value, desc->value_len);
-+	return read_value(msg, &desc->value[offset], desc->value_len - offset);
- }
- 
- static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage *msg,
+On Fri, Mar 9, 2018 at 2:10 PM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Also adds item generator for the change-folder command.
+> ---
+>  tools/bluetooth-player.c | 38 ++++++++++++++------------------------
+>  1 file changed, 14 insertions(+), 24 deletions(-)
+>
+> diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+> index 75650a722..441a934cc 100644
+> --- a/tools/bluetooth-player.c
+> +++ b/tools/bluetooth-player.c
+> @@ -115,15 +115,21 @@ static void play_reply(DBusMessage *message, void *user_data)
+>         return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>  }
+>
+> -static void cmd_play_item(int argc, char *argv[])
+> +static void cmd_play(int argc, char *argv[])
+>  {
+>         GDBusProxy *proxy;
+>
+> -       proxy = g_dbus_proxy_lookup(items, NULL, argv[1],
+> +       if (argc > 1) {
+> +               proxy = g_dbus_proxy_lookup(items, NULL, argv[1],
+>                                                 BLUEZ_MEDIA_ITEM_INTERFACE);
+> -       if (proxy == NULL) {
+> -               bt_shell_printf("Item %s not available\n", argv[1]);
+> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +               if (proxy == NULL) {
+> +                       bt_shell_printf("Item %s not available\n", argv[1]);
+> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +               }
+> +       } else {
+> +               if (!check_default_player())
+> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +               proxy = default_player;
+>         }
+>
+>         if (g_dbus_proxy_method_call(proxy, "Play", NULL, play_reply,
+> @@ -132,24 +138,7 @@ static void cmd_play_item(int argc, char *argv[])
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>         }
+>
+> -       bt_shell_printf("Attempting to play %s\n", argv[1]);
+> -}
+> -
+> -static void cmd_play(int argc, char *argv[])
+> -{
+> -       if (argc > 1)
+> -               return cmd_play_item(argc, argv);
+> -
+> -       if (!check_default_player())
+> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> -
+> -       if (g_dbus_proxy_method_call(default_player, "Play", NULL, play_reply,
+> -                                                       NULL, NULL) == FALSE) {
+> -               bt_shell_printf("Failed to play\n");
+> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> -       }
+> -
+> -       bt_shell_printf("Attempting to play\n");
+> +       bt_shell_printf("Attempting to play %s\n", argv[1] ? : "");
+>  }
+>
+>  static void pause_reply(DBusMessage *message, void *user_data)
+> @@ -963,7 +952,8 @@ static const struct bt_shell_menu main_menu = {
+>         { "scan",         "<alltracks/group/off>", cmd_scan,
+>                                                 "Set scan mode"},
+>         { "change-folder", "<item>",  cmd_change_folder,
+> -                                               "Change current folder" },
+> +                                               "Change current folder",
+> +                                                       item_generator},
+
+This seems unrelated, could send it in a separate patch?
+
+>         { "list-items", "[start] [end]",  cmd_list_items,
+>                                         "List items of current folder" },
+>         { "search",     "<string>",   cmd_search,
+> --
+> 2.14.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.13.6
-
+Luiz Augusto von Dentz
