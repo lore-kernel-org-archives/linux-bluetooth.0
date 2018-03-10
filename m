@@ -1,31 +1,47 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Sun, 11 Mar 2018 06:33:54 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Use default baud rate if missing
- shutdown GPIO
-Message-ID: <20180311133354.GA15813@x1c>
-References: <20180307213903.47583-1-marcel@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180307213903.47583-1-marcel@holtmann.org>
+From: John Klug <ski.brimson@gmail.com>
+Date: Fri, 9 Mar 2018 21:46:16 -0600
+Message-ID: <CADU0Vqw6qZ5gcsUCtJJxYewW2DUSm8Sj8JOotYYJFErxbyLyyA@mail.gmail.com>
+Subject: How can I retrieve the remote device name?
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+I am using 5.47 Bluez and python.
 
-On Wed, Mar 07, 2018, Marcel Holtmann wrote:
-> In case the shutdown GPIO is not wired up, it is impossible to reset the
-> Bluetooth controller to its original state. This include the initial
-> default baud rate which leads to issues when reloading the module or
-> when something unexpected happens. To avoid any kind of runtime
-> deadlocks, stick with the initial default baud rate.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/hci_bcm.c | 5 +++++
->  1 file changed, 5 insertions(+)
+I am trying to use rfcomm with Profile1.
 
-Applied to bluetooth-next. Thanks.
 
-Johan
+    @dbus.service.method('org.bluez.Profile1',
+                         in_signature='oha{sv}',
+                         out_signature='')
+    def NewConnection(self, path, fd, properties):
+
+I get a path like:
+/org/bluez/hci0/dev_DC_74_A8_05_39_77
+
+The file descriptor works great.
+
+Properties is an empty dictionary.
+
+What can I use to retrieve the name of the device that made the new connection?
+
+Is the properties dictionary supposed to be empty?  The examples try
+to retrieve a Version and Features, but I get nothing and a zero
+length dictionary:
+
+
+        # Following code shows noting (why?)
+        lg.debug('Look for a key len(properties): %d',len(properties))
+        for key in properties.keys():
+            lg.debug('found a key!!!!!')
+            lg.debug('  %s = %s' % (key, properties[key]))
+            if key == 'Version' or key == 'Features':
+                print('  %s = 0x%04x' % (key, properties[key]))
+                lg.debug('  %s = 0x%04x' % (key, properties[key]))
+            else:
+                print('  %s = %s' % (key, properties[key]))
+                lg.info('  %s = %s' % (key, properties[key]))
+        lg.debug('Past keys')
