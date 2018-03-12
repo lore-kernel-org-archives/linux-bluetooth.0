@@ -1,261 +1,89 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH 2/4 v1] btmgmt: Add PHY configuration get/set commands
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-References: <1520580354-2185-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1520580354-2185-2-git-send-email-jaganathx.kanakkassery@intel.com>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Message-ID: <27a6ae54-60ab-9d85-8529-bc8ecf9cc706@jp.fujitsu.com>
-Date: Mon, 12 Mar 2018 17:14:12 +0900
 MIME-Version: 1.0
-In-Reply-To: <1520580354-2185-2-git-send-email-jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <053aee30-4bef-c9b6-c7b6-a0f954c7910c@jp.fujitsu.com>
+References: <053aee30-4bef-c9b6-c7b6-a0f954c7910c@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 12 Mar 2018 10:13:06 +0200
+Message-ID: <CABBYNZ+2i3+AtT2aDyhtwrRjWpmkycAuhWD3n1vMacwNVYd1Mg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 1/2] tools/bluetooth-player: Merge cmd_play{,_item}()
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Eramoto,
 
-On 03/09/2018 04:25 PM, Jaganath Kanakkassery wrote:
+On Mon, Mar 12, 2018 at 3:56 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
 > ---
->  lib/mgmt.h     |  33 +++++++++++++++
->  tools/btmgmt.c | 129 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-
-Could you rebase the patches which change btmgmt since it had massive
-changes by commit 6523d168 ("tools/btmgmt: Port to use bt_shell"). And
-now, commands need to call properly the exit function on non-interactive
-mode.
-
-
-Regards,
-Eramoto
-
-
->  2 files changed, 162 insertions(+)
->  mode change 100644 => 100755 tools/btmgmt.c
-> 
-> diff --git a/lib/mgmt.h b/lib/mgmt.h
-> index 798a05e..7a25e17 100644
-> --- a/lib/mgmt.h
-> +++ b/lib/mgmt.h
-> @@ -101,6 +101,7 @@ struct mgmt_rp_read_index_list {
->  #define MGMT_SETTING_PRIVACY		0x00002000
->  #define MGMT_SETTING_CONFIGURATION	0x00004000
->  #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
-> +#define MGMT_SETTING_PHY_CONFIGURATION 0x00010000
->  
->  #define MGMT_OP_READ_INFO		0x0004
->  struct mgmt_rp_read_info {
-> @@ -546,6 +547,30 @@ struct mgmt_cp_set_appearance {
->  	uint16_t appearance;
->  } __packed;
->  
-> +#define MGMT_OP_GET_PHY_CONFIGURATION	0x0044
-> +struct mgmt_rp_get_phy_confguration {
-> +	uint16_t	supported_phys;
-> +	uint16_t	selected_phys;
-> +} __packed;
-> +
-> +#define MGMT_PHY_LE_1M_TX		0x0001
-> +#define MGMT_PHY_LE_1M_RX		0x0002
-> +#define MGMT_PHY_LE_2M_TX		0x0004
-> +#define MGMT_PHY_LE_2M_RX		0x0008
-> +#define MGMT_PHY_LE_CODED_TX		0x0010
-> +#define MGMT_PHY_LE_CODED_RX		0x0020
-> +
-> +#define MGMT_PHY_LE_TX_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_2M_TX | \
-> +			     MGMT_PHY_LE_CODED_TX)
-> +#define MGMT_PHY_LE_RX_MASK (MGMT_PHY_LE_1M_RX | MGMT_PHY_LE_2M_RX | \
-> +			     MGMT_PHY_LE_CODED_RX)
-> +
-> +#define MGMT_OP_SET_PHY_CONFIGURATION	0x0045
-> +struct mgmt_cp_set_phy_confguration {
-> +	uint16_t	default_phys;
-> +} __packed;
-> +
-> +
->  #define MGMT_EV_CMD_COMPLETE		0x0001
->  struct mgmt_ev_cmd_complete {
->  	uint16_t opcode;
-> @@ -764,6 +789,11 @@ struct mgmt_ev_ext_info_changed {
->  	uint8_t  eir[0];
->  } __packed;
->  
-> +#define MGMT_EV_PHY_CONFIGURATION_CHANGED	0x0026
-> +struct mgmt_ev_phy_configuration_changed {
-> +	uint16_t	selected_phys;
-> +} __packed;
-> +
->  static const char *mgmt_op[] = {
->  	"<0x0000>",
->  	"Read Version",
-> @@ -833,6 +863,8 @@ static const char *mgmt_op[] = {
->  	"Start Limited Discovery",
->  	"Read Extended Controller Information",
->  	"Set Appearance",
-> +	"Get PHY Configuration",
-> +	"Set PHY Configuration",
->  };
->  
->  static const char *mgmt_ev[] = {
-> @@ -874,6 +906,7 @@ static const char *mgmt_ev[] = {
->  	"Advertising Added",
->  	"Advertising Removed",
->  	"Extended Controller Information Changed",
-> +	"PHY Configuration Changed",
->  };
->  
->  static const char *mgmt_status[] = {
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> old mode 100644
-> new mode 100755
-> index 3911ba2..5ad534f
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -4341,6 +4341,131 @@ static void cmd_appearance(struct mgmt *mgmt, uint16_t index, int argc,
->  	}
+> Changes since v1
+>  - separate into two patch which are 1/2 and 2/2.
+>
+>  tools/bluetooth-player.c | 35 ++++++++++++-----------------------
+>  1 file changed, 12 insertions(+), 23 deletions(-)
+>
+> diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+> index 75650a722..13b70349e 100644
+> --- a/tools/bluetooth-player.c
+> +++ b/tools/bluetooth-player.c
+> @@ -115,15 +115,21 @@ static void play_reply(DBusMessage *message, void *user_data)
+>         return bt_shell_noninteractive_quit(EXIT_FAILURE);
 >  }
->  
-> +static const char *phys_str[] = {
-> +	"1MTX",
-> +	"1MRX",
-> +	"2MTX",
-> +	"2MRX",
-> +	"CODEDTX",
-> +	"CODEDRX",
-> +};
-> +
-> +static const char *phys2str(uint16_t phys)
-> +{
-> +	static char str[256];
-> +	unsigned i;
-> +	int off;
-> +
-> +	off = 0;
-> +	str[0] = '\0';
-> +
-> +	for (i = 0; i < NELEM(phys_str); i++) {
-> +		if ((phys & (1 << i)) != 0)
-> +			off += snprintf(str + off, sizeof(str) - off, "%s ",
-> +							phys_str[i]);
-> +	}
-> +
-> +	return str;
-> +}
-> +
-> +static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
-> +							void *user_data)
-> +{
-> +	const struct mgmt_rp_get_phy_confguration *rp = param;
-> +	uint16_t supported_flags, selected_phys;
-> +
-> +	if (status != 0) {
-> +		error("Reading mgmt version failed with status 0x%02x (%s)",
-> +						status, mgmt_errstr(status));
-> +		goto done;
-> +	}
-> +
-> +	if (len < sizeof(*rp)) {
-> +		error("Too small version reply (%u bytes)", len);
-> +		goto done;
-> +	}
-> +
-> +	supported_flags = get_le16(&rp->supported_phys);
-> +	selected_phys = get_le16(&rp->selected_phys);
-> +
-> +	print("Supported phys: %s", phys2str(supported_flags));
-> +	print("Selected phys: %s", phys2str(selected_phys));
-> +
-> +done:
-> +	noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static void cmd_get_phy(struct mgmt *mgmt, uint16_t index, int argc,
-> +								char **argv)
-> +{
-> +	if (index == MGMT_INDEX_NONE)
-> +		index = 0;
-> +
-> +	if (mgmt_send(mgmt, MGMT_OP_GET_PHY_CONFIGURATION, index, 0, NULL,
-> +					get_phy_rsp, NULL, NULL) == 0) {
-> +		error("Unable to send Get PHY cmd");
-> +		return noninteractive_quit(EXIT_FAILURE);
-> +	}
-> +}
-> +
-> +static void set_phy_rsp(uint8_t status, uint16_t len, const void *param,
-> +							void *user_data)
-> +{
-> +	if (status != 0)
-> +		error("Could not set PHY Configuration with status 0x%02x (%s)",
-> +						status, mgmt_errstr(status));
-> +	else
-> +		print("PHY Configuration successfully set");
-> +
-> +	noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static void cmd_set_phy(struct mgmt *mgmt, uint16_t index,
-> +							int argc, char **argv)
-> +{
-> +	struct mgmt_cp_set_phy_confguration cp;
-> +	int i;
-> +	uint16_t phys = 0;
-> +
-> +	if (argc < 2) {
-> +		print("Specify one or more of \"1MTX\" \"1MRX\" \"2MTX\" \
-> +			\"2MRX\" \"CODEDTX\" \"CODEDRX\"");
-> +		return noninteractive_quit(EXIT_FAILURE);
-> +	}
-> +
-> +	for (i = 1; i < argc; i++) {
-> +		if (strcasecmp(argv[i], "1MTX") == 0)
-> +			phys |= MGMT_PHY_LE_1M_TX;
-> +
-> +		if (strcasecmp(argv[i], "1MRX") == 0)
-> +			phys |= MGMT_PHY_LE_1M_RX;
-> +
-> +		if (strcasecmp(argv[i], "2MTX") == 0)
-> +			phys |= MGMT_PHY_LE_2M_TX;
-> +
-> +		if (strcasecmp(argv[i], "2MRX") == 0)
-> +			phys |= MGMT_PHY_LE_2M_RX;
-> +
-> +		if (strcasecmp(argv[i], "CODEDTX") == 0)
-> +			phys |= MGMT_PHY_LE_CODED_TX;
-> +
-> +		if (strcasecmp(argv[i], "CODEDRX") == 0)
-> +			phys |= MGMT_PHY_LE_CODED_RX;
-> +	}
-> +
-> +	cp.default_phys = cpu_to_le16(phys);
-> +
-> +	if (index == MGMT_INDEX_NONE)
-> +		index = 0;
-> +
-> +	if (mgmt_send(mgmt, MGMT_OP_SET_PHY_CONFIGURATION, index, sizeof(cp),
-> +					&cp, set_phy_rsp, NULL, NULL) == 0) {
-> +		error("Unable to send %s cmd",
-> +				mgmt_opstr(MGMT_OP_GET_PHY_CONFIGURATION));
-> +		return noninteractive_quit(EXIT_FAILURE);
-> +	}
-> +}
-> +
->  struct cmd_info {
->  	char *cmd;
->  	const char *arg;
-> @@ -4473,6 +4598,10 @@ static struct cmd_info all_cmd[] = {
->  		cmd_clr_adv,		"Clear advertising instances"	},
->  	{ "appearance",		"<appearance>",
->  		cmd_appearance,		"Set appearance"		},
-> +	{ "get-phy",		NULL,
-> +		cmd_get_phy,		"Get PHY Configuration"         },
-> +        { "set-phy",		"<phys>",
-> +		cmd_set_phy,		"Set PHY Configuration"         },
->  };
->  
->  static void cmd_quit(struct mgmt *mgmt, uint16_t index,
-> 
+>
+> -static void cmd_play_item(int argc, char *argv[])
+> +static void cmd_play(int argc, char *argv[])
+>  {
+>         GDBusProxy *proxy;
+>
+> -       proxy = g_dbus_proxy_lookup(items, NULL, argv[1],
+> +       if (argc > 1) {
+> +               proxy = g_dbus_proxy_lookup(items, NULL, argv[1],
+>                                                 BLUEZ_MEDIA_ITEM_INTERFACE);
+> -       if (proxy == NULL) {
+> -               bt_shell_printf("Item %s not available\n", argv[1]);
+> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +               if (proxy == NULL) {
+> +                       bt_shell_printf("Item %s not available\n", argv[1]);
+> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +               }
+> +       } else {
+> +               if (!check_default_player())
+> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +               proxy = default_player;
+>         }
+>
+>         if (g_dbus_proxy_method_call(proxy, "Play", NULL, play_reply,
+> @@ -132,24 +138,7 @@ static void cmd_play_item(int argc, char *argv[])
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>         }
+>
+> -       bt_shell_printf("Attempting to play %s\n", argv[1]);
+> -}
+> -
+> -static void cmd_play(int argc, char *argv[])
+> -{
+> -       if (argc > 1)
+> -               return cmd_play_item(argc, argv);
+> -
+> -       if (!check_default_player())
+> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> -
+> -       if (g_dbus_proxy_method_call(default_player, "Play", NULL, play_reply,
+> -                                                       NULL, NULL) == FALSE) {
+> -               bt_shell_printf("Failed to play\n");
+> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> -       }
+> -
+> -       bt_shell_printf("Attempting to play\n");
+> +       bt_shell_printf("Attempting to play %s\n", argv[1] ? : "");
+>  }
+>
+>  static void pause_reply(DBusMessage *message, void *user_data)
+> --
+> 2.14.1
 
+Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
