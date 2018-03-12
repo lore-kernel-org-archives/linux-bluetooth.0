@@ -1,42 +1,66 @@
 Return-Path: <linux-crypto-owner@vger.kernel.org>
-Subject: Re: [tpmdd-devel] in-kernel user of ecdsa
-From: James Bottomley <jejb@linux.vnet.ibm.com>
-To: Tudor Ambarus <tudor.ambarus@microchip.com>,
-        David Howells <dhowells@redhat.com>, dwmw2@infradead.org,
-        keyrings@vger.kernel.org
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-        <linux-bluetooth@vger.kernel.org>,
-        linux-security-module@vger.kernel.org,
-        tpmdd-devel@lists.sourceforge.net,
+To: David Howells <dhowells@redhat.com>, <dwmw2@infradead.org>,
+        <keyrings@vger.kernel.org>
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
+Subject: in-kernel user of ecdsa
+CC: <linux-security-module@vger.kernel.org>,
+        <tpmdd-devel@lists.sourceforge.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        keyrings@vger.kernel.org
-Date: Mon, 12 Mar 2018 11:09:18 -0700
-In-Reply-To: <0f698592-8ade-14d4-7891-1c35501c6285@microchip.com>
-References: <0f698592-8ade-14d4-7891-1c35501c6285@microchip.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Message-Id: <1520878158.4522.31.camel@linux.vnet.ibm.com>
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+        <linux-bluetooth@vger.kernel.org>
+Message-ID: <0f698592-8ade-14d4-7891-1c35501c6285@microchip.com>
+Date: Mon, 12 Mar 2018 19:07:53 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2018-03-12 at 19:07 +0200, Tudor Ambarus wrote:
-> Hi,
-> 
-> Would you consider using ECDSA in the kernel module signing facility?
-> When compared with RSA, ECDSA has shorter keys, the key generation
-> process is faster, the sign operation is faster, but the verify
-> operation is slower than with RSA.
+Hi,
 
-You missed the keyrings list, which is where the module signing utility
-is discussed.
+Would you consider using ECDSA in the kernel module signing facility?
+When compared with RSA, ECDSA has shorter keys, the key generation
+process is faster, the sign operation is faster, but the verify
+operation is slower than with RSA.
 
-First question is, have you actually tried?  It looks like sign-file
-doesn't do anything RSA specific so if you give it an EC X.509
-certificate it will produce an ECDSA signature.
+Smaller key sizes imply reduced memory footprint and bandwidth that are
+especially attractive for memory constrained devices. I'm working with
+such a device, capable of generating ecc keys, secure key storage and
+ecdsa/ecdh crypto acceleration. I'm trying to find an in-kernel user of
+ecdsa.
 
-I think our kernel internal x509 parsers don't have the EC OIDs, so
-signature verification will fail; but, especially since we have the
-rest of the EC machinery in the crypto subsystem, that looks to be
-simply fixable.
 
-James
+ECDSA and RSA comparison
+------------------------
+-> ECDSA requires a much smaller key length in order to provide the same
+security strength as RSA [1]:
+
+Security Strength    RSA (bits)        ECDSA (bits)
+112                   2048             224 - 255
+128                   3072             256 - 383
+192                   7680             384 - 511
+256                  15360             512+
+
+7680 and 15360  keys are not included in the NIST standards for
+interoperability and efficiency reasons, the keys are just too big.
+
+-> key generation: ECC key generation is faster than IFC (Integer -
+Factorization Cryptography). RSA private key is based on large prime
+numbers, while for ECDSA any positive integer less than n is a valid
+private key.
+
+-> ECDSA sign operations are faster than RSA, but verify operations are
+slower. Here's an openssl speed test that I've run on my computer:
+
+                   sign    verify    sign/s verify/s
+rsa 2048 bits 0.000604s 0.000018s   1656.3  56813.7
+rsa 4096 bits 0.004027s 0.000062s    248.3  16052.5
+
+                              sign    verify    sign/s verify/s
+256 bit ecdsa (nistp256)   0.0000s   0.0001s  28986.4  13516.3
+384 bit ecdsa (nistp384)   0.0002s   0.0008s   5541.0   1322.2
+521 bit ecdsa (nistp521)   0.0003s   0.0006s   3104.2   1756.2
+
+Best,
+ta
+
+[1] NIST SP 800-57 Pt. 1 Rev. 4, Recommendation for key management
