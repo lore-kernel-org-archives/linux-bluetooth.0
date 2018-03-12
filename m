@@ -1,89 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: [PATCH BlueZ v2 2/2] tools/bluetooth-player: Add item-generator for
+ change-folder
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <053aee30-4bef-c9b6-c7b6-a0f954c7910c@jp.fujitsu.com>
+Message-ID: <797ada51-e29d-6e75-52ed-73b0b4ac43fb@jp.fujitsu.com>
+Date: Mon, 12 Mar 2018 10:56:45 +0900
 MIME-Version: 1.0
 In-Reply-To: <053aee30-4bef-c9b6-c7b6-a0f954c7910c@jp.fujitsu.com>
-References: <053aee30-4bef-c9b6-c7b6-a0f954c7910c@jp.fujitsu.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 12 Mar 2018 10:13:06 +0200
-Message-ID: <CABBYNZ+2i3+AtT2aDyhtwrRjWpmkycAuhWD3n1vMacwNVYd1Mg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/2] tools/bluetooth-player: Merge cmd_play{,_item}()
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+---
+Changes since v1
+ - separate into two patch which are 1/2 and 2/2.
 
-On Mon, Mar 12, 2018 at 3:56 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> ---
-> Changes since v1
->  - separate into two patch which are 1/2 and 2/2.
->
->  tools/bluetooth-player.c | 35 ++++++++++++-----------------------
->  1 file changed, 12 insertions(+), 23 deletions(-)
->
-> diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-> index 75650a722..13b70349e 100644
-> --- a/tools/bluetooth-player.c
-> +++ b/tools/bluetooth-player.c
-> @@ -115,15 +115,21 @@ static void play_reply(DBusMessage *message, void *user_data)
->         return bt_shell_noninteractive_quit(EXIT_FAILURE);
->  }
->
-> -static void cmd_play_item(int argc, char *argv[])
-> +static void cmd_play(int argc, char *argv[])
->  {
->         GDBusProxy *proxy;
->
-> -       proxy = g_dbus_proxy_lookup(items, NULL, argv[1],
-> +       if (argc > 1) {
-> +               proxy = g_dbus_proxy_lookup(items, NULL, argv[1],
->                                                 BLUEZ_MEDIA_ITEM_INTERFACE);
-> -       if (proxy == NULL) {
-> -               bt_shell_printf("Item %s not available\n", argv[1]);
-> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +               if (proxy == NULL) {
-> +                       bt_shell_printf("Item %s not available\n", argv[1]);
-> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +               }
-> +       } else {
-> +               if (!check_default_player())
-> +                       return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +               proxy = default_player;
->         }
->
->         if (g_dbus_proxy_method_call(proxy, "Play", NULL, play_reply,
-> @@ -132,24 +138,7 @@ static void cmd_play_item(int argc, char *argv[])
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->         }
->
-> -       bt_shell_printf("Attempting to play %s\n", argv[1]);
-> -}
-> -
-> -static void cmd_play(int argc, char *argv[])
-> -{
-> -       if (argc > 1)
-> -               return cmd_play_item(argc, argv);
-> -
-> -       if (!check_default_player())
-> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> -
-> -       if (g_dbus_proxy_method_call(default_player, "Play", NULL, play_reply,
-> -                                                       NULL, NULL) == FALSE) {
-> -               bt_shell_printf("Failed to play\n");
-> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> -       }
-> -
-> -       bt_shell_printf("Attempting to play\n");
-> +       bt_shell_printf("Attempting to play %s\n", argv[1] ? : "");
->  }
->
->  static void pause_reply(DBusMessage *message, void *user_data)
-> --
-> 2.14.1
+ tools/bluetooth-player.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Applied, thanks.
-
+diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+index 13b70349e..441a934cc 100644
+--- a/tools/bluetooth-player.c
++++ b/tools/bluetooth-player.c
+@@ -952,7 +952,8 @@ static const struct bt_shell_menu main_menu = {
+ 	{ "scan",         "<alltracks/group/off>", cmd_scan,
+ 						"Set scan mode"},
+ 	{ "change-folder", "<item>",  cmd_change_folder,
+-						"Change current folder" },
++						"Change current folder",
++							item_generator},
+ 	{ "list-items", "[start] [end]",  cmd_list_items,
+ 					"List items of current folder" },
+ 	{ "search",     "<string>",   cmd_search,
 -- 
-Luiz Augusto von Dentz
+2.14.1
+
