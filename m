@@ -1,79 +1,35 @@
-Return-Path: <kvalo@codeaurora.org>
-From: Kalle Valo <kvalo@codeaurora.org>
-To: Amitkumar Karwar <amitkarwar@gmail.com>
-Cc: marcel@holtmann.org,  linux-wireless@vger.kernel.org,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,  linux-bluetooth@vger.kernel.org
-Subject: Re: [v9 0/8] rsi: add bluetooth and coex support
-References: <1519741578-12640-1-git-send-email-amitkarwar@gmail.com>
-Date: Mon, 12 Mar 2018 12:00:28 +0200
-In-Reply-To: <1519741578-12640-1-git-send-email-amitkarwar@gmail.com>
-	(Amitkumar Karwar's message of "Tue, 27 Feb 2018 19:56:10 +0530")
-Message-ID: <87a7vd396r.fsf@purkki.adurom.net>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [2/3] mwifiex: support sysfs initiated device coredump
+From: Kalle Valo <kvalo@codeaurora.org>
+In-Reply-To: <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
+References: <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
+To: Arend Van Spriel <arend.vanspriel@broadcom.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arend van Spriel <arend.vanspriel@broadcom.com>
+Message-Id: <20180312094115.1996760452@smtp.codeaurora.org>
+Date: Mon, 12 Mar 2018 09:41:15 +0000 (UTC)
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Amitkumar Karwar <amitkarwar@gmail.com> writes:
+Arend Van Spriel <arend.vanspriel@broadcom.com> wrote:
 
-> From: Amitkumar Karwar <amit.karwar@redpinesignals.com>
->
-> This patch series adds new bluetooth driver and coex enhancments
-> in existing wlan driver for RSI chipsets.
-> As per our architecture, both wlan and bluetooth drivers talk
-> over same SDIO interface to device. Separate endpoint will be
-> used in case of USB interface.
->
-> Change in v9: "#ifdef CONFIG_RSI_COEX" check moved from 6/8 to 4/6
->               to resolve kbuild test robot reported error
-> Change in v8: 4/8, 5/8 are modified
-> Change in v7: 4/8 is modified
-> Changes in v6: 1/8, 3/8, 4/8, 5/8, 6/8 are modified
-> Changes in v5: 5/8 is modified
-> Changes in v4: 5/8 is modified
-> Changes in v3: 4/8, 5/8 and 6/8 patches are modified
-> Changes in v2: 2/8, 5/8 and 6/8 patches are modified
->
-> Prameela Rani Garnepudi (6):
->   rsi: add rx control block to handle rx packets in USB
->   rsi: add header file rsi_91x
->   rsi: add coex support
->   Bluetooth: btrsi: add new rsi bluetooth driver
->   rsi: add module parameter operating mode
->   rsi: sdio changes to support BT
->
-> Siva Rebbagondla (2):
->   rsi: add bluetooth rx endpoint
->   rsi: handle BT traffic in driver
->
->  drivers/bluetooth/Kconfig                   |  12 ++
->  drivers/bluetooth/Makefile                  |   2 +
->  drivers/bluetooth/btrsi.c                   | 188 ++++++++++++++++++++++++++++
->  drivers/net/wireless/rsi/Kconfig            |   9 ++
->  drivers/net/wireless/rsi/Makefile           |   1 +
->  drivers/net/wireless/rsi/rsi_91x_coex.c     | 179 ++++++++++++++++++++++++++
->  drivers/net/wireless/rsi/rsi_91x_core.c     |  20 ++-
->  drivers/net/wireless/rsi/rsi_91x_hal.c      |  56 +++++++--
->  drivers/net/wireless/rsi/rsi_91x_main.c     | 129 ++++++++++++++++++-
->  drivers/net/wireless/rsi/rsi_91x_mgmt.c     |   2 +-
->  drivers/net/wireless/rsi/rsi_91x_sdio.c     |  13 +-
->  drivers/net/wireless/rsi/rsi_91x_sdio_ops.c |   5 +-
->  drivers/net/wireless/rsi/rsi_91x_usb.c      | 124 +++++++++++++-----
->  drivers/net/wireless/rsi/rsi_91x_usb_ops.c  |  35 ++++--
->  drivers/net/wireless/rsi/rsi_coex.h         |  37 ++++++
->  drivers/net/wireless/rsi/rsi_common.h       |   5 +-
->  drivers/net/wireless/rsi/rsi_hal.h          |  21 ++++
->  drivers/net/wireless/rsi/rsi_main.h         |  21 ++--
->  drivers/net/wireless/rsi/rsi_mgmt.h         |   3 +
->  drivers/net/wireless/rsi/rsi_usb.h          |  16 ++-
->  include/net/rsi_91x.h                       |  56 +++++++++
->  21 files changed, 852 insertions(+), 82 deletions(-)
->  create mode 100644 drivers/bluetooth/btrsi.c
->  create mode 100644 drivers/net/wireless/rsi/rsi_91x_coex.c
->  create mode 100644 drivers/net/wireless/rsi/rsi_coex.h
->  create mode 100644 include/net/rsi_91x.h
+> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
+> it is possible to initiate a device coredump from user-space. This
+> patch adds support for it adding the .coredump() driver callback.
+> As there is no longer a need to initiate it through debugfs remove
+> that code.
+> 
+> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
 
-Just a heads up to everyone that I applied this to pending branch in
-w-d-next and if everything goes ok with kbuild bot I'll apply this to
-the master branch soon.
+Based on the discussion I assume this is ok to take to w-d-next. If that's not
+the case, please let me know ASAP.
 
 -- 
-Kalle Valo
+https://patchwork.kernel.org/patch/10231933/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
