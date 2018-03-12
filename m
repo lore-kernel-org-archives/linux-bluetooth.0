@@ -1,95 +1,79 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 1/3] client: Fix reading long values
-Date: Mon, 12 Mar 2018 12:16:24 +0100
-Message-Id: <20180312111626.5899-1-grzegorz.kolodziejczyk@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <kvalo@codeaurora.org>
+From: Kalle Valo <kvalo@codeaurora.org>
+To: Amitkumar Karwar <amitkarwar@gmail.com>
+Cc: marcel@holtmann.org,  linux-wireless@vger.kernel.org,  Amitkumar Karwar <amit.karwar@redpinesignals.com>,  Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,  linux-bluetooth@vger.kernel.org
+Subject: Re: [v9 0/8] rsi: add bluetooth and coex support
+References: <1519741578-12640-1-git-send-email-amitkarwar@gmail.com>
+Date: Mon, 12 Mar 2018 12:00:28 +0200
+In-Reply-To: <1519741578-12640-1-git-send-email-amitkarwar@gmail.com>
+	(Amitkumar Karwar's message of "Tue, 27 Feb 2018 19:56:10 +0530")
+Message-ID: <87a7vd396r.fsf@purkki.adurom.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-While value has more than single MTU can carry long read procedure will
-be triggered. In such cases offset need to bo considered while getting
-value from storage.
----
- client/gatt.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 47 insertions(+), 2 deletions(-)
+Amitkumar Karwar <amitkarwar@gmail.com> writes:
 
-diff --git a/client/gatt.c b/client/gatt.c
-index 8c818d8c1..7a6035ac1 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -1412,6 +1412,39 @@ static const GDBusPropertyTable chrc_properties[] = {
- 	{ }
- };
- 
-+static int parse_offset(DBusMessageIter *iter, uint16_t *offset)
-+{
-+	DBusMessageIter dict;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-+		return -EINVAL;
-+
-+	dbus_message_iter_recurse(iter, &dict);
-+
-+	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
-+		const char *key;
-+		DBusMessageIter value, entry;
-+		int var;
-+
-+		dbus_message_iter_recurse(&dict, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
-+
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		var = dbus_message_iter_get_arg_type(&value);
-+		if (strcasecmp(key, "offset") == 0) {
-+			if (var != DBUS_TYPE_UINT16)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, offset);
-+		}
-+
-+		dbus_message_iter_next(&dict);
-+	}
-+
-+	return 0;
-+}
-+
- static DBusMessage *read_value(DBusMessage *msg, uint8_t *value,
- 						uint16_t value_len)
- {
-@@ -1433,8 +1466,14 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
- 							void *user_data)
- {
- 	struct chrc *chrc = user_data;
-+	DBusMessageIter iter;
-+	uint16_t offset = 0;
-+
-+	dbus_message_iter_init(msg, &iter);
-+
-+	parse_offset(&iter, &offset);
- 
--	return read_value(msg, chrc->value, chrc->value_len);
-+	return read_value(msg, &chrc->value[offset], chrc->value_len - offset);
- }
- 
- static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len)
-@@ -1785,8 +1824,14 @@ static DBusMessage *desc_read_value(DBusConnection *conn, DBusMessage *msg,
- 							void *user_data)
- {
- 	struct desc *desc = user_data;
-+	DBusMessageIter iter;
-+	uint16_t offset = 0;
-+
-+	dbus_message_iter_init(msg, &iter);
-+
-+	parse_offset(&iter, &offset);
- 
--	return read_value(msg, desc->value, desc->value_len);
-+	return read_value(msg, &desc->value[offset], desc->value_len - offset);
- }
- 
- static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage *msg,
+> From: Amitkumar Karwar <amit.karwar@redpinesignals.com>
+>
+> This patch series adds new bluetooth driver and coex enhancments
+> in existing wlan driver for RSI chipsets.
+> As per our architecture, both wlan and bluetooth drivers talk
+> over same SDIO interface to device. Separate endpoint will be
+> used in case of USB interface.
+>
+> Change in v9: "#ifdef CONFIG_RSI_COEX" check moved from 6/8 to 4/6
+>               to resolve kbuild test robot reported error
+> Change in v8: 4/8, 5/8 are modified
+> Change in v7: 4/8 is modified
+> Changes in v6: 1/8, 3/8, 4/8, 5/8, 6/8 are modified
+> Changes in v5: 5/8 is modified
+> Changes in v4: 5/8 is modified
+> Changes in v3: 4/8, 5/8 and 6/8 patches are modified
+> Changes in v2: 2/8, 5/8 and 6/8 patches are modified
+>
+> Prameela Rani Garnepudi (6):
+>   rsi: add rx control block to handle rx packets in USB
+>   rsi: add header file rsi_91x
+>   rsi: add coex support
+>   Bluetooth: btrsi: add new rsi bluetooth driver
+>   rsi: add module parameter operating mode
+>   rsi: sdio changes to support BT
+>
+> Siva Rebbagondla (2):
+>   rsi: add bluetooth rx endpoint
+>   rsi: handle BT traffic in driver
+>
+>  drivers/bluetooth/Kconfig                   |  12 ++
+>  drivers/bluetooth/Makefile                  |   2 +
+>  drivers/bluetooth/btrsi.c                   | 188 ++++++++++++++++++++++++++++
+>  drivers/net/wireless/rsi/Kconfig            |   9 ++
+>  drivers/net/wireless/rsi/Makefile           |   1 +
+>  drivers/net/wireless/rsi/rsi_91x_coex.c     | 179 ++++++++++++++++++++++++++
+>  drivers/net/wireless/rsi/rsi_91x_core.c     |  20 ++-
+>  drivers/net/wireless/rsi/rsi_91x_hal.c      |  56 +++++++--
+>  drivers/net/wireless/rsi/rsi_91x_main.c     | 129 ++++++++++++++++++-
+>  drivers/net/wireless/rsi/rsi_91x_mgmt.c     |   2 +-
+>  drivers/net/wireless/rsi/rsi_91x_sdio.c     |  13 +-
+>  drivers/net/wireless/rsi/rsi_91x_sdio_ops.c |   5 +-
+>  drivers/net/wireless/rsi/rsi_91x_usb.c      | 124 +++++++++++++-----
+>  drivers/net/wireless/rsi/rsi_91x_usb_ops.c  |  35 ++++--
+>  drivers/net/wireless/rsi/rsi_coex.h         |  37 ++++++
+>  drivers/net/wireless/rsi/rsi_common.h       |   5 +-
+>  drivers/net/wireless/rsi/rsi_hal.h          |  21 ++++
+>  drivers/net/wireless/rsi/rsi_main.h         |  21 ++--
+>  drivers/net/wireless/rsi/rsi_mgmt.h         |   3 +
+>  drivers/net/wireless/rsi/rsi_usb.h          |  16 ++-
+>  include/net/rsi_91x.h                       |  56 +++++++++
+>  21 files changed, 852 insertions(+), 82 deletions(-)
+>  create mode 100644 drivers/bluetooth/btrsi.c
+>  create mode 100644 drivers/net/wireless/rsi/rsi_91x_coex.c
+>  create mode 100644 drivers/net/wireless/rsi/rsi_coex.h
+>  create mode 100644 include/net/rsi_91x.h
+
+Just a heads up to everyone that I applied this to pending branch in
+w-d-next and if everything goes ok with kbuild bot I'll apply this to
+the master branch soon.
+
 -- 
-2.13.6
-
+Kalle Valo
