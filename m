@@ -1,33 +1,38 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <arend.vanspriel@broadcom.com>
+Subject: Re: [2/3] mwifiex: support sysfs initiated device coredump
+To: Kalle Valo <kvalo@codeaurora.org>
+References: <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
+ <20180312094115.2E1C1606DB@smtp.codeaurora.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+Message-ID: <5AA67616.2000602@broadcom.com>
+Date: Mon, 12 Mar 2018 13:44:06 +0100
 MIME-Version: 1.0
-In-Reply-To: <1520487050-11082-1-git-send-email-amit.k.bag@intel.com>
-References: <1520487050-11082-1-git-send-email-amit.k.bag@intel.com>
-From: Josh Boyer <jwboyer@kernel.org>
-Date: Mon, 12 Mar 2018 09:19:19 -0400
-Message-ID: <CA+5PVA6UCszJjzoN2mVCTD67sF9MhSTgEKY4heM+qMpQ8Yd_gA@mail.gmail.com>
-Subject: Re: [PATCH] linux-firmware:Update firmware patch for Intel Bluetooth
- 7265 (D1)
-To: Amit K Bag <amit.k.bag@intel.com>
-Cc: Linux Firmware <linux-firmware@kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>,
-        sukumar.ghorai@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20180312094115.2E1C1606DB@smtp.codeaurora.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 8, 2018 at 12:30 AM, Amit K Bag <amit.k.bag@intel.com> wrote:
-> This patch updates the firmware file for Intel Bluetooth 7265
-> Also it is known as Intel stonePeak(STPD1).
+On 3/12/2018 10:41 AM, Kalle Valo wrote:
+> Arend Van Spriel <arend.vanspriel@broadcom.com> wrote:
 >
-> FW Build: REL_51_00001
+>> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
+>> it is possible to initiate a device coredump from user-space. This
+>> patch adds support for it adding the .coredump() driver callback.
+>> As there is no longer a need to initiate it through debugfs remove
+>> that code.
+>>
+>> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
 >
-> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
-> ---
->  WHENCE                                     |   2 +-
->  intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq | Bin 44846 -> 47627 bytes
->  2 files changed, 1 insertion(+), 1 deletion(-)
+> Based on the discussion I assume this is ok to take to w-d-next. If that's not
+> the case, please let me know ASAP.
 
-Applied and pushed out.  Thanks.
+It is up to the mwifiex maintainers to decide, I guess. The ABI 
+documentation need to be revised and change the callback to void return 
+type. I am not sure what the best approach is. 1) apply this and fix 
+return type later, or 2) fix return type and resubmit this. What is your 
+opinion?
 
-josh
+Regards,
+Arend
