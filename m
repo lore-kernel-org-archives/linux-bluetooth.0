@@ -1,66 +1,143 @@
-Return-Path: <linux-crypto-owner@vger.kernel.org>
-To: David Howells <dhowells@redhat.com>, <dwmw2@infradead.org>,
-        <keyrings@vger.kernel.org>
-From: Tudor Ambarus <tudor.ambarus@microchip.com>
-Subject: in-kernel user of ecdsa
-CC: <linux-security-module@vger.kernel.org>,
-        <tpmdd-devel@lists.sourceforge.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-        <linux-bluetooth@vger.kernel.org>
-Message-ID: <0f698592-8ade-14d4-7891-1c35501c6285@microchip.com>
-Date: Mon, 12 Mar 2018 19:07:53 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Sender: linux-crypto-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 1/5] Bluetooth: btmrvl: Use common error handling code in
+ btmrvl_sdio_register_dev()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5c3361c6-ef1d-b919-8817-05c2c98fb2ef@users.sourceforge.net>
+Date: Mon, 12 Mar 2018 17:18:31 +0100
+Cc: linux-bluetooth@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+Message-Id: <EE3DFCC7-3B51-43B6-A28B-3102F55479AA@holtmann.org>
+References: <8d050f76-aed1-7b6b-8778-a78aef34d4ea@users.sourceforge.net>
+ <5c3361c6-ef1d-b919-8817-05c2c98fb2ef@users.sourceforge.net>
+To: SF Markus Elfring <elfring@users.sourceforge.net>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Markus,
 
-Would you consider using ECDSA in the kernel module signing facility?
-When compared with RSA, ECDSA has shorter keys, the key generation
-process is faster, the sign operation is faster, but the verify
-operation is slower than with RSA.
+> Adjust a jump target so that a bit of exception handling can be better
+> reused at the end of this function.
+> 
+> This issue was detected by using the Coccinelle software.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+> drivers/bluetooth/btmrvl_sdio.c | 50 ++++++++++++++++-------------------------
+> 1 file changed, 19 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+> index 0f020254fd39..df2a04bd8428 100644
+> --- a/drivers/bluetooth/btmrvl_sdio.c
+> +++ b/drivers/bluetooth/btmrvl_sdio.c
+> @@ -949,31 +949,24 @@ static int btmrvl_sdio_register_dev(struct btmrvl_sdio_card *card)
+> 	ret = sdio_set_block_size(card->func, SDIO_BLOCK_SIZE);
+> 	if (ret) {
+> 		BT_ERR("cannot set SDIO block size");
+> -		ret = -EIO;
+> -		goto release_irq;
+> +		goto release_with_eio;
+> 	}
+> 
+> 	reg = sdio_readb(func, card->reg->io_port_0, &ret);
+> -	if (ret < 0) {
+> -		ret = -EIO;
+> -		goto release_irq;
+> -	}
+> +	if (ret < 0)
+> +		goto release_with_eio;
+> 
+> 	card->ioport = reg;
+> 
+> 	reg = sdio_readb(func, card->reg->io_port_1, &ret);
+> -	if (ret < 0) {
+> -		ret = -EIO;
+> -		goto release_irq;
+> -	}
+> +	if (ret < 0)
+> +		goto release_with_eio;
+> 
+> 	card->ioport |= (reg << 8);
+> 
+> 	reg = sdio_readb(func, card->reg->io_port_2, &ret);
+> -	if (ret < 0) {
+> -		ret = -EIO;
+> -		goto release_irq;
+> -	}
+> +	if (ret < 0)
+> +		goto release_with_eio;
+> 
+> 	card->ioport |= (reg << 16);
+> 
+> @@ -981,26 +974,20 @@ static int btmrvl_sdio_register_dev(struct btmrvl_sdio_card *card)
+> 
+> 	if (card->reg->int_read_to_clear) {
+> 		reg = sdio_readb(func, card->reg->host_int_rsr, &ret);
+> -		if (ret < 0) {
+> -			ret = -EIO;
+> -			goto release_irq;
+> -		}
+> +		if (ret < 0)
+> +			goto release_with_eio;
+> +
+> 		sdio_writeb(func, reg | 0x3f, card->reg->host_int_rsr, &ret);
+> -		if (ret < 0) {
+> -			ret = -EIO;
+> -			goto release_irq;
+> -		}
+> +		if (ret < 0)
+> +			goto release_with_eio;
+> 
+> 		reg = sdio_readb(func, card->reg->card_misc_cfg, &ret);
+> -		if (ret < 0) {
+> -			ret = -EIO;
+> -			goto release_irq;
+> -		}
+> +		if (ret < 0)
+> +			goto release_with_eio;
+> +
+> 		sdio_writeb(func, reg | 0x10, card->reg->card_misc_cfg, &ret);
+> -		if (ret < 0) {
+> -			ret = -EIO;
+> -			goto release_irq;
+> -		}
+> +		if (ret < 0)
+> +			goto release_with_eio;
+> 	}
+> 
+> 	sdio_set_drvdata(func, card);
+> @@ -1009,7 +996,8 @@ static int btmrvl_sdio_register_dev(struct btmrvl_sdio_card *card)
+> 
+> 	return 0;
+> 
+> -release_irq:
+> +release_with_eio:
+> +	ret = -EIO;
+> 	sdio_release_irq(func);
+> 
+> disable_func:
 
-Smaller key sizes imply reduced memory footprint and bandwidth that are
-especially attractive for memory constrained devices. I'm working with
-such a device, capable of generating ecc keys, secure key storage and
-ecdsa/ecdh crypto acceleration. I'm trying to find an in-kernel user of
-ecdsa.
+please do not send me any patches with renaming goto labels. I dislike long goto labels anyway and it doesn’t make it any better in mind.
 
+In addition, this patch is half baked. If you want to do something, then you replace all err = -EIO and use this.
 
-ECDSA and RSA comparison
-------------------------
--> ECDSA requires a much smaller key length in order to provide the same
-security strength as RSA [1]:
+release_irq:
+        sdio_release_irq(func);
 
-Security Strength    RSA (bits)        ECDSA (bits)
-112                   2048             224 - 255
-128                   3072             256 - 383
-192                   7680             384 - 511
-256                  15360             512+
+disable_func:
+        sdio_disable_func(func);
 
-7680 and 15360  keys are not included in the NIST standards for
-interoperability and efficiency reasons, the keys are just too big.
+release_host:
+        sdio_release_host(func);
 
--> key generation: ECC key generation is faster than IFC (Integer -
-Factorization Cryptography). RSA private key is based on large prime
-numbers, while for ECDSA any positive integer less than n is a valid
-private key.
+	return -EIO;
 
--> ECDSA sign operations are faster than RSA, but verify operations are
-slower. Here's an openssl speed test that I've run on my computer:
+And replace goto failed with return -EINVAL;
 
-                   sign    verify    sign/s verify/s
-rsa 2048 bits 0.000604s 0.000018s   1656.3  56813.7
-rsa 4096 bits 0.004027s 0.000062s    248.3  16052.5
+Regards
 
-                              sign    verify    sign/s verify/s
-256 bit ecdsa (nistp256)   0.0000s   0.0001s  28986.4  13516.3
-384 bit ecdsa (nistp384)   0.0002s   0.0008s   5541.0   1322.2
-521 bit ecdsa (nistp521)   0.0003s   0.0006s   3104.2   1756.2
-
-Best,
-ta
-
-[1] NIST SP 800-57 Pt. 1 Rev. 4, Recommendation for key management
+Marcel
