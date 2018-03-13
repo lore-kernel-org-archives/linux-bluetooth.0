@@ -1,49 +1,40 @@
-Return-Path: <elfring@users.sourceforge.net>
-Subject: Re: [3/5] Bluetooth: btmrvl: One check less in
- btmrvl_sdio_card_to_host()
-To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
- LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
-References: <8d050f76-aed1-7b6b-8778-a78aef34d4ea@users.sourceforge.net>
- <a988a80d-12c0-a414-ab81-ff4ab075855c@users.sourceforge.net>
- <609D1B28-2B75-4AB5-B707-FDB5D0500F1A@holtmann.org>
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <09cd7314-d053-3a6d-a9e1-d666a00ddb55@users.sourceforge.net>
-Date: Tue, 13 Mar 2018 08:46:33 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <609D1B28-2B75-4AB5-B707-FDB5D0500F1A@holtmann.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <27a6ae54-60ab-9d85-8529-bc8ecf9cc706@jp.fujitsu.com>
+References: <1520580354-2185-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1520580354-2185-2-git-send-email-jaganathx.kanakkassery@intel.com> <27a6ae54-60ab-9d85-8529-bc8ecf9cc706@jp.fujitsu.com>
+From: Jaganath K <jaganath.k.os@gmail.com>
+Date: Tue, 13 Mar 2018 11:32:50 +0530
+Message-ID: <CAJzH+bq7nka-OfO0m7_MRaT+XgZozWjJhP=9TabT9pqyVn4Rbw@mail.gmail.com>
+Subject: Re: [PATCH 2/4 v1] btmgmt: Add PHY configuration get/set commands
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->> @@ -797,12 +792,18 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
->> 		break;
->> 	}
->>
->> -exit:
->> -	if (ret) {
->> -		hdev->stat.err_rx++;
->> -		kfree_skb(skb);
->> -	}
->> +	return 0;
->> +
->> +free_skb:
->> +	kfree_skb(skb);
->> +e_io:
->> +	ret = -EIO;
->> +	goto increment_counter;
->>
->> +e_inval:
->> +	ret = -EINVAL;
->> +increment_counter:
->> +	hdev->stat.err_rx++;
->> 	return ret;
-> 
-> Nope!
-> 
-> This is not easier to read for me. This goto exit jumping and I hate that.
+Hi Eramoto,
 
-Can the software design direction become feasible to omit the repeated check
-for the variable “ret” (and further initialisations)?
+On Mon, Mar 12, 2018 at 1:44 PM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Hi Jaganath,
+>
+> On 03/09/2018 04:25 PM, Jaganath Kanakkassery wrote:
+>> ---
+>>  lib/mgmt.h     |  33 +++++++++++++++
+>>  tools/btmgmt.c | 129 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>
+>
+>
+> Could you rebase the patches which change btmgmt since it had massive
+> changes by commit 6523d168 ("tools/btmgmt: Port to use bt_shell"). And
+> now, commands need to call properly the exit function on non-interactive
+> mode.
+>
+>
 
-Regards,
-Markus
+Thanks for pointing it out. I have raised v2 after rebasing.
+
+Thanks,
+Jaganath
