@@ -1,51 +1,45 @@
-Return-Path: <thierry.escande@linaro.org>
-From: Thierry Escande <thierry.escande@linaro.org>
-To: Rob Herring <robh+dt@kernel.org>,
-	Andy Gross <andy.gross@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Brown <david.brown@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>
-Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/3] Bluetooth: hci_qca: Add serdev support
-Date: Tue, 13 Mar 2018 17:44:41 +0100
-Message-Id: <20180313164444.19881-1-thierry.escande@linaro.org>
+Return-Path: <linux-wireless-owner@vger.kernel.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset = "utf-8"
+Subject: Re: [v9,1/8] rsi: add rx control block to handle rx packets in USB
+From: Kalle Valo <kvalo@codeaurora.org>
+In-Reply-To: <1519741578-12640-2-git-send-email-amitkarwar@gmail.com>
+References: <1519741578-12640-2-git-send-email-amitkarwar@gmail.com>
+To: Amitkumar Karwar <amitkarwar@gmail.com>
+Cc: marcel@holtmann.org, linux-wireless@vger.kernel.org,
+        Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+        Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+        linux-bluetooth@vger.kernel.org,
+        Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Message-Id: <20180313164006.381A060390@smtp.codeaurora.org>
+Date: Tue, 13 Mar 2018 16:40:06 +0000 (UTC)
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Amitkumar Karwar <amitkarwar@gmail.com> wrote:
 
-This patchset enables the Qualcomm BT controller QCA6174 node in the
-device tree of the db820c board. This allows the bluetooth chipset to
-be probed and registered against the hci layer by using the serdev
-framework.
+> From: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+> 
+> Rx bluetooth endpoint shall be added in further patches. Rx control
+> block is introduced here to handle Rx packets properly. Separate
+> function is written to initialize the RX control blocks.
+> 
+> Signed-off-by: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+> Signed-off-by: Amitkumar Karwar <amit.karwar@redpinesignals.com>
 
-This patchset also contains the documentation for the compatible
-string "qcom,qca6174-bt" related to this chipset.
+8 patches applied to wireless-drivers-next.git, thanks.
 
-v2:
-- Fixed author email
-
-Thierry Escande (3):
-  arm64: dts: apq8096-db820c: enable bluetooth node
-  dt-bindings: net: bluetooth: Add qualcomm-bluetooth
-  Bluetooth: hci_qca: Add serdev support
-
- .../devicetree/bindings/net/qualcomm-bluetooth.txt |  34 +++++++
- arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  |  14 +++
- .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    |  17 ++++
- arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       |  32 +++++++
- arch/arm64/boot/dts/qcom/msm8996.dtsi              |  10 ++
- drivers/bluetooth/Kconfig                          |   2 +-
- drivers/bluetooth/hci_qca.c                        | 102 ++++++++++++++++++++-
- 7 files changed, 208 insertions(+), 3 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+1100f81bbcd1 rsi: add rx control block to handle rx packets in USB
+a4302bff28e2 rsi: add bluetooth rx endpoint
+4c10d56a76bb rsi: add header file rsi_91x
+2108df3c4b18 rsi: add coex support
+38aa4da50483 Bluetooth: btrsi: add new rsi bluetooth driver
+716b840c7641 rsi: handle BT traffic in driver
+898b25533931 rsi: add module parameter operating mode
+681805b1401b rsi: sdio changes to support BT
 
 -- 
-2.14.1
+https://patchwork.kernel.org/patch/10245547/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
