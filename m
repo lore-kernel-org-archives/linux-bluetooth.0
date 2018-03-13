@@ -1,53 +1,251 @@
-Return-Path: <arend.vanspriel@broadcom.com>
-Subject: Re: [2/3] mwifiex: support sysfs initiated device coredump
-To: Kalle Valo <kvalo@codeaurora.org>
-References: <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
- <20180312094115.2E1C1606DB@smtp.codeaurora.org>
- <5AA67616.2000602@broadcom.com> <87efkoazow.fsf@kamboji.qca.qualcomm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-wireless@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Message-ID: <5AA829A1.1090209@broadcom.com>
-Date: Tue, 13 Mar 2018 20:42:25 +0100
+Return-Path: <thierry.escande@linaro.org>
+From: Thierry Escande <thierry.escande@linaro.org>
+To: Rob Herring <robh+dt@kernel.org>,
+	Andy Gross <andy.gross@linaro.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	David Brown <david.brown@linaro.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	linux-bluetooth@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 3/3] Bluetooth: hci_qca: Add serdev support
+Date: Tue, 13 Mar 2018 19:38:07 +0100
+Message-Id: <20180313183807.6701-4-thierry.escande@linaro.org>
+In-Reply-To: <20180313183807.6701-1-thierry.escande@linaro.org>
+References: <20180313183807.6701-1-thierry.escande@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87efkoazow.fsf@kamboji.qca.qualcomm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset = "utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 3/13/2018 2:10 PM, Kalle Valo wrote:
-> Arend van Spriel <arend.vanspriel@broadcom.com> writes:
->
->> On 3/12/2018 10:41 AM, Kalle Valo wrote:
->>> Arend Van Spriel <arend.vanspriel@broadcom.com> wrote:
->>>
->>>> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
->>>> it is possible to initiate a device coredump from user-space. This
->>>> patch adds support for it adding the .coredump() driver callback.
->>>> As there is no longer a need to initiate it through debugfs remove
->>>> that code.
->>>>
->>>> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
->>>
->>> Based on the discussion I assume this is ok to take to w-d-next. If that's not
->>> the case, please let me know ASAP.
->>
->> It is up to the mwifiex maintainers to decide, I guess. The ABI
->> documentation need to be revised and change the callback to void
->> return type. I am not sure what the best approach is. 1) apply this
->> and fix return type later, or 2) fix return type and resubmit this.
->> What is your opinion?
->
-> I guess the callback change will go through Greg's tree? Then I suspect
-> it's easier that you submit the callback change to Greg first and wait
-> for it to trickle down to wireless-drivers-next (after the next merge
-> window) and then I can apply the driver patches. Otherwise there might
-> be a conflict between my and Greg's tree.
+Add support for Qualcomm serial slave devices. Probe the serial device,
+retrieve its maximum speed and register a new hci uart device.
 
-That was my assessment, but unfortunately Marcel already applied the 
-btmrvl patch before I could reply. So how do I move from here? Option 1) 
-revert brmrvl and fix callback return type, or 2) apply mwifiex patch 
-and fix callback return type later for both drivers.
+Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
+---
 
-Regards,
-Arend
+v3:
+- Remove redundant call to gpiod_set_value() after devm_gpiod_get()
+- Check returned values for clk_set_rate() and clk_prepare_enable()
+- Use clk_disable_unprepare()
+
+ drivers/bluetooth/Kconfig   |   2 +-
+ drivers/bluetooth/hci_qca.c | 109 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 108 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 07e55cd8f8c8..c2a6a7ebd14b 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -195,7 +195,7 @@ config BT_HCIUART_BCM
+ 
+ config BT_HCIUART_QCA
+ 	bool "Qualcomm Atheros protocol support"
+-	depends on BT_HCIUART
++	depends on BT_HCIUART_SERDEV
+ 	select BT_HCIUART_H4
+ 	select BT_QCA
+ 	help
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 05ec530b8a3a..aa0886d5324f 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -29,7 +29,11 @@
+  */
+ 
+ #include <linux/kernel.h>
++#include <linux/clk.h>
+ #include <linux/debugfs.h>
++#include <linux/gpio/consumer.h>
++#include <linux/of.h>
++#include <linux/serdev.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -50,6 +54,9 @@
+ #define IBS_TX_IDLE_TIMEOUT_MS		2000
+ #define BAUDRATE_SETTLE_TIMEOUT_MS	300
+ 
++/* divclk4 rate */
++#define DIVCLK4_RATE_32KHZ	32768
++
+ /* HCI_IBS transmit side sleep protocol states */
+ enum tx_ibs_states {
+ 	HCI_IBS_TX_ASLEEP,
+@@ -111,6 +118,12 @@ struct qca_data {
+ 	u64 votes_off;
+ };
+ 
++struct qca_serdev {
++	struct hci_uart	 serdev_hu;
++	struct gpio_desc *bt_en;
++	struct clk	 *divclk4;
++};
++
+ static void __serial_clock_on(struct tty_struct *tty)
+ {
+ 	/* TODO: Some chipset requires to enable UART clock on client
+@@ -386,6 +399,7 @@ static void hci_ibs_wake_retrans_timeout(struct timer_list *t)
+ /* Initialize protocol */
+ static int qca_open(struct hci_uart *hu)
+ {
++	struct qca_serdev *qcadev;
+ 	struct qca_data *qca;
+ 
+ 	BT_DBG("hu %p qca_open", hu);
+@@ -444,6 +458,13 @@ static int qca_open(struct hci_uart *hu)
+ 	timer_setup(&qca->tx_idle_timer, hci_ibs_tx_idle_timeout, 0);
+ 	qca->tx_idle_delay = IBS_TX_IDLE_TIMEOUT_MS;
+ 
++	if (hu->serdev) {
++		serdev_device_open(hu->serdev);
++
++		qcadev = serdev_device_get_drvdata(hu->serdev);
++		gpiod_set_value(qcadev->bt_en, 1);
++	}
++
+ 	BT_DBG("HCI_UART_QCA open, tx_idle_delay=%u, wake_retrans=%u",
+ 	       qca->tx_idle_delay, qca->wake_retrans);
+ 
+@@ -512,6 +533,7 @@ static int qca_flush(struct hci_uart *hu)
+ /* Close protocol */
+ static int qca_close(struct hci_uart *hu)
+ {
++	struct qca_serdev *qcadev;
+ 	struct qca_data *qca = hu->priv;
+ 
+ 	BT_DBG("hu %p qca close", hu);
+@@ -525,6 +547,13 @@ static int qca_close(struct hci_uart *hu)
+ 	destroy_workqueue(qca->workqueue);
+ 	qca->hu = NULL;
+ 
++	if (hu->serdev) {
++		serdev_device_close(hu->serdev);
++
++		qcadev = serdev_device_get_drvdata(hu->serdev);
++		gpiod_set_value(qcadev->bt_en, 0);
++	}
++
+ 	kfree_skb(qca->rx_skb);
+ 
+ 	hu->priv = NULL;
+@@ -885,6 +914,14 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	return 0;
+ }
+ 
++static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
++{
++	if (hu->serdev)
++		serdev_device_set_baudrate(hu->serdev, speed);
++	else
++		hci_uart_set_baudrate(hu, speed);
++}
++
+ static int qca_setup(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+@@ -905,7 +942,7 @@ static int qca_setup(struct hci_uart *hu)
+ 		speed = hu->proto->init_speed;
+ 
+ 	if (speed)
+-		hci_uart_set_baudrate(hu, speed);
++		host_set_baudrate(hu, speed);
+ 
+ 	/* Setup user speed if needed */
+ 	speed = 0;
+@@ -924,7 +961,7 @@ static int qca_setup(struct hci_uart *hu)
+ 				   ret);
+ 			return ret;
+ 		}
+-		hci_uart_set_baudrate(hu, speed);
++		host_set_baudrate(hu, speed);
+ 	}
+ 
+ 	/* Setup patch / NVM configurations */
+@@ -958,12 +995,80 @@ static struct hci_uart_proto qca_proto = {
+ 	.dequeue	= qca_dequeue,
+ };
+ 
++static int qca_serdev_probe(struct serdev_device *serdev)
++{
++	struct qca_serdev *qcadev;
++	int err;
++
++	qcadev = devm_kzalloc(&serdev->dev, sizeof(*qcadev), GFP_KERNEL);
++	if (!qcadev)
++		return -ENOMEM;
++
++	qcadev->serdev_hu.serdev = serdev;
++	serdev_device_set_drvdata(serdev, qcadev);
++
++	qcadev->bt_en = devm_gpiod_get(&serdev->dev, "bt-disable-n",
++				       GPIOD_OUT_LOW);
++	if (IS_ERR(qcadev->bt_en)) {
++		dev_err(&serdev->dev, "failed to acquire bt-disable-n gpio\n");
++		return PTR_ERR(qcadev->bt_en);
++	}
++
++	qcadev->divclk4 = devm_clk_get(&serdev->dev, NULL);
++	if (IS_ERR(qcadev->divclk4)) {
++		dev_err(&serdev->dev, "failed to acquire divclk4\n");
++		return PTR_ERR(qcadev->divclk4);
++	}
++
++	err = clk_set_rate(qcadev->divclk4, DIVCLK4_RATE_32KHZ);
++	if (err)
++		return err;
++
++	err = clk_prepare_enable(qcadev->divclk4);
++	if (err)
++		return err;
++
++	err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
++	if (err)
++		clk_disable_unprepare(qcadev->divclk4);
++
++	return err;
++}
++
++static void qca_serdev_remove(struct serdev_device *serdev)
++{
++	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
++
++	hci_uart_unregister_device(&qcadev->serdev_hu);
++
++	clk_disable_unprepare(qcadev->divclk4);
++}
++
++static const struct of_device_id qca_bluetooth_of_match[] = {
++	{ .compatible = "qcom,qca6174-bt" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
++
++static struct serdev_device_driver qca_serdev_driver = {
++	.probe = qca_serdev_probe,
++	.remove = qca_serdev_remove,
++	.driver = {
++		.name = "hci_uart_qca",
++		.of_match_table = qca_bluetooth_of_match,
++	},
++};
++
+ int __init qca_init(void)
+ {
++	serdev_device_driver_register(&qca_serdev_driver);
++
+ 	return hci_uart_register_proto(&qca_proto);
+ }
+ 
+ int __exit qca_deinit(void)
+ {
++	serdev_device_driver_unregister(&qca_serdev_driver);
++
+ 	return hci_uart_unregister_proto(&qca_proto);
+ }
+-- 
+2.14.1
