@@ -1,4 +1,4 @@
-Return-Path: <linux-wireless-owner@vger.kernel.org>
+Return-Path: <kvalo@codeaurora.org>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Subject: Re: [v9,1/8] rsi: add rx control block to handle rx packets in USB
@@ -7,13 +7,12 @@ In-Reply-To: <1519741578-12640-2-git-send-email-amitkarwar@gmail.com>
 References: <1519741578-12640-2-git-send-email-amitkarwar@gmail.com>
 To: Amitkumar Karwar <amitkarwar@gmail.com>
 Cc: marcel@holtmann.org, linux-wireless@vger.kernel.org,
-        Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-        Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
-        linux-bluetooth@vger.kernel.org,
-        Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
-Message-Id: <20180313164006.381A060390@smtp.codeaurora.org>
+ Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+ Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+ linux-bluetooth@vger.kernel.org,
+ Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+Message-Id: <20180313164006.4D60C6070A@smtp.codeaurora.org>
 Date: Tue, 13 Mar 2018 16:40:06 +0000 (UTC)
-Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Amitkumar Karwar <amitkarwar@gmail.com> wrote:
