@@ -1,39 +1,57 @@
-Return-Path: <andy.shevchenko@gmail.com>
+Return-Path: <arend.vanspriel@broadcom.com>
+Subject: Re: [2/3] mwifiex: support sysfs initiated device coredump
+To: Marcel Holtmann <marcel@holtmann.org>
+References: <1519210220-22437-3-git-send-email-arend.vanspriel@broadcom.com>
+ <20180312094115.2E1C1606DB@smtp.codeaurora.org>
+ <5AA67616.2000602@broadcom.com> <87efkoazow.fsf@kamboji.qca.qualcomm.com>
+ <5AA829A1.1090209@broadcom.com>
+ <24B25258-E680-490C-B7FF-D34CEBBA8566@holtmann.org>
+Cc: Kalle Valo <kvalo@codeaurora.org>,
+ linux-wireless <linux-wireless@vger.kernel.org>,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+Message-ID: <5AA832B7.2010007@broadcom.com>
+Date: Tue, 13 Mar 2018 21:21:11 +0100
 MIME-Version: 1.0
-In-Reply-To: <20180313183807.6701-4-thierry.escande@linaro.org>
-References: <20180313183807.6701-1-thierry.escande@linaro.org> <20180313183807.6701-4-thierry.escande@linaro.org>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Tue, 13 Mar 2018 22:57:57 +0200
-Message-ID: <CAHp75Vc0oka68fZv6tm6zrtZEH+5hRmD+PmmG5bc0EgPQHGuTQ@mail.gmail.com>
-Subject: Re: [PATCH v3 3/3] Bluetooth: hci_qca: Add serdev support
-To: Thierry Escande <thierry.escande@linaro.org>
-Cc: Rob Herring <robh+dt@kernel.org>, Andy Gross <andy.gross@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	David Brown <david.brown@linaro.org>, Mark Rutland <mark.rutland@arm.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Bjorn Andersson <bjorn.andersson@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, devicetree <devicetree@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <24B25258-E680-490C-B7FF-D34CEBBA8566@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 13, 2018 at 8:38 PM, Thierry Escande
-<thierry.escande@linaro.org> wrote:
-> Add support for Qualcomm serial slave devices. Probe the serial device,
-> retrieve its maximum speed and register a new hci uart device.
+On 3/13/2018 9:19 PM, Marcel Holtmann wrote:
+> Hi Arend,
+>
+>>>>>> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
+>>>>>> it is possible to initiate a device coredump from user-space. This
+>>>>>> patch adds support for it adding the .coredump() driver callback.
+>>>>>> As there is no longer a need to initiate it through debugfs remove
+>>>>>> that code.
+>>>>>>
+>>>>>> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+>>>>>
+>>>>> Based on the discussion I assume this is ok to take to w-d-next. If that's not
+>>>>> the case, please let me know ASAP.
+>>>>
+>>>> It is up to the mwifiex maintainers to decide, I guess. The ABI
+>>>> documentation need to be revised and change the callback to void
+>>>> return type. I am not sure what the best approach is. 1) apply this
+>>>> and fix return type later, or 2) fix return type and resubmit this.
+>>>> What is your opinion?
+>>>
+>>> I guess the callback change will go through Greg's tree? Then I suspect
+>>> it's easier that you submit the callback change to Greg first and wait
+>>> for it to trickle down to wireless-drivers-next (after the next merge
+>>> window) and then I can apply the driver patches. Otherwise there might
+>>> be a conflict between my and Greg's tree.
+>>
+>> That was my assessment, but unfortunately Marcel already applied the btmrvl patch before I could reply. So how do I move from here? Option 1) revert brmrvl and fix callback return type, or 2) apply mwifiex patch and fix callback return type later for both drivers.
+>
+> I can take the patch back out of bluetooth-next if needed. It is your call.
 
->  config BT_HCIUART_QCA
->         bool "Qualcomm Atheros protocol support"
-> -       depends on BT_HCIUART
-> +       depends on BT_HCIUART_SERDEV
+Thanks, Marcel
 
-Consider to address Loic's comments.
+Let's go for that. Please revert/remove the patch.
 
-> +#include <linux/of.h>
-
-This is still here. Why?
-
--- 
-With Best Regards,
-Andy Shevchenko
+Regards,
+Arend
