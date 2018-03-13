@@ -1,55 +1,68 @@
-Return-Path: <thierry.escande@linaro.org>
-From: Thierry Escande <thierry.escande@linaro.org>
-To: Rob Herring <robh+dt@kernel.org>,
-	Andy Gross <andy.gross@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Brown <david.brown@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 0/3] Bluetooth: hci_qca: Add serdev support
-Date: Tue, 13 Mar 2018 19:38:04 +0100
-Message-Id: <20180313183807.6701-1-thierry.escande@linaro.org>
+Return-Path: <loic.poulain@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset = "utf-8"
+In-Reply-To: <20180313160326.18180-4-thierry.escande@linaro.org>
+References: <20180313160326.18180-1-thierry.escande@linaro.org> <20180313160326.18180-4-thierry.escande@linaro.org>
+From: Loic Poulain <loic.poulain@linaro.org>
+Date: Tue, 13 Mar 2018 19:18:57 +0100
+Message-ID: <CAMZdPi-hoqhX_S-nFeE6ABUOZAp6oPtZqpLbpXoe5jDqmiFozA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: hci_qca: Add serdev support
+To: Thierry Escande <thierry.escande@linaro.org>
+Cc: Rob Herring <robh+dt@kernel.org>, Andy Gross <andy.gross@linaro.org>,
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	David Brown <david.brown@linaro.org>, Mark Rutland <mark.rutland@arm.com>,
+	Bjorn Andersson <bjorn.andersson@linaro.org>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, linux-arm-msm@vger.kernel.org,
+	devicetree <devicetree@vger.kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 13 March 2018 at 17:03, Thierry Escande <thierry.escande@linaro.org> wrote:
+> From: Thierry Escande <thierry.escande@collabora.com>
+>
+> Add support for Qualcomm serial slave devices. Probe the serial device,
+> retrieve its maximum speed and register a new hci uart device.
+>
+> Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
+> ---
+>  drivers/bluetooth/Kconfig   |   2 +-
+>  drivers/bluetooth/hci_qca.c | 102 +++++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 101 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> index 07e55cd8f8c8..c2a6a7ebd14b 100644
+> --- a/drivers/bluetooth/Kconfig
+> +++ b/drivers/bluetooth/Kconfig
+> @@ -195,7 +195,7 @@ config BT_HCIUART_BCM
+>
+>  config BT_HCIUART_QCA
+>         bool "Qualcomm Atheros protocol support"
+> -       depends on BT_HCIUART
+> +       depends on BT_HCIUART_SERDEV
 
-This patchset enables the Qualcomm BT controller QCA6174 node in the
-device tree of the db820c board. This allows the bluetooth chipset to
-be probed and registered against the hci layer by using the serdev
-framework.
+Driver depends on both BT_HCIUART and BT_HCIUART_SERDEV.
 
-This patchset also contains the documentation for the compatible
-string "qcom,qca6174-bt" related to this chipset.
+> @@ -386,6 +399,7 @@ static void hci_ibs_wake_retrans_timeout(struct timer_list *t)
+>  /* Initialize protocol */
+>  static int qca_open(struct hci_uart *hu)
+>  {
+> +       struct qca_serdev *qcadev;
+>         struct qca_data *qca;
+>
+>         BT_DBG("hu %p qca_open", hu);
+> @@ -444,6 +458,13 @@ static int qca_open(struct hci_uart *hu)
+>         timer_setup(&qca->tx_idle_timer, hci_ibs_tx_idle_timeout, 0);
+>         qca->tx_idle_delay = IBS_TX_IDLE_TIMEOUT_MS;
+>
+> +       if (hu->serdev) {
+> +               serdev_device_open(hu->serdev);
+> +
+> +               qcadev = serdev_device_get_drvdata(hu->serdev);
+> +               gpiod_set_value(qcadev->bt_en, 1);
 
-v3:
-- Address comments for patch #3 (details in patch)
+I suggest to replace gpiod_set_value calls with the _cansleep version.
+You always set gpio value from sleepable context and this should avoid
+any further issue with different gpio controller.
 
-v2:
-- Fix author email
-
-Thierry Escande (3):
-  arm64: dts: apq8096-db820c: enable bluetooth node
-  dt-bindings: net: bluetooth: Add qualcomm-bluetooth
-  Bluetooth: hci_qca: Add serdev support
-
- .../devicetree/bindings/net/qualcomm-bluetooth.txt |  34 +++++++
- arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  |  14 +++
- .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    |  17 ++++
- arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       |  32 ++++++
- arch/arm64/boot/dts/qcom/msm8996.dtsi              |  10 ++
- drivers/bluetooth/Kconfig                          |   2 +-
- drivers/bluetooth/hci_qca.c                        | 109 ++++++++++++++++++++-
- 7 files changed, 215 insertions(+), 3 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-
--- 
-2.14.1
+Regards,
+Loic
