@@ -1,42 +1,41 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Subject: [RFC 0/1] Bluetooth: hci_bcm: Do not tie GPIO pin order to a specific ACPI HID
-Date: Wed, 14 Mar 2018 14:54:53 +0100
-Message-Id: <20180314135454.8387-1-hdegoede@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 3/3] shared/gatt-client: Fix attempting to discovery with handle 0
+Date: Wed, 14 Mar 2018 15:17:26 +0200
+Message-Id: <20180314131726.24945-3-luiz.dentz@gmail.com>
+In-Reply-To: <20180314131726.24945-1-luiz.dentz@gmail.com>
+References: <20180314131726.24945-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-While working on a patch to add the BCM2E84 ACPI HID to the hci_bcm code,
-to fix BT the Lenovo Yoga2: https://bugzilla.redhat.com/show_bug.cgi?id=1554835
+If a service was removed an no other service was added it may happen
+that pending_svc has not empty but first_svc and last_svc has not been
+set causing the following request:
 
-I realized that I was basing wether to use the acpi_bcm_int_first_gpios or
-the acpi_bcm_int_last_gpios mapping on the order of resources in the ACPI
-device's resource table, which is something which we might as well do in
-the code directly.
+< ACL Data TX: Handle 76 flags 0x00 dlen 11
+      ATT: Read By Type Request (0x08) len 6
+        Handle range: 0x0000-0x0000
+        Attribute type: Include (0x2802)
+---
+ src/shared/gatt-client.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I've not done much testing with this change yet, because I hit a snag.
-While working on this the reporter of the Yoga2 problem got back to me that
-things work, but that his bluetooth keyboard cannot wakeup the HCI from
-runtime-suspend. I've yet to debug this but I think this might be caused
-by the device-wakeup and shutdown GPIOs being swapped. Which would mean
-we have a 3th possible order...
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index c369ccb40..e1d489d32 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -988,7 +988,7 @@ static void discover_secondary_cb(bool success, uint8_t att_ecode,
+ 	}
+ 
+ next:
+-	if (queue_isempty(op->pending_svcs))
++	if (queue_isempty(op->pending_svcs) || !op->svc_first)
+ 		goto done;
+ 
+ 	client->discovery_req = bt_gatt_discover_included_services(client->att,
+-- 
+2.14.3
 
-Assuming we have the 3th possible order, it might be best to forget about
-this patch and just keep defining hardcoded orders for each ACPI HID
-until we hit a case where we actually need 2 different orders for a single
-HID and then maybe dust of this patch.
-
-But I wrote this patch now so I wanted to share it and see what others
-think because I personally still like the idea of figuring things out
-automatically.
-
-Regards,
-
-Hans
