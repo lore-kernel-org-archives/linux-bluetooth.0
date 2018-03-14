@@ -1,46 +1,86 @@
-Return-Path: <bjorn.andersson@linaro.org>
-Date: Wed, 14 Mar 2018 11:30:43 -0700
-From: Bjorn Andersson <bjorn.andersson@linaro.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Thierry Escande <thierry.escande@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Andy Gross <andy.gross@linaro.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Brown <david.brown@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
-	linux-arm-msm@vger.kernel.org,
-	devicetree <devicetree@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
 Subject: Re: [PATCH v4 2/3] dt-bindings: net: bluetooth: Add
  qualcomm-bluetooth
-Message-ID: <20180314183043.GX18510@minitux>
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180314155514.3374-3-thierry.escande@linaro.org>
+Date: Wed, 14 Mar 2018 17:13:47 +0100
+Cc: Rob Herring <robh+dt@kernel.org>,
+        Andy Gross <andy.gross@linaro.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        David Brown <david.brown@linaro.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        Linux Bluetooth mailing list
+        <linux-bluetooth@vger.kernel.org>, linux-arm-msm@vger.kernel.org,
+        devicetree <devicetree@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Message-Id: <FF2E3FDE-76C5-477A-A904-32AC064297DA@holtmann.org>
 References: <20180314155514.3374-1-thierry.escande@linaro.org>
  <20180314155514.3374-3-thierry.escande@linaro.org>
- <FF2E3FDE-76C5-477A-A904-32AC064297DA@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <FF2E3FDE-76C5-477A-A904-32AC064297DA@holtmann.org>
+To: Thierry Escande <thierry.escande@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed 14 Mar 09:13 PDT 2018, Marcel Holtmann wrote:
-> > +		bt-disable-n-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
+Hi Thierry,
+
+> Add binding document for serial bluetooth chips using Qualcomm protocol.
 > 
-> can we use a common name here. I think that Nokia and Broadcom drivers
-> define one. And if this is the enable/shutdown GPIO, we should name it
-> consistently across all manufacturers. It essentially does the same on
-> Bluetooth UART chips no matter what chip is behind them.
+> Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
+> ---
 > 
+> v4:
+> - Move bt-disable-n-gpios to required properties section
+> - Add clocks and pinctrl-0 as required properties
+> 
+> v3: no change
+> v2: no change
+> 
+> .../devicetree/bindings/net/qualcomm-bluetooth.txt | 34 ++++++++++++++++++++++
+> 1 file changed, 34 insertions(+)
+> create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> new file mode 100644
+> index 000000000000..cdb14b96c229
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> @@ -0,0 +1,34 @@
+> +Qualcomm Bluetooth Chips
+> +---------------------
+> +
+> +This documents the binding structure and common properties for serial
+> +attached Qualcomm devices.
+> +
+> +Serial attached Qualcomm devices shall be a child node of the host UART
+> +device the slave device is attached to.
+> +
+> +Required properties:
+> + - compatible: should contain one of the following:
+> +   * "qcom,qca6174-bt"
+> + - bt-disable-n-gpios: gpio specifier, used to enable chip during probe
+> + - pinctrl-0: pin phandle for bt_en gpio
+> + - clocks: clock phandle for SUSCLK_32KHZ
+> +
+> +Example:
+> +
+> +serial@7570000 {
+> +	pinctrl-names = "default", "sleep";
+> +	pinctrl-0 = <&blsp1_uart1_default>;
+> +	pinctrl-1 = <&blsp1_uart1_sleep>;
+> +
+> +	bluetooth {
+> +		compatible = "qcom,qca6174-bt";
+> +
+> +		bt-disable-n-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
 
-Broadcomm has a device-wakup-gpios and Nokia has bluetooth-wakup-gpios.
-It might be that these behave in the same way, but from the description
-they only trigger the wakeup.
+can we use a common name here. I think that Nokia and Broadcom drivers define one. And if this is the enable/shutdown GPIO, we should name it consistently across all manufacturers. It essentially does the same on Bluetooth UART chips no matter what chip is behind them.
 
-The reason for the proposed naming here is that the pin is named
-"BT_DISABLE_N" in the datasheet.
+Regards
 
-Regards,
-Bjorn
+Marcel
