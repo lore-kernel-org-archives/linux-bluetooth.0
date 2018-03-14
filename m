@@ -1,12 +1,12 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1520920445-30353-4-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1520920445-30353-2-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1520920445-30353-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1520920445-30353-4-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1520920445-30353-2-git-send-email-jaganathx.kanakkassery@intel.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 14 Mar 2018 09:45:57 +0200
-Message-ID: <CABBYNZKgMgVB3g=Xxjj4LM-dWstKvkaDBC_16Rmb69OW3DtiAA@mail.gmail.com>
-Subject: Re: [PATCH v2 4/4] btmgmt: Add support for setting PHY in add-adv
+Date: Wed, 14 Mar 2018 09:42:40 +0200
+Message-ID: <CABBYNZJi7pRxtGa=oLaq9vO3M6k5wFSMcR2d0sgov3yjfByY5Q@mail.gmail.com>
+Subject: Re: [PATCH v2 2/4] btmgmt: Add PHY configuration get/set commands
 To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
@@ -19,94 +19,237 @@ Hi Jaganath,
 On Tue, Mar 13, 2018 at 7:54 AM, Jaganath Kanakkassery
 <jaganath.k.os@gmail.com> wrote:
 > ---
->  lib/mgmt.h     |  3 +++
->  tools/btmgmt.c | 17 ++++++++++++++++-
->  2 files changed, 19 insertions(+), 1 deletion(-)
+>  lib/mgmt.h     |  33 +++++++++++++++
+>  tools/btmgmt.c | 132 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 165 insertions(+)
+>  mode change 100644 => 100755 tools/btmgmt.c
 >
 > diff --git a/lib/mgmt.h b/lib/mgmt.h
-> index 7a25e17..ec6a380 100644
+> index 798a05e..7a25e17 100644
 > --- a/lib/mgmt.h
 > +++ b/lib/mgmt.h
-> @@ -506,6 +506,9 @@ struct mgmt_rp_add_advertising {
->  #define MGMT_ADV_FLAG_TX_POWER         (1 << 4)
->  #define MGMT_ADV_FLAG_APPEARANCE       (1 << 5)
->  #define MGMT_ADV_FLAG_LOCAL_NAME       (1 << 6)
-> +#define MGMT_ADV_FLAG_SEC_1M           (1 << 7)
-> +#define MGMT_ADV_FLAG_SEC_2M           (1 << 8)
-> +#define MGMT_ADV_FLAG_SEC_CODED                (1 << 9)
+> @@ -101,6 +101,7 @@ struct mgmt_rp_read_index_list {
+>  #define MGMT_SETTING_PRIVACY           0x00002000
+>  #define MGMT_SETTING_CONFIGURATION     0x00004000
+>  #define MGMT_SETTING_STATIC_ADDRESS    0x00008000
+> +#define MGMT_SETTING_PHY_CONFIGURATION 0x00010000
 >
->  #define MGMT_OP_REMOVE_ADVERTISING     0x003F
->  struct mgmt_cp_remove_advertising {
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> index 6ada176..e44ecac 100755
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -3629,6 +3629,9 @@ static const char *adv_flags_str[] = {
->                                 "tx-power",
->                                 "scan-rsp-appearance",
->                                 "scan-rsp-local-name",
-> +                               "Secondary-channel-1M",
-> +                               "Secondary-channel-2M",
-> +                               "Secondary-channel-CODED",
+>  #define MGMT_OP_READ_INFO              0x0004
+>  struct mgmt_rp_read_info {
+> @@ -546,6 +547,30 @@ struct mgmt_cp_set_appearance {
+>         uint16_t appearance;
+>  } __packed;
+>
+> +#define MGMT_OP_GET_PHY_CONFIGURATION  0x0044
+> +struct mgmt_rp_get_phy_confguration {
+> +       uint16_t        supported_phys;
+> +       uint16_t        selected_phys;
+> +} __packed;
+> +
+> +#define MGMT_PHY_LE_1M_TX              0x0001
+> +#define MGMT_PHY_LE_1M_RX              0x0002
+> +#define MGMT_PHY_LE_2M_TX              0x0004
+> +#define MGMT_PHY_LE_2M_RX              0x0008
+> +#define MGMT_PHY_LE_CODED_TX           0x0010
+> +#define MGMT_PHY_LE_CODED_RX           0x0020
+> +
+> +#define MGMT_PHY_LE_TX_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_2M_TX | \
+> +                            MGMT_PHY_LE_CODED_TX)
+> +#define MGMT_PHY_LE_RX_MASK (MGMT_PHY_LE_1M_RX | MGMT_PHY_LE_2M_RX | \
+> +                            MGMT_PHY_LE_CODED_RX)
+> +
+> +#define MGMT_OP_SET_PHY_CONFIGURATION  0x0045
+> +struct mgmt_cp_set_phy_confguration {
+> +       uint16_t        default_phys;
+> +} __packed;
+> +
+> +
+>  #define MGMT_EV_CMD_COMPLETE           0x0001
+>  struct mgmt_ev_cmd_complete {
+>         uint16_t opcode;
+> @@ -764,6 +789,11 @@ struct mgmt_ev_ext_info_changed {
+>         uint8_t  eir[0];
+>  } __packed;
+>
+> +#define MGMT_EV_PHY_CONFIGURATION_CHANGED      0x0026
+> +struct mgmt_ev_phy_configuration_changed {
+> +       uint16_t        selected_phys;
+> +} __packed;
+> +
+>  static const char *mgmt_op[] = {
+>         "<0x0000>",
+>         "Read Version",
+> @@ -833,6 +863,8 @@ static const char *mgmt_op[] = {
+>         "Start Limited Discovery",
+>         "Read Extended Controller Information",
+>         "Set Appearance",
+> +       "Get PHY Configuration",
+> +       "Set PHY Configuration",
 >  };
 >
->  static const char *adv_flags2str(uint32_t flags)
-> @@ -3846,6 +3849,7 @@ static void add_adv_usage(void)
->                 "\t -s, --scan-rsp <data>     Scan Response Data bytes\n"
->                 "\t -t, --timeout <timeout>   Timeout in seconds\n"
->                 "\t -D, --duration <duration> Duration in seconds\n"
-> +               "\t -P, --phy <phy>           Phy type, Specify 1M/2M/CODED\n"
-
-This is not longer needed since btmgmt uses bt_shell it can run in
-non-iterative mode thus the command handler itself can be used, you
-just have to remember to use bt_shell_noninteractive_quit when done
-with the command.
-
->                 "\t -c, --connectable         \"connectable\" flag\n"
->                 "\t -g, --general-discov      \"general-discoverable\" flag\n"
->                 "\t -l, --limited-discov      \"limited-discoverable\" flag\n"
-> @@ -3864,6 +3868,7 @@ static struct option add_adv_options[] = {
->         { "scan-rsp",           1, 0, 's' },
->         { "timeout",            1, 0, 't' },
->         { "duration",           1, 0, 'D' },
-> +       { "phy",                1, 0, 'P' },
->         { "connectable",        0, 0, 'c' },
->         { "general-discov",     0, 0, 'g' },
->         { "limited-discov",     0, 0, 'l' },
-> @@ -3932,7 +3937,7 @@ static void cmd_add_adv(int argc, char **argv)
->         uint32_t flags = 0;
->         uint16_t index;
+>  static const char *mgmt_ev[] = {
+> @@ -874,6 +906,7 @@ static const char *mgmt_ev[] = {
+>         "Advertising Added",
+>         "Advertising Removed",
+>         "Extended Controller Information Changed",
+> +       "PHY Configuration Changed",
+>  };
 >
-> -       while ((opt = getopt_long(argc, argv, "+u:d:s:t:D:cglmphna",
-> +       while ((opt = getopt_long(argc, argv, "+u:d:s:t:D:P:cglmphna",
->                                                 add_adv_options, NULL)) != -1) {
->                 switch (opt) {
->                 case 'u':
-> @@ -4017,6 +4022,16 @@ static void cmd_add_adv(int argc, char **argv)
->                 case 'a':
->                         flags |= MGMT_ADV_FLAG_APPEARANCE;
->                         break;
-> +               case 'P':
-> +                       if (strcasecmp(optarg, "1M") == 0)
-> +                               flags |= MGMT_ADV_FLAG_SEC_1M;
-> +                       else if (strcasecmp(optarg, "2M") == 0)
-> +                               flags |= MGMT_ADV_FLAG_SEC_2M;
-> +                       else if (strcasecmp(optarg, "CODED") == 0)
-> +                               flags |= MGMT_ADV_FLAG_SEC_CODED;
-> +                       else
-> +                               goto done;
-> +                       break;
->                 case 'h':
->                         success = true;
->                         /* fall through */
-> --
-> 2.7.4
+>  static const char *mgmt_status[] = {
+> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+> old mode 100644
+> new mode 100755
+> index 122c46d..6ada176
+> --- a/tools/btmgmt.c
+> +++ b/tools/btmgmt.c
+> @@ -4165,6 +4165,134 @@ static void cmd_appearance(int argc, char **argv)
+>         }
+>  }
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> +static const char *phys_str[] = {
+> +       "1MTX",
+> +       "1MRX",
+> +       "2MTX",
+> +       "2MRX",
+> +       "CODEDTX",
+> +       "CODEDRX",
+> +};
+> +
+> +static const char *phys2str(uint16_t phys)
+> +{
+> +       static char str[256];
+> +       unsigned i;
+> +       int off;
+> +
+> +       off = 0;
+> +       str[0] = '\0';
+> +
+> +       for (i = 0; i < NELEM(phys_str); i++) {
+> +               if ((phys & (1 << i)) != 0)
+> +                       off += snprintf(str + off, sizeof(str) - off, "%s ",
+> +                                                       phys_str[i]);
+> +       }
+> +
+> +       return str;
+> +}
+> +
+> +static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
+> +                                                       void *user_data)
+> +{
+> +       const struct mgmt_rp_get_phy_confguration *rp = param;
+> +       uint16_t supported_flags, selected_phys;
+> +
+> +       if (status != 0) {
+> +               error("Get PHY Configuration failed with status 0x%02x (%s)",
+> +                                               status, mgmt_errstr(status));
+> +               goto done;
+> +       }
+> +
+> +       if (len < sizeof(*rp)) {
+> +               error("Too small get-phy reply (%u bytes)", len);
+> +               goto done;
+> +       }
+> +
+> +       supported_flags = get_le16(&rp->supported_phys);
+> +       selected_phys = get_le16(&rp->selected_phys);
+> +
+> +       print("Supported phys: %s", phys2str(supported_flags));
+> +       print("Selected phys: %s", phys2str(selected_phys));
+> +
+> +done:
+> +       bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_get_phy(int argc, char **argv)
+> +{
+> +       uint16_t index;
+> +
+> +       index = mgmt_index;
+> +       if (index == MGMT_INDEX_NONE)
+> +               index = 0;
+> +
+> +       if (mgmt_send(mgmt, MGMT_OP_GET_PHY_CONFIGURATION, index, 0, NULL,
+> +                                       get_phy_rsp, NULL, NULL) == 0) {
+> +               error("Unable to send Get PHY cmd");
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +}
+> +
+> +static void set_phy_rsp(uint8_t status, uint16_t len, const void *param,
+> +                                                       void *user_data)
+> +{
+> +       if (status != 0)
+> +               error("Could not set PHY Configuration with status 0x%02x (%s)",
+> +                                               status, mgmt_errstr(status));
+> +       else
+> +               print("PHY Configuration successfully set");
+> +
+> +       bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_set_phy(int argc, char **argv)
+> +{
+> +       struct mgmt_cp_set_phy_confguration cp;
+> +       int i;
+> +       uint16_t phys = 0;
+> +       uint16_t index;
+> +
+> +       if (argc < 2) {
+> +               print("Specify one or more of \"1MTX\" \"1MRX\" \"2MTX\" \
+> +                       \"2MRX\" \"CODEDTX\" \"CODEDRX\"");
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       for (i = 1; i < argc; i++) {
+> +               if (strcasecmp(argv[i], "1MTX") == 0)
+> +                       phys |= MGMT_PHY_LE_1M_TX;
+> +
+> +               if (strcasecmp(argv[i], "1MRX") == 0)
+> +                       phys |= MGMT_PHY_LE_1M_RX;
+> +
+> +               if (strcasecmp(argv[i], "2MTX") == 0)
+> +                       phys |= MGMT_PHY_LE_2M_TX;
+> +
+> +               if (strcasecmp(argv[i], "2MRX") == 0)
+> +                       phys |= MGMT_PHY_LE_2M_RX;
+> +
+> +               if (strcasecmp(argv[i], "CODEDTX") == 0)
+> +                       phys |= MGMT_PHY_LE_CODED_TX;
+> +
+> +               if (strcasecmp(argv[i], "CODEDRX") == 0)
+> +                       phys |= MGMT_PHY_LE_CODED_RX;
+> +       }
+> +
+> +       cp.default_phys = cpu_to_le16(phys);
+> +
+> +       index = mgmt_index;
+> +       if (index == MGMT_INDEX_NONE)
+> +               index = 0;
+> +
+> +       if (mgmt_send(mgmt, MGMT_OP_SET_PHY_CONFIGURATION, index, sizeof(cp),
+> +                                       &cp, set_phy_rsp, NULL, NULL) == 0) {
+> +               error("Unable to send %s cmd",
+> +                               mgmt_opstr(MGMT_OP_GET_PHY_CONFIGURATION));
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +}
+> +
+>  static void register_mgmt_callbacks(struct mgmt *mgmt, uint16_t index)
+>  {
+>         mgmt_register(mgmt, MGMT_EV_CONTROLLER_ERROR, index, controller_error,
+> @@ -4360,6 +4488,10 @@ static const struct bt_shell_menu main_menu = {
+>                 cmd_clr_adv,            "Clear advertising instances"   },
+>         { "appearance",         "<appearance>",
+>                 cmd_appearance,         "Set appearance"                },
+> +       { "get-phy",            NULL,
+> +               cmd_get_phy,            "Get PHY Configuration"         },
+> +        { "set-phy",           "<phys>",
+> +               cmd_set_phy,            "Set PHY Configuration"         },
+>         {} },
+>  };
 
+Instead of having 2 commands we could have just phy and in case there
+is no parameter given it would print the current value.
 
 
 -- 
