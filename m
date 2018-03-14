@@ -1,67 +1,79 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH 4.16 REGRESSION fix 1/2] Revert "Bluetooth: hci_bcm:
- Streamline runtime PM code"
-To: Lukas Wunner <lukas@wunner.de>
+Return-Path: <foo00@h08.hostsharing.net>
+Date: Wed, 14 Mar 2018 23:22:44 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Hans de Goede <hdegoede@redhat.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-acpi@vger.kernel.org, "Robert R. Howell" <rhowell@uwyo.edu>
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	=?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-acpi@vger.kernel.org
+Subject: Re: [PATCH 4.16 REGRESSION fix 2/2] Bluetooth: hci_bcm: Set
+ pulsed_host_wake flag in sleep parameters
+Message-ID: <20180314222244.GC28738@wunner.de>
 References: <20180314220603.7559-1-hdegoede@redhat.com>
- <20180314220603.7559-2-hdegoede@redhat.com>
- <20180314221603.GB28738@wunner.de>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <807b74cb-2222-2d47-12c2-0415a9027102@redhat.com>
-Date: Wed, 14 Mar 2018 23:23:12 +0100
+ <20180314220603.7559-3-hdegoede@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180314221603.GB28738@wunner.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180314220603.7559-3-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On 14-03-18 23:16, Lukas Wunner wrote:
-> On Wed, Mar 14, 2018 at 11:06:02PM +0100, Hans de Goede wrote:
->> This reverts commit 43fff7683468 ("Bluetooth: hci_bcm: Streamline runtime
->> PM code"). The commit msg for this commit states "No functional change
->> intended.", but replacing:
->>
->>   pm_runtime_get();
->>   pm_runtime_mark_last_busy();
->>   pm_runtime_put_autosuspend();
->>
->> with:
->>
->>   pm_request_resume();
->>
->> Does result in a functional change, pm_request_resume() only calls
->> pm_runtime_mark_last_busy() if the device was suspended before the call.
+On Wed, Mar 14, 2018 at 11:06:03PM +0100, Hans de Goede wrote:
+> The IRQ output of the bcm bt-device is really a level IRQ signal, which
+> signals a logical high as long as the device's buffer contains data. Since
+> the draining in the buffer is done in the tty driver, we cannot (easily)
+> wait in a threaded interrupt handler for the draining, after which the
+> IRQ should go low again.
 > 
-> Yes, Robert Howell (cc) reported this a few days ago:
-> https://bugzilla.kernel.org/show_bug.cgi?id=198953
+> So instead we treat the IRQ as an edge interrupt. This opens the window
+> for a theoretical race where we wakeup, read some data and then autosuspend
+> *before* the IRQ has gone (logical) low, followed by the device just at
+> that moment receiving more data, causing the IRQ to stay high and we never
+> see an edge.
 > 
-> I've worked with him to develop a fix which is better IMHO than a revert,
-> namely he's replacing the pm_request_resume() in bcm_recv() with
-> pm_runtime_mark_last_busy(), and the pm_request_resume() in the interrupt
-> handler can stay.  He says that fixes the issue for him.
+> Since we call pm_runtime_mark_last_busy() on every received byte, there
+> should be plenty time for the IRQ to go (logical) low before we ever
+> suspend, so this should never happen, but after commit 43fff7683468
+> ("Bluetooth: hci_bcm: Streamline runtime PM code"), which has been reverted
+> since, this was actually happening causing the device to get stuck in
+> runtime suspend.
+> 
+> The bcm bt-device actually has a workaround for this, if we set the
+> pulsed_host_wake flag in the sleep parameters, then the device monitors
+> if the host is draining the buffer and if not then after a timeout the
+> device will pulse the IRQ line, causing us to see an edge, fixing the
+> stuck in suspend condition.
+> 
+> This commit sets the pulsed_host_wake flag to fix the (mostly theoretical)
+> race caused by us treating the IRQ as an edge IRQ.
+> 
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 
-It makes the race window a lot smaller, but it still leaves a race:
+Reviewed-by: Lukas Wunner <lukas@wunner.de>
 
-1) some data comes in, gets full read from the device
-2) 4.9999 seconds elapse since last byte has been read
-3) new data comes in, triggers IRQ, IRQ does nothing because runtime suspend
-has not yet kicked in
-4) runtime suspend kicks in, disabling the uart before the first new byte is received
-5) stuck again
+Good work, thanks.
 
-> I hope he'll submit the patch shortly.
-
-We're quite far into the cycle already and this is a serious regression,
-also nothing of great value is lost by the revert, the original commit
-was a minor cleanup which turns out to have bad side-effects, a simple
-revert really is the best solution here, esp. in this point of the cycle.
-
-Regards,
-
-Hans
+> ---
+>  drivers/bluetooth/hci_bcm.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index b089012a49f9..04b9a6c75c75 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -307,7 +307,7 @@ static const struct bcm_set_sleep_mode default_sleep_params = {
+>  	.usb_auto_sleep = 0,
+>  	.usb_resume_timeout = 0,
+>  	.break_to_host = 0,
+> -	.pulsed_host_wake = 0,
+> +	.pulsed_host_wake = 1,
+>  };
+>  
+>  static int bcm_setup_sleep(struct hci_uart *hu)
+> -- 
+> 2.14.3
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-acpi" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
