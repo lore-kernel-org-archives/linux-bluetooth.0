@@ -1,67 +1,178 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH 4.16 REGRESSION fix 1/2] Revert "Bluetooth: hci_bcm:
- Streamline runtime PM code"
+Subject: Re: [RFC] Bluetooth: hci_bcm: Do not tie GPIO pin order to a specific
+ ACPI HID
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180314220603.7559-2-hdegoede@redhat.com>
-Date: Thu, 15 Mar 2018 19:40:19 +0100
+In-Reply-To: <20180314135454.8387-2-hdegoede@redhat.com>
+Date: Thu, 15 Mar 2018 19:36:23 +0100
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-acpi@vger.kernel.org
-Message-Id: <7B7C3F12-A785-4E7F-8267-C6072EEEB433@holtmann.org>
-References: <20180314220603.7559-1-hdegoede@redhat.com>
- <20180314220603.7559-2-hdegoede@redhat.com>
+        linux-bluetooth@vger.kernel.org, linux-acpi@vger.kernel.org
+Message-Id: <7B14886D-E218-468B-A4E1-0D137BA4B461@holtmann.org>
+References: <20180314135454.8387-1-hdegoede@redhat.com>
+ <20180314135454.8387-2-hdegoede@redhat.com>
 To: Hans de Goede <hdegoede@redhat.com>
-Sender: linux-serial-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Hans,
 
-> This reverts commit 43fff7683468 ("Bluetooth: hci_bcm: Streamline runtime
-> PM code"). The commit msg for this commit states "No functional change
-> intended.", but replacing:
+> Since I've been doing a lot of work on Linux Bay Trail / Cherry Trail
+> support, I've gathered a collection of ACPI DSDTs from about 50 such
+> machines.
 > 
-> pm_runtime_get();
-> pm_runtime_mark_last_busy();
-> pm_runtime_put_autosuspend();
+> Looking at these DSTDs many have an ACPI device entry describing a bcm
+> bluetooth device (often disabled in the DSDT), quite a few of these ACPI
+> device entries have a resource-table where the order does not match with
+> the order currently associated with the HID of that entry in the
+> bcm_acpi_match table.
 > 
-> with:
+> Looking at the Windows .inf files, there is nothing indicating a specific
+> order there, so I believe that there is no 1:1 mapping between the ACPI
+> HID and the order in which the resources are listed.
 > 
-> pm_request_resume();
+> Therefor this commit replaces the hardcoded mapping based on ACPI HID,
+> with code which actually checks in which order the resources are listed
+> and bases the gpio-mapping on that.
 > 
-> Does result in a functional change, pm_request_resume() only calls
-> pm_runtime_mark_last_busy() if the device was suspended before the call.
+> This should ensure that we always pick the right mapping and this will
+> make adding new ACPI HIDs to the driver easier.
 > 
-> This results in the following happening:
-> 
-> 1) Device is runtime suspended
-> 2) Device drives host_wake IRQ logically high as it starts receiving data
-> 3) bcm_host_wake() gets called, causes the device to runtime-resume,
->   current time gets marked as last_busy time
-> 4) After 5 seconds the autosuspend timer expires and the dev autosuspends
->   as no one has been calling pm_runtime_mark_last_busy(), the device was
->   resumed during those 5 seconds, so all the pm_request_resume() calls
->   while receiving data and/or bcm_host_wake() calls were nops
-> 5) If 4) happens while the device has (just received) data in its buffer to
->   be read by the host the IRQ line is *already* / still logically high
->   when we autosuspend and since we use an edge triggered IRQ, the IRQ
->   will never trigger, causing the device to get stuck in suspend
-> 
-> Therefor this commit has to be reverted, so that we avoid the device
-> getting stuck in suspend.
-> 
-> Cc: Lukas Wunner <lukas@wunner.de>
 > Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 > ---
-> drivers/bluetooth/hci_bcm.c | 11 ++++++++---
-> 1 file changed, 8 insertions(+), 3 deletions(-)
+> drivers/bluetooth/hci_bcm.c | 82 ++++++++++++++++++++++++++++-----------------
+> 1 file changed, 51 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+> index 5c8ed6198e8c..8a60bbd32e9e 100644
+> --- a/drivers/bluetooth/hci_bcm.c
+> +++ b/drivers/bluetooth/hci_bcm.c
+> @@ -98,6 +98,8 @@ struct bcm_device {
+> 	int			(*set_shutdown)(struct bcm_device *, bool);
+> #ifdef CONFIG_ACPI
+> 	acpi_handle		btlp, btpu, btpd;
+> +	int			gpio_count;
+> +	int			gpio_int_idx;
+> #endif
+> 
+> 	struct clk		*clk;
+> @@ -838,8 +840,11 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
+> 
+> 	case ACPI_RESOURCE_TYPE_GPIO:
+> 		gpio = &ares->data.gpio;
+> -		if (gpio->connection_type == ACPI_RESOURCE_GPIO_TYPE_INT)
+> +		if (gpio->connection_type == ACPI_RESOURCE_GPIO_TYPE_INT) {
+> +			dev->gpio_int_idx = dev->gpio_count;
+> 			dev->irq_active_low = gpio->polarity == ACPI_ACTIVE_LOW;
+> +		}
+> +		dev->gpio_count++;
+> 		break;
+> 
+> 	case ACPI_RESOURCE_TYPE_SERIAL_BUS:
+> @@ -956,20 +961,11 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+> 	LIST_HEAD(resources);
+> 	const struct dmi_system_id *dmi_id;
+> 	const struct acpi_gpio_mapping *gpio_mapping = acpi_bcm_int_last_gpios;
+> -	const struct acpi_device_id *id;
+> 	struct resource_entry *entry;
+> 	int ret;
+> 
+> -	/* Retrieve GPIO data */
+> -	id = acpi_match_device(dev->dev->driver->acpi_match_table, dev->dev);
+> -	if (id)
+> -		gpio_mapping = (const struct acpi_gpio_mapping *) id->driver_data;
+> -
+> -	ret = devm_acpi_dev_add_driver_gpios(dev->dev, gpio_mapping);
+> -	if (ret)
+> -		return ret;
+> -
+> 	/* Retrieve UART ACPI info */
+> +	dev->gpio_int_idx = -1;
+> 	ret = acpi_dev_get_resources(ACPI_COMPANION(dev->dev),
+> 				     &resources, bcm_resource, dev);
+> 	if (ret < 0)
+> @@ -983,6 +979,30 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+> 	}
+> 	acpi_dev_free_resource_list(&resources);
+> 
+> +	/*
+> +	 * If the DSDT uses an Interrupt resource for the IRQ, then there are
+> +	 * only 2 GPIO resources, we use the irq-last mapping for this, since
+> +	 * we already have an irq the 3th / last mapping will not be used.
+> +	 */
 
-patch has been applied to bluetooth-stable tree.
+minor nitpick that we use the net multi-line comment style. At least for new comments.
+
+> +	if (dev->irq)
+> +		gpio_mapping = acpi_bcm_int_last_gpios;
+> +	else if (dev->gpio_int_idx == 0)
+> +		gpio_mapping = acpi_bcm_int_first_gpios;
+> +	else if (dev->gpio_int_idx == 2)
+> +		gpio_mapping = acpi_bcm_int_last_gpios;
+> +	else
+> +		dev_warn(dev->dev, "Unexpected ACPI gpio_int_idx: %d\n",
+> +			 dev->gpio_int_idx);
+> +
+> +	/* Warn if our expectations are not met. */
+> +	if (dev->gpio_count != (dev->irq ? 2 : 3))
+> +		dev_warn(dev->dev, "Unexpected number of ACPI GPIOs: %d\n",
+> +			 dev->gpio_count);
+> +
+> +	ret = devm_acpi_dev_add_driver_gpios(dev->dev, gpio_mapping);
+> +	if (ret)
+> +		return ret;
+> +
+> 	dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
+> 	if (dmi_id) {
+> 		dev_warn(dev->dev, "%s: Overwriting IRQ polarity to active low",
+> @@ -1073,26 +1093,26 @@ static const struct hci_uart_proto bcm_proto = {
+> 
+> #ifdef CONFIG_ACPI
+> static const struct acpi_device_id bcm_acpi_match[] = {
+> -	{ "BCM2E1A", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E39", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E3A", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E3D", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E3F", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E40", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E54", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E55", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E64", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E65", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E67", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E71", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E72", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E7B", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E7C", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E7E", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+> -	{ "BCM2E84", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+> -	{ "BCM2E95", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+> -	{ "BCM2E96", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+> -	{ "BCM2EA4", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+> +	{ "BCM2E1A" },
+> +	{ "BCM2E39" },
+> +	{ "BCM2E3A" },
+> +	{ "BCM2E3D" },
+> +	{ "BCM2E3F" },
+> +	{ "BCM2E40" },
+> +	{ "BCM2E54" },
+> +	{ "BCM2E55" },
+> +	{ "BCM2E64" },
+> +	{ "BCM2E65" },
+> +	{ "BCM2E67" },
+> +	{ "BCM2E71" },
+> +	{ "BCM2E72" },
+> +	{ "BCM2E7B" },
+> +	{ "BCM2E7C" },
+> +	{ "BCM2E7E" },
+> +	{ "BCM2E84" },
+> +	{ "BCM2E95" },
+> +	{ "BCM2E96" },
+> +	{ "BCM2EA4" },
+
+Otherwise I like this a lot since it makes thing easier and potentially adding new IDs via new_id should become simple (if that is actually supported for ACPI).
 
 Regards
 
