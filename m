@@ -1,51 +1,35 @@
-Return-Path: <arndbergmann@gmail.com>
-MIME-Version: 1.0
-Sender: arndbergmann@gmail.com
-In-Reply-To: <988BDE3E-B2D2-4ABF-B644-4BFF41AF4157@holtmann.org>
-References: <20180315165050.2211236-1-arnd@arndb.de> <988BDE3E-B2D2-4ABF-B644-4BFF41AF4157@holtmann.org>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Thu, 15 Mar 2018 22:16:51 +0100
-Message-ID: <CAK8P3a1DTbbRUoCoYsmaSAQBQhaePZ0Tx-g2+xuab3yRcGhLpw@mail.gmail.com>
-Subject: Re: [PATCH] [v2] Bluetooth: btrsi: rework dependencies
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, Kalle Valo <kvalo@codeaurora.org>,
-	Sebastian Reichel <sre@kernel.org>, Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
-	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-	linux-wireless <linux-wireless@vger.kernel.org>, Networking <netdev@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@kernel.org
+Subject: [Bug 198953] hci_bcm: Streamline runtime PM code    change for 4.16
+ kernel breaks bluetooth on ASUS T100TA
+Date: Thu, 15 Mar 2018 20:01:45 +0000
+Message-ID: <bug-198953-62941-5JiUM20b2t@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-198953-62941@https.bugzilla.kernel.org/>
+References: <bug-198953-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Mar 15, 2018 at 7:30 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Arnd,
->
->> The linkage between the bluetooth driver and the wireless
->> driver is not defined properly, leading to build problems
->> such as:
->>
->> warning: (BT_HCIRSI) selects RSI_COEX which has unmet direct dependencies (NETDEVICES && WLAN && WLAN_VENDOR_RSI && BT_HCIRSI && RSI_91X)
->> drivers/net/wireless/rsi/rsi_91x_main.o: In function `rsi_read_pkt':
->> (.text+0x205): undefined reference to `rsi_bt_ops'
->>
->> As the dependency is actually the reverse (RSI_91X uses
->> the BT_RSI driver, not the other way round), this changes
->> the dependency to match, and enables the bluetooth driver
->> from the RSI_COEX symbol.
->>
->> Fixes: 38aa4da50483 ("Bluetooth: btrsi: add new rsi bluetooth driver")
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->> ---
->> v2: Pick a different from v1
->> ---
->> drivers/bluetooth/Kconfig        | 4 +---
->> drivers/net/wireless/rsi/Kconfig | 4 +++-
->> 2 files changed, 4 insertions(+), 4 deletions(-)
->
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
->
-> Since I think Kalle still has to take it through his tree until the btrsi driver makes it into net-next.
+https://bugzilla.kernel.org/show_bug.cgi?id=198953
 
-Ok. Kalle, please wait for v3 though, I just ran into another build failure
-caused by a typo in v2.
+--- Comment #20 from jbMacAZ (jbmacbrodie@yahoo.com) ---
+Created attachment 274769
+  --> https://bugzilla.kernel.org/attachment.cgi?id=274769&action=edit
+acpidump for T100CHI
 
-        Arnd
+Attached is the acpidump for the T100CHI.  I've applied the three patches to
+4.16-5c5 (the revert is still applied.)  Bluetooth still works on the T100CHI
+through at least one BT timeout cycle.
+
+Also, if there are other helpful patches for the T100*, please share them at
+the T100/Ubuntu group!  It can take months for accepted patches to actually get
+to the mainstream.
+
+Thanks,
+John
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
