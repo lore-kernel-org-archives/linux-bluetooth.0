@@ -3,186 +3,175 @@ From: avichal <avichal.a@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: sachin.dev@samsung.com, anupam.r@samsung.com,
         avichal <avichal.a@samsung.com>
-Subject: [PATCH BlueZ 2/2] gatt-database : Add support for Included service
-Date: Thu, 15 Mar 2018 20:15:37 +0530
-Message-id: <1521125138-24229-3-git-send-email-avichal.a@samsung.com>
+Subject: [PATCH BlueZ] tools/gatt-service: Add reference implementation for
+ Included Service
+Date: Thu, 15 Mar 2018 20:15:38 +0530
+Message-id: <1521125138-24229-4-git-send-email-avichal.a@samsung.com>
 In-reply-to: <1521125138-24229-1-git-send-email-avichal.a@samsung.com>
 References: <avichal.a@samsung.com>
         <1521125138-24229-1-git-send-email-avichal.a@samsung.com>
-        <CGME20180315144722epcas2p2761b6a90377b142efcf8a725af458810@epcas2p2.samsung.com>
+        <CGME20180315144724epcas1p4ea57deffd99cd3ac2bb1e3c6f51445b6@epcas1p4.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
-Added support of included services in gatt server
-While registring the service new property is added
-"includes"
-
-        array{object} type  [read-only]
-        Array of object paths representing the included
-        services of this service.
+Created two new primary services which will act as includes services for
+first  primary service
 
 Signed-off-by: avichal <avichal.a@samsung.com>
 ---
- src/gatt-database.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 99 insertions(+), 1 deletion(-)
+ tools/gatt-service.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 94 insertions(+), 2 deletions(-)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 9a33ae7..b2e93ce 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -109,6 +109,7 @@ struct external_service {
- 	uint16_t attr_cnt;
- 	struct queue *chrcs;
- 	struct queue *descs;
-+	struct queue *includes;
- };
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 6bd5576..379c120 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -47,9 +47,17 @@
+ /* Immediate Alert Service UUID */
+ #define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
+ #define ALERT_LEVEL_CHR_UUID		"00002a06-0000-1000-8000-00805f9b34fb"
++#define IAS_UUID1   "A00B"
++#define IAS_UUID2   "A00C"
++#define IAS_UUID3   "A00D"
++#define ALERT_LEVEL_CHR_UUID1		"00002b06-0000-1000-8000-00805f9b34fb"
++#define ALERT_LEVEL_CHR_UUID2		"00002c07-0000-1000-8000-00805f9b34fb"
++/* Random UUID for testing purpose */
  
- struct external_profile {
-@@ -444,12 +445,21 @@ static void desc_free(void *data)
- 	free(desc);
- }
+ /* Random UUID for testing purpose */
+ #define READ_WRITE_DESCRIPTOR_UUID	"8260c653-1a54-426b-9e36-e84c238bc669"
++#define READ_WRITE_DESCRIPTOR_UUID1 "0260c653-1a54-426b-9e36-e84c238bc669"
++#define READ_WRITE_DESCRIPTOR_UUID2 "FFFF"
  
-+static void inc_free(void *data)
-+{
-+	struct external_desc *inc = data;
-+
-+	free(inc);
-+}
-+
-+
- static void service_free(void *data)
+ static GMainLoop *main_loop;
+ static GSList *services;
+@@ -335,18 +343,47 @@ static gboolean service_get_includes(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *user_data)
  {
- 	struct external_service *service = data;
- 
- 	queue_destroy(service->chrcs, chrc_free);
- 	queue_destroy(service->descs, desc_free);
-+	queue_destroy(service->includes,inc_free );
- 
- 	if (service->attrib)
- 		gatt_db_remove_service(service->app->database->db,
-@@ -1533,6 +1543,7 @@ static struct external_service *create_service(struct gatt_app *app,
- 	service->proxy = g_dbus_proxy_ref(proxy);
- 	service->chrcs = queue_new();
- 	service->descs = queue_new();
-+	service->includes = queue_new();
- 
- 	/* Add 1 for the service declaration */
- 	if (!incr_attr_count(service, 1)) {
-@@ -1616,6 +1627,44 @@ static bool parse_uuid(GDBusProxy *proxy, bt_uuid_t *uuid)
- 	return true;
- }
- 
-+
-+static bool parse_includes(GDBusProxy *proxy, struct external_service * service)
-+{
-+	DBusMessageIter iter;
+ 	const char *uuid = user_data;
++	char service_path[100] = {0,};
 +	DBusMessageIter array;
-+	char *obj;
++	char *p = NULL;
+ 
++	snprintf(service_path,100,"/service3");
+ 	printf("Get Includes: %s\n", uuid);
+ 
++	p = service_path;
 +
-+	if (!g_dbus_proxy_get_property(proxy, "Includes", &iter))
-+		return false;
++	printf("Includes path: %s\n", p);
 +
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return false;
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++			DBUS_TYPE_OBJECT_PATH_AS_STRING, &array);
 +
-+	dbus_message_iter_recurse(&iter, &array);
++	dbus_message_iter_append_basic(&array, DBUS_TYPE_OBJECT_PATH,
++							&p);
 +
++	snprintf(service_path,100,"/service2");
++	p = service_path;
++	printf("Get Includes: %s\n", p);
 +
-+	do {
-+		if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_OBJECT_PATH)
-+			return false;
-+
-+		dbus_message_iter_get_basic(&array, &obj);
-+
-+		if(queue_push_tail(service->includes,obj)){
-+			DBG("Included paths added\n");
-+			incr_attr_count(service ,1);
-+		}
-+		else{
-+			error("Failed to add Includes path in que\n");
-+			return FALSE;
-+		}
-+
-+	} while (dbus_message_iter_next(&array));
++	dbus_message_iter_append_basic(&array, DBUS_TYPE_OBJECT_PATH,
++							&p);
++	dbus_message_iter_close_container(iter, &array);
 +
 +
-+	return true;
-+}
+ 	return TRUE;
 +
-+
- static bool parse_primary(GDBusProxy *proxy, bool *primary)
- {
- 	DBusMessageIter iter;
-@@ -2488,6 +2537,46 @@ fail:
- 	gatt_db_attribute_write_result(attrib, id, BT_ATT_ERROR_UNLIKELY);
  }
  
 +
-+
-+static void include_services(void * data ,void *userdata)
-+{
-+	char *obj = (char*)data;
-+	struct external_service * service = (struct external_service *)userdata;
-+	struct gatt_db_attribute *attrib=NULL;
-+	struct external_service  *service_inc=NULL;
-+
-+	DBG("object path recieved %s,",obj);
-+
-+	service_inc = queue_find(service->app->services, match_service_by_path, obj);
-+	if(service_inc)	{
-+
-+		if(!(service)->attrib)
-+			error("service attibute not found\n");
-+
-+
-+		if(!service_inc->attrib)
-+			error("include attribute not found\n");
-+
-+
-+		attrib = gatt_db_service_add_included((service)->attrib ,service_inc ->attrib);
-+		if(attrib == NULL)
-+			error("include service attributes failed \n");
-+
-+		else
-+			(service)->attrib = attrib;
-+
-+	}
-+	else
-+		error("include service not found\n");
-+
-+}
-+
-+static void database_add_includes(struct external_service *service)
-+{
-+	queue_foreach(service->includes,include_services,service );
-+}
-+
- static bool database_add_chrc(struct external_service *service,
- 						struct external_chrc *chrc)
+ static gboolean service_exist_includes(const GDBusPropertyTable *property,
+ 							void *user_data)
  {
-@@ -2560,11 +2649,20 @@ static bool database_add_service(struct external_service *service)
- 		return false;
- 	}
+ 	const char *uuid = user_data;
+ 
+ 	printf("Exist Includes: %s\n", uuid);
++	if(strncmp(uuid,"00001802",8) == 0)
++	{
++		return TRUE;
++	}
+ 
+ 	return FALSE;
+ }
+@@ -624,7 +661,7 @@ static char *register_service(const char *uuid)
+ 	return path;
+ }
+ 
+-static void create_services()
++static void create_services_one()
+ {
+ 	char *service_path;
+ 	uint8_t level = 0;
+@@ -651,6 +688,59 @@ static void create_services()
+ 	printf("Registered service: %s\n", service_path);
+ }
  
 +
-+	if(!parse_includes(service->proxy,service)){
-+		error("Failed to read \"Includes\" property of service");
++static void create_services_two()
++{
++	char *service_path;
++	uint8_t level = 0;
++
++	service_path = register_service(IAS_UUID2);
++	if (!service_path)
++		return;
++
++	if (!register_characteristic(ALERT_LEVEL_CHR_UUID2,
++						&level, sizeof(level),
++						ias_alert_level_props,
++						READ_WRITE_DESCRIPTOR_UUID2,
++						desc_props,
++						service_path)) {
++		printf("Couldn't register Alert Level characteristic (IAS)\n");
++		g_dbus_unregister_interface(connection, service_path,
++							GATT_SERVICE_IFACE);
++		g_free(service_path);
++		return;
++	}
++	services = g_slist_prepend(services, service_path);
++	printf("Registered service: %s\n", service_path);
++}
++
++static void create_services_three()
++{
++	char *service_path;
++	uint8_t level = 0;
++
++	service_path = register_service(IAS_UUID3);
++	if (!service_path)
++		return;
++
++	if (!register_characteristic(ALERT_LEVEL_CHR_UUID1,
++						&level, sizeof(level),
++						ias_alert_level_props,
++						READ_WRITE_DESCRIPTOR_UUID1,
++						desc_props,
++						service_path)) {
++		printf("Couldn't register Alert Level characteristic (IAS)\n");
++		g_dbus_unregister_interface(connection, service_path,
++							GATT_SERVICE_IFACE);
++		g_free(service_path);
++		return;
 +	}
 +
- 	service->attrib = gatt_db_add_service(service->app->database->db, &uuid,
--						primary, service->attr_cnt);
-+					primary, service->attr_cnt);
- 	if (!service->attrib)
- 		return false;
++
++	services = g_slist_prepend(services, service_path);
++	printf("Registered service: %s\n", service_path);
++}
++
+ static void register_app_reply(DBusMessage *reply, void *user_data)
+ {
+ 	DBusError derr;
+@@ -789,7 +879,9 @@ int main(int argc, char *argv[])
+ 	printf("gatt-service unique name: %s\n",
+ 				dbus_bus_get_unique_name(connection));
  
-+	database_add_includes(service);
-+	DBG("ATTR count %d\n",service->attr_cnt);
-+
-+
- 	entry = queue_get_entries(service->chrcs);
- 	while (entry) {
- 		struct external_chrc *chrc = entry->data;
+-	create_services();
++	create_services_one();
++	create_services_two();
++	create_services_three();
+ 
+ 	client = g_dbus_client_new(connection, "org.bluez", "/");
+ 
 -- 
 2.7.4
 
