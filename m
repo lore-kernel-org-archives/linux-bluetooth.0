@@ -3,8 +3,8 @@ From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@kernel.org
 Subject: [Bug 198953] hci_bcm: Streamline runtime PM code    change for 4.16
  kernel breaks bluetooth on ASUS T100TA
-Date: Thu, 15 Mar 2018 20:01:45 +0000
-Message-ID: <bug-198953-62941-5JiUM20b2t@https.bugzilla.kernel.org/>
+Date: Thu, 15 Mar 2018 19:47:59 +0000
+Message-ID: <bug-198953-62941-U5BfYflpv7@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-198953-62941@https.bugzilla.kernel.org/>
 References: <bug-198953-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -14,21 +14,22 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 https://bugzilla.kernel.org/show_bug.cgi?id=198953
 
---- Comment #20 from jbMacAZ (jbmacbrodie@yahoo.com) ---
-Created attachment 274769
-  --> https://bugzilla.kernel.org/attachment.cgi?id=274769&action=edit
-acpidump for T100CHI
+--- Comment #19 from Robert R. Howell (rhowell@uwyo.edu) ---
+Hi Hans
 
-Attached is the acpidump for the T100CHI.  I've applied the three patches to
-4.16-5c5 (the revert is still applied.)  Bluetooth still works on the T100CHI
-through at least one BT timeout cycle.
+Adding the "Reported-and-tested-by" tag would be fine.  
 
-Also, if there are other helpful patches for the T100*, please share them at
-the T100/Ubuntu group!  It can take months for accepted patches to actually get
-to the mainstream.
+While I've been building kernels with a few special patches for my Baytrail
+devices for the last couple years I'm just starting to learn how git is used
+with the main repositories, and how to post patches and commits to the mailing
+lists.  So I'm more than happy to have you add the Encore information in your
+patch.
 
-Thanks,
-John
+I don't yet have a public repository for the patches I use -- they are mostly
+from the files at the Ubuntu ASUS T100 group at
+<https://plus.google.com/communities/117853703024346186936>, with a few extra
+of my own.  But I'm certainly happy to share those.  Let me think about the
+best way to do that and I'll get back to you with a direct email on that.
 
 -- 
 You are receiving this mail because:
