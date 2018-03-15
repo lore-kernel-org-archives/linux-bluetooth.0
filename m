@@ -1,69 +1,39 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluebooth: btusb: Fix quirk for Atheros 1525/QCA6174
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180315160234.21789-1-tiwai@suse.de>
-Date: Thu, 15 Mar 2018 19:32:54 +0100
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        Ivan Levshin <ivan.levshin@microfocus.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <D780224D-FFA1-4965-AF3D-299BF0A3D32B@holtmann.org>
-References: <20180315160234.21789-1-tiwai@suse.de>
-To: Takashi Iwai <tiwai@suse.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@kernel.org
+Subject: [Bug 198953] hci_bcm: Streamline runtime PM code    change for 4.16
+ kernel breaks bluetooth on ASUS T100TA
+Date: Thu, 15 Mar 2018 18:31:48 +0000
+Message-ID: <bug-198953-62941-BLlnaEgQAB@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-198953-62941@https.bugzilla.kernel.org/>
+References: <bug-198953-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Takashi,
+https://bugzilla.kernel.org/show_bug.cgi?id=198953
 
-> The Atheros 1525/QCA6174 BT doesn't seem working properly on the
-> recent kernels, as it tries to load a wrong firmware
-> ar3k/AthrBT_0x00000200.dfu and it fails.
-> 
-> This seems to have been a problem for some time, and the known
-> workaround is to apply BTUSB_QCA_ROM quirk instead of BTUSB_ATH3012.
-> 
-> The device in question is:
-> 
-> T: Bus=01 Lev=01 Prnt=01 Port=09 Cnt=03 Dev#=  4 Spd=12   MxCh= 0
-> D: Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P: Vendor=0cf3 ProdID=3004 Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E: Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E: Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Bugzilla: http://bugzilla.opensuse.org/show_bug.cgi?id=1082504
-> Reported-and-tested-by: Ivan Levshin <ivan.levshin@microfocus.com>
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Takashi Iwai <tiwai@suse.de>
-> 
-> ---
-> drivers/bluetooth/btusb.c |    2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+--- Comment #18 from Hans de Goede (jwrdegoede@fedoraproject.org) ---
+p.s.
 
-patch has been applied to bluetooth-stable tree.
+Do you have a git repo or some such with the other Bay Trail patches you use
+somewhere? As part of my ongoing Bay and Cherry Trail support work I'm trying
+to get all patches from various places, such as:
 
-Regards
+https://github.com/burzumishi/linux-baytrail-flexx10/tree/master/kernel/patches/v4.8
+https://github.com/muhviehstah/linux-baytrail411/commits/master
+https://github.com/jfwells/linux-asus-t100ta
 
-Marcel
+Upstream, so I'm always interested in what patches people use / need. Perhaps
+there is even a patch in there which would be a good candidate for your first
+upstream patch submission (you seem to know your way around the kernel, so I
+believe you would make a good kernel dev).
+
+Anyways this is offtopic for this bug, so please drop me a mail at
+hdegoede@redhat.com about the the other Bay Trail patches you use (or file a
+new bug for them).
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
