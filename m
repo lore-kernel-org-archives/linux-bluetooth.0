@@ -1,39 +1,55 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 198953] hci_bcm: Streamline runtime PM code    change for 4.16
- kernel breaks bluetooth on ASUS T100TA
-Date: Thu, 15 Mar 2018 18:31:48 +0000
-Message-ID: <bug-198953-62941-BLlnaEgQAB@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-198953-62941@https.bugzilla.kernel.org/>
-References: <bug-198953-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH] [v2] Bluetooth: btrsi: rework dependencies
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180315165050.2211236-1-arnd@arndb.de>
+Date: Thu, 15 Mar 2018 19:30:23 +0100
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        Amitkumar Karwar <amit.karwar@redpinesignals.com>,
+        Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+        Linux Bluetooth mailing list
+        <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        netdev@vger.kernel.org
+Message-Id: <988BDE3E-B2D2-4ABF-B644-4BFF41AF4157@holtmann.org>
+References: <20180315165050.2211236-1-arnd@arndb.de>
+To: Arnd Bergmann <arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=198953
+Hi Arnd,
 
---- Comment #18 from Hans de Goede (jwrdegoede@fedoraproject.org) ---
-p.s.
+> The linkage between the bluetooth driver and the wireless
+> driver is not defined properly, leading to build problems
+> such as:
+> 
+> warning: (BT_HCIRSI) selects RSI_COEX which has unmet direct dependencies (NETDEVICES && WLAN && WLAN_VENDOR_RSI && BT_HCIRSI && RSI_91X)
+> drivers/net/wireless/rsi/rsi_91x_main.o: In function `rsi_read_pkt':
+> (.text+0x205): undefined reference to `rsi_bt_ops'
+> 
+> As the dependency is actually the reverse (RSI_91X uses
+> the BT_RSI driver, not the other way round), this changes
+> the dependency to match, and enables the bluetooth driver
+> from the RSI_COEX symbol.
+> 
+> Fixes: 38aa4da50483 ("Bluetooth: btrsi: add new rsi bluetooth driver")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> v2: Pick a different from v1
+> ---
+> drivers/bluetooth/Kconfig        | 4 +---
+> drivers/net/wireless/rsi/Kconfig | 4 +++-
+> 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Do you have a git repo or some such with the other Bay Trail patches you use
-somewhere? As part of my ongoing Bay and Cherry Trail support work I'm trying
-to get all patches from various places, such as:
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-https://github.com/burzumishi/linux-baytrail-flexx10/tree/master/kernel/patches/v4.8
-https://github.com/muhviehstah/linux-baytrail411/commits/master
-https://github.com/jfwells/linux-asus-t100ta
+Since I think Kalle still has to take it through his tree until the btrsi driver makes it into net-next.
 
-Upstream, so I'm always interested in what patches people use / need. Perhaps
-there is even a patch in there which would be a good candidate for your first
-upstream patch submission (you seem to know your way around the kernel, so I
-believe you would make a good kernel dev).
+Regards
 
-Anyways this is offtopic for this bug, so please drop me a mail at
-hdegoede@redhat.com about the the other Bay Trail patches you use (or file a
-new bug for them).
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Marcel
