@@ -1,67 +1,104 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH 4.16 REGRESSION fix 1/2] Revert "Bluetooth: hci_bcm:
- Streamline runtime PM code"
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180315081408.GC4615@wunner.de>
-Date: Thu, 15 Mar 2018 14:15:10 +0100
-Cc: Hans de Goede <hdegoede@redhat.com>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-        Linux Bluetooth mailing list
-        <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
-        linux-acpi@vger.kernel.org, "Robert R. Howell" <rhowell@uwyo.edu>
-Message-Id: <2F4B2A06-7ABD-49D6-BCC8-2885F87FE00B@holtmann.org>
-References: <20180314220603.7559-1-hdegoede@redhat.com>
- <20180314220603.7559-2-hdegoede@redhat.com>
- <20180314221603.GB28738@wunner.de>
- <807b74cb-2222-2d47-12c2-0415a9027102@redhat.com>
- <20180314223813.GD28738@wunner.de>
- <066d03cc-6dd0-7eca-f8cc-78e81277459c@redhat.com>
- <20180315081408.GC4615@wunner.de>
-To: Lukas Wunner <lukas@wunner.de>
-Sender: linux-serial-owner@vger.kernel.org
+Return-Path: <thierry.escande@linaro.org>
+Subject: Re: [PATCH v4 2/3] dt-bindings: net: bluetooth: Add
+ qualcomm-bluetooth
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
+ Rob Herring <robh+dt@kernel.org>, Andy Gross <andy.gross@linaro.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, David Brown
+ <david.brown@linaro.org>, Mark Rutland <mark.rutland@arm.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Loic Poulain <loic.poulain@linaro.org>,
+ Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+ linux-arm-msm@vger.kernel.org, devicetree <devicetree@vger.kernel.org>,
+ linux-kernel@vger.kernel.org
+References: <20180314155514.3374-1-thierry.escande@linaro.org>
+ <20180314155514.3374-3-thierry.escande@linaro.org>
+ <FF2E3FDE-76C5-477A-A904-32AC064297DA@holtmann.org>
+ <20180314183043.GX18510@minitux>
+ <D999852D-E9A7-41D2-9878-A93CB4D43D0C@holtmann.org>
+ <20180314190522.GY18510@minitux>
+ <494C4C44-1949-405E-91DA-1B40100ED2E6@holtmann.org>
+From: Thierry Escande <thierry.escande@linaro.org>
+Message-ID: <d14007a1-a4dd-bd28-3452-a4d3ad70e5a0@linaro.org>
+Date: Thu, 15 Mar 2018 12:07:44 +0100
+MIME-Version: 1.0
+In-Reply-To: <494C4C44-1949-405E-91DA-1B40100ED2E6@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukas,
+Hi Marcel,
 
->>>> We're quite far into the cycle already and this is a serious regression,
->>>> also nothing of great value is lost by the revert, the original commit
->>>> was a minor cleanup which turns out to have bad side-effects, a simple
->>>> revert really is the best solution here, esp. in this point of the cycle.
->>> 
->>> Just an hour ago he sent me the patch to look over it.  And we're at
->>> least two and a half weeks away from v4.16.
->> 
->> No we are *only* two and a half weeks away from v4.16 (worst case scenario)
->> and Linus does not like getting last minute fixes.
+On 14/03/2018 20:51, Marcel Holtmann wrote:
+> Hi Bjorn,
 > 
-> That doesn't preclude allowing a few hours to discuss things.
-> There is never such a rush.  In the present case, a new contributor
-> was willing to debug the issue and submit a patch.  Onboarding new
-> contributors is important and IMO it's worth waiting a few days for
-> them to sort things out, even if it means a regression stays present
-> a little longer.  I'm sorry that it meant you wasted time debugging
-> it in parallel.
+>>>>>> +		bt-disable-n-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
+>>>>>
+>>>>> can we use a common name here. I think that Nokia and Broadcom drivers
+>>>>> define one. And if this is the enable/shutdown GPIO, we should name it
+>>>>> consistently across all manufacturers. It essentially does the same on
+>>>>> Bluetooth UART chips no matter what chip is behind them.
+>>>>>
+>>>>
+>>>> Broadcomm has a device-wakup-gpios and Nokia has bluetooth-wakup-gpios.
+>>>> It might be that these behave in the same way, but from the description
+>>>> they only trigger the wakeup.
+>>>
+>>> that is something that we might need to start fixing. I really prefer
+>>> if we name the GPIOs a bit more consistent.
+>>>
+>>>> The reason for the proposed naming here is that the pin is named
+>>>> "BT_DISABLE_N" in the datasheet.
+>>>
+>>> That is not a reason I buy. So the next board comes around that labels
+>>> it in the data sheet BT_DISABLE_YEAH_SUPER_GREAT and you send me a
+>>> patch to the driver to look for that name. If the GPIO does the same
+>>> thing, I couldn’t care less what the data sheet says. That might be
+>>> a comment in the DT file, but it should not pollute the driver code.
+>>>
+>>
+>> BT_DISABLE_N is the name of this pin in the datasheet of the QCA chip,
+>> not on the board, so this name is the same regardless of what you name
+>> the line or gpio your board connect it to.
 > 
-> That said, when submitting the patch I clearly failed to notice that
-> for devices using autosuspend, pm_request_resume() doesn't update
-> the last usage timestamp.  While that could be fixed by calling
-> pm_runtime_mark_last_busy() before pm_request_resume(), it doesn't
-> seem to be customary as a look at all the call sites of
-> pm_request_resume() shows.  The original three-line sequence,
-> although quite verbose, appears to be what is commonly used in such
-> a case.  For this reason reverting back to the original version
-> seems justified.
+> and QCA chip v1 and QCA chip v2 will use the same driver and same firmware loading mechanism. So why do we have to add a new GPIO naming if they decide to change the name in the data sheet. With Bluetooth it is pretty much all the same. Every UART chip has a shutdown/reset GPIO to enable/disable the chip behind the UART.
+> 
+>>> A new board should not require driver changes, you just ship a new DT
+>>> for that board and an existing driver hopefully just does the job. No
+>>> matter how someone named a GPIO in a piece of paper.
+>>>
+>>
+>> I totally agree with the fact that the board should not affect the
+>> naming of the gpio in the driver. But I do enjoy when we refer to pins
+>> by their real name - instead of having to guess which pin in the _chip_
+>> specification the driver actually refer to.
+>>
+>>
+>> That said, what name would you prefer for this?
+>>
+>> Afaict this is not "wakeup" and there are a few extra steps between the
+>> disabled state and "bluetooth is enabled", so "enable" feels slightly
+>> wrong. And it probably should be "bluetooth" and not just "device" as
+>> this refers to a pin on a WiFi/BT combo chip.
+> 
+> The Broadcom side called it shutdown GPIO, it is essentially the shutdown/reset GPIO or power on/off GPIO. Personally I do not care what it is named, but it will be all the same for all Bluetooth chips. Take a poll from Broadcom, Intel, Realtek and Qualcomm and you can pick a reasonable common name.
 
-there is no reason to rush this through. With a properly worded commit message that explain the reason, I have no problem to do a last minute -rc inclusion.
+The Nokia driver has "bluetooth-wakeup" gpio. The Broadcom one has 
+"device-wakeup" and "shutdown". The "shutdown" gpio is set to its active 
+state to power on the chip which sounds reversed logic. Same for the 
+"bt-disable-n" gpio in the Qualcomm driver, configured as ACTIVE_HIGH, 
+and which is set to 1 to enable it...
 
-However what I like to have is a single patch with all Acks and also CC: stable tags if required that we can just send off in the direction towards Linus. I saw there is an alternative patch on the mailing list. So I would like to have a good conclusion on what goes to -rc and that we all agree.
+So for consistency, naming it as "shutdown" to stick to the bcm driver 
+but it should be configured as ACTIVE_LOW in the dts so we actually do a 
+gpiod_set_value(0) to un-shutdown it. Does that sound ok?
 
-Regards
+Regards,
+Thierry
 
-Marcel
-
+> For the wakeup GPIOs, these are different and depend on if there is some low-power mode provided. You would need to check the data sheet to see if they provide more advanced low-power state handling.
+> 
+> Regards
+> 
+> Marcel
+> 
