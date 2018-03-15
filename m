@@ -1,154 +1,63 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [RFC] Bluetooth: hci_bcm: Do not tie GPIO pin order to a specific
- ACPI HID
-To: Marcel Holtmann <marcel@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH 4.16 REGRESSION fix 2/2] Bluetooth: hci_bcm: Set
+ pulsed_host_wake flag in sleep parameters
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180314220603.7559-3-hdegoede@redhat.com>
+Date: Thu, 15 Mar 2018 19:40:21 +0100
 Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- linux-acpi@vger.kernel.org
-References: <20180314135454.8387-1-hdegoede@redhat.com>
- <20180314135454.8387-2-hdegoede@redhat.com>
- <7B14886D-E218-468B-A4E1-0D137BA4B461@holtmann.org>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <8b2c6a1b-97b0-b5a1-567a-d17bba1d4827@redhat.com>
-Date: Thu, 15 Mar 2018 19:45:16 +0100
-MIME-Version: 1.0
-In-Reply-To: <7B14886D-E218-468B-A4E1-0D137BA4B461@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-acpi@vger.kernel.org
+Message-Id: <42ADB588-D50F-468A-9E42-7D991A78847A@holtmann.org>
+References: <20180314220603.7559-1-hdegoede@redhat.com>
+ <20180314220603.7559-3-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Hans,
 
-On 15-03-18 19:36, Marcel Holtmann wrote:
-> Hi Hans,
+> The IRQ output of the bcm bt-device is really a level IRQ signal, which
+> signals a logical high as long as the device's buffer contains data. Since
+> the draining in the buffer is done in the tty driver, we cannot (easily)
+> wait in a threaded interrupt handler for the draining, after which the
+> IRQ should go low again.
 > 
->> Since I've been doing a lot of work on Linux Bay Trail / Cherry Trail
->> support, I've gathered a collection of ACPI DSDTs from about 50 such
->> machines.
->>
->> Looking at these DSTDs many have an ACPI device entry describing a bcm
->> bluetooth device (often disabled in the DSDT), quite a few of these ACPI
->> device entries have a resource-table where the order does not match with
->> the order currently associated with the HID of that entry in the
->> bcm_acpi_match table.
->>
->> Looking at the Windows .inf files, there is nothing indicating a specific
->> order there, so I believe that there is no 1:1 mapping between the ACPI
->> HID and the order in which the resources are listed.
->>
->> Therefor this commit replaces the hardcoded mapping based on ACPI HID,
->> with code which actually checks in which order the resources are listed
->> and bases the gpio-mapping on that.
->>
->> This should ensure that we always pick the right mapping and this will
->> make adding new ACPI HIDs to the driver easier.
-
-<snip>
-
->> @@ -983,6 +979,30 @@ static int bcm_acpi_probe(struct bcm_device *dev)
->> 	}
->> 	acpi_dev_free_resource_list(&resources);
->>
->> +	/*
->> +	 * If the DSDT uses an Interrupt resource for the IRQ, then there are
->> +	 * only 2 GPIO resources, we use the irq-last mapping for this, since
->> +	 * we already have an irq the 3th / last mapping will not be used.
->> +	 */
+> So instead we treat the IRQ as an edge interrupt. This opens the window
+> for a theoretical race where we wakeup, read some data and then autosuspend
+> *before* the IRQ has gone (logical) low, followed by the device just at
+> that moment receiving more data, causing the IRQ to stay high and we never
+> see an edge.
 > 
-> minor nitpick that we use the net multi-line comment style. At least for new comments.
-
-Ok, will fix for the non RFC version. As for the reason why this was RFC,
-the problem turned out to be another IRQ polarity issue. I've a more generic
-fix for that too now. I will submit 2 series with my work soonish (still need
-to run a bunch of tests first).
-
->> +	if (dev->irq)
->> +		gpio_mapping = acpi_bcm_int_last_gpios;
->> +	else if (dev->gpio_int_idx == 0)
->> +		gpio_mapping = acpi_bcm_int_first_gpios;
->> +	else if (dev->gpio_int_idx == 2)
->> +		gpio_mapping = acpi_bcm_int_last_gpios;
->> +	else
->> +		dev_warn(dev->dev, "Unexpected ACPI gpio_int_idx: %d\n",
->> +			 dev->gpio_int_idx);
->> +
->> +	/* Warn if our expectations are not met. */
->> +	if (dev->gpio_count != (dev->irq ? 2 : 3))
->> +		dev_warn(dev->dev, "Unexpected number of ACPI GPIOs: %d\n",
->> +			 dev->gpio_count);
->> +
->> +	ret = devm_acpi_dev_add_driver_gpios(dev->dev, gpio_mapping);
->> +	if (ret)
->> +		return ret;
->> +
->> 	dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
->> 	if (dmi_id) {
->> 		dev_warn(dev->dev, "%s: Overwriting IRQ polarity to active low",
->> @@ -1073,26 +1093,26 @@ static const struct hci_uart_proto bcm_proto = {
->>
->> #ifdef CONFIG_ACPI
->> static const struct acpi_device_id bcm_acpi_match[] = {
->> -	{ "BCM2E1A", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E39", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E3A", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E3D", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E3F", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E40", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E54", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E55", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E64", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E65", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E67", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E71", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E72", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E7B", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E7C", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E7E", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
->> -	{ "BCM2E84", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
->> -	{ "BCM2E95", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
->> -	{ "BCM2E96", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
->> -	{ "BCM2EA4", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
->> +	{ "BCM2E1A" },
->> +	{ "BCM2E39" },
->> +	{ "BCM2E3A" },
->> +	{ "BCM2E3D" },
->> +	{ "BCM2E3F" },
->> +	{ "BCM2E40" },
->> +	{ "BCM2E54" },
->> +	{ "BCM2E55" },
->> +	{ "BCM2E64" },
->> +	{ "BCM2E65" },
->> +	{ "BCM2E67" },
->> +	{ "BCM2E71" },
->> +	{ "BCM2E72" },
->> +	{ "BCM2E7B" },
->> +	{ "BCM2E7C" },
->> +	{ "BCM2E7E" },
->> +	{ "BCM2E84" },
->> +	{ "BCM2E95" },
->> +	{ "BCM2E96" },
->> +	{ "BCM2EA4" },
+> Since we call pm_runtime_mark_last_busy() on every received byte, there
+> should be plenty time for the IRQ to go (logical) low before we ever
+> suspend, so this should never happen, but after commit 43fff7683468
+> ("Bluetooth: hci_bcm: Streamline runtime PM code"), which has been reverted
+> since, this was actually happening causing the device to get stuck in
+> runtime suspend.
 > 
-> Otherwise I like this a lot since it makes thing easier and potentially adding new IDs via new_id should become simple (if that is actually supported for ACPI).
+> The bcm bt-device actually has a workaround for this, if we set the
+> pulsed_host_wake flag in the sleep parameters, then the device monitors
+> if the host is draining the buffer and if not then after a timeout the
+> device will pulse the IRQ line, causing us to see an edge, fixing the
+> stuck in suspend condition.
+> 
+> This commit sets the pulsed_host_wake flag to fix the (mostly theoretical)
+> race caused by us treating the IRQ as an edge IRQ.
+> 
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> drivers/bluetooth/hci_bcm.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Yes being able to use new_id (or bind) is the idea. Note if this is
-supported is not APCI specific, the ACPI code only generates the
-modalias, the rest is up to the serdev bus code, which I think
-should just work.
+patch has been applied to bluetooth-stable tree.
 
-Note supporting new_id is only one reason, looking at the DSTDs I
-have we're going to run out of luck at one point and have 2 machines
-which both use the same ACPI HID but need a different order. I've
-made a summary of various settings found in all the DSTDs I've with
-BCM2E## ids in them here:
+Regards
 
-https://fedorapeople.org/~jwrdegoede/bcm-bt-stuff
+Marcel
 
-As you can see there are several cases where the order in the old
-bcm_acpi_match does not match with what is in the DSTD. Note not
-necessarily all devices with a BCM2E## device in their DSTD actually
-have one, because there is a lot of copy and paste going on in
-DSTD tables.
-
-Regards,
-
-Hans
