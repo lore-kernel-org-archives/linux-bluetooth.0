@@ -1,58 +1,58 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <foo00@h08.hostsharing.net>
+Date: Thu, 15 Mar 2018 09:32:09 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Hans de Goede <hdegoede@redhat.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	=?iso-8859-1?Q?Fr=E9d=E9ric?= Danis <frederic.danis.oss@gmail.com>,
+	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-acpi@vger.kernel.org
+Subject: Re: [PATCH 4.16 REGRESSION fix 1/2] Revert "Bluetooth: hci_bcm:
+ Streamline runtime PM code"
+Message-ID: <20180315083209.GA21373@wunner.de>
+References: <20180314220603.7559-1-hdegoede@redhat.com>
+ <20180314220603.7559-2-hdegoede@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20180314131726.24945-1-luiz.dentz@gmail.com>
-References: <20180314131726.24945-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 15 Mar 2018 11:01:12 +0200
-Message-ID: <CABBYNZJA_xakoD8Q2k5K3YOuP1=gWFNq0YmFoJCFp4s=2athig@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] shared/gatt-client: Omit valid errors for
- primary discovery
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180314220603.7559-2-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Wed, Mar 14, 2018 at 11:06:02PM +0100, Hans de Goede wrote:
+> This reverts commit 43fff7683468 ("Bluetooth: hci_bcm: Streamline runtime
+> PM code"). The commit msg for this commit states "No functional change
+> intended.", but replacing:
+> 
+>  pm_runtime_get();
+>  pm_runtime_mark_last_busy();
+>  pm_runtime_put_autosuspend();
+> 
+> with:
+> 
+>  pm_request_resume();
+> 
+> Does result in a functional change, pm_request_resume() only calls
+> pm_runtime_mark_last_busy() if the device was suspended before the call.
+> 
+> This results in the following happening:
+> 
+> 1) Device is runtime suspended
+> 2) Device drives host_wake IRQ logically high as it starts receiving data
+> 3) bcm_host_wake() gets called, causes the device to runtime-resume,
+>    current time gets marked as last_busy time
+> 4) After 5 seconds the autosuspend timer expires and the dev autosuspends
+>    as no one has been calling pm_runtime_mark_last_busy(), the device was
+>    resumed during those 5 seconds, so all the pm_request_resume() calls
+>    while receiving data and/or bcm_host_wake() calls were nops
+> 5) If 4) happens while the device has (just received) data in its buffer to
+>    be read by the host the IRQ line is *already* / still logically high
+>    when we autosuspend and since we use an edge triggered IRQ, the IRQ
+>    will never trigger, causing the device to get stuck in suspend
+> 
+> Therefor this commit has to be reverted, so that we avoid the device
+> getting stuck in suspend.
+> 
+> Cc: Lukas Wunner <lukas@wunner.de>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 
-On Wed, Mar 14, 2018 at 3:17 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND shall not cause anything to be printed
-> since it is a valid response and just mark the end of primary discovery.
-> ---
->  src/shared/gatt-client.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index 1285c37ef..d61668df7 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -1023,9 +1023,6 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
->         discovery_req_clear(client);
->
->         if (!success) {
-> -               util_debug(client->debug_callback, client->debug_data,
-> -                                       "Primary service discovery failed."
-> -                                       " ATT ECODE: 0x%02x", att_ecode);
->                 /* Reset error in case of not found */
->                 switch (att_ecode) {
->                 case BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND:
-> @@ -1033,6 +1030,9 @@ static void discover_primary_cb(bool success, uint8_t att_ecode,
->                         att_ecode = 0;
->                         goto secondary;
->                 default:
-> +                       util_debug(client->debug_callback, client->debug_data,
-> +                                       "Primary service discovery failed."
-> +                                       " ATT ECODE: 0x%02x", att_ecode);
->                         goto done;
->                 }
->         }
-> --
-> 2.14.3
-
-Applied.
-
-
--- 
-Luiz Augusto von Dentz
+Acked-by: Lukas Wunner <lukas@wunner.de>
