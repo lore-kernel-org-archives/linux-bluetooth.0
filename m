@@ -1,79 +1,57 @@
-Return-Path: <arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Kalle Valo <kvalo@codeaurora.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Sebastian Reichel <sre@kernel.org>,
-	Amitkumar Karwar <amit.karwar@redpinesignals.com>,
-	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] [v2] Bluetooth: btrsi: rework dependencies
-Date: Thu, 15 Mar 2018 17:50:16 +0100
-Message-Id: <20180315165050.2211236-1-arnd@arndb.de>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH] Bluetooth: btrsi: rework dependencies
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAK8P3a3y00nUVuYopxXWaJjo_OxXhVsATyiSOfXz5b09JFq2dA@mail.gmail.com>
+Date: Thu, 15 Mar 2018 17:03:52 +0100
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Linux Bluetooth mailing list
+        <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Networking <netdev@vger.kernel.org>
+Message-Id: <F9369C84-62C6-4881-8089-40F3F912F871@holtmann.org>
+References: <20180315154312.3941446-1-arnd@arndb.de>
+ <EE0D5CBE-0867-4FE0-B157-CA4086C84233@holtmann.org>
+ <CAK8P3a3y00nUVuYopxXWaJjo_OxXhVsATyiSOfXz5b09JFq2dA@mail.gmail.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The linkage between the bluetooth driver and the wireless
-driver is not defined properly, leading to build problems
-such as:
+Hi Arnd,
 
-warning: (BT_HCIRSI) selects RSI_COEX which has unmet direct dependencies (NETDEVICES && WLAN && WLAN_VENDOR_RSI && BT_HCIRSI && RSI_91X)
-drivers/net/wireless/rsi/rsi_91x_main.o: In function `rsi_read_pkt':
-(.text+0x205): undefined reference to `rsi_bt_ops'
+>>> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+>>> index 03cfc1b20c4a..9e8d22712ff3 100644
+>>> --- a/drivers/bluetooth/Makefile
+>>> +++ b/drivers/bluetooth/Makefile
+>>> @@ -28,7 +28,7 @@ obj-$(CONFIG_BT_QCA)                += btqca.o
+>>> 
+>>> obj-$(CONFIG_BT_HCIUART_NOKIA)        += hci_nokia.o
+>>> 
+>>> -obj-$(CONFIG_BT_HCIRSI)              += btrsi.o
+>>> +obj-$(CONFIG_BT_HCIRSI_MODULE)       += btrsi.o
+>> 
+>> do we need this new option? I have avoided these kind of complex things multi config entries. Can we not just select the RSI_91X?
+>> 
+> 
+> I couldn't come up with a simpler way to do this.
+> Selecting RSI_91X is not possible unless we make the BT
+> driver 'depend on WLAN_VENDOR_RSI && MAC80211',
+> which is even more backwards.
+> 
+> The problem here is that it's actually a reverse dependency:
+> the wlan driver calls into the bt driver.
+> 
+> What we could do is to make BT_HCIRSI a silent symbol
+> and have that selected by RSI_COEX, which can then
+> be user-visible. With that, the Kconfig structure would follow
+> what the code does.
 
-As the dependency is actually the reverse (RSI_91X uses
-the BT_RSI driver, not the other way round), this changes
-the dependency to match, and enables the bluetooth driver
-from the RSI_COEX symbol.
+that sounds a bit better to me. If the RSI driver maintainers don’t like that, then they should re-architect the code to make this more dynamic and flexible.
 
-Fixes: 38aa4da50483 ("Bluetooth: btrsi: add new rsi bluetooth driver")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-v2: Pick a different from v1
----
- drivers/bluetooth/Kconfig        | 4 +---
- drivers/net/wireless/rsi/Kconfig | 4 +++-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Regards
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index d8bbd661dbdb..149a38ee1fce 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -393,9 +393,7 @@ config BT_QCOMSMD
- 	  kernel or say M to compile as a module.
- 
- config BT_HCIRSI
--	tristate "Redpine HCI support"
--	default n
--	select RSI_COEX
-+	tristate
- 	help
- 	  Redpine BT driver.
- 	  This driver handles BT traffic from upper layers and pass
-diff --git a/drivers/net/wireless/rsi/Kconfig b/drivers/net/wireless/rsi/Kconfig
-index f004be33fcfa..c6006fab8638 100644
---- a/drivers/net/wireless/rsi/Kconfig
-+++ b/drivers/net/wireless/rsi/Kconfig
-@@ -13,6 +13,7 @@ if WLAN_VENDOR_RSI
- 
- config RSI_91X
- 	tristate "Redpine Signals Inc 91x WLAN driver support"
-+	select BT_RSI if RSI_COEX
- 	depends on MAC80211
- 	---help---
- 	  This option enabes support for RSI 1x1 devices.
-@@ -44,7 +45,8 @@ config RSI_USB
- 
- config RSI_COEX
- 	bool "Redpine Signals WLAN BT Coexistence support"
--	depends on BT_HCIRSI && RSI_91X
-+	depends on BT && RSI_91X
-+	depends on !(BT=m && RSI_91X=y)
- 	default y
- 	---help---
- 	  This option enables the WLAN BT coex support in rsi drivers.
--- 
-2.9.0
+Marcel
