@@ -3,8 +3,8 @@ From: bugzilla-daemon@bugzilla.kernel.org
 To: linux-bluetooth@kernel.org
 Subject: [Bug 198953] hci_bcm: Streamline runtime PM code    change for 4.16
  kernel breaks bluetooth on ASUS T100TA
-Date: Thu, 15 Mar 2018 17:09:29 +0000
-Message-ID: <bug-198953-62941-skjyEwW3S7@https.bugzilla.kernel.org/>
+Date: Thu, 15 Mar 2018 17:08:28 +0000
+Message-ID: <bug-198953-62941-hLo6cQ7BAn@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-198953-62941@https.bugzilla.kernel.org/>
 References: <bug-198953-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -14,10 +14,10 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 https://bugzilla.kernel.org/show_bug.cgi?id=198953
 
---- Comment #12 from Robert R. Howell (rhowell@uwyo.edu) ---
-Created attachment 274761
-  --> https://bugzilla.kernel.org/attachment.cgi?id=274761&action=edit
-acpidump for ASUS T100TAM
+--- Comment #11 from Robert R. Howell (rhowell@uwyo.edu) ---
+Created attachment 274759
+  --> https://bugzilla.kernel.org/attachment.cgi?id=274759&action=edit
+acpidump for ASUS T100TA
 
 -- 
 You are receiving this mail because:
