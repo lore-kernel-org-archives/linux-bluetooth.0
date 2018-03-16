@@ -1,35 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Cho, Yu-Chen" <acho@suse.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: acho@suse.com
-Subject: [PATCH BlueZ] tool/hcidump: Fix memory leak with malformed packet
-Date: Fri, 16 Mar 2018 18:43:34 +0800
-Message-Id: <20180316104334.16550-1-acho@suse.com>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@kernel.org
+Subject: [Bug 198953] hci_bcm: Streamline runtime PM code    change for 4.16
+ kernel breaks bluetooth on ASUS T100TA
+Date: Fri, 16 Mar 2018 10:36:01 +0000
+Message-ID: <bug-198953-62941-EETmYrIQZt@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-198953-62941@https.bugzilla.kernel.org/>
+References: <bug-198953-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Supported Commands is a 64 octet bit field.
-Do not allow to read more then the size.
----
- tools/parser/csr.c | 5 +++++
- 1 file changed, 5 insertions(+)
+https://bugzilla.kernel.org/show_bug.cgi?id=198953
 
-diff --git a/tools/parser/csr.c b/tools/parser/csr.c
-index a0a4eb5fe..d14830821 100644
---- a/tools/parser/csr.c
-+++ b/tools/parser/csr.c
-@@ -145,6 +145,11 @@ static inline void commands_dump(int level, char *str, struct frame *frm)
- 	unsigned char commands[64];
- 	unsigned int i;
- 
-+	if (frm->len > 64) {
-+		perror("Read Error");
-+		exit(0);
-+	}
-+
- 	memcpy(commands, frm->ptr, frm->len);
- 
- 	p_indent(level, frm);
+--- Comment #21 from Hans de Goede (jwrdegoede@fedoraproject.org) ---
+p.s.
+
+Thanks for the apcidumps too.
+
+Question can you attach the nvram file (/lib/firmware/brcm/brcmfmac43####.txt)
+you are using on the Toshiba encore ?  I'm wondering what the crystal frequency
+there is (the xtalfreq=37400 / xtalfreq=26000 line in the textfile), because
+the loaded patchram file needs to match the frequency.
+
 -- 
-2.16.2
-
+You are receiving this mail because:
+You are the assignee for the bug.
