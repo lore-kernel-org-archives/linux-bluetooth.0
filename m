@@ -1,152 +1,130 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Stotland, Inga" <inga.stotland@intel.com>
-To: "a.rai@samsung.com" <a.rai@samsung.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "anupam.r@samsung.com" <anupam.r@samsung.com>,
-        "sachin.dev@samsung.com" <sachin.dev@samsung.com>
-Subject: Re: [PATCH] Mesh: add 'node-reset' command
-Date: Fri, 16 Mar 2018 19:26:47 +0000
-Message-ID: <1521228405.3021.9.camel@intel.com>
-References: <CGME20180316074231epcas2p40b46daed3307a524f41d8c9994912596@epcas2p4.samsung.com>
-         <1521186139-12275-1-git-send-email-a.rai@samsung.com>
-In-Reply-To: <1521186139-12275-1-git-send-email-a.rai@samsung.com>
-Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-IE76I2magrKJWwTibtQZ"
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: Problem with naming of broadcom bt patchram firmware files
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
+ Rob Herring <robh@kernel.org>, Lukas Wunner <lukas@wunner.de>,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+ linux-serial@vger.kernel.org, linux-acpi <linux-acpi@vger.kernel.org>,
+ rhowell@uwyo.edu
+References: <359ee843-2c7c-456d-7cb7-fc3496e190c6@redhat.com>
+ <717D36B1-2023-4342-A043-8D5D713AC8AC@holtmann.org>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <420f5119-7b2c-bc97-6574-080b26782d66@redhat.com>
+Date: Fri, 16 Mar 2018 19:42:06 +0100
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <717D36B1-2023-4342-A043-8D5D713AC8AC@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-IE76I2magrKJWwTibtQZ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Marcel,
 
-Hi Atul,
+On 03/16/2018 01:58 PM, Marcel Holtmann wrote:
+> Hi Hans,
+> 
+>> I've been working recently on adding support for serialport /
+>> serdev attached brcm bt devices on more (x86) boards.
+>>
+>> This is going well in general, but I just noticed a problem
+>> with this.
+>>
+>> Currently on for example both the Raspberry Pi 3 and the
+>> Chuwi Vi8 Plus, we will load brcm/BCM43430A1.hcd as patchram
+>> file. Ideally this file will be in linux-firmware (*) so things
+>> will just work.
+>>
+>> But it turns out there are 2 different builds of the firmware,
+>> one for boards which use a 26MHz crystal and one for boards which
+>> use a 37.4Mhz crystal and guess what the RPi 3 uses 37.4Mhz
+>> and the Chuwi Vi8 Plus 26Mhz.
+>>
+>> So this causes 2 problems:
+>>
+>> 1) We need a -xxmhz postfix to the firmware name I believe,
+>> but this will break existing setups, so I guess we first
+>> try to load with the postfix, and then fallback to the old
+>> name?
+>>
+>> 2) A bigger problem is how to figure out which frequency we
+>> need. The wifi driver knows this as there is an xtalfreq=26000
+>> or xtalfreq=37400 in the nvram file it loads. We could come
+>> up with a mechanism to use this, but this will not be pretty and
+>> it assumes that the uart attached bcm bt is always combined
+>> with a wifi part which uses nvram from /lib/firmware.
+>>
+>> Looking at all the devices I'm aware of atm there is no
+>> real heuristic for this, but if we only look at x86 we can
+>> get away with a per chip default, which we set in the
+>> bcm_uart_subver_table.
+>>
+>> So the direction I'm thinking in atm is:
+>>
+>> 1) Let hci_bcm.c tell btbcm.c which frequency to use, with an
+>> option for it to pass "don't know use default"
+>>
+>> 2) For ARM allow setting the frequency through a devicetree property
+>> which gets set on the serdev device-node (the node with the
+>> "brcm,bcm43438-bt" compatible), with a fallback to the default
+>> if not set.
+>>
+>> 3) On x86 rely on the defaults and if ever necessary use DMI
+>> quirks to override
+>>
+>> Note for this to work, the default for the BCM43430A1.hcd needs
+>> to be 26 MHz and the RPi needs to have an updated devicetree
+>> setting the freq to 37.4.
+>>
+>> So what are your thoughts on this?
+> 
+> we need to move towards a modalias:firmware file name mapping table so that you can also just put all the firmware files you find in the Windows driver into lib/firmware and stop worrying about it. That is what Windows actually does, the PnP ID maps to the firmware file. They do that even for USB. Some time ago, I have written code for that and seems like I need to dust this off since now it is needed.
+> 
+> Here is what I had for /lib/firmware/brcm/bcmbtfw.map table that I used for testing.
+> 
+> usb:v0930p0223*         BCM20702A1_001.002.014.1483.1674.hex
+> usb:v0A5Cp21E8*         BCM20702A1_001.002.014.1443.1459.hex
+> usb:v0A5Cp21EC*         BCM20702A1_001.002.014.1443.1460.hex
+> usb:v0B05p17CB*         BCM20702A1_001.002.014.1443.1467.hex
+> usb:v19FFp0239*         BCM20702B0_002.001.014.0527.0557.hex
 
-On Fri, 2018-03-16 at 13:12 +0530, Atul Rai wrote:
-> This patch adds 'node-reset' command which can be used to reset a
-> node (other than a Provisioner) and remove it from the network.
-> ---
->  mesh/config-client.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
->=20
-> diff --git a/mesh/config-client.c b/mesh/config-client.c
-> index 19e617d..7cb8a37 100644
-> --- a/mesh/config-client.c
-> +++ b/mesh/config-client.c
-> @@ -342,6 +342,17 @@ static bool client_msg_recvd(uint16_t src,
-> uint8_t *data,
->  		bt_shell_printf("Min Hops\t%2.2x\n", data[7]);
->  		bt_shell_printf("Max Hops\t%2.2x\n", data[8]);
->  		break;
-> +
-> +	/* Per Mesh Profile 4.3.2.54 */
-> +	case OP_NODE_RESET_STATUS:
-> +		bt_shell_printf("Node %4.4x reset status %s\n",
-> +				src, mesh_status_str(data[0]));
-> +
-> +		net_release_address(node_get_primary(node),
-> +				(node_get_num_elements(node) - 1));
-> +		/* TODO: Remove node info from database */
-> +		node_free(node);
-> +		break;
->  	}
-> =20
->  	return true;
-> @@ -1124,6 +1135,11 @@ static void cmd_ttl_get(int argc, char
-> *argv[])
->  	cmd_default(OP_CONFIG_DEFAULT_TTL_GET);
->  }
-> =20
-> +static void cmd_node_reset(int argc, char *argv[])
-> +{
-> +	cmd_default(OP_NODE_RESET);
-> +}
-> +
->  static const struct bt_shell_menu cfg_menu =3D {
->  	.name =3D "config",
->  	.desc =3D "Configuration Model Submenu",
-> @@ -1179,6 +1195,8 @@ static const struct bt_shell_menu cfg_menu =3D {
->  				cmd_sub_add,    "Add subscription"},
->  	{"sub-get", "<ele_addr> <model id>",
->  				cmd_sub_get,    "Get subscription"},
-> +	{"node-reset",		NULL,                   cmd_no
-> de_reset,
+I think we are already doing something like this for USB devices,
+that is we already put the USB ids in the filename we look for, right?
 
-Please change leading white spaces to tabs in the line below and
-capitalize "Reset" in the command description for consistency.=20
-> +                                     "reset a node and remove it
-> from network"},
->  	{} },
->  };
-> =20
+with that said having a map like this so that we can directly use
+windows firmware filenames sounds like we might want it, otoh
+they embed a specific version in the filename which makes
+pushing out updated versions problematic, if we update the map,
+then things will break until the user install the new version,
+likewise if ever get these in linux-firmware (which I'm hopefully
+we do) then if we push a new version to linux-firmware we break
+things unless we also keep the old version there.
 
-This looks good, just needs a little style fix.
+TL;DR: I don't think using the Windows filenames as is is a good
+idea as they embed firmware version info in the filename which
+we do not want.
+
+> And we can stick ACPI and DT modalias entries in there as well.
+
+That would have the same problem with versions, also I
+would prefer to have to have the 26 / 37.4 MHz explicit
+in the filename, I think that there will be versions
+where there is both a 26MHz and 37.4MHz build of that version.
+
+I do agree that using the ACPI HID (which is in the modalias)
+likely is a good way to detect 26 vs 37.4 MHz, at least
+I hope there is a 1:1 mapping between those 2.
+
+> In addition, I am really thinking we should let hci_bcm.c be what it is and move towards the btuart.c serdev only driver that I posted a few days ago. That way we
+> can try to keep this clean and don’t have to deal with TTY line discipline legacy.
+> 
+> Do you have a good reference for the Broadcom Windows driver that includes UART based devices.
+
+You mean a download link, or?
+
+> And I wonder if the Apple UART devices use ROM patching or if they are RAM based like their USB counterparts.
+
+No idea.
 
 Regards,
-Inga
---=-IE76I2magrKJWwTibtQZ
-Content-Type: application/x-pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
 
-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
-Zg5mBVQoBK5apmk2/QnKNb/XBUyu62quyTXRahXz2KXRqznXj++7MiP2dYTRzC1XMK1lAgMBAAGj
-ggIxMIICLTAdBgNVHQ4EFgQUzeWQY29S+1e6mTvizPBEGBE3JGUwHwYDVR0jBBgwFoAU2kEjnFqP
-ca9Xgz4g0+Nl2wzLC9swZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5jb20vcmVw
-b3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEIu
-Y3JsMIGfBggrBgEFBQcBAQSBkjCBjzAiBggrBgEFBQcwAYYWaHR0cDovL29jc3AuaW50ZWwuY29t
-LzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRlbC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0
-ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEIuY3J0MAsGA1Ud
-DwQEAwIHgDA8BgkrBgEEAYI3FQcELzAtBiUrBgEEAYI3FQiGw4x1hJnlUYP9gSiFjp9TgpHACWeB
-3r05lfBDAgFkAgEJMB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsGAQQBgjcV
-CgQcMBowCgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBLBgNVHREERDBCoCcGCisGAQQBgjcUAgOg
-GQwXaW5nYS5zdG90bGFuZEBpbnRlbC5jb22BF2luZ2Euc3RvdGxhbmRAaW50ZWwuY29tMA0GCSqG
-SIb3DQEBBQUAA4IBAQCoG+97GZuQEwQnuWIVQWcpVw1Ym/kJEGjRAiB8JMflkvaemGuUV/xS2ccg
-o4V80bU6Ee3jhFp3DH8aiO068JigsTZRDt172E7E/p187o2M6FicC63aUgWW/FZfEaOXuky/8jdz
-9oaWcDIwFm+L6vpSQrE5Wbk5sCX04SvRlJ6X/+KAWJGE5sU9lA4XB0yJapCCoVyNZln3H3PdSXC2
-rdOl2HSUdGOvmIwNkaSLLaVgUjz6mFzzRi/64tOfROIQSEdBYNStKYCixc2KP/sWL6LtfW+sQVLZ
-r+HHDskuWTuEbYxFinLxC1gayzk80cz9z4qMg5bQJWyClLIwh4qpnUpoMYICFzCCAhMCAQEwgZAw
-eTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBDbGFyYTEaMBgGA1UE
-ChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3Vp
-bmcgQ0EgNEICEzMAAE9zKgiM3IZosrQAAAAAT3MwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzEL
-BgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE4MDMxNjE5MjY0NVowIwYJKoZIhvcNAQkEMRYE
-FIkfmD95LpssX0kLd9S6cbMFDDn8MA0GCSqGSIb3DQEBAQUABIIBAJguvQ+O8cbB8M86r2oio63F
-yKb5u54RrWNYo0rd6FfWVd14N+68++Cj9qTvJP/+clfcKGGP9dcKT2Lh25Q+BCGq/hUSmnTtEDbD
-Kx+1Y2vj/+w8/z4LumA7rqCfkC+gsf+bGzFLtvPDnu01bmtYV4YHXdikCjrqF2A8HxsZ0KYTlipU
-m+WZ/XjYcAJMWAmMjZ/iaOLXvxgwSseyUt1Wtwl87KwnrR6CfZZ7Ne2yKZDlNzpKhAoEsRvPL13a
-asp5IcwZZ08wDl7v3AFRWslJAM1/W8qI8qw8wa2TOEjsGsPPneywn82nSifZ8b6cUA0IJBotBGpF
-ZXYQQhitDziNnfAAAAAAAAA=
-
-
---=-IE76I2magrKJWwTibtQZ--
+Hans
