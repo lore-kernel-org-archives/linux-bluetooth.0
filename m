@@ -1,167 +1,136 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: avichal <avichal.a@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com, anupam.r@samsung.com,
-        avichal <avichal.a@samsung.com>
-Subject: [PATCH BlueZ 2/2] gatt-database: Add support for Included service
-Date: Fri, 16 Mar 2018 18:39:06 +0530
-Message-id: <1521205746-3636-1-git-send-email-avichal.a@samsung.com>
-In-reply-to: <CABBYNZJ_QegMdkc1yE462Dpu6Vfdot3SP3FNuPQZ1-SajwAFEQ@mail.gmail.com>
-References: <CABBYNZJ_QegMdkc1yE462Dpu6Vfdot3SP3FNuPQZ1-SajwAFEQ@mail.gmail.com>
-        <CGME20180316131046epcas1p1016f3684a15ae62cfce0cecef9d6a5c4@epcas1p1.samsung.com>
+MIME-Version: 1.0
+In-Reply-To: <20180315135242.27251-1-luiz.dentz@gmail.com>
+References: <20180315135242.27251-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 16 Mar 2018 15:00:59 +0200
+Message-ID: <CABBYNZ+aUUE1QDBZ6mu86t=inaGVG-B7VqfafmgercUHru1QQQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/shell: Enable generator for submenus
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support of included services in gatt server.While
-registring the service new property is added
-"includes"
-        array{object} type  [read-only]
-        Array of object paths representing the included
-        services of this service.
----
- src/gatt-database.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
+Hi,
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 9a33ae7..d1acc65 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -109,6 +109,7 @@ struct external_service {
- 	uint16_t attr_cnt;
- 	struct queue *chrcs;
- 	struct queue *descs;
-+	struct queue *includes;
- };
- 
- struct external_profile {
-@@ -444,12 +445,20 @@ static void desc_free(void *data)
- 	free(desc);
- }
- 
-+static void inc_free(void *data)
-+{
-+	struct external_desc *inc = data;
-+
-+	free(inc);
-+}
-+
- static void service_free(void *data)
- {
- 	struct external_service *service = data;
- 
- 	queue_destroy(service->chrcs, chrc_free);
- 	queue_destroy(service->descs, desc_free);
-+	queue_destroy(service->includes,inc_free );
- 
- 	if (service->attrib)
- 		gatt_db_remove_service(service->app->database->db,
-@@ -1533,6 +1542,7 @@ static struct external_service *create_service(struct gatt_app *app,
- 	service->proxy = g_dbus_proxy_ref(proxy);
- 	service->chrcs = queue_new();
- 	service->descs = queue_new();
-+	service->includes = queue_new();
- 
- 	/* Add 1 for the service declaration */
- 	if (!incr_attr_count(service, 1)) {
-@@ -1616,6 +1626,39 @@ static bool parse_uuid(GDBusProxy *proxy, bt_uuid_t *uuid)
- 	return true;
- }
- 
-+static bool parse_includes(GDBusProxy *proxy, struct external_service *service)
-+{
-+	DBusMessageIter iter;
-+	DBusMessageIter array;
-+	char *obj;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "Includes", &iter))
-+		return false;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return false;
-+
-+	dbus_message_iter_recurse(&iter, &array);
-+
-+	do {
-+		if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_OBJECT_PATH)
-+			return false;
-+
-+		dbus_message_iter_get_basic(&array, &obj);
-+
-+		if (queue_push_tail(service->includes,obj)){
-+			DBG("Included paths added\n");
-+			incr_attr_count(service ,1);
-+		}else {
-+			error("Failed to add Includes path in que\n");
-+			return FALSE;
-+		}
-+
-+	} while (dbus_message_iter_next(&array));
-+
-+	return true;
-+}
-+
- static bool parse_primary(GDBusProxy *proxy, bool *primary)
- {
- 	DBusMessageIter iter;
-@@ -2488,6 +2531,40 @@ fail:
- 	gatt_db_attribute_write_result(attrib, id, BT_ATT_ERROR_UNLIKELY);
- }
- 
-+static void include_services(void *data ,void *userdata)
-+{
-+	char *obj = (char *)data;
-+	struct external_service *service = (struct external_service *)userdata;
-+	struct gatt_db_attribute *attrib=NULL;
-+	struct external_service  *service_inc=NULL;
-+
-+	DBG("object path receieved %s,",obj);
-+
-+	service_inc = queue_find(service->app->services, match_service_by_path, obj);
-+	if(service_inc)	{
-+
-+		if (!(service)->attrib)
-+			error("service attibute not found\n");
-+
-+		if (!service_inc->attrib)
-+			error("include attribute not found\n");
-+
-+		attrib = gatt_db_service_add_included((service)->attrib ,service_inc->attrib);
-+		if (attrib == NULL)
-+			error("include service attributes failed\n");
-+		else
-+			(service)->attrib = attrib;
-+
-+	} else
-+		error("include service not found\n");
-+
-+}
-+
-+static void database_add_includes(struct external_service *service)
-+{
-+	queue_foreach(service->includes,include_services,service );
-+}
-+
- static bool database_add_chrc(struct external_service *service,
- 						struct external_chrc *chrc)
- {
-@@ -2560,11 +2637,17 @@ static bool database_add_service(struct external_service *service)
- 		return false;
- 	}
- 
-+	if (!parse_includes(service->proxy,service))
-+		error("Failed to read \"Includes\" property of service");
-+
- 	service->attrib = gatt_db_add_service(service->app->database->db, &uuid,
- 						primary, service->attr_cnt);
- 	if (!service->attrib)
- 		return false;
- 
-+	database_add_includes(service);
-+	DBG("ATTR count %d\n",service->attr_cnt);
-+
- 	entry = queue_get_entries(service->chrcs);
- 	while (entry) {
- 		struct external_chrc *chrc = entry->data;
+On Thu, Mar 15, 2018 at 3:52 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This enables command generator to work with submenu commands like:
+>
+> [bluetooth]# advertise.
+> advertise.appearance    advertise.manufacturer  advertise.timeout
+> advertise.clear         advertise.name          advertise.tx-power
+> advertise.duration      advertise.service       advertise.uuids
+>
+> Note that by default submenus commands will not be shown until . is
+> present in the input, that way only one command list is active at time.
+> ---
+>  src/shared/shell.c | 39 +++++++++++++++++++++++++++++++++------
+>  1 file changed, 33 insertions(+), 6 deletions(-)
+>
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index 3b680d7b0..0a05b5215 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -102,7 +102,7 @@ static void cmd_help(int argc, char *argv[])
+>         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>  }
+>
+> -static const struct bt_shell_menu *find_menu(const char *name)
+> +static const struct bt_shell_menu *find_menu(const char *name, size_t len)
+>  {
+>         const struct queue_entry *entry;
+>
+> @@ -110,8 +110,10 @@ static const struct bt_shell_menu *find_menu(const char *name)
+>                                                 entry = entry->next) {
+>                 struct bt_shell_menu *menu = entry->data;
+>
+> -               if (!strcmp(menu->name, name))
+> +               if (!strncmp(menu->name, name, len))
+>                         return menu;
+> +
+> +
+>         }
+>
+>         return NULL;
+> @@ -151,7 +153,7 @@ static void cmd_menu(int argc, char *argv[])
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>         }
+>
+> -       menu = find_menu(argv[1]);
+> +       menu = find_menu(argv[1], strlen(argv[1]));
+>         if (!menu) {
+>                 bt_shell_printf("Unable find menu with name: %s\n", argv[1]);
+>                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> @@ -403,7 +405,7 @@ static int submenu_exec(int argc, char *argv[])
+>         len = name - argv[0];
+>         name[0] = '\0';
+>
+> -       submenu = find_menu(argv[0]);
+> +       submenu = find_menu(argv[0], strlen(argv[0]));
+>         if (!submenu)
+>                 return -ENOENT;
+>
+> @@ -601,12 +603,15 @@ static char *find_cmd(const char *text,
+>  static char *cmd_generator(const char *text, int state)
+>  {
+>         static int index;
+> -       static bool default_menu_enabled;
+> +       static bool default_menu_enabled, submenu_enabled;
+> +       static const struct bt_shell_menu *menu;
+>         char *cmd;
+>
+>         if (!state) {
+>                 index = 0;
+> +               menu = NULL;
+>                 default_menu_enabled = true;
+> +               submenu_enabled = false;
+>         }
+>
+>         if (default_menu_enabled) {
+> @@ -615,11 +620,33 @@ static char *cmd_generator(const char *text, int state)
+>                         return cmd;
+>                 } else {
+>                         index = 0;
+> +                       menu = data.menu;
+>                         default_menu_enabled = false;
+>                 }
+>         }
+>
+> -       return find_cmd(text, data.menu->entries, &index);
+> +       if (!submenu_enabled) {
+> +               cmd = find_cmd(text, menu->entries, &index);
+> +               if (cmd || menu != data.main)
+> +                       return cmd;
+> +
+> +               cmd = strrchr(text, '.');
+> +               if (!cmd)
+> +                       return NULL;
+> +
+> +               menu = find_menu(text, cmd - text);
+> +               if (!menu)
+> +                       return NULL;
+> +
+> +               index = 0;
+> +               submenu_enabled = true;
+> +       }
+> +
+> +       cmd = find_cmd(text + strlen(menu->name) + 1, menu->entries, &index);
+> +       if (cmd)
+> +               asprintf(&cmd, "%s.%s", menu->name, cmd);
+> +
+> +       return cmd;
+>  }
+>
+>  static wordexp_t args;
+> --
+> 2.14.3
+
+Applied.
+
+
+
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
