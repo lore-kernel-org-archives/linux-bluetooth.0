@@ -1,136 +1,98 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20180315135242.27251-1-luiz.dentz@gmail.com>
-References: <20180315135242.27251-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 16 Mar 2018 15:00:59 +0200
-Message-ID: <CABBYNZ+aUUE1QDBZ6mu86t=inaGVG-B7VqfafmgercUHru1QQQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/shell: Enable generator for submenus
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: Problem with naming of broadcom bt patchram firmware files
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <359ee843-2c7c-456d-7cb7-fc3496e190c6@redhat.com>
+Date: Fri, 16 Mar 2018 13:58:57 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+        Rob Herring <robh@kernel.org>, Lukas Wunner <lukas@wunner.de>,
+        Linux Bluetooth mailing list
+        <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
+        linux-acpi <linux-acpi@vger.kernel.org>, rhowell@uwyo.edu
+Message-Id: <717D36B1-2023-4342-A043-8D5D713AC8AC@holtmann.org>
+References: <359ee843-2c7c-456d-7cb7-fc3496e190c6@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Hans,
 
-On Thu, Mar 15, 2018 at 3:52 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This enables command generator to work with submenu commands like:
->
-> [bluetooth]# advertise.
-> advertise.appearance    advertise.manufacturer  advertise.timeout
-> advertise.clear         advertise.name          advertise.tx-power
-> advertise.duration      advertise.service       advertise.uuids
->
-> Note that by default submenus commands will not be shown until . is
-> present in the input, that way only one command list is active at time.
-> ---
->  src/shared/shell.c | 39 +++++++++++++++++++++++++++++++++------
->  1 file changed, 33 insertions(+), 6 deletions(-)
->
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index 3b680d7b0..0a05b5215 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -102,7 +102,7 @@ static void cmd_help(int argc, char *argv[])
->         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
->  }
->
-> -static const struct bt_shell_menu *find_menu(const char *name)
-> +static const struct bt_shell_menu *find_menu(const char *name, size_t len)
->  {
->         const struct queue_entry *entry;
->
-> @@ -110,8 +110,10 @@ static const struct bt_shell_menu *find_menu(const char *name)
->                                                 entry = entry->next) {
->                 struct bt_shell_menu *menu = entry->data;
->
-> -               if (!strcmp(menu->name, name))
-> +               if (!strncmp(menu->name, name, len))
->                         return menu;
-> +
-> +
->         }
->
->         return NULL;
-> @@ -151,7 +153,7 @@ static void cmd_menu(int argc, char *argv[])
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->         }
->
-> -       menu = find_menu(argv[1]);
-> +       menu = find_menu(argv[1], strlen(argv[1]));
->         if (!menu) {
->                 bt_shell_printf("Unable find menu with name: %s\n", argv[1]);
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> @@ -403,7 +405,7 @@ static int submenu_exec(int argc, char *argv[])
->         len = name - argv[0];
->         name[0] = '\0';
->
-> -       submenu = find_menu(argv[0]);
-> +       submenu = find_menu(argv[0], strlen(argv[0]));
->         if (!submenu)
->                 return -ENOENT;
->
-> @@ -601,12 +603,15 @@ static char *find_cmd(const char *text,
->  static char *cmd_generator(const char *text, int state)
->  {
->         static int index;
-> -       static bool default_menu_enabled;
-> +       static bool default_menu_enabled, submenu_enabled;
-> +       static const struct bt_shell_menu *menu;
->         char *cmd;
->
->         if (!state) {
->                 index = 0;
-> +               menu = NULL;
->                 default_menu_enabled = true;
-> +               submenu_enabled = false;
->         }
->
->         if (default_menu_enabled) {
-> @@ -615,11 +620,33 @@ static char *cmd_generator(const char *text, int state)
->                         return cmd;
->                 } else {
->                         index = 0;
-> +                       menu = data.menu;
->                         default_menu_enabled = false;
->                 }
->         }
->
-> -       return find_cmd(text, data.menu->entries, &index);
-> +       if (!submenu_enabled) {
-> +               cmd = find_cmd(text, menu->entries, &index);
-> +               if (cmd || menu != data.main)
-> +                       return cmd;
-> +
-> +               cmd = strrchr(text, '.');
-> +               if (!cmd)
-> +                       return NULL;
-> +
-> +               menu = find_menu(text, cmd - text);
-> +               if (!menu)
-> +                       return NULL;
-> +
-> +               index = 0;
-> +               submenu_enabled = true;
-> +       }
-> +
-> +       cmd = find_cmd(text + strlen(menu->name) + 1, menu->entries, &index);
-> +       if (cmd)
-> +               asprintf(&cmd, "%s.%s", menu->name, cmd);
-> +
-> +       return cmd;
->  }
->
->  static wordexp_t args;
-> --
-> 2.14.3
+> I've been working recently on adding support for serialport /
+> serdev attached brcm bt devices on more (x86) boards.
+> 
+> This is going well in general, but I just noticed a problem
+> with this.
+> 
+> Currently on for example both the Raspberry Pi 3 and the
+> Chuwi Vi8 Plus, we will load brcm/BCM43430A1.hcd as patchram
+> file. Ideally this file will be in linux-firmware (*) so things
+> will just work.
+> 
+> But it turns out there are 2 different builds of the firmware,
+> one for boards which use a 26MHz crystal and one for boards which
+> use a 37.4Mhz crystal and guess what the RPi 3 uses 37.4Mhz
+> and the Chuwi Vi8 Plus 26Mhz.
+> 
+> So this causes 2 problems:
+> 
+> 1) We need a -xxmhz postfix to the firmware name I believe,
+> but this will break existing setups, so I guess we first
+> try to load with the postfix, and then fallback to the old
+> name?
+> 
+> 2) A bigger problem is how to figure out which frequency we
+> need. The wifi driver knows this as there is an xtalfreq=26000
+> or xtalfreq=37400 in the nvram file it loads. We could come
+> up with a mechanism to use this, but this will not be pretty and
+> it assumes that the uart attached bcm bt is always combined
+> with a wifi part which uses nvram from /lib/firmware.
+> 
+> Looking at all the devices I'm aware of atm there is no
+> real heuristic for this, but if we only look at x86 we can
+> get away with a per chip default, which we set in the
+> bcm_uart_subver_table.
+> 
+> So the direction I'm thinking in atm is:
+> 
+> 1) Let hci_bcm.c tell btbcm.c which frequency to use, with an
+> option for it to pass "don't know use default"
+> 
+> 2) For ARM allow setting the frequency through a devicetree property
+> which gets set on the serdev device-node (the node with the
+> "brcm,bcm43438-bt" compatible), with a fallback to the default
+> if not set.
+> 
+> 3) On x86 rely on the defaults and if ever necessary use DMI
+> quirks to override
+> 
+> Note for this to work, the default for the BCM43430A1.hcd needs
+> to be 26 MHz and the RPi needs to have an updated devicetree
+> setting the freq to 37.4.
+> 
+> So what are your thoughts on this?
 
-Applied.
+we need to move towards a modalias:firmware file name mapping table so that you can also just put all the firmware files you find in the Windows driver into lib/firmware and stop worrying about it. That is what Windows actually does, the PnP ID maps to the firmware file. They do that even for USB. Some time ago, I have written code for that and seems like I need to dust this off since now it is needed.
 
+Here is what I had for /lib/firmware/brcm/bcmbtfw.map table that I used for testing.
 
+usb:v0930p0223*         BCM20702A1_001.002.014.1483.1674.hex
+usb:v0A5Cp21E8*         BCM20702A1_001.002.014.1443.1459.hex
+usb:v0A5Cp21EC*         BCM20702A1_001.002.014.1443.1460.hex
+usb:v0B05p17CB*         BCM20702A1_001.002.014.1443.1467.hex
+usb:v19FFp0239*         BCM20702B0_002.001.014.0527.0557.hex
 
--- 
-Luiz Augusto von Dentz
+And we can stick ACPI and DT modalias entries in there as well.
+
+In addition, I am really thinking we should let hci_bcm.c be what it is and move towards the btuart.c serdev only driver that I posted a few days ago. That way we 
+can try to keep this clean and don’t have to deal with TTY line discipline legacy.
+
+Do you have a good reference for the Broadcom Windows driver that includes UART based devices. And I wonder if the Apple UART devices use ROM patching or if they are RAM based like their USB counterparts.
+
+Regards
+
+Marcel
+
