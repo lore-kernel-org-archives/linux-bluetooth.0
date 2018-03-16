@@ -6,65 +6,72 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Subject: [PATCH 4/5] Bluetooth: hci_bcm: Remove duplication in gpio-mappings declaration
-Date: Fri, 16 Mar 2018 21:28:10 +0100
-Message-Id: <20180316202811.5678-4-hdegoede@redhat.com>
+	linux-acpi@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH 3/5] Bluetooth: hci_bcm: Add 6 new ACPI HIDs
+Date: Fri, 16 Mar 2018 21:28:09 +0100
+Message-Id: <20180316202811.5678-3-hdegoede@redhat.com>
 In-Reply-To: <20180316202811.5678-1-hdegoede@redhat.com>
 References: <20180316202811.5678-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-We declare the same set of const acpi_gpio_params twice with different
-names, besides the needless duplication this naming leads to a sortof
-double indirection which also makes it harder to see how the mapping is
-actually setup.
+Add 6 new ACPI HIDs to enable bluetooth on devices using these HIDs,
+I've tested the following HIDs / devices:
 
-This commit renames the first set to have generic names, which better
-describe the contents of the mapping and drops the second set.
+BCM2E74: Jumper ezPad mini 3
+BCM2E83: Acer Iconia Tab8 w1-810
+BCM2E90: Meegopad T08
+BCM2EAA: Chuwi Vi8 plus (CWI519)
 
+The reporter of Red Hat bugzilla 1554835 has tested:
+BCM2E84: Lenovo Yoga2
+
+The reporter of kernel bugzilla 274481 has tested:
+BCM2E38: Toshiba Encore
+
+Note the Lenovo Yoga2 and Toshiba Encore also needs the earlier patch to
+treat all Interrupt ACPI resources as active low.
+
+Cc: stable@vger.kernel.org
+Buglink: https://bugzilla.kernel.org/attachment.cgi?id=274481
+Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1554835
+Reported-and-tested-by: Robert R. Howell <rhowell@uwyo.edu>
+Reported-and-tested-by: Christian Herzog <daduke@daduke.org>
+Tested-by: Hans de Goede <hdegoede@redhat.com>
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/hci_bcm.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 18416c435b20..3c7fc5d6ef9f 100644
+index 7acd77a53b08..18416c435b20 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -774,25 +774,21 @@ static int bcm_resume(struct device *dev)
- }
- #endif
- 
--static const struct acpi_gpio_params int_last_device_wakeup_gpios = { 0, 0, false };
--static const struct acpi_gpio_params int_last_shutdown_gpios = { 1, 0, false };
--static const struct acpi_gpio_params int_last_host_wakeup_gpios = { 2, 0, false };
-+static const struct acpi_gpio_params first_gpio = { 0, 0, false };
-+static const struct acpi_gpio_params second_gpio = { 1, 0, false };
-+static const struct acpi_gpio_params third_gpio = { 2, 0, false };
- 
- static const struct acpi_gpio_mapping acpi_bcm_int_last_gpios[] = {
--	{ "device-wakeup-gpios", &int_last_device_wakeup_gpios, 1 },
--	{ "shutdown-gpios", &int_last_shutdown_gpios, 1 },
--	{ "host-wakeup-gpios", &int_last_host_wakeup_gpios, 1 },
-+	{ "device-wakeup-gpios", &first_gpio, 1 },
-+	{ "shutdown-gpios", &second_gpio, 1 },
-+	{ "host-wakeup-gpios", &third_gpio, 1 },
+@@ -1075,6 +1075,7 @@ static const struct hci_uart_proto bcm_proto = {
+ #ifdef CONFIG_ACPI
+ static const struct acpi_device_id bcm_acpi_match[] = {
+ 	{ "BCM2E1A", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
++	{ "BCM2E38", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E39", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E3A", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E3D", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+@@ -1087,12 +1088,17 @@ static const struct acpi_device_id bcm_acpi_match[] = {
+ 	{ "BCM2E67", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E71", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E72", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
++	{ "BCM2E74", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E7B", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E7C", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E7E", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
++	{ "BCM2E83", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
++	{ "BCM2E84", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
++	{ "BCM2E90", (kernel_ulong_t)&acpi_bcm_int_last_gpios },
+ 	{ "BCM2E95", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+ 	{ "BCM2E96", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
+ 	{ "BCM2EA4", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
++	{ "BCM2EAA", (kernel_ulong_t)&acpi_bcm_int_first_gpios },
  	{ },
  };
- 
--static const struct acpi_gpio_params int_first_host_wakeup_gpios = { 0, 0, false };
--static const struct acpi_gpio_params int_first_device_wakeup_gpios = { 1, 0, false };
--static const struct acpi_gpio_params int_first_shutdown_gpios = { 2, 0, false };
--
- static const struct acpi_gpio_mapping acpi_bcm_int_first_gpios[] = {
--	{ "device-wakeup-gpios", &int_first_device_wakeup_gpios, 1 },
--	{ "shutdown-gpios", &int_first_shutdown_gpios, 1 },
--	{ "host-wakeup-gpios", &int_first_host_wakeup_gpios, 1 },
-+	{ "host-wakeup-gpios", &first_gpio, 1 },
-+	{ "device-wakeup-gpios", &second_gpio, 1 },
-+	{ "shutdown-gpios", &third_gpio, 1 },
- 	{ },
- };
- 
+ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
 -- 
 2.14.3
