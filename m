@@ -8,73 +8,57 @@ Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-serial@vger.kernel.org,
 	linux-acpi@vger.kernel.org,
 	stable@vger.kernel.org
-Subject: [PATCH 2/5] Bluetooth: hci_bcm: Treat Interrupt ACPI resources as always being active-low
-Date: Fri, 16 Mar 2018 21:28:08 +0100
-Message-Id: <20180316202811.5678-2-hdegoede@redhat.com>
-In-Reply-To: <20180316202811.5678-1-hdegoede@redhat.com>
-References: <20180316202811.5678-1-hdegoede@redhat.com>
+Subject: [PATCH 1/5] Bluetooth: hci_bcm: Add irq_polarity module option
+Date: Fri, 16 Mar 2018 21:28:07 +0100
+Message-Id: <20180316202811.5678-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Older devices with a serdev attached bcm bt hci, use an Interrupt ACPI
-resource to describe the IRQ (rather then a GpioInt resource).
-
-These device seem to all claim the IRQ is active-high and seem to all need
-a DMI quirk to treat it as active-low. Instead simply always assume that
-Interrupt resource specified IRQs are always active-low.
-
-This fixes the bt device not being able to wake the host from runtime-
-suspend on the: Asus T100TAM, Asus T200TA, Lenovo Yoga2 and the Toshiba
-Encore, without the need to add 4 new DMI quirks for these models.
-
-This also allows us to remove 2 DMI quirks for the Asus T100TA and Asus
-T100CHI series. Likely the 2 remaining quirks can also be removed but I
-could not find a DSDT of these devices to verify this.
+Add irq_polarity module option for easier troubleshooting of irq-polarity
+issues.
 
 Cc: stable@vger.kernel.org
-Buglink: https://bugzilla.kernel.org/show_bug.cgi?id=198953
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1554835
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/hci_bcm.c | 20 +++-----------------
- 1 file changed, 3 insertions(+), 17 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index bb6cd1623132..7acd77a53b08 100644
+index 5e3aba3c3185..bb6cd1623132 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -799,22 +799,6 @@ static const struct acpi_gpio_mapping acpi_bcm_int_first_gpios[] = {
- #ifdef CONFIG_ACPI
- /* IRQ polarity of some chipsets are not defined correctly in ACPI table. */
- static const struct dmi_system_id bcm_active_low_irq_dmi_table[] = {
--	{
--		.ident = "Asus T100TA",
--		.matches = {
--			DMI_EXACT_MATCH(DMI_SYS_VENDOR,
--					"ASUSTeK COMPUTER INC."),
--			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100TA"),
--		},
--	},
--	{
--		.ident = "Asus T100CHI",
--		.matches = {
--			DMI_EXACT_MATCH(DMI_SYS_VENDOR,
--					"ASUSTeK COMPUTER INC."),
--			DMI_EXACT_MATCH(DMI_PRODUCT_NAME, "T100CHI"),
--		},
--	},
- 	{	/* Handle ThinkPad 8 tablets with BCM2E55 chipset ACPI ID */
- 		.ident = "Lenovo ThinkPad 8",
- 		.matches = {
-@@ -842,7 +826,9 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
- 	switch (ares->type) {
- 	case ACPI_RESOURCE_TYPE_EXTENDED_IRQ:
- 		irq = &ares->data.extended_irq;
--		dev->irq_active_low = irq->polarity == ACPI_ACTIVE_LOW;
-+		if (irq->polarity != ACPI_ACTIVE_LOW)
-+			dev_info(dev->dev, "ACPI Interrupt resource is active-high, this is usually wrong, treating the IRQ as active-low\n");
-+		dev->irq_active_low = true;
- 		break;
+@@ -126,6 +126,10 @@ struct bcm_data {
+ static DEFINE_MUTEX(bcm_device_lock);
+ static LIST_HEAD(bcm_device_list);
  
- 	case ACPI_RESOURCE_TYPE_GPIO:
++static int irq_polarity = -1;
++module_param(irq_polarity, int, 0444);
++MODULE_PARM_DESC(irq_polarity, "IRQ polarity 0: active-high 1: active-low");
++
+ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ {
+ 	if (hu->serdev)
+@@ -988,11 +992,17 @@ static int bcm_acpi_probe(struct bcm_device *dev)
+ 	}
+ 	acpi_dev_free_resource_list(&resources);
+ 
+-	dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
+-	if (dmi_id) {
+-		dev_warn(dev->dev, "%s: Overwriting IRQ polarity to active low",
+-			    dmi_id->ident);
+-		dev->irq_active_low = true;
++	if (irq_polarity != -1) {
++		dev->irq_active_low = irq_polarity;
++		dev_warn(dev->dev, "Overwriting IRQ polarity to active %s by module-param\n",
++			 dev->irq_active_low ? "low" : "high");
++	} else {
++		dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
++		if (dmi_id) {
++			dev_warn(dev->dev, "%s: Overwriting IRQ polarity to active low",
++				 dmi_id->ident);
++			dev->irq_active_low = true;
++		}
+ 	}
+ 
+ 	return 0;
 -- 
 2.14.3
