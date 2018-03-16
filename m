@@ -1,130 +1,172 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: Problem with naming of broadcom bt patchram firmware files
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>,
- Rob Herring <robh@kernel.org>, Lukas Wunner <lukas@wunner.de>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
- linux-serial@vger.kernel.org, linux-acpi <linux-acpi@vger.kernel.org>,
- rhowell@uwyo.edu
-References: <359ee843-2c7c-456d-7cb7-fc3496e190c6@redhat.com>
- <717D36B1-2023-4342-A043-8D5D713AC8AC@holtmann.org>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <420f5119-7b2c-bc97-6574-080b26782d66@redhat.com>
-Date: Fri, 16 Mar 2018 19:42:06 +0100
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Stotland, Inga" <inga.stotland@intel.com>
+To: "a.rai@samsung.com" <a.rai@samsung.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "anupam.r@samsung.com" <anupam.r@samsung.com>,
+        "sachin.dev@samsung.com" <sachin.dev@samsung.com>
+Subject: Re: [PATCH] Mesh: Close net session on device disconnection
+Date: Fri, 16 Mar 2018 18:26:45 +0000
+Message-ID: <1521224803.3021.1.camel@intel.com>
+References: <CGME20180316074208epcas2p22e43ea7190d2ce88a5cf952269c8939a@epcas2p2.samsung.com>
+         <1521186117-12216-1-git-send-email-a.rai@samsung.com>
+In-Reply-To: <1521186117-12216-1-git-send-email-a.rai@samsung.com>
+Content-Type: multipart/signed; micalg=sha-1;
+        protocol="application/x-pkcs7-signature"; boundary="=-82WioPYKsE1vzq3tf6Ya"
 MIME-Version: 1.0
-In-Reply-To: <717D36B1-2023-4342-A043-8D5D713AC8AC@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+--=-82WioPYKsE1vzq3tf6Ya
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 03/16/2018 01:58 PM, Marcel Holtmann wrote:
-> Hi Hans,
-> 
->> I've been working recently on adding support for serialport /
->> serdev attached brcm bt devices on more (x86) boards.
->>
->> This is going well in general, but I just noticed a problem
->> with this.
->>
->> Currently on for example both the Raspberry Pi 3 and the
->> Chuwi Vi8 Plus, we will load brcm/BCM43430A1.hcd as patchram
->> file. Ideally this file will be in linux-firmware (*) so things
->> will just work.
->>
->> But it turns out there are 2 different builds of the firmware,
->> one for boards which use a 26MHz crystal and one for boards which
->> use a 37.4Mhz crystal and guess what the RPi 3 uses 37.4Mhz
->> and the Chuwi Vi8 Plus 26Mhz.
->>
->> So this causes 2 problems:
->>
->> 1) We need a -xxmhz postfix to the firmware name I believe,
->> but this will break existing setups, so I guess we first
->> try to load with the postfix, and then fallback to the old
->> name?
->>
->> 2) A bigger problem is how to figure out which frequency we
->> need. The wifi driver knows this as there is an xtalfreq=26000
->> or xtalfreq=37400 in the nvram file it loads. We could come
->> up with a mechanism to use this, but this will not be pretty and
->> it assumes that the uart attached bcm bt is always combined
->> with a wifi part which uses nvram from /lib/firmware.
->>
->> Looking at all the devices I'm aware of atm there is no
->> real heuristic for this, but if we only look at x86 we can
->> get away with a per chip default, which we set in the
->> bcm_uart_subver_table.
->>
->> So the direction I'm thinking in atm is:
->>
->> 1) Let hci_bcm.c tell btbcm.c which frequency to use, with an
->> option for it to pass "don't know use default"
->>
->> 2) For ARM allow setting the frequency through a devicetree property
->> which gets set on the serdev device-node (the node with the
->> "brcm,bcm43438-bt" compatible), with a fallback to the default
->> if not set.
->>
->> 3) On x86 rely on the defaults and if ever necessary use DMI
->> quirks to override
->>
->> Note for this to work, the default for the BCM43430A1.hcd needs
->> to be 26 MHz and the RPi needs to have an updated devicetree
->> setting the freq to 37.4.
->>
->> So what are your thoughts on this?
-> 
-> we need to move towards a modalias:firmware file name mapping table so that you can also just put all the firmware files you find in the Windows driver into lib/firmware and stop worrying about it. That is what Windows actually does, the PnP ID maps to the firmware file. They do that even for USB. Some time ago, I have written code for that and seems like I need to dust this off since now it is needed.
-> 
-> Here is what I had for /lib/firmware/brcm/bcmbtfw.map table that I used for testing.
-> 
-> usb:v0930p0223*         BCM20702A1_001.002.014.1483.1674.hex
-> usb:v0A5Cp21E8*         BCM20702A1_001.002.014.1443.1459.hex
-> usb:v0A5Cp21EC*         BCM20702A1_001.002.014.1443.1460.hex
-> usb:v0B05p17CB*         BCM20702A1_001.002.014.1443.1467.hex
-> usb:v19FFp0239*         BCM20702B0_002.001.014.0527.0557.hex
+Hi Atul,
 
-I think we are already doing something like this for USB devices,
-that is we already put the USB ids in the filename we look for, right?
+On Fri, 2018-03-16 at 13:11 +0530, Atul Rai wrote:
+> On device disconnection, net session is not closed. On next
+> attempt to provision/connect a device, net session proxy is
+> not updated by net_session_open() as proxy_in is not NULL.
+> This causes meshctl to use invalid proxy resulting in below
+> crash.
+>=20
+> 0  strlen () at ../sysdeps/x86_64/strlen.S:106
+> 1  0x00007f3a3c8b1ac4 in _dbus_string_init_const () from libdbus-
+> 1.so.3
+> 2  0x00007f3a3c89ed15 in ?? () from libdbus-1.so.3
+> 3  0x00007f3a3c89fba0 in dbus_message_new_method_call () from
+> libdbus-1.so.3
+> 4  0x0000000000419880 in g_dbus_proxy_method_call at
+> gdbus/client.c:997
+> 5  0x000000000040ab9d in mesh_gatt_write at mesh/gatt.c:347
+> 6  0x000000000040d761 in send_mesh_pkt at mesh/net.c:1227
+> 7  send_seg at mesh/net.c:1325
+> 8  0x000000000040fa60 in net_access_layer_send at mesh/net.c:2163
+> 9  0x0000000000413c74 in config_send at mesh/config-client.c:418
+> 10 0x0000000000414886 in cmd_composition_get at mesh/config-
+> client.c:470
+> 11 0x000000000041ffd9 in cmd_exec at src/shared/shell.c:356
+> 12 menu_exec at src/shared/shell.c:383
+> 13 0x00000000004203a5 in shell_exec at src/shared/shell.c:426
+> 14 0x0000000000420d24 in rl_handler (input=3D0x2259aa0 "composition-get=
+=20
+> ")
+> at src/shared/shell.c:571
+> 15 0x00007f3a3c45d6f5 in rl_callback_read_char () from
+> libreadline.so.6
+> 16 0x0000000000420229 in input_read at src/shared/shell.c:1034
+> 17 0x0000000000421655 in watch_callback at src/shared/io-glib.c:170
+> 18 0x00007f3a3cb1a04a in g_main_context_dispatch () from libglib-
+> 2.0.so.0
+> 19 0x00007f3a3cb1a3f0 in ?? () from libglib-2.0.so.0
+> 20 0x00007f3a3cb1a712 in g_main_loop_run () from libglib-2.0.so.0
+> 21 0x0000000000421bf5 in mainloop_run () at src/shared/mainloop-
+> glib.c:73
+> 22 0x000000000042115a in bt_shell_run () at src/shared/shell.c:962
+> 23 0x0000000000405c5d in main at mesh/main.c:1992
+> ---
+>  mesh/main.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/mesh/main.c b/mesh/main.c
+> index 7c72f49..d991c9f 100644
+> --- a/mesh/main.c
+> +++ b/mesh/main.c
+> @@ -949,7 +949,6 @@ static void mesh_session_setup(GDBusProxy *proxy)
+>  		data_out_notify(connection.data_out, true,
+> notify_prov_out_cb);
+> =20
+>  	} else if (connection.type !=3D CONN_TYPE_INVALID){
+> -
+>  		connection.data_in =3D get_characteristic(proxy,
+>  						MESH_PROXY_DATA_IN_U
+> UID_STR);
+>  		if (!connection.data_in)
+> @@ -1202,8 +1201,10 @@ static void property_changed(GDBusProxy
+> *proxy, const char *name,
+>  				if (connected && connection.device
+> =3D=3D NULL)
+>  					set_connected_device(proxy);
+>  				else if (!connected &&
+> -						connection.device =3D=3D
+> proxy)
+> +						connection.device =3D=3D
+> proxy) {
+> +					net_session_close(connection
+> .data_in);
+>  					set_connected_device(NULL);
+> +				}
+>  			} else if ((strcmp(name, "Alias") =3D=3D 0) &&
+>  						connection.device =3D=3D
+> proxy) {
+>  				/* Re-generate prompt */
 
-with that said having a map like this so that we can directly use
-windows firmware filenames sounds like we might want it, otoh
-they embed a specific version in the filename which makes
-pushing out updated versions problematic, if we update the map,
-then things will break until the user install the new version,
-likewise if ever get these in linux-firmware (which I'm hopefully
-we do) then if we push a new version to linux-firmware we break
-things unless we also keep the old version there.
-
-TL;DR: I don't think using the Windows filenames as is is a good
-idea as they embed firmware version info in the filename which
-we do not want.
-
-> And we can stick ACPI and DT modalias entries in there as well.
-
-That would have the same problem with versions, also I
-would prefer to have to have the 26 / 37.4 MHz explicit
-in the filename, I think that there will be versions
-where there is both a 26MHz and 37.4MHz build of that version.
-
-I do agree that using the ACPI HID (which is in the modalias)
-likely is a good way to detect 26 vs 37.4 MHz, at least
-I hope there is a 1:1 mapping between those 2.
-
-> In addition, I am really thinking we should let hci_bcm.c be what it is and move towards the btuart.c serdev only driver that I posted a few days ago. That way we
-> can try to keep this clean and don’t have to deal with TTY line discipline legacy.
-> 
-> Do you have a good reference for the Broadcom Windows driver that includes UART based devices.
-
-You mean a download link, or?
-
-> And I wonder if the Apple UART devices use ROM patching or if they are RAM based like their USB counterparts.
-
-No idea.
+This looks fine.
 
 Regards,
+Inga
+--=-82WioPYKsE1vzq3tf6Ya
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-Hans
+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
+Zg5mBVQoBK5apmk2/QnKNb/XBUyu62quyTXRahXz2KXRqznXj++7MiP2dYTRzC1XMK1lAgMBAAGj
+ggIxMIICLTAdBgNVHQ4EFgQUzeWQY29S+1e6mTvizPBEGBE3JGUwHwYDVR0jBBgwFoAU2kEjnFqP
+ca9Xgz4g0+Nl2wzLC9swZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5jb20vcmVw
+b3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEIu
+Y3JsMIGfBggrBgEFBQcBAQSBkjCBjzAiBggrBgEFBQcwAYYWaHR0cDovL29jc3AuaW50ZWwuY29t
+LzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRlbC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0
+ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIwNEIuY3J0MAsGA1Ud
+DwQEAwIHgDA8BgkrBgEEAYI3FQcELzAtBiUrBgEEAYI3FQiGw4x1hJnlUYP9gSiFjp9TgpHACWeB
+3r05lfBDAgFkAgEJMB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsGAQQBgjcV
+CgQcMBowCgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBLBgNVHREERDBCoCcGCisGAQQBgjcUAgOg
+GQwXaW5nYS5zdG90bGFuZEBpbnRlbC5jb22BF2luZ2Euc3RvdGxhbmRAaW50ZWwuY29tMA0GCSqG
+SIb3DQEBBQUAA4IBAQCoG+97GZuQEwQnuWIVQWcpVw1Ym/kJEGjRAiB8JMflkvaemGuUV/xS2ccg
+o4V80bU6Ee3jhFp3DH8aiO068JigsTZRDt172E7E/p187o2M6FicC63aUgWW/FZfEaOXuky/8jdz
+9oaWcDIwFm+L6vpSQrE5Wbk5sCX04SvRlJ6X/+KAWJGE5sU9lA4XB0yJapCCoVyNZln3H3PdSXC2
+rdOl2HSUdGOvmIwNkaSLLaVgUjz6mFzzRi/64tOfROIQSEdBYNStKYCixc2KP/sWL6LtfW+sQVLZ
+r+HHDskuWTuEbYxFinLxC1gayzk80cz9z4qMg5bQJWyClLIwh4qpnUpoMYICFzCCAhMCAQEwgZAw
+eTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBDbGFyYTEaMBgGA1UE
+ChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2ljIElzc3Vp
+bmcgQ0EgNEICEzMAAE9zKgiM3IZosrQAAAAAT3MwCQYFKw4DAhoFAKBdMBgGCSqGSIb3DQEJAzEL
+BgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE4MDMxNjE4MjY0M1owIwYJKoZIhvcNAQkEMRYE
+FMfj0SZH8vf9avstswWN3ZZcp4T/MA0GCSqGSIb3DQEBAQUABIIBAF575nvCh2vCrsNKMMx/yyOj
+JUC7Vmd6TX7PUZe1DQ9xQVt5qfnJp2W1go7W2Bp9nLfd1zsPO3867AWUAKHlYv329PxDLLrj3z0g
+PcxyH0/No+fayYXlpz0sP+bvhICpOqtjnH5ueoBkp63W/Isu31nbxe3WLjq3NG1HyPGhn1gDDpNz
+thBWWbPhs8qbX7LFZm/Ojuq5/G9FGGCn+7V/fZ0/jlQ3I5JTnWPqQYv5tkLKZ51ENzMzyo5a3jrL
+80CVssvTQGk6oyHFG/jDOcdYmVALFrgcSPQMhi/dfZBl+39MHLMDkeVN4UICPHtlclXf15q0Qkf+
+ULsDoAyq+ELHEvYAAAAAAAA=
+
+
+--=-82WioPYKsE1vzq3tf6Ya--
