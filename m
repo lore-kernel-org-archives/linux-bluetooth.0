@@ -1,32 +1,89 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 198953] hci_bcm: Streamline runtime PM code    change for 4.16
- kernel breaks bluetooth on ASUS T100TA
-Date: Sun, 18 Mar 2018 03:49:15 +0000
-Message-ID: <bug-198953-62941-u4PNoql1gv@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-198953-62941@https.bugzilla.kernel.org/>
-References: <bug-198953-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <01000162362879ce-d5906360-2001-4c67-b414-07e116a0ef93-000000@amazonses.com>
+Subject: Re: [RFC v1 6/8] Bluetooth: hci_h5: add support for Realtek UART
+ Bluetooth modules
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Cc: Rob Herring <robh+dt@kernel.org>, devicetree
+ <devicetree@vger.kernel.org>,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+ linux-serial@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
+ <jslaby@suse.com>, Johan Hovold <johan@kernel.org>,
+ linux-sunxi@googlegroups.com, linux-amlogic@lists.infradead.org,
+ Larry.Finger@lwfinger.net
+References: <20171117223543.32429-1-martin.blumenstingl@googlemail.com>
+ <20171117223543.32429-7-martin.blumenstingl@googlemail.com>
+ <14831F71-B426-491A-A5B0-7F93533AE78C@holtmann.org>
+From: Jeremy Cline <jeremy@jcline.org>
+Message-ID: <01000162362879ce-d5906360-2001-4c67-b414-07e116a0ef93-000000@email.amazonses.com>
+Date: Sat, 17 Mar 2018 22:50:45 +0000
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <14831F71-B426-491A-A5B0-7F93533AE78C@holtmann.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=198953
+Hi Marcel, Martin,
 
---- Comment #22 from Robert R. Howell (rhowell@uwyo.edu) ---
-Hi Hans
+On 03/16/2018 03:22 PM, Marcel Holtmann wrote:
+> Hi Martin,
+> 
+>> Realtek RTL8723BS and RTL8723DS are SDIO wifi chips with an embedded
+>> Bluetooth controller which connects to the host via UART.
+>> The H5 protocol is used for communication between host and device.
+>>
+>> The Realtek "rtl8723bs_bt" and "rtl8723ds_bt" userspace Bluetooth UART
+>> initialization tools (rtk_hciattach) use the following sequence:
+>> 1) send H5 sync pattern (already supported by hci_h5)
+>> 2) get LMP version (already supported by btrtl)
+>> 3) get ROM version (already supported by btrtl)
+>> 4) load the firmware and config for the current chipset (already
+>>   supported by btrtl)
+>> 5) read UART settings from the config blob (already supported by btrtl)
+>> 6) send UART settings via a vendor command to the device (which changes
+>>   the baudrate of the device and enables or disables flow control
+>>   depending on the config)
+>> 7) change the baudrate and flow control settings on the host
+>> 8) send the firmware and config blob to the device (already supported by
+>>   btrtl)
+>>
+>> This uses the serdev library as well as the existing btrtl driver to
+>> initialize the Bluetooth functionality, which consists of:
+>> - identifying the device and loading the corresponding firmware and
+>>  config blobs (steps #2, #3 and #4)
+>> - configuring the baudrate and flow control (steps #6 and #7)
+>> - uploading the firmware to the device (step #8)
+>>
+>> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+>> ---
+>> drivers/bluetooth/Kconfig  |   1 +
+>> drivers/bluetooth/hci_h5.c | 195 ++++++++++++++++++++++++++++++++++++++++++++-
+>> 2 files changed, 195 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+>> index 60e1c7d6986d..3001f1200c72 100644
+>> --- a/drivers/bluetooth/Kconfig
+>> +++ b/drivers/bluetooth/Kconfig
+>> @@ -146,6 +146,7 @@ config BT_HCIUART_LL
+>> config BT_HCIUART_3WIRE
+>> 	bool "Three-wire UART (H5) protocol support"
+>> 	depends on BT_HCIUART
+>> +	select BT_RTL if SERIAL_DEV_BUS
+>> 	help
+>> 	  The HCI Three-wire UART Transport Layer makes it possible to
+>> 	  user the Bluetooth HCI over a serial port interface. The HCI
+> 
+> so I just posted a bt3wire.c driver that is serdev only and written from scratch. On a RPi3 Broadcom chip it kinda works. I think there is a lot of extra work to be done, but this might be a better starting point for Realtek UART devices.
 
-I'll attach the brcmfmac43241b4-sdio.txt file I'm using for the Toshiba Encore
-in just a minute.  There was some confusion in my few year old notes about
-where I obtained the version I was using, so to eliminate that confusion that I
-made a new copy from the contents of /sys/firmware/efi/efivars/nvram... on the
-Encore and tested it to be sure WiFi and Bluetooth were still working OK.  That
-is the version I'm attaching.  It does show that the Encore uses
-xtalfreq=37400, like the T100's.
+I picked up the v2 version of this RFC and rebased it to the latest
+bluetooth-next and added ACPI support. It also kinda works, but there's
+a few problems left to track down and I still haven't looked into
+getting rid of the config blobs.
 
-Bob
+It sounded like Martin wasn't going to be able to get to this until
+at least the 4.18 cycle, so unless he objects I'm going to look at
+getting what I've got working with that bt3wire.c driver.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Regards,
+Jeremy
