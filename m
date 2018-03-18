@@ -1,91 +1,90 @@
-Return-Path: <martin.blumenstingl@googlemail.com>
-MIME-Version: 1.0
-In-Reply-To: <01000162362879ce-d5906360-2001-4c67-b414-07e116a0ef93-000000@email.amazonses.com>
-References: <20171117223543.32429-1-martin.blumenstingl@googlemail.com>
- <20171117223543.32429-7-martin.blumenstingl@googlemail.com>
- <14831F71-B426-491A-A5B0-7F93533AE78C@holtmann.org> <01000162362879ce-d5906360-2001-4c67-b414-07e116a0ef93-000000@email.amazonses.com>
-From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Date: Sun, 18 Mar 2018 23:52:38 +0100
-Message-ID: <CAFBinCCyG368zkAZ8WG8i0ZdNPpyN35vNXOmdEnS++6ppBohQA@mail.gmail.com>
-Subject: Re: [RFC v1 6/8] Bluetooth: hci_h5: add support for Realtek UART
- Bluetooth modules
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [RFC] Bluetooth: Add new serdev based driver for 3-Wire attached
+ controllers
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <010001623a5a3d47-9a205d5b-5d17-44ed-9cc1-99f3f1448a07-000000@email.amazonses.com>
+Date: Sun, 18 Mar 2018 20:35:57 +0100
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <71DBC780-64EE-43C9-83E7-4B2F58249EF3@holtmann.org>
+References: <20180316221221.130478-1-marcel@holtmann.org>
+ <010001623a5a3d47-9a205d5b-5d17-44ed-9cc1-99f3f1448a07-000000@email.amazonses.com>
 To: Jeremy Cline <jeremy@jcline.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Rob Herring <robh+dt@kernel.org>,
-	devicetree <devicetree@vger.kernel.org>,
-	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
-	Mark Rutland <mark.rutland@arm.com>, "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.com>, Johan Hovold <johan@kernel.org>, linux-sunxi@googlegroups.com,
-	linux-amlogic@lists.infradead.org, Larry.Finger@lwfinger.net
-Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jeremy,
 
-On Sat, Mar 17, 2018 at 11:50 PM, Jeremy Cline <jeremy@jcline.org> wrote:
-> Hi Marcel, Martin,
->
-> On 03/16/2018 03:22 PM, Marcel Holtmann wrote:
->> Hi Martin,
->>
->>> Realtek RTL8723BS and RTL8723DS are SDIO wifi chips with an embedded
->>> Bluetooth controller which connects to the host via UART.
->>> The H5 protocol is used for communication between host and device.
->>>
->>> The Realtek "rtl8723bs_bt" and "rtl8723ds_bt" userspace Bluetooth UART
->>> initialization tools (rtk_hciattach) use the following sequence:
->>> 1) send H5 sync pattern (already supported by hci_h5)
->>> 2) get LMP version (already supported by btrtl)
->>> 3) get ROM version (already supported by btrtl)
->>> 4) load the firmware and config for the current chipset (already
->>>   supported by btrtl)
->>> 5) read UART settings from the config blob (already supported by btrtl)
->>> 6) send UART settings via a vendor command to the device (which changes
->>>   the baudrate of the device and enables or disables flow control
->>>   depending on the config)
->>> 7) change the baudrate and flow control settings on the host
->>> 8) send the firmware and config blob to the device (already supported by
->>>   btrtl)
->>>
->>> This uses the serdev library as well as the existing btrtl driver to
->>> initialize the Bluetooth functionality, which consists of:
->>> - identifying the device and loading the corresponding firmware and
->>>  config blobs (steps #2, #3 and #4)
->>> - configuring the baudrate and flow control (steps #6 and #7)
->>> - uploading the firmware to the device (step #8)
->>>
->>> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
->>> ---
->>> drivers/bluetooth/Kconfig  |   1 +
->>> drivers/bluetooth/hci_h5.c | 195 ++++++++++++++++++++++++++++++++++++++++++++-
->>> 2 files changed, 195 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
->>> index 60e1c7d6986d..3001f1200c72 100644
->>> --- a/drivers/bluetooth/Kconfig
->>> +++ b/drivers/bluetooth/Kconfig
->>> @@ -146,6 +146,7 @@ config BT_HCIUART_LL
->>> config BT_HCIUART_3WIRE
->>>      bool "Three-wire UART (H5) protocol support"
->>>      depends on BT_HCIUART
->>> +    select BT_RTL if SERIAL_DEV_BUS
->>>      help
->>>        The HCI Three-wire UART Transport Layer makes it possible to
->>>        user the Bluetooth HCI over a serial port interface. The HCI
->>
->> so I just posted a bt3wire.c driver that is serdev only and written from scratch. On a RPi3 Broadcom chip it kinda works. I think there is a lot of extra work to be done, but this might be a better starting point for Realtek UART devices.
->
-> I picked up the v2 version of this RFC and rebased it to the latest
-> bluetooth-next and added ACPI support. It also kinda works, but there's
-> a few problems left to track down and I still haven't looked into
-> getting rid of the config blobs.
->
-> It sounded like Martin wasn't going to be able to get to this until
-> at least the 4.18 cycle, so unless he objects I'm going to look at
-> getting what I've got working with that bt3wire.c driver.
-please go ahead - I am still busy with other things
-thank you for taking this over!
+>> +static int bt3wire_receive_buf(struct serdev_device *serdev, const u8 *buf,
+>> +			      size_t count)
+>> +{
+>> +	struct bt3wire_dev *bdev = serdev_device_get_drvdata(serdev);
+>> +	size_t i;
+>> +
+>> +	for (i = 0; i < count; i++) {
+>> +		const unsigned char *ptr = buf + i;
+>> +
+>> +		switch (bdev->rx_slip_state) {
+>> +		case SLIP_WAIT_DELIM:
+>> +			/* The delimiter octet 0xC0 is placed at the start and
+>> +			 * end of every packet. To synchronize with the packet
+>> +			 * stream, wait for the delimiter octet and drop any
+>> +			 * other octets.
+>> +			 */
+>> +			if (*ptr == SLIP_DELIM) {
+>> +				bdev->rx_skb = bt_skb_alloc(MAX_PACKET_SIZE,
+>> +							    GFP_ATOMIC);
+>> +				if (bdev->rx_skb)
+>> +					bdev->rx_slip_state = SLIP_PACKET;
+>> +			}
+>> +			break;
+>> +		case SLIP_PACKET:
+>> +			/* Receiving the delimiter octet 0xC0 indicates a
+>> +			 * complete packet, the escape octet 0xDB indicates
+>> +			 * the switch to an escape sequence, and all other
+>> +			 * octets are copied into the result.
+>> +			 */
+>> +			if (*ptr == SLIP_DELIM) {
+>> +				bt3wire_process_pkt(bdev, bdev->rx_skb);
+>> +				bdev->rx_skb = NULL;
+>> +				bdev->rx_slip_state = SLIP_WAIT_DELIM;
+>> +			} else if (*ptr == SLIP_ESC) {
+>> +				bdev->rx_slip_state = SLIP_ESCAPE;
+>> +			} else {
+>> +				if (bdev->rx_skb->len < MAX_PACKET_SIZE) {
+>> +					skb_put_u8(bdev->rx_skb, *ptr);
+>> +				} else {
+>> +					kfree_skb(bdev->rx_skb);
+>> +					bdev->rx_skb = NULL;
+>> +					bdev->rx_slip_state = SLIP_WAIT_DELIM;
+>> +				}
+>> +			}
+>> +			break;
+>> +		case SLIP_ESCAPE:
+>> +			/* As part of the escape sequence, only the octets
+>> +			 * 0xDC for the delimiter and 0xDD for the escape
+>> +			 * sequence are valid. All other octets are causing
+>> +			 * re-sychronization with the delimter.
+>> +			 */
+>> +			if (*ptr == SLIP_ESC_DELIM) {
+>> +				if (bdev->rx_skb->len < MAX_PACKET_SIZE) {
+>> +					skb_put_u8(bdev->rx_skb, SLIP_DELIM);
+>> +				} else {
+>> +					kfree_skb(bdev->rx_skb);
+>> +					bdev->rx_skb = NULL;
+>> +					bdev->rx_slip_state = SLIP_WAIT_DELIM;
+>> +				}
+>> +				bdev->rx_slip_state = SLIP_PACKET;
+> 
+> Should this be in "if (bdev->rx_skb->len < MAX_PACKET_SIZE)" block?
+> Otherwise a too-large packet is put in the SLIP_PACKET state instead of
+> SLIP_WAIT_DELIM.
 
+indeed, this is a bug. Good catch.
 
 Regards
-Martin
+
+Marcel
+
