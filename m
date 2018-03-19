@@ -1,52 +1,55 @@
-Return-Path: <paulmcquad@gmail.com>
-From: Paul McQuade <paulmcquad@gmail.com>
-To: paulmcquad@gmail.com
-Cc: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/4] Bluetooth: trailing whitespace
-Date: Mon, 19 Mar 2018 11:32:19 +0000
-Message-Id: <20180319113222.6725-1-paulmcquad@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: =?UTF-8?q?Robert=20Luba=C5=9B?= <robert.lubas@silvair.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: =?UTF-8?q?Robert=20Luba=C5=9B?= <robert.lubas@silvair.com>
+Subject: [PATCH BlueZ v2] Mesh: Fix proxy PDU SAR msg length
+Date: Mon, 19 Mar 2018 11:58:41 +0100
+Message-Id: <20180319105841.32436-1-robert.lubas@silvair.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Removed whitespace
-
-Signed-off-by: Paul McQuade <paulmcquad@gmail.com>
+In read_pipe function there was a mishandled case when the msg has
+more than one segment. As a result e.g. after provisioning the
+capabilities discovery was incorrect parsed.
 ---
- drivers/bluetooth/bfusb.c     | 2 +-
- drivers/bluetooth/btuart_cs.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ mesh/gatt.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-index ab090a313a5f..0d5b403fe431 100644
---- a/drivers/bluetooth/bfusb.c
-+++ b/drivers/bluetooth/bfusb.c
-@@ -148,7 +148,7 @@ static int bfusb_send_bulk(struct bfusb_data *data, struct sk_buff *skb)
+diff --git a/mesh/gatt.c b/mesh/gatt.c
+index 9116a9de1..693577a3a 100644
+--- a/mesh/gatt.c
++++ b/mesh/gatt.c
+@@ -383,7 +383,7 @@ static bool pipe_read(struct io *io, bool prov, void *user_data)
+ 	uint8_t buf[512];
+ 	uint8_t *res;
+ 	int fd = io_get_fd(io);
+-	ssize_t len;
++	ssize_t len, len_sar;
  
- 	err = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (err) {
--		BT_ERR("%s bulk tx submit failed urb %p err %d", 
-+		BT_ERR("%s bulk tx submit failed urb %p err %d",
- 					data->hdev->name, urb, err);
- 		skb_unlink(skb, &data->pending_q);
- 		usb_free_urb(urb);
-diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
-index 310e9c2e09b6..8dce5bfad947 100644
---- a/drivers/bluetooth/btuart_cs.c
-+++ b/drivers/bluetooth/btuart_cs.c
-@@ -365,10 +365,10 @@ static void btuart_change_speed(struct btuart_info *info,
+ 	if (io != notify_io)
+ 		return true;
+@@ -393,14 +393,14 @@ static bool pipe_read(struct io *io, bool prov, void *user_data)
+ 			break;
  
- 	fcr = UART_FCR_ENABLE_FIFO | UART_FCR_CLEAR_RCVR | UART_FCR_CLEAR_XMIT;
+ 		res = buf;
+-		mesh_gatt_sar(&res, len);
+-
+-		if (prov)
+-			prov_data_ready(node, res, len);
+-		else
+-			net_data_ready(res, len);
++		len_sar = mesh_gatt_sar(&res, len);
++		if (len_sar) {
++			if (prov)
++				prov_data_ready(node, res, len_sar);
++			else
++				net_data_ready(res, len_sar);
++		}
+ 	}
+-
+ 	return true;
+ }
  
--	/* 
-+	/*
- 	 * Use trigger level 1 to avoid 3 ms. timeout delay at 9600 bps, and
- 	 * almost 1,7 ms at 19200 bps. At speeds above that we can just forget
--	 * about this timeout since it will always be fast enough. 
-+	 * about this timeout since it will always be fast enough.
- 	 */
- 
- 	if (speed < 38400)
 -- 
-2.16.2
+2.11.0
+
