@@ -1,166 +1,284 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: avichal <avichal.a@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: sachin.dev@samsung.com, anupam.r@samsung.com,
-        avichal <avichal.a@samsung.com>
-Subject: [PATCH v2 BlueZ 2/2] gatt-database: Add support for Included
- service
-Date: Mon, 19 Mar 2018 14:40:46 +0530
-Message-id: <1521450646-31184-1-git-send-email-avichal.a@samsung.com>
-References: <CGME20180319091106epcas1p1c5eafd1f0bdb22199c8feb3ac2e0fc79@epcas1p1.samsung.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: [PATCH BlueZ] client: Fix stay on error handling in non-interactive
+Message-ID: <616a6ea1-2cc0-1361-008a-442d12f9d8fd@jp.fujitsu.com>
+Date: Mon, 19 Mar 2018 17:40:48 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support of included services in gatt server.While
-registring the service new property is added
-"includes"
-        array{object} type  [read-only]
-        Array of object paths representing the included
-        services of this service.
+Returns the FAILURE status since there is no meaning of stay in
+non-interactive mode when executing some commands with an invalid
+argument or with no controller. Also returns with the SUCCESS status
+when getting a scan filtering value or disconnecting a non-default
+device.
 ---
- src/gatt-database.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
+ client/advertising.c |  2 +-
+ client/main.c        | 63 ++++++++++++++++++++++++++--------------------------
+ 2 files changed, 32 insertions(+), 33 deletions(-)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 9a33ae7..d1acc65 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -109,6 +109,7 @@ struct external_service {
- 	uint16_t attr_cnt;
- 	struct queue *chrcs;
- 	struct queue *descs;
-+	struct queue *includes;
- };
- 
- struct external_profile {
-@@ -444,12 +445,20 @@ static void desc_free(void *data)
- 	free(desc);
- }
- 
-+static void inc_free(void *data)
-+{
-+	struct external_desc *inc = data;
-+
-+	free(inc);
-+}
-+
- static void service_free(void *data)
- {
- 	struct external_service *service = data;
- 
- 	queue_destroy(service->chrcs, chrc_free);
- 	queue_destroy(service->descs, desc_free);
-+	queue_destroy(service->includes,inc_free );
- 
- 	if (service->attrib)
- 		gatt_db_remove_service(service->app->database->db,
-@@ -1533,6 +1542,7 @@ static struct external_service *create_service(struct gatt_app *app,
- 	service->proxy = g_dbus_proxy_ref(proxy);
- 	service->chrcs = queue_new();
- 	service->descs = queue_new();
-+	service->includes = queue_new();
- 
- 	/* Add 1 for the service declaration */
- 	if (!incr_attr_count(service, 1)) {
-@@ -1616,6 +1626,39 @@ static bool parse_uuid(GDBusProxy *proxy, bt_uuid_t *uuid)
- 	return true;
- }
- 
-+static bool parse_includes(GDBusProxy *proxy, struct external_service *service)
-+{
-+	DBusMessageIter iter;
-+	DBusMessageIter array;
-+	char *obj;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "Includes", &iter))
-+		return false;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-+		return false;
-+
-+	dbus_message_iter_recurse(&iter, &array);
-+
-+	do {
-+		if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_OBJECT_PATH)
-+			return false;
-+
-+		dbus_message_iter_get_basic(&array, &obj);
-+
-+		if (queue_push_tail(service->includes,obj)){
-+			DBG("Included paths added\n");
-+			incr_attr_count(service ,1);
-+		}else {
-+			error("Failed to add Includes path in que\n");
-+			return FALSE;
-+		}
-+
-+	} while (dbus_message_iter_next(&array));
-+
-+	return true;
-+}
-+
- static bool parse_primary(GDBusProxy *proxy, bool *primary)
- {
- 	DBusMessageIter iter;
-@@ -2488,6 +2531,40 @@ fail:
- 	gatt_db_attribute_write_result(attrib, id, BT_ATT_ERROR_UNLIKELY);
- }
- 
-+static void include_services(void *data ,void *userdata)
-+{
-+	char *obj = (char *)data;
-+	struct external_service *service = (struct external_service *)userdata;
-+	struct gatt_db_attribute *attrib=NULL;
-+	struct external_service  *service_inc=NULL;
-+
-+	DBG("object path receieved %s,",obj);
-+
-+	service_inc = queue_find(service->app->services, match_service_by_path, obj);
-+	if(service_inc)	{
-+
-+		if (!(service)->attrib)
-+			error("service attibute not found\n");
-+
-+		if (!service_inc->attrib)
-+			error("include attribute not found\n");
-+
-+		attrib = gatt_db_service_add_included((service)->attrib ,service_inc->attrib);
-+		if (attrib == NULL)
-+			error("include service attributes failed\n");
-+		else
-+			(service)->attrib = attrib;
-+
-+	} else
-+		error("include service not found\n");
-+
-+}
-+
-+static void database_add_includes(struct external_service *service)
-+{
-+	queue_foreach(service->includes,include_services,service );
-+}
-+
- static bool database_add_chrc(struct external_service *service,
- 						struct external_chrc *chrc)
- {
-@@ -2560,11 +2637,17 @@ static bool database_add_service(struct external_service *service)
- 		return false;
+diff --git a/client/advertising.c b/client/advertising.c
+index 4517f8f86..152a22a56 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -644,7 +644,7 @@ void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value)
  	}
  
-+	if (!parse_includes(service->proxy,service))
-+		error("Failed to read \"Includes\" property of service");
-+
- 	service->attrib = gatt_db_add_service(service->app->database->db, &uuid,
- 						primary, service->attr_cnt);
- 	if (!service->attrib)
- 		return false;
+ 	if (ad.tx_power == *value)
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
  
-+	database_add_includes(service);
-+	DBG("ATTR count %d\n",service->attr_cnt);
-+
- 	entry = queue_get_entries(service->chrcs);
- 	while (entry) {
- 		struct external_chrc *chrc = entry->data;
+ 	ad.tx_power = *value;
+ 
+diff --git a/client/main.c b/client/main.c
+index a83010b48..b299ae166 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -840,7 +840,7 @@ static void cmd_show(int argc, char *argv[])
+ 
+ 	if (argc < 2 || !strlen(argv[1])) {
+ 		if (check_default_ctrl() == FALSE)
+-			return;
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 		proxy = default_ctrl->proxy;
+ 	} else {
+@@ -848,7 +848,7 @@ static void cmd_show(int argc, char *argv[])
+ 		if (!adapter) {
+ 			bt_shell_printf("Controller %s not available\n",
+ 								argv[1]);
+-			return;
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 		}
+ 		proxy = adapter->proxy;
+ 	}
+@@ -960,7 +960,7 @@ static void cmd_system_alias(int argc, char *argv[])
+ 	char *name;
+ 
+ 	if (check_default_ctrl() == FALSE)
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	name = g_strdup(argv[1]);
+ 
+@@ -977,7 +977,7 @@ static void cmd_reset_alias(int argc, char *argv[])
+ 	char *name;
+ 
+ 	if (check_default_ctrl() == FALSE)
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	name = g_strdup("");
+ 
+@@ -995,10 +995,10 @@ static void cmd_power(int argc, char *argv[])
+ 	char *str;
+ 
+ 	if (!parse_argument(argc, argv, NULL, NULL, &powered, NULL))
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	if (check_default_ctrl() == FALSE)
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	str = g_strdup_printf("power %s", powered == TRUE ? "on" : "off");
+ 
+@@ -1016,10 +1016,10 @@ static void cmd_pairable(int argc, char *argv[])
+ 	char *str;
+ 
+ 	if (!parse_argument(argc, argv, NULL, NULL, &pairable, NULL))
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	if (check_default_ctrl() == FALSE)
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	str = g_strdup_printf("pairable %s", pairable == TRUE ? "on" : "off");
+ 
+@@ -1039,10 +1039,10 @@ static void cmd_discoverable(int argc, char *argv[])
+ 	char *str;
+ 
+ 	if (!parse_argument(argc, argv, NULL, NULL, &discoverable, NULL))
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	if (check_default_ctrl() == FALSE)
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	str = g_strdup_printf("discoverable %s",
+ 				discoverable == TRUE ? "on" : "off");
+@@ -1202,10 +1202,10 @@ static void cmd_scan(int argc, char *argv[])
+ 	const char *method;
+ 
+ 	if (!parse_argument(argc, argv, NULL, NULL, &enable, NULL))
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	if (check_default_ctrl() == FALSE)
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	if (enable == TRUE) {
+ 		set_discovery_filter();
+@@ -1230,7 +1230,7 @@ static void cmd_scan_filter_uuids(int argc, char *argv[])
+ 		for (uuid = filter.uuids; uuid && *uuid; uuid++)
+ 			print_uuid(*uuid);
+ 
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ 	}
+ 
+ 	g_strfreev(filter.uuids);
+@@ -1257,7 +1257,7 @@ static void cmd_scan_filter_rssi(int argc, char *argv[])
+ 	if (argc < 2 || !strlen(argv[1])) {
+ 		if (filter.rssi != DISTANCE_VAL_INVALID)
+ 			bt_shell_printf("RSSI: %d\n", filter.rssi);
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ 	}
+ 
+ 	filter.pathloss = DISTANCE_VAL_INVALID;
+@@ -1272,7 +1272,7 @@ static void cmd_scan_filter_pathloss(int argc, char *argv[])
+ 		if (filter.pathloss != DISTANCE_VAL_INVALID)
+ 			bt_shell_printf("Pathloss: %d\n",
+ 						filter.pathloss);
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ 	}
+ 
+ 	filter.rssi = DISTANCE_VAL_INVALID;
+@@ -1287,7 +1287,7 @@ static void cmd_scan_filter_transport(int argc, char *argv[])
+ 		if (filter.transport)
+ 			bt_shell_printf("Transport: %s\n",
+ 					filter.transport);
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ 	}
+ 
+ 	g_free(filter.transport);
+@@ -1301,7 +1301,7 @@ static void cmd_scan_filter_duplicate_data(int argc, char *argv[])
+ 	if (argc < 2 || !strlen(argv[1])) {
+ 		bt_shell_printf("DuplicateData: %s\n",
+ 				filter.duplicate ? "on" : "off");
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ 	}
+ 
+ 	if (!strcmp(argv[1], "on"))
+@@ -1310,7 +1310,7 @@ static void cmd_scan_filter_duplicate_data(int argc, char *argv[])
+ 		filter.duplicate = false;
+ 	else {
+ 		bt_shell_printf("Invalid option: %s\n", argv[1]);
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+ 	filter.set = false;
+@@ -1412,12 +1412,12 @@ static void cmd_scan_filter_clear(int argc, char *argv[])
+ 		all = true;
+ 
+ 	if (!data_clear(filter_clear, all ? "all" : argv[1]))
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	filter.set = false;
+ 
+ 	if (check_default_ctrl() == FALSE)
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	set_discovery_filter();
+ }
+@@ -1667,7 +1667,7 @@ static void cmd_remove(int argc, char *argv[])
+ 	GDBusProxy *proxy;
+ 
+ 	if (check_default_ctrl() == FALSE)
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	if (strcmp(argv[1], "*") == 0) {
+ 		GList *list;
+@@ -1684,7 +1684,7 @@ static void cmd_remove(int argc, char *argv[])
+ 	proxy = find_proxy_by_address(default_ctrl->devices, argv[1]);
+ 	if (!proxy) {
+ 		bt_shell_printf("Device %s not available\n", argv[1]);
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+ 	remove_device(proxy);
+@@ -1746,10 +1746,8 @@ static void disconn_reply(DBusMessage *message, void *user_data)
+ 
+ 	bt_shell_printf("Successful disconnected\n");
+ 
+-	if (proxy != default_dev)
+-		return;
+-
+-	set_default_device(NULL, NULL);
++	if (proxy == default_dev)
++		set_default_device(NULL, NULL);
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -1799,7 +1797,7 @@ static void cmd_set_alias(int argc, char *argv[])
+ 
+ 	if (!default_dev) {
+ 		bt_shell_printf("No device connected\n");
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+ 	name = g_strdup(argv[1]);
+@@ -1820,7 +1818,7 @@ static void cmd_select_attribute(int argc, char *argv[])
+ 
+ 	if (!default_dev) {
+ 		bt_shell_printf("No device connected\n");
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+ 	proxy = gatt_select_attribute(default_attr, argv[1]);
+@@ -1964,7 +1962,7 @@ static void cmd_notify(int argc, char *argv[])
+ 	dbus_bool_t enable;
+ 
+ 	if (!parse_argument(argc, argv, NULL, NULL, &enable, NULL))
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	if (!default_attr) {
+ 		bt_shell_printf("No attribute selected\n");
+@@ -2145,7 +2143,7 @@ static void cmd_advertise(int argc, char *argv[])
+ 
+ 	if (!parse_argument(argc, argv, ad_arguments, "type",
+ 					&enable, &type))
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	if (!default_ctrl || !default_ctrl->ad_proxy) {
+ 		bt_shell_printf("LEAdvertisingManager not found\n");
+@@ -2188,7 +2186,7 @@ static void cmd_advertise_tx_power(int argc, char *argv[])
+ 	}
+ 
+ 	if (!parse_argument(argc, argv, NULL, NULL, &powered, NULL))
+-		return;
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+ 	ad_advertise_tx_power(dbus_conn, &powered);
+ }
+@@ -2345,7 +2343,8 @@ static void cmd_ad_clear(int argc, char *argv[])
+ 	if (argc < 2 || !strlen(argv[1]))
+ 		all = true;
+ 
+-	data_clear(ad_clear, all ? "all" : argv[1]);
++	if(!data_clear(ad_clear, all ? "all" : argv[1]))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ }
+ 
+ static const struct bt_shell_menu advertise_menu = {
 -- 
-2.7.4
+2.14.1
 
