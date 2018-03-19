@@ -1,44 +1,177 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: hci_bcm: Don't change runtime-status when not using runtime-pm
-Date: Mon, 19 Mar 2018 22:02:36 +0100
-Message-Id: <20180319210237.26205-1-hdegoede@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1521460946-15265-1-git-send-email-avichal.a@samsung.com>
+References: <CGME20180319120415epcas2p35499634a0a93393fa6af290a570fb5fe@epcas2p3.samsung.com>
+ <1521460946-15265-1-git-send-email-avichal.a@samsung.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 19 Mar 2018 17:07:39 +0200
+Message-ID: <CABBYNZ+6sPXhqt+RDyEtKPc5DE0XJYP-tvh_wygMGzOVDSeq4g@mail.gmail.com>
+Subject: Re: [PATCH v3 BlueZ 2/2] gatt-database: Add support for Included service
+To: Avichal Agarwal <avichal.a@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        sachin.dev@samsung.com, Anupam Roy <anupam.r@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The pm_runtime_set_suspended() call in bcm_close() is intended as a
-counterpart to the pm_runtime_set_active() call from bcm_request_irq()
-(which gets called from bcm_setup()).
+Hi Avichal,
 
-The pm_runtime_set_active() call only happens if our pre-requisites for
-doing runtime-pm are met. This commit adds the same check to the
-pm_runtime_set_suspended() call to avoid the runtime-pm state getting
-stuck in suspended after after a bcm_close().
+On Mon, Mar 19, 2018 at 2:02 PM, Avichal Agarwal <avichal.a@samsung.com> wrote:
+> Add support of included services in gatt server.While
+> registring the service new property is added
+> "includes"
+>         array{object} type  [read-only]
+>         Array of object paths representing the included
+>         services of this service.
+> ---
+>  src/gatt-database.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 83 insertions(+)
+>
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 9a33ae7..d1acc65 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -109,6 +109,7 @@ struct external_service {
+>         uint16_t attr_cnt;
+>         struct queue *chrcs;
+>         struct queue *descs;
+> +       struct queue *includes;
+>  };
+>
+>  struct external_profile {
+> @@ -444,12 +445,20 @@ static void desc_free(void *data)
+>         free(desc);
+>  }
+>
+> +static void inc_free(void *data)
+> +{
+> +       struct external_desc *inc = data;
+> +
+> +       free(inc);
+> +}
+> +
+>  static void service_free(void *data)
+>  {
+>         struct external_service *service = data;
+>
+>         queue_destroy(service->chrcs, chrc_free);
+>         queue_destroy(service->descs, desc_free);
+> +       queue_destroy(service->includes,inc_free );
+>
+>         if (service->attrib)
+>                 gatt_db_remove_service(service->app->database->db,
+> @@ -1533,6 +1542,7 @@ static struct external_service *create_service(struct gatt_app *app,
+>         service->proxy = g_dbus_proxy_ref(proxy);
+>         service->chrcs = queue_new();
+>         service->descs = queue_new();
+> +       service->includes = queue_new();
+>
+>         /* Add 1 for the service declaration */
+>         if (!incr_attr_count(service, 1)) {
+> @@ -1616,6 +1626,39 @@ static bool parse_uuid(GDBusProxy *proxy, bt_uuid_t *uuid)
+>         return true;
+>  }
+>
+> +static bool parse_includes(GDBusProxy *proxy, struct external_service *service)
+> +{
+> +       DBusMessageIter iter;
+> +       DBusMessageIter array;
+> +       char *obj;
+> +
+> +       if (!g_dbus_proxy_get_property(proxy, "Includes", &iter))
+> +               return false;
+> +
+> +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
+> +               return false;
+> +
+> +       dbus_message_iter_recurse(&iter, &array);
+> +
+> +       do {
+> +               if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_OBJECT_PATH)
+> +                       return false;
+> +
+> +               dbus_message_iter_get_basic(&array, &obj);
+> +
+> +               if (queue_push_tail(service->includes,obj)){
+> +                       DBG("Included paths added\n");
+> +                       incr_attr_count(service ,1);
+> +               }else {
+> +                       error("Failed to add Includes path in que\n");
+> +                       return FALSE;
+> +               }
+> +
+> +       } while (dbus_message_iter_next(&array));
+> +
+> +       return true;
+> +}
+> +
+>  static bool parse_primary(GDBusProxy *proxy, bool *primary)
+>  {
+>         DBusMessageIter iter;
+> @@ -2488,6 +2531,40 @@ fail:
+>         gatt_db_attribute_write_result(attrib, id, BT_ATT_ERROR_UNLIKELY);
+>  }
+>
+> +static void include_services(void *data ,void *userdata)
+> +{
+> +       char *obj = (char *)data;
+> +       struct external_service *service = (struct external_service *)userdata;
+> +       struct gatt_db_attribute *attrib=NULL;
+> +       struct external_service  *service_inc=NULL;
+> +
+> +       DBG("object path receieved %s,",obj);
+> +
+> +       service_inc = queue_find(service->app->services, match_service_by_path, obj);
+> +       if(service_inc) {
+> +
+> +               if (!(service)->attrib)
+> +                       error("service attibute not found\n");
+> +
+> +               if (!service_inc->attrib)
+> +                       error("include attribute not found\n");
+> +
+> +               attrib = gatt_db_service_add_included((service)->attrib ,service_inc->attrib);
+> +               if (attrib == NULL)
+> +                       error("include service attributes failed\n");
+> +               else
+> +                       (service)->attrib = attrib;
+> +
+> +       } else
+> +               error("include service not found\n");
+> +
+> +}
+> +
+> +static void database_add_includes(struct external_service *service)
+> +{
+> +       queue_foreach(service->includes,include_services,service );
+> +}
+> +
+>  static bool database_add_chrc(struct external_service *service,
+>                                                 struct external_chrc *chrc)
+>  {
+> @@ -2560,11 +2637,17 @@ static bool database_add_service(struct external_service *service)
+>                 return false;
+>         }
+>
+> +       if (!parse_includes(service->proxy,service))
+> +               error("Failed to read \"Includes\" property of service");
+> +
+>         service->attrib = gatt_db_add_service(service->app->database->db, &uuid,
+>                                                 primary, service->attr_cnt);
+>         if (!service->attrib)
+>                 return false;
+>
+> +       database_add_includes(service);
+> +       DBG("ATTR count %d\n",service->attr_cnt);
+> +
+>         entry = queue_get_entries(service->chrcs);
+>         while (entry) {
+>                 struct external_chrc *chrc = entry->data;
+> --
+> 2.7.4
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/hci_bcm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I don't see the patch v3 for 1/2, have you actually sent it?
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index eee33b0e4d67..06e2434c9b3d 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -464,7 +464,7 @@ static int bcm_close(struct hci_uart *hu)
- 		err = bcm_gpio_set_power(bdev, false);
- 		if (err)
- 			bt_dev_err(hu->hdev, "Failed to power down");
--		else
-+		else if (IS_ENABLED(CONFIG_PM) && bdev->irq > 0)
- 			pm_runtime_set_suspended(bdev->dev);
- 	}
- 	mutex_unlock(&bcm_device_lock);
+
 -- 
-2.14.3
+Luiz Augusto von Dentz
