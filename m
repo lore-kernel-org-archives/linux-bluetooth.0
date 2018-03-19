@@ -1,63 +1,58 @@
-Return-Path: <thierry.escande@linaro.org>
-From: Thierry Escande <thierry.escande@linaro.org>
-To: Rob Herring <robh+dt@kernel.org>,
-	Andy Gross <andy.gross@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Brown <david.brown@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Bjorn Andersson <bjorn.andersson@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v5 0/3] Bluetooth: hci_qca: Add serdev support
-Date: Tue, 20 Mar 2018 04:23:28 +0100
-Message-Id: <20180320032331.29865-1-thierry.escande@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset = "utf-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: Using BDADDR efivar to set bd_addr for bci_hcm devices?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <724b6359-9d30-c7a6-89fb-591a695c49b3@redhat.com>
+Date: Mon, 19 Mar 2018 23:13:59 +0100
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-acpi <linux-acpi@vger.kernel.org>
+Message-Id: <31BC049B-32EE-407F-A11C-1080A54D0FA7@holtmann.org>
+References: <724b6359-9d30-c7a6-89fb-591a695c49b3@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Hans,
 
-This patchset enables the Qualcomm BT controller QCA6174 node in the
-device tree of the db820c board. This allows the bluetooth chipset to
-be probed and registered against the hci layer by using the serdev
-framework.
+> While fixing the bluetooth on the meegopad t08 I noticed that
+> it (and other devices) have a BDADDR efivar with the same guid
+> as used for the nvram variable which contains the wifi's
+> nvram settings for sdio broadcom wifi chips (if present):
+> 
+> hexdump -C /sys/firmware/efi/efivars/BDADDR-74b00bd9-805a-4d61-b51f-43268123d113
+> 00000000  07 00 00 00 ac 83 f3 37  39 af                    |.......79.|
+> 
+> Booting into Windows shows the bluetooth using
+> an address of ac 83 f3 37  39 af, which makes
+> sense as the meegopad has an AMPAK AP6234 wifi
+> module and the ac 83 f3 prefix belongs to AMPAK.
+> 
+> Getting the contents from an efivar from within the kernel is
+> not that hard, so I was thinking that maybe we need to teach
+> the hci_bcm code to check for this and use the bd_addr from
+> there so that we have the same bd_addr as Windows, OTOH not
+> having the same bd_addr is an advantage because this allows
+> devices which can be paired to multiple bt hosts to be paired
+> with both Windows and Linux at the same time using a different
+> key.
+> 
+> So what do you think about adding support for the BDADDR efivar
+> and using it to set bd_addr?
+> 
+> 1) Good idea?
+> 2) Good idea, but make it optional (compile and/or runtime) ?
+> 3) Bad idea ?
 
-This patchset also contains the documentation for the compatible
-string "qcom,qca6174-bt" related to this chipset.
+I am all for using the BD_ADDR from EFI variables. That way this become how it was intended. If we want to be flexible, we can add a module parameter to disable it and have it stick with the default one.
 
-v5:
-- Rename 'bt-disable-n' gpio as 'enable'
+If we can do it directly from within the kernel automatically, then lets do it. Some similar code was added to hci_ll.c for DT entries from the boot loader. Alternative, this can be always done from userspace via Set Public Address mgmt command.
 
-v4:
-- Fix dt binding documentation
-- Address some other issues in patch #3
+Regards
 
-v3:
-- Address comments for patch #3 (details in patch)
+Marcel
 
-v2:
-- Fix author email
-
-Thierry Escande (3):
-  arm64: dts: apq8096-db820c: enable bluetooth node
-  dt-bindings: net: bluetooth: Add qualcomm-bluetooth
-  Bluetooth: hci_qca: Add serdev support
-
- .../devicetree/bindings/net/qualcomm-bluetooth.txt |  34 +++++++
- arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  |  14 +++
- .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    |  17 ++++
- arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       |  33 +++++++
- arch/arm64/boot/dts/qcom/msm8996.dtsi              |  10 ++
- drivers/bluetooth/Kconfig                          |   1 +
- drivers/bluetooth/hci_qca.c                        | 109 ++++++++++++++++++++-
- 7 files changed, 216 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-
--- 
-2.14.1
