@@ -1,54 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] Mesh: Fix reclaiming addresses when deleting a node
-Date: Mon, 19 Mar 2018 00:14:12 -0700
-Message-Id: <20180319071412.5269-1-inga.stotland@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <645f8de1-77a5-71d9-ca31-637fcf30c6fa@jp.fujitsu.com>
+References: <645f8de1-77a5-71d9-ca31-637fcf30c6fa@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 19 Mar 2018 07:52:29 +0200
+Message-ID: <CABBYNZJagFifysKhJ346bWYKQ07UVzaLaNAtsADOGR91bACAww@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] shared/shell: Return NULL if generator error occur
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The calculations for address pool edges were off by 1.
-Also, handle a case when newly adjacent address pools need to be merged.
----
- mesh/net.c | 24 +++++++++++++++++++-----
- 1 file changed, 19 insertions(+), 5 deletions(-)
+Hi Eramoto,
 
-diff --git a/mesh/net.c b/mesh/net.c
-index 20dfcb8a8..b64847fe1 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -785,11 +785,25 @@ void net_release_address(uint16_t addr, uint8_t num_elements)
- 		max = range >> 16;
- 		min = range & 0xffff;
- 
--		if (min == (addr + num_elements + 1))
--			min  = addr;
--		else if (addr && max == (addr - 1))
--			max = addr + num_elements + 1;
--		else
-+		if (min == (addr + num_elements))
-+			min = addr;
-+		else if (addr && max == (addr - 1)) {
-+			max = max + num_elements;
-+
-+			/* Check if needs to merge with the next pool */
-+			if (l->next) {
-+				GList *l1 = l->next;
-+				uint32_t range1 = GPOINTER_TO_UINT(l1->data);
-+				uint16_t min1 = range1 & 0xffff;
-+
-+				if (min1 == (max + 1)) {
-+					max = range1 >> 16;
-+					net.address_pool = g_list_delete_link(
-+							net.address_pool, l);
-+					l = l1;
-+				}
-+			}
-+		} else
- 			continue;
- 
- 		range = min + (max << 16);
+On Mon, Mar 19, 2018 at 6:46 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Explicitly returns NULL if asprintf() fails, since the asprintf(3)
+> man-page says that the contents of the first argument are undefined if
+> any error occurs.
+> ---
+>  src/shared/shell.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index 0a05b5215..7417e7ab4 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -643,8 +643,13 @@ static char *cmd_generator(const char *text, int state)
+>         }
+>
+>         cmd = find_cmd(text + strlen(menu->name) + 1, menu->entries, &index);
+> -       if (cmd)
+> -               asprintf(&cmd, "%s.%s", menu->name, cmd);
+> +       if (cmd) {
+> +               int err;
+> +
+> +               err = asprintf(&cmd, "%s.%s", menu->name, cmd);
+> +               if (err < 0)
+> +                       return NULL;
+> +       }
+>
+>         return cmd;
+>  }
+> --
+> 2.14.1
+
+Applied, thanks.
+
 -- 
-2.13.6
-
+Luiz Augusto von Dentz
