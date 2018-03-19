@@ -1,123 +1,166 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Avichal Agarwal <avichal.a@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] gatt: Add confirmation callback
-Date: Mon, 19 Mar 2018 14:44:26 +0200
-Message-Id: <20180319124427.26418-1-luiz.dentz@gmail.com>
+Cc: sachin.dev@samsung.com, anupam.r@samsung.com,
+        Avichal Agarwal <avichal.a@samsung.com>
+Subject: [PATCH v3 BlueZ 2/2] gatt-database: Add support for Included
+ service
+Date: Mon, 19 Mar 2018 17:32:26 +0530
+Message-id: <1521460946-15265-1-git-send-email-avichal.a@samsung.com>
+References: <CGME20180319120415epcas2p35499634a0a93393fa6af290a570fb5fe@epcas2p3.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This replaces indicate flag with confirmation callback to enable
-setting custom callback if necessary.
+Add support of included services in gatt server.While
+registring the service new property is added
+"includes"
+        array{object} type  [read-only]
+        Array of object paths representing the included
+        services of this service.
 ---
- src/gatt-database.c | 33 ++++++++++++++++++++-------------
- 1 file changed, 20 insertions(+), 13 deletions(-)
+ src/gatt-database.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
 
 diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 9a33ae7f9..82f376568 100644
+index 9a33ae7..d1acc65 100644
 --- a/src/gatt-database.c
 +++ b/src/gatt-database.c
-@@ -956,8 +956,8 @@ struct notify {
- 	uint16_t handle, ccc_handle;
- 	const uint8_t *value;
- 	uint16_t len;
--	bool indicate;
--	GDBusProxy *proxy;
-+	bt_gatt_server_conf_func_t conf;
-+	void *user_data;
+@@ -109,6 +109,7 @@ struct external_service {
+ 	uint16_t attr_cnt;
+ 	struct queue *chrcs;
+ 	struct queue *descs;
++	struct queue *includes;
  };
  
- static void conf_cb(void *user_data)
-@@ -983,7 +983,7 @@ static void send_notification_to_device(void *data, void *user_data)
- 	if (!ccc)
- 		return;
- 
--	if (!ccc->value[0] || (notify->indicate && !(ccc->value[0] & 0x02)))
-+	if (!ccc->value[0] || (notify->conf && !(ccc->value[0] & 0x02)))
- 		return;
- 
- 	device = btd_adapter_get_device(notify->database->adapter,
-@@ -1003,7 +1003,7 @@ static void send_notification_to_device(void *data, void *user_data)
- 	 * TODO: If the device is not connected but bonded, send the
- 	 * notification/indication when it becomes connected.
- 	 */
--	if (!notify->indicate) {
-+	if (!notify->conf) {
- 		DBG("GATT server sending notification");
- 		bt_gatt_server_send_notification(server,
- 					notify->handle, notify->value,
-@@ -1013,8 +1013,8 @@ static void send_notification_to_device(void *data, void *user_data)
- 
- 	DBG("GATT server sending indication");
- 	bt_gatt_server_send_indication(server, notify->handle, notify->value,
--							notify->len, conf_cb,
--							notify->proxy, NULL);
-+						notify->len, notify->conf,
-+						notify->user_data, NULL);
- 
- 	return;
- 
-@@ -1027,10 +1027,16 @@ remove:
- 	}
+ struct external_profile {
+@@ -444,12 +445,20 @@ static void desc_free(void *data)
+ 	free(desc);
  }
  
-+static void service_changed_conf(void *user_data)
++static void inc_free(void *data)
 +{
-+	DBG("");
++	struct external_desc *inc = data;
++
++	free(inc);
 +}
 +
- static void send_notification_to_devices(struct btd_gatt_database *database,
- 					uint16_t handle, const uint8_t *value,
- 					uint16_t len, uint16_t ccc_handle,
--					bool indicate, GDBusProxy *proxy)
-+					bt_gatt_server_conf_func_t conf,
-+					void *user_data)
+ static void service_free(void *data)
  {
- 	struct notify notify;
+ 	struct external_service *service = data;
  
-@@ -1041,8 +1047,8 @@ static void send_notification_to_devices(struct btd_gatt_database *database,
- 	notify.ccc_handle = ccc_handle;
- 	notify.value = value;
- 	notify.len = len;
--	notify.indicate = indicate;
--	notify.proxy = proxy;
-+	notify.conf = conf;
-+	notify.user_data = user_data;
+ 	queue_destroy(service->chrcs, chrc_free);
+ 	queue_destroy(service->descs, desc_free);
++	queue_destroy(service->includes,inc_free );
  
- 	queue_foreach(database->device_states, send_notification_to_device,
- 								&notify);
-@@ -1073,7 +1079,7 @@ static void send_service_changed(struct btd_gatt_database *database,
- 	put_le16(end, value + 2);
+ 	if (service->attrib)
+ 		gatt_db_remove_service(service->app->database->db,
+@@ -1533,6 +1542,7 @@ static struct external_service *create_service(struct gatt_app *app,
+ 	service->proxy = g_dbus_proxy_ref(proxy);
+ 	service->chrcs = queue_new();
+ 	service->descs = queue_new();
++	service->includes = queue_new();
  
- 	send_notification_to_devices(database, handle, value, sizeof(value),
--							ccc_handle, true, NULL);
-+					ccc_handle, service_changed_conf, NULL);
- }
- 
- static void gatt_db_service_added(struct gatt_db_attribute *attrib,
-@@ -1948,8 +1954,8 @@ static bool pipe_io_read(struct io *io, void *user_data)
- 				gatt_db_attribute_get_handle(chrc->attrib),
- 				buf, bytes_read,
- 				gatt_db_attribute_get_handle(chrc->ccc),
--				chrc->props & BT_GATT_CHRC_PROP_INDICATE,
--				chrc->proxy);
-+				chrc->props & BT_GATT_CHRC_PROP_INDICATE ?
-+				conf_cb : NULL, chrc->proxy);
- 
+ 	/* Add 1 for the service declaration */
+ 	if (!incr_attr_count(service, 1)) {
+@@ -1616,6 +1626,39 @@ static bool parse_uuid(GDBusProxy *proxy, bt_uuid_t *uuid)
  	return true;
  }
-@@ -2225,7 +2231,8 @@ static void property_changed_cb(GDBusProxy *proxy, const char *name,
- 				gatt_db_attribute_get_handle(chrc->attrib),
- 				value, len,
- 				gatt_db_attribute_get_handle(chrc->ccc),
--				chrc->props & BT_GATT_CHRC_PROP_INDICATE, proxy);
-+				chrc->props & BT_GATT_CHRC_PROP_INDICATE ?
-+				conf_cb : NULL, proxy);
+ 
++static bool parse_includes(GDBusProxy *proxy, struct external_service *service)
++{
++	DBusMessageIter iter;
++	DBusMessageIter array;
++	char *obj;
++
++	if (!g_dbus_proxy_get_property(proxy, "Includes", &iter))
++		return false;
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
++		return false;
++
++	dbus_message_iter_recurse(&iter, &array);
++
++	do {
++		if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_OBJECT_PATH)
++			return false;
++
++		dbus_message_iter_get_basic(&array, &obj);
++
++		if (queue_push_tail(service->includes,obj)){
++			DBG("Included paths added\n");
++			incr_attr_count(service ,1);
++		}else {
++			error("Failed to add Includes path in que\n");
++			return FALSE;
++		}
++
++	} while (dbus_message_iter_next(&array));
++
++	return true;
++}
++
+ static bool parse_primary(GDBusProxy *proxy, bool *primary)
+ {
+ 	DBusMessageIter iter;
+@@ -2488,6 +2531,40 @@ fail:
+ 	gatt_db_attribute_write_result(attrib, id, BT_ATT_ERROR_UNLIKELY);
  }
  
- static bool database_add_ccc(struct external_service *service,
++static void include_services(void *data ,void *userdata)
++{
++	char *obj = (char *)data;
++	struct external_service *service = (struct external_service *)userdata;
++	struct gatt_db_attribute *attrib=NULL;
++	struct external_service  *service_inc=NULL;
++
++	DBG("object path receieved %s,",obj);
++
++	service_inc = queue_find(service->app->services, match_service_by_path, obj);
++	if(service_inc)	{
++
++		if (!(service)->attrib)
++			error("service attibute not found\n");
++
++		if (!service_inc->attrib)
++			error("include attribute not found\n");
++
++		attrib = gatt_db_service_add_included((service)->attrib ,service_inc->attrib);
++		if (attrib == NULL)
++			error("include service attributes failed\n");
++		else
++			(service)->attrib = attrib;
++
++	} else
++		error("include service not found\n");
++
++}
++
++static void database_add_includes(struct external_service *service)
++{
++	queue_foreach(service->includes,include_services,service );
++}
++
+ static bool database_add_chrc(struct external_service *service,
+ 						struct external_chrc *chrc)
+ {
+@@ -2560,11 +2637,17 @@ static bool database_add_service(struct external_service *service)
+ 		return false;
+ 	}
+ 
++	if (!parse_includes(service->proxy,service))
++		error("Failed to read \"Includes\" property of service");
++
+ 	service->attrib = gatt_db_add_service(service->app->database->db, &uuid,
+ 						primary, service->attr_cnt);
+ 	if (!service->attrib)
+ 		return false;
+ 
++	database_add_includes(service);
++	DBG("ATTR count %d\n",service->attr_cnt);
++
+ 	entry = queue_get_entries(service->chrcs);
+ 	while (entry) {
+ 		struct external_chrc *chrc = entry->data;
 -- 
-2.14.3
+2.7.4
 
