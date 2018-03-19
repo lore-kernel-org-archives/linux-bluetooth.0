@@ -1,136 +1,36 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZJ+xYukPE0nY_VkfVqOF1tvHMHFE5-_Z_vNQ815H59dMw@mail.gmail.com>
-References: <CACgnnk=4aQiprXz1iY33kmPf2jYT=pPzr4c20N1n4Xt7m4322Q@mail.gmail.com>
- <CABBYNZ+ZntY4vr-Sk9OLtgvdgGRazzaFzpK5G3r+X0tZq4G10g@mail.gmail.com>
- <CACgnnkmivLGAy7_YkoRgWCNR61rvr3CnQWNfKOWAWrBy4iRadA@mail.gmail.com> <CABBYNZJ+xYukPE0nY_VkfVqOF1tvHMHFE5-_Z_vNQ815H59dMw@mail.gmail.com>
-From: =?UTF-8?Q?Robert_Luba=C5=9B?= <robert.lubas@silvair.com>
-Date: Mon, 19 Mar 2018 12:39:21 +0100
-Message-ID: <CACgnnk=8USZj3e8Tf-GJb+zsh1eVMTRe0JbS-vom77VGe3N2bw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] mesh: Fix proxy PDU SAR msg length
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <paulmcquad@gmail.com>
+From: Paul McQuade <paulmcquad@gmail.com>
+To: paulmcquad@gmail.com
+Cc: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 4/4] Bluetooth: space required
+Date: Mon, 19 Mar 2018 11:32:22 +0000
+Message-Id: <20180319113222.6725-4-paulmcquad@gmail.com>
+In-Reply-To: <20180319113222.6725-1-paulmcquad@gmail.com>
+References: <20180319113222.6725-1-paulmcquad@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+space required before the open parenthesis '('
 
-You right, I posted a second version of the patch using right tools.
+Signed-off-by: Paul McQuade <paulmcquad@gmail.com>
+---
+ drivers/bluetooth/hci_serdev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-2018-03-19 6:51 GMT+01:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> Hi Robert,
->
-> On Fri, Mar 16, 2018 at 11:56 AM, Robert Luba=C5=9B <robert.lubas@silvair=
-.com> wrote:
->> Assignment outside if statement.
->> ---
->>  mesh/gatt.c | 16 ++++++++--------
->>  1 file changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/mesh/gatt.c b/mesh/gatt.c
->> index 9116a9de1..693577a3a 100644
->> --- a/mesh/gatt.c
->> +++ b/mesh/gatt.c
->> @@ -383,7 +383,7 @@ static bool pipe_read(struct io *io, bool prov,
->> void *user_data)
->>         uint8_t buf[512];
->>         uint8_t *res;
->>         int fd =3D io_get_fd(io);
->> -       ssize_t len;
->> +       ssize_t len, len_sar;
->>
->>         if (io !=3D notify_io)
->>                 return true;
->> @@ -393,14 +393,14 @@ static bool pipe_read(struct io *io, bool prov,
->> void *user_data)
->>                         break;
->>
->>                 res =3D buf;
->> -               mesh_gatt_sar(&res, len);
->> -
->> -               if (prov)
->> -                       prov_data_ready(node, res, len);
->> -               else
->> -                       net_data_ready(res, len);
->> +               len_sar =3D mesh_gatt_sar(&res, len);
->> +               if (len_sar) {
->> +                       if (prov)
->> +                               prov_data_ready(node, res, len_sar);
->> +                       else
->> +                               net_data_ready(res, len_sar);
->> +               }
->>         }
->> -
->>         return true;
->>  }
->
-> Looks like you responded with the new patch instead of sending just
-> the changes an as a result I cannot apply the patch with git am,
-> perhaps you are not using git format-patch + git send-email?
->
->> 2018-03-16 9:36 GMT+01:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
->>>
->>> Hi Robert,
->>>
->>> On Fri, Mar 16, 2018 at 10:14 AM, Robert Luba=C5=9B <robert.lubas@silva=
-ir.com> wrote:
->>> > In read_pipe function there was a mishandled case when the msg has
->>> > more than one segment. As a result e.g. after provisioning the
->>> > capabilities discovery was incorrect parsed.
->>> >
->>> > ---
->>> >  mesh/gatt.c | 15 +++++++--------
->>> >  1 file changed, 7 insertions(+), 8 deletions(-)
->>> >
->>> > diff --git a/mesh/gatt.c b/mesh/gatt.c
->>> > index 9116a9de1..8fecac10b 100644
->>> > --- a/mesh/gatt.c
->>> > +++ b/mesh/gatt.c
->>> > @@ -383,7 +383,7 @@ static bool pipe_read(struct io *io, bool prov,
->>> > void *user_data)
->>> >         uint8_t buf[512];
->>> >         uint8_t *res;
->>> >         int fd =3D io_get_fd(io);
->>> > -       ssize_t len;
->>> > +       ssize_t len, len_sar;
->>> >
->>> >         if (io !=3D notify_io)
->>> >                 return true;
->>> > @@ -393,14 +393,13 @@ static bool pipe_read(struct io *io, bool prov,
->>> > void *user_data)
->>> >                         break;
->>> >
->>> >                 res =3D buf;
->>> > -               mesh_gatt_sar(&res, len);
->>> > -
->>> > -               if (prov)
->>> > -                       prov_data_ready(node, res, len);
->>> > -               else
->>> > -                       net_data_ready(res, len);
->>> > +               if (len_sar =3D mesh_gatt_sar(&res, len)) {
->>>
->>> Leave the assignment outside of if statement like:
->>>
->>> len_sar =3D...
->>> if (len_sar)...
->>>
->>> > +                       if (prov)
->>> > +                               prov_data_ready(node, res, len_sar);
->>> > +                       else
->>> > +                               net_data_ready(res, len_sar);
->>> > +               }
->>> >         }
->>> > -
->>> >         return true;
->>> >  }
->>>
->>> Other than that it looks fine.
->>>
->>> --
->>> Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index e0e6461b9200..ec4b6b2bbf9a 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -94,7 +94,7 @@ static void hci_uart_write_work(struct work_struct *work)
+ 			hci_uart_tx_complete(hu, hci_skb_pkt_type(skb));
+ 			kfree_skb(skb);
+ 		}
+-	} while(test_bit(HCI_UART_TX_WAKEUP, &hu->tx_state));
++	} while (test_bit(HCI_UART_TX_WAKEUP, &hu->tx_state));
+ 
+ 	clear_bit(HCI_UART_SENDING, &hu->tx_state);
+ }
+-- 
+2.16.2
