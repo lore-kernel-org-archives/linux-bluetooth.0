@@ -5,32 +5,33 @@ Cc: marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: space required
-Date: Mon, 19 Mar 2018 11:32:22 +0000
-Message-Id: <20180319113222.6725-4-paulmcquad@gmail.com>
+Subject: [PATCH 3/4] Bluetooth: trailing statements
+Date: Mon, 19 Mar 2018 11:32:21 +0000
+Message-Id: <20180319113222.6725-3-paulmcquad@gmail.com>
 In-Reply-To: <20180319113222.6725-1-paulmcquad@gmail.com>
 References: <20180319113222.6725-1-paulmcquad@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-space required before the open parenthesis '('
+trailing statements should be on next line
 
 Signed-off-by: Paul McQuade <paulmcquad@gmail.com>
 ---
- drivers/bluetooth/hci_serdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/hci_ll.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
-index e0e6461b9200..ec4b6b2bbf9a 100644
---- a/drivers/bluetooth/hci_serdev.c
-+++ b/drivers/bluetooth/hci_serdev.c
-@@ -94,7 +94,7 @@ static void hci_uart_write_work(struct work_struct *work)
- 			hci_uart_tx_complete(hu, hci_skb_pkt_type(skb));
- 			kfree_skb(skb);
- 		}
--	} while(test_bit(HCI_UART_TX_WAKEUP, &hu->tx_state));
-+	} while (test_bit(HCI_UART_TX_WAKEUP, &hu->tx_state));
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 1b4417a623a4..06d859d82de8 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -567,7 +567,8 @@ static int read_local_version(struct hci_dev *hdev)
+ 	version = le16_to_cpu(ver->lmp_subver);
  
- 	clear_bit(HCI_UART_SENDING, &hu->tx_state);
+ out:
+-	if (err) bt_dev_err(hdev, "Failed to read TI version info: %d", err);
++	if (err)
++	bt_dev_err(hdev, "Failed to read TI version info: %d", err);
+ 	kfree_skb(skb);
+ 	return err ? err : version;
  }
 -- 
 2.16.2
