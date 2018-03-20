@@ -1,57 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: pull request: bluetooth 2018-03-16
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180316182319.GA4401@x1c>
-Date: Tue, 20 Mar 2018 09:44:37 +0100
-Cc: linux-bluetooth@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>
-Message-Id: <2162D348-7B5F-4693-87AB-8835A1638CF3@holtmann.org>
-References: <20180316182319.GA4401@x1c>
-To: Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
+MIME-Version: 1.0
+In-Reply-To: <1521522581-13036-1-git-send-email-avichal.a@samsung.com>
+References: <CGME20180320051001epcas1p3945a3b9beb4f980540c77f487f0c8d80@epcas1p3.samsung.com>
+ <1521522581-13036-1-git-send-email-avichal.a@samsung.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 20 Mar 2018 10:44:32 +0200
+Message-ID: <CABBYNZ+apdoe4eUVAFM0-KWs71Cf=CVdYp8KdxWg8qaWDZwJWw@mail.gmail.com>
+Subject: Re: [PATCH v3 BlueZ 1/2] doc/gatt-api.txt: Add support for Included Service
+To: Avichal Agarwal <avichal.a@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        sachin.dev@samsung.com, Anupam Roy <anupam.r@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+Hi Avichal,
 
-> Here are a few more important Bluetooth driver fixes for the 4.16
-> kernel.
-> 
-> Please let me know if there are any issues pulling. Thanks.
-> 
-> Johan
-> 
+On Tue, Mar 20, 2018 at 7:09 AM, Avichal Agarwal <avichal.a@samsung.com> wrote:
+> included service support implemented at server side
+>
 > ---
-> The following changes since commit 3d502067599f0db12e74e6646aee8728efe3e5be:
-> 
->  net/smc: simplify wait when closing listen socket (2018-03-15 09:49:13 -0400)
-> 
-> are available in the Git repository at:
-> 
->  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-> 
-> for you to fetch changes up to e07c99b07ae85255d5c5bc2480fbd4c4e77f71bc:
-> 
->  Bluetooth: hci_bcm: Set pulsed_host_wake flag in sleep parameters (2018-03-15 19:39:37 +0100)
-> 
-> ----------------------------------------------------------------
-> Hans de Goede (2):
->      Revert "Bluetooth: hci_bcm: Streamline runtime PM code"
->      Bluetooth: hci_bcm: Set pulsed_host_wake flag in sleep parameters
-> 
-> Takashi Iwai (1):
->      Bluetooth: btusb: Fix quirk for Atheros 1525/QCA6174
-> 
-> drivers/bluetooth/btusb.c   |  2 +-
-> drivers/bluetooth/hci_bcm.c | 13 +++++++++----
-> 2 files changed, 10 insertions(+), 5 deletions(-)
+>  doc/gatt-api.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index ccf3a8b..9579381 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -45,7 +45,7 @@ Properties    string UUID [read-only]
+>                         belongs to. Only present on services from remote
+>                         devices.
+>
+> -               array{object} Includes [read-only]: Not implemented
+> +               array{object} Includes [read-only]
+>
+>                         Array of object paths representing the included
+>                         services of this service.
+> --
+> 2.7.4
 
-any issue with this pull request? I ask since it seems to have disappeared from patchwork.
+Applied, thanks. Note that I did substantial changes to fix the coding
+style and remove some debugs that made no sense for the final code.
+Btw, it would be really cool if you can add Includes support to
+bluetoothctl.
 
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
