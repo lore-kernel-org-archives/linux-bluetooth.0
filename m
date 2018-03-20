@@ -1,218 +1,69 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: bpa10x: Use separate h4_recv_buf helper
-Date: Tue, 20 Mar 2018 19:18:55 +0100
-Message-Id: <20180320181855.37297-1-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <sre@kernel.org>
+Date: Tue, 20 Mar 2018 18:28:27 +0100
+From: Sebastian Reichel <sre@kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
+	robh@kernel.org, Tony Lindgren <tony@atomide.com>
+Subject: Re: [RFC] Bluetooth: hci_ll: Convert to use h4_recv_buf helper
+Message-ID: <20180320172827.ohla5v4a23v3u3qq@earth.universe>
+References: <20180320083704.11705-1-marcel@holtmann.org>
+ <4DBD77C5-BBFD-4952-A296-30187D85A07F@holtmann.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="56z2bbbch5angq5m"
+In-Reply-To: <4DBD77C5-BBFD-4952-A296-30187D85A07F@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When adding the alignment and padding support for H:4 packet processing
-for the Nokia driver, it broke the h4_recv_buf usage within bpa10x
-driver. To fix this use a separate helper function and placing it into a
-dedicated h4_recv.h header file.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/Kconfig   |   3 +-
- drivers/bluetooth/bpa10x.c  |   2 +-
- drivers/bluetooth/h4_recv.h | 160 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 162 insertions(+), 3 deletions(-)
- create mode 100644 drivers/bluetooth/h4_recv.h
+--56z2bbbch5angq5m
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 07e55cd8f8c8..8bcb8b858f0a 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -242,8 +242,7 @@ config BT_HCIBCM203X
- 
- config BT_HCIBPA10X
- 	tristate "HCI BPA10x USB driver"
--	depends on USB && BT_HCIUART
--	select BT_HCIUART_H4
-+	depends on USB
- 	help
- 	  Bluetooth HCI BPA10x USB driver.
- 	  This driver provides support for the Digianswer BPA 100/105 Bluetooth
-diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index 801ea4ca65e4..c6f7cc57db14 100644
---- a/drivers/bluetooth/bpa10x.c
-+++ b/drivers/bluetooth/bpa10x.c
-@@ -35,7 +35,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
- 
--#include "hci_uart.h"
-+#include "h4_recv.h"
- 
- #define VERSION "0.11"
- 
-diff --git a/drivers/bluetooth/h4_recv.h b/drivers/bluetooth/h4_recv.h
-new file mode 100644
-index 000000000000..b432651f8236
---- /dev/null
-+++ b/drivers/bluetooth/h4_recv.h
-@@ -0,0 +1,160 @@
-+/*
-+ *
-+ *  Generic Bluetooth HCI UART driver
-+ *
-+ *  Copyright (C) 2015-2018  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+
-+#include <asm/unaligned.h>
-+
-+struct h4_recv_pkt {
-+	u8  type;	/* Packet type */
-+	u8  hlen;	/* Header length */
-+	u8  loff;	/* Data length offset in header */
-+	u8  lsize;	/* Data length field size */
-+	u16 maxlen;	/* Max overall packet length */
-+	int (*recv)(struct hci_dev *hdev, struct sk_buff *skb);
-+};
-+
-+#define H4_RECV_ACL \
-+	.type = HCI_ACLDATA_PKT, \
-+	.hlen = HCI_ACL_HDR_SIZE, \
-+	.loff = 2, \
-+	.lsize = 2, \
-+	.maxlen = HCI_MAX_FRAME_SIZE \
-+
-+#define H4_RECV_SCO \
-+	.type = HCI_SCODATA_PKT, \
-+	.hlen = HCI_SCO_HDR_SIZE, \
-+	.loff = 2, \
-+	.lsize = 1, \
-+	.maxlen = HCI_MAX_SCO_SIZE
-+
-+#define H4_RECV_EVENT \
-+	.type = HCI_EVENT_PKT, \
-+	.hlen = HCI_EVENT_HDR_SIZE, \
-+	.loff = 1, \
-+	.lsize = 1, \
-+	.maxlen = HCI_MAX_EVENT_SIZE
-+
-+static inline struct sk_buff *h4_recv_buf(struct hci_dev *hdev,
-+					  struct sk_buff *skb,
-+					  const unsigned char *buffer,
-+					  int count,
-+					  const struct h4_recv_pkt *pkts,
-+					  int pkts_count)
-+{
-+	while (count) {
-+		int i, len;
-+
-+		if (!count)
-+			break;
-+
-+		if (!skb) {
-+			for (i = 0; i < pkts_count; i++) {
-+				if (buffer[0] != (&pkts[i])->type)
-+					continue;
-+
-+				skb = bt_skb_alloc((&pkts[i])->maxlen,
-+						   GFP_ATOMIC);
-+				if (!skb)
-+					return ERR_PTR(-ENOMEM);
-+
-+				hci_skb_pkt_type(skb) = (&pkts[i])->type;
-+				hci_skb_expect(skb) = (&pkts[i])->hlen;
-+				break;
-+			}
-+
-+			/* Check for invalid packet type */
-+			if (!skb)
-+				return ERR_PTR(-EILSEQ);
-+
-+			count -= 1;
-+			buffer += 1;
-+		}
-+
-+		len = min_t(uint, hci_skb_expect(skb) - skb->len, count);
-+		skb_put_data(skb, buffer, len);
-+
-+		count -= len;
-+		buffer += len;
-+
-+		/* Check for partial packet */
-+		if (skb->len < hci_skb_expect(skb))
-+			continue;
-+
-+		for (i = 0; i < pkts_count; i++) {
-+			if (hci_skb_pkt_type(skb) == (&pkts[i])->type)
-+				break;
-+		}
-+
-+		if (i >= pkts_count) {
-+			kfree_skb(skb);
-+			return ERR_PTR(-EILSEQ);
-+		}
-+
-+		if (skb->len == (&pkts[i])->hlen) {
-+			u16 dlen;
-+
-+			switch ((&pkts[i])->lsize) {
-+			case 0:
-+				/* No variable data length */
-+				dlen = 0;
-+				break;
-+			case 1:
-+				/* Single octet variable length */
-+				dlen = skb->data[(&pkts[i])->loff];
-+				hci_skb_expect(skb) += dlen;
-+
-+				if (skb_tailroom(skb) < dlen) {
-+					kfree_skb(skb);
-+					return ERR_PTR(-EMSGSIZE);
-+				}
-+				break;
-+			case 2:
-+				/* Double octet variable length */
-+				dlen = get_unaligned_le16(skb->data +
-+							  (&pkts[i])->loff);
-+				hci_skb_expect(skb) += dlen;
-+
-+				if (skb_tailroom(skb) < dlen) {
-+					kfree_skb(skb);
-+					return ERR_PTR(-EMSGSIZE);
-+				}
-+				break;
-+			default:
-+				/* Unsupported variable length */
-+				kfree_skb(skb);
-+				return ERR_PTR(-EILSEQ);
-+			}
-+
-+			if (!dlen) {
-+				/* No more data, complete frame */
-+				(&pkts[i])->recv(hdev, skb);
-+				skb = NULL;
-+			}
-+		} else {
-+			/* Complete frame */
-+			(&pkts[i])->recv(hdev, skb);
-+			skb = NULL;
-+		}
-+	}
-+
-+	return skb;
-+}
--- 
-2.14.3
+Hi,
 
+On Tue, Mar 20, 2018 at 04:50:37PM +0100, Marcel Holtmann wrote:
+> Hi,
+>=20
+> > The HCILL or eHCILL protocol from TI is actually an H:4 protocol with a
+> > few extra events and thus can also use the h4_recv_buf helper. Instead
+> > of open coding the same funtionality add the extra events to the packet
+> > description table and use h4_recv_buf.
+> >=20
+> > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> > ---
+> > drivers/bluetooth/Kconfig  |   1 +
+> > drivers/bluetooth/hci_ll.c | 214 +++++++++++++++-----------------------=
+-------
+> > 2 files changed, 70 insertions(+), 145 deletions(-)
+>=20
+> is anybody able to test this change for me and verify that it doesn=E2=80=
+=99t break things.
+
+The diffstat looks nice :) I can give it a test on Motorola Droid 4
+later this week. If you want feedback a bit earlier, maybe Tony
+can give it a try (added to cc).
+
+-- Sebastian
+
+--56z2bbbch5angq5m
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlqxRLQACgkQ2O7X88g7
++przsg//RDkFGFLzzTaTOlUPUppAyi4tB2WnAIR5lBajQw5od1XhCNRTmerm00w8
+b7bwvs0PiWZ6A8uQzvw/+9UKAobncTFT4MOtgIe10PxA9ySh/D7q3rJNmlv+LoWv
+VqW3RBREKaTpLGIb+bjo50To5plxCsge4UAJCDIkJN202P6jd7oveYLUTqrEcqHP
+Ij/Rpzcdhp5nWhaDJpX7IwGlzAnYFd5REEe+RiGEwljKxHndYk+AD3mJjOpu0Mkc
+pcbENsv40FaInHE1jTTITuYaTYNE5DYj9q7TYnusvUGuZpVMaBt08Yc4W/Si3LqV
++inb76XE3dJQegeTVFMbwKFGLrLRNmkf2FvS9EtweFgIHWTxMAFA0Q5VLPetHw3v
+ANmv8BswsQoJRcqXuDOzENMYXxr6gDHRGjl4pDHwJo2y0AWLgcCrm1xOn+UDod1l
+BuoigeF2pgnPF4aVqaRqZuQBVhLYg0okC2kJJBrPjFViuGddH3h8xQUhiqwFSVCY
+9ZJ7u9PyrvAZTwWzVVEIHCh2ORjJYgecYUaq7D5v+FdbkLeMmzTUHEuMCk7El4PN
+QKBq8/xYzfTulpfQ7+w/n2/y1KUKj78YLKiWzA++toXLHB7rODBC03Yrf/fpTOgr
+YMt6F/5UFcIuNaYrwQ+GN18XAVQYtT2sldGmAHGCKBRoGJOibWM=
+=+xvJ
+-----END PGP SIGNATURE-----
+
+--56z2bbbch5angq5m--
