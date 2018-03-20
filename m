@@ -1,75 +1,32 @@
-Return-Path: <garsilva@embeddedor.com>
-Date: Tue, 20 Mar 2018 18:34:44 -0500
-From: "Gustavo A. R. Silva" <garsilva@embeddedor.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] Bluetooth: Remove VLA usage in aes_cmac
-Message-ID: <20180320233444.GA14446@embeddedor.com>
+Return-Path: <tony@atomide.com>
+Date: Tue, 20 Mar 2018 16:29:43 -0700
+From: Tony Lindgren <tony@atomide.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Sebastian Reichel <sre@kernel.org>, linux-bluetooth@vger.kernel.org,
+	Ulf Hansson <ulf.hansson@linaro.org>, robh@kernel.org
+Subject: Re: [RFC] Bluetooth: hci_ll: Convert to use h4_recv_buf helper
+Message-ID: <20180320232943.GX5796@atomide.com>
+References: <20180320083704.11705-1-marcel@holtmann.org>
+ <4DBD77C5-BBFD-4952-A296-30187D85A07F@holtmann.org>
+ <20180320172827.ohla5v4a23v3u3qq@earth.universe>
+ <20180320201449.GV5796@atomide.com>
+ <E7257152-583E-4BCC-B366-2627E62F1FE1@holtmann.org>
+ <20180320211151.GW5796@atomide.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180320211151.GW5796@atomide.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In preparation to enabling -Wvla, remove VLA and replace it
-with dynamic memory allocation instead.
+* Tony Lindgren <tony@atomide.com> [180320 14:11]:
+> * Marcel Holtmann <marcel@holtmann.org> [180320 21:01]:
+> > that might be a git am issue and it being rather strict.
+> 
+> Or the patch not being correct copied from the archive.
+> Do you have a patchwork url for it or care to bounce the
+> patch to me?
 
-The use of stack Variable Length Arrays needs to be avoided, as they
-can be a vector for stack exhaustion, which can be both a runtime bug
-or a security flaw. Also, in general, as code evolves it is easy to
-lose track of how big a VLA can get. Thus, we can end up having runtime
-failures that are hard to debug.
+Thanks got it applied now, works the same way as without it
+where hcitool scan finds some devices. Sorry don't have
+anything really configured beyond that right now, but:
 
-Also, fixed as part of the directive to remove all VLAs from
-the kernel: https://lkml.org/lkml/2018/3/7/621
-
-Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
----
- net/bluetooth/smp.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index a2ddae2..23c694d 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -173,7 +173,7 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
- 		    size_t len, u8 mac[16])
- {
- 	uint8_t tmp[16], mac_msb[16], msg_msb[CMAC_MSG_MAX];
--	SHASH_DESC_ON_STACK(desc, tfm);
-+	struct shash_desc *shash;
- 	int err;
- 
- 	if (len > CMAC_MSG_MAX)
-@@ -184,8 +184,13 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
- 		return -EINVAL;
- 	}
- 
--	desc->tfm = tfm;
--	desc->flags = 0;
-+	shash = kzalloc(sizeof(*shash) + crypto_shash_descsize(tfm),
-+			GFP_KERNEL);
-+	if (!shash)
-+		return -ENOMEM;
-+
-+	shash->tfm = tfm;
-+	shash->flags = 0;
- 
- 	/* Swap key and message from LSB to MSB */
- 	swap_buf(k, tmp, 16);
-@@ -200,8 +205,9 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
- 		return err;
- 	}
- 
--	err = crypto_shash_digest(desc, msg_msb, len, mac_msb);
--	shash_desc_zero(desc);
-+	err = crypto_shash_digest(shash, msg_msb, len, mac_msb);
-+	shash_desc_zero(shash);
-+	kfree(shash);
- 	if (err) {
- 		BT_ERR("Hash computation error %d", err);
- 		return err;
--- 
-2.7.4
+Tested-by: Tony Lindgren <tony@atomide.com>
