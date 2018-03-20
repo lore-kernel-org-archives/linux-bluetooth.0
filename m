@@ -1,482 +1,751 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v3] Add support for requiring min key size for access GATT characteristics
-Date: Tue, 20 Mar 2018 11:29:07 +0100
-Message-Id: <20180320102907.29633-1-szymon.janc@codecoup.pl>
+Subject: [PATCH] Bluetooth: Remove unused btuart_cs driver
+Date: Tue, 20 Mar 2018 10:59:15 +0100
+Message-Id: <20180320095915.18867-1-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to configure bluetoothd to require minimum encryption key
-size when accessing GATT server characteristics. It is a global
-configuration option affecting whole GATT database.
----
- peripheral/gatt.c        |  2 +-
- src/adapter.c            | 45 ++++++++++++++++++++++++++++++++-------------
- src/device.c             | 15 +++++++++++++--
- src/device.h             |  1 +
- src/hcid.h               |  2 ++
- src/main.c               | 17 ++++++++++++++---
- src/main.conf            |  5 +++++
- src/shared/att.c         | 22 +++++++++++++++++++---
- src/shared/att.h         |  3 ++-
- src/shared/gatt-client.c |  4 ++--
- src/shared/gatt-server.c | 36 ++++++++++++++++++++++++++++--------
- src/shared/gatt-server.h |  3 ++-
- tools/btgatt-server.c    |  2 +-
- unit/test-gatt.c         |  2 +-
- 14 files changed, 123 insertions(+), 36 deletions(-)
+With patch 279c936153199 the btuart_cs driver has been deprecated in
+favor of serial_cs + hci_uart combination.
 
-diff --git a/peripheral/gatt.c b/peripheral/gatt.c
-index 5ae19a8e5..08541c424 100644
---- a/peripheral/gatt.c
-+++ b/peripheral/gatt.c
-@@ -128,7 +128,7 @@ static struct gatt_conn *gatt_conn_new(int fd)
+  static struct pcmcia_device_id btuart_ids[] = {
+         /* don't use this driver. Use serial_cs + hci_uart instead */
+         PCMCIA_DEVICE_NULL
+  };
+
+Intead of keeping it around, just remove it since it is not even
+assigned to any PCMCIA identifiers anymore.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/Kconfig     |  16 -
+ drivers/bluetooth/Makefile    |   1 -
+ drivers/bluetooth/btuart_cs.c | 675 ------------------------------------------
+ 3 files changed, 692 deletions(-)
+ delete mode 100644 drivers/bluetooth/btuart_cs.c
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 8a0a5edb6a0a..c66f8424e21e 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -319,22 +319,6 @@ config BT_HCIBLUECARD
+ 	  Say Y here to compile support for HCI BlueCard devices into the
+ 	  kernel or say M to compile it as module (bluecard_cs).
  
- 	bt_att_set_security(conn->att, BT_SECURITY_MEDIUM);
- 
--	conn->gatt = bt_gatt_server_new(gatt_db, conn->att, mtu);
-+	conn->gatt = bt_gatt_server_new(gatt_db, conn->att, mtu, 0);
- 	if (!conn->gatt) {
- 		fprintf(stderr, "Failed to create GATT server\n");
- 		bt_att_unref(conn->att);
-diff --git a/src/adapter.c b/src/adapter.c
-index 6d7d61504..6b9222bcf 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3441,25 +3441,27 @@ failed:
- 	return ltk;
- }
- 
--static GSList *get_ltk_info(GKeyFile *key_file, const char *peer,
-+static struct smp_ltk_info *get_ltk_info(GKeyFile *key_file, const char *peer,
-+							uint8_t bdaddr_type)
-+{
-+	DBG("%s", peer);
-+
-+	return get_ltk(key_file, peer, bdaddr_type, "LongTermKey");
-+}
-+
-+static struct smp_ltk_info *get_slave_ltk_info(GKeyFile *key_file,
-+							const char *peer,
- 							uint8_t bdaddr_type)
- {
- 	struct smp_ltk_info *ltk;
--	GSList *l = NULL;
- 
- 	DBG("%s", peer);
- 
--	ltk = get_ltk(key_file, peer, bdaddr_type, "LongTermKey");
--	if (ltk)
--		l = g_slist_append(l, ltk);
+-config BT_HCIBTUART
+-	tristate "HCI UART (PC Card) device driver"
+-	depends on PCMCIA
+-	help
+-	  Bluetooth HCI UART (PC Card) driver.
+-	  This driver provides support for Bluetooth PCMCIA devices with
+-	  an UART interface:
+-	     Xircom CreditCard Bluetooth Adapter
+-	     Xircom RealPort2 Bluetooth Adapter
+-	     Sphinx PICO Card
+-	     H-Soft blue+Card
+-	     Cyber-blue Compact Flash Card
 -
- 	ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
--	if (ltk) {
-+	if (ltk)
- 		ltk->master = false;
--		l = g_slist_append(l, ltk);
+-	  Say Y here to compile support for HCI UART devices into the
+-	  kernel or say M to compile it as module (btuart_cs).
+-
+ config BT_HCIVHCI
+ 	tristate "HCI VHCI (Virtual HCI device) driver"
+ 	help
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 201a6b9f92f7..f3cfe62b4c41 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -11,7 +11,6 @@ obj-$(CONFIG_BT_HCIBFUSB)	+= bfusb.o
+ obj-$(CONFIG_BT_HCIDTL1)	+= dtl1_cs.o
+ obj-$(CONFIG_BT_HCIBT3C)	+= bt3c_cs.o
+ obj-$(CONFIG_BT_HCIBLUECARD)	+= bluecard_cs.o
+-obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
+ 
+ obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
+ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
+diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
+deleted file mode 100644
+index 310e9c2e09b6..000000000000
+--- a/drivers/bluetooth/btuart_cs.c
++++ /dev/null
+@@ -1,675 +0,0 @@
+-/*
+- *
+- *  Driver for Bluetooth PCMCIA cards with HCI UART interface
+- *
+- *  Copyright (C) 2001-2002  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License version 2 as
+- *  published by the Free Software Foundation;
+- *
+- *  Software distributed under the License is distributed on an "AS
+- *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+- *  implied. See the License for the specific language governing
+- *  rights and limitations under the License.
+- *
+- *  The initial developer of the original code is David A. Hinds
+- *  <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
+- *  are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
+- *
+- */
+-
+-#include <linux/module.h>
+-
+-#include <linux/kernel.h>
+-#include <linux/init.h>
+-#include <linux/slab.h>
+-#include <linux/types.h>
+-#include <linux/delay.h>
+-#include <linux/errno.h>
+-#include <linux/ptrace.h>
+-#include <linux/ioport.h>
+-#include <linux/spinlock.h>
+-#include <linux/moduleparam.h>
+-
+-#include <linux/skbuff.h>
+-#include <linux/string.h>
+-#include <linux/serial.h>
+-#include <linux/serial_reg.h>
+-#include <linux/bitops.h>
+-#include <linux/io.h>
+-
+-#include <pcmcia/cistpl.h>
+-#include <pcmcia/ciscode.h>
+-#include <pcmcia/ds.h>
+-#include <pcmcia/cisreg.h>
+-
+-#include <net/bluetooth/bluetooth.h>
+-#include <net/bluetooth/hci_core.h>
+-
+-
+-
+-/* ======================== Module parameters ======================== */
+-
+-
+-MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+-MODULE_DESCRIPTION("Bluetooth driver for Bluetooth PCMCIA cards with HCI UART interface");
+-MODULE_LICENSE("GPL");
+-
+-
+-
+-/* ======================== Local structures ======================== */
+-
+-
+-struct btuart_info {
+-	struct pcmcia_device *p_dev;
+-
+-	struct hci_dev *hdev;
+-
+-	spinlock_t lock;	/* For serializing operations */
+-
+-	struct sk_buff_head txq;
+-	unsigned long tx_state;
+-
+-	unsigned long rx_state;
+-	unsigned long rx_count;
+-	struct sk_buff *rx_skb;
+-};
+-
+-
+-static int btuart_config(struct pcmcia_device *link);
+-static void btuart_release(struct pcmcia_device *link);
+-
+-static void btuart_detach(struct pcmcia_device *p_dev);
+-
+-
+-/* Maximum baud rate */
+-#define SPEED_MAX  115200
+-
+-/* Default baud rate: 57600, 115200, 230400 or 460800 */
+-#define DEFAULT_BAUD_RATE  115200
+-
+-
+-/* Transmit states  */
+-#define XMIT_SENDING	1
+-#define XMIT_WAKEUP	2
+-#define XMIT_WAITING	8
+-
+-/* Receiver states */
+-#define RECV_WAIT_PACKET_TYPE	0
+-#define RECV_WAIT_EVENT_HEADER	1
+-#define RECV_WAIT_ACL_HEADER	2
+-#define RECV_WAIT_SCO_HEADER	3
+-#define RECV_WAIT_DATA		4
+-
+-
+-
+-/* ======================== Interrupt handling ======================== */
+-
+-
+-static int btuart_write(unsigned int iobase, int fifo_size, __u8 *buf, int len)
+-{
+-	int actual = 0;
+-
+-	/* Tx FIFO should be empty */
+-	if (!(inb(iobase + UART_LSR) & UART_LSR_THRE))
+-		return 0;
+-
+-	/* Fill FIFO with current frame */
+-	while ((fifo_size-- > 0) && (actual < len)) {
+-		/* Transmit next byte */
+-		outb(buf[actual], iobase + UART_TX);
+-		actual++;
 -	}
- 
--	return l;
-+	return ltk;
- }
- 
- static struct irk_info *get_irk_info(GKeyFile *key_file, const char *peer,
-@@ -4019,7 +4021,9 @@ static void load_devices(struct btd_adapter *adapter)
- 		char filename[PATH_MAX];
- 		GKeyFile *key_file;
- 		struct link_key_info *key_info;
--		GSList *list, *ltk_info;
-+		struct smp_ltk_info *ltk_info;
-+		struct smp_ltk_info *slave_ltk_info;
-+		GSList *list;
- 		struct irk_info *irk_info;
- 		struct conn_param *param;
- 		uint8_t bdaddr_type;
-@@ -4044,7 +4048,13 @@ static void load_devices(struct btd_adapter *adapter)
- 		bdaddr_type = get_le_addr_type(key_file);
- 
- 		ltk_info = get_ltk_info(key_file, entry->d_name, bdaddr_type);
--		ltks = g_slist_concat(ltks, ltk_info);
-+		if (ltk_info)
-+			ltks = g_slist_append(ltks, ltk_info);
-+
-+		slave_ltk_info = get_slave_ltk_info(key_file, entry->d_name,
-+								bdaddr_type);
-+		if (slave_ltk_info)
-+			ltks = g_slist_append(ltks, slave_ltk_info);
- 
- 		irk_info = get_irk_info(key_file, entry->d_name, bdaddr_type);
- 		if (irk_info)
-@@ -4079,9 +4089,16 @@ device_exist:
- 			device_set_bonded(device, BDADDR_BREDR);
- 		}
- 
--		if (ltk_info) {
-+		if (ltk_info || slave_ltk_info) {
- 			device_set_paired(device, bdaddr_type);
- 			device_set_bonded(device, bdaddr_type);
-+
-+			if (ltk_info)
-+				device_set_ltk_enc_size(device,
-+							ltk_info->enc_size);
-+			else if (slave_ltk_info)
-+				device_set_ltk_enc_size(device,
-+						slave_ltk_info->enc_size);
- 		}
- 
- free:
-@@ -7464,6 +7481,8 @@ static void new_long_term_key_callback(uint16_t index, uint16_t length,
- 		device_set_bonded(device, addr->type);
- 	}
- 
-+	device_set_ltk_enc_size(device, ev->key.enc_size);
-+
- 	bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
- }
- 
-diff --git a/src/device.c b/src/device.c
-index 7c7196ca1..f3c5e7925 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -243,6 +243,7 @@ struct btd_device {
- 
- 	struct csrk_info *local_csrk;
- 	struct csrk_info *remote_csrk;
-+	uint8_t ltk_enc_size;
- 
- 	sdp_list_t	*tmp_records;
- 
-@@ -1460,6 +1461,12 @@ bool device_is_disconnecting(struct btd_device *device)
- 	return device->disconn_timer > 0;
- }
- 
-+void device_set_ltk_enc_size(struct btd_device *device, uint8_t enc_size)
-+{
-+	device->ltk_enc_size = enc_size;
-+	bt_att_set_enc_key_size(device->att, device->ltk_enc_size);
-+}
-+
- static void device_set_auto_connect(struct btd_device *device, gboolean enable)
- {
- 	char addr[18];
-@@ -4834,10 +4841,14 @@ static void gatt_server_init(struct btd_device *device, struct gatt_db *db)
- 
- 	gatt_server_cleanup(device);
- 
--	device->server = bt_gatt_server_new(db, device->att, device->att_mtu);
--	if (!device->server)
-+	device->server = bt_gatt_server_new(db, device->att, device->att_mtu,
-+						main_opts.min_enc_key_size);
-+	if (!device->server) {
- 		error("Failed to initialize bt_gatt_server");
-+		return;
-+	}
- 
-+	bt_att_set_enc_key_size(device->att, device->ltk_enc_size);
- 	bt_gatt_server_set_debug(device->server, gatt_debug, NULL, NULL);
- }
- 
-diff --git a/src/device.h b/src/device.h
-index bc046f780..306c813fc 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -130,6 +130,7 @@ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type);
- void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type);
- void device_request_disconnect(struct btd_device *device, DBusMessage *msg);
- bool device_is_disconnecting(struct btd_device *device);
-+void device_set_ltk_enc_size(struct btd_device *device, uint8_t enc_size);
- 
- typedef void (*disconnect_watch) (struct btd_device *device, gboolean removal,
- 					void *user_data);
-diff --git a/src/hcid.h b/src/hcid.h
-index 62e2bd606..2c2b89d9c 100644
---- a/src/hcid.h
-+++ b/src/hcid.h
-@@ -54,6 +54,8 @@ struct main_opts {
- 
- 	bt_mode_t	mode;
- 	bt_gatt_cache_t gatt_cache;
-+
-+	uint8_t		min_enc_key_size;
- };
- 
- extern struct main_opts main_opts;
-diff --git a/src/main.c b/src/main.c
-index 21f0b14a4..7e6af42cd 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -103,6 +103,7 @@ static const char *policy_options[] = {
- 
- static const char *gatt_options[] = {
- 	"Cache",
-+	"MinEncKeySize",
- 	NULL
- };
- 
-@@ -402,12 +403,22 @@ static void parse_config(GKeyFile *config)
- 	if (err) {
- 		g_clear_error(&err);
- 		main_opts.gatt_cache = BT_GATT_CACHE_ALWAYS;
+-
+-	return actual;
+-}
+-
+-
+-static void btuart_write_wakeup(struct btuart_info *info)
+-{
+-	if (!info) {
+-		BT_ERR("Unknown device");
 -		return;
-+	} else {
-+		main_opts.gatt_cache = parse_gatt_cache(str);
-+		g_free(str);
- 	}
- 
--	main_opts.gatt_cache = parse_gatt_cache(str);
-+	val = g_key_file_get_integer(config, "GATT",
-+						"MinEncKeySize", &err);
-+	if (err) {
-+		DBG("%s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		DBG("MinEncKeySize=%d", val);
- 
--	g_free(str);
-+		if (val >=7 && val <= 16)
-+			main_opts.min_enc_key_size = val;
-+	}
- }
- 
- static void init_defaults(void)
-diff --git a/src/main.conf b/src/main.conf
-index 21986b386..cbae32ec5 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -77,6 +77,11 @@
- # Default: always
- #Cache = always
- 
-+# Minimum required Encryption Key Size for accessing secured characteristics.
-+# Possible values: 0 and 7-16. 0 means don't care.
-+# Defaults to 0
-+# MinEncKeySize = 0
-+
- [Policy]
- #
- # The ReconnectUUIDs defines the set of remote services that should try
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 0aab246d6..8bf3f4611 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -55,6 +55,7 @@ struct bt_att {
- 	struct io *io;
- 	bool io_on_l2cap;
- 	int io_sec_level;		/* Only used for non-L2CAP */
-+	uint8_t enc_size;
- 
- 	struct queue *req_queue;	/* Queued ATT protocol requests */
- 	struct att_send_op *pending_req;
-@@ -602,7 +603,7 @@ static bool change_security(struct bt_att *att, uint8_t ecode)
- 	if (att->io_sec_level != BT_ATT_SECURITY_AUTO)
- 		return false;
- 
--	security = bt_att_get_security(att);
-+	security = bt_att_get_security(att, NULL);
- 
- 	if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
- 					security < BT_ATT_SECURITY_MEDIUM) {
-@@ -1454,7 +1455,7 @@ bool bt_att_unregister_all(struct bt_att *att)
- 	return true;
- }
- 
--int bt_att_get_security(struct bt_att *att)
-+int bt_att_get_security(struct bt_att *att, uint8_t *enc_size)
- {
- 	struct bt_security sec;
- 	socklen_t len;
-@@ -1462,14 +1463,21 @@ int bt_att_get_security(struct bt_att *att)
- 	if (!att)
- 		return -EINVAL;
- 
--	if (!att->io_on_l2cap)
-+	if (!att->io_on_l2cap) {
-+		if (enc_size)
-+			*enc_size = att->enc_size;
-+
- 		return att->io_sec_level;
-+	}
- 
- 	memset(&sec, 0, sizeof(sec));
- 	len = sizeof(sec);
- 	if (getsockopt(att->fd, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) < 0)
- 		return -EIO;
- 
-+	if (enc_size)
-+		*enc_size = att->enc_size;
-+
- 	return sec.level;
- }
- 
-@@ -1496,6 +1504,14 @@ bool bt_att_set_security(struct bt_att *att, int level)
- 	return true;
- }
- 
-+void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size)
-+{
-+	if (!att)
-+		return;
-+
-+	att->enc_size = enc_size;
-+}
-+
- static bool sign_set_key(struct sign_info **sign, uint8_t key[16],
- 				bt_att_counter_func_t func, void *user_data)
- {
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 7bffee7d6..49d93269b 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -84,8 +84,9 @@ bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id);
- 
- bool bt_att_unregister_all(struct bt_att *att);
- 
--int bt_att_get_security(struct bt_att *att);
-+int bt_att_get_security(struct bt_att *att, uint8_t *enc_size);
- bool bt_att_set_security(struct bt_att *att, int level);
-+void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size);
- 
- bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
- 			bt_att_counter_func_t func, void *user_data);
-diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-index e1d489d32..a5c7b1485 100644
---- a/src/shared/gatt-client.c
-+++ b/src/shared/gatt-client.c
-@@ -2466,7 +2466,7 @@ unsigned int bt_gatt_client_write_without_response(
- 
- 	/* Only use signed write if unencrypted */
- 	if (signed_write) {
--		security = bt_att_get_security(client->att);
-+		security = bt_att_get_security(client->att, NULL);
- 		op = security > BT_SECURITY_LOW ?  BT_ATT_OP_WRITE_CMD :
- 						BT_ATT_OP_SIGNED_WRITE_CMD;
- 	} else
-@@ -3182,5 +3182,5 @@ int bt_gatt_client_get_security(struct bt_gatt_client *client)
- 	if (!client)
- 		return -1;
- 
--	return bt_att_get_security(client->att);
-+	return bt_att_get_security(client->att, NULL);
- }
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index faa56abeb..f6c98e277 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -103,6 +103,8 @@ struct bt_gatt_server {
- 	unsigned int prep_write_id;
- 	unsigned int exec_write_id;
- 
-+	uint8_t min_enc_size;
-+
- 	struct queue *prep_queue;
- 	unsigned int max_prep_queue_len;
- 
-@@ -382,6 +384,7 @@ done:
- static uint8_t check_permissions(struct bt_gatt_server *server,
- 				struct gatt_db_attribute *attr, uint32_t mask)
- {
-+	uint8_t enc_size;
- 	uint32_t perm;
- 	int security;
- 
-@@ -397,15 +400,30 @@ static uint8_t check_permissions(struct bt_gatt_server *server,
- 	if (!perm)
- 		return 0;
- 
--	security = bt_att_get_security(server->att);
--	if (perm & BT_ATT_PERM_SECURE && security < BT_ATT_SECURITY_FIPS)
--		return BT_ATT_ERROR_AUTHENTICATION;
-+	security = bt_att_get_security(server->att, &enc_size);
-+	if (perm & BT_ATT_PERM_SECURE) {
-+		if (security < BT_ATT_SECURITY_FIPS)
-+			return BT_ATT_ERROR_AUTHENTICATION;
-+
-+		if (server->min_enc_size && server->min_enc_size > enc_size)
-+			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
-+	}
- 
--	if (perm & BT_ATT_PERM_AUTHEN && security < BT_ATT_SECURITY_HIGH)
--		return BT_ATT_ERROR_AUTHENTICATION;
-+	if (perm & BT_ATT_PERM_AUTHEN) {
-+		if (security < BT_ATT_SECURITY_HIGH)
-+			return BT_ATT_ERROR_AUTHENTICATION;
- 
--	if (perm & BT_ATT_PERM_ENCRYPT && security < BT_ATT_SECURITY_MEDIUM)
--		return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION;
-+		if (server->min_enc_size && server->min_enc_size > enc_size)
-+			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
-+	}
-+
-+	if (perm & BT_ATT_PERM_ENCRYPT) {
-+		if (security < BT_ATT_SECURITY_MEDIUM)
-+			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION;
-+
-+		if (server->min_enc_size && server->min_enc_size > enc_size)
-+			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
-+	}
- 
- 	return 0;
- }
-@@ -1481,7 +1499,8 @@ static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
- }
- 
- struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
--					struct bt_att *att, uint16_t mtu)
-+					struct bt_att *att, uint16_t mtu,
-+					uint8_t min_enc_size)
- {
- 	struct bt_gatt_server *server;
- 
-@@ -1494,6 +1513,7 @@ struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
- 	server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
- 	server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
- 	server->prep_queue = queue_new();
-+	server->min_enc_size = min_enc_size;
- 
- 	if (!gatt_server_register_att_handlers(server)) {
- 		bt_gatt_server_free(server);
-diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
-index 74a6c721e..d5d209350 100644
---- a/src/shared/gatt-server.h
-+++ b/src/shared/gatt-server.h
-@@ -26,7 +26,8 @@
- struct bt_gatt_server;
- 
- struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
--					struct bt_att *att, uint16_t mtu);
-+					struct bt_att *att, uint16_t mtu,
-+					uint8_t min_enc_size);
- uint16_t bt_gatt_server_get_mtu(struct bt_gatt_server *server);
- 
- struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server);
-diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-index fadaff2ad..89812bd75 100644
---- a/tools/btgatt-server.c
-+++ b/tools/btgatt-server.c
-@@ -583,7 +583,7 @@ static struct server *server_create(int fd, uint16_t mtu, bool hr_visible)
- 		goto fail;
- 	}
- 
--	server->gatt = bt_gatt_server_new(server->db, server->att, mtu);
-+	server->gatt = bt_gatt_server_new(server->db, server->att, mtu, 0);
- 	if (!server->gatt) {
- 		fprintf(stderr, "Failed to create GATT server\n");
- 		goto fail;
-diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-index 5d79e94c0..c7e28f865 100644
---- a/unit/test-gatt.c
-+++ b/unit/test-gatt.c
-@@ -667,7 +667,7 @@ static struct context *create_context(uint16_t mtu, gconstpointer data)
- 		g_assert(context->server_db);
- 
- 		context->server = bt_gatt_server_new(context->server_db,
--							context->att, mtu);
-+							context->att, mtu, 0);
- 		g_assert(context->server);
- 
- 		bt_gatt_server_set_debug(context->server, print_debug,
+-	}
+-
+-	if (test_and_set_bit(XMIT_SENDING, &(info->tx_state))) {
+-		set_bit(XMIT_WAKEUP, &(info->tx_state));
+-		return;
+-	}
+-
+-	do {
+-		unsigned int iobase = info->p_dev->resource[0]->start;
+-		register struct sk_buff *skb;
+-		int len;
+-
+-		clear_bit(XMIT_WAKEUP, &(info->tx_state));
+-
+-		if (!pcmcia_dev_present(info->p_dev))
+-			return;
+-
+-		skb = skb_dequeue(&(info->txq));
+-		if (!skb)
+-			break;
+-
+-		/* Send frame */
+-		len = btuart_write(iobase, 16, skb->data, skb->len);
+-		set_bit(XMIT_WAKEUP, &(info->tx_state));
+-
+-		if (len == skb->len) {
+-			kfree_skb(skb);
+-		} else {
+-			skb_pull(skb, len);
+-			skb_queue_head(&(info->txq), skb);
+-		}
+-
+-		info->hdev->stat.byte_tx += len;
+-
+-	} while (test_bit(XMIT_WAKEUP, &(info->tx_state)));
+-
+-	clear_bit(XMIT_SENDING, &(info->tx_state));
+-}
+-
+-
+-static void btuart_receive(struct btuart_info *info)
+-{
+-	unsigned int iobase;
+-	int boguscount = 0;
+-
+-	if (!info) {
+-		BT_ERR("Unknown device");
+-		return;
+-	}
+-
+-	iobase = info->p_dev->resource[0]->start;
+-
+-	do {
+-		info->hdev->stat.byte_rx++;
+-
+-		/* Allocate packet */
+-		if (!info->rx_skb) {
+-			info->rx_state = RECV_WAIT_PACKET_TYPE;
+-			info->rx_count = 0;
+-			info->rx_skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
+-			if (!info->rx_skb) {
+-				BT_ERR("Can't allocate mem for new packet");
+-				return;
+-			}
+-		}
+-
+-		if (info->rx_state == RECV_WAIT_PACKET_TYPE) {
+-
+-			hci_skb_pkt_type(info->rx_skb) = inb(iobase + UART_RX);
+-
+-			switch (hci_skb_pkt_type(info->rx_skb)) {
+-
+-			case HCI_EVENT_PKT:
+-				info->rx_state = RECV_WAIT_EVENT_HEADER;
+-				info->rx_count = HCI_EVENT_HDR_SIZE;
+-				break;
+-
+-			case HCI_ACLDATA_PKT:
+-				info->rx_state = RECV_WAIT_ACL_HEADER;
+-				info->rx_count = HCI_ACL_HDR_SIZE;
+-				break;
+-
+-			case HCI_SCODATA_PKT:
+-				info->rx_state = RECV_WAIT_SCO_HEADER;
+-				info->rx_count = HCI_SCO_HDR_SIZE;
+-				break;
+-
+-			default:
+-				/* Unknown packet */
+-				BT_ERR("Unknown HCI packet with type 0x%02x received",
+-				       hci_skb_pkt_type(info->rx_skb));
+-				info->hdev->stat.err_rx++;
+-
+-				kfree_skb(info->rx_skb);
+-				info->rx_skb = NULL;
+-				break;
+-
+-			}
+-
+-		} else {
+-
+-			skb_put_u8(info->rx_skb, inb(iobase + UART_RX));
+-			info->rx_count--;
+-
+-			if (info->rx_count == 0) {
+-
+-				int dlen;
+-				struct hci_event_hdr *eh;
+-				struct hci_acl_hdr *ah;
+-				struct hci_sco_hdr *sh;
+-
+-
+-				switch (info->rx_state) {
+-
+-				case RECV_WAIT_EVENT_HEADER:
+-					eh = hci_event_hdr(info->rx_skb);
+-					info->rx_state = RECV_WAIT_DATA;
+-					info->rx_count = eh->plen;
+-					break;
+-
+-				case RECV_WAIT_ACL_HEADER:
+-					ah = hci_acl_hdr(info->rx_skb);
+-					dlen = __le16_to_cpu(ah->dlen);
+-					info->rx_state = RECV_WAIT_DATA;
+-					info->rx_count = dlen;
+-					break;
+-
+-				case RECV_WAIT_SCO_HEADER:
+-					sh = hci_sco_hdr(info->rx_skb);
+-					info->rx_state = RECV_WAIT_DATA;
+-					info->rx_count = sh->dlen;
+-					break;
+-
+-				case RECV_WAIT_DATA:
+-					hci_recv_frame(info->hdev, info->rx_skb);
+-					info->rx_skb = NULL;
+-					break;
+-
+-				}
+-
+-			}
+-
+-		}
+-
+-		/* Make sure we don't stay here too long */
+-		if (boguscount++ > 16)
+-			break;
+-
+-	} while (inb(iobase + UART_LSR) & UART_LSR_DR);
+-}
+-
+-
+-static irqreturn_t btuart_interrupt(int irq, void *dev_inst)
+-{
+-	struct btuart_info *info = dev_inst;
+-	unsigned int iobase;
+-	int boguscount = 0;
+-	int iir, lsr;
+-	irqreturn_t r = IRQ_NONE;
+-
+-	if (!info || !info->hdev)
+-		/* our irq handler is shared */
+-		return IRQ_NONE;
+-
+-	iobase = info->p_dev->resource[0]->start;
+-
+-	spin_lock(&(info->lock));
+-
+-	iir = inb(iobase + UART_IIR) & UART_IIR_ID;
+-	while (iir) {
+-		r = IRQ_HANDLED;
+-
+-		/* Clear interrupt */
+-		lsr = inb(iobase + UART_LSR);
+-
+-		switch (iir) {
+-		case UART_IIR_RLSI:
+-			BT_ERR("RLSI");
+-			break;
+-		case UART_IIR_RDI:
+-			/* Receive interrupt */
+-			btuart_receive(info);
+-			break;
+-		case UART_IIR_THRI:
+-			if (lsr & UART_LSR_THRE) {
+-				/* Transmitter ready for data */
+-				btuart_write_wakeup(info);
+-			}
+-			break;
+-		default:
+-			BT_ERR("Unhandled IIR=%#x", iir);
+-			break;
+-		}
+-
+-		/* Make sure we don't stay here too long */
+-		if (boguscount++ > 100)
+-			break;
+-
+-		iir = inb(iobase + UART_IIR) & UART_IIR_ID;
+-
+-	}
+-
+-	spin_unlock(&(info->lock));
+-
+-	return r;
+-}
+-
+-
+-static void btuart_change_speed(struct btuart_info *info,
+-				unsigned int speed)
+-{
+-	unsigned long flags;
+-	unsigned int iobase;
+-	int fcr;		/* FIFO control reg */
+-	int lcr;		/* Line control reg */
+-	int divisor;
+-
+-	if (!info) {
+-		BT_ERR("Unknown device");
+-		return;
+-	}
+-
+-	iobase = info->p_dev->resource[0]->start;
+-
+-	spin_lock_irqsave(&(info->lock), flags);
+-
+-	/* Turn off interrupts */
+-	outb(0, iobase + UART_IER);
+-
+-	divisor = SPEED_MAX / speed;
+-
+-	fcr = UART_FCR_ENABLE_FIFO | UART_FCR_CLEAR_RCVR | UART_FCR_CLEAR_XMIT;
+-
+-	/* 
+-	 * Use trigger level 1 to avoid 3 ms. timeout delay at 9600 bps, and
+-	 * almost 1,7 ms at 19200 bps. At speeds above that we can just forget
+-	 * about this timeout since it will always be fast enough. 
+-	 */
+-
+-	if (speed < 38400)
+-		fcr |= UART_FCR_TRIGGER_1;
+-	else
+-		fcr |= UART_FCR_TRIGGER_14;
+-
+-	/* Bluetooth cards use 8N1 */
+-	lcr = UART_LCR_WLEN8;
+-
+-	outb(UART_LCR_DLAB | lcr, iobase + UART_LCR);	/* Set DLAB */
+-	outb(divisor & 0xff, iobase + UART_DLL);	/* Set speed */
+-	outb(divisor >> 8, iobase + UART_DLM);
+-	outb(lcr, iobase + UART_LCR);	/* Set 8N1  */
+-	outb(fcr, iobase + UART_FCR);	/* Enable FIFO's */
+-
+-	/* Turn on interrupts */
+-	outb(UART_IER_RLSI | UART_IER_RDI | UART_IER_THRI, iobase + UART_IER);
+-
+-	spin_unlock_irqrestore(&(info->lock), flags);
+-}
+-
+-
+-
+-/* ======================== HCI interface ======================== */
+-
+-
+-static int btuart_hci_flush(struct hci_dev *hdev)
+-{
+-	struct btuart_info *info = hci_get_drvdata(hdev);
+-
+-	/* Drop TX queue */
+-	skb_queue_purge(&(info->txq));
+-
+-	return 0;
+-}
+-
+-
+-static int btuart_hci_open(struct hci_dev *hdev)
+-{
+-	return 0;
+-}
+-
+-
+-static int btuart_hci_close(struct hci_dev *hdev)
+-{
+-	btuart_hci_flush(hdev);
+-
+-	return 0;
+-}
+-
+-
+-static int btuart_hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+-{
+-	struct btuart_info *info = hci_get_drvdata(hdev);
+-
+-	switch (hci_skb_pkt_type(skb)) {
+-	case HCI_COMMAND_PKT:
+-		hdev->stat.cmd_tx++;
+-		break;
+-	case HCI_ACLDATA_PKT:
+-		hdev->stat.acl_tx++;
+-		break;
+-	case HCI_SCODATA_PKT:
+-		hdev->stat.sco_tx++;
+-		break;
+-	}
+-
+-	/* Prepend skb with frame type */
+-	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+-	skb_queue_tail(&(info->txq), skb);
+-
+-	btuart_write_wakeup(info);
+-
+-	return 0;
+-}
+-
+-
+-
+-/* ======================== Card services HCI interaction ======================== */
+-
+-
+-static int btuart_open(struct btuart_info *info)
+-{
+-	unsigned long flags;
+-	unsigned int iobase = info->p_dev->resource[0]->start;
+-	struct hci_dev *hdev;
+-
+-	spin_lock_init(&(info->lock));
+-
+-	skb_queue_head_init(&(info->txq));
+-
+-	info->rx_state = RECV_WAIT_PACKET_TYPE;
+-	info->rx_count = 0;
+-	info->rx_skb = NULL;
+-
+-	/* Initialize HCI device */
+-	hdev = hci_alloc_dev();
+-	if (!hdev) {
+-		BT_ERR("Can't allocate HCI device");
+-		return -ENOMEM;
+-	}
+-
+-	info->hdev = hdev;
+-
+-	hdev->bus = HCI_PCCARD;
+-	hci_set_drvdata(hdev, info);
+-	SET_HCIDEV_DEV(hdev, &info->p_dev->dev);
+-
+-	hdev->open  = btuart_hci_open;
+-	hdev->close = btuart_hci_close;
+-	hdev->flush = btuart_hci_flush;
+-	hdev->send  = btuart_hci_send_frame;
+-
+-	spin_lock_irqsave(&(info->lock), flags);
+-
+-	/* Reset UART */
+-	outb(0, iobase + UART_MCR);
+-
+-	/* Turn off interrupts */
+-	outb(0, iobase + UART_IER);
+-
+-	/* Initialize UART */
+-	outb(UART_LCR_WLEN8, iobase + UART_LCR);	/* Reset DLAB */
+-	outb((UART_MCR_DTR | UART_MCR_RTS | UART_MCR_OUT2), iobase + UART_MCR);
+-
+-	/* Turn on interrupts */
+-	// outb(UART_IER_RLSI | UART_IER_RDI | UART_IER_THRI, iobase + UART_IER);
+-
+-	spin_unlock_irqrestore(&(info->lock), flags);
+-
+-	btuart_change_speed(info, DEFAULT_BAUD_RATE);
+-
+-	/* Timeout before it is safe to send the first HCI packet */
+-	msleep(1000);
+-
+-	/* Register HCI device */
+-	if (hci_register_dev(hdev) < 0) {
+-		BT_ERR("Can't register HCI device");
+-		info->hdev = NULL;
+-		hci_free_dev(hdev);
+-		return -ENODEV;
+-	}
+-
+-	return 0;
+-}
+-
+-
+-static int btuart_close(struct btuart_info *info)
+-{
+-	unsigned long flags;
+-	unsigned int iobase = info->p_dev->resource[0]->start;
+-	struct hci_dev *hdev = info->hdev;
+-
+-	if (!hdev)
+-		return -ENODEV;
+-
+-	btuart_hci_close(hdev);
+-
+-	spin_lock_irqsave(&(info->lock), flags);
+-
+-	/* Reset UART */
+-	outb(0, iobase + UART_MCR);
+-
+-	/* Turn off interrupts */
+-	outb(0, iobase + UART_IER);
+-
+-	spin_unlock_irqrestore(&(info->lock), flags);
+-
+-	hci_unregister_dev(hdev);
+-	hci_free_dev(hdev);
+-
+-	return 0;
+-}
+-
+-static int btuart_probe(struct pcmcia_device *link)
+-{
+-	struct btuart_info *info;
+-
+-	/* Create new info device */
+-	info = devm_kzalloc(&link->dev, sizeof(*info), GFP_KERNEL);
+-	if (!info)
+-		return -ENOMEM;
+-
+-	info->p_dev = link;
+-	link->priv = info;
+-
+-	link->config_flags |= CONF_ENABLE_IRQ | CONF_AUTO_SET_VPP |
+-		CONF_AUTO_SET_IO;
+-
+-	return btuart_config(link);
+-}
+-
+-
+-static void btuart_detach(struct pcmcia_device *link)
+-{
+-	btuart_release(link);
+-}
+-
+-static int btuart_check_config(struct pcmcia_device *p_dev, void *priv_data)
+-{
+-	int *try = priv_data;
+-
+-	if (!try)
+-		p_dev->io_lines = 16;
+-
+-	if ((p_dev->resource[0]->end != 8) || (p_dev->resource[0]->start == 0))
+-		return -EINVAL;
+-
+-	p_dev->resource[0]->end = 8;
+-	p_dev->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
+-	p_dev->resource[0]->flags |= IO_DATA_PATH_WIDTH_8;
+-
+-	return pcmcia_request_io(p_dev);
+-}
+-
+-static int btuart_check_config_notpicky(struct pcmcia_device *p_dev,
+-					void *priv_data)
+-{
+-	static unsigned int base[5] = { 0x3f8, 0x2f8, 0x3e8, 0x2e8, 0x0 };
+-	int j;
+-
+-	if (p_dev->io_lines > 3)
+-		return -ENODEV;
+-
+-	p_dev->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
+-	p_dev->resource[0]->flags |= IO_DATA_PATH_WIDTH_8;
+-	p_dev->resource[0]->end = 8;
+-
+-	for (j = 0; j < 5; j++) {
+-		p_dev->resource[0]->start = base[j];
+-		p_dev->io_lines = base[j] ? 16 : 3;
+-		if (!pcmcia_request_io(p_dev))
+-			return 0;
+-	}
+-	return -ENODEV;
+-}
+-
+-static int btuart_config(struct pcmcia_device *link)
+-{
+-	struct btuart_info *info = link->priv;
+-	int i;
+-	int try;
+-
+-	/* First pass: look for a config entry that looks normal.
+-	 * Two tries: without IO aliases, then with aliases
+-	 */
+-	for (try = 0; try < 2; try++)
+-		if (!pcmcia_loop_config(link, btuart_check_config, &try))
+-			goto found_port;
+-
+-	/* Second pass: try to find an entry that isn't picky about
+-	 * its base address, then try to grab any standard serial port
+-	 * address, and finally try to get any free port.
+-	 */
+-	if (!pcmcia_loop_config(link, btuart_check_config_notpicky, NULL))
+-		goto found_port;
+-
+-	BT_ERR("No usable port range found");
+-	goto failed;
+-
+-found_port:
+-	i = pcmcia_request_irq(link, btuart_interrupt);
+-	if (i != 0)
+-		goto failed;
+-
+-	i = pcmcia_enable_device(link);
+-	if (i != 0)
+-		goto failed;
+-
+-	if (btuart_open(info) != 0)
+-		goto failed;
+-
+-	return 0;
+-
+-failed:
+-	btuart_release(link);
+-	return -ENODEV;
+-}
+-
+-
+-static void btuart_release(struct pcmcia_device *link)
+-{
+-	struct btuart_info *info = link->priv;
+-
+-	btuart_close(info);
+-
+-	pcmcia_disable_device(link);
+-}
+-
+-static const struct pcmcia_device_id btuart_ids[] = {
+-	/* don't use this driver. Use serial_cs + hci_uart instead */
+-	PCMCIA_DEVICE_NULL
+-};
+-MODULE_DEVICE_TABLE(pcmcia, btuart_ids);
+-
+-static struct pcmcia_driver btuart_driver = {
+-	.owner		= THIS_MODULE,
+-	.name		= "btuart_cs",
+-	.probe		= btuart_probe,
+-	.remove		= btuart_detach,
+-	.id_table	= btuart_ids,
+-};
+-module_pcmcia_driver(btuart_driver);
 -- 
 2.14.3
 
