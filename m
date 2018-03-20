@@ -1,65 +1,57 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: Using BDADDR efivar to set bd_addr for bci_hcm devices?
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, Lukas Wunner <lukas@wunner.de>,
- linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-acpi <linux-acpi@vger.kernel.org>
-References: <724b6359-9d30-c7a6-89fb-591a695c49b3@redhat.com>
- <31BC049B-32EE-407F-A11C-1080A54D0FA7@holtmann.org>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <bc36c706-32ed-5451-6268-652115e84037@redhat.com>
-Date: Tue, 20 Mar 2018 10:09:37 +0100
-MIME-Version: 1.0
-In-Reply-To: <31BC049B-32EE-407F-A11C-1080A54D0FA7@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: pull request: bluetooth 2018-03-16
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180316182319.GA4401@x1c>
+Date: Tue, 20 Mar 2018 09:44:37 +0100
+Cc: linux-bluetooth@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>
+Message-Id: <2162D348-7B5F-4693-87AB-8835A1638CF3@holtmann.org>
+References: <20180316182319.GA4401@x1c>
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI,
+Hi Dave,
 
-On 19-03-18 23:13, Marcel Holtmann wrote:
-> Hi Hans,
+> Here are a few more important Bluetooth driver fixes for the 4.16
+> kernel.
 > 
->> While fixing the bluetooth on the meegopad t08 I noticed that
->> it (and other devices) have a BDADDR efivar with the same guid
->> as used for the nvram variable which contains the wifi's
->> nvram settings for sdio broadcom wifi chips (if present):
->>
->> hexdump -C /sys/firmware/efi/efivars/BDADDR-74b00bd9-805a-4d61-b51f-43268123d113
->> 00000000  07 00 00 00 ac 83 f3 37  39 af                    |.......79.|
->>
->> Booting into Windows shows the bluetooth using
->> an address of ac 83 f3 37  39 af, which makes
->> sense as the meegopad has an AMPAK AP6234 wifi
->> module and the ac 83 f3 prefix belongs to AMPAK.
->>
->> Getting the contents from an efivar from within the kernel is
->> not that hard, so I was thinking that maybe we need to teach
->> the hci_bcm code to check for this and use the bd_addr from
->> there so that we have the same bd_addr as Windows, OTOH not
->> having the same bd_addr is an advantage because this allows
->> devices which can be paired to multiple bt hosts to be paired
->> with both Windows and Linux at the same time using a different
->> key.
->>
->> So what do you think about adding support for the BDADDR efivar
->> and using it to set bd_addr?
->>
->> 1) Good idea?
->> 2) Good idea, but make it optional (compile and/or runtime) ?
->> 3) Bad idea ?
+> Please let me know if there are any issues pulling. Thanks.
 > 
-> I am all for using the BD_ADDR from EFI variables. That way this become how it was intended. If we want to be flexible, we can add a module parameter to disable it and have it stick with the default one.
+> Johan
+> 
+> ---
+> The following changes since commit 3d502067599f0db12e74e6646aee8728efe3e5be:
+> 
+>  net/smc: simplify wait when closing listen socket (2018-03-15 09:49:13 -0400)
+> 
+> are available in the Git repository at:
+> 
+>  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+> 
+> for you to fetch changes up to e07c99b07ae85255d5c5bc2480fbd4c4e77f71bc:
+> 
+>  Bluetooth: hci_bcm: Set pulsed_host_wake flag in sleep parameters (2018-03-15 19:39:37 +0100)
+> 
+> ----------------------------------------------------------------
+> Hans de Goede (2):
+>      Revert "Bluetooth: hci_bcm: Streamline runtime PM code"
+>      Bluetooth: hci_bcm: Set pulsed_host_wake flag in sleep parameters
+> 
+> Takashi Iwai (1):
+>      Bluetooth: btusb: Fix quirk for Atheros 1525/QCA6174
+> 
+> drivers/bluetooth/btusb.c   |  2 +-
+> drivers/bluetooth/hci_bcm.c | 13 +++++++++----
+> 2 files changed, 10 insertions(+), 5 deletions(-)
 
-Ok.
+any issue with this pull request? I ask since it seems to have disappeared from patchwork.
 
-> If we can do it directly from within the kernel automatically, then lets do it. Some similar code was added to hci_ll.c for DT entries from the boot loader. Alternative, this can be always done from userspace via Set Public Address mgmt command.
+Regards
 
-Accessing the efivar from the kernel is easy (the internal API for this
-is a bit clunky but usable), so we can do this within the kernel automatically.
+Marcel
 
-I've put writing a patch for this on my TODO.
-
-Regards,
-
-Hans
