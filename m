@@ -1,57 +1,43 @@
-Return-Path: <tony@atomide.com>
-Date: Tue, 20 Mar 2018 13:14:49 -0700
-From: Tony Lindgren <tony@atomide.com>
-To: Sebastian Reichel <sre@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org,
-	Ulf Hansson <ulf.hansson@linaro.org>, robh@kernel.org
-Subject: Re: [RFC] Bluetooth: hci_ll: Convert to use h4_recv_buf helper
-Message-ID: <20180320201449.GV5796@atomide.com>
-References: <20180320083704.11705-1-marcel@holtmann.org>
- <4DBD77C5-BBFD-4952-A296-30187D85A07F@holtmann.org>
- <20180320172827.ohla5v4a23v3u3qq@earth.universe>
+Return-Path: <vicencb@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180320172827.ohla5v4a23v3u3qq@earth.universe>
+In-Reply-To: <B4CFAEE8-F54B-4130-B3F3-412754EDB170@holtmann.org>
+References: <CA64719F-6732-4683-ACC6-AF82733384C3@holtmann.org>
+ <20180320184110.3888-1-vicencb@gmail.com> <B4CFAEE8-F54B-4130-B3F3-412754EDB170@holtmann.org>
+From: Vicente Bergas <vicencb@gmail.com>
+Date: Tue, 20 Mar 2018 20:13:08 +0100
+Message-ID: <CAAMcf8DB0FKjDUbRYCXLA+xqACSyd-3mKQ2E=QVtAiLwKJFO2g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add USB ID 7392:a611 for Edimax EW-7611ULB
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-* Sebastian Reichel <sre@kernel.org> [180320 17:30]:
-> Hi,
->=20
-> On Tue, Mar 20, 2018 at 04:50:37PM +0100, Marcel Holtmann wrote:
-> > Hi,
-> >=20
-> > > The HCILL or eHCILL protocol from TI is actually an H:4 protocol with=
- a
-> > > few extra events and thus can also use the h4_recv_buf helper. Instead
-> > > of open coding the same funtionality add the extra events to the pack=
-et
-> > > description table and use h4_recv_buf.
-> > >=20
-> > > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> > > ---
-> > > drivers/bluetooth/Kconfig  |   1 +
-> > > drivers/bluetooth/hci_ll.c | 214 +++++++++++++++---------------------=
----------
-> > > 2 files changed, 70 insertions(+), 145 deletions(-)
-> >=20
-> > is anybody able to test this change for me and verify that it doesn=E2=
-=80=99t break things.
->=20
-> The diffstat looks nice :) I can give it a test on Motorola Droid 4
-> later this week. If you want feedback a bit earlier, maybe Tony
-> can give it a try (added to cc).
+On Tue, Mar 20, 2018 at 7:53 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Vicente,
+>
+>> This WiFi/Bluetooth USB dongle uses a Realtek chipset, so, use btrtl for it.
+>>
+>> Product information:
+>> https://wikidevi.com/wiki/Edimax_EW-7611ULB
+>>
+>> From /sys/kernel/debug/usb/devices
+>> T:  Bus=02 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  3 Spd=480  MxCh= 0
+>> ...
+>>
+>> Tested-by: Vicente Bergas <vicencb@gmail.com>
+>> Signed-off-by: Vicente Bergas <vicencb@gmail.com>
+>> ---
+>> drivers/bluetooth/btusb.c | 3 +++
+>> 1 file changed, 3 insertions(+)
+>
+> patch has been applied to bluetooth-next tree.
+>
+> Regards
+>
+> Marcel
+>
 
-I tried applying it from the mailing list archive against
-current Linux next and -rc6 but it failed:
-
-patching file drivers/bluetooth/Kconfig
-Hunk #1 succeeded at 147 with fuzz 2 (offset -13 lines).
-patching file drivers/bluetooth/hci_ll.c
-Hunk #2 succeeded at 88 (offset 4 lines).
-Hunk #3 FAILED at 364.
-
-Any ideas which patch(es) I might be missing?
+Thank you!
 
 Regards,
-
-Tony
+  Vicente.
