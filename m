@@ -1,33 +1,41 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: pull request: bluetooth 2018-03-16
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180320.102926.1557866956544440900.davem@davemloft.net>
-Date: Tue, 20 Mar 2018 18:28:18 +0100
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Message-Id: <D66AC7BA-8BA7-4906-AF69-BBD078CCAF90@holtmann.org>
-References: <20180316182319.GA4401@x1c>
- <2162D348-7B5F-4693-87AB-8835A1638CF3@holtmann.org>
- <20180320.102926.1557866956544440900.davem@davemloft.net>
-To: "David S. Miller" <davem@davemloft.net>
+From: lambertarthur22@gmail.com
+Date: Tue, 20 Mar 2018 16:59:54 +0100
+To: Michael Simon <michael.simon.at@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: issue since bluez 48 with ios pairing only
+Message-ID: <20180320155954.GA32282@arthur-bzh>
+References: <20180320112749.GB21933@arthur-bzh>
+ <CAOVXOEb9kzkYQP1YF5QMS2DBN=FWL0-PkENne8dOVcvbLFta2w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAOVXOEb9kzkYQP1YF5QMS2DBN=FWL0-PkENne8dOVcvbLFta2w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
+Michael Simon wrote :
+>    Hi Arthur,
+>    we had the same issue, it was related to the new "Bluetooth LE Battery
+>    service", when we built bluez without this module the problem was gone.
+>    I think the problem is that iPhones are advertising the battery service
+>    but require pairing for it and this module tries to read the services
+>    values as soon as the iPhone is connected.
+>    Regards,
+>    Michael
 
->> any issue with this pull request? I ask since it seems to have
->> disappeared from patchwork.
-> 
-> Should be pulled in now, don't know how that happened ;-)
+Thank you very much for your quick and good answer Michael. Its works perfecly now !
+I will integrate bluez 49 in my firmware for testing thanks to you !
 
-awesome. Thanks.
+Luiz Augusto von Dentz wrote :
 
-Any chance you can pull net into net-next once you send it off to Linus? We have a few further Broadcom driver improvements for net-next that conflict a little bit.
+>    If you running with bluetoothd you should be using bluetoothctl
+>    instead of btmgmt, and in case you are not using bluetoothd then the
+>    BlueZ version don't really matter and what you should check is the
+>    kernels changes.
 
-Regards
+We are using bluetoothd and dbus api to declare our custom services. We choosed
+to use btmgmt because all the options provide by btmgmt was not present in bluetoothctl
+one year ago. I will try to look at this tool this week
 
-Marcel
-
+Regards,
+Arthur.
