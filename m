@@ -1,111 +1,83 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v4 1/4] client: Fix reading long values
-Date: Wed, 21 Mar 2018 11:34:08 +0100
-Message-ID: <1945037.y6NqV2LbZ1@ix>
-In-Reply-To: <20180320140519.6285-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20180320140519.6285-1-grzegorz.kolodziejczyk@codecoup.pl>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Date: Tue, 20 Mar 2018 20:05:27 -0500
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH v2] Bluetooth: Remove VLA usage in aes_cmac
+Message-ID: <20180321010527.GA16616@embeddedor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+In preparation to enabling -Wvla, remove VLA and replace it
+with dynamic memory allocation instead.
 
-On Tuesday, 20 March 2018 15:05:16 CET Grzegorz Kolodziejczyk wrote:
-> While value has more than single MTU can carry long read procedure will
-> be triggered. In such cases offset need to bo considered while getting
-> value from storage.
-> ---
->  client/gatt.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 47 insertions(+), 2 deletions(-)
-> 
-> diff --git a/client/gatt.c b/client/gatt.c
-> index 8c818d8c1..7a6035ac1 100644
-> --- a/client/gatt.c
-> +++ b/client/gatt.c
-> @@ -1412,6 +1412,39 @@ static const GDBusPropertyTable chrc_properties[] = {
-> { }
->  };
-> 
-> +static int parse_offset(DBusMessageIter *iter, uint16_t *offset)
-> +{
-> +	DBusMessageIter dict;
-> +
-> +	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-> +		return -EINVAL;
-> +
-> +	dbus_message_iter_recurse(iter, &dict);
-> +
-> +	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
-> +		const char *key;
-> +		DBusMessageIter value, entry;
-> +		int var;
-> +
-> +		dbus_message_iter_recurse(&dict, &entry);
-> +		dbus_message_iter_get_basic(&entry, &key);
-> +
-> +		dbus_message_iter_next(&entry);
-> +		dbus_message_iter_recurse(&entry, &value);
-> +
-> +		var = dbus_message_iter_get_arg_type(&value);
-> +		if (strcasecmp(key, "offset") == 0) {
-> +			if (var != DBUS_TYPE_UINT16)
-> +				return -EINVAL;
-> +			dbus_message_iter_get_basic(&value, offset);
-> +		}
-> +
-> +		dbus_message_iter_next(&dict);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static DBusMessage *read_value(DBusMessage *msg, uint8_t *value,
->  						uint16_t value_len)
->  {
-> @@ -1433,8 +1466,14 @@ static DBusMessage *chrc_read_value(DBusConnection
-> *conn, DBusMessage *msg, void *user_data)
->  {
->  	struct chrc *chrc = user_data;
-> +	DBusMessageIter iter;
-> +	uint16_t offset = 0;
-> +
-> +	dbus_message_iter_init(msg, &iter);
-> +
-> +	parse_offset(&iter, &offset);
-> 
-> -	return read_value(msg, chrc->value, chrc->value_len);
-> +	return read_value(msg, &chrc->value[offset], chrc->value_len - offset);
->  }
-> 
->  static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int
-> *len) @@ -1785,8 +1824,14 @@ static DBusMessage
-> *desc_read_value(DBusConnection *conn, DBusMessage *msg, void *user_data)
->  {
->  	struct desc *desc = user_data;
-> +	DBusMessageIter iter;
-> +	uint16_t offset = 0;
-> +
-> +	dbus_message_iter_init(msg, &iter);
-> +
-> +	parse_offset(&iter, &offset);
-> 
-> -	return read_value(msg, desc->value, desc->value_len);
-> +	return read_value(msg, &desc->value[offset], desc->value_len - offset);
->  }
-> 
->  static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage
-> *msg,
+The use of stack Variable Length Arrays needs to be avoided, as they
+can be a vector for stack exhaustion, which can be both a runtime bug
+or a security flaw. Also, in general, as code evolves it is easy to
+lose track of how big a VLA can get. Thus, we can end up having runtime
+failures that are hard to debug.
 
-All patches applied, thanks.
-As discussed, I changed authz parameter to authorize.
+Also, fixed as part of the directive to remove all VLAs from
+the kernel: https://lkml.org/lkml/2018/3/7/621
 
+Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
+---
+Changes in v2:
+ - Fix memory leak in previous patch.
 
+ net/bluetooth/smp.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index a2ddae2..0fa7035 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -173,7 +173,7 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
+ 		    size_t len, u8 mac[16])
+ {
+ 	uint8_t tmp[16], mac_msb[16], msg_msb[CMAC_MSG_MAX];
+-	SHASH_DESC_ON_STACK(desc, tfm);
++	struct shash_desc *shash;
+ 	int err;
+ 
+ 	if (len > CMAC_MSG_MAX)
+@@ -184,8 +184,13 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
+ 		return -EINVAL;
+ 	}
+ 
+-	desc->tfm = tfm;
+-	desc->flags = 0;
++	shash = kzalloc(sizeof(*shash) + crypto_shash_descsize(tfm),
++			GFP_KERNEL);
++	if (!shash)
++		return -ENOMEM;
++
++	shash->tfm = tfm;
++	shash->flags = 0;
+ 
+ 	/* Swap key and message from LSB to MSB */
+ 	swap_buf(k, tmp, 16);
+@@ -197,11 +202,13 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
+ 	err = crypto_shash_setkey(tfm, tmp, 16);
+ 	if (err) {
+ 		BT_ERR("cipher setkey failed: %d", err);
++		kfree(shash);
+ 		return err;
+ 	}
+ 
+-	err = crypto_shash_digest(desc, msg_msb, len, mac_msb);
+-	shash_desc_zero(desc);
++	err = crypto_shash_digest(shash, msg_msb, len, mac_msb);
++	shash_desc_zero(shash);
++	kfree(shash);
+ 	if (err) {
+ 		BT_ERR("Hash computation error %d", err);
+ 		return err;
 -- 
-pozdrawiam
-Szymon Janc
-
-
+2.7.4
