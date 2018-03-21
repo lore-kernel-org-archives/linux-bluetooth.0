@@ -1,212 +1,111 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_bcm: Add ACPI HIDs found in Windows .inf files and DSTDs
-Date: Wed, 21 Mar 2018 13:53:18 +0100
-Message-Id: <20180321125318.4542-1-hdegoede@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v4 1/4] client: Fix reading long values
+Date: Wed, 21 Mar 2018 11:34:08 +0100
+Message-ID: <1945037.y6NqV2LbZ1@ix>
+In-Reply-To: <20180320140519.6285-1-grzegorz.kolodziejczyk@codecoup.pl>
+References: <20180320140519.6285-1-grzegorz.kolodziejczyk@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now that we need just an ACPI HID in the table, and the driver auto-
-configures itself otherwise, we can easily add a bunch of known ACPI HIDs.
+Hi Grzegorz,
 
-This avoids having to add these 1 by 1 as devices with one are encountered
-by users.
+On Tuesday, 20 March 2018 15:05:16 CET Grzegorz Kolodziejczyk wrote:
+> While value has more than single MTU can carry long read procedure will
+> be triggered. In such cases offset need to bo considered while getting
+> value from storage.
+> ---
+>  client/gatt.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 47 insertions(+), 2 deletions(-)
+> 
+> diff --git a/client/gatt.c b/client/gatt.c
+> index 8c818d8c1..7a6035ac1 100644
+> --- a/client/gatt.c
+> +++ b/client/gatt.c
+> @@ -1412,6 +1412,39 @@ static const GDBusPropertyTable chrc_properties[] = {
+> { }
+>  };
+> 
+> +static int parse_offset(DBusMessageIter *iter, uint16_t *offset)
+> +{
+> +	DBusMessageIter dict;
+> +
+> +	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+> +		return -EINVAL;
+> +
+> +	dbus_message_iter_recurse(iter, &dict);
+> +
+> +	while (dbus_message_iter_get_arg_type(&dict) == DBUS_TYPE_DICT_ENTRY) {
+> +		const char *key;
+> +		DBusMessageIter value, entry;
+> +		int var;
+> +
+> +		dbus_message_iter_recurse(&dict, &entry);
+> +		dbus_message_iter_get_basic(&entry, &key);
+> +
+> +		dbus_message_iter_next(&entry);
+> +		dbus_message_iter_recurse(&entry, &value);
+> +
+> +		var = dbus_message_iter_get_arg_type(&value);
+> +		if (strcasecmp(key, "offset") == 0) {
+> +			if (var != DBUS_TYPE_UINT16)
+> +				return -EINVAL;
+> +			dbus_message_iter_get_basic(&value, offset);
+> +		}
+> +
+> +		dbus_message_iter_next(&dict);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static DBusMessage *read_value(DBusMessage *msg, uint8_t *value,
+>  						uint16_t value_len)
+>  {
+> @@ -1433,8 +1466,14 @@ static DBusMessage *chrc_read_value(DBusConnection
+> *conn, DBusMessage *msg, void *user_data)
+>  {
+>  	struct chrc *chrc = user_data;
+> +	DBusMessageIter iter;
+> +	uint16_t offset = 0;
+> +
+> +	dbus_message_iter_init(msg, &iter);
+> +
+> +	parse_offset(&iter, &offset);
+> 
+> -	return read_value(msg, chrc->value, chrc->value_len);
+> +	return read_value(msg, &chrc->value[offset], chrc->value_len - offset);
+>  }
+> 
+>  static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int
+> *len) @@ -1785,8 +1824,14 @@ static DBusMessage
+> *desc_read_value(DBusConnection *conn, DBusMessage *msg, void *user_data)
+>  {
+>  	struct desc *desc = user_data;
+> +	DBusMessageIter iter;
+> +	uint16_t offset = 0;
+> +
+> +	dbus_message_iter_init(msg, &iter);
+> +
+> +	parse_offset(&iter, &offset);
+> 
+> -	return read_value(msg, desc->value, desc->value_len);
+> +	return read_value(msg, &desc->value[offset], desc->value_len - offset);
+>  }
+> 
+>  static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage
+> *msg,
 
-This commit may seem as if it simply adds all IDs between BCM2E00-BCM2EAC,
-but that is not true, all these IDs were found in actual .inf files and
-the range is not entirely continuous, the following IDs are not added:
-BCM2E6A, BCM2E6C, BCM2E8F and BCM2E91 because I did not see these in any
-.inf files. As for the large amount of IDs this seems to be caused by
-Broadcom using a separate ID for every bluetooth module using their
-chips. E.g. BCM2EA6 seems to be specifically for the Raspberry Pi 3.
+All patches applied, thanks.
+As discussed, I changed authz parameter to authorize.
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/hci_bcm.c | 141 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 141 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 308752131445..01cb0df7ad5b 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -1113,31 +1113,172 @@ static const struct hci_uart_proto bcm_proto = {
- 
- #ifdef CONFIG_ACPI
- static const struct acpi_device_id bcm_acpi_match[] = {
-+	{ "BCM2E00" },
-+	{ "BCM2E01" },
-+	{ "BCM2E02" },
-+	{ "BCM2E03" },
-+	{ "BCM2E04" },
-+	{ "BCM2E05" },
-+	{ "BCM2E06" },
-+	{ "BCM2E07" },
-+	{ "BCM2E08" },
-+	{ "BCM2E09" },
-+	{ "BCM2E0A" },
-+	{ "BCM2E0B" },
-+	{ "BCM2E0C" },
-+	{ "BCM2E0D" },
-+	{ "BCM2E0E" },
-+	{ "BCM2E0F" },
-+	{ "BCM2E10" },
-+	{ "BCM2E11" },
-+	{ "BCM2E12" },
-+	{ "BCM2E13" },
-+	{ "BCM2E14" },
-+	{ "BCM2E15" },
-+	{ "BCM2E16" },
-+	{ "BCM2E17" },
-+	{ "BCM2E18" },
-+	{ "BCM2E19" },
- 	{ "BCM2E1A" },
-+	{ "BCM2E1B" },
-+	{ "BCM2E1C" },
-+	{ "BCM2E1D" },
-+	{ "BCM2E1F" },
-+	{ "BCM2E20" },
-+	{ "BCM2E21" },
-+	{ "BCM2E22" },
-+	{ "BCM2E23" },
-+	{ "BCM2E24" },
-+	{ "BCM2E25" },
-+	{ "BCM2E26" },
-+	{ "BCM2E27" },
-+	{ "BCM2E28" },
-+	{ "BCM2E29" },
-+	{ "BCM2E2A" },
-+	{ "BCM2E2B" },
-+	{ "BCM2E2C" },
-+	{ "BCM2E2D" },
-+	{ "BCM2E2E" },
-+	{ "BCM2E2F" },
-+	{ "BCM2E30" },
-+	{ "BCM2E31" },
-+	{ "BCM2E32" },
-+	{ "BCM2E33" },
-+	{ "BCM2E34" },
-+	{ "BCM2E35" },
-+	{ "BCM2E36" },
-+	{ "BCM2E37" },
- 	{ "BCM2E38" },
- 	{ "BCM2E39" },
- 	{ "BCM2E3A" },
-+	{ "BCM2E3B" },
-+	{ "BCM2E3C" },
- 	{ "BCM2E3D" },
-+	{ "BCM2E3E" },
- 	{ "BCM2E3F" },
- 	{ "BCM2E40" },
-+	{ "BCM2E41" },
-+	{ "BCM2E42" },
-+	{ "BCM2E43" },
-+	{ "BCM2E44" },
-+	{ "BCM2E45" },
-+	{ "BCM2E46" },
-+	{ "BCM2E47" },
-+	{ "BCM2E48" },
-+	{ "BCM2E49" },
-+	{ "BCM2E4A" },
-+	{ "BCM2E4B" },
-+	{ "BCM2E4C" },
-+	{ "BCM2E4D" },
-+	{ "BCM2E4E" },
-+	{ "BCM2E4F" },
-+	{ "BCM2E50" },
-+	{ "BCM2E51" },
-+	{ "BCM2E52" },
-+	{ "BCM2E53" },
- 	{ "BCM2E54" },
- 	{ "BCM2E55" },
-+	{ "BCM2E56" },
-+	{ "BCM2E57" },
-+	{ "BCM2E58" },
-+	{ "BCM2E59" },
-+	{ "BCM2E5A" },
-+	{ "BCM2E5B" },
-+	{ "BCM2E5C" },
-+	{ "BCM2E5D" },
-+	{ "BCM2E5E" },
-+	{ "BCM2E5F" },
-+	{ "BCM2E60" },
-+	{ "BCM2E61" },
-+	{ "BCM2E62" },
-+	{ "BCM2E63" },
- 	{ "BCM2E64" },
- 	{ "BCM2E65" },
-+	{ "BCM2E66" },
- 	{ "BCM2E67" },
-+	{ "BCM2E68" },
-+	{ "BCM2E69" },
-+	{ "BCM2E6B" },
-+	{ "BCM2E6D" },
-+	{ "BCM2E6E" },
-+	{ "BCM2E6F" },
-+	{ "BCM2E70" },
- 	{ "BCM2E71" },
- 	{ "BCM2E72" },
-+	{ "BCM2E73" },
- 	{ "BCM2E74" },
-+	{ "BCM2E75" },
-+	{ "BCM2E76" },
-+	{ "BCM2E77" },
-+	{ "BCM2E78" },
-+	{ "BCM2E79" },
-+	{ "BCM2E7A" },
- 	{ "BCM2E7B" },
- 	{ "BCM2E7C" },
-+	{ "BCM2E7D" },
- 	{ "BCM2E7E" },
-+	{ "BCM2E7F" },
-+	{ "BCM2E80" },
-+	{ "BCM2E81" },
-+	{ "BCM2E82" },
- 	{ "BCM2E83" },
- 	{ "BCM2E84" },
-+	{ "BCM2E85" },
-+	{ "BCM2E86" },
-+	{ "BCM2E87" },
-+	{ "BCM2E88" },
-+	{ "BCM2E89" },
-+	{ "BCM2E8A" },
-+	{ "BCM2E8B" },
-+	{ "BCM2E8C" },
-+	{ "BCM2E8D" },
-+	{ "BCM2E8E" },
- 	{ "BCM2E90" },
-+	{ "BCM2E92" },
-+	{ "BCM2E93" },
-+	{ "BCM2E94" },
- 	{ "BCM2E95" },
- 	{ "BCM2E96" },
-+	{ "BCM2E97" },
-+	{ "BCM2E98" },
-+	{ "BCM2E99" },
-+	{ "BCM2E9A" },
-+	{ "BCM2E9B" },
-+	{ "BCM2E9C" },
-+	{ "BCM2E9D" },
-+	{ "BCM2EA0" },
-+	{ "BCM2EA1" },
-+	{ "BCM2EA2" },
-+	{ "BCM2EA3" },
- 	{ "BCM2EA4" },
-+	{ "BCM2EA5" },
-+	{ "BCM2EA6" },
-+	{ "BCM2EA7" },
-+	{ "BCM2EA8" },
-+	{ "BCM2EA9" },
- 	{ "BCM2EAA" },
-+	{ "BCM2EAB" },
-+	{ "BCM2EAC" },
- 	{ },
- };
- MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
 -- 
-2.14.3
+pozdrawiam
+Szymon Janc
+
+
