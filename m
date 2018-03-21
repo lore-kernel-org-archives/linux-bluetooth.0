@@ -1,92 +1,225 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180321165900.7879-1-robert.lubas@silvair.com>
-References: <20180321165900.7879-1-robert.lubas@silvair.com>
+In-Reply-To: <20180321174723.11463-2-andrzej.kaczmarek@codecoup.pl>
+References: <20180321174723.11463-1-andrzej.kaczmarek@codecoup.pl> <20180321174723.11463-2-andrzej.kaczmarek@codecoup.pl>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 21 Mar 2018 20:39:02 +0200
-Message-ID: <CABBYNZL3b6M5hnKpvGXXTB+q8Ma6wtC2SoC+_iKvTjtwGeSrLg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Mesh: Fix TTL in Config Heartbeat Publication Set
-To: =?UTF-8?Q?Robert_Luba=C5=9B?= <robert.lubas@silvair.com>
+Date: Wed, 21 Mar 2018 20:31:43 +0200
+Message-ID: <CABBYNZJ04e1BeU8M_WFrR_myi1dbSV4J9RC5dYUkORvgOVACSQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] shared/gatt-client: Fix discovery of
+ discontinuous database
+To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Robert,
+Hi Andrzej
 
-On Wed, Mar 21, 2018 at 6:59 PM, Robert Luba=C5=9B <robert.lubas@silvair.co=
-m> wrote:
-> In 4.2.17.4 Heartbeat Publication TTL value range is 0x00-0x7F.
-> In cmd_hb_pub_set heartbeat ttl was set to DEFAULT_TTL 0x77, this
-> patch fix this by adding ttl param to hb-pub-set.
+On Wed, Mar 21, 2018 at 7:47 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@codecoup.pl> wrote:
+> If local cache of peer's database has gaps where new services appear
+> after reconnection, GATT client will attempt to discover all included
+> services and characteristics definitions between starting handle of
+> first service and end handle of last service. This means the result
+> will contain also attributes which are already present in active
+> services in local database and thus attempting to add them again will
+> fail.
 
-I don't follow, is 0x77 not valid? It should be if the range is really
-0x00-0x7F.
+This is actually by design since that means we can discover
+characteristics of more than one service at once, otherwise we cannot
+take advantage of setting a big MTU since we end up with multiple
+round trips which are normally a lot slower than having the same
+attribute rediscovered. The insert logic should probably be updated to
+ignore if an attribute already exists.
 
+> To fix this, instead of discovering whole range we'll only discover
+> ranges for missing services - starting with included services then
+> characteristics. To optimize this process we'll merge ranges of
+> adjacent services.
+>
+> This issue can sometimes be observed with iOS devices as ANCS and CTS
+> services may not be available all the time.
 > ---
->  mesh/config-client.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+>  src/shared/gatt-client.c | 75 +++++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 61 insertions(+), 14 deletions(-)
 >
-> diff --git a/mesh/config-client.c b/mesh/config-client.c
-> index 19e617d62..9757e2625 100644
-> --- a/mesh/config-client.c
-> +++ b/mesh/config-client.c
-> @@ -1042,7 +1042,7 @@ static void cmd_hb_pub_set(int argc, char *argv[])
->         n =3D mesh_opcode_set(OP_CONFIG_HEARTBEAT_PUB_SET, msg);
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index f0850e0fe..96b4ee034 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -320,6 +320,7 @@ typedef void (*discovery_op_fail_func_t)(struct discovery_op *op);
 >
->         parm_cnt =3D read_input_parameters(argc, argv);
-> -       if (parm_cnt !=3D 5) {
-> +       if (parm_cnt !=3D 6) {
->                 bt_shell_printf("Bad arguments: %s\n", argv[1]);
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>  struct discovery_op {
+>         struct bt_gatt_client *client;
+> +       struct queue *discov_ranges;
+>         struct queue *pending_svcs;
+>         struct queue *pending_chrcs;
+>         struct queue *ext_prop_desc;
+> @@ -328,8 +329,6 @@ struct discovery_op {
+>         uint16_t start;
+>         uint16_t end;
+>         uint16_t last;
+> -       uint16_t svc_first;
+> -       uint16_t svc_last;
+>         unsigned int db_id;
+>         int ref_count;
+>         discovery_op_complete_func_t complete_func;
+> @@ -341,6 +340,7 @@ static void discovery_op_free(struct discovery_op *op)
+>         if (op->db_id > 0)
+>                 gatt_db_unregister(op->client->db, op->db_id);
+>
+> +       queue_destroy(op->discov_ranges, free);
+>         queue_destroy(op->pending_svcs, NULL);
+>         queue_destroy(op->pending_chrcs, free);
+>         queue_destroy(op->ext_prop_desc, NULL);
+> @@ -406,6 +406,7 @@ static struct discovery_op *discovery_op_create(struct bt_gatt_client *client,
+>         struct discovery_op *op;
+>
+>         op = new0(struct discovery_op, 1);
+> +       op->discov_ranges = queue_new();
+>         op->pending_svcs = queue_new();
+>         op->pending_chrcs = queue_new();
+>         op->ext_prop_desc = queue_new();
+> @@ -477,6 +478,7 @@ static void discover_incl_cb(bool success, uint8_t att_ecode,
+>         bt_uuid_t uuid;
+>         char uuid_str[MAX_LEN_UUID_STR];
+>         unsigned int includes_count, i;
+> +       struct handle_range *range;
+>
+>         discovery_req_clear(client);
+>
+> @@ -530,12 +532,17 @@ static void discover_incl_cb(bool success, uint8_t att_ecode,
 >         }
-> @@ -1056,12 +1056,12 @@ static void cmd_hb_pub_set(int argc, char *argv[]=
-)
->         /* Period Log */
->         msg[n++] =3D parms[2];
->         /* Heartbeat TTL */
-> -       msg[n++] =3D DEFAULT_TTL;
-> +       msg[n++] =3D parms[3];
->         /* Features */
-> -       put_le16(parms[3], msg + n);
-> +       put_le16(parms[4], msg + n);
->         n +=3D 2;
->         /* NetKey Index */
-> -       put_le16(parms[4], msg + n);
-> +       put_le16(parms[5], msg + n);
->         n +=3D 2;
 >
->         if (!config_send(msg, n)) {
-> @@ -1167,8 +1167,9 @@ static const struct bt_shell_menu cfg_menu =3D {
->                                                 "Set relay"},
->         {"relay-get",           NULL,                   cmd_relay_get,
->                                                 "Get relay"},
-> -       {"hb-pub-set", "<pub_addr> <count> <period> <features> <net_idx>"=
-,
-> -                               cmd_hb_pub_set,     "Set heartbeat publis=
-h"},
-> +       {"hb-pub-set", "<pub_addr> <count> <period> <ttl> <features> "
-> +                               "<net_idx>",
-> +                               cmd_hb_pub_set, "\n\t\t\t\t\t\t  Set hear=
-tbeat publish"},
-
-I don't really like the idea of having extra formatting on the command
-description, bt_shell should do the right thing and if that doesn't
-fit in the terminal it should wrap around automatically.
-
->         {"hb-pub-get",           NULL,                   cmd_hb_pub_get,
->                                                 "Get heartbeat publish"},
->         {"hb-sub-set", "<src_addr> <dst_addr> <period>",
+>  next:
+> +       range = queue_pop_head(op->discov_ranges);
+> +       if (!range)
+> +               goto failed;
+> +
+>         client->discovery_req = bt_gatt_discover_characteristics(client->att,
+> -                                                       op->svc_first,
+> -                                                       op->svc_last,
+> +                                                       range->start,
+> +                                                       range->end,
+>                                                         discover_chrcs_cb,
+>                                                         discovery_op_ref(op),
+>                                                         discovery_op_unref);
+> +       free(range);
+>         if (client->discovery_req)
+>                 return;
+>
+> @@ -871,6 +878,36 @@ static void discover_chrcs_cb(bool success, uint8_t att_ecode,
+>                 queue_push_tail(op->pending_chrcs, chrc_data);
+>         }
+>
+> +next:
+> +       /*
+> +        * Before attempting to process discovered characteristics make sure we
+> +        * discovered all missing ranges.
+> +        */
+> +       if (queue_length(op->discov_ranges)) {
+> +               struct handle_range *range;
+> +
+> +               range = queue_peek_head(op->discov_ranges);
+> +               if (!range)
+> +                       goto failed;
+> +
+> +               client->discovery_req =
+> +                       bt_gatt_discover_included_services(client->att,
+> +                                                       range->start,
+> +                                                       range->end,
+> +                                                       discover_incl_cb,
+> +                                                       discovery_op_ref(op),
+> +                                                       discovery_op_unref);
+> +               if (client->discovery_req)
+> +                       return;
+> +
+> +               util_debug(client->debug_callback, client->debug_data,
+> +                               "Failed to start included services discovery");
+> +
+> +               discovery_op_unref(op);
+> +
+> +               goto failed;
+> +       }
+> +
+>         /*
+>          * Sequentially discover descriptors for each characteristic and insert
+>          * the characteristics into the database as we proceed.
+> @@ -881,7 +918,6 @@ static void discover_chrcs_cb(bool success, uint8_t att_ecode,
+>         if (discovering)
+>                 return;
+>
+> -next:
+>         /* Done with the current service */
+>         gatt_db_service_set_active(op->cur_svc, true);
+>
+> @@ -900,17 +936,25 @@ static void discovery_found_service(struct discovery_op *op,
+>  {
+>         /* Skip if service already active */
+>         if (!gatt_db_service_get_active(attr)) {
+> +               struct handle_range *range;
+> +
+>                 /* Skip if there are no attributes */
+>                 if (end == start)
+>                         gatt_db_service_set_active(attr, true);
+> -               else
+> +               else {
+>                         queue_push_tail(op->pending_svcs, attr);
+>
+> -               /* Update discovery range */
+> -               if (!op->svc_first || op->svc_first > start)
+> -                       op->svc_first = start;
+> -               if (op->svc_last < end)
+> -                       op->svc_last = end;
+> +                       /* Update discovery range */
+> +                       range = queue_peek_tail(op->discov_ranges);
+> +                       if (!range || (range->end + 1 != start)) {
+> +                               range = new0(struct handle_range, 1);
+> +                               range->start = start;
+> +                               range->end = end;
+> +                               queue_push_tail(op->discov_ranges, range);
+> +                       } else {
+> +                               range->end = end;
+> +                       }
+> +               }
+>         } else
+>                 /* Remove from pending if active */
+>                 queue_remove(op->pending_svcs, attr);
+> @@ -932,6 +976,7 @@ static void discover_secondary_cb(bool success, uint8_t att_ecode,
+>         uint128_t u128;
+>         bt_uuid_t uuid;
+>         char uuid_str[MAX_LEN_UUID_STR];
+> +       struct handle_range *range;
+>
+>         discovery_req_clear(client);
+>
+> @@ -991,12 +1036,14 @@ static void discover_secondary_cb(bool success, uint8_t att_ecode,
+>         }
+>
+>  next:
+> -       if (queue_isempty(op->pending_svcs) || !op->svc_first)
+> +       if (queue_isempty(op->pending_svcs) || queue_isempty(op->discov_ranges))
+>                 goto done;
+>
+> +       range = queue_peek_head(op->discov_ranges);
+> +
+>         client->discovery_req = bt_gatt_discover_included_services(client->att,
+> -                                                       op->svc_first,
+> -                                                       op->svc_last,
+> +                                                       range->start,
+> +                                                       range->end,
+>                                                         discover_incl_cb,
+>                                                         discovery_op_ref(op),
+>                                                         discovery_op_unref);
 > --
-> 2.11.0
+> 2.16.2
 >
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
 
---=20
+-- 
 Luiz Augusto von Dentz
