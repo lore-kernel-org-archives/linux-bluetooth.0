@@ -1,46 +1,212 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH v2] Bluetooth: Remove VLA usage in aes_cmac
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180321010527.GA16616@embeddedor.com>
-Date: Wed, 21 Mar 2018 14:45:44 +0100
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Message-Id: <8448C1B0-A2A9-4376-9CC3-7643F0FFC0FB@holtmann.org>
-References: <20180321010527.GA16616@embeddedor.com>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Sender: netdev-owner@vger.kernel.org
+Return-Path: <hdegoede@redhat.com>
+From: Hans de Goede <hdegoede@redhat.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Hans de Goede <hdegoede@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-acpi@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_bcm: Add ACPI HIDs found in Windows .inf files and DSTDs
+Date: Wed, 21 Mar 2018 13:53:18 +0100
+Message-Id: <20180321125318.4542-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gustavo,
+Now that we need just an ACPI HID in the table, and the driver auto-
+configures itself otherwise, we can easily add a bunch of known ACPI HIDs.
 
-> In preparation to enabling -Wvla, remove VLA and replace it
-> with dynamic memory allocation instead.
-> 
-> The use of stack Variable Length Arrays needs to be avoided, as they
-> can be a vector for stack exhaustion, which can be both a runtime bug
-> or a security flaw. Also, in general, as code evolves it is easy to
-> lose track of how big a VLA can get. Thus, we can end up having runtime
-> failures that are hard to debug.
-> 
-> Also, fixed as part of the directive to remove all VLAs from
-> the kernel: https://lkml.org/lkml/2018/3/7/621
-> 
-> Signed-off-by: Gustavo A. R. Silva <garsilva@embeddedor.com>
-> ---
-> Changes in v2:
-> - Fix memory leak in previous patch.
-> 
-> net/bluetooth/smp.c | 17 ++++++++++++-----
-> 1 file changed, 12 insertions(+), 5 deletions(-)
+This avoids having to add these 1 by 1 as devices with one are encountered
+by users.
 
-patch has been applied to bluetooth-next tree.
+This commit may seem as if it simply adds all IDs between BCM2E00-BCM2EAC,
+but that is not true, all these IDs were found in actual .inf files and
+the range is not entirely continuous, the following IDs are not added:
+BCM2E6A, BCM2E6C, BCM2E8F and BCM2E91 because I did not see these in any
+.inf files. As for the large amount of IDs this seems to be caused by
+Broadcom using a separate ID for every bluetooth module using their
+chips. E.g. BCM2EA6 seems to be specifically for the Raspberry Pi 3.
 
-Regards
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/hci_bcm.c | 141 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 141 insertions(+)
 
-Marcel
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 308752131445..01cb0df7ad5b 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1113,31 +1113,172 @@ static const struct hci_uart_proto bcm_proto = {
+ 
+ #ifdef CONFIG_ACPI
+ static const struct acpi_device_id bcm_acpi_match[] = {
++	{ "BCM2E00" },
++	{ "BCM2E01" },
++	{ "BCM2E02" },
++	{ "BCM2E03" },
++	{ "BCM2E04" },
++	{ "BCM2E05" },
++	{ "BCM2E06" },
++	{ "BCM2E07" },
++	{ "BCM2E08" },
++	{ "BCM2E09" },
++	{ "BCM2E0A" },
++	{ "BCM2E0B" },
++	{ "BCM2E0C" },
++	{ "BCM2E0D" },
++	{ "BCM2E0E" },
++	{ "BCM2E0F" },
++	{ "BCM2E10" },
++	{ "BCM2E11" },
++	{ "BCM2E12" },
++	{ "BCM2E13" },
++	{ "BCM2E14" },
++	{ "BCM2E15" },
++	{ "BCM2E16" },
++	{ "BCM2E17" },
++	{ "BCM2E18" },
++	{ "BCM2E19" },
+ 	{ "BCM2E1A" },
++	{ "BCM2E1B" },
++	{ "BCM2E1C" },
++	{ "BCM2E1D" },
++	{ "BCM2E1F" },
++	{ "BCM2E20" },
++	{ "BCM2E21" },
++	{ "BCM2E22" },
++	{ "BCM2E23" },
++	{ "BCM2E24" },
++	{ "BCM2E25" },
++	{ "BCM2E26" },
++	{ "BCM2E27" },
++	{ "BCM2E28" },
++	{ "BCM2E29" },
++	{ "BCM2E2A" },
++	{ "BCM2E2B" },
++	{ "BCM2E2C" },
++	{ "BCM2E2D" },
++	{ "BCM2E2E" },
++	{ "BCM2E2F" },
++	{ "BCM2E30" },
++	{ "BCM2E31" },
++	{ "BCM2E32" },
++	{ "BCM2E33" },
++	{ "BCM2E34" },
++	{ "BCM2E35" },
++	{ "BCM2E36" },
++	{ "BCM2E37" },
+ 	{ "BCM2E38" },
+ 	{ "BCM2E39" },
+ 	{ "BCM2E3A" },
++	{ "BCM2E3B" },
++	{ "BCM2E3C" },
+ 	{ "BCM2E3D" },
++	{ "BCM2E3E" },
+ 	{ "BCM2E3F" },
+ 	{ "BCM2E40" },
++	{ "BCM2E41" },
++	{ "BCM2E42" },
++	{ "BCM2E43" },
++	{ "BCM2E44" },
++	{ "BCM2E45" },
++	{ "BCM2E46" },
++	{ "BCM2E47" },
++	{ "BCM2E48" },
++	{ "BCM2E49" },
++	{ "BCM2E4A" },
++	{ "BCM2E4B" },
++	{ "BCM2E4C" },
++	{ "BCM2E4D" },
++	{ "BCM2E4E" },
++	{ "BCM2E4F" },
++	{ "BCM2E50" },
++	{ "BCM2E51" },
++	{ "BCM2E52" },
++	{ "BCM2E53" },
+ 	{ "BCM2E54" },
+ 	{ "BCM2E55" },
++	{ "BCM2E56" },
++	{ "BCM2E57" },
++	{ "BCM2E58" },
++	{ "BCM2E59" },
++	{ "BCM2E5A" },
++	{ "BCM2E5B" },
++	{ "BCM2E5C" },
++	{ "BCM2E5D" },
++	{ "BCM2E5E" },
++	{ "BCM2E5F" },
++	{ "BCM2E60" },
++	{ "BCM2E61" },
++	{ "BCM2E62" },
++	{ "BCM2E63" },
+ 	{ "BCM2E64" },
+ 	{ "BCM2E65" },
++	{ "BCM2E66" },
+ 	{ "BCM2E67" },
++	{ "BCM2E68" },
++	{ "BCM2E69" },
++	{ "BCM2E6B" },
++	{ "BCM2E6D" },
++	{ "BCM2E6E" },
++	{ "BCM2E6F" },
++	{ "BCM2E70" },
+ 	{ "BCM2E71" },
+ 	{ "BCM2E72" },
++	{ "BCM2E73" },
+ 	{ "BCM2E74" },
++	{ "BCM2E75" },
++	{ "BCM2E76" },
++	{ "BCM2E77" },
++	{ "BCM2E78" },
++	{ "BCM2E79" },
++	{ "BCM2E7A" },
+ 	{ "BCM2E7B" },
+ 	{ "BCM2E7C" },
++	{ "BCM2E7D" },
+ 	{ "BCM2E7E" },
++	{ "BCM2E7F" },
++	{ "BCM2E80" },
++	{ "BCM2E81" },
++	{ "BCM2E82" },
+ 	{ "BCM2E83" },
+ 	{ "BCM2E84" },
++	{ "BCM2E85" },
++	{ "BCM2E86" },
++	{ "BCM2E87" },
++	{ "BCM2E88" },
++	{ "BCM2E89" },
++	{ "BCM2E8A" },
++	{ "BCM2E8B" },
++	{ "BCM2E8C" },
++	{ "BCM2E8D" },
++	{ "BCM2E8E" },
+ 	{ "BCM2E90" },
++	{ "BCM2E92" },
++	{ "BCM2E93" },
++	{ "BCM2E94" },
+ 	{ "BCM2E95" },
+ 	{ "BCM2E96" },
++	{ "BCM2E97" },
++	{ "BCM2E98" },
++	{ "BCM2E99" },
++	{ "BCM2E9A" },
++	{ "BCM2E9B" },
++	{ "BCM2E9C" },
++	{ "BCM2E9D" },
++	{ "BCM2EA0" },
++	{ "BCM2EA1" },
++	{ "BCM2EA2" },
++	{ "BCM2EA3" },
+ 	{ "BCM2EA4" },
++	{ "BCM2EA5" },
++	{ "BCM2EA6" },
++	{ "BCM2EA7" },
++	{ "BCM2EA8" },
++	{ "BCM2EA9" },
+ 	{ "BCM2EAA" },
++	{ "BCM2EAB" },
++	{ "BCM2EAC" },
+ 	{ },
+ };
+ MODULE_DEVICE_TABLE(acpi, bcm_acpi_match);
+-- 
+2.14.3
