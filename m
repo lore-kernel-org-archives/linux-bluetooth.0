@@ -1,61 +1,61 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: =?UTF-8?q?Robert=20Luba=C5=9B?= <robert.lubas@silvair.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: =?UTF-8?q?Robert=20Luba=C5=9B?= <robert.lubas@silvair.com>
-Subject: [PATCH BlueZ] Mesh: Fix TTL in Config Heartbeat Publication Set
-Date: Wed, 21 Mar 2018 17:59:00 +0100
-Message-Id: <20180321165900.7879-1-robert.lubas@silvair.com>
+Subject: [PATCH BlueZ] build: Fix not disabling obexd when given --disable-obex
+Date: Wed, 21 Mar 2018 18:54:22 +0200
+Message-Id: <20180321165422.17501-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In 4.2.17.4 Heartbeat Publication TTL value range is 0x00-0x7F.
-In cmd_hb_pub_set heartbeat ttl was set to DEFAULT_TTL 0x77, this
-patch fix this by adding ttl param to hb-pub-set.
----
- mesh/config-client.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/mesh/config-client.c b/mesh/config-client.c
-index 19e617d62..9757e2625 100644
---- a/mesh/config-client.c
-+++ b/mesh/config-client.c
-@@ -1042,7 +1042,7 @@ static void cmd_hb_pub_set(int argc, char *argv[])
- 	n = mesh_opcode_set(OP_CONFIG_HEARTBEAT_PUB_SET, msg);
+--disable-obex shall disable building obexd daemon.
+---
+ Makefile.am    | 4 ++++
+ Makefile.obexd | 3 ---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index daf34b6ca..5ac76d81c 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -223,7 +223,11 @@ test_scripts =
+ unit_tests =
  
- 	parm_cnt = read_input_parameters(argc, argv);
--	if (parm_cnt != 5) {
-+	if (parm_cnt != 6) {
- 		bt_shell_printf("Bad arguments: %s\n", argv[1]);
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
-@@ -1056,12 +1056,12 @@ static void cmd_hb_pub_set(int argc, char *argv[])
- 	/* Period Log */
- 	msg[n++] = parms[2];
- 	/* Heartbeat TTL */
--	msg[n++] = DEFAULT_TTL;
-+	msg[n++] = parms[3];
- 	/* Features */
--	put_le16(parms[3], msg + n);
-+	put_le16(parms[4], msg + n);
- 	n += 2;
- 	/* NetKey Index */
--	put_le16(parms[4], msg + n);
-+	put_le16(parms[5], msg + n);
- 	n += 2;
+ include Makefile.tools
++
++if OBEX
+ include Makefile.obexd
++endif
++
+ include android/Makefile.am
  
- 	if (!config_send(msg, n)) {
-@@ -1167,8 +1167,9 @@ static const struct bt_shell_menu cfg_menu = {
- 						"Set relay"},
- 	{"relay-get",           NULL,                   cmd_relay_get,
- 						"Get relay"},
--	{"hb-pub-set", "<pub_addr> <count> <period> <features> <net_idx>",
--				cmd_hb_pub_set,     "Set heartbeat publish"},
-+	{"hb-pub-set", "<pub_addr> <count> <period> <ttl> <features> "
-+				"<net_idx>",
-+				cmd_hb_pub_set,	"\n\t\t\t\t\t\t  Set heartbeat publish"},
- 	{"hb-pub-get",           NULL,                   cmd_hb_pub_get,
- 						"Get heartbeat publish"},
- 	{"hb-sub-set", "<src_addr> <dst_addr> <period>",
+ if HID2HCI
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 5959f2292..11d101158 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -1,4 +1,3 @@
+-
+ if SYSTEMD
+ systemduserunitdir = @SYSTEMD_USERUNITDIR@
+ systemduserunit_DATA = obexd/src/obex.service
+@@ -32,7 +31,6 @@ obexd_builtin_sources += obexd/plugins/opp.c
+ obexd_builtin_modules += ftp
+ obexd_builtin_sources += obexd/plugins/ftp.c obexd/plugins/ftp.h
+ 
+-if OBEX
+ obexd_builtin_modules += irmc
+ obexd_builtin_sources += obexd/plugins/irmc.c
+ 
+@@ -41,7 +39,6 @@ obexd_builtin_sources += obexd/plugins/pbap.c \
+ 				obexd/plugins/vcard.h obexd/plugins/vcard.c \
+ 				obexd/plugins/phonebook.h \
+ 				obexd/plugins/phonebook-dummy.c
+-endif
+ 
+ obexd_builtin_modules += mas
+ obexd_builtin_sources += obexd/plugins/mas.c obexd/src/map_ap.h \
 -- 
-2.11.0
+2.14.3
 
