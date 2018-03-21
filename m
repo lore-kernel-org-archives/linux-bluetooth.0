@@ -1,79 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-From: Adam Ford <aford173@gmail.com>
-Date: Wed, 21 Mar 2018 10:31:55 -0500
-Message-ID: <CAHCN7xKQxF34LSy7TZUQ2yCo9KdrKppOvamgna-CHJD_kt=80w@mail.gmail.com>
-Subject: WL1837-st on imx6 request_firmware failed with 4.16-RC6
-To: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        arm-soc <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <CAOT_U5Y+GLS1VU_hJs0fi1_Z0xDcL5eYMAzpgknD1aJ-GbKwiQ@mail.gmail.com>
+References: <CAOT_U5Y+GLS1VU_hJs0fi1_Z0xDcL5eYMAzpgknD1aJ-GbKwiQ@mail.gmail.com>
+From: "Burton, Ross" <ross.burton@intel.com>
+Date: Wed, 21 Mar 2018 15:27:51 +0000
+Message-ID: <CAJTo0LbZi2P+qjJ-d3Bq1npsrsWJ9CNznXdc+zxd8w_KhJKEiw@mail.gmail.com>
+Subject: Re: [yocto] Building BlueZ from git in Yocto
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I have an i.MX6 board and I am trying to get Bluetooth operational on
-4.16-RC6 using the default imx_v6_v7_defconfig
+On 21 March 2018 at 15:15, Alan Martinovic <alan.martinovic@senic.com> wrote:
+> Building it with Yocto results in the mentioned error:
+>
+> | ../git/src/genbuiltin hostname wiimote autopair policy   a2dp avrcp network input hog  gap scanparam deviceinfo  battery > src/builtin.h
+> | ../git/obexd/src/genbuiltin filesystem bluetooth  opp ftp irmc pbap mas mns > obexd/src/builtin.h
+> | /bin/bash: obexd/src/builtin.h: No such file or directory
+> | Makefile:9431: recipe for target 'obexd/src/builtin.h' failed
+> | make: *** [obexd/src/builtin.h] Error 1
+> | make: *** Waiting for unfinished jobs....
+> | ERROR: oe_runmake failed
+> | WARNING: exit code 1 from a shell command.
+>
+>
+> It seems that for some reason in Yocto, make can't redirect into `obexd/src/builtin.h` while
+> it does so successfully for native build.
 
-I have my device tree configured as follows:
+Yocto will be doing an out-of-tree build with high parallelism,
+neither of which you are likely doing yourself.
 
-&uart2 {
-  pinctrl-names = "default";
-  pinctrl-0 = <&pinctrl_uart2>;
-  uart-has-rtscts;
-  status = "okay";
+The hint is "no such file or directory" for a file it is writing *to*.
+This means the parent doesn't exist, in this case obexd/src/.
 
-  bluetooth {
-    compatible = "ti,wl1837-st";
-    enable-gpios = <&gpio7 8 GPIO_ACTIVE_HIGH>;
-  };
-};
+This is a typical race in out-of-tree and parallel builds, where
+genbuiltin is racing against other commands to create the directory.
+The fix is to ensure that whatever rule calls genbuiltin actually does
+a mkdir first.
 
-I have the firmware TIInit_11.8.32  available in /lib/firmware/ti-connectivity
+We have a fix for this already in oe-core:
 
-# ls -l /lib/firmware/ti-connectivity/
-total 2748
--rwxrwxrwx    1 root     root         53488 Mar 21  2018 TIInit_10.6.15.bts
--rwxrwxrwx    1 root     root         70313 Mar 21  2018 TIInit_11.8.32.bts
--rwxrwxrwx    1 root     root         14610 Mar 21  2018 TIInit_12.10.28.bts
--rwxrwxrwx    1 root     root         70313 Mar 21  2018 TIInit_12.8.32.bts
--rwxrwxrwx    1 root     root         48909 Jan  4  2018 TIInit_7.2.31.bts
--rwxrwxrwx    1 root     root         50695 Mar 21  2018 TIInit_7.6.15.bts
+http://git.openembedded.org/openembedded-core/tree/meta/recipes-connectivity/bluez5/bluez5/out-of-tree.patch
 
-However, when the Bluetooth driver loads, it appears it cannot locate
-the proper firmware image.
+So I imagine you're using an old release of Yocto.  I sent this patch
+to the linux-bluetooth list in April 2016 but it was either moderated
+away or missed.
 
-[    0.176338] Bluetooth: Core ver 2.22
-[    0.176453] Bluetooth: HCI device and connection manager initialized
-[    0.176529] Bluetooth: HCI socket layer initialized
-[    0.176563] Bluetooth: L2CAP socket layer initialized
-[    0.176705] Bluetooth: SCO socket layer initialized
-[    2.043237] Bluetooth: HCI UART driver ver 2.3
-[    2.047710] Bluetooth: HCI UART protocol H4 registered
-[    2.055090] Bluetooth: HCI UART protocol LL registered
-[    2.130658] Bluetooth: hci0: request_firmware failed(errno -2) for
-ti-connectivity/TIInit_11.8.32.bts
-[    2.147064] Bluetooth: hci0: download firmware failed, retrying...
-[    2.218509] Bluetooth: hci0: request_firmware failed(errno -2) for
-ti-connectivity/TIInit_11.8.32.bts
-[    2.227752] Bluetooth: hci0: download firmware failed, retrying...
-[    2.288584] Bluetooth: hci0: request_firmware failed(errno -2) for
-ti-connectivity/TIInit_11.8.32.bts
-[    2.306472] Bluetooth: hci0: download firmware failed, retrying...
-[    2.380161] Bluetooth: hci0: request_firmware failed(errno -2) for
-ti-connectivity/TIInit_11.8.32.bts
-[    2.389459] Bluetooth: hci0: download firmware failed, retrying...
-
-I was hoping someone might have some insight on what might be the issue.
-
-Thanks
-
-adam
-
-pinctrl_uart2: uart2grp {
-fsl,pins = <
-MX6QDL_PAD_SD4_DAT4__UART2_RX_DATA 0x1b0b1
-MX6QDL_PAD_SD4_DAT5__UART2_RTS_B 0x1b0b1
-MX6QDL_PAD_SD4_DAT6__UART2_CTS_B 0x1b0b1
-MX6QDL_PAD_SD4_DAT7__UART2_TX_DATA 0x1b0b1
-MX6QDL_PAD_SD3_RST__GPIO7_IO08 0x13059 /* BT_EN */
->;
-};
+Ross
