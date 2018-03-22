@@ -2,13 +2,13 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v2] gatt: Mark Includes property of org.bluez.GattService1 as optional
-Date: Thu, 22 Mar 2018 11:06:13 +0100
-Message-Id: <20180322100613.28536-1-szymon.janc@codecoup.pl>
+Subject: [PATCH] gatt: Mark Includes property oforg.bluez.GattService1 as optional
+Date: Thu, 22 Mar 2018 10:40:24 +0100
+Message-Id: <20180322094024.27610-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If property is not present treat it as no Include Services present.
+If property is not present treat it as no Include Service present.
 ---
  doc/gatt-api.txt    | 2 +-
  src/gatt-database.c | 3 ++-
