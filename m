@@ -1,53 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Reply-To: jay@systech.com
-Subject: Re: Bluez 5.49 Segmentation Fault
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Cc: linux-bluetooth@vger.kernel.org
-References: <e4a2aaba-6888-6c44-b48d-e954514263b4@systech.com>
- <3101238.RsEhQVg2kc@ix>
-From: Jay Foster <jay@systech.com>
-Message-ID: <7e888e08-ab9f-0a46-7c46-88ada4ca4ca0@systech.com>
-Date: Thu, 22 Mar 2018 13:21:12 -0700
-MIME-Version: 1.0
-In-Reply-To: <3101238.RsEhQVg2kc@ix>
-Content-Type: text/plain; charset=utf-8; format=flowed
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH] gatt: Fail to register service with invalid Includes property
+Date: Thu, 22 Mar 2018 21:07:55 +0100
+Message-Id: <20180322200755.21972-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 3/22/2018 1:04 PM, Szymon Janc wrote:
-> Hi Jay,
->
-> On Thursday, 22 March 2018 20:31:23 CET Jay Foster wrote:
->> I am experiencing problems with the latest 5.49 version of the bluez
->> bluetooth daemon.  Attempting to configure the Discoverable property of
->> an adapter causes the bluetoothd to segmentation fault.  This works
->> correctly for version 5.48 and earlier.
->>
->> The following command demonstrates the bug.
->>
->> dbus-send --system --dest=org.bluez --print-reply /org/bluez/hci0
->> org.freedesktop.DBus.Properties.Set string:org.bluez.Adapter1
->> string:Discoverable variant:boolean:true
-> I'm not able to reproduce this on 5.49 tag. Could you run bluetoothd under
-> valgrind and provide the output?
->
-Unfortunately, no.  valgrind is not available for my target.  I was able 
-to use gdb and get the following backtrace:
+This is optional property but if it is present it must be of
+proper type.
+---
+ src/gatt-database.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Program received signal SIGSEGV, Segmentation fault.
-0x00081768 in btd_adv_manager_refresh ()
-Current language:  auto
-The current source language is "auto; currently asm".
-(gdb) bt
-#0  0x00081768 in btd_adv_manager_refresh ()
-#1  0x00084efc in settings_changed ()
-#2  0x00085020 in new_settings_callback ()
-#3  0x0008a6a8 in property_set_mode_complete ()
-#4  0x000e4384 in request_complete ()
-#5  0x000e4784 in can_read_data ()
-#6  0x000fe32c in watch_callback ()
-#7  0xb6f25f00 in ?? () from /usr/lib/libglib-2.0.so.0
-#8  0xb6f25f00 in ?? () from /usr/lib/libglib-2.0.so.0
-
-Jay
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index a22fc3b85..19f03c544 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -1676,6 +1676,7 @@ static bool parse_includes(GDBusProxy *proxy, struct external_service *service)
+ 	DBusMessageIter array;
+ 	char *obj;
+ 
++	/* Includes property is optional */
+ 	if (!g_dbus_proxy_get_property(proxy, "Includes", &iter))
+ 		return true;
+ 
+@@ -2682,8 +2683,10 @@ static bool database_add_service(struct external_service *service)
+ 		return false;
+ 	}
+ 
+-	if (!parse_includes(service->proxy, service))
++	if (!parse_includes(service->proxy, service)) {
+ 		error("Failed to read \"Includes\" property of service");
++		return false;
++	}
+ 
+ 	service->attrib = gatt_db_add_service(service->app->database->db, &uuid,
+ 						primary, service->attr_cnt);
+-- 
+2.14.3
 
