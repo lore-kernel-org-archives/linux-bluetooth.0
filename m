@@ -1,73 +1,86 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Gix, Brian" <brian.gix@intel.com>
-To: =?windows-1250?Q?Robert_Luba=9C?= <robert.lubas@silvair.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ V2] Mesh: Fix TTL in Config Heartbeat Publication
- Set
-Date: Thu, 22 Mar 2018 21:33:56 +0000
-Message-ID: <EC1DC23A-0357-4500-939A-98229F1BF561@intel.com>
-References: <20180322104442.27650-1-robert.lubas@silvair.com>
-In-Reply-To: <20180322104442.27650-1-robert.lubas@silvair.com>
-Content-Type: text/plain; charset="windows-1250"
+Reply-To: jay@systech.com
+Subject: Re: Bluez 5.49 Segmentation Fault
+From: Jay Foster <jay@systech.com>
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org
+References: <e4a2aaba-6888-6c44-b48d-e954514263b4@systech.com>
+ <3101238.RsEhQVg2kc@ix> <7e888e08-ab9f-0a46-7c46-88ada4ca4ca0@systech.com>
+ <2bfa2cf5-f020-f731-bd82-fbd04a29f74b@systech.com>
+Message-ID: <a00d90f5-3642-a9e2-662e-74a3fded2314@systech.com>
+Date: Thu, 22 Mar 2018 14:09:14 -0700
 MIME-Version: 1.0
+In-Reply-To: <2bfa2cf5-f020-f731-bd82-fbd04a29f74b@systech.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I am unable to look at all the code in context at the moment, but using the DEFAULT_TTL (0xff) for any TTL value, will automatically get replaced with whatever the default TTL has been set to. It is a handy value which means �use the system setting� without needing to look it up.
+On 3/22/2018 1:29 PM, Jay Foster wrote:
+> On 3/22/2018 1:21 PM, Jay Foster wrote:
+>> On 3/22/2018 1:04 PM, Szymon Janc wrote:
+>>> Hi Jay,
+>>>
+>>> On Thursday, 22 March 2018 20:31:23 CET Jay Foster wrote:
+>>>> I am experiencing problems with the latest 5.49 version of the bluez
+>>>> bluetooth daemon.  Attempting to configure the Discoverable 
+>>>> property of
+>>>> an adapter causes the bluetoothd to segmentation fault. This works
+>>>> correctly for version 5.48 and earlier.
+>>>>
+>>>> The following command demonstrates the bug.
+>>>>
+>>>> dbus-send --system --dest=org.bluez --print-reply /org/bluez/hci0
+>>>> org.freedesktop.DBus.Properties.Set string:org.bluez.Adapter1
+>>>> string:Discoverable variant:boolean:true
+>>> I'm not able to reproduce this on 5.49 tag. Could you run bluetoothd 
+>>> under
+>>> valgrind and provide the output?
+>>>
+>> Unfortunately, no.  valgrind is not available for my target.  I was 
+>> able to use gdb and get the following backtrace:
+>>
+>> Program received signal SIGSEGV, Segmentation fault.
+>> 0x00081768 in btd_adv_manager_refresh ()
+>> Current language:  auto
+>> The current source language is "auto; currently asm".
+>> (gdb) bt
+>> #0  0x00081768 in btd_adv_manager_refresh ()
+>> #1  0x00084efc in settings_changed ()
+>> #2  0x00085020 in new_settings_callback ()
+>> #3  0x0008a6a8 in property_set_mode_complete ()
+>> #4  0x000e4384 in request_complete ()
+>> #5  0x000e4784 in can_read_data ()
+>> #6  0x000fe32c in watch_callback ()
+>> #7  0xb6f25f00 in ?? () from /usr/lib/libglib-2.0.so.0
+>> #8  0xb6f25f00 in ?? () from /usr/lib/libglib-2.0.so.0
+>>
+>> Jay
+>>
+> It also only seems to happen with a particular BD adapter, a USB dongle.
+>
+>     Bus 001 Device 006: ID 0a12:0001 Cambridge Silicon Radio, Ltd 
+> Bluetooth Dongle (HCI mode)
+>
+> This BD adapter does not support BLE, which might be a factor.
+>
+> Jay
+The following patch seems to fix this.
 
-> On Mar 22, 2018, at 3:45 AM, Robert Luba� <robert.lubas@silvair.com> wrote:
-> 
-> In Mesh Profile spec 4.2.17.4 Heartbeat Publication TTL value range is
-> 0x00-0x7F. In cmd_hb_pub_set heartbeat ttl was set to DEFAULT_TTL 0xFF, this
-> patch fix this by adding ttl param to hb-pub-set.
-> ---
-> mesh/config-client.c | 12 ++++++------
-> 1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/mesh/config-client.c b/mesh/config-client.c
-> index 19e617d62..0b5b8677b 100644
-> --- a/mesh/config-client.c
-> +++ b/mesh/config-client.c
-> @@ -1042,7 +1042,7 @@ static void cmd_hb_pub_set(int argc, char *argv[])
->    n = mesh_opcode_set(OP_CONFIG_HEARTBEAT_PUB_SET, msg);
-> 
->    parm_cnt = read_input_parameters(argc, argv);
-> -    if (parm_cnt != 5) {
-> +    if (parm_cnt != 6) {
->        bt_shell_printf("Bad arguments: %s\n", argv[1]);
->        return bt_shell_noninteractive_quit(EXIT_FAILURE);
->    }
-> @@ -1056,12 +1056,12 @@ static void cmd_hb_pub_set(int argc, char *argv[])
->    /* Period Log */
->    msg[n++] = parms[2];
->    /* Heartbeat TTL */
-> -    msg[n++] = DEFAULT_TTL;
-> +    msg[n++] = parms[3];
->    /* Features */
-> -    put_le16(parms[3], msg + n);
-> +    put_le16(parms[4], msg + n);
->    n += 2;
->    /* NetKey Index */
-> -    put_le16(parms[4], msg + n);
-> +    put_le16(parms[5], msg + n);
->    n += 2;
-> 
->    if (!config_send(msg, n)) {
-> @@ -1167,8 +1167,8 @@ static const struct bt_shell_menu cfg_menu = {
->                        "Set relay"},
->    {"relay-get",           NULL,                   cmd_relay_get,
->                        "Get relay"},
-> -    {"hb-pub-set", "<pub_addr> <count> <period> <features> <net_idx>",
-> -                cmd_hb_pub_set,     "Set heartbeat publish"},
-> +    {"hb-pub-set", "<pub_addr> <count> <period> <ttl> <features> <net_idx>",
-> +                cmd_hb_pub_set,    "Set heartbeat publish"},
->    {"hb-pub-get",           NULL,                   cmd_hb_pub_get,
->                        "Get heartbeat publish"},
->    {"hb-sub-set", "<src_addr> <dst_addr> <period>",
-> -- 
-> 2.11.0
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+--- a/src/advertising.c    2018-03-10 07:37:07.000000000 -0800
++++ b/src/advertising.c    2018-03-22 13:57:17.229968345 -0700
+@@ -1171,8 +1171,10 @@ void btd_adv_manager_destroy(struct btd_
+      manager_destroy(manager);
+  }
+
+  void btd_adv_manager_refresh(struct btd_adv_manager *manager)
+  {
+-    queue_foreach(manager->clients, (queue_foreach_func_t)refresh_adv,
+-                                    NULL);
++    if (manager != NULL) {
++        queue_foreach(manager->clients, (queue_foreach_func_t)refresh_adv,
++                                        NULL);
++    }
+  }
+
+Jay
+
