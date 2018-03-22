@@ -1,57 +1,66 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 198953] hci_bcm: Streamline runtime PM code    change for 4.16
- kernel breaks bluetooth on ASUS T100TA
-Date: Thu, 22 Mar 2018 16:31:24 +0000
-Message-ID: <bug-198953-62941-105PPCN3eW@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-198953-62941@https.bugzilla.kernel.org/>
-References: <bug-198953-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
+From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH BlueZ v2 3/3] shared/gatt-client: Fix tracking current service during discovery
+Date: Thu, 22 Mar 2018 16:21:01 +0100
+Message-Id: <20180322152101.9871-4-andrzej.kaczmarek@codecoup.pl>
+In-Reply-To: <20180322152101.9871-1-andrzej.kaczmarek@codecoup.pl>
+References: <20180322152101.9871-1-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=198953
+We should mark service as completed before trying to insert another
+characteristic - in case inserting characteristic for new service
+fails, previous one won't be discarded.
+---
+ src/shared/gatt-client.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
---- Comment #27 from Robert R. Howell (rhowell@uwyo.edu) ---
-Hi Hans
-
-I've tested your new NVRAM patch on my T100TA, T100TAM, and Toshiba Encore and
-it works on all three.  If the ...sdio.txt file is present it uses that,
-otherwise it successfully gets the information from NVRAM.
-
-There was one side effect you may want to know about.  Originally I had my
-kernel built with the CONFIG_FW_LOADER_USER_HELPER_FALLBACK option set.  It
-turns out that when that option is set your NVRAM patch causes an additional 60
-second delay in WiFi coming up, as the system waits for some timeout to occur
-during the "firmware" load.  That is in addition to another 60 second delay
-which was introduced by CLM related changes in kernel 4.15, as I mentioned in
-my other bug report at <https://bugzilla.kernel.org/show_bug.cgi?id=198089>. 
-But both 60 second delays disappear when I build a kernel without
-CONFIG_FW_LOADER_USER_HELPER_FALLBACK being set, and apparently in most
-distributions, that option is NOT set.
-
-In testing that NVRAM patch I discovered another issue with the brcmfmac
-driver, in that after unloading it with "modprobe -r brcmfmac", reloading it
-with "modprobe brcmfmac" often fails.  However while your patch MAY affect the
-details of what happens, sort of problem seems to be present at least from 4.15
-onward, and perhaps earlier.  The problem may also be intermittent, so sorting
-this out has become difficult.  With your patch in use, the failure usually
-occurs as follows.  But something like this (perhaps with slightly different
-messages) often goes wrong without the NVRAM patch too.  The only way to clear
-this error is to reboot, so that also makes debugging difficult.  I'll let you
-know if I can sort out the pattern.
-
-[  135.464064] brcmfmac: brcmf_fw_map_chip_to_name: using
-brcm/brcmfmac43241b4-sdio.bin for chip 0x004324(17188) rev 0x000005
-[  135.464167] usbcore: registered new interface driver brcmfmac
-[  140.718849] brcmfmac: brcmf_sdio_bus_stop: Failed to force clock for F2: err
--16
-
-Since in normal use I typically don't need to unload and reload the driver,
-usually this bug doesn't cause a problem.
-
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index b7cf91820..5721f3e5c 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -588,6 +588,19 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
+ 		struct gatt_db_attribute *svc;
+ 		uint16_t start, end;
+ 
++		/* Adjust current service */
++		svc = gatt_db_get_service(client->db, chrc_data->value_handle);
++		if (op->cur_svc != svc) {
++			if (op->cur_svc) {
++				queue_remove(op->pending_svcs, op->cur_svc);
++
++				/* Done with the current service */
++				gatt_db_service_set_active(op->cur_svc, true);
++			}
++
++			op->cur_svc = svc;
++		}
++
+ 		attr = gatt_db_insert_characteristic(client->db,
+ 							chrc_data->value_handle,
+ 							&chrc_data->uuid, 0,
+@@ -605,19 +618,6 @@ static bool discover_descs(struct discovery_op *op, bool *discovering)
+ 							chrc_data->value_handle)
+ 			goto failed;
+ 
+-		/* Adjust current service */
+-		svc = gatt_db_get_service(client->db, chrc_data->value_handle);
+-		if (op->cur_svc != svc) {
+-			if (op->cur_svc) {
+-				queue_remove(op->pending_svcs, op->cur_svc);
+-
+-				/* Done with the current service */
+-				gatt_db_service_set_active(op->cur_svc, true);
+-			}
+-
+-			op->cur_svc = svc;
+-		}
+-
+ 		gatt_db_attribute_get_service_handles(svc, &start, &end);
+ 
+ 		/*
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.16.2
+
