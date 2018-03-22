@@ -1,138 +1,89 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] gatt: Add confirmation callback
-Date: Thu, 22 Mar 2018 15:55:50 +0100
-Message-ID: <1572389.x88qM0ZYMA@ix>
-In-Reply-To: <20180319124427.26418-1-luiz.dentz@gmail.com>
-References: <20180319124427.26418-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1955404.AOsejSYyjx@ix>
+References: <20180322100613.28536-1-szymon.janc@codecoup.pl>
+ <CABBYNZ+Ai=Mm=mL9sigyZVVxbA=4=MjBGJzC1mAORhEVnX_uVA@mail.gmail.com> <1955404.AOsejSYyjx@ix>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 22 Mar 2018 14:38:01 +0200
+Message-ID: <CABBYNZKUds_5T7NGj3089oMaHUSLVaOgOujbrdQ0yzdBB93Rnw@mail.gmail.com>
+Subject: Re: [PATCH v2] gatt: Mark Includes property of org.bluez.GattService1
+ as optional
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Szymon,
 
-On Monday, 19 March 2018 13:44:26 CET Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This replaces indicate flag with confirmation callback to enable
-> setting custom callback if necessary.
-> ---
->  src/gatt-database.c | 33 ++++++++++++++++++++-------------
->  1 file changed, 20 insertions(+), 13 deletions(-)
-> 
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index 9a33ae7f9..82f376568 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -956,8 +956,8 @@ struct notify {
->  	uint16_t handle, ccc_handle;
->  	const uint8_t *value;
->  	uint16_t len;
-> -	bool indicate;
-> -	GDBusProxy *proxy;
-> +	bt_gatt_server_conf_func_t conf;
-> +	void *user_data;
->  };
-> 
->  static void conf_cb(void *user_data)
-> @@ -983,7 +983,7 @@ static void send_notification_to_device(void *data, void
-> *user_data) if (!ccc)
->  		return;
-> 
-> -	if (!ccc->value[0] || (notify->indicate && !(ccc->value[0] & 0x02)))
-> +	if (!ccc->value[0] || (notify->conf && !(ccc->value[0] & 0x02)))
->  		return;
-> 
->  	device = btd_adapter_get_device(notify->database->adapter,
-> @@ -1003,7 +1003,7 @@ static void send_notification_to_device(void *data,
-> void *user_data) * TODO: If the device is not connected but bonded, send
-> the
->  	 * notification/indication when it becomes connected.
->  	 */
-> -	if (!notify->indicate) {
-> +	if (!notify->conf) {
->  		DBG("GATT server sending notification");
->  		bt_gatt_server_send_notification(server,
->  					notify->handle, notify->value,
-> @@ -1013,8 +1013,8 @@ static void send_notification_to_device(void *data,
-> void *user_data)
-> 
->  	DBG("GATT server sending indication");
->  	bt_gatt_server_send_indication(server, notify->handle, notify->value,
-> -							notify->len, conf_cb,
-> -							notify->proxy, NULL);
-> +						notify->len, notify->conf,
-> +						notify->user_data, NULL);
-> 
->  	return;
-> 
-> @@ -1027,10 +1027,16 @@ remove:
->  	}
->  }
-> 
-> +static void service_changed_conf(void *user_data)
-> +{
-> +	DBG("");
-> +}
-> +
->  static void send_notification_to_devices(struct btd_gatt_database
-> *database, uint16_t handle, const uint8_t *value,
->  					uint16_t len, uint16_t ccc_handle,
-> -					bool indicate, GDBusProxy *proxy)
-> +					bt_gatt_server_conf_func_t conf,
-> +					void *user_data)
->  {
->  	struct notify notify;
-> 
-> @@ -1041,8 +1047,8 @@ static void send_notification_to_devices(struct
-> btd_gatt_database *database, notify.ccc_handle = ccc_handle;
->  	notify.value = value;
->  	notify.len = len;
-> -	notify.indicate = indicate;
-> -	notify.proxy = proxy;
-> +	notify.conf = conf;
-> +	notify.user_data = user_data;
-> 
->  	queue_foreach(database->device_states, send_notification_to_device,
->  								&notify);
-> @@ -1073,7 +1079,7 @@ static void send_service_changed(struct
-> btd_gatt_database *database, put_le16(end, value + 2);
-> 
->  	send_notification_to_devices(database, handle, value, sizeof(value),
-> -							ccc_handle, true, NULL);
-> +					ccc_handle, service_changed_conf, NULL);
->  }
-> 
->  static void gatt_db_service_added(struct gatt_db_attribute *attrib,
-> @@ -1948,8 +1954,8 @@ static bool pipe_io_read(struct io *io, void
-> *user_data) gatt_db_attribute_get_handle(chrc->attrib),
->  				buf, bytes_read,
->  				gatt_db_attribute_get_handle(chrc->ccc),
-> -				chrc->props & BT_GATT_CHRC_PROP_INDICATE,
-> -				chrc->proxy);
-> +				chrc->props & BT_GATT_CHRC_PROP_INDICATE ?
-> +				conf_cb : NULL, chrc->proxy);
-> 
->  	return true;
->  }
-> @@ -2225,7 +2231,8 @@ static void property_changed_cb(GDBusProxy *proxy,
-> const char *name, gatt_db_attribute_get_handle(chrc->attrib),
->  				value, len,
->  				gatt_db_attribute_get_handle(chrc->ccc),
-> -				chrc->props & BT_GATT_CHRC_PROP_INDICATE, proxy);
-> +				chrc->props & BT_GATT_CHRC_PROP_INDICATE ?
-> +				conf_cb : NULL, proxy);
->  }
-> 
->  static bool database_add_ccc(struct external_service *service,
+On Thu, Mar 22, 2018 at 2:18 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> Hi,
+>
+> On Thursday, 22 March 2018 11:28:20 CET Luiz Augusto von Dentz wrote:
+>> Hi Szymon,
+>>
+>> On Thu, Mar 22, 2018 at 12:06 PM, Szymon Janc <szymon.janc@codecoup.pl>
+> wrote:
+>> > If property is not present treat it as no Include Services present.
+>> > ---
+>> >
+>> >  doc/gatt-api.txt    | 2 +-
+>> >  src/gatt-database.c | 3 ++-
+>> >  2 files changed, 3 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+>> > index f58de23c3..60a997cbf 100644
+>> > --- a/doc/gatt-api.txt
+>> > +++ b/doc/gatt-api.txt
+>> > @@ -45,7 +45,7 @@ Properties    string UUID [read-only]
+>> >
+>> >                         belongs to. Only present on services from remote
+>> >                         devices.
+>> >
+>> > -               array{object} Includes [read-only]
+>> > +               array{object} Includes [read-only, optional]
+>> >
+>> >                         Array of object paths representing the included
+>> >                         services of this service.
+>> >
+>> > diff --git a/src/gatt-database.c b/src/gatt-database.c
+>> > index c1ae91211..2e1c20d78 100644
+>> > --- a/src/gatt-database.c
+>> > +++ b/src/gatt-database.c
+>> > @@ -1676,8 +1676,9 @@ static bool parse_includes(GDBusProxy *proxy, struct
+>> > external_service *service)>
+>> >         DBusMessageIter array;
+>> >         char *obj;
+>> >
+>> > +       /* Includes property is optional */
+>> >
+>> >         if (!g_dbus_proxy_get_property(proxy, "Includes", &iter))
+>> >
+>> > -               return false;
+>> > +               return true;
+>> >
+>> >         if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
+>> >
+>> >                 return false;
+>> >
+>> > --
+>> > 2.14.3
+>>
+>> Ive pushed a similar patch about an hour ago:
+>
+> OK. And what about v3 change? should we failed to register if Includes are not
+> in valid format?
 
-Both patches applied, thanks.
+Yep, I guess you just need to rebase so we can integrate that change
+you did in v3.
+
+> --
+> pozdrawiam
+> Szymon Janc
+>
+>
+
+
 
 -- 
-pozdrawiam
-Szymon Janc
-
-
+Luiz Augusto von Dentz
