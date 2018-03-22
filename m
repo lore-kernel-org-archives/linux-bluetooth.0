@@ -1,157 +1,73 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOT_U5ZvVd35LTMMBAm332htfFpStzzXkG+6t=Yedtw5i_WTOQ@mail.gmail.com>
-References: <CAOT_U5ZvVd35LTMMBAm332htfFpStzzXkG+6t=Yedtw5i_WTOQ@mail.gmail.com>
+In-Reply-To: <20180321165422.17501-1-luiz.dentz@gmail.com>
+References: <20180321165422.17501-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 22 Mar 2018 11:25:25 +0200
-Message-ID: <CABBYNZ+BwyUSvEUuTNmv-P-O27zyaJtp=K8WOjgjqk6nPCCDfg@mail.gmail.com>
-Subject: Re: Building BlueZ master from git in Yocto
-To: Alan Martinovic <alan.martinovic@senic.com>
-Cc: Yocto-mailing-list <yocto@yoctoproject.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 22 Mar 2018 10:37:33 +0200
+Message-ID: <CABBYNZLpqu5sPpv2djQJy3wn-DgKy5rGgftk86YhK1UV0asvCQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] build: Fix not disabling obexd when given --disable-obex
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alan,
+Hi,
 
-On Wed, Mar 21, 2018 at 5:21 PM, Alan Martinovic
-<alan.martinovic@senic.com> wrote:
-> Started this issue a few days ago thinking it was a problem with
-> the bluez flags. I guess it might still be given it tries to build obex
-> even when it's been configured that is shouldn't...
+On Wed, Mar 21, 2018 at 6:54 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> The exact issue seems to point it's a Yocto related
-> or might be both (hence both lists). I have configured
-> BlueZ to build without any flags.
+> --disable-obex shall disable building obexd daemon.
+> ---
+>  Makefile.am    | 4 ++++
+>  Makefile.obexd | 3 ---
+>  2 files changed, 4 insertions(+), 3 deletions(-)
 >
-> In terms of BlueZ code this means:
+> diff --git a/Makefile.am b/Makefile.am
+> index daf34b6ca..5ac76d81c 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -223,7 +223,11 @@ test_scripts =
+>  unit_tests =
 >
->     git clone https://git.kernel.org/pub/scm/bluetooth/bluez.git
->     cd bluez
->     ./bootstrap
->     make
+>  include Makefile.tools
+> +
+> +if OBEX
+>  include Makefile.obexd
+> +endif
+> +
+>  include android/Makefile.am
 >
-> This is built correctly for x86.
+>  if HID2HCI
+> diff --git a/Makefile.obexd b/Makefile.obexd
+> index 5959f2292..11d101158 100644
+> --- a/Makefile.obexd
+> +++ b/Makefile.obexd
+> @@ -1,4 +1,3 @@
+> -
+>  if SYSTEMD
+>  systemduserunitdir = @SYSTEMD_USERUNITDIR@
+>  systemduserunit_DATA = obexd/src/obex.service
+> @@ -32,7 +31,6 @@ obexd_builtin_sources += obexd/plugins/opp.c
+>  obexd_builtin_modules += ftp
+>  obexd_builtin_sources += obexd/plugins/ftp.c obexd/plugins/ftp.h
 >
-> Trying to replicate that to Yocto, I've extended the recipe to
-> not to pass any feature configuration flags:
+> -if OBEX
+>  obexd_builtin_modules += irmc
+>  obexd_builtin_sources += obexd/plugins/irmc.c
 >
->     $ bitbake bluez5 -e | grep EXTRA_OECONF
->     ...
->     EXTRA_OECONF=""
+> @@ -41,7 +39,6 @@ obexd_builtin_sources += obexd/plugins/pbap.c \
+>                                 obexd/plugins/vcard.h obexd/plugins/vcard.c \
+>                                 obexd/plugins/phonebook.h \
+>                                 obexd/plugins/phonebook-dummy.c
+> -endif
 >
-> Before hand did all the steps so that BlueZ is correctly pulled
-> from master, and no patches from Yocto are applied to it.
->
-> Building it with Yocto results in the mentioned error:
->
-> | ../git/src/genbuiltin hostname wiimote autopair policy   a2dp avrcp
-> network input hog  gap scanparam deviceinfo  battery > src/builtin.h
-> | ../git/obexd/src/genbuiltin filesystem bluetooth  opp ftp irmc pbap
-> mas mns > obexd/src/builtin.h
-> | /bin/bash: obexd/src/builtin.h: No such file or directory
-> | Makefile:9431: recipe for target 'obexd/src/builtin.h' failed
-> | make: *** [obexd/src/builtin.h] Error 1
-> | make: *** Waiting for unfinished jobs....
-> | ERROR: oe_runmake failed
-> | WARNING: exit code 1 from a shell command.
-
-This should be fixed upstream, note that by having --disable-obex it
-should no longer build obexd.
-
->
-> It seems that for some reason in Yocto, make can't redirect into
-> `obexd/src/builtin.h` while
-> it does so successfully for native build.
->
-> Open for comments/critics on how to diagnose this.... :)
->
-> Be Well,
-> Alan
->
->
->
->
->
-> On Fri, Mar 16, 2018 at 5:13 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->>
->> Hi Alan,
->>
->> On Fri, Mar 16, 2018 at 4:50 PM, Alan Martinovic
->> <alan.martinovic@senic.com> wrote:
->> > Hi,
->> > I'm trying to cross compile a BLE BlueZ master.
->> > Am having build issues pointing to obex.
->> > I'm building it using Yocto but have stripped it down
->> > to the essentials:
->> >
->> > ./configure
->> >   --build=x86_64-linux
->> >   --host=arm-linux-gnueabi
->> >   --target=arm-linux-gnueabi
->> >   --prefix=/usr
->> >   --exec_prefix=/usr
->> >   --bindir=/usr/bin
->> >   --sbindir=/usr/sbin
->> >   --libexecdir=/usr/libexec
->> >   --datadir=/usr/share
->> >   --sysconfdir=/etc
->> >   --sharedstatedir=/com
->> >   --localstatedir=/var
->> >   --libdir=/usr/lib
->> >   --includedir=/usr/include
->> >   --oldincludedir=/usr/include
->> >   --infodir=/usr/share/info
->> >   --mandir=/usr/share/man
->> >   --disable-silent-rules
->> >   --disable-dependency-tracking
->> >   --with-libtool-sysroot=/home/alan/senic-os/build/tmp-glibc/work/cortexa7hf-neon-vfpv4-senic-linux-gnueabi/bluez5/5.49+gitAUTOINC+969dfae9a7-r0/recipe-sysroot
->> >   --enable-test
->> >   --enable-datafiles
->> >   --enable-library
->> >   --enable-a2dp
->> >   --enable-avrcp
->> >   --disable-cups
->> >   --enable-deprecated
->> >   --disable-health
->> >   --enable-hid
->> >   --enable-hog
->> >   --disable-midi
->> >   --enable-network
->> >   --disable-nfc
->> >   --disable-obex
->> >   --enable-client
->> >   --disable-sap
->> >   --disable-sixaxis
->> >   --enable-systemd
->> >   --disable-testing
->> >   --disable-threads
->> >   --enable-tools
->> > make -j 16
->> >
->> > This results in a build error:
->> >
->> >  ../git/obexd/src/genbuiltin filesystem bluetooth  opp ftp  mas mns >
->> > obexd/src/builtin.h
->> >  /bin/bash: obexd/src/builtin.h: No such file or directory
->> >  Makefile:9431: recipe for target 'obexd/src/builtin.h' failed
->> >
->> >
->> > Given that I don't need it for BLE, what else is required
->> > besides "--disable-obex" to bypass this error?
->>
->> Obviously, it is a bug in the way we handle --disable-obex so we will
->> need to fix it.
->>
->> --
->> Luiz Augusto von Dentz
+>  obexd_builtin_modules += mas
+>  obexd_builtin_sources += obexd/plugins/mas.c obexd/src/map_ap.h \
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.14.3
 
+Applied.
 
 
 -- 
