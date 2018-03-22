@@ -1,46 +1,61 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180322031300.32156-1-inga.stotland@intel.com>
-References: <20180322031300.32156-1-inga.stotland@intel.com>
+In-Reply-To: <20180322100613.28536-1-szymon.janc@codecoup.pl>
+References: <20180322100613.28536-1-szymon.janc@codecoup.pl>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 22 Mar 2018 12:30:31 +0200
-Message-ID: <CABBYNZLd0rhkcVyCr4sJEOnYkdY-vJhc34UHfQZaN44v23OQew@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/shell: Fix short option parsing
-To: Inga Stotland <inga.stotland@intel.com>
+Date: Thu, 22 Mar 2018 12:28:20 +0200
+Message-ID: <CABBYNZ+Ai=Mm=mL9sigyZVVxbA=4=MjBGJzC1mAORhEVnX_uVA@mail.gmail.com>
+Subject: Re: [PATCH v2] gatt: Mark Includes property of org.bluez.GattService1
+ as optional
+To: Szymon Janc <szymon.janc@codecoup.pl>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
+Hi Szymon,
 
-On Thu, Mar 22, 2018 at 5:13 AM, Inga Stotland <inga.stotland@intel.com> wrote:
-> The index value used for detecting and validating a short option
-> was not reset after processing a first short option.
-> This prevented the correct parsing of additional short options.
-> Fixed by resetting the index value back to original after each
-> iteration.
+On Thu, Mar 22, 2018 at 12:06 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> If property is not present treat it as no Include Services present.
 > ---
->  src/shared/shell.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  doc/gatt-api.txt    | 2 +-
+>  src/gatt-database.c | 3 ++-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
 >
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index 9cd8d2567..10f26264f 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -957,6 +957,8 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index f58de23c3..60a997cbf 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -45,7 +45,7 @@ Properties    string UUID [read-only]
+>                         belongs to. Only present on services from remote
+>                         devices.
 >
->                         *opt->optarg[index - offset] = optarg;
->                 }
-> +
-> +               index = -1;
->         }
+> -               array{object} Includes [read-only]
+> +               array{object} Includes [read-only, optional]
 >
->         data.argc = argc - optind;
+>                         Array of object paths representing the included
+>                         services of this service.
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index c1ae91211..2e1c20d78 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -1676,8 +1676,9 @@ static bool parse_includes(GDBusProxy *proxy, struct external_service *service)
+>         DBusMessageIter array;
+>         char *obj;
+>
+> +       /* Includes property is optional */
+>         if (!g_dbus_proxy_get_property(proxy, "Includes", &iter))
+> -               return false;
+> +               return true;
+>
+>         if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
+>                 return false;
 > --
-> 2.13.6
+> 2.14.3
 
-Applied, thanks.
+Ive pushed a similar patch about an hour ago:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=4f7162071f885714f8a3aaedc50333576e2dd8f5
 
 -- 
 Luiz Augusto von Dentz
