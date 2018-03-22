@@ -1,74 +1,156 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180321165422.17501-1-luiz.dentz@gmail.com>
-References: <20180321165422.17501-1-luiz.dentz@gmail.com>
+In-Reply-To: <CACgnnk=sK+d7o2rYjOiE3mXk_fRqMkx6C-49LFvXsvSCFjqFRA@mail.gmail.com>
+References: <20180321165900.7879-1-robert.lubas@silvair.com>
+ <CABBYNZL3b6M5hnKpvGXXTB+q8Ma6wtC2SoC+_iKvTjtwGeSrLg@mail.gmail.com> <CACgnnk=sK+d7o2rYjOiE3mXk_fRqMkx6C-49LFvXsvSCFjqFRA@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 22 Mar 2018 10:37:33 +0200
-Message-ID: <CABBYNZLpqu5sPpv2djQJy3wn-DgKy5rGgftk86YhK1UV0asvCQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] build: Fix not disabling obexd when given --disable-obex
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 22 Mar 2018 10:25:44 +0200
+Message-ID: <CABBYNZK-=DtgV+5JNmcfyqEVUsqaaEsXP2Fm9qjMjFDJdWWXPg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Mesh: Fix TTL in Config Heartbeat Publication Set
+To: =?UTF-8?Q?Robert_Luba=C5=9B?= <robert.lubas@silvair.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Robert,
 
-On Wed, Mar 21, 2018 at 6:54 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thu, Mar 22, 2018 at 7:54 AM, Robert Luba=C5=9B <robert.lubas@silvair.co=
+m> wrote:
+> Hi Luiz,
 >
-> --disable-obex shall disable building obexd daemon.
-> ---
->  Makefile.am    | 4 ++++
->  Makefile.obexd | 3 ---
->  2 files changed, 4 insertions(+), 3 deletions(-)
+> Sorry, I have another thing in my my mind. DEFAULT_TTL was set to 0xFF (n=
+ot
+> 0x77)
+> and this is out of valid range(my device does not  acknowledge the messag=
+e).
+> I will follow with V2.
 >
-> diff --git a/Makefile.am b/Makefile.am
-> index daf34b6ca..5ac76d81c 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -223,7 +223,11 @@ test_scripts =
->  unit_tests =
+> About the extra formatting - I just took as a example the pub-set command=
+.
 >
->  include Makefile.tools
-> +
-> +if OBEX
->  include Makefile.obexd
-> +endif
-> +
->  include android/Makefile.am
+> with extra formatting config help looks like :
+> relay-get                                        Get relay
+> hb-pub-set <pub_addr> <count> <period> <ttl> <features> <net_idx>
+>                                                      Set heartbeat publis=
+h
+> hb-pub-get                                      Get heartbeat publish
 >
->  if HID2HCI
-> diff --git a/Makefile.obexd b/Makefile.obexd
-> index 5959f2292..11d101158 100644
-> --- a/Makefile.obexd
-> +++ b/Makefile.obexd
-> @@ -1,4 +1,3 @@
-> -
->  if SYSTEMD
->  systemduserunitdir = @SYSTEMD_USERUNITDIR@
->  systemduserunit_DATA = obexd/src/obex.service
-> @@ -32,7 +31,6 @@ obexd_builtin_sources += obexd/plugins/opp.c
->  obexd_builtin_modules += ftp
->  obexd_builtin_sources += obexd/plugins/ftp.c obexd/plugins/ftp.h
+> without extra formatting:
+> relay-get                                        Get relay
+> hb-pub-set <pub_addr> <count> <period> <ttl> <features> <net_idx> Set
+> heartbeat publish
+> hb-pub-get                                     Get heartbeat publish
 >
-> -if OBEX
->  obexd_builtin_modules += irmc
->  obexd_builtin_sources += obexd/plugins/irmc.c
+> What do you think?
+
+Lets please keep the comments inline instead of top-posting, as for
+the formatting Id say we should fix this in bt_shell so it actually
+detects if the line should be broken or not. We may as well truncate
+if that doesn't fit into the terminal, but that should be done generic
+so the commands don't need to come up with their own way of
+formatting.
+
+> 2018-03-21 19:39 GMT+01:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
+>>
+>> Hi Robert,
+>>
+>> On Wed, Mar 21, 2018 at 6:59 PM, Robert Luba=C5=9B <robert.lubas@silvair=
+.com>
+>> wrote:
+>> > In 4.2.17.4 Heartbeat Publication TTL value range is 0x00-0x7F.
+>> > In cmd_hb_pub_set heartbeat ttl was set to DEFAULT_TTL 0x77, this
+>> > patch fix this by adding ttl param to hb-pub-set.
+>>
+>> I don't follow, is 0x77 not valid? It should be if the range is really
+>> 0x00-0x7F.
+>>
+>> > ---
+>> >  mesh/config-client.c | 13 +++++++------
+>> >  1 file changed, 7 insertions(+), 6 deletions(-)
+>> >
+>> > diff --git a/mesh/config-client.c b/mesh/config-client.c
+>> > index 19e617d62..9757e2625 100644
+>> > --- a/mesh/config-client.c
+>> > +++ b/mesh/config-client.c
+>> > @@ -1042,7 +1042,7 @@ static void cmd_hb_pub_set(int argc, char *argv[=
+])
+>> >         n =3D mesh_opcode_set(OP_CONFIG_HEARTBEAT_PUB_SET, msg);
+>> >
+>> >         parm_cnt =3D read_input_parameters(argc, argv);
+>> > -       if (parm_cnt !=3D 5) {
+>> > +       if (parm_cnt !=3D 6) {
+>> >                 bt_shell_printf("Bad arguments: %s\n", argv[1]);
+>> >                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>> >         }
+>> > @@ -1056,12 +1056,12 @@ static void cmd_hb_pub_set(int argc, char
+>> > *argv[])
+>> >         /* Period Log */
+>> >         msg[n++] =3D parms[2];
+>> >         /* Heartbeat TTL */
+>> > -       msg[n++] =3D DEFAULT_TTL;
+>> > +       msg[n++] =3D parms[3];
+>> >         /* Features */
+>> > -       put_le16(parms[3], msg + n);
+>> > +       put_le16(parms[4], msg + n);
+>> >         n +=3D 2;
+>> >         /* NetKey Index */
+>> > -       put_le16(parms[4], msg + n);
+>> > +       put_le16(parms[5], msg + n);
+>> >         n +=3D 2;
+>> >
+>> >         if (!config_send(msg, n)) {
+>> > @@ -1167,8 +1167,9 @@ static const struct bt_shell_menu cfg_menu =3D {
+>> >                                                 "Set relay"},
+>> >         {"relay-get",           NULL,                   cmd_relay_get,
+>> >                                                 "Get relay"},
+>> > -       {"hb-pub-set", "<pub_addr> <count> <period> <features>
+>> > <net_idx>",
+>> > -                               cmd_hb_pub_set,     "Set heartbeat
+>> > publish"},
+>> > +       {"hb-pub-set", "<pub_addr> <count> <period> <ttl> <features> "
+>> > +                               "<net_idx>",
+>> > +                               cmd_hb_pub_set, "\n\t\t\t\t\t\t  Set
+>> > heartbeat publish"},
+>>
+>> I don't really like the idea of having extra formatting on the command
+>> description, bt_shell should do the right thing and if that doesn't
+>> fit in the terminal it should wrap around automatically.
+>>
+>> >         {"hb-pub-get",           NULL,                   cmd_hb_pub_ge=
+t,
+>> >                                                 "Get heartbeat
+>> > publish"},
+>> >         {"hb-sub-set", "<src_addr> <dst_addr> <period>",
+>> > --
+>> > 2.11.0
+>> >
+>> > --
+>> > To unsubscribe from this list: send the line "unsubscribe
+>> > linux-bluetooth" in
+>> > the body of a message to majordomo@vger.kernel.org
+>> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
 >
-> @@ -41,7 +39,6 @@ obexd_builtin_sources += obexd/plugins/pbap.c \
->                                 obexd/plugins/vcard.h obexd/plugins/vcard.c \
->                                 obexd/plugins/phonebook.h \
->                                 obexd/plugins/phonebook-dummy.c
-> -endif
 >
->  obexd_builtin_modules += mas
->  obexd_builtin_sources += obexd/plugins/mas.c obexd/src/map_ap.h \
+>
+>
 > --
-> 2.14.3
+> Robert Luba=C5=9B
+> Software Developer
+>
+> Silvair by Seed Labs
+> Jasnog=C3=B3rska 44
+> 31-358 Krakow
+> POLAND
+>
+> www.silvair.com
 
-Applied.
 
 
--- 
+--=20
 Luiz Augusto von Dentz
