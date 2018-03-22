@@ -1,45 +1,36 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] shared/shell: Add bt_shell_cleanup
-Date: Thu, 22 Mar 2018 13:04:50 -0700
-Message-Id: <20180322200450.27180-1-inga.stotland@intel.com>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: jay@systech.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Bluez 5.49 Segmentation Fault
+Date: Thu, 22 Mar 2018 21:04:05 +0100
+Message-ID: <3101238.RsEhQVg2kc@ix>
+In-Reply-To: <e4a2aaba-6888-6c44-b48d-e954514263b4@systech.com>
+References: <e4a2aaba-6888-6c44-b48d-e954514263b4@systech.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This releases resources used for shell initialization.
-This is needed as a separate function to enable clean shutdown
-when an application needs to exit prior to calling bt_shell_run(),
-e.g., when failing program initialization based on processed command
-line input options.
----
- src/shared/shell.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Hi Jay,
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 10f26264f..33bc0d980 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -1001,11 +1001,16 @@ void bt_shell_run(void)
- 
- 	mainloop_run();
- 
-+	io_destroy(signal);
-+
-+	bt_shell_cleanup();
-+}
-+
-+void bt_shell_cleanup(void)
-+{
- 	bt_shell_release_prompt("");
- 	bt_shell_detach();
- 
--	io_destroy(signal);
--
- 	if (data.envs) {
- 		queue_destroy(data.envs, env_destroy);
- 		data.envs = NULL;
+On Thursday, 22 March 2018 20:31:23 CET Jay Foster wrote:
+> I am experiencing problems with the latest 5.49 version of the bluez
+> bluetooth daemon.  Attempting to configure the Discoverable property of
+> an adapter causes the bluetoothd to segmentation fault.  This works
+> correctly for version 5.48 and earlier.
+> 
+> The following command demonstrates the bug.
+> 
+> dbus-send --system --dest=org.bluez --print-reply /org/bluez/hci0
+> org.freedesktop.DBus.Properties.Set string:org.bluez.Adapter1
+> string:Discoverable variant:boolean:true
+
+I'm not able to reproduce this on 5.49 tag. Could you run bluetoothd under 
+valgrind and provide the output?
+
 -- 
-2.13.6
+pozdrawiam
+Szymon Janc
+
 
