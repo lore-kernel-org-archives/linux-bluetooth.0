@@ -2,58 +2,55 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH 1/2] device: Change storage warning to debug messages
-Date: Fri, 23 Mar 2018 15:27:13 +0100
-Message-Id: <20180323142714.30687-1-szymon.janc@codecoup.pl>
+Subject: [PATCH 2/2] device: Fix storing GATT attributes
+Date: Fri, 23 Mar 2018 15:27:14 +0100
+Message-Id: <20180323142714.30687-2-szymon.janc@codecoup.pl>
+In-Reply-To: <20180323142714.30687-1-szymon.janc@codecoup.pl>
+References: <20180323142714.30687-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is normal for device to have private address so there is no reason
-to issue warning message when not storing data for it.
+This fix two issues:
+ - not storing attributes after pairing if device is using RPA
+ - storing attributes for temporary device if it is using static
+   or public address
 ---
- src/device.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ src/device.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
 diff --git a/src/device.c b/src/device.c
-index bf5441543..f26d6e3d2 100644
+index f26d6e3d2..102e812e6 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -479,7 +479,7 @@ static void store_device_info(struct btd_device *device)
- 		return;
- 
- 	if (device_address_is_private(device)) {
--		warn("Can't store info for private addressed device %s",
-+		DBG("Can't store info for private addressed device %s",
- 								device->path);
- 		return;
+@@ -2333,11 +2333,12 @@ static void device_svc_resolved(struct btd_device *dev, uint8_t browse_type,
+ 		dev->pending_paired = false;
  	}
-@@ -496,7 +496,7 @@ void device_store_cached_name(struct btd_device *dev, const char *name)
- 	gsize length = 0;
  
- 	if (device_address_is_private(dev)) {
--		warn("Can't store name for private addressed device %s",
-+		DBG("Can't store name for private addressed device %s",
- 								dev->path);
- 		return;
- 	}
-@@ -2005,7 +2005,7 @@ static void store_services(struct btd_device *device)
- 	gsize length = 0;
+-	if (!dev->temporary)
++	if (!dev->temporary) {
+ 		store_device_info(dev);
  
- 	if (device_address_is_private(device)) {
--		warn("Can't store services for private addressed device %s",
-+		DBG("Can't store services for private addressed device %s",
- 								device->path);
- 		return;
- 	}
-@@ -2193,7 +2193,7 @@ static void store_gatt_db(struct btd_device *device)
- 	struct gatt_saver saver;
+-	if (bdaddr_type != BDADDR_BREDR && err == 0)
+-		store_services(dev);
++		if (bdaddr_type != BDADDR_BREDR && err == 0)
++			store_services(dev);
++	}
  
- 	if (device_address_is_private(device)) {
--		warn("Can't store GATT db for private addressed device %s",
-+		DBG("Can't store GATT db for private addressed device %s",
- 								device->path);
- 		return;
- 	}
+ 	if (req)
+ 		browse_request_complete(req, browse_type, bdaddr_type, err);
+@@ -5278,6 +5279,12 @@ void btd_device_set_temporary(struct btd_device *device, bool temporary)
+ 		adapter_whitelist_add(device->adapter, device);
+ 
+ 	store_device_info(device);
++
++	/* attributes were not cached when resolved if device was temporary */
++	if (device->bdaddr_type != BDADDR_BREDR &&
++			device->le_state.svc_resolved &&
++			g_slist_length(device->primaries) != 0)
++		store_services(device);
+ }
+ 
+ void btd_device_set_trusted(struct btd_device *device, gboolean trusted)
 -- 
 2.14.3
 
