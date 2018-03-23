@@ -1,11 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Szymon Janc <szymon.janc@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4] tools: Add initial code for btmon-logger
-Date: Fri, 23 Mar 2018 09:44:10 +0100
-Message-ID: <6040878.hEjtWufRTq@ix>
-In-Reply-To: <20180314142801.21381-1-szymon.janc@codecoup.pl>
-References: <20180314142801.21381-1-szymon.janc@codecoup.pl>
+Subject: Re: [PATCH v4] Add support for requiring min key size for access GATT characteristics
+Date: Fri, 23 Mar 2018 09:39:19 +0100
+Message-ID: <3864433.ay3Gg6OzoQ@ix>
+In-Reply-To: <20180320135651.10781-1-szymon.janc@codecoup.pl>
+References: <20180320135651.10781-1-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,625 +13,496 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Wednesday, 14 March 2018 15:28:01 CET Szymon Janc wrote:
-> This is intended for use for automated logging or unatrended systems.
-> It doesn't contain any packet decoding functionality which results
-> in much smaller binary.
+On Tuesday, 20 March 2018 14:56:51 CET Szymon Janc wrote:
+> This allows to configure bluetoothd to require minimum encryption key
+> size when accessing GATT server characteristics. It is a global
+> configuration option affecting whole GATT database.
 > ---
->  .gitignore                    |   2 +
->  Makefile.tools                |  15 ++
->  android/bluetoothd-snoop.c    |   2 +-
->  bootstrap-configure           |   1 +
->  configure.ac                  |   4 +
->  monitor/control.c             |   2 +-
->  src/shared/btsnoop.c          |  75 +++++++++-
->  src/shared/btsnoop.h          |   3 +-
->  tools/btmon-logger.c          | 314
-> ++++++++++++++++++++++++++++++++++++++++++ tools/btmon-logger.service.in | 
-> 15 ++
->  10 files changed, 428 insertions(+), 5 deletions(-)
->  create mode 100644 tools/btmon-logger.c
->  create mode 100644 tools/btmon-logger.service.in
+>  peripheral/gatt.c        |  2 +-
+>  src/adapter.c            | 45 ++++++++++++++++++++++++++++++++-------------
+> src/device.c             | 15 +++++++++++++--
+>  src/device.h             |  1 +
+>  src/hcid.h               |  2 ++
+>  src/main.c               | 17 ++++++++++++++---
+>  src/main.conf            |  5 +++++
+>  src/shared/att.c         | 22 +++++++++++++++++++---
+>  src/shared/att.h         |  3 ++-
+>  src/shared/gatt-client.c |  4 ++--
+>  src/shared/gatt-server.c | 47
+> +++++++++++++++++++++++++++++++++++++++-------- src/shared/gatt-server.h | 
+> 3 ++-
+>  tools/btgatt-server.c    |  2 +-
+>  unit/test-gatt.c         |  2 +-
+>  14 files changed, 134 insertions(+), 36 deletions(-)
 > 
-> diff --git a/.gitignore b/.gitignore
-> index 47808059b..2c5cf0f83 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -118,6 +118,8 @@ tools/btconfig
->  tools/btmgmt
->  tools/btsnoop
->  tools/btpclient
-> +tools/btmon-logger
-> +tools/btmon-logger.service
->  peripheral/btsensor
->  monitor/btmon
->  emulator/btvirt
-> diff --git a/Makefile.tools b/Makefile.tools
-> index f7ab77de1..75e39085d 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -66,6 +66,21 @@ monitor_btmon_LDADD = lib/libbluetooth-internal.la \
->  				src/libshared-mainloop.la @UDEV_LIBS@
->  endif
+> diff --git a/peripheral/gatt.c b/peripheral/gatt.c
+> index 5ae19a8e5..08541c424 100644
+> --- a/peripheral/gatt.c
+> +++ b/peripheral/gatt.c
+> @@ -128,7 +128,7 @@ static struct gatt_conn *gatt_conn_new(int fd)
 > 
-> +if LOGGER
-> +libexec_PROGRAMS += tools/btmon-logger
-> +
-> +tools_btmon_logger_SOURCES = tools/btmon-logger.c lib/monitor.h
-> +tools_btmon_logger_LDADD = src/libshared-mainloop.la
-> +tools_btmon_logger_DEPENDENCIES = tools/btmon-logger.service
-> +
-> +if SYSTEMD
-> +systemdsystemunit_DATA += tools/btmon-logger.service
-> +endif
-> +endif
-> +
-> +CLEANFILES += tools/btmon-logger.service
-> +EXTRA_DIST += tools/btmon-logger.service.in
-> +
->  if TESTING
->  noinst_PROGRAMS += emulator/btvirt emulator/b1ee emulator/hfp \
->  					peripheral/btsensor tools/3dsp \
-> diff --git a/android/bluetoothd-snoop.c b/android/bluetoothd-snoop.c
-> index 4b096632a..8d9a2d087 100644
-> --- a/android/bluetoothd-snoop.c
-> +++ b/android/bluetoothd-snoop.c
-> @@ -148,7 +148,7 @@ static int open_monitor(const char *path)
->  	struct sockaddr_hci addr;
->  	int opt = 1;
+>  	bt_att_set_security(conn->att, BT_SECURITY_MEDIUM);
 > 
-> -	snoop = btsnoop_create(path, BTSNOOP_FORMAT_HCI);
-> +	snoop = btsnoop_create(path, 0, 0, BTSNOOP_FORMAT_HCI);
->  	if (!snoop)
->  		return -1;
-> 
-> diff --git a/bootstrap-configure b/bootstrap-configure
-> index 658eef296..b14b4553b 100755
-> --- a/bootstrap-configure
-> +++ b/bootstrap-configure
-> @@ -24,4 +24,5 @@ fi
->  		--enable-sixaxis \
->  		--enable-midi \
->  		--enable-mesh \
-> +		--enable-logger \
->  		--disable-datafiles $*
-> diff --git a/configure.ac b/configure.ac
-> index db46d6f07..5132131f2 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -327,6 +327,10 @@ AC_ARG_ENABLE(sixaxis,
-> AC_HELP_STRING([--enable-sixaxis], AM_CONDITIONAL(SIXAXIS, test
-> "${enable_sixaxis}" = "yes" &&
->  					 test "${enable_udev}" != "no")
-> 
-> +AC_ARG_ENABLE(logger, AC_HELP_STRING([--enable-logger],
-> +		[enable HCI logger service]), [enable_logger=${enableval}])
-> +AM_CONDITIONAL(LOGGER, test "${enable_logger}" = "yes")
-> +
->  if (test "${prefix}" = "NONE"); then
->  	dnl no prefix and no localstatedir, so default to /var
->  	if (test "$localstatedir" = '${prefix}/var'); then
-> diff --git a/monitor/control.c b/monitor/control.c
-> index 1cd79ca5d..6330fff96 100644
-> --- a/monitor/control.c
-> +++ b/monitor/control.c
-> @@ -1373,7 +1373,7 @@ int control_tty(const char *path, unsigned int speed)
-> 
->  bool control_writer(const char *path)
->  {
-> -	btsnoop_file = btsnoop_create(path, BTSNOOP_FORMAT_MONITOR);
-> +	btsnoop_file = btsnoop_create(path, 0, 0, BTSNOOP_FORMAT_MONITOR);
-> 
->  	return !!btsnoop_file;
->  }
-> diff --git a/src/shared/btsnoop.c b/src/shared/btsnoop.c
-> index e20d1b382..d6589ddf4 100644
-> --- a/src/shared/btsnoop.c
-> +++ b/src/shared/btsnoop.c
-> @@ -30,6 +30,8 @@
->  #include <unistd.h>
->  #include <stdlib.h>
->  #include <string.h>
-> +#include <stdio.h>
-> +#include <limits.h>
->  #include <arpa/inet.h>
->  #include <sys/stat.h>
-> 
-> @@ -73,6 +75,11 @@ struct btsnoop {
->  	bool aborted;
->  	bool pklg_format;
->  	bool pklg_v2;
-> +	const char *path;
-> +	size_t max_size;
-> +	size_t cur_size;
-> +	unsigned int max_count;
-> +	unsigned int cur_count;
->  };
-> 
->  struct btsnoop *btsnoop_open(const char *path, unsigned long flags)
-> @@ -131,17 +138,31 @@ failed:
->  	return NULL;
+> -	conn->gatt = bt_gatt_server_new(gatt_db, conn->att, mtu);
+> +	conn->gatt = bt_gatt_server_new(gatt_db, conn->att, mtu, 0);
+>  	if (!conn->gatt) {
+>  		fprintf(stderr, "Failed to create GATT server\n");
+>  		bt_att_unref(conn->att);
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 6d7d61504..6b9222bcf 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -3441,25 +3441,27 @@ failed:
+>  	return ltk;
 >  }
 > 
-> -struct btsnoop *btsnoop_create(const char *path, uint32_t format)
-> +struct btsnoop *btsnoop_create(const char *path, size_t max_size,
-> +					unsigned int max_count, uint32_t format)
->  {
->  	struct btsnoop *btsnoop;
->  	struct btsnoop_hdr hdr;
-> +	const char *real_path;
-> +	char tmp[PATH_MAX];
->  	ssize_t written;
-> 
-> +	if (!max_size && max_count)
-> +		return NULL;
-> +
->  	btsnoop = calloc(1, sizeof(*btsnoop));
->  	if (!btsnoop)
->  		return NULL;
-> 
-> -	btsnoop->fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC,
-> +	/* if splitting files we always add counter to file path */
-> +	if (max_size) {
-> +		snprintf(tmp, PATH_MAX,"%s.0", path);
-> +		real_path = tmp;
-> +	} else {
-> +		real_path = path;
-> +	}
-> +
-> +	btsnoop->fd = open(real_path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC,
->  					S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
->  	if (btsnoop->fd < 0) {
->  		free(btsnoop);
-> @@ -150,6 +171,9 @@ struct btsnoop *btsnoop_create(const char *path,
-> uint32_t format)
-> 
->  	btsnoop->format = format;
->  	btsnoop->index = 0xffff;
-> +	btsnoop->path = path;
-> +	btsnoop->max_count = max_count;
-> +	btsnoop->max_size = max_size;
-> 
->  	memcpy(hdr.id, btsnoop_id, sizeof(btsnoop_id));
->  	hdr.version = htobe32(btsnoop_version);
-> @@ -162,6 +186,8 @@ struct btsnoop *btsnoop_create(const char *path,
-> uint32_t format) return NULL;
->  	}
-> 
-> +	btsnoop->cur_size = BTSNOOP_HDR_SIZE;
-> +
->  	return btsnoop_ref(btsnoop);
->  }
-> 
-> @@ -197,6 +223,42 @@ uint32_t btsnoop_get_format(struct btsnoop *btsnoop)
->  	return btsnoop->format;
->  }
-> 
-> +static bool btsnoop_rotate(struct btsnoop *btsnoop)
+> -static GSList *get_ltk_info(GKeyFile *key_file, const char *peer,
+> +static struct smp_ltk_info *get_ltk_info(GKeyFile *key_file, const char
+> *peer, +							uint8_t bdaddr_type)
 > +{
-> +	struct btsnoop_hdr hdr;
-> +	char path[PATH_MAX];
-> +	ssize_t written;
+> +	DBG("%s", peer);
 > +
-> +	close(btsnoop->fd);
-> +
-> +	/* check if needs to cleanup old files */
-> +	if (btsnoop->max_count && btsnoop->cur_count >= btsnoop->max_count) {
-> +		snprintf(path, PATH_MAX,"%s.%u", btsnoop->path,
-> +				btsnoop->cur_count - btsnoop->max_count);
-> +		unlink(path);
-> +	}
-> +
-> +	snprintf(path, PATH_MAX,"%s.%u", btsnoop->path, btsnoop->cur_count);
-> +	btsnoop->cur_count++;
-> +
-> +	btsnoop->fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC,
-> +					S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
-> +	if (btsnoop->fd < 0)
-> +		return false;
-> +
-> +	memcpy(hdr.id, btsnoop_id, sizeof(btsnoop_id));
-> +	hdr.version = htobe32(btsnoop_version);
-> +	hdr.type = htobe32(btsnoop->format);
-> +
-> +	written = write(btsnoop->fd, &hdr, BTSNOOP_HDR_SIZE);
-> +	if (written < 0)
-> +		return false;
-> +
-> +	btsnoop->cur_size = BTSNOOP_HDR_SIZE;
-> +
-> +	return true;
+> +	return get_ltk(key_file, peer, bdaddr_type, "LongTermKey");
 > +}
 > +
->  bool btsnoop_write(struct btsnoop *btsnoop, struct timeval *tv,
->  			uint32_t flags, uint32_t drops, const void *data,
->  			uint16_t size)
-> @@ -208,6 +270,11 @@ bool btsnoop_write(struct btsnoop *btsnoop, struct
-> timeval *tv, if (!btsnoop || !tv)
->  		return false;
+> +static struct smp_ltk_info *get_slave_ltk_info(GKeyFile *key_file,
+> +							const char *peer,
+>  							uint8_t bdaddr_type)
+>  {
+>  	struct smp_ltk_info *ltk;
+> -	GSList *l = NULL;
 > 
-> +	if (btsnoop->max_size && btsnoop->max_size <=
-> +			btsnoop->cur_size + size + BTSNOOP_PKT_SIZE)
-> +		if (!btsnoop_rotate(btsnoop))
-> +			return false;
+>  	DBG("%s", peer);
+> 
+> -	ltk = get_ltk(key_file, peer, bdaddr_type, "LongTermKey");
+> -	if (ltk)
+> -		l = g_slist_append(l, ltk);
+> -
+>  	ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
+> -	if (ltk) {
+> +	if (ltk)
+>  		ltk->master = false;
+> -		l = g_slist_append(l, ltk);
+> -	}
+> 
+> -	return l;
+> +	return ltk;
+>  }
+> 
+>  static struct irk_info *get_irk_info(GKeyFile *key_file, const char *peer,
+> @@ -4019,7 +4021,9 @@ static void load_devices(struct btd_adapter *adapter)
+>  		char filename[PATH_MAX];
+>  		GKeyFile *key_file;
+>  		struct link_key_info *key_info;
+> -		GSList *list, *ltk_info;
+> +		struct smp_ltk_info *ltk_info;
+> +		struct smp_ltk_info *slave_ltk_info;
+> +		GSList *list;
+>  		struct irk_info *irk_info;
+>  		struct conn_param *param;
+>  		uint8_t bdaddr_type;
+> @@ -4044,7 +4048,13 @@ static void load_devices(struct btd_adapter *adapter)
+> bdaddr_type = get_le_addr_type(key_file);
+> 
+>  		ltk_info = get_ltk_info(key_file, entry->d_name, bdaddr_type);
+> -		ltks = g_slist_concat(ltks, ltk_info);
+> +		if (ltk_info)
+> +			ltks = g_slist_append(ltks, ltk_info);
 > +
->  	ts = (tv->tv_sec - 946684800ll) * 1000000ll + tv->tv_usec;
+> +		slave_ltk_info = get_slave_ltk_info(key_file, entry->d_name,
+> +								bdaddr_type);
+> +		if (slave_ltk_info)
+> +			ltks = g_slist_append(ltks, slave_ltk_info);
 > 
->  	pkt.size  = htobe32(size);
-> @@ -220,12 +287,16 @@ bool btsnoop_write(struct btsnoop *btsnoop, struct
-> timeval *tv, if (written < 0)
->  		return false;
+>  		irk_info = get_irk_info(key_file, entry->d_name, bdaddr_type);
+>  		if (irk_info)
+> @@ -4079,9 +4089,16 @@ device_exist:
+>  			device_set_bonded(device, BDADDR_BREDR);
+>  		}
 > 
-> +	btsnoop->cur_size += BTSNOOP_PKT_SIZE;
+> -		if (ltk_info) {
+> +		if (ltk_info || slave_ltk_info) {
+>  			device_set_paired(device, bdaddr_type);
+>  			device_set_bonded(device, bdaddr_type);
 > +
->  	if (data && size > 0) {
->  		written = write(btsnoop->fd, data, size);
->  		if (written < 0)
->  			return false;
+> +			if (ltk_info)
+> +				device_set_ltk_enc_size(device,
+> +							ltk_info->enc_size);
+> +			else if (slave_ltk_info)
+> +				device_set_ltk_enc_size(device,
+> +						slave_ltk_info->enc_size);
+>  		}
+> 
+>  free:
+> @@ -7464,6 +7481,8 @@ static void new_long_term_key_callback(uint16_t index,
+> uint16_t length, device_set_bonded(device, addr->type);
 >  	}
 > 
-> +	btsnoop->cur_size += size;
+> +	device_set_ltk_enc_size(device, ev->key.enc_size);
 > +
+>  	bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
+>  }
+> 
+> diff --git a/src/device.c b/src/device.c
+> index 7c7196ca1..f3c5e7925 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -243,6 +243,7 @@ struct btd_device {
+> 
+>  	struct csrk_info *local_csrk;
+>  	struct csrk_info *remote_csrk;
+> +	uint8_t ltk_enc_size;
+> 
+>  	sdp_list_t	*tmp_records;
+> 
+> @@ -1460,6 +1461,12 @@ bool device_is_disconnecting(struct btd_device
+> *device) return device->disconn_timer > 0;
+>  }
+> 
+> +void device_set_ltk_enc_size(struct btd_device *device, uint8_t enc_size)
+> +{
+> +	device->ltk_enc_size = enc_size;
+> +	bt_att_set_enc_key_size(device->att, device->ltk_enc_size);
+> +}
+> +
+>  static void device_set_auto_connect(struct btd_device *device, gboolean
+> enable) {
+>  	char addr[18];
+> @@ -4834,10 +4841,14 @@ static void gatt_server_init(struct btd_device
+> *device, struct gatt_db *db)
+> 
+>  	gatt_server_cleanup(device);
+> 
+> -	device->server = bt_gatt_server_new(db, device->att, device->att_mtu);
+> -	if (!device->server)
+> +	device->server = bt_gatt_server_new(db, device->att, device->att_mtu,
+> +						main_opts.min_enc_key_size);
+> +	if (!device->server) {
+>  		error("Failed to initialize bt_gatt_server");
+> +		return;
+> +	}
+> 
+> +	bt_att_set_enc_key_size(device->att, device->ltk_enc_size);
+>  	bt_gatt_server_set_debug(device->server, gatt_debug, NULL, NULL);
+>  }
+> 
+> diff --git a/src/device.h b/src/device.h
+> index bc046f780..306c813fc 100644
+> --- a/src/device.h
+> +++ b/src/device.h
+> @@ -130,6 +130,7 @@ void device_add_connection(struct btd_device *dev,
+> uint8_t bdaddr_type); void device_remove_connection(struct btd_device
+> *device, uint8_t bdaddr_type); void device_request_disconnect(struct
+> btd_device *device, DBusMessage *msg); bool device_is_disconnecting(struct
+> btd_device *device);
+> +void device_set_ltk_enc_size(struct btd_device *device, uint8_t enc_size);
+> 
+>  typedef void (*disconnect_watch) (struct btd_device *device, gboolean
+> removal, void *user_data);
+> diff --git a/src/hcid.h b/src/hcid.h
+> index 62e2bd606..2c2b89d9c 100644
+> --- a/src/hcid.h
+> +++ b/src/hcid.h
+> @@ -54,6 +54,8 @@ struct main_opts {
+> 
+>  	bt_mode_t	mode;
+>  	bt_gatt_cache_t gatt_cache;
+> +
+> +	uint8_t		min_enc_key_size;
+>  };
+> 
+>  extern struct main_opts main_opts;
+> diff --git a/src/main.c b/src/main.c
+> index 21f0b14a4..7e6af42cd 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -103,6 +103,7 @@ static const char *policy_options[] = {
+> 
+>  static const char *gatt_options[] = {
+>  	"Cache",
+> +	"MinEncKeySize",
+>  	NULL
+>  };
+> 
+> @@ -402,12 +403,22 @@ static void parse_config(GKeyFile *config)
+>  	if (err) {
+>  		g_clear_error(&err);
+>  		main_opts.gatt_cache = BT_GATT_CACHE_ALWAYS;
+> -		return;
+> +	} else {
+> +		main_opts.gatt_cache = parse_gatt_cache(str);
+> +		g_free(str);
+>  	}
+> 
+> -	main_opts.gatt_cache = parse_gatt_cache(str);
+> +	val = g_key_file_get_integer(config, "GATT",
+> +						"MinEncKeySize", &err);
+> +	if (err) {
+> +		DBG("%s", err->message);
+> +		g_clear_error(&err);
+> +	} else {
+> +		DBG("MinEncKeySize=%d", val);
+> 
+> -	g_free(str);
+> +		if (val >=7 && val <= 16)
+> +			main_opts.min_enc_key_size = val;
+> +	}
+>  }
+> 
+>  static void init_defaults(void)
+> diff --git a/src/main.conf b/src/main.conf
+> index 21986b386..cbae32ec5 100644
+> --- a/src/main.conf
+> +++ b/src/main.conf
+> @@ -77,6 +77,11 @@
+>  # Default: always
+>  #Cache = always
+> 
+> +# Minimum required Encryption Key Size for accessing secured
+> characteristics. +# Possible values: 0 and 7-16. 0 means don't care.
+> +# Defaults to 0
+> +# MinEncKeySize = 0
+> +
+>  [Policy]
+>  #
+>  # The ReconnectUUIDs defines the set of remote services that should try
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index 0aab246d6..8bf3f4611 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -55,6 +55,7 @@ struct bt_att {
+>  	struct io *io;
+>  	bool io_on_l2cap;
+>  	int io_sec_level;		/* Only used for non-L2CAP */
+> +	uint8_t enc_size;
+> 
+>  	struct queue *req_queue;	/* Queued ATT protocol requests */
+>  	struct att_send_op *pending_req;
+> @@ -602,7 +603,7 @@ static bool change_security(struct bt_att *att, uint8_t
+> ecode) if (att->io_sec_level != BT_ATT_SECURITY_AUTO)
+>  		return false;
+> 
+> -	security = bt_att_get_security(att);
+> +	security = bt_att_get_security(att, NULL);
+> 
+>  	if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
+>  					security < BT_ATT_SECURITY_MEDIUM) {
+> @@ -1454,7 +1455,7 @@ bool bt_att_unregister_all(struct bt_att *att)
 >  	return true;
 >  }
 > 
-> diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
-> index 3df8998a3..3043d33e2 100644
-> --- a/src/shared/btsnoop.h
-> +++ b/src/shared/btsnoop.h
-> @@ -99,7 +99,8 @@ struct btsnoop_opcode_user_logging {
->  struct btsnoop;
+> -int bt_att_get_security(struct bt_att *att)
+> +int bt_att_get_security(struct bt_att *att, uint8_t *enc_size)
+>  {
+>  	struct bt_security sec;
+>  	socklen_t len;
+> @@ -1462,14 +1463,21 @@ int bt_att_get_security(struct bt_att *att)
+>  	if (!att)
+>  		return -EINVAL;
 > 
->  struct btsnoop *btsnoop_open(const char *path, unsigned long flags);
-> -struct btsnoop *btsnoop_create(const char *path, uint32_t format);
-> +struct btsnoop *btsnoop_create(const char *path, size_t max_size,
-> +				unsigned int max_count, uint32_t format);
+> -	if (!att->io_on_l2cap)
+> +	if (!att->io_on_l2cap) {
+> +		if (enc_size)
+> +			*enc_size = att->enc_size;
+> +
+>  		return att->io_sec_level;
+> +	}
 > 
->  struct btsnoop *btsnoop_ref(struct btsnoop *btsnoop);
->  void btsnoop_unref(struct btsnoop *btsnoop);
-> diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
-> new file mode 100644
-> index 000000000..dbf3c5653
-> --- /dev/null
-> +++ b/tools/btmon-logger.c
-> @@ -0,0 +1,314 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2017-2018  Codecoup
-> + *  Copyright (C) 2011-2014  Intel Corporation
-> + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 
-> USA + *
-> + */
+>  	memset(&sec, 0, sizeof(sec));
+>  	len = sizeof(sec);
+>  	if (getsockopt(att->fd, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) < 0)
+>  		return -EIO;
+> 
+> +	if (enc_size)
+> +		*enc_size = att->enc_size;
 > +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <limits.h>
-> +#include <string.h>
-> +#include <time.h>
-> +#include <getopt.h>
-> +#include <unistd.h>
-> +#include <sys/socket.h>
-> +
-> +#include <linux/capability.h>
-> +
-> +#include "lib/bluetooth.h"
-> +#include "lib/hci.h"
-> +
-> +#include "src/shared/util.h"
-> +#include "src/shared/mainloop.h"
-> +#include "src/shared/btsnoop.h"
-> +
-> +extern int capget(struct __user_cap_header_struct *header,
-> +					struct __user_cap_data_struct *data);
-> +extern int capset(struct __user_cap_header_struct *header,
-> +				const struct __user_cap_data_struct *data);
-> +
-> +#define MONITOR_INDEX_NONE 0xffff
-> +
-> +struct monitor_hdr {
-> +	uint16_t opcode;
-> +	uint16_t index;
-> +	uint16_t len;
-> +} __attribute__ ((packed));
-> +
-> +static struct btsnoop *btsnoop_file = NULL;
-> +
-> +static void data_callback(int fd, uint32_t events, void *user_data)
+>  	return sec.level;
+>  }
+> 
+> @@ -1496,6 +1504,14 @@ bool bt_att_set_security(struct bt_att *att, int
+> level) return true;
+>  }
+> 
+> +void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size)
 > +{
-> +	uint8_t buf[BTSNOOP_MAX_PACKET_SIZE];
-> +	unsigned char control[64];
-> +	struct monitor_hdr hdr;
-> +	struct msghdr msg;
-> +	struct iovec iov[2];
-> +
-> +	if (events & (EPOLLERR | EPOLLHUP)) {
-> +		mainloop_remove_fd(fd);
+> +	if (!att)
 > +		return;
-> +	}
 > +
-> +	iov[0].iov_base = &hdr;
-> +	iov[0].iov_len = sizeof(hdr);
-> +	iov[1].iov_base = buf;
-> +	iov[1].iov_len = sizeof(buf);
-> +
-> +	memset(&msg, 0, sizeof(msg));
-> +	msg.msg_iov = iov;
-> +	msg.msg_iovlen = 2;
-> +	msg.msg_control = control;
-> +	msg.msg_controllen = sizeof(control);
-> +
-> +	while (1) {
-> +		struct cmsghdr *cmsg;
-> +		struct timeval *tv = NULL;
-> +		struct timeval ctv;
-> +		uint16_t opcode, index, pktlen;
-> +		ssize_t len;
-> +
-> +		len = recvmsg(fd, &msg, MSG_DONTWAIT);
-> +		if (len < 0)
-> +			break;
-> +
-> +		if (len < (ssize_t) sizeof(hdr))
-> +			break;
-> +
-> +		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL;
-> +					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-> +			if (cmsg->cmsg_level != SOL_SOCKET)
-> +				continue;
-> +
-> +			if (cmsg->cmsg_type == SCM_TIMESTAMP) {
-> +				memcpy(&ctv, CMSG_DATA(cmsg), sizeof(ctv));
-> +				tv = &ctv;
-> +			}
-> +		}
-> +
-> +		opcode = le16_to_cpu(hdr.opcode);
-> +		index  = le16_to_cpu(hdr.index);
-> +		pktlen = le16_to_cpu(hdr.len);
-> +
-> +		btsnoop_write_hci(btsnoop_file, tv, index, opcode, 0, buf,
-> +									pktlen);
-> +	}
+> +	att->enc_size = enc_size;
 > +}
 > +
-> +static bool open_monitor_channel(void)
+>  static bool sign_set_key(struct sign_info **sign, uint8_t key[16],
+>  				bt_att_counter_func_t func, void *user_data)
+>  {
+> diff --git a/src/shared/att.h b/src/shared/att.h
+> index 7bffee7d6..49d93269b 100644
+> --- a/src/shared/att.h
+> +++ b/src/shared/att.h
+> @@ -84,8 +84,9 @@ bool bt_att_unregister_disconnect(struct bt_att *att,
+> unsigned int id);
+> 
+>  bool bt_att_unregister_all(struct bt_att *att);
+> 
+> -int bt_att_get_security(struct bt_att *att);
+> +int bt_att_get_security(struct bt_att *att, uint8_t *enc_size);
+>  bool bt_att_set_security(struct bt_att *att, int level);
+> +void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size);
+> 
+>  bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
+>  			bt_att_counter_func_t func, void *user_data);
+> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+> index e1d489d32..a5c7b1485 100644
+> --- a/src/shared/gatt-client.c
+> +++ b/src/shared/gatt-client.c
+> @@ -2466,7 +2466,7 @@ unsigned int bt_gatt_client_write_without_response(
+> 
+>  	/* Only use signed write if unencrypted */
+>  	if (signed_write) {
+> -		security = bt_att_get_security(client->att);
+> +		security = bt_att_get_security(client->att, NULL);
+>  		op = security > BT_SECURITY_LOW ?  BT_ATT_OP_WRITE_CMD :
+>  						BT_ATT_OP_SIGNED_WRITE_CMD;
+>  	} else
+> @@ -3182,5 +3182,5 @@ int bt_gatt_client_get_security(struct bt_gatt_client
+> *client) if (!client)
+>  		return -1;
+> 
+> -	return bt_att_get_security(client->att);
+> +	return bt_att_get_security(client->att, NULL);
+>  }
+> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+> index faa56abeb..4b554f665 100644
+> --- a/src/shared/gatt-server.c
+> +++ b/src/shared/gatt-server.c
+> @@ -103,6 +103,8 @@ struct bt_gatt_server {
+>  	unsigned int prep_write_id;
+>  	unsigned int exec_write_id;
+> 
+> +	uint8_t min_enc_size;
+> +
+>  	struct queue *prep_queue;
+>  	unsigned int max_prep_queue_len;
+> 
+> @@ -379,9 +381,18 @@ done:
+>  	process_read_by_type(op);
+>  }
+> 
+> +static bool check_min_key_size(uint8_t min_size, uint8_t size)
 > +{
-> +	struct sockaddr_hci addr;
-> +	int fd, opt = 1;
+> +	if (!min_size || !size)
+> +		return true;
 > +
-> +	fd = socket(AF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC, BTPROTO_HCI);
-> +	if (fd < 0) {
-> +		perror("Failed to open monitor channel");
-> +		return false;
-> +	}
-> +
-> +	memset(&addr, 0, sizeof(addr));
-> +	addr.hci_family = AF_BLUETOOTH;
-> +	addr.hci_dev = HCI_DEV_NONE;
-> +	addr.hci_channel = HCI_CHANNEL_MONITOR;
-> +
-> +	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-> +		perror("Failed to bind monitor channel");
-> +		close(fd);
-> +		return false;
-> +	}
-> +
-> +	if (setsockopt(fd, SOL_SOCKET, SO_TIMESTAMP, &opt, sizeof(opt)) < 0) {
-> +		perror("Failed to enable timestamps");
-> +		close(fd);
-> +		return false;
-> +	}
-> +
-> +	if (setsockopt(fd, SOL_SOCKET, SO_PASSCRED, &opt, sizeof(opt)) < 0) {
-> +		perror("Failed to enable credentials");
-> +		close(fd);
-> +		return false;
-> +	}
-> +
-> +	mainloop_add_fd(fd, EPOLLIN, data_callback, NULL, NULL);
-> +
-> +	return true;
+> +	return min_size <= size;
 > +}
 > +
-> +static void signal_callback(int signum, void *user_data)
-> +{
-> +	switch (signum) {
-> +	case SIGINT:
-> +	case SIGTERM:
-> +		mainloop_quit();
-> +		break;
-> +	}
-> +}
-> +
-> +static void drop_capabilities(void)
-> +{
-> +	struct __user_cap_header_struct header;
-> +	struct __user_cap_data_struct cap;
-> +	unsigned int mask;
-> +	int err;
-> +
-> +	header.version = _LINUX_CAPABILITY_VERSION;
-> +	header.pid = 0;
-> +
-> +	err = capget(&header, &cap);
-> +	if (err) {
-> +		perror("Unable to get current capabilities");
-> +		return;
-> +	}
-> +
-> +	/* not needed anymore since mgmt socket is already open */
-> +	mask = ~(CAP_TO_MASK(CAP_NET_RAW) | CAP_TO_MASK(CAP_NET_BIND_SERVICE));
-> +
-> +	cap.effective &= mask;
-> +	cap.permitted &= mask;
-> +	cap.inheritable &= mask;
-> +
-> +	err = capset(&header, &cap);
-> +	if (err)
-> +		perror("Failed to set capabilities");
-> +}
-> +
-> +static void usage(void)
-> +{
-> +	printf("btmon-logger - Bluetooth monitor\n"
-> +		"Usage:\n");
-> +	printf("\tbtmon-logger [options]\n");
-> +	printf("options:\n"
-> +		"\t-b, --basename <path>  Save traces in specified path\n"
-> +		"\t-l, --limit <limit>    Limit traces file size (rotate)\n"
-> +		"\t-c, --count <count>    Limit number of rotated files\n"
-> +		"\t-v, --version          Show version\n"
-> +		"\t-h, --help             Show help options\n");
-> +}
-> +
-> +static const struct option main_options[] = {
-> +	{ "basename",	required_argument,	NULL, 'b' },
-> +	{ "limit",	required_argument,	NULL, 'l' },
-> +	{ "count",	required_argument,	NULL, 'c' },
-> +	{ "version",	no_argument,		NULL, 'v' },
-> +	{ "help",	no_argument,		NULL, 'h' },
-> +	{ }
-> +};
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	const char *path = "hci.log";
-> +	unsigned long max_count = 0;
-> +	size_t size_limit = 0;
-> +	int exit_status;
-> +	sigset_t mask;
-> +	char *endptr;
-> +
-> +	mainloop_init();
-> +
-> +	while (true) {
-> +		int opt;
-> +
-> +		opt = getopt_long(argc, argv, "b:l:c:vh", main_options,
-> +									NULL);
-> +		if (opt < 0)
-> +			break;
-> +
-> +		switch (opt) {
-> +		case 'b':
-> +			path = optarg;
-> +			if (strlen(path) > PATH_MAX) {
-> +				fprintf(stderr, "Too long path\n");
-> +				return EXIT_FAILURE;
-> +			}
-> +			break;
-> +		case 'l':
-> +			size_limit = strtoul(optarg, &endptr, 10);
-> +
-> +			if (size_limit == ULONG_MAX) {
-> +				fprintf(stderr, "Invalid limit\n");
-> +				return EXIT_FAILURE;
-> +			}
-> +
-> +			if (*endptr != '\0') {
-> +				if (*endptr == 'K' || *endptr == 'k') {
-> +					size_limit *= 1024;
-> +				} else if (*endptr == 'M' || *endptr == 'm') {
-> +					size_limit *= 1024 * 1024;
-> +				} else {
-> +					fprintf(stderr, "Invalid limit\n");
-> +					return EXIT_FAILURE;
-> +				}
-> +			}
-> +
-> +			/* limit this to reasonable size */
-> +			if (size_limit < 4096) {
-> +				fprintf(stderr, "Too small limit value\n");
-> +				return EXIT_FAILURE;
-> +			}
-> +			break;
-> +		case 'c':
-> +			max_count = strtoul(optarg, &endptr, 10);
-> +			break;
-> +		case 'v':
-> +			printf("%s\n", VERSION);
-> +			return EXIT_SUCCESS;
-> +		case 'h':
-> +			usage();
-> +			return EXIT_SUCCESS;
-> +		default:
-> +			return EXIT_FAILURE;
-> +		}
+>  static uint8_t check_permissions(struct bt_gatt_server *server,
+>  				struct gatt_db_attribute *attr, uint32_t mask)
+>  {
+> +	uint8_t enc_size;
+>  	uint32_t perm;
+>  	int security;
+> 
+> @@ -397,15 +408,33 @@ static uint8_t check_permissions(struct bt_gatt_server
+> *server, if (!perm)
+>  		return 0;
+> 
+> -	security = bt_att_get_security(server->att);
+> -	if (perm & BT_ATT_PERM_SECURE && security < BT_ATT_SECURITY_FIPS)
+> -		return BT_ATT_ERROR_AUTHENTICATION;
+> +	security = bt_att_get_security(server->att, &enc_size);
+> +	if (security < 0)
+> +		return BT_ATT_ERROR_UNLIKELY;
+> 
+> -	if (perm & BT_ATT_PERM_AUTHEN && security < BT_ATT_SECURITY_HIGH)
+> -		return BT_ATT_ERROR_AUTHENTICATION;
+> +	if (perm & BT_ATT_PERM_SECURE) {
+> +		if (security < BT_ATT_SECURITY_FIPS)
+> +			return BT_ATT_ERROR_AUTHENTICATION;
+> 
+> -	if (perm & BT_ATT_PERM_ENCRYPT && security < BT_ATT_SECURITY_MEDIUM)
+> -		return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION;
+> +		if (!check_min_key_size(server->min_enc_size, enc_size))
+> +			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
 > +	}
 > +
-> +	if (argc - optind > 0) {
-> +		fprintf(stderr, "Invalid command line parameters\n");
-> +		return EXIT_FAILURE;
+> +	if (perm & BT_ATT_PERM_AUTHEN) {
+> +		if (security < BT_ATT_SECURITY_HIGH)
+> +			return BT_ATT_ERROR_AUTHENTICATION;
+> +
+> +		if (!check_min_key_size(server->min_enc_size, enc_size))
+> +			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
 > +	}
 > +
-> +	if (!open_monitor_channel())
-> +		return EXIT_FAILURE;
+> +	if (perm & BT_ATT_PERM_ENCRYPT) {
+> +		if (security < BT_ATT_SECURITY_MEDIUM)
+> +			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION;
 > +
-> +	btsnoop_file = btsnoop_create(path, size_limit, max_count,
-> +							BTSNOOP_FORMAT_MONITOR);
-> +	if (!btsnoop_file)
-> +		return EXIT_FAILURE;
-> +
-> +	drop_capabilities();
-> +
-> +	sigemptyset(&mask);
-> +	sigaddset(&mask, SIGINT);
-> +	sigaddset(&mask, SIGTERM);
-> +
-> +	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
-> +
-> +	printf("Bluetooth monitor logger ver %s\n", VERSION);
-> +
-> +	exit_status = mainloop_run();
-> +
-> +	btsnoop_unref(btsnoop_file);
-> +
-> +	return exit_status;
-> +}
-> diff --git a/tools/btmon-logger.service.in b/tools/btmon-logger.service.in
-> new file mode 100644
-> index 000000000..004bb9f28
-> --- /dev/null
-> +++ b/tools/btmon-logger.service.in
-> @@ -0,0 +1,15 @@
-> +[Unit]
-> +Description=Bluetooth monitor logger
-> +ConditionPathIsDirectory=/sys/class/bluetooth
-> +
-> +[Service]
-> +Type=simple
-> +ExecStartPre=/usr/bin/mkdir -p /var/log/bluetooth
-> +ExecStart=/usr/libexec/bluetooth/btmon-logger -b /var/log/bluetooth/hci.log
-> +CapabilityBoundingSet=CAP_NET_RAW CAP_NET_BIND_SERVICE
-> +LimitNPROC=1
-> +ProtectHome=true
-> +ProtectSystem=full
-> +
-> +[Install]
-> +WantedBy=bluetooth.target
+> +		if (!check_min_key_size(server->min_enc_size, enc_size))
+> +			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
+> +	}
+> 
+>  	return 0;
+>  }
+> @@ -1481,7 +1510,8 @@ static bool gatt_server_register_att_handlers(struct
+> bt_gatt_server *server) }
+> 
+>  struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
+> -					struct bt_att *att, uint16_t mtu)
+> +					struct bt_att *att, uint16_t mtu,
+> +					uint8_t min_enc_size)
+>  {
+>  	struct bt_gatt_server *server;
+> 
+> @@ -1494,6 +1524,7 @@ struct bt_gatt_server *bt_gatt_server_new(struct
+> gatt_db *db, server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
+>  	server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
+>  	server->prep_queue = queue_new();
+> +	server->min_enc_size = min_enc_size;
+> 
+>  	if (!gatt_server_register_att_handlers(server)) {
+>  		bt_gatt_server_free(server);
+> diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
+> index 74a6c721e..d5d209350 100644
+> --- a/src/shared/gatt-server.h
+> +++ b/src/shared/gatt-server.h
+> @@ -26,7 +26,8 @@
+>  struct bt_gatt_server;
+> 
+>  struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
+> -					struct bt_att *att, uint16_t mtu);
+> +					struct bt_att *att, uint16_t mtu,
+> +					uint8_t min_enc_size);
+>  uint16_t bt_gatt_server_get_mtu(struct bt_gatt_server *server);
+> 
+>  struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server);
+> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
+> index fadaff2ad..89812bd75 100644
+> --- a/tools/btgatt-server.c
+> +++ b/tools/btgatt-server.c
+> @@ -583,7 +583,7 @@ static struct server *server_create(int fd, uint16_t
+> mtu, bool hr_visible) goto fail;
+>  	}
+> 
+> -	server->gatt = bt_gatt_server_new(server->db, server->att, mtu);
+> +	server->gatt = bt_gatt_server_new(server->db, server->att, mtu, 0);
+>  	if (!server->gatt) {
+>  		fprintf(stderr, "Failed to create GATT server\n");
+>  		goto fail;
+> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+> index 5d79e94c0..c7e28f865 100644
+> --- a/unit/test-gatt.c
+> +++ b/unit/test-gatt.c
+> @@ -667,7 +667,7 @@ static struct context *create_context(uint16_t mtu,
+> gconstpointer data) g_assert(context->server_db);
+> 
+>  		context->server = bt_gatt_server_new(context->server_db,
+> -							context->att, mtu);
+> +							context->att, mtu, 0);
+>  		g_assert(context->server);
+> 
+>  		bt_gatt_server_set_debug(context->server, print_debug,
 
-If there are no more comments on this I'd like to merge this in near future.
+If there are no more comments on this I'll merge it later today.
 
 -- 
 pozdrawiam
