@@ -1,511 +1,282 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4] Add support for requiring min key size for access GATT characteristics
-Date: Fri, 23 Mar 2018 09:39:19 +0100
-Message-ID: <3864433.ay3Gg6OzoQ@ix>
-In-Reply-To: <20180320135651.10781-1-szymon.janc@codecoup.pl>
-References: <20180320135651.10781-1-szymon.janc@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: BCM43341B0  Frame reassembly failed
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1521762522.7136.11.camel@deako.com>
+Date: Fri, 23 Mar 2018 09:15:24 +0100
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <C43496BC-05A7-4502-83A8-535782578878@holtmann.org>
+References: <1521668904.13274.10.camel@deako.com>
+ <81374C63-9B4D-4CDE-922B-95F15C10CB97@holtmann.org>
+ <1521759228.7136.6.camel@deako.com>
+ <D4216F60-512D-4F87-9820-7178A2742140@holtmann.org>
+ <1521762522.7136.11.camel@deako.com>
+To: Brennan Ashton <brn@deako.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Brennan,
 
-On Tuesday, 20 March 2018 14:56:51 CET Szymon Janc wrote:
-> This allows to configure bluetoothd to require minimum encryption key
-> size when accessing GATT server characteristics. It is a global
-> configuration option affecting whole GATT database.
-> ---
->  peripheral/gatt.c        |  2 +-
->  src/adapter.c            | 45 ++++++++++++++++++++++++++++++++-------------
-> src/device.c             | 15 +++++++++++++--
->  src/device.h             |  1 +
->  src/hcid.h               |  2 ++
->  src/main.c               | 17 ++++++++++++++---
->  src/main.conf            |  5 +++++
->  src/shared/att.c         | 22 +++++++++++++++++++---
->  src/shared/att.h         |  3 ++-
->  src/shared/gatt-client.c |  4 ++--
->  src/shared/gatt-server.c | 47
-> +++++++++++++++++++++++++++++++++++++++-------- src/shared/gatt-server.h | 
-> 3 ++-
->  tools/btgatt-server.c    |  2 +-
->  unit/test-gatt.c         |  2 +-
->  14 files changed, 134 insertions(+), 36 deletions(-)
+>>>>> I recently brought an Intel Edison board with a BCM43341B0 chip
+>>>>> up
+>>>>> from
+>>>>> 4.9 to 4.16.0-rc6 but I am having reliability issues when using
+>>>>> btattach instead of the previous brcm_patchram_plus utility to
+>>>>> attach
+>>>>> the device.
+>>>>> 
+>>>>> 
+>>>>> The hci communication with the bluetooth chip gets corrupted
+>>>>> almost
+>>>>> always when creating a GATT connection.  Thowing "Bluetooth:
+>>>>> hci0:
+>>>>> Frame reassembly failed (-84)" and then requiring the device to
+>>>>> be
+>>>>> reset to communicate again.
+>>>>> 
+>>>>> Kernel logs interleaved with attaching the device:
+>>>>> # /usr/bin/btattach --bredr /dev/ttyS0 -P bcm -S 3000000 &
+>>>>> # Attaching Primary controller to /dev/ttyS0
+>>>>> [   53.148206] Bluetooth: HCI UART driver ver 2.3
+>>>>> [   53.152758] Bluetooth: HCI UART protocol H4 registered
+>>>>> [   53.157970] Bluetooth: HCI UART protocol Three-wire (H5)
+>>>>> registered
+>>>>> [   53.164512] hci_bcm hci_bcm: hci_bcm device registered.
+>>>>> [   53.170445] Bluetooth: HCI UART protocol Broadcom registered
+>>>>> Switched line discipline from 0 to 15
+>>>>> Device index 0 attached
+>>>>> [   53.333220] Bluetooth: hci0: BCM: chip id 82
+>>>>> [   53.340184] Bluetooth: hci0: BCM: features 0x2f
+>>>>> [   53.368421] Bluetooth: hci0: BCM43341B0
+>>>>> [   53.372338] Bluetooth: hci0: BCM43341B0 (002.001.014) build
+>>>>> 0000
+>>>>> [   57.843684] Bluetooth: hci0: BCM (002.001.014) build 0166
+>>>> 
+>>>> if you have a chance, I like to see the complete binary btmon -w
+>>>> trace.log.
+>>> 
+>>> I have attached two traces starting the monitoring and then
+>>> attaching
+>>> the bluetooth device, first with btattach and second with the
+>>> patchram.
+>>> 
+>>> btattach-trace.log  patchram-trace.log
+>>> 
+>>> The with btattach you can see the failure on connect, with patchram
+>>> the
+>>> full connection is successful as is the disconnect.
+>>> 
+>>>> 
+>>>> However I think we need to figure out what is causing the -EILSEQ
+>>>> error in the h4_recv_buf() in hci_h4.c. There are more than one
+>>>> in it
+>>>> and you have to do some printk debugging to figure out which one
+>>>> it
+>>>> is.
+>>>> 
+>>>> So if you do something like this, then we might be able to debug
+>>>> what
+>>>> is going on in the H:4 stream.
+>>>> 
+>>>> diff --git a/drivers/bluetooth/hci_h4.c
+>>>> b/drivers/bluetooth/hci_h4.c
+>>>> index fb97a3bf069b..ba9b293f4948 100644
+>>>> --- a/drivers/bluetooth/hci_h4.c
+>>>> +++ b/drivers/bluetooth/hci_h4.c
+>>>> @@ -201,8 +201,13 @@ struct sk_buff *h4_recv_buf(struct hci_dev
+>>>> *hdev, struct sk_buff *skb,
+>>>>                       }
+>>>> 
+>>>>                       /* Check for invalid packet type */
+>>>> -                       if (!skb)
+>>>> +                       if (!skb) {
+>>>> +                               printk(KERN_INFO "H4: Invalid
+>>>> packet
+>>>> type\n");
+>>>> +                               print_hex_dump(KERN_INFO, "  ",
+>>>> +                                              DUMP_PREFIX_OFFSET
+>>>> ,
+>>>> 16, 1,
+>>>> +                                              buffer, count,
+>>>> true);
+>>>>                               return ERR_PTR(-EILSEQ);
+>>>> +                       }
+>>>> 
+>>>>                       count -= 1;
+>>>>                       buffer += 1;
+>>>> @@ -224,6 +229,9 @@ struct sk_buff *h4_recv_buf(struct hci_dev
+>>>> *hdev,
+>>>> struct sk_buff *skb,
+>>>>               }
+>>>> 
+>>>>               if (i >= pkts_count) {
+>>>> +                       printk(KERN_INFO "H4: Corrupted packet
+>>>> type\n");
+>>>> +                       print_hex_dump(KERN_INFO, "  ",
+>>>> DUMP_PREFIX_OFFSET,
+>>>> +                                      16, 1, skb->data, skb-
+>>>>> len,
+>>>> true);
+>>>>                       kfree_skb(skb);
+>>>>                       return ERR_PTR(-EILSEQ);
+>>>>               }
+>>>> @@ -259,6 +267,10 @@ struct sk_buff *h4_recv_buf(struct hci_dev
+>>>> *hdev, struct sk_buff *skb,
+>>>>                               break;
+>>>>                       default:
+>>>>                               /* Unsupported variable length */
+>>>> +                               printk(KERN_INFO "H4: Invalid
+>>>> variable len\n");
+>>>> +                               print_hex_dump(KERN_INFO, "  ",
+>>>> +                                              DUMP_PREFIX_OFFSET
+>>>> ,
+>>>> 16, 1,
+>>>> +                                              skb->data, skb-
+>>>>> len,
+>>>> true);
+>>>>                               kfree_skb(skb);
+>>>>                               return ERR_PTR(-EILSEQ);
+>>>>                       }
+>>>> 
+>>>> If the H:4 stream fails for whatever reason, then that is pretty
+>>>> bad
+>>>> since there is no recovery.
+>>> 
+>>> 
+>>> Here are the results with the printk patch:
+>>> Kernel (btattach)
+>>> 
+>>> [   73.192554] Bluetooth: HCI UART driver ver 2.3
+>>> [   73.197063] Bluetooth: HCI UART protocol H4 registered
+>>> [   73.202268] Bluetooth: HCI UART protocol Three-wire (H5)
+>>> registered
+>>> [   73.208744] hci_bcm hci_bcm: hci_bcm device registered.
+>>> [   73.214382] Bluetooth: HCI UART protocol Broadcom registered
+>>> [   73.393060] Bluetooth: hci0: BCM: chip id 82
+>>> [   73.398965] Bluetooth: hci0: BCM: features 0x2f
+>>> [   73.624991] Bluetooth: hci0: BCM43341B0
+>>> [   73.747834] Bluetooth: hci0: BCM43341B0 (002.001.014) build 0000
+>>> [   74.317254] random: crng init done
+>>> [   78.234907] Bluetooth: hci0: BCM (002.001.014) build 0166
+>>> [  124.797242] H4: Invalid packet type
+>>> [  124.800808]   00000000: 90 9a 01 00 40 00 01 01 3e 54 00 18 45
+>>> 69 24
+>>> 00  ....@...>T..Ei$.
+>>> [  124.809049]   00000010: 00 00 f4 01
+>>> 00                                   .....
+>>> [  124.816332] Bluetooth: hci0: Frame reassembly failed (-84)
+>> 
+>> so here is the problem, we detect a 0x90 packet type in the stream.
+>> If we detect that, we would need to re-synchronize to a H:4 valid
+>> packet type. Can you compare timestamps and see what the packet
+>> before and after of this is. btmon and dmesg can print absolute
+>> timestamps.
+>> 
 > 
-> diff --git a/peripheral/gatt.c b/peripheral/gatt.c
-> index 5ae19a8e5..08541c424 100644
-> --- a/peripheral/gatt.c
-> +++ b/peripheral/gatt.c
-> @@ -128,7 +128,7 @@ static struct gatt_conn *gatt_conn_new(int fd)
+> I am worried we are going to far away looking at this, since attaching
+> to the device differently seems to be triggering this. Maybe the serial
+> interface is being configured differently here:
+> https://github.com/01org/edison-firmware/blob/master/broadcom_cws/bluet
+> ooth/firmware/brcm_patchram_plus.c
 > 
->  	bt_att_set_security(conn->att, BT_SECURITY_MEDIUM);
 > 
-> -	conn->gatt = bt_gatt_server_new(gatt_db, conn->att, mtu);
-> +	conn->gatt = bt_gatt_server_new(gatt_db, conn->att, mtu, 0);
->  	if (!conn->gatt) {
->  		fprintf(stderr, "Failed to create GATT server\n");
->  		bt_att_unref(conn->att);
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 6d7d61504..6b9222bcf 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -3441,25 +3441,27 @@ failed:
->  	return ltk;
->  }
 > 
-> -static GSList *get_ltk_info(GKeyFile *key_file, const char *peer,
-> +static struct smp_ltk_info *get_ltk_info(GKeyFile *key_file, const char
-> *peer, +							uint8_t bdaddr_type)
-> +{
-> +	DBG("%s", peer);
-> +
-> +	return get_ltk(key_file, peer, bdaddr_type, "LongTermKey");
-> +}
-> +
-> +static struct smp_ltk_info *get_slave_ltk_info(GKeyFile *key_file,
-> +							const char *peer,
->  							uint8_t bdaddr_type)
->  {
->  	struct smp_ltk_info *ltk;
-> -	GSList *l = NULL;
+> I think this is what you are asking for though.  I aligned the time-
+> stamps of the kernel and btmon messages:
 > 
->  	DBG("%s", peer);
 > 
-> -	ltk = get_ltk(key_file, peer, bdaddr_type, "LongTermKey");
-> -	if (ltk)
-> -		l = g_slist_append(l, ltk);
-> -
->  	ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
-> -	if (ltk) {
-> +	if (ltk)
->  		ltk->master = false;
-> -		l = g_slist_append(l, ltk);
-> -	}
+> < HCI Command: LE Set Adve.. (0x08|0x0006) plen 15  #312 [hci0]
+> 23:35:24.170102
+>        Min advertising interval: 1280.000 msec (0x0800)
+>        Max advertising interval: 1280.000 msec (0x0800)
+>        Type: Connectable undirected - ADV_IND (0x00)
+>        Own address type: Public (0x00)
+>        Direct address type: Public (0x00)
+>        Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
+>        Channel map: 37, 38, 39 (0x07)
+>        Filter policy: Allow Scan Request from Any, Allow Connect
+> Request from Any (0x00)
+>> HCI Event: Command Complete (0x0e) plen 4         #313 [hci0]
+> 23:35:24.173680
+>      LE Set Advertising Parameters (0x08|0x0006) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: LE Set Adver.. (0x08|0x000a) plen 1  #314 [hci0]
+> 23:35:24.173990
+>        Advertising: Enabled (0x01)
+>> HCI Event: Command Complete (0x0e) plen 4         #315 [hci0]
+> 23:35:24.176283
+>      LE Set Advertise Enable (0x08|0x000a) ncmd 1
+>        Status: Success (0x00)
+> @ Control Event: 0xffff                         {0x0003} [hci0]
+> 23:35:24.176434
+>        01 00 3e 00 00 01            
 > 
-> -	return l;
-> +	return ltk;
->  }
 > 
->  static struct irk_info *get_irk_info(GKeyFile *key_file, const char *peer,
-> @@ -4019,7 +4021,9 @@ static void load_devices(struct btd_adapter *adapter)
->  		char filename[PATH_MAX];
->  		GKeyFile *key_file;
->  		struct link_key_info *key_info;
-> -		GSList *list, *ltk_info;
-> +		struct smp_ltk_info *ltk_info;
-> +		struct smp_ltk_info *slave_ltk_info;
-> +		GSList *list;
->  		struct irk_info *irk_info;
->  		struct conn_param *param;
->  		uint8_t bdaddr_type;
-> @@ -4044,7 +4048,13 @@ static void load_devices(struct btd_adapter *adapter)
-> bdaddr_type = get_le_addr_type(key_file);
-> 
->  		ltk_info = get_ltk_info(key_file, entry->d_name, bdaddr_type);
-> -		ltks = g_slist_concat(ltks, ltk_info);
-> +		if (ltk_info)
-> +			ltks = g_slist_append(ltks, ltk_info);
-> +
-> +		slave_ltk_info = get_slave_ltk_info(key_file, entry->d_name,
-> +								bdaddr_type);
-> +		if (slave_ltk_info)
-> +			ltks = g_slist_append(ltks, slave_ltk_info);
-> 
->  		irk_info = get_irk_info(key_file, entry->d_name, bdaddr_type);
->  		if (irk_info)
-> @@ -4079,9 +4089,16 @@ device_exist:
->  			device_set_bonded(device, BDADDR_BREDR);
->  		}
-> 
-> -		if (ltk_info) {
-> +		if (ltk_info || slave_ltk_info) {
->  			device_set_paired(device, bdaddr_type);
->  			device_set_bonded(device, bdaddr_type);
-> +
-> +			if (ltk_info)
-> +				device_set_ltk_enc_size(device,
-> +							ltk_info->enc_size);
-> +			else if (slave_ltk_info)
-> +				device_set_ltk_enc_size(device,
-> +						slave_ltk_info->enc_size);
->  		}
-> 
->  free:
-> @@ -7464,6 +7481,8 @@ static void new_long_term_key_callback(uint16_t index,
-> uint16_t length, device_set_bonded(device, addr->type);
->  	}
-> 
-> +	device_set_ltk_enc_size(device, ev->key.enc_size);
-> +
->  	bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
->  }
-> 
-> diff --git a/src/device.c b/src/device.c
-> index 7c7196ca1..f3c5e7925 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -243,6 +243,7 @@ struct btd_device {
-> 
->  	struct csrk_info *local_csrk;
->  	struct csrk_info *remote_csrk;
-> +	uint8_t ltk_enc_size;
-> 
->  	sdp_list_t	*tmp_records;
-> 
-> @@ -1460,6 +1461,12 @@ bool device_is_disconnecting(struct btd_device
-> *device) return device->disconn_timer > 0;
->  }
-> 
-> +void device_set_ltk_enc_size(struct btd_device *device, uint8_t enc_size)
-> +{
-> +	device->ltk_enc_size = enc_size;
-> +	bt_att_set_enc_key_size(device->att, device->ltk_enc_size);
-> +}
-> +
->  static void device_set_auto_connect(struct btd_device *device, gboolean
-> enable) {
->  	char addr[18];
-> @@ -4834,10 +4841,14 @@ static void gatt_server_init(struct btd_device
-> *device, struct gatt_db *db)
-> 
->  	gatt_server_cleanup(device);
-> 
-> -	device->server = bt_gatt_server_new(db, device->att, device->att_mtu);
-> -	if (!device->server)
-> +	device->server = bt_gatt_server_new(db, device->att, device->att_mtu,
-> +						main_opts.min_enc_key_size);
-> +	if (!device->server) {
->  		error("Failed to initialize bt_gatt_server");
-> +		return;
-> +	}
-> 
-> +	bt_att_set_enc_key_size(device->att, device->ltk_enc_size);
->  	bt_gatt_server_set_debug(device->server, gatt_debug, NULL, NULL);
->  }
-> 
-> diff --git a/src/device.h b/src/device.h
-> index bc046f780..306c813fc 100644
-> --- a/src/device.h
-> +++ b/src/device.h
-> @@ -130,6 +130,7 @@ void device_add_connection(struct btd_device *dev,
-> uint8_t bdaddr_type); void device_remove_connection(struct btd_device
-> *device, uint8_t bdaddr_type); void device_request_disconnect(struct
-> btd_device *device, DBusMessage *msg); bool device_is_disconnecting(struct
-> btd_device *device);
-> +void device_set_ltk_enc_size(struct btd_device *device, uint8_t enc_size);
-> 
->  typedef void (*disconnect_watch) (struct btd_device *device, gboolean
-> removal, void *user_data);
-> diff --git a/src/hcid.h b/src/hcid.h
-> index 62e2bd606..2c2b89d9c 100644
-> --- a/src/hcid.h
-> +++ b/src/hcid.h
-> @@ -54,6 +54,8 @@ struct main_opts {
-> 
->  	bt_mode_t	mode;
->  	bt_gatt_cache_t gatt_cache;
-> +
-> +	uint8_t		min_enc_key_size;
->  };
-> 
->  extern struct main_opts main_opts;
-> diff --git a/src/main.c b/src/main.c
-> index 21f0b14a4..7e6af42cd 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -103,6 +103,7 @@ static const char *policy_options[] = {
-> 
->  static const char *gatt_options[] = {
->  	"Cache",
-> +	"MinEncKeySize",
->  	NULL
->  };
-> 
-> @@ -402,12 +403,22 @@ static void parse_config(GKeyFile *config)
->  	if (err) {
->  		g_clear_error(&err);
->  		main_opts.gatt_cache = BT_GATT_CACHE_ALWAYS;
-> -		return;
-> +	} else {
-> +		main_opts.gatt_cache = parse_gatt_cache(str);
-> +		g_free(str);
->  	}
-> 
-> -	main_opts.gatt_cache = parse_gatt_cache(str);
-> +	val = g_key_file_get_integer(config, "GATT",
-> +						"MinEncKeySize", &err);
-> +	if (err) {
-> +		DBG("%s", err->message);
-> +		g_clear_error(&err);
-> +	} else {
-> +		DBG("MinEncKeySize=%d", val);
-> 
-> -	g_free(str);
-> +		if (val >=7 && val <= 16)
-> +			main_opts.min_enc_key_size = val;
-> +	}
->  }
-> 
->  static void init_defaults(void)
-> diff --git a/src/main.conf b/src/main.conf
-> index 21986b386..cbae32ec5 100644
-> --- a/src/main.conf
-> +++ b/src/main.conf
-> @@ -77,6 +77,11 @@
->  # Default: always
->  #Cache = always
-> 
-> +# Minimum required Encryption Key Size for accessing secured
-> characteristics. +# Possible values: 0 and 7-16. 0 means don't care.
-> +# Defaults to 0
-> +# MinEncKeySize = 0
-> +
->  [Policy]
->  #
->  # The ReconnectUUIDs defines the set of remote services that should try
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 0aab246d6..8bf3f4611 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -55,6 +55,7 @@ struct bt_att {
->  	struct io *io;
->  	bool io_on_l2cap;
->  	int io_sec_level;		/* Only used for non-L2CAP */
-> +	uint8_t enc_size;
-> 
->  	struct queue *req_queue;	/* Queued ATT protocol requests */
->  	struct att_send_op *pending_req;
-> @@ -602,7 +603,7 @@ static bool change_security(struct bt_att *att, uint8_t
-> ecode) if (att->io_sec_level != BT_ATT_SECURITY_AUTO)
->  		return false;
-> 
-> -	security = bt_att_get_security(att);
-> +	security = bt_att_get_security(att, NULL);
-> 
->  	if (ecode == BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION &&
->  					security < BT_ATT_SECURITY_MEDIUM) {
-> @@ -1454,7 +1455,7 @@ bool bt_att_unregister_all(struct bt_att *att)
->  	return true;
->  }
-> 
-> -int bt_att_get_security(struct bt_att *att)
-> +int bt_att_get_security(struct bt_att *att, uint8_t *enc_size)
->  {
->  	struct bt_security sec;
->  	socklen_t len;
-> @@ -1462,14 +1463,21 @@ int bt_att_get_security(struct bt_att *att)
->  	if (!att)
->  		return -EINVAL;
-> 
-> -	if (!att->io_on_l2cap)
-> +	if (!att->io_on_l2cap) {
-> +		if (enc_size)
-> +			*enc_size = att->enc_size;
-> +
->  		return att->io_sec_level;
-> +	}
-> 
->  	memset(&sec, 0, sizeof(sec));
->  	len = sizeof(sec);
->  	if (getsockopt(att->fd, SOL_BLUETOOTH, BT_SECURITY, &sec, &len) < 0)
->  		return -EIO;
-> 
-> +	if (enc_size)
-> +		*enc_size = att->enc_size;
-> +
->  	return sec.level;
->  }
-> 
-> @@ -1496,6 +1504,14 @@ bool bt_att_set_security(struct bt_att *att, int
-> level) return true;
->  }
-> 
-> +void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size)
-> +{
-> +	if (!att)
-> +		return;
-> +
-> +	att->enc_size = enc_size;
-> +}
-> +
->  static bool sign_set_key(struct sign_info **sign, uint8_t key[16],
->  				bt_att_counter_func_t func, void *user_data)
->  {
-> diff --git a/src/shared/att.h b/src/shared/att.h
-> index 7bffee7d6..49d93269b 100644
-> --- a/src/shared/att.h
-> +++ b/src/shared/att.h
-> @@ -84,8 +84,9 @@ bool bt_att_unregister_disconnect(struct bt_att *att,
-> unsigned int id);
-> 
->  bool bt_att_unregister_all(struct bt_att *att);
-> 
-> -int bt_att_get_security(struct bt_att *att);
-> +int bt_att_get_security(struct bt_att *att, uint8_t *enc_size);
->  bool bt_att_set_security(struct bt_att *att, int level);
-> +void bt_att_set_enc_key_size(struct bt_att *att, uint8_t enc_size);
-> 
->  bool bt_att_set_local_key(struct bt_att *att, uint8_t sign_key[16],
->  			bt_att_counter_func_t func, void *user_data);
-> diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
-> index e1d489d32..a5c7b1485 100644
-> --- a/src/shared/gatt-client.c
-> +++ b/src/shared/gatt-client.c
-> @@ -2466,7 +2466,7 @@ unsigned int bt_gatt_client_write_without_response(
-> 
->  	/* Only use signed write if unencrypted */
->  	if (signed_write) {
-> -		security = bt_att_get_security(client->att);
-> +		security = bt_att_get_security(client->att, NULL);
->  		op = security > BT_SECURITY_LOW ?  BT_ATT_OP_WRITE_CMD :
->  						BT_ATT_OP_SIGNED_WRITE_CMD;
->  	} else
-> @@ -3182,5 +3182,5 @@ int bt_gatt_client_get_security(struct bt_gatt_client
-> *client) if (!client)
->  		return -1;
-> 
-> -	return bt_att_get_security(client->att);
-> +	return bt_att_get_security(client->att, NULL);
->  }
-> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> index faa56abeb..4b554f665 100644
-> --- a/src/shared/gatt-server.c
-> +++ b/src/shared/gatt-server.c
-> @@ -103,6 +103,8 @@ struct bt_gatt_server {
->  	unsigned int prep_write_id;
->  	unsigned int exec_write_id;
-> 
-> +	uint8_t min_enc_size;
-> +
->  	struct queue *prep_queue;
->  	unsigned int max_prep_queue_len;
-> 
-> @@ -379,9 +381,18 @@ done:
->  	process_read_by_type(op);
->  }
-> 
-> +static bool check_min_key_size(uint8_t min_size, uint8_t size)
-> +{
-> +	if (!min_size || !size)
-> +		return true;
-> +
-> +	return min_size <= size;
-> +}
-> +
->  static uint8_t check_permissions(struct bt_gatt_server *server,
->  				struct gatt_db_attribute *attr, uint32_t mask)
->  {
-> +	uint8_t enc_size;
->  	uint32_t perm;
->  	int security;
-> 
-> @@ -397,15 +408,33 @@ static uint8_t check_permissions(struct bt_gatt_server
-> *server, if (!perm)
->  		return 0;
-> 
-> -	security = bt_att_get_security(server->att);
-> -	if (perm & BT_ATT_PERM_SECURE && security < BT_ATT_SECURITY_FIPS)
-> -		return BT_ATT_ERROR_AUTHENTICATION;
-> +	security = bt_att_get_security(server->att, &enc_size);
-> +	if (security < 0)
-> +		return BT_ATT_ERROR_UNLIKELY;
-> 
-> -	if (perm & BT_ATT_PERM_AUTHEN && security < BT_ATT_SECURITY_HIGH)
-> -		return BT_ATT_ERROR_AUTHENTICATION;
-> +	if (perm & BT_ATT_PERM_SECURE) {
-> +		if (security < BT_ATT_SECURITY_FIPS)
-> +			return BT_ATT_ERROR_AUTHENTICATION;
-> 
-> -	if (perm & BT_ATT_PERM_ENCRYPT && security < BT_ATT_SECURITY_MEDIUM)
-> -		return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION;
-> +		if (!check_min_key_size(server->min_enc_size, enc_size))
-> +			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
-> +	}
-> +
-> +	if (perm & BT_ATT_PERM_AUTHEN) {
-> +		if (security < BT_ATT_SECURITY_HIGH)
-> +			return BT_ATT_ERROR_AUTHENTICATION;
-> +
-> +		if (!check_min_key_size(server->min_enc_size, enc_size))
-> +			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
-> +	}
-> +
-> +	if (perm & BT_ATT_PERM_ENCRYPT) {
-> +		if (security < BT_ATT_SECURITY_MEDIUM)
-> +			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION;
-> +
-> +		if (!check_min_key_size(server->min_enc_size, enc_size))
-> +			return BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE;
-> +	}
-> 
->  	return 0;
->  }
-> @@ -1481,7 +1510,8 @@ static bool gatt_server_register_att_handlers(struct
-> bt_gatt_server *server) }
-> 
->  struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
-> -					struct bt_att *att, uint16_t mtu)
-> +					struct bt_att *att, uint16_t mtu,
-> +					uint8_t min_enc_size)
->  {
->  	struct bt_gatt_server *server;
-> 
-> @@ -1494,6 +1524,7 @@ struct bt_gatt_server *bt_gatt_server_new(struct
-> gatt_db *db, server->mtu = MAX(mtu, BT_ATT_DEFAULT_LE_MTU);
->  	server->max_prep_queue_len = DEFAULT_MAX_PREP_QUEUE_LEN;
->  	server->prep_queue = queue_new();
-> +	server->min_enc_size = min_enc_size;
-> 
->  	if (!gatt_server_register_att_handlers(server)) {
->  		bt_gatt_server_free(server);
-> diff --git a/src/shared/gatt-server.h b/src/shared/gatt-server.h
-> index 74a6c721e..d5d209350 100644
-> --- a/src/shared/gatt-server.h
-> +++ b/src/shared/gatt-server.h
-> @@ -26,7 +26,8 @@
->  struct bt_gatt_server;
-> 
->  struct bt_gatt_server *bt_gatt_server_new(struct gatt_db *db,
-> -					struct bt_att *att, uint16_t mtu);
-> +					struct bt_att *att, uint16_t mtu,
-> +					uint8_t min_enc_size);
->  uint16_t bt_gatt_server_get_mtu(struct bt_gatt_server *server);
-> 
->  struct bt_gatt_server *bt_gatt_server_ref(struct bt_gatt_server *server);
-> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-> index fadaff2ad..89812bd75 100644
-> --- a/tools/btgatt-server.c
-> +++ b/tools/btgatt-server.c
-> @@ -583,7 +583,7 @@ static struct server *server_create(int fd, uint16_t
-> mtu, bool hr_visible) goto fail;
->  	}
-> 
-> -	server->gatt = bt_gatt_server_new(server->db, server->att, mtu);
-> +	server->gatt = bt_gatt_server_new(server->db, server->att, mtu, 0);
->  	if (!server->gatt) {
->  		fprintf(stderr, "Failed to create GATT server\n");
->  		goto fail;
-> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
-> index 5d79e94c0..c7e28f865 100644
-> --- a/unit/test-gatt.c
-> +++ b/unit/test-gatt.c
-> @@ -667,7 +667,7 @@ static struct context *create_context(uint16_t mtu,
-> gconstpointer data) g_assert(context->server_db);
-> 
->  		context->server = bt_gatt_server_new(context->server_db,
-> -							context->att, mtu);
-> +							context->att, mtu, 0);
->  		g_assert(context->server);
-> 
->  		bt_gatt_server_set_debug(context->server, print_debug,
+> 2018-03-22T23:35:34,770131+0000 H4: Invalid packet type
+> 2018-03-22T23:35:34,773701+0000   00000000: 90 9a 01 00 40 00 01 01 0e
+> e7 86 49 6f 4d 24 00  ....@......IoM$.
+> 2018-03-22T23:35:34,781939+0000   00000010: 00 00 f4 01
+> 00                                   .....
+> 2018-03-22T23:35:34,789248+0000 Bluetooth: hci0: Frame reassembly
+> failed (-84)
+> 2018-03-22T23:35:35,025555+0000 Bluetooth: hci0: ACL packet for unknown
+> connection handle 64
 
-If there are no more comments on this I'll merge it later today.
+so this packet is your LE Connection Complete event, but it is for some reason garbled up.
 
--- 
-pozdrawiam
-Szymon Janc
+struct bt_hci_evt_hdr {                                                          
+        uint8_t  evt;                               = 0x90
+        uint8_t  plen;                              = 0x9a
+} __attribute__ ((packed));
 
+#define BT_HCI_EVT_LE_CONN_COMPLETE                 = 0x01
+struct bt_hci_evt_le_conn_complete {
+        uint8_t  status;                            = 0x00
+        uint16_t handle;                            = 0x40 0x00
+        uint8_t  role;                              = 0x01
+        uint8_t  peer_addr_type;                    = 0x01
+        uint8_t  peer_addr[6];                      = 0x0e 0xe7 0x86 0x49 0x6f 0x4d
+        uint16_t interval;                          = 0x24 0x00
+        uint16_t latency;                           = 0x00 0x00
+        uint16_t supv_timeout;                      = 0xf4 0x01
+        uint8_t  clock_accuracy;                    = 0x00
+} __attribute__ ((packed));
+
+The header part of that is totally garbage and also one octet short since it is missing the 0x04 in front of it. This accidentally doesn’t make the whole stream fall flat on its face, because we drop the whole SKB and don’t try to re-synchronize.
+
+So I assume you have an incoming connection and you are trying to act as peripheral.
+
+Maybe the hu->padding and hu->alignment is causing some issue in h4_recv_buf. So you might want remove this part and see if that makes any difference.
+
+                /* remove padding bytes from buffer */
+                for (; hu->padding && count > 0; hu->padding--) {
+                        count--;
+                        buffer++;
+                }
+
+Other than that it will be most likely some issue in the transport. Maybe it is as simple as having the operational speed configured. I saw in the trace that for the Edison board, we seem to skip it.
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index ff8435ce163c..5f8d78cb7e64 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1024,6 +1024,8 @@ static int bcm_probe(struct platform_device *pdev)
+                        return ret;
+        }
+ 
++       dev->oper_speed = 115200;
++
+        ret = bcm_get_resources(dev);
+        if (ret)
+                return ret;
+
+If I am not mistaken, then the above should do that for the Edison platform device. You can set it higher, but I would try with the default one and then check if it shows up in the btmon trace. It could be well that it needs to be faster so that the ACL packets and HCI event packets can leave the controller as fast as possible. So by all means try to set it to 3000000 as well.
+
+My main problem with Edison is that the platform is not yet serdev enabled. Nobody wants to spend any time in making it done properly. So if the dev->oper_speed does not result in the HCI UART speed change command as first command, we need to figure out where to put this information.
+
+Regards
+
+Marcel
 
