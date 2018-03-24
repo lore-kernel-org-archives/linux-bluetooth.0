@@ -1,218 +1,751 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] Bluetooth: bpa10x: Use separate h4_recv_buf helper
-Date: Sat, 24 Mar 2018 10:19:53 +0100
-Message-Id: <20180324091954.73229-2-marcel@holtmann.org>
+Subject: [PATCH v2 3/3] Bluetooth: Remove unused btuart_cs driver
+Date: Sat, 24 Mar 2018 10:19:54 +0100
+Message-Id: <20180324091954.73229-3-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When adding the alignment and padding support for H:4 packet processing
-for the Nokia driver, it broke the h4_recv_buf usage within bpa10x
-driver. To fix this use a separate helper function and placing it into a
-dedicated h4_recv.h header file.
+With patch 279c936153199 the btuart_cs driver has been deprecated in
+favor of serial_cs + hci_uart combination.
+
+  static struct pcmcia_device_id btuart_ids[] = {
+         /* don't use this driver. Use serial_cs + hci_uart instead */
+         PCMCIA_DEVICE_NULL
+  };
+
+Intead of keeping it around, just remove it since it is not even
+assigned to any PCMCIA identifiers anymore.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/Kconfig   |   3 +-
- drivers/bluetooth/bpa10x.c  |   2 +-
- drivers/bluetooth/h4_recv.h | 160 ++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 162 insertions(+), 3 deletions(-)
- create mode 100644 drivers/bluetooth/h4_recv.h
+ drivers/bluetooth/Kconfig     |  16 -
+ drivers/bluetooth/Makefile    |   1 -
+ drivers/bluetooth/btuart_cs.c | 675 ------------------------------------------
+ 3 files changed, 692 deletions(-)
+ delete mode 100644 drivers/bluetooth/btuart_cs.c
 
 diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index d2abcb768ae8..de13c0e2bfc2 100644
+index de13c0e2bfc2..de3f23df87d8 100644
 --- a/drivers/bluetooth/Kconfig
 +++ b/drivers/bluetooth/Kconfig
-@@ -243,8 +243,7 @@ config BT_HCIBCM203X
+@@ -305,22 +305,6 @@ config BT_HCIBLUECARD
+ 	  Say Y here to compile support for HCI BlueCard devices into the
+ 	  kernel or say M to compile it as module (bluecard_cs).
  
- config BT_HCIBPA10X
- 	tristate "HCI BPA10x USB driver"
--	depends on USB && BT_HCIUART
--	select BT_HCIUART_H4
-+	depends on USB
+-config BT_HCIBTUART
+-	tristate "HCI UART (PC Card) device driver"
+-	depends on PCMCIA
+-	help
+-	  Bluetooth HCI UART (PC Card) driver.
+-	  This driver provides support for Bluetooth PCMCIA devices with
+-	  an UART interface:
+-	     Xircom CreditCard Bluetooth Adapter
+-	     Xircom RealPort2 Bluetooth Adapter
+-	     Sphinx PICO Card
+-	     H-Soft blue+Card
+-	     Cyber-blue Compact Flash Card
+-
+-	  Say Y here to compile support for HCI UART devices into the
+-	  kernel or say M to compile it as module (btuart_cs).
+-
+ config BT_HCIVHCI
+ 	tristate "HCI VHCI (Virtual HCI device) driver"
  	help
- 	  Bluetooth HCI BPA10x USB driver.
- 	  This driver provides support for the Digianswer BPA 100/105 Bluetooth
-diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
-index 801ea4ca65e4..c6f7cc57db14 100644
---- a/drivers/bluetooth/bpa10x.c
-+++ b/drivers/bluetooth/bpa10x.c
-@@ -35,7 +35,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 4e4e44d09796..e0c147129358 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -11,7 +11,6 @@ obj-$(CONFIG_BT_HCIBFUSB)	+= bfusb.o
+ obj-$(CONFIG_BT_HCIDTL1)	+= dtl1_cs.o
+ obj-$(CONFIG_BT_HCIBT3C)	+= bt3c_cs.o
+ obj-$(CONFIG_BT_HCIBLUECARD)	+= bluecard_cs.o
+-obj-$(CONFIG_BT_HCIBTUART)	+= btuart_cs.o
  
--#include "hci_uart.h"
-+#include "h4_recv.h"
- 
- #define VERSION "0.11"
- 
-diff --git a/drivers/bluetooth/h4_recv.h b/drivers/bluetooth/h4_recv.h
-new file mode 100644
-index 000000000000..b432651f8236
---- /dev/null
-+++ b/drivers/bluetooth/h4_recv.h
-@@ -0,0 +1,160 @@
-+/*
-+ *
-+ *  Generic Bluetooth HCI UART driver
-+ *
-+ *  Copyright (C) 2015-2018  Intel Corporation
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-+ *
-+ */
-+
-+#include <asm/unaligned.h>
-+
-+struct h4_recv_pkt {
-+	u8  type;	/* Packet type */
-+	u8  hlen;	/* Header length */
-+	u8  loff;	/* Data length offset in header */
-+	u8  lsize;	/* Data length field size */
-+	u16 maxlen;	/* Max overall packet length */
-+	int (*recv)(struct hci_dev *hdev, struct sk_buff *skb);
-+};
-+
-+#define H4_RECV_ACL \
-+	.type = HCI_ACLDATA_PKT, \
-+	.hlen = HCI_ACL_HDR_SIZE, \
-+	.loff = 2, \
-+	.lsize = 2, \
-+	.maxlen = HCI_MAX_FRAME_SIZE \
-+
-+#define H4_RECV_SCO \
-+	.type = HCI_SCODATA_PKT, \
-+	.hlen = HCI_SCO_HDR_SIZE, \
-+	.loff = 2, \
-+	.lsize = 1, \
-+	.maxlen = HCI_MAX_SCO_SIZE
-+
-+#define H4_RECV_EVENT \
-+	.type = HCI_EVENT_PKT, \
-+	.hlen = HCI_EVENT_HDR_SIZE, \
-+	.loff = 1, \
-+	.lsize = 1, \
-+	.maxlen = HCI_MAX_EVENT_SIZE
-+
-+static inline struct sk_buff *h4_recv_buf(struct hci_dev *hdev,
-+					  struct sk_buff *skb,
-+					  const unsigned char *buffer,
-+					  int count,
-+					  const struct h4_recv_pkt *pkts,
-+					  int pkts_count)
-+{
-+	while (count) {
-+		int i, len;
-+
-+		if (!count)
-+			break;
-+
-+		if (!skb) {
-+			for (i = 0; i < pkts_count; i++) {
-+				if (buffer[0] != (&pkts[i])->type)
-+					continue;
-+
-+				skb = bt_skb_alloc((&pkts[i])->maxlen,
-+						   GFP_ATOMIC);
-+				if (!skb)
-+					return ERR_PTR(-ENOMEM);
-+
-+				hci_skb_pkt_type(skb) = (&pkts[i])->type;
-+				hci_skb_expect(skb) = (&pkts[i])->hlen;
-+				break;
-+			}
-+
-+			/* Check for invalid packet type */
-+			if (!skb)
-+				return ERR_PTR(-EILSEQ);
-+
-+			count -= 1;
-+			buffer += 1;
-+		}
-+
-+		len = min_t(uint, hci_skb_expect(skb) - skb->len, count);
-+		skb_put_data(skb, buffer, len);
-+
-+		count -= len;
-+		buffer += len;
-+
-+		/* Check for partial packet */
-+		if (skb->len < hci_skb_expect(skb))
-+			continue;
-+
-+		for (i = 0; i < pkts_count; i++) {
-+			if (hci_skb_pkt_type(skb) == (&pkts[i])->type)
-+				break;
-+		}
-+
-+		if (i >= pkts_count) {
-+			kfree_skb(skb);
-+			return ERR_PTR(-EILSEQ);
-+		}
-+
-+		if (skb->len == (&pkts[i])->hlen) {
-+			u16 dlen;
-+
-+			switch ((&pkts[i])->lsize) {
-+			case 0:
-+				/* No variable data length */
-+				dlen = 0;
-+				break;
-+			case 1:
-+				/* Single octet variable length */
-+				dlen = skb->data[(&pkts[i])->loff];
-+				hci_skb_expect(skb) += dlen;
-+
-+				if (skb_tailroom(skb) < dlen) {
-+					kfree_skb(skb);
-+					return ERR_PTR(-EMSGSIZE);
-+				}
-+				break;
-+			case 2:
-+				/* Double octet variable length */
-+				dlen = get_unaligned_le16(skb->data +
-+							  (&pkts[i])->loff);
-+				hci_skb_expect(skb) += dlen;
-+
-+				if (skb_tailroom(skb) < dlen) {
-+					kfree_skb(skb);
-+					return ERR_PTR(-EMSGSIZE);
-+				}
-+				break;
-+			default:
-+				/* Unsupported variable length */
-+				kfree_skb(skb);
-+				return ERR_PTR(-EILSEQ);
-+			}
-+
-+			if (!dlen) {
-+				/* No more data, complete frame */
-+				(&pkts[i])->recv(hdev, skb);
-+				skb = NULL;
-+			}
-+		} else {
-+			/* Complete frame */
-+			(&pkts[i])->recv(hdev, skb);
-+			skb = NULL;
-+		}
-+	}
-+
-+	return skb;
-+}
+ obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
+ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
+diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
+deleted file mode 100644
+index 310e9c2e09b6..000000000000
+--- a/drivers/bluetooth/btuart_cs.c
++++ /dev/null
+@@ -1,675 +0,0 @@
+-/*
+- *
+- *  Driver for Bluetooth PCMCIA cards with HCI UART interface
+- *
+- *  Copyright (C) 2001-2002  Marcel Holtmann <marcel@holtmann.org>
+- *
+- *
+- *  This program is free software; you can redistribute it and/or modify
+- *  it under the terms of the GNU General Public License version 2 as
+- *  published by the Free Software Foundation;
+- *
+- *  Software distributed under the License is distributed on an "AS
+- *  IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or
+- *  implied. See the License for the specific language governing
+- *  rights and limitations under the License.
+- *
+- *  The initial developer of the original code is David A. Hinds
+- *  <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
+- *  are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
+- *
+- */
+-
+-#include <linux/module.h>
+-
+-#include <linux/kernel.h>
+-#include <linux/init.h>
+-#include <linux/slab.h>
+-#include <linux/types.h>
+-#include <linux/delay.h>
+-#include <linux/errno.h>
+-#include <linux/ptrace.h>
+-#include <linux/ioport.h>
+-#include <linux/spinlock.h>
+-#include <linux/moduleparam.h>
+-
+-#include <linux/skbuff.h>
+-#include <linux/string.h>
+-#include <linux/serial.h>
+-#include <linux/serial_reg.h>
+-#include <linux/bitops.h>
+-#include <linux/io.h>
+-
+-#include <pcmcia/cistpl.h>
+-#include <pcmcia/ciscode.h>
+-#include <pcmcia/ds.h>
+-#include <pcmcia/cisreg.h>
+-
+-#include <net/bluetooth/bluetooth.h>
+-#include <net/bluetooth/hci_core.h>
+-
+-
+-
+-/* ======================== Module parameters ======================== */
+-
+-
+-MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+-MODULE_DESCRIPTION("Bluetooth driver for Bluetooth PCMCIA cards with HCI UART interface");
+-MODULE_LICENSE("GPL");
+-
+-
+-
+-/* ======================== Local structures ======================== */
+-
+-
+-struct btuart_info {
+-	struct pcmcia_device *p_dev;
+-
+-	struct hci_dev *hdev;
+-
+-	spinlock_t lock;	/* For serializing operations */
+-
+-	struct sk_buff_head txq;
+-	unsigned long tx_state;
+-
+-	unsigned long rx_state;
+-	unsigned long rx_count;
+-	struct sk_buff *rx_skb;
+-};
+-
+-
+-static int btuart_config(struct pcmcia_device *link);
+-static void btuart_release(struct pcmcia_device *link);
+-
+-static void btuart_detach(struct pcmcia_device *p_dev);
+-
+-
+-/* Maximum baud rate */
+-#define SPEED_MAX  115200
+-
+-/* Default baud rate: 57600, 115200, 230400 or 460800 */
+-#define DEFAULT_BAUD_RATE  115200
+-
+-
+-/* Transmit states  */
+-#define XMIT_SENDING	1
+-#define XMIT_WAKEUP	2
+-#define XMIT_WAITING	8
+-
+-/* Receiver states */
+-#define RECV_WAIT_PACKET_TYPE	0
+-#define RECV_WAIT_EVENT_HEADER	1
+-#define RECV_WAIT_ACL_HEADER	2
+-#define RECV_WAIT_SCO_HEADER	3
+-#define RECV_WAIT_DATA		4
+-
+-
+-
+-/* ======================== Interrupt handling ======================== */
+-
+-
+-static int btuart_write(unsigned int iobase, int fifo_size, __u8 *buf, int len)
+-{
+-	int actual = 0;
+-
+-	/* Tx FIFO should be empty */
+-	if (!(inb(iobase + UART_LSR) & UART_LSR_THRE))
+-		return 0;
+-
+-	/* Fill FIFO with current frame */
+-	while ((fifo_size-- > 0) && (actual < len)) {
+-		/* Transmit next byte */
+-		outb(buf[actual], iobase + UART_TX);
+-		actual++;
+-	}
+-
+-	return actual;
+-}
+-
+-
+-static void btuart_write_wakeup(struct btuart_info *info)
+-{
+-	if (!info) {
+-		BT_ERR("Unknown device");
+-		return;
+-	}
+-
+-	if (test_and_set_bit(XMIT_SENDING, &(info->tx_state))) {
+-		set_bit(XMIT_WAKEUP, &(info->tx_state));
+-		return;
+-	}
+-
+-	do {
+-		unsigned int iobase = info->p_dev->resource[0]->start;
+-		register struct sk_buff *skb;
+-		int len;
+-
+-		clear_bit(XMIT_WAKEUP, &(info->tx_state));
+-
+-		if (!pcmcia_dev_present(info->p_dev))
+-			return;
+-
+-		skb = skb_dequeue(&(info->txq));
+-		if (!skb)
+-			break;
+-
+-		/* Send frame */
+-		len = btuart_write(iobase, 16, skb->data, skb->len);
+-		set_bit(XMIT_WAKEUP, &(info->tx_state));
+-
+-		if (len == skb->len) {
+-			kfree_skb(skb);
+-		} else {
+-			skb_pull(skb, len);
+-			skb_queue_head(&(info->txq), skb);
+-		}
+-
+-		info->hdev->stat.byte_tx += len;
+-
+-	} while (test_bit(XMIT_WAKEUP, &(info->tx_state)));
+-
+-	clear_bit(XMIT_SENDING, &(info->tx_state));
+-}
+-
+-
+-static void btuart_receive(struct btuart_info *info)
+-{
+-	unsigned int iobase;
+-	int boguscount = 0;
+-
+-	if (!info) {
+-		BT_ERR("Unknown device");
+-		return;
+-	}
+-
+-	iobase = info->p_dev->resource[0]->start;
+-
+-	do {
+-		info->hdev->stat.byte_rx++;
+-
+-		/* Allocate packet */
+-		if (!info->rx_skb) {
+-			info->rx_state = RECV_WAIT_PACKET_TYPE;
+-			info->rx_count = 0;
+-			info->rx_skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
+-			if (!info->rx_skb) {
+-				BT_ERR("Can't allocate mem for new packet");
+-				return;
+-			}
+-		}
+-
+-		if (info->rx_state == RECV_WAIT_PACKET_TYPE) {
+-
+-			hci_skb_pkt_type(info->rx_skb) = inb(iobase + UART_RX);
+-
+-			switch (hci_skb_pkt_type(info->rx_skb)) {
+-
+-			case HCI_EVENT_PKT:
+-				info->rx_state = RECV_WAIT_EVENT_HEADER;
+-				info->rx_count = HCI_EVENT_HDR_SIZE;
+-				break;
+-
+-			case HCI_ACLDATA_PKT:
+-				info->rx_state = RECV_WAIT_ACL_HEADER;
+-				info->rx_count = HCI_ACL_HDR_SIZE;
+-				break;
+-
+-			case HCI_SCODATA_PKT:
+-				info->rx_state = RECV_WAIT_SCO_HEADER;
+-				info->rx_count = HCI_SCO_HDR_SIZE;
+-				break;
+-
+-			default:
+-				/* Unknown packet */
+-				BT_ERR("Unknown HCI packet with type 0x%02x received",
+-				       hci_skb_pkt_type(info->rx_skb));
+-				info->hdev->stat.err_rx++;
+-
+-				kfree_skb(info->rx_skb);
+-				info->rx_skb = NULL;
+-				break;
+-
+-			}
+-
+-		} else {
+-
+-			skb_put_u8(info->rx_skb, inb(iobase + UART_RX));
+-			info->rx_count--;
+-
+-			if (info->rx_count == 0) {
+-
+-				int dlen;
+-				struct hci_event_hdr *eh;
+-				struct hci_acl_hdr *ah;
+-				struct hci_sco_hdr *sh;
+-
+-
+-				switch (info->rx_state) {
+-
+-				case RECV_WAIT_EVENT_HEADER:
+-					eh = hci_event_hdr(info->rx_skb);
+-					info->rx_state = RECV_WAIT_DATA;
+-					info->rx_count = eh->plen;
+-					break;
+-
+-				case RECV_WAIT_ACL_HEADER:
+-					ah = hci_acl_hdr(info->rx_skb);
+-					dlen = __le16_to_cpu(ah->dlen);
+-					info->rx_state = RECV_WAIT_DATA;
+-					info->rx_count = dlen;
+-					break;
+-
+-				case RECV_WAIT_SCO_HEADER:
+-					sh = hci_sco_hdr(info->rx_skb);
+-					info->rx_state = RECV_WAIT_DATA;
+-					info->rx_count = sh->dlen;
+-					break;
+-
+-				case RECV_WAIT_DATA:
+-					hci_recv_frame(info->hdev, info->rx_skb);
+-					info->rx_skb = NULL;
+-					break;
+-
+-				}
+-
+-			}
+-
+-		}
+-
+-		/* Make sure we don't stay here too long */
+-		if (boguscount++ > 16)
+-			break;
+-
+-	} while (inb(iobase + UART_LSR) & UART_LSR_DR);
+-}
+-
+-
+-static irqreturn_t btuart_interrupt(int irq, void *dev_inst)
+-{
+-	struct btuart_info *info = dev_inst;
+-	unsigned int iobase;
+-	int boguscount = 0;
+-	int iir, lsr;
+-	irqreturn_t r = IRQ_NONE;
+-
+-	if (!info || !info->hdev)
+-		/* our irq handler is shared */
+-		return IRQ_NONE;
+-
+-	iobase = info->p_dev->resource[0]->start;
+-
+-	spin_lock(&(info->lock));
+-
+-	iir = inb(iobase + UART_IIR) & UART_IIR_ID;
+-	while (iir) {
+-		r = IRQ_HANDLED;
+-
+-		/* Clear interrupt */
+-		lsr = inb(iobase + UART_LSR);
+-
+-		switch (iir) {
+-		case UART_IIR_RLSI:
+-			BT_ERR("RLSI");
+-			break;
+-		case UART_IIR_RDI:
+-			/* Receive interrupt */
+-			btuart_receive(info);
+-			break;
+-		case UART_IIR_THRI:
+-			if (lsr & UART_LSR_THRE) {
+-				/* Transmitter ready for data */
+-				btuart_write_wakeup(info);
+-			}
+-			break;
+-		default:
+-			BT_ERR("Unhandled IIR=%#x", iir);
+-			break;
+-		}
+-
+-		/* Make sure we don't stay here too long */
+-		if (boguscount++ > 100)
+-			break;
+-
+-		iir = inb(iobase + UART_IIR) & UART_IIR_ID;
+-
+-	}
+-
+-	spin_unlock(&(info->lock));
+-
+-	return r;
+-}
+-
+-
+-static void btuart_change_speed(struct btuart_info *info,
+-				unsigned int speed)
+-{
+-	unsigned long flags;
+-	unsigned int iobase;
+-	int fcr;		/* FIFO control reg */
+-	int lcr;		/* Line control reg */
+-	int divisor;
+-
+-	if (!info) {
+-		BT_ERR("Unknown device");
+-		return;
+-	}
+-
+-	iobase = info->p_dev->resource[0]->start;
+-
+-	spin_lock_irqsave(&(info->lock), flags);
+-
+-	/* Turn off interrupts */
+-	outb(0, iobase + UART_IER);
+-
+-	divisor = SPEED_MAX / speed;
+-
+-	fcr = UART_FCR_ENABLE_FIFO | UART_FCR_CLEAR_RCVR | UART_FCR_CLEAR_XMIT;
+-
+-	/* 
+-	 * Use trigger level 1 to avoid 3 ms. timeout delay at 9600 bps, and
+-	 * almost 1,7 ms at 19200 bps. At speeds above that we can just forget
+-	 * about this timeout since it will always be fast enough. 
+-	 */
+-
+-	if (speed < 38400)
+-		fcr |= UART_FCR_TRIGGER_1;
+-	else
+-		fcr |= UART_FCR_TRIGGER_14;
+-
+-	/* Bluetooth cards use 8N1 */
+-	lcr = UART_LCR_WLEN8;
+-
+-	outb(UART_LCR_DLAB | lcr, iobase + UART_LCR);	/* Set DLAB */
+-	outb(divisor & 0xff, iobase + UART_DLL);	/* Set speed */
+-	outb(divisor >> 8, iobase + UART_DLM);
+-	outb(lcr, iobase + UART_LCR);	/* Set 8N1  */
+-	outb(fcr, iobase + UART_FCR);	/* Enable FIFO's */
+-
+-	/* Turn on interrupts */
+-	outb(UART_IER_RLSI | UART_IER_RDI | UART_IER_THRI, iobase + UART_IER);
+-
+-	spin_unlock_irqrestore(&(info->lock), flags);
+-}
+-
+-
+-
+-/* ======================== HCI interface ======================== */
+-
+-
+-static int btuart_hci_flush(struct hci_dev *hdev)
+-{
+-	struct btuart_info *info = hci_get_drvdata(hdev);
+-
+-	/* Drop TX queue */
+-	skb_queue_purge(&(info->txq));
+-
+-	return 0;
+-}
+-
+-
+-static int btuart_hci_open(struct hci_dev *hdev)
+-{
+-	return 0;
+-}
+-
+-
+-static int btuart_hci_close(struct hci_dev *hdev)
+-{
+-	btuart_hci_flush(hdev);
+-
+-	return 0;
+-}
+-
+-
+-static int btuart_hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+-{
+-	struct btuart_info *info = hci_get_drvdata(hdev);
+-
+-	switch (hci_skb_pkt_type(skb)) {
+-	case HCI_COMMAND_PKT:
+-		hdev->stat.cmd_tx++;
+-		break;
+-	case HCI_ACLDATA_PKT:
+-		hdev->stat.acl_tx++;
+-		break;
+-	case HCI_SCODATA_PKT:
+-		hdev->stat.sco_tx++;
+-		break;
+-	}
+-
+-	/* Prepend skb with frame type */
+-	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+-	skb_queue_tail(&(info->txq), skb);
+-
+-	btuart_write_wakeup(info);
+-
+-	return 0;
+-}
+-
+-
+-
+-/* ======================== Card services HCI interaction ======================== */
+-
+-
+-static int btuart_open(struct btuart_info *info)
+-{
+-	unsigned long flags;
+-	unsigned int iobase = info->p_dev->resource[0]->start;
+-	struct hci_dev *hdev;
+-
+-	spin_lock_init(&(info->lock));
+-
+-	skb_queue_head_init(&(info->txq));
+-
+-	info->rx_state = RECV_WAIT_PACKET_TYPE;
+-	info->rx_count = 0;
+-	info->rx_skb = NULL;
+-
+-	/* Initialize HCI device */
+-	hdev = hci_alloc_dev();
+-	if (!hdev) {
+-		BT_ERR("Can't allocate HCI device");
+-		return -ENOMEM;
+-	}
+-
+-	info->hdev = hdev;
+-
+-	hdev->bus = HCI_PCCARD;
+-	hci_set_drvdata(hdev, info);
+-	SET_HCIDEV_DEV(hdev, &info->p_dev->dev);
+-
+-	hdev->open  = btuart_hci_open;
+-	hdev->close = btuart_hci_close;
+-	hdev->flush = btuart_hci_flush;
+-	hdev->send  = btuart_hci_send_frame;
+-
+-	spin_lock_irqsave(&(info->lock), flags);
+-
+-	/* Reset UART */
+-	outb(0, iobase + UART_MCR);
+-
+-	/* Turn off interrupts */
+-	outb(0, iobase + UART_IER);
+-
+-	/* Initialize UART */
+-	outb(UART_LCR_WLEN8, iobase + UART_LCR);	/* Reset DLAB */
+-	outb((UART_MCR_DTR | UART_MCR_RTS | UART_MCR_OUT2), iobase + UART_MCR);
+-
+-	/* Turn on interrupts */
+-	// outb(UART_IER_RLSI | UART_IER_RDI | UART_IER_THRI, iobase + UART_IER);
+-
+-	spin_unlock_irqrestore(&(info->lock), flags);
+-
+-	btuart_change_speed(info, DEFAULT_BAUD_RATE);
+-
+-	/* Timeout before it is safe to send the first HCI packet */
+-	msleep(1000);
+-
+-	/* Register HCI device */
+-	if (hci_register_dev(hdev) < 0) {
+-		BT_ERR("Can't register HCI device");
+-		info->hdev = NULL;
+-		hci_free_dev(hdev);
+-		return -ENODEV;
+-	}
+-
+-	return 0;
+-}
+-
+-
+-static int btuart_close(struct btuart_info *info)
+-{
+-	unsigned long flags;
+-	unsigned int iobase = info->p_dev->resource[0]->start;
+-	struct hci_dev *hdev = info->hdev;
+-
+-	if (!hdev)
+-		return -ENODEV;
+-
+-	btuart_hci_close(hdev);
+-
+-	spin_lock_irqsave(&(info->lock), flags);
+-
+-	/* Reset UART */
+-	outb(0, iobase + UART_MCR);
+-
+-	/* Turn off interrupts */
+-	outb(0, iobase + UART_IER);
+-
+-	spin_unlock_irqrestore(&(info->lock), flags);
+-
+-	hci_unregister_dev(hdev);
+-	hci_free_dev(hdev);
+-
+-	return 0;
+-}
+-
+-static int btuart_probe(struct pcmcia_device *link)
+-{
+-	struct btuart_info *info;
+-
+-	/* Create new info device */
+-	info = devm_kzalloc(&link->dev, sizeof(*info), GFP_KERNEL);
+-	if (!info)
+-		return -ENOMEM;
+-
+-	info->p_dev = link;
+-	link->priv = info;
+-
+-	link->config_flags |= CONF_ENABLE_IRQ | CONF_AUTO_SET_VPP |
+-		CONF_AUTO_SET_IO;
+-
+-	return btuart_config(link);
+-}
+-
+-
+-static void btuart_detach(struct pcmcia_device *link)
+-{
+-	btuart_release(link);
+-}
+-
+-static int btuart_check_config(struct pcmcia_device *p_dev, void *priv_data)
+-{
+-	int *try = priv_data;
+-
+-	if (!try)
+-		p_dev->io_lines = 16;
+-
+-	if ((p_dev->resource[0]->end != 8) || (p_dev->resource[0]->start == 0))
+-		return -EINVAL;
+-
+-	p_dev->resource[0]->end = 8;
+-	p_dev->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
+-	p_dev->resource[0]->flags |= IO_DATA_PATH_WIDTH_8;
+-
+-	return pcmcia_request_io(p_dev);
+-}
+-
+-static int btuart_check_config_notpicky(struct pcmcia_device *p_dev,
+-					void *priv_data)
+-{
+-	static unsigned int base[5] = { 0x3f8, 0x2f8, 0x3e8, 0x2e8, 0x0 };
+-	int j;
+-
+-	if (p_dev->io_lines > 3)
+-		return -ENODEV;
+-
+-	p_dev->resource[0]->flags &= ~IO_DATA_PATH_WIDTH;
+-	p_dev->resource[0]->flags |= IO_DATA_PATH_WIDTH_8;
+-	p_dev->resource[0]->end = 8;
+-
+-	for (j = 0; j < 5; j++) {
+-		p_dev->resource[0]->start = base[j];
+-		p_dev->io_lines = base[j] ? 16 : 3;
+-		if (!pcmcia_request_io(p_dev))
+-			return 0;
+-	}
+-	return -ENODEV;
+-}
+-
+-static int btuart_config(struct pcmcia_device *link)
+-{
+-	struct btuart_info *info = link->priv;
+-	int i;
+-	int try;
+-
+-	/* First pass: look for a config entry that looks normal.
+-	 * Two tries: without IO aliases, then with aliases
+-	 */
+-	for (try = 0; try < 2; try++)
+-		if (!pcmcia_loop_config(link, btuart_check_config, &try))
+-			goto found_port;
+-
+-	/* Second pass: try to find an entry that isn't picky about
+-	 * its base address, then try to grab any standard serial port
+-	 * address, and finally try to get any free port.
+-	 */
+-	if (!pcmcia_loop_config(link, btuart_check_config_notpicky, NULL))
+-		goto found_port;
+-
+-	BT_ERR("No usable port range found");
+-	goto failed;
+-
+-found_port:
+-	i = pcmcia_request_irq(link, btuart_interrupt);
+-	if (i != 0)
+-		goto failed;
+-
+-	i = pcmcia_enable_device(link);
+-	if (i != 0)
+-		goto failed;
+-
+-	if (btuart_open(info) != 0)
+-		goto failed;
+-
+-	return 0;
+-
+-failed:
+-	btuart_release(link);
+-	return -ENODEV;
+-}
+-
+-
+-static void btuart_release(struct pcmcia_device *link)
+-{
+-	struct btuart_info *info = link->priv;
+-
+-	btuart_close(info);
+-
+-	pcmcia_disable_device(link);
+-}
+-
+-static const struct pcmcia_device_id btuart_ids[] = {
+-	/* don't use this driver. Use serial_cs + hci_uart instead */
+-	PCMCIA_DEVICE_NULL
+-};
+-MODULE_DEVICE_TABLE(pcmcia, btuart_ids);
+-
+-static struct pcmcia_driver btuart_driver = {
+-	.owner		= THIS_MODULE,
+-	.name		= "btuart_cs",
+-	.probe		= btuart_probe,
+-	.remove		= btuart_detach,
+-	.id_table	= btuart_ids,
+-};
+-module_pcmcia_driver(btuart_driver);
 -- 
 2.14.3
 
