@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] client: Attempt to convert the device path to address
-Date: Mon, 26 Mar 2018 16:33:04 +0300
-Message-Id: <20180326133304.14531-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] client: Add envs for proxies
+Date: Mon, 26 Mar 2018 16:33:03 +0300
+Message-Id: <20180326133304.14531-3-luiz.dentz@gmail.com>
 In-Reply-To: <20180326133304.14531-1-luiz.dentz@gmail.com>
 References: <20180326133304.14531-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,89 +11,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Printing the object path is not only long but it also may change.
+This adds envs for device and adapter proxies found so other files are
+able to access them.
 ---
- client/gatt.c | 32 ++++++++++++++++++++++++--------
- 1 file changed, 24 insertions(+), 8 deletions(-)
+ client/main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/client/gatt.c b/client/gatt.c
-index cbf7adf57..7103c4f83 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -1415,6 +1415,20 @@ static const GDBusPropertyTable chrc_properties[] = {
- 	{ }
- };
+diff --git a/client/main.c b/client/main.c
+index 584217a82..a36e932ac 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -456,6 +456,7 @@ static void device_added(GDBusProxy *proxy)
  
-+static const char *path_to_address(const char *path)
-+{
-+	GDBusProxy *proxy;
-+	DBusMessageIter iter;
-+	const char *address = path;
-+
-+	proxy = bt_shell_get_env(path);
-+
-+	if (g_dbus_proxy_get_property(proxy, "Address", &iter))
-+		dbus_message_iter_get_basic(&iter, &address);
-+
-+	return address;
-+}
-+
- static int parse_options(DBusMessageIter *iter, uint16_t *offset, uint16_t *mtu,
- 						char **device, char **link)
- {
-@@ -1539,8 +1553,8 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
+ 	adapter->devices = g_list_append(adapter->devices, proxy);
+ 	print_device(proxy, COLORED_NEW);
++	bt_shell_set_env(g_dbus_proxy_get_path(proxy), proxy);
  
--	bt_shell_printf("ReadValue: %s offset %u link %s\n", device, offset,
--								link);
-+	bt_shell_printf("ReadValue: %s offset %u link %s\n",
-+			path_to_address(device), offset, link);
+ 	if (default_dev)
+ 		return;
+@@ -494,6 +495,7 @@ static void adapter_added(GDBusProxy *proxy)
+ 	adapter->proxy = proxy;
  
- 	if (chrc->authorization_req && offset == 0)
- 		chrc->authorized = false;
-@@ -1722,7 +1736,8 @@ static DBusMessage *chrc_acquire_write(DBusConnection *conn, DBusMessage *msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
+ 	print_adapter(proxy, COLORED_NEW);
++	bt_shell_set_env(g_dbus_proxy_get_path(proxy), proxy);
+ }
  
--	bt_shell_printf("AcquireWrite: %s link %s\n", device, link);
-+	bt_shell_printf("AcquireWrite: %s link %s\n", path_to_address(device),
-+									link);
+ static void ad_manager_added(GDBusProxy *proxy)
+@@ -561,6 +563,7 @@ static void device_removed(GDBusProxy *proxy)
+ 	adapter->devices = g_list_remove(adapter->devices, proxy);
  
- 	reply = chrc_create_pipe(chrc, msg);
+ 	print_device(proxy, COLORED_DEL);
++	bt_shell_set_env(g_dbus_proxy_get_path(proxy), NULL);
  
-@@ -1753,7 +1768,8 @@ static DBusMessage *chrc_acquire_notify(DBusConnection *conn, DBusMessage *msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
+ 	if (default_dev == proxy)
+ 		set_default_device(NULL, NULL);
+@@ -575,6 +578,7 @@ static void adapter_removed(GDBusProxy *proxy)
  
--	bt_shell_printf("AcquireNotify: %s link %s\n", device, link);
-+	bt_shell_printf("AcquireNotify: %s link %s\n", path_to_address(device),
-+									link);
+ 		if (adapter->proxy == proxy) {
+ 			print_adapter(proxy, COLORED_DEL);
++			bt_shell_set_env(g_dbus_proxy_get_path(proxy), NULL);
  
- 	reply = chrc_create_pipe(chrc, msg);
- 
-@@ -1961,8 +1977,8 @@ static DBusMessage *desc_read_value(DBusConnection *conn, DBusMessage *msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
- 
--	bt_shell_printf("ReadValue: %s offset %u link %s\n", device, offset,
--								link);
-+	bt_shell_printf("ReadValue: %s offset %u link %s\n",
-+			path_to_address(device), offset, link);
- 
- 	if (offset > desc->value_len)
- 		return g_dbus_create_error(msg, "org.bluez.Error.InvalidOffset",
-@@ -1993,8 +2009,8 @@ static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage *msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
- 
--	bt_shell_printf("WriteValue: %s offset %u link %s\n", device, offset,
--								link);
-+	bt_shell_printf("WriteValue: %s offset %u link %s\n",
-+			path_to_address(device), offset, link);
- 
- 	bt_shell_printf("[" COLORED_CHG "] Attribute %s written" , desc->path);
- 
+ 			if (default_ctrl && default_ctrl->proxy == proxy) {
+ 				default_ctrl = NULL;
 -- 
 2.14.3
 
