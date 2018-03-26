@@ -1,83 +1,91 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180324023336.13879-1-inga.stotland@intel.com>
-References: <20180324023336.13879-1-inga.stotland@intel.com>
+In-Reply-To: <5ebabd54-eae8-a7d1-2c22-ffedca75d6f3@jp.fujitsu.com>
+References: <5ebabd54-eae8-a7d1-2c22-ffedca75d6f3@jp.fujitsu.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 26 Mar 2018 16:31:27 +0300
-Message-ID: <CABBYNZKSyN0KZAray2afZXyESF1BeY0LOvK0hv-AuX05vu7MSg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] mesh/meshctl: Exit cleanly if start up fails
-To: Inga Stotland <inga.stotland@intel.com>
+Date: Mon, 26 Mar 2018 16:26:49 +0300
+Message-ID: <CABBYNZLxMy-fj=HESjdzDt+CV2u3MJVCd-7shop+01PwUpXjVQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/6] Make commands return exit status
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
+Hi Eramoto,
 
-On Sat, Mar 24, 2018 at 4:33 AM, Inga Stotland <inga.stotland@intel.com> wrote:
-> When failing to start meshctl due to invalid input configuration,
-> release bt_shell resources prior to exit.
+On Mon, Mar 26, 2018 at 11:25 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Commands always return 0 as exit status in non-interactive mode. This
+> patch set makes them return the exit_status variable as exit status.
+>
+> Note:
+>   This patch set does not include the following fix for meshctl, due to
+>   conflict with Inga's patch ("mesh/meshctl: Exit cleanly if start up
+>   fails")[1]. I will send a rebased fix after merging Inga's patch to
+>   BlueZ master branch.
+>
+>   [1]: https://www.spinics.net/lists/linux-bluetooth/msg75020.html
 
+So here is the concern the exit status or the memory leaks, because
+the latter is not really a problem if the process will be terminated
+all the resources will be freed anyway so calling bt_shell_cleanup
+seems pointless in this regard. The status seems alright as I can see
+it being used with scripts that may parse the exit status.
 
-Similar response as to Eramoto's patch, if the tool is going to exit
-there is no need to free up the resources, the exit status is still
-useful but that is a different matter. Or perhaps we just want to
-avoid false positives with static analyzers?
-
-
+>
+> ERAMOTO Masaya (6):
+>   shared/shell: Return exit status to caller
+>   client: Return exit status for non-interactive
+>   tools/bluetooth-player: Return exit status for non-interactive
+>   tools/obexctl: Return exit status for non-interactive
+>   tools/btmgmt: Return exit status for non-interactive
+>   shared/mainloop: Fix overwriting exit status
+>
+>  client/main.c            | 5 +++--
+>  src/shared/mainloop.c    | 4 +---
+>  src/shared/shell.c       | 7 +++++--
+>  src/shared/shell.h       | 2 +-
+>  tools/bluetooth-player.c | 5 +++--
+>  tools/btmgmt.c           | 2 +-
+>  tools/obexctl.c          | 5 +++--
+>  7 files changed, 17 insertions(+), 13 deletions(-)
+>
+>
 > ---
->  mesh/main.c | 14 +++++++++-----
->  1 file changed, 9 insertions(+), 5 deletions(-)
+>  mesh/main.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
 > diff --git a/mesh/main.c b/mesh/main.c
-> index d991c9f8c..d0f71c2d9 100644
+> index d991c9f8c..c79c44bd8 100644
 > --- a/mesh/main.c
 > +++ b/mesh/main.c
-> @@ -1930,11 +1930,11 @@ int main(int argc, char *argv[])
->         mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
->                                                                         + 2);
->         if (!mesh_local_config_filename)
-> -               exit(1);
-> +               goto fail;
+> @@ -1904,6 +1904,7 @@ static void client_ready(GDBusClient *client, void *user_data)
+>  int main(int argc, char *argv[])
+>  {
+>         GDBusClient *client;
+> +       int status;
+>         int len;
+>         int extra;
 >
->         mesh_prov_db_filename = g_malloc(len + strlen("prov_db.json") + 2);
->         if (!mesh_prov_db_filename) {
-> -               exit(1);
-> +               goto fail;
->         }
+> @@ -1989,7 +1990,7 @@ int main(int argc, char *argv[])
+>         if (!onoff_client_init(PRIMARY_ELEMENT_IDX))
+>                 g_printerr("Failed to initialize mesh generic On/Off client\n");
 >
->         sprintf(mesh_local_config_filename, "%s", mesh_config_dir);
-> @@ -1950,7 +1950,7 @@ int main(int argc, char *argv[])
->         if (!prov_db_read_local_node(mesh_local_config_filename, true)) {
->                 g_printerr("Failed to parse local node configuration file %s\n",
->                         mesh_local_config_filename);
-> -               exit(1);
-> +               goto fail;
->         }
+> -       bt_shell_run();
+> +       status = bt_shell_run();
 >
->         sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
-> @@ -1965,7 +1965,7 @@ int main(int argc, char *argv[])
->         if (!prov_db_read(mesh_prov_db_filename)) {
->                 g_printerr("Failed to parse provisioning database file %s\n",
->                         mesh_prov_db_filename);
-> -               exit(1);
-> +               goto fail;
->         }
+>         g_dbus_client_unref(client);
 >
->         dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-> @@ -2001,5 +2001,9 @@ int main(int argc, char *argv[])
+> @@ -2001,5 +2002,5 @@ int main(int argc, char *argv[])
 >         g_list_free(service_list);
 >         g_list_free_full(ctrl_list, proxy_leak);
 >
 > -       return 0;
-> +       return EXIT_SUCCESS;
-> +
-> +fail:
-> +       bt_shell_cleanup();
-> +       return EXIT_FAILURE;
+> +       return status;
 >  }
 > --
-> 2.13.6
+> 2.14.1
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
