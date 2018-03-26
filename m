@@ -1,53 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] shared/shell: Add export command
-Date: Mon, 26 Mar 2018 16:33:02 +0300
-Message-Id: <20180326133304.14531-2-luiz.dentz@gmail.com>
-In-Reply-To: <20180326133304.14531-1-luiz.dentz@gmail.com>
-References: <20180326133304.14531-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4] shared/shell: Don't allocate any data if env value is NULL
+Date: Mon, 26 Mar 2018 16:33:01 +0300
+Message-Id: <20180326133304.14531-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds export command to default menu which can be used to print
-the environment variables that have been set.
+If value is NULL there is no point in allocating any data if value is
+NULL since bt_shell_get_env would return NULL anyway, also this makes
+sure the existing value is freed which means passing NULL can remove
+an env like it was intended.
 ---
- src/shared/shell.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ src/shared/shell.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 241878b30..552e066d7 100644
+index 33bc0d980..241878b30 100644
 --- a/src/shared/shell.c
 +++ b/src/shared/shell.c
-@@ -198,6 +198,17 @@ static bool cmd_back_exists(const struct bt_shell_menu *menu)
- 	return true;
- }
+@@ -1142,6 +1142,8 @@ void bt_shell_set_env(const char *name, void *value)
+ 	struct bt_shell_env *env;
  
-+static void cmd_export(int argc, char *argv[])
-+{
-+	const struct queue_entry *entry;
-+
-+	for (entry = queue_get_entries(data.envs); entry; entry = entry->next) {
-+		struct bt_shell_env *env = entry->data;
-+
-+		print_text(COLOR_HIGHLIGHT, "%s=%p", env->name, env->value);
-+	}
-+}
-+
- static const struct bt_shell_menu_entry default_menu[] = {
- 	{ "back",         NULL,       cmd_back, "Return to main menu", NULL,
- 							NULL, cmd_back_exists },
-@@ -209,6 +220,8 @@ static const struct bt_shell_menu_entry default_menu[] = {
- 	{ "exit",         NULL,       cmd_quit, "Quit program" },
- 	{ "help",         NULL,       cmd_help,
- 					"Display help about this program" },
-+	{ "export",       NULL,       cmd_export,
-+						"Print evironment variables" },
- 	{ }
- };
+ 	if (!data.envs) {
++		if (!value)
++			return;
+ 		data.envs = queue_new();
+ 		goto done;
+ 	}
+@@ -1150,6 +1152,10 @@ void bt_shell_set_env(const char *name, void *value)
+ 	if (env)
+ 		env_destroy(env);
  
++	/* Don't create an env if value is not set */
++	if (!value)
++		return;
++
+ done:
+ 	env = new0(struct bt_shell_env, 1);
+ 	env->name = strdup(name);
 -- 
 2.14.3
 
