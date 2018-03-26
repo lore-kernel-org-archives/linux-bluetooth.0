@@ -1,97 +1,60 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <5ebabd54-eae8-a7d1-2c22-ffedca75d6f3@jp.fujitsu.com>
-References: <5ebabd54-eae8-a7d1-2c22-ffedca75d6f3@jp.fujitsu.com>
+In-Reply-To: <20180323133703.12499-1-luiz.dentz@gmail.com>
+References: <20180323133703.12499-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 26 Mar 2018 16:26:49 +0300
-Message-ID: <CABBYNZLxMy-fj=HESjdzDt+CV2u3MJVCd-7shop+01PwUpXjVQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/6] Make commands return exit status
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 26 Mar 2018 16:20:51 +0300
+Message-ID: <CABBYNZ+DGn9uV2TiuutQaj7GNERWLadt8a0s+zE+UyaN-P8vyQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] doc/gatt-api: Update documentation regarding link option
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+Hi,
 
-On Mon, Mar 26, 2018 at 11:25 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Commands always return 0 as exit status in non-interactive mode. This
-> patch set makes them return the exit_status variable as exit status.
+On Fri, Mar 23, 2018 at 3:37 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Note:
->   This patch set does not include the following fix for meshctl, due to
->   conflict with Inga's patch ("mesh/meshctl: Exit cleanly if start up
->   fails")[1]. I will send a rebased fix after merging Inga's patch to
->   BlueZ master branch.
->
->   [1]: https://www.spinics.net/lists/linux-bluetooth/msg75020.html
-
-So here is the concern the exit status or the memory leaks, because
-the latter is not really a problem if the process will be terminated
-all the resources will be freed anyway so calling bt_shell_cleanup
-seems pointless in this regard. The status seems alright as I can see
-it being used with scripts that may parse the exit status.
-
->
-> ERAMOTO Masaya (6):
->   shared/shell: Return exit status to caller
->   client: Return exit status for non-interactive
->   tools/bluetooth-player: Return exit status for non-interactive
->   tools/obexctl: Return exit status for non-interactive
->   tools/btmgmt: Return exit status for non-interactive
->   shared/mainloop: Fix overwriting exit status
->
->  client/main.c            | 5 +++--
->  src/shared/mainloop.c    | 4 +---
->  src/shared/shell.c       | 7 +++++--
->  src/shared/shell.h       | 2 +-
->  tools/bluetooth-player.c | 5 +++--
->  tools/btmgmt.c           | 2 +-
->  tools/obexctl.c          | 5 +++--
->  7 files changed, 17 insertions(+), 13 deletions(-)
->
->
+> This reflects what the code has already doing so any server operation which
+> requires the device option shall also get the link type as well.
 > ---
->  mesh/main.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  doc/gatt-api.txt | 3 +++
+>  1 file changed, 3 insertions(+)
 >
-> diff --git a/mesh/main.c b/mesh/main.c
-> index d991c9f8c..c79c44bd8 100644
-> --- a/mesh/main.c
-> +++ b/mesh/main.c
-> @@ -1904,6 +1904,7 @@ static void client_ready(GDBusClient *client, void *user_data)
->  int main(int argc, char *argv[])
->  {
->         GDBusClient *client;
-> +       int status;
->         int len;
->         int extra;
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index 60a997cbf..0f1cc9029 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -84,6 +84,7 @@ Methods               array{byte} ReadValue(dict options)
 >
-> @@ -1989,7 +1990,7 @@ int main(int argc, char *argv[])
->         if (!onoff_client_init(PRIMARY_ELEMENT_IDX))
->                 g_printerr("Failed to initialize mesh generic On/Off client\n");
+>                         Possible options: "offset": Start offset
+>                                           "device": Device path (Server only)
+> +                                         "link": Link type (Server only)
 >
-> -       bt_shell_run();
-> +       status = bt_shell_run();
+>                         Possible Errors: org.bluez.Error.Failed
+>                                          org.bluez.Error.InProgress
+> @@ -117,6 +118,7 @@ Methods             array{byte} ReadValue(dict options)
 >
->         g_dbus_client_unref(client);
+>                         Possible options: "device": Object Device (Server only)
+>                                           "MTU": Exchanged MTU (Server only)
+> +                                         "link": Link type (Server only)
 >
-> @@ -2001,5 +2002,5 @@ int main(int argc, char *argv[])
->         g_list_free(service_list);
->         g_list_free_full(ctrl_list, proxy_leak);
+>                         Possible Errors: org.bluez.Error.Failed
+>                                          org.bluez.Error.NotSupported
+> @@ -152,6 +154,7 @@ Methods             array{byte} ReadValue(dict options)
 >
-> -       return 0;
-> +       return status;
->  }
+>                         Possible options: "device": Object Device (Server only)
+>                                           "MTU": Exchanged MTU (Server only)
+> +                                         "link": Link type (Server only)
+>
+>                         Possible Errors: org.bluez.Error.Failed
+>                                          org.bluez.Error.NotSupported
 > --
-> 2.14.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.14.3
 
+Applied.
 
 
 -- 
