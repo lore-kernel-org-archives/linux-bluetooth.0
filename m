@@ -1,10 +1,10 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH BlueZ 2/6] client: Return exit status for non-interactive
+Subject: [PATCH BlueZ 1/6] shared/shell: Return exit status to caller
 From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <5ebabd54-eae8-a7d1-2c22-ffedca75d6f3@jp.fujitsu.com>
-Message-ID: <4b898795-52f9-5c4c-1739-ada17c4b111c@jp.fujitsu.com>
-Date: Mon, 26 Mar 2018 17:31:02 +0900
+Message-ID: <55db0097-8ca9-40b8-285b-569c2a53a8f5@jp.fujitsu.com>
+Date: Mon, 26 Mar 2018 17:31:00 +0900
 MIME-Version: 1.0
 In-Reply-To: <5ebabd54-eae8-a7d1-2c22-ffedca75d6f3@jp.fujitsu.com>
 Content-Type: text/plain; charset="utf-8"
@@ -12,37 +12,50 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- client/main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ src/shared/shell.c | 7 +++++--
+ src/shared/shell.h | 2 +-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index 584217a82..7a100b552 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2532,6 +2532,7 @@ static void client_ready(GDBusClient *client, void *user_data)
- int main(int argc, char *argv[])
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 33bc0d980..b503c6628 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -993,17 +993,20 @@ static void env_destroy(void *data)
+ 	free(env);
+ }
+ 
+-void bt_shell_run(void)
++int bt_shell_run(void)
  {
- 	GDBusClient *client;
+ 	struct io *signal;
 +	int status;
  
- 	bt_shell_init(argc, argv, &opt);
- 	bt_shell_set_menu(&main_menu);
-@@ -2559,7 +2560,7 @@ int main(int argc, char *argv[])
+ 	signal = setup_signalfd();
  
- 	g_dbus_client_set_ready_watch(client, client_ready, NULL);
+-	mainloop_run();
++	status = mainloop_run();
  
--	bt_shell_run();
-+	status = bt_shell_run();
+ 	io_destroy(signal);
  
- 	g_dbus_client_unref(client);
- 
-@@ -2569,5 +2570,5 @@ int main(int argc, char *argv[])
- 
- 	g_free(auto_register_agent);
- 
--	return 0;
+ 	bt_shell_cleanup();
++
 +	return status;
  }
+ 
+ void bt_shell_cleanup(void)
+diff --git a/src/shared/shell.h b/src/shared/shell.h
+index 33c31f35b..8b7cb7f30 100644
+--- a/src/shared/shell.h
++++ b/src/shared/shell.h
+@@ -66,7 +66,7 @@ struct bt_shell_opt {
+ 
+ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt);
+ 
+-void bt_shell_run(void);
++int bt_shell_run(void);
+ 
+ void bt_shell_quit(int status);
+ void bt_shell_noninteractive_quit(int status);
 -- 
 2.14.1
 
