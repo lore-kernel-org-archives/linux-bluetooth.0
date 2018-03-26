@@ -1,46 +1,45 @@
-Return-Path: <robherring2@gmail.com>
-Date: Mon, 26 Mar 2018 17:23:33 -0500
-From: Rob Herring <robh@kernel.org>
-To: Thierry Escande <thierry.escande@linaro.org>
-Cc: Andy Gross <andy.gross@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Brown <david.brown@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Bjorn Andersson <bjorn.andersson@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 2/3] dt-bindings: net: bluetooth: Add
- qualcomm-bluetooth
-Message-ID: <20180326222333.mety3fcwcgcfcaqv@rob-hp-laptop>
-References: <20180320032331.29865-1-thierry.escande@linaro.org>
- <20180320032331.29865-3-thierry.escande@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180320032331.29865-3-thierry.escande@linaro.org>
+Return-Path: <ianwmorrison@gmail.com>
+From: ianwmorrison@gmail.com
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	stable@vger.kernel.org,
+	hdegoede@redhat.com,
+	ianwmorrison@gmail.com
+Subject: [PATCH] Bluetooth: hci_bcm: Remove DMI quirk for the MINIX Z83-4
+Date: Tue, 27 Mar 2018 09:09:28 +1100
+Message-Id: <20180326220928.2755-1-ianwmorrison@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Mar 20, 2018 at 04:23:30AM +0100, Thierry Escande wrote:
-> Add binding document for serial bluetooth chips using Qualcomm protocol.
-> 
-> Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
-> ---
-> 
-> v5:
-> - Rename 'bt-disable-n' gpio as 'enable'
-> 
-> v4:
-> - Move bt-disable-n-gpios to required properties section
-> - Add clocks and pinctrl-0 as required properties
-> 
-> v3: no change
-> v2: no change
-> 
->  .../devicetree/bindings/net/qualcomm-bluetooth.txt | 34 ++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+As Interrupt resource specified IRQs are now assumed to be always
+active-low the DMI quirk for the MINIX Z83-4 is no longer required.
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Cc: stable@vger.kernel.org
+Signed-off-by: Ian W MORRISON <ianwmorrison@gmail.com>
+---
+ drivers/bluetooth/hci_bcm.c | 7 -------
+ 1 file changed, 7 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 6828e485bc24..8a011267a4f6 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -804,13 +804,6 @@ static const struct dmi_system_id bcm_active_low_irq_dmi_table[] = {
+ 			DMI_EXACT_MATCH(DMI_PRODUCT_VERSION, "ThinkPad 8"),
+ 		},
+ 	},
+-	{
+-		.ident = "MINIX Z83-4",
+-		.matches = {
+-			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "MINIX"),
+-			DMI_MATCH(DMI_PRODUCT_NAME, "Z83-4"),
+-		},
+-	},
+ 	{ }
+ };
+ 
+-- 
+2.11.0
