@@ -1,53 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <601e83b6-023b-0ba6-920e-9dfa66548393@jp.fujitsu.com>
-References: <5ebabd54-eae8-a7d1-2c22-ffedca75d6f3@jp.fujitsu.com>
- <CABBYNZLxMy-fj=HESjdzDt+CV2u3MJVCd-7shop+01PwUpXjVQ@mail.gmail.com> <601e83b6-023b-0ba6-920e-9dfa66548393@jp.fujitsu.com>
+In-Reply-To: <20180326141153.16430-1-szymon.janc@codecoup.pl>
+References: <20180326141153.16430-1-szymon.janc@codecoup.pl>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 27 Mar 2018 14:09:01 +0300
-Message-ID: <CABBYNZJpVnXRoMDSxZrNm9b++P0S6tJwf99=LvTjTSLVRbK9zQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/6] Make commands return exit status
-To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Date: Tue, 27 Mar 2018 14:08:21 +0300
+Message-ID: <CABBYNZ+DUTHnzTQH=5QxDyg3Rz6X1Z-0szOKr-NediKfVKTzXA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] device: Change storage warning to debug messages
+To: Szymon Janc <szymon.janc@codecoup.pl>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eramoto,
+Hi Szymon,
 
-On Tue, Mar 27, 2018 at 8:38 AM, ERAMOTO Masaya
-<eramoto.masaya@jp.fujitsu.com> wrote:
-> Hi Luiz,
+On Mon, Mar 26, 2018 at 5:11 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
+> It is normal for device to have private address so there is no reason
+> to issue warning message when not storing data for it.
+> ---
+>  src/device.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> On 03/26/2018 10:26 PM, Luiz Augusto von Dentz wrote:
->> Hi Eramoto,
->>
->> On Mon, Mar 26, 2018 at 11:25 AM, ERAMOTO Masaya
->> <eramoto.masaya@jp.fujitsu.com> wrote:
->>> Commands always return 0 as exit status in non-interactive mode. This
->>> patch set makes them return the exit_status variable as exit status.
->>>
->>> Note:
->>>   This patch set does not include the following fix for meshctl, due to
->>>   conflict with Inga's patch ("mesh/meshctl: Exit cleanly if start up
->>>   fails")[1]. I will send a rebased fix after merging Inga's patch to
->>>   BlueZ master branch.
->>>
->>>   [1]: https://www.spinics.net/lists/linux-bluetooth/msg75020.html
->>
->> So here is the concern the exit status or the memory leaks, because
->> the latter is not really a problem if the process will be terminated
->> all the resources will be freed anyway so calling bt_shell_cleanup
->> seems pointless in this regard. The status seems alright as I can see
->> it being used with scripts that may parse the exit status.
+> diff --git a/src/device.c b/src/device.c
+> index 780458fd7..b43e21658 100644
+> --- a/src/device.c
+> +++ b/src/device.c
+> @@ -480,7 +480,7 @@ static void store_device_info(struct btd_device *device)
+>                 return;
 >
-> bluetoothctl etc. always return 0 except calling exit(), since
-> bt_shell_run() does not return value even if a subcommand fails.
-> Because it is hard for scripts to handle them whose exit status is 0
-> if they hit any unexpected problem, they are not convenient on
-> non-interactive mode.
+>         if (device_address_is_private(device)) {
+> -               warn("Can't store info for private addressed device %s",
+> +               DBG("Can't store info for private addressed device %s",
+>                                                                 device->path);
+>                 return;
+>         }
+> @@ -497,7 +497,7 @@ void device_store_cached_name(struct btd_device *dev, const char *name)
+>         gsize length = 0;
 >
-> This patch set makes bt_shell_run() return EXIT_SUCCESS/EXIT_FAILURE or
-> error code, and bluetoothctl etc. be able to pass the status to scripts.
+>         if (device_address_is_private(dev)) {
+> -               warn("Can't store name for private addressed device %s",
+> +               DBG("Can't store name for private addressed device %s",
+>                                                                 dev->path);
+>                 return;
+>         }
+> @@ -2012,7 +2012,7 @@ static void store_services(struct btd_device *device)
+>         gsize length = 0;
+>
+>         if (device_address_is_private(device)) {
+> -               warn("Can't store services for private addressed device %s",
+> +               DBG("Can't store services for private addressed device %s",
+>                                                                 device->path);
+>                 return;
+>         }
+> @@ -2200,7 +2200,7 @@ static void store_gatt_db(struct btd_device *device)
+>         struct gatt_saver saver;
+>
+>         if (device_address_is_private(device)) {
+> -               warn("Can't store GATT db for private addressed device %s",
+> +               DBG("Can't store GATT db for private addressed device %s",
+>                                                                 device->path);
+>                 return;
+>         }
+> --
+> 2.14.3
 
 Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
