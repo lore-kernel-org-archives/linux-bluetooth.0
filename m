@@ -1,70 +1,71 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180326141153.16430-1-szymon.janc@codecoup.pl>
-References: <20180326141153.16430-1-szymon.janc@codecoup.pl>
+In-Reply-To: <06461e3f-9f40-65ab-baa6-d5ae8e14beea@laposte.net>
+References: <06461e3f-9f40-65ab-baa6-d5ae8e14beea@laposte.net>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 27 Mar 2018 14:08:21 +0300
-Message-ID: <CABBYNZ+DUTHnzTQH=5QxDyg3Rz6X1Z-0szOKr-NediKfVKTzXA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] device: Change storage warning to debug messages
-To: Szymon Janc <szymon.janc@codecoup.pl>
+Date: Tue, 27 Mar 2018 14:00:24 +0300
+Message-ID: <CABBYNZJ+1pfbE-te9+DVjjiLKk-2d4c9N8kiR8YNmD=B7W=33Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] adapter: Don't refresh adv_manager for non-LE devices
+To: Antoine Belvire <antoine.belvire@laposte.net>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Antoine,
 
-On Mon, Mar 26, 2018 at 5:11 PM, Szymon Janc <szymon.janc@codecoup.pl> wrote:
-> It is normal for device to have private address so there is no reason
-> to issue warning message when not storing data for it.
+On Mon, Mar 26, 2018 at 10:31 PM, Antoine Belvire
+<antoine.belvire@laposte.net> wrote:
+> btd_adv_manager_refresh is called upon MGMT_SETTING_DISCOVERABLE setting
+> change
+> but as only LE adapters have an adv_manager, this leads to segmentation
+> fault
+> for non-LE devices:
+>
+> 0  btd_adv_manager_refresh (manager=0x0) at src/advertising.c:1176
+> 1  0x0000556fe45fcb02 in settings_changed (settings=<optimized out>,
+>     adapter=0x556fe53f7c70) at src/adapter.c:543
+> 2  new_settings_callback (index=<optimized out>, length=<optimized out>,
+>     param=<optimized out>, user_data=0x556fe53f7c70) at src/adapter.c:573
+> 3  0x0000556fe462c278 in request_complete (mgmt=mgmt@entry=0x556fe53f20c0,
+>     status=<optimized out>, opcode=opcode@entry=7, index=index@entry=0,
+>     length=length@entry=4, param=0x556fe53eb5f9) at src/shared/mgmt.c:261
+> 4  0x0000556fe462cd9d in can_read_data (io=<optimized out>,
+>     user_data=0x556fe53f20c0) at src/shared/mgmt.c:353
+> 5  0x0000556fe46396e3 in watch_callback (channel=<optimized out>,
+>     cond=<optimized out>, user_data=<optimized out>)
+>     at src/shared/io-glib.c:170
+> 6  0x00007fe351c980e5 in g_main_context_dispatch ()
+>    from /usr/lib64/libglib-2.0.so.0
+> 7  0x00007fe351c984b0 in ?? () from /usr/lib64/libglib-2.0.so.0
+> 8  0x00007fe351c987c2 in g_main_loop_run () from /usr/lib64/libglib-2.0.so.0
+> 9  0x0000556fe45abc75 in main (argc=<optimized out>, argv=<optimized out>)
+>     at src/main.c:770
+>
+> This commit prevents the call to btd_adv_manager_refresh for non-LE devices.
 > ---
->  src/device.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  src/adapter.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> diff --git a/src/device.c b/src/device.c
-> index 780458fd7..b43e21658 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -480,7 +480,7 @@ static void store_device_info(struct btd_device *device)
->                 return;
->
->         if (device_address_is_private(device)) {
-> -               warn("Can't store info for private addressed device %s",
-> +               DBG("Can't store info for private addressed device %s",
->                                                                 device->path);
->                 return;
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 6d7d61504..e0f48cf9c 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -540,7 +540,8 @@ static void settings_changed(struct btd_adapter
+> *adapter, uint32_t settings)
+>                 g_dbus_emit_property_changed(dbus_conn, adapter->path,
+>                                         ADAPTER_INTERFACE, "Discoverable");
+>                 store_adapter_info(adapter);
+> -               btd_adv_manager_refresh(adapter->adv_manager);
+> +               if (adapter->supported_settings & MGMT_SETTING_LE)
+> +                       btd_adv_manager_refresh(adapter->adv_manager);
 >         }
-> @@ -497,7 +497,7 @@ void device_store_cached_name(struct btd_device *dev, const char *name)
->         gsize length = 0;
 >
->         if (device_address_is_private(dev)) {
-> -               warn("Can't store name for private addressed device %s",
-> +               DBG("Can't store name for private addressed device %s",
->                                                                 dev->path);
->                 return;
->         }
-> @@ -2012,7 +2012,7 @@ static void store_services(struct btd_device *device)
->         gsize length = 0;
->
->         if (device_address_is_private(device)) {
-> -               warn("Can't store services for private addressed device %s",
-> +               DBG("Can't store services for private addressed device %s",
->                                                                 device->path);
->                 return;
->         }
-> @@ -2200,7 +2200,7 @@ static void store_gatt_db(struct btd_device *device)
->         struct gatt_saver saver;
->
->         if (device_address_is_private(device)) {
-> -               warn("Can't store GATT db for private addressed device %s",
-> +               DBG("Can't store GATT db for private addressed device %s",
->                                                                 device->path);
->                 return;
->         }
+>         if (changed_mask & MGMT_SETTING_BONDABLE) {
 > --
-> 2.14.3
+> 2.16.2
 
-Applied, thanks.
+This one doesn't apply anymore, could you please rebase.
 
 -- 
 Luiz Augusto von Dentz
