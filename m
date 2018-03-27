@@ -1,197 +1,105 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arend van Spriel <arend.vanspriel@broadcom.com>
-Subject: [PATCH] Revert "Bluetooth: btmrvl: support sysfs initiated firmware coredump"
-Date: Tue, 27 Mar 2018 23:03:40 +0200
-Message-Id: <1522184620-1695-1-git-send-email-arend.vanspriel@broadcom.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <bjorn.andersson@linaro.org>
+Date: Tue, 27 Mar 2018 11:47:22 -0700
+From: Bjorn Andersson <bjorn.andersson@linaro.org>
+To: Thierry Escande <thierry.escande@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Rob Herring <robh+dt@kernel.org>,
+	Andy Gross <andy.gross@linaro.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	David Brown <david.brown@linaro.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	devicetree <devicetree@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 2/3] dt-bindings: net: bluetooth: Add
+ qualcomm-bluetooth
+Message-ID: <20180327184722.GB18510@minitux>
+References: <20180320032331.29865-1-thierry.escande@linaro.org>
+ <20180320032331.29865-3-thierry.escande@linaro.org>
+ <FAC61078-6298-47A7-A51C-73D72BEF6E4A@holtmann.org>
+ <20180326225106.GC1403@tuxbook-pro>
+ <2e0db4b4-80cc-9a5b-9e0a-812f1bc9fbcf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <2e0db4b4-80cc-9a5b-9e0a-812f1bc9fbcf@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This reverts commit 118c193d9699ffc1c897c38a1d314f38543c8e1c. A discussion
-about the driver callback ended with the idea to change the return type of
-the callback to void. That change would lead to build error in linux-next
-so let's remove this change and resubmit later according the new callback
-definition.
+On Tue 27 Mar 08:56 PDT 2018, Thierry Escande wrote:
 
-Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
----
-Hi Marcel,
+> Hi Bjorn,
+> 
+> On 27/03/2018 00:51, Bjorn Andersson wrote:
+> > On Tue 20 Mar 23:58 HKT 2018, Marcel Holtmann wrote:
+> > > > Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
+> > [..]
+> > > > + - clocks: clock phandle for SUSCLK_32KHZ
+> > > 
+> > > if I compare this with broadcom-bluetooth.txt or ti-bluetooth.txt then
+> > > besides compatible, everything else is optional. The
+> > > nokia-bluetooth.txt has everything required, but that is also a really
+> > > specific platform.
+> > > 
+> > > Can we be less restrictive for a QCA general purpose chip?
+> > > 
+> > 
+> > The way we deal with this in other bindings is that we tie such
+> > requirements to the compatible; i.e. we would say that qcom,qca6174-bt
+> > requires a clock and we would have something like qcom,qca-bt that makes
+> > it optional.
+> > 
+> > The beauty of this is that the driver will tell you if you forgot to
+> > specify the clock when it actually is required, which saves you
+> > considerable amount of debugging time.
+> > 
+> > 
+> > NB. The way the bcm driver handles this is insufficient, as it treats
+> > any error from clk_get as "there's no clock specified". The driver
+> > should accept a clock not being specified, but should fail properly when
+> > a clock is specified but can't be acquired (e.g. due to clk_get()
+> > returning EPROBE_DEFER).
+> > 
+> > > > +
+> > > > +Example:
+> > > > +
+> > > > +serial@7570000 {
+> > > > +	pinctrl-names = "default", "sleep";
+> > > > +	pinctrl-0 = <&blsp1_uart1_default>;
+> > > > +	pinctrl-1 = <&blsp1_uart1_sleep>;
+> > > > +
+> > > > +	bluetooth {
+> > > > +		compatible = "qcom,qca6174-bt";
+> > > > +
+> > > > +		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
+> > > > +
+> > > > +		pinctrl-names = "default";
+> > > > +		pinctrl-0 = <&bt_en_pin_a>;
+> > > 
+> > > This one I do not understand and you might want to shed some light
+> > > into why this is done that way.
+> > > 
+> > 
+> > This is completely generic and only relates to getting the electrical
+> > properties of the gpio pin set up correctly. So I would recommend that
+> > we omit this from the binding and example (including the pinctrl
+> > properties for the serial above).
+> 
+> If I remove the pinctrl entry in the bluetooth node, the gpio19 is then
+> marked as unclaimed. The drive strength also defaults to low but that
+> doesn't seem to be an issue and the the chip can still be enabled through
+> gpio19. Is it ok to have it unclaimed? If so I can remove it from the
+> binding and the doc then.
+> 
+> Regarding the blsp1_uart1_default of the serial node, I can still enable the
+> chip if I remove it but the hci commands all end in timeout. It seems that
+> the function for these pins has to be explicitly set to blsp_uart2. So at
+> least, the default pinctrl seems mandatory.
+> 
 
-Still noticed the patch in bt-next/master so decided to sent this formal
-revert patch.
+Our board needs these properties to get the uart and gpio in the right
+state, but this is unrelated to BT - that's why I suggested that you
+omit these properties from the BT binding.
 
 Regards,
-Arend
----
- drivers/bluetooth/btmrvl_debugfs.c | 31 +++++++++++++++++++++++++++++++
- drivers/bluetooth/btmrvl_drv.h     |  2 ++
- drivers/bluetooth/btmrvl_main.c    |  6 ++++++
- drivers/bluetooth/btmrvl_sdio.c    | 18 ++++++------------
- 4 files changed, 45 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
-index 023d35e..1828ed8 100644
---- a/drivers/bluetooth/btmrvl_debugfs.c
-+++ b/drivers/bluetooth/btmrvl_debugfs.c
-@@ -167,6 +167,35 @@ static ssize_t btmrvl_hscmd_read(struct file *file, char __user *userbuf,
- 	.llseek = default_llseek,
- };
- 
-+static ssize_t btmrvl_fwdump_write(struct file *file, const char __user *ubuf,
-+				   size_t count, loff_t *ppos)
-+{
-+	struct btmrvl_private *priv = file->private_data;
-+	char buf[16];
-+	bool result;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	if (copy_from_user(&buf, ubuf, min_t(size_t, sizeof(buf) - 1, count)))
-+		return -EFAULT;
-+
-+	if (strtobool(buf, &result))
-+		return -EINVAL;
-+
-+	if (!result)
-+		return -EINVAL;
-+
-+	btmrvl_firmware_dump(priv);
-+
-+	return count;
-+}
-+
-+static const struct file_operations btmrvl_fwdump_fops = {
-+	.write	= btmrvl_fwdump_write,
-+	.open	= simple_open,
-+	.llseek = default_llseek,
-+};
-+
- void btmrvl_debugfs_init(struct hci_dev *hdev)
- {
- 	struct btmrvl_private *priv = hci_get_drvdata(hdev);
-@@ -197,6 +226,8 @@ void btmrvl_debugfs_init(struct hci_dev *hdev)
- 			    priv, &btmrvl_hscmd_fops);
- 	debugfs_create_file("hscfgcmd", 0644, dbg->config_dir,
- 			    priv, &btmrvl_hscfgcmd_fops);
-+	debugfs_create_file("fw_dump", 0200, dbg->config_dir,
-+			    priv, &btmrvl_fwdump_fops);
- 
- 	dbg->status_dir = debugfs_create_dir("status", hdev->debugfs);
- 	debugfs_create_u8("curpsmode", 0444, dbg->status_dir,
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index f045454..fc3caf4 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -110,6 +110,7 @@ struct btmrvl_private {
- 				u8 *payload, u16 nb);
- 	int (*hw_wakeup_firmware)(struct btmrvl_private *priv);
- 	int (*hw_process_int_status)(struct btmrvl_private *priv);
-+	void (*firmware_dump)(struct btmrvl_private *priv);
- 	spinlock_t driver_lock;		/* spinlock used by driver */
- #ifdef CONFIG_DEBUG_FS
- 	void *debugfs_data;
-@@ -182,6 +183,7 @@ struct btmrvl_event {
- int btmrvl_enable_ps(struct btmrvl_private *priv);
- int btmrvl_prepare_command(struct btmrvl_private *priv);
- int btmrvl_enable_hs(struct btmrvl_private *priv);
-+void btmrvl_firmware_dump(struct btmrvl_private *priv);
- 
- #ifdef CONFIG_DEBUG_FS
- void btmrvl_debugfs_init(struct hci_dev *hdev);
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index 708ad216..f6c694a 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -358,6 +358,12 @@ int btmrvl_prepare_command(struct btmrvl_private *priv)
- 	return ret;
- }
- 
-+void btmrvl_firmware_dump(struct btmrvl_private *priv)
-+{
-+	if (priv->firmware_dump)
-+		priv->firmware_dump(priv);
-+}
-+
- static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
- {
- 	int ret = 0;
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 8588fdd..6f99b9f 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1311,11 +1311,9 @@ rdwr_status btmrvl_sdio_rdwr_firmware(struct btmrvl_private *priv,
- }
- 
- /* This function dump sdio register and memory data */
--static int btmrvl_sdio_coredump(struct device *dev)
-+static void btmrvl_sdio_dump_firmware(struct btmrvl_private *priv)
- {
--	struct sdio_func *func = dev_to_sdio_func(dev);
--	struct btmrvl_sdio_card *card;
--	struct btmrvl_private *priv;
-+	struct btmrvl_sdio_card *card = priv->btmrvl_dev.card;
- 	int ret = 0;
- 	unsigned int reg, reg_start, reg_end;
- 	enum rdwr_status stat;
-@@ -1323,15 +1321,12 @@ static int btmrvl_sdio_coredump(struct device *dev)
- 	u8 dump_num = 0, idx, i, read_reg, doneflag = 0;
- 	u32 memory_size, fw_dump_len = 0;
- 
--	card = sdio_get_drvdata(func);
--	priv = card->priv;
--
- 	/* dump sdio register first */
- 	btmrvl_sdio_dump_regs(priv);
- 
- 	if (!card->supports_fw_dump) {
- 		BT_ERR("Firmware dump not supported for this card!");
--		return -ENODATA;
-+		return;
- 	}
- 
- 	for (idx = 0; idx < ARRAY_SIZE(mem_type_mapping_tbl); idx++) {
-@@ -1450,12 +1445,12 @@ static int btmrvl_sdio_coredump(struct device *dev)
- 	sdio_release_host(card->func);
- 
- 	if (fw_dump_len == 0)
--		return -ENODATA;
-+		return;
- 
- 	fw_dump_data = vzalloc(fw_dump_len+1);
- 	if (!fw_dump_data) {
- 		BT_ERR("Vzalloc fw_dump_data fail!");
--		return -ENOMEM;
-+		return;
- 	}
- 	fw_dump_ptr = fw_dump_data;
- 
-@@ -1492,7 +1487,6 @@ static int btmrvl_sdio_coredump(struct device *dev)
- 	 */
- 	dev_coredumpv(&card->func->dev, fw_dump_data, fw_dump_len, GFP_KERNEL);
- 	BT_INFO("== btmrvl firmware dump to /sys/class/devcoredump end");
--	return 0;
- }
- 
- static int btmrvl_sdio_probe(struct sdio_func *func,
-@@ -1553,6 +1547,7 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
- 	priv->hw_host_to_card = btmrvl_sdio_host_to_card;
- 	priv->hw_wakeup_firmware = btmrvl_sdio_wakeup_fw;
- 	priv->hw_process_int_status = btmrvl_sdio_process_int_status;
-+	priv->firmware_dump = btmrvl_sdio_dump_firmware;
- 
- 	if (btmrvl_register_hdev(priv)) {
- 		BT_ERR("Register hdev failed!");
-@@ -1722,7 +1717,6 @@ static int btmrvl_sdio_resume(struct device *dev)
- 	.remove		= btmrvl_sdio_remove,
- 	.drv = {
- 		.owner = THIS_MODULE,
--		.coredump = btmrvl_sdio_coredump,
- 		.pm = &btmrvl_sdio_pm_ops,
- 	}
- };
--- 
-1.9.1
-
+Bjorn
