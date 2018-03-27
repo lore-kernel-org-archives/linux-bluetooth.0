@@ -1,100 +1,42 @@
-Return-Path: <thierry.escande@linaro.org>
-Subject: Re: [PATCH v5 2/3] dt-bindings: net: bluetooth: Add
- qualcomm-bluetooth
-To: Bjorn Andersson <bjorn.andersson@linaro.org>,
- Marcel Holtmann <marcel@holtmann.org>
-Cc: Rob Herring <robh+dt@kernel.org>, Andy Gross <andy.gross@linaro.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, David Brown
- <david.brown@linaro.org>, Mark Rutland <mark.rutland@arm.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Loic Poulain <loic.poulain@linaro.org>,
- Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
- linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree <devicetree@vger.kernel.org>, linux-kernel@vger.kernel.org
-References: <20180320032331.29865-1-thierry.escande@linaro.org>
- <20180320032331.29865-3-thierry.escande@linaro.org>
- <FAC61078-6298-47A7-A51C-73D72BEF6E4A@holtmann.org>
- <20180326225106.GC1403@tuxbook-pro>
-From: Thierry Escande <thierry.escande@linaro.org>
-Message-ID: <2e0db4b4-80cc-9a5b-9e0a-812f1bc9fbcf@linaro.org>
-Date: Tue, 27 Mar 2018 17:56:28 +0200
-MIME-Version: 1.0
-In-Reply-To: <20180326225106.GC1403@tuxbook-pro>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] gatt: Fix checking for paired flag instead of bonded
+Date: Tue, 27 Mar 2018 18:38:20 +0300
+Message-Id: <20180327153820.25606-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bjorn,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 27/03/2018 00:51, Bjorn Andersson wrote:
-> On Tue 20 Mar 23:58 HKT 2018, Marcel Holtmann wrote:
->>> Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
-> [..]
->>> + - clocks: clock phandle for SUSCLK_32KHZ
->>
->> if I compare this with broadcom-bluetooth.txt or ti-bluetooth.txt then
->> besides compatible, everything else is optional. The
->> nokia-bluetooth.txt has everything required, but that is also a really
->> specific platform.
->>
->> Can we be less restrictive for a QCA general purpose chip?
->>
-> 
-> The way we deal with this in other bindings is that we tie such
-> requirements to the compatible; i.e. we would say that qcom,qca6174-bt
-> requires a clock and we would have something like qcom,qca-bt that makes
-> it optional.
-> 
-> The beauty of this is that the driver will tell you if you forgot to
-> specify the clock when it actually is required, which saves you
-> considerable amount of debugging time.
-> 
-> 
-> NB. The way the bcm driver handles this is insufficient, as it treats
-> any error from clk_get as "there's no clock specified". The driver
-> should accept a clock not being specified, but should fail properly when
-> a clock is specified but can't be acquired (e.g. due to clk_get()
-> returning EPROBE_DEFER).
-> 
->>> +
->>> +Example:
->>> +
->>> +serial@7570000 {
->>> +	pinctrl-names = "default", "sleep";
->>> +	pinctrl-0 = <&blsp1_uart1_default>;
->>> +	pinctrl-1 = <&blsp1_uart1_sleep>;
->>> +
->>> +	bluetooth {
->>> +		compatible = "qcom,qca6174-bt";
->>> +
->>> +		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
->>> +
->>> +		pinctrl-names = "default";
->>> +		pinctrl-0 = <&bt_en_pin_a>;
->>
->> This one I do not understand and you might want to shed some light
->> into why this is done that way.
->>
-> 
-> This is completely generic and only relates to getting the electrical
-> properties of the gpio pin set up correctly. So I would recommend that
-> we omit this from the binding and example (including the pinctrl
-> properties for the serial above).
+Device state should remain valid for devices that are bonded/stored not
+only paired.
+---
+ src/gatt-database.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-If I remove the pinctrl entry in the bluetooth node, the gpio19 is then 
-marked as unclaimed. The drive strength also defaults to low but that 
-doesn't seem to be an issue and the the chip can still be enabled 
-through gpio19. Is it ok to have it unclaimed? If so I can remove it 
-from the binding and the doc then.
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 2c2526f74..5e2390b34 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -324,7 +324,7 @@ static void att_disconnected(int err, void *user_data)
+ 	if (!device)
+ 		goto remove;
+ 
+-	if (device_is_paired(device, state->bdaddr_type))
++	if (device_is_bonded(device, state->bdaddr_type))
+ 		return;
+ 
+ remove:
+@@ -1125,7 +1125,7 @@ static void send_notification_to_device(void *data, void *user_data)
+ 
+ 	server = btd_device_get_gatt_server(device);
+ 	if (!server) {
+-		if (!device_is_paired(device, device_state->bdaddr_type))
++		if (!device_is_bonded(device, device_state->bdaddr_type))
+ 			goto remove;
+ 		state_set_pending(device_state, notify);
+ 		return;
+-- 
+2.14.3
 
-Regarding the blsp1_uart1_default of the serial node, I can still enable 
-the chip if I remove it but the hci commands all end in timeout. It 
-seems that the function for these pins has to be explicitly set to 
-blsp_uart2. So at least, the default pinctrl seems mandatory.
-
-Regards,
-Thierry
-
-> 
-> Regards,
-> Bjorn
-> 
