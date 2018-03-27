@@ -1,105 +1,58 @@
-Return-Path: <bjorn.andersson@linaro.org>
-Date: Tue, 27 Mar 2018 11:47:22 -0700
-From: Bjorn Andersson <bjorn.andersson@linaro.org>
-To: Thierry Escande <thierry.escande@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Rob Herring <robh+dt@kernel.org>,
-	Andy Gross <andy.gross@linaro.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Brown <david.brown@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	devicetree <devicetree@vger.kernel.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 2/3] dt-bindings: net: bluetooth: Add
- qualcomm-bluetooth
-Message-ID: <20180327184722.GB18510@minitux>
-References: <20180320032331.29865-1-thierry.escande@linaro.org>
- <20180320032331.29865-3-thierry.escande@linaro.org>
- <FAC61078-6298-47A7-A51C-73D72BEF6E4A@holtmann.org>
- <20180326225106.GC1403@tuxbook-pro>
- <2e0db4b4-80cc-9a5b-9e0a-812f1bc9fbcf@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Tue, 27 Mar 2018 20:30:26 +0200 (CEST)
+From: antoine.belvire@laposte.net
+To: linux-bluetooth@vger.kernel.org
+Message-ID: <805571163.1228107.1522175426038.JavaMail.zimbra@laposte.net>
+In-Reply-To: <929278015.1214376.1522174823401.JavaMail.zimbra@laposte.net>
+Subject: [PATCH BlueZ resubmit] adapter: Don't refresh adv_manager for
+ non-LE devices
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <2e0db4b4-80cc-9a5b-9e0a-812f1bc9fbcf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue 27 Mar 08:56 PDT 2018, Thierry Escande wrote:
+btd_adv_manager_refresh is called upon MGMT_SETTING_DISCOVERABLE setting change
+but as only LE adapters have an adv_manager, this leads to segmentation fault
+for non-LE devices:
 
-> Hi Bjorn,
-> 
-> On 27/03/2018 00:51, Bjorn Andersson wrote:
-> > On Tue 20 Mar 23:58 HKT 2018, Marcel Holtmann wrote:
-> > > > Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
-> > [..]
-> > > > + - clocks: clock phandle for SUSCLK_32KHZ
-> > > 
-> > > if I compare this with broadcom-bluetooth.txt or ti-bluetooth.txt then
-> > > besides compatible, everything else is optional. The
-> > > nokia-bluetooth.txt has everything required, but that is also a really
-> > > specific platform.
-> > > 
-> > > Can we be less restrictive for a QCA general purpose chip?
-> > > 
-> > 
-> > The way we deal with this in other bindings is that we tie such
-> > requirements to the compatible; i.e. we would say that qcom,qca6174-bt
-> > requires a clock and we would have something like qcom,qca-bt that makes
-> > it optional.
-> > 
-> > The beauty of this is that the driver will tell you if you forgot to
-> > specify the clock when it actually is required, which saves you
-> > considerable amount of debugging time.
-> > 
-> > 
-> > NB. The way the bcm driver handles this is insufficient, as it treats
-> > any error from clk_get as "there's no clock specified". The driver
-> > should accept a clock not being specified, but should fail properly when
-> > a clock is specified but can't be acquired (e.g. due to clk_get()
-> > returning EPROBE_DEFER).
-> > 
-> > > > +
-> > > > +Example:
-> > > > +
-> > > > +serial@7570000 {
-> > > > +	pinctrl-names = "default", "sleep";
-> > > > +	pinctrl-0 = <&blsp1_uart1_default>;
-> > > > +	pinctrl-1 = <&blsp1_uart1_sleep>;
-> > > > +
-> > > > +	bluetooth {
-> > > > +		compatible = "qcom,qca6174-bt";
-> > > > +
-> > > > +		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
-> > > > +
-> > > > +		pinctrl-names = "default";
-> > > > +		pinctrl-0 = <&bt_en_pin_a>;
-> > > 
-> > > This one I do not understand and you might want to shed some light
-> > > into why this is done that way.
-> > > 
-> > 
-> > This is completely generic and only relates to getting the electrical
-> > properties of the gpio pin set up correctly. So I would recommend that
-> > we omit this from the binding and example (including the pinctrl
-> > properties for the serial above).
-> 
-> If I remove the pinctrl entry in the bluetooth node, the gpio19 is then
-> marked as unclaimed. The drive strength also defaults to low but that
-> doesn't seem to be an issue and the the chip can still be enabled through
-> gpio19. Is it ok to have it unclaimed? If so I can remove it from the
-> binding and the doc then.
-> 
-> Regarding the blsp1_uart1_default of the serial node, I can still enable the
-> chip if I remove it but the hci commands all end in timeout. It seems that
-> the function for these pins has to be explicitly set to blsp_uart2. So at
-> least, the default pinctrl seems mandatory.
-> 
+0  btd_adv_manager_refresh (manager=0x0) at src/advertising.c:1176
+1  0x0000556fe45fcb02 in settings_changed (settings=<optimized out>,
+    adapter=0x556fe53f7c70) at src/adapter.c:543
+2  new_settings_callback (index=<optimized out>, length=<optimized out>,
+    param=<optimized out>, user_data=0x556fe53f7c70) at src/adapter.c:573
+3  0x0000556fe462c278 in request_complete (mgmt=mgmt@entry=0x556fe53f20c0,
+    status=<optimized out>, opcode=opcode@entry=7, index=index@entry=0,
+    length=length@entry=4, param=0x556fe53eb5f9) at src/shared/mgmt.c:261
+4  0x0000556fe462cd9d in can_read_data (io=<optimized out>,
+    user_data=0x556fe53f20c0) at src/shared/mgmt.c:353
+5  0x0000556fe46396e3 in watch_callback (channel=<optimized out>,
+    cond=<optimized out>, user_data=<optimized out>)
+    at src/shared/io-glib.c:170
+6  0x00007fe351c980e5 in g_main_context_dispatch ()
+   from /usr/lib64/libglib-2.0.so.0
+7  0x00007fe351c984b0 in ?? () from /usr/lib64/libglib-2.0.so.0
+8  0x00007fe351c987c2 in g_main_loop_run () from /usr/lib64/libglib-2.0.so.0
+9  0x0000556fe45abc75 in main (argc=<optimized out>, argv=<optimized out>)
+    at src/main.c:770
 
-Our board needs these properties to get the uart and gpio in the right
-state, but this is unrelated to BT - that's why I suggested that you
-omit these properties from the BT binding.
+This commit prevents the call to btd_adv_manager_refresh for non-LE devices.
+---
+ src/adapter.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Regards,
-Bjorn
+diff --git a/src/adapter.c b/src/adapter.c
+index 6b9222bcf..daccfdc19 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -540,7 +540,8 @@ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
+ 		g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 					ADAPTER_INTERFACE, "Discoverable");
+ 		store_adapter_info(adapter);
+-		btd_adv_manager_refresh(adapter->adv_manager);
++		if (adapter->supported_settings & MGMT_SETTING_LE)
++			btd_adv_manager_refresh(adapter->adv_manager);
+ 	}
+ 
+ 	if (changed_mask & MGMT_SETTING_BONDABLE) {
+-- 
+2.16.2
