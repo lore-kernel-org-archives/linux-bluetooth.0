@@ -2,35 +2,55 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Revert "Bluetooth: btmrvl: support sysfs initiated
- firmware coredump"
+Subject: Re: [PATCH] Bluetooth: hidp: sixaxis dualshock report via ctrl quirk
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1522184620-1695-1-git-send-email-arend.vanspriel@broadcom.com>
-Date: Wed, 28 Mar 2018 11:37:16 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Message-Id: <6DE6EDF0-488F-477D-A978-A19232594961@holtmann.org>
-References: <1522184620-1695-1-git-send-email-arend.vanspriel@broadcom.com>
-To: Arend van Spriel <arend.vanspriel@broadcom.com>
+In-Reply-To: <20180328034526.13446-1-arnaud.rebillout@collabora.com>
+Date: Wed, 28 Mar 2018 11:30:21 +0200
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>, vivek@collabora.com
+Message-Id: <DABE3E89-2AAE-457C-AAEA-BFE34844BE96@holtmann.org>
+References: <20180328034526.13446-1-arnaud.rebillout@collabora.com>
+To: Arnaud Rebillout <arnaud.rebillout@collabora.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arend,
+Hi Arnaud,
 
-> This reverts commit 118c193d9699ffc1c897c38a1d314f38543c8e1c. A discussion
-> about the driver callback ended with the idea to change the return type of
-> the callback to void. That change would lead to build error in linux-next
-> so let's remove this change and resubmit later according the new callback
-> definition.
+> The Sixaxis and Dualshock 4 wants report sent via the ctrl channel.
 > 
-> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> This patch has been used in the SteamOS kernel for a while now.
+> <https://github.com/ValveSoftware/steamos_kernel/commit/6e215b67a13c85d0cf5a9e0970acd9df7d2b77bd>
+> 
+> Signed-off-by: Vivek Das Mohapatra <vivek@collabora.com>
+> Signed-off-by: Arnaud Rebillout <arnaud.rebillout@collabora.com>
 > ---
-> Hi Marcel,
+> net/bluetooth/hidp/core.c | 13 ++++++++++---
+> 1 file changed, 10 insertions(+), 3 deletions(-)
 > 
-> Still noticed the patch in bt-next/master so decided to sent this formal
-> revert patch.
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index 1036e4fa1ea2..fa75da91a559 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -379,9 +379,16 @@ static int hidp_output_report(struct hid_device *hid, __u8 *data, size_t count)
+> {
+> 	struct hidp_session *session = hid->driver_data;
+> 
+> -	return hidp_send_intr_message(session,
+> -				      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
+> -				      data, count);
+> +	/* The Sixaxis and Dualshock 4 wants report sent via the ctrl channel */
+> +	if (hid->vendor == 0x54c && (hid->product == 0x5c4 || hid->product == 0x268)) {
+> +		return hidp_send_ctrl_message(session,
+> +					      HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT,
+> +					      data, count);
+> +	} else {
+> +		return hidp_send_intr_message(session,
+> +					      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
+> +					      data, count);
+> +	}
+> }
 
-I rebased the tree now to take this patch out. Thanks for reminding me.
+see the comment from Bastien, the HIDP layer is just a transport layer and should really not need to know about device specific quirks. Seems these quirks could be easily handled one layer about where the right channel is selected.
 
 Regards
 
