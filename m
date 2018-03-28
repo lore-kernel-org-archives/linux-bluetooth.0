@@ -1,58 +1,56 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: hidp: sixaxis dualshock report via ctrl quirk
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180328034526.13446-1-arnaud.rebillout@collabora.com>
-Date: Wed, 28 Mar 2018 11:30:21 +0200
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>, vivek@collabora.com
-Message-Id: <DABE3E89-2AAE-457C-AAEA-BFE34844BE96@holtmann.org>
-References: <20180328034526.13446-1-arnaud.rebillout@collabora.com>
-To: Arnaud Rebillout <arnaud.rebillout@collabora.com>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] gatt: Fix checking for paired flag instead of bonded
+Date: Wed, 28 Mar 2018 08:44:06 +0200
+Message-ID: <2347263.yuiY7U8pNs@ix>
+In-Reply-To: <20180327153820.25606-1-luiz.dentz@gmail.com>
+References: <20180327153820.25606-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arnaud,
+Hi Luiz,
 
-> The Sixaxis and Dualshock 4 wants report sent via the ctrl channel.
+On Tuesday, 27 March 2018 17:38:20 CEST Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> This patch has been used in the SteamOS kernel for a while now.
-> <https://github.com/ValveSoftware/steamos_kernel/commit/6e215b67a13c85d0cf5a9e0970acd9df7d2b77bd>
-> 
-> Signed-off-by: Vivek Das Mohapatra <vivek@collabora.com>
-> Signed-off-by: Arnaud Rebillout <arnaud.rebillout@collabora.com>
+> Device state should remain valid for devices that are bonded/stored not
+> only paired.
 > ---
-> net/bluetooth/hidp/core.c | 13 ++++++++++---
-> 1 file changed, 10 insertions(+), 3 deletions(-)
+>  src/gatt-database.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-> index 1036e4fa1ea2..fa75da91a559 100644
-> --- a/net/bluetooth/hidp/core.c
-> +++ b/net/bluetooth/hidp/core.c
-> @@ -379,9 +379,16 @@ static int hidp_output_report(struct hid_device *hid, __u8 *data, size_t count)
-> {
-> 	struct hidp_session *session = hid->driver_data;
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 2c2526f74..5e2390b34 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -324,7 +324,7 @@ static void att_disconnected(int err, void *user_data)
+>  	if (!device)
+>  		goto remove;
 > 
-> -	return hidp_send_intr_message(session,
-> -				      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
-> -				      data, count);
-> +	/* The Sixaxis and Dualshock 4 wants report sent via the ctrl channel */
-> +	if (hid->vendor == 0x54c && (hid->product == 0x5c4 || hid->product == 0x268)) {
-> +		return hidp_send_ctrl_message(session,
-> +					      HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT,
-> +					      data, count);
-> +	} else {
-> +		return hidp_send_intr_message(session,
-> +					      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
-> +					      data, count);
-> +	}
-> }
+> -	if (device_is_paired(device, state->bdaddr_type))
+> +	if (device_is_bonded(device, state->bdaddr_type))
+>  		return;
+> 
+>  remove:
+> @@ -1125,7 +1125,7 @@ static void send_notification_to_device(void *data,
+> void *user_data)
+> 
+>  	server = btd_device_get_gatt_server(device);
+>  	if (!server) {
+> -		if (!device_is_paired(device, device_state->bdaddr_type))
+> +		if (!device_is_bonded(device, device_state->bdaddr_type))
+>  			goto remove;
+>  		state_set_pending(device_state, notify);
+>  		return;
 
-see the comment from Bastien, the HIDP layer is just a transport layer and should really not need to know about device specific quirks. Seems these quirks could be easily handled one layer about where the right channel is selected.
+Applied, thanks.
 
-Regards
+-- 
+pozdrawiam
+Szymon Janc
 
-Marcel
 
