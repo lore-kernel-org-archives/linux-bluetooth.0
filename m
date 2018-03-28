@@ -1,25 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: David Frey <dpfrey@gmail.com>
-Date: Wed, 28 Mar 2018 11:02:11 -0700
-Message-ID: <CAAvkfd_baAUHfnO9JX3h2rc4BYQBzjBeWqf2tiGBMJQMG2yseA@mail.gmail.com>
-Subject: Support adapter without HCI
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH -next] Bluetooth: btrsi: remove unused including
+ <linux/version.h>
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1522243334-94150-1-git-send-email-weiyongjun1@huawei.com>
+Date: Wed, 28 Mar 2018 17:25:41 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
+Message-Id: <1E496CDC-4C0E-48F9-B752-7B925E1FEFD2@holtmann.org>
+References: <1522243334-94150-1-git-send-email-weiyongjun1@huawei.com>
+To: Wei Yongjun <weiyongjun1@huawei.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Is it possible to support a bluetooth adapter in the Linux kernel in
-the case where the adapter doesn't present a HCI interface?  The
-adapter in question was originally envisioned as a standalone host,
-but I am interested in using it as an adapter (over SPI) controlled by
-another CPU running Linux.  The BLE implementation on the target is a
-closed source binary that provides GAP and GATT APIs.  Details of the
-APIs are here: http://labs.mediatek.com/api/mt7697/group___bluetooth.html
+Hi Wei,
 
-If it *is* possible to support adapters which don't offer an HCI
-interface, then I'm hoping that someone can point me at an example or
-an interface definition so I can get an idea of what is required.
+> Remove including <linux/version.h> that don't need it.
+> 
+> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+> ---
+> drivers/bluetooth/btrsi.c | 1 -
+> 1 file changed, 1 deletion(-)
 
-Thanks,
-David
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
