@@ -2,34 +2,35 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Remove DMI quirk for the MINIX Z83-4
+Subject: Re: [PATCH] Revert "Bluetooth: btmrvl: support sysfs initiated
+ firmware coredump"
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180326220928.2755-1-ianwmorrison@gmail.com>
-Date: Wed, 28 Mar 2018 11:39:29 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-serial@vger.kernel.org,
-        linux-acpi <linux-acpi@vger.kernel.org>, stable@vger.kernel.org,
-        hdegoede@redhat.com
-Message-Id: <5DF0FA92-1058-45C9-AB5E-6C9678EF6BAE@holtmann.org>
-References: <20180326220928.2755-1-ianwmorrison@gmail.com>
-To: ianwmorrison@gmail.com
+In-Reply-To: <1522184620-1695-1-git-send-email-arend.vanspriel@broadcom.com>
+Date: Wed, 28 Mar 2018 11:37:16 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Message-Id: <6DE6EDF0-488F-477D-A978-A19232594961@holtmann.org>
+References: <1522184620-1695-1-git-send-email-arend.vanspriel@broadcom.com>
+To: Arend van Spriel <arend.vanspriel@broadcom.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ian,
+Hi Arend,
 
-> As Interrupt resource specified IRQs are now assumed to be always
-> active-low the DMI quirk for the MINIX Z83-4 is no longer required.
+> This reverts commit 118c193d9699ffc1c897c38a1d314f38543c8e1c. A discussion
+> about the driver callback ended with the idea to change the return type of
+> the callback to void. That change would lead to build error in linux-next
+> so let's remove this change and resubmit later according the new callback
+> definition.
 > 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ian W MORRISON <ianwmorrison@gmail.com>
+> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
 > ---
-> drivers/bluetooth/hci_bcm.c | 7 -------
-> 1 file changed, 7 deletions(-)
+> Hi Marcel,
+> 
+> Still noticed the patch in bt-next/master so decided to sent this formal
+> revert patch.
 
-patch has been applied to bluetooth-next tree.
+I rebased the tree now to take this patch out. Thanks for reminding me.
 
 Regards
 
