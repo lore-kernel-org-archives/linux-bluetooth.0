@@ -1,51 +1,43 @@
-Return-Path: <arnaud.rebillout@collabora.com>
-From: Arnaud Rebillout <arnaud.rebillout@collabora.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: arnaud.rebillout@collabora.com,
-	marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	vivek@collabora.com
-Subject: [PATCH] Bluetooth: hidp: sixaxis dualshock report via ctrl quirk
-Date: Wed, 28 Mar 2018 10:45:26 +0700
-Message-Id: <20180328034526.13446-1-arnaud.rebillout@collabora.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+From: Mikhail Gavrilov <mikhail.v.gavrilov@gmail.com>
+Date: Wed, 28 Mar 2018 08:24:26 +0500
+Message-ID: <CABXGCsOtMbRwZcyBRXWq+a2j4K7Q=JMPEC=xikrFCSqUypJyxA@mail.gmail.com>
+Subject: BUG: sleeping function called from invalid context at net/core/sock.c:2768
+To: linux-bluetooth@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: vivek <vivek@collabora.com>
+$ uname -r
+4.16.0-rc7
 
-The Sixaxis and Dualshock 4 wants report sent via the ctrl channel.
+[85044.650045] Bluetooth: hci0: last event is not cmd complete (0x0f)
+[85057.544598] usb 1-9.2: USB disconnect, device number 12
+[85060.640035] Bluetooth: hci0: last event is not cmd complete (0x0f)
+[85065.025725] BUG: sleeping function called from invalid context at
+net/core/sock.c:2768
+[85065.025729] in_atomic(): 1, irqs_disabled(): 0, pid: 2084, name: krfcommd
+[85065.025730] INFO: lockdep is turned off.
+[85065.025733] CPU: 6 PID: 2084 Comm: krfcommd Not tainted 4.16.0-rc7 #1
+[85065.025735] Hardware name: Gigabyte Technology Co., Ltd.
+Z87M-D3H/Z87M-D3H, BIOS F11 08/12/2014
+[85065.025736] Call Trace:
+[85065.025743]  dump_stack+0x85/0xbf
+[85065.025747]  ___might_sleep+0x15b/0x240
+[85065.025751]  lock_sock_nested+0x29/0xa0
+[85065.025764]  bt_accept_enqueue+0x3c/0xb0 [bluetooth]
+[85065.025770]  rfcomm_connect_ind+0x227/0x250 [rfcomm]
+[85065.025774]  rfcomm_run+0x155a/0x1860 [rfcomm]
+[85065.025778]  ? do_wait_intr_irq+0xb0/0xb0
+[85065.025783]  ? rfcomm_check_accept+0xa0/0xa0 [rfcomm]
+[85065.025786]  kthread+0x121/0x140
+[85065.025789]  ? kthread_create_worker_on_cpu+0x70/0x70
+[85065.025792]  ret_from_fork+0x3a/0x50
+[85069.642058] Bluetooth: hci0: last event is not cmd complete (0x0f)
 
-This patch has been used in the SteamOS kernel for a while now.
-<https://github.com/ValveSoftware/steamos_kernel/commit/6e215b67a13c85d0cf5a9e0970acd9df7d2b77bd>
 
-Signed-off-by: Vivek Das Mohapatra <vivek@collabora.com>
-Signed-off-by: Arnaud Rebillout <arnaud.rebillout@collabora.com>
----
- net/bluetooth/hidp/core.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 1036e4fa1ea2..fa75da91a559 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -379,9 +379,16 @@ static int hidp_output_report(struct hid_device *hid, __u8 *data, size_t count)
- {
- 	struct hidp_session *session = hid->driver_data;
- 
--	return hidp_send_intr_message(session,
--				      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
--				      data, count);
-+	/* The Sixaxis and Dualshock 4 wants report sent via the ctrl channel */
-+	if (hid->vendor == 0x54c && (hid->product == 0x5c4 || hid->product == 0x268)) {
-+		return hidp_send_ctrl_message(session,
-+					      HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT,
-+					      data, count);
-+	} else {
-+		return hidp_send_intr_message(session,
-+					      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
-+					      data, count);
-+	}
- }
- 
- static int hidp_raw_request(struct hid_device *hid, unsigned char reportnum,
--- 
-2.16.2
+--
+Best Regards,
+Mike Gavrilov.
