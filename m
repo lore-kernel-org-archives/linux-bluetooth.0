@@ -14,74 +14,180 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	linux-arm-msm@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 2/3] dt-bindings: net: bluetooth: Add qualcomm-bluetooth
-Date: Wed, 28 Mar 2018 11:51:32 +0200
-Message-Id: <20180328095133.14343-3-thierry.escande@linaro.org>
+Subject: [PATCH v6 1/3] arm64: dts: apq8096-db820c: enable bluetooth node
+Date: Wed, 28 Mar 2018 11:51:31 +0200
+Message-Id: <20180328095133.14343-2-thierry.escande@linaro.org>
 In-Reply-To: <20180328095133.14343-1-thierry.escande@linaro.org>
 References: <20180328095133.14343-1-thierry.escande@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset = "utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add binding document for serial bluetooth chips using Qualcomm protocol.
+Add a new serial node for the Qualcomm BT controller QCA6174. This
+allows automatic probing and hci registration through the serdev
+framework instead of relying on the userspace helpers.
 
 Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
-Reviewed-by: Rob Herring <robh@kernel.org>
 ---
 
-v6:
-- Remove chip specific pinctrl conf
-- Move gpio and clocks into optional props section
+v6
+- Move gpio properties into pinconf subnode
+- move pinmux properties into mux and config subnodes
 
 v5:
 - Rename 'bt-disable-n' gpio as 'enable'
 
-v4:
-- Move bt-disable-n-gpios to required properties section
-- Add clocks and pinctrl-0 as required properties
-
+v4: no change
 v3: no change
-v2: no change
 
- .../devicetree/bindings/net/qualcomm-bluetooth.txt | 30 ++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+v2:
+- Fix author email
 
-diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-new file mode 100644
-index 000000000000..f1ca8f667a5e
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-@@ -0,0 +1,30 @@
-+Qualcomm Bluetooth Chips
-+---------------------
+ arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  | 26 +++++++++++++++++
+ .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    | 21 ++++++++++++++
+ arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       | 33 ++++++++++++++++++++++
+ arch/arm64/boot/dts/qcom/msm8996.dtsi              | 10 +++++++
+ 4 files changed, 90 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi b/arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi
+index 24552f19b3fa..6a573875d45a 100644
+--- a/arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi
++++ b/arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi
+@@ -36,4 +36,30 @@
+ 			drive-strength = <2>;	/* 2 MA */
+ 		};
+ 	};
 +
-+This documents the binding structure and common properties for serial
-+attached Qualcomm devices.
++	blsp1_uart1_default: blsp1_uart1_default {
++		mux {
++			pins = "gpio41", "gpio42", "gpio43", "gpio44";
++			function = "blsp_uart2";
++		};
 +
-+Serial attached Qualcomm devices shall be a child node of the host UART
-+device the slave device is attached to.
-+
-+Required properties:
-+ - compatible: should contain one of the following:
-+   * "qcom,qca6174-bt"
-+
-+Optional properties:
-+ - enable-gpios: gpio specifier used to enable chip
-+ - clocks: clock provided to the controler (SUSCLK_32KHZ)
-+
-+Example:
-+
-+serial@7570000 {
-+	label = "BT-UART";
-+	status = "okay";
-+
-+	bluetooth {
-+		compatible = "qcom,qca6174-bt";
-+
-+		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
-+		clocks = <&divclk4>;
++		config {
++			pins = "gpio41", "gpio42", "gpio43", "gpio44";
++			drive-strength = <16>;
++			bias-disable;
++		};
 +	};
-+};
++
++	blsp1_uart1_sleep: blsp1_uart1_sleep {
++		mux {
++			pins = "gpio41", "gpio42", "gpio43", "gpio44";
++			function = "gpio";
++		};
++
++		config {
++			pins = "gpio41", "gpio42", "gpio43", "gpio44";
++			drive-strength = <2>;
++			bias-disable;
++		};
++	};
+ };
+diff --git a/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi b/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi
+index 59b29ddfb6e9..0a8cf7e5974f 100644
+--- a/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi
++++ b/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi
+@@ -26,6 +26,27 @@
+ 		};
+ 	};
+ 
++	divclk4_pin_a: divclk4 {
++		pinconf {
++			pins = "gpio18";
++			function = PMIC_GPIO_FUNC_FUNC2;
++
++			bias-disable;
++			power-source = <PM8994_GPIO_S4>;
++		};
++	};
++
++	bt_en_pin_a: bt-en-active {
++		pinconf {
++			pins = "gpio19";
++			function = PMIC_GPIO_FUNC_NORMAL;
++
++			output-low;
++			power-source = <PM8994_GPIO_S4>; // 1.8V
++			qcom,drive-strength = <PMIC_GPIO_STRENGTH_LOW>;
++		};
++	};
++
+ 	usb3_vbus_det_gpio: pm8996_gpio22 {
+ 		pinconf {
+ 			pins = "gpio22";
+diff --git a/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi b/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi
+index 1c8f1b86472d..8b3bcdf0d718 100644
+--- a/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi
++++ b/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi
+@@ -23,6 +23,7 @@
+ 	aliases {
+ 		serial0 = &blsp2_uart1;
+ 		serial1 = &blsp2_uart2;
++		serial2 = &blsp1_uart1;
+ 		i2c0	= &blsp1_i2c2;
+ 		i2c1	= &blsp2_i2c1;
+ 		i2c2	= &blsp2_i2c0;
+@@ -34,7 +35,39 @@
+ 		stdout-path = "serial0:115200n8";
+ 	};
+ 
++	clocks {
++		divclk4: divclk4 {
++			compatible = "fixed-clock";
++			#clock-cells = <0>;
++			clock-frequency = <32768>;
++			clock-output-names = "divclk4";
++
++			pinctrl-names = "default";
++			pinctrl-0 = <&divclk4_pin_a>;
++		};
++	};
++
+ 	soc {
++		serial@7570000 {
++			label = "BT-UART";
++			status = "okay";
++			pinctrl-names = "default", "sleep";
++			pinctrl-0 = <&blsp1_uart1_default>;
++			pinctrl-1 = <&blsp1_uart1_sleep>;
++
++			bluetooth {
++				compatible = "qcom,qca6174-bt";
++
++				/* bt_disable_n gpio */
++				enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
++
++				pinctrl-names = "default";
++				pinctrl-0 = <&bt_en_pin_a>;
++
++				clocks = <&divclk4>;
++			};
++		};
++
+ 		serial@75b0000 {
+ 			label = "LS-UART1";
+ 			status = "okay";
+diff --git a/arch/arm64/boot/dts/qcom/msm8996.dtsi b/arch/arm64/boot/dts/qcom/msm8996.dtsi
+index 0a6f7952bbb1..2d54a86a027f 100644
+--- a/arch/arm64/boot/dts/qcom/msm8996.dtsi
++++ b/arch/arm64/boot/dts/qcom/msm8996.dtsi
+@@ -408,6 +408,16 @@
+ 			#clock-cells = <1>;
+ 		};
+ 
++		blsp1_uart1: serial@7570000 {
++			compatible = "qcom,msm-uartdm-v1.4", "qcom,msm-uartdm";
++			reg = <0x07570000 0x1000>;
++			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&gcc GCC_BLSP1_UART2_APPS_CLK>,
++				 <&gcc GCC_BLSP1_AHB_CLK>;
++			clock-names = "core", "iface";
++			status = "disabled";
++		};
++
+ 		blsp1_spi0: spi@7575000 {
+ 			compatible = "qcom,spi-qup-v2.2.1";
+ 			reg = <0x07575000 0x600>;
 -- 
 2.14.1
