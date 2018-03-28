@@ -1,306 +1,267 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH v2] gatt: Add support for storing Service Changed CCC value
-Date: Wed, 28 Mar 2018 12:10:55 +0200
-Message-Id: <20180328101055.16375-1-szymon.janc@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <thierry.escande@linaro.org>
+From: Thierry Escande <thierry.escande@linaro.org>
+To: Rob Herring <robh+dt@kernel.org>,
+	Andy Gross <andy.gross@linaro.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	David Brown <david.brown@linaro.org>,
+	Mark Rutland <mark.rutland@arm.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Bjorn Andersson <bjorn.andersson@linaro.org>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	linux-bluetooth@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v6 3/3] Bluetooth: hci_qca: Add serdev support
+Date: Wed, 28 Mar 2018 11:51:33 +0200
+Message-Id: <20180328095133.14343-4-thierry.escande@linaro.org>
+In-Reply-To: <20180328095133.14343-1-thierry.escande@linaro.org>
+References: <20180328095133.14343-1-thierry.escande@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset = "utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for storing CCC value of Service Changed
-characteristic. Once bluetoothd is restart stored values are read
-and any device subscribed to indications will receive Service Changed
-indication with 0x00010-0xffff value. This is to invalidate any
-non-core services since there is no way to verify if applications
-will register their services in same order (or at all).
+Add support for Qualcomm serial slave devices. Probe the serial device,
+retrieve its maximum speed and register a new hci uart device.
 
-This fix accessing invalid handles by stacks that rely only on Service
-Changed indication for rediscovery ie. Apple iOS.
+Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- doc/settings-storage.txt |  8 +++++
- src/adapter.c            |  3 ++
- src/device.c             | 78 ++++++++++++++++++++++++++++++++++++++++++++
- src/device.h             |  6 ++++
- src/gatt-database.c      | 85 ++++++++++++++++++++++++++++++++++++++++++++++--
- src/gatt-database.h      |  2 ++
- 6 files changed, 180 insertions(+), 2 deletions(-)
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 160bbb246..dd6fc5746 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -302,3 +302,11 @@ Long term key) related to a remote device.
-   Counter		Integer		Signing counter
+v6:
+- Fix gpio name in error message
+
+v5:
+- Use gpio new name 'enable'
+
+v4:
+- Rename divclk4 as susclk (its name in the bt chip)
+- Use gpiod_set_value_cansleep()
+- Replace #include <linux/of.h> with <linux/mod_devicetable.h>
+- Restore dependency on BT_HCIUART
+
+v3:
+- Remove redundant call to gpiod_set_value() after devm_gpiod_get()
+- Check returned values for clk_set_rate() and clk_prepare_enable()
+- Use clk_disable_unprepare()
+
+v2:
+- Fix author email
+
+ drivers/bluetooth/Kconfig   |   1 +
+ drivers/bluetooth/hci_qca.c | 109 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 108 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 07e55cd8f8c8..e0f1a6609b68 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -196,6 +196,7 @@ config BT_HCIUART_BCM
+ config BT_HCIUART_QCA
+ 	bool "Qualcomm Atheros protocol support"
+ 	depends on BT_HCIUART
++	depends on BT_HCIUART_SERDEV
+ 	select BT_HCIUART_H4
+ 	select BT_QCA
+ 	help
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 05ec530b8a3a..1c4475d0707c 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -29,7 +29,11 @@
+  */
  
-   Authenticated		Boolean		True if the key is authenticated
-+
-+[ServiceChanged]
-+
-+   This section holds informations related to Service Changed characteristic
-+   of GATT core service.
-+
-+  CCC_LE		Integer		CCC value for LE transport
-+  CCC_BR/EDR		Integer		CCC value for BR/EDR transport
-diff --git a/src/adapter.c b/src/adapter.c
-index 6b9222bcf..932b2a34d 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -8017,6 +8017,9 @@ load:
- 	clear_blocked(adapter);
- 	load_devices(adapter);
+ #include <linux/kernel.h>
++#include <linux/clk.h>
+ #include <linux/debugfs.h>
++#include <linux/gpio/consumer.h>
++#include <linux/mod_devicetable.h>
++#include <linux/serdev.h>
  
-+	/* restore Service Changed CCC value for bonded devices */
-+	btd_gatt_database_restore_svc_chng_ccc(adapter->database);
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+@@ -50,6 +54,9 @@
+ #define IBS_TX_IDLE_TIMEOUT_MS		2000
+ #define BAUDRATE_SETTLE_TIMEOUT_MS	300
+ 
++/* susclk rate */
++#define SUSCLK_RATE_32KHZ	32768
 +
- 	/* retrieve the active connections: address the scenario where
- 	 * the are active connections before the daemon've started */
- 	if (adapter->current_settings & MGMT_SETTING_POWERED)
-diff --git a/src/device.c b/src/device.c
-index ce515be9b..f693b7023 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5250,6 +5250,10 @@ const bdaddr_t *device_get_address(struct btd_device *device)
+ /* HCI_IBS transmit side sleep protocol states */
+ enum tx_ibs_states {
+ 	HCI_IBS_TX_ASLEEP,
+@@ -111,6 +118,12 @@ struct qca_data {
+ 	u64 votes_off;
+ };
+ 
++struct qca_serdev {
++	struct hci_uart	 serdev_hu;
++	struct gpio_desc *bt_en;
++	struct clk	 *susclk;
++};
++
+ static void __serial_clock_on(struct tty_struct *tty)
  {
- 	return &device->bdaddr;
- }
-+uint8_t device_get_le_address_type(struct btd_device *device)
-+{
-+	return device->bdaddr_type;
-+}
- 
- const char *device_get_path(const struct btd_device *device)
+ 	/* TODO: Some chipset requires to enable UART clock on client
+@@ -386,6 +399,7 @@ static void hci_ibs_wake_retrans_timeout(struct timer_list *t)
+ /* Initialize protocol */
+ static int qca_open(struct hci_uart *hu)
  {
-@@ -5347,6 +5351,80 @@ void device_set_legacy(struct btd_device *device, bool legacy)
- 					DEVICE_INTERFACE, "LegacyPairing");
- }
++	struct qca_serdev *qcadev;
+ 	struct qca_data *qca;
  
-+void device_store_svc_chng_ccc(struct btd_device *device, uint8_t bdaddr_type,
-+								uint16_t value)
-+{
-+	char filename[PATH_MAX];
-+	char device_addr[18];
-+	GKeyFile *key_file;
-+	uint16_t old_value;
-+	gsize length = 0;
-+	char *str;
+ 	BT_DBG("hu %p qca_open", hu);
+@@ -444,6 +458,13 @@ static int qca_open(struct hci_uart *hu)
+ 	timer_setup(&qca->tx_idle_timer, hci_ibs_tx_idle_timeout, 0);
+ 	qca->tx_idle_delay = IBS_TX_IDLE_TIMEOUT_MS;
+ 
++	if (hu->serdev) {
++		serdev_device_open(hu->serdev);
 +
-+	ba2str(&device->bdaddr, device_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
-+				btd_adapter_get_storage_dir(device->adapter),
-+				device_addr);
-+
-+	key_file = g_key_file_new();
-+	g_key_file_load_from_file(key_file, filename, 0, NULL);
-+
-+	/* for bonded devices this is done on every connection so limit writes
-+	 * to storage if no change needed
-+	 */
-+	if (bdaddr_type == BDADDR_BREDR) {
-+		old_value = g_key_file_get_integer(key_file, "ServiceChanged",
-+							"CCC_BR/EDR", NULL);
-+		if (old_value == value)
-+			goto done;
-+
-+		g_key_file_set_integer(key_file, "ServiceChanged", "CCC_BR/EDR",
-+									value);
-+	} else {
-+		old_value = g_key_file_get_integer(key_file, "ServiceChanged",
-+							"CCC_LE", NULL);
-+		if (old_value == value)
-+			goto done;
-+
-+		g_key_file_set_integer(key_file, "ServiceChanged", "CCC_LE",
-+									value);
++		qcadev = serdev_device_get_drvdata(hu->serdev);
++		gpiod_set_value_cansleep(qcadev->bt_en, 1);
 +	}
 +
-+	create_file(filename, S_IRUSR | S_IWUSR);
-+
-+	str = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(filename, str, length, NULL);
-+	g_free(str);
-+
-+done:
-+	g_key_file_free(key_file);
-+}
-+void device_load_svc_chng_ccc(struct btd_device *device, uint16_t *ccc_le,
-+							uint16_t *ccc_bredr)
-+{
-+	char filename[PATH_MAX];
-+	char device_addr[18];
-+	GKeyFile *key_file;
-+
-+	ba2str(&device->bdaddr, device_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
-+				btd_adapter_get_storage_dir(device->adapter),
-+				device_addr);
-+
-+	key_file = g_key_file_new();
-+	g_key_file_load_from_file(key_file, filename, 0, NULL);
-+
-+	if (ccc_le)
-+		*ccc_le = g_key_file_get_integer(key_file, "ServiceChanged",
-+							"CCC_LE", NULL);
-+
-+	if (ccc_bredr)
-+		*ccc_bredr = g_key_file_get_integer(key_file, "ServiceChanged",
-+							"CCC_BR/EDR", NULL);
-+
-+	g_key_file_free(key_file);
-+}
-+
- void device_set_rssi_with_delta(struct btd_device *device, int8_t rssi,
- 							int8_t delta_threshold)
+ 	BT_DBG("HCI_UART_QCA open, tx_idle_delay=%u, wake_retrans=%u",
+ 	       qca->tx_idle_delay, qca->wake_retrans);
+ 
+@@ -512,6 +533,7 @@ static int qca_flush(struct hci_uart *hu)
+ /* Close protocol */
+ static int qca_close(struct hci_uart *hu)
  {
-diff --git a/src/device.h b/src/device.h
-index 306c813fc..b90f9273a 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -87,6 +87,7 @@ void device_probe_profile(gpointer a, gpointer b);
- void device_remove_profile(gpointer a, gpointer b);
- struct btd_adapter *device_get_adapter(struct btd_device *device);
- const bdaddr_t *device_get_address(struct btd_device *device);
-+uint8_t device_get_le_address_type(struct btd_device *device);
- const char *device_get_path(const struct btd_device *device);
- gboolean device_is_temporary(struct btd_device *device);
- bool device_is_connectable(struct btd_device *device);
-@@ -132,6 +133,11 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg);
- bool device_is_disconnecting(struct btd_device *device);
- void device_set_ltk_enc_size(struct btd_device *device, uint8_t enc_size);
++	struct qca_serdev *qcadev;
+ 	struct qca_data *qca = hu->priv;
  
-+void device_store_svc_chng_ccc(struct btd_device *device, uint8_t bdaddr_type,
-+								uint16_t value);
-+void device_load_svc_chng_ccc(struct btd_device *device, uint16_t *ccc_le,
-+							uint16_t *ccc_bredr);
+ 	BT_DBG("hu %p qca close", hu);
+@@ -525,6 +547,13 @@ static int qca_close(struct hci_uart *hu)
+ 	destroy_workqueue(qca->workqueue);
+ 	qca->hu = NULL;
+ 
++	if (hu->serdev) {
++		serdev_device_close(hu->serdev);
 +
- typedef void (*disconnect_watch) (struct btd_device *device, gboolean removal,
- 					void *user_data);
++		qcadev = serdev_device_get_drvdata(hu->serdev);
++		gpiod_set_value_cansleep(qcadev->bt_en, 0);
++	}
++
+ 	kfree_skb(qca->rx_skb);
  
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 5e2390b34..1cdc72e1b 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -264,7 +264,7 @@ static struct ccc_state *find_ccc_state(struct device_state *dev_state,
+ 	hu->priv = NULL;
+@@ -885,6 +914,14 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	return 0;
  }
  
- static struct device_state *device_state_create(struct btd_gatt_database *db,
--							bdaddr_t *bdaddr,
-+							const bdaddr_t *bdaddr,
- 							uint8_t bdaddr_type)
++static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
++{
++	if (hu->serdev)
++		serdev_device_set_baudrate(hu->serdev, speed);
++	else
++		hci_uart_set_baudrate(hu, speed);
++}
++
+ static int qca_setup(struct hci_uart *hu)
  {
- 	struct device_state *dev_state;
-@@ -324,8 +324,19 @@ static void att_disconnected(int err, void *user_data)
- 	if (!device)
- 		goto remove;
+ 	struct hci_dev *hdev = hu->hdev;
+@@ -905,7 +942,7 @@ static int qca_setup(struct hci_uart *hu)
+ 		speed = hu->proto->init_speed;
  
--	if (device_is_bonded(device, state->bdaddr_type))
-+	if (device_is_bonded(device, state->bdaddr_type)) {
-+		struct ccc_state *ccc;
-+		uint16_t handle;
+ 	if (speed)
+-		hci_uart_set_baudrate(hu, speed);
++		host_set_baudrate(hu, speed);
+ 
+ 	/* Setup user speed if needed */
+ 	speed = 0;
+@@ -924,7 +961,7 @@ static int qca_setup(struct hci_uart *hu)
+ 				   ret);
+ 			return ret;
+ 		}
+-		hci_uart_set_baudrate(hu, speed);
++		host_set_baudrate(hu, speed);
+ 	}
+ 
+ 	/* Setup patch / NVM configurations */
+@@ -958,12 +995,80 @@ static struct hci_uart_proto qca_proto = {
+ 	.dequeue	= qca_dequeue,
+ };
+ 
++static int qca_serdev_probe(struct serdev_device *serdev)
++{
++	struct qca_serdev *qcadev;
++	int err;
 +
-+		handle = gatt_db_attribute_get_handle(state->db->svc_chngd_ccc);
++	qcadev = devm_kzalloc(&serdev->dev, sizeof(*qcadev), GFP_KERNEL);
++	if (!qcadev)
++		return -ENOMEM;
 +
-+		ccc = find_ccc_state(state, handle);
-+		if (ccc)
-+			device_store_svc_chng_ccc(device, state->bdaddr_type,
-+								ccc->value[0]);
++	qcadev->serdev_hu.serdev = serdev;
++	serdev_device_set_drvdata(serdev, qcadev);
 +
- 		return;
++	qcadev->bt_en = devm_gpiod_get(&serdev->dev, "enable",
++				       GPIOD_OUT_LOW);
++	if (IS_ERR(qcadev->bt_en)) {
++		dev_err(&serdev->dev, "failed to acquire enable gpio\n");
++		return PTR_ERR(qcadev->bt_en);
 +	}
- 
- remove:
- 	/* Remove device state if device no longer exists or is not paired */
-@@ -1076,6 +1087,7 @@ static void state_set_pending(struct device_state *state, struct notify *notify)
++
++	qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
++	if (IS_ERR(qcadev->susclk)) {
++		dev_err(&serdev->dev, "failed to acquire clk\n");
++		return PTR_ERR(qcadev->susclk);
++	}
++
++	err = clk_set_rate(qcadev->susclk, SUSCLK_RATE_32KHZ);
++	if (err)
++		return err;
++
++	err = clk_prepare_enable(qcadev->susclk);
++	if (err)
++		return err;
++
++	err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
++	if (err)
++		clk_disable_unprepare(qcadev->susclk);
++
++	return err;
++}
++
++static void qca_serdev_remove(struct serdev_device *serdev)
++{
++	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
++
++	hci_uart_unregister_device(&qcadev->serdev_hu);
++
++	clk_disable_unprepare(qcadev->susclk);
++}
++
++static const struct of_device_id qca_bluetooth_of_match[] = {
++	{ .compatible = "qcom,qca6174-bt" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
++
++static struct serdev_device_driver qca_serdev_driver = {
++	.probe = qca_serdev_probe,
++	.remove = qca_serdev_remove,
++	.driver = {
++		.name = "hci_uart_qca",
++		.of_match_table = qca_bluetooth_of_match,
++	},
++};
++
+ int __init qca_init(void)
  {
- 	uint16_t start, end, old_start, old_end;
- 
-+	/* Cache this only for Service Changed */
- 	if (notify->conf != service_changed_conf)
- 		return;
- 
-@@ -3275,3 +3287,72 @@ void btd_gatt_database_att_connected(struct btd_gatt_database *database,
- 	free(state->pending);
- 	state->pending = NULL;
++	serdev_device_driver_register(&qca_serdev_driver);
++
+ 	return hci_uart_register_proto(&qca_proto);
  }
+ 
+ int __exit qca_deinit(void)
+ {
++	serdev_device_driver_unregister(&qca_serdev_driver);
 +
-+static void restore_ccc(struct btd_gatt_database *database,
-+			const bdaddr_t *addr, uint8_t addr_type, uint16_t value)
-+{
-+	struct device_state *dev_state;
-+	struct ccc_state *ccc;
-+
-+	dev_state = device_state_create(database, addr, addr_type);
-+	queue_push_tail(database->device_states, dev_state);
-+
-+	ccc = new0(struct ccc_state, 1);
-+	ccc->handle = gatt_db_attribute_get_handle(database->svc_chngd_ccc);
-+	memcpy(ccc->value, &value, sizeof(ccc->value));
-+	queue_push_tail(dev_state->ccc_states, ccc);
-+}
-+
-+static void restore_state(struct btd_device *device, void *data)
-+{
-+	struct btd_gatt_database *database = data;
-+	uint16_t ccc_le, ccc_bredr;
-+
-+	device_load_svc_chng_ccc(device, &ccc_le, &ccc_bredr);
-+
-+	if (ccc_le) {
-+		restore_ccc(database, device_get_address(device),
-+				device_get_le_address_type(device), ccc_le);
-+
-+		DBG("%s LE", device_get_path(device));
-+	}
-+
-+	if (ccc_bredr) {
-+		restore_ccc(database, device_get_address(device),
-+						BDADDR_BREDR, ccc_bredr);
-+
-+		DBG("%s BR/EDR", device_get_path(device));
-+	}
-+}
-+
-+void btd_gatt_database_restore_svc_chng_ccc(struct btd_gatt_database *database)
-+{
-+	uint8_t value[4];
-+	uint16_t handle, ccc_handle;
-+
-+	handle = gatt_db_attribute_get_handle(database->svc_chngd);
-+	ccc_handle = gatt_db_attribute_get_handle(database->svc_chngd_ccc);
-+
-+	if (!handle || !ccc_handle) {
-+		error("Failed to obtain handles for \"Service Changed\""
-+							" characteristic");
-+		return;
-+	}
-+
-+	/* restore states for bonded device that registered for Service Changed
-+	 * indication
-+	 */
-+	btd_adapter_for_each_device(database->adapter, restore_state, database);
-+
-+	/* This needs to be updated (probably to 0x0001) if we ever change
-+	 * core services
-+	 *
-+	 * TODO we could also store this info (along with CCC value) and be able
-+	 * to send 0x0001-0xffff only once per device.
-+	 */
-+	put_le16(0x000a, value);
-+	put_le16(0xffff, value + 2);
-+
-+	send_notification_to_devices(database, handle, value, sizeof(value),
-+					ccc_handle, service_changed_conf, NULL);
-+}
-diff --git a/src/gatt-database.h b/src/gatt-database.h
-index 0da33f604..a6c3139c4 100644
---- a/src/gatt-database.h
-+++ b/src/gatt-database.h
-@@ -25,3 +25,5 @@ void btd_gatt_database_destroy(struct btd_gatt_database *database);
- struct gatt_db *btd_gatt_database_get_db(struct btd_gatt_database *database);
- void btd_gatt_database_att_connected(struct btd_gatt_database *database,
- 						struct bt_att *att);
-+
-+void btd_gatt_database_restore_svc_chng_ccc(struct btd_gatt_database *database);
+ 	return hci_uart_unregister_proto(&qca_proto);
+ }
 -- 
-2.14.3
-
+2.14.1
