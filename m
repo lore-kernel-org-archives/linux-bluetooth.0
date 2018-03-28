@@ -1,67 +1,37 @@
-Return-Path: <thierry.escande@linaro.org>
-From: Thierry Escande <thierry.escande@linaro.org>
-To: Rob Herring <robh+dt@kernel.org>,
-	Andy Gross <andy.gross@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Brown <david.brown@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Bjorn Andersson <bjorn.andersson@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v6 0/3] Bluetooth: hci_qca: Add serdev support
-Date: Wed, 28 Mar 2018 11:51:30 +0200
-Message-Id: <20180328095133.14343-1-thierry.escande@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset = "utf-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Remove DMI quirk for the MINIX Z83-4
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180326220928.2755-1-ianwmorrison@gmail.com>
+Date: Wed, 28 Mar 2018 11:39:29 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-serial@vger.kernel.org,
+        linux-acpi <linux-acpi@vger.kernel.org>, stable@vger.kernel.org,
+        hdegoede@redhat.com
+Message-Id: <5DF0FA92-1058-45C9-AB5E-6C9678EF6BAE@holtmann.org>
+References: <20180326220928.2755-1-ianwmorrison@gmail.com>
+To: ianwmorrison@gmail.com
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ian,
 
-This patchset enables the Qualcomm BT controller QCA6174 node in the
-device tree of the db820c board. This allows the bluetooth chipset to
-be probed and registered against the hci layer by using the serdev
-framework.
+> As Interrupt resource specified IRQs are now assumed to be always
+> active-low the DMI quirk for the MINIX Z83-4 is no longer required.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Ian W MORRISON <ianwmorrison@gmail.com>
+> ---
+> drivers/bluetooth/hci_bcm.c | 7 -------
+> 1 file changed, 7 deletions(-)
 
-This patchset also contains the documentation for the compatible
-string "qcom,qca6174-bt" related to this chipset.
+patch has been applied to bluetooth-next tree.
 
-v6:
-- Move pinctrl properties into subnodes
-- fix binding documentation
+Regards
 
-v5:
-- Rename 'bt-disable-n' gpio as 'enable'
+Marcel
 
-v4:
-- Fix dt binding documentation
-- Address some other issues in patch #3
-
-v3:
-- Address comments for patch #3 (details in patch)
-
-v2:
-- Fix author email
-
-Thierry Escande (3):
-  arm64: dts: apq8096-db820c: enable bluetooth node
-  dt-bindings: net: bluetooth: Add qualcomm-bluetooth
-  Bluetooth: hci_qca: Add serdev support
-
- .../devicetree/bindings/net/qualcomm-bluetooth.txt |  34 +++++++
- arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  |  26 +++++
- .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    |  21 ++++
- arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       |  33 +++++++
- arch/arm64/boot/dts/qcom/msm8996.dtsi              |  10 ++
- drivers/bluetooth/Kconfig                          |   1 +
- drivers/bluetooth/hci_qca.c                        | 109 ++++++++++++++++++++-
- 7 files changed, 232 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-
--- 
-2.14.1
