@@ -1,52 +1,51 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
-Subject: [PATCH BlueZ] mesh: Return exit status for non-interactive
-Message-ID: <9f2f8362-c561-a87e-dc61-71dbd15500e1@jp.fujitsu.com>
-Date: Wed, 28 Mar 2018 15:22:02 +0900
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <arnaud.rebillout@collabora.com>
+From: Arnaud Rebillout <arnaud.rebillout@collabora.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: arnaud.rebillout@collabora.com,
+	marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	vivek@collabora.com
+Subject: [PATCH] Bluetooth: hidp: sixaxis dualshock report via ctrl quirk
+Date: Wed, 28 Mar 2018 10:45:26 +0700
+Message-Id: <20180328034526.13446-1-arnaud.rebillout@collabora.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: vivek <vivek@collabora.com>
+
+The Sixaxis and Dualshock 4 wants report sent via the ctrl channel.
+
+This patch has been used in the SteamOS kernel for a while now.
+<https://github.com/ValveSoftware/steamos_kernel/commit/6e215b67a13c85d0cf5a9e0970acd9df7d2b77bd>
+
+Signed-off-by: Vivek Das Mohapatra <vivek@collabora.com>
+Signed-off-by: Arnaud Rebillout <arnaud.rebillout@collabora.com>
 ---
-This patch is related to the previous patch set[1].
+ net/bluetooth/hidp/core.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-[1]: https://www.spinics.net/lists/linux-bluetooth/msg75031.html
-
- mesh/main.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/mesh/main.c b/mesh/main.c
-index d0f71c2d9..3e1484f61 100644
---- a/mesh/main.c
-+++ b/mesh/main.c
-@@ -1904,6 +1904,7 @@ static void client_ready(GDBusClient *client, void *user_data)
- int main(int argc, char *argv[])
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 1036e4fa1ea2..fa75da91a559 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -379,9 +379,16 @@ static int hidp_output_report(struct hid_device *hid, __u8 *data, size_t count)
  {
- 	GDBusClient *client;
-+	int status;
- 	int len;
- 	int extra;
+ 	struct hidp_session *session = hid->driver_data;
  
-@@ -1989,7 +1990,7 @@ int main(int argc, char *argv[])
- 	if (!onoff_client_init(PRIMARY_ELEMENT_IDX))
- 		g_printerr("Failed to initialize mesh generic On/Off client\n");
+-	return hidp_send_intr_message(session,
+-				      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
+-				      data, count);
++	/* The Sixaxis and Dualshock 4 wants report sent via the ctrl channel */
++	if (hid->vendor == 0x54c && (hid->product == 0x5c4 || hid->product == 0x268)) {
++		return hidp_send_ctrl_message(session,
++					      HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT,
++					      data, count);
++	} else {
++		return hidp_send_intr_message(session,
++					      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
++					      data, count);
++	}
+ }
  
--	bt_shell_run();
-+	status = bt_shell_run();
- 
- 	g_dbus_client_unref(client);
- 
-@@ -2001,7 +2002,7 @@ int main(int argc, char *argv[])
- 	g_list_free(service_list);
- 	g_list_free_full(ctrl_list, proxy_leak);
- 
--	return EXIT_SUCCESS;
-+	return status;
- 
- fail:
- 	bt_shell_cleanup();
+ static int hidp_raw_request(struct hid_device *hid, unsigned char reportnum,
 -- 
-2.14.1
-
+2.16.2
