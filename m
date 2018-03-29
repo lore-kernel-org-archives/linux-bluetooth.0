@@ -1,60 +1,42 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20180326133304.14531-1-luiz.dentz@gmail.com>
-References: <20180326133304.14531-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 29 Mar 2018 14:12:04 +0300
-Message-ID: <CABBYNZKrB3uS4ygWzjpB2L420Jatr46gu31S9LPSek2pq8-54A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] shared/shell: Don't allocate any data if env
- value is NULL
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [RFC] Bluetooth: Fix spurious error message
+Date: Thu, 29 Mar 2018 11:41:17 +0200
+Message-Id: <20180329094117.25855-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This message was debug message before 2064ee332e4c1b7495cf68b. Looks
+like it was changed by accident in that patch. This is causing some
+error messages when doing BR/EDR discovery since Inquiry Command
+generates Command Status event, not Command Complete.
 
-On Mon, Mar 26, 2018 at 4:33 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If value is NULL there is no point in allocating any data if value is
-> NULL since bt_shell_get_env would return NULL anyway, also this makes
-> sure the existing value is freed which means passing NULL can remove
-> an env like it was intended.
-> ---
->  src/shared/shell.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/src/shared/shell.c b/src/shared/shell.c
-> index 33bc0d980..241878b30 100644
-> --- a/src/shared/shell.c
-> +++ b/src/shared/shell.c
-> @@ -1142,6 +1142,8 @@ void bt_shell_set_env(const char *name, void *value)
->         struct bt_shell_env *env;
->
->         if (!data.envs) {
-> +               if (!value)
-> +                       return;
->                 data.envs = queue_new();
->                 goto done;
->         }
-> @@ -1150,6 +1152,10 @@ void bt_shell_set_env(const char *name, void *value)
->         if (env)
->                 env_destroy(env);
->
-> +       /* Don't create an env if value is not set */
-> +       if (!value)
-> +               return;
-> +
->  done:
->         env = new0(struct bt_shell_env, 1);
->         env->name = strdup(name);
-> --
-> 2.14.3
+I'm sending this as RFC for now since while things seem to work fine
+despite this condition (and it was like that for quite some time) it
+feels like this is indeed case that should be handled by HCI request
+code.
 
-Applied.
+Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+---
+ net/bluetooth/hci_event.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index cd3bbb766c24..3f111343f57b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5207,8 +5207,7 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
+ 	}
+ 
+ 	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
+-		bt_dev_err(hdev, "last event is not cmd complete (0x%2.2x)",
+-			   hdr->evt);
++		BT_DBG("last event is not cmd complete (0x%2.2x)", hdr->evt);
+ 		return false;
+ 	}
+ 
 -- 
-Luiz Augusto von Dentz
+2.14.3
+
