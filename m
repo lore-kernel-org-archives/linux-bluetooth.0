@@ -1,75 +1,26 @@
-Return-Path: <thierry.escande@linaro.org>
-From: Thierry Escande <thierry.escande@linaro.org>
-To: Rob Herring <robh+dt@kernel.org>,
-	Andy Gross <andy.gross@linaro.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	David Brown <david.brown@linaro.org>,
-	Mark Rutland <mark.rutland@arm.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Bjorn Andersson <bjorn.andersson@linaro.org>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 0/4] Bluetooth: hci_qca: Add serdev support
-Date: Thu, 29 Mar 2018 21:15:20 +0200
-Message-Id: <20180329191524.30225-1-thierry.escande@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset = "utf-8"
+In-Reply-To: <CAOT_U5abUJeZuB4-e1T1qQF82rk4W07HVGBN0hPLVqC6TJCJbg@mail.gmail.com>
+References: <CAAvkfd_baAUHfnO9JX3h2rc4BYQBzjBeWqf2tiGBMJQMG2yseA@mail.gmail.com>
+ <CAOT_U5bOS63BbqoyLPhTQ_z4ve0u+obLFg8HENyMYxik00+oWA@mail.gmail.com>
+ <CAAvkfd8izSkCW7-1a_PedkY9Ceo+eDOK3V-Kxz63fR5DGaVHFQ@mail.gmail.com> <CAOT_U5abUJeZuB4-e1T1qQF82rk4W07HVGBN0hPLVqC6TJCJbg@mail.gmail.com>
+From: David Frey <dpfrey@gmail.com>
+Date: Thu, 29 Mar 2018 11:43:33 -0700
+Message-ID: <CAAvkfd8x62XYByNpTxSNg4x4HhX-WaNdLnrojueabQJLrCZycw@mail.gmail.com>
+Subject: Re: Support adapter without HCI
+To: Alan Martinovic <alan.martinovic@senic.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+> > There is a closed source BLE library that
+> > exposes GATT and GAP functions.
+>
+> Can you expand on the definition on "exposes" here?
+> From where to whom?
 
-This patchset enables the Qualcomm BT controller QCA6174 node in the
-device tree of the db820c board. This allows the bluetooth chipset to
-be probed and registered against the hci layer by using the serdev
-framework.
-
-This patchset also contains the documentation for the compatible
-string "qcom,qca6174-bt" related to this chipset.
-
-v7:
-- Add a new patch enabling regulators and gpios for the bt/wlan
-  combo chip
-
-v6:
-- Move pinctrl properties into subnodes
-- fix binding documentation
-
-v5:
-- Rename 'bt-disable-n' gpio as 'enable'
-
-v4:
-- Fix dt binding documentation
-- Address some other issues in patch #3
-
-v3:
-- Address comments for patch #3 (details in patch)
-
-v2:
-- Fix author email
-
-
-Srinivas Kandagatla (1):
-  arm64: dts: apq8096-db820c: Enable wlan and bt en pins
-
-Thierry Escande (3):
-  arm64: dts: apq8096-db820c: enable bluetooth node
-  dt-bindings: net: bluetooth: Add qualcomm-bluetooth
-  Bluetooth: hci_qca: Add serdev support
-
- .../devicetree/bindings/net/qualcomm-bluetooth.txt |  30 ++++++
- arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  |  26 +++++
- .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    |  32 ++++++
- arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       |  62 ++++++++++++
- arch/arm64/boot/dts/qcom/msm8996.dtsi              |  10 ++
- drivers/bluetooth/Kconfig                          |   1 +
- drivers/bluetooth/hci_qca.c                        | 109 ++++++++++++++++++++-
- 7 files changed, 268 insertions(+), 2 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-
--- 
-2.14.1
+What I meant was that there is a C API exposed by a library on the
+microcontroller for doing GATT and GAP.  In order to allow Linux to
+make use of this library, I will need to provide some sort of RPC
+protocol over SPI or UART.
