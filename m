@@ -14,169 +14,108 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	linux-arm-msm@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 2/4] arm64: dts: apq8096-db820c: enable bluetooth node
-Date: Thu, 29 Mar 2018 21:15:22 +0200
-Message-Id: <20180329191524.30225-3-thierry.escande@linaro.org>
+Subject: [PATCH v7 1/4] arm64: dts: apq8096-db820c: Enable wlan and bt en pins
+Date: Thu, 29 Mar 2018 21:15:21 +0200
+Message-Id: <20180329191524.30225-2-thierry.escande@linaro.org>
 In-Reply-To: <20180329191524.30225-1-thierry.escande@linaro.org>
 References: <20180329191524.30225-1-thierry.escande@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset = "utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add a new serial node for the Qualcomm BT controller QCA6174. This
-allows automatic probing and hci registration through the serdev
-framework instead of relying on the userspace helpers.
+From: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 
+This patch enables regulators and gpios for the Qualcomm QCA6174 BT/WLAN
+combo controller.
+
+Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
 ---
 
 v7:
-- Remove bt-en-active node declared in previous patch
+- New patch in this patchset
 
-v6
-- Move gpio properties into pinconf subnode
-- move pinmux properties into mux and config subnodes
+ .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    | 22 +++++++++++++++
+ arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       | 31 ++++++++++++++++++++++
+ 2 files changed, 53 insertions(+)
 
-v5:
-- Rename 'bt-disable-n' gpio as 'enable'
-
-v4: no change
-v3: no change
-
-v2:
-- Fix author email
-
- arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  | 26 +++++++++++++++++++
- .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    | 10 ++++++++
- arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       | 30 ++++++++++++++++++++++
- arch/arm64/boot/dts/qcom/msm8996.dtsi              | 10 ++++++++
- 4 files changed, 76 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi b/arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi
-index 24552f19b3fa..6a573875d45a 100644
---- a/arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi
-+++ b/arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi
-@@ -36,4 +36,30 @@
- 			drive-strength = <2>;	/* 2 MA */
- 		};
- 	};
-+
-+	blsp1_uart1_default: blsp1_uart1_default {
-+		mux {
-+			pins = "gpio41", "gpio42", "gpio43", "gpio44";
-+			function = "blsp_uart2";
-+		};
-+
-+		config {
-+			pins = "gpio41", "gpio42", "gpio43", "gpio44";
-+			drive-strength = <16>;
-+			bias-disable;
-+		};
-+	};
-+
-+	blsp1_uart1_sleep: blsp1_uart1_sleep {
-+		mux {
-+			pins = "gpio41", "gpio42", "gpio43", "gpio44";
-+			function = "gpio";
-+		};
-+
-+		config {
-+			pins = "gpio41", "gpio42", "gpio43", "gpio44";
-+			drive-strength = <2>;
-+			bias-disable;
-+		};
-+	};
- };
 diff --git a/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi b/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi
-index 5d50f45c4df7..6167af955659 100644
+index 59b29ddfb6e9..5d50f45c4df7 100644
 --- a/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi
 +++ b/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi
-@@ -48,6 +48,16 @@
+@@ -14,6 +14,28 @@
  		};
  	};
  
-+	divclk4_pin_a: divclk4 {
++	bt_en_gpios: bt_en_gpios {
 +		pinconf {
-+			pins = "gpio18";
-+			function = PMIC_GPIO_FUNC_FUNC2;
-+
-+			bias-disable;
-+			power-source = <PM8994_GPIO_S4>;
++			pins = "gpio19";
++			function = PMIC_GPIO_FUNC_NORMAL;
++			output-low;
++			power-source = <PM8994_GPIO_S4>; // 1.8V
++			qcom,drive-strength = <PMIC_GPIO_STRENGTH_LOW>;
++			bias-pull-down;
 +		};
 +	};
 +
- 	usb3_vbus_det_gpio: pm8996_gpio22 {
++	wlan_en_gpios: wlan_en_gpios {
++		pinconf {
++			pins = "gpio8";
++			function = PMIC_GPIO_FUNC_NORMAL;
++			output-low;
++			power-source = <PM8994_GPIO_S4>; // 1.8V
++			qcom,drive-strength = <PMIC_GPIO_STRENGTH_LOW>;
++			bias-pull-down;
++		};
++	};
++
+ 	volume_up_gpio: pm8996_gpio2 {
  		pinconf {
- 			pins = "gpio22";
+ 			pins = "gpio2";
 diff --git a/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi b/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi
-index ec5e6eee0a7a..4b8bb026346e 100644
+index 1c8f1b86472d..ec5e6eee0a7a 100644
 --- a/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi
 +++ b/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi
-@@ -23,6 +23,7 @@
- 	aliases {
- 		serial0 = &blsp2_uart1;
- 		serial1 = &blsp2_uart2;
-+		serial2 = &blsp1_uart1;
- 		i2c0	= &blsp1_i2c2;
- 		i2c1	= &blsp2_i2c1;
- 		i2c2	= &blsp2_i2c0;
-@@ -34,7 +35,36 @@
- 		stdout-path = "serial0:115200n8";
- 	};
- 
-+	clocks {
-+		divclk4: divclk4 {
-+			compatible = "fixed-clock";
-+			#clock-cells = <0>;
-+			clock-frequency = <32768>;
-+			clock-output-names = "divclk4";
-+
-+			pinctrl-names = "default";
-+			pinctrl-0 = <&divclk4_pin_a>;
-+		};
-+	};
-+
- 	soc {
-+		serial@7570000 {
-+			label = "BT-UART";
-+			status = "okay";
-+			pinctrl-names = "default", "sleep";
-+			pinctrl-0 = <&blsp1_uart1_default>;
-+			pinctrl-1 = <&blsp1_uart1_sleep>;
-+
-+			bluetooth {
-+				compatible = "qcom,qca6174-bt";
-+
-+				/* bt_disable_n gpio */
-+				enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
-+
-+				clocks = <&divclk4>;
-+			};
-+		};
-+
- 		serial@75b0000 {
- 			label = "LS-UART1";
- 			status = "okay";
-diff --git a/arch/arm64/boot/dts/qcom/msm8996.dtsi b/arch/arm64/boot/dts/qcom/msm8996.dtsi
-index 0a6f7952bbb1..2d54a86a027f 100644
---- a/arch/arm64/boot/dts/qcom/msm8996.dtsi
-+++ b/arch/arm64/boot/dts/qcom/msm8996.dtsi
-@@ -408,6 +408,16 @@
- 			#clock-cells = <1>;
+@@ -139,9 +139,40 @@
+ 			pinctrl-0 = <&usb2_vbus_det_gpio>;
  		};
  
-+		blsp1_uart1: serial@7570000 {
-+			compatible = "qcom,msm-uartdm-v1.4", "qcom,msm-uartdm";
-+			reg = <0x07570000 0x1000>;
-+			interrupts = <GIC_SPI 108 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&gcc GCC_BLSP1_UART2_APPS_CLK>,
-+				 <&gcc GCC_BLSP1_AHB_CLK>;
-+			clock-names = "core", "iface";
-+			status = "disabled";
++		bt_en: bt-en-1-8v {
++			pinctrl-names = "default";
++			pinctrl-0 = <&bt_en_gpios>;
++			compatible = "regulator-fixed";
++			regulator-name = "bt-en-regulator";
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++
++			/* WLAN card specific delay */
++			startup-delay-us = <70000>;
++			enable-active-high;
 +		};
 +
- 		blsp1_spi0: spi@7575000 {
- 			compatible = "qcom,spi-qup-v2.2.1";
- 			reg = <0x07575000 0x600>;
++		wlan_en: wlan-en-1-8v {
++			pinctrl-names = "default";
++			pinctrl-0 = <&wlan_en_gpios>;
++			compatible = "regulator-fixed";
++			regulator-name = "wlan-en-regulator";
++			regulator-min-microvolt = <1800000>;
++			regulator-max-microvolt = <1800000>;
++
++			gpio = <&pm8994_gpios 8 0>;
++
++			/* WLAN card specific delay */
++			startup-delay-us = <70000>;
++			enable-active-high;
++		};
++
+ 		agnoc@0 {
+ 			qcom,pcie@600000 {
++				status = "okay";
+ 				perst-gpio = <&msmgpio 35 GPIO_ACTIVE_LOW>;
++				vddpe-supply = <&wlan_en>;
++				vddpe1-supply = <&bt_en>;
+ 			};
+ 
+ 			qcom,pcie@608000 {
 -- 
 2.14.1
