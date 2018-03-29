@@ -1,76 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CANB6vTuaGyc1Jjok_TfKF7PU2ymviBFEd9y1V6nOT+TRw64zxQ@mail.gmail.com>
-References: <CANB6vTuaGyc1Jjok_TfKF7PU2ymviBFEd9y1V6nOT+TRw64zxQ@mail.gmail.com>
+In-Reply-To: <9f2f8362-c561-a87e-dc61-71dbd15500e1@jp.fujitsu.com>
+References: <9f2f8362-c561-a87e-dc61-71dbd15500e1@jp.fujitsu.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 29 Mar 2018 15:59:47 +0300
-Message-ID: <CABBYNZ+qozuMQJuj5zqaF33rJLQLgNREZu6fToQCZ47zQZCMGQ@mail.gmail.com>
-Subject: Re: BlueZ Peripheral & central Application
-To: ken Clark <kenidevices@gmail.com>
+Date: Thu, 29 Mar 2018 15:46:11 +0300
+Message-ID: <CABBYNZLS08+kj=cC=131iVsi-juisFYfFrDkwrkjU-w3bXtA7A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] mesh: Return exit status for non-interactive
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ken,
+Hi Eramoto,
 
-On Thu, Mar 29, 2018 at 3:43 PM, ken Clark <kenidevices@gmail.com> wrote:
-> We are attempting to create a BlueZ application for an embedded linux
-> device that performs the following tasks:
+On Wed, Mar 28, 2018 at 9:22 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> ---
+> This patch is related to the previous patch set[1].
 >
-> Advertises as a peripheral
-> Declared a peripheral GATT database
-> Accepts connections as a peripheral.
-> Scans and connections to other peripherals as the central devices
+> [1]: https://www.spinics.net/lists/linux-bluetooth/msg75031.html
 >
-> I've been working with the BlueZ code for a while now, and see all the
-> pieces in various codebases, but I have failed in attempting to
-> understand how the combine them.
+>  mesh/main.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 >
-> client/bluetoothclt  allows for setting advertising data
-> It see options for declaring services & characteristics, but have no
-> idea how and what order to use them in to successfully declare the
-> gatt database.
-
-I use something like the following on a daily basis:
-
-> menu gatt
-> register-service <uuid>
-> register-characteristic <uuid> <permissions>
-<repeat if there are more services>
-> register-application
-> back
-> advertise on
-
-If you have a second  controller you can use it as a central:
-
-> select <address ctrl1>
-> scan on
-<wait until it show up, if it doesn't try setting transport filter
-with scan.transport le>
-> connect <address ctrl0>
-
-> tools/btgatt-server allows for declaring the GATT Database and
-> accepting connections as a peripheral.
-
-btgatt-server is a standalone testing tool that will conflict with
-bluetoothd, so better not to use if you do plan to use the D-Bus APIs.
-
+> diff --git a/mesh/main.c b/mesh/main.c
+> index d0f71c2d9..3e1484f61 100644
+> --- a/mesh/main.c
+> +++ b/mesh/main.c
+> @@ -1904,6 +1904,7 @@ static void client_ready(GDBusClient *client, void *user_data)
+>  int main(int argc, char *argv[])
+>  {
+>         GDBusClient *client;
+> +       int status;
+>         int len;
+>         int extra;
 >
-> Can someone provide tips, examples or documentation on how to combine
-> these functions into a single application.
-
-bluetoothctl should have it all by now, if it doesn't then we need to
-fix it so any feedback in this regard is welcome.
-
-> Thanks
-> Ken
+> @@ -1989,7 +1990,7 @@ int main(int argc, char *argv[])
+>         if (!onoff_client_init(PRIMARY_ELEMENT_IDX))
+>                 g_printerr("Failed to initialize mesh generic On/Off client\n");
+>
+> -       bt_shell_run();
+> +       status = bt_shell_run();
+>
+>         g_dbus_client_unref(client);
+>
+> @@ -2001,7 +2002,7 @@ int main(int argc, char *argv[])
+>         g_list_free(service_list);
+>         g_list_free_full(ctrl_list, proxy_leak);
+>
+> -       return EXIT_SUCCESS;
+> +       return status;
+>
+>  fail:
+>         bt_shell_cleanup();
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.14.1
 
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
