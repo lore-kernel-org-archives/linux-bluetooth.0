@@ -1,42 +1,38 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [RFC] Bluetooth: Fix spurious error message
-Date: Thu, 29 Mar 2018 11:41:17 +0200
-Message-Id: <20180329094117.25855-1-szymon.janc@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <arend.vanspriel@broadcom.com>
+Subject: Re: [PATCH] Revert "Bluetooth: btmrvl: support sysfs initiated
+ firmware coredump"
+To: Marcel Holtmann <marcel@holtmann.org>
+References: <1522184620-1695-1-git-send-email-arend.vanspriel@broadcom.com>
+ <6DE6EDF0-488F-477D-A978-A19232594961@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From: Arend van Spriel <arend.vanspriel@broadcom.com>
+Message-ID: <5ABCA6AF.6050502@broadcom.com>
+Date: Thu, 29 Mar 2018 10:41:19 +0200
+MIME-Version: 1.0
+In-Reply-To: <6DE6EDF0-488F-477D-A978-A19232594961@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This message was debug message before 2064ee332e4c1b7495cf68b. Looks
-like it was changed by accident in that patch. This is causing some
-error messages when doing BR/EDR discovery since Inquiry Command
-generates Command Status event, not Command Complete.
+On 3/28/2018 11:37 AM, Marcel Holtmann wrote:
+> Hi Arend,
+>
+>> This reverts commit 118c193d9699ffc1c897c38a1d314f38543c8e1c. A discussion
+>> about the driver callback ended with the idea to change the return type of
+>> the callback to void. That change would lead to build error in linux-next
+>> so let's remove this change and resubmit later according the new callback
+>> definition.
+>>
+>> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+>> ---
+>> Hi Marcel,
+>>
+>> Still noticed the patch in bt-next/master so decided to sent this formal
+>> revert patch.
+>
+> I rebased the tree now to take this patch out. Thanks for reminding me.
 
-I'm sending this as RFC for now since while things seem to work fine
-despite this condition (and it was like that for quite some time) it
-feels like this is indeed case that should be handled by HCI request
-code.
+Better safe than sorry.
 
-Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
----
- net/bluetooth/hci_event.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index cd3bbb766c24..3f111343f57b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5207,8 +5207,7 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
- 	}
- 
- 	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
--		bt_dev_err(hdev, "last event is not cmd complete (0x%2.2x)",
--			   hdr->evt);
-+		BT_DBG("last event is not cmd complete (0x%2.2x)", hdr->evt);
- 		return false;
- 	}
- 
--- 
-2.14.3
-
+Thanks,
+Arend
