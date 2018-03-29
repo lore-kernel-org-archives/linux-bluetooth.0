@@ -14,108 +14,62 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	linux-arm-msm@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v7 1/4] arm64: dts: apq8096-db820c: Enable wlan and bt en pins
-Date: Thu, 29 Mar 2018 21:15:21 +0200
-Message-Id: <20180329191524.30225-2-thierry.escande@linaro.org>
-In-Reply-To: <20180329191524.30225-1-thierry.escande@linaro.org>
-References: <20180329191524.30225-1-thierry.escande@linaro.org>
+Subject: [PATCH v7 0/4] Bluetooth: hci_qca: Add serdev support
+Date: Thu, 29 Mar 2018 21:15:20 +0200
+Message-Id: <20180329191524.30225-1-thierry.escande@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset = "utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+Hi,
 
-This patch enables regulators and gpios for the Qualcomm QCA6174 BT/WLAN
-combo controller.
+This patchset enables the Qualcomm BT controller QCA6174 node in the
+device tree of the db820c board. This allows the bluetooth chipset to
+be probed and registered against the hci layer by using the serdev
+framework.
 
-Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
-Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
----
+This patchset also contains the documentation for the compatible
+string "qcom,qca6174-bt" related to this chipset.
 
 v7:
-- New patch in this patchset
+- Add a new patch enabling regulators and gpios for the bt/wlan
+  combo chip
 
- .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    | 22 +++++++++++++++
- arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       | 31 ++++++++++++++++++++++
- 2 files changed, 53 insertions(+)
+v6:
+- Move pinctrl properties into subnodes
+- fix binding documentation
 
-diff --git a/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi b/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi
-index 59b29ddfb6e9..5d50f45c4df7 100644
---- a/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi
-+++ b/arch/arm64/boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi
-@@ -14,6 +14,28 @@
- 		};
- 	};
- 
-+	bt_en_gpios: bt_en_gpios {
-+		pinconf {
-+			pins = "gpio19";
-+			function = PMIC_GPIO_FUNC_NORMAL;
-+			output-low;
-+			power-source = <PM8994_GPIO_S4>; // 1.8V
-+			qcom,drive-strength = <PMIC_GPIO_STRENGTH_LOW>;
-+			bias-pull-down;
-+		};
-+	};
-+
-+	wlan_en_gpios: wlan_en_gpios {
-+		pinconf {
-+			pins = "gpio8";
-+			function = PMIC_GPIO_FUNC_NORMAL;
-+			output-low;
-+			power-source = <PM8994_GPIO_S4>; // 1.8V
-+			qcom,drive-strength = <PMIC_GPIO_STRENGTH_LOW>;
-+			bias-pull-down;
-+		};
-+	};
-+
- 	volume_up_gpio: pm8996_gpio2 {
- 		pinconf {
- 			pins = "gpio2";
-diff --git a/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi b/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi
-index 1c8f1b86472d..ec5e6eee0a7a 100644
---- a/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi
-+++ b/arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi
-@@ -139,9 +139,40 @@
- 			pinctrl-0 = <&usb2_vbus_det_gpio>;
- 		};
- 
-+		bt_en: bt-en-1-8v {
-+			pinctrl-names = "default";
-+			pinctrl-0 = <&bt_en_gpios>;
-+			compatible = "regulator-fixed";
-+			regulator-name = "bt-en-regulator";
-+			regulator-min-microvolt = <1800000>;
-+			regulator-max-microvolt = <1800000>;
-+
-+			/* WLAN card specific delay */
-+			startup-delay-us = <70000>;
-+			enable-active-high;
-+		};
-+
-+		wlan_en: wlan-en-1-8v {
-+			pinctrl-names = "default";
-+			pinctrl-0 = <&wlan_en_gpios>;
-+			compatible = "regulator-fixed";
-+			regulator-name = "wlan-en-regulator";
-+			regulator-min-microvolt = <1800000>;
-+			regulator-max-microvolt = <1800000>;
-+
-+			gpio = <&pm8994_gpios 8 0>;
-+
-+			/* WLAN card specific delay */
-+			startup-delay-us = <70000>;
-+			enable-active-high;
-+		};
-+
- 		agnoc@0 {
- 			qcom,pcie@600000 {
-+				status = "okay";
- 				perst-gpio = <&msmgpio 35 GPIO_ACTIVE_LOW>;
-+				vddpe-supply = <&wlan_en>;
-+				vddpe1-supply = <&bt_en>;
- 			};
- 
- 			qcom,pcie@608000 {
+v5:
+- Rename 'bt-disable-n' gpio as 'enable'
+
+v4:
+- Fix dt binding documentation
+- Address some other issues in patch #3
+
+v3:
+- Address comments for patch #3 (details in patch)
+
+v2:
+- Fix author email
+
+
+Srinivas Kandagatla (1):
+  arm64: dts: apq8096-db820c: Enable wlan and bt en pins
+
+Thierry Escande (3):
+  arm64: dts: apq8096-db820c: enable bluetooth node
+  dt-bindings: net: bluetooth: Add qualcomm-bluetooth
+  Bluetooth: hci_qca: Add serdev support
+
+ .../devicetree/bindings/net/qualcomm-bluetooth.txt |  30 ++++++
+ arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  |  26 +++++
+ .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    |  32 ++++++
+ arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       |  62 ++++++++++++
+ arch/arm64/boot/dts/qcom/msm8996.dtsi              |  10 ++
+ drivers/bluetooth/Kconfig                          |   1 +
+ drivers/bluetooth/hci_qca.c                        | 109 ++++++++++++++++++++-
+ 7 files changed, 268 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+
 -- 
 2.14.1
