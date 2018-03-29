@@ -1,79 +1,76 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOT_U5bOS63BbqoyLPhTQ_z4ve0u+obLFg8HENyMYxik00+oWA@mail.gmail.com>
-References: <CAAvkfd_baAUHfnO9JX3h2rc4BYQBzjBeWqf2tiGBMJQMG2yseA@mail.gmail.com>
- <CAOT_U5bOS63BbqoyLPhTQ_z4ve0u+obLFg8HENyMYxik00+oWA@mail.gmail.com>
-From: David Frey <dpfrey@gmail.com>
-Date: Thu, 29 Mar 2018 08:38:13 -0700
-Message-ID: <CAAvkfd8izSkCW7-1a_PedkY9Ceo+eDOK3V-Kxz63fR5DGaVHFQ@mail.gmail.com>
-Subject: Re: Support adapter without HCI
-To: Alan Martinovic <alan.martinovic@senic.com>
-Cc: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CANB6vTuaGyc1Jjok_TfKF7PU2ymviBFEd9y1V6nOT+TRw64zxQ@mail.gmail.com>
+References: <CANB6vTuaGyc1Jjok_TfKF7PU2ymviBFEd9y1V6nOT+TRw64zxQ@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 29 Mar 2018 15:59:47 +0300
+Message-ID: <CABBYNZ+qozuMQJuj5zqaF33rJLQLgNREZu6fToQCZ47zQZCMGQ@mail.gmail.com>
+Subject: Re: BlueZ Peripheral & central Application
+To: ken Clark <kenidevices@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ken,
 
-I'm sorry if I was unclear. What I would like it to be able to write
-application code for Linux that uses bluez to talk to BLE devices
-connected to a bluetooth adapter.  The thing that I think might be
-problematic is fitting the adapter into the Linux kernel framework for
-bluetooth adapters.  The SoC that I want to use as an adapter does not
-present an HCI interface.  There is a closed source BLE library that
-exposes GATT and GAP functions.  So my question is really whether it
-is possible to support an adapter in the linux kernel that doesn't
-support HCI and if it is, are there any examples of drivers like that?
+On Thu, Mar 29, 2018 at 3:43 PM, ken Clark <kenidevices@gmail.com> wrote:
+> We are attempting to create a BlueZ application for an embedded linux
+> device that performs the following tasks:
+>
+> Advertises as a peripheral
+> Declared a peripheral GATT database
+> Accepts connections as a peripheral.
+> Scans and connections to other peripherals as the central devices
+>
+> I've been working with the BlueZ code for a while now, and see all the
+> pieces in various codebases, but I have failed in attempting to
+> understand how the combine them.
+>
+> client/bluetoothclt  allows for setting advertising data
+> It see options for declaring services & characteristics, but have no
+> idea how and what order to use them in to successfully declare the
+> gatt database.
 
-If this is *not* possible, then I will probably have to define a
-non-standard interface (outside of bluez) for controlling the
-bluetooth feature of the chip.  That's really not ideal since any code
-that users write won't be portable to other adapters.  I guess I could
-try to implement the same DBus interfaces that are provided by Bluez,
-but this is definitely not my first choice.
+I use something like the following on a daily basis:
 
-Thanks,
-David
+> menu gatt
+> register-service <uuid>
+> register-characteristic <uuid> <permissions>
+<repeat if there are more services>
+> register-application
+> back
+> advertise on
 
-On Thu, Mar 29, 2018 at 1:10 AM, Alan Martinovic
-<alan.martinovic@senic.com> wrote:
-> Hi,
-> I didn't get through you question what are the actual commands
-> that are being passed via SPI to the controller once HCI has been removed?
+If you have a second  controller you can use it as a central:
+
+> select <address ctrl1>
+> scan on
+<wait until it show up, if it doesn't try setting transport filter
+with scan.transport le>
+> connect <address ctrl0>
+
+> tools/btgatt-server allows for declaring the GATT Database and
+> accepting connections as a peripheral.
+
+btgatt-server is a standalone testing tool that will conflict with
+bluetoothd, so better not to use if you do plan to use the D-Bus APIs.
+
 >
-> You want to use the API provided by the library on the controller and invoke it
-> directly from the host via SPI?
->
-> I saw something kind of similar from Nordic:
->     https://github.com/NordicSemiconductor/pc-ble-driver
->
-> Would be willing to bet that they just invented something
-> that replaces HCI, but it's still a intermediate protocol that glues
-> together the host and controller, can't see how that can be avoided.
->
-> Be Well,
-> Alan
->
->
->
->
->
-> On Wed, Mar 28, 2018 at 8:02 PM, David Frey <dpfrey@gmail.com> wrote:
->> Is it possible to support a bluetooth adapter in the Linux kernel in
->> the case where the adapter doesn't present a HCI interface?  The
->> adapter in question was originally envisioned as a standalone host,
->> but I am interested in using it as an adapter (over SPI) controlled by
->> another CPU running Linux.  The BLE implementation on the target is a
->> closed source binary that provides GAP and GATT APIs.  Details of the
->> APIs are here: http://labs.mediatek.com/api/mt7697/group___bluetooth.html
->>
->> If it *is* possible to support adapters which don't offer an HCI
->> interface, then I'm hoping that someone can point me at an example or
->> an interface definition so I can get an idea of what is required.
->>
->> Thanks,
->> David
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Can someone provide tips, examples or documentation on how to combine
+> these functions into a single application.
+
+bluetoothctl should have it all by now, if it doesn't then we need to
+fix it so any feedback in this regard is welcome.
+
+> Thanks
+> Ken
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
