@@ -1,51 +1,62 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Fri, 30 Mar 2018 16:05:06 -0500
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] Bluetooth: Mark expected switch fall-throughs
-Message-ID: <20180330210506.GA20604@embeddedgus>
+Return-Path: <arnaud.rebillout@collabora.com>
+Subject: Re: [PATCH] Bluetooth: hidp: sixaxis dualshock report via ctrl quirk
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, vivek@collabora.com
+References: <20180328034526.13446-1-arnaud.rebillout@collabora.com>
+ <DABE3E89-2AAE-457C-AAEA-BFE34844BE96@holtmann.org>
+From: Arnaud Rebillout <arnaud.rebillout@collabora.com>
+Message-ID: <f0425f48-8bf8-c394-2b16-5208f949cc88@collabora.com>
+Date: Fri, 30 Mar 2018 14:46:15 +0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <DABE3E89-2AAE-457C-AAEA-BFE34844BE96@holtmann.org>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-where we are expecting to fall through.
+Hi Marcel,
 
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- net/bluetooth/mgmt.c        | 1 +
- net/bluetooth/rfcomm/sock.c | 1 +
- 2 files changed, 2 insertions(+)
+On 03/28/2018 04:30 PM, Marcel Holtmann wrote:
+> Hi Arnaud,
+>
+>> The Sixaxis and Dualshock 4 wants report sent via the ctrl channel.
+>>
+>> This patch has been used in the SteamOS kernel for a while now.
+>> <https://github.com/ValveSoftware/steamos_kernel/commit/6e215b67a13c85d0cf5a9e0970acd9df7d2b77bd>
+>>
+>> Signed-off-by: Vivek Das Mohapatra <vivek@collabora.com>
+>> Signed-off-by: Arnaud Rebillout <arnaud.rebillout@collabora.com>
+>> ---
+>> net/bluetooth/hidp/core.c | 13 ++++++++++---
+>> 1 file changed, 10 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+>> index 1036e4fa1ea2..fa75da91a559 100644
+>> --- a/net/bluetooth/hidp/core.c
+>> +++ b/net/bluetooth/hidp/core.c
+>> @@ -379,9 +379,16 @@ static int hidp_output_report(struct hid_device *hid, __u8 *data, size_t count)
+>> {
+>> 	struct hidp_session *session = hid->driver_data;
+>>
+>> -	return hidp_send_intr_message(session,
+>> -				      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
+>> -				      data, count);
+>> +	/* The Sixaxis and Dualshock 4 wants report sent via the ctrl channel */
+>> +	if (hid->vendor == 0x54c && (hid->product == 0x5c4 || hid->product == 0x268)) {
+>> +		return hidp_send_ctrl_message(session,
+>> +					      HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT,
+>> +					      data, count);
+>> +	} else {
+>> +		return hidp_send_intr_message(session,
+>> +					      HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT,
+>> +					      data, count);
+>> +	}
+>> }
+> see the comment from Bastien, the HIDP layer is just a transport layer and should really not need to know about device specific quirks. Seems these quirks could be easily handled one layer about where the right channel is selected.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 6e9fc86..8a80d48 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4801,6 +4801,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
- 		case MGMT_LTK_P256_DEBUG:
- 			authenticated = 0x00;
- 			type = SMP_LTK_P256_DEBUG;
-+			/* fall through */
- 		default:
- 			continue;
- 		}
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 93a3b21..d606e92 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -221,6 +221,7 @@ static void __rfcomm_sock_close(struct sock *sk)
- 	case BT_CONFIG:
- 	case BT_CONNECTED:
- 		rfcomm_dlc_close(d, 0);
-+		/* fall through */
- 
- 	default:
- 		sock_set_flag(sk, SOCK_ZAPPED);
--- 
-2.7.4
+I noticed indeed that the fix for the Sixaxis is already present in
+`drivers/hid/hid-sony.c`. I'm not sure about the Dualshock 4, but I will
+investigate further. If there's anything to fix I will patch `hid-sony.c`.
+
+Thanks for the feedback, and sorry for the noise :)
+
+  Arnaud
