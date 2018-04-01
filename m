@@ -1,97 +1,28 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh/meshctl: Fix reclaiming address range
-Date: Sun,  1 Apr 2018 16:35:33 -0700
-Message-Id: <20180401233533.20526-1-inga.stotland@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Sun, 01 Apr 2018 17:46:48 -0400 (EDT)
+Message-Id: <20180401.174648.1592796197331628647.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2018-04-01
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20180401185342.GA14384@x1c.home>
+References: <20180401185342.GA14384@x1c.home>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The computations for reclaiming released unicast addresses back
-into address pool were off by 1. Also, the adjacent pools need
-to be merged, if the released range fills the gap between two
-address pools.
----
- mesh/net.c | 32 ++++++++++++++++++++++++++------
- 1 file changed, 26 insertions(+), 6 deletions(-)
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Sun, 1 Apr 2018 21:53:42 +0300
 
-diff --git a/mesh/net.c b/mesh/net.c
-index 20dfcb8a8..85c4b715b 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -730,7 +730,7 @@ static int match_address_range(const void *a, const void *b)
- 	uint16_t max = range >> 16;
- 	uint16_t min = range & 0xffff;
- 
--	return ((max - min) >= (num_elements - 1)) ? 0 : -1;
-+	return ((max - min + 1) >= num_elements) ? 0 : -1;
- 
- }
- 
-@@ -749,13 +749,14 @@ uint16_t net_obtain_address(uint8_t num_eles)
- 		addr = min;
- 		min += num_eles;
- 
--		if (min > max)
-+		if (min > max) {
- 			net.address_pool = g_list_delete_link(net.address_pool,
- 								l);
--		else {
-+		} else {
- 			range = min + (max << 16);
- 			l->data = GUINT_TO_POINTER(range);
- 		}
-+
- 		return addr;
- 	}
- 
-@@ -775,23 +776,42 @@ void net_release_address(uint16_t addr, uint8_t num_elements)
- 	GList *l;
- 	uint32_t range;
- 
-+	if (addr == UNASSIGNED_ADDRESS)
-+		return;
-+
- 	for (l = net.address_pool; l != NULL; l = l->next)
- 	{
- 		uint16_t max;
- 		uint16_t min;
-+		GList *l1 = l->next;
- 
- 		range = GPOINTER_TO_UINT(l->data);
- 
- 		max = range >> 16;
- 		min = range & 0xffff;
- 
--		if (min == (addr + num_elements + 1))
-+		if (min == (addr + num_elements))
- 			min  = addr;
--		else if (addr && max == (addr - 1))
--			max = addr + num_elements + 1;
-+		else if (max == (addr - 1))
-+			max = addr + num_elements;
- 		else
- 			continue;
- 
-+		/* Check if range pools need to be merged */
-+		if (l1) {
-+			uint16_t min1;
-+
-+			range = GPOINTER_TO_UINT(l1->data);
-+			min1 = range & 0xffff;
-+
-+			if (min1 == (max + 1)) {
-+				max = range >> 16;
-+				l->next = l1->next;
-+				net.address_pool = g_list_delete_link(
-+							net.address_pool, l1);
-+			}
-+		}
-+
- 		range = min + (max << 16);
- 		l->data = GUINT_TO_POINTER(range);
- 		return;
--- 
-2.14.3
+> Here's (most likely) the last bluetooth-next pull request for the 4.17
+> kernel:
+> 
+>  - Remove unused btuart_cs driver (replaced by serial_cs + hci_uart)
+>  - New USB ID for Edimax EW-7611ULB controller
+>  - Cleanups & fixes to hci_bcm driver
+>  - Clenups to btmrvl driver
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
+Pulled, thanks Johan.
