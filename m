@@ -1,106 +1,78 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <sean.wang@mediatek.com>
+From: <sean.wang@mediatek.com>
+To: <robh+dt@kernel.org>, <mark.rutland@arm.com>, <marcel@holtmann.org>,
+	<johan.hedberg@gmail.com>
+CC: <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>, "Matthias
+ Brugger" <matthias.bgg@gmail.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+	Weiyi Lu <weiyi.lu@mediatek.com>
+Subject: [PATCH v1 5/7] soc: mediatek: add a fixed wait for SRAM stable
+Date: Tue, 3 Apr 2018 15:15:55 +0800
+Message-ID: <0fc10b2498c6dbe20141831c722c32cc74330d3d.1522736996.git.sean.wang@mediatek.com>
+In-Reply-To: <cover.1522736996.git.sean.wang@mediatek.com>
+References: <cover.1522736996.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
-In-Reply-To: <20180402192920.19111-1-robert.lubas@silvair.com>
-References: <20180402192920.19111-1-robert.lubas@silvair.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 3 Apr 2018 11:18:39 +0300
-Message-ID: <CABBYNZ+t6tETeaFq1ABionGg0KNR+Oaz1cVt9seybnBJQXKMNw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] Mesh: Add Config Beacon to Configuration Model
-To: =?UTF-8?Q?Robert_Luba=C5=9B?= <robert.lubas@silvair.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Robert,
+From: Sean Wang <sean.wang@mediatek.com>
 
-On Mon, Apr 2, 2018 at 10:29 PM, Robert Luba=C5=9B <robert.lubas@silvair.co=
-m> wrote:
-> This patch adds two commands (set and get) to menu config and handles the
-> incomming status message.
-> ---
->  mesh/config-client.c | 42 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 42 insertions(+)
->
-> diff --git a/mesh/config-client.c b/mesh/config-client.c
-> index 95297bfee..4e5e06258 100644
-> --- a/mesh/config-client.c
-> +++ b/mesh/config-client.c
-> @@ -179,6 +179,13 @@ static bool client_msg_recvd(uint16_t src, uint8_t *=
-data,
->                                 mesh_status_str(data[0]));
->                 break;
->
-> +       case OP_CONFIG_BEACON_STATUS:
-> +               if (len !=3D 1)
-> +                       return true;
-> +               bt_shell_printf("Node %4.4x Config Beacon Status 0x%02x\n=
-",
-> +                               src, data[0]);
-> +               break;
-> +
->         case OP_CONFIG_RELAY_STATUS:
->                 if (len !=3D 2)
->                         return true;
-> @@ -689,6 +696,37 @@ static void cmd_bind(int argc, char *argv[])
->         return bt_shell_noninteractive_quit(EXIT_SUCCESS);
->  }
->
-> +static void cmd_beacon_set(int argc, char *argv[])
-> +{
-> +       uint16_t n;
-> +       uint8_t msg[2 + 1];
-> +       int parm_cnt;
-> +
-> +       if (!verify_config_target(target))
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +
-> +       n =3D mesh_opcode_set(OP_CONFIG_BEACON_SET, msg);
-> +
-> +       parm_cnt =3D read_input_parameters(argc, argv);
-> +       if (parm_cnt !=3D 1) {
-> +               bt_shell_printf("bad arguments\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       msg[n++] =3D parms[0];
-> +
-> +       if (!config_send(msg, n)) {
-> +               bt_shell_printf("Failed to send \"SET BEACON\"\n");
-> +               return;
-> +       }
-> +
-> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);}
+MT7622_POWER_DOMAIN_WB doesn't send an ACK when its managed SRAM becomes
+stable, which is not like the behavior the other power domains should
+have. Therefore, it's necessary for such a power domain to have a fixed
+and well-predefined duration to wait until its managed SRAM can be allowed
+to access by all functions running on the top.
 
-You should have a like break before }
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Cc: Matthias Brugger <matthias.bgg@gmail.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Weiyi Lu <weiyi.lu@mediatek.com>
+---
+ drivers/soc/mediatek/mtk-scpsys.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-> +
-> +static void cmd_beacon_get(int argc, char *argv[])
-> +{
-> +       cmd_default(OP_CONFIG_BEACON_GET);
-> +}
-> +
->  static void cmd_ident_set(int argc, char *argv[])
->  {
->         uint16_t n;
-> @@ -1178,6 +1216,10 @@ static const struct bt_shell_menu cfg_menu =3D {
->                                                 "Set node identity state"=
-},
->         {"ident-get",           "<net_idx>",            cmd_ident_get,
->                                                 "Get node identity state"=
-},
-> +       {"beacon-set",           "<state>",             cmd_beacon_set,
-> +                                               "Set node identity state"=
-},
-> +       {"beacon-get",           NULL,                  cmd_beacon_get,
-> +                                               "Get node beacon state"},
->         {"relay-set",           "<relay> <rexmt count> <rexmt steps>",
->                                                 cmd_relay_set,
->                                                 "Set relay"},
-> --
-> 2.11.0
-
-Other than this looks good, lets see if Inga has anything to comment.
-
---=20
-Luiz Augusto von Dentz
+diff --git a/drivers/soc/mediatek/mtk-scpsys.c b/drivers/soc/mediatek/mtk-scpsys.c
+index f9b7248..19aceb8 100644
+--- a/drivers/soc/mediatek/mtk-scpsys.c
++++ b/drivers/soc/mediatek/mtk-scpsys.c
+@@ -121,6 +121,7 @@ struct scp_domain_data {
+ 	u32 bus_prot_mask;
+ 	enum clk_id clk_id[MAX_CLKS];
+ 	bool active_wakeup;
++	u32 us_sram_fwait;
+ };
+ 
+ struct scp;
+@@ -234,11 +235,16 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
+ 	val &= ~scpd->data->sram_pdn_bits;
+ 	writel(val, ctl_addr);
+ 
+-	/* wait until SRAM_PDN_ACK all 0 */
+-	ret = readl_poll_timeout(ctl_addr, tmp, (tmp & pdn_ack) == 0,
+-				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
+-	if (ret < 0)
+-		goto err_pwr_ack;
++	/* Either wait until SRAM_PDN_ACK all 0 or have a force wait */
++	if (!scpd->data->us_sram_fwait) {
++		ret = readl_poll_timeout(ctl_addr, tmp, (tmp & pdn_ack) == 0,
++					 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
++		if (ret < 0)
++			goto err_pwr_ack;
++	} else {
++		usleep_range(scpd->data->us_sram_fwait,
++			     scpd->data->us_sram_fwait + 100);
++	};
+ 
+ 	if (scpd->data->bus_prot_mask) {
+ 		ret = mtk_infracfg_clear_bus_protection(scp->infracfg,
+@@ -783,6 +789,7 @@ static const struct scp_domain_data scp_domain_data_mt7622[] = {
+ 		.clk_id = {CLK_NONE},
+ 		.bus_prot_mask = MT7622_TOP_AXI_PROT_EN_WB,
+ 		.active_wakeup = true,
++		.us_sram_fwait = 12000,
+ 	},
+ };
+ 
+-- 
+2.7.4
