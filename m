@@ -1,79 +1,47 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_bcm: Remove irq-active-low DMI quirk for the Thinkpad 8
-Date: Tue,  3 Apr 2018 17:35:21 +0200
-Message-Id: <20180403153521.16349-1-hdegoede@redhat.com>
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH resend] Bluetooth: hci_bcm: Add broken-irq dmi blacklist
+ and add Meegopad T08 to it
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180403144020.14819-1-hdegoede@redhat.com>
+Date: Tue, 3 Apr 2018 16:44:26 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-acpi@vger.kernel.org
+Message-Id: <994F66BC-E46C-4A49-8572-4A194E029CD0@holtmann.org>
+References: <20180403144020.14819-1-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Interrupts specified through an "Interrupt" ACPI resource (versus through
-a "GpioInt" resource) are now always assumed to be active low.
+Hi Hans,
 
-When this change was originally made the Thinkpad 8 quirk was kept around
-because it was uncertain if the Thinkpad 8 uses an "Interrupt" or a
-"GpioInt" resource.
+> The Meegopad T08 hdmi-stick (think Intel computestick) has a brcm43430
+> wifi/bt combo chip. The BCM2E90 ACPI device describing the BT part does
+> contain a valid ActiveLow GpioInt entry, but the GPIO it points to never
+> goes low, so either the IRQ pin is not connected, or the ACPI resource-
+> table points to the wrong GPIO.
+> 
+> Eitherway things will not work if we try to use the specified IRQ, this
+> commits adds a DMI based broken-irq blacklist and disables use of the IRQ
+> and thus also runtime-pm for devices on this list.
+> 
+> This blacklist starts with the the Meegopad T08, fixing bluetooth not
+> working on this hdmi-stick. Since this is not a battery powered device
+> the loss of runtime-pm is not really an issue.
+> 
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> drivers/bluetooth/hci_bcm.c | 23 +++++++++++++++++++++++
+> 1 file changed, 23 insertions(+)
 
-Bug https://bugzilla.kernel.org/show_bug.cgi?id=196701 has a DSDT for the
-Thinkpad 8 attached and it uses an "Interrupt" resource, so the quirk is
-not necessary and the quirk, as well as the irq-active-low quirk handling
-code can be removed.
+patch has been applied to bluetooth-next tree.
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/hci_bcm.c | 20 --------------------
- 1 file changed, 20 deletions(-)
+Regards
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index c937a0600f0f..3cd11b59b533 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -809,18 +809,6 @@ static const struct dmi_system_id bcm_broken_irq_dmi_table[] = {
- };
- 
- #ifdef CONFIG_ACPI
--/* IRQ polarity of some chipsets are not defined correctly in ACPI table. */
--static const struct dmi_system_id bcm_active_low_irq_dmi_table[] = {
--	{	/* Handle ThinkPad 8 tablets with BCM2E55 chipset ACPI ID */
--		.ident = "Lenovo ThinkPad 8",
--		.matches = {
--			DMI_EXACT_MATCH(DMI_SYS_VENDOR, "LENOVO"),
--			DMI_EXACT_MATCH(DMI_PRODUCT_VERSION, "ThinkPad 8"),
--		},
--	},
--	{ }
--};
--
- static int bcm_resource(struct acpi_resource *ares, void *data)
- {
- 	struct bcm_device *dev = data;
-@@ -967,7 +955,6 @@ static int bcm_get_resources(struct bcm_device *dev)
- static int bcm_acpi_probe(struct bcm_device *dev)
- {
- 	LIST_HEAD(resources);
--	const struct dmi_system_id *dmi_id;
- 	const struct acpi_gpio_mapping *gpio_mapping = acpi_bcm_int_last_gpios;
- 	struct resource_entry *entry;
- 	int ret;
-@@ -1014,13 +1001,6 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 		dev->irq_active_low = irq_polarity;
- 		dev_warn(dev->dev, "Overwriting IRQ polarity to active %s by module-param\n",
- 			 dev->irq_active_low ? "low" : "high");
--	} else {
--		dmi_id = dmi_first_match(bcm_active_low_irq_dmi_table);
--		if (dmi_id) {
--			dev_warn(dev->dev, "%s: Overwriting IRQ polarity to active low",
--				 dmi_id->ident);
--			dev->irq_active_low = true;
--		}
- 	}
- 
- 	return 0;
--- 
-2.17.0.rc2
+Marcel
+
