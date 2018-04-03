@@ -1,195 +1,127 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH v2] Bluetooth: Fix connection if directed advertising and
- privacy is used
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180403114006.29070-1-szymon.janc@codecoup.pl>
-Date: Tue, 3 Apr 2018 16:14:10 +0200
-Cc: Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        stable@vger.kernel.org
-Message-Id: <7EC276EC-5FA3-4B6E-8204-DDFB5D170C8E@holtmann.org>
-References: <20180403114006.29070-1-szymon.janc@codecoup.pl>
-To: Szymon Janc <szymon.janc@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH 1/2] Bluetooth: hci_bcm: Don't change runtime-status when
+ not using runtime-pm
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
+References: <20180319210237.26205-1-hdegoede@redhat.com>
+ <20180324080213.GB15184@wunner.de>
+ <8f97d9b8-ce7d-fa77-cf12-31c12025b0f1@redhat.com>
+ <20180324141909.GA2013@wunner.de>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <4c95557d-3f68-825d-e50a-9ff6c5c72e0a@redhat.com>
+Date: Tue, 3 Apr 2018 14:55:22 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180324141909.GA2013@wunner.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi,
 
-> Local random address needs to be updated before creating connection if
-> RPA from LE Direct Advertising Report was resolved in host. Otherwise
-> remote device might ignore connection request due to address mismatch.
+On 24-03-18 15:19, Lukas Wunner wrote:
+> On Sat, Mar 24, 2018 at 12:07:10PM +0100, Hans de Goede wrote:
+>> On 24-03-18 09:02, Lukas Wunner wrote:
+>>> On Mon, Mar 19, 2018 at 10:02:36PM +0100, Hans de Goede wrote:
+>>>> The pm_runtime_set_suspended() call in bcm_close() is intended as a
+>>>> counterpart to the pm_runtime_set_active() call from bcm_request_irq()
+>>>> (which gets called from bcm_setup()).
+>>>>
+>>>> The pm_runtime_set_active() call only happens if our pre-requisites for
+>>>> doing runtime-pm are met. This commit adds the same check to the
+>>>> pm_runtime_set_suspended() call to avoid the runtime-pm state getting
+>>>> stuck in suspended after after a bcm_close().
+>>>
+>>> Have you actually observed the state getting stuck in suspended?
+>>> I'm asking because I don't quite see how this could happen:
+>>> pm_runtime_set_suspended() becomes a no-op unless runtime PM is disabled.
+>>> Now, a few lines further up in bcm_close(), pm_runtime_disable() is only
+>>> called under the conditions you're adding here.  If it's not called,
+>>> pm_runtime_set_suspended() doesn't have any effect anyway so adding the
+>>> conditions is pointless.  Am I missing something?
+>>
+>> All devices start with runtime-pm disabled and on devices without
+>> an IRQ we never enable it. So when the pm_runtime_set_suspended()
+>> gets called runtime-pm is still in its initial disabled state.
 > 
-> This was affecting following qualification test cases:
-> GAP/CONN/SCEP/BV-03-C, GAP/CONN/GCEP/BV-05-C, GAP/CONN/DCEP/BV-05-C
+> Okay but the device's initial state is set to RPM_SUSPENDED by
+> pm_runtime_init() and AFAICS neither the platform nor acpi buses
+> subsequently set it to RPM_ACTIVE, so the device is in suspended
+> state anyway, unless I've overlooked some detail.
+
+Ah, no you're right, I assumed that devices would default to
+RPM_ACTIVE (which corresponds to value 0), but you are right
+they are set to suspended by default.
+
+So this patch can be dropped.
+
+Marcel: It would still be nice to get the second patch from
+this series merged.
+
+> Which raises another question, bcm_suspend() only calls
+> bcm_suspend_device() if it's runtime active.  So devices
+> without IRQ, which are always in runtime suspended state,
+> are apparently never orderly put to sleep on ->suspend.
+
+No that is not a problem, pm_runtime_active() is defined as:
+
+static inline bool pm_runtime_active(struct device *dev)
+{
+         return dev->power.runtime_status == RPM_ACTIVE
+                 || dev->power.disable_depth;
+}
+
+On devices without an IRQ we never enable runtime_pm, so
+dev->power.disable_depth stays at its initial value of 1 and
+this function will return 1.
+
+> Also, if the device is always in suspended state, there's nothing
+> that keeps the UART in active state.  Has anyone ever actually
+> tested if this driver works without IRQ?
+
+AFAIK the code deciding to suspend parents also uses
+pm_runtime_active()
+
+The reason why I was worried about the suspended status field is
+because there also is pm_runtime_status_suspended() which only
+checks the status field, but I guess that is only used in
+special cases.
+
+>>> Related:  I notice that bcm_resume() calls pm_runtime_set_active().
+>>> Doesn't that have the effect that if the device is not opened and
+>>> the system goes to sleep, the device is kept in runtime active state
+>>> after resume and thus prevents the UART from runtime suspending until
+>>> the device is opened?
+>>
+>> AFAIK this just tells runtime pm that we've woken up the device
+>> (which we have), so that it does not call bcm_resume_device() *again*
+>> on the first runtime_pm_get().
 > 
-> Before patch:
-> < HCI Command: LE Set Random Address (0x08|0x0005) plen 6          #11350 [hci0] 84680.231216
->        Address: 56:BC:E8:24:11:68 (Resolvable)
->          Identity type: Random (0x01)
->          Identity: F2:F1:06:3D:9C:42 (Static)
->> HCI Event: Command Complete (0x0e) plen 4                        #11351 [hci0] 84680.246022
->      LE Set Random Address (0x08|0x0005) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7         #11352 [hci0] 84680.246417
->        Type: Passive (0x00)
->        Interval: 60.000 msec (0x0060)
->        Window: 30.000 msec (0x0030)
->        Own address type: Random (0x01)
->        Filter policy: Accept all advertisement, inc. directed unresolved RPA (0x02)
->> HCI Event: Command Complete (0x0e) plen 4                        #11353 [hci0] 84680.248854
->      LE Set Scan Parameters (0x08|0x000b) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2             #11354 [hci0] 84680.249466
->        Scanning: Enabled (0x01)
->        Filter duplicates: Enabled (0x01)
->> HCI Event: Command Complete (0x0e) plen 4                        #11355 [hci0] 84680.253222
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
->> HCI Event: LE Meta Event (0x3e) plen 18                          #11356 [hci0] 84680.458387
->      LE Direct Advertising Report (0x0b)
->        Num reports: 1
->        Event type: Connectable directed - ADV_DIRECT_IND (0x01)
->        Address type: Random (0x01)
->        Address: 53:38:DA:46:8C:45 (Resolvable)
->          Identity type: Public (0x00)
->          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
->        Direct address type: Random (0x01)
->        Direct address: 7C:D6:76:8C:DF:82 (Resolvable)
->          Identity type: Random (0x01)
->          Identity: F2:F1:06:3D:9C:42 (Static)
->        RSSI: -74 dBm (0xb6)
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2             #11357 [hci0] 84680.458737
->        Scanning: Disabled (0x00)
->        Filter duplicates: Disabled (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                        #11358 [hci0] 84680.469982
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Create Connection (0x08|0x000d) plen 25          #11359 [hci0] 84680.470444
->        Scan interval: 60.000 msec (0x0060)
->        Scan window: 60.000 msec (0x0060)
->        Filter policy: White list is not used (0x00)
->        Peer address type: Random (0x01)
->        Peer address: 53:38:DA:46:8C:45 (Resolvable)
->          Identity type: Public (0x00)
->          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
->        Own address type: Random (0x01)
->        Min connection interval: 30.00 msec (0x0018)
->        Max connection interval: 50.00 msec (0x0028)
->        Connection latency: 0 (0x0000)
->        Supervision timeout: 420 msec (0x002a)
->        Min connection length: 0.000 msec (0x0000)
->        Max connection length: 0.000 msec (0x0000)
->> HCI Event: Command Status (0x0f) plen 4                          #11360 [hci0] 84680.474971
->      LE Create Connection (0x08|0x000d) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0    #11361 [hci0] 84682.545385
->> HCI Event: Command Complete (0x0e) plen 4                        #11362 [hci0] 84682.551014
->      LE Create Connection Cancel (0x08|0x000e) ncmd 1
->        Status: Success (0x00)
->> HCI Event: LE Meta Event (0x3e) plen 19                          #11363 [hci0] 84682.551074
->      LE Connection Complete (0x01)
->        Status: Unknown Connection Identifier (0x02)
->        Handle: 0
->        Role: Master (0x00)
->        Peer address type: Public (0x00)
->        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
->        Connection interval: 0.00 msec (0x0000)
->        Connection latency: 0 (0x0000)
->        Supervision timeout: 0 msec (0x0000)
->        Master clock accuracy: 0x00
+> That's odd, by default the PM core runtime resumes a device before
+> going to system sleep, the only exception is if the devices uses
+> the "direct_complete" procedure, which requires that ->prepare
+> returns a positive int.  The platform bus doesn't even have a
+> ->prepare hook, so never uses direct complete AFAICS, and the acpi
+> bus uses direct_complete only under certain conditions and even then
+> devices seem to be resumed to runtime active state when the system wakes,
+> according to the code comment in acpi_subsys_resume_noirq().
 > 
-> After patch:
-> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7    #210 [hci0] 667.152459
->        Type: Passive (0x00)
->        Interval: 60.000 msec (0x0060)
->        Window: 30.000 msec (0x0030)
->        Own address type: Random (0x01)
->        Filter policy: Accept all advertisement, inc. directed unresolved RPA (0x02)
->> HCI Event: Command Complete (0x0e) plen 4                   #211 [hci0] 667.153613
->      LE Set Scan Parameters (0x08|0x000b) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2        #212 [hci0] 667.153704
->        Scanning: Enabled (0x01)
->        Filter duplicates: Enabled (0x01)
->> HCI Event: Command Complete (0x0e) plen 4                   #213 [hci0] 667.154584
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
->> HCI Event: LE Meta Event (0x3e) plen 18                     #214 [hci0] 667.182619
->      LE Direct Advertising Report (0x0b)
->        Num reports: 1
->        Event type: Connectable directed - ADV_DIRECT_IND (0x01)
->        Address type: Random (0x01)
->        Address: 50:52:D9:A6:48:A0 (Resolvable)
->          Identity type: Public (0x00)
->          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
->        Direct address type: Random (0x01)
->        Direct address: 7C:C1:57:A5:B7:A8 (Resolvable)
->          Identity type: Random (0x01)
->          Identity: F4:28:73:5D:38:B0 (Static)
->        RSSI: -70 dBm (0xba)
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2       #215 [hci0] 667.182704
->        Scanning: Disabled (0x00)
->        Filter duplicates: Disabled (0x00)
->> HCI Event: Command Complete (0x0e) plen 4                  #216 [hci0] 667.183599
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Random Address (0x08|0x0005) plen 6    #217 [hci0] 667.183645
->        Address: 7C:C1:57:A5:B7:A8 (Resolvable)
->          Identity type: Random (0x01)
->          Identity: F4:28:73:5D:38:B0 (Static)
->> HCI Event: Command Complete (0x0e) plen 4                  #218 [hci0] 667.184590
->      LE Set Random Address (0x08|0x0005) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Create Connection (0x08|0x000d) plen 25    #219 [hci0] 667.184613
->        Scan interval: 60.000 msec (0x0060)
->        Scan window: 60.000 msec (0x0060)
->        Filter policy: White list is not used (0x00)
->        Peer address type: Random (0x01)
->        Peer address: 50:52:D9:A6:48:A0 (Resolvable)
->          Identity type: Public (0x00)
->          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
->        Own address type: Random (0x01)
->        Min connection interval: 30.00 msec (0x0018)
->        Max connection interval: 50.00 msec (0x0028)
->        Connection latency: 0 (0x0000)
->        Supervision timeout: 420 msec (0x002a)
->        Min connection length: 0.000 msec (0x0000)
->        Max connection length: 0.000 msec (0x0000)
->> HCI Event: Command Status (0x0f) plen 4                    #220 [hci0] 667.186558
->      LE Create Connection (0x08|0x000d) ncmd 1
->        Status: Success (0x00)
->> HCI Event: LE Meta Event (0x3e) plen 19                    #221 [hci0] 667.485824
->      LE Connection Complete (0x01)
->        Status: Success (0x00)
->        Handle: 0
->        Role: Master (0x00)
->        Peer address type: Random (0x01)
->        Peer address: 50:52:D9:A6:48:A0 (Resolvable)
->          Identity type: Public (0x00)
->          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
->        Connection interval: 50.00 msec (0x0028)
->        Connection latency: 0 (0x0000)
->        Supervision timeout: 420 msec (0x002a)
->        Master clock accuracy: 0x07
-> @ MGMT Event: Device Connected (0x000b) plen 13          {0x0002} [hci0] 667.485996
->        LE Address: 11:22:33:44:55:66 (OUI 11-22-33)
->        Flags: 0x00000000
->        Data length: 0
+> So the pm_runtime_set_active() in bcm_resume() looks odd to me.
+
+This code precedes my involvement in the driver, I agree this looks
+a bit weird.
+
+>> The pm_runtime_enable() will start the
+>> autosuspend timer I believe (I could be wrong I'm not an expert on this)
+>> and then we will autosuspend again after the timer expires.
 > 
-> Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
-> Cc: stable@vger.kernel.org
-> ---
-> include/net/bluetooth/hci_core.h |  2 +-
-> net/bluetooth/hci_conn.c         | 29 +++++++++++++++++++++--------
-> net/bluetooth/hci_event.c        | 15 +++++++++++----
-> net/bluetooth/l2cap_core.c       |  2 +-
-> 4 files changed, 34 insertions(+), 14 deletions(-)
+> No, pm_runtime_enable() doesn't do that, but device_complete calls
+> pm_runtime_put() as the last step when coming out of system sleep,
+> and that will start the autosuspend timer.
 
-patch has been applied to bluetooth tree.
+Ok.
 
-Regards
+Regards,
 
-Marcel
-
+Hans
