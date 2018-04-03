@@ -1,631 +1,303 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH v1 6/7] Bluetooth: hci_mediatek: Add protocol support for
- MediaTek serial devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
-Date: Tue, 3 Apr 2018 12:27:50 +0200
-Cc: robh+dt@kernel.org, mark.rutland@arm.com,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Message-Id: <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
-References: <cover.1522736996.git.sean.wang@mediatek.com>
- <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
-To: sean.wang@mediatek.com
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>, stable@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix connection if directed advertising and privacy is used
+Date: Tue,  3 Apr 2018 11:35:04 +0200
+Message-Id: <20180403093504.23757-1-szymon.janc@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sean,
+Local random address needs to be updated before creating connection if
+RPA from LE Direct Advertising Report was resolved in host. Otherwise
+remote device might ignore connection request due to address mismatch.
 
-> This adds a driver for the MediaTek serial protocol based on H4 protocol,
-> which can enable the built-in Bluetooth device inside MT7622 SoC.
-> 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
-> drivers/bluetooth/Kconfig        |  12 +
-> drivers/bluetooth/Makefile       |   1 +
-> drivers/bluetooth/hci_mediatek.c | 499 +++++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/hci_uart.h     |   3 +-
-> 4 files changed, 514 insertions(+), 1 deletion(-)
-> create mode 100644 drivers/bluetooth/hci_mediatek.c
-> 
-> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-> index 010f5f5..851f430 100644
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -104,6 +104,18 @@ config BT_HCIUART_H4
-> 
-> 	  Say Y here to compile support for HCI UART (H4) protocol.
-> 
-> +config BT_HCIUART_MEDIATEK
-> +	tristate "MediaTek protocol support"
-> +	depends on BT_HCIUART_SERDEV
-> +	select BT_HCIUART_H4
-> +	help
-> +	  The MediaTek protocol based on H4 enables patch firmware download and
-> +	  configuration. This protocol is required for MediaTek Bluetooth
-> +	  devices with a serial bus such as BTIF, which can be usually found on
-> +	  various MediaTek SoCs.
-> +
-> +	  Say Y here to compile support for MediaTek protocol.
-> +
-> config BT_HCIUART_NOKIA
-> 	tristate "UART Nokia H4+ protocol support"
-> 	depends on BT_HCIUART
-> diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
-> index ec16c55..db93c76 100644
-> --- a/drivers/bluetooth/Makefile
-> +++ b/drivers/bluetooth/Makefile
-> @@ -43,5 +43,6 @@ hci_uart-$(CONFIG_BT_HCIUART_INTEL)	+= hci_intel.o
-> hci_uart-$(CONFIG_BT_HCIUART_BCM)	+= hci_bcm.o
-> hci_uart-$(CONFIG_BT_HCIUART_QCA)	+= hci_qca.o
-> hci_uart-$(CONFIG_BT_HCIUART_AG6XX)	+= hci_ag6xx.o
-> +hci_uart-$(CONFIG_BT_HCIUART_MEDIATEK)  += hci_mediatek.o
+This was affecting following qualification test cases:
+GAP/CONN/SCEP/BV-03-C, GAP/CONN/GCEP/BV-05-C, GAP/CONN/DCEP/BV-05-C
 
-we used when available the 3 letter short version of the manufacture. So this would be MTK and hci_mtk.o in this case. Not that I care that much.
+Before patch:
+< HCI Command: LE Set Random Address (0x08|0x0005) plen 6          #11350 [hci0] 84680.231216
+        Address: 56:BC:E8:24:11:68 (Resolvable)
+          Identity type: Random (0x01)
+          Identity: F2:F1:06:3D:9C:42 (Static)
+> HCI Event: Command Complete (0x0e) plen 4                        #11351 [hci0] 84680.246022
+      LE Set Random Address (0x08|0x0005) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7         #11352 [hci0] 84680.246417
+        Type: Passive (0x00)
+        Interval: 60.000 msec (0x0060)
+        Window: 30.000 msec (0x0030)
+        Own address type: Random (0x01)
+        Filter policy: Accept all advertisement, inc. directed unresolved RPA (0x02)
+> HCI Event: Command Complete (0x0e) plen 4                        #11353 [hci0] 84680.248854
+      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2             #11354 [hci0] 84680.249466
+        Scanning: Enabled (0x01)
+        Filter duplicates: Enabled (0x01)
+> HCI Event: Command Complete (0x0e) plen 4                        #11355 [hci0] 84680.253222
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Success (0x00)
+> HCI Event: LE Meta Event (0x3e) plen 18                          #11356 [hci0] 84680.458387
+      LE Direct Advertising Report (0x0b)
+        Num reports: 1
+        Event type: Connectable directed - ADV_DIRECT_IND (0x01)
+        Address type: Random (0x01)
+        Address: 53:38:DA:46:8C:45 (Resolvable)
+          Identity type: Public (0x00)
+          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
+        Direct address type: Random (0x01)
+        Direct address: 7C:D6:76:8C:DF:82 (Resolvable)
+          Identity type: Random (0x01)
+          Identity: F2:F1:06:3D:9C:42 (Static)
+        RSSI: -74 dBm (0xb6)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2             #11357 [hci0] 84680.458737
+        Scanning: Disabled (0x00)
+        Filter duplicates: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                        #11358 [hci0] 84680.469982
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Create Connection (0x08|0x000d) plen 25          #11359 [hci0] 84680.470444
+        Scan interval: 60.000 msec (0x0060)
+        Scan window: 60.000 msec (0x0060)
+        Filter policy: White list is not used (0x00)
+        Peer address type: Random (0x01)
+        Peer address: 53:38:DA:46:8C:45 (Resolvable)
+          Identity type: Public (0x00)
+          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
+        Own address type: Random (0x01)
+        Min connection interval: 30.00 msec (0x0018)
+        Max connection interval: 50.00 msec (0x0028)
+        Connection latency: 0 (0x0000)
+        Supervision timeout: 420 msec (0x002a)
+        Min connection length: 0.000 msec (0x0000)
+        Max connection length: 0.000 msec (0x0000)
+> HCI Event: Command Status (0x0f) plen 4                          #11360 [hci0] 84680.474971
+      LE Create Connection (0x08|0x000d) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Create Connection Cancel (0x08|0x000e) plen 0    #11361 [hci0] 84682.545385
+> HCI Event: Command Complete (0x0e) plen 4                        #11362 [hci0] 84682.551014
+      LE Create Connection Cancel (0x08|0x000e) ncmd 1
+        Status: Success (0x00)
+> HCI Event: LE Meta Event (0x3e) plen 19                          #11363 [hci0] 84682.551074
+      LE Connection Complete (0x01)
+        Status: Unknown Connection Identifier (0x02)
+        Handle: 0
+        Role: Master (0x00)
+        Peer address type: Public (0x00)
+        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Connection interval: 0.00 msec (0x0000)
+        Connection latency: 0 (0x0000)
+        Supervision timeout: 0 msec (0x0000)
+        Master clock accuracy: 0x00
 
-> hci_uart-$(CONFIG_BT_HCIUART_MRVL)	+= hci_mrvl.o
-> hci_uart-objs				:= $(hci_uart-y)
-> diff --git a/drivers/bluetooth/hci_mediatek.c b/drivers/bluetooth/hci_mediatek.c
-> new file mode 100644
-> index 0000000..7ac1e7a
-> --- /dev/null
-> +++ b/drivers/bluetooth/hci_mediatek.c
-> @@ -0,0 +1,499 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +// Copyright (c) 2018 MediaTek Inc.
-> +
-> +/*
-> + * Bluetooth HCI Serial driver for MediaTek SoC
-> + *
-> + * Author: Sean Wang <sean.wang@mediatek.com>
-> + *
-> + */
-> +
-> +#include <linux/clk.h>
-> +#include <linux/errno.h>
-> +#include <linux/firmware.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/pm_runtime.h>
-> +#include <linux/unaligned/le_struct.h>
-> +#include <linux/serdev.h>
-> +#include <linux/skbuff.h>
-> +#include <linux/types.h>
-> +#include <net/bluetooth/bluetooth.h>
-> +#include <net/bluetooth/hci_core.h>
-> +
-> +#include "hci_uart.h"
-> +
-> +#define FIRMWARE_MT7622		"mediatek/mt7622_patch_firmware.bin”
+After patch:
+< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7    #210 [hci0] 667.152459
+        Type: Passive (0x00)
+        Interval: 60.000 msec (0x0060)
+        Window: 30.000 msec (0x0030)
+        Own address type: Random (0x01)
+        Filter policy: Accept all advertisement, inc. directed unresolved RPA (0x02)
+> HCI Event: Command Complete (0x0e) plen 4                   #211 [hci0] 667.153613
+      LE Set Scan Parameters (0x08|0x000b) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2        #212 [hci0] 667.153704
+        Scanning: Enabled (0x01)
+        Filter duplicates: Enabled (0x01)
+> HCI Event: Command Complete (0x0e) plen 4                   #213 [hci0] 667.154584
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Success (0x00)
+> HCI Event: LE Meta Event (0x3e) plen 18                     #214 [hci0] 667.182619
+      LE Direct Advertising Report (0x0b)
+        Num reports: 1
+        Event type: Connectable directed - ADV_DIRECT_IND (0x01)
+        Address type: Random (0x01)
+        Address: 50:52:D9:A6:48:A0 (Resolvable)
+          Identity type: Public (0x00)
+          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
+        Direct address type: Random (0x01)
+        Direct address: 7C:C1:57:A5:B7:A8 (Resolvable)
+          Identity type: Random (0x01)
+          Identity: F4:28:73:5D:38:B0 (Static)
+        RSSI: -70 dBm (0xba)
+< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2       #215 [hci0] 667.182704
+        Scanning: Disabled (0x00)
+        Filter duplicates: Disabled (0x00)
+> HCI Event: Command Complete (0x0e) plen 4                  #216 [hci0] 667.183599
+      LE Set Scan Enable (0x08|0x000c) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Random Address (0x08|0x0005) plen 6    #217 [hci0] 667.183645
+        Address: 7C:C1:57:A5:B7:A8 (Resolvable)
+          Identity type: Random (0x01)
+          Identity: F4:28:73:5D:38:B0 (Static)
+> HCI Event: Command Complete (0x0e) plen 4                  #218 [hci0] 667.184590
+      LE Set Random Address (0x08|0x0005) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Create Connection (0x08|0x000d) plen 25    #219 [hci0] 667.184613
+        Scan interval: 60.000 msec (0x0060)
+        Scan window: 60.000 msec (0x0060)
+        Filter policy: White list is not used (0x00)
+        Peer address type: Random (0x01)
+        Peer address: 50:52:D9:A6:48:A0 (Resolvable)
+          Identity type: Public (0x00)
+          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
+        Own address type: Random (0x01)
+        Min connection interval: 30.00 msec (0x0018)
+        Max connection interval: 50.00 msec (0x0028)
+        Connection latency: 0 (0x0000)
+        Supervision timeout: 420 msec (0x002a)
+        Min connection length: 0.000 msec (0x0000)
+        Max connection length: 0.000 msec (0x0000)
+> HCI Event: Command Status (0x0f) plen 4                    #220 [hci0] 667.186558
+      LE Create Connection (0x08|0x000d) ncmd 1
+        Status: Success (0x00)
+> HCI Event: LE Meta Event (0x3e) plen 19                    #221 [hci0] 667.485824
+      LE Connection Complete (0x01)
+        Status: Success (0x00)
+        Handle: 0
+        Role: Master (0x00)
+        Peer address type: Random (0x01)
+        Peer address: 50:52:D9:A6:48:A0 (Resolvable)
+          Identity type: Public (0x00)
+          Identity: 11:22:33:44:55:66 (OUI 11-22-33)
+        Connection interval: 50.00 msec (0x0028)
+        Connection latency: 0 (0x0000)
+        Supervision timeout: 420 msec (0x002a)
+        Master clock accuracy: 0x07
+@ MGMT Event: Device Connected (0x000b) plen 13          {0x0002} [hci0] 667.485996
+        LE Address: 11:22:33:44:55:66 (OUI 11-22-33)
+        Flags: 0x00000000
+        Data length: 0
 
-Has this firmware already been submitted to linux-firmware tree?
+Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: stable@vger.kernel.org
+---
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/hci_conn.c         | 29 +++++++++++++++++++++--------
+ net/bluetooth/hci_event.c        |  9 ++++++---
+ net/bluetooth/l2cap_core.c       |  2 +-
+ 4 files changed, 29 insertions(+), 13 deletions(-)
 
-> +
-> +#define MTK_STP_HDR_SIZE	4
-> +#define MTK_STP_TLR_SIZE	2
-> +#define MTK_WMT_HDR_SIZE	5
-> +#define MTK_WMT_CMD_SIZE	(MTK_WMT_HDR_SIZE + MTK_STP_HDR_SIZE + \
-> +				 MTK_STP_TLR_SIZE + HCI_ACL_HDR_SIZE)
-> +
-> +enum {
-> +	MTK_WMT_PATCH_DWNLD = 0x1,
-> +	MTK_WMT_FUNC_CTRL = 0x6,
-> +	MTK_WMT_RST = 0x7
-> +};
-> +
-> +struct mtk_stp_splitter {
-> +	u8	pad[6];
-> +	u8	cursor;
-> +	u16	dlen;
-> +};
-> +
-> +struct mtk_bt_dev {
-> +	struct hci_uart hu;
-> +	struct clk *clk;
-> +	struct sk_buff *rx_skb;
-> +	struct sk_buff_head txq;
-> +	struct completion wmt_cmd;
-> +	struct mtk_stp_splitter *sp;
-> +};
-> +
-> +struct mtk_stp_hdr {
-> +	__u8 prefix;
-> +	__u8 dlen1:4;
-> +	__u8 type:4;
-> +	__u8 dlen2:8;
-> +	__u8 cs;
-> +} __packed;
-> +
-> +struct mtk_wmt_hdr {
-> +	__u8	dir;
-> +	__u8	op;
-> +	__le16	dlen;
-> +	__u8	flag;
-> +} __packed;
-> +
-> +static void mtk_stp_reset(struct mtk_stp_splitter *sp)
-> +{
-> +	sp->cursor = 2;
-> +	sp->dlen = 0;
-> +}
-> +
-> +static const unsigned char *
-> +mtk_stp_split(struct device *dev, struct mtk_stp_splitter *sp,
-> +	      const unsigned char *data, int count, int *sz_h4)
-> +{
-> +	struct mtk_stp_hdr *shdr;
-> +
-> +	/* The cursor is reset when all the data of STP is being consumed. */
-> +	if (!sp->dlen && sp->cursor >= 6)
-> +		sp->cursor = 0;
-> +
-> +	/* Filling pad until all STP info is obtained. */
-> +	while (sp->cursor < 6 && count > 0) {
-> +		sp->pad[sp->cursor] = *data;
-> +		sp->cursor++;
-> +		data++;
-> +		count--;
-> +	}
-> +
-> +	/* Retrieve STP info and have a sanity check. */
-> +	if (!sp->dlen && sp->cursor >= 6) {
-> +		shdr = (struct mtk_stp_hdr *)&sp->pad[2];
-> +		sp->dlen = shdr->dlen1 << 8 | shdr->dlen2;
-> +
-> +		/* Resync STP when unexpected data is being read. */
-> +		if (shdr->prefix != 0x80 || sp->dlen > 2048) {
-> +			dev_err(dev, "stp format unexpect (%d, %d)",
-> +				shdr->prefix, sp->dlen);
-> +			mtk_stp_reset(sp);
-> +		}
-> +	}
-> +
-> +	/* Directly leave when there's no data found for H4 can process. */
-> +	if (count <= 0)
-> +		return NULL;
-> +
-> +	/* Tranlate to how much the size of data H4 can handle so far. */
-> +	*sz_h4 = min_t(int, count, sp->dlen);
-> +	/* Update remaining the size of STP packet. */
-> +	sp->dlen -= *sz_h4;
-> +
-> +	/* Data points to STP payload which can be handled by H4. */
-> +	return data;
-> +}
-> +
-> +static void mtk_stp_hdr_build(struct mtk_stp_hdr *shdr, u8 type, u32 dlen)
-> +{
-> +	__u8 *p = (__u8 *)shdr;
-> +
-> +	shdr->prefix = 0x80;
-> +	shdr->dlen1 = (dlen & 0xf00) >> 8;
-> +	shdr->type = type;
-> +	shdr->dlen2 = dlen & 0xff;
-> +	shdr->cs = (p[0] + p[1] + p[2]) & 0xff;
-> +}
-> +
-> +static int mtk_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-> +{
-> +	struct mtk_bt_dev *btdev = hu->priv;
-> +	struct mtk_stp_hdr *shdr;
-> +	struct sk_buff *new_skb;
-> +	int dlen;
-> +
-> +	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
-> +	dlen = skb->len;
-> +
-> +	/* Make sure of STP header at least has 4-bytes free space to fill. */
-> +	if (unlikely(skb_headroom(skb) < MTK_STP_HDR_SIZE)) {
-> +		new_skb = skb_realloc_headroom(skb, MTK_STP_HDR_SIZE);
-> +		kfree_skb(skb);
-> +		skb = new_skb;
-> +	}
-> +
-> +	/* Build for STP packet format. */
-> +	shdr = skb_push(skb, MTK_STP_HDR_SIZE);
-> +	mtk_stp_hdr_build(shdr, 0, dlen);
-> +	skb_put_zero(skb, MTK_STP_TLR_SIZE);
-> +
-> +	skb_queue_tail(&btdev->txq, skb);
-> +
-> +	return 0;
-> +}
-> +
-> +static int mtk_wmt_cmd_sync(struct hci_uart *hu, u8 opcode, u8 flag, u16 plen,
-> +			    const void *param)
-> +{
-> +	struct mtk_bt_dev *btdev = hu->priv;
-> +	struct hci_command_hdr *hhdr;
-> +	struct hci_acl_hdr *ahdr;
-> +	struct mtk_wmt_hdr *whdr;
-> +	struct sk_buff *skb;
-> +	int ret = 0;
-> +
-> +	init_completion(&btdev->wmt_cmd);
-> +
-> +	skb = bt_skb_alloc(plen + MTK_WMT_CMD_SIZE, GFP_KERNEL);
-> +	if (!skb)
-> +		return -ENOMEM;
-> +
-> +	/*
-> +	 * WMT data is carried in either ACL or HCI format with op code as
-> +	 * 0xfc6f and followed by a WMT header and its actual payload.
-> +	 */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 95ccc1eef558..b619a190ff12 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -895,7 +895,7 @@ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 				     u16 conn_timeout);
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, u8 sec_level, u16 conn_timeout,
+-				u8 role);
++				u8 role, bdaddr_t *direct_rpa);
+ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
+ 				 u8 sec_level, u8 auth_type);
+ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index a9682534c377..45ff5dc124cc 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -749,18 +749,31 @@ static bool conn_use_rpa(struct hci_conn *conn)
+ }
+ 
+ static void hci_req_add_le_create_conn(struct hci_request *req,
+-				       struct hci_conn *conn)
++				       struct hci_conn *conn,
++				       bdaddr_t *direct_rpa)
+ {
+ 	struct hci_cp_le_create_conn cp;
+ 	struct hci_dev *hdev = conn->hdev;
+ 	u8 own_addr_type;
+ 
+-	/* Update random address, but set require_privacy to false so
+-	 * that we never connect with an non-resolvable address.
++	/* If direct address was provided we use it instead of current
++	 * address.
+ 	 */
+-	if (hci_update_random_address(req, false, conn_use_rpa(conn),
+-				      &own_addr_type))
+-		return;
++	if (direct_rpa) {
++		if (bacmp(&req->hdev->random_addr, direct_rpa))
++			hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
++								direct_rpa);
++
++		/* direct address is always RPA */
++		own_addr_type = ADDR_LE_DEV_RANDOM;
++	} else {
++		/* Update random address, but set require_privacy to false so
++		 * that we never connect with an non-resolvable address.
++		 */
++		if (hci_update_random_address(req, false, conn_use_rpa(conn),
++					      &own_addr_type))
++			return;
++	}
+ 
+ 	memset(&cp, 0, sizeof(cp));
+ 
+@@ -825,7 +838,7 @@ static void hci_req_directed_advertising(struct hci_request *req,
+ 
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, u8 sec_level, u16 conn_timeout,
+-				u8 role)
++				u8 role, bdaddr_t *direct_rpa)
+ {
+ 	struct hci_conn_params *params;
+ 	struct hci_conn *conn;
+@@ -940,7 +953,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		hci_dev_set_flag(hdev, HCI_LE_SCAN_INTERRUPTED);
+ 	}
+ 
+-	hci_req_add_le_create_conn(&req, conn);
++	hci_req_add_le_create_conn(&req, conn, direct_rpa);
+ 
+ create_conn:
+ 	err = hci_req_run(&req, create_le_conn_complete);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index cd3bbb766c24..4d3f19e86bee 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4648,7 +4648,8 @@ static void hci_le_conn_update_complete_evt(struct hci_dev *hdev,
+ /* This function requires the caller holds hdev->lock */
+ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
+ 					      bdaddr_t *addr,
+-					      u8 addr_type, u8 adv_type)
++					      u8 addr_type, u8 adv_type,
++					      bdaddr_t *direct_rpa)
+ {
+ 	struct hci_conn *conn;
+ 	struct hci_conn_params *params;
+@@ -4699,7 +4700,8 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
+ 	}
+ 
+ 	conn = hci_connect_le(hdev, addr, addr_type, BT_SECURITY_LOW,
+-			      HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER);
++			      HCI_LE_AUTOCONN_TIMEOUT, HCI_ROLE_MASTER,
++			      direct_rpa);
+ 	if (!IS_ERR(conn)) {
+ 		/* If HCI_AUTO_CONN_EXPLICIT is set, conn is already owned
+ 		 * by higher layer that tried to connect, if no then
+@@ -4809,7 +4811,8 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	}
+ 
+ 	/* Check if we have been requested to connect to this device */
+-	conn = check_pending_le_conn(hdev, bdaddr, bdaddr_type, type);
++	conn = check_pending_le_conn(hdev, bdaddr, bdaddr_type, type,
++								direct_addr);
+ 	if (conn && type == LE_ADV_IND) {
+ 		/* Store report for later inclusion by
+ 		 * mgmt_device_connected
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index fc6615d59165..9b7907ebfa01 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7156,7 +7156,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 			hcon = hci_connect_le(hdev, dst, dst_type,
+ 					      chan->sec_level,
+ 					      HCI_LE_CONN_TIMEOUT,
+-					      HCI_ROLE_SLAVE);
++					      HCI_ROLE_SLAVE, NULL);
+ 		else
+ 			hcon = hci_connect_le_scan(hdev, dst, dst_type,
+ 						   chan->sec_level,
+-- 
+2.14.3
 
-Please use net subsystem comment style.
-
-> +	switch (opcode) {
-> +	case MTK_WMT_PATCH_DWNLD:
-> +		ahdr = skb_put(skb, HCI_ACL_HDR_SIZE);
-> +		ahdr->handle = cpu_to_le16(0xfc6f);
-> +		ahdr->dlen   = cpu_to_le16(plen + MTK_WMT_HDR_SIZE);
-> +		break;
-> +	default:
-> +		hhdr = skb_put(skb, HCI_COMMAND_HDR_SIZE);
-> +		hhdr->opcode = cpu_to_le16(0xfc6f);
-> +		hhdr->plen = plen + MTK_WMT_HDR_SIZE;
-> +		break;
-> +	}
-> +
-> +	hci_skb_pkt_type(skb) = opcode == MTK_WMT_PATCH_DWNLD ?
-> +				HCI_ACLDATA_PKT : HCI_COMMAND_PKT;
-
-Why not move that into the switch statement above.
-
-> +
-> +	/* Start to build a WMT header and its actual payload. */
-> +	whdr = skb_put(skb, MTK_WMT_HDR_SIZE);
-> +	whdr->dir = 1;
-> +	whdr->op = opcode;
-> +	whdr->dlen = cpu_to_le16(plen + 1);
-> +	whdr->flag = flag;
-> +	skb_put_data(skb, param, plen);
-> +
-> +	mtk_enqueue(hu, skb);
-> +	hci_uart_tx_wakeup(hu);
-> +
-> +	/*
-> +	 * Waiting a WMT event response, while we must take care in case of
-> +	 * failures for the wait.
-> +	 */
-> +	ret = wait_for_completion_interruptible_timeout(&btdev->wmt_cmd, HZ);
-> +
-> +	return ret > 0 ? 0 : ret < 0 ? ret : -ETIMEDOUT;
-> +}
-
-All in all I am not convinced that this is super clean. I get that we need something special for having this in the ACL data packets, but for the standard HCI command I prefer that __hci_cmd_sync is used. I addition, it seems that patch download is the only special case and that happens before at the setup stage. So we could make things special for that. I need to understand this a bit better. Can I get a btmon -w trace.log file from the whole init procedure.
-
-
-> +
-> +static int mtk_setup_fw(struct hci_uart *hu)
-> +{
-> +	struct mtk_bt_dev *btdev = hu->priv;
-> +	const struct firmware *fw;
-> +	struct device *dev;
-> +	const char *fwname;
-> +	const u8 *fw_ptr;
-> +	size_t fw_size;
-> +	int err, dlen;
-> +	u8 flag;
-> +
-> +	dev = &hu->serdev->dev;
-> +	fwname = FIRMWARE_MT7622;
-> +
-> +	init_completion(&btdev->wmt_cmd);
-> +
-> +	err = request_firmware(&fw, fwname, dev);
-> +	if (err < 0) {
-> +		dev_err(dev, "%s: Failed to load firmware file (%d)",
-> +			hu->hdev->name, err);
-> +		return err;
-> +	}
-> +
-> +	fw_ptr = fw->data;
-> +	fw_size = fw->size;
-> +
-> +	/* The size of a patch header at least has 30 bytes. */
-> +	if (fw_size < 30)
-> +		return -EINVAL;
-> +
-> +	while (fw_size > 0) {
-> +		dlen = min_t(int, 1000, fw_size);
-> +
-> +		/* Tell deivice the position in sequence. */
-> +		flag = (fw_size - dlen <= 0) ? 3 :
-> +		       (fw_size < fw->size) ? 2 : 1;
-> +
-> +		err = mtk_wmt_cmd_sync(hu, MTK_WMT_PATCH_DWNLD, flag,
-> +				       dlen, fw_ptr);
-> +		if (err < 0)
-> +			break;
-> +
-> +		fw_size -= dlen;
-> +		fw_ptr += dlen;
-> +	}
-> +
-> +	release_firmware(fw);
-> +
-> +	return err;
-> +}
-> +
-> +static int mtk_open(struct hci_uart *hu)
-> +{
-> +	struct mtk_bt_dev *btdev = hu->priv;
-> +	struct device *dev;
-> +	int err = 0;
-> +
-> +	dev = &hu->serdev->dev;
-> +
-> +	serdev_device_open(hu->serdev);
-> +	skb_queue_head_init(&btdev->txq);
-> +
-> +	/* Setup the usage of H4. */
-> +	hu->alignment = 1;
-> +	hu->padding = 0;
-> +	mtk_stp_reset(btdev->sp);
-> +
-> +	/* Enable the power domain and clock the device requires */
-> +	pm_runtime_enable(dev);
-> +	err = pm_runtime_get_sync(dev);
-> +	if (err < 0) {
-> +		pm_runtime_disable(dev);
-> +		return err;
-> +	}
-> +
-> +	err = clk_prepare_enable(btdev->clk);
-> +	if (err < 0) {
-> +		pm_runtime_put_sync(dev);
-> +		pm_runtime_disable(dev);
-> +	}
-> +
-> +	return err;
-> +}
-> +
-> +static int mtk_close(struct hci_uart *hu)
-> +{
-> +	struct mtk_bt_dev *btdev = hu->priv;
-> +	struct device *dev = &hu->serdev->dev;
-> +	u8 param = 0x0;
-> +
-> +	skb_queue_purge(&btdev->txq);
-> +	kfree_skb(btdev->rx_skb);
-> +
-> +	/* Disable the device. */
-> +	mtk_wmt_cmd_sync(hu, MTK_WMT_FUNC_CTRL, 0x0, sizeof(param), &param);
-
-Wouldn’t this require a enable device in open callback?
-
-> +
-> +	/* Shutdown the clock and power domain the device requires. */
-> +	clk_disable_unprepare(btdev->clk);
-> +
-> +	pm_runtime_put_sync(dev);
-> +	pm_runtime_disable(dev);
-> +
-> +	serdev_device_close(hu->serdev);
-> +
-> +	return 0;
-> +}
-> +
-> +int mtk_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	struct hci_event_hdr *hdr = (void *)skb->data;
-> +	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	struct mtk_bt_dev *btdev = hu->priv;
-> +
-> +	if (hci_skb_pkt_type(skb) == HCI_EVENT_PKT &&
-> +	    hdr->evt == 0xe4) {
-> +		complete(&btdev->wmt_cmd);
-> +		kfree_skb(skb);
-> +		return 0;
-> +	}
-> +
-> +	return hci_recv_frame(hdev, skb);
-> +}
-
-actually this is overdoing it. You can use hci_recv_frame for ACL and SCO and just a special one for events. However all in all I question the need for the special handling anyway. As I said above, I have the feeling this can be done via __hci_cmd_sync or __hci_cmd_sync_ev. So I really like to see a btmon -w trace.log for these so that I can see how they look.
-
-> +
-> +static const struct h4_recv_pkt mtk_recv_pkts[] = {
-> +	{ H4_RECV_ACL,		.recv = mtk_recv_frame },
-> +	{ H4_RECV_SCO,		.recv = mtk_recv_frame },
-> +	{ H4_RECV_EVENT,	.recv = mtk_recv_frame },
-> +};
-> +
-> +static int mtk_recv(struct hci_uart *hu, const void *data, int count)
-> +{
-> +	const unsigned char *p_left = data, *p_h4;
-> +	struct mtk_bt_dev *btdev = hu->priv;
-> +	int sz_left = count, sz_h4, adv;
-> +	struct device *dev;
-> +	int err;
-> +
-> +	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
-> +		return -EUNATCH;
-> +
-> +	dev = &hu->serdev->dev;
-> +
-> +	while (sz_left > 0) {
-> +		p_h4 = mtk_stp_split(dev, btdev->sp, p_left, sz_left, &sz_h4);
-> +		if (!p_h4)
-> +			break;
-
-Now this is troubling me a bit. While there are some H:4 frames somewhere in here, you need to do another set of framing. So what is the framing that comes from the serial part in the first place?
-
-Btw. it is fine if hci_uart is not a good fit. I actually think it is a bad fit and using the btuart driver I send around a few weeks ago is a better starting point. However if the framing itself is more elaborate actually, then even a brand new driver and just re-using h4_recv.h would be good. If however the extra framing already does a real framing job, then even h4_recv.h is useless and we can just pick the frames right out of serial device. For example bfusb.c had such an extra framing on top of H:4.
-
-> +
-> +		adv = p_h4 - p_left;
-> +		sz_left -= adv;
-> +		p_left += adv;
-> +
-> +		btdev->rx_skb = h4_recv_buf(hu->hdev, btdev->rx_skb,
-> +					    p_h4, sz_h4, mtk_recv_pkts,
-> +					    ARRAY_SIZE(mtk_recv_pkts));
-> +		if (IS_ERR(btdev->rx_skb)) {
-> +			err = PTR_ERR(btdev->rx_skb);
-> +			dev_err(dev, "Frame reassembly failed (%d)", err);
-> +			btdev->rx_skb = NULL;
-> +			return err;
-> +		}
-> +
-> +		sz_left -= sz_h4;
-> +		p_left += sz_h4;
-> +	}
-> +
-> +	return count;
-> +}
-> +
-> +static struct sk_buff *mtk_dequeue(struct hci_uart *hu)
-> +{
-> +	struct mtk_bt_dev *btdev = hu->priv;
-> +
-> +	return skb_dequeue(&btdev->txq);
-> +}
-> +
-> +static int mtk_flush(struct hci_uart *hu)
-> +{
-> +	struct mtk_bt_dev *btdev = hu->priv;
-> +
-> +	skb_queue_purge(&btdev->txq);
-> +
-> +	return 0;
-> +}
-> +
-> +static int mtk_setup(struct hci_uart *hu)
-> +{
-> +	struct device *dev;
-> +	u8 param = 0x1;
-> +	int err;
-> +
-> +	dev = &hu->serdev->dev;
-> +
-> +	/* Setup a firmware which the device definitely requires. */
-> +	err = mtk_setup_fw(hu);
-> +	if (err < 0) {
-> +		dev_err(dev, "Fail at setup FW (%d): %d", __LINE__, err);
-> +		return err;
-> +	}
-> +
-> +	/* Activate funciton the firmware provides to. */
-> +	err = mtk_wmt_cmd_sync(hu, MTK_WMT_RST, 0x4, 0, 0);
-> +	if (err < 0) {
-> +		dev_err(dev, "Fail at WMT RST (%d): %d", __LINE__, err);
-> +		return err;
-> +	}
-> +
-> +	/* Enable Bluetooth protocol. */
-> +	err = mtk_wmt_cmd_sync(hu, MTK_WMT_FUNC_CTRL, 0x0, sizeof(param),
-> +			       &param);
-> +	if (err < 0)
-> +		dev_err(dev, "Fail at FUNC CTRL (%d): %d", __LINE__, err);
-
-Just as a reminder, setup callback is only called once. You should enable the transport in open callback.
-
-> +
-> +	return err;
-> +}
-> +
-> +static const struct hci_uart_proto mtk_proto = {
-> +	.id		= HCI_UART_MTK,
-> +	.name		= "MediaTek",
-> +	.open		= mtk_open,
-> +	.close		= mtk_close,
-> +	.recv		= mtk_recv,
-> +	.enqueue	= mtk_enqueue,
-> +	.dequeue	= mtk_dequeue,
-> +	.flush		= mtk_flush,
-> +	.setup		= mtk_setup,
-> +	.manufacturer	= 1,
-
-Unless you are Nokia, this id is wrong.
-
-> +};
-> +
-> +static int mtk_bluetooth_serdev_probe(struct serdev_device *serdev)
-> +{
-> +	struct device *dev = &serdev->dev;
-> +	struct mtk_bt_dev *btdev;
-> +	int err = 0;
-> +
-> +	btdev = devm_kzalloc(dev, sizeof(*btdev), GFP_KERNEL);
-> +	if (!btdev)
-> +		return -ENOMEM;
-> +
-> +	btdev->sp = devm_kzalloc(dev, sizeof(*btdev->sp), GFP_KERNEL);
-> +	if (!btdev->sp)
-> +		return -ENOMEM;
-> +
-> +	btdev->clk = devm_clk_get(dev, "ref");
-> +	if (IS_ERR(btdev->clk))
-> +		return PTR_ERR(btdev->clk);
-> +
-> +	btdev->hu.serdev = serdev;
-> +	btdev->hu.priv = btdev;
-> +
-> +	serdev_device_set_drvdata(serdev, btdev);
-> +
-> +	err = hci_uart_register_device(&btdev->hu, &mtk_proto);
-> +	if (err)
-> +		dev_err(dev, "Could not register bluetooth uart: %d", err);
-> +
-> +	return err;
-> +}
-> +
-> +static void mtk_bluetooth_serdev_remove(struct serdev_device *serdev)
-> +{
-> +	struct mtk_bt_dev *btdev = serdev_device_get_drvdata(serdev);
-> +
-> +	hci_uart_unregister_device(&btdev->hu);
-> +}
-> +
-> +static const struct of_device_id mtk_bluetooth_of_match[] = {
-> +	{ .compatible = "mediatek,mt7622-bluetooth" },
-> +	{},
-> +};
-> +MODULE_DEVICE_TABLE(of, mtk_bluetooth_of_match);
-> +
-> +static struct serdev_device_driver mtk_bluetooth_serdev_driver = {
-> +	.probe = mtk_bluetooth_serdev_probe,
-> +	.remove = mtk_bluetooth_serdev_remove,
-> +	.driver = {
-> +		.name = "mediatek-bluetooth",
-> +		.of_match_table = of_match_ptr(mtk_bluetooth_of_match),
-> +	},
-> +};
-> +
-> +module_serdev_device_driver(mtk_bluetooth_serdev_driver);
-> +
-> +MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
-> +MODULE_DESCRIPTION("Bluetooth HCI Serial driver for MediaTek SoC");
-> +MODULE_LICENSE("GPL v2");
-> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-> index 66e8c68..3f0911e 100644
-> --- a/drivers/bluetooth/hci_uart.h
-> +++ b/drivers/bluetooth/hci_uart.h
-> @@ -35,7 +35,7 @@
-> #define HCIUARTGETFLAGS		_IOR('U', 204, int)
-> 
-> /* UART protocols */
-> -#define HCI_UART_MAX_PROTO	12
-> +#define HCI_UART_MAX_PROTO	13
-> 
-> #define HCI_UART_H4	0
-> #define HCI_UART_BCSP	1
-> @@ -49,6 +49,7 @@
-> #define HCI_UART_AG6XX	9
-> #define HCI_UART_NOKIA	10
-> #define HCI_UART_MRVL	11
-> +#define HCI_UART_MTK	12
-
-I am really trying to avoid new id assignments here and go for serdev only drivers.
-
-Regards
-
-Marcel
