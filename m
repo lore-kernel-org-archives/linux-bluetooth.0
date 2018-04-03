@@ -1,84 +1,66 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Subject: [PATCH resend] Bluetooth: hci_bcm: Add broken-irq dmi blacklist and add Meegopad T08 to it
-Date: Tue,  3 Apr 2018 16:40:20 +0200
-Message-Id: <20180403144020.14819-1-hdegoede@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH 1/2] Bluetooth: hci_bcm: Don't change runtime-status when
+ not using runtime-pm
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <4c95557d-3f68-825d-e50a-9ff6c5c72e0a@redhat.com>
+Date: Tue, 3 Apr 2018 16:16:28 +0200
+Cc: Lukas Wunner <lukas@wunner.de>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-acpi@vger.kernel.org
+Message-Id: <C2E1C50D-55B8-4769-A641-17A87780FAE4@holtmann.org>
+References: <20180319210237.26205-1-hdegoede@redhat.com>
+ <20180324080213.GB15184@wunner.de>
+ <8f97d9b8-ce7d-fa77-cf12-31c12025b0f1@redhat.com>
+ <20180324141909.GA2013@wunner.de>
+ <4c95557d-3f68-825d-e50a-9ff6c5c72e0a@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Meegopad T08 hdmi-stick (think Intel computestick) has a brcm43430
-wifi/bt combo chip. The BCM2E90 ACPI device describing the BT part does
-contain a valid ActiveLow GpioInt entry, but the GPIO it points to never
-goes low, so either the IRQ pin is not connected, or the ACPI resource-
-table points to the wrong GPIO.
+Hi Hans,
 
-Eitherway things will not work if we try to use the specified IRQ, this
-commits adds a DMI based broken-irq blacklist and disables use of the IRQ
-and thus also runtime-pm for devices on this list.
+>>>>> The pm_runtime_set_suspended() call in bcm_close() is intended as a
+>>>>> counterpart to the pm_runtime_set_active() call from bcm_request_irq()
+>>>>> (which gets called from bcm_setup()).
+>>>>> 
+>>>>> The pm_runtime_set_active() call only happens if our pre-requisites for
+>>>>> doing runtime-pm are met. This commit adds the same check to the
+>>>>> pm_runtime_set_suspended() call to avoid the runtime-pm state getting
+>>>>> stuck in suspended after after a bcm_close().
+>>>> 
+>>>> Have you actually observed the state getting stuck in suspended?
+>>>> I'm asking because I don't quite see how this could happen:
+>>>> pm_runtime_set_suspended() becomes a no-op unless runtime PM is disabled.
+>>>> Now, a few lines further up in bcm_close(), pm_runtime_disable() is only
+>>>> called under the conditions you're adding here.  If it's not called,
+>>>> pm_runtime_set_suspended() doesn't have any effect anyway so adding the
+>>>> conditions is pointless.  Am I missing something?
+>>> 
+>>> All devices start with runtime-pm disabled and on devices without
+>>> an IRQ we never enable it. So when the pm_runtime_set_suspended()
+>>> gets called runtime-pm is still in its initial disabled state.
+>> Okay but the device's initial state is set to RPM_SUSPENDED by
+>> pm_runtime_init() and AFAICS neither the platform nor acpi buses
+>> subsequently set it to RPM_ACTIVE, so the device is in suspended
+>> state anyway, unless I've overlooked some detail.
+> 
+> Ah, no you're right, I assumed that devices would default to
+> RPM_ACTIVE (which corresponds to value 0), but you are right
+> they are set to suspended by default.
+> 
+> So this patch can be dropped.
+> 
+> Marcel: It would still be nice to get the second patch from
+> this series merged.
 
-This blacklist starts with the the Meegopad T08, fixing bluetooth not
-working on this hdmi-stick. Since this is not a battery powered device
-the loss of runtime-pm is not really an issue.
+can you resent that patch? And should it also go into stable?
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/hci_bcm.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+Regards
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 52cbd18f6ed1..26e4a0cb27c1 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -794,6 +794,20 @@ static const struct acpi_gpio_mapping acpi_bcm_int_first_gpios[] = {
- 	{ },
- };
- 
-+/* Some firmware reports an IRQ which does not work (wrong pin in fw table?) */
-+static const struct dmi_system_id bcm_broken_irq_dmi_table[] = {
-+	{
-+		.ident = "Meegopad T08",
-+		.matches = {
-+			DMI_EXACT_MATCH(DMI_BOARD_VENDOR,
-+					"To be filled by OEM."),
-+			DMI_EXACT_MATCH(DMI_BOARD_NAME, "T3 MRD"),
-+			DMI_EXACT_MATCH(DMI_BOARD_VERSION, "V1.1"),
-+		},
-+	},
-+	{ }
-+};
-+
- #ifdef CONFIG_ACPI
- /* IRQ polarity of some chipsets are not defined correctly in ACPI table. */
- static const struct dmi_system_id bcm_active_low_irq_dmi_table[] = {
-@@ -911,6 +925,8 @@ static int bcm_gpio_set_shutdown(struct bcm_device *dev, bool powered)
- 
- static int bcm_get_resources(struct bcm_device *dev)
- {
-+	const struct dmi_system_id *dmi_id;
-+
- 	dev->name = dev_name(dev->dev);
- 
- 	if (x86_apple_machine && !bcm_apple_get_resources(dev))
-@@ -943,6 +959,13 @@ static int bcm_get_resources(struct bcm_device *dev)
- 		dev->irq = gpiod_to_irq(gpio);
- 	}
- 
-+	dmi_id = dmi_first_match(bcm_broken_irq_dmi_table);
-+	if (dmi_id) {
-+		dev_info(dev->dev, "%s: Has a broken IRQ config, disabling IRQ support / runtime-pm\n",
-+			 dmi_id->ident);
-+		dev->irq = 0;
-+	}
-+
- 	dev_dbg(dev->dev, "BCM irq: %d\n", dev->irq);
- 	return 0;
- }
--- 
-2.17.0.rc2
+Marcel
+
