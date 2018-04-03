@@ -1,127 +1,45 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH 1/2] Bluetooth: hci_bcm: Don't change runtime-status when
- not using runtime-pm
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-References: <20180319210237.26205-1-hdegoede@redhat.com>
- <20180324080213.GB15184@wunner.de>
- <8f97d9b8-ce7d-fa77-cf12-31c12025b0f1@redhat.com>
- <20180324141909.GA2013@wunner.de>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <4c95557d-3f68-825d-e50a-9ff6c5c72e0a@redhat.com>
-Date: Tue, 3 Apr 2018 14:55:22 +0200
+Return-Path: <fengguang.wu@intel.com>
+Date: Tue, 3 Apr 2018 20:13:03 +0800
+From: kbuild test robot <lkp@intel.com>
+To: sean.wang@mediatek.com
+Cc: kbuild-all@01.org, robh+dt@kernel.org, mark.rutland@arm.com,
+	marcel@holtmann.org, johan.hedberg@gmail.com,
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Sean Wang <sean.wang@mediatek.com>
+Subject: Re: [PATCH v1 6/7] Bluetooth: hci_mediatek: Add protocol support for
+ MediaTek serial devices
+Message-ID: <201804032020.XSC8Oqit%fengguang.wu@intel.com>
+References: <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
-In-Reply-To: <20180324141909.GA2013@wunner.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Sean,
 
-On 24-03-18 15:19, Lukas Wunner wrote:
-> On Sat, Mar 24, 2018 at 12:07:10PM +0100, Hans de Goede wrote:
->> On 24-03-18 09:02, Lukas Wunner wrote:
->>> On Mon, Mar 19, 2018 at 10:02:36PM +0100, Hans de Goede wrote:
->>>> The pm_runtime_set_suspended() call in bcm_close() is intended as a
->>>> counterpart to the pm_runtime_set_active() call from bcm_request_irq()
->>>> (which gets called from bcm_setup()).
->>>>
->>>> The pm_runtime_set_active() call only happens if our pre-requisites for
->>>> doing runtime-pm are met. This commit adds the same check to the
->>>> pm_runtime_set_suspended() call to avoid the runtime-pm state getting
->>>> stuck in suspended after after a bcm_close().
->>>
->>> Have you actually observed the state getting stuck in suspended?
->>> I'm asking because I don't quite see how this could happen:
->>> pm_runtime_set_suspended() becomes a no-op unless runtime PM is disabled.
->>> Now, a few lines further up in bcm_close(), pm_runtime_disable() is only
->>> called under the conditions you're adding here.  If it's not called,
->>> pm_runtime_set_suspended() doesn't have any effect anyway so adding the
->>> conditions is pointless.  Am I missing something?
->>
->> All devices start with runtime-pm disabled and on devices without
->> an IRQ we never enable it. So when the pm_runtime_set_suspended()
->> gets called runtime-pm is still in its initial disabled state.
-> 
-> Okay but the device's initial state is set to RPM_SUSPENDED by
-> pm_runtime_init() and AFAICS neither the platform nor acpi buses
-> subsequently set it to RPM_ACTIVE, so the device is in suspended
-> state anyway, unless I've overlooked some detail.
+I love your patch! Perhaps something to improve:
 
-Ah, no you're right, I assumed that devices would default to
-RPM_ACTIVE (which corresponds to value 0), but you are right
-they are set to suspended by default.
+[auto build test WARNING on next-20180329]
+[also build test WARNING on v4.16]
+[cannot apply to linus/master bluetooth/master bluetooth-next/master v4.16 v4.16-rc7 v4.16-rc6]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-So this patch can be dropped.
+url:    https://github.com/0day-ci/linux/commits/sean-wang-mediatek-com/add-support-for-Bluetooth-on-MT7622-SoC/20180403-160035
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
 
-Marcel: It would still be nice to get the second patch from
-this series merged.
 
-> Which raises another question, bcm_suspend() only calls
-> bcm_suspend_device() if it's runtime active.  So devices
-> without IRQ, which are always in runtime suspended state,
-> are apparently never orderly put to sleep on ->suspend.
+sparse warnings: (new ones prefixed by >>)
 
-No that is not a problem, pm_runtime_active() is defined as:
+>> drivers/bluetooth/hci_mediatek.c:322:5: sparse: symbol 'mtk_recv_frame' was not declared. Should it be static?
+>> drivers/bluetooth/hci_mediatek.c:415:57: sparse: Using plain integer as NULL pointer
 
-static inline bool pm_runtime_active(struct device *dev)
-{
-         return dev->power.runtime_status == RPM_ACTIVE
-                 || dev->power.disable_depth;
-}
+Please review and possibly fold the followup patch.
 
-On devices without an IRQ we never enable runtime_pm, so
-dev->power.disable_depth stays at its initial value of 1 and
-this function will return 1.
-
-> Also, if the device is always in suspended state, there's nothing
-> that keeps the UART in active state.  Has anyone ever actually
-> tested if this driver works without IRQ?
-
-AFAIK the code deciding to suspend parents also uses
-pm_runtime_active()
-
-The reason why I was worried about the suspended status field is
-because there also is pm_runtime_status_suspended() which only
-checks the status field, but I guess that is only used in
-special cases.
-
->>> Related:  I notice that bcm_resume() calls pm_runtime_set_active().
->>> Doesn't that have the effect that if the device is not opened and
->>> the system goes to sleep, the device is kept in runtime active state
->>> after resume and thus prevents the UART from runtime suspending until
->>> the device is opened?
->>
->> AFAIK this just tells runtime pm that we've woken up the device
->> (which we have), so that it does not call bcm_resume_device() *again*
->> on the first runtime_pm_get().
-> 
-> That's odd, by default the PM core runtime resumes a device before
-> going to system sleep, the only exception is if the devices uses
-> the "direct_complete" procedure, which requires that ->prepare
-> returns a positive int.  The platform bus doesn't even have a
-> ->prepare hook, so never uses direct complete AFAICS, and the acpi
-> bus uses direct_complete only under certain conditions and even then
-> devices seem to be resumed to runtime active state when the system wakes,
-> according to the code comment in acpi_subsys_resume_noirq().
-> 
-> So the pm_runtime_set_active() in bcm_resume() looks odd to me.
-
-This code precedes my involvement in the driver, I agree this looks
-a bit weird.
-
->> The pm_runtime_enable() will start the
->> autosuspend timer I believe (I could be wrong I'm not an expert on this)
->> and then we will autosuspend again after the timer expires.
-> 
-> No, pm_runtime_enable() doesn't do that, but device_complete calls
-> pm_runtime_put() as the last step when coming out of system sleep,
-> and that will start the autosuspend timer.
-
-Ok.
-
-Regards,
-
-Hans
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
