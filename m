@@ -4,13 +4,12 @@ To: <robh+dt@kernel.org>, <mark.rutland@arm.com>, <marcel@holtmann.org>,
 	<johan.hedberg@gmail.com>
 CC: <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>, "Rob
- Herring" <robh@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
-	<linux-serial@vger.kernel.org>
-Subject: [PATCH v1 2/7] serdev: add dev_pm_domain_attach|detach()
-Date: Tue, 3 Apr 2018 15:15:52 +0800
-Message-ID: <f976766cd499c8d7053a1f442aba1494b4d3314f.1522736996.git.sean.wang@mediatek.com>
+	<linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>, "Matthias
+ Brugger" <matthias.bgg@gmail.com>, Ulf Hansson <ulf.hansson@linaro.org>,
+	"Weiyi Lu" <weiyi.lu@mediatek.com>
+Subject: [PATCH v1 3/7] soc: mediatek: reuse read[l,x]_poll_timeout helpers
+Date: Tue, 3 Apr 2018 15:15:53 +0800
+Message-ID: <2c0d233c658fa6093a18a54e82a3e51340251bc9.1522736996.git.sean.wang@mediatek.com>
 In-Reply-To: <cover.1522736996.git.sean.wang@mediatek.com>
 References: <cover.1522736996.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
@@ -19,63 +18,174 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-In order to open up the required power gate before any operation can be
-effectively performed over the serial bus between CPU and serdev, it's
-clearly essential to add common attach functions for PM domains to serdev
-at the probe phase.
-
-Similarly, the relevant dettach function for the PM domains should be
-properly and reversely added at the remove phase.
+Reuse the common helpers read[l,x]_poll_timeout provided by Linux core
+instead of an open-coded handling. The name of the local variable
+sram_pdn_ack in scpsys_power_on is renamed to pdn_ack in order to be
+consistent with the one used in scpsys_power_off.
 
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-Cc: Rob Herring <robh@kernel.org>
+Cc: Matthias Brugger <matthias.bgg@gmail.com>
 Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Jiri Slaby <jslaby@suse.com>
-Cc: linux-serial@vger.kernel.org
+Cc: Weiyi Lu <weiyi.lu@mediatek.com>
 ---
- drivers/tty/serdev/core.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ drivers/soc/mediatek/mtk-scpsys.c | 91 ++++++++++-----------------------------
+ 1 file changed, 23 insertions(+), 68 deletions(-)
 
-diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-index df93b72..c93d8ee 100644
---- a/drivers/tty/serdev/core.c
-+++ b/drivers/tty/serdev/core.c
+diff --git a/drivers/soc/mediatek/mtk-scpsys.c b/drivers/soc/mediatek/mtk-scpsys.c
+index d762a46..f9b7248 100644
+--- a/drivers/soc/mediatek/mtk-scpsys.c
++++ b/drivers/soc/mediatek/mtk-scpsys.c
 @@ -13,6 +13,7 @@
- #include <linux/module.h>
- #include <linux/of.h>
+ #include <linux/clk.h>
+ #include <linux/init.h>
+ #include <linux/io.h>
++#include <linux/iopoll.h>
+ #include <linux/mfd/syscon.h>
  #include <linux/of_device.h>
-+#include <linux/pm_domain.h>
- #include <linux/serdev.h>
- #include <linux/slab.h>
+ #include <linux/platform_device.h>
+@@ -27,6 +28,9 @@
+ #include <dt-bindings/power/mt7623a-power.h>
+ #include <dt-bindings/power/mt8173-power.h>
  
-@@ -330,8 +331,16 @@ EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
- static int serdev_drv_probe(struct device *dev)
++#define MTK_POLL_DELAY_US   10
++#define MTK_POLL_TIMEOUT    (jiffies_to_usecs(HZ))
++
+ #define SPM_VDE_PWR_CON			0x0210
+ #define SPM_MFG_PWR_CON			0x0214
+ #define SPM_VEN_PWR_CON			0x0230
+@@ -184,12 +188,10 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
  {
- 	const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
-+	int ret;
-+
-+	ret = dev_pm_domain_attach(dev, true);
-+	if (ret != -EPROBE_DEFER) {
-+		ret = sdrv->probe(to_serdev_device(dev));
-+		if (ret)
-+			dev_pm_domain_detach(dev, true);
-+	}
+ 	struct scp_domain *scpd = container_of(genpd, struct scp_domain, genpd);
+ 	struct scp *scp = scpd->scp;
+-	unsigned long timeout;
+-	bool expired;
+ 	void __iomem *ctl_addr = scp->base + scpd->data->ctl_offs;
+-	u32 sram_pdn_ack = scpd->data->sram_pdn_ack_bits;
++	u32 pdn_ack = scpd->data->sram_pdn_ack_bits;
+ 	u32 val;
+-	int ret;
++	int ret, tmp;
+ 	int i;
  
--	return sdrv->probe(to_serdev_device(dev));
-+	return ret;
- }
+ 	if (scpd->supply) {
+@@ -215,23 +217,10 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
+ 	writel(val, ctl_addr);
  
- static int serdev_drv_remove(struct device *dev)
-@@ -339,6 +348,9 @@ static int serdev_drv_remove(struct device *dev)
- 	const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
- 	if (sdrv->remove)
- 		sdrv->remove(to_serdev_device(dev));
-+
-+	dev_pm_domain_detach(dev, true);
-+
- 	return 0;
- }
+ 	/* wait until PWR_ACK = 1 */
+-	timeout = jiffies + HZ;
+-	expired = false;
+-	while (1) {
+-		ret = scpsys_domain_is_on(scpd);
+-		if (ret > 0)
+-			break;
+-
+-		if (expired) {
+-			ret = -ETIMEDOUT;
+-			goto err_pwr_ack;
+-		}
+-
+-		cpu_relax();
+-
+-		if (time_after(jiffies, timeout))
+-			expired = true;
+-	}
++	ret = readx_poll_timeout(scpsys_domain_is_on, scpd, tmp, tmp > 0,
++				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
++	if (ret < 0)
++		goto err_pwr_ack;
  
+ 	val &= ~PWR_CLK_DIS_BIT;
+ 	writel(val, ctl_addr);
+@@ -246,20 +235,10 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
+ 	writel(val, ctl_addr);
+ 
+ 	/* wait until SRAM_PDN_ACK all 0 */
+-	timeout = jiffies + HZ;
+-	expired = false;
+-	while (sram_pdn_ack && (readl(ctl_addr) & sram_pdn_ack)) {
+-
+-		if (expired) {
+-			ret = -ETIMEDOUT;
+-			goto err_pwr_ack;
+-		}
+-
+-		cpu_relax();
+-
+-		if (time_after(jiffies, timeout))
+-			expired = true;
+-	}
++	ret = readl_poll_timeout(ctl_addr, tmp, (tmp & pdn_ack) == 0,
++				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
++	if (ret < 0)
++		goto err_pwr_ack;
+ 
+ 	if (scpd->data->bus_prot_mask) {
+ 		ret = mtk_infracfg_clear_bus_protection(scp->infracfg,
+@@ -289,12 +268,10 @@ static int scpsys_power_off(struct generic_pm_domain *genpd)
+ {
+ 	struct scp_domain *scpd = container_of(genpd, struct scp_domain, genpd);
+ 	struct scp *scp = scpd->scp;
+-	unsigned long timeout;
+-	bool expired;
+ 	void __iomem *ctl_addr = scp->base + scpd->data->ctl_offs;
+ 	u32 pdn_ack = scpd->data->sram_pdn_ack_bits;
+ 	u32 val;
+-	int ret;
++	int ret, tmp;
+ 	int i;
+ 
+ 	if (scpd->data->bus_prot_mask) {
+@@ -310,19 +287,10 @@ static int scpsys_power_off(struct generic_pm_domain *genpd)
+ 	writel(val, ctl_addr);
+ 
+ 	/* wait until SRAM_PDN_ACK all 1 */
+-	timeout = jiffies + HZ;
+-	expired = false;
+-	while (pdn_ack && (readl(ctl_addr) & pdn_ack) != pdn_ack) {
+-		if (expired) {
+-			ret = -ETIMEDOUT;
+-			goto out;
+-		}
+-
+-		cpu_relax();
+-
+-		if (time_after(jiffies, timeout))
+-			expired = true;
+-	}
++	ret = readl_poll_timeout(ctl_addr, tmp, (tmp & pdn_ack) == pdn_ack,
++				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
++	if (ret < 0)
++		goto out;
+ 
+ 	val |= PWR_ISO_BIT;
+ 	writel(val, ctl_addr);
+@@ -340,23 +308,10 @@ static int scpsys_power_off(struct generic_pm_domain *genpd)
+ 	writel(val, ctl_addr);
+ 
+ 	/* wait until PWR_ACK = 0 */
+-	timeout = jiffies + HZ;
+-	expired = false;
+-	while (1) {
+-		ret = scpsys_domain_is_on(scpd);
+-		if (ret == 0)
+-			break;
+-
+-		if (expired) {
+-			ret = -ETIMEDOUT;
+-			goto out;
+-		}
+-
+-		cpu_relax();
+-
+-		if (time_after(jiffies, timeout))
+-			expired = true;
+-	}
++	ret = readx_poll_timeout(scpsys_domain_is_on, scpd, tmp, tmp == 0,
++				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
++	if (ret < 0)
++		goto out;
+ 
+ 	for (i = 0; i < MAX_CLKS && scpd->clk[i]; i++)
+ 		clk_disable_unprepare(scpd->clk[i]);
 -- 
 2.7.4
