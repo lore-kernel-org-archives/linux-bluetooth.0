@@ -1,40 +1,132 @@
-Return-Path: <gustavo@embeddedor.com>
-Subject: Re: [PATCH v2] Bluetooth: Remove VLA usage in aes_cmac
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- Bluez mailing list <linux-bluetooth@vger.kernel.org>,
- Network Development <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
-References: <20180321010527.GA16616@embeddedor.com>
- <3BD15121-532A-45E2-B62E-1008C0289500@holtmann.org>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Message-ID: <2af25866-4e8a-7f9c-9298-e45abfab20c7@embeddedor.com>
-Date: Thu, 5 Apr 2018 03:35:55 -0500
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 1/2] Mesh: Add Config Beacon to Configuration Model
+To: "Stotland, Inga" <inga.stotland@intel.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20180402192920.19111-1-robert.lubas@silvair.com>
+ <CABBYNZ+t6tETeaFq1ABionGg0KNR+Oaz1cVt9seybnBJQXKMNw@mail.gmail.com>
+ <cc368289-3c04-2bb8-07fe-84b9449b6ddd@silvair.com>
+ <D6866572D7A1DB48A0D22000C21836C75C551C24@ORSMSX103.amr.corp.intel.com>
+From: Robert Lubas <robert.lubas@silvair.com>
+Message-ID: <82d16f33-c657-49b5-8eea-570b8f082adc@silvair.com>
+Date: Thu, 5 Apr 2018 09:42:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <3BD15121-532A-45E2-B62E-1008C0289500@holtmann.org>
+In-Reply-To: <D6866572D7A1DB48A0D22000C21836C75C551C24@ORSMSX103.amr.corp.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Inga, Luiz,
 
-On 04/05/2018 02:23 AM, Marcel Holtmann wrote:
-
-> so I took this patch back out of bluetooth-next before sending the pull request. I think the discussion on how to fix SHASH_DESC_ON_STACK macro needs to complete first. Once that has concluded we can revisit if this patch is still needed or if another solution has been found. Same as with WiFi, these are not just one-shot calls where a memory allocation doesn’t matter. We need this for random address resolution and thus there can be many of the aes_cmac calls when seeing neighboring devices.
+On 04/03/2018 06:27 PM, Stotland, Inga wrote:
+> Hi Robert, Luiz,
 > 
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Robert Lubas
+> Sent: Tuesday, April 3, 2018 5:09 AM
+> To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH BlueZ 1/2] Mesh: Add Config Beacon to Configuration Model
+> 
+> Hi Luiz,
+> 
+> On 04/03/2018 10:18 AM, Luiz Augusto von Dentz wrote:
+>> Hi Robert,
+>>
+>> On Mon, Apr 2, 2018 at 10:29 PM, Robert Lubaś <robert.lubas@silvair.com> wrote:
+>>> This patch adds two commands (set and get) to menu config and handles
+>>> the incomming status message.
+>>> ---
+>>>    mesh/config-client.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+>>>    1 file changed, 42 insertions(+)
+>>>
+>>> diff --git a/mesh/config-client.c b/mesh/config-client.c index
+>>> 95297bfee..4e5e06258 100644
+>>> --- a/mesh/config-client.c
+>>> +++ b/mesh/config-client.c
+>>> @@ -179,6 +179,13 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
+>>>                                   mesh_status_str(data[0]));
+>>>                   break;
+>>>
+>>> +       case OP_CONFIG_BEACON_STATUS:
+>>> +               if (len != 1)
+>>> +                       return true;
+>>> +               bt_shell_printf("Node %4.4x Config Beacon Status 0x%02x\n",
+>>> +                               src, data[0]);
+>>> +               break;
+>>> +
+>>>           case OP_CONFIG_RELAY_STATUS:
+>>>                   if (len != 2)
+>>>                           return true; @@ -689,6 +696,37 @@ static
+>>> void cmd_bind(int argc, char *argv[])
+>>>           return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>>>    }
+>>>
+>>> +static void cmd_beacon_set(int argc, char *argv[]) {
+>>> +       uint16_t n;
+>>> +       uint8_t msg[2 + 1];
+>>> +       int parm_cnt;
+>>> +
+>>> +       if (!verify_config_target(target))
+>>> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>>> +
+>>> +       n = mesh_opcode_set(OP_CONFIG_BEACON_SET, msg);
+>>> +
+>>> +       parm_cnt = read_input_parameters(argc, argv);
+>>> +       if (parm_cnt != 1) {
+>>> +               bt_shell_printf("bad arguments\n");
+>>> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>>> +       }
+>>> +
+>>> +       msg[n++] = parms[0];
+>>> +
+>>> +       if (!config_send(msg, n)) {
+>>> +               bt_shell_printf("Failed to send \"SET BEACON\"\n");
+>>> +               return;
+>>> +       }
+>>> +
+>>> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);}
+>>
+>> You should have a like break before }
+>>
+>>> +
+>>> +static void cmd_beacon_get(int argc, char *argv[]) {
+>>> +       cmd_default(OP_CONFIG_BEACON_GET);
+>>> +}
+>>> +
+>>>    static void cmd_ident_set(int argc, char *argv[])
+>>>    {
+>>>           uint16_t n;
+>>> @@ -1178,6 +1216,10 @@ static const struct bt_shell_menu cfg_menu = {
+>>>                                                   "Set node identity state"},
+>>>           {"ident-get",           "<net_idx>",            cmd_ident_get,
+>>>                                                   "Get node identity
+>>> state"},
+>>> +       {"beacon-set",           "<state>",             cmd_beacon_set,
+>>> +                                               "Set node identity state"},
+>>> +       {"beacon-get",           NULL,                  cmd_beacon_get,
+>>> +                                               "Get node beacon
+>>> + state"},
+>>>           {"relay-set",           "<relay> <rexmt count> <rexmt steps>",
+>>>                                                   cmd_relay_set,
+>>>                                                   "Set relay"},
+>>> --
+>>> 2.11.0
+>>
+>> Other than this looks good, lets see if Inga has anything to comment.
+>>
+> The broken line goes to V2.
+> 
+> Thanks
+> --
+> 
+> The patches look fine.
+> Thanks,
+> Inga
+> 
+>
 
-Yeah. I agree.
+I include small fix (broken line) after Luiz review. There is a separate 
+dangling e-mail with patch.
+Robert
 
-Based on Herbert's response to the discussion about SHASH_DESC_ON_STACK 
-https://lkml.org/lkml/2018/3/27/300
-
-it seems it is feasible to fix that macro very easily. I will follow up 
-on this.
-
-By the way, what is you opinion on replacing crypto_shash_descsize(ctx) 
-with PAGE_SIZE / 8 in SHASH_DESC_ON_STACK?
-
-Does it work for you?
-
-Thanks
---
-Gustavo
