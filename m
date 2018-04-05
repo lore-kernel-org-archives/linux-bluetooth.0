@@ -1,56 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Sasha Levin <Alexander.Levin@microsoft.com>
-To: Sasha Levin <Alexander.Levin@microsoft.com>,
-        "sean.wang@mediatek.com" <sean.wang@mediatek.com>,
-        Sean Wang <sean.wang@mediatek.com>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "mark.rutland@arm.com" <mark.rutland@arm.com>
-CC: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Weiyi Lu <weiyi.lu@mediatek.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH v1 5/7] soc: mediatek: add a fixed wait for SRAM stable
-Date: Thu, 5 Apr 2018 16:42:58 +0000
-Message-ID: <DM5PR2101MB1032103E32029A14A2E41D1FFBBB0@DM5PR2101MB1032.namprd21.prod.outlook.com>
-References: <0fc10b2498c6dbe20141831c722c32cc74330d3d.1522736996.git.sean.wang@mediatek.com>
-In-Reply-To: <0fc10b2498c6dbe20141831c722c32cc74330d3d.1522736996.git.sean.wang@mediatek.com>
-Content-Type: text/plain; charset="iso-8859-1"
+From: Libor Peltan <lpeltan@insys-tec.de>
+To: Ravi Minnikanti <ravichandraminnikanti@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: AW: How to un-pair a device via DBus
+Date: Thu, 5 Apr 2018 11:41:26 +0000
+Message-ID: <AM3PR06MB0838E1C4A660F112978811C49ABB0@AM3PR06MB0838.eurprd06.prod.outlook.com>
+References: <AM3PR06MB0838B8DD1EDF9B387B98E3ED9AA40@AM3PR06MB0838.eurprd06.prod.outlook.com>
+ <3c9ba361-bf93-9424-9dc3-f69be91ef919@gmail.com>
+In-Reply-To: <3c9ba361-bf93-9424-9dc3-f69be91ef919@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi.
-
-[This is an automated email]
-
-This commit has been processed by the -stable helper bot and determined
-to be a high probability candidate for -stable trees. (score: 83.4612)
-
-The bot has tested the following trees: v4.15.15, v4.14.32, v4.9.92, v4.4.1=
-26,=20
-
-v4.15.15: Failed to apply! Possible dependencies:
-    40b3b88a117c ("soc: mediatek: reuse read[l,x]_poll_timeout helpers")
-
-v4.14.32: Failed to apply! Possible dependencies:
-    40b3b88a117c ("soc: mediatek: reuse read[l,x]_poll_timeout helpers")
-
-v4.9.92: Failed to apply! Possible dependencies:
-    40b3b88a117c ("soc: mediatek: reuse read[l,x]_poll_timeout helpers")
-    52510ee93488 ("soc: mediatek: add SCPSYS power domain driver for MediaT=
-ek MT7622 SoC")
-
-v4.4.126: Failed to apply! Possible dependencies:
-    40b3b88a117c ("soc: mediatek: reuse read[l,x]_poll_timeout helpers")
-    52510ee93488 ("soc: mediatek: add SCPSYS power domain driver for MediaT=
-ek MT7622 SoC")
-
-
-Please let us know if you'd like to have this patch included in a stable tr=
-ee.
-
---
-Thanks.
-Sasha=
+VGhhbmsgeW91IGJvdGgsIFJhdmkgYW5kIEJhcnJ5LCB0aGlzIGhlbHBlZC4NCg0KLS0tLS1VcnNw
+csO8bmdsaWNoZSBOYWNocmljaHQtLS0tLQ0KVm9uOiBSYXZpIE1pbm5pa2FudGkgW21haWx0bzpy
+YXZpY2hhbmRyYW1pbm5pa2FudGlAZ21haWwuY29tXSANCkdlc2VuZGV0OiBEb25uZXJzdGFnLCA1
+LiBBcHJpbCAyMDE4IDA3OjA3DQpBbjogTGlib3IgUGVsdGFuIDxscGVsdGFuQGluc3lzLXRlYy5k
+ZT47IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCkJldHJlZmY6IFJlOiBIb3cgdG8g
+dW4tcGFpciBhIGRldmljZSB2aWEgREJ1cw0KDQpZb3UgY2FuIHVzZSBSZW1vdmVEZXZpY2UgbWV0
+aG9kIGZyb20gb3JnLmJsdWV6LkFkYXB0ZXIxIGludGVyZmFjZS4NCg0KU2VlDQpodHRwczovL2dp
+dC5rZXJuZWwub3JnL3B1Yi9zY20vYmx1ZXRvb3RoL2JsdWV6LmdpdC90cmVlL2RvYy9hZGFwdGVy
+LWFwaS50eHQNCg0KLVJhdmkNCg0KT24gMDQtMDQtMjAxOCAyMToxMCwgTGlib3IgUGVsdGFuIHdy
+b3RlOg0KPiBIZWxsbywNCj4gSSdtIGFza2luZyBqdXN0IGZvciBhIGhpbnQsIGhvdyB0byBkbyBz
+dHVmZiwgYXMgSSdtIHByb2JhYmx5IG1pc3Npbmcgc29tZXRoaW5nIG9idm9pdXMuDQo+IA0KPiBN
+eSBhcHBsaWNhdGlvbiBjb250cm9scyBhbGwgYmx1ZXRvb3RoIGV2ZW50cyBhbmQgb3B0aW9ucyB2
+aWEgREJ1cyBpbnRlcmZhY2UuIEkgYWxyZWFkeSB1c2UgQ29ubmVjdC9EaXNjb25uZWN0IG1ldGhv
+ZHMgb2YgZGV2aWNlcywgdGhlaXIgVHJ1c3RlZCBwcm9wZXJ0eSBldGMuLCBhcyBkZXNjcmliZWQg
+aGVyZToNCj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2JsdWV0b290aC9ibHVlei5n
+aXQvdHJlZS9kb2MvZGV2aWNlLWFwaQ0KPiAudHh0DQo+IA0KPiBIb3dldmVyLCB3aGVuIEkgY2Fs
+bCBDYW5jZWxQYWlyaW5nIG1ldGhvZCwgSSBhbHdheXMgcmVjZWl2ZSBEb2VzTm90RXhpc3QgZXJy
+b3IuDQo+IA0KPiBNeSBpbnRlbnRpb24gaXMgdG8gcmVtb3ZlIGEgcGFpcmVkIGRldmljZSBmcm9t
+IHRoZSBkZXZpY2VzIGxpc3QsIG9yIGF0IGxlYXN0IG1hcmsgaXMgYXMgIm5vdCBwYWlyZWQiLCBz
+byB0aGF0IHRoZSBkZXZpY2UgbXVzdCBwYWlyIGFnYWluIGJlZm9yZSBhbnl0aGluZyBlbHNlLg0K
+PiANCj4gUGxlYXNlIG5vdGUgdGhhdCBzZXR0aW5nIHRoZSBQYWlyZWQgcHJvcGVydHkgdG8gIm9m
+ZiIgZG9lcyBub3Qgd29yayBhcyB0aGlzIHByb3BlcnR5IGlzIHJlYWQtb25seS4NCj4gDQo+IEFs
+c28gdGhlIHNvbHV0aW9uIG9mIGRlbGV0aW5nIHRoZSBkZXZpY2UncyBkaXJlY3RvcnkgaXMgbm90
+IGEgZ29vZCBvcHRpb24gZm9yIG1lIGFzIHRoZSBibHVldG9vdGggZGFlbW9uIHdvdWxkIHByb2Jh
+Ymx5IG5lZWQgdG8gYmUgcmVzdGFydGVkLg0KPiANCj4gSG93IHRvIGludm9rZSBkZXZpY2UgcmVt
+b3ZhbCBvciB1bi1wYWlyIHZpYSBEQnVzID8NCj4gDQo+IFRoYW5rcyBmb3IgYW55IGFuc3dlcnMh
+DQo+IExpYm9yIFBlbHRhbg0KPiANCj4gLS0NCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxp
+c3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIA0KPiBsaW51eC1ibHVldG9vdGgiIGluIHRo
+ZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnIA0KPiBNb3Jl
+IG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZv
+Lmh0bWwNCj4gDQo=
