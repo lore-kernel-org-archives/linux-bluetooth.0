@@ -1,46 +1,51 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Libor Peltan <lpeltan@insys-tec.de>
-To: Ravi Minnikanti <ravichandraminnikanti@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: AW: How to un-pair a device via DBus
-Date: Thu, 5 Apr 2018 11:41:26 +0000
-Message-ID: <AM3PR06MB0838E1C4A660F112978811C49ABB0@AM3PR06MB0838.eurprd06.prod.outlook.com>
-References: <AM3PR06MB0838B8DD1EDF9B387B98E3ED9AA40@AM3PR06MB0838.eurprd06.prod.outlook.com>
- <3c9ba361-bf93-9424-9dc3-f69be91ef919@gmail.com>
-In-Reply-To: <3c9ba361-bf93-9424-9dc3-f69be91ef919@gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <gustavo@embeddedor.com>
+Subject: Re: [PATCH v2] Bluetooth: Remove VLA usage in aes_cmac
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+References: <20180321010527.GA16616@embeddedor.com>
+ <3BD15121-532A-45E2-B62E-1008C0289500@holtmann.org>
+ <2af25866-4e8a-7f9c-9298-e45abfab20c7@embeddedor.com>
+ <347FC7F5-4BB3-4477-9EF1-BAAA98F1D107@holtmann.org>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Message-ID: <b6336234-7eaa-27d6-3424-665f78033d9b@embeddedor.com>
+Date: Thu, 5 Apr 2018 04:51:36 -0500
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <347FC7F5-4BB3-4477-9EF1-BAAA98F1D107@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VGhhbmsgeW91IGJvdGgsIFJhdmkgYW5kIEJhcnJ5LCB0aGlzIGhlbHBlZC4NCg0KLS0tLS1VcnNw
-csO8bmdsaWNoZSBOYWNocmljaHQtLS0tLQ0KVm9uOiBSYXZpIE1pbm5pa2FudGkgW21haWx0bzpy
-YXZpY2hhbmRyYW1pbm5pa2FudGlAZ21haWwuY29tXSANCkdlc2VuZGV0OiBEb25uZXJzdGFnLCA1
-LiBBcHJpbCAyMDE4IDA3OjA3DQpBbjogTGlib3IgUGVsdGFuIDxscGVsdGFuQGluc3lzLXRlYy5k
-ZT47IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCkJldHJlZmY6IFJlOiBIb3cgdG8g
-dW4tcGFpciBhIGRldmljZSB2aWEgREJ1cw0KDQpZb3UgY2FuIHVzZSBSZW1vdmVEZXZpY2UgbWV0
-aG9kIGZyb20gb3JnLmJsdWV6LkFkYXB0ZXIxIGludGVyZmFjZS4NCg0KU2VlDQpodHRwczovL2dp
-dC5rZXJuZWwub3JnL3B1Yi9zY20vYmx1ZXRvb3RoL2JsdWV6LmdpdC90cmVlL2RvYy9hZGFwdGVy
-LWFwaS50eHQNCg0KLVJhdmkNCg0KT24gMDQtMDQtMjAxOCAyMToxMCwgTGlib3IgUGVsdGFuIHdy
-b3RlOg0KPiBIZWxsbywNCj4gSSdtIGFza2luZyBqdXN0IGZvciBhIGhpbnQsIGhvdyB0byBkbyBz
-dHVmZiwgYXMgSSdtIHByb2JhYmx5IG1pc3Npbmcgc29tZXRoaW5nIG9idm9pdXMuDQo+IA0KPiBN
-eSBhcHBsaWNhdGlvbiBjb250cm9scyBhbGwgYmx1ZXRvb3RoIGV2ZW50cyBhbmQgb3B0aW9ucyB2
-aWEgREJ1cyBpbnRlcmZhY2UuIEkgYWxyZWFkeSB1c2UgQ29ubmVjdC9EaXNjb25uZWN0IG1ldGhv
-ZHMgb2YgZGV2aWNlcywgdGhlaXIgVHJ1c3RlZCBwcm9wZXJ0eSBldGMuLCBhcyBkZXNjcmliZWQg
-aGVyZToNCj4gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2JsdWV0b290aC9ibHVlei5n
-aXQvdHJlZS9kb2MvZGV2aWNlLWFwaQ0KPiAudHh0DQo+IA0KPiBIb3dldmVyLCB3aGVuIEkgY2Fs
-bCBDYW5jZWxQYWlyaW5nIG1ldGhvZCwgSSBhbHdheXMgcmVjZWl2ZSBEb2VzTm90RXhpc3QgZXJy
-b3IuDQo+IA0KPiBNeSBpbnRlbnRpb24gaXMgdG8gcmVtb3ZlIGEgcGFpcmVkIGRldmljZSBmcm9t
-IHRoZSBkZXZpY2VzIGxpc3QsIG9yIGF0IGxlYXN0IG1hcmsgaXMgYXMgIm5vdCBwYWlyZWQiLCBz
-byB0aGF0IHRoZSBkZXZpY2UgbXVzdCBwYWlyIGFnYWluIGJlZm9yZSBhbnl0aGluZyBlbHNlLg0K
-PiANCj4gUGxlYXNlIG5vdGUgdGhhdCBzZXR0aW5nIHRoZSBQYWlyZWQgcHJvcGVydHkgdG8gIm9m
-ZiIgZG9lcyBub3Qgd29yayBhcyB0aGlzIHByb3BlcnR5IGlzIHJlYWQtb25seS4NCj4gDQo+IEFs
-c28gdGhlIHNvbHV0aW9uIG9mIGRlbGV0aW5nIHRoZSBkZXZpY2UncyBkaXJlY3RvcnkgaXMgbm90
-IGEgZ29vZCBvcHRpb24gZm9yIG1lIGFzIHRoZSBibHVldG9vdGggZGFlbW9uIHdvdWxkIHByb2Jh
-Ymx5IG5lZWQgdG8gYmUgcmVzdGFydGVkLg0KPiANCj4gSG93IHRvIGludm9rZSBkZXZpY2UgcmVt
-b3ZhbCBvciB1bi1wYWlyIHZpYSBEQnVzID8NCj4gDQo+IFRoYW5rcyBmb3IgYW55IGFuc3dlcnMh
-DQo+IExpYm9yIFBlbHRhbg0KPiANCj4gLS0NCj4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxp
-c3Q6IHNlbmQgdGhlIGxpbmUgInVuc3Vic2NyaWJlIA0KPiBsaW51eC1ibHVldG9vdGgiIGluIHRo
-ZSBib2R5IG9mIGEgbWVzc2FnZSB0byBtYWpvcmRvbW9Admdlci5rZXJuZWwub3JnIA0KPiBNb3Jl
-IG1ham9yZG9tbyBpbmZvIGF0ICBodHRwOi8vdmdlci5rZXJuZWwub3JnL21ham9yZG9tby1pbmZv
-Lmh0bWwNCj4gDQo=
+
+
+On 04/05/2018 03:46 AM, Marcel Holtmann wrote:
+
+>> By the way, what is you opinion on replacing crypto_shash_descsize(ctx) with PAGE_SIZE / 8 in SHASH_DESC_ON_STACK?
+>>
+>> Does it work for you?
+> 
+> isn’t that just waste?
+> 
+
+Agree.
+
+> The macro itself is this.
+> 
+> #define SHASH_DESC_ON_STACK(shash, ctx)                           \
+>          char __##shash##_desc[sizeof(struct shash_desc) +         \
+>                  crypto_shash_descsize(ctx)] CRYPTO_MINALIGN_ATTR; \
+>          struct shash_desc *shash = (struct shash_desc *)__##shash##_desc
+> 
+> For AES-CMAC, we could always do this with a manual macro that gives us the right size. However that is error prone if any internals change. I think what has to happened that crypto_shash_decsize becomes something the compiler can evaluate at compile time.
+> 
+
+Yeah. That would imply an analysis of the algorithm each of the callers 
+use. In the case of AES-CMAC, what is the maximum digest size?
+
+I tried to find a fixed-length value for AES-CMAC but I didn't get any 
+output with git grep -n _DIGEST_SIZE | grep AES
+
+Thanks
+--
+Gustavo
