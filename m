@@ -1,44 +1,36 @@
-Return-Path: <bgodavar@codeaurora.org>
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	rtatiya@codeaurora.org,
-	linux-arm-msm@vger.kernel.org,
-	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH 0/3] Enable Bluetooth functionality for WCN3990
-Date: Fri,  6 Apr 2018 17:22:23 +0530
-Message-Id: <1523015546-994-1-git-send-email-bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH] Bluetooth: btqcomsmd: Fix rx/tx stats
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1523006625-17257-1-git-send-email-loic.poulain@linaro.org>
+Date: Fri, 6 Apr 2018 11:39:26 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        bjorn.andersson@linaro.org
+Message-Id: <6EB5487A-A076-451F-89B6-9421DD008AA0@holtmann.org>
+References: <1523006625-17257-1-git-send-email-loic.poulain@linaro.org>
+To: Loic Poulain <loic.poulain@linaro.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches enable Bluetooth functionality for WCN3990 by 
-- adding support for voting of voltage regulators for WCN3990 attached to MSM
-- Bluetooth firmware download support for WCN3990
-- description of device tree bindings
+Hi Loic,
 
-Balakrishna Godavarthi (1):
-  Bluetooth: Added support for wcn3990 soc.
+> HCI RX/TX byte counters were only incremented when sending ACL packets.
+> To reflect the real HCI traffic, we need to increment these counters on
+> HCI events and HCI commands as well.
+> 
+> Increment error counter on rpmsg errors.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+> ---
+> drivers/bluetooth/btqcomsmd.c | 10 ++++++++++
+> 1 file changed, 10 insertions(+)
 
-Rupesh Tatiya (2):
-  Bluetooth: Add device tree bindings for Atheros chips
-  Add support to power Bluetooth QCA chips attached to MSM
+patch has been applied to bluetooth-next tree.
 
- .../devicetree/bindings/bluetooth/btqca_power.txt  |  30 ++
- drivers/bluetooth/Makefile                         |   5 +-
- drivers/bluetooth/btqca.c                          | 393 ++++++++++++++++-----
- drivers/bluetooth/btqca.h                          |  46 ++-
- drivers/bluetooth/btqca_power.c                    | 177 ++++++++++
- drivers/bluetooth/btqca_power.h                    |  71 ++++
- drivers/bluetooth/hci_qca.c                        | 324 ++++++++++++++---
- include/net/bluetooth/hci_core.h                   |   3 +-
- net/bluetooth/hci_core.c                           |   2 +-
- net/bluetooth/hci_request.c                        |  23 ++
- net/bluetooth/hci_request.h                        |   2 +
- 11 files changed, 942 insertions(+), 134 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/bluetooth/btqca_power.txt
- create mode 100644 drivers/bluetooth/btqca_power.c
- create mode 100644 drivers/bluetooth/btqca_power.h
+Regards
 
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Marcel
+
