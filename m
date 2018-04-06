@@ -1,36 +1,59 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH] Bluetooth: btqcomsmd: Fix rx/tx stats
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1523006625-17257-1-git-send-email-loic.poulain@linaro.org>
-Date: Fri, 6 Apr 2018 11:39:26 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        bjorn.andersson@linaro.org
-Message-Id: <6EB5487A-A076-451F-89B6-9421DD008AA0@holtmann.org>
-References: <1523006625-17257-1-git-send-email-loic.poulain@linaro.org>
-To: Loic Poulain <loic.poulain@linaro.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <loic.poulain@linaro.org>
+From: Loic Poulain <loic.poulain@linaro.org>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	bjorn.andersson@linaro.org,
+	Loic Poulain <loic.poulain@linaro.org>
+Subject: [PATCH] Bluetooth: btqcomsmd: Fix rx/tx stats
+Date: Fri,  6 Apr 2018 11:23:45 +0200
+Message-Id: <1523006625-17257-1-git-send-email-loic.poulain@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+HCI RX/TX byte counters were only incremented when sending ACL packets.
+To reflect the real HCI traffic, we need to increment these counters on
+HCI events and HCI commands as well.
 
-> HCI RX/TX byte counters were only incremented when sending ACL packets.
-> To reflect the real HCI traffic, we need to increment these counters on
-> HCI events and HCI commands as well.
-> 
-> Increment error counter on rpmsg errors.
-> 
-> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
-> ---
-> drivers/bluetooth/btqcomsmd.c | 10 ++++++++++
-> 1 file changed, 10 insertions(+)
+Increment error counter on rpmsg errors.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+---
+ drivers/bluetooth/btqcomsmd.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+index 2c9a5fc..7df3eed 100644
+--- a/drivers/bluetooth/btqcomsmd.c
++++ b/drivers/bluetooth/btqcomsmd.c
+@@ -65,6 +65,7 @@ static int btqcomsmd_cmd_callback(struct rpmsg_device *rpdev, void *data,
+ {
+ 	struct btqcomsmd *btq = priv;
+ 
++	btq->hdev->stat.byte_rx += count;
+ 	return btqcomsmd_recv(btq->hdev, HCI_EVENT_PKT, data, count);
+ }
+ 
+@@ -76,12 +77,21 @@ static int btqcomsmd_send(struct hci_dev *hdev, struct sk_buff *skb)
+ 	switch (hci_skb_pkt_type(skb)) {
+ 	case HCI_ACLDATA_PKT:
+ 		ret = rpmsg_send(btq->acl_channel, skb->data, skb->len);
++		if (ret) {
++			hdev->stat.err_tx++;
++			break;
++		}
+ 		hdev->stat.acl_tx++;
+ 		hdev->stat.byte_tx += skb->len;
+ 		break;
+ 	case HCI_COMMAND_PKT:
+ 		ret = rpmsg_send(btq->cmd_channel, skb->data, skb->len);
++		if (ret) {
++			hdev->stat.err_tx++;
++			break;
++		}
+ 		hdev->stat.cmd_tx++;
++		hdev->stat.byte_tx += skb->len;
+ 		break;
+ 	default:
+ 		ret = -EILSEQ;
+-- 
+2.7.4
