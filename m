@@ -1,15 +1,71 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Dr Nukular <dr.nukular@outlook.at>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Bluetooth connection drops after idle time
-Date: Sat, 7 Apr 2018 06:32:56 +0000
-Message-ID: <AM5PR0502MB3059AD084567C3660CF64B2DEAB90@AM5PR0502MB3059.eurprd05.prod.outlook.com>
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH 1/3] Bluetooth: Add device tree bindings for Atheros chips
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1523015546-994-2-git-send-email-bgodavar@codeaurora.org>
+Date: Fri, 6 Apr 2018 18:49:01 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        rtatiya@codeaurora.org, linux-arm-msm@vger.kernel.org
+Message-Id: <DC35DCB9-4046-4002-84D3-30E507A7B24E@holtmann.org>
+References: <1523015546-994-1-git-send-email-bgodavar@codeaurora.org>
+ <1523015546-994-2-git-send-email-bgodavar@codeaurora.org>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rob Herring <robh@kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Balakrishan,
 
-Bluetooth connection drops if the device, such as mouse or keyboard, is inactive for some time. Once the device is used again the bluetooth connection comes back on. This would not be an issue, if it wasn't for the time that it takes until the connection is re-established again. It is not responsive enough and interferes with the workflow, if you have to wait several seconds until you can use your device again, especially since you naturally expect an immediate response.
+> Change-Id: Ie62e3b90b6226019142206c8d44712a6c8550ef2
+> Signed-off-by: Rupesh Tatiya <rtatiya@codeaurora.org>
+> ---
+> .../devicetree/bindings/bluetooth/btqca_power.txt  | 30 ++++++++++++++++++++++
+> 1 file changed, 30 insertions(+)
+> create mode 100644 Documentation/devicetree/bindings/bluetooth/btqca_power.txt
+> 
+> diff --git a/Documentation/devicetree/bindings/bluetooth/btqca_power.txt b/Documentation/devicetree/bindings/bluetooth/btqca_power.txt
+> new file mode 100644
+> index 0000000..f0f593c
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/bluetooth/btqca_power.txt
+> @@ -0,0 +1,30 @@
+> +* Bluetooth Controller
+> +Bluetooth controller communicates with the Bluetooth Host using HCI Transport layer.
+> +HCI Transport layer can be based on UART or USB serial communication protocol.
+> +
+> +Required properties:
+> +  - compatible: Should be set to one of the following:
+> +	qca,ar3002
+> +	qca,qca6174
+> +	qca,wcn3990
+> +
+> +Optional properties:
+> +  - vddpa-supply: Bluetooth VDD PA regulator handle
+> +  - vddio-supply: Bluetooth VDD IO regulator handle
+> +  - vddldo-supply: Bluetooth VDD LDO regulator handle. Kept under optional parameters
+> +		as some of the chipsets doesn't require ldo or it may use from same vddio.
+> +  - vddxtal-supply: Bluetooth VDD XTAL regulator handle
+> +  - vddcore-supply: Bluetooth VDD CORE regulator handle
+> +  - vddpwd-supply: Chip power down gpio is required when bluetooth module
+> +		and other modules like wifi co-exist in a singe chip and shares a
+> +		common gpio to bring chip out of reset.
+> +
+> +Example:
+> +  bt-ar3002 {
+> +    compatible = "qca,ar3002";
+> +    vddio-supply = <&pm8941_s3>;
+> +    vddpa-supply = <&pm8941_l19>;
+> +    vddxtal-supply = <&pm8994_l30>;
+> +    vddcore-supply = <&pm8994_s3>;
+> +    vddpwd-supply = <&ath_chip_pwd_l>;
+> +};
 
-If this is not a bug, then please enable a setting to disable that "feature" or improve the time by reducing it to a minimum to reconnect the device.
+so I do not get this. I assumed we want to tie these to the UART and the Bluetooth serdev slave on top of that UART. Doing them as random platform device is pointless to me.
+
+Regards
+
+Marcel
+
