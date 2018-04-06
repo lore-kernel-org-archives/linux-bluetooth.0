@@ -1,59 +1,59 @@
-Return-Path: <loic.poulain@linaro.org>
-From: Loic Poulain <loic.poulain@linaro.org>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	bjorn.andersson@linaro.org,
-	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH] Bluetooth: btqcomsmd: Fix rx/tx stats
-Date: Fri,  6 Apr 2018 11:23:45 +0200
-Message-Id: <1523006625-17257-1-git-send-email-loic.poulain@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Subject: [PATCH BlueZ] emulator/b1ee: Enable to specify connecting host
+Message-ID: <e39b74fb-9418-7e23-7049-8f4a687a40e4@jp.fujitsu.com>
+Date: Fri, 6 Apr 2018 17:45:40 +0900
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HCI RX/TX byte counters were only incremented when sending ACL packets.
-To reflect the real HCI traffic, we need to increment these counters on
-HCI events and HCI commands as well.
-
-Increment error counter on rpmsg errors.
-
-Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+Because the default host seems to be unofficial since 2017, removes the
+DEFAULT_SERVER macro.
 ---
- drivers/bluetooth/btqcomsmd.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ emulator/b1ee.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-index 2c9a5fc..7df3eed 100644
---- a/drivers/bluetooth/btqcomsmd.c
-+++ b/drivers/bluetooth/btqcomsmd.c
-@@ -65,6 +65,7 @@ static int btqcomsmd_cmd_callback(struct rpmsg_device *rpdev, void *data,
- {
- 	struct btqcomsmd *btq = priv;
+diff --git a/emulator/b1ee.c b/emulator/b1ee.c
+index 1fe46840f..42340f014 100644
+--- a/emulator/b1ee.c
++++ b/emulator/b1ee.c
+@@ -41,7 +41,6 @@
  
-+	btq->hdev->stat.byte_rx += count;
- 	return btqcomsmd_recv(btq->hdev, HCI_EVENT_PKT, data, count);
- }
+ #include "src/shared/mainloop.h"
  
-@@ -76,12 +77,21 @@ static int btqcomsmd_send(struct hci_dev *hdev, struct sk_buff *skb)
- 	switch (hci_skb_pkt_type(skb)) {
- 	case HCI_ACLDATA_PKT:
- 		ret = rpmsg_send(btq->acl_channel, skb->data, skb->len);
-+		if (ret) {
-+			hdev->stat.err_tx++;
-+			break;
-+		}
- 		hdev->stat.acl_tx++;
- 		hdev->stat.byte_tx += skb->len;
- 		break;
- 	case HCI_COMMAND_PKT:
- 		ret = rpmsg_send(btq->cmd_channel, skb->data, skb->len);
-+		if (ret) {
-+			hdev->stat.err_tx++;
-+			break;
-+		}
- 		hdev->stat.cmd_tx++;
-+		hdev->stat.byte_tx += skb->len;
- 		break;
- 	default:
- 		ret = -EILSEQ;
+-#define DEFAULT_SERVER		"b1ee.com"
+ #define DEFAULT_HOST_PORT	"45550"		/* 0xb1ee */
+ #define DEFAULT_SNIFFER_PORT	"45551"		/* 0xb1ef */
+ 
+@@ -182,7 +181,7 @@ static int do_connect(const char *node, const char *service)
+ 	hints.ai_family = PF_UNSPEC;
+ 	hints.ai_socktype = SOCK_STREAM;
+ 
+-	err = getaddrinfo(DEFAULT_SERVER, DEFAULT_HOST_PORT, &hints, &res);
++	err = getaddrinfo(node, DEFAULT_HOST_PORT, &hints, &res);
+ 	if (err) {
+ 		perror(gai_strerror(err));
+ 		exit(1);
+@@ -227,8 +226,15 @@ int main(int argc, char *argv[])
+ 	ssize_t written;
+ 	sigset_t mask;
+ 
+-	server_fd = do_connect(DEFAULT_SERVER, DEFAULT_HOST_PORT);
+-	sniffer_fd = do_connect(DEFAULT_SERVER, DEFAULT_SNIFFER_PORT);
++	if (argc < 2) {
++		perror("b1ee - Bluetooth device testing tool over internet\n"
++			"Usage:\n"
++			"\tb1ee <host>\n");
++		return EXIT_FAILURE;
++	}
++
++	server_fd = do_connect(argv[1], DEFAULT_HOST_PORT);
++	sniffer_fd = do_connect(argv[1], DEFAULT_SNIFFER_PORT);
+ 
+ 	written = write(sniffer_fd, sniff_cmd, sizeof(sniff_cmd));
+ 	if (written < 0)
 -- 
-2.7.4
+2.14.1
+
