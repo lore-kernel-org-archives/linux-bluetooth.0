@@ -1,52 +1,72 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Fix spurious error message
-Date: Wed, 11 Apr 2018 09:33:07 +0200
-Message-ID: <1545691.2kjr4zKebi@ix>
-In-Reply-To: <20180329094117.25855-1-szymon.janc@codecoup.pl>
-References: <20180329094117.25855-1-szymon.janc@codecoup.pl>
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <e39b74fb-9418-7e23-7049-8f4a687a40e4@jp.fujitsu.com>
+References: <e39b74fb-9418-7e23-7049-8f4a687a40e4@jp.fujitsu.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 10 Apr 2018 15:33:42 +0300
+Message-ID: <CABBYNZK_ZJMTo_0cCQ1kaM2rxZ+wyoM18zvJ-c7jbz=NxPE27w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] emulator/b1ee: Enable to specify connecting host
+To: ERAMOTO Masaya <eramoto.masaya@jp.fujitsu.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-On Thursday, 29 March 2018 11:41:17 CEST Szymon Janc wrote:
-> This message was debug message before 2064ee332e4c1b7495cf68b. Looks
-> like it was changed by accident in that patch. This is causing some
-> error messages when doing BR/EDR discovery since Inquiry Command
-> generates Command Status event, not Command Complete.
-> 
-> I'm sending this as RFC for now since while things seem to work fine
-> despite this condition (and it was like that for quite some time) it
-> feels like this is indeed case that should be handled by HCI request
-> code.
-> 
-> Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+On Fri, Apr 6, 2018 at 11:45 AM, ERAMOTO Masaya
+<eramoto.masaya@jp.fujitsu.com> wrote:
+> Because the default host seems to be unofficial since 2017, removes the
+> DEFAULT_SERVER macro.
 > ---
->  net/bluetooth/hci_event.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index cd3bbb766c24..3f111343f57b 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -5207,8 +5207,7 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev,
-> u16 opcode, }
-> 
->  	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
-> -		bt_dev_err(hdev, "last event is not cmd complete (0x%2.2x)",
-> -			   hdr->evt);
-> +		BT_DBG("last event is not cmd complete (0x%2.2x)", hdr->evt);
->  		return false;
->  	}
+>  emulator/b1ee.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+>
+> diff --git a/emulator/b1ee.c b/emulator/b1ee.c
+> index 1fe46840f..42340f014 100644
+> --- a/emulator/b1ee.c
+> +++ b/emulator/b1ee.c
+> @@ -41,7 +41,6 @@
+>
+>  #include "src/shared/mainloop.h"
+>
+> -#define DEFAULT_SERVER         "b1ee.com"
+>  #define DEFAULT_HOST_PORT      "45550"         /* 0xb1ee */
+>  #define DEFAULT_SNIFFER_PORT   "45551"         /* 0xb1ef */
+>
+> @@ -182,7 +181,7 @@ static int do_connect(const char *node, const char *service)
+>         hints.ai_family = PF_UNSPEC;
+>         hints.ai_socktype = SOCK_STREAM;
+>
+> -       err = getaddrinfo(DEFAULT_SERVER, DEFAULT_HOST_PORT, &hints, &res);
+> +       err = getaddrinfo(node, DEFAULT_HOST_PORT, &hints, &res);
+>         if (err) {
+>                 perror(gai_strerror(err));
+>                 exit(1);
+> @@ -227,8 +226,15 @@ int main(int argc, char *argv[])
+>         ssize_t written;
+>         sigset_t mask;
+>
+> -       server_fd = do_connect(DEFAULT_SERVER, DEFAULT_HOST_PORT);
+> -       sniffer_fd = do_connect(DEFAULT_SERVER, DEFAULT_SNIFFER_PORT);
+> +       if (argc < 2) {
+> +               perror("b1ee - Bluetooth device testing tool over internet\n"
+> +                       "Usage:\n"
+> +                       "\tb1ee <host>\n");
+> +               return EXIT_FAILURE;
+> +       }
+> +
+> +       server_fd = do_connect(argv[1], DEFAULT_HOST_PORT);
+> +       sniffer_fd = do_connect(argv[1], DEFAULT_SNIFFER_PORT);
+>
+>         written = write(sniffer_fd, sniff_cmd, sizeof(sniff_cmd));
+>         if (written < 0)
+> --
+> 2.14.1
 
-Any thoughts on this?
+Any input regarding this changes? I guess it would be fine to have the
+host as argument but then perhaps we should take the port as well,
+though the port could be an option so we still default to the current
+port.
 
 -- 
-pozdrawiam
-Szymon Janc
-
-
+Luiz Augusto von Dentz
