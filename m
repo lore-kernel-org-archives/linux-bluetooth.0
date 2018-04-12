@@ -1,32 +1,39 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: bugzilla-daemon@bugzilla.kernel.org
-To: linux-bluetooth@kernel.org
-Subject: [Bug 199351] intel 8265 bluetooth no longer functions as of 4.16
-Date: Fri, 13 Apr 2018 03:29:32 +0000
-Message-ID: <bug-199351-62941-kzJh4W57yc@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-199351-62941@https.bugzilla.kernel.org/>
-References: <bug-199351-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <nunziomeli5@gmail.com>
+From: Nunzio Meli <nunziomeli5@gmail.com>
+To: marcel@holtmann.org
+Cc: linux-bluetooth@vger.kernel.org,
+	Nunzio Meli <nunzio.meli@shazam.com>
+Subject: [PATCH] substitute spaces with tabs
+Date: Thu, 12 Apr 2018 23:54:33 +0100
+Message-Id: <20180412225433.57726-1-nunzio.meli@shazam.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=199351
+---
+ drivers/bluetooth/hci_intel.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
---- Comment #7 from jebrosen2014@gmail.com ---
-I believe I have found the culprit: commit
-eff2d68ca7388ee1c08811c6bbf4d8587cba01da enables btusb autosuspend by default
-given a certain Kconfig option, and I confirmed that Arch Linux did opt in to
-it. 
-
-
-Appending `btusb.enable_autosuspend=n` to my kernel command line has
-effectively solved my issue as far as I am concerned.
-
-I had discovered that autosuspend "broke" my bluetooth device a long time ago,
-but it hasn't crossed my mind for a while. The actual bug here is that
-autosuspend causes the bluetooth device to stop working.
-
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index 7c166e3b308b..2a7bdc0bad92 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -609,12 +609,12 @@ static int intel_setup(struct hci_uart *hu)
+ 		return -EINVAL;
+ 	}
+ 
+-        /* Check for supported iBT hardware variants of this firmware
+-         * loading method.
+-         *
+-         * This check has been put in place to ensure correct forward
+-         * compatibility options when newer hardware variants come along.
+-         */
++	/* Check for supported iBT hardware variants of this firmware
++	 * loading method.
++	 *
++	 * This check has been put in place to ensure correct forward
++	 * compatibility options when newer hardware variants come along.
++	 */
+ 	switch (ver.hw_variant) {
+ 	case 0x0b:	/* LnP */
+ 	case 0x0c:	/* WsP */
 -- 
-You are receiving this mail because:
-You are the assignee for the bug.
+2.15.1 (Apple Git-101)
