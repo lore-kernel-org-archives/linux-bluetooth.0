@@ -2,339 +2,495 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v1 10/10] mgmt-tester: Add support ext create connection and enh conn complete
-Date: Thu, 12 Apr 2018 16:51:01 +0530
-Message-Id: <1523532061-17192-11-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v1 09/10] mgmt-tester: Add tests for extended scanning and device found
+Date: Thu, 12 Apr 2018 16:51:00 +0530
+Message-Id: <1523532061-17192-10-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1523532061-17192-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1523532061-17192-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- emulator/btdev.c    | 86 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- emulator/bthost.c   | 55 ++++++++++++++++++++++++++++++++++
- emulator/bthost.h   |  3 ++
- tools/mgmt-tester.c | 49 +++++++++++++++++++++++++-----
- 4 files changed, 184 insertions(+), 9 deletions(-)
+ emulator/btdev.c    |  86 ++++++++++++++++++
+ emulator/bthost.c   |  44 ++++++++++
+ emulator/bthost.h   |   4 +
+ tools/mgmt-tester.c | 244 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 378 insertions(+)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index c3d2b8a..72c35da 100644
+index 36aa696..c3d2b8a 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -636,7 +636,8 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 
- 	memset(btdev, 0, sizeof(*btdev));
- 
--	if (type == BTDEV_TYPE_BREDRLE || type == BTDEV_TYPE_LE) {
-+	if (type == BTDEV_TYPE_BREDRLE || type == BTDEV_TYPE_LE
-+				|| BTDEV_TYPE_BREDRLE50) {
- 		btdev->crypto = bt_crypto_new();
- 		if (!btdev->crypto) {
- 			free(btdev);
-@@ -1220,6 +1221,53 @@ static void le_conn_complete(struct btdev *btdev,
- 	send_event(btdev, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
+@@ -2073,6 +2073,44 @@ static void le_set_scan_enable_complete(struct btdev *btdev)
+ 	}
  }
  
-+static void le_ext_conn_complete(struct btdev *btdev,
-+				const struct bt_hci_cmd_le_ext_create_conn *leecc,
-+				uint8_t status)
++static void le_set_ext_scan_enable_complete(struct btdev *btdev)
 +{
-+	char buf[1 + sizeof(struct bt_hci_evt_le_enhanced_conn_complete)];
-+	struct bt_hci_evt_le_enhanced_conn_complete *cc = (void *) &buf[1];
-+	struct bt_hci_le_ext_create_conn *lecc = (void *)leecc->data;
++	int i;
 +
-+	memset(buf, 0, sizeof(buf));
++	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
++		uint16_t report_type;
 +
-+	buf[0] = BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE;
++		if (!btdev_list[i] || btdev_list[i] == btdev)
++			continue;
 +
-+	if (!status) {
-+		struct btdev *remote;
++		if (!btdev_list[i]->le_adv_enable)
++			continue;
 +
-+		remote = find_btdev_by_bdaddr_type(leecc->peer_addr,
-+							leecc->peer_addr_type);
++		if (!ext_adv_match(btdev, btdev_list[i]))
++			continue;
 +
-+		btdev->conn = remote;
-+		btdev->le_adv_enable = 0;
-+		remote->conn = btdev;
-+		remote->le_adv_enable = 0;
++		report_type = get_ext_adv_report_type(btdev_list[i]->le_ext_adv_type);
++		le_send_ext_adv_report(btdev, btdev_list[i], report_type, false);
 +
-+		cc->status = status;
-+		cc->peer_addr_type = btdev->le_scan_own_addr_type;
-+		if (cc->peer_addr_type == 0x01)
-+			memcpy(cc->peer_addr, btdev->random_addr, 6);
-+		else
-+			memcpy(cc->peer_addr, btdev->bdaddr, 6);
++		if (btdev->le_scan_type != 0x01)
++			continue;
 +
-+		cc->role = 0x01;
-+		cc->handle = cpu_to_le16(42);
-+		cc->interval = lecc->max_interval;
-+		cc->latency = lecc->latency;
-+		cc->supv_timeout = lecc->supv_timeout;
++				/* if scannable bit is set the send scan response */
++		if (btdev_list[i]->le_ext_adv_type & 0x02) {
++			if (btdev_list[i]->le_ext_adv_type == 0x13)
++				report_type = 0x1b;
++			else if (btdev_list[i]->le_ext_adv_type == 0x12)
++				report_type = 0x1a;
++			else if (!(btdev_list[i]->le_ext_adv_type & 0x10))
++				report_type &= 0x08;
++			else
++				continue;
 +
-+		send_event(remote, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
++			le_send_ext_adv_report(btdev, btdev_list[i], report_type, true);
++		}
 +	}
-+
-+	cc->status = status;
-+	cc->peer_addr_type = leecc->peer_addr_type;
-+	memcpy(cc->peer_addr, leecc->peer_addr, 6);
-+	cc->role = 0x00;
-+
-+	send_event(btdev, BT_HCI_EVT_LE_META_EVENT, buf, sizeof(buf));
 +}
 +
- static const uint8_t *scan_addr(const struct btdev *btdev)
+ static void le_read_remote_features_complete(struct btdev *btdev)
  {
- 	if (btdev->le_scan_own_addr_type == 0x01)
-@@ -1268,6 +1316,14 @@ static bool adv_connectable(struct btdev *btdev)
- 	return btdev->le_adv_type != 0x03;
- }
- 
-+static bool ext_adv_connectable(struct btdev *btdev)
-+{
-+	if (!btdev->le_adv_enable)
-+		return false;
-+
-+	return btdev->le_ext_adv_type & 0x01;
-+}
-+
- static void le_conn_request(struct btdev *btdev,
- 				const struct bt_hci_cmd_le_create_conn *lecc)
- {
-@@ -1282,6 +1338,20 @@ static void le_conn_request(struct btdev *btdev,
- 					BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH);
- }
- 
-+static void le_ext_conn_request(struct btdev *btdev,
-+				const struct bt_hci_cmd_le_ext_create_conn *leecc)
-+{
-+	struct btdev *remote = find_btdev_by_bdaddr_type(leecc->peer_addr,
-+							leecc->peer_addr_type);
-+
-+	if (remote && ext_adv_connectable(remote) && ext_adv_match(btdev, remote) &&
-+				remote->le_adv_own_addr == leecc->peer_addr_type)
-+		le_ext_conn_complete(btdev, leecc, 0);
-+	else
-+		le_ext_conn_complete(btdev, leecc,
-+					BT_HCI_ERR_CONN_FAILED_TO_ESTABLISH);
-+}
-+
- static void conn_request(struct btdev *btdev, const uint8_t *bdaddr)
- {
- 	struct btdev *remote = find_btdev_by_bdaddr(bdaddr);
-@@ -3593,7 +3663,12 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		}
+ 	char buf[1 + sizeof(struct bt_hci_evt_le_remote_features_complete)];
+@@ -2245,6 +2283,9 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 	const struct bt_hci_cmd_le_set_ext_adv_data *lsead;
+ 	const struct bt_hci_cmd_le_set_ext_scan_rsp_data *lsesrd;
+ 	const struct bt_hci_cmd_le_set_default_phy *phys;
++	const struct bt_hci_cmd_le_set_ext_scan_params *lsesp;
++	const struct bt_hci_le_scan_phy *lsp;
++	const struct bt_hci_cmd_le_set_ext_scan_enable *lsese;
+ 	struct bt_hci_rsp_read_default_link_policy rdlp;
+ 	struct bt_hci_rsp_read_stored_link_key rslk;
+ 	struct bt_hci_rsp_write_stored_link_key wslk;
+@@ -3516,6 +3557,42 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 			status = BT_HCI_ERR_SUCCESS;
  		cmd_complete(btdev, opcode, &status, sizeof(status));
  		break;
-+	case BT_HCI_CMD_LE_EXT_CREATE_CONN:
++	case BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS:
 +		if (btdev->type != BTDEV_TYPE_BREDRLE50)
 +			goto unsupported;
- 
-+		cmd_status(btdev, BT_HCI_ERR_SUCCESS, opcode);
++
++		lsesp = data;
++		lsp = (void *)lsesp->data;
++
++		if (btdev->le_scan_enable)
++			status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		else if (lsesp->num_phys == 0)
++			status = BT_HCI_ERR_INVALID_PARAMETERS;
++		else {
++			status = BT_HCI_ERR_SUCCESS;
++			/* Currently we dont support multiple types in single command
++			 * So just take the first one will do.
++			 */
++			btdev->le_scan_type = lsp->type;
++			btdev->le_scan_own_addr_type = lsesp->own_addr_type;
++		}
++
++		cmd_complete(btdev, opcode, &status, sizeof(status));
 +		break;
++	case BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE:
++		if (btdev->type != BTDEV_TYPE_BREDRLE50)
++			goto unsupported;
++
++		lsese = data;
++		if (btdev->le_scan_enable == lsese->enable)
++			status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		else {
++			btdev->le_scan_enable = lsese->enable;
++			btdev->le_filter_dup = lsese->filter_dup;
++			status = BT_HCI_ERR_SUCCESS;
++		}
++		cmd_complete(btdev, opcode, &status, sizeof(status));
++		break;
+ 
  	default:
  		goto unsupported;
- 	}
-@@ -3632,6 +3707,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+@@ -3554,6 +3631,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+ 	const struct bt_hci_cmd_le_conn_param_req_reply *lcprr;
  	const struct bt_hci_cmd_le_conn_param_req_neg_reply *lcprnr;
  	const struct bt_hci_cmd_le_set_scan_enable *lsse;
- 	const struct bt_hci_cmd_le_set_ext_scan_enable *lsese;
-+	const struct bt_hci_cmd_le_ext_create_conn *leecc;
++	const struct bt_hci_cmd_le_set_ext_scan_enable *lsese;
  
  	switch (opcode) {
  	case BT_HCI_CMD_INQUIRY:
-@@ -3834,7 +3910,13 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 		if (btdev->le_scan_enable && lsese->enable)
- 			le_set_ext_scan_enable_complete(btdev);
- 		break;
--
-+	case BT_HCI_CMD_LE_EXT_CREATE_CONN:
+@@ -3748,6 +3826,14 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
+ 		lsse = data;
+ 		if (btdev->le_scan_enable && lsse->enable)
+ 			le_set_scan_enable_complete(btdev);
++		break;
++	case BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE:
 +		if (btdev->type != BTDEV_TYPE_BREDRLE50)
 +			return;
-+		leecc = data;
-+		btdev->le_scan_own_addr_type = leecc->own_addr_type;
-+		le_ext_conn_request(btdev, leecc);
++		lsese = data;
++		if (btdev->le_scan_enable && lsese->enable)
++			le_set_ext_scan_enable_complete(btdev);
 +		break;
+ 
  	}
  }
- 
 diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 45b9bd6..d37957f 100644
+index 2bcdc31..45b9bd6 100644
 --- a/emulator/bthost.c
 +++ b/emulator/bthost.c
-@@ -1167,6 +1167,26 @@ static void evt_le_conn_complete(struct bthost *bthost, const void *data,
- 	init_conn(bthost, le16_to_cpu(ev->handle), ev->peer_addr, addr_type);
- }
- 
-+static void evt_le_ext_conn_complete(struct bthost *bthost, const void *data,
-+								uint8_t len)
-+{
-+	const struct bt_hci_evt_le_enhanced_conn_complete *ev = data;
-+	uint8_t addr_type;
-+
-+	if (len < sizeof(*ev))
-+		return;
-+
-+	if (ev->status)
-+		return;
-+
-+	if (ev->peer_addr_type == 0x00)
-+		addr_type = BDADDR_LE_PUBLIC;
-+	else
-+		addr_type = BDADDR_LE_RANDOM;
-+
-+	init_conn(bthost, le16_to_cpu(ev->handle), ev->peer_addr, addr_type);
-+}
-+
- static void evt_le_conn_update_complete(struct bthost *bthost, const void *data,
- 								uint8_t len)
- {
-@@ -1246,6 +1266,9 @@ static void evt_le_meta_event(struct bthost *bthost, const void *data,
- 	case BT_HCI_EVT_LE_LONG_TERM_KEY_REQUEST:
- 		evt_le_ltk_request(bthost, evt_data, len - 1);
+@@ -839,6 +839,12 @@ static void evt_cmd_complete(struct bthost *bthost, const void *data,
  		break;
-+	case BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE:
-+		evt_le_ext_conn_complete(bthost, evt_data, len - 1);
+ 	case BT_HCI_CMD_LE_SET_ADV_DATA:
+ 		break;
++	case BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS:
++		break;
++	case BT_HCI_CMD_LE_SET_EXT_ADV_DATA:
++		break;
++	case BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE:
 +		break;
  	default:
- 		printf("Unsupported LE Meta event 0x%2.2x\n", *event);
+ 		printf("Unhandled cmd_complete opcode 0x%04x\n", opcode);
  		break;
-@@ -2275,6 +2298,38 @@ void bthost_hci_connect(struct bthost *bthost, const uint8_t *bdaddr,
- 	}
+@@ -2301,6 +2307,29 @@ void bthost_set_adv_data(struct bthost *bthost, const uint8_t *data,
+ 							sizeof(adv_cp));
  }
  
-+void bthost_hci_ext_connect(struct bthost *bthost, const uint8_t *bdaddr,
-+							uint8_t addr_type)
++void bthost_set_ext_adv_data(struct bthost *bthost, const uint8_t *data,
++								uint8_t len)
 +{
-+	struct bt_hci_cmd_le_ext_create_conn *cc;
-+	struct bt_hci_le_ext_create_conn *cp;
-+	uint8_t buf[sizeof(*cc) + sizeof(*cp)];
++	struct bt_hci_cmd_le_set_ext_adv_data *adv_cp;
++	uint8_t buf[sizeof(*adv_cp) + 31];
 +
-+	cc = (void *)buf;
-+	cp = (void *)cc->data;
++	adv_cp = (void *)buf;
 +
-+	bthost->conn_init = true;
++	memset(adv_cp, 0, sizeof(*adv_cp));
++	memset(adv_cp->data, 0, 31);
 +
-+	memset(cc, 0, sizeof(*cc));
-+	memset(cp, 0, sizeof(*cp));
++	adv_cp->operation = 0x03;
++	adv_cp->fragment_preference = 0x01;
 +
-+	memcpy(cc->peer_addr, bdaddr, sizeof(cc->peer_addr));
++	if (len) {
++		adv_cp->data_len = len;
++		memcpy(adv_cp->data, data, len);
++	}
 +
-+	if (addr_type == BDADDR_LE_RANDOM)
-+		cc->peer_addr_type = 0x01;
-+
-+	cc->phys = 0x01;
-+
-+	cp->scan_interval = cpu_to_le16(0x0060);
-+	cp->scan_window = cpu_to_le16(0x0030);
-+	cp->min_interval = cpu_to_le16(0x0028);
-+	cp->max_interval = cpu_to_le16(0x0038);
-+	cp->supv_timeout = cpu_to_le16(0x002a);
-+
-+	send_command(bthost, BT_HCI_CMD_LE_EXT_CREATE_CONN,
-+						buf, sizeof(buf));
++	send_command(bthost, BT_HCI_CMD_LE_SET_EXT_ADV_DATA, buf,
++							sizeof(buf));
 +}
 +
- void bthost_hci_disconnect(struct bthost *bthost, uint16_t handle,
- 								uint8_t reason)
+ void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable)
  {
+ 	struct bt_hci_cmd_le_set_adv_parameters cp;
+@@ -2312,6 +2341,21 @@ void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable)
+ 	send_command(bthost, BT_HCI_CMD_LE_SET_ADV_ENABLE, &enable, 1);
+ }
+ 
++void bthost_set_ext_adv_enable(struct bthost *bthost, uint8_t enable)
++{
++	struct bt_hci_cmd_le_set_ext_adv_params cp;
++	struct bt_hci_cmd_le_set_ext_adv_enable cp_enable;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.evt_properties = cpu_to_le16(0x0013);
++	send_command(bthost, BT_HCI_CMD_LE_SET_EXT_ADV_PARAMS,
++							&cp, sizeof(cp));
++
++	cp_enable.enable = enable;
++	send_command(bthost, BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE, &cp_enable,
++					sizeof(cp_enable));
++}
++
+ void bthost_write_ssp_mode(struct bthost *bthost, uint8_t mode)
+ {
+ 	send_command(bthost, BT_HCI_CMD_WRITE_SIMPLE_PAIRING_MODE, &mode, 1);
 diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 752c14b..b5f3696 100644
+index 553865a..752c14b 100644
 --- a/emulator/bthost.h
 +++ b/emulator/bthost.h
-@@ -56,6 +56,9 @@ void bthost_set_connect_cb(struct bthost *bthost, bthost_new_conn_cb cb,
- void bthost_hci_connect(struct bthost *bthost, const uint8_t *bdaddr,
- 							uint8_t addr_type);
+@@ -83,6 +83,10 @@ void bthost_set_adv_data(struct bthost *bthost, const uint8_t *data,
+ 								uint8_t len);
+ void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable);
  
-+void bthost_hci_ext_connect(struct bthost *bthost, const uint8_t *bdaddr,
-+							uint8_t addr_type);
++void bthost_set_ext_adv_data(struct bthost *bthost, const uint8_t *data,
++								uint8_t len);
++void bthost_set_ext_adv_enable(struct bthost *bthost, uint8_t enable);
 +
- void bthost_hci_disconnect(struct bthost *bthost, uint16_t handle,
- 								uint8_t reason);
+ void bthost_write_ssp_mode(struct bthost *bthost, uint8_t mode);
  
+ void bthost_write_le_host_supported(struct bthost *bthost, uint8_t mode);
 diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index e5076b5..1523ca8 100644
+index 7485318..e5076b5 100644
 --- a/tools/mgmt-tester.c
 +++ b/tools/mgmt-tester.c
-@@ -5292,6 +5292,7 @@ static void client_cmd_complete(uint16_t opcode, uint8_t status,
- 	switch (opcode) {
- 	case BT_HCI_CMD_WRITE_SCAN_ENABLE:
- 	case BT_HCI_CMD_LE_SET_ADV_ENABLE:
-+	case BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE:
- 		tester_print("Client set connectable: %s (0x%02x)",
- 						mgmt_errstr(status), status);
- 		if (!status && test->client_enable_ssp) {
-@@ -5321,9 +5322,14 @@ static void setup_bthost(void)
+@@ -8374,6 +8374,205 @@ static const struct generic_data set_phy_invalid_param = {
+ 	.expect_status = MGMT_STATUS_INVALID_PARAMS,
+ };
  
- 	bthost = hciemu_client_get_host(data->hciemu);
- 	bthost_set_cmd_complete_cb(bthost, client_cmd_complete, data);
--	if (data->hciemu_type == HCIEMU_TYPE_LE || test->client_enable_adv)
--		bthost_set_adv_enable(bthost, 0x01);
--	else
++static const char start_discovery_valid_ext_scan_enable[] = {
++	0x01,
++	0x01,
++	0x00, 0x00,
++	0x00, 0x00
++};
 +
-+	if (data->hciemu_type == HCIEMU_TYPE_LE ||
-+		test->client_enable_adv) {
-+		if (data->hciemu_type == HCIEMU_TYPE_BREDRLE50)
-+			bthost_set_ext_adv_enable(bthost, 0x01);
-+		else
-+			bthost_set_adv_enable(bthost, 0x01);
-+	} else
- 		bthost_write_scan_enable(bthost, 0x03);
- }
- 
-@@ -8866,9 +8872,15 @@ static void le_connected_event(uint16_t index, uint16_t length,
- 	tester_print("Device connected");
- 
- 	test_add_condition(data);
--	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_CMD,
--						BT_HCI_CMD_LE_SET_ADV_ENABLE,
--						test_adv_enable_hook, data);
++static const struct generic_data start_discovery_bredrle_ext_scan_enable = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_START_DISCOVERY,
++	.send_param = start_discovery_bredrle_param,
++	.send_len = sizeof(start_discovery_bredrle_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_discovery_bredrle_param,
++	.expect_len = sizeof(start_discovery_bredrle_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE,
++	.expect_hci_param = start_discovery_valid_ext_scan_enable,
++	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_enable),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_discovery_evt,
++	.expect_alt_ev_len = sizeof(start_discovery_evt),
++};
 +
-+	if (data->hciemu_type == HCIEMU_TYPE_BREDRLE50)
-+		hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_CMD,
-+					BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE,
-+					test_adv_enable_hook, data);
-+	else
-+		hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_CMD,
-+					BT_HCI_CMD_LE_SET_ADV_ENABLE,
-+					test_adv_enable_hook, data);
++static const struct generic_data start_discovery_le_ext_scan_enable = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_START_DISCOVERY,
++	.send_param = start_discovery_le_param,
++	.send_len = sizeof(start_discovery_le_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_discovery_le_param,
++	.expect_len = sizeof(start_discovery_le_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE,
++	.expect_hci_param = start_discovery_valid_ext_scan_enable,
++	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_enable),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_discovery_le_evt,
++	.expect_alt_ev_len = sizeof(start_discovery_le_evt),
++};
++
++static const char start_discovery_valid_ext_scan_param[] = {
++	0x01,			/* Own Addr type*/
++	0x00,			/* Scan filter policy*/
++	0x01,			/*Phys - 1m */
++	0x01,			/* Type */
++	0x12, 0x00,		/* Interval */
++	0x12, 0x00,		/* Window */
++};
++
++static const struct generic_data start_discovery_le_ext_scan_param = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_START_DISCOVERY,
++	.send_param = start_discovery_le_param,
++	.send_len = sizeof(start_discovery_le_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_discovery_le_param,
++	.expect_len = sizeof(start_discovery_le_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
++	.expect_hci_param = start_discovery_valid_ext_scan_param,
++	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_param),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_discovery_le_evt,
++	.expect_alt_ev_len = sizeof(start_discovery_le_evt),
++};
++
++static const char stop_discovery_valid_ext_scan_disable[] = {
++	0x00,
++	0x00,
++	0x00, 0x00,
++	0x00, 0x00
++};
++
++static const struct generic_data stop_discovery_le_ext_scan_disable = {
++	.setup_settings = settings_powered_le,
++	.setup_send_opcode = MGMT_OP_START_DISCOVERY,
++	.setup_send_param = start_discovery_bredrle_param,
++	.setup_send_len = sizeof(start_discovery_bredrle_param),
++	.send_opcode = MGMT_OP_STOP_DISCOVERY,
++	.send_param = stop_discovery_bredrle_param,
++	.send_len = sizeof(stop_discovery_bredrle_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = stop_discovery_bredrle_param,
++	.expect_len = sizeof(stop_discovery_bredrle_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE,
++	.expect_hci_param = stop_discovery_valid_ext_scan_disable,
++	.expect_hci_len = sizeof(stop_discovery_valid_ext_scan_disable),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = stop_discovery_evt,
++	.expect_alt_ev_len = sizeof(stop_discovery_evt),
++};
++
++static const struct generic_data start_discovery_le_2m_scan_param = {
++	.setup_settings = settings_powered_le,
++	.setup_send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
++	.setup_send_param = set_phy_2m_param,
++	.setup_send_len = sizeof(set_phy_2m_param),
++	.send_opcode = MGMT_OP_START_DISCOVERY,
++	.send_param = start_discovery_bredrle_param,
++	.send_len = sizeof(start_discovery_bredrle_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_discovery_bredrle_param,
++	.expect_len = sizeof(start_discovery_bredrle_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
++	.expect_hci_param = start_discovery_valid_ext_scan_param,
++	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_param),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_discovery_evt,
++	.expect_alt_ev_len = sizeof(start_discovery_evt),
++};
++
++static const char start_discovery_valid_coded_scan_param[] = {
++	0x01,			/* Own Addr type*/
++	0x00,			/* Scan filter policy*/
++	0x04,			/*Phys - coded */
++	0x01,			/* Type */
++	0x12, 0x00,		/* Interval */
++	0x12, 0x00,		/* Window */
++};
++
++static const struct generic_data start_discovery_le_coded_scan_param = {
++	.setup_settings = settings_powered_le,
++	.setup_send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
++	.setup_send_param = set_phy_coded_param,
++	.setup_send_len = sizeof(set_phy_coded_param),
++	.send_opcode = MGMT_OP_START_DISCOVERY,
++	.send_param = start_discovery_bredrle_param,
++	.send_len = sizeof(start_discovery_bredrle_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_discovery_bredrle_param,
++	.expect_len = sizeof(start_discovery_bredrle_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
++	.expect_hci_param = start_discovery_valid_coded_scan_param,
++	.expect_hci_len = sizeof(start_discovery_valid_coded_scan_param),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_discovery_evt,
++	.expect_alt_ev_len = sizeof(start_discovery_evt),
++};
++
++static const char set_phy_1m_2m_coded_param[] = { 0x3f, 0x00 };
++
++static const char start_discovery_valid_1m_2m_coded_scan_param[] = {
++	0x01,			/* Own Addr type*/
++	0x00,			/* Scan filter policy*/
++	0x05,			/*Phys - 1m, coded */
++	0x01,			/* Type */
++	0x12, 0x00,		/* Interval */
++	0x12, 0x00,		/* Window */
++	0x01,			/* Type */
++	0x12, 0x00,		/* Interval */
++	0x12, 0x00,		/* Window */
++};
++
++static const struct generic_data start_discovery_le_1m_coded_scan_param = {
++	.setup_settings = settings_powered_le,
++	.setup_send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
++	.setup_send_param = set_phy_1m_2m_coded_param,
++	.setup_send_len = sizeof(set_phy_1m_2m_coded_param),
++	.send_opcode = MGMT_OP_START_DISCOVERY,
++	.send_param = start_discovery_bredrle_param,
++	.send_len = sizeof(start_discovery_bredrle_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = start_discovery_bredrle_param,
++	.expect_len = sizeof(start_discovery_bredrle_param),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
++	.expect_hci_param = start_discovery_valid_1m_2m_coded_scan_param,
++	.expect_hci_len = sizeof(start_discovery_valid_1m_2m_coded_scan_param),
++	.expect_alt_ev = MGMT_EV_DISCOVERING,
++	.expect_alt_ev_param = start_discovery_evt,
++	.expect_alt_ev_len = sizeof(start_discovery_evt),
++};
++
++static void set_phy_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	if (status != MGMT_STATUS_SUCCESS) {
++		tester_setup_failed();
++		return;
++	}
++
++	tester_print("Set PHY Success");
++
++	tester_setup_complete();
++}
++
++static void setup_phy_configuration(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct generic_data *test = data->test_data;
++	const void *send_param = test->setup_send_param;
++	uint16_t send_len = test->setup_send_len;
++	unsigned int id;
++
++	id = mgmt_register(data->mgmt, MGMT_EV_DISCOVERING, data->mgmt_index,
++			   discovering_event, NULL, NULL);
++	data->mgmt_discov_ev_id = id;
++
++	mgmt_send(data->mgmt, test->setup_send_opcode, data->mgmt_index,
++				send_len, send_param, set_phy_callback,
++				NULL, NULL);
++}
  
- 	/* Make sure we get not disconnected during the testaces */
- 	mgmt_register(data->mgmt_alt, MGMT_EV_DEVICE_DISCONNECTED,
-@@ -8908,7 +8920,10 @@ static void add_device_callback(uint8_t status, uint16_t len, const void *param,
+ static bool power_off(uint16_t index)
+ {
+@@ -8501,6 +8700,12 @@ static void trigger_device_found(void *user_data)
+ 							test->adv_data_len);
+ 
+ 		bthost_set_adv_enable(bthost, 0x01);
++	} else if (data->hciemu_type == HCIEMU_TYPE_BREDRLE50) {
++		if (test->set_adv)
++			bthost_set_ext_adv_data(bthost, test->adv_data,
++							test->adv_data_len);
++
++		bthost_set_ext_adv_enable(bthost, 0x01);
  	}
  
- 	bthost = hciemu_client_get_host(data->hciemu);
--	bthost_hci_connect(bthost, master_bdaddr, BDADDR_LE_PUBLIC);
-+	if (data->hciemu_type == HCIEMU_TYPE_BREDRLE50)
-+		bthost_hci_ext_connect(bthost, master_bdaddr, BDADDR_LE_PUBLIC);
-+	else
-+		bthost_hci_connect(bthost, master_bdaddr, BDADDR_LE_PUBLIC);
- }
+ 	if (data->hciemu_type != HCIEMU_TYPE_LE)
+@@ -10138,5 +10343,44 @@ int main(int argc, char *argv[])
+ 	test_bredrle50("Set PHY Invalid Param", &set_phy_invalid_param,
+ 					NULL, test_command_generic);
  
- static void test_connected_and_advertising(const void *test_data)
-@@ -10382,5 +10397,25 @@ int main(int argc, char *argv[])
- 				&device_found_invalid_field,
- 				NULL, test_device_found);
- 
-+	test_bredrle50_full("Ext Adv. connectable & connected (slave) - Success",
-+				&conn_slave_adv_conneactable_test,
-+				setup_advertise_while_connected,
-+				test_connected_and_advertising, 10);
++	test_bredrle50("Start Discovery BREDR LE - (Ext Scan Enable)",
++					&start_discovery_bredrle_ext_scan_enable,
++					NULL,
++					test_command_generic);
 +
-+	test_bredrle50_full("Ext Adv. non-connectable & connected (slave) - Success",
-+				&conn_slave_adv_non_conneactable_test,
-+				setup_advertise_while_connected,
-+				test_connected_and_advertising, 10);
++	test_bredrle50("Start Discovery LE - (Ext Scan Enable)",
++					&start_discovery_le_ext_scan_enable,
++					NULL,
++					test_command_generic);
 +
-+	test_bredrle50_full("Ext Adv. connectable & connected (master) - Success",
-+				&conn_master_adv_conneactable_test,
-+				setup_advertise_while_connected,
-+				test_connected_and_advertising, 10);
++	test_bredrle50("Start Discovery LE - (Ext Scan Param)",
++					&start_discovery_le_ext_scan_param,
++					NULL,
++					test_command_generic);
 +
-+	test_bredrle50_full("Ext Adv. non-connectable & connected (master) - Success",
-+				&conn_master_adv_non_conneactable_test,
-+				setup_advertise_while_connected,
-+				test_connected_and_advertising, 10);
++	test_bredrle50("Stop Discovery - (Ext Scan Disable)",
++				&stop_discovery_le_ext_scan_disable,
++				setup_start_discovery, test_command_generic);
++
++	test_bredrle50("Start Discovery - (2m, Scan Param)",
++				&start_discovery_le_2m_scan_param,
++				setup_phy_configuration, test_command_generic);
++
++	test_bredrle50("Start Discovery - (coded, Scan Param)",
++				&start_discovery_le_coded_scan_param,
++				setup_phy_configuration, test_command_generic);
++
++	test_bredrle50("Start Discovery - (1m, 2m, coded, Scan Param)",
++				&start_discovery_le_1m_coded_scan_param,
++				setup_phy_configuration, test_command_generic);
++
++	test_bredrle50("Ext Device Found - Advertising data - Zero padded",
++				&device_found_gtag,
++				NULL, test_device_found);
++
++	test_bredrle50("Ext Device Found - Advertising data - Invalid field",
++				&device_found_invalid_field,
++				NULL, test_device_found);
 +
  	return tester_run();
  }
