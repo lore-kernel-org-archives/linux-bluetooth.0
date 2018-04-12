@@ -2,128 +2,74 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v1 03/10] monitor: Add support PHY management commands and event
-Date: Thu, 12 Apr 2018 16:50:54 +0530
-Message-Id: <1523532061-17192-4-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v1 02/10] doc/mgmt-api: Add advertising phys support to flags
+Date: Thu, 12 Apr 2018 16:50:53 +0530
+Message-Id: <1523532061-17192-3-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1523532061-17192-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1523532061-17192-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- monitor/packet.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ doc/mgmt-api.txt | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b800a2d..e3b5ab7 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -97,6 +97,7 @@
- #define COLOR_UNKNOWN_ADDRESS_TYPE	COLOR_WHITE_BG
- #define COLOR_UNKNOWN_DEVICE_FLAG	COLOR_WHITE_BG
- #define COLOR_UNKNOWN_ADV_FLAG		COLOR_WHITE_BG
-+#define COLOR_UNKNOWN_PHY		COLOR_WHITE_BG
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index caba22d..87982e0 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -2504,6 +2504,9 @@ Read Advertising Features Command
+ 		4	Add TX Power field to Adv_Data
+ 		5	Add Appearance field to Scan_Rsp
+ 		6	Add Local Name in Scan_Rsp
++		7	Secondary Channel with LE 1M
++		8	Secondary Channel with LE 2M
++		9	Secondary Channel with LE Coded
  
- #define COLOR_PHY_PACKET		COLOR_BLUE
+ 	The Flags bit 0 indicates support for connectable advertising
+ 	and for switching to connectable advertising independent of the
+@@ -2553,6 +2556,15 @@ Read Advertising Features Command
+ 	space is limited a short version or no name information. The
+ 	Local Name will be added at the end of the scan response data.
  
-@@ -10611,6 +10612,7 @@ static const struct {
- 	{ 13, "Privacy"			},
- 	{ 14, "Controller Configuration"},
- 	{ 15, "Static Address"		},
-+	{ 16, "PHY Configuration"	},
- 	{ }
- };
++	The Flags bit 7 indicates support for advertising in secondary
++	channel in LE 1M PHY.
++
++	The Flags bit 8 indicates support for advertising in secondary
++	channel in LE 2M PHY. Primary channel would be on 1M.
++
++	The Flags bit 9 indicates support for advertising in secondary
++	channel in LE CODED PHY.
++
+ 	The valid range for Instance identifiers is 1-254. The value 0
+ 	is reserved for internal use and the value 255 is reserved for
+ 	future extensions. However the Max_Instances value for indicating
+@@ -2613,6 +2625,9 @@ Add Advertising Command
+ 		4	Add TX Power field to Adv_Data
+ 		5	Add Appearance field to Scan_Rsp
+ 		6	Add Local Name in Scan_Rsp
++		7	Secondary Channel with LE 1M
++		8	Secondary Channel with LE 2M
++		9	Secondary Channel with LE Coded
  
-@@ -11905,6 +11907,54 @@ static void mgmt_set_apperance_cmd(const void *data, uint16_t size)
- 	print_appearance(appearance);
- }
+ 	When the connectable flag is set, then the controller will use
+ 	undirected connectable advertising. The value of the connectable
+@@ -2640,6 +2655,16 @@ Add Advertising Command
+ 	supported to provide less air traffic for devices implementing
+ 	broadcaster role.
  
-+static const struct {
-+	uint8_t bit;
-+	const char *str;
-+} mgmt_phy_table[] = {
-+	{  0, "1MTX"	},
-+	{  1, "1MRX"	},
-+	{  2, "2MTX"	},
-+	{  3, "2MRX"	},
-+	{  4, "CODEDTX"	},
-+	{  5, "CODEDRX"	},
-+	{ }
-+};
++	Secondary channel flags can be used to advertise in secondary
++	channel with the corresponding PHYs. These flag bits are mutually
++	exclusive and setting multiple will result in Invalid Parameter
++	error. Choosing either LE 1M or LE 2M will result in using
++	extended advertising on the primary channel with LE 1M and the
++	respectively LE 1M or LE 2M on the secondary channel. Choosing
++	LE Coded will result in using extended advertising on the primary
++	and secondary channels with LE Coded. Choosing none of these flags
++	will result in legacy advertising.
 +
-+static void mgmt_print_phys(const char *label, uint16_t phys)
-+{
-+	uint16_t mask = phys;
-+	int i;
-+
-+	print_field("%s: 0x%4.4x", label, phys);
-+
-+	for (i = 0; mgmt_phy_table[i].str; i++) {
-+		if (phys & (1 << mgmt_phy_table[i].bit)) {
-+			print_field("  %s", mgmt_phy_table[i].str);
-+			mask &= ~(1 << mgmt_phy_table[i].bit);
-+		}
-+	}
-+
-+	if (mask)
-+		print_text(COLOR_UNKNOWN_PHY, "  Unknown PHYs"
-+							" (0x%8.8x)", mask);
-+}
-+
-+static void mgmt_get_phy_rsp(const void *data, uint16_t size)
-+{
-+	uint16_t supported_phys = get_le16(data);
-+	uint16_t selected_phys = get_le16(data + 2);
-+
-+	mgmt_print_phys("Supported PHYs", supported_phys);
-+	mgmt_print_phys("Selected PHYs", selected_phys);
-+}
-+
-+static void mgmt_set_phy_cmd(const void *data, uint16_t size)
-+{
-+	uint16_t default_phys = get_le16(data);
-+
-+	mgmt_print_phys("Default PHYs", default_phys);
-+}
-+
- struct mgmt_data {
- 	uint16_t opcode;
- 	const char *str;
-@@ -12118,6 +12168,12 @@ static const struct mgmt_data mgmt_command_table[] = {
- 	{ 0x0043, "Set Appearance",
- 				mgmt_set_apperance_cmd, 2, true,
- 				mgmt_null_rsp, 0, true },
-+	{ 0x0044, "Get PHY Configuration",
-+				mgmt_null_cmd, 0, true,
-+				mgmt_get_phy_rsp, 4, true },
-+	{ 0x0045, "Set PHY Configuration",
-+				mgmt_set_phy_cmd, 2, true,
-+				mgmt_null_rsp, 0, true },
- 	{ }
- };
- 
-@@ -12496,6 +12552,13 @@ static void mgmt_ext_controller_info_changed_evt(const void *data, uint16_t size
- 	print_eir(data + 2, size - 2, false);
- }
- 
-+static void mgmt_phy_changed_evt(const void *data, uint16_t size)
-+{
-+	uint16_t selected_phys = get_le16(data);
-+
-+	mgmt_print_phys("Selected PHYs", selected_phys);
-+}
-+
- static const struct mgmt_data mgmt_event_table[] = {
- 	{ 0x0001, "Command Complete",
- 			mgmt_command_complete_evt, 3, false },
-@@ -12571,6 +12634,8 @@ static const struct mgmt_data mgmt_event_table[] = {
- 			mgmt_advertising_removed_evt, 1, true },
- 	{ 0x0025, "Extended Controller Information Changed",
- 			mgmt_ext_controller_info_changed_evt, 2, false },
-+	{ 0x0026, "PHY Configuration Changed",
-+			mgmt_phy_changed_evt, 2, true },
- 	{ }
- };
+ 	The Duration parameter configures the length of an Instance. The
+ 	value is in seconds.
  
 -- 
 2.7.4
