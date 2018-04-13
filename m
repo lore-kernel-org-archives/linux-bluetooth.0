@@ -1,12 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Sat, 14 Apr 2018 00:28:54 +0800
+Date: Sat, 14 Apr 2018 00:28:55 +0800
 From: kbuild test robot <lkp@intel.com>
 To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 Cc: kbuild-all@01.org, linux-bluetooth@vger.kernel.org,
         Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: Re: [PATCH v1 15/18] Bluetooth: Implement disable and removal of adv
- instance
-Message-ID: <201804132202.mLXQJclE%fengguang.wu@intel.com>
+Subject: [RFC PATCH] Bluetooth: __hci_req_remove_ext_adv_set() can be static
+Message-ID: <20180413162854.GA9996@lkp-snb01>
 References: <1523531987-17140-16-git-send-email-jaganathx.kanakkassery@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -14,28 +13,23 @@ In-Reply-To: <1523531987-17140-16-git-send-email-jaganathx.kanakkassery@intel.co
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
 
-Thank you for the patch! Perhaps something to improve:
-
-[auto build test WARNING on bluetooth-next/master]
-[also build test WARNING on v4.16 next-20180413]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-
-url:    https://github.com/0day-ci/linux/commits/Jaganath-Kanakkassery/Extended-Adv-Scan-Connection-and-PHY-support/20180413-201735
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
-
-
-sparse warnings: (new ones prefixed by >>)
-
->> net/bluetooth/hci_request.c:1446:6: sparse: symbol '__hci_req_remove_ext_adv_set' was not declared. Should it be static?
-
-Please review and possibly fold the followup patch.
-
+Fixes: 8369ebfd29c2 ("Bluetooth: Implement disable and removal of adv instance")
+Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+ hci_request.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 0e470f7..341b5bd 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1443,7 +1443,7 @@ static void adv_timeout_expire(struct work_struct *work)
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-void __hci_req_remove_ext_adv_set(struct hci_request *req, u8 instance)
++static void __hci_req_remove_ext_adv_set(struct hci_request *req, u8 instance)
+ {
+ 	struct hci_cp_le_remove_adv_set cp;
+ 
