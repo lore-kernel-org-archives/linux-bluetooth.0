@@ -1,28 +1,22 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH] substitute spaces with tabs
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180412225433.57726-1-nunzio.meli@shazam.com>
-Date: Fri, 13 Apr 2018 08:11:25 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-        Nunzio Meli <nunzio.meli@shazam.com>
-Message-Id: <DA28713A-728D-47F8-9282-86FBA55015DB@holtmann.org>
-References: <20180412225433.57726-1-nunzio.meli@shazam.com>
-To: Nunzio Meli <nunziomeli5@gmail.com>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@kernel.org
+Subject: [Bug 199351] intel 8265 bluetooth no longer functions as of 4.16
+Date: Fri, 13 Apr 2018 05:00:48 +0000
+Message-ID: <bug-199351-62941-T6vEhPD2xY@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-199351-62941@https.bugzilla.kernel.org/>
+References: <bug-199351-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nunzio,
+https://bugzilla.kernel.org/show_bug.cgi?id=199351
 
-> ---
-> drivers/bluetooth/hci_intel.c | 12 ++++++------
-> 1 file changed, 6 insertions(+), 6 deletions(-)
+--- Comment #8 from Bernd Steinhauser (linux@bernd-steinhauser.de) ---
+Interesting, because that's exactly the option that I found to cause my problem
+as well, even though the outcome seems to be different. ;)
 
-I am missing Signed-off-by and proper subject line. See submitting patches guide.
-
-Regards
-
-Marcel
-
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
