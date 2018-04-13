@@ -1,104 +1,267 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 13 Apr 2018 22:29:11 +0800
-From: kbuild test robot <lkp@intel.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Cc: kbuild-all@01.org, linux-bluetooth@vger.kernel.org,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: Re: [PATCH v1 16/18] Bluetooth: Use ext adv for directed adv
-Message-ID: <201804132258.WzVQyRsH%fengguang.wu@intel.com>
-References: <1523531987-17140-17-git-send-email-jaganathx.kanakkassery@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1523531987-17140-17-git-send-email-jaganathx.kanakkassery@intel.com>
+From: Avichal Agarwal <avichal.a@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com, anupam.r@samsung.com,
+        Avichal Agarwal <avichal.a@samsung.com>
+Subject: [PATCH Bluez] client/gatt : Add support for Included Service
+Date: Fri, 13 Apr 2018 14:23:19 +0530
+Message-id: <1523609599-13117-1-git-send-email-avichal.a@samsung.com>
+References: <CGME20180413085416epcas2p4708d940b4466a3f390d847a14058588b@epcas2p4.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
-
-Thank you for the patch! Perhaps something to improve:
-
-[auto build test WARNING on bluetooth-next/master]
-[also build test WARNING on v4.16 next-20180413]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-
-url:    https://github.com/0day-ci/linux/commits/Jaganath-Kanakkassery/Extended-Adv-Scan-Connection-and-PHY-support/20180413-201735
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
-
-
-sparse warnings: (new ones prefixed by >>)
-
->> net/bluetooth/hci_conn.c:868:35: sparse: incorrect type in assignment (different base types) @@    expected restricted __le16 [addressable] [usertype] evt_properties @@    got e] evt_properties @@
-   net/bluetooth/hci_conn.c:868:35:    expected restricted __le16 [addressable] [usertype] evt_properties
-   net/bluetooth/hci_conn.c:868:35:    got int
-
-vim +868 net/bluetooth/hci_conn.c
-
-   855	
-   856	static void hci_req_directed_advertising(struct hci_request *req,
-   857						 struct hci_conn *conn)
-   858	{
-   859		struct hci_dev *hdev = req->hdev;
-   860		u8 own_addr_type;
-   861		u8 enable;
-   862	
-   863		if (ext_adv_capable(hdev)) {
-   864			struct hci_cp_le_set_ext_adv_params cp;
-   865	
-   866			memset(&cp, 0, sizeof(cp));
-   867	
- > 868			cp.evt_properties = LE_LEGACY_ADV_DIRECT_IND;
-   869			cp.own_addr_type = own_addr_type;
-   870			cp.channel_map = hdev->le_adv_channel_map;
-   871			cp.tx_power = 127;
-   872			cp.primary_phy = HCI_ADV_PHY_1M;
-   873			cp.secondary_phy = HCI_ADV_PHY_1M;
-   874			cp.handle = 0; /* Use instance 0 for directed adv */
-   875			cp.own_addr_type = own_addr_type;
-   876			cp.peer_addr_type = conn->dst_type;
-   877			bacpy(&cp.peer_addr, &conn->dst);
-   878	
-   879			hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
-   880	
-   881			__hci_req_enable_ext_advertising(req);
-   882		} else {
-   883			struct hci_cp_le_set_adv_param cp;
-   884	
-   885			/* Clear the HCI_LE_ADV bit temporarily so that the
-   886			 * hci_update_random_address knows that it's safe to go ahead
-   887			 * and write a new random address. The flag will be set back on
-   888			 * as soon as the SET_ADV_ENABLE HCI command completes.
-   889			 */
-   890			hci_dev_clear_flag(hdev, HCI_LE_ADV);
-   891	
-   892			/* Set require_privacy to false so that the remote device has a
-   893			 * chance of identifying us.
-   894			 */
-   895			if (hci_update_random_address(req, false, conn_use_rpa(conn),
-   896						      &own_addr_type) < 0)
-   897				return;
-   898	
-   899			memset(&cp, 0, sizeof(cp));
-   900			cp.type = LE_ADV_DIRECT_IND;
-   901			cp.own_address_type = own_addr_type;
-   902			cp.direct_addr_type = conn->dst_type;
-   903			bacpy(&cp.direct_addr, &conn->dst);
-   904			cp.channel_map = hdev->le_adv_channel_map;
-   905	
-   906			hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
-   907	
-   908			enable = 0x01;
-   909			hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable),
-   910				    &enable);
-   911		}
-   912	
-   913		conn->state = BT_CONNECT;
-   914	}
-   915	
-
+included service support implemented at service registration
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+ client/gatt.c | 147 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ client/gatt.h |   5 ++
+ client/main.c |  20 ++++++++
+ 3 files changed, 172 insertions(+)
+
+diff --git a/client/gatt.c b/client/gatt.c
+index 80c1243..b762b4f 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -85,6 +85,7 @@ struct service {
+ 	char *uuid;
+ 	bool primary;
+ 	GList *chrcs;
++	GList *inc;
+ };
+ 
+ static GList *local_services;
+@@ -127,6 +128,29 @@ static void print_service(struct service *service, const char *description)
+ 					service->path, service->uuid, text);
+ }
+ 
++static void print_inc_service(struct service *service, const char *description)
++{
++	const char *text;
++
++	text = bt_uuidstr_to_str(service->uuid);
++	if (!text)
++		bt_shell_printf("%s%s%s%s Included Service\n\t%s\n\t%s\n",
++					description ? "[" : "",
++					description ? : "",
++					description ? "] " : "",
++					service->primary ? "Primary" :
++					"Secondary",
++					service->path, service->uuid);
++	else
++		bt_shell_printf("%s%s%s%s Included Service\n\t%s\n\t%s\n\t%s\n",
++					description ? "[" : "",
++					description ? : "",
++					description ? "] " : "",
++					service->primary ? "Primary" :
++					"Secondary",
++					service->path, service->uuid, text);
++}
++
+ static void print_service_proxy(GDBusProxy *proxy, const char *description)
+ {
+ 	struct service service;
+@@ -1153,11 +1177,19 @@ static void chrc_unregister(void *data)
+ 						CHRC_INTERFACE);
+ }
+ 
++static void inc_unregister(void *data)
++{
++	char *path = data;
++
++	g_free(path);
++}
++
+ static void service_free(void *data)
+ {
+ 	struct service *service = data;
+ 
+ 	g_list_free_full(service->chrcs, chrc_unregister);
++	g_list_free_full(service->inc, inc_unregister);
+ 	g_free(service->path);
+ 	g_free(service->uuid);
+ 	g_free(service);
+@@ -1186,9 +1218,53 @@ static gboolean service_get_primary(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++
++static gboolean service_get_includes(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	DBusMessageIter array;
++	struct service *service = data;
++	char *inc  = NULL;
++	GList *l;
++
++	if (service->inc) {
++		for (l =  service->inc ; l; l = g_list_next(l)) {
++
++			inc = l->data;
++			dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++						DBUS_TYPE_OBJECT_PATH_AS_STRING, &array);
++
++			dbus_message_iter_append_basic(&array, DBUS_TYPE_OBJECT_PATH,
++										&inc);
++
++		}
++
++		dbus_message_iter_close_container(iter, &array);
++
++		return TRUE;
++	}
++
++	return FALSE;
++
++}
++
++static gboolean service_exist_includes(const GDBusPropertyTable *property,
++							void *data)
++{
++	struct service *service = data;
++
++	if (service->inc)
++		return TRUE;
++	else
++		return FALSE;
++
++}
++
++
+ static const GDBusPropertyTable service_properties[] = {
+ 	{ "UUID", "s", service_get_uuid },
+ 	{ "Primary", "b", service_get_primary },
++	{ "Includes", "ao", service_get_includes, NULL,	service_exist_includes },
+ 	{ }
+ };
+ 
+@@ -1280,6 +1356,77 @@ void gatt_unregister_service(DBusConnection *conn, GDBusProxy *proxy,
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
++static char *inc_find(struct service  *serv, char *path)
++{
++	GList *lc;
++
++	for (lc = serv->inc; lc; lc =  g_list_next(lc)) {
++		char *incp = lc->data;
++		/* match object path */
++		if (!strcmp(incp, path))
++			return incp;
++	}
++
++	return NULL;
++}
++
++void gatt_register_include(DBusConnection *conn, GDBusProxy *proxy,
++					int argc, char *argv[])
++{
++	struct service *service, *inc_service;
++	char *inc_path;
++
++	if (!local_services) {
++		bt_shell_printf("No service registered\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	service = g_list_last(local_services)->data;
++
++
++	inc_service = service_find(argv[1]);
++	if (!inc_service) {
++		bt_shell_printf("Failed to find  service object\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	inc_path = g_strdup(service->path);
++
++	inc_service->inc = g_list_append(inc_service->inc, inc_path);
++
++	print_service(inc_service, COLORED_NEW);
++	print_inc_service(service, COLORED_NEW);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++void gatt_unregister_include(DBusConnection *conn, GDBusProxy *proxy,
++						int argc, char *argv[])
++{
++	struct service *ser_inc, *service;
++	char *path = NULL;
++
++	service = service_find(argv[1]);
++	if (!service) {
++		bt_shell_printf("Failed to unregister include service object\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	ser_inc = service_find(argv[2]);
++	if (!ser_inc) {
++		bt_shell_printf("Failed to find  include service object\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	path = inc_find(service, ser_inc->path);
++	if (path) {
++		service->inc = g_list_remove(service->inc, path);
++		inc_unregister(path);
++	}
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
+ static gboolean chrc_get_uuid(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+diff --git a/client/gatt.h b/client/gatt.h
+index f4c36b8..d169552 100644
+--- a/client/gatt.h
++++ b/client/gatt.h
+@@ -65,3 +65,8 @@ void gatt_register_desc(DBusConnection *conn, GDBusProxy *proxy,
+ 						int argc, char *argv[]);
+ void gatt_unregister_desc(DBusConnection *conn, GDBusProxy *proxy,
+ 						int argc, char *argv[]);
++
++void gatt_register_include(DBusConnection *conn, GDBusProxy *proxy,
++					int argc, char *argv[]);
++void gatt_unregister_include(DBusConnection *conn, GDBusProxy *proxy,
++						int argc, char *argv[]);
+diff --git a/client/main.c b/client/main.c
+index b96278d..9d0220d 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2000,6 +2000,22 @@ static void cmd_register_service(int argc, char *argv[])
+ 	gatt_register_service(dbus_conn, default_ctrl->proxy, argc, argv);
+ }
+ 
++static void cmd_register_includes(int argc, char *argv[])
++{
++	if (check_default_ctrl() == FALSE)
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	gatt_register_include(dbus_conn, default_ctrl->proxy, argc, argv);
++}
++
++static void cmd_unregister_includes(int argc, char *argv[])
++{
++	if (check_default_ctrl() == FALSE)
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	gatt_unregister_include(dbus_conn, default_ctrl->proxy, argc, argv);
++}
++
+ static void cmd_unregister_service(int argc, char *argv[])
+ {
+ 	if (check_default_ctrl() == FALSE)
+@@ -2436,6 +2452,10 @@ static const struct bt_shell_menu gatt_menu = {
+ 					"Register application service."  },
+ 	{ "unregister-service", "<UUID/object>", cmd_unregister_service,
+ 					"Unregister application service" },
++	{ "register-includes", "<UUID>", cmd_register_includes,
++					"Register as Included service in." },
++	{ "unregister-includes", "<Service-UUID><Inc-UUID>", cmd_unregister_includes,
++						"Unregister Included service." },
+ 	{ "register-characteristic", "<UUID> <Flags=read,write,notify...> "
+ 				"[authorize]", cmd_register_characteristic,
+ 				"Register application characteristic" },
+-- 
+2.7.4
+
