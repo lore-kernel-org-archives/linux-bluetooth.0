@@ -1,50 +1,41 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Amit Pundir <amit.pundir@linaro.org>
-To: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Cc: dragonboard@lists.96boards.org,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Nicolas Dechesne <nicolas.dechesne@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Stable <stable@vger.kernel.org>
-Subject: [PATCH] Bluetooth: hci_qca: Avoid missing rampatch failure with userspace fw loader
-Date: Mon, 16 Apr 2018 12:10:24 +0530
-Message-Id: <1523860824-3392-1-git-send-email-amit.pundir@linaro.org>
+Date: Sat, 14 Apr 2018 00:28:54 +0800
+From: kbuild test robot <lkp@intel.com>
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Cc: kbuild-all@01.org, linux-bluetooth@vger.kernel.org,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: Re: [PATCH v1 15/18] Bluetooth: Implement disable and removal of adv
+ instance
+Message-ID: <201804132202.mLXQJclE%fengguang.wu@intel.com>
+References: <1523531987-17140-16-git-send-email-jaganathx.kanakkassery@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1523531987-17140-16-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AOSP use userspace firmware loader to load firmwares, which will
-return -EAGAIN in case qca/rampatch_00440302.bin is not found.
-Since there is no rampatch for dragonboard820c QCA controller
-revision, just make it work as is.
+Hi Jaganath,
 
-CC: Loic Poulain <loic.poulain@linaro.org>
-CC: Nicolas Dechesne <nicolas.dechesne@linaro.org>
-CC: Marcel Holtmann <marcel@holtmann.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>
-CC: Stable <stable@vger.kernel.org>
-Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on bluetooth-next/master]
+[also build test WARNING on v4.16 next-20180413]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Jaganath-Kanakkassery/Extended-Adv-Scan-Connection-and-PHY-support/20180413-201735
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
+
+
+sparse warnings: (new ones prefixed by >>)
+
+>> net/bluetooth/hci_request.c:1446:6: sparse: symbol '__hci_req_remove_ext_adv_set' was not declared. Should it be static?
+
+Please review and possibly fold the followup patch.
+
 ---
- drivers/bluetooth/hci_qca.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 05ec530b8a3a..330e9b29e145 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -935,6 +935,12 @@ static int qca_setup(struct hci_uart *hu)
- 	} else if (ret == -ENOENT) {
- 		/* No patch/nvm-config found, run with original fw/config */
- 		ret = 0;
-+	} else if (ret == -EAGAIN) {
-+		/*
-+		 * Userspace firmware loader will return -EAGAIN in case no
-+		 * patch/nvm-config is found, so run with original fw/config.
-+		 */
-+		ret = 0;
- 	}
- 
- 	/* Setup bdaddr */
--- 
-2.7.4
-
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
