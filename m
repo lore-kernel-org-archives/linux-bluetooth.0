@@ -1,35 +1,72 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Sat, 14 Apr 2018 00:28:55 +0800
-From: kbuild test robot <lkp@intel.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Cc: kbuild-all@01.org, linux-bluetooth@vger.kernel.org,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [RFC PATCH] Bluetooth: __hci_req_remove_ext_adv_set() can be static
-Message-ID: <20180413162854.GA9996@lkp-snb01>
-References: <1523531987-17140-16-git-send-email-jaganathx.kanakkassery@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1523531987-17140-16-git-send-email-jaganathx.kanakkassery@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/shell: Fix artifacts related to prompt
+Date: Fri, 13 Apr 2018 17:52:12 +0300
+Message-Id: <20180413145212.30659-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Fixes: 8369ebfd29c2 ("Bluetooth: Implement disable and removal of adv instance")
-Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
+Both bt_shell_prompt_input and bt_shell_input could cause the prompt to
+be printed incorrectly, so they now rely on bt_shell_printf which
+properly check if input and prompt shall be saved/restored.
 ---
- hci_request.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/shell.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 0e470f7..341b5bd 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1443,7 +1443,7 @@ static void adv_timeout_expire(struct work_struct *work)
- 	hci_dev_unlock(hdev);
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index be2a8dfe0..9395598ee 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -475,7 +475,8 @@ void bt_shell_printf(const char *fmt, ...)
+ 	if (save_input) {
+ 		saved_point = rl_point;
+ 		saved_line = rl_copy_text(0, rl_end);
+-		rl_save_prompt();
++		if (!data.saved_prompt)
++			rl_save_prompt();
+ 		rl_replace_line("", 0);
+ 		rl_redisplay();
+ 	}
+@@ -485,7 +486,8 @@ void bt_shell_printf(const char *fmt, ...)
+ 	va_end(args);
+ 
+ 	if (save_input) {
+-		rl_restore_prompt();
++		if (!data.saved_prompt)
++			rl_restore_prompt();
+ 		rl_replace_line(saved_line, 0);
+ 		rl_point = saved_point;
+ 		rl_forced_update_display();
+@@ -523,12 +525,12 @@ void bt_shell_prompt_input(const char *label, const char *msg,
+ 	if (data.saved_prompt)
+ 		return;
+ 
+-	rl_save_prompt();
+-	rl_message(COLOR_RED "[%s]" COLOR_OFF " %s ", label, msg);
+-
+ 	data.saved_prompt = true;
+ 	data.saved_func = func;
+ 	data.saved_user_data = user_data;
++
++	rl_save_prompt();
++	bt_shell_printf(COLOR_RED "[%s]" COLOR_OFF " %s ", label, msg);
  }
  
--void __hci_req_remove_ext_adv_set(struct hci_request *req, u8 instance)
-+static void __hci_req_remove_ext_adv_set(struct hci_request *req, u8 instance)
- {
- 	struct hci_cp_le_remove_adv_set cp;
+ int bt_shell_release_prompt(const char *input)
+@@ -1085,9 +1087,7 @@ void bt_shell_set_prompt(const char *string)
+ 		return;
  
+ 	rl_set_prompt(string);
+-	printf("\r");
+-	rl_on_new_line();
+-	rl_redisplay();
++	bt_shell_printf("\r");
+ }
+ 
+ static bool input_read(struct io *io, void *user_data)
+-- 
+2.14.3
+
