@@ -1,46 +1,85 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
-Subject: Re: [PATCH] ieee802154: assembly of 6LoWPAN fragments improvement
-From: Stefan Schmidt <stefan@osg.samsung.com>
-To: Rafael Vuijk <r.vuijk@sownet.nl>
-Cc: Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-References: <20180221113540.GA54319@Rafael-Mac.intra.sownet.nl>
- <60c224d2-17e5-eaf8-2d1b-763ae4cd92db@osg.samsung.com>
- <20180222212407.GA82995@Rafael-Mac.intra.sownet.nl>
- <e387c90e-ad4d-994f-4043-b6b83eb7a2a8@osg.samsung.com>
-Message-ID: <6a728b61-26f1-7a2a-779d-7205b3c7c3b1@osg.samsung.com>
-Date: Mon, 16 Apr 2018 15:01:34 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <e387c90e-ad4d-994f-4043-b6b83eb7a2a8@osg.samsung.com>
-Content-Type: text/plain; charset=utf-8
-Sender: linux-wpan-owner@vger.kernel.org
+In-Reply-To: <20180413145212.30659-1-luiz.dentz@gmail.com>
+References: <20180413145212.30659-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 16 Apr 2018 13:15:13 +0300
+Message-ID: <CABBYNZJFhRS2KfZuEizzc_0z=pNtOsB4YpxrMAvVZuH4VXo9kw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/shell: Fix artifacts related to prompt
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Rafael.
+Hi,
 
-
-On 02/26/2018 01:10 PM, Stefan Schmidt wrote:
-> On 02/23/2018 12:10 AM, Rafael Vuijk wrote:
->> On Wed, Feb 21, 2018 at 05:31:07PM +0100, Stefan Schmidt wrote:
->>
->>> To me this looks like to distinguished things to fix and thus being fixed in two separate commits.
->> That makes sense. That'd be 1/2 v2 and 2/2 v2 or so?
->> I should split up my own commits more often too ;) (bad habit)
-> Yes, splitting them up in 1/2 and 2/2 and adding the v2 version tag will help me and patchwork to keep track of it.
+On Fri, Apr 13, 2018 at 5:52 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
+> Both bt_shell_prompt_input and bt_shell_input could cause the prompt to
+> be printed incorrectly, so they now rely on bt_shell_printf which
+> properly check if input and prompt shall be saved/restored.
+> ---
+>  src/shared/shell.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index be2a8dfe0..9395598ee 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -475,7 +475,8 @@ void bt_shell_printf(const char *fmt, ...)
+>         if (save_input) {
+>                 saved_point = rl_point;
+>                 saved_line = rl_copy_text(0, rl_end);
+> -               rl_save_prompt();
+> +               if (!data.saved_prompt)
+> +                       rl_save_prompt();
+>                 rl_replace_line("", 0);
+>                 rl_redisplay();
+>         }
+> @@ -485,7 +486,8 @@ void bt_shell_printf(const char *fmt, ...)
+>         va_end(args);
+>
+>         if (save_input) {
+> -               rl_restore_prompt();
+> +               if (!data.saved_prompt)
+> +                       rl_restore_prompt();
+>                 rl_replace_line(saved_line, 0);
+>                 rl_point = saved_point;
+>                 rl_forced_update_display();
+> @@ -523,12 +525,12 @@ void bt_shell_prompt_input(const char *label, const char *msg,
+>         if (data.saved_prompt)
+>                 return;
+>
+> -       rl_save_prompt();
+> -       rl_message(COLOR_RED "[%s]" COLOR_OFF " %s ", label, msg);
+> -
+>         data.saved_prompt = true;
+>         data.saved_func = func;
+>         data.saved_user_data = user_data;
+> +
+> +       rl_save_prompt();
+> +       bt_shell_printf(COLOR_RED "[%s]" COLOR_OFF " %s ", label, msg);
+>  }
+>
+>  int bt_shell_release_prompt(const char *input)
+> @@ -1085,9 +1087,7 @@ void bt_shell_set_prompt(const char *string)
+>                 return;
+>
+>         rl_set_prompt(string);
+> -       printf("\r");
+> -       rl_on_new_line();
+> -       rl_redisplay();
+> +       bt_shell_printf("\r");
+>  }
+>
+>  static bool input_read(struct io *io, void *user_data)
+> --
+> 2.14.3
 
-Just a quick note on this patch. I first waited for you to sent the split version. During this I sadly forgot
-about this issue and patch all together during some travels.
+Applied.
 
-Last week I finally remembered and wanted to setup a test case for this on my own. With the result
-that I found a new patchset in 4.16 breaking 6LoWPAN fragmentation/reassembly for completely. Not
-even initiating a ssh session works. I bisected the commit now and reported to the author. Hopefully
-we can get this fixed soon.
 
-In summary: your patch is nor forgotten and I still want to reproduce it and get your fix in (sorry for the delay)
-You could help from your side by splitting the patch up and sending the second version. Once the above
-mentioned other issue is fixed I will look into yours.
-
-regards
-Stefan Schmidt
+-- 
+Luiz Augusto von Dentz
