@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 5/7] advertising: Add Data implementation
-Date: Wed, 18 Apr 2018 14:05:00 +0300
-Message-Id: <20180418110502.13099-5-luiz.dentz@gmail.com>
+Subject: [RFC 4/7] doc/advertising-api: Add Data property
+Date: Wed, 18 Apr 2018 14:04:59 +0300
+Message-Id: <20180418110502.13099-4-luiz.dentz@gmail.com>
 In-Reply-To: <20180418110502.13099-1-luiz.dentz@gmail.com>
 References: <20180418110502.13099-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the support for Data property.
+Data property can be used to add advertising data with arbitrary/profile
+specific type.
 ---
- src/advertising.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ doc/advertising-api.txt | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index b976562c4..400c21b5e 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -583,6 +583,64 @@ static bool parse_timeout(DBusMessageIter *iter,
- 	return true;
- }
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index 15e64d38a..758c4e687 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -61,6 +61,12 @@ Properties	string Type
+ 			Service Data elements to include. The keys are the
+ 			UUID to associate with the data.
  
-+static bool parse_data(DBusMessageIter *iter, struct btd_adv_client *client)
-+{
-+	DBusMessageIter entries;
++		dict Data [Experimental]
 +
-+	if (!iter) {
-+		bt_ad_clear_data(client->data);
-+		return true;
-+	}
++			Advertising Type to include in the Advertising
++			Data. Key is the advertising type and value is the
++			data as byte array.
 +
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
-+		return false;
-+
-+	dbus_message_iter_recurse(iter, &entries);
-+
-+	bt_ad_clear_data(client->data);
-+
-+	while (dbus_message_iter_get_arg_type(&entries)
-+						== DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry, array;
-+		uint8_t type;
-+		uint8_t *data;
-+		int len;
-+
-+		dbus_message_iter_recurse(&entries, &entry);
-+		dbus_message_iter_get_basic(&entry, &type);
-+
-+		dbus_message_iter_next(&entry);
-+
-+		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
-+			goto fail;
-+
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
-+			goto fail;
-+
-+		dbus_message_iter_recurse(&value, &array);
-+
-+		if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_BYTE)
-+			goto fail;
-+
-+		dbus_message_iter_get_fixed_array(&array, &data, &len);
-+
-+		DBG("Adding Data for type 0x%02x len %u", type, len);
-+
-+		if (!bt_ad_add_data(client->data, type, data, len))
-+			goto fail;
-+
-+		dbus_message_iter_next(&entries);
-+	}
-+
-+	return true;
-+
-+fail:
-+	bt_ad_clear_data(client->data);
-+	return false;
-+}
-+
- static struct adv_parser {
- 	const char *name;
- 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
-@@ -597,6 +655,7 @@ static struct adv_parser {
- 	{ "Appearance", parse_appearance },
- 	{ "Duration", parse_duration },
- 	{ "Timeout", parse_timeout },
-+	{ "Data", parse_data },
- 	{ },
- };
+ 		array{string} Includes
  
+ 			List of features to be included in the advertising
 -- 
 2.14.3
 
