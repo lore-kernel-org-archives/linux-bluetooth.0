@@ -2,78 +2,42 @@ Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH v7 0/4] Bluetooth: hci_qca: Add serdev support
+Subject: Re: [PATCH] Bluetooth: hci_qca: Avoid missing rampatch failure with
+ userspace fw loader
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180329191524.30225-1-thierry.escande@linaro.org>
-Date: Wed, 18 Apr 2018 09:41:17 +0200
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Andy Gross <andy.gross@linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        David Brown <david.brown@linaro.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+In-Reply-To: <1523860824-3392-1-git-send-email-amit.pundir@linaro.org>
+Date: Wed, 18 Apr 2018 09:33:11 +0200
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        dragonboard@lists.96boards.org,
         Loic Poulain <loic.poulain@linaro.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <A9CF38EA-6562-4791-9633-DE1BB45C74A3@holtmann.org>
-References: <20180329191524.30225-1-thierry.escande@linaro.org>
-To: Thierry Escande <thierry.escande@linaro.org>
+        Nicolas Dechesne <nicolas.dechesne@linaro.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Stable <stable@vger.kernel.org>
+Message-Id: <1C10FB33-04EA-4409-BE56-6C8BFC28B3ED@holtmann.org>
+References: <1523860824-3392-1-git-send-email-amit.pundir@linaro.org>
+To: Amit Pundir <amit.pundir@linaro.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thierry,
+Hi Amit,
 
-> This patchset enables the Qualcomm BT controller QCA6174 node in the
-> device tree of the db820c board. This allows the bluetooth chipset to
-> be probed and registered against the hci layer by using the serdev
-> framework.
+> AOSP use userspace firmware loader to load firmwares, which will
+> return -EAGAIN in case qca/rampatch_00440302.bin is not found.
+> Since there is no rampatch for dragonboard820c QCA controller
+> revision, just make it work as is.
 > 
-> This patchset also contains the documentation for the compatible
-> string "qcom,qca6174-bt" related to this chipset.
-> 
-> v7:
-> - Add a new patch enabling regulators and gpios for the bt/wlan
->  combo chip
-> 
-> v6:
-> - Move pinctrl properties into subnodes
-> - fix binding documentation
-> 
-> v5:
-> - Rename 'bt-disable-n' gpio as 'enable'
-> 
-> v4:
-> - Fix dt binding documentation
-> - Address some other issues in patch #3
-> 
-> v3:
-> - Address comments for patch #3 (details in patch)
-> 
-> v2:
-> - Fix author email
-> 
-> 
-> Srinivas Kandagatla (1):
->  arm64: dts: apq8096-db820c: Enable wlan and bt en pins
-> 
-> Thierry Escande (3):
->  arm64: dts: apq8096-db820c: enable bluetooth node
->  dt-bindings: net: bluetooth: Add qualcomm-bluetooth
->  Bluetooth: hci_qca: Add serdev support
-> 
-> .../devicetree/bindings/net/qualcomm-bluetooth.txt |  30 ++++++
-> arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  |  26 +++++
-> .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    |  32 ++++++
-> arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       |  62 ++++++++++++
-> arch/arm64/boot/dts/qcom/msm8996.dtsi              |  10 ++
-> drivers/bluetooth/Kconfig                          |   1 +
-> drivers/bluetooth/hci_qca.c                        | 109 ++++++++++++++++++++-
-> 7 files changed, 268 insertions(+), 2 deletions(-)
-> create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> CC: Loic Poulain <loic.poulain@linaro.org>
+> CC: Nicolas Dechesne <nicolas.dechesne@linaro.org>
+> CC: Marcel Holtmann <marcel@holtmann.org>
+> CC: Johan Hedberg <johan.hedberg@gmail.com>
+> CC: Stable <stable@vger.kernel.org>
+> Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+> ---
+> drivers/bluetooth/hci_qca.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 
-all 4 patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
