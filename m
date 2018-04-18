@@ -1,50 +1,80 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] shared/gatt-server: Fix prepare write queuing
-Date: Wed, 18 Apr 2018 10:37:12 +0200
-Message-Id: <20180418083712.30846-3-grzegorz.kolodziejczyk@codecoup.pl>
-In-Reply-To: <20180418083712.30846-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20180418083712.30846-1-grzegorz.kolodziejczyk@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH v7 0/4] Bluetooth: hci_qca: Add serdev support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180329191524.30225-1-thierry.escande@linaro.org>
+Date: Wed, 18 Apr 2018 09:41:17 +0200
+Cc: Rob Herring <robh+dt@kernel.org>,
+        Andy Gross <andy.gross@linaro.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        David Brown <david.brown@linaro.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+        linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <A9CF38EA-6562-4791-9633-DE1BB45C74A3@holtmann.org>
+References: <20180329191524.30225-1-thierry.escande@linaro.org>
+To: Thierry Escande <thierry.escande@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Multiple prepare writes may be done for multiple attributes. Queue
-mechanism must be aware of handle under which preparation is done.
----
- src/shared/gatt-server.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+Hi Thierry,
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 4b554f665..20d01fd08 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1190,6 +1190,14 @@ static bool prep_data_new(struct bt_gatt_server *server,
- 	return true;
- }
- 
-+static bool match_prep_attr_handle(const void *data, const void *match_data)
-+{
-+	const struct prep_write_data *prep_data = data;
-+	const uint16_t *match_handle = match_data;
-+
-+	return prep_data->handle == *match_handle;
-+}
-+
- static bool store_prep_data(struct bt_gatt_server *server,
- 					uint16_t handle, uint16_t offset,
- 					uint16_t length, uint8_t *value)
-@@ -1200,7 +1208,9 @@ static bool store_prep_data(struct bt_gatt_server *server,
- 	 * Now lets check if prep write is a continuation of long write
- 	 * If so do aggregation of data
- 	 */
--	prep_data = queue_peek_tail(server->prep_queue);
-+	prep_data = queue_find(server->prep_queue, match_prep_attr_handle,
-+								&handle);
-+
- 	if (prep_data && (prep_data->handle == handle) &&
- 			(offset == (prep_data->length + prep_data->offset)))
- 		return append_prep_data(prep_data, handle, length, value);
--- 
-2.13.6
+> This patchset enables the Qualcomm BT controller QCA6174 node in the
+> device tree of the db820c board. This allows the bluetooth chipset to
+> be probed and registered against the hci layer by using the serdev
+> framework.
+> 
+> This patchset also contains the documentation for the compatible
+> string "qcom,qca6174-bt" related to this chipset.
+> 
+> v7:
+> - Add a new patch enabling regulators and gpios for the bt/wlan
+>  combo chip
+> 
+> v6:
+> - Move pinctrl properties into subnodes
+> - fix binding documentation
+> 
+> v5:
+> - Rename 'bt-disable-n' gpio as 'enable'
+> 
+> v4:
+> - Fix dt binding documentation
+> - Address some other issues in patch #3
+> 
+> v3:
+> - Address comments for patch #3 (details in patch)
+> 
+> v2:
+> - Fix author email
+> 
+> 
+> Srinivas Kandagatla (1):
+>  arm64: dts: apq8096-db820c: Enable wlan and bt en pins
+> 
+> Thierry Escande (3):
+>  arm64: dts: apq8096-db820c: enable bluetooth node
+>  dt-bindings: net: bluetooth: Add qualcomm-bluetooth
+>  Bluetooth: hci_qca: Add serdev support
+> 
+> .../devicetree/bindings/net/qualcomm-bluetooth.txt |  30 ++++++
+> arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  |  26 +++++
+> .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    |  32 ++++++
+> arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       |  62 ++++++++++++
+> arch/arm64/boot/dts/qcom/msm8996.dtsi              |  10 ++
+> drivers/bluetooth/Kconfig                          |   1 +
+> drivers/bluetooth/hci_qca.c                        | 109 ++++++++++++++++++++-
+> 7 files changed, 268 insertions(+), 2 deletions(-)
+> create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
 
+all 4 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
