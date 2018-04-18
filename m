@@ -2,50 +2,29 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [RFC] Bluetooth: Fix spurious error message
+Subject: Re: Low latency options for Bluetooth?
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180329094117.25855-1-szymon.janc@codecoup.pl>
-Date: Wed, 18 Apr 2018 09:04:51 +0200
+In-Reply-To: <87wox5di3k.fsf@mure.haselwarter.org>
+Date: Wed, 18 Apr 2018 08:42:03 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6B83B342-1195-4E83-9B81-CB66DA3A0A0A@holtmann.org>
-References: <20180329094117.25855-1-szymon.janc@codecoup.pl>
-To: Szymon Janc <szymon.janc@codecoup.pl>,
-        Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <5AE870C0-52D4-4EA8-B947-D33AE0662461@holtmann.org>
+References: <87wox5di3k.fsf@mure.haselwarter.org>
+To: Philipp Haselwarter <philipp@haselwarter.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Philipp,
 
-> This message was debug message before 2064ee332e4c1b7495cf68b. Looks
-> like it was changed by accident in that patch. This is causing some
-> error messages when doing BR/EDR discovery since Inquiry Command
-> generates Command Status event, not Command Complete.
+> Legacy bluetooth codecs have a latency of ~200 ms or more, which creates
+> a noticeable lag when watching videos or during voice calls.
 > 
-> I'm sending this as RFC for now since while things seem to work fine
-> despite this condition (and it was like that for quite some time) it
-> feels like this is indeed case that should be handled by HCI request
-> code.
+> The AptX Low Latency (LL) codec can provide a stable connection with at
+> most 40 ms of latency.
 > 
-> Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
-> ---
-> net/bluetooth/hci_event.c | 3 +--
-> 1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index cd3bbb766c24..3f111343f57b 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -5207,8 +5207,7 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
-> 	}
-> 
-> 	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
-> -		bt_dev_err(hdev, "last event is not cmd complete (0x%2.2x)",
-> -			   hdr->evt);
-> +		BT_DBG("last event is not cmd complete (0x%2.2x)", hdr->evt);
-> 		return false;
-> 	}
+> - Is there a way to get AptX LL to work on Linux?
+> - Are there alternatives for a low latency Bluetooth connection?
 
-I changed this intentionally since it looked like an error to me. However Johan needs to have a look at this and we need to get a proper fix. Just hiding it behind a debug statement is not helping.
+with BlueZ for Android we actually had AptX working (given CSR provided you with a correct binary).
 
 Regards
 
