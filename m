@@ -1,40 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Ankit Navik <ankit.p.navik@intel.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] src/profile: Updates HFP version to 1.7
-Date: Wed, 18 Apr 2018 15:29:21 +0530
-Message-Id: <1524045561-14167-1-git-send-email-ankit.p.navik@intel.com>
+Subject: [PATCH BlueZ 2/3] client: Fix writing attribute values
+Date: Wed, 18 Apr 2018 10:37:11 +0200
+Message-Id: <20180418083712.30846-2-grzegorz.kolodziejczyk@codecoup.pl>
+In-Reply-To: <20180418083712.30846-1-grzegorz.kolodziejczyk@codecoup.pl>
+References: <20180418083712.30846-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add changes to update HFP version to 0x0107 for HFP_HS_UUID and
-HFP_AG_UUID.
+Attribute values is not copied with dbus_message_iter_get_fixed_array,
+so gatt write callback needs to replace old value with reallocation and
+copy.
 ---
- src/profile.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ client/gatt.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/src/profile.c b/src/profile.c
-index 7c5318c..1e9c585 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1971,7 +1971,7 @@ static struct default_settings {
- 		.authorize	= true,
- 		.auto_connect	= true,
- 		.get_record	= get_hfp_hf_record,
--		.version	= 0x0105,
-+		.version	= 0x0107,
- 	}, {
- 		.uuid		= HFP_AG_UUID,
- 		.name		= "Hands-Free Voice gateway",
-@@ -1981,7 +1981,7 @@ static struct default_settings {
- 		.authorize	= true,
- 		.auto_connect	= true,
- 		.get_record	= get_hfp_ag_record,
--		.version	= 0x0105,
-+		.version	= 0x0107,
- 	}, {
- 		.uuid		= HSP_AG_UUID,
- 		.name		= "Headset Voice gateway",
+diff --git a/client/gatt.c b/client/gatt.c
+index 52a999dc9..102c11437 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -1589,12 +1589,18 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
+ static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len)
+ {
+ 	DBusMessageIter array;
++	uint8_t *read_value;
++	int read_len;
+ 
+ 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
+ 		return -EINVAL;
+ 
+ 	dbus_message_iter_recurse(iter, &array);
+-	dbus_message_iter_get_fixed_array(&array, value, len);
++	dbus_message_iter_get_fixed_array(&array, &read_value, &read_len);
++
++	g_free(*value);
++	*value = g_memdup(read_value, read_len);
++	*len = read_len;
+ 
+ 	return 0;
+ }
 -- 
-2.7.4
+2.13.6
 
