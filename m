@@ -1,199 +1,68 @@
-Return-Path: <matthias.bgg@gmail.com>
-Subject: Re: [PATCH v1 3/7] soc: mediatek: reuse read[l,x]_poll_timeout
- helpers
-To: sean.wang@mediatek.com, robh+dt@kernel.org, mark.rutland@arm.com,
- marcel@holtmann.org, johan.hedberg@gmail.com
-Cc: devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-kernel@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>,
- Weiyi Lu <weiyi.lu@mediatek.com>
-References: <cover.1522736996.git.sean.wang@mediatek.com>
- <2c0d233c658fa6093a18a54e82a3e51340251bc9.1522736996.git.sean.wang@mediatek.com>
-From: Matthias Brugger <matthias.bgg@gmail.com>
-Message-ID: <549e6adc-73c1-aa03-93dc-578138729750@gmail.com>
-Date: Wed, 18 Apr 2018 17:06:52 +0200
-MIME-Version: 1.0
-In-Reply-To: <2c0d233c658fa6093a18a54e82a3e51340251bc9.1522736996.git.sean.wang@mediatek.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [RFC 2/7] doc/device-api: Add AdvertisingData property
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZLCcws0W7yCXoV86M+NgjCEWzKwWzgakbswH-L6dLcMPg@mail.gmail.com>
+Date: Wed, 18 Apr 2018 16:54:32 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <67640720-0FEB-4496-96CB-4DCDC562C75C@holtmann.org>
+References: <20180418110502.13099-1-luiz.dentz@gmail.com>
+ <20180418110502.13099-2-luiz.dentz@gmail.com>
+ <B738AD8F-D0DA-4BFE-ADE9-9AEE08437D59@holtmann.org>
+ <CABBYNZLCcws0W7yCXoV86M+NgjCEWzKwWzgakbswH-L6dLcMPg@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
-
-On 04/03/2018 09:15 AM, sean.wang@mediatek.com wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
+>>> This adds AdvertisingData which exposes data being advertised which is
+>>> may be useful for profiles not handled by bluetoothd.
+>>> ---
+>>> doc/device-api.txt | 5 +++++
+>>> 1 file changed, 5 insertions(+)
+>>> 
+>>> diff --git a/doc/device-api.txt b/doc/device-api.txt
+>>> index 1b448eef1..f2f8464bc 100644
+>>> --- a/doc/device-api.txt
+>>> +++ b/doc/device-api.txt
+>>> @@ -251,3 +251,8 @@ Properties        string Address [readonly]
+>>>              array{byte} AdvertisingFlags [readonly, experimental]
+>>> 
+>>>                      The Advertising Data Flags of the remote device.
+>>> +
+>>> +             dict AdvertisingData [readonly, experimental]
+>>> +
+>>> +                     The Advertising Data of the remote device. Keys are
+>>> +                     are 8 bits AD Type followed by data as byte array.
+>> 
+>> this somehow needs to be explained on how a dict like that would look like. And also which AD types are _not_ valid here. Or at least not valid in conjunction with using other properties.
 > 
-> Reuse the common helpers read[l,x]_poll_timeout provided by Linux core
-> instead of an open-coded handling. The name of the local variable
-> sram_pdn_ack in scpsys_power_on is renamed to pdn_ack in order to be
-> consistent with the one used in scpsys_power_off.
-> 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> Cc: Matthias Brugger <matthias.bgg@gmail.com>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Weiyi Lu <weiyi.lu@mediatek.com>
-> ---
+> Sure, I can add a couple of examples for the existing profiles like
+> Transport Discovery Data. For the peripheral we could limit the
+> available type to just AD types available in the assigned number, like
+> a whitelist, or blacklist the types that either kernel or bluetooothd
+> are managing, I guess either way would work but maintaining the first
+> option might be more troublesome since there are new profile being
+> adopted all the time which was the reason why I haven't bother adding
+> profile specific properties since we would end up with too many. There
+> is also the option to use Advertising1 interface instead of Device1
+> that way central and peripheral APIs would be symmetric.
 
-pushed to v4.17-next/soc
+actually I am fine with allowing any AD type, but not allowing conflicting AD type here with other properties. So if you want all freeform, then do it and only use AdvertisingData, but if you want a combination, then certain AD types are not allowed.
 
-Thanks!
+Now I just saw that this is Device API, so all AD fields that are not covered by the exposed properties are fair game. My comment about not conflicting data is for the Advertising API.
 
->  drivers/soc/mediatek/mtk-scpsys.c | 91 ++++++++++-----------------------------
->  1 file changed, 23 insertions(+), 68 deletions(-)
-> 
-> diff --git a/drivers/soc/mediatek/mtk-scpsys.c b/drivers/soc/mediatek/mtk-scpsys.c
-> index d762a46..f9b7248 100644
-> --- a/drivers/soc/mediatek/mtk-scpsys.c
-> +++ b/drivers/soc/mediatek/mtk-scpsys.c
-> @@ -13,6 +13,7 @@
->  #include <linux/clk.h>
->  #include <linux/init.h>
->  #include <linux/io.h>
-> +#include <linux/iopoll.h>
->  #include <linux/mfd/syscon.h>
->  #include <linux/of_device.h>
->  #include <linux/platform_device.h>
-> @@ -27,6 +28,9 @@
->  #include <dt-bindings/power/mt7623a-power.h>
->  #include <dt-bindings/power/mt8173-power.h>
->  
-> +#define MTK_POLL_DELAY_US   10
-> +#define MTK_POLL_TIMEOUT    (jiffies_to_usecs(HZ))
-> +
->  #define SPM_VDE_PWR_CON			0x0210
->  #define SPM_MFG_PWR_CON			0x0214
->  #define SPM_VEN_PWR_CON			0x0230
-> @@ -184,12 +188,10 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
->  {
->  	struct scp_domain *scpd = container_of(genpd, struct scp_domain, genpd);
->  	struct scp *scp = scpd->scp;
-> -	unsigned long timeout;
-> -	bool expired;
->  	void __iomem *ctl_addr = scp->base + scpd->data->ctl_offs;
-> -	u32 sram_pdn_ack = scpd->data->sram_pdn_ack_bits;
-> +	u32 pdn_ack = scpd->data->sram_pdn_ack_bits;
->  	u32 val;
-> -	int ret;
-> +	int ret, tmp;
->  	int i;
->  
->  	if (scpd->supply) {
-> @@ -215,23 +217,10 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
->  	writel(val, ctl_addr);
->  
->  	/* wait until PWR_ACK = 1 */
-> -	timeout = jiffies + HZ;
-> -	expired = false;
-> -	while (1) {
-> -		ret = scpsys_domain_is_on(scpd);
-> -		if (ret > 0)
-> -			break;
-> -
-> -		if (expired) {
-> -			ret = -ETIMEDOUT;
-> -			goto err_pwr_ack;
-> -		}
-> -
-> -		cpu_relax();
-> -
-> -		if (time_after(jiffies, timeout))
-> -			expired = true;
-> -	}
-> +	ret = readx_poll_timeout(scpsys_domain_is_on, scpd, tmp, tmp > 0,
-> +				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
-> +	if (ret < 0)
-> +		goto err_pwr_ack;
->  
->  	val &= ~PWR_CLK_DIS_BIT;
->  	writel(val, ctl_addr);
-> @@ -246,20 +235,10 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
->  	writel(val, ctl_addr);
->  
->  	/* wait until SRAM_PDN_ACK all 0 */
-> -	timeout = jiffies + HZ;
-> -	expired = false;
-> -	while (sram_pdn_ack && (readl(ctl_addr) & sram_pdn_ack)) {
-> -
-> -		if (expired) {
-> -			ret = -ETIMEDOUT;
-> -			goto err_pwr_ack;
-> -		}
-> -
-> -		cpu_relax();
-> -
-> -		if (time_after(jiffies, timeout))
-> -			expired = true;
-> -	}
-> +	ret = readl_poll_timeout(ctl_addr, tmp, (tmp & pdn_ack) == 0,
-> +				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
-> +	if (ret < 0)
-> +		goto err_pwr_ack;
->  
->  	if (scpd->data->bus_prot_mask) {
->  		ret = mtk_infracfg_clear_bus_protection(scp->infracfg,
-> @@ -289,12 +268,10 @@ static int scpsys_power_off(struct generic_pm_domain *genpd)
->  {
->  	struct scp_domain *scpd = container_of(genpd, struct scp_domain, genpd);
->  	struct scp *scp = scpd->scp;
-> -	unsigned long timeout;
-> -	bool expired;
->  	void __iomem *ctl_addr = scp->base + scpd->data->ctl_offs;
->  	u32 pdn_ack = scpd->data->sram_pdn_ack_bits;
->  	u32 val;
-> -	int ret;
-> +	int ret, tmp;
->  	int i;
->  
->  	if (scpd->data->bus_prot_mask) {
-> @@ -310,19 +287,10 @@ static int scpsys_power_off(struct generic_pm_domain *genpd)
->  	writel(val, ctl_addr);
->  
->  	/* wait until SRAM_PDN_ACK all 1 */
-> -	timeout = jiffies + HZ;
-> -	expired = false;
-> -	while (pdn_ack && (readl(ctl_addr) & pdn_ack) != pdn_ack) {
-> -		if (expired) {
-> -			ret = -ETIMEDOUT;
-> -			goto out;
-> -		}
-> -
-> -		cpu_relax();
-> -
-> -		if (time_after(jiffies, timeout))
-> -			expired = true;
-> -	}
-> +	ret = readl_poll_timeout(ctl_addr, tmp, (tmp & pdn_ack) == pdn_ack,
-> +				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
-> +	if (ret < 0)
-> +		goto out;
->  
->  	val |= PWR_ISO_BIT;
->  	writel(val, ctl_addr);
-> @@ -340,23 +308,10 @@ static int scpsys_power_off(struct generic_pm_domain *genpd)
->  	writel(val, ctl_addr);
->  
->  	/* wait until PWR_ACK = 0 */
-> -	timeout = jiffies + HZ;
-> -	expired = false;
-> -	while (1) {
-> -		ret = scpsys_domain_is_on(scpd);
-> -		if (ret == 0)
-> -			break;
-> -
-> -		if (expired) {
-> -			ret = -ETIMEDOUT;
-> -			goto out;
-> -		}
-> -
-> -		cpu_relax();
-> -
-> -		if (time_after(jiffies, timeout))
-> -			expired = true;
-> -	}
-> +	ret = readx_poll_timeout(scpsys_domain_is_on, scpd, tmp, tmp == 0,
-> +				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
-> +	if (ret < 0)
-> +		goto out;
->  
->  	for (i = 0; i < MAX_CLKS && scpd->clk[i]; i++)
->  		clk_disable_unprepare(scpd->clk[i]);
-> 
+> Btw, I don't know what went wrong with Service Data type, afaik that
+> was meant for the profile to use instead of each creating its own AD
+> type, now types can be profile specific without the use of the UUIDs
+> which makes it hard to correlate with the actual profile.
+
+Most likely size or some how stupid things that it is not a real service. This reminds me, I would actually also blacklist the Mesh AD Types since they should not be processed via D-Bus. So lets just say which ones are blacklisted.
+
+Regards
+
+Marcel
+
