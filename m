@@ -1,451 +1,1338 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/7] shared/ad: Add support for arbritary type
-Date: Thu, 19 Apr 2018 16:46:24 +0300
-Message-Id: <20180419134630.15624-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <bgodavar@codeaurora.org>
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	rtatiya@codeaurora.org,
+	thierry.escande@linaro.org,
+	linux-arm-msm@vger.kernel.org,
+	Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [PATCH v2 2/2] Bluetooth: Add support for wcn3990 soc.
+Date: Thu, 19 Apr 2018 19:04:58 +0530
+Message-Id: <1524144898-4645-3-git-send-email-bgodavar@codeaurora.org>
+In-Reply-To: <1524144898-4645-1-git-send-email-bgodavar@codeaurora.org>
+References: <1524144898-4645-1-git-send-email-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+ - Add support to set voltage/current of various regualtors
+   to power up/down BT QCA chip wcn3990.
+ - Add firmware download support for BT QCA chip wcn3990.
 
-This adds APIs to include data of arbritary type as long as it is not
-of a type which blacklisted due to being handled already or it is
-considered to safe to be set by an application.
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 ---
- src/shared/ad.c | 231 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
- src/shared/ad.h |  60 +++++++++++++++
- 2 files changed, 278 insertions(+), 13 deletions(-)
+ drivers/bluetooth/btqca.c        | 393 +++++++++++++++++++++++-------
+ drivers/bluetooth/btqca.h        |  49 +++-
+ drivers/bluetooth/hci_qca.c      | 501 +++++++++++++++++++++++++++++++++------
+ include/net/bluetooth/hci_core.h |   3 +-
+ net/bluetooth/hci_core.c         |   2 +-
+ net/bluetooth/hci_request.c      |  23 ++
+ net/bluetooth/hci_request.h      |   2 +
+ 7 files changed, 812 insertions(+), 161 deletions(-)
 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index 255794dc4..f0e62cef1 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -37,6 +37,7 @@ struct bt_ad {
- 	struct queue *manufacturer_data;
- 	struct queue *solicit_uuids;
- 	struct queue *service_data;
-+	struct queue *data;
- };
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index 0bbdfce..5b47df8 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -1,7 +1,7 @@
+ /*
+  *  Bluetooth supports for Qualcomm Atheros chips
+  *
+- *  Copyright (c) 2015 The Linux Foundation. All rights reserved.
++ *  Copyright (c) 2015, 2018 The Linux Foundation. All rights reserved.
+  *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License version 2
+@@ -19,82 +19,18 @@
+  */
+ #include <linux/module.h>
+ #include <linux/firmware.h>
+-
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+-
+ #include "btqca.h"
  
- struct bt_ad *bt_ad_new(void)
-@@ -48,6 +49,7 @@ struct bt_ad *bt_ad_new(void)
- 	ad->manufacturer_data = queue_new();
- 	ad->solicit_uuids = queue_new();
- 	ad->service_data = queue_new();
-+	ad->data = queue_new();
- 	ad->appearance = UINT16_MAX;
+ #define VERSION "0.1"
  
- 	return bt_ad_ref(ad);
-@@ -94,6 +96,14 @@ static bool manuf_match(const void *data, const void *elem)
- 	return manuf->manufacturer_id == manuf_id;
+-static int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
+-{
+-	struct sk_buff *skb;
+-	struct edl_event_hdr *edl;
+-	struct rome_version *ver;
+-	char cmd;
+-	int err = 0;
+-
+-	BT_DBG("%s: ROME Patch Version Request", hdev->name);
+-
+-	cmd = EDL_PATCH_VER_REQ_CMD;
+-	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
+-				&cmd, HCI_VENDOR_PKT, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		err = PTR_ERR(skb);
+-		BT_ERR("%s: Failed to read version of ROME (%d)", hdev->name,
+-		       err);
+-		return err;
+-	}
+-
+-	if (skb->len != sizeof(*edl) + sizeof(*ver)) {
+-		BT_ERR("%s: Version size mismatch len %d", hdev->name,
+-		       skb->len);
+-		err = -EILSEQ;
+-		goto out;
+-	}
+-
+-	edl = (struct edl_event_hdr *)(skb->data);
+-	if (!edl) {
+-		BT_ERR("%s: TLV with no header", hdev->name);
+-		err = -EILSEQ;
+-		goto out;
+-	}
+-
+-	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
+-	    edl->rtype != EDL_APP_VER_RES_EVT) {
+-		BT_ERR("%s: Wrong packet received %d %d", hdev->name,
+-		       edl->cresp, edl->rtype);
+-		err = -EIO;
+-		goto out;
+-	}
+-
+-	ver = (struct rome_version *)(edl->data);
+-
+-	BT_DBG("%s: Product:0x%08x", hdev->name, le32_to_cpu(ver->product_id));
+-	BT_DBG("%s: Patch  :0x%08x", hdev->name, le16_to_cpu(ver->patch_ver));
+-	BT_DBG("%s: ROM    :0x%08x", hdev->name, le16_to_cpu(ver->rome_ver));
+-	BT_DBG("%s: SOC    :0x%08x", hdev->name, le32_to_cpu(ver->soc_id));
+-
+-	/* ROME chipset version can be decided by patch and SoC
+-	 * version, combination with upper 2 bytes from SoC
+-	 * and lower 2 bytes from patch will be used.
+-	 */
+-	*rome_version = (le32_to_cpu(ver->soc_id) << 16) |
+-			(le16_to_cpu(ver->rome_ver) & 0x0000ffff);
+-
+-out:
+-	kfree_skb(skb);
+-
+-	return err;
+-}
+-
+-static int rome_reset(struct hci_dev *hdev)
++static int qca_btsoc_reset(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+ 	int err;
+ 
+-	BT_DBG("%s: ROME HCI_RESET", hdev->name);
++	BT_DBG("%s: ROME/wcn3990 HCI_RESET", hdev->name);
+ 
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+@@ -108,7 +44,7 @@ static int rome_reset(struct hci_dev *hdev)
+ 	return 0;
  }
  
-+static void data_destroy(void *data)
+-static void rome_tlv_check_data(struct rome_config *config,
++static void rome_tlv_check_data(struct qca_config *config,
+ 				const struct firmware *fw)
+ {
+ 	const u8 *data;
+@@ -194,8 +130,121 @@ static void rome_tlv_check_data(struct rome_config *config,
+ 	}
+ }
+ 
+-static int rome_tlv_send_segment(struct hci_dev *hdev, int idx, int seg_size,
+-				 const u8 *data)
++static void cherokee_tlv_check_data(struct qca_config *config,
++			const struct firmware *fw, bool *dwnd_flag)
 +{
-+	struct bt_ad_data *ad = data;
++	const u8 *data;
++	u32 type_len;
++	u16 tag_id, tag_len;
++	int idx, length;
++	struct tlv_type_hdr *tlv;
++	struct cherokee_tlv_type_patch *tlv_patch;
++	struct tlv_type_nvm *tlv_nvm;
 +
-+	free(ad->data);
-+	free(ad);
++	tlv = (struct tlv_type_hdr *)fw->data;
++
++	type_len = le32_to_cpu(tlv->type_len);
++	length = (type_len >> 8) & 0x00ffffff;
++
++	BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
++	BT_DBG("Length\t\t : %d bytes", length);
++
++	switch (config->type) {
++	case TLV_TYPE_PATCH:
++		tlv_patch = (struct tlv_type_patch *)tlv->data;
++		BT_DBG("Total Length\t\t : %d bytes",
++			le32_to_cpu(tlv_patch->total_size));
++		BT_DBG("Patch Data Length\t : %d bytes",
++			le32_to_cpu(tlv_patch->data_length));
++		BT_DBG("Signing Format Version : 0x%x",
++			tlv_patch->format_version);
++		BT_DBG("Signature Algorithm\t : 0x%x",
++			tlv_patch->signature);
++		BT_DBG("Download flag\t : 0x%x",
++			tlv_patch->dwnd_cfg);
++		BT_DBG("Reserved\t\t : 0x%x",
++			le16_to_cpu(tlv_patch->reserved1));
++		BT_DBG("Product ID\t\t : 0x%04x",
++			le16_to_cpu(tlv_patch->product_id));
++		BT_DBG("Rom Build Version\t : 0x%04x",
++			le16_to_cpu(tlv_patch->rom_build));
++		BT_DBG("Patch Version\t\t : 0x%04x",
++			le16_to_cpu(tlv_patch->patch_version));
++		BT_DBG("Reserved\t\t : 0x%x",
++			le16_to_cpu(tlv_patch->reserved2));
++		BT_DBG("Patch Entry Address\t : 0x%x",
++			le32_to_cpu(tlv_patch->entry));
++		/* If the download flag is 0x03, don't wait
++		 * for response from soc,i.e. 1 to n-1
++		 * segment download.
++		 */
++		if (tlv_patch->dwnd_cfg == 0x03)
++			*dwnd_flag = false;
++		else
++			*dwnd_flag = true;
++		break;
++
++	case TLV_TYPE_NVM:
++		idx = 0;
++		data = tlv->data;
++		while (idx < length) {
++			tlv_nvm = (struct tlv_type_nvm *)(data + idx);
++			tag_id = le16_to_cpu(tlv_nvm->tag_id);
++			tag_len = le16_to_cpu(tlv_nvm->tag_len);
++
++			/* Update NVM tags as needed */
++			switch (tag_id) {
++			case EDL_TAG_ID_HCI:
++				/* HCI transport layer parameters
++				 * enabling software inband sleep
++				 * onto controller side.
++				 */
++				tlv_nvm->data[0] |= 0x80;
++
++				/* UART Baud Rate */
++				tlv_nvm->data[2] = config->user_baud_rate;
++				break;
++			case EDL_TAG_ID_DEEP_SLEEP:
++				/* Sleep enable mask
++				 * enabling deep sleep feature on controller.
++				 */
++				tlv_nvm->data[0] |= 0x01;
++				break;
++			}
++
++			idx += (sizeof(u16) + sizeof(u16) + 8 + tag_len);
++		}
++		break;
++	default:
++		BT_ERR("Unknown TLV type %d", config->type);
++		break;
++	}
 +}
 +
- void bt_ad_unref(struct bt_ad *ad)
- {
- 	if (!ad)
-@@ -110,6 +120,8 @@ void bt_ad_unref(struct bt_ad *ad)
- 
- 	queue_destroy(ad->service_data, uuid_destroy);
- 
-+	queue_destroy(ad->data, data_destroy);
-+
- 	free(ad->name);
- 
- 	free(ad);
-@@ -203,6 +215,24 @@ static size_t name_length(const char *name, size_t *pos)
- 	return len;
- }
- 
-+static size_t data_length(struct queue *queue)
++static int cherokee_tlv_send_segment(struct hci_dev *hdev, int idx,
++					int seg_size, const u8 *data)
 +{
-+	size_t length = 0;
-+	const struct queue_entry *entry;
++	u8 cmd[MAX_SIZE_PER_TLV_SEGMENT + 2];
++	int err = 0;
 +
-+	entry = queue_get_entries(queue);
++	BT_DBG("%s: Download segment #%d size %d", hdev->name, idx, seg_size);
 +
-+	while (entry) {
-+		struct bt_ad_data *data = entry->data;
++	cmd[0] = EDL_PATCH_TLV_REQ_CMD;
++	cmd[1] = seg_size;
++	memcpy(cmd + 2, data, seg_size);
 +
-+		length += 1 + 1 + data->len;
-+
-+		entry = entry->next;
++	err = __hci_cmd_no_event(hdev, EDL_PATCH_CMD_OPCODE, seg_size + 2,
++					cmd);
++	if (err < 0) {
++		BT_ERR("%s: Failed to send TLV segment (%d)", hdev->name, err);
++		return err;
 +	}
 +
-+	return length;
++	return err;
 +}
 +
- static size_t calculate_length(struct bt_ad *ad)
++static int qca_btsoc_tlv_send_segment(struct hci_dev *hdev, int idx,
++					int seg_size, const u8 *data)
  {
- 	size_t length = 0;
-@@ -219,6 +249,8 @@ static size_t calculate_length(struct bt_ad *ad)
- 
- 	length += ad->appearance != UINT16_MAX ? 4 : 0;
- 
-+	length += data_length(ad->data);
-+
- 	return length;
- }
- 
-@@ -258,21 +290,21 @@ static void serialize_uuids(struct queue *uuids, uint8_t uuid_type,
- static void serialize_service_uuids(struct queue *uuids, uint8_t *buf,
- 								uint8_t *pos)
- {
--	serialize_uuids(uuids, BT_UUID16, EIR_UUID16_ALL, buf, pos);
-+	serialize_uuids(uuids, BT_UUID16, BT_AD_UUID16_ALL, buf, pos);
- 
--	serialize_uuids(uuids, BT_UUID32, EIR_UUID32_ALL, buf, pos);
-+	serialize_uuids(uuids, BT_UUID32, BT_AD_UUID32_ALL, buf, pos);
- 
--	serialize_uuids(uuids, BT_UUID128, EIR_UUID128_ALL, buf, pos);
-+	serialize_uuids(uuids, BT_UUID128, BT_AD_UUID128_ALL, buf, pos);
- }
- 
- static void serialize_solicit_uuids(struct queue *uuids, uint8_t *buf,
- 								uint8_t *pos)
- {
--	serialize_uuids(uuids, BT_UUID16, EIR_SOLICIT16, buf, pos);
-+	serialize_uuids(uuids, BT_UUID16, BT_AD_SOLICIT16, buf, pos);
- 
--	serialize_uuids(uuids, BT_UUID32, EIR_SOLICIT32, buf, pos);
-+	serialize_uuids(uuids, BT_UUID32, BT_AD_SOLICIT32, buf, pos);
- 
--	serialize_uuids(uuids, BT_UUID128, EIR_SOLICIT128, buf, pos);
-+	serialize_uuids(uuids, BT_UUID128, BT_AD_SOLICIT128, buf, pos);
- }
- 
- static void serialize_manuf_data(struct queue *manuf_data, uint8_t *buf,
-@@ -285,7 +317,7 @@ static void serialize_manuf_data(struct queue *manuf_data, uint8_t *buf,
- 
- 		buf[(*pos)++] = data->len + 2 + 1;
- 
--		buf[(*pos)++] = EIR_MANUFACTURER_DATA;
-+		buf[(*pos)++] = BT_AD_MANUFACTURER_DATA;
- 
- 		bt_put_le16(data->manufacturer_id, buf + (*pos));
- 
-@@ -312,13 +344,13 @@ static void serialize_service_data(struct queue *service_data, uint8_t *buf,
- 
- 		switch (uuid_len) {
- 		case 2:
--			buf[(*pos)++] = EIR_SVC_DATA16;
-+			buf[(*pos)++] = BT_AD_SERVICE_DATA16;
- 			break;
- 		case 4:
--			buf[(*pos)++] = EIR_SVC_DATA32;
-+			buf[(*pos)++] = BT_AD_SERVICE_DATA32;
- 			break;
- 		case 16:
--			buf[(*pos)++] = EIR_SVC_DATA128;
-+			buf[(*pos)++] = BT_AD_SERVICE_DATA128;
- 			break;
- 		}
- 
-@@ -340,14 +372,14 @@ static void serialize_service_data(struct queue *service_data, uint8_t *buf,
- static void serialize_name(const char *name, uint8_t *buf, uint8_t *pos)
- {
- 	int len;
--	uint8_t type = EIR_NAME_COMPLETE;
-+	uint8_t type = BT_AD_NAME_COMPLETE;
- 
- 	if (!name)
- 		return;
- 
- 	len = strlen(name);
- 	if (len > MAX_ADV_DATA_LEN - (*pos + 2)) {
--		type = EIR_NAME_SHORT;
-+		type = BT_AD_NAME_SHORT;
- 		len = MAX_ADV_DATA_LEN - (*pos + 2);
+ 	struct sk_buff *skb;
+ 	struct edl_event_hdr *edl;
+@@ -264,16 +313,56 @@ static int rome_tlv_download_request(struct hci_dev *hdev,
+ 	data = fw->data;
+ 	for (i = 0; i < total_segment; i++) {
+ 		buffer = data + i * MAX_SIZE_PER_TLV_SEGMENT;
+-		ret = rome_tlv_send_segment(hdev, i, MAX_SIZE_PER_TLV_SEGMENT,
+-					    buffer);
++		ret = qca_btsoc_tlv_send_segment(hdev, i,
++					MAX_SIZE_PER_TLV_SEGMENT, buffer);
+ 		if (ret < 0)
+ 			return -EIO;
  	}
  
-@@ -364,12 +396,30 @@ static void serialize_appearance(uint16_t value, uint8_t *buf, uint8_t *pos)
- 		return;
- 
- 	buf[(*pos)++] = sizeof(value) + 1;
--	buf[(*pos)++] = EIR_GAP_APPEARANCE;
-+	buf[(*pos)++] = BT_AD_GAP_APPEARANCE;
- 
- 	bt_put_le16(value, buf + (*pos));
- 	*pos += 2;
+ 	if (remain_size) {
+ 		buffer = data + total_segment * MAX_SIZE_PER_TLV_SEGMENT;
+-		ret = rome_tlv_send_segment(hdev, total_segment, remain_size,
+-					    buffer);
++		ret = qca_btsoc_tlv_send_segment(hdev, total_segment,
++							remain_size, buffer);
++		if (ret < 0)
++			return -EIO;
++	}
++
++	return 0;
++}
++static int cherokee_tlv_download_request(struct hci_dev *hdev,
++			const struct firmware *fw)
++{
++	const u8 *buffer, *data;
++	int total_segment, remain_size;
++	int ret, i;
++
++	if (!fw || !fw->data)
++		return -EINVAL;
++
++	total_segment = fw->size / MAX_SIZE_PER_TLV_SEGMENT;
++	remain_size = fw->size % MAX_SIZE_PER_TLV_SEGMENT;
++
++	BT_DBG("%s: Total segment num %d remain size %d total size %zu",
++			hdev->name, total_segment, remain_size, fw->size);
++
++	data = fw->data;
++	for (i = 0; i < total_segment; i++) {
++		buffer = data + i * MAX_SIZE_PER_TLV_SEGMENT;
++		/* Read response from soc for last segment sent */
++		if (!remain_size && ((i+1) == total_segment))
++			ret = qca_btsoc_tlv_send_segment(hdev, i,
++					MAX_SIZE_PER_TLV_SEGMENT, buffer);
++		else
++			ret = cherokee_tlv_send_segment(hdev, i,
++					MAX_SIZE_PER_TLV_SEGMENT, buffer);
++		if (ret < 0)
++			return -EIO;
++	}
++
++	if (remain_size) {
++		buffer = data + total_segment * MAX_SIZE_PER_TLV_SEGMENT;
++		ret = qca_btsoc_tlv_send_segment(hdev, total_segment,
++							remain_size, buffer);
+ 		if (ret < 0)
+ 			return -EIO;
+ 	}
+@@ -282,7 +371,7 @@ static int rome_tlv_download_request(struct hci_dev *hdev,
  }
  
-+static void serialize_data(struct queue *queue, uint8_t *buf, uint8_t *pos)
-+{
-+	const struct queue_entry *entry = queue_get_entries(queue);
-+
-+	while (entry) {
-+		struct bt_ad_data *data = entry->data;
-+
-+		buf[(*pos)++] = data->len + 1;
-+		buf[(*pos)++] = data->type;
-+
-+		memcpy(buf + *pos, data->data, data->len);
-+
-+		*pos += data->len;
-+
-+		entry = entry->next;
-+	}
-+}
-+
- uint8_t *bt_ad_generate(struct bt_ad *ad, size_t *length)
+ static int rome_download_firmware(struct hci_dev *hdev,
+-				  struct rome_config *config)
++				  struct qca_config *config)
  {
- 	uint8_t *adv_data;
-@@ -399,6 +449,8 @@ uint8_t *bt_ad_generate(struct bt_ad *ad, size_t *length)
- 
- 	serialize_appearance(ad->appearance, adv_data, &pos);
- 
-+	serialize_data(ad->data, adv_data, &pos);
-+
- 	return adv_data;
+ 	const struct firmware *fw;
+ 	int ret;
+@@ -309,7 +398,46 @@ static int rome_download_firmware(struct hci_dev *hdev,
+ 	return ret;
  }
  
-@@ -756,3 +808,156 @@ void bt_ad_clear_appearance(struct bt_ad *ad)
+-int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++static int cherokee_download_firmware(struct hci_dev *hdev,
++					struct qca_config *config)
++{
++	const struct firmware *fw;
++	bool dwnd_flag = true;
++	int ret;
++
++	BT_INFO("%s: wcn3990  Downloading %s", hdev->name, config->fwname);
++
++	ret = request_firmware(&fw, config->fwname, &hdev->dev);
++	if (ret) {
++		BT_ERR("%s: Failed to request file: %s (%d)", hdev->name,
++			config->fwname, ret);
++		return ret;
++	}
++
++	cherokee_tlv_check_data(config, fw, &dwnd_flag);
++	/* check whether the download flag is set.if bit is enabled
++	 * terminate the ram patch download. As we are not supporting,
++	 * receiving of response from soc for every segment sent.
++	 * We look for response from soc for last segment.
++	 */
++	if (dwnd_flag == true && config->type == TLV_TYPE_PATCH) {
++		BT_ERR("%s: btsoc download flag enabled", hdev->name);
++		return -EOPNOTSUPP;
++	}
++
++	ret = cherokee_tlv_download_request(hdev, fw);
++	if (ret) {
++		BT_ERR("%s: Failed to download file: %s (%d)", hdev->name,
++		config->fwname, ret);
++	}
++
++	release_firmware(fw);
++
++	return ret;
++}
++
++
++int qca_btsoc_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ {
+ 	struct sk_buff *skb;
+ 	u8 cmd[9];
+@@ -332,12 +460,12 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
  
- 	ad->appearance = UINT16_MAX;
+ 	return 0;
  }
-+
-+static bool data_type_match(const void *data, const void *user_data)
+-EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
++EXPORT_SYMBOL_GPL(qca_btsoc_set_bdaddr);
+ 
+ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
+ {
+ 	u32 rome_ver = 0;
+-	struct rome_config config;
++	struct qca_config config;
+ 	int err;
+ 
+ 	BT_DBG("%s: ROME setup on UART", hdev->name);
+@@ -345,7 +473,7 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
+ 	config.user_baud_rate = baudrate;
+ 
+ 	/* Get ROME version information */
+-	err = rome_patch_ver_req(hdev, &rome_ver);
++	err = qca_btsoc_patch_ver_req(hdev, &rome_ver);
+ 	if (err < 0 || rome_ver == 0) {
+ 		BT_ERR("%s: Failed to get version 0x%x", hdev->name, err);
+ 		return err;
+@@ -374,7 +502,7 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
+ 	}
+ 
+ 	/* Perform HCI reset */
+-	err = rome_reset(hdev);
++	err = qca_btsoc_reset(hdev);
+ 	if (err < 0) {
+ 		BT_ERR("%s: Failed to run HCI_RESET (%d)", hdev->name, err);
+ 		return err;
+@@ -386,6 +514,111 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
+ }
+ EXPORT_SYMBOL_GPL(qca_uart_setup_rome);
+ 
++int qca_btsoc_patch_ver_req(struct hci_dev *hdev, u32 *soc_version)
 +{
-+	const struct bt_ad_data *a = data;
-+	const uint8_t type = PTR_TO_UINT(user_data);
++	struct sk_buff *skb;
++	struct edl_event_hdr *edl;
++	struct qca_btsoc_version *ver;
++	char cmd;
++	int err = 0;
 +
-+	return a->type == type;
-+}
++	BT_DBG("%s: BTSOC Patch Version Request", hdev->name);
 +
-+static uint8_t type_blacklist[] = {
-+	BT_AD_FLAGS,
-+	BT_AD_UUID16_SOME,
-+	BT_AD_UUID16_ALL,
-+	BT_AD_UUID32_SOME,
-+	BT_AD_UUID32_ALL,
-+	BT_AD_UUID128_SOME,
-+	BT_AD_UUID128_ALL,
-+	BT_AD_NAME_SHORT,
-+	BT_AD_NAME_COMPLETE,
-+	BT_AD_TX_POWER,
-+	BT_AD_CLASS_OF_DEV,
-+	BT_AD_SSP_HASH,
-+	BT_AD_SSP_RANDOMIZER,
-+	BT_AD_DEVICE_ID,
-+	BT_AD_SMP_TK,
-+	BT_AD_SMP_OOB_FLAGS,
-+	BT_AD_SLAVE_CONN_INTERVAL,
-+	BT_AD_SOLICIT16,
-+	BT_AD_SOLICIT128,
-+	BT_AD_SERVICE_DATA16,
-+	BT_AD_PUBLIC_ADDRESS,
-+	BT_AD_RANDOM_ADDRESS,
-+	BT_AD_GAP_APPEARANCE,
-+	BT_AD_ADVERTISING_INTERVAL,
-+	BT_AD_LE_DEVICE_ADDRESS,
-+	BT_AD_LE_ROLE,
-+	BT_AD_SSP_HASH_P256,
-+	BT_AD_SSP_RANDOMIZER_P256,
-+	BT_AD_SOLICIT32,
-+	BT_AD_SERVICE_DATA32,
-+	BT_AD_SERVICE_DATA128,
-+	BT_AD_LE_SC_CONFIRM_VALUE,
-+	BT_AD_LE_SC_RANDOM_VALUE,
-+	BT_AD_LE_SUPPORTED_FEATURES,
-+	BT_AD_CHANNEL_MAP_UPDATE_IND,
-+	BT_AD_MESH_PROV,
-+	BT_AD_MESH_DATA,
-+	BT_AD_MESH_BEACON,
-+	BT_AD_3D_INFO_DATA,
-+	BT_AD_MANUFACTURER_DATA,
-+};
-+
-+bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len)
-+{
-+	struct bt_ad_data *new_data;
-+	size_t i;
-+
-+	if (!ad)
-+		return false;
-+
-+	if (len > (MAX_ADV_DATA_LEN - 2))
-+		return false;
-+
-+	new_data = queue_find(ad->data, data_type_match, UINT_TO_PTR(type));
-+	if (new_data) {
-+		if (new_data->len == len && !memcmp(new_data->data, data, len))
-+			return false;
-+		new_data->data = realloc(new_data->data, len);
-+		memcpy(new_data->data, data, len);
-+		new_data->len = len;
-+		return true;
++	cmd = EDL_PATCH_VER_REQ_CMD;
++	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
++				&cmd, HCI_VENDOR_PKT, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		BT_ERR("%s: Failed to read version of ROME (%d)", hdev->name,
++		       err);
++		return err;
 +	}
 +
-+	for (i = 0; i < sizeof(type_blacklist); i++) {
-+		if (type == type_blacklist[i])
-+			return false;
++	if (skb->len != sizeof(*edl) + sizeof(*ver)) {
++		BT_ERR("%s: Version size mismatch len %d", hdev->name,
++		       skb->len);
++		err = -EILSEQ;
++		goto out;
 +	}
 +
-+	new_data = new0(struct bt_ad_data, 1);
-+	new_data->type = type;
-+	new_data->data = malloc(len);
-+	if (!new_data->data) {
-+		free(new_data);
-+		return false;
++	edl = (struct edl_event_hdr *)(skb->data);
++	if (!edl) {
++		BT_ERR("%s: TLV with no header", hdev->name);
++		err = -EILSEQ;
++		goto out;
 +	}
 +
-+	memcpy(new_data->data, data, len);
-+	new_data->len = len;
++	if (edl->cresp != EDL_CMD_REQ_RES_EVT ||
++	    edl->rtype != EDL_APP_VER_RES_EVT) {
++		BT_ERR("%s: Wrong packet received %d %d", hdev->name,
++		       edl->cresp, edl->rtype);
++		err = -EIO;
++		goto out;
++	}
 +
-+	if (queue_push_tail(ad->data, new_data))
-+		return true;
++	ver = (struct qca_btsoc_version *)(edl->data);
 +
-+	data_destroy(new_data);
++	BT_DBG("%s: Product:0x%08x", hdev->name, le32_to_cpu(ver->product_id));
++	BT_DBG("%s: Patch  :0x%08x", hdev->name, le16_to_cpu(ver->patch_ver));
++	BT_DBG("%s: ROM    :0x%08x", hdev->name, le16_to_cpu(ver->btsoc_ver));
++	BT_DBG("%s: SOC    :0x%08x", hdev->name, le32_to_cpu(ver->soc_id));
 +
-+	return false;
++	/* BTSOC chipset version can be decided by patch and SoC
++	 * version, combination with upper 2 bytes from SoC
++	 * and lower 2 bytes from patch will be used.
++	 */
++	*soc_version = (le32_to_cpu(ver->soc_id) << 16) |
++				(le16_to_cpu(ver->btsoc_ver) & 0x0000ffff);
++
++out:
++	kfree_skb(skb);
++
++	return err;
 +}
++EXPORT_SYMBOL_GPL(qca_btsoc_patch_ver_req);
 +
-+static bool data_match(const void *data, const void *user_data)
++int qca_uart_setup_cherokee(struct hci_dev *hdev, uint8_t baudrate,
++					u32 *cherokee_ver)
 +{
-+	const struct bt_ad_data *d1 = data;
-+	const struct bt_ad_data *d2 = user_data;
++	struct qca_config config;
++	int err;
 +
-+	if (d1->type != d2->type)
-+		return false;
++	BT_DBG("%s: wcn3990 setup on UART", hdev->name);
++	config.user_baud_rate = baudrate;
 +
-+	if (d1->len != d2->len)
-+		return false;
++	/* Download rampatch file */
++	config.type = TLV_TYPE_PATCH;
++	snprintf(config.fwname, sizeof(config.fwname), "qca/rampatch_%08x.tlv",
++		*cherokee_ver);
++	err = cherokee_download_firmware(hdev, &config);
++	if (err < 0) {
++		BT_ERR("%s: Failed to download patch (%d)", hdev->name, err);
++		return err;
++	}
 +
-+	return !memcmp(d1->data, d2->data, d1->len);
++	/* Download NVM configuration */
++	config.type = TLV_TYPE_NVM;
++	snprintf(config.fwname, sizeof(config.fwname), "qca/nvm_%08x.bin",
++		*cherokee_ver);
++	err = cherokee_download_firmware(hdev, &config);
++	if (err < 0) {
++		BT_ERR("%s: Failed to download NVM (%d)", hdev->name, err);
++		return err;
++	}
++
++	/* Perform HCI reset */
++	err = qca_btsoc_reset(hdev);
++	if (err < 0) {
++		BT_ERR("%s: Failed to run HCI_RESET (%d)", hdev->name, err);
++		return err;
++	}
++
++	BT_INFO("%s: wcn3990 setup on UART is completed", hdev->name);
++
++	return 0;
 +}
++EXPORT_SYMBOL_GPL(qca_uart_setup_cherokee);
 +
-+bool bt_ad_has_data(struct bt_ad *ad, const struct bt_ad_data *data)
-+{
-+	if (!ad)
-+		return false;
-+
-+	if (!data)
-+		return !queue_isempty(ad->data);
-+
-+	return queue_find(ad->data, data_match, data);
-+}
-+
-+void bt_ad_foreach_data(struct bt_ad *ad, bt_ad_func_t func, void *user_data)
-+{
-+	if (!ad)
-+		return;
-+
-+	queue_foreach(ad->data, func, user_data);
-+}
-+
-+bool bt_ad_remove_data(struct bt_ad *ad, uint8_t type)
-+{
-+	struct bt_ad_data *data;
-+
-+	if (!ad)
-+		return false;
-+
-+	data = queue_remove_if(ad->data, data_type_match, UINT_TO_PTR(type));
-+	if (!data)
-+		return false;
-+
-+	data_destroy(data);
-+
-+	return true;
-+}
-+
-+void bt_ad_clear_data(struct bt_ad *ad)
-+{
-+	if (!ad)
-+		return;
-+
-+	queue_remove_all(ad->data, NULL, NULL, data_destroy);
-+}
-diff --git a/src/shared/ad.h b/src/shared/ad.h
-index f0e3b8127..8d705323b 100644
---- a/src/shared/ad.h
-+++ b/src/shared/ad.h
-@@ -27,6 +27,50 @@
- #include "lib/bluetooth.h"
- #include "lib/uuid.h"
+ MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
+ MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 65e994b..7608423 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -1,7 +1,7 @@
+ /*
+  *  Bluetooth supports for Qualcomm Atheros ROME chips
+  *
+- *  Copyright (c) 2015 The Linux Foundation. All rights reserved.
++ *  Copyright (c) 2015, 2018 The Linux Foundation. All rights reserved.
+  *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License version 2
+@@ -37,6 +37,9 @@
+ #define EDL_TAG_ID_HCI			(17)
+ #define EDL_TAG_ID_DEEP_SLEEP		(27)
  
-+#define BT_AD_FLAGS			0x01
-+#define BT_AD_UUID16_SOME		0x02
-+#define BT_AD_UUID16_ALL		0x03
-+#define BT_AD_UUID32_SOME		0x04
-+#define BT_AD_UUID32_ALL		0x05
-+#define BT_AD_UUID128_SOME		0x06
-+#define BT_AD_UUID128_ALL		0x07
-+#define BT_AD_NAME_SHORT		0x08
-+#define BT_AD_NAME_COMPLETE		0x09
-+#define BT_AD_TX_POWER			0x0a
-+#define BT_AD_CLASS_OF_DEV		0x0d
-+#define BT_AD_SSP_HASH			0x0e
-+#define BT_AD_SSP_RANDOMIZER		0x0f
-+#define BT_AD_DEVICE_ID			0x10
-+#define BT_AD_SMP_TK			0x10
-+#define BT_AD_SMP_OOB_FLAGS		0x11
-+#define BT_AD_SLAVE_CONN_INTERVAL	0x12
-+#define BT_AD_SOLICIT16			0x14
-+#define BT_AD_SOLICIT128		0x15
-+#define BT_AD_SERVICE_DATA16		0x16
-+#define BT_AD_PUBLIC_ADDRESS		0x17
-+#define BT_AD_RANDOM_ADDRESS		0x18
-+#define BT_AD_GAP_APPEARANCE		0x19
-+#define BT_AD_ADVERTISING_INTERVAL	0x1a
-+#define BT_AD_LE_DEVICE_ADDRESS		0x1b
-+#define BT_AD_LE_ROLE			0x1c
-+#define BT_AD_SSP_HASH_P256		0x1d
-+#define BT_AD_SSP_RANDOMIZER_P256	0x1e
-+#define BT_AD_SOLICIT32			0x1f
-+#define BT_AD_SERVICE_DATA32		0x20
-+#define BT_AD_SERVICE_DATA128		0x21
-+#define BT_AD_LE_SC_CONFIRM_VALUE	0x22
-+#define BT_AD_LE_SC_RANDOM_VALUE	0x23
-+#define BT_AD_URI			0x24
-+#define BT_AD_INDOOR_POSITIONING	0x25
-+#define BT_AD_TRANSPORT_DISCOVERY	0x26
-+#define BT_AD_LE_SUPPORTED_FEATURES	0x27
-+#define BT_AD_CHANNEL_MAP_UPDATE_IND	0x28
-+#define BT_AD_MESH_PROV			0x29
-+#define BT_AD_MESH_DATA			0x2a
-+#define BT_AD_MESH_BEACON		0x2b
-+#define BT_AD_3D_INFO_DATA		0x3d
-+#define BT_AD_MANUFACTURER_DATA		0xff
++#define CHEROKEE_POWERON_PULSE		(0xFC)
++#define CHEROKEE_POWEROFF_PULSE		(0xC0)
 +
- typedef void (*bt_ad_func_t)(void *data, void *user_data);
- 
- struct bt_ad;
-@@ -39,6 +83,12 @@ struct bt_ad_manufacturer_data {
- 
- struct bt_ad_service_data {
- 	bt_uuid_t uuid;
-+	size_t len;
-+	void *data;
-+};
-+
-+struct bt_ad_data {
-+	uint8_t type;
- 	uint8_t *data;
- 	size_t len;
+ enum qca_bardrate {
+ 	QCA_BAUDRATE_115200 	= 0,
+ 	QCA_BAUDRATE_57600,
+@@ -66,7 +69,7 @@ enum rome_tlv_type {
+ 	TLV_TYPE_NVM
  };
-@@ -96,3 +146,13 @@ void bt_ad_clear_name(struct bt_ad *ad);
- bool bt_ad_add_appearance(struct bt_ad *ad, uint16_t appearance);
  
- void bt_ad_clear_appearance(struct bt_ad *ad);
+-struct rome_config {
++struct qca_config {
+ 	u8 type;
+ 	char fwname[64];
+ 	uint8_t user_baud_rate;
+@@ -78,13 +81,14 @@ struct edl_event_hdr {
+ 	__u8 data[0];
+ } __packed;
+ 
+-struct rome_version {
++struct qca_btsoc_version {
+ 	__le32 product_id;
+ 	__le16 patch_ver;
+-	__le16 rome_ver;
++	__le16 btsoc_ver;
+ 	__le32 soc_id;
+ } __packed;
+ 
 +
-+bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len);
+ struct tlv_seg_resp {
+ 	__u8 result;
+ } __packed;
+@@ -102,6 +106,21 @@ struct tlv_type_patch {
+ 	__le32 entry;
+ } __packed;
+ 
++struct cherokee_tlv_type_patch {
++	__le32 total_size;
++	__le32 data_length;
++	__u8   format_version;
++	__u8   signature;
++	__u8   dwnd_cfg;
++	__le16 reserved1;
++	__le16 product_id;
++	__le16 rom_build;
++	__le16 patch_version;
++	__le16 reserved2;
++	__le32 entry;
++} __packed;
 +
-+bool bt_ad_has_data(struct bt_ad *ad, const struct bt_ad_data *data);
 +
-+void bt_ad_foreach_data(struct bt_ad *ad, bt_ad_func_t func, void *user_data);
+ struct tlv_type_nvm {
+ 	__le16 tag_id;
+ 	__le16 tag_len;
+@@ -115,14 +134,21 @@ struct tlv_type_hdr {
+ 	__u8   data[0];
+ } __packed;
+ 
++int qca_btsoc_cleanup(struct hci_dev *hdev);
++int btqca_power_setup(bool on);
 +
-+bool bt_ad_remove_data(struct bt_ad *ad, uint8_t type);
+ #if IS_ENABLED(CONFIG_BT_QCA)
+ 
+-int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
++int qca_btsoc_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate);
++int qca_uart_setup_cherokee(struct hci_dev *hdev, uint8_t baudrate,
++				u32 *cherokee_ver);
++int qca_btsoc_patch_ver_req(struct hci_dev *hdev, u32 *soc_version);
+ 
+ #else
+ 
+-static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++static inline int qca_btsoc_set_bdaddr(struct hci_dev *hdev,
++						const bdaddr_t *bdaddr)
+ {
+ 	return -EOPNOTSUPP;
+ }
+@@ -132,4 +158,15 @@ static inline int qca_uart_setup_rome(struct hci_dev *hdev, int speed)
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int qca_uart_setup_cherokee(struct hci_dev *hdev,
++					uint8_t baudrate, u32 *cherokee_ver)
++{
++	return -EOPNOTSUPP;
++}
 +
-+void bt_ad_clear_data(struct bt_ad *ad);
++static int qca_btsoc_patch_ver_req(struct hci_dev *hdev, u32 *cherokee_version)
++{
++	return -EOPNOTSUPP;
++}
++
+ #endif
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index b7547e6..1343e63 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -5,7 +5,7 @@
+  *  protocol extension to H4.
+  *
+  *  Copyright (C) 2007 Texas Instruments, Inc.
+- *  Copyright (c) 2010, 2012 The Linux Foundation. All rights reserved.
++ *  Copyright (c) 2010, 2012, 2018 The Linux Foundation. All rights reserved.
+  *
+  *  Acknowledgements:
+  *  This file is based on hci_ll.c, which was...
+@@ -35,9 +35,15 @@
+ #include <linux/mod_devicetable.h>
+ #include <linux/module.h>
+ #include <linux/serdev.h>
+-
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
++#include <asm-generic/delay.h>
++#include <linux/tty.h>
++#include <linux/platform_device.h>
++#include <linux/delay.h>
++#include <linux/slab.h>
++#include <linux/regulator/consumer.h>
++#include <linux/of_device.h>
+ 
+ #include "hci_uart.h"
+ #include "btqca.h"
+@@ -84,12 +90,12 @@ struct qca_data {
+ 	struct hci_uart *hu;
+ 	struct sk_buff *rx_skb;
+ 	struct sk_buff_head txq;
+-	struct sk_buff_head tx_wait_q;	/* HCI_IBS wait queue	*/
+-	spinlock_t hci_ibs_lock;	/* HCI_IBS state lock	*/
+-	u8 tx_ibs_state;	/* HCI_IBS transmit side power state*/
+-	u8 rx_ibs_state;	/* HCI_IBS receive side power state */
+-	bool tx_vote;		/* Clock must be on for TX */
+-	bool rx_vote;		/* Clock must be on for RX */
++	struct sk_buff_head tx_wait_q;  /* HCI_IBS wait queue   */
++	spinlock_t hci_ibs_lock;        /* HCI_IBS state lock   */
++	u8 tx_ibs_state;        /* HCI_IBS transmit side power state*/
++	u8 rx_ibs_state;        /* HCI_IBS receive side power state */
++	bool tx_vote;           /* Clock must be on for TX */
++	bool rx_vote;           /* Clock must be on for RX */
+ 	struct timer_list tx_idle_timer;
+ 	u32 tx_idle_delay;
+ 	struct timer_list wake_retrans_timer;
+@@ -119,12 +125,49 @@ struct qca_data {
+ 	u64 votes_off;
+ };
+ 
++enum btqca_soc_t {
++	BTQCA_INVALID = -1,
++	BTQCA_AR3002,
++	BTQCA_ROME,
++	BTQCA_CHEROKEE
++};
++
+ struct qca_serdev {
+ 	struct hci_uart	 serdev_hu;
+ 	struct gpio_desc *bt_en;
+ 	struct clk	 *susclk;
++	enum btqca_soc_t btsoc_type;
++};
++
++/*
++ * voltage regulator information required for configuring the
++ * QCA bluetooth chipset
++ */
++struct btqca_vreg {
++	const char *name;
++	unsigned int min_v;
++	unsigned int max_v;
++	unsigned int load_ua;
+ };
+ 
++struct btqca_vreg_data {
++	enum btqca_soc_t soc_type;
++	struct btqca_vreg *vregs;
++	size_t num_vregs;
++};
++
++/*
++ * Platform data for the QCA bluetooth power driver.
++ */
++struct btqca_power {
++	struct device *dev;
++	struct btqca_vreg_data *vreg_data;
++	struct regulator_bulk_data *vreg_bulk;
++	bool vreg_status;
++};
++
++static struct btqca_power *qca;
++
+ static void __serial_clock_on(struct tty_struct *tty)
+ {
+ 	/* TODO: Some chipset requires to enable UART clock on client
+@@ -462,9 +505,11 @@ static int qca_open(struct hci_uart *hu)
+ 
+ 	if (hu->serdev) {
+ 		serdev_device_open(hu->serdev);
+-
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+-		gpiod_set_value_cansleep(qcadev->bt_en, 1);
++		if (qcadev->btsoc_type == BTQCA_CHEROKEE)
++			btqca_power_setup(true);
++		else
++			gpiod_set_value_cansleep(qcadev->bt_en, 1);
+ 	}
+ 
+ 	BT_DBG("HCI_UART_QCA open, tx_idle_delay=%u, wake_retrans=%u",
+@@ -553,7 +598,10 @@ static int qca_close(struct hci_uart *hu)
+ 		serdev_device_close(hu->serdev);
+ 
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+-		gpiod_set_value_cansleep(qcadev->bt_en, 0);
++		if (qcadev->btsoc_type == BTQCA_CHEROKEE)
++			qca_btsoc_cleanup(hu->hdev);
++		else
++			gpiod_set_value_cansleep(qcadev->bt_en, 0);
+ 	}
+ 
+ 	kfree_skb(qca->rx_skb);
+@@ -873,6 +921,8 @@ static uint8_t qca_get_baudrate_value(int speed)
+ 		return QCA_BAUDRATE_2000000;
+ 	case 3000000:
+ 		return QCA_BAUDRATE_3000000;
++	case 3200000:
++		return QCA_BAUDRATE_3200000;
+ 	case 3500000:
+ 		return QCA_BAUDRATE_3500000;
+ 	default:
+@@ -887,7 +937,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	struct sk_buff *skb;
+ 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
+ 
+-	if (baudrate > QCA_BAUDRATE_3000000)
++	if (baudrate > QCA_BAUDRATE_3200000)
+ 		return -EINVAL;
+ 
+ 	cmd[4] = baudrate;
+@@ -924,62 +974,263 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ 		hci_uart_set_baudrate(hu, speed);
+ }
+ 
++static int qca_send_poweron_cmd(struct hci_dev *hdev)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct qca_data *qca = hu->priv;
++	struct sk_buff *skb;
++	u8 cmd;
++
++	BT_DBG("%s sending power on command to btsoc", hdev->name);
++	/* By sending 0xFC host is trying to power up the soc */
++	cmd = CHEROKEE_POWERON_PULSE;
++	skb = bt_skb_alloc(sizeof(cmd), GFP_ATOMIC);
++	if (!skb) {
++		BT_ERR("Failed to allocate memory for skb  packet");
++		return -ENOMEM;
++	}
++
++	skb_put_data(skb, &cmd, sizeof(cmd));
++	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
++
++	skb_queue_tail(&qca->txq, skb);
++	hci_uart_tx_wakeup(hu);
++
++	/* Wait for 100 us for soc to settle down */
++	set_current_state(TASK_UNINTERRUPTIBLE);
++	schedule_timeout(usecs_to_jiffies(100));
++	set_current_state(TASK_INTERRUPTIBLE);
++
++	return 0;
++}
++
++static int qca_send_poweroff_cmd(struct hci_dev *hdev)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct qca_data *qca = hu->priv;
++	struct sk_buff *skb;
++	u8 cmd;
++
++	BT_DBG("%s sending power off command to btsoc", hdev->name);
++	/* By sending 0xC0 host is trying to power off the soc */
++	cmd = CHEROKEE_POWEROFF_PULSE;
++	skb = bt_skb_alloc(sizeof(cmd), GFP_ATOMIC);
++	if (!skb) {
++		BT_ERR("Failed to allocate memory for skb  packet");
++		return -ENOMEM;
++	}
++
++	skb_put_data(skb, &cmd, sizeof(cmd));
++	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
++
++	skb_queue_tail(&qca->txq, skb);
++	hci_uart_tx_wakeup(hu);
++
++	/* Wait for 100 us for soc to settle down */
++	set_current_state(TASK_UNINTERRUPTIBLE);
++	schedule_timeout(usecs_to_jiffies(100));
++	set_current_state(TASK_INTERRUPTIBLE);
++
++	return 0;
++}
++
++static int qca_serdev_open(struct hci_uart *hu)
++{
++	int ret = 0;
++
++	if (hu->serdev)
++		serdev_device_open(hu->serdev);
++	else {
++		BT_ERR("%s:open operation not supported", hu->hdev->name);
++		ret = 1;
++	}
++
++	return ret;
++}
++
++int qca_btsoc_cleanup(struct hci_dev *hdev)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++
++	/* change host baud rate before sending power off command */
++	host_set_baudrate(hu, 2400);
++	/* send 0xC0 command to btsoc before turning off regulators */
++	qca_send_poweroff_cmd(hdev);
++	/* turn off btsoc */
++	return btqca_power_setup(false);
++}
++
++static int qca_serdev_close(struct hci_uart *hu)
++{
++	int ret = 0;
++
++	if (hu->serdev)
++		serdev_device_close(hu->serdev);
++	else {
++		BT_ERR("%s:close operation not supported", hu->hdev->name);
++		ret = 1;
++	}
++
++	return ret;
++}
++
+ static int qca_setup(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+ 	struct qca_data *qca = hu->priv;
++	struct qca_serdev *qcadev;
+ 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+ 	int ret;
++	unsigned int  soc_ver;
++
++	qcadev = serdev_device_get_drvdata(hu->serdev);
++
++	switch (qcadev->btsoc_type) {
++	case BTQCA_CHEROKEE:
++
++		BT_INFO("%s:setting up wcn3990", hdev->name);
++		/* Patch downloading has to be done without IBS mode */
++		clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++		/* Setup initial baudrate */
++		speed = 0;
++		if (hu->init_speed)
++			speed = hu->init_speed;
++		else if (hu->proto->init_speed)
++			speed = hu->proto->init_speed;
++
++		if (speed)
++			host_set_baudrate(hu, speed);
++		else {
++			BT_ERR("%s:initial speed %u", hdev->name, speed);
++			return -1;
++		}
+ 
+-	BT_INFO("%s: ROME setup", hdev->name);
++		/* clear flow control- for sync cmd*/
++		hci_uart_set_flow_control(hu, true);
++		/* send poweron command to btsoc */
++		ret = qca_send_poweron_cmd(hdev);
++		if (ret) {
++			BT_ERR("%s:sending sync command failed", hdev->name);
++			return ret;
++		}
++
++		/* close port */
++		ret = qca_serdev_close(hu);
++		if (ret)
++			return ret;
++		/* reopen port */
++		ret = qca_serdev_open(hu);
++		if (ret)
++			return ret;
++		/* Setup initial baudrate */
++		speed = 0;
++		if (hu->init_speed)
++			speed = hu->init_speed;
++		else if (hu->proto->init_speed)
++			speed = hu->proto->init_speed;
++		if (speed)
++			host_set_baudrate(hu, speed);
++		else {
++			BT_ERR("%s:initial speed %u", hdev->name, speed);
++			return -1;
++		}
+ 
+-	/* Patch downloading has to be done without IBS mode */
+-	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++		/* Enable flow control */
++		hci_uart_set_flow_control(hu, false);
++		/*  wait until flow control settled */
++		mdelay(100);
+ 
+-	/* Setup initial baudrate */
+-	speed = 0;
+-	if (hu->init_speed)
+-		speed = hu->init_speed;
+-	else if (hu->proto->init_speed)
+-		speed = hu->proto->init_speed;
++		ret = qca_btsoc_patch_ver_req(hdev, &soc_ver);
++		if (ret < 0 || soc_ver == 0) {
++			BT_ERR("%s: Failed to get version 0x%x", hdev->name,
++				ret);
++			return ret;
++		}
+ 
+-	if (speed)
+-		host_set_baudrate(hu, speed);
++		BT_INFO("%s:wcn3990 controller version 0x%08x", hdev->name,
++			soc_ver);
+ 
+-	/* Setup user speed if needed */
+-	speed = 0;
+-	if (hu->oper_speed)
+-		speed = hu->oper_speed;
+-	else if (hu->proto->oper_speed)
++		/* clear flow control */
++		hci_uart_set_flow_control(hu, true);
++		/* set operating speed */
+ 		speed = hu->proto->oper_speed;
++		if (speed) {
++			qca_baudrate = qca_get_baudrate_value(speed);
++			BT_INFO("%s: Set UART speed to %d", hdev->name, speed);
++			ret = qca_set_baudrate(hdev, qca_baudrate);
++			if (ret) {
++				BT_ERR("%s:Failed to change the baud rate(%d)",
++					hdev->name, ret);
++				return ret;
++			}
++			if (speed)
++				host_set_baudrate(hu, speed);
++			else {
++				BT_ERR("%s:Error in setting operator speed:%u",
++					hdev->name, speed);
++				return -1;
++			}
++		}
+ 
+-	if (speed) {
+-		qca_baudrate = qca_get_baudrate_value(speed);
++		/* Set flow control */
++		hci_uart_set_flow_control(hu, false);
++		/*Setup patch and  NVM configurations */
++		ret = qca_uart_setup_cherokee(hdev, qca_baudrate, &soc_ver);
++		if (!ret) {
++			set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++			qca_debugfs_init(hdev);
++		}
+ 
+-		BT_INFO("%s: Set UART speed to %d", hdev->name, speed);
+-		ret = qca_set_baudrate(hdev, qca_baudrate);
+-		if (ret) {
+-			BT_ERR("%s: Failed to change the baud rate (%d)",
+-			       hdev->name, ret);
+-			return ret;
++		/* Setup wcn3990 bdaddr */
++		hu->hdev->set_bdaddr = qca_btsoc_set_bdaddr;
++
++		return ret;
++
++	default:
++		BT_INFO("%s: ROME setup", hdev->name);
++		/* Patch downloading has to be done without IBS mode */
++		clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++		/* Setup initial baudrate */
++		speed = 0;
++		if (hu->init_speed)
++			speed = hu->init_speed;
++		else if (hu->proto->init_speed)
++			speed = hu->proto->init_speed;
++		if (speed)
++			hci_uart_set_baudrate(hu, speed);
++
++		/* Setup user speed if needed */
++		speed = 0;
++		if (hu->oper_speed)
++			speed = hu->oper_speed;
++		else if (hu->proto->oper_speed)
++			speed = hu->proto->oper_speed;
++
++		if (speed) {
++			qca_baudrate = qca_get_baudrate_value(speed);
++
++			BT_INFO("%s: Set UART speed to %d", hdev->name, speed);
++			ret = qca_set_baudrate(hdev, qca_baudrate);
++			if (ret) {
++				BT_ERR("%s:Failed to change the baud rate(%d)",
++					hdev->name, ret);
++					return ret;
++				}
++			host_set_baudrate(hu, speed);
+ 		}
+-		host_set_baudrate(hu, speed);
+-	}
+ 
+-	/* Setup patch / NVM configurations */
+-	ret = qca_uart_setup_rome(hdev, qca_baudrate);
+-	if (!ret) {
+-		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+-		qca_debugfs_init(hdev);
+-	} else if (ret == -ENOENT) {
+-		/* No patch/nvm-config found, run with original fw/config */
+-		ret = 0;
+-	}
++		/* Setup patch / NVM configurations */
++		ret = qca_uart_setup_rome(hdev, qca_baudrate);
++		if (!ret) {
++			set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++			qca_debugfs_init(hdev);
++		}
+ 
+-	/* Setup bdaddr */
+-	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
++		/* Setup bdaddr */
++		hu->hdev->set_bdaddr = qca_btsoc_set_bdaddr;
+ 
+-	return ret;
++		return ret;
++	}
+ }
+ 
+ static struct hci_uart_proto qca_proto = {
+@@ -997,42 +1248,142 @@ static int qca_setup(struct hci_uart *hu)
+ 	.dequeue	= qca_dequeue,
+ };
+ 
++static const struct btqca_vreg_data cherokee_data = {
++	.soc_type = BTQCA_CHEROKEE,
++	.vregs = (struct btqca_vreg []) {
++		{ "vddio",   1352000, 1352000,  0 },
++		{ "vddxtal", 1904000, 2040000,  0 },
++		{ "vddcore", 1800000, 1800000,  1 },
++		{ "vddpa",   130400,  1304000,  1 },
++		{ "vddldo",  3000000, 3312000,  1 },
++		{ "vddpwd",  3312000, 3600000,  0 },
++	},
++	.num_vregs = 6,
++};
++
++int btqca_power_setup(bool on)
++{
++	int ret = 0;
++	int i;
++	struct btqca_vreg *vregs;
++
++	if (!qca || !qca->vreg_data || !qca->vreg_bulk)
++		return -EINVAL;
++	vregs = qca->vreg_data->vregs;
++
++	BT_DBG("on: %d", on);
++
++	/* turn on if regualtors are off */
++	if (on == true && qca->vreg_status == false) {
++		qca->vreg_status = true;
++		for (i = 0; i < qca->vreg_data->num_vregs; i++) {
++			regulator_set_voltage(qca->vreg_bulk[i].consumer,
++					      vregs[i].min_v,
++					      vregs[i].max_v);
++
++			if (vregs[i].load_ua)
++				regulator_set_load(qca->vreg_bulk[i].consumer,
++						   vregs[i].load_ua);
++
++			regulator_enable(qca->vreg_bulk[i].consumer);
++		}
++	} else if (on == false && qca->vreg_status == true) {
++		qca->vreg_status = false;
++		for (i = 0; i < qca->vreg_data->num_vregs; i++) {
++			regulator_disable(qca->vreg_bulk[i].consumer);
++			regulator_set_voltage(qca->vreg_bulk[i].consumer,
++						0, vregs[i].max_v);
++			if (vregs[i].load_ua)
++				regulator_set_load(qca->vreg_bulk[i].consumer,
++						   0);
++		}
++	}
++
++	return ret;
++}
++
++static int init_regulators(struct btqca_power *qca,
++			   const struct btqca_vreg *vregs,
++			   size_t num_vregs)
++{
++	int i;
++
++	qca->vreg_bulk = devm_kzalloc(qca->dev, num_vregs *
++					sizeof(struct regulator_bulk_data),
++					GFP_KERNEL);
++	if (!qca->vreg_bulk)
++		return -ENOMEM;
++
++	for (i = 0; i < num_vregs; i++)
++		qca->vreg_bulk[i].supply = vregs[i].name;
++
++	return devm_regulator_bulk_get(qca->dev, num_vregs, qca->vreg_bulk);
++}
++
+ static int qca_serdev_probe(struct serdev_device *serdev)
+ {
+ 	struct qca_serdev *qcadev;
+-	int err;
++	struct btqca_vreg_data *data;
++	int err = 0;
+ 
+ 	qcadev = devm_kzalloc(&serdev->dev, sizeof(*qcadev), GFP_KERNEL);
+ 	if (!qcadev)
+ 		return -ENOMEM;
+ 
+ 	qcadev->serdev_hu.serdev = serdev;
++	data = of_device_get_match_data(&serdev->dev);
++	if (data && data->soc_type == BTQCA_CHEROKEE)
++		qcadev->btsoc_type = BTQCA_CHEROKEE;
++	else
++		qcadev->btsoc_type = BTQCA_ROME;
++
+ 	serdev_device_set_drvdata(serdev, qcadev);
++	if (qcadev->btsoc_type == BTQCA_CHEROKEE) {
++		qca = kzalloc(sizeof(struct btqca_power), GFP_KERNEL);
++		if (!qca)
++			return -ENOMEM;
++
++		qca->dev = &serdev->dev;
++		qca->vreg_data = data;
++		err = init_regulators(qca, data->vregs, data->num_vregs);
++		if (err) {
++			BT_ERR("Failed to init regualtors:%d", err);
++			kfree(qca);
++		}
+ 
+-	qcadev->bt_en = devm_gpiod_get(&serdev->dev, "enable",
+-				       GPIOD_OUT_LOW);
+-	if (IS_ERR(qcadev->bt_en)) {
+-		dev_err(&serdev->dev, "failed to acquire enable gpio\n");
+-		return PTR_ERR(qcadev->bt_en);
+-	}
++		/* set voltage regulator status as false */
++		qca->vreg_status = false;
++		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
++		if (err) {
++			BT_ERR("wcn3990 serdev registration failed");
++			kfree(qca);
++		}
++	} else {
++		qcadev->bt_en = devm_gpiod_get(&serdev->dev, "enable",
++					       GPIOD_OUT_LOW);
++		if (IS_ERR(qcadev->bt_en)) {
++			dev_err(&serdev->dev, "failed to acquire enable gpio\n");
++			return PTR_ERR(qcadev->bt_en);
++		}
+ 
+-	qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
+-	if (IS_ERR(qcadev->susclk)) {
+-		dev_err(&serdev->dev, "failed to acquire clk\n");
+-		return PTR_ERR(qcadev->susclk);
+-	}
++		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
++		if (IS_ERR(qcadev->susclk)) {
++			dev_err(&serdev->dev, "failed to acquire clk\n");
++			return PTR_ERR(qcadev->susclk);
++		}
+ 
+-	err = clk_set_rate(qcadev->susclk, SUSCLK_RATE_32KHZ);
+-	if (err)
+-		return err;
++		err = clk_set_rate(qcadev->susclk, SUSCLK_RATE_32KHZ);
++		if (err)
++			return err;
+ 
+-	err = clk_prepare_enable(qcadev->susclk);
+-	if (err)
+-		return err;
++		err = clk_prepare_enable(qcadev->susclk);
++		if (err)
++			return err;
+ 
+-	err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
+-	if (err)
+-		clk_disable_unprepare(qcadev->susclk);
++		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
++		if (err)
++			clk_disable_unprepare(qcadev->susclk);
++	}
+ 
+ 	return err;
+ }
+@@ -1042,12 +1393,16 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+ 	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+ 
+ 	hci_uart_unregister_device(&qcadev->serdev_hu);
+-
+-	clk_disable_unprepare(qcadev->susclk);
++	if (qcadev->btsoc_type == BTQCA_CHEROKEE) {
++		btqca_power_setup(false);
++		kfree(qca);
++	} else
++		clk_disable_unprepare(qcadev->susclk);
+ }
+ 
+ static const struct of_device_id qca_bluetooth_of_match[] = {
+ 	{ .compatible = "qcom,qca6174-bt" },
++	{ .compatible = "qca,wcn3990-bt", .data = &cherokee_data},
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c10cb79..b932ec50 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1418,7 +1418,8 @@ struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 			       const void *param, u32 timeout);
+ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 				  const void *param, u8 event, u32 timeout);
+-
++int __hci_cmd_no_event(struct hci_dev *hdev, u16 opcode, u32 plen,
++			const void *param);
+ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
+ 		 const void *param);
+ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 97ef85e..8addd97 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3370,7 +3370,7 @@ int hci_unregister_cb(struct hci_cb *cb)
+ }
+ EXPORT_SYMBOL(hci_unregister_cb);
+ 
+-static void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
++void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	int err;
+ 
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index f7d6ba6..1ffee59a 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -114,6 +114,29 @@ void hci_req_sync_cancel(struct hci_dev *hdev, int err)
+ 	}
+ }
+ 
++/*  Queue a frame to an asynchronous transfer to btdevice,
++ *  with out any event from btdevice.
++ */
++int __hci_cmd_no_event(struct hci_dev *hdev, u16 opcode, u32 plen,
++		       const void *param)
++{
++	struct sk_buff *skb;
++
++	BT_DBG("%s opcode 0x%4.4x plen %d", hdev->name, opcode, plen);
++
++	skb = hci_prepare_cmd(hdev, opcode, plen, param);
++	if (!skb) {
++		BT_ERR("%s no memory for command (opcode 0x%4.4x)",
++		       hdev->name, opcode);
++		return -ENOMEM;
++	}
++
++	hci_send_frame(hdev, skb);
++
++	return 0;
++}
++EXPORT_SYMBOL(__hci_cmd_no_event);
++
+ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 				  const void *param, u8 event, u32 timeout)
+ {
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index dde77bd..a855edd 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -128,3 +128,5 @@ static inline u16 eir_append_le16(u8 *eir, u16 eir_len, u8 type, u16 data)
+ 
+ 	return eir_len;
+ }
++
++void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb);
 -- 
-2.14.3
-
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
