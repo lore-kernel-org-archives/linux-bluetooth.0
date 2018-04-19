@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/7] device: Add implementation of AdvertisingData
-Date: Thu, 19 Apr 2018 16:46:26 +0300
-Message-Id: <20180419134630.15624-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 7/7] client: Add support for setting advertising Data property
+Date: Thu, 19 Apr 2018 16:46:30 +0300
+Message-Id: <20180419134630.15624-7-luiz.dentz@gmail.com>
 In-Reply-To: <20180419134630.15624-1-luiz.dentz@gmail.com>
 References: <20180419134630.15624-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,230 +11,317 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the implementation of AdvertisingData property:
+This adds data command to advertise menu which can be used to set
+an arbitrary/profile specific advertising type and data:
 
-[CHG] Device 00:1B:DC:07:31:88 AdvertisingData Key: 0x26
-[CHG] Device 00:1B:DC:07:31:88 AdvertisingData Value:
-  01 01 00                                         ...
+[bluetooth]# data 0x26 0x01 0x01 0x00
 ---
- src/adapter.c |  3 +++
- src/device.c  | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- src/device.h  |  2 ++
- src/eir.c     | 27 ++++++++++++++++++++++++
- src/eir.h     |  8 +++++++
- 5 files changed, 106 insertions(+), 1 deletion(-)
+ client/advertising.c | 158 +++++++++++++++++++++++++++++++++++++--------------
+ client/advertising.h |   2 +
+ client/main.c        |  13 +++++
+ 3 files changed, 130 insertions(+), 43 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f91b04173..705c8ad7d 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -6093,6 +6093,9 @@ static void update_found_devices(struct btd_adapter *adapter,
- 	if (eir_data.sd_list)
- 		device_set_service_data(dev, eir_data.sd_list, duplicate);
+diff --git a/client/advertising.c b/client/advertising.c
+index 152a22a56..045133aa3 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -54,6 +54,11 @@ struct manufacturer_data {
+ 	struct ad_data data;
+ };
  
-+	if (eir_data.data_list)
-+		device_set_data(dev, eir_data.data_list, duplicate);
++struct data {
++	uint8_t type;
++	struct ad_data data;
++};
 +
- 	if (bdaddr_type != BDADDR_BREDR)
- 		device_set_flags(dev, eir_data.flags);
- 
-diff --git a/src/device.c b/src/device.c
-index f693b7023..38e23211f 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1276,6 +1276,46 @@ dev_property_service_data_exist(const GDBusPropertyTable *property,
- 	return bt_ad_has_service_data(device->ad, NULL);
+ static struct ad {
+ 	bool registered;
+ 	char *type;
+@@ -65,6 +70,7 @@ static struct ad {
+ 	size_t uuids_len;
+ 	struct service_data service;
+ 	struct manufacturer_data manufacturer;
++	struct data data;
+ 	bool tx_power;
+ 	bool name;
+ 	bool appearance;
+@@ -373,12 +379,35 @@ static gboolean get_timeout(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
-+static void append_advertising_data(void *data, void *user_data)
++static gboolean data_exists(const GDBusPropertyTable *property, void *data)
 +{
-+	struct bt_ad_data *ad = data;
-+	DBusMessageIter *dict = user_data;
-+
-+	g_dbus_dict_append_basic_array(dict,
-+				DBUS_TYPE_BYTE, &ad->type,
-+				DBUS_TYPE_BYTE, &ad->data, ad->len);
++	return ad.data.type != 0;
 +}
 +
-+static gboolean
-+dev_property_get_advertising_data(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
++static gboolean get_data(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
 +{
-+	struct btd_device *device = data;
 +	DBusMessageIter dict;
++	struct ad_data *data = &ad.data.data;
++	uint8_t *val = data->data;
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
-+					DBUS_TYPE_BYTE_AS_STRING
-+					DBUS_TYPE_VARIANT_AS_STRING
-+					DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
-+					&dict);
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{yv}", &dict);
 +
-+	bt_ad_foreach_data(device->ad, append_advertising_data, &dict);
++	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_BYTE, &ad.data.type,
++					DBUS_TYPE_BYTE, &val, data->len);
 +
 +	dbus_message_iter_close_container(iter, &dict);
 +
 +	return TRUE;
 +}
 +
-+static gboolean
-+dev_property_advertising_data_exist(const GDBusPropertyTable *property,
-+								void *data)
-+{
-+	struct btd_device *device = data;
-+
-+	return bt_ad_has_data(device->ad, NULL);
-+}
-+
- static gboolean disconnect_all(gpointer user_data)
- {
- 	struct btd_device *device = user_data;
-@@ -1681,6 +1721,29 @@ void device_set_service_data(struct btd_device *dev, GSList *list,
- 	g_slist_foreach(list, add_service_data, dev);
+ static const GDBusPropertyTable ad_props[] = {
+ 	{ "Type", "s", get_type },
+ 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
+ 	{ "ServiceData", "a{sv}", get_service_data, NULL, service_data_exists },
+ 	{ "ManufacturerData", "a{qv}", get_manufacturer_data, NULL,
+ 						manufacturer_data_exists },
++	{ "Data", "a{yv}", get_data, NULL, data_exists },
+ 	{ "Includes", "as", get_includes, NULL, includes_exists },
+ 	{ "LocalName", "s", get_local_name, NULL, local_name_exits },
+ 	{ "Appearance", "q", get_appearance, NULL, appearance_exits },
+@@ -508,46 +537,55 @@ static void ad_clear_service(void)
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
  }
  
-+static void add_data(void *data, void *user_data)
-+{
-+	struct eir_ad *ad = data;
-+	struct btd_device *dev = user_data;
-+
-+	if (!bt_ad_add_data(dev->ad, ad->type, ad->data, ad->len))
-+		return;
-+
-+	if (ad->type == EIR_TRANSPORT_DISCOVERY)
-+		g_dbus_emit_property_changed(dbus_conn, dev->path,
-+						DEVICE_INTERFACE,
-+						"AdvertisingData");
-+}
-+
-+void device_set_data(struct btd_device *dev, GSList *list,
-+							bool duplicate)
-+{
-+	if (duplicate)
-+		bt_ad_clear_data(dev->ad);
-+
-+	g_slist_foreach(list, add_data, dev);
-+}
-+
- static struct btd_service *find_connectable_service(struct btd_device *dev,
- 							const char *uuid)
+-void ad_advertise_service(DBusConnection *conn, int argc, char *argv[])
++static bool ad_add_data(struct ad_data *data, int argc, char *argv[])
  {
-@@ -2673,7 +2736,9 @@ static const GDBusPropertyTable device_properties[] = {
- 	{ "AdvertisingFlags", "ay", dev_property_get_flags, NULL,
- 					dev_property_flags_exist,
- 					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL},
+ 	unsigned int i;
+-	struct ad_data *data;
+ 
+-	if (argc < 2 || !strlen(argv[1])) {
+-		if (ad.service.uuid) {
+-			print_uuid(ad.service.uuid);
+-			bt_shell_hexdump(ad.service.data.data,
+-						ad.service.data.len);
+-		}
+-		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+-	}
++	memset(data, 0, sizeof(*data));
+ 
+-	ad_clear_service();
 -
-+	{ "AdvertisingData", "a{yv}", dev_property_get_advertising_data,
-+				NULL, dev_property_advertising_data_exist,
-+				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ }
- };
+-	ad.service.uuid = g_strdup(argv[1]);
+-	data = &ad.service.data;
+-
+-	for (i = 2; i < (unsigned int) argc; i++) {
++	for (i = 0; i < (unsigned int) argc; i++) {
+ 		long int val;
+ 		char *endptr = NULL;
  
-diff --git a/src/device.h b/src/device.h
-index b90f9273a..06b100499 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -83,6 +83,8 @@ void device_set_manufacturer_data(struct btd_device *dev, GSList *list,
- 							bool duplicate);
- void device_set_service_data(struct btd_device *dev, GSList *list,
- 							bool duplicate);
-+void device_set_data(struct btd_device *dev, GSList *list,
-+							bool duplicate);
- void device_probe_profile(gpointer a, gpointer b);
- void device_remove_profile(gpointer a, gpointer b);
- struct btd_adapter *device_get_adapter(struct btd_device *device);
-diff --git a/src/eir.c b/src/eir.c
-index c984fa5a7..25d961dad 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -51,6 +51,14 @@ static void sd_free(void *data)
- 	g_free(sd);
- }
- 
-+static void data_free(void *data)
-+{
-+	struct eir_ad *ad = data;
-+
-+	g_free(ad->data);
-+	g_free(ad);
-+}
-+
- void eir_data_free(struct eir_data *eir)
- {
- 	g_slist_free_full(eir->services, free);
-@@ -65,6 +73,8 @@ void eir_data_free(struct eir_data *eir)
- 	eir->msd_list = NULL;
- 	g_slist_free_full(eir->sd_list, sd_free);
- 	eir->sd_list = NULL;
-+	g_slist_free_full(eir->data_list, data_free);
-+	eir->data_list = NULL;
- }
- 
- static void eir_parse_uuid16(struct eir_data *eir, const void *data,
-@@ -226,6 +236,20 @@ static void eir_parse_uuid128_data(struct eir_data *eir, const uint8_t *data,
- 	eir_parse_sd(eir, &service, data + 16, len - 16);
- }
- 
-+static void eir_parse_data(struct eir_data *eir, uint8_t type,
-+					const uint8_t *data, uint8_t len)
-+{
-+	struct eir_ad *ad;
-+
-+	ad = g_malloc(sizeof(*ad));
-+	ad->type = type;
-+	ad->len = len;
-+	ad->data = g_malloc(len);
-+	memcpy(ad->data, data, len);
-+
-+	eir->data_list = g_slist_append(eir->data_list, ad);
-+}
-+
- void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
- {
- 	uint16_t len = 0;
-@@ -346,6 +370,9 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
- 			eir_parse_msd(eir, data, data_len);
- 			break;
- 
-+		default:
-+			eir_parse_data(eir, eir_data[1], data, data_len);
-+			break;
+ 		if (i >= G_N_ELEMENTS(data->data)) {
+ 			bt_shell_printf("Too much data\n");
+-			ad_clear_service();
+-			return;
++			return false;
  		}
  
- 		eir_data += field_len + 1;
-diff --git a/src/eir.h b/src/eir.h
-index 219ee794b..c868177a6 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -49,6 +49,7 @@
- #define EIR_SOLICIT32               0x1F  /* LE: Solicit UUIDs, 32-bit */
- #define EIR_SVC_DATA32              0x20  /* LE: Service data, 32-bit UUID */
- #define EIR_SVC_DATA128             0x21  /* LE: Service data, 128-bit UUID */
-+#define EIR_TRANSPORT_DISCOVERY     0x26  /* Transport Discovery Service */
- #define EIR_MANUFACTURER_DATA       0xFF  /* Manufacturer Specific Data */
+ 		val = strtol(argv[i], &endptr, 0);
+ 		if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
+ 			bt_shell_printf("Invalid value at index %d\n", i);
+-			ad_clear_service();
+-			return;
++			return false;
+ 		}
  
- /* Flags Descriptions */
-@@ -75,6 +76,12 @@ struct eir_sd {
- 	uint8_t data_len;
- };
+ 		data->data[data->len] = val;
+ 		data->len++;
+ 	}
  
-+struct eir_ad {
-+	uint8_t type;
-+	uint8_t len;
-+	void *data;
-+};
++	return true;
++}
 +
- struct eir_data {
- 	GSList *services;
- 	unsigned int flags;
-@@ -92,6 +99,7 @@ struct eir_data {
- 	uint16_t did_source;
- 	GSList *msd_list;
- 	GSList *sd_list;
-+	GSList *data_list;
- };
++void ad_advertise_service(DBusConnection *conn, int argc, char *argv[])
++{
++	struct ad_data data;
++
++	if (argc < 2 || !strlen(argv[1])) {
++		if (ad.service.uuid) {
++			print_uuid(ad.service.uuid);
++			bt_shell_hexdump(ad.service.data.data,
++						ad.service.data.len);
++		}
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	}
++
++	if (!ad_add_data(&data, argc - 2, argv + 2))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	ad_clear_service();
++
++	ad.service.uuid = g_strdup(argv[1]);
++	ad.service.data = data;
++
+ 	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "ServiceData");
  
- void eir_data_free(struct eir_data *eir);
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+@@ -573,10 +611,9 @@ static void ad_clear_manufacturer(void)
+ 
+ void ad_advertise_manufacturer(DBusConnection *conn, int argc, char *argv[])
+ {
+-	unsigned int i;
+ 	char *endptr = NULL;
+ 	long int val;
+-	struct ad_data *data;
++	struct ad_data data;
+ 
+ 	if (argc < 2 || !strlen(argv[1])) {
+ 		if (ad.manufacturer.data.len) {
+@@ -589,34 +626,18 @@ void ad_advertise_manufacturer(DBusConnection *conn, int argc, char *argv[])
+ 		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ 	}
+ 
+-	ad_clear_manufacturer();
+-
+ 	val = strtol(argv[1], &endptr, 0);
+ 	if (!endptr || *endptr != '\0' || val > UINT16_MAX) {
+ 		bt_shell_printf("Invalid manufacture id\n");
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	ad.manufacturer.id = val;
+-	data = &ad.manufacturer.data;
+-
+-	for (i = 2; i < (unsigned int) argc; i++) {
+-		if (i >= G_N_ELEMENTS(data->data)) {
+-			bt_shell_printf("Too much data\n");
+-			ad_clear_manufacturer();
+-			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-		}
+-
+-		val = strtol(argv[i], &endptr, 0);
+-		if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
+-			bt_shell_printf("Invalid value at index %d\n", i);
+-			ad_clear_manufacturer();
+-			return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-		}
++	if (!ad_add_data(&data, argc - 2, argv + 2))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+-		data->data[data->len] = val;
+-		data->len++;
+-	}
++	ad_clear_manufacturer();
++	ad.manufacturer.id = val;
++	ad.manufacturer.data = data;
+ 
+ 	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
+ 							"ManufacturerData");
+@@ -636,6 +657,57 @@ void ad_disable_manufacturer(DBusConnection *conn)
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
++static void ad_clear_data(void)
++{
++	memset(&ad.manufacturer, 0, sizeof(ad.manufacturer));
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++void ad_advertise_data(DBusConnection *conn, int argc, char *argv[])
++{
++	char *endptr = NULL;
++	long int val;
++	struct ad_data data;
++
++	if (argc < 2 || !strlen(argv[1])) {
++		if (ad.manufacturer.data.len) {
++			bt_shell_printf("Type: 0x%02x\n", ad.data.type);
++			bt_shell_hexdump(ad.data.data.data, ad.data.data.len);
++		}
++
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	}
++
++	val = strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
++		bt_shell_printf("Invalid type\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	if (!ad_add_data(&data, argc - 2, argv + 2))
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	ad_clear_data();
++	ad.data.type = val;
++	ad.data.data = data;
++
++	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Data");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++void ad_disable_data(DBusConnection *conn)
++{
++	if (!ad.data.type && !ad.data.data.len)
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++
++	ad_clear_data();
++	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Data");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
+ void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value)
+ {
+ 	if (!value) {
+diff --git a/client/advertising.h b/client/advertising.h
+index b73d33b13..12b4d69c1 100644
+--- a/client/advertising.h
++++ b/client/advertising.h
+@@ -37,3 +37,5 @@ void ad_advertise_local_name(DBusConnection *conn, const char *name);
+ void ad_advertise_local_appearance(DBusConnection *conn, long int *value);
+ void ad_advertise_duration(DBusConnection *conn, long int *value);
+ void ad_advertise_timeout(DBusConnection *conn, long int *value);
++void ad_advertise_data(DBusConnection *conn, int argc, char *argv[]);
++void ad_disable_data(DBusConnection *conn);
+diff --git a/client/main.c b/client/main.c
+index b96278d45..d0d7f2a8f 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2185,6 +2185,11 @@ static void cmd_advertise_manufacturer(int argc, char *argv[])
+ 	ad_advertise_manufacturer(dbus_conn, argc, argv);
+ }
+ 
++static void cmd_advertise_data(int argc, char *argv[])
++{
++	ad_advertise_data(dbus_conn, argc, argv);
++}
++
+ static void cmd_advertise_tx_power(int argc, char *argv[])
+ {
+ 	dbus_bool_t powered;
+@@ -2302,6 +2307,11 @@ static void ad_clear_manufacturer(void)
+ 	ad_disable_manufacturer(dbus_conn);
+ }
+ 
++static void ad_clear_data(void)
++{
++	ad_disable_data(dbus_conn);
++}
++
+ static void ad_clear_tx_power(void)
+ {
+ 	dbus_bool_t powered = false;
+@@ -2337,6 +2347,7 @@ static const struct clear_entry ad_clear[] = {
+ 	{ "uuids",		ad_clear_uuids },
+ 	{ "service",		ad_clear_service },
+ 	{ "manufacturer",	ad_clear_manufacturer },
++	{ "data",		ad_clear_data },
+ 	{ "tx-power",		ad_clear_tx_power },
+ 	{ "name",		ad_clear_name },
+ 	{ "appearance",		ad_clear_appearance },
+@@ -2367,6 +2378,8 @@ static const struct bt_shell_menu advertise_menu = {
+ 	{ "manufacturer", "[id] [data=xx xx ...]",
+ 			cmd_advertise_manufacturer,
+ 			"Set/Get advertise manufacturer data" },
++	{ "data", "[type] [data=xx xx ...]", cmd_advertise_data,
++			"Set/Get advertise data" },
+ 	{ "tx-power", "[on/off]", cmd_advertise_tx_power,
+ 			"Show/Enable/Disable TX power to be advertised",
+ 							NULL },
 -- 
 2.14.3
 
