@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/7] doc/device-api: Add AdvertisingData property
-Date: Thu, 19 Apr 2018 16:46:25 +0300
-Message-Id: <20180419134630.15624-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/7] advertising: Add Data implementation
+Date: Thu, 19 Apr 2018 16:46:28 +0300
+Message-Id: <20180419134630.15624-5-luiz.dentz@gmail.com>
 In-Reply-To: <20180419134630.15624-1-luiz.dentz@gmail.com>
 References: <20180419134630.15624-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,36 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds AdvertisingData which exposes data being advertised which is
-may be useful for profiles not handled by bluetoothd.
+This adds the support for Data property.
 ---
- doc/device-api.txt | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ src/advertising.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 1b448eef1..65d8fee37 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -251,3 +251,19 @@ Properties	string Address [readonly]
- 		array{byte} AdvertisingFlags [readonly, experimental]
+diff --git a/src/advertising.c b/src/advertising.c
+index b976562c4..400c21b5e 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -583,6 +583,64 @@ static bool parse_timeout(DBusMessageIter *iter,
+ 	return true;
+ }
  
- 			The Advertising Data Flags of the remote device.
++static bool parse_data(DBusMessageIter *iter, struct btd_adv_client *client)
++{
++	DBusMessageIter entries;
 +
-+		dict AdvertisingData [readonly, experimental]
++	if (!iter) {
++		bt_ad_clear_data(client->data);
++		return true;
++	}
 +
-+			The Advertising Data of the remote device. Keys are
-+			are 8 bits AD Type followed by data as byte array.
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
++		return false;
 +
-+			Note: Only types considered safe to be handled by
-+			application are exposed.
++	dbus_message_iter_recurse(iter, &entries);
 +
-+			Possible values:
-+				<type> <byte array>
-+				...
++	bt_ad_clear_data(client->data);
 +
-+			Example:
-+				<Transport Discovery> <Organization Flags...>
-+				0x26                   0x01         0x01...
++	while (dbus_message_iter_get_arg_type(&entries)
++						== DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter value, entry, array;
++		uint8_t type;
++		uint8_t *data;
++		int len;
++
++		dbus_message_iter_recurse(&entries, &entry);
++		dbus_message_iter_get_basic(&entry, &type);
++
++		dbus_message_iter_next(&entry);
++
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
++			goto fail;
++
++		dbus_message_iter_recurse(&entry, &value);
++
++		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
++			goto fail;
++
++		dbus_message_iter_recurse(&value, &array);
++
++		if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_BYTE)
++			goto fail;
++
++		dbus_message_iter_get_fixed_array(&array, &data, &len);
++
++		DBG("Adding Data for type 0x%02x len %u", type, len);
++
++		if (!bt_ad_add_data(client->data, type, data, len))
++			goto fail;
++
++		dbus_message_iter_next(&entries);
++	}
++
++	return true;
++
++fail:
++	bt_ad_clear_data(client->data);
++	return false;
++}
++
+ static struct adv_parser {
+ 	const char *name;
+ 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
+@@ -597,6 +655,7 @@ static struct adv_parser {
+ 	{ "Appearance", parse_appearance },
+ 	{ "Duration", parse_duration },
+ 	{ "Timeout", parse_timeout },
++	{ "Data", parse_data },
+ 	{ },
+ };
+ 
 -- 
 2.14.3
 
