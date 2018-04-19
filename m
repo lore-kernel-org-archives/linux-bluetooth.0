@@ -1,115 +1,116 @@
-Return-Path: <john@metanate.com>
-From: John Keeping <john@metanate.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	John Keeping <john@metanate.com>
-Subject: [PATCH] Bluetooth: use wait_event API instead of open-coding it
-Date: Thu, 19 Apr 2018 16:29:37 +0100
-Message-Id: <20180419152937.13515-1-john@metanate.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20180419140312.22707-1-grzegorz.kolodziejczyk@codecoup.pl>
+References: <20180419140312.22707-1-grzegorz.kolodziejczyk@codecoup.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 19 Apr 2018 18:18:10 +0300
+Message-ID: <CABBYNZKzpWb44ZMPaRtVgw9toSifquED8oxCn4ud3Db_FS8UOw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 1/4] client: Add missing newline character to
+ shell printfs
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I've seen timeout errors from HCI commands where it looks like
-schedule_timeout() has returned immediately; additional logging for the
-error case gives:
+Hi Grzegorz,
 
-	req_status=1 req_result=0 remaining=10000 jiffies
+On Thu, Apr 19, 2018 at 5:03 PM, Grzegorz Kolodziejczyk
+<grzegorz.kolodziejczyk@codecoup.pl> wrote:
+> This patch adds missing newline characters to shell printfs. It fixes
+> printig issues.
 
-so the device is still in state HCI_REQ_PEND and the value returned by
-schedule_timeout() is the same as the original timeout (HCI_INIT_TIMEOUT
-on a system with HZ=1000).
+We might be able to solve this sort of problem by introducing a macro,
+e.g. bt_shell_msg, that adds the new line, for bt_shell_printf Id like
+to keep as it is since there could be tools that need to break the
+messages.
 
-Use wait_event_interruptible_timeout() instead of open-coding similar
-behaviour which is subject to the spurious failure described above.
+> ---
+>  client/gatt.c | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
+>
+> diff --git a/client/gatt.c b/client/gatt.c
+> index 7103c4f83..52a999dc9 100644
+> --- a/client/gatt.c
+> +++ b/client/gatt.c
+> @@ -627,7 +627,8 @@ static void write_attribute(GDBusProxy *proxy, char *arg)
+>                 bt_shell_printf("Attempting to write fd %d\n",
+>                                                 io_get_fd(write_io.io));
+>                 if (io_send(write_io.io, &iov, 1) < 0) {
+> -                       bt_shell_printf("Failed to write: %s", strerror(errno));
+> +                       bt_shell_printf("Failed to write: %s\n",
+> +                                                       strerror(errno));
+>                         return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>                 }
+>                 return;
+> @@ -1622,7 +1623,7 @@ static void authorize_write_response(const char *input, void *user_data)
+>                 goto error;
+>         }
+>
+> -       bt_shell_printf("[" COLORED_CHG "] Attribute %s written" , chrc->path);
+> +       bt_shell_printf("[" COLORED_CHG "] Attribute %s written\n", chrc->path);
+>
+>         g_dbus_emit_property_changed(aad->conn, chrc->path, CHRC_INTERFACE,
+>                                                                 "Value");
+> @@ -1671,7 +1672,7 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
+>                                         "org.bluez.Error.InvalidArguments",
+>                                         NULL);
+>
+> -       bt_shell_printf("[" COLORED_CHG "] Attribute %s written" , chrc->path);
+> +       bt_shell_printf("[" COLORED_CHG "] Attribute %s written\n", chrc->path);
+>
+>         g_dbus_emit_property_changed(conn, chrc->path, CHRC_INTERFACE, "Value");
+>
+> @@ -1789,8 +1790,8 @@ static DBusMessage *chrc_start_notify(DBusConnection *conn, DBusMessage *msg,
+>                 return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+>
+>         chrc->notifying = true;
+> -       bt_shell_printf("[" COLORED_CHG "] Attribute %s notifications enabled",
+> -                                                       chrc->path);
+> +       bt_shell_printf("[" COLORED_CHG "] Attribute %s notifications "
+> +                                               "enabled\n", chrc->path);
+>         g_dbus_emit_property_changed(conn, chrc->path, CHRC_INTERFACE,
+>                                                         "Notifying");
+>
+> @@ -1806,8 +1807,8 @@ static DBusMessage *chrc_stop_notify(DBusConnection *conn, DBusMessage *msg,
+>                 return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+>
+>         chrc->notifying = false;
+> -       bt_shell_printf("[" COLORED_CHG "] Attribute %s notifications disabled",
+> -                                                       chrc->path);
+> +       bt_shell_printf("[" COLORED_CHG "] Attribute %s notifications "
+> +                                               "disabled\n", chrc->path);
+>         g_dbus_emit_property_changed(conn, chrc->path, CHRC_INTERFACE,
+>                                                         "Notifying");
+>
+> @@ -1819,7 +1820,8 @@ static DBusMessage *chrc_confirm(DBusConnection *conn, DBusMessage *msg,
+>  {
+>         struct chrc *chrc = user_data;
+>
+> -       bt_shell_printf("Attribute %s indication confirm received", chrc->path);
+> +       bt_shell_printf("Attribute %s indication confirm received\n",
+> +                                                               chrc->path);
+>
+>         return dbus_message_new_method_return(msg);
+>  }
+> @@ -2012,7 +2014,7 @@ static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage *msg,
+>         bt_shell_printf("WriteValue: %s offset %u link %s\n",
+>                         path_to_address(device), offset, link);
+>
+> -       bt_shell_printf("[" COLORED_CHG "] Attribute %s written" , desc->path);
+> +       bt_shell_printf("[" COLORED_CHG "] Attribute %s written\n" , desc->path);
+>
+>         g_dbus_emit_property_changed(conn, desc->path, CHRC_INTERFACE, "Value");
+>
+> --
+> 2.13.6
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Signed-off-by: John Keeping <john@metanate.com>
----
-I saw problems with the -rt patchset on 4.9 and I'm not convinced that
-it's Bluetooth at fault for the problem described above, but I think
-this is a nice cleanup even if it's not a bug fix.
 
- net/bluetooth/hci_request.c | 30 +++++++-----------------------
- 1 file changed, 7 insertions(+), 23 deletions(-)
 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 66c0781773df..e44d34734834 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -122,7 +122,6 @@ void hci_req_sync_cancel(struct hci_dev *hdev, int err)
- struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
- 				  const void *param, u8 event, u32 timeout)
- {
--	DECLARE_WAITQUEUE(wait, current);
- 	struct hci_request req;
- 	struct sk_buff *skb;
- 	int err = 0;
-@@ -135,21 +134,14 @@ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
- 
- 	hdev->req_status = HCI_REQ_PEND;
- 
--	add_wait_queue(&hdev->req_wait_q, &wait);
--	set_current_state(TASK_INTERRUPTIBLE);
--
- 	err = hci_req_run_skb(&req, hci_req_sync_complete);
--	if (err < 0) {
--		remove_wait_queue(&hdev->req_wait_q, &wait);
--		set_current_state(TASK_RUNNING);
-+	if (err < 0)
- 		return ERR_PTR(err);
--	}
- 
--	schedule_timeout(timeout);
-+	err = wait_event_interruptible_timeout(hdev->req_wait_q,
-+			hdev->req_status != HCI_REQ_PEND, timeout);
- 
--	remove_wait_queue(&hdev->req_wait_q, &wait);
--
--	if (signal_pending(current))
-+	if (err == -ERESTARTSYS)
- 		return ERR_PTR(-EINTR);
- 
- 	switch (hdev->req_status) {
-@@ -197,7 +189,6 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 		   unsigned long opt, u32 timeout, u8 *hci_status)
- {
- 	struct hci_request req;
--	DECLARE_WAITQUEUE(wait, current);
- 	int err = 0;
- 
- 	BT_DBG("%s start", hdev->name);
-@@ -213,16 +204,10 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 		return err;
- 	}
- 
--	add_wait_queue(&hdev->req_wait_q, &wait);
--	set_current_state(TASK_INTERRUPTIBLE);
--
- 	err = hci_req_run_skb(&req, hci_req_sync_complete);
- 	if (err < 0) {
- 		hdev->req_status = 0;
- 
--		remove_wait_queue(&hdev->req_wait_q, &wait);
--		set_current_state(TASK_RUNNING);
--
- 		/* ENODATA means the HCI request command queue is empty.
- 		 * This can happen when a request with conditionals doesn't
- 		 * trigger any commands to be sent. This is normal behavior
-@@ -240,11 +225,10 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 		return err;
- 	}
- 
--	schedule_timeout(timeout);
--
--	remove_wait_queue(&hdev->req_wait_q, &wait);
-+	err = wait_event_interruptible_timeout(hdev->req_wait_q,
-+			hdev->req_status != HCI_REQ_PEND, timeout);
- 
--	if (signal_pending(current))
-+	if (err == -ERESTARTSYS)
- 		return -EINTR;
- 
- 	switch (hdev->req_status) {
 -- 
-2.17.0
+Luiz Augusto von Dentz
