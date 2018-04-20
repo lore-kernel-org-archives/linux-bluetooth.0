@@ -1,51 +1,44 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Szymon Janc <szymon.janc@codecoup.pl>
+Date: Fri, 20 Apr 2018 12:00:36 +0200
+From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@codecoup.pl>
-Subject: [PATCH] adapter: Fix accessing NULL adv_manager
-Date: Fri, 20 Apr 2018 13:02:38 +0200
-Message-Id: <20180420110238.24490-1-szymon.janc@codecoup.pl>
+Subject: [blueZ] Readline mandatory ?
+Message-ID: <20180420120036.040c1b09@windsurf.numericable.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-adv_manager might be NULL also if BR/EDR only mdoe is set in main.conf
-or if btd_adv_manager_new failed so checking for LE in supported
-settings is not enough. This also makes btd_adv_manager_refresh
-consistent with other adv_manager API regarding passing NULL manager
-as function parameter.
----
- src/adapter.c     | 3 +--
- src/advertising.c | 3 +++
- 2 files changed, 4 insertions(+), 2 deletions(-)
+Hello,
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f91b04173..932b2a34d 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -540,8 +540,7 @@ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
- 		g_dbus_emit_property_changed(dbus_conn, adapter->path,
- 					ADAPTER_INTERFACE, "Discoverable");
- 		store_adapter_info(adapter);
--		if (adapter->supported_settings & MGMT_SETTING_LE)
--			btd_adv_manager_refresh(adapter->adv_manager);
-+		btd_adv_manager_refresh(adapter->adv_manager);
- 	}
- 
- 	if (changed_mask & MGMT_SETTING_BONDABLE) {
-diff --git a/src/advertising.c b/src/advertising.c
-index b976562c4..0cb6eac3a 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -1173,6 +1173,9 @@ void btd_adv_manager_destroy(struct btd_adv_manager *manager)
- 
- void btd_adv_manager_refresh(struct btd_adv_manager *manager)
- {
-+	if (!manager)
-+		return;
-+
- 	queue_foreach(manager->clients, (queue_foreach_func_t)refresh_adv,
- 									NULL);
- }
+Until commit bee3796113196da1b3f56da42fcae4d9bae6695e, the readline
+library was an optional dependency of bluez (only needed when
+--enable-client was used).
+
+However, following this commit, shell.c is now built as part of
+libshared, and readline becomes a mandatory dependency, which is not even
+checked by the configure script. This leads to a build failure such as:
+
+src/shared/shell.c:39:31: fatal error: readline/readline.h: No such file or directory
+ #include <readline/readline.h>
+
+Is this an intended side effect of commit
+bee3796113196da1b3f56da42fcae4d9bae6695e ? If yes, then the configure
+script should be adjusted accordingly. If not, how should the code be
+fixed to not use readline unconditionally ?
+
+The fact that readline is under GPLv3 might be an issue for some
+people, so having it as a mandatory dependency might be problematic.
+
+The problem reported here exists in both the 5.49 release and the
+latest master branch as of a085d8c88bd45474d3f9d9a0d3d20ebf7de858f6.
+
+Any hint on how to resolve this issue ?
+
+Thanks,
+
+Thomas Petazzoni
 -- 
-2.14.3
-
+Thomas Petazzoni, CTO, Bootlin (formerly Free Electrons)
+Embedded Linux and Kernel engineering
+https://bootlin.com
