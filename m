@@ -9,125 +9,126 @@ Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
 	linux-acpi@vger.kernel.org
-Subject: [PATCH 4/6] Bluetooth: btbcm: Allow using btbcm_initialize() for reinit
-Date: Fri, 20 Apr 2018 14:44:05 +0200
-Message-Id: <20180420124407.19712-4-hdegoede@redhat.com>
+Subject: [PATCH 3/6] Bluetooth: btbcm: Make btbcm_initialize() also work for USB connected devices
+Date: Fri, 20 Apr 2018 14:44:04 +0200
+Message-Id: <20180420124407.19712-3-hdegoede@redhat.com>
 In-Reply-To: <20180420124407.19712-1-hdegoede@redhat.com>
 References: <20180420124407.19712-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btbcm_finalize() does a re-init of the controller, which is almost the
-same as the initial init. Modify btbcm_initialize() so that it can be
-used for this re-init and modify btbcm_finalize() to use it.
-
-As an added bonus this also makes the dev_info from btbcm_finalize()
-use the proper hw_name instead of always printing "BCM".
+Make btbcm_initialize() also work for USB connected device,
+btbcm_initialize() and btbcm_setup_patchram() are quite similar,
+this is a preparation patch for making btbcm_setup_patchram() use
+btbcm_initialize() to remove the code duplication.
 
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/btbcm.c   | 33 ++++++++++-----------------------
- drivers/bluetooth/btbcm.h   |  5 +++--
- drivers/bluetooth/hci_bcm.c |  2 +-
- 3 files changed, 14 insertions(+), 26 deletions(-)
+ drivers/bluetooth/btbcm.c | 72 +++++++++++++++++++++++----------------
+ 1 file changed, 43 insertions(+), 29 deletions(-)
 
 diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index dd243afe32de..fdcbeb489a2e 100644
+index e3393bceb1a0..dd243afe32de 100644
 --- a/drivers/bluetooth/btbcm.c
 +++ b/drivers/bluetooth/btbcm.c
-@@ -346,7 +346,8 @@ static const struct bcm_subver_table bcm_usb_subver_table[] = {
+@@ -332,12 +332,27 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
  	{ }
  };
  
--int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len)
-+int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len,
-+		     bool reinit)
++static const struct bcm_subver_table bcm_usb_subver_table[] = {
++	{ 0x210b, "BCM43142A0"	},	/* 001.001.011 */
++	{ 0x2112, "BCM4314A0"	},	/* 001.001.018 */
++	{ 0x2118, "BCM20702A0"	},	/* 001.001.024 */
++	{ 0x2126, "BCM4335A0"	},	/* 001.001.038 */
++	{ 0x220e, "BCM20702A1"	},	/* 001.002.014 */
++	{ 0x230f, "BCM4354A2"	},	/* 001.003.015 */
++	{ 0x4106, "BCM4335B0"	},	/* 002.001.006 */
++	{ 0x410e, "BCM20702B0"	},	/* 002.001.014 */
++	{ 0x6109, "BCM4335C0"	},	/* 003.001.009 */
++	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
++	{ }
++};
++
+ int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len)
  {
- 	u16 subver, rev, pid, vid;
+-	u16 subver, rev;
++	u16 subver, rev, pid, vid;
  	const char *hw_name = NULL;
-@@ -371,9 +372,11 @@ int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len)
- 	kfree_skb(skb);
+ 	struct sk_buff *skb;
+ 	struct hci_rp_read_local_version *ver;
++	const struct bcm_subver_table *bcm_subver_table;
+ 	int i, err;
  
- 	/* Read controller information */
--	err = btbcm_read_info(hdev);
--	if (err)
--		return err;
-+	if (!reinit) {
-+		err = btbcm_read_info(hdev);
-+		if (err)
-+			return err;
+ 	/* Reset */
+@@ -360,22 +375,35 @@ int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len)
+ 	if (err)
+ 		return err;
+ 
+-	switch ((rev & 0xf000) >> 12) {
+-	case 0:
+-	case 1:
+-	case 2:
+-	case 3:
+-		for (i = 0; bcm_uart_subver_table[i].name; i++) {
+-			if (subver == bcm_uart_subver_table[i].subver) {
+-				hw_name = bcm_uart_subver_table[i].name;
+-				break;
+-			}
++	/* Upper nibble of rev should be between 0 and 3? */
++	if (((rev & 0xf000) >> 12) > 3)
++		return 0;
++
++	bcm_subver_table = (hdev->bus == HCI_USB) ? bcm_usb_subver_table :
++						    bcm_uart_subver_table;
++
++	for (i = 0; bcm_subver_table[i].name; i++) {
++		if (subver == bcm_subver_table[i].subver) {
++			hw_name = bcm_subver_table[i].name;
++			break;
+ 		}
 +	}
  
- 	/* Upper nibble of rev should be between 0 and 3? */
- 	if (((rev & 0xf000) >> 12) > 3)
-@@ -416,30 +419,14 @@ EXPORT_SYMBOL_GPL(btbcm_initialize);
+-		snprintf(fw_name, len, "brcm/%s.hcd", hw_name ? : "BCM");
+-		break;
+-	default:
+-		return 0;
++	if (hdev->bus == HCI_USB) {
++		/* Read USB Product Info */
++		skb = btbcm_read_usb_product(hdev);
++		if (IS_ERR(skb))
++			return PTR_ERR(skb);
++
++		vid = get_unaligned_le16(skb->data + 1);
++		pid = get_unaligned_le16(skb->data + 3);
++		kfree_skb(skb);
++
++		snprintf(fw_name, len, "brcm/%s-%4.4x-%4.4x.hcd",
++			 hw_name ? : "BCM", vid, pid);
++	} else {
++		snprintf(fw_name, len, "brcm/%s.hcd",
++			 hw_name ? : "BCM");
+ 	}
  
- int btbcm_finalize(struct hci_dev *hdev)
- {
--	struct sk_buff *skb;
--	struct hci_rp_read_local_version *ver;
--	u16 subver, rev;
-+	char fw_name[64];
- 	int err;
- 
--	/* Reset */
--	err = btbcm_reset(hdev);
-+	/* Re-initialize */
-+	err = btbcm_initialize(hdev, fw_name, sizeof(fw_name), true);
- 	if (err)
- 		return err;
- 
--	/* Read Local Version Info */
--	skb = btbcm_read_local_version(hdev);
--	if (IS_ERR(skb))
--		return PTR_ERR(skb);
--
--	ver = (struct hci_rp_read_local_version *)skb->data;
--	rev = le16_to_cpu(ver->hci_rev);
--	subver = le16_to_cpu(ver->lmp_subver);
--	kfree_skb(skb);
--
--	bt_dev_info(hdev, "BCM (%3.3u.%3.3u.%3.3u) build %4.4u",
--		    (subver & 0xe000) >> 13, (subver & 0x1f00) >> 8,
--		    (subver & 0x00ff), rev & 0x0fff);
--
- 	btbcm_check_bdaddr(hdev);
- 
- 	set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index cfe6ad4cc621..5346515c880c 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -73,7 +73,8 @@ int btbcm_patchram(struct hci_dev *hdev, const struct firmware *fw);
- int btbcm_setup_patchram(struct hci_dev *hdev);
- int btbcm_setup_apple(struct hci_dev *hdev);
- 
--int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len);
-+int btbcm_initialize(struct hci_dev *hdev, char *fw_name, size_t len,
-+		     bool reinit);
- int btbcm_finalize(struct hci_dev *hdev);
- 
- #else
-@@ -104,7 +105,7 @@ static inline int btbcm_setup_apple(struct hci_dev *hdev)
+ 	bt_dev_info(hdev, "%s (%3.3u.%3.3u.%3.3u) build %4.4u",
+@@ -420,20 +448,6 @@ int btbcm_finalize(struct hci_dev *hdev)
  }
+ EXPORT_SYMBOL_GPL(btbcm_finalize);
  
- static inline int btbcm_initialize(struct hci_dev *hdev, char *fw_name,
--				   size_t len)
-+				   size_t len, bool reinit)
+-static const struct bcm_subver_table bcm_usb_subver_table[] = {
+-	{ 0x210b, "BCM43142A0"	},	/* 001.001.011 */
+-	{ 0x2112, "BCM4314A0"	},	/* 001.001.018 */
+-	{ 0x2118, "BCM20702A0"	},	/* 001.001.024 */
+-	{ 0x2126, "BCM4335A0"	},	/* 001.001.038 */
+-	{ 0x220e, "BCM20702A1"	},	/* 001.002.014 */
+-	{ 0x230f, "BCM4354A2"	},	/* 001.003.015 */
+-	{ 0x4106, "BCM4335B0"	},	/* 002.001.006 */
+-	{ 0x410e, "BCM20702B0"	},	/* 002.001.014 */
+-	{ 0x6109, "BCM4335C0"	},	/* 003.001.009 */
+-	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
+-	{ }
+-};
+-
+ int btbcm_setup_patchram(struct hci_dev *hdev)
  {
- 	return 0;
- }
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 04c4b93b4c6f..f06f0f1132fb 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -501,7 +501,7 @@ static int bcm_setup(struct hci_uart *hu)
- 	hu->hdev->set_diag = bcm_set_diag;
- 	hu->hdev->set_bdaddr = btbcm_set_bdaddr;
- 
--	err = btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name));
-+	err = btbcm_initialize(hu->hdev, fw_name, sizeof(fw_name), false);
- 	if (err)
- 		return err;
- 
+ 	char fw_name[64];
 -- 
 2.17.0
