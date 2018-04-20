@@ -1,133 +1,50 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZK98ZsQ8oa6DHm-CsNZvLkALR6H-Vp8eg0xSp5aU5cY4A@mail.gmail.com>
-References: <20180419140312.22707-1-grzegorz.kolodziejczyk@codecoup.pl>
- <20180419140312.22707-4-grzegorz.kolodziejczyk@codecoup.pl> <CABBYNZK98ZsQ8oa6DHm-CsNZvLkALR6H-Vp8eg0xSp5aU5cY4A@mail.gmail.com>
-From: =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?=
-        <grzegorz.kolodziejczyk@codecoup.pl>
-Date: Fri, 20 Apr 2018 10:11:41 +0200
-Message-ID: <CALevQMbHt9aFxAKbj8LAA3kcUYB+t9Na8bBE6YLqTfRR37n56A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 4/4] shared/gatt-server: Fix prepare write queuing
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <cmcvista@gmail.com>
+From: Chriz Chow <cmcvista@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	Szymon Janc <szymon.janc@codecoup.pl>
+Cc: Chriz Chow <chriz.chow@aminocom.com>
+Subject: [PATCH v2] Bluetooth: Prevent buffer overflow for large advertisement data
+Date: Fri, 20 Apr 2018 15:46:24 +0800
+Message-Id: <1524210384-19845-1-git-send-email-chriz.chow@aminocom.com>
+In-Reply-To: <1646173.KpzMEjoeCb@ix>
+References: <1646173.KpzMEjoeCb@ix>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+There are some controllers sending out advertising data with illegal
+length value which is longer than HCI_MAX_AD_LENGTH, causing the
+buffer last_adv_data overflows. To avoid these controllers from
+overflowing the buffer, we do not process the advertisement data
+if its length is incorrect.
 
-I did this fix while testing it agains PTS test case "4.6.39
-GATT/SR/GAW/BV-10-C [Nested Long Characteristic Value Reliable Writes
-- to Server]"
+Signed-off-by: Chriz Chow <chriz.chow@aminocom.com>
+---
+ net/bluetooth/hci_event.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-Without this fix bluez behaves as described:
-1) PTS do prepare write to CHARACTERISTIC1 with offset =3D 0 and value
-with size =3D ATT_MTU-5.
-2) Bluez do new prepare write for CHARACTERISTIC1
-3) PTS do prepare write to CHARACTERISTIC2 with offset =3D 0 and value
-with size =3D ATT_MTU-5.
-4) Bluez do new prepare write for CHARACTERISTIC2
-5) PTS do prepare write to CHARACTERISTIC1 with offset =3D ATT_MTU-5 and
-value with size < ATT_MTU-5.
-6) Bluez do new prepare write for CHARACTERISTIC1
-7) PTS do prepare write to CHARACTERISTIC2 with offset =3D ATT_MTU-5 and
-value with size < ATT_MTU-5.
-8) Bluez do new prepare write for CHARACTERISTIC2
-
-9) Execut write is issued with flag "Immediately write all pend-ing
-prepared values".
-10) PTS do read of those two CHARACTERISTICS and got response with
-value from last prepare write to CHARACTERISTIC (this from second
-prepare write form offset ATT_MTU-5) cause thos are 4 seperate prepare
-writes queues (bluez appends only if last prepare write was to the
-same handle).
-11) Test result fails cause expected value isn't the same as read.
-
-What's more, spec says"
-"If a Characteristic Value is prepared two or more times during this sub-
-procedure, then all prepared values are written to the same Characteristic
-Value in the order that they were prepared." BLUETOOTH SPECIFICATION
-Version 5.0 | Vol 3, Part G (4.9.5)
-
-"Each client=E2=80=99s queued values are separate; the execution of one que=
-ue shall not
-affect the preparation or execution of any other client=E2=80=99s queued
-values." BLUETOOTH SPECIFICATION Version 5.0 | Vol 3, Part F (3.4.6.1)
-
-Regards,
-Grzegorz
-
-2018-04-19 17:11 GMT+02:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> Hi Grzegorz,
->
-> On Thu, Apr 19, 2018 at 5:03 PM, Grzegorz Kolodziejczyk
-> <grzegorz.kolodziejczyk@codecoup.pl> wrote:
->> Multiple prepare writes may be done for multiple attributes. Queue
->> mechanism must be aware of handle under which preparation is done.
->> ---
->>  src/shared/gatt-server.c | 15 ++++++++++++---
->>  1 file changed, 12 insertions(+), 3 deletions(-)
->>
->> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
->> index 4b554f665..d1efa83a1 100644
->> --- a/src/shared/gatt-server.c
->> +++ b/src/shared/gatt-server.c
->> @@ -1190,6 +1190,14 @@ static bool prep_data_new(struct bt_gatt_server *=
-server,
->>         return true;
->>  }
->>
->> +static bool match_prep_attr_handle(const void *data, const void *match_=
-data)
->> +{
->> +       const struct prep_write_data *prep_data =3D data;
->> +       const uint16_t *match_handle =3D match_data;
->> +
->> +       return prep_data->handle =3D=3D *match_handle;
->> +}
->> +
->>  static bool store_prep_data(struct bt_gatt_server *server,
->>                                         uint16_t handle, uint16_t offset=
-,
->>                                         uint16_t length, uint8_t *value)
->> @@ -1200,9 +1208,10 @@ static bool store_prep_data(struct bt_gatt_server=
- *server,
->>          * Now lets check if prep write is a continuation of long write
->>          * If so do aggregation of data
->>          */
->> -       prep_data =3D queue_peek_tail(server->prep_queue);
->> -       if (prep_data && (prep_data->handle =3D=3D handle) &&
->> -                       (offset =3D=3D (prep_data->length + prep_data->o=
-ffset)))
->> +       prep_data =3D queue_find(server->prep_queue, match_prep_attr_han=
-dle,
->> +                                                               &handle)=
-;
->
-> If I got this right it is not that the code is broken, it just don't
-> group together the writes if there are other handles in the prepare
-> queue. Afaik that was done because the order we write the handles may
-> matter, so it is up to the remote stack to make the order proper if it
-> wants long writes to all be executed in sequence, or interleaved which
-> means we would have to store new chunks in the order they are
-> prepared.
->
->> +       if (prep_data && (offset =3D=3D (prep_data->length + prep_data->=
-offset)))
->>                 return append_prep_data(prep_data, handle, length, value=
-);
->>
->>         return prep_data_new(server, handle, offset, length, value);
->> --
->> 2.13.6
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetoot=
-h" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
->
-> --
-> Luiz Augusto von Dentz
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 139707c..dc4cfd5 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4942,10 +4942,14 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		struct hci_ev_le_advertising_info *ev = ptr;
+ 		s8 rssi;
+ 
+-		rssi = ev->data[ev->length];
+-		process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
+-				   ev->bdaddr_type, NULL, 0, rssi,
+-				   ev->data, ev->length);
++		if (ev->length <= HCI_MAX_AD_LENGTH) {
++			rssi = ev->data[ev->length];
++			process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
++					   ev->bdaddr_type, NULL, 0, rssi,
++					   ev->data, ev->length);
++		} else {
++			BT_ERR("Dropped invalid adv data");
++		}
+ 
+ 		ptr += sizeof(*ev) + ev->length + 1;
+ 	}
+-- 
+2.7.4
