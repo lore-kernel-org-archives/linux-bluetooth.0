@@ -1,50 +1,96 @@
-Return-Path: <cmcvista@gmail.com>
-From: Chriz Chow <cmcvista@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	Szymon Janc <szymon.janc@codecoup.pl>
-Cc: Chriz Chow <chriz.chow@aminocom.com>
-Subject: [PATCH v2] Bluetooth: Prevent buffer overflow for large advertisement data
-Date: Fri, 20 Apr 2018 15:46:24 +0800
-Message-Id: <1524210384-19845-1-git-send-email-chriz.chow@aminocom.com>
-In-Reply-To: <1646173.KpzMEjoeCb@ix>
-References: <1646173.KpzMEjoeCb@ix>
+Return-Path: <sean.wang@mediatek.com>
+Message-ID: <1524196190.26454.3.camel@mtkswgap22>
+Subject: Re: [PATCH v1 5/7] soc: mediatek: add a fixed wait for SRAM stable
+From: Sean Wang <sean.wang@mediatek.com>
+To: Matthias Brugger <matthias.bgg@gmail.com>
+CC: <robh+dt@kernel.org>, <mark.rutland@arm.com>, <marcel@holtmann.org>,
+	<johan.hedberg@gmail.com>, <devicetree@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, <linux-kernel@vger.kernel.org>, "Ulf
+ Hansson" <ulf.hansson@linaro.org>, Weiyi Lu <weiyi.lu@mediatek.com>
+Date: Fri, 20 Apr 2018 11:49:50 +0800
+In-Reply-To: <5f2530a0-aee2-39fe-eb5c-56cd4a68c9db@gmail.com>
+References: <cover.1522736996.git.sean.wang@mediatek.com>
+	 <0fc10b2498c6dbe20141831c722c32cc74330d3d.1522736996.git.sean.wang@mediatek.com>
+	 <5f2530a0-aee2-39fe-eb5c-56cd4a68c9db@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are some controllers sending out advertising data with illegal
-length value which is longer than HCI_MAX_AD_LENGTH, causing the
-buffer last_adv_data overflows. To avoid these controllers from
-overflowing the buffer, we do not process the advertisement data
-if its length is incorrect.
+On Thu, 2018-04-19 at 12:33 +0200, Matthias Brugger wrote:
+> 
+> On 04/03/2018 09:15 AM, sean.wang@mediatek.com wrote:
+> > From: Sean Wang <sean.wang@mediatek.com>
+> > 
+> > MT7622_POWER_DOMAIN_WB doesn't send an ACK when its managed SRAM becomes
+> > stable, which is not like the behavior the other power domains should
+> > have. Therefore, it's necessary for such a power domain to have a fixed
+> > and well-predefined duration to wait until its managed SRAM can be allowed
+> > to access by all functions running on the top.
+> > 
+> > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> > Cc: Matthias Brugger <matthias.bgg@gmail.com>
+> > Cc: Ulf Hansson <ulf.hansson@linaro.org>
+> > Cc: Weiyi Lu <weiyi.lu@mediatek.com>
+> > ---
+> >  drivers/soc/mediatek/mtk-scpsys.c | 17 ++++++++++++-----
+> >  1 file changed, 12 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/drivers/soc/mediatek/mtk-scpsys.c b/drivers/soc/mediatek/mtk-scpsys.c
+> > index f9b7248..19aceb8 100644
+> > --- a/drivers/soc/mediatek/mtk-scpsys.c
+> > +++ b/drivers/soc/mediatek/mtk-scpsys.c
+> > @@ -121,6 +121,7 @@ struct scp_domain_data {
+> >  	u32 bus_prot_mask;
+> >  	enum clk_id clk_id[MAX_CLKS];
+> >  	bool active_wakeup;
+> > +	u32 us_sram_fwait;
+> 
+> Before adding more and more fields to scp_domain_data which get checked in if's,
+> I'd prefer to add a caps field used for bus_prot_mask, active_wakeup in a first
+> patch and add the cap FORCE_WAIT in a second patch.
+> 
+> Can you help to implement this Sean, or shall I give it a try?
+> 
 
-Signed-off-by: Chriz Chow <chriz.chow@aminocom.com>
----
- net/bluetooth/hci_event.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Sure, I have a willing to do and then see if you're also fond of it.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 139707c..dc4cfd5 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4942,10 +4942,14 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		struct hci_ev_le_advertising_info *ev = ptr;
- 		s8 rssi;
- 
--		rssi = ev->data[ev->length];
--		process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
--				   ev->bdaddr_type, NULL, 0, rssi,
--				   ev->data, ev->length);
-+		if (ev->length <= HCI_MAX_AD_LENGTH) {
-+			rssi = ev->data[ev->length];
-+			process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
-+					   ev->bdaddr_type, NULL, 0, rssi,
-+					   ev->data, ev->length);
-+		} else {
-+			BT_ERR("Dropped invalid adv data");
-+		}
- 
- 		ptr += sizeof(*ev) + ev->length + 1;
- 	}
--- 
-2.7.4
+thanks!
+
+> Regards,
+> Matthias
+> 
+> >  };
+> >  
+> >  struct scp;
+> > @@ -234,11 +235,16 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
+> >  	val &= ~scpd->data->sram_pdn_bits;
+> >  	writel(val, ctl_addr);
+> >  
+> > -	/* wait until SRAM_PDN_ACK all 0 */
+> > -	ret = readl_poll_timeout(ctl_addr, tmp, (tmp & pdn_ack) == 0,
+> > -				 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
+> > -	if (ret < 0)
+> > -		goto err_pwr_ack;
+> > +	/* Either wait until SRAM_PDN_ACK all 0 or have a force wait */
+> > +	if (!scpd->data->us_sram_fwait) {
+> > +		ret = readl_poll_timeout(ctl_addr, tmp, (tmp & pdn_ack) == 0,
+> > +					 MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
+> > +		if (ret < 0)
+> > +			goto err_pwr_ack;
+> > +	} else {
+> > +		usleep_range(scpd->data->us_sram_fwait,
+> > +			     scpd->data->us_sram_fwait + 100);
+> > +	};
+> >  
+> >  	if (scpd->data->bus_prot_mask) {
+> >  		ret = mtk_infracfg_clear_bus_protection(scp->infracfg,
+> > @@ -783,6 +789,7 @@ static const struct scp_domain_data scp_domain_data_mt7622[] = {
+> >  		.clk_id = {CLK_NONE},
+> >  		.bus_prot_mask = MT7622_TOP_AXI_PROT_EN_WB,
+> >  		.active_wakeup = true,
+> > +		.us_sram_fwait = 12000,
+> >  	},
+> >  };
+> >  
+> > 
