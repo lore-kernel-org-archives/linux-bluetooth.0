@@ -1,38 +1,75 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Fri, 20 Apr 2018 16:03:53 +0200
-From: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] build: Make bt_shell conditional to readline
-Message-ID: <20180420160353.5cb58146@windsurf.numericable.fr>
-In-Reply-To: <20180420130254.20063-1-luiz.dentz@gmail.com>
-References: <20180420130254.20063-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CABBYNZLmjfzBUfR1hWKvxcTaHhH7XKi_wZhjAuNMdpUxn2vBTw@mail.gmail.com>
+References: <20180420120036.040c1b09@windsurf.numericable.fr> <CABBYNZLmjfzBUfR1hWKvxcTaHhH7XKi_wZhjAuNMdpUxn2vBTw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 20 Apr 2018 16:04:37 +0300
+Message-ID: <CABBYNZJrOLb0PZ8Y7kP8SuSJYOamaw54rr2VLwu-zV-5aubhzw@mail.gmail.com>
+Subject: Re: [blueZ] Readline mandatory ?
+To: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Thomas,
 
-On Fri, 20 Apr 2018 16:02:54 +0300, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> bt_shell APIs shall only be build if readline is present on the system
-> since it currently depend on it.
+On Fri, Apr 20, 2018 at 3:57 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Thomas,
+>
+> On Fri, Apr 20, 2018 at 1:00 PM, Thomas Petazzoni
+> <thomas.petazzoni@bootlin.com> wrote:
+>> Hello,
+>>
+>> Until commit bee3796113196da1b3f56da42fcae4d9bae6695e, the readline
+>> library was an optional dependency of bluez (only needed when
+>> --enable-client was used).
+>>
+>> However, following this commit, shell.c is now built as part of
+>> libshared, and readline becomes a mandatory dependency, which is not even
+>> checked by the configure script. This leads to a build failure such as:
+>>
+>> src/shared/shell.c:39:31: fatal error: readline/readline.h: No such file or directory
+>>  #include <readline/readline.h>
+>>
+>> Is this an intended side effect of commit
+>> bee3796113196da1b3f56da42fcae4d9bae6695e ? If yes, then the configure
+>> script should be adjusted accordingly. If not, how should the code be
+>> fixed to not use readline unconditionally ?
+>>
+>> The fact that readline is under GPLv3 might be an issue for some
+>> people, so having it as a mandatory dependency might be problematic.
+>>
+>> The problem reported here exists in both the 5.49 release and the
+>> latest master branch as of a085d8c88bd45474d3f9d9a0d3d20ebf7de858f6.
+>>
+>> Any hint on how to resolve this issue ?
+>
+> We will have to fix this, it shell should probably be conditional to
+> build with libshared like the tools are.
 
-Tested-by: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Ive send a patch for it, could please check if it does build properly
+on a system without readline.
 
-I've tested with a few different BlueZ configurations (not all
-combinations though), and all of them built fine. The specific
-configuration that was failing to build due to the dependency on
-readline no longer fails to build.
+>> Thanks,
+>>
+>> Thomas Petazzoni
+>> --
+>> Thomas Petazzoni, CTO, Bootlin (formerly Free Electrons)
+>> Embedded Linux and Kernel engineering
+>> https://bootlin.com
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Thanks a lot Luiz for having looked so quickly at this bug report!
 
-Best regards,
 
-Thomas
 -- 
-Thomas Petazzoni, CTO, Bootlin (formerly Free Electrons)
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Luiz Augusto von Dentz
