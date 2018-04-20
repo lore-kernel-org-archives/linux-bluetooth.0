@@ -1,74 +1,62 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	=?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= <frederic.danis.oss@gmail.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Subject: [PATCH 1/6] Bluetooth: btbcm: Stop using upper nibble of rev to chose between uart/USB paths
-Date: Fri, 20 Apr 2018 14:44:02 +0200
-Message-Id: <20180420124407.19712-1-hdegoede@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] adapter: Fix accessing NULL adv_manager
+Date: Fri, 20 Apr 2018 13:37:07 +0200
+Message-ID: <3639790.BHHmaqKJhx@ix>
+In-Reply-To: <20180420110238.24490-1-szymon.janc@codecoup.pl>
+References: <20180420110238.24490-1-szymon.janc@codecoup.pl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-btbcm_setup_patchram() was using the upper nibble of the revision code to
-determine if we are dealing with an uart or USB connected bcm-bt device,
-but just as btbcm_initialize() has started accepting 1 and 2 as uart
-connected devices, I've now encountered an USB connected device (0a5c:216c)
-which has 0 in the upper nibble. So it seems that the upper nibble is not
-really a reliable indicator of the bus type.
+On Friday, 20 April 2018 13:02:38 CEST Szymon Janc wrote:
+> adv_manager might be NULL also if BR/EDR only mdoe is set in main.conf
+> or if btd_adv_manager_new failed so checking for LE in supported
+> settings is not enough. This also makes btd_adv_manager_refresh
+> consistent with other adv_manager API regarding passing NULL manager
+> as function parameter.
+> ---
+>  src/adapter.c     | 3 +--
+>  src/advertising.c | 3 +++
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/src/adapter.c b/src/adapter.c
+> index f91b04173..932b2a34d 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -540,8 +540,7 @@ static void settings_changed(struct btd_adapter
+> *adapter, uint32_t settings) g_dbus_emit_property_changed(dbus_conn,
+> adapter->path,
+>  					ADAPTER_INTERFACE, "Discoverable");
+>  		store_adapter_info(adapter);
+> -		if (adapter->supported_settings & MGMT_SETTING_LE)
+> -			btd_adv_manager_refresh(adapter->adv_manager);
+> +		btd_adv_manager_refresh(adapter->adv_manager);
+>  	}
+> 
+>  	if (changed_mask & MGMT_SETTING_BONDABLE) {
+> diff --git a/src/advertising.c b/src/advertising.c
+> index b976562c4..0cb6eac3a 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -1173,6 +1173,9 @@ void btd_adv_manager_destroy(struct btd_adv_manager
+> *manager)
+> 
+>  void btd_adv_manager_refresh(struct btd_adv_manager *manager)
+>  {
+> +	if (!manager)
+> +		return;
+> +
+>  	queue_foreach(manager->clients, (queue_foreach_func_t)refresh_adv,
+>  									NULL);
+>  }
 
-Instead check hdev->bus which does give us a reliable indication. This
-fixes the patchram code trying to load the patchram by the fallback BCM.hcd
-filename, now it correctly requests BCM43142A0-0a5c-216c.hcd.
+Applied.
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/btbcm.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 6659f113042c..f44ddc0a6b25 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -465,9 +465,11 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 	if (err)
- 		return err;
- 
--	switch ((rev & 0xf000) >> 12) {
--	case 0:
--	case 3:
-+	/* Upper nibble of rev should be between 0 and 3? */
-+	if (((rev & 0xf000) >> 12) > 3)
-+		return 0;
-+
-+	if (hdev->bus != HCI_USB) {
- 		for (i = 0; bcm_uart_subver_table[i].name; i++) {
- 			if (subver == bcm_uart_subver_table[i].subver) {
- 				hw_name = bcm_uart_subver_table[i].name;
-@@ -477,9 +479,7 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 
- 		snprintf(fw_name, sizeof(fw_name), "brcm/%s.hcd",
- 			 hw_name ? : "BCM");
--		break;
--	case 1:
--	case 2:
-+	} else {
- 		/* Read USB Product Info */
- 		skb = btbcm_read_usb_product(hdev);
- 		if (IS_ERR(skb))
-@@ -498,9 +498,6 @@ int btbcm_setup_patchram(struct hci_dev *hdev)
- 
- 		snprintf(fw_name, sizeof(fw_name), "brcm/%s-%4.4x-%4.4x.hcd",
- 			 hw_name ? : "BCM", vid, pid);
--		break;
--	default:
--		return 0;
- 	}
- 
- 	bt_dev_info(hdev, "%s (%3.3u.%3.3u.%3.3u) build %4.4u",
 -- 
-2.17.0
+pozdrawiam
+Szymon Janc
+
+
