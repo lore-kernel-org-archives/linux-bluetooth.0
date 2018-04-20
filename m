@@ -1,37 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <20180420120036.040c1b09@windsurf.numericable.fr>
+References: <20180420120036.040c1b09@windsurf.numericable.fr>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] build: Make bt_shell conditional to readline
-Date: Fri, 20 Apr 2018 16:02:54 +0300
-Message-Id: <20180420130254.20063-1-luiz.dentz@gmail.com>
+Date: Fri, 20 Apr 2018 15:57:32 +0300
+Message-ID: <CABBYNZLmjfzBUfR1hWKvxcTaHhH7XKi_wZhjAuNMdpUxn2vBTw@mail.gmail.com>
+Subject: Re: [blueZ] Readline mandatory ?
+To: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Thomas,
 
-bt_shell APIs shall only be build if readline is present on the system
-since it currently depend on it.
----
- Makefile.am | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+On Fri, Apr 20, 2018 at 1:00 PM, Thomas Petazzoni
+<thomas.petazzoni@bootlin.com> wrote:
+> Hello,
+>
+> Until commit bee3796113196da1b3f56da42fcae4d9bae6695e, the readline
+> library was an optional dependency of bluez (only needed when
+> --enable-client was used).
+>
+> However, following this commit, shell.c is now built as part of
+> libshared, and readline becomes a mandatory dependency, which is not even
+> checked by the configure script. This leads to a build failure such as:
+>
+> src/shared/shell.c:39:31: fatal error: readline/readline.h: No such file or directory
+>  #include <readline/readline.h>
+>
+> Is this an intended side effect of commit
+> bee3796113196da1b3f56da42fcae4d9bae6695e ? If yes, then the configure
+> script should be adjusted accordingly. If not, how should the code be
+> fixed to not use readline unconditionally ?
+>
+> The fact that readline is under GPLv3 might be an issue for some
+> people, so having it as a mandatory dependency might be problematic.
+>
+> The problem reported here exists in both the 5.49 release and the
+> latest master branch as of a085d8c88bd45474d3f9d9a0d3d20ebf7de858f6.
+>
+> Any hint on how to resolve this issue ?
 
-diff --git a/Makefile.am b/Makefile.am
-index daf34b6ca..9c3c17139 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -119,7 +119,11 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/gatt-server.h src/shared/gatt-server.c \
- 			src/shared/gatt-db.h src/shared/gatt-db.c \
- 			src/shared/gap.h src/shared/gap.c \
--			src/shared/tty.h src/shared/shell.c src/shared/shell.h
-+			src/shared/tty.h
-+
-+if READLINE
-+shared_sources += src/shared/shell.c src/shared/shell.h
-+endif
- 
- src_libshared_glib_la_SOURCES = $(shared_sources) \
- 				src/shared/io-glib.c \
+We will have to fix this, it shell should probably be conditional to
+build with libshared like the tools are.
+
+> Thanks,
+>
+> Thomas Petazzoni
+> --
+> Thomas Petazzoni, CTO, Bootlin (formerly Free Electrons)
+> Embedded Linux and Kernel engineering
+> https://bootlin.com
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.14.3
-
+Luiz Augusto von Dentz
