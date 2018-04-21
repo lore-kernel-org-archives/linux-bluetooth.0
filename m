@@ -1,96 +1,98 @@
-Return-Path: <jirislaby@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
- ML netdev <netdev@vger.kernel.org>
-From: Jiri Slaby <jslaby@suse.cz>
-Subject: Bluetooth/lock_sock: false positive "WARNING: possible recursive
- locking detected"
-Message-ID: <695d5172-e7f8-9e44-b6ab-0ce1a9473f34@suse.cz>
-Date: Sun, 22 Apr 2018 09:57:29 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: bugzilla-daemon@bugzilla.kernel.org
+To: linux-bluetooth@kernel.org
+Subject: [Bug 199459] New: Bluetooth on BCM43228 with firmware loaded only
+ works with disabled Wi-Fi
+Date: Sat, 21 Apr 2018 22:45:41 +0000
+Message-ID: <bug-199459-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+https://bugzilla.kernel.org/show_bug.cgi?id=199459
 
-I have just got this lockdep warning during suspend:
-> [ 2891.586061] ============================================
-> [ 2891.586063] WARNING: possible recursive locking detected
-> [ 2891.586065] 4.16.2-10.ge881e16-default #1 Not tainted
-> [ 2891.586067] --------------------------------------------
-> [ 2891.586068] kworker/u9:3/873 is trying to acquire lock:
-> [ 2891.586070]  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<000000007b85e829>] bt_accept_enqueue+0x29/0x90 [bluetooth]
-> [ 2891.586086]
->                but task is already holding lock:
-> [ 2891.586088]  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<0000000042f0b4a5>] l2cap_sock_new_connection_cb+0x18/0xa0 [bluetooth]
-> [ 2891.586109]
->                other info that might help us debug this:
-> [ 2891.586111]  Possible unsafe locking scenario:
-> 
-> [ 2891.586115]        CPU0
-> [ 2891.586116]        ----
-> [ 2891.586117]   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
-> [ 2891.586120]   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
-> [ 2891.586122]
->                 *** DEADLOCK ***
-> 
-> [ 2891.586125]  May be due to missing lock nesting notation
-> 
-> [ 2891.586127] 5 locks held by kworker/u9:3/873:
-> [ 2891.586128]  #0:  ((wq_completion)"%s"hdev->name#2){+.+.}, at: [<000000004aa1a273>] process_one_work+0x1e3/0x6a0
-> [ 2891.586135]  #1:  ((work_completion)(&hdev->rx_work)){+.+.}, at: [<000000004aa1a273>] process_one_work+0x1e3/0x6a0
-> [ 2891.586140]  #2:  (&conn->chan_lock){+.+.}, at: [<00000000fbad6c82>] l2cap_connect+0x88/0x540 [bluetooth]
-> [ 2891.586155]  #3:  (&chan->lock/2){+.+.}, at: [<000000007c38e27e>] l2cap_connect+0xa0/0x540 [bluetooth]
-> [ 2891.586170]  #4:  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<0000000042f0b4a5>] l2cap_sock_new_connection_cb+0x18/0xa0 [bluetooth]
-> [ 2891.586183]
->                stack backtrace:
-> [ 2891.586187] CPU: 2 PID: 873 Comm: kworker/u9:3 Not tainted 4.16.2-10.ge881e16-default #1 openSUSE Tumbleweed (unreleased)
-> [ 2891.586189] Hardware name: Dell Inc. Latitude 7280/0KK5D1, BIOS 1.9.3 03/09/2018
-> [ 2891.586200] Workqueue: hci0 hci_rx_work [bluetooth]
-> [ 2891.586202] Call Trace:
-> [ 2891.586207]  dump_stack+0x85/0xc5
-> [ 2891.586211]  __lock_acquire+0x6b4/0x1370
-> [ 2891.586221]  lock_acquire+0x9f/0x210
-> [ 2891.586237]  lock_sock_nested+0x5a/0x80
-> [ 2891.586256]  bt_accept_enqueue+0x29/0x90 [bluetooth]
-> [ 2891.586268]  l2cap_sock_new_connection_cb+0x5d/0xa0 [bluetooth]
-> [ 2891.586280]  l2cap_connect+0x126/0x540 [bluetooth]
-> [ 2891.586315]  l2cap_sig_channel+0x443/0x13b0 [bluetooth]
-> [ 2891.586330]  l2cap_recv_frame+0x1a4/0x300 [bluetooth]
-> [ 2891.586341]  hci_rx_work+0x1c8/0x5c0 [bluetooth]
-> [ 2891.586345]  process_one_work+0x269/0x6a0
-> [ 2891.586350]  worker_thread+0x2b/0x3d0
-> [ 2891.586356]  kthread+0x113/0x130
-> [ 2891.586363]  ret_from_fork+0x24/0x50
-> [ 4954.622809] e1000e: eth0 NIC Link is Down
-> [ 4955.299532] PM: suspend entry (deep)
-> [ 4955.299538] PM: Syncing filesystems ... done.
+            Bug ID: 199459
+           Summary: Bluetooth on BCM43228 with firmware loaded only works
+                    with disabled Wi-Fi
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.14.34
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: krnekit@gmail.com
+        Regression: No
 
-This is:
-  lock_sock(sk);       in bt_accept_enqueue
-nested in
-  lock_sock(parent);   in l2cap_sock_new_connection_cb
+I have a laptop with the Broadcom BCM43228 Wi-Fi + Bluetooth and I use the b43
+driver for it.
 
-So this looks like a false positive to me. So I believe this is a fix:
+I found, that when I connected a bluetooth speaker (with a microphone), it
+works fine in A2DP mode, but in HFP/HSP mode neither playback nor recording
+works, though speaker indicates, that it's in HFP/HSP mode. I use a PulseAudio
+mixer to switch modes.
 
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1232,7 +1232,7 @@ static struct l2cap_chan
-*l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
- {
-        struct sock *sk, *parent = chan->data;
+I found information, that Broadcom bluetooth chips requires firmware to work in
+HFP/HSP mode. And indeed, in the dmesg output I see the following:
 
--       lock_sock(parent);
-+       lock_sock_nested(parent, L2CAP_NESTING_PARENT);
+bluetooth hci0: Direct firmware load for brcm/BCM20702A1-0489-e046.hcd failed
+with error -2
+Bluetooth: hci0: BCM: Patch brcm/BCM20702A1-0489-e046.hcd not found
 
-        /* Check for backlog size */
-        if (sk_acceptq_is_full(parent)) {
+That firmware file should be placed to the /lib/firmware/brcm/ It can be
+extracted from a Windows driver and converted using the hex2hcd utility. Also,
+ready firmware available here:
+https://github.com/winterheart/broadcom-bt-firmware I tried both and they are
+the same.
 
+With the firmware both A2DP and HFP/HSP mode works, but more serious issue
+arises: when I enable Wi-Fi, Bluetooth fails to connect to speaker (and to
+other devices) and cannot even find it during scan. Once I disable the Wi-Fi,
+Bluetooth starts to work. Without the firmware they are work fine
+simultaneously, only the HFP/HSP support is missing.
 
-?
+I also discovered, the once I copy the firmware an enable the Bluetooth, it
+seems like the firmware loaded into the device memory and stay there even after
+ reboot. So if I delete the firmware file and reboot my laptop, Bluetooth still
+works like the firmware loaded. The only thing that helps to get rid of that is
+to suspend my laptop and to resume it back, that seems to load the default
+firmware.
 
-thanks,
+With "loaded" firmware I see this in dmesg:
+
+Bluetooth: hci0: Acer Laptop
+Bluetooth: hci0: BCM20702A1 (001.002.014) build 1465
+
+After I suspend/resume my laptop, I see thin in dmesg:
+
+Bluetooth: hci0: BCM20702A
+Bluetooth: hci0: BCM20702A1 (001.002.014) build 0000
+
+Additional information:
+
+Laptop: Acer Aspire V5-552G
+Distribution: Mageia Cauldron x86_64
+Kernel: 4.14.34-desktop-1.mga7
+Output of `lspci -vv` for the device:
+
+04:00.0 Network controller: Broadcom Limited BCM43228 802.11a/b/g/n
+        Subsystem: Foxconn International, Inc. Device e04b
+        Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr-
+Stepping- SERR- FastB2B- DisINTx-
+        Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=fast >TAbort- <TAbort-
+<MAbort- >SERR- <PERR- INTx-
+        Latency: 0, Cache Line Size: 64 bytes
+        Interrupt: pin A routed to IRQ 17
+        Region 0: Memory at f0000000 (64-bit, non-prefetchable) [size=16K]
+        Capabilities: <access denied>
+        Kernel driver in use: bcma-pci-bridge
+        Kernel modules: bcma
+
 -- 
-js
-suse labs
+You are receiving this mail because:
+You are the assignee for the bug.
