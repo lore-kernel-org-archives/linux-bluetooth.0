@@ -1,45 +1,47 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH 1/6] Bluetooth: btbcm: Stop using upper nibble of rev to
- chose between uart/USB paths
+Subject: Re: [PATCH] Bluetooth: use wait_event API instead of open-coding it
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180420124407.19712-1-hdegoede@redhat.com>
-Date: Mon, 23 Apr 2018 19:58:45 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
-        Lukas Wunner <lukas@wunner.de>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-Message-Id: <008777D7-1215-4874-AD1E-882FE7562B0E@holtmann.org>
-References: <20180420124407.19712-1-hdegoede@redhat.com>
-To: Hans de Goede <hdegoede@redhat.com>
-Sender: linux-serial-owner@vger.kernel.org
+In-Reply-To: <20180419152937.13515-1-john@metanate.com>
+Date: Mon, 23 Apr 2018 19:58:41 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+        ML netdev <netdev@vger.kernel.org>,
+        linux-kernel@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <343B67B0-5FE7-4113-8725-202AC0C8BA8A@holtmann.org>
+References: <20180419152937.13515-1-john@metanate.com>
+To: John Keeping <john@metanate.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hans,
+Hi John,
 
-> btbcm_setup_patchram() was using the upper nibble of the revision code to
-> determine if we are dealing with an uart or USB connected bcm-bt device,
-> but just as btbcm_initialize() has started accepting 1 and 2 as uart
-> connected devices, I've now encountered an USB connected device (0a5c:216c)
-> which has 0 in the upper nibble. So it seems that the upper nibble is not
-> really a reliable indicator of the bus type.
+> I've seen timeout errors from HCI commands where it looks like
+> schedule_timeout() has returned immediately; additional logging for the
+> error case gives:
 > 
-> Instead check hdev->bus which does give us a reliable indication. This
-> fixes the patchram code trying to load the patchram by the fallback BCM.hcd
-> filename, now it correctly requests BCM43142A0-0a5c-216c.hcd.
+> 	req_status=1 req_result=0 remaining=10000 jiffies
 > 
-> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> so the device is still in state HCI_REQ_PEND and the value returned by
+> schedule_timeout() is the same as the original timeout (HCI_INIT_TIMEOUT
+> on a system with HZ=1000).
+> 
+> Use wait_event_interruptible_timeout() instead of open-coding similar
+> behaviour which is subject to the spurious failure described above.
+> 
+> Signed-off-by: John Keeping <john@metanate.com>
 > ---
-> drivers/bluetooth/btbcm.c | 15 ++++++---------
-> 1 file changed, 6 insertions(+), 9 deletions(-)
+> I saw problems with the -rt patchset on 4.9 and I'm not convinced that
+> it's Bluetooth at fault for the problem described above, but I think
+> this is a nice cleanup even if it's not a bug fix.
+> 
+> net/bluetooth/hci_request.c | 30 +++++++-----------------------
+> 1 file changed, 7 insertions(+), 23 deletions(-)
 
-all 6 patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
