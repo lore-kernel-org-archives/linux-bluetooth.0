@@ -1,47 +1,39 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH] Bluetooth: use wait_event API instead of open-coding it
+Subject: Re: [PATCH v2] Bluetooth: Prevent buffer overflow for large
+ advertisement data
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180419152937.13515-1-john@metanate.com>
-Date: Mon, 23 Apr 2018 19:58:41 +0200
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-        ML netdev <netdev@vger.kernel.org>,
-        linux-kernel@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <343B67B0-5FE7-4113-8725-202AC0C8BA8A@holtmann.org>
-References: <20180419152937.13515-1-john@metanate.com>
-To: John Keeping <john@metanate.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1524210384-19845-1-git-send-email-chriz.chow@aminocom.com>
+Date: Mon, 23 Apr 2018 19:58:43 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        Szymon Janc <szymon.janc@codecoup.pl>,
+        Chriz Chow <chriz.chow@aminocom.com>
+Message-Id: <6CA9D034-6A25-4D8C-80F1-A147FC94351F@holtmann.org>
+References: <1646173.KpzMEjoeCb@ix>
+ <1524210384-19845-1-git-send-email-chriz.chow@aminocom.com>
+To: Chriz Chow <cmcvista@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi John,
+Hi Chriz,
 
-> I've seen timeout errors from HCI commands where it looks like
-> schedule_timeout() has returned immediately; additional logging for the
-> error case gives:
+> There are some controllers sending out advertising data with illegal
+> length value which is longer than HCI_MAX_AD_LENGTH, causing the
+> buffer last_adv_data overflows. To avoid these controllers from
+> overflowing the buffer, we do not process the advertisement data
+> if its length is incorrect.
 > 
-> 	req_status=1 req_result=0 remaining=10000 jiffies
-> 
-> so the device is still in state HCI_REQ_PEND and the value returned by
-> schedule_timeout() is the same as the original timeout (HCI_INIT_TIMEOUT
-> on a system with HZ=1000).
-> 
-> Use wait_event_interruptible_timeout() instead of open-coding similar
-> behaviour which is subject to the spurious failure described above.
-> 
-> Signed-off-by: John Keeping <john@metanate.com>
+> Signed-off-by: Chriz Chow <chriz.chow@aminocom.com>
 > ---
-> I saw problems with the -rt patchset on 4.9 and I'm not convinced that
-> it's Bluetooth at fault for the problem described above, but I think
-> this is a nice cleanup even if it's not a bug fix.
-> 
-> net/bluetooth/hci_request.c | 30 +++++++-----------------------
-> 1 file changed, 7 insertions(+), 23 deletions(-)
+> net/bluetooth/hci_event.c | 12 ++++++++----
+> 1 file changed, 8 insertions(+), 4 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
+
