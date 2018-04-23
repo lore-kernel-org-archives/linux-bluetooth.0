@@ -1,64 +1,45 @@
-Return-Path: <loic.poulain@linaro.org>
-From: Loic Poulain <loic.poulain@linaro.org>
-To: marcel@holtmann.org
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	kkapra@codeaurora.org,
-	Loic Poulain <loic.poulain@linaro.org>
-Subject: [PATCH 1/2] Bluetooth: Add __hci_cmd_sync_noev function
-Date: Mon, 23 Apr 2018 19:59:39 +0200
-Message-Id: <1524506380-7417-1-git-send-email-loic.poulain@linaro.org>
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH 1/6] Bluetooth: btbcm: Stop using upper nibble of rev to
+ chose between uart/USB paths
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180420124407.19712-1-hdegoede@redhat.com>
+Date: Mon, 23 Apr 2018 19:58:45 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        =?utf-8?Q?Fr=C3=A9d=C3=A9ric_Danis?= <frederic.danis.oss@gmail.com>,
+        Lukas Wunner <lukas@wunner.de>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
+Message-Id: <008777D7-1215-4874-AD1E-882FE7562B0E@holtmann.org>
+References: <20180420124407.19712-1-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function allows to send a HCI command without expecting any
-controller event/response in return.
+Hi Hans,
 
-Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
----
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_core.c         | 17 +++++++++++++++++
- 2 files changed, 19 insertions(+)
+> btbcm_setup_patchram() was using the upper nibble of the revision code to
+> determine if we are dealing with an uart or USB connected bcm-bt device,
+> but just as btbcm_initialize() has started accepting 1 and 2 as uart
+> connected devices, I've now encountered an USB connected device (0a5c:216c)
+> which has 0 in the upper nibble. So it seems that the upper nibble is not
+> really a reliable indicator of the bus type.
+> 
+> Instead check hdev->bus which does give us a reliable indication. This
+> fixes the patchram code trying to load the patchram by the fallback BCM.hcd
+> filename, now it correctly requests BCM43142A0-0a5c-216c.hcd.
+> 
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> drivers/bluetooth/btbcm.c | 15 ++++++---------
+> 1 file changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b619a19..d48a7df 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1393,6 +1393,8 @@ struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
- 			       const void *param, u32 timeout);
- struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
- 				  const void *param, u8 event, u32 timeout);
-+int __hci_cmd_sync_noev(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			const void *param);
- 
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
- 		 const void *param);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 40d260f..2831c4e 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3459,6 +3459,23 @@ struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
- }
- EXPORT_SYMBOL(hci_cmd_sync);
- 
-+int __hci_cmd_sync_noev(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			const void *param)
-+{
-+	struct sk_buff *skb = hci_prepare_cmd(hdev, opcode, plen, param);
-+
-+	if (!skb) {
-+		bt_dev_err(hdev, "no memory for command (opcode 0x%4.4x)",
-+			   opcode);
-+		return -ENOMEM;
-+	}
-+
-+	hci_send_frame(hdev, skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(__hci_cmd_sync_noev);
-+
- /* Send ACL data */
- static void hci_add_acl_hdr(struct sk_buff *skb, __u16 handle, __u16 flags)
- {
--- 
-2.7.4
+all 6 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
