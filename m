@@ -2,42 +2,96 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: Help with LE Create Connection
+Subject: Re: Bluetooth/lock_sock: false positive "WARNING: possible recursive
+ locking detected"
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAGuV3hM+GPfDQf5C6-Ug8R+QPe-xo361TgVTem2HjWjnZ0To2Q@mail.gmail.com>
-Date: Mon, 23 Apr 2018 19:02:25 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <8B5DE5B9-93AD-4385-932C-880F08BE8F4E@holtmann.org>
-References: <CAGuV3hPxvhDbsO1TZLcQwtQuAWrm5TqQrH=zG3UrFsvjfZOeFA@mail.gmail.com>
- <CAGuV3hM+GPfDQf5C6-Ug8R+QPe-xo361TgVTem2HjWjnZ0To2Q@mail.gmail.com>
-To: Fulko Hew <fulko.hew@gmail.com>
+In-Reply-To: <695d5172-e7f8-9e44-b6ab-0ce1a9473f34@suse.cz>
+Date: Mon, 23 Apr 2018 19:01:07 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        ML netdev <netdev@vger.kernel.org>
+Message-Id: <2CC4E349-C5BB-4D75-B33B-D8DA92EBFC16@holtmann.org>
+References: <695d5172-e7f8-9e44-b6ab-0ce1a9473f34@suse.cz>
+To: Jiri Slaby <jslaby@suse.cz>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Fulko,
+Hi Jiri,
 
-> I'm doing my first Bluetooth app, and I have a specific question and a
-> general question:
+>> [ 2891.586061] ============================================
+>> [ 2891.586063] WARNING: possible recursive locking detected
+>> [ 2891.586065] 4.16.2-10.ge881e16-default #1 Not tainted
+>> [ 2891.586067] --------------------------------------------
+>> [ 2891.586068] kworker/u9:3/873 is trying to acquire lock:
+>> [ 2891.586070]  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<000000007b85e829>] bt_accept_enqueue+0x29/0x90 [bluetooth]
+>> [ 2891.586086]
+>>               but task is already holding lock:
+>> [ 2891.586088]  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<0000000042f0b4a5>] l2cap_sock_new_connection_cb+0x18/0xa0 [bluetooth]
+>> [ 2891.586109]
+>>               other info that might help us debug this:
+>> [ 2891.586111]  Possible unsafe locking scenario:
+>> 
+>> [ 2891.586115]        CPU0
+>> [ 2891.586116]        ----
+>> [ 2891.586117]   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
+>> [ 2891.586120]   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
+>> [ 2891.586122]
+>>                *** DEADLOCK ***
+>> 
+>> [ 2891.586125]  May be due to missing lock nesting notation
+>> 
+>> [ 2891.586127] 5 locks held by kworker/u9:3/873:
+>> [ 2891.586128]  #0:  ((wq_completion)"%s"hdev->name#2){+.+.}, at: [<000000004aa1a273>] process_one_work+0x1e3/0x6a0
+>> [ 2891.586135]  #1:  ((work_completion)(&hdev->rx_work)){+.+.}, at: [<000000004aa1a273>] process_one_work+0x1e3/0x6a0
+>> [ 2891.586140]  #2:  (&conn->chan_lock){+.+.}, at: [<00000000fbad6c82>] l2cap_connect+0x88/0x540 [bluetooth]
+>> [ 2891.586155]  #3:  (&chan->lock/2){+.+.}, at: [<000000007c38e27e>] l2cap_connect+0xa0/0x540 [bluetooth]
+>> [ 2891.586170]  #4:  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<0000000042f0b4a5>] l2cap_sock_new_connection_cb+0x18/0xa0 [bluetooth]
+>> [ 2891.586183]
+>>               stack backtrace:
+>> [ 2891.586187] CPU: 2 PID: 873 Comm: kworker/u9:3 Not tainted 4.16.2-10.ge881e16-default #1 openSUSE Tumbleweed (unreleased)
+>> [ 2891.586189] Hardware name: Dell Inc. Latitude 7280/0KK5D1, BIOS 1.9.3 03/09/2018
+>> [ 2891.586200] Workqueue: hci0 hci_rx_work [bluetooth]
+>> [ 2891.586202] Call Trace:
+>> [ 2891.586207]  dump_stack+0x85/0xc5
+>> [ 2891.586211]  __lock_acquire+0x6b4/0x1370
+>> [ 2891.586221]  lock_acquire+0x9f/0x210
+>> [ 2891.586237]  lock_sock_nested+0x5a/0x80
+>> [ 2891.586256]  bt_accept_enqueue+0x29/0x90 [bluetooth]
+>> [ 2891.586268]  l2cap_sock_new_connection_cb+0x5d/0xa0 [bluetooth]
+>> [ 2891.586280]  l2cap_connect+0x126/0x540 [bluetooth]
+>> [ 2891.586315]  l2cap_sig_channel+0x443/0x13b0 [bluetooth]
+>> [ 2891.586330]  l2cap_recv_frame+0x1a4/0x300 [bluetooth]
+>> [ 2891.586341]  hci_rx_work+0x1c8/0x5c0 [bluetooth]
+>> [ 2891.586345]  process_one_work+0x269/0x6a0
+>> [ 2891.586350]  worker_thread+0x2b/0x3d0
+>> [ 2891.586356]  kthread+0x113/0x130
+>> [ 2891.586363]  ret_from_fork+0x24/0x50
+>> [ 4954.622809] e1000e: eth0 NIC Link is Down
+>> [ 4955.299532] PM: suspend entry (deep)
+>> [ 4955.299538] PM: Syncing filesystems ... done.
 > 
-> 1/ Where can I find documentation on the BlueZ API?
->   I've searched and haven't found anything yet.
+> This is:
+>  lock_sock(sk);       in bt_accept_enqueue
+> nested in
+>  lock_sock(parent);   in l2cap_sock_new_connection_cb
 > 
-> 2/ I've captured a trace of an existing conversation off of my Android phone,
->   and I'm trying to re-create it via my own app using BlueZ.
->   I've gotten to the point of trying to do an LE Create Connection
-> via hci_le_create_conn()
->   and my first stumbling block is the value of the 'peer address type'.
->   From my investigation, I need to use the 'public' address type
-> which according to
->   the spec, and Wireshark is a value of 0x00, but bluetooth.h defines
-> 'public' as 0x01
->   (as per the following extract).  Can anyone explain it to me?
+> So this looks like a false positive to me. So I believe this is a fix:
 > 
->   #define BDADDR_BREDR           0x00
->   #define BDADDR_LE_PUBLIC       0x01
->   #define BDADDR_LE_RANDOM       0x02
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1232,7 +1232,7 @@ static struct l2cap_chan
+> *l2cap_sock_new_connection_cb(struct l2cap_chan *chan)
+> {
+>        struct sock *sk, *parent = chan->data;
+> 
+> -       lock_sock(parent);
+> +       lock_sock_nested(parent, L2CAP_NESTING_PARENT);
+> 
+>        /* Check for backlog size */
+>        if (sk_acceptq_is_full(parent)) {
+> 
 
-why not use the bluetoothd D-Bus GATT APIs for your application. It will create all needed connections. Manually doing HCI is the wrong approach since that is owned by the kernel.
+can you send a patch for it?
 
 Regards
 
