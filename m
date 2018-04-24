@@ -2,75 +2,115 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH BlueZ v2 02/11] doc/mgmt-api: Add advertising phys support to flags
-Date: Tue, 24 Apr 2018 19:30:38 +0530
-Message-Id: <1524578447-17347-3-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH BlueZ v2 01/11] doc/mgmt-api: Add support for Set Phy Configuration command
+Date: Tue, 24 Apr 2018 19:30:37 +0530
+Message-Id: <1524578447-17347-2-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1524578447-17347-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1524578447-17347-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This also adds PHY Configuration Changed Event.
 ---
- doc/mgmt-api.txt | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ doc/mgmt-api.txt | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index caba22d..87982e0 100644
+index 8e7de14..caba22d 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
-@@ -2504,6 +2504,9 @@ Read Advertising Features Command
- 		4	Add TX Power field to Adv_Data
- 		5	Add Appearance field to Scan_Rsp
- 		6	Add Local Name in Scan_Rsp
-+		7	Secondary Channel with LE 1M
-+		8	Secondary Channel with LE 2M
-+		9	Secondary Channel with LE Coded
+@@ -2917,6 +2917,72 @@ Set Appearance Command
+ 				Invalid Index
  
- 	The Flags bit 0 indicates support for connectable advertising
- 	and for switching to connectable advertising independent of the
-@@ -2553,6 +2556,15 @@ Read Advertising Features Command
- 	space is limited a short version or no name information. The
- 	Local Name will be added at the end of the scan response data.
  
-+	The Flags bit 7 indicates support for advertising in secondary
-+	channel in LE 1M PHY.
++Get PHY Configuration Command
++==========================
 +
-+	The Flags bit 8 indicates support for advertising in secondary
-+	channel in LE 2M PHY. Primary channel would be on 1M.
++	Command Code:		0x0043
++	Controller Index:	<controller id>
++	Command Parameters:
++	Return Parameters:	Supported_phys (2 Octet)
++				Selected_phys (2 Octet)
 +
-+	The Flags bit 9 indicates support for advertising in secondary
-+	channel in LE CODED PHY.
++	This command is used to retrieve the supported PHYs and currently
++	selected PHYs.
 +
- 	The valid range for Instance identifiers is 1-254. The value 0
- 	is reserved for internal use and the value 255 is reserved for
- 	future extensions. However the Max_Instances value for indicating
-@@ -2613,6 +2625,9 @@ Add Advertising Command
- 		4	Add TX Power field to Adv_Data
- 		5	Add Appearance field to Scan_Rsp
- 		6	Add Local Name in Scan_Rsp
-+		7	Secondary Channel with LE 1M
-+		8	Secondary Channel with LE 2M
-+		9	Secondary Channel with LE Coded
- 
- 	When the connectable flag is set, then the controller will use
- 	undirected connectable advertising. The value of the connectable
-@@ -2640,6 +2655,16 @@ Add Advertising Command
- 	supported to provide less air traffic for devices implementing
- 	broadcaster role.
- 
-+	Secondary channel flags can be used to advertise in secondary
-+	channel with the corresponding PHYs. These flag bits are mutually
-+	exclusive and setting multiple will result in Invalid Parameter
-+	error. Choosing either LE 1M or LE 2M will result in using
-+	extended advertising on the primary channel with LE 1M and the
-+	respectively LE 1M or LE 2M on the secondary channel. Choosing
-+	LE Coded will result in using extended advertising on the primary
-+	and secondary channels with LE Coded. Choosing none of these flags
-+	will result in legacy advertising.
++	Supported_phys and Selected_phys is a bitmask with the following bits.
++		0	LE 1M TX
++		1	LE 1M RX
++		2	LE 2M TX
++		3	LE 2M RX
++		4	LE CODED TX
++		5	LE CODED RX
 +
- 	The Duration parameter configures the length of an Instance. The
- 	value is in seconds.
++	LE 1M TX and LE 1M RX would be supported by default.
++
++	This command is only available for LE capable controllers.
++        It will return Not Supported otherwise.
++
++        Possible errors:	Not Supported
++				Invalid Index
++
++Set PHY Configuration Command
++=============================
++
++	Command Code:		0x0044
++	Controller Index:	<controller id>
++	Command Parameters: 	Default_phys (2 Octet)
++	Return Parameters:
++
++	This command is used to set the default phy to the controller.
++
++	This will be stored and used for all the subsequent scanning
++	and connection initiation.
++
++	The list of supported PHYs can be retrieved via the
++	Get PHY Configuration command. Selecting unsupported PHYs will
++	result in an Invalid Parameters	error.
++
++	This can be called at any point to change the preferred PHYs.
++
++	Default_phys is a bitmask with the following bits.
++		0	LE 1M TX
++		1	LE 1M RX
++		2	LE 2M TX
++		3	LE 2M RX
++		4	LE CODED TX
++		5	LE CODED RX
++
++	This command generates a Command Complete event on success
++	or a Command Status event on failure.
++
++	This command is only available for LE capable controllers.
++	It will return Not Supported otherwise.
++
++	Possible errors:	Not Supported
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
  
+@@ -3782,3 +3848,18 @@ Extended Controller Information Changed Event
+ 
+ 	The event will only be sent to management sockets other than the
+ 	one through which the change was triggered.
++
++PHY Configuration Changed Event
++===============================
++
++	Event Code:		0x0026
++	Controller Index:	<controller id>
++	Event Parameters:	Selected_phys (2 Octets)
++
++	This event indicates that default PHYs have been updated.
++
++	This event will only be used after Set PHY Configuration
++	command has been used at least once.
++
++	The event will only be sent to management sockets other than the
++	one through which the change was triggered.
 -- 
 2.7.4
 
