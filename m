@@ -2,205 +2,297 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v2 18/18] Bluetooth: Implement secondary advertising on different PHYs
-Date: Tue, 24 Apr 2018 19:20:51 +0530
-Message-Id: <1524577851-17238-19-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v2 14/18] Bluetooth: Use Set ext adv/scan rsp data if controller supports
+Date: Tue, 24 Apr 2018 19:20:47 +0530
+Message-Id: <1524577851-17238-15-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1524577851-17238-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1524577851-17238-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for advertising in primary and secondary
-channel on different PHYs. User can add the phy preference in
-the flag based on which phy type will be added in extended
-advertising parameter would be set.
+This patch implements Set Ext Adv data and Set Ext Scan rsp data
+if controller support extended advertising.
 
-@ MGMT Command: Add Advertising (0x003e) plen 11
-        Instance: 1
-        Flags: 0x00000200
-          Advertise in CODED on Secondary channel
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 0
-        Scan response length: 0
-< HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 2
-        Extended advertising: Disabled (0x00)
-        Number of sets: Disable all sets (0x00)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Extended Advertising Enable (0x08|0x0039) ncmd 2
-        Status: Success (0x00)
-< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
+Currently the operation is set as Complete data and fragment
+preference is set as no fragment
+
+< HCI Command: LE Set Extended Advertising Data (0x08|0x0037) plen 35
         Handle: 0x00
-        Properties: 0x0000
-        Min advertising interval: 1280.000 msec (0x0800)
-        Max advertising interval: 1280.000 msec (0x0800)
-        Channel map: 37, 38, 39 (0x07)
-        Own address type: Random (0x01)
-        Peer address type: Public (0x00)
-        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
-        TX power: 127 dbm (0x7f)
-        Primary PHY: LE Coded (0x03)
-        Secondary max skip: 0x00
-        Secondary PHY: LE Coded (0x03)
-        SID: 0x00
-        Scan request notifications: Disabled (0x00)
+        Operation: Complete extended advertising data (0x03)
+        Fragment preference: Minimize fragmentation (0x01)
+        Data length: 0x15
+        16-bit Service UUIDs (complete): 2 entries
+          Heart Rate (0x180d)
+          Battery Service (0x180f)
+        Name (complete): Test LE
+        Company: Google (224)
+          Data: 0102
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Advertising Data (0x08|0x0037) ncmd 1
+        Status: Success (0x00)
 
 Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- include/net/bluetooth/hci.h  |  4 ++++
- include/net/bluetooth/mgmt.h |  6 ++++++
- net/bluetooth/hci_request.c  | 39 +++++++++++++++++++++++++++++++--------
- net/bluetooth/mgmt.c         | 18 +++++++++++++++---
- 4 files changed, 56 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci.h |  22 ++++++++
+ net/bluetooth/hci_request.c | 124 +++++++++++++++++++++++++++++++++-----------
+ net/bluetooth/hci_request.h |   1 +
+ net/bluetooth/mgmt.c        |  10 +++-
+ 4 files changed, 124 insertions(+), 33 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index f7d53ab..6eb9cb2 100644
+index 27dcceb..5e2a644 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -406,6 +406,8 @@ enum {
- #define HCI_LE_SLAVE_FEATURES		0x08
- #define HCI_LE_PING			0x10
- #define HCI_LE_DATA_LEN_EXT		0x20
-+#define HCI_LE_PHY_2M			0x01
-+#define HCI_LE_PHY_CODED		0x08
- #define HCI_LE_EXT_ADV			0x10
- #define HCI_LE_EXT_SCAN_POLICY		0x80
- #define HCI_LE_PHY_2M			0x01
-@@ -1594,6 +1596,8 @@ struct hci_cp_le_set_ext_adv_params {
+@@ -1613,6 +1613,28 @@ struct hci_cp_ext_adv_set {
+ 	__u8  max_events;
  } __packed;
  
- #define HCI_ADV_PHY_1M		0X01
-+#define HCI_ADV_PHY_2M		0x02
-+#define HCI_ADV_PHY_CODED	0x03
- 
- struct hci_rp_le_set_ext_adv_params {
- 	__u8  status;
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 7c8c68cc..0f1993e 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -562,6 +562,12 @@ struct mgmt_rp_add_advertising {
- #define MGMT_ADV_FLAG_TX_POWER		BIT(4)
- #define MGMT_ADV_FLAG_APPEARANCE	BIT(5)
- #define MGMT_ADV_FLAG_LOCAL_NAME	BIT(6)
-+#define MGMT_ADV_FLAG_SEC_1M 		BIT(7)
-+#define MGMT_ADV_FLAG_SEC_2M 		BIT(8)
-+#define MGMT_ADV_FLAG_SEC_CODED 	BIT(9)
++#define HCI_OP_LE_SET_EXT_ADV_DATA		0x2037
++struct hci_cp_le_set_ext_adv_data {
++	__u8  handle;
++	__u8  operation;
++	__u8  fragment_preference;
++	__u8  length;
++	__u8  data[HCI_MAX_AD_LENGTH];
++} __packed;
 +
-+#define MGMT_ADV_FLAG_SEC_MASK	(MGMT_ADV_FLAG_SEC_1M | MGMT_ADV_FLAG_SEC_2M | \
-+				 MGMT_ADV_FLAG_SEC_CODED)
++#define HCI_OP_LE_SET_EXT_SCAN_RSP_DATA		0x2038
++struct hci_cp_le_set_ext_scan_rsp_data {
++	__u8  handle;
++	__u8  operation;
++	__u8  fragment_preference;
++	__u8  length;
++	__u8  data[HCI_MAX_AD_LENGTH];
++} __packed;
++
++#define LE_SET_ADV_DATA_OP_COMPLETE	0x03
++
++#define LE_SET_ADV_DATA_NO_FRAG		0x01
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
  
- #define MGMT_OP_REMOVE_ADVERTISING	0x003F
- struct mgmt_cp_remove_advertising {
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 6825a65..0a8ac3e 100644
+index a2091b5..5fde161 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -1522,6 +1522,7 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- 	bdaddr_t random_addr;
- 	u8 own_addr_type;
- 	int err;
-+	bool secondary_adv;
- 	/* In ext adv set param interval is 3 octets */
- 	const u8 adv_interval[3] = { 0x00, 0x08, 0x00 };
+@@ -1173,29 +1173,58 @@ static u8 create_instance_scan_rsp_data(struct hci_dev *hdev, u8 instance,
+ void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+-	struct hci_cp_le_set_scan_rsp_data cp;
+ 	u8 len;
  
-@@ -1551,20 +1552,42 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- 	memcpy(cp.min_interval, adv_interval, sizeof(cp.min_interval));
- 	memcpy(cp.max_interval, adv_interval, sizeof(cp.max_interval));
+ 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
+ 		return;
  
--	if (connectable)
--		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
--	else if (get_adv_instance_scan_rsp_len(hdev, instance))
--		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_SCAN_IND);
--	else
--		cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
-+	secondary_adv = (flags & MGMT_ADV_FLAG_SEC_MASK);
-+
-+	if (connectable) {
-+		if (secondary_adv)
-+			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_CONN_IND);
-+		else
-+			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
-+	} else if (get_adv_instance_scan_rsp_len(hdev, instance)) {
-+		if (secondary_adv)
-+			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_SCAN_IND);
-+		else
-+			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_SCAN_IND);
-+	} else {
-+		if (secondary_adv)
-+			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_NON_CONN_IND);
-+		else
-+			cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
-+	}
- 
- 	cp.own_addr_type = own_addr_type;
- 	cp.channel_map = hdev->le_adv_channel_map;
- 	cp.tx_power = 127;
--	cp.primary_phy = HCI_ADV_PHY_1M;
--	cp.secondary_phy = HCI_ADV_PHY_1M;
- 	cp.handle = 0;
- 
-+	if (flags & MGMT_ADV_FLAG_SEC_2M) {
-+		cp.primary_phy = HCI_ADV_PHY_1M;
-+		cp.secondary_phy = HCI_ADV_PHY_2M;
-+	} else if (flags & MGMT_ADV_FLAG_SEC_CODED) {
-+		cp.primary_phy = HCI_ADV_PHY_CODED;
-+		cp.secondary_phy = HCI_ADV_PHY_CODED;
-+	} else {
-+		/* In all other cases use 1M */
-+		cp.primary_phy = HCI_ADV_PHY_1M;
-+		cp.secondary_phy = HCI_ADV_PHY_1M;
-+	}
-+
- 	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
- 
- 	if (own_addr_type == ADDR_LE_DEV_RANDOM &&
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c282638..87ca151 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6217,6 +6217,16 @@ static u32 get_supported_adv_flags(struct hci_dev *hdev)
- 	    ext_adv_capable(hdev))
- 		flags |= MGMT_ADV_FLAG_TX_POWER;
- 
+-	memset(&cp, 0, sizeof(cp));
 +	if (ext_adv_capable(hdev)) {
-+		flags |= MGMT_ADV_FLAG_SEC_1M;
++		struct hci_cp_le_set_ext_scan_rsp_data cp;
+ 
+-	if (instance)
+-		len = create_instance_scan_rsp_data(hdev, instance, cp.data);
+-	else
+-		len = create_default_scan_rsp_data(hdev, cp.data);
++		memset(&cp, 0, sizeof(cp));
+ 
+-	if (hdev->scan_rsp_data_len == len &&
+-	    !memcmp(cp.data, hdev->scan_rsp_data, len))
+-		return;
++		if (instance)
++			len = create_instance_scan_rsp_data(hdev, instance,
++							    cp.data);
++		else
++			len = create_default_scan_rsp_data(hdev, cp.data);
 +
-+		if (hdev->le_features[1] & HCI_LE_PHY_2M)
-+			flags |= MGMT_ADV_FLAG_SEC_2M;
++		if (hdev->scan_rsp_data_len == len &&
++		    !memcmp(cp.data, hdev->scan_rsp_data, len))
++			return;
 +
-+		if (hdev->le_features[1] & HCI_LE_PHY_CODED)
-+			flags |= MGMT_ADV_FLAG_SEC_CODED;
++		memcpy(hdev->scan_rsp_data, cp.data, sizeof(cp.data));
++		hdev->scan_rsp_data_len = len;
++
++		cp.handle = 0;
++		cp.length = len;
++		cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
++		cp.fragment_preference = LE_SET_ADV_DATA_NO_FRAG;
+ 
+-	memcpy(hdev->scan_rsp_data, cp.data, sizeof(cp.data));
+-	hdev->scan_rsp_data_len = len;
++		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_RSP_DATA, sizeof(cp),
++			    &cp);
++	} else {
++		struct hci_cp_le_set_scan_rsp_data cp;
++
++		memset(&cp, 0, sizeof(cp));
++
++		if (instance)
++			len = create_instance_scan_rsp_data(hdev, instance,
++							    cp.data);
++		else
++			len = create_default_scan_rsp_data(hdev, cp.data);
++
++		if (hdev->scan_rsp_data_len == len &&
++		    !memcmp(cp.data, hdev->scan_rsp_data, len))
++			return;
+ 
+-	cp.length = len;
++		memcpy(hdev->scan_rsp_data, cp.data, sizeof(cp.data));
++		hdev->scan_rsp_data_len = len;
+ 
+-	hci_req_add(req, HCI_OP_LE_SET_SCAN_RSP_DATA, sizeof(cp), &cp);
++		cp.length = len;
++
++		hci_req_add(req, HCI_OP_LE_SET_SCAN_RSP_DATA, sizeof(cp), &cp);
 +	}
-+
- 	return flags;
  }
  
-@@ -6422,7 +6432,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 	struct mgmt_cp_add_advertising *cp = data;
- 	struct mgmt_rp_add_advertising rp;
- 	u32 flags;
--	u32 supported_flags;
-+	u32 supported_flags, phy_flags;
- 	u8 status;
- 	u16 timeout, duration;
- 	unsigned int prev_instance_cnt = hdev->adv_instance_cnt;
-@@ -6452,10 +6462,12 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 	duration = __le16_to_cpu(cp->duration);
+ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+@@ -1269,27 +1298,51 @@ static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ void __hci_req_update_adv_data(struct hci_request *req, u8 instance)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+-	struct hci_cp_le_set_adv_data cp;
+ 	u8 len;
  
- 	/* The current implementation only supports a subset of the specified
--	 * flags.
-+	 * flags. Also need to check mutual exclusiveness of sec flags.
+ 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
+ 		return;
+ 
+-	memset(&cp, 0, sizeof(cp));
++	if (ext_adv_capable(hdev)) {
++		struct hci_cp_le_set_ext_adv_data cp;
+ 
+-	len = create_instance_adv_data(hdev, instance, cp.data);
++		memset(&cp, 0, sizeof(cp));
+ 
+-	/* There's nothing to do if the data hasn't changed */
+-	if (hdev->adv_data_len == len &&
+-	    memcmp(cp.data, hdev->adv_data, len) == 0)
+-		return;
++		len = create_instance_adv_data(hdev, instance, cp.data);
++
++		/* There's nothing to do if the data hasn't changed */
++		if (hdev->adv_data_len == len &&
++		    memcmp(cp.data, hdev->adv_data, len) == 0)
++			return;
++
++		memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
++		hdev->adv_data_len = len;
++
++		cp.length = len;
++		cp.handle = 0;
++		cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
++		cp.fragment_preference = LE_SET_ADV_DATA_NO_FRAG;
++
++		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_DATA, sizeof(cp), &cp);
++	} else {
++		struct hci_cp_le_set_adv_data cp;
+ 
+-	memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
+-	hdev->adv_data_len = len;
++		memset(&cp, 0, sizeof(cp));
++
++		len = create_instance_adv_data(hdev, instance, cp.data);
++
++		/* There's nothing to do if the data hasn't changed */
++		if (hdev->adv_data_len == len &&
++		    memcmp(cp.data, hdev->adv_data, len) == 0)
++			return;
++
++		memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
++		hdev->adv_data_len = len;
+ 
+-	cp.length = len;
++		cp.length = len;
+ 
+-	hci_req_add(req, HCI_OP_LE_SET_ADV_DATA, sizeof(cp), &cp);
++		hci_req_add(req, HCI_OP_LE_SET_ADV_DATA, sizeof(cp), &cp);
++	}
+ }
+ 
+ int hci_req_update_adv_data(struct hci_dev *hdev, u8 instance)
+@@ -1364,8 +1417,7 @@ static void adv_timeout_expire(struct work_struct *work)
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static int __hci_req_setup_ext_adv_instance(struct hci_request *req,
+-					    u8 instance)
++int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ {
+ 	struct hci_cp_le_set_ext_adv_params cp;
+ 	struct hci_dev *hdev = req->hdev;
+@@ -1441,6 +1493,8 @@ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance)
+ 	if (err < 0)
+ 		return err;
+ 
++	__hci_req_update_adv_data(req, instance);
++	__hci_req_update_scan_rsp_data(req, instance);
+ 	__hci_req_enable_ext_advertising(req);
+ 
+ 	return 0;
+@@ -2488,14 +2542,22 @@ static int powered_update_hci(struct hci_request *req, unsigned long opt)
+ 		 */
+ 		if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
+ 		    list_empty(&hdev->adv_instances)) {
+-			__hci_req_update_adv_data(req, 0x00);
+-			__hci_req_update_scan_rsp_data(req, 0x00);
++			int err = 0;
++
++			if (ext_adv_capable(hdev))
++				err = __hci_req_setup_ext_adv_instance(req,
++								       0x00);
++
++			if (!err) {
++				__hci_req_update_adv_data(req, 0x00);
++				__hci_req_update_scan_rsp_data(req, 0x00);
++			}
+ 
+ 			if (hci_dev_test_flag(hdev, HCI_ADVERTISING)) {
+-				if (ext_adv_capable(hdev))
+-					__hci_req_start_ext_adv(req, 0x00);
+-				else
++				if (!ext_adv_capable(hdev))
+ 					__hci_req_enable_advertising(req);
++				else if (!err)
++					__hci_req_enable_ext_advertising(req);
+ 			}
+ 		} else if (!list_empty(&hdev->adv_instances)) {
+ 			struct adv_info *adv_instance;
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 9b8c74d..6afc624 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -80,6 +80,7 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
+ 				struct hci_request *req, u8 instance,
+ 				bool force);
+ 
++int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
+ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
+ void __hci_req_enable_ext_advertising(struct hci_request *req);
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 80c4b17..a62b329 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1783,10 +1783,16 @@ static void le_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
  	 */
- 	supported_flags = get_supported_adv_flags(hdev);
--	if (flags & ~supported_flags)
-+	phy_flags = flags & MGMT_ADV_FLAG_SEC_MASK;
-+	if (flags & ~supported_flags ||
-+	    ((phy_flags && (phy_flags ^ (phy_flags & -phy_flags)))))
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
- 				       MGMT_STATUS_INVALID_PARAMS);
+ 	if (hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
+ 		struct hci_request req;
++		int err = 0;
  
+ 		hci_req_init(&req, hdev);
+-		__hci_req_update_adv_data(&req, 0x00);
+-		__hci_req_update_scan_rsp_data(&req, 0x00);
++		if (ext_adv_capable(hdev))
++			err = __hci_req_setup_ext_adv_instance(&req, 0x00);
++
++		if (!err) {
++			__hci_req_update_adv_data(&req, 0x00);
++			__hci_req_update_scan_rsp_data(&req, 0x00);
++		}
+ 		hci_req_run(&req, NULL);
+ 		hci_update_background_scan(hdev);
+ 	}
 -- 
 2.7.4
 
