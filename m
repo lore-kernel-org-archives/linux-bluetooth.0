@@ -2,138 +2,108 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v2 15/18] Bluetooth: Implement disable and removal of adv instance
-Date: Tue, 24 Apr 2018 19:20:48 +0530
-Message-Id: <1524577851-17238-16-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v2 16/18] Bluetooth: Use ext adv for directed adv
+Date: Tue, 24 Apr 2018 19:20:49 +0530
+Message-Id: <1524577851-17238-17-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1524577851-17238-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1524577851-17238-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If ext adv is enabled then use ext adv to disable as well.
-Also remove the adv set during LE disable.
-
-< HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 2
-        Extended advertising: Disabled (0x00)
-        Number of sets: Disable all sets (0x00)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Extended Advertising Enable (0x08|0x0039) ncmd 2
-        Status: Success (0x00)
+This patch does extended advertising for directed advertising
+if the controller supportes. Instance 0 is used for directed
+advertising.
 
 Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- include/net/bluetooth/hci.h |  7 +++++++
- net/bluetooth/hci_event.c   |  2 ++
- net/bluetooth/hci_request.c | 22 ++++++++++++++++++++--
- net/bluetooth/hci_request.h |  1 +
- net/bluetooth/mgmt.c        |  3 +++
- 5 files changed, 33 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_conn.c | 67 ++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 45 insertions(+), 22 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5e2a644..fd55abc 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1635,6 +1635,13 @@ struct hci_cp_le_set_ext_scan_rsp_data {
- 
- #define LE_SET_ADV_DATA_NO_FRAG		0x01
- 
-+#define HCI_OP_LE_REMOVE_ADV_SET	0x203c
-+struct hci_cp_le_remove_adv_set {
-+	__u8  handle;
-+} __packed;
-+
-+#define HCI_OP_LE_CLEAR_ADV_SETS	0x203d
-+
- /* ---- HCI Events ---- */
- #define HCI_EV_INQUIRY_COMPLETE		0x01
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2ff8bc2..a969665 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1159,6 +1159,8 @@ static void hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev,
- 			queue_delayed_work(hdev->workqueue,
- 					   &conn->le_conn_timeout,
- 					   conn->conn_timeout);
-+	} else {
-+		hci_dev_clear_flag(hdev, HCI_LE_ADV);
- 	}
- 
- 	hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 5fde161..7051c5b 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -933,9 +933,19 @@ static u8 get_cur_adv_instance_scan_rsp_len(struct hci_dev *hdev)
- 
- void __hci_req_disable_advertising(struct hci_request *req)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 5d421a2..fc27bd8 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -870,35 +870,58 @@ static void hci_req_directed_advertising(struct hci_request *req,
+ 					 struct hci_conn *conn)
  {
--	u8 enable = 0x00;
-+	if (ext_adv_capable(req->hdev)) {
-+		struct hci_cp_le_set_ext_adv_enable cp;
- 
--	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
-+		cp.enable = 0x00;
-+		/* Disable all adv sets */
-+		cp.num_of_sets = 0x00;
-+
-+		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_ENABLE, sizeof(cp), &cp);
-+	} else {
-+		u8 enable = 0x00;
-+
-+		hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
-+	}
- }
- 
- static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
-@@ -1417,6 +1427,11 @@ static void adv_timeout_expire(struct work_struct *work)
- 	hci_dev_unlock(hdev);
- }
- 
-+void __hci_req_clear_ext_adv_sets(struct hci_request *req)
-+{
-+	hci_req_add(req, HCI_OP_LE_REMOVE_ADV_SET, 0, NULL);
-+}
-+
- int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- {
- 	struct hci_cp_le_set_ext_adv_params cp;
-@@ -1489,6 +1504,9 @@ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance)
  	struct hci_dev *hdev = req->hdev;
- 	int err;
+-	struct hci_cp_le_set_adv_param cp;
+ 	u8 own_addr_type;
+ 	u8 enable;
  
-+	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
-+		__hci_req_disable_advertising(req);
+-	/* Clear the HCI_LE_ADV bit temporarily so that the
+-	 * hci_update_random_address knows that it's safe to go ahead
+-	 * and write a new random address. The flag will be set back on
+-	 * as soon as the SET_ADV_ENABLE HCI command completes.
+-	 */
+-	hci_dev_clear_flag(hdev, HCI_LE_ADV);
++	if (ext_adv_capable(hdev)) {
++		struct hci_cp_le_set_ext_adv_params cp;
+ 
+-	/* Set require_privacy to false so that the remote device has a
+-	 * chance of identifying us.
+-	 */
+-	if (hci_update_random_address(req, false, conn_use_rpa(conn),
+-				      &own_addr_type) < 0)
+-		return;
++		memset(&cp, 0, sizeof(cp));
+ 
+-	memset(&cp, 0, sizeof(cp));
+-	cp.type = LE_ADV_DIRECT_IND;
+-	cp.own_address_type = own_addr_type;
+-	cp.direct_addr_type = conn->dst_type;
+-	bacpy(&cp.direct_addr, &conn->dst);
+-	cp.channel_map = hdev->le_adv_channel_map;
++		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_DIRECT_IND);
++		cp.own_addr_type = own_addr_type;
++		cp.channel_map = hdev->le_adv_channel_map;
++		cp.tx_power = 127;
++		cp.primary_phy = HCI_ADV_PHY_1M;
++		cp.secondary_phy = HCI_ADV_PHY_1M;
++		cp.handle = 0; /* Use instance 0 for directed adv */
++		cp.own_addr_type = own_addr_type;
++		cp.peer_addr_type = conn->dst_type;
++		bacpy(&cp.peer_addr, &conn->dst);
 +
- 	err = __hci_req_setup_ext_adv_instance(req, instance);
- 	if (err < 0)
- 		return err;
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 6afc624..2451861 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -83,6 +83,7 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
- int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
- int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
- void __hci_req_enable_ext_advertising(struct hci_request *req);
-+void __hci_req_clear_ext_adv_sets(struct hci_request *req);
++		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
  
- void __hci_req_update_class(struct hci_request *req);
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a62b329..c282638 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1891,6 +1891,9 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 	} else {
- 		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
- 			__hci_req_disable_advertising(&req);
+-	hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
++		__hci_req_enable_ext_advertising(req);
++	} else {
++		struct hci_cp_le_set_adv_param cp;
 +
-+		if (ext_adv_capable(hdev))
-+			__hci_req_clear_ext_adv_sets(&req);
- 	}
++		/* Clear the HCI_LE_ADV bit temporarily so that the
++		 * hci_update_random_address knows that it's safe to go ahead
++		 * and write a new random address. The flag will be set back on
++		 * as soon as the SET_ADV_ENABLE HCI command completes.
++		 */
++		hci_dev_clear_flag(hdev, HCI_LE_ADV);
  
- 	hci_req_add(&req, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(hci_cp),
+-	enable = 0x01;
+-	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
++		/* Set require_privacy to false so that the remote device has a
++		 * chance of identifying us.
++		 */
++		if (hci_update_random_address(req, false, conn_use_rpa(conn),
++					      &own_addr_type) < 0)
++			return;
++
++		memset(&cp, 0, sizeof(cp));
++		cp.type = LE_ADV_DIRECT_IND;
++		cp.own_address_type = own_addr_type;
++		cp.direct_addr_type = conn->dst_type;
++		bacpy(&cp.direct_addr, &conn->dst);
++		cp.channel_map = hdev->le_adv_channel_map;
++
++		hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
++
++		enable = 0x01;
++		hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable),
++			    &enable);
++	}
+ 
+ 	conn->state = BT_CONNECT;
+ }
 -- 
 2.7.4
 
