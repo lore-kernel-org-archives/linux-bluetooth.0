@@ -2,108 +2,107 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v2 10/18] Bluetooth: Handle extended ADV PDU types
-Date: Tue, 24 Apr 2018 19:20:43 +0530
-Message-Id: <1524577851-17238-11-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v2 11/18] Bluetooth: Use selected PHYs in extended connect
+Date: Tue, 24 Apr 2018 19:20:44 +0530
+Message-Id: <1524577851-17238-12-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1524577851-17238-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1524577851-17238-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch defines the extended ADV types and handle it in ADV report.
+Use the selected PHYs by Set PHY Configuration management command
+in extended create connection.
 
 Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- include/net/bluetooth/hci.h |  8 ++++++++
- net/bluetooth/hci_event.c   | 49 +++++++++++++++++++++++++++++++--------------
- 2 files changed, 42 insertions(+), 15 deletions(-)
+ net/bluetooth/hci_conn.c | 63 ++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 47 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index feafac4..ee58389 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1964,6 +1964,14 @@ struct hci_ev_le_conn_complete {
- #define LE_LEGACY_SCAN_RSP_ADV		0x001b
- #define LE_LEGACY_SCAN_RSP_ADV_SCAN	0x001a
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index cc967ca..5d421a2 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -777,8 +777,9 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 	if (use_ext_conn(hdev)) {
+ 		struct hci_cp_le_ext_create_conn *cp;
+ 		struct hci_cp_le_ext_conn_param *p;
+-		/* As of now only LE 1M is supported */
+-		u8 data[sizeof(*cp) + sizeof(*p) * 1];
++		u8 data[sizeof(*cp) + sizeof(*p) * 3];
++		u8 init_phys;
++		u32 plen;
  
-+/* Extended Advertising event types */
-+#define LE_EXT_ADV_NON_CONN_IND		0x0000
-+#define LE_EXT_ADV_CONN_IND		0x0001
-+#define LE_EXT_ADV_SCAN_IND		0x0002
-+#define LE_EXT_ADV_DIRECT_IND		0x0004
-+#define LE_EXT_ADV_SCAN_RSP		0x0008
-+#define LE_EXT_ADV_LEGACY_PDU		0x0010
+ 		cp = (void *) data;
+ 		p = (void *) cp->data;
+@@ -788,24 +789,54 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 		bacpy(&cp->peer_addr, &conn->dst);
+ 		cp->peer_addr_type = conn->dst_type;
+ 		cp->own_addr_type = own_addr_type;
+-		cp->phys = LE_SCAN_PHY_1M;
+ 
+-		memset(p, 0, sizeof(*p));
++		if (scan_1m(hdev))
++			cp->phys |= LE_SCAN_PHY_1M;
+ 
+-		/* Set window to be the same value as the interval to enable
+-		 * continuous scanning.
+-		 */
++		if (scan_2m(hdev))
++			cp->phys |= LE_SCAN_PHY_2M;
 +
- #define ADDR_LE_DEV_PUBLIC	0x00
- #define ADDR_LE_DEV_RANDOM	0x01
++		if (scan_coded(hdev))
++			cp->phys |= LE_SCAN_PHY_CODED;
++
++		init_phys = cp->phys;
++
++		plen = sizeof(*cp);
++
++		/* Use same param for all PHYs */
++		while (init_phys) {
++			u16 min_interval, max_interval, supv_timeout;
  
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7faab06..5663dfa 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5133,20 +5133,39 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_dev_unlock(hdev);
- }
- 
--static u8 convert_legacy_evt_type(u16 evt_type)
--{
--	switch (evt_type) {
--	case LE_LEGACY_ADV_IND:
--		return LE_ADV_IND;
--	case LE_LEGACY_ADV_DIRECT_IND:
--		return LE_ADV_DIRECT_IND;
--	case LE_LEGACY_ADV_SCAN_IND:
--		return LE_ADV_SCAN_IND;
--	case LE_LEGACY_NONCONN_IND:
--		return LE_ADV_NONCONN_IND;
--	case LE_LEGACY_SCAN_RSP_ADV:
--	case LE_LEGACY_SCAN_RSP_ADV_SCAN:
--		return LE_ADV_SCAN_RSP;
-+static u8 convert_ext_evt_type(u16 evt_type)
-+{
-+	if (evt_type & LE_EXT_ADV_LEGACY_PDU) {
-+		switch (evt_type) {
-+		case LE_LEGACY_ADV_IND:
-+			return LE_ADV_IND;
-+		case LE_LEGACY_ADV_DIRECT_IND:
-+			return LE_ADV_DIRECT_IND;
-+		case LE_LEGACY_ADV_SCAN_IND:
-+			return LE_ADV_SCAN_IND;
-+		case LE_LEGACY_NONCONN_IND:
-+			return LE_ADV_NONCONN_IND;
-+		case LE_LEGACY_SCAN_RSP_ADV:
-+		case LE_LEGACY_SCAN_RSP_ADV_SCAN:
-+			return LE_ADV_SCAN_RSP;
+-		p->scan_interval = cpu_to_le16(hdev->le_scan_interval);
+-		p->scan_window = p->scan_interval;
+-		p->conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
+-		p->conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
+-		p->conn_latency = cpu_to_le16(conn->le_conn_latency);
+-		p->supervision_timeout = cpu_to_le16(conn->le_supv_timeout);
+-		p->min_ce_len = cpu_to_le16(0x0000);
+-		p->max_ce_len = cpu_to_le16(0x0000);
++			if (!(init_phys & 0x01)) {
++				init_phys >>= 0x01;
++				continue;
++			}
++
++			memset(p, 0, sizeof(*p));
++
++			/* Set window to be the same value as the interval to
++			 * enable continuous scanning.
++			 */
++
++			min_interval = conn->le_conn_min_interval;
++			max_interval = conn->le_conn_max_interval;
++			supv_timeout = conn->le_supv_timeout;
++
++			p->scan_interval = cpu_to_le16(hdev->le_scan_interval);
++			p->scan_window = p->scan_interval;
++			p->conn_interval_min = cpu_to_le16(min_interval);
++			p->conn_interval_max = cpu_to_le16(max_interval);
++			p->conn_latency = cpu_to_le16(conn->le_conn_latency);
++			p->supervision_timeout = cpu_to_le16(supv_timeout);
++			p->min_ce_len = cpu_to_le16(0x0000);
++			p->max_ce_len = cpu_to_le16(0x0000);
++
++			p++;
++			plen += sizeof(*p);
++			init_phys >>= 1;
 +		}
-+	} else {
-+		if (evt_type & LE_EXT_ADV_CONN_IND) {
-+			if (evt_type & LE_EXT_ADV_DIRECT_IND)
-+				return LE_ADV_DIRECT_IND;
-+
-+			return LE_ADV_IND;
-+		}
-+
-+		if (evt_type & LE_EXT_ADV_SCAN_RSP)
-+			return LE_ADV_SCAN_RSP;
-+
-+		if (evt_type & LE_EXT_ADV_SCAN_IND)
-+			return LE_ADV_SCAN_IND;
-+
-+		if (evt_type == LE_EXT_ADV_NON_CONN_IND ||
-+		    evt_type & LE_EXT_ADV_DIRECT_IND)
-+			return LE_ADV_NONCONN_IND;
- 	}
  
- 	BT_ERR_RATELIMITED("Unknown advertising packet type: 0x%02x",
-@@ -5168,7 +5187,7 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		u16 evt_type;
+-		hci_req_add(req, HCI_OP_LE_EXT_CREATE_CONN, sizeof(data), data);
++		hci_req_add(req, HCI_OP_LE_EXT_CREATE_CONN, plen, data);
  
- 		evt_type = __le16_to_cpu(ev->evt_type);
--		legacy_evt_type = convert_legacy_evt_type(evt_type);
-+		legacy_evt_type = convert_ext_evt_type(evt_type);
- 		if (legacy_evt_type != LE_ADV_INVALID) {
- 			process_adv_report(hdev, legacy_evt_type, &ev->bdaddr,
- 					   ev->bdaddr_type, NULL, 0, ev->rssi,
+ 	} else {
+ 		struct hci_cp_le_create_conn cp;
 -- 
 2.7.4
 
