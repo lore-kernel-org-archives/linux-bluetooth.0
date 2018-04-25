@@ -1,143 +1,72 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Brian Gix <brian.gix@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v2 00/11] Bluetooth Mesh Daemon
-Date: Wed, 25 Apr 2018 10:50:26 -0700
-Message-Id: <20180425175037.20946-1-brian.gix@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <bgodavar@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Wed, 25 Apr 2018 20:49:29 +0530
+From: bgodavar@codeaurora.org
+To: Loic Poulain <loic.poulain@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "open list:BLUETOOTH DRIVERS"
+ <linux-bluetooth@vger.kernel.org>, linux-arm-msm@vger.kernel.org,
+ kkapra@codeaurora.org
+Subject: Re: [PATCH 2/2] Bluetooth: btqca: Add AR3002 rampatch support
+In-Reply-To: <CAMZdPi_khDRySWydoe577Q3vmDFzQY0SBzweJD60026Gb0d8Gw@mail.gmail.com>
+References: <1524506380-7417-1-git-send-email-loic.poulain@linaro.org>
+ <1524506380-7417-2-git-send-email-loic.poulain@linaro.org>
+ <B39D4D6F-96FB-442E-84D8-BEA603E7A053@holtmann.org>
+ <CAMZdPi8ABhv8EDaE+afFpHexuMKjst5djiMt4HFoGqPNHs+akQ@mail.gmail.com>
+ <f46651bdc4bdab38ec6f2b00b7fda142@codeaurora.org>
+ <CAMZdPi_khDRySWydoe577Q3vmDFzQY0SBzweJD60026Gb0d8Gw@mail.gmail.com>
+Message-ID: <eec3a56977ca821c1e13537ab35b0c97@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v2 of patch-set to address maximum patch size limits
+Hi Loic,
 
-This is our starting point for creating a stand-alone Mesh Daemon.
+On 2018-04-25 19:07, Loic Poulain wrote:
+> Hi Balakrishna,
+> 
+> On 25 April 2018 at 14:16,  <bgodavar@codeaurora.org> wrote:
+>> 
+>> Thank you for adding me to loop, is the header size of RAM patch file
+>> remains same for ROME < 3.2 and ROME >= 3.2, what about the header 
+>> format,
+>> do we have same header format for different ROME versions, even 
+>> mismatch of
+>> header will not break any execution, but it may show wrong data in 
+>> kernel
+>> logs.
+> 
+> Yes, at least in my case, we just use byte 7 which was previously 
+> 'reserved':
+> 
+>  struct edl_event_hdr {
+> @@ -94,7 +102,8 @@ struct tlv_type_patch {
+>         __le32 data_length;
+>         __u8   format_version;
+>         __u8   signature;
+> -       __le16 reserved1;
+> +       __u8   download_mode;
+> +       __u8   reserved1;
+>         __le16 product_id;
+>         __le16 rom_build;
+>         __le16 patch_version;
+> 
+> Regards,
+> Loic
 
-The Mesh Daemon (meshd) is intended to eventually co-exist beside the
-Bluetooth Daemon (bluetoothd), and either daemon may exist without the
-other. The Mesh Daemon will need full control/ownership of a
-BT Controller that supports at least Core Spec revision 4.0 or
-greater.  It works strictly over the Advertising bearer, but we
-have plans to extend it to support Mesh Proxy Server over GATT, at
-which point it will require support from bluetoothd.
+A small suggestion from my side, suppose in near future ROME <v3.2 
+wanted to go with new format i.e. acknowledging for last segment of RAM 
+patch.
+then checking rom_build field may not work.
+i.e.
+if (le16_to_cpu(tlv_patch->rom_build) >= 0x0302)
+config->dnld_mode = tlv_patch->download_mode;
 
-The current meshd, and it's companion Non-Background Command-line
-version btmesh, exists fully within user-space, but requires an
-HCI_USER socket to the kernel controler, and currently requires root
-privledges.
+i suggest you to check the byte download_mode directly and decide to 
+wait for ACK from SoC, for every RAM patch segment sent.
+i think byte download_mode is explicitly for mode of downloading the 
+patch i.e. with ACK or NACK. (pls double confirm about this byte).
 
-This first revision is intended to operate as a standard
-(non-provisioner) node.  It includes the Configuration Server model,
-and if it cannot find it's Mesh Configuration, will look for it's
-Composition data, and start up as unprovisioned, and accept an
-incoming PB-ADV provisioning session.
+This is how we are doing for wcn3990 (in Add support wcn3990 patch).
 
-Two of us (Inga and Brian) have been working on this, and will be
-the initial supporters and maintainers, and we gladly invite other
-interested parties to participate.
-
-Brian Gix (4):
-  meshd: Shared private meshd interfaces
-  meshd: Infrastructure for Mesh daemon
-  meshd: Provisioning logic for mesh
-  meshd: Upper and Lower mesh transport
-
-Inga Stotland (7):
-  meshd: Header files for mesh access layer and utilities
-  meshd: Source files for mesh access layer and utilities
-  meshd: Source code for handling access layer mux/demux
-  meshd: Mesh config server model
-  meshd: Read and write mesh configuration in JSON format
-  meshd: Sample device composition in JSON fromat
-  Makefile for meshd and configure.ac
-
- Makefile.am                   |    1 +
- Makefile.meshd                |   44 +
- configure.ac                  |    2 +-
- meshd/common/agent.c          |  229 +++
- meshd/common/agent.h          |   42 +
- meshd/common/mesh-defs.h      |   84 +
- meshd/common/util.c           |   71 +
- meshd/common/util.h           |   25 +
- meshd/config/composition.json |   44 +
- meshd/mesh-json/mesh-db.c     | 1360 +++++++++++++
- meshd/mesh-json/mesh-db.h     |  144 ++
- meshd/src/appkey.c            |  538 ++++++
- meshd/src/appkey.h            |   43 +
- meshd/src/btmesh.c            |  176 ++
- meshd/src/cfgmod-server.c     | 1194 ++++++++++++
- meshd/src/cfgmod.h            |   98 +
- meshd/src/crypto.c            | 1607 ++++++++++++++++
- meshd/src/crypto.h            |  164 ++
- meshd/src/display.c           |   67 +
- meshd/src/display.h           |   29 +
- meshd/src/friend.c            | 1116 +++++++++++
- meshd/src/friend.h            |   57 +
- meshd/src/hci.c               |  699 +++++++
- meshd/src/hci.h               |   56 +
- meshd/src/main.c              |  174 ++
- meshd/src/mesh-io-api.h       |   58 +
- meshd/src/mesh-io-generic.c   |  660 +++++++
- meshd/src/mesh-io-generic.h   |   20 +
- meshd/src/mesh-io.c           |  187 ++
- meshd/src/mesh-io.h           |   99 +
- meshd/src/mesh.c              |  184 ++
- meshd/src/mesh.h              |   32 +
- meshd/src/model.c             | 1274 +++++++++++++
- meshd/src/model.h             |  146 ++
- meshd/src/net.c               | 4188 +++++++++++++++++++++++++++++++++++++++++
- meshd/src/net.h               |  392 ++++
- meshd/src/node.c              |  851 +++++++++
- meshd/src/node.h              |   80 +
- meshd/src/prov.c              |  722 +++++++
- meshd/src/prov.h              |  162 ++
- meshd/src/provision.c         | 1159 ++++++++++++
- meshd/src/provision.h         |   30 +
- meshd/src/storage.c           |  673 +++++++
- meshd/src/storage.h           |   51 +
- 44 files changed, 19031 insertions(+), 1 deletion(-)
- create mode 100644 Makefile.meshd
- create mode 100644 meshd/common/agent.c
- create mode 100644 meshd/common/agent.h
- create mode 100644 meshd/common/mesh-defs.h
- create mode 100644 meshd/common/util.c
- create mode 100644 meshd/common/util.h
- create mode 100644 meshd/config/composition.json
- create mode 100644 meshd/mesh-json/mesh-db.c
- create mode 100644 meshd/mesh-json/mesh-db.h
- create mode 100644 meshd/src/appkey.c
- create mode 100644 meshd/src/appkey.h
- create mode 100644 meshd/src/btmesh.c
- create mode 100644 meshd/src/cfgmod-server.c
- create mode 100644 meshd/src/cfgmod.h
- create mode 100644 meshd/src/crypto.c
- create mode 100644 meshd/src/crypto.h
- create mode 100644 meshd/src/display.c
- create mode 100644 meshd/src/display.h
- create mode 100644 meshd/src/friend.c
- create mode 100644 meshd/src/friend.h
- create mode 100644 meshd/src/hci.c
- create mode 100644 meshd/src/hci.h
- create mode 100644 meshd/src/main.c
- create mode 100644 meshd/src/mesh-io-api.h
- create mode 100644 meshd/src/mesh-io-generic.c
- create mode 100644 meshd/src/mesh-io-generic.h
- create mode 100644 meshd/src/mesh-io.c
- create mode 100644 meshd/src/mesh-io.h
- create mode 100644 meshd/src/mesh.c
- create mode 100644 meshd/src/mesh.h
- create mode 100644 meshd/src/model.c
- create mode 100644 meshd/src/model.h
- create mode 100644 meshd/src/net.c
- create mode 100644 meshd/src/net.h
- create mode 100644 meshd/src/node.c
- create mode 100644 meshd/src/node.h
- create mode 100644 meshd/src/prov.c
- create mode 100644 meshd/src/prov.h
- create mode 100644 meshd/src/provision.c
- create mode 100644 meshd/src/provision.h
- create mode 100644 meshd/src/storage.c
- create mode 100644 meshd/src/storage.h
-
--- 
-2.14.3
-
+Regards
+Balakrishna.
