@@ -1,50 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH 3/7] meshd: Header files for mesh access layer and utilities
-Date: Wed, 25 Apr 2018 07:20:38 -0700
-Message-Id: <20180425142042.1262-4-brian.gix@intel.com>
+Cc: Brian Gix <brian.gix@intel.com>
+Subject: [PATCH 1/7] meshd: Shared private meshd interfaces
+Date: Wed, 25 Apr 2018 07:20:36 -0700
+Message-Id: <20180425142042.1262-2-brian.gix@intel.com>
 In-Reply-To: <20180425142042.1262-1-brian.gix@intel.com>
 References: <20180425142042.1262-1-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Inga Stotland <inga.stotland@intel.com>
-
-This adds initial implementation of Mesh access layer functionality
 ---
- meshd/common/agent.h     |  42 ++++++++++++++
- meshd/common/mesh-defs.h |  84 +++++++++++++++++++++++++++
- meshd/common/util.h      |  25 ++++++++
- meshd/src/appkey.h       |  43 ++++++++++++++
- meshd/src/cfgmod.h       |  98 +++++++++++++++++++++++++++++++
- meshd/src/mesh.h         |  32 +++++++++++
- meshd/src/model.h        | 146 +++++++++++++++++++++++++++++++++++++++++++++++
- meshd/src/node.h         |  80 ++++++++++++++++++++++++++
- meshd/src/storage.h      |  51 +++++++++++++++++
- 9 files changed, 601 insertions(+)
- create mode 100644 meshd/common/agent.h
- create mode 100644 meshd/common/mesh-defs.h
- create mode 100644 meshd/common/util.h
- create mode 100644 meshd/src/appkey.h
- create mode 100644 meshd/src/cfgmod.h
- create mode 100644 meshd/src/mesh.h
- create mode 100644 meshd/src/model.h
- create mode 100644 meshd/src/node.h
- create mode 100644 meshd/src/storage.h
+ meshd/src/crypto.h          | 164 ++++++++++++++++++
+ meshd/src/display.h         |  29 ++++
+ meshd/src/friend.h          |  57 +++++++
+ meshd/src/hci.h             |  56 +++++++
+ meshd/src/mesh-io-api.h     |  58 +++++++
+ meshd/src/mesh-io-generic.h |  20 +++
+ meshd/src/mesh-io.h         |  99 +++++++++++
+ meshd/src/net.h             | 392 ++++++++++++++++++++++++++++++++++++++++++++
+ meshd/src/prov.h            | 162 ++++++++++++++++++
+ meshd/src/provision.h       |  30 ++++
+ 10 files changed, 1067 insertions(+)
+ create mode 100644 meshd/src/crypto.h
+ create mode 100644 meshd/src/display.h
+ create mode 100644 meshd/src/friend.h
+ create mode 100644 meshd/src/hci.h
+ create mode 100644 meshd/src/mesh-io-api.h
+ create mode 100644 meshd/src/mesh-io-generic.h
+ create mode 100644 meshd/src/mesh-io.h
+ create mode 100644 meshd/src/net.h
+ create mode 100644 meshd/src/prov.h
+ create mode 100644 meshd/src/provision.h
 
-diff --git a/meshd/common/agent.h b/meshd/common/agent.h
+diff --git a/meshd/src/crypto.h b/meshd/src/crypto.h
 new file mode 100644
-index 000000000..6fb475691
+index 000000000..251b2cc7f
 --- /dev/null
-+++ b/meshd/common/agent.h
-@@ -0,0 +1,42 @@
++++ b/meshd/src/crypto.h
+@@ -0,0 +1,164 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2017  Intel Corporation. All rights reserved.
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
 + *
 + *
 + *  This library is free software; you can redistribute it and/or
@@ -57,37 +56,319 @@ index 000000000..6fb475691
 + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 + *  Lesser General Public License for more details.
 + *
++ */
++
++#include <stdbool.h>
++#include <stdint.h>
++
++bool mesh_crypto_aes_ccm_encrypt(const uint8_t nonce[13], const uint8_t key[16],
++					const uint8_t *aad, uint16_t aad_len,
++					const uint8_t *msg, uint16_t msg_len,
++					uint8_t *out_msg,
++					void *out_mic, size_t mic_size);
++bool mesh_crypto_aes_ccm_decrypt(const uint8_t nonce[13], const uint8_t key[16],
++				const uint8_t *aad, uint16_t aad_len,
++				const uint8_t *enc_msg, uint16_t enc_msg_len,
++				uint8_t *out_msg,
++				void *out_mic, size_t mic_size);
++bool mesh_aes_ecb_one(const uint8_t key[16],
++			const uint8_t plaintext[16], uint8_t encrypted[16]);
++bool mesh_crypto_nkik(const uint8_t network_key[16], uint8_t identity_key[16]);
++bool mesh_crypto_nkbk(const uint8_t network_key[16], uint8_t beacon_key[16]);
++bool mesh_crypto_nkpk(const uint8_t network_key[16], uint8_t proxy_key[16]);
++bool mesh_crypto_identity(const uint8_t net_key[16], uint16_t addr,
++							uint8_t id[16]);
++bool mesh_crypto_beacon_cmac(const uint8_t encryption_key[16],
++				const uint8_t network_id[16],
++				uint32_t iv_index, bool kr,
++				bool iu, uint64_t *cmac);
++bool mesh_crypto_network_nonce(bool frnd, uint8_t ttl, uint32_t seq,
++				uint16_t src, uint32_t iv_index,
++				uint8_t nonce[13]);
++bool mesh_crypto_network_encrypt(bool ctl, uint8_t ttl,
++				uint32_t seq, uint16_t src,
++				uint32_t iv_index,
++				const uint8_t net_key[16],
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *net_mic);
++bool mesh_crypto_network_decrypt(bool frnd, uint8_t ttl,
++				uint32_t seq, uint16_t src,
++				uint32_t iv_index,
++				const uint8_t net_key[16],
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *net_mic, size_t mic_size);
++bool mesh_crypto_application_nonce(uint32_t seq, uint16_t src,
++				uint16_t dst, uint32_t iv_index,
++				bool aszmic, uint8_t nonce[13]);
++bool mesh_crypto_device_nonce(uint32_t seq, uint16_t src,
++				uint16_t dst, uint32_t iv_index,
++				bool aszmic, uint8_t nonce[13]);
++bool mesh_crypto_application_encrypt(uint8_t akf, uint32_t seq, uint16_t src,
++					uint16_t dst, uint32_t iv_index,
++					const uint8_t app_key[16],
++					const uint8_t *aad, uint8_t aad_len,
++					const uint8_t *msg, uint8_t msg_len,
++					uint8_t *out,
++					void *app_mic, size_t mic_size);
++bool mesh_crypto_application_decrypt(uint8_t akf, uint32_t seq, uint16_t src,
++				uint16_t dst, uint32_t iv_index,
++				const uint8_t app_key[16],
++				const uint8_t *aad, uint8_t aad_len,
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *app_mic, size_t mic_size);
++bool mesh_crypto_device_key(const uint8_t secret[32],
++						const uint8_t salt[16],
++						uint8_t device_key[16]);
++bool mesh_crypto_virtual_addr(const uint8_t virtual_label[16],
++						uint16_t *v_addr);
++bool mesh_crypto_nonce(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t nonce[13]);
++bool mesh_crypto_k1(const uint8_t ikm[16], const uint8_t salt[16],
++		const void *info, size_t info_len, uint8_t okm[16]);
++bool mesh_crypto_k2(const uint8_t n[16], const uint8_t *p, size_t p_len,
++							uint8_t net_id[1],
++							uint8_t enc_key[16],
++							uint8_t priv_key[16]);
++bool mesh_crypto_k3(const uint8_t n[16], uint8_t out64[8]);
++bool mesh_crypto_k4(const uint8_t a[16], uint8_t out5[1]);
++bool mesh_crypto_s1(const void *info, size_t len, uint8_t salt[16]);
++bool mesh_crypto_prov_prov_salt(const uint8_t conf_salt[16],
++					const uint8_t prov_rand[16],
++					const uint8_t dev_rand[16],
++					uint8_t prov_salt[16]);
++bool mesh_crypto_prov_conf_key(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t conf_key[16]);
++bool mesh_crypto_session_key(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t session_key[16]);
++bool mesh_crypto_privacy_counter(uint32_t iv_index,
++						const uint8_t *payload,
++						uint8_t privacy_counter[16]);
++bool mesh_crypto_network_obfuscate(const uint8_t privacy_key[16],
++					const uint8_t privacy_counter[16],
++					bool ctl, uint8_t ttl, uint32_t seq,
++					uint16_t src, uint8_t *out);
++bool mesh_crypto_network_clarify(const uint8_t privacy_key[16],
++				const uint8_t privacy_counter[16],
++				const uint8_t net_hdr[6],
++				bool *ctl, uint8_t *ttl,
++				uint32_t *seq, uint16_t *src);
++
++bool mesh_crypto_packet_build(bool ctl, uint8_t ttl,
++				uint32_t seq,
++				uint16_t src, uint16_t dst,
++				uint8_t opcode,
++				bool segmented, uint8_t key_id,
++				bool szmic, bool relay, uint16_t seqZero,
++				uint8_t segO, uint8_t segN,
++				const uint8_t *payload, uint8_t payload_len,
++				uint8_t *packet, uint8_t *packet_len);
++bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
++				bool *ctl, uint8_t *ttl, uint32_t *seq,
++				uint16_t *src, uint16_t *dst,
++				uint32_t *cookie, uint8_t *opcode,
++				bool *segmented, uint8_t *key_id,
++				bool *szmic, bool *relay, uint16_t *seqZero,
++				uint8_t *segO, uint8_t *segN,
++				const uint8_t **payload, uint8_t *payload_len);
++bool mesh_crypto_payload_encrypt(uint8_t *aad, const uint8_t *payload,
++				uint8_t *out, uint16_t payload_len,
++				uint16_t src, uint16_t dst, uint8_t key_id,
++				uint32_t seq_num, uint32_t iv_index,
++				bool aszmic,
++				const uint8_t application_key[16]);
++bool mesh_crypto_payload_decrypt(uint8_t *aad, uint16_t aad_len,
++				const uint8_t *payload, uint16_t payload_len,
++				bool szmict,
++				uint16_t src, uint16_t dst, uint8_t key_id,
++				uint32_t seq_num, uint32_t iv_index,
++				uint8_t *out,
++				const uint8_t application_key[16]);
++bool mesh_crypto_packet_encode(uint8_t *packet, uint8_t packet_len,
++				const uint8_t network_key[16],
++				uint32_t iv_index,
++				const uint8_t privacy_key[16]);
++bool mesh_crypto_packet_decode(const uint8_t *packet, uint8_t packet_len,
++				bool proxy, uint8_t *out, uint32_t iv_index,
++				const uint8_t network_key[16],
++				const uint8_t privacy_key[16]);
++bool mesh_crypto_packet_label(uint8_t *packet, uint8_t packet_len,
++				uint16_t iv_index, uint8_t network_id);
++
++uint8_t mesh_crypto_compute_fcs(const uint8_t *packet, uint8_t packet_len);
++bool mesh_crypto_check_fcs(const uint8_t *packet, uint8_t packet_len,
++							uint8_t received_fcs);
++bool mesh_crypto_aes_cmac(const uint8_t key[16], const uint8_t *msg,
++					size_t msg_len, uint8_t res[16]);
++
+diff --git a/meshd/src/display.h b/meshd/src/display.h
+new file mode 100644
+index 000000000..d43292741
+--- /dev/null
++++ b/meshd/src/display.h
+@@ -0,0 +1,29 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
 + *
 + */
 +
-+#define MAX_HEXADECIMAL_OOB_LEN	128
-+#define DECIMAL_OOB_LEN		4
-+#define MAX_ASCII_OOB_LEN		16
++#define COLOR_OFF	"\x1B[0m"
++#define COLOR_RED	"\x1B[0;91m"
++#define COLOR_GREEN	"\x1B[0;92m"
++#define COLOR_YELLOW	"\x1B[0;93m"
++#define COLOR_BLUE	"\x1B[0;94m"
 +
-+enum oob_type {
-+	NONE,
-+	HEXADECIMAL,
-+	DECIMAL,
-+	ASCII,
-+	OUTPUT,
-+} oob_type_t;
++unsigned int num_columns(void);
 +
-+typedef void (*agent_input_cb)(enum oob_type type, void *input, uint16_t len,
++void print_packet(const char *label, const void *data, uint16_t size);
++
+diff --git a/meshd/src/friend.h b/meshd/src/friend.h
+new file mode 100644
+index 000000000..1fa6ec92a
+--- /dev/null
++++ b/meshd/src/friend.h
+@@ -0,0 +1,57 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#define OP_FRND_REQUEST			0x8040
++#define OP_FRND_INQUIRY			0x8041
++#define OP_FRND_CONFIRM			0x8042
++#define OP_FRND_SUB_LIST_ADD		0x8043
++#define OP_FRND_SUB_LIST_CONFIRM	0x8044
++#define OP_FRND_SUB_LIST_REMOVE		0x8045
++#define OP_FRND_NEGOTIATE		0x8046
++#define OP_FRND_CLEAR			0x8047
++
++void friend_poll(struct mesh_net *net, uint16_t src, bool seq,
++						struct mesh_friend *frnd);
++void friend_request(struct mesh_net *net, uint16_t src, uint8_t minReq,
++			uint8_t delay, uint32_t timeout, uint16_t prev,
++			uint8_t num_elements, uint16_t cntr, int8_t rssi);
++void friend_clear_confirm(struct mesh_net *net, uint16_t src, uint16_t lpn,
++							uint16_t lpnCounter);
++void friend_clear(struct mesh_net *net, uint16_t src, uint16_t lpn,
++			uint16_t lpnCounter, struct mesh_friend *frnd);
++void friend_sub_add(struct mesh_net *net, struct mesh_friend *frnd,
++					const uint8_t *pkt, uint8_t len);
++void friend_sub_del(struct mesh_net *net, struct mesh_friend *frnd,
++					const uint8_t *pkt, uint8_t len);
++void mesh_friend_relay_init(struct mesh_net *net, uint16_t addr);
++
++/* Low-Power-Node role */
++void frnd_sub_add(struct mesh_net *net, uint32_t parms[7]);
++void frnd_sub_del(struct mesh_net *net, uint32_t parms[7]);
++void frnd_poll(struct mesh_net *net, bool retry);
++void frnd_clear(struct mesh_net *net);
++void frnd_ack_poll(struct mesh_net *net);
++void frnd_poll_cancel(struct mesh_net *net);
++void frnd_request_friend(struct mesh_net *net, uint8_t cache,
++			uint8_t offer_delay, uint8_t delay, uint32_t timeout);
++void frnd_offer(struct mesh_net *net, uint16_t src, uint8_t window,
++			uint8_t cache, uint8_t sub_list_size,
++			int8_t r_rssi, int8_t l_rssi, uint16_t fn_cnt);
++void frnd_key_refresh(struct mesh_net *net, uint8_t phase);
++struct mesh_key_set *frnd_get_key(struct mesh_net *net);
+diff --git a/meshd/src/hci.h b/meshd/src/hci.h
+new file mode 100644
+index 000000000..a1362b76a
+--- /dev/null
++++ b/meshd/src/hci.h
+@@ -0,0 +1,56 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++struct bt_hci;
++
++typedef void (*bt_hci_destroy_func_t)(void *user_data);
++
++struct bt_hci *bt_hci_new(int fd);
++struct bt_hci *bt_hci_new_user_channel(uint16_t index);
++struct bt_hci *bt_hci_new_raw_device(uint16_t index);
++
++struct bt_hci *bt_hci_ref(struct bt_hci *hci);
++void bt_hci_unref(struct bt_hci *hci);
++
++bool bt_hci_set_close_on_unref(struct bt_hci *hci, bool do_close);
++
++typedef void (*bt_hci_callback_func_t)(const void *data, uint8_t size,
 +							void *user_data);
-+bool agent_input_request(enum oob_type type, uint16_t max_len,
-+					agent_input_cb cb, void *user_data);
 +
-+bool agent_output_request(const char *str);
-+void agent_output_request_cancel(void);
-+bool agent_completion(void);
-+bool agent_input(const char *input);
-+void agent_release(void);
-diff --git a/meshd/common/mesh-defs.h b/meshd/common/mesh-defs.h
++unsigned int bt_hci_send(struct bt_hci *hci, uint16_t opcode,
++				const void *data, uint8_t size,
++				bt_hci_callback_func_t callback,
++				void *user_data, bt_hci_destroy_func_t destroy);
++bool bt_hci_cancel(struct bt_hci *hci, unsigned int id);
++bool bt_hci_flush(struct bt_hci *hci);
++
++unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
++				bt_hci_callback_func_t callback,
++				void *user_data, bt_hci_destroy_func_t destroy);
++bool bt_hci_unregister(struct bt_hci *hci, unsigned int id);
++
++typedef void (*bt_hci_receive_func_t)(uint16_t handle, uint8_t flags,
++					const void *data, uint16_t size,
++							void *user_data);
++
++bool bt_hci_receive(struct bt_hci *hci, bt_hci_receive_func_t callback,
++				void *user_data, bt_hci_destroy_func_t destroy);
++
++bool bt_hci_write(struct bt_hci *hci, uint16_t handle, uint8_t flags,
++				const void *data, uint16_t size);
+diff --git a/meshd/src/mesh-io-api.h b/meshd/src/mesh-io-api.h
 new file mode 100644
-index 000000000..d40fc43e8
+index 000000000..f69fceeb2
 --- /dev/null
-+++ b/meshd/common/mesh-defs.h
-@@ -0,0 +1,84 @@
++++ b/meshd/src/mesh-io-api.h
+@@ -0,0 +1,58 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -105,453 +386,53 @@ index 000000000..d40fc43e8
 + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 + *  Lesser General Public License for more details.
 + *
-+ *
 + */
 +
-+#define MESH_AD_TYPE_PROVISION	0x29
-+#define MESH_AD_TYPE_NETWORK	0x2A
-+#define MESH_AD_TYPE_BEACON	0x2B
++struct mesh_io_private;
 +
-+#define FEATURE_RELAY	1
-+#define FEATURE_PROXY	2
-+#define FEATURE_FRIEND	4
-+#define FEATURE_LPN	8
++typedef bool (*mesh_io_init_t)(uint16_t index, struct mesh_io *io);
++typedef bool (*mesh_io_destroy_t)(struct mesh_io *io);
++typedef bool (*mesh_io_caps_t)(struct mesh_io *io, struct mesh_io_caps *caps);
++typedef bool (*mesh_io_send_t)(struct mesh_io *io,
++					struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len);
++typedef bool (*mesh_io_register_t)(struct mesh_io *io, uint8_t filter_id,
++				mesh_io_recv_func_t cb, void *user_data);
++typedef bool (*mesh_io_deregister_t)(struct mesh_io *io, uint8_t filter_id);
++typedef bool (*mesh_io_filter_set_t)(struct mesh_io *io,
++			uint8_t filter_id, const uint8_t *data, uint8_t len,
++			mesh_io_status_func_t callback, void *user_data);
++typedef bool (*mesh_io_tx_cancel_t)(struct mesh_io *io, uint8_t *pattern,
++								uint8_t len);
 +
-+#define MESH_MODE_DISABLED	0
-+#define MESH_MODE_ENABLED	1
-+#define MESH_MODE_UNSUPPORTED	2
-+
-+#define KEY_REFRESH_PHASE_NONE	0x00
-+#define KEY_REFRESH_PHASE_ONE	0x01
-+#define KEY_REFRESH_PHASE_TWO	0x02
-+#define KEY_REFRESH_PHASE_THREE	0x03
-+
-+#define DEFAULT_TTL		0xff
-+
-+/* Supported algorithms for provisioning */
-+#define ALG_FIPS_256_ECC	0x0001
-+
-+/* Input OOB action bit flags */
-+#define OOB_IN_PUSH	0x0001
-+#define OOB_IN_TWIST	0x0002
-+#define OOB_IN_NUMBER	0x0004
-+#define OOB_IN_ALPHA	0x0008
-+
-+/* Output OOB action bit flags */
-+#define OOB_OUT_BLINK	0x0001
-+#define OOB_OUT_BEEP	0x0002
-+#define OOB_OUT_VIBRATE	0x0004
-+#define OOB_OUT_NUMBER	0x0008
-+#define OOB_OUT_ALPHA	0x0010
-+
-+#define UNASSIGNED_ADDRESS	0x0000
-+#define PROXIES_ADDRESS	0xfffc
-+#define FRIENDS_ADDRESS	0xfffd
-+#define RELAYS_ADDRESS		0xfffe
-+#define ALL_NODES_ADDRESS	0xffff
-+#define VIRTUAL_ADDRESS_LOW	0x8000
-+#define VIRTUAL_ADDRESS_HIGH	0xbfff
-+#define GROUP_ADDRESS_LOW	0xc000
-+#define GROUP_ADDRESS_HIGH	0xff00
-+
-+#define NODE_IDENTITY_STOPPED		0x00
-+#define NODE_IDENTITY_RUNNING		0x01
-+#define NODE_IDENTITY_NOT_SUPPORTED	0x02
-+
-+#define PRIMARY_ELE_IDX		0x00
-+
-+#define VENDOR_ID_MASK		0xffff0000
-+
-+#define MAX_KEY_IDX		0x0fff
-+
-+#define IS_UNASSIGNED(x)	((x) == UNASSIGNED_ADDRESS)
-+#define IS_UNICAST(x)		(((x) > UNASSIGNED_ADDRESS) && \
-+					((x) < VIRTUAL_ADDRESS_LOW))
-+#define IS_VIRTUAL(x)		(((x) >= VIRTUAL_ADDRESS_LOW) && \
-+					((x) <= VIRTUAL_ADDRESS_HIGH))
-+#define IS_GROUP(x)		(((x) >= GROUP_ADDRESS_LOW) && \
-+					((x) <= GROUP_ADDRESS_HIGH))
-+#define IS_ALL_NODES(x)	((x) == ALL_NODES_ADDRESS)
-diff --git a/meshd/common/util.h b/meshd/common/util.h
-new file mode 100644
-index 000000000..ed880bce7
---- /dev/null
-+++ b/meshd/common/util.h
-@@ -0,0 +1,25 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *
-+ */
-+
-+uint32_t get_timestamp_secs(void);
-+bool str2hex(const char *str, uint16_t in_len, uint8_t *out,
-+							uint16_t out_len);
-+size_t hex2str(uint8_t *in, size_t in_len, char *out, size_t out_len);
-+
-diff --git a/meshd/src/appkey.h b/meshd/src/appkey.h
-new file mode 100644
-index 000000000..8fce3dcd0
---- /dev/null
-+++ b/meshd/src/appkey.h
-@@ -0,0 +1,43 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *
-+ */
-+
-+/* TODO: get this number from configuration */
-+#define MAX_APP_KEYS	32
-+
-+bool appkey_key_init(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
-+				uint8_t *key_value, uint8_t *new_key_value);
-+void appkey_key_free(void *data);
-+int appkey_packet_decrypt(struct mesh_net *net, bool szmict, uint32_t seq,
-+				uint32_t iv_index, uint16_t src, uint16_t dst,
-+				uint8_t *virt, uint16_t virt_size,
-+				uint8_t key_id, const uint8_t *data,
-+				uint16_t data_size, uint8_t *out);
-+bool appkey_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
-+				uint16_t src, uint16_t crpl, uint32_t seq,
-+				uint32_t iv_index);
-+const uint8_t *appkey_get_key(struct mesh_net *net, uint16_t app_idx,
-+							uint8_t *key_id);
-+bool appkey_have_key(struct mesh_net *net, uint16_t app_idx);
-+int appkey_key_add(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
-+					const uint8_t *new_key, bool update);
-+int appkey_key_delete(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx);
-+void appkey_delete_bound_keys(struct mesh_net *net, uint16_t net_idx);
-+uint8_t appkey_list(struct mesh_net *net, uint16_t net_idx, uint8_t *buf,
-+					uint16_t buf_size, uint16_t *size);
-diff --git a/meshd/src/cfgmod.h b/meshd/src/cfgmod.h
-new file mode 100644
-index 000000000..bedb0c6f6
---- /dev/null
-+++ b/meshd/src/cfgmod.h
-@@ -0,0 +1,98 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *
-+ */
-+
-+#define CONFIG_SRV_MODEL	(VENDOR_ID_MASK | 0x0000)
-+#define CONFIG_CLI_MODEL	(VENDOR_ID_MASK | 0x0001)
-+
-+/* New List */
-+#define OP_APPKEY_ADD				0x00
-+#define OP_APPKEY_DELETE			0x8000
-+#define OP_APPKEY_GET				0x8001
-+#define OP_APPKEY_LIST				0x8002
-+#define OP_APPKEY_STATUS			0x8003
-+#define OP_APPKEY_UPDATE			0x01
-+#define OP_DEV_COMP_GET				0x8008
-+#define OP_DEV_COMP_STATUS			0x02
-+#define OP_CONFIG_BEACON_GET			0x8009
-+#define OP_CONFIG_BEACON_SET			0x800A
-+#define OP_CONFIG_BEACON_STATUS			0x800B
-+#define OP_CONFIG_DEFAULT_TTL_GET		0x800C
-+#define OP_CONFIG_DEFAULT_TTL_SET		0x800D
-+#define OP_CONFIG_DEFAULT_TTL_STATUS		0x800E
-+#define OP_CONFIG_FRIEND_GET			0x800F
-+#define OP_CONFIG_FRIEND_SET			0x8010
-+#define OP_CONFIG_FRIEND_STATUS			0x8011
-+#define OP_CONFIG_PROXY_GET			0x8012
-+#define OP_CONFIG_PROXY_SET			0x8013
-+#define OP_CONFIG_PROXY_STATUS			0x8014
-+#define OP_CONFIG_KEY_REFRESH_PHASE_GET		0x8015
-+#define OP_CONFIG_KEY_REFRESH_PHASE_SET		0x8016
-+#define OP_CONFIG_KEY_REFRESH_PHASE_STATUS	0x8017
-+#define OP_CONFIG_MODEL_PUB_GET			0x8018
-+#define OP_CONFIG_MODEL_PUB_SET			0x03
-+#define OP_CONFIG_MODEL_PUB_STATUS		0x8019
-+#define OP_CONFIG_MODEL_PUB_VIRT_SET		0x801A
-+#define OP_CONFIG_MODEL_SUB_ADD			0x801B
-+#define OP_CONFIG_MODEL_SUB_DELETE		0x801C
-+#define OP_CONFIG_MODEL_SUB_DELETE_ALL		0x801D
-+#define OP_CONFIG_MODEL_SUB_OVERWRITE		0x801E
-+#define OP_CONFIG_MODEL_SUB_STATUS		0x801F
-+#define OP_CONFIG_MODEL_SUB_VIRT_ADD		0x8020
-+#define OP_CONFIG_MODEL_SUB_VIRT_DELETE		0x8021
-+#define OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE	0x8022
-+#define OP_CONFIG_NETWORK_TRANSMIT_GET		0x8023
-+#define OP_CONFIG_NETWORK_TRANSMIT_SET		0x8024
-+#define OP_CONFIG_NETWORK_TRANSMIT_STATUS	0x8025
-+#define OP_CONFIG_RELAY_GET			0x8026
-+#define OP_CONFIG_RELAY_SET			0x8027
-+#define OP_CONFIG_RELAY_STATUS			0x8028
-+#define OP_CONFIG_MODEL_SUB_GET			0x8029
-+#define OP_CONFIG_MODEL_SUB_LIST		0x802A
-+#define OP_CONFIG_VEND_MODEL_SUB_GET		0x802B
-+#define OP_CONFIG_VEND_MODEL_SUB_LIST		0x802C
-+#define OP_CONFIG_POLL_TIMEOUT_LIST		0x802D
-+#define OP_CONFIG_POLL_TIMEOUT_STATUS		0x802E
-+/* Health opcodes in health-mod.h */
-+#define OP_CONFIG_HEARTBEAT_PUB_GET		0x8038
-+#define OP_CONFIG_HEARTBEAT_PUB_SET		0x8039
-+#define OP_CONFIG_HEARTBEAT_PUB_STATUS		0x06
-+#define OP_CONFIG_HEARTBEAT_SUB_GET		0x803A
-+#define OP_CONFIG_HEARTBEAT_SUB_SET		0x803B
-+#define OP_CONFIG_HEARTBEAT_SUB_STATUS		0x803C
-+#define OP_MODEL_APP_BIND			0x803D
-+#define OP_MODEL_APP_STATUS			0x803E
-+#define OP_MODEL_APP_UNBIND			0x803F
-+#define OP_NETKEY_ADD				0x8040
-+#define OP_NETKEY_DELETE			0x8041
-+#define OP_NETKEY_GET				0x8042
-+#define OP_NETKEY_LIST				0x8043
-+#define OP_NETKEY_STATUS			0x8044
-+#define OP_NETKEY_UPDATE			0x8045
-+#define OP_NODE_IDENTITY_GET			0x8046
-+#define OP_NODE_IDENTITY_SET			0x8047
-+#define OP_NODE_IDENTITY_STATUS			0x8048
-+#define OP_NODE_RESET				0x8049
-+#define OP_NODE_RESET_STATUS			0x804A
-+#define OP_MODEL_APP_GET			0x804B
-+#define OP_MODEL_APP_LIST			0x804C
-+#define OP_VEND_MODEL_APP_GET			0x804C
-+#define OP_VEND_MODEL_APP_LIST			0x804E
-+
-+void mesh_config_srv_init(struct mesh_net *net, uint8_t ele_idx);
-diff --git a/meshd/src/mesh.h b/meshd/src/mesh.h
-new file mode 100644
-index 000000000..7cd1e6158
---- /dev/null
-+++ b/meshd/src/mesh.h
-@@ -0,0 +1,32 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *
-+ */
-+
-+struct bt_mesh;
-+struct mesh_net;
-+
-+struct bt_mesh *mesh_create(uint16_t index);
-+struct bt_mesh *mesh_ref(struct bt_mesh *mesh);
-+void mesh_unref(struct bt_mesh *mesh);
-+bool mesh_load_config(struct bt_mesh *mesh, const char *in_config_name);
-+bool mesh_set_output(struct bt_mesh *mesh, const char *out_config_name);
-+const char *mesh_status_str(uint8_t err);
-+
-+/* Command line testing */
-+struct mesh_net *mesh_get_net(struct bt_mesh *mesh);
-diff --git a/meshd/src/model.h b/meshd/src/model.h
-new file mode 100644
-index 000000000..3a41bd722
---- /dev/null
-+++ b/meshd/src/model.h
-@@ -0,0 +1,146 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *
-+ */
-+
-+#include <ell/ell.h>
-+
-+struct mesh_model;
-+
-+#define OP_UNRELIABLE			0x0100
-+
-+#define MAX_BINDINGS	10
-+#define MAX_GRP_PER_MOD	10
-+
-+#define	VIRTUAL_BASE			0x10000
-+
-+#define MESH_MAX_ACCESS_PAYLOAD		380
-+
-+#define MESH_STATUS_SUCCESS		0x00
-+#define MESH_STATUS_INVALID_ADDRESS	0x01
-+#define MESH_STATUS_INVALID_MODEL	0x02
-+#define MESH_STATUS_INVALID_APPKEY	0x03
-+#define MESH_STATUS_INVALID_NETKEY	0x04
-+#define MESH_STATUS_INSUFF_RESOURCES	0x05
-+#define MESH_STATUS_IDX_ALREADY_STORED	0x06
-+#define MESH_STATUS_INVALID_PUB_PARAM	0x07
-+#define MESH_STATUS_NOT_SUB_MOD		0x08
-+#define MESH_STATUS_STORAGE_FAIL	0x09
-+#define MESH_STATUS_FEATURE_NO_SUPPORT	0x0a
-+#define MESH_STATUS_CANNOT_UPDATE	0x0b
-+#define MESH_STATUS_CANNOT_REMOVE	0x0c
-+#define MESH_STATUS_CANNOT_BIND		0x0d
-+#define MESH_STATUS_UNABLE_CHANGE_STATE	0x0e
-+#define MESH_STATUS_CANNOT_SET		0x0f
-+#define MESH_STATUS_UNSPECIFIED_ERROR	0x10
-+#define MESH_STATUS_INVALID_BINDING	0x11
-+
-+#define OP_MODEL_TEST			0x8000fffe
-+#define OP_MODEL_INVALID		0x8000ffff
-+
-+#define USE_PUB_VALUE			0x00
-+
-+#define ACTION_ADD		1
-+#define ACTION_UPDATE		2
-+#define ACTION_DELETE		3
-+
-+struct mesh_model_pub {
-+	uint32_t addr;
-+	uint16_t idx;
-+	uint8_t ttl;
-+	uint8_t credential;
-+	uint8_t period;
-+	uint8_t retransmit;
++struct mesh_io_api {
++	mesh_io_init_t		init;
++	mesh_io_destroy_t	destroy;
++	mesh_io_caps_t		caps;
++	mesh_io_send_t		send;
++	mesh_io_register_t	reg;
++	mesh_io_deregister_t	dereg;
++	mesh_io_filter_set_t	set;
++	mesh_io_tx_cancel_t	cancel;
 +};
 +
-+typedef void (*mesh_model_unregister)(void *user_data);
-+typedef bool (*mesh_model_recv_cb)(uint16_t src, uint32_t dst, uint16_t unicast,
-+					uint16_t app_idx, const uint8_t *data,
-+					uint16_t len, uint8_t ttl,
-+					const void *user_data);
-+typedef int (*mesh_model_bind_cb)(uint16_t app_idx, int action);
-+typedef int (*mesh_model_pub_cb)(struct mesh_model_pub *pub);
-+typedef int (*mesh_model_sub_cb)(uint16_t sub_addr, int action);
-+
-+struct mesh_model_ops {
-+	mesh_model_unregister unregister;
-+	mesh_model_recv_cb recv;
-+	mesh_model_bind_cb bind;
-+	mesh_model_pub_cb pub;
-+	mesh_model_sub_cb sub;
++struct mesh_io {
++	enum mesh_io_type		type;
++	uint16_t			index;
++	const struct mesh_io_api	*api;
++	struct mesh_io_private		*pvt;
 +};
 +
-+struct mesh_model *mesh_model_new(uint8_t ele_idx, uint32_t id, bool vendor);
-+void mesh_model_free(void *data);
-+uint32_t mesh_model_get_model_id(const struct mesh_model *model);
-+bool mesh_model_vendor_register(struct mesh_net *net, uint8_t ele_idx,
-+					uint32_t mod_id,
-+					const struct mesh_model_ops *cbs,
-+					void *user_data);
-+bool mesh_model_register(struct mesh_net *net, uint8_t ele_idx, uint32_t mod_id,
-+					const struct mesh_model_ops *cbs,
-+							void *user_data);
-+struct mesh_model_pub *mesh_model_pub_get(struct mesh_net *net, uint8_t ele_idx,
-+						uint32_t mod_id, int *status);
-+int mesh_model_pub_set(struct mesh_net *net, uint16_t addr, uint32_t id,
-+			const uint8_t *mod_addr, uint16_t idx, bool cred_flag,
-+			uint8_t ttl, uint8_t period, uint8_t retransmit,
-+			bool b_virt, uint16_t *dst);
-+struct mesh_model *mesh_model_init(struct mesh_net *net, uint8_t ele_idx,
-+						struct mesh_db_model *db_mod);
-+
-+int mesh_model_binding_add(struct mesh_net *net, uint16_t addr, uint32_t id,
-+						uint16_t app_idx);
-+int mesh_model_binding_del(struct mesh_net *net, uint16_t addr, uint32_t id,
-+						uint16_t idx);
-+int mesh_model_get_bindings(struct mesh_net *net, uint16_t addr, uint32_t id,
-+				uint8_t *buf, uint16_t buf_len, uint16_t *size);
-+int mesh_model_sub_add(struct mesh_net *net, uint16_t addr, uint32_t id,
-+						const uint8_t *grp, bool b_virt,
-+						uint16_t *dst);
-+int mesh_model_sub_del(struct mesh_net *net, uint16_t addr, uint32_t id,
-+						const uint8_t *grp, bool b_virt,
-+						uint16_t *dst);
-+int mesh_model_sub_del_all(struct mesh_net *net, uint16_t addr, uint32_t id);
-+int mesh_model_sub_ovr(struct mesh_net *net, uint16_t addr, uint32_t id,
-+						const uint8_t *grp, bool b_virt,
-+						uint16_t *dst);
-+int mesh_model_sub_get(struct mesh_net *net, uint16_t addr, uint32_t id,
-+			uint8_t *buf, uint16_t buf_size, uint16_t *size);
-+uint16_t mesh_model_cfg_blk(uint8_t *pkt);
-+unsigned int mesh_model_send(struct mesh_net *net, uint32_t mod_id,
-+				uint16_t src, uint32_t target,
-+				uint16_t app_idx, uint8_t ttl,
-+				const void *msg, uint16_t msg_len);
-+
-+bool mesh_model_rx(struct mesh_net *net, bool szmict, uint32_t seq0,
-+			uint32_t seq, uint32_t iv_index, uint8_t ttl,
-+			uint16_t src, uint16_t dst, uint8_t key_id,
-+			const uint8_t *data, uint16_t size);
-+
-+void mesh_model_app_key_generate_new(struct mesh_net *net, uint16_t net_idx);
-+void mesh_model_app_key_delete(struct mesh_net *net, struct l_queue *models,
-+								uint16_t idx);
-+struct l_queue *mesh_model_get_appkeys(struct mesh_net *net);
-+void *mesh_model_get_local_node_data(struct mesh_net *net);
-+void mesh_model_add_virtual(struct mesh_net *net, const uint8_t *v);
-+void mesh_model_del_virtual(struct mesh_net *net, uint32_t va24);
-+void mesh_model_list_virtual(struct mesh_net *net);
-+uint16_t mesh_model_opcode_set(uint32_t opcode, uint8_t *buf);
-+bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size,
-+					uint32_t *opcode, uint16_t *n);
-diff --git a/meshd/src/node.h b/meshd/src/node.h
++struct mesh_io_table {
++	enum mesh_io_type		type;
++	const struct mesh_io_api	*api;
++};
+diff --git a/meshd/src/mesh-io-generic.h b/meshd/src/mesh-io-generic.h
 new file mode 100644
-index 000000000..8ebb41941
+index 000000000..4bf4d5cb7
 --- /dev/null
-+++ b/meshd/src/node.h
-@@ -0,0 +1,80 @@
++++ b/meshd/src/mesh-io-generic.h
+@@ -0,0 +1,20 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -569,80 +450,523 @@ index 000000000..8ebb41941
 + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 + *  Lesser General Public License for more details.
 + *
++ */
++
++extern const struct mesh_io_api mesh_io_generic;
+diff --git a/meshd/src/mesh-io.h b/meshd/src/mesh-io.h
+new file mode 100644
+index 000000000..754f6129c
+--- /dev/null
++++ b/meshd/src/mesh-io.h
+@@ -0,0 +1,99 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
 + *
 + */
 +
-+#include "meshd/mesh-json/mesh-db.h"
++struct mesh_io;
 +
-+struct mesh_net;
++#define MESH_IO_FILTER_BEACON	1
++#define MESH_IO_FILTER_PROV	2
++#define MESH_IO_FILTER_NET	3
++
++#define MESH_IO_TX_COUNT_UNLIMITED	0
++
++enum mesh_io_type {
++	MESH_IO_TYPE_NONE = 0,
++	MESH_IO_TYPE_GENERIC
++};
++
++enum mesh_io_timing_type {
++	MESH_IO_TIMING_TYPE_GENERAL = 1,
++	MESH_IO_TIMING_TYPE_POLL,
++	MESH_IO_TIMING_TYPE_POLL_RSP
++};
++
++struct mesh_io_recv_info {
++	uint32_t instant;
++	uint8_t chan;
++	int8_t rssi;
++};
++
++struct mesh_io_send_info {
++	enum mesh_io_timing_type type;
++	union {
++		struct {
++			uint16_t interval;
++			uint8_t cnt;
++			uint8_t min_delay;
++			uint8_t max_delay;
++		} gen;
++
++		struct {
++			uint16_t scan_duration;
++			uint8_t scan_delay;
++			uint8_t filter_ids[2];
++			uint8_t min_delay;
++			uint8_t max_delay;
++		} poll;
++
++		struct {
++			uint32_t instant;
++			uint8_t delay;
++		} poll_rsp;
++
++	} u;
++};
++
++struct mesh_io_caps {
++	uint8_t max_num_filters;
++	uint8_t window_accuracy;
++};
++
++typedef void (*mesh_io_recv_func_t)(void *user_data,
++					struct mesh_io_recv_info *info,
++					const uint8_t *data, uint16_t len);
++
++typedef void (*mesh_io_status_func_t)(void *user_data, int status,
++							uint8_t filter_id);
++
++struct mesh_io *mesh_io_new(uint16_t index, enum mesh_io_type type);
++void mesh_io_destroy(struct mesh_io *io);
++
++bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps);
++
++bool mesh_io_register_recv_cb(struct mesh_io *io, uint8_t filter_id,
++				mesh_io_recv_func_t cb, void *user_data);
++
++bool mesh_io_deregister_recv_cb(struct mesh_io *io, uint8_t filter_id);
++
++bool mesh_set_filter(struct mesh_io *io, uint8_t filter_id,
++				const uint8_t *data, uint8_t len,
++				mesh_io_status_func_t cb, void *user_data);
++
++bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len);
++bool mesh_io_send_cancel(struct mesh_io *io, uint8_t *pattern, uint8_t len);
+diff --git a/meshd/src/net.h b/meshd/src/net.h
+new file mode 100644
+index 000000000..e48380314
+--- /dev/null
++++ b/meshd/src/net.h
+@@ -0,0 +1,392 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#include <stdbool.h>
++#include <stdint.h>
++
++#ifndef __packed
++#define __packed __attribute__((packed))
++#endif
++
++struct mesh_io;
 +struct mesh_node;
 +
-+/* To prevent local node JSON cache thrashing, minimum update times */
-+#define MIN_SEQ_TRIGGER	32
-+#define MIN_SEQ_CACHE		(2*MIN_SEQ_TRIGGER)
-+#define MIN_SEQ_CACHE_TIME	(5*60)
++#define DEV_ID	0
 +
-+struct mesh_node *node_new(void);
-+void node_free(struct mesh_node *node);
-+uint8_t *node_uuid_get(struct mesh_node *node);
-+struct mesh_node *node_find_by_addr(uint16_t addr);
-+struct mesh_node *node_find_by_uuid(uint8_t uuid[16]);
-+bool node_is_provisioned(struct mesh_node *node);
-+bool node_app_key_delete(struct mesh_net *net, uint16_t addr,
-+				uint16_t net_idx, uint16_t idx);
-+bool node_net_key_delete(struct mesh_node *node, uint16_t index);
-+bool node_set_primary(struct mesh_node *node, uint16_t unicast);
-+uint16_t node_get_primary(struct mesh_node *node);
-+uint16_t node_get_primary_net_idx(struct mesh_node *node);
-+bool node_set_device_key(struct mesh_node *node, uint8_t key[16]);
-+const uint8_t *node_get_device_key(struct mesh_node *node);
-+void node_set_num_elements(struct mesh_node *node, uint8_t num_ele);
-+uint8_t node_get_num_elements(struct mesh_node *node);
-+bool node_parse_composition(struct mesh_node *node, uint8_t *buf, uint16_t len);
-+struct l_queue *node_get_net_keys(struct mesh_node *node);
-+struct l_queue *node_get_app_keys(struct mesh_node *node);
-+bool node_add_binding(struct mesh_node *node, uint8_t ele_idx,
-+			uint32_t model_id, uint16_t app_idx);
-+bool node_del_binding(struct mesh_node *node, uint8_t ele_idx,
-+			uint32_t model_id, uint16_t app_idx);
-+uint8_t node_default_ttl_get(struct mesh_node *node);
-+bool node_default_ttl_set(struct mesh_node *node, uint8_t ttl);
-+bool node_set_sequence_number(struct mesh_node *node, uint32_t seq);
-+uint32_t node_get_sequence_number(struct mesh_node *node);
-+int node_get_element_idx(struct mesh_node *node, uint16_t ele_addr);
-+struct l_queue *node_get_element_models(struct mesh_node *node, uint8_t ele_idx,
-+								int *status);
-+struct mesh_model *node_get_model(struct mesh_node *node, uint8_t ele_idx,
-+						uint32_t id, int *status);
-+uint16_t node_get_crpl(struct mesh_node *node);
-+struct mesh_node *node_create_from_storage(struct mesh_net *net,
-+						struct mesh_db_node *db_node,
-+								bool local);
-+uint16_t node_generate_comp(struct mesh_node *node, uint8_t *buf, uint16_t sz);
-+uint8_t node_lpn_mode_get(struct mesh_node *node);
-+bool node_relay_mode_set(struct mesh_node *node, bool enable, uint8_t cnt,
++#define UNUSED_KEY_IDX	0xffff
++
++#define APP_ID_DEV	0
++#define APP_ID_ANY	((unsigned int) -1)
++#define NET_ID_ANY	(APP_ID_ANY - 1)
++
++#define CTL		0x80
++#define TTL_MASK	0x7f
++#define SEQ_MASK	0xffffff
++
++#define CREDFLAG_MASK	0x1000
++#define APP_IDX_MASK	0x0fff
++#define APP_IDX_DEV	0x7fff
++#define APP_IDX_ANY	0x8000
++#define APP_IDX_NET	0xffff
++
++#define NET_IDX_INVALID	0xffff
++#define NET_NID_INVALID	0xff
++
++#define KEY_CACHE_SIZE	64
++#define FRND_CACHE_MAX	32
++
++#define MAX_UNSEG_LEN	15 /* msg_len == 11 + sizeof(MIC) */
++#define MAX_SEG_LEN	12 /* UnSeg length - 3 octets overhead */
++#define SEG_MAX(len)	(((len) <= MAX_UNSEG_LEN) ? 0 : \
++						(((len) - 1) / MAX_SEG_LEN))
++#define SEG_OFF(seg)	((seg) * MAX_SEG_LEN)
++#define MAX_SEG_TO_LEN(seg)	((seg) ? SEG_OFF((seg) + 1) : MAX_UNSEG_LEN)
++
++#define SEGMENTED	0x80
++#define UNSEGMENTED	0x00
++#define SEG_HDR_SHIFT	31
++#define IS_SEGMENTED(hdr)	(!!((hdr) & (true << SEG_HDR_SHIFT)))
++
++#define KEY_ID_MASK	0x7f
++#define KEY_AID_MASK	0x3f
++#define KEY_ID_AKF	0x40
++#define KEY_AID_SHIFT	0
++#define AKF_HDR_SHIFT	30
++#define KEY_HDR_SHIFT	24
++#define HAS_APP_KEY(hdr)	(!!((hdr) & (true << AKF_HDR_SHIFT)))
++
++#define OPCODE_MASK	0x7f
++#define OPCODE_HDR_SHIFT	24
++#define RELAY		0x80
++#define RELAY_HDR_SHIFT	23
++#define SZMIC		0x80
++#define SZMIC_HDR_SHIFT	23
++#define SEQ_ZERO_MASK	0x1fff
++#define SEQ_ZERO_HDR_SHIFT	10
++#define IS_RELAYED(hdr)	(!!((hdr) & (true << RELAY_HDR_SHIFT)))
++#define HAS_MIC64(hdr)	(!!((hdr) & (true << SZMIC_HDR_SHIFT)))
++
++#define SEG_MASK	0x1f
++#define SEGO_HDR_SHIFT	5
++#define SEGN_HDR_SHIFT	0
++#define SEG_TOTAL(hdr)	(((hdr) >> SEGN_HDR_SHIFT) & SEG_MASK)
++
++/* Mask of Hdr bits which must be constant over entire incoming SAR message */
++/* (SEG || AKF || AID || SZMIC || SeqZero || SegN) */
++#define HDR_KEY_MASK		((true << SEG_HDR_SHIFT) |		\
++				(KEY_ID_MASK << KEY_HDR_SHIFT) |	\
++				(true << SZMIC_HDR_SHIFT) |		\
++				(SEQ_ZERO_MASK << SEQ_ZERO_HDR_SHIFT) |	\
++				(SEG_MASK << SEGN_HDR_SHIFT))
++
++#define HDR_ACK_MASK		((OPCODE_MASK << OPCODE_HDR_SHIFT) |	\
++				(SEQ_ZERO_MASK << SEQ_ZERO_HDR_SHIFT))
++
++
++
++#define MSG_CACHE_SIZE		70
++#define REPLAY_CACHE_SIZE	10
++
++/* Proxy Configuration Opcodes */
++#define PROXY_OP_SET_FILTER_TYPE	0x00
++#define PROXY_OP_FILTER_ADD		0x01
++#define PROXY_OP_FILTER_DEL		0x02
++#define PROXY_OP_FILTER_STATUS		0x03
++
++/* Proxy Filter Defines */
++#define PROXY_FILTER_WHITELIST		0x00
++#define PROXY_FILTER_BLACKLIST		0x01
++
++/* Network Tranport Opcodes */
++#define NET_OP_SEG_ACKNOWLEDGE		0x00
++#define NET_OP_FRND_POLL		0x01
++#define NET_OP_FRND_UPDATE		0x02
++#define NET_OP_FRND_REQUEST		0x03
++#define NET_OP_FRND_OFFER		0x04
++#define NET_OP_FRND_CLEAR		0x05
++#define NET_OP_FRND_CLEAR_CONFIRM	0x06
++
++#define NET_OP_PROXY_SUB_ADD		0x07
++#define NET_OP_PROXY_SUB_REMOVE		0x08
++#define NET_OP_PROXY_SUB_CONFIRM	0x09
++#define NET_OP_HEARTBEAT		0x0a
++
++#define FRND_OPCODE(x) \
++		((x) >= NET_OP_FRND_POLL && (x) <= NET_OP_FRND_CLEAR_CONFIRM)
++
++struct mesh_net_addr_range {
++	uint16_t low;
++	uint16_t high;
++	uint16_t next;
++};
++
++struct mesh_net_prov_caps {
++	uint8_t num_ele;
++	uint16_t algorithms;
++	uint8_t pub_type;
++	uint8_t static_type;
++	uint8_t output_size;
++	uint16_t output_action;
++	uint8_t input_size;
++	uint16_t input_action;
++} __packed;
++
++struct mesh_net_heartbeat {
++	struct l_timeout *pub_timer;
++	struct l_timeout *sub_timer;
++	struct timeval sub_time;
++	bool sub_enabled;
++	uint32_t pub_period;
++	uint32_t sub_period;
++	uint32_t sub_start;
++	uint16_t pub_dst;
++	uint16_t pub_count;
++	uint16_t pub_features;
++	uint16_t features;
++	uint16_t pub_net_idx;
++	uint16_t sub_src;
++	uint16_t sub_dst;
++	uint16_t sub_count;
++	uint8_t pub_ttl;
++	uint8_t sub_min_hops;
++	uint8_t sub_max_hops;
++};
++
++struct mesh_key_set {
++	bool frnd;
++	uint8_t nid;
++	uint8_t enc_key[16];
++	uint8_t privacy_key[16];
++};
++
++struct mesh_friend {
++	struct mesh_net *net;
++	struct l_queue *pkt_cache;
++	struct l_timeout *timeout;
++	void *pkt;
++	uint16_t *grp_list;
++	uint32_t poll_timeout;
++	uint32_t last_hdr;
++	uint16_t dst; /* Primary Element unicast addr */
++	uint16_t fn_cnt;
++	uint16_t lp_cnt;
++	int16_t grp_cnt;
++	struct mesh_key_set key_set;
++	struct mesh_key_set new_key_set;
++	uint8_t ele_cnt;
++	uint8_t frd;
++	uint8_t frw;
++	bool seq;
++	bool last;
++};
++
++struct mesh_frnd_pkt {
++	uint32_t iv_index;
++	uint32_t seq;
++	uint16_t src;
++	uint16_t dst;
++	uint16_t size;
++	uint8_t segN;
++	uint8_t segO;
++	uint8_t ttl;
++	uint8_t tc;
++	bool szmict;
++	union {
++		struct {
++			uint8_t key_id;
++		} m;
++		struct {
++			uint16_t seq0;
++		} a;
++		struct {
++			uint8_t opcode;
++		} c;
++	} u;
++	uint8_t data[];
++};
++
++struct mesh_friend_seg_one {
++	uint32_t hdr;
++	uint32_t seq;
++	bool sent;
++	bool md;
++	uint8_t data[15];
++};
++
++struct mesh_friend_seg_12 {
++	uint32_t hdr;
++	uint32_t seq;
++	bool sent;
++	bool md;
++	uint8_t data[12];
++};
++
++struct mesh_friend_msg {
++	uint32_t iv_index;
++	uint32_t flags;
++	uint16_t src;
++	uint16_t dst;
++	uint8_t ttl;
++	uint8_t cnt_in;
++	uint8_t cnt_out;
++	uint8_t last_len;
++	bool done;
++	bool ctl;
++	union {
++		struct mesh_friend_seg_one one[1]; /* Single segment */
++		struct mesh_friend_seg_12 s12[0]; /* Array of segments */
++	} u;
++};
++
++typedef void (*mesh_status_func_t)(void *user_data, bool result);
++typedef void (*mesh_net_status_func_t)(uint16_t remote, uint8_t status,
++					void *data, uint16_t size,
++					void *user_data);
++
++struct mesh_net *mesh_net_new(uint16_t index);
++struct mesh_net *mesh_net_ref(struct mesh_net *net);
++void mesh_net_unref(struct mesh_net *net);
++void mesh_net_flush_msg_queues(struct mesh_net *net);
++void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update);
++bool mesh_net_iv_index_update(struct mesh_net *net);
++bool mesh_net_set_seq_num(struct mesh_net *net, uint32_t number);
++uint32_t mesh_net_get_seq_num(struct mesh_net *net);
++uint32_t mesh_net_next_seq_num(struct mesh_net *net);
++bool mesh_net_set_default_ttl(struct mesh_net *net, uint8_t ttl);
++uint8_t mesh_net_get_default_ttl(struct mesh_net *net);
++bool mesh_net_get_frnd_seq(struct mesh_net *net);
++void mesh_net_set_frnd_seq(struct mesh_net *net, bool seq);
++uint16_t mesh_net_get_address(struct mesh_net *net);
++bool mesh_net_register_unicast(struct mesh_net *net,
++					uint16_t unicast, uint8_t num_ele);
++bool mesh_net_set_friend(struct mesh_net *net, uint16_t friend_addr);
++uint16_t mesh_net_get_friend(struct mesh_net *net);
++uint8_t mesh_net_get_num_ele(struct mesh_net *net);
++bool mesh_net_set_beacon_mode(struct mesh_net *net, bool enable);
++bool mesh_net_set_proxy_mode(struct mesh_net *net, bool enable);
++bool mesh_net_set_relay_mode(struct mesh_net *net, bool enable, uint8_t cnt,
++							uint8_t interval);
++bool mesh_net_set_friend_mode(struct mesh_net *net, bool enable);
++bool mesh_net_add_keyset(struct mesh_net *net, struct mesh_key_set *key_set);
++bool mesh_net_remove_keyset(struct mesh_net *net, struct mesh_key_set *key_set);
++int mesh_net_del_key(struct mesh_net *net, uint16_t net_idx);
++int mesh_net_add_key(struct mesh_net *net, bool update,
++					uint16_t net_idx, const void *key);
++uint32_t mesh_net_get_iv_index(struct mesh_net *net);
++void mesh_net_get_snb_state(struct mesh_net *net,
++					uint8_t *flags, uint32_t *iv_index);
++bool mesh_net_get_key(struct mesh_net *net, bool new_key, uint16_t idx,
++							uint8_t key[16]);
++bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io);
++struct mesh_io *mesh_net_detach(struct mesh_net *net);
++struct l_queue *mesh_net_get_app_keys(struct mesh_net *net);
++
++bool mesh_net_flush(struct mesh_net *net);
++void mesh_net_transport_send(struct mesh_net *net, struct mesh_key_set *key_set,
++				bool fast, uint32_t iv_index, uint8_t ttl,
++				uint32_t seq, uint16_t src, uint16_t dst,
++				const uint8_t *msg, uint16_t msg_len);
++
++unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
++				uint16_t src, uint16_t dst, uint8_t key_id,
++				uint8_t ttl, uint32_t seq, uint32_t iv_index,
++				bool szmic, const void *msg, uint16_t msg_len,
++				mesh_net_status_func_t status_func,
++				void *user_data);
++void mesh_net_app_send_cancel(struct mesh_net *net, unsigned int id);
++void mesh_net_ack_send(struct mesh_net *net, struct mesh_key_set *key_set,
++				uint32_t iv_index, uint8_t ttl, uint32_t seq,
++				uint16_t src, uint16_t dst, bool rly,
++				uint16_t seqZero, uint32_t ack_flags);
++struct mesh_net_prov_caps *mesh_net_prov_caps_get(struct mesh_net *net);
++uint8_t *mesh_net_priv_key_get(struct mesh_net *net);
++bool mesh_net_priv_key_set(struct mesh_net *net, uint8_t key[32]);
++uint8_t *mesh_net_prov_rand(struct mesh_net *net);
++uint16_t mesh_net_prov_uni(struct mesh_net *net, uint8_t ele_cnt);
++bool mesh_net_id_uuid_set(struct mesh_net *net, uint8_t uuid[16]);
++uint8_t *mesh_net_test_addr(struct mesh_net *net);
++int mesh_net_get_identity_mode(struct mesh_net *net, uint16_t idx,
++								uint8_t *mode);
++char *mesh_net_id_name(struct mesh_net *net);
++bool mesh_net_test_mode(struct mesh_net *net);
++bool mesh_net_dst_reg(struct mesh_net *net, uint16_t dst);
++bool mesh_net_dst_unreg(struct mesh_net *net, uint16_t dst);
++struct mesh_friend *mesh_friend_new(struct mesh_net *net, uint16_t dst,
++					uint8_t ele_cnt, uint8_t frd,
++					uint8_t frw, uint32_t fpt,
++					uint16_t fn_cnt, uint16_t lp_cnt);
++void mesh_friend_free(void *frnd);
++bool mesh_friend_clear(struct mesh_net *net, struct mesh_friend *frnd);
++void mesh_friend_sub_add(struct mesh_net *net, uint16_t lpn, uint8_t ele_cnt,
++							uint8_t grp_cnt,
++							const uint8_t *list);
++void mesh_friend_sub_del(struct mesh_net *net, uint16_t lpn, uint8_t cnt,
++						const uint8_t *del_list);
++uint8_t mesh_net_key_refresh_phase_set(struct mesh_net *net, uint16_t net_idx,
++							uint8_t transition);
++uint8_t mesh_net_key_refresh_phase_get(struct mesh_net *net, uint16_t net_idx,
++							uint8_t *phase);
++int mesh_net_kr_phase_one(struct mesh_net *net, uint16_t net_idx,
++							const uint8_t *key);
++int mesh_net_key_refresh_phase_two(struct mesh_net *net, uint16_t net_idx);
++int mesh_net_key_refresh_finish(struct mesh_net *net, uint16_t net_idx);
++void mesh_net_send_seg(struct mesh_net *net, struct mesh_key_set *key_set,
++				uint32_t iv_index, uint8_t ttl, uint32_t seq,
++				uint16_t src, uint16_t dst, uint32_t hdr,
++				const void *seg, uint16_t seg_len);
++uint16_t mesh_net_get_features(struct mesh_net *net);
++struct mesh_net_heartbeat *mesh_net_heartbeat_get(struct mesh_net *net);
++void mesh_net_heartbeat_init(struct mesh_net *net);
++void mesh_net_heartbeat_send(struct mesh_net *net);
++void mesh_net_uni_range_set(struct mesh_net *net,
++				struct mesh_net_addr_range *range);
++struct mesh_net_addr_range mesh_net_uni_range_get(struct mesh_net *net);
++void mesh_net_provisioner_mode_set(struct mesh_net *net, bool mode);
++bool mesh_net_provisioner_mode_get(struct mesh_net *net);
++bool mesh_net_key_list_get(struct mesh_net *net, uint8_t *buf, uint16_t *count);
++uint16_t mesh_net_get_primary_idx(struct mesh_net *net);
++void mesh_net_sub_list_add(struct mesh_net *net, uint16_t addr);
++void mesh_net_sub_list_del(struct mesh_net *net, uint16_t addr);
++uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr);
++struct mesh_io *mesh_net_get_io(struct mesh_net *net);
++bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
++							bool provisioner);
++struct mesh_node *mesh_net_local_node_get(struct mesh_net *net);
++bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl);
++uint16_t mesh_net_get_crpl(struct mesh_net *net);
++bool mesh_net_have_key(struct mesh_net *net, uint16_t net_idx);
++bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig);
++void *mesh_net_jconfig_get(struct mesh_net *net);
++bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg);
++bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg);
++bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr);
++void mesh_net_set_window_accuracy(struct mesh_net *net, uint8_t accuracy);
++void mesh_net_transmit_params_set(struct mesh_net *net, uint8_t count,
 +							uint16_t interval);
-+uint8_t node_relay_mode_get(struct mesh_node *node, uint8_t *cnt,
++void mesh_net_transmit_params_get(struct mesh_net *net, uint8_t *count,
 +							uint16_t *interval);
-+bool node_proxy_mode_set(struct mesh_node *node, bool enable);
-+uint8_t node_proxy_mode_get(struct mesh_node *node);
-+bool node_beacon_mode_set(struct mesh_node *node, bool enable);
-+uint8_t node_beacon_mode_get(struct mesh_node *node);
-+bool node_friend_mode_set(struct mesh_node *node, bool enable);
-+uint8_t node_friend_mode_get(struct mesh_node *node);
-+uint32_t node_seq_cache(struct mesh_node *node);
-+void node_cleanup(struct mesh_net *net);
-diff --git a/meshd/src/storage.h b/meshd/src/storage.h
++struct mesh_prov *mesh_net_get_prov(struct mesh_net *net);
++void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov);
++void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned);
++bool mesh_net_provisioned_get(struct mesh_net *net);
++bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
++				uint16_t net_idx,  uint8_t net_key[16],
++				uint16_t unicast, uint16_t snb_flags,
++				uint32_t iv_index, mesh_status_func_t cb,
++				void *user_data);
+diff --git a/meshd/src/prov.h b/meshd/src/prov.h
 new file mode 100644
-index 000000000..341932dba
+index 000000000..09fe6c3cd
 --- /dev/null
-+++ b/meshd/src/storage.h
-@@ -0,0 +1,51 @@
++++ b/meshd/src/prov.h
+@@ -0,0 +1,162 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2017-2918  Intel Corporation. All rights reserved.
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
 + *
 + *
 + *  This library is free software; you can redistribute it and/or
@@ -655,40 +979,187 @@ index 000000000..341932dba
 + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 + *  Lesser General Public License for more details.
 + *
++ */
++
++#ifndef __packed
++#define __packed __attribute__((packed))
++#endif
++
++struct mesh_net;
++struct mesh_dev;
++
++enum mesh_trans {
++	MESH_TRANS_IDLE,
++	MESH_TRANS_TX,
++	MESH_TRANS_RX,
++};
++
++enum mesh_bearer {
++	MESH_BEARER_IDLE,
++	MESH_BEARER_ADV,
++};
++
++enum mesh_prov_mode {
++	MESH_PROV_MODE_NONE,
++	MESH_PROV_MODE_INITIATOR,
++	MESH_PROV_MODE_GATT_ACCEPTOR,
++	MESH_PROV_MODE_ADV_ACCEPTOR,
++	MESH_PROV_MODE_GATT_CLIENT,
++	MESH_PROV_MODE_MESH_SERVER,
++	MESH_PROV_MODE_MESH_CLIENT,
++	MESH_PROV_MODE_MESH_GATT_CLIENT,
++};
++
++struct mesh_prov;
++typedef void (*mesh_prov_open_func_t)(struct mesh_prov *prov);
++typedef void (*mesh_prov_close_func_t)(struct mesh_prov *prov, uint8_t reason);
++typedef void (*mesh_prov_send_func_t)(bool success, struct mesh_prov *prov);
++typedef void (*mesh_prov_receive_func_t)(const void *data, uint16_t size,
++							struct mesh_prov *prov);
++
++struct prov_invite {
++	uint8_t attention;
++} __packed;
++
++struct prov_start {
++	uint8_t algorithm;
++	uint8_t pub_key;
++	uint8_t auth_method;
++	uint8_t auth_action;
++	uint8_t auth_size;
++} __packed;
++
++struct conf_input {
++	struct prov_invite		invite;
++	struct mesh_net_prov_caps	caps;
++	struct prov_start		start;
++	uint8_t				prv_pub_key[64];
++	uint8_t				dev_pub_key[64];
++} __packed;
++
++struct mesh_prov {
++	int ref_count;
++	struct mesh_dev *dev;
++	struct mesh_net *net;
++	enum mesh_prov_mode mode;
++	enum mesh_trans trans;
++	enum mesh_bearer bearer;
++	uint8_t uuid[16];
++	uint8_t caps[12];
++
++	uint32_t conn_id;
++	uint16_t net_idx;
++	uint16_t remote;
++	uint16_t addr;
++	uint16_t expected_len;
++	uint16_t packet_len;
++	uint8_t local_msg_num;
++	uint8_t peer_msg_num;
++	uint8_t last_peer_msg_num;
++	uint8_t got_segs;
++	uint8_t expected_segs;
++	uint8_t expected_fcs;
++	uint8_t packet_buf[80];
++	uint8_t peer_buf[80];
++	struct timeval tx_start;
++	struct l_timeout *tx_timeout;
++
++	/* Provisioning credentials and crypto material */
++	struct conf_input conf_inputs;
++	uint8_t dev_key[16];
++	uint8_t conf_salt[16];
++	uint8_t s_key[16];
++	uint8_t s_nonce[13];
++	uint8_t conf_key[16];
++	uint8_t conf[16];
++	uint8_t r_conf[16];
++	uint8_t rand_auth[32];
++	uint8_t prov_salt[16];
++	uint8_t secret[32];
++	uint8_t r_public[64];
++	uint8_t l_public[64];
++	/* End Provisioning credentials and crypto material */
++
++	mesh_prov_open_func_t open_callback;
++	mesh_prov_close_func_t close_callback;
++	mesh_prov_receive_func_t receive_callback;
++	void *receive_data;
++	mesh_prov_send_func_t send_callback;
++	void *send_data;
++};
++
++struct mesh_prov *mesh_prov_new(struct mesh_net *net, uint16_t remote);
++
++struct mesh_prov *mesh_prov_ref(struct mesh_prov *prov);
++void mesh_prov_unref(struct mesh_prov *prov);
++
++bool mesh_prov_gatt_client(struct mesh_prov *prov, struct mesh_dev *dev,
++					uint8_t uuid[16],
++					mesh_prov_open_func_t open_callback,
++					mesh_prov_close_func_t close_callback,
++					mesh_prov_receive_func_t recv_callback,
++					void *user_data);
++
++bool mesh_prov_listen(struct mesh_net *net, uint8_t uuid[16], uint8_t caps[12],
++					mesh_prov_open_func_t open_callback,
++					mesh_prov_close_func_t close_callback,
++					mesh_prov_receive_func_t recv_callback,
++					void *user_data);
++
++bool mesh_prov_connect(struct mesh_prov *prov, struct mesh_dev *dev,
++					uint16_t net_idx, uint8_t uuid[16],
++					mesh_prov_open_func_t open_callback,
++					mesh_prov_close_func_t close_callback,
++					mesh_prov_receive_func_t recv_callback,
++					void *user_data);
++
++unsigned int mesh_prov_send(struct mesh_prov *prov,
++					const void *data, uint16_t size,
++					mesh_prov_send_func_t send_callback,
++					void *user_data);
++bool mesh_prov_cancel(struct mesh_prov *prov, unsigned int id);
++
++bool mesh_prov_close(struct mesh_prov *prov, uint8_t reason);
++void mesh_prov_set_addr(struct mesh_prov *prov, uint16_t addr);
++uint16_t mesh_prov_get_addr(struct mesh_prov *prov);
++void mesh_prov_set_idx(struct mesh_prov *prov, uint16_t net_idx);
++uint16_t mesh_prov_get_idx(struct mesh_prov *prov);
+diff --git a/meshd/src/provision.h b/meshd/src/provision.h
+new file mode 100644
+index 000000000..0c59bf037
+--- /dev/null
++++ b/meshd/src/provision.h
+@@ -0,0 +1,30 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
 + *
 + */
 +
-+struct mesh_net;
++struct mesh_prov;
++struct l_queue;
 +
-+bool storage_parse_config(struct mesh_net *net, const char *config_name);
-+bool storage_save_config(struct mesh_net *net, const char *config_name,
-+			bool no_wait, mesh_status_func_t cb, void *user_data);
-+bool storage_save_new_config(struct mesh_net *net, const char *config_name,
-+					mesh_status_func_t cb, void *user_data);
-+void storage_release(struct mesh_net *net);
-+
-+bool storage_model_bind(struct mesh_net *net, uint16_t addr, uint32_t id,
-+						uint16_t app_idx, bool unbind);
-+
-+bool storage_local_set_ttl(struct mesh_net *net, uint8_t ttl);
-+bool storage_local_set_relay(struct mesh_net *net, bool enable, uint8_t count,
-+							uint8_t interval);
-+bool storage_local_set_transmit_params(struct mesh_net *net, uint8_t count,
-+							uint8_t interval);
-+bool storage_local_set_mode(struct mesh_net *net, uint8_t mode,
-+							const char *mode_name);
-+bool storage_local_net_key_add(struct mesh_net *net, uint16_t net_idx,
-+					const uint8_t key[16], int phase);
-+bool storage_local_net_key_del(struct mesh_net *net, uint16_t net_idx);
-+bool storage_local_app_key_add(struct mesh_net *net, uint16_t net_idx,
-+			uint16_t app_idx, const uint8_t key[16], bool update);
-+bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
-+							uint16_t app_idx);
-+bool storage_local_write_sequence_number(struct mesh_net *net, uint32_t seq);
-+bool storage_local_set_iv_index(struct mesh_net *net, uint32_t iv_index,
-+								bool update);
-+bool storage_local_set_device_key(struct mesh_net *net, uint8_t dev_key[16]);
-+bool storage_local_set_unicast(struct mesh_net *net, uint16_t unicast);
++void initiator_prov_open(struct mesh_prov *prov);
++void initiator_prov_close(struct mesh_prov *prov, uint8_t reason);
++void initiator_prov_receive(const void *pkt, uint16_t size,
++							struct mesh_prov *prov);
++void acceptor_prov_open(struct mesh_prov *prov);
++void acceptor_prov_close(struct mesh_prov *prov, uint8_t reason);
++void acceptor_prov_receive(const void *pkt, uint16_t size,
++							struct mesh_prov *prov);
 -- 
 2.14.3
 
