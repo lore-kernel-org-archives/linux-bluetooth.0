@@ -1,50 +1,84 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [4.15 stable regression] "Bluetooth: btusb: Fix quirk for Atheros
- 1525/QCA6174" breaks bluetooth on some devices
-From: Hans de Goede <hdegoede@redhat.com>
-To: Takashi Iwai <tiwai@suse.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Marcel Holtmann <marcel@holtmann.org>
-Cc: "M. Kristall" <mkpdev@gmail.com>, linux-bluetooth@vger.kernel.org
-References: <6c97cffb-751f-466d-cd7b-42624fdb18c7@redhat.com>
-Message-ID: <9a752bfc-74bf-25e7-8820-91d1e3163b75@redhat.com>
-Date: Wed, 25 Apr 2018 14:40:37 +0200
+Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <6c97cffb-751f-466d-cd7b-42624fdb18c7@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Wed, 25 Apr 2018 17:46:24 +0530
+From: bgodavar@codeaurora.org
+To: Loic Poulain <loic.poulain@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "open list:BLUETOOTH DRIVERS"
+ <linux-bluetooth@vger.kernel.org>, linux-arm-msm@vger.kernel.org,
+ kkapra@codeaurora.org
+Subject: Re: [PATCH 2/2] Bluetooth: btqca: Add AR3002 rampatch support
+In-Reply-To: <CAMZdPi8ABhv8EDaE+afFpHexuMKjst5djiMt4HFoGqPNHs+akQ@mail.gmail.com>
+References: <1524506380-7417-1-git-send-email-loic.poulain@linaro.org>
+ <1524506380-7417-2-git-send-email-loic.poulain@linaro.org>
+ <B39D4D6F-96FB-442E-84D8-BEA603E7A053@holtmann.org>
+ <CAMZdPi8ABhv8EDaE+afFpHexuMKjst5djiMt4HFoGqPNHs+akQ@mail.gmail.com>
+Message-ID: <f46651bdc4bdab38ec6f2b00b7fda142@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Loic,
 
-On 18-04-18 15:18, Hans de Goede wrote:
-> Hi Takashi, Marcel,
+On 2018-04-25 13:28, Loic Poulain wrote:
+> Hi Marcel,
 > 
-> It seems that this commit:
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git/commit/?h=linux-4.15.y&id=7ec32f585fefd7c154453aa29ccf8fa2a11cc865
+> +Balakrishna Godavarthi, I've just seen that his recent patch for
+> wcn3990 support deals with the same download issue.
 > 
-> Is breaking bluetooth on some devices, see:
+> On 24 April 2018 at 17:13, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Loic,
+>> 
+>>> This patch adds rampatch download compatibility for ROME >= 3.2.
+>>> Starting with ROME 3.2, the 'download mode' field of the rampatch
+>>> header indicates if the controller acknowledges (or not) the received
+>>> rampatch segments. If not, we need to send all the segments without
+>>> expecting any event from the controller (except for the last 
+>>> segment).
+>>> Goal is (I assume) to speed-up rampatch download.
+>> 
+>> WHYYYYYYYYYY ???
+>> 
+>> I have done the measurement with the Intel chips and it is 
+>> insignificant on Linux. The Linux USB subsystem is a lot better than 
+>> the one from Windows.
 > 
-> https://bugzilla.redhat.com/show_bug.cgi?id=1568911
+> To be honest, I have no much information (so maybe Windows
+> optimization is the point), I mainly extracted info from a Yocto
+> hciattach patch:
+> https://github.com/boundarydevices/meta-boundary/blob/krogoth/recipes-connectivity/bluez5/bluez5/0001-hciattach-add-QCA9377-Tuffello-support.patch
 > 
-> The problem is the following error now being thrown:
+> My module version use HCI UART as transport layer.
 > 
-> [   28.466248] Bluetooth: hci0: don't support firmware rome 0x1020200
 > 
-> Looking at the code I wonder if maybe we need to mask the ver_rom
-> with & 0xfff when comparing it to the qca_devices_table[i].rom_version
-> filed ?
+>> Is there any chance we can just switch this back on and keep waiting 
+>> for the event?
 > 
-> Or maybe the commit is actually wrong, or maybe devices with the
-> 0cf3:3004 USB id need either the BTUSB_QCA_ROM or BTUSB_ATH3012
-> quirk depending on the device and we need to probe this somehow?
+> I tried to change the fw/rampatch header on  the fly to 'standard
+> download mode' before starting flashing.
+> It seems to be supported since pretty all segments are correctly sent
+> and acked by the vendor event.
+> However the last segment is nacked:
+> 
+>     Bluetooth: hci0: TLV with error stat 0x0 rtype 0x4 (0x3)
+> 
+> I suppose the rampatch contains a checksum which is verified once
+> download is complete, hacking the header would cause a corruption of
+> the rampatch, leading to this NACK.
+> So in theory, the download behavior seems to depend only on the
+> rampatch file(header) and is not hard-coded on controller side.
+> 
+> Since rampatchs are not under our control, I think it's good to
+> support this download mode anyway.
+> 
+> Regards,
+> Loic
 
-I've been receiving more complaints from users about this on
-various devices, so I think that the 7ec32f585fefd7c154453aa29ccf8fa2a11cc865
-commit should be reverted from 4.15.x while we figure this out.
+Thank you for adding me to loop, is the header size of RAM patch file 
+remains same for ROME < 3.2 and ROME >= 3.2, what about the header 
+format, do we have same header format for different ROME versions, even 
+mismatch of header will not break any execution, but it may show wrong 
+data in kernel logs.
 
-Does anyone have any idea how we cam distinguish between the 2
-different versions which seem to be hiding between the same USB-id ?
 
-Regards,
-
-Hans
+Regards
+Balakrishna.
