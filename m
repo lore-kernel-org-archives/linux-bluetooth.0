@@ -2,9 +2,9 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH 5/7] meshd: Read and write mesh configuration in JSON format
-Date: Wed, 25 Apr 2018 07:20:40 -0700
-Message-Id: <20180425142042.1262-6-brian.gix@intel.com>
+Subject: [PATCH 3/7] meshd: Header files for mesh access layer and utilities
+Date: Wed, 25 Apr 2018 07:20:38 -0700
+Message-Id: <20180425142042.1262-4-brian.gix@intel.com>
 In-Reply-To: <20180425142042.1262-1-brian.gix@intel.com>
 References: <20180425142042.1262-1-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,21 +12,82 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Inga Stotland <inga.stotland@intel.com>
 
-This adds implementation for parsing and writing Mesh configuration
-into JSON format. Alos, parse stored unprovisioned device composiotion.
+This adds initial implementation of Mesh access layer functionality
 ---
- meshd/mesh-json/mesh-db.c | 1360 +++++++++++++++++++++++++++++++++++++++++++++
- meshd/mesh-json/mesh-db.h |  144 +++++
- 2 files changed, 1504 insertions(+)
- create mode 100644 meshd/mesh-json/mesh-db.c
- create mode 100644 meshd/mesh-json/mesh-db.h
+ meshd/common/agent.h     |  42 ++++++++++++++
+ meshd/common/mesh-defs.h |  84 +++++++++++++++++++++++++++
+ meshd/common/util.h      |  25 ++++++++
+ meshd/src/appkey.h       |  43 ++++++++++++++
+ meshd/src/cfgmod.h       |  98 +++++++++++++++++++++++++++++++
+ meshd/src/mesh.h         |  32 +++++++++++
+ meshd/src/model.h        | 146 +++++++++++++++++++++++++++++++++++++++++++++++
+ meshd/src/node.h         |  80 ++++++++++++++++++++++++++
+ meshd/src/storage.h      |  51 +++++++++++++++++
+ 9 files changed, 601 insertions(+)
+ create mode 100644 meshd/common/agent.h
+ create mode 100644 meshd/common/mesh-defs.h
+ create mode 100644 meshd/common/util.h
+ create mode 100644 meshd/src/appkey.h
+ create mode 100644 meshd/src/cfgmod.h
+ create mode 100644 meshd/src/mesh.h
+ create mode 100644 meshd/src/model.h
+ create mode 100644 meshd/src/node.h
+ create mode 100644 meshd/src/storage.h
 
-diff --git a/meshd/mesh-json/mesh-db.c b/meshd/mesh-json/mesh-db.c
+diff --git a/meshd/common/agent.h b/meshd/common/agent.h
 new file mode 100644
-index 000000000..6d894a920
+index 000000000..6fb475691
 --- /dev/null
-+++ b/meshd/mesh-json/mesh-db.c
-@@ -0,0 +1,1360 @@
++++ b/meshd/common/agent.h
+@@ -0,0 +1,42 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2017  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *
++ */
++
++#define MAX_HEXADECIMAL_OOB_LEN	128
++#define DECIMAL_OOB_LEN		4
++#define MAX_ASCII_OOB_LEN		16
++
++enum oob_type {
++	NONE,
++	HEXADECIMAL,
++	DECIMAL,
++	ASCII,
++	OUTPUT,
++} oob_type_t;
++
++typedef void (*agent_input_cb)(enum oob_type type, void *input, uint16_t len,
++							void *user_data);
++bool agent_input_request(enum oob_type type, uint16_t max_len,
++					agent_input_cb cb, void *user_data);
++
++bool agent_output_request(const char *str);
++void agent_output_request_cancel(void);
++bool agent_completion(void);
++bool agent_input(const char *input);
++void agent_release(void);
+diff --git a/meshd/common/mesh-defs.h b/meshd/common/mesh-defs.h
+new file mode 100644
+index 000000000..d40fc43e8
+--- /dev/null
++++ b/meshd/common/mesh-defs.h
+@@ -0,0 +1,84 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -47,1496 +108,587 @@ index 000000000..6d894a920
 + *
 + */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++#define MESH_AD_TYPE_PROVISION	0x29
++#define MESH_AD_TYPE_NETWORK	0x2A
++#define MESH_AD_TYPE_BEACON	0x2B
 +
-+#include <errno.h>
-+#include <stdbool.h>
-+#include <stdio.h>
-+#include <string.h>
++#define FEATURE_RELAY	1
++#define FEATURE_PROXY	2
++#define FEATURE_FRIEND	4
++#define FEATURE_LPN	8
++
++#define MESH_MODE_DISABLED	0
++#define MESH_MODE_ENABLED	1
++#define MESH_MODE_UNSUPPORTED	2
++
++#define KEY_REFRESH_PHASE_NONE	0x00
++#define KEY_REFRESH_PHASE_ONE	0x01
++#define KEY_REFRESH_PHASE_TWO	0x02
++#define KEY_REFRESH_PHASE_THREE	0x03
++
++#define DEFAULT_TTL		0xff
++
++/* Supported algorithms for provisioning */
++#define ALG_FIPS_256_ECC	0x0001
++
++/* Input OOB action bit flags */
++#define OOB_IN_PUSH	0x0001
++#define OOB_IN_TWIST	0x0002
++#define OOB_IN_NUMBER	0x0004
++#define OOB_IN_ALPHA	0x0008
++
++/* Output OOB action bit flags */
++#define OOB_OUT_BLINK	0x0001
++#define OOB_OUT_BEEP	0x0002
++#define OOB_OUT_VIBRATE	0x0004
++#define OOB_OUT_NUMBER	0x0008
++#define OOB_OUT_ALPHA	0x0010
++
++#define UNASSIGNED_ADDRESS	0x0000
++#define PROXIES_ADDRESS	0xfffc
++#define FRIENDS_ADDRESS	0xfffd
++#define RELAYS_ADDRESS		0xfffe
++#define ALL_NODES_ADDRESS	0xffff
++#define VIRTUAL_ADDRESS_LOW	0x8000
++#define VIRTUAL_ADDRESS_HIGH	0xbfff
++#define GROUP_ADDRESS_LOW	0xc000
++#define GROUP_ADDRESS_HIGH	0xff00
++
++#define NODE_IDENTITY_STOPPED		0x00
++#define NODE_IDENTITY_RUNNING		0x01
++#define NODE_IDENTITY_NOT_SUPPORTED	0x02
++
++#define PRIMARY_ELE_IDX		0x00
++
++#define VENDOR_ID_MASK		0xffff0000
++
++#define MAX_KEY_IDX		0x0fff
++
++#define IS_UNASSIGNED(x)	((x) == UNASSIGNED_ADDRESS)
++#define IS_UNICAST(x)		(((x) > UNASSIGNED_ADDRESS) && \
++					((x) < VIRTUAL_ADDRESS_LOW))
++#define IS_VIRTUAL(x)		(((x) >= VIRTUAL_ADDRESS_LOW) && \
++					((x) <= VIRTUAL_ADDRESS_HIGH))
++#define IS_GROUP(x)		(((x) >= GROUP_ADDRESS_LOW) && \
++					((x) <= GROUP_ADDRESS_HIGH))
++#define IS_ALL_NODES(x)	((x) == ALL_NODES_ADDRESS)
+diff --git a/meshd/common/util.h b/meshd/common/util.h
+new file mode 100644
+index 000000000..ed880bce7
+--- /dev/null
++++ b/meshd/common/util.h
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *
++ */
++
++uint32_t get_timestamp_secs(void);
++bool str2hex(const char *str, uint16_t in_len, uint8_t *out,
++							uint16_t out_len);
++size_t hex2str(uint8_t *in, size_t in_len, char *out, size_t out_len);
++
+diff --git a/meshd/src/appkey.h b/meshd/src/appkey.h
+new file mode 100644
+index 000000000..8fce3dcd0
+--- /dev/null
++++ b/meshd/src/appkey.h
+@@ -0,0 +1,43 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *
++ */
++
++/* TODO: get this number from configuration */
++#define MAX_APP_KEYS	32
++
++bool appkey_key_init(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
++				uint8_t *key_value, uint8_t *new_key_value);
++void appkey_key_free(void *data);
++int appkey_packet_decrypt(struct mesh_net *net, bool szmict, uint32_t seq,
++				uint32_t iv_index, uint16_t src, uint16_t dst,
++				uint8_t *virt, uint16_t virt_size,
++				uint8_t key_id, const uint8_t *data,
++				uint16_t data_size, uint8_t *out);
++bool appkey_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
++				uint16_t src, uint16_t crpl, uint32_t seq,
++				uint32_t iv_index);
++const uint8_t *appkey_get_key(struct mesh_net *net, uint16_t app_idx,
++							uint8_t *key_id);
++bool appkey_have_key(struct mesh_net *net, uint16_t app_idx);
++int appkey_key_add(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
++					const uint8_t *new_key, bool update);
++int appkey_key_delete(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx);
++void appkey_delete_bound_keys(struct mesh_net *net, uint16_t net_idx);
++uint8_t appkey_list(struct mesh_net *net, uint16_t net_idx, uint8_t *buf,
++					uint16_t buf_size, uint16_t *size);
+diff --git a/meshd/src/cfgmod.h b/meshd/src/cfgmod.h
+new file mode 100644
+index 000000000..bedb0c6f6
+--- /dev/null
++++ b/meshd/src/cfgmod.h
+@@ -0,0 +1,98 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *
++ */
++
++#define CONFIG_SRV_MODEL	(VENDOR_ID_MASK | 0x0000)
++#define CONFIG_CLI_MODEL	(VENDOR_ID_MASK | 0x0001)
++
++/* New List */
++#define OP_APPKEY_ADD				0x00
++#define OP_APPKEY_DELETE			0x8000
++#define OP_APPKEY_GET				0x8001
++#define OP_APPKEY_LIST				0x8002
++#define OP_APPKEY_STATUS			0x8003
++#define OP_APPKEY_UPDATE			0x01
++#define OP_DEV_COMP_GET				0x8008
++#define OP_DEV_COMP_STATUS			0x02
++#define OP_CONFIG_BEACON_GET			0x8009
++#define OP_CONFIG_BEACON_SET			0x800A
++#define OP_CONFIG_BEACON_STATUS			0x800B
++#define OP_CONFIG_DEFAULT_TTL_GET		0x800C
++#define OP_CONFIG_DEFAULT_TTL_SET		0x800D
++#define OP_CONFIG_DEFAULT_TTL_STATUS		0x800E
++#define OP_CONFIG_FRIEND_GET			0x800F
++#define OP_CONFIG_FRIEND_SET			0x8010
++#define OP_CONFIG_FRIEND_STATUS			0x8011
++#define OP_CONFIG_PROXY_GET			0x8012
++#define OP_CONFIG_PROXY_SET			0x8013
++#define OP_CONFIG_PROXY_STATUS			0x8014
++#define OP_CONFIG_KEY_REFRESH_PHASE_GET		0x8015
++#define OP_CONFIG_KEY_REFRESH_PHASE_SET		0x8016
++#define OP_CONFIG_KEY_REFRESH_PHASE_STATUS	0x8017
++#define OP_CONFIG_MODEL_PUB_GET			0x8018
++#define OP_CONFIG_MODEL_PUB_SET			0x03
++#define OP_CONFIG_MODEL_PUB_STATUS		0x8019
++#define OP_CONFIG_MODEL_PUB_VIRT_SET		0x801A
++#define OP_CONFIG_MODEL_SUB_ADD			0x801B
++#define OP_CONFIG_MODEL_SUB_DELETE		0x801C
++#define OP_CONFIG_MODEL_SUB_DELETE_ALL		0x801D
++#define OP_CONFIG_MODEL_SUB_OVERWRITE		0x801E
++#define OP_CONFIG_MODEL_SUB_STATUS		0x801F
++#define OP_CONFIG_MODEL_SUB_VIRT_ADD		0x8020
++#define OP_CONFIG_MODEL_SUB_VIRT_DELETE		0x8021
++#define OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE	0x8022
++#define OP_CONFIG_NETWORK_TRANSMIT_GET		0x8023
++#define OP_CONFIG_NETWORK_TRANSMIT_SET		0x8024
++#define OP_CONFIG_NETWORK_TRANSMIT_STATUS	0x8025
++#define OP_CONFIG_RELAY_GET			0x8026
++#define OP_CONFIG_RELAY_SET			0x8027
++#define OP_CONFIG_RELAY_STATUS			0x8028
++#define OP_CONFIG_MODEL_SUB_GET			0x8029
++#define OP_CONFIG_MODEL_SUB_LIST		0x802A
++#define OP_CONFIG_VEND_MODEL_SUB_GET		0x802B
++#define OP_CONFIG_VEND_MODEL_SUB_LIST		0x802C
++#define OP_CONFIG_POLL_TIMEOUT_LIST		0x802D
++#define OP_CONFIG_POLL_TIMEOUT_STATUS		0x802E
++/* Health opcodes in health-mod.h */
++#define OP_CONFIG_HEARTBEAT_PUB_GET		0x8038
++#define OP_CONFIG_HEARTBEAT_PUB_SET		0x8039
++#define OP_CONFIG_HEARTBEAT_PUB_STATUS		0x06
++#define OP_CONFIG_HEARTBEAT_SUB_GET		0x803A
++#define OP_CONFIG_HEARTBEAT_SUB_SET		0x803B
++#define OP_CONFIG_HEARTBEAT_SUB_STATUS		0x803C
++#define OP_MODEL_APP_BIND			0x803D
++#define OP_MODEL_APP_STATUS			0x803E
++#define OP_MODEL_APP_UNBIND			0x803F
++#define OP_NETKEY_ADD				0x8040
++#define OP_NETKEY_DELETE			0x8041
++#define OP_NETKEY_GET				0x8042
++#define OP_NETKEY_LIST				0x8043
++#define OP_NETKEY_STATUS			0x8044
++#define OP_NETKEY_UPDATE			0x8045
++#define OP_NODE_IDENTITY_GET			0x8046
++#define OP_NODE_IDENTITY_SET			0x8047
++#define OP_NODE_IDENTITY_STATUS			0x8048
++#define OP_NODE_RESET				0x8049
++#define OP_NODE_RESET_STATUS			0x804A
++#define OP_MODEL_APP_GET			0x804B
++#define OP_MODEL_APP_LIST			0x804C
++#define OP_VEND_MODEL_APP_GET			0x804C
++#define OP_VEND_MODEL_APP_LIST			0x804E
++
++void mesh_config_srv_init(struct mesh_net *net, uint8_t ele_idx);
+diff --git a/meshd/src/mesh.h b/meshd/src/mesh.h
+new file mode 100644
+index 000000000..7cd1e6158
+--- /dev/null
++++ b/meshd/src/mesh.h
+@@ -0,0 +1,32 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *
++ */
++
++struct bt_mesh;
++struct mesh_net;
++
++struct bt_mesh *mesh_create(uint16_t index);
++struct bt_mesh *mesh_ref(struct bt_mesh *mesh);
++void mesh_unref(struct bt_mesh *mesh);
++bool mesh_load_config(struct bt_mesh *mesh, const char *in_config_name);
++bool mesh_set_output(struct bt_mesh *mesh, const char *out_config_name);
++const char *mesh_status_str(uint8_t err);
++
++/* Command line testing */
++struct mesh_net *mesh_get_net(struct bt_mesh *mesh);
+diff --git a/meshd/src/model.h b/meshd/src/model.h
+new file mode 100644
+index 000000000..3a41bd722
+--- /dev/null
++++ b/meshd/src/model.h
+@@ -0,0 +1,146 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *
++ */
 +
 +#include <ell/ell.h>
 +
-+#include "meshd/common/mesh-defs.h"
-+#include "meshd/common/util.h"
-+
-+#include "meshd/mesh-json/mesh-db.h"
-+
-+#define CHECK_KEY_IDX_RANGE(x) (((x) >= 0) && ((x) <= 4095))
-+
-+static bool get_int(json_object *jobj, const char *keyword, int *value)
-+{
-+	json_object *jvalue;
-+
-+	if (!json_object_object_get_ex(jobj, keyword, &jvalue))
-+		return false;
-+
-+	*value = json_object_get_int(jvalue);
-+	if (errno == EINVAL)
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool add_key(json_object *jobject, const char *desc,
-+					const uint8_t key[16])
-+{
-+	json_object *jstring;
-+	char hexstr[33];
-+
-+	hex2str((uint8_t *) key, 16, hexstr, 33);
-+	jstring = json_object_new_string(hexstr);
-+	if (!jstring)
-+		return false;
-+
-+	json_object_object_add(jobject, desc, jstring);
-+	return true;
-+}
-+
-+static json_object *get_element_model(json_object *jnode, int ele_idx,
-+						uint32_t mod_id, bool vendor)
-+{
-+	json_object *jelements, *jelement, *jmodels;
-+	int i, num_mods;
-+	size_t len;
-+	char buf[9];
-+
-+	if (!vendor)
-+		snprintf(buf, 5, "%4.4x", (uint16_t)mod_id);
-+	else
-+		snprintf(buf, 9, "%8.8x", mod_id);
-+
-+	json_object_object_get_ex(jnode, "elements", &jelements);
-+	if (!jelements)
-+		return NULL;
-+
-+	jelement = json_object_array_get_idx(jelements, ele_idx);
-+	if (!jelement)
-+		return NULL;
-+
-+	json_object_object_get_ex(jelement, "models", &jmodels);
-+	if (!jmodels)
-+		return NULL;
-+
-+	num_mods = json_object_array_length(jmodels);
-+	if (!num_mods)
-+		return NULL;
-+
-+	if (!vendor) {
-+		snprintf(buf, 5, "%4.4x", mod_id);
-+		len = 4;
-+	} else {
-+		snprintf(buf, 9, "%8.8x", mod_id);
-+		len = 8;
-+	}
-+
-+	for (i = 0; i < num_mods; ++i) {
-+		json_object *jmodel, *jvalue;
-+		char *str;
-+
-+		jmodel = json_object_array_get_idx(jmodels, i);
-+		json_object_object_get_ex(jmodel, "modelId", &jvalue);
-+		if (!jvalue)
-+			return NULL;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str)
-+			return NULL;
-+
-+		if (!strncmp(str, buf, len))
-+			return jmodel;
-+	}
-+
-+	return NULL;
-+}
-+
-+static bool jarray_has_string(json_object *jarray, char *str, size_t len)
-+{
-+	int i, sz = json_object_array_length(jarray);
-+
-+	for (i = 0; i < sz; ++i) {
-+		json_object *jentry;
-+		char *str_entry;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+		str_entry = (char *)json_object_get_string(jentry);
-+		if (!str_entry)
-+			continue;
-+
-+		if (!strncmp(str, str_entry, len))
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+static json_object *jarray_string_del(json_object *jarray, char *str,
-+								size_t len)
-+{
-+	int i, sz = json_object_array_length(jarray);
-+	json_object *jarray_new;
-+
-+	jarray_new = json_object_new_array();
-+	if (!jarray_new)
-+		return NULL;
-+
-+	for (i = 0; i < sz; ++i) {
-+		json_object *jentry;
-+		char *str_entry;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+		str_entry = (char *)json_object_get_string(jentry);
-+		if (str_entry && !strncmp(str, str_entry, len))
-+			continue;
-+
-+		json_object_array_add(jarray_new, jentry);
-+	}
-+
-+	return jarray_new;
-+}
-+
-+static json_object *get_key_object(json_object *jarray, uint16_t idx)
-+{
-+	int i, sz = json_object_array_length(jarray);
-+
-+	for (i = 0; i < sz; ++i) {
-+		json_object *jentry, *jvalue;
-+		uint32_t jidx;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+		if (!json_object_object_get_ex(jentry, "index", &jvalue))
-+			return NULL;
-+
-+		jidx = json_object_get_int(jvalue);
-+
-+		if (jidx == idx)
-+			return jentry;
-+	}
-+
-+	return NULL;
-+}
-+
-+static json_object *jarray_key_del(json_object *jarray, int16_t idx)
-+{
-+	json_object *jarray_new;
-+	int i, sz = json_object_array_length(jarray);
-+	char idx_str[5];
-+
-+	snprintf(idx_str, 5, "%4.4x", idx);
-+
-+	jarray_new = json_object_new_array();
-+	if (!jarray_new)
-+		return NULL;
-+
-+	for (i = 0; i < sz; ++i) {
-+		json_object *jentry, *jvalue;
-+		char *str;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+
-+		if (json_object_object_get_ex(jentry, "index", &jvalue)) {
-+			str = (char *)json_object_get_string(jvalue);
-+			if (str && !strncmp(str, idx_str, 4))
-+				continue;
-+		}
-+
-+		json_object_array_add(jarray_new, jentry);
-+	}
-+
-+	return jarray_new;
-+}
-+
-+bool mesh_db_read_iv_index(json_object *jobj, uint32_t *idx, bool *update)
-+{
-+	int tmp;
-+
-+	/* IV index */
-+	if (!get_int(jobj, "IVindex", &tmp))
-+		return false;
-+
-+	*idx = (uint32_t) tmp;
-+
-+	if (!get_int(jobj, "IVupdate", &tmp))
-+		return false;
-+
-+	*update = tmp ? true : false;
-+
-+	return true;
-+}
-+
-+bool mesh_db_read_device_key(json_object *jobj, uint8_t key_buf[16])
-+{
-+	json_object *jvalue;
-+	char *str;
-+
-+	if (!key_buf)
-+		return false;
-+
-+	if (!json_object_object_get_ex(jobj, "deviceKey", &jvalue) ||
-+								!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (!str2hex(str, strlen(str), key_buf, 16))
-+		return false;
-+
-+	return true;
-+}
-+
-+bool mesh_db_read_app_keys(json_object *jobj, mesh_db_app_key_cb cb,
-+							void *user_data)
-+{
-+	json_object *jarray;
-+	int len;
-+	int i;
-+
-+	if (!cb)
-+		return true;
-+
-+	json_object_object_get_ex(jobj, "appKeys", &jarray);
-+	if (!jarray || (json_object_get_type(jarray) != json_type_array))
-+		return false;
-+
-+	len = json_object_array_length(jarray);
-+
-+	for (i = 0; i < len; ++i) {
-+		json_object *jtemp, *jvalue;
-+		int app_idx, net_idx;
-+		bool key_refresh = false;
-+		char *str;
-+		uint8_t key[16];
-+		uint8_t new_key[16];
-+
-+		jtemp = json_object_array_get_idx(jarray, i);
-+
-+		if (!get_int(jtemp, "index", &app_idx))
-+			return false;
-+
-+		if (!CHECK_KEY_IDX_RANGE(app_idx))
-+			return false;
-+
-+		if (!get_int(jtemp, "boundNetKey", &net_idx))
-+			return false;
-+
-+		if (!CHECK_KEY_IDX_RANGE(net_idx))
-+			return false;
-+
-+		json_object_object_get_ex(jtemp, "oldKey", &jvalue);
-+		if (jvalue) {
-+			str = (char *)json_object_get_string(jvalue);
-+			if (!str2hex(str, strlen(str), key, 16))
-+				return false;
-+			key_refresh = true;
-+		}
-+
-+		json_object_object_get_ex(jtemp, "key", &jvalue);
-+		if (!jvalue)
-+			return false;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str2hex(str, strlen(str), key_refresh ? new_key : key, 16))
-+			return false;
-+
-+		if (!cb((uint16_t)net_idx, (uint16_t) app_idx, key,
-+				key_refresh ? new_key : NULL, user_data))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+bool mesh_db_read_net_keys(json_object *jobj, mesh_db_net_key_cb cb,
-+								void *user_data)
-+{
-+	json_object *jarray;
-+	int len;
-+	int i;
-+
-+	if (!cb)
-+		return true;
-+
-+	json_object_object_get_ex(jobj, "netKeys", &jarray);
-+	if (!jarray || (json_object_get_type(jarray) != json_type_array))
-+		return false;
-+
-+	len = json_object_array_length(jarray);
-+
-+	for (i = 0; i < len; ++i) {
-+		json_object *jtemp, *jvalue;
-+		int idx;
-+		char *str;
-+		bool key_refresh = false;
-+		int phase;
-+		uint8_t key[16];
-+		uint8_t new_key[16];
-+
-+		jtemp = json_object_array_get_idx(jarray, i);
-+
-+		if (!get_int(jtemp, "index", &idx))
-+			return false;
-+
-+		if (!CHECK_KEY_IDX_RANGE(idx))
-+			return false;
-+
-+		json_object_object_get_ex(jtemp, "oldKey", &jvalue);
-+		if (jvalue) {
-+			str = (char *)json_object_get_string(jvalue);
-+			if (!str2hex(str, strlen(str), key, 16))
-+				return false;
-+			key_refresh = true;
-+		}
-+
-+		json_object_object_get_ex(jtemp, "key", &jvalue);
-+		if (!jvalue)
-+			return false;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str2hex(str, strlen(str), key_refresh ? new_key : key, 16))
-+			return false;
-+
-+		json_object_object_get_ex(jtemp, "keyRefresh", &jvalue);
-+		if (!jvalue)
-+			phase = KEY_REFRESH_PHASE_NONE;
-+		else
-+			phase = json_object_get_int(jvalue);
-+
-+
-+		if (!cb((uint16_t)idx, key, key_refresh ? new_key : NULL, phase,
-+								user_data))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
-+					const uint8_t key[16], int phase)
-+{
-+	json_object *jarray, *jentry = NULL, *jstring;
-+	char buf[5];
-+
-+	json_object_object_get_ex(jobj, "netKeys", &jarray);
-+	if (!jarray && (phase != KEY_REFRESH_PHASE_NONE))
-+		return false;
-+
-+	if (jarray)
-+		jentry = get_key_object(jarray, idx);
-+
-+	/*
-+	 * The key entry should exist if the key is updated
-+	 * (i.e., Key Refresh is underway)
-+	 */
-+	if (!jentry && (phase != KEY_REFRESH_PHASE_NONE))
-+		return false;
-+
-+	if (jentry) {
-+		uint8_t buf[16];
-+		json_object *jvalue;
-+		char *str;
-+
-+		json_object_object_get_ex(jentry, "key", &jvalue);
-+		if (!jvalue)
-+			return false;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str2hex(str, strlen(str), buf, sizeof(buf)))
-+			return false;
-+
-+		/* If the same key, return success */
-+		if (memcmp(key, buf, 16) == 0)
-+			return true;
-+
-+		return false;
-+	}
-+
-+	if (phase == KEY_REFRESH_PHASE_NONE) {
-+		jentry = json_object_new_object();
-+		if (!jentry)
-+			goto fail;
-+
-+		snprintf(buf, 5, "%4.4x", idx);
-+		jstring = json_object_new_string(buf);
-+		if (!jstring)
-+			goto fail;
-+
-+		json_object_object_add(jentry, "index", jstring);
-+
-+		snprintf(buf, 5, "%4.4x", idx);
-+		jstring = json_object_new_string(buf);
-+		if (!jstring)
-+			goto fail;
-+
-+		if (!add_key(jentry, "key", key))
-+			goto fail;
-+
-+		if (!jarray) {
-+			jarray = json_object_new_array();
-+			if (!jarray)
-+				goto fail;
-+			json_object_object_add(jobj, "netKeys", jarray);
-+		}
-+
-+		json_object_array_add(jarray, jentry);
-+
-+	} else {
-+
-+		if (!json_object_object_get_ex(jentry, "key", &jstring))
-+			return false;
-+
-+		json_object_object_add(jentry, "oldKey", jstring);
-+		json_object_object_del(jentry, "key");
-+
-+		if (!add_key(jentry, "key", key))
-+			return false;
-+	}
-+
-+
-+	json_object_object_add(jentry, "keyRefresh",
-+					json_object_new_int(phase));
-+
-+	return true;
-+fail:
-+
-+	if (jentry)
-+		json_object_put(jentry);
-+
-+	return false;
-+}
-+
-+bool mesh_db_net_key_del(json_object *jobj, uint16_t idx)
-+{
-+	json_object *jarray, *jarray_new;
-+
-+	json_object_object_get_ex(jobj, "netKeys", &jarray);
-+	if (!jarray)
-+		return true;
-+
-+	/* Check if matching entry exists */
-+	if (!get_key_object(jarray, idx))
-+		return true;
-+
-+	if (json_object_array_length(jarray) == 1) {
-+		json_object_object_del(jobj, "netKeys");
-+		return true;
-+	}
-+
-+	/*
-+	 * There is no easy way to delete a value from json array.
-+	 * Create a new copy without specified element and
-+	 * then remove old array.
-+	 */
-+	jarray_new = jarray_key_del(jarray, idx);
-+	if (!jarray_new)
-+		return false;
-+
-+	json_object_object_del(jobj, "netKeys");
-+	json_object_object_add(jobj, "netKeys", jarray_new);
-+
-+	return true;
-+}
-+
-+bool mesh_db_write_device_key(json_object *jnode, uint8_t *key)
-+{
-+	return add_key(jnode, "deviceKey", key);
-+}
-+
-+bool mesh_db_app_key_add(json_object *jobj, uint16_t net_idx, uint16_t app_idx,
-+			 const uint8_t key[16], bool update)
-+{
-+	json_object *jarray, *jentry = NULL, *jstring = NULL;
-+	char buf[5];
-+
-+	json_object_object_get_ex(jobj, "appKeys", &jarray);
-+	if (!jarray && update)
-+		return false;
-+
-+	if (jarray)
-+		jentry = get_key_object(jarray, app_idx);
-+
-+	/* The key entry should exist if the key is updated */
-+	if (!jentry  && update)
-+		return false;
-+
-+	if (jentry) {
-+		uint8_t buf[16];
-+		json_object *jvalue;
-+		char *str;
-+
-+		json_object_object_get_ex(jentry, "key", &jvalue);
-+		if (!jvalue)
-+			return false;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str2hex(str, strlen(str), buf, sizeof(buf)))
-+			return false;
-+
-+		/* If the same key, return success */
-+		if (memcmp(key, buf, 16) == 0)
-+			return true;
-+
-+		return false;
-+	}
-+
-+	if (!update) {
-+		jentry = json_object_new_object();
-+		if (!jentry)
-+			goto fail;
-+
-+		snprintf(buf, 5, "%4.4x", app_idx);
-+		jstring = json_object_new_string(buf);
-+		if (!jstring)
-+			goto fail;
-+
-+		json_object_object_add(jentry, "index", jstring);
-+
-+		snprintf(buf, 5, "%4.4x", net_idx);
-+		jstring = json_object_new_string(buf);
-+		if (!jstring)
-+			goto fail;
-+
-+		json_object_object_add(jentry, "boundNetKey", jstring);
-+
-+		if (!add_key(jentry, "key", key))
-+			goto fail;
-+
-+		if (!jarray) {
-+			jarray = json_object_new_array();
-+			if (!jarray)
-+				goto fail;
-+			json_object_object_add(jobj, "appKeys", jarray);
-+		}
-+
-+		json_object_array_add(jarray, jentry);
-+
-+	} else {
-+
-+		if (!json_object_object_get_ex(jentry, "key", &jstring))
-+			return false;
-+
-+		json_object_object_add(jentry, "oldKey", jstring);
-+		json_object_object_del(jentry, "key");
-+
-+		if (!add_key(jentry, "key", key))
-+			return false;
-+	}
-+
-+	return true;
-+fail:
-+
-+	if (jentry)
-+		json_object_put(jentry);
-+
-+	return false;
-+}
-+
-+bool mesh_db_app_key_del(json_object *jobj, uint16_t net_idx, uint16_t idx)
-+{
-+	json_object *jarray, *jarray_new;
-+
-+	json_object_object_get_ex(jobj, "appKeys", &jarray);
-+	if (!jarray)
-+		return true;
-+
-+	/* Check if matching entry exists */
-+	if (!get_key_object(jarray, idx))
-+		return true;
-+
-+	if (json_object_array_length(jarray) == 1) {
-+		json_object_object_del(jobj, "appKeys");
-+		return true;
-+	}
-+
-+	/*
-+	 * There is no easy way to delete a value from json array.
-+	 * Create a new copy without specified element and
-+	 * then remove old array.
-+	 */
-+	jarray_new = jarray_key_del(jarray, idx);
-+	if (!jarray_new)
-+		return false;
-+
-+	json_object_object_del(jobj, "appKeys");
-+	json_object_object_add(jobj, "appKeys", jarray_new);
-+
-+	return true;
-+}
-+
-+bool mesh_db_model_binding_add(json_object *jnode, uint8_t ele_idx, bool vendor,
-+				uint32_t mod_id, uint16_t app_idx)
-+{
-+	json_object *jmodel, *jstring, *jarray;
-+	char buf[5];
-+
-+	jmodel = get_element_model(jnode, ele_idx, mod_id, vendor);
-+	if (!jmodel)
-+		return false;
-+
-+	json_object_object_get_ex(jmodel, "bind", &jarray);
-+
-+	snprintf(buf, 5, "%4.4x", app_idx);
-+
-+	if (jarray && jarray_has_string(jarray, buf, 4))
-+		return true;
-+
-+	jstring = json_object_new_string(buf);
-+	if (!jstring)
-+		return false;
-+
-+	if (!jarray) {
-+		jarray = json_object_new_array();
-+		if (!jarray) {
-+			json_object_put(jstring);
-+			return false;
-+		}
-+		json_object_object_add(jmodel, "bind", jarray);
-+	}
-+
-+	json_object_array_add(jarray, jstring);
-+
-+	return true;
-+}
-+
-+bool mesh_db_model_binding_del(json_object *jnode, uint8_t ele_idx, bool vendor,
-+				uint32_t mod_id, uint16_t app_idx)
-+{
-+	json_object *jmodel, *jarray, *jarray_new;
-+	char buf[5];
-+
-+	jmodel = get_element_model(jnode, ele_idx, mod_id, vendor);
-+	if (!jmodel)
-+		return false;
-+
-+	json_object_object_get_ex(jmodel, "bind", &jarray);
-+
-+	snprintf(buf, 5, "%4.4x", app_idx);
-+
-+	if (!jarray || !jarray_has_string(jarray, buf, 4))
-+		return true;
-+
-+	if (json_object_array_length(jarray) == 1) {
-+		json_object_object_del(jmodel, "bind");
-+		return true;
-+	}
-+
-+	/*
-+	 * There is no easy way to delete a value from json array.
-+	 * Create a new copy without specified element and
-+	 * then remove old array.
-+	 */
-+	jarray_new = jarray_string_del(jarray, buf, 4);
-+	if (!jarray_new)
-+		return false;
-+
-+	json_object_object_del(jmodel, "bind");
-+	json_object_object_add(jmodel, "bind", jarray_new);
-+
-+	return true;
-+}
-+
-+static void free_model(void *data)
-+{
-+	struct mesh_db_model *mod = data;
-+
-+	l_free(mod->bindings);
-+	l_free(mod->subs);
-+	l_free(mod->pub);
-+	l_free(mod);
-+}
-+
-+static void free_element(void *data)
-+{
-+	struct mesh_db_element *ele = data;
-+
-+	l_queue_destroy(ele->models, free_model);
-+	l_free(ele);
-+}
-+
-+static bool parse_bindings(json_object *jbindings, struct mesh_db_model *mod)
-+{
-+	int cnt;
-+	int i;
-+
-+	cnt = json_object_array_length(jbindings);
-+	if (cnt > 0xffff)
-+		return false;
-+
-+	mod->num_subs = cnt;
-+
-+	/* Allow empty bindings list */
-+	if (!cnt)
-+		return true;
-+
-+	mod->bindings = l_new(uint16_t, cnt);
-+	if (!mod->bindings)
-+		return false;
-+
-+	for (i = 0; i < cnt; ++i) {
-+		int idx;
-+		json_object *jvalue;
-+
-+		jvalue = json_object_array_get_idx(jbindings, i);
-+		if (!jvalue)
-+			return false;
-+
-+		idx = json_object_get_int(jvalue);
-+		if (!CHECK_KEY_IDX_RANGE(idx))
-+			return false;
-+
-+		mod->bindings[i] = (uint16_t) idx;
-+	}
-+
-+	return true;
-+}
-+
-+static bool parse_models(json_object *jmodels, struct mesh_db_element *ele)
-+{
-+	int i, num_models;
-+
-+	num_models = json_object_array_length(jmodels);
-+	if (!num_models)
-+		return true;
-+
-+	for (i = 0; i < num_models; ++i) {
-+		json_object *jmodel, *jarray, *jvalue;
-+		struct mesh_db_model *mod;
-+		uint32_t id;
-+		int len;
-+		char *str;
-+
-+		jmodel = json_object_array_get_idx(jmodels, i);
-+		if (!jmodel)
-+			goto fail;
-+
-+		mod = l_new(struct mesh_db_model, 1);
-+		if (!ele)
-+			goto fail;
-+
-+		json_object_object_get_ex(jmodel, "modelId", &jvalue);
-+		str = (char *)json_object_get_string(jvalue);
-+
-+		len = strlen(str);
-+
-+		if (len != 4 && len != 8)
-+			goto fail;
-+
-+		if (len == 4) {
-+			if (sscanf(str, "%04x", &id) != 1)
-+				goto fail;
-+
-+			id |= VENDOR_ID_MASK;
-+		} else if (len == 8) {
-+			if (sscanf(str, "%08x", &id) != 1)
-+				goto fail;
-+		} else
-+			goto fail;
-+
-+		mod->id = id;
-+
-+		if (len == 8)
-+			mod->vendor = true;
-+
-+		json_object_object_get_ex(jmodel, "bind", &jarray);
-+
-+		if (jarray && (json_object_get_type(jmodels) != json_type_array
-+					|| !parse_bindings(jarray, mod)))
-+			goto fail;
-+
-+		/* TODO add pub/sub */
-+		l_queue_push_tail(ele->models, mod);
-+	}
-+
-+	return true;
-+
-+fail:
-+	l_queue_destroy(ele->models, free_model);
-+	return false;
-+}
-+
-+static bool parse_elements(json_object *jelements, struct mesh_db_node *node)
-+{
-+	int i, num_ele;
-+
-+	num_ele = json_object_array_length(jelements);
-+	if (!num_ele)
-+		/* Allow "empty" nodes */
-+		return true;
-+
-+	node->elements = l_queue_new();
-+	if (!node->elements)
-+		return false;
-+
-+	for (i = 0; i < num_ele; ++i) {
-+		json_object *jelement;
-+		json_object *jmodels;
-+		json_object *jvalue;
-+		struct mesh_db_element *ele;
-+		int index;
-+		char *str;
-+
-+		jelement = json_object_array_get_idx(jelements, i);
-+		if (!jelement)
-+			goto fail;
-+
-+		if (!get_int(jelement, "elementIndex", &index) ||
-+								index > num_ele)
-+			goto fail;
-+
-+		ele = l_new(struct mesh_db_element, 1);
-+		if (!ele)
-+			goto fail;
-+
-+		ele->index = index;
-+		ele->models = l_queue_new();
-+		if (!ele->models)
-+			goto fail;
-+
-+		json_object_object_get_ex(jelement, "location", &jvalue);
-+		str = (char *)json_object_get_string(jvalue);
-+		if (sscanf(str, "%04hx", &(ele->location)) != 1)
-+			goto fail;
-+
-+		json_object_object_get_ex(jelement, "models", &jmodels);
-+
-+		if (jmodels && (json_object_get_type(jmodels) != json_type_array
-+				|| !parse_models(jmodels, ele)))
-+			goto fail;
-+
-+		l_queue_push_tail(node->elements, ele);
-+	}
-+
-+	return true;
-+
-+fail:
-+	l_queue_destroy(node->elements, free_element);
-+	node->elements = NULL;
-+
-+	return false;
-+}
-+
-+static int get_mode(json_object *jvalue)
-+{
-+	const char *str;
-+
-+	str = json_object_get_string(jvalue);
-+	if (!str)
-+		return 0xffffffff;
-+
-+	if (!strncasecmp(str, "disabled", strlen("disabled")))
-+		return MESH_MODE_DISABLED;
-+
-+	if (!strncasecmp(str, "enabled", strlen("enabled")))
-+		return MESH_MODE_ENABLED;
-+
-+	if (!strncasecmp(str, "unsupported", strlen("unsupported")))
-+		return MESH_MODE_UNSUPPORTED;
-+
-+	return 0xffffffff;
-+}
-+
-+static void parse_features(json_object *jconfig, struct mesh_db_node *node)
-+{
-+	json_object *jvalue, *jrelay;
-+	int mode, count;
-+	uint16_t interval;
-+
-+	json_object_object_get_ex(jconfig, "proxy", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_UNSUPPORTED)
-+			node->modes.proxy = mode;
-+	}
-+
-+	json_object_object_get_ex(jconfig, "friend", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_UNSUPPORTED)
-+			node->modes.friend = mode;
-+	}
-+
-+	json_object_object_get_ex(jconfig, "lowPower", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_UNSUPPORTED)
-+			node->modes.friend = mode;
-+	}
-+
-+	json_object_object_get_ex(jconfig, "beacon", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_ENABLED)
-+			node->modes.beacon = mode;
-+	}
-+
-+	json_object_object_get_ex(jconfig, "relay", &jrelay);
-+	if (!jrelay)
-+		return;
-+
-+	json_object_object_get_ex(jrelay, "mode", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_UNSUPPORTED)
-+			node->modes.relay.state = mode;
-+		else
-+			return;
-+	} else
-+		return;
-+
-+	json_object_object_get_ex(jrelay, "count", &jvalue);
-+	if (!jvalue)
-+		return;
-+
-+	/* TODO: check range */
-+	count = json_object_get_int(jvalue);
-+	node->modes.relay.cnt = count;
-+
-+	json_object_object_get_ex(jrelay, "interval", &jvalue);
-+	if (!jvalue)
-+		return;
-+
-+	/* TODO: check range */
-+	interval = json_object_get_int(jvalue);
-+	node->modes.relay.interval = interval;
-+}
-+
-+static bool parse_composition(json_object *jcomp, struct mesh_db_node *node)
-+{
-+	json_object *jvalue;
-+	char *str;
-+
-+	/* All the fields in node composition are mandatory */
-+	json_object_object_get_ex(jcomp, "cid", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node->cid) != 1)
-+		return false;
-+
-+	json_object_object_get_ex(jcomp, "pid", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node->pid) != 1)
-+		return false;
-+
-+	json_object_object_get_ex(jcomp, "vid", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node->vid) != 1)
-+		return false;
-+
-+	json_object_object_get_ex(jcomp, "crpl", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node->crpl) != 1)
-+		return false;
-+
-+	return true;
-+}
-+
-+static uint16_t get_prov_flags(json_object *jarray, uint16_t max_value)
-+{
-+	int i, cnt;
-+	uint16_t result = 0;
-+
-+	cnt = json_object_array_length(jarray);
-+	if (!cnt)
-+		return 0;
-+
-+	for (i = 0; i < cnt; ++i) {
-+		json_object *jvalue;
-+		int value;
-+
-+		jvalue = json_object_array_get_idx(jarray, i);
-+		value = json_object_get_int(jvalue);
-+		if (value > 16)
-+			continue;
-+
-+		if ((1 << value) > max_value)
-+			continue;
-+
-+		result |= (1 << value);
-+	}
-+
-+	return result;
-+}
-+
-+bool mesh_db_read_node(json_object *jnode, mesh_db_node_cb cb, void *user_data)
-+{
-+	struct mesh_db_node node;
-+	json_object *jvalue;
-+	char *str;
-+
-+	if (!cb) {
-+		l_info("Node read callback is required");
-+		return false;
-+	}
-+
-+	memset(&node, 0, sizeof(node));
-+
-+	if (!parse_composition(jnode, &node)) {
-+		l_info("Failed to parse local node composition");
-+		return false;
-+	}
-+
-+	parse_features(jnode, &node);
-+
-+	json_object_object_get_ex(jnode, "unicastAddress", &jvalue);
-+	if (!jvalue) {
-+		l_info("Bad config: Unicast address must be present");
-+		return false;
-+	}
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node.unicast) != 1)
-+		return false;
-+
-+	json_object_object_get_ex(jnode, "defaultTTL", &jvalue);
-+	if (jvalue) {
-+		int ttl = json_object_get_int(jvalue);
-+
-+		if (ttl < 0 || ttl == 1 || ttl > DEFAULT_TTL)
-+			return false;
-+		node.ttl = (uint8_t) ttl;
-+	}
-+
-+	json_object_object_get_ex(jnode, "sequenceNumber", &jvalue);
-+	if (jvalue)
-+		node.seq_number = json_object_get_int(jvalue);
-+
-+	json_object_object_get_ex(jnode, "elements", &jvalue);
-+	if (jvalue && json_object_get_type(jvalue) == json_type_array) {
-+		if (!parse_elements(jvalue, &node))
-+			return false;
-+	}
-+
-+	return cb(&node, user_data);
-+}
-+
-+bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
-+								void *user_data)
-+{
-+	struct mesh_db_node node;
-+	json_object *jvalue;
-+	char *str;
-+
-+	if (!cb) {
-+		l_info("Device read callback is required");
-+		return false;
-+	}
-+
-+	memset(&node, 0, sizeof(node));
-+
-+	if (!parse_composition(jnode, &node)) {
-+		l_info("Failed to parse local device composition");
-+		return false;
-+	}
-+
-+	parse_features(jnode, &node);
-+
-+	json_object_object_get_ex(jnode, "elements", &jvalue);
-+	if (jvalue && json_object_get_type(jvalue) == json_type_array) {
-+		if (!parse_elements(jvalue, &node))
-+			return false;
-+	}
-+
-+	json_object_object_get_ex(jnode, "UUID", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (!str2hex(str, strlen(str), node.uuid, 16))
-+		return false;
-+
-+	return cb(&node, user_data);
-+}
-+
-+bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov)
-+{
-+	json_object *jprov, *jarray, *jvalue, *jobj;
-+	int value;
-+	char *str;
-+
-+	if (!prov)
-+		return false;
-+
-+	json_object_object_get_ex(jnode, "provision", &jprov);
-+	if (!jprov)
-+		return false;
-+
-+	json_object_object_get_ex(jprov, "algorithms", &jarray);
-+	if (!jarray || json_object_get_type(jarray) != json_type_array)
-+		return false;
-+
-+	prov->algorithm = get_prov_flags(jarray, ALG_FIPS_256_ECC);
-+	if (!prov->algorithm) {
-+		l_info("At least one algorithm must be indicated");
-+		return false;
-+	}
-+
-+	json_object_object_get_ex(jprov, "outputOOB", &jobj);
-+	json_object_object_get_ex(jobj, "size", &jvalue);
-+	value = json_object_get_int(jvalue);
-+	if (value > 8)
-+		return false;
-+
-+	prov->output_oob.size = (uint8_t) value;
-+	json_object_object_get_ex(jobj, "actions", &jarray);
-+	if (!jarray || json_object_get_type(jarray) != json_type_array)
-+		return false;
-+
-+	prov->output_oob.actions = get_prov_flags(jarray, OOB_OUT_ALPHA);
-+
-+	json_object_object_get_ex(jprov, "inputOOB", &jobj);
-+	json_object_object_get_ex(jobj, "size", &jvalue);
-+	value = json_object_get_int(jvalue);
-+	if (value > 8)
-+		return false;
-+
-+	prov->input_oob.size = (uint8_t) value;
-+	json_object_object_get_ex(jobj, "actions", &jarray);
-+	if (!jarray || json_object_get_type(jarray) != json_type_array)
-+		return false;
-+
-+	prov->input_oob.actions = get_prov_flags(jarray, OOB_IN_ALPHA);
-+
-+	json_object_object_get_ex(jprov, "publicType", &jvalue);
-+	prov->pub_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
-+
-+	json_object_object_get_ex(jprov, "staticType", &jvalue);
-+	prov->static_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
-+
-+	json_object_object_get_ex(jprov, "privateKey", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (!str2hex(str, strlen(str), prov->priv_key, 32))
-+		return false;
-+
-+	return true;
-+}
-+
-+bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
-+								uint16_t value)
-+{
-+	json_object *jstring;
-+	char buf[5];
-+
-+	snprintf(buf, 5, "%4.4x", value);
-+	jstring = json_object_new_string(buf);
-+	if (!jstring)
-+		return false;
-+
-+	json_object_object_add(jobj, desc, jstring);
-+	return true;
-+}
-+
-+bool mesh_db_write_int(json_object *jobj, const char *keyword, int value)
-+{
-+	json_object *jvalue;
-+
-+	json_object_object_del(jobj, keyword);
-+
-+	jvalue = json_object_new_int(value);
-+	if (!jvalue)
-+		return false;
-+
-+	json_object_object_add(jobj, keyword, jvalue);
-+	return true;
-+}
-+
-+bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value)
-+{
-+	json_object *jvalue;
-+
-+	json_object_object_del(jobj, keyword);
-+
-+	jvalue = json_object_new_boolean(value);
-+	if (!jvalue)
-+		return false;
-+
-+	json_object_object_add(jobj, keyword, jvalue);
-+	return true;
-+}
-+
-+bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value)
-+{
-+	json_object *jstring;
-+
-+	switch (value) {
-+	case MESH_MODE_DISABLED:
-+		jstring = json_object_new_string("disabled");
-+		break;
-+	case MESH_MODE_ENABLED:
-+		jstring = json_object_new_string("enabled");
-+		break;
-+	case MESH_MODE_UNSUPPORTED:
-+		jstring = json_object_new_string("unsupported");
-+		break;
-+	default:
-+		return false;
-+	};
-+
-+	if (!jstring)
-+		return false;
-+
-+	json_object_object_add(jobj, keyword, jstring);
-+
-+	return true;
-+}
-+
-+bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
-+							uint16_t interval)
-+{
-+	json_object *jrelay;
-+
-+	json_object_object_del(jnode, "relay");
-+
-+	jrelay = json_object_new_object();
-+	if (jrelay)
-+		return false;
-+
-+	if (!mesh_db_write_mode(jrelay, "mode", mode))
-+		goto fail;
-+
-+	if (!mesh_db_write_int(jrelay, "count", count))
-+		goto fail;
-+
-+	if (!mesh_db_write_int(jrelay, "interval", interval))
-+		goto fail;
-+
-+	json_object_object_add(jnode, "relay", jrelay);
-+
-+	return true;
-+fail:
-+	json_object_put(jrelay);
-+	return false;
-+}
-+
-+bool mesh_db_read_net_transmit(json_object *jobj, uint8_t *cnt,
-+							uint16_t *interval)
-+{
-+	json_object *jretransmit, *jvalue;
-+
-+	json_object_object_get_ex(jobj, "retransmit", &jretransmit);
-+	if (!jretransmit)
-+		return false;
-+
-+	json_object_object_get_ex(jretransmit, "count", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	*cnt = (uint8_t) json_object_get_int(jvalue);
-+
-+	json_object_object_get_ex(jretransmit, "interval", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	*interval = (uint16_t) json_object_get_int(jvalue);
-+
-+	return true;
-+}
-+
-+bool mesh_db_write_net_transmit(json_object *jobj, uint8_t cnt,
-+							uint16_t interval)
-+{
-+	json_object *jretransmit;
-+
-+	json_object_object_del(jobj, "retransmit");
-+
-+	jretransmit = json_object_new_object();
-+	if (jretransmit)
-+		return false;
-+
-+	if (!mesh_db_write_int(jretransmit, "count", cnt))
-+		goto fail;
-+
-+	if (!mesh_db_write_int(jretransmit, "interval", interval))
-+		goto fail;
-+
-+	json_object_object_add(jobj, "retransmit", jretransmit);
-+
-+	return true;
-+fail:
-+	json_object_put(jretransmit);
-+	return false;
-+
-+}
-+
-+bool mesh_db_write_iv_index(json_object *jobj, uint32_t idx, bool update)
-+{
-+	int tmp = update ? 1 : 0;
-+
-+	if (!mesh_db_write_int(jobj, "IVindex", idx))
-+		return false;
-+
-+	if (!mesh_db_write_int(jobj, "IVupdate", tmp))
-+		return false;
-+
-+	return true;
-+}
-+
-+void mesh_db_remove_property(json_object *jobj, const char *desc)
-+{
-+	json_object_object_del(jobj, desc);
-+}
-diff --git a/meshd/mesh-json/mesh-db.h b/meshd/mesh-json/mesh-db.h
-new file mode 100644
-index 000000000..336302f28
---- /dev/null
-+++ b/meshd/mesh-json/mesh-db.h
-@@ -0,0 +1,144 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *
-+ */
-+
-+#include <json-c/json.h>
-+
-+struct mesh_db_sub {
-+	bool virt;
-+	union {
-+		uint16_t addr;
-+		uint8_t	virt_addr[16];
-+	} src;
-+};
-+
-+struct mesh_db_pub {
-+	bool virt;
-+	uint16_t addr;
++struct mesh_model;
++
++#define OP_UNRELIABLE			0x0100
++
++#define MAX_BINDINGS	10
++#define MAX_GRP_PER_MOD	10
++
++#define	VIRTUAL_BASE			0x10000
++
++#define MESH_MAX_ACCESS_PAYLOAD		380
++
++#define MESH_STATUS_SUCCESS		0x00
++#define MESH_STATUS_INVALID_ADDRESS	0x01
++#define MESH_STATUS_INVALID_MODEL	0x02
++#define MESH_STATUS_INVALID_APPKEY	0x03
++#define MESH_STATUS_INVALID_NETKEY	0x04
++#define MESH_STATUS_INSUFF_RESOURCES	0x05
++#define MESH_STATUS_IDX_ALREADY_STORED	0x06
++#define MESH_STATUS_INVALID_PUB_PARAM	0x07
++#define MESH_STATUS_NOT_SUB_MOD		0x08
++#define MESH_STATUS_STORAGE_FAIL	0x09
++#define MESH_STATUS_FEATURE_NO_SUPPORT	0x0a
++#define MESH_STATUS_CANNOT_UPDATE	0x0b
++#define MESH_STATUS_CANNOT_REMOVE	0x0c
++#define MESH_STATUS_CANNOT_BIND		0x0d
++#define MESH_STATUS_UNABLE_CHANGE_STATE	0x0e
++#define MESH_STATUS_CANNOT_SET		0x0f
++#define MESH_STATUS_UNSPECIFIED_ERROR	0x10
++#define MESH_STATUS_INVALID_BINDING	0x11
++
++#define OP_MODEL_TEST			0x8000fffe
++#define OP_MODEL_INVALID		0x8000ffff
++
++#define USE_PUB_VALUE			0x00
++
++#define ACTION_ADD		1
++#define ACTION_UPDATE		2
++#define ACTION_DELETE		3
++
++struct mesh_model_pub {
++	uint32_t addr;
 +	uint16_t idx;
 +	uint8_t ttl;
 +	uint8_t credential;
 +	uint8_t period;
 +	uint8_t retransmit;
-+	uint8_t virt_addr[16];
 +};
 +
-+struct mesh_db_model {
-+	struct mesh_db_sub *subs;
-+	struct mesh_db_pub *pub;
-+	uint16_t *bindings;
-+	uint32_t id;
-+	bool vendor;
-+	uint32_t num_bindings;
-+	uint32_t num_subs;
++typedef void (*mesh_model_unregister)(void *user_data);
++typedef bool (*mesh_model_recv_cb)(uint16_t src, uint32_t dst, uint16_t unicast,
++					uint16_t app_idx, const uint8_t *data,
++					uint16_t len, uint8_t ttl,
++					const void *user_data);
++typedef int (*mesh_model_bind_cb)(uint16_t app_idx, int action);
++typedef int (*mesh_model_pub_cb)(struct mesh_model_pub *pub);
++typedef int (*mesh_model_sub_cb)(uint16_t sub_addr, int action);
++
++struct mesh_model_ops {
++	mesh_model_unregister unregister;
++	mesh_model_recv_cb recv;
++	mesh_model_bind_cb bind;
++	mesh_model_pub_cb pub;
++	mesh_model_sub_cb sub;
 +};
 +
-+struct mesh_db_element {
-+	struct l_queue *models;
-+	uint16_t location;
-+	uint8_t index;
-+};
-+
-+struct mesh_db_modes {
-+	struct {
-+		uint16_t interval;
-+		uint8_t cnt;
-+		uint8_t state;
-+	} relay;
-+	uint8_t lpn;
-+	uint8_t friend;
-+	uint8_t proxy;
-+	uint8_t beacon;
-+};
-+
-+struct mesh_db_node {
-+	bool provisioner;
-+	uint32_t seq_number;
-+	struct mesh_db_modes modes;
-+	uint16_t cid;
-+	uint16_t pid;
-+	uint16_t vid;
-+	uint16_t crpl;
-+	uint16_t unicast;
-+	uint8_t ttl;
-+	struct l_queue *elements;
-+	uint8_t uuid[16];
-+};
-+
-+struct mesh_db_prov {
-+	uint16_t algorithm;
-+	struct {
-+		uint16_t actions;
-+		uint8_t size;
-+	} input_oob;
-+	uint8_t pub_type;
-+	struct {
-+		uint16_t actions;
-+		uint8_t size;
-+	} output_oob;
-+	uint8_t static_type;
-+	uint8_t priv_key[32];
-+};
-+
-+typedef bool (*mesh_db_net_key_cb)(uint16_t idx, uint8_t key[16],
-+			uint8_t new_key[16], int phase, void *user_data);
-+typedef bool (*mesh_db_app_key_cb)(uint16_t idx, uint16_t net_idx,
-+			uint8_t key[16], uint8_t new_key[16], void *user_data);
-+typedef bool (*mesh_db_node_cb)(struct mesh_db_node *node, void *user_data);
-+
-+bool mesh_db_read_node(json_object *jobj, mesh_db_node_cb cb, void *user_data);
-+bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
++struct mesh_model *mesh_model_new(uint8_t ele_idx, uint32_t id, bool vendor);
++void mesh_model_free(void *data);
++uint32_t mesh_model_get_model_id(const struct mesh_model *model);
++bool mesh_model_vendor_register(struct mesh_net *net, uint8_t ele_idx,
++					uint32_t mod_id,
++					const struct mesh_model_ops *cbs,
++					void *user_data);
++bool mesh_model_register(struct mesh_net *net, uint8_t ele_idx, uint32_t mod_id,
++					const struct mesh_model_ops *cbs,
 +							void *user_data);
-+bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov);
-+bool mesh_db_read_iv_index(json_object *jobj, uint32_t *idx, bool *update);
-+bool mesh_db_read_device_key(json_object *jobj, uint8_t key_buf[16]);
-+bool mesh_db_read_net_transmit(json_object *jobj, uint8_t *cnt,
++struct mesh_model_pub *mesh_model_pub_get(struct mesh_net *net, uint8_t ele_idx,
++						uint32_t mod_id, int *status);
++int mesh_model_pub_set(struct mesh_net *net, uint16_t addr, uint32_t id,
++			const uint8_t *mod_addr, uint16_t idx, bool cred_flag,
++			uint8_t ttl, uint8_t period, uint8_t retransmit,
++			bool b_virt, uint16_t *dst);
++struct mesh_model *mesh_model_init(struct mesh_net *net, uint8_t ele_idx,
++						struct mesh_db_model *db_mod);
++
++int mesh_model_binding_add(struct mesh_net *net, uint16_t addr, uint32_t id,
++						uint16_t app_idx);
++int mesh_model_binding_del(struct mesh_net *net, uint16_t addr, uint32_t id,
++						uint16_t idx);
++int mesh_model_get_bindings(struct mesh_net *net, uint16_t addr, uint32_t id,
++				uint8_t *buf, uint16_t buf_len, uint16_t *size);
++int mesh_model_sub_add(struct mesh_net *net, uint16_t addr, uint32_t id,
++						const uint8_t *grp, bool b_virt,
++						uint16_t *dst);
++int mesh_model_sub_del(struct mesh_net *net, uint16_t addr, uint32_t id,
++						const uint8_t *grp, bool b_virt,
++						uint16_t *dst);
++int mesh_model_sub_del_all(struct mesh_net *net, uint16_t addr, uint32_t id);
++int mesh_model_sub_ovr(struct mesh_net *net, uint16_t addr, uint32_t id,
++						const uint8_t *grp, bool b_virt,
++						uint16_t *dst);
++int mesh_model_sub_get(struct mesh_net *net, uint16_t addr, uint32_t id,
++			uint8_t *buf, uint16_t buf_size, uint16_t *size);
++uint16_t mesh_model_cfg_blk(uint8_t *pkt);
++unsigned int mesh_model_send(struct mesh_net *net, uint32_t mod_id,
++				uint16_t src, uint32_t target,
++				uint16_t app_idx, uint8_t ttl,
++				const void *msg, uint16_t msg_len);
++
++bool mesh_model_rx(struct mesh_net *net, bool szmict, uint32_t seq0,
++			uint32_t seq, uint32_t iv_index, uint8_t ttl,
++			uint16_t src, uint16_t dst, uint8_t key_id,
++			const uint8_t *data, uint16_t size);
++
++void mesh_model_app_key_generate_new(struct mesh_net *net, uint16_t net_idx);
++void mesh_model_app_key_delete(struct mesh_net *net, struct l_queue *models,
++								uint16_t idx);
++struct l_queue *mesh_model_get_appkeys(struct mesh_net *net);
++void *mesh_model_get_local_node_data(struct mesh_net *net);
++void mesh_model_add_virtual(struct mesh_net *net, const uint8_t *v);
++void mesh_model_del_virtual(struct mesh_net *net, uint32_t va24);
++void mesh_model_list_virtual(struct mesh_net *net);
++uint16_t mesh_model_opcode_set(uint32_t opcode, uint8_t *buf);
++bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size,
++					uint32_t *opcode, uint16_t *n);
+diff --git a/meshd/src/node.h b/meshd/src/node.h
+new file mode 100644
+index 000000000..8ebb41941
+--- /dev/null
++++ b/meshd/src/node.h
+@@ -0,0 +1,80 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *
++ */
++
++#include "meshd/mesh-json/mesh-db.h"
++
++struct mesh_net;
++struct mesh_node;
++
++/* To prevent local node JSON cache thrashing, minimum update times */
++#define MIN_SEQ_TRIGGER	32
++#define MIN_SEQ_CACHE		(2*MIN_SEQ_TRIGGER)
++#define MIN_SEQ_CACHE_TIME	(5*60)
++
++struct mesh_node *node_new(void);
++void node_free(struct mesh_node *node);
++uint8_t *node_uuid_get(struct mesh_node *node);
++struct mesh_node *node_find_by_addr(uint16_t addr);
++struct mesh_node *node_find_by_uuid(uint8_t uuid[16]);
++bool node_is_provisioned(struct mesh_node *node);
++bool node_app_key_delete(struct mesh_net *net, uint16_t addr,
++				uint16_t net_idx, uint16_t idx);
++bool node_net_key_delete(struct mesh_node *node, uint16_t index);
++bool node_set_primary(struct mesh_node *node, uint16_t unicast);
++uint16_t node_get_primary(struct mesh_node *node);
++uint16_t node_get_primary_net_idx(struct mesh_node *node);
++bool node_set_device_key(struct mesh_node *node, uint8_t key[16]);
++const uint8_t *node_get_device_key(struct mesh_node *node);
++void node_set_num_elements(struct mesh_node *node, uint8_t num_ele);
++uint8_t node_get_num_elements(struct mesh_node *node);
++bool node_parse_composition(struct mesh_node *node, uint8_t *buf, uint16_t len);
++struct l_queue *node_get_net_keys(struct mesh_node *node);
++struct l_queue *node_get_app_keys(struct mesh_node *node);
++bool node_add_binding(struct mesh_node *node, uint8_t ele_idx,
++			uint32_t model_id, uint16_t app_idx);
++bool node_del_binding(struct mesh_node *node, uint8_t ele_idx,
++			uint32_t model_id, uint16_t app_idx);
++uint8_t node_default_ttl_get(struct mesh_node *node);
++bool node_default_ttl_set(struct mesh_node *node, uint8_t ttl);
++bool node_set_sequence_number(struct mesh_node *node, uint32_t seq);
++uint32_t node_get_sequence_number(struct mesh_node *node);
++int node_get_element_idx(struct mesh_node *node, uint16_t ele_addr);
++struct l_queue *node_get_element_models(struct mesh_node *node, uint8_t ele_idx,
++								int *status);
++struct mesh_model *node_get_model(struct mesh_node *node, uint8_t ele_idx,
++						uint32_t id, int *status);
++uint16_t node_get_crpl(struct mesh_node *node);
++struct mesh_node *node_create_from_storage(struct mesh_net *net,
++						struct mesh_db_node *db_node,
++								bool local);
++uint16_t node_generate_comp(struct mesh_node *node, uint8_t *buf, uint16_t sz);
++uint8_t node_lpn_mode_get(struct mesh_node *node);
++bool node_relay_mode_set(struct mesh_node *node, bool enable, uint8_t cnt,
++							uint16_t interval);
++uint8_t node_relay_mode_get(struct mesh_node *node, uint8_t *cnt,
 +							uint16_t *interval);
-+bool mesh_db_write_net_transmit(json_object *jobj, uint8_t cnt,
-+							uint16_t interval);
-+bool mesh_db_read_net_keys(json_object *jobj, mesh_db_net_key_cb cb,
-+							void *user_data);
-+bool mesh_db_read_app_keys(json_object *jobj, mesh_db_app_key_cb cb,
-+							void *user_data);
-+bool mesh_db_write_device_key(json_object *jobj, uint8_t *key);
-+bool mesh_db_write_network_key(json_object *jobj, uint16_t idx, uint8_t *key,
-+						uint8_t *new_key, int phase);
-+bool mesh_db_write_app_key(json_object *jobj, uint16_t net_idx,
-+			uint16_t app_idx, uint8_t *key, uint8_t *new_key);
-+bool mesh_db_write_int(json_object *jobj, const char *keyword, int value);
-+bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
-+								uint16_t value);
-+bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value);
-+bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
-+							uint16_t interval);
-+bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value);
-+bool mesh_db_model_binding_add(json_object *jnode, uint8_t ele_idx, bool vendor,
-+					uint32_t mod_id, uint16_t app_idx);
-+bool mesh_db_model_binding_del(json_object *jnode, uint8_t ele_idx, bool vendor,
-+					uint32_t mod_id, uint16_t app_idx);
-+bool mesh_db_app_key_add(json_object *jnode, uint16_t net_idx, uint16_t app_idx,
-+					const uint8_t key[16], bool update);
-+bool mesh_db_app_key_del(json_object *jobj, uint16_t net_idx, uint16_t idx);
-+bool mesh_db_net_key_add(json_object *jobj, uint16_t net_idx,
++bool node_proxy_mode_set(struct mesh_node *node, bool enable);
++uint8_t node_proxy_mode_get(struct mesh_node *node);
++bool node_beacon_mode_set(struct mesh_node *node, bool enable);
++uint8_t node_beacon_mode_get(struct mesh_node *node);
++bool node_friend_mode_set(struct mesh_node *node, bool enable);
++uint8_t node_friend_mode_get(struct mesh_node *node);
++uint32_t node_seq_cache(struct mesh_node *node);
++void node_cleanup(struct mesh_net *net);
+diff --git a/meshd/src/storage.h b/meshd/src/storage.h
+new file mode 100644
+index 000000000..341932dba
+--- /dev/null
++++ b/meshd/src/storage.h
+@@ -0,0 +1,51 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2017-2918  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *
++ */
++
++struct mesh_net;
++
++bool storage_parse_config(struct mesh_net *net, const char *config_name);
++bool storage_save_config(struct mesh_net *net, const char *config_name,
++			bool no_wait, mesh_status_func_t cb, void *user_data);
++bool storage_save_new_config(struct mesh_net *net, const char *config_name,
++					mesh_status_func_t cb, void *user_data);
++void storage_release(struct mesh_net *net);
++
++bool storage_model_bind(struct mesh_net *net, uint16_t addr, uint32_t id,
++						uint16_t app_idx, bool unbind);
++
++bool storage_local_set_ttl(struct mesh_net *net, uint8_t ttl);
++bool storage_local_set_relay(struct mesh_net *net, bool enable, uint8_t count,
++							uint8_t interval);
++bool storage_local_set_transmit_params(struct mesh_net *net, uint8_t count,
++							uint8_t interval);
++bool storage_local_set_mode(struct mesh_net *net, uint8_t mode,
++							const char *mode_name);
++bool storage_local_net_key_add(struct mesh_net *net, uint16_t net_idx,
 +					const uint8_t key[16], int phase);
-+bool mesh_db_net_key_del(json_object *jobj, uint16_t net_idx);
-+bool mesh_db_write_kr_phase(json_object *jobj, uint16_t net_idx, int phase);
-+bool mesh_db_write_address(json_object *jobj, uint16_t address);
-+bool mesh_db_write_iv_index(json_object *jobj, uint32_t idx, bool update);
-+void mesh_db_remove_property(json_object *jobj, const char *desc);
++bool storage_local_net_key_del(struct mesh_net *net, uint16_t net_idx);
++bool storage_local_app_key_add(struct mesh_net *net, uint16_t net_idx,
++			uint16_t app_idx, const uint8_t key[16], bool update);
++bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
++							uint16_t app_idx);
++bool storage_local_write_sequence_number(struct mesh_net *net, uint32_t seq);
++bool storage_local_set_iv_index(struct mesh_net *net, uint32_t iv_index,
++								bool update);
++bool storage_local_set_device_key(struct mesh_net *net, uint8_t dev_key[16]);
++bool storage_local_set_unicast(struct mesh_net *net, uint16_t unicast);
 -- 
 2.14.3
 
