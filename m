@@ -2,9 +2,9 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH 7/7] Makefile for meshd and configure.ac
-Date: Wed, 25 Apr 2018 07:20:42 -0700
-Message-Id: <20180425142042.1262-8-brian.gix@intel.com>
+Subject: [PATCH 6/7] meshd: Sample device composition in JSON fromat
+Date: Wed, 25 Apr 2018 07:20:41 -0700
+Message-Id: <20180425142042.1262-7-brian.gix@intel.com>
 In-Reply-To: <20180425142042.1262-1-brian.gix@intel.com>
 References: <20180425142042.1262-1-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,88 +12,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Inga Stotland <inga.stotland@intel.com>
 
+This is a sample unprovisioned device composition described
+in JSON format.
 ---
- Makefile.am    |  1 +
- Makefile.meshd | 44 ++++++++++++++++++++++++++++++++++++++++++++
- configure.ac   |  2 +-
- 3 files changed, 46 insertions(+), 1 deletion(-)
- create mode 100644 Makefile.meshd
+ meshd/config/composition.json | 44 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
+ create mode 100644 meshd/config/composition.json
 
-diff --git a/Makefile.am b/Makefile.am
-index daf34b6ca..2a96fa1d3 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -225,6 +225,7 @@ unit_tests =
- include Makefile.tools
- include Makefile.obexd
- include android/Makefile.am
-+include Makefile.meshd
- 
- if HID2HCI
- rulesdir = @UDEV_DIR@/rules.d
-diff --git a/Makefile.meshd b/Makefile.meshd
+diff --git a/meshd/config/composition.json b/meshd/config/composition.json
 new file mode 100644
-index 000000000..4a9d45a12
+index 000000000..20c0d0c3a
 --- /dev/null
-+++ b/Makefile.meshd
++++ b/meshd/config/composition.json
 @@ -0,0 +1,44 @@
-+if MESH
-+mesh_json_sources = meshd/mesh-json/mesh-db.h meshd/mesh-json/mesh-db.c
-+mesh_common_sources = meshd/common/mesh-defs.h \
-+					meshd/common/util.h meshd/common/util.c
-+
-+meshd_sources = $(mesh_common_sources) $(mesh_json_sources) \
-+				meshd/src/mesh.h meshd/src/mesh.c \
-+				meshd/src/mesh-io.h meshd/src/mesh-io.c \
-+				meshd/src/mesh-io-api.h meshd/src/bt.h \
-+				meshd/src/mesh-io-generic.h \
-+				meshd/src/mesh-io-generic.c \
-+				meshd/src/hci.h meshd/src/hci.c \
-+				meshd/src/storage.h meshd/src/storage.c \
-+				meshd/src/net.h meshd/src/net.c \
-+				meshd/src/display.h meshd/src/display.c \
-+				meshd/src/crypto.h meshd/src/crypto.c \
-+				meshd/src/friend.h meshd/src/friend.c \
-+				meshd/src/appkeys.h meshd/src/appkey.c \
-+				meshd/src/node.h meshd/src/node.c \
-+				meshd/src/prov.h meshd/src/prov.c \
-+				meshd/src/provision.h meshd/src/provision.c \
-+				meshd/src/model.h meshd/src/model.c \
-+				meshd/src/cfgmod.h meshd/src/cfgmod-server.c
-+
-+libexec_PROGRAMS += meshd/src/meshd
-+
-+meshd_src_meshd_SOURCES = $(meshd_sources) \
-+						meshd/src/main.c
-+
-+meshd_src_meshd_LDADD = /usr/lib64/libell.la src/shared/ecc.lo \
-+			@DBUS_LIBS@ -lell -ljson-c -ldl
-+
-+noinst_PROGRAMS += meshd/src/btmesh
-+
-+meshd_src_btmesh_SOURCES = $(meshd_sources) \
-+						meshd/common/agent.h \
-+						meshd/common/agent.c \
-+						meshd/src/btmesh.c
-+
-+meshd_src_btmesh_LDADD = /usr/lib64/libell.la src/shared/ecc.lo \
-+						src/libshared-mainloop.la \
-+						-lreadline -lell -ljson-c -ldl
-+
-+endif
-diff --git a/configure.ac b/configure.ac
-index 5132131f2..f6259c0fe 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -248,7 +248,7 @@ AC_ARG_ENABLE(btpclient, AC_HELP_STRING([--enable-btpclient],
- 		[enable BTP client]), [enable_btpclient=${enableval}])
- AM_CONDITIONAL(BTPCLIENT, test "${enable_btpclient}" = "yes")
- 
--if (test "${enable_btpclient}" = "yes"); then
-+if (test "${enable_btpclient}" = "yes" || test "${enable_mesh}" == "yes"); then
- 	PKG_CHECK_MODULES(ELL, ell >= 0.3, dummy=yes,
- 			  AC_MSG_ERROR(ell library >= 0.3 is required))
- 	AC_SUBST(ELL_CFLAGS)
++{
++  "$schema":"file:\/\/\/BlueZ\/MeshD\/local_schema\/mesh.jsonschema",
++  "meshName":"BT Mesh sample node",
++  "UUID":"E0ED0F0200000000203C100200000000",
++  "cid":"0002",
++  "pid":"0010",
++  "vid":"0001",
++  "crpl":"000a",
++  "proxy":"unsupported",
++  "friend":"disabled",
++  "lowPower":"disabled",
++  "relay":{
++    "mode":"enabled"
++  },
++  "elements":[
++    {
++      "elementIndex":0,
++      "location":"0001",
++      "models":[
++        {
++          "modelId":"0000"
++        },
++        {
++          "modelId":"1001"
++        }
++      ]
++    }
++  ],
++  "provision": {
++    "privateKey": "729aa0670d72cd6497502ed473502b037e8803b5c60829a5a3caa219505530ba",
++    "algorithms": [ 0 ],
++	"inputOOB": {
++       "size": 8,
++       "actions": [ 2, 3]
++    },
++    "outputOOB": {
++      "size": 8,
++      "actions": [ 3, 4]
++    },
++    "publicType": false,
++    "staticType": false
++  },
++   }
++}
 -- 
 2.14.3
 
