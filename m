@@ -1,72 +1,99 @@
-Return-Path: <bgodavar@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Wed, 25 Apr 2018 20:49:29 +0530
-From: bgodavar@codeaurora.org
-To: Loic Poulain <loic.poulain@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "open list:BLUETOOTH DRIVERS"
- <linux-bluetooth@vger.kernel.org>, linux-arm-msm@vger.kernel.org,
- kkapra@codeaurora.org
-Subject: Re: [PATCH 2/2] Bluetooth: btqca: Add AR3002 rampatch support
-In-Reply-To: <CAMZdPi_khDRySWydoe577Q3vmDFzQY0SBzweJD60026Gb0d8Gw@mail.gmail.com>
-References: <1524506380-7417-1-git-send-email-loic.poulain@linaro.org>
- <1524506380-7417-2-git-send-email-loic.poulain@linaro.org>
- <B39D4D6F-96FB-442E-84D8-BEA603E7A053@holtmann.org>
- <CAMZdPi8ABhv8EDaE+afFpHexuMKjst5djiMt4HFoGqPNHs+akQ@mail.gmail.com>
- <f46651bdc4bdab38ec6f2b00b7fda142@codeaurora.org>
- <CAMZdPi_khDRySWydoe577Q3vmDFzQY0SBzweJD60026Gb0d8Gw@mail.gmail.com>
-Message-ID: <eec3a56977ca821c1e13537ab35b0c97@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Brian Gix <brian.gix@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH 7/7] Makefile for meshd and configure.ac
+Date: Wed, 25 Apr 2018 07:20:42 -0700
+Message-Id: <20180425142042.1262-8-brian.gix@intel.com>
+In-Reply-To: <20180425142042.1262-1-brian.gix@intel.com>
+References: <20180425142042.1262-1-brian.gix@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+From: Inga Stotland <inga.stotland@intel.com>
 
-On 2018-04-25 19:07, Loic Poulain wrote:
-> Hi Balakrishna,
-> 
-> On 25 April 2018 at 14:16,  <bgodavar@codeaurora.org> wrote:
->> 
->> Thank you for adding me to loop, is the header size of RAM patch file
->> remains same for ROME < 3.2 and ROME >= 3.2, what about the header 
->> format,
->> do we have same header format for different ROME versions, even 
->> mismatch of
->> header will not break any execution, but it may show wrong data in 
->> kernel
->> logs.
-> 
-> Yes, at least in my case, we just use byte 7 which was previously 
-> 'reserved':
-> 
->  struct edl_event_hdr {
-> @@ -94,7 +102,8 @@ struct tlv_type_patch {
->         __le32 data_length;
->         __u8   format_version;
->         __u8   signature;
-> -       __le16 reserved1;
-> +       __u8   download_mode;
-> +       __u8   reserved1;
->         __le16 product_id;
->         __le16 rom_build;
->         __le16 patch_version;
-> 
-> Regards,
-> Loic
+---
+ Makefile.am    |  1 +
+ Makefile.meshd | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac   |  2 +-
+ 3 files changed, 46 insertions(+), 1 deletion(-)
+ create mode 100644 Makefile.meshd
 
-A small suggestion from my side, suppose in near future ROME <v3.2 
-wanted to go with new format i.e. acknowledging for last segment of RAM 
-patch.
-then checking rom_build field may not work.
-i.e.
-if (le16_to_cpu(tlv_patch->rom_build) >= 0x0302)
-config->dnld_mode = tlv_patch->download_mode;
+diff --git a/Makefile.am b/Makefile.am
+index daf34b6ca..2a96fa1d3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -225,6 +225,7 @@ unit_tests =
+ include Makefile.tools
+ include Makefile.obexd
+ include android/Makefile.am
++include Makefile.meshd
+ 
+ if HID2HCI
+ rulesdir = @UDEV_DIR@/rules.d
+diff --git a/Makefile.meshd b/Makefile.meshd
+new file mode 100644
+index 000000000..4a9d45a12
+--- /dev/null
++++ b/Makefile.meshd
+@@ -0,0 +1,44 @@
++if MESH
++mesh_json_sources = meshd/mesh-json/mesh-db.h meshd/mesh-json/mesh-db.c
++mesh_common_sources = meshd/common/mesh-defs.h \
++					meshd/common/util.h meshd/common/util.c
++
++meshd_sources = $(mesh_common_sources) $(mesh_json_sources) \
++				meshd/src/mesh.h meshd/src/mesh.c \
++				meshd/src/mesh-io.h meshd/src/mesh-io.c \
++				meshd/src/mesh-io-api.h meshd/src/bt.h \
++				meshd/src/mesh-io-generic.h \
++				meshd/src/mesh-io-generic.c \
++				meshd/src/hci.h meshd/src/hci.c \
++				meshd/src/storage.h meshd/src/storage.c \
++				meshd/src/net.h meshd/src/net.c \
++				meshd/src/display.h meshd/src/display.c \
++				meshd/src/crypto.h meshd/src/crypto.c \
++				meshd/src/friend.h meshd/src/friend.c \
++				meshd/src/appkeys.h meshd/src/appkey.c \
++				meshd/src/node.h meshd/src/node.c \
++				meshd/src/prov.h meshd/src/prov.c \
++				meshd/src/provision.h meshd/src/provision.c \
++				meshd/src/model.h meshd/src/model.c \
++				meshd/src/cfgmod.h meshd/src/cfgmod-server.c
++
++libexec_PROGRAMS += meshd/src/meshd
++
++meshd_src_meshd_SOURCES = $(meshd_sources) \
++						meshd/src/main.c
++
++meshd_src_meshd_LDADD = /usr/lib64/libell.la src/shared/ecc.lo \
++			@DBUS_LIBS@ -lell -ljson-c -ldl
++
++noinst_PROGRAMS += meshd/src/btmesh
++
++meshd_src_btmesh_SOURCES = $(meshd_sources) \
++						meshd/common/agent.h \
++						meshd/common/agent.c \
++						meshd/src/btmesh.c
++
++meshd_src_btmesh_LDADD = /usr/lib64/libell.la src/shared/ecc.lo \
++						src/libshared-mainloop.la \
++						-lreadline -lell -ljson-c -ldl
++
++endif
+diff --git a/configure.ac b/configure.ac
+index 5132131f2..f6259c0fe 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -248,7 +248,7 @@ AC_ARG_ENABLE(btpclient, AC_HELP_STRING([--enable-btpclient],
+ 		[enable BTP client]), [enable_btpclient=${enableval}])
+ AM_CONDITIONAL(BTPCLIENT, test "${enable_btpclient}" = "yes")
+ 
+-if (test "${enable_btpclient}" = "yes"); then
++if (test "${enable_btpclient}" = "yes" || test "${enable_mesh}" == "yes"); then
+ 	PKG_CHECK_MODULES(ELL, ell >= 0.3, dummy=yes,
+ 			  AC_MSG_ERROR(ell library >= 0.3 is required))
+ 	AC_SUBST(ELL_CFLAGS)
+-- 
+2.14.3
 
-i suggest you to check the byte download_mode directly and decide to 
-wait for ACK from SoC, for every RAM patch segment sent.
-i think byte download_mode is explicitly for mode of downloading the 
-patch i.e. with ACK or NACK. (pls double confirm about this byte).
-
-This is how we are doing for wcn3990 (in Add support wcn3990 patch).
-
-Regards
-Balakrishna.
