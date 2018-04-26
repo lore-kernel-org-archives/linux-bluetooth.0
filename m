@@ -1,48 +1,44 @@
 Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH] Revert "Bluetooth: btusb: Fix quirk for Atheros
+ 1525/QCA6174"
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ stable@vger.kernel.org, Takashi Iwai <tiwai@suse.de>
+References: <20180426121819.23327-1-hdegoede@redhat.com>
+ <85CF4178-2D2E-49D6-8837-EBD36623DFEE@holtmann.org>
 From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	Jeremy Cline <jeremy@jcline.org>,
-	linux-bluetooth@vger.kernel.org,
-	stable@vger.kernel.org,
-	Garrett LeSage <glesage@redhat.com>
-Subject: [PATCH] Bluetooth: btusb: Add Dell XPS 13 9360 to btusb_needs_reset_resume_table
-Date: Thu, 26 Apr 2018 20:52:06 +0200
-Message-Id: <20180426185206.29508-1-hdegoede@redhat.com>
+Message-ID: <009e5572-3766-f634-43be-7a3fce9ccfd8@redhat.com>
+Date: Thu, 26 Apr 2018 20:28:46 +0200
+MIME-Version: 1.0
+In-Reply-To: <85CF4178-2D2E-49D6-8837-EBD36623DFEE@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Dell XPS 13 9360 uses a QCA Rome chip which needs to be reset
-(and have its firmware reloaded) for bluetooth to work after
-suspend/resume.
+Hi,
 
-BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
-Cc: stable@vger.kernel.org
-Cc: Garrett LeSage <glesage@redhat.com>
-Reported-and-tested-by: Garrett LeSage <glesage@redhat.com>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/btusb.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+On 26-04-18 14:22, Marcel Holtmann wrote:
+> Hi Hans,
+> 
+>> Commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros
+>> 1525/QCA6174") is causing bluetooth to no longer work for several
+>> people, see: https://bugzilla.redhat.com/show_bug.cgi?id=1568911
+>>
+>> So lets revert it for now and try to find another solution for
+>> devices which need the modified quirk.
+>>
+>> Cc: stable@vger.kernel.org
+>> Cc: Takashi Iwai <tiwai@suse.de>
+>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+>> ---
+>> drivers/bluetooth/btusb.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> patch has been applied to bluetooth-next tree.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ee31c997e695..55693648b211 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -399,6 +399,13 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
- 			DMI_MATCH(DMI_PRODUCT_NAME, "OptiPlex 3060"),
- 		},
- 	},
-+	{
-+		/* Dell XPS 9360 (QCA ROME device 0cf3:e300) */
-+		.matches = {
-+			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc."),
-+			DMI_MATCH(DMI_PRODUCT_NAME, "XPS 13 9360"),
-+		},
-+	},
- 	{}
- };
- 
--- 
-2.17.0
+This is a regression fix, so can we please get this into 4.17-rc#
+so that Greg can then take it into 4.16.z ?
+
+Thanks,
+
+Hans
