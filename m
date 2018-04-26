@@ -2,35 +2,38 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH v3 1/2] Bluetooth: Add __hci_cmd_send function
+Subject: Re: [PATCH] Revert "Bluetooth: btusb: Fix quirk for Atheros
+ 1525/QCA6174"
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1524741207-19753-1-git-send-email-loic.poulain@linaro.org>
-Date: Thu, 26 Apr 2018 14:22:29 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, bgodavar@codeaurora.org
-Message-Id: <B5F4518D-AA16-486F-BDAD-35C9394D2A89@holtmann.org>
-References: <1524741207-19753-1-git-send-email-loic.poulain@linaro.org>
-To: Loic Poulain <loic.poulain@linaro.org>
+In-Reply-To: <20180426121819.23327-1-hdegoede@redhat.com>
+Date: Thu, 26 Apr 2018 14:22:01 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
+        Takashi Iwai <tiwai@suse.de>
+Message-Id: <85CF4178-2D2E-49D6-8837-EBD36623DFEE@holtmann.org>
+References: <20180426121819.23327-1-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Hans,
 
-> This function allows to send a HCI command without expecting any
-> controller event/response in return. This is allowed for vendor-
-> specific commands only.
+> Commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros
+> 1525/QCA6174") is causing bluetooth to no longer work for several
+> people, see: https://bugzilla.redhat.com/show_bug.cgi?id=1568911
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@linaro.org>
+> So lets revert it for now and try to find another solution for
+> devices which need the modified quirk.
+> 
+> Cc: stable@vger.kernel.org
+> Cc: Takashi Iwai <tiwai@suse.de>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 > ---
-> v2: Only allow vendor-specific command to be unresponded
->     Rename function to __hci_cmd_send
-> v3: no change
-> 
-> include/net/bluetooth/hci_core.h |  2 ++
-> net/bluetooth/hci_core.c         | 31 +++++++++++++++++++++++++++++++
-> 2 files changed, 33 insertions(+)
+> drivers/bluetooth/btusb.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-both patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
