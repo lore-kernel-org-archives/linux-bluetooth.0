@@ -1,695 +1,727 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Thu, 26 Apr 2018 15:38:06 +0800
-From: kbuild test robot <lkp@intel.com>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: kbuild-all@01.org, marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, hemantg@codeaurora.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: Re: [PATCH v3 2/2] Bluetooth: Add support for wcn3990 soc.
-Message-ID: <201804261223.lHxB3BZq%fengguang.wu@intel.com>
-References: <1524579073-21572-3-git-send-email-bgodavar@codeaurora.org>
+Return-Path: <sean.wang@mediatek.com>
+Message-ID: <1524728068.12322.125.camel@mtkswgap22>
+Subject: Re: [PATCH v1 6/7] Bluetooth: hci_mediatek: Add protocol support
+ for MediaTek serial devices
+From: Sean Wang <sean.wang@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: <robh+dt@kernel.org>, <mark.rutland@arm.com>, Johan Hedberg
+	<johan.hedberg@gmail.com>, <devicetree@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Date: Thu, 26 Apr 2018 15:34:28 +0800
+In-Reply-To: <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
+References: <cover.1522736996.git.sean.wang@mediatek.com>
+	 <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
+	 <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="xHFwDpU9dbj6ez1V"
-In-Reply-To: <1524579073-21572-3-git-send-email-bgodavar@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+On Tue, 2018-04-03 at 12:27 +0200, Marcel Holtmann wrote:
+> Hi Sean,
+> 
+> > This adds a driver for the MediaTek serial protocol based on H4 protocol,
+> > which can enable the built-in Bluetooth device inside MT7622 SoC.
+> > 
+> > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> > ---
+> > drivers/bluetooth/Kconfig        |  12 +
+> > drivers/bluetooth/Makefile       |   1 +
+> > drivers/bluetooth/hci_mediatek.c | 499 +++++++++++++++++++++++++++++++++++++++
+> > drivers/bluetooth/hci_uart.h     |   3 +-
+> > 4 files changed, 514 insertions(+), 1 deletion(-)
+> > create mode 100644 drivers/bluetooth/hci_mediatek.c
+> > 
+> > diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+> > index 010f5f5..851f430 100644
+> > --- a/drivers/bluetooth/Kconfig
+> > +++ b/drivers/bluetooth/Kconfig
+> > @@ -104,6 +104,18 @@ config BT_HCIUART_H4
+> > 
+> > 	  Say Y here to compile support for HCI UART (H4) protocol.
+> > 
+> > +config BT_HCIUART_MEDIATEK
+> > +	tristate "MediaTek protocol support"
+> > +	depends on BT_HCIUART_SERDEV
+> > +	select BT_HCIUART_H4
+> > +	help
+> > +	  The MediaTek protocol based on H4 enables patch firmware download and
+> > +	  configuration. This protocol is required for MediaTek Bluetooth
+> > +	  devices with a serial bus such as BTIF, which can be usually found on
+> > +	  various MediaTek SoCs.
+> > +
+> > +	  Say Y here to compile support for MediaTek protocol.
+> > +
+> > config BT_HCIUART_NOKIA
+> > 	tristate "UART Nokia H4+ protocol support"
+> > 	depends on BT_HCIUART
+> > diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+> > index ec16c55..db93c76 100644
+> > --- a/drivers/bluetooth/Makefile
+> > +++ b/drivers/bluetooth/Makefile
+> > @@ -43,5 +43,6 @@ hci_uart-$(CONFIG_BT_HCIUART_INTEL)	+= hci_intel.o
+> > hci_uart-$(CONFIG_BT_HCIUART_BCM)	+= hci_bcm.o
+> > hci_uart-$(CONFIG_BT_HCIUART_QCA)	+= hci_qca.o
+> > hci_uart-$(CONFIG_BT_HCIUART_AG6XX)	+= hci_ag6xx.o
+> > +hci_uart-$(CONFIG_BT_HCIUART_MEDIATEK)  += hci_mediatek.o
+> 
+> we used when available the 3 letter short version of the manufacture. So this would be MTK and hci_mtk.o in this case. Not that I care that much.
+> 
 
---xHFwDpU9dbj6ez1V
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+sure, i can use hci_mtk.o instead of the long one.
 
-Hi Balakrishna,
+> > hci_uart-$(CONFIG_BT_HCIUART_MRVL)	+= hci_mrvl.o
+> > hci_uart-objs				:= $(hci_uart-y)
+> > diff --git a/drivers/bluetooth/hci_mediatek.c b/drivers/bluetooth/hci_mediatek.c
+> > new file mode 100644
+> > index 0000000..7ac1e7a
+> > --- /dev/null
+> > +++ b/drivers/bluetooth/hci_mediatek.c
+> > @@ -0,0 +1,499 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +// Copyright (c) 2018 MediaTek Inc.
+> > +
+> > +/*
+> > + * Bluetooth HCI Serial driver for MediaTek SoC
+> > + *
+> > + * Author: Sean Wang <sean.wang@mediatek.com>
+> > + *
+> > + */
+> > +
+> > +#include <linux/clk.h>
+> > +#include <linux/errno.h>
+> > +#include <linux/firmware.h>
+> > +#include <linux/kernel.h>
+> > +#include <linux/module.h>
+> > +#include <linux/of.h>
+> > +#include <linux/pm_runtime.h>
+> > +#include <linux/unaligned/le_struct.h>
+> > +#include <linux/serdev.h>
+> > +#include <linux/skbuff.h>
+> > +#include <linux/types.h>
+> > +#include <net/bluetooth/bluetooth.h>
+> > +#include <net/bluetooth/hci_core.h>
+> > +
+> > +#include "hci_uart.h"
+> > +
+> > +#define FIRMWARE_MT7622		"mediatek/mt7622_patch_firmware.bin”
+> 
+> Has this firmware already been submitted to linux-firmware tree?
+> 
 
-Thank you for the patch! Yet something to improve:
+I didn't submit this firmware yet into linux-firmware. But I will do it
+eventually.
 
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on next-20180424]
-[cannot apply to v4.17-rc2]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+Currently, it still takes some time to tweak the firmware before make it
+release, so I let driver go first to see if the driver can get any idea
+for becoming better. 
 
-url:    https://github.com/0day-ci/linux/commits/Balakrishna-Godavarthi/Enable-Bluetooth-functionality-for-WCN3990/20180426-103256
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-config: x86_64-randconfig-x000-201816 (attached as .config)
-compiler: gcc-7 (Debian 7.3.0-16) 7.3.0
-reproduce:
-        # save the attached .config to linux build tree
-        make ARCH=x86_64 
+> > +
+> > +#define MTK_STP_HDR_SIZE	4
+> > +#define MTK_STP_TLR_SIZE	2
+> > +#define MTK_WMT_HDR_SIZE	5
+> > +#define MTK_WMT_CMD_SIZE	(MTK_WMT_HDR_SIZE + MTK_STP_HDR_SIZE + \
+> > +				 MTK_STP_TLR_SIZE + HCI_ACL_HDR_SIZE)
+> > +
+> > +enum {
+> > +	MTK_WMT_PATCH_DWNLD = 0x1,
+> > +	MTK_WMT_FUNC_CTRL = 0x6,
+> > +	MTK_WMT_RST = 0x7
+> > +};
+> > +
+> > +struct mtk_stp_splitter {
+> > +	u8	pad[6];
+> > +	u8	cursor;
+> > +	u16	dlen;
+> > +};
+> > +
+> > +struct mtk_bt_dev {
+> > +	struct hci_uart hu;
+> > +	struct clk *clk;
+> > +	struct sk_buff *rx_skb;
+> > +	struct sk_buff_head txq;
+> > +	struct completion wmt_cmd;
+> > +	struct mtk_stp_splitter *sp;
+> > +};
+> > +
+> > +struct mtk_stp_hdr {
+> > +	__u8 prefix;
+> > +	__u8 dlen1:4;
+> > +	__u8 type:4;
+> > +	__u8 dlen2:8;
+> > +	__u8 cs;
+> > +} __packed;
+> > +
+> > +struct mtk_wmt_hdr {
+> > +	__u8	dir;
+> > +	__u8	op;
+> > +	__le16	dlen;
+> > +	__u8	flag;
+> > +} __packed;
+> > +
+> > +static void mtk_stp_reset(struct mtk_stp_splitter *sp)
+> > +{
+> > +	sp->cursor = 2;
+> > +	sp->dlen = 0;
+> > +}
+> > +
+> > +static const unsigned char *
+> > +mtk_stp_split(struct device *dev, struct mtk_stp_splitter *sp,
+> > +	      const unsigned char *data, int count, int *sz_h4)
+> > +{
+> > +	struct mtk_stp_hdr *shdr;
+> > +
+> > +	/* The cursor is reset when all the data of STP is being consumed. */
+> > +	if (!sp->dlen && sp->cursor >= 6)
+> > +		sp->cursor = 0;
+> > +
+> > +	/* Filling pad until all STP info is obtained. */
+> > +	while (sp->cursor < 6 && count > 0) {
+> > +		sp->pad[sp->cursor] = *data;
+> > +		sp->cursor++;
+> > +		data++;
+> > +		count--;
+> > +	}
+> > +
+> > +	/* Retrieve STP info and have a sanity check. */
+> > +	if (!sp->dlen && sp->cursor >= 6) {
+> > +		shdr = (struct mtk_stp_hdr *)&sp->pad[2];
+> > +		sp->dlen = shdr->dlen1 << 8 | shdr->dlen2;
+> > +
+> > +		/* Resync STP when unexpected data is being read. */
+> > +		if (shdr->prefix != 0x80 || sp->dlen > 2048) {
+> > +			dev_err(dev, "stp format unexpect (%d, %d)",
+> > +				shdr->prefix, sp->dlen);
+> > +			mtk_stp_reset(sp);
+> > +		}
+> > +	}
+> > +
+> > +	/* Directly leave when there's no data found for H4 can process. */
+> > +	if (count <= 0)
+> > +		return NULL;
+> > +
+> > +	/* Tranlate to how much the size of data H4 can handle so far. */
+> > +	*sz_h4 = min_t(int, count, sp->dlen);
+> > +	/* Update remaining the size of STP packet. */
+> > +	sp->dlen -= *sz_h4;
+> > +
+> > +	/* Data points to STP payload which can be handled by H4. */
+> > +	return data;
+> > +}
+> > +
+> > +static void mtk_stp_hdr_build(struct mtk_stp_hdr *shdr, u8 type, u32 dlen)
+> > +{
+> > +	__u8 *p = (__u8 *)shdr;
+> > +
+> > +	shdr->prefix = 0x80;
+> > +	shdr->dlen1 = (dlen & 0xf00) >> 8;
+> > +	shdr->type = type;
+> > +	shdr->dlen2 = dlen & 0xff;
+> > +	shdr->cs = (p[0] + p[1] + p[2]) & 0xff;
+> > +}
+> > +
+> > +static int mtk_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+> > +{
+> > +	struct mtk_bt_dev *btdev = hu->priv;
+> > +	struct mtk_stp_hdr *shdr;
+> > +	struct sk_buff *new_skb;
+> > +	int dlen;
+> > +
+> > +	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+> > +	dlen = skb->len;
+> > +
+> > +	/* Make sure of STP header at least has 4-bytes free space to fill. */
+> > +	if (unlikely(skb_headroom(skb) < MTK_STP_HDR_SIZE)) {
+> > +		new_skb = skb_realloc_headroom(skb, MTK_STP_HDR_SIZE);
+> > +		kfree_skb(skb);
+> > +		skb = new_skb;
+> > +	}
+> > +
+> > +	/* Build for STP packet format. */
+> > +	shdr = skb_push(skb, MTK_STP_HDR_SIZE);
+> > +	mtk_stp_hdr_build(shdr, 0, dlen);
+> > +	skb_put_zero(skb, MTK_STP_TLR_SIZE);
+> > +
+> > +	skb_queue_tail(&btdev->txq, skb);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int mtk_wmt_cmd_sync(struct hci_uart *hu, u8 opcode, u8 flag, u16 plen,
+> > +			    const void *param)
+> > +{
+> > +	struct mtk_bt_dev *btdev = hu->priv;
+> > +	struct hci_command_hdr *hhdr;
+> > +	struct hci_acl_hdr *ahdr;
+> > +	struct mtk_wmt_hdr *whdr;
+> > +	struct sk_buff *skb;
+> > +	int ret = 0;
+> > +
+> > +	init_completion(&btdev->wmt_cmd);
+> > +
+> > +	skb = bt_skb_alloc(plen + MTK_WMT_CMD_SIZE, GFP_KERNEL);
+> > +	if (!skb)
+> > +		return -ENOMEM;
+> > +
+> > +	/*
+> > +	 * WMT data is carried in either ACL or HCI format with op code as
+> > +	 * 0xfc6f and followed by a WMT header and its actual payload.
+> > +	 */
+> 
+> Please use net subsystem comment style.
+> 
 
-All error/warnings (new ones prefixed by >>):
+Sure, I will use net subsystem comment style.
 
-   In file included from drivers//bluetooth/hci_qca.c:38:0:
-   drivers//bluetooth/hci_qca.c: In function 'qca_serdev_open':
->> include/net/bluetooth/bluetooth.h:146:9: warning: format '%s' expects a matching 'char *' argument [-Wformat=]
-     BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-            ^
-   include/net/bluetooth/bluetooth.h:136:33: note: in definition of macro 'BT_ERR'
-    #define BT_ERR(fmt, ...) bt_err(fmt "\n", ##__VA_ARGS__)
-                                    ^~~
->> drivers//bluetooth/hci_qca.c:1041:3: note: in expansion of macro 'bt_dev_err'
-      bt_dev_err(hu->hdev, "%s:open operation not supported");
-      ^~~~~~~~~~
-   drivers//bluetooth/hci_qca.c:1041:26: note: format string is defined here
-      bt_dev_err(hu->hdev, "%s:open operation not supported");
-                            ~^
-   drivers//bluetooth/hci_qca.c: In function 'qca_serdev_probe':
->> drivers//bluetooth/hci_qca.c:1334:7: warning: assignment discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-     data = of_device_get_match_data(&serdev->dev);
-          ^
-   drivers//bluetooth/hci_qca.c: In function 'btqca_power_setup':
->> drivers//bluetooth/hci_qca.c:1288:4: warning: ignoring return value of 'regulator_enable', declared with attribute warn_unused_result [-Wunused-result]
-       regulator_enable(qca->vreg_bulk[i].consumer);
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
---
-   drivers//bluetooth/btqca.c: In function 'cherokee_tlv_check_data':
->> drivers//bluetooth/btqca.c:154:13: error: assignment from incompatible pointer type [-Werror=incompatible-pointer-types]
-      tlv_patch = (struct tlv_type_patch *)tlv->data;
-                ^
-   In file included from drivers//bluetooth/btqca.c:22:0:
-   drivers//bluetooth/btqca.c: In function 'cherokee_download_firmware':
->> include/net/bluetooth/bluetooth.h:142:10: warning: too many arguments for format [-Wformat-extra-args]
-     BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-             ^
-   include/net/bluetooth/bluetooth.h:134:35: note: in definition of macro 'BT_INFO'
-    #define BT_INFO(fmt, ...) bt_info(fmt "\n", ##__VA_ARGS__)
-                                      ^~~
->> drivers//bluetooth/btqca.c:408:2: note: in expansion of macro 'bt_dev_info'
-     bt_dev_info(hdev, "wcn3990  Downloading", config->fwname);
-     ^~~~~~~~~~~
-   cc1: some warnings being treated as errors
---
-   In file included from drivers/bluetooth/hci_qca.c:38:0:
-   drivers/bluetooth/hci_qca.c: In function 'qca_serdev_open':
->> include/net/bluetooth/bluetooth.h:146:9: warning: format '%s' expects a matching 'char *' argument [-Wformat=]
-     BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-            ^
-   include/net/bluetooth/bluetooth.h:136:33: note: in definition of macro 'BT_ERR'
-    #define BT_ERR(fmt, ...) bt_err(fmt "\n", ##__VA_ARGS__)
-                                    ^~~
-   drivers/bluetooth/hci_qca.c:1041:3: note: in expansion of macro 'bt_dev_err'
-      bt_dev_err(hu->hdev, "%s:open operation not supported");
-      ^~~~~~~~~~
-   drivers/bluetooth/hci_qca.c:1041:26: note: format string is defined here
-      bt_dev_err(hu->hdev, "%s:open operation not supported");
-                            ~^
-   drivers/bluetooth/hci_qca.c: In function 'qca_serdev_probe':
-   drivers/bluetooth/hci_qca.c:1334:7: warning: assignment discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
-     data = of_device_get_match_data(&serdev->dev);
-          ^
-   drivers/bluetooth/hci_qca.c: In function 'btqca_power_setup':
-   drivers/bluetooth/hci_qca.c:1288:4: warning: ignoring return value of 'regulator_enable', declared with attribute warn_unused_result [-Wunused-result]
-       regulator_enable(qca->vreg_bulk[i].consumer);
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
---
-   drivers/bluetooth/btqca.c: In function 'cherokee_tlv_check_data':
-   drivers/bluetooth/btqca.c:154:13: error: assignment from incompatible pointer type [-Werror=incompatible-pointer-types]
-      tlv_patch = (struct tlv_type_patch *)tlv->data;
-                ^
-   In file included from drivers/bluetooth/btqca.c:22:0:
-   drivers/bluetooth/btqca.c: In function 'cherokee_download_firmware':
->> include/net/bluetooth/bluetooth.h:142:10: warning: too many arguments for format [-Wformat-extra-args]
-     BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-             ^
-   include/net/bluetooth/bluetooth.h:134:35: note: in definition of macro 'BT_INFO'
-    #define BT_INFO(fmt, ...) bt_info(fmt "\n", ##__VA_ARGS__)
-                                      ^~~
-   drivers/bluetooth/btqca.c:408:2: note: in expansion of macro 'bt_dev_info'
-     bt_dev_info(hdev, "wcn3990  Downloading", config->fwname);
-     ^~~~~~~~~~~
-   cc1: some warnings being treated as errors
+> > +	switch (opcode) {
+> > +	case MTK_WMT_PATCH_DWNLD:
+> > +		ahdr = skb_put(skb, HCI_ACL_HDR_SIZE);
+> > +		ahdr->handle = cpu_to_le16(0xfc6f);
+> > +		ahdr->dlen   = cpu_to_le16(plen + MTK_WMT_HDR_SIZE);
+> > +		break;
+> > +	default:
+> > +		hhdr = skb_put(skb, HCI_COMMAND_HDR_SIZE);
+> > +		hhdr->opcode = cpu_to_le16(0xfc6f);
+> > +		hhdr->plen = plen + MTK_WMT_HDR_SIZE;
+> > +		break;
+> > +	}
+> > +
+> > +	hci_skb_pkt_type(skb) = opcode == MTK_WMT_PATCH_DWNLD ?
+> > +				HCI_ACLDATA_PKT : HCI_COMMAND_PKT;
+> 
+> Why not move that into the switch statement above.
+> 
 
-vim +146 include/net/bluetooth/bluetooth.h
+Sure, I will merge it into the switch statement.
 
-e781b7f7 Szymon Janc    2015-09-16  140  
-6f558b70 Loic Poulain   2015-08-30  141  #define bt_dev_info(hdev, fmt, ...)				\
-6f558b70 Loic Poulain   2015-08-30 @142  	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-594b31ea Frederic Danis 2015-09-23  143  #define bt_dev_warn(hdev, fmt, ...)				\
-594b31ea Frederic Danis 2015-09-23  144  	BT_WARN("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-6f558b70 Loic Poulain   2015-08-30  145  #define bt_dev_err(hdev, fmt, ...)				\
-6f558b70 Loic Poulain   2015-08-30 @146  	BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-6f558b70 Loic Poulain   2015-08-30  147  #define bt_dev_dbg(hdev, fmt, ...)				\
-6f558b70 Loic Poulain   2015-08-30  148  	BT_DBG("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-6f558b70 Loic Poulain   2015-08-30  149  
+> > +
+> > +	/* Start to build a WMT header and its actual payload. */
+> > +	whdr = skb_put(skb, MTK_WMT_HDR_SIZE);
+> > +	whdr->dir = 1;
+> > +	whdr->op = opcode;
+> > +	whdr->dlen = cpu_to_le16(plen + 1);
+> > +	whdr->flag = flag;
+> > +	skb_put_data(skb, param, plen);
+> > +
+> > +	mtk_enqueue(hu, skb);
+> > +	hci_uart_tx_wakeup(hu);
+> > +
+> > +	/*
+> > +	 * Waiting a WMT event response, while we must take care in case of
+> > +	 * failures for the wait.
+> > +	 */
+> > +	ret = wait_for_completion_interruptible_timeout(&btdev->wmt_cmd, HZ);
+> > +
+> > +	return ret > 0 ? 0 : ret < 0 ? ret : -ETIMEDOUT;
+> > +}
+> 
+> All in all I am not convinced that this is super clean. I get that we need something special for having this in the ACL data packets, but for the standard HCI command I prefer that __hci_cmd_sync is used. I addition, it seems that patch download is the only special case and that happens before at the setup stage. So we could make things special for that. I need to understand this a bit better. Can I get a btmon -w trace.log file from the whole init procedure.
+> 
+> 
 
-:::::: The code at line 146 was first introduced by commit
-:::::: 6f558b70fb39fc8272fc513ecf191b3ad87d867b Bluetooth: Add bt_dev logging macros
+I can try to use __hci_cmd_sync to send those chip-specific hci commands
+which only can be recognized by the chip, but no meaningful to bluez
+core.
 
-:::::: TO: Loic Poulain <loic.poulain@intel.com>
-:::::: CC: Marcel Holtmann <marcel@holtmann.org>
+Is btmon able to capture these cmd/evt between driver and device?
 
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+my question's caused by that mtk_wmt_cmd_sync and its events only happen
+between driver and device,  it doesn't go to core.
 
---xHFwDpU9dbj6ez1V
-Content-Type: application/gzip
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
+> > +
+> > +static int mtk_setup_fw(struct hci_uart *hu)
+> > +{
+> > +	struct mtk_bt_dev *btdev = hu->priv;
+> > +	const struct firmware *fw;
+> > +	struct device *dev;
+> > +	const char *fwname;
+> > +	const u8 *fw_ptr;
+> > +	size_t fw_size;
+> > +	int err, dlen;
+> > +	u8 flag;
+> > +
+> > +	dev = &hu->serdev->dev;
+> > +	fwname = FIRMWARE_MT7622;
+> > +
+> > +	init_completion(&btdev->wmt_cmd);
+> > +
+> > +	err = request_firmware(&fw, fwname, dev);
+> > +	if (err < 0) {
+> > +		dev_err(dev, "%s: Failed to load firmware file (%d)",
+> > +			hu->hdev->name, err);
+> > +		return err;
+> > +	}
+> > +
+> > +	fw_ptr = fw->data;
+> > +	fw_size = fw->size;
+> > +
+> > +	/* The size of a patch header at least has 30 bytes. */
+> > +	if (fw_size < 30)
+> > +		return -EINVAL;
+> > +
+> > +	while (fw_size > 0) {
+> > +		dlen = min_t(int, 1000, fw_size);
+> > +
+> > +		/* Tell deivice the position in sequence. */
+> > +		flag = (fw_size - dlen <= 0) ? 3 :
+> > +		       (fw_size < fw->size) ? 2 : 1;
+> > +
+> > +		err = mtk_wmt_cmd_sync(hu, MTK_WMT_PATCH_DWNLD, flag,
+> > +				       dlen, fw_ptr);
+> > +		if (err < 0)
+> > +			break;
+> > +
+> > +		fw_size -= dlen;
+> > +		fw_ptr += dlen;
+> > +	}
+> > +
+> > +	release_firmware(fw);
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +static int mtk_open(struct hci_uart *hu)
+> > +{
+> > +	struct mtk_bt_dev *btdev = hu->priv;
+> > +	struct device *dev;
+> > +	int err = 0;
+> > +
+> > +	dev = &hu->serdev->dev;
+> > +
+> > +	serdev_device_open(hu->serdev);
+> > +	skb_queue_head_init(&btdev->txq);
+> > +
+> > +	/* Setup the usage of H4. */
+> > +	hu->alignment = 1;
+> > +	hu->padding = 0;
+> > +	mtk_stp_reset(btdev->sp);
+> > +
+> > +	/* Enable the power domain and clock the device requires */
+> > +	pm_runtime_enable(dev);
+> > +	err = pm_runtime_get_sync(dev);
+> > +	if (err < 0) {
+> > +		pm_runtime_disable(dev);
+> > +		return err;
+> > +	}
+> > +
+> > +	err = clk_prepare_enable(btdev->clk);
+> > +	if (err < 0) {
+> > +		pm_runtime_put_sync(dev);
+> > +		pm_runtime_disable(dev);
+> > +	}
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +static int mtk_close(struct hci_uart *hu)
+> > +{
+> > +	struct mtk_bt_dev *btdev = hu->priv;
+> > +	struct device *dev = &hu->serdev->dev;
+> > +	u8 param = 0x0;
+> > +
+> > +	skb_queue_purge(&btdev->txq);
+> > +	kfree_skb(btdev->rx_skb);
+> > +
+> > +	/* Disable the device. */
+> > +	mtk_wmt_cmd_sync(hu, MTK_WMT_FUNC_CTRL, 0x0, sizeof(param), &param);
+> 
+> Wouldn’t this require a enable device in open callback?
+> 
 
-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
-Go3OFBVsD3Tust+4dpqcPZiB+z/SwE+2VcEBAA==
+It's another story ...
 
---xHFwDpU9dbj6ez1V--
+At initial time I began working on the driver. I indeed made the
+mtk_open and mtk_close be consistent, but it's required a few patches
+for core to solve a problem: 
+
+The problem is that hci_uart resource CAN'T be used in mtk_open to send
+these specific command taking to the chip since hci_uart_proto->open()
+would be called much earlier in hci_uart_register_device at which
+hci_uart is even not being allocated yet. 
+
+So, in the first version I want to make thing be simple, instead, I only
+hold mtk_open is doing platform stuff such as clock enablement, and
+power enablement and any other thing about configuring chip all is moved
+to setup handler.
+
+> > +
+> > +	/* Shutdown the clock and power domain the device requires. */
+> > +	clk_disable_unprepare(btdev->clk);
+> > +
+> > +	pm_runtime_put_sync(dev);
+> > +	pm_runtime_disable(dev);
+> > +
+> > +	serdev_device_close(hu->serdev);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +int mtk_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+> > +{
+> > +	struct hci_event_hdr *hdr = (void *)skb->data;
+> > +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> > +	struct mtk_bt_dev *btdev = hu->priv;
+> > +
+> > +	if (hci_skb_pkt_type(skb) == HCI_EVENT_PKT &&
+> > +	    hdr->evt == 0xe4) {
+> > +		complete(&btdev->wmt_cmd);
+> > +		kfree_skb(skb);
+> > +		return 0;
+> > +	}
+> > +
+> > +	return hci_recv_frame(hdev, skb);
+> > +}
+> 
+> actually this is overdoing it. You can use hci_recv_frame for ACL and SCO and just a special one for events. However all in all I question the need for the special handling anyway. As I said above, I have the feeling this can be done via __hci_cmd_sync or __hci_cmd_sync_ev. So I really like to see a btmon -w trace.log for these so that I can see how they look.
+
+in the next version, I would only use a special way for events; ACL and
+SCO can just use a generic way. 
+
+BTW, add more words for the mtk_recv_frame what it's doing for
+
+* The special handling with hdr->evt 0xe4 in mtk_recv_frame is
+corresponding to mtk_wmt_cmd_sync.
+
+* It is expected to not to propagate the chip-specific events to bluez
+core since it's only meaningful data between driver and device.
+
+
+> > +
+> > +static const struct h4_recv_pkt mtk_recv_pkts[] = {
+> > +	{ H4_RECV_ACL,		.recv = mtk_recv_frame },
+> > +	{ H4_RECV_SCO,		.recv = mtk_recv_frame },
+> > +	{ H4_RECV_EVENT,	.recv = mtk_recv_frame },
+> > +};
+> > +
+> > +static int mtk_recv(struct hci_uart *hu, const void *data, int count)
+> > +{
+> > +	const unsigned char *p_left = data, *p_h4;
+> > +	struct mtk_bt_dev *btdev = hu->priv;
+> > +	int sz_left = count, sz_h4, adv;
+> > +	struct device *dev;
+> > +	int err;
+> > +
+> > +	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
+> > +		return -EUNATCH;
+> > +
+> > +	dev = &hu->serdev->dev;
+> > +
+> > +	while (sz_left > 0) {
+> > +		p_h4 = mtk_stp_split(dev, btdev->sp, p_left, sz_left, &sz_h4);
+> > +		if (!p_h4)
+> > +			break;
+> 
+> Now this is troubling me a bit. While there are some H:4 frames somewhere in here, you need to do another set of framing. So what is the framing that comes from the serial part in the first place?
+> 
+
+the chip always adds a fews bytes before and after the H:4 data, it's
+something like that.
+
+-------------------------------------  
+| STP header  |  H:4   | STP tailer |  
+-------------------------------------  
+
+mtk_stp_split no looked into the details of H:4, only is used to find
+where is the start of H:4 part and keep info. from STP header and then
+feed the H:4 part into h4_recv_buf to reuse the extent logic to process
+HCI/ACL/SCO pkts. So, I think it should be unnecessary to create a new
+framing for the current usage.
+
+
+> Btw. it is fine if hci_uart is not a good fit. I actually think it is a bad fit and using the btuart driver I send around a few weeks ago is a better starting point. However if the framing itself is more elaborate actually, then even a brand new driver and just re-using h4_recv.h would be good. If however the extra framing already does a real framing job, then even h4_recv.h is useless and we can just pick the frames right out of serial device. For example bfusb.c had such an extra framing on top of H:4.
+
+
+
+> > +
+> > +		adv = p_h4 - p_left;
+> > +		sz_left -= adv;
+> > +		p_left += adv;
+> > +
+> > +		btdev->rx_skb = h4_recv_buf(hu->hdev, btdev->rx_skb,
+> > +					    p_h4, sz_h4, mtk_recv_pkts,
+> > +					    ARRAY_SIZE(mtk_recv_pkts));
+> > +		if (IS_ERR(btdev->rx_skb)) {
+> > +			err = PTR_ERR(btdev->rx_skb);
+> > +			dev_err(dev, "Frame reassembly failed (%d)", err);
+> > +			btdev->rx_skb = NULL;
+> > +			return err;
+> > +		}
+> > +
+> > +		sz_left -= sz_h4;
+> > +		p_left += sz_h4;
+> > +	}
+> > +
+> > +	return count;
+> > +}
+> > +
+> > +static struct sk_buff *mtk_dequeue(struct hci_uart *hu)
+> > +{
+> > +	struct mtk_bt_dev *btdev = hu->priv;
+> > +
+> > +	return skb_dequeue(&btdev->txq);
+> > +}
+> > +
+> > +static int mtk_flush(struct hci_uart *hu)
+> > +{
+> > +	struct mtk_bt_dev *btdev = hu->priv;
+> > +
+> > +	skb_queue_purge(&btdev->txq);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int mtk_setup(struct hci_uart *hu)
+> > +{
+> > +	struct device *dev;
+> > +	u8 param = 0x1;
+> > +	int err;
+> > +
+> > +	dev = &hu->serdev->dev;
+> > +
+> > +	/* Setup a firmware which the device definitely requires. */
+> > +	err = mtk_setup_fw(hu);
+> > +	if (err < 0) {
+> > +		dev_err(dev, "Fail at setup FW (%d): %d", __LINE__, err);
+> > +		return err;
+> > +	}
+> > +
+> > +	/* Activate funciton the firmware provides to. */
+> > +	err = mtk_wmt_cmd_sync(hu, MTK_WMT_RST, 0x4, 0, 0);
+> > +	if (err < 0) {
+> > +		dev_err(dev, "Fail at WMT RST (%d): %d", __LINE__, err);
+> > +		return err;
+> > +	}
+> > +
+> > +	/* Enable Bluetooth protocol. */
+> > +	err = mtk_wmt_cmd_sync(hu, MTK_WMT_FUNC_CTRL, 0x0, sizeof(param),
+> > +			       &param);
+> > +	if (err < 0)
+> > +		dev_err(dev, "Fail at FUNC CTRL (%d): %d", __LINE__, err);
+> 
+> Just as a reminder, setup callback is only called once. You should enable the transport in open callback.
+> 
+
+If capable, I would like to move all chip initialization stuff to
+mtk_open and de-initialization stuff to mtk_close.
+
+In that way, a user power up/down with bluetoothctl or hcitool can
+completely recover the chip from any fatal errors. and even it seem at
+bluez core, there's workqueue in charge of recovery thing.
+
+But the core seems not supports me to move chip handling in
+mtk_open :-( 
+
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +static const struct hci_uart_proto mtk_proto = {
+> > +	.id		= HCI_UART_MTK,
+> > +	.name		= "MediaTek",
+> > +	.open		= mtk_open,
+> > +	.close		= mtk_close,
+> > +	.recv		= mtk_recv,
+> > +	.enqueue	= mtk_enqueue,
+> > +	.dequeue	= mtk_dequeue,
+> > +	.flush		= mtk_flush,
+> > +	.setup		= mtk_setup,
+> > +	.manufacturer	= 1,
+> 
+> Unless you are Nokia, this id is wrong.
+> 
+
+okay, i will remove it 
+
+> > +};
+> > +
+> > +static int mtk_bluetooth_serdev_probe(struct serdev_device *serdev)
+> > +{
+> > +	struct device *dev = &serdev->dev;
+> > +	struct mtk_bt_dev *btdev;
+> > +	int err = 0;
+> > +
+> > +	btdev = devm_kzalloc(dev, sizeof(*btdev), GFP_KERNEL);
+> > +	if (!btdev)
+> > +		return -ENOMEM;
+> > +
+> > +	btdev->sp = devm_kzalloc(dev, sizeof(*btdev->sp), GFP_KERNEL);
+> > +	if (!btdev->sp)
+> > +		return -ENOMEM;
+> > +
+> > +	btdev->clk = devm_clk_get(dev, "ref");
+> > +	if (IS_ERR(btdev->clk))
+> > +		return PTR_ERR(btdev->clk);
+> > +
+> > +	btdev->hu.serdev = serdev;
+> > +	btdev->hu.priv = btdev;
+> > +
+> > +	serdev_device_set_drvdata(serdev, btdev);
+> > +
+> > +	err = hci_uart_register_device(&btdev->hu, &mtk_proto);
+> > +	if (err)
+> > +		dev_err(dev, "Could not register bluetooth uart: %d", err);
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +static void mtk_bluetooth_serdev_remove(struct serdev_device *serdev)
+> > +{
+> > +	struct mtk_bt_dev *btdev = serdev_device_get_drvdata(serdev);
+> > +
+> > +	hci_uart_unregister_device(&btdev->hu);
+> > +}
+> > +
+> > +static const struct of_device_id mtk_bluetooth_of_match[] = {
+> > +	{ .compatible = "mediatek,mt7622-bluetooth" },
+> > +	{},
+> > +};
+> > +MODULE_DEVICE_TABLE(of, mtk_bluetooth_of_match);
+> > +
+> > +static struct serdev_device_driver mtk_bluetooth_serdev_driver = {
+> > +	.probe = mtk_bluetooth_serdev_probe,
+> > +	.remove = mtk_bluetooth_serdev_remove,
+> > +	.driver = {
+> > +		.name = "mediatek-bluetooth",
+> > +		.of_match_table = of_match_ptr(mtk_bluetooth_of_match),
+> > +	},
+> > +};
+> > +
+> > +module_serdev_device_driver(mtk_bluetooth_serdev_driver);
+> > +
+> > +MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
+> > +MODULE_DESCRIPTION("Bluetooth HCI Serial driver for MediaTek SoC");
+> > +MODULE_LICENSE("GPL v2");
+> > diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> > index 66e8c68..3f0911e 100644
+> > --- a/drivers/bluetooth/hci_uart.h
+> > +++ b/drivers/bluetooth/hci_uart.h
+> > @@ -35,7 +35,7 @@
+> > #define HCIUARTGETFLAGS		_IOR('U', 204, int)
+> > 
+> > /* UART protocols */
+> > -#define HCI_UART_MAX_PROTO	12
+> > +#define HCI_UART_MAX_PROTO	13
+> > 
+> > #define HCI_UART_H4	0
+> > #define HCI_UART_BCSP	1
+> > @@ -49,6 +49,7 @@
+> > #define HCI_UART_AG6XX	9
+> > #define HCI_UART_NOKIA	10
+> > #define HCI_UART_MRVL	11
+> > +#define HCI_UART_MTK	12
+> 
+> I am really trying to avoid new id assignments here and go for serdev only drivers.
+> 
+
+it seems no necessary for a serdev device. can i remove it from driver?
+but what id should be filled in hci_uart_proto ?
+
+430 static const struct hci_uart_proto mtk_proto = {
+431         .id             = HCI_UART_MTK,
+432         .name           = "MediaTek",
+433         .open           = mtk_open,
+
+> Regards
+> 
+> Marcel
+> 
