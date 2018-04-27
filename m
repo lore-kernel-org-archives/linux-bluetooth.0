@@ -1,144 +1,263 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH v1 6/7] Bluetooth: hci_mediatek: Add protocol support for
- MediaTek serial devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1524820468.12322.205.camel@mtkswgap22>
-Date: Fri, 27 Apr 2018 18:34:22 +0200
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Message-Id: <CB157958-F0F1-4728-9B4C-1799BC60A2C4@holtmann.org>
-References: <cover.1522736996.git.sean.wang@mediatek.com>
- <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
- <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
- <1524728068.12322.125.camel@mtkswgap22>
- <0DB4E6C1-28AD-41B7-8623-10046809A686@holtmann.org>
- <1524802381.12322.164.camel@mtkswgap22>
- <BBFEF77F-BE5D-4092-BB2B-8844C10CC34E@holtmann.org>
- <1524820468.12322.205.camel@mtkswgap22>
-To: Sean Wang <sean.wang@mediatek.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] client: Add possiblity to define maximum attribute value length
+Date: Fri, 27 Apr 2018 16:01:09 +0200
+Message-Id: <20180427140109.31477-1-grzegorz.kolodziejczyk@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sean,
+This patch allows to define maximum value length for characteristic and
+descriptor value while registering.
+---
+ client/gatt.c | 66 +++++++++++++++++++++++++++++++++++++++++++++++------------
+ client/gatt.h |  4 ++++
+ client/main.c | 13 ++++++------
+ 3 files changed, 64 insertions(+), 19 deletions(-)
 
->>>>>>> This adds a driver for the MediaTek serial protocol based on H4 protocol,
->>>>>>> which can enable the built-in Bluetooth device inside MT7622 SoC.
->>>>>>> 
->>>>>>> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
->>>>>>> ---
->>> 
-> 
-> [... snip ...]
-> 
->>> 
->>> where could I find the newest btuart.c (which seems cannot be found in
->>> 4.17 rc2)? It seems a time to rewrite the driver based on btuart.c
->> 
->> It is not merged yet. I posted RFC patches to the mailing list.
->> 
-> 
-> got it.
-> 
->>> 
->>> the Bluetooth device can't survive in a power/down cycle and
->>> 
->>> * power on should be including
->>> - enable clk and power domain
->>> - download firmware through specific ACL command
->>> - send specific commands to configure bluetooth (Required to note that
->>> the steps should be after downloading firmware because the behavior for
->>> the command might be changed by the firmware)
->> 
->> Then this sounds like you need a quirk that runs setup() after every open() and not just after the first open(). You would be the first hardware that looses their firmware, but that is fine, I almost expect that at some point someone comes along and requires this. So just create a new HCI_QUIRK_NON_PERSISTENT_SETUP.
->> 
-> 
-> Yes, it should be good to have an option HCI_QUIRK_NON_PERSISTENT_SETUP
-> to allow us to run setup() for every open(). 
-> 
-> When users are feeling unexpected thing happening on its device, they
-> always have a habit trying to restart device from UI.
-> 
-> If close() -> open() can completely power reset a bluetooth device and
-> then it can recover from any fatal error to the initial state as at
-> boot. It's good for these problems specially hard to be reproduced and
-> required to reboot the whole machine to save.
-> 
-> However, it would take a little longer time on open() since it takes
-> extra time to make firmware download and reconfiguration.
+diff --git a/client/gatt.c b/client/gatt.c
+index d59d1ba1e..969a78be0 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -60,6 +60,7 @@ struct desc {
+ 	char *uuid;
+ 	char **flags;
+ 	int value_len;
++	unsigned int max_val_len;
+ 	uint8_t *value;
+ };
+ 
+@@ -71,6 +72,7 @@ struct chrc {
+ 	bool notifying;
+ 	GList *descs;
+ 	int value_len;
++	unsigned int max_val_len;
+ 	uint8_t *value;
+ 	uint16_t mtu;
+ 	struct io *write_io;
+@@ -612,7 +614,7 @@ static void write_attribute(GDBusProxy *proxy, char *val_str, uint16_t offset)
+ {
+ 	struct iovec iov;
+ 	struct write_attribute_data wd;
+-	uint8_t value[512];
++	uint8_t value[MAX_ATTR_VAL_LEN];
+ 	char *entry;
+ 	unsigned int i;
+ 
+@@ -689,7 +691,7 @@ void gatt_write_attribute(GDBusProxy *proxy, int argc, char *argv[])
+ static bool pipe_read(struct io *io, void *user_data)
+ {
+ 	struct chrc *chrc = user_data;
+-	uint8_t buf[512];
++	uint8_t buf[MAX_ATTR_VAL_LEN];
+ 	int fd = io_get_fd(io);
+ 	ssize_t bytes_read;
+ 
+@@ -1611,7 +1613,8 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
+ 	return read_value(msg, &chrc->value[offset], chrc->value_len - offset);
+ }
+ 
+-static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len)
++static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len,
++								int max_len)
+ {
+ 	DBusMessageIter array;
+ 	uint16_t offset = 0;
+@@ -1628,6 +1631,9 @@ static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len)
+ 	if (parse_options(iter, &offset, NULL, NULL, NULL))
+ 		return -EINVAL;
+ 
++	if ((offset + read_len) > max_len)
++		return -EOVERFLOW;
++
+ 	if ((offset + read_len) > *len) {
+ 		*len = offset + read_len;
+ 		*value = g_realloc(*value, *len);
+@@ -1645,6 +1651,7 @@ static void authorize_write_response(const char *input, void *user_data)
+ 	DBusMessageIter iter;
+ 	DBusMessage *reply;
+ 	char *err;
++	int errsv;
+ 
+ 	dbus_message_iter_init(pending_message, &iter);
+ 
+@@ -1656,10 +1663,16 @@ static void authorize_write_response(const char *input, void *user_data)
+ 
+ 	chrc->authorized = true;
+ 
+-	if (parse_value_arg(&iter, &chrc->value, &chrc->value_len)) {
++	errsv = parse_value_arg(&iter, &chrc->value, &chrc->value_len,
++							chrc->max_val_len);
++	if (errsv == -EINVAL) {
+ 		err = "org.bluez.Error.InvalidArguments";
+ 
+ 		goto error;
++	} else if (errsv == -EOVERFLOW) {
++		err = "org.bluez.Error.InvalidValueLength";
++
++		goto error;
+ 	}
+ 
+ 	bt_shell_printf("[" COLORED_CHG "] Attribute %s written" , chrc->path);
+@@ -1685,6 +1698,7 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
+ 	struct chrc *chrc = user_data;
+ 	DBusMessageIter iter;
+ 	char *str;
++	int errsv;
+ 
+ 	dbus_message_iter_init(msg, &iter);
+ 
+@@ -1706,10 +1720,15 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
+ 		return NULL;
+ 	}
+ 
+-	if (parse_value_arg(&iter, &chrc->value, &chrc->value_len))
++	errsv = parse_value_arg(&iter, &chrc->value, &chrc->value_len,
++							chrc->max_val_len);
++	if (errsv == -EINVAL) {
+ 		return g_dbus_create_error(msg,
+-					"org.bluez.Error.InvalidArguments",
+-					NULL);
++				"org.bluez.Error.InvalidArguments", NULL);
++	} else if (errsv == -EOVERFLOW) {
++		return g_dbus_create_error(msg,
++				"org.bluez.Error.InvalidValueLength", NULL);
++	}
+ 
+ 	bt_shell_printf("[" COLORED_CHG "] Attribute %s written" , chrc->path);
+ 
+@@ -1881,9 +1900,9 @@ static const GDBusMethodTable chrc_methods[] = {
+ 	{ }
+ };
+ 
+-static uint8_t *str2bytearray(char *arg, int *val_len)
++static uint8_t *str2bytearray(char *arg, int *val_len, unsigned int max_val_len)
+ {
+-	uint8_t value[512];
++	uint8_t value[MAX_ATTR_VAL_LEN];
+ 	char *entry;
+ 	unsigned int i;
+ 
+@@ -1908,6 +1927,12 @@ static uint8_t *str2bytearray(char *arg, int *val_len)
+ 		value[i] = val;
+ 	}
+ 
++	if (i > max_val_len) {
++		bt_shell_printf("Value exceeds maximum length (%i)\n",
++								max_val_len);
++		return NULL;
++	}
++
+ 	*val_len = i;
+ 
+ 	return g_memdup(value, i);
+@@ -1919,7 +1944,13 @@ static void chrc_set_value(const char *input, void *user_data)
+ 
+ 	g_free(chrc->value);
+ 
+-	chrc->value = str2bytearray((char *) input, &chrc->value_len);
++	chrc->value = str2bytearray((char *) input, &chrc->value_len,
++							chrc->max_val_len);
++
++	if (!chrc->value) {
++		print_chrc(chrc, COLORED_DEL);
++		chrc_unregister(chrc);
++	}
+ }
+ 
+ void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy,
+@@ -1940,7 +1971,8 @@ void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy,
+ 	chrc->uuid = g_strdup(argv[1]);
+ 	chrc->path = g_strdup_printf("%s/chrc%p", service->path, chrc);
+ 	chrc->flags = g_strsplit(argv[2], ",", -1);
+-	chrc->authorization_req = argc > 3 ? true : false;
++	chrc->max_val_len = argc > 3 ? atoi(argv[3]) : MAX_ATTR_VAL_LEN;
++	chrc->authorization_req = argc > 4 ? true : false;
+ 
+ 	if (g_dbus_register_interface(conn, chrc->path, CHRC_INTERFACE,
+ 					chrc_methods, NULL, chrc_properties,
+@@ -2037,7 +2069,8 @@ static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage *msg,
+ 
+ 	dbus_message_iter_init(msg, &iter);
+ 
+-	if (parse_value_arg(&iter, &desc->value, &desc->value_len))
++	if (parse_value_arg(&iter, &desc->value, &desc->value_len,
++							desc->max_val_len))
+ 		return g_dbus_create_error(msg,
+ 					"org.bluez.Error.InvalidArguments",
+ 					NULL);
+@@ -2140,7 +2173,13 @@ static void desc_set_value(const char *input, void *user_data)
+ 
+ 	g_free(desc->value);
+ 
+-	desc->value = str2bytearray((char *) input, &desc->value_len);
++	desc->value = str2bytearray((char *) input, &desc->value_len,
++							desc->max_val_len);
++
++	if (!desc->value) {
++		print_desc(desc, COLORED_DEL);
++		desc_unregister(desc);
++	}
+ }
+ 
+ void gatt_register_desc(DBusConnection *conn, GDBusProxy *proxy,
+@@ -2166,6 +2205,7 @@ void gatt_register_desc(DBusConnection *conn, GDBusProxy *proxy,
+ 	desc->uuid = g_strdup(argv[1]);
+ 	desc->path = g_strdup_printf("%s/desc%p", desc->chrc->path, desc);
+ 	desc->flags = g_strsplit(argv[2], ",", -1);
++	desc->max_val_len = argc > 3 ? atoi(argv[3]) : MAX_ATTR_VAL_LEN;
+ 
+ 	if (g_dbus_register_interface(conn, desc->path, DESC_INTERFACE,
+ 					desc_methods, NULL, desc_properties,
+diff --git a/client/gatt.h b/client/gatt.h
+index 957ae8003..189a0aa40 100644
+--- a/client/gatt.h
++++ b/client/gatt.h
+@@ -21,6 +21,10 @@
+  *
+  */
+ 
++#define MAX_ATTR_VAL_LEN	512
++#define STR_(i) #i
++#define STR(i) STR_(i)
++
+ void gatt_add_service(GDBusProxy *proxy);
+ void gatt_remove_service(GDBusProxy *proxy);
+ 
+diff --git a/client/main.c b/client/main.c
+index dd85a1c85..60e0f10b0 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2013,7 +2013,7 @@ static void cmd_register_characteristic(int argc, char *argv[])
+ 	if (check_default_ctrl() == FALSE)
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 
+-	if (argc > 3 && strcmp(argv[3], "authorize")) {
++	if (argc > 4 && strcmp(argv[4], "authorize")) {
+ 		bt_shell_printf("Invalid authorize argument\n");
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+@@ -2437,14 +2437,15 @@ static const struct bt_shell_menu gatt_menu = {
+ 	{ "unregister-service", "<UUID/object>", cmd_unregister_service,
+ 					"Unregister application service" },
+ 	{ "register-characteristic", "<UUID> <Flags=read,write,notify...> "
+-				"[authorize]", cmd_register_characteristic,
+-				"Register application characteristic" },
++			"[max value len=0(default=" STR(MAX_ATTR_VAL_LEN) ")-"
++			STR(MAX_ATTR_VAL_LEN) "] [authorize]",
++			cmd_register_characteristic,
++			"Register application characteristic" },
+ 	{ "unregister-characteristic", "<UUID/object>",
+ 				cmd_unregister_characteristic,
+ 				"Unregister application characteristic" },
+-	{ "register-descriptor", "<UUID> <Flags=read,write...>",
+-					cmd_register_descriptor,
+-					"Register application descriptor" },
++	{ "register-descriptor", "<UUID> <Flags=read,write...> [max value len]",
++		cmd_register_descriptor, "Register application descriptor" },
+ 	{ "unregister-descriptor", "<UUID/object>",
+ 					cmd_unregister_descriptor,
+ 					"Unregister application descriptor" },
+-- 
+2.13.6
 
-if setup() is smart enough to skip the firmware download if it is already active, you can avoid these kind of things. It is up to your hardware. All the devices I have encountered so far only needed setup() once. Maybe some can be more power aggressive via GPIOs to full reset the hardware, but that could also be achieved via RFKILL. We need to see how this shapes up with your hardware. An alternative could be HCI_QUIRK_SETUP_AFTER_RFKILL and that means only the rfkill switch that brings down hciX interfaces will cause the full cycle.
-
-My recommendation is to not worry too much here. You want to get the base logic done and then we deal with the rest. Maybe doing ->post_open() and ->pre_close() is more useful since you want HCI transport to send a HCI command to complete transport activation and shutdown.
-
-> 
->>> * power off should be including
->>> - send specific commands, such as to disable bluetooth
->> 
->> So try to put these in shutdown()
->> 
-> 
-> got it.
-> 
->>> - disable power domain and clk
->> 
->> And do this in close().
->> 
-> 
-> got it.
-> 
-> 
->>> 
->>>>> 
->>>>>>> +
->>>>>>> +	return err;
-> 
-> 
-> [ ... snip ....]
-> 
->>      .open           = mtk_open,
->>>> 
->> 
->> Go with a brand new btmtkuart.c driver. I really sounds you don’t want the hci_ldisc.c framework in your way. You want direct control over the core callbacks.
->> 
-> 
-> 1)
-> 
-> In fact. the device is working via a internal serial bus, rather than
-> via uart for mt7622. so could i call it btmtkserial.c ?
-> 
-> Becasue mediatek indeed also have bluetooth over uart, if i called it
-> btmtkserialc, the same code logic I think can be fit to all other
-> devices using either uart or internal serial bus.
-
-It is just a name so far. Start with btmtkuart.c for now. We will sort that naming out later. Mind you that as long as this is abstracted via serdev, it doesn’t really matter what it is in detail. It is just that Bluetooth called H:4 UART and H:5 3-Wire UART. These are the two UART protocol we are running. That you have extra serial bus framing is just some other detail. But picking the final driver name is something we worry about after detailed review.
-
-> 
-> 2)
-> 
-> Yes, i don't want hci_ldisc. so far i thought serdev version is enough,
-> and i preferred that bluetotoh device don't depend on any utility on
-> user space to launch.
-
-serdev is the way to go. I will not accept any now drivers that require btattach.
-
-> 
-> 3) 
-> 
-> last question
-> 
-> if i have bluetooth over usb, the usb version bluetooth can reuse
-> btmtkserial.c code?
-
-We would most likely create a btmtk.c for shared code. Similar to btintel.c, btbcm.c etc. However lets do that in step two since it is harder to review.
-
-Regards
-
-Marcel
