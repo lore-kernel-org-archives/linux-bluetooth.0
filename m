@@ -1,88 +1,134 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [4.15 stable regression] "Bluetooth: btusb: Fix quirk for Atheros
- 1525/QCA6174" breaks bluetooth on some devices
-From: Hans de Goede <hdegoede@redhat.com>
-To: Takashi Iwai <tiwai@suse.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Marcel Holtmann <marcel@holtmann.org>, "M. Kristall" <mkpdev@gmail.com>,
- linux-bluetooth@vger.kernel.org
-References: <6c97cffb-751f-466d-cd7b-42624fdb18c7@redhat.com>
- <9a752bfc-74bf-25e7-8820-91d1e3163b75@redhat.com>
- <20180425124757.GA29829@kroah.com>
- <e5cbd297-f8b1-2fd0-cd99-cfd39ea55b62@redhat.com>
- <s5hmuxrjusq.wl-tiwai@suse.de>
- <9b2d31fc-be06-cc05-1ec1-3d0f6f1e21bf@redhat.com>
- <s5hsh7igc65.wl-tiwai@suse.de> <s5hk1stu8ln.wl-tiwai@suse.de>
- <ac4374d3-64b9-8a5e-0716-4805bad598ec@redhat.com>
-Message-ID: <acf2c235-beb2-6136-cf37-eb1472292b9e@redhat.com>
-Date: Fri, 27 Apr 2018 11:23:49 +0200
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Message-ID: <1524820468.12322.205.camel@mtkswgap22>
+Subject: Re: [PATCH v1 6/7] Bluetooth: hci_mediatek: Add protocol support
+ for MediaTek serial devices
+From: Sean Wang <sean.wang@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Date: Fri, 27 Apr 2018 17:14:28 +0800
+In-Reply-To: <BBFEF77F-BE5D-4092-BB2B-8844C10CC34E@holtmann.org>
+References: <cover.1522736996.git.sean.wang@mediatek.com>
+         <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
+         <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
+         <1524728068.12322.125.camel@mtkswgap22>
+         <0DB4E6C1-28AD-41B7-8623-10046809A686@holtmann.org>
+         <1524802381.12322.164.camel@mtkswgap22>
+         <BBFEF77F-BE5D-4092-BB2B-8844C10CC34E@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-In-Reply-To: <ac4374d3-64b9-8a5e-0716-4805bad598ec@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Fri, 2018-04-27 at 07:25 +0200, Marcel Holtmann wrote:
+> Hi Sean,
+> 
+> >>>>> This adds a driver for the MediaTek serial protocol based on H4 protocol,
+> >>>>> which can enable the built-in Bluetooth device inside MT7622 SoC.
+> >>>>> 
+> >>>>> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> >>>>> ---
+> > 
 
-On 27-04-18 10:57, Hans de Goede wrote:
->> -- 8< --
->> From: Takashi Iwai <tiwai@suse.de>
->> Subject: [PATCH] Bluetooth: btusb: Apply QCQ_ROME setup for BTUSB_ATH3012
->>   quirk, too
->>
->> In commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros
->> 1525/QCA6174") we tried to address the non-working Atheros BT devices
->> by changing the quirk from BTUSB_ATH3012 to BTUSB_QCQ_ROME.  This made
->> such devices working while it turned out to break other existing chips
->> with the very same USB ID.
->>
->> This is another attempt to tackle the issue.  The essential point to
->> use BTUSB_QCA_ROME is to apply the btusb_setup_qca() and do RAM-
->> patching.  And the previous attempt failed because btusb_setup_qcq()
->> returns -ENODEV if the ROM version doesn't match with the expected
->> ones.  For some devices that have already the "correct" ROM versions,
->> we may just skip the setup procedure and continue the rest.
->>
->> So, this patch applies btusb_setup_qca() also in BTUSB_ATH3012 quirk,
->> and adds a check of the ROM version in the function to skip the setup
->> if the ROM version looks already sane.
->>
->> Signed-off-by: Takashi Iwai <tiwai@suse.de>
->> ---
->>   drivers/bluetooth/btusb.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index c8c8b0b8d333..720356320ace 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -2673,6 +2673,10 @@ static int btusb_setup_qca(struct hci_dev *hdev)
->>           return err;
->>       ver_rom = le32_to_cpu(ver.rom_version);
->> +    /* Don't care about high ROM versions */
->> +    if (ver_rom & ~0xffffU)
->> +        return 0;
->> +
->>       for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
->>           if (ver_rom == qca_devices_table[i].rom_version)
->>               info = &qca_devices_table[i];
->> @@ -3055,6 +3059,7 @@ static int btusb_probe(struct usb_interface *intf,
->>       }
->>       if (id->driver_info & BTUSB_ATH3012) {
->> +        data->setup_on_usb = btusb_setup_qca;
->>           hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
->>           set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
->>           set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
->>
+ [... snip ...]
+
+> > 
+> > where could I find the newest btuart.c (which seems cannot be found in
+> > 4.17 rc2)? It seems a time to rewrite the driver based on btuart.c
+> 
+> It is not merged yet. I posted RFC patches to the mailing list.
+> 
+
+got it.
+
+> > 
+> > the Bluetooth device can't survive in a power/down cycle and
+> > 
+> > * power on should be including
+> >  - enable clk and power domain
+> >  - download firmware through specific ACL command
+> >  - send specific commands to configure bluetooth (Required to note that
+> > the steps should be after downloading firmware because the behavior for
+> > the command might be changed by the firmware)
+> 
+> Then this sounds like you need a quirk that runs setup() after every open() and not just after the first open(). You would be the first hardware that looses their firmware, but that is fine, I almost expect that at some point someone comes along and requires this. So just create a new HCI_QUIRK_NON_PERSISTENT_SETUP.
+> 
+
+Yes, it should be good to have an option HCI_QUIRK_NON_PERSISTENT_SETUP
+to allow us to run setup() for every open(). 
+
+When users are feeling unexpected thing happening on its device, they
+always have a habit trying to restart device from UI.
+
+If close() -> open() can completely power reset a bluetooth device and
+then it can recover from any fatal error to the initial state as at
+boot. It's good for these problems specially hard to be reproduced and
+required to reboot the whole machine to save.
+
+However, it would take a little longer time on open() since it takes
+extra time to make firmware download and reconfiguration.
+
+> > * power off should be including
+> >  - send specific commands, such as to disable bluetooth
+> 
+> So try to put these in shutdown()
+> 
+
+got it.
+
+> >  - disable power domain and clk
+> 
+> And do this in close().
+> 
+
+got it.
 
 
-p.s.
+> > 
+> >>> 
+> >>>>> +
+> >>>>> +	return err;
 
-This change makes the BTUSB_ATH3012 / BTUSB_QCA_ROME code-paths almost
-the same, the only difference is the BTUSB_ATH3012 path also setting the
-HCI_QUIRK_STRICT_DUPLICATE_FILTER flag. Does anyone know if it perhaps
-would be correct to also set that flag for the QCA_ROME chipset and
-then unify the 2 code-paths?
 
-Regards,
+[ ... snip ....]
 
-Hans
+>       .open           = mtk_open,
+> >> 
+> 
+> Go with a brand new btmtkuart.c driver. I really sounds you don’t want the hci_ldisc.c framework in your way. You want direct control over the core callbacks.
+> 
+
+1)
+
+In fact. the device is working via a internal serial bus, rather than
+via uart for mt7622. so could i call it btmtkserial.c ?
+
+Becasue mediatek indeed also have bluetooth over uart, if i called it
+btmtkserialc, the same code logic I think can be fit to all other
+devices using either uart or internal serial bus.
+
+2)
+
+Yes, i don't want hci_ldisc. so far i thought serdev version is enough,
+and i preferred that bluetotoh device don't depend on any utility on
+user space to launch.
+
+
+3) 
+
+last question
+
+if i have bluetooth over usb, the usb version bluetooth can reuse
+btmtkserial.c code?
+
+
+> Regards
+> 
+> Marcel
+> 
