@@ -1,185 +1,82 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] client: Define maximum attribute value length as initial value
-Date: Fri, 27 Apr 2018 16:01:29 +0200
-Message-Id: <20180427140129.31658-2-grzegorz.kolodziejczyk@codecoup.pl>
-In-Reply-To: <20180427140129.31658-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20180427140129.31658-1-grzegorz.kolodziejczyk@codecoup.pl>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <0100016307676ed2-fd5830a5-1933-4fc2-b356-a5112a65579f-000000@amazonses.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Only check needs_reset_resume DMI table
+ for QCA rome chipsets
+To: Hans de Goede <hdegoede@redhat.com>, Marcel Holtmann
+ <marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
+ Jeremy Cline <jcline@redhat.com>
+References: <20180427092643.27140-1-hdegoede@redhat.com>
+From: Jeremy Cline <jeremy@jcline.org>
+Message-ID: <0100016307676ed2-fd5830a5-1933-4fc2-b356-a5112a65579f-000000@email.amazonses.com>
+Date: Fri, 27 Apr 2018 14:00:09 +0000
+MIME-Version: 1.0
+In-Reply-To: <20180427092643.27140-1-hdegoede@redhat.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Initial registered attribute value is set as maximal attribute length.
----
- client/gatt.c | 54 +++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 45 insertions(+), 9 deletions(-)
+On 04/27/2018 05:26 AM, Hans de Goede wrote:
+> Jeremy Cline correctly points out in rhbz#1514836 that a device where the
+> QCA rome chipset needs the USB_QUIRK_RESET_RESUME quirk, may also ship
+> with a different wifi/bt chipset in some configurations.
+> 
+> If that is the case then we are needlessly penalizing those other chipsets
+> with a reset-resume quirk, typically causing 0.4W extra power use because
+> this disables runtime-pm.
+> 
+> This commit moves the DMI table check to a btusb_check_needs_reset_resume()
+> helper (so that we can easily also call it for other chipsets) and calls
+> this new helper only for QCA_ROME chipsets for now.
+> 
+> BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
+> Cc: stable@vger.kernel.org
+> Cc: Jeremy Cline <jcline@redhat.com>
+> Suggested-by: Jeremy Cline <jcline@redhat.com>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+>  drivers/bluetooth/btusb.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index f064984c9ec0..15e7cdca6eb5 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2863,6 +2863,12 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
+>  }
+>  #endif
+>  
+> +static void btusb_check_needs_reset_resume(struct usb_interface *intf)
+> +{
+> +	if (dmi_check_system(btusb_needs_reset_resume_table))
+> +		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
+> +}
+> +
+>  static int btusb_probe(struct usb_interface *intf,
+>  		       const struct usb_device_id *id)
+>  {
+> @@ -2985,9 +2991,6 @@ static int btusb_probe(struct usb_interface *intf,
+>  	hdev->send   = btusb_send_frame;
+>  	hdev->notify = btusb_notify;
+>  
+> -	if (dmi_check_system(btusb_needs_reset_resume_table))
+> -		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
+> -
+>  #ifdef CONFIG_PM
+>  	err = btusb_config_oob_wake(hdev);
+>  	if (err)
+> @@ -3076,6 +3079,7 @@ static int btusb_probe(struct usb_interface *intf,
+>  		data->setup_on_usb = btusb_setup_qca;
+>  		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
+>  		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> +		btusb_check_needs_reset_resume(intf);
 
-diff --git a/client/gatt.c b/client/gatt.c
-index d59d1ba1e..6bf644c48 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -54,12 +54,15 @@
- #define COLORED_CHG	COLOR_YELLOW "CHG" COLOR_OFF
- #define COLORED_DEL	COLOR_RED "DEL" COLOR_OFF
- 
-+#define MAX_ATTR_VAL_LEN	512
-+
- struct desc {
- 	struct chrc *chrc;
- 	char *path;
- 	char *uuid;
- 	char **flags;
- 	int value_len;
-+	unsigned int max_val_len;
- 	uint8_t *value;
- };
- 
-@@ -71,6 +74,7 @@ struct chrc {
- 	bool notifying;
- 	GList *descs;
- 	int value_len;
-+	unsigned int max_val_len;
- 	uint8_t *value;
- 	uint16_t mtu;
- 	struct io *write_io;
-@@ -612,7 +616,7 @@ static void write_attribute(GDBusProxy *proxy, char *val_str, uint16_t offset)
- {
- 	struct iovec iov;
- 	struct write_attribute_data wd;
--	uint8_t value[512];
-+	uint8_t value[MAX_ATTR_VAL_LEN];
- 	char *entry;
- 	unsigned int i;
- 
-@@ -689,7 +693,7 @@ void gatt_write_attribute(GDBusProxy *proxy, int argc, char *argv[])
- static bool pipe_read(struct io *io, void *user_data)
- {
- 	struct chrc *chrc = user_data;
--	uint8_t buf[512];
-+	uint8_t buf[MAX_ATTR_VAL_LEN];
- 	int fd = io_get_fd(io);
- 	ssize_t bytes_read;
- 
-@@ -1611,7 +1615,8 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
- 	return read_value(msg, &chrc->value[offset], chrc->value_len - offset);
- }
- 
--static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len)
-+static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len,
-+								int max_len)
- {
- 	DBusMessageIter array;
- 	uint16_t offset = 0;
-@@ -1628,6 +1633,9 @@ static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len)
- 	if (parse_options(iter, &offset, NULL, NULL, NULL))
- 		return -EINVAL;
- 
-+	if ((offset + read_len) > max_len)
-+		return -EOVERFLOW;
-+
- 	if ((offset + read_len) > *len) {
- 		*len = offset + read_len;
- 		*value = g_realloc(*value, *len);
-@@ -1645,6 +1653,7 @@ static void authorize_write_response(const char *input, void *user_data)
- 	DBusMessageIter iter;
- 	DBusMessage *reply;
- 	char *err;
-+	int errsv;
- 
- 	dbus_message_iter_init(pending_message, &iter);
- 
-@@ -1656,10 +1665,16 @@ static void authorize_write_response(const char *input, void *user_data)
- 
- 	chrc->authorized = true;
- 
--	if (parse_value_arg(&iter, &chrc->value, &chrc->value_len)) {
-+	errsv = parse_value_arg(&iter, &chrc->value, &chrc->value_len,
-+							chrc->max_val_len);
-+	if (errsv == -EINVAL) {
- 		err = "org.bluez.Error.InvalidArguments";
- 
- 		goto error;
-+	} else if (errsv == -EOVERFLOW) {
-+		err = "org.bluez.Error.InvalidValueLength";
-+
-+		goto error;
- 	}
- 
- 	bt_shell_printf("[" COLORED_CHG "] Attribute %s written" , chrc->path);
-@@ -1685,6 +1700,7 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
- 	struct chrc *chrc = user_data;
- 	DBusMessageIter iter;
- 	char *str;
-+	int errsv;
- 
- 	dbus_message_iter_init(msg, &iter);
- 
-@@ -1706,10 +1722,15 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
- 		return NULL;
- 	}
- 
--	if (parse_value_arg(&iter, &chrc->value, &chrc->value_len))
-+	errsv = parse_value_arg(&iter, &chrc->value, &chrc->value_len,
-+							chrc->max_val_len);
-+	if (errsv == -EINVAL) {
- 		return g_dbus_create_error(msg,
--					"org.bluez.Error.InvalidArguments",
--					NULL);
-+				"org.bluez.Error.InvalidArguments", NULL);
-+	} else if (errsv == -EOVERFLOW) {
-+		return g_dbus_create_error(msg,
-+				"org.bluez.Error.InvalidValueLength", NULL);
-+	}
- 
- 	bt_shell_printf("[" COLORED_CHG "] Attribute %s written" , chrc->path);
- 
-@@ -1883,7 +1904,7 @@ static const GDBusMethodTable chrc_methods[] = {
- 
- static uint8_t *str2bytearray(char *arg, int *val_len)
- {
--	uint8_t value[512];
-+	uint8_t value[MAX_ATTR_VAL_LEN];
- 	char *entry;
- 	unsigned int i;
- 
-@@ -1920,6 +1941,13 @@ static void chrc_set_value(const char *input, void *user_data)
- 	g_free(chrc->value);
- 
- 	chrc->value = str2bytearray((char *) input, &chrc->value_len);
-+
-+	if (!chrc->value) {
-+		print_chrc(chrc, COLORED_DEL);
-+		chrc_unregister(chrc);
-+	}
-+
-+	chrc->max_val_len = chrc->value_len;
- }
- 
- void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy,
-@@ -2037,7 +2065,8 @@ static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage *msg,
- 
- 	dbus_message_iter_init(msg, &iter);
- 
--	if (parse_value_arg(&iter, &desc->value, &desc->value_len))
-+	if (parse_value_arg(&iter, &desc->value, &desc->value_len,
-+							desc->max_val_len))
- 		return g_dbus_create_error(msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
-@@ -2141,6 +2170,13 @@ static void desc_set_value(const char *input, void *user_data)
- 	g_free(desc->value);
- 
- 	desc->value = str2bytearray((char *) input, &desc->value_len);
-+
-+	if (!desc->value) {
-+		print_desc(desc, COLORED_DEL);
-+		desc_unregister(desc);
-+	}
-+
-+	desc->max_val_len = desc->value_len;
- }
- 
- void gatt_register_desc(DBusConnection *conn, GDBusProxy *proxy,
--- 
-2.13.6
+If we later need the quirk applied to an Intel chipset for a particular
+DMI, this call would get added to the Intel block and then the quirk
+would start getting applied to the Intel variety of the XPS 13 9360
+again, right?
 
+I have a feeling that's a rather large "if" and I don't have any idea
+how likely it is. Is it even something worth worrying about?
+
+Regards,
+Jeremy
