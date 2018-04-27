@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH BlueZ] client: Add possiblity to define maximum attribute value length
-Date: Fri, 27 Apr 2018 16:01:09 +0200
-Message-Id: <20180427140109.31477-1-grzegorz.kolodziejczyk@codecoup.pl>
+Date: Fri, 27 Apr 2018 16:01:28 +0200
+Message-Id: <20180427140129.31658-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
