@@ -1,91 +1,132 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Only check needs_reset_resume DMI table
- for QCA rome chipsets
-To: Jeremy Cline <jeremy@jcline.org>, Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
- Jeremy Cline <jcline@redhat.com>
-References: <20180427092643.27140-1-hdegoede@redhat.com>
- <0100016307676ed2-fd5830a5-1933-4fc2-b356-a5112a65579f-000000@email.amazonses.com>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <55a828e6-01b3-891b-acaa-1bb12aa73a8c@redhat.com>
-Date: Fri, 27 Apr 2018 20:43:16 +0200
-MIME-Version: 1.0
-In-Reply-To: <0100016307676ed2-fd5830a5-1933-4fc2-b356-a5112a65579f-000000@email.amazonses.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <brian.gix@intel.com>
+From: Brian Gix <brian.gix@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ v2 1/1] shared/ecc: Allow pre-composed Private Keys
+Date: Fri, 27 Apr 2018 10:10:49 -0700
+Message-Id: <20180427171049.2250-2-brian.gix@intel.com>
+In-Reply-To: <20180427171049.2250-1-brian.gix@intel.com>
+References: <20180427171049.2250-1-brian.gix@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Add function ecc_make_public_key() which takes a const private_key
+and generates a validated public_key to complete the pair.
 
-On 04/27/2018 04:00 PM, Jeremy Cline wrote:
-> On 04/27/2018 05:26 AM, Hans de Goede wrote:
->> Jeremy Cline correctly points out in rhbz#1514836 that a device where the
->> QCA rome chipset needs the USB_QUIRK_RESET_RESUME quirk, may also ship
->> with a different wifi/bt chipset in some configurations.
->>
->> If that is the case then we are needlessly penalizing those other chipsets
->> with a reset-resume quirk, typically causing 0.4W extra power use because
->> this disables runtime-pm.
->>
->> This commit moves the DMI table check to a btusb_check_needs_reset_resume()
->> helper (so that we can easily also call it for other chipsets) and calls
->> this new helper only for QCA_ROME chipsets for now.
->>
->> BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
->> Cc: stable@vger.kernel.org
->> Cc: Jeremy Cline <jcline@redhat.com>
->> Suggested-by: Jeremy Cline <jcline@redhat.com>
->> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->> ---
->>   drivers/bluetooth/btusb.c | 10 +++++++---
->>   1 file changed, 7 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index f064984c9ec0..15e7cdca6eb5 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -2863,6 +2863,12 @@ static int btusb_config_oob_wake(struct hci_dev *hdev)
->>   }
->>   #endif
->>   
->> +static void btusb_check_needs_reset_resume(struct usb_interface *intf)
->> +{
->> +	if (dmi_check_system(btusb_needs_reset_resume_table))
->> +		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
->> +}
->> +
->>   static int btusb_probe(struct usb_interface *intf,
->>   		       const struct usb_device_id *id)
->>   {
->> @@ -2985,9 +2991,6 @@ static int btusb_probe(struct usb_interface *intf,
->>   	hdev->send   = btusb_send_frame;
->>   	hdev->notify = btusb_notify;
->>   
->> -	if (dmi_check_system(btusb_needs_reset_resume_table))
->> -		interface_to_usbdev(intf)->quirks |= USB_QUIRK_RESET_RESUME;
->> -
->>   #ifdef CONFIG_PM
->>   	err = btusb_config_oob_wake(hdev);
->>   	if (err)
->> @@ -3076,6 +3079,7 @@ static int btusb_probe(struct usb_interface *intf,
->>   		data->setup_on_usb = btusb_setup_qca;
->>   		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
->>   		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
->> +		btusb_check_needs_reset_resume(intf);
-> 
-> If we later need the quirk applied to an Intel chipset for a particular
-> DMI, this call would get added to the Intel block and then the quirk
-> would start getting applied to the Intel variety of the XPS 13 9360
-> again, right?
-> 
-> I have a feeling that's a rather large "if" and I don't have any idea
-> how likely it is. Is it even something worth worrying about?
+Non-ephemeral key sets are required to support Bluetooth Mesh.
+---
+ src/shared/ecc.c | 42 +++++++++++++++++++++++++++++-------------
+ src/shared/ecc.h | 17 ++++++++++++++---
+ 2 files changed, 43 insertions(+), 16 deletions(-)
 
-ATM that seems rather unlikely, but we are tracking the USB-ids to
-which the DMI quirks belong (as comments) so we can later switch from
-a dmi-id only check to a combined dmi + usb-id check if necessary.
-
-Regards,
-
-Hans
+diff --git a/src/shared/ecc.c b/src/shared/ecc.c
+index eb2cc005d..47f229ca9 100644
+--- a/src/shared/ecc.c
++++ b/src/shared/ecc.c
+@@ -856,33 +856,49 @@ static void ecc_native2bytes(const uint64_t native[NUM_ECC_DIGITS],
+ 	}
+ }
+ 
+-bool ecc_make_key(uint8_t public_key[64], uint8_t private_key[32])
++bool ecc_make_public_key(const uint8_t private_key[32], uint8_t public_key[64])
+ {
+ 	struct ecc_point pk;
+ 	uint64_t priv[NUM_ECC_DIGITS];
+-	unsigned tries = 0;
+ 
+-	do {
+-		if (!get_random_number(priv) || (tries++ >= MAX_TRIES))
+-			return false;
++	ecc_bytes2native(private_key, priv);
+ 
+-		if (vli_is_zero(priv))
+-			continue;
++	if (vli_is_zero(priv))
++		return false;
+ 
+-		/* Make sure the private key is in the range [1, n-1]. */
+-		if (vli_cmp(curve_n, priv) != 1)
+-			continue;
++	/* Make sure the private key is in the range [1, n-1]. */
++	if (vli_cmp(curve_n, priv) != 1)
++		return false;
++
++	ecc_point_mult(&pk, &curve_g, priv, NULL, vli_num_bits(priv));
+ 
+-		ecc_point_mult(&pk, &curve_g, priv, NULL, vli_num_bits(priv));
+-	} while (ecc_point_is_zero(&pk));
++	if (ecc_point_is_zero(&pk))
++		return false;
+ 
+-	ecc_native2bytes(priv, private_key);
+ 	ecc_native2bytes(pk.x, public_key);
+ 	ecc_native2bytes(pk.y, &public_key[32]);
+ 
+ 	return true;
+ }
+ 
++bool ecc_make_key(uint8_t public_key[64], uint8_t private_key[32])
++{
++	uint64_t priv[NUM_ECC_DIGITS];
++	unsigned tries = 0;
++	bool result = false;
++
++	for (tries = 0; !result && tries < MAX_TRIES; tries++) {
++		if (!get_random_number(priv))
++			continue;
++
++		ecc_native2bytes(priv, private_key);
++
++		result = ecc_make_public_key(private_key, public_key);
++	}
++
++	return result;
++}
++
+ bool ecc_valid_public_key(const uint8_t public_key[64])
+ {
+ 	struct ecc_point pk;
+diff --git a/src/shared/ecc.h b/src/shared/ecc.h
+index f89f2b0c3..a88e735c7 100644
+--- a/src/shared/ecc.h
++++ b/src/shared/ecc.h
+@@ -27,14 +27,25 @@
+ #include <stdbool.h>
+ #include <stdint.h>
+ 
++/* Create a public key from a private key.
++ *
++ * Outputs:
++ *	private_key - Const private key
++ *	public_key  - Will be filled in with the public key.
++ *
++ * Returns true if the public key was generated successfully, false
++ * if an error occurred. The keys are with the LSB first.
++ */
++bool ecc_make_public_key(const uint8_t private_key[32], uint8_t public_key[64]);
++
+ /* Create a public/private key pair.
+  *
+  * Outputs:
+  *	public_key  - Will be filled in with the public key.
+- *	private_Key - Will be filled in with the private key.
++ *	private_key - Will be filled in with the private key.
+  *
+  * Returns true if the key pair was generated successfully, false
+- * if an error occurred. They keys are with the LSB first.
++ * if an error occurred. The keys are with the LSB first.
+  */
+ bool ecc_make_key(uint8_t public_key[64], uint8_t private_key[32]);
+ 
+@@ -54,7 +65,7 @@ bool ecc_valid_public_key(const uint8_t public_key[64]);
+  *
+  * Inputs:
+  *	public_key  - The public key of the remote party.
+- *	private_Key - Your private key.
++ *	private_key - Your private key.
+  *
+  * Outputs:
+  *	secret - Will be filled in with the shared secret value.
+-- 
+2.14.3
