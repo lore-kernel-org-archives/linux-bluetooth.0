@@ -1,134 +1,188 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Message-ID: <1524820468.12322.205.camel@mtkswgap22>
-Subject: Re: [PATCH v1 6/7] Bluetooth: hci_mediatek: Add protocol support
- for MediaTek serial devices
-From: Sean Wang <sean.wang@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Date: Fri, 27 Apr 2018 17:14:28 +0800
-In-Reply-To: <BBFEF77F-BE5D-4092-BB2B-8844C10CC34E@holtmann.org>
-References: <cover.1522736996.git.sean.wang@mediatek.com>
-         <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
-         <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
-         <1524728068.12322.125.camel@mtkswgap22>
-         <0DB4E6C1-28AD-41B7-8623-10046809A686@holtmann.org>
-         <1524802381.12322.164.camel@mtkswgap22>
-         <BBFEF77F-BE5D-4092-BB2B-8844C10CC34E@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [4.15 stable regression] "Bluetooth: btusb: Fix quirk for Atheros
+ 1525/QCA6174" breaks bluetooth on some devices
+To: Takashi Iwai <tiwai@suse.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Marcel Holtmann <marcel@holtmann.org>, "M. Kristall" <mkpdev@gmail.com>,
+ linux-bluetooth@vger.kernel.org
+References: <6c97cffb-751f-466d-cd7b-42624fdb18c7@redhat.com>
+ <9a752bfc-74bf-25e7-8820-91d1e3163b75@redhat.com>
+ <20180425124757.GA29829@kroah.com>
+ <e5cbd297-f8b1-2fd0-cd99-cfd39ea55b62@redhat.com>
+ <s5hmuxrjusq.wl-tiwai@suse.de>
+ <9b2d31fc-be06-cc05-1ec1-3d0f6f1e21bf@redhat.com>
+ <s5hsh7igc65.wl-tiwai@suse.de> <s5hk1stu8ln.wl-tiwai@suse.de>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <ac4374d3-64b9-8a5e-0716-4805bad598ec@redhat.com>
+Date: Fri, 27 Apr 2018 10:57:58 +0200
 MIME-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <s5hk1stu8ln.wl-tiwai@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2018-04-27 at 07:25 +0200, Marcel Holtmann wrote:
-> Hi Sean,
+Hi,
+
+On 26-04-18 20:27, Takashi Iwai wrote:
+> On Thu, 26 Apr 2018 18:33:38 +0200,
+> Takashi Iwai wrote:
+>>
+>> On Thu, 26 Apr 2018 14:18:23 +0200,
+>> Hans de Goede wrote:
+>>>
+>>> Hi,
+>>>
+>>> On 25-04-18 15:10, Takashi Iwai wrote:
+>>>> On Wed, 25 Apr 2018 14:49:59 +0200,
+>>>> Hans de Goede wrote:
+>>>>>
+>>>>> Hi,
+>>>>>
+>>>>> On 25-04-18 14:47, Greg Kroah-Hartman wrote:
+>>>>>> On Wed, Apr 25, 2018 at 02:40:37PM +0200, Hans de Goede wrote:
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> On 18-04-18 15:18, Hans de Goede wrote:
+>>>>>>>> Hi Takashi, Marcel,
+>>>>>>>>
+>>>>>>>> It seems that this commit:
+>>>>>>>> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git/commit/?h=linux-4.15.y&id=7ec32f585fefd7c154453aa29ccf8fa2a11cc865
+>>>>>>>>
+>>>>>>>> Is breaking bluetooth on some devices, see:
+>>>>>>>>
+>>>>>>>> https://bugzilla.redhat.com/show_bug.cgi?id=1568911
+>>>>>>>>
+>>>>>>>> The problem is the following error now being thrown:
+>>>>>>>>
+>>>>>>>> [   28.466248] Bluetooth: hci0: don't support firmware rome 0x1020200
+>>>>>>>>
+>>>>>>>> Looking at the code I wonder if maybe we need to mask the ver_rom
+>>>>>>>> with & 0xfff when comparing it to the qca_devices_table[i].rom_version
+>>>>>>>> filed ?
+>>>>>>>>
+>>>>>>>> Or maybe the commit is actually wrong, or maybe devices with the
+>>>>>>>> 0cf3:3004 USB id need either the BTUSB_QCA_ROM or BTUSB_ATH3012
+>>>>>>>> quirk depending on the device and we need to probe this somehow?
+>>>>>>>
+>>>>>>> I've been receiving more complaints from users about this on
+>>>>>>> various devices, so I think that the 7ec32f585fefd7c154453aa29ccf8fa2a11cc865
+>>>>>>> commit should be reverted from 4.15.x while we figure this out.
+>>>>>>>
+>>>>>>> Does anyone have any idea how we cam distinguish between the 2
+>>>>>>> different versions which seem to be hiding between the same USB-id ?
+>>>>>>
+>>>>>> 4.15.y is end-of-life, so there is no more releases being made for it,
+>>>>>> sorry.
+>>>>>
+>>>>> Ah, right, no problem, Fedora should be moving to 4.16.x soon then
+>>>>> anyways.
+>>>>>
+>>>>>> But, this commit is in 4.4.y, 4.9.y, 4.14.y, and 4.16.  Can you revert
+>>>>>> it in Linus's tree and I can revert it everywhere else as well?
+>>>>>
+>>>>> Takashi, do you agree that reverting this for now is best? And if so
+>>>>> can you please send a revert?
+>>>>
+>>>> The best would be to fix it properly :)
+>>>>
+>>>> But I agree that it needs a quick resolution, and the revert is
+>>>> appropriate in this case.  Since you've confirmed that the revert
+>>>> worked, feel free to submit the revert patch from your side.
+>>>
+>>> Done.
+>>>
+>>>> Back to the original issue: now I'm wondering what made such
+>>>> inconsistent behavior.  My current suspect is the racy driver loading
+>>>> between btusb and ath3k.  Both have the same USB ID, and the driver
+>>>> loading order may interfere the behavior with each other?
+>>>>
+>>>> Or might it be a WiFi/BT combo chip that may have a racy firmware
+>>>> initialization?
+>>>
+>>> I've no idea I'm afraid.
+>>
+>> I checked with the original reporter about this possibility, and all
+>> failed.  So, it's not about the interaction between them.
+>>
+>> And, now after looking at the log in your bugzilla, I guess the fix
+>> would be something like below.
+>>
+>> Basically the only significant difference between these two BT quirks
+>> is the RAM-patching.  Without RAM patching, the wrong ROM versions are
+>> read by ath3k as is on the device of our reporter.
+>>
+>> OTOH, there are devices with the correct ROM versions, and at
+>> btusb_setup_qca(), we give -ENODEV at open just because the function
+>> expects only the buggy version numbers.  Instead of -ENODEV, it should
+>> just return 0.
+>>
+>> Hans, could you check whether it works for them?
 > 
-> >>>>> This adds a driver for the MediaTek serial protocol based on H4 protocol,
-> >>>>> which can enable the built-in Bluetooth device inside MT7622 SoC.
-> >>>>> 
-> >>>>> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> >>>>> ---
-> > 
+> ... or better with the one below.
 
- [... snip ...]
+Yes that one indeed looks better.
 
-> > 
-> > where could I find the newest btuart.c (which seems cannot be found in
-> > 4.17 rc2)? It seems a time to rewrite the driver based on btuart.c
+I've started a Fedora kernel (test) build with the revert + the patch
+from you below and asked the reporter_s_ of this problem to test, see:
+https://bugzilla.redhat.com/show_bug.cgi?id=1568911
+(you may want to put yourself in the Cc there).
+
+In the mean time I've also stumbled over this bug, which is another
+bug tracking the same issue:
+https://bugzilla.kernel.org/show_bug.cgi?id=199271
+
+Regards,
+
+Hans
+
+
+> -- 8< --
+> From: Takashi Iwai <tiwai@suse.de>
+> Subject: [PATCH] Bluetooth: btusb: Apply QCQ_ROME setup for BTUSB_ATH3012
+>   quirk, too
 > 
-> It is not merged yet. I posted RFC patches to the mailing list.
+> In commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros
+> 1525/QCA6174") we tried to address the non-working Atheros BT devices
+> by changing the quirk from BTUSB_ATH3012 to BTUSB_QCQ_ROME.  This made
+> such devices working while it turned out to break other existing chips
+> with the very same USB ID.
 > 
-
-got it.
-
-> > 
-> > the Bluetooth device can't survive in a power/down cycle and
-> > 
-> > * power on should be including
-> >  - enable clk and power domain
-> >  - download firmware through specific ACL command
-> >  - send specific commands to configure bluetooth (Required to note that
-> > the steps should be after downloading firmware because the behavior for
-> > the command might be changed by the firmware)
+> This is another attempt to tackle the issue.  The essential point to
+> use BTUSB_QCA_ROME is to apply the btusb_setup_qca() and do RAM-
+> patching.  And the previous attempt failed because btusb_setup_qcq()
+> returns -ENODEV if the ROM version doesn't match with the expected
+> ones.  For some devices that have already the "correct" ROM versions,
+> we may just skip the setup procedure and continue the rest.
 > 
-> Then this sounds like you need a quirk that runs setup() after every open() and not just after the first open(). You would be the first hardware that looses their firmware, but that is fine, I almost expect that at some point someone comes along and requires this. So just create a new HCI_QUIRK_NON_PERSISTENT_SETUP.
+> So, this patch applies btusb_setup_qca() also in BTUSB_ATH3012 quirk,
+> and adds a check of the ROM version in the function to skip the setup
+> if the ROM version looks already sane.
 > 
-
-Yes, it should be good to have an option HCI_QUIRK_NON_PERSISTENT_SETUP
-to allow us to run setup() for every open(). 
-
-When users are feeling unexpected thing happening on its device, they
-always have a habit trying to restart device from UI.
-
-If close() -> open() can completely power reset a bluetooth device and
-then it can recover from any fatal error to the initial state as at
-boot. It's good for these problems specially hard to be reproduced and
-required to reboot the whole machine to save.
-
-However, it would take a little longer time on open() since it takes
-extra time to make firmware download and reconfiguration.
-
-> > * power off should be including
-> >  - send specific commands, such as to disable bluetooth
+> Signed-off-by: Takashi Iwai <tiwai@suse.de>
+> ---
+>   drivers/bluetooth/btusb.c | 5 +++++
+>   1 file changed, 5 insertions(+)
 > 
-> So try to put these in shutdown()
-> 
-
-got it.
-
-> >  - disable power domain and clk
-> 
-> And do this in close().
-> 
-
-got it.
-
-
-> > 
-> >>> 
-> >>>>> +
-> >>>>> +	return err;
-
-
-[ ... snip ....]
-
->       .open           = mtk_open,
-> >> 
-> 
-> Go with a brand new btmtkuart.c driver. I really sounds you don’t want the hci_ldisc.c framework in your way. You want direct control over the core callbacks.
-> 
-
-1)
-
-In fact. the device is working via a internal serial bus, rather than
-via uart for mt7622. so could i call it btmtkserial.c ?
-
-Becasue mediatek indeed also have bluetooth over uart, if i called it
-btmtkserialc, the same code logic I think can be fit to all other
-devices using either uart or internal serial bus.
-
-2)
-
-Yes, i don't want hci_ldisc. so far i thought serdev version is enough,
-and i preferred that bluetotoh device don't depend on any utility on
-user space to launch.
-
-
-3) 
-
-last question
-
-if i have bluetooth over usb, the usb version bluetooth can reuse
-btmtkserial.c code?
-
-
-> Regards
-> 
-> Marcel
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index c8c8b0b8d333..720356320ace 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2673,6 +2673,10 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+>   		return err;
+>   
+>   	ver_rom = le32_to_cpu(ver.rom_version);
+> +	/* Don't care about high ROM versions */
+> +	if (ver_rom & ~0xffffU)
+> +		return 0;
+> +
+>   	for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
+>   		if (ver_rom == qca_devices_table[i].rom_version)
+>   			info = &qca_devices_table[i];
+> @@ -3055,6 +3059,7 @@ static int btusb_probe(struct usb_interface *intf,
+>   	}
+>   
+>   	if (id->driver_info & BTUSB_ATH3012) {
+> +		data->setup_on_usb = btusb_setup_qca;
+>   		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
+>   		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+>   		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
 > 
