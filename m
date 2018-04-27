@@ -1,50 +1,63 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH] Revert "Bluetooth: btusb: Fix quirk for Atheros
- 1525/QCA6174"
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
- stable@vger.kernel.org, Takashi Iwai <tiwai@suse.de>
-References: <20180426121819.23327-1-hdegoede@redhat.com>
- <85CF4178-2D2E-49D6-8837-EBD36623DFEE@holtmann.org>
- <009e5572-3766-f634-43be-7a3fce9ccfd8@redhat.com>
-Message-ID: <a4ba16ef-6369-fe32-24e0-30efb27a63f3@redhat.com>
-Date: Fri, 27 Apr 2018 10:49:52 +0200
+Return-Path: <luiz.dentz@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <009e5572-3766-f634-43be-7a3fce9ccfd8@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <6E19B1B3-3BFC-45E4-A4F1-52D3ADE47E10@holtmann.org>
+References: <87wox5di3k.fsf@mure.haselwarter.org> <5AE870C0-52D4-4EA8-B947-D33AE0662461@holtmann.org>
+ <CABBYNZKgcCf3N=gebmzwAPrFNXWd3wTwTVMg=_WYd4GtX0Lt3Q@mail.gmail.com> <6E19B1B3-3BFC-45E4-A4F1-52D3ADE47E10@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 27 Apr 2018 11:04:21 +0300
+Message-ID: <CABBYNZJvv_SYGtgBjsTeSHi55H1CgP8PsVMspxYM-yXHavg+bA@mail.gmail.com>
+Subject: Re: Low latency options for Bluetooth?
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Philipp Haselwarter <philipp@haselwarter.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-On 26-04-18 20:28, Hans de Goede wrote:
-> Hi,
-> 
-> On 26-04-18 14:22, Marcel Holtmann wrote:
->> Hi Hans,
->>
->>> Commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros
->>> 1525/QCA6174") is causing bluetooth to no longer work for several
->>> people, see: https://bugzilla.redhat.com/show_bug.cgi?id=1568911
+On Tue, Apr 24, 2018 at 10:01 AM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Luiz,
+>
+>>>> Legacy bluetooth codecs have a latency of ~200 ms or more, which creat=
+es
+>>>> a noticeable lag when watching videos or during voice calls.
+>>>>
+>>>> The AptX Low Latency (LL) codec can provide a stable connection with a=
+t
+>>>> most 40 ms of latency.
+>>>>
+>>>> - Is there a way to get AptX LL to work on Linux?
+>>>> - Are there alternatives for a low latency Bluetooth connection?
 >>>
->>> So lets revert it for now and try to find another solution for
->>> devices which need the modified quirk.
->>>
->>> Cc: stable@vger.kernel.org
->>> Cc: Takashi Iwai <tiwai@suse.de>
->>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->>> ---
->>> drivers/bluetooth/btusb.c | 2 +-
->>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>> with BlueZ for Android we actually had AptX working (given CSR provided=
+ you with a correct binary).
 >>
->> patch has been applied to bluetooth-next tree.
-> 
-> This is a regression fix, so can we please get this into 4.17-rc#
-> so that Greg can then take it into 4.16.z ?
+>> There is a pretty old patch for PulseAudio that enables AptX:
+>>
+>> https://build.tizen.org/package/view_file/Tizen/pulseaudio/0020-add-blue=
+tooth-a2dp-aptx-codec-support-samsung.patch?expand=3D1
+>>
+>> It doesn't have the actual AptX library, which I guess cannot be
+>> distributed under the same license. We could perhaps have OPUS (which
+>> should perform quite well) instead which should be available in all
+>> distros already, that said no headset or phone would support it
+>> initially, though it wouldn't be a problem for phones to add support
+>> for it since it has been in use in WebRTC, youtube, skype, etc.
+>
+> actually it seems FFmpeg has an open source aptX encoder and decoder.
+>
+> https://patchwork.ffmpeg.org/patch/5879/
+>
+> https://github.com/FFmpeg/FFmpeg/blob/master/libavcodec/aptx.c
+>
+> So I think someone could extend PA to use FFmpeg=E2=80=99s aptX and just =
+enable aptX for all devices.
 
-Also see: https://bugzilla.kernel.org/show_bug.cgi?id=199271
+Interesting, I guess we could do that, most likely it will be hard for
+distros since they don't normally ship with libavcodec since other
+codecs might not be 'free', but I guess users may be able to install
+that by themselves.
 
-Regards,
-
-Hans
+--=20
+Luiz Augusto von Dentz
