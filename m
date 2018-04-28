@@ -1,59 +1,41 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
+         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@zabzd.ru>
+Subject: Re: Algorithm for create serial connection without rfcomm
+To: linux-bluetooth@vger.kernel.org
+References: <000301d347db$df1dd300$9d597900$@com>
+ <6B2D6FC09217DA4280D35175FA16A620688418CA@msceml521-mbx.china.huawei.com>
+ <457BA4F48509464E9000537839AF501857261694@msceml521-mbx.china.huawei.com>
+ <59E7EBF9.3050705@zabzd.ru>
+ <457BA4F48509464E9000537839AF501857261990@msceml521-mbx.china.huawei.com>
+ <7CC793D56C5DD04ABFAFBF59EB0D4A3650F1DDAB@msceml522-mbx.china.huawei.com>
+ <59E946F9.1060501@zabzd.ru>
+ <7CC793D56C5DD04ABFAFBF59EB0D4A3650F1E01D@msceml522-mbx.china.huawei.com>
+ <59ED2E3D.7030809@zabzd.ru>
+ <7CC793D56C5DD04ABFAFBF59EB0D4A3650F1E6D0@msceml522-mbx.china.huawei.com>
+ <59F92B55.0@zabzd.ru>
+ <7CC793D56C5DD04ABFAFBF59EB0D4A3650F23FDB@msceml522-mbx.china.huawei.com>
+ <480C9E29A742984996B50276401889F36B33E940@msceml521-mbx.china.huawei.com>
+ <5AE03410.7070806@zabzd.ru>
+ <CAAu3APYXpqO77M0AhAVD-EnOapXAOXsAD4e26x5ULTVCxfSreg@mail.gmail.com>
+Message-ID: <5AE3EA6A.5020407@zabzd.ru>
+Date: Sat, 28 Apr 2018 11:28:42 +0800
 MIME-Version: 1.0
-References: <20180427171049.2250-1-brian.gix@intel.com>
-In-Reply-To: <20180427171049.2250-1-brian.gix@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 30 Apr 2018 07:19:38 +0000
-Message-ID: <CABBYNZLcUWJ46NdqDciuxwZt=nWmoiAjL6pNM3MiLHc_LMK4ow@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/1] Allow Non-Ephemeral ECC Key Sets
-To: "Gix, Brian" <brian.gix@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAAu3APYXpqO77M0AhAVD-EnOapXAOXsAD4e26x5ULTVCxfSreg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+No, nothing is clear yet.
 
-On Fri, Apr 27, 2018 at 8:11 PM Brian Gix <brian.gix@intel.com> wrote:
+I use bash script for manage bluetooth, dbus-send command help me use DBus.
 
-> Version 2, to address uninitialized private_key issue, by adding a new
-> API. This is separates the two major tasks of generating ECC key sets,
-> which are:
+All programm need serial device ex: /dev/ttyS0 or for bluetooth 
+/dev/rfcomm0 created.
 
-> a) Create a Private Key (Only used here when creating Ephemeral set)
-> b) Create the matching Public Key from the Private Key.
+I can not understand whether a device will be created, or it should be 
+created by myself. And how to create a device with a given name ex: 
+/dev/rfcomm0
 
-> In hindsight, we may have wanted to call the original API something like
-> ecc_make_keys() or ecc_make_key_set() instead of the singlular
-ecc_make_key.
-> Making that change now will require more wide-reaching changes, however.
-But
-> I am willing to do it in a v3 if people think it better.
-
-> Some minor spelling/capitalization issues were also addressed
-
-> Mesh will be the first to use non-Ephemeral keys
-
-> Brian Gix (1):
->    shared/ecc: Allow pre-composed Private Keys
-
->   src/shared/ecc.c | 42 +++++++++++++++++++++++++++++-------------
->   src/shared/ecc.h | 17 ++++++++++++++---
->   2 files changed, 43 insertions(+), 16 deletions(-)
-
-
-I went ahead and applied this one since the bigger set depending on it,
-note that I did have to fix the following warning by checkpatch:
-
-  Applying: shared/ecc: Allow pre-composed Private Keys
-WARNING:UNSPECIFIED_INT: Prefer 'unsigned int' to bare use of 'unsigned'
-#50: FILE: src/shared/ecc.c:887:
-+    unsigned tries = 0;
-
-> --
-> 2.14.3
-
-
-
--- 
-Luiz Augusto von Dentz
+After run ./spp-profile  script will the device file be created in /dev 
+directory?
