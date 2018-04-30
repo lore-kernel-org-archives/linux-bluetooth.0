@@ -1,95 +1,99 @@
-Return-Path: <kai.heng.feng@canonical.com>
-Content-Type: text/plain;
-	charset=utf-8;
-	delsp=yes;
-	format=flowed
-Mime-Version: 1.0 (Mac OS X Mail 11.2 \(3445.5.20\))
-Subject: Re: [PATCH] Bluetooth: btusb: Remove Yoga 920 from the
- btusb_needs_reset_resume_table
-From: Kai Heng Feng <kai.heng.feng@canonical.com>
-In-Reply-To: <CA+ASDXNwiWXdhyRZMiMXkVazqGxr8pLfmTpo1hD2CbCBmNrzLg@mail.gmail.com>
-Date: Thu, 1 Mar 2018 00:45:42 +0800
-Cc: Hans de Goede <hdegoede@redhat.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
- linux-serial@vger.kernel.org,
- ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
- stable <stable@vger.kernel.org>,
- Leif Liddy <leif.linux@gmail.com>
-Message-Id: <D7B95CCB-5AF4-4034-8813-1F0CFBC378F7@canonical.com>
-References: <20180228105750.6491-1-hdegoede@redhat.com>
- <20180228105750.6491-2-hdegoede@redhat.com>
- <CA+ASDXNwiWXdhyRZMiMXkVazqGxr8pLfmTpo1hD2CbCBmNrzLg@mail.gmail.com>
-To: Brian Norris <briannorris@chromium.org>
+Return-Path: <brian.gix@intel.com>
+From: Brian Gix <brian.gix@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ v4 14/14] Makefile for meshd and configure.ac
+Date: Mon, 30 Apr 2018 14:03:19 -0700
+Message-Id: <20180430210319.25137-15-brian.gix@intel.com>
+In-Reply-To: <20180430210319.25137-1-brian.gix@intel.com>
+References: <20180430210319.25137-1-brian.gix@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Brian Norris <briannorris@chromium.org> wrote:
+From: Inga Stotland <inga.stotland@intel.com>
 
-> + Leif
->
-> On Wed, Feb 28, 2018 at 2:57 AM, Hans de Goede <hdegoede@redhat.com> wrote:
->> Commit 55a9c95d70ab ("Bluetooth: btusb: Use DMI matching for QCA
->> reset_resume quirking"), added the Lenovo Yoga 920 to the
->> btusb_needs_reset_resume_table.
->>
->> Testing has shown that this is a false positive and the problems where
->> caused by issues with the initial fix: commit fd865802c66b ("Bluetooth:
->> btusb: fix QCA Rome suspend/resume"), which has already been reverted.
->>
->> So the QCA Rome BT in the Yoga 920 does not need a reset-resume quirk at
->> all and this commit removes it from the btusb_needs_reset_resume_table.
->>
->> Note that after this commit the btusb_needs_reset_resume_table is now
->> empty. It is kept around on purpose, since this whole series of commits
->> started for a reason and there are actually broken platforms around,
->> which need to be added to it.
->
-> This is hilarious.
->
+---
+ Makefile.am    |  1 +
+ Makefile.meshd | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ configure.ac   |  2 +-
+ 3 files changed, 46 insertions(+), 1 deletion(-)
+ create mode 100644 Makefile.meshd
 
-The platform at my hand still needs the quirk though, so the table is quite  
-useful.
-I’ll send a patch soon.
-
-> I think we need to go back to the author(s) of commit fd865802c66b and
-> find proper details about said "numerous reported instances" of
-> problems... Anyway:
->
-> Reviewed-by: Brian Norris <briannorris@chromium.org>
->
->> BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=1514836
->> Fixes: 55a9c95d70ab ("Bluetooth: btusb: Use DMI matching for QCA ...")
->> Cc: stable@vger.kernel.org
->> Cc: Brian Norris <briannorris@chromium.org>
->> Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>
->> Tested-by: Kevin Fenzi <kevin@scrye.com>
->> Suggested-by: Brian Norris <briannorris@chromium.org>
->> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->> ---
->>  drivers/bluetooth/btusb.c | 7 -------
->>  1 file changed, 7 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index a4b62f0a93cc..418550eb1522 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -386,13 +386,6 @@ static const struct usb_device_id blacklist_table[]  
->> = {
->>   * the module itself. So we use a DMI list to match known broken platforms.
->>   */
->>  static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
->> -       {
->> -               /* Lenovo Yoga 920 (QCA Rome device 0cf3:e300) */
->> -               .matches = {
->> -                       DMI_MATCH(DMI_SYS_VENDOR, "LENOVO"),
->> -                       DMI_MATCH(DMI_PRODUCT_VERSION, "Lenovo YOGA 920"),
->> -               },
->> -       },
->>         {}
->>  };
->>
->> —
-
->> 2.14.3
+diff --git a/Makefile.am b/Makefile.am
+index daf34b6ca..2a96fa1d3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -225,6 +225,7 @@ unit_tests =
+ include Makefile.tools
+ include Makefile.obexd
+ include android/Makefile.am
++include Makefile.meshd
+ 
+ if HID2HCI
+ rulesdir = @UDEV_DIR@/rules.d
+diff --git a/Makefile.meshd b/Makefile.meshd
+new file mode 100644
+index 000000000..4a9d45a12
+--- /dev/null
++++ b/Makefile.meshd
+@@ -0,0 +1,44 @@
++if MESH
++mesh_json_sources = meshd/mesh-json/mesh-db.h meshd/mesh-json/mesh-db.c
++mesh_common_sources = meshd/common/mesh-defs.h \
++					meshd/common/util.h meshd/common/util.c
++
++meshd_sources = $(mesh_common_sources) $(mesh_json_sources) \
++				meshd/src/mesh.h meshd/src/mesh.c \
++				meshd/src/mesh-io.h meshd/src/mesh-io.c \
++				meshd/src/mesh-io-api.h meshd/src/bt.h \
++				meshd/src/mesh-io-generic.h \
++				meshd/src/mesh-io-generic.c \
++				meshd/src/hci.h meshd/src/hci.c \
++				meshd/src/storage.h meshd/src/storage.c \
++				meshd/src/net.h meshd/src/net.c \
++				meshd/src/display.h meshd/src/display.c \
++				meshd/src/crypto.h meshd/src/crypto.c \
++				meshd/src/friend.h meshd/src/friend.c \
++				meshd/src/appkeys.h meshd/src/appkey.c \
++				meshd/src/node.h meshd/src/node.c \
++				meshd/src/prov.h meshd/src/prov.c \
++				meshd/src/provision.h meshd/src/provision.c \
++				meshd/src/model.h meshd/src/model.c \
++				meshd/src/cfgmod.h meshd/src/cfgmod-server.c
++
++libexec_PROGRAMS += meshd/src/meshd
++
++meshd_src_meshd_SOURCES = $(meshd_sources) \
++						meshd/src/main.c
++
++meshd_src_meshd_LDADD = /usr/lib64/libell.la src/shared/ecc.lo \
++			@DBUS_LIBS@ -lell -ljson-c -ldl
++
++noinst_PROGRAMS += meshd/src/btmesh
++
++meshd_src_btmesh_SOURCES = $(meshd_sources) \
++						meshd/common/agent.h \
++						meshd/common/agent.c \
++						meshd/src/btmesh.c
++
++meshd_src_btmesh_LDADD = /usr/lib64/libell.la src/shared/ecc.lo \
++						src/libshared-mainloop.la \
++						-lreadline -lell -ljson-c -ldl
++
++endif
+diff --git a/configure.ac b/configure.ac
+index 5132131f2..f6259c0fe 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -248,7 +248,7 @@ AC_ARG_ENABLE(btpclient, AC_HELP_STRING([--enable-btpclient],
+ 		[enable BTP client]), [enable_btpclient=${enableval}])
+ AM_CONDITIONAL(BTPCLIENT, test "${enable_btpclient}" = "yes")
+ 
+-if (test "${enable_btpclient}" = "yes"); then
++if (test "${enable_btpclient}" = "yes" || test "${enable_mesh}" == "yes"); then
+ 	PKG_CHECK_MODULES(ELL, ell >= 0.3, dummy=yes,
+ 			  AC_MSG_ERROR(ell library >= 0.3 is required))
+ 	AC_SUBST(ELL_CFLAGS)
+-- 
+2.14.3
