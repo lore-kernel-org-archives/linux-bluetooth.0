@@ -4,24 +4,103 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org
 Cc: Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v4 04/14] meshd: Initial Mesh Friendship support
-Date: Mon, 30 Apr 2018 14:03:09 -0700
-Message-Id: <20180430210319.25137-5-brian.gix@intel.com>
+Subject: [PATCH BlueZ v4 03/14] meshd: Infrastructure for Mesh daemon
+Date: Mon, 30 Apr 2018 14:03:08 -0700
+Message-Id: <20180430210319.25137-4-brian.gix@intel.com>
 In-Reply-To: <20180430210319.25137-1-brian.gix@intel.com>
 References: <20180430210319.25137-1-brian.gix@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- meshd/src/friend.c | 1116 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 1116 insertions(+)
- create mode 100644 meshd/src/friend.c
+ meshd/src/display.c         |  67 +++++
+ meshd/src/hci.c             | 699 ++++++++++++++++++++++++++++++++++++++++++++
+ meshd/src/mesh-io-generic.c | 660 +++++++++++++++++++++++++++++++++++++++++
+ meshd/src/mesh-io.c         | 187 ++++++++++++
+ 4 files changed, 1613 insertions(+)
+ create mode 100644 meshd/src/display.c
+ create mode 100644 meshd/src/hci.c
+ create mode 100644 meshd/src/mesh-io-generic.c
+ create mode 100644 meshd/src/mesh-io.c
 
-diff --git a/meshd/src/friend.c b/meshd/src/friend.c
+diff --git a/meshd/src/display.c b/meshd/src/display.c
 new file mode 100644
-index 000000000..a212f5523
+index 000000000..adf92cae0
 --- /dev/null
-+++ b/meshd/src/friend.c
-@@ -0,0 +1,1116 @@
++++ b/meshd/src/display.c
+@@ -0,0 +1,67 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#include <stdio.h>
++#include <unistd.h>
++#include <termios.h>
++#include <sys/ioctl.h>
++#include <sys/time.h>
++#include <ell/ell.h>
++
++#include "display.h"
++
++#define likely(x)   __builtin_expect(!!(x), 1)
++#define unlikely(x) __builtin_expect(!!(x), 0)
++
++static unsigned int cached_num_columns;
++
++unsigned int num_columns(void)
++{
++	struct winsize ws;
++
++	if (likely(cached_num_columns > 0))
++		return cached_num_columns;
++
++	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) < 0 || ws.ws_col == 0)
++		cached_num_columns = 80;
++	else
++		cached_num_columns = ws.ws_col;
++
++	return cached_num_columns;
++}
++
++void print_packet(const char *label, const void *data, uint16_t size)
++{
++	struct timeval pkt_time;
++
++	gettimeofday(&pkt_time, NULL);
++
++	if (size > 0) {
++		char *str;
++
++		str = l_util_hexstring(data, size);
++		l_info("%05d.%03d %s: %s",
++				(uint32_t) pkt_time.tv_sec % 100000,
++				(uint32_t) pkt_time.tv_usec/1000, label, str);
++		l_free(str);
++	} else
++		l_info("%05d.%03d %s: empty",
++				(uint32_t) pkt_time.tv_sec % 100000,
++				(uint32_t) pkt_time.tv_usec/1000, label);
++}
+diff --git a/meshd/src/hci.c b/meshd/src/hci.c
+new file mode 100644
+index 000000000..4e5a40d63
+--- /dev/null
++++ b/meshd/src/hci.c
+@@ -0,0 +1,699 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -46,1097 +125,1539 @@ index 000000000..a212f5523
 +#endif
 +
 +#include <unistd.h>
-+#include <stdio.h>
++#include <stdlib.h>
++#include <sys/uio.h>
++#include <sys/socket.h>
++#include <ell/ell.h>
++
++#include "monitor/bt.h"
++
++#include "meshd/src/hci.h"
++
++#define BTPROTO_HCI	1
++struct sockaddr_hci {
++	sa_family_t	hci_family;
++	unsigned short	hci_dev;
++	unsigned short  hci_channel;
++};
++#define HCI_CHANNEL_USER	1
++
++struct bt_hci {
++	int ref_count;
++	struct l_io *io;
++	bool is_stream;
++	bool writer_active;
++	uint8_t num_cmds;
++	uint8_t num_pkts;
++	unsigned int next_cmd_id;
++	unsigned int next_evt_id;
++	struct l_queue *cmd_queue;
++	struct l_queue *rsp_queue;
++	struct l_queue *evt_list;
++	struct l_queue *pkt_queue;
++	bt_hci_receive_func_t receive_callback;
++	bt_hci_destroy_func_t receive_destroy;
++	void *receive_data;
++};
++
++struct cmd {
++	unsigned int id;
++	uint16_t opcode;
++	void *data;
++	uint8_t size;
++	bt_hci_callback_func_t callback;
++	bt_hci_destroy_func_t destroy;
++	void *user_data;
++};
++
++struct evt {
++	unsigned int id;
++	uint8_t event;
++	bt_hci_callback_func_t callback;
++	bt_hci_destroy_func_t destroy;
++	void *user_data;
++};
++
++struct pkt {
++	uint16_t handle;
++	uint8_t flags;
++	void *data;
++	uint16_t size;
++};
++
++static void cmd_free(void *data)
++{
++	struct cmd *cmd = data;
++
++	if (cmd->destroy)
++		cmd->destroy(cmd->user_data);
++
++	l_free(cmd->data);
++	l_free(cmd);
++}
++
++static void evt_free(void *data)
++{
++	struct evt *evt = data;
++
++	if (evt->destroy)
++		evt->destroy(evt->user_data);
++
++	l_free(evt);
++}
++
++static void pkt_free(void *data)
++{
++	struct pkt *pkt = data;
++
++	l_free(pkt->data);
++	l_free(pkt);
++}
++
++static void send_command(struct bt_hci *hci, uint16_t opcode,
++						void *data, uint8_t size)
++{
++	uint8_t type = BT_H4_CMD_PKT;
++	struct bt_hci_cmd_hdr hdr;
++	struct iovec iov[3];
++	int fd, iovcnt;
++
++	hdr.opcode = L_CPU_TO_LE16(opcode);
++	hdr.plen = size;
++
++	iov[0].iov_base = &type;
++	iov[0].iov_len  = 1;
++	iov[1].iov_base = &hdr;
++	iov[1].iov_len  = sizeof(hdr);
++
++	if (size > 0) {
++		iov[2].iov_base = data;
++		iov[2].iov_len  = size;
++		iovcnt = 3;
++	} else
++		iovcnt = 2;
++
++	fd = l_io_get_fd(hci->io);
++	if (fd < 0) {
++		l_error("hci->io Bad");
++		return;
++	}
++
++	if (writev(fd, iov, iovcnt) < 0) {
++		l_error("writev Bad");
++		return;
++	}
++
++	hci->num_cmds--;
++}
++
++static void send_packet(struct bt_hci *hci, uint16_t handle, uint8_t flags,
++						void *data, uint8_t size)
++{
++	uint8_t type = BT_H4_ACL_PKT;
++	struct bt_hci_acl_hdr hdr;
++	struct iovec iov[3];
++	int fd, iovcnt;
++
++	hdr.handle = L_CPU_TO_LE16(flags << 12 | handle);
++	hdr.dlen = L_CPU_TO_LE16(size);
++
++	iov[0].iov_base = &type;
++	iov[0].iov_len  = 1;
++	iov[1].iov_base = &hdr;
++	iov[1].iov_len  = sizeof(hdr);
++
++	if (size > 0) {
++		iov[2].iov_base = data;
++		iov[2].iov_len  = size;
++		iovcnt = 3;
++	} else
++		iovcnt = 2;
++
++	fd = l_io_get_fd(hci->io);
++	if (fd < 0) {
++		l_error("hci->io Bad");
++		return;
++	}
++
++	if (writev(fd, iov, iovcnt) < 0) {
++		l_error("writev Bad");
++		return;
++	}
++
++	hci->num_pkts--;
++}
++
++static bool io_write_callback(struct l_io *io, void *user_data)
++{
++	struct bt_hci *hci = user_data;
++	struct cmd *cmd;
++
++	if (hci->num_cmds > 0)
++		cmd = l_queue_pop_head(hci->cmd_queue);
++	else
++		cmd = NULL;
++
++	if (cmd) {
++		send_command(hci, cmd->opcode, cmd->data, cmd->size);
++		l_queue_push_tail(hci->rsp_queue, cmd);
++	} else {
++		struct pkt *pkt;
++
++		if (hci->num_pkts < 1)
++			goto done;
++
++		pkt = l_queue_pop_head(hci->pkt_queue);
++		if (pkt) {
++			send_packet(hci, pkt->handle, pkt->flags,
++							pkt->data, pkt->size);
++			pkt_free(pkt);
++		}
++	}
++
++	if (!l_queue_isempty(hci->pkt_queue))
++		return true;
++
++done:
++	hci->writer_active = false;
++
++	return false;
++}
++
++static void wakeup_writer(struct bt_hci *hci)
++{
++	if (hci->writer_active)
++		return;
++
++	if (l_queue_isempty(hci->cmd_queue) && l_queue_isempty(hci->pkt_queue))
++		return;
++
++	if (!l_io_set_write_handler(hci->io, io_write_callback, hci, NULL))
++		return;
++
++	hci->writer_active = true;
++}
++
++static bool match_cmd_opcode(const void *a, const void *b)
++{
++	const struct cmd *cmd = a;
++	uint16_t opcode = L_PTR_TO_UINT(b);
++
++	return cmd->opcode == opcode;
++}
++
++static void process_response(struct bt_hci *hci, uint16_t opcode,
++					const void *data, size_t size)
++{
++	struct cmd *cmd;
++
++	if (opcode == BT_HCI_CMD_NOP)
++		goto done;
++
++	cmd = l_queue_remove_if(hci->rsp_queue, match_cmd_opcode,
++						L_UINT_TO_PTR(opcode));
++	if (!cmd)
++		goto done;
++
++	if (cmd->callback)
++		cmd->callback(data, size, cmd->user_data);
++
++	cmd_free(cmd);
++
++done:
++	wakeup_writer(hci);
++}
++
++static void process_notify(void *data, void *user_data)
++{
++	struct bt_hci_evt_hdr *hdr = user_data;
++	struct evt *evt = data;
++
++	if (evt->event == hdr->evt)
++		evt->callback(user_data + sizeof(struct bt_hci_evt_hdr),
++						hdr->plen, evt->user_data);
++}
++
++static void process_event(struct bt_hci *hci, const void *data, size_t size)
++{
++	const struct bt_hci_evt_hdr *hdr = data;
++	const struct bt_hci_evt_cmd_complete *cc;
++	const struct bt_hci_evt_cmd_status *cs;
++	const struct bt_hci_evt_num_completed_packets *cp;
++
++	if (size < sizeof(struct bt_hci_evt_hdr))
++		return;
++
++	data += sizeof(struct bt_hci_evt_hdr);
++	size -= sizeof(struct bt_hci_evt_hdr);
++
++	if (hdr->plen != size)
++		return;
++
++	switch (hdr->evt) {
++	case BT_HCI_EVT_CMD_COMPLETE:
++		if (size < sizeof(*cc))
++			return;
++		cc = data;
++		hci->num_cmds = cc->ncmd;
++		process_response(hci, L_LE16_TO_CPU(cc->opcode),
++						data + sizeof(*cc),
++						size - sizeof(*cc));
++		break;
++
++	case BT_HCI_EVT_CMD_STATUS:
++		if (size < sizeof(*cs))
++			return;
++		cs = data;
++		hci->num_cmds = cs->ncmd;
++		process_response(hci, L_LE16_TO_CPU(cs->opcode),
++							&cs->status, 1);
++		break;
++
++	case BT_HCI_EVT_NUM_COMPLETED_PACKETS:
++		if (size < sizeof(*cp))
++			return;
++		cp = data;
++		l_debug("BT_HCI_EVT_NUM_COMPLETED_PACKETS:%d", cp->count);
++		/* Ignoring handle information for now */
++		hci->num_pkts = cp->count;
++		wakeup_writer(hci);
++		break;
++
++	default:
++		l_queue_foreach(hci->evt_list, process_notify, (void *) hdr);
++		break;
++	}
++}
++
++static void process_acl(struct bt_hci *hci, const void *data, size_t size)
++{
++	const struct bt_hci_acl_hdr *hdr = data;
++	uint16_t handle;
++
++	if (size < sizeof(struct bt_hci_acl_hdr))
++		return;
++
++	data += sizeof(struct bt_hci_acl_hdr);
++	size -= sizeof(struct bt_hci_acl_hdr);
++
++	if (L_LE16_TO_CPU(hdr->dlen) != size)
++		return;
++
++	handle = L_LE16_TO_CPU(hdr->handle);
++
++	if (hci->receive_callback)
++		hci->receive_callback(handle & 0x0fff, handle >> 12,
++					data, size, hci->receive_data);
++}
++
++static bool io_read_callback(struct l_io *io, void *user_data)
++{
++	struct bt_hci *hci = user_data;
++	uint8_t buf[512];
++	ssize_t len;
++	int fd;
++
++	fd = l_io_get_fd(hci->io);
++	if (fd < 0)
++		return false;
++
++	if (hci->is_stream)
++		return false;
++
++	len = read(fd, buf, sizeof(buf));
++	if (len < 0)
++		return false;
++
++	if (len < 1)
++		return true;
++
++	switch (buf[0]) {
++	case BT_H4_EVT_PKT:
++		process_event(hci, buf + 1, len - 1);
++		break;
++	case BT_H4_ACL_PKT:
++		process_acl(hci, buf + 1, len - 1);
++		break;
++	default:
++		l_info("%2.2x-RXed", buf[0]);
++	}
++
++	return true;
++}
++
++static struct bt_hci *create_hci(int fd)
++{
++	struct bt_hci *hci;
++
++	if (fd < 0)
++		return NULL;
++
++	hci = l_new(struct bt_hci, 1);
++
++	hci->io = l_io_new(fd);
++
++	hci->is_stream = true;
++	hci->writer_active = false;
++	hci->num_cmds = 1;
++	hci->num_pkts = 1;
++	hci->next_cmd_id = 1;
++	hci->next_evt_id = 1;
++
++	hci->cmd_queue = l_queue_new();
++	hci->rsp_queue = l_queue_new();
++	hci->evt_list = l_queue_new();
++	hci->pkt_queue = l_queue_new();
++
++	if (!l_io_set_read_handler(hci->io, io_read_callback, hci, NULL)) {
++		l_queue_destroy(hci->pkt_queue, NULL);
++		l_queue_destroy(hci->evt_list, NULL);
++		l_queue_destroy(hci->rsp_queue, NULL);
++		l_queue_destroy(hci->cmd_queue, NULL);
++		l_io_destroy(hci->io);
++		l_free(hci);
++		return NULL;
++	}
++
++	return bt_hci_ref(hci);
++}
++
++struct bt_hci *bt_hci_new(int fd)
++{
++	struct bt_hci *hci;
++
++	hci = create_hci(fd);
++	if (!hci)
++		return NULL;
++
++	return hci;
++}
++
++static int create_socket(uint16_t index, uint16_t channel)
++{
++	struct sockaddr_hci addr;
++	int fd;
++
++	fd = socket(PF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC | SOCK_NONBLOCK,
++								BTPROTO_HCI);
++	if (fd < 0)
++		return -1;
++
++	memset(&addr, 0, sizeof(addr));
++	addr.hci_family = AF_BLUETOOTH;
++	addr.hci_dev = index;
++	addr.hci_channel = channel;
++
++	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		close(fd);
++		return -1;
++	}
++
++	return fd;
++}
++
++struct bt_hci *bt_hci_new_user_channel(uint16_t index)
++{
++	struct bt_hci *hci;
++	int fd;
++
++	fd = create_socket(index, HCI_CHANNEL_USER);
++	if (fd < 0)
++		return NULL;
++
++	hci = create_hci(fd);
++	if (!hci) {
++		close(fd);
++		return NULL;
++	}
++
++	hci->is_stream = false;
++
++	bt_hci_set_close_on_unref(hci, true);
++
++	return hci;
++}
++
++struct bt_hci *bt_hci_ref(struct bt_hci *hci)
++{
++	if (!hci)
++		return NULL;
++
++	__sync_fetch_and_add(&hci->ref_count, 1);
++
++	return hci;
++}
++
++void bt_hci_unref(struct bt_hci *hci)
++{
++	if (!hci)
++		return;
++
++	if (__sync_sub_and_fetch(&hci->ref_count, 1))
++		return;
++
++	if (hci->receive_destroy)
++		hci->receive_destroy(hci->receive_data);
++
++	l_queue_destroy(hci->pkt_queue, pkt_free);
++	l_queue_destroy(hci->evt_list, evt_free);
++	l_queue_destroy(hci->cmd_queue, cmd_free);
++	l_queue_destroy(hci->rsp_queue, cmd_free);
++
++	l_io_destroy(hci->io);
++
++	l_free(hci);
++}
++
++bool bt_hci_set_close_on_unref(struct bt_hci *hci, bool do_close)
++{
++	if (!hci)
++		return false;
++
++	return l_io_set_close_on_destroy(hci->io, do_close);
++}
++
++unsigned int bt_hci_send(struct bt_hci *hci, uint16_t opcode,
++				const void *data, uint8_t size,
++				bt_hci_callback_func_t callback,
++				void *user_data, bt_hci_destroy_func_t destroy)
++{
++	struct cmd *cmd;
++
++	if (!hci)
++		return 0;
++
++	cmd = l_new(struct cmd, 1);
++
++	cmd->opcode = opcode;
++	cmd->size = size;
++
++	if (cmd->size > 0)
++		cmd->data = l_memdup(data, cmd->size);
++
++	if (hci->next_cmd_id < 1)
++		hci->next_cmd_id = 1;
++
++	cmd->id = hci->next_cmd_id++;
++
++	cmd->callback = callback;
++	cmd->destroy = destroy;
++	cmd->user_data = user_data;
++
++	if (!l_queue_push_tail(hci->cmd_queue, cmd)) {
++		l_free(cmd->data);
++		l_free(cmd);
++		return 0;
++	}
++
++	wakeup_writer(hci);
++
++	return cmd->id;
++}
++
++static bool match_cmd_id(const void *a, const void *b)
++{
++	const struct cmd *cmd = a;
++	unsigned int id = L_PTR_TO_UINT(b);
++
++	return cmd->id == id;
++}
++
++bool bt_hci_cancel(struct bt_hci *hci, unsigned int id)
++{
++	struct cmd *cmd;
++
++	if (!hci || !id)
++		return false;
++
++	cmd = l_queue_remove_if(hci->cmd_queue, match_cmd_id,
++						L_UINT_TO_PTR(id));
++	if (!cmd) {
++		cmd = l_queue_remove_if(hci->rsp_queue, match_cmd_id,
++							L_UINT_TO_PTR(id));
++		if (!cmd)
++			return false;
++	}
++
++	cmd_free(cmd);
++
++	wakeup_writer(hci);
++
++	return true;
++}
++
++bool bt_hci_flush(struct bt_hci *hci)
++{
++	if (!hci)
++		return false;
++
++	if (hci->writer_active) {
++		l_io_set_write_handler(hci->io, NULL, NULL, NULL);
++		hci->writer_active = false;
++	}
++
++	l_queue_clear(hci->cmd_queue, cmd_free);
++	l_queue_clear(hci->rsp_queue, cmd_free);
++
++	return true;
++}
++
++unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
++				bt_hci_callback_func_t callback,
++				void *user_data, bt_hci_destroy_func_t destroy)
++{
++	struct evt *evt;
++
++	if (!hci)
++		return 0;
++
++	evt = l_new(struct evt, 1);
++
++	evt->event = event;
++
++	if (hci->next_evt_id < 1)
++		hci->next_evt_id = 1;
++
++	evt->id = hci->next_evt_id++;
++
++	evt->callback = callback;
++	evt->destroy = destroy;
++	evt->user_data = user_data;
++
++	if (!l_queue_push_tail(hci->evt_list, evt)) {
++		l_free(evt);
++		return 0;
++	}
++
++	return evt->id;
++}
++
++static bool match_evt_id(const void *a, const void *b)
++{
++	const struct evt *evt = a;
++	unsigned int id = L_PTR_TO_UINT(b);
++
++	return evt->id == id;
++}
++
++bool bt_hci_unregister(struct bt_hci *hci, unsigned int id)
++{
++	struct evt *evt;
++
++	if (!hci || !id)
++		return false;
++
++	evt = l_queue_remove_if(hci->evt_list, match_evt_id,
++						L_UINT_TO_PTR(id));
++	if (!evt)
++		return false;
++
++	evt_free(evt);
++
++	return true;
++}
++
++bool bt_hci_receive(struct bt_hci *hci, bt_hci_receive_func_t callback,
++				void *user_data, bt_hci_destroy_func_t destroy)
++{
++	if (!hci)
++		return false;
++
++	if (hci->receive_destroy)
++		hci->receive_destroy(hci->receive_data);
++
++	hci->receive_callback = callback;
++	hci->receive_destroy = destroy;
++	hci->receive_data = user_data;
++
++	return true;
++}
++
++bool bt_hci_write(struct bt_hci *hci, uint16_t handle, uint8_t flags,
++				const void *data, uint16_t size)
++{
++	struct pkt *pkt;
++
++	if (!hci)
++		return false;
++
++	pkt = l_new(struct pkt, 1);
++
++	pkt->handle = handle;
++	pkt->flags = flags;
++	pkt->size = size;
++
++	if (pkt->size > 0)
++		pkt->data = l_memdup(data, pkt->size);
++
++	if (!l_queue_push_tail(hci->pkt_queue, pkt)) {
++		l_free(pkt->data);
++		l_free(pkt);
++		return false;
++	}
++
++	wakeup_writer(hci);
++
++	return true;
++}
+diff --git a/meshd/src/mesh-io-generic.c b/meshd/src/mesh-io-generic.c
+new file mode 100644
+index 000000000..e5042bb79
+--- /dev/null
++++ b/meshd/src/mesh-io-generic.c
+@@ -0,0 +1,660 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
 +#include <sys/time.h>
 +#include <ell/ell.h>
 +
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++
++#include "monitor/bt.h"
++
++#include "meshd/src/hci.h"
++#include "meshd/src/display.h"
++#include "meshd/src/mesh-io.h"
++#include "meshd/src/mesh-io-api.h"
++
++#include "meshd/src/mesh-io-generic.h"
++
++struct mesh_io_private {
++	uint16_t index;
++	struct bt_hci *hci;
++	struct l_timeout *tx_timeout;
++	struct l_queue *rx_regs;
++	struct l_queue *tx_pkts;
++	uint8_t filters[3]; /* Simple filtering on AD type only */
++	bool sending;
++	struct tx_pkt *tx;
++	uint16_t interval;
++};
++
++struct pvt_rx_reg {
++	uint8_t filter_id;
++	mesh_io_recv_func_t cb;
++	void *user_data;
++};
++
++struct process_data {
++	struct mesh_io_private		*pvt;
++	const uint8_t			*data;
++	uint8_t				len;
++	struct mesh_io_recv_info	info;
++};
++
++struct tx_pkt {
++	struct mesh_io_send_info	info;
++	bool				delete;
++	uint8_t				len;
++	uint8_t				pkt[30];
++};
++
++struct tx_pattern {
++	const uint8_t			*data;
++	uint8_t				len;
++};
++
++static uint32_t get_instant(void)
++{
++	struct timeval tm;
++	uint32_t instant;
++
++	gettimeofday(&tm, NULL);
++	instant = tm.tv_sec * 1000;
++	instant += tm.tv_usec / 1000;
++
++	return instant;
++}
++
++static uint32_t instant_remaining_ms(uint32_t instant)
++{
++	instant -= get_instant();
++	return instant;
++}
++
++static void process_rx_callbacks(void *v_rx, void *v_reg)
++{
++	struct pvt_rx_reg *rx_reg = v_rx;
++	struct process_data *rx = v_reg;
++	uint8_t ad_type;
++
++	ad_type = rx->pvt->filters[rx_reg->filter_id - 1];
++
++	if (rx->data[0] == ad_type && rx_reg->cb)
++		rx_reg->cb(rx_reg->user_data, &rx->info, rx->data, rx->len);
++}
++
++static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
++					uint32_t instant,
++					const uint8_t *data, uint8_t len)
++{
++	struct process_data rx = {
++		.pvt = pvt,
++		.data = data,
++		.len = len,
++		.info.instant = instant,
++		.info.chan = 7,
++		.info.rssi = rssi,
++	};
++
++	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
++}
++
++static void event_adv_report(struct mesh_io *io, const void *buf, uint8_t size)
++{
++	const struct bt_hci_evt_le_adv_report *evt = buf;
++	const uint8_t *adv;
++	uint32_t instant;
++	uint8_t adv_len;
++	uint16_t len = 0;
++	int8_t rssi;
++
++	if (evt->event_type != 0x03)
++		return;
++
++	if (evt->addr_type != BDADDR_LE_PUBLIC &&
++			evt->addr_type != BDADDR_LE_RANDOM)
++		return;
++
++	instant = get_instant();
++	adv = evt->data;
++	adv_len = evt->data_len;
++
++	/* rssi is just beyond last byte of data */
++	rssi = (int8_t) adv[adv_len];
++
++	while (len < adv_len - 1) {
++		uint8_t field_len = adv[0];
++
++		/* Check for the end of advertising data */
++		if (field_len == 0)
++			break;
++
++		len += field_len + 1;
++
++		/* Do not continue data parsing if got incorrect length */
++		if (len > adv_len)
++			break;
++
++		/* TODO: Create an Instant to use */
++		process_rx(io->pvt, rssi, instant, adv + 1, adv[0]);
++
++		adv += field_len + 1;
++	}
++}
++
++static void event_callback(const void *buf, uint8_t size, void *user_data)
++{
++	uint8_t event = l_get_u8(buf);
++	struct mesh_io *io = user_data;
++
++	switch (event) {
++	case BT_HCI_EVT_LE_ADV_REPORT:
++		event_adv_report(io, buf + 1, size - 1);
++		break;
++
++	default:
++		l_info("Other Meta Evt - %d", event);
++	}
++}
++
++static bool dev_init(uint16_t index, struct mesh_io *io)
++{
++	struct mesh_io_private *tmp;
++
++	if (!io || io->pvt)
++		return false;
++
++	tmp = l_new(struct mesh_io_private, 1);
++
++	if (tmp == NULL)
++		return false;
++
++	tmp->rx_regs = l_queue_new();
++	tmp->tx_pkts = l_queue_new();
++	if (!tmp->rx_regs || !tmp->tx_pkts)
++		goto fail;
++
++	tmp->hci = bt_hci_new_user_channel(index);
++	if (!tmp->hci)
++		goto fail;
++
++	bt_hci_register(tmp->hci, BT_HCI_EVT_LE_META_EVENT,
++						event_callback, io, NULL);
++
++	io->pvt = tmp;
++	return true;
++
++fail:
++	l_queue_destroy(tmp->rx_regs, l_free);
++	l_queue_destroy(tmp->tx_pkts, l_free);
++	l_free(tmp);
++	return false;
++}
++
++static bool dev_destroy(struct mesh_io *io)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	if (!pvt)
++		return true;
++
++	bt_hci_unref(pvt->hci);
++	l_timeout_remove(pvt->tx_timeout);
++	l_queue_destroy(pvt->rx_regs, l_free);
++	l_queue_destroy(pvt->tx_pkts, l_free);
++	l_free(pvt);
++	io->pvt = NULL;
++
++	return true;
++}
++
++static bool dev_caps(struct mesh_io *io, struct mesh_io_caps *caps)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	if (!pvt || !caps)
++		return false;
++
++	caps->max_num_filters = sizeof(pvt->filters);
++	caps->window_accuracy = 50;
++
++	return true;
++}
++
++static void send_cancel_done(const void *buf, uint8_t size,
++							void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct bt_hci_cmd_le_set_random_address cmd;
++
++	if (!pvt)
++		return;
++
++	pvt->sending = false;
++
++	/* At end of any burst of ADVs, change random address */
++	l_getrandom(cmd.addr, 6);
++	cmd.addr[5] |= 0xc0;
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_RANDOM_ADDRESS,
++				&cmd, sizeof(cmd), NULL, NULL, NULL);
++}
++
++static void send_cancel(struct mesh_io_private *pvt)
++{
++	struct bt_hci_cmd_le_set_adv_enable cmd;
++
++	if (!pvt)
++		return;
++
++	if (!pvt->sending) {
++		send_cancel_done(NULL, 0, pvt);
++		return;
++	}
++
++	cmd.enable = 0x00;	/* Disable advertising */
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
++				&cmd, sizeof(cmd),
++				send_cancel_done, pvt, NULL);
++}
++
++static void set_send_adv_enable(const void *buf, uint8_t size,
++							void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct bt_hci_cmd_le_set_adv_enable cmd;
++
++	if (!pvt)
++		return;
++
++	pvt->sending = true;
++	cmd.enable = 0x01;	/* Enable advertising */
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
++				&cmd, sizeof(cmd), NULL, NULL, NULL);
++}
++
++static void set_send_adv_data(const void *buf, uint8_t size,
++							void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	struct bt_hci_cmd_le_set_adv_data cmd;
++
++	if (!pvt || !pvt->tx)
++		return;
++
++	tx = pvt->tx;
++	if (tx->len >= sizeof(cmd.data))
++		goto done;
++
++	memset(&cmd, 0, sizeof(cmd));
++
++	cmd.len = tx->len + 1;
++	cmd.data[0] = tx->len;
++	memcpy(cmd.data + 1, tx->pkt, tx->len);
++
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_DATA,
++					&cmd, sizeof(cmd),
++					set_send_adv_enable, pvt, NULL);
++done:
++	if (tx->delete)
++		l_free(tx);
++
++	pvt->tx = NULL;
++}
++
++static void set_send_adv_params(const void *buf, uint8_t size,
++							void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct bt_hci_cmd_le_set_adv_parameters cmd;
++	uint16_t hci_interval;
++
++	if (!pvt)
++		return;
++
++	hci_interval = (pvt->interval * 16) / 10;
++	cmd.min_interval = L_CPU_TO_LE16(hci_interval);
++	cmd.max_interval = L_CPU_TO_LE16(hci_interval);
++	cmd.type = 0x03; /* ADV_NONCONN_IND */
++	cmd.own_addr_type = 0x01; /* ADDR_TYPE_RANDOM */
++	cmd.direct_addr_type = 0x00;
++	memset(cmd.direct_addr, 0, 6);
++	cmd.channel_map = 0x07;
++	cmd.filter_policy = 0x03;
++
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
++				&cmd, sizeof(cmd),
++				set_send_adv_data, pvt, NULL);
++}
++
++static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
++							uint16_t interval)
++{
++	struct bt_hci_cmd_le_set_adv_enable cmd;
++
++	pvt->tx = tx;
++	pvt->interval = interval;
++
++	if (!pvt->sending) {
++		set_send_adv_params(NULL, 0, pvt);
++		return;
++	}
++
++	cmd.enable = 0x00;	/* Disable advertising */
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
++				&cmd, sizeof(cmd),
++				set_send_adv_params, pvt, NULL);
++}
++
++static void tx_timeout(struct l_timeout *timeout, void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	uint16_t ms;
++	uint8_t count;
++
++	if (!pvt)
++		return;
++
++	tx = l_queue_pop_head(pvt->tx_pkts);
++	if (!tx) {
++		l_timeout_remove(timeout);
++		pvt->tx_timeout = NULL;
++		send_cancel(pvt);
++		return;
++	}
++
++	if (tx->info.type == MESH_IO_TIMING_TYPE_GENERAL) {
++		ms = tx->info.u.gen.interval;
++		count = tx->info.u.gen.cnt;
++		if (count != MESH_IO_TX_COUNT_UNLIMITED)
++			tx->info.u.gen.cnt--;
++	} else {
++		ms = 25;
++		count = 1;
++	}
++
++	tx->delete = !!(count == 1);
++
++	send_pkt(pvt, tx, ms);
++
++	if (count == 1) {
++		/* send_pkt will delete when done */
++		tx = l_queue_peek_head(pvt->tx_pkts);
++		if (tx && tx->info.type == MESH_IO_TIMING_TYPE_POLL_RSP) {
++			ms = instant_remaining_ms(tx->info.u.poll_rsp.instant +
++						tx->info.u.poll_rsp.delay);
++		}
++	} else
++		l_queue_push_tail(pvt->tx_pkts, tx);
++
++	if (timeout) {
++		pvt->tx_timeout = timeout;
++		l_timeout_modify_ms(timeout, ms);
++	} else
++		pvt->tx_timeout = l_timeout_create_ms(ms, tx_timeout,
++								pvt, NULL);
++}
++
++static void tx_worker(void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	uint32_t delay;
++
++	tx = l_queue_peek_head(pvt->tx_pkts);
++	if (!tx)
++		return;
++
++	switch (tx->info.type) {
++	case MESH_IO_TIMING_TYPE_GENERAL:
++		if (tx->info.u.gen.min_delay == tx->info.u.gen.max_delay)
++			delay = tx->info.u.gen.min_delay;
++		else {
++			l_getrandom(&delay, sizeof(delay));
++			delay %= tx->info.u.gen.max_delay -
++						tx->info.u.gen.min_delay;
++			delay += tx->info.u.gen.min_delay;
++		}
++		break;
++
++	case MESH_IO_TIMING_TYPE_POLL:
++		if (tx->info.u.poll.min_delay == tx->info.u.poll.max_delay)
++			delay = tx->info.u.poll.min_delay;
++		else {
++			l_getrandom(&delay, sizeof(delay));
++			delay %= tx->info.u.poll.max_delay -
++						tx->info.u.poll.min_delay;
++			delay += tx->info.u.poll.min_delay;
++		}
++		break;
++
++	case MESH_IO_TIMING_TYPE_POLL_RSP:
++		/* Delay until Instant + Delay */
++		delay = instant_remaining_ms(tx->info.u.poll_rsp.instant +
++						tx->info.u.poll_rsp.delay);
++		if (delay > 255)
++			delay = 0;
++		break;
++
++	default:
++		return;
++	}
++
++	if (!delay)
++		tx_timeout(pvt->tx_timeout, pvt);
++	else if (pvt->tx_timeout)
++		l_timeout_modify_ms(pvt->tx_timeout, delay);
++	else
++		pvt->tx_timeout = l_timeout_create_ms(delay, tx_timeout,
++								pvt, NULL);
++}
++
++static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len)
++{
++	struct mesh_io_private *pvt = io->pvt;
++	struct tx_pkt *tx;
++	bool sending = false;
++
++	if (!info || !data || !len || len > sizeof(tx->pkt))
++		return false;
++
++
++	tx = l_new(struct tx_pkt, 1);
++	if (!tx)
++		return false;
++
++	memcpy(&tx->info, info, sizeof(tx->info));
++	memcpy(&tx->pkt, data, len);
++	tx->len = len;
++
++	if (info->type == MESH_IO_TIMING_TYPE_POLL_RSP)
++		l_queue_push_head(pvt->tx_pkts, tx);
++	else {
++		sending = !l_queue_isempty(pvt->tx_pkts);
++		l_queue_push_tail(pvt->tx_pkts, tx);
++	}
++
++	if (!sending) {
++		l_timeout_remove(pvt->tx_timeout);
++		pvt->tx_timeout = NULL;
++		l_idle_oneshot(tx_worker, pvt, NULL);
++	}
++
++	return true;
++}
++
++static bool find_by_ad_type(const void *a, const void *b)
++{
++	const struct tx_pkt *tx = a;
++	uint8_t ad_type = L_PTR_TO_UINT(b);
++
++	return !ad_type || ad_type == tx->pkt[0];
++}
++
++static bool find_by_pattern(const void *a, const void *b)
++{
++	const struct tx_pkt *tx = a;
++	const struct tx_pattern *pattern = b;
++
++	if (tx->len < pattern->len)
++		return false;
++
++	return (!memcmp(tx->pkt, pattern->data, pattern->len));
++}
++
++static bool tx_cancel(struct mesh_io *io, uint8_t *data, uint8_t len)
++{
++	struct mesh_io_private *pvt = io->pvt;
++	struct tx_pkt *tx;
++
++	if (!data)
++		return false;
++
++	if (len == 1) {
++		do {
++			tx = l_queue_remove_if(pvt->tx_pkts, find_by_ad_type,
++							L_UINT_TO_PTR(data[0]));
++			l_free(tx);
++		} while (tx);
++	}  else {
++		struct tx_pattern pattern = {
++			.data = data,
++			.len = len
++		};
++
++		do {
++			tx = l_queue_remove_if(pvt->tx_pkts, find_by_pattern,
++								&pattern);
++			l_free(tx);
++		} while (tx);
++	}
++
++	if (l_queue_isempty(pvt->tx_pkts)) {
++		send_cancel(pvt);
++		l_timeout_remove(pvt->tx_timeout);
++		pvt->tx_timeout = NULL;
++	}
++
++	return true;
++}
++
++static bool find_by_filter_id(const void *a, const void *b)
++{
++	const struct pvt_rx_reg *rx_reg = a;
++	uint8_t filter_id = L_PTR_TO_UINT(b);
++
++	return rx_reg->filter_id == filter_id;
++}
++
++static bool recv_register(struct mesh_io *io, uint8_t filter_id,
++				mesh_io_recv_func_t cb, void *user_data)
++{
++	struct bt_hci_cmd_le_set_scan_enable cmd;
++	struct mesh_io_private *pvt = io->pvt;
++	struct pvt_rx_reg *rx_reg;
++	bool scanning;
++
++	l_info("%s %d", __func__, filter_id);
++	if (!cb || !filter_id || filter_id > sizeof(pvt->filters))
++		return false;
++
++	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
++						L_UINT_TO_PTR(filter_id));
++
++	if (!rx_reg) {
++		rx_reg = l_new(struct pvt_rx_reg, 1);
++		if (!rx_reg)
++			return false;
++	}
++
++	rx_reg->filter_id = filter_id;
++	rx_reg->cb = cb;
++	rx_reg->user_data = user_data;
++
++	scanning = !l_queue_isempty(pvt->rx_regs);
++
++	l_queue_push_head(pvt->rx_regs, rx_reg);
++
++	if (!scanning) {
++		cmd.enable = 0x01;	/* Enable scanning */
++		cmd.filter_dup = 0x00;	/* Report duplicates */
++		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++				&cmd, sizeof(cmd), NULL, NULL, NULL);
++	}
++
++	return true;
++}
++
++static bool recv_deregister(struct mesh_io *io, uint8_t filter_id)
++{
++	struct bt_hci_cmd_le_set_scan_enable cmd;
++	struct mesh_io_private *pvt = io->pvt;
++
++	struct pvt_rx_reg *rx_reg;
++
++	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
++						L_UINT_TO_PTR(filter_id));
++
++	if (rx_reg)
++		l_free(rx_reg);
++
++	if (l_queue_isempty(pvt->rx_regs)) {
++		cmd.enable = 0x00;	/* Disable scanning */
++		cmd.filter_dup = 0x00;	/* Report duplicates */
++		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++				&cmd, sizeof(cmd), NULL, NULL, NULL);
++
++	}
++
++	return true;
++}
++
++static bool filter_set(struct mesh_io *io,
++		uint8_t filter_id, const uint8_t *data, uint8_t len,
++		mesh_io_status_func_t callback, void *user_data)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	l_info("%s id: %d, --> %2.2x", __func__, filter_id, data[0]);
++	if (!data || !len || !filter_id || filter_id > sizeof(pvt->filters))
++		return false;
++
++	pvt->filters[filter_id - 1] = data[0];
++
++	/* TODO: Delayed Call to successful status */
++
++	return true;
++}
++
++const struct mesh_io_api mesh_io_generic = {
++	.init = dev_init,
++	.destroy = dev_destroy,
++	.caps = dev_caps,
++	.send = send_tx,
++	.reg = recv_register,
++	.dereg = recv_deregister,
++	.set = filter_set,
++	.cancel = tx_cancel,
++};
+diff --git a/meshd/src/mesh-io.c b/meshd/src/mesh-io.c
+new file mode 100644
+index 000000000..0f6fae933
+--- /dev/null
++++ b/meshd/src/mesh-io.c
+@@ -0,0 +1,187 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <ell/ell.h>
++
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++
 +#include "meshd/common/mesh-defs.h"
 +
-+#include "meshd/src/mesh.h"
-+#include "meshd/src/node.h"
-+#include "meshd/src/net.h"
-+#include "meshd/src/crypto.h"
-+#include "meshd/src/model.h"
-+#include "meshd/src/display.h"
++#include "meshd/src/mesh-io.h"
++#include "meshd/src/mesh-io-api.h"
 +
-+#include "meshd/src/friend.h"
++/* List of Mesh-IO Type headers */
++#include "meshd/src/mesh-io-generic.h"
 +
-+#define MAX_FRND_GROUPS		20
-+#define FRND_RELAY_WINDOW	250		/* 250 ms */
-+#define FRND_CACHE_SIZE		16
-+#define FRND_SUB_LIST_SIZE	8
-+
-+#define RESPONSE_DELAY		(100 - 12)	/*  100  ms - 12ms hw delay */
-+#define MIN_RESP_DELAY		10		/*   10  ms */
-+#define MAX_RESP_DELAY		255		/*  255  ms */
-+
-+/* Absolute maximum time to wait for LPN to choose us. */
-+#define RESPONSE_POLL_DELAY	1300		/* 1.300  s */
-+
-+static uint8_t frnd_relay_window = FRND_RELAY_WINDOW;
-+static uint8_t frnd_cache_size = FRND_CACHE_SIZE;
-+static uint8_t frnd_sublist_size = FRND_SUB_LIST_SIZE;
-+
-+struct frnd_negotiation {
-+	struct l_timeout	*timeout;
-+	struct mesh_net		*net;
-+	struct mesh_key_set	key_set;
-+	uint32_t		poll_timeout;
-+	uint16_t		low_power_node;
-+	uint16_t		old_relay;
-+	uint8_t			num_ele;
-+	uint8_t			lp_cnt;
-+	uint8_t			fn_cnt;
-+	uint8_t			wrfrw;
-+	uint8_t			receive_delay;
-+	int8_t			rssi;
-+	bool			clearing;
++/* List of Supported Mesh-IO Types */
++static const struct mesh_io_table table[] = {
++	{MESH_IO_TYPE_GENERIC,	&mesh_io_generic},
 +};
 +
-+static struct l_queue *frnd_negotiations;
-+static uint16_t counter;
++static struct l_queue *io_list;
 +
-+static void response_timeout(struct l_timeout *timeout, void *user_data)
++static bool match_by_io(const void *a, const void *b)
 +{
-+	struct frnd_negotiation *neg = user_data;
-+
-+	/* LPN did not choose us */
-+	l_info("Did not win negotiation for %4.4x", neg->low_power_node);
-+
-+	mesh_net_remove_keyset(neg->net, &neg->key_set);
-+	l_queue_remove(frnd_negotiations, neg);
-+	l_timeout_remove(timeout);
-+	l_free(neg);
++	return a == b;
 +}
 +
-+static void response_delay(struct l_timeout *timeout, void *user_data)
++static bool match_by_index(const void *a, const void *b)
 +{
-+	struct frnd_negotiation *neg = user_data;
-+	uint16_t net_idx = mesh_net_get_primary_idx(neg->net);
-+	uint8_t key[16];
-+	uint8_t p[9] = { 1 };
-+	uint8_t msg[8];
-+	uint16_t n = 0;
-+	bool res;
++	const struct mesh_io *io = a;
 +
-+	l_timeout_remove(timeout);
-+
-+	/* Create key Set for this offer */
-+	l_put_be16(neg->low_power_node, p + 1);
-+	l_put_be16(mesh_net_get_address(neg->net), p + 3);
-+	l_put_be16(neg->lp_cnt, p + 5);
-+	l_put_be16(counter, p + 7);
-+	res = mesh_net_get_key(neg->net, false, net_idx, key);
-+	if (!res)
-+		goto cleanup;
-+
-+	print_packet("Friend Key P =", p, 9);
-+	res = mesh_crypto_k2(key, p, sizeof(p), &neg->key_set.nid,
-+			neg->key_set.enc_key, neg->key_set.privacy_key);
-+	if (!res)
-+		goto cleanup;
-+
-+	print_packet("NID =", &neg->key_set.nid, 1);
-+	print_packet("ENC_KEY =", neg->key_set.enc_key, 16);
-+	print_packet("PRIV_KEY =", neg->key_set.privacy_key, 16);
-+
-+	neg->fn_cnt = counter++;
-+	neg->key_set.frnd = true;
-+	mesh_net_add_keyset(neg->net, &neg->key_set);
-+
-+	msg[n++] = NET_OP_FRND_OFFER;
-+	msg[n++] = frnd_relay_window;
-+	msg[n++] = frnd_cache_size;
-+	msg[n++] = frnd_sublist_size;
-+	msg[n++] = neg->rssi;
-+	l_put_be16(neg->fn_cnt, msg + n);
-+	n += 2;
-+	print_packet("Tx-NET_OP_FRND_OFFER", msg, n);
-+	mesh_net_transport_send(neg->net, NULL, true,
-+			mesh_net_get_iv_index(neg->net), 0,
-+			0, 0, neg->low_power_node,
-+			msg, n);
-+
-+	/* Offer expires in 1.3 seconds, which is the max time for LPN to
-+	 * receive all offers, 1 second to make decision, and a little extra
-+	 */
-+	neg->timeout = l_timeout_create_ms(1000 + MAX_RESP_DELAY,
-+						response_timeout, neg, NULL);
-+
-+	return;
-+
-+cleanup:
-+	mesh_net_remove_keyset(neg->net, &neg->key_set);
-+	l_queue_remove(frnd_negotiations, neg);
-+	l_free(neg);
++	return io->index == L_PTR_TO_UINT(b);
 +}
 +
-+static uint8_t cache_size(uint8_t power)
++struct mesh_io *mesh_io_new(uint16_t index, enum mesh_io_type type)
 +{
-+	return 1 << power;
-+}
-+
-+static bool match_by_lpn(const void *a, const void *b)
-+{
-+	const struct frnd_negotiation *neg = a;
-+	uint16_t lpn = L_PTR_TO_UINT(b);
-+
-+	return neg->low_power_node == lpn;
-+}
-+
-+static bool match_by_dst(const void *a, const void *b)
-+{
-+	const struct mesh_friend *frnd = a;
-+	uint16_t dst = L_PTR_TO_UINT(b);
-+
-+	return frnd->dst == dst;
-+}
-+
-+/* Scaling factors in 1/10 ms */
-+static const int32_t scaling[] = {
-+	10,
-+	15,
-+	20,
-+	15,
-+};
-+
-+void friend_request(struct mesh_net *net, uint16_t src,
-+		uint8_t minReq, uint8_t delay, uint32_t timeout,
-+		uint16_t prev, uint8_t num_ele, uint16_t cntr,
-+		int8_t rssi)
-+{
-+	struct frnd_negotiation *neg;
-+	uint8_t rssiScale = (minReq >> 5) & 3;
-+	uint8_t winScale = (minReq >> 3) & 3;
-+	uint8_t minCache = (minReq >> 0) & 7;
-+	int32_t rsp_delay;
-+
-+	l_info("RSSI of Request: %d dbm", rssi);
-+	l_info("Delay: %d ms", delay);
-+	l_info("Poll Timeout of Request: %d ms", timeout * 100);
-+	l_info("Previous Friend: %4.4x", prev);
-+	l_info("Num Elem: %2.2x", num_ele);
-+	l_info("Cache Requested: %d", cache_size(minCache));
-+	l_info("Cache to offer: %d", frnd_cache_size);
-+
-+	/* Determine our own suitability before
-+	 * deciding to participate in negotiation
-+	 */
-+	if (minCache == 0 || num_ele == 0)
-+		return;
-+
-+	if (delay < 0x0A)
-+		return;
-+
-+	if (timeout < 0x00000A || timeout > 0x34BBFF)
-+		return;
-+
-+	if (cache_size(minCache) > frnd_cache_size)
-+		return;
-+
-+	if (frnd_negotiations == NULL)
-+		frnd_negotiations = l_queue_new();
-+
-+	/* TODO: Check RSSI, and then start Negotiation if appropriate */
-+
-+	/* We are participating in this Negotiation */
-+	neg = l_new(struct frnd_negotiation, 1);
-+	l_queue_push_head(frnd_negotiations, neg);
-+
-+	neg->net = net;
-+	neg->low_power_node = src;
-+	neg->lp_cnt = cntr;
-+	neg->rssi = rssi;
-+	neg->receive_delay = delay;
-+	neg->poll_timeout = timeout;
-+	neg->old_relay = prev;
-+	neg->num_ele = num_ele;
-+
-+	/* RSSI (Negative Factor, larger values == less time)
-+	 * Scaling factor 0-3 == multiplier of 1.0 - 2.5
-+	 * Minimum factor of 1. Bit 1 adds additional factor
-+	 * of 1, bit zero and additional 0.5
-+	 */
-+	rsp_delay = -(rssi * scaling[rssiScale]);
-+	l_info("RSSI Factor: %d ms", rsp_delay / 10);
-+
-+	/* Relay Window (Positive Factor, larger values == more time)
-+	 * Scaling factor 0-3 == multiplier of 1.0 - 2.5
-+	 * Minimum factor of 1. Bit 1 adds additional factor
-+	 * of 1, bit zero and additional 0.5
-+	 */
-+	rsp_delay += frnd_relay_window * scaling[winScale];
-+	l_info("Win Size Factor: %d ms",
-+			(frnd_relay_window * scaling[winScale]) / 10);
-+
-+	/* Normalize to ms */
-+	rsp_delay /= 10;
-+
-+	/* Range limits are 10-255 ms */
-+	if (rsp_delay < MIN_RESP_DELAY)
-+		rsp_delay = MIN_RESP_DELAY;
-+	else if (rsp_delay > MAX_RESP_DELAY)
-+		rsp_delay = MAX_RESP_DELAY;
-+
-+	l_info("Total Response Delay: %d ms", rsp_delay);
-+
-+	/* Add in 100ms delay before start of "Offer Period" */
-+	rsp_delay += RESPONSE_DELAY;
-+
-+	neg->timeout = l_timeout_create_ms(rsp_delay,
-+						response_delay, neg, NULL);
-+}
-+
-+static struct l_queue *retired_lpns;
-+
-+void friend_clear_confirm(struct mesh_net *net, uint16_t src,
-+					uint16_t lpn, uint16_t lpnCounter)
-+{
-+	struct frnd_negotiation *neg = l_queue_remove_if(frnd_negotiations,
-+					match_by_lpn, L_UINT_TO_PTR(lpn));
-+
-+	l_info("Friend Clear confirmed %4.4x (cnt %4.4x)", lpn, lpnCounter);
-+
-+	if (!neg)
-+		return;
-+
-+	l_timeout_remove(neg->timeout);
-+	l_queue_remove(frnd_negotiations, neg);
-+	l_free(neg);
-+}
-+
-+static void friend_poll_timeout(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_friend *frnd = user_data;
-+
-+	if (mesh_friend_clear(frnd->net, frnd))
-+		l_info("Friend Poll Timeout %4.4x", frnd->dst);
-+
-+	l_timeout_remove(frnd->timeout);
-+	frnd->timeout = NULL;
-+
-+	/* Friend may be in either Network or Retired list, so try both */
-+	l_queue_remove(retired_lpns, frnd);
-+	mesh_friend_free(frnd);
-+}
-+
-+void friend_clear(struct mesh_net *net, uint16_t src, uint16_t lpn,
-+				uint16_t lpnCounter, struct mesh_friend *frnd)
-+{
-+	uint8_t msg[5] = { NET_OP_FRND_CLEAR_CONFIRM };
-+	bool removed = false;
-+	uint16_t lpnDelta;
-+
-+	if (frnd) {
-+		lpnDelta = lpnCounter - frnd->lp_cnt;
-+
-+		/* Ignore old Friend Clear commands */
-+		if (lpnDelta > 0x100)
-+			return;
-+
-+		/* Move friend from Network list to Retired list */
-+		removed = mesh_friend_clear(net, frnd);
-+		if (removed) {
-+			struct mesh_friend *old;
-+			struct frnd_negotiation *neg = l_queue_remove_if(
-+						frnd_negotiations,
-+						match_by_lpn,
-+						L_UINT_TO_PTR(frnd->dst));
-+
-+			/* Cancel any negotiations or clears */
-+			if (neg) {
-+				l_timeout_remove(neg->timeout);
-+				l_free(neg);
-+			}
-+
-+			/* Create Retired LPN list if needed */
-+			if (retired_lpns == NULL)
-+				retired_lpns = l_queue_new();
-+
-+			/* Find any duplicates */
-+			old = l_queue_find(retired_lpns, match_by_dst,
-+						L_UINT_TO_PTR(lpn));
-+
-+			/* Force time-out of old friendship */
-+			if (old)
-+				friend_poll_timeout(old->timeout, old);
-+
-+			/* Retire this LPN (keeps timeout running) */
-+			l_queue_push_tail(retired_lpns, frnd);
-+		}
-+	} else {
-+		frnd = l_queue_find(retired_lpns, match_by_dst,
-+						L_UINT_TO_PTR(lpn));
-+		if (!frnd)
-+			return;
-+
-+		lpnDelta = lpnCounter - frnd->lp_cnt;
-+
-+		/* Ignore old Friend Clear commands */
-+		if (!lpnDelta || (lpnDelta > 0x100))
-+			return;
-+	}
-+
-+	l_info("Friend Cleared %4.4x (%4.4x)", lpn, lpnCounter);
-+
-+	l_put_be16(lpn, msg + 1);
-+	l_put_be16(lpnCounter, msg + 3);
-+	mesh_net_transport_send(net, NULL, false,
-+			mesh_net_get_iv_index(net), DEFAULT_TTL,
-+			0, 0, src,
-+			msg, sizeof(msg));
-+}
-+
-+static void clear_retry(struct l_timeout *timeout, void *user_data)
-+{
-+	struct frnd_negotiation *neg = user_data;
-+	uint8_t msg[5] = { NET_OP_FRND_CLEAR };
-+	uint32_t secs = 1 << neg->receive_delay;
-+
-+
-+	l_put_be16(neg->low_power_node, msg + 1);
-+	l_put_be16(neg->lp_cnt, msg + 3);
-+	mesh_net_transport_send(neg->net, NULL, false,
-+			mesh_net_get_iv_index(neg->net), DEFAULT_TTL,
-+			0, 0, neg->old_relay,
-+			msg, sizeof(msg));
-+
-+	if (secs && ((secs << 1) < neg->poll_timeout/10)) {
-+		neg->receive_delay++;
-+		l_info("Try FRND_CLR again in %d seconds (total timeout %d)",
-+						secs, neg->poll_timeout/10);
-+		l_timeout_modify(neg->timeout, secs);
-+	} else {
-+		l_info("FRND_CLR timed out %d", secs);
-+		l_timeout_remove(timeout);
-+		l_queue_remove(frnd_negotiations, neg);
-+		l_free(neg);
-+	}
-+}
-+
-+static void friend_delay_rsp(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_friend *frnd = user_data;
-+	struct mesh_friend_msg *pkt = frnd->pkt;
-+	struct mesh_net *net = frnd->net;
-+	uint32_t net_seq, iv_index;
-+	uint8_t upd[7] = { NET_OP_FRND_UPDATE };
-+
-+	l_timeout_remove(timeout);
-+
-+	if (pkt == NULL)
-+		goto update;
-+
-+	if (pkt->ctl) {
-+		/* Make sure we don't change the bit-sense of MD,
-+		 * once it has been set because that would cause
-+		 * a "Dirty Nonce" security violation
-+		 */
-+		if (((pkt->u.one[0].hdr >> OPCODE_HDR_SHIFT) & OPCODE_MASK) ==
-+						NET_OP_SEG_ACKNOWLEDGE) {
-+			bool rly = !!((pkt->u.one[0].hdr >> RELAY_HDR_SHIFT) &
-+									true);
-+			uint16_t seqZero = pkt->u.one[0].hdr >>
-+							SEQ_ZERO_HDR_SHIFT;
-+
-+			seqZero &= SEQ_ZERO_MASK;
-+
-+			l_info("Fwd ACK pkt %6.6x-%8.8x",
-+					pkt->u.one[0].seq,
-+					pkt->iv_index);
-+
-+			pkt->u.one[0].sent = true;
-+			mesh_net_ack_send(net, &frnd->key_set,
-+					pkt->iv_index, pkt->ttl,
-+					pkt->u.one[0].seq, pkt->src, pkt->dst,
-+					rly, seqZero,
-+					l_get_be32(pkt->u.one[0].data));
-+
-+
-+		} else {
-+			l_info("Fwd CTL pkt %6.6x-%8.8x",
-+					pkt->u.one[0].seq,
-+					pkt->iv_index);
-+
-+			print_packet("Frnd-CTL",
-+					pkt->u.one[0].data, pkt->last_len);
-+
-+			pkt->u.one[0].sent = true;
-+			mesh_net_transport_send(net, &frnd->key_set, false,
-+					pkt->iv_index, pkt->ttl,
-+					pkt->u.one[0].seq, pkt->src, pkt->dst,
-+					pkt->u.one[0].data, pkt->last_len);
-+		}
-+	} else {
-+		/* If segments after this one, then More Data must be TRUE */
-+		uint8_t len;
-+
-+		if (pkt->cnt_out < pkt->cnt_in)
-+			len = sizeof(pkt->u.s12[0].data);
-+		else
-+			len = pkt->last_len;
-+
-+		l_info("Fwd FRND pkt %6.6x",
-+				pkt->u.s12[pkt->cnt_out].seq);
-+
-+		print_packet("Frnd-Msg", pkt->u.s12[pkt->cnt_out].data, len);
-+
-+		pkt->u.s12[pkt->cnt_out].sent = true;
-+		mesh_net_send_seg(net, &frnd->key_set,
-+				pkt->iv_index,
-+				pkt->ttl,
-+				pkt->u.s12[pkt->cnt_out].seq,
-+				pkt->src, pkt->dst,
-+				pkt->u.s12[pkt->cnt_out].hdr,
-+				pkt->u.s12[pkt->cnt_out].data, len);
-+	}
-+
-+	return;
-+
-+update:
-+	// No More Data -- send Update message with md = false
-+	net_seq = mesh_net_get_seq_num(net);
-+	l_info("Fwd FRND UPDATE %6.6x with MD == 0", net_seq);
-+
-+	frnd->last = frnd->seq;
-+	mesh_net_get_snb_state(net, upd + 1, &iv_index);
-+	l_put_be32(iv_index, upd + 2);
-+	upd[6] = false; // Queue is Empty
-+	print_packet("Update", upd, sizeof(upd));
-+	mesh_net_transport_send(net, &frnd->key_set, false,
-+			mesh_net_get_iv_index(net), 0,
-+			net_seq, 0, frnd->dst,
-+			upd, sizeof(upd));
-+	mesh_net_next_seq_num(net);
-+}
-+
-+
-+void friend_poll(struct mesh_net *net, uint16_t src, bool seq,
-+					struct mesh_friend *frnd)
-+{
-+	struct frnd_negotiation *neg;
-+	struct mesh_friend_msg *pkt;
-+	bool md;
-+
-+	neg = l_queue_find(frnd_negotiations, match_by_lpn, L_UINT_TO_PTR(src));
-+	if (neg && !neg->clearing) {
-+		uint8_t msg[5] = { NET_OP_FRND_CLEAR };
-+
-+		l_info("Won negotiation for %4.4x", neg->low_power_node);
-+
-+		/* This call will clean-up and replace if already friends */
-+		frnd = mesh_friend_new(net, src, neg->num_ele,
-+						neg->receive_delay,
-+						neg->wrfrw,
-+						neg->poll_timeout,
-+						neg->fn_cnt, neg->lp_cnt);
-+
-+		frnd->timeout = l_timeout_create_ms(
-+					frnd->poll_timeout * 100,
-+					friend_poll_timeout, frnd, NULL);
-+
-+		l_timeout_remove(neg->timeout);
-+		mesh_net_remove_keyset(neg->net, &neg->key_set);
-+
-+		if (neg->old_relay == 0 ||
-+				neg->old_relay == mesh_net_get_address(net)) {
-+			l_queue_remove(frnd_negotiations, neg);
-+			l_free(neg);
-+		} else {
-+			neg->clearing = true;
-+			l_put_be16(neg->low_power_node, msg + 1);
-+			l_put_be16(neg->lp_cnt, msg + 3);
-+			mesh_net_transport_send(net, NULL, false,
-+					mesh_net_get_iv_index(net), DEFAULT_TTL,
-+					0, 0, neg->old_relay,
-+					msg, sizeof(msg));
-+
-+			/* Reuse receive_delay as a shift counter to
-+			 * time-out FRIEND_CLEAR
-+			 */
-+			neg->receive_delay = 1;
-+			neg->timeout = l_timeout_create(1, clear_retry,
-+								neg, NULL);
-+		}
-+	}
-+
-+	if (!frnd)
-+		return;
-+
-+	/* Reset Poll Timeout */
-+	l_timeout_modify_ms(frnd->timeout, frnd->poll_timeout * 100);
-+
-+	if (!l_queue_length(frnd->pkt_cache))
-+		goto update;
-+
-+	if (frnd->seq != frnd->last && frnd->seq != seq) {
-+		pkt = l_queue_peek_head(frnd->pkt_cache);
-+		if (pkt->cnt_out < pkt->cnt_in) {
-+			pkt->cnt_out++;
-+		} else {
-+			pkt = l_queue_pop_head(frnd->pkt_cache);
-+			l_free(pkt);
-+		}
-+	}
-+
-+	pkt = l_queue_peek_head(frnd->pkt_cache);
-+
-+	if (!pkt)
-+		goto update;
-+
-+	frnd->seq = seq;
-+	frnd->last = !seq;
-+	md = !!(l_queue_length(frnd->pkt_cache) > 1);
-+
-+	if (pkt->ctl) {
-+		/* Make sure we don't change the bit-sense of MD,
-+		 * once it has been set because that would cause
-+		 * a "Dirty Nonce" security violation
-+		 */
-+		if (!(pkt->u.one[0].sent))
-+			pkt->u.one[0].md = md;
-+	} else {
-+		/* If segments after this one, then More Data must be TRUE */
-+		if (pkt->cnt_out < pkt->cnt_in)
-+			md = true;
-+
-+		/* Make sure we don't change the bit-sense of MD, once
-+		 * it has been set because that would cause a
-+		 * "Dirty Nonce" security violation
-+		 */
-+		if (!(pkt->u.s12[pkt->cnt_out].sent))
-+			pkt->u.s12[pkt->cnt_out].md = md;
-+	}
-+	frnd->pkt = pkt;
-+	l_timeout_create_ms(frnd->frd, friend_delay_rsp, frnd, NULL);
-+
-+	return;
-+
-+update:
-+	frnd->pkt = NULL;
-+	l_timeout_create_ms(frnd->frd, friend_delay_rsp, frnd, NULL);
-+}
-+
-+void friend_sub_add(struct mesh_net *net, struct mesh_friend *frnd,
-+					const uint8_t *pkt, uint8_t len)
-+{
-+	uint16_t *new_list;
-+	uint32_t net_seq;
-+	uint8_t plen = len;
-+	uint8_t msg[] = { NET_OP_PROXY_SUB_CONFIRM, 0 };
-+
-+	if (!frnd || MAX_FRND_GROUPS < frnd->grp_cnt + (len/2))
-+		return;
-+
-+	msg[1] = *pkt++;
-+	plen--;
-+
-+	/* Sanity Check Values, abort if any illegal */
-+	while (plen >= 2) {
-+		plen -= 2;
-+		if (l_get_be16(pkt + plen) < 0x8000)
-+			return;
-+	}
-+
-+	new_list = l_malloc(frnd->grp_cnt * sizeof(uint16_t) + len);
-+	if (frnd->grp_list)
-+		memcpy(new_list, frnd->grp_list,
-+				frnd->grp_cnt * sizeof(uint16_t));
-+
-+	while (len >= 2) {
-+		new_list[frnd->grp_cnt++] = l_get_be16(pkt);
-+		pkt += 2;
-+		len -= 2;
-+	}
-+
-+	l_free(frnd->grp_list);
-+	frnd->grp_list = new_list;
-+
-+	print_packet("Tx-NET_OP_PROXY_SUB_CONFIRM", msg, sizeof(msg));
-+	net_seq = mesh_net_get_seq_num(net);
-+	mesh_net_transport_send(net, &frnd->key_set, false,
-+			mesh_net_get_iv_index(net), 0,
-+			net_seq, 0, frnd->dst,
-+			msg, sizeof(msg));
-+	mesh_net_next_seq_num(net);
-+}
-+
-+void friend_sub_del(struct mesh_net *net, struct mesh_friend *frnd,
-+					const uint8_t *pkt, uint8_t len)
-+{
-+	uint32_t net_seq;
-+	uint8_t msg[] = { NET_OP_PROXY_SUB_CONFIRM, 0 };
-+	int i;
-+
-+	if (!frnd)
-+		return;
-+
-+	msg[1] = *pkt++;
-+	len--;
-+
-+	while (len >= 2) {
-+		uint16_t grp = l_get_be16(pkt);
-+
-+		for (i = frnd->grp_cnt - 1; i >= 0; i--) {
-+			if (frnd->grp_list[i] == grp) {
-+				frnd->grp_cnt--;
-+				memcpy(&frnd->grp_list[i],
-+						&frnd->grp_list[i + 1],
-+						(frnd->grp_cnt - i) * 2);
-+				break;
-+			}
-+		}
-+		len -= 2;
-+		pkt += 2;
-+	}
-+
-+	print_packet("Tx-NET_OP_PROXY_SUB_CONFIRM", msg, sizeof(msg));
-+	net_seq = mesh_net_get_seq_num(net);
-+	mesh_net_transport_send(net, &frnd->key_set, false,
-+			mesh_net_get_iv_index(net), 0,
-+			net_seq, 0, frnd->dst,
-+			msg, sizeof(msg));
-+	mesh_net_next_seq_num(net);
-+}
-+
-+/* Low-Power-Node role */
-+struct frnd_offers {
-+	uint16_t fn_cnt;
-+	uint16_t src;
-+	uint8_t window;
-+	uint8_t cache;
-+	uint8_t sub_list_size;
-+	int8_t local_rssi;
-+	int8_t remote_rssi;
-+};
-+
-+#define MAX_POLL_RETRIES	5
-+static bool quick_pick;
-+static uint8_t poll_cnt;
-+static struct l_queue *offers;
-+static uint16_t old_friend;
-+static uint16_t fn_cnt, cnt = 0xffff;
-+static uint32_t poll_period_ms;
-+static struct l_timeout *poll_retry_to;
-+static struct l_timeout *poll_period_to;
-+static struct mesh_key_set lpn_set;
-+static struct mesh_key_set new_lpn_set;
-+
-+void frnd_offer(struct mesh_net *net, uint16_t src, uint8_t window,
-+			uint8_t cache, uint8_t sub_list_size,
-+			int8_t r_rssi, int8_t l_rssi, uint16_t fn_cnt)
-+{
-+	struct frnd_offers *offer;
-+
-+	l_info("RSSI of Offer: %d dbm", l_rssi);
-+
-+	/* Ignore RFU window value 0 */
-+	if (window == 0)
-+		return;
-+
-+	if (mesh_net_get_friend(net))
-+		return;
-+
-+	if (quick_pick) {
-+		if (mesh_net_set_friend(net, src)) {
-+			old_friend = src;
-+			frnd_poll(net, false);
-+		}
-+		return;
-+	}
-+
-+	offer = l_new(struct frnd_offers, 1);
-+	offer->src = src;
-+	offer->window = window;
-+	offer->cache = cache;
-+	offer->sub_list_size = sub_list_size;
-+	offer->local_rssi = l_rssi;
-+	offer->remote_rssi = r_rssi;
-+	offer->fn_cnt = fn_cnt;
-+
-+	l_queue_push_tail(offers, offer);
-+}
-+
-+static void frnd_poll_timeout(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_net *net = user_data;
-+
-+	frnd_poll(net, true);
-+}
-+
-+static void frnd_negotiated_to(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_net *net = user_data;
-+
-+	l_info("frnd_negotiated_to");
-+	if (!mesh_net_get_friend(net)) {
-+		l_timeout_remove(poll_period_to);
-+		poll_period_to = NULL;
-+		return;
-+	}
-+
-+	if (!poll_retry_to)
-+		frnd_poll(net, false);
-+}
-+
-+void frnd_poll_cancel(struct mesh_net *net)
-+{
-+	l_timeout_remove(poll_retry_to);
-+	poll_retry_to = NULL;
-+}
-+
-+void frnd_poll(struct mesh_net *net, bool retry)
-+{
-+	struct mesh_key_set *key_set = &lpn_set;
-+	uint32_t net_seq;
-+	uint8_t msg[2] = { NET_OP_FRND_POLL };
-+	bool seq = mesh_net_get_frnd_seq(net);
-+
-+	/* Check if we are in Phase 2 of Key Refresh */
-+	if (new_lpn_set.nid != 0xff) {
-+		uint8_t phase;
-+		uint16_t net_idx = mesh_net_get_primary_idx(net);
-+		uint8_t status =
-+			mesh_net_key_refresh_phase_get(net, net_idx, &phase);
-+
-+		if (status == MESH_STATUS_SUCCESS &&
-+				phase == KEY_REFRESH_PHASE_TWO)
-+			key_set = &new_lpn_set;
-+	}
-+
-+	if (!retry) {
-+		poll_cnt = MAX_POLL_RETRIES;
-+		seq = !seq;
-+		mesh_net_set_frnd_seq(net, seq);
-+	} else if (!(poll_cnt--)) {
-+		l_info("Lost Friendship with %4.4x", old_friend);
-+		l_timeout_remove(poll_period_to);
-+		poll_period_to = NULL;
-+		frnd_poll_cancel(net);
-+		mesh_net_remove_keyset(net, &lpn_set);
-+		mesh_net_remove_keyset(net, &new_lpn_set);
-+		mesh_net_set_friend(net, 0);
-+		return;
-+	}
-+
-+	if (poll_retry_to)
-+		l_timeout_remove(poll_retry_to);
-+
-+	l_info("TX-FRIEND POLL %d", seq);
-+	msg[1] = seq;
-+	net_seq = mesh_net_get_seq_num(net);
-+	mesh_net_transport_send(net, key_set, true,
-+			mesh_net_get_iv_index(net), 0,
-+			net_seq, 0, mesh_net_get_friend(net),
-+			msg, sizeof(msg));
-+	mesh_net_next_seq_num(net);
-+	poll_retry_to = l_timeout_create_ms(1000, frnd_poll_timeout, net, NULL);
-+
-+	/* Reset Poll Period for next "Wake Up" */
-+	if (poll_period_to)
-+		l_timeout_modify_ms(poll_period_to, poll_period_ms);
-+	else
-+		poll_period_to = l_timeout_create_ms(poll_period_ms,
-+						frnd_negotiated_to, net, NULL);
-+}
-+
-+void frnd_ack_poll(struct mesh_net *net)
-+{
-+	/* Start new POLL, but only if not already Polling */
-+	if (poll_retry_to == NULL)
-+		frnd_poll(net, false);
-+}
-+
-+static void req_timeout(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_net *net = user_data;
-+	struct frnd_offers *best;
-+	struct frnd_offers *offer = l_queue_pop_head(offers);
-+	uint8_t p[9] = { 1 };
-+	uint8_t key[16];
-+	bool res;
-+
-+	l_timeout_remove(timeout);
-+
-+	best = offer;
-+	while (offer) {
-+		/* Screen out clearly inferior RSSI friends first */
-+		if (offer->local_rssi < -40 && offer->remote_rssi < -40) {
-+			if (best->local_rssi + 20 < offer->local_rssi ||
-+				best->remote_rssi + 20 < offer->remote_rssi) {
-+
-+				l_free(best);
-+				best = offer;
-+				offer = l_queue_pop_head(offers);
-+				continue;
-+			}
-+		}
-+
-+		/* Otherwise use best Windows, with Cache size as tie breaker */
-+		if (best->window > offer->window ||
-+				(best->window == offer->window &&
-+				 best->cache < offer->cache)) {
-+			l_free(best);
-+			best = offer;
-+		} else if (best != offer)
-+			l_free(offer);
-+
-+		offer = l_queue_pop_head(offers);
-+	}
-+
-+	mesh_net_remove_keyset(net, &lpn_set);
-+	mesh_net_remove_keyset(net, &new_lpn_set);
-+	if (mesh_net_get_friend(net)) {
-+		l_free(best);
-+		return;
-+	} else if (!best) {
-+		l_info("No Offers Received");
-+		return;
-+	}
-+
-+	fn_cnt = best->fn_cnt;
-+	l_put_be16(mesh_net_get_address(net), p + 1);
-+	l_put_be16(best->src, p + 3);
-+	l_put_be16(cnt, p + 5);
-+	l_put_be16(best->fn_cnt, p + 7);
-+	print_packet("Friend Key P =", p, 9);
-+	res = mesh_net_get_key(net, false, mesh_net_get_primary_idx(net), key);
-+	if (!res)
-+		return;
-+
-+	res = mesh_crypto_k2(key, p, sizeof(p), &lpn_set.nid,
-+			lpn_set.enc_key, lpn_set.privacy_key);
-+	if (!res)
-+		return;
-+
-+	print_packet("Cur-NID", &lpn_set.nid, 1);
-+	print_packet("Cur-ENC_KEY", lpn_set.enc_key, 16);
-+	print_packet("Cur-PRIV_KEY", lpn_set.privacy_key, 16);
-+
-+	mesh_net_add_keyset(net, &lpn_set);
-+
-+	res = mesh_net_get_key(net, true, mesh_net_get_primary_idx(net), key);
-+
-+	if (res)
-+		res = mesh_crypto_k2(key, p, sizeof(p), &new_lpn_set.nid,
-+			new_lpn_set.enc_key, new_lpn_set.privacy_key);
-+	if (!res) {
-+		new_lpn_set.nid = 0xff;
-+		goto old_keys_only;
-+	}
-+
-+	print_packet("New-NID", &new_lpn_set.nid, 1);
-+	print_packet("New-ENC_KEY", new_lpn_set.enc_key, 16);
-+	print_packet("New-PRIV_KEY", new_lpn_set.privacy_key, 16);
-+
-+	mesh_net_add_keyset(net, &new_lpn_set);
-+
-+old_keys_only:
-+
-+	l_info("Winning offer %4.4x RSSI: %ddb Window: %dms Cache sz: %d",
-+			best->src, best->local_rssi,
-+			best->window, best->cache);
-+
-+	if (mesh_net_set_friend(net, best->src)) {
-+		old_friend = best->src;
-+		mesh_net_set_frnd_seq(net, true);
-+		frnd_poll(net, false);
-+	}
-+
-+	l_free(best);
-+}
-+
-+void frnd_clear(struct mesh_net *net)
-+{
-+	uint8_t msg[12];
-+	uint8_t n = 0;
-+	uint16_t frnd_addr = mesh_net_get_friend(net);
-+	uint16_t my_addr = mesh_net_get_address(net);
-+
-+	msg[n++] = NET_OP_FRND_CLEAR;
-+	l_put_be16(my_addr, msg + n);
-+	n += 2;
-+	l_put_be16(cnt, msg + n);
-+	n += 2;
-+
-+	mesh_net_remove_keyset(net, &lpn_set);
-+	mesh_net_remove_keyset(net, &new_lpn_set);
-+	mesh_net_set_friend(net, 0);
-+
-+	mesh_net_transport_send(net, NULL, false,
-+			mesh_net_get_iv_index(net), 0,
-+			0, 0, frnd_addr,
-+			msg, n);
-+}
-+
-+void frnd_request_friend(struct mesh_net *net, uint8_t cache,
-+			uint8_t offer_delay, uint8_t delay, uint32_t timeout)
-+{
-+	uint8_t msg[12];
-+	uint8_t n = 0;
-+
-+	if (offers == NULL)
-+		offers = l_queue_new();
-+
-+	msg[n++] = NET_OP_FRND_REQUEST;
-+	msg[n] = cache & 0x07;		// MinRequirements - Cache
-+	msg[n++] |= (offer_delay & 0x0f) << 3;	// Offer Delay
-+	poll_period_ms = (timeout * 300) / 4; // 3/4 of the time in ms
-+	l_put_be32(timeout, msg + n);	// PollTimeout
-+	msg[n++] = delay;		// ReceiveDelay
-+	n += 3;
-+	l_put_be16(old_friend, msg + n);	// PreviousAddress
-+	n += 2;
-+	msg[n++] = mesh_net_get_num_ele(net);	// NumElements
-+	l_put_be16(cnt + 1, msg + n);	// Next counter
-+	n += 2;
-+	print_packet("Tx-NET_OP_FRND_REQUEST", msg, n);
-+	mesh_net_transport_send(net, NULL, false,
-+			mesh_net_get_iv_index(net), 0,
-+			0, 0, FRIENDS_ADDRESS,
-+			msg, n);
-+	l_timeout_create_ms(1000, req_timeout, net, NULL); // 1000 ms
-+	mesh_net_set_friend(net, 0);
-+	cnt++;
-+}
-+
-+static uint8_t trans_id;
-+void frnd_sub_add(struct mesh_net *net, uint32_t parms[7])
-+{
-+	struct mesh_key_set *key_set = &lpn_set;
-+	uint32_t net_seq;
-+	uint8_t msg[15] = { NET_OP_PROXY_SUB_ADD };
-+	uint8_t i, n = 1;
-+
-+	/* Check if we are in Phase 2 of Key Refresh */
-+	if (new_lpn_set.nid != 0xff) {
-+		uint8_t phase;
-+		uint16_t net_idx = mesh_net_get_primary_idx(net);
-+		uint8_t status = mesh_net_key_refresh_phase_get(net,
-+							net_idx, &phase);
-+
-+		if (status == MESH_STATUS_SUCCESS &&
-+				phase == KEY_REFRESH_PHASE_TWO)
-+			key_set = &new_lpn_set;
-+	}
-+
-+	msg[n++] = ++trans_id;
-+	for (i = 0; i < 7; i++) {
-+		if (parms[i] < 0x8000 || parms[i] > 0xffff)
++	const struct mesh_io_api	*api = NULL;
++	struct mesh_io			*io;
++	uint16_t			i;
++
++	l_info("%s %d\n", __func__, type);
++	for (i = 0; i < L_ARRAY_SIZE(table); i++) {
++		if (table[i].type == type) {
++			api = table[i].api;
 +			break;
-+
-+		l_put_be16(parms[i], msg + n);
-+		n += 2;
++		}
 +	}
 +
-+	net_seq = mesh_net_get_seq_num(net);
-+	print_packet("Friend Sub Add", msg, n);
-+	mesh_net_transport_send(net, key_set, false,
-+			mesh_net_get_iv_index(net), 0,
-+			net_seq, 0, mesh_net_get_friend(net),
-+			msg, n);
-+	mesh_net_next_seq_num(net);
++	io = l_queue_find(io_list, match_by_index, L_UINT_TO_PTR(index));
++
++	if (api == NULL || api->init == NULL || io != NULL)
++		return NULL;
++
++	io = l_new(struct mesh_io, 1);
++
++	if (io == NULL)
++		return NULL;
++
++	io->type = type;
++	io->index = index;
++	io->api = api;
++	if (!api->init(index, io))
++		goto fail;
++
++	if (io_list == NULL)
++		io_list = l_queue_new();
++
++	if (api->set) {
++		uint8_t pkt = MESH_AD_TYPE_NETWORK;
++		uint8_t bec = MESH_AD_TYPE_BEACON;
++		uint8_t prv = MESH_AD_TYPE_PROVISION;
++
++		api->set(io, 1, &bec, 1, NULL, NULL);
++		api->set(io, 2, &prv, 1, NULL, NULL);
++		api->set(io, 3, &pkt, 1, NULL, NULL);
++	}
++
++	if (l_queue_push_head(io_list, io))
++		return io;
++
++fail:
++	if (api->destroy)
++		api->destroy(io);
++
++	l_free(io);
++	return NULL;
 +}
 +
-+void frnd_sub_del(struct mesh_net *net, uint32_t parms[7])
++void mesh_io_destroy(struct mesh_io *io)
 +{
-+	struct mesh_key_set *key_set = &lpn_set;
-+	uint32_t net_seq;
-+	uint8_t msg[15] = { NET_OP_PROXY_SUB_REMOVE };
-+	uint8_t i, n = 1;
++	io = l_queue_remove_if(io_list, match_by_io, io);
 +
-+	/* Check if we are in Phase 2 of Key Refresh */
-+	if (new_lpn_set.nid != 0xff) {
-+		uint8_t phase;
-+		uint16_t net_idx = mesh_net_get_primary_idx(net);
-+		uint8_t status = mesh_net_key_refresh_phase_get(net,
-+							net_idx, &phase);
++	if (io && io->api && io->api->destroy)
++		io->api->destroy(io);
 +
-+		if (status == MESH_STATUS_SUCCESS &&
-+				phase == KEY_REFRESH_PHASE_TWO)
-+			key_set = &new_lpn_set;
-+	}
++	l_free(io);
 +
-+	msg[n++] = ++trans_id;
-+	for (i = 0; i < 7; i++) {
-+		if (parms[i] < 0x8000 || parms[i] > 0xffff)
-+			break;
-+
-+		l_put_be16(parms[i], msg + n);
-+		n += 2;
-+	}
-+
-+	net_seq = mesh_net_get_seq_num(net);
-+	print_packet("Friend Sub Del", msg, n);
-+	mesh_net_transport_send(net, key_set, false,
-+			mesh_net_get_iv_index(net), 0,
-+			net_seq, 0, mesh_net_get_friend(net),
-+			msg, n);
-+	mesh_net_next_seq_num(net);
-+}
-+
-+void frnd_key_refresh(struct mesh_net *net, uint8_t phase)
-+{
-+	uint16_t net_idx = mesh_net_get_primary_idx(net);
-+	uint8_t p[9] = { 1 };
-+	uint8_t key[16];
-+
-+	switch (phase) {
-+	default:
-+	case 0:
-+	case 3:
-+		if (new_lpn_set.nid != 0xff) {
-+			l_info("LPN Retiring KeySet %2.2x", lpn_set.nid);
-+			lpn_set = new_lpn_set;
-+			new_lpn_set.nid = 0xff;
-+			mesh_net_remove_keyset(net, &new_lpn_set);
-+		}
-+		return;
-+
-+	case 1:
-+		mesh_net_remove_keyset(net, &new_lpn_set);
-+		if (!mesh_net_get_key(net, true, net_idx, key)) {
-+			new_lpn_set.nid = 0xff;
-+			return;
-+		}
-+
-+		l_put_be16(mesh_net_get_address(net), p + 1);
-+		l_put_be16(mesh_net_get_friend(net), p + 3);
-+		l_put_be16(cnt, p + 5);
-+		l_put_be16(fn_cnt, p + 7);
-+		print_packet("Friend Key P =", p, 9);
-+
-+		if (!mesh_crypto_k2(key, p, sizeof(p), &new_lpn_set.nid,
-+					new_lpn_set.enc_key,
-+					new_lpn_set.privacy_key)) {
-+			new_lpn_set.nid = 0xff;
-+			return;
-+		}
-+
-+		print_packet("New-NID", &new_lpn_set.nid, 1);
-+		print_packet("New-ENC_KEY", new_lpn_set.enc_key, 16);
-+		print_packet("New-PRIV_KEY", new_lpn_set.privacy_key, 16);
-+
-+		mesh_net_add_keyset(net, &new_lpn_set);
-+		return;
-+
-+	case 2:
-+		/* Should we do anything here?  Maybe not */
-+		return;
++	if (l_queue_isempty(io_list)) {
++		l_queue_destroy(io_list, NULL);
++		io_list = NULL;
 +	}
 +}
 +
-+struct mesh_key_set *frnd_get_key(struct mesh_net *net)
++bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps)
 +{
-+	uint8_t idx = mesh_net_get_primary_idx(net);
-+	uint8_t phase = 0;
++	io = l_queue_find(io_list, match_by_io, io);
 +
-+	mesh_net_key_refresh_phase_get(net, idx, &phase);
++	if (io && io->api && io->api->caps)
++		return io->api->caps(io, caps);
 +
-+	if (phase == 2)
-+		return &new_lpn_set;
-+	else
-+		return &lpn_set;
++	return false;
++}
++
++bool mesh_io_register_recv_cb(struct mesh_io *io, uint8_t filter_id,
++				mesh_io_recv_func_t cb, void *user_data)
++{
++	io = l_queue_find(io_list, match_by_io, io);
++
++	if (io && io->api && io->api->reg)
++		return io->api->reg(io, filter_id, cb, user_data);
++
++	return false;
++}
++
++bool mesh_io_deregister_recv_cb(struct mesh_io *io, uint8_t filter_id)
++{
++	io = l_queue_find(io_list, match_by_io, io);
++
++	if (io && io->api && io->api->dereg)
++		return io->api->dereg(io, filter_id);
++
++	return false;
++}
++
++bool mesh_set_filter(struct mesh_io *io, uint8_t filter_id,
++				const uint8_t *data, uint8_t len,
++				mesh_io_status_func_t cb, void *user_data)
++{
++	io = l_queue_find(io_list, match_by_io, io);
++
++	if (io && io->api && io->api->set)
++		return io->api->set(io, filter_id, data, len, cb, user_data);
++
++	return false;
++}
++
++bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len)
++{
++	io = l_queue_find(io_list, match_by_io, io);
++
++	if (io && io->api && io->api->send)
++		return io->api->send(io, info, data, len);
++
++	return false;
++}
++
++bool mesh_io_send_cancel(struct mesh_io *io, uint8_t *pattern, uint8_t len)
++{
++	io = l_queue_find(io_list, match_by_io, io);
++
++	if (io && io->api && io->api->cancel)
++		return io->api->cancel(io, pattern, len);
++
++	return false;
 +}
 -- 
 2.14.3
