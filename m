@@ -1,148 +1,116 @@
 Return-Path: <brian.gix@intel.com>
-From: Brian Gix <brian.gix@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Cc: Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v4 00/14] Bluetooth Mesh Daemon
-Date: Mon, 30 Apr 2018 14:03:05 -0700
-Message-Id: <20180430210319.25137-1-brian.gix@intel.com>
+From: "Gix, Brian" <brian.gix@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH BlueZ v2 1/1] shared/ecc: Allow pre-composed Private Keys
+Date: Mon, 30 Apr 2018 15:47:52 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4375C0484F9@ORSMSX103.amr.corp.intel.com>
+References: <20180427171049.2250-1-brian.gix@intel.com>
+ <20180427171049.2250-2-brian.gix@intel.com>
+ <B8AE2E0F-864A-4289-BCDC-60CBBAED12F3@holtmann.org>
+In-Reply-To: <B8AE2E0F-864A-4289-BCDC-60CBBAED12F3@holtmann.org>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Version 4 of this patch set uses the new ECC function ecc_make_public_key()
-when a non-ephemeral Public/Private key-pair is required for Provisioning
-
-Otherwise:
-This is our starting point for creating a stand-alone Mesh Daemon.
-
-The Mesh Daemon (meshd) is intended to eventually co-exist beside the
-Bluetooth Daemon (bluetoothd), and either daemon may exist without the
-other. The Mesh Daemon will need full control/ownership of a
-BT Controller that supports at least Core Spec revision 4.0 or
-greater.  It works strictly over the Advertising bearer, but we
-have plans to extend it to support Mesh Proxy Server over GATT, at
-which point it will require support from bluetoothd.
-
-The current meshd, and it's companion Non-Background Command-line
-version btmesh, exists fully within user-space, but requires an
-HCI_USER socket to the kernel controler, and currently requires root
-privledges.
-
-This first revision is intended to operate as a standard
-(non-provisioner) node.  It includes the Configuration Server model,
-and if it cannot find it's Mesh Configuration, will look for it's
-Composition data, and start up as unprovisioned, and accept an
-incoming PB-ADV provisioning session.
-
-Two of us (Inga and Brian) have been working on this, and will be
-the initial supporters and maintainers, and we gladly invite other
-interested parties to participate.
-
-Brian Gix (7):
-  meshd: Shared private meshd interfaces
-  meshd: Mesh crypto support
-  meshd: Infrastructure for Mesh daemon
-  meshd: Initial Mesh Friendship support
-  meshd: Provisioning logic for mesh
-  meshd: Upper and Lower mesh transport
-  meshd: Add Accessors to Transport layer data
-
-Inga Stotland (7):
-  meshd: Header files for mesh access layer and utilities
-  meshd: Source files for mesh access layer and utilities
-  meshd: Source code for handling access layer mux/demux
-  meshd: Mesh config server model
-  meshd: Read and write mesh configuration in JSON format
-  meshd: Sample device composition in JSON fromat
-  Makefile for meshd and configure.ac
-
- Makefile.am                   |    1 +
- Makefile.meshd                |   44 +
- configure.ac                  |    2 +-
- meshd/common/agent.c          |  229 +++
- meshd/common/agent.h          |   42 +
- meshd/common/mesh-defs.h      |   84 +
- meshd/common/util.c           |   71 +
- meshd/common/util.h           |   25 +
- meshd/config/composition.json |   44 +
- meshd/mesh-json/mesh-db.c     | 1360 +++++++++++++
- meshd/mesh-json/mesh-db.h     |  144 ++
- meshd/src/appkey.c            |  538 ++++++
- meshd/src/appkey.h            |   43 +
- meshd/src/btmesh.c            |  176 ++
- meshd/src/cfgmod-server.c     | 1194 ++++++++++++
- meshd/src/cfgmod.h            |   98 +
- meshd/src/crypto.c            | 1607 ++++++++++++++++
- meshd/src/crypto.h            |  164 ++
- meshd/src/display.c           |   67 +
- meshd/src/display.h           |   29 +
- meshd/src/friend.c            | 1116 +++++++++++
- meshd/src/friend.h            |   57 +
- meshd/src/hci.c               |  699 +++++++
- meshd/src/hci.h               |   56 +
- meshd/src/main.c              |  174 ++
- meshd/src/mesh-io-api.h       |   58 +
- meshd/src/mesh-io-generic.c   |  660 +++++++
- meshd/src/mesh-io-generic.h   |   20 +
- meshd/src/mesh-io.c           |  187 ++
- meshd/src/mesh-io.h           |   99 +
- meshd/src/mesh.c              |  184 ++
- meshd/src/mesh.h              |   32 +
- meshd/src/model.c             | 1274 +++++++++++++
- meshd/src/model.h             |  146 ++
- meshd/src/net.c               | 4188 +++++++++++++++++++++++++++++++++++++++++
- meshd/src/net.h               |  392 ++++
- meshd/src/node.c              |  851 +++++++++
- meshd/src/node.h              |   80 +
- meshd/src/prov.c              |  722 +++++++
- meshd/src/prov.h              |  162 ++
- meshd/src/provision.c         | 1159 ++++++++++++
- meshd/src/provision.h         |   30 +
- meshd/src/storage.c           |  673 +++++++
- meshd/src/storage.h           |   51 +
- 44 files changed, 19031 insertions(+), 1 deletion(-)
- create mode 100644 Makefile.meshd
- create mode 100644 meshd/common/agent.c
- create mode 100644 meshd/common/agent.h
- create mode 100644 meshd/common/mesh-defs.h
- create mode 100644 meshd/common/util.c
- create mode 100644 meshd/common/util.h
- create mode 100644 meshd/config/composition.json
- create mode 100644 meshd/mesh-json/mesh-db.c
- create mode 100644 meshd/mesh-json/mesh-db.h
- create mode 100644 meshd/src/appkey.c
- create mode 100644 meshd/src/appkey.h
- create mode 100644 meshd/src/btmesh.c
- create mode 100644 meshd/src/cfgmod-server.c
- create mode 100644 meshd/src/cfgmod.h
- create mode 100644 meshd/src/crypto.c
- create mode 100644 meshd/src/crypto.h
- create mode 100644 meshd/src/display.c
- create mode 100644 meshd/src/display.h
- create mode 100644 meshd/src/friend.c
- create mode 100644 meshd/src/friend.h
- create mode 100644 meshd/src/hci.c
- create mode 100644 meshd/src/hci.h
- create mode 100644 meshd/src/main.c
- create mode 100644 meshd/src/mesh-io-api.h
- create mode 100644 meshd/src/mesh-io-generic.c
- create mode 100644 meshd/src/mesh-io-generic.h
- create mode 100644 meshd/src/mesh-io.c
- create mode 100644 meshd/src/mesh-io.h
- create mode 100644 meshd/src/mesh.c
- create mode 100644 meshd/src/mesh.h
- create mode 100644 meshd/src/model.c
- create mode 100644 meshd/src/model.h
- create mode 100644 meshd/src/net.c
- create mode 100644 meshd/src/net.h
- create mode 100644 meshd/src/node.c
- create mode 100644 meshd/src/node.h
- create mode 100644 meshd/src/prov.c
- create mode 100644 meshd/src/prov.h
- create mode 100644 meshd/src/provision.c
- create mode 100644 meshd/src/provision.h
- create mode 100644 meshd/src/storage.c
- create mode 100644 meshd/src/storage.h
-
--- 
-2.14.3
+SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IE1hcmNl
+bCBIb2x0bWFubiBbbWFpbHRvOm1hcmNlbEBob2x0bWFubi5vcmddDQo+IFNlbnQ6IE1vbmRheSwg
+QXByaWwgMzAsIDIwMTggMTo0NiBBTQ0KPiBUbzogR2l4LCBCcmlhbiA8YnJpYW4uZ2l4QGludGVs
+LmNvbT4NCj4gQ2M6IEx1aXogQXVndXN0byB2b24gRGVudHogPGx1aXouZGVudHpAZ21haWwuY29t
+PjsgbGludXgtDQo+IGJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogUmU6IFtQ
+QVRDSCBCbHVlWiB2MiAxLzFdIHNoYXJlZC9lY2M6IEFsbG93IHByZS1jb21wb3NlZCBQcml2YXRl
+DQo+IEtleXMNCj4gDQo+IEhpIEJyaWFuLA0KPiANCj4gPiBBZGQgZnVuY3Rpb24gZWNjX21ha2Vf
+cHVibGljX2tleSgpIHdoaWNoIHRha2VzIGEgY29uc3QgcHJpdmF0ZV9rZXkgYW5kDQo+ID4gZ2Vu
+ZXJhdGVzIGEgdmFsaWRhdGVkIHB1YmxpY19rZXkgdG8gY29tcGxldGUgdGhlIHBhaXIuDQo+ID4N
+Cj4gPiBOb24tZXBoZW1lcmFsIGtleSBzZXRzIGFyZSByZXF1aXJlZCB0byBzdXBwb3J0IEJsdWV0
+b290aCBNZXNoLg0KPiA+IC0tLQ0KPiA+IHNyYy9zaGFyZWQvZWNjLmMgfCA0MiArKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0NCj4gPiBzcmMvc2hhcmVkL2VjYy5oIHwg
+MTcgKysrKysrKysrKysrKystLS0NCj4gPiAyIGZpbGVzIGNoYW5nZWQsIDQzIGluc2VydGlvbnMo
+KyksIDE2IGRlbGV0aW9ucygtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL3NyYy9zaGFyZWQvZWNj
+LmMgYi9zcmMvc2hhcmVkL2VjYy5jIGluZGV4DQo+ID4gZWIyY2MwMDVkLi40N2YyMjljYTkgMTAw
+NjQ0DQo+ID4gLS0tIGEvc3JjL3NoYXJlZC9lY2MuYw0KPiA+ICsrKyBiL3NyYy9zaGFyZWQvZWNj
+LmMNCj4gPiBAQCAtODU2LDMzICs4NTYsNDkgQEAgc3RhdGljIHZvaWQgZWNjX25hdGl2ZTJieXRl
+cyhjb25zdCB1aW50NjRfdA0KPiBuYXRpdmVbTlVNX0VDQ19ESUdJVFNdLA0KPiA+IAl9DQo+ID4g
+fQ0KPiA+DQo+ID4gLWJvb2wgZWNjX21ha2Vfa2V5KHVpbnQ4X3QgcHVibGljX2tleVs2NF0sIHVp
+bnQ4X3QgcHJpdmF0ZV9rZXlbMzJdKQ0KPiA+ICtib29sIGVjY19tYWtlX3B1YmxpY19rZXkoY29u
+c3QgdWludDhfdCBwcml2YXRlX2tleVszMl0sIHVpbnQ4X3QNCj4gPiArcHVibGljX2tleVs2NF0p
+DQo+ID4gew0KPiA+IAlzdHJ1Y3QgZWNjX3BvaW50IHBrOw0KPiA+IAl1aW50NjRfdCBwcml2W05V
+TV9FQ0NfRElHSVRTXTsNCj4gPiAtCXVuc2lnbmVkIHRyaWVzID0gMDsNCj4gPg0KPiA+IC0JZG8g
+ew0KPiA+IC0JCWlmICghZ2V0X3JhbmRvbV9udW1iZXIocHJpdikgfHwgKHRyaWVzKysgPj0gTUFY
+X1RSSUVTKSkNCj4gPiAtCQkJcmV0dXJuIGZhbHNlOw0KPiA+ICsJZWNjX2J5dGVzMm5hdGl2ZShw
+cml2YXRlX2tleSwgcHJpdik7DQo+ID4NCj4gPiAtCQlpZiAodmxpX2lzX3plcm8ocHJpdikpDQo+
+ID4gLQkJCWNvbnRpbnVlOw0KPiA+ICsJaWYgKHZsaV9pc196ZXJvKHByaXYpKQ0KPiA+ICsJCXJl
+dHVybiBmYWxzZTsNCj4gPg0KPiA+IC0JCS8qIE1ha2Ugc3VyZSB0aGUgcHJpdmF0ZSBrZXkgaXMg
+aW4gdGhlIHJhbmdlIFsxLCBuLTFdLiAqLw0KPiA+IC0JCWlmICh2bGlfY21wKGN1cnZlX24sIHBy
+aXYpICE9IDEpDQo+ID4gLQkJCWNvbnRpbnVlOw0KPiA+ICsJLyogTWFrZSBzdXJlIHRoZSBwcml2
+YXRlIGtleSBpcyBpbiB0aGUgcmFuZ2UgWzEsIG4tMV0uICovDQo+ID4gKwlpZiAodmxpX2NtcChj
+dXJ2ZV9uLCBwcml2KSAhPSAxKQ0KPiA+ICsJCXJldHVybiBmYWxzZTsNCj4gPiArDQo+ID4gKwll
+Y2NfcG9pbnRfbXVsdCgmcGssICZjdXJ2ZV9nLCBwcml2LCBOVUxMLCB2bGlfbnVtX2JpdHMocHJp
+dikpOw0KPiA+DQo+ID4gLQkJZWNjX3BvaW50X211bHQoJnBrLCAmY3VydmVfZywgcHJpdiwgTlVM
+TCwNCj4gdmxpX251bV9iaXRzKHByaXYpKTsNCj4gPiAtCX0gd2hpbGUgKGVjY19wb2ludF9pc196
+ZXJvKCZwaykpOw0KPiA+ICsJaWYgKGVjY19wb2ludF9pc196ZXJvKCZwaykpDQo+ID4gKwkJcmV0
+dXJuIGZhbHNlOw0KPiA+DQo+ID4gLQllY2NfbmF0aXZlMmJ5dGVzKHByaXYsIHByaXZhdGVfa2V5
+KTsNCj4gPiAJZWNjX25hdGl2ZTJieXRlcyhway54LCBwdWJsaWNfa2V5KTsNCj4gPiAJZWNjX25h
+dGl2ZTJieXRlcyhway55LCAmcHVibGljX2tleVszMl0pOw0KPiA+DQo+ID4gCXJldHVybiB0cnVl
+Ow0KPiA+IH0NCj4gPg0KPiA+ICtib29sIGVjY19tYWtlX2tleSh1aW50OF90IHB1YmxpY19rZXlb
+NjRdLCB1aW50OF90IHByaXZhdGVfa2V5WzMyXSkgew0KPiA+ICsJdWludDY0X3QgcHJpdltOVU1f
+RUNDX0RJR0lUU107DQo+ID4gKwl1bnNpZ25lZCB0cmllcyA9IDA7DQo+ID4gKwlib29sIHJlc3Vs
+dCA9IGZhbHNlOw0KPiA+ICsNCj4gPiArCWZvciAodHJpZXMgPSAwOyAhcmVzdWx0ICYmIHRyaWVz
+IDwgTUFYX1RSSUVTOyB0cmllcysrKSB7DQo+ID4gKwkJaWYgKCFnZXRfcmFuZG9tX251bWJlcihw
+cml2KSkNCj4gPiArCQkJY29udGludWU7DQo+ID4gKw0KPiA+ICsJCWVjY19uYXRpdmUyYnl0ZXMo
+cHJpdiwgcHJpdmF0ZV9rZXkpOw0KPiA+ICsNCj4gPiArCQlyZXN1bHQgPSBlY2NfbWFrZV9wdWJs
+aWNfa2V5KHByaXZhdGVfa2V5LCBwdWJsaWNfa2V5KTsNCj4gPiArCX0NCj4gDQo+IHRoaXMgaXMg
+YWN0dWFsbHkgYSBmdW5jdGlvbmFsIGNoYW5nZS4gT24gcmVzdWx0ID09IGZhbHNlLCB0aGUgcHJp
+dmF0ZV9rZXkgcmV0dXJuDQo+IHZhbHVlIGlzIG5vdyBwb3B1bGF0ZWQuIEFsc28gdGhlICFyZXN1
+bHQgaW4gdGhlIGZvci1sb29wIGNoZWNrIGlzIHJhdGhlcg0KPiBjb21wbGljYXRlZC4gVGhhdCBp
+cyBoYXJkIHRvIGZvbGxvdyBjb2RlLiBJbiBhZGRpdGlvbiBzZXR0aW5nIHRyaWVzID0gMCBvbg0K
+PiBkZWNsYXJhdGlvbiBpcyBwb2ludGxlc3MuIEp1c3QgYmxpbmRseSB0cnlpbmcgdG8gc3dhcCBh
+IGRvLXdoaWxlIHdpdGggYSBmb3ItbG9vcA0KPiBpcyBub3QgZ29pbmcgdG8gd29yay4NCj4gDQo+
+IEkgd291bGQgaGF2ZSBwcmVmZXJyZWQgeW91IGRpZG7igJl0IHRvdWNoIGVjY19tYWtlX2tleSBh
+dCBhbGwgYW5kIGp1c3QgY3JlYXRlDQo+IGEgbmV3IGVjY19tYWtlX3B1YmxpY19rZXkuIEkgdGhp
+bmsgeW91IHRyaWVkIHRvIG92ZXItb3B0aW1pemUgaGVyZS4NCg0KSXQgaXMgYSAiRnVuY3Rpb25h
+bCBjaGFuZ2Ugb24gRmFpbCIgd2hpY2ggSSBkaXNyZWdhcmRlZCBhcyB0cml2aWFsIChJIGRvIG5v
+dCBiZWxpZXZlDQphbnkgaW1wbGVtZW50YXRpb25zIHdvdWxkIHVzZSBhIHJldHVybiBwcml2YXRl
+X2tleSBvbiBmYWlsKSBidXQgSSBkbyB0YWtlIHlvdXIgcG9pbnQuDQoNCkx1aXogaGFzIGFscmVh
+ZHkgYXBwbGllZCB0aGUgcGF0Y2gsIGJ1dCBJIGNhbiByZS1lZGl0IGl0IHRvIHJlc3RvcmUgdGhl
+IG9yaWdpbmFsIGVjY19tYWtlX2tleSgpDQp0byBpdHMgb3JpZ2luYWwgc3RhdGUgKG1ha2luZyB0
+aGUgcmVzdCBvZiB0aGUgY29tbWVudHMgbW9vdCksIGFuZCBhZGQgZWNjX21ha2VfcHVibGljX2tl
+eSgpDQphcyBhIHN0YW5kLWFsb25lIGZ1bmN0aW9uIHdpdGggbm8gY3Jvc3MgZGVwZW5kZW5jaWVz
+IHdpdGggZWNjX21ha2Vfa2V5KCkuIFRob3VnaHRzPw0KDQo+IA0KPiA+ICsNCj4gPiArCXJldHVy
+biByZXN1bHQ7DQo+ID4gK30NCj4gPiArDQo+ID4gYm9vbCBlY2NfdmFsaWRfcHVibGljX2tleShj
+b25zdCB1aW50OF90IHB1YmxpY19rZXlbNjRdKSB7DQo+ID4gCXN0cnVjdCBlY2NfcG9pbnQgcGs7
+DQo+ID4gZGlmZiAtLWdpdCBhL3NyYy9zaGFyZWQvZWNjLmggYi9zcmMvc2hhcmVkL2VjYy5oIGlu
+ZGV4DQo+ID4gZjg5ZjJiMGMzLi5hODhlNzM1YzcgMTAwNjQ0DQo+ID4gLS0tIGEvc3JjL3NoYXJl
+ZC9lY2MuaA0KPiA+ICsrKyBiL3NyYy9zaGFyZWQvZWNjLmgNCj4gPiBAQCAtMjcsMTQgKzI3LDI1
+IEBADQo+ID4gI2luY2x1ZGUgPHN0ZGJvb2wuaD4NCj4gPiAjaW5jbHVkZSA8c3RkaW50Lmg+DQo+
+ID4NCj4gPiArLyogQ3JlYXRlIGEgcHVibGljIGtleSBmcm9tIGEgcHJpdmF0ZSBrZXkuDQo+ID4g
+KyAqDQo+ID4gKyAqIE91dHB1dHM6DQo+ID4gKyAqCXByaXZhdGVfa2V5IC0gQ29uc3QgcHJpdmF0
+ZSBrZXkNCj4gDQo+IFRoaXMgc28gd3JvbmcuDQo+IA0KPiBJdCBpcyBJbnB1dHM6IHByaXZhdGVf
+a2V5IGFuZCB0aGUgd29yZCDigJxDb25zdOKAnSBoYXMgbm90aGluZyB0byBkbyBoZXJlLg0KDQpZ
+b3UgYXJlIGNvcnJlY3QsIHRoYXQgcHJpdmF0ZV9rZXkgaGVyZSBzaG91bGQgYmUgaW4gbGlzdGVk
+IGFzIGFuIElucHV0LiANCg0KSG93ZXZlciBjb25zdCBhYnNvbHV0ZWx5IGFwcGxpZXMgaW4gdGhp
+cyBjYXNlICh0aGUgaW5wdXQgY2FzZSkgc2luY2UgaXQgbXVzdA0Kbm90IGJlIGNoYW5nZWQgKGl0
+IGlzIG5vbi1lcGhlbWVyYWwpLg0KDQoNCj4gDQo+ID4gKyAqCXB1YmxpY19rZXkgIC0gV2lsbCBi
+ZSBmaWxsZWQgaW4gd2l0aCB0aGUgcHVibGljIGtleS4NCj4gPiArICoNCj4gPiArICogUmV0dXJu
+cyB0cnVlIGlmIHRoZSBwdWJsaWMga2V5IHdhcyBnZW5lcmF0ZWQgc3VjY2Vzc2Z1bGx5LCBmYWxz
+ZQ0KPiA+ICsgKiBpZiBhbiBlcnJvciBvY2N1cnJlZC4gVGhlIGtleXMgYXJlIHdpdGggdGhlIExT
+QiBmaXJzdC4NCj4gPiArICovDQo+ID4gK2Jvb2wgZWNjX21ha2VfcHVibGljX2tleShjb25zdCB1
+aW50OF90IHByaXZhdGVfa2V5WzMyXSwgdWludDhfdA0KPiA+ICtwdWJsaWNfa2V5WzY0XSk7DQo+
+ID4gKw0KPiA+IC8qIENyZWF0ZSBhIHB1YmxpYy9wcml2YXRlIGtleSBwYWlyLg0KPiA+ICAqDQo+
+ID4gICogT3V0cHV0czoNCj4gPiAgKglwdWJsaWNfa2V5ICAtIFdpbGwgYmUgZmlsbGVkIGluIHdp
+dGggdGhlIHB1YmxpYyBrZXkuDQo+ID4gLSAqCXByaXZhdGVfS2V5IC0gV2lsbCBiZSBmaWxsZWQg
+aW4gd2l0aCB0aGUgcHJpdmF0ZSBrZXkuDQo+ID4gKyAqCXByaXZhdGVfa2V5IC0gV2lsbCBiZSBm
+aWxsZWQgaW4gd2l0aCB0aGUgcHJpdmF0ZSBrZXkuDQo+ID4gICoNCj4gPiAgKiBSZXR1cm5zIHRy
+dWUgaWYgdGhlIGtleSBwYWlyIHdhcyBnZW5lcmF0ZWQgc3VjY2Vzc2Z1bGx5LCBmYWxzZQ0KPiA+
+IC0gKiBpZiBhbiBlcnJvciBvY2N1cnJlZC4gVGhleSBrZXlzIGFyZSB3aXRoIHRoZSBMU0IgZmly
+c3QuDQo+ID4gKyAqIGlmIGFuIGVycm9yIG9jY3VycmVkLiBUaGUga2V5cyBhcmUgd2l0aCB0aGUg
+TFNCIGZpcnN0Lg0KPiA+ICAqLw0KPiA+IGJvb2wgZWNjX21ha2Vfa2V5KHVpbnQ4X3QgcHVibGlj
+X2tleVs2NF0sIHVpbnQ4X3QgcHJpdmF0ZV9rZXlbMzJdKTsNCj4gPg0KPiA+IEBAIC01NCw3ICs2
+NSw3IEBAIGJvb2wgZWNjX3ZhbGlkX3B1YmxpY19rZXkoY29uc3QgdWludDhfdA0KPiA+IHB1Ymxp
+Y19rZXlbNjRdKTsNCj4gPiAgKg0KPiA+ICAqIElucHV0czoNCj4gPiAgKglwdWJsaWNfa2V5ICAt
+IFRoZSBwdWJsaWMga2V5IG9mIHRoZSByZW1vdGUgcGFydHkuDQo+ID4gLSAqCXByaXZhdGVfS2V5
+IC0gWW91ciBwcml2YXRlIGtleS4NCj4gPiArICoJcHJpdmF0ZV9rZXkgLSBZb3VyIHByaXZhdGUg
+a2V5Lg0KPiA+ICAqDQo+ID4gICogT3V0cHV0czoNCj4gPiAgKglzZWNyZXQgLSBXaWxsIGJlIGZp
+bGxlZCBpbiB3aXRoIHRoZSBzaGFyZWQgc2VjcmV0IHZhbHVlLg0KPiANCj4gUmVnYXJkcw0KPiAN
+Cj4gTWFyY2VsDQoNCg==
