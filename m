@@ -4,103 +4,24 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	linux-bluetooth@vger.kernel.org
 Cc: Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v4 03/14] meshd: Infrastructure for Mesh daemon
-Date: Mon, 30 Apr 2018 14:03:08 -0700
-Message-Id: <20180430210319.25137-4-brian.gix@intel.com>
+Subject: [PATCH BlueZ v4 02/14] meshd: Mesh crypto support
+Date: Mon, 30 Apr 2018 14:03:07 -0700
+Message-Id: <20180430210319.25137-3-brian.gix@intel.com>
 In-Reply-To: <20180430210319.25137-1-brian.gix@intel.com>
 References: <20180430210319.25137-1-brian.gix@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- meshd/src/display.c         |  67 +++++
- meshd/src/hci.c             | 699 ++++++++++++++++++++++++++++++++++++++++++++
- meshd/src/mesh-io-generic.c | 660 +++++++++++++++++++++++++++++++++++++++++
- meshd/src/mesh-io.c         | 187 ++++++++++++
- 4 files changed, 1613 insertions(+)
- create mode 100644 meshd/src/display.c
- create mode 100644 meshd/src/hci.c
- create mode 100644 meshd/src/mesh-io-generic.c
- create mode 100644 meshd/src/mesh-io.c
+ meshd/src/crypto.c | 1607 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 1607 insertions(+)
+ create mode 100644 meshd/src/crypto.c
 
-diff --git a/meshd/src/display.c b/meshd/src/display.c
+diff --git a/meshd/src/crypto.c b/meshd/src/crypto.c
 new file mode 100644
-index 000000000..adf92cae0
+index 000000000..cf35cfbe8
 --- /dev/null
-+++ b/meshd/src/display.c
-@@ -0,0 +1,67 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <termios.h>
-+#include <sys/ioctl.h>
-+#include <sys/time.h>
-+#include <ell/ell.h>
-+
-+#include "display.h"
-+
-+#define likely(x)   __builtin_expect(!!(x), 1)
-+#define unlikely(x) __builtin_expect(!!(x), 0)
-+
-+static unsigned int cached_num_columns;
-+
-+unsigned int num_columns(void)
-+{
-+	struct winsize ws;
-+
-+	if (likely(cached_num_columns > 0))
-+		return cached_num_columns;
-+
-+	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) < 0 || ws.ws_col == 0)
-+		cached_num_columns = 80;
-+	else
-+		cached_num_columns = ws.ws_col;
-+
-+	return cached_num_columns;
-+}
-+
-+void print_packet(const char *label, const void *data, uint16_t size)
-+{
-+	struct timeval pkt_time;
-+
-+	gettimeofday(&pkt_time, NULL);
-+
-+	if (size > 0) {
-+		char *str;
-+
-+		str = l_util_hexstring(data, size);
-+		l_info("%05d.%03d %s: %s",
-+				(uint32_t) pkt_time.tv_sec % 100000,
-+				(uint32_t) pkt_time.tv_usec/1000, label, str);
-+		l_free(str);
-+	} else
-+		l_info("%05d.%03d %s: empty",
-+				(uint32_t) pkt_time.tv_sec % 100000,
-+				(uint32_t) pkt_time.tv_usec/1000, label);
-+}
-diff --git a/meshd/src/hci.c b/meshd/src/hci.c
-new file mode 100644
-index 000000000..4e5a40d63
---- /dev/null
-+++ b/meshd/src/hci.c
-@@ -0,0 +1,699 @@
++++ b/meshd/src/crypto.c
+@@ -0,0 +1,1607 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -124,1540 +45,1589 @@ index 000000000..4e5a40d63
 +#include <config.h>
 +#endif
 +
++#include <fcntl.h>
 +#include <unistd.h>
-+#include <stdlib.h>
-+#include <sys/uio.h>
++#include <string.h>
 +#include <sys/socket.h>
 +#include <ell/ell.h>
 +
-+#include "monitor/bt.h"
++#include <linux/if_alg.h>
 +
-+#include "meshd/src/hci.h"
++#ifndef SOL_ALG
++#define SOL_ALG		279
++#endif
 +
-+#define BTPROTO_HCI	1
-+struct sockaddr_hci {
-+	sa_family_t	hci_family;
-+	unsigned short	hci_dev;
-+	unsigned short  hci_channel;
-+};
-+#define HCI_CHANNEL_USER	1
++#ifndef ALG_SET_AEAD_AUTHSIZE
++#define ALG_SET_AEAD_AUTHSIZE	5
++#endif
 +
-+struct bt_hci {
-+	int ref_count;
-+	struct l_io *io;
-+	bool is_stream;
-+	bool writer_active;
-+	uint8_t num_cmds;
-+	uint8_t num_pkts;
-+	unsigned int next_cmd_id;
-+	unsigned int next_evt_id;
-+	struct l_queue *cmd_queue;
-+	struct l_queue *rsp_queue;
-+	struct l_queue *evt_list;
-+	struct l_queue *pkt_queue;
-+	bt_hci_receive_func_t receive_callback;
-+	bt_hci_destroy_func_t receive_destroy;
-+	void *receive_data;
-+};
++#include "meshd/src/mesh.h"
++#include "meshd/src/node.h"
++#include "meshd/src/net.h"
++#include "meshd/src/crypto.h"
++#include "meshd/src/display.h"
 +
-+struct cmd {
-+	unsigned int id;
-+	uint16_t opcode;
-+	void *data;
-+	uint8_t size;
-+	bt_hci_callback_func_t callback;
-+	bt_hci_destroy_func_t destroy;
-+	void *user_data;
-+};
-+
-+struct evt {
-+	unsigned int id;
-+	uint8_t event;
-+	bt_hci_callback_func_t callback;
-+	bt_hci_destroy_func_t destroy;
-+	void *user_data;
-+};
-+
-+struct pkt {
-+	uint16_t handle;
-+	uint8_t flags;
-+	void *data;
-+	uint16_t size;
-+};
-+
-+static void cmd_free(void *data)
++static int alg_new(int fd, const void *keyval, socklen_t keylen,
++							size_t mic_size)
 +{
-+	struct cmd *cmd = data;
-+
-+	if (cmd->destroy)
-+		cmd->destroy(cmd->user_data);
-+
-+	l_free(cmd->data);
-+	l_free(cmd);
-+}
-+
-+static void evt_free(void *data)
-+{
-+	struct evt *evt = data;
-+
-+	if (evt->destroy)
-+		evt->destroy(evt->user_data);
-+
-+	l_free(evt);
-+}
-+
-+static void pkt_free(void *data)
-+{
-+	struct pkt *pkt = data;
-+
-+	l_free(pkt->data);
-+	l_free(pkt);
-+}
-+
-+static void send_command(struct bt_hci *hci, uint16_t opcode,
-+						void *data, uint8_t size)
-+{
-+	uint8_t type = BT_H4_CMD_PKT;
-+	struct bt_hci_cmd_hdr hdr;
-+	struct iovec iov[3];
-+	int fd, iovcnt;
-+
-+	hdr.opcode = L_CPU_TO_LE16(opcode);
-+	hdr.plen = size;
-+
-+	iov[0].iov_base = &type;
-+	iov[0].iov_len  = 1;
-+	iov[1].iov_base = &hdr;
-+	iov[1].iov_len  = sizeof(hdr);
-+
-+	if (size > 0) {
-+		iov[2].iov_base = data;
-+		iov[2].iov_len  = size;
-+		iovcnt = 3;
-+	} else
-+		iovcnt = 2;
-+
-+	fd = l_io_get_fd(hci->io);
-+	if (fd < 0) {
-+		l_error("hci->io Bad");
-+		return;
++	if (setsockopt(fd, SOL_ALG, ALG_SET_KEY, keyval, keylen) < 0) {
++		l_error("key");
++		return -1;
 +	}
 +
-+	if (writev(fd, iov, iovcnt) < 0) {
-+		l_error("writev Bad");
-+		return;
++	if (mic_size &&
++		setsockopt(fd, SOL_ALG, ALG_SET_AEAD_AUTHSIZE,
++							NULL, mic_size) < 0) {
++		l_error("taglen");
++		return -1;
 +	}
 +
-+	hci->num_cmds--;
++	/* FIXME: This should use accept4() with SOCK_CLOEXEC */
++	return accept(fd, NULL, 0);
 +}
 +
-+static void send_packet(struct bt_hci *hci, uint16_t handle, uint8_t flags,
-+						void *data, uint8_t size)
++static bool alg_encrypt(int fd, const void *inbuf, size_t inlen,
++						void *outbuf, size_t outlen)
 +{
-+	uint8_t type = BT_H4_ACL_PKT;
-+	struct bt_hci_acl_hdr hdr;
-+	struct iovec iov[3];
-+	int fd, iovcnt;
-+
-+	hdr.handle = L_CPU_TO_LE16(flags << 12 | handle);
-+	hdr.dlen = L_CPU_TO_LE16(size);
-+
-+	iov[0].iov_base = &type;
-+	iov[0].iov_len  = 1;
-+	iov[1].iov_base = &hdr;
-+	iov[1].iov_len  = sizeof(hdr);
-+
-+	if (size > 0) {
-+		iov[2].iov_base = data;
-+		iov[2].iov_len  = size;
-+		iovcnt = 3;
-+	} else
-+		iovcnt = 2;
-+
-+	fd = l_io_get_fd(hci->io);
-+	if (fd < 0) {
-+		l_error("hci->io Bad");
-+		return;
-+	}
-+
-+	if (writev(fd, iov, iovcnt) < 0) {
-+		l_error("writev Bad");
-+		return;
-+	}
-+
-+	hci->num_pkts--;
-+}
-+
-+static bool io_write_callback(struct l_io *io, void *user_data)
-+{
-+	struct bt_hci *hci = user_data;
-+	struct cmd *cmd;
-+
-+	if (hci->num_cmds > 0)
-+		cmd = l_queue_pop_head(hci->cmd_queue);
-+	else
-+		cmd = NULL;
-+
-+	if (cmd) {
-+		send_command(hci, cmd->opcode, cmd->data, cmd->size);
-+		l_queue_push_tail(hci->rsp_queue, cmd);
-+	} else {
-+		struct pkt *pkt;
-+
-+		if (hci->num_pkts < 1)
-+			goto done;
-+
-+		pkt = l_queue_pop_head(hci->pkt_queue);
-+		if (pkt) {
-+			send_packet(hci, pkt->handle, pkt->flags,
-+							pkt->data, pkt->size);
-+			pkt_free(pkt);
-+		}
-+	}
-+
-+	if (!l_queue_isempty(hci->pkt_queue))
-+		return true;
-+
-+done:
-+	hci->writer_active = false;
-+
-+	return false;
-+}
-+
-+static void wakeup_writer(struct bt_hci *hci)
-+{
-+	if (hci->writer_active)
-+		return;
-+
-+	if (l_queue_isempty(hci->cmd_queue) && l_queue_isempty(hci->pkt_queue))
-+		return;
-+
-+	if (!l_io_set_write_handler(hci->io, io_write_callback, hci, NULL))
-+		return;
-+
-+	hci->writer_active = true;
-+}
-+
-+static bool match_cmd_opcode(const void *a, const void *b)
-+{
-+	const struct cmd *cmd = a;
-+	uint16_t opcode = L_PTR_TO_UINT(b);
-+
-+	return cmd->opcode == opcode;
-+}
-+
-+static void process_response(struct bt_hci *hci, uint16_t opcode,
-+					const void *data, size_t size)
-+{
-+	struct cmd *cmd;
-+
-+	if (opcode == BT_HCI_CMD_NOP)
-+		goto done;
-+
-+	cmd = l_queue_remove_if(hci->rsp_queue, match_cmd_opcode,
-+						L_UINT_TO_PTR(opcode));
-+	if (!cmd)
-+		goto done;
-+
-+	if (cmd->callback)
-+		cmd->callback(data, size, cmd->user_data);
-+
-+	cmd_free(cmd);
-+
-+done:
-+	wakeup_writer(hci);
-+}
-+
-+static void process_notify(void *data, void *user_data)
-+{
-+	struct bt_hci_evt_hdr *hdr = user_data;
-+	struct evt *evt = data;
-+
-+	if (evt->event == hdr->evt)
-+		evt->callback(user_data + sizeof(struct bt_hci_evt_hdr),
-+						hdr->plen, evt->user_data);
-+}
-+
-+static void process_event(struct bt_hci *hci, const void *data, size_t size)
-+{
-+	const struct bt_hci_evt_hdr *hdr = data;
-+	const struct bt_hci_evt_cmd_complete *cc;
-+	const struct bt_hci_evt_cmd_status *cs;
-+	const struct bt_hci_evt_num_completed_packets *cp;
-+
-+	if (size < sizeof(struct bt_hci_evt_hdr))
-+		return;
-+
-+	data += sizeof(struct bt_hci_evt_hdr);
-+	size -= sizeof(struct bt_hci_evt_hdr);
-+
-+	if (hdr->plen != size)
-+		return;
-+
-+	switch (hdr->evt) {
-+	case BT_HCI_EVT_CMD_COMPLETE:
-+		if (size < sizeof(*cc))
-+			return;
-+		cc = data;
-+		hci->num_cmds = cc->ncmd;
-+		process_response(hci, L_LE16_TO_CPU(cc->opcode),
-+						data + sizeof(*cc),
-+						size - sizeof(*cc));
-+		break;
-+
-+	case BT_HCI_EVT_CMD_STATUS:
-+		if (size < sizeof(*cs))
-+			return;
-+		cs = data;
-+		hci->num_cmds = cs->ncmd;
-+		process_response(hci, L_LE16_TO_CPU(cs->opcode),
-+							&cs->status, 1);
-+		break;
-+
-+	case BT_HCI_EVT_NUM_COMPLETED_PACKETS:
-+		if (size < sizeof(*cp))
-+			return;
-+		cp = data;
-+		l_debug("BT_HCI_EVT_NUM_COMPLETED_PACKETS:%d", cp->count);
-+		/* Ignoring handle information for now */
-+		hci->num_pkts = cp->count;
-+		wakeup_writer(hci);
-+		break;
-+
-+	default:
-+		l_queue_foreach(hci->evt_list, process_notify, (void *) hdr);
-+		break;
-+	}
-+}
-+
-+static void process_acl(struct bt_hci *hci, const void *data, size_t size)
-+{
-+	const struct bt_hci_acl_hdr *hdr = data;
-+	uint16_t handle;
-+
-+	if (size < sizeof(struct bt_hci_acl_hdr))
-+		return;
-+
-+	data += sizeof(struct bt_hci_acl_hdr);
-+	size -= sizeof(struct bt_hci_acl_hdr);
-+
-+	if (L_LE16_TO_CPU(hdr->dlen) != size)
-+		return;
-+
-+	handle = L_LE16_TO_CPU(hdr->handle);
-+
-+	if (hci->receive_callback)
-+		hci->receive_callback(handle & 0x0fff, handle >> 12,
-+					data, size, hci->receive_data);
-+}
-+
-+static bool io_read_callback(struct l_io *io, void *user_data)
-+{
-+	struct bt_hci *hci = user_data;
-+	uint8_t buf[512];
++	__u32 alg_op = ALG_OP_ENCRYPT;
++	char cbuf[CMSG_SPACE(sizeof(alg_op))];
++	struct cmsghdr *cmsg;
++	struct msghdr msg;
++	struct iovec iov;
 +	ssize_t len;
-+	int fd;
 +
-+	fd = l_io_get_fd(hci->io);
-+	if (fd < 0)
-+		return false;
++	memset(cbuf, 0, sizeof(cbuf));
++	memset(&msg, 0, sizeof(msg));
 +
-+	if (hci->is_stream)
-+		return false;
++	msg.msg_control = cbuf;
++	msg.msg_controllen = sizeof(cbuf);
 +
-+	len = read(fd, buf, sizeof(buf));
++	cmsg = CMSG_FIRSTHDR(&msg);
++	cmsg->cmsg_level = SOL_ALG;
++	cmsg->cmsg_type = ALG_SET_OP;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(alg_op));
++	memcpy(CMSG_DATA(cmsg), &alg_op, sizeof(alg_op));
++
++	iov.iov_base = (void *) inbuf;
++	iov.iov_len = inlen;
++
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++
++	len = sendmsg(fd, &msg, 0);
 +	if (len < 0)
 +		return false;
 +
-+	if (len < 1)
-+		return true;
-+
-+	switch (buf[0]) {
-+	case BT_H4_EVT_PKT:
-+		process_event(hci, buf + 1, len - 1);
-+		break;
-+	case BT_H4_ACL_PKT:
-+		process_acl(hci, buf + 1, len - 1);
-+		break;
-+	default:
-+		l_info("%2.2x-RXed", buf[0]);
-+	}
++	len = read(fd, outbuf, outlen);
++	if (len < 0)
++		return false;
 +
 +	return true;
 +}
 +
-+static struct bt_hci *create_hci(int fd)
++static int aes_ecb_setup(const uint8_t key[16])
 +{
-+	struct bt_hci *hci;
++	struct sockaddr_alg salg;
++	int fd, nfd;
 +
-+	if (fd < 0)
-+		return NULL;
-+
-+	hci = l_new(struct bt_hci, 1);
-+
-+	hci->io = l_io_new(fd);
-+
-+	hci->is_stream = true;
-+	hci->writer_active = false;
-+	hci->num_cmds = 1;
-+	hci->num_pkts = 1;
-+	hci->next_cmd_id = 1;
-+	hci->next_evt_id = 1;
-+
-+	hci->cmd_queue = l_queue_new();
-+	hci->rsp_queue = l_queue_new();
-+	hci->evt_list = l_queue_new();
-+	hci->pkt_queue = l_queue_new();
-+
-+	if (!l_io_set_read_handler(hci->io, io_read_callback, hci, NULL)) {
-+		l_queue_destroy(hci->pkt_queue, NULL);
-+		l_queue_destroy(hci->evt_list, NULL);
-+		l_queue_destroy(hci->rsp_queue, NULL);
-+		l_queue_destroy(hci->cmd_queue, NULL);
-+		l_io_destroy(hci->io);
-+		l_free(hci);
-+		return NULL;
-+	}
-+
-+	return bt_hci_ref(hci);
-+}
-+
-+struct bt_hci *bt_hci_new(int fd)
-+{
-+	struct bt_hci *hci;
-+
-+	hci = create_hci(fd);
-+	if (!hci)
-+		return NULL;
-+
-+	return hci;
-+}
-+
-+static int create_socket(uint16_t index, uint16_t channel)
-+{
-+	struct sockaddr_hci addr;
-+	int fd;
-+
-+	fd = socket(PF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC | SOCK_NONBLOCK,
-+								BTPROTO_HCI);
++	fd = socket(PF_ALG, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
 +	if (fd < 0)
 +		return -1;
 +
-+	memset(&addr, 0, sizeof(addr));
-+	addr.hci_family = AF_BLUETOOTH;
-+	addr.hci_dev = index;
-+	addr.hci_channel = channel;
++	memset(&salg, 0, sizeof(salg));
++	salg.salg_family = AF_ALG;
++	strcpy((char *) salg.salg_type, "skcipher");
++	strcpy((char *) salg.salg_name, "ecb(aes)");
 +
-+	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++	if (bind(fd, (struct sockaddr *) &salg, sizeof(salg)) < 0) {
 +		close(fd);
 +		return -1;
 +	}
 +
++	nfd = alg_new(fd, key, 16, 0);
++
++	close(fd);
++
++	return nfd;
++}
++
++static bool aes_ecb(int fd, const uint8_t plaintext[16], uint8_t encrypted[16])
++{
++	return alg_encrypt(fd, plaintext, 16, encrypted, 16);
++}
++
++static void aes_ecb_destroy(int fd)
++{
++	close(fd);
++}
++
++static bool aes_ecb_one(const uint8_t key[16],
++			const uint8_t plaintext[16], uint8_t encrypted[16])
++{
++	bool result;
++	int fd;
++
++	fd = aes_ecb_setup(key);
++	if (fd < 0)
++		return false;
++
++	result = aes_ecb(fd, plaintext, encrypted);
++
++	aes_ecb_destroy(fd);
++
++	return result;
++}
++
++bool mesh_aes_ecb_one(const uint8_t key[16],
++			const uint8_t plaintext[16], uint8_t encrypted[16])
++{
++	return aes_ecb_one(key, plaintext, encrypted);
++}
++
++/* Maximum message length that can be passed to aes_cmac */
++#define CMAC_MSG_MAX	(64 + 64 + 17)
++
++static int aes_cmac_setup(const uint8_t key[16])
++{
++	struct sockaddr_alg salg;
++	int fd, nfd;
++
++	fd = socket(PF_ALG, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
++	if (fd < 0)
++		return -1;
++
++	memset(&salg, 0, sizeof(salg));
++	salg.salg_family = AF_ALG;
++	strcpy((char *) salg.salg_type, "hash");
++	strcpy((char *) salg.salg_name, "cmac(aes)");
++
++	if (bind(fd, (struct sockaddr *) &salg, sizeof(salg)) < 0) {
++		close(fd);
++		return -1;
++	}
++
++	nfd = alg_new(fd, key, 16, 0);
++
++	close(fd);
++
++	return nfd;
++}
++
++static bool aes_cmac(int fd, const uint8_t *msg,
++					size_t msg_len, uint8_t res[16])
++{
++	ssize_t len;
++
++	if (msg_len > CMAC_MSG_MAX)
++		return false;
++
++	len = send(fd, msg, msg_len, 0);
++	if (len < 0)
++		return false;
++
++	len = read(fd, res, 16);
++	if (len < 0)
++		return false;
++
++	return true;
++}
++
++static void aes_cmac_destroy(int fd)
++{
++	close(fd);
++}
++
++static int aes_cmac_N_start(const uint8_t N[16])
++{
++	int fd;
++
++	fd = aes_cmac_setup(N);
 +	return fd;
 +}
 +
-+struct bt_hci *bt_hci_new_user_channel(uint16_t index)
++static bool aes_cmac_one(const uint8_t key[16], const void *msg,
++					size_t msg_len, uint8_t res[16])
 +{
-+	struct bt_hci *hci;
++	bool result;
 +	int fd;
 +
-+	fd = create_socket(index, HCI_CHANNEL_USER);
++	fd = aes_cmac_setup(key);
 +	if (fd < 0)
-+		return NULL;
-+
-+	hci = create_hci(fd);
-+	if (!hci) {
-+		close(fd);
-+		return NULL;
-+	}
-+
-+	hci->is_stream = false;
-+
-+	bt_hci_set_close_on_unref(hci, true);
-+
-+	return hci;
-+}
-+
-+struct bt_hci *bt_hci_ref(struct bt_hci *hci)
-+{
-+	if (!hci)
-+		return NULL;
-+
-+	__sync_fetch_and_add(&hci->ref_count, 1);
-+
-+	return hci;
-+}
-+
-+void bt_hci_unref(struct bt_hci *hci)
-+{
-+	if (!hci)
-+		return;
-+
-+	if (__sync_sub_and_fetch(&hci->ref_count, 1))
-+		return;
-+
-+	if (hci->receive_destroy)
-+		hci->receive_destroy(hci->receive_data);
-+
-+	l_queue_destroy(hci->pkt_queue, pkt_free);
-+	l_queue_destroy(hci->evt_list, evt_free);
-+	l_queue_destroy(hci->cmd_queue, cmd_free);
-+	l_queue_destroy(hci->rsp_queue, cmd_free);
-+
-+	l_io_destroy(hci->io);
-+
-+	l_free(hci);
-+}
-+
-+bool bt_hci_set_close_on_unref(struct bt_hci *hci, bool do_close)
-+{
-+	if (!hci)
 +		return false;
 +
-+	return l_io_set_close_on_destroy(hci->io, do_close);
++	result = aes_cmac(fd, msg, msg_len, res);
++
++	aes_cmac_destroy(fd);
++
++	return result;
 +}
 +
-+unsigned int bt_hci_send(struct bt_hci *hci, uint16_t opcode,
-+				const void *data, uint8_t size,
-+				bt_hci_callback_func_t callback,
-+				void *user_data, bt_hci_destroy_func_t destroy)
++bool mesh_crypto_aes_cmac(const uint8_t key[16], const uint8_t *msg,
++					size_t msg_len, uint8_t res[16])
 +{
-+	struct cmd *cmd;
-+
-+	if (!hci)
-+		return 0;
-+
-+	cmd = l_new(struct cmd, 1);
-+
-+	cmd->opcode = opcode;
-+	cmd->size = size;
-+
-+	if (cmd->size > 0)
-+		cmd->data = l_memdup(data, cmd->size);
-+
-+	if (hci->next_cmd_id < 1)
-+		hci->next_cmd_id = 1;
-+
-+	cmd->id = hci->next_cmd_id++;
-+
-+	cmd->callback = callback;
-+	cmd->destroy = destroy;
-+	cmd->user_data = user_data;
-+
-+	if (!l_queue_push_tail(hci->cmd_queue, cmd)) {
-+		l_free(cmd->data);
-+		l_free(cmd);
-+		return 0;
-+	}
-+
-+	wakeup_writer(hci);
-+
-+	return cmd->id;
++	return aes_cmac_one(key, msg, msg_len, res);
 +}
 +
-+static bool match_cmd_id(const void *a, const void *b)
++bool mesh_crypto_aes_ccm_encrypt(const uint8_t nonce[13], const uint8_t key[16],
++					const uint8_t *aad, uint16_t aad_len,
++					const uint8_t *msg, uint16_t msg_len,
++					uint8_t *out_msg,
++					void *out_mic, size_t mic_size)
 +{
-+	const struct cmd *cmd = a;
-+	unsigned int id = L_PTR_TO_UINT(b);
++	uint8_t pmsg[16], cmic[16], cmsg[16];
++	uint8_t mic[16], Xn[16];
++	uint16_t blk_cnt, last_blk;
++	bool result;
++	size_t i, j;
++	int fd;
 +
-+	return cmd->id == id;
-+}
-+
-+bool bt_hci_cancel(struct bt_hci *hci, unsigned int id)
-+{
-+	struct cmd *cmd;
-+
-+	if (!hci || !id)
-+		return false;
-+
-+	cmd = l_queue_remove_if(hci->cmd_queue, match_cmd_id,
-+						L_UINT_TO_PTR(id));
-+	if (!cmd) {
-+		cmd = l_queue_remove_if(hci->rsp_queue, match_cmd_id,
-+							L_UINT_TO_PTR(id));
-+		if (!cmd)
-+			return false;
-+	}
-+
-+	cmd_free(cmd);
-+
-+	wakeup_writer(hci);
-+
-+	return true;
-+}
-+
-+bool bt_hci_flush(struct bt_hci *hci)
-+{
-+	if (!hci)
-+		return false;
-+
-+	if (hci->writer_active) {
-+		l_io_set_write_handler(hci->io, NULL, NULL, NULL);
-+		hci->writer_active = false;
-+	}
-+
-+	l_queue_clear(hci->cmd_queue, cmd_free);
-+	l_queue_clear(hci->rsp_queue, cmd_free);
-+
-+	return true;
-+}
-+
-+unsigned int bt_hci_register(struct bt_hci *hci, uint8_t event,
-+				bt_hci_callback_func_t callback,
-+				void *user_data, bt_hci_destroy_func_t destroy)
-+{
-+	struct evt *evt;
-+
-+	if (!hci)
-+		return 0;
-+
-+	evt = l_new(struct evt, 1);
-+
-+	evt->event = event;
-+
-+	if (hci->next_evt_id < 1)
-+		hci->next_evt_id = 1;
-+
-+	evt->id = hci->next_evt_id++;
-+
-+	evt->callback = callback;
-+	evt->destroy = destroy;
-+	evt->user_data = user_data;
-+
-+	if (!l_queue_push_tail(hci->evt_list, evt)) {
-+		l_free(evt);
-+		return 0;
-+	}
-+
-+	return evt->id;
-+}
-+
-+static bool match_evt_id(const void *a, const void *b)
-+{
-+	const struct evt *evt = a;
-+	unsigned int id = L_PTR_TO_UINT(b);
-+
-+	return evt->id == id;
-+}
-+
-+bool bt_hci_unregister(struct bt_hci *hci, unsigned int id)
-+{
-+	struct evt *evt;
-+
-+	if (!hci || !id)
-+		return false;
-+
-+	evt = l_queue_remove_if(hci->evt_list, match_evt_id,
-+						L_UINT_TO_PTR(id));
-+	if (!evt)
-+		return false;
-+
-+	evt_free(evt);
-+
-+	return true;
-+}
-+
-+bool bt_hci_receive(struct bt_hci *hci, bt_hci_receive_func_t callback,
-+				void *user_data, bt_hci_destroy_func_t destroy)
-+{
-+	if (!hci)
-+		return false;
-+
-+	if (hci->receive_destroy)
-+		hci->receive_destroy(hci->receive_data);
-+
-+	hci->receive_callback = callback;
-+	hci->receive_destroy = destroy;
-+	hci->receive_data = user_data;
-+
-+	return true;
-+}
-+
-+bool bt_hci_write(struct bt_hci *hci, uint16_t handle, uint8_t flags,
-+				const void *data, uint16_t size)
-+{
-+	struct pkt *pkt;
-+
-+	if (!hci)
-+		return false;
-+
-+	pkt = l_new(struct pkt, 1);
-+
-+	pkt->handle = handle;
-+	pkt->flags = flags;
-+	pkt->size = size;
-+
-+	if (pkt->size > 0)
-+		pkt->data = l_memdup(data, pkt->size);
-+
-+	if (!l_queue_push_tail(hci->pkt_queue, pkt)) {
-+		l_free(pkt->data);
-+		l_free(pkt);
++	if (aad_len >= 0xff00) {
++		l_error("Unsupported AAD size");
 +		return false;
 +	}
 +
-+	wakeup_writer(hci);
-+
-+	return true;
-+}
-diff --git a/meshd/src/mesh-io-generic.c b/meshd/src/mesh-io-generic.c
-new file mode 100644
-index 000000000..e5042bb79
---- /dev/null
-+++ b/meshd/src/mesh-io-generic.c
-@@ -0,0 +1,660 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <sys/time.h>
-+#include <ell/ell.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+
-+#include "monitor/bt.h"
-+
-+#include "meshd/src/hci.h"
-+#include "meshd/src/display.h"
-+#include "meshd/src/mesh-io.h"
-+#include "meshd/src/mesh-io-api.h"
-+
-+#include "meshd/src/mesh-io-generic.h"
-+
-+struct mesh_io_private {
-+	uint16_t index;
-+	struct bt_hci *hci;
-+	struct l_timeout *tx_timeout;
-+	struct l_queue *rx_regs;
-+	struct l_queue *tx_pkts;
-+	uint8_t filters[3]; /* Simple filtering on AD type only */
-+	bool sending;
-+	struct tx_pkt *tx;
-+	uint16_t interval;
-+};
-+
-+struct pvt_rx_reg {
-+	uint8_t filter_id;
-+	mesh_io_recv_func_t cb;
-+	void *user_data;
-+};
-+
-+struct process_data {
-+	struct mesh_io_private		*pvt;
-+	const uint8_t			*data;
-+	uint8_t				len;
-+	struct mesh_io_recv_info	info;
-+};
-+
-+struct tx_pkt {
-+	struct mesh_io_send_info	info;
-+	bool				delete;
-+	uint8_t				len;
-+	uint8_t				pkt[30];
-+};
-+
-+struct tx_pattern {
-+	const uint8_t			*data;
-+	uint8_t				len;
-+};
-+
-+static uint32_t get_instant(void)
-+{
-+	struct timeval tm;
-+	uint32_t instant;
-+
-+	gettimeofday(&tm, NULL);
-+	instant = tm.tv_sec * 1000;
-+	instant += tm.tv_usec / 1000;
-+
-+	return instant;
-+}
-+
-+static uint32_t instant_remaining_ms(uint32_t instant)
-+{
-+	instant -= get_instant();
-+	return instant;
-+}
-+
-+static void process_rx_callbacks(void *v_rx, void *v_reg)
-+{
-+	struct pvt_rx_reg *rx_reg = v_rx;
-+	struct process_data *rx = v_reg;
-+	uint8_t ad_type;
-+
-+	ad_type = rx->pvt->filters[rx_reg->filter_id - 1];
-+
-+	if (rx->data[0] == ad_type && rx_reg->cb)
-+		rx_reg->cb(rx_reg->user_data, &rx->info, rx->data, rx->len);
-+}
-+
-+static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
-+					uint32_t instant,
-+					const uint8_t *data, uint8_t len)
-+{
-+	struct process_data rx = {
-+		.pvt = pvt,
-+		.data = data,
-+		.len = len,
-+		.info.instant = instant,
-+		.info.chan = 7,
-+		.info.rssi = rssi,
-+	};
-+
-+	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
-+}
-+
-+static void event_adv_report(struct mesh_io *io, const void *buf, uint8_t size)
-+{
-+	const struct bt_hci_evt_le_adv_report *evt = buf;
-+	const uint8_t *adv;
-+	uint32_t instant;
-+	uint8_t adv_len;
-+	uint16_t len = 0;
-+	int8_t rssi;
-+
-+	if (evt->event_type != 0x03)
-+		return;
-+
-+	if (evt->addr_type != BDADDR_LE_PUBLIC &&
-+			evt->addr_type != BDADDR_LE_RANDOM)
-+		return;
-+
-+	instant = get_instant();
-+	adv = evt->data;
-+	adv_len = evt->data_len;
-+
-+	/* rssi is just beyond last byte of data */
-+	rssi = (int8_t) adv[adv_len];
-+
-+	while (len < adv_len - 1) {
-+		uint8_t field_len = adv[0];
-+
-+		/* Check for the end of advertising data */
-+		if (field_len == 0)
-+			break;
-+
-+		len += field_len + 1;
-+
-+		/* Do not continue data parsing if got incorrect length */
-+		if (len > adv_len)
-+			break;
-+
-+		/* TODO: Create an Instant to use */
-+		process_rx(io->pvt, rssi, instant, adv + 1, adv[0]);
-+
-+		adv += field_len + 1;
-+	}
-+}
-+
-+static void event_callback(const void *buf, uint8_t size, void *user_data)
-+{
-+	uint8_t event = l_get_u8(buf);
-+	struct mesh_io *io = user_data;
-+
-+	switch (event) {
-+	case BT_HCI_EVT_LE_ADV_REPORT:
-+		event_adv_report(io, buf + 1, size - 1);
-+		break;
-+
-+	default:
-+		l_info("Other Meta Evt - %d", event);
-+	}
-+}
-+
-+static bool dev_init(uint16_t index, struct mesh_io *io)
-+{
-+	struct mesh_io_private *tmp;
-+
-+	if (!io || io->pvt)
++	fd = aes_ecb_setup(key);
++	if (fd < 0)
 +		return false;
 +
-+	tmp = l_new(struct mesh_io_private, 1);
++	/* C_mic = e(AppKey, 0x01 || nonce || 0x0000) */
++	pmsg[0] = 0x01;
++	memcpy(pmsg + 1, nonce, 13);
++	l_put_be16(0x0000, pmsg + 14);
 +
-+	if (tmp == NULL)
-+		return false;
-+
-+	tmp->rx_regs = l_queue_new();
-+	tmp->tx_pkts = l_queue_new();
-+	if (!tmp->rx_regs || !tmp->tx_pkts)
-+		goto fail;
-+
-+	tmp->hci = bt_hci_new_user_channel(index);
-+	if (!tmp->hci)
-+		goto fail;
-+
-+	bt_hci_register(tmp->hci, BT_HCI_EVT_LE_META_EVENT,
-+						event_callback, io, NULL);
-+
-+	io->pvt = tmp;
-+	return true;
-+
-+fail:
-+	l_queue_destroy(tmp->rx_regs, l_free);
-+	l_queue_destroy(tmp->tx_pkts, l_free);
-+	l_free(tmp);
-+	return false;
-+}
-+
-+static bool dev_destroy(struct mesh_io *io)
-+{
-+	struct mesh_io_private *pvt = io->pvt;
-+
-+	if (!pvt)
-+		return true;
-+
-+	bt_hci_unref(pvt->hci);
-+	l_timeout_remove(pvt->tx_timeout);
-+	l_queue_destroy(pvt->rx_regs, l_free);
-+	l_queue_destroy(pvt->tx_pkts, l_free);
-+	l_free(pvt);
-+	io->pvt = NULL;
-+
-+	return true;
-+}
-+
-+static bool dev_caps(struct mesh_io *io, struct mesh_io_caps *caps)
-+{
-+	struct mesh_io_private *pvt = io->pvt;
-+
-+	if (!pvt || !caps)
-+		return false;
-+
-+	caps->max_num_filters = sizeof(pvt->filters);
-+	caps->window_accuracy = 50;
-+
-+	return true;
-+}
-+
-+static void send_cancel_done(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct bt_hci_cmd_le_set_random_address cmd;
-+
-+	if (!pvt)
-+		return;
-+
-+	pvt->sending = false;
-+
-+	/* At end of any burst of ADVs, change random address */
-+	l_getrandom(cmd.addr, 6);
-+	cmd.addr[5] |= 0xc0;
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_RANDOM_ADDRESS,
-+				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+}
-+
-+static void send_cancel(struct mesh_io_private *pvt)
-+{
-+	struct bt_hci_cmd_le_set_adv_enable cmd;
-+
-+	if (!pvt)
-+		return;
-+
-+	if (!pvt->sending) {
-+		send_cancel_done(NULL, 0, pvt);
-+		return;
-+	}
-+
-+	cmd.enable = 0x00;	/* Disable advertising */
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
-+				&cmd, sizeof(cmd),
-+				send_cancel_done, pvt, NULL);
-+}
-+
-+static void set_send_adv_enable(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct bt_hci_cmd_le_set_adv_enable cmd;
-+
-+	if (!pvt)
-+		return;
-+
-+	pvt->sending = true;
-+	cmd.enable = 0x01;	/* Enable advertising */
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
-+				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+}
-+
-+static void set_send_adv_data(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct tx_pkt *tx;
-+	struct bt_hci_cmd_le_set_adv_data cmd;
-+
-+	if (!pvt || !pvt->tx)
-+		return;
-+
-+	tx = pvt->tx;
-+	if (tx->len >= sizeof(cmd.data))
++	result = aes_ecb(fd, pmsg, cmic);
++	if (!result)
 +		goto done;
 +
-+	memset(&cmd, 0, sizeof(cmd));
-+
-+	cmd.len = tx->len + 1;
-+	cmd.data[0] = tx->len;
-+	memcpy(cmd.data + 1, tx->pkt, tx->len);
-+
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_DATA,
-+					&cmd, sizeof(cmd),
-+					set_send_adv_enable, pvt, NULL);
-+done:
-+	if (tx->delete)
-+		l_free(tx);
-+
-+	pvt->tx = NULL;
-+}
-+
-+static void set_send_adv_params(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct bt_hci_cmd_le_set_adv_parameters cmd;
-+	uint16_t hci_interval;
-+
-+	if (!pvt)
-+		return;
-+
-+	hci_interval = (pvt->interval * 16) / 10;
-+	cmd.min_interval = L_CPU_TO_LE16(hci_interval);
-+	cmd.max_interval = L_CPU_TO_LE16(hci_interval);
-+	cmd.type = 0x03; /* ADV_NONCONN_IND */
-+	cmd.own_addr_type = 0x01; /* ADDR_TYPE_RANDOM */
-+	cmd.direct_addr_type = 0x00;
-+	memset(cmd.direct_addr, 0, 6);
-+	cmd.channel_map = 0x07;
-+	cmd.filter_policy = 0x03;
-+
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
-+				&cmd, sizeof(cmd),
-+				set_send_adv_data, pvt, NULL);
-+}
-+
-+static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
-+							uint16_t interval)
-+{
-+	struct bt_hci_cmd_le_set_adv_enable cmd;
-+
-+	pvt->tx = tx;
-+	pvt->interval = interval;
-+
-+	if (!pvt->sending) {
-+		set_send_adv_params(NULL, 0, pvt);
-+		return;
-+	}
-+
-+	cmd.enable = 0x00;	/* Disable advertising */
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
-+				&cmd, sizeof(cmd),
-+				set_send_adv_params, pvt, NULL);
-+}
-+
-+static void tx_timeout(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct tx_pkt *tx;
-+	uint16_t ms;
-+	uint8_t count;
-+
-+	if (!pvt)
-+		return;
-+
-+	tx = l_queue_pop_head(pvt->tx_pkts);
-+	if (!tx) {
-+		l_timeout_remove(timeout);
-+		pvt->tx_timeout = NULL;
-+		send_cancel(pvt);
-+		return;
-+	}
-+
-+	if (tx->info.type == MESH_IO_TIMING_TYPE_GENERAL) {
-+		ms = tx->info.u.gen.interval;
-+		count = tx->info.u.gen.cnt;
-+		if (count != MESH_IO_TX_COUNT_UNLIMITED)
-+			tx->info.u.gen.cnt--;
-+	} else {
-+		ms = 25;
-+		count = 1;
-+	}
-+
-+	tx->delete = !!(count == 1);
-+
-+	send_pkt(pvt, tx, ms);
-+
-+	if (count == 1) {
-+		/* send_pkt will delete when done */
-+		tx = l_queue_peek_head(pvt->tx_pkts);
-+		if (tx && tx->info.type == MESH_IO_TIMING_TYPE_POLL_RSP) {
-+			ms = instant_remaining_ms(tx->info.u.poll_rsp.instant +
-+						tx->info.u.poll_rsp.delay);
-+		}
-+	} else
-+		l_queue_push_tail(pvt->tx_pkts, tx);
-+
-+	if (timeout) {
-+		pvt->tx_timeout = timeout;
-+		l_timeout_modify_ms(timeout, ms);
-+	} else
-+		pvt->tx_timeout = l_timeout_create_ms(ms, tx_timeout,
-+								pvt, NULL);
-+}
-+
-+static void tx_worker(void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct tx_pkt *tx;
-+	uint32_t delay;
-+
-+	tx = l_queue_peek_head(pvt->tx_pkts);
-+	if (!tx)
-+		return;
-+
-+	switch (tx->info.type) {
-+	case MESH_IO_TIMING_TYPE_GENERAL:
-+		if (tx->info.u.gen.min_delay == tx->info.u.gen.max_delay)
-+			delay = tx->info.u.gen.min_delay;
-+		else {
-+			l_getrandom(&delay, sizeof(delay));
-+			delay %= tx->info.u.gen.max_delay -
-+						tx->info.u.gen.min_delay;
-+			delay += tx->info.u.gen.min_delay;
-+		}
-+		break;
-+
-+	case MESH_IO_TIMING_TYPE_POLL:
-+		if (tx->info.u.poll.min_delay == tx->info.u.poll.max_delay)
-+			delay = tx->info.u.poll.min_delay;
-+		else {
-+			l_getrandom(&delay, sizeof(delay));
-+			delay %= tx->info.u.poll.max_delay -
-+						tx->info.u.poll.min_delay;
-+			delay += tx->info.u.poll.min_delay;
-+		}
-+		break;
-+
-+	case MESH_IO_TIMING_TYPE_POLL_RSP:
-+		/* Delay until Instant + Delay */
-+		delay = instant_remaining_ms(tx->info.u.poll_rsp.instant +
-+						tx->info.u.poll_rsp.delay);
-+		if (delay > 255)
-+			delay = 0;
-+		break;
-+
-+	default:
-+		return;
-+	}
-+
-+	if (!delay)
-+		tx_timeout(pvt->tx_timeout, pvt);
-+	else if (pvt->tx_timeout)
-+		l_timeout_modify_ms(pvt->tx_timeout, delay);
++	/* X_0 = e(AppKey, 0x09 || nonce || length) */
++	if (mic_size == sizeof(uint64_t))
++		pmsg[0] = 0x19 | (aad_len ? 0x40 : 0x00);
 +	else
-+		pvt->tx_timeout = l_timeout_create_ms(delay, tx_timeout,
-+								pvt, NULL);
-+}
++		pmsg[0] = 0x09 | (aad_len ? 0x40 : 0x00);
 +
-+static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
-+					const uint8_t *data, uint16_t len)
-+{
-+	struct mesh_io_private *pvt = io->pvt;
-+	struct tx_pkt *tx;
-+	bool sending = false;
++	memcpy(pmsg + 1, nonce, 13);
++	l_put_be16(msg_len, pmsg + 14);
 +
-+	if (!info || !data || !len || len > sizeof(tx->pkt))
-+		return false;
++	result = aes_ecb(fd, pmsg, Xn);
++	if (!result)
++		goto done;
 +
++	/* If AAD is being used to authenticate, include it here */
++	if (aad_len) {
++		l_put_be16(aad_len, pmsg);
 +
-+	tx = l_new(struct tx_pkt, 1);
-+	if (!tx)
-+		return false;
++		for (i = 0; i < sizeof(uint16_t); i++)
++			pmsg[i] = Xn[i] ^ pmsg[i];
 +
-+	memcpy(&tx->info, info, sizeof(tx->info));
-+	memcpy(&tx->pkt, data, len);
-+	tx->len = len;
++		j = 0;
++		aad_len += sizeof(uint16_t);
++		while (aad_len > 16) {
++			do {
++				pmsg[i] = Xn[i] ^ aad[j];
++				i++, j++;
++			} while (i < 16);
 +
-+	if (info->type == MESH_IO_TIMING_TYPE_POLL_RSP)
-+		l_queue_push_head(pvt->tx_pkts, tx);
-+	else {
-+		sending = !l_queue_isempty(pvt->tx_pkts);
-+		l_queue_push_tail(pvt->tx_pkts, tx);
++			aad_len -= 16;
++			i = 0;
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++		}
++
++		for (i = 0; i < aad_len; i++, j++)
++			pmsg[i] = Xn[i] ^ aad[j];
++
++		for (i = aad_len; i < 16; i++)
++			pmsg[i] = Xn[i];
++
++		result = aes_ecb(fd, pmsg, Xn);
++		if (!result)
++			goto done;
 +	}
 +
-+	if (!sending) {
-+		l_timeout_remove(pvt->tx_timeout);
-+		pvt->tx_timeout = NULL;
-+		l_idle_oneshot(tx_worker, pvt, NULL);
++	last_blk = msg_len % 16;
++	blk_cnt = (msg_len + 15) / 16;
++	if (!last_blk)
++		last_blk = 16;
++
++	for (j = 0; j < blk_cnt; j++) {
++		if (j + 1 == blk_cnt) {
++			/* X_1 = e(AppKey, X_0 ^ Payload[0-15]) */
++			for (i = 0; i < last_blk; i++)
++				pmsg[i] = Xn[i] ^ msg[(j * 16) + i];
++			for (i = last_blk; i < 16; i++)
++				pmsg[i] = Xn[i] ^ 0x00;
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++
++			/* MIC = C_mic ^ X_1 */
++			for (i = 0; i < sizeof(mic); i++)
++				mic[i] = cmic[i] ^ Xn[i];
++
++			/* C_1 = e(AppKey, 0x01 || nonce || 0x0001) */
++			pmsg[0] = 0x01;
++			memcpy(pmsg + 1, nonce, 13);
++			l_put_be16(j + 1, pmsg + 14);
++
++			result = aes_ecb(fd, pmsg, cmsg);
++			if (!result)
++				goto done;
++
++			if (out_msg) {
++				/* Encrypted = Payload[0-15] ^ C_1 */
++				for (i = 0; i < last_blk; i++)
++					out_msg[(j * 16) + i] =
++						msg[(j * 16) + i] ^ cmsg[i];
++
++			}
++		} else {
++			/* X_1 = e(AppKey, X_0 ^ Payload[0-15]) */
++			for (i = 0; i < 16; i++)
++				pmsg[i] = Xn[i] ^ msg[(j * 16) + i];
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++
++			/* C_1 = e(AppKey, 0x01 || nonce || 0x0001) */
++			pmsg[0] = 0x01;
++			memcpy(pmsg + 1, nonce, 13);
++			l_put_be16(j + 1, pmsg + 14);
++
++			result = aes_ecb(fd, pmsg, cmsg);
++			if (!result)
++				goto done;
++
++			if (out_msg) {
++				/* Encrypted = Payload[0-15] ^ C_N */
++				for (i = 0; i < 16; i++)
++					out_msg[(j * 16) + i] =
++						msg[(j * 16) + i] ^ cmsg[i];
++			}
++
++		}
++	}
++
++	if (out_msg)
++		memcpy(out_msg + msg_len, mic, mic_size);
++
++	if (out_mic) {
++		switch (mic_size) {
++		case sizeof(uint32_t):
++			*(uint32_t *)out_mic = l_get_be32(mic);
++			break;
++		case sizeof(uint64_t):
++			*(uint64_t *)out_mic = l_get_be64(mic);
++			break;
++		default:
++			l_error("Unsupported MIC size");
++		}
++	}
++
++done:
++	aes_ecb_destroy(fd);
++
++	return result;
++}
++
++bool mesh_crypto_aes_ccm_decrypt(const uint8_t nonce[13], const uint8_t key[16],
++				const uint8_t *aad, uint16_t aad_len,
++				const uint8_t *enc_msg, uint16_t enc_msg_len,
++				uint8_t *out_msg,
++				void *out_mic, size_t mic_size)
++{
++	uint8_t msg[16], pmsg[16], cmic[16], cmsg[16], Xn[16];
++	uint8_t mic[16];
++	uint16_t msg_len = enc_msg_len - mic_size;
++	uint16_t last_blk, blk_cnt;
++	bool result;
++	size_t i, j;
++	int fd;
++
++	if (enc_msg_len < 5 || aad_len >= 0xff00)
++		return false;
++
++	fd = aes_ecb_setup(key);
++	if (fd < 0)
++		return false;
++
++	/* C_mic = e(AppKey, 0x01 || nonce || 0x0000) */
++	pmsg[0] = 0x01;
++	memcpy(pmsg + 1, nonce, 13);
++	l_put_be16(0x0000, pmsg + 14);
++
++	result = aes_ecb(fd, pmsg, cmic);
++	if (!result)
++		goto done;
++
++	/* X_0 = e(AppKey, 0x09 || nonce || length) */
++	if (mic_size == sizeof(uint64_t))
++		pmsg[0] = 0x19 | (aad_len ? 0x40 : 0x00);
++	else
++		pmsg[0] = 0x09 | (aad_len ? 0x40 : 0x00);
++
++	memcpy(pmsg + 1, nonce, 13);
++	l_put_be16(msg_len, pmsg + 14);
++
++	result = aes_ecb(fd, pmsg, Xn);
++	if (!result)
++		goto done;
++
++	/* If AAD is being used to authenticate, include it here */
++	if (aad_len) {
++		l_put_be16(aad_len, pmsg);
++
++		for (i = 0; i < sizeof(uint16_t); i++)
++			pmsg[i] = Xn[i] ^ pmsg[i];
++
++		j = 0;
++		aad_len += sizeof(uint16_t);
++		while (aad_len > 16) {
++			do {
++				pmsg[i] = Xn[i] ^ aad[j];
++				i++, j++;
++			} while (i < 16);
++
++			aad_len -= 16;
++			i = 0;
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++		}
++
++		for (i = 0; i < aad_len; i++, j++)
++			pmsg[i] = Xn[i] ^ aad[j];
++
++		for (i = aad_len; i < 16; i++)
++			pmsg[i] = Xn[i];
++
++		result = aes_ecb(fd, pmsg, Xn);
++		if (!result)
++			goto done;
++	}
++
++	last_blk = msg_len % 16;
++	blk_cnt = (msg_len + 15) / 16;
++	if (!last_blk)
++		last_blk = 16;
++
++	for (j = 0; j < blk_cnt; j++) {
++		if (j + 1 == blk_cnt) {
++			/* C_1 = e(AppKey, 0x01 || nonce || 0x0001) */
++			pmsg[0] = 0x01;
++			memcpy(pmsg + 1, nonce, 13);
++			l_put_be16(j + 1, pmsg + 14);
++
++			result = aes_ecb(fd, pmsg, cmsg);
++			if (!result)
++				goto done;
++
++			/* Encrypted = Payload[0-15] ^ C_1 */
++			for (i = 0; i < last_blk; i++)
++				msg[i] = enc_msg[(j * 16) + i] ^ cmsg[i];
++
++			if (out_msg)
++				memcpy(out_msg + (j * 16), msg, last_blk);
++
++			/* X_1 = e(AppKey, X_0 ^ Payload[0-15]) */
++			for (i = 0; i < last_blk; i++)
++				pmsg[i] = Xn[i] ^ msg[i];
++			for (i = last_blk; i < 16; i++)
++				pmsg[i] = Xn[i] ^ 0x00;
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++
++			/* MIC = C_mic ^ X_1 */
++			for (i = 0; i < sizeof(mic); i++)
++				mic[i] = cmic[i] ^ Xn[i];
++		} else {
++			/* C_1 = e(AppKey, 0x01 || nonce || 0x0001) */
++			pmsg[0] = 0x01;
++			memcpy(pmsg + 1, nonce, 13);
++			l_put_be16(j + 1, pmsg + 14);
++
++			result = aes_ecb(fd, pmsg, cmsg);
++			if (!result)
++				goto done;
++
++			/* Encrypted = Payload[0-15] ^ C_1 */
++			for (i = 0; i < 16; i++)
++				msg[i] = enc_msg[(j * 16) + i] ^ cmsg[i];
++
++			if (out_msg)
++				memcpy(out_msg + (j * 16), msg, 16);
++
++			/* X_1 = e(AppKey, X_0 ^ Payload[0-15]) */
++			for (i = 0; i < 16; i++)
++				pmsg[i] = Xn[i] ^ msg[i];
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++		}
++	}
++
++	if (out_mic) {
++		switch (mic_size) {
++		case sizeof(uint32_t):
++			*(uint32_t *)out_mic = l_get_be32(mic);
++			break;
++		case sizeof(uint64_t):
++			*(uint64_t *)out_mic = l_get_be64(mic);
++			break;
++		default:
++			l_error("Unsupported MIC size");
++		}
++	}
++
++done:
++	aes_ecb_destroy(fd);
++
++	return result;
++}
++
++bool mesh_crypto_k1(const uint8_t ikm[16], const uint8_t salt[16],
++		const void *info, size_t info_len, uint8_t okm[16])
++{
++	uint8_t res[16];
++
++	if (!aes_cmac_one(salt, ikm, 16, res))
++		return false;
++
++	return aes_cmac_one(res, info, info_len, okm);
++}
++
++bool mesh_crypto_k2(const uint8_t n[16], const uint8_t *p, size_t p_len,
++							uint8_t net_id[1],
++							uint8_t enc_key[16],
++							uint8_t priv_key[16])
++{
++	int fd;
++	uint8_t output[16];
++	uint8_t t[16];
++	uint8_t *stage;
++	bool success = false;
++
++	print_packet("K2-N", n, 16);
++	stage = l_malloc(sizeof(output) + p_len + 1);
++	if (stage == NULL)
++		return false;
++
++	if (!mesh_crypto_s1("smk2", 4, stage))
++		goto fail;
++	print_packet("K2-S1(smk2)", stage, 16);
++	print_packet("K2-P", p, p_len);
++
++	if (!aes_cmac_one(stage, n, 16, t))
++		goto fail;
++
++	print_packet("K2-T", t, 16);
++
++	fd = aes_cmac_N_start(t);
++	if (fd < 0)
++		goto fail;
++
++	memcpy(stage, p, p_len);
++	stage[p_len] = 1;
++
++	if (!aes_cmac(fd, stage, p_len + 1, output))
++		goto done;
++
++	print_packet("K2-T1", output, 16);
++
++	net_id[0] = output[15] & 0x7f;
++
++	memcpy(stage, output, 16);
++	memcpy(stage + 16, p, p_len);
++	stage[p_len + 16] = 2;
++
++	if (!aes_cmac(fd, stage, p_len + 16 + 1, output))
++		goto done;
++	print_packet("K2-T2", output, 16);
++
++	memcpy(enc_key, output, 16);
++
++	memcpy(stage, output, 16);
++	memcpy(stage + 16, p, p_len);
++	stage[p_len + 16] = 3;
++
++	if (!aes_cmac(fd, stage, p_len + 16 + 1, output))
++		goto done;
++	print_packet("K2-T3", output, 16);
++
++	memcpy(priv_key, output, 16);
++	success = true;
++
++done:
++	aes_cmac_destroy(fd);
++fail:
++	l_free(stage);
++
++	return success;
++}
++
++static bool crypto_128(const uint8_t n[16], const char *s, uint8_t out128[16])
++{
++	uint8_t id128[] = { 'i', 'd', '1', '2', '8', 0x01 };
++	uint8_t salt[16];
++
++	if (!mesh_crypto_s1(s, 4, salt))
++		return false;
++
++	return mesh_crypto_k1(n, salt, id128, sizeof(id128), out128);
++}
++
++bool mesh_crypto_nkik(const uint8_t n[16], uint8_t identity_key[16])
++{
++	return crypto_128(n, "nkik", identity_key);
++}
++
++bool mesh_crypto_identity(const uint8_t net_key[16], uint16_t addr,
++							uint8_t id[16])
++{
++	uint8_t id_key[16];
++	uint8_t tmp[16];
++
++	print_packet("Net_Key", net_key, 16);
++
++	if (!mesh_crypto_nkik(net_key, id_key))
++		return false;
++
++	print_packet("ID_Key", id_key, 16);
++
++	if (!l_get_be64(id + 8))
++		l_getrandom(id + 8, 8);
++
++	memset(tmp, 0, sizeof(tmp));
++	memcpy(tmp + 6, id + 8, 8);
++	l_put_be16(addr, tmp + 14);
++
++	print_packet("Nonce", tmp, 16);
++	if (!aes_ecb_one(id_key, tmp, tmp))
++		return false;
++
++	print_packet("result", tmp, 16);
++
++	memcpy(id, tmp + 8, 8);
++	return true;
++}
++
++bool mesh_crypto_nkbk(const uint8_t n[16], uint8_t beacon_key[16])
++{
++	return crypto_128(n, "nkbk", beacon_key);
++}
++
++bool mesh_crypto_nkpk(const uint8_t n[16], uint8_t proxy_key[16])
++{
++	return crypto_128(n, "nkpk", proxy_key);
++}
++
++bool mesh_crypto_k3(const uint8_t n[16], uint8_t out64[8])
++{
++	uint8_t tmp[16];
++	uint8_t t[16];
++	uint8_t id64[] = { 'i', 'd', '6', '4', 0x01 };
++
++	if (!mesh_crypto_s1("smk3", 4, tmp))
++		return false;
++
++	if (!aes_cmac_one(tmp, n, 16, t))
++		return false;
++
++	if (!aes_cmac_one(t, id64, sizeof(id64), tmp))
++		return false;
++
++	memcpy(out64, tmp + 8, 8);
++
++	return true;
++}
++
++bool mesh_crypto_k4(const uint8_t a[16], uint8_t out6[1])
++{
++	uint8_t tmp[16];
++	uint8_t t[16];
++	uint8_t id6[] = { 'i', 'd', '6', 0x01 };
++
++	if (!mesh_crypto_s1("smk4", 4, tmp))
++		return false;
++
++	if (!aes_cmac_one(tmp, a, 16, t))
++		return false;
++
++	if (!aes_cmac_one(t, id6, sizeof(id6), tmp))
++		return false;
++
++	out6[0] = tmp[15] & 0x3f;
++	return true;
++}
++
++bool mesh_crypto_beacon_cmac(const uint8_t encryption_key[16],
++				const uint8_t network_id[8],
++				uint32_t iv_index, bool kr, bool iu,
++				uint64_t *cmac)
++{
++	uint8_t msg[13], tmp[16];
++
++	if (!cmac)
++		return false;
++
++	msg[0] = kr ? 0x01 : 0x00;
++	msg[0] |= iu ? 0x02 : 0x00;
++	memcpy(msg + 1, network_id, 8);
++	l_put_be32(iv_index, msg + 9);
++
++	if (!aes_cmac_one(encryption_key, msg, 13, tmp))
++		return false;
++
++	*cmac = l_get_be64(tmp);
++
++	return true;
++}
++
++bool mesh_crypto_network_nonce(bool ctl, uint8_t ttl, uint32_t seq,
++				uint16_t src, uint32_t iv_index,
++				uint8_t nonce[13])
++{
++	nonce[0] = 0;
++	nonce[1] = (ttl & TTL_MASK) | (ctl ? CTL : 0x00);
++	nonce[2] = (seq >> 16) & 0xff;
++	nonce[3] = (seq >> 8) & 0xff;
++	nonce[4] = seq & 0xff;
++
++	/* SRC */
++	l_put_be16(src, nonce + 5);
++
++	l_put_be16(0, nonce + 7);
++
++	/* IV Index */
++	l_put_be32(iv_index, nonce + 9);
++
++	return true;
++}
++
++bool mesh_crypto_network_encrypt(bool ctl, uint8_t ttl,
++				uint32_t seq, uint16_t src,
++				uint32_t iv_index,
++				const uint8_t net_key[16],
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *net_mic)
++{
++	uint8_t nonce[13];
++
++	if (!mesh_crypto_network_nonce(ctl, ttl, seq, src, iv_index, nonce))
++		return false;
++
++	return mesh_crypto_aes_ccm_encrypt(nonce, net_key, NULL, 0, enc_msg,
++				enc_msg_len, out, net_mic,
++				ctl ? sizeof(uint64_t) : sizeof(uint32_t));
++}
++
++bool mesh_crypto_network_decrypt(bool ctl, uint8_t ttl,
++				uint32_t seq, uint16_t src,
++				uint32_t iv_index,
++				const uint8_t net_key[16],
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *net_mic, size_t mic_size)
++{
++	uint8_t nonce[13];
++
++	if (!mesh_crypto_network_nonce(ctl, ttl, seq, src, iv_index, nonce))
++		return false;
++
++	return mesh_crypto_aes_ccm_decrypt(nonce, net_key, NULL, 0,
++						enc_msg, enc_msg_len, out,
++						net_mic, mic_size);
++}
++
++bool mesh_crypto_application_nonce(uint32_t seq, uint16_t src,
++					uint16_t dst, uint32_t iv_index,
++					bool aszmic, uint8_t nonce[13])
++{
++	nonce[0] = 0x01;
++	nonce[1] = aszmic ? 0x80 : 0x00;
++	nonce[2] = (seq & 0x00ff0000) >> 16;
++	nonce[3] = (seq & 0x0000ff00) >> 8;
++	nonce[4] = (seq & 0x000000ff);
++	nonce[5] = (src & 0xff00) >> 8;
++	nonce[6] = (src & 0x00ff);
++	nonce[7] = (dst & 0xff00) >> 8;
++	nonce[8] = (dst & 0x00ff);
++	l_put_be32(iv_index, nonce + 9);
++
++	return true;
++}
++
++bool mesh_crypto_device_nonce(uint32_t seq, uint16_t src,
++					uint16_t dst, uint32_t iv_index,
++					bool aszmic, uint8_t nonce[13])
++{
++	nonce[0] = 0x02;
++	nonce[1] = aszmic ? 0x80 : 0x00;
++	nonce[2] = (seq & 0x00ff0000) >> 16;
++	nonce[3] = (seq & 0x0000ff00) >> 8;
++	nonce[4] = (seq & 0x000000ff);
++	nonce[5] = (src & 0xff00) >> 8;
++	nonce[6] = (src & 0x00ff);
++	nonce[7] = (dst & 0xff00) >> 8;
++	nonce[8] = (dst & 0x00ff);
++	l_put_be32(iv_index, nonce + 9);
++
++	return true;
++}
++
++bool mesh_crypto_application_encrypt(uint8_t key_id, uint32_t seq, uint16_t src,
++					uint16_t dst, uint32_t iv_index,
++					const uint8_t app_key[16],
++					const uint8_t *aad, uint8_t aad_len,
++					const uint8_t *msg, uint8_t msg_len,
++					uint8_t *out,
++					void *app_mic, size_t mic_size)
++{
++	uint8_t nonce[13];
++	bool aszmic = (mic_size == sizeof(uint64_t)) ? true : false;
++
++	if (!key_id && !mesh_crypto_device_nonce(seq, src, dst,
++						iv_index, aszmic, nonce))
++		return false;
++
++	if (key_id && !mesh_crypto_application_nonce(seq, src, dst,
++						iv_index, aszmic, nonce))
++		return false;
++
++	return mesh_crypto_aes_ccm_encrypt(nonce, app_key, aad, aad_len,
++						msg, msg_len,
++						out, app_mic, mic_size);
++}
++
++bool mesh_crypto_application_decrypt(uint8_t key_id, uint32_t seq, uint16_t src,
++				uint16_t dst, uint32_t iv_index,
++				const uint8_t app_key[16],
++				const uint8_t *aad, uint8_t aad_len,
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *app_mic, size_t mic_size)
++{
++	uint8_t nonce[13];
++	bool aszmic = (mic_size == sizeof(uint64_t)) ? true : false;
++
++	if (!key_id && !mesh_crypto_device_nonce(seq, src, dst,
++						iv_index, aszmic, nonce))
++		return false;
++
++	if (key_id && !mesh_crypto_application_nonce(seq, src, dst,
++						iv_index, aszmic, nonce))
++		return false;
++
++	return mesh_crypto_aes_ccm_decrypt(nonce, app_key,
++						aad, aad_len, enc_msg,
++						enc_msg_len, out,
++						app_mic, mic_size);
++}
++
++bool mesh_crypto_session_key(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t session_key[16])
++{
++	const uint8_t prsk[4] = "prsk";
++
++	if (!aes_cmac_one(salt, secret, 32, session_key))
++		return false;
++
++	return aes_cmac_one(session_key, prsk, 4, session_key);
++}
++
++bool mesh_crypto_nonce(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t nonce[13])
++{
++	const uint8_t prsn[4] = "prsn";
++	uint8_t tmp[16];
++	bool result;
++
++	if (!aes_cmac_one(salt, secret, 32, tmp))
++		return false;
++
++	result =  aes_cmac_one(tmp, prsn, 4, tmp);
++
++	if (result)
++		memcpy(nonce, tmp + 3, 13);
++
++	return result;
++}
++
++bool mesh_crypto_s1(const void *info, size_t len, uint8_t salt[16])
++{
++	const uint8_t zero[16] = {0};
++
++	return aes_cmac_one(zero, info, len, salt);
++}
++
++bool mesh_crypto_prov_prov_salt(const uint8_t conf_salt[16],
++					const uint8_t prov_rand[16],
++					const uint8_t dev_rand[16],
++					uint8_t prov_salt[16])
++{
++	const uint8_t zero[16] = {0};
++	uint8_t tmp[16 * 3];
++
++	memcpy(tmp, conf_salt, 16);
++	memcpy(tmp + 16, prov_rand, 16);
++	memcpy(tmp + 32, dev_rand, 16);
++
++	return aes_cmac_one(zero, tmp, sizeof(tmp), prov_salt);
++}
++
++bool mesh_crypto_prov_conf_key(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t conf_key[16])
++{
++	const uint8_t prck[4] = "prck";
++
++	if (!aes_cmac_one(salt, secret, 32, conf_key))
++		return false;
++
++	return aes_cmac_one(conf_key, prck, 4, conf_key);
++}
++
++bool mesh_crypto_device_key(const uint8_t secret[32],
++						const uint8_t salt[16],
++						uint8_t device_key[16])
++{
++	const uint8_t prdk[4] = "prdk";
++
++	if (!aes_cmac_one(salt, secret, 32, device_key))
++		return false;
++
++	return aes_cmac_one(device_key, prdk, 4, device_key);
++}
++
++bool mesh_crypto_virtual_addr(const uint8_t virtual_label[16],
++						uint16_t *addr)
++{
++	uint8_t tmp[16];
++
++	if (!mesh_crypto_s1("vtad", 4, tmp))
++		return false;
++
++	if (!addr || !aes_cmac_one(tmp, virtual_label, 16, tmp))
++		return false;
++
++	*addr = (l_get_be16(tmp + 14) & 0x3fff) | 0x8000;
++
++	return true;
++}
++
++bool mesh_crypto_privacy_counter(uint32_t iv_index,
++						const uint8_t *payload,
++						uint8_t privacy_counter[16])
++{
++	memset(privacy_counter, 0, 5);
++	l_put_be32(iv_index, privacy_counter + 5);
++	memcpy(privacy_counter + 9, payload, 7);
++
++	return true;
++}
++
++bool mesh_crypto_network_obfuscate(const uint8_t privacy_key[16],
++					const uint8_t privacy_counter[16],
++					bool ctl, uint8_t ttl, uint32_t seq,
++					uint16_t src, uint8_t *out)
++{
++	uint8_t ecb[16], tmp[16];
++	int i;
++
++	if (!aes_ecb_one(privacy_key, privacy_counter, ecb))
++		return false;
++
++	tmp[0] = ((!!ctl) << 7) | (ttl & TTL_MASK);
++	tmp[1] = (seq & 0xff0000) >> 16;
++	tmp[2] = (seq & 0x00ff00) >> 8;
++	tmp[3] = (seq & 0x0000ff);
++	tmp[4] = (src & 0xff00) >> 8;
++	tmp[5] = (src & 0x00ff);
++
++	if (out) {
++		for (i = 0; i < 6; i++)
++			out[i] = ecb[i] ^ tmp[i];
 +	}
 +
 +	return true;
 +}
 +
-+static bool find_by_ad_type(const void *a, const void *b)
++bool mesh_crypto_network_clarify(const uint8_t privacy_key[16],
++				const uint8_t privacy_counter[16],
++				const uint8_t net_hdr[6],
++				bool *ctl, uint8_t *ttl,
++				uint32_t *seq, uint16_t *src)
 +{
-+	const struct tx_pkt *tx = a;
-+	uint8_t ad_type = L_PTR_TO_UINT(b);
++	uint8_t ecb[16], tmp[6];
++	int i;
 +
-+	return !ad_type || ad_type == tx->pkt[0];
-+}
-+
-+static bool find_by_pattern(const void *a, const void *b)
-+{
-+	const struct tx_pkt *tx = a;
-+	const struct tx_pattern *pattern = b;
-+
-+	if (tx->len < pattern->len)
++	if (!aes_ecb_one(privacy_key, privacy_counter, ecb))
 +		return false;
 +
-+	return (!memcmp(tx->pkt, pattern->data, pattern->len));
++	for (i = 0; i < 6; i++)
++		tmp[i] = ecb[i] ^ net_hdr[i];
++
++	if (ctl)
++		*ctl = !!(tmp[0] & CTL);
++
++	if (ttl)
++		*ttl = tmp[0] & TTL_MASK;
++
++	if (seq)
++		*seq = l_get_be32(tmp) & SEQ_MASK;
++
++	if (src)
++		*src = l_get_be16(tmp + 4);
++
++	return true;
 +}
 +
-+static bool tx_cancel(struct mesh_io *io, uint8_t *data, uint8_t len)
++bool mesh_crypto_packet_build(bool ctl, uint8_t ttl,
++				uint32_t seq,
++				uint16_t src, uint16_t dst,
++				uint8_t opcode,
++				bool segmented, uint8_t key_id,
++				bool szmic, bool relay, uint16_t seqZero,
++				uint8_t segO, uint8_t segN,
++				const uint8_t *payload, uint8_t payload_len,
++				uint8_t *packet, uint8_t *packet_len)
 +{
-+	struct mesh_io_private *pvt = io->pvt;
-+	struct tx_pkt *tx;
++	uint32_t hdr;
++	size_t n;
 +
-+	if (!data)
-+		return false;
++	l_put_be32(seq, packet + 1);
++	packet[1] = (ctl ? CTL : 0) | (ttl & TTL_MASK);
 +
-+	if (len == 1) {
-+		do {
-+			tx = l_queue_remove_if(pvt->tx_pkts, find_by_ad_type,
-+							L_UINT_TO_PTR(data[0]));
-+			l_free(tx);
-+		} while (tx);
-+	}  else {
-+		struct tx_pattern pattern = {
-+			.data = data,
-+			.len = len
-+		};
++	l_put_be16(src, packet + 5);
++	l_put_be16(dst, packet + 7);
++	n = 9;
 +
-+		do {
-+			tx = l_queue_remove_if(pvt->tx_pkts, find_by_pattern,
-+								&pattern);
-+			l_free(tx);
-+		} while (tx);
++	if (!ctl) {
++		hdr = segmented << SEG_HDR_SHIFT;
++		hdr |= (key_id & KEY_ID_MASK) << KEY_HDR_SHIFT;
++		if (segmented) {
++			hdr |= szmic << SZMIC_HDR_SHIFT;
++			hdr |= (seqZero & SEQ_ZERO_MASK) << SEQ_ZERO_HDR_SHIFT;
++			hdr |= (segO & SEG_MASK) << SEGO_HDR_SHIFT;
++			hdr |= (segN & SEG_MASK) << SEGN_HDR_SHIFT;
++		}
++		l_put_be32(hdr, packet + n);
++
++		/* Only first octet is valid for unsegmented messages */
++		if (segmented)
++			n += 4;
++		else
++			n += 1;
++
++		memcpy(packet + n, payload, payload_len);
++
++		l_put_be32(0x00000000, packet + payload_len + n);
++		if (packet_len)
++			*packet_len = payload_len + n + 4;
++	} else {
++		if ((opcode & OPCODE_MASK) != opcode)
++			return false;
++
++		hdr = opcode << KEY_HDR_SHIFT;
++		l_put_be32(hdr, packet + n);
++		n += 1;
++
++		memcpy(packet + n, payload, payload_len);
++		n += payload_len;
++
++		l_put_be64(0x0000000000000000, packet + n);
++		if (packet_len)
++			*packet_len = n + 8;
 +	}
 +
-+	if (l_queue_isempty(pvt->tx_pkts)) {
-+		send_cancel(pvt);
-+		l_timeout_remove(pvt->tx_timeout);
-+		pvt->tx_timeout = NULL;
++
++	return true;
++}
++
++bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
++				bool *ctl, uint8_t *ttl, uint32_t *seq,
++				uint16_t *src, uint16_t *dst,
++				uint32_t *cookie, uint8_t *opcode,
++				bool *segmented, uint8_t *key_id,
++				bool *szmic, bool *relay, uint16_t *seqZero,
++				uint8_t *segO, uint8_t *segN,
++				const uint8_t **payload, uint8_t *payload_len)
++{
++	uint32_t hdr;
++	uint16_t this_dst;
++	bool is_segmented;
++
++	if (packet_len < 14)
++		return false;
++
++	this_dst = l_get_be16(packet + 7);
++
++	/* Try to keep bits in the order they exist within the packet */
++	if (ctl)
++		*ctl = !!(packet[1] & CTL);
++
++	if (ttl)
++		*ttl = packet[1] & TTL_MASK;
++
++	if (seq)
++		*seq = l_get_be32(packet + 1) & SEQ_MASK;
++
++	if (src)
++		*src = l_get_be16(packet + 5);
++
++	if (dst)
++		*dst = this_dst;
++
++	hdr = l_get_be32(packet + 9);
++
++	is_segmented = !!((hdr >> SEG_HDR_SHIFT) & true);
++	if (segmented)
++		*segmented = is_segmented;
++
++	if (packet[1] & CTL) {
++		uint8_t this_opcode = packet[9] & OPCODE_MASK;
++
++		if (cookie)
++			*cookie = l_get_be32(packet + 9);
++
++		if (opcode)
++			*opcode = this_opcode;
++
++		if (this_dst && this_opcode == NET_OP_SEG_ACKNOWLEDGE) {
++			if (relay)
++				*relay = !!((hdr >> RELAY_HDR_SHIFT) & true);
++
++			if (seqZero)
++				*seqZero = (hdr >> SEQ_ZERO_HDR_SHIFT) &
++								SEQ_ZERO_MASK;
++
++			if (payload)
++				*payload = packet + 9;
++
++			if (payload_len)
++				*payload_len = packet_len - 9 - 8;
++		} else {
++			if (payload)
++				*payload = packet + 10;
++
++			if (payload_len)
++				*payload_len = packet_len - 10 - 8;
++		}
++	} else {
++		if (cookie)
++			*cookie = l_get_be32(packet + packet_len - 8);
++
++		if (key_id)
++			*key_id = (hdr >> KEY_HDR_SHIFT) & KEY_ID_MASK;
++
++		if (is_segmented) {
++			if (szmic)
++				*szmic = !!((hdr >> SZMIC_HDR_SHIFT) & true);
++
++			if (seqZero)
++				*seqZero = (hdr >> SEQ_ZERO_HDR_SHIFT) &
++								SEQ_ZERO_MASK;
++
++			if (segO)
++				*segO = (hdr >> SEGO_HDR_SHIFT) & SEG_MASK;
++
++			if (segN)
++				*segN = (hdr >> SEGN_HDR_SHIFT) & SEG_MASK;
++
++			if (payload)
++				*payload = packet + 13;
++
++			if (payload_len)
++				*payload_len = packet_len - 13 - 4;
++		} else {
++			if (payload)
++				*payload = packet + 10;
++
++			if (payload_len)
++				*payload_len = packet_len - 10 - 4;
++		}
 +	}
 +
 +	return true;
 +}
 +
-+static bool find_by_filter_id(const void *a, const void *b)
++bool mesh_crypto_payload_encrypt(uint8_t *aad, const uint8_t *payload,
++				uint8_t *out, uint16_t payload_len,
++				uint16_t src, uint16_t dst, uint8_t key_id,
++				uint32_t seq_num, uint32_t iv_index,
++				bool aszmic,
++				const uint8_t application_key[16])
 +{
-+	const struct pvt_rx_reg *rx_reg = a;
-+	uint8_t filter_id = L_PTR_TO_UINT(b);
++	uint8_t application_nonce[13] = { 0x01, };
 +
-+	return rx_reg->filter_id == filter_id;
-+}
-+
-+static bool recv_register(struct mesh_io *io, uint8_t filter_id,
-+				mesh_io_recv_func_t cb, void *user_data)
-+{
-+	struct bt_hci_cmd_le_set_scan_enable cmd;
-+	struct mesh_io_private *pvt = io->pvt;
-+	struct pvt_rx_reg *rx_reg;
-+	bool scanning;
-+
-+	l_info("%s %d", __func__, filter_id);
-+	if (!cb || !filter_id || filter_id > sizeof(pvt->filters))
++	if (payload_len < 1)
 +		return false;
 +
-+	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
-+						L_UINT_TO_PTR(filter_id));
++	/* Key_ID == 0 means the Device Key is being used */
++	if (!key_id)
++		application_nonce[0] = 0x02;
 +
-+	if (!rx_reg) {
-+		rx_reg = l_new(struct pvt_rx_reg, 1);
-+		if (!rx_reg)
++	/* Seq Num */
++	l_put_be32(seq_num, application_nonce + 1);
++
++	/* ASZMIC */
++	application_nonce[1] |= aszmic ? 0x80 : 0x00;
++
++	/* SRC */
++	l_put_be16(src, application_nonce + 5);
++
++	/* DST */
++	l_put_be16(dst, application_nonce + 7);
++
++	/* IV Index */
++	l_put_be32(iv_index, application_nonce + 9);
++
++	/* print_packet("AAD", aad, aad ? 16 : 0); */
++	/* print_packet("Nonce", application_nonce, 13); */
++	/* print_packet("Key", application_key, 16); */
++	/* print_packet("Payload[clr]", payload, payload_len); */
++
++	if (!mesh_crypto_aes_ccm_encrypt(application_nonce, application_key,
++					aad, aad ? 16 : 0,
++					payload, payload_len,
++					out, NULL,
++					aszmic ? 8 : 4))
++		return false;
++
++	/* print_packet("Payload[enc]", out, payload_len + (aszmic ? 8 : 4)); */
++
++	return true;
++}
++
++bool mesh_crypto_payload_decrypt(uint8_t *aad, uint16_t aad_len,
++				const uint8_t *payload, uint16_t payload_len,
++				bool szmict,
++				uint16_t src, uint16_t dst,
++				uint8_t key_id, uint32_t seq_num,
++				uint32_t iv_index, uint8_t *out,
++				const uint8_t app_key[16])
++{
++	uint8_t app_nonce[13] = { 0x01, };
++	uint32_t mic32;
++	uint64_t mic64;
++
++	if (payload_len < 5 || !out)
++		return false;
++
++	/* Key_ID == 0 means the Device Key is being used */
++	if (!key_id)
++		app_nonce[0] = 0x02;
++
++	/* Seq Num */
++	l_put_be32(seq_num, app_nonce + 1);
++
++	/* ASZMIC */
++	app_nonce[1] |= szmict ? 0x80 : 0x00;
++
++	/* SRC */
++	l_put_be16(src, app_nonce + 5);
++
++	/* DST */
++	l_put_be16(dst, app_nonce + 7);
++
++	/* IV Index */
++	l_put_be32(iv_index, app_nonce + 9);
++
++	memcpy(out, payload, payload_len);
++
++	/* print_packet("AAD", aad, aad_len); */
++	/* print_packet("Nonce", app_nonce, 13); */
++	/* print_packet("Key", app_key, 16); */
++	/* print_packet("Payload[enc]", payload, payload_len); */
++
++	if (szmict) {
++		if (!mesh_crypto_aes_ccm_decrypt(app_nonce, app_key,
++					aad, aad_len,
++					payload, payload_len,
++					out, &mic64, sizeof(mic64)))
++			return false;
++
++		mic64 ^= l_get_be64(out + payload_len - 8);
++		l_put_be64(mic64, out + payload_len - 8);
++
++		/* print_packet("Payload[clr]", out, payload_len - 8); */
++
++		if (mic64)
++			return false;
++	} else {
++		if (!mesh_crypto_aes_ccm_decrypt(app_nonce, app_key,
++					aad, aad_len,
++					payload, payload_len,
++					out, &mic32, sizeof(mic32)))
++			return false;
++
++		mic32 ^= l_get_be32(out + payload_len - 4);
++		l_put_be32(mic32, out + payload_len - 4);
++
++		/* print_packet("Payload[clr]", out, payload_len - 4); */
++
++		if (mic32)
 +			return false;
 +	}
 +
-+	rx_reg->filter_id = filter_id;
-+	rx_reg->cb = cb;
-+	rx_reg->user_data = user_data;
-+
-+	scanning = !l_queue_isempty(pvt->rx_regs);
-+
-+	l_queue_push_head(pvt->rx_regs, rx_reg);
-+
-+	if (!scanning) {
-+		cmd.enable = 0x01;	/* Enable scanning */
-+		cmd.filter_dup = 0x00;	/* Report duplicates */
-+		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+	}
-+
 +	return true;
 +}
 +
-+static bool recv_deregister(struct mesh_io *io, uint8_t filter_id)
++bool mesh_crypto_packet_encode(uint8_t *packet, uint8_t packet_len,
++				const uint8_t network_key[16],
++				uint32_t iv_index,
++				const uint8_t privacy_key[16])
 +{
-+	struct bt_hci_cmd_le_set_scan_enable cmd;
-+	struct mesh_io_private *pvt = io->pvt;
++	uint8_t network_nonce[13] = { 0x00, 0x00 };
++	uint8_t privacy_counter[16] = { 0x00, 0x00, 0x00, 0x00, 0x00, };
++	uint8_t tmp[16];
++	int i;
 +
-+	struct pvt_rx_reg *rx_reg;
-+
-+	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
-+						L_UINT_TO_PTR(filter_id));
-+
-+	if (rx_reg)
-+		l_free(rx_reg);
-+
-+	if (l_queue_isempty(pvt->rx_regs)) {
-+		cmd.enable = 0x00;	/* Disable scanning */
-+		cmd.filter_dup = 0x00;	/* Report duplicates */
-+		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+
-+	}
-+
-+	return true;
-+}
-+
-+static bool filter_set(struct mesh_io *io,
-+		uint8_t filter_id, const uint8_t *data, uint8_t len,
-+		mesh_io_status_func_t callback, void *user_data)
-+{
-+	struct mesh_io_private *pvt = io->pvt;
-+
-+	l_info("%s id: %d, --> %2.2x", __func__, filter_id, data[0]);
-+	if (!data || !len || !filter_id || filter_id > sizeof(pvt->filters))
++	if (packet_len < 14)
 +		return false;
 +
-+	pvt->filters[filter_id - 1] = data[0];
++	/* Detect Proxy packet by CTL == true && DST == 0x0000 */
++	if ((packet[1] & CTL) && l_get_be16(packet + 7) == 0)
++		network_nonce[0] = 0x03; /*  Proxy Nonce */
++	else
++		/* CTL + TTL */
++		network_nonce[1] = packet[1];
 +
-+	/* TODO: Delayed Call to successful status */
++	/* Seq Num */
++	network_nonce[2] = packet[2];
++	network_nonce[3] = packet[3];
++	network_nonce[4] = packet[4];
++
++	/* SRC */
++	network_nonce[5] = packet[5];
++	network_nonce[6] = packet[6];
++
++	/* DST not available */
++	network_nonce[7] = 0;
++	network_nonce[8] = 0;
++
++	/* IV Index */
++	l_put_be32(iv_index, network_nonce + 9);
++
++	/* print_packet("Net-Nonce", network_nonce, 13); */
++	/* print_packet("Net-Key", network_key, 16); */
++	/* print_packet("Net-Payload[clr]", packet, packet_len); */
++
++	/* Check for Long net-MIC */
++	if (packet[1] & CTL) {
++		if (!mesh_crypto_aes_ccm_encrypt(network_nonce, network_key,
++					NULL, 0,
++					packet + 7, packet_len - 7 - 8,
++					packet + 7, NULL, sizeof(uint64_t)))
++			return false;
++	} else {
++		if (!mesh_crypto_aes_ccm_encrypt(network_nonce, network_key,
++					NULL, 0,
++					packet + 7, packet_len - 7 - 4,
++					packet + 7, NULL, sizeof(uint32_t)))
++			return false;
++	}
++
++	/* print_packet("Net-Payload[enc]", packet, packet_len); */
++
++	l_put_be32(iv_index, privacy_counter + 5);
++	memcpy(privacy_counter + 9, packet + 7, 7);
++
++	/* print_packet("Priv-Random", privacy_counter, 16); */
++
++	/* print_packet("Priv-Key", privacy_key, 16); */
++
++
++	if (!aes_ecb_one(privacy_key, privacy_counter, tmp))
++		return false;
++
++	for (i = 0; i < 6; i++)
++		packet[1 + i] ^= tmp[i];
++
++	/* print_packet("Net-Private", packet, packet_len); */
 +
 +	return true;
 +}
 +
-+const struct mesh_io_api mesh_io_generic = {
-+	.init = dev_init,
-+	.destroy = dev_destroy,
-+	.caps = dev_caps,
-+	.send = send_tx,
-+	.reg = recv_register,
-+	.dereg = recv_deregister,
-+	.set = filter_set,
-+	.cancel = tx_cancel,
++bool mesh_crypto_packet_decode(const uint8_t *packet, uint8_t packet_len,
++				bool proxy, uint8_t *out, uint32_t iv_index,
++				const uint8_t network_key[16],
++				const uint8_t privacy_key[16])
++{
++	uint8_t privacy_counter[16] = { 0x00, 0x00, 0x00, 0x00, 0x00, };
++	uint8_t network_nonce[13] = { 0x00, 0x00, };
++	uint8_t tmp[16];
++	uint16_t src;
++	int i;
++
++	if (packet_len < 14)
++		return false;
++
++	/* print_packet("Priv-Key", privacy_key, 16); */
++
++	l_put_be32(iv_index, privacy_counter + 5);
++	memcpy(privacy_counter + 9, packet + 7, 7);
++
++	/* print_packet("Priv-Random", privacy_counter, 16); */
++
++	if (!aes_ecb_one(privacy_key, privacy_counter, tmp))
++		return false;
++
++	memcpy(out, packet, packet_len);
++	for (i = 0; i < 6; i++)
++		out[1 + i] ^= tmp[i];
++
++	src  = l_get_be16(out + 5);
++
++	/* Pre-check SRC address for illegal values */
++	if (!src || src >= 0x8000)
++		return false;
++
++	/* Detect Proxy packet by CTL == true && proxy == true */
++	if ((out[1] & CTL) && proxy)
++		network_nonce[0] = 0x03; /*  Proxy Nonce */
++	else
++		/* CTL + TTL */
++		network_nonce[1] = out[1];
++
++	/* Seq Num */
++	network_nonce[2] = out[2];
++	network_nonce[3] = out[3];
++	network_nonce[4] = out[4];
++
++	/* SRC */
++	network_nonce[5] = out[5];
++	network_nonce[6] = out[6];
++
++	/* DST not available */
++	network_nonce[7] = 0;
++	network_nonce[8] = 0;
++
++	/* IV Index */
++	l_put_be32(iv_index, network_nonce + 9);
++
++	/* print_packet("Net-Nonce", network_nonce, 13); */
++	/* print_packet("Net-Key", network_key, 16); */
++	/* print_packet("Net-Pkt[enc]", out, packet_len); */
++
++	/* Check for Long MIC */
++	if (out[1] & CTL) {
++		uint64_t mic;
++
++		if (!mesh_crypto_aes_ccm_decrypt(network_nonce, network_key,
++					NULL, 0, packet + 7, packet_len - 7,
++					out + 7, &mic, sizeof(mic)))
++			return false;
++
++		mic ^= l_get_be64(out + packet_len - 8);
++		l_put_be64(mic, out + packet_len - 8);
++
++		if (mic)
++			return false;
++	} else {
++		uint32_t mic;
++
++		if (!mesh_crypto_aes_ccm_decrypt(network_nonce, network_key,
++					NULL, 0, packet + 7, packet_len - 7,
++					out + 7, &mic, sizeof(mic)))
++			return false;
++
++		mic ^= l_get_be32(out + packet_len - 4);
++		l_put_be32(mic, out + packet_len - 4);
++
++		if (mic)
++			return false;
++	}
++
++	/* print_packet("Net-Pkt[clr]", out, packet_len); */
++
++	return true;
++}
++
++bool mesh_crypto_packet_label(uint8_t *packet, uint8_t packet_len,
++				uint16_t iv_index, uint8_t network_id)
++{
++	packet[0] = (iv_index & 0x0001) << 7 | (network_id & 0x7f);
++
++	return true;
++}
++
++/* reversed, 8-bit, poly=0x07 */
++static const uint8_t crc_table[256] = {
++	0x00, 0x91, 0xe3, 0x72, 0x07, 0x96, 0xe4, 0x75,
++	0x0e, 0x9f, 0xed, 0x7c, 0x09, 0x98, 0xea, 0x7b,
++	0x1c, 0x8d, 0xff, 0x6e, 0x1b, 0x8a, 0xf8, 0x69,
++	0x12, 0x83, 0xf1, 0x60, 0x15, 0x84, 0xf6, 0x67,
++
++	0x38, 0xa9, 0xdb, 0x4a, 0x3f, 0xae, 0xdc, 0x4d,
++	0x36, 0xa7, 0xd5, 0x44, 0x31, 0xa0, 0xd2, 0x43,
++	0x24, 0xb5, 0xc7, 0x56, 0x23, 0xb2, 0xc0, 0x51,
++	0x2a, 0xbb, 0xc9, 0x58, 0x2d, 0xbc, 0xce, 0x5f,
++
++	0x70, 0xe1, 0x93, 0x02, 0x77, 0xe6, 0x94, 0x05,
++	0x7e, 0xef, 0x9d, 0x0c, 0x79, 0xe8, 0x9a, 0x0b,
++	0x6c, 0xfd, 0x8f, 0x1e, 0x6b, 0xfa, 0x88, 0x19,
++	0x62, 0xf3, 0x81, 0x10, 0x65, 0xf4, 0x86, 0x17,
++
++	0x48, 0xd9, 0xab, 0x3a, 0x4f, 0xde, 0xac, 0x3d,
++	0x46, 0xd7, 0xa5, 0x34, 0x41, 0xd0, 0xa2, 0x33,
++	0x54, 0xc5, 0xb7, 0x26, 0x53, 0xc2, 0xb0, 0x21,
++	0x5a, 0xcb, 0xb9, 0x28, 0x5d, 0xcc, 0xbe, 0x2f,
++
++	0xe0, 0x71, 0x03, 0x92, 0xe7, 0x76, 0x04, 0x95,
++	0xee, 0x7f, 0x0d, 0x9c, 0xe9, 0x78, 0x0a, 0x9b,
++	0xfc, 0x6d, 0x1f, 0x8e, 0xfb, 0x6a, 0x18, 0x89,
++	0xf2, 0x63, 0x11, 0x80, 0xf5, 0x64, 0x16, 0x87,
++
++	0xd8, 0x49, 0x3b, 0xaa, 0xdf, 0x4e, 0x3c, 0xad,
++	0xd6, 0x47, 0x35, 0xa4, 0xd1, 0x40, 0x32, 0xa3,
++	0xc4, 0x55, 0x27, 0xb6, 0xc3, 0x52, 0x20, 0xb1,
++	0xca, 0x5b, 0x29, 0xb8, 0xcd, 0x5c, 0x2e, 0xbf,
++
++	0x90, 0x01, 0x73, 0xe2, 0x97, 0x06, 0x74, 0xe5,
++	0x9e, 0x0f, 0x7d, 0xec, 0x99, 0x08, 0x7a, 0xeb,
++	0x8c, 0x1d, 0x6f, 0xfe, 0x8b, 0x1a, 0x68, 0xf9,
++	0x82, 0x13, 0x61, 0xf0, 0x85, 0x14, 0x66, 0xf7,
++
++	0xa8, 0x39, 0x4b, 0xda, 0xaf, 0x3e, 0x4c, 0xdd,
++	0xa6, 0x37, 0x45, 0xd4, 0xa1, 0x30, 0x42, 0xd3,
++	0xb4, 0x25, 0x57, 0xc6, 0xb3, 0x22, 0x50, 0xc1,
++	0xba, 0x2b, 0x59, 0xc8, 0xbd, 0x2c, 0x5e, 0xcf
 +};
-diff --git a/meshd/src/mesh-io.c b/meshd/src/mesh-io.c
-new file mode 100644
-index 000000000..0f6fae933
---- /dev/null
-+++ b/meshd/src/mesh-io.c
-@@ -0,0 +1,187 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <ell/ell.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+
-+#include "meshd/common/mesh-defs.h"
-+
-+#include "meshd/src/mesh-io.h"
-+#include "meshd/src/mesh-io-api.h"
-+
-+/* List of Mesh-IO Type headers */
-+#include "meshd/src/mesh-io-generic.h"
-+
-+/* List of Supported Mesh-IO Types */
-+static const struct mesh_io_table table[] = {
-+	{MESH_IO_TYPE_GENERIC,	&mesh_io_generic},
-+};
-+
-+static struct l_queue *io_list;
-+
-+static bool match_by_io(const void *a, const void *b)
++uint8_t mesh_crypto_compute_fcs(const uint8_t *packet, uint8_t packet_len)
 +{
-+	return a == b;
++	uint8_t fcs = 0xff;
++	int i;
++
++	for (i = 0; i < packet_len; i++)
++		fcs = crc_table[fcs ^ packet[i]];
++
++	return 0xff - fcs;
 +}
 +
-+static bool match_by_index(const void *a, const void *b)
++bool mesh_crypto_check_fcs(const uint8_t *packet, uint8_t packet_len,
++							uint8_t received_fcs)
 +{
-+	const struct mesh_io *io = a;
++	uint8_t fcs = 0xff;
++	int i;
 +
-+	return io->index == L_PTR_TO_UINT(b);
-+}
++	for (i = 0; i < packet_len; i++)
++		fcs = crc_table[fcs ^ packet[i]];
 +
-+struct mesh_io *mesh_io_new(uint16_t index, enum mesh_io_type type)
-+{
-+	const struct mesh_io_api	*api = NULL;
-+	struct mesh_io			*io;
-+	uint16_t			i;
++	fcs = crc_table[fcs ^ received_fcs];
 +
-+	l_info("%s %d\n", __func__, type);
-+	for (i = 0; i < L_ARRAY_SIZE(table); i++) {
-+		if (table[i].type == type) {
-+			api = table[i].api;
-+			break;
-+		}
-+	}
++	if (fcs != 0xcf)
++		l_error("IOT Warning! CRC %2.2x != 0xcf", fcs);
 +
-+	io = l_queue_find(io_list, match_by_index, L_UINT_TO_PTR(index));
-+
-+	if (api == NULL || api->init == NULL || io != NULL)
-+		return NULL;
-+
-+	io = l_new(struct mesh_io, 1);
-+
-+	if (io == NULL)
-+		return NULL;
-+
-+	io->type = type;
-+	io->index = index;
-+	io->api = api;
-+	if (!api->init(index, io))
-+		goto fail;
-+
-+	if (io_list == NULL)
-+		io_list = l_queue_new();
-+
-+	if (api->set) {
-+		uint8_t pkt = MESH_AD_TYPE_NETWORK;
-+		uint8_t bec = MESH_AD_TYPE_BEACON;
-+		uint8_t prv = MESH_AD_TYPE_PROVISION;
-+
-+		api->set(io, 1, &bec, 1, NULL, NULL);
-+		api->set(io, 2, &prv, 1, NULL, NULL);
-+		api->set(io, 3, &pkt, 1, NULL, NULL);
-+	}
-+
-+	if (l_queue_push_head(io_list, io))
-+		return io;
-+
-+fail:
-+	if (api->destroy)
-+		api->destroy(io);
-+
-+	l_free(io);
-+	return NULL;
-+}
-+
-+void mesh_io_destroy(struct mesh_io *io)
-+{
-+	io = l_queue_remove_if(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->destroy)
-+		io->api->destroy(io);
-+
-+	l_free(io);
-+
-+	if (l_queue_isempty(io_list)) {
-+		l_queue_destroy(io_list, NULL);
-+		io_list = NULL;
-+	}
-+}
-+
-+bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->caps)
-+		return io->api->caps(io, caps);
-+
-+	return false;
-+}
-+
-+bool mesh_io_register_recv_cb(struct mesh_io *io, uint8_t filter_id,
-+				mesh_io_recv_func_t cb, void *user_data)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->reg)
-+		return io->api->reg(io, filter_id, cb, user_data);
-+
-+	return false;
-+}
-+
-+bool mesh_io_deregister_recv_cb(struct mesh_io *io, uint8_t filter_id)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->dereg)
-+		return io->api->dereg(io, filter_id);
-+
-+	return false;
-+}
-+
-+bool mesh_set_filter(struct mesh_io *io, uint8_t filter_id,
-+				const uint8_t *data, uint8_t len,
-+				mesh_io_status_func_t cb, void *user_data)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->set)
-+		return io->api->set(io, filter_id, data, len, cb, user_data);
-+
-+	return false;
-+}
-+
-+bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
-+					const uint8_t *data, uint16_t len)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->send)
-+		return io->api->send(io, info, data, len);
-+
-+	return false;
-+}
-+
-+bool mesh_io_send_cancel(struct mesh_io *io, uint8_t *pattern, uint8_t len)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->cancel)
-+		return io->api->cancel(io, pattern, len);
-+
-+	return false;
++	return fcs == 0xcf;
 +}
 -- 
 2.14.3
