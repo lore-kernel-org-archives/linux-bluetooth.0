@@ -1,81 +1,200 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20180502081635epcas2p170eb2b4ed9336425921119b66e554fef@epcas2p1.samsung.com>
- <1525248985-10990-1-git-send-email-nagaraj.dr@samsung.com>
-In-Reply-To: <1525248985-10990-1-git-send-email-nagaraj.dr@samsung.com>
+References: <20180502091757.24190-1-grzegorz.kolodziejczyk@codecoup.pl> <20180502091757.24190-2-grzegorz.kolodziejczyk@codecoup.pl>
+In-Reply-To: <20180502091757.24190-2-grzegorz.kolodziejczyk@codecoup.pl>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 02 May 2018 11:49:07 +0000
-Message-ID: <CABBYNZ++cdKY256edfNkMU6tsaccRrqg6eN9scdTK5m8t2Okxw@mail.gmail.com>
-Subject: Re: [PATCH] src/device.c : Fix BREDR-ATT MTU issue
-To: nagaraj.dr@samsung.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Syam Sidhardhan <s.syam@samsung.com>
+Date: Wed, 02 May 2018 11:32:53 +0000
+Message-ID: <CABBYNZKbHnKF_GbFq3qQpzjtb0s-EwdR=9RwMb34r-T7D0kT+Q@mail.gmail.com>
+Subject: Re: [RFC 1/2] shared/gatt-server: Request authorization for prepare writes.
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nagaraj,
-On Wed, May 2, 2018 at 11:40 AM Nagaraj D R <nagaraj.dr@samsung.com> wrote:
+Hi Grzegorz,
+On Wed, May 2, 2018 at 1:09 PM Grzegorz Kolodziejczyk <
+grzegorz.kolodziejczyk@codecoup.pl> wrote:
 
-> For BREDR-ATT, according to spec, ATT MTU is same has
-> L2CAP configured MTU on which ATT is running. So, set the MTU to
-> L2CAP configuration and for LE-ATT adjust the ATT MTU based on
-> EXCHANGE_MTU request and response.
+> This patch adds gatt-server possibility to request authorization from
+> application if needed and previously wasn't authorized. Authorization is
+> requested by sending write request with no data to application.
 > ---
->   src/device.c              | 2 +-
->   src/shared/gatt-helpers.c | 1 +
->   2 files changed, 2 insertions(+), 1 deletion(-)
+>   doc/gatt-api.txt         |  8 ++++++
+>   src/gatt-database.c      |  6 +++++
+>   src/shared/gatt-server.c | 64
++++++++++++++++++++++++++++++++++++++++++-------
+>   3 files changed, 69 insertions(+), 9 deletions(-)
 
-> diff --git a/src/device.c b/src/device.c
-> index f693b70..cf4c8df 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -4922,7 +4922,7 @@ bool device_attach_att(struct btd_device *dev,
-GIOChannel *io)
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index 0f1cc9029..b9bdc9352 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -251,6 +251,14 @@ Properties string UUID [read-only]
+>                                  "secure-read" (Server only)
+>                                  "secure-write" (Server only)
+
+Documentation changes should be split in a different patch.
+
+> +               boolean Authorized [read-only, optional] (Server only)
+> +
+> +                       True, if read/write operation was previously
+authorized
+> +                       and attribute requires authorization. If no
+Authorized
+> +                       property is available along with characteristic
+or this
+> +                       property is set to true, then daemon don't send
+empty
+> +                       write request for authorization.
+
+I guess we are missing the authorization flag, otherwise the daemon cannot
+tell if authorization is required on not, or we assume it is always
+required if Authorized is set to false? In that case, we should make it
+clearer in the documentation. Perhaps we should make the property state if
+the authorization is required like boolean Authorization, if it is not
+present it would be assumed to be false meaning authorization is not
+required. We should also state how it affects the calls stating that a
+prepare write would cause WriteValue to be called with empty data if
+authorization is required, and perhaps we should attempt to call WriteValue
+just once per procedure which means the authorization would be valid until
+execute, or we change the property to be string that can assume the values:
+always, once, never. Btw, I don't think we can support Authorization with
+AcquireWrite since there is no reply to writes on the pipe, so we might as
+well document that those properties cannot be used together.
+
+>   Characteristic Descriptors hierarchy
+>   ====================================
+
+> diff --git a/src/gatt-database.c b/src/gatt-database.c
+> index 0ac5b75b0..419db909c 100644
+> --- a/src/gatt-database.c
+> +++ b/src/gatt-database.c
+> @@ -2614,6 +2614,12 @@ static void chrc_write_cb(struct gatt_db_attribute
+*attrib,
+>                  goto fail;
 >          }
 
->          dev->att_mtu = MIN(mtu, BT_ATT_MAX_LE_MTU);
-> -       attrib = g_attrib_new(io, BT_ATT_DEFAULT_LE_MTU, false);
-> +       attrib = g_attrib_new(io, dev->att_mtu, false);
+> +       if (offset && g_dbus_proxy_get_property(chrc->proxy, "Authorized",
+> +                                                               &iter)) {
+> +               gatt_db_attribute_write_result(attrib, id, 0);
+> +               return;
+> +       }
 
-This would actually undo the following patch:
+What is the logic behind checking the offset? Is this check here because
+the prepare writes are now passed up the stack? Afaik the offset can be set
+to 0 even with prepare write which means we should check the opcode instead
+which might be required for execute as well otherwise nothing that has
+offset set will be ever written to the application.
 
-     src/device: Use BT_ATT_DEFAULT_LE_MTU as default MTU
+>          if (chrc->write_io) {
+>                  if (pipe_io_send(chrc->write_io, value, len) < 0) {
+>                          error("Unable to write: %s", strerror(errno));
+> diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+> index 4b554f665..cdade76f8 100644
+> --- a/src/shared/gatt-server.c
+> +++ b/src/shared/gatt-server.c
+> @@ -1208,6 +1208,45 @@ static bool store_prep_data(struct bt_gatt_server
+*server,
+>          return prep_data_new(server, handle, offset, length, value);
+>   }
 
-     Use the default MTU until an MTU exchange has taken place and
-     something else has been negotiated. If either side does not support
-     MTU exchange, the connection shall continue to use this default
-     value instead of the device maximum which was the previous behavior.
+> +struct prep_write_complete_data {
+> +       void *pdu;
+> +       uint16_t length;
+> +       struct bt_gatt_server *server;
+> +};
+> +
+> +static void prep_write_complete_cb(struct gatt_db_attribute *attr, int
+err,
+> +                                                               void
+*user_data)
+> +{
+> +       struct prep_write_complete_data *pwcd = user_data;
+> +       uint16_t handle = 0;
+> +       uint16_t offset;
+> +
+> +       handle = get_le16(pwcd->pdu);
+> +
+> +       if (err) {
+> +               bt_att_send_error_rsp(pwcd->server->att,
+> +                                       BT_ATT_OP_PREP_WRITE_REQ, handle,
+err);
+> +               free(pwcd->pdu);
+> +               free(pwcd);
+> +
+> +               return;
+> +       }
+> +
+> +       offset = get_le16(pwcd->pdu + 2);
+> +
+> +       if (!store_prep_data(pwcd->server, handle, offset, pwcd->length -
+4,
+> +                                               &((uint8_t *)
+pwcd->pdu)[4]))
+> +               bt_att_send_error_rsp(pwcd->server->att,
+> +                                       BT_ATT_OP_PREP_WRITE_RSP, handle,
+> +
+BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
+> +
+> +       bt_att_send(pwcd->server->att, BT_ATT_OP_PREP_WRITE_RSP,
+pwcd->pdu,
+> +                                               pwcd->length, NULL, NULL,
+NULL);
+> +
+> +       free(pwcd->pdu);
+> +       free(pwcd);
+> +}
+> +
+>   static void prep_write_cb(uint8_t opcode, const void *pdu,
+>                                          uint16_t length, void *user_data)
+>   {
+> @@ -1215,7 +1254,8 @@ static void prep_write_cb(uint8_t opcode, const
+void *pdu,
+>          uint16_t handle = 0;
+>          uint16_t offset;
+>          struct gatt_db_attribute *attr;
+> -       uint8_t ecode;
+> +       struct prep_write_complete_data *pwcd;
+> +       uint8_t ecode, status;
 
-We should probably check if the cid is for LE or not and reset mtu to
-BT_ATT_DEFAULT_LE_MTU that way att_mtu should be valid for either LE or
-BR/EDR.
+>          if (length < 4) {
+>                  ecode = BT_ATT_ERROR_INVALID_PDU;
+> @@ -1245,15 +1285,21 @@ static void prep_write_cb(uint8_t opcode, const
+void *pdu,
+>          if (ecode)
+>                  goto error;
 
->          if (!attrib) {
->                  error("Unable to create new GAttrib instance");
->                  return false;
-> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index 6b39bb1..8ec65be 100644
-> --- a/src/shared/gatt-helpers.c
-> +++ b/src/shared/gatt-helpers.c
-> @@ -517,6 +517,7 @@ static void mtu_cb(uint8_t opcode, const void *pdu,
-uint16_t length,
->          if (opcode == BT_ATT_OP_ERROR_RSP) {
->                  success = false;
->                  att_ecode = process_error(pdu, length);
-> +               bt_att_set_mtu(op->att, BT_ATT_DEFAULT_LE_MTU);
+> -       if (!store_prep_data(server, handle, offset, length - 4,
+> -                                               &((uint8_t *) pdu)[4])) {
+> -               ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+> -               goto error;
+> -       }
+> +       pwcd = new0(struct prep_write_complete_data, 1);
+> +       pwcd->pdu = malloc(length);
+> +       memcpy(pwcd->pdu, pdu, length);
+> +       pwcd->length = length;
+> +       pwcd->server = server;
 
-I not following this one, we only really use bt_att_set_mtu if the command
-succeeds so this should not be necessary, or this is due Exchange being
-used multiple times? I recall the spec not allowing that to happen, and if
-does Im not sure why we would have to return to the default instead of the
-value previously set in case the of error response.
+> -       bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu, length,
+NULL,
+> -                                                               NULL,
+NULL);
+> -       return;
+> +       status = gatt_db_attribute_write(attr, offset, NULL, 0,
+> +                                               BT_ATT_OP_PREP_WRITE_REQ,
+> +                                               server->att,
+> +                                               prep_write_complete_cb,
+pwcd);
+> +       if (status)
+> +               return;
+> +
+> +       ecode = BT_ATT_ERROR_UNLIKELY;
 
->                  goto done;
->          }
-
+>   error:
+>          bt_att_send_error_rsp(server->att, opcode, handle, ecode);
 > --
-> 1.9.1
+> 2.13.6
 
 > --
 > To unsubscribe from this list: send the line "unsubscribe
