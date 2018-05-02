@@ -1,33 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+From: Nagaraj D R <nagaraj.dr@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 0/2] Add support for prepare writes authorization
-Date: Wed,  2 May 2018 11:17:55 +0200
-Message-Id: <20180502091757.24190-1-grzegorz.kolodziejczyk@codecoup.pl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Cc: Syam Sidhardhan <s.syam@samsung.com>,
+        Nagaraj D R <nagaraj.dr@samsung.com>
+Subject: [PATCH] src/device.c : Fix BREDR-ATT MTU issue
+Date: Wed, 02 May 2018 13:46:25 +0530
+Message-id: <1525248985-10990-1-git-send-email-nagaraj.dr@samsung.com>
+References: <CGME20180502081635epcas2p170eb2b4ed9336425921119b66e554fef@epcas2p1.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set adds support for prepare writes authorization handling.
-This case covers "GATT/SR/GAW/BI-11-C [Write Long Characteristic Value –
-Insufficient Authorization]" PTS test case. If authorization property doesn't
-exist or is set to true then daemon doesn't bother application database
-with authorization ask and behaves as before.
+For BREDR-ATT, according to spec, ATT MTU is same has
+L2CAP configured MTU on which ATT is running. So, set the MTU to
+L2CAP configuration and for LE-ATT adjust the ATT MTU based on
+EXCHANGE_MTU request and response.
+---
+ src/device.c              | 2 +-
+ src/shared/gatt-helpers.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-This patch set is on top of: 72c0c310fd2940d0989af2371728e743894ffcbc
-(client: Define maximum attribute value length as initial value)
-
-Grzegorz Kolodziejczyk (2):
-  shared/gatt-server: Request authorization for prepare writes.
-  client: Add authorized property handling to characteristic attribute
-
- client/gatt.c            | 46 ++++++++++++++++++++++++++++++++++
- doc/gatt-api.txt         |  8 ++++++
- src/gatt-database.c      |  6 +++++
- src/shared/gatt-server.c | 64 +++++++++++++++++++++++++++++++++++++++++-------
- 4 files changed, 115 insertions(+), 9 deletions(-)
-
+diff --git a/src/device.c b/src/device.c
+index f693b70..cf4c8df 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4922,7 +4922,7 @@ bool device_attach_att(struct btd_device *dev, GIOChannel *io)
+ 	}
+ 
+ 	dev->att_mtu = MIN(mtu, BT_ATT_MAX_LE_MTU);
+-	attrib = g_attrib_new(io, BT_ATT_DEFAULT_LE_MTU, false);
++	attrib = g_attrib_new(io, dev->att_mtu, false);
+ 	if (!attrib) {
+ 		error("Unable to create new GAttrib instance");
+ 		return false;
+diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+index 6b39bb1..8ec65be 100644
+--- a/src/shared/gatt-helpers.c
++++ b/src/shared/gatt-helpers.c
+@@ -517,6 +517,7 @@ static void mtu_cb(uint8_t opcode, const void *pdu, uint16_t length,
+ 	if (opcode == BT_ATT_OP_ERROR_RSP) {
+ 		success = false;
+ 		att_ecode = process_error(pdu, length);
++		bt_att_set_mtu(op->att, BT_ATT_DEFAULT_LE_MTU);
+ 		goto done;
+ 	}
+ 
 -- 
-2.13.6
+1.9.1
 
