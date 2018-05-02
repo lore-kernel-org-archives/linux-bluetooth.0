@@ -1,13 +1,14 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
 References: <20180502091757.24190-1-grzegorz.kolodziejczyk@codecoup.pl>
- <20180502091757.24190-2-grzegorz.kolodziejczyk@codecoup.pl> <CABBYNZKbHnKF_GbFq3qQpzjtb0s-EwdR=9RwMb34r-T7D0kT+Q@mail.gmail.com>
-In-Reply-To: <CABBYNZKbHnKF_GbFq3qQpzjtb0s-EwdR=9RwMb34r-T7D0kT+Q@mail.gmail.com>
+ <20180502091757.24190-3-grzegorz.kolodziejczyk@codecoup.pl> <CABBYNZJVwKdAKPGxgOE_48=2zLvETe8oirr8w56Su5PrUh1eyA@mail.gmail.com>
+In-Reply-To: <CABBYNZJVwKdAKPGxgOE_48=2zLvETe8oirr8w56Su5PrUh1eyA@mail.gmail.com>
 From: =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?=
         <grzegorz.kolodziejczyk@codecoup.pl>
-Date: Wed, 02 May 2018 13:31:01 +0000
-Message-ID: <CALevQMa0KqNd46MBuL6PPTUodXrWOyC4U_J-xgv-KQ1CBNH3HQ@mail.gmail.com>
-Subject: Re: [RFC 1/2] shared/gatt-server: Request authorization for prepare writes.
+Date: Wed, 02 May 2018 13:06:35 +0000
+Message-ID: <CALevQMaqsR3YLmCWC66LNS6Avsd6eFF5sfqGZQWJ0yNHUgR1Aw@mail.gmail.com>
+Subject: Re: [RFC 2/2] client: Add authorized property handling to
+ characteristic attribute
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -15,226 +16,138 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
-=C5=9Br., 2 maj 2018 o 13:33 Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+=C5=9Br., 2 maj 2018 o 12:42 Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 napisa=C5=82(a):
 
 > Hi Grzegorz,
 > On Wed, May 2, 2018 at 1:09 PM Grzegorz Kolodziejczyk <
 > grzegorz.kolodziejczyk@codecoup.pl> wrote:
 
-> > This patch adds gatt-server possibility to request authorization from
-> > application if needed and previously wasn't authorized. Authorization i=
-s
-> > requested by sending write request with no data to application.
+> > This patch adds handling of authorized property to bluetoothctl.
 > > ---
-> >   doc/gatt-api.txt         |  8 ++++++
-> >   src/gatt-database.c      |  6 +++++
-> >   src/shared/gatt-server.c | 64
-> +++++++++++++++++++++++++++++++++++++++++-------
-> >   3 files changed, 69 insertions(+), 9 deletions(-)
+> >   client/gatt.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 46 insertions(+)
 
-> > diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> > index 0f1cc9029..b9bdc9352 100644
-> > --- a/doc/gatt-api.txt
-> > +++ b/doc/gatt-api.txt
-> > @@ -251,6 +251,14 @@ Properties string UUID [read-only]
-> >                                  "secure-read" (Server only)
-> >                                  "secure-write" (Server only)
-
-> Documentation changes should be split in a different patch.
-
-> > +               boolean Authorized [read-only, optional] (Server only)
-> > +
-> > +                       True, if read/write operation was previously
-> authorized
-> > +                       and attribute requires authorization. If no
-> Authorized
-> > +                       property is available along with characteristic
-> or this
-> > +                       property is set to true, then daemon don't send
-> empty
-> > +                       write request for authorization.
-
-> I guess we are missing the authorization flag, otherwise the daemon canno=
+> > diff --git a/client/gatt.c b/client/gatt.c
+> > index 6bf644c48..fffa86851 100644
+> > --- a/client/gatt.c
+> > +++ b/client/gatt.c
+> > @@ -1432,6 +1432,30 @@ static gboolean chrc_notify_acquired_exists(cons=
 t
-> tell if authorization is required on not, or we assume it is always
-> required if Authorized is set to false? In that case, we should make it
-If there is no authorization request then there is no property on client
-(chrc_get_authorized_exists checks for prop existence).
-There are 3 ways of handling this property:
-1) No property - means that writing behaves as before without issuing
-authorization request part, only gatt database asks for property existence.
-2) Property set to False - means that there is authorization request for
-preparing write this property, once authorized it sets to True
-3) Property set to True - means that write was previously authorized and
-any continous (offset > 0) write can be issued. If write will be issued
-with offset =3D 0, new authorization request will be required.
-> clearer in the documentation. Perhaps we should make the property state i=
-f
-> the authorization is required like boolean Authorization, if it is not
-> present it would be assumed to be false meaning authorization is not
-> required. We should also state how it affects the calls stating that a
-> prepare write would cause WriteValue to be called with empty data if
-> authorization is required, and perhaps we should attempt to call
-WriteValue
-> just once per procedure which means the authorization would be valid unti=
-l
-> execute, or we change the property to be string that can assume the
-values:
-> always, once, never. Btw, I don't think we can support Authorization with
-Every time write request will be issued with offset =3D 0 - application wil=
-l
-be asked for authorization - that was my assumption.
-> AcquireWrite since there is no reply to writes on the pipe, so we might a=
-s
-> well document that those properties cannot be used together.
-Right, I'll update it in next version.
-
-
-> >   Characteristic Descriptors hierarchy
-> >   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-> > diff --git a/src/gatt-database.c b/src/gatt-database.c
-> > index 0ac5b75b0..419db909c 100644
-> > --- a/src/gatt-database.c
-> > +++ b/src/gatt-database.c
-> > @@ -2614,6 +2614,12 @@ static void chrc_write_cb(struct
-gatt_db_attribute
-> *attrib,
-> >                  goto fail;
-> >          }
-
-> > +       if (offset && g_dbus_proxy_get_property(chrc->proxy,
-"Authorized",
-> > +                                                               &iter))
-{
-> > +               gatt_db_attribute_write_result(attrib, id, 0);
-> > +               return;
-> > +       }
-
-> What is the logic behind checking the offset? Is this check here because
-> the prepare writes are now passed up the stack? Afaik the offset can be
-set
-> to 0 even with prepare write which means we should check the opcode
-instead
-> which might be required for execute as well otherwise nothing that has
-> offset set will be ever written to the application.
-
-> >          if (chrc->write_io) {
-> >                  if (pipe_io_send(chrc->write_io, value, len) < 0) {
-> >                          error("Unable to write: %s", strerror(errno));
-> > diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> > index 4b554f665..cdade76f8 100644
-> > --- a/src/shared/gatt-server.c
-> > +++ b/src/shared/gatt-server.c
-> > @@ -1208,6 +1208,45 @@ static bool store_prep_data(struct bt_gatt_serve=
-r
-> *server,
-> >          return prep_data_new(server, handle, offset, length, value);
+> GDBusPropertyTable *property,
+> >          return FALSE;
 > >   }
 
-> > +struct prep_write_complete_data {
-> > +       void *pdu;
-> > +       uint16_t length;
-> > +       struct bt_gatt_server *server;
-> > +};
-> > +
-> > +static void prep_write_complete_cb(struct gatt_db_attribute *attr, int
-> err,
-> > +                                                               void
-> *user_data)
+> > +static gboolean chrc_get_authorized(const GDBusPropertyTable *property=
+,
+> > +                                       DBusMessageIter *iter, void
+*data)
 > > +{
-> > +       struct prep_write_complete_data *pwcd =3D user_data;
-> > +       uint16_t handle =3D 0;
-> > +       uint16_t offset;
+> > +       struct chrc *chrc =3D data;
+> > +       dbus_bool_t value;
 > > +
-> > +       handle =3D get_le16(pwcd->pdu);
+> > +       value =3D chrc->authorized ? TRUE : FALSE;
 > > +
-> > +       if (err) {
-> > +               bt_att_send_error_rsp(pwcd->server->att,
-> > +                                       BT_ATT_OP_PREP_WRITE_REQ,
-handle,
-> err);
-> > +               free(pwcd->pdu);
-> > +               free(pwcd);
+> > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value)=
+;
+> > +
+> > +       return TRUE;
+> > +}
+> > +
+> > +static gboolean chrc_get_authorized_exists(const GDBusPropertyTable
+> *property,
+> > +                                                               void
+> *data)
+> > +{
+> > +       struct chrc *chrc =3D data;
+> > +
+> > +       if (chrc->authorization_req)
+> > +               return TRUE;
+> > +
+> > +       return FALSE;
+> > +}
+> > +
+> >   static const GDBusPropertyTable chrc_properties[] =3D {
+> >          { "UUID", "s", chrc_get_uuid, NULL, NULL },
+> >          { "Service", "o", chrc_get_service, NULL, NULL },
+> > @@ -1442,6 +1466,8 @@ static const GDBusPropertyTable chrc_properties[]
+=3D
+> {
+> >                                          chrc_write_acquired_exists },
+> >          { "NotifyAcquired", "b", chrc_get_notify_acquired, NULL,
+> >                                          chrc_notify_acquired_exists },
+> > +       { "Authorized", "b", chrc_get_authorized, NULL,
+> > +
+> chrc_get_authorized_exists },
+> >          { }
+> >   };
+
+> > @@ -1665,6 +1691,15 @@ static void authorize_write_response(const char
+> *input, void *user_data)
+
+> >          chrc->authorized =3D true;
+
+> > +       /* Authorization check of prepare writes */
+> > +       if (!chrc->value_len) {
+> > +               reply =3D g_dbus_create_reply(pending_message,
+> DBUS_TYPE_INVALID);
+> > +               g_dbus_send_message(aad->conn, reply);
+> > +               g_free(aad);
 > > +
 > > +               return;
 > > +       }
 > > +
-> > +       offset =3D get_le16(pwcd->pdu + 2);
-> > +
-> > +       if (!store_prep_data(pwcd->server, handle, offset, pwcd->length
--
-> 4,
-> > +                                               &((uint8_t *)
-> pwcd->pdu)[4]))
-> > +               bt_att_send_error_rsp(pwcd->server->att,
-> > +                                       BT_ATT_OP_PREP_WRITE_RSP,
-handle,
-> > +
-> BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
-> > +
-> > +       bt_att_send(pwcd->server->att, BT_ATT_OP_PREP_WRITE_RSP,
-> pwcd->pdu,
-> > +                                               pwcd->length, NULL,
-NULL,
-> NULL);
-> > +
-> > +       free(pwcd->pdu);
-> > +       free(pwcd);
-> > +}
-> > +
-> >   static void prep_write_cb(uint8_t opcode, const void *pdu,
-> >                                          uint16_t length, void
-*user_data)
-> >   {
-> > @@ -1215,7 +1254,8 @@ static void prep_write_cb(uint8_t opcode, const
-> void *pdu,
-> >          uint16_t handle =3D 0;
-> >          uint16_t offset;
-> >          struct gatt_db_attribute *attr;
-> > -       uint8_t ecode;
-> > +       struct prep_write_complete_data *pwcd;
-> > +       uint8_t ecode, status;
+> >          errsv =3D parse_value_arg(&iter, &chrc->value, &chrc->value_le=
+n,
 
-> >          if (length < 4) {
-> >                  ecode =3D BT_ATT_ERROR_INVALID_PDU;
-> > @@ -1245,15 +1285,21 @@ static void prep_write_cb(uint8_t opcode, const
-> void *pdu,
-> >          if (ecode)
-> >                  goto error;
+> chrc->max_val_len);
+> >          if (errsv =3D=3D -EINVAL) {
+> > @@ -1701,8 +1736,16 @@ static DBusMessage
+> *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
+> >          DBusMessageIter iter;
+> >          char *str;
+> >          int errsv;
+> > +       uint16_t offset =3D 0;
 
-> > -       if (!store_prep_data(server, handle, offset, length - 4,
-> > -                                               &((uint8_t *) pdu)[4]))
-{
-> > -               ecode =3D BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
-> > -               goto error;
-> > -       }
-> > +       pwcd =3D new0(struct prep_write_complete_data, 1);
-> > +       pwcd->pdu =3D malloc(length);
-> > +       memcpy(pwcd->pdu, pdu, length);
-> > +       pwcd->length =3D length;
-> > +       pwcd->server =3D server;
-
-> > -       bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu, length,
-> NULL,
-> > -                                                               NULL,
-> NULL);
-> > -       return;
-> > +       status =3D gatt_db_attribute_write(attr, offset, NULL, 0,
+> >          dbus_message_iter_init(msg, &iter);
+> > +       /* Get offset only (second parameter) */
+> > +       dbus_message_iter_next(&iter);
 > > +
-BT_ATT_OP_PREP_WRITE_REQ,
-> > +                                               server->att,
-> > +                                               prep_write_complete_cb,
-> pwcd);
-> > +       if (status)
-> > +               return;
+> > +       parse_options(&iter, &offset, NULL, NULL, NULL);
 > > +
-> > +       ecode =3D BT_ATT_ERROR_UNLIKELY;
+> > +       if (chrc->authorization_req && offset =3D=3D 0)
+> > +               chrc->authorized =3D false;
 
-> >   error:
-> >          bt_att_send_error_rsp(server->att, opcode, handle, ecode);
+> >          if (chrc->authorization_req && !chrc->authorized) {
+> >                  struct authorize_attribute_data *aad;
+> > @@ -1722,6 +1765,9 @@ static DBusMessage
+*chrc_write_value(DBusConnection
+> *conn, DBusMessage *msg,
+> >                  return NULL;
+> >          }
+
+> > +       /* Rewind to value parameter */
+> > +       dbus_message_iter_init(msg, &iter);
+
+> I would prefer to make parse_value_arg parse the offset as well so we
+don't
+> have to reinit the iter.
+Current version of bluetoothctl already parsses offset in parse_value_arg
+for writing value purposes (patch 1dd33d584ce1e4bd0f1d87e88663350a80f37f01)=
+.
+
+As the offset is second parameter for write method it's needed (afaik) to
+recurse over iterator to offset parameter then parse value (there is no
+need to parse value at beginnig). Currently this implementation assumes
+that every write request with offset =3D 0 is new write request which has t=
+o
+be authoriez/re-authorized.
+
+> >          errsv =3D parse_value_arg(&iter, &chrc->value, &chrc->value_le=
+n,
+
+> chrc->max_val_len);
+> >          if (errsv =3D=3D -EINVAL) {
 > > --
 > > 2.13.6
 
