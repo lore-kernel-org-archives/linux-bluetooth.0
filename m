@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 6/9] monitor: Add support for Transport Discovery AD
-Date: Wed,  2 May 2018 12:24:39 +0300
-Message-Id: <20180502092442.10567-6-luiz.dentz@gmail.com>
+Subject: [PATCH v2 5/9] advertising: Add Data implementation
+Date: Wed,  2 May 2018 12:24:38 +0300
+Message-Id: <20180502092442.10567-5-luiz.dentz@gmail.com>
 In-Reply-To: <20180502092442.10567-1-luiz.dentz@gmail.com>
 References: <20180502092442.10567-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,103 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for decoding Transport Discovery Data:
-
-@ MGMT Command: Add Advertising (0x003e) plen 16
-        Instance: 1
-        Flags: 0x00000001
-          Switch into Connectable mode
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 5
-        Transport Discovery Data
-          Organization: Bluetooth SIG (0x01)
-          Flags: 0x01
-            Role: 0x01
-              Seeker Only
-            Transport Data Incomplete: False (0x00)
-            Transport State: 0x00
-              Off
-          Length: 0
-          Data:
-        Scan response length: 0
+This adds the support for Data property.
 ---
- monitor/packet.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ src/advertising.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b800a2d75..c00e9efa4 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -3545,6 +3545,57 @@ static void print_mesh_data(const uint8_t *data, uint8_t len)
- 	packet_hexdump(data + 1, len - 1);
+diff --git a/src/advertising.c b/src/advertising.c
+index 0cb6eac3a..441d0a235 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -583,6 +583,64 @@ static bool parse_timeout(DBusMessageIter *iter,
+ 	return true;
  }
  
-+static void print_transport_data(const uint8_t *data, uint8_t len)
++static bool parse_data(DBusMessageIter *iter, struct btd_adv_client *client)
 +{
-+	print_field("Transport Discovery Data");
++	DBusMessageIter entries;
 +
-+	if (len < 3)
-+		return;
-+
-+	print_field("  Organization: %s (0x%02x)",
-+			data[0] == 0x01 ? "Bluetooth SIG" : "RFU", data[0]);
-+	print_field("  Flags: 0x%2.2x", data[1]);
-+	print_field("    Role: 0x%2.2x", data[1] & 0x03);
-+
-+	switch (data[1] & 0x03) {
-+	case 0x00:
-+		print_field("      Not Specified");
-+		break;
-+	case 0x01:
-+		print_field("      Seeker Only");
-+		break;
-+	case 0x02:
-+		print_field("      Provider Only");
-+		break;
-+	case 0x03:
-+		print_field("      Both Seeker an Provider");
-+		break;
++	if (!iter) {
++		bt_ad_clear_data(client->data);
++		return true;
 +	}
 +
-+	print_field("    Transport Data Incomplete: %s (0x%2.2x)",
-+			data[1] & 0x04 ? "True" : "False", data[1] & 0x04);
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
++		return false;
 +
-+	print_field("    Transport State: 0x%2.2x", data[1] & 0x18);
++	dbus_message_iter_recurse(iter, &entries);
 +
-+	switch (data[1] & 0x18) {
-+	case 0x00:
-+		print_field("      Off");
-+		break;
-+	case 0x08:
-+		print_field("      On");
-+		break;
-+	case 0x10:
-+		print_field("      Temporary Unavailable");
-+		break;
-+	case 0x18:
-+		print_field("      RFU");
-+		break;
++	bt_ad_clear_data(client->data);
++
++	while (dbus_message_iter_get_arg_type(&entries)
++						== DBUS_TYPE_DICT_ENTRY) {
++		DBusMessageIter value, entry, array;
++		uint8_t type;
++		uint8_t *data;
++		int len;
++
++		dbus_message_iter_recurse(&entries, &entry);
++		dbus_message_iter_get_basic(&entry, &type);
++
++		dbus_message_iter_next(&entry);
++
++		if (dbus_message_iter_get_arg_type(&entry) != DBUS_TYPE_VARIANT)
++			goto fail;
++
++		dbus_message_iter_recurse(&entry, &value);
++
++		if (dbus_message_iter_get_arg_type(&value) != DBUS_TYPE_ARRAY)
++			goto fail;
++
++		dbus_message_iter_recurse(&value, &array);
++
++		if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_BYTE)
++			goto fail;
++
++		dbus_message_iter_get_fixed_array(&array, &data, &len);
++
++		DBG("Adding Data for type 0x%02x len %u", type, len);
++
++		if (!bt_ad_add_data(client->data, type, data, len))
++			goto fail;
++
++		dbus_message_iter_next(&entries);
 +	}
 +
-+	print_field("  Length: %u", data[2]);
-+	print_hex_field("  Data", data + 3, len - 3);
++	return true;
++
++fail:
++	bt_ad_clear_data(client->data);
++	return false;
 +}
 +
- static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
- {
- 	uint16_t len = 0;
-@@ -3744,6 +3795,10 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
- 			print_randomizer_p256(data);
- 			break;
+ static struct adv_parser {
+ 	const char *name;
+ 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
+@@ -597,6 +655,7 @@ static struct adv_parser {
+ 	{ "Appearance", parse_appearance },
+ 	{ "Duration", parse_duration },
+ 	{ "Timeout", parse_timeout },
++	{ "Data", parse_data },
+ 	{ },
+ };
  
-+		case BT_EIR_TRANSPORT_DISCOVERY:
-+			print_transport_data(data, data_len);
-+			break;
-+
- 		case BT_EIR_3D_INFO_DATA:
- 			print_hex_field("3D Information Data", data, data_len);
- 			if (data_len < 2)
 -- 
 2.14.3
 
