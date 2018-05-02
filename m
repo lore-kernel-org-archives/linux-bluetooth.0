@@ -1,164 +1,105 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <20180502091757.24190-1-grzegorz.kolodziejczyk@codecoup.pl>
- <20180502091757.24190-3-grzegorz.kolodziejczyk@codecoup.pl> <CABBYNZJVwKdAKPGxgOE_48=2zLvETe8oirr8w56Su5PrUh1eyA@mail.gmail.com>
-In-Reply-To: <CABBYNZJVwKdAKPGxgOE_48=2zLvETe8oirr8w56Su5PrUh1eyA@mail.gmail.com>
-From: =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?=
-        <grzegorz.kolodziejczyk@codecoup.pl>
-Date: Wed, 02 May 2018 13:06:35 +0000
-Message-ID: <CALevQMaqsR3YLmCWC66LNS6Avsd6eFF5sfqGZQWJ0yNHUgR1Aw@mail.gmail.com>
-Subject: Re: [RFC 2/2] client: Add authorized property handling to
- characteristic attribute
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+References: <1525248985-10990-1-git-send-email-nagaraj.dr@samsung.com>
+ <CGME20180502081635epcas2p170eb2b4ed9336425921119b66e554fef@epcms5p6>
+ <CABBYNZ++cdKY256edfNkMU6tsaccRrqg6eN9scdTK5m8t2Okxw@mail.gmail.com> <20180502121827epcms5p6a7927635ac30d7f3cacb0e1d9ccfe467@epcms5p6>
+In-Reply-To: <20180502121827epcms5p6a7927635ac30d7f3cacb0e1d9ccfe467@epcms5p6>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 02 May 2018 12:41:38 +0000
+Message-ID: <CABBYNZKNy2jV3YhPB0+1GC0OuDimgQ8XRRwC_i9PCNQEm354EA@mail.gmail.com>
+Subject: Re: Re: [PATCH] src/device.c : Fix BREDR-ATT MTU issue
+To: nagaraj.dr@samsung.com
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Syam Sidhardhan <s.syam@samsung.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-=C5=9Br., 2 maj 2018 o 12:42 Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-napisa=C5=82(a):
+Hi Nagaraj,
+On Wed, May 2, 2018 at 3:18 PM Nagaraj D R <nagaraj.dr@samsung.com> wrote:
 
-> Hi Grzegorz,
-> On Wed, May 2, 2018 at 1:09 PM Grzegorz Kolodziejczyk <
-> grzegorz.kolodziejczyk@codecoup.pl> wrote:
+> Hello Luiz
 
-> > This patch adds handling of authorized property to bluetoothctl.
-> > ---
-> >   client/gatt.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 46 insertions(+)
+> Sender : Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> >Hi Nagaraj,
+> >On Wed, May 2, 2018 at 11:40 AM Nagaraj D R <nagaraj.dr@samsung.com>
+wrote:
 
-> > diff --git a/client/gatt.c b/client/gatt.c
-> > index 6bf644c48..fffa86851 100644
-> > --- a/client/gatt.c
-> > +++ b/client/gatt.c
-> > @@ -1432,6 +1432,30 @@ static gboolean chrc_notify_acquired_exists(cons=
-t
-> GDBusPropertyTable *property,
-> >          return FALSE;
-> >   }
+> >> For BREDR-ATT, according to spec, ATT MTU is same has
+> >> L2CAP configured MTU on which ATT is running. So, set the MTU to
+> >> L2CAP configuration and for LE-ATT adjust the ATT MTU based on
+> >> EXCHANGE_MTU request and response.
+> >> ---
+> >>   src/device.c              | 2 +-
+> >>   src/shared/gatt-helpers.c | 1 +
+> >>   2 files changed, 2 insertions(+), 1 deletion(-)
 
-> > +static gboolean chrc_get_authorized(const GDBusPropertyTable *property=
-,
-> > +                                       DBusMessageIter *iter, void
-*data)
-> > +{
-> > +       struct chrc *chrc =3D data;
-> > +       dbus_bool_t value;
-> > +
-> > +       value =3D chrc->authorized ? TRUE : FALSE;
-> > +
-> > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &value)=
-;
-> > +
-> > +       return TRUE;
-> > +}
-> > +
-> > +static gboolean chrc_get_authorized_exists(const GDBusPropertyTable
-> *property,
-> > +                                                               void
-> *data)
-> > +{
-> > +       struct chrc *chrc =3D data;
-> > +
-> > +       if (chrc->authorization_req)
-> > +               return TRUE;
-> > +
-> > +       return FALSE;
-> > +}
-> > +
-> >   static const GDBusPropertyTable chrc_properties[] =3D {
-> >          { "UUID", "s", chrc_get_uuid, NULL, NULL },
-> >          { "Service", "o", chrc_get_service, NULL, NULL },
-> > @@ -1442,6 +1466,8 @@ static const GDBusPropertyTable chrc_properties[]
-=3D
-> {
-> >                                          chrc_write_acquired_exists },
-> >          { "NotifyAcquired", "b", chrc_get_notify_acquired, NULL,
-> >                                          chrc_notify_acquired_exists },
-> > +       { "Authorized", "b", chrc_get_authorized, NULL,
-> > +
-> chrc_get_authorized_exists },
-> >          { }
-> >   };
+> >> diff --git a/src/device.c b/src/device.c
+> >> index f693b70..cf4c8df 100644
+> >> --- a/src/device.c
+> >> +++ b/src/device.c
+> >> @@ -4922,7 +4922,7 @@ bool device_attach_att(struct btd_device *dev,
+> GIOChannel *io)
+> >>          }
 
-> > @@ -1665,6 +1691,15 @@ static void authorize_write_response(const char
-> *input, void *user_data)
+> >>          dev->att_mtu = MIN(mtu, BT_ATT_MAX_LE_MTU);
+> >> -       attrib = g_attrib_new(io, BT_ATT_DEFAULT_LE_MTU, false);
+> >> +       attrib = g_attrib_new(io, dev->att_mtu, false);
 
-> >          chrc->authorized =3D true;
+> >This would actually undo the following patch:
 
-> > +       /* Authorization check of prepare writes */
-> > +       if (!chrc->value_len) {
-> > +               reply =3D g_dbus_create_reply(pending_message,
-> DBUS_TYPE_INVALID);
-> > +               g_dbus_send_message(aad->conn, reply);
-> > +               g_free(aad);
-> > +
-> > +               return;
-> > +       }
-> > +
-> >          errsv =3D parse_value_arg(&iter, &chrc->value, &chrc->value_le=
-n,
+> >     src/device: Use BT_ATT_DEFAULT_LE_MTU as default MTU
 
-> chrc->max_val_len);
-> >          if (errsv =3D=3D -EINVAL) {
-> > @@ -1701,8 +1736,16 @@ static DBusMessage
-> *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
-> >          DBusMessageIter iter;
-> >          char *str;
-> >          int errsv;
-> > +       uint16_t offset =3D 0;
+> >   Use the default MTU until an MTU exchange has taken place and
+> >     something else has been negotiated. If either side does not support
+> >    MTU exchange, the connection shall continue to use this default
+> >     value instead of the device maximum which was the previous behavior.
 
-> >          dbus_message_iter_init(msg, &iter);
-> > +       /* Get offset only (second parameter) */
-> > +       dbus_message_iter_next(&iter);
-> > +
-> > +       parse_options(&iter, &offset, NULL, NULL, NULL);
-> > +
-> > +       if (chrc->authorization_req && offset =3D=3D 0)
-> > +               chrc->authorized =3D false;
+> >We should probably check if the cid is for LE or not and reset mtu to
+> >BT_ATT_DEFAULT_LE_MTU that way att_mtu should be valid for either LE or
+> >BR/EDR.
 
-> >          if (chrc->authorization_req && !chrc->authorized) {
-> >                  struct authorize_attribute_data *aad;
-> > @@ -1722,6 +1765,9 @@ static DBusMessage
-*chrc_write_value(DBusConnection
-> *conn, DBusMessage *msg,
-> >                  return NULL;
-> >          }
+> I agree, we should check for CID.
+> If it is BREDR-ATT connection only then consider L2CAP MTU otherwise
+> set the MTU to min value and set it through ATT_MTU exchange.
 
-> > +       /* Rewind to value parameter */
-> > +       dbus_message_iter_init(msg, &iter);
+> >>          if (!attrib) {
+> >>                  error("Unable to create new GAttrib instance");
+> >>                  return false;
+> >> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> >> index 6b39bb1..8ec65be 100644
+> >> --- a/src/shared/gatt-helpers.c
+> >> +++ b/src/shared/gatt-helpers.c
+> >> @@ -517,6 +517,7 @@ static void mtu_cb(uint8_t opcode, const void *pdu,
+> uint16_t length,
+> >>          if (opcode == BT_ATT_OP_ERROR_RSP) {
+> >>                  success = false;
+> >>                  att_ecode = process_error(pdu, length);
+> >> +               bt_att_set_mtu(op->att, BT_ATT_DEFAULT_LE_MTU);
 
-> I would prefer to make parse_value_arg parse the offset as well so we
-don't
-> have to reinit the iter.
-Current version of bluetoothctl already parsses offset in parse_value_arg
-for writing value purposes (patch 1dd33d584ce1e4bd0f1d87e88663350a80f37f01)=
-.
+> >I not following this one, we only really use bt_att_set_mtu if the
+command
+> >succeeds so this should not be necessary, or this is due Exchange being
+> >used multiple times? I recall the spec not allowing that to happen, and
+if
+> >does Im not sure why we would have to return to the default instead of
+the
+> >value previously set in case the of error response.
 
-As the offset is second parameter for write method it's needed (afaik) to
-recurse over iterator to offset parameter then parse value (there is no
-need to parse value at beginnig). Currently this implementation assumes
-that every write request with offset =3D 0 is new write request which has t=
-o
-be authoriez/re-authorized.
+> This change was in connection with my proposed change.
+> i.e We set the MTU to L2CAP-MTU (for both LE-ATT and BREDR-ATT)
+> In case of LE-ATT, if remote does not support the ATT-MTU exchange
+procedure,
+> then it will return "BT_ATT_OP_ERROR_RSP" and we will fall back to
+default-MTU
 
-> >          errsv =3D parse_value_arg(&iter, &chrc->value, &chrc->value_le=
-n,
+> With CID check that you advised, this change won't be necessary.
 
-> chrc->max_val_len);
-> >          if (errsv =3D=3D -EINVAL) {
-> > --
-> > 2.13.6
-
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Ok now it is clear, so I suppose you will be sending a v2 shortly?
 
 
 
-> --
-> Luiz Augusto von Dentz
-Grzegorz Ko=C5=82odziejczyk
+
+
+-- 
+Luiz Augusto von Dentz
