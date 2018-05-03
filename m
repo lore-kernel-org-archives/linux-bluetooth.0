@@ -1,287 +1,484 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <20180502091757.24190-1-grzegorz.kolodziejczyk@codecoup.pl>
- <20180502091757.24190-2-grzegorz.kolodziejczyk@codecoup.pl>
- <CABBYNZKbHnKF_GbFq3qQpzjtb0s-EwdR=9RwMb34r-T7D0kT+Q@mail.gmail.com> <CALevQMa0KqNd46MBuL6PPTUodXrWOyC4U_J-xgv-KQ1CBNH3HQ@mail.gmail.com>
-In-Reply-To: <CALevQMa0KqNd46MBuL6PPTUodXrWOyC4U_J-xgv-KQ1CBNH3HQ@mail.gmail.com>
+References: <20180502092442.10567-1-luiz.dentz@gmail.com>
+In-Reply-To: <20180502092442.10567-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 03 May 2018 09:54:25 +0000
-Message-ID: <CABBYNZKEgmGppXhSZgumquvxR9-wNOBhKGa6x96Hts_Z-SMu=Q@mail.gmail.com>
-Subject: Re: [RFC 1/2] shared/gatt-server: Request authorization for prepare writes.
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 03 May 2018 05:39:41 +0000
+Message-ID: <CABBYNZKQZTkL-bwzNcEVSQLXJi5sm_at4aLiswqgGXT4_nNh4g@mail.gmail.com>
+Subject: Re: [PATCH v2 1/9] shared/ad: Add support for arbritary type
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
-On Wed, May 2, 2018 at 4:31 PM Grzegorz Ko=C5=82odziejczyk <
-grzegorz.kolodziejczyk@codecoup.pl> wrote:
+Hi,
+On Wed, May 2, 2018 at 12:24 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com>
+wrote:
 
-> Hi Luiz,
-> =C5=9Br., 2 maj 2018 o 13:33 Luiz Augusto von Dentz <luiz.dentz@gmail.com=
->
-> napisa=C5=82(a):
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> > Hi Grzegorz,
-> > On Wed, May 2, 2018 at 1:09 PM Grzegorz Kolodziejczyk <
-> > grzegorz.kolodziejczyk@codecoup.pl> wrote:
+> This adds APIs to include data of arbritary type as long as it is not
+> of a type which blacklisted due to being handled already or it is
+> considered to safe to be set by an application.
+> ---
+>   src/shared/ad.c | 231
+++++++++++++++++++++++++++++++++++++++++++++++++++++----
+>   src/shared/ad.h |  60 +++++++++++++++
+>   2 files changed, 278 insertions(+), 13 deletions(-)
 
-> > > This patch adds gatt-server possibility to request authorization from
-> > > application if needed and previously wasn't authorized. Authorization
-is
-> > > requested by sending write request with no data to application.
-> > > ---
-> > >   doc/gatt-api.txt         |  8 ++++++
-> > >   src/gatt-database.c      |  6 +++++
-> > >   src/shared/gatt-server.c | 64
-> > +++++++++++++++++++++++++++++++++++++++++-------
-> > >   3 files changed, 69 insertions(+), 9 deletions(-)
+> diff --git a/src/shared/ad.c b/src/shared/ad.c
+> index 255794dc4..f0e62cef1 100644
+> --- a/src/shared/ad.c
+> +++ b/src/shared/ad.c
+> @@ -37,6 +37,7 @@ struct bt_ad {
+>          struct queue *manufacturer_data;
+>          struct queue *solicit_uuids;
+>          struct queue *service_data;
+> +       struct queue *data;
+>   };
 
-> > > diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> > > index 0f1cc9029..b9bdc9352 100644
-> > > --- a/doc/gatt-api.txt
-> > > +++ b/doc/gatt-api.txt
-> > > @@ -251,6 +251,14 @@ Properties string UUID [read-only]
-> > >                                  "secure-read" (Server only)
-> > >                                  "secure-write" (Server only)
+>   struct bt_ad *bt_ad_new(void)
+> @@ -48,6 +49,7 @@ struct bt_ad *bt_ad_new(void)
+>          ad->manufacturer_data = queue_new();
+>          ad->solicit_uuids = queue_new();
+>          ad->service_data = queue_new();
+> +       ad->data = queue_new();
+>          ad->appearance = UINT16_MAX;
 
-> > Documentation changes should be split in a different patch.
+>          return bt_ad_ref(ad);
+> @@ -94,6 +96,14 @@ static bool manuf_match(const void *data, const void
+*elem)
+>          return manuf->manufacturer_id == manuf_id;
+>   }
 
-> > > +               boolean Authorized [read-only, optional] (Server only=
-)
-> > > +
-> > > +                       True, if read/write operation was previously
-> > authorized
-> > > +                       and attribute requires authorization. If no
-> > Authorized
-> > > +                       property is available along with
-characteristic
-> > or this
-> > > +                       property is set to true, then daemon don't
-send
-> > empty
-> > > +                       write request for authorization.
+> +static void data_destroy(void *data)
+> +{
+> +       struct bt_ad_data *ad = data;
+> +
+> +       free(ad->data);
+> +       free(ad);
+> +}
+> +
+>   void bt_ad_unref(struct bt_ad *ad)
+>   {
+>          if (!ad)
+> @@ -110,6 +120,8 @@ void bt_ad_unref(struct bt_ad *ad)
 
-> > I guess we are missing the authorization flag, otherwise the daemon
-cannot
-> > tell if authorization is required on not, or we assume it is always
-> > required if Authorized is set to false? In that case, we should make it
-> If there is no authorization request then there is no property on client
-> (chrc_get_authorized_exists checks for prop existence).
-> There are 3 ways of handling this property:
-> 1) No property - means that writing behaves as before without issuing
-> authorization request part, only gatt database asks for property
-existence.
-> 2) Property set to False - means that there is authorization request for
-> preparing write this property, once authorized it sets to True
-> 3) Property set to True - means that write was previously authorized and
-> any continous (offset > 0) write can be issued. If write will be issued
-> with offset =3D 0, new authorization request will be required.
+>          queue_destroy(ad->service_data, uuid_destroy);
 
-I don't quite follow why we want the property to transit states? Ins't it
-simpler to just check the reply of WriteValue and then just continue?
+> +       queue_destroy(ad->data, data_destroy);
+> +
+>          free(ad->name);
 
-> > clearer in the documentation. Perhaps we should make the property state
-if
-> > the authorization is required like boolean Authorization, if it is not
-> > present it would be assumed to be false meaning authorization is not
-> > required. We should also state how it affects the calls stating that a
-> > prepare write would cause WriteValue to be called with empty data if
-> > authorization is required, and perhaps we should attempt to call
-> WriteValue
-> > just once per procedure which means the authorization would be valid
-until
-> > execute, or we change the property to be string that can assume the
-> values:
-> > always, once, never. Btw, I don't think we can support Authorization
-with
-> Every time write request will be issued with offset =3D 0 - application w=
-ill
-> be asked for authorization - that was my assumption.
-> > AcquireWrite since there is no reply to writes on the pipe, so we might
-as
-> > well document that those properties cannot be used together.
-> Right, I'll update it in next version.
+>          free(ad);
+> @@ -203,6 +215,24 @@ static size_t name_length(const char *name, size_t
+*pos)
+>          return len;
+>   }
 
-Did you actually read about the suggestion above, I guess that will get us
-the same result without the application having to change the value of the
-property, which btw I don't think works with concurrent devices since
-Authorized would mean it is authorized for every device while we should
-track the authorization per prepare write.
+> +static size_t data_length(struct queue *queue)
+> +{
+> +       size_t length = 0;
+> +       const struct queue_entry *entry;
+> +
+> +       entry = queue_get_entries(queue);
+> +
+> +       while (entry) {
+> +               struct bt_ad_data *data = entry->data;
+> +
+> +               length += 1 + 1 + data->len;
+> +
+> +               entry = entry->next;
+> +       }
+> +
+> +       return length;
+> +}
+> +
+>   static size_t calculate_length(struct bt_ad *ad)
+>   {
+>          size_t length = 0;
+> @@ -219,6 +249,8 @@ static size_t calculate_length(struct bt_ad *ad)
+
+>          length += ad->appearance != UINT16_MAX ? 4 : 0;
+
+> +       length += data_length(ad->data);
+> +
+>          return length;
+>   }
+
+> @@ -258,21 +290,21 @@ static void serialize_uuids(struct queue *uuids,
+uint8_t uuid_type,
+>   static void serialize_service_uuids(struct queue *uuids, uint8_t *buf,
+>                                                                  uint8_t
+*pos)
+>   {
+> -       serialize_uuids(uuids, BT_UUID16, EIR_UUID16_ALL, buf, pos);
+> +       serialize_uuids(uuids, BT_UUID16, BT_AD_UUID16_ALL, buf, pos);
+
+> -       serialize_uuids(uuids, BT_UUID32, EIR_UUID32_ALL, buf, pos);
+> +       serialize_uuids(uuids, BT_UUID32, BT_AD_UUID32_ALL, buf, pos);
+
+> -       serialize_uuids(uuids, BT_UUID128, EIR_UUID128_ALL, buf, pos);
+> +       serialize_uuids(uuids, BT_UUID128, BT_AD_UUID128_ALL, buf, pos);
+>   }
+
+>   static void serialize_solicit_uuids(struct queue *uuids, uint8_t *buf,
+>                                                                  uint8_t
+*pos)
+>   {
+> -       serialize_uuids(uuids, BT_UUID16, EIR_SOLICIT16, buf, pos);
+> +       serialize_uuids(uuids, BT_UUID16, BT_AD_SOLICIT16, buf, pos);
+
+> -       serialize_uuids(uuids, BT_UUID32, EIR_SOLICIT32, buf, pos);
+> +       serialize_uuids(uuids, BT_UUID32, BT_AD_SOLICIT32, buf, pos);
+
+> -       serialize_uuids(uuids, BT_UUID128, EIR_SOLICIT128, buf, pos);
+> +       serialize_uuids(uuids, BT_UUID128, BT_AD_SOLICIT128, buf, pos);
+>   }
+
+>   static void serialize_manuf_data(struct queue *manuf_data, uint8_t *buf,
+> @@ -285,7 +317,7 @@ static void serialize_manuf_data(struct queue
+*manuf_data, uint8_t *buf,
+
+>                  buf[(*pos)++] = data->len + 2 + 1;
+
+> -               buf[(*pos)++] = EIR_MANUFACTURER_DATA;
+> +               buf[(*pos)++] = BT_AD_MANUFACTURER_DATA;
+
+>                  bt_put_le16(data->manufacturer_id, buf + (*pos));
+
+> @@ -312,13 +344,13 @@ static void serialize_service_data(struct queue
+*service_data, uint8_t *buf,
+
+>                  switch (uuid_len) {
+>                  case 2:
+> -                       buf[(*pos)++] = EIR_SVC_DATA16;
+> +                       buf[(*pos)++] = BT_AD_SERVICE_DATA16;
+>                          break;
+>                  case 4:
+> -                       buf[(*pos)++] = EIR_SVC_DATA32;
+> +                       buf[(*pos)++] = BT_AD_SERVICE_DATA32;
+>                          break;
+>                  case 16:
+> -                       buf[(*pos)++] = EIR_SVC_DATA128;
+> +                       buf[(*pos)++] = BT_AD_SERVICE_DATA128;
+>                          break;
+>                  }
+
+> @@ -340,14 +372,14 @@ static void serialize_service_data(struct queue
+*service_data, uint8_t *buf,
+>   static void serialize_name(const char *name, uint8_t *buf, uint8_t *pos)
+>   {
+>          int len;
+> -       uint8_t type = EIR_NAME_COMPLETE;
+> +       uint8_t type = BT_AD_NAME_COMPLETE;
+
+>          if (!name)
+>                  return;
+
+>          len = strlen(name);
+>          if (len > MAX_ADV_DATA_LEN - (*pos + 2)) {
+> -               type = EIR_NAME_SHORT;
+> +               type = BT_AD_NAME_SHORT;
+>                  len = MAX_ADV_DATA_LEN - (*pos + 2);
+>          }
+
+> @@ -364,12 +396,30 @@ static void serialize_appearance(uint16_t value,
+uint8_t *buf, uint8_t *pos)
+>                  return;
+
+>          buf[(*pos)++] = sizeof(value) + 1;
+> -       buf[(*pos)++] = EIR_GAP_APPEARANCE;
+> +       buf[(*pos)++] = BT_AD_GAP_APPEARANCE;
+
+>          bt_put_le16(value, buf + (*pos));
+>          *pos += 2;
+>   }
+
+> +static void serialize_data(struct queue *queue, uint8_t *buf, uint8_t
+*pos)
+> +{
+> +       const struct queue_entry *entry = queue_get_entries(queue);
+> +
+> +       while (entry) {
+> +               struct bt_ad_data *data = entry->data;
+> +
+> +               buf[(*pos)++] = data->len + 1;
+> +               buf[(*pos)++] = data->type;
+> +
+> +               memcpy(buf + *pos, data->data, data->len);
+> +
+> +               *pos += data->len;
+> +
+> +               entry = entry->next;
+> +       }
+> +}
+> +
+>   uint8_t *bt_ad_generate(struct bt_ad *ad, size_t *length)
+>   {
+>          uint8_t *adv_data;
+> @@ -399,6 +449,8 @@ uint8_t *bt_ad_generate(struct bt_ad *ad, size_t
+*length)
+
+>          serialize_appearance(ad->appearance, adv_data, &pos);
+
+> +       serialize_data(ad->data, adv_data, &pos);
+> +
+>          return adv_data;
+>   }
+
+> @@ -756,3 +808,156 @@ void bt_ad_clear_appearance(struct bt_ad *ad)
+
+>          ad->appearance = UINT16_MAX;
+>   }
+> +
+> +static bool data_type_match(const void *data, const void *user_data)
+> +{
+> +       const struct bt_ad_data *a = data;
+> +       const uint8_t type = PTR_TO_UINT(user_data);
+> +
+> +       return a->type == type;
+> +}
+> +
+> +static uint8_t type_blacklist[] = {
+> +       BT_AD_FLAGS,
+> +       BT_AD_UUID16_SOME,
+> +       BT_AD_UUID16_ALL,
+> +       BT_AD_UUID32_SOME,
+> +       BT_AD_UUID32_ALL,
+> +       BT_AD_UUID128_SOME,
+> +       BT_AD_UUID128_ALL,
+> +       BT_AD_NAME_SHORT,
+> +       BT_AD_NAME_COMPLETE,
+> +       BT_AD_TX_POWER,
+> +       BT_AD_CLASS_OF_DEV,
+> +       BT_AD_SSP_HASH,
+> +       BT_AD_SSP_RANDOMIZER,
+> +       BT_AD_DEVICE_ID,
+> +       BT_AD_SMP_TK,
+> +       BT_AD_SMP_OOB_FLAGS,
+> +       BT_AD_SLAVE_CONN_INTERVAL,
+> +       BT_AD_SOLICIT16,
+> +       BT_AD_SOLICIT128,
+> +       BT_AD_SERVICE_DATA16,
+> +       BT_AD_PUBLIC_ADDRESS,
+> +       BT_AD_RANDOM_ADDRESS,
+> +       BT_AD_GAP_APPEARANCE,
+> +       BT_AD_ADVERTISING_INTERVAL,
+> +       BT_AD_LE_DEVICE_ADDRESS,
+> +       BT_AD_LE_ROLE,
+> +       BT_AD_SSP_HASH_P256,
+> +       BT_AD_SSP_RANDOMIZER_P256,
+> +       BT_AD_SOLICIT32,
+> +       BT_AD_SERVICE_DATA32,
+> +       BT_AD_SERVICE_DATA128,
+> +       BT_AD_LE_SC_CONFIRM_VALUE,
+> +       BT_AD_LE_SC_RANDOM_VALUE,
+> +       BT_AD_LE_SUPPORTED_FEATURES,
+> +       BT_AD_CHANNEL_MAP_UPDATE_IND,
+> +       BT_AD_MESH_PROV,
+> +       BT_AD_MESH_DATA,
+> +       BT_AD_MESH_BEACON,
+> +       BT_AD_3D_INFO_DATA,
+> +       BT_AD_MANUFACTURER_DATA,
+> +};
+> +
+> +bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t
+len)
+> +{
+> +       struct bt_ad_data *new_data;
+> +       size_t i;
+> +
+> +       if (!ad)
+> +               return false;
+> +
+> +       if (len > (MAX_ADV_DATA_LEN - 2))
+> +               return false;
+> +
+> +       new_data = queue_find(ad->data, data_type_match,
+UINT_TO_PTR(type));
+> +       if (new_data) {
+> +               if (new_data->len == len && !memcmp(new_data->data, data,
+len))
+> +                       return false;
+> +               new_data->data = realloc(new_data->data, len);
+> +               memcpy(new_data->data, data, len);
+> +               new_data->len = len;
+> +               return true;
+> +       }
+> +
+> +       for (i = 0; i < sizeof(type_blacklist); i++) {
+> +               if (type == type_blacklist[i])
+> +                       return false;
+> +       }
+> +
+> +       new_data = new0(struct bt_ad_data, 1);
+> +       new_data->type = type;
+> +       new_data->data = malloc(len);
+> +       if (!new_data->data) {
+> +               free(new_data);
+> +               return false;
+> +       }
+> +
+> +       memcpy(new_data->data, data, len);
+> +       new_data->len = len;
+> +
+> +       if (queue_push_tail(ad->data, new_data))
+> +               return true;
+> +
+> +       data_destroy(new_data);
+> +
+> +       return false;
+> +}
+> +
+> +static bool data_match(const void *data, const void *user_data)
+> +{
+> +       const struct bt_ad_data *d1 = data;
+> +       const struct bt_ad_data *d2 = user_data;
+> +
+> +       if (d1->type != d2->type)
+> +               return false;
+> +
+> +       if (d1->len != d2->len)
+> +               return false;
+> +
+> +       return !memcmp(d1->data, d2->data, d1->len);
+> +}
+> +
+> +bool bt_ad_has_data(struct bt_ad *ad, const struct bt_ad_data *data)
+> +{
+> +       if (!ad)
+> +               return false;
+> +
+> +       if (!data)
+> +               return !queue_isempty(ad->data);
+> +
+> +       return queue_find(ad->data, data_match, data);
+> +}
+> +
+> +void bt_ad_foreach_data(struct bt_ad *ad, bt_ad_func_t func, void
+*user_data)
+> +{
+> +       if (!ad)
+> +               return;
+> +
+> +       queue_foreach(ad->data, func, user_data);
+> +}
+> +
+> +bool bt_ad_remove_data(struct bt_ad *ad, uint8_t type)
+> +{
+> +       struct bt_ad_data *data;
+> +
+> +       if (!ad)
+> +               return false;
+> +
+> +       data = queue_remove_if(ad->data, data_type_match,
+UINT_TO_PTR(type));
+> +       if (!data)
+> +               return false;
+> +
+> +       data_destroy(data);
+> +
+> +       return true;
+> +}
+> +
+> +void bt_ad_clear_data(struct bt_ad *ad)
+> +{
+> +       if (!ad)
+> +               return;
+> +
+> +       queue_remove_all(ad->data, NULL, NULL, data_destroy);
+> +}
+> diff --git a/src/shared/ad.h b/src/shared/ad.h
+> index f0e3b8127..8d705323b 100644
+> --- a/src/shared/ad.h
+> +++ b/src/shared/ad.h
+> @@ -27,6 +27,50 @@
+>   #include "lib/bluetooth.h"
+>   #include "lib/uuid.h"
+
+> +#define BT_AD_FLAGS                    0x01
+> +#define BT_AD_UUID16_SOME              0x02
+> +#define BT_AD_UUID16_ALL               0x03
+> +#define BT_AD_UUID32_SOME              0x04
+> +#define BT_AD_UUID32_ALL               0x05
+> +#define BT_AD_UUID128_SOME             0x06
+> +#define BT_AD_UUID128_ALL              0x07
+> +#define BT_AD_NAME_SHORT               0x08
+> +#define BT_AD_NAME_COMPLETE            0x09
+> +#define BT_AD_TX_POWER                 0x0a
+> +#define BT_AD_CLASS_OF_DEV             0x0d
+> +#define BT_AD_SSP_HASH                 0x0e
+> +#define BT_AD_SSP_RANDOMIZER           0x0f
+> +#define BT_AD_DEVICE_ID                        0x10
+> +#define BT_AD_SMP_TK                   0x10
+> +#define BT_AD_SMP_OOB_FLAGS            0x11
+> +#define BT_AD_SLAVE_CONN_INTERVAL      0x12
+> +#define BT_AD_SOLICIT16                        0x14
+> +#define BT_AD_SOLICIT128               0x15
+> +#define BT_AD_SERVICE_DATA16           0x16
+> +#define BT_AD_PUBLIC_ADDRESS           0x17
+> +#define BT_AD_RANDOM_ADDRESS           0x18
+> +#define BT_AD_GAP_APPEARANCE           0x19
+> +#define BT_AD_ADVERTISING_INTERVAL     0x1a
+> +#define BT_AD_LE_DEVICE_ADDRESS                0x1b
+> +#define BT_AD_LE_ROLE                  0x1c
+> +#define BT_AD_SSP_HASH_P256            0x1d
+> +#define BT_AD_SSP_RANDOMIZER_P256      0x1e
+> +#define BT_AD_SOLICIT32                        0x1f
+> +#define BT_AD_SERVICE_DATA32           0x20
+> +#define BT_AD_SERVICE_DATA128          0x21
+> +#define BT_AD_LE_SC_CONFIRM_VALUE      0x22
+> +#define BT_AD_LE_SC_RANDOM_VALUE       0x23
+> +#define BT_AD_URI                      0x24
+> +#define BT_AD_INDOOR_POSITIONING       0x25
+> +#define BT_AD_TRANSPORT_DISCOVERY      0x26
+> +#define BT_AD_LE_SUPPORTED_FEATURES    0x27
+> +#define BT_AD_CHANNEL_MAP_UPDATE_IND   0x28
+> +#define BT_AD_MESH_PROV                        0x29
+> +#define BT_AD_MESH_DATA                        0x2a
+> +#define BT_AD_MESH_BEACON              0x2b
+> +#define BT_AD_3D_INFO_DATA             0x3d
+> +#define BT_AD_MANUFACTURER_DATA                0xff
+> +
+>   typedef void (*bt_ad_func_t)(void *data, void *user_data);
+
+>   struct bt_ad;
+> @@ -39,6 +83,12 @@ struct bt_ad_manufacturer_data {
+
+>   struct bt_ad_service_data {
+>          bt_uuid_t uuid;
+> +       size_t len;
+> +       void *data;
+> +};
+> +
+> +struct bt_ad_data {
+> +       uint8_t type;
+>          uint8_t *data;
+>          size_t len;
+>   };
+> @@ -96,3 +146,13 @@ void bt_ad_clear_name(struct bt_ad *ad);
+>   bool bt_ad_add_appearance(struct bt_ad *ad, uint16_t appearance);
+
+>   void bt_ad_clear_appearance(struct bt_ad *ad);
+> +
+> +bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t
+len);
+> +
+> +bool bt_ad_has_data(struct bt_ad *ad, const struct bt_ad_data *data);
+> +
+> +void bt_ad_foreach_data(struct bt_ad *ad, bt_ad_func_t func, void
+*user_data);
+> +
+> +bool bt_ad_remove_data(struct bt_ad *ad, uint8_t type);
+> +
+> +void bt_ad_clear_data(struct bt_ad *ad);
+> --
+> 2.14.3
+
+Applied.
 
 
-> > >   Characteristic Descriptors hierarchy
-> > >   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-> > > diff --git a/src/gatt-database.c b/src/gatt-database.c
-> > > index 0ac5b75b0..419db909c 100644
-> > > --- a/src/gatt-database.c
-> > > +++ b/src/gatt-database.c
-> > > @@ -2614,6 +2614,12 @@ static void chrc_write_cb(struct
-> gatt_db_attribute
-> > *attrib,
-> > >                  goto fail;
-> > >          }
-
-> > > +       if (offset && g_dbus_proxy_get_property(chrc->proxy,
-> "Authorized",
-> > > +
-&iter))
-> {
-> > > +               gatt_db_attribute_write_result(attrib, id, 0);
-> > > +               return;
-> > > +       }
-
-> > What is the logic behind checking the offset? Is this check here becaus=
-e
-> > the prepare writes are now passed up the stack? Afaik the offset can be
-> set
-> > to 0 even with prepare write which means we should check the opcode
-> instead
-> > which might be required for execute as well otherwise nothing that has
-> > offset set will be ever written to the application.
-
-You haven't ack or nack this comment.
-
-> > >          if (chrc->write_io) {
-> > >                  if (pipe_io_send(chrc->write_io, value, len) < 0) {
-> > >                          error("Unable to write: %s",
-strerror(errno));
-> > > diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-> > > index 4b554f665..cdade76f8 100644
-> > > --- a/src/shared/gatt-server.c
-> > > +++ b/src/shared/gatt-server.c
-> > > @@ -1208,6 +1208,45 @@ static bool store_prep_data(struct
-bt_gatt_server
-> > *server,
-> > >          return prep_data_new(server, handle, offset, length, value);
-> > >   }
-
-> > > +struct prep_write_complete_data {
-> > > +       void *pdu;
-> > > +       uint16_t length;
-> > > +       struct bt_gatt_server *server;
-> > > +};
-> > > +
-> > > +static void prep_write_complete_cb(struct gatt_db_attribute *attr,
-int
-> > err,
-> > > +                                                               void
-> > *user_data)
-> > > +{
-> > > +       struct prep_write_complete_data *pwcd =3D user_data;
-> > > +       uint16_t handle =3D 0;
-> > > +       uint16_t offset;
-> > > +
-> > > +       handle =3D get_le16(pwcd->pdu);
-> > > +
-> > > +       if (err) {
-> > > +               bt_att_send_error_rsp(pwcd->server->att,
-> > > +                                       BT_ATT_OP_PREP_WRITE_REQ,
-> handle,
-> > err);
-> > > +               free(pwcd->pdu);
-> > > +               free(pwcd);
-> > > +
-> > > +               return;
-> > > +       }
-> > > +
-> > > +       offset =3D get_le16(pwcd->pdu + 2);
-> > > +
-> > > +       if (!store_prep_data(pwcd->server, handle, offset,
-pwcd->length
-> -
-> > 4,
-> > > +                                               &((uint8_t *)
-> > pwcd->pdu)[4]))
-> > > +               bt_att_send_error_rsp(pwcd->server->att,
-> > > +                                       BT_ATT_OP_PREP_WRITE_RSP,
-> handle,
-> > > +
-> > BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
-> > > +
-> > > +       bt_att_send(pwcd->server->att, BT_ATT_OP_PREP_WRITE_RSP,
-> > pwcd->pdu,
-> > > +                                               pwcd->length, NULL,
-> NULL,
-> > NULL);
-> > > +
-> > > +       free(pwcd->pdu);
-> > > +       free(pwcd);
-> > > +}
-> > > +
-> > >   static void prep_write_cb(uint8_t opcode, const void *pdu,
-> > >                                          uint16_t length, void
-> *user_data)
-> > >   {
-> > > @@ -1215,7 +1254,8 @@ static void prep_write_cb(uint8_t opcode, const
-> > void *pdu,
-> > >          uint16_t handle =3D 0;
-> > >          uint16_t offset;
-> > >          struct gatt_db_attribute *attr;
-> > > -       uint8_t ecode;
-> > > +       struct prep_write_complete_data *pwcd;
-> > > +       uint8_t ecode, status;
-
-> > >          if (length < 4) {
-> > >                  ecode =3D BT_ATT_ERROR_INVALID_PDU;
-> > > @@ -1245,15 +1285,21 @@ static void prep_write_cb(uint8_t opcode,
-const
-> > void *pdu,
-> > >          if (ecode)
-> > >                  goto error;
-
-> > > -       if (!store_prep_data(server, handle, offset, length - 4,
-> > > -                                               &((uint8_t *)
-pdu)[4]))
-> {
-> > > -               ecode =3D BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
-> > > -               goto error;
-> > > -       }
-> > > +       pwcd =3D new0(struct prep_write_complete_data, 1);
-> > > +       pwcd->pdu =3D malloc(length);
-> > > +       memcpy(pwcd->pdu, pdu, length);
-> > > +       pwcd->length =3D length;
-> > > +       pwcd->server =3D server;
-
-> > > -       bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu,
-length,
-> > NULL,
-> > > -                                                               NULL,
-> > NULL);
-> > > -       return;
-> > > +       status =3D gatt_db_attribute_write(attr, offset, NULL, 0,
-> > > +
-> BT_ATT_OP_PREP_WRITE_REQ,
-> > > +                                               server->att,
-> > > +
-prep_write_complete_cb,
-> > pwcd);
-> > > +       if (status)
-> > > +               return;
-> > > +
-> > > +       ecode =3D BT_ATT_ERROR_UNLIKELY;
-
-> > >   error:
-> > >          bt_att_send_error_rsp(server->att, opcode, handle, ecode);
-> > > --
-> > > 2.13.6
-
-> > > --
-> > > To unsubscribe from this list: send the line "unsubscribe
-> > linux-bluetooth" in
-> > > the body of a message to majordomo@vger.kernel.org
-> > > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
-> > --
-> > Luiz Augusto von Dentz
-> Grzegorz Ko=C5=82odziejczyk
-
-
-
---=20
+-- 
 Luiz Augusto von Dentz
