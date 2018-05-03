@@ -1,178 +1,183 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org,
-        Tudor Ambarus <tudor.ambarus@microchip.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1] Bluetooth: Re-use kstrtobool_from_user()
-Date: Thu,  3 May 2018 14:46:47 +0300
-Message-Id: <20180503114647.30315-1-andriy.shevchenko@linux.intel.com>
+MIME-Version: 1.0
+References: <20180502091757.24190-1-grzegorz.kolodziejczyk@codecoup.pl>
+ <20180502091757.24190-3-grzegorz.kolodziejczyk@codecoup.pl>
+ <CABBYNZJVwKdAKPGxgOE_48=2zLvETe8oirr8w56Su5PrUh1eyA@mail.gmail.com> <CALevQMaqsR3YLmCWC66LNS6Avsd6eFF5sfqGZQWJ0yNHUgR1Aw@mail.gmail.com>
+In-Reply-To: <CALevQMaqsR3YLmCWC66LNS6Avsd6eFF5sfqGZQWJ0yNHUgR1Aw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Thu, 03 May 2018 09:58:47 +0000
+Message-ID: <CABBYNZK6LdwWxZtqvvviySkCHEh8tN5BNnjFufd_=zq0NCASYQ@mail.gmail.com>
+Subject: Re: [RFC 2/2] client: Add authorized property handling to
+ characteristic attribute
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Re-use kstrtobool_from_user() instead of open coded variant.
+Hi Grzegorz,
+On Wed, May 2, 2018 at 4:06 PM Grzegorz Ko=C5=82odziejczyk <
+grzegorz.kolodziejczyk@codecoup.pl> wrote:
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/bluetooth/btmrvl_debugfs.c | 12 ++++--------
- net/bluetooth/hci_core.c           | 23 +++++++----------------
- net/bluetooth/hci_debugfs.c        | 24 ++++++++----------------
- net/bluetooth/smp.c                | 12 ++++--------
- 4 files changed, 23 insertions(+), 48 deletions(-)
+> Hi Luiz,
+> =C5=9Br., 2 maj 2018 o 12:42 Luiz Augusto von Dentz <luiz.dentz@gmail.com=
+>
+> napisa=C5=82(a):
 
-diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
-index 1828ed8cae7a..2f15546dd4fa 100644
---- a/drivers/bluetooth/btmrvl_debugfs.c
-+++ b/drivers/bluetooth/btmrvl_debugfs.c
-@@ -171,16 +171,12 @@ static ssize_t btmrvl_fwdump_write(struct file *file, const char __user *ubuf,
- 				   size_t count, loff_t *ppos)
- {
- 	struct btmrvl_private *priv = file->private_data;
--	char buf[16];
- 	bool result;
-+	int err;
- 
--	memset(buf, 0, sizeof(buf));
--
--	if (copy_from_user(&buf, ubuf, min_t(size_t, sizeof(buf) - 1, count)))
--		return -EFAULT;
--
--	if (strtobool(buf, &result))
--		return -EINVAL;
-+	err = kstrtobool_from_user(ubuf, count, &result);
-+	if (err)
-+		return err;
- 
- 	if (!result)
- 		return -EINVAL;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b0ee9edaae35..1dec33790198 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -76,19 +76,15 @@ static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
- {
- 	struct hci_dev *hdev = file->private_data;
- 	struct sk_buff *skb;
--	char buf[32];
--	size_t buf_size = min(count, (sizeof(buf)-1));
- 	bool enable;
-+	int err;
- 
- 	if (!test_bit(HCI_UP, &hdev->flags))
- 		return -ENETDOWN;
- 
--	if (copy_from_user(buf, user_buf, buf_size))
--		return -EFAULT;
--
--	buf[buf_size] = '\0';
--	if (strtobool(buf, &enable))
--		return -EINVAL;
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
- 
- 	if (enable == hci_dev_test_flag(hdev, HCI_DUT_MODE))
- 		return -EALREADY;
-@@ -135,17 +131,12 @@ static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
- 				 size_t count, loff_t *ppos)
- {
- 	struct hci_dev *hdev = file->private_data;
--	char buf[32];
--	size_t buf_size = min(count, (sizeof(buf)-1));
- 	bool enable;
- 	int err;
- 
--	if (copy_from_user(buf, user_buf, buf_size))
--		return -EFAULT;
--
--	buf[buf_size] = '\0';
--	if (strtobool(buf, &enable))
--		return -EINVAL;
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
- 
- 	/* When the diagnostic flags are not persistent and the transport
- 	 * is not active or in user channel operation, then there is no need
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 418b76e557b0..0d8ab5b3c177 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -47,19 +47,15 @@ static ssize_t __name ## _write(struct file *file,			      \
- 				 size_t count, loff_t *ppos)		      \
- {									      \
- 	struct hci_dev *hdev = file->private_data;			      \
--	char buf[32];							      \
--	size_t buf_size = min(count, (sizeof(buf) - 1));		      \
- 	bool enable;							      \
-+	int err;							      \
- 									      \
- 	if (test_bit(HCI_UP, &hdev->flags))				      \
- 		return -EBUSY;						      \
- 									      \
--	if (copy_from_user(buf, user_buf, buf_size))			      \
--		return -EFAULT;						      \
--									      \
--	buf[buf_size] = '\0';						      \
--	if (strtobool(buf, &enable))					      \
--		return -EINVAL;						      \
-+	err = kstrtobool_from_user(user_buf, count, &enable);		      \
-+	if (err)							      \
-+		return err;						      \
- 									      \
- 	if (enable == test_bit(__quirk, &hdev->quirks))			      \
- 		return -EALREADY;					      \
-@@ -658,19 +654,15 @@ static ssize_t force_static_address_write(struct file *file,
- 					  size_t count, loff_t *ppos)
- {
- 	struct hci_dev *hdev = file->private_data;
--	char buf[32];
--	size_t buf_size = min(count, (sizeof(buf)-1));
- 	bool enable;
-+	int err;
- 
- 	if (test_bit(HCI_UP, &hdev->flags))
- 		return -EBUSY;
- 
--	if (copy_from_user(buf, user_buf, buf_size))
--		return -EFAULT;
--
--	buf[buf_size] = '\0';
--	if (strtobool(buf, &enable))
--		return -EINVAL;
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
- 
- 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR))
- 		return -EALREADY;
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index a2ddae2f37d7..ae91e2d40056 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3315,16 +3315,12 @@ static ssize_t force_bredr_smp_write(struct file *file,
- 				     size_t count, loff_t *ppos)
- {
- 	struct hci_dev *hdev = file->private_data;
--	char buf[32];
--	size_t buf_size = min(count, (sizeof(buf)-1));
- 	bool enable;
-+	int err;
- 
--	if (copy_from_user(buf, user_buf, buf_size))
--		return -EFAULT;
--
--	buf[buf_size] = '\0';
--	if (strtobool(buf, &enable))
--		return -EINVAL;
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
- 
- 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
- 		return -EALREADY;
--- 
-2.17.0
+> > Hi Grzegorz,
+> > On Wed, May 2, 2018 at 1:09 PM Grzegorz Kolodziejczyk <
+> > grzegorz.kolodziejczyk@codecoup.pl> wrote:
 
+> > > This patch adds handling of authorized property to bluetoothctl.
+> > > ---
+> > >   client/gatt.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+> > >   1 file changed, 46 insertions(+)
+
+> > > diff --git a/client/gatt.c b/client/gatt.c
+> > > index 6bf644c48..fffa86851 100644
+> > > --- a/client/gatt.c
+> > > +++ b/client/gatt.c
+> > > @@ -1432,6 +1432,30 @@ static gboolean
+chrc_notify_acquired_exists(const
+> > GDBusPropertyTable *property,
+> > >          return FALSE;
+> > >   }
+
+> > > +static gboolean chrc_get_authorized(const GDBusPropertyTable
+*property,
+> > > +                                       DBusMessageIter *iter, void
+> *data)
+> > > +{
+> > > +       struct chrc *chrc =3D data;
+> > > +       dbus_bool_t value;
+> > > +
+> > > +       value =3D chrc->authorized ? TRUE : FALSE;
+> > > +
+> > > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
+&value);
+> > > +
+> > > +       return TRUE;
+> > > +}
+> > > +
+> > > +static gboolean chrc_get_authorized_exists(const GDBusPropertyTable
+> > *property,
+> > > +                                                               void
+> > *data)
+> > > +{
+> > > +       struct chrc *chrc =3D data;
+> > > +
+> > > +       if (chrc->authorization_req)
+> > > +               return TRUE;
+> > > +
+> > > +       return FALSE;
+> > > +}
+> > > +
+> > >   static const GDBusPropertyTable chrc_properties[] =3D {
+> > >          { "UUID", "s", chrc_get_uuid, NULL, NULL },
+> > >          { "Service", "o", chrc_get_service, NULL, NULL },
+> > > @@ -1442,6 +1466,8 @@ static const GDBusPropertyTable
+chrc_properties[]
+> =3D
+> > {
+> > >                                          chrc_write_acquired_exists }=
+,
+> > >          { "NotifyAcquired", "b", chrc_get_notify_acquired, NULL,
+> > >                                          chrc_notify_acquired_exists
+},
+> > > +       { "Authorized", "b", chrc_get_authorized, NULL,
+> > > +
+> > chrc_get_authorized_exists },
+> > >          { }
+> > >   };
+
+> > > @@ -1665,6 +1691,15 @@ static void authorize_write_response(const cha=
+r
+> > *input, void *user_data)
+
+> > >          chrc->authorized =3D true;
+
+> > > +       /* Authorization check of prepare writes */
+> > > +       if (!chrc->value_len) {
+> > > +               reply =3D g_dbus_create_reply(pending_message,
+> > DBUS_TYPE_INVALID);
+> > > +               g_dbus_send_message(aad->conn, reply);
+> > > +               g_free(aad);
+> > > +
+> > > +               return;
+> > > +       }
+> > > +
+> > >          errsv =3D parse_value_arg(&iter, &chrc->value,
+&chrc->value_len,
+
+> > chrc->max_val_len);
+> > >          if (errsv =3D=3D -EINVAL) {
+> > > @@ -1701,8 +1736,16 @@ static DBusMessage
+> > *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
+> > >          DBusMessageIter iter;
+> > >          char *str;
+> > >          int errsv;
+> > > +       uint16_t offset =3D 0;
+
+> > >          dbus_message_iter_init(msg, &iter);
+> > > +       /* Get offset only (second parameter) */
+> > > +       dbus_message_iter_next(&iter);
+> > > +
+> > > +       parse_options(&iter, &offset, NULL, NULL, NULL);
+> > > +
+> > > +       if (chrc->authorization_req && offset =3D=3D 0)
+> > > +               chrc->authorized =3D false;
+
+> > >          if (chrc->authorization_req && !chrc->authorized) {
+> > >                  struct authorize_attribute_data *aad;
+> > > @@ -1722,6 +1765,9 @@ static DBusMessage
+> *chrc_write_value(DBusConnection
+> > *conn, DBusMessage *msg,
+> > >                  return NULL;
+> > >          }
+
+> > > +       /* Rewind to value parameter */
+> > > +       dbus_message_iter_init(msg, &iter);
+
+> > I would prefer to make parse_value_arg parse the offset as well so we
+> don't
+> > have to reinit the iter.
+> Current version of bluetoothctl already parsses offset in parse_value_arg
+> for writing value purposes (patch
+1dd33d584ce1e4bd0f1d87e88663350a80f37f01).
+
+> As the offset is second parameter for write method it's needed (afaik) to
+> recurse over iterator to offset parameter then parse value (there is no
+> need to parse value at beginnig). Currently this implementation assumes
+> that every write request with offset =3D 0 is new write request which has=
+ to
+> be authoriez/re-authorized.
+
+That fact that parse_value_arg is already a strong indication that we
+should reuse it, we just need to add the offset as a output parameter, like
+it is done in parse_options, that way we will get both the value and the
+offset in the same call and don't have to reinit the iter.
+
+> > >          errsv =3D parse_value_arg(&iter, &chrc->value,
+&chrc->value_len,
+
+> > chrc->max_val_len);
+> > >          if (errsv =3D=3D -EINVAL) {
+> > > --
+> > > 2.13.6
+
+> > > --
+> > > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in
+> > > the body of a message to majordomo@vger.kernel.org
+> > > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+> > --
+> > Luiz Augusto von Dentz
+> Grzegorz Ko=C5=82odziejczyk
+
+
+
+--=20
+Luiz Augusto von Dentz
