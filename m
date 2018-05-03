@@ -1,65 +1,397 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: David Llewellyn-Jones <david@flypig.co.uk>
-Subject: BLE ad discoverability flags - missing when ads are generated, but
- needed when scanning
-To: linux-bluetooth@vger.kernel.org
-Message-ID: <68cc4a9b-5bbb-6dd0-3560-4de1594b8271@flypig.co.uk>
-Date: Thu, 3 May 2018 17:32:53 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+From: Austin Morton <austinpmorton@gmail.com>
+Date: Thu, 3 May 2018 10:52:07 -0400
+Message-ID: <CAPWKHJTGzLBoXkPDnegn=U2uufMrtOe=Z8+715d7P_pvPKdTJg@mail.gmail.com>
+Subject: [PATCH 1/1] sbc: Use extended inline assembly for armv6 primitives
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+GCC 5+ may generate incorrect code when calling a naked function
+which modifies certain registers if optimizations are enabled.
 
-I've been using bluez on a combination of an Ubuntu laptop running bluez
-5.49 compiled from source and a Sailfish OS phone running the default
-install bluez 5.47. On the laptop I'm using DBUS to interact with bluez;
-on the phone I'm going via the QTBluetoothDiscoveryAgent interface,
-running QT 5.6.
+Specifically in this case the math to increment "out" between calls to
+sbc_analyze_xxx in sbc_analyze_4b_xxx will be generated to use
+r3 without saving it.  The inline assembly clobbers this register and
+does not push it to the stack.
 
-The difficulty I've been experiencing is that BLE advertisements sent
-from the laptop in peripheral mode aren't being discovered by the phone.
+While this does appear to be a bug in GCC, the recommendation on the
+GCC bug tracker was to simply avoid using naked functions.
 
-I can see the advertisements being picked up by btmon on the phone, but
-it doesn't filter up to the QT wrapper. Looking through the bluez source
-code, it appears that the reason is because in the case of unfiltered
-discovery, bluez ignores adverts that don't have either EIR_LIM_DISC or
-EIR_GEN_DISC flags set, as in the following code:
+See GCC bug 85593.
+---
+ sbc/sbc_primitives_armv6.c | 216 ++++++++++++++++++-------------------
+ 1 file changed, 104 insertions(+), 112 deletions(-)
 
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/adapter.c?h=5.47#n5658
+diff --git a/sbc/sbc_primitives_armv6.c b/sbc/sbc_primitives_armv6.c
+index 665f157..9c58afc 100644
+--- a/sbc/sbc_primitives_armv6.c
++++ b/sbc/sbc_primitives_armv6.c
+@@ -38,58 +38,55 @@
 
-However, as far as I can tell (I could easily be wrong), bluez never
-adds these flags into the advertising data. I was expecting to see them
-added in the following bit of code:
+ #ifdef SBC_BUILD_WITH_ARMV6_SUPPORT
 
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/shared/ad.c#n423
+-static void __attribute__((naked)) sbc_analyze_four_armv6()
++static void sbc_analyze_four_armv6(int16_t *in, int32_t *out, const
+FIXED_T* consts)
+ {
+-       /* r0 = in, r1 = out, r2 = consts */
+        __asm__ volatile (
+-               "push   {r1, r4-r7, lr}\n"
+-               "push   {r8-r11}\n"
+-               "ldrd   r4,  r5,  [r0, #0]\n"
+-               "ldrd   r6,  r7,  [r2, #0]\n"
+-               "ldrd   r8,  r9,  [r0, #16]\n"
+-               "ldrd   r10, r11, [r2, #16]\n"
++               "ldrd   r4,  r5,  [%1, #0]\n"
++               "ldrd   r6,  r7,  [%2, #0]\n"
++               "ldrd   r8,  r9,  [%1, #16]\n"
++               "ldrd   r10, r11, [%2, #16]\n"
+                "mov    r14, #0x8000\n"
+                "smlad  r3,  r4,  r6,  r14\n"
+                "smlad  r12, r5,  r7,  r14\n"
+-               "ldrd   r4,  r5,  [r0, #32]\n"
+-               "ldrd   r6,  r7,  [r2, #32]\n"
++               "ldrd   r4,  r5,  [%1, #32]\n"
++               "ldrd   r6,  r7,  [%2, #32]\n"
+                "smlad  r3,  r8,  r10, r3\n"
+                "smlad  r12, r9,  r11, r12\n"
+-               "ldrd   r8,  r9,  [r0, #48]\n"
+-               "ldrd   r10, r11, [r2, #48]\n"
++               "ldrd   r8,  r9,  [%1, #48]\n"
++               "ldrd   r10, r11, [%2, #48]\n"
+                "smlad  r3,  r4,  r6,  r3\n"
+                "smlad  r12, r5,  r7,  r12\n"
+-               "ldrd   r4,  r5,  [r0, #64]\n"
+-               "ldrd   r6,  r7,  [r2, #64]\n"
++               "ldrd   r4,  r5,  [%1, #64]\n"
++               "ldrd   r6,  r7,  [%2, #64]\n"
+                "smlad  r3,  r8,  r10, r3\n"
+                "smlad  r12, r9,  r11, r12\n"
+-               "ldrd   r8,  r9,  [r0, #8]\n"
+-               "ldrd   r10, r11, [r2, #8]\n"
++               "ldrd   r8,  r9,  [%1, #8]\n"
++               "ldrd   r10, r11, [%2, #8]\n"
+                "smlad  r3,  r4,  r6,  r3\n"      /* t1[0] is done */
+                "smlad  r12, r5,  r7,  r12\n"     /* t1[1] is done */
+-               "ldrd   r4,  r5,  [r0, #24]\n"
+-               "ldrd   r6,  r7,  [r2, #24]\n"
++               "ldrd   r4,  r5,  [%1, #24]\n"
++               "ldrd   r6,  r7,  [%2, #24]\n"
+                "pkhtb  r3,  r12, r3, asr #16\n"  /* combine t1[0] and t1[1] */
+                "smlad  r12, r8,  r10, r14\n"
+                "smlad  r14, r9,  r11, r14\n"
+-               "ldrd   r8,  r9,  [r0, #40]\n"
+-               "ldrd   r10, r11, [r2, #40]\n"
++               "ldrd   r8,  r9,  [%1, #40]\n"
++               "ldrd   r10, r11, [%2, #40]\n"
+                "smlad  r12, r4,  r6,  r12\n"
+                "smlad  r14, r5,  r7,  r14\n"
+-               "ldrd   r4,  r5,  [r0, #56]\n"
+-               "ldrd   r6,  r7,  [r2, #56]\n"
++               "ldrd   r4,  r5,  [%1, #56]\n"
++               "ldrd   r6,  r7,  [%2, #56]\n"
+                "smlad  r12, r8,  r10, r12\n"
+                "smlad  r14, r9,  r11, r14\n"
+-               "ldrd   r8,  r9,  [r0, #72]\n"
+-               "ldrd   r10, r11, [r2, #72]\n"
++               "ldrd   r8,  r9,  [%1, #72]\n"
++               "ldrd   r10, r11, [%2, #72]\n"
+                "smlad  r12, r4,  r6,  r12\n"
+                "smlad  r14, r5,  r7,  r14\n"
+-               "ldrd   r4,  r5,  [r2, #80]\n"    /* start loading cos table */
++               "ldrd   r4,  r5,  [%2, #80]\n"    /* start loading cos table */
+                "smlad  r12, r8,  r10, r12\n"     /* t1[2] is done */
+                "smlad  r14, r9,  r11, r14\n"     /* t1[3] is done */
+-               "ldrd   r6,  r7,  [r2, #88]\n"
+-               "ldrd   r8,  r9,  [r2, #96]\n"
+-               "ldrd   r10, r11, [r2, #104]\n"   /* cos table fully loaded */
++               "ldrd   r6,  r7,  [%2, #88]\n"
++               "ldrd   r8,  r9,  [%2, #96]\n"
++               "ldrd   r10, r11, [%2, #104]\n"   /* cos table fully loaded */
+                "pkhtb  r12, r14, r12, asr #16\n" /* combine t1[2] and t1[3] */
+                "smuad  r4,  r3,  r4\n"
+                "smuad  r5,  r3,  r5\n"
+@@ -99,196 +96,191 @@ static void __attribute__((naked))
+sbc_analyze_four_armv6()
+                "smuad  r7,  r3,  r7\n"
+                "smlad  r6,  r12, r10, r6\n"
+                "smlad  r7,  r12, r11, r7\n"
+-               "pop    {r8-r11}\n"
+-               "stmia  r1, {r4, r5, r6, r7}\n"
+-               "pop    {r1, r4-r7, pc}\n"
++               "stmia  %0, {r4, r5, r6, r7}\n"
++               : "+r" (out)
++               : "r" (in), "r" (consts)
++               : "memory",
++               "r3", "r4", "r5", "r6", "r7", "r8",
++               "r9", "r10", "r11", "r12", "r14"
+        );
+ }
 
-As a result, I can't figure out a way to produce advertisements from my
-laptop that can be picked up by my phone.
+-#define sbc_analyze_four(in, out, consts) \
+-       ((void (*)(int16_t *, int32_t *, const FIXED_T*)) \
+-               sbc_analyze_four_armv6)((in), (out), (consts))
+-
+-static void __attribute__((naked)) sbc_analyze_eight_armv6()
++static void sbc_analyze_eight_armv6(int16_t *in, int32_t *out, const
+FIXED_T* consts)
+ {
+-       /* r0 = in, r1 = out, r2 = consts */
+        __asm__ volatile (
+-               "push   {r1, r4-r7, lr}\n"
+-               "push   {r8-r11}\n"
+-               "ldrd   r4,  r5,  [r0, #24]\n"
+-               "ldrd   r6,  r7,  [r2, #24]\n"
+-               "ldrd   r8,  r9,  [r0, #56]\n"
+-               "ldrd   r10, r11, [r2, #56]\n"
++               "ldrd   r4,  r5,  [%1, #24]\n"
++               "ldrd   r6,  r7,  [%2, #24]\n"
++               "ldrd   r8,  r9,  [%1, #56]\n"
++               "ldrd   r10, r11, [%2, #56]\n"
+                "mov    r14, #0x8000\n"
+                "smlad  r3,  r4,  r6,  r14\n"
+                "smlad  r12, r5,  r7,  r14\n"
+-               "ldrd   r4,  r5,  [r0, #88]\n"
+-               "ldrd   r6,  r7,  [r2, #88]\n"
++               "ldrd   r4,  r5,  [%1, #88]\n"
++               "ldrd   r6,  r7,  [%2, #88]\n"
+                "smlad  r3,  r8,  r10, r3\n"
+                "smlad  r12, r9,  r11, r12\n"
+-               "ldrd   r8,  r9,  [r0, #120]\n"
+-               "ldrd   r10, r11, [r2, #120]\n"
++               "ldrd   r8,  r9,  [%1, #120]\n"
++               "ldrd   r10, r11, [%2, #120]\n"
+                "smlad  r3,  r4,  r6,  r3\n"
+                "smlad  r12, r5,  r7,  r12\n"
+-               "ldrd   r4,  r5,  [r0, #152]\n"
+-               "ldrd   r6,  r7,  [r2, #152]\n"
++               "ldrd   r4,  r5,  [%1, #152]\n"
++               "ldrd   r6,  r7,  [%2, #152]\n"
+                "smlad  r3,  r8,  r10, r3\n"
+                "smlad  r12, r9,  r11, r12\n"
+-               "ldrd   r8,  r9,  [r0, #16]\n"
+-               "ldrd   r10, r11, [r2, #16]\n"
++               "ldrd   r8,  r9,  [%1, #16]\n"
++               "ldrd   r10, r11, [%2, #16]\n"
+                "smlad  r3,  r4,  r6,  r3\n"      /* t1[6] is done */
+                "smlad  r12, r5,  r7,  r12\n"     /* t1[7] is done */
+-               "ldrd   r4,  r5,  [r0, #48]\n"
+-               "ldrd   r6,  r7,  [r2, #48]\n"
++               "ldrd   r4,  r5,  [%1, #48]\n"
++               "ldrd   r6,  r7,  [%2, #48]\n"
+                "pkhtb  r3,  r12, r3, asr #16\n"  /* combine t1[6] and t1[7] */
+                "str    r3,  [sp, #-4]!\n"        /* save to stack */
+                "smlad  r3,  r8,  r10, r14\n"
+                "smlad  r12, r9,  r11, r14\n"
+-               "ldrd   r8,  r9,  [r0, #80]\n"
+-               "ldrd   r10, r11, [r2, #80]\n"
++               "ldrd   r8,  r9,  [%1, #80]\n"
++               "ldrd   r10, r11, [%2, #80]\n"
+                "smlad  r3,  r4,  r6,  r3\n"
+                "smlad  r12, r5,  r7,  r12\n"
+-               "ldrd   r4,  r5,  [r0, #112]\n"
+-               "ldrd   r6,  r7,  [r2, #112]\n"
++               "ldrd   r4,  r5,  [%1, #112]\n"
++               "ldrd   r6,  r7,  [%2, #112]\n"
+                "smlad  r3,  r8,  r10, r3\n"
+                "smlad  r12, r9,  r11, r12\n"
+-               "ldrd   r8,  r9,  [r0, #144]\n"
+-               "ldrd   r10, r11, [r2, #144]\n"
++               "ldrd   r8,  r9,  [%1, #144]\n"
++               "ldrd   r10, r11, [%2, #144]\n"
+                "smlad  r3,  r4,  r6,  r3\n"
+                "smlad  r12, r5,  r7,  r12\n"
+-               "ldrd   r4,  r5,  [r0, #0]\n"
+-               "ldrd   r6,  r7,  [r2, #0]\n"
++               "ldrd   r4,  r5,  [%1, #0]\n"
++               "ldrd   r6,  r7,  [%2, #0]\n"
+                "smlad  r3,  r8,  r10, r3\n"      /* t1[4] is done */
+                "smlad  r12, r9,  r11, r12\n"     /* t1[5] is done */
+-               "ldrd   r8,  r9,  [r0, #32]\n"
+-               "ldrd   r10, r11, [r2, #32]\n"
++               "ldrd   r8,  r9,  [%1, #32]\n"
++               "ldrd   r10, r11, [%2, #32]\n"
+                "pkhtb  r3,  r12, r3, asr #16\n"  /* combine t1[4] and t1[5] */
+                "str    r3,  [sp, #-4]!\n"        /* save to stack */
+                "smlad  r3,  r4,  r6,  r14\n"
+                "smlad  r12, r5,  r7,  r14\n"
+-               "ldrd   r4,  r5,  [r0, #64]\n"
+-               "ldrd   r6,  r7,  [r2, #64]\n"
++               "ldrd   r4,  r5,  [%1, #64]\n"
++               "ldrd   r6,  r7,  [%2, #64]\n"
+                "smlad  r3,  r8,  r10, r3\n"
+                "smlad  r12, r9,  r11, r12\n"
+-               "ldrd   r8,  r9,  [r0, #96]\n"
+-               "ldrd   r10, r11, [r2, #96]\n"
++               "ldrd   r8,  r9,  [%1, #96]\n"
++               "ldrd   r10, r11, [%2, #96]\n"
+                "smlad  r3,  r4,  r6,  r3\n"
+                "smlad  r12, r5,  r7,  r12\n"
+-               "ldrd   r4,  r5,  [r0, #128]\n"
+-               "ldrd   r6,  r7,  [r2, #128]\n"
++               "ldrd   r4,  r5,  [%1, #128]\n"
++               "ldrd   r6,  r7,  [%2, #128]\n"
+                "smlad  r3,  r8,  r10, r3\n"
+                "smlad  r12, r9,  r11, r12\n"
+-               "ldrd   r8,  r9,  [r0, #8]\n"
+-               "ldrd   r10, r11, [r2, #8]\n"
++               "ldrd   r8,  r9,  [%1, #8]\n"
++               "ldrd   r10, r11, [%2, #8]\n"
+                "smlad  r3,  r4,  r6,  r3\n"      /* t1[0] is done */
+                "smlad  r12, r5,  r7,  r12\n"     /* t1[1] is done */
+-               "ldrd   r4,  r5,  [r0, #40]\n"
+-               "ldrd   r6,  r7,  [r2, #40]\n"
++               "ldrd   r4,  r5,  [%1, #40]\n"
++               "ldrd   r6,  r7,  [%2, #40]\n"
+                "pkhtb  r3,  r12, r3, asr #16\n"  /* combine t1[0] and t1[1] */
+                "smlad  r12, r8,  r10, r14\n"
+                "smlad  r14, r9,  r11, r14\n"
+-               "ldrd   r8,  r9,  [r0, #72]\n"
+-               "ldrd   r10, r11, [r2, #72]\n"
++               "ldrd   r8,  r9,  [%1, #72]\n"
++               "ldrd   r10, r11, [%2, #72]\n"
+                "smlad  r12, r4,  r6,  r12\n"
+                "smlad  r14, r5,  r7,  r14\n"
+-               "ldrd   r4,  r5,  [r0, #104]\n"
+-               "ldrd   r6,  r7,  [r2, #104]\n"
++               "ldrd   r4,  r5,  [%1, #104]\n"
++               "ldrd   r6,  r7,  [%2, #104]\n"
+                "smlad  r12, r8,  r10, r12\n"
+                "smlad  r14, r9,  r11, r14\n"
+-               "ldrd   r8,  r9,  [r0, #136]\n"
+-               "ldrd   r10, r11, [r2, #136]!\n"
++               "ldrd   r8,  r9,  [%1, #136]\n"
++               "ldrd   r10, r11, [%2, #136]!\n"
+                "smlad  r12, r4,  r6,  r12\n"
+                "smlad  r14, r5,  r7,  r14\n"
+-               "ldrd   r4,  r5,  [r2, #(160 - 136 + 0)]\n"
++               "ldrd   r4,  r5,  [%2, #(160 - 136 + 0)]\n"
+                "smlad  r12, r8,  r10, r12\n"     /* t1[2] is done */
+                "smlad  r14, r9,  r11, r14\n"     /* t1[3] is done */
+-               "ldrd   r6,  r7,  [r2, #(160 - 136 + 8)]\n"
++               "ldrd   r6,  r7,  [%2, #(160 - 136 + 8)]\n"
+                "smuad  r4,  r3,  r4\n"
+                "smuad  r5,  r3,  r5\n"
+                "pkhtb  r12, r14, r12, asr #16\n" /* combine t1[2] and t1[3] */
+                                                  /* r3  = t2[0:1] */
+                                                  /* r12 = t2[2:3] */
+                "pop    {r0, r14}\n"              /* t2[4:5], t2[6:7] */
+-               "ldrd   r8,  r9,  [r2, #(160 - 136 + 32)]\n"
++               "ldrd   r8,  r9,  [%2, #(160 - 136 + 32)]\n"
+                "smuad  r6,  r3,  r6\n"
+                "smuad  r7,  r3,  r7\n"
+-               "ldrd   r10, r11, [r2, #(160 - 136 + 40)]\n"
++               "ldrd   r10, r11, [%2, #(160 - 136 + 40)]\n"
+                "smlad  r4,  r12, r8,  r4\n"
+                "smlad  r5,  r12, r9,  r5\n"
+-               "ldrd   r8,  r9,  [r2, #(160 - 136 + 64)]\n"
++               "ldrd   r8,  r9,  [%2, #(160 - 136 + 64)]\n"
+                "smlad  r6,  r12, r10, r6\n"
+                "smlad  r7,  r12, r11, r7\n"
+-               "ldrd   r10, r11, [r2, #(160 - 136 + 72)]\n"
++               "ldrd   r10, r11, [%2, #(160 - 136 + 72)]\n"
+                "smlad  r4,  r0,  r8,  r4\n"
+                "smlad  r5,  r0,  r9,  r5\n"
+-               "ldrd   r8,  r9,  [r2, #(160 - 136 + 96)]\n"
++               "ldrd   r8,  r9,  [%2, #(160 - 136 + 96)]\n"
+                "smlad  r6,  r0,  r10, r6\n"
+                "smlad  r7,  r0,  r11, r7\n"
+-               "ldrd   r10, r11, [r2, #(160 - 136 + 104)]\n"
++               "ldrd   r10, r11, [%2, #(160 - 136 + 104)]\n"
+                "smlad  r4,  r14, r8,  r4\n"
+                "smlad  r5,  r14, r9,  r5\n"
+-               "ldrd   r8,  r9,  [r2, #(160 - 136 + 16 + 0)]\n"
++               "ldrd   r8,  r9,  [%2, #(160 - 136 + 16 + 0)]\n"
+                "smlad  r6,  r14, r10, r6\n"
+                "smlad  r7,  r14, r11, r7\n"
+-               "ldrd   r10, r11, [r2, #(160 - 136 + 16 + 8)]\n"
+-               "stmia  r1!, {r4, r5}\n"
++               "ldrd   r10, r11, [%2, #(160 - 136 + 16 + 8)]\n"
++               "stmia  %0!, {r4, r5}\n"
+                "smuad  r4,  r3,  r8\n"
+                "smuad  r5,  r3,  r9\n"
+-               "ldrd   r8,  r9,  [r2, #(160 - 136 + 16 + 32)]\n"
+-               "stmia  r1!, {r6, r7}\n"
++               "ldrd   r8,  r9,  [%2, #(160 - 136 + 16 + 32)]\n"
++               "stmia  %0!, {r6, r7}\n"
+                "smuad  r6,  r3,  r10\n"
+                "smuad  r7,  r3,  r11\n"
+-               "ldrd   r10, r11, [r2, #(160 - 136 + 16 + 40)]\n"
++               "ldrd   r10, r11, [%2, #(160 - 136 + 16 + 40)]\n"
+                "smlad  r4,  r12, r8,  r4\n"
+                "smlad  r5,  r12, r9,  r5\n"
+-               "ldrd   r8,  r9,  [r2, #(160 - 136 + 16 + 64)]\n"
++               "ldrd   r8,  r9,  [%2, #(160 - 136 + 16 + 64)]\n"
+                "smlad  r6,  r12, r10, r6\n"
+                "smlad  r7,  r12, r11, r7\n"
+-               "ldrd   r10, r11, [r2, #(160 - 136 + 16 + 72)]\n"
++               "ldrd   r10, r11, [%2, #(160 - 136 + 16 + 72)]\n"
+                "smlad  r4,  r0,  r8,  r4\n"
+                "smlad  r5,  r0,  r9,  r5\n"
+-               "ldrd   r8,  r9,  [r2, #(160 - 136 + 16 + 96)]\n"
++               "ldrd   r8,  r9,  [%2, #(160 - 136 + 16 + 96)]\n"
+                "smlad  r6,  r0,  r10, r6\n"
+                "smlad  r7,  r0,  r11, r7\n"
+-               "ldrd   r10, r11, [r2, #(160 - 136 + 16 + 104)]\n"
++               "ldrd   r10, r11, [%2, #(160 - 136 + 16 + 104)]\n"
+                "smlad  r4,  r14, r8,  r4\n"
+                "smlad  r5,  r14, r9,  r5\n"
+                "smlad  r6,  r14, r10, r6\n"
+                "smlad  r7,  r14, r11, r7\n"
+-               "pop    {r8-r11}\n"
+-               "stmia  r1!, {r4, r5, r6, r7}\n"
+-               "pop    {r1, r4-r7, pc}\n"
++               "stmia  %0!, {r4, r5, r6, r7}\n"
++               : "+r" (out)
++               : "r" (in), "r" (consts)
++               : "memory",
++               "r3", "r4", "r5", "r6", "r7", "r8",
++               "r9", "r10", "r11", "r12", "r14"
+        );
+ }
 
-Adding the flags by calling the following function within
-bt_ad_generate() with a value of 0x06 fixed the issue (i.e. allowed my
-phone to discover my laptop).
+-#define sbc_analyze_eight(in, out, consts) \
+-       ((void (*)(int16_t *, int32_t *, const FIXED_T*)) \
+-               sbc_analyze_eight_armv6)((in), (out), (consts))
+-
+ static void sbc_analyze_4b_4s_armv6(struct sbc_encoder_state *state,
+                int16_t *x, int32_t *out, int out_stride)
+ {
+        /* Analyze blocks */
+-       sbc_analyze_four(x + 12, out, analysis_consts_fixed4_simd_odd);
++       sbc_analyze_four_armv6(x + 12, out, analysis_consts_fixed4_simd_odd);
+        out += out_stride;
+-       sbc_analyze_four(x + 8, out, analysis_consts_fixed4_simd_even);
++       sbc_analyze_four_armv6(x + 8, out, analysis_consts_fixed4_simd_even);
+        out += out_stride;
+-       sbc_analyze_four(x + 4, out, analysis_consts_fixed4_simd_odd);
++       sbc_analyze_four_armv6(x + 4, out, analysis_consts_fixed4_simd_odd);
+        out += out_stride;
+-       sbc_analyze_four(x + 0, out, analysis_consts_fixed4_simd_even);
++       sbc_analyze_four_armv6(x + 0, out, analysis_consts_fixed4_simd_even);
+ }
 
-static void serialize_flags(uint8_t value, uint8_t *buf, uint8_t *pos)
-{
-	if (value == 0)
-		return;
+ static void sbc_analyze_4b_8s_armv6(struct sbc_encoder_state *state,
+                int16_t *x, int32_t *out, int out_stride)
+ {
+        /* Analyze blocks */
+-       sbc_analyze_eight(x + 24, out, analysis_consts_fixed8_simd_odd);
++       sbc_analyze_eight_armv6(x + 24, out, analysis_consts_fixed8_simd_odd);
+        out += out_stride;
+-       sbc_analyze_eight(x + 16, out, analysis_consts_fixed8_simd_even);
++       sbc_analyze_eight_armv6(x + 16, out, analysis_consts_fixed8_simd_even);
+        out += out_stride;
+-       sbc_analyze_eight(x + 8, out, analysis_consts_fixed8_simd_odd);
++       sbc_analyze_eight_armv6(x + 8, out, analysis_consts_fixed8_simd_odd);
+        out += out_stride;
+-       sbc_analyze_eight(x + 0, out, analysis_consts_fixed8_simd_even);
++       sbc_analyze_eight_armv6(x + 0, out, analysis_consts_fixed8_simd_even);
+ }
 
-	buf[(*pos)++] = sizeof(value) + 1;
-	buf[(*pos)++] = EIR_FLAGS;
-	buf[(*pos)++] = value;
-}
-
-My question is therefore whether there's a way for bluez to produce BLE
-advertisements (on my laptop) that can be picked up by a non-filtered
-scan using bluez (on my phone). I searched the Web and the list archives
-but didn't find anything that seemed to help answer.
-
-Thank you reading this far ("if indeed you still are", as Richard Ayoade
-might say!).
-
-David
--- 
-Website: http://www.flypig.co.uk
+ static inline void sbc_analyze_1b_8s_armv6_even(struct
+sbc_encoder_state *state,
+--
+2.17.0.windows.1
