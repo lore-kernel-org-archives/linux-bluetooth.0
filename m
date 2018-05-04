@@ -1,61 +1,61 @@
-Return-Path: <bgodavar@codeaurora.org>
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	rtatiya@codeaurora.org,
-	hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org,
-	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v4 0/3] Enable Bluetooth functionality for WCN3990. 
-Date: Fri,  4 May 2018 21:05:03 +0530
-Message-Id: <1525448106-18616-1-git-send-email-bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Hunt, Preston" <preston.hunt@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH BlueZ] test/example-advertisement: add python3 support 
+Date: Fri, 4 May 2018 14:59:18 +0000
+Message-ID: <DF5EAE85-3D61-4D67-A452-4E6AEB3320CA@intel.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches enable Bluetooth functionality for WCN3990 by 
-- adding support for voting of voltage regulators for WCN3990 attached to MSM
-- Bluetooth firmware download support for WCN3990
-- description of device tree bindings
-
-v4:
-  * rebased all changes on top of bluetooth-next.
-  * addressed review comments.
-  * New patch created for firmware download.
-
-v3:
-  * Rebased all changes on top of bluetooth-next.
-  * dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn3990
-    - added dt-binding snippet for bluetooth chip wcn3990.
-  * Bluetooth: Add support for wcn3990 soc.   
-    - updated BT_INFO with bt_dev_info, where ever necessary.
-     
-v2:
-   * Add support for wcn3990:
-    These changes are aligned as per serdev frame work.
-          We implemented these changes on top of https://patchwork.kernel.org/patch/10316093/
-        As this patch enable serdev for one of the Qualcomm BT chip.
-
-        The changes in the patch include.
-        - Adding support to voting up/down regulators for WCN3990.
-           - Bluetooth firmware download for wcn3990.
-  
-  * Add device tree bindings for Atheros chips:
-          These changes are on top of https://patchwork.kernel.org/patch/10316097/.
-          - Description of device tree bindings.
-
-
-Balakrishna Godavarthi (3):
-  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
-    wcn3990
-  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990.
-  Bluetooth: btqca: Add wcn3990 firmware download support.
-
- .../devicetree/bindings/net/qualcomm-bluetooth.txt |  31 +-
- drivers/bluetooth/btqca.c                          |  45 +-
- drivers/bluetooth/btqca.h                          |  19 +
- drivers/bluetooth/hci_qca.c                        | 555 ++++++++++++++++++---
- 4 files changed, 575 insertions(+), 75 deletions(-)
-
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+VGhpcyBhZGRzIHN1cHBvcnQgZm9yIHB5dGhvbjMgdG8gdGhlIGV4aXN0aW5nIHNjcmlwdC4gVGhl
+IHNjcmlwdCB3aWxsDQpub3cgd29yayB3aXRoIGVpdGhlciBweXRob24yIG9yIHB5dGhvbjMuDQot
+LS0NCiB0ZXN0L2V4YW1wbGUtYWR2ZXJ0aXNlbWVudCB8IDI0ICsrKysrKysrKysrKysrKy0tLS0t
+LS0tLQ0KIDEgZmlsZSBjaGFuZ2VkLCAxNSBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQ0K
+DQpkaWZmIC0tZ2l0IGEvdGVzdC9leGFtcGxlLWFkdmVydGlzZW1lbnQgYi90ZXN0L2V4YW1wbGUt
+YWR2ZXJ0aXNlbWVudA0KaW5kZXggZDliNWI0Mi4uZmQ4NGVhYyAxMDA3NTUNCi0tLSBhL3Rlc3Qv
+ZXhhbXBsZS1hZHZlcnRpc2VtZW50DQorKysgYi90ZXN0L2V4YW1wbGUtYWR2ZXJ0aXNlbWVudA0K
+QEAgLTEsMTIgKzEsMTggQEANCiAjIS91c3IvYmluL3B5dGhvbg0KIA0KK2Zyb20gX19mdXR1cmVf
+XyBpbXBvcnQgcHJpbnRfZnVuY3Rpb24NCisNCiBpbXBvcnQgZGJ1cw0KIGltcG9ydCBkYnVzLmV4
+Y2VwdGlvbnMNCiBpbXBvcnQgZGJ1cy5tYWlubG9vcC5nbGliDQogaW1wb3J0IGRidXMuc2Vydmlj
+ZQ0KIA0KIGltcG9ydCBhcnJheQ0KLWltcG9ydCBnb2JqZWN0DQorDQordHJ5Og0KKyAgZnJvbSBn
+aS5yZXBvc2l0b3J5IGltcG9ydCBHT2JqZWN0ICAjIHB5dGhvbjMNCitleGNlcHQgSW1wb3J0RXJy
+b3I6DQorICBpbXBvcnQgZ29iamVjdCBhcyBHT2JqZWN0ICAjIHB5dGhvbjINCiANCiBmcm9tIHJh
+bmRvbSBpbXBvcnQgcmFuZGludA0KIA0KQEAgLTExOCwxNyArMTI0LDE3IEBAIGNsYXNzIEFkdmVy
+dGlzZW1lbnQoZGJ1cy5zZXJ2aWNlLk9iamVjdCk6DQogICAgICAgICAgICAgICAgICAgICAgICAg
+IGluX3NpZ25hdHVyZT0ncycsDQogICAgICAgICAgICAgICAgICAgICAgICAgIG91dF9zaWduYXR1
+cmU9J2F7c3Z9JykNCiAgICAgZGVmIEdldEFsbChzZWxmLCBpbnRlcmZhY2UpOg0KLSAgICAgICAg
+cHJpbnQgJ0dldEFsbCcNCisgICAgICAgIHByaW50KCdHZXRBbGwnKQ0KICAgICAgICAgaWYgaW50
+ZXJmYWNlICE9IExFX0FEVkVSVElTRU1FTlRfSUZBQ0U6DQogICAgICAgICAgICAgcmFpc2UgSW52
+YWxpZEFyZ3NFeGNlcHRpb24oKQ0KLSAgICAgICAgcHJpbnQgJ3JldHVybmluZyBwcm9wcycNCisg
+ICAgICAgIHByaW50KCdyZXR1cm5pbmcgcHJvcHMnKQ0KICAgICAgICAgcmV0dXJuIHNlbGYuZ2V0
+X3Byb3BlcnRpZXMoKVtMRV9BRFZFUlRJU0VNRU5UX0lGQUNFXQ0KIA0KICAgICBAZGJ1cy5zZXJ2
+aWNlLm1ldGhvZChMRV9BRFZFUlRJU0VNRU5UX0lGQUNFLA0KICAgICAgICAgICAgICAgICAgICAg
+ICAgICBpbl9zaWduYXR1cmU9JycsDQogICAgICAgICAgICAgICAgICAgICAgICAgIG91dF9zaWdu
+YXR1cmU9JycpDQogICAgIGRlZiBSZWxlYXNlKHNlbGYpOg0KLSAgICAgICAgcHJpbnQgJyVzOiBS
+ZWxlYXNlZCEnICUgc2VsZi5wYXRoDQorICAgICAgICBwcmludCgnJXM6IFJlbGVhc2VkIScgJSBz
+ZWxmLnBhdGgpDQogDQogY2xhc3MgVGVzdEFkdmVydGlzZW1lbnQoQWR2ZXJ0aXNlbWVudCk6DQog
+DQpAQCAtMTQ0LDExICsxNTAsMTEgQEAgY2xhc3MgVGVzdEFkdmVydGlzZW1lbnQoQWR2ZXJ0aXNl
+bWVudCk6DQogDQogDQogZGVmIHJlZ2lzdGVyX2FkX2NiKCk6DQotICAgIHByaW50ICdBZHZlcnRp
+c2VtZW50IHJlZ2lzdGVyZWQnDQorICAgIHByaW50KCdBZHZlcnRpc2VtZW50IHJlZ2lzdGVyZWQn
+KQ0KIA0KIA0KIGRlZiByZWdpc3Rlcl9hZF9lcnJvcl9jYihlcnJvcik6DQotICAgIHByaW50ICdG
+YWlsZWQgdG8gcmVnaXN0ZXIgYWR2ZXJ0aXNlbWVudDogJyArIHN0cihlcnJvcikNCisgICAgcHJp
+bnQoJ0ZhaWxlZCB0byByZWdpc3RlciBhZHZlcnRpc2VtZW50OiAnICsgc3RyKGVycm9yKSkNCiAg
+ICAgbWFpbmxvb3AucXVpdCgpDQogDQogDQpAQCAtMTU3LDcgKzE2Myw3IEBAIGRlZiBmaW5kX2Fk
+YXB0ZXIoYnVzKToNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgREJVU19PTV9JRkFD
+RSkNCiAgICAgb2JqZWN0cyA9IHJlbW90ZV9vbS5HZXRNYW5hZ2VkT2JqZWN0cygpDQogDQotICAg
+IGZvciBvLCBwcm9wcyBpbiBvYmplY3RzLml0ZXJpdGVtcygpOg0KKyAgICBmb3IgbywgcHJvcHMg
+aW4gb2JqZWN0cy5pdGVtcygpOg0KICAgICAgICAgaWYgTEVfQURWRVJUSVNJTkdfTUFOQUdFUl9J
+RkFDRSBpbiBwcm9wczoNCiAgICAgICAgICAgICByZXR1cm4gbw0KIA0KQEAgLTE3Myw3ICsxNzks
+NyBAQCBkZWYgbWFpbigpOg0KIA0KICAgICBhZGFwdGVyID0gZmluZF9hZGFwdGVyKGJ1cykNCiAg
+ICAgaWYgbm90IGFkYXB0ZXI6DQotICAgICAgICBwcmludCAnTEVBZHZlcnRpc2luZ01hbmFnZXIx
+IGludGVyZmFjZSBub3QgZm91bmQnDQorICAgICAgICBwcmludCgnTEVBZHZlcnRpc2luZ01hbmFn
+ZXIxIGludGVyZmFjZSBub3QgZm91bmQnKQ0KICAgICAgICAgcmV0dXJuDQogDQogICAgIGFkYXB0
+ZXJfcHJvcHMgPSBkYnVzLkludGVyZmFjZShidXMuZ2V0X29iamVjdChCTFVFWl9TRVJWSUNFX05B
+TUUsIGFkYXB0ZXIpLA0KQEAgLTE4Niw3ICsxOTIsNyBAQCBkZWYgbWFpbigpOg0KIA0KICAgICB0
+ZXN0X2FkdmVydGlzZW1lbnQgPSBUZXN0QWR2ZXJ0aXNlbWVudChidXMsIDApDQogDQotICAgIG1h
+aW5sb29wID0gZ29iamVjdC5NYWluTG9vcCgpDQorICAgIG1haW5sb29wID0gR09iamVjdC5NYWlu
+TG9vcCgpDQogDQogICAgIGFkX21hbmFnZXIuUmVnaXN0ZXJBZHZlcnRpc2VtZW50KHRlc3RfYWR2
+ZXJ0aXNlbWVudC5nZXRfcGF0aCgpLCB7fSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgcmVwbHlfaGFuZGxlcj1yZWdpc3Rlcl9hZF9jYiwNCi0tIA0KMi43LjQNCg0KDQo=
