@@ -1,61 +1,202 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Hunt, Preston" <preston.hunt@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH BlueZ] test/example-advertisement: add python3 support 
-Date: Fri, 4 May 2018 14:59:18 +0000
-Message-ID: <DF5EAE85-3D61-4D67-A452-4E6AEB3320CA@intel.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+References: <20180502091757.24190-1-grzegorz.kolodziejczyk@codecoup.pl>
+ <20180502091757.24190-3-grzegorz.kolodziejczyk@codecoup.pl>
+ <CABBYNZJVwKdAKPGxgOE_48=2zLvETe8oirr8w56Su5PrUh1eyA@mail.gmail.com>
+ <CALevQMaqsR3YLmCWC66LNS6Avsd6eFF5sfqGZQWJ0yNHUgR1Aw@mail.gmail.com> <CABBYNZK6LdwWxZtqvvviySkCHEh8tN5BNnjFufd_=zq0NCASYQ@mail.gmail.com>
+In-Reply-To: <CABBYNZK6LdwWxZtqvvviySkCHEh8tN5BNnjFufd_=zq0NCASYQ@mail.gmail.com>
+From: =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?=
+        <grzegorz.kolodziejczyk@codecoup.pl>
+Date: Fri, 04 May 2018 14:03:12 +0000
+Message-ID: <CALevQMYUodE8W+NgFY6V=tzwTjL+3OD3COrz-ytdqSGzDtAs9A@mail.gmail.com>
+Subject: Re: [RFC 2/2] client: Add authorized property handling to
+ characteristic attribute
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VGhpcyBhZGRzIHN1cHBvcnQgZm9yIHB5dGhvbjMgdG8gdGhlIGV4aXN0aW5nIHNjcmlwdC4gVGhl
-IHNjcmlwdCB3aWxsDQpub3cgd29yayB3aXRoIGVpdGhlciBweXRob24yIG9yIHB5dGhvbjMuDQot
-LS0NCiB0ZXN0L2V4YW1wbGUtYWR2ZXJ0aXNlbWVudCB8IDI0ICsrKysrKysrKysrKysrKy0tLS0t
-LS0tLQ0KIDEgZmlsZSBjaGFuZ2VkLCAxNSBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQ0K
-DQpkaWZmIC0tZ2l0IGEvdGVzdC9leGFtcGxlLWFkdmVydGlzZW1lbnQgYi90ZXN0L2V4YW1wbGUt
-YWR2ZXJ0aXNlbWVudA0KaW5kZXggZDliNWI0Mi4uZmQ4NGVhYyAxMDA3NTUNCi0tLSBhL3Rlc3Qv
-ZXhhbXBsZS1hZHZlcnRpc2VtZW50DQorKysgYi90ZXN0L2V4YW1wbGUtYWR2ZXJ0aXNlbWVudA0K
-QEAgLTEsMTIgKzEsMTggQEANCiAjIS91c3IvYmluL3B5dGhvbg0KIA0KK2Zyb20gX19mdXR1cmVf
-XyBpbXBvcnQgcHJpbnRfZnVuY3Rpb24NCisNCiBpbXBvcnQgZGJ1cw0KIGltcG9ydCBkYnVzLmV4
-Y2VwdGlvbnMNCiBpbXBvcnQgZGJ1cy5tYWlubG9vcC5nbGliDQogaW1wb3J0IGRidXMuc2Vydmlj
-ZQ0KIA0KIGltcG9ydCBhcnJheQ0KLWltcG9ydCBnb2JqZWN0DQorDQordHJ5Og0KKyAgZnJvbSBn
-aS5yZXBvc2l0b3J5IGltcG9ydCBHT2JqZWN0ICAjIHB5dGhvbjMNCitleGNlcHQgSW1wb3J0RXJy
-b3I6DQorICBpbXBvcnQgZ29iamVjdCBhcyBHT2JqZWN0ICAjIHB5dGhvbjINCiANCiBmcm9tIHJh
-bmRvbSBpbXBvcnQgcmFuZGludA0KIA0KQEAgLTExOCwxNyArMTI0LDE3IEBAIGNsYXNzIEFkdmVy
-dGlzZW1lbnQoZGJ1cy5zZXJ2aWNlLk9iamVjdCk6DQogICAgICAgICAgICAgICAgICAgICAgICAg
-IGluX3NpZ25hdHVyZT0ncycsDQogICAgICAgICAgICAgICAgICAgICAgICAgIG91dF9zaWduYXR1
-cmU9J2F7c3Z9JykNCiAgICAgZGVmIEdldEFsbChzZWxmLCBpbnRlcmZhY2UpOg0KLSAgICAgICAg
-cHJpbnQgJ0dldEFsbCcNCisgICAgICAgIHByaW50KCdHZXRBbGwnKQ0KICAgICAgICAgaWYgaW50
-ZXJmYWNlICE9IExFX0FEVkVSVElTRU1FTlRfSUZBQ0U6DQogICAgICAgICAgICAgcmFpc2UgSW52
-YWxpZEFyZ3NFeGNlcHRpb24oKQ0KLSAgICAgICAgcHJpbnQgJ3JldHVybmluZyBwcm9wcycNCisg
-ICAgICAgIHByaW50KCdyZXR1cm5pbmcgcHJvcHMnKQ0KICAgICAgICAgcmV0dXJuIHNlbGYuZ2V0
-X3Byb3BlcnRpZXMoKVtMRV9BRFZFUlRJU0VNRU5UX0lGQUNFXQ0KIA0KICAgICBAZGJ1cy5zZXJ2
-aWNlLm1ldGhvZChMRV9BRFZFUlRJU0VNRU5UX0lGQUNFLA0KICAgICAgICAgICAgICAgICAgICAg
-ICAgICBpbl9zaWduYXR1cmU9JycsDQogICAgICAgICAgICAgICAgICAgICAgICAgIG91dF9zaWdu
-YXR1cmU9JycpDQogICAgIGRlZiBSZWxlYXNlKHNlbGYpOg0KLSAgICAgICAgcHJpbnQgJyVzOiBS
-ZWxlYXNlZCEnICUgc2VsZi5wYXRoDQorICAgICAgICBwcmludCgnJXM6IFJlbGVhc2VkIScgJSBz
-ZWxmLnBhdGgpDQogDQogY2xhc3MgVGVzdEFkdmVydGlzZW1lbnQoQWR2ZXJ0aXNlbWVudCk6DQog
-DQpAQCAtMTQ0LDExICsxNTAsMTEgQEAgY2xhc3MgVGVzdEFkdmVydGlzZW1lbnQoQWR2ZXJ0aXNl
-bWVudCk6DQogDQogDQogZGVmIHJlZ2lzdGVyX2FkX2NiKCk6DQotICAgIHByaW50ICdBZHZlcnRp
-c2VtZW50IHJlZ2lzdGVyZWQnDQorICAgIHByaW50KCdBZHZlcnRpc2VtZW50IHJlZ2lzdGVyZWQn
-KQ0KIA0KIA0KIGRlZiByZWdpc3Rlcl9hZF9lcnJvcl9jYihlcnJvcik6DQotICAgIHByaW50ICdG
-YWlsZWQgdG8gcmVnaXN0ZXIgYWR2ZXJ0aXNlbWVudDogJyArIHN0cihlcnJvcikNCisgICAgcHJp
-bnQoJ0ZhaWxlZCB0byByZWdpc3RlciBhZHZlcnRpc2VtZW50OiAnICsgc3RyKGVycm9yKSkNCiAg
-ICAgbWFpbmxvb3AucXVpdCgpDQogDQogDQpAQCAtMTU3LDcgKzE2Myw3IEBAIGRlZiBmaW5kX2Fk
-YXB0ZXIoYnVzKToNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgREJVU19PTV9JRkFD
-RSkNCiAgICAgb2JqZWN0cyA9IHJlbW90ZV9vbS5HZXRNYW5hZ2VkT2JqZWN0cygpDQogDQotICAg
-IGZvciBvLCBwcm9wcyBpbiBvYmplY3RzLml0ZXJpdGVtcygpOg0KKyAgICBmb3IgbywgcHJvcHMg
-aW4gb2JqZWN0cy5pdGVtcygpOg0KICAgICAgICAgaWYgTEVfQURWRVJUSVNJTkdfTUFOQUdFUl9J
-RkFDRSBpbiBwcm9wczoNCiAgICAgICAgICAgICByZXR1cm4gbw0KIA0KQEAgLTE3Myw3ICsxNzks
-NyBAQCBkZWYgbWFpbigpOg0KIA0KICAgICBhZGFwdGVyID0gZmluZF9hZGFwdGVyKGJ1cykNCiAg
-ICAgaWYgbm90IGFkYXB0ZXI6DQotICAgICAgICBwcmludCAnTEVBZHZlcnRpc2luZ01hbmFnZXIx
-IGludGVyZmFjZSBub3QgZm91bmQnDQorICAgICAgICBwcmludCgnTEVBZHZlcnRpc2luZ01hbmFn
-ZXIxIGludGVyZmFjZSBub3QgZm91bmQnKQ0KICAgICAgICAgcmV0dXJuDQogDQogICAgIGFkYXB0
-ZXJfcHJvcHMgPSBkYnVzLkludGVyZmFjZShidXMuZ2V0X29iamVjdChCTFVFWl9TRVJWSUNFX05B
-TUUsIGFkYXB0ZXIpLA0KQEAgLTE4Niw3ICsxOTIsNyBAQCBkZWYgbWFpbigpOg0KIA0KICAgICB0
-ZXN0X2FkdmVydGlzZW1lbnQgPSBUZXN0QWR2ZXJ0aXNlbWVudChidXMsIDApDQogDQotICAgIG1h
-aW5sb29wID0gZ29iamVjdC5NYWluTG9vcCgpDQorICAgIG1haW5sb29wID0gR09iamVjdC5NYWlu
-TG9vcCgpDQogDQogICAgIGFkX21hbmFnZXIuUmVnaXN0ZXJBZHZlcnRpc2VtZW50KHRlc3RfYWR2
-ZXJ0aXNlbWVudC5nZXRfcGF0aCgpLCB7fSwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgcmVwbHlfaGFuZGxlcj1yZWdpc3Rlcl9hZF9jYiwNCi0tIA0KMi43LjQNCg0KDQo=
+Hi Luiz,
+czw., 3 maj 2018 o 11:58 Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+napisa=C5=82(a):
+
+> Hi Grzegorz,
+> On Wed, May 2, 2018 at 4:06 PM Grzegorz Ko=C5=82odziejczyk <
+> grzegorz.kolodziejczyk@codecoup.pl> wrote:
+
+> > Hi Luiz,
+> > =C5=9Br., 2 maj 2018 o 12:42 Luiz Augusto von Dentz <luiz.dentz@gmail.c=
+om>
+> > napisa=C5=82(a):
+
+> > > Hi Grzegorz,
+> > > On Wed, May 2, 2018 at 1:09 PM Grzegorz Kolodziejczyk <
+> > > grzegorz.kolodziejczyk@codecoup.pl> wrote:
+
+> > > > This patch adds handling of authorized property to bluetoothctl.
+> > > > ---
+> > > >   client/gatt.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+> > > >   1 file changed, 46 insertions(+)
+
+> > > > diff --git a/client/gatt.c b/client/gatt.c
+> > > > index 6bf644c48..fffa86851 100644
+> > > > --- a/client/gatt.c
+> > > > +++ b/client/gatt.c
+> > > > @@ -1432,6 +1432,30 @@ static gboolean
+> chrc_notify_acquired_exists(const
+> > > GDBusPropertyTable *property,
+> > > >          return FALSE;
+> > > >   }
+
+> > > > +static gboolean chrc_get_authorized(const GDBusPropertyTable
+> *property,
+> > > > +                                       DBusMessageIter *iter, void
+> > *data)
+> > > > +{
+> > > > +       struct chrc *chrc =3D data;
+> > > > +       dbus_bool_t value;
+> > > > +
+> > > > +       value =3D chrc->authorized ? TRUE : FALSE;
+> > > > +
+> > > > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
+> &value);
+> > > > +
+> > > > +       return TRUE;
+> > > > +}
+> > > > +
+> > > > +static gboolean chrc_get_authorized_exists(const GDBusPropertyTabl=
+e
+> > > *property,
+> > > > +                                                               voi=
+d
+> > > *data)
+> > > > +{
+> > > > +       struct chrc *chrc =3D data;
+> > > > +
+> > > > +       if (chrc->authorization_req)
+> > > > +               return TRUE;
+> > > > +
+> > > > +       return FALSE;
+> > > > +}
+> > > > +
+> > > >   static const GDBusPropertyTable chrc_properties[] =3D {
+> > > >          { "UUID", "s", chrc_get_uuid, NULL, NULL },
+> > > >          { "Service", "o", chrc_get_service, NULL, NULL },
+> > > > @@ -1442,6 +1466,8 @@ static const GDBusPropertyTable
+> chrc_properties[]
+> > =3D
+> > > {
+> > > >                                          chrc_write_acquired_exists
+},
+> > > >          { "NotifyAcquired", "b", chrc_get_notify_acquired, NULL,
+> > > >                                          chrc_notify_acquired_exist=
+s
+> },
+> > > > +       { "Authorized", "b", chrc_get_authorized, NULL,
+> > > > +
+> > > chrc_get_authorized_exists },
+> > > >          { }
+> > > >   };
+
+> > > > @@ -1665,6 +1691,15 @@ static void authorize_write_response(const
+char
+> > > *input, void *user_data)
+
+> > > >          chrc->authorized =3D true;
+
+> > > > +       /* Authorization check of prepare writes */
+> > > > +       if (!chrc->value_len) {
+> > > > +               reply =3D g_dbus_create_reply(pending_message,
+> > > DBUS_TYPE_INVALID);
+> > > > +               g_dbus_send_message(aad->conn, reply);
+> > > > +               g_free(aad);
+> > > > +
+> > > > +               return;
+> > > > +       }
+> > > > +
+> > > >          errsv =3D parse_value_arg(&iter, &chrc->value,
+> &chrc->value_len,
+
+> > > chrc->max_val_len);
+> > > >          if (errsv =3D=3D -EINVAL) {
+> > > > @@ -1701,8 +1736,16 @@ static DBusMessage
+> > > *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
+> > > >          DBusMessageIter iter;
+> > > >          char *str;
+> > > >          int errsv;
+> > > > +       uint16_t offset =3D 0;
+
+> > > >          dbus_message_iter_init(msg, &iter);
+> > > > +       /* Get offset only (second parameter) */
+> > > > +       dbus_message_iter_next(&iter);
+> > > > +
+> > > > +       parse_options(&iter, &offset, NULL, NULL, NULL);
+> > > > +
+> > > > +       if (chrc->authorization_req && offset =3D=3D 0)
+> > > > +               chrc->authorized =3D false;
+
+> > > >          if (chrc->authorization_req && !chrc->authorized) {
+> > > >                  struct authorize_attribute_data *aad;
+> > > > @@ -1722,6 +1765,9 @@ static DBusMessage
+> > *chrc_write_value(DBusConnection
+> > > *conn, DBusMessage *msg,
+> > > >                  return NULL;
+> > > >          }
+
+> > > > +       /* Rewind to value parameter */
+> > > > +       dbus_message_iter_init(msg, &iter);
+
+> > > I would prefer to make parse_value_arg parse the offset as well so we
+> > don't
+> > > have to reinit the iter.
+> > Current version of bluetoothctl already parsses offset in
+parse_value_arg
+> > for writing value purposes (patch
+> 1dd33d584ce1e4bd0f1d87e88663350a80f37f01).
+
+> > As the offset is second parameter for write method it's needed (afaik)
+to
+> > recurse over iterator to offset parameter then parse value (there is no
+> > need to parse value at beginnig). Currently this implementation assumes
+> > that every write request with offset =3D 0 is new write request which h=
+as
+to
+> > be authoriez/re-authorized.
+
+> That fact that parse_value_arg is already a strong indication that we
+> should reuse it, we just need to add the offset as a output parameter,
+like
+> it is done in parse_options, that way we will get both the value and the
+> offset in the same call and don't have to reinit the iter.
+For now the parse_value_arg function is not only parsing dbus message and
+gets values, but also write attribute value.
+I guess the idea of requesting authorization for write value with offset =
+=3D
+0 is not considered for now so this wouldn't be needed.
+
+> > > >          errsv =3D parse_value_arg(&iter, &chrc->value,
+> &chrc->value_len,
+
+> > > chrc->max_val_len);
+> > > >          if (errsv =3D=3D -EINVAL) {
+> > > > --
+> > > > 2.13.6
+
+> > > > --
+> > > > To unsubscribe from this list: send the line "unsubscribe
+> > > linux-bluetooth" in
+> > > > the body of a message to majordomo@vger.kernel.org
+> > > > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+> > > --
+> > > Luiz Augusto von Dentz
+> > Grzegorz Ko=C5=82odziejczyk
+
+
+
+> --
+> Luiz Augusto von Dentz
+Grzegorz Ko=C5=82odziejczyk
