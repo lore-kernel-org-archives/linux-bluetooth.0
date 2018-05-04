@@ -1,202 +1,215 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <20180502091757.24190-1-grzegorz.kolodziejczyk@codecoup.pl>
- <20180502091757.24190-3-grzegorz.kolodziejczyk@codecoup.pl>
- <CABBYNZJVwKdAKPGxgOE_48=2zLvETe8oirr8w56Su5PrUh1eyA@mail.gmail.com>
- <CALevQMaqsR3YLmCWC66LNS6Avsd6eFF5sfqGZQWJ0yNHUgR1Aw@mail.gmail.com> <CABBYNZK6LdwWxZtqvvviySkCHEh8tN5BNnjFufd_=zq0NCASYQ@mail.gmail.com>
-In-Reply-To: <CABBYNZK6LdwWxZtqvvviySkCHEh8tN5BNnjFufd_=zq0NCASYQ@mail.gmail.com>
-From: =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?=
-        <grzegorz.kolodziejczyk@codecoup.pl>
-Date: Fri, 04 May 2018 14:03:12 +0000
-Message-ID: <CALevQMYUodE8W+NgFY6V=tzwTjL+3OD3COrz-ytdqSGzDtAs9A@mail.gmail.com>
-Subject: Re: [RFC 2/2] client: Add authorized property handling to
- characteristic attribute
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+References: <68cc4a9b-5bbb-6dd0-3560-4de1594b8271@flypig.co.uk>
+ <CABBYNZJ08UMN8-0LfuWpgpELKLmjvSTdcjDUvQqdsQhp3N9xBw@mail.gmail.com>
+ <1100eedc-ec4f-e798-9ca7-511a9030c9b6@flypig.co.uk> <4a59a008-4595-8530-cd22-6a4a1cf4520f@flypig.co.uk>
+ <CABBYNZ+rmXvnMpkkP-wkmGs07S2EA=Pum9j=LFxFJzYJm45C-A@mail.gmail.com>
+In-Reply-To: <CABBYNZ+rmXvnMpkkP-wkmGs07S2EA=Pum9j=LFxFJzYJm45C-A@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 04 May 2018 11:14:43 +0000
+Message-ID: <CABBYNZLkkcSWns5R4U8fmxQFJ2A9RccYxqvrEVVF_rGY668fDA@mail.gmail.com>
+Subject: Re: BLE ad discoverability flags - missing when ads are generated,
+ but needed when scanning
+To: david@flypig.co.uk
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Szymon Janc <szymon.janc@codecoup.pl>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-czw., 3 maj 2018 o 11:58 Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-napisa=C5=82(a):
+Hi Szymon,
+On Fri, May 4, 2018 at 2:13 PM Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+wrote:
 
-> Hi Grzegorz,
-> On Wed, May 2, 2018 at 4:06 PM Grzegorz Ko=C5=82odziejczyk <
-> grzegorz.kolodziejczyk@codecoup.pl> wrote:
+> Hi David,
+> On Fri, May 4, 2018 at 1:34 PM David Llewellyn-Jones <david@flypig.co.uk>
+> wrote:
 
 > > Hi Luiz,
-> > =C5=9Br., 2 maj 2018 o 12:42 Luiz Augusto von Dentz <luiz.dentz@gmail.c=
-om>
-> > napisa=C5=82(a):
 
-> > > Hi Grzegorz,
-> > > On Wed, May 2, 2018 at 1:09 PM Grzegorz Kolodziejczyk <
-> > > grzegorz.kolodziejczyk@codecoup.pl> wrote:
+> > Forgive me for following up my own post, this is an addendum.
 
-> > > > This patch adds handling of authorized property to bluetoothctl.
-> > > > ---
-> > > >   client/gatt.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
-> > > >   1 file changed, 46 insertions(+)
+> > On 03/05/18 19:15, David Llewellyn-Jones wrote:
+> > > Hi Luiz,
+> > >
+> > > Thanks for the prompt reply.
+> > >
+> > > On 03/05/18 18:58, Luiz Augusto von Dentz wrote:
+> > >> Hi David,
+> > >>
+> > >> On Thu, May 3, 2018 at 7:42 PM David Llewellyn-Jones <
+> david@flypig.co.uk>
+> > >> wrote:
+> > >>
+> > >>> Hi,
+> > >>
+> > >>> I've been using bluez on a combination of an Ubuntu laptop running
+> bluez
+> > >>> 5.49 compiled from source and a Sailfish OS phone running the
+default
+> > >>> install bluez 5.47. On the laptop I'm using DBUS to interact with
+> bluez;
+> > >>> on the phone I'm going via the QTBluetoothDiscoveryAgent interface,
+> > >>> running QT 5.6.
+> > >>
+> > >>> The difficulty I've been experiencing is that BLE advertisements
+sent
+> > >>> from the laptop in peripheral mode aren't being discovered by the
+> phone.
+> > >>
+> > >>> I can see the advertisements being picked up by btmon on the phone,
+> but
+> > >>> it doesn't filter up to the QT wrapper. Looking through the bluez
+> source
+> > >>> code, it appears that the reason is because in the case of
+unfiltered
+> > >>> discovery, bluez ignores adverts that don't have either EIR_LIM_DISC
+> or
+> > >>> EIR_GEN_DISC flags set, as in the following code:
+> > >>
+> > >>
+> > >>
 
-> > > > diff --git a/client/gatt.c b/client/gatt.c
-> > > > index 6bf644c48..fffa86851 100644
-> > > > --- a/client/gatt.c
-> > > > +++ b/client/gatt.c
-> > > > @@ -1432,6 +1432,30 @@ static gboolean
-> chrc_notify_acquired_exists(const
-> > > GDBusPropertyTable *property,
-> > > >          return FALSE;
-> > > >   }
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/adapter.c?h=5.47#n5658
+> > >>
+> > >>> However, as far as I can tell (I could easily be wrong), bluez never
+> > >>> adds these flags into the advertising data. I was expecting to see
+> them
+> > >>> added in the following bit of code:
+> > >>
+> > >>
+> > >>
 
-> > > > +static gboolean chrc_get_authorized(const GDBusPropertyTable
-> *property,
-> > > > +                                       DBusMessageIter *iter, void
-> > *data)
-> > > > +{
-> > > > +       struct chrc *chrc =3D data;
-> > > > +       dbus_bool_t value;
-> > > > +
-> > > > +       value =3D chrc->authorized ? TRUE : FALSE;
-> > > > +
-> > > > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
-> &value);
-> > > > +
-> > > > +       return TRUE;
-> > > > +}
-> > > > +
-> > > > +static gboolean chrc_get_authorized_exists(const GDBusPropertyTabl=
-e
-> > > *property,
-> > > > +                                                               voi=
-d
-> > > *data)
-> > > > +{
-> > > > +       struct chrc *chrc =3D data;
-> > > > +
-> > > > +       if (chrc->authorization_req)
-> > > > +               return TRUE;
-> > > > +
-> > > > +       return FALSE;
-> > > > +}
-> > > > +
-> > > >   static const GDBusPropertyTable chrc_properties[] =3D {
-> > > >          { "UUID", "s", chrc_get_uuid, NULL, NULL },
-> > > >          { "Service", "o", chrc_get_service, NULL, NULL },
-> > > > @@ -1442,6 +1466,8 @@ static const GDBusPropertyTable
-> chrc_properties[]
-> > =3D
-> > > {
-> > > >                                          chrc_write_acquired_exists
-},
-> > > >          { "NotifyAcquired", "b", chrc_get_notify_acquired, NULL,
-> > > >                                          chrc_notify_acquired_exist=
-s
-> },
-> > > > +       { "Authorized", "b", chrc_get_authorized, NULL,
-> > > > +
-> > > chrc_get_authorized_exists },
-> > > >          { }
-> > > >   };
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/shared/ad.c#n423
+> > >>
+> > >>> As a result, I can't figure out a way to produce advertisements from
+> my
+> > >>> laptop that can be picked up by my phone.
+> > >>
+> > >>> Adding the flags by calling the following function within
+> > >>> bt_ad_generate() with a value of 0x06 fixed the issue (i.e. allowed
+my
+> > >>> phone to discover my laptop).
+> > >>
+> > >>> static void serialize_flags(uint8_t value, uint8_t *buf, uint8_t
+*pos)
+> > >>> {
+> > >>>          if (value == 0)
+> > >>>                  return;
+> > >>
+> > >>>          buf[(*pos)++] = sizeof(value) + 1;
+> > >>>          buf[(*pos)++] = EIR_FLAGS;
+> > >>>          buf[(*pos)++] = value;
+> > >>> }
+> > >>
+> > >>> My question is therefore whether there's a way for bluez to produce
+> BLE
+> > >>> advertisements (on my laptop) that can be picked up by a
+non-filtered
+> > >>> scan using bluez (on my phone). I searched the Web and the list
+> archives
+> > >>> but didn't find anything that seemed to help answer.
+> > >>
+> > >> It is actually added if you have marked the adapter as Discoverable:
+> > >>
+> > >>
 
-> > > > @@ -1665,6 +1691,15 @@ static void authorize_write_response(const
-char
-> > > *input, void *user_data)
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/advertising.c#n740
+> > >
+> > > From what I can make out, the flag is registered, but never actually
+> > > added to the advert payload data. At least, this is what I could make
+> > > out from the 5.49 code, and running experiments matched this behaviour
+> > > (i.e. marking the adapter discoverable and running the scan still
+> > > yielded no results).
+> > >
+> > > I also noticed that making the adapter discoverable turns on
+visibility
+> > > for Bluetooth Classic, which I was hoping to avoid. There would be
+> > > definite value for me in separating the two (e.g. being able to
+> > > explicitly set the flags in the advert).
+> > >
+> > >> There has been some debate if we should have this per instance but
+that
+> > >> would probably require some changes in the way we deal with whitelist
+> > >> devices since currently we only allow unknown devices to connect when
+> > >> discoverable.
+> > >
+> > > I'm afraid I don't understand the issue as I'm not sure what you mean
+by
+> > > whitelist devices, and I must have missed this discussing when
+searching
+> > > the archives. I'll dig a bit further to try to understand better.
 
-> > > >          chrc->authorized =3D true;
+> > I had a look through the archives but couldn't find the debate you're
+> > referring to. However, I had a look at references to whitelisting in the
+> > code, which I hope has allowed the following better understanding:
 
-> > > > +       /* Authorization check of prepare writes */
-> > > > +       if (!chrc->value_len) {
-> > > > +               reply =3D g_dbus_create_reply(pending_message,
-> > > DBUS_TYPE_INVALID);
-> > > > +               g_dbus_send_message(aad->conn, reply);
-> > > > +               g_free(aad);
-> > > > +
-> > > > +               return;
-> > > > +       }
-> > > > +
-> > > >          errsv =3D parse_value_arg(&iter, &chrc->value,
-> &chrc->value_len,
+> > If a device is sending adverts with the 'discoverable' flag set, but the
+> > adapter isn't in discoverable mode, then any recipient of the
+> > advertisement will be rejected if it tries to connect and isn't
+> > whitelisted (bonded). This is undesirable behaviour.
 
-> > > chrc->max_val_len);
-> > > >          if (errsv =3D=3D -EINVAL) {
-> > > > @@ -1701,8 +1736,16 @@ static DBusMessage
-> > > *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
-> > > >          DBusMessageIter iter;
-> > > >          char *str;
-> > > >          int errsv;
-> > > > +       uint16_t offset =3D 0;
+> > Is this a correct interpretation of the problem?
 
-> > > >          dbus_message_iter_init(msg, &iter);
-> > > > +       /* Get offset only (second parameter) */
-> > > > +       dbus_message_iter_next(&iter);
-> > > > +
-> > > > +       parse_options(&iter, &offset, NULL, NULL, NULL);
-> > > > +
-> > > > +       if (chrc->authorization_req && offset =3D=3D 0)
-> > > > +               chrc->authorized =3D false;
+> Yes, and that is why we are not setting the flags since devices would not
+> be able to connect if the adapter is not set discoverable.
 
-> > > >          if (chrc->authorization_req && !chrc->authorized) {
-> > > >                  struct authorize_attribute_data *aad;
-> > > > @@ -1722,6 +1765,9 @@ static DBusMessage
-> > *chrc_write_value(DBusConnection
-> > > *conn, DBusMessage *msg,
-> > > >                  return NULL;
-> > > >          }
+> > For my particular use case I'd like the phone to be able to receive the
+> > advert, then read/write GATT characteristics without the adapter being
+> > in BR/EDR discoverable mode. When I use iOS to connect to the same bluez
+> > peripheral it works seamlessly and I'm trying to match the same
+> > behaviour. Unlike bluez 5.47, iOS doesn't filter out the adverts with no
+> > 'discoverable' flag.
 
-> > > > +       /* Rewind to value parameter */
-> > > > +       dbus_message_iter_init(msg, &iter);
+> > So I think there are two issues here:
 
-> > > I would prefer to make parse_value_arg parse the offset as well so we
-> > don't
-> > > have to reinit the iter.
-> > Current version of bluetoothctl already parsses offset in
-parse_value_arg
-> > for writing value purposes (patch
-> 1dd33d584ce1e4bd0f1d87e88663350a80f37f01).
+> > 1. Should the flags be added to the ad data payload? As far as I can
+> > tell the current implementation never includes them, but there are
+> > circumstances when they should be. I'd be very happy if I'm wrong!
 
-> > As the offset is second parameter for write method it's needed (afaik)
-to
-> > recurse over iterator to offset parameter then parse value (there is no
-> > need to parse value at beginnig). Currently this implementation assumes
-> > that every write request with offset =3D 0 is new write request which h=
-as
-to
-> > be authoriez/re-authorized.
+> It seems to be working properly and I can find the advertising instance:
 
-> That fact that parse_value_arg is already a strong indication that we
-> should reuse it, we just need to add the offset as a output parameter,
-like
-> it is done in parse_options, that way we will get both the value and the
-> offset in the same call and don't have to reinit the iter.
-For now the parse_value_arg function is not only parsing dbus message and
-gets values, but also write attribute value.
-I guess the idea of requesting authorization for write value with offset =
-=3D
-0 is not considered for now so this wouldn't be needed.
+> > HCI Event: LE Meta Event (0x3e) plen 15
+>         LE Advertising Report (0x02)
+>           Num reports: 1
+>           Event type: Connectable undirected - ADV_IND (0x00)
+>           Address type: Public (0x00)
+>           Address: 00:1B:DC:08:E4:FD (Vencer Co., Ltd.)
+>           Data length: 3
+>           Flags: 0x02
+>             LE General Discoverable Mode
+>           RSSI: -28 dBm (0xe4)
+> @ MGMT Event: Device Found (0x0012) plen 17
+>           LE Address: 00:1B:DC:08:E4:FD (Vencer Co., Ltd.)
+>           RSSI: -28 dBm (0xe4)
+>           Flags: 0x00000000
+>           Data length: 3
+>           Flags: 0x02
+>             LE General Discoverable Mode
 
-> > > >          errsv =3D parse_value_arg(&iter, &chrc->value,
-> &chrc->value_len,
+> > 2. If the 'discoverable' flag can be set in the ad independent of the
+> > adapter, how to tackle unknown devices that then try to connect?
 
-> > > chrc->max_val_len);
-> > > >          if (errsv =3D=3D -EINVAL) {
-> > > > --
-> > > > 2.13.6
+> We would have to change the kernel policy regarding discoverable, it would
+> have to check if there is any instance advertising with Discoverable mode,
+> we may restrict it to just the address of that instance though.
 
-> > > > --
-> > > > To unsubscribe from this list: send the line "unsubscribe
-> > > linux-bluetooth" in
-> > > > the body of a message to majordomo@vger.kernel.org
-> > > > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > I can put together a patch that, even if it's of no use, might better
+> > illustrate 1 if that would be helpful? For 2, I'd value any suggestions
+> > for the correct way to allow a central to access the peripheral
+> > characteristics as seamlessly as possible.
 
+> I guess the real problem here is that by only allowing connecting with
+> discoverable set that means we would leak the public address over BR/EDR
+> when using LE privacy, so I guess we really need to allow discoverable
+> setting per ad instance but will have to change this policy in the kernel.
+> In terms of API probably nothing has to be changed but the kernel will
+need
+> to be aware of the instances discoverable flag in order to allow
+connection
+> even if the global discoverable flag is not set.
 
+Thoughts?
 
-> > > --
-> > > Luiz Augusto von Dentz
-> > Grzegorz Ko=C5=82odziejczyk
-
-
-
-> --
-> Luiz Augusto von Dentz
-Grzegorz Ko=C5=82odziejczyk
+-- 
+Luiz Augusto von Dentz
