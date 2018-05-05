@@ -1,50 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] doc/advertising-api: Add Flags property
-Date: Mon,  7 May 2018 11:24:09 +0300
-Message-Id: <20180507082409.30018-1-luiz.dentz@gmail.com>
+Date: Sun, 6 May 2018 04:11:54 +0800
+From: kbuild test robot <lkp@intel.com>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc: kbuild-all@01.org, marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [RFC PATCH] Bluetooth: hci_qca: btqca_disable_regulators() can be
+ static
+Message-ID: <20180505201154.GA97475@lkp-hsx03>
+References: <1525448106-18616-3-git-send-email-bgodavar@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1525448106-18616-3-git-send-email-bgodavar@codeaurora.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds Flags which the application can use in case it want to set
-it own flags.
-
-Note: This would allow for example an application to advertise as
-discoverable even if the adapter is not discoverable which may be
-required by dual-mode as it may not require BR/EDR to be discoverable.
+Fixes: 1bab29c5dbe1 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990.")
+Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
 ---
- doc/advertising-api.txt | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ hci_qca.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index eef98ad91..234f9c2f2 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -78,6 +78,21 @@ Properties	string Type
- 				<Transport Discovery> <Organization Flags...>
- 				0x26                   0x01         0x01...
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 075fab7..ff9fbe0 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1291,7 +1291,7 @@ static const struct btqca_vreg_data cherokee_data = {
+ 	.num_vregs = 5,
+ };
  
-+		byte Flags [Experimental]
-+
-+			Advertising Flags to include. When present this will
-+			override existing flags such as Discoverable.
-+
-+			Note: This property shall not be set when Type is set
-+			to broadcast.
-+
-+			Possible value:
-+				bit 0 - LE Limited Discoverable Mode
-+				bit 1 - LE General Discoverable Mode
-+				bit 2 - BR/EDR Not Supported
-+				bit 3 - Simultaneous LE and BR/EDR (Controller)
-+				bit 4 - Simultaneous LE and BR/EDR (Host)
-+
- 		array{string} Includes
- 
- 			List of features to be included in the advertising
--- 
-2.14.3
-
+-void btqca_disable_regulators(int reg_nu, struct btqca_vreg *vregs)
++static void btqca_disable_regulators(int reg_nu, struct btqca_vreg *vregs)
+ {
+ 	/* disable the regulator if requested by user
+ 	 * or when fault in any regulator.
