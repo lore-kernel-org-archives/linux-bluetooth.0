@@ -1,123 +1,82 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Message-ID: <1525762084.14468.20.camel@mtkswgap22>
-Subject: Re: [PATCH v1 6/7] Bluetooth: hci_mediatek: Add protocol support
- for MediaTek serial devices
-From: Sean Wang <sean.wang@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: <robh+dt@kernel.org>, <mark.rutland@arm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Date: Tue, 8 May 2018 14:48:04 +0800
-In-Reply-To: <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
-References: <cover.1522736996.git.sean.wang@mediatek.com>
-         <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
-         <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Brian Gix <brian.gix@intel.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org
+Cc: Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ 0/1] shared/ecc: Make ecc_make_key() a stand alone API
+Date: Mon,  7 May 2018 15:35:24 -0700
+Message-Id: <20180507223524.32070-2-brian.gix@intel.com>
+In-Reply-To: <20180507223524.32070-1-brian.gix@intel.com>
+References: <20180507223524.32070-1-brian.gix@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Marcel
+And correct minor flaws in API descriptions
+---
+ src/shared/ecc.c | 25 +++++++++++++++++--------
+ src/shared/ecc.h |  4 +++-
+ 2 files changed, 20 insertions(+), 9 deletions(-)
 
-On Tue, 2018-04-03 at 12:27 +0200, Marcel Holtmann wrote:
-> Hi Sean,
-> 
+diff --git a/src/shared/ecc.c b/src/shared/ecc.c
+index 15f6b8a93..1c1c3446a 100644
+--- a/src/shared/ecc.c
++++ b/src/shared/ecc.c
+@@ -883,20 +883,29 @@ bool ecc_make_public_key(const uint8_t private_key[32], uint8_t public_key[64])
+ 
+ bool ecc_make_key(uint8_t public_key[64], uint8_t private_key[32])
+ {
++	struct ecc_point pk;
+ 	uint64_t priv[NUM_ECC_DIGITS];
+-	unsigned int tries = 0;
+-	bool result = false;
++	unsigned tries = 0;
++
++	do {
++		if (!get_random_number(priv) || (tries++ >= MAX_TRIES))
++			return false;
+ 
+-	for (tries = 0; !result && tries < MAX_TRIES; tries++) {
+-		if (!get_random_number(priv))
++		if (vli_is_zero(priv))
+ 			continue;
+ 
+-		ecc_native2bytes(priv, private_key);
++		/* Make sure the private key is in the range [1, n-1]. */
++		if (vli_cmp(curve_n, priv) != 1)
++			continue;
+ 
+-		result = ecc_make_public_key(private_key, public_key);
+-	}
++		ecc_point_mult(&pk, &curve_g, priv, NULL, vli_num_bits(priv));
++	} while (ecc_point_is_zero(&pk));
+ 
+-	return result;
++	ecc_native2bytes(priv, private_key);
++	ecc_native2bytes(pk.x, public_key);
++	ecc_native2bytes(pk.y, &public_key[32]);
++
++	return true;
+ }
+ 
+ bool ecc_valid_public_key(const uint8_t public_key[64])
+diff --git a/src/shared/ecc.h b/src/shared/ecc.h
+index a88e735c7..8c15e4ee8 100644
+--- a/src/shared/ecc.h
++++ b/src/shared/ecc.h
+@@ -28,9 +28,11 @@
+ #include <stdint.h>
+ 
+ /* Create a public key from a private key.
++ *
++ * Inputs:
++ *	private_key - Your private key.
+  *
+  * Outputs:
+- *	private_key - Const private key
+  *	public_key  - Will be filled in with the public key.
+  *
+  * Returns true if the public key was generated successfully, false
+-- 
+2.14.3
 
-[ ... ]
-
-> > +
-> > +static int mtk_wmt_cmd_sync(struct hci_uart *hu, u8 opcode, u8 flag, u16 plen,
-> > +			    const void *param)
-> > +{
-> > +	struct mtk_bt_dev *btdev = hu->priv;
-> > +	struct hci_command_hdr *hhdr;
-> > +	struct hci_acl_hdr *ahdr;
-> > +	struct mtk_wmt_hdr *whdr;
-> > +	struct sk_buff *skb;
-> > +	int ret = 0;
-> > +
-> > +	init_completion(&btdev->wmt_cmd);
-> > +
-> > +	skb = bt_skb_alloc(plen + MTK_WMT_CMD_SIZE, GFP_KERNEL);
-> > +	if (!skb)
-> > +		return -ENOMEM;
-> > +
-> > +	/*
-> > +	 * WMT data is carried in either ACL or HCI format with op code as
-> > +	 * 0xfc6f and followed by a WMT header and its actual payload.
-> > +	 */
-> 
-> Please use net subsystem comment style.
-> 
-> > +	switch (opcode) {
-> > +	case MTK_WMT_PATCH_DWNLD:
-> > +		ahdr = skb_put(skb, HCI_ACL_HDR_SIZE);
-> > +		ahdr->handle = cpu_to_le16(0xfc6f);
-> > +		ahdr->dlen   = cpu_to_le16(plen + MTK_WMT_HDR_SIZE);
-> > +		break;
-> > +	default:
-> > +		hhdr = skb_put(skb, HCI_COMMAND_HDR_SIZE);
-> > +		hhdr->opcode = cpu_to_le16(0xfc6f);
-> > +		hhdr->plen = plen + MTK_WMT_HDR_SIZE;
-> > +		break;
-> > +	}
-> > +
-> > +	hci_skb_pkt_type(skb) = opcode == MTK_WMT_PATCH_DWNLD ?
-> > +				HCI_ACLDATA_PKT : HCI_COMMAND_PKT;
-> 
-> Why not move that into the switch statement above.
-> 
-> > +
-> > +	/* Start to build a WMT header and its actual payload. */
-> > +	whdr = skb_put(skb, MTK_WMT_HDR_SIZE);
-> > +	whdr->dir = 1;
-> > +	whdr->op = opcode;
-> > +	whdr->dlen = cpu_to_le16(plen + 1);
-> > +	whdr->flag = flag;
-> > +	skb_put_data(skb, param, plen);
-> > +
-> > +	mtk_enqueue(hu, skb);
-> > +	hci_uart_tx_wakeup(hu);
-> > +
-> > +	/*
-> > +	 * Waiting a WMT event response, while we must take care in case of
-> > +	 * failures for the wait.
-> > +	 */
-> > +	ret = wait_for_completion_interruptible_timeout(&btdev->wmt_cmd, HZ);
-> > +
-> > +	return ret > 0 ? 0 : ret < 0 ? ret : -ETIMEDOUT;
-> > +}
-> 
-> All in all I am not convinced that this is super clean. I get that we need something special for having this in the ACL data packets, but for the standard HCI command I prefer that __hci_cmd_sync is used. I addition, it seems that patch download is the only special case and that happens before at the setup stage. So we could make things special for that. I need to understand this a bit better. Can I get a btmon -w trace.log file from the whole init procedure.
-> 
-
-While i was trying to rewrite the driver based on btuart.c. you posted
-on RFC, I used __hci_cmd_sync_ev to replace such kinds of SoC specific
-hci command sending which I've done previously with mtk_wmt_cmd_sync.
-
-However, eventually, I got a cmd_timer timeout whose message printed
-on console as "Bluetooth: hci0: command 0xfc6f tx timeout".
-
-The mtk soc specific cmd/event I posted below, I dumped directly in
-driver, always uses cmd as opcode 0xfc6f, and its event id as 0xe4.
-
-It appears to the event id is not standard and thus it cannot cancel the
-cmd timer when the special hci event is being handled. This way can we
-can still use __hci_cmd_sync api ?
-                         
-[    4.896200] hci tx: 00000000: 01 6f fc 05 01 07 01 00 04    
-[    4.904671] hci rx: 00000000: e4 05 02 07 01 00
-00                             
-[    4.912859] Bluetooth: hci0 event 0xe4
-
-
-buildroot login: [    6.914509] Bluetooth: hci0: command 0xfc6f tx
-timeout
-[    6.919831] hci tx: 00000000: 01 6f fc 06 01 06 02 00 00
-01                    .o........
-[    7.006631] hci rx: 00000000: e4 05 02 06 01 00
-00                             .......
-[    7.014821] Bluetooth: hci0 event 0xe4
