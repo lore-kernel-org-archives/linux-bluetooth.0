@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/5] client: Add advertise.flags command
-Date: Mon,  7 May 2018 19:14:02 +0300
-Message-Id: <20180507161403.14181-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/5] shared/ad: Add bt_ad_add_flags and bt_ad_clear_flags
+Date: Mon,  7 May 2018 19:14:00 +0300
+Message-Id: <20180507161403.14181-2-luiz.dentz@gmail.com>
 In-Reply-To: <20180507161403.14181-1-luiz.dentz@gmail.com>
 References: <20180507161403.14181-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,145 +11,158 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds advertise.flags command which can be used to set it own
-instance:
-
-[bluetooth]# advertise.flags 0x02
-[bluetooth]# advertise on
-
-@ MGMT Command: Add Advertising (0x003e) plen 14
-        Instance: 1
-        Flags: 0x00000001
-          Switch into Connectable mode
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 3
-        Flags: 0x02
-          LE General Discoverable Mode
-        Scan response length: 0
-< HCI Command: LE Set Advertising Data (0x08|0x0008) plen 32
-        Length: 3
-        Flags: 0x02
-          LE General Discoverable Mode
+This adds basically functionality to add and remove AD flags.
 ---
- client/advertising.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- client/advertising.h |  1 +
- client/main.c        |  7 +++++++
- 3 files changed, 55 insertions(+)
+ src/shared/ad.c | 92 +++++++++++++++++++++++++++++++++++++--------------------
+ src/shared/ad.h |  4 +++
+ 2 files changed, 64 insertions(+), 32 deletions(-)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 045133aa3..a0fc32eea 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -71,6 +71,7 @@ static struct ad {
- 	struct service_data service;
- 	struct manufacturer_data manufacturer;
- 	struct data data;
-+	uint8_t flags[1];
- 	bool tx_power;
- 	bool name;
- 	bool appearance;
-@@ -401,6 +402,26 @@ static gboolean get_data(const GDBusPropertyTable *property,
- 	return TRUE;
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index f0e62cef1..102fe0e13 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -127,6 +127,48 @@ void bt_ad_unref(struct bt_ad *ad)
+ 	free(ad);
  }
  
-+static gboolean flags_exists(const GDBusPropertyTable *property, void *data)
++static bool data_type_match(const void *data, const void *user_data)
 +{
-+	return ad.flags[0];
++	const struct bt_ad_data *a = data;
++	const uint8_t type = PTR_TO_UINT(user_data);
++
++	return a->type == type;
 +}
 +
-+static gboolean get_flags(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
++static bool ad_replace_data(struct bt_ad *ad, uint8_t type, void *data,
++							size_t len)
 +{
-+	DBusMessageIter array;
-+	uint8_t *val = ad.flags;
++	struct bt_ad_data *new_data;
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "y", &array);
-+
-+	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE, &val, 1);
-+
-+	dbus_message_iter_close_container(iter, &array);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable ad_props[] = {
- 	{ "Type", "s", get_type },
- 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
-@@ -408,6 +429,7 @@ static const GDBusPropertyTable ad_props[] = {
- 	{ "ManufacturerData", "a{qv}", get_manufacturer_data, NULL,
- 						manufacturer_data_exists },
- 	{ "Data", "a{yv}", get_data, NULL, data_exists },
-+	{ "Flags", "ay", get_flags, NULL, flags_exists },
- 	{ "Includes", "as", get_includes, NULL, includes_exists },
- 	{ "LocalName", "s", get_local_name, NULL, local_name_exits },
- 	{ "Appearance", "q", get_appearance, NULL, appearance_exits },
-@@ -708,6 +730,31 @@ void ad_disable_data(DBusConnection *conn)
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
- 
-+void ad_advertise_flags(DBusConnection *conn, int argc, char *argv[])
-+{
-+	char *endptr = NULL;
-+	long int val;
-+
-+	if (argc < 2 || !strlen(argv[1])) {
-+		if (ad.flags[0])
-+			bt_shell_hexdump(ad.flags, sizeof(ad.flags));
-+
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	new_data = queue_find(ad->data, data_type_match, UINT_TO_PTR(type));
++	if (new_data) {
++		if (new_data->len == len && !memcmp(new_data->data, data, len))
++			return false;
++		new_data->data = realloc(new_data->data, len);
++		memcpy(new_data->data, data, len);
++		new_data->len = len;
++		return true;
 +	}
 +
-+	val = strtol(argv[1], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || val > UINT8_MAX) {
-+		bt_shell_printf("Invalid value\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	new_data = new0(struct bt_ad_data, 1);
++	new_data->type = type;
++	new_data->data = malloc(len);
++	if (!new_data->data) {
++		free(new_data);
++		return false;
 +	}
 +
-+	ad.flags[0] = val;
++	memcpy(new_data->data, data, len);
++	new_data->len = len;
 +
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Flags");
++	if (queue_push_tail(ad->data, new_data))
++		return true;
 +
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	data_destroy(new_data);
++
++	return false;
 +}
 +
- void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value)
+ static size_t uuid_list_length(struct queue *uuid_queue)
  {
- 	if (!value) {
-diff --git a/client/advertising.h b/client/advertising.h
-index 12b4d69c1..42e51c693 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -39,3 +39,4 @@ void ad_advertise_duration(DBusConnection *conn, long int *value);
- void ad_advertise_timeout(DBusConnection *conn, long int *value);
- void ad_advertise_data(DBusConnection *conn, int argc, char *argv[]);
- void ad_disable_data(DBusConnection *conn);
-+void ad_advertise_flags(DBusConnection *conn, int argc, char *argv[]);
-diff --git a/client/main.c b/client/main.c
-index 54bd5371a..52ed159ad 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2192,6 +2192,11 @@ static void cmd_advertise_data(int argc, char *argv[])
- 	ad_advertise_data(dbus_conn, argc, argv);
+ 	bool uuid16_included = false;
+@@ -809,12 +851,25 @@ void bt_ad_clear_appearance(struct bt_ad *ad)
+ 	ad->appearance = UINT16_MAX;
  }
  
-+static void cmd_advertise_flags(int argc, char *argv[])
-+{
-+	ad_advertise_flags(dbus_conn, argc, argv);
+-static bool data_type_match(const void *data, const void *user_data)
++bool bt_ad_add_flags(struct bt_ad *ad, uint8_t *flags, size_t len)
+ {
+-	const struct bt_ad_data *a = data;
+-	const uint8_t type = PTR_TO_UINT(user_data);
++	if (!ad)
++		return false;
+ 
+-	return a->type == type;
++	/* TODO: Add table to check other flags */
++	if (len > 1 || flags[0] & 0xe0)
++		return false;
++
++	return ad_replace_data(ad, BT_AD_FLAGS, flags, len);
 +}
 +
- static void cmd_advertise_tx_power(int argc, char *argv[])
++void bt_ad_clear_flags(struct bt_ad *ad)
++{
++	if (!ad)
++		return;
++
++	queue_remove_all(ad->data, data_type_match, UINT_TO_PTR(BT_AD_FLAGS),
++							data_destroy);
+ }
+ 
+ static uint8_t type_blacklist[] = {
+@@ -862,7 +917,6 @@ static uint8_t type_blacklist[] = {
+ 
+ bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len)
  {
- 	dbus_bool_t powered;
-@@ -2382,6 +2387,8 @@ static const struct bt_shell_menu advertise_menu = {
- 			"Set/Get advertise manufacturer data" },
- 	{ "data", "[type] [data=xx xx ...]", cmd_advertise_data,
- 			"Set/Get advertise data" },
-+	{ "flags", "[value]", cmd_advertise_flags,
-+			"Set/Get advertise flags" },
- 	{ "tx-power", "[on/off]", cmd_advertise_tx_power,
- 			"Show/Enable/Disable TX power to be advertised",
- 							NULL },
+-	struct bt_ad_data *new_data;
+ 	size_t i;
+ 
+ 	if (!ad)
+@@ -871,38 +925,12 @@ bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len)
+ 	if (len > (MAX_ADV_DATA_LEN - 2))
+ 		return false;
+ 
+-	new_data = queue_find(ad->data, data_type_match, UINT_TO_PTR(type));
+-	if (new_data) {
+-		if (new_data->len == len && !memcmp(new_data->data, data, len))
+-			return false;
+-		new_data->data = realloc(new_data->data, len);
+-		memcpy(new_data->data, data, len);
+-		new_data->len = len;
+-		return true;
+-	}
+-
+ 	for (i = 0; i < sizeof(type_blacklist); i++) {
+ 		if (type == type_blacklist[i])
+ 			return false;
+ 	}
+ 
+-	new_data = new0(struct bt_ad_data, 1);
+-	new_data->type = type;
+-	new_data->data = malloc(len);
+-	if (!new_data->data) {
+-		free(new_data);
+-		return false;
+-	}
+-
+-	memcpy(new_data->data, data, len);
+-	new_data->len = len;
+-
+-	if (queue_push_tail(ad->data, new_data))
+-		return true;
+-
+-	data_destroy(new_data);
+-
+-	return false;
++	return ad_replace_data(ad, type, data, len);
+ }
+ 
+ static bool data_match(const void *data, const void *user_data)
+diff --git a/src/shared/ad.h b/src/shared/ad.h
+index 8d705323b..0e30cdca9 100644
+--- a/src/shared/ad.h
++++ b/src/shared/ad.h
+@@ -147,6 +147,10 @@ bool bt_ad_add_appearance(struct bt_ad *ad, uint16_t appearance);
+ 
+ void bt_ad_clear_appearance(struct bt_ad *ad);
+ 
++bool bt_ad_add_flags(struct bt_ad *ad, uint8_t *flags, size_t len);
++
++void bt_ad_clear_flags(struct bt_ad *ad);
++
+ bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len);
+ 
+ bool bt_ad_has_data(struct bt_ad *ad, const struct bt_ad_data *data);
 -- 
 2.14.3
 
