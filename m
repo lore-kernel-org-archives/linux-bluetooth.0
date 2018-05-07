@@ -1,50 +1,25 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/5] doc/advertising-api: Add Flags property
-Date: Mon,  7 May 2018 19:13:59 +0300
-Message-Id: <20180507161403.14181-1-luiz.dentz@gmail.com>
+Date: Mon, 07 May 2018 11:56:12 -0400 (EDT)
+Message-Id: <20180507.115612.1605737993336284295.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth 2018-05-07
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20180507150533.GA2927@x1c.home>
+References: <20180507150533.GA2927@x1c.home>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Mon, 7 May 2018 18:05:33 +0300
 
-This adds Flags which the application can use in case it want to set
-it own flags.
+> Here are a few more Bluetooth fixes for the 4.17 kernel, all for the
+> btusb driver. Two relate to the needs_reset_resume table, and one is a
+> revert of a patch for Atheros 1525/QCA6174 which caused a regression for
+> some people.
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-Note: This would allow for example an application to advertise as
-discoverable even if the adapter is not discoverable which may be
-required by dual-mode as it may not require BR/EDR to be discoverable.
----
- doc/advertising-api.txt | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
-
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index eef98ad91..4e015f282 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -78,6 +78,21 @@ Properties	string Type
- 				<Transport Discovery> <Organization Flags...>
- 				0x26                   0x01         0x01...
- 
-+		array{byte} Flags [Experimental]
-+
-+			Advertising Flags to include. When present this will
-+			override existing flags such as Discoverable.
-+
-+			Note: This property shall not be set when Type is set
-+			to broadcast.
-+
-+			Possible value:
-+				bit 0 - LE Limited Discoverable Mode
-+				bit 1 - LE General Discoverable Mode
-+				bit 2 - BR/EDR Not Supported
-+				bit 3 - Simultaneous LE and BR/EDR (Controller)
-+				bit 4 - Simultaneous LE and BR/EDR (Host)
-+
- 		array{string} Includes
- 
- 			List of features to be included in the advertising
--- 
-2.14.3
-
+Pulled, thanks Johan.
