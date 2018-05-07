@@ -1,58 +1,78 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20180503120603epcas1p1d9863187b17bd7afae23284c8767aa9c@epcas1p1.samsung.com>
- <1525349138-6194-1-git-send-email-sahil.pai1@samsung.com>
-In-Reply-To: <1525349138-6194-1-git-send-email-sahil.pai1@samsung.com>
+References: <20180507082409.30018-1-luiz.dentz@gmail.com> <3965092.rnYZXRLaLl@ix>
+In-Reply-To: <3965092.rnYZXRLaLl@ix>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 07 May 2018 09:39:11 +0000
-Message-ID: <CABBYNZJnWd=3x33H9=jQmCWKfqJ11MBVKP1mq=pX0JfuMhkyyA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] obexd: Fix memory leak when loading plugins
-To: sahil.pai1@samsung.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Syam Sidhardhan <s.syam@samsung.com>
+Date: Mon, 07 May 2018 09:29:53 +0000
+Message-ID: <CABBYNZ+oZGmADEysZq0QzByPfZ7P--61GkJmgnC5mwsidLfQ4w@mail.gmail.com>
+Subject: Re: [RFC] doc/advertising-api: Add Flags property
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-On Thu, May 3, 2018 at 3:09 PM Sahil Pai <sahil.pai1@samsung.com> wrote:
+Hi Szymon,
+On Mon, May 7, 2018 at 11:33 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
 
-> On failure to open plugin directory, memory allocated to 'patterns'
-> and 'excludes' is not being freed, and the following memory leak is
-> logged:
+> Hi Luiz,
 
-> Direct leak of 28 byte(s) in 1 object(s) allocated from:
->      #0 0xb6aa1c49 in malloc (/usr/lib/liblsan.so+0x9c49)
->      #1 0xb6976e89 in g_malloc (/lib/libglib-2.0.so.0+0x3ae89)
->      #2 0xb69886f1 in g_strsplit_set (/lib/libglib-2.0.so.0+0x4c6f1)
->      #3 0xb6f82f3b in plugin_init (/usr/libexec/bluetooth/obexd+0x20f3b)
->      #4 0xb6f70dc9 in main (/usr/libexec/bluetooth/obexd+0xedc9)
-> ---
->   obexd/src/plugin.c | 5 ++++-
->   1 file changed, 4 insertions(+), 1 deletion(-)
+> On Monday, 7 May 2018 10:24:09 CEST Luiz Augusto von Dentz wrote:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This adds Flags which the application can use in case it want to set
+> > it own flags.
+> >
+> > Note: This would allow for example an application to advertise as
+> > discoverable even if the adapter is not discoverable which may be
+> > required by dual-mode as it may not require BR/EDR to be discoverable.
+> > ---
+> >  doc/advertising-api.txt | 15 +++++++++++++++
+> >  1 file changed, 15 insertions(+)
+> >
+> > diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+> > index eef98ad91..234f9c2f2 100644
+> > --- a/doc/advertising-api.txt
+> > +++ b/doc/advertising-api.txt
+> > @@ -78,6 +78,21 @@ Properties string Type
+> >                               <Transport Discovery> <Organization
+Flags...>
+> >                               0x26                   0x01
+0x01...
+> >
+> > +             byte Flags [Experimental]
+> > +
+> > +                     Advertising Flags to include. When present this
+will
+> > +                     override existing flags such as Discoverable.
+> > +
+> > +                     Note: This property shall not be set when Type is
+set
+> > +                     to broadcast.
+> > +
+> > +                     Possible value:
+> > +                             bit 0 - LE Limited Discoverable Mode
+> > +                             bit 1 - LE General Discoverable Mode
+> > +                             bit 2 - BR/EDR Not Supported
+> > +                             bit 3 - Simultaneous LE and BR/EDR
+(Controller)
+> > +                             bit 4 - Simultaneous LE and BR/EDR (Host)
+> > +
+> >               array{string} Includes
+> >
+> >                       List of features to be included in the advertising
 
-> diff --git a/obexd/src/plugin.c b/obexd/src/plugin.c
-> index 7d971b6..a1962b9 100644
-> --- a/obexd/src/plugin.c
-> +++ b/obexd/src/plugin.c
-> @@ -138,8 +138,11 @@ gboolean plugin_init(const char *pattern, const char
-*exclude)
->          DBG("Loading plugins %s", PLUGINDIR);
+> I'd make Flags array{byte} (just like Flags in Device1) to keep it future
+> proof.
 
->          dir = g_dir_open(PLUGINDIR, 0, NULL);
-> -       if (!dir)
-> +       if (!dir) {
-> +               g_strfreev(patterns);
-> +               g_strfreev(excludes);
->                  return FALSE;
-> +       }
+Yep, good catch.
 
->          while ((file = g_dir_read_name(dir)) != NULL) {
->                  struct obex_plugin_desc *desc;
 > --
-> 1.9.1
+> pozdrawiam
+> Szymon Janc
 
-Applied, thanks.
+
+
 
 -- 
 Luiz Augusto von Dentz
