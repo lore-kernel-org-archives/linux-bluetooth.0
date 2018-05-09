@@ -1,118 +1,98 @@
-Return-Path: <mka@chromium.org>
-Date: Wed, 9 May 2018 10:24:25 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
-	hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v4 2/3] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth chip wcn3990.
-Message-ID: <20180509172425.GH19594@google.com>
-References: <1525448106-18616-1-git-send-email-bgodavar@codeaurora.org>
- <1525448106-18616-3-git-send-email-bgodavar@codeaurora.org>
- <20180505011713.GE19594@google.com>
- <595e02f711f40a104ed86b7eb06b28d7@codeaurora.org>
+Return-Path: <szymon.janc@codecoup.pl>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] build: Disable some warnings from GCC 8
+Date: Wed, 09 May 2018 15:04:16 +0200
+Message-ID: <2459401.iogB4MuffB@ix>
+In-Reply-To: <EDA6E2ED-674B-45FE-900B-6DA05D1D1EC2@holtmann.org>
+References: <20180509121113.4110-1-szymon.janc@codecoup.pl> <EDA6E2ED-674B-45FE-900B-6DA05D1D1EC2@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <595e02f711f40a104ed86b7eb06b28d7@codeaurora.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Balakrishna,
+Hi Marce,
 
-On Wed, May 09, 2018 at 03:37:34PM +0530, Balakrishna Godavarthi wrote:
-> Hi,
-> Please find my comments inline.
-> 
-> On 2018-05-05 06:47, Matthias Kaehlcke wrote:
-> > Hi,
-> > 
-> > On Fri, May 04, 2018 at 09:05:05PM +0530, Balakrishna Godavarthi wrote:
-> > > Add support to set voltage/current of various regulators
-> > > to power up/down Bluetooth chip wcn3990.
-> > > Add support to read baudrate from dts.
-> > > 
-> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> > > ---
-> > >  drivers/bluetooth/hci_qca.c | 555
-> > > ++++++++++++++++++++++++++++++++++++++------
-> > >  1 file changed, 483 insertions(+), 72 deletions(-)
-> > > 
-> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > > index f05382b..075fab7 100644
-> > > --- a/drivers/bluetooth/hci_qca.c
-> > > +++ b/drivers/bluetooth/hci_qca.c
-> > > ...
-> > > -	bt_dev_info(hdev, "ROME setup");
-> > > +		/* disable flow control, as chip is still not turned on */
-> > > +		hci_uart_set_flow_control(hu, true);
-> > 
-> > The interface of this function is confusing. enable = true disables
-> > flow control ... Not the fault of this driver though :)
-> [Bala]: yes it is bit confusing. i taught to update.. but not sure of
-> impact.
->         so instead of updating, using the same function and written a
-> comment above.
+On Wednesday, 9 May 2018 14:26:36 CEST Marcel Holtmann wrote:
+> Hi Szymon,
+>=20
+> > GCC 8 -Wall -Wextra seem to enable additional checks. Those generates
+> > lots of spourious warnings so disable them (at least for time being).
+> > ---
+> > acinclude.m4 | 3 +++
+> > 1 file changed, 3 insertions(+)
+> >=20
+> > diff --git a/acinclude.m4 b/acinclude.m4
+> > index bc39c6d73..39a6be44a 100644
+> > --- a/acinclude.m4
+> > +++ b/acinclude.m4
+> > @@ -16,6 +16,9 @@ AC_DEFUN([COMPILER_FLAGS], [
+> >=20
+> > 		with_cflags=3D"$with_cflags -Wall -Werror -Wextra"
+> > 		with_cflags=3D"$with_cflags -Wno-unused-parameter"
+> > 		with_cflags=3D"$with_cflags -Wno-missing-field-initializers"
+> >=20
+> > +		with_cflags=3D"$with_cflags -Wno-format-truncation"
+> > +		with_cflags=3D"$with_cflags -Wno-cast-function-type"
+> > +		with_cflags=3D"$with_cflags -Wno-stringop-truncation=E2=80=9D
+>=20
+> can you explain these with examples on why we would disable them.
 
-Sure, not much you can do about it. Just mentioned it since I was
-about to comment that things are done inversely, but tean checked
-hci_uart_set_flow_control() and saw that it has this odd
-interface. Folks more familiar with the Bluetooth subsystem are
-probably already used to it ;-)
+=2DWformat-truncation
 
-> > > -	if (speed)
-> > > -		host_set_baudrate(hu, speed);
-> > > +		/* Enable flow control */
-> > > +		hci_uart_set_flow_control(hu, false);
-> > > +		/*  wait until flow control settled */
-> > > +		mdelay(100);
-> > 
-> > A busy wait of 100ms doesn't seem a good idea. Use msleep()
-> > instead. Is it really necessary to wait that long?
-> [Bala]: yes this delay is required for BT Soc to bootup and settle down.
+Than one warns when snprintf could be truncated:
+eg=20
+char a[10];
+char b[10];
+char c[15];
+=2E.
+snprintf(c, sizeof(c), "%s%s", a, b);
 
-:(
+This sometimes triggers warning also with "sizeof(c) - 1" when c is either=
+=20
+memset before or last byte being explicitly set to '\0' after snprintf.
 
-> > What follows looks similar to the Cherokee path. I didn't look at all
-> > the details, but it's probably possible to share some more code.
-> [Bala]: yes these are two different chip.
->         we also have difference in setup. the follwing are major differences
->         Cherokee uses flow control. where ROME flow control is disabled.
->         ON sequence also varies.
+Also, sometimes we are fine if resulting string is left unterminated eg
+when filling in mgmt commands or struct sockaddr with paths and/or names.
+Some could be change to memcpy + strlen (possibly after getting min size fr=
+om=20
+both buffers) or we could adjust buffers to make those go away.
 
-Ok, I'll give it another pass in the next revision to see if I have
-suggestions to make it at least a bit less redundant.
 
-> > > +static const struct btqca_vreg_data cherokee_data = {
-> > > +	.soc_type = BTQCA_CHEROKEE,
-> > > +	.vregs = (struct btqca_vreg []) {
-> > > +		{ "vddio",   1352000, 1352000,  0 },
-> > > +		{ "vddxtal", 1904000, 2040000,  0 },
-> > > +		{ "vddcore", 1800000, 1800000,  1 },
-> > > +		{ "vddpa",   130400,  1304000,  1 },
-> > 
-> > 0 missing for min_v?
-> 
-> [Bala]: min_v is  the minimum voltage required for BT chip.
 
-I referred to the value '130400', which happens to be exactly 1/10 of
-the max_v '1304000', so I suspect the voltages are the same and a zero
-is missing.
+=2DWstringop-truncation
+This is pretty match the same as above but for strncpy and family.
+Also here, some could be change to memcpy + strlen. Or even better don't us=
+e=20
+strncpy at all and have own implementation of strlcpy.
 
-> > > +			regulator_set_voltage(qca->vreg_bulk[i].consumer,
-> > > +					      vregs[i].min_v,
-> > > +					      vregs[i].max_v);
-> > 
-> > Check return value.
-> [Bala]: i am checking the status for regulator enable
->         do we really require to check the status. as this same regulators
-> are used by different sub systems.
->         we will get an error during regulator enable when voltages are not
-> settled down.
 
-regulator_set_voltage() could fail due to requesting a voltage range
-not supported by the regulator. In this case regulator_enable() could
-still succeed, but not supply the requested voltage.
 
-Thanks
+=2DWcast-function-type
+Warn when a function pointer is cast to an incompatible function pointer.
+We often cast function pointers with g_slist_foreach or queue call to avoid
+need for having wrappers. This seems to be fine as along as casted function
+doesn't expect more parameters than type it is casted to. To fix those we=20
+would have to always wrap eg:
 
-Matthias
++static void update_adapter_cb(gpointer data,  gpointer user_data)
++{
++	struct hdp_adapter *hdp_adapter =3D data;
++
++	update_adapter(hdp_adapter);
++}
++
+ static void remove_application(struct hdp_application *app)
+ {
+ 	DBG("Application %s deleted", app->path);
+ 	hdp_application_unref(app);
+=20
+=2D	g_slist_foreach(adapters, (GFunc) update_adapter, NULL);
++	g_slist_foreach(adapters, update_adapter_cb, NULL);
+ }
+
+
+
+=2D-=20
+pozdrawiam
+Szymon Janc
