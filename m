@@ -2,7 +2,7 @@ Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
-Date: Wed, 09 May 2018 14:57:05 +0530
+Date: Wed, 09 May 2018 14:26:16 +0530
 From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 To: Matthias Kaehlcke <mka@chromium.org>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
@@ -14,10 +14,10 @@ In-Reply-To: <20180505011713.GE19594@google.com>
 References: <1525448106-18616-1-git-send-email-bgodavar@codeaurora.org>
  <1525448106-18616-3-git-send-email-bgodavar@codeaurora.org>
  <20180505011713.GE19594@google.com>
-Message-ID: <6f2a4fbf1196b7b59619887797eb4086@codeaurora.org>
+Message-ID: <05ba9ec554565a24df68babb9b05c9e8@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi,
+Hi,
 
 On 2018-05-05 06:47, Matthias Kaehlcke wrote:
 > Hi,
@@ -58,7 +58,6 @@ On 2018-05-05 06:47, Matthias Kaehlcke wrote:
 >> +#include <linux/of_device.h>
 > 
 > AFAIK the convention is to order includes alphabetically.
-    [Bala]:will update.
 > 
 >> +static struct btqca_power *qca;
 > 
@@ -66,8 +65,6 @@ On 2018-05-05 06:47, Matthias Kaehlcke wrote:
 > common use case, but in general it's preferable not to have this kind
 > of limitations.
 > 
-    [Bala]:yes, as we need to limit driver fro single instance.
-
 >>  static void __serial_clock_on(struct tty_struct *tty)
 >>  {
 >>  	/* TODO: Some chipset requires to enable UART clock on client
@@ -84,7 +81,6 @@ On 2018-05-05 06:47, Matthias Kaehlcke wrote:
 >> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
 > 
 > Use curly braces for the else branch too.
-   [Bala]:will update.
 > 
 >> +static int qca_send_poweron_cmd(struct hci_dev *hdev)
 >> +{
@@ -159,7 +155,6 @@ On 2018-05-05 06:47, Matthias Kaehlcke wrote:
 > This function is almost a clone of qca_send_poweron_cmd(), move the
 > common code to something like qca_send_cmd() and call it from
 > qca_send_poweron/off_cmd().
-[Bala]: will make as one function.
 > 
 >> +static int qca_serdev_open(struct hci_uart *hu)
 >> +{
@@ -180,7 +175,6 @@ On 2018-05-05 06:47, Matthias Kaehlcke wrote:
 >> +		serdev_device_close(hu->serdev);
 > 
 > Add curly braces to the if branch too.
-  [Bala]- Will update
 > 
 >>  static int qca_setup(struct hci_uart *hu)
 >>  {
@@ -209,7 +203,6 @@ On 2018-05-05 06:47, Matthias Kaehlcke wrote:
 >> +			host_set_baudrate(hu, speed);
 > 
 > Add curly braces.
-[Bala]- will update.
 > 
 >> +		else {
 >> +			bt_dev_err(hdev, "initial speed %u", speed);
@@ -222,9 +215,6 @@ On 2018-05-05 06:47, Matthias Kaehlcke wrote:
 > 
 > The interface of this function is confusing. enable = true disables
 > flow control ... Not the fault of this driver though :)
-[Bala]- yes i feel it is reverse. but i don't want disturb the function 
-as some one may be using the same function
-         before calling these function, i have written a comment.
 > 
 >> +		/* send poweron command to btsoc */
 >> +		ret = qca_send_poweron_cmd(hdev);
@@ -275,10 +265,6 @@ as some one may be using the same function
 > 
 > A busy wait of 100ms doesn't seem a good idea. Use msleep()
 > instead. Is it really necessary to wait that long?
-
-[Bala]- after long analysis we conclude to wait for 100ms to make SoC to 
-bootup.\
-
 > 
 >> +		bt_dev_info(hdev, "wcn3990 Patch Version Request");
 >> +		ret = rome_patch_ver_req(hdev, &soc_ver);
@@ -365,10 +351,6 @@ bootup.\
 > 
 > What follows looks similar to the Cherokee path. I didn't look at all
 > the details, but it's probably possible to share some more code.
-   [Bala]- Cherokee has a different way for setup.
-           ROME will not have flow control enabled.
-
-
 > 
 >> +		bt_dev_info(hdev, "ROME setup");
 >> +
@@ -573,6 +555,8 @@ bootup.\
 >> +		clk_disable_unprepare(qcadev->susclk);
 > 
 > Add curly braces.
+
+will send a incremental patches as per your comments.
 
 -- 
 Regards
