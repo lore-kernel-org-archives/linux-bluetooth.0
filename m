@@ -1,42 +1,102 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Ankit Navik <ankit.p.navik@intel.com>
-To: linux-bluetooth@vger.kernel.org, bharat22bhusan@gmail.com
-Cc: ankit.p.navik.intel.com@vger.kernel.org
-Subject: [PATCH] src/profile: Updates HFP version to 1.7
-Date: Thu, 10 May 2018 15:02:03 +0530
-Message-Id: <1525944723-2238-1-git-send-email-ankit.p.navik@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Message-ID: <1525934741.18877.38.camel@mtkswgap22>
+Subject: Re: [PATCH v1 6/7] Bluetooth: hci_mediatek: Add protocol support
+ for MediaTek serial devices
+From: Sean Wang <sean.wang@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Date: Thu, 10 May 2018 14:45:41 +0800
+In-Reply-To: <6033F916-F103-4F07-9912-695B5B49F30F@holtmann.org>
+References: <cover.1522736996.git.sean.wang@mediatek.com>
+         <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
+         <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
+         <1525762084.14468.20.camel@mtkswgap22>
+         <D474053D-6910-4B04-8B98-59B96FEB86BC@holtmann.org>
+         <1525767775.18877.22.camel@mtkswgap22>
+         <6033F916-F103-4F07-9912-695B5B49F30F@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add changes to update HFP version to 0x0107 for HFP_HS_UUID and
-HFP_AG_UUID. Ofono get this version from bluez and enable HFP 1.7
-specific commands.
----
- src/profile.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Tue, 2018-05-08 at 13:18 +0200, Marcel Holtmann wrote:
+> Hi Sean,
+> 
+> >>>>> +
 
-diff --git a/src/profile.c b/src/profile.c
-index 7c5318c..1e9c585 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1971,7 +1971,7 @@ static struct default_settings {
- 		.authorize	= true,
- 		.auto_connect	= true,
- 		.get_record	= get_hfp_hf_record,
--		.version	= 0x0105,
-+		.version	= 0x0107,
- 	}, {
- 		.uuid		= HFP_AG_UUID,
- 		.name		= "Hands-Free Voice gateway",
-@@ -1981,7 +1981,7 @@ static struct default_settings {
- 		.authorize	= true,
- 		.auto_connect	= true,
- 		.get_record	= get_hfp_ag_record,
--		.version	= 0x0105,
-+		.version	= 0x0107,
- 	}, {
- 		.uuid		= HSP_AG_UUID,
- 		.name		= "Headset Voice gateway",
--- 
-2.7.4
+[ ... ]
 
+> > 
+> > I'm happy to do with btmon. just the environment with buildroot the BT
+> > running on seems there's a missing support for btmon. I can start to use
+> > btmon once I change the environment to Debian.
+> > 
+> >> So all the MTK vendor commands respond with a vendor event? Or are there some that do the standard command status/complete handling?
+> >> 
+> > 
+> > yes, mtk controller after mt7622 (included), its MTK vendors command
+> > (opcode 0xfc6f) always respond with a vendor event id 0xe4. And they
+> > don't do any standard status/complete handling.
+
+
+> then we need to figure out where the __hci_cmd_sync_ev causes a problem. Since normally that should just work for you.
+> 
+
+Okay. I will look into more about the issue after I finished the v2
+based on btuart driver. By the way, I've ported the btmon to my board,
+these vendor commands/events reported via btmon looks like below shown
+up
+
+> HCI Event: Unknown (0xe4) plen 5
+ [hci0] 11.213593
+        02 01 01 00 00                                   .....
+
+> HCI Event: Unknown (0xe4) plen 5
+ [hci0] 11.214272
+        02 01 01 00 00                                   .....
+
+< HCI Command: Vendor (0x3f|0x006f) plen 5
+ [hci0] 11.214318
+        01 07 01 00 04                                   .....
+
+> HCI Event: Unknown (0xe4) plen 5
+ [hci0] 11.214438
+        02 07 01 00 00                                   .....
+
+< HCI Command: Vendor (0x3f|0x006f) plen 6
+ [hci0] 13.229379
+        01 06 02 00 00 01                                ......
+
+> HCI Event: Unknown (0xe4) plen 5
+ [hci0] 13.307729
+        02 06 01 00 00                                   .....
+
+
+> > BTW, mtk controller before mt7622, such as mt7623, its MTK vendor
+> > command always go with completely specific format, not with hci format.
+> 
+> What does that mean? Do you have an example?
+> 
+
+what I meant is that these vendor commands and events applied on old
+SoCs prior to MT7622 always use completely proprietary format rather
+than any BT packet to setup the BT controller.
+
+for example:
+- vendor command 
+01 06 02 00 00 01 
+
+- vendor event
+02 06 01 00 00
+
+> Regards
+> 
+> Marcel
+> 
