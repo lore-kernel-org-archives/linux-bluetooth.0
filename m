@@ -1,92 +1,140 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
-References: <20180507161403.14181-1-luiz.dentz@gmail.com> <EF92087E-6EF8-403F-803C-A912DCF50A07@holtmann.org>
- <CABBYNZJK9nHb1HQFEVgiC5roPRtcU59JWV+Q2gVgbZcfwUtfUw@mail.gmail.com> <3919BA38-D8EB-40EE-94F1-01B6E8E3EDC3@holtmann.org>
-In-Reply-To: <3919BA38-D8EB-40EE-94F1-01B6E8E3EDC3@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 11 May 2018 14:12:17 +0300
-Message-ID: <CABBYNZLibRcGaSZRhA1yGdHO_=pH1DCBd45HYypBsv8cjKt1jg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] doc/advertising-api: Add Flags property
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Thu, 10 May 2018 21:31:28 +0530
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+ linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
+ hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v4 2/3] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth chip wcn3990.
+In-Reply-To: <20180509172425.GH19594@google.com>
+References: <1525448106-18616-1-git-send-email-bgodavar@codeaurora.org>
+ <1525448106-18616-3-git-send-email-bgodavar@codeaurora.org>
+ <20180505011713.GE19594@google.com>
+ <595e02f711f40a104ed86b7eb06b28d7@codeaurora.org>
+ <20180509172425.GH19594@google.com>
+Message-ID: <932e28f7f38f64f2f1a5aded07806185@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Matthias,
 
-On Tue, May 8, 2018 at 2:17 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+On 2018-05-09 22:54, Matthias Kaehlcke wrote:
+> Hi Balakrishna,
+> 
+> On Wed, May 09, 2018 at 03:37:34PM +0530, Balakrishna Godavarthi wrote:
+>> Hi,
+>> Please find my comments inline.
+>> 
+>> On 2018-05-05 06:47, Matthias Kaehlcke wrote:
+>> > Hi,
+>> >
+>> > On Fri, May 04, 2018 at 09:05:05PM +0530, Balakrishna Godavarthi wrote:
+>> > > Add support to set voltage/current of various regulators
+>> > > to power up/down Bluetooth chip wcn3990.
+>> > > Add support to read baudrate from dts.
+>> > >
+>> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> > > ---
+>> > >  drivers/bluetooth/hci_qca.c | 555
+>> > > ++++++++++++++++++++++++++++++++++++++------
+>> > >  1 file changed, 483 insertions(+), 72 deletions(-)
+>> > >
+>> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> > > index f05382b..075fab7 100644
+>> > > --- a/drivers/bluetooth/hci_qca.c
+>> > > +++ b/drivers/bluetooth/hci_qca.c
+>> > > ...
+>> > > -	bt_dev_info(hdev, "ROME setup");
+>> > > +		/* disable flow control, as chip is still not turned on */
+>> > > +		hci_uart_set_flow_control(hu, true);
+>> >
+>> > The interface of this function is confusing. enable = true disables
+>> > flow control ... Not the fault of this driver though :)
+>> [Bala]: yes it is bit confusing. i taught to update.. but not sure of
+>> impact.
+>>         so instead of updating, using the same function and written a
+>> comment above.
+> 
+> Sure, not much you can do about it. Just mentioned it since I was
+> about to comment that things are done inversely, but tean checked
+> hci_uart_set_flow_control() and saw that it has this odd
+> interface. Folks more familiar with the Bluetooth subsystem are
+> probably already used to it ;-)
+> 
+>> > > -	if (speed)
+>> > > -		host_set_baudrate(hu, speed);
+>> > > +		/* Enable flow control */
+>> > > +		hci_uart_set_flow_control(hu, false);
+>> > > +		/*  wait until flow control settled */
+>> > > +		mdelay(100);
+>> >
+>> > A busy wait of 100ms doesn't seem a good idea. Use msleep()
+>> > instead. Is it really necessary to wait that long?
+>> [Bala]: yes this delay is required for BT Soc to bootup and settle 
+>> down.
+> 
+> :(
+> 
+>> > What follows looks similar to the Cherokee path. I didn't look at all
+>> > the details, but it's probably possible to share some more code.
+>> [Bala]: yes these are two different chip.
+>>         we also have difference in setup. the follwing are major 
+>> differences
+>>         Cherokee uses flow control. where ROME flow control is 
+>> disabled.
+>>         ON sequence also varies.
+> 
+> Ok, I'll give it another pass in the next revision to see if I have
+> suggestions to make it at least a bit less redundant.
+> 
+>> > > +static const struct btqca_vreg_data cherokee_data = {
+>> > > +	.soc_type = BTQCA_CHEROKEE,
+>> > > +	.vregs = (struct btqca_vreg []) {
+>> > > +		{ "vddio",   1352000, 1352000,  0 },
+>> > > +		{ "vddxtal", 1904000, 2040000,  0 },
+>> > > +		{ "vddcore", 1800000, 1800000,  1 },
+>> > > +		{ "vddpa",   130400,  1304000,  1 },
+>> >
+>> > 0 missing for min_v?
+>> 
+>> [Bala]: min_v is  the minimum voltage required for BT chip.
+> 
+> I referred to the value '130400', which happens to be exactly 1/10 of
+> the max_v '1304000', so I suspect the voltages are the same and a zero
+> is missing.
+> 
+[Bala]: Good catch, the same regulator is used for WLAN too. that could 
+be reason i could not able to catch this issue during testing
+         will update and retest it again.
 
-> Hi Luiz,
+>> > > +			regulator_set_voltage(qca->vreg_bulk[i].consumer,
+>> > > +					      vregs[i].min_v,
+>> > > +					      vregs[i].max_v);
+>> >
+>> > Check return value.
+>> [Bala]: i am checking the status for regulator enable
+>>         do we really require to check the status. as this same 
+>> regulators
+>> are used by different sub systems.
+>>         we will get an error during regulator enable when voltages are 
+>> not
+>> settled down.
+> 
+> regulator_set_voltage() could fail due to requesting a voltage range
+> not supported by the regulator. In this case regulator_enable() could
+> still succeed, but not supply the requested voltage.
+> 
+[Bala]: will catch the return status.
 
-> >>> This adds Flags which the application can use in case it want to set
-> >>> it own flags.
-> >>>
-> >>> Note: This would allow for example an application to advertise as
-> >>> discoverable even if the adapter is not discoverable which may be
-> >>> required by dual-mode as it may not require BR/EDR to be discoverable.
-> >>> ---
-> >>> doc/advertising-api.txt | 15 +++++++++++++++
-> >>> 1 file changed, 15 insertions(+)
-> >>>
-> >>> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> >>> index eef98ad91..4e015f282 100644
-> >>> --- a/doc/advertising-api.txt
-> >>> +++ b/doc/advertising-api.txt
-> >>> @@ -78,6 +78,21 @@ Properties string Type
-> >>>                              <Transport Discovery> <Organization
-> > Flags...>
-> >>>                              0x26                   0x01
-> > 0x01...
-> >>>
-> >>> +             array{byte} Flags [Experimental]
-> >>> +
-> >>> +                     Advertising Flags to include. When present this
-> > will
-> >>> +                     override existing flags such as Discoverable.
-> >>> +
-> >>> +                     Note: This property shall not be set when Type
-is
-> > set
-> >>> +                     to broadcast.
-> >>> +
-> >>> +                     Possible value:
-> >>> +                             bit 0 - LE Limited Discoverable Mode
-> >>> +                             bit 1 - LE General Discoverable Mode
-> >>> +                             bit 2 - BR/EDR Not Supported
-> >>> +                             bit 3 - Simultaneous LE and BR/EDR
-> > (Controller)
-> >>> +                             bit 4 - Simultaneous LE and BR/EDR
-(Host)
-> >>> +
-> >
-> >> I think this is the wrong approach. Exposing this low-level part is
-just
-> > giving an API to circumvent and violate the Bluetooth spec. You are
-> > inviting apps to create bad advertising data. So NAK.
-> >
-> > Then we should find some alternative, perhaps only allow certain flags
-to
-> > be set this way or change the property to just Discoverable.
+> Thanks
+> 
+> Matthias
 
-> I would just add a single property Discoverable that maps to General
-Discoverable Mode. If you want to get extra credits, then adding
-DiscoverableTimeout (like we have in adapter-api.txt) would allow to switch
-it back from discoverable to connectable.
-
-Alright, perhaps we could maintain it as Flags and only allow certain flags
-to be set by the application since I do intend to use the same interface to
-expose device advertisement so we can remove the AdvertisingData and
-AdvertisingFlags from the Device interface. Regarding the Timeout we
-already have something similar with Duration, or do you think that there
-are use cases that we cannot fulfill? For bit 3-4 I guess we never set
-those, but BR/EDR Not Supported could be useful for the application to
-control the bearer it wants the remote to connect to.
-
-> Regards
-
-> Marcel
-
-
+I will send the patch after testing these changes.
 
 -- 
-Luiz Augusto von Dentz
+Regards
+Balakrishna.
