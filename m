@@ -1,102 +1,50 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Message-ID: <1525934741.18877.38.camel@mtkswgap22>
-Subject: Re: [PATCH v1 6/7] Bluetooth: hci_mediatek: Add protocol support
- for MediaTek serial devices
-From: Sean Wang <sean.wang@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Date: Thu, 10 May 2018 14:45:41 +0800
-In-Reply-To: <6033F916-F103-4F07-9912-695B5B49F30F@holtmann.org>
-References: <cover.1522736996.git.sean.wang@mediatek.com>
-         <f0e0a0b7f1dc3845dc6eafb4ccd60284d1675f8d.1522736996.git.sean.wang@mediatek.com>
-         <A7391E5D-2945-415B-8AB1-8DFBF2E65878@holtmann.org>
-         <1525762084.14468.20.camel@mtkswgap22>
-         <D474053D-6910-4B04-8B98-59B96FEB86BC@holtmann.org>
-         <1525767775.18877.22.camel@mtkswgap22>
-         <6033F916-F103-4F07-9912-695B5B49F30F@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Navik, Ankit P" <ankit.p.navik@intel.com>
+To: bharat panda <bharat22bhusan@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] src/profile: Updates HFP version to 1.7
+Date: Thu, 10 May 2018 04:50:21 +0000
+Message-ID: <2F886D5F95ED3A47BC8C177EADCD1CC72814D044@BGSMSX104.gar.corp.intel.com>
+References: <1524045561-14167-1-git-send-email-ankit.p.navik@intel.com>
+ <CANBo3n-hV2ZCXV6xpg3HNqGpzZLDB=Ed8ZM-o4ugWquMomw0aw@mail.gmail.com>
+In-Reply-To: <CANBo3n-hV2ZCXV6xpg3HNqGpzZLDB=Ed8ZM-o4ugWquMomw0aw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2018-05-08 at 13:18 +0200, Marcel Holtmann wrote:
-> Hi Sean,
-> 
-> >>>>> +
-
-[ ... ]
-
-> > 
-> > I'm happy to do with btmon. just the environment with buildroot the BT
-> > running on seems there's a missing support for btmon. I can start to use
-> > btmon once I change the environment to Debian.
-> > 
-> >> So all the MTK vendor commands respond with a vendor event? Or are there some that do the standard command status/complete handling?
-> >> 
-> > 
-> > yes, mtk controller after mt7622 (included), its MTK vendors command
-> > (opcode 0xfc6f) always respond with a vendor event id 0xe4. And they
-> > don't do any standard status/complete handling.
-
-
-> then we need to figure out where the __hci_cmd_sync_ev causes a problem. Since normally that should just work for you.
-> 
-
-Okay. I will look into more about the issue after I finished the v2
-based on btuart driver. By the way, I've ported the btmon to my board,
-these vendor commands/events reported via btmon looks like below shown
-up
-
-> HCI Event: Unknown (0xe4) plen 5
- [hci0] 11.213593
-        02 01 01 00 00                                   .....
-
-> HCI Event: Unknown (0xe4) plen 5
- [hci0] 11.214272
-        02 01 01 00 00                                   .....
-
-< HCI Command: Vendor (0x3f|0x006f) plen 5
- [hci0] 11.214318
-        01 07 01 00 04                                   .....
-
-> HCI Event: Unknown (0xe4) plen 5
- [hci0] 11.214438
-        02 07 01 00 00                                   .....
-
-< HCI Command: Vendor (0x3f|0x006f) plen 6
- [hci0] 13.229379
-        01 06 02 00 00 01                                ......
-
-> HCI Event: Unknown (0xe4) plen 5
- [hci0] 13.307729
-        02 06 01 00 00                                   .....
-
-
-> > BTW, mtk controller before mt7622, such as mt7623, its MTK vendor
-> > command always go with completely specific format, not with hci format.
-> 
-> What does that mean? Do you have an example?
-> 
-
-what I meant is that these vendor commands and events applied on old
-SoCs prior to MT7622 always use completely proprietary format rather
-than any BT packet to setup the BT controller.
-
-for example:
-- vendor command 
-01 06 02 00 00 01 
-
-- vendor event
-02 06 01 00 00
-
-> Regards
-> 
-> Marcel
-> 
+SGkgQmhhcmF0LCANCg0KPiBPbiBUaHUsIE1heSAxMCwgMjAxOCBhdCA5OjUxIEFNLCBiaGFyYXQg
+cGFuZGEgPGJoYXJhdDIyYmh1c2FuQGdtYWlsLmNvbT4gd3JvdGU6PiANCj4gSGkgQW5raXQsDQo+
+IA0KPiBJcyB0aGlzIHRvIHVwZ3JhZGUgQmx1ZVogSEZQIHZlcnNpb24gdG8gMS43IHNvIHRoYXQg
+b0Zvbm8gY2FuIGdldCB0aGlzIHZlcnNpb24gdG8NCj4gcHJvY2VlZCB3aXRoIDEuNyBzcGVjaWZp
+YyBjb21tYW5kcz8NCg0KWWVzDQoNCj4gSWYgc28sIHRoZW4gcGxlYXNlIHVwZGF0ZSB0aGUgY29t
+bWl0IG1lc3NhZ2UgaW4gZGV0YWlsIGFuZCB0aGUgcGF0Y2ggbG9va3MgZ29vZA0KPiB0byBtZSwg
+c29tZW9uZSBzaG91bGQgYXBwcm92ZS4NCg0Kb2ssIEkgd2lsbCB1cGRhdGUgY29tbWl0IG1lc3Nh
+Z2UuDQoNCj4gDQo+IE9uIFdlZCwgQXByIDE4LCAyMDE4IGF0IDM6MjkgUE0sIEFua2l0IE5hdmlr
+IDxhbmtpdC5wLm5hdmlrQGludGVsLmNvbT4gd3JvdGU6DQo+ID4gQWRkIGNoYW5nZXMgdG8gdXBk
+YXRlIEhGUCB2ZXJzaW9uIHRvIDB4MDEwNyBmb3IgSEZQX0hTX1VVSUQgYW5kDQo+ID4gSEZQX0FH
+X1VVSUQuDQo+ID4gLS0tDQo+ID4gIHNyYy9wcm9maWxlLmMgfCA0ICsrLS0NCj4gPiAgMSBmaWxl
+IGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYg
+LS1naXQgYS9zcmMvcHJvZmlsZS5jIGIvc3JjL3Byb2ZpbGUuYyBpbmRleCA3YzUzMThjLi4xZTlj
+NTg1DQo+ID4gMTAwNjQ0DQo+ID4gLS0tIGEvc3JjL3Byb2ZpbGUuYw0KPiA+ICsrKyBiL3NyYy9w
+cm9maWxlLmMNCj4gPiBAQCAtMTk3MSw3ICsxOTcxLDcgQEAgc3RhdGljIHN0cnVjdCBkZWZhdWx0
+X3NldHRpbmdzIHsNCj4gPiAgICAgICAgICAgICAgICAgLmF1dGhvcml6ZSAgICAgID0gdHJ1ZSwN
+Cj4gPiAgICAgICAgICAgICAgICAgLmF1dG9fY29ubmVjdCAgID0gdHJ1ZSwNCj4gPiAgICAgICAg
+ICAgICAgICAgLmdldF9yZWNvcmQgICAgID0gZ2V0X2hmcF9oZl9yZWNvcmQsDQo+ID4gLSAgICAg
+ICAgICAgICAgIC52ZXJzaW9uICAgICAgICA9IDB4MDEwNSwNCj4gPiArICAgICAgICAgICAgICAg
+LnZlcnNpb24gICAgICAgID0gMHgwMTA3LA0KPiA+ICAgICAgICAgfSwgew0KPiA+ICAgICAgICAg
+ICAgICAgICAudXVpZCAgICAgICAgICAgPSBIRlBfQUdfVVVJRCwNCj4gPiAgICAgICAgICAgICAg
+ICAgLm5hbWUgICAgICAgICAgID0gIkhhbmRzLUZyZWUgVm9pY2UgZ2F0ZXdheSIsDQo+ID4gQEAg
+LTE5ODEsNyArMTk4MSw3IEBAIHN0YXRpYyBzdHJ1Y3QgZGVmYXVsdF9zZXR0aW5ncyB7DQo+ID4g
+ICAgICAgICAgICAgICAgIC5hdXRob3JpemUgICAgICA9IHRydWUsDQo+ID4gICAgICAgICAgICAg
+ICAgIC5hdXRvX2Nvbm5lY3QgICA9IHRydWUsDQo+ID4gICAgICAgICAgICAgICAgIC5nZXRfcmVj
+b3JkICAgICA9IGdldF9oZnBfYWdfcmVjb3JkLA0KPiA+IC0gICAgICAgICAgICAgICAudmVyc2lv
+biAgICAgICAgPSAweDAxMDUsDQo+ID4gKyAgICAgICAgICAgICAgIC52ZXJzaW9uICAgICAgICA9
+IDB4MDEwNywNCj4gPiAgICAgICAgIH0sIHsNCj4gPiAgICAgICAgICAgICAgICAgLnV1aWQgICAg
+ICAgICAgID0gSFNQX0FHX1VVSUQsDQo+ID4gICAgICAgICAgICAgICAgIC5uYW1lICAgICAgICAg
+ICA9ICJIZWFkc2V0IFZvaWNlIGdhdGV3YXkiLA0KPiA+IC0tDQo+ID4gMi43LjQNCj4gPg0KPiA+
+IC0tDQo+ID4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVu
+c3Vic2NyaWJlDQo+ID4gbGludXgtYmx1ZXRvb3RoIiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2Ug
+dG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZw0KPiA+IE1vcmUgbWFqb3Jkb21vIGluZm8gYXQg
+IGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0KPiANCj4gDQo+IA0K
+PiAtLQ0KPiBSZWdhcmRzDQo+IEJoYXJhdA0K
