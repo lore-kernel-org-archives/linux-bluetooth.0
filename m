@@ -1,50 +1,63 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Navik, Ankit P" <ankit.p.navik@intel.com>
-To: bharat panda <bharat22bhusan@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] src/profile: Updates HFP version to 1.7
-Date: Thu, 10 May 2018 04:50:21 +0000
-Message-ID: <2F886D5F95ED3A47BC8C177EADCD1CC72814D044@BGSMSX104.gar.corp.intel.com>
-References: <1524045561-14167-1-git-send-email-ankit.p.navik@intel.com>
- <CANBo3n-hV2ZCXV6xpg3HNqGpzZLDB=Ed8ZM-o4ugWquMomw0aw@mail.gmail.com>
-In-Reply-To: <CANBo3n-hV2ZCXV6xpg3HNqGpzZLDB=Ed8ZM-o4ugWquMomw0aw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <1524045561-14167-1-git-send-email-ankit.p.navik@intel.com>
+References: <1524045561-14167-1-git-send-email-ankit.p.navik@intel.com>
+From: bharat panda <bharat22bhusan@gmail.com>
+Date: Thu, 10 May 2018 09:50:40 +0530
+Message-ID: <CANBo3n-hV2ZCXV6xpg3HNqGpzZLDB=Ed8ZM-o4ugWquMomw0aw@mail.gmail.com>
+Subject: Re: [PATCH] src/profile: Updates HFP version to 1.7
+To: Ankit Navik <ankit.p.navik@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQmhhcmF0LCANCg0KPiBPbiBUaHUsIE1heSAxMCwgMjAxOCBhdCA5OjUxIEFNLCBiaGFyYXQg
-cGFuZGEgPGJoYXJhdDIyYmh1c2FuQGdtYWlsLmNvbT4gd3JvdGU6PiANCj4gSGkgQW5raXQsDQo+
-IA0KPiBJcyB0aGlzIHRvIHVwZ3JhZGUgQmx1ZVogSEZQIHZlcnNpb24gdG8gMS43IHNvIHRoYXQg
-b0Zvbm8gY2FuIGdldCB0aGlzIHZlcnNpb24gdG8NCj4gcHJvY2VlZCB3aXRoIDEuNyBzcGVjaWZp
-YyBjb21tYW5kcz8NCg0KWWVzDQoNCj4gSWYgc28sIHRoZW4gcGxlYXNlIHVwZGF0ZSB0aGUgY29t
-bWl0IG1lc3NhZ2UgaW4gZGV0YWlsIGFuZCB0aGUgcGF0Y2ggbG9va3MgZ29vZA0KPiB0byBtZSwg
-c29tZW9uZSBzaG91bGQgYXBwcm92ZS4NCg0Kb2ssIEkgd2lsbCB1cGRhdGUgY29tbWl0IG1lc3Nh
-Z2UuDQoNCj4gDQo+IE9uIFdlZCwgQXByIDE4LCAyMDE4IGF0IDM6MjkgUE0sIEFua2l0IE5hdmlr
-IDxhbmtpdC5wLm5hdmlrQGludGVsLmNvbT4gd3JvdGU6DQo+ID4gQWRkIGNoYW5nZXMgdG8gdXBk
-YXRlIEhGUCB2ZXJzaW9uIHRvIDB4MDEwNyBmb3IgSEZQX0hTX1VVSUQgYW5kDQo+ID4gSEZQX0FH
-X1VVSUQuDQo+ID4gLS0tDQo+ID4gIHNyYy9wcm9maWxlLmMgfCA0ICsrLS0NCj4gPiAgMSBmaWxl
-IGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYg
-LS1naXQgYS9zcmMvcHJvZmlsZS5jIGIvc3JjL3Byb2ZpbGUuYyBpbmRleCA3YzUzMThjLi4xZTlj
-NTg1DQo+ID4gMTAwNjQ0DQo+ID4gLS0tIGEvc3JjL3Byb2ZpbGUuYw0KPiA+ICsrKyBiL3NyYy9w
-cm9maWxlLmMNCj4gPiBAQCAtMTk3MSw3ICsxOTcxLDcgQEAgc3RhdGljIHN0cnVjdCBkZWZhdWx0
-X3NldHRpbmdzIHsNCj4gPiAgICAgICAgICAgICAgICAgLmF1dGhvcml6ZSAgICAgID0gdHJ1ZSwN
-Cj4gPiAgICAgICAgICAgICAgICAgLmF1dG9fY29ubmVjdCAgID0gdHJ1ZSwNCj4gPiAgICAgICAg
-ICAgICAgICAgLmdldF9yZWNvcmQgICAgID0gZ2V0X2hmcF9oZl9yZWNvcmQsDQo+ID4gLSAgICAg
-ICAgICAgICAgIC52ZXJzaW9uICAgICAgICA9IDB4MDEwNSwNCj4gPiArICAgICAgICAgICAgICAg
-LnZlcnNpb24gICAgICAgID0gMHgwMTA3LA0KPiA+ICAgICAgICAgfSwgew0KPiA+ICAgICAgICAg
-ICAgICAgICAudXVpZCAgICAgICAgICAgPSBIRlBfQUdfVVVJRCwNCj4gPiAgICAgICAgICAgICAg
-ICAgLm5hbWUgICAgICAgICAgID0gIkhhbmRzLUZyZWUgVm9pY2UgZ2F0ZXdheSIsDQo+ID4gQEAg
-LTE5ODEsNyArMTk4MSw3IEBAIHN0YXRpYyBzdHJ1Y3QgZGVmYXVsdF9zZXR0aW5ncyB7DQo+ID4g
-ICAgICAgICAgICAgICAgIC5hdXRob3JpemUgICAgICA9IHRydWUsDQo+ID4gICAgICAgICAgICAg
-ICAgIC5hdXRvX2Nvbm5lY3QgICA9IHRydWUsDQo+ID4gICAgICAgICAgICAgICAgIC5nZXRfcmVj
-b3JkICAgICA9IGdldF9oZnBfYWdfcmVjb3JkLA0KPiA+IC0gICAgICAgICAgICAgICAudmVyc2lv
-biAgICAgICAgPSAweDAxMDUsDQo+ID4gKyAgICAgICAgICAgICAgIC52ZXJzaW9uICAgICAgICA9
-IDB4MDEwNywNCj4gPiAgICAgICAgIH0sIHsNCj4gPiAgICAgICAgICAgICAgICAgLnV1aWQgICAg
-ICAgICAgID0gSFNQX0FHX1VVSUQsDQo+ID4gICAgICAgICAgICAgICAgIC5uYW1lICAgICAgICAg
-ICA9ICJIZWFkc2V0IFZvaWNlIGdhdGV3YXkiLA0KPiA+IC0tDQo+ID4gMi43LjQNCj4gPg0KPiA+
-IC0tDQo+ID4gVG8gdW5zdWJzY3JpYmUgZnJvbSB0aGlzIGxpc3Q6IHNlbmQgdGhlIGxpbmUgInVu
-c3Vic2NyaWJlDQo+ID4gbGludXgtYmx1ZXRvb3RoIiBpbiB0aGUgYm9keSBvZiBhIG1lc3NhZ2Ug
-dG8gbWFqb3Jkb21vQHZnZXIua2VybmVsLm9yZw0KPiA+IE1vcmUgbWFqb3Jkb21vIGluZm8gYXQg
-IGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0KPiANCj4gDQo+IA0K
-PiAtLQ0KPiBSZWdhcmRzDQo+IEJoYXJhdA0K
+Hi Ankit,
+
+Is this to upgrade BlueZ HFP version to 1.7 so that oFono can get this
+version to proceed with 1.7 specific commands?
+If so, then please update the commit message in detail and the patch
+looks good to me, someone should approve.
+
+On Wed, Apr 18, 2018 at 3:29 PM, Ankit Navik <ankit.p.navik@intel.com> wrote:
+> Add changes to update HFP version to 0x0107 for HFP_HS_UUID and
+> HFP_AG_UUID.
+> ---
+>  src/profile.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/profile.c b/src/profile.c
+> index 7c5318c..1e9c585 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -1971,7 +1971,7 @@ static struct default_settings {
+>                 .authorize      = true,
+>                 .auto_connect   = true,
+>                 .get_record     = get_hfp_hf_record,
+> -               .version        = 0x0105,
+> +               .version        = 0x0107,
+>         }, {
+>                 .uuid           = HFP_AG_UUID,
+>                 .name           = "Hands-Free Voice gateway",
+> @@ -1981,7 +1981,7 @@ static struct default_settings {
+>                 .authorize      = true,
+>                 .auto_connect   = true,
+>                 .get_record     = get_hfp_ag_record,
+> -               .version        = 0x0105,
+> +               .version        = 0x0107,
+>         }, {
+>                 .uuid           = HSP_AG_UUID,
+>                 .name           = "Headset Voice gateway",
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Regards
+Bharat
