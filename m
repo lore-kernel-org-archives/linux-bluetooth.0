@@ -1,61 +1,69 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH v5 1/3] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI chip wcn3990
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1526041263-18795-2-git-send-email-bgodavar@codeaurora.org>
-Date: Fri, 11 May 2018 20:28:32 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        rtatiya@codeaurora.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org
-Message-Id: <F3C64EA5-D660-41E2-8233-0522D7019CB2@holtmann.org>
-References: <1526041263-18795-1-git-send-email-bgodavar@codeaurora.org>
- <1526041263-18795-2-git-send-email-bgodavar@codeaurora.org>
+Return-Path: <mka@chromium.org>
+Date: Fri, 11 May 2018 10:40:24 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
 To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
+	hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v5 2/3] Bluetooth: btqca: Add wcn3990 firmware download
+ support.
+Message-ID: <20180511174024.GL19594@google.com>
+References: <1526041263-18795-1-git-send-email-bgodavar@codeaurora.org>
+ <1526041263-18795-3-git-send-email-bgodavar@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1526041263-18795-3-git-send-email-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Balakrishna,
+Hi Bala,
 
+On Fri, May 11, 2018 at 05:51:02PM +0530, Balakrishna Godavarthi wrote:
+> This patch enables the RAM and NV patch download for wcn3990.
+> 
 > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > ---
-> .../devicetree/bindings/net/qualcomm-bluetooth.txt | 31 ++++++++++++++++++++--
-> 1 file changed, 29 insertions(+), 2 deletions(-)
+>  drivers/bluetooth/btqca.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+>  drivers/bluetooth/btqca.h | 13 +++++++++++++
+>  2 files changed, 58 insertions(+), 1 deletion(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> index 0ea18a5..63cae49 100644
-> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> @@ -10,12 +10,24 @@ device the slave device is attached to.
-> Required properties:
->  - compatible: should contain one of the following:
->    * "qcom,qca6174-bt"
-> +   * "qcom,wcn3990-bt"
-> 
-> Optional properties:
->  - enable-gpios: gpio specifier used to enable chip
->  - clocks: clock provided to the controller (SUSCLK_32KHZ)
-> -
-> -Example:
-> + - vddpa-supply: Bluetooth VDD PA regulator handle
-> + - vddio-supply: Bluetooth VDD IO regulator handle
-> + - vddldo-supply: Bluetooth VDD LDO regulator handle. Kept under optional
-> +		  parameters as some of the chipsets doesn't require ldo or
-> +		  it may use from same vddio.
-> + - vddxtal-supply: Bluetooth VDD XTAL regulator handle
-> + - vddcore-supply: Bluetooth VDD CORE regulator handle
-> + - vddpwd-supply: Chip power down gpio is required when bluetooth module
-> +		  and other modules like wifi co-exist in a singe chip and
-> +		  shares a common gpio to bring chip out of reset.
-> + - oper-speed: operating speed of the chip.
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index 8219816..40c6b4f 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -27,7 +27,7 @@
+>  
+>  #define VERSION "0.1"
+>  
+> -static int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
+> +int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
 
-we actually agreed on using max-speed for these. And it should optional to limit speed for “broken” devices or that have some limit because of the platform.
+If this and other functions aren't really Rome specific they should
+probably be renamed to qca_...
 
-Regards
+> +int qca_uart_setup_cherokee(struct hci_dev *hdev, uint8_t baudrate,
+> +			    u32 *soc_ver)
+> +{
+> +	struct rome_config config;
+> +	int err;
+> +
+> +	/* we are using the existing funciton of ROME,
+> +	 * instead of duplicating the function for wcn3990.
+> +	 */
 
-Marcel
+The comment isn't quite accurate, the qca_uart_setup_cherokee() calls
+existing functions, but is essentially a copy of qca_uart_setup_rome().
 
+The main difference is that the patch version is passed as a parameter
+instead of determining it in the uart setup function. There seems to
+be no need to pass the version number in, or if you prefer to do it
+this way, you could change the Rome code to do this.
+
+The other delta is the filename extension of the rampatch file, which
+is .bin for Rome and .tlv for Cherokee. Is there a good reason to use
+a different extension? If not just stick to the existing naming
+scheme, otherwise you could pass the chip type as a parameter and
+chose the extensions based on that.
+
+Thanks
+
+Matthias
