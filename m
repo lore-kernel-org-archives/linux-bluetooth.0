@@ -1,26 +1,38 @@
-Return-Path: <hanipouspilot@gmail.com>
-MIME-Version: 1.0
-From: Dmitry Tunin <hanipouspilot@gmail.com>
-Date: Sun, 13 May 2018 16:08:07 +0300
-Message-ID: <CANoib0FoY86caY-zABHssXq_G8zmt3zJemvYrTyvQ1R58xseoQ@mail.gmail.com>
-Subject: [REGRESSION] And a drity fix for 0cf3:3004 QCA Rome device
-To: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <vaibhavmurkute88@gmail.com>
+From: Vaibhav Murkute <vaibhavmurkute88@gmail.com>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Vaibhav Murkute <vaibhavmurkute88@gmail.com>
+Subject: [PATCH] drivers: bluetooth: hci_serdev: Removed unnecessary curly braces
+Date: Fri, 11 May 2018 15:12:32 -0700
+Message-Id: <1526076752-5871-1-git-send-email-vaibhavmurkute88@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Marcel
+checkpatch.pl shows a warning for these unnecessary curly braces.
+so just removed those curly braces.
 
-Since  f44cb4b older AR3012 devices stopped working. We discussed that
-before that QCA released a ROME device with a duplicate code.
+Signed-off-by: Vaibhav Murkute <vaibhavmurkute88@gmail.com>
+---
+ drivers/bluetooth/hci_serdev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-If there is no easy way to check which one is used, then it may be a
-good decision to change the kernel code for the newer device in new
-kernels.
-
-But anyway it should be made cleaner. The device is still listed in
-ath3k.o as an AR3012.
-
-Regards,
-
-Dmitry.
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index e0e6461..137c314 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -204,9 +204,9 @@ static int hci_uart_setup(struct hci_dev *hdev)
+ 		return 0;
+ 	}
+ 
+-	if (skb->len != sizeof(*ver)) {
++	if (skb->len != sizeof(*ver))
+ 		bt_dev_err(hdev, "Event length mismatch for version info");
+-	}
++
+ 
+ 	kfree_skb(skb);
+ 	return 0;
+-- 
+2.7.4
