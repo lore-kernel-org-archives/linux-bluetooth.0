@@ -1,204 +1,239 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH v2 BlueZ] shared/io-ell: Add support for ELL based IO handling
-Date: Tue, 15 May 2018 18:58:55 -0700
-Message-Id: <20180516015855.11701-1-inga.stotland@intel.com>
+Mime-Version: 1.0
+Subject: RE: [PATCH v2 BlueZ] tools/gatt-service: Add reference
+ implementation for Included Service
+Reply-To: avichal.a@samsung.com
+From: Avichal Agarwal <avichal.a@samsung.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <003f01d3ec57$711cd060$53567120$@samsung.com>
+Message-ID: <20180515142137epcms5p432d1c81075573ba0800494390288c56d@epcms5p4>
+Date: Tue, 15 May 2018 19:51:37 +0530
+Content-Type: text/plain; charset="utf-8"
+References: <003f01d3ec57$711cd060$53567120$@samsung.com>
+        <1521550393-20026-1-git-send-email-avichal.a@samsung.com>
+        <CGME20180320125349epcas1p1998e73353a1929039aecbfb98dfa4b51@epcms5p4>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- Makefile.am         |   6 +-
- src/shared/io-ell.c | 155 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 160 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/io-ell.c
-
-diff --git a/Makefile.am b/Makefile.am
-index 9c3c17139..322706fad 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -95,7 +95,8 @@ gdbus_libgdbus_internal_la_SOURCES = gdbus/gdbus.h \
- 				gdbus/mainloop.c gdbus/watch.c \
- 				gdbus/object.c gdbus/client.c gdbus/polkit.c
- 
--noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la
-+noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la \
-+				src/libshared-ell.la
- 
- shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/queue.h src/shared/queue.c \
-@@ -135,6 +136,9 @@ src_libshared_mainloop_la_SOURCES = $(shared_sources) \
- 				src/shared/timeout-mainloop.c \
- 				src/shared/mainloop.h src/shared/mainloop.c
- 
-+src_libshared_ell_la_SOURCES = $(shared_sources) \
-+				src/shared/io-ell.c
-+
- attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
- 		attrib/gatt.h attrib/gatt.c \
- 		attrib/gattrib.h attrib/gattrib.c \
-diff --git a/src/shared/io-ell.c b/src/shared/io-ell.c
-new file mode 100644
-index 000000000..3701f4398
---- /dev/null
-+++ b/src/shared/io-ell.c
-@@ -0,0 +1,155 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <unistd.h>
-+#include <errno.h>
-+#include <sys/socket.h>
-+
-+#include <ell/ell.h>
-+
-+#include "src/shared/io.h"
-+
-+struct io {
-+	struct l_io *l_io;
-+};
-+
-+struct io *io_new(int fd)
-+{
-+	struct io *io;
-+	struct l_io *l_io;
-+
-+	if (fd < 0)
-+		return NULL;
-+
-+	io = l_new(struct io, 1);
-+	if (!io)
-+		return NULL;
-+
-+	l_io = l_io_new(fd);
-+	if (!l_io) {
-+		l_free(io);
-+		return NULL;
-+	}
-+
-+	io->l_io = l_io;
-+
-+	return io;
-+}
-+
-+void io_destroy(struct io *io)
-+{
-+	if (!io)
-+		return;
-+
-+	if (io->l_io)
-+		l_io_destroy(io->l_io);
-+
-+	l_free(io);
-+}
-+
-+int io_get_fd(struct io *io)
-+{
-+	if (!io || !io->l_io)
-+		return -ENOTCONN;
-+
-+	return l_io_get_fd(io->l_io);
-+}
-+
-+bool io_set_close_on_destroy(struct io *io, bool do_close)
-+{
-+	if (!io || !io->l_io)
-+		return false;
-+
-+	return l_io_set_close_on_destroy(io->l_io, do_close);
-+}
-+
-+bool io_set_read_handler(struct io *io, io_callback_func_t callback,
-+				void *user_data, io_destroy_func_t destroy)
-+{
-+	if (!io || !io->l_io)
-+		return false;
-+
-+	return l_io_set_read_handler(io->l_io, (l_io_read_cb_t) callback,
-+							user_data, destroy);
-+}
-+
-+bool io_set_write_handler(struct io *io, io_callback_func_t callback,
-+				void *user_data, io_destroy_func_t destroy)
-+{
-+	if (!io || !io->l_io)
-+		return false;
-+
-+	return l_io_set_write_handler(io->l_io, (l_io_write_cb_t) callback,
-+							user_data, destroy);
-+}
-+
-+bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
-+				void *user_data, io_destroy_func_t destroy)
-+{
-+	if (!io || !io->l_io)
-+		return false;
-+
-+	return l_io_set_disconnect_handler(io->l_io,
-+						(l_io_disconnect_cb_t) callback,
-+							user_data, destroy);
-+}
-+
-+ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt)
-+{
-+	ssize_t ret;
-+	int fd;
-+
-+	if (!io || !io->l_io)
-+		return -ENOTCONN;
-+
-+	fd = l_io_get_fd(io->l_io);
-+	if (fd < 0)
-+		return -ENOTCONN;
-+
-+	do {
-+		ret = writev(fd, iov, iovcnt);
-+	} while (ret < 0 && errno == EINTR);
-+
-+	if (ret < 0)
-+		return -errno;
-+
-+	return ret;
-+}
-+
-+bool io_shutdown(struct io *io)
-+{
-+	int fd;
-+
-+	if (!io || !io->l_io)
-+		return false;
-+
-+	fd = l_io_get_fd(io->l_io);
-+	if (fd < 0)
-+		return false;
-+
-+	return shutdown(fd, SHUT_RDWR) == 0;
-+}
--- 
-2.14.3
-
+=C2=A0=0D=0A=0D=0A=C2=A0=0D=0Aping=0D=0A-----Original=C2=A0Message-----=0D=
+=0AFrom:=C2=A0linux-bluetooth-owner=40vger.kernel.org=C2=A0=5Bmailto:linux-=
+bluetooth-owner=40vger.kernel.org=5D=C2=A0On=C2=A0Behalf=C2=A0Of=C2=A0Avich=
+al=C2=A0Agarwal=0D=0ASent:=C2=A0Tuesday,=C2=A0March=C2=A020,=C2=A02018=C2=
+=A06:23=C2=A0PM=0D=0ATo:=C2=A0linux-bluetooth=40vger.kernel.org=0D=0ACc:=C2=
+=A0sachin.dev=40samsung.com;=C2=A0anupam.r=40samsung.com;=C2=A0Avichal=C2=
+=A0Agarwal=0D=0ASubject:=C2=A0=5BPATCH=C2=A0v2=C2=A0BlueZ=5D=C2=A0tools/gat=
+t-service:=C2=A0Add=C2=A0reference=C2=A0implementation=C2=A0for=C2=A0Includ=
+ed=C2=A0Service=0D=0A=C2=A0=0D=0ACreated=C2=A0two=C2=A0new=C2=A0primary=C2=
+=A0services=C2=A0which=C2=A0will=C2=A0act=C2=A0as=C2=A0includes=C2=A0servic=
+es=C2=A0for=C2=A0first=C2=A0=C2=A0primary=C2=A0service=0D=0A---=0D=0A=C2=A0=
+tools/gatt-service.c=C2=A0=7C=C2=A094=C2=A0++++++++++++++++++++++++++++++++=
+++++++++++++++++++--=0D=0A=C2=A01=C2=A0file=C2=A0changed,=C2=A092=C2=A0inse=
+rtions(+),=C2=A02=C2=A0deletions(-)=0D=0A=C2=A0=0D=0Adiff=C2=A0--git=C2=A0a=
+/tools/gatt-service.c=C2=A0b/tools/gatt-service.c=C2=A0index=C2=A06bd5576..=
+2ce8a1f=C2=A0100644=0D=0A---=C2=A0a/tools/gatt-service.c=0D=0A+++=C2=A0b/to=
+ols/gatt-service.c=0D=0A=40=40=C2=A0-47,9=C2=A0+47,17=C2=A0=40=40=0D=0A=C2=
+=A0/*=C2=A0Immediate=C2=A0Alert=C2=A0Service=C2=A0UUID=C2=A0*/=0D=0A=C2=A0=
+=23define=C2=A0IAS_UUID=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=2200001802-0000-1000-8000-00805f9b34fb=22=0D=0A=C2=A0=23=
+define=C2=A0ALERT_LEVEL_CHR_UUID=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=2200002a06-0000-1000=
+-8000-00805f9b34fb=22=0D=0A+=23define=C2=A0IAS_UUID1=C2=A0=C2=A0=C2=A0=22A0=
+0B=22=0D=0A+=23define=C2=A0IAS_UUID2=C2=A0=C2=A0=C2=A0=22A00C=22=0D=0A+=23d=
+efine=C2=A0IAS_UUID3=C2=A0=C2=A0=C2=A0=22A00D=22=0D=0A+=23define=C2=A0ALERT=
+_LEVEL_CHR_UUID1=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=2200002b06-0000-1000-8000-00805f9b3=
+4fb=22=0D=0A+=23define=C2=A0ALERT_LEVEL_CHR_UUID2=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=22=
+00002c07-0000-1000-8000-00805f9b34fb=22=0D=0A+/*=C2=A0Random=C2=A0UUID=C2=
+=A0for=C2=A0testing=C2=A0purpose=C2=A0*/=0D=0A=C2=A0=0D=0A=C2=A0/*=C2=A0Ran=
+dom=C2=A0UUID=C2=A0for=C2=A0testing=C2=A0purpose=C2=A0*/=0D=0A=C2=A0=23defi=
+ne=C2=A0READ_WRITE_DESCRIPTOR_UUID=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=228260c653-1a54-426b-9e36-e84c238bc669=22=0D=0A+=23define=C2=A0RE=
+AD_WRITE_DESCRIPTOR_UUID1=C2=A0=220260c653-1a54-426b-9e36-e84c238bc669=22=
+=0D=0A+=23define=C2=A0READ_WRITE_DESCRIPTOR_UUID2=C2=A0=22FFFF=22=0D=0A=C2=
+=A0=0D=0A=C2=A0static=C2=A0GMainLoop=C2=A0*main_loop;=0D=0A=C2=A0static=C2=
+=A0GSList=C2=A0*services;=0D=0A=40=40=C2=A0-335,18=C2=A0+343,45=C2=A0=40=40=
+=C2=A0static=C2=A0gboolean=C2=A0service_get_includes(const=C2=A0GDBusProper=
+tyTable=C2=A0*property,=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0DBusMessageIter=C2=A0*it=
+er,=C2=A0void=C2=A0*user_data)=C2=A0=C2=A0=7B=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const=C2=A0char=C2=A0*uuid=C2=A0=3D=C2=A0user=
+_data;=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char=C2=A0serv=
+ice_path=5B100=5D=C2=A0=3D=C2=A0=7B0,=7D;=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0DBusMessageIter=C2=A0array;=0D=0A+=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char=C2=A0*p=C2=A0=3D=C2=A0NULL;=0D=0A=C2=A0=
+=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0snprintf(service_pat=
+h,=C2=A0100,=C2=A0=22/service3=22);=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0printf(=22Get=C2=A0Includes:=C2=A0%s=5Cn=22,=C2=A0uuid=
+);=0D=0A=C2=A0=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0p=C2=
+=A0=3D=C2=A0service_path;=0D=0A+=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0printf(=22Includes=C2=A0path:=C2=A0%s=5Cn=22,=C2=A0p);=0D=0A+=
+=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dbus_message_iter_op=
+en_container(iter,=C2=A0DBUS_TYPE_ARRAY,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0DBUS_TYPE_OBJECT_PATH_AS_STRING,=
+=C2=A0&array);=0D=0A+=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0dbus_message_iter_append_basic(&array,=C2=A0DBUS_TYPE_OBJECT_PATH,=0D=0A=
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0&p);=0D=0A+=0D=0A+=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0snprintf(service_path,=C2=A0100,=C2=A0=22/ser=
+vice2=22);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0p=C2=A0=3D=
+=C2=A0service_path;=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0p=
+rintf(=22Get=C2=A0Includes:=C2=A0%s=5Cn=22,=C2=A0p);=0D=0A+=0D=0A+=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dbus_message_iter_append_basic(&arra=
+y,=C2=A0DBUS_TYPE_OBJECT_PATH,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+&p);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dbus_message_ite=
+r_close_container(iter,=C2=A0&array);=0D=0A+=0D=0A+=0D=0A=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return=C2=A0TRUE;=0D=0A+=0D=0A=C2=A0=7D=
+=0D=0A=C2=A0=0D=0A+=0D=0A=C2=A0static=C2=A0gboolean=C2=A0service_exist_incl=
+udes(const=C2=A0GDBusPropertyTable=C2=A0*property,=0D=0A=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0void=C2=A0*user_data)=0D=0A=C2=A0=7B=0D=0A=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0const=C2=A0char=C2=A0*uuid=C2=
+=A0=3D=C2=A0user_data;=0D=0A=C2=A0=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0printf(=22Exist=C2=A0Includes:=C2=A0%s=5Cn=22,=C2=A0uu=
+id);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if=C2=A0(strncmp=
+(uuid,=C2=A0=2200001802=22,=C2=A08)=C2=A0=3D=3D=C2=A00)=0D=0A+=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0return=C2=A0TRUE;=0D=0A=C2=A0=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0return=C2=A0FALSE;=0D=0A=C2=A0=7D=0D=0A=40=40=C2=A0=
+-624,7=C2=A0+659,7=C2=A0=40=40=C2=A0static=C2=A0char=C2=A0*register_service=
+(const=C2=A0char=C2=A0*uuid)=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0return=C2=A0path;=0D=0A=C2=A0=7D=0D=0A=C2=A0=0D=0A-static=C2=
+=A0void=C2=A0create_services()=0D=0A+static=C2=A0void=C2=A0create_services_=
+one(void)=0D=0A=C2=A0=7B=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0char=C2=A0*service_path;=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0uint8_t=C2=A0level=C2=A0=3D=C2=A00;=0D=0A=40=40=C2=A0-651=
+,6=C2=A0+686,59=C2=A0=40=40=C2=A0static=C2=A0void=C2=A0create_services()=0D=
+=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf(=22Register=
+ed=C2=A0service:=C2=A0%s=5Cn=22,=C2=A0service_path);=C2=A0=C2=A0=7D=0D=0A=
+=C2=A0=0D=0A+=0D=0A+static=C2=A0void=C2=A0create_services_two(void)=0D=0A+=
+=7B=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0char=C2=A0*servic=
+e_path;=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0uint8_t=C2=A0=
+level=C2=A0=3D=C2=A00;=0D=0A+=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0service_path=C2=A0=3D=C2=A0register_service(IAS_UUID2);=0D=0A+=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if=C2=A0(=21service_path)=0D=
+=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0return;=0D=0A+=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0if=C2=A0(=21register_characteristic(ALERT_LEVEL_CHR_UU=
+ID2,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+&level,=C2=A0sizeof(level),=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0ias_alert_level_props,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0READ_WRITE_DESCRIPTOR_UUID2,=0D=
+=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0desc_p=
+rops,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+service_path))=C2=A0=7B=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf(=22Couldn't=C2=A0=
+register=C2=A0Alert=C2=A0Level=C2=A0characteristic=C2=A0(IAS)=5Cn=22);=0D=
+=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0g_dbus_unregister_interface(connection,=C2=A0ser=
+vice_path,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0GATT_SERVICE_IFACE);=
+=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_free(service_path);=0D=0A+=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0return;=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7D=0D=
+=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0services=C2=A0=3D=C2=A0=
+g_slist_prepend(services,=C2=A0service_path);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0printf(=22Registered=C2=A0service:=C2=A0%s=5Cn=
+=22,=C2=A0service_path);=C2=A0=7D=0D=0A+=0D=0A+static=C2=A0void=C2=A0create=
+_services_three(void)=C2=A0=7B=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0char=C2=A0*service_path;=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0uint8_t=C2=A0level=C2=A0=3D=C2=A00;=0D=0A+=0D=0A+=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0service_path=C2=A0=3D=C2=A0regist=
+er_service(IAS_UUID3);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0if=C2=A0(=21service_path)=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return;=0D=0A+=0D=
+=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if=C2=A0(=21register_ch=
+aracteristic(ALERT_LEVEL_CHR_UUID1,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0&level,=C2=A0sizeof(level),=0D=0A+=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ias_alert_level_props=
+,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0REA=
+D_WRITE_DESCRIPTOR_UUID1,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0desc_props,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0service_path))=C2=A0=7B=0D=0A+=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0printf(=22Couldn't=C2=A0register=C2=A0Alert=C2=A0Level=C2=A0characterist=
+ic=C2=A0(IAS)=5Cn=22);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_dbus_unregister_interf=
+ace(connection,=C2=A0service_path,=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0GATT_SERVICE_IFACE);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0g_free(service_path);=0D=
+=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0return;=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=7D=0D=0A+=0D=0A+=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0services=C2=A0=3D=C2=A0g_slist_prepend(services,=C2=A0service_p=
+ath);=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf(=22Regis=
+tered=C2=A0service:=C2=A0%s=5Cn=22,=C2=A0service_path);=C2=A0=7D=0D=0A+=0D=
+=0A=C2=A0static=C2=A0void=C2=A0register_app_reply(DBusMessage=C2=A0*reply,=
+=C2=A0void=C2=A0*user_data)=C2=A0=C2=A0=7B=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0DBusError=C2=A0derr;=0D=0A=40=40=C2=A0-789,7=C2=
+=A0+877,9=C2=A0=40=40=C2=A0int=C2=A0main(int=C2=A0argc,=C2=A0char=C2=A0*arg=
+v=5B=5D)=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0printf(=
+=22gatt-service=C2=A0unique=C2=A0name:=C2=A0%s=5Cn=22,=0D=0A=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0dbus_bus_get_unique_name(connection));=0D=
+=0A=C2=A0=0D=0A-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0create_serv=
+ices();=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0create_servic=
+es_one();=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0create_serv=
+ices_two();=0D=0A+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0create_se=
+rvices_three();=0D=0A=C2=A0=0D=0A=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0client=C2=A0=3D=C2=A0g_dbus_client_new(connection,=C2=A0=22org.=
+bluez=22,=C2=A0=22/=22);=0D=0A=C2=A0=0D=0A--=0D=0A2.7.4=0D=0A=C2=A0=0D=0A--=
+=0D=0ATo=C2=A0unsubscribe=C2=A0from=C2=A0this=C2=A0list:=C2=A0send=C2=A0the=
+=C2=A0line=C2=A0=22unsubscribe=C2=A0linux-bluetooth=22=C2=A0in=C2=A0the=C2=
+=A0body=C2=A0of=C2=A0a=C2=A0message=C2=A0to=C2=A0majordomo=40vger.kernel.or=
+g=C2=A0More=C2=A0majordomo=C2=A0info=C2=A0at=C2=A0=C2=A0http://vger.kernel.=
+org/majordomo-info.html=0D=0A=C2=A0=0D=0A=C2=A0=0D=0A=C2=A0=0D=0A=C2=A0=0D=
+=0A=0D=0ARegards=0D=0AAvichal=20Agarwal=0D=0A=C2=A0
