@@ -1,112 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <20180509110553.28989-1-grzegorz.kolodziejczyk@codecoup.pl>
- <20180509110553.28989-3-grzegorz.kolodziejczyk@codecoup.pl> <CABBYNZLO+1=tcqqsdF+Y2Yf7qROGmC-dPAek47N=z5nQFYfP9A@mail.gmail.com>
-In-Reply-To: <CABBYNZLO+1=tcqqsdF+Y2Yf7qROGmC-dPAek47N=z5nQFYfP9A@mail.gmail.com>
-From: =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?=
-        <grzegorz.kolodziejczyk@codecoup.pl>
-Date: Wed, 16 May 2018 15:08:08 +0200
-Message-ID: <CALevQMaox9GX4dCqj85uZJVs8M-0n8FV2W_cONVh7pB75qe+rQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/5] doc/gatt-api: Add authorization options for attributes
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+References: <1525944723-2238-1-git-send-email-ankit.p.navik@intel.com>
+In-Reply-To: <1525944723-2238-1-git-send-email-ankit.p.navik@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 16 May 2018 15:48:27 +0300
+Message-ID: <CABBYNZL_p=59CUAnR+n9Ef3w9MOX5ApNFf149LeC-MQNsKtjig@mail.gmail.com>
+Subject: Re: [PATCH] src/profile: Updates HFP version to 1.7
+To: ankit.p.navik@intel.com
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        bharat panda <bharat22bhusan@gmail.com>,
+        ankit.p.navik.intel.com@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-=C5=9Br., 16 maj 2018 o 09:16 Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-napisa=C5=82(a):
+Hi Ankit,
 
-> Hi Grzegorz,
-> On Wed, May 9, 2018 at 2:08 PM Grzegorz Kolodziejczyk <
-> grzegorz.kolodziejczyk@codecoup.pl> wrote:
+On Thu, May 10, 2018 at 12:33 PM Ankit Navik <ankit.p.navik@intel.com>
+wrote:
 
-> > This patch adds authorization property for attributes and prepare write
-> > request for authorization option for write request. This is require to
-> > handle correctly prepare writes, which may response with insufficient
-> > authorization error.
-> > ---
-> >   doc/gatt-api.txt | 9 +++++++++
-> >   1 file changed, 9 insertions(+)
+> Add changes to update HFP version to 0x0107 for HFP_HS_UUID and
+> HFP_AG_UUID. Ofono get this version from bluez and enable HFP 1.7
+> specific commands.
+> ---
+>   src/profile.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 
-> > diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> > index 0f1cc9029..7d2517ccc 100644
-> > --- a/doc/gatt-api.txt
-> > +++ b/doc/gatt-api.txt
-> > @@ -85,6 +85,8 @@ Methods               array{byte} ReadValue(dict
-> options)
-> >                          Possible options: "offset": Start offset
-> >                                            "device": Device path (Serve=
-r
-> only)
-> >                                            "link": Link type (Server
-only)
-> > +                                         "prep-authz-req": boolean Is
-> prepare write
-> > +
-authorization
-> request
-
-> I'd keep it simple and just call it authorize.
-Ok.
-
-> >                          Possible Errors: org.bluez.Error.Failed
-> >                                           org.bluez.Error.InProgress
-> > @@ -251,6 +253,11 @@ Properties string UUID [read-only]
-> >                                  "secure-read" (Server only)
-> >                                  "secure-write" (Server only)
-
-> > +               boolean Authorize [read-only, optional] (Server only)
-> > +
-> > +                       True, if authorization is required for attribut=
-e
-> > +                       operations.
-
-> We should probably mention the default is false if the property is not
-> available.
-Ok.
-
-> >   Characteristic Descriptors hierarchy
-> >   =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-> > @@ -284,6 +291,8 @@ Methods             array{byte} ReadValue(dict
-flags)
-> >                          Possible options: "offset": Start offset
-> >                                            "device": Device path (Serve=
-r
-> only)
-> >                                            "link": Link type (Server
-only)
-> > +                                         "prep-authz-req": boolean Is
-> prepare write
-> > +
-authorization
-> request
-
-> Do we need and authorize flag for read? I thought this was only for
-prepare
-> write.
-I guess this is a confusing patch presentatnion formating :) this option is
-for WriteValue not for ReadValue in real, but somehow git format patch
-treat "ReadValue" as Method... or something in this way.
-
-> >                          Possible Errors: org.bluez.Error.Failed
-> >                                           org.bluez.Error.InProgress
-> > --
-> > 2.13.6
-
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+> diff --git a/src/profile.c b/src/profile.c
+> index 7c5318c..1e9c585 100644
+> --- a/src/profile.c
+> +++ b/src/profile.c
+> @@ -1971,7 +1971,7 @@ static struct default_settings {
+>                  .authorize      = true,
+>                  .auto_connect   = true,
+>                  .get_record     = get_hfp_hf_record,
+> -               .version        = 0x0105,
+> +               .version        = 0x0107,
+>          }, {
+>                  .uuid           = HFP_AG_UUID,
+>                  .name           = "Hands-Free Voice gateway",
+> @@ -1981,7 +1981,7 @@ static struct default_settings {
+>                  .authorize      = true,
+>                  .auto_connect   = true,
+>                  .get_record     = get_hfp_ag_record,
+> -               .version        = 0x0105,
+> +               .version        = 0x0107,
+>          }, {
+>                  .uuid           = HSP_AG_UUID,
+>                  .name           = "Headset Voice gateway",
 > --
-> Luiz Augusto von Dentz
+> 2.7.4
 
-Regards,
-Grzegorz
+Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
