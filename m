@@ -1,231 +1,202 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <20180514235614.25231-1-inga.stotland@intel.com>
-In-Reply-To: <20180514235614.25231-1-inga.stotland@intel.com>
+References: <1521550393-20026-1-git-send-email-avichal.a@samsung.com>
+ <CGME20180320125349epcas1p1998e73353a1929039aecbfb98dfa4b51@epcms5p4>
+ <003f01d3ec57$711cd060$53567120$@samsung.com> <20180515142137epcms5p432d1c81075573ba0800494390288c56d@epcms5p4>
+In-Reply-To: <20180515142137epcms5p432d1c81075573ba0800494390288c56d@epcms5p4>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 16 May 2018 15:47:49 +0300
-Message-ID: <CABBYNZ+7cngMm0UAZa4diu8TSkK0C6UOxi+MD7gDxM=yvU+enQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/io-ell: Add support for ELL based IO handling
-To: "Stotland, Inga" <inga.stotland@intel.com>
+Date: Wed, 16 May 2018 15:46:57 +0300
+Message-ID: <CABBYNZKuraxFS2KshELueNmCUXzGQuzticpYhxD3AUtqY1av=w@mail.gmail.com>
+Subject: Re: [PATCH v2 BlueZ] tools/gatt-service: Add reference implementation
+ for Included Service
+To: avichal <avichal.a@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
-
-On Tue, May 15, 2018 at 2:59 AM Inga Stotland <inga.stotland@intel.com>
+Hi,
+On Tue, May 15, 2018 at 8:39 PM Avichal Agarwal <avichal.a@samsung.com>
 wrote:
 
+
+
+
+> ping
+> -----Original Message-----
+> From: linux-bluetooth-owner@vger.kernel.org [mailto:
+linux-bluetooth-owner@vger.kernel.org] On Behalf Of Avichal Agarwal
+> Sent: Tuesday, March 20, 2018 6:23 PM
+> To: linux-bluetooth@vger.kernel.org
+> Cc: sachin.dev@samsung.com; anupam.r@samsung.com; Avichal Agarwal
+> Subject: [PATCH v2 BlueZ] tools/gatt-service: Add reference
+implementation for Included Service
+
+> Created two new primary services which will act as includes services for
+first  primary service
 > ---
->   Makefile.am         |   6 +-
->   src/shared/io-ell.c | 155
-++++++++++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 160 insertions(+), 1 deletion(-)
->   create mode 100644 src/shared/io-ell.c
+>   tools/gatt-service.c | 94
+++++++++++++++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 92 insertions(+), 2 deletions(-)
 
-> diff --git a/Makefile.am b/Makefile.am
-> index 9c3c17139..322706fad 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -95,7 +95,8 @@ gdbus_libgdbus_internal_la_SOURCES = gdbus/gdbus.h \
->                                  gdbus/mainloop.c gdbus/watch.c \
->                                  gdbus/object.c gdbus/client.c
-gdbus/polkit.c
+> diff --git a/tools/gatt-service.c b/tools/gatt-service.c index
+6bd5576..2ce8a1f 100644
+> --- a/tools/gatt-service.c
+> +++ b/tools/gatt-service.c
+> @@ -47,9 +47,17 @@
+>   /* Immediate Alert Service UUID */
+>   #define IAS_UUID
+  "00001802-0000-1000-8000-00805f9b34fb"
+>   #define ALERT_LEVEL_CHR_UUID
+  "00002a06-0000-1000-8000-00805f9b34fb"
+> +#define IAS_UUID1   "A00B"
+> +#define IAS_UUID2   "A00C"
+> +#define IAS_UUID3   "A00D"
+> +#define ALERT_LEVEL_CHR_UUID1
+  "00002b06-0000-1000-8000-00805f9b34fb"
+> +#define ALERT_LEVEL_CHR_UUID2
+  "00002c07-0000-1000-8000-00805f9b34fb"
+> +/* Random UUID for testing purpose */
 
-> -noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la
-> +noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la \
-> +                               src/libshared-ell.la
+>   /* Random UUID for testing purpose */
+>   #define READ_WRITE_DESCRIPTOR_UUID
+  "8260c653-1a54-426b-9e36-e84c238bc669"
+> +#define READ_WRITE_DESCRIPTOR_UUID1
+"0260c653-1a54-426b-9e36-e84c238bc669"
+> +#define READ_WRITE_DESCRIPTOR_UUID2 "FFFF"
 
->   shared_sources = src/shared/io.h src/shared/timeout.h \
->                          src/shared/queue.h src/shared/queue.c \
-> @@ -135,6 +136,9 @@ src_libshared_mainloop_la_SOURCES = $(shared_sources)
-\
->                                  src/shared/timeout-mainloop.c \
->                                  src/shared/mainloop.h
-src/shared/mainloop.c
+>   static GMainLoop *main_loop;
+>   static GSList *services;
+> @@ -335,18 +343,45 @@ static gboolean service_get_includes(const
+GDBusPropertyTable *property,
+>                                           DBusMessageIter *iter, void
+*user_data)  {
+>           const char *uuid = user_data;
+> +        char service_path[100] = {0,};
+> +        DBusMessageIter array;
+> +        char *p = NULL;
 
-> +src_libshared_ell_la_SOURCES = $(shared_sources) \
-> +                               src/shared/io-ell.c
+> +        snprintf(service_path, 100, "/service3");
+>           printf("Get Includes: %s\n", uuid);
+
+> +        p = service_path;
 > +
->   attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
->                  attrib/gatt.h attrib/gatt.c \
->                  attrib/gattrib.h attrib/gattrib.c \
-> diff --git a/src/shared/io-ell.c b/src/shared/io-ell.c
-> new file mode 100644
-> index 000000000..a885b935a
-> --- /dev/null
-> +++ b/src/shared/io-ell.c
-> @@ -0,0 +1,155 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
-  02110-1301  USA
-> + *
-> + */
+> +        printf("Includes path: %s\n", p);
 > +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
+> +        dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> +                        DBUS_TYPE_OBJECT_PATH_AS_STRING, &array);
 > +
-> +#include <unistd.h>
-> +#include <errno.h>
-> +#include <sys/socket.h>
+> +        dbus_message_iter_append_basic(&array, DBUS_TYPE_OBJECT_PATH,
+> +                                                        &p);
 > +
-> +#include <ell/ell.h>
+> +        snprintf(service_path, 100, "/service2");
+> +        p = service_path;
+> +        printf("Get Includes: %s\n", p);
 > +
-> +#include "src/shared/io.h"
+> +        dbus_message_iter_append_basic(&array, DBUS_TYPE_OBJECT_PATH,
+> +                                                        &p);
+> +        dbus_message_iter_close_container(iter, &array);
 > +
-> +struct io {
-> +       struct l_io *l_io;
-> +};
 > +
-> +struct io *io_new(int fd)
+>           return TRUE;
+> +
+>   }
+
+> +
+>   static gboolean service_exist_includes(const GDBusPropertyTable
+*property,
+>                                                           void *user_data)
+>   {
+>           const char *uuid = user_data;
+
+>           printf("Exist Includes: %s\n", uuid);
+> +        if (strncmp(uuid, "00001802", 8) == 0)
+> +                return TRUE;
+
+>           return FALSE;
+>   }
+> @@ -624,7 +659,7 @@ static char *register_service(const char *uuid)
+>           return path;
+>   }
+
+> -static void create_services()
+> +static void create_services_one(void)
+>   {
+>           char *service_path;
+>           uint8_t level = 0;
+> @@ -651,6 +686,59 @@ static void create_services()
+>           printf("Registered service: %s\n", service_path);  }
+
+> +
+> +static void create_services_two(void)
 > +{
-> +       struct io *io;
-> +       struct l_io *l_io;
+> +        char *service_path;
+> +        uint8_t level = 0;
 > +
-> +       if (fd < 0)
-> +               return NULL;
+> +        service_path = register_service(IAS_UUID2);
+> +        if (!service_path)
+> +                return;
 > +
-> +       io = l_new(struct io, 1);
-> +       if (!io)
-> +               return NULL;
+> +        if (!register_characteristic(ALERT_LEVEL_CHR_UUID2,
+> +                                                &level, sizeof(level),
+> +                                                ias_alert_level_props,
 > +
-> +       l_io = l_io_new(fd);
-> +       if (!io) {
-> +               l_free(io);
-> +               return NULL;
-> +       }
+  READ_WRITE_DESCRIPTOR_UUID2,
+> +                                                desc_props,
+> +                                                service_path)) {
+> +                printf("Couldn't register Alert Level characteristic
+(IAS)\n");
+> +                g_dbus_unregister_interface(connection, service_path,
 > +
-> +       io->l_io = l_io;
+  GATT_SERVICE_IFACE);
+> +                g_free(service_path);
+> +                return;
+> +        }
+> +        services = g_slist_prepend(services, service_path);
+> +        printf("Registered service: %s\n", service_path); }
 > +
-> +       return io;
-> +}
+> +static void create_services_three(void) {
+> +        char *service_path;
+> +        uint8_t level = 0;
 > +
-> +void io_destroy(struct io *io)
-> +{
-> +       if (!io)
-> +               return;
+> +        service_path = register_service(IAS_UUID3);
+> +        if (!service_path)
+> +                return;
 > +
-> +       if (io->l_io)
-> +               l_io_destroy(io->l_io);
+> +        if (!register_characteristic(ALERT_LEVEL_CHR_UUID1,
+> +                                                &level, sizeof(level),
+> +                                                ias_alert_level_props,
 > +
-> +       l_free(io);
-> +}
+  READ_WRITE_DESCRIPTOR_UUID1,
+> +                                                desc_props,
+> +                                                service_path)) {
+> +                printf("Couldn't register Alert Level characteristic
+(IAS)\n");
+> +                g_dbus_unregister_interface(connection, service_path,
 > +
-> +int io_get_fd(struct io *io)
-> +{
-> +       if (!io || !io->l_io)
-> +               return -ENOTCONN;
+  GATT_SERVICE_IFACE);
+> +                g_free(service_path);
+> +                return;
+> +        }
 > +
-> +       return l_io_get_fd(io->l_io);
-> +}
 > +
-> +bool io_set_close_on_destroy(struct io *io, bool do_close)
-> +{
-> +       if (!io || !io->l_io)
-> +               return false;
+> +        services = g_slist_prepend(services, service_path);
+> +        printf("Registered service: %s\n", service_path); }
 > +
-> +       return l_io_set_close_on_destroy(io->l_io, do_close);
-> +}
-> +
-> +bool io_set_read_handler(struct io *io, io_callback_func_t callback,
-> +                               void *user_data, io_destroy_func_t
-destroy)
-> +{
-> +       if (!io || !io->l_io)
-> +               return false;
-> +
-> +       return l_io_set_read_handler(io->l_io, (l_io_read_cb_t) callback,
-> +                                                       user_data,
-destroy);
-> +}
-> +
-> +bool io_set_write_handler(struct io *io, io_callback_func_t callback,
-> +                               void *user_data, io_destroy_func_t
-destroy)
-> +{
-> +       if (!io || !io->l_io)
-> +               return false;
-> +
-> +       return l_io_set_write_handler(io->l_io, (l_io_write_cb_t)
-callback,
-> +                                                       user_data,
-destroy);
-> +}
-> +
-> +bool io_set_disconnect_handler(struct io *io, io_callback_func_t
-callback,
-> +                               void *user_data, io_destroy_func_t
-destroy)
-> +{
-> +       if (!io || !io->l_io)
-> +               return false;
-> +
-> +       return l_io_set_disconnect_handler(io->l_io,
-> +                                               (l_io_disconnect_cb_t)
-callback,
-> +                                                       user_data,
-destroy);
-> +}
-> +
-> +ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt)
-> +{
-> +       ssize_t ret;
-> +       int fd;
-> +
-> +       if (!io || !io->l_io)
-> +               return -ENOTCONN;
-> +
-> +       fd = l_io_get_fd(io->l_io);
-> +       if (fd < 0)
-> +               return -ENOTCONN;
-> +
-> +       do {
-> +               ret = writev(fd, iov, iovcnt);
-> +       } while (ret < 0 && errno == EINTR);
-> +
-> +       if (ret < 0)
-> +               return -errno;
-> +
-> +       return ret;
-> +}
-> +
-> +bool io_shutdown(struct io *io)
-> +{
-> +       int fd;
-> +
-> +       if (!io || !io->l_io)
-> +               return false;
-> +
-> +       fd = l_io_get_fd(io->l_io);
-> +       if (fd < 0)
-> +               return false;
-> +
-> +       return shutdown(fd, SHUT_RDWR) == 0;
-> +}
+>   static void register_app_reply(DBusMessage *reply, void *user_data)  {
+>           DBusError derr;
+> @@ -789,7 +877,9 @@ int main(int argc, char *argv[])
+>           printf("gatt-service unique name: %s\n",
+>                                   dbus_bus_get_unique_name(connection));
+
+> -        create_services();
+> +        create_services_one();
+> +        create_services_two();
+> +        create_services_three();
+
+>           client = g_dbus_client_new(connection, "org.bluez", "/");
+
 > --
-> 2.14.3
+> 2.7.4
 
 Applied, thanks.
-
--- 
-Luiz Augusto von Dentz
