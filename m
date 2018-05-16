@@ -1,55 +1,229 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <1525944723-2238-1-git-send-email-ankit.p.navik@intel.com>
-In-Reply-To: <1525944723-2238-1-git-send-email-ankit.p.navik@intel.com>
+References: <20180514235614.25231-1-inga.stotland@intel.com>
+In-Reply-To: <20180514235614.25231-1-inga.stotland@intel.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 16 May 2018 15:48:27 +0300
-Message-ID: <CABBYNZL_p=59CUAnR+n9Ef3w9MOX5ApNFf149LeC-MQNsKtjig@mail.gmail.com>
-Subject: Re: [PATCH] src/profile: Updates HFP version to 1.7
-To: ankit.p.navik@intel.com
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        bharat panda <bharat22bhusan@gmail.com>,
-        ankit.p.navik.intel.com@vger.kernel.org
+Date: Wed, 16 May 2018 15:47:49 +0300
+Message-ID: <CABBYNZ+7cngMm0UAZa4diu8TSkK0C6UOxi+MD7gDxM=yvU+enQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/io-ell: Add support for ELL based IO handling
+To: "Stotland, Inga" <inga.stotland@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ankit,
+Hi Inga,
 
-On Thu, May 10, 2018 at 12:33 PM Ankit Navik <ankit.p.navik@intel.com>
+On Tue, May 15, 2018 at 2:59 AM Inga Stotland <inga.stotland@intel.com>
 wrote:
 
-> Add changes to update HFP version to 0x0107 for HFP_HS_UUID and
-> HFP_AG_UUID. Ofono get this version from bluez and enable HFP 1.7
-> specific commands.
 > ---
->   src/profile.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   Makefile.am         |   6 +-
+>   src/shared/io-ell.c | 155
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   2 files changed, 160 insertions(+), 1 deletion(-)
+>   create mode 100644 src/shared/io-ell.c
 
-> diff --git a/src/profile.c b/src/profile.c
-> index 7c5318c..1e9c585 100644
-> --- a/src/profile.c
-> +++ b/src/profile.c
-> @@ -1971,7 +1971,7 @@ static struct default_settings {
->                  .authorize      = true,
->                  .auto_connect   = true,
->                  .get_record     = get_hfp_hf_record,
-> -               .version        = 0x0105,
-> +               .version        = 0x0107,
->          }, {
->                  .uuid           = HFP_AG_UUID,
->                  .name           = "Hands-Free Voice gateway",
-> @@ -1981,7 +1981,7 @@ static struct default_settings {
->                  .authorize      = true,
->                  .auto_connect   = true,
->                  .get_record     = get_hfp_ag_record,
-> -               .version        = 0x0105,
-> +               .version        = 0x0107,
->          }, {
->                  .uuid           = HSP_AG_UUID,
->                  .name           = "Headset Voice gateway",
+> diff --git a/Makefile.am b/Makefile.am
+> index 9c3c17139..322706fad 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -95,7 +95,8 @@ gdbus_libgdbus_internal_la_SOURCES = gdbus/gdbus.h \
+>                                  gdbus/mainloop.c gdbus/watch.c \
+>                                  gdbus/object.c gdbus/client.c
+gdbus/polkit.c
+
+> -noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la
+> +noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la \
+> +                               src/libshared-ell.la
+
+>   shared_sources = src/shared/io.h src/shared/timeout.h \
+>                          src/shared/queue.h src/shared/queue.c \
+> @@ -135,6 +136,9 @@ src_libshared_mainloop_la_SOURCES = $(shared_sources)
+\
+>                                  src/shared/timeout-mainloop.c \
+>                                  src/shared/mainloop.h
+src/shared/mainloop.c
+
+> +src_libshared_ell_la_SOURCES = $(shared_sources) \
+> +                               src/shared/io-ell.c
+> +
+>   attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
+>                  attrib/gatt.h attrib/gatt.c \
+>                  attrib/gattrib.h attrib/gattrib.c \
+> diff --git a/src/shared/io-ell.c b/src/shared/io-ell.c
+> new file mode 100644
+> index 000000000..a885b935a
+> --- /dev/null
+> +++ b/src/shared/io-ell.c
+> @@ -0,0 +1,155 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2018  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <unistd.h>
+> +#include <errno.h>
+> +#include <sys/socket.h>
+> +
+> +#include <ell/ell.h>
+> +
+> +#include "src/shared/io.h"
+> +
+> +struct io {
+> +       struct l_io *l_io;
+> +};
+> +
+> +struct io *io_new(int fd)
+> +{
+> +       struct io *io;
+> +       struct l_io *l_io;
+> +
+> +       if (fd < 0)
+> +               return NULL;
+> +
+> +       io = l_new(struct io, 1);
+> +       if (!io)
+> +               return NULL;
+> +
+> +       l_io = l_io_new(fd);
+> +       if (!io) {
+> +               l_free(io);
+> +               return NULL;
+> +       }
+> +
+> +       io->l_io = l_io;
+> +
+> +       return io;
+> +}
+> +
+> +void io_destroy(struct io *io)
+> +{
+> +       if (!io)
+> +               return;
+> +
+> +       if (io->l_io)
+> +               l_io_destroy(io->l_io);
+> +
+> +       l_free(io);
+> +}
+> +
+> +int io_get_fd(struct io *io)
+> +{
+> +       if (!io || !io->l_io)
+> +               return -ENOTCONN;
+> +
+> +       return l_io_get_fd(io->l_io);
+> +}
+> +
+> +bool io_set_close_on_destroy(struct io *io, bool do_close)
+> +{
+> +       if (!io || !io->l_io)
+> +               return false;
+> +
+> +       return l_io_set_close_on_destroy(io->l_io, do_close);
+> +}
+> +
+> +bool io_set_read_handler(struct io *io, io_callback_func_t callback,
+> +                               void *user_data, io_destroy_func_t
+destroy)
+> +{
+> +       if (!io || !io->l_io)
+> +               return false;
+> +
+> +       return l_io_set_read_handler(io->l_io, (l_io_read_cb_t) callback,
+> +                                                       user_data,
+destroy);
+> +}
+> +
+> +bool io_set_write_handler(struct io *io, io_callback_func_t callback,
+> +                               void *user_data, io_destroy_func_t
+destroy)
+> +{
+> +       if (!io || !io->l_io)
+> +               return false;
+> +
+> +       return l_io_set_write_handler(io->l_io, (l_io_write_cb_t)
+callback,
+> +                                                       user_data,
+destroy);
+> +}
+> +
+> +bool io_set_disconnect_handler(struct io *io, io_callback_func_t
+callback,
+> +                               void *user_data, io_destroy_func_t
+destroy)
+> +{
+> +       if (!io || !io->l_io)
+> +               return false;
+> +
+> +       return l_io_set_disconnect_handler(io->l_io,
+> +                                               (l_io_disconnect_cb_t)
+callback,
+> +                                                       user_data,
+destroy);
+> +}
+> +
+> +ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt)
+> +{
+> +       ssize_t ret;
+> +       int fd;
+> +
+> +       if (!io || !io->l_io)
+> +               return -ENOTCONN;
+> +
+> +       fd = l_io_get_fd(io->l_io);
+> +       if (fd < 0)
+> +               return -ENOTCONN;
+> +
+> +       do {
+> +               ret = writev(fd, iov, iovcnt);
+> +       } while (ret < 0 && errno == EINTR);
+> +
+> +       if (ret < 0)
+> +               return -errno;
+> +
+> +       return ret;
+> +}
+> +
+> +bool io_shutdown(struct io *io)
+> +{
+> +       int fd;
+> +
+> +       if (!io || !io->l_io)
+> +               return false;
+> +
+> +       fd = l_io_get_fd(io->l_io);
+> +       if (fd < 0)
+> +               return false;
+> +
+> +       return shutdown(fd, SHUT_RDWR) == 0;
+> +}
 > --
-> 2.7.4
+> 2.14.3
 
 Applied, thanks.
 
