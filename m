@@ -1,64 +1,31 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] build: Fix requiring ell
-Date: Wed, 16 May 2018 21:39:11 +0300
-Message-Id: <20180516183911.30428-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <denkenz@gmail.com>
+Subject: Re: [PATCH BlueZ] shared/io-ell: Add support for ELL based IO
+ handling
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Inga Stotland <inga.stotland@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+References: <20180514235614.25231-1-inga.stotland@intel.com>
+ <C65C87C6-375D-46B1-8CB1-3C96EF9939E4@holtmann.org>
+From: Denis Kenzior <denkenz@gmail.com>
+Message-ID: <5b6349ba-e0dd-8b56-5654-c1e0e20be4a8@gmail.com>
+Date: Wed, 16 May 2018 09:39:29 -0500
+MIME-Version: 1.0
+In-Reply-To: <C65C87C6-375D-46B1-8CB1-3C96EF9939E4@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-Make sure libshared-ell is only build if ell is available.
----
- Makefile.am  | 6 ++++--
- configure.ac | 3 ++-
- 2 files changed, 6 insertions(+), 3 deletions(-)
+>> +
+>> +	do {
+>> +		ret = writev(fd, iov, iovcnt);
+>> +	} while (ret < 0 && errno == EINTR);
+> 
+> explain this one to me. Or maybe Luiz should explain it since he introduced this.
+> 
 
-diff --git a/Makefile.am b/Makefile.am
-index 322706fad..27b6027d5 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -95,8 +95,7 @@ gdbus_libgdbus_internal_la_SOURCES = gdbus/gdbus.h \
- 				gdbus/mainloop.c gdbus/watch.c \
- 				gdbus/object.c gdbus/client.c gdbus/polkit.c
- 
--noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la \
--				src/libshared-ell.la
-+noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la
- 
- shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/queue.h src/shared/queue.c \
-@@ -136,8 +135,11 @@ src_libshared_mainloop_la_SOURCES = $(shared_sources) \
- 				src/shared/timeout-mainloop.c \
- 				src/shared/mainloop.h src/shared/mainloop.c
- 
-+if ELL
- src_libshared_ell_la_SOURCES = $(shared_sources) \
- 				src/shared/io-ell.c
-+noinst_LTLIBRARIES += src/libshared-ell.la
-+endif
- 
- attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
- 		attrib/gatt.h attrib/gatt.c \
-diff --git a/configure.ac b/configure.ac
-index 5132131f2..a5c102df9 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -249,11 +249,12 @@ AC_ARG_ENABLE(btpclient, AC_HELP_STRING([--enable-btpclient],
- AM_CONDITIONAL(BTPCLIENT, test "${enable_btpclient}" = "yes")
- 
- if (test "${enable_btpclient}" = "yes"); then
--	PKG_CHECK_MODULES(ELL, ell >= 0.3, dummy=yes,
-+	PKG_CHECK_MODULES(ELL, ell >= 0.3, enable_ell=yes,
- 			  AC_MSG_ERROR(ell library >= 0.3 is required))
- 	AC_SUBST(ELL_CFLAGS)
- 	AC_SUBST(ELL_LIBS)
- fi
-+AM_CONDITIONAL(ELL, test "${enable_ell}" != "no")
- 
- AC_ARG_ENABLE(client, AC_HELP_STRING([--disable-client],
- 		[disable command line client]), [enable_client=${enableval}])
--- 
-2.14.3
+I'm curious why not use TEMP_FAILURE_RETRY macro?  ell already uses that 
+for clarity.
 
+Regards,
+-Denis
