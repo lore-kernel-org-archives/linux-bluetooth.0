@@ -1,39 +1,68 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <20180514235614.25231-1-inga.stotland@intel.com>
- <C65C87C6-375D-46B1-8CB1-3C96EF9939E4@holtmann.org> <5b6349ba-e0dd-8b56-5654-c1e0e20be4a8@gmail.com>
-In-Reply-To: <5b6349ba-e0dd-8b56-5654-c1e0e20be4a8@gmail.com>
+References: <AM3PR06MB083875B8578B90DE59B104F69A920@AM3PR06MB0838.eurprd06.prod.outlook.com>
+In-Reply-To: <AM3PR06MB083875B8578B90DE59B104F69A920@AM3PR06MB0838.eurprd06.prod.outlook.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 17 May 2018 11:01:58 +0300
-Message-ID: <CABBYNZ+dmaLOTOJgYMoLS2jzWNZCqHYjVvcJsKYiFTgv1en-wg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] shared/io-ell: Add support for ELL based IO handling
-To: Denis Kenzior <denkenz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "Stotland, Inga" <inga.stotland@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 17 May 2018 10:55:05 +0300
+Message-ID: <CABBYNZLeRu5pe+4gYvbv=aGO6x+4H3Ki5xoazKJWyawYnkozig@mail.gmail.com>
+Subject: Re: question: auto-trust after pairing
+To: lpeltan@insys-tec.de
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-On Wed, May 16, 2018 at 5:42 PM Denis Kenzior <denkenz@gmail.com> wrote:
+Hi Libor,
+On Wed, May 16, 2018 at 2:01 PM Libor Peltan <lpeltan@insys-tec.de> wrote:
 
-> Hi,
+> Hello everyone,
 
-> >> +
-> >> +    do {
-> >> +            ret = writev(fd, iov, iovcnt);
-> >> +    } while (ret < 0 && errno == EINTR);
-> >
-> > explain this one to me. Or maybe Luiz should explain it since he
-introduced this.
-> >
+> I'd like to ask about specific configuration of bluetooth daemon.
 
-> I'm curious why not use TEMP_FAILURE_RETRY macro?  ell already uses that
-> for clarity.
+> 1. How it works for me:
+> I'm running BlueZ 5.47 on an ARMv7-powered board with a Qualcomm chip.
+> When a device (mostly a phone) connects via bluetooth, it is paired
+automatically without any PIN exchange.
+> In order to use PAN protocol over bluetooth, the connected device needs
+to be trusted.
+> To achieve this, I created an external program, that communicates with
+bluetoothd via DBus. When a DBus message arrives informing about new paired
+device, the program responds (if some policy conditions are fulfilled) with
+DBus message requesting trusting this device. Overall, this makes an approx
+0.5 secs delay between pairing and trusting of the device.
 
-Szymon was actually suggesting that we should have something similar in
-ell, e.g. l_io_send, it would be nice if that would handle iovec similarly
-to how is done here but perhaps using the TEMP_FAILURE_RETRY as suggested
-by Denis.
+> 2. My problem
+> When testing an iPhone in the role of the connecting device, after the
+pairing I can see an error message on the iPhone. After trying to connect
+again, it already works. It's not nice, for the future users, to always
+receive an error message on first attempt - I need to avoid this.
+> I observed that after pairing, the iPhone immediately (in 10 millis)
+tries to connect to PAN. This is not yet possible, since it's not yet
+trusted. This causes the error message.
+
+> 3. My question
+> Is there a way to change bluetoothd, so that he automatically trusts a
+device when it pairs?
+> Is it possible to turn this "auto-trust" mode on and off without
+restarting bluetoothd?
+
+Even in case of just works pairing there should be a request to the agent
+to accept it, trust affects connection authorization perhaps we are not
+doing it properly for PAN since there should delay a little bit the
+accepting of the L2CAP connection but that is done for all profiles so Id
+be surprised that is what is causing the problem.
+
+> Thanks much for the answers or any other usefult tips!
+
+> Libor Peltan
+
+> --
+> To unsubscribe from this list: send the line "unsubscribe
+linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
 
 -- 
 Luiz Augusto von Dentz
