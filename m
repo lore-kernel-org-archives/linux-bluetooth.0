@@ -1,68 +1,80 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] build: Fix requiring ell
+Date: Thu, 17 May 2018 09:19:54 +0200
+Message-ID: <1687283.vk6G9qqcK3@ix>
+In-Reply-To: <20180516183911.30428-1-luiz.dentz@gmail.com>
+References: <20180516183911.30428-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-References: <AM3PR06MB083875B8578B90DE59B104F69A920@AM3PR06MB0838.eurprd06.prod.outlook.com>
-In-Reply-To: <AM3PR06MB083875B8578B90DE59B104F69A920@AM3PR06MB0838.eurprd06.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 17 May 2018 10:55:05 +0300
-Message-ID: <CABBYNZLeRu5pe+4gYvbv=aGO6x+4H3Ki5xoazKJWyawYnkozig@mail.gmail.com>
-Subject: Re: question: auto-trust after pairing
-To: lpeltan@insys-tec.de
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Libor,
-On Wed, May 16, 2018 at 2:01 PM Libor Peltan <lpeltan@insys-tec.de> wrote:
+Hi Luiz,
 
-> Hello everyone,
+On Wednesday, 16 May 2018 20:39:11 CEST Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Make sure libshared-ell is only build if ell is available.
+> ---
+>  Makefile.am  | 6 ++++--
+>  configure.ac | 3 ++-
+>  2 files changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index 322706fad..27b6027d5 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -95,8 +95,7 @@ gdbus_libgdbus_internal_la_SOURCES = gdbus/gdbus.h \
+>  				gdbus/mainloop.c gdbus/watch.c \
+>  				gdbus/object.c gdbus/client.c gdbus/polkit.c
+> 
+> -noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la \
+> -				src/libshared-ell.la
+> +noinst_LTLIBRARIES += src/libshared-glib.la src/libshared-mainloop.la
+> 
+>  shared_sources = src/shared/io.h src/shared/timeout.h \
+>  			src/shared/queue.h src/shared/queue.c \
+> @@ -136,8 +135,11 @@ src_libshared_mainloop_la_SOURCES = $(shared_sources) \
+> src/shared/timeout-mainloop.c \
+>  				src/shared/mainloop.h src/shared/mainloop.c
+> 
+> +if ELL
+>  src_libshared_ell_la_SOURCES = $(shared_sources) \
+>  				src/shared/io-ell.c
+> +noinst_LTLIBRARIES += src/libshared-ell.la
+> +endif
+> 
+>  attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
+>  		attrib/gatt.h attrib/gatt.c \
+> diff --git a/configure.ac b/configure.ac
+> index 5132131f2..a5c102df9 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -249,11 +249,12 @@ AC_ARG_ENABLE(btpclient,
+> AC_HELP_STRING([--enable-btpclient], AM_CONDITIONAL(BTPCLIENT, test
+> "${enable_btpclient}" = "yes")
+> 
+>  if (test "${enable_btpclient}" = "yes"); then
+> -	PKG_CHECK_MODULES(ELL, ell >= 0.3, dummy=yes,
+> +	PKG_CHECK_MODULES(ELL, ell >= 0.3, enable_ell=yes,
+>  			  AC_MSG_ERROR(ell library >= 0.3 is required))
+>  	AC_SUBST(ELL_CFLAGS)
+>  	AC_SUBST(ELL_LIBS)
+>  fi
+> +AM_CONDITIONAL(ELL, test "${enable_ell}" != "no")
+> 
+>  AC_ARG_ENABLE(client, AC_HELP_STRING([--disable-client],
+>  		[disable command line client]), [enable_client=${enableval}])
 
-> I'd like to ask about specific configuration of bluetooth daemon.
-
-> 1. How it works for me:
-> I'm running BlueZ 5.47 on an ARMv7-powered board with a Qualcomm chip.
-> When a device (mostly a phone) connects via bluetooth, it is paired
-automatically without any PIN exchange.
-> In order to use PAN protocol over bluetooth, the connected device needs
-to be trusted.
-> To achieve this, I created an external program, that communicates with
-bluetoothd via DBus. When a DBus message arrives informing about new paired
-device, the program responds (if some policy conditions are fulfilled) with
-DBus message requesting trusting this device. Overall, this makes an approx
-0.5 secs delay between pairing and trusting of the device.
-
-> 2. My problem
-> When testing an iPhone in the role of the connecting device, after the
-pairing I can see an error message on the iPhone. After trying to connect
-again, it already works. It's not nice, for the future users, to always
-receive an error message on first attempt - I need to avoid this.
-> I observed that after pairing, the iPhone immediately (in 10 millis)
-tries to connect to PAN. This is not yet possible, since it's not yet
-trusted. This causes the error message.
-
-> 3. My question
-> Is there a way to change bluetoothd, so that he automatically trusts a
-device when it pairs?
-> Is it possible to turn this "auto-trust" mode on and off without
-restarting bluetoothd?
-
-Even in case of just works pairing there should be a request to the agent
-to accept it, trust affects connection authorization perhaps we are not
-doing it properly for PAN since there should delay a little bit the
-accepting of the L2CAP connection but that is done for all profiles so Id
-be surprised that is what is causing the problem.
-
-> Thanks much for the answers or any other usefult tips!
-
-> Libor Peltan
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe
-linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+I think this is not correct as this will make libshared-ell build dependent on 
+btpclient. And btpclient doesn't use libshared.
 
 
 -- 
-Luiz Augusto von Dentz
+pozdrawiam
+Szymon Janc
+
+
