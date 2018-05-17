@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH v3] build: Fix requiring ell
-Date: Thu, 17 May 2018 13:05:12 +0300
-Message-Id: <20180517100512.7210-1-luiz.dentz@gmail.com>
+Date: Thu, 17 May 2018 13:04:26 +0300
+Message-Id: <20180517100426.6817-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -42,7 +42,7 @@ index 322706fad..27b6027d5 100644
  attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
  		attrib/gatt.h attrib/gatt.c \
 diff --git a/configure.ac b/configure.ac
-index 5132131f2..2daf1aaa4 100644
+index 5132131f2..1599b72c4 100644
 --- a/configure.ac
 +++ b/configure.ac
 @@ -248,12 +248,13 @@ AC_ARG_ENABLE(btpclient, AC_HELP_STRING([--enable-btpclient],
@@ -51,13 +51,13 @@ index 5132131f2..2daf1aaa4 100644
  
 -if (test "${enable_btpclient}" = "yes"); then
 -	PKG_CHECK_MODULES(ELL, ell >= 0.3, dummy=yes,
-+if (test "${enable_btpclient}" = "yes" || test "${enable_mesh}" = "yes"); then
++if (test "${enable_btpclient}" = "yes" || test "${enable_mesh}"); then
 +	PKG_CHECK_MODULES(ELL, ell >= 0.3, enable_ell=yes,
  			  AC_MSG_ERROR(ell library >= 0.3 is required))
  	AC_SUBST(ELL_CFLAGS)
  	AC_SUBST(ELL_LIBS)
  fi
-+AM_CONDITIONAL(ELL, test "${enable_ell}" = "yes")
++AM_CONDITIONAL(ELL, test "${enable_ell}" != "no")
  
  AC_ARG_ENABLE(client, AC_HELP_STRING([--disable-client],
  		[disable command line client]), [enable_client=${enableval}])
