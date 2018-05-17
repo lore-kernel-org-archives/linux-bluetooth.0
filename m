@@ -1,172 +1,281 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org,
-        Arend van Spriel <arend.vanspriel@broadcom.com>
-Subject: [PATCH] btmrvl: support sysfs initiated firmware coredump
-Date: Fri, 18 May 2018 00:15:12 +0200
-Message-Id: <1526595312-1371-1-git-send-email-arend.vanspriel@broadcom.com>
+From: Avichal Agarwal <avichal.a@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: sachin.dev@samsung.com, anupam.r@samsung.com,
+        Avichal Agarwal <avichal.a@samsung.com>
+Subject: [PATCH v3 Bluez] client/gatt : Add support for Included Service
+Date: Thu, 17 May 2018 22:31:16 +0530
+Message-id: <1526576476-5447-1-git-send-email-avichal.a@samsung.com>
+References: <CGME20180517170131epcas2p334febcfc1f04116a06bf4d0fdc1bc5ce@epcas2p3.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
-it is possible to initiate a device coredump from user-space. This
-patch adds support for it in btmrvl_sdio adding the .coredump()
-driver callback. This makes dump through debugfs obsolete so removing
-it.
-
-Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+included service support implemented at service registration
 ---
-This patch depends upon a patch that is in Linus' tree since 4.17-rc3:
+ client/gatt.c | 153 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ client/gatt.h |   5 ++
+ client/main.c |  21 ++++++++
+ 3 files changed, 177 insertions(+), 2 deletions(-)
 
-
-  commit ed4564babeeee4fb19fe4ec0beabe29754e380f9
-  Author: Arend van Spriel <aspriel@gmail.com>
-  Date:   Sun Apr 8 23:57:07 2018 +0200
-
-     drivers: change struct device_driver::coredump() return type to void
-
-However, bt-next is still at 4.17-rc1.
-
-Regards,
-Arend
----
- drivers/bluetooth/btmrvl_debugfs.c | 31 -------------------------------
- drivers/bluetooth/btmrvl_drv.h     |  2 --
- drivers/bluetooth/btmrvl_main.c    |  6 ------
- drivers/bluetooth/btmrvl_sdio.c    | 11 ++++++++---
- 4 files changed, 8 insertions(+), 42 deletions(-)
-
-diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
-index 1828ed8..023d35e 100644
---- a/drivers/bluetooth/btmrvl_debugfs.c
-+++ b/drivers/bluetooth/btmrvl_debugfs.c
-@@ -167,35 +167,6 @@ static ssize_t btmrvl_hscmd_read(struct file *file, char __user *userbuf,
- 	.llseek = default_llseek,
+diff --git a/client/gatt.c b/client/gatt.c
+index d59d1ba..16781a3 100644
+--- a/client/gatt.c
++++ b/client/gatt.c
+@@ -85,6 +85,7 @@ struct service {
+ 	char *uuid;
+ 	bool primary;
+ 	GList *chrcs;
++	GList *inc;
  };
  
--static ssize_t btmrvl_fwdump_write(struct file *file, const char __user *ubuf,
--				   size_t count, loff_t *ppos)
--{
--	struct btmrvl_private *priv = file->private_data;
--	char buf[16];
--	bool result;
--
--	memset(buf, 0, sizeof(buf));
--
--	if (copy_from_user(&buf, ubuf, min_t(size_t, sizeof(buf) - 1, count)))
--		return -EFAULT;
--
--	if (strtobool(buf, &result))
--		return -EINVAL;
--
--	if (!result)
--		return -EINVAL;
--
--	btmrvl_firmware_dump(priv);
--
--	return count;
--}
--
--static const struct file_operations btmrvl_fwdump_fops = {
--	.write	= btmrvl_fwdump_write,
--	.open	= simple_open,
--	.llseek = default_llseek,
--};
--
- void btmrvl_debugfs_init(struct hci_dev *hdev)
- {
- 	struct btmrvl_private *priv = hci_get_drvdata(hdev);
-@@ -226,8 +197,6 @@ void btmrvl_debugfs_init(struct hci_dev *hdev)
- 			    priv, &btmrvl_hscmd_fops);
- 	debugfs_create_file("hscfgcmd", 0644, dbg->config_dir,
- 			    priv, &btmrvl_hscfgcmd_fops);
--	debugfs_create_file("fw_dump", 0200, dbg->config_dir,
--			    priv, &btmrvl_fwdump_fops);
- 
- 	dbg->status_dir = debugfs_create_dir("status", hdev->debugfs);
- 	debugfs_create_u8("curpsmode", 0444, dbg->status_dir,
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index fc3caf4..f045454 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -110,7 +110,6 @@ struct btmrvl_private {
- 				u8 *payload, u16 nb);
- 	int (*hw_wakeup_firmware)(struct btmrvl_private *priv);
- 	int (*hw_process_int_status)(struct btmrvl_private *priv);
--	void (*firmware_dump)(struct btmrvl_private *priv);
- 	spinlock_t driver_lock;		/* spinlock used by driver */
- #ifdef CONFIG_DEBUG_FS
- 	void *debugfs_data;
-@@ -183,7 +182,6 @@ struct btmrvl_event {
- int btmrvl_enable_ps(struct btmrvl_private *priv);
- int btmrvl_prepare_command(struct btmrvl_private *priv);
- int btmrvl_enable_hs(struct btmrvl_private *priv);
--void btmrvl_firmware_dump(struct btmrvl_private *priv);
- 
- #ifdef CONFIG_DEBUG_FS
- void btmrvl_debugfs_init(struct hci_dev *hdev);
-diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
-index f6c694a..708ad216 100644
---- a/drivers/bluetooth/btmrvl_main.c
-+++ b/drivers/bluetooth/btmrvl_main.c
-@@ -358,12 +358,6 @@ int btmrvl_prepare_command(struct btmrvl_private *priv)
- 	return ret;
+ static GList *local_services;
+@@ -127,6 +128,29 @@ static void print_service(struct service *service, const char *description)
+ 					service->path, service->uuid, text);
  }
  
--void btmrvl_firmware_dump(struct btmrvl_private *priv)
--{
--	if (priv->firmware_dump)
--		priv->firmware_dump(priv);
--}
--
- static int btmrvl_tx_pkt(struct btmrvl_private *priv, struct sk_buff *skb)
- {
- 	int ret = 0;
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 6f99b9f..888bac4 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1311,9 +1311,11 @@ rdwr_status btmrvl_sdio_rdwr_firmware(struct btmrvl_private *priv,
- }
- 
- /* This function dump sdio register and memory data */
--static void btmrvl_sdio_dump_firmware(struct btmrvl_private *priv)
-+static void btmrvl_sdio_coredump(struct device *dev)
- {
--	struct btmrvl_sdio_card *card = priv->btmrvl_dev.card;
-+	struct sdio_func *func = dev_to_sdio_func(dev);
-+	struct btmrvl_sdio_card *card;
-+	struct btmrvl_private *priv;
- 	int ret = 0;
- 	unsigned int reg, reg_start, reg_end;
- 	enum rdwr_status stat;
-@@ -1321,6 +1323,9 @@ static void btmrvl_sdio_dump_firmware(struct btmrvl_private *priv)
- 	u8 dump_num = 0, idx, i, read_reg, doneflag = 0;
- 	u32 memory_size, fw_dump_len = 0;
- 
-+	card = sdio_get_drvdata(func);
-+	priv = card->priv;
++static void print_inc_service(struct service *service, const char *description)
++{
++	const char *text;
 +
- 	/* dump sdio register first */
- 	btmrvl_sdio_dump_regs(priv);
++	text = bt_uuidstr_to_str(service->uuid);
++	if (!text)
++		bt_shell_printf("%s%s%s%s Included Service\n\t%s\n\t%s\n",
++					description ? "[" : "",
++					description ? : "",
++					description ? "] " : "",
++					service->primary ? "Primary" :
++					"Secondary",
++					service->path, service->uuid);
++	else
++		bt_shell_printf("%s%s%s%s Included Service\n\t%s\n\t%s\n\t%s\n",
++					description ? "[" : "",
++					description ? : "",
++					description ? "] " : "",
++					service->primary ? "Primary" :
++					"Secondary",
++					service->path, service->uuid, text);
++}
++
+ static void print_service_proxy(GDBusProxy *proxy, const char *description)
+ {
+ 	struct service service;
+@@ -1179,11 +1203,19 @@ static void chrc_unregister(void *data)
+ 						CHRC_INTERFACE);
+ }
  
-@@ -1547,7 +1552,6 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
- 	priv->hw_host_to_card = btmrvl_sdio_host_to_card;
- 	priv->hw_wakeup_firmware = btmrvl_sdio_wakeup_fw;
- 	priv->hw_process_int_status = btmrvl_sdio_process_int_status;
--	priv->firmware_dump = btmrvl_sdio_dump_firmware;
++static void inc_unregister(void *data)
++{
++	char *path = data;
++
++	g_free(path);
++}
++
+ static void service_free(void *data)
+ {
+ 	struct service *service = data;
  
- 	if (btmrvl_register_hdev(priv)) {
- 		BT_ERR("Register hdev failed!");
-@@ -1717,6 +1721,7 @@ static int btmrvl_sdio_resume(struct device *dev)
- 	.remove		= btmrvl_sdio_remove,
- 	.drv = {
- 		.owner = THIS_MODULE,
-+		.coredump = btmrvl_sdio_coredump,
- 		.pm = &btmrvl_sdio_pm_ops,
- 	}
+ 	g_list_free_full(service->chrcs, chrc_unregister);
++	g_list_free_full(service->inc, inc_unregister);
+ 	g_free(service->path);
+ 	g_free(service->uuid);
+ 	g_free(service);
+@@ -1212,9 +1244,54 @@ static gboolean service_get_primary(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++
++static gboolean service_get_includes(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	DBusMessageIter array;
++	struct service *service = data;
++	char *inc  = NULL;
++	GList *l;
++
++	if (service->inc) {
++		for (l =  service->inc ; l; l = g_list_next(l)) {
++
++			inc = l->data;
++			dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++				DBUS_TYPE_OBJECT_PATH_AS_STRING, &array);
++
++			dbus_message_iter_append_basic(&array,
++				DBUS_TYPE_OBJECT_PATH, &inc);
++
++		}
++
++		dbus_message_iter_close_container(iter, &array);
++
++		return TRUE;
++	}
++
++	return FALSE;
++
++}
++
++static gboolean service_exist_includes(const GDBusPropertyTable *property,
++							void *data)
++{
++	struct service *service = data;
++
++	if (service->inc)
++		return TRUE;
++	else
++		return FALSE;
++
++}
++
++
+ static const GDBusPropertyTable service_properties[] = {
+ 	{ "UUID", "s", service_get_uuid },
+ 	{ "Primary", "b", service_get_primary },
++	{ "Includes", "ao", service_get_includes,
++		NULL,	service_exist_includes },
+ 	{ }
  };
+ 
+@@ -1260,8 +1337,8 @@ void gatt_register_service(DBusConnection *conn, GDBusProxy *proxy,
+ 
+ 	local_services = g_list_append(local_services, service);
+ 
+-	bt_shell_prompt_input(service->path, "Primary (yes/no):", service_set_primary,
+-			service);
++	bt_shell_prompt_input(service->path, "Primary (yes/no):",
++		 service_set_primary, service);
+ 
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+@@ -1306,6 +1383,78 @@ void gatt_unregister_service(DBusConnection *conn, GDBusProxy *proxy,
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
++static char *inc_find(struct service  *serv, char *path)
++{
++	GList *lc;
++
++	for (lc = serv->inc; lc; lc =  g_list_next(lc)) {
++		char *incp = lc->data;
++		/* match object path */
++		if (!strcmp(incp, path))
++			return incp;
++	}
++
++	return NULL;
++}
++
++void gatt_register_include(DBusConnection *conn, GDBusProxy *proxy,
++					int argc, char *argv[])
++{
++	struct service *service, *inc_service;
++	char *inc_path;
++
++	if (!local_services) {
++		bt_shell_printf("No service registered\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	service = g_list_last(local_services)->data;
++
++
++	inc_service = service_find(argv[1]);
++	if (!inc_service) {
++		bt_shell_printf("Failed to find  service object\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	inc_path = g_strdup(service->path);
++
++	inc_service->inc = g_list_append(inc_service->inc, inc_path);
++
++	print_service(inc_service, COLORED_NEW);
++	print_inc_service(service, COLORED_NEW);
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++void gatt_unregister_include(DBusConnection *conn, GDBusProxy *proxy,
++						int argc, char *argv[])
++{
++	struct service *ser_inc, *service;
++	char *path = NULL;
++
++	service = service_find(argv[1]);
++	if (!service) {
++		bt_shell_printf
++			("Failed to unregister include 	service object\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	ser_inc = service_find(argv[2]);
++	if (!ser_inc) {
++		bt_shell_printf("Failed to find  include service object\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	path = inc_find(service, ser_inc->path);
++	if (path) {
++		service->inc = g_list_remove(service->inc, path);
++		inc_unregister(path);
++	}
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
+ static gboolean chrc_get_uuid(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+diff --git a/client/gatt.h b/client/gatt.h
+index 957ae80..d4d7bed 100644
+--- a/client/gatt.h
++++ b/client/gatt.h
+@@ -65,3 +65,8 @@ void gatt_register_desc(DBusConnection *conn, GDBusProxy *proxy,
+ 						int argc, char *argv[]);
+ void gatt_unregister_desc(DBusConnection *conn, GDBusProxy *proxy,
+ 						int argc, char *argv[]);
++
++void gatt_register_include(DBusConnection *conn, GDBusProxy *proxy,
++					int argc, char *argv[]);
++void gatt_unregister_include(DBusConnection *conn, GDBusProxy *proxy,
++						int argc, char *argv[]);
+diff --git a/client/main.c b/client/main.c
+index 54bd537..a962b4e 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2002,6 +2002,22 @@ static void cmd_register_service(int argc, char *argv[])
+ 	gatt_register_service(dbus_conn, default_ctrl->proxy, argc, argv);
+ }
+ 
++static void cmd_register_includes(int argc, char *argv[])
++{
++	if (check_default_ctrl() == FALSE)
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	gatt_register_include(dbus_conn, default_ctrl->proxy, argc, argv);
++}
++
++static void cmd_unregister_includes(int argc, char *argv[])
++{
++	if (check_default_ctrl() == FALSE)
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++
++	gatt_unregister_include(dbus_conn, default_ctrl->proxy, argc, argv);
++}
++
+ static void cmd_unregister_service(int argc, char *argv[])
+ {
+ 	if (check_default_ctrl() == FALSE)
+@@ -2451,6 +2467,11 @@ static const struct bt_shell_menu gatt_menu = {
+ 					"Register application service."  },
+ 	{ "unregister-service", "<UUID/object>", cmd_unregister_service,
+ 					"Unregister application service" },
++	{ "register-includes", "<UUID>", cmd_register_includes,
++					"Register as Included service in." },
++	{ "unregister-includes", "<Service-UUID><Inc-UUID>",
++			cmd_unregister_includes,
++				 "Unregister Included service." },
+ 	{ "register-characteristic", "<UUID> <Flags=read,write,notify...> "
+ 				"[authorize]", cmd_register_characteristic,
+ 				"Register application characteristic" },
 -- 
-1.9.1
+2.7.4
 
