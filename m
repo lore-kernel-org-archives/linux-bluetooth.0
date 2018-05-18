@@ -3,39 +3,31 @@ From: Nagaraj D R <nagaraj.dr@samsung.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Syam Sidhardhan <s.syam@samsung.com>,
         Nagaraj D R <nagaraj.dr@samsung.com>
-Subject: [PATCH] Fix possible invalid memory access
-Date: Fri, 18 May 2018 09:28:16 +0530
-Message-id: <1526615896-23631-1-git-send-email-nagaraj.dr@samsung.com>
-References: <CGME20180518035824epcas2p356c2382c482a8fcdd0598816d4dee070@epcas2p3.samsung.com>
+Subject: [PATCH] Fix Memory leak
+Date: Fri, 18 May 2018 09:27:44 +0530
+Message-id: <1526615864-23577-1-git-send-email-nagaraj.dr@samsung.com>
+References: <CGME20180518035758epcas1p180d3cc8c19a1fbdf2819a35d7062804d@epcas1p1.samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Uninitialized data is read from local variable 'addr'
+Memory associated with 'adv_data' will be leaked in case of
+'generate_scan_rsp' failure
 ---
- client/main.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ src/advertising.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/client/main.c b/client/main.c
-index 54bd537..73e77c4 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1774,12 +1774,12 @@ static void cmd_disconn(int argc, char *argv[])
+diff --git a/src/advertising.c b/src/advertising.c
+index 441d0a2..b087b48 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -752,6 +752,7 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
+ 	scan_rsp = generate_scan_rsp(client, &flags, &scan_rsp_len);
+ 	if (!scan_rsp && scan_rsp_len) {
+ 		error("Scan data couldn't be generated.");
++		free(adv_data);
+ 		return -EINVAL;
+ 	}
  
- 	if (argc < 2 || strlen(argv[1]) == 0) {
- 		DBusMessageIter iter;
--		const char *addr;
- 
--		if (g_dbus_proxy_get_property(proxy, "Address", &iter) == TRUE)
-+		if (g_dbus_proxy_get_property(proxy, "Address", &iter) == TRUE) {
-+			const char *addr;
- 			dbus_message_iter_get_basic(&iter, &addr);
--
--		bt_shell_printf("Attempting to disconnect from %s\n", addr);
-+			bt_shell_printf("Attempting to disconnect from %s\n", addr);
-+		}
- 	} else
- 		bt_shell_printf("Attempting to disconnect from %s\n", argv[1]);
- }
 -- 
 1.9.1
 
