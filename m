@@ -1,120 +1,139 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: Robert Schneider <Robert.Schneider@aramar.de>
-Subject: KORG nanoKONTROL Studio ... again
-Message-ID: <4f787a1b-848b-be07-bdd0-198892c56120@aramar.de>
-Date: Sat, 19 May 2018 15:41:16 +0200
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Fri, 18 May 2018 22:51:05 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: davem@davemloft.net
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2018-05-18
+Message-ID: <20180518195105.GA15231@x1c.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="Qxx1br4bt0+wmkIi"
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After pausing for some time and waiting for Ubuntu 18.04, I thought I give MIDI 
-over Bluetooth to my KORG nanoKONTROL Studio another try. However, to no avail.
 
-Still I cannot make the device show up in the MIDI device list.
+--Qxx1br4bt0+wmkIi
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Here are some outputs from bluetoothctl. If anyone can help, I'd appreciate that.
+Hi Dave,
 
-Regards, Robert
+Here's the first bluetooth-next pull request for the 4.18 kernel:
 
-The devices shows up:
+ - Refactoring of the btbcm driver
+ - New USB IDs for QCA_ROME and LiteOn controllers
+ - Buffer overflow fix if the controller sends invalid advertising data len=
+gth
+ - Various cleanups & fixes for Qualcomm controllers
 
-[bluetooth]# devices
-Device 60:F1:89:28:DA:1F nanoKONTROL Studio
+Please let me know if there are any issues pulling. Thanks.
 
-The info says:
+Johan
 
-[bluetooth]# info 60:F1:89:28:DA:1F
-Device 60:F1:89:28:DA:1F (public)
-     Name: nanoKONTROL Studio
-     Alias: nanoKONTROL Studio
-     Appearance: 0x0080
-     Icon: computer
-     Paired: no
-     Trusted: yes
-     Blocked: no
-     Connected: no
-     LegacyPairing: no
-     UUID: Generic Access Profile (00001800-0000-1000-8000-00805f9b34fb)
-     UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-     UUID: Device Information (0000180a-0000-1000-8000-00805f9b34fb)
-     UUID: Vendor specific (03b80e5a-ede8-4b33-a751-6ce34ec4c700)
-     UUID: Vendor specific (d0611e78-bbb4-4591-a5f8-487910ae4366)
+---
+The following changes since commit 538e2de104cfb4ef1acb35af42427bff42adbe4d:
 
-connect says:
+  Merge branch 'net-Allow-more-drivers-with-COMPILE_TEST' (2018-05-17 17:11=
+:07 -0400)
 
-[bluetooth]# connect 60:F1:89:28:DA:1F
-Attempting to connect to 60:F1:89:28:DA:1F
-[CHG] Device 60:F1:89:28:DA:1F Connected: yes
-Connection successful
-[NEW] Primary Service
-     /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service000c
-     00001801-0000-1000-8000-00805f9b34fb
-     Generic Attribute Profile
-[NEW] Characteristic
-     /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service000c/char000d
-     00002a05-0000-1000-8000-00805f9b34fb
-     Service Changed
-[NEW] Descriptor
-/org/bluez/hci0/dev_60_F1_89_28_DA_1F/service000c/char000d/desc000f
-     00002902-0000-1000-8000-00805f9b34fb
-     Client Characteristic Configuration
-[NEW] Primary Service
-     /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0010
-     0000180a-0000-1000-8000-00805f9b34fb
-     Device Information
-[NEW] Characteristic
-     /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0010/char0011
-     00002a29-0000-1000-8000-00805f9b34fb
-     Manufacturer Name String
-[NEW] Characteristic
-     /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0010/char0013
-     00002a24-0000-1000-8000-00805f9b34fb
-     Model Number String
-[NEW] Primary Service
-     /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0015
-     d0611e78-bbb4-4591-a5f8-487910ae4366
-     Vendor specific
-[NEW] Characteristic
-     /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0015/char0016
-     8667556c-9a37-4c91-84ed-54ee27d90049
-     Vendor specific
-[NEW] Descriptor
-/org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0015/char0016/desc0018
-     00002902-0000-1000-8000-00805f9b34fb
-     Client Characteristic Configuration
-[NEW] Primary Service
-     /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0019
-     03b80e5a-ede8-4b33-a751-6ce34ec4c700
-     Vendor specific
-[NEW] Characteristic
-     /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0019/char001a
-     7772e5db-3868-4112-a1a9-f2669d106bf3
-     Vendor specific
-[NEW] Descriptor
-/org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0019/char001a/desc001c
-     00002902-0000-1000-8000-00805f9b34fb
-     Client Characteristic Configuration
-[CHG] Device 60:F1:89:28:DA:1F ServicesResolved: yes
+are available in the Git repository at:
 
-Now info says:
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t for-upstream
 
-[nanoKONTROL Studio]# info 60:F1:89:28:DA:1F
-Device 60:F1:89:28:DA:1F (public)
-     Name: nanoKONTROL Studio
-     Alias: nanoKONTROL Studio
-     Appearance: 0x0080
-     Icon: computer
-     Paired: no
-     Trusted: yes
-     Blocked: no
-     Connected: yes
-     LegacyPairing: no
-     UUID: Generic Access Profile (00001800-0000-1000-8000-00805f9b34fb)
-     UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-     UUID: Device Information (0000180a-0000-1000-8000-00805f9b34fb)
-     UUID: Vendor specific (03b80e5a-ede8-4b33-a751-6ce34ec4c700)
-     UUID: Vendor specific (d0611e78-bbb4-4591-a5f8-487910ae4366)
+for you to fetch changes up to df2445bf77833674ebf790d2e6fcfd1d389b8a7b:
 
+  Bluetooth: Add a new 13d3:3496 QCA_ROME device (2018-05-18 06:37:52 +0200)
 
+----------------------------------------------------------------
+Amit Pundir (1):
+      Bluetooth: hci_qca: Avoid missing rampatch failure with userspace fw =
+loader
+
+Chriz Chow (1):
+      Bluetooth: Prevent buffer overflow for large advertisement data
+
+Fabio Estevam (1):
+      Bluetooth: hci_ldisc: Provide a 'default' switch case
+
+Hans de Goede (8):
+      Bluetooth: hci_bcm: Add broken-irq dmi blacklist and add Meegopad T08=
+ to it
+      Bluetooth: hci_bcm: Remove irq-active-low DMI quirk for the Thinkpad 8
+      Bluetooth: btbcm: Stop using upper nibble of rev to chose between uar=
+t/USB paths
+      Bluetooth: btbcm: Factor out common code to determine subversion
+      Bluetooth: btbcm: Make btbcm_initialize() also work for USB connected=
+ devices
+      Bluetooth: btbcm: Allow using btbcm_initialize() for reinit
+      Bluetooth: btbcm: Remove duplicate code from btbcm_setup_patchram()
+      Bluetooth: btbcm: btbcm_initialize(): Initialize hw_name to "BCM"
+
+John Keeping (1):
+      Bluetooth: use wait_event API instead of open-coding it
+
+Jo=E3o Paulo Rechi Vita (1):
+      Bluetooth: Add a new 13d3:3496 QCA_ROME device
+
+Loic Poulain (3):
+      Bluetooth: btqcomsmd: Fix rx/tx stats
+      Bluetooth: Add __hci_cmd_send function
+      Bluetooth: btqca: Add AR3002 rampatch support
+
+Srinivas Kandagatla (1):
+      arm64: dts: apq8096-db820c: Enable wlan and bt en pins
+
+Thierry Escande (3):
+      arm64: dts: apq8096-db820c: enable bluetooth node
+      dt-bindings: net: bluetooth: Add qualcomm-bluetooth
+      Bluetooth: hci_qca: Add serdev support
+
+Vic Wei (1):
+      Bluetooth: btusb: add ID for LiteOn 04ca:301a
+
+ .../devicetree/bindings/net/qualcomm-bluetooth.txt |  30 +++
+ arch/arm64/boot/dts/qcom/apq8096-db820c-pins.dtsi  |  26 +++
+ .../boot/dts/qcom/apq8096-db820c-pmic-pins.dtsi    |  32 ++++
+ arch/arm64/boot/dts/qcom/apq8096-db820c.dtsi       |  61 +++++++
+ arch/arm64/boot/dts/qcom/msm8996.dtsi              |  10 +
+ drivers/bluetooth/Kconfig                          |   1 +
+ drivers/bluetooth/btbcm.c                          | 201 +++++++----------=
+----
+ drivers/bluetooth/btbcm.h                          |   5 +-
+ drivers/bluetooth/btqca.c                          | 104 +++++------
+ drivers/bluetooth/btqca.h                          |  11 +-
+ drivers/bluetooth/btqcomsmd.c                      |  10 +
+ drivers/bluetooth/btusb.c                          |   2 +
+ drivers/bluetooth/hci_bcm.c                        |  35 ++--
+ drivers/bluetooth/hci_ldisc.c                      |   2 +
+ drivers/bluetooth/hci_qca.c                        | 116 +++++++++++-
+ include/net/bluetooth/hci_core.h                   |   2 +
+ net/bluetooth/hci_core.c                           |  31 ++++
+ net/bluetooth/hci_event.c                          |  12 +-
+ net/bluetooth/hci_request.c                        |  30 +--
+ 19 files changed, 480 insertions(+), 241 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetoot=
+h.txt
+
+--Qxx1br4bt0+wmkIi
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJa/y6pAAoJECQj9vv5qNQSXUkP/iPOfCq4S5/XYarK+Qquw6Ov
++K6pQq+VBcOQa2EdUBYxDr3WfNQfjldWW+N0S1OOrAYZUACHh4KOqQtXxSb+lioP
+Pqs16QIN210Qb19UQp9CUBNmDoSh02FTGDv3FDJxD3KrQTKq+1Qe4h6RcOobAms7
+ocA46tBS9bhi6a2opujMEgkZFs81L6z/wKQl+pDLh7/X4q16VPRTEEKfM+JDMgub
+y1GdDWVLW4nqv1FjMk2//TLt/csm4cAE/kjWjM13G+F137wD9K/n7CW3KTTanr2v
+rvw9+fOYj//XimIVZXOHZ/0efmxwYfX79bysA+WBhsMCXkBCSLH96ecE7MIuCng6
+BNHkqIxHmLCFhXHcay23sYt/Hc71DLTxvuhlauBE7tdLPeFJAiJ6i/jLzXzAqfp4
+38QoG0evdsjIq1DBOpn+sjhxZc/a7LHn0CJo7wVkZSbFTTWjYhtaCk9mpBtkMReN
+K+Yfko4uZbO2o+ZDgBrYOWpGgJk02nEb+BTRB7XB4VqP0CURXffHmEDTbxLcU6lp
+5+YZX+2/YcvaFd/E0DdodNpaoofX+6NQZ+aN/zuUIxFJeZkWbPAunPK7bfn5IkEN
+lVXAS+/UFVRaRBEHU+HfaOs8py76wkwAuxTiD91sF3kJskIQoNZZp6xpdD6mP+nX
+zCbf+JC4zMuZEPFUHzhe
+=O5N2
+-----END PGP SIGNATURE-----
+
+--Qxx1br4bt0+wmkIi--
