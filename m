@@ -1,811 +1,140 @@
-Return-Path: <bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: meshctl: Failed to AcquireWrite
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <adcc154e-622d-d974-87cc-23d9d0b220c3@posteo.de>
+ <CABBYNZLUKFm1u=OsSArm73Diq=dsXJTc0V2=MaYN7pt-9wjPCA@mail.gmail.com>
+From: "wenzel.reichmuth@posteo.de" <wenzel.reichmuth@posteo.de>
+Message-ID: <a0673f4c-143d-4b0b-0e2a-ba51e1ea2db9@posteo.de>
+Date: Fri, 18 May 2018 16:40:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Fri, 18 May 2018 20:12:49 +0530
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
- linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
- hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v5 3/3] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth chip wcn3990.
-In-Reply-To: <7BDBCEFB-B5D3-4832-9DF7-993D85A67C1A@holtmann.org>
-References: <1526041263-18795-1-git-send-email-bgodavar@codeaurora.org>
- <1526041263-18795-4-git-send-email-bgodavar@codeaurora.org>
- <7BDBCEFB-B5D3-4832-9DF7-993D85A67C1A@holtmann.org>
-Message-ID: <9a37b01a1adf4c95d2d2d345f90f749e@codeaurora.org>
+In-Reply-To: <CABBYNZLUKFm1u=OsSArm73Diq=dsXJTc0V2=MaYN7pt-9wjPCA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi, thanks for reply. This is my meshctl output:
 
-Find my comments in line.
+[meshctl]# discover-unprovisioned on
+SetDiscoveryFilter success
+Discovery started
+Adapter property changed
+[CHG] Controller B8:27:EB:04:E6:D4 Discovering: yes
+		Mesh Provisioning Service (00001827-0000-1000-8000-00805f9b34fb)
+			Device UUID: e534e0da9ae700000000000000000000
+			OOB: 0000
+[NEW] Device E7:9A:DA:E0:34:E5 Zephyr
+[meshctl]# security 0
+Provision Security Level set to 0 (low)
+[meshctl]# provision e534e0da9ae700000000000000000000
+Trying to connect Device E7:9A:DA:E0:34:E5 Zephyr
+Adapter property changed
+[CHG] Controller B8:27:EB:04:E6:D4 Discovering: no
+Connection successful
+Service added /org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service0006
+Service added /org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a
+Char added /org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000b:
+Char added /org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000d:
+Services resolved yes
+Found matching char: path
+/org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000b, uuid
+00002adb-0000-1000-8000-00805f9b34fb
+Found matching char: path
+/org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000d, uuid
+00002adc-0000-1000-8000-00805f9b34fb
+Start notification on
+/org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000d
+Characteristic property changed
+/org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000d
+AcquireNotify success: fd 7 MTU 69
+Notify for Mesh Provisioning Out Data started
+Open-Node: 0x17ebe50
+Open-Prov: 0x17f64d8
+Open-Prov: proxy 0x17f1e08
+Initiated provisioning
+Characteristic property changed
+/org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000b
+AcquireWrite success: fd 8 MTU 69
+GATT-TX:	 03 00 10
+GATT-RX:	 03 01 01 00 01 00 00 00 00 00 00 00 00
+Got provisioning data (12 bytes)
+	 01 01 00 01 00 00 00 00 00 00 00 00
+GATT-TX:	 03 02 00 00 00 00 00
+GATT-TX:	 03 03 67 85 01 73 01 02 ea c5 3d af 03 82 09 b7
+GATT-TX:	 e4 f8 6a c3 11 15 a2 98 cf 6a 2f 9e 4a d0 77 b3
+GATT-TX:	 94 ec 9c f8 ee e4 f7 6d 15 f5 35 6b 43 a5 fd 21
+GATT-TX:	 fc db b4 2c cd f9 61 1d 03 42 1c d1 d9 d4 8c a2
+GATT-TX:	 f8 ad
+GATT-RX:	 03 03 2d 9e 3e ea 9c cd 61 5f ac be 46 f6 43 b6
+GATT-RX:	 ee b6 2c cb de 6e c6 40 e7 9d 82 20 8e cf 76 9e
+GATT-RX:	 8a 16 4c 8e 6b aa 7c f7 af 0d 4a 48 d5 11 83 0a
+GATT-RX:	 f3 53 d4 aa bc 3f d4 26 bc 94 78 5d 67 1f f5 cd
+GATT-RX:	 c1 05
+Got provisioning data (65 bytes)
+	 03 2d 9e 3e ea 9c cd 61 5f ac be 46 f6 43 b6 ee
+	 b6 2c cb de 6e c6 40 e7 9d 82 20 8e cf 76 9e 8a
+	 16 4c 8e 6b aa 7c f7 af 0d 4a 48 d5 11 83 0a f3
+	 53 d4 aa bc 3f d4 26 bc 94 78 5d 67 1f f5 cd c1
+	 05
+GATT-TX:	 03 05 ba 40 d3 a0 fd ef c2 5a ed 0c 93 4b 80 c9
+GATT-TX:	 8b e9
+GATT-RX:	 03 05 63 09 38 59 da 51 a7 bb da b6 e6 e8 4c 36
+GATT-RX:	 4c cd
+Got provisioning data (17 bytes)
+	 05 63 09 38 59 da 51 a7 bb da b6 e6 e8 4c 36 4c
+	 cd
+GATT-TX:	 03 06 b4 7b b8 3c 4e ab 08 05 14 26 2e a6 62 83
+GATT-TX:	 fa 91
+GATT-RX:	 03 06 df b9 45 a3 3d c6 d2 cd 1d 5e 85 82 46 65
+GATT-RX:	 0f 20
+Got provisioning data (17 bytes)
+	 06 df b9 45 a3 3d c6 d2 cd 1d 5e 85 82 46 65 0f
+	 20
+Confirmation Validated
+S-Key	 f2 1d d7 c4 ea d0 b8 d5 2a 62 d7 98 44 64 41 d9
+S-Nonce	 59 57 79 52 a0 f7 6c 06 90 b0 be d4 4f
+DevKey	 41 fa 20 0e 6a 5f 4a 1f ab 9a 24 3a 87 2d 96 87
+Data	 18 ee d9 c2 a5 6a dd 85 04 9f fc 3c 59 ad 0e 12
+Data	 00 00 00 00 00 00 05 01 10
+DataEncrypted + mic	 22 8b 63 c6 46 9a 19 fc 99 4d 12 a1 38 d2 39 18
+DataEncrypted + mic	 83 78 e2 41 19 6f 40 29 24 31 85 f4 e5 f2 06 9c
+DataEncrypted + mic	 14
+GATT-TX:	 03 07 22 8b 63 c6 46 9a 19 fc 99 4d 12 a1 38 d2
+GATT-TX:	 39 18 83 78 e2 41 19 6f 40 29 24 31 85 f4 e5 f2
+GATT-TX:	 06 9c 14
+GATT-RX:	 03 08
+Got provisioning data (1 bytes)
+	 08
+Provision success. Assigned Primary Unicast 0110
+Attempting to disconnect from E7:9A:DA:E0:34:E5
+Characteristic property changed
+/org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000d
+Write closed
+Service added /org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a
+Char added /org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000b:
+Char added /org/bluez/hci0/dev_E7_9A_DA_E0_34_E5/service000a/char000d:
+Services resolved no
+SetDiscoveryFilter success
+Discovery started
+Adapter property changed
+[CHG] Controller B8:27:EB:04:E6:D4 Discovering: yes
+[meshctl]# menu config
+[meshctl]# target 0110
+Configuring node 0110
+[config: Target = 0110]# appkey-add 1
+Failed to AcquireWrite
 
-On 2018-05-12 01:40, Marcel Holtmann wrote:
-> Hi Balakrishna,
+Am 17.05.18 um 10:19 schrieb Luiz Augusto von Dentz:
+> Hi,
+> On Wed, May 16, 2018 at 2:15 PM wenzel.reichmuth@posteo.de <
+> wenzel.reichmuth@posteo.de> wrote:
 > 
->> Add support to set voltage/current of various regulators
->> to power up/down Bluetooth chip wcn3990.
->> Add support to read baudrate from dts.
->> 
->> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> ---
->> drivers/bluetooth/btqca.h   |   6 +
->> drivers/bluetooth/hci_qca.c | 547 
->> ++++++++++++++++++++++++++++++++++++++------
->> 2 files changed, 480 insertions(+), 73 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
->> index 2a7366b..8e2142a 100644
->> --- a/drivers/bluetooth/btqca.h
->> +++ b/drivers/bluetooth/btqca.h
->> @@ -37,6 +37,9 @@
->> #define EDL_TAG_ID_HCI			(17)
->> #define EDL_TAG_ID_DEEP_SLEEP		(27)
->> 
->> +#define CHEROKEE_POWERON_PULSE          (0xFC)
->> +#define CHEROKEE_POWEROFF_PULSE         (0xC0)
->> +
->> enum qca_bardrate {
->> 	QCA_BAUDRATE_115200 	= 0,
->> 	QCA_BAUDRATE_57600,
->> @@ -124,6 +127,9 @@ struct tlv_type_hdr {
->> 	__u8   data[0];
->> } __packed;
->> 
->> +int btqca_power_setup(bool on);
+>> Hello. I am using meshctl from bluez 5.49 and try to configure a mesh
+>> with zephyr nodes on redbear ble nano 2. I am able to discover and
+>> provision a node. but when i try to configure it e.g. appkey-add i get
+>> "Failed to AcquireWrite". Any hint, how to get this solved? there is
+>> sparse documentation for meshctl.
 > 
-> my initial comment on this has not yet been addressed. They are all
-> per hci_dev or I am not going to merge it.
+> Perhaps the problem is with fd passing being blocked by something like
+> selinux, do you have logs of the problem?
 > 
-[Bala]- might have missed. will update.
-
->> +int qca_btsoc_cleanup(struct hci_dev *hdev);
->> +
->> #if IS_ENABLED(CONFIG_BT_QCA)
->> 
->> int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index f05382b..71f9591 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -5,7 +5,7 @@
->>  *  protocol extension to H4.
->>  *
->>  *  Copyright (C) 2007 Texas Instruments, Inc.
->> - *  Copyright (c) 2010, 2012 The Linux Foundation. All rights 
->> reserved.
->> + *  Copyright (c) 2010, 2012, 2018 The Linux Foundation. All rights 
->> reserved.
->>  *
->>  *  Acknowledgements:
->>  *  This file is based on hci_ll.c, which was...
->> @@ -35,6 +35,11 @@
->> #include <linux/mod_devicetable.h>
->> #include <linux/module.h>
->> #include <linux/serdev.h>
->> +#include <linux/delay.h>
->> +#include <linux/platform_device.h>
->> +#include <linux/regulator/consumer.h>
->> +#include <linux/of_device.h>
->> +#include <linux/device.h>
->> 
->> #include <net/bluetooth/bluetooth.h>
->> #include <net/bluetooth/hci_core.h>
->> @@ -119,12 +124,51 @@ struct qca_data {
->> 	u64 votes_off;
->> };
->> 
->> +enum btqca_soc_t {
->> +	BTQCA_INVALID = -1,
->> +	BTQCA_AR3002,
->> +	BTQCA_ROME,
->> +	BTQCA_CHEROKEE
->> +};
->> +
->> struct qca_serdev {
->> 	struct hci_uart	 serdev_hu;
->> 	struct gpio_desc *bt_en;
->> 	struct clk	 *susclk;
->> +	enum btqca_soc_t btsoc_type;
->> +	u32 init_speed;
->> +	u32 oper_speed;
->> +};
->> +
->> +/*
->> + * voltage regulator information required for configuring the
->> + * QCA bluetooth chipset
->> + */
->> +struct btqca_vreg {
->> +	const char *name;
->> +	unsigned int min_v;
->> +	unsigned int max_v;
->> +	unsigned int load_ua;
->> +};
->> +
->> +struct btqca_vreg_data {
->> +	enum btqca_soc_t soc_type;
->> +	struct btqca_vreg *vregs;
->> +	size_t num_vregs;
->> +};
->> +
->> +/*
->> + * Platform data for the QCA bluetooth power driver.
->> + */
->> +struct btqca_power {
->> +	struct device *dev;
->> +	const struct btqca_vreg_data *vreg_data;
->> +	struct regulator_bulk_data *vreg_bulk;
->> +	bool vregs_on;
->> };
->> 
->> +static struct btqca_power *qca;
->> +
-> 
-> No such global variable.
-[Bala]:- will hook this variable to struct qca_uart_setup_cherokee().
-
-> 
->> static void __serial_clock_on(struct tty_struct *tty)
->> {
->> 	/* TODO: Some chipset requires to enable UART clock on client
->> @@ -402,6 +446,7 @@ static int qca_open(struct hci_uart *hu)
->> {
->> 	struct qca_serdev *qcadev;
->> 	struct qca_data *qca;
->> +	int ret = 0;
->> 
->> 	BT_DBG("hu %p qca_open", hu);
->> 
->> @@ -463,13 +508,22 @@ static int qca_open(struct hci_uart *hu)
->> 		serdev_device_open(hu->serdev);
->> 
->> 		qcadev = serdev_device_get_drvdata(hu->serdev);
->> -		gpiod_set_value_cansleep(qcadev->bt_en, 1);
->> +		if (qcadev->btsoc_type == BTQCA_CHEROKEE) {
->> +			hu->init_speed = qcadev->init_speed;
->> +			hu->oper_speed = qcadev->oper_speed;
->> +			ret = btqca_power_setup(true);
->> +			if (ret)
->> +				goto out;
-> 
-> Doing return btqca_power_setup is the same and less complicated.
-> 
-
-[Bala]: will update
-
->> +		} else {
->> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
->> +		}
->> 	}
->> 
->> 	BT_DBG("HCI_UART_QCA open, tx_idle_delay=%u, wake_retrans=%u",
->> 	       qca->tx_idle_delay, qca->wake_retrans);
->> 
->> -	return 0;
->> +out:
->> +	return ret;
->> }
->> 
->> static void qca_debugfs_init(struct hci_dev *hdev)
->> @@ -552,7 +606,10 @@ static int qca_close(struct hci_uart *hu)
->> 		serdev_device_close(hu->serdev);
->> 
->> 		qcadev = serdev_device_get_drvdata(hu->serdev);
->> -		gpiod_set_value_cansleep(qcadev->bt_en, 0);
->> +		if (qcadev->btsoc_type == BTQCA_CHEROKEE)
->> +			qca_btsoc_cleanup(hu->hdev);
->> +		else
->> +			gpiod_set_value_cansleep(qcadev->bt_en, 0);
->> 	}
->> 
->> 	kfree_skb(qca->rx_skb);
->> @@ -872,6 +929,8 @@ static uint8_t qca_get_baudrate_value(int speed)
->> 		return QCA_BAUDRATE_2000000;
->> 	case 3000000:
->> 		return QCA_BAUDRATE_3000000;
->> +	case 3200000:
->> +		return QCA_BAUDRATE_3200000;
->> 	case 3500000:
->> 		return QCA_BAUDRATE_3500000;
->> 	default:
->> @@ -886,7 +945,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
->> uint8_t baudrate)
->> 	struct sk_buff *skb;
->> 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
->> 
->> -	if (baudrate > QCA_BAUDRATE_3000000)
->> +	if (baudrate > QCA_BAUDRATE_3200000)
->> 		return -EINVAL;
-> 
-> The baud rate addition can be a separate patch.
-> 
-
-[Bala]:- will update.
-
->> 
->> 	cmd[4] = baudrate;
->> @@ -923,68 +982,260 @@ static inline void host_set_baudrate(struct 
->> hci_uart *hu, unsigned int speed)
->> 		hci_uart_set_baudrate(hu, speed);
->> }
->> 
->> +static int qca_send_vendor_cmd(struct hci_dev *hdev, u8 cmd)
->> +{
->> +	struct hci_uart *hu = hci_get_drvdata(hdev);
->> +	struct qca_data *qca = hu->priv;
->> +	struct sk_buff *skb;
->> +
->> +	BT_DBG("%s:sending command %02x to SoC", hdev->name, cmd);
->> +
->> +	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
->> +	if (!skb) {
->> +		BT_ERR("Failed to allocate memory for skb  packet");
->> +		return -ENOMEM;
->> +	}
->> +
->> +	skb_put_data(skb, &cmd, sizeof(cmd));
->> +	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
->> +
->> +	skb_queue_tail(&qca->txq, skb);
->> +	hci_uart_tx_wakeup(hu);
->> +
->> +	/* Wait for 100 us for soc to settle down */
->> +	set_current_state(TASK_UNINTERRUPTIBLE);
->> +	schedule_timeout(usecs_to_jiffies(100));
->> +	set_current_state(TASK_INTERRUPTIBLE);
-> 
-> Any reason to not use msleep.
-> 
-
-[Bala]- i can achieve the same with msleep too. will update.
-
->> +
->> +	return 0;
->> +}
->> +
->> +static int qca_serdev_open(struct hci_uart *hu)
->> +{
->> +	int ret = 0;
->> +
->> +	if (hu->serdev) {
->> +		serdev_device_open(hu->serdev);
->> +	} else {
->> +		bt_dev_err(hu->hdev, "open operation not supported");
->> +		ret = 1;
->> +	}
->> +
->> +	return ret;
->> +}
->> +
->> +int qca_btsoc_cleanup(struct hci_dev *hdev)
->> +{
->> +	struct hci_uart *hu = hci_get_drvdata(hdev);
->> +
->> +	/* change host baud rate before sending power off command */
->> +	host_set_baudrate(hu, 2400);
->> +	/* send 0xC0 command to btsoc before turning off regulators */
->> +	qca_send_vendor_cmd(hdev, CHEROKEE_POWEROFF_PULSE);
->> +	/* turn off btsoc */
->> +	return btqca_power_setup(false);
->> +}
->> +
->> +static int qca_serdev_close(struct hci_uart *hu)
->> +{
->> +	int ret = 0;
->> +
->> +	if (hu->serdev) {
->> +		serdev_device_close(hu->serdev);
->> +	} else {
->> +		bt_dev_err(hu->hdev, "close operation not supported");
->> +		ret = 1;
->> +	}
->> +
->> +	return ret;
->> +}
->> static int qca_setup(struct hci_uart *hu)
->> {
->> 	struct hci_dev *hdev = hu->hdev;
->> 	struct qca_data *qca = hu->priv;
->> +	struct qca_serdev *qcadev;
->> 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->> 	int ret;
->> +	int soc_ver;
->> +
->> +	qcadev = serdev_device_get_drvdata(hu->serdev);
->> +
->> +	switch (qcadev->btsoc_type) {
->> +	case BTQCA_CHEROKEE:
->> +		bt_dev_info(hdev, "setting up wcn3990”);
-> 
-> Nope. This is debug level stuff.
-
-[Bala]:- will update
-
-> 
->> +		/* Patch downloading has to be done without IBS mode */
->> +		clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> +		/* Setup initial baudrate */
->> +		speed = 0;
->> +		if (hu->init_speed)
->> +			speed = hu->init_speed;
->> +		else if (hu->proto->init_speed)
->> +			speed = hu->proto->init_speed;
->> +
->> +		if (speed) {
->> +			host_set_baudrate(hu, speed);
->> +		} else {
->> +			bt_dev_err(hdev, "initial speed %u", speed);
->> +			return -1;
->> +		}
->> +
->> +		/* disable flow control, as chip is still not turned on */
->> +		hci_uart_set_flow_control(hu, true);
->> +		/* send 0xFC  command to btsoc */
->> +		ret = qca_send_vendor_cmd(hdev, CHEROKEE_POWERON_PULSE);
->> +		if (ret) {
->> +			bt_dev_err(hdev, "Failed to send power on command");
->> +			return ret;
->> +		}
->> +
->> +		/* close serial port */
->> +		ret = qca_serdev_close(hu);
->> +		if (ret)
->> +			return ret;
->> +		/* open serial port */
->> +		ret = qca_serdev_open(hu);
->> +		if (ret)
->> +			return ret;
->> 
->> -	bt_dev_info(hdev, "ROME setup");
->> +		/* Setup initial baudrate */
->> +		speed = 0;
->> +		if (hu->init_speed)
->> +			speed = hu->init_speed;
->> +		else if (hu->proto->init_speed)
->> +			speed = hu->proto->init_speed;
->> +		if (speed) {
->> +			host_set_baudrate(hu, speed);
->> +		} else {
->> +			BT_ERR("%s:initial speed %u", hdev->name, speed);
->> +			return -1;
->> +		}
->> 
->> -	/* Patch downloading has to be done without IBS mode */
->> -	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> +		/* Enable flow control */
->> +		hci_uart_set_flow_control(hu, false);
->> +		/*  wait until flow control settled */
->> +		msleep(100);
->> +		bt_dev_info(hdev, "wcn3990 Patch Version Request");
->> +		ret = rome_patch_ver_req(hdev, &soc_ver);
->> +		if (ret < 0 || soc_ver == 0) {
->> +			BT_ERR("%s: Failed to get version 0x%x", hdev->name,
->> +				ret);
->> +			return ret;
->> +		}
->> 
->> -	/* Setup initial baudrate */
->> -	speed = 0;
->> -	if (hu->init_speed)
->> -		speed = hu->init_speed;
->> -	else if (hu->proto->init_speed)
->> -		speed = hu->proto->init_speed;
->> +		bt_dev_info(hdev, "wcn3990 controller version 0x%08x", soc_ver);
->> +
->> +		/* clear flow control */
->> +		hci_uart_set_flow_control(hu, true);
->> +		/* set operating speed */
->> +		speed = 0;
->> +		if (hu->oper_speed)
->> +			speed = hu->oper_speed;
->> +		else if (hu->proto->oper_speed)
->> +			speed = hu->proto->oper_speed;
->> +		if (speed) {
->> +			qca_baudrate = qca_get_baudrate_value(speed);
->> +			bt_dev_info(hdev, "Set UART speed to %d", speed);
->> +			ret = qca_set_baudrate(hdev, qca_baudrate);
->> +			if (ret) {
->> +				BT_ERR("%s:Failed to change the baud rate(%d)",
->> +					hdev->name, ret);
->> +				return ret;
->> +			}
->> +			if (speed) {
->> +				host_set_baudrate(hu, speed);
->> +			} else {
->> +				BT_ERR("%s:Error in setting operator speed:%u",
->> +					hdev->name, speed);
->> +				return -1;
->> +			}
->> +		}
->> 
->> -	if (speed)
->> -		host_set_baudrate(hu, speed);
->> +		/* Set flow control */
->> +		hci_uart_set_flow_control(hu, false);
->> +		/* Setup patch and NVM configurations */
->> +		ret = qca_uart_setup_cherokee(hdev, qca_baudrate, &soc_ver);
->> +		if (!ret) {
->> +			set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> +			qca_debugfs_init(hdev);
->> +		} else if (ret == -ENOENT) {
->> +			/* No patch/nvm-config found, run with original
->> +			 * fw/config.
->> +			 */
->> +			ret = 0;
->> +		} else if (ret == -EAGAIN) {
->> +			/*
->> +			 * Userspace firmware loader will return -EAGAIN in
->> +			 * case no patch/nvm-config is found, so run with
->> +			 * original fw/config.
->> +			 */
->> +			ret = 0;
->> +		}
->> 
->> -	/* Setup user speed if needed */
->> -	speed = 0;
->> -	if (hu->oper_speed)
->> -		speed = hu->oper_speed;
->> -	else if (hu->proto->oper_speed)
->> -		speed = hu->proto->oper_speed;
->> +		/* Setup wcn3990 bdaddr */
->> +		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
->> 
->> -	if (speed) {
->> -		qca_baudrate = qca_get_baudrate_value(speed);
->> +		return ret;
->> 
->> -		bt_dev_info(hdev, "Set UART speed to %d", speed);
->> -		ret = qca_set_baudrate(hdev, qca_baudrate);
->> -		if (ret) {
->> -			bt_dev_err(hdev, "Failed to change the baud rate (%d)",
->> -				   ret);
->> +	default:
->> +		bt_dev_info(hdev, "ROME setup");
->> +
->> +		/* Patch downloading has to be done without IBS mode */
->> +		clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> +
->> +		/* Setup initial baudrate */
->> +		speed = 0;
->> +		if (hu->init_speed)
->> +			speed = hu->init_speed;
->> +		else if (hu->proto->init_speed)
->> +			speed = hu->proto->init_speed;
->> +
->> +		if (speed)
->> +			host_set_baudrate(hu, speed);
->> +
->> +		/* Setup user speed if needed */
->> +		speed = 0;
->> +		if (hu->oper_speed)
->> +			speed = hu->oper_speed;
->> +		else if (hu->proto->oper_speed)
->> +			speed = hu->proto->oper_speed;
->> +
->> +		if (speed) {
->> +			qca_baudrate = qca_get_baudrate_value(speed);
->> +
->> +			bt_dev_info(hdev, "Set UART speed to %d", speed);
->> +			ret = qca_set_baudrate(hdev, qca_baudrate);
->> +			if (ret) {
->> +				bt_dev_err(hdev, "Failed to change the baud rate (%d)",
->> +					    ret);
->> 			return ret;
->> +			}
->> +			host_set_baudrate(hu, speed);
->> 		}
->> -		host_set_baudrate(hu, speed);
->> -	}
->> 
->> -	/* Setup patch / NVM configurations */
->> -	ret = qca_uart_setup_rome(hdev, qca_baudrate);
->> -	if (!ret) {
->> -		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> -		qca_debugfs_init(hdev);
->> -	} else if (ret == -ENOENT) {
->> -		/* No patch/nvm-config found, run with original fw/config */
->> -		ret = 0;
->> -	} else if (ret == -EAGAIN) {
->> -		/*
->> -		 * Userspace firmware loader will return -EAGAIN in case no
->> -		 * patch/nvm-config is found, so run with original fw/config.
->> -		 */
->> -		ret = 0;
->> -	}
->> +		/* Setup patch / NVM configurations */
->> +		ret = qca_uart_setup_rome(hdev, qca_baudrate);
->> +		if (!ret) {
->> +			set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> +			qca_debugfs_init(hdev);
->> +		} else if (ret == -ENOENT) {
->> +			/* No patch/nvm-config found, run with original
->> +			 * fw/config
->> +			 */
->> +			ret = 0;
->> +		} else if (ret == -EAGAIN) {
->> +			/*
->> +			 * Userspace firmware loader will return -EAGAIN in
->> +			 * case no patch/nvm-config is found, so run with
->> +			 * original fw/config.
->> +			 */
->> +			ret = 0;
->> +		}
->> 
->> -	/* Setup bdaddr */
->> -	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
->> +		/* Setup bdaddr */
->> +		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
->> 
->> -	return ret;
->> +		return ret;
->> +	}
->> }
-> 
-> This change is so complex and convoluted that I can not review it.
-> 
->> 
->> static struct hci_uart_proto qca_proto = {
->> @@ -1002,44 +1253,189 @@ static int qca_setup(struct hci_uart *hu)
->> 	.dequeue	= qca_dequeue,
->> };
->> 
->> +static const struct btqca_vreg_data cherokee_data = {
->> +	.soc_type = BTQCA_CHEROKEE,
->> +	.vregs = (struct btqca_vreg []) {
->> +		{ "vddio",   1352000, 1352000,  0 },
->> +		{ "vddxtal", 1904000, 2040000,  0 },
->> +		{ "vddcore", 1800000, 1800000,  1 },
->> +		{ "vddpa",   1304000, 1304000,  1 },
->> +		{ "vddldo",  3000000, 3312000,  1 },
->> +	},
->> +	.num_vregs = 5,
->> +};
->> +
->> +static int btqca_enable_regulators(int i, struct btqca_vreg *vregs)
->> +{
->> +	int ret = 0;
->> +
->> +	ret = regulator_set_voltage(qca->vreg_bulk[i].consumer, 
->> vregs[i].min_v,
->> +				    vregs[i].max_v);
->> +	if (ret)
->> +		goto out;
->> +
->> +	if (vregs[i].load_ua)
->> +		ret = regulator_set_load(qca->vreg_bulk[i].consumer,
->> +					 vregs[i].load_ua);
->> +
->> +	if (ret)
->> +		goto out;
->> +
->> +	ret = regulator_enable(qca->vreg_bulk[i].consumer);
->> +
->> +out:
->> +	return ret;
->> +
->> +}
->> +
->> +static void btqca_disable_regulators(int reg_nu, struct btqca_vreg 
->> *vregs)
->> +{
->> +	int i;
->> +
->> +	/* disable the regulator if requested by user
->> +	 * or when fault to enable any regulator.
->> +	 */
->> +	for (i = reg_nu - 1; i >= 0 ; i--) {
->> +		regulator_disable(qca->vreg_bulk[i].consumer);
->> +		regulator_set_voltage(qca->vreg_bulk[i].consumer, 0,
->> +				      vregs[i].max_v);
->> +		if (vregs[i].load_ua)
->> +			regulator_set_load(qca->vreg_bulk[i].consumer, 0);
->> +	}
->> +}
->> +
->> +int btqca_power_setup(bool on)
->> +{
->> +	int ret = 0;
->> +	int i;
->> +	struct btqca_vreg *vregs;
->> +
->> +	if (!qca || !qca->vreg_data || !qca->vreg_bulk)
->> +		return -EINVAL;
->> +	vregs = qca->vreg_data->vregs;
->> +
->> +	BT_DBG("on: %d", on);
->> +	/* turn on if regualtors are off */
->> +	if (on == true && qca->vregs_on == false) {
->> +		qca->vregs_on = true;
->> +		for (i = 0; i < qca->vreg_data->num_vregs; i++) {
->> +			ret = btqca_enable_regulators(i, vregs);
->> +			if (ret)
->> +				break;
->> +		}
->> +	} else if (on == false && qca->vregs_on == true) {
->> +		qca->vregs_on = false;
->> +		/* turn off regulator in reverse order */
->> +		btqca_disable_regulators(qca->vreg_data->num_vregs, vregs);
->> +	}
-> 
-> I do not get this function separation. Please clean this up. And use x
-> and !x instead of == false and == true.
-
-[Bala]:will update
-
-> 
->> +
->> +	/* regulators failed */
->> +	if (ret) {
->> +		qca->vregs_on = false;
->> +		BT_ERR("failed to enable regulator:%s", vregs[i].name);
->> +		/* turn off regulators which are enabled */
->> +		btqca_disable_regulators(i, vregs);
->> +	}
->> +
->> +	return ret;
->> +}
->> +
->> +static int init_regulators(struct btqca_power *qca,
->> +			   const struct btqca_vreg *vregs,
->> +			   size_t num_vregs)
->> +{
->> +	int i;
->> +
->> +	qca->vreg_bulk = devm_kzalloc(qca->dev, num_vregs *
->> +					sizeof(struct regulator_bulk_data),
->> +					GFP_KERNEL);
->> +	if (!qca->vreg_bulk)
->> +		return -ENOMEM;
->> +
->> +	for (i = 0; i < num_vregs; i++)
->> +		qca->vreg_bulk[i].supply = vregs[i].name;
->> +
->> +	return devm_regulator_bulk_get(qca->dev, num_vregs, qca->vreg_bulk);
->> +}
->> +
->> static int qca_serdev_probe(struct serdev_device *serdev)
->> {
->> 	struct qca_serdev *qcadev;
->> -	int err;
->> +	const struct btqca_vreg_data *data;
->> +	int err = 0;
->> 
->> 	qcadev = devm_kzalloc(&serdev->dev, sizeof(*qcadev), GFP_KERNEL);
->> 	if (!qcadev)
->> 		return -ENOMEM;
->> 
->> 	qcadev->serdev_hu.serdev = serdev;
->> +	data = of_device_get_match_data(&serdev->dev);
->> +	if (data && data->soc_type == BTQCA_CHEROKEE)
->> +		qcadev->btsoc_type = BTQCA_CHEROKEE;
->> +	else
->> +		qcadev->btsoc_type = BTQCA_ROME;
->> +
->> 	serdev_device_set_drvdata(serdev, qcadev);
->> +	if (qcadev->btsoc_type == BTQCA_CHEROKEE) {
->> +		qca = devm_kzalloc(&serdev->dev, sizeof(struct btqca_power),
->> +				   GFP_KERNEL);
->> +		if (!qca)
->> +			return -ENOMEM;
->> +
->> +		qca->dev = &serdev->dev;
->> +		qca->vreg_data = data;
->> +		err = init_regulators(qca, data->vregs, data->num_vregs);
->> +		if (err) {
->> +			BT_ERR("Failed to init regulators:%d", err);
->> +			kfree(qca);
->> +			goto out;
->> +		}
->> 
->> -	qcadev->bt_en = devm_gpiod_get(&serdev->dev, "enable",
->> -				       GPIOD_OUT_LOW);
->> -	if (IS_ERR(qcadev->bt_en)) {
->> -		dev_err(&serdev->dev, "failed to acquire enable gpio\n");
->> -		return PTR_ERR(qcadev->bt_en);
->> -	}
->> +		/* set voltage regulator status as false */
->> +		qca->vregs_on = false;
->> +		/* get operating speed */
->> +		device_property_read_u32(&serdev->dev, "oper-speed",
->> +					 &qcadev->oper_speed);
->> +		device_property_read_u32(&serdev->dev, "init-speed",
->> +					 &qcadev->init_speed);
-> 
-> Not even defined in DT.
-
-[Bala]: will update in dt,bindings .txt file.
-
-> 
->> +		if (!qcadev->oper_speed)
->> +			BT_INFO("UART will pick default proto operating speed");
->> +		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
->> +		if (err) {
->> +			BT_ERR("wcn3990 serdev registration failed");
->> +			kfree(qca);
->> +			goto out;
->> +		}
->> 
->> -	qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
->> -	if (IS_ERR(qcadev->susclk)) {
->> -		dev_err(&serdev->dev, "failed to acquire clk\n");
->> -		return PTR_ERR(qcadev->susclk);
->> -	}
->> +	} else {
->> +		qcadev->bt_en = devm_gpiod_get(&serdev->dev, "enable",
->> +					       GPIOD_OUT_LOW);
->> +		if (IS_ERR(qcadev->bt_en)) {
->> +			dev_err(&serdev->dev, "failed to acquire enable gpio\n");
->> +			return PTR_ERR(qcadev->bt_en);
->> +		}
->> 
->> -	err = clk_set_rate(qcadev->susclk, SUSCLK_RATE_32KHZ);
->> -	if (err)
->> -		return err;
->> +		qcadev->susclk = devm_clk_get(&serdev->dev, NULL);
->> +		if (IS_ERR(qcadev->susclk)) {
->> +			dev_err(&serdev->dev, "failed to acquire clk\n");
->> +			return PTR_ERR(qcadev->susclk);
->> +		}
->> 
->> -	err = clk_prepare_enable(qcadev->susclk);
->> -	if (err)
->> -		return err;
->> +		err = clk_set_rate(qcadev->susclk, SUSCLK_RATE_32KHZ);
->> +		if (err)
->> +			return err;
->> 
->> -	err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
->> -	if (err)
->> -		clk_disable_unprepare(qcadev->susclk);
->> +		err = clk_prepare_enable(qcadev->susclk);
->> +		if (err)
->> +			return err;
->> +
->> +		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
->> +		if (err)
->> +			clk_disable_unprepare(qcadev->susclk);
->> +	}
->> +
->> +out:	return err;
->> 
->> -	return err;
->> }
->> 
->> static void qca_serdev_remove(struct serdev_device *serdev)
->> @@ -1047,12 +1443,17 @@ static void qca_serdev_remove(struct 
->> serdev_device *serdev)
->> 	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
->> 
->> 	hci_uart_unregister_device(&qcadev->serdev_hu);
->> -
->> -	clk_disable_unprepare(qcadev->susclk);
->> +	if (qcadev->btsoc_type == BTQCA_CHEROKEE) {
->> +		btqca_power_setup(false);
-> 
-> I am really not merging this. A driver that supports only one instance
-> is not okay.
-
-[Bala]: will study on this.
-
-> 
->> +		kfree(qca);
->> +	} else {
->> +		clk_disable_unprepare(qcadev->susclk);
->> +	}
->> }
->> 
->> static const struct of_device_id qca_bluetooth_of_match[] = {
->> 	{ .compatible = "qcom,qca6174-bt" },
->> +	{ .compatible = "qcom,wcn3990-bt", .data = &cherokee_data},
->> 	{ /* sentinel */ }
->> };
->> MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
-> 
-> Regards
-> 
-> Marcel
-
--- 
-Regards
-Balakrishna.
