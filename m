@@ -1,65 +1,69 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: Re: [PATCH 2/2] tools/btgatt-client: print error string and code
-To: linux-bluetooth@vger.kernel.org
-Cc: Biman Paul <biman.paul@samsung.com>,
-        Syam Sidhardhan <s.syam@samsung.com>
-References: <1499438042-4741-1-git-send-email-biman.paul@samsung.com>
- <CGME20170707142625epcas5p3f3cb0fdf883a357af4bca919ff5c52fb@epcas5p3.samsung.com>
- <1499438042-4741-2-git-send-email-biman.paul@samsung.com>
-From: Biman Paul <biman.innovative@gmail.com>
-Message-ID: <8065cdde-e6d9-48a6-abb4-56f9ee8efae9@gmail.com>
-Date: Sun, 20 May 2018 19:58:29 +0530
+Subject: Re: KORG nanoKONTROL Studio ... again
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <4f787a1b-848b-be07-bdd0-198892c56120@aramar.de>
+ <CABBYNZ+HQ2CeuHLrx1w5k6BK-AV8SYbdE_-TOej522cwf-BtUg@mail.gmail.com>
+ <f557429f-e61b-1ac6-c894-bc84db45c65c@aramar.de>
+ <CABBYNZKS+xNeiW6p+_aLp=K8Fu8DoSX+7xTt5x7-SOHkhXX=fw@mail.gmail.com>
+From: Robert Schneider <Robert.Schneider@aramar.de>
+Message-ID: <9dac26c6-72ee-7368-cb2b-62747e0e9707@aramar.de>
+Date: Sun, 20 May 2018 16:35:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <1499438042-4741-2-git-send-email-biman.paul@samsung.com>
+In-Reply-To: <CABBYNZKS+xNeiW6p+_aLp=K8Fu8DoSX+7xTt5x7-SOHkhXX=fw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping
+On 20.05.2018 16:29, Luiz Augusto von Dentz wrote:
 
+I just figured, that the Ubuntu bluez seems to be build without midi support. 
+Its bluetoothd does not list libasound as a library. Isn't that an indicator 
+that midi was not compiled into it?
 
-On Friday 07 July 2017 08:04 PM, Biman Paul wrote:
-> It is difficult to remember each and every error code.
-> Printing the error string reduces some effort to refer
-> error codes and their meaning every time.
-> ---
->   tools/btgatt-client.c |   11 ++++++-----
->   1 file changed, 6 insertions(+), 5 deletions(-)
+So I guess I need to create a build env first in order to build a bluez with 
+midi support.
+
+> Hi Robert,
+> On Sun, May 20, 2018 at 4:46 PM Robert Schneider
+> <Robert.Schneider@aramar.de>
+> wrote:
 >
-> diff --git a/tools/btgatt-client.c b/tools/btgatt-client.c
-> index 51bc362..2fb1a31 100644
-> --- a/tools/btgatt-client.c
-> +++ b/tools/btgatt-client.c
-> @@ -365,8 +365,8 @@ static void ready_cb(bool success, uint8_t att_ecode, void *user_data)
->   	struct client *cli = user_data;
->   
->   	if (!success) {
-> -		PRLOG("GATT discovery procedures failed - error code: 0x%02x\n",
-> -								att_ecode);
-> +		PRLOG("GATT discovery procedures failed: %s (0x%02x)\n",
-> +				ecode_to_string(att_ecode), att_ecode);
->   		return;
->   	}
->   
-> @@ -480,7 +480,8 @@ static void read_multiple_cb(bool success, uint8_t att_ecode,
->   	int i;
->   
->   	if (!success) {
-> -		PRLOG("\nRead multiple request failed: 0x%02x\n", att_ecode);
-> +		PRLOG("\nRead multiple request failed: %s (0x%02x)\n",
-> +				ecode_to_string(att_ecode), att_ecode);
->   		return;
->   	}
->   
-> @@ -1109,8 +1110,8 @@ static void notify_cb(uint16_t value_handle, const uint8_t *value,
->   static void register_notify_cb(uint16_t att_ecode, void *user_data)
->   {
->   	if (att_ecode) {
-> -		PRLOG("Failed to register notify handler "
-> -					"- error code: 0x%02x\n", att_ecode);
-> +		PRLOG("Failed to register notify handler: %s (0x%02x)\n",
-> +				ecode_to_string(att_ecode), att_ecode);
->   		return;
->   	}
->   
+>> On 20.05.2018 14:14, Luiz Augusto von Dentz wrote:
+>> [...]
+>>> The info says:
+>>>> [bluetooth]# info 60:F1:89:28:DA:1F
+>>>> Device 60:F1:89:28:DA:1F (public)
+>>>>         Name: nanoKONTROL Studio
+>>>>         Alias: nanoKONTROL Studio
+>>>>         Appearance: 0x0080
+>>>>         Icon: computer
+>>>>         Paired: no
+>>>>         Trusted: yes
+>>>>         Blocked: no
+>>>>         Connected: no
+>>>>         LegacyPairing: no
+>>>>         UUID: Generic Access Profile
+> (00001800-0000-1000-8000-00805f9b34fb)
+>>>>         UUID: Generic Attribute Profile
+> (00001801-0000-1000-8000-00805f9b34fb)
+>>>>         UUID: Device Information (0000180a-0000-1000-8000-00805f9b34fb)
+>>>>         UUID: Vendor specific (03b80e5a-ede8-4b33-a751-6ce34ec4c700)
+>>>>         UUID: Vendor specific (d0611e78-bbb4-4591-a5f8-487910ae4366)
+>>>    From the looks of it seems the device is not using the standard MIDI
+>>> service but vendor specific ones which don't have support.
+>> Hm, 03b80e5a-ede8-4b33-a751-6ce34ec4c700 seems to be the MIDI service,
+> doesn't
+>> it? It is listed up there, as a Vendor specific code, though.
+> You are right:
+>
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/profiles/midi/libmidi.h#n32
+>
+> Perhaps it is the MIDI_IO_UUID that is missing, we should probably add
+> decoders for these so they are not shown as Vendor specific.
+>
+>
+>> [...]
+>
+>
 
