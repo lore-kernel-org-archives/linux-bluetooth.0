@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 8/8] client: Add advertise.discoverable-timeout command
-Date: Mon, 21 May 2018 17:07:34 +0300
-Message-Id: <20180521140734.10344-9-luiz.dentz@gmail.com>
+Subject: [PATCH v2 7/8] advertising: Add implementation of DiscoverableTimeout property
+Date: Mon, 21 May 2018 17:07:33 +0300
+Message-Id: <20180521140734.10344-8-luiz.dentz@gmail.com>
 In-Reply-To: <20180521140734.10344-1-luiz.dentz@gmail.com>
 References: <20180521140734.10344-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,163 +11,158 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds advertise.discoverable-timeout command which can be used to
-limit the amount of time the advertisement is discoverable:
-
-[bluetooth]# advertise.discoverable on
-[bluetooth]# advertise.discoverable-timeout 10
-[bluetooth]# advertise on
-
-@ MGMT Command: Add Advertising (0x003e) plen 14
-        Instance: 1
-        Flags: 0x00000001
-          Switch into Connectable mode
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 3
-        Flags: 0x02
-          LE General Discoverable Mode
-        Scan response length: 0
-@ MGMT Event: Advertising Added (0x0023) plen 1
-        Instance: 1
-@ MGMT Event: Command Complete (0x0001) plen 4
-      Add Advertising (0x003e) plen 1
-        Status: Success (0x00)
-        Instance: 1
-@ MGMT Command: Add Advertising (0x003e) plen 14
-        Instance: 1
-        Flags: 0x00000001
-          Switch into Connectable mode
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 3
-        Flags: 0x00
-        Scan response length: 0
+This parses the contents of DiscoverableTimeout property and add
+a timeout handler which clears the discoverable when it expires.
 ---
- client/advertising.c | 38 ++++++++++++++++++++++++++++++++++++++
- client/advertising.h |  1 +
- client/main.c        | 22 ++++++++++++++++++++++
- 3 files changed, 61 insertions(+)
+ src/advertising.c | 106 ++++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 87 insertions(+), 19 deletions(-)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 8abf4785b..73f2f3df8 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -66,6 +66,7 @@ static struct ad {
- 	uint16_t local_appearance;
+diff --git a/src/advertising.c b/src/advertising.c
+index 1fd114490..2ec9468c4 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -65,7 +65,9 @@ struct btd_adv_client {
+ 	uint16_t appearance;
  	uint16_t duration;
  	uint16_t timeout;
 +	uint16_t discoverable_to;
- 	char **uuids;
- 	size_t uuids_len;
- 	struct service_data service;
-@@ -424,6 +425,21 @@ static gboolean get_discoverable(const GDBusPropertyTable *property,
- 	return TRUE;
+ 	unsigned int to_id;
++	unsigned int disc_to_id;
+ 	GDBusClient *client;
+ 	GDBusProxy *proxy;
+ 	DBusMessage *reg;
+@@ -102,6 +104,9 @@ static void client_free(void *data)
+ 	if (client->to_id > 0)
+ 		g_source_remove(client->to_id);
+ 
++	if (client->disc_to_id > 0)
++		g_source_remove(client->disc_to_id);
++
+ 	if (client->client) {
+ 		g_dbus_client_set_disconnect_watch(client->client, NULL, NULL);
+ 		g_dbus_client_unref(client->client);
+@@ -682,25 +687,6 @@ fail:
+ 	return false;
  }
  
-+static gboolean discoverable_timeout_exits(const GDBusPropertyTable *property,
-+							void *data)
-+{
-+	return ad.discoverable_to;
-+}
-+
-+static gboolean get_discoverable_timeout(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
-+							&ad.discoverable_to);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable ad_props[] = {
- 	{ "Type", "s", get_type },
- 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
-@@ -432,6 +448,8 @@ static const GDBusPropertyTable ad_props[] = {
- 						manufacturer_data_exists },
- 	{ "Data", "a{yv}", get_data, NULL, data_exists },
- 	{ "Discoverable", "b", get_discoverable, NULL, discoverable_exists },
-+	{ "DiscoverableTimeout", "q", get_discoverable_timeout, NULL,
-+						discoverable_timeout_exits },
- 	{ "Includes", "as", get_includes, NULL, includes_exists },
- 	{ "LocalName", "s", get_local_name, NULL, local_name_exits },
- 	{ "Appearance", "q", get_appearance, NULL, appearance_exits },
-@@ -750,6 +768,26 @@ void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value)
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
- 
-+void ad_advertise_discoverable_timeout(DBusConnection *conn, long int *value)
-+{
-+	if (!value) {
-+		if (ad.discoverable_to)
-+			bt_shell_printf("Timeout: %u sec\n",
-+					ad.discoverable_to);
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+	}
-+
-+	if (ad.discoverable_to == *value)
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+
-+	ad.discoverable_to = *value;
-+
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
-+					"DiscoverableTimeout");
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
- void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value)
+-static struct adv_parser {
+-	const char *name;
+-	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
+-} parsers[] = {
+-	{ "Type", parse_type },
+-	{ "ServiceUUIDs", parse_service_uuids },
+-	{ "SolicitUUIDs", parse_solicit_uuids },
+-	{ "ManufacturerData", parse_manufacturer_data },
+-	{ "ServiceData", parse_service_data },
+-	{ "Includes", parse_includes },
+-	{ "LocalName", parse_local_name },
+-	{ "Appearance", parse_appearance },
+-	{ "Duration", parse_duration },
+-	{ "Timeout", parse_timeout },
+-	{ "Data", parse_data },
+-	{ "Discoverable", parse_discoverable },
+-	{ },
+-};
+-
+ static size_t calc_max_adv_len(struct btd_adv_client *client, uint32_t flags)
  {
- 	if (!value) {
-diff --git a/client/advertising.h b/client/advertising.h
-index 599190866..fe3a7c8c6 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -40,3 +40,4 @@ void ad_advertise_timeout(DBusConnection *conn, long int *value);
- void ad_advertise_data(DBusConnection *conn, int argc, char *argv[]);
- void ad_disable_data(DBusConnection *conn);
- void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value);
-+void ad_advertise_discoverable_timeout(DBusConnection *conn, long int *value);
-diff --git a/client/main.c b/client/main.c
-index 26ce94947..180f841ae 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2228,6 +2228,25 @@ static void cmd_advertise_discoverable(int argc, char *argv[])
- 	ad_advertise_discoverable(dbus_conn, &discoverable);
+ 	size_t max = client->manager->max_adv_len;
+@@ -834,6 +820,68 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
+ 	return 0;
  }
  
-+static void cmd_advertise_discoverable_timeout(int argc, char *argv[])
++static gboolean client_discoverable_timeout(void *user_data)
 +{
-+	long int value;
-+	char *endptr = NULL;
++	struct btd_adv_client *client = user_data;
++	uint8_t flags = 0x00;
 +
-+	if (argc < 2) {
-+		ad_advertise_discoverable_timeout(dbus_conn, NULL);
-+		return;
-+	}
++	DBG("");
 +
-+	value = strtol(argv[1], &endptr, 0);
-+	if (!endptr || *endptr != '\0' || value > UINT16_MAX) {
-+		bt_shell_printf("Invalid argument\n");
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+	}
++	client->disc_to_id = 0;
 +
-+	ad_advertise_discoverable_timeout(dbus_conn, &value);
++	if (!bt_ad_add_flags(client->data, &flags, 1))
++		return false;
++
++	refresh_adv(client, NULL);
++
++	return FALSE;
 +}
 +
- static void cmd_advertise_tx_power(int argc, char *argv[])
++static bool parse_discoverable_timeout(DBusMessageIter *iter,
++					struct btd_adv_client *client)
++{
++	if (!iter) {
++		client->discoverable_to = 0;
++		g_source_remove(client->disc_to_id);
++		client->disc_to_id = 0;
++		return true;
++	}
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
++		return false;
++
++	dbus_message_iter_get_basic(iter, &client->discoverable_to);
++
++	if (client->disc_to_id)
++		g_source_remove(client->disc_to_id);
++
++	client->disc_to_id = g_timeout_add_seconds(client->discoverable_to,
++						client_discoverable_timeout,
++						client);
++
++	return true;
++}
++
++static struct adv_parser {
++	const char *name;
++	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
++} parsers[] = {
++	{ "Type", parse_type },
++	{ "ServiceUUIDs", parse_service_uuids },
++	{ "SolicitUUIDs", parse_solicit_uuids },
++	{ "ManufacturerData", parse_manufacturer_data },
++	{ "ServiceData", parse_service_data },
++	{ "Includes", parse_includes },
++	{ "LocalName", parse_local_name },
++	{ "Appearance", parse_appearance },
++	{ "Duration", parse_duration },
++	{ "Timeout", parse_timeout },
++	{ "Data", parse_data },
++	{ "Discoverable", parse_discoverable },
++	{ "DiscoverableTimeout", parse_discoverable_timeout },
++	{ },
++};
++
+ static void properties_changed(GDBusProxy *proxy, const char *name,
+ 					DBusMessageIter *iter, void *user_data)
  {
- 	dbus_bool_t powered;
-@@ -2420,6 +2439,9 @@ static const struct bt_shell_menu advertise_menu = {
- 			"Set/Get advertise data" },
- 	{ "discoverable", "[on/off]", cmd_advertise_discoverable,
- 			"Set/Get advertise discoverable" },
-+	{ "discoverable-timeout", "[seconds]",
-+			cmd_advertise_discoverable_timeout,
-+			"Set/Get advertise discoverable timeout" },
- 	{ "tx-power", "[on/off]", cmd_advertise_tx_power,
- 			"Show/Enable/Disable TX power to be advertised",
- 							NULL },
+@@ -936,6 +984,26 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
+ 		goto fail;
+ 	}
+ 
++	if (client->flags & MGMT_ADV_FLAG_MANAGED_FLAGS) {
++		/* Set Limited Discoverable of DiscoverableTimeout is set */
++		if (client->disc_to_id) {
++			uint8_t flags = 0x01;
++			if (!bt_ad_add_flags(client->data, &flags, 1))
++				goto fail;
++		}
++	} else if (client->disc_to_id) {
++		/* Ignore DiscoverableTimeout if not discoverable */
++		g_source_remove(client->disc_to_id);
++		client->disc_to_id = 0;
++		client->discoverable_to = 0;
++	}
++
++	if (client->timeout < client->discoverable_to) {
++		/* DiscoverableTimeout must not be bigger than Timeout */
++		error("DiscoverableTimeout > Timeout");
++		goto fail;
++	}
++
+ 	err = refresh_adv(client, add_adv_callback);
+ 	if (!err)
+ 		return NULL;
 -- 
 2.14.3
 
