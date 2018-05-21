@@ -1,50 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180516135230.7182-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20180516135230.7182-1-grzegorz.kolodziejczyk@codecoup.pl>
+In-Reply-To: <1526615896-23631-1-git-send-email-nagaraj.dr@samsung.com>
+References: <CGME20180518035824epcas2p356c2382c482a8fcdd0598816d4dee070@epcas2p3.samsung.com>
+ <1526615896-23631-1-git-send-email-nagaraj.dr@samsung.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 21 May 2018 11:38:34 +0300
-Message-ID: <CABBYNZ+mHq81LLjUPDxCTcvS5xyntD52LNPd490J-ZUj0NoPkw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/5] client: Add missing duplicated string free
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 21 May 2018 11:37:53 +0300
+Message-ID: <CABBYNZLE06Rty1e--oX4eiNt9uaDkcMg1=ZNrB5EC2jRWC32=w@mail.gmail.com>
+Subject: Re: [PATCH] Fix possible invalid memory access
+To: Nagaraj D R <nagaraj.dr@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Syam Sidhardhan <s.syam@samsung.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi,
 
-On Wed, May 16, 2018 at 4:52 PM, Grzegorz Kolodziejczyk
-<grzegorz.kolodziejczyk@codecoup.pl> wrote:
-> This patch free duplicated strings in read, write attribute callbacks.
+On Fri, May 18, 2018 at 6:58 AM, Nagaraj D R <nagaraj.dr@samsung.com> wrote:
+> Uninitialized data is read from local variable 'addr'
 > ---
->  client/gatt.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  client/main.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 >
-> diff --git a/client/gatt.c b/client/gatt.c
-> index d59d1ba1e..c8267a75f 100644
-> --- a/client/gatt.c
-> +++ b/client/gatt.c
-> @@ -1598,6 +1598,7 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
+> diff --git a/client/main.c b/client/main.c
+> index 54bd537..73e77c4 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -1774,12 +1774,12 @@ static void cmd_disconn(int argc, char *argv[])
 >
->                 bt_shell_prompt_input("gatt", str, authorize_read_response,
->                                                                         aad);
-> +               g_free(str);
+>         if (argc < 2 || strlen(argv[1]) == 0) {
+>                 DBusMessageIter iter;
+> -               const char *addr;
 >
->                 pending_message = dbus_message_ref(msg);
->
-> @@ -1700,6 +1701,7 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
->
->                 bt_shell_prompt_input("gatt", str, authorize_write_response,
->                                                                         aad);
-> +               g_free(str);
->
->                 pending_message = dbus_message_ref(msg);
->
+> -               if (g_dbus_proxy_get_property(proxy, "Address", &iter) == TRUE)
+> +               if (g_dbus_proxy_get_property(proxy, "Address", &iter) == TRUE) {
+> +                       const char *addr;
+>                         dbus_message_iter_get_basic(&iter, &addr);
+> -
+> -               bt_shell_printf("Attempting to disconnect from %s\n", addr);
+> +                       bt_shell_printf("Attempting to disconnect from %s\n", addr);
+> +               }
+>         } else
+>                 bt_shell_printf("Attempting to disconnect from %s\n", argv[1]);
+>  }
 > --
-> 2.13.6
+> 1.9.1
 
-Patches 1 and 2 applied, thanks.
+Applied, notice that I did some changes so all commands using
+find_device shall use proxy_address when printing the address.
 
 -- 
 Luiz Augusto von Dentz
