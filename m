@@ -1,12 +1,12 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1526615896-23631-1-git-send-email-nagaraj.dr@samsung.com>
-References: <CGME20180518035824epcas2p356c2382c482a8fcdd0598816d4dee070@epcas2p3.samsung.com>
- <1526615896-23631-1-git-send-email-nagaraj.dr@samsung.com>
+In-Reply-To: <1526615048-23393-1-git-send-email-nagaraj.dr@samsung.com>
+References: <CGME20180518034418epcas2p3b31813a79452e5934a438347b8edc82a@epcas2p3.samsung.com>
+ <1526615048-23393-1-git-send-email-nagaraj.dr@samsung.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 21 May 2018 11:37:53 +0300
-Message-ID: <CABBYNZLE06Rty1e--oX4eiNt9uaDkcMg1=ZNrB5EC2jRWC32=w@mail.gmail.com>
-Subject: Re: [PATCH] Fix possible invalid memory access
+Date: Mon, 21 May 2018 11:37:09 +0300
+Message-ID: <CABBYNZLuEuo+N7oYhcUMC2H-mB9f+WKM5FAuXGcFym_XWwLR0Q@mail.gmail.com>
+Subject: Re: [PATCH] Fix improper usage of g_free
 To: Nagaraj D R <nagaraj.dr@samsung.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Syam Sidhardhan <s.syam@samsung.com>
@@ -16,38 +16,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Fri, May 18, 2018 at 6:58 AM, Nagaraj D R <nagaraj.dr@samsung.com> wrote:
-> Uninitialized data is read from local variable 'addr'
+On Fri, May 18, 2018 at 6:44 AM, Nagaraj D R <nagaraj.dr@samsung.com> wrote:
+> g_free should be used for only those memory allocations
+> done through glib APIs
 > ---
->  client/main.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  client/advertising.c | 2 +-
+>  src/adapter.c        | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/client/main.c b/client/main.c
-> index 54bd537..73e77c4 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -1774,12 +1774,12 @@ static void cmd_disconn(int argc, char *argv[])
+> diff --git a/client/advertising.c b/client/advertising.c
+> index 045133a..5592be6 100644
+> --- a/client/advertising.c
+> +++ b/client/advertising.c
+> @@ -757,7 +757,7 @@ void ad_advertise_local_name(DBusConnection *conn, const char *name)
+>                 return;
 >
->         if (argc < 2 || strlen(argv[1]) == 0) {
->                 DBusMessageIter iter;
-> -               const char *addr;
+>         g_free(ad.local_name);
+> -       ad.local_name = strdup(name);
+> +       ad.local_name = g_strdup(name);
 >
-> -               if (g_dbus_proxy_get_property(proxy, "Address", &iter) == TRUE)
-> +               if (g_dbus_proxy_get_property(proxy, "Address", &iter) == TRUE) {
-> +                       const char *addr;
->                         dbus_message_iter_get_basic(&iter, &addr);
-> -
-> -               bt_shell_printf("Attempting to disconnect from %s\n", addr);
-> +                       bt_shell_printf("Attempting to disconnect from %s\n", addr);
-> +               }
->         } else
->                 bt_shell_printf("Attempting to disconnect from %s\n", argv[1]);
->  }
+>         g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "LocalName");
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index c1c792a..07a4e42 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -2258,7 +2258,7 @@ static bool parse_uuids(DBusMessageIter *value, struct discovery_filter *filter)
+>                 bt_uuid_to_uuid128(&uuid, &u128);
+>                 bt_uuid_to_string(&u128, uuidstr, sizeof(uuidstr));
+>
+> -               filter->uuids = g_slist_prepend(filter->uuids, strdup(uuidstr));
+> +               filter->uuids = g_slist_prepend(filter->uuids, g_strdup(uuidstr));
+>
+>                 dbus_message_iter_next(&arriter);
+>         }
 > --
 > 1.9.1
 
-Applied, notice that I did some changes so all commands using
-find_device shall use proxy_address when printing the address.
+I rather not use the g_str* then, so we might need to replace g_free
+with free for local_name and also the filter.
+
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
 
 -- 
 Luiz Augusto von Dentz
