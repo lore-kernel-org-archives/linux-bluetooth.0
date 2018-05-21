@@ -1,35 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/util: Add definition to BLE-MIDI UUIDs
-Date: Mon, 21 May 2018 17:07:27 +0300
-Message-Id: <20180521140734.10344-2-luiz.dentz@gmail.com>
-In-Reply-To: <20180521140734.10344-1-luiz.dentz@gmail.com>
-References: <20180521140734.10344-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 1/8] doc/advertising-api: Add Discoverable property
+Date: Mon, 21 May 2018 17:07:26 +0300
+Message-Id: <20180521140734.10344-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds both UUIDs used by MMA BLE-MIDI as used by the midi plugin.
----
- src/shared/util.c | 3 +++
- 1 file changed, 3 insertions(+)
+This adds Discoverable which the application can use in case it want
+to set the General Discoverable flag per instance.
 
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 43a81afa0..78dded2f2 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -831,6 +831,9 @@ static const struct {
- 	{ "6e400001-b5a3-f393-e0a9-e50e24dcca9e", "Nordic UART Service" },
- 	{ "6e400002-b5a3-f393-e0a9-e50e24dcca9e", "Nordic UART TX"	},
- 	{ "6e400003-b5a3-f393-e0a9-e50e24dcca9e", "Nordic UART RX"	},
-+	/* MMA BLE-MIDI */
-+	{ "03B80E5A-EDE8-4B33-A751-6CE34EC4C700", "MMA MIDI"		},
-+	{ "7772E5DB-3868-4112-A1A9-F2669D106BF3", "MMA MIDI IO"		},
- 	{ }
- };
+Note: This would allow for example an application to advertise as
+discoverable even if the adapter is not discoverable which may be
+required by dual-mode as it may not require BR/EDR to be discoverable.
+---
+ doc/advertising-api.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index eef98ad91..96deeeccd 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -78,6 +78,14 @@ Properties	string Type
+ 				<Transport Discovery> <Organization Flags...>
+ 				0x26                   0x01         0x01...
  
++		bool Discoverable [Experimental]
++
++			Advertise as general discoverable. When present this
++			will override adapter Discoverable property.
++
++			Note: This property shall not be set when Type is set
++			to broadcast.
++
+ 		array{string} Includes
+ 
+ 			List of features to be included in the advertising
 -- 
 2.14.3
 
