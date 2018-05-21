@@ -1,144 +1,173 @@
-Return-Path: <tiwai@suse.de>
-From: Takashi Iwai <tiwai@suse.de>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: Apply QCA Rome patches for some ATH3012 models
-Date: Mon, 21 May 2018 22:34:52 +0200
-Message-Id: <20180521203452.9705-1-tiwai@suse.de>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 8/8] client: Add advertise.discoverable-timeout command
+Date: Mon, 21 May 2018 17:07:34 +0300
+Message-Id: <20180521140734.10344-9-luiz.dentz@gmail.com>
+In-Reply-To: <20180521140734.10344-1-luiz.dentz@gmail.com>
+References: <20180521140734.10344-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros
-1525/QCA6174") we tried to address the non-working Atheros BT devices
-by changing the quirk from BTUSB_ATH3012 to BTUSB_QCA_ROME.  This made
-such devices working while it turned out to break other existing chips
-with the very same USB ID, hence it was reverted afterwards.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is another attempt to tackle the issue.  The essential point to
-use BTUSB_QCA_ROME is to apply the btusb_setup_qca() and do RAM-
-patching.  And the previous attempt failed because btusb_setup_qca()
-returns -ENODEV if the ROM version doesn't match with the expected
-ones.  For some devices that have already the "correct" ROM versions,
-we may just skip the setup procedure and continue the rest.
+This adds advertise.discoverable-timeout command which can be used to
+limit the amount of time the advertisement is discoverable:
 
-So, the first fix we'll need is to add a check of the ROM version in
-the function to skip the setup if the ROM version looks already sane,
-so that it can be applied for all ath devices.
+[bluetooth]# advertise.discoverable on
+[bluetooth]# advertise.discoverable-timeout 10
+[bluetooth]# advertise on
 
-However, the world is a bit more complex than that simple solution.
-Since BTUSB_ATH3012 quirk checks the bcdDevice and bails out when it's
-0x0001 at the beginning of probing, so the device probe always aborts
-here.
-
-In this patch, we add another check of ROM version again, and if the
-device needs patching, the probe continues.  For that, a slight
-refactoring of btusb_qca_send_vendor_req() was required so that the
-probe function can pass usb_device pointer directly before allocating
-hci_dev stuff.
-
-Fixes: commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros 1525/QCA6174")
-Bugzilla: http://bugzilla.opensuse.org/show_bug.cgi?id=1082504
-Tested-by: Ivan Levshin <ivan.levshin@microfocus.com>
-Signed-off-by: Takashi Iwai <tiwai@suse.de>
-
+@ MGMT Command: Add Advertising (0x003e) plen 14
+        Instance: 1
+        Flags: 0x00000001
+          Switch into Connectable mode
+        Duration: 0
+        Timeout: 0
+        Advertising data length: 3
+        Flags: 0x02
+          LE General Discoverable Mode
+        Scan response length: 0
+@ MGMT Event: Advertising Added (0x0023) plen 1
+        Instance: 1
+@ MGMT Event: Command Complete (0x0001) plen 4
+      Add Advertising (0x003e) plen 1
+        Status: Success (0x00)
+        Instance: 1
+@ MGMT Command: Add Advertising (0x003e) plen 14
+        Instance: 1
+        Flags: 0x00000001
+          Switch into Connectable mode
+        Duration: 0
+        Timeout: 0
+        Advertising data length: 3
+        Flags: 0x00
+        Scan response length: 0
 ---
- drivers/bluetooth/btusb.c | 32 +++++++++++++++++++++++++-------
- 1 file changed, 25 insertions(+), 7 deletions(-)
+ client/advertising.c | 38 ++++++++++++++++++++++++++++++++++++++
+ client/advertising.h |  1 +
+ client/main.c        | 22 ++++++++++++++++++++++
+ 3 files changed, 61 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b937cc1e2c07..9a91f44ee33b 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2497,11 +2497,9 @@ static const struct qca_device_info qca_devices_table[] = {
- 	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
- };
- 
--static int btusb_qca_send_vendor_req(struct hci_dev *hdev, u8 request,
-+static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
- 				     void *data, u16 size)
- {
--	struct btusb_data *btdata = hci_get_drvdata(hdev);
--	struct usb_device *udev = btdata->udev;
- 	int pipe, err;
- 	u8 *buf;
- 
-@@ -2516,7 +2514,7 @@ static int btusb_qca_send_vendor_req(struct hci_dev *hdev, u8 request,
- 	err = usb_control_msg(udev, pipe, request, USB_TYPE_VENDOR | USB_DIR_IN,
- 			      0, 0, buf, size, USB_CTRL_SET_TIMEOUT);
- 	if (err < 0) {
--		bt_dev_err(hdev, "Failed to access otp area (%d)", err);
-+		dev_err(&udev->dev, "Failed to access otp area (%d)", err);
- 		goto done;
- 	}
- 
-@@ -2666,20 +2664,38 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 	return err;
+diff --git a/client/advertising.c b/client/advertising.c
+index 8abf4785b..73f2f3df8 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -66,6 +66,7 @@ static struct ad {
+ 	uint16_t local_appearance;
+ 	uint16_t duration;
+ 	uint16_t timeout;
++	uint16_t discoverable_to;
+ 	char **uuids;
+ 	size_t uuids_len;
+ 	struct service_data service;
+@@ -424,6 +425,21 @@ static gboolean get_discoverable(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
-+/* identify the ROM version and check whether patches are needed */
-+static bool btusb_qca_need_patch(struct usb_device *udev)
++static gboolean discoverable_timeout_exits(const GDBusPropertyTable *property,
++							void *data)
 +{
-+	struct qca_version ver;
-+
-+	if (btusb_qca_send_vendor_req(udev, QCA_GET_TARGET_VERSION, &ver,
-+				      sizeof(ver)) < 0)
-+		return false;
-+	/* only low ROM versions need patches */
-+	return !(le32_to_cpu(ver.rom_version) & ~0xffffU);
++	return ad.discoverable_to;
 +}
 +
- static int btusb_setup_qca(struct hci_dev *hdev)
- {
-+	struct btusb_data *btdata = hci_get_drvdata(hdev);
-+	struct usb_device *udev = btdata->udev;
- 	const struct qca_device_info *info = NULL;
- 	struct qca_version ver;
- 	u32 ver_rom;
- 	u8 status;
- 	int i, err;
- 
--	err = btusb_qca_send_vendor_req(hdev, QCA_GET_TARGET_VERSION, &ver,
-+	err = btusb_qca_send_vendor_req(udev, QCA_GET_TARGET_VERSION, &ver,
- 					sizeof(ver));
- 	if (err < 0)
- 		return err;
- 
- 	ver_rom = le32_to_cpu(ver.rom_version);
-+	/* Don't care about high ROM versions */
-+	if (ver_rom & ~0xffffU)
-+		return 0;
++static gboolean get_discoverable_timeout(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
++{
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16,
++							&ad.discoverable_to);
 +
- 	for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
- 		if (ver_rom == qca_devices_table[i].rom_version)
- 			info = &qca_devices_table[i];
-@@ -2689,7 +2705,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 		return -ENODEV;
- 	}
++	return TRUE;
++}
++
+ static const GDBusPropertyTable ad_props[] = {
+ 	{ "Type", "s", get_type },
+ 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
+@@ -432,6 +448,8 @@ static const GDBusPropertyTable ad_props[] = {
+ 						manufacturer_data_exists },
+ 	{ "Data", "a{yv}", get_data, NULL, data_exists },
+ 	{ "Discoverable", "b", get_discoverable, NULL, discoverable_exists },
++	{ "DiscoverableTimeout", "q", get_discoverable_timeout, NULL,
++						discoverable_timeout_exits },
+ 	{ "Includes", "as", get_includes, NULL, includes_exists },
+ 	{ "LocalName", "s", get_local_name, NULL, local_name_exits },
+ 	{ "Appearance", "q", get_appearance, NULL, appearance_exits },
+@@ -750,6 +768,26 @@ void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value)
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
  
--	err = btusb_qca_send_vendor_req(hdev, QCA_CHECK_STATUS, &status,
-+	err = btusb_qca_send_vendor_req(udev, QCA_CHECK_STATUS, &status,
- 					sizeof(status));
- 	if (err < 0)
- 		return err;
-@@ -2903,7 +2919,8 @@ static int btusb_probe(struct usb_interface *intf,
- 		/* Old firmware would otherwise let ath3k driver load
- 		 * patch and sysconfig files
- 		 */
--		if (le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001)
-+		if (le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001 &&
-+		    !btusb_qca_need_patch(udev))
- 			return -ENODEV;
- 	}
++void ad_advertise_discoverable_timeout(DBusConnection *conn, long int *value)
++{
++	if (!value) {
++		if (ad.discoverable_to)
++			bt_shell_printf("Timeout: %u sec\n",
++					ad.discoverable_to);
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	}
++
++	if (ad.discoverable_to == *value)
++		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++
++	ad.discoverable_to = *value;
++
++	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE,
++					"DiscoverableTimeout");
++
++	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
+ void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value)
+ {
+ 	if (!value) {
+diff --git a/client/advertising.h b/client/advertising.h
+index 599190866..fe3a7c8c6 100644
+--- a/client/advertising.h
++++ b/client/advertising.h
+@@ -40,3 +40,4 @@ void ad_advertise_timeout(DBusConnection *conn, long int *value);
+ void ad_advertise_data(DBusConnection *conn, int argc, char *argv[]);
+ void ad_disable_data(DBusConnection *conn);
+ void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value);
++void ad_advertise_discoverable_timeout(DBusConnection *conn, long int *value);
+diff --git a/client/main.c b/client/main.c
+index 26ce94947..180f841ae 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -2228,6 +2228,25 @@ static void cmd_advertise_discoverable(int argc, char *argv[])
+ 	ad_advertise_discoverable(dbus_conn, &discoverable);
+ }
  
-@@ -3065,6 +3082,7 @@ static int btusb_probe(struct usb_interface *intf,
- 	}
- 
- 	if (id->driver_info & BTUSB_ATH3012) {
-+		data->setup_on_usb = btusb_setup_qca;
- 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
++static void cmd_advertise_discoverable_timeout(int argc, char *argv[])
++{
++	long int value;
++	char *endptr = NULL;
++
++	if (argc < 2) {
++		ad_advertise_discoverable_timeout(dbus_conn, NULL);
++		return;
++	}
++
++	value = strtol(argv[1], &endptr, 0);
++	if (!endptr || *endptr != '\0' || value > UINT16_MAX) {
++		bt_shell_printf("Invalid argument\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	ad_advertise_discoverable_timeout(dbus_conn, &value);
++}
++
+ static void cmd_advertise_tx_power(int argc, char *argv[])
+ {
+ 	dbus_bool_t powered;
+@@ -2420,6 +2439,9 @@ static const struct bt_shell_menu advertise_menu = {
+ 			"Set/Get advertise data" },
+ 	{ "discoverable", "[on/off]", cmd_advertise_discoverable,
+ 			"Set/Get advertise discoverable" },
++	{ "discoverable-timeout", "[seconds]",
++			cmd_advertise_discoverable_timeout,
++			"Set/Get advertise discoverable timeout" },
+ 	{ "tx-power", "[on/off]", cmd_advertise_tx_power,
+ 			"Show/Enable/Disable TX power to be advertised",
+ 							NULL },
 -- 
-2.16.3
+2.14.3
+
