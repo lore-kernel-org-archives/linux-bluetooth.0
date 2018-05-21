@@ -1,52 +1,144 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Nagaraj D R <nagaraj.dr@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Syam Sidhardhan <s.syam@samsung.com>,
-        Nagaraj D R <nagaraj.dr@samsung.com>
-Subject: [PATCH] Fix improper usage of g_free
-Date: Tue, 22 May 2018 08:55:10 +0530
-Message-id: <1526959510-26918-1-git-send-email-nagaraj.dr@samsung.com>
-References: <CGME20180522032519epcas2p3cf940be103b17857bcb293a8bc37e5f8@epcas2p3.samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: Apply QCA Rome patches for some ATH3012 models
+Date: Mon, 21 May 2018 22:34:52 +0200
+Message-Id: <20180521203452.9705-1-tiwai@suse.de>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-g_free should be used for only those memory allocations
-done through glib APIs
+In commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros
+1525/QCA6174") we tried to address the non-working Atheros BT devices
+by changing the quirk from BTUSB_ATH3012 to BTUSB_QCA_ROME.  This made
+such devices working while it turned out to break other existing chips
+with the very same USB ID, hence it was reverted afterwards.
 
-This patch is in continuation with
-commit 01333078f591969f885bb94187a91d35e8fd5388
-commit 8cfef5aa0c92c0ba096034fc1cd003a4f2c36bcf
+This is another attempt to tackle the issue.  The essential point to
+use BTUSB_QCA_ROME is to apply the btusb_setup_qca() and do RAM-
+patching.  And the previous attempt failed because btusb_setup_qca()
+returns -ENODEV if the ROM version doesn't match with the expected
+ones.  For some devices that have already the "correct" ROM versions,
+we may just skip the setup procedure and continue the rest.
+
+So, the first fix we'll need is to add a check of the ROM version in
+the function to skip the setup if the ROM version looks already sane,
+so that it can be applied for all ath devices.
+
+However, the world is a bit more complex than that simple solution.
+Since BTUSB_ATH3012 quirk checks the bcdDevice and bails out when it's
+0x0001 at the beginning of probing, so the device probe always aborts
+here.
+
+In this patch, we add another check of ROM version again, and if the
+device needs patching, the probe continues.  For that, a slight
+refactoring of btusb_qca_send_vendor_req() was required so that the
+probe function can pass usb_device pointer directly before allocating
+hci_dev stuff.
+
+Fixes: commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros 1525/QCA6174")
+Bugzilla: http://bugzilla.opensuse.org/show_bug.cgi?id=1082504
+Tested-by: Ivan Levshin <ivan.levshin@microfocus.com>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+
 ---
- client/advertising.c | 2 +-
- src/adapter.c        | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btusb.c | 32 +++++++++++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 7 deletions(-)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 39f9946..40fb3d5 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -756,7 +756,7 @@ void ad_advertise_local_name(DBusConnection *conn, const char *name)
- 	if (ad.local_name && !strcmp(name, ad.local_name))
- 		return;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b937cc1e2c07..9a91f44ee33b 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2497,11 +2497,9 @@ static const struct qca_device_info qca_devices_table[] = {
+ 	{ 0x00000302, 28, 4, 18 }, /* Rome 3.2 */
+ };
  
--	g_free(ad.local_name);
-+	free(ad.local_name);
- 	ad.local_name = strdup(name);
+-static int btusb_qca_send_vendor_req(struct hci_dev *hdev, u8 request,
++static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+ 				     void *data, u16 size)
+ {
+-	struct btusb_data *btdata = hci_get_drvdata(hdev);
+-	struct usb_device *udev = btdata->udev;
+ 	int pipe, err;
+ 	u8 *buf;
  
- 	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "LocalName");
-diff --git a/src/adapter.c b/src/adapter.c
-index 390216a..9493587 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2423,7 +2423,7 @@ static bool parse_discovery_filter_dict(struct btd_adapter *adapter,
- 	return true;
+@@ -2516,7 +2514,7 @@ static int btusb_qca_send_vendor_req(struct hci_dev *hdev, u8 request,
+ 	err = usb_control_msg(udev, pipe, request, USB_TYPE_VENDOR | USB_DIR_IN,
+ 			      0, 0, buf, size, USB_CTRL_SET_TIMEOUT);
+ 	if (err < 0) {
+-		bt_dev_err(hdev, "Failed to access otp area (%d)", err);
++		dev_err(&udev->dev, "Failed to access otp area (%d)", err);
+ 		goto done;
+ 	}
  
- invalid_args:
--	g_slist_free_full((*filter)->uuids, g_free);
-+	g_slist_free_full((*filter)->uuids, free);
- 	g_free(*filter);
- 	*filter = NULL;
- 	return false;
+@@ -2666,20 +2664,38 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++/* identify the ROM version and check whether patches are needed */
++static bool btusb_qca_need_patch(struct usb_device *udev)
++{
++	struct qca_version ver;
++
++	if (btusb_qca_send_vendor_req(udev, QCA_GET_TARGET_VERSION, &ver,
++				      sizeof(ver)) < 0)
++		return false;
++	/* only low ROM versions need patches */
++	return !(le32_to_cpu(ver.rom_version) & ~0xffffU);
++}
++
+ static int btusb_setup_qca(struct hci_dev *hdev)
+ {
++	struct btusb_data *btdata = hci_get_drvdata(hdev);
++	struct usb_device *udev = btdata->udev;
+ 	const struct qca_device_info *info = NULL;
+ 	struct qca_version ver;
+ 	u32 ver_rom;
+ 	u8 status;
+ 	int i, err;
+ 
+-	err = btusb_qca_send_vendor_req(hdev, QCA_GET_TARGET_VERSION, &ver,
++	err = btusb_qca_send_vendor_req(udev, QCA_GET_TARGET_VERSION, &ver,
+ 					sizeof(ver));
+ 	if (err < 0)
+ 		return err;
+ 
+ 	ver_rom = le32_to_cpu(ver.rom_version);
++	/* Don't care about high ROM versions */
++	if (ver_rom & ~0xffffU)
++		return 0;
++
+ 	for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
+ 		if (ver_rom == qca_devices_table[i].rom_version)
+ 			info = &qca_devices_table[i];
+@@ -2689,7 +2705,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+ 		return -ENODEV;
+ 	}
+ 
+-	err = btusb_qca_send_vendor_req(hdev, QCA_CHECK_STATUS, &status,
++	err = btusb_qca_send_vendor_req(udev, QCA_CHECK_STATUS, &status,
+ 					sizeof(status));
+ 	if (err < 0)
+ 		return err;
+@@ -2903,7 +2919,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 		/* Old firmware would otherwise let ath3k driver load
+ 		 * patch and sysconfig files
+ 		 */
+-		if (le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001)
++		if (le16_to_cpu(udev->descriptor.bcdDevice) <= 0x0001 &&
++		    !btusb_qca_need_patch(udev))
+ 			return -ENODEV;
+ 	}
+ 
+@@ -3065,6 +3082,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 	}
+ 
+ 	if (id->driver_info & BTUSB_ATH3012) {
++		data->setup_on_usb = btusb_setup_qca;
+ 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
+ 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
 -- 
-1.9.1
-
+2.16.3
