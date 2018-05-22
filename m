@@ -1,42 +1,97 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Add Dell Inspiron 5565 to btusb_needs_reset_resume_table
-Date: Tue, 22 May 2018 09:34:10 +0200
-Message-Id: <20180522073410.10329-1-hdegoede@redhat.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+References: <20180516135538.7817-1-grzegorz.kolodziejczyk@codecoup.pl> <CABBYNZ+5jm-PM=bxsCzROaAR2MED9+NUrxvEsynbKb62jPZ-+w@mail.gmail.com>
+In-Reply-To: <CABBYNZ+5jm-PM=bxsCzROaAR2MED9+NUrxvEsynbKb62jPZ-+w@mail.gmail.com>
+From: =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?=
+        <grzegorz.kolodziejczyk@codecoup.pl>
+Date: Tue, 22 May 2018 09:33:23 +0200
+Message-ID: <CALevQMbBpXQ351j0u2=iSUMidkpPxnBaBHGNXZxfmaoJzyDBJg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 3/5] doc/gatt-api: Add authorization options for attributes
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Dell Inspiron 5565 uses a QCA Rome chip which needs to be reset
-(and have its firmware reloaded) for bluetooth to work after
-suspend/resume.
+Hi Luiz,
+pon., 21 maj 2018 o 11:44 Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+napisa=C5=82(a):
 
-BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=15750392
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/btusb.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+> Hi Grzegorz,
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b937cc1e2c07..8932855634b2 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -406,6 +406,13 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
- 			DMI_MATCH(DMI_PRODUCT_NAME, "XPS 13 9360"),
- 		},
- 	},
-+	{
-+		/* Dell Inspiron 5565 (QCA ROME device 0cf3:e009) */
-+		.matches = {
-+			DMI_MATCH(DMI_SYS_VENDOR, "Dell Inc."),
-+			DMI_MATCH(DMI_PRODUCT_NAME, "Inspiron 5565"),
-+		},
-+	},
- 	{}
- };
- 
--- 
-2.17.0
+> On Wed, May 16, 2018 at 4:55 PM, Grzegorz Kolodziejczyk
+> <grzegorz.kolodziejczyk@codecoup.pl> wrote:
+> > This patch adds authorization property for attributes and prepare write
+> > request for authorization option for write request. This is require to
+> > handle correctly prepare writes, which may response with insufficient
+> > authorization error.
+
+> I noticed there also a new error that we should document.
+
+You mean "org.bluez.Error.NotAuthorized" for WriteValue ? If so, it's
+already documented as possible error for WriteValues.
+> > ---
+> >  doc/gatt-api.txt | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
+> >
+> > diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> > index 0f1cc9029..7d8c427cd 100644
+> > --- a/doc/gatt-api.txt
+> > +++ b/doc/gatt-api.txt
+> > @@ -85,6 +85,8 @@ Methods               array{byte} ReadValue(dict
+options)
+> >                         Possible options: "offset": Start offset
+> >                                           "device": Device path (Server
+only)
+> >                                           "link": Link type (Server
+only)
+> > +                                         "authorize": boolean Is
+authorization
+> > +                                                      request
+> >
+> >                         Possible Errors: org.bluez.Error.Failed
+> >                                          org.bluez.Error.InProgress
+> > @@ -251,6 +253,12 @@ Properties string UUID [read-only]
+> >                                 "secure-read" (Server only)
+> >                                 "secure-write" (Server only)
+> >
+> > +               boolean Authorize [read-only, optional] (Server only)
+> > +
+> > +                       True, if authorization is required for attribut=
+e
+> > +                       operations. By default this valuie is set to
+false for
+> > +                       attribute.
+> > +
+> >  Characteristic Descriptors hierarchy
+> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > @@ -284,6 +292,8 @@ Methods             array{byte} ReadValue(dict
+flags)
+> >                         Possible options: "offset": Start offset
+> >                                           "device": Device path (Server
+only)
+> >                                           "link": Link type (Server
+only)
+> > +                                         "authorize": boolean Is
+authorization
+> > +                                                      request
+> >
+> >                         Possible Errors: org.bluez.Error.Failed
+> >                                          org.bluez.Error.InProgress
+> > --
+> > 2.13.6
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+> --
+> Luiz Augusto von Dentz
+
+Grzegorz Ko=C5=82odziejczyk
