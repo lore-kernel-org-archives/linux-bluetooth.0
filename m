@@ -1,62 +1,52 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH] Bluetooth: Apply QCA Rome patches for some ATH3012 models
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180521203452.9705-1-tiwai@suse.de>
-Date: Tue, 22 May 2018 09:03:10 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Message-Id: <A4990AB0-0D75-4943-AB32-86CF96FC577D@holtmann.org>
-References: <20180521203452.9705-1-tiwai@suse.de>
-To: Takashi Iwai <tiwai@suse.de>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Nagaraj D R <nagaraj.dr@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Syam Sidhardhan <s.syam@samsung.com>,
+        Nagaraj D R <nagaraj.dr@samsung.com>
+Subject: [PATCH] Fix improper usage of g_free
+Date: Tue, 22 May 2018 08:55:10 +0530
+Message-id: <1526959510-26918-1-git-send-email-nagaraj.dr@samsung.com>
+References: <CGME20180522032519epcas2p3cf940be103b17857bcb293a8bc37e5f8@epcas2p3.samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Takashi,
+g_free should be used for only those memory allocations
+done through glib APIs
 
-> In commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros
-> 1525/QCA6174") we tried to address the non-working Atheros BT devices
-> by changing the quirk from BTUSB_ATH3012 to BTUSB_QCA_ROME.  This made
-> such devices working while it turned out to break other existing chips
-> with the very same USB ID, hence it was reverted afterwards.
-> 
-> This is another attempt to tackle the issue.  The essential point to
-> use BTUSB_QCA_ROME is to apply the btusb_setup_qca() and do RAM-
-> patching.  And the previous attempt failed because btusb_setup_qca()
-> returns -ENODEV if the ROM version doesn't match with the expected
-> ones.  For some devices that have already the "correct" ROM versions,
-> we may just skip the setup procedure and continue the rest.
-> 
-> So, the first fix we'll need is to add a check of the ROM version in
-> the function to skip the setup if the ROM version looks already sane,
-> so that it can be applied for all ath devices.
-> 
-> However, the world is a bit more complex than that simple solution.
-> Since BTUSB_ATH3012 quirk checks the bcdDevice and bails out when it's
-> 0x0001 at the beginning of probing, so the device probe always aborts
-> here.
-> 
-> In this patch, we add another check of ROM version again, and if the
-> device needs patching, the probe continues.  For that, a slight
-> refactoring of btusb_qca_send_vendor_req() was required so that the
-> probe function can pass usb_device pointer directly before allocating
-> hci_dev stuff.
-> 
-> Fixes: commit f44cb4b19ed4 ("Bluetooth: btusb: Fix quirk for Atheros 1525/QCA6174")
-> Bugzilla: http://bugzilla.opensuse.org/show_bug.cgi?id=1082504
-> Tested-by: Ivan Levshin <ivan.levshin@microfocus.com>
-> Signed-off-by: Takashi Iwai <tiwai@suse.de>
-> 
-> ---
-> drivers/bluetooth/btusb.c | 32 +++++++++++++++++++++++++-------
-> 1 file changed, 25 insertions(+), 7 deletions(-)
+This patch is in continuation with
+commit 01333078f591969f885bb94187a91d35e8fd5388
+commit 8cfef5aa0c92c0ba096034fc1cd003a4f2c36bcf
+---
+ client/advertising.c | 2 +-
+ src/adapter.c        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+diff --git a/client/advertising.c b/client/advertising.c
+index 39f9946..40fb3d5 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -756,7 +756,7 @@ void ad_advertise_local_name(DBusConnection *conn, const char *name)
+ 	if (ad.local_name && !strcmp(name, ad.local_name))
+ 		return;
+ 
+-	g_free(ad.local_name);
++	free(ad.local_name);
+ 	ad.local_name = strdup(name);
+ 
+ 	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "LocalName");
+diff --git a/src/adapter.c b/src/adapter.c
+index 390216a..9493587 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2423,7 +2423,7 @@ static bool parse_discovery_filter_dict(struct btd_adapter *adapter,
+ 	return true;
+ 
+ invalid_args:
+-	g_slist_free_full((*filter)->uuids, g_free);
++	g_slist_free_full((*filter)->uuids, free);
+ 	g_free(*filter);
+ 	*filter = NULL;
+ 	return false;
+-- 
+1.9.1
 
-Regards
-
-Marcel
