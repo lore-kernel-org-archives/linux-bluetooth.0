@@ -2,46 +2,58 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH] btmrvl: support sysfs initiated firmware coredump
+Subject: Re: [PATCH] Bluetooth: Add a new Realtek 8723DE ID 2ff8:b011
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1526595312-1371-1-git-send-email-arend.vanspriel@broadcom.com>
-Date: Tue, 22 May 2018 09:04:44 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <57FC7035-839E-48E9-AA93-B3966860012D@holtmann.org>
-References: <1526595312-1371-1-git-send-email-arend.vanspriel@broadcom.com>
-To: Arend van Spriel <arend.vanspriel@broadcom.com>
+In-Reply-To: <20180521100920.7998-1-jian-hong@endlessm.com>
+Date: Tue, 22 May 2018 09:03:13 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux@endlessm.com
+Message-Id: <F1DE5535-655B-4EA4-98AF-5B36BE8034F2@holtmann.org>
+References: <20180521100920.7998-1-jian-hong@endlessm.com>
+To: Jian-Hong Pan <jian-hong@endlessm.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arend,
+Hi Jian-Hong,
 
-> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
-> it is possible to initiate a device coredump from user-space. This
-> patch adds support for it in btmrvl_sdio adding the .coredump()
-> driver callback. This makes dump through debugfs obsolete so removing
-> it.
+> Without this patch we cannot turn on the Bluethooth adapter on ASUS
+> E406MA.
 > 
-> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=2ff8 ProdID=b011 Rev= 2.00
+> S:  Manufacturer=Realtek
+> S:  Product=802.11n WLAN Adapter
+> S:  SerialNumber=00e04c000001
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> Signed-off-by: Jian-Hong Pan <jian-hong@endlessm.com>
 > ---
-> This patch depends upon a patch that is in Linus' tree since 4.17-rc3:
-> 
-> 
->  commit ed4564babeeee4fb19fe4ec0beabe29754e380f9
->  Author: Arend van Spriel <aspriel@gmail.com>
->  Date:   Sun Apr 8 23:57:07 2018 +0200
-> 
->     drivers: change struct device_driver::coredump() return type to void
-> 
-> However, bt-next is still at 4.17-rc1.
-> 
-> Regards,
-> Arend
-> ---
-> drivers/bluetooth/btmrvl_debugfs.c | 31 -------------------------------
-> drivers/bluetooth/btmrvl_drv.h     |  2 --
-> drivers/bluetooth/btmrvl_main.c    |  6 ------
-> drivers/bluetooth/btmrvl_sdio.c    | 11 ++++++++---
-> 4 files changed, 8 insertions(+), 42 deletions(-)
+> drivers/bluetooth/btusb.c | 3 +++
+> 1 file changed, 3 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
