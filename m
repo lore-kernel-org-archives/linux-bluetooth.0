@@ -2,70 +2,48 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH v2 4/7] Bluetooth: Add new quirk for non-persistent setup
- settings
+Subject: Re: [PATCH] btmrvl: support sysfs initiated firmware coredump
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1d6097f538b3182b2876ad48225ecd6e2d1b128c.1526374087.git.sean.wang@mediatek.com>
-Date: Tue, 22 May 2018 09:21:23 +0200
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Message-Id: <920B3BE9-3FE8-4AC6-8C5F-63B0E00182AC@holtmann.org>
-References: <cover.1526374087.git.sean.wang@mediatek.com>
- <1d6097f538b3182b2876ad48225ecd6e2d1b128c.1526374087.git.sean.wang@mediatek.com>
-To: sean.wang@mediatek.com
+In-Reply-To: <1526595312-1371-1-git-send-email-arend.vanspriel@broadcom.com>
+Date: Tue, 22 May 2018 09:04:44 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <57FC7035-839E-48E9-AA93-B3966860012D@holtmann.org>
+References: <1526595312-1371-1-git-send-email-arend.vanspriel@broadcom.com>
+To: Arend van Spriel <arend.vanspriel@broadcom.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sean,
+Hi Arend,
 
-> Add a new quirk HCI_QUIRK_NON_PERSISTENT_SETUP allowing that a quirk that
-> runs setup() after every open() and not just after the first open().
+> Since commit 3c47d19ff4dc ("drivers: base: add coredump driver ops")
+> it is possible to initiate a device coredump from user-space. This
+> patch adds support for it in btmrvl_sdio adding the .coredump()
+> driver callback. This makes dump through debugfs obsolete so removing
+> it.
 > 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
 > ---
-> include/net/bluetooth/hci.h | 9 +++++++++
-> net/bluetooth/hci_core.c    | 3 ++-
-> 2 files changed, 11 insertions(+), 1 deletion(-)
+> This patch depends upon a patch that is in Linus' tree since 4.17-rc3:
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 1668211..b37d973 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -183,6 +183,15 @@ enum {
-> 	 * during the hdev->setup vendor callback.
-> 	 */
-> 	HCI_QUIRK_NON_PERSISTENT_DIAG,
-> +
-> +	/* When this quirk is set, setup() would be run after every
-> +	 * open() and not just after the first open().
-> +	 *
-> +	 * This quirk can be set before hci_register_dev is called or
-> +	 * during the hdev->setup vendor callback.
-> +	 *
-> +	 */
-> +	HCI_QUIRK_NON_PERSISTENT_SETUP,
-> };
 > 
-> /* HCI device flags */
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 40d260f..7de712e2 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1377,7 +1377,8 @@ static int hci_dev_do_open(struct hci_dev *hdev)
-> 	atomic_set(&hdev->cmd_cnt, 1);
-> 	set_bit(HCI_INIT, &hdev->flags);
+>  commit ed4564babeeee4fb19fe4ec0beabe29754e380f9
+>  Author: Arend van Spriel <aspriel@gmail.com>
+>  Date:   Sun Apr 8 23:57:07 2018 +0200
 > 
-> -	if (hci_dev_test_flag(hdev, HCI_SETUP)) {
-> +	if (hci_dev_test_flag(hdev, HCI_SETUP) ||
-> +	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
-> 		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+>     drivers: change struct device_driver::coredump() return type to void
+> 
+> However, bt-next is still at 4.17-rc1.
+> 
+> Regards,
+> Arend
+> ---
+> drivers/bluetooth/btmrvl_debugfs.c | 31 -------------------------------
+> drivers/bluetooth/btmrvl_drv.h     |  2 --
+> drivers/bluetooth/btmrvl_main.c    |  6 ------
+> drivers/bluetooth/btmrvl_sdio.c    | 11 ++++++++---
+> 4 files changed, 8 insertions(+), 42 deletions(-)
 
-I am not 100% sure that we want to send the HCI_DEV_SETUP event also multiple times. That is a userspace change that I would need to think about. We need to check create_monitor_event() and see what the btmon trace for this looks like. Can you send me a btmon -w trace.log when this change is active.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
