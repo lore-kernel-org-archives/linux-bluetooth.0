@@ -1,72 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: linux-bluetooth@vger.kernel.org
-From: tobi <tobi@biertrinken.rocks>
-Subject: warmreset breaks communication with CSR8811
-Message-ID: <c20e33c4-ff97-00de-9fb2-e70b0d3b983a@biertrinken.rocks>
-Date: Tue, 22 May 2018 13:30:28 +0200
+Subject: Re: [PATCH v3 1/8] doc/advertising-api: Add Discoverable property
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20180522095011.517-1-luiz.dentz@gmail.com>
+ <9313e463-558a-57da-529e-0c463b8fbf24@flypig.co.uk>
+ <CABBYNZ+YQVfJCfHUxkR5BEWenu4OpsukDycvGFFApeOTWiWbEA@mail.gmail.com>
+From: David Llewellyn-Jones <david@flypig.co.uk>
+Message-ID: <6089f1f8-e4d9-3ac6-4ec4-82f171f512c1@flypig.co.uk>
+Date: Tue, 22 May 2018 11:52:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <CABBYNZ+YQVfJCfHUxkR5BEWenu4OpsukDycvGFFApeOTWiWbEA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Luiz,
 
-i have problem connecting bluez (currently im using 5.49 from 
-debian:unstable and linux-4.14) to my CSR8811 (connected via 2 wire UART).
-hciattach works and i can use some bccmd commands but when i do a 
-warmreset (to activate my pskey changes) bluez seems unable to get a valid
-reply from the chip :-(
+On 22/05/18 11:45, Luiz Augusto von Dentz wrote:
+> Hi David,
+> 
+> On Tue, May 22, 2018 at 1:25 PM, David Llewellyn-Jones
+> <david@flypig.co.uk> wrote:
+>> On 22/05/18 10:50, Luiz Augusto von Dentz wrote:
+>>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>
+>>> This adds Discoverable which the application can use in case it want
+>>> to set the General Discoverable flag per instance.
+>>>
+>>> Note: This would allow for example an application to advertise as
+>>> discoverable even if the adapter is not discoverable which may be
+>>> required by dual-mode as it may not require BR/EDR to be discoverable.
+>>
+>> Thanks for these patches Luiz. I'm not sure whether it's useful for me
+>> to comment on them, or whether this is just part of the process of them
+>> winding their way towards a release.
+>>
+>> Is there anything helpful I can do with regards these?
+> 
+> It is just the regular process, Marcel made some comments that this
+> set should fix, but feel free to comment if you find there is
+> something that we should address.
 
-here my commands:
+Okay, thank you for clarifying. I'd hesitate to make comments without
+having tried it, so I'll give it a go and see if anything comes up.
 
-root@BLOKS ~# hciattach -s 38400 /dev/ttyS1 bcsp 38400 noflow
-Device setup complete
-root@BLOKS ~# hciconfig
-hci0:    Type: Primary  Bus: UART
-     BD Address: 00:02:5B:00:A5:A5  ACL MTU: 310:10  SCO MTU: 64:8
-     UP RUNNING
-     RX bytes:1314 acl:0 sco:0 events:41 errors:0
-     TX bytes:2583 acl:0 sco:0 commands:40 errors:0
+Thanks for all of your work on this. It'll be great to have this
+controllable.
 
-root@BLOKS ~# bccmd -t HCI buildname
-Build name: gem_5hci_rom_bt4.1_gemA12_1407301204_dspm_encr128 2014-07-30
-root@BLOKS ~# bccmd -t HCI psload -s 0 /data/8811.psr
-Loading PSKEY_BDADDR ... done
-Loading PSKEY_ANA_FREQ ... done
-root@BLOKS ~# bccmd -t HCI warmreset
-root@BLOKS ~# hciconfig
-hci0:    Type: Primary  Bus: UART
-     BD Address: 00:02:5B:00:A5:A5  ACL MTU: 310:10  SCO MTU: 64:8
-     UP RUNNING
-     RX bytes:1639 acl:0 sco:0 events:47 errors:0
-     TX bytes:3587 acl:0 sco:0 commands:76 errors:0
-
-root@BLOKS ~# bccmd -t HCI buildname
-Can't read version info for hci0: Connection timed out (110)
-root@BLOKS ~# bccmd -t HCI psload -s 0 /data/8811.psr
-Can't read version info for hci0: Connection timed out (110)
-root@BLOKS ~#
-
-
-while executing the commands above i get the following kernel messages:
-
-[  308.225409] NET: Registered protocol family 31
-[  308.229874] Bluetooth: HCI device and connection manager initialized
-[  308.237778] Bluetooth: HCI socket layer initialized
-[  308.242980] Bluetooth: L2CAP socket layer initialized
-[  308.248113] Bluetooth: SCO socket layer initialized
-[  308.256807] Bluetooth: HCI UART driver ver 2.3
-[  308.261273] Bluetooth: HCI UART protocol BCSP registered
-[  308.290364] Bluetooth: Out-of-order packet arrived, got 1 expected 0
-[  409.275259] Bluetooth: hci0 command 0x1001 tx timeout
-[  439.755276] Bluetooth: hci0 command 0x1001 tx timeout
-[  533.420270] Bluetooth: Checksum failed: computed d032 received d000
-
-
-any ideas?
-
-Thanks,
-
-
-Tobi
-
+David
+-- 
+Website: http://www.flypig.co.uk
