@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 6/8] doc/advertising-api: Add DiscoverableTimeout property
-Date: Tue, 22 May 2018 12:50:09 +0300
-Message-Id: <20180522095011.517-6-luiz.dentz@gmail.com>
+Subject: [PATCH v3 5/8] client: Print AD Data and Discoverable once registered
+Date: Tue, 22 May 2018 12:50:08 +0300
+Message-Id: <20180522095011.517-5-luiz.dentz@gmail.com>
 In-Reply-To: <20180522095011.517-1-luiz.dentz@gmail.com>
 References: <20180522095011.517-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This property can control how long an instance is visible.
----
- doc/advertising-api.txt | 9 +++++++++
- 1 file changed, 9 insertions(+)
+This prints both Data and Discoverable if advertise command succeeds:
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index 96deeeccd..cfce0f9a3 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -86,6 +86,15 @@ Properties	string Type
- 			Note: This property shall not be set when Type is set
- 			to broadcast.
+[bluetooth]# advertise.data 0x26 0x01 0x00
+[bluetooth]# advertise.discoverable on
+[bluetooth]# advertise on
+Advertising object registered
+Data Type: 0x26
+  01 00                                            ..
+Tx Power: off
+Name: off
+Apperance: off
+Discoverable: on
+---
+ client/advertising.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/client/advertising.c b/client/advertising.c
+index cb0ca4a57..8abf4785b 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -164,6 +164,11 @@ static void print_ad(void)
+ 						ad.manufacturer.data.len);
+ 	}
  
-+		uint16 DiscoverableTimeout [Experimental]
++	if (ad.data.data.len) {
++		bt_shell_printf("Data Type: 0x%02x\n", ad.data.type);
++		bt_shell_hexdump(ad.data.data.data, ad.data.data.len);
++	}
 +
-+			The discoverable timeout in seconds. A value of zero
-+			means that the timeout is disabled and it will stay in
-+			discoverable/limited mode forever.
-+
-+			Note: This property shall not be set when Type is set
-+			to broadcast.
-+
- 		array{string} Includes
+ 	bt_shell_printf("Tx Power: %s\n", ad.tx_power ? "on" : "off");
  
- 			List of features to be included in the advertising
+ 	if (ad.local_name)
+@@ -179,6 +184,8 @@ static void print_ad(void)
+ 		bt_shell_printf("Apperance: %s\n",
+ 					ad.appearance ? "on" : "off");
+ 
++	bt_shell_printf("Discoverable: %s\n", ad.discoverable ? "on": "off");
++
+ 	if (ad.duration)
+ 		bt_shell_printf("Duration: %u sec\n", ad.duration);
+ 
 -- 
 2.14.3
 
