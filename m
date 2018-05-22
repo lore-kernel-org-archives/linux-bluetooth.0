@@ -1,122 +1,184 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/8] advertising: Add implementation of Discoverable property
-Date: Tue, 22 May 2018 12:50:06 +0300
-Message-Id: <20180522095011.517-3-luiz.dentz@gmail.com>
+Subject: [PATCH v3 2/8] shared/ad: Add function to manipulate flags
+Date: Tue, 22 May 2018 12:50:05 +0300
+Message-Id: <20180522095011.517-2-luiz.dentz@gmail.com>
 In-Reply-To: <20180522095011.517-1-luiz.dentz@gmail.com>
 References: <20180522095011.517-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This parses the contents of Discoverable property and add it to AD data
-directly using bt_ad_add_flags.
+This adds basically functionality to manipulate AD flags.
 ---
- src/advertising.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 65 insertions(+), 1 deletion(-)
+ src/shared/ad.c | 106 +++++++++++++++++++++++++++++++++++++++-----------------
+ src/shared/ad.h |   6 ++++
+ 2 files changed, 80 insertions(+), 32 deletions(-)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index b087b48b7..cba30ada0 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -641,6 +641,56 @@ fail:
- 	return false;
+diff --git a/src/shared/ad.c b/src/shared/ad.c
+index f0e62cef1..3ceb87632 100644
+--- a/src/shared/ad.c
++++ b/src/shared/ad.c
+@@ -127,6 +127,48 @@ void bt_ad_unref(struct bt_ad *ad)
+ 	free(ad);
  }
  
-+static bool set_flags(struct btd_adv_client *client, uint8_t flags)
++static bool data_type_match(const void *data, const void *user_data)
 +{
-+	if (!flags) {
-+		bt_ad_clear_flags(client->data);
-+		return true;
-+	}
++	const struct bt_ad_data *a = data;
++	const uint8_t type = PTR_TO_UINT(user_data);
 +
-+	/* Set BR/EDR Not Supported for LE only */
-+	if (!btd_adapter_get_bredr(client->manager->adapter))
-+		flags |= 0x04;
-+
-+	if (!bt_ad_add_flags(client->data, &flags, 1))
-+		return false;
-+
-+	return true;
++	return a->type == type;
 +}
 +
-+static bool parse_discoverable(DBusMessageIter *iter,
-+				struct btd_adv_client *client)
++static bool ad_replace_data(struct bt_ad *ad, uint8_t type, void *data,
++							size_t len)
 +{
-+	uint8_t flags;
-+	dbus_bool_t discoverable;
++	struct bt_ad_data *new_data;
 +
-+	if (!iter) {
-+		bt_ad_clear_flags(client->data);
++	new_data = queue_find(ad->data, data_type_match, UINT_TO_PTR(type));
++	if (new_data) {
++		if (new_data->len == len && !memcmp(new_data->data, data, len))
++			return false;
++		new_data->data = realloc(new_data->data, len);
++		memcpy(new_data->data, data, len);
++		new_data->len = len;
 +		return true;
 +	}
 +
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
++	new_data = new0(struct bt_ad_data, 1);
++	new_data->type = type;
++	new_data->data = malloc(len);
++	if (!new_data->data) {
++		free(new_data);
 +		return false;
++	}
 +
-+	dbus_message_iter_get_basic(iter, &discoverable);
++	memcpy(new_data->data, data, len);
++	new_data->len = len;
 +
-+	if (discoverable)
-+		flags = 0x02;
-+	else
-+		flags = 0x00;
++	if (queue_push_tail(ad->data, new_data))
++		return true;
 +
-+	if (!set_flags(client , flags))
-+		goto fail;
++	data_destroy(new_data);
 +
-+	DBG("Adding Flags 0x%02x", flags);
-+
-+	return true;
-+
-+fail:
-+	bt_ad_clear_flags(client->data);
 +	return false;
 +}
 +
- static struct adv_parser {
- 	const char *name;
- 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
-@@ -656,6 +706,7 @@ static struct adv_parser {
- 	{ "Duration", parse_duration },
- 	{ "Timeout", parse_timeout },
- 	{ "Data", parse_data },
-+	{ "Discoverable", parse_discoverable },
- 	{ },
- };
+ static size_t uuid_list_length(struct queue *uuid_queue)
+ {
+ 	bool uuid16_included = false;
+@@ -809,12 +851,39 @@ void bt_ad_clear_appearance(struct bt_ad *ad)
+ 	ad->appearance = UINT16_MAX;
+ }
  
-@@ -737,7 +788,8 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
- 	if (client->type == AD_TYPE_PERIPHERAL) {
- 		flags = MGMT_ADV_FLAG_CONNECTABLE;
+-static bool data_type_match(const void *data, const void *user_data)
++bool bt_ad_add_flags(struct bt_ad *ad, uint8_t *flags, size_t len)
+ {
+-	const struct bt_ad_data *a = data;
+-	const uint8_t type = PTR_TO_UINT(user_data);
++	if (!ad)
++		return false;
  
--		if (btd_adapter_get_discoverable(client->manager->adapter))
-+		if (btd_adapter_get_discoverable(client->manager->adapter) &&
-+				!(bt_ad_has_flags(client->data)))
- 			flags |= MGMT_ADV_FLAG_DISCOV;
- 	}
- 
-@@ -881,6 +933,18 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
- 		}
- 	}
- 
-+	/* BLUETOOTH SPECIFICATION Version 5.0 | Vol 3, Part C page 2042:
-+	 * A device in the broadcast mode shall not set the
-+	 * ‘LE General Discoverable Mode’ flag or the
-+	 * ‘LE Limited Discoverable Mode’ flag in the Flags AD Type as
-+	 * defined in [Core Specification Supplement], Part A, Section 1.3.
-+	 */
-+	if (client->type == AD_TYPE_BROADCAST &&
-+				bt_ad_has_flags(client->data)) {
-+		error("Broadcast cannot set flags");
-+		goto fail;
-+	}
+-	return a->type == type;
++	/* TODO: Add table to check other flags */
++	if (len > 1 || flags[0] & 0xe0)
++		return false;
 +
- 	err = refresh_adv(client, add_adv_callback);
- 	if (!err)
- 		return NULL;
++	return ad_replace_data(ad, BT_AD_FLAGS, flags, len);
++}
++
++bool bt_ad_has_flags(struct bt_ad *ad)
++{
++	struct bt_ad_data *data;
++
++	if (!ad)
++		return false;
++
++	data = queue_find(ad->data, data_type_match, UINT_TO_PTR(BT_AD_FLAGS));
++	if (!data)
++		return false;
++
++	return true;
++}
++
++void bt_ad_clear_flags(struct bt_ad *ad)
++{
++	if (!ad)
++		return;
++
++	queue_remove_all(ad->data, data_type_match, UINT_TO_PTR(BT_AD_FLAGS),
++							data_destroy);
+ }
+ 
+ static uint8_t type_blacklist[] = {
+@@ -862,7 +931,6 @@ static uint8_t type_blacklist[] = {
+ 
+ bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len)
+ {
+-	struct bt_ad_data *new_data;
+ 	size_t i;
+ 
+ 	if (!ad)
+@@ -871,38 +939,12 @@ bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len)
+ 	if (len > (MAX_ADV_DATA_LEN - 2))
+ 		return false;
+ 
+-	new_data = queue_find(ad->data, data_type_match, UINT_TO_PTR(type));
+-	if (new_data) {
+-		if (new_data->len == len && !memcmp(new_data->data, data, len))
+-			return false;
+-		new_data->data = realloc(new_data->data, len);
+-		memcpy(new_data->data, data, len);
+-		new_data->len = len;
+-		return true;
+-	}
+-
+ 	for (i = 0; i < sizeof(type_blacklist); i++) {
+ 		if (type == type_blacklist[i])
+ 			return false;
+ 	}
+ 
+-	new_data = new0(struct bt_ad_data, 1);
+-	new_data->type = type;
+-	new_data->data = malloc(len);
+-	if (!new_data->data) {
+-		free(new_data);
+-		return false;
+-	}
+-
+-	memcpy(new_data->data, data, len);
+-	new_data->len = len;
+-
+-	if (queue_push_tail(ad->data, new_data))
+-		return true;
+-
+-	data_destroy(new_data);
+-
+-	return false;
++	return ad_replace_data(ad, type, data, len);
+ }
+ 
+ static bool data_match(const void *data, const void *user_data)
+diff --git a/src/shared/ad.h b/src/shared/ad.h
+index 8d705323b..a31df0fe5 100644
+--- a/src/shared/ad.h
++++ b/src/shared/ad.h
+@@ -147,6 +147,12 @@ bool bt_ad_add_appearance(struct bt_ad *ad, uint16_t appearance);
+ 
+ void bt_ad_clear_appearance(struct bt_ad *ad);
+ 
++bool bt_ad_add_flags(struct bt_ad *ad, uint8_t *flags, size_t len);
++
++bool bt_ad_has_flags(struct bt_ad *ad);
++
++void bt_ad_clear_flags(struct bt_ad *ad);
++
+ bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len);
+ 
+ bool bt_ad_has_data(struct bt_ad *ad, const struct bt_ad_data *data);
 -- 
 2.14.3
 
