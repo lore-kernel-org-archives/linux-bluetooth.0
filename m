@@ -1,43 +1,45 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 1/8] doc/advertising-api: Add Discoverable property
-Date: Tue, 22 May 2018 12:50:04 +0300
-Message-Id: <20180522095011.517-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Message-ID: <1526976323.18877.47.camel@mtkswgap22>
+Subject: Re: [PATCH v2 4/7] Bluetooth: Add new quirk for non-persistent
+ setup settings
+From: Sean Wang <sean.wang@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Date: Tue, 22 May 2018 16:05:23 +0800
+In-Reply-To: <920B3BE9-3FE8-4AC6-8C5F-63B0E00182AC@holtmann.org>
+References: <cover.1526374087.git.sean.wang@mediatek.com>
+         <1d6097f538b3182b2876ad48225ecd6e2d1b128c.1526374087.git.sean.wang@mediatek.com>
+         <920B3BE9-3FE8-4AC6-8C5F-63B0E00182AC@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, 2018-05-22 at 09:21 +0200, Marcel Holtmann wrote:
+> Hi Sean,
+> 
 
-This adds Discoverable which the application can use in case it want
-to set the General Discoverable flag per instance.
+[ ... ]
 
-Note: This would allow for example an application to advertise as
-discoverable even if the adapter is not discoverable which may be
-required by dual-mode as it may not require BR/EDR to be discoverable.
----
- doc/advertising-api.txt | 8 ++++++++
- 1 file changed, 8 insertions(+)
+> > -	if (hci_dev_test_flag(hdev, HCI_SETUP)) {
+> > +	if (hci_dev_test_flag(hdev, HCI_SETUP) ||
+> > +	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+> > 		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+> 
+> I am not 100% sure that we want to send the HCI_DEV_SETUP event also multiple times. That is a userspace change that I would need to think about. We need to check create_monitor_event() and see what the btmon trace for this looks like. Can you send me a btmon -w trace.log when this change is active.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-index eef98ad91..96deeeccd 100644
---- a/doc/advertising-api.txt
-+++ b/doc/advertising-api.txt
-@@ -78,6 +78,14 @@ Properties	string Type
- 				<Transport Discovery> <Organization Flags...>
- 				0x26                   0x01         0x01...
- 
-+		bool Discoverable [Experimental]
-+
-+			Advertise as general discoverable. When present this
-+			will override adapter Discoverable property.
-+
-+			Note: This property shall not be set when Type is set
-+			to broadcast.
-+
- 		array{string} Includes
- 
- 			List of features to be included in the advertising
--- 
-2.14.3
+Sure, I'll send you the trace.log with the change is active.
 
+	Sean
