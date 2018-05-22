@@ -1,153 +1,122 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 4/8] client: Add advertise.discoverable command
-Date: Tue, 22 May 2018 12:50:07 +0300
-Message-Id: <20180522095011.517-4-luiz.dentz@gmail.com>
+Subject: [PATCH v3 3/8] advertising: Add implementation of Discoverable property
+Date: Tue, 22 May 2018 12:50:06 +0300
+Message-Id: <20180522095011.517-3-luiz.dentz@gmail.com>
 In-Reply-To: <20180522095011.517-1-luiz.dentz@gmail.com>
 References: <20180522095011.517-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds advertise.discoverable command which can be used to set it
-own instance:
-
-[bluetooth]# advertise.discoverable on
-[bluetooth]# advertise on
-
-@ MGMT Command: Add Advertising (0x003e) plen 14
-        Instance: 1
-        Flags: 0x00000001
-          Switch into Connectable mode
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 3
-        Flags: 0x02
-          LE General Discoverable Mode
-        Scan response length: 0
-< HCI Command: LE Set Advertising Data (0x08|0x0008) plen 32
-        Length: 3
-        Flags: 0x02
-          LE General Discoverable Mode
+This parses the contents of Discoverable property and add it to AD data
+directly using bt_ad_add_flags.
 ---
- client/advertising.c | 35 +++++++++++++++++++++++++++++++++++
- client/advertising.h |  1 +
- client/main.c        | 17 +++++++++++++++++
- 3 files changed, 53 insertions(+)
+ src/advertising.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 65 insertions(+), 1 deletion(-)
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 39f99467b..cb0ca4a57 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -71,6 +71,7 @@ static struct ad {
- 	struct service_data service;
- 	struct manufacturer_data manufacturer;
- 	struct data data;
-+	bool discoverable;
- 	bool tx_power;
- 	bool name;
- 	bool appearance;
-@@ -401,6 +402,21 @@ static gboolean get_data(const GDBusPropertyTable *property,
- 	return TRUE;
+diff --git a/src/advertising.c b/src/advertising.c
+index b087b48b7..cba30ada0 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -641,6 +641,56 @@ fail:
+ 	return false;
  }
  
-+static gboolean discoverable_exists(const GDBusPropertyTable *property,
-+							void *data)
++static bool set_flags(struct btd_adv_client *client, uint8_t flags)
 +{
-+	return ad.discoverable;
-+}
-+
-+static gboolean get_discoverable(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
-+							&ad.discoverable);
-+
-+	return TRUE;
-+}
-+
- static const GDBusPropertyTable ad_props[] = {
- 	{ "Type", "s", get_type },
- 	{ "ServiceUUIDs", "as", get_uuids, NULL, uuids_exists },
-@@ -408,6 +424,7 @@ static const GDBusPropertyTable ad_props[] = {
- 	{ "ManufacturerData", "a{qv}", get_manufacturer_data, NULL,
- 						manufacturer_data_exists },
- 	{ "Data", "a{yv}", get_data, NULL, data_exists },
-+	{ "Discoverable", "b", get_discoverable, NULL, discoverable_exists },
- 	{ "Includes", "as", get_includes, NULL, includes_exists },
- 	{ "LocalName", "s", get_local_name, NULL, local_name_exits },
- 	{ "Appearance", "q", get_appearance, NULL, appearance_exits },
-@@ -708,6 +725,24 @@ void ad_disable_data(DBusConnection *conn)
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
- 
-+void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value)
-+{
-+	if (!value) {
-+		bt_shell_printf("Discoverable: %s\n",
-+				ad.discoverable ? "on" : "off");
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	if (!flags) {
++		bt_ad_clear_flags(client->data);
++		return true;
 +	}
 +
-+	if (ad.discoverable == *value)
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	/* Set BR/EDR Not Supported for LE only */
++	if (!btd_adapter_get_bredr(client->manager->adapter))
++		flags |= 0x04;
 +
-+	ad.discoverable = *value;
++	if (!bt_ad_add_flags(client->data, &flags, 1))
++		return false;
 +
-+	g_dbus_emit_property_changed(conn, AD_PATH, AD_IFACE, "Discoverable");
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++	return true;
 +}
 +
- void ad_advertise_tx_power(DBusConnection *conn, dbus_bool_t *value)
- {
- 	if (!value) {
-diff --git a/client/advertising.h b/client/advertising.h
-index 12b4d69c1..599190866 100644
---- a/client/advertising.h
-+++ b/client/advertising.h
-@@ -39,3 +39,4 @@ void ad_advertise_duration(DBusConnection *conn, long int *value);
- void ad_advertise_timeout(DBusConnection *conn, long int *value);
- void ad_advertise_data(DBusConnection *conn, int argc, char *argv[]);
- void ad_disable_data(DBusConnection *conn);
-+void ad_advertise_discoverable(DBusConnection *conn, dbus_bool_t *value);
-diff --git a/client/main.c b/client/main.c
-index 52d807946..26ce94947 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2213,6 +2213,21 @@ static void cmd_advertise_data(int argc, char *argv[])
- 	ad_advertise_data(dbus_conn, argc, argv);
- }
- 
-+static void cmd_advertise_discoverable(int argc, char *argv[])
++static bool parse_discoverable(DBusMessageIter *iter,
++				struct btd_adv_client *client)
 +{
++	uint8_t flags;
 +	dbus_bool_t discoverable;
 +
-+	if (argc < 2) {
-+		ad_advertise_discoverable(dbus_conn, NULL);
-+		return;
++	if (!iter) {
++		bt_ad_clear_flags(client->data);
++		return true;
 +	}
 +
-+	if (!parse_argument(argc, argv, NULL, NULL, &discoverable, NULL))
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_BOOLEAN)
++		return false;
 +
-+	ad_advertise_discoverable(dbus_conn, &discoverable);
++	dbus_message_iter_get_basic(iter, &discoverable);
++
++	if (discoverable)
++		flags = 0x02;
++	else
++		flags = 0x00;
++
++	if (!set_flags(client , flags))
++		goto fail;
++
++	DBG("Adding Flags 0x%02x", flags);
++
++	return true;
++
++fail:
++	bt_ad_clear_flags(client->data);
++	return false;
 +}
 +
- static void cmd_advertise_tx_power(int argc, char *argv[])
- {
- 	dbus_bool_t powered;
-@@ -2403,6 +2418,8 @@ static const struct bt_shell_menu advertise_menu = {
- 			"Set/Get advertise manufacturer data" },
- 	{ "data", "[type] [data=xx xx ...]", cmd_advertise_data,
- 			"Set/Get advertise data" },
-+	{ "discoverable", "[on/off]", cmd_advertise_discoverable,
-+			"Set/Get advertise discoverable" },
- 	{ "tx-power", "[on/off]", cmd_advertise_tx_power,
- 			"Show/Enable/Disable TX power to be advertised",
- 							NULL },
+ static struct adv_parser {
+ 	const char *name;
+ 	bool (*func)(DBusMessageIter *iter, struct btd_adv_client *client);
+@@ -656,6 +706,7 @@ static struct adv_parser {
+ 	{ "Duration", parse_duration },
+ 	{ "Timeout", parse_timeout },
+ 	{ "Data", parse_data },
++	{ "Discoverable", parse_discoverable },
+ 	{ },
+ };
+ 
+@@ -737,7 +788,8 @@ static int refresh_adv(struct btd_adv_client *client, mgmt_request_func_t func)
+ 	if (client->type == AD_TYPE_PERIPHERAL) {
+ 		flags = MGMT_ADV_FLAG_CONNECTABLE;
+ 
+-		if (btd_adapter_get_discoverable(client->manager->adapter))
++		if (btd_adapter_get_discoverable(client->manager->adapter) &&
++				!(bt_ad_has_flags(client->data)))
+ 			flags |= MGMT_ADV_FLAG_DISCOV;
+ 	}
+ 
+@@ -881,6 +933,18 @@ static DBusMessage *parse_advertisement(struct btd_adv_client *client)
+ 		}
+ 	}
+ 
++	/* BLUETOOTH SPECIFICATION Version 5.0 | Vol 3, Part C page 2042:
++	 * A device in the broadcast mode shall not set the
++	 * ‘LE General Discoverable Mode’ flag or the
++	 * ‘LE Limited Discoverable Mode’ flag in the Flags AD Type as
++	 * defined in [Core Specification Supplement], Part A, Section 1.3.
++	 */
++	if (client->type == AD_TYPE_BROADCAST &&
++				bt_ad_has_flags(client->data)) {
++		error("Broadcast cannot set flags");
++		goto fail;
++	}
++
+ 	err = refresh_adv(client, add_adv_callback);
+ 	if (!err)
+ 		return NULL;
 -- 
 2.14.3
 
