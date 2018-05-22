@@ -1,184 +1,43 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/8] shared/ad: Add function to manipulate flags
-Date: Tue, 22 May 2018 12:50:05 +0300
-Message-Id: <20180522095011.517-2-luiz.dentz@gmail.com>
-In-Reply-To: <20180522095011.517-1-luiz.dentz@gmail.com>
-References: <20180522095011.517-1-luiz.dentz@gmail.com>
+Subject: [PATCH v3 1/8] doc/advertising-api: Add Discoverable property
+Date: Tue, 22 May 2018 12:50:04 +0300
+Message-Id: <20180522095011.517-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds basically functionality to manipulate AD flags.
----
- src/shared/ad.c | 106 +++++++++++++++++++++++++++++++++++++++-----------------
- src/shared/ad.h |   6 ++++
- 2 files changed, 80 insertions(+), 32 deletions(-)
+This adds Discoverable which the application can use in case it want
+to set the General Discoverable flag per instance.
 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index f0e62cef1..3ceb87632 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -127,6 +127,48 @@ void bt_ad_unref(struct bt_ad *ad)
- 	free(ad);
- }
+Note: This would allow for example an application to advertise as
+discoverable even if the adapter is not discoverable which may be
+required by dual-mode as it may not require BR/EDR to be discoverable.
+---
+ doc/advertising-api.txt | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index eef98ad91..96deeeccd 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -78,6 +78,14 @@ Properties	string Type
+ 				<Transport Discovery> <Organization Flags...>
+ 				0x26                   0x01         0x01...
  
-+static bool data_type_match(const void *data, const void *user_data)
-+{
-+	const struct bt_ad_data *a = data;
-+	const uint8_t type = PTR_TO_UINT(user_data);
++		bool Discoverable [Experimental]
 +
-+	return a->type == type;
-+}
++			Advertise as general discoverable. When present this
++			will override adapter Discoverable property.
 +
-+static bool ad_replace_data(struct bt_ad *ad, uint8_t type, void *data,
-+							size_t len)
-+{
-+	struct bt_ad_data *new_data;
++			Note: This property shall not be set when Type is set
++			to broadcast.
 +
-+	new_data = queue_find(ad->data, data_type_match, UINT_TO_PTR(type));
-+	if (new_data) {
-+		if (new_data->len == len && !memcmp(new_data->data, data, len))
-+			return false;
-+		new_data->data = realloc(new_data->data, len);
-+		memcpy(new_data->data, data, len);
-+		new_data->len = len;
-+		return true;
-+	}
-+
-+	new_data = new0(struct bt_ad_data, 1);
-+	new_data->type = type;
-+	new_data->data = malloc(len);
-+	if (!new_data->data) {
-+		free(new_data);
-+		return false;
-+	}
-+
-+	memcpy(new_data->data, data, len);
-+	new_data->len = len;
-+
-+	if (queue_push_tail(ad->data, new_data))
-+		return true;
-+
-+	data_destroy(new_data);
-+
-+	return false;
-+}
-+
- static size_t uuid_list_length(struct queue *uuid_queue)
- {
- 	bool uuid16_included = false;
-@@ -809,12 +851,39 @@ void bt_ad_clear_appearance(struct bt_ad *ad)
- 	ad->appearance = UINT16_MAX;
- }
+ 		array{string} Includes
  
--static bool data_type_match(const void *data, const void *user_data)
-+bool bt_ad_add_flags(struct bt_ad *ad, uint8_t *flags, size_t len)
- {
--	const struct bt_ad_data *a = data;
--	const uint8_t type = PTR_TO_UINT(user_data);
-+	if (!ad)
-+		return false;
- 
--	return a->type == type;
-+	/* TODO: Add table to check other flags */
-+	if (len > 1 || flags[0] & 0xe0)
-+		return false;
-+
-+	return ad_replace_data(ad, BT_AD_FLAGS, flags, len);
-+}
-+
-+bool bt_ad_has_flags(struct bt_ad *ad)
-+{
-+	struct bt_ad_data *data;
-+
-+	if (!ad)
-+		return false;
-+
-+	data = queue_find(ad->data, data_type_match, UINT_TO_PTR(BT_AD_FLAGS));
-+	if (!data)
-+		return false;
-+
-+	return true;
-+}
-+
-+void bt_ad_clear_flags(struct bt_ad *ad)
-+{
-+	if (!ad)
-+		return;
-+
-+	queue_remove_all(ad->data, data_type_match, UINT_TO_PTR(BT_AD_FLAGS),
-+							data_destroy);
- }
- 
- static uint8_t type_blacklist[] = {
-@@ -862,7 +931,6 @@ static uint8_t type_blacklist[] = {
- 
- bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len)
- {
--	struct bt_ad_data *new_data;
- 	size_t i;
- 
- 	if (!ad)
-@@ -871,38 +939,12 @@ bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len)
- 	if (len > (MAX_ADV_DATA_LEN - 2))
- 		return false;
- 
--	new_data = queue_find(ad->data, data_type_match, UINT_TO_PTR(type));
--	if (new_data) {
--		if (new_data->len == len && !memcmp(new_data->data, data, len))
--			return false;
--		new_data->data = realloc(new_data->data, len);
--		memcpy(new_data->data, data, len);
--		new_data->len = len;
--		return true;
--	}
--
- 	for (i = 0; i < sizeof(type_blacklist); i++) {
- 		if (type == type_blacklist[i])
- 			return false;
- 	}
- 
--	new_data = new0(struct bt_ad_data, 1);
--	new_data->type = type;
--	new_data->data = malloc(len);
--	if (!new_data->data) {
--		free(new_data);
--		return false;
--	}
--
--	memcpy(new_data->data, data, len);
--	new_data->len = len;
--
--	if (queue_push_tail(ad->data, new_data))
--		return true;
--
--	data_destroy(new_data);
--
--	return false;
-+	return ad_replace_data(ad, type, data, len);
- }
- 
- static bool data_match(const void *data, const void *user_data)
-diff --git a/src/shared/ad.h b/src/shared/ad.h
-index 8d705323b..a31df0fe5 100644
---- a/src/shared/ad.h
-+++ b/src/shared/ad.h
-@@ -147,6 +147,12 @@ bool bt_ad_add_appearance(struct bt_ad *ad, uint16_t appearance);
- 
- void bt_ad_clear_appearance(struct bt_ad *ad);
- 
-+bool bt_ad_add_flags(struct bt_ad *ad, uint8_t *flags, size_t len);
-+
-+bool bt_ad_has_flags(struct bt_ad *ad);
-+
-+void bt_ad_clear_flags(struct bt_ad *ad);
-+
- bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len);
- 
- bool bt_ad_has_data(struct bt_ad *ad, const struct bt_ad_data *data);
+ 			List of features to be included in the advertising
 -- 
 2.14.3
 
