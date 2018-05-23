@@ -1,96 +1,119 @@
-Return-Path: <hdegoede@redhat.com>
-To: Jeremy Cline <jcline@redhat.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Marcel Holtmann <marcel@holtmann.org>
-From: Hans de Goede <hdegoede@redhat.com>
-Subject: RTL8723BS bluetooth almost working with serdev enumeration, need help
-Cc: linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-acpi <linux-acpi@vger.kernel.org>
-Message-ID: <208ad44f-ade6-5f27-47f1-7fe012be1bdc@redhat.com>
-Date: Wed, 23 May 2018 23:04:48 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: KORG nanoKONTROL Studio ... again
+From: Robert Schneider <Robert.Schneider@aramar.de>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <4f787a1b-848b-be07-bdd0-198892c56120@aramar.de>
+ <CABBYNZ+HQ2CeuHLrx1w5k6BK-AV8SYbdE_-TOej522cwf-BtUg@mail.gmail.com>
+ <f557429f-e61b-1ac6-c894-bc84db45c65c@aramar.de>
+ <CABBYNZKS+xNeiW6p+_aLp=K8Fu8DoSX+7xTt5x7-SOHkhXX=fw@mail.gmail.com>
+ <9dac26c6-72ee-7368-cb2b-62747e0e9707@aramar.de>
+Message-ID: <4650be8c-54dc-ba8e-ff91-e9a4cb9402f6@aramar.de>
+Date: Wed, 23 May 2018 19:23:38 +0200
 MIME-Version: 1.0
+In-Reply-To: <9dac26c6-72ee-7368-cb2b-62747e0e9707@aramar.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi all,
 
-The last 2 evenings I've been working on
-$subject, based on:
+I did some more testing today, after compiling a bluetoothd that has MIDI 
+support, the device now shows up in the alsa MIDI devices list, however, 
+communication fails. As I am not savvy enough to interpret this, could someone 
+more technically involved shed some light on this for me?
 
-1) The btrtl patches from Martin Blumenstingl; +
-2) The bt3wire driver from Marcel Holtmann; +
-3) ACPI serdev binding support for the bt3wire driver
-    by Jeremy Cline
+I see that "bonding" fails with status 5. But that doesn't tell me anything. 
+Especially, I would be interested in how I could solve that issue.
 
-See: https://github.com/jwrdegoede/linux-sunxi/commits/master
-for the code, although there is not much to
-see there really.
+Thanks in advance and regards,
 
-I have this almost working, the problem I have
-is really weird.
+Robert
 
-If I start up a tablet with a RTL8723BS wifi
-chip and then log in using a bluetooth keyboard
-everything works.
-
-But if I log in with an USB keyboard, then I get
-the following messages, first in journal we see
-pulseaudio doing some setup to support bluetooth
-audio (it seems to do this as soon as I login):
-
-Bluetoothd[1282]: Endpoint registered: sender=:1.51 path=/MediaEndpoint/A2DPSource
-Bluetoothd[1282]: Endpoint registered: sender=:1.51 path=/MediaEndpoint/A2DPSink
-
-And then 2 seconds later I get:
-
-[  191.177256] Bluetooth: hci0: command 0x0c24 tx timeout
-[  191.179538] Bluetooth: hci0: Acknowledgement packet
-[  193.226082] Bluetooth: hci0: command 0x0c52 tx timeout
-
-And if I press a key on the bluetooth keyboard after this:
-
-[ 1739.156758] Bluetooth: hci0: Acknowledgement packet
-[ 1741.182473] Bluetooth: hci0: command 0x0409 tx timeout
-
-Unloading and reloading the bt3wire module fixes this. Note
-that the bt controller sends Acknowledgement packets instead
-of a regular reply it seems, at least after the initial
-timeout.
-
-If I hack the kernel to not do serdev enumeration for the uart
-so I get a /dev/ttyS4 and then use:
-
-https://github.com/lwfinger/rtl8723bs_bt
-
-I do not get this problem.
-
-It almost is as if after we've initialized the bt controller
-through bt3wire.c it is in a sleep state or something
-and the bt keyboard sending data first wakes it up...?
-
-One thing which I found is that the hciattach_rtk.c
-userspace code sends an ack to the controller after
-it completes uploading the firmware. I tried to
-duplicate this like this:
-
---- a/drivers/bluetooth/bt3wire.c
-+++ b/drivers/bluetooth/bt3wire.c
-
-@@ -788,6 +808,9 @@ static int bt3wire_btrtl_setup(struct bt3wire_dev *bdev)
-
-         err = btrtl_download_firmware(bdev->hdev, btrtl_dev);
-
-+       bt3wire_queue_pkt(bdev, PKT_TYPE_ACK, NULL, 0);
-+       bt3wire_tx_wakeup(bdev);
-+
-  out_free:
-         btrtl_free(btrtl_dev);
-
-
-But I believe that is not the right way, I think that instead I should
-__hci_cmd_sync() but it is not entirely clear to me what I need to
-pass to that function to get the equivalent of bt3wire_queue_pkt(bdev, PKT_TYPE_ACK, NULL, 0);
-
-Regards,
-
-Hans
+bluetoothd[890]: src/device.c:device_probe_profiles() Probing profiles for 
+device 60:F1:89:28:DA:1F
+bluetoothd[890]: profiles/midi/midi.c:midi_device_probe() MIDI GATT Driver 
+profile probe (60:F1:89:28:DA:1F)
+bluetoothd[890]: src/service.c:change_state() 0x5649f05dc240: device 
+60:F1:89:28:DA:1F profile MIDI GATT Driver state changed: unavailable -> 
+disconnected (0)
+bluetoothd[890]: src/device.c:device_set_auto_connect() 60:F1:89:28:DA:1F auto 
+connect: 1
+bluetoothd[890]: src/device.c:device_set_auto_connect() Already connected
+bluetoothd[890]: profiles/midi/midi.c:midi_accept() MIDI GATT Driver profile 
+accept (60:F1:89:28:DA:1F)
+bluetoothd[890]: profiles/midi/midi.c:handle_midi_io() MIDI I/O handle: 0x001b
+bluetoothd[890]: src/service.c:change_state() 0x5649f05dc240: device 
+60:F1:89:28:DA:1F profile MIDI GATT Driver state changed: disconnected -> 
+connected (0)
+bluetoothd[890]: src/service.c:btd_service_ref() 0x5649f05dc240: ref=2
+bluetoothd[890]: plugins/policy.c:service_cb() Added MIDI GATT Driver reconnect 0
+bluetoothd[890]: src/gatt-client.c:btd_gatt_client_ready() GATT client ready
+bluetoothd[890]: src/gatt-client.c:create_services() Exporting objects for GATT 
+services: 60:F1:89:28:DA:1F
+bluetoothd[890]: src/gatt-client.c:service_create() Exported GATT service: 
+/org/bluez/hci0/dev_60_F1_89_28_DA_1F/service000c
+bluetoothd[890]: src/gatt-client.c:characteristic_create() Exported GATT 
+characteristic: /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service000c/char000d
+bluetoothd[890]: src/gatt-client.c:descriptor_create() Exported GATT 
+characteristic descriptor: 
+/org/bluez/hci0/dev_60_F1_89_28_DA_1F/service000c/char000d/desc000f
+bluetoothd[890]: src/gatt-client.c:service_create() Exported GATT service: 
+/org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0010
+bluetoothd[890]: src/gatt-client.c:characteristic_create() Exported GATT 
+characteristic: /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0010/char0011
+bluetoothd[890]: src/gatt-client.c:characteristic_create() Exported GATT 
+characteristic: /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0010/char0013
+bluetoothd[890]: src/gatt-client.c:service_create() Exported GATT service: 
+/org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0015
+bluetoothd[890]: src/gatt-client.c:characteristic_create() Exported GATT 
+characteristic: /org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0015/char0016
+bluetoothd[890]: src/gatt-client.c:descriptor_create() Exported GATT 
+characteristic descriptor: 
+/org/bluez/hci0/dev_60_F1_89_28_DA_1F/service0015/char0016/desc0018
+bluetoothd[890]: src/device.c:device_svc_resolved() 
+/org/bluez/hci0/dev_60_F1_89_28_DA_1F err 0
+bluetoothd[890]: src/adapter.c:add_device_complete() 60:F1:89:28:DA:1F (1) added 
+to kernel connect list
+bluetoothd[890]: src/device.c:gatt_debug() Registered handler for "Service 
+Changed": 1
+bluetoothd[890]: profiles/gap/gas.c:read_device_name_cb() GAP Device Name: 
+nanoKONTROL Studio
+bluetoothd[890]: profiles/gap/gas.c:read_appearance_cb() GAP Appearance: 0x0080
+bluetoothd[890]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr 
+60:F1:89:28:DA:1F type 1 status 0x5
+bluetoothd[890]: src/device.c:device_bonding_complete() bonding (nil) status 0x05
+bluetoothd[890]: src/device.c:device_bonding_failed() status 5
+bluetoothd[890]: src/adapter.c:resume_discovery()
+bluetoothd[890]: src/adapter.c:dev_disconnected() Device 60:F1:89:28:DA:1F 
+disconnected, reason 2
+bluetoothd[890]: src/adapter.c:adapter_remove_connection()
+bluetoothd[890]: plugins/policy.c:disconnect_cb() reason 2
+bluetoothd[890]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr 
+60:F1:89:28:DA:1F type 1 status 0xe
+bluetoothd[890]: src/device.c:device_bonding_complete() bonding (nil) status 0x0e
+bluetoothd[890]: src/device.c:device_bonding_failed() status 14
+bluetoothd[890]: src/adapter.c:resume_discovery()
+bluetoothd[890]: MIDI I/O: Failed to read initial request
+bluetoothd[890]: src/device.c:att_disconnected_cb()
+bluetoothd[890]: src/device.c:att_disconnected_cb() Software caused connection 
+abort (103)
+bluetoothd[890]: src/service.c:change_state() 0x5649f05ce090: device 
+60:F1:89:28:DA:1F profile gap-profile state changed: connected -> disconnecting (0)
+bluetoothd[890]: src/service.c:change_state() 0x5649f05ce090: device 
+60:F1:89:28:DA:1F profile gap-profile state changed: disconnecting -> 
+disconnected (0)
+bluetoothd[890]: src/service.c:change_state() 0x5649f05dbe30: device 
+60:F1:89:28:DA:1F profile deviceinfo state changed: connected -> disconnecting (0)
+bluetoothd[890]: src/service.c:change_state() 0x5649f05dbe30: device 
+60:F1:89:28:DA:1F profile deviceinfo state changed: disconnecting -> 
+disconnected (0)
+bluetoothd[890]: src/service.c:change_state() 0x5649f05dc240: device 
+60:F1:89:28:DA:1F profile MIDI GATT Driver state changed: connected -> 
+disconnecting (0)
+bluetoothd[890]: profiles/midi/midi.c:midi_disconnect() MIDI GATT Driver profile 
+disconnect (60:F1:89:28:DA:1F)
+bluetoothd[890]: src/service.c:change_state() 0x5649f05dc240: device 
+60:F1:89:28:DA:1F profile MIDI GATT Driver state changed: disconnecting -> 
+disconnected (0)
+bluetoothd[890]: src/gatt-client.c:btd_gatt_client_disconnected() Device 
+disconnected. Cleaning up.
