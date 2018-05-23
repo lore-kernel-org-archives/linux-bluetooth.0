@@ -1,589 +1,188 @@
-Return-Path: <bgodavar@codeaurora.org>
+Return-Path: <sean.wang@mediatek.com>
+Message-ID: <1527057423.4607.3.camel@mtkswgap22>
+Subject: Re: [SPAM]Re: [PATCH v2 4/7] Bluetooth: Add new quirk for
+ non-persistent setup settings
+From: Sean Wang <sean.wang@mediatek.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Mark Rutland <mark.rutland@arm.com>, devicetree
+	<devicetree@vger.kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	<linux-kernel@vger.kernel.org>, BlueZ development
+	<linux-bluetooth@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	<linux-mediatek@lists.infradead.org>, linux-arm-kernel
+	<linux-arm-kernel@lists.infradead.org>
+Date: Wed, 23 May 2018 14:37:03 +0800
+In-Reply-To: <1526976323.18877.47.camel@mtkswgap22>
+References: <cover.1526374087.git.sean.wang@mediatek.com>
+	 <1d6097f538b3182b2876ad48225ecd6e2d1b128c.1526374087.git.sean.wang@mediatek.com>
+	 <920B3BE9-3FE8-4AC6-8C5F-63B0E00182AC@holtmann.org>
+	 <1526976323.18877.47.camel@mtkswgap22>
+Content-Type: multipart/mixed; boundary="=-JSBWckcOte03YOpWJ8HM"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Wed, 23 May 2018 17:47:00 +0530
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
- linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
- hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v5 3/3] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth chip wcn3990.
-In-Reply-To: <20180511212520.GM19594@google.com>
-References: <1526041263-18795-1-git-send-email-bgodavar@codeaurora.org>
- <1526041263-18795-4-git-send-email-bgodavar@codeaurora.org>
- <20180511212520.GM19594@google.com>
-Message-ID: <8b8cc08dbef6cbbc2b5522330e4d9690@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Matthias,
-
-please find my comment inline.
-
-On 2018-05-12 02:55, Matthias Kaehlcke wrote:
-> Hi Bala,
-> 
-> On Fri, May 11, 2018 at 05:51:03PM +0530, Balakrishna Godavarthi wrote:
->> Add support to set voltage/current of various regulators
->> to power up/down Bluetooth chip wcn3990.
->> Add support to read baudrate from dts.
->> 
->> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> ---
-> 
-> Please include a change log also in the individual patches, not just
-> in the cover letter. In a revision after many comments it may be
-> sufficient to say "addressed <reviewers> comments", if the number if
-> changes is limited it is preferable to briefly list the individual
-> changes.
-> 
-
-[Bala]: will add from next patch set.
-
->>  drivers/bluetooth/btqca.h   |   6 +
->>  drivers/bluetooth/hci_qca.c | 547 
->> ++++++++++++++++++++++++++++++++++++++------
->>  2 files changed, 480 insertions(+), 73 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
->> index 2a7366b..8e2142a 100644
->> --- a/drivers/bluetooth/btqca.h
->> +++ b/drivers/bluetooth/btqca.h
->> @@ -37,6 +37,9 @@
->>  #define EDL_TAG_ID_HCI			(17)
->>  #define EDL_TAG_ID_DEEP_SLEEP		(27)
->> 
->> +#define CHEROKEE_POWERON_PULSE          (0xFC)
->> +#define CHEROKEE_POWEROFF_PULSE         (0xC0)
-> 
-> The parentheses are not needed around a literal. That they are used
-> for the other values is IMO no good reason to introduce more of them.
-> You might want to squeeze in a clean up patch that removes them for
-> the other defines.
-> 
->> +int btqca_power_setup(bool on);
->> +int qca_btsoc_cleanup(struct hci_dev *hdev);
-> 
-> nit: inconsistent naming.
-> 
-> If maintainers and authors have no objections you might want to
-> squeeze in a patch that renames everything to btqca. Just a suggestion
-> though.
-> 
-
-[bala]: changed the name of function to qca_power_setup
-
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index f05382b..71f9591 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -5,7 +5,7 @@
->>   *  protocol extension to H4.
->>   *
->>   *  Copyright (C) 2007 Texas Instruments, Inc.
->> - *  Copyright (c) 2010, 2012 The Linux Foundation. All rights 
->> reserved.
->> + *  Copyright (c) 2010, 2012, 2018 The Linux Foundation. All rights 
->> reserved.
->>   *
->>   *  Acknowledgements:
->>   *  This file is based on hci_ll.c, which was...
->> @@ -35,6 +35,11 @@
->>  #include <linux/mod_devicetable.h>
->>  #include <linux/module.h>
->>  #include <linux/serdev.h>
->> +#include <linux/delay.h>
->> +#include <linux/platform_device.h>
->> +#include <linux/regulator/consumer.h>
->> +#include <linux/of_device.h>
->> +#include <linux/device.h>
-> 
-> As I mentioned on v4, the includes should be in alphabetical order.
-> 
-
-[Bala]: some thing like this?
-
-     #include <linux/delay.h>
-     #include <linux/device.h>
-     #include <linux/mod_devicetable.h>
-     #include <linux/module.h>
-     #include <linux/of_device.h>
-     #include <linux/platform_device.h>
-     #include <linux/regulator/consumer.h>
-     #include <linux/serdev.h>
-
-
->> +enum btqca_soc_t {
-> 
-> nit: Again, inconsistent naming, some functions/structs are called
-> qca_... other btqca_... Personally I prefer btqca_ to avoid clashes.
-> 
-[Bala]: will append qca_.* for the function and structure which are 
-newly added. to aling with already existing functions and strcutures
-        so btqca_soc_t will be qca_soc_type.
-        let me know your comments on this.
-
-
->> +/*
->> + * voltage regulator information required for configuring the
->> + * QCA bluetooth chipset
-> 
-> nit: Voltage, Bluetooth
-> 
-
-[Bala]: will update
-
->> + */
->> +struct btqca_vreg {
->> +	const char *name;
->> +	unsigned int min_v;
->> +	unsigned int max_v;
->> +	unsigned int load_ua;
->> +};
-> 
-> nit: consider min_uV, max_uV, load_uA (as in the regulator framework).
-> 
-
-[Bala]: will update
-
->> +
->> +struct btqca_vreg_data {
->> +	enum btqca_soc_t soc_type;
->> +	struct btqca_vreg *vregs;
->> +	size_t num_vregs;
->> +};
->> +
->> +/*
->> + * Platform data for the QCA bluetooth power driver.
-> 
-> nit: Bluetooth
-> 
-
-[Bala]: will update
-
->> +static int qca_send_vendor_cmd(struct hci_dev *hdev, u8 cmd)
->> +{
->> +	struct hci_uart *hu = hci_get_drvdata(hdev);
->> +	struct qca_data *qca = hu->priv;
->> +	struct sk_buff *skb;
->> +
->> +	BT_DBG("%s:sending command %02x to SoC", hdev->name, cmd);
-> 
-> bt_dev_dbg()
-> 
-
-[Bala]: will update
-
->> +
->> +	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
->> +	if (!skb) {
->> +		BT_ERR("Failed to allocate memory for skb  packet");
-> 
-> bt_dev_err()
-> 
-
-[Bala]: will update
-
->> +	/* Wait for 100 us for soc to settle down */
-> 
-> nit: uS, SoC
-> 
-
-[Bala]: will update
-
->> +static int qca_serdev_open(struct hci_uart *hu)
->> +{
->> +	int ret = 0;
->> +
->> +	if (hu->serdev) {
->> +		serdev_device_open(hu->serdev);
->> +	} else {
->> +		bt_dev_err(hu->hdev, "open operation not supported");
->> +		ret = 1;
->> +	}
->> +
->> +	return ret;
->> +}
-> 
-> From v4:
-> 
->> > Check return value.
->> [Bala]: as we are not checking in qca_open, the return in this
->> function is to know the serdev function availability.
-> 
-> Sorry, your comment didn't really clarify things for me. The function
-> is called from qca_setup() apparently with the intention to open the
-> serial port, not to check if the function is available. If the serial
-> port can't be opened for whatever reason the function should return an
-> error (typically a negative value).
-> 
-> Also the error message is misleading, the underlying problem is not
-> that the open operations is not supported, but that no serdev device
-> is associated with the hci_uart. Actually it seems this could never
-> happen:
-> 
-> In qca_serdev_probe():
-> 
->   qcadev->serdev_hu.serdev = serdev;
-> 
-> And qca_serdev_open() is only called from qca_setup(). Basically the
-> first thing qca_setup() does is:
-> 
->   qcadev = serdev_device_get_drvdata(hu->serdev);
-> 
-> Thus if hu->serdev is NULL qca_setup() will crash shortly after:
-> 
->   switch (qcadev->btsoc_type) {
-> 
-> I think we can get rid of qca_serdev_open/close() and just call
-> directly serdev_device_open().
-> 
-
-[Bala]: yes your correct. will call the serdev_.* close and open from 
-qca_setup()
-         Do we really need to check hu->serdev == NULL in qca_setup?
-
->> +int qca_btsoc_cleanup(struct hci_dev *hdev)
->> +{
->> +	struct hci_uart *hu = hci_get_drvdata(hdev);
->> +
->> +	/* change host baud rate before sending power off command */
->> +	host_set_baudrate(hu, 2400);
->> +	/* send 0xC0 command to btsoc before turning off regulators */
->> +	qca_send_vendor_cmd(hdev, CHEROKEE_POWEROFF_PULSE);
-> 
-> The comment doesn't provide any useful information. From the code it's
-> evident that a CHEROKEE_POWEROFF_PULSE is sent, if anybody is
-> interested in the hex code they can look up the definition of
-> CHEROKEE_POWEROFF_PULSE.
-> 
-
-[Bala]: will remove the comment.
-
->> +	/* turn off btsoc */
->> +	return btqca_power_setup(false);
-> 
-> This comment laso doesn't provide any value.
-> 
-
-[Bala]: will remove
-
->> +static int qca_serdev_close(struct hci_uart *hu)
->> +{
->> +	int ret = 0;
->> +
->> +	if (hu->serdev) {
->> +		serdev_device_close(hu->serdev);
->> +	} else {
->> +		bt_dev_err(hu->hdev, "close operation not supported");
->> +		ret = 1;
->> +	}
->> +
->> +	return ret;
->> +}
-> 
-> Same commants as for open().
-> 
-> Preferably keep open() and close() together, without squeezing the
-> cleanup function in between.
-> 
-
-[Bala]: will remove these functions and directly call them from serdev_* 
-close or open from qca_setup()
-
-
->>  static int qca_setup(struct hci_uart *hu)
->>  {
->>  	struct hci_dev *hdev = hu->hdev;
->>  	struct qca_data *qca = hu->priv;
->> +	struct qca_serdev *qcadev;
->>  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->>  	int ret;
->> +	int soc_ver;
->> +
->> +	qcadev = serdev_device_get_drvdata(hu->serdev);
->> +
->> +	switch (qcadev->btsoc_type) {
->> +	case BTQCA_CHEROKEE:
-> 
-> I still thinks this is has a lot of common code with the default/Rome
-> case, but let's first clarify and possibly improve a few things.
-> 
-
-[Bala]: actually i haven't edited any part of code for ROME i.e. default 
-case expect the indentation.
-         Yes we have little common code, but if i do any changes to ROME 
-code i.e. default case,i don't have ROME Chip to test.
-         i am little bit worried if some thing in ROME got broken with my 
-change. that will create problem.
-
-
->> +		bt_dev_info(hdev, "setting up wcn3990");
->> +		/* Patch downloading has to be done without IBS mode */
->> +		clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> +		/* Setup initial baudrate */
->> +		speed = 0;
->> +		if (hu->init_speed)
->> +			speed = hu->init_speed;
->> +		else if (hu->proto->init_speed)
->> +			speed = hu->proto->init_speed;
-> 
-> This pattern is repeated a several times for initial and operating
-> speeds. Helper functions like btqca_get_init_speed() and
-> btqca_get_oper_speed() would make the code more readable and compact.
-
-[Bala]: will create a new functions.
-
-> 
->> +
->> +		if (speed) {
->> +			host_set_baudrate(hu, speed);
->> +		} else {
->> +			bt_dev_err(hdev, "initial speed %u", speed);
->> +			return -1;
->> +		}
-> 
-> Note: Up to here Rome and Cherokee do exactly the same.
-> 
->> +		/* disable flow control, as chip is still not turned on */
->> +		hci_uart_set_flow_control(hu, true);
->> +		/* send 0xFC  command to btsoc */
->> +		ret = qca_send_vendor_cmd(hdev, CHEROKEE_POWERON_PULSE);
-> 
-> Delete useless comment.
-> 
-
-[Bala]: will update.
-
->> +		if (ret) {
->> +			bt_dev_err(hdev, "Failed to send power on command");
->> +			return ret;
->> +		}
->> +
->> +		/* close serial port */
->> +		ret = qca_serdev_close(hu);
->> +		if (ret)
->> +			return ret;
->> +		/* open serial port */
->> +		ret = qca_serdev_open(hu);
->> +		if (ret)
->> +			return ret;
-> 
-> The comments are pointless, it is evident from the code that the
-> serial port is opened/closed. Much more interesting would be to
-> explain why it is necessary to close and re-open the port.
-> 
-
-[Bala]: will update.
-
->> -	bt_dev_info(hdev, "ROME setup");
->> +		/* Setup initial baudrate */
->> +		speed = 0;
->> +		if (hu->init_speed)
->> +			speed = hu->init_speed;
->> +		else if (hu->proto->init_speed)
->> +			speed = hu->proto->init_speed;
->> +		if (speed) {
->> +			host_set_baudrate(hu, speed);
->> +		} else {
->> +			BT_ERR("%s:initial speed %u", hdev->name, speed);
-> 
-> bt_dev_err()
-> 
->> +			return -1;
->> +		}
-> 
-> The initial baudrate has already been set above, is it necessary to
-> configure it again because the port was closed?
-> 
-
-[Bala]: for safer side we setting init speed again after close and open.
-
-> This baudrate code is extremely noisy. Besides introducing the helper
-> functions mentioned above you could log the error message in
-> host_set_baudrate() or even have an addtional wrapper that determines
-> and sets the baudrate. The latter would reduce the above to:
-> 
-> if (xyz_set_baudrate(hu, INIT_RATE))
-> 	return -1;
-> 
-> And that multiple times.
-> 
-
-[Bala]: will create wrapper to handle baudrate setting.
-
->> +		/* clear flow control */
->> +		hci_uart_set_flow_control(hu, true);
->> +		/* set operating speed */
-> 
-> Note: Starting from here the code for Cherokee and Rome is essentially
-> the same, except for enabling flow control.
-> 
-> If you prefer keep the somewhat redundant code paths in the next
-> revision, but please consider the improvements I suggested. With less
-> noisy code it will be easier to determine if it is reasonable to join
-> the two code paths.
-> 
-
-[Bala]: will try to use common code.
-
->> +static int btqca_enable_regulators(int i, struct btqca_vreg *vregs)
-> 
-> The common convention is to pass first the structure a function acts
-> on, then other parameters.  Use a more expressive name for the
-> number of regulators, like 'num_regs' or 'nregs'.
-> 
-> 
-
-[Bala]:will update.
-
->> +{
->> +	int ret = 0;
-> 
-> Initialization is not necessary, ret is assigned in the next line.
-> 
-
-[Bala]:will remove.
-
->> +static void btqca_disable_regulators(int reg_nu, struct btqca_vreg 
->> *vregs)
->> +{
-> 
-> Same as for the enable function. Please use the same name for the
-> argument with the number of regulators on both functions, personally I
-> don't think 'reg_nu' is a great choice, but that's just my opinion ;-)
-> 
-
-[Bala]: in btqca_enable_regulator() we are enabling one regulator. i.e. 
-this is called by btqc_power_setup() function.
-         in btqca_disable_regulator() we are disabling all the 
-regulators.
-         i think it require a checkup. will update both in the same way.
-
->> +int btqca_power_setup(bool on)
->> +{
->> +	int ret = 0;
->> +	int i;
->> +	struct btqca_vreg *vregs;
->> +
->> +	if (!qca || !qca->vreg_data || !qca->vreg_bulk)
->> +		return -EINVAL;
->> +	vregs = qca->vreg_data->vregs;
->> +
->> +	BT_DBG("on: %d", on);
->> +	/* turn on if regualtors are off */
-> 
-> regulators
-> 
-> Consider dropping the comment, IMO the code speaks for itself.
-> 
-
-[Bala]: will remove
-
->> +	if (on == true && qca->vregs_on == false) {
-> 
-> if (on && !qca->vreg_on) {
-> 
->> +		qca->vregs_on = true;
-> 
-> Typically you'd change the variable after having performed the
-> operation with success.
-> 
-
-[Bala]: will update.
-
->> +		for (i = 0; i < qca->vreg_data->num_vregs; i++) {
->> +			ret = btqca_enable_regulators(i, vregs);
->> +			if (ret)
->> +				break;
->> +		}
->> +	} else if (on == false && qca->vregs_on == true) {
-> 
-> if (!on && qca->vreg_on) {
-> 
->> +		qca->vregs_on = false;
-> 
-> Better done after having disabled the regulators.
-
-[Bala]: will update.
-
-> 
->> +		/* turn off regulator in reverse order */
->> +		btqca_disable_regulators(qca->vreg_data->num_vregs, vregs);
->> +	}
->> +
->> +	/* regulators failed */
->> +	if (ret) {
->> +		qca->vregs_on = false;
->> +		BT_ERR("failed to enable regulator:%s", vregs[i].name);
->> +		/* turn off regulators which are enabled */
->> +		btqca_disable_regulators(i, vregs);
->> +	}
-> 
-> Why not do this directly when the problem is detected? The code also
-> relies on 'ret' only being set in the 'on' path. Which isn't intuitive
-> for the reader and *might* change in the future.
-> 
-
-[Bala]: will copy the same in on block.
-
-
->> +
->> +	return ret;
->> +}
->> +
->> +static int init_regulators(struct btqca_power *qca,
-> 
-> Preferably keep use the same prefix (btqca_) consistently, unless
-> names become awfully long or otherwise unreadable.
-> 
-[Bala]: will rename as qca_init_regulators() and also changes functions 
-starting with btqca_.* to qca_.*
-
->>  static int qca_serdev_probe(struct serdev_device *serdev)
->>  {
->> 	struct qca_serdev *qcadev;
->> 	const struct btqca_vreg_data *data;
->> 	int err = 0;
-> 
-> unnecessary initialization
-
-[Bala]: will remove.
-
-> 
->> 		/* set voltage regulator status as false */
->> 		qca->vregs_on = false;
-> 
-> delete pointless comment
-
-[Bala]: will remove
-
-> 
->> 		/* get operating speed */
->> 		device_property_read_u32(&serdev->dev, "oper-speed",
-> 
-> comment doesn't add much value
-> 
-
-[Bala]: will remove
-
->> +		err = hci_uart_register_device(&qcadev->serdev_hu, &qca_proto);
->> +		if (err) {
->> +			BT_ERR("wcn3990 serdev registration failed");
->> +			kfree(qca);
->> +			goto out;
-> 
-> disable regulators
-
-[Bala]: we didn't enable regulators yet. we just get the regulators 
-address. explicitly disabling the regulators is not safe.
-
-> 
-> Thanks
-> 
-> Matthias
-
--- 
-Regards
-Balakrishna.
+--=-JSBWckcOte03YOpWJ8HM
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+
+On Tue, 2018-05-22 at 16:05 +0800, Sean Wang wrote:
+> On Tue, 2018-05-22 at 09:21 +0200, Marcel Holtmann wrote:
+> > Hi Sean,
+> > 
+> 
+> [ ... ]
+> 
+> > > -	if (hci_dev_test_flag(hdev, HCI_SETUP)) {
+> > > +	if (hci_dev_test_flag(hdev, HCI_SETUP) ||
+> > > +	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+> > > 		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+> > 
+> > I am not 100% sure that we want to send the HCI_DEV_SETUP event also multiple times. That is a userspace change that I would need to think about. We need to check create_monitor_event() and see what the btmon trace for this looks like. Can you send me a btmon -w trace.log when this change is active.
+> > 
+> > Regards
+> > 
+> > Marcel
+> > 
+> 
+> Sure, I'll send you the trace.log with the change is active.
+> 
+> 	Sean
+> 
+
+Hi, Marcel
+
+Attached trace.log was captured when I inputted commands power on and
+then off in bluetoothctl.
+
+	Sean 
+
+> 
+> _______________________________________________
+> Linux-mediatek mailing list
+> Linux-mediatek@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-mediatek
+
+
+--=-JSBWckcOte03YOpWJ8HM
+Content-Disposition: attachment; filename="trace.log"
+Content-Type: text/x-log; name="trace.log"; charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+YnRzbm9vcAAAAAABAAAH0QAAACQAAAAk//8ADAAAAAAA4kqMl5V8lkxpbnV4IHZlcnNpb24gNC4x
+Ni4wLXJjMSsgKGFhcmNoNjQpAAAAACEAAAAh//8ADAAAAAAA4kqMl5V8nkJsdWV0b290aCBzdWJz
+eXN0ZW0gdmVyc2lvbiAyLjIyAAAAABAAAAAQAAAAAAAAAAAA4kqMl5V8oQADASJ2RgAAaGNpMAAA
+AAAAAAAeAAAAHv//AA4AAAAAAOJKjJeVfKUBAAAAAgABDgABAAAAEGJsdWV0b290aGQAAAAAAAAA
+AAAeAAAAHv//AA4AAAAAAOJKjJeVfPgCAAAAAgABDgABAAAAEGJ0bW9uAAAAAAAAAAAAAAAAAAAH
+AAAABwAAABAAAAAAAOJKjJfvcQMBAAAABQABAAAAAAAAAAAAAAAIAAAAAADiSoyX8jEbAAAACAAA
+AAgAAAANCgAAAAAA4kqMl/IxJgEidkYAAEYAAAAABwAAAAcAAAADAAAAAADiSoyX8o8l5AUCAQEA
+AAAAAAcAAAAHAAAAAwAAAAAA4kqMl/KTCOQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfylv7k
+BQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX8prp5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqM
+l/Ke1eQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfyorjkBQIBAQAAAAAABwAAAAcAAAADAAAA
+AADiSoyX8qaZ5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/KqeuQFAgEBAAAAAAAHAAAABwAA
+AAMAAAAAAOJKjJfyrlbkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX8rI25AUCAQEAAAAAAAcA
+AAAHAAAAAwAAAAAA4kqMl/K2FeQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfyufbkBQIBAQAA
+AAAABwAAAAcAAAADAAAAAADiSoyX8r3W5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/LBtuQF
+AgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfyxZfkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX
+8sl55AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/LNVeQFAgEBAAAAAAAHAAAABwAAAAMAAAAA
+AOJKjJfy0TbkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX8tUX5AUCAQEAAAAAAAcAAAAHAAAA
+AwAAAAAA4kqMl/LY9+QFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfy3NfkBQIBAQAAAAAABwAA
+AAcAAAADAAAAAADiSoyX8uC35AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/Lkk+QFAgEBAAAA
+AAAHAAAABwAAAAMAAAAAAOJKjJfy6HTkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX8uxU5AUC
+AQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/LwNeQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfy
+9BXkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX8vf25AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA
+4kqMl/L71+QFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfy/7rkBQIBAQAAAAAABwAAAAcAAAAD
+AAAAAADiSoyX8wOd5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/MHhOQFAgEBAAAAAAAHAAAA
+BwAAAAMAAAAAAOJKjJfzC2jkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX8w9K5AUCAQEAAAAA
+AAcAAAAHAAAAAwAAAAAA4kqMl/MTLOQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfzFxLkBQIB
+AQAAAAAABwAAAAcAAAADAAAAAADiSoyX8xry5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/Me
+1eQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfzIrfkBQIBAQAAAAAABwAAAAcAAAADAAAAAADi
+SoyX8yad5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/MqgOQFAgEBAAAAAAAHAAAABwAAAAMA
+AAAAAOJKjJfzLmLkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX8zJE5AUCAQEAAAAAAAcAAAAH
+AAAAAwAAAAAA4kqMl/M2KuQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfzOg3kBQIBAQAAAAAA
+BwAAAAcAAAADAAAAAADiSoyX8z3v5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/NB0eQFAgEB
+AAAAAAAHAAAABwAAAAMAAAAAAOJKjJfzRbfkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX80ma
+5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/NNfOQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJK
+jJfzUV7kBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX81VF5AUCAQEAAAAAAAcAAAAHAAAAAwAA
+AAAA4kqMl/NZKeQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfzXQvkBQIBAQAAAAAABwAAAAcA
+AAADAAAAAADiSoyX82Du5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/Nk1eQFAgEBAAAAAAAH
+AAAABwAAAAMAAAAAAOJKjJfzaLfkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX82ya5AUCAQEA
+AAAAAAcAAAAHAAAAAwAAAAAA4kqMl/Nwe+QFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfzdGLk
+BQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX83hG5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqM
+l/N8KeQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfzgAvkBQIBAQAAAAAABwAAAAcAAAADAAAA
+AADiSoyX84Px5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/OH0+QFAgEBAAAAAAAHAAAABwAA
+AAMAAAAAAOJKjJfzi7XkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX84+X5AUCAQEAAAAAAAcA
+AAAHAAAAAwAAAAAA4kqMl/OTfeQFAgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfzl2HkBQIBAQAA
+AAAABwAAAAcAAAADAAAAAADiSoyX85tD5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/OfJeQF
+AgEBAAAAAAAHAAAABwAAAAMAAAAAAOJKjJfzow3kBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX
+86bv5AUCAQEAAAAAAAcAAAAHAAAAAwAAAAAA4kqMl/Oq0uQFAgEBAAAAAAAHAAAABwAAAAMAAAAA
+AOJKjJfzrrTkBQIBAQAAAAAABwAAAAcAAAADAAAAAADiSoyX87KZ5AUCAQEAAAAAAAcAAAAHAAAA
+AwAAAAAA4kqMl/O1OuQFAgEBAAAAAAAIAAAACAAAAAIAAAAAAOJKjJfztV1v/AUBBwEABAAAAAcA
+AAAHAAAAAwAAAAAA4kqMl/O12OQFAgcBAAAAAAAJAAAACQAAAAIAAAAAAOJKjJgSqc9v/AYBBgIA
+AAEAAAAHAAAABwAAAAMAAAAAAOJKjJgT3ADkBQIGAQAAAAAAAwAAAAMAAAACAAAAAADiSoyYMWz+
+AwwAAAAABgAAAAYAAAADAAAAAADiSoyYMX8jDgQBAwwAAAAAAwAAAAMAAAACAAAAAADiSoyYMX9N
+AxAAAAAADgAAAA4AAAADAAAAAADiSoyYMX/tDgwBAxAAvz6N/tv/e4cAAAADAAAAAwAAAAIAAAAA
+AOJKjJgxgAMBEAAAAAALAAAACwAAAAMAAAAAAOJKjJgxgRP/CSkZCRcgSAcRAAAAAA4AAAAOAAAA
+AwAAAAAA4kqMmDGBhA4MAQEQAAgHEQhGABkJAAAAAwAAAAMAAAACAAAAAADiSoyYMYGXCRAAAAAA
+DAAAAAwAAAADAAAAAADiSoyYMYIrDg0KAQkQAAEidkYAAAAAAAMAAAADAAAAAgAAAAAA4kqMmDGC
+cQUQAAAAAA0AAAANAAAAAwAAAAAA4kqMmDGDAg4LAQUQAP0DuAgAAQAAAAADAAAAAwAAAAIAAAAA
+AOJKjJgxgxcjDAAAAAAJAAAACQAAAAMAAAAAAOJKjJgxg6gOBwEjDAAAHwAAAAADAAAAAwAAAAIA
+AAAAAOJKjJgxg7sUDAAAAAD+AAAA/gAAAAMAAAAAAOJKjJgxhPgO/AEUDABNVEsgTVQ3NjIyICMx
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAMAAAADAAAAAgAAAAAA4kqMmDGFLCUMAAAAAAgAAAAIAAAAAwAAAAAA4kqMmDGF
+tw4GASUMAGAAAAAAAwAAAAMAAAACAAAAAADiSoyYMYXSOAwAAAAABwAAAAcAAAADAAAAAADiSoyY
+MYZbDgUBOAwABAAAAAMAAAADAAAAAgAAAAAA4kqMmDGGnjkMAAAAAA0KAAAADQoAAAADAAAAAADi
+SoyYMYdZDggBOQwAATOLngAAAAQAAAAEAAAAAgAAAAAA4kqMmDGHcgUMAQAAAAAGAAAABgAAAAMA
+AAAAAOJKjJgxiAEOBAEFDAAAAAAFAAAABQAAAAIAAAAAAOJKjJgxiBYWDAIAfQAAAAYAAAAGAAAA
+AwAAAAAA4kqMmDGIyw4EARYMAAAAAAMAAAADAAAAAgAAAAAA4kqMmDGI5gIgAAAAAAkAAAAJAAAA
+AwAAAAAA4kqMmDGJaA4HAQIgAPsACAAAAAMAAAADAAAAAgAAAAAA4kqMmDGJfQMgAAAAAA4AAAAO
+AAAAAwAAAAAA4kqMmDGKKw4MAQMgAP0AAAAAAAAAAAAAAwAAAAMAAAACAAAAAADiSoyYMYpmHCAA
+AAAADgAAAA4AAAADAAAAAADiSoyYMYrzDgwBHCAA////HwAAAAAAAAADAAAAAwAAAAIAAAAAAOJK
+jJgxiwcCEAAAAABGAAAARgAAAAMAAAAAAOJKjJgxi7kORAECEAD///8DzP///////J/zD+j/P/eP
+/xwABAABAAAAADjg9fPP//8BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAQAAAAC
+AAAAAADiSoyYMYvfVgwBAQAAAAYAAAAGAAAAAwAAAAAA4kqMmDGMgQ4EAVYMAAAAAAQAAAAEAAAA
+AgAAAAAA4kqMmDGMt0UMAQIAAAAGAAAABgAAAAMAAAAAAOJKjJgxjTsOBAFFDAAAAAADAAAAAwAA
+AAIAAAAAAOJKjJgxjVRYDAAAAAAHAAAABwAAAAMAAAAAAOJKjJgxjfAOBQFYDAD/AAAABAAAAAQA
+AAACAAAAAADiSoyYMY4EBBABAQAAABAAAAAQAAAAAwAAAAAA4kqMmDGOoQ4OAQQQAAECAQAAAAAA
+AAAAAAALAAAACwAAAAIAAAAAAOJKjJgxjtcBDAj///v/B/i/PQAAAAYAAAAGAAAAAwAAAAAA4kqM
+mDGPYQ4EAQEMAAAAAA0KAAAADQoAAAACAAAAAADiSoyYMY97DQwHAAAAAAAAAQAAAA0KAAAADQoA
+AAADAAAAAADiSoyYMZAxDggBDQwABAAAAAAAAAUAAAAFAAAAAgAAAAAA4kqMmDGQRA8IAgUAAAAA
+BgAAAAYAAAADAAAAAADiSoyYMZDmDgQBDwgAAAAAAwAAAAMAAAACAAAAAADiSoyYMZD7GwwAAAAA
+DQoAAAANCgAAAAMAAAAAAOJKjJgxkZUOCAEbDAAACBIAAAAAAwAAAAMAAAACAAAAAADiSoyYMZGo
+RgwAAAAABwAAAAcAAAADAAAAAADiSoyYMZI8DgUBRgwAAAAAAAsAAAALAAAAAgAAAAAA4kqMmDGS
+TwEgCIAJAAAAAAAAAAAABgAAAAYAAAADAAAAAADiSoyYMZL3DgQBASAAAAAABQAAAAUAAAACAAAA
+AADiSoyYMZMLbQwCAQAAAAAGAAAABgAAAAMAAAAAAOJKjJgxk7QOBAFtDAAAAAAEAAAABAAAAAIA
+AAAAAOJKjJgxk9MEEAECAAAAEAAAABAAAAADAAAAAADiSoyYMZRhDg4BBBAAAgIlCwAAAAAAAAAA
+AA0KAAAADQoAAAACAAAAAADiSoyYMZSIEgwHAAAAAAAAAQAAAAgAAAAIAAAAAwAAAAAA4kqMmDGV
+GA4GARIMAAAAAAAACwAAAAsAAAACAAAAAADiSoyYMZUrYwwIAMCwAAAAAAAAAAAGAAAABgAAAAMA
+AAAAAOJKjJgxlc4OBAFjDAAAAAADAAAAAwAAAAIAAAAAAOJKjJgxle8LEAAAAAANCgAAAA0KAAAA
+AwAAAAAA4kqMmDGWhg4IAQsQAAICAwAAAAADAAAAAwAAAAIAAAAAAOJKjJgxlpl3DAAAAAANAAAA
+DQAAAAMAAAAAAOJKjJgxlzgOCwF3DAAAAAAAAAAAAAAABAAAAAQAAAACAAAAAADiSoyYMZdLegwB
+AQAAAAYAAAAGAAAAAwAAAAAA4kqMmDGX4g4EAXoMAAAAAAYAAAAGAAAAAgAAAAAA4kqMmDGYHDEg
+AwMAAAAAAAYAAAAGAAAAAwAAAAAA4kqMmDGYwg4EATEgAAAAAAgAAAAIAAAADQoAAAAAAOJKjJgx
+mOkBInZGAABGAAAAACMAAAAjAAAAAgAAAAAA4kqMmDGZLwkgIA0KCQlidWlsZGVyAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAYAAAAGAAAAAwAAAAAA4kqMmDGZ3g4EAQkgAAAAAAQAAAAEAAAAAgAA
+AAAA4kqMmDGZ8xoMAQIAAAAGAAAABgAAAAMAAAAAAOJKjJgxmrMOBAEaDAAAAAAGAAAABgAAAAIA
+AAAAAOJKjJgxmskkDAMAAAAAAAAGAAAABgAAAAMAAAAAAOJKjJgxm4wOBAEkDAAAAAAJAAAACQAA
+ABEAAAAAAOJKjJgxm60CAAAABwAAAAAAAAAJAAAACQAAABEAAAAAAOJKjJgxm60BAAAABwAAAAAA
+AAD7AAAA+wAAAAIAAAAAAOJKjJgxm8gTDPhidWlsZGVyAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAGAAAA
+AwAAAAAA4kqMmDGdJg4EARMMAAAAAPQAAAD0AAAAAgAAAAAA4kqMmDGdPlIM8QAICWJ1aWxkZXIC
+DQr/CRACAGsdRgIrBQkDABgBGA4RDBEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAABgAAAAYAAAADAAAAAADiSoyYMZ7BDgQBUgwAAAAADQAAAA0AAAARAAAAAADiSoyYMZ7v
+AQAAAAEABQAA0Q0KAAAAAAANCgAAAA0KAAAAEQAAAAAA4kqMmDGe+QIAAAAGANENCgAAAAAABwAA
+AAcAAAAQAAAAAADiSoyYm11jAQAAAAUAAAAAAAQAAAAEAAAAAgAAAAAA4kqMmJtdjxoMAQAAAAAG
+AAAABgAAAAMAAAAAAOJKjJibXokOBAEaDAAAAAAJAAAACQAAAAIAAAAAAOJKjJibXrpv/AYBBgIA
+AAAAAAAHAAAABwAAAAMAAAAAAOJKjJibYBzkBQIGAQAAAAAADQAAAA0AAAARAAAAAADiSoyYm3s8
+AQAAAAEABQAA0A0KAAAAAAANCgAAAA0KAAAAEQAAAAAA4kqMmJt7TAIAAAAGANANCgAAAAAAAAAA
+AAAAAAAJAAAAAADiSoyYm3tp
+
+
+--=-JSBWckcOte03YOpWJ8HM--
