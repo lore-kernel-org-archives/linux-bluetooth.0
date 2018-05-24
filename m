@@ -1,165 +1,200 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Gix, Brian" <brian.gix@intel.com>
-To: "a.rai@samsung.com" <a.rai@samsung.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Anupam Roy <anupam.r@samsung.com>,
+Mime-Version: 1.0
+Subject: RE: [PATCH BlueZ v4 00/14] Bluetooth Mesh Daemon
+Reply-To: a.rai@samsung.com
+From: Atul Kumar Rai <a.rai@samsung.com>
+To: Brian Gix <brian.gix@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Anupam Roy <anupam.r@samsung.com>,
         SACHIN DEV SHARMA <sachin.dev@samsung.com>
-Subject: Re: [PATCH BlueZ v4 00/14] Bluetooth Mesh Daemon
-Date: Thu, 24 May 2018 06:45:31 +0000
-Message-ID: <4F023D34-B3F6-44D4-AF5A-90BC4EF514FD@intel.com>
+In-Reply-To: <20180430210319.25137-1-brian.gix@intel.com>
+Message-ID: <20180524050753epcms5p6d7414d626ed0039e9592098ef7238a5c@epcms5p6>
+Date: Thu, 24 May 2018 10:37:53 +0530
+Content-Type: text/plain; charset="utf-8"
 References: <20180430210319.25137-1-brian.gix@intel.com>
-        <CGME20180430210346epcas2p26aece6a2f299d3b9e151a7531781a0a8@epcms5p6>,<20180524050753epcms5p6d7414d626ed0039e9592098ef7238a5c@epcms5p6>
-In-Reply-To: <20180524050753epcms5p6d7414d626ed0039e9592098ef7238a5c@epcms5p6>
-Content-Type: text/plain; charset="Windows-1252"
-MIME-Version: 1.0
+        <CGME20180430210346epcas2p26aece6a2f299d3b9e151a7531781a0a8@epcms5p6>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Atul,
-
-
-> On May 23, 2018, at 10:08 PM, Atul Kumar Rai <a.rai@samsung.com> wrote:
-> 
-> Hi Brian,
->  
->>  Version 4 of this patch set uses the new ECC function ecc_make_public_key()
->>  when a non-ephemeral Public/Private key-pair is required for Provisioning
->>   
->>  Otherwise:
->>  This is our starting point for creating a stand-alone Mesh Daemon.
->>   
->>  The Mesh Daemon (meshd) is intended to eventually co-exist beside the
->>  Bluetooth Daemon (bluetoothd), and either daemon may exist without the
->>  other. The Mesh Daemon will need full control/ownership of a
->>  BT Controller that supports at least Core Spec revision 4.0 or
->>  greater.  It works strictly over the Advertising bearer, but we
->>  have plans to extend it to support Mesh Proxy Server over GATT, at
->>  which point it will require support from bluetoothd.
->>   
->>  The current meshd, and it's companion Non-Background Command-line
->>  version btmesh, exists fully within user-space, but requires an
->>  HCI_USER socket to the kernel controler, and currently requires root
->>  privledges.
->>   
->>  This first revision is intended to operate as a standard
->>  (non-provisioner) node.  It includes the Configuration Server model,
->>  and if it cannot find it's Mesh Configuration, will look for it's
->>  Composition data, and start up as unprovisioned, and accept an
->>  incoming PB-ADV provisioning session.
->>   
->>  Two of us (Inga and Brian) have been working on this, and will be
->>  the initial supporters and maintainers, and we gladly invite other
->>  interested parties to participate.
->>   
->>  Brian Gix (7):
->>    meshd: Shared private meshd interfaces
->>    meshd: Mesh crypto support
->>    meshd: Infrastructure for Mesh daemon
->>    meshd: Initial Mesh Friendship support
->>    meshd: Provisioning logic for mesh
->>    meshd: Upper and Lower mesh transport
->>    meshd: Add Accessors to Transport layer data
->>   
->>  Inga Stotland (7):
->>    meshd: Header files for mesh access layer and utilities
->>    meshd: Source files for mesh access layer and utilities
->>    meshd: Source code for handling access layer mux/demux
->>    meshd: Mesh config server model
->>    meshd: Read and write mesh configuration in JSON format
->>    meshd: Sample device composition in JSON fromat
->>    Makefile for meshd and configure.ac
->>   
->>   Makefile.am                   |    1 +
->>   Makefile.meshd                |   44 +
->>   configure.ac                  |    2 +-
->>   meshd/common/agent.c          |  229 +++
->>   meshd/common/agent.h          |   42 +
->>   meshd/common/mesh-defs.h      |   84 +
->>   meshd/common/util.c           |   71 +
->>   meshd/common/util.h           |   25 +
->>   meshd/config/composition.json |   44 +
->>   meshd/mesh-json/mesh-db.c     | 1360 +++++++++++++
->>   meshd/mesh-json/mesh-db.h     |  144 ++
->>   meshd/src/appkey.c            |  538 ++++++
->>   meshd/src/appkey.h            |   43 +
->>   meshd/src/btmesh.c            |  176 ++
->>   meshd/src/cfgmod-server.c     | 1194 ++++++++++++
->>   meshd/src/cfgmod.h            |   98 +
->>   meshd/src/crypto.c            | 1607 ++++++++++++++++
->>   meshd/src/crypto.h            |  164 ++
->>   meshd/src/display.c           |   67 +
->>   meshd/src/display.h           |   29 +
->>   meshd/src/friend.c            | 1116 +++++++++++
->>   meshd/src/friend.h            |   57 +
->>   meshd/src/hci.c               |  699 +++++++
->>   meshd/src/hci.h               |   56 +
->>   meshd/src/main.c              |  174 ++
->>   meshd/src/mesh-io-api.h       |   58 +
->>   meshd/src/mesh-io-generic.c   |  660 +++++++
->>   meshd/src/mesh-io-generic.h   |   20 +
->>   meshd/src/mesh-io.c           |  187 ++
->>   meshd/src/mesh-io.h           |   99 +
->>   meshd/src/mesh.c              |  184 ++
->>   meshd/src/mesh.h              |   32 +
->>   meshd/src/model.c             | 1274 +++++++++++++
->>   meshd/src/model.h             |  146 ++
->>   meshd/src/net.c               | 4188 +++++++++++++++++++++++++++++++++++++++++
->>   meshd/src/net.h               |  392 ++++
->>   meshd/src/node.c              |  851 +++++++++
->>   meshd/src/node.h              |   80 +
->>   meshd/src/prov.c              |  722 +++++++
->>   meshd/src/prov.h              |  162 ++
->>   meshd/src/provision.c         | 1159 ++++++++++++
->>   meshd/src/provision.h         |   30 +
->>   meshd/src/storage.c           |  673 +++++++
->>   meshd/src/storage.h           |   51 +
->>   44 files changed, 19031 insertions(+), 1 deletion(-)
->>   create mode 100644 Makefile.meshd
->>   create mode 100644 meshd/common/agent.c
->>   create mode 100644 meshd/common/agent.h
->>   create mode 100644 meshd/common/mesh-defs.h
->>   create mode 100644 meshd/common/util.c
->>   create mode 100644 meshd/common/util.h
->>   create mode 100644 meshd/config/composition.json
->>   create mode 100644 meshd/mesh-json/mesh-db.c
->>   create mode 100644 meshd/mesh-json/mesh-db.h
->>   create mode 100644 meshd/src/appkey.c
->>   create mode 100644 meshd/src/appkey.h
->>   create mode 100644 meshd/src/btmesh.c
->>   create mode 100644 meshd/src/cfgmod-server.c
->>   create mode 100644 meshd/src/cfgmod.h
->>   create mode 100644 meshd/src/crypto.c
->>   create mode 100644 meshd/src/crypto.h
->>   create mode 100644 meshd/src/display.c
->>   create mode 100644 meshd/src/display.h
->>   create mode 100644 meshd/src/friend.c
->>   create mode 100644 meshd/src/friend.h
->>   create mode 100644 meshd/src/hci.c
->>   create mode 100644 meshd/src/hci.h
->>   create mode 100644 meshd/src/main.c
->>   create mode 100644 meshd/src/mesh-io-api.h
->>   create mode 100644 meshd/src/mesh-io-generic.c
->>   create mode 100644 meshd/src/mesh-io-generic.h
->>   create mode 100644 meshd/src/mesh-io.c
->>   create mode 100644 meshd/src/mesh-io.h
->>   create mode 100644 meshd/src/mesh.c
->>   create mode 100644 meshd/src/mesh.h
->>   create mode 100644 meshd/src/model.c
->>   create mode 100644 meshd/src/model.h
->>   create mode 100644 meshd/src/net.c
->>   create mode 100644 meshd/src/net.h
->>   create mode 100644 meshd/src/node.c
->>   create mode 100644 meshd/src/node.h
->>   create mode 100644 meshd/src/prov.c
->>   create mode 100644 meshd/src/prov.h
->>   create mode 100644 meshd/src/provision.c
->>   create mode 100644 meshd/src/provision.h
->>   create mode 100644 meshd/src/storage.c
->>   create mode 100644 meshd/src/storage.h
->>   
->>  -- 
->>  2.14.3
->  
-> Is there any existing tool to provision over advertising bearer?
-
-The Provisioner role will be one of the first additions we make, but prior to that, the Bluetooth SIG’s PTS tool is available, and can be used for provisioning purposes. Also the local node configuration is in a JSON format that may be edited by hand.
+Hi=C2=A0Brian,=0D=0A=C2=A0=0D=0A>=C2=A0Version=C2=A04=C2=A0of=C2=A0this=C2=
+=A0patch=C2=A0set=C2=A0uses=C2=A0the=C2=A0new=C2=A0ECC=C2=A0function=C2=A0e=
+cc_make_public_key()=0D=0A>=C2=A0when=C2=A0a=C2=A0non-ephemeral=C2=A0Public=
+/Private=C2=A0key-pair=C2=A0is=C2=A0required=C2=A0for=C2=A0Provisioning=0D=
+=0A>=C2=A0=C2=A0=0D=0A>=C2=A0Otherwise:=0D=0A>=C2=A0This=C2=A0is=C2=A0our=
+=C2=A0starting=C2=A0point=C2=A0for=C2=A0creating=C2=A0a=C2=A0stand-alone=C2=
+=A0Mesh=C2=A0Daemon.=0D=0A>=C2=A0=C2=A0=0D=0A>=C2=A0The=C2=A0Mesh=C2=A0Daem=
+on=C2=A0(meshd)=C2=A0is=C2=A0intended=C2=A0to=C2=A0eventually=C2=A0co-exist=
+=C2=A0beside=C2=A0the=0D=0A>=C2=A0Bluetooth=C2=A0Daemon=C2=A0(bluetoothd),=
+=C2=A0and=C2=A0either=C2=A0daemon=C2=A0may=C2=A0exist=C2=A0without=C2=A0the=
+=0D=0A>=C2=A0other.=C2=A0The=C2=A0Mesh=C2=A0Daemon=C2=A0will=C2=A0need=C2=
+=A0full=C2=A0control/ownership=C2=A0of=C2=A0a=0D=0A>=C2=A0BT=C2=A0Controlle=
+r=C2=A0that=C2=A0supports=C2=A0at=C2=A0least=C2=A0Core=C2=A0Spec=C2=A0revis=
+ion=C2=A04.0=C2=A0or=0D=0A>=C2=A0greater.=C2=A0=C2=A0It=C2=A0works=C2=A0str=
+ictly=C2=A0over=C2=A0the=C2=A0Advertising=C2=A0bearer,=C2=A0but=C2=A0we=0D=
+=0A>=C2=A0have=C2=A0plans=C2=A0to=C2=A0extend=C2=A0it=C2=A0to=C2=A0support=
+=C2=A0Mesh=C2=A0Proxy=C2=A0Server=C2=A0over=C2=A0GATT,=C2=A0at=0D=0A>=C2=A0=
+which=C2=A0point=C2=A0it=C2=A0will=C2=A0require=C2=A0support=C2=A0from=C2=
+=A0bluetoothd.=0D=0A>=C2=A0=C2=A0=0D=0A>=C2=A0The=C2=A0current=C2=A0meshd,=
+=C2=A0and=C2=A0it's=C2=A0companion=C2=A0Non-Background=C2=A0Command-line=0D=
+=0A>=C2=A0version=C2=A0btmesh,=C2=A0exists=C2=A0fully=C2=A0within=C2=A0user=
+-space,=C2=A0but=C2=A0requires=C2=A0an=0D=0A>=C2=A0HCI_USER=C2=A0socket=C2=
+=A0to=C2=A0the=C2=A0kernel=C2=A0controler,=C2=A0and=C2=A0currently=C2=A0req=
+uires=C2=A0root=0D=0A>=C2=A0privledges.=0D=0A>=C2=A0=C2=A0=0D=0A>=C2=A0This=
+=C2=A0first=C2=A0revision=C2=A0is=C2=A0intended=C2=A0to=C2=A0operate=C2=A0a=
+s=C2=A0a=C2=A0standard=0D=0A>=C2=A0(non-provisioner)=C2=A0node.=C2=A0=C2=A0=
+It=C2=A0includes=C2=A0the=C2=A0Configuration=C2=A0Server=C2=A0model,=0D=0A>=
+=C2=A0and=C2=A0if=C2=A0it=C2=A0cannot=C2=A0find=C2=A0it's=C2=A0Mesh=C2=A0Co=
+nfiguration,=C2=A0will=C2=A0look=C2=A0for=C2=A0it's=0D=0A>=C2=A0Composition=
+=C2=A0data,=C2=A0and=C2=A0start=C2=A0up=C2=A0as=C2=A0unprovisioned,=C2=A0an=
+d=C2=A0accept=C2=A0an=0D=0A>=C2=A0incoming=C2=A0PB-ADV=C2=A0provisioning=C2=
+=A0session.=0D=0A>=C2=A0=C2=A0=0D=0A>=C2=A0Two=C2=A0of=C2=A0us=C2=A0(Inga=
+=C2=A0and=C2=A0Brian)=C2=A0have=C2=A0been=C2=A0working=C2=A0on=C2=A0this,=
+=C2=A0and=C2=A0will=C2=A0be=0D=0A>=C2=A0the=C2=A0initial=C2=A0supporters=C2=
+=A0and=C2=A0maintainers,=C2=A0and=C2=A0we=C2=A0gladly=C2=A0invite=C2=A0othe=
+r=0D=0A>=C2=A0interested=C2=A0parties=C2=A0to=C2=A0participate.=0D=0A>=C2=
+=A0=C2=A0=0D=0A>=C2=A0Brian=C2=A0Gix=C2=A0(7):=0D=0A>=C2=A0=C2=A0=C2=A0mesh=
+d:=C2=A0Shared=C2=A0private=C2=A0meshd=C2=A0interfaces=0D=0A>=C2=A0=C2=A0=
+=C2=A0meshd:=C2=A0Mesh=C2=A0crypto=C2=A0support=0D=0A>=C2=A0=C2=A0=C2=A0mes=
+hd:=C2=A0Infrastructure=C2=A0for=C2=A0Mesh=C2=A0daemon=0D=0A>=C2=A0=C2=A0=
+=C2=A0meshd:=C2=A0Initial=C2=A0Mesh=C2=A0Friendship=C2=A0support=0D=0A>=C2=
+=A0=C2=A0=C2=A0meshd:=C2=A0Provisioning=C2=A0logic=C2=A0for=C2=A0mesh=0D=0A=
+>=C2=A0=C2=A0=C2=A0meshd:=C2=A0Upper=C2=A0and=C2=A0Lower=C2=A0mesh=C2=A0tra=
+nsport=0D=0A>=C2=A0=C2=A0=C2=A0meshd:=C2=A0Add=C2=A0Accessors=C2=A0to=C2=A0=
+Transport=C2=A0layer=C2=A0data=0D=0A>=C2=A0=C2=A0=0D=0A>=C2=A0Inga=C2=A0Sto=
+tland=C2=A0(7):=0D=0A>=C2=A0=C2=A0=C2=A0meshd:=C2=A0Header=C2=A0files=C2=A0=
+for=C2=A0mesh=C2=A0access=C2=A0layer=C2=A0and=C2=A0utilities=0D=0A>=C2=A0=
+=C2=A0=C2=A0meshd:=C2=A0Source=C2=A0files=C2=A0for=C2=A0mesh=C2=A0access=C2=
+=A0layer=C2=A0and=C2=A0utilities=0D=0A>=C2=A0=C2=A0=C2=A0meshd:=C2=A0Source=
+=C2=A0code=C2=A0for=C2=A0handling=C2=A0access=C2=A0layer=C2=A0mux/demux=0D=
+=0A>=C2=A0=C2=A0=C2=A0meshd:=C2=A0Mesh=C2=A0config=C2=A0server=C2=A0model=
+=0D=0A>=C2=A0=C2=A0=C2=A0meshd:=C2=A0Read=C2=A0and=C2=A0write=C2=A0mesh=C2=
+=A0configuration=C2=A0in=C2=A0JSON=C2=A0format=0D=0A>=C2=A0=C2=A0=C2=A0mesh=
+d:=C2=A0Sample=C2=A0device=C2=A0composition=C2=A0in=C2=A0JSON=C2=A0fromat=
+=0D=0A>=C2=A0=C2=A0=C2=A0Makefile=C2=A0for=C2=A0meshd=C2=A0and=C2=A0configu=
+re.ac=0D=0A>=C2=A0=C2=A0=0D=0A>=C2=A0=C2=A0Makefile.am=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A0=C2=A01=C2=A0+=0D=0A>=C2=A0=C2=A0Mak=
+efile.meshd=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A044=C2=A0+=0D=0A>=C2=
+=A0=C2=A0configure.ac=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A0=
+=C2=A02=C2=A0+-=0D=0A>=C2=A0=C2=A0meshd/common/agent.c=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0229=C2=A0+++=0D=0A>=
+=C2=A0=C2=A0meshd/common/agent.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A042=C2=A0+=0D=0A>=C2=A0=C2=A0meshd/co=
+mmon/mesh-defs.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A084=
+=C2=A0+=0D=0A>=C2=A0=C2=A0meshd/common/util.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A071=C2=A0+=0D=0A>=
+=C2=A0=C2=A0meshd/common/util.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A025=C2=A0+=0D=0A>=C2=A0=C2=A0me=
+shd/config/composition.json=C2=A0=7C=C2=A0=C2=A0=C2=A044=C2=A0+=0D=0A>=C2=
+=A0=C2=A0meshd/mesh-json/mesh-db.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A013=
+60=C2=A0+++++++++++++=0D=0A>=C2=A0=C2=A0meshd/mesh-json/mesh-db.h=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0144=C2=A0++=0D=0A>=C2=A0=C2=A0meshd/src=
+/appkey.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=7C=C2=A0=C2=A0538=C2=A0++++++=0D=0A>=C2=A0=C2=A0meshd/src/appkey.h=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=
+=C2=A0=C2=A0=C2=A043=C2=A0+=0D=0A>=C2=A0=C2=A0meshd/src/btmesh.c=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=
+=A0176=C2=A0++=0D=0A>=C2=A0=C2=A0meshd/src/cfgmod-server.c=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=7C=C2=A01194=C2=A0++++++++++++=0D=0A>=C2=A0=C2=A0meshd/src/=
+cfgmod.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=7C=C2=A0=C2=A0=C2=A098=C2=A0+=0D=0A>=C2=A0=C2=A0meshd/src/crypto.c=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=
+=C2=A01607=C2=A0++++++++++++++++=0D=0A>=C2=A0=C2=A0meshd/src/crypto.h=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=
+=C2=A0164=C2=A0++=0D=0A>=C2=A0=C2=A0meshd/src/display.c=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A067=C2=
+=A0+=0D=0A>=C2=A0=C2=A0meshd/src/display.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A029=C2=A0+=0D=0A>=C2=
+=A0=C2=A0meshd/src/friend.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A01116=C2=A0+++++++++++=0D=0A>=C2=A0=C2=A0me=
+shd/src/friend.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A057=C2=A0+=0D=0A>=C2=A0=C2=A0meshd/src/h=
+ci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0699=C2=A0+++++++=0D=0A>=C2=A0=C2=A0mesh=
+d/src/hci.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A056=C2=A0+=0D=0A>=C2=A0=C2=
+=A0meshd/src/main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0174=C2=A0++=0D=0A>=C2=A0=C2=A0=
+meshd/src/mesh-io-api.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=
+=C2=A0=C2=A058=C2=A0+=0D=0A>=C2=A0=C2=A0meshd/src/mesh-io-generic.c=C2=A0=
+=C2=A0=C2=A0=7C=C2=A0=C2=A0660=C2=A0+++++++=0D=0A>=C2=A0=C2=A0meshd/src/mes=
+h-io-generic.h=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A020=C2=A0+=0D=0A>=C2=A0=
+=C2=A0meshd/src/mesh-io.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0187=C2=A0++=0D=0A>=C2=A0=C2=A0meshd/src/me=
+sh-io.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=7C=C2=A0=C2=A0=C2=A099=C2=A0+=0D=0A>=C2=A0=C2=A0meshd/src/mesh.c=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=7C=C2=A0=C2=A0184=C2=A0++=0D=0A>=C2=A0=C2=A0meshd/src/mesh.h=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=
+=C2=A0=C2=A0=C2=A032=C2=A0+=0D=0A>=C2=A0=C2=A0meshd/src/model.c=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=
+1274=C2=A0+++++++++++++=0D=0A>=C2=A0=C2=A0meshd/src/model.h=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=
+=A0146=C2=A0++=0D=0A>=C2=A0=C2=A0meshd/src/net.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0418=
+8=C2=A0+++++++++++++++++++++++++++++++++++++++++=0D=0A>=C2=A0=C2=A0meshd/sr=
+c/net.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0392=C2=A0++++=0D=0A>=C2=A0=C2=A0mesh=
+d/src/node.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0851=C2=A0+++++++++=0D=0A>=C2=A0=C2=A0me=
+shd/src/node.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A080=C2=A0+=0D=0A>=C2=A0=C2=A0me=
+shd/src/prov.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0722=C2=A0+++++++=0D=0A>=C2=A0=C2=A0m=
+eshd/src/prov.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0162=C2=A0++=0D=0A>=C2=A0=C2=A0meshd/=
+src/provision.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=
+=A01159=C2=A0++++++++++++=0D=0A>=C2=A0=C2=A0meshd/src/provision.h=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A030=C2=A0+=
+=0D=0A>=C2=A0=C2=A0meshd/src/storage.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0673=C2=A0+++++++=0D=0A>=C2=A0=
+=C2=A0meshd/src/storage.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=7C=C2=A0=C2=A0=C2=A051=C2=A0+=0D=0A>=C2=A0=C2=A044=C2=A0=
+files=C2=A0changed,=C2=A019031=C2=A0insertions(+),=C2=A01=C2=A0deletion(-)=
+=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0Makefile.meshd=0D=0A>=
+=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/common/agent.c=0D=0A>=
+=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/common/agent.h=0D=0A>=
+=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/common/mesh-defs.h=0D=
+=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/common/util.c=0D=0A=
+>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/common/util.h=0D=0A>=
+=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/config/composition.json=
+=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/mesh-json/mesh-d=
+b.c=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/mesh-json/mes=
+h-db.h=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/appkey=
+.c=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/appkey.h=
+=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/btmesh.c=0D=
+=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/cfgmod-server.c=
+=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/cfgmod.h=0D=
+=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/crypto.c=0D=0A>=
+=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/crypto.h=0D=0A>=C2=
+=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/display.c=0D=0A>=C2=A0=
+=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/display.h=0D=0A>=C2=A0=C2=
+=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/friend.c=0D=0A>=C2=A0=C2=A0c=
+reate=C2=A0mode=C2=A0100644=C2=A0meshd/src/friend.h=0D=0A>=C2=A0=C2=A0creat=
+e=C2=A0mode=C2=A0100644=C2=A0meshd/src/hci.c=0D=0A>=C2=A0=C2=A0create=C2=A0=
+mode=C2=A0100644=C2=A0meshd/src/hci.h=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=
+=A0100644=C2=A0meshd/src/main.c=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100=
+644=C2=A0meshd/src/mesh-io-api.h=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A010=
+0644=C2=A0meshd/src/mesh-io-generic.c=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=
+=A0100644=C2=A0meshd/src/mesh-io-generic.h=0D=0A>=C2=A0=C2=A0create=C2=A0mo=
+de=C2=A0100644=C2=A0meshd/src/mesh-io.c=0D=0A>=C2=A0=C2=A0create=C2=A0mode=
+=C2=A0100644=C2=A0meshd/src/mesh-io.h=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=
+=A0100644=C2=A0meshd/src/mesh.c=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100=
+644=C2=A0meshd/src/mesh.h=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=
+=A0meshd/src/model.c=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0me=
+shd/src/model.h=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/s=
+rc/net.c=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/net.=
+h=0D=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/node.c=0D=
+=0A>=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/node.h=0D=0A>=
+=C2=A0=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/prov.c=0D=0A>=C2=A0=
+=C2=A0create=C2=A0mode=C2=A0100644=C2=A0meshd/src/prov.h=0D=0A>=C2=A0=C2=A0=
+create=C2=A0mode=C2=A0100644=C2=A0meshd/src/provision.c=0D=0A>=C2=A0=C2=A0c=
+reate=C2=A0mode=C2=A0100644=C2=A0meshd/src/provision.h=0D=0A>=C2=A0=C2=A0cr=
+eate=C2=A0mode=C2=A0100644=C2=A0meshd/src/storage.c=0D=0A>=C2=A0=C2=A0creat=
+e=C2=A0mode=C2=A0100644=C2=A0meshd/src/storage.h=0D=0A>=C2=A0=C2=A0=0D=0A>=
+=C2=A0--=C2=A0=0D=0A>=C2=A02.14.3=0D=0A=C2=A0=0D=0AIs=C2=A0there=C2=A0any=
+=C2=A0existing=C2=A0tool=C2=A0to=C2=A0provision=C2=A0over=C2=A0advertising=
+=C2=A0bearer?=0D=0A=C2=A0=0D=0A=C2=A0=0D=0A=C2=A0=0D=0A-=C2=A0Regards=0D=0A=
+Atul=C2=A0Rai
