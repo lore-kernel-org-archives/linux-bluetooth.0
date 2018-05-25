@@ -1,97 +1,25 @@
-Return-Path: <mka@chromium.org>
-Date: Fri, 25 May 2018 14:57:42 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
-	hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v6 2/5] Bluetooth: btqca: Rename ROME related functions
- to Generic functions
-Message-ID: <20180525215742.GA168650@google.com>
-References: <20180524160051.29966-1-bgodavar@codeaurora.org>
- <20180524160051.29966-3-bgodavar@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180524160051.29966-3-bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Jorge Miranda <jmiranda@dei.uminho.pt>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Continuous Bluetooth discovery 
+Message-Id: <E491D5C0-CCAE-4903-8DAE-23EE302BCD3C@dei.uminho.pt>
+Date: Fri, 25 May 2018 19:10:31 +0100
+To: linux-bluetooth@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, May 24, 2018 at 09:30:48PM +0530, Balakrishna Godavarthi wrote:
-> Some of the QCA BTSoC ROME functions, are used for different versions
-> or different make of BTSoC's. Instead of duplicating the same functions
-> for new chip, updating names of the functions that are used for both
-> chip's to keep this generic and would help in future when we would have
-> new BT SoC.
+Hi everybody,
 
-The commit message talks about 'functions', however only the name of
-one function (rome_patch_ver_req()) has changed. From the changes in
-log messages I assume you also intended to rename
-rome_reset() and rome_download_firmware(). 
+I developing daemon that executes a BLE device discovery continuously, i.e. it starts when the daemon starts and only terminates when the daemon terminates. This can last for a long time; as long as the dameon runs without crashing or being killed.
 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> 
-> Changes in v6:
-> 	* initial patch
-> 	* updated names of functions that are used for both the chips to 
-> 	  keep this generic and would help in future when we would have 
-> 	  new BT SoC.
-> 
-> ---
->  drivers/bluetooth/btqca.c | 14 +++++++-------
->  drivers/bluetooth/btqca.h |  6 ++++++
->  2 files changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 8219816c54a0..5c3551239b12 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -27,7 +27,7 @@
->  
->  #define VERSION "0.1"
->  
-> -static int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
-> +int qca_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
+I noticed a few days ago, that after leaving the daemon running for about a day, I couldn’t discover any BLE devices, or connect to a BLE device from the daemon, although the daemon was running properly because I could access to it through its API. This also applies to bluetoothctl. The only way to make the daemon work again was to restart the bluetooth service. Before this, I tried to power the adapter down and start/stop the scan through bluetoothctl, but to no avail. But I noticed that there were some Bluetooth events occurring, through btmon, when the scan was on, although nothing would come up on bluetoothctl or on my dameon. The best way I have to describe this is as if the events were queue and then were being poped.
 
-The different version names are confusing. The name of the function
-calls it 'patch version', the parameter 'rome_version' and the callers
-vary between 'soc_version' and 'rome_version'.
+So, is it possible that leaving the discovery running for this long can cause some issue on the bluetooth service? I noticed that on macOS, for example, a discovery would run for some time, then it stops and starts again - I presume the same happens on other OS. Should my daemon do the same? Why? For these tests I used Ubuntu 17.10 and BlueZ 5.47 (compiled from source).
 
-It would be unfair to ask you to 'fix the world' in this patch series,
-but please stick at least to a consistent naming scheme in the code
-you change. Obviously feel free to squeeze in another cleanup patch :)
+I also noticed that there were some updates on the last versions of BlueZ regarding discovery. Could updating BlueZ to a more recent version solve this?
 
->  static int rome_reset(struct hci_dev *hdev)
->  {
->  	struct sk_buff *skb;
->  	int err;
->  
-> -	BT_DBG("%s: ROME HCI_RESET", hdev->name);
-> +	bt_dev_dbg(hdev, "QCA BTSoC HCI_RESET");
->  
->  	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
->  	if (IS_ERR(skb)) {
-> @@ -267,7 +267,7 @@ static int rome_download_firmware(struct hci_dev *hdev,
->  	const u8 *segment;
->  	int ret, remain, i = 0;
->  
-> -	bt_dev_info(hdev, "ROME Downloading %s", config->fwname);
-> +	bt_dev_info(hdev, "QCA BTSoC Downloading %s", config->fwname);
->  
->  	ret = request_firmware(&fw, config->fwname, &hdev->dev);
->  	if (ret) {
-> @@ -339,7 +339,7 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
->  	config.user_baud_rate = baudrate;
->  
->  	/* Get ROME version information */
+Thank you in advance!
 
-'patch version'/'SoC version'/... , whatever the chosen consistent
-name is.
-
-> -	err = rome_patch_ver_req(hdev, &rome_ver);
-> +	err = qca_patch_ver_req(hdev, &rome_ver);
-
-rome_ver => ${consistent_name}_ver
-
-Thanks
-
-Matthias
+Jorge Miranda
