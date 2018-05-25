@@ -1,116 +1,86 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] android/client: Fix compilation with GCC 8
+Date: Fri, 25 May 2018 10:03:33 +0200
+Message-ID: <2695625.sZmO0cdVq1@ix>
+In-Reply-To: <20180509121113.4110-3-szymon.janc@codecoup.pl>
+References: <20180509121113.4110-1-szymon.janc@codecoup.pl> <20180509121113.4110-3-szymon.janc@codecoup.pl>
 MIME-Version: 1.0
-References: <20180525073857.17860-1-grzegorz.kolodziejczyk@codecoup.pl> <CABBYNZKBje6E+it8JyLwT1_jGrFCY+rxTxoz5Wq0AXQgzX-eRg@mail.gmail.com>
-In-Reply-To: <CABBYNZKBje6E+it8JyLwT1_jGrFCY+rxTxoz5Wq0AXQgzX-eRg@mail.gmail.com>
-From: =?UTF-8?Q?Grzegorz_Ko=C5=82odziejczyk?=
-        <grzegorz.kolodziejczyk@codecoup.pl>
-Date: Fri, 25 May 2018 10:06:52 +0200
-Message-ID: <CALevQMZTcLweMQ_067EmiYFoCV+0m9NZpFkW9f9u8yy+hZxLXQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 1/4] doc/gatt-api: Add authorization options for attributes
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-pt., 25 maj 2018 o 09:52 Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-napisa=C5=82(a):
-
-> Hi Grzegorz,
-
-> On Fri, May 25, 2018 at 10:38 AM, Grzegorz Kolodziejczyk
-> <grzegorz.kolodziejczyk@codecoup.pl> wrote:
-> > This patch adds authorization property for attributes and prepare write
-> > request for authorization option for write request. This is require to
-> > handle correctly prepare writes, which may response with insufficient
-> > authorization error.
-> > ---
-> >  doc/gatt-api.txt | 18 ++++++++++++++++++
-> >  1 file changed, 18 insertions(+)
-> >
-> > diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> > index 0f1cc9029..914fc7031 100644
-> > --- a/doc/gatt-api.txt
-> > +++ b/doc/gatt-api.txt
-> > @@ -85,6 +85,9 @@ Methods               array{byte} ReadValue(dict
-options)
-> >                         Possible options: "offset": Start offset
-> >                                           "device": Device path (Server
-only)
-> >                                           "link": Link type (Server
-only)
-> > +                                         "prep-authorize": boolean Is
-prepare
-> > +
-authorization
-> > +                                                           request
-> >
-> >                         Possible Errors: org.bluez.Error.Failed
-> >                                          org.bluez.Error.InProgress
-> > @@ -251,6 +254,12 @@ Properties string UUID [read-only]
-> >                                 "secure-read" (Server only)
-> >                                 "secure-write" (Server only)
-> >
-> > +               boolean Authorize [read-only, optional] (Server only)
-> > +
-> > +                       True, if authorization is required for attribut=
-e
-> > +                       operations. By default this valuie is set to
-false for
-> > +                       attribute.
-
-> One of the things we discussed yesterday was to move to Flags as
-> authorization, that way it is not even possible to set it to false.
-
-Ok - now I got it, I've missunderstood it.
-> >  Characteristic Descriptors hierarchy
-> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > @@ -284,6 +293,9 @@ Methods             array{byte} ReadValue(dict
-flags)
-> >                         Possible options: "offset": Start offset
-> >                                           "device": Device path (Server
-only)
-> >                                           "link": Link type (Server
-only)
-> > +                                         "prep-authorize": boolean Is
-prepare
-> > +
-authorization
-> > +                                                           request
-> >
-> >                         Possible Errors: org.bluez.Error.Failed
-> >                                          org.bluez.Error.InProgress
-> > @@ -322,6 +334,12 @@ Properties string UUID [read-only]
-> >                                 "secure-read" (Server Only)
-> >                                 "secure-write" (Server Only)
-> >
-> > +               boolean Authorize [read-only, optional] (Server only)
-> > +
-> > +                       True, if authorization is required for attribut=
-e
-> > +                       operations. By default this valuie is set to
-false for
-> > +                       attribute.
-> > +
-> >  GATT Profile hierarchy
-> >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > --
-> > 2.13.6
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-linux-bluetooth" in
-> > the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+On Wednesday, 9 May 2018 14:11:13 CEST Szymon Janc wrote:
+>   CC       android/client/android_haltest-if-gatt.o
+> android/client/if-gatt.c: In function =E2=80=98multi_adv_set_inst_data_p=
+=E2=80=99:
+> android/client/if-gatt.c:2034:7: error: =E2=80=98set_scan_rsp=E2=80=99 ma=
+y be used
+>       uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+>   EXEC(if_gatt->client->multi_adv_set_inst_data, client_if, set_scan_rsp,
+>        ^~~~~~~
+> android/client/if-gatt.c:2034:7: error: =E2=80=98include_name=E2=80=99 ma=
+y be used
+>          uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+> android/client/if-gatt.c:2034:7: error: =E2=80=98include_txpower=E2=80=99=
+ may be used
+>          uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+> android/client/if-gatt.c: In function =E2=80=98set_adv_data_p=E2=80=99:
+> android/client/if-gatt.c:1859:7: error: =E2=80=98set_scan_rsp=E2=80=99 ma=
+y be used
+>          uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+>   EXEC(if_gatt->client->set_adv_data, client_if, set_scan_rsp,
+>        ^~~~~~~
+> android/client/if-gatt.c:1859:7: error: =E2=80=98include_name=E2=80=99 ma=
+y be used
+>          uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+> android/client/if-gatt.c:1859:7: error: =E2=80=98include_txpower=E2=80=99=
+ may be used
+>          uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+> cc1: all warnings being treated as errors
+> make[1]: *** [Makefile:6431: android/client/android_haltest-if-gatt.o] Er=
+ror
+> 1 make: *** [Makefile:3262: all] Error 2
+> ---
+>  android/client/if-gatt.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+> index 35267832f..ed14f92c4 100644
+> --- a/android/client/if-gatt.c
+> +++ b/android/client/if-gatt.c
+> @@ -1825,8 +1825,9 @@ static void set_adv_data_c(int argc, const char
+> **argv, static void set_adv_data_p(int argc, const char **argv)
+>  {
+>  	int client_if;
+> -	bool set_scan_rsp;
+> -	bool include_name, include_txpower;
+> +	bool set_scan_rsp =3D false;
+> +	bool include_name =3D false;
+> +	bool include_txpower =3D false;
+>  	int min_interval, max_interval;
+>  	int appearance;
+>  	uint16_t manufacturer_len;
+> @@ -2003,8 +2004,9 @@ static void multi_adv_set_inst_data_c(int argc, con=
+st
+> char **argv, static void multi_adv_set_inst_data_p(int argc, const char
+> **argv) {
+>  	int client_if;
+> -	bool set_scan_rsp;
+> -	bool include_name, include_txpower;
+> +	bool set_scan_rsp =3D false;
+> +	bool include_name =3D false;
+> +	bool include_txpower =3D false;
+>  	int appearance;
+>  	uint16_t manufacturer_len;
+>  	uint8_t manufacturer_data[100];
 
 
+This patch is now applied.
 
-> --
-> Luiz Augusto von Dentz
+=2D-=20
+pozdrawiam
+Szymon Janc
 
-Regards,
-Grzegorz
+
