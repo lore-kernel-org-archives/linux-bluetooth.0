@@ -1,95 +1,122 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <mka@chromium.org>
+Date: Fri, 25 May 2018 16:54:33 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
+	hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v5 2/3] Bluetooth: btqca: Add wcn3990 firmware download
+ support.
+Message-ID: <20180525235433.GC168650@google.com>
+References: <1526041263-18795-1-git-send-email-bgodavar@codeaurora.org>
+ <1526041263-18795-3-git-send-email-bgodavar@codeaurora.org>
+ <20180511174024.GL19594@google.com>
+ <7677945035df7442d604b66d7c47e11b@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <68c8200a-d99f-431c-8685-30b5b9e395c4@interia.pl>
-References: <68c8200a-d99f-431c-8685-30b5b9e395c4@interia.pl>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Sat, 26 May 2018 08:13:02 +0300
-Message-ID: <CABBYNZKAHLb9ELQUyvfCdb70HdfbWDXMO201d9_4yebPvWDBLQ@mail.gmail.com>
-Subject: Re: Problem with mpris-proxy
-To: =?UTF-8?Q?Rafa=C5=82_Bilski?= <rafalbilski@interia.pl>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <7677945035df7442d604b66d7c47e11b@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rafal,
+On Fri, May 18, 2018 at 08:04:46PM +0530, Balakrishna Godavarthi wrote:
 
-On Fri, May 25, 2018 at 7:31 PM, Rafa=C5=82 Bilski <rafalbilski@interia.pl>=
- wrote:
-> Hello,
->
->     I've been trying to display track name on bluetooth device AND contro=
-l a
-> player on computer using
->
-> device's buttons.
->
->     I can have one, but not both.
->
->     If "mpris-proxy" isn't running I get key pressed/released event on
-> computer and I can control the player
->
-> with buttons. Even if player doesn't have GUI it seems to get signals on
-> dbus mpris interface. BUT no metadata
+> as i was on vacation i couldn't able to reply to your comments.
+> find my comments inline.
 
-Do you have the mpris-player and bluetoothd logs?
+Also sorry for my late reply
 
-> seems to be send to bluetooth device and there isn't anything on display.
->
->     When "mpris-proxy" is running player doesn't get any button events, B=
-UT
-> I have all track information on
->
-> a display.
+> On 2018-05-11 23:10, Matthias Kaehlcke wrote:
+> > Hi Bala,
+> > 
+> > On Fri, May 11, 2018 at 05:51:02PM +0530, Balakrishna Godavarthi wrote:
+> > > This patch enables the RAM and NV patch download for wcn3990.
+> > > 
+> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> > > ---
+> > >  drivers/bluetooth/btqca.c | 46
+> > > +++++++++++++++++++++++++++++++++++++++++++++-
+> > >  drivers/bluetooth/btqca.h | 13 +++++++++++++
+> > >  2 files changed, 58 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> > > index 8219816..40c6b4f 100644
+> > > --- a/drivers/bluetooth/btqca.c
+> > > +++ b/drivers/bluetooth/btqca.c
+> > > @@ -27,7 +27,7 @@
+> > > 
+> > >  #define VERSION "0.1"
+> > > 
+> > > -static int rome_patch_ver_req(struct hci_dev *hdev, u32
+> > > *rome_version)
+> > > +int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
+> > 
+> > If this and other functions aren't really Rome specific they should
+> > probably be renamed to qca_...
+> > 
+> [Bala]:- will update the functions name in separate patch.
+> 
+> > > +int qca_uart_setup_cherokee(struct hci_dev *hdev, uint8_t baudrate,
+> > > +			    u32 *soc_ver)
+> > > +{
+> > > +	struct rome_config config;
+> > > +	int err;
+> > > +
+> > > +	/* we are using the existing funciton of ROME,
+> > > +	 * instead of duplicating the function for wcn3990.
+> > > +	 */
+> > 
+> > The comment isn't quite accurate, the qca_uart_setup_cherokee() calls
+> > existing functions, but is essentially a copy of qca_uart_setup_rome().
+> > 
+> > The main difference is that the patch version is passed as a parameter
+> > instead of determining it in the uart setup function. There seems to
+> > be no need to pass the version number in, or if you prefer to do it
+> > this way, you could change the Rome code to do this.
+> > 
+> > The other delta is the filename extension of the rampatch file, which
+> > is .bin for Rome and .tlv for Cherokee. Is there a good reason to use
+> > a different extension? If not just stick to the existing naming
+> > scheme, otherwise you could pass the chip type as a parameter and
+> > chose the extensions based on that.
+> > 
+> [Bala]:- as we see the process to setup of BTchip ROME and wcn3990 setup.
+>          For Rome:
+>          1. change the operating speed to 3.0mbps.
+>          2. request the version
+>          3. download RAM patch (.bin extestion)
+>          4. downlaod NV patch (.bin extersnion)
+>          5. Reset ROME
+> 
+>         steps 2 to 5 are done in the function qca_uart_setup_rome()
+> 
+>         For WCN3990:
+>         1. Set baudrate to 115200.
+>         2. request the version
+>         3. set baudrate to operating speed.
+>         4. download RAM patch (.tlv extestion)
+>         5. downlaod NV patch (.bin extersnion)
+>         6. Reset wcn3990
+> 
+>        steps 2 is done in function rome_patch_ver_req(), where as steps 4 to
+> 6 qca_uart_setup_cherokee()
+> 
+>        the big difference is .bin extension for RAM patch is deprecated and
+> BTCCHIP vendor will not support .bin for ram patch any more for latest
+> chips.
+>        so that could be reason we using a separate function
+> qca_uart_setup_cherokee(). if i use the same function by passing the chip
+> name to decide the file extension.
+>        but again unnecessary i have to request the version command to
+> BTCHIP.
 
-Perhaps with dbus-monitor if the message is not being rejected or something=
-.
+You could just pass the version as parameter in both cases, Rome and
+Cherokee could go through their respective hoops to obtain it before
+calling qca_uart_setup().
 
->     In both cases, with pulseaudio, "btmon" shows that device sends key
-> pressed/released events:
->
->> ACL Data RX: Handle 43 flags 0x02 dlen 12                  #1 [hci0]
->> 6.185397
->       Channel: 68 len 8 [PSM 0 mode 0] {chan 0}
->         30 11 0e 00 48 7c 46 00 0...H|F.
-> < ACL Data TX: Handle 43 flags 0x00 dlen 12 #2 [hci0] 6.185506
->       Channel: 68 len 8 [PSM 0 mode 0] {chan 0}
->         32 11 0e 09 48 7c 46 00 2...H|F.
->> ACL Data RX: Handle 43 flags 0x02 dlen 12 #3 [hci0] 6.189511
->       Channel: 68 len 8 [PSM 0 mode 0] {chan 0}
->         40 11 0e 00 48 7c c6 00 @...H|..
-> < ACL Data TX: Handle 43 flags 0x00 dlen 12 #4 [hci0] 6.189650
->       Channel: 68 len 8 [PSM 0 mode 0] {chan 0}
->         42 11 0e 09 48 7c c6 00 B...H|..
->> HCI Event: Number of Completed Packets (0x13) plen 5 #5 [hci0] 6.191383
->         Num handles: 1
->         Handle: 43
->         Count: 1
->> HCI Event: Number of Completed Packets (0x13) plen 5 #6 [hci0] 6.193385
->         Num handles: 1
->         Handle: 43
->         Count: 1
->
->     On bluealsa I only have sound. No keys or information on display.
->
-> Is this issue related to pulseaudio?
-> Can I somehow take over uuid 0x110e using dbus and python and still have
-> sound?
-> I tried connecting to 0x110e L2CAP socket, but this only works if device =
-is
-> disconnected and unable to produce sound.
->
-> Please advise
-> Rafal Bilski
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+The different extension and format strings could easily be fixed. I
+admit though that the length of the function is on the edge of where
+the redundance is an issue, so if Marcel is fine with it I won't inisit.
 
-
-
---=20
-Luiz Augusto von Dentz
+(slightly off-topic: is qca_uart_setup_xyz() actually the appropriate
+name for the function? Admittedly I know little about the platform,
+but it seems the most important thing the function does is to load the
+two firmware files, which sounds more like qca_setup_xyz() ...)
