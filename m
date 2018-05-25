@@ -1,341 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 2/4] shared/gatt-server: Request authorization for prepare writes.
-Date: Fri, 25 May 2018 09:38:55 +0200
-Message-Id: <20180525073857.17860-2-grzegorz.kolodziejczyk@codecoup.pl>
-In-Reply-To: <20180525073857.17860-1-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20180525073857.17860-1-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ v3 1/4] doc/gatt-api: Add authorization options for attributes
+Date: Fri, 25 May 2018 09:38:54 +0200
+Message-Id: <20180525073857.17860-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds gatt-server possibility to request authorization from
-application if needed and previously wasn't authorized. Authorization is
-requested by sending message with set prepare write authorization reqest
-to client.
+This patch adds authorization property for attributes and prepare write
+request for authorization option for write request. This is require to
+handle correctly prepare writes, which may response with insufficient
+authorization error.
 ---
- src/gatt-database.c      | 93 ++++++++++++++++++++++++++++++++++++++++--------
- src/shared/gatt-server.c | 64 ++++++++++++++++++++++++++++-----
- 2 files changed, 134 insertions(+), 23 deletions(-)
+ doc/gatt-api.txt | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 0ac5b75b0..f46d96271 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -133,6 +133,8 @@ struct external_chrc {
- 	struct queue *pending_reads;
- 	struct queue *pending_writes;
- 	unsigned int ntfy_cnt;
-+	bool prep_authorized;
-+	bool req_prep_authorization;
- };
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 0f1cc9029..914fc7031 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -85,6 +85,9 @@ Methods		array{byte} ReadValue(dict options)
+ 			Possible options: "offset": Start offset
+ 					  "device": Device path (Server only)
+ 					  "link": Link type (Server only)
++					  "prep-authorize": boolean Is prepare
++							    authorization
++							    request
  
- struct external_desc {
-@@ -144,6 +146,8 @@ struct external_desc {
- 	bool handled;
- 	struct queue *pending_reads;
- 	struct queue *pending_writes;
-+	bool prep_authorized;
-+	bool req_prep_authorization;
- };
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+@@ -251,6 +254,12 @@ Properties	string UUID [read-only]
+ 				"secure-read" (Server only)
+ 				"secure-write" (Server only)
  
- struct pending_op {
-@@ -154,6 +158,8 @@ struct pending_op {
- 	struct gatt_db_attribute *attrib;
- 	struct queue *owner_queue;
- 	struct iovec data;
-+	bool is_characteristic;
-+	bool prep_authorize;
- };
- 
- struct notify {
-@@ -1937,6 +1943,9 @@ static void append_options(DBusMessageIter *iter, void *user_data)
- 							&op->offset);
- 	if (link)
- 		dict_append_entry(iter, "link", DBUS_TYPE_STRING, &link);
-+	if (op->prep_authorize)
-+		dict_append_entry(iter, "prep-authorize", DBUS_TYPE_BOOLEAN,
-+							&op->prep_authorize);
- }
- 
- static void read_setup_cb(DBusMessageIter *iter, void *user_data)
-@@ -2008,6 +2017,8 @@ static void write_setup_cb(DBusMessageIter *iter, void *user_data)
- static void write_reply_cb(DBusMessage *message, void *user_data)
- {
- 	struct pending_op *op = user_data;
-+	struct external_chrc *chrc;
-+	struct external_desc *desc;
- 	DBusError err;
- 	DBusMessageIter iter;
- 	uint8_t ecode = 0;
-@@ -2027,6 +2038,16 @@ static void write_reply_cb(DBusMessage *message, void *user_data)
- 		goto done;
- 	}
- 
-+	if (op->prep_authorize) {
-+		if (op->is_characteristic) {
-+			chrc = gatt_db_attribute_get_user_data(op->attrib);
-+			chrc->prep_authorized = true;
-+		} else {
-+			desc = gatt_db_attribute_get_user_data(op->attrib);
-+			desc->prep_authorized = true;
-+		}
-+	}
++		boolean Authorize [read-only, optional] (Server only)
 +
- 	dbus_message_iter_init(message, &iter);
- 	if (dbus_message_iter_has_next(&iter)) {
- 		/*
-@@ -2045,9 +2066,10 @@ static struct pending_op *pending_write_new(struct btd_device *device,
- 					struct queue *owner_queue,
- 					struct gatt_db_attribute *attrib,
- 					unsigned int id,
--					const uint8_t *value,
--					size_t len,
--					uint16_t offset, uint8_t link_type)
-+					const uint8_t *value, size_t len,
-+					uint16_t offset, uint8_t link_type,
-+					bool is_characteristic,
-+					bool prep_authorize)
- {
- 	struct pending_op *op;
- 
-@@ -2062,6 +2084,8 @@ static struct pending_op *pending_write_new(struct btd_device *device,
- 	op->id = id;
- 	op->offset = offset;
- 	op->link_type = link_type;
-+	op->is_characteristic = is_characteristic;
-+	op->prep_authorize = prep_authorize;
- 	queue_push_tail(owner_queue, op);
- 
- 	return op;
-@@ -2073,12 +2097,15 @@ static struct pending_op *send_write(struct btd_device *device,
- 					struct queue *owner_queue,
- 					unsigned int id,
- 					const uint8_t *value, size_t len,
--					uint16_t offset, uint8_t link_type)
-+					uint16_t offset, uint8_t link_type,
-+					bool is_characteristic,
-+					bool prep_authorize)
- {
- 	struct pending_op *op;
- 
- 	op = pending_write_new(device, owner_queue, attrib, id, value, len,
--							offset, link_type);
-+					offset, link_type, is_characteristic,
-+					prep_authorize);
- 
- 	if (g_dbus_proxy_method_call(proxy, "WriteValue", write_setup_cb,
- 					owner_queue ? write_reply_cb : NULL,
-@@ -2191,7 +2218,7 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
- retry:
- 	send_write(op->device, op->attrib, chrc->proxy, NULL, op->id,
- 				op->data.iov_base, op->data.iov_len, 0,
--				op->link_type);
-+				op->link_type, false, false);
- }
- 
- static void acquire_write_setup(DBusMessageIter *iter, void *user_data)
-@@ -2229,7 +2256,7 @@ static struct pending_op *acquire_write(struct external_chrc *chrc,
- 	struct pending_op *op;
- 
- 	op = pending_write_new(device, NULL, attrib, id, value, len, 0,
--							link_type);
-+						link_type, false, false);
- 
- 	if (g_dbus_proxy_method_call(chrc->proxy, "AcquireWrite",
- 					acquire_write_setup,
-@@ -2532,8 +2559,24 @@ static void desc_write_cb(struct gatt_db_attribute *attrib,
- 		goto fail;
- 	}
- 
-+	if (opcode == BT_ATT_OP_PREP_WRITE_REQ) {
-+		if (!desc->prep_authorized && desc->req_prep_authorization)
-+			send_write(device, attrib, desc->proxy,
-+					desc->pending_writes, id, value, len,
-+					offset, bt_att_get_link_type(att),
-+					false, true);
-+		else
-+			gatt_db_attribute_write_result(attrib, id, 0);
++			True, if authorization is required for attribute
++			operations. By default this valuie is set to false for
++			attribute.
 +
-+		return;
-+	}
-+
-+	if (opcode == BT_ATT_OP_EXEC_WRITE_REQ)
-+		desc->prep_authorized = false;
-+
- 	if (send_write(device, attrib, desc->proxy, desc->pending_writes, id,
--				value, len, offset, bt_att_get_link_type(att)))
-+			value, len, offset, bt_att_get_link_type(att), false,
-+			false))
- 		return;
+ Characteristic Descriptors hierarchy
+ ====================================
  
- fail:
-@@ -2544,12 +2587,16 @@ static bool database_add_desc(struct external_service *service,
- 						struct external_desc *desc)
- {
- 	bt_uuid_t uuid;
-+	DBusMessageIter iter;
+@@ -284,6 +293,9 @@ Methods		array{byte} ReadValue(dict flags)
+ 			Possible options: "offset": Start offset
+ 					  "device": Device path (Server only)
+ 					  "link": Link type (Server only)
++					  "prep-authorize": boolean Is prepare
++							    authorization
++							    request
  
- 	if (!parse_uuid(desc->proxy, &uuid)) {
- 		error("Failed to read \"UUID\" property of descriptor");
- 		return false;
- 	}
+ 			Possible Errors: org.bluez.Error.Failed
+ 					 org.bluez.Error.InProgress
+@@ -322,6 +334,12 @@ Properties	string UUID [read-only]
+ 				"secure-read" (Server Only)
+ 				"secure-write" (Server Only)
  
-+	desc->req_prep_authorization = g_dbus_proxy_get_property(desc->proxy,
-+							"Authorize", &iter);
++		boolean Authorize [read-only, optional] (Server only)
 +
- 	desc->attrib = gatt_db_service_add_descriptor(service->attrib, &uuid,
- 							desc->perm,
- 							desc_read_cb,
-@@ -2614,6 +2661,25 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
- 		goto fail;
- 	}
++			True, if authorization is required for attribute
++			operations. By default this valuie is set to false for
++			attribute.
++
+ GATT Profile hierarchy
+ =====================
  
-+	if (!(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
-+		queue = chrc->pending_writes;
-+	else
-+		queue = NULL;
-+
-+	if (opcode == BT_ATT_OP_PREP_WRITE_REQ) {
-+		if (!chrc->prep_authorized && chrc->req_prep_authorization)
-+			send_write(device, attrib, chrc->proxy, queue,
-+					id, value, len, offset,
-+					bt_att_get_link_type(att), true, true);
-+		else
-+			gatt_db_attribute_write_result(attrib, id, 0);
-+
-+		return;
-+	}
-+
-+	if (id == BT_ATT_OP_EXEC_WRITE_REQ)
-+		chrc->prep_authorized = false;
-+
- 	if (chrc->write_io) {
- 		if (pipe_io_send(chrc->write_io, value, len) < 0) {
- 			error("Unable to write: %s", strerror(errno));
-@@ -2630,13 +2696,8 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
- 			return;
- 	}
- 
--	if (!(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
--		queue = chrc->pending_writes;
--	else
--		queue = NULL;
--
- 	if (send_write(device, attrib, chrc->proxy, queue, id, value, len,
--					offset, bt_att_get_link_type(att)))
-+			offset, bt_att_get_link_type(att), false, false))
- 		return;
- 
- fail:
-@@ -2679,6 +2740,7 @@ static bool database_add_chrc(struct external_service *service,
- {
- 	bt_uuid_t uuid;
- 	const struct queue_entry *entry;
-+	DBusMessageIter iter;
- 
- 	if (!parse_uuid(chrc->proxy, &uuid)) {
- 		error("Failed to read \"UUID\" property of characteristic");
-@@ -2690,6 +2752,9 @@ static bool database_add_chrc(struct external_service *service,
- 		return false;
- 	}
- 
-+	chrc->req_prep_authorization = g_dbus_proxy_get_property(chrc->proxy,
-+							"Authorize", &iter);
-+
- 	chrc->attrib = gatt_db_service_add_characteristic(service->attrib,
- 						&uuid, chrc->perm,
- 						chrc->props, chrc_read_cb,
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 4b554f665..cdade76f8 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1208,6 +1208,45 @@ static bool store_prep_data(struct bt_gatt_server *server,
- 	return prep_data_new(server, handle, offset, length, value);
- }
- 
-+struct prep_write_complete_data {
-+	void *pdu;
-+	uint16_t length;
-+	struct bt_gatt_server *server;
-+};
-+
-+static void prep_write_complete_cb(struct gatt_db_attribute *attr, int err,
-+								void *user_data)
-+{
-+	struct prep_write_complete_data *pwcd = user_data;
-+	uint16_t handle = 0;
-+	uint16_t offset;
-+
-+	handle = get_le16(pwcd->pdu);
-+
-+	if (err) {
-+		bt_att_send_error_rsp(pwcd->server->att,
-+					BT_ATT_OP_PREP_WRITE_REQ, handle, err);
-+		free(pwcd->pdu);
-+		free(pwcd);
-+
-+		return;
-+	}
-+
-+	offset = get_le16(pwcd->pdu + 2);
-+
-+	if (!store_prep_data(pwcd->server, handle, offset, pwcd->length - 4,
-+						&((uint8_t *) pwcd->pdu)[4]))
-+		bt_att_send_error_rsp(pwcd->server->att,
-+					BT_ATT_OP_PREP_WRITE_RSP, handle,
-+					BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
-+
-+	bt_att_send(pwcd->server->att, BT_ATT_OP_PREP_WRITE_RSP, pwcd->pdu,
-+						pwcd->length, NULL, NULL, NULL);
-+
-+	free(pwcd->pdu);
-+	free(pwcd);
-+}
-+
- static void prep_write_cb(uint8_t opcode, const void *pdu,
- 					uint16_t length, void *user_data)
- {
-@@ -1215,7 +1254,8 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
- 	uint16_t handle = 0;
- 	uint16_t offset;
- 	struct gatt_db_attribute *attr;
--	uint8_t ecode;
-+	struct prep_write_complete_data *pwcd;
-+	uint8_t ecode, status;
- 
- 	if (length < 4) {
- 		ecode = BT_ATT_ERROR_INVALID_PDU;
-@@ -1245,15 +1285,21 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
- 	if (ecode)
- 		goto error;
- 
--	if (!store_prep_data(server, handle, offset, length - 4,
--						&((uint8_t *) pdu)[4])) {
--		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
--		goto error;
--	}
-+	pwcd = new0(struct prep_write_complete_data, 1);
-+	pwcd->pdu = malloc(length);
-+	memcpy(pwcd->pdu, pdu, length);
-+	pwcd->length = length;
-+	pwcd->server = server;
- 
--	bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu, length, NULL,
--								NULL, NULL);
--	return;
-+	status = gatt_db_attribute_write(attr, offset, NULL, 0,
-+						BT_ATT_OP_PREP_WRITE_REQ,
-+						server->att,
-+						prep_write_complete_cb, pwcd);
-+
-+	if (status)
-+		return;
-+
-+	ecode = BT_ATT_ERROR_UNLIKELY;
- 
- error:
- 	bt_att_send_error_rsp(server->att, opcode, handle, ecode);
 -- 
 2.13.6
 
