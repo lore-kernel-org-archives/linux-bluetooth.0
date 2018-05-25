@@ -1,39 +1,82 @@
-Return-Path: <jian-hong@endlessm.com>
-MIME-Version: 1.0
-In-Reply-To: <CAD8Lp456sVtCrC0cMHXQV-PCXq12GfOjtmCpwuguF_=c-1YyaA@mail.gmail.com>
-References: <20180525095452.5203-1-jian-hong@endlessm.com> <CAD8Lp456sVtCrC0cMHXQV-PCXq12GfOjtmCpwuguF_=c-1YyaA@mail.gmail.com>
-From: Jian-Hong Pan <jian-hong@endlessm.com>
-Date: Fri, 25 May 2018 22:05:35 +0800
-Message-ID: <CAPpJ_ee0xxW69GPi8A2RvUUv=O4gesYCbOKiCngLrHi4hk0T7A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Add a new Realtek 8723DE ID 0bda:b009
-To: Daniel Drake <drake@endlessm.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
-	Linux Kernel <linux-kernel@vger.kernel.org>, Linux Upstreaming Team <linux@endlessm.com>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Emil Lenngren <emil.lenngren@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Emil Lenngren <emil.lenngren@gmail.com>
+Subject: [PATCH] Bluetooth: Fix flow bugs in H5 so the protocol doesn't stall
+Date: Fri, 25 May 2018 15:59:23 +0200
+Message-Id: <1527256763-13474-1-git-send-email-emil.lenngren@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+1. If more than tx_win packets are enqueued, so that the unack queue
+gets full, then when packets are later acked, uart tx is not woken up,
+meaning that the flow will be stalled unless uart tx is not later
+woken up for some other reason (e.g. packet is received so an ack
+needs to be sent).
 
-2018-05-25 21:25 GMT+08:00 Daniel Drake <drake@endlessm.com>:
-> Hi Jian-Hong,
->
-> On Fri, May 25, 2018 at 3:54 AM, Jian-Hong Pan <jian-hong@endlessm.com> wrote:
->>
->> Without this patch we cannot turn on the Bluethooth adapter on HP
->> 14-bs007la.
->
-> Please correct me if I'm wrong, but it looks like we are still waiting
-> for the testing of this patch from our colleagues in Guatemala.
->
-> There are unlikely to be any issues with such a trivial change, but we
-> should probably wait for confirmation that it works before having it
-> included upstream.
+2. If remote peer sends tx_win packets to us and our ack(s) are
+incorrectly received by the remote device, it will first resend the
+tx_win packets and wait for their ack before it can send the next
+packets. However, we only send ack if a NEW packet (not a resent packet)
+is arrived. Therefore, we will never send ack and the remote device
+will keep resend the packets (and wait for the acks) forever, until
+we send a new tx packet.
+---
+ drivers/bluetooth/hci_h5.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-Oh, sure!  That will be better.  Thanks for your reminder.
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index abee221..6fca22c 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -238,16 +238,19 @@ static int h5_close(struct hci_uart *hu)
+ 	return 0;
+ }
+ 
+-static void h5_pkt_cull(struct h5 *h5)
++static void h5_pkt_cull(struct hci_uart *hu)
+ {
++	struct h5 *h5 = hu->priv;
+ 	struct sk_buff *skb, *tmp;
+ 	unsigned long flags;
+ 	int i, to_remove;
++	bool was_full;
+ 	u8 seq;
+ 
+ 	spin_lock_irqsave(&h5->unack.lock, flags);
+ 
+ 	to_remove = skb_queue_len(&h5->unack);
++	was_full = to_remove == h5->tx_win;
+ 	if (to_remove == 0)
+ 		goto unlock;
+ 
+@@ -278,6 +281,8 @@ static void h5_pkt_cull(struct h5 *h5)
+ 
+ unlock:
+ 	spin_unlock_irqrestore(&h5->unack.lock, flags);
++	if (was_full && to_remove > 0 && !skb_queue_empty(&h5->rel))
++		hci_uart_tx_wakeup(hu);
+ }
+ 
+ static void h5_handle_internal_rx(struct hci_uart *hu)
+@@ -354,7 +359,7 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
+ 
+ 	h5->rx_ack = H5_HDR_ACK(hdr);
+ 
+-	h5_pkt_cull(h5);
++	h5_pkt_cull(hu);
+ 
+ 	switch (H5_HDR_PKT_TYPE(hdr)) {
+ 	case HCI_EVENT_PKT:
+@@ -419,6 +424,8 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, unsigned char c)
+ 	if (H5_HDR_RELIABLE(hdr) && H5_HDR_SEQ(hdr) != h5->tx_ack) {
+ 		BT_ERR("Out-of-order packet arrived (%u != %u)",
+ 		       H5_HDR_SEQ(hdr), h5->tx_ack);
++		set_bit(H5_TX_ACK_REQ, &h5->flags);
++		hci_uart_tx_wakeup(hu);
+ 		h5_reset_rx(h5);
+ 		return 0;
+ 	}
+-- 
+2.7.4
 
-Thanks,
-Jian-Hong Pan
-
-> Thanks
-> Daniel
