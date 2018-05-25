@@ -1,58 +1,97 @@
 Return-Path: <mka@chromium.org>
-Date: Fri, 25 May 2018 15:03:34 -0700
+Date: Fri, 25 May 2018 14:57:42 -0700
 From: Matthias Kaehlcke <mka@chromium.org>
 To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
 	linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
 	hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v6 3/5] Bluetooth: hci_qca: Enable 3.2 Mbps operating
- speed.
-Message-ID: <20180525220334.GB168650@google.com>
+Subject: Re: [PATCH v6 2/5] Bluetooth: btqca: Rename ROME related functions
+ to Generic functions
+Message-ID: <20180525215742.GA168650@google.com>
 References: <20180524160051.29966-1-bgodavar@codeaurora.org>
- <20180524160051.29966-4-bgodavar@codeaurora.org>
+ <20180524160051.29966-3-bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180524160051.29966-4-bgodavar@codeaurora.org>
+In-Reply-To: <20180524160051.29966-3-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, May 24, 2018 at 09:30:49PM +0530, Balakrishna Godavarthi wrote:
+On Thu, May 24, 2018 at 09:30:48PM +0530, Balakrishna Godavarthi wrote:
+> Some of the QCA BTSoC ROME functions, are used for different versions
+> or different make of BTSoC's. Instead of duplicating the same functions
+> for new chip, updating names of the functions that are used for both
+> chip's to keep this generic and would help in future when we would have
+> new BT SoC.
+
+The commit message talks about 'functions', however only the name of
+one function (rome_patch_ver_req()) has changed. From the changes in
+log messages I assume you also intended to rename
+rome_reset() and rome_download_firmware(). 
+
 > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > ---
 > 
 > Changes in v6:
 > 	* initial patch
-> 	* enables Qualcomm chip to operate at 3.2Mbps.
-
-The second point should be rather part of the commit message, but
-since the summary basically states the same I guess it's fine to
-omit it.
-
+> 	* updated names of functions that are used for both the chips to 
+> 	  keep this generic and would help in future when we would have 
+> 	  new BT SoC.
 > 
 > ---
->  drivers/bluetooth/hci_qca.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  drivers/bluetooth/btqca.c | 14 +++++++-------
+>  drivers/bluetooth/btqca.h |  6 ++++++
+>  2 files changed, 13 insertions(+), 7 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index f05382b5a65d..cb1034998040 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -872,6 +872,8 @@ static uint8_t qca_get_baudrate_value(int speed)
->  		return QCA_BAUDRATE_2000000;
->  	case 3000000:
->  		return QCA_BAUDRATE_3000000;
-> +	case 3200000:
-> +		return QCA_BAUDRATE_3200000;
->  	case 3500000:
->  		return QCA_BAUDRATE_3500000;
->  	default:
-> @@ -886,7 +888,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  	struct sk_buff *skb;
->  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index 8219816c54a0..5c3551239b12 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -27,7 +27,7 @@
 >  
-> -	if (baudrate > QCA_BAUDRATE_3000000)
-> +	if (baudrate > QCA_BAUDRATE_3200000)
->  		return -EINVAL;
+>  #define VERSION "0.1"
 >  
->  	cmd[4] = baudrate;
+> -static int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
+> +int qca_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
 
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+The different version names are confusing. The name of the function
+calls it 'patch version', the parameter 'rome_version' and the callers
+vary between 'soc_version' and 'rome_version'.
+
+It would be unfair to ask you to 'fix the world' in this patch series,
+but please stick at least to a consistent naming scheme in the code
+you change. Obviously feel free to squeeze in another cleanup patch :)
+
+>  static int rome_reset(struct hci_dev *hdev)
+>  {
+>  	struct sk_buff *skb;
+>  	int err;
+>  
+> -	BT_DBG("%s: ROME HCI_RESET", hdev->name);
+> +	bt_dev_dbg(hdev, "QCA BTSoC HCI_RESET");
+>  
+>  	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+>  	if (IS_ERR(skb)) {
+> @@ -267,7 +267,7 @@ static int rome_download_firmware(struct hci_dev *hdev,
+>  	const u8 *segment;
+>  	int ret, remain, i = 0;
+>  
+> -	bt_dev_info(hdev, "ROME Downloading %s", config->fwname);
+> +	bt_dev_info(hdev, "QCA BTSoC Downloading %s", config->fwname);
+>  
+>  	ret = request_firmware(&fw, config->fwname, &hdev->dev);
+>  	if (ret) {
+> @@ -339,7 +339,7 @@ int qca_uart_setup_rome(struct hci_dev *hdev, uint8_t baudrate)
+>  	config.user_baud_rate = baudrate;
+>  
+>  	/* Get ROME version information */
+
+'patch version'/'SoC version'/... , whatever the chosen consistent
+name is.
+
+> -	err = rome_patch_ver_req(hdev, &rome_ver);
+> +	err = qca_patch_ver_req(hdev, &rome_ver);
+
+rome_ver => ${consistent_name}_ver
+
+Thanks
+
+Matthias
