@@ -1,62 +1,109 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH BlueZ v4 1/4] doc/gatt-api: Add authorization options for
- attributes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180525091541.4688-1-grzegorz.kolodziejczyk@codecoup.pl>
-Date: Sat, 26 May 2018 18:13:55 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <487AACC5-DA1A-4CCA-B5F7-E762CBCABC90@holtmann.org>
-References: <20180525091541.4688-1-grzegorz.kolodziejczyk@codecoup.pl>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+Subject: Re: Problem with mpris-proxy
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <68c8200a-d99f-431c-8685-30b5b9e395c4@interia.pl>
+ <CABBYNZKAHLb9ELQUyvfCdb70HdfbWDXMO201d9_4yebPvWDBLQ@mail.gmail.com>
+From: =?UTF-8?Q?Rafa=c5=82_Bilski?= <rafalbilski@interia.pl>
+Message-ID: <0e802acc-1fe8-da6c-4dea-110332b88d50@interia.pl>
+Date: Sat, 26 May 2018 10:37:41 +0100
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKAHLb9ELQUyvfCdb70HdfbWDXMO201d9_4yebPvWDBLQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+> Hi Rafal,
+>
+> On Fri, May 25, 2018 at 7:31 PM, Rafał Bilski <rafalbilski@interia.pl> wrote:
+>> Hello,
+>>
+>>      I've been trying to display track name on bluetooth device AND control a
+>> player on computer using
+>>
+>> device's buttons.
+>>
+>>      I can have one, but not both.
+>>
+>>      If "mpris-proxy" isn't running I get key pressed/released event on
+>> computer and I can control the player
+>>
+>> with buttons. Even if player doesn't have GUI it seems to get signals on
+>> dbus mpris interface. BUT no metadata
+> Do you have the mpris-player and bluetoothd logs?
+Hi,
 
-> This patch adds authorization property for attributes and prepare write
-> request for authorization option for write request. This is require to
-> handle correctly prepare writes, which may response with insufficient
-> authorization error.
-> ---
-> doc/gatt-api.txt | 8 ++++++++
-> 1 file changed, 8 insertions(+)
-> 
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index 0f1cc9029..6b1487254 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -85,6 +85,9 @@ Methods		array{byte} ReadValue(dict options)
-> 			Possible options: "offset": Start offset
-> 					  "device": Device path (Server only)
-> 					  "link": Link type (Server only)
-> +					  "prep-authorize": boolean Is prepare
-> +							    authorization
-> +							    request
-> 
-> 			Possible Errors: org.bluez.Error.Failed
-> 					 org.bluez.Error.InProgress
-> @@ -250,6 +253,7 @@ Properties	string UUID [read-only]
-> 				"encrypt-authenticated-write"
-> 				"secure-read" (Server only)
-> 				"secure-write" (Server only)
-> +				"authorize"
-> 
-> Characteristic Descriptors hierarchy
-> ====================================
-> @@ -284,6 +288,9 @@ Methods		array{byte} ReadValue(dict flags)
-> 			Possible options: "offset": Start offset
-> 					  "device": Device path (Server only)
-> 					  "link": Link type (Server only)
-> +					  "prep-authorize": boolean Is prepare
-> +							    authorization
-> +							    request
+I do now. With debugging enabled information in log is much more useful.
 
-lets use “prepare-authorize” and not shortcut things for no good reason.
+Working (no "mpris-proxy"):
+bluetoothd[5584]: profiles/audio/avctp.c:handle_panel_passthrough() AV/C: PAUSE pressed
+bluetoothd[5584]: profiles/audio/avctp.c:handle_panel_passthrough() AV/C: PAUSE released
 
-Regards
+Not working ("mpris-proxy" running):
+bluetoothd[5584]: profiles/audio/media.c:play()
+dbus-daemon[274]: [system] Rejected send message, 1 matched rules; type="method_call", 
+sender=":1.90" (uid=0 pid=5584 comm="//libexec/bluetooth/bluetoothd -d ") 
+interface="org.mpris.MediaPlayer2.Player" member="Play" error name="(unset)" requested_reply="0" 
+destination=":1.95" (uid=1000 pid=5684 comm="mpris-proxy ")
+bluetoothd[5584]: profiles/audio/media.c:pause()
+dbus-daemon[274]: [system] Rejected send message, 1 matched rules; type="method_call", 
+sender=":1.90" (uid=0 pid=5584 comm="//libexec/bluetooth/bluetoothd -d ") 
+interface="org.mpris.MediaPlayer2.Player" member="Pause" error name="(unset)" requested_reply="0" 
+destination=":1.95" (uid=1000 pid=5684 comm="mpris-proxy ")
 
-Marcel
+>
+>> seems to be send to bluetooth device and there isn't anything on display.
+>>
+>>      When "mpris-proxy" is running player doesn't get any button events, BUT
+>> I have all track information on
+>>
+>> a display.
+> Perhaps with dbus-monitor if the message is not being rejected or something.
+It looks like you are spot on.
+I guess default dbus configuration in ArchLinux isn't good enough?
+Could you point me in right direction?
+>
+>>      In both cases, with pulseaudio, "btmon" shows that device sends key
+>> pressed/released events:
+>>
+>>> ACL Data RX: Handle 43 flags 0x02 dlen 12                  #1 [hci0]
+>>> 6.185397
+>>        Channel: 68 len 8 [PSM 0 mode 0] {chan 0}
+>>          30 11 0e 00 48 7c 46 00 0...H|F.
+>> < ACL Data TX: Handle 43 flags 0x00 dlen 12 #2 [hci0] 6.185506
+>>        Channel: 68 len 8 [PSM 0 mode 0] {chan 0}
+>>          32 11 0e 09 48 7c 46 00 2...H|F.
+>>> ACL Data RX: Handle 43 flags 0x02 dlen 12 #3 [hci0] 6.189511
+>>        Channel: 68 len 8 [PSM 0 mode 0] {chan 0}
+>>          40 11 0e 00 48 7c c6 00 @...H|..
+>> < ACL Data TX: Handle 43 flags 0x00 dlen 12 #4 [hci0] 6.189650
+>>        Channel: 68 len 8 [PSM 0 mode 0] {chan 0}
+>>          42 11 0e 09 48 7c c6 00 B...H|..
+>>> HCI Event: Number of Completed Packets (0x13) plen 5 #5 [hci0] 6.191383
+>>          Num handles: 1
+>>          Handle: 43
+>>          Count: 1
+>>> HCI Event: Number of Completed Packets (0x13) plen 5 #6 [hci0] 6.193385
+>>          Num handles: 1
+>>          Handle: 43
+>>          Count: 1
+>>
+>>      On bluealsa I only have sound. No keys or information on display.
+>>
+>> Is this issue related to pulseaudio?
+>> Can I somehow take over uuid 0x110e using dbus and python and still have
+>> sound?
+>> I tried connecting to 0x110e L2CAP socket, but this only works if device is
+>> disconnected and unable to produce sound.
+>>
+>> Please advise
+>> Rafal Bilski
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
+>> in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
 
