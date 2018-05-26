@@ -1,66 +1,62 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-From: Himanshu Gusain <himanshu.gusain1989@gmail.com>
-Date: Sat, 26 May 2018 13:08:29 -0500
-Message-ID: <CAE8=ow2C5U0jvEqPgeyx94fEF1vdJ913toMdUynBU4Xk2X7rgQ@mail.gmail.com>
-Subject: Unable to assign ip address to bnep interface
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH BlueZ v4 1/4] doc/gatt-api: Add authorization options for
+ attributes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180525091541.4688-1-grzegorz.kolodziejczyk@codecoup.pl>
+Date: Sat, 26 May 2018 18:13:55 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <487AACC5-DA1A-4CCA-B5F7-E762CBCABC90@holtmann.org>
+References: <20180525091541.4688-1-grzegorz.kolodziejczyk@codecoup.pl>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All
+Hi Grzegorz,
 
-I am facing  some trouble while setting up Bluetooth
-PAN communication between our reference board (which act as Server)
-& Ubuntu system (which act as Client )
+> This patch adds authorization property for attributes and prepare write
+> request for authorization option for write request. This is require to
+> handle correctly prepare writes, which may response with insufficient
+> authorization error.
+> ---
+> doc/gatt-api.txt | 8 ++++++++
+> 1 file changed, 8 insertions(+)
+> 
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index 0f1cc9029..6b1487254 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -85,6 +85,9 @@ Methods		array{byte} ReadValue(dict options)
+> 			Possible options: "offset": Start offset
+> 					  "device": Device path (Server only)
+> 					  "link": Link type (Server only)
+> +					  "prep-authorize": boolean Is prepare
+> +							    authorization
+> +							    request
+> 
+> 			Possible Errors: org.bluez.Error.Failed
+> 					 org.bluez.Error.InProgress
+> @@ -250,6 +253,7 @@ Properties	string UUID [read-only]
+> 				"encrypt-authenticated-write"
+> 				"secure-read" (Server only)
+> 				"secure-write" (Server only)
+> +				"authorize"
+> 
+> Characteristic Descriptors hierarchy
+> ====================================
+> @@ -284,6 +288,9 @@ Methods		array{byte} ReadValue(dict flags)
+> 			Possible options: "offset": Start offset
+> 					  "device": Device path (Server only)
+> 					  "link": Link type (Server only)
+> +					  "prep-authorize": boolean Is prepare
+> +							    authorization
+> +							    request
 
-Below is the error I am getting when setting IP in Server,
+lets use “prepare-authorize” and not shortcut things for no good reason.
 
-        ifconfig bnep0 10.0.0.2 netmask 255.255.255.0 up
-       //ifconfig: SIOCSIFFLAGS: Cannot assign requested address
+Regards
 
-Although i am able to successfully set IP on the client system
+Marcel
 
-I can see the bnep session is running on the Server
-
-
-       1292 root     hciattach /dev/ttyPS1 any 115200
-
-       1334 root     bluetoothd -d
-
-       1389 root     pand --listen --role NAP --persist
-
-       1451 root     pand --listen --role NAP --persist
-
-       1455 root    [kbnepd bnep0]
-
-
-
-Below is the ifconfig command ouput
-what it looks the Server is not transmiiting any packets
-
-# ifconfig -a
-
-bnep0     Link encap:Ethernet  HWaddr 43:39:00:07:1F:AC
-
-          inet addr:10.0.0.2  Bcast:10.255.255.255  Mask:255.0.0.0
-
-          BROADCAST MULTICAST  MTU:1500  Metric:1
-
-          RX packets:15 errors:0 dropped:0 overruns:0 frame:0
-
-          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
-
-          collisions:0 txqueuelen:1000
-
-          RX bytes:963 (963.0 B)  TX bytes:0 (0.0 B)
-
-
-After enabling the debug logs i can see bnep_rx_frame getting
-called whenever I ping from Client side,but don't see any bnep_tx_frame logs
-
-Not sure what is blocking the tx from server
-
-Thanks
-Himanshu
