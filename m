@@ -10,104 +10,113 @@ Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-serial@vger.kernel.org,
 	linux-acpi@vger.kernel.org,
 	devicetree@vger.kernel.org
-Subject: [PATCH 07/13] Bluetooth: hci_uart: Restore hci_dev->flush callback on open()
-Date: Sun, 27 May 2018 21:04:51 +0200
-Message-Id: <20180527190457.2632-8-hdegoede@redhat.com>
+Subject: [PATCH 06/13] Bluetooth: btrtl: load the config blob from devicetree when available
+Date: Sun, 27 May 2018 21:04:50 +0200
+Message-Id: <20180527190457.2632-7-hdegoede@redhat.com>
 In-Reply-To: <20180527190457.2632-1-hdegoede@redhat.com>
 References: <20180527190457.2632-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For reasons explained in detail in commit 3611f4d2a5e0 ("hci_ldisc:
-fix null pointer deref") the hci_uart_close() functions sets
-hci_dev->flush to NULL.
+From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 
-But the device may be re-opened after a close, this commit restores the
-hci_dev->flush callback on open().
+Some Realtek bluetooth devices need a "config" blob. The btrtl driver
+currently only allows loading this config blob via the request_firmware
+mechanism.
 
-Note this commit also moves the nearly empty defition of hci_uart_open()
-a bit down in the file to avoid the need for forward declaring
-hci_uart_flush().
+The UART Bluetooth chips use this config blob to specify the baudrate,
+whether flow control is used and some other unknown bits. This means
+that the config blob is board-specific - thus loading it via
+request_firmware means that the rootfs is tied to a specific board.
 
+The UART Bluetooth chips are implemented through serdev. This means
+there is also a devicetree node which describes the Bluetooth chip.
+Thus we can also load the blob from the devicetree node to keep the
+filesystem independent of any board configuration data. In the future
+this could be extended to support ACPI as well (in case that's needed).
+
+Parse the devicetree node if it exists and obtain the config blob from
+there. Otherwise fall back to using the "old" request_firmware
+mechanism.
+
+Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Signed-off-by: Jeremy Cline <jeremy@jcline.org>
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/hci_ldisc.c  | 20 +++++++++++---------
- drivers/bluetooth/hci_serdev.c | 19 +++++++++++--------
- 2 files changed, 22 insertions(+), 17 deletions(-)
+ drivers/bluetooth/btrtl.c | 43 +++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 41 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index b6a71705b7d6..8da0f53b5912 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -229,15 +229,6 @@ int hci_uart_init_ready(struct hci_uart *hu)
- }
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 134eac0c8fe7..4962a7a2d9c1 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -18,6 +18,7 @@
+ #include <linux/module.h>
+ #include <linux/firmware.h>
+ #include <asm/unaligned.h>
++#include <linux/of.h>
+ #include <linux/usb.h>
  
- /* ------- Interface to HCI layer ------ */
--/* Initialize device */
--static int hci_uart_open(struct hci_dev *hdev)
--{
--	BT_DBG("%s %p", hdev->name, hdev);
--
--	/* Nothing to do for UART driver */
--	return 0;
--}
--
- /* Reset device */
- static int hci_uart_flush(struct hci_dev *hdev)
- {
-@@ -264,6 +255,17 @@ static int hci_uart_flush(struct hci_dev *hdev)
- 	return 0;
+ #include <net/bluetooth/bluetooth.h>
+@@ -509,6 +510,41 @@ void btrtl_free(struct btrtl_device_info *btrtl_dev)
  }
+ EXPORT_SYMBOL_GPL(btrtl_free);
  
-+/* Initialize device */
-+static int hci_uart_open(struct hci_dev *hdev)
++static int rtl_load_config_from_dt(struct hci_dev *hdev,
++				   struct btrtl_device_info *btrtl_dev)
 +{
-+	BT_DBG("%s %p", hdev->name, hdev);
++	struct device_node *np = hdev->dev.parent->of_node;
++	int ret, config_len;
 +
-+	/* Undo clearing this from hci_uart_close() */
-+	hdev->flush = hci_uart_flush;
++	if (!of_device_is_available(np))
++		return -ENOENT;
++
++	if (!of_find_property(np, "realtek,config-data", NULL))
++		return -ENOENT;
++
++	config_len = of_property_count_u8_elems(np, "realtek,config-data");
++	if (config_len <= 0)
++		return -ENOENT;
++
++	btrtl_dev->cfg_data = kzalloc(config_len, GFP_KERNEL);
++	if (!btrtl_dev->cfg_data)
++		return -ENOMEM;
++
++	ret = of_property_read_u8_array(np, "realtek,config-data",
++					btrtl_dev->cfg_data, config_len);
++	if (ret) {
++		kfree(btrtl_dev->cfg_data);
++		return ret;
++	}
++
++	btrtl_dev->cfg_len = config_len;
++
++	bt_dev_dbg(hdev, "rtl: using config data with len %d from DT",
++		   config_len);
 +
 +	return 0;
 +}
 +
- /* Close device */
- static int hci_uart_close(struct hci_dev *hdev)
+ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
  {
-diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
-index e0e6461b9200..da6eb5bcfa6f 100644
---- a/drivers/bluetooth/hci_serdev.c
-+++ b/drivers/bluetooth/hci_serdev.c
-@@ -101,14 +101,6 @@ static void hci_uart_write_work(struct work_struct *work)
+ 	struct btrtl_device_info *btrtl_dev;
+@@ -567,13 +603,16 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
+ 		goto err_free;
+ 	}
  
- /* ------- Interface to HCI layer ------ */
- 
--/* Initialize device */
--static int hci_uart_open(struct hci_dev *hdev)
--{
--	BT_DBG("%s %p", hdev->name, hdev);
--
--	return 0;
--}
--
- /* Reset device */
- static int hci_uart_flush(struct hci_dev *hdev)
- {
-@@ -129,6 +121,17 @@ static int hci_uart_flush(struct hci_dev *hdev)
- 	return 0;
- }
- 
-+/* Initialize device */
-+static int hci_uart_open(struct hci_dev *hdev)
-+{
-+	BT_DBG("%s %p", hdev->name, hdev);
-+
-+	/* Undo clearing this from hci_uart_close() */
-+	hdev->flush = hci_uart_flush;
-+
-+	return 0;
-+}
-+
- /* Close device */
- static int hci_uart_close(struct hci_dev *hdev)
- {
+-	if (btrtl_dev->ic_info->cfg_name) {
++	/* try loading the config blob from device-tree first: */
++	ret = rtl_load_config_from_dt(hdev, btrtl_dev);
++	/* fall back to loading the config via request_firmware: */
++	if (ret && btrtl_dev->ic_info->cfg_name) {
+ 		btrtl_dev->cfg_len = rtl_load_file(hdev,
+ 						   btrtl_dev->ic_info->cfg_name,
+ 						   &btrtl_dev->cfg_data);
+ 		if (btrtl_dev->ic_info->config_needed && btrtl_dev->cfg_len <= 0) {
+ 			bt_dev_err(hdev,
+-				   "mandatory config file %s not found\n",
++				   "mandatory config blob not found in %s or DT\n",
+ 				   btrtl_dev->ic_info->cfg_name);
+ 			ret = btrtl_dev->cfg_len;
+ 			goto err_free;
 -- 
 2.17.0
