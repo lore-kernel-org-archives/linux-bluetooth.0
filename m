@@ -1,356 +1,386 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v5 3/4] client: Add authorized property handling to characteristic attribute
-Date: Mon, 28 May 2018 10:20:53 +0200
-Message-Id: <20180528082054.4017-3-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ v5 2/4] shared/gatt-server: Request authorization for prepare writes.
+Date: Mon, 28 May 2018 10:20:52 +0200
+Message-Id: <20180528082054.4017-2-grzegorz.kolodziejczyk@codecoup.pl>
 In-Reply-To: <20180528082054.4017-1-grzegorz.kolodziejczyk@codecoup.pl>
 References: <20180528082054.4017-1-grzegorz.kolodziejczyk@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds handling of characteristic prepare write authorized
-property to bluetoothctl.
+This patch adds gatt-server possibility to request authorization from
+application if needed and previously wasn't authorized. Authorization is
+requested by sending message with set prepare write authorization reqest
+to client.
 ---
- client/gatt.c | 146 +++++++++++++++++++++++++++++++++++++---------------------
- client/main.c |   9 +---
- 2 files changed, 96 insertions(+), 59 deletions(-)
+ src/gatt-database.c      | 108 ++++++++++++++++++++++++++++++++++++++---------
+ src/shared/gatt-server.c |  64 ++++++++++++++++++++++++----
+ 2 files changed, 142 insertions(+), 30 deletions(-)
 
-diff --git a/client/gatt.c b/client/gatt.c
-index d37a6f55c..3e70f365c 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -80,7 +80,6 @@ struct chrc {
- 	struct io *write_io;
- 	struct io *notify_io;
- 	bool authorization_req;
--	bool authorized;
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 0ac5b75b0..22c78e840 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -133,6 +133,8 @@ struct external_chrc {
+ 	struct queue *pending_reads;
+ 	struct queue *pending_writes;
+ 	unsigned int ntfy_cnt;
++	bool prep_authorized;
++	bool req_prep_authorization;
  };
  
- struct service {
-@@ -1609,7 +1608,8 @@ static const char *path_to_address(const char *path)
+ struct external_desc {
+@@ -144,6 +146,8 @@ struct external_desc {
+ 	bool handled;
+ 	struct queue *pending_reads;
+ 	struct queue *pending_writes;
++	bool prep_authorized;
++	bool req_prep_authorization;
+ };
+ 
+ struct pending_op {
+@@ -154,6 +158,8 @@ struct pending_op {
+ 	struct gatt_db_attribute *attrib;
+ 	struct queue *owner_queue;
+ 	struct iovec data;
++	bool is_characteristic;
++	bool prep_authorize;
+ };
+ 
+ struct notify {
+@@ -1371,7 +1377,8 @@ static bool incr_attr_count(struct external_service *service, uint16_t incr)
  }
  
- static int parse_options(DBusMessageIter *iter, uint16_t *offset, uint16_t *mtu,
--						char **device, char **link)
-+						char **device, char **link,
-+						bool *prep_authorize)
+ static bool parse_chrc_flags(DBusMessageIter *array, uint8_t *props,
+-					uint8_t *ext_props, uint32_t *perm)
++					uint8_t *ext_props, uint32_t *perm,
++					bool *req_prep_authorization)
  {
- 	DBusMessageIter dict;
+ 	const char *flag;
  
-@@ -1650,6 +1650,12 @@ static int parse_options(DBusMessageIter *iter, uint16_t *offset, uint16_t *mtu,
- 				return -EINVAL;
- 			if (link)
- 				dbus_message_iter_get_basic(&value, link);
-+		} else if (strcasecmp(key, "prepare-authorize") == 0) {
-+			if (var != DBUS_TYPE_BOOLEAN)
-+				return -EINVAL;
-+			if (prep_authorize)
-+				dbus_message_iter_get_basic(&value,
-+								prep_authorize);
- 		}
- 
- 		dbus_message_iter_next(&dict);
-@@ -1703,8 +1709,6 @@ static void authorize_read_response(const char *input, void *user_data)
- 	reply = read_value(pending_message, &chrc->value[aad->offset],
- 						chrc->value_len - aad->offset);
- 
--	chrc->authorized = true;
--
- 	g_dbus_send_message(aad->conn, reply);
- 
- 	g_free(aad);
-@@ -1727,18 +1731,15 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
- 
- 	dbus_message_iter_init(msg, &iter);
- 
--	if (parse_options(&iter, &offset, NULL, &device, &link))
-+	if (parse_options(&iter, &offset, NULL, &device, &link, NULL))
- 		return g_dbus_create_error(msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
- 
- 	bt_shell_printf("ReadValue: %s offset %u link %s\n",
--			path_to_address(device), offset, link);
--
--	if (chrc->authorization_req && offset == 0)
--		chrc->authorized = false;
-+					path_to_address(device), offset, link);
- 
--	if (chrc->authorization_req && !chrc->authorized) {
-+	if (chrc->authorization_req) {
- 		struct authorize_attribute_data *aad;
- 
- 		aad = g_new0(struct authorize_attribute_data, 1);
-@@ -1765,33 +1766,31 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
- 	return read_value(msg, &chrc->value[offset], chrc->value_len - offset);
+@@ -1430,6 +1437,8 @@ static bool parse_chrc_flags(DBusMessageIter *array, uint8_t *props,
+ 			*props |= BT_GATT_CHRC_PROP_WRITE;
+ 			*ext_props |= BT_GATT_CHRC_EXT_PROP_AUTH_WRITE;
+ 			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_SECURE;
++		} else if (!strcmp("authorize", flag)) {
++			*req_prep_authorization = true;
+ 		} else {
+ 			error("Invalid characteristic flag: %s", flag);
+ 			return false;
+@@ -1442,7 +1451,8 @@ static bool parse_chrc_flags(DBusMessageIter *array, uint8_t *props,
+ 	return true;
  }
  
--static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len,
--								int max_len)
-+static int parse_value_arg(DBusMessageIter *iter, uint8_t **value, int *len)
+-static bool parse_desc_flags(DBusMessageIter *array, uint32_t *perm)
++static bool parse_desc_flags(DBusMessageIter *array, uint32_t *perm,
++						bool *req_prep_authorization)
  {
- 	DBusMessageIter array;
--	uint16_t offset = 0;
--	uint8_t *read_value;
--	int read_len;
+ 	const char *flag;
  
- 	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY)
- 		return -EINVAL;
+@@ -1470,6 +1480,8 @@ static bool parse_desc_flags(DBusMessageIter *array, uint32_t *perm)
+ 			*perm |= BT_ATT_PERM_READ | BT_ATT_PERM_READ_SECURE;
+ 		else if (!strcmp("secure-write", flag))
+ 			*perm |= BT_ATT_PERM_WRITE | BT_ATT_PERM_WRITE_SECURE;
++		else if (!strcmp("authorize", flag))
++			*req_prep_authorization = true;
+ 		else {
+ 			error("Invalid descriptor flag: %s", flag);
+ 			return false;
+@@ -1480,7 +1492,7 @@ static bool parse_desc_flags(DBusMessageIter *array, uint32_t *perm)
+ }
  
- 	dbus_message_iter_recurse(iter, &array);
--	dbus_message_iter_get_fixed_array(&array, &read_value, &read_len);
-+	dbus_message_iter_get_fixed_array(&array, value, len);
+ static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props,
+-								uint32_t *perm)
++				uint32_t *perm, bool *req_prep_authorization)
+ {
+ 	DBusMessageIter iter, array;
+ 	const char *iface;
+@@ -1495,9 +1507,10 @@ static bool parse_flags(GDBusProxy *proxy, uint8_t *props, uint8_t *ext_props,
  
--	dbus_message_iter_next(iter);
--	if (parse_options(iter, &offset, NULL, NULL, NULL))
--		return -EINVAL;
-+	return 0;
-+}
+ 	iface = g_dbus_proxy_get_interface(proxy);
+ 	if (!strcmp(iface, GATT_DESC_IFACE))
+-		return parse_desc_flags(&array, perm);
++		return parse_desc_flags(&array, perm, req_prep_authorization);
  
--	if ((offset + read_len) > max_len)
-+static int write_value(int *dst_len, uint8_t **dst_value, uint8_t *src_val,
-+				int src_len, uint16_t offset, uint16_t max_len)
-+{
-+	if ((offset + src_len) > max_len)
- 		return -EOVERFLOW;
+-	return parse_chrc_flags(&array, props, ext_props, perm);
++	return parse_chrc_flags(&array, props, ext_props, perm,
++							req_prep_authorization);
+ }
  
--	if ((offset + read_len) > *len) {
--		*len = offset + read_len;
--		*value = g_realloc(*value, *len);
-+	if ((offset + src_len) != *dst_len) {
-+		*dst_len = offset + src_len;
-+		*dst_value = g_realloc(*dst_value, *dst_len);
+ static struct external_chrc *chrc_create(struct gatt_app *app,
+@@ -1545,7 +1558,8 @@ static struct external_chrc *chrc_create(struct gatt_app *app,
+ 	 * are used to determine if any special descriptors should be
+ 	 * created.
+ 	 */
+-	if (!parse_flags(proxy, &chrc->props, &chrc->ext_props, &chrc->perm)) {
++	if (!parse_flags(proxy, &chrc->props, &chrc->ext_props, &chrc->perm,
++					&chrc->req_prep_authorization)) {
+ 		error("Failed to parse characteristic properties");
+ 		goto fail;
  	}
- 
--	memcpy(*value + offset, read_value, read_len);
-+	memcpy(*dst_value + offset, src_val, src_len);
- 
- 	return 0;
+@@ -1627,7 +1641,8 @@ static struct external_desc *desc_create(struct gatt_app *app,
+ 	 * Parse descriptors flags here since they are used to
+ 	 * determine the permission the descriptor should have
+ 	 */
+-	if (!parse_flags(proxy, NULL, NULL, &desc->perm)) {
++	if (!parse_flags(proxy, NULL, NULL, &desc->perm,
++					&desc->req_prep_authorization)) {
+ 		error("Failed to parse characteristic properties");
+ 		goto fail;
+ 	}
+@@ -1937,6 +1952,9 @@ static void append_options(DBusMessageIter *iter, void *user_data)
+ 							&op->offset);
+ 	if (link)
+ 		dict_append_entry(iter, "link", DBUS_TYPE_STRING, &link);
++	if (op->prep_authorize)
++		dict_append_entry(iter, "prepare-authorize", DBUS_TYPE_BOOLEAN,
++							&op->prep_authorize);
  }
-@@ -1800,12 +1799,26 @@ static void authorize_write_response(const char *input, void *user_data)
+ 
+ static void read_setup_cb(DBusMessageIter *iter, void *user_data)
+@@ -2008,6 +2026,8 @@ static void write_setup_cb(DBusMessageIter *iter, void *user_data)
+ static void write_reply_cb(DBusMessage *message, void *user_data)
  {
- 	struct authorize_attribute_data *aad = user_data;
- 	struct chrc *chrc = aad->attribute;
-+	bool prep_authorize = false;
+ 	struct pending_op *op = user_data;
++	struct external_chrc *chrc;
++	struct external_desc *desc;
+ 	DBusError err;
  	DBusMessageIter iter;
- 	DBusMessage *reply;
-+	int value_len;
-+	uint8_t *value;
- 	char *err;
--	int errsv;
- 
- 	dbus_message_iter_init(pending_message, &iter);
-+	if (parse_value_arg(&iter, &value, &value_len)) {
-+		err = "org.bluez.Error.InvalidArguments";
-+
-+		goto error;
-+	}
-+
-+	dbus_message_iter_next(&iter);
-+	if (parse_options(&iter, NULL, NULL, NULL, NULL, &prep_authorize)) {
-+		err = "org.bluez.Error.InvalidArguments";
-+
-+		goto error;
-+	}
- 
- 	if (!strcmp(input, "no")) {
- 		err = "org.bluez.Error.NotAuthorized";
-@@ -1813,15 +1826,17 @@ static void authorize_write_response(const char *input, void *user_data)
- 		goto error;
+ 	uint8_t ecode = 0;
+@@ -2027,6 +2047,16 @@ static void write_reply_cb(DBusMessage *message, void *user_data)
+ 		goto done;
  	}
  
--	chrc->authorized = true;
-+	/* Authorization check of prepare writes */
-+	if (prep_authorize) {
-+		reply = g_dbus_create_reply(pending_message, DBUS_TYPE_INVALID);
-+		g_dbus_send_message(aad->conn, reply);
-+		g_free(aad);
++	if (op->prep_authorize) {
++		if (op->is_characteristic) {
++			chrc = gatt_db_attribute_get_user_data(op->attrib);
++			chrc->prep_authorized = true;
++		} else {
++			desc = gatt_db_attribute_get_user_data(op->attrib);
++			desc->prep_authorized = true;
++		}
++	}
++
+ 	dbus_message_iter_init(message, &iter);
+ 	if (dbus_message_iter_has_next(&iter)) {
+ 		/*
+@@ -2045,9 +2075,10 @@ static struct pending_op *pending_write_new(struct btd_device *device,
+ 					struct queue *owner_queue,
+ 					struct gatt_db_attribute *attrib,
+ 					unsigned int id,
+-					const uint8_t *value,
+-					size_t len,
+-					uint16_t offset, uint8_t link_type)
++					const uint8_t *value, size_t len,
++					uint16_t offset, uint8_t link_type,
++					bool is_characteristic,
++					bool prep_authorize)
+ {
+ 	struct pending_op *op;
  
--	errsv = parse_value_arg(&iter, &chrc->value, &chrc->value_len,
--							chrc->max_val_len);
--	if (errsv == -EINVAL) {
--		err = "org.bluez.Error.InvalidArguments";
+@@ -2062,6 +2093,8 @@ static struct pending_op *pending_write_new(struct btd_device *device,
+ 	op->id = id;
+ 	op->offset = offset;
+ 	op->link_type = link_type;
++	op->is_characteristic = is_characteristic;
++	op->prep_authorize = prep_authorize;
+ 	queue_push_tail(owner_queue, op);
+ 
+ 	return op;
+@@ -2073,12 +2106,15 @@ static struct pending_op *send_write(struct btd_device *device,
+ 					struct queue *owner_queue,
+ 					unsigned int id,
+ 					const uint8_t *value, size_t len,
+-					uint16_t offset, uint8_t link_type)
++					uint16_t offset, uint8_t link_type,
++					bool is_characteristic,
++					bool prep_authorize)
+ {
+ 	struct pending_op *op;
+ 
+ 	op = pending_write_new(device, owner_queue, attrib, id, value, len,
+-							offset, link_type);
++					offset, link_type, is_characteristic,
++					prep_authorize);
+ 
+ 	if (g_dbus_proxy_method_call(proxy, "WriteValue", write_setup_cb,
+ 					owner_queue ? write_reply_cb : NULL,
+@@ -2191,7 +2227,7 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
+ retry:
+ 	send_write(op->device, op->attrib, chrc->proxy, NULL, op->id,
+ 				op->data.iov_base, op->data.iov_len, 0,
+-				op->link_type);
++				op->link_type, false, false);
+ }
+ 
+ static void acquire_write_setup(DBusMessageIter *iter, void *user_data)
+@@ -2229,7 +2265,7 @@ static struct pending_op *acquire_write(struct external_chrc *chrc,
+ 	struct pending_op *op;
+ 
+ 	op = pending_write_new(device, NULL, attrib, id, value, len, 0,
+-							link_type);
++						link_type, false, false);
+ 
+ 	if (g_dbus_proxy_method_call(chrc->proxy, "AcquireWrite",
+ 					acquire_write_setup,
+@@ -2532,8 +2568,24 @@ static void desc_write_cb(struct gatt_db_attribute *attrib,
+ 		goto fail;
+ 	}
+ 
++	if (opcode == BT_ATT_OP_PREP_WRITE_REQ) {
++		if (!desc->prep_authorized && desc->req_prep_authorization)
++			send_write(device, attrib, desc->proxy,
++					desc->pending_writes, id, value, len,
++					offset, bt_att_get_link_type(att),
++					false, true);
++		else
++			gatt_db_attribute_write_result(attrib, id, 0);
++
 +		return;
 +	}
- 
--		goto error;
--	} else if (errsv == -EOVERFLOW) {
-+	if (write_value(&chrc->value_len, &chrc->value, value, value_len,
-+					aad->offset, chrc->max_val_len)) {
- 		err = "org.bluez.Error.InvalidValueLength";
- 
- 		goto error;
-@@ -1848,18 +1863,31 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
- 							void *user_data)
- {
- 	struct chrc *chrc = user_data;
-+	uint16_t offset = 0;
-+	bool prep_authorize = false;
- 	DBusMessageIter iter;
-+	int value_len;
-+	uint8_t *value;
- 	char *str;
--	int errsv;
- 
- 	dbus_message_iter_init(msg, &iter);
- 
--	if (chrc->authorization_req && !chrc->authorized) {
-+	if (parse_value_arg(&iter, &value, &value_len))
-+		return g_dbus_create_error(msg,
-+				"org.bluez.Error.InvalidArguments", NULL);
 +
-+	dbus_message_iter_next(&iter);
-+	if (parse_options(&iter, &offset, NULL, NULL, NULL, &prep_authorize))
-+		return g_dbus_create_error(msg,
-+				"org.bluez.Error.InvalidArguments", NULL);
++	if (opcode == BT_ATT_OP_EXEC_WRITE_REQ)
++		desc->prep_authorized = false;
 +
-+	if (chrc->authorization_req) {
- 		struct authorize_attribute_data *aad;
+ 	if (send_write(device, attrib, desc->proxy, desc->pending_writes, id,
+-				value, len, offset, bt_att_get_link_type(att)))
++			value, len, offset, bt_att_get_link_type(att), false,
++			false))
+ 		return;
  
- 		aad = g_new0(struct authorize_attribute_data, 1);
- 		aad->conn = conn;
- 		aad->attribute = chrc;
-+		aad->offset = offset;
- 
- 		str = g_strdup_printf("Authorize attribute(%s) write (yes/no):",
- 								chrc->path);
-@@ -1873,15 +1901,14 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
- 		return NULL;
+ fail:
+@@ -2614,6 +2666,25 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
+ 		goto fail;
  	}
  
--	errsv = parse_value_arg(&iter, &chrc->value, &chrc->value_len,
--							chrc->max_val_len);
--	if (errsv == -EINVAL) {
--		return g_dbus_create_error(msg,
--				"org.bluez.Error.InvalidArguments", NULL);
--	} else if (errsv == -EOVERFLOW) {
-+	/* Authorization check of prepare writes */
-+	if (prep_authorize)
-+		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++	if (!(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
++		queue = chrc->pending_writes;
++	else
++		queue = NULL;
 +
-+	if (write_value(&chrc->value_len, &chrc->value, value, value_len,
-+						offset, chrc->max_val_len))
- 		return g_dbus_create_error(msg,
- 				"org.bluez.Error.InvalidValueLength", NULL);
--	}
- 
- 	bt_shell_printf("[" COLORED_CHG "] Attribute %s written" , chrc->path);
- 
-@@ -1943,7 +1970,7 @@ static DBusMessage *chrc_acquire_write(DBusConnection *conn, DBusMessage *msg,
- 					"org.bluez.Error.NotPermitted",
- 					NULL);
- 
--	if (parse_options(&iter, NULL, &chrc->mtu, &device, &link))
-+	if (parse_options(&iter, NULL, &chrc->mtu, &device, &link, NULL))
- 		return g_dbus_create_error(msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
-@@ -1975,7 +2002,7 @@ static DBusMessage *chrc_acquire_notify(DBusConnection *conn, DBusMessage *msg,
- 					"org.bluez.Error.NotPermitted",
- 					NULL);
- 
--	if (parse_options(&iter, NULL, &chrc->mtu, &device, &link))
-+	if (parse_options(&iter, NULL, &chrc->mtu, &device, &link, NULL))
- 		return g_dbus_create_error(msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
-@@ -2101,6 +2128,18 @@ static void chrc_set_value(const char *input, void *user_data)
- 	chrc->max_val_len = chrc->value_len;
- }
- 
-+static gboolean attr_authorization_flag_exists(char **flags)
-+{
-+	int i;
++	if (opcode == BT_ATT_OP_PREP_WRITE_REQ) {
++		if (!chrc->prep_authorized && chrc->req_prep_authorization)
++			send_write(device, attrib, chrc->proxy, queue,
++					id, value, len, offset,
++					bt_att_get_link_type(att), true, true);
++		else
++			gatt_db_attribute_write_result(attrib, id, 0);
 +
-+	for (i = 0; flags[i]; i++) {
-+		if (!strcmp("authorize", flags[i]))
-+			return TRUE;
++		return;
 +	}
 +
-+	return FALSE;
-+}
++	if (opcode == BT_ATT_OP_EXEC_WRITE_REQ)
++		chrc->prep_authorized = false;
 +
- void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy,
- 					int argc, char *argv[])
- {
-@@ -2119,7 +2158,7 @@ void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy,
- 	chrc->uuid = g_strdup(argv[1]);
- 	chrc->path = g_strdup_printf("%s/chrc%p", service->path, chrc);
- 	chrc->flags = g_strsplit(argv[2], ",", -1);
--	chrc->authorization_req = argc > 3 ? true : false;
-+	chrc->authorization_req = attr_authorization_flag_exists(chrc->flags);
+ 	if (chrc->write_io) {
+ 		if (pipe_io_send(chrc->write_io, value, len) < 0) {
+ 			error("Unable to write: %s", strerror(errno));
+@@ -2630,13 +2701,8 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
+ 			return;
+ 	}
  
- 	if (g_dbus_register_interface(conn, chrc->path, CHRC_INTERFACE,
- 					chrc_methods, NULL, chrc_properties,
-@@ -2191,7 +2230,7 @@ static DBusMessage *desc_read_value(DBusConnection *conn, DBusMessage *msg,
- 
- 	dbus_message_iter_init(msg, &iter);
- 
--	if (parse_options(&iter, &offset, NULL, &device, &link))
-+	if (parse_options(&iter, &offset, NULL, &device, &link, NULL))
- 		return g_dbus_create_error(msg,
- 					"org.bluez.Error.InvalidArguments",
- 					NULL);
-@@ -2213,21 +2252,24 @@ static DBusMessage *desc_write_value(DBusConnection *conn, DBusMessage *msg,
- 	DBusMessageIter iter;
- 	uint16_t offset = 0;
- 	char *device = NULL, *link = NULL;
-+	int value_len;
-+	uint8_t *value;
- 
- 	dbus_message_iter_init(msg, &iter);
- 
--	if (parse_value_arg(&iter, &desc->value, &desc->value_len,
--							desc->max_val_len))
-+	if (parse_value_arg(&iter, &value, &value_len))
- 		return g_dbus_create_error(msg,
--					"org.bluez.Error.InvalidArguments",
--					NULL);
-+				"org.bluez.Error.InvalidArguments", NULL);
- 
- 	dbus_message_iter_next(&iter);
-+	if (parse_options(&iter, &offset, NULL, &device, &link, NULL))
-+		return g_dbus_create_error(msg,
-+				"org.bluez.Error.InvalidArguments", NULL);
- 
--	if (parse_options(&iter, &offset, NULL, &device, &link))
-+	if (write_value(&desc->value_len, &desc->value, value,
-+					value_len, offset, desc->max_val_len))
- 		return g_dbus_create_error(msg,
--					"org.bluez.Error.InvalidArguments",
--					NULL);
-+				"org.bluez.Error.InvalidValueLength", NULL);
- 
- 	bt_shell_printf("WriteValue: %s offset %u link %s\n",
- 			path_to_address(device), offset, link);
-diff --git a/client/main.c b/client/main.c
-index 180f841ae..87323d8f7 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2036,11 +2036,6 @@ static void cmd_register_characteristic(int argc, char *argv[])
- 	if (check_default_ctrl() == FALSE)
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 
--	if (argc > 3 && strcmp(argv[3], "authorize")) {
--		bt_shell_printf("Invalid authorize argument\n");
--		return bt_shell_noninteractive_quit(EXIT_FAILURE);
--	}
+-	if (!(chrc->props & BT_GATT_CHRC_PROP_WRITE_WITHOUT_RESP))
+-		queue = chrc->pending_writes;
+-	else
+-		queue = NULL;
 -
- 	gatt_register_chrc(dbus_conn, default_ctrl->proxy, argc, argv);
+ 	if (send_write(device, attrib, chrc->proxy, queue, id, value, len,
+-					offset, bt_att_get_link_type(att)))
++			offset, bt_att_get_link_type(att), false, false))
+ 		return;
+ 
+ fail:
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 4b554f665..cdade76f8 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -1208,6 +1208,45 @@ static bool store_prep_data(struct bt_gatt_server *server,
+ 	return prep_data_new(server, handle, offset, length, value);
  }
  
-@@ -2517,8 +2512,8 @@ static const struct bt_shell_menu gatt_menu = {
- 			cmd_unregister_includes,
- 				 "Unregister Included service." },
- 	{ "register-characteristic", "<UUID> <Flags=read,write,notify...> "
--				"[authorize]", cmd_register_characteristic,
--				"Register application characteristic" },
-+					, cmd_register_characteristic,
-+					"Register application characteristic" },
- 	{ "unregister-characteristic", "<UUID/object>",
- 				cmd_unregister_characteristic,
- 				"Unregister application characteristic" },
++struct prep_write_complete_data {
++	void *pdu;
++	uint16_t length;
++	struct bt_gatt_server *server;
++};
++
++static void prep_write_complete_cb(struct gatt_db_attribute *attr, int err,
++								void *user_data)
++{
++	struct prep_write_complete_data *pwcd = user_data;
++	uint16_t handle = 0;
++	uint16_t offset;
++
++	handle = get_le16(pwcd->pdu);
++
++	if (err) {
++		bt_att_send_error_rsp(pwcd->server->att,
++					BT_ATT_OP_PREP_WRITE_REQ, handle, err);
++		free(pwcd->pdu);
++		free(pwcd);
++
++		return;
++	}
++
++	offset = get_le16(pwcd->pdu + 2);
++
++	if (!store_prep_data(pwcd->server, handle, offset, pwcd->length - 4,
++						&((uint8_t *) pwcd->pdu)[4]))
++		bt_att_send_error_rsp(pwcd->server->att,
++					BT_ATT_OP_PREP_WRITE_RSP, handle,
++					BT_ATT_ERROR_INSUFFICIENT_RESOURCES);
++
++	bt_att_send(pwcd->server->att, BT_ATT_OP_PREP_WRITE_RSP, pwcd->pdu,
++						pwcd->length, NULL, NULL, NULL);
++
++	free(pwcd->pdu);
++	free(pwcd);
++}
++
+ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 					uint16_t length, void *user_data)
+ {
+@@ -1215,7 +1254,8 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 	uint16_t handle = 0;
+ 	uint16_t offset;
+ 	struct gatt_db_attribute *attr;
+-	uint8_t ecode;
++	struct prep_write_complete_data *pwcd;
++	uint8_t ecode, status;
+ 
+ 	if (length < 4) {
+ 		ecode = BT_ATT_ERROR_INVALID_PDU;
+@@ -1245,15 +1285,21 @@ static void prep_write_cb(uint8_t opcode, const void *pdu,
+ 	if (ecode)
+ 		goto error;
+ 
+-	if (!store_prep_data(server, handle, offset, length - 4,
+-						&((uint8_t *) pdu)[4])) {
+-		ecode = BT_ATT_ERROR_INSUFFICIENT_RESOURCES;
+-		goto error;
+-	}
++	pwcd = new0(struct prep_write_complete_data, 1);
++	pwcd->pdu = malloc(length);
++	memcpy(pwcd->pdu, pdu, length);
++	pwcd->length = length;
++	pwcd->server = server;
+ 
+-	bt_att_send(server->att, BT_ATT_OP_PREP_WRITE_RSP, pdu, length, NULL,
+-								NULL, NULL);
+-	return;
++	status = gatt_db_attribute_write(attr, offset, NULL, 0,
++						BT_ATT_OP_PREP_WRITE_REQ,
++						server->att,
++						prep_write_complete_cb, pwcd);
++
++	if (status)
++		return;
++
++	ecode = BT_ATT_ERROR_UNLIKELY;
+ 
+ error:
+ 	bt_att_send_error_rsp(server->att, opcode, handle, ecode);
 -- 
 2.13.6
 
