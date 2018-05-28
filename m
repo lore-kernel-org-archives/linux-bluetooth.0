@@ -1,71 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <0492fa2a-ab18-c7c7-1b6f-dd24c47e97f9@palumbi.it>
-References: <df2637cb-3888-46c0-53cb-f135e1ecd03b@palumbi.it>
- <CABBYNZKuGtLtvq2Ciu1Mgn-jZDnN4omc3TuYWg7eL7QsUW9ptA@mail.gmail.com> <0492fa2a-ab18-c7c7-1b6f-dd24c47e97f9@palumbi.it>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 28 May 2018 13:50:06 +0300
-Message-ID: <CABBYNZK+N+Gpv9vf8V8JnEbwh4EHO0H9vb+o9KfEs=8zynUORA@mail.gmail.com>
-Subject: Re: BLE advertise name
-To: Marco Palumbi <marco@palumbi.it>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [PATCH BlueZ v2] test: Switch to Python3
+Date: Mon, 28 May 2018 13:37:08 +0200
+Message-Id: <1527507428-5257-1-git-send-email-krzk@kernel.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marco,
+Python2 will be maintained till end of 2019.  Switch to Python3 by
+replacing iteritems() with items() to fix error when runnig test-nap:
 
-On Mon, May 28, 2018 at 1:40 PM, Marco Palumbi <marco@palumbi.it> wrote:
-> thank you for the replay Luiz.
->
->
-> On 27/05/2018 09:01, Luiz Augusto von Dentz wrote:
->>
->> Hi Marco,
->>
->> On Sat, May 26, 2018 at 9:49 PM, Marco Palumbi <marco@palumbi.it> wrote:
->>>
->>> hello to all,
->>>
->>> I am trying to let BlueZ advertise on BLE with a name longer than 9
->>> character. is this possible?
->>> it seems to me that BlueZ uses the shortname to advertise over BLE.
->>> Any suggestion?
->>
->> How exactly are you trying to advertise? Btw, you should be able to
->> check what type we are using in the advertisement with use of btmon.
->>
-> I tried to play with btmon but I wasn't able to find useful information from
-> it (probably I am not using it correctly..)
-> here is what I have done (BlueZ 5.41 - Digi Embedded Yocto 2.2-r3)
->
-> after starting the  bluetoothd
->
-> btmgmt -i hci0 le on
-> btmgmt -i hci0 connectable on
-> btmgmt -i hci0 advertising on
-> btmgmt -i hci0 discov on
-> btmgmt -i hci0 name MyVeryLongNameThatExceedsNineCharacters
->
-> now, if I search for BLE devices from an adroid phone using the "nRF Connct"
-> (app from Nordic Semi for BLE tast) I can see my device shown only with this
-> name:
->
-> MyVeryLong  (indeed they are 10 chars and not 9)
->
-> while if I do a "classic" ble scan from android I see it shown twice both
-> with the long and the short name.
->
-> Nevertheless the android app "nRF Connct" is able to get longer names from
-> devices not using BlueZ stack
->
-> is this a limit of BlueZ or there is something wrong on my setup?
+	AttributeError: 'dbus.Dictionary' object has no attribute 'iteritems'
 
-Except that you should be using btmgmt as that requires sudo/root, I
-actually wonder why you haven't tried with bluetoothctl as that would
-use the D-Bus API available to applications?
+---
 
+Changes since v1:
+1. Fix also find_device_in_objects().
+---
+ test/bluezutils.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
+diff --git a/test/bluezutils.py b/test/bluezutils.py
+index de08cbdcb712..cd8964082450 100644
+--- a/test/bluezutils.py
++++ b/test/bluezutils.py
+@@ -15,7 +15,7 @@ def find_adapter(pattern=None):
+ 
+ def find_adapter_in_objects(objects, pattern=None):
+ 	bus = dbus.SystemBus()
+-	for path, ifaces in objects.iteritems():
++	for path, ifaces in objects.items():
+ 		adapter = ifaces.get(ADAPTER_INTERFACE)
+ 		if adapter is None:
+ 			continue
+@@ -35,7 +35,7 @@ def find_device_in_objects(objects, device_address, adapter_pattern=None):
+ 	if adapter_pattern:
+ 		adapter = find_adapter_in_objects(objects, adapter_pattern)
+ 		path_prefix = adapter.object_path
+-	for path, ifaces in objects.iteritems():
++	for path, ifaces in objects.items():
+ 		device = ifaces.get(DEVICE_INTERFACE)
+ 		if device is None:
+ 			continue
 -- 
-Luiz Augusto von Dentz
+2.7.4
+
