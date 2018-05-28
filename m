@@ -1,12 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180528082054.4017-4-grzegorz.kolodziejczyk@codecoup.pl>
-References: <20180528082054.4017-1-grzegorz.kolodziejczyk@codecoup.pl> <20180528082054.4017-4-grzegorz.kolodziejczyk@codecoup.pl>
+In-Reply-To: <20180528082054.4017-1-grzegorz.kolodziejczyk@codecoup.pl>
+References: <20180528082054.4017-1-grzegorz.kolodziejczyk@codecoup.pl>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 28 May 2018 16:41:05 +0300
-Message-ID: <CABBYNZ+Lut0zswZraUf2MqAvo2guHsbd0Mp=qsRMnB11j=ezyQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v5 4/4] client: Don't require authorization for
- trusted devices
+Date: Mon, 28 May 2018 16:39:48 +0300
+Message-ID: <CABBYNZLkGWF4wy215sX9_QcsnAT3iYd37KuSwLPZFNooihRm4w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5 1/4] doc/gatt-api: Add authorization options for attributes
 To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -17,73 +16,58 @@ Hi Grzegorz,
 
 On Mon, May 28, 2018 at 11:20 AM, Grzegorz Kolodziejczyk
 <grzegorz.kolodziejczyk@codecoup.pl> wrote:
-> This patch adds possibility to ommit authorization request from trusted
-> devices.
+> This patch adds authorization property for attributes and prepare write
+> request for authorization option for write request. This is require to
+> handle correctly prepare writes, which may response with insufficient
+> authorization error.
 > ---
->  client/gatt.c | 21 ++++++++++++++++++---
->  1 file changed, 18 insertions(+), 3 deletions(-)
+>  doc/gatt-api.txt | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 >
-> diff --git a/client/gatt.c b/client/gatt.c
-> index 3e70f365c..c7dfe42d7 100644
-> --- a/client/gatt.c
-> +++ b/client/gatt.c
-> @@ -1720,6 +1720,20 @@ error:
->         g_free(aad);
->  }
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index 0f1cc9029..2a8da75b0 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -85,6 +85,9 @@ Methods               array{byte} ReadValue(dict options)
+>                         Possible options: "offset": Start offset
+>                                           "device": Device path (Server only)
+>                                           "link": Link type (Server only)
+> +                                         "prepare-authorize": boolean Is prepare
+> +                                                              authorization
+> +                                                              request
 >
-> +static bool is_device_trusted(const char *path)
-> +{
-> +       GDBusProxy *proxy;
-> +       DBusMessageIter iter;
-> +       bool trusted;
-> +
-> +       proxy = bt_shell_get_env(path);
-> +
-> +       if (g_dbus_proxy_get_property(proxy, "Trusted", &iter))
-> +               dbus_message_iter_get_basic(&iter, &trusted);
-> +
-> +       return trusted;
-> +}
-> +
->  static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
->                                                         void *user_data)
->  {
-> @@ -1739,7 +1753,7 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
->         bt_shell_printf("ReadValue: %s offset %u link %s\n",
->                                         path_to_address(device), offset, link);
+>                         Possible Errors: org.bluez.Error.Failed
+>                                          org.bluez.Error.InProgress
+> @@ -250,6 +253,7 @@ Properties  string UUID [read-only]
+>                                 "encrypt-authenticated-write"
+>                                 "secure-read" (Server only)
+>                                 "secure-write" (Server only)
+> +                               "authorize"
 >
-> -       if (chrc->authorization_req) {
-> +       if (!is_device_trusted(device) && chrc->authorization_req) {
->                 struct authorize_attribute_data *aad;
+>  Characteristic Descriptors hierarchy
+>  ====================================
+> @@ -284,6 +288,9 @@ Methods             array{byte} ReadValue(dict flags)
+>                         Possible options: "offset": Start offset
+>                                           "device": Device path (Server only)
+>                                           "link": Link type (Server only)
+> +                                         "prepare-authorize": boolean Is prepare
+> +                                                              authorization
+> +                                                              request
 >
->                 aad = g_new0(struct authorize_attribute_data, 1);
-> @@ -1865,6 +1879,7 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
->         struct chrc *chrc = user_data;
->         uint16_t offset = 0;
->         bool prep_authorize = false;
-> +       char *device = NULL;
->         DBusMessageIter iter;
->         int value_len;
->         uint8_t *value;
-> @@ -1877,11 +1892,11 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
->                                 "org.bluez.Error.InvalidArguments", NULL);
+>                         Possible Errors: org.bluez.Error.Failed
+>                                          org.bluez.Error.InProgress
+> @@ -321,6 +328,7 @@ Properties  string UUID [read-only]
+>                                 "encrypt-authenticated-write"
+>                                 "secure-read" (Server Only)
+>                                 "secure-write" (Server Only)
+> +                               "authorize"
 >
->         dbus_message_iter_next(&iter);
-> -       if (parse_options(&iter, &offset, NULL, NULL, NULL, &prep_authorize))
-> +       if (parse_options(&iter, &offset, NULL, &device, NULL, &prep_authorize))
->                 return g_dbus_create_error(msg,
->                                 "org.bluez.Error.InvalidArguments", NULL);
->
-> -       if (chrc->authorization_req) {
-> +       if (!is_device_trusted(device) && chrc->authorization_req) {
->                 struct authorize_attribute_data *aad;
->
->                 aad = g_new0(struct authorize_attribute_data, 1);
+>  GATT Profile hierarchy
+>  =====================
 > --
 > 2.13.6
 
-We should be able to do this in the daemon so the application wont
-have to authorize these requests if the device is trusted.
+Patches 1-3 applyed, thanks.
 
 -- 
 Luiz Augusto von Dentz
