@@ -1,74 +1,70 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@codecoup.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] client: Don't require authorization for trusted devices
-Date: Tue, 29 May 2018 10:32:17 +0200
-Message-Id: <20180529083218.32603-1-grzegorz.kolodziejczyk@codecoup.pl>
+Subject: [PATCH BlueZ] shared/shell: Disable argument count check if optarg are detected
+Date: Tue, 29 May 2018 11:31:43 +0300
+Message-Id: <20180529083143.31359-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds possibility to ommit authorization request from trusted
-devices.
----
- client/gatt.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/client/gatt.c b/client/gatt.c
-index 3e70f365c..c7dfe42d7 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -1720,6 +1720,20 @@ error:
- 	g_free(aad);
- }
+Command which start with optional arguments might be using optargs
+format in which case checking argument count check does not work so
+this disables it which shall make things btmgmt work:
+
+[mgmt]# add-adv --help
+Usage: add-adv [options] <instance_id>
+Options:
+	 -u, --uuid <uuid>         Service UUID
+	 -d, --adv-data <data>     Advertising Data bytes
+	 -s, --scan-rsp <data>     Scan Response Data bytes
+	 -t, --timeout <timeout>   Timeout in seconds
+	 -D, --duration <duration> Duration in seconds
+	 -c, --connectable         "connectable" flag
+	 -g, --general-discov      "general-discoverable" flag
+	 -l, --limited-discov      "limited-discoverable" flag
+	 -n, --scan-rsp-local-name "local-name" flag
+	 -a, --scan-rsp-appearance "appearance" flag
+	 -m, --managed-flags       "managed-flags" flag
+	 -p, --tx-power            "tx-power" flag
+e.g.:
+	add-adv -u 180d -u 180f -d 080954657374204C45 1
+[mgmt]# add-adv -u 180d -u 180f -d 080954657374204C45 1
+Instance added: 1
+---
+ src/shared/shell.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index e7f17e021..97d91577e 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -295,6 +295,7 @@ static int cmd_exec(const struct bt_shell_menu_entry *entry,
+ 	size_t len;
+ 	char *man, *opt;
+ 	int flags = WRDE_NOCMD;
++	bool optargs = false;
  
-+static bool is_device_trusted(const char *path)
-+{
-+	GDBusProxy *proxy;
-+	DBusMessageIter iter;
-+	bool trusted;
-+
-+	proxy = bt_shell_get_env(path);
-+
-+	if (g_dbus_proxy_get_property(proxy, "Trusted", &iter))
-+		dbus_message_iter_get_basic(&iter, &trusted);
-+
-+	return trusted;
-+}
-+
- static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
- 							void *user_data)
- {
-@@ -1739,7 +1753,7 @@ static DBusMessage *chrc_read_value(DBusConnection *conn, DBusMessage *msg,
- 	bt_shell_printf("ReadValue: %s offset %u link %s\n",
- 					path_to_address(device), offset, link);
+ 	if (!entry->arg || entry->arg[0] == '\0') {
+ 		if (argc > 1) {
+@@ -323,6 +324,7 @@ static int cmd_exec(const struct bt_shell_menu_entry *entry,
+ 			goto optional;
+ 		}
+ 		man = strndup(opt, man - opt + 1);
++		optargs = true;
+ 	}
  
--	if (chrc->authorization_req) {
-+	if (!is_device_trusted(device) && chrc->authorization_req) {
- 		struct authorize_attribute_data *aad;
+ 	if (parse_args(man, &w, "<>", flags) < 0) {
+@@ -355,7 +357,7 @@ optional:
+ 	free(opt);
  
- 		aad = g_new0(struct authorize_attribute_data, 1);
-@@ -1865,6 +1879,7 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
- 	struct chrc *chrc = user_data;
- 	uint16_t offset = 0;
- 	bool prep_authorize = false;
-+	char *device = NULL;
- 	DBusMessageIter iter;
- 	int value_len;
- 	uint8_t *value;
-@@ -1877,11 +1892,11 @@ static DBusMessage *chrc_write_value(DBusConnection *conn, DBusMessage *msg,
- 				"org.bluez.Error.InvalidArguments", NULL);
- 
- 	dbus_message_iter_next(&iter);
--	if (parse_options(&iter, &offset, NULL, NULL, NULL, &prep_authorize))
-+	if (parse_options(&iter, &offset, NULL, &device, NULL, &prep_authorize))
- 		return g_dbus_create_error(msg,
- 				"org.bluez.Error.InvalidArguments", NULL);
- 
--	if (chrc->authorization_req) {
-+	if (!is_device_trusted(device) && chrc->authorization_req) {
- 		struct authorize_attribute_data *aad;
- 
- 		aad = g_new0(struct authorize_attribute_data, 1);
+ 	/* Check if there are too many arguments */
+-	if ((unsigned) argc - 1 > w.we_wordc && !w.we_offs) {
++	if (!optargs && ((unsigned int) argc - 1 > w.we_wordc && !w.we_offs)) {
+ 		print_text(COLOR_HIGHLIGHT, "Too many arguments: %d > %zu",
+ 					argc - 1, w.we_wordc);
+ 		goto fail;
 -- 
-2.13.6
+2.17.0
 
