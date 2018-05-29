@@ -8,15 +8,14 @@ Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
 	Rob Herring <robh@kernel.org>,
 	Johan Hovold <johan@kernel.org>,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 11/19] Bluetooth: hci_bcm: MODULE_DEVICE_TABLE(serdev)
-Date: Tue, 29 May 2018 15:10:06 +0200
-Message-Id: <20180529131014.18641-12-ricardo.ribalda@gmail.com>
+Subject: [PATCH 04/19] Bluetooth: hci_nokia: Add serdev_id_table
+Date: Tue, 29 May 2018 15:09:59 +0200
+Message-Id: <20180529131014.18641-5-ricardo.ribalda@gmail.com>
 In-Reply-To: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
 References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Export serdev table to the module header, allowing module autoload via
-udev/modprobe.
+Describe which hardware is supported by the current driver.
 
 Cc: Marcel Holtmann <marcel@holtmann.org>
 Cc: Johan Hedberg <johan.hedberg@gmail.com>
@@ -25,23 +24,32 @@ Cc: Johan Hovold <johan@kernel.org>
 Cc: linux-bluetooth@vger.kernel.org
 Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 ---
- drivers/bluetooth/hci_bcm.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/hci_nokia.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index f4d7846c06b8..ff0fd3502a90 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -1327,8 +1327,10 @@ MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
+diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
+index 3539fd03f47e..e32dfcd56b8d 100644
+--- a/drivers/bluetooth/hci_nokia.c
++++ b/drivers/bluetooth/hci_nokia.c
+@@ -801,6 +801,11 @@ static const struct of_device_id nokia_bluetooth_of_match[] = {
+ MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
+ #endif
  
- static const struct serdev_device_id bcm_serdev_id[] = {
- 	{ "bcm43438-bt", },
-+	{ "hci_uart_bcm", },
- 	{}
++static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
++	{ "hp4-bluetooth", },
++	{},
++};
++
+ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
+ 	.probe = nokia_bluetooth_serdev_probe,
+ 	.remove = nokia_bluetooth_serdev_remove,
+@@ -809,6 +814,7 @@ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
+ 		.pm = &nokia_bluetooth_pm_ops,
+ 		.of_match_table = of_match_ptr(nokia_bluetooth_of_match),
+ 	},
++	.id_table = nokia_bluetooth_serdev_id,
  };
-+MODULE_DEVICE_TABLE(serdev, bcm_serdev_id);
  
- static struct serdev_device_driver bcm_serdev_driver = {
- 	.probe = bcm_serdev_probe,
+ module_serdev_device_driver(nokia_bluetooth_serdev_driver);
 -- 
 2.17.0
