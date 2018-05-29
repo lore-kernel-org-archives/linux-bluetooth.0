@@ -8,9 +8,9 @@ Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
 	Rob Herring <robh@kernel.org>,
 	Johan Hovold <johan@kernel.org>,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 03/19] Bluetooth: hci_ll: Add serdev_id_table
-Date: Tue, 29 May 2018 15:09:58 +0200
-Message-Id: <20180529131014.18641-4-ricardo.ribalda@gmail.com>
+Subject: [PATCH 02/19] Bluetooth: hci_bcm: Add serdev_id_table
+Date: Tue, 29 May 2018 15:09:57 +0200
+Message-Id: <20180529131014.18641-3-ricardo.ribalda@gmail.com>
 In-Reply-To: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
 References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -24,43 +24,32 @@ Cc: Johan Hovold <johan@kernel.org>
 Cc: linux-bluetooth@vger.kernel.org
 Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 ---
- drivers/bluetooth/hci_ll.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index 27e414b4e3a2..c31942c9b466 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -776,6 +776,22 @@ static const struct of_device_id hci_ti_of_match[] = {
- };
- MODULE_DEVICE_TABLE(of, hci_ti_of_match);
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 441f5e1deb11..f4d7846c06b8 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1325,6 +1325,11 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
+ #endif
  
-+static struct serdev_device_id hci_ti_id[] = {
-+	{ "cc2560", },
-+	{ "wl1271-st", },
-+	{ "wl1273-st", },
-+	{ "wl1281-st", },
-+	{ "wl1283-st", },
-+	{ "wl1285-st", },
-+	{ "wl1801-st", },
-+	{ "wl1805-st", },
-+	{ "wl1807-st", },
-+	{ "wl1831-st", },
-+	{ "wl1835-st", },
-+	{ "wl1837-st", },
-+	{},
++static const struct serdev_device_id bcm_serdev_id[] = {
++	{ "bcm43438-bt", },
++	{}
 +};
 +
- static struct serdev_device_driver hci_ti_drv = {
- 	.driver		= {
- 		.name	= "hci-ti",
-@@ -783,6 +799,7 @@ static struct serdev_device_driver hci_ti_drv = {
+ static struct serdev_device_driver bcm_serdev_driver = {
+ 	.probe = bcm_serdev_probe,
+ 	.remove = bcm_serdev_remove,
+@@ -1334,6 +1339,7 @@ static struct serdev_device_driver bcm_serdev_driver = {
+ 		.acpi_match_table = ACPI_PTR(bcm_acpi_match),
+ 		.pm = &bcm_pm_ops,
  	},
- 	.probe	= hci_ti_probe,
- 	.remove	= hci_ti_remove,
-+	.id_table = hci_ti_id,
++	.id_table = bcm_serdev_id,
  };
- #else
- #define ll_setup NULL
+ 
+ int __init bcm_init(void)
 -- 
 2.17.0
