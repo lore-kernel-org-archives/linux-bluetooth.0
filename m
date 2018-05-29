@@ -1,148 +1,47 @@
-Return-Path: <andriy.shevchenko@linux.intel.com>
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
+Return-Path: <ricardo.ribalda@gmail.com>
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-serial@vger.kernel.org
+Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Johan Hovold <johan@kernel.org>,
 	linux-bluetooth@vger.kernel.org
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 1/2] Bluetooth: Re-use kstrtobool_from_user()
-Date: Tue, 29 May 2018 16:33:48 +0300
-Message-Id: <20180529133349.19814-1-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH 13/19] Bluetooth: hci_nokia: MODULE_DEVICE_TABLE(serdev)
+Date: Tue, 29 May 2018 15:10:08 +0200
+Message-Id: <20180529131014.18641-14-ricardo.ribalda@gmail.com>
+In-Reply-To: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
+References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Re-use kstrtobool_from_user() instead of open coded variant.
+Export serdev table to the module header, allowing module autoload via
+udev/modprobe.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Johan Hovold <johan@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org
+Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 ---
- net/bluetooth/hci_core.c    | 23 +++++++----------------
- net/bluetooth/hci_debugfs.c | 24 ++++++++----------------
- net/bluetooth/smp.c         | 12 ++++--------
- 3 files changed, 19 insertions(+), 40 deletions(-)
+ drivers/bluetooth/hci_nokia.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b0ee9edaae35..1dec33790198 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -76,19 +76,15 @@ static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
- {
- 	struct hci_dev *hdev = file->private_data;
- 	struct sk_buff *skb;
--	char buf[32];
--	size_t buf_size = min(count, (sizeof(buf)-1));
- 	bool enable;
-+	int err;
+diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
+index e32dfcd56b8d..c283e1ca6064 100644
+--- a/drivers/bluetooth/hci_nokia.c
++++ b/drivers/bluetooth/hci_nokia.c
+@@ -803,8 +803,10 @@ MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
  
- 	if (!test_bit(HCI_UP, &hdev->flags))
- 		return -ENETDOWN;
+ static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
+ 	{ "hp4-bluetooth", },
++	{ "nokia-bluetooth", },
+ 	{},
+ };
++MODULE_DEVICE_TABLE(serdev, nokia_bluetooth_serdev_id);
  
--	if (copy_from_user(buf, user_buf, buf_size))
--		return -EFAULT;
--
--	buf[buf_size] = '\0';
--	if (strtobool(buf, &enable))
--		return -EINVAL;
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
- 
- 	if (enable == hci_dev_test_flag(hdev, HCI_DUT_MODE))
- 		return -EALREADY;
-@@ -135,17 +131,12 @@ static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
- 				 size_t count, loff_t *ppos)
- {
- 	struct hci_dev *hdev = file->private_data;
--	char buf[32];
--	size_t buf_size = min(count, (sizeof(buf)-1));
- 	bool enable;
- 	int err;
- 
--	if (copy_from_user(buf, user_buf, buf_size))
--		return -EFAULT;
--
--	buf[buf_size] = '\0';
--	if (strtobool(buf, &enable))
--		return -EINVAL;
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
- 
- 	/* When the diagnostic flags are not persistent and the transport
- 	 * is not active or in user channel operation, then there is no need
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 418b76e557b0..0d8ab5b3c177 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -47,19 +47,15 @@ static ssize_t __name ## _write(struct file *file,			      \
- 				 size_t count, loff_t *ppos)		      \
- {									      \
- 	struct hci_dev *hdev = file->private_data;			      \
--	char buf[32];							      \
--	size_t buf_size = min(count, (sizeof(buf) - 1));		      \
- 	bool enable;							      \
-+	int err;							      \
- 									      \
- 	if (test_bit(HCI_UP, &hdev->flags))				      \
- 		return -EBUSY;						      \
- 									      \
--	if (copy_from_user(buf, user_buf, buf_size))			      \
--		return -EFAULT;						      \
--									      \
--	buf[buf_size] = '\0';						      \
--	if (strtobool(buf, &enable))					      \
--		return -EINVAL;						      \
-+	err = kstrtobool_from_user(user_buf, count, &enable);		      \
-+	if (err)							      \
-+		return err;						      \
- 									      \
- 	if (enable == test_bit(__quirk, &hdev->quirks))			      \
- 		return -EALREADY;					      \
-@@ -658,19 +654,15 @@ static ssize_t force_static_address_write(struct file *file,
- 					  size_t count, loff_t *ppos)
- {
- 	struct hci_dev *hdev = file->private_data;
--	char buf[32];
--	size_t buf_size = min(count, (sizeof(buf)-1));
- 	bool enable;
-+	int err;
- 
- 	if (test_bit(HCI_UP, &hdev->flags))
- 		return -EBUSY;
- 
--	if (copy_from_user(buf, user_buf, buf_size))
--		return -EFAULT;
--
--	buf[buf_size] = '\0';
--	if (strtobool(buf, &enable))
--		return -EINVAL;
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
- 
- 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR))
- 		return -EALREADY;
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index a2ddae2f37d7..ae91e2d40056 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -3315,16 +3315,12 @@ static ssize_t force_bredr_smp_write(struct file *file,
- 				     size_t count, loff_t *ppos)
- {
- 	struct hci_dev *hdev = file->private_data;
--	char buf[32];
--	size_t buf_size = min(count, (sizeof(buf)-1));
- 	bool enable;
-+	int err;
- 
--	if (copy_from_user(buf, user_buf, buf_size))
--		return -EFAULT;
--
--	buf[buf_size] = '\0';
--	if (strtobool(buf, &enable))
--		return -EINVAL;
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
- 
- 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_BREDR_SMP))
- 		return -EALREADY;
+ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
+ 	.probe = nokia_bluetooth_serdev_probe,
 -- 
 2.17.0
