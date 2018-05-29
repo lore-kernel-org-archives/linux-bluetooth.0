@@ -8,9 +8,9 @@ Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
 	Rob Herring <robh@kernel.org>,
 	Johan Hovold <johan@kernel.org>,
 	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 13/19] Bluetooth: hci_nokia: MODULE_DEVICE_TABLE(serdev)
-Date: Tue, 29 May 2018 15:10:08 +0200
-Message-Id: <20180529131014.18641-14-ricardo.ribalda@gmail.com>
+Subject: [PATCH 12/19] Bluetooth: hci_ll: MODULE_DEVICE_TABLE(serdev)
+Date: Tue, 29 May 2018 15:10:07 +0200
+Message-Id: <20180529131014.18641-13-ricardo.ribalda@gmail.com>
 In-Reply-To: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
 References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -25,23 +25,23 @@ Cc: Johan Hovold <johan@kernel.org>
 Cc: linux-bluetooth@vger.kernel.org
 Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 ---
- drivers/bluetooth/hci_nokia.c | 2 ++
+ drivers/bluetooth/hci_ll.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
-index e32dfcd56b8d..c283e1ca6064 100644
---- a/drivers/bluetooth/hci_nokia.c
-+++ b/drivers/bluetooth/hci_nokia.c
-@@ -803,8 +803,10 @@ MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
- 
- static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
- 	{ "hp4-bluetooth", },
-+	{ "nokia-bluetooth", },
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index c31942c9b466..5c36d8967a00 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -789,8 +789,10 @@ static struct serdev_device_id hci_ti_id[] = {
+ 	{ "wl1831-st", },
+ 	{ "wl1835-st", },
+ 	{ "wl1837-st", },
++	{ "hci-ti", },
  	{},
  };
-+MODULE_DEVICE_TABLE(serdev, nokia_bluetooth_serdev_id);
++MODULE_DEVICE_TABLE(serdev, hci_ti_id);
  
- static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
- 	.probe = nokia_bluetooth_serdev_probe,
+ static struct serdev_device_driver hci_ti_drv = {
+ 	.driver		= {
 -- 
 2.17.0
