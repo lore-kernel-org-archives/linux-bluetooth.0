@@ -1,47 +1,77 @@
-Return-Path: <thierry.escande@linaro.org>
-From: Thierry Escande <thierry.escande@linaro.org>
+Return-Path: <andriy.shevchenko@linux.intel.com>
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Bjorn Andersson <bjorn.andersson@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_qca: Fix "Sleep inside atomic section" warning
-Date: Tue, 29 May 2018 18:37:16 +0200
-Message-Id: <20180529163716.3886-1-thierry.escande@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset = "utf-8"
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1 2/2] Bluetooth: btmrvl: Re-use kstrtol_from_user()
+Date: Tue, 29 May 2018 16:33:49 +0300
+Message-Id: <20180529133349.19814-2-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20180529133349.19814-1-andriy.shevchenko@linux.intel.com>
+References: <20180529133349.19814-1-andriy.shevchenko@linux.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the following warning during boot:
+Re-use kstrtol_from_user() instead of open coded variant.
 
- do not call blocking ops when !TASK_RUNNING; state=1 set at
- [<(ptrval)>] qca_setup+0x194/0x750 [hci_uart]
- WARNING: CPU: 2 PID: 1878 at kernel/sched/core.c:6135
- __might_sleep+0x7c/0x88
-
-In qca_set_baudrate(), the current task state is set to
-TASK_UNINTERRUPTIBLE before going to sleep for 300ms. It was then
-restored to TASK_INTERRUPTIBLE. This patch sets the current task state
-back to TASK_RUNNING instead.
-
-Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- drivers/bluetooth/hci_qca.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btmrvl_debugfs.c | 24 +++---------------------
+ 1 file changed, 3 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f05382b5a65d..51790dd02afb 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -910,7 +910,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	 */
- 	set_current_state(TASK_UNINTERRUPTIBLE);
- 	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
--	set_current_state(TASK_INTERRUPTIBLE);
-+	set_current_state(TASK_RUNNING);
+diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
+index 023d35e3c7a7..c4867576be00 100644
+--- a/drivers/bluetooth/btmrvl_debugfs.c
++++ b/drivers/bluetooth/btmrvl_debugfs.c
+@@ -35,15 +35,9 @@ static ssize_t btmrvl_hscfgcmd_write(struct file *file,
+ 			const char __user *ubuf, size_t count, loff_t *ppos)
+ {
+ 	struct btmrvl_private *priv = file->private_data;
+-	char buf[16];
+ 	long result, ret;
  
- 	return 0;
- }
+-	memset(buf, 0, sizeof(buf));
+-
+-	if (copy_from_user(&buf, ubuf, min_t(size_t, sizeof(buf) - 1, count)))
+-		return -EFAULT;
+-
+-	ret = kstrtol(buf, 10, &result);
++	ret = kstrtol_from_user(ubuf, count, 10, &result);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -81,15 +75,9 @@ static ssize_t btmrvl_pscmd_write(struct file *file, const char __user *ubuf,
+ 						size_t count, loff_t *ppos)
+ {
+ 	struct btmrvl_private *priv = file->private_data;
+-	char buf[16];
+ 	long result, ret;
+ 
+-	memset(buf, 0, sizeof(buf));
+-
+-	if (copy_from_user(&buf, ubuf, min_t(size_t, sizeof(buf) - 1, count)))
+-		return -EFAULT;
+-
+-	ret = kstrtol(buf, 10, &result);
++	ret = kstrtol_from_user(ubuf, count, 10, &result);
+ 	if (ret)
+ 		return ret;
+ 
+@@ -127,15 +115,9 @@ static ssize_t btmrvl_hscmd_write(struct file *file, const char __user *ubuf,
+ 						size_t count, loff_t *ppos)
+ {
+ 	struct btmrvl_private *priv = file->private_data;
+-	char buf[16];
+ 	long result, ret;
+ 
+-	memset(buf, 0, sizeof(buf));
+-
+-	if (copy_from_user(&buf, ubuf, min_t(size_t, sizeof(buf) - 1, count)))
+-		return -EFAULT;
+-
+-	ret = kstrtol(buf, 10, &result);
++	ret = kstrtol_from_user(ubuf, count, 10, &result);
+ 	if (ret)
+ 		return ret;
+ 
 -- 
-2.14.1
+2.17.0
