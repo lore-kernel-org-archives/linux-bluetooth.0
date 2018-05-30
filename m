@@ -1,39 +1,75 @@
-Return-Path: <fengguang.wu@intel.com>
-Date: Wed, 30 May 2018 20:14:52 +0800
-From: kbuild test robot <fengguang.wu@intel.com>
-To: Hans de Goede <hdegoede@redhat.com>
-Cc: kbuild-all@01.org, Marcel Holtmann <marcel@holtmann.org>,
+Return-Path: <velemas@gmail.com>
+From: Artiom Vaskov <velemas@gmail.com>
+To: 
+Cc: honwchong@gmail.com,
+	Larry.Finger@lwfinger.net,
+	Artiom Vaskov <velemas@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-	Hans de Goede <hdegoede@redhat.com>, robh@kernel.org,
-	Jeremy Cline <jeremy@jcline.org>, linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
-	devicetree@vger.kernel.org
-Subject: [RFC PATCH] Bluetooth: btrtl: btrtl_convert_baudrate() can be static
-Message-ID: <20180530121452.GA8292@lkp-hsx02>
-References: <20180527190457.2632-5-hdegoede@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180527190457.2632-5-hdegoede@redhat.com>
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btusb: Add additional device ID for RTL8822BE
+Date: Wed, 30 May 2018 11:23:00 +0300
+Message-Id: <20180530082300.5510-1-velemas@gmail.com>
+In-Reply-To: <6BC33699-4306-4EE9-A290-B5845A402C4C@holtmann.org>
+References: <6BC33699-4306-4EE9-A290-B5845A402C4C@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The Asus ROG GL702ZC laptop contains a Realtek RTL8822BE device with
+an associated BT chip using a USB ID of 13d3:3526. This ID is added
+to the driver.
 
-Fixes: 547b9528309e ("Bluetooth: btrtl: add support for retrieving the UART settings")
-Signed-off-by: kbuild test robot <fengguang.wu@intel.com>
+The /sys/kernel/debug/usb/devices portion for this device is:
+
+T:  Bus=01 Lev=01 Prnt=01 Port=09 Cnt=04 Dev#=  5 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3526 Rev= 1.10
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+Signed-off-by: Artiom Vaskov <velemas@gmail.com>
 ---
- btrtl.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v2:
+- changed commit message
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index bc56ef7..99b77f6 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -591,7 +591,7 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
- }
- EXPORT_SYMBOL_GPL(btrtl_setup_realtek);
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b937cc1e2c07..34e5aedd4e27 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -379,6 +379,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3462), .driver_info = BTUSB_REALTEK },
  
--unsigned int btrtl_convert_baudrate(u32 device_baudrate)
-+static unsigned int btrtl_convert_baudrate(u32 device_baudrate)
- {
- 	switch (device_baudrate) {
- 	case 0x0252a00a:
+ 	/* Additional Realtek 8822BE Bluetooth devices */
++	{ USB_DEVICE(0x13d3, 0x3526), .driver_info = BTUSB_REALTEK },
+ 	{ USB_DEVICE(0x0b05, 0x185c), .driver_info = BTUSB_REALTEK },
+ 
+ 	/* Silicon Wave based devices */
+-- 
+2.17.1
