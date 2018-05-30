@@ -1,6 +1,6 @@
 Return-Path: <fengguang.wu@intel.com>
 Date: Wed, 30 May 2018 20:14:52 +0800
-From: kbuild test robot <lkp@intel.com>
+From: kbuild test robot <fengguang.wu@intel.com>
 To: Hans de Goede <hdegoede@redhat.com>
 Cc: kbuild-all@01.org, Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
@@ -9,37 +9,31 @@ Cc: kbuild-all@01.org, Marcel Holtmann <marcel@holtmann.org>,
 	Jeremy Cline <jeremy@jcline.org>, linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
 	devicetree@vger.kernel.org
-Subject: Re: [PATCH 04/13] Bluetooth: btrtl: add support for retrieving the
- UART settings
-Message-ID: <201805301938.m1Ny6tn6%fengguang.wu@intel.com>
+Subject: [RFC PATCH] Bluetooth: btrtl: btrtl_convert_baudrate() can be static
+Message-ID: <20180530121452.GA8292@lkp-hsx02>
 References: <20180527190457.2632-5-hdegoede@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <20180527190457.2632-5-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
 
-Thank you for the patch! Perhaps something to improve:
-
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on v4.17-rc7 next-20180529]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-
-url:    https://github.com/0day-ci/linux/commits/Hans-de-Goede/Bluetooth-Add-RTL8723BS-support/20180530-141115
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF=-D__CHECK_ENDIAN__
-
-
-sparse warnings: (new ones prefixed by >>)
-
->> drivers/bluetooth/btrtl.c:594:14: sparse: symbol 'btrtl_convert_baudrate' was not declared. Should it be static?
-
-Please review and possibly fold the followup patch.
-
+Fixes: 547b9528309e ("Bluetooth: btrtl: add support for retrieving the UART settings")
+Signed-off-by: kbuild test robot <fengguang.wu@intel.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+ btrtl.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index bc56ef7..99b77f6 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -591,7 +591,7 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+ }
+ EXPORT_SYMBOL_GPL(btrtl_setup_realtek);
+ 
+-unsigned int btrtl_convert_baudrate(u32 device_baudrate)
++static unsigned int btrtl_convert_baudrate(u32 device_baudrate)
+ {
+ 	switch (device_baudrate) {
+ 	case 0x0252a00a:
