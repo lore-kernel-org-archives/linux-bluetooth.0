@@ -1,25 +1,45 @@
-Return-Path: <robh@kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20180527190457.2632-10-hdegoede@redhat.com>
-References: <20180527190457.2632-1-hdegoede@redhat.com> <20180527190457.2632-10-hdegoede@redhat.com>
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 30 May 2018 08:25:44 -0500
-Message-ID: <CAL_JsqKBc4_bsaqNd3t5=LPBYgv32Jw3pzUq-=25V7JBbRhF7A@mail.gmail.com>
-Subject: Re: [PATCH 09/13] Bluetooth: hci_serdev: Fix HCI_UART_INIT_PENDING
- not working
+Return-Path: <fengguang.wu@intel.com>
+Date: Wed, 30 May 2018 20:14:52 +0800
+From: kbuild test robot <lkp@intel.com>
 To: Hans de Goede <hdegoede@redhat.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Jeremy Cline <jeremy@jcline.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	"open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>, linux-acpi@vger.kernel.org,
+Cc: kbuild-all@01.org, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Hans de Goede <hdegoede@redhat.com>, robh@kernel.org,
+	Jeremy Cline <jeremy@jcline.org>, linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
 	devicetree@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 04/13] Bluetooth: btrtl: add support for retrieving the
+ UART settings
+Message-ID: <201805301938.m1Ny6tn6%fengguang.wu@intel.com>
+References: <20180527190457.2632-5-hdegoede@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180527190457.2632-5-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, May 27, 2018 at 2:04 PM, Hans de Goede <hdegoede@redhat.com> wrote:
-> Init hci_uart->init_ready so that hci_uart_init_ready() works properly.
+Hi Martin,
 
-Why do you need to init in a wq? For serdev devices, probe is async
-already. So my thought was this wouldn't be needed.
+Thank you for the patch! Perhaps something to improve:
 
-Rob
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on v4.17-rc7 next-20180529]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Hans-de-Goede/Bluetooth-Add-RTL8723BS-support/20180530-141115
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
+
+
+sparse warnings: (new ones prefixed by >>)
+
+>> drivers/bluetooth/btrtl.c:594:14: sparse: symbol 'btrtl_convert_baudrate' was not declared. Should it be static?
+
+Please review and possibly fold the followup patch.
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
