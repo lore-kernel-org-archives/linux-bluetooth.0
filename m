@@ -1,75 +1,145 @@
-Return-Path: <velemas@gmail.com>
-From: Artiom Vaskov <velemas@gmail.com>
-To: 
-Cc: honwchong@gmail.com,
-	Larry.Finger@lwfinger.net,
-	Artiom Vaskov <velemas@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btusb: Add additional device ID for RTL8822BE
-Date: Wed, 30 May 2018 11:23:00 +0300
-Message-Id: <20180530082300.5510-1-velemas@gmail.com>
-In-Reply-To: <6BC33699-4306-4EE9-A290-B5845A402C4C@holtmann.org>
-References: <6BC33699-4306-4EE9-A290-B5845A402C4C@holtmann.org>
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH 01/13] dt-bindings: net: bluetooth: add support for
+ Realtek Bluetooth chips
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Rob Herring <robh@kernel.org>, Jeremy Cline <jeremy@jcline.org>,
+ linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-acpi@vger.kernel.org, devicetree@vger.kernel.org
+References: <20180527190457.2632-1-hdegoede@redhat.com>
+ <20180527190457.2632-2-hdegoede@redhat.com>
+ <7A22F14E-9F45-4779-B7E5-CEB330A5601E@holtmann.org>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <16b7e10b-6816-f441-00e5-9e86d1df33a7@redhat.com>
+Date: Wed, 30 May 2018 10:04:37 +0200
+MIME-Version: 1.0
+In-Reply-To: <7A22F14E-9F45-4779-B7E5-CEB330A5601E@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Asus ROG GL702ZC laptop contains a Realtek RTL8822BE device with
-an associated BT chip using a USB ID of 13d3:3526. This ID is added
-to the driver.
+Hi,
 
-The /sys/kernel/debug/usb/devices portion for this device is:
+On 30-05-18 08:42, Marcel Holtmann wrote:
+> Hi Hans,
+> 
+>> This adds the documentation for Bluetooth functionality of the Realtek
+>> RTL8723BS and RTL8723DS.
+>> Both are SDIO wifi chips with an additional Bluetooth module which is
+>> connected via UART to the host.
+>>
+>> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+>> Signed-off-by: Jeremy Cline <jeremy@jcline.org>
+>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+>> ---
+>> .../bindings/net/realtek-bluetooth.txt        | 41 +++++++++++++++++++
+>> 1 file changed, 41 insertions(+)
+>> create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+>> new file mode 100644
+>> index 000000000000..1491329c4cd1
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+>> @@ -0,0 +1,41 @@
+>> +Realtek Bluetooth Chips
+>> +-----------------------
+>> +
+>> +This documents the binding structure and common properties for serial
+>> +attached Realtek devices.
+>> +
+>> +Serial attached Realtek devices shall be a child node of the host UART
+>> +device the slave device is attached to. See ../serial/slave-device.txt
+>> +for more information
+>> +
+>> +Required properties:
+>> +- compatible: should contain one of the following:
+>> +    * "realtek,rtl8723bs-bluetooth"
+>> +    * "realtek,rtl8723ds-bluetooth"
+>> +
+>> +Optional properties:
+>> +- realtek,config-data: Bluetooth chipset configuration data which is
+>> +			needed for communication (it typically contains
+>> +			board specific settings like the baudrate and
+>> +			whether flow-control is used).
+>> +			This is an array of u8 values.
+>> +- enable-gpios: GPIO specifier, used to enable/disable the BT module
+>> +- reset-gpios: GPIO specifier, used to reset the BT module
+>> +
+>> +
+>> +Example:
+>> +
+>> +&uart {
+>> +	...
+>> +
+>> +	bluetooth {
+>> +		compatible = "realtek,rtl8723bs-bluetooth";
+>> +		enable-gpios = <&gpio 20 GPIO_ACTIVE_HIGH>;
+>> +		reset-gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
+>> +		realtek,config-data = /bits/ 8 <
+>> +			0x55 0xab 0x23 0x87 0x29 0x00 0xf4 0x00 0x01 0x01 0xf6 0x00
+>> +			0x02 0x81 0x00 0xfa 0x00 0x02 0x12 0x80 0x0c 0x00 0x10 0x02
+>> +			0x80 0x92 0x04 0x50 0xc5 0xea 0x19 0xe1 0x1b 0xfd 0xaf 0x5f
+>> +			0x01 0xa4 0x0b 0xd9 0x00 0x01 0x0f 0xe4 0x00 0x01 0x08>;
+>> +	};
+>> +};
+> 
+> we actually need to agree on this config-data. As I wrote in an earlier email some time ago, the actual config-data files are just memory portions that will overload the default config area. I wrote tools/rtlfw.c to parse these.
+> 
+> So now I wonder if we can just read the current configuration and run with that when no extra blob is provided. That way it would always work and we might just give the config-data filename here. Mostly this is the for PCM and UART settings anyway.
 
-T:  Bus=01 Lev=01 Prnt=01 Port=09 Cnt=04 Dev#=  5 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3526 Rev= 1.10
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I've been thinking about this too and 2 different solutions come to mind.
 
-Signed-off-by: Artiom Vaskov <velemas@gmail.com>
----
-Changes in v2:
-- changed commit message
+Note this is all x86 specific, I think it best to solve this for x86 first
+and then we can apply the lessons learned there to ARM/devicetree when
+someone comes along who wants to hook-up things on ARM.
 
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+My first idea was to stick with a config blob using the firmware_load
+mechanism, but to add a postfix to the filename based on the ACPI
+HID (hardware-id) of the serdev device, so in practice this means
+we would try to load:
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b937cc1e2c07..34e5aedd4e27 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -379,6 +379,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3462), .driver_info = BTUSB_REALTEK },
- 
- 	/* Additional Realtek 8822BE Bluetooth devices */
-+	{ USB_DEVICE(0x13d3, 0x3526), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x0b05, 0x185c), .driver_info = BTUSB_REALTEK },
- 
- 	/* Silicon Wave based devices */
--- 
-2.17.1
+/lib/firmware/rtl_bt/rtl8723bs_config-OBDA8723.bin
+
+On most x86 devices, so far all my testing on a bunch of different
+devices has shown that the same config works for all x86 devices
+(I took the config from a Chuwi Vi8 tablet which uses 3000000bps
++ hardware flowcontrol).
+
+This way we can put the config in linux-firmware, without it
+getting loaded on ARM boards where it might very well be wrong.
+
+
+My second idea is to include a default config inside the driver,
+which can be optionally overridden by a file in
+/lib/firmware/rtl_bt and/or dt. Combined with module-options to
+override the baudrate and flowcontrol setting (and patch the
+builtin config accordingly).
+
+
+Your idea to read back the config from the device is also
+interesting, but I don't think that will gain us anything because
+AFAIK the whole purpose of the board specific config file
+bits is that the chip lack eeprom space to store this info,
+so we will just always get some generic defaults.
+
+
+I've run your rtlfw tool on a bunch of different config files and
+there are a lot of unknown fields, and even of the known fields
+I don't think we understand all the bits. So all in all the
+config file is a bit of a black box and as such I believe it
+would be best to just treat it as such and I personally
+prefer my first idea, which is to add a postfix to the
+firmware filename request, so on x86 load:
+
+/lib/firmware/rtl_bt/rtl8723bs_config-OBDA8723.bin
+
+And on devicetree we could postfix things with the machine
+model string (as returned by  of_flat_dt_get_machine_name())
+
+
+So Marcel, which direction do you think we should go?
+
+Regards,
+
+Hans
