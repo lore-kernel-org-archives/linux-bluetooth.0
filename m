@@ -1,35 +1,38 @@
-Return-Path: <luiz.dentz@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <20180507223524.32070-1-brian.gix@intel.com>
-References: <20180507223524.32070-1-brian.gix@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 30 May 2018 10:23:34 +0300
-Message-ID: <CABBYNZLkMnL=3fMOFajwoe6CH=Ptm1RLEiTWF3Pj35ekTiiUnQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/1] ECC Cleanup
-To: Brian Gix <brian.gix@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
+Subject: Re: [PATCH 09/13] Bluetooth: hci_serdev: Fix HCI_UART_INIT_PENDING
+ not working
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180527190457.2632-10-hdegoede@redhat.com>
+Date: Wed, 30 May 2018 08:49:58 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        robh@kernel.org, Jeremy Cline <jeremy@jcline.org>,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-acpi@vger.kernel.org, devicetree@vger.kernel.org
+Message-Id: <9656BBC5-4E1B-448F-AD4E-586489F92A7E@holtmann.org>
+References: <20180527190457.2632-1-hdegoede@redhat.com>
+ <20180527190457.2632-10-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Hans,
 
-On Tue, May 8, 2018 at 1:35 AM, Brian Gix <brian.gix@intel.com> wrote:
-> Revert ecc_make_key to original implementation, and cleanup API
->
-> Brian Gix (1):
->   shared/ecc: Make ecc_make_key() a stand alone API
->
->  src/shared/ecc.c | 25 +++++++++++++++++--------
->  src/shared/ecc.h |  4 +++-
->  2 files changed, 20 insertions(+), 9 deletions(-)
->
-> --
-> 2.14.3
+> Init hci_uart->init_ready so that hci_uart_init_ready() works properly.
+> 
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> drivers/bluetooth/hci_ldisc.c  | 2 +-
+> drivers/bluetooth/hci_serdev.c | 1 +
+> drivers/bluetooth/hci_uart.h   | 1 +
+> 3 files changed, 3 insertions(+), 1 deletion(-)
 
-Applied, thanks.
+this patch has been cherry-picked and applied to bluetooth-next tree.
 
+Regards
 
+Marcel
 
--- 
-Luiz Augusto von Dentz
