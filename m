@@ -1,32 +1,57 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.3 \(3445.6.18\))
-Subject: Re: [PATCH v1 2/2] Bluetooth: btmrvl: Re-use kstrtol_from_user()
+Subject: Re: [PATCH] Bluetooth: hci_qca: Fix "Sleep inside atomic section"
+ warning
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180529133349.19814-2-andriy.shevchenko@linux.intel.com>
-Date: Wed, 30 May 2018 08:16:23 +0200
+In-Reply-To: <20180529163716.3886-1-thierry.escande@linaro.org>
+Date: Wed, 30 May 2018 08:13:35 +0200
 Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <EE541983-21F2-470E-90E1-82067F76FD31@holtmann.org>
-References: <20180529133349.19814-1-andriy.shevchenko@linux.intel.com>
- <20180529133349.19814-2-andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <CEB5894A-50FD-4541-8531-5EB73200771D@holtmann.org>
+References: <20180529163716.3886-1-thierry.escande@linaro.org>
+To: Thierry Escande <thierry.escande@linaro.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andy,
+Hi Thierry,
 
-> Re-use kstrtol_from_user() instead of open coded variant.
+> This patch fixes the following warning during boot:
 > 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> do not call blocking ops when !TASK_RUNNING; state=1 set at
+> [<(ptrval)>] qca_setup+0x194/0x750 [hci_uart]
+> WARNING: CPU: 2 PID: 1878 at kernel/sched/core.c:6135
+> __might_sleep+0x7c/0x88
+> 
+> In qca_set_baudrate(), the current task state is set to
+> TASK_UNINTERRUPTIBLE before going to sleep for 300ms. It was then
+> restored to TASK_INTERRUPTIBLE. This patch sets the current task state
+> back to TASK_RUNNING instead.
+> 
+> Signed-off-by: Thierry Escande <thierry.escande@linaro.org>
 > ---
-> drivers/bluetooth/btmrvl_debugfs.c | 24 +++---------------------
-> 1 file changed, 3 insertions(+), 21 deletions(-)
+> drivers/bluetooth/hci_qca.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
+
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index f05382b5a65d..51790dd02afb 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -910,7 +910,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+> 	 */
+> 	set_current_state(TASK_UNINTERRUPTIBLE);
+> 	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
+> -	set_current_state(TASK_INTERRUPTIBLE);
+> +	set_current_state(TASK_RUNNING);
+> 
+
+However wouldn’t it better to use msleep or similar instead of open coding it with schedule_timeout?
 
 Regards
 
 Marcel
-
