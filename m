@@ -1,33 +1,41 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: =?UTF-8?Q?Rafa=c5=82_Bilski?= <rafalbilski@interia.pl>
-Subject: [PATCH] Allow bluetoothd to call methods on dbus' system bus
-Message-ID: <8ae38491-75b4-b230-2232-fd12a4bd7b7a@interia.pl>
-Date: Wed, 30 May 2018 23:26:09 +0100
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH 09/13] Bluetooth: hci_serdev: Fix HCI_UART_INIT_PENDING
+ not working
+To: Rob Herring <robh@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Jeremy Cline <jeremy@jcline.org>,
+ "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+ "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+ linux-acpi@vger.kernel.org, devicetree@vger.kernel.org
+References: <20180527190457.2632-1-hdegoede@redhat.com>
+ <20180527190457.2632-10-hdegoede@redhat.com>
+ <CAL_JsqKBc4_bsaqNd3t5=LPBYgv32Jw3pzUq-=25V7JBbRhF7A@mail.gmail.com>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <c15c697b-150e-20fe-7e17-c04d4b853c35@redhat.com>
+Date: Wed, 30 May 2018 19:31:31 +0200
 MIME-Version: 1.0
+In-Reply-To: <CAL_JsqKBc4_bsaqNd3t5=LPBYgv32Jw3pzUq-=25V7JBbRhF7A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Default dbus configuration doesn't allow calling methods on system bus. Only sending signals is 
-allowed.
-If "mpris-proxy" isn't running "/usr/lib/gsd-media-keys" translates keystrokes from 
-"profiles/audio/avctp.c:handle_panel_passthrough()"
-to dbus method calls on session bus. This is allowed on dbus by default.
-If "mpris-proxy" is running "bluetoothd" executes dbus' method calls on system bus.  These 
-apparently are rejected by default.
+Hi,
 
-diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-index 0c0b221bb..1cafab631 100644
---- a/src/bluetooth.conf
-+++ b/src/bluetooth.conf
-@@ -8,6 +8,7 @@
-    <!-- ../system.conf have denied everything, so we just punch some holes -->
-  
-    <policy user="root">
-+    <allow send_type="method_call"/>
-      <allow own="org.bluez"/>
-      <allow send_destination="org.bluez"/>
-      <allow send_interface="org.bluez.Agent1"/>
+On 30-05-18 15:25, Rob Herring wrote:
+> On Sun, May 27, 2018 at 2:04 PM, Hans de Goede <hdegoede@redhat.com> wrote:
+>> Init hci_uart->init_ready so that hci_uart_init_ready() works properly.
+> 
+> Why do you need to init in a wq? For serdev devices, probe is async
+> already. So my thought was this wouldn't be needed.
 
+The H5 protocol needs to exchange a number of messages to
+sync the 2 sides before it can accept any HCI commands, so
+it uses the delayed-registration feature of the hci_ldisc code by
+setting the HCI_UART_INIT_PENDING. When doing serdev based enumeration
+we could do something different but that would require significant
+changes to the hci_h5.c code.
+
+Regards,
+
+Hans
