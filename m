@@ -1,124 +1,176 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Date: Sun, 1 Apr 2018 21:53:42 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2018-04-01
-Message-ID: <20180401185342.GA14384@x1c.home>
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH 01/13] dt-bindings: net: bluetooth: add support for
+ Realtek Bluetooth chips
+To: Rob Herring <robh@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Jeremy Cline <jeremy@jcline.org>, linux-bluetooth@vger.kernel.org,
+ linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20180527190457.2632-1-hdegoede@redhat.com>
+ <20180527190457.2632-2-hdegoede@redhat.com>
+ <7A22F14E-9F45-4779-B7E5-CEB330A5601E@holtmann.org>
+ <16b7e10b-6816-f441-00e5-9e86d1df33a7@redhat.com>
+ <20180531164214.GA12210@rob-hp-laptop>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <0d99e890-b93c-df55-ae43-8fc910778243@redhat.com>
+Date: Thu, 31 May 2018 22:50:10 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="TB36FDmn/VVEgNH/"
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <20180531164214.GA12210@rob-hp-laptop>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi,
 
---TB36FDmn/VVEgNH/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On 31-05-18 18:42, Rob Herring wrote:
+> On Wed, May 30, 2018 at 10:04:37AM +0200, Hans de Goede wrote:
+>> Hi,
+>>
+>> On 30-05-18 08:42, Marcel Holtmann wrote:
+>>> Hi Hans,
+>>>
+>>>> This adds the documentation for Bluetooth functionality of the Realtek
+>>>> RTL8723BS and RTL8723DS.
+>>>> Both are SDIO wifi chips with an additional Bluetooth module which is
+>>>> connected via UART to the host.
+>>>>
+>>>> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+>>>> Signed-off-by: Jeremy Cline <jeremy@jcline.org>
+>>>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+>>>> ---
+>>>> .../bindings/net/realtek-bluetooth.txt        | 41 +++++++++++++++++++
+>>>> 1 file changed, 41 insertions(+)
+>>>> create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+>>>>
+>>>> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+>>>> new file mode 100644
+>>>> index 000000000000..1491329c4cd1
+>>>> --- /dev/null
+>>>> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.txt
+>>>> @@ -0,0 +1,41 @@
+>>>> +Realtek Bluetooth Chips
+>>>> +-----------------------
+>>>> +
+>>>> +This documents the binding structure and common properties for serial
+>>>> +attached Realtek devices.
+>>>> +
+>>>> +Serial attached Realtek devices shall be a child node of the host UART
+>>>> +device the slave device is attached to. See ../serial/slave-device.txt
+>>>> +for more information
+>>>> +
+>>>> +Required properties:
+>>>> +- compatible: should contain one of the following:
+>>>> +    * "realtek,rtl8723bs-bluetooth"
+>>>> +    * "realtek,rtl8723ds-bluetooth"
+>>>> +
+>>>> +Optional properties:
+>>>> +- realtek,config-data: Bluetooth chipset configuration data which is
+>>>> +			needed for communication (it typically contains
+>>>> +			board specific settings like the baudrate and
+>>>> +			whether flow-control is used).
+>>>> +			This is an array of u8 values.
+>>>> +- enable-gpios: GPIO specifier, used to enable/disable the BT module
+>>>> +- reset-gpios: GPIO specifier, used to reset the BT module
+>>>> +
+>>>> +
+>>>> +Example:
+>>>> +
+>>>> +&uart {
+>>>> +	...
+>>>> +
+>>>> +	bluetooth {
+>>>> +		compatible = "realtek,rtl8723bs-bluetooth";
+>>>> +		enable-gpios = <&gpio 20 GPIO_ACTIVE_HIGH>;
+>>>> +		reset-gpios = <&gpio 11 GPIO_ACTIVE_HIGH>;
+>>>> +		realtek,config-data = /bits/ 8 <
+>>>> +			0x55 0xab 0x23 0x87 0x29 0x00 0xf4 0x00 0x01 0x01 0xf6 0x00
+>>>> +			0x02 0x81 0x00 0xfa 0x00 0x02 0x12 0x80 0x0c 0x00 0x10 0x02
+>>>> +			0x80 0x92 0x04 0x50 0xc5 0xea 0x19 0xe1 0x1b 0xfd 0xaf 0x5f
+>>>> +			0x01 0xa4 0x0b 0xd9 0x00 0x01 0x0f 0xe4 0x00 0x01 0x08>;
+>>>> +	};
+>>>> +};
+>>>
+>>> we actually need to agree on this config-data. As I wrote in an earlier email some time ago, the actual config-data files are just memory portions that will overload the default config area. I wrote tools/rtlfw.c to parse these.
+>>>
+>>> So now I wonder if we can just read the current configuration and run with that when no extra blob is provided. That way it would always work and we might just give the config-data filename here. Mostly this is the for PCM and UART settings anyway.
+>>
+>> I've been thinking about this too and 2 different solutions come to mind.
+>>
+>> Note this is all x86 specific, I think it best to solve this for x86 first
+>> and then we can apply the lessons learned there to ARM/devicetree when
+>> someone comes along who wants to hook-up things on ARM.
+>>
+>> My first idea was to stick with a config blob using the firmware_load
+>> mechanism, but to add a postfix to the filename based on the ACPI
+>> HID (hardware-id) of the serdev device, so in practice this means
+>> we would try to load:
+>>
+>> /lib/firmware/rtl_bt/rtl8723bs_config-OBDA8723.bin
+>>
+>> On most x86 devices, so far all my testing on a bunch of different
+>> devices has shown that the same config works for all x86 devices
+>> (I took the config from a Chuwi Vi8 tablet which uses 3000000bps
+>> + hardware flowcontrol).
+>>
+>> This way we can put the config in linux-firmware, without it
+>> getting loaded on ARM boards where it might very well be wrong.
+>>
+>>
+>> My second idea is to include a default config inside the driver,
+>> which can be optionally overridden by a file in
+>> /lib/firmware/rtl_bt and/or dt. Combined with module-options to
+>> override the baudrate and flowcontrol setting (and patch the
+>> builtin config accordingly).
+>>
+>>
+>> Your idea to read back the config from the device is also
+>> interesting, but I don't think that will gain us anything because
+>> AFAIK the whole purpose of the board specific config file
+>> bits is that the chip lack eeprom space to store this info,
+>> so we will just always get some generic defaults.
+>>
+>>
+>> I've run your rtlfw tool on a bunch of different config files and
+>> there are a lot of unknown fields, and even of the known fields
+>> I don't think we understand all the bits. So all in all the
+>> config file is a bit of a black box and as such I believe it
+>> would be best to just treat it as such and I personally
+>> prefer my first idea, which is to add a postfix to the
+>> firmware filename request, so on x86 load:
+>>
+>> /lib/firmware/rtl_bt/rtl8723bs_config-OBDA8723.bin
+>>
+>> And on devicetree we could postfix things with the machine
+>> model string (as returned by  of_flat_dt_get_machine_name())
+> 
+> If the firmware file is going to depend on the DT, then you might as
+> well just put the data into the DT.
 
-Hi Dave,
+Ok, note we don't need the entire firmware in DT, just a (binary
+format) config file for the firmware. The question is if we are
+going to try and break up the info from the config-file and then
+regenerate it inside the kernel driver. Or if we are just going
+to put the say 60 bytes in DT as an u8 array as the original
+binding proposed by Martin Blumenstingl suggests.
 
-Here's (most likely) the last bluetooth-next pull request for the 4.17
-kernel:
+Since we only know the meaning for a couple of the bytes in
+the file, which is typically 40 - 60 bytes big, I think it
+is probably best to just treat it as a blob.
 
- - Remove unused btuart_cs driver (replaced by serial_cs + hci_uart)
- - New USB ID for Edimax EW-7611ULB controller
- - Cleanups & fixes to hci_bcm driver
- - Clenups to btmrvl driver
+> There's a similar issue on QCom Dragonboards. The WiFi (and BT?)
+> firmware files are supposedly board specific, so folks don't want to put
+> them into linux-firmware. But it also seems to be unknown as to which
+> parts are board specific are not.
 
-Please let me know if there are any issues pulling. Thanks.
+In my experience with broadcom and now the rtl8723bs the
+actual firmware and the needed config data are separate.
 
-Johan
+Hmm that is actually no entirely true, for broadcom the
+bluetooth patchram file depends on the clockcrystal freq
+used on the board, so there are 2 versions of it for a
+single chip, 1 for each of the 2 different freqs used.
 
----
-The following changes since commit 06b19fe9a6df7aaa423cd8404ebe5ac9ec4b2960:
+Regards,
 
-  Merge branch 'chelsio-inline-tls' (2018-03-31 23:37:33 -0400)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to 9ea471320e1302be0fac67c14a7ab7982609fea7:
-
-  Bluetooth: Mark expected switch fall-throughs (2018-04-01 21:43:03 +0300)
-
-----------------------------------------------------------------
-Gustavo A. R. Silva (1):
-      Bluetooth: Mark expected switch fall-throughs
-
-Hans de Goede (6):
-      Bluetooth: hci_bcm: Add irq_polarity module option
-      Bluetooth: hci_bcm: Treat Interrupt ACPI resources as always being active-low
-      Bluetooth: hci_bcm: Add 6 new ACPI HIDs
-      Bluetooth: hci_bcm: Remove duplication in gpio-mappings declaration
-      Bluetooth: hci_bcm: Do not tie GPIO pin order to a specific ACPI HID
-      Bluetooth: hci_bcm: Add ACPI HIDs found in Windows .inf files and DSTDs
-
-Ian W MORRISON (1):
-      Bluetooth: hci_bcm: Remove DMI quirk for the MINIX Z83-4
-
-Jaganath Kanakkassery (1):
-      Bluetooth: Fix data type of appearence
-
-Loic Poulain (1):
-      Bluetooth: hci_bcm: use gpiod cansleep version
-
-Marcel Holtmann (5):
-      Bluetooth: hci_bcm: Use default baud rate if missing shutdown GPIO
-      Bluetooth: hci_ll: Use skb_put_u8 instead of struct hcill_cmd
-      Bluetooth: hci_ll: Convert to use h4_recv_buf helper
-      Bluetooth: bpa10x: Use separate h4_recv_buf helper
-      Bluetooth: Remove unused btuart_cs driver
-
-Markus Elfring (2):
-      Bluetooth: btmrvl: Delete an unnecessary variable initialisation in btmrvl_sdio_register_dev()
-      Bluetooth: btmrvl: Delete an unnecessary variable initialisation in btmrvl_sdio_card_to_host()
-
-Vic Wei (1):
-      Bluetooth: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for BTUSB_QCA_ROME
-
-Vicente Bergas (1):
-      Bluetooth: btusb: Add USB ID 7392:a611 for Edimax EW-7611ULB
-
-Wei Yongjun (1):
-      Bluetooth: btrsi: remove unused including <linux/version.h>
-
- drivers/bluetooth/Kconfig       |  20 +-
- drivers/bluetooth/Makefile      |   1 -
- drivers/bluetooth/bpa10x.c      |   2 +-
- drivers/bluetooth/btmrvl_sdio.c |   4 +-
- drivers/bluetooth/btrsi.c       |   1 -
- drivers/bluetooth/btuart_cs.c   | 675 ----------------------------------------
- drivers/bluetooth/btusb.c       |   4 +
- drivers/bluetooth/h4_recv.h     | 160 ++++++++++
- drivers/bluetooth/hci_bcm.c     | 305 +++++++++++++-----
- drivers/bluetooth/hci_ll.c      | 222 +++++--------
- include/net/bluetooth/mgmt.h    |   2 +-
- net/bluetooth/mgmt.c            |   1 +
- net/bluetooth/rfcomm/sock.c     |   1 +
- 13 files changed, 473 insertions(+), 925 deletions(-)
- delete mode 100644 drivers/bluetooth/btuart_cs.c
- create mode 100644 drivers/bluetooth/h4_recv.h
-
---TB36FDmn/VVEgNH/
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJawSq2AAoJECQj9vv5qNQSsG4QAIg2fWZB/AqYZn/MT+nwaDOZ
-OQK7SwHvm3aLvsyzxQnmT4ToNFde3yrjib0yCDZk6WBjRJhHcPvYOAzJAZN1WaxP
-OU4RSnAHLzByfM3hr82yoQDGDNP4zQUirDO+ZRd385EO7fq/6P4lV11Hl5j3xCK2
-InQ3w4d6SGMAkbz4fpF+IWvuO1KKKtadCz0O4flSz/jaMU9oIV7iljwFzu/QaduY
-mn8+XoQeGhrLnQOJ+u/bqMKXISS/p2WaLC3f0zs/S5m+yzOMTHkH5Bw9t133/t9o
-47CtJww7BE0Qx6cLtitFDEswFxQBFKXDKic4gKAVhcLzfVB4ArHpnjOdzpPT/6nz
-fI5rNCNrwSxZTk5NoGQDygsZu6uPqyiVEzsVQpyA2IG7UBSFpDowDleKT7SKukEr
-emMAEeinr44G8KZF7hf/vaPJWklaHguAytZ0aEK2NoEpAucVKaxJOawnib0CfPu2
-MVe5nG6E2GkHTBntO52RCPINIcyc7xNFtti6rCeldDRxF0GDSdxgVyX8Y6TTeL25
-yi116AWAlWHUcw860jqTqaYUCWfM0iuaL9LoIs+Jo/cCyaI7ngLuoBbrTpQlrlrN
-f9PF3lUktBIMEhyxpldqlwrmCKzvxw170JHbqES3INGfj4QpEdIlSUu+adPg+Jdz
-ix6bpnEgsLcQ/+IcgjSK
-=ULUB
------END PGP SIGNATURE-----
-
---TB36FDmn/VVEgNH/--
+Hans
