@@ -1,85 +1,67 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Subject: [PATCH] obexd: use AM_LDFLAGS for linking
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-To: linux-bluetooth@vger.kernel.org
-References: <20171212182717.3429-1-stefan.seyfried@googlemail.com>
-Message-ID: <61e22a32-7a04-854c-b4d3-259d49e82cf6@message-id.googlemail.com>
-Date: Tue, 5 Jun 2018 09:48:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20171212182717.3429-1-stefan.seyfried@googlemail.com>
-Content-Type: multipart/mixed;
- boundary="------------ACC4451F55799CB2302AC01D"
+From: Chris Murphy <lists@colorremedies.com>
+Date: Mon, 4 Jun 2018 15:32:17 -0600
+Message-ID: <CAJCQCtQgVqYSsFOUh0JOv79kbhacUajFPwKZztZWxapy_gFqNw@mail.gmail.com>
+Subject: constant bt mouse disconnects
+To: Bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is a multi-part message in MIME format.
---------------ACC4451F55799CB2302AC01D
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Summary: Every 5-20 minutes, the bluetooth mouse stops working.
+Unprompted, it will reconnect and start working again. There are no
+bluetoothd or kernel messages at the time of the disconnect, only
+after reconnecting and working again are there messages. At the time
+of the reconnect, the GNOME bluetooth icon in the upper right menu bar
+area vanishes for ~2 seconds and reappears. The disconnect lasts
+perhaps 10-30 seconds (varies).
 
-Also attached, because Thunderbird is likely to screw this up... :-)
+On the same hardware (same mouse and laptop), the problem doesn't
+happen when running Windows 10. And with a different laptop (a Mac)
+the problem doesn't happen when running macOS, but does happen when
+running Fedora. So it seems like a bug somewhere on the Linux side of
+things but getting more debug info on why this is happening is eluding
+me.
 
->From b912306ae756eaf75caa1ab7e04e3112fac4a01c Mon Sep 17 00:00:00 2001
-From: Stefan Seyfried <seife+dev@b1-systems.com>
-Date: Mon, 11 Dec 2017 22:52:28 +0100
-Subject: [PATCH] obexd: use AM_LDFLAGS for linking
+Fedora 28
+4.17.0-0.rc7.git1.1.fc29.x86_64 (happens with 4.16, 4.15, 4.14 kernels)
+bluez-5.49-3.fc28.x86_64
+gnome-bluetooth-3.28.0-1.fc28.x86_64
 
-without this, --enable-pie does not work for obexd
----
- Makefile.obexd | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+bluetoothd is running with -d option to get debugging info
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 2e33cbc72..86c395305 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -83,7 +83,7 @@ obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
- 			gdbus/libgdbus-internal.la \
- 			@ICAL_LIBS@ @DBUS_LIBS@ @GLIB_LIBS@ -ldl
 
--obexd_src_obexd_LDFLAGS = -Wl,--export-dynamic
-+obexd_src_obexd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic
+[chris@f28h ~]$ sudo hciconfig -a
+[sudo] password for chris:
+hci0:    Type: Primary  Bus: USB
+    BD Address: 00:C2:C6:F0:52:57  ACL MTU: 1021:4  SCO MTU: 96:6
+    UP RUNNING PSCAN ISCAN
+    RX bytes:1721145 acl:87464 sco:0 events:621 errors:0
+    TX bytes:7108 acl:228 sco:0 commands:190 errors:0
+    Features: 0xbf 0xfe 0x0f 0xfe 0xdb 0xff 0x7b 0x87
+    Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+    Link policy: RSWITCH SNIFF
+    Link mode: SLAVE ACCEPT
+    Name: 'f28h.local'
+    Class: 0x0c010c
+    Service Classes: Rendering, Capturing
+    Device Class: Computer, Laptop
+    HCI Version: 4.2 (0x8)  Revision: 0x100
+    LMP Version: 4.2 (0x8)  Subversion: 0x100
+    Manufacturer: Intel Corp. (2)
 
- obexd_src_obexd_CFLAGS = $(AM_CFLAGS) @GLIB_CFLAGS@ @DBUS_CFLAGS@ \
- 				@ICAL_CFLAGS@ -DOBEX_PLUGIN_BUILTIN \
+The mouse is an Apple MagicMouse.
+
+bluetoothd and kernel except from journal:
+https://drive.google.com/open?id=1V1Bxi0BIRi0z-Ck0cjTb1Yo3RApsKE8D
+
+Full journal:
+https://drive.google.com/open?id=1l-Dldi7TFpO_dtsGMBG3xTDRd0Cl3frD
+
+
+Thanks
+
+
 -- 
-Stefan Seyfried
-
-"For a successful technology, reality must take precedence over
- public relations, for nature cannot be fooled." -- Richard Feynman
-
---------------ACC4451F55799CB2302AC01D
-Content-Type: text/x-patch;
- name="0001-obexd-use-AM_LDFLAGS-for-linking.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="0001-obexd-use-AM_LDFLAGS-for-linking.patch"
-
->From b912306ae756eaf75caa1ab7e04e3112fac4a01c Mon Sep 17 00:00:00 2001
-From: Stefan Seyfried <seife+dev@b1-systems.com>
-Date: Mon, 11 Dec 2017 22:52:28 +0100
-Subject: [PATCH] obexd: use AM_LDFLAGS for linking
-
-without this, --enable-pie does not work for obexd
----
- Makefile.obexd | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile.obexd b/Makefile.obexd
-index 2e33cbc72..86c395305 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -83,7 +83,7 @@ obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
- 			gdbus/libgdbus-internal.la \
- 			@ICAL_LIBS@ @DBUS_LIBS@ @GLIB_LIBS@ -ldl
- 
--obexd_src_obexd_LDFLAGS = -Wl,--export-dynamic
-+obexd_src_obexd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic
- 
- obexd_src_obexd_CFLAGS = $(AM_CFLAGS) @GLIB_CFLAGS@ @DBUS_CFLAGS@ \
- 				@ICAL_CFLAGS@ -DOBEX_PLUGIN_BUILTIN \
--- 
-2.15.1
-
-
---------------ACC4451F55799CB2302AC01D--
+Chris Murphy
