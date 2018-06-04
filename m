@@ -1,47 +1,26 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20180531121906.21140-1-luiz.dentz@gmail.com>
-References: <20180531121906.21140-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 4 Jun 2018 13:06:49 +0300
-Message-ID: <CABBYNZJ8ks=OZoGKbviGZFKnHxtaqgXnV1FW8K1NsphJRCtHRg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core: Allow sending to org.mpris.MediaPlayer2.Player
+From: "Hermida, Isaac" <Isaac.Hermida@digi.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: How to do authenticated connections in BLE?
+Date: Mon, 4 Jun 2018 09:01:10 +0000
+Message-ID: <5B14FFD5.3060602@digi.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Thu, May 31, 2018 at 3:19 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds a policy to allow sending to org.mpris.MediaPlayer2.Player
-> interface since that is used when the player supports it.
-> ---
->  src/bluetooth.conf | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/src/bluetooth.conf b/src/bluetooth.conf
-> index 0c0b221bb..b67a954a2 100644
-> --- a/src/bluetooth.conf
-> +++ b/src/bluetooth.conf
-> @@ -19,6 +19,7 @@
->      <allow send_interface="org.bluez.LEAdvertisement1"/>
->      <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
->      <allow send_interface="org.freedesktop.DBus.Properties"/>
-> +    <allow send_interface="org.mpris.MediaPlayer2.Player"/>
->    </policy>
->
->    <policy at_console="true">
-> --
-> 2.17.0
-
-
-Applied.
-
-
-
--- 
-Luiz Augusto von Dentz
+SGkgdGhlcmUsDQoNCkkgaGF2ZSB0aGUgYnRnYXR0LXNlcnZlciBydW5uaW5nIHdoZXJlIEkgY2Fu
+IGludGVyYWN0IHdpdGggaXQuIE5vdyBJIA0KaW5jcmVhc2UgdGhlIHNlY3VyaXR5IChidGdhdHQt
+c2VydmVyIC1zIGhpZ2ggLi4uKSBhbmQgd2hlbiBJIHRyeSB0byANCmNvbm5lY3QgdG8gdGhlIHNl
+cnZlciBJIGdvdCBpdCByZWplY3RlZCAoYnRtZ210IC0gYXV0aCBmYWlsZWQgd2l0aCANCnN0YXR1
+cyAweDA1IChBdXRoZW50aWNhdGlvbiBGYWlsZWQpKS4NCg0KQWZ0ZXIgdGhhdCBJIG1hbnVhbGx5
+IHBhaXJlZCBhbmQgdHJ1c3RlZCBib3RoIGRldmljZXMgKGJsdWV0b290Y3RsIC0gDQphZ2VudCAt
+IC4uLikgYW5kIEkgc2VlIHRoZW0gYXMgcGFpcmVkLWRldmljZXMuIFRoZW4gSSByZXBlYXQgdGhl
+IHByb2Nlc3MgDQooLXMgaGlnaCksIGFuZCBhZ2FpbiwgSSBnb3QgdGhlIHNhbWUgYXV0aGVudGlj
+YXRpb24gZXJyb3IuIFNob3VsZCB0aGF0IA0KdGhpcyBzZWNvbmQgdHJ5IHdvcms/IGFtIEkgbWlz
+c2luZyBzb21ldGhpbmc/DQooSSB0cmllZCBibHVlei01LjQxIGFuZCA1LjQ2IHZlcnNpb25zKQ0K
+DQpQcm9iYWJseSBJIGFtIG1pc3NpbmcvbWlzc3VuZGVyc3RhbmRpbmcgc29tZXRoaW5nLCBzbyB0
+byBwdXQgY29udGV4dCBvbiANCndoYXQgSSBhbSBkb2luZywgd2hhdCBJIGFtIGxvb2tpbmcgZm9y
+IGlzIGEgd2F5IHRvIG9ubHkgYWNjZXB0IA0KY29ubmVjdGlvbnMgb2YgYXV0aGVudGljYXRlZC9w
+YWlyZWQgZGV2aWNlcyAoZG9uZSBiZWZvcmVoYW5kIG9yIG5vdCBkb2VzIA0Kbm90IG1hdHRlciku
+DQo=
