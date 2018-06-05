@@ -1,56 +1,60 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-serial-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH] Bluetooth: btusb: Avoid race condition during controller
- recovery
+Subject: Re: [PATCH 04/19] Bluetooth: hci_nokia: Add serdev_id_table
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1527760213-8877-1-git-send-email-amit.k.bag@intel.com>
-Date: Tue, 5 Jun 2018 16:05:46 +0200
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-        Sukumar Ghorai <sukumar.ghorai@intel.com>,
-        chethan.tumkur.narayan@intel.com, ravishankar.srivatsa@intel.com
-Message-Id: <E4D2CF02-5248-476F-9DFF-C3DE20984B50@holtmann.org>
-References: <1527760213-8877-1-git-send-email-amit.k.bag@intel.com>
-To: Amit K Bag <amit.k.bag@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20180529131014.18641-5-ricardo.ribalda@gmail.com>
+Date: Tue, 5 Jun 2018 15:53:55 +0200
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-serial@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Rob Herring <robh@kernel.org>, Johan Hovold <johan@kernel.org>,
+        linux-bluetooth@vger.kernel.org
+Message-Id: <E848BED5-1D83-47FA-A673-29B366A60227@holtmann.org>
+References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
+ <20180529131014.18641-5-ricardo.ribalda@gmail.com>
+To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amit,
+Hi Ricardo,
 
-> Observed race condition during controller recovery mechanism
-> resulting the controller not responding to the reset command.
+> Describe which hardware is supported by the current driver.
 > 
-> To avoid such race condition need a delay of 2ms soon after the
-> USB re-enumeration and before sending the Reset command which shall
-> allow controller to completely recover and process the Reset command.
-> 
-> Change-Id: Ifbc387d4377bc79081244d444d45ba6effc95f23
-> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: Rob Herring <robh@kernel.org>
+> Cc: Johan Hovold <johan@kernel.org>
+> Cc: linux-bluetooth@vger.kernel.org
+> Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
 > ---
-> drivers/bluetooth/btusb.c | 9 +++++++++
-> 1 file changed, 9 insertions(+)
+> drivers/bluetooth/hci_nokia.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f73a27ea28cc..844b4145ff76 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1741,6 +1741,15 @@ static int btusb_setup_intel(struct hci_dev *hdev)
-> 	int disable_patch, err;
-> 	struct intel_version ver;
+> diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
+> index 3539fd03f47e..e32dfcd56b8d 100644
+> --- a/drivers/bluetooth/hci_nokia.c
+> +++ b/drivers/bluetooth/hci_nokia.c
+> @@ -801,6 +801,11 @@ static const struct of_device_id nokia_bluetooth_of_match[] = {
+> MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
+> #endif
 > 
-> +	/* Observed race condition during controller recovery mechanism
-> +	 * resulting the controller not responding to the reset command.
-> +	 *
-> +	 * To avoid such race condition need a delay of 2ms soon after the
-> +	 * USB re-enumeration and before sending the Reset command which shall
-> +	 * allow controller to completely recover and process the Reset command.
-> +	 */
-> +	mdelay(2);
+> +static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
+> +	{ "hp4-bluetooth", },
+> +	{},
+> +};
 > +
-> 	BT_DBG("%s", hdev->name);
+> static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
+> 	.probe = nokia_bluetooth_serdev_probe,
+> 	.remove = nokia_bluetooth_serdev_remove,
+> @@ -809,6 +814,7 @@ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
+> 		.pm = &nokia_bluetooth_pm_ops,
+> 		.of_match_table = of_match_ptr(nokia_bluetooth_of_match),
+> 	},
+> +	.id_table = nokia_bluetooth_serdev_id,
+> };
 
-can you leave the BT_DBG() at the top and move the mdelay + comment after it.
+I would actually skip this hardware. First of all it is such a dedicated custom Nokia transport and hardware, and secondly it is no longer produced anyway.
 
 Regards
 
