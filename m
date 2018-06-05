@@ -1,62 +1,41 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH 04/19] Bluetooth: hci_nokia: Add serdev_id_table
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180529131014.18641-5-ricardo.ribalda@gmail.com>
-Date: Tue, 5 Jun 2018 15:53:55 +0200
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-serial@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh@kernel.org>, Johan Hovold <johan@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <E848BED5-1D83-47FA-A673-29B366A60227@holtmann.org>
-References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
- <20180529131014.18641-5-ricardo.ribalda@gmail.com>
-To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Sender: linux-serial-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Hermida, Isaac" <Isaac.Hermida@digi.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: How to do authenticated connections in BLE?
+Date: Tue, 5 Jun 2018 13:49:26 +0000
+Message-ID: <5B1694E5.8050500@digi.com>
+References: <5B14FFD5.3060602@digi.com>
+In-Reply-To: <5B14FFD5.3060602@digi.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ricardo,
-
-> Describe which hardware is supported by the current driver.
-> 
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: Johan Hovold <johan@kernel.org>
-> Cc: linux-bluetooth@vger.kernel.org
-> Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-> ---
-> drivers/bluetooth/hci_nokia.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
-> index 3539fd03f47e..e32dfcd56b8d 100644
-> --- a/drivers/bluetooth/hci_nokia.c
-> +++ b/drivers/bluetooth/hci_nokia.c
-> @@ -801,6 +801,11 @@ static const struct of_device_id nokia_bluetooth_of_match[] = {
-> MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
-> #endif
-> 
-> +static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
-> +	{ "hp4-bluetooth", },
-> +	{},
-> +};
-> +
-> static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
-> 	.probe = nokia_bluetooth_serdev_probe,
-> 	.remove = nokia_bluetooth_serdev_remove,
-> @@ -809,6 +814,7 @@ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
-> 		.pm = &nokia_bluetooth_pm_ops,
-> 		.of_match_table = of_match_ptr(nokia_bluetooth_of_match),
-> 	},
-> +	.id_table = nokia_bluetooth_serdev_id,
-> };
-
-I would actually skip this hardware. First of all it is such a dedicated custom Nokia transport and hardware, and secondly it is no longer produced anyway.
-
-Regards
-
-Marcel
-
+PiBJIGhhdmUgdGhlIGJ0Z2F0dC1zZXJ2ZXIgcnVubmluZyB3aGVyZSBJIGNhbiBpbnRlcmFjdCB3
+aXRoIGl0LiBOb3cgSQ0KPiBpbmNyZWFzZSB0aGUgc2VjdXJpdHkgKGJ0Z2F0dC1zZXJ2ZXIgLXMg
+aGlnaCAuLi4pIGFuZCB3aGVuIEkgdHJ5IHRvDQo+IGNvbm5lY3QgdG8gdGhlIHNlcnZlciBJIGdv
+dCBpdCByZWplY3RlZCAoYnRtZ210IC0gYXV0aCBmYWlsZWQgd2l0aA0KPiBzdGF0dXMgMHgwNSAo
+QXV0aGVudGljYXRpb24gRmFpbGVkKSkuDQo+DQo+IEFmdGVyIHRoYXQgSSBtYW51YWxseSBwYWly
+ZWQgYW5kIHRydXN0ZWQgYm90aCBkZXZpY2VzIChibHVldG9vdGN0bCAtDQo+IGFnZW50IC0gLi4u
+KSBhbmQgSSBzZWUgdGhlbSBhcyBwYWlyZWQtZGV2aWNlcy4gVGhlbiBJIHJlcGVhdCB0aGUgcHJv
+Y2Vzcw0KPiAoLXMgaGlnaCksIGFuZCBhZ2FpbiwgSSBnb3QgdGhlIHNhbWUgYXV0aGVudGljYXRp
+b24gZXJyb3IuIFNob3VsZCB0aGF0DQo+IHRoaXMgc2Vjb25kIHRyeSB3b3JrPyBhbSBJIG1pc3Np
+bmcgc29tZXRoaW5nPw0KPiAoSSB0cmllZCBibHVlei01LjQxIGFuZCA1LjQ2IHZlcnNpb25zKQ0K
+Pg0KPiBQcm9iYWJseSBJIGFtIG1pc3NpbmcvbWlzc3VuZGVyc3RhbmRpbmcgc29tZXRoaW5nLCBz
+byB0byBwdXQgY29udGV4dCBvbg0KPiB3aGF0IEkgYW0gZG9pbmcsIHdoYXQgSSBhbSBsb29raW5n
+IGZvciBpcyBhIHdheSB0byBvbmx5IGFjY2VwdA0KPiBjb25uZWN0aW9ucyBvZiBhdXRoZW50aWNh
+dGVkL3BhaXJlZCBkZXZpY2VzIChkb25lIGJlZm9yZWhhbmQgb3Igbm90IGRvZXMNCj4gbm90IG1h
+dHRlcikuDQpBbnN3ZXJpbmcgaGVyZSwgdGhlIHByb2JsZW0gaXMgcmVsYXRlZCB3aXRoIGEgZHVh
+bCBkZXZpY2UuIER1ZSB0byBpdCBpcyANCmR1YWwsIHRoZSBwYWlyaW5nIGlzIGJlaW5nIGRvbmUg
+Zm9yIHRoZSBCREVEUiBiZWFyZXIgYW5kIG5vdCBmb3IgdGhlIExFIA0KYmVhcmVyLiBBcyB0cmlj
+a3kgb3B0aW9uLCB3aGF0IEkgaGF2ZSBkb25lIGlzIGRpc2FibGUgYmRlZHIuIEFub3RoZXIgDQp0
+cmlja3kgb3B0aW9uIGlzIGNyZWF0ZSBhIGxlY2MgY29ubmVjdGlvbiAoaGNpdG9vbCBsZWNjIGJk
+YWRkcikgYW5kIHRoZW4gDQpsdW5jaCB0aGUgcGFpciBwcm9jZXNzLg0KU28sIHdpdGhvdXQgZG9p
+bmcgYW55ICJ0cmlja3kiIG9wZXJhdGlvbiwgZG9lcyBhbnlvbmUga25vdyBpZiBpdCBpcyANCnBv
+c3NpYmxlIHRvIGZvcmNlIHRoZSBhdXRoZW50aWNhdGlvbiBpbiBvbmUgc3BlY2lmaWMgdHJhbnNw
+b3J0IGxheWVyIA0KKEJERURSIG9yIExFKT8gSSBoYXZlIHNlZW4gdGhhdCBub3JtYWxseSBpdCBp
+cyBwaWNrZWQgdGhlICJsYXN0IHVzZWQiLCANCmJ1dCBJIHdvdWxkIGxpa2UgdG8ga25vdyBpZiB0
+aGVyZSBpcyBhIHdheSB0byBzcGVjaWZpY2FsbHkgaW5kaWNhdGUgaXQuDQoNClNvLCBpbiBteSBj
+YXNlICh3aXRob3V0IHRoZSB0cmljayksIHdoZW4gSSBzdGFydCBhIEdBVFQgc2VydmVyIHdpdGgg
+DQpzZWN1cml0eSBoaWdoLCB0aGUgY29ubmVjdGlvbiBpcyByZWplY3RlZCBkdWUgdG8gYXV0aGVu
+dGljYXRpb24gZmFpbC4=
