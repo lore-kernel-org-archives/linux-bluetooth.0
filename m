@@ -1,68 +1,44 @@
-Return-Path: <pavel@ucw.cz>
-Date: Thu, 7 Jun 2018 12:27:40 +0200
-From: Pavel Machek <pavel@ucw.cz>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
-	LKML <linux-kernel@vger.kernel.org>, linux-serial@vger.kernel.org,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Rob Herring <robh@kernel.org>, Johan Hovold <johan@kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 04/19] Bluetooth: hci_nokia: Add serdev_id_table
-Message-ID: <20180607102740.GD4372@localhost>
-References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
- <20180529131014.18641-5-ricardo.ribalda@gmail.com>
- <E848BED5-1D83-47FA-A673-29B366A60227@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <E848BED5-1D83-47FA-A673-29B366A60227@holtmann.org>
+In-Reply-To: <CABBYNZKSn6YwLifxDh4UeoWWPiFu2kBKo-roZjYg8DmytvvMUA@mail.gmail.com>
+References: <CAOvzQrvFQO_RM6M==T27PW=WLE1sXjF2jKn1ihhbRu7gTMZwKg@mail.gmail.com>
+ <CABBYNZKSn6YwLifxDh4UeoWWPiFu2kBKo-roZjYg8DmytvvMUA@mail.gmail.com>
+From: Gladwin Simendy <gladwinsimendy@gmail.com>
+Date: Thu, 7 Jun 2018 15:24:46 +0530
+Message-ID: <CAOvzQrucg3xkRVi-LP4KPN+qHRgofiMauQqkYrHd8CNe8FQVaA@mail.gmail.com>
+Subject: Re: Codec support other than Bluez
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
+Hi Luiz,
 
-> > Describe which hardware is supported by the current driver.
-> > 
-> > Cc: Marcel Holtmann <marcel@holtmann.org>
-> > Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> > Cc: Rob Herring <robh@kernel.org>
-> > Cc: Johan Hovold <johan@kernel.org>
-> > Cc: linux-bluetooth@vger.kernel.org
-> > Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-> > ---
-> > drivers/bluetooth/hci_nokia.c | 6 ++++++
-> > 1 file changed, 6 insertions(+)
-> > 
-> > diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
-> > index 3539fd03f47e..e32dfcd56b8d 100644
-> > --- a/drivers/bluetooth/hci_nokia.c
-> > +++ b/drivers/bluetooth/hci_nokia.c
-> > @@ -801,6 +801,11 @@ static const struct of_device_id nokia_bluetooth_of_match[] = {
-> > MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
-> > #endif
-> > 
-> > +static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
-> > +	{ "hp4-bluetooth", },
-> > +	{},
-> > +};
-> > +
-> > static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
-> > 	.probe = nokia_bluetooth_serdev_probe,
-> > 	.remove = nokia_bluetooth_serdev_remove,
-> > @@ -809,6 +814,7 @@ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
-> > 		.pm = &nokia_bluetooth_pm_ops,
-> > 		.of_match_table = of_match_ptr(nokia_bluetooth_of_match),
-> > 	},
-> > +	.id_table = nokia_bluetooth_serdev_id,
-> > };
-> 
-> I would actually skip this hardware. First of all it is such a dedicated custom Nokia transport and hardware, and secondly it is no longer produced anyway.
-> 
+Actually I am trying to enable it for Bluez and not pulseaudio. I need
+to get the APTx audio played in my PC.
 
-Would it make sense to cc: sre here? We want good support even for old
-hardware, and this is n9/n950, it is still on "top ten supported
-phones" list... Probably even top 5.
+Regards,
+Gladwin.
 
-Thanks,
-								 Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+On Thu, Jun 7, 2018 at 1:12 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Gladwin,
+>
+> On Thu, Jun 7, 2018 at 10:25 AM, Gladwin Simendy
+> <gladwinsimendy@gmail.com> wrote:
+>> Hi,
+>>
+>> I have been checking the Bluez source for using APTx codec with phone.
+>> But after making connection with Bluez, I can find only SBC codec in
+>> get capabilities and APTx is not found.
+>>
+>> Is there anything which I need to enable or change the default SBC
+>> before using APTx codec for Bluez?
+>
+> You would have to register an endpoint with APTx support, it seems
+> that it is available via libavcodec nowadays so we could perhaps
+> enable it in PulseAudio at some point.
+>
+> --
+> Luiz Augusto von Dentz
