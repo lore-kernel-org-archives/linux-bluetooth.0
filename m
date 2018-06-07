@@ -1,28 +1,68 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <pavel@ucw.cz>
+Date: Thu, 7 Jun 2018 12:27:40 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
+	LKML <linux-kernel@vger.kernel.org>, linux-serial@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Rob Herring <robh@kernel.org>, Johan Hovold <johan@kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 04/19] Bluetooth: hci_nokia: Add serdev_id_table
+Message-ID: <20180607102740.GD4372@localhost>
+References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
+ <20180529131014.18641-5-ricardo.ribalda@gmail.com>
+ <E848BED5-1D83-47FA-A673-29B366A60227@holtmann.org>
 MIME-Version: 1.0
-From: Guilhem Lettron <guilhem@lettron.fr>
-Date: Thu, 7 Jun 2018 13:56:06 +0200
-Message-ID: <CAMQoE_1PA4XX_PkGe_NS8yQgroPQkBHbFJjsW-mGx4nRh25DmQ@mail.gmail.com>
-Subject: HP Elite Presenter Mouse support
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <E848BED5-1D83-47FA-A673-29B366A60227@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-It seems that I'm the only one who buy an HP Elite Presenter Mouse (
-http://www8.hp.com/us/en/products/oas/product-detail.html?oid=17872528&jumpid=reg_r1002_usen_c-001_title_r0001
-)
+Hi!
 
-This device uses BLE and can be transformed between a mouse and a
-presenter / gesture mouse.
-Currently, this "mouse" can only be used for presentation, page up /
-down is working fine.
-But neither traditional mouse or gesture mouse is working.
-I'm on an ubuntu bionic and get some logs from bluez:
-https://gist.github.com/guilhem/443cf5b588e6c1eb5d38ff7ed1ff5547
-Does anyone know if there is a quick fix or quirk to put?
-I'm available for any other information to debug it.
+> > Describe which hardware is supported by the current driver.
+> > 
+> > Cc: Marcel Holtmann <marcel@holtmann.org>
+> > Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> > Cc: Rob Herring <robh@kernel.org>
+> > Cc: Johan Hovold <johan@kernel.org>
+> > Cc: linux-bluetooth@vger.kernel.org
+> > Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+> > ---
+> > drivers/bluetooth/hci_nokia.c | 6 ++++++
+> > 1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
+> > index 3539fd03f47e..e32dfcd56b8d 100644
+> > --- a/drivers/bluetooth/hci_nokia.c
+> > +++ b/drivers/bluetooth/hci_nokia.c
+> > @@ -801,6 +801,11 @@ static const struct of_device_id nokia_bluetooth_of_match[] = {
+> > MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
+> > #endif
+> > 
+> > +static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
+> > +	{ "hp4-bluetooth", },
+> > +	{},
+> > +};
+> > +
+> > static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
+> > 	.probe = nokia_bluetooth_serdev_probe,
+> > 	.remove = nokia_bluetooth_serdev_remove,
+> > @@ -809,6 +814,7 @@ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
+> > 		.pm = &nokia_bluetooth_pm_ops,
+> > 		.of_match_table = of_match_ptr(nokia_bluetooth_of_match),
+> > 	},
+> > +	.id_table = nokia_bluetooth_serdev_id,
+> > };
+> 
+> I would actually skip this hardware. First of all it is such a dedicated custom Nokia transport and hardware, and secondly it is no longer produced anyway.
+> 
 
-Thanks.
-Guilhem Lettron
+Would it make sense to cc: sre here? We want good support even for old
+hardware, and this is n9/n950, it is still on "top ten supported
+phones" list... Probably even top 5.
+
+Thanks,
+								 Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
