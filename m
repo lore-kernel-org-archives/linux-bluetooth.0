@@ -1,156 +1,83 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Configure SCO routing automatically
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180605191743.27748-1-attitokes@gmail.com>
-Date: Thu, 7 Jun 2018 15:43:40 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <280FCB2C-6DF1-4790-A89F-AF5BE3513AE5@holtmann.org>
-References: <20180605191743.27748-1-attitokes@gmail.com>
-To: =?utf-8?B?QXR0aWxhIFTFkWvDqXM=?= <attitokes@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <pavel@ucw.cz>
+Date: Thu, 7 Jun 2018 14:51:01 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
+	LKML <linux-kernel@vger.kernel.org>, linux-serial@vger.kernel.org,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Rob Herring <robh@kernel.org>, Johan Hovold <johan@kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 04/19] Bluetooth: hci_nokia: Add serdev_id_table
+Message-ID: <20180607125101.GA8074@amd>
+References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
+ <20180529131014.18641-5-ricardo.ribalda@gmail.com>
+ <E848BED5-1D83-47FA-A673-29B366A60227@holtmann.org>
+ <20180607102740.GD4372@localhost>
+ <22CF0FC7-6DC7-4DD2-9EA1-9F51B40F53E5@holtmann.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="8t9RHnE3ZwKMSgU+"
+In-Reply-To: <22CF0FC7-6DC7-4DD2-9EA1-9F51B40F53E5@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Attila,
 
-please include a commit message explains the changes.
+--8t9RHnE3ZwKMSgU+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Signed-off-by: Attila Tőkés <attitokes@gmail.com>
-> ---
-> drivers/bluetooth/hci_bcm.c | 61 +++++++++++++++++++++++++++++++++++++
-> 1 file changed, 61 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index ddbd8c6a..50c73eef 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -83,6 +83,16 @@
-> * @hu: pointer to HCI UART controller struct,
-> *	used to disable flow control during runtime suspend and system sleep
-> * @is_suspended: whether flow control is currently disabled
-> + *
-> + *  SCO routing parameters:
-> + *   used as the parameters for the bcm_set_pcm_int_params command
-> + *	@sco_routing:
-> + *	 >= 255 (skip SCO routing configuration)
-> + *	 0-3 (PCM, Transport, Codec, I2S)
-> + *	@pcm_interface_rate: 0-4 (128 Kbps - 2048 Kbps)
-> + *	@pcm_frame_type: 0 (short), 1 (long)
-> + *	@pcm_sync_mode: 0 (slave), 1 (master)
-> + *	@pcm_clock_mode: 0 (slave), 1 (master)
-> */
-> struct bcm_device {
-> 	/* Must be the first member, hci_serdev.c expects this. */
-> @@ -114,6 +124,13 @@ struct bcm_device {
-> 	struct hci_uart		*hu;
-> 	bool			is_suspended;
-> #endif
-> +
-> +	/* SCO routing parameters */
-> +	u32			sco_routing;
-> +	u32			pcm_interface_rate;
-> +	u32			pcm_frame_type;
-> +	u32			pcm_sync_mode;
-> +	u32			pcm_clock_mode;
-> };
+Hi!
 
-These should be all u8 since that is what they are in bcm_set_pcm_int_params.
 
-> /* generic bcm uart resources */
-> @@ -189,6 +206,35 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
-> 	return 0;
-> }
-> 
-> +static int bcm_configure_sco_routing(struct hci_uart *hu, struct bcm_device *bcm_dev)
-> +{
-> +	struct hci_dev *hdev = hu->hdev;
-> +	struct sk_buff *skb;
-> +	struct bcm_set_pcm_int_params params;
-> +
-> +	bt_dev_dbg(hdev, "BCM: Configuring SCO routing (%d %d %d %d %d)",
-> +			bcm_dev->sco_routing, bcm_dev->pcm_interface_rate, bcm_dev->pcm_frame_type,
-> +			bcm_dev->pcm_sync_mode,	bcm_dev->pcm_clock_mode);
-> +
-> +	params.routing = bcm_dev->sco_routing;
-> +	params.rate = bcm_dev->pcm_interface_rate;
-> +	params.frame_sync = bcm_dev->pcm_frame_type;
-> +	params.sync_mode = bcm_dev->pcm_sync_mode;
-> +	params.clock_mode = bcm_dev->pcm_clock_mode;
-> +
-> +	// send the SCO routing configuration command
+> >>> +	{ "hp4-bluetooth", },
+> >>> +	{},
+> >>> +};
+> >>> +
+> >>> static struct serdev_device_driver nokia_bluetooth_serdev_driver =3D {
+> >>> 	.probe =3D nokia_bluetooth_serdev_probe,
+> >>> 	.remove =3D nokia_bluetooth_serdev_remove,
+> >>> @@ -809,6 +814,7 @@ static struct serdev_device_driver nokia_bluetoot=
+h_serdev_driver =3D {
+> >>> 		.pm =3D &nokia_bluetooth_pm_ops,
+> >>> 		.of_match_table =3D of_match_ptr(nokia_bluetooth_of_match),
+> >>> 	},
+> >>> +	.id_table =3D nokia_bluetooth_serdev_id,
+> >>> };
+> >>=20
+> >> I would actually skip this hardware. First of all it is such a dedicat=
+ed custom Nokia transport and hardware, and secondly it is no longer produc=
+ed anyway.
+> >>=20
+> >=20
+> > Would it make sense to cc: sre here? We want good support even for old
+> > hardware, and this is n9/n950, it is still on "top ten supported
+> > phones" list... Probably even top 5.
+>=20
+> but that is not what this patch series is about. We do not need new_id ki=
+nda support for the existing hardware. My point is there will be no newly d=
+esigned hardware using this driver.
+>=20
 
-Please follow networking comment style here.
+You are right, new hardware with that protocol sounds unlikely at this
+point.
 
-> +	skb = __hci_cmd_sync(hdev, 0xfc1c, sizeof(params), &params, HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		int err = PTR_ERR(skb);
-> +		bt_dev_err(hdev, "BCM: failed to configure SCO routing (%d)", err);
-> +		return err;
-> +	}
-> +
-> +	kfree_skb(skb);
-> +
-> +	return 0;
-> +}
-> +
-> /* bcm_device_exists should be protected by bcm_device_lock */
-> static bool bcm_device_exists(struct bcm_device *device)
-> {
-> @@ -534,6 +580,10 @@ static int bcm_setup(struct hci_uart *hu)
-> 			host_set_baudrate(hu, speed);
-> 	}
-> 
-> +	if (bcm->dev->sco_routing < 0xff) {
-> +		bcm_configure_sco_routing(hu, bcm->dev);
-> +	}
-> +
+Sorry for the noise,
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
 
-Move that check into bcm_configure_sco_routing to exit that function early.
+--8t9RHnE3ZwKMSgU+
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-I would also recommend to read the current settings first and deal with missing parameters in the DT. For example if you just change the routing part that should be fine as well.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
-> finalize:
-> 	release_firmware(fw);
-> 
-> @@ -1007,6 +1057,11 @@ static int bcm_acpi_probe(struct bcm_device *dev)
-> static int bcm_of_probe(struct bcm_device *bdev)
-> {
-> 	device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
-> +	device_property_read_u32(bdev->dev, "sco-routing", &bdev->sco_routing);
-> +	device_property_read_u32(bdev->dev, "pcm-interface-rate", &bdev->pcm_interface_rate);
-> +	device_property_read_u32(bdev->dev, "pcm-frame-type", &bdev->pcm_frame_type);
-> +	device_property_read_u32(bdev->dev, "pcm-sync-mode", &bdev->pcm_sync_mode);
-> +	device_property_read_u32(bdev->dev, "pcm-clock-mode", &bdev->pcm_clock_mode);
-> 	return 0;
-> }
+iEYEARECAAYFAlsZKjUACgkQMOfwapXb+vJTiACeLqDgMf0mHp9GAafdvWoq7hf8
+oq4An0BpsPFON4XV2mEol/wRhJ5nDXfh
+=FwgU
+-----END PGP SIGNATURE-----
 
-You need a patch documenting these DT settings.
-
-> 
-> @@ -1022,6 +1077,9 @@ static int bcm_probe(struct platform_device *pdev)
-> 	dev->dev = &pdev->dev;
-> 	dev->irq = platform_get_irq(pdev, 0);
-> 
-> +	/* SCO routing configuration is disabled by default */
-> +	dev->sco_routing = 0xff;
-> +
-> 	if (has_acpi_companion(&pdev->dev)) {
-> 		ret = bcm_acpi_probe(dev);
-> 		if (ret)
-> @@ -1281,6 +1339,9 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
-> 	bcmdev->serdev_hu.serdev = serdev;
-> 	serdev_device_set_drvdata(serdev, bcmdev);
-> 
-> +	/* SCO routing configuration is disabled by default */
-> +	bcmdev->sco_routing = 0xff;
-> +
-> 	if (has_acpi_companion(&serdev->dev))
-> 		err = bcm_acpi_probe(bcmdev);
-> 	else
-
-Regards
-
-Marcel
+--8t9RHnE3ZwKMSgU+--
