@@ -1,73 +1,28 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH 04/19] Bluetooth: hci_nokia: Add serdev_id_table
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180607102740.GD4372@localhost>
-Date: Thu, 7 Jun 2018 14:32:08 +0200
-Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-serial@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh@kernel.org>, Johan Hovold <johan@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <22CF0FC7-6DC7-4DD2-9EA1-9F51B40F53E5@holtmann.org>
-References: <20180529131014.18641-1-ricardo.ribalda@gmail.com>
- <20180529131014.18641-5-ricardo.ribalda@gmail.com>
- <E848BED5-1D83-47FA-A673-29B366A60227@holtmann.org>
- <20180607102740.GD4372@localhost>
-To: Pavel Machek <pavel@ucw.cz>
-Sender: linux-serial-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+From: Guilhem Lettron <guilhem@lettron.fr>
+Date: Thu, 7 Jun 2018 13:56:06 +0200
+Message-ID: <CAMQoE_1PA4XX_PkGe_NS8yQgroPQkBHbFJjsW-mGx4nRh25DmQ@mail.gmail.com>
+Subject: HP Elite Presenter Mouse support
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavel,
+Hi,
+It seems that I'm the only one who buy an HP Elite Presenter Mouse (
+http://www8.hp.com/us/en/products/oas/product-detail.html?oid=17872528&jumpid=reg_r1002_usen_c-001_title_r0001
+)
 
->>> Describe which hardware is supported by the current driver.
->>> 
->>> Cc: Marcel Holtmann <marcel@holtmann.org>
->>> Cc: Johan Hedberg <johan.hedberg@gmail.com>
->>> Cc: Rob Herring <robh@kernel.org>
->>> Cc: Johan Hovold <johan@kernel.org>
->>> Cc: linux-bluetooth@vger.kernel.org
->>> Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
->>> ---
->>> drivers/bluetooth/hci_nokia.c | 6 ++++++
->>> 1 file changed, 6 insertions(+)
->>> 
->>> diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
->>> index 3539fd03f47e..e32dfcd56b8d 100644
->>> --- a/drivers/bluetooth/hci_nokia.c
->>> +++ b/drivers/bluetooth/hci_nokia.c
->>> @@ -801,6 +801,11 @@ static const struct of_device_id nokia_bluetooth_of_match[] = {
->>> MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
->>> #endif
->>> 
->>> +static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
->>> +	{ "hp4-bluetooth", },
->>> +	{},
->>> +};
->>> +
->>> static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
->>> 	.probe = nokia_bluetooth_serdev_probe,
->>> 	.remove = nokia_bluetooth_serdev_remove,
->>> @@ -809,6 +814,7 @@ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
->>> 		.pm = &nokia_bluetooth_pm_ops,
->>> 		.of_match_table = of_match_ptr(nokia_bluetooth_of_match),
->>> 	},
->>> +	.id_table = nokia_bluetooth_serdev_id,
->>> };
->> 
->> I would actually skip this hardware. First of all it is such a dedicated custom Nokia transport and hardware, and secondly it is no longer produced anyway.
->> 
-> 
-> Would it make sense to cc: sre here? We want good support even for old
-> hardware, and this is n9/n950, it is still on "top ten supported
-> phones" list... Probably even top 5.
+This device uses BLE and can be transformed between a mouse and a
+presenter / gesture mouse.
+Currently, this "mouse" can only be used for presentation, page up /
+down is working fine.
+But neither traditional mouse or gesture mouse is working.
+I'm on an ubuntu bionic and get some logs from bluez:
+https://gist.github.com/guilhem/443cf5b588e6c1eb5d38ff7ed1ff5547
+Does anyone know if there is a quick fix or quirk to put?
+I'm available for any other information to debug it.
 
-but that is not what this patch series is about. We do not need new_id kinda support for the existing hardware. My point is there will be no newly designed hardware using this driver.
-
-Regards
-
-Marcel
-
+Thanks.
+Guilhem Lettron
