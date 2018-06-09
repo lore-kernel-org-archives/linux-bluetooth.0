@@ -1,93 +1,83 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Sat, 9 Jun 2018 11:29:21 -0400
-From: Alexander Aring <aring@mojatatu.com>
-To: Michael Richardson <mcr@sandelman.ca>
-Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: netdevice notifier and device private data
-Message-ID: <20180609152921.hqfmprmd4ryttaie@x220t>
-References: <20180608173455.vrnfvv7dlu4oxwqf@x220t>
- <32763.1528486664@localhost>
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH 01/13] dt-bindings: net: bluetooth: add support for
+ Realtek Bluetooth chips
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Rob Herring <robh@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+ Jeremy Cline <jeremy@jcline.org>,
+ BlueZ development <linux-bluetooth@vger.kernel.org>,
+ linux-serial@vger.kernel.org, linux-acpi <linux-acpi@vger.kernel.org>,
+ devicetree@vger.kernel.org
+References: <20180527190457.2632-1-hdegoede@redhat.com>
+ <20180527190457.2632-2-hdegoede@redhat.com>
+ <7A22F14E-9F45-4779-B7E5-CEB330A5601E@holtmann.org>
+ <16b7e10b-6816-f441-00e5-9e86d1df33a7@redhat.com>
+ <20180531164214.GA12210@rob-hp-laptop>
+ <0d99e890-b93c-df55-ae43-8fc910778243@redhat.com>
+ <14D10B2C-319C-4676-AE84-1D76AA603C3B@holtmann.org>
+ <94b57c4a-985e-250a-f91f-e0f0cd97be1e@redhat.com>
+ <9F05431A-7FEF-4EFB-B35C-AA0E1BAA98EE@holtmann.org>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <3bac3b64-21cb-82a2-4470-71b4816c5c99@redhat.com>
+Date: Sat, 9 Jun 2018 13:29:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <32763.1528486664@localhost>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <9F05431A-7FEF-4EFB-B35C-AA0E1BAA98EE@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Fri, Jun 08, 2018 at 03:37:44PM -0400, Michael Richardson wrote:
+On 04-06-18 21:11, Marcel Holtmann wrote:
+
+<snip>
+
+>>>> Hmm that is actually no entirely true, for broadcom the
+>>>> bluetooth patchram file depends on the clockcrystal freq
+>>>> used on the board, so there are 2 versions of it for a
+>>>> single chip, 1 for each of the 2 different freqs used.
+>>> are you using .hex or .hcd files for Broadcom? The .hex files are pure patchram, while the .hcd can actually contain extra HCI commands. I remember that some .hcd files contain also HCI commands to do extra settings. Maybe we need a tool that shows the details of these files. We have this for nokfw and rtlfw now.
+>>
+>> I'm using hcd files for broadcom.
 > 
-> Alexander Aring <aring@mojatatu.com> wrote:
->     Alex> I already see code outside who changed tun netdevice to the
->     Alex> ARPHRD_6LOWPAN type and I suppose they running into this
->     Alex> issue.  (Btw: I don't know why somebody wants to changed that
->     Alex> type to ARPHRD_6LOWPAN on tun).
-> 
-> so that they can have the kernel do 6lowpan processing, emitting 6lowPAN
-> packets into userspace to be transfered into a radio via some proprietary
-> interface (including, for instance SLIP over USB cable to Contiki or OpenWSN stack, 
-> set up to act as radio only)
-> 
+> so I added tools/bcmfw to analyze HCD files. We might also need a compare HCD files option. However you might be able to compare the HCD files that you think are different for some of your hardware.
 
-No, the datapath doesn't change. If the user space evaluate the
-dev->type (there exists some ioctl() for it) it will assume it has a
-6LoWPAN type interface.
+The problem is that I don't think I can get the exact same
+version / build of the patchram in 26MHz and 37.4 Mhz versions
+and comparing different versions is not really going to be useful.
 
-A lot of user space software outside will doing interface specific
-handling after detect the type. E.g. wireshark will select some dissector
-handling.
+All I really know here is that I can usually take any 37.4MHz build,
+as indicated by the build string in the hcd file, e.g. :
 
-On a tun interface and switch to 6LoWPAN it will not change much the
-dissector view, because both raw IPv6 packets on datapath. For me as
-6LoWPAN maintainer it makes no sense to switch to it. Currently
-some netdevice notifier will crash (if you a lucky it will not).
+BCM43438A1 37.4MHz Raspberry Pi 3-0043O
 
-Futhermore user space programs e.g. radvd will do 6lowpan specific
-handling on 6lowpan dev->type, it will not work either on tun devices.
+And use that on a board where the wifi nvram file says the
+crystal is 37.4MHz and things will work fine. Where as any
+hcd with 26Mhz in the buildstring will not work.
 
-I know that wpantund from NestLabs do this switch, I am very curious
-about the reason but I think they do it because the name is 6LoWPAN. But
-wpantund is just a SLIP like protocol with additional radio/foo commands.
+My work on the brcm bluetooth code has left me to believe
+that the ACPI HID is (supposed to be) unique per board.
 
----
+I'm thinking of adding a postfix string as driver_data
+in the acpi_match_id table for ACPI HIDs which I can test
+and then make the bcm-bt code first try e.g. firmware_request
+BCM4356A2-26M.hcd before calling BCM4356A2.hcd .
 
-According to the people who say "I like to have a 6LoWPAN tun device,
-that would be nice" - I don't know how this will ever work since 6LoWPAN
-header highly depends on MAC header information. Tun devices works
-because IP architecture allows a separation from MAC layer. I already
-saw protocols at IETF where MAC header information are needed on top of
-UDP payload in case of 6LoWPAN. (I talked about that at last netdev in
-Montreal).
+I could instead simply postfix the ACPI HID (as I plan to
+do for the realtek btconfig) but as said in all my testing
+simply using the latest build, with the right crystal
+freq seems to work best. So I would prefer to go with
+e.g. BCM4356A2-26M.hcd rather then BCM4356A2-BCM2E74.hcd
+this way we will only need 2 hcd files (26M and 37.4M) per
+chipset rather a whole lot of them.
 
-Bluetooth wanted to add a tun 6lowpan interface and I was curious how
-this works. At the end it was a "Bluetooth mapping to ethernet header"
-(not as tunnel, as propagated). I was not acking it, because if there
-are protocols who needs more information than just what you can map to
-ethernet... it will not work. At least it will also not work with IEEE
-802.15.4 at all. They was just lucky that Bluetooth and ethernet use the
-same mac address length (And I had some questions to the multicast bit
-as well).
+Marcel, what do you think of this, would you accept a (to-be-written)
+patchset adding -26M / -37.4M postfixes as described above?
 
-Tunnel might work to get mac information. But so far 6loWPAN works it is
-that you have a L2 underlaying interface and on top (ip link set master)
-a raw IPv6 interface which do the adaptation automatically as a protocol
-translation (That's why I cannot understand Bluetooth 6LoWPAN use tx
-queues on their 6LoWPAN interface, they need to fix the queue in the
-underlaying L2 interface).
+This is all aimed at getting the hcd files into linux-firmware,
+where less files definitely would be more. Note I'm only talking
+about serdev attached bcm-bt devices here. For usb we can keep
+using the existing scheme or come up with a new scheme.
 
-As an alternative solution I think it should be something done like TAP
-like interface per subsystem. I mean NO ETHERTNET, but the ethernet in
-TAP interfaces out and replace it with Bluetooth or IEEE 802.15.4.
-I might can easily create a simple TAP IEEE 802.15.4 to show what I
-mean.
+Regards,
 
-With an IEEE 802.15.4 TAP device and a 6lowpan interface on top you can
-realize your use case and pass 802.15.4 L2 frames to device node -> pops
-up at 6LoPWAN interface and send IPv6 stuff and you can read on device
-node.
-
-I am still in the opinion the L2 TAP like interface is the way to go to
-offer such feature.
-
-- Alex
+Hans
