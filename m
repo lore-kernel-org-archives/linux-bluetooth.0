@@ -1,77 +1,70 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Michael Richardson <mcr+ietf@sandelman.ca>
-To: Alexander Aring <aring@mojatatu.com>
-cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Date: Sun, 10 Jun 2018 11:39:56 -0400
+From: Alexander Aring <aring@mojatatu.com>
+To: Michael Richardson <mcr@sandelman.ca>
+Cc: netdev@vger.kernel.org, linux-wpan@vger.kernel.org,
         linux-bluetooth@vger.kernel.org
 Subject: Re: netdevice notifier and device private data
-In-Reply-To: <20180610153956.mgzigzfne6shjb4s@x220t>
-References: <20180608173455.vrnfvv7dlu4oxwqf@x220t> <32763.1528486664@localhost> <20180609152921.hqfmprmd4ryttaie@x220t> <29706.1528570878@localhost> <20180610153956.mgzigzfne6shjb4s@x220t>
+Message-ID: <20180610153956.mgzigzfne6shjb4s@x220t>
+References: <20180608173455.vrnfvv7dlu4oxwqf@x220t>
+ <32763.1528486664@localhost>
+ <20180609152921.hqfmprmd4ryttaie@x220t>
+ <29706.1528570878@localhost>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Sun, 10 Jun 2018 22:09:39 -0400
-Message-ID: <1326.1528682979@localhost>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <29706.1528570878@localhost>
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
+On Sat, Jun 09, 2018 at 03:01:18PM -0400, Michael Richardson wrote:
+> 
+> Alexander Aring <aring@mojatatu.com> wrote:
+>     > Futhermore user space programs e.g. radvd will do 6lowpan specific
+>     > handling on 6lowpan dev->type, it will not work either on tun
+>     > devices.
+> 
+>     > I know that wpantund from NestLabs do this switch, I am very
+>     > curious about the reason but I think they do it because the name
+>     > is 6LoWPAN. But wpantund is just a SLIP like protocol with
+>     > additional radio/foo commands.
+> 
+> How do they change it then, and what does it do?
 
-Alexander Aring <aring@mojatatu.com> wrote:
-    >> It totally seems like broken behaviour.  Maybe it's not even
-    >> intentional.  Maybe they are just foobar.
+They change it with the ioctl() of tun characte device, see [0].
 
-    > They simple don't know what they doing... somebody thought 6LoWPAN ne=
-ed
-    > to be 6LoWPAN, but they actually don't use the 6LoWPAN handling inside
-    > the kernel. _Except_ they doing out of tree stuff which I don't
-    > believe.
+What it does, it just changing the interface type to something else,
+also there is no check at all that Linux has this interface type.
 
-So, it seems like this ioctl() should be disabled, or restricted to cases
-that actually work.  hate to break their code, but if it's broken anyway, at
-least the kernel won't crash under them.
+User space software e.g. radvd [1] will evaluate this type and doing
+specific handling. Obviously changing it to 6LoWPAN and using this code
+will confuse everything, because the handling makes only sense for a
+6LoWPAN Linux interface which actually also use the 6LoWPAN subsystem.
 
-    > According to [0] it also works with tun default (I suppsoe raw IPv6),
-    > because ifdef. And they should not change it because they don't use
-    > in-kernel 6LoWPAN functionality.
+They just using tun as all other to feed a IPv6 stack on a remote
+microcontroller e.g. openthread, contiki, riot. via slip. (wpantund also
+allow some radio, foo configuration).
 
-    > I really think that this tun/tap feature makes a lot of trouble for
-    > some type changes. I probably introduce lowpan_dev pointer to netdevi=
-ce
-    > and then check if it's really a 6LoPWAN interface, a dev->type will n=
-ot
-    > garantuee anymore you have a 6LoWPAN interface. At least in user space
-    > it's not possible to have a check if you really have a 6LoWPAN
-    > interface.
+> It totally seems like broken behaviour.  Maybe it's not even intentional.
+> Maybe they are just foobar.
+> 
 
-    > - Alex
+They simple don't know what they doing... somebody thought 6LoWPAN need
+to be 6LoWPAN, but they actually don't use the 6LoWPAN handling inside
+the kernel. _Except_ they doing out of tree stuff which I don't believe.
 
-    > [0]
-    > https://github.com/openthread/wpantund/blob/master/src/util/tunnel.c#=
-L180
-    > [1] https://github.com/reubenhwk/radvd/blob/master/device-linux.c#L75
+According to [0] it also works with tun default (I suppsoe raw IPv6),
+because ifdef. And they should not change it because they don't use
+in-kernel 6LoWPAN functionality.
 
-=2D-=20
-Michael Richardson <mcr+IETF@sandelman.ca>, Sandelman Software Works
- -=3D IPv6 IoT consulting =3D-
+I really think that this tun/tap feature makes a lot of trouble for some
+type changes. I probably introduce lowpan_dev pointer to netdevice and
+then check if it's really a 6LoPWAN interface, a dev->type will not
+garantuee anymore you have a 6LoWPAN interface. At least in user space
+it's not possible to have a check if you really have a 6LoWPAN interface.
 
+- Alex
 
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEVAwUBWx3Z4ICLcPvd0N1lAQIB3AgAj9QBPjOOiA5n84vdP47/8lxTsBkLTF8b
-/bEdL5tJkeFDJqvc1OkK8ldt99LLFOMrITIrnOClmrKBtczN00WLVCrtX/v7juX6
-dM1DT1G65eP/ecbJrBd2AY6CBc9RPqESz4xatOiSAZc2ez0wRuyTbcPQqkpoCBXo
-cXl5PstkeX4W+VVIqCQuyj6derJx44iKckPMCvq2TytMywG9TT0dX5RLFci1jLvW
-L0cN0lVu2XPcDAU4xsrLV9PdjsXd854sI3yZyV1JxPZzX+SjKy9wVeoGI22cFzzp
-J45J/uwP+lixmSQojEiKFBKTJ+rSeKq2/ToG/qSaZ8VX/a+HqbpwEw==
-=KeRd
------END PGP SIGNATURE-----
---=-=-=--
+[0] https://github.com/openthread/wpantund/blob/master/src/util/tunnel.c#L180
+[1] https://github.com/reubenhwk/radvd/blob/master/device-linux.c#L75
