@@ -1,63 +1,47 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH v2 04/24] Bluetooth: hci_nokia: Add serdev_id_table
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180611115240.32606-5-ricardo.ribalda@gmail.com>
-Date: Mon, 11 Jun 2018 14:56:20 +0200
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-serial@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh@kernel.org>, Johan Hovold <johan@kernel.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Message-Id: <94360989-9AA9-422D-9CA3-AA631731BD2D@holtmann.org>
+Return-Path: <ricardo.ribalda@gmail.com>
+From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linux-serial@vger.kernel.org
+Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Johan Hovold <johan@kernel.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 13/24] Bluetooth: hci_nokia: MODULE_DEVICE_TABLE(serdev)
+Date: Mon, 11 Jun 2018 13:52:29 +0200
+Message-Id: <20180611115240.32606-14-ricardo.ribalda@gmail.com>
+In-Reply-To: <20180611115240.32606-1-ricardo.ribalda@gmail.com>
 References: <20180611115240.32606-1-ricardo.ribalda@gmail.com>
- <20180611115240.32606-5-ricardo.ribalda@gmail.com>
-To: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ricardo,
+Export serdev table to the module header, allowing module autoload via
+udev/modprobe.
 
-> Describe which hardware is supported by the current driver.
-> 
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: Johan Hovold <johan@kernel.org>
-> Cc: Andy Shevchenko <andy.shevchenko@gmail.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-> ---
-> drivers/bluetooth/hci_nokia.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
-> index 3539fd03f47e..eb3d59894aef 100644
-> --- a/drivers/bluetooth/hci_nokia.c
-> +++ b/drivers/bluetooth/hci_nokia.c
-> @@ -801,6 +801,11 @@ static const struct of_device_id nokia_bluetooth_of_match[] = {
-> MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
-> #endif
-> 
-> +static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
-> +	{ "hp4-bluetooth", },
-> +	{}
-> +};
-> +
-> static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
-> 	.probe = nokia_bluetooth_serdev_probe,
-> 	.remove = nokia_bluetooth_serdev_remove,
-> @@ -809,6 +814,7 @@ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
-> 		.pm = &nokia_bluetooth_pm_ops,
-> 		.of_match_table = of_match_ptr(nokia_bluetooth_of_match),
-> 	},
-> +	.id_table = nokia_bluetooth_serdev_id,
-> };
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: Johan Hovold <johan@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org
+Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
+---
+ drivers/bluetooth/hci_nokia.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-as I said before, don’t bother with this driver. There is no need for this. Nothing is generic here, it is all specific for each of the 5 devices they shipped. Nokia is not building these kind of devices anymore and if they start changing their mind, then we add a patch for it listening this id.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_nokia.c b/drivers/bluetooth/hci_nokia.c
+index eb3d59894aef..fef285608f10 100644
+--- a/drivers/bluetooth/hci_nokia.c
++++ b/drivers/bluetooth/hci_nokia.c
+@@ -803,8 +803,10 @@ MODULE_DEVICE_TABLE(of, nokia_bluetooth_of_match);
+ 
+ static struct serdev_device_id nokia_bluetooth_serdev_id[] = {
+ 	{ "hp4-bluetooth", },
++	{ "nokia-bluetooth", },
+ 	{}
+ };
++MODULE_DEVICE_TABLE(serdev, nokia_bluetooth_serdev_id);
+ 
+ static struct serdev_device_driver nokia_bluetooth_serdev_driver = {
+ 	.probe = nokia_bluetooth_serdev_probe,
+-- 
+2.17.1
