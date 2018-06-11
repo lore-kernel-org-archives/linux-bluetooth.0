@@ -1,201 +1,136 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Message-ID: <1528797516.21593.46.camel@mtkswgap22>
-Subject: Re: [PATCH v2 4/7] Bluetooth: Add new quirk for non-persistent
- setup settings
-From: Sean Wang <sean.wang@mediatek.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Mark Rutland <mark.rutland@arm.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-Date: Tue, 12 Jun 2018 17:58:36 +0800
-In-Reply-To: <DC3FE66E-C3FD-455F-8592-E927604086CD@holtmann.org>
-References: <cover.1526374087.git.sean.wang@mediatek.com>
-         <1d6097f538b3182b2876ad48225ecd6e2d1b128c.1526374087.git.sean.wang@mediatek.com>
-         <920B3BE9-3FE8-4AC6-8C5F-63B0E00182AC@holtmann.org>
-         <1526976323.18877.47.camel@mtkswgap22> <1527057423.4607.3.camel@mtkswgap22>
-         <B82BB5F4-E197-4915-A543-C5FF9A5A41F1@holtmann.org>
-         <1527084544.4607.8.camel@mtkswgap22>
-         <37400FCE-8F9A-433B-8E3A-DE9CBEB469D7@holtmann.org>
-         <1527175805.4607.103.camel@mtkswgap22>
-         <DC3FE66E-C3FD-455F-8592-E927604086CD@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
+Return-Path: <robh+dt@kernel.org>
 MIME-Version: 1.0
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <D56466C0-2312-4F0E-AB00-66EF4BEECB1A@holtmann.org>
+References: <280FCB2C-6DF1-4790-A89F-AF5BE3513AE5@holtmann.org>
+ <20180608162009.22762-1-attitokes@gmail.com> <CAL_JsqKGeCEBBLNQNdymQovknRM7zt4+nNJy0YSkxRicOxkCSg@mail.gmail.com>
+ <CAMoM21HshLyv+Np1vOKYTAunsPCazyP-WESiaheNXHsC078S8g@mail.gmail.com>
+ <CAL_Jsq+a93Rpf3UAPBQ5QmA8KavberGXz76WCiZ7feHH5GgcDA@mail.gmail.com>
+ <4F0D6729-AE77-47D4-9765-FBC44181D4DE@holtmann.org> <CAL_JsqL2StWgA9gkL9i3o85-C3TNixBLmbTXzFQW8bts4phJqQ@mail.gmail.com>
+ <D56466C0-2312-4F0E-AB00-66EF4BEECB1A@holtmann.org>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Mon, 11 Jun 2018 13:05:29 -0600
+Message-ID: <CAL_JsqKi=GPYGabjrkKx+1Qv9=NnB6j7=YQhQsBwOBWGAY03tw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Configure SCO routing automatically
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?UTF-8?B?QXR0aWxhIFTFkWvDqXM=?= <attitokes@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, Mark Rutland <mark.rutland@arm.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Artiom Vaskov <velemas@gmail.com>,
+	netdev <netdev@vger.kernel.org>, devicetree <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2018-05-30 at 08:26 +0200, Marcel Holtmann wrote:
-> Hi Sean,
-> 
-> >>>>>> 
+On Mon, Jun 11, 2018 at 12:19 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Rob,
+>
+>>>>>>> Added support to automatically configure the SCO packet routing at =
+the
+>>>>>>> device setup. The SCO packets are used with the HSP / HFP profiles,=
+ but in
+>>>>>>> some devices (ex. CYW43438) they are routed to a PCM output by defa=
+ult. This
+>>>>>>> change allows sending the vendor specific HCI command to configure =
+the SCO
+>>>>>>> routing. The parameters of the command are loaded from the device t=
+ree.
+>>>>>>
+>>>>>> Please wrap your commit msg.
+>>>>>
+>>>>>
+>>>>> Sure.
+>>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>> Signed-off-by: Attila T=C5=91k=C3=A9s <attitokes@gmail.com>
+>>>>>>> ---
+>>>>>>> .../bindings/net/broadcom-bluetooth.txt       |  7 ++
+>>>>>>
+>>>>>> Please split bindings to separate patch.
+>>>>>
+>>>>>
+>>>>> Ok, I will split this in two.
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>>> drivers/bluetooth/hci_bcm.c                   | 72 ++++++++++++++++=
++++
+>>>>>>> 2 files changed, 79 insertions(+)
+>>>>>>>
+>>>>>>> diff --git
+>>>>>>> a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+>>>>>>> b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+>>>>>>> index 4194ff7e..aea3a094 100644
+>>>>>>> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+>>>>>>> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+>>>>>>> @@ -21,6 +21,12 @@ Optional properties:
+>>>>>>> - clocks: clock specifier if external clock provided to the control=
+ler
+>>>>>>> - clock-names: should be "extclk"
+>>>>>>>
+>>>>>>> + SCO routing parameters:
+>>>>>>> + - sco-routing: 0-3 (PCM, Transport, Codec, I2S)
+>>>>>>> + - pcm-interface-rate: 0-4 (128 Kbps - 2048 Kbps)
+>>>>>>> + - pcm-frame-type: 0 (short), 1 (long)
+>>>>>>> + - pcm-sync-mode: 0 (slave), 1 (master)
+>>>>>>> + - pcm-clock-mode: 0 (slave), 1 (master)
+>>>>>>
+>>>>>> Are these Broadcom specific? Properties need either vendor prefix or
+>>>>>> to be documented in a common location. I think these look like the
+>>>>>> latter.
+>>>>>
+>>>>>
+>>>>> These will be used as parameters of a vendor specific (Broadcom/Cypre=
+ss)
+>>>>> command configuring the SCO packet routing. See the Write_SCO_PCM_Int=
+_Param
+>>>>> command from: http://www.cypress.com/file/298311/download.
+>>>>
+>>>> The DT should just describe how the h/w is hooked-up. What the s/w has
+>>>> to do based on that is the driver's problem which is certainly
+>>>> vendor/chip specific, but that is all irrelevant to the binding.
+>>>>
+>>>>> What would be the property names with a Broadcom / Cypress vendor pre=
+fix?
+>>>>>
+>>>>>   brcm,sco-routing
+>>>>>   brcm,pcm-interface-rate
+>>>>>   brcm,pcm-frame-type
+>>>>>   brcm,pcm-sync-mode
+>>>>>   brcm,pcm-clock-mode
+>>>>>
+>>>>> ?
+>>>>
+>>>> Yes.
+>>>
+>>> we can do this. However all pcm-* are optional if you switch the HCI tr=
+ansport. And sco-routing should default to HCI if that is not present. Mean=
+ing a driver should actively trying to change this. Nevertheless, it would =
+be good if a driver reads the current settings.
+>>>
+>>> In theory we could make sco-routing generic, but so many vendors have d=
+ifferent modes, that we better keep this vendor specific.
+>>
+>> Even if vendor specific, the properties for not HCI transport case are
+>> still incomplete IMO.
+>>
+>> By modes, you mean PCM vs. I2S and all the flavors of timings you can
+>> have within those or something else? For the former, that's often
+>> going to be a process of solving what each end support and if that
+>> doesn't work, then IIRC we already have properties for setting
+>> modes/timing. All the same issues exist with audio codecs and this is
+>> really not any different.
+>
+> this is what Broadcom uses to configure their PCM transport. So I think f=
+or now, we make them brcm, specific and see how that goes. We can always ge=
+neralize them later if enough chip manufactures provide support for it.
 
-[ ... ]
+We already have properties doing the same thing defined in
+Documentation/devicetree/bindings/sound/simple-card.txt. Use and
+extend that. We don't need new properties especially for something
+that is not complete. For example If I have 2 host ports (every SoC
+has at least 2), how do I indicate which one is connected to BT.
 
-> >>> * Unknown packet (code 14 len 30)                                      0.641509
-> >>>       01 00 00 00 02 00 01 0e 00 01 00 00 00 10 62 6c  ..............bl
-> >>>       75 65 74 6f 6f 74 68 64 00 00 00 00 00 00        uetoothd......  
-> >>> * Unknown packet (code 14 len 30)                                      0.641592
-> >>>       02 00 00 00 02 00 01 0e 00 01 00 00 00 10 62 74  ..............bt
-> >>>       6d 6f 6e 00 00 00 00 00 00 00 00 00 00 00        mon...........  
-> >>> * Unknown packet (code 16 len 7)                                [hci0] 6.536771
-> >>>       01 00 00 00 05 00 01                             .......         
-> >>> = Open Index: 00:00:46:76:22:01                                 [hci0] 6.717019
-> >>> = Index Info: 00:00:46:76:22:01 (MediaTek, Inc.)                [hci0] 6.717030
-> >> 
-> >> can you try with the latest BlueZ 5.49 or git version. Seems it actually stumbles over the extra packet here. Fun fact is that I can not get a backtrace to pin-point the issue in btmon and why it crashes.
-> >> 
-> > 
-> > I had less experience updating user land BlueZ, but I can try it as possible and see whether Unknown packets still are present at newest version BlueZ. Hopefully I don't misunderstand your point here. 
-> 
-> please use the latest btmon and check if it can read your trace.
-> 
-
-sure, I'll have a try with the latest btmon.
-
-> >>>> HCI Event: Unknown (0xe4) plen 5                              [hci0] 6.741093
-> >>>       02 01 01 00 00                                   .....           
-> >>>> HCI Event: Unknown (0xe4) plen 5                              [hci0] 6.742088
-> >>>       02 01 01 00 00                                   .....           
-> >>>> HCI Event: Unknown (0xe4) plen 5                              [hci0] 6.743102
-> >>>       02 01 01 00 00                                   .....           
-
-
-[ ... ]
-
-> >>>> HCI Event: Unknown (0xe4) plen 5                              [hci0] 6.814708
-> >>>       02 01 01 00 00                                   .....           
-> >>>> HCI Event: Unknown (0xe4) plen 5                              [hci0] 6.815705
-> >>>       02 01 01 00 00                                   .....           
-> >>>> HCI Event: Unknown (0xe4) plen 5                              [hci0] 6.816378
-> >>>       02 01 01 00 00                                   .....           
-> >> 
-> >> Why do I see only HCI events here? Is this event conveying any useful information. It is kinda complicated that this is 0xe4 event code which is actually reserved for future use by the Bluetooth SIG. Are there any accompanying HCI commands for this and they just not make it into btmon?
-> >> 
-> > 
-> > I have made all vendor HCI commands go through BlueZ core in v2 patch. 
-> > 
-> > And for these HCI events, they are all corresponding to vendor ACL data, applied only to firmware setup packets, but they're not being sent via BlueZ core, so they are not being logged in btmon.
-> > 
-> > As for its event, where heading 0xe4 refers to a vendor event and is used on notification of that either vendor ACL data or vendor HCI command have been done.
-> 
-> I would prefer if everything goes via the Bluetooth core since then we have it all properly scheduled. Sending things down the ACL data path however if kinda funky. Does your hardware accept sending command both via ACL data and as HCI command? If so, then I would prefer sending them as HCI commands since the speed improvement you think you are getting is neglectable on Linux (I have been down that path). This seems to be a pure optimization when Windows is driving the device.
-> 
-
-firmware people said the device can support firmware download as HCI commands. According to my test, this way indeed works so I will improve the part in the next version.
-
-
-> And the vendor event 0xe4 is really only received during firmware download? It is not ever received during normal operation?
-> 
-
-0xe4 is only received during chip initialization.
-
-I also thought 0xe4 is a poor definition for vendor event and already have notified firmware people should pick 0xff as its vendor event id in the future.
-
-but for now, unfortunately, 0xe4 cannot be changed on the device, the only way is to add a workaround in RX path as below to allow btmon can recognize these bad events properly. 
-
-int mtk_btuart_hci_frame(struct hci_dev *hdev, struct sk_buff *skb)
-{
-        struct hci_event_hdr *hdr = (void *)skb->data;
-
-        /* Fix up the vendor event id with HCI_VENDOR_PKT instead of
-         * 0xe4 so that btmon can parse the kind of vendor event properly.
-         */
-        if (hdr->evt == 0xe4)
-                hdr->evt = HCI_VENDOR_PKT;
-
-        /* Each HCI event would go through the core. */
-        return hci_recv_frame(hdev, skb);
-}
-
-
-> > 
-> >> 
-> >> 
-> >>> < HCI Command: Vendor (0x3f|0x006f) plen 5                      [hci0] 6.816413
-> >>>       01 07 01 00 04                                   .....           
-> >>>> HCI Event: Unknown (0xe4) plen 5                              [hci0] 6.816536
-> >>>       02 07 01 00 00                                   .....           
-
-[ ... ]
-
-> >>>         Encapsulated PDU
-> >>>         Erroneous Data Reporting
-> >>>         Non-flushable Packet Boundary Flag
-> >>>         Link Supervision Timeout Changed Event
-> >>>         Inquiry TX Power Level
-> >>>         Enhanced Power Control
-> >>>         Extended features
-> >>> < HCI Command: Read Local Version Info.. (0x04|0x0001) plen 0  [hci0] 10.865987
-> >>>> HCI Event: Vendor (0xff) plen 9                              [hci0] 10.866259
-> >>>       29 19 09 17 20 48 07 11 00                       )... H…       
-> >> 
-> >> Is this meant to happen here?
-> >> 
-> > 
-> > If event received is not expected as the specification defines, I think it's probably incorrect.
-> > 
-> > But it requires more discussion with firmware people to make it clearer.
-> 
-> Please check and let them decode what this event means.
-> 
-
-it's just debugging purpose information listing built-time something
-like that and will be removed in the firmware.
-
-> > 
-> >>>> HCI Event: Command Complete (0x0e) plen 12                   [hci0] 10.866372
-> >>>     Read Local Version Information (0x04|0x0001) ncmd 1
-> >>>       Status: Success (0x00)
-> >>>       HCI version: Bluetooth 4.2 (0x08) - Revision 4359 (0x1107)
-> >>>       LMP version: Bluetooth 4.2 (0x08) - Subversion 2329 (0x0919)
-> >>>       Manufacturer: MediaTek, Inc. (70)
-> >>> < HCI Command: Read BD ADDR (0x04|0x0009) plen 0               [hci0] 10.866391
-> >>>> HCI Event: Command Complete (0x0e) plen 10                   [hci0] 10.866539
-
-[ ... ]
-
-> >>>         LE Add Device To Resolving List (Octet 34 - Bit 3)
-> >>>         LE Remove Device From Resolving List (Octet 34 - Bit 4)
-> >>>         LE Clear Resolving List (Octet 34 - Bit 5)
-> >>>         LE Read Resolving List Size (Octet 34 - Bit 6)
-> >>>         LE Read Peer Resolvable Address (Octet 34 - Bit 7)
-> >>>         LE Read Local Resolvable Address (Octet 35 - Bit 0)
-> >>>         LE Set Address Resolution Enable (Octet 35 - Bit 1)
-> >>>         LE Set Resolvable Private Address Timeout (Octet 35 - Bit 2)
-> >>>         LE Read Maximum Data Length (Octet 35 - Bit 3)
-> >>>         Octet 35 - Bit 4 
-> >>>         Octet 35 - Bit 5 
-> >>>         Octet 35 - Bit 6 
-> >>>         Octet 35 - Bit 7 
-> >>>         Octet 36 - Bit 0 
-> >> 
-> >> So you support the PHY commands, but do not indicate support LE 2M or LE Coded? Also these are Bluetooth 5.0 commands.
-> >> 
-> > 
-> > To be honest. When I ported the device into Bluez core, a unexpected event for LE read local feature would cause a fail at Bluez core, so I made a hack on Bluez core  
-> > 
-> > to allow that I can keeping bring up the device without be blocked by the issue most probably from firmware.
-> > 
-> > Below code snippet is the only thing I added to avoid a fail at Bluez core to bring up the device.
-> > 
-> > @@ -927,6 +927,8 @@ static void hci_cc_le_read_local_features(struct hci_dev *hdev,
-> >                return;
-> > 
-> >        memcpy(hdev->le_features, rp->features, 8);
-> > +       hdev->le_features[0] = 0;
-> > +       hdev->le_features[1] = 0;
-> > }
-> 
-> Send me the trace where you didn’t clear the feature bits and I check what is going on. I doubt that we have a bug, but maybe some of the commands are optional and we should add an appropriate check. Or you guys need to fix your firmware. A new btmon should decode all bits properly.
-> 
-
-okay, I'll have a follow-up.
-
-> Regards
-> 
-> Marcel
-> 
+Rob
