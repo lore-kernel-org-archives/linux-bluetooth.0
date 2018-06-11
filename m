@@ -1,55 +1,18 @@
-Return-Path: <ricardo.ribalda@gmail.com>
-From: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linux-serial@vger.kernel.org
-Cc: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Johan Hovold <johan@kernel.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 02/24] Bluetooth: hci_bcm: Add serdev_id_table
-Date: Mon, 11 Jun 2018 13:52:18 +0200
-Message-Id: <20180611115240.32606-3-ricardo.ribalda@gmail.com>
-In-Reply-To: <20180611115240.32606-1-ricardo.ribalda@gmail.com>
-References: <20180611115240.32606-1-ricardo.ribalda@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+From: sudeepta bhuyan <sudeepta.bhuyan@gmail.com>
+Date: Mon, 11 Jun 2018 17:21:34 +0530
+Message-ID: <CA+TC0NoyzywZiHVgdPgEVp-t8JpEU+cM0b40=6Dw=yJW6jeZRQ@mail.gmail.com>
+Subject: BLE packets per connection interval
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Describe which hardware is supported by the current driver.
+Hello,
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: Johan Hovold <johan@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org
-Signed-off-by: Ricardo Ribalda Delgado <ricardo.ribalda@gmail.com>
----
- drivers/bluetooth/hci_bcm.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Is there a way to tweak with the number of BLE packets sent per
+connection interval in BlueZ?
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 441f5e1deb11..f4d7846c06b8 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -1325,6 +1325,11 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
- MODULE_DEVICE_TABLE(of, bcm_bluetooth_of_match);
- #endif
- 
-+static const struct serdev_device_id bcm_serdev_id[] = {
-+	{ "bcm43438-bt", },
-+	{}
-+};
-+
- static struct serdev_device_driver bcm_serdev_driver = {
- 	.probe = bcm_serdev_probe,
- 	.remove = bcm_serdev_remove,
-@@ -1334,6 +1339,7 @@ static struct serdev_device_driver bcm_serdev_driver = {
- 		.acpi_match_table = ACPI_PTR(bcm_acpi_match),
- 		.pm = &bcm_pm_ops,
- 	},
-+	.id_table = bcm_serdev_id,
- };
- 
- int __init bcm_init(void)
--- 
-2.17.1
+Thanks,
+Sudeepta
