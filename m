@@ -1,42 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [PATCH BlueZ] monitor: Fix printing params for HCI Intel DDC command
-Date: Wed, 13 Jun 2018 12:52:18 -0700
-Message-Id: <1528919538-26014-1-git-send-email-tedd.an@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <20180613143922.11016-1-luiz.dentz@gmail.com>
+References: <20180613143922.11016-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 13 Jun 2018 17:40:30 +0300
+Message-ID: <CABBYNZJJ3ACsPdfZM0XPExE4J+LO4SkMNqc6DHnXFHoxYjPU2g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core: Allow sending to org.mpris.MediaPlayer2.Player
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+Hi,
 
-The offset of value for HCI Intel DDC command is incorrect.
-HCI Intel DDC parameter has a combination of following structure:
+On Wed, Jun 13, 2018 at 5:39 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds a policy to allow sending to org.mpris.MediaPlayer2.Player
+> interface since that is used when the player supports it.
+> ---
+>  src/bluetooth.conf | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+> index 0c0b221bb..b67a954a2 100644
+> --- a/src/bluetooth.conf
+> +++ b/src/bluetooth.conf
+> @@ -19,6 +19,7 @@
+>      <allow send_interface="org.bluez.LEAdvertisement1"/>
+>      <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
+>      <allow send_interface="org.freedesktop.DBus.Properties"/>
+> +    <allow send_interface="org.mpris.MediaPlayer2.Player"/>
+>    </policy>
+>
+>    <policy at_console="true">
+> --
+> 2.17.0
 
-struct intel_ddc {
-	u8  len;
-	u16 id;
-	u8  *value;
-}
+Please disregard this since it was already applied.
 
-The offset of value should be sum of len and id which is 3.
----
- monitor/intel.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/monitor/intel.c b/monitor/intel.c
-index ce624be..4cd1788 100644
---- a/monitor/intel.c
-+++ b/monitor/intel.c
-@@ -437,7 +437,7 @@ static void ddc_config_write_cmd(const void *data, uint8_t size)
- 		uint16_t param_id = get_le16(data + 1);
- 
- 		print_field("Identifier: 0x%4.4x", param_id);
--		packet_hexdump(data + 2, param_len - 2);
-+		packet_hexdump(data + 3, param_len - 2);
- 
- 		data += param_len + 1;
- 		size -= param_len + 1;
+
 -- 
-2.7.4
-
+Luiz Augusto von Dentz
