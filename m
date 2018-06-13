@@ -1,259 +1,89 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1524578447-17347-5-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <CABBYNZJTQfVRd5DLUmfDS7J_K_zD4qDEft6B2Jiu9WdwgX+7Uw@mail.gmail.com>
 References: <1524578447-17347-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1524578447-17347-5-git-send-email-jaganathx.kanakkassery@intel.com>
+ <CAJzH+bq-oH2ne260GgO0ehke1NZfHmRh2QFoyQn5sj84xHX46A@mail.gmail.com> <CABBYNZJTQfVRd5DLUmfDS7J_K_zD4qDEft6B2Jiu9WdwgX+7Uw@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 13 Jun 2018 11:43:40 +0300
-Message-ID: <CABBYNZLxun+KkrS_mPx3uiCn+Qk7rOrP2M0q4LrGfDTozTsZHA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 04/11] btmgmt: Add PHY configuration get/set commands
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Date: Wed, 13 Jun 2018 11:22:07 +0300
+Message-ID: <CABBYNZ+rNx9+nzJ24en3hwSKVKgrgPfE=FgE9d08CqVXHrZV1Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 00/11] Extended Adv, Scan, Connection and PHY support
+To: Jaganath K <jaganath.k.os@gmail.com>
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi,
 
-On Tue, Apr 24, 2018 at 5:00 PM, Jaganath Kanakkassery
-<jaganath.k.os@gmail.com> wrote:
-> ---
->  lib/mgmt.h     |  33 +++++++++++++++
->  tools/btmgmt.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 161 insertions(+)
->  mode change 100644 => 100755 tools/btmgmt.c
+On Wed, Jun 13, 2018 at 11:09 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Jaganath,
 >
-> diff --git a/lib/mgmt.h b/lib/mgmt.h
-> index 798a05e..7a25e17 100644
-> --- a/lib/mgmt.h
-> +++ b/lib/mgmt.h
-> @@ -101,6 +101,7 @@ struct mgmt_rp_read_index_list {
->  #define MGMT_SETTING_PRIVACY           0x00002000
->  #define MGMT_SETTING_CONFIGURATION     0x00004000
->  #define MGMT_SETTING_STATIC_ADDRESS    0x00008000
-> +#define MGMT_SETTING_PHY_CONFIGURATION 0x00010000
+> On Wed, Jun 6, 2018 at 8:50 AM, Jaganath K <jaganath.k.os@gmail.com> wrote:
+>> Hi,
+>>
+>> Ping
+>>
+>> On Tue, Apr 24, 2018 at 7:30 PM, Jaganath Kanakkassery
+>> <jaganath.k.os@gmail.com> wrote:
+>>> This patch set adds new mgmt APIs for Get / Set PHY contiguration,
+>>> Set PHY in Advertising, added mgmt-tester for the new commands,
+>>> and also added btmgmt and monitor changes for the new commands
+>>> and events
+>>>
+>>> v2: Made emulator changes onto a seperate patch
 >
->  #define MGMT_OP_READ_INFO              0x0004
->  struct mgmt_rp_read_info {
-> @@ -546,6 +547,30 @@ struct mgmt_cp_set_appearance {
->         uint16_t appearance;
->  } __packed;
->
-> +#define MGMT_OP_GET_PHY_CONFIGURATION  0x0044
-> +struct mgmt_rp_get_phy_confguration {
-> +       uint16_t        supported_phys;
-> +       uint16_t        selected_phys;
-> +} __packed;
-> +
-> +#define MGMT_PHY_LE_1M_TX              0x0001
-> +#define MGMT_PHY_LE_1M_RX              0x0002
-> +#define MGMT_PHY_LE_2M_TX              0x0004
-> +#define MGMT_PHY_LE_2M_RX              0x0008
-> +#define MGMT_PHY_LE_CODED_TX           0x0010
-> +#define MGMT_PHY_LE_CODED_RX           0x0020
-> +
-> +#define MGMT_PHY_LE_TX_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_2M_TX | \
-> +                            MGMT_PHY_LE_CODED_TX)
-> +#define MGMT_PHY_LE_RX_MASK (MGMT_PHY_LE_1M_RX | MGMT_PHY_LE_2M_RX | \
-> +                            MGMT_PHY_LE_CODED_RX)
-> +
-> +#define MGMT_OP_SET_PHY_CONFIGURATION  0x0045
-> +struct mgmt_cp_set_phy_confguration {
-> +       uint16_t        default_phys;
-> +} __packed;
-> +
-> +
->  #define MGMT_EV_CMD_COMPLETE           0x0001
->  struct mgmt_ev_cmd_complete {
->         uint16_t opcode;
-> @@ -764,6 +789,11 @@ struct mgmt_ev_ext_info_changed {
->         uint8_t  eir[0];
->  } __packed;
->
-> +#define MGMT_EV_PHY_CONFIGURATION_CHANGED      0x0026
-> +struct mgmt_ev_phy_configuration_changed {
-> +       uint16_t        selected_phys;
-> +} __packed;
-> +
->  static const char *mgmt_op[] = {
->         "<0x0000>",
->         "Read Version",
-> @@ -833,6 +863,8 @@ static const char *mgmt_op[] = {
->         "Start Limited Discovery",
->         "Read Extended Controller Information",
->         "Set Appearance",
-> +       "Get PHY Configuration",
-> +       "Set PHY Configuration",
->  };
->
->  static const char *mgmt_ev[] = {
-> @@ -874,6 +906,7 @@ static const char *mgmt_ev[] = {
->         "Advertising Added",
->         "Advertising Removed",
->         "Extended Controller Information Changed",
-> +       "PHY Configuration Changed",
->  };
->
->  static const char *mgmt_status[] = {
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> old mode 100644
-> new mode 100755
-> index f60bb8b..750bb44
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -4165,6 +4165,132 @@ static void cmd_appearance(int argc, char **argv)
->         }
->  }
->
-> +static const char *phys_str[] = {
-> +       "1MTX",
-> +       "1MRX",
-> +       "2MTX",
-> +       "2MRX",
-> +       "CODEDTX",
-> +       "CODEDRX",
-> +};
-> +
-> +static const char *phys2str(uint16_t phys)
-> +{
-> +       static char str[256];
-> +       unsigned i;
-> +       int off;
-> +
-> +       off = 0;
-> +       str[0] = '\0';
-> +
-> +       for (i = 0; i < NELEM(phys_str); i++) {
-> +               if ((phys & (1 << i)) != 0)
-> +                       off += snprintf(str + off, sizeof(str) - off, "%s ",
-> +                                                       phys_str[i]);
-> +       }
-> +
-> +       return str;
-> +}
-> +
-> +static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
-> +                                                       void *user_data)
-> +{
-> +       const struct mgmt_rp_get_phy_confguration *rp = param;
-> +       uint16_t supported_flags, selected_phys;
-> +
-> +       if (status != 0) {
-> +               error("Get PHY Configuration failed with status 0x%02x (%s)",
-> +                                               status, mgmt_errstr(status));
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       if (len < sizeof(*rp)) {
-> +               error("Too small get-phy reply (%u bytes)", len);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       supported_flags = get_le16(&rp->supported_phys);
-> +       selected_phys = get_le16(&rp->selected_phys);
-> +
-> +       print("Supported phys: %s", phys2str(supported_flags));
-> +       print("Selected phys: %s", phys2str(selected_phys));
-> +
-> +       bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static void get_phy()
-> +{
-> +       uint16_t index;
-> +
-> +       index = mgmt_index;
-> +       if (index == MGMT_INDEX_NONE)
-> +               index = 0;
-> +
-> +       if (mgmt_send(mgmt, MGMT_OP_GET_PHY_CONFIGURATION, index, 0, NULL,
-> +                                       get_phy_rsp, NULL, NULL) == 0) {
-> +               error("Unable to send Get PHY cmd");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +}
-> +
-> +static void set_phy_rsp(uint8_t status, uint16_t len, const void *param,
-> +                                                       void *user_data)
-> +{
-> +       if (status != 0) {
-> +               error("Could not set PHY Configuration with status 0x%02x (%s)",
-> +                                               status, mgmt_errstr(status));
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       print("PHY Configuration successfully set");
-> +
-> +       bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static void cmd_phy(int argc, char **argv)
-> +{
-> +       struct mgmt_cp_set_phy_confguration cp;
-> +       int i;
-> +       uint16_t phys = 0;
-> +       uint16_t index;
-> +
-> +       if (argc < 2)
-> +               return get_phy();
-> +
-> +       for (i = 1; i < argc; i++) {
-> +               if (strcasecmp(argv[i], "1MTX") == 0)
-> +                       phys |= MGMT_PHY_LE_1M_TX;
-> +
-> +               if (strcasecmp(argv[i], "1MRX") == 0)
-> +                       phys |= MGMT_PHY_LE_1M_RX;
-> +
-> +               if (strcasecmp(argv[i], "2MTX") == 0)
-> +                       phys |= MGMT_PHY_LE_2M_TX;
-> +
-> +               if (strcasecmp(argv[i], "2MRX") == 0)
-> +                       phys |= MGMT_PHY_LE_2M_RX;
-> +
-> +               if (strcasecmp(argv[i], "CODEDTX") == 0)
-> +                       phys |= MGMT_PHY_LE_CODED_TX;
-> +
-> +               if (strcasecmp(argv[i], "CODEDRX") == 0)
-> +                       phys |= MGMT_PHY_LE_CODED_RX;
-> +       }
-> +
-> +       cp.default_phys = cpu_to_le16(phys);
-> +
-> +       index = mgmt_index;
-> +       if (index == MGMT_INDEX_NONE)
-> +               index = 0;
-> +
-> +       if (mgmt_send(mgmt, MGMT_OP_SET_PHY_CONFIGURATION, index, sizeof(cp),
-> +                                       &cp, set_phy_rsp, NULL, NULL) == 0) {
-> +               error("Unable to send %s cmd",
-> +                               mgmt_opstr(MGMT_OP_GET_PHY_CONFIGURATION));
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +}
-> +
->  static void register_mgmt_callbacks(struct mgmt *mgmt, uint16_t index)
->  {
->         mgmt_register(mgmt, MGMT_EV_CONTROLLER_ERROR, index, controller_error,
-> @@ -4360,6 +4486,8 @@ static const struct bt_shell_menu main_menu = {
->                 cmd_clr_adv,            "Clear advertising instances"   },
->         { "appearance",         "<appearance>",
->                 cmd_appearance,         "Set appearance"                },
-> +       { "phy",                "[phys]",
-> +               cmd_phy,                "Get/Set PHY Configuration"     },
+> One thing Im missing here is the introduction of HCI command decoders
+> into the monitor since these changes appear to only introduce the mgmt
+> commands. Those could be pushed right away.
 
-If the parameters is of variable size it shall end with '...'.
+Nevermind, the HCI command decoding is already part of the monitor, so
+if there is no opposition Id like to push the patches up to the
+emulator since that one I think need some work.
 
->         {} },
->  };
+>>> Jaganath Kanakkassery (11):
+>>>   doc/mgmt-api: Add support for Set Phy Configuration command
+>>>   doc/mgmt-api: Add advertising phys support to flags
+>>>   monitor: Add support PHY management commands and event
+>>>   btmgmt: Add PHY configuration get/set commands
+>>>   monitor: Add support for Secondary PHY flags in Add Advertising
+>>>   btmgmt: Add support for setting PHY in add-adv
+>>>   emulator: Add 5.0 feature support
+>>>   mgmt-tester: Add extended advertising test cases
+>>>   mgmt-tester: Add PHY Configuration test cases
+>>>   mgmt-tester: Add tests for extended scanning and device found
+>>>   mgmt-tester: Add support ext create connection and enh conn complete
+>>>
+>>>  doc/mgmt-api.txt    |  106 +++
+>>>  emulator/btdev.c    |  458 ++++++++++-
+>>>  emulator/btdev.h    |    1 +
+>>>  emulator/bthost.c   |   99 +++
+>>>  emulator/bthost.h   |    7 +
+>>>  emulator/hciemu.c   |    3 +
+>>>  emulator/hciemu.h   |    1 +
+>>>  lib/mgmt.h          |   36 +
+>>>  monitor/bt.h        |    1 +
+>>>  monitor/packet.c    |   68 ++
+>>>  tools/btmgmt.c      |  145 +++-
+>>>  tools/mgmt-tester.c | 2253 ++++++++++++++++++++++++++++++++++++++++++++++++---
+>>>  12 files changed, 3073 insertions(+), 105 deletions(-)
+>>>  mode change 100644 => 100755 tools/btmgmt.c
+>>>
+>>> --
+>>> 2.7.4
+>>>
+>>
+>> Thanks,
+>> Jaganath
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
 >
 > --
-> 2.7.4
-
-Applying: btmgmt: Add PHY configuration get/set commands
-.git/rebase-apply/patch:165: trailing whitespace.
-
-error: 1 line adds whitespace errors.
+> Luiz Augusto von Dentz
 
 
 
