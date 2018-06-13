@@ -1,61 +1,32 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] shared/shell: Set shell name on SHELL env
-Date: Wed, 13 Jun 2018 17:39:40 +0300
-Message-Id: <20180613143941.11139-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] core: Allow sending to org.mpris.MediaPlayer2.Player
+Date: Wed, 13 Jun 2018 17:39:22 +0300
+Message-Id: <20180613143922.11016-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This set SHELL to the first argument given.
+This adds a policy to allow sending to org.mpris.MediaPlayer2.Player
+interface since that is used when the player supports it.
 ---
- src/shared/shell.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ src/bluetooth.conf | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 97d91577e..2353a5e22 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -63,6 +63,7 @@ struct bt_shell_env {
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index 0c0b221bb..b67a954a2 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -19,6 +19,7 @@
+     <allow send_interface="org.bluez.LEAdvertisement1"/>
+     <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
+     <allow send_interface="org.freedesktop.DBus.Properties"/>
++    <allow send_interface="org.mpris.MediaPlayer2.Player"/>
+   </policy>
  
- static struct {
- 	bool init;
-+	char *name;
- 	int argc;
- 	char **argv;
- 	bool mode;
-@@ -933,6 +934,7 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 	struct option options[256];
- 	char optstr[256];
- 	size_t offset;
-+	const char *name;
- 
- 	offset = sizeof(main_options) / sizeof(struct option);
- 
-@@ -978,6 +980,13 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 		index = -1;
- 	}
- 
-+	name = strrchr(argv[0], '/');
-+	if (!name)
-+		name = argv[0];
-+
-+	data.name = strdup(name);
-+	bt_shell_set_env("SHELL", data.name);
-+
- 	data.argc = argc - optind;
- 	data.argv = argv + optind;
- 	optind = 0;
-@@ -1039,6 +1048,7 @@ void bt_shell_cleanup(void)
- 	rl_cleanup();
- 
- 	data.init = false;
-+	free(data.name);
- }
- 
- void bt_shell_quit(int status)
+   <policy at_console="true">
 -- 
-2.17.1
+2.17.0
 
