@@ -1,42 +1,60 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Thu, 14 Jun 2018 22:35:00 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andreas Kemnade <andreas@kemnade.info>
-Cc: marcel@holtmann.org, davem@davemloft.net,
+Return-Path: <andreas@kemnade.info>
+From: Andreas Kemnade <andreas@kemnade.info>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
 	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH RFC] bluetooth: fix paring problems with 0cf3:0036 and
- certain devices
-Message-ID: <20180614203500.GA7182@x1c>
-References: <20180614193330.28410-1-andreas@kemnade.info>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180614193330.28410-1-andreas@kemnade.info>
+Cc: Andreas Kemnade <andreas@kemnade.info>
+Subject: [PATCH RFC] bluetooth: fix paring problems with 0cf3:0036 and certain devices
+Date: Thu, 14 Jun 2018 21:33:30 +0200
+Message-Id: <20180614193330.28410-1-andreas@kemnade.info>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andreas,
+This is clearly a RFC patch, things should be fixed in a cleaner way.
+With the bluetooth usb adapter 0cf3:0036 (Atheros), there are pairing
+problems in combination with certain remove devices. The cause is that
+smp_resume_cb() gets called after SMP_CMD_IDENT_INFO arrives in the end 
+of a SC pairing with numerical comparison. so that there are unexpected
+packet messages in dmesg and although an ltk is known, bluetoothd
+considers the device as unpaired and not even the ltk is not stored.
 
-On Thu, Jun 14, 2018, Andreas Kemnade wrote:
-> This is clearly a RFC patch, things should be fixed in a cleaner way.
-> With the bluetooth usb adapter 0cf3:0036 (Atheros), there are pairing
-> problems in combination with certain remove devices. The cause is that
-> smp_resume_cb() gets called after SMP_CMD_IDENT_INFO arrives in the end 
-> of a SC pairing with numerical comparison. so that there are unexpected
-> packet messages in dmesg and although an ltk is known, bluetoothd
-> considers the device as unpaired and not even the ltk is not stored.
-> 
-> The patch makes the smp code be more tolerant with the order but that
-> does not feel like a safe thing to do.
-> Maybe the pairing result should be given back to userspace without the
-> irk related stuff.
+The patch makes the smp code be more tolerant with the order but that
+does not feel like a safe thing to do.
+Maybe the pairing result should be given back to userspace without the
+irk related stuff.
 
-This sounds like the well known race between ACL data and HCI events
-that's inherent with the way the USB HCI transport is designed. So
-what's happening is that to the host it looks like some packets were
-delivered over an unencrypted connection even though they in reality
-came over an encrypted one. Not enforcing the encrypted connection
-requirement is not really a solution since it creates a security
-vulnerabilty. The best option (as far as I know) is to consider
-switching to some other transport (e.g. H:4 over USB where both ACL data
-and HCI events share a single "pipe").
+Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
+---
+ net/bluetooth/smp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Johan
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index a2ddae2f37d7..8023b6e6342f 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1012,6 +1012,7 @@ static u8 smp_random(struct smp_chan *smp)
+ 			return SMP_UNSPECIFIED;
+ 
+ 		hci_le_start_enc(hcon, ediv, rand, stk, smp->enc_key_size);
++		smp_distribute_keys(smp);
+ 		hcon->enc_key_size = smp->enc_key_size;
+ 		set_bit(HCI_CONN_STK_ENCRYPT, &hcon->flags);
+ 	} else {
+@@ -2837,6 +2838,7 @@ static int smp_cmd_dhkey_check(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	if (hcon->out) {
+ 		hci_le_start_enc(hcon, 0, 0, smp->tk, smp->enc_key_size);
++		smp_distribute_keys(smp);
+ 		hcon->enc_key_size = smp->enc_key_size;
+ 	}
+ 
+@@ -3067,7 +3069,6 @@ static void smp_resume_cb(struct l2cap_chan *chan)
+ 
+ 	cancel_delayed_work(&smp->security_timer);
+ 
+-	smp_distribute_keys(smp);
+ }
+ 
+ static void smp_ready_cb(struct l2cap_chan *chan)
+-- 
+2.11.0
