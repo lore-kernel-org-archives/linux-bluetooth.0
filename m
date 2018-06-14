@@ -1,99 +1,74 @@
-Return-Path: <ulf.hansson@linaro.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Subject: Re: Bluetoothctl: "write" command only send one byte.
+To: Szymon Janc <szymon.janc@codecoup.pl>
+Cc: linux-bluetooth@vger.kernel.org
+References: <4043ca82-99c9-d1e9-37ec-3e484ad09250@foobot.io>
+ <2575764.Np7OUyMvvF@ix>
+From: Manuel Masiello <manuel@foobot.io>
+Message-ID: <3d780f63-4d85-d44d-72bc-30af171371e9@foobot.io>
+Date: Thu, 14 Jun 2018 09:19:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <e338118bb6b9f560560887eb974eb250a6c89984.1528960095.git.sean.wang@mediatek.com>
-References: <cover.1528960095.git.sean.wang@mediatek.com> <e338118bb6b9f560560887eb974eb250a6c89984.1528960095.git.sean.wang@mediatek.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Thu, 14 Jun 2018 10:58:22 +0200
-Message-ID: <CAPDyKFqVpfhJf3R3jbXtjGgXf+0pg=9dgALBnxM_bSyBQrQQDQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/7] serdev: add dev_pm_domain_attach|detach()
-To: sean.wang@mediatek.com
-Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-mediatek@lists.infradead.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Rob Herring <robh@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
-	linux-serial@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <2575764.Np7OUyMvvF@ix>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 14 Jun 2018 at 09:14, <sean.wang@mediatek.com> wrote:
->
-> From: Sean Wang <sean.wang@mediatek.com>
->
-> In order to open up the required power gate before any operation can be
-> effectively performed over the serial bus between CPU and serdev, it's
-> clearly essential to add common attach functions for PM domains to serdev
-> at the probe phase.
->
-> Similarly, the relevant dettach function for the PM domains should be
-> properly and reversely added at the remove phase.
->
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Jiri Slaby <jslaby@suse.com>
-> Cc: linux-serial@vger.kernel.org
-> ---
->  drivers/tty/serdev/core.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> index df93b72..c93d8ee 100644
-> --- a/drivers/tty/serdev/core.c
-> +++ b/drivers/tty/serdev/core.c
-> @@ -13,6 +13,7 @@
->  #include <linux/module.h>
->  #include <linux/of.h>
->  #include <linux/of_device.h>
-> +#include <linux/pm_domain.h>
->  #include <linux/serdev.h>
->  #include <linux/slab.h>
->
-> @@ -330,8 +331,16 @@ EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
->  static int serdev_drv_probe(struct device *dev)
->  {
->         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
-> +       int ret;
-> +
-> +       ret = dev_pm_domain_attach(dev, true);
-> +       if (ret != -EPROBE_DEFER) {
+Hello,
+Thank you for your reply. This question dates a bit.
+I remember having to change my code a lot to make it work but I do not 
+know why it works now.
+I do not have any more odds in my python code:
 
->From 4.18 rc1 via commit 919b7308fcc4, dev_pm_domain_attach() will
-return better error codes.
+'write 0x' + ' 0x'.join(sString.encode('hex') for sString in (sString + 
+'\0'))
 
-I suggest to change the above error path to:
-if (ret)
-     return ret;
+Best,
+Manuel
 
-Then continue with the probing below.
-
-> +               ret = sdrv->probe(to_serdev_device(dev));
-> +               if (ret)
-> +                       dev_pm_domain_detach(dev, true);
-> +       }
+On 06/14/2018 12:54 AM, Szymon Janc wrote:
+> Hi,
 >
-> -       return sdrv->probe(to_serdev_device(dev));
-> +       return ret;
->  }
+> On Thursday, 8 March 2018 18:11:26 CEST Manuel Masiello wrote:
+>> Hello everybody,
+>>
+>> I write to the community because I have a problem using Bluetoothctl.
+>> I am looking to write in an attribute with the gatt command "Write".
+>>
+>> Here is my command line operation suite:
+>>
+>> $ bluetoothctl
+>>
+>> [bluetooth]# power on
+>> [bluetooth]# connect A6:41:29:67:30:ED
+>> [my_device]# menu gatt
+>> [my_device]# select-attribute
+>> /org/bluez/hci0/dev_A6_41_29_67_30_ED/service0034/char0035
+>> [my_device:/service0034/char0035]# write 0x41 0x54 0x2b 0x4e 0x69 0x6d
+>> 0x70 0x00
+>>
+>> This is where I have a problem. I never get an error message but the BLE
+>> device only receive the 1st byte 0x41.
+>> However, using Android applications like LightBlue or nRF Connect, it
+>> receives correctly what I seek sent.
+>> I scanned the net without finding an answer. I do not really understand
+>> why it does not work ...
+>>
+>>
+>> For information:
+>> Linux version 4.13.0-36-generic (buildd@lcy01-amd64-017) (gcc version
+>> 7.2.0 (Ubuntu 7.2.0-8ubuntu3.2)) #40-Ubuntu SMP Fri Feb 16 20:07:48 UTC 2018
+>>
+>> I only have "Bluetoothctl" to do the job because the Alpine Linux
+>> distribution contains nothing else:
+>> https://pkgs.alpinelinux.org/contents?file=&path=&name=bluez&branch=edge&rep
+>> o=main&arch=x86
+>>
+>> Is there anyone who can help me find my mistake?
+> Digging out this unanswered question as people seems to ask this on IRC too.
+> You need to use quotes:
+> write "0x41 0x54 0x2b 0x4e 0x69 0x6d 0x70 0x00"
 >
->  static int serdev_drv_remove(struct device *dev)
-> @@ -339,6 +348,9 @@ static int serdev_drv_remove(struct device *dev)
->         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
->         if (sdrv->remove)
->                 sdrv->remove(to_serdev_device(dev));
-> +
-> +       dev_pm_domain_detach(dev, true);
-> +
->         return 0;
->  }
->
-> --
-> 2.7.4
+> And yeah, this could be fixed to accept also 0x01020304 and no quotes for
+> conveniense:-)
 >
 
-Otherwise, this makes sense to me!
-
-Kind regards
-Uffe
