@@ -1,55 +1,71 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <andreas@kemnade.info>
+Date: Fri, 15 Jun 2018 07:45:26 +0200
+From: Andreas Kemnade <andreas@kemnade.info>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: marcel@holtmann.org, davem@davemloft.net,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH RFC] bluetooth: fix paring problems with 0cf3:0036 and
+ certain devices
+Message-ID: <20180615074526.3982da35@kemnade.info>
+In-Reply-To: <20180614203500.GA7182@x1c>
+References: <20180614193330.28410-1-andreas@kemnade.info>
+	<20180614203500.GA7182@x1c>
 MIME-Version: 1.0
-In-Reply-To: <1528919538-26014-1-git-send-email-tedd.an@linux.intel.com>
-References: <1528919538-26014-1-git-send-email-tedd.an@linux.intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 15 Jun 2018 09:41:00 +0300
-Message-ID: <CABBYNZ+UrOJVoCk4FCT0cU2PQwk_G49Knj10UtfmJ5QxDGw4Lw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] monitor: Fix printing params for HCI Intel DDC command
-To: Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tedd,
+Hi Johan,
 
-On Wed, Jun 13, 2018 at 10:52 PM, Tedd Ho-Jeong An
-<tedd.an@linux.intel.com> wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
->
-> The offset of value for HCI Intel DDC command is incorrect.
-> HCI Intel DDC parameter has a combination of following structure:
->
-> struct intel_ddc {
->         u8  len;
->         u16 id;
->         u8  *value;
-> }
->
-> The offset of value should be sum of len and id which is 3.
-> ---
->  monitor/intel.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/monitor/intel.c b/monitor/intel.c
-> index ce624be..4cd1788 100644
-> --- a/monitor/intel.c
-> +++ b/monitor/intel.c
-> @@ -437,7 +437,7 @@ static void ddc_config_write_cmd(const void *data, uint8_t size)
->                 uint16_t param_id = get_le16(data + 1);
->
->                 print_field("Identifier: 0x%4.4x", param_id);
-> -               packet_hexdump(data + 2, param_len - 2);
-> +               packet_hexdump(data + 3, param_len - 2);
->
->                 data += param_len + 1;
->                 size -= param_len + 1;
-> --
-> 2.7.4
+On Thu, 14 Jun 2018 22:35:00 +0200
+Johan Hedberg <johan.hedberg@gmail.com> wrote:
 
-Applied, thanks.
+> Hi Andreas,
+> 
+> On Thu, Jun 14, 2018, Andreas Kemnade wrote:
+> > This is clearly a RFC patch, things should be fixed in a cleaner
+> > way. With the bluetooth usb adapter 0cf3:0036 (Atheros), there are
+> > pairing problems in combination with certain remove devices. The
+> > cause is that smp_resume_cb() gets called after SMP_CMD_IDENT_INFO
+> > arrives in the end of a SC pairing with numerical comparison. so
+> > that there are unexpected packet messages in dmesg and although an
+> > ltk is known, bluetoothd considers the device as unpaired and not
+> > even the ltk is not stored.
+> > 
+> > The patch makes the smp code be more tolerant with the order but
+> > that does not feel like a safe thing to do.
+> > Maybe the pairing result should be given back to userspace without
+> > the irk related stuff.  
+> 
+> This sounds like the well known race between ACL data and HCI events
+> that's inherent with the way the USB HCI transport is designed. So
+> what's happening is that to the host it looks like some packets were
+> delivered over an unencrypted connection even though they in reality
+> came over an encrypted one. 
 
--- 
-Luiz Augusto von Dentz
+That matches what I thought. But then the question arises whether this
+race also can happen the oppositie way, so that the host thinks it gets
+an encrypted packet but that is really an unencrypted one? Ugly.
+
+But interrupt endpoints are designed for correct timing, so there
+might be something rotten in the adapter.
+
+> Not enforcing the encrypted connection
+> requirement is not really a solution since it creates a security
+> vulnerabilty. The best option (as far as I know) is to consider
+> switching to some other transport (e.g. H:4 over USB where both ACL
+> data and HCI events share a single "pipe").
+> 
+So can we convince the bluetooth adapter to speak H4? So that we add a
+quirk to use H4 for certain bluetooth adapters?
+
+A quick grep in the kernel does not show up an easy possibility to do
+so.
+
+Maybe a fix which would be a bit better would be to not completely
+ignore SMP_CMD_IDENT_ADDR_INFO (where the kernel has no doubt that it
+is encrypted) without SMP_CMD_IDENT_INFO, so userspace
+would not get a pairing timeout but instead a pairing without irk but
+with ltk?
+
+Regards,
+Andreas
