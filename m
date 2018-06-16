@@ -1,41 +1,33 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH COMMITTED] bluetooth: hci_nokia: Don't include
+Return-Path: <davem@davemloft.net>
+Date: Sat, 16 Jun 2018 16:40:59 -0700 (PDT)
+Message-Id: <20180616.164059.1116555189277956188.davem@davemloft.net>
+To: marcel@holtmann.org
+CC: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: [PATCH COMMITTED] bluetooth: hci_nokia: Don't include
  linux/unaligned/le_struct.h directly.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180616.164059.1116555189277956188.davem@davemloft.net>
-Date: Sun, 17 Jun 2018 09:42:03 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Message-Id: <ACBA32F4-EFD6-488C-B3F6-358C8882C322@holtmann.org>
-References: <20180616.164059.1116555189277956188.davem@davemloft.net>
-To: "David S. Miller" <davem@davemloft.net>
-Sender: netdev-owner@vger.kernel.org
+From: David Miller <davem@davemloft.net>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=iso-8859-7
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Dave,
-
-> This breaks the build as this header is not meant to be used in this
-> way.
-> 
-> ./include/linux/unaligned/access_ok.h:8:28: error: redefinition of ‘get_unaligned_le16’
-> static __always_inline u16 get_unaligned_le16(const void *p)
->                            ^~~~~~~~~~~~~~~~~~
-> In file included from drivers/bluetooth/hci_nokia.c:32:
-> ./include/linux/unaligned/le_struct.h:7:19: note: previous definition of ‘get_unaligned_le16’ was here
-> static inline u16 get_unaligned_le16(const void *p)
-> 
-> Use asm/unaligned.h instead.
-> 
-> Signed-off-by: David S. Miller <davem@davemloft.net>
-> ---
-> drivers/bluetooth/hci_nokia.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
+DQpUaGlzIGJyZWFrcyB0aGUgYnVpbGQgYXMgdGhpcyBoZWFkZXIgaXMgbm90IG1lYW50IHRvIGJl
+IHVzZWQgaW4gdGhpcw0Kd2F5Lg0KDQouL2luY2x1ZGUvbGludXgvdW5hbGlnbmVkL2FjY2Vzc19v
+ay5oOjg6Mjg6IGVycm9yOiByZWRlZmluaXRpb24gb2YgoWdldF91bmFsaWduZWRfbGUxNqINCiBz
+dGF0aWMgX19hbHdheXNfaW5saW5lIHUxNiBnZXRfdW5hbGlnbmVkX2xlMTYoY29uc3Qgdm9pZCAq
+cCkNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn4NCkluIGZp
+bGUgaW5jbHVkZWQgZnJvbSBkcml2ZXJzL2JsdWV0b290aC9oY2lfbm9raWEuYzozMjoNCi4vaW5j
+bHVkZS9saW51eC91bmFsaWduZWQvbGVfc3RydWN0Lmg6NzoxOTogbm90ZTogcHJldmlvdXMgZGVm
+aW5pdGlvbiBvZiChZ2V0X3VuYWxpZ25lZF9sZTE2oiB3YXMgaGVyZQ0KIHN0YXRpYyBpbmxpbmUg
+dTE2IGdldF91bmFsaWduZWRfbGUxNihjb25zdCB2b2lkICpwKQ0KDQpVc2UgYXNtL3VuYWxpZ25l
+ZC5oIGluc3RlYWQuDQoNClNpZ25lZC1vZmYtYnk6IERhdmlkIFMuIE1pbGxlciA8ZGF2ZW1AZGF2
+ZW1sb2Z0Lm5ldD4NCi0tLQ0KIGRyaXZlcnMvYmx1ZXRvb3RoL2hjaV9ub2tpYS5jIHwgMiArLQ0K
+IDEgZmlsZSBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KDQpkaWZmIC0t
+Z2l0IGEvZHJpdmVycy9ibHVldG9vdGgvaGNpX25va2lhLmMgYi9kcml2ZXJzL2JsdWV0b290aC9o
+Y2lfbm9raWEuYw0KaW5kZXggMTRkMTU5ZTIwNDJkLi4yZGMzM2U2NWQyZDAgMTAwNjQ0DQotLS0g
+YS9kcml2ZXJzL2JsdWV0b290aC9oY2lfbm9raWEuYw0KKysrIGIvZHJpdmVycy9ibHVldG9vdGgv
+aGNpX25va2lhLmMNCkBAIC0yOSw3ICsyOSw3IEBADQogI2luY2x1ZGUgPGxpbnV4L3NsYWIuaD4N
+CiAjaW5jbHVkZSA8bGludXgvc3RyaW5nLmg+DQogI2luY2x1ZGUgPGxpbnV4L3R5cGVzLmg+DQot
+I2luY2x1ZGUgPGxpbnV4L3VuYWxpZ25lZC9sZV9zdHJ1Y3QuaD4NCisjaW5jbHVkZSA8YXNtL3Vu
+YWxpZ25lZC5oPg0KICNpbmNsdWRlIDxuZXQvYmx1ZXRvb3RoL2JsdWV0b290aC5oPg0KICNpbmNs
+dWRlIDxuZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmg+DQogDQotLSANCjIuMTcuMQ0KDQo=
