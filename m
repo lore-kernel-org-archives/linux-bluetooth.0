@@ -1,78 +1,62 @@
-Return-Path: <swboyd@chromium.org>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>, johan.hedberg@gmail.com,
- marcel@holtmann.org, mka@chromium.org, robh@kernel.org,
- thierry.escande@linaro.org
-From: Stephen Boyd <swboyd@chromium.org>
-In-Reply-To: <20180616062718.29844-9-bgodavar@codeaurora.org>
-Cc: linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
- hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
- Balakrishna Godavarthi <bgodavar@codeaurora.org>
-References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-9-bgodavar@codeaurora.org>
-Message-ID: <152934015159.16708.15821626950761504540@swboyd.mtv.corp.google.com>
-Subject: Re: [PATCH v7 8/8] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
- chip wcn3990
-Date: Mon, 18 Jun 2018 09:42:31 -0700
+In-Reply-To: <1528978884-3882-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1528978884-3882-1-git-send-email-jaganathx.kanakkassery@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 18 Jun 2018 17:27:43 +0300
+Message-ID: <CABBYNZJLQ3iX4zaob6Q43zUjfwa8a26O6BJTBcpavR05BgYjfA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v3 00/11] Extended Adv, Scan, Connection and PHY support
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Quoting Balakrishna Godavarthi (2018-06-15 23:27:18)
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 28ae6a17a595..1961e313aae7 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1031,9 +1145,118 @@ static struct hci_uart_proto qca_proto =3D {
->         .dequeue        =3D qca_dequeue,
->  };
->  =
+Hi Jaganath,
 
-> +static const struct qca_vreg_data qca_cherokee_data =3D {
-> +       .soc_type =3D QCA_WCN3990,
-> +       .vregs =3D (struct qca_vreg []) {
-> +               { "vddio",   1352000, 1352000,  0 },
-> +               { "vddxtal", 1904000, 2040000,  0 },
-> +               { "vddcore", 1800000, 1800000,  1 },
-> +               { "vddpa",   1304000, 1304000,  1 },
-> +               { "vddldo",  3000000, 3312000,  1 },
+On Thu, Jun 14, 2018 at 3:21 PM, Jaganath Kanakkassery
+<jaganath.k.os@gmail.com> wrote:
+> This patch set adds new mgmt APIs for Get / Set PHY contiguration,
+> Set PHY in Advertising, added mgmt-tester for the new commands,
+> and also added btmgmt and monitor changes for the new commands
+> and events
+>
+> v2: Made emulator changes onto a seperate patch
+> v3: Applied Luiz's comments and fixed whitespace error
+>
+> Jaganath Kanakkassery (11):
+>   doc/mgmt-api: Add support for Set Phy Configuration command
+>   doc/mgmt-api: Add advertising phys support to flags
+>   monitor: Add support PHY management commands and event
+>   btmgmt: Add PHY configuration get/set commands
+>   monitor: Add support for Secondary PHY flags in Add Advertising
+>   btmgmt: Add support for setting PHY in add-adv
+>   emulator: Add 5.0 feature support
+>   mgmt-tester: Add extended advertising test cases
+>   mgmt-tester: Add PHY Configuration test cases
+>   mgmt-tester: Add tests for extended scanning and device found
+>   mgmt-tester: Add support ext create connection and enh conn complete
+>
+>  doc/mgmt-api.txt    |  106 +++
+>  emulator/btdev.c    |  448 +++++++++-
+>  emulator/btdev.h    |    1 +
+>  emulator/bthost.c   |   99 +++
+>  emulator/bthost.h   |    7 +
+>  emulator/hciemu.c   |    3 +
+>  emulator/hciemu.h   |    1 +
+>  lib/mgmt.h          |   36 +
+>  monitor/bt.h        |    1 +
+>  monitor/packet.c    |   68 ++
+>  tools/btmgmt.c      |  145 +++-
+>  tools/mgmt-tester.c | 2253 ++++++++++++++++++++++++++++++++++++++++++++++++---
+>  12 files changed, 3063 insertions(+), 105 deletions(-)
+>  mode change 100644 => 100755 tools/btmgmt.c
+>
+> --
+> 2.7.4
 
-Load of 0 and 1 seems sort of odd. Are these made up to indicate "some
-load" vs. "no load"?
+Patches 1-7 have been applied, thanks.
 
-> +       },
-> +       .num_vregs =3D 5,
-> +};
-> +
-> +static int qca_enable_regulator(struct qca_vreg vregs,
-> +                               struct regulator *regulator)
-> +{
-> +       int ret;
-> +
-> +       ret =3D regulator_set_voltage(regulator, vregs.min_uV,
-> +                                   vregs.max_uV);
-> +       if (ret)
-> +               goto out;
-
-Just return ret;
-
-> +
-> +       if (vregs.load_uA)
-> +               ret =3D regulator_set_load(regulator,
-> +                                        vregs.load_uA);
-> +
-> +       if (ret)
-> +               goto out;
-> +
-
-Same.
-
-> +       ret =3D regulator_enable(regulator);
-> +
-> +out:
-> +       return ret;
-
-And make this return regulator_enable(regulator).
-
-> +
-> +}
-> +
+-- 
+Luiz Augusto von Dentz
