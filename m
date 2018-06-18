@@ -1,71 +1,69 @@
-Return-Path: <mka@chromium.org>
-Date: Mon, 18 Jun 2018 12:42:37 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, robh@kernel.org,
-	thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
-	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 2/8] Bluetooth: btqca: Rename string ROME to QCA in
- logs.
-Message-ID: <20180618194237.GR88063@google.com>
-References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-3-bgodavar@codeaurora.org>
+Return-Path: <jprvita@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180616062718.29844-3-bgodavar@codeaurora.org>
+In-Reply-To: <259476D2-706B-4FA2-86DE-3A6BDCC6B7EC@holtmann.org>
+References: <20180618165739.13126-1-jprvita@endlessm.com> <259476D2-706B-4FA2-86DE-3A6BDCC6B7EC@holtmann.org>
+From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
+Date: Mon, 18 Jun 2018 11:57:14 -0700
+Message-ID: <CA+A7VXVT3e832EEF4TQusdM_hsH-wVw_DZyfwC5xxEzC09Vquw@mail.gmail.com>
+Subject: Re: [PATCH] monitor: Add option to disable SCO packets
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	Linux Upstreaming Team <linux@endlessm.com>, =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jun 16, 2018 at 11:57:12AM +0530, Balakrishna Godavarthi wrote:
-> To have generic text in bt_dev_info, bt_dev_err and bt_dev_dbg
-> updated from ROME to QCA where ever possible. This avoids
-> confusion to user, when using the future Qualcomm Bluetooth SoC's.
-> Updated BT_DBG, BT_ERR and BT_INFO with bt_dev_dbg, bt_dev_err and
-> bt_dev_info where ever applicable.
-> 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> Changes in v7:
-> 	* initial patch.
-> 	* Updated the logs to generic.
-> 
-> ---
->  drivers/bluetooth/btqca.c | 56 +++++++++++++++++++--------------------
->  1 file changed, 27 insertions(+), 29 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 8219816c54a0..a36fae1f3c2c 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -35,36 +35,35 @@ static int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
->  	char cmd;
->  	int err = 0;
->  
-> -	BT_DBG("%s: ROME Patch Version Request", hdev->name);
-> +	bt_dev_dbg(hdev, "QCA Version Request");
->  
->  	cmd = EDL_PATCH_VER_REQ_CMD;
->  	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
->  				&cmd, HCI_VENDOR_PKT, HCI_INIT_TIMEOUT);
->  	if (IS_ERR(skb)) {
->  		err = PTR_ERR(skb);
-> -		BT_ERR("%s: Failed to read version of ROME (%d)", hdev->name,
-> -		       err);
-> +		bt_dev_err(hdev, "Reading QCA version information failed (%d)",
-> +			   err);
+Hello Marcel, thanks for the quick reply.
 
-[Not really the scope of this patch/series, but an idea for a future
-improvement:
+On Mon, Jun 18, 2018 at 10:50 AM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+>
+> I am confused. I assumed I made SCO off by default.
+>
 
-Some error messages put the error code inside parentheses, others put
-it after a colon. Would be good to unify this (my preference would be
-after the colon).]
+Dumping the contents for SCO packets is OFF by default (enabled by
+-S), that is, the hex dump part on the output bellow:
 
-Shouldn't this patch be squashed with "[3/8] Bluetooth: btqca: Rename
-ROME related functions to Generic functions"? It's a bit odd to do the
-renaming of the functions and log entries in two steps, even though
-the end result is the same.
+  SCO Data RX: Handle 257 flags 0x00 dlen 48
 
-What would make sense is to have a separate patch for BT_XYZ() to
-bt_dev_xyz(), though it's probably ok to do it in the patch that
-changes the log strings.
+                                                               #3537
+[hci0] 16.106123
+        23 00 2b 00 20 00 06 00 0f 00 21 00 15 00 05 00  #.+. .....!.....
+        1d 00 13 00 ff ff 15 00 1b 00 f8 ff f1 ff 0f 00  ................
+        0f 00 fc ff f3 ff f8 ff f8 ff fa ff 02 00 00 00  ................
+
+But without -S we still log the header / flags part for each packet:
+
+  SCO Data RX: Handle 258 flags 0x00 dlen 48
+
+                                                               #3541
+[hci0] 14.128754
+
+> Anyhow, I don=E2=80=99t want to see tons of independent options. Since ne=
+xt thing is you tell me that AVDTP media channel is also something you want=
+ to filter out. So then we better find a generic way to apply filters and a=
+lso notifications about =E2=80=9Cdropped x packets due to filter=E2=80=9D k=
+inda hints.
+>
+
+My argument behind filtering out SCO is because AFAIU it is only data,
+not signaling. On a quick look I had assumed there was no easy way to
+separate AVDTP signaling from data, but on a second look is actually
+quite obvious, so you are right, that would be an obvious next step
+:-)
+
+Maybe we could hide the SCO and AVDTP media channels by default? In
+this case we could print a notification when the program starts that
+these channels are being suppressed, and / or every time the channel
+is established. That would be reflected on the package count printed
+with the timestamp, and I'm not sure if that would be a problem: is
+that number reflecting how many packets have been exchanged or
+printed?
+
+As much as I like the idea of a generic configurable filter, I can't
+look into that atm.
+
+Regards,
+
+--
+Jo=C3=A3o Paulo Rechi Vita
+http://about.me/jprvita
