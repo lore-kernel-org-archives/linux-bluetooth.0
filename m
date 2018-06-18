@@ -1,268 +1,106 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <robh@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1528978884-3882-5-git-send-email-jaganathx.kanakkassery@intel.com>
-References: <1528978884-3882-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1528978884-3882-5-git-send-email-jaganathx.kanakkassery@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 18 Jun 2018 16:44:27 +0300
-Message-ID: <CABBYNZJKUPnnBcc32PAd2o7mqr3EHiNTWiwMTvotbCqqGPcODA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 04/11] btmgmt: Add PHY configuration get/set commands
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+In-Reply-To: <20180616062718.29844-2-bgodavar@codeaurora.org>
+References: <20180616062718.29844-1-bgodavar@codeaurora.org> <20180616062718.29844-2-bgodavar@codeaurora.org>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 18 Jun 2018 07:29:54 -0600
+Message-ID: <CAL_JsqL5K-4LBEwS0ag=7M8cOp2nF+mRC+M03BinSj-YR0+b=Q@mail.gmail.com>
+Subject: Re: [PATCH v7 1/8] dt-bindings: net: bluetooth: Add device tree
+ bindings for QTI chip wcn3990
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Matthias Kaehlcke <mka@chromium.org>, Thierry Escande <thierry.escande@linaro.org>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, rtatiya@codeaurora.org,
+	hemantg@codeaurora.org, linux-arm-msm <linux-arm-msm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+On Sat, Jun 16, 2018 at 12:27 AM, Balakrishna Godavarthi
+<bgodavar@codeaurora.org> wrote:
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 
-On Thu, Jun 14, 2018 at 3:21 PM, Jaganath Kanakkassery
-<jaganath.k.os@gmail.com> wrote:
+Commit messag missing.
+
+Please use get_maintainers.pl and send patches to the right lists. DT
+list in this case.
+
 > ---
->  lib/mgmt.h     |  33 +++++++++++++++
->  tools/btmgmt.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 161 insertions(+)
->  mode change 100644 => 100755 tools/btmgmt.c
+> Changes in v7:
+>         * no change.
 >
-> diff --git a/lib/mgmt.h b/lib/mgmt.h
-> index 798a05e..7a25e17 100644
-> --- a/lib/mgmt.h
-> +++ b/lib/mgmt.h
-> @@ -101,6 +101,7 @@ struct mgmt_rp_read_index_list {
->  #define MGMT_SETTING_PRIVACY           0x00002000
->  #define MGMT_SETTING_CONFIGURATION     0x00004000
->  #define MGMT_SETTING_STATIC_ADDRESS    0x00008000
-> +#define MGMT_SETTING_PHY_CONFIGURATION 0x00010000
+> Changes in v6:
 >
->  #define MGMT_OP_READ_INFO              0x0004
->  struct mgmt_rp_read_info {
-> @@ -546,6 +547,30 @@ struct mgmt_cp_set_appearance {
->         uint16_t appearance;
->  } __packed;
+>         * Changed the oper-speed to max-speed.
 >
-> +#define MGMT_OP_GET_PHY_CONFIGURATION  0x0044
-> +struct mgmt_rp_get_phy_confguration {
-> +       uint16_t        supported_phys;
-> +       uint16_t        selected_phys;
-> +} __packed;
-> +
-> +#define MGMT_PHY_LE_1M_TX              0x0001
-> +#define MGMT_PHY_LE_1M_RX              0x0002
-> +#define MGMT_PHY_LE_2M_TX              0x0004
-> +#define MGMT_PHY_LE_2M_RX              0x0008
-> +#define MGMT_PHY_LE_CODED_TX           0x0010
-> +#define MGMT_PHY_LE_CODED_RX           0x0020
-> +
-> +#define MGMT_PHY_LE_TX_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_2M_TX | \
-> +                            MGMT_PHY_LE_CODED_TX)
-> +#define MGMT_PHY_LE_RX_MASK (MGMT_PHY_LE_1M_RX | MGMT_PHY_LE_2M_RX | \
-> +                            MGMT_PHY_LE_CODED_RX)
-> +
-> +#define MGMT_OP_SET_PHY_CONFIGURATION  0x0045
-> +struct mgmt_cp_set_phy_confguration {
-> +       uint16_t        default_phys;
-> +} __packed;
-> +
-> +
->  #define MGMT_EV_CMD_COMPLETE           0x0001
->  struct mgmt_ev_cmd_complete {
->         uint16_t opcode;
-> @@ -764,6 +789,11 @@ struct mgmt_ev_ext_info_changed {
->         uint8_t  eir[0];
->  } __packed;
+> Changes in v5:
 >
-> +#define MGMT_EV_PHY_CONFIGURATION_CHANGED      0x0026
-> +struct mgmt_ev_phy_configuration_changed {
-> +       uint16_t        selected_phys;
-> +} __packed;
+>         * Added entry for oper-speed and init-speed.
+>
+> ---
+>  .../bindings/net/qualcomm-bluetooth.txt       | 31 +++++++++++++++++--
+>  1 file changed, 29 insertions(+), 2 deletions(-)
+>
+> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> index 0ea18a53cc29..c4590bc87390 100644
+> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> @@ -10,12 +10,24 @@ device the slave device is attached to.
+>  Required properties:
+>   - compatible: should contain one of the following:
+>     * "qcom,qca6174-bt"
+> +   * "qcom,wcn3990-bt"
+>
+>  Optional properties:
+>   - enable-gpios: gpio specifier used to enable chip
+>   - clocks: clock provided to the controller (SUSCLK_32KHZ)
+> -
+> -Example:
+> + - vddpa-supply: Bluetooth VDD PA regulator handle
+> + - vddio-supply: Bluetooth VDD IO regulator handle
+> + - vddldo-supply: Bluetooth VDD LDO regulator handle. Kept under optional
+> +                 parameters as some of the chipsets doesn't require ldo or
+> +                 it may use from same vddio.
+
+You need to be explicit as to which properties apply or don't apply to
+specific compatible strings.
+
+Supplies should be based on inputs to the chip, so if 1 regulator
+supplies 2 inputs you still need both.
+
+> + - vddxtal-supply: Bluetooth VDD XTAL regulator handle
+> + - vddcore-supply: Bluetooth VDD CORE regulator handle
+> + - vddpwd-supply: Chip power down gpio is required when bluetooth module
+> +                 and other modules like wifi co-exist in a singe chip and
+> +                 shares a common gpio to bring chip out of reset.
+> + - max-speed: operating speed of the chip.
 > +
->  static const char *mgmt_op[] = {
->         "<0x0000>",
->         "Read Version",
-> @@ -833,6 +863,8 @@ static const char *mgmt_op[] = {
->         "Start Limited Discovery",
->         "Read Extended Controller Information",
->         "Set Appearance",
-> +       "Get PHY Configuration",
-> +       "Set PHY Configuration",
+> +Examples:
+>
+>  serial@7570000 {
+>         label = "BT-UART";
+> @@ -28,3 +40,18 @@ serial@7570000 {
+>                 clocks = <&divclk4>;
+>         };
 >  };
->
->  static const char *mgmt_ev[] = {
-> @@ -874,6 +906,7 @@ static const char *mgmt_ev[] = {
->         "Advertising Added",
->         "Advertising Removed",
->         "Extended Controller Information Changed",
-> +       "PHY Configuration Changed",
->  };
->
->  static const char *mgmt_status[] = {
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> old mode 100644
-> new mode 100755
-> index ef1a393..5379b11
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -4165,6 +4165,132 @@ static void cmd_appearance(int argc, char **argv)
->         }
->  }
->
-> +static const char *phys_str[] = {
-> +       "1MTX",
-> +       "1MRX",
-> +       "2MTX",
-> +       "2MRX",
-> +       "CODEDTX",
-> +       "CODEDRX",
+> +
+> +serial@898000 {
+> +       label = "BT-UART";
+> +       status = "okay";
+> +
+> +       bluetooth: bt_wcn3990 {
+
+Reverse these. The node name should be "bluetooth".
+
+> +               compatible = "qcom,wcn3990-bt";
+> +               vddio-supply = <&pm8998_s3>;
+> +               vddxtal-supply = <&pm8998_s5>;
+> +               vddcore-supply = <&pm8998_l7>;
+> +               vddpa-supply = <&pm8998_l17>;
+> +               vddldo-supply = <&pm8998_l25>;
+> +               max-speed = <3200000>;
+> +       };
 > +};
-> +
-> +static const char *phys2str(uint16_t phys)
-> +{
-> +       static char str[256];
-> +       unsigned i;
-> +       int off;
-> +
-> +       off = 0;
-> +       str[0] = '\0';
-> +
-> +       for (i = 0; i < NELEM(phys_str); i++) {
-> +               if ((phys & (1 << i)) != 0)
-> +                       off += snprintf(str + off, sizeof(str) - off, "%s ",
-> +                                                       phys_str[i]);
-> +       }
-> +
-> +       return str;
-> +}
-> +
-> +static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
-> +                                                       void *user_data)
-> +{
-> +       const struct mgmt_rp_get_phy_confguration *rp = param;
-> +       uint16_t supported_flags, selected_phys;
-> +
-> +       if (status != 0) {
-> +               error("Get PHY Configuration failed with status 0x%02x (%s)",
-> +                                               status, mgmt_errstr(status));
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       if (len < sizeof(*rp)) {
-> +               error("Too small get-phy reply (%u bytes)", len);
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       supported_flags = get_le16(&rp->supported_phys);
-> +       selected_phys = get_le16(&rp->selected_phys);
-> +
-> +       print("Supported phys: %s", phys2str(supported_flags));
-> +       print("Selected phys: %s", phys2str(selected_phys));
-> +
-> +       bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static void get_phy()
-> +{
-> +       uint16_t index;
-> +
-> +       index = mgmt_index;
-> +       if (index == MGMT_INDEX_NONE)
-> +               index = 0;
-> +
-> +       if (mgmt_send(mgmt, MGMT_OP_GET_PHY_CONFIGURATION, index, 0, NULL,
-> +                                       get_phy_rsp, NULL, NULL) == 0) {
-> +               error("Unable to send Get PHY cmd");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +}
-> +
-> +static void set_phy_rsp(uint8_t status, uint16_t len, const void *param,
-> +                                                       void *user_data)
-> +{
-> +       if (status != 0) {
-> +               error("Could not set PHY Configuration with status 0x%02x (%s)",
-> +                                               status, mgmt_errstr(status));
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       print("PHY Configuration successfully set");
-> +
-> +       bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +}
-> +
-> +static void cmd_phy(int argc, char **argv)
-> +{
-> +       struct mgmt_cp_set_phy_confguration cp;
-> +       int i;
-> +       uint16_t phys = 0;
-> +       uint16_t index;
-> +
-> +       if (argc < 2)
-> +               return get_phy();
-> +
-> +       for (i = 1; i < argc; i++) {
-> +               if (strcasecmp(argv[i], "1MTX") == 0)
-> +                       phys |= MGMT_PHY_LE_1M_TX;
-> +
-> +               if (strcasecmp(argv[i], "1MRX") == 0)
-> +                       phys |= MGMT_PHY_LE_1M_RX;
-> +
-> +               if (strcasecmp(argv[i], "2MTX") == 0)
-> +                       phys |= MGMT_PHY_LE_2M_TX;
-> +
-> +               if (strcasecmp(argv[i], "2MRX") == 0)
-> +                       phys |= MGMT_PHY_LE_2M_RX;
-> +
-> +               if (strcasecmp(argv[i], "CODEDTX") == 0)
-> +                       phys |= MGMT_PHY_LE_CODED_TX;
-> +
-> +               if (strcasecmp(argv[i], "CODEDRX") == 0)
-> +                       phys |= MGMT_PHY_LE_CODED_RX;
-> +       }
-> +
-> +       cp.default_phys = cpu_to_le16(phys);
-> +
-> +       index = mgmt_index;
-> +       if (index == MGMT_INDEX_NONE)
-> +               index = 0;
-> +
-> +       if (mgmt_send(mgmt, MGMT_OP_SET_PHY_CONFIGURATION, index, sizeof(cp),
-> +                                       &cp, set_phy_rsp, NULL, NULL) == 0) {
-> +               error("Unable to send %s cmd",
-> +                               mgmt_opstr(MGMT_OP_GET_PHY_CONFIGURATION));
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +}
-> +
->  static void register_mgmt_callbacks(struct mgmt *mgmt, uint16_t index)
->  {
->         mgmt_register(mgmt, MGMT_EV_CONTROLLER_ERROR, index, controller_error,
-> @@ -4360,6 +4486,8 @@ static const struct bt_shell_menu main_menu = {
->                 cmd_clr_adv,            "Clear advertising instances"   },
->         { "appearance",         "<appearance>",
->                 cmd_appearance,         "Set appearance"                },
-> +       { "phy",                "[phys]",
-> +               cmd_phy,                "Get/Set PHY Configuration"     },
->         {} },
->  };
->
 > --
-> 2.7.4
-
-Applying: btmgmt: Add PHY configuration get/set commands
-ERROR:EXECUTE_PERMISSIONS: do not set execute permissions for source files
-#75: FILE: tools/btmgmt.c
-
-WARNING:UNSPECIFIED_INT: Prefer 'unsigned int' to bare use of 'unsigned'
-#95: FILE: tools/btmgmt.c:4180:
-+    unsigned i;
-
-ERROR:FUNCTION_WITHOUT_ARGS: Bad function definition - void get_phy()
-should probably be void get_phy(void)
-#136: FILE: tools/btmgmt.c:4221:
-+static void get_phy()
-
-total: 2 errors, 1 warnings, 203 lines checked
-
-
-
--- 
-Luiz Augusto von Dentz
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+> a Linux Foundation Collaborative Project
+>
