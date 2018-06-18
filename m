@@ -1,67 +1,71 @@
 Return-Path: <mka@chromium.org>
-Date: Mon, 18 Jun 2018 12:59:38 -0700
+Date: Mon, 18 Jun 2018 12:42:37 -0700
 From: Matthias Kaehlcke <mka@chromium.org>
 To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com, robh@kernel.org,
 	thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
 	rtatiya@codeaurora.org, hemantg@codeaurora.org,
 	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 3/8] Bluetooth: btqca: Rename ROME related functions
- to Generic functions
-Message-ID: <20180618195938.GS88063@google.com>
+Subject: Re: [PATCH v7 2/8] Bluetooth: btqca: Rename string ROME to QCA in
+ logs.
+Message-ID: <20180618194237.GR88063@google.com>
 References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-4-bgodavar@codeaurora.org>
+ <20180616062718.29844-3-bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180616062718.29844-4-bgodavar@codeaurora.org>
+In-Reply-To: <20180616062718.29844-3-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jun 16, 2018 at 11:57:13AM +0530, Balakrishna Godavarthi wrote:
-> Some of the QCA BTSoC ROME functions, are used for different versions
-> or different make of BTSoC's. Instead of duplicating the same functions
-> for new chip, updating names of the functions that are used for both
-> chip's to keep this generic and would help in future when we would have
-> new BT SoC.
+On Sat, Jun 16, 2018 at 11:57:12AM +0530, Balakrishna Godavarthi wrote:
+> To have generic text in bt_dev_info, bt_dev_err and bt_dev_dbg
+> updated from ROME to QCA where ever possible. This avoids
+> confusion to user, when using the future Qualcomm Bluetooth SoC's.
+> Updated BT_DBG, BT_ERR and BT_INFO with bt_dev_dbg, bt_dev_err and
+> bt_dev_info where ever applicable.
 > 
 > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > ---
-> 
 > Changes in v7:
-> 	* updated the all the functions of ROME to generic.
-> 
-> Changes in v6:
-> 	* initial patch
-> 	* updated names of functions that are used for both the chips to 
-> 	  keep this generic and would help in future when we would have 
-> 	  new BT SoC.
+> 	* initial patch.
+> 	* Updated the logs to generic.
 > 
 > ---
-
-As per my comment on "[2/8] Bluetooth: btqca: Rename string ROME to
-QCA in logs.", it would probably make sense to squash these two
-patches.
-
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index 13d77fd873b6..d0ee96540636 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -37,7 +37,7 @@
->  #define EDL_TAG_ID_HCI			(17)
->  #define EDL_TAG_ID_DEEP_SLEEP		(27)
+>  drivers/bluetooth/btqca.c | 56 +++++++++++++++++++--------------------
+>  1 file changed, 27 insertions(+), 29 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index 8219816c54a0..a36fae1f3c2c 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -35,36 +35,35 @@ static int rome_patch_ver_req(struct hci_dev *hdev, u32 *rome_version)
+>  	char cmd;
+>  	int err = 0;
 >  
-> -enum qca_bardrate {
-> +enum qca_baudrate {
->  	QCA_BAUDRATE_115200 	= 0,
->  	QCA_BAUDRATE_57600,
->  	QCA_BAUDRATE_38400,
+> -	BT_DBG("%s: ROME Patch Version Request", hdev->name);
+> +	bt_dev_dbg(hdev, "QCA Version Request");
+>  
+>  	cmd = EDL_PATCH_VER_REQ_CMD;
+>  	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CMD_LEN,
+>  				&cmd, HCI_VENDOR_PKT, HCI_INIT_TIMEOUT);
+>  	if (IS_ERR(skb)) {
+>  		err = PTR_ERR(skb);
+> -		BT_ERR("%s: Failed to read version of ROME (%d)", hdev->name,
+> -		       err);
+> +		bt_dev_err(hdev, "Reading QCA version information failed (%d)",
+> +			   err);
 
-This is a bit sneaky, it is not related with the change nor mentioned
-in the commit message.
+[Not really the scope of this patch/series, but an idea for a future
+improvement:
 
-It is certainly a welcome change, but should be done in a separate
-patch (not necessarily in this series).
+Some error messages put the error code inside parentheses, others put
+it after a colon. Would be good to unify this (my preference would be
+after the colon).]
 
-The fact that only the enum declaration needs to be fixed indicates
-that the enum isn't used for variables/paramters/return values of this
-type. Also beyond the scope of this series, but using the enum type
-instead of int types would be another possible future improvement.
+Shouldn't this patch be squashed with "[3/8] Bluetooth: btqca: Rename
+ROME related functions to Generic functions"? It's a bit odd to do the
+renaming of the functions and log entries in two steps, even though
+the end result is the same.
+
+What would make sense is to have a separate patch for BT_XYZ() to
+bt_dev_xyz(), though it's probably ok to do it in the patch that
+changes the log strings.
