@@ -1,69 +1,48 @@
-Return-Path: <jprvita@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <259476D2-706B-4FA2-86DE-3A6BDCC6B7EC@holtmann.org>
-References: <20180618165739.13126-1-jprvita@endlessm.com> <259476D2-706B-4FA2-86DE-3A6BDCC6B7EC@holtmann.org>
-From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-Date: Mon, 18 Jun 2018 11:57:14 -0700
-Message-ID: <CA+A7VXVT3e832EEF4TQusdM_hsH-wVw_DZyfwC5xxEzC09Vquw@mail.gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
 Subject: Re: [PATCH] monitor: Add option to disable SCO packets
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180618165739.13126-1-jprvita@endlessm.com>
+Date: Mon, 18 Jun 2018 19:50:19 +0200
 Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Linux Upstreaming Team <linux@endlessm.com>, =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>
-Content-Type: text/plain; charset="UTF-8"
+        Linux Upstreaming Team <linux@endlessm.com>,
+        =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>
+Message-Id: <259476D2-706B-4FA2-86DE-3A6BDCC6B7EC@holtmann.org>
+References: <20180618165739.13126-1-jprvita@endlessm.com>
+To: =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel, thanks for the quick reply.
+Hi Joao Paulo,
 
-On Mon, Jun 18, 2018 at 10:50 AM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
->
-> I am confused. I assumed I made SCO off by default.
->
+> It is difficult to follow anything else happening when a SCO connection
+> is active, as the log gets floded with SCO packets. This adds an option
+> to disable dumping SCO packets.
+> ---
+> monitor/main.c   | 9 +++++++--
+> monitor/packet.c | 6 ++++--
+> monitor/packet.h | 1 +
+> 3 files changed, 12 insertions(+), 4 deletions(-)
+> 
+> diff --git a/monitor/main.c b/monitor/main.c
+> index 5fa87ea3f..6a8618c41 100644
+> --- a/monitor/main.c
+> +++ b/monitor/main.c
+> @@ -70,7 +70,8 @@ static void usage(void)
+> 		"\t-V, --vendor <compid>  Set default company identifier\n"
+> 		"\t-t, --time             Show time instead of time offset\n"
+> 		"\t-T, --date             Show time and date information\n"
+> -		"\t-S, --sco              Dump SCO traffic\n"
+> +		"\t-N, --no-sco-packets   Do not dump SCO packets\n"
+> +		"\t-S, --sco              Dump SCO traffic (without -N)\n”
 
-Dumping the contents for SCO packets is OFF by default (enabled by
--S), that is, the hex dump part on the output bellow:
+I am confused. I assumed I made SCO off by default.
 
-  SCO Data RX: Handle 257 flags 0x00 dlen 48
+Anyhow, I don’t want to see tons of independent options. Since next thing is you tell me that AVDTP media channel is also something you want to filter out. So then we better find a generic way to apply filters and also notifications about “dropped x packets due to filter” kinda hints.
 
-                                                               #3537
-[hci0] 16.106123
-        23 00 2b 00 20 00 06 00 0f 00 21 00 15 00 05 00  #.+. .....!.....
-        1d 00 13 00 ff ff 15 00 1b 00 f8 ff f1 ff 0f 00  ................
-        0f 00 fc ff f3 ff f8 ff f8 ff fa ff 02 00 00 00  ................
+Regards
 
-But without -S we still log the header / flags part for each packet:
+Marcel
 
-  SCO Data RX: Handle 258 flags 0x00 dlen 48
-
-                                                               #3541
-[hci0] 14.128754
-
-> Anyhow, I don=E2=80=99t want to see tons of independent options. Since ne=
-xt thing is you tell me that AVDTP media channel is also something you want=
- to filter out. So then we better find a generic way to apply filters and a=
-lso notifications about =E2=80=9Cdropped x packets due to filter=E2=80=9D k=
-inda hints.
->
-
-My argument behind filtering out SCO is because AFAIU it is only data,
-not signaling. On a quick look I had assumed there was no easy way to
-separate AVDTP signaling from data, but on a second look is actually
-quite obvious, so you are right, that would be an obvious next step
-:-)
-
-Maybe we could hide the SCO and AVDTP media channels by default? In
-this case we could print a notification when the program starts that
-these channels are being suppressed, and / or every time the channel
-is established. That would be reflected on the package count printed
-with the timestamp, and I'm not sure if that would be a problem: is
-that number reflecting how many packets have been exchanged or
-printed?
-
-As much as I like the idea of a generic configurable filter, I can't
-look into that atm.
-
-Regards,
-
---
-Jo=C3=A3o Paulo Rechi Vita
-http://about.me/jprvita
