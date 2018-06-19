@@ -2,116 +2,85 @@ Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
-Date: Tue, 19 Jun 2018 12:39:07 +0530
+Date: Tue, 19 Jun 2018 12:36:39 +0530
 From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 To: Matthias Kaehlcke <mka@chromium.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, robh@kernel.org,
  thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
  rtatiya@codeaurora.org, hemantg@codeaurora.org,
  linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 4/8] Bluetooth: btqca: Redefine qca_uart_setup() to
- generic function.
-In-Reply-To: <20180618211942.GT88063@google.com>
+Subject: Re: [PATCH v7 3/8] Bluetooth: btqca: Rename ROME related functions to
+ Generic functions
+In-Reply-To: <20180618195938.GS88063@google.com>
 References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-5-bgodavar@codeaurora.org>
- <20180618211942.GT88063@google.com>
-Message-ID: <fdd4fd89b53ba0fb85a53e4d4d33b0d5@codeaurora.org>
+ <20180616062718.29844-4-bgodavar@codeaurora.org>
+ <20180618195938.GS88063@google.com>
+Message-ID: <bdce6bde36a04e3a0f555a3ca3fe58de@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
+
 
 Hi Matthias,
 
-Please find my comments inline.
-
-On 2018-06-19 02:49, Matthias Kaehlcke wrote:
-> On Sat, Jun 16, 2018 at 11:57:14AM +0530, Balakrishna Godavarthi wrote:
->> Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
->> SoC, to use the same function instead of duplicating the function.
->> Added new arguments soc_type and soc_ver to the functions.
->> 
->> These arguments will help to decide type of firmware files
->> to be loaded into Bluetooth chip.
->> soc_type holds the Bluetooth chip connected to APPS processor.
->> soc_ver holds the Bluetooth chip version.
+On 2018-06-19 01:29, Matthias Kaehlcke wrote:
+> On Sat, Jun 16, 2018 at 11:57:13AM +0530, Balakrishna Godavarthi wrote:
+>> Some of the QCA BTSoC ROME functions, are used for different versions
+>> or different make of BTSoC's. Instead of duplicating the same 
+>> functions
+>> for new chip, updating names of the functions that are used for both
+>> chip's to keep this generic and would help in future when we would 
+>> have
+>> new BT SoC.
 >> 
 >> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 >> ---
 >> 
 >> Changes in v7:
+>> 	* updated the all the functions of ROME to generic.
+>> 
+>> Changes in v6:
 >> 	* initial patch
->> 	* redefined qca_uart_setup function to generic.
+>> 	* updated names of functions that are used for both the chips to
+>> 	  keep this generic and would help in future when we would have
+>> 	  new BT SoC.
 >> 
 >> ---
->>  drivers/bluetooth/btqca.c   | 23 ++++++++++++-----------
->>  drivers/bluetooth/btqca.h   | 13 +++++++++++--
->>  drivers/bluetooth/hci_qca.c |  3 ++-
->>  3 files changed, 25 insertions(+), 14 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
->> index c5cf9cab438a..f748730039cf 100644
->> --- a/drivers/bluetooth/btqca.c
->> +++ b/drivers/bluetooth/btqca.c
->> @@ -327,9 +327,9 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, 
->> const bdaddr_t *bdaddr)
->>  }
->>  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
->> 
->> -int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
->> +int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate, uint8_t 
->> soc_type,
 > 
-> Use 'enum qca_btsoc_type' as type for 'soc_type'.
+> As per my comment on "[2/8] Bluetooth: btqca: Rename string ROME to
+> QCA in logs.", it would probably make sense to squash these two
+> patches.
 > 
 
-[Bala]: will update.
+[Bala]: will squash [2/8] and [3/8] patches into one.
 
->> +		   u32 soc_ver)
->>  {
->> -	u32 rome_ver = 0;
->>  	struct rome_config config;
->>  	int err;
+>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>> index 13d77fd873b6..d0ee96540636 100644
+>> --- a/drivers/bluetooth/btqca.h
+>> +++ b/drivers/bluetooth/btqca.h
+>> @@ -37,7 +37,7 @@
+>>  #define EDL_TAG_ID_HCI			(17)
+>>  #define EDL_TAG_ID_DEEP_SLEEP		(27)
 >> 
->> @@ -337,19 +337,20 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
->> baudrate)
->> 
->>  	config.user_baud_rate = baudrate;
->> 
->> -	/* Get QCA version information */
->> -	err = qca_read_soc_version(hdev, &rome_ver);
->> -	if (err < 0 || rome_ver == 0) {
->> -		bt_dev_err(hdev, "QCA Failed to get version %d", err);
->> -		return err;
->> +	if (!soc_ver) {
->> +		/* Get QCA version information */
->> +		err = qca_read_soc_version(hdev, &soc_ver);
->> +		if (err < 0 || soc_ver == 0) {
->> +			bt_dev_err(hdev, "QCA Failed to get version %d", err);
->> +			return err;
->> +		}
->> +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
->>  	}
+>> -enum qca_bardrate {
+>> +enum qca_baudrate {
+>>  	QCA_BAUDRATE_115200 	= 0,
+>>  	QCA_BAUDRATE_57600,
+>>  	QCA_BAUDRATE_38400,
 > 
-> Why is this needed? A caller that passes in soc_ver = 0 could just
-> call qca_read_soc_version() themselves.
-[Bala]: hci_qca support two chip one ROME (already up-streamed) and 
-other wcn3990.
-         there setup sequence differs.
+> This is a bit sneaky, it is not related with the change nor mentioned
+> in the commit message.
+> 
+> It is certainly a welcome change, but should be done in a separate
+> patch (not necessarily in this series).
+> 
+> The fact that only the enum declaration needs to be fixed indicates
+> that the enum isn't used for variables/paramters/return values of this
+> type. Also beyond the scope of this series, but using the enum type
+> instead of int types would be another possible future improvement.
 
-         wcn3900:
-         1. set baudrate to 115200
-         2. read soc version
-         3. set baudarte to 3.2Mbps
-         4. download firmware. (calls qca_uart_setup)
+[Bala]: while reviewing the code, i found this. will leave it for now.
+         once this series of patches are done. will send this change in 
+different series.
 
-        ROME:
-        1. set baudrate to 3.0 mbps
-        2. calls qca_uart_setup to read soc version and download 
-firmware.
-
-       so to make use of existing function qca_setup_uart(). passing 
-soc_ver as argument.
-       if soc_ver is zero, then read soc version (i.e. for ROME chip).
-
-       Pls let me know, if you have any queries.
 -- 
 Regards
 Balakrishna.
