@@ -1,152 +1,57 @@
-Return-Path: <bgodavar@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Wed, 20 Jun 2018 16:23:25 +0530
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
- thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
- rtatiya@codeaurora.org, hemantg@codeaurora.org,
- linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 4/8] Bluetooth: btqca: Redefine qca_uart_setup() to
- generic function.
-In-Reply-To: <20180619200338.GD169030@google.com>
-References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-5-bgodavar@codeaurora.org>
- <20180618211942.GT88063@google.com>
- <fdd4fd89b53ba0fb85a53e4d4d33b0d5@codeaurora.org>
- <20180619200338.GD169030@google.com>
-Message-ID: <f37214cb19823893f2679787139ec471@codeaurora.org>
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+From: Michael Scott <michael@opensourcefoundries.com>
+Cc: Michael Scott <michael@opensourcefoundries.com>,
+        Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] 6lowpan: iphc: reset mac_header after decompress to fix panic
+Date: Tue, 19 Jun 2018 16:44:06 -0700
+Message-Id: <20180619234406.8217-1-michael@opensourcefoundries.com>
+To: unlisted-recipients:; (no To-header on input)
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Matthias,
+After decompression of 6lowpan socket data, an IPv6 header is inserted
+before the existing socket payload.  After this, we reset the
+network_header value of the skb to account for the difference in payload
+size from prior to decompression + the addition of the IPv6 header.
 
-On 2018-06-20 01:33, Matthias Kaehlcke wrote:
-> On Tue, Jun 19, 2018 at 12:39:07PM +0530, Balakrishna Godavarthi wrote:
->> Hi Matthias,
->> 
->> Please find my comments inline.
->> 
->> On 2018-06-19 02:49, Matthias Kaehlcke wrote:
->> > On Sat, Jun 16, 2018 at 11:57:14AM +0530, Balakrishna Godavarthi wrote:
->> > > Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
->> > > SoC, to use the same function instead of duplicating the function.
->> > > Added new arguments soc_type and soc_ver to the functions.
->> > >
->> > > These arguments will help to decide type of firmware files
->> > > to be loaded into Bluetooth chip.
->> > > soc_type holds the Bluetooth chip connected to APPS processor.
->> > > soc_ver holds the Bluetooth chip version.
->> > >
->> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> > > ---
->> > >
->> > > Changes in v7:
->> > > 	* initial patch
->> > > 	* redefined qca_uart_setup function to generic.
->> > >
->> > > ---
->> > >  drivers/bluetooth/btqca.c   | 23 ++++++++++++-----------
->> > >  drivers/bluetooth/btqca.h   | 13 +++++++++++--
->> > >  drivers/bluetooth/hci_qca.c |  3 ++-
->> > >  3 files changed, 25 insertions(+), 14 deletions(-)
->> > >
->> > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
->> > > index c5cf9cab438a..f748730039cf 100644
->> > > --- a/drivers/bluetooth/btqca.c
->> > > +++ b/drivers/bluetooth/btqca.c
->> > > @@ -327,9 +327,9 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,
->> > > const bdaddr_t *bdaddr)
->> > >  }
->> > >  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
->> > >
->> > > -int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
->> > > +int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate, uint8_t
->> > > soc_type,
->> >
->> > Use 'enum qca_btsoc_type' as type for 'soc_type'.
->> >
->> 
->> [Bala]: will update.
->> 
->> > > +		   u32 soc_ver)
->> > >  {
->> > > -	u32 rome_ver = 0;
->> > >  	struct rome_config config;
->> > >  	int err;
->> > >
->> > > @@ -337,19 +337,20 @@ int qca_uart_setup(struct hci_dev *hdev,
->> > > uint8_t baudrate)
->> > >
->> > >  	config.user_baud_rate = baudrate;
->> > >
->> > > -	/* Get QCA version information */
->> > > -	err = qca_read_soc_version(hdev, &rome_ver);
->> > > -	if (err < 0 || rome_ver == 0) {
->> > > -		bt_dev_err(hdev, "QCA Failed to get version %d", err);
->> > > -		return err;
->> > > +	if (!soc_ver) {
->> > > +		/* Get QCA version information */
->> > > +		err = qca_read_soc_version(hdev, &soc_ver);
->> > > +		if (err < 0 || soc_ver == 0) {
->> > > +			bt_dev_err(hdev, "QCA Failed to get version %d", err);
->> > > +			return err;
->> > > +		}
->> > > +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
->> > >  	}
->> >
->> > Why is this needed? A caller that passes in soc_ver = 0 could just
->> > call qca_read_soc_version() themselves.
->> [Bala]: hci_qca support two chip one ROME (already up-streamed) and 
->> other
->> wcn3990.
->>         there setup sequence differs.
->> 
->>         wcn3900:
->>         1. set baudrate to 115200
->>         2. read soc version
->>         3. set baudarte to 3.2Mbps
->>         4. download firmware. (calls qca_uart_setup)
->> 
->>        ROME:
->>        1. set baudrate to 3.0 mbps
->>        2. calls qca_uart_setup to read soc version and download 
->> firmware.
->> 
->>       so to make use of existing function qca_setup_uart(). passing 
->> soc_ver
->> as argument.
->>       if soc_ver is zero, then read soc version (i.e. for ROME chip).
->> 
->>       Pls let me know, if you have any queries.
-> 
-> I don't really understand this argumentation. Let's look at the code
-> at the end of this series, where both Rome and wcn3900 are supported:
-> 
-> https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1059
-> 
-> The version could be read (for Rome only) after setting the operating 
-> speed:
+However, we fail to reset the mac_header value.
 
-[Bala]: yes we can read SoC version after setting operating baud rate. 
-an advice from SoC vendor that, read SoC version before setting 
-operating speed.
-         one advantage from reading SoC version before setting operating 
-baudrate,it will helps us to understand whether the soc is responding to 
-any commands in default baud rate
-         before setting operating speed.
-> 
-> https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1111
-> 
-> I concede that having two "if (qcadev->btsoc_type == XYZ)" branches in
-> qca_setup() is kinda ugly, but I think it's still better than the
-> conditional call of qca_read_soc_version() in qca_uart_setup().
+Leaving the mac_header value untouched here, can cause a calculation
+error in net/packet/af_packet.c packet_rcv() function when an
+AF_PACKET socket is opened in SOCK_RAW mode for use on a 6lowpan
+interface.
 
-[Bala]: we require an if-else block  for soc type.As wcn3900 support 
-hardware flow control where as ROME is not supporting hardware flow 
-control.
+On line 2088, the data pointer is moved backward by the value returned
+from skb_mac_header().  If skb->data is adjusted so that it is before
+the skb->head pointer (which can happen when an old value of mac_header
+is left in place) the kernel generates a panic in net/core/skbuff.c
+line 1717.
 
+This panic can be generated by BLE 6lowpan interfaces (such as bt0) and
+802.15.4 interfaces (such as lowpan0) as they both use the same 6lowpan
+sources for compression and decompression.
+
+Signed-off-by: Michael Scott <michael@opensourcefoundries.com>
+---
+ net/6lowpan/iphc.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+index 6b1042e21656..52fad5dad9f7 100644
+--- a/net/6lowpan/iphc.c
++++ b/net/6lowpan/iphc.c
+@@ -770,6 +770,7 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+ 		hdr.hop_limit, &hdr.daddr);
+ 
+ 	skb_push(skb, sizeof(hdr));
++	skb_reset_mac_header(skb);
+ 	skb_reset_network_header(skb);
+ 	skb_copy_to_linear_data(skb, &hdr, sizeof(hdr));
+ 
 -- 
-Regards
-Balakrishna.
+2.17.0
+
