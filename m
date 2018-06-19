@@ -2,222 +2,116 @@ Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
-Date: Tue, 19 Jun 2018 12:41:37 +0530
+Date: Tue, 19 Jun 2018 12:39:07 +0530
 From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 To: Matthias Kaehlcke <mka@chromium.org>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
  thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
  rtatiya@codeaurora.org, hemantg@codeaurora.org,
  linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 5/8] Bluetooth: hci_qca: Defined wrapper functions for
- setting UART speeds
-In-Reply-To: <20180618215128.GU88063@google.com>
+Subject: Re: [PATCH v7 4/8] Bluetooth: btqca: Redefine qca_uart_setup() to
+ generic function.
+In-Reply-To: <20180618211942.GT88063@google.com>
 References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-6-bgodavar@codeaurora.org>
- <20180618215128.GU88063@google.com>
-Message-ID: <36000c0c93849527efdc19f6a6dc106e@codeaurora.org>
+ <20180616062718.29844-5-bgodavar@codeaurora.org>
+ <20180618211942.GT88063@google.com>
+Message-ID: <fdd4fd89b53ba0fb85a53e4d4d33b0d5@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Matthias,
+Hi Matthias,
 
-Please find my comments in line.
+Please find my comments inline.
 
-On 2018-06-19 03:21, Matthias Kaehlcke wrote:
-> On Sat, Jun 16, 2018 at 11:57:15AM +0530, Balakrishna Godavarthi wrote:
->> Subject: Bluetooth: hci_qca: Defined wrapper functions for setting
->>          UART speeds
-> 
-> s/Defined/Define/
-> 
-> or
-> 
-> s/Defined/Add/
-> 
-[Bala]: will update the text.
+On 2018-06-19 02:49, Matthias Kaehlcke wrote:
+> On Sat, Jun 16, 2018 at 11:57:14AM +0530, Balakrishna Godavarthi wrote:
+>> Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
+>> SoC, to use the same function instead of duplicating the function.
+>> Added new arguments soc_type and soc_ver to the functions.
 >> 
->> In qca_setup, we set initial and operating speeds for Qualcomm
->> Bluetooth SoC's. This block of code is common across different
->> Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
->> a wrapper function to set the speeds. So that future coming SoC's
->> can use these wrapper functions to set speeds.
+>> These arguments will help to decide type of firmware files
+>> to be loaded into Bluetooth chip.
+>> soc_type holds the Bluetooth chip connected to APPS processor.
+>> soc_ver holds the Bluetooth chip version.
 >> 
 >> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 >> ---
 >> 
 >> Changes in v7:
 >> 	* initial patch
->> 	* created wrapper functions for init and operating speeds.
+>> 	* redefined qca_uart_setup function to generic.
 >> 
 >> ---
->>  drivers/bluetooth/hci_qca.c | 64 
->> ++++++++++++++++++++++++++-----------
->>  1 file changed, 45 insertions(+), 19 deletions(-)
+>>  drivers/bluetooth/btqca.c   | 23 ++++++++++++-----------
+>>  drivers/bluetooth/btqca.h   | 13 +++++++++++--
+>>  drivers/bluetooth/hci_qca.c |  3 ++-
+>>  3 files changed, 25 insertions(+), 14 deletions(-)
 >> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index fe62420ef838..3e09c6223baf 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -923,21 +923,10 @@ static inline void host_set_baudrate(struct 
->> hci_uart *hu, unsigned int speed)
->>  		hci_uart_set_baudrate(hu, speed);
+>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>> index c5cf9cab438a..f748730039cf 100644
+>> --- a/drivers/bluetooth/btqca.c
+>> +++ b/drivers/bluetooth/btqca.c
+>> @@ -327,9 +327,9 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, 
+>> const bdaddr_t *bdaddr)
 >>  }
+>>  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
 >> 
->> -static int qca_setup(struct hci_uart *hu)
->> +static void qca_set_init_speed(struct hci_uart *hu)
->>  {
->> -	struct hci_dev *hdev = hu->hdev;
->> -	struct qca_data *qca = hu->priv;
->> -	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->> -	int ret;
->> -	int soc_ver = 0;
->> -
->> -	bt_dev_info(hdev, "ROME setup");
->> -
->> -	/* Patch downloading has to be done without IBS mode */
->> -	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> +	unsigned int speed = 0;
->> 
->> -	/* Setup initial baudrate */
->> -	speed = 0;
->>  	if (hu->init_speed)
->>  		speed = hu->init_speed;
->>  	else if (hu->proto->init_speed)
->> @@ -945,27 +934,64 @@ static int qca_setup(struct hci_uart *hu)
->> 
->>  	if (speed)
->>  		host_set_baudrate(hu, speed);
->> +}
->> +
->> +static int qca_get_oper_speed(struct hci_uart *hu)
+>> -int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
+>> +int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate, uint8_t 
+>> soc_type,
 > 
-> Return type should be unsigned int.
+> Use 'enum qca_btsoc_type' as type for 'soc_type'.
 > 
-[Bala]: will update
->> +{
->> +	unsigned int speed = 0;
->> 
->> -	/* Setup user speed if needed */
->> -	speed = 0;
->>  	if (hu->oper_speed)
->>  		speed = hu->oper_speed;
->>  	else if (hu->proto->oper_speed)
->>  		speed = hu->proto->oper_speed;
->> 
->> +	return speed;
->> +}
->> +
->> +static int qca_set_oper_speed(struct hci_uart *hu)
->> +{
->> +	unsigned int speed = 0, qca_baudrate;
-> 
-> initialization is not needed.
-> 
-[Bala]: will update
 
->> +	int ret = 0;
->> +
->> +	speed = qca_get_oper_speed(hu);
->>  	if (speed) {
-> 
-> nit:
-> 	if (!speed)
-> 		return 0;
-> 
-> 
 [Bala]: will update.
 
->>  		qca_baudrate = qca_get_baudrate_value(speed);
->> -
->> -		bt_dev_info(hdev, "Set UART speed to %d", speed);
->> -		ret = qca_set_baudrate(hdev, qca_baudrate);
->> +		bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
->> +		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
->>  		if (ret) {
->> -			bt_dev_err(hdev, "Failed to change the baud rate (%d)",
->> +			bt_dev_err(hu->hdev, "Failed to change the baud rate (%d)",
->>  				   ret);
->>  			return ret;
->>  		}
->>  		host_set_baudrate(hu, speed);
->>  	}
+>> +		   u32 soc_ver)
+>>  {
+>> -	u32 rome_ver = 0;
+>>  	struct rome_config config;
+>>  	int err;
 >> 
->> +	return ret;
->> +}
->> +
->> +static int qca_setup(struct hci_uart *hu)
->> +{
->> +	struct hci_dev *hdev = hu->hdev;
->> +	struct qca_data *qca = hu->priv;
->> +	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->> +	int ret;
->> +	int soc_ver = 0;
->> +
->> +	bt_dev_info(hdev, "ROME setup");
->> +
->> +	/* Patch downloading has to be done without IBS mode */
->> +	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> +
->> +	/* Setup initial baudrate */
->> +	qca_set_init_speed(hu);
->> +	/* Setup user speed if needed */
->> +	ret = qca_set_oper_speed(hu);
->> +	if (ret)
->> +		return ret;
->> +	speed = qca_get_oper_speed(hu);
->> +	if (speed)
->> +		qca_baudrate = qca_get_baudrate_value(speed);
+>> @@ -337,19 +337,20 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+>> baudrate)
+>> 
+>>  	config.user_baud_rate = baudrate;
+>> 
+>> -	/* Get QCA version information */
+>> -	err = qca_read_soc_version(hdev, &rome_ver);
+>> -	if (err < 0 || rome_ver == 0) {
+>> -		bt_dev_err(hdev, "QCA Failed to get version %d", err);
+>> -		return err;
+>> +	if (!soc_ver) {
+>> +		/* Get QCA version information */
+>> +		err = qca_read_soc_version(hdev, &soc_ver);
+>> +		if (err < 0 || soc_ver == 0) {
+>> +			bt_dev_err(hdev, "QCA Failed to get version %d", err);
+>> +			return err;
+>> +		}
+>> +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+>>  	}
 > 
-> nit: the sequence
-> 
-> qca_set_oper_speed()
-> qca_get_oper_speed()
-> 
-> is slightly awkward to read. This could be avoided if the speed was
-> passed as parameter, though I understand this isn't done for symmetry
-> with qca_set_init_speed(). An alternative could be:
-> 
-> static int qca_set_speed(struct hci_uart *hu, unsigned int speed, enum
->     qca_speed_type speed_type)
-> {
-> 	unsigned int qca_baudrate;
-> 
-> 	if (speed_type == QCA_OPER_SPEED) {
-> 		qca_baudrate = qca_get_baudrate_value(speed);
-> 		bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
-> 		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
-> 		if (ret) {
-> 			bt_dev_err(hu->hdev, "Failed to change the baud rate (%d)",
-> 				ret);
-> 			return ret;
-> 		}
-> 	}
-> 
-> 	host_set_baudrate(hu, speed);
-> 
-> 	/* If the order doesn't matter set the host baudrate first and
-> 	   return if speed_type != QCA_OPER_SPEED */
-> 
-> 	return 0;
-> }
-> 
-> static int qca_setup(struct hci_uart *hu)
-> {
-> 	...
-> 	speed = qca_get_init_speed(hu);
-> 	if (speed)
-> 		qca_set_speed(hu, speed, QCA_INIT_SPEED);
-> 
-> 	speed = qca_get_oper_speed(hu);
-> 	if (speed) {
-> 	   	qca_set_speed(hu, speed, QCA_OPER_SPEED);
-> 		qca_baudrate = qca_get_baudrate_value(speed);
-> 	}
-> 	...
-> }
-> 
-> Just a suggestion, ok for me if you prefer to keep it as is.
+> Why is this needed? A caller that passes in soc_ver = 0 could just
+> call qca_read_soc_version() themselves.
+[Bala]: hci_qca support two chip one ROME (already up-streamed) and 
+other wcn3990.
+         there setup sequence differs.
 
-[Bala]: will study and update the same.
+         wcn3900:
+         1. set baudrate to 115200
+         2. read soc version
+         3. set baudarte to 3.2Mbps
+         4. download firmware. (calls qca_uart_setup)
+
+        ROME:
+        1. set baudrate to 3.0 mbps
+        2. calls qca_uart_setup to read soc version and download 
+firmware.
+
+       so to make use of existing function qca_setup_uart(). passing 
+soc_ver as argument.
+       if soc_ver is zero, then read soc version (i.e. for ROME chip).
+
+       Pls let me know, if you have any queries.
 -- 
 Regards
 Balakrishna.
