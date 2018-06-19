@@ -1,138 +1,127 @@
 Return-Path: <mka@chromium.org>
-Date: Tue, 19 Jun 2018 14:53:02 -0700
+Date: Tue, 19 Jun 2018 13:03:38 -0700
 From: Matthias Kaehlcke <mka@chromium.org>
 To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, robh@kernel.org,
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
 	thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
 	rtatiya@codeaurora.org, hemantg@codeaurora.org,
 	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 8/8] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth chip wcn3990
-Message-ID: <20180619215302.GF169030@google.com>
+Subject: Re: [PATCH v7 4/8] Bluetooth: btqca: Redefine qca_uart_setup() to
+ generic function.
+Message-ID: <20180619200338.GD169030@google.com>
 References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-9-bgodavar@codeaurora.org>
+ <20180616062718.29844-5-bgodavar@codeaurora.org>
+ <20180618211942.GT88063@google.com>
+ <fdd4fd89b53ba0fb85a53e4d4d33b0d5@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180616062718.29844-9-bgodavar@codeaurora.org>
+In-Reply-To: <fdd4fd89b53ba0fb85a53e4d4d33b0d5@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sat, Jun 16, 2018 at 11:57:18AM +0530, Balakrishna Godavarthi wrote:
-> Add support to set voltage/current of various regulators
-> to power up/down Bluetooth chip wcn3990.
+On Tue, Jun 19, 2018 at 12:39:07PM +0530, Balakrishna Godavarthi wrote:
+> Hi Matthias,
 > 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 28ae6a17a595..1961e313aae7 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -402,6 +441,7 @@ static int qca_open(struct hci_uart *hu)
->  {
->  	struct qca_serdev *qcadev;
->  	struct qca_data *qca;
-> +	int ret = 0;
->  
->  	BT_DBG("hu %p qca_open", hu);
->  
-> @@ -463,13 +503,19 @@ static int qca_open(struct hci_uart *hu)
->  		serdev_device_open(hu->serdev);
->  
->  		qcadev = serdev_device_get_drvdata(hu->serdev);
-> -		gpiod_set_value_cansleep(qcadev->bt_en, 1);
-> +		if (qcadev->btsoc_type == QCA_WCN3990) {
-> +			hu->init_speed = qcadev->init_speed;
-> +			hu->oper_speed = qcadev->oper_speed;
-> +			ret = qca_btsoc_power_setup(hu, true);
+> Please find my comments inline.
+> 
+> On 2018-06-19 02:49, Matthias Kaehlcke wrote:
+> > On Sat, Jun 16, 2018 at 11:57:14AM +0530, Balakrishna Godavarthi wrote:
+> > > Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
+> > > SoC, to use the same function instead of duplicating the function.
+> > > Added new arguments soc_type and soc_ver to the functions.
+> > > 
+> > > These arguments will help to decide type of firmware files
+> > > to be loaded into Bluetooth chip.
+> > > soc_type holds the Bluetooth chip connected to APPS processor.
+> > > soc_ver holds the Bluetooth chip version.
+> > > 
+> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> > > ---
+> > > 
+> > > Changes in v7:
+> > > 	* initial patch
+> > > 	* redefined qca_uart_setup function to generic.
+> > > 
+> > > ---
+> > >  drivers/bluetooth/btqca.c   | 23 ++++++++++++-----------
+> > >  drivers/bluetooth/btqca.h   | 13 +++++++++++--
+> > >  drivers/bluetooth/hci_qca.c |  3 ++-
+> > >  3 files changed, 25 insertions(+), 14 deletions(-)
+> > > 
+> > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> > > index c5cf9cab438a..f748730039cf 100644
+> > > --- a/drivers/bluetooth/btqca.c
+> > > +++ b/drivers/bluetooth/btqca.c
+> > > @@ -327,9 +327,9 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,
+> > > const bdaddr_t *bdaddr)
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+> > > 
+> > > -int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
+> > > +int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate, uint8_t
+> > > soc_type,
+> > 
+> > Use 'enum qca_btsoc_type' as type for 'soc_type'.
+> > 
+> 
+> [Bala]: will update.
+> 
+> > > +		   u32 soc_ver)
+> > >  {
+> > > -	u32 rome_ver = 0;
+> > >  	struct rome_config config;
+> > >  	int err;
+> > > 
+> > > @@ -337,19 +337,20 @@ int qca_uart_setup(struct hci_dev *hdev,
+> > > uint8_t baudrate)
+> > > 
+> > >  	config.user_baud_rate = baudrate;
+> > > 
+> > > -	/* Get QCA version information */
+> > > -	err = qca_read_soc_version(hdev, &rome_ver);
+> > > -	if (err < 0 || rome_ver == 0) {
+> > > -		bt_dev_err(hdev, "QCA Failed to get version %d", err);
+> > > -		return err;
+> > > +	if (!soc_ver) {
+> > > +		/* Get QCA version information */
+> > > +		err = qca_read_soc_version(hdev, &soc_ver);
+> > > +		if (err < 0 || soc_ver == 0) {
+> > > +			bt_dev_err(hdev, "QCA Failed to get version %d", err);
+> > > +			return err;
+> > > +		}
+> > > +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+> > >  	}
+> > 
+> > Why is this needed? A caller that passes in soc_ver = 0 could just
+> > call qca_read_soc_version() themselves.
+> [Bala]: hci_qca support two chip one ROME (already up-streamed) and other
+> wcn3990.
+>         there setup sequence differs.
+> 
+>         wcn3900:
+>         1. set baudrate to 115200
+>         2. read soc version
+>         3. set baudarte to 3.2Mbps
+>         4. download firmware. (calls qca_uart_setup)
+> 
+>        ROME:
+>        1. set baudrate to 3.0 mbps
+>        2. calls qca_uart_setup to read soc version and download firmware.
+> 
+>       so to make use of existing function qca_setup_uart(). passing soc_ver
+> as argument.
+>       if soc_ver is zero, then read soc version (i.e. for ROME chip).
+> 
+>       Pls let me know, if you have any queries.
 
-Better do this before starting the timers, otherwise you need to take
-care of stopping them in case of failure.
+I don't really understand this argumentation. Let's look at the code
+at the end of this series, where both Rome and wcn3900 are supported:
 
-If qca_btsoc_power_setup() fails you also have to free
-'qca->workqueue' and 'qca'.
+https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1059
 
-> +static int qca_send_vendor_cmd(struct hci_dev *hdev, u8 cmd)
-> +{
-> +	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	struct qca_data *qca = hu->priv;
-> +	struct sk_buff *skb;
-> +
-> +	bt_dev_dbg(hdev, "sending command %02x to SoC", cmd);
-> +
-> +	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
-> +	if (!skb) {
-> +		bt_dev_err(hdev, "Failed to allocate memory for skb packet");
+The version could be read (for Rome only) after setting the operating speed:
 
-I was told that custom OOM messages should not be used, since the
-mm code will complain loudly in this case.
+https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1111
 
-> +static int qca_btsoc_shutdown(struct hci_uart *hu)
-
-The return value is not evaluated by the only caller, so this should
-probably be void.
-
->  static int qca_setup(struct hci_uart *hu)
->  {
->  	struct hci_dev *hdev = hu->hdev;
->  	struct qca_data *qca = hu->priv;
-> +	struct qca_serdev *qcadev;
->  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->  	int ret;
->  	int soc_ver = 0;
->  
-> -	bt_dev_info(hdev, "ROME setup");
-> +	qcadev = serdev_device_get_drvdata(hu->serdev);
->  
->  	/* Patch downloading has to be done without IBS mode */
->  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
-> -
-> -	/* Setup initial baudrate */
->  	qca_set_init_speed(hu);
-> +
-> +	if (qcadev->btsoc_type == QCA_WCN3990) {
-> +		bt_dev_dbg(hdev, "setting up wcn3990");
-> +		hci_uart_set_flow_control(hu, true);
-> +		ret = qca_send_vendor_cmd(hdev, CHEROKEE_POWERON_PULSE);
-> +		if (ret) {
-> +			bt_dev_err(hdev, "failed to send power on command");
-> +			return ret;
-> +		}
-> +		serdev_device_close(hu->serdev);
-> +		ret = serdev_device_open(hu->serdev);
-> +		if (ret) {
-> +			bt_dev_err(hdev, "failed to open port");
-> +			return ret;
-> +		}
-> +		msleep(100);
-> +		qca_set_init_speed(hu);
-> +		hci_uart_set_flow_control(hu, false);
-> +		ret = qca_read_soc_version(hdev, &soc_ver);
-> +		if (ret < 0 || soc_ver == 0) {
-> +			bt_dev_err(hdev, "Failed to get version %d", ret);
-
-serdev_device_close() ?
-
-Also applies to other error paths in this function.
-
->  static int qca_serdev_probe(struct serdev_device *serdev)
->  {
->  	struct qca_serdev *qcadev;
-> +	const struct qca_vreg_data *data;
->  	int err;
->  
->  	qcadev = devm_kzalloc(&serdev->dev, sizeof(*qcadev), GFP_KERNEL);
-> @@ -1041,47 +1264,85 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  		return -ENOMEM;
->  
->  	qcadev->serdev_hu.serdev = serdev;
-> +	data = of_device_get_match_data(&serdev->dev);
-> +	if (data && data->soc_type == QCA_WCN3990)
-> +		qcadev->btsoc_type = QCA_WCN3990;
-> +	else
-> +		qcadev->btsoc_type = QCA_ROME;
-> +
->  	serdev_device_set_drvdata(serdev, qcadev);
-> +	if (qcadev->btsoc_type == QCA_WCN3990) {
-
-nit: the double "if (soc_type == QCA_WCN3990)" is a bit odd. Consider
-changing this condition to "if (data && data->soc_type == QCA_WCN3990)"
-and assign qcadev->btsoc_type in the corresponding branch.
+I concede that having two "if (qcadev->btsoc_type == XYZ)" branches in
+qca_setup() is kinda ugly, but I think it's still better than the
+conditional call of qca_read_soc_version() in qca_uart_setup().
