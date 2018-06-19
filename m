@@ -1,128 +1,138 @@
-Return-Path: <bigeasy@linutronix.de>
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: linux-bluetooth@vger.kernel.org
-Cc: linux-usb@vger.kernel.org,
-	tglx@linutronix.de,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: use irqsave() in URB's complete callback
-Date: Tue, 19 Jun 2018 23:56:57 +0200
-Message-Id: <20180619215657.13745-1-bigeasy@linutronix.de>
+Return-Path: <mka@chromium.org>
+Date: Tue, 19 Jun 2018 14:53:02 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, robh@kernel.org,
+	thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
+	rtatiya@codeaurora.org, hemantg@codeaurora.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v7 8/8] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth chip wcn3990
+Message-ID: <20180619215302.GF169030@google.com>
+References: <20180616062718.29844-1-bgodavar@codeaurora.org>
+ <20180616062718.29844-9-bgodavar@codeaurora.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180616062718.29844-9-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The USB completion callback does not disable interrupts while acquiring
-the ->lock. We want to remove the local_irq_disable() invocation from
-__usb_hcd_giveback_urb() and therefore it is required for the callback
-handler to disable the interrupts while acquiring the lock.
-The callback may be invoked either in IRQ or BH context depending on the
-USB host controller.
-Use the _irqsave variant of the locking primitives.
+On Sat, Jun 16, 2018 at 11:57:18AM +0530, Balakrishna Godavarthi wrote:
+> Add support to set voltage/current of various regulators
+> to power up/down Bluetooth chip wcn3990.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 28ae6a17a595..1961e313aae7 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -402,6 +441,7 @@ static int qca_open(struct hci_uart *hu)
+>  {
+>  	struct qca_serdev *qcadev;
+>  	struct qca_data *qca;
+> +	int ret = 0;
+>  
+>  	BT_DBG("hu %p qca_open", hu);
+>  
+> @@ -463,13 +503,19 @@ static int qca_open(struct hci_uart *hu)
+>  		serdev_device_open(hu->serdev);
+>  
+>  		qcadev = serdev_device_get_drvdata(hu->serdev);
+> -		gpiod_set_value_cansleep(qcadev->bt_en, 1);
+> +		if (qcadev->btsoc_type == QCA_WCN3990) {
+> +			hu->init_speed = qcadev->init_speed;
+> +			hu->oper_speed = qcadev->oper_speed;
+> +			ret = qca_btsoc_power_setup(hu, true);
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- drivers/bluetooth/btusb.c | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+Better do this before starting the timers, otherwise you need to take
+care of stopping them in case of failure.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f73a27ea28cc..f262163fecd5 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -509,9 +509,10 @@ static inline void btusb_free_frags(struct btusb_data =
-*data)
- static int btusb_recv_intr(struct btusb_data *data, void *buffer, int coun=
-t)
- {
- 	struct sk_buff *skb;
-+	unsigned long flags;
- 	int err =3D 0;
-=20
--	spin_lock(&data->rxlock);
-+	spin_lock_irqsave(&data->rxlock, flags);
- 	skb =3D data->evt_skb;
-=20
- 	while (count) {
-@@ -556,7 +557,7 @@ static int btusb_recv_intr(struct btusb_data *data, voi=
-d *buffer, int count)
- 	}
-=20
- 	data->evt_skb =3D skb;
--	spin_unlock(&data->rxlock);
-+	spin_unlock_irqrestore(&data->rxlock, flags);
-=20
- 	return err;
- }
-@@ -564,9 +565,10 @@ static int btusb_recv_intr(struct btusb_data *data, vo=
-id *buffer, int count)
- static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int coun=
-t)
- {
- 	struct sk_buff *skb;
-+	unsigned long flags;
- 	int err =3D 0;
-=20
--	spin_lock(&data->rxlock);
-+	spin_lock_irqsave(&data->rxlock, flags);
- 	skb =3D data->acl_skb;
-=20
- 	while (count) {
-@@ -613,7 +615,7 @@ static int btusb_recv_bulk(struct btusb_data *data, voi=
-d *buffer, int count)
- 	}
-=20
- 	data->acl_skb =3D skb;
--	spin_unlock(&data->rxlock);
-+	spin_unlock_irqrestore(&data->rxlock, flags);
-=20
- 	return err;
- }
-@@ -621,9 +623,10 @@ static int btusb_recv_bulk(struct btusb_data *data, vo=
-id *buffer, int count)
- static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int coun=
-t)
- {
- 	struct sk_buff *skb;
-+	unsigned long flags;
- 	int err =3D 0;
-=20
--	spin_lock(&data->rxlock);
-+	spin_lock_irqsave(&data->rxlock, flags);
- 	skb =3D data->sco_skb;
-=20
- 	while (count) {
-@@ -668,7 +671,7 @@ static int btusb_recv_isoc(struct btusb_data *data, voi=
-d *buffer, int count)
- 	}
-=20
- 	data->sco_skb =3D skb;
--	spin_unlock(&data->rxlock);
-+	spin_unlock_irqrestore(&data->rxlock, flags);
-=20
- 	return err;
- }
-@@ -1066,6 +1069,7 @@ static void btusb_tx_complete(struct urb *urb)
- 	struct sk_buff *skb =3D urb->context;
- 	struct hci_dev *hdev =3D (struct hci_dev *)skb->dev;
- 	struct btusb_data *data =3D hci_get_drvdata(hdev);
-+	unsigned long flags;
-=20
- 	BT_DBG("%s urb %p status %d count %d", hdev->name, urb, urb->status,
- 	       urb->actual_length);
-@@ -1079,9 +1083,9 @@ static void btusb_tx_complete(struct urb *urb)
- 		hdev->stat.err_tx++;
-=20
- done:
--	spin_lock(&data->txlock);
-+	spin_lock_irqsave(&data->txlock, flags);
- 	data->tx_in_flight--;
--	spin_unlock(&data->txlock);
-+	spin_unlock_irqrestore(&data->txlock, flags);
-=20
- 	kfree(urb->setup_packet);
-=20
---=20
-2.17.1
+If qca_btsoc_power_setup() fails you also have to free
+'qca->workqueue' and 'qca'.
+
+> +static int qca_send_vendor_cmd(struct hci_dev *hdev, u8 cmd)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	struct qca_data *qca = hu->priv;
+> +	struct sk_buff *skb;
+> +
+> +	bt_dev_dbg(hdev, "sending command %02x to SoC", cmd);
+> +
+> +	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+> +	if (!skb) {
+> +		bt_dev_err(hdev, "Failed to allocate memory for skb packet");
+
+I was told that custom OOM messages should not be used, since the
+mm code will complain loudly in this case.
+
+> +static int qca_btsoc_shutdown(struct hci_uart *hu)
+
+The return value is not evaluated by the only caller, so this should
+probably be void.
+
+>  static int qca_setup(struct hci_uart *hu)
+>  {
+>  	struct hci_dev *hdev = hu->hdev;
+>  	struct qca_data *qca = hu->priv;
+> +	struct qca_serdev *qcadev;
+>  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+>  	int ret;
+>  	int soc_ver = 0;
+>  
+> -	bt_dev_info(hdev, "ROME setup");
+> +	qcadev = serdev_device_get_drvdata(hu->serdev);
+>  
+>  	/* Patch downloading has to be done without IBS mode */
+>  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+> -
+> -	/* Setup initial baudrate */
+>  	qca_set_init_speed(hu);
+> +
+> +	if (qcadev->btsoc_type == QCA_WCN3990) {
+> +		bt_dev_dbg(hdev, "setting up wcn3990");
+> +		hci_uart_set_flow_control(hu, true);
+> +		ret = qca_send_vendor_cmd(hdev, CHEROKEE_POWERON_PULSE);
+> +		if (ret) {
+> +			bt_dev_err(hdev, "failed to send power on command");
+> +			return ret;
+> +		}
+> +		serdev_device_close(hu->serdev);
+> +		ret = serdev_device_open(hu->serdev);
+> +		if (ret) {
+> +			bt_dev_err(hdev, "failed to open port");
+> +			return ret;
+> +		}
+> +		msleep(100);
+> +		qca_set_init_speed(hu);
+> +		hci_uart_set_flow_control(hu, false);
+> +		ret = qca_read_soc_version(hdev, &soc_ver);
+> +		if (ret < 0 || soc_ver == 0) {
+> +			bt_dev_err(hdev, "Failed to get version %d", ret);
+
+serdev_device_close() ?
+
+Also applies to other error paths in this function.
+
+>  static int qca_serdev_probe(struct serdev_device *serdev)
+>  {
+>  	struct qca_serdev *qcadev;
+> +	const struct qca_vreg_data *data;
+>  	int err;
+>  
+>  	qcadev = devm_kzalloc(&serdev->dev, sizeof(*qcadev), GFP_KERNEL);
+> @@ -1041,47 +1264,85 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  		return -ENOMEM;
+>  
+>  	qcadev->serdev_hu.serdev = serdev;
+> +	data = of_device_get_match_data(&serdev->dev);
+> +	if (data && data->soc_type == QCA_WCN3990)
+> +		qcadev->btsoc_type = QCA_WCN3990;
+> +	else
+> +		qcadev->btsoc_type = QCA_ROME;
+> +
+>  	serdev_device_set_drvdata(serdev, qcadev);
+> +	if (qcadev->btsoc_type == QCA_WCN3990) {
+
+nit: the double "if (soc_type == QCA_WCN3990)" is a bit odd. Consider
+changing this condition to "if (data && data->soc_type == QCA_WCN3990)"
+and assign qcadev->btsoc_type in the corresponding branch.
