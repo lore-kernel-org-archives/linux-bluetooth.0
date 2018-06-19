@@ -1,127 +1,82 @@
-Return-Path: <mka@chromium.org>
-Date: Tue, 19 Jun 2018 13:03:38 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
-	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 4/8] Bluetooth: btqca: Redefine qca_uart_setup() to
- generic function.
-Message-ID: <20180619200338.GD169030@google.com>
-References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-5-bgodavar@codeaurora.org>
- <20180618211942.GT88063@google.com>
- <fdd4fd89b53ba0fb85a53e4d4d33b0d5@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <fdd4fd89b53ba0fb85a53e4d4d33b0d5@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
+Subject: Re: [PATCH] monitor: Add option to disable SCO packets
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZLBRUsej-4GWuFSQ_HyvB3x43d9iiC7_5jsYTm=uKn5aQ@mail.gmail.com>
+Date: Tue, 19 Jun 2018 16:19:07 +0200
+Cc: =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Linux Upstreaming Team <linux@endlessm.com>,
+        =?utf-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>
+Message-Id: <4AD21309-9D8E-49AA-926B-09ADC0607131@holtmann.org>
+References: <20180618165739.13126-1-jprvita@endlessm.com>
+ <259476D2-706B-4FA2-86DE-3A6BDCC6B7EC@holtmann.org>
+ <CA+A7VXVT3e832EEF4TQusdM_hsH-wVw_DZyfwC5xxEzC09Vquw@mail.gmail.com>
+ <CABBYNZLBRUsej-4GWuFSQ_HyvB3x43d9iiC7_5jsYTm=uKn5aQ@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jun 19, 2018 at 12:39:07PM +0530, Balakrishna Godavarthi wrote:
-> Hi Matthias,
-> 
-> Please find my comments inline.
-> 
-> On 2018-06-19 02:49, Matthias Kaehlcke wrote:
-> > On Sat, Jun 16, 2018 at 11:57:14AM +0530, Balakrishna Godavarthi wrote:
-> > > Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
-> > > SoC, to use the same function instead of duplicating the function.
-> > > Added new arguments soc_type and soc_ver to the functions.
-> > > 
-> > > These arguments will help to decide type of firmware files
-> > > to be loaded into Bluetooth chip.
-> > > soc_type holds the Bluetooth chip connected to APPS processor.
-> > > soc_ver holds the Bluetooth chip version.
-> > > 
-> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> > > ---
-> > > 
-> > > Changes in v7:
-> > > 	* initial patch
-> > > 	* redefined qca_uart_setup function to generic.
-> > > 
-> > > ---
-> > >  drivers/bluetooth/btqca.c   | 23 ++++++++++++-----------
-> > >  drivers/bluetooth/btqca.h   | 13 +++++++++++--
-> > >  drivers/bluetooth/hci_qca.c |  3 ++-
-> > >  3 files changed, 25 insertions(+), 14 deletions(-)
-> > > 
-> > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> > > index c5cf9cab438a..f748730039cf 100644
-> > > --- a/drivers/bluetooth/btqca.c
-> > > +++ b/drivers/bluetooth/btqca.c
-> > > @@ -327,9 +327,9 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,
-> > > const bdaddr_t *bdaddr)
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
-> > > 
-> > > -int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
-> > > +int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate, uint8_t
-> > > soc_type,
-> > 
-> > Use 'enum qca_btsoc_type' as type for 'soc_type'.
-> > 
-> 
-> [Bala]: will update.
-> 
-> > > +		   u32 soc_ver)
-> > >  {
-> > > -	u32 rome_ver = 0;
-> > >  	struct rome_config config;
-> > >  	int err;
-> > > 
-> > > @@ -337,19 +337,20 @@ int qca_uart_setup(struct hci_dev *hdev,
-> > > uint8_t baudrate)
-> > > 
-> > >  	config.user_baud_rate = baudrate;
-> > > 
-> > > -	/* Get QCA version information */
-> > > -	err = qca_read_soc_version(hdev, &rome_ver);
-> > > -	if (err < 0 || rome_ver == 0) {
-> > > -		bt_dev_err(hdev, "QCA Failed to get version %d", err);
-> > > -		return err;
-> > > +	if (!soc_ver) {
-> > > +		/* Get QCA version information */
-> > > +		err = qca_read_soc_version(hdev, &soc_ver);
-> > > +		if (err < 0 || soc_ver == 0) {
-> > > +			bt_dev_err(hdev, "QCA Failed to get version %d", err);
-> > > +			return err;
-> > > +		}
-> > > +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
-> > >  	}
-> > 
-> > Why is this needed? A caller that passes in soc_ver = 0 could just
-> > call qca_read_soc_version() themselves.
-> [Bala]: hci_qca support two chip one ROME (already up-streamed) and other
-> wcn3990.
->         there setup sequence differs.
-> 
->         wcn3900:
->         1. set baudrate to 115200
->         2. read soc version
->         3. set baudarte to 3.2Mbps
->         4. download firmware. (calls qca_uart_setup)
-> 
->        ROME:
->        1. set baudrate to 3.0 mbps
->        2. calls qca_uart_setup to read soc version and download firmware.
-> 
->       so to make use of existing function qca_setup_uart(). passing soc_ver
-> as argument.
->       if soc_ver is zero, then read soc version (i.e. for ROME chip).
-> 
->       Pls let me know, if you have any queries.
+Hi Luiz,
 
-I don't really understand this argumentation. Let's look at the code
-at the end of this series, where both Rome and wcn3900 are supported:
+>>> I am confused. I assumed I made SCO off by default.
+>>> 
+>> 
+>> Dumping the contents for SCO packets is OFF by default (enabled by
+>> -S), that is, the hex dump part on the output bellow:
+>> 
+>>  SCO Data RX: Handle 257 flags 0x00 dlen 48
+>> 
+>>                                                               #3537
+>> [hci0] 16.106123
+>>        23 00 2b 00 20 00 06 00 0f 00 21 00 15 00 05 00  #.+. .....!.....
+>>        1d 00 13 00 ff ff 15 00 1b 00 f8 ff f1 ff 0f 00  ................
+>>        0f 00 fc ff f3 ff f8 ff f8 ff fa ff 02 00 00 00  ................
+>> 
+>> But without -S we still log the header / flags part for each packet:
+>> 
+>>  SCO Data RX: Handle 258 flags 0x00 dlen 48
+>> 
+>>                                                               #3541
+>> [hci0] 14.128754
+>> 
+>>> Anyhow, I don’t want to see tons of independent options. Since next thing is you tell me that AVDTP media channel is also something you want to filter out. So then we better find a generic way to apply filters and also notifications about “dropped x packets due to filter” kinda hints.
+>>> 
+> 
+> We might look at doing this kind of filtering using BPF instead which
+> perhaps could be loaded from a file.
 
-https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1059
+doing this BPF would be best.
 
-The version could be read (for Rome only) after setting the operating speed:
+>> My argument behind filtering out SCO is because AFAIU it is only data,
+>> not signaling. On a quick look I had assumed there was no easy way to
+>> separate AVDTP signaling from data, but on a second look is actually
+>> quite obvious, so you are right, that would be an obvious next step
+>> :-)
+>> 
+>> Maybe we could hide the SCO and AVDTP media channels by default? In
+>> this case we could print a notification when the program starts that
+>> these channels are being suppressed, and / or every time the channel
+>> is established. That would be reflected on the package count printed
+>> with the timestamp, and I'm not sure if that would be a problem: is
+>> that number reflecting how many packets have been exchanged or
+>> printed?
+>> 
+>> As much as I like the idea of a generic configurable filter, I can't
+>> look into that atm.
+> 
+> BPF already works with Bluetooth socket so perhaps we just need a way
+> to load the filter from file.
+> 
+> @Marcel: We never applied the patch below, are you okay with it:
+> 
+> https://www.spinics.net/lists/linux-bluetooth/msg71245.html
 
-https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1111
+I somehow never saw that patch. Can you re-send it to the mailing list.
 
-I concede that having two "if (qcadev->btsoc_type == XYZ)" branches in
-qca_setup() is kinda ugly, but I think it's still better than the
-conditional call of qca_read_soc_version() in qca_uart_setup().
+Regards
+
+Marcel
+
