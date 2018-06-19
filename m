@@ -1,95 +1,223 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <CA+A7VXVT3e832EEF4TQusdM_hsH-wVw_DZyfwC5xxEzC09Vquw@mail.gmail.com>
-References: <20180618165739.13126-1-jprvita@endlessm.com> <259476D2-706B-4FA2-86DE-3A6BDCC6B7EC@holtmann.org>
- <CA+A7VXVT3e832EEF4TQusdM_hsH-wVw_DZyfwC5xxEzC09Vquw@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 19 Jun 2018 11:14:15 +0300
-Message-ID: <CABBYNZLBRUsej-4GWuFSQ_HyvB3x43d9iiC7_5jsYTm=uKn5aQ@mail.gmail.com>
-Subject: Re: [PATCH] monitor: Add option to disable SCO packets
-To: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Linux Upstreaming Team <linux@endlessm.com>, =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Tue, 19 Jun 2018 12:41:37 +0530
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+ thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
+ rtatiya@codeaurora.org, hemantg@codeaurora.org,
+ linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v7 5/8] Bluetooth: hci_qca: Defined wrapper functions for
+ setting UART speeds
+In-Reply-To: <20180618215128.GU88063@google.com>
+References: <20180616062718.29844-1-bgodavar@codeaurora.org>
+ <20180616062718.29844-6-bgodavar@codeaurora.org>
+ <20180618215128.GU88063@google.com>
+Message-ID: <36000c0c93849527efdc19f6a6dc106e@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joao,
+HI Matthias,
 
-On Mon, Jun 18, 2018 at 9:57 PM, Jo=C3=A3o Paulo Rechi Vita
-<jprvita@gmail.com> wrote:
-> Hello Marcel, thanks for the quick reply.
->
-> On Mon, Jun 18, 2018 at 10:50 AM, Marcel Holtmann <marcel@holtmann.org> w=
-rote:
->>
->> I am confused. I assumed I made SCO off by default.
->>
->
-> Dumping the contents for SCO packets is OFF by default (enabled by
-> -S), that is, the hex dump part on the output bellow:
->
->   SCO Data RX: Handle 257 flags 0x00 dlen 48
->
->                                                                #3537
-> [hci0] 16.106123
->         23 00 2b 00 20 00 06 00 0f 00 21 00 15 00 05 00  #.+. .....!.....
->         1d 00 13 00 ff ff 15 00 1b 00 f8 ff f1 ff 0f 00  ................
->         0f 00 fc ff f3 ff f8 ff f8 ff fa ff 02 00 00 00  ................
->
-> But without -S we still log the header / flags part for each packet:
->
->   SCO Data RX: Handle 258 flags 0x00 dlen 48
->
->                                                                #3541
-> [hci0] 14.128754
->
->> Anyhow, I don=E2=80=99t want to see tons of independent options. Since n=
-ext thing is you tell me that AVDTP media channel is also something you wan=
-t to filter out. So then we better find a generic way to apply filters and =
-also notifications about =E2=80=9Cdropped x packets due to filter=E2=80=9D =
-kinda hints.
->>
+Please find my comments in line.
 
-We might look at doing this kind of filtering using BPF instead which
-perhaps could be loaded from a file.
+On 2018-06-19 03:21, Matthias Kaehlcke wrote:
+> On Sat, Jun 16, 2018 at 11:57:15AM +0530, Balakrishna Godavarthi wrote:
+>> Subject: Bluetooth: hci_qca: Defined wrapper functions for setting
+>>          UART speeds
+> 
+> s/Defined/Define/
+> 
+> or
+> 
+> s/Defined/Add/
+> 
+[Bala]: will update the text.
+>> 
+>> In qca_setup, we set initial and operating speeds for Qualcomm
+>> Bluetooth SoC's. This block of code is common across different
+>> Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
+>> a wrapper function to set the speeds. So that future coming SoC's
+>> can use these wrapper functions to set speeds.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>> 
+>> Changes in v7:
+>> 	* initial patch
+>> 	* created wrapper functions for init and operating speeds.
+>> 
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 64 
+>> ++++++++++++++++++++++++++-----------
+>>  1 file changed, 45 insertions(+), 19 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index fe62420ef838..3e09c6223baf 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -923,21 +923,10 @@ static inline void host_set_baudrate(struct 
+>> hci_uart *hu, unsigned int speed)
+>>  		hci_uart_set_baudrate(hu, speed);
+>>  }
+>> 
+>> -static int qca_setup(struct hci_uart *hu)
+>> +static void qca_set_init_speed(struct hci_uart *hu)
+>>  {
+>> -	struct hci_dev *hdev = hu->hdev;
+>> -	struct qca_data *qca = hu->priv;
+>> -	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+>> -	int ret;
+>> -	int soc_ver = 0;
+>> -
+>> -	bt_dev_info(hdev, "ROME setup");
+>> -
+>> -	/* Patch downloading has to be done without IBS mode */
+>> -	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>> +	unsigned int speed = 0;
+>> 
+>> -	/* Setup initial baudrate */
+>> -	speed = 0;
+>>  	if (hu->init_speed)
+>>  		speed = hu->init_speed;
+>>  	else if (hu->proto->init_speed)
+>> @@ -945,27 +934,64 @@ static int qca_setup(struct hci_uart *hu)
+>> 
+>>  	if (speed)
+>>  		host_set_baudrate(hu, speed);
+>> +}
+>> +
+>> +static int qca_get_oper_speed(struct hci_uart *hu)
+> 
+> Return type should be unsigned int.
+> 
+[Bala]: will update
+>> +{
+>> +	unsigned int speed = 0;
+>> 
+>> -	/* Setup user speed if needed */
+>> -	speed = 0;
+>>  	if (hu->oper_speed)
+>>  		speed = hu->oper_speed;
+>>  	else if (hu->proto->oper_speed)
+>>  		speed = hu->proto->oper_speed;
+>> 
+>> +	return speed;
+>> +}
+>> +
+>> +static int qca_set_oper_speed(struct hci_uart *hu)
+>> +{
+>> +	unsigned int speed = 0, qca_baudrate;
+> 
+> initialization is not needed.
+> 
+[Bala]: will update
 
-> My argument behind filtering out SCO is because AFAIU it is only data,
-> not signaling. On a quick look I had assumed there was no easy way to
-> separate AVDTP signaling from data, but on a second look is actually
-> quite obvious, so you are right, that would be an obvious next step
-> :-)
->
-> Maybe we could hide the SCO and AVDTP media channels by default? In
-> this case we could print a notification when the program starts that
-> these channels are being suppressed, and / or every time the channel
-> is established. That would be reflected on the package count printed
-> with the timestamp, and I'm not sure if that would be a problem: is
-> that number reflecting how many packets have been exchanged or
-> printed?
->
-> As much as I like the idea of a generic configurable filter, I can't
-> look into that atm.
+>> +	int ret = 0;
+>> +
+>> +	speed = qca_get_oper_speed(hu);
+>>  	if (speed) {
+> 
+> nit:
+> 	if (!speed)
+> 		return 0;
+> 
+> 
+[Bala]: will update.
 
-BPF already works with Bluetooth socket so perhaps we just need a way
-to load the filter from file.
+>>  		qca_baudrate = qca_get_baudrate_value(speed);
+>> -
+>> -		bt_dev_info(hdev, "Set UART speed to %d", speed);
+>> -		ret = qca_set_baudrate(hdev, qca_baudrate);
+>> +		bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
+>> +		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
+>>  		if (ret) {
+>> -			bt_dev_err(hdev, "Failed to change the baud rate (%d)",
+>> +			bt_dev_err(hu->hdev, "Failed to change the baud rate (%d)",
+>>  				   ret);
+>>  			return ret;
+>>  		}
+>>  		host_set_baudrate(hu, speed);
+>>  	}
+>> 
+>> +	return ret;
+>> +}
+>> +
+>> +static int qca_setup(struct hci_uart *hu)
+>> +{
+>> +	struct hci_dev *hdev = hu->hdev;
+>> +	struct qca_data *qca = hu->priv;
+>> +	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+>> +	int ret;
+>> +	int soc_ver = 0;
+>> +
+>> +	bt_dev_info(hdev, "ROME setup");
+>> +
+>> +	/* Patch downloading has to be done without IBS mode */
+>> +	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>> +
+>> +	/* Setup initial baudrate */
+>> +	qca_set_init_speed(hu);
+>> +	/* Setup user speed if needed */
+>> +	ret = qca_set_oper_speed(hu);
+>> +	if (ret)
+>> +		return ret;
+>> +	speed = qca_get_oper_speed(hu);
+>> +	if (speed)
+>> +		qca_baudrate = qca_get_baudrate_value(speed);
+> 
+> nit: the sequence
+> 
+> qca_set_oper_speed()
+> qca_get_oper_speed()
+> 
+> is slightly awkward to read. This could be avoided if the speed was
+> passed as parameter, though I understand this isn't done for symmetry
+> with qca_set_init_speed(). An alternative could be:
+> 
+> static int qca_set_speed(struct hci_uart *hu, unsigned int speed, enum
+>     qca_speed_type speed_type)
+> {
+> 	unsigned int qca_baudrate;
+> 
+> 	if (speed_type == QCA_OPER_SPEED) {
+> 		qca_baudrate = qca_get_baudrate_value(speed);
+> 		bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
+> 		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
+> 		if (ret) {
+> 			bt_dev_err(hu->hdev, "Failed to change the baud rate (%d)",
+> 				ret);
+> 			return ret;
+> 		}
+> 	}
+> 
+> 	host_set_baudrate(hu, speed);
+> 
+> 	/* If the order doesn't matter set the host baudrate first and
+> 	   return if speed_type != QCA_OPER_SPEED */
+> 
+> 	return 0;
+> }
+> 
+> static int qca_setup(struct hci_uart *hu)
+> {
+> 	...
+> 	speed = qca_get_init_speed(hu);
+> 	if (speed)
+> 		qca_set_speed(hu, speed, QCA_INIT_SPEED);
+> 
+> 	speed = qca_get_oper_speed(hu);
+> 	if (speed) {
+> 	   	qca_set_speed(hu, speed, QCA_OPER_SPEED);
+> 		qca_baudrate = qca_get_baudrate_value(speed);
+> 	}
+> 	...
+> }
+> 
+> Just a suggestion, ok for me if you prefer to keep it as is.
 
-@Marcel: We never applied the patch below, are you okay with it:
-
-https://www.spinics.net/lists/linux-bluetooth/msg71245.html
-
-> Regards,
->
-> --
-> Jo=C3=A3o Paulo Rechi Vita
-> http://about.me/jprvita
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
-" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
---=20
-Luiz Augusto von Dentz
+[Bala]: will study and update the same.
+-- 
+Regards
+Balakrishna.
