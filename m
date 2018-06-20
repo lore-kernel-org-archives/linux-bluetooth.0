@@ -2,142 +2,150 @@ Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
-Date: Wed, 20 Jun 2018 17:03:04 +0530
+Date: Wed, 20 Jun 2018 16:23:25 +0530
 From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: Rob Herring <robh@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, Thierry
- Escande <thierry.escande@linaro.org>, "open list:BLUETOOTH DRIVERS"
- <linux-bluetooth@vger.kernel.org>, rtatiya@codeaurora.org,
- hemantg@codeaurora.org, linux-arm-msm <linux-arm-msm@vger.kernel.org>
-Subject: Re: [PATCH v7 1/8] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI chip wcn3990
-In-Reply-To: <CAL_JsqL5K-4LBEwS0ag=7M8cOp2nF+mRC+M03BinSj-YR0+b=Q@mail.gmail.com>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+ thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
+ rtatiya@codeaurora.org, hemantg@codeaurora.org,
+ linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v7 4/8] Bluetooth: btqca: Redefine qca_uart_setup() to
+ generic function.
+In-Reply-To: <20180619200338.GD169030@google.com>
 References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-2-bgodavar@codeaurora.org>
- <CAL_JsqL5K-4LBEwS0ag=7M8cOp2nF+mRC+M03BinSj-YR0+b=Q@mail.gmail.com>
-Message-ID: <ec01ffb8cb16afef0e92d4355f5e839e@codeaurora.org>
+ <20180616062718.29844-5-bgodavar@codeaurora.org>
+ <20180618211942.GT88063@google.com>
+ <fdd4fd89b53ba0fb85a53e4d4d33b0d5@codeaurora.org>
+ <20180619200338.GD169030@google.com>
+Message-ID: <f37214cb19823893f2679787139ec471@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rob,
+Hi Matthias,
 
-please find my comments inline.
-
-On 2018-06-18 18:59, Rob Herring wrote:
-> On Sat, Jun 16, 2018 at 12:27 AM, Balakrishna Godavarthi
-> <bgodavar@codeaurora.org> wrote:
->> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+On 2018-06-20 01:33, Matthias Kaehlcke wrote:
+> On Tue, Jun 19, 2018 at 12:39:07PM +0530, Balakrishna Godavarthi wrote:
+>> Hi Matthias,
+>> 
+>> Please find my comments inline.
+>> 
+>> On 2018-06-19 02:49, Matthias Kaehlcke wrote:
+>> > On Sat, Jun 16, 2018 at 11:57:14AM +0530, Balakrishna Godavarthi wrote:
+>> > > Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
+>> > > SoC, to use the same function instead of duplicating the function.
+>> > > Added new arguments soc_type and soc_ver to the functions.
+>> > >
+>> > > These arguments will help to decide type of firmware files
+>> > > to be loaded into Bluetooth chip.
+>> > > soc_type holds the Bluetooth chip connected to APPS processor.
+>> > > soc_ver holds the Bluetooth chip version.
+>> > >
+>> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> > > ---
+>> > >
+>> > > Changes in v7:
+>> > > 	* initial patch
+>> > > 	* redefined qca_uart_setup function to generic.
+>> > >
+>> > > ---
+>> > >  drivers/bluetooth/btqca.c   | 23 ++++++++++++-----------
+>> > >  drivers/bluetooth/btqca.h   | 13 +++++++++++--
+>> > >  drivers/bluetooth/hci_qca.c |  3 ++-
+>> > >  3 files changed, 25 insertions(+), 14 deletions(-)
+>> > >
+>> > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>> > > index c5cf9cab438a..f748730039cf 100644
+>> > > --- a/drivers/bluetooth/btqca.c
+>> > > +++ b/drivers/bluetooth/btqca.c
+>> > > @@ -327,9 +327,9 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,
+>> > > const bdaddr_t *bdaddr)
+>> > >  }
+>> > >  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+>> > >
+>> > > -int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
+>> > > +int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate, uint8_t
+>> > > soc_type,
+>> >
+>> > Use 'enum qca_btsoc_type' as type for 'soc_type'.
+>> >
+>> 
+>> [Bala]: will update.
+>> 
+>> > > +		   u32 soc_ver)
+>> > >  {
+>> > > -	u32 rome_ver = 0;
+>> > >  	struct rome_config config;
+>> > >  	int err;
+>> > >
+>> > > @@ -337,19 +337,20 @@ int qca_uart_setup(struct hci_dev *hdev,
+>> > > uint8_t baudrate)
+>> > >
+>> > >  	config.user_baud_rate = baudrate;
+>> > >
+>> > > -	/* Get QCA version information */
+>> > > -	err = qca_read_soc_version(hdev, &rome_ver);
+>> > > -	if (err < 0 || rome_ver == 0) {
+>> > > -		bt_dev_err(hdev, "QCA Failed to get version %d", err);
+>> > > -		return err;
+>> > > +	if (!soc_ver) {
+>> > > +		/* Get QCA version information */
+>> > > +		err = qca_read_soc_version(hdev, &soc_ver);
+>> > > +		if (err < 0 || soc_ver == 0) {
+>> > > +			bt_dev_err(hdev, "QCA Failed to get version %d", err);
+>> > > +			return err;
+>> > > +		}
+>> > > +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+>> > >  	}
+>> >
+>> > Why is this needed? A caller that passes in soc_ver = 0 could just
+>> > call qca_read_soc_version() themselves.
+>> [Bala]: hci_qca support two chip one ROME (already up-streamed) and 
+>> other
+>> wcn3990.
+>>         there setup sequence differs.
+>> 
+>>         wcn3900:
+>>         1. set baudrate to 115200
+>>         2. read soc version
+>>         3. set baudarte to 3.2Mbps
+>>         4. download firmware. (calls qca_uart_setup)
+>> 
+>>        ROME:
+>>        1. set baudrate to 3.0 mbps
+>>        2. calls qca_uart_setup to read soc version and download 
+>> firmware.
+>> 
+>>       so to make use of existing function qca_setup_uart(). passing 
+>> soc_ver
+>> as argument.
+>>       if soc_ver is zero, then read soc version (i.e. for ROME chip).
+>> 
+>>       Pls let me know, if you have any queries.
 > 
-> Commit messag missing.
+> I don't really understand this argumentation. Let's look at the code
+> at the end of this series, where both Rome and wcn3900 are supported:
 > 
-[Bala]: my bad, i some how missed. will update.
-
-> Please use get_maintainers.pl and send patches to the right lists. DT
-> list in this case.
+> https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1059
 > 
-[Bala]: will find the correct POC.
+> The version could be read (for Rome only) after setting the operating 
+> speed:
 
-
->> ---
->> Changes in v7:
->>         * no change.
->> 
->> Changes in v6:
->> 
->>         * Changed the oper-speed to max-speed.
->> 
->> Changes in v5:
->> 
->>         * Added entry for oper-speed and init-speed.
->> 
->> ---
->>  .../bindings/net/qualcomm-bluetooth.txt       | 31 
->> +++++++++++++++++--
->>  1 file changed, 29 insertions(+), 2 deletions(-)
->> 
->> diff --git 
->> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt 
->> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->> index 0ea18a53cc29..c4590bc87390 100644
->> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->> @@ -10,12 +10,24 @@ device the slave device is attached to.
->>  Required properties:
->>   - compatible: should contain one of the following:
->>     * "qcom,qca6174-bt"
->> +   * "qcom,wcn3990-bt"
->> 
->>  Optional properties:
->>   - enable-gpios: gpio specifier used to enable chip
->>   - clocks: clock provided to the controller (SUSCLK_32KHZ)
->> -
->> -Example:
->> + - vddpa-supply: Bluetooth VDD PA regulator handle
->> + - vddio-supply: Bluetooth VDD IO regulator handle
->> + - vddldo-supply: Bluetooth VDD LDO regulator handle. Kept under 
->> optional
->> +                 parameters as some of the chipsets doesn't require 
->> ldo or
->> +                 it may use from same vddio.
+[Bala]: yes we can read SoC version after setting operating baud rate. 
+an advice from SoC vendor that, read SoC version before setting 
+operating speed.
+         one advantage from reading SoC version before setting operating 
+baudrate,it will helps us to understand whether the soc is responding to 
+any commands in default baud rate
+         before setting operating speed.
 > 
-> You need to be explicit as to which properties apply or don't apply to
-> specific compatible strings.
+> https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1111
 > 
+> I concede that having two "if (qcadev->btsoc_type == XYZ)" branches in
+> qca_setup() is kinda ugly, but I think it's still better than the
+> conditional call of qca_read_soc_version() in qca_uart_setup().
 
-[Bala]: will update.
-
-> Supplies should be based on inputs to the chip, so if 1 regulator
-> supplies 2 inputs you still need both.
-> 
-[Bala]:  sorry i did't get you, all these regulators are single output 
-line regulators.
-          i.e. <supply-name>- supply, need single regulator input as a 
-handle.
-          and these line regulators generate fixed voltage output.
-          please let me know, if i have cleared your query
-
->> + - vddxtal-supply: Bluetooth VDD XTAL regulator handle
->> + - vddcore-supply: Bluetooth VDD CORE regulator handle
->> + - vddpwd-supply: Chip power down gpio is required when bluetooth 
->> module
->> +                 and other modules like wifi co-exist in a singe chip 
->> and
->> +                 shares a common gpio to bring chip out of reset.
->> + - max-speed: operating speed of the chip.
->> +
->> +Examples:
->> 
->>  serial@7570000 {
->>         label = "BT-UART";
->> @@ -28,3 +40,18 @@ serial@7570000 {
->>                 clocks = <&divclk4>;
->>         };
->>  };
->> +
->> +serial@898000 {
->> +       label = "BT-UART";
->> +       status = "okay";
->> +
->> +       bluetooth: bt_wcn3990 {
-> 
-> Reverse these. The node name should be "bluetooth".
-> 
->> +               compatible = "qcom,wcn3990-bt";
->> +               vddio-supply = <&pm8998_s3>;
->> +               vddxtal-supply = <&pm8998_s5>;
->> +               vddcore-supply = <&pm8998_l7>;
->> +               vddpa-supply = <&pm8998_l17>;
->> +               vddldo-supply = <&pm8998_l25>;
->> +               max-speed = <3200000>;
->> +       };
->> +};
->> --
->> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
->> Forum,
->> a Linux Foundation Collaborative Project
->> 
-
-Thanks for reviewing, will send a incremental patch.
+[Bala]: we require an if-else block  for soc type.As wcn3900 support 
+hardware flow control where as ROME is not supporting hardware flow 
+control.
 
 -- 
 Regards
