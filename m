@@ -1,66 +1,83 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-From: Ville Syrjala <ville.syrjala@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Kay Sievers <kay.sievers@vrfy.org>,
-        =?UTF-8?q?Zbigniew=20J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Ville=20Syrj=C3=A4l=C3=A4?=
-        <ville.syrjala@linux.intel.com>
-Subject: [PATCH v2] hid2hci: Fix udev rules for linux-4.14+
-Date: Wed, 20 Jun 2018 19:42:40 +0300
-Message-Id: <20180620164240.6535-1-ville.syrjala@linux.intel.com>
-In-Reply-To: <20180507130638.3516-1-ville.syrjala@linux.intel.com>
-References: <20180507130638.3516-1-ville.syrjala@linux.intel.com>
+Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Wed, 20 Jun 2018 20:58:22 +0530
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, Thierry
+ Escande <thierry.escande@linaro.org>, "open list:BLUETOOTH DRIVERS"
+ <linux-bluetooth@vger.kernel.org>, rtatiya@codeaurora.org,
+ hemantg@codeaurora.org, linux-arm-msm <linux-arm-msm@vger.kernel.org>
+Subject: Re: [PATCH v7 1/8] dt-bindings: net: bluetooth: Add device tree
+ bindings for QTI chip wcn3990
+In-Reply-To: <CAL_Jsq+e72nW7PatD3H-OLC5aQ9Y_PmmMqrnCk6dk-SdHkmtYA@mail.gmail.com>
+References: <20180616062718.29844-1-bgodavar@codeaurora.org>
+ <20180616062718.29844-2-bgodavar@codeaurora.org>
+ <CAL_JsqL5K-4LBEwS0ag=7M8cOp2nF+mRC+M03BinSj-YR0+b=Q@mail.gmail.com>
+ <ec01ffb8cb16afef0e92d4355f5e839e@codeaurora.org>
+ <CAL_Jsq+e72nW7PatD3H-OLC5aQ9Y_PmmMqrnCk6dk-SdHkmtYA@mail.gmail.com>
+Message-ID: <4b9e1da814baef46e11768b7be90357e@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Ville Syrjälä <ville.syrjala@linux.intel.com>
+Hi Rob,
 
-Since commit 1455cf8dbfd0 ("driver core: emit uevents when
-device is bound to a driver") the kernel started emitting
-"bind" and "unbind" uevents which confuse the hid2hci
-udev rules.
+On 2018-06-20 20:24, Rob Herring wrote:
+> On Wed, Jun 20, 2018 at 5:33 AM, Balakrishna Godavarthi
+> <bgodavar@codeaurora.org> wrote:
+>> Hi Rob,
+>> 
+>> please find my comments inline.
+>> 
+>> On 2018-06-18 18:59, Rob Herring wrote:
+>>> 
+>>> On Sat, Jun 16, 2018 at 12:27 AM, Balakrishna Godavarthi
+>>> <bgodavar@codeaurora.org> wrote:
+>>>> 
+>>>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> 
+> [...]
+> 
+>>>> -Example:
+>>>> + - vddpa-supply: Bluetooth VDD PA regulator handle
+>>>> + - vddio-supply: Bluetooth VDD IO regulator handle
+>>>> + - vddldo-supply: Bluetooth VDD LDO regulator handle. Kept under
+>>>> optional
+>>>> +                 parameters as some of the chipsets doesn't require 
+>>>> ldo
+>>>> or
+>>>> +                 it may use from same vddio.
+>>> 
+>>> 
+>>> You need to be explicit as to which properties apply or don't apply 
+>>> to
+>>> specific compatible strings.
+>>> 
+>> 
+>> [Bala]: will update.
+>> 
+>>> Supplies should be based on inputs to the chip, so if 1 regulator
+>>> supplies 2 inputs you still need both.
+>>> 
+>> [Bala]:  sorry i did't get you, all these regulators are single output 
+>> line
+>> regulators.
+>>          i.e. <supply-name>- supply, need single regulator input as a
+>> handle.
+>>          and these line regulators generate fixed voltage output.
+>>          please let me know, if i have cleared your query
+> 
+> I was referring to "it may use from same vddio". If you mean vddldo is
+> left disconnected, then omitting the property is fine. If you mean
+> vddio and vddldo are connected to the same regulator, then you should
+> have both properties in the binding.
+> 
+> Rob
 
-The symptoms on an affected machine (Dell E5400 in my case)
-include bluetooth devices not appearing and udev hogging
-the cpu as it's busy processing a constant stream of these
-"bind"+"unbind" uevents.
+  may be pharse is confusing, will correct the text.
+  we require both vregs to turn on wcn3990.
 
-Change the udev rules not do anything except for "add" and
-"change" events. This seems to cure my machine at least.
-
-v2: Don't mess up "change" (Zbyszek)
-    Fix up the commit message a bit
-
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Kay Sievers <kay.sievers@vrfy.org>
-Cc: Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl>
-Cc: systemd-devel@lists.freedesktop.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Signed-off-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
----
- tools/hid2hci.rules | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/hid2hci.rules b/tools/hid2hci.rules
-index db6bb03d2ef3..5c7208af7a02 100644
---- a/tools/hid2hci.rules
-+++ b/tools/hid2hci.rules
-@@ -1,6 +1,6 @@
- # do not edit this file, it will be overwritten on update
- 
--ACTION=="remove", GOTO="hid2hci_end"
-+ACTION!="add|change", GOTO="hid2hci_end"
- SUBSYSTEM!="usb*", GOTO="hid2hci_end"
- 
- # Variety of Dell Bluetooth devices - match on a mouse device that is
 -- 
-2.16.4
+Regards
+Balakrishna.
