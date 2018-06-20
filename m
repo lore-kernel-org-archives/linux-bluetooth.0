@@ -1,66 +1,87 @@
-Return-Path: <robh@kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ec01ffb8cb16afef0e92d4355f5e839e@codeaurora.org>
-References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-2-bgodavar@codeaurora.org> <CAL_JsqL5K-4LBEwS0ag=7M8cOp2nF+mRC+M03BinSj-YR0+b=Q@mail.gmail.com>
- <ec01ffb8cb16afef0e92d4355f5e839e@codeaurora.org>
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 20 Jun 2018 08:54:24 -0600
-Message-ID: <CAL_Jsq+e72nW7PatD3H-OLC5aQ9Y_PmmMqrnCk6dk-SdHkmtYA@mail.gmail.com>
-Subject: Re: [PATCH v7 1/8] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI chip wcn3990
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Matthias Kaehlcke <mka@chromium.org>, Thierry Escande <thierry.escande@linaro.org>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, rtatiya@codeaurora.org,
-	hemantg@codeaurora.org, linux-arm-msm <linux-arm-msm@vger.kernel.org>
+In-Reply-To: <CA+A7VXU30H_=aZw_Xi2S2iOkPp=nQxfMRTE9msAAX+oh7v1Qvw@mail.gmail.com>
+References: <CA+A7VXVEBULPWJpxMeED-QxxG25Az1ckWdL+cudqE0RL7he9Xg@mail.gmail.com>
+ <5a3c473313387957bac050067857e22e62d544f5.camel@iki.fi> <CA+A7VXVy=1RjvaQgSyE5M9Hw=QRuy8Ejc0A=pFhtxn1=06ZC3Q@mail.gmail.com>
+ <5731aaabb375e5b82945cabff8c315a2ef827cbe.camel@iki.fi> <CA+A7VXU30H_=aZw_Xi2S2iOkPp=nQxfMRTE9msAAX+oh7v1Qvw@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 20 Jun 2018 17:47:46 +0300
+Message-ID: <CABBYNZ+w=iC=OYz8y=NyLuvdEXfWprDoMuZiqTs+SijU7med9w@mail.gmail.com>
+Subject: Re: Failure to connect Sony headsets
+To: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
+Cc: Tanu Kaskinen <tanuk@iki.fi>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        General PulseAudio Discussion
+        <pulseaudio-discuss@lists.freedesktop.org>,
+        =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>,
+        Linux Upstreaming Team <linux@endlessm.com>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jun 20, 2018 at 5:33 AM, Balakrishna Godavarthi
-<bgodavar@codeaurora.org> wrote:
-> Hi Rob,
->
-> please find my comments inline.
->
-> On 2018-06-18 18:59, Rob Herring wrote:
->>
->> On Sat, Jun 16, 2018 at 12:27 AM, Balakrishna Godavarthi
->> <bgodavar@codeaurora.org> wrote:
+Hi Joao,
+
+On Fri, Jun 15, 2018 at 2:33 AM, Jo=C3=A3o Paulo Rechi Vita
+<jprvita@gmail.com> wrote:
+> On Thu, Jun 14, 2018 at 8:27 AM, Tanu Kaskinen <tanuk@iki.fi> wrote:
+>> On Thu, 2018-06-14 at 08:05 -0700, Jo=C3=A3o Paulo Rechi Vita wrote:
+>>> > > I also had to disable module-card-restore, otherwise it tries to
+>>> > > switch to the saved a2dp_sink profile right when the card is create=
+d,
+>>> > > which also makes the device abort the AVDTP connection for some
+>>> > > reason.
+>>> >
+>>> > This is without increasing the timeout, right, so the problem is that
+>>> > module-card-restore is trying to restore a2dp_sink before it's
+>>> > available? module-card-restore has been fixed to not to try to restor=
+e
+>>> > unavailable profiles:
+>>> > https://cgit.freedesktop.org/pulseaudio/pulseaudio/commit/?id=3Dd6597=
+4d8501052bafb03e65f5df954511e9949a2
+>>> >
 >>>
->>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-
-[...]
-
->>> -Example:
->>> + - vddpa-supply: Bluetooth VDD PA regulator handle
->>> + - vddio-supply: Bluetooth VDD IO regulator handle
->>> + - vddldo-supply: Bluetooth VDD LDO regulator handle. Kept under
->>> optional
->>> +                 parameters as some of the chipsets doesn't require ldo
->>> or
->>> +                 it may use from same vddio.
+>>> No, this is in addition to increasing the timeout. To have things
+>>> working I need to increase the timeout AND disable
+>>> module-card-restore. Sorry for not being clear about it before.
+>>>
+>>> I will try the commit you pointed, but I don't think it will help
+>>> since, if I'm following this right, the transport is already marked as
+>>> available at this point (I need to double-check on this point though
+>>> -- sorry, too many moving parts).
 >>
->>
->> You need to be explicit as to which properties apply or don't apply to
->> specific compatible strings.
+>> If you confirm that module-card-restore indeed has to be disabled even
+>> with the increased timeout, then it would be very interesting to know
+>> what effect module-card-restore has in the card initialization. To me
+>> it seems that it should make no difference, because the a2dp profile is
+>> the default anyway, and all the module does is to choose the initial
+>> profile.
 >>
 >
-> [Bala]: will update.
+> Ok, I have done more testing focusing on this specific point and
+> confirmed we indeed don't need to disable module-card-restore. With
+> the 60s timeout the headset was able to connect successfully 6 times
+> in a row. So for now the only open point is if there is any better fix
+> for these headsets than increasing the timeout.
+
+Im trying to reproduce this with sony sbh50 but apparently it doesn't
+have the same problem as it worked just fine, one thing I notice
+though is that HFP does not connect:
+
+https://gist.github.com/Vudentz/6f385ededcb00d1d0f4403f06923fd1a
+
+As you can see locally we only support HSP which means there is no
+match for MFP, but perhaps you are running with oFono? Anyway I should
+have an mw600 somewhere but that is quite old already, but you
+mentioned it did not work with MDR-XB950N1 which is quite new model?
+Anyway if you can gather some logs of bluetoothd that would be useful
+to identify where is the problem.
+
 >
->> Supplies should be based on inputs to the chip, so if 1 regulator
->> supplies 2 inputs you still need both.
->>
-> [Bala]:  sorry i did't get you, all these regulators are single output line
-> regulators.
->          i.e. <supply-name>- supply, need single regulator input as a
-> handle.
->          and these line regulators generate fixed voltage output.
->          please let me know, if i have cleared your query
+> --
+> Jo=C3=A3o Paulo Rechi Vita
+> http://about.me/jprvita
 
-I was referring to "it may use from same vddio". If you mean vddldo is
-left disconnected, then omitting the property is fine. If you mean
-vddio and vddldo are connected to the same regulator, then you should
-have both properties in the binding.
 
-Rob
+
+--=20
+Luiz Augusto von Dentz
