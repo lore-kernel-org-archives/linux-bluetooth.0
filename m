@@ -1,87 +1,144 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <CA+A7VXU30H_=aZw_Xi2S2iOkPp=nQxfMRTE9msAAX+oh7v1Qvw@mail.gmail.com>
-References: <CA+A7VXVEBULPWJpxMeED-QxxG25Az1ckWdL+cudqE0RL7he9Xg@mail.gmail.com>
- <5a3c473313387957bac050067857e22e62d544f5.camel@iki.fi> <CA+A7VXVy=1RjvaQgSyE5M9Hw=QRuy8Ejc0A=pFhtxn1=06ZC3Q@mail.gmail.com>
- <5731aaabb375e5b82945cabff8c315a2ef827cbe.camel@iki.fi> <CA+A7VXU30H_=aZw_Xi2S2iOkPp=nQxfMRTE9msAAX+oh7v1Qvw@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 20 Jun 2018 17:47:46 +0300
-Message-ID: <CABBYNZ+w=iC=OYz8y=NyLuvdEXfWprDoMuZiqTs+SijU7med9w@mail.gmail.com>
-Subject: Re: Failure to connect Sony headsets
-To: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-Cc: Tanu Kaskinen <tanuk@iki.fi>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        General PulseAudio Discussion
-        <pulseaudio-discuss@lists.freedesktop.org>,
-        =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>,
-        Linux Upstreaming Team <linux@endlessm.com>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Wed, 20 Jun 2018 17:03:04 +0530
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To: Rob Herring <robh@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, Thierry
+ Escande <thierry.escande@linaro.org>, "open list:BLUETOOTH DRIVERS"
+ <linux-bluetooth@vger.kernel.org>, rtatiya@codeaurora.org,
+ hemantg@codeaurora.org, linux-arm-msm <linux-arm-msm@vger.kernel.org>
+Subject: Re: [PATCH v7 1/8] dt-bindings: net: bluetooth: Add device tree
+ bindings for QTI chip wcn3990
+In-Reply-To: <CAL_JsqL5K-4LBEwS0ag=7M8cOp2nF+mRC+M03BinSj-YR0+b=Q@mail.gmail.com>
+References: <20180616062718.29844-1-bgodavar@codeaurora.org>
+ <20180616062718.29844-2-bgodavar@codeaurora.org>
+ <CAL_JsqL5K-4LBEwS0ag=7M8cOp2nF+mRC+M03BinSj-YR0+b=Q@mail.gmail.com>
+Message-ID: <ec01ffb8cb16afef0e92d4355f5e839e@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joao,
+Hi Rob,
 
-On Fri, Jun 15, 2018 at 2:33 AM, Jo=C3=A3o Paulo Rechi Vita
-<jprvita@gmail.com> wrote:
-> On Thu, Jun 14, 2018 at 8:27 AM, Tanu Kaskinen <tanuk@iki.fi> wrote:
->> On Thu, 2018-06-14 at 08:05 -0700, Jo=C3=A3o Paulo Rechi Vita wrote:
->>> > > I also had to disable module-card-restore, otherwise it tries to
->>> > > switch to the saved a2dp_sink profile right when the card is create=
-d,
->>> > > which also makes the device abort the AVDTP connection for some
->>> > > reason.
->>> >
->>> > This is without increasing the timeout, right, so the problem is that
->>> > module-card-restore is trying to restore a2dp_sink before it's
->>> > available? module-card-restore has been fixed to not to try to restor=
-e
->>> > unavailable profiles:
->>> > https://cgit.freedesktop.org/pulseaudio/pulseaudio/commit/?id=3Dd6597=
-4d8501052bafb03e65f5df954511e9949a2
->>> >
->>>
->>> No, this is in addition to increasing the timeout. To have things
->>> working I need to increase the timeout AND disable
->>> module-card-restore. Sorry for not being clear about it before.
->>>
->>> I will try the commit you pointed, but I don't think it will help
->>> since, if I'm following this right, the transport is already marked as
->>> available at this point (I need to double-check on this point though
->>> -- sorry, too many moving parts).
->>
->> If you confirm that module-card-restore indeed has to be disabled even
->> with the increased timeout, then it would be very interesting to know
->> what effect module-card-restore has in the card initialization. To me
->> it seems that it should make no difference, because the a2dp profile is
->> the default anyway, and all the module does is to choose the initial
->> profile.
->>
->
-> Ok, I have done more testing focusing on this specific point and
-> confirmed we indeed don't need to disable module-card-restore. With
-> the 60s timeout the headset was able to connect successfully 6 times
-> in a row. So for now the only open point is if there is any better fix
-> for these headsets than increasing the timeout.
+please find my comments inline.
 
-Im trying to reproduce this with sony sbh50 but apparently it doesn't
-have the same problem as it worked just fine, one thing I notice
-though is that HFP does not connect:
+On 2018-06-18 18:59, Rob Herring wrote:
+> On Sat, Jun 16, 2018 at 12:27 AM, Balakrishna Godavarthi
+> <bgodavar@codeaurora.org> wrote:
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> 
+> Commit messag missing.
+> 
+[Bala]: my bad, i some how missed. will update.
 
-https://gist.github.com/Vudentz/6f385ededcb00d1d0f4403f06923fd1a
-
-As you can see locally we only support HSP which means there is no
-match for MFP, but perhaps you are running with oFono? Anyway I should
-have an mw600 somewhere but that is quite old already, but you
-mentioned it did not work with MDR-XB950N1 which is quite new model?
-Anyway if you can gather some logs of bluetoothd that would be useful
-to identify where is the problem.
-
->
-> --
-> Jo=C3=A3o Paulo Rechi Vita
-> http://about.me/jprvita
+> Please use get_maintainers.pl and send patches to the right lists. DT
+> list in this case.
+> 
+[Bala]: will find the correct POC.
 
 
+>> ---
+>> Changes in v7:
+>>         * no change.
+>> 
+>> Changes in v6:
+>> 
+>>         * Changed the oper-speed to max-speed.
+>> 
+>> Changes in v5:
+>> 
+>>         * Added entry for oper-speed and init-speed.
+>> 
+>> ---
+>>  .../bindings/net/qualcomm-bluetooth.txt       | 31 
+>> +++++++++++++++++--
+>>  1 file changed, 29 insertions(+), 2 deletions(-)
+>> 
+>> diff --git 
+>> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt 
+>> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+>> index 0ea18a53cc29..c4590bc87390 100644
+>> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+>> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+>> @@ -10,12 +10,24 @@ device the slave device is attached to.
+>>  Required properties:
+>>   - compatible: should contain one of the following:
+>>     * "qcom,qca6174-bt"
+>> +   * "qcom,wcn3990-bt"
+>> 
+>>  Optional properties:
+>>   - enable-gpios: gpio specifier used to enable chip
+>>   - clocks: clock provided to the controller (SUSCLK_32KHZ)
+>> -
+>> -Example:
+>> + - vddpa-supply: Bluetooth VDD PA regulator handle
+>> + - vddio-supply: Bluetooth VDD IO regulator handle
+>> + - vddldo-supply: Bluetooth VDD LDO regulator handle. Kept under 
+>> optional
+>> +                 parameters as some of the chipsets doesn't require 
+>> ldo or
+>> +                 it may use from same vddio.
+> 
+> You need to be explicit as to which properties apply or don't apply to
+> specific compatible strings.
+> 
 
---=20
-Luiz Augusto von Dentz
+[Bala]: will update.
+
+> Supplies should be based on inputs to the chip, so if 1 regulator
+> supplies 2 inputs you still need both.
+> 
+[Bala]:  sorry i did't get you, all these regulators are single output 
+line regulators.
+          i.e. <supply-name>- supply, need single regulator input as a 
+handle.
+          and these line regulators generate fixed voltage output.
+          please let me know, if i have cleared your query
+
+>> + - vddxtal-supply: Bluetooth VDD XTAL regulator handle
+>> + - vddcore-supply: Bluetooth VDD CORE regulator handle
+>> + - vddpwd-supply: Chip power down gpio is required when bluetooth 
+>> module
+>> +                 and other modules like wifi co-exist in a singe chip 
+>> and
+>> +                 shares a common gpio to bring chip out of reset.
+>> + - max-speed: operating speed of the chip.
+>> +
+>> +Examples:
+>> 
+>>  serial@7570000 {
+>>         label = "BT-UART";
+>> @@ -28,3 +40,18 @@ serial@7570000 {
+>>                 clocks = <&divclk4>;
+>>         };
+>>  };
+>> +
+>> +serial@898000 {
+>> +       label = "BT-UART";
+>> +       status = "okay";
+>> +
+>> +       bluetooth: bt_wcn3990 {
+> 
+> Reverse these. The node name should be "bluetooth".
+> 
+>> +               compatible = "qcom,wcn3990-bt";
+>> +               vddio-supply = <&pm8998_s3>;
+>> +               vddxtal-supply = <&pm8998_s5>;
+>> +               vddcore-supply = <&pm8998_l7>;
+>> +               vddpa-supply = <&pm8998_l17>;
+>> +               vddldo-supply = <&pm8998_l25>;
+>> +               max-speed = <3200000>;
+>> +       };
+>> +};
+>> --
+>> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
+>> Forum,
+>> a Linux Foundation Collaborative Project
+>> 
+
+Thanks for reviewing, will send a incremental patch.
+
+-- 
+Regards
+Balakrishna.
