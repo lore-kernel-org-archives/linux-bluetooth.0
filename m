@@ -1,302 +1,167 @@
-Return-Path: <bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Thu, 21 Jun 2018 01:19:00 +0530
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
- thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
- rtatiya@codeaurora.org, hemantg@codeaurora.org,
- linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 5/8] Bluetooth: hci_qca: Defined wrapper functions for
- setting UART speeds
-In-Reply-To: <36000c0c93849527efdc19f6a6dc106e@codeaurora.org>
-References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-6-bgodavar@codeaurora.org>
- <20180618215128.GU88063@google.com>
- <36000c0c93849527efdc19f6a6dc106e@codeaurora.org>
-Message-ID: <431406f54800ff5d1a20b69e5a2fdf9c@codeaurora.org>
+In-Reply-To: <20170726090632.16494-1-luiz.dentz@gmail.com>
+References: <20170726090632.16494-1-luiz.dentz@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 20 Jun 2018 20:00:33 +0300
+Message-ID: <CABBYNZL011pcFsfLSJBLNgEU0aHqDGjuvqEvbU4xbaKHyiJmDg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] monitor: Use BPF to filter packets by index
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Matthias,
+Hi Marcel,
 
-On 2018-06-19 12:41, Balakrishna Godavarthi wrote:
-> HI Matthias,
-> 
-> Please find my comments in line.
-> 
-> On 2018-06-19 03:21, Matthias Kaehlcke wrote:
->> On Sat, Jun 16, 2018 at 11:57:15AM +0530, Balakrishna Godavarthi 
->> wrote:
->>> Subject: Bluetooth: hci_qca: Defined wrapper functions for setting
->>>          UART speeds
->> 
->> s/Defined/Define/
->> 
->> or
->> 
->> s/Defined/Add/
->> 
-> [Bala]: will update the text.
->>> 
->>> In qca_setup, we set initial and operating speeds for Qualcomm
->>> Bluetooth SoC's. This block of code is common across different
->>> Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
->>> a wrapper function to set the speeds. So that future coming SoC's
->>> can use these wrapper functions to set speeds.
->>> 
->>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->>> ---
->>> 
->>> Changes in v7:
->>> 	* initial patch
->>> 	* created wrapper functions for init and operating speeds.
->>> 
->>> ---
->>>  drivers/bluetooth/hci_qca.c | 64 
->>> ++++++++++++++++++++++++++-----------
->>>  1 file changed, 45 insertions(+), 19 deletions(-)
->>> 
->>> diff --git a/drivers/bluetooth/hci_qca.c 
->>> b/drivers/bluetooth/hci_qca.c
->>> index fe62420ef838..3e09c6223baf 100644
->>> --- a/drivers/bluetooth/hci_qca.c
->>> +++ b/drivers/bluetooth/hci_qca.c
->>> @@ -923,21 +923,10 @@ static inline void host_set_baudrate(struct 
->>> hci_uart *hu, unsigned int speed)
->>>  		hci_uart_set_baudrate(hu, speed);
->>>  }
->>> 
->>> -static int qca_setup(struct hci_uart *hu)
->>> +static void qca_set_init_speed(struct hci_uart *hu)
->>>  {
->>> -	struct hci_dev *hdev = hu->hdev;
->>> -	struct qca_data *qca = hu->priv;
->>> -	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->>> -	int ret;
->>> -	int soc_ver = 0;
->>> -
->>> -	bt_dev_info(hdev, "ROME setup");
->>> -
->>> -	/* Patch downloading has to be done without IBS mode */
->>> -	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->>> +	unsigned int speed = 0;
->>> 
->>> -	/* Setup initial baudrate */
->>> -	speed = 0;
->>>  	if (hu->init_speed)
->>>  		speed = hu->init_speed;
->>>  	else if (hu->proto->init_speed)
->>> @@ -945,27 +934,64 @@ static int qca_setup(struct hci_uart *hu)
->>> 
->>>  	if (speed)
->>>  		host_set_baudrate(hu, speed);
->>> +}
->>> +
->>> +static int qca_get_oper_speed(struct hci_uart *hu)
->> 
->> Return type should be unsigned int.
->> 
-> [Bala]: will update
->>> +{
->>> +	unsigned int speed = 0;
->>> 
->>> -	/* Setup user speed if needed */
->>> -	speed = 0;
->>>  	if (hu->oper_speed)
->>>  		speed = hu->oper_speed;
->>>  	else if (hu->proto->oper_speed)
->>>  		speed = hu->proto->oper_speed;
->>> 
->>> +	return speed;
->>> +}
->>> +
->>> +static int qca_set_oper_speed(struct hci_uart *hu)
->>> +{
->>> +	unsigned int speed = 0, qca_baudrate;
->> 
->> initialization is not needed.
->> 
-> [Bala]: will update
-> 
->>> +	int ret = 0;
->>> +
->>> +	speed = qca_get_oper_speed(hu);
->>>  	if (speed) {
->> 
->> nit:
->> 	if (!speed)
->> 		return 0;
->> 
->> 
-> [Bala]: will update.
-> 
->>>  		qca_baudrate = qca_get_baudrate_value(speed);
->>> -
->>> -		bt_dev_info(hdev, "Set UART speed to %d", speed);
->>> -		ret = qca_set_baudrate(hdev, qca_baudrate);
->>> +		bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
->>> +		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
->>>  		if (ret) {
->>> -			bt_dev_err(hdev, "Failed to change the baud rate (%d)",
->>> +			bt_dev_err(hu->hdev, "Failed to change the baud rate (%d)",
->>>  				   ret);
->>>  			return ret;
->>>  		}
->>>  		host_set_baudrate(hu, speed);
->>>  	}
->>> 
->>> +	return ret;
->>> +}
->>> +
->>> +static int qca_setup(struct hci_uart *hu)
->>> +{
->>> +	struct hci_dev *hdev = hu->hdev;
->>> +	struct qca_data *qca = hu->priv;
->>> +	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->>> +	int ret;
->>> +	int soc_ver = 0;
->>> +
->>> +	bt_dev_info(hdev, "ROME setup");
->>> +
->>> +	/* Patch downloading has to be done without IBS mode */
->>> +	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->>> +
->>> +	/* Setup initial baudrate */
->>> +	qca_set_init_speed(hu);
->>> +	/* Setup user speed if needed */
->>> +	ret = qca_set_oper_speed(hu);
->>> +	if (ret)
->>> +		return ret;
->>> +	speed = qca_get_oper_speed(hu);
->>> +	if (speed)
->>> +		qca_baudrate = qca_get_baudrate_value(speed);
->> 
->> nit: the sequence
->> 
->> qca_set_oper_speed()
->> qca_get_oper_speed()
->> 
->> is slightly awkward to read. This could be avoided if the speed was
->> passed as parameter, though I understand this isn't done for symmetry
->> with qca_set_init_speed(). An alternative could be:
->> 
->> static int qca_set_speed(struct hci_uart *hu, unsigned int speed, enum
->>     qca_speed_type speed_type)
->> {
->> 	unsigned int qca_baudrate;
->> 
->> 	if (speed_type == QCA_OPER_SPEED) {
->> 		qca_baudrate = qca_get_baudrate_value(speed);
->> 		bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
->> 		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
->> 		if (ret) {
->> 			bt_dev_err(hu->hdev, "Failed to change the baud rate (%d)",
->> 				ret);
->> 			return ret;
->> 		}
->> 	}
->> 
->> 	host_set_baudrate(hu, speed);
->> 
->> 	/* If the order doesn't matter set the host baudrate first and
->> 	   return if speed_type != QCA_OPER_SPEED */
->> 
->> 	return 0;
->> }
->> 
->> static int qca_setup(struct hci_uart *hu)
->> {
->> 	...
->> 	speed = qca_get_init_speed(hu);
->> 	if (speed)
->> 		qca_set_speed(hu, speed, QCA_INIT_SPEED);
->> 
->> 	speed = qca_get_oper_speed(hu);
->> 	if (speed) {
->> 	   	qca_set_speed(hu, speed, QCA_OPER_SPEED);
->> 		qca_baudrate = qca_get_baudrate_value(speed);
->> 	}
->> 	...
->> }
->> 
->> Just a suggestion, ok for me if you prefer to keep it as is.
-> 
-> [Bala]: will study and update the same.
+On Wed, Jul 26, 2017 at 12:06 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This uses a BPF filter to filter packets to specific index.
+> ---
+>  monitor/control.c | 36 ++++++++++++++++++++++++++++++++++++
+>  monitor/control.h |  1 +
+>  monitor/packet.c  |  9 ++-------
+>  3 files changed, 39 insertions(+), 7 deletions(-)
+>
+> diff --git a/monitor/control.c b/monitor/control.c
+> index 9bbdc37dc..05cfc3aaa 100644
+> --- a/monitor/control.c
+> +++ b/monitor/control.c
+> @@ -28,6 +28,7 @@
+>
+>  #include <stdio.h>
+>  #include <stdbool.h>
+> +#include <stddef.h>
+>  #include <errno.h>
+>  #include <unistd.h>
+>  #include <stdlib.h>
+> @@ -39,6 +40,7 @@
+>  #include <sys/stat.h>
+>  #include <termios.h>
+>  #include <fcntl.h>
+> +#include <linux/filter.h>
+>
+>  #include "lib/bluetooth.h"
+>  #include "lib/hci.h"
+> @@ -58,6 +60,7 @@
+>  static struct btsnoop *btsnoop_file = NULL;
+>  static bool hcidump_fallback = false;
+>  static bool decode_control = true;
+> +static uint16_t filter_index = HCI_DEV_NONE;
+>
+>  struct control_data {
+>         uint16_t channel;
+> @@ -1028,6 +1031,31 @@ static int open_socket(uint16_t channel)
+>         return fd;
+>  }
+>
+> +static void attach_index_filter(int fd, uint16_t index)
+> +{
+> +       struct sock_filter filters[] = {
+> +               /* A <- MGMT index */
+> +               BPF_STMT(BPF_LD + BPF_B + BPF_ABS,
+> +                                       offsetof(struct mgmt_hdr, index)),
+> +               /* A == HCI_DEV_NONE */
+> +               BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, HCI_DEV_NONE, 0, 1),
+> +               /* return */
+> +               BPF_STMT(BPF_RET|BPF_K, 0x0fffffff), /* pass */
+> +               /* A ==  index */
+> +               BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, index, 0, 1),
+> +               /* returns */
+> +               BPF_STMT(BPF_RET|BPF_K, 0x0fffffff), /* pass */
+> +               BPF_STMT(BPF_RET|BPF_K, 0), /* reject */
+> +       };
+> +       struct sock_fprog fprog = {
+> +               .len = sizeof(filters) / sizeof(filters[0]),
+> +               /* casting const away: */
+> +               .filter = filters,
+> +       };
+> +
+> +       setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, &fprog, sizeof(fprog));
+> +}
+> +
+>  static int open_channel(uint16_t channel)
+>  {
+>         struct control_data *data;
+> @@ -1045,6 +1073,9 @@ static int open_channel(uint16_t channel)
+>                 return -1;
+>         }
+>
+> +       if (filter_index != HCI_DEV_NONE)
+> +               attach_index_filter(data->fd, filter_index);
+> +
+>         mainloop_add_fd(data->fd, EPOLLIN, data_callback, data, free_data);
+>
+>         return 0;
+> @@ -1459,3 +1490,8 @@ void control_disable_decoding(void)
+>  {
+>         decode_control = false;
+>  }
+> +
+> +void control_filter_index(uint16_t index)
+> +{
+> +       filter_index = index;
+> +}
+> diff --git a/monitor/control.h b/monitor/control.h
+> index 630a852e4..dc655a45d 100644
+> --- a/monitor/control.h
+> +++ b/monitor/control.h
+> @@ -30,5 +30,6 @@ void control_server(const char *path);
+>  int control_tty(const char *path, unsigned int speed);
+>  int control_tracing(void);
+>  void control_disable_decoding(void);
+> +void control_filter_index(uint16_t index);
+>
+>  void control_message(uint16_t opcode, const void *data, uint16_t size);
+> diff --git a/monitor/packet.c b/monitor/packet.c
+> index 387be1dcb..cedbef1f7 100644
+> --- a/monitor/packet.c
+> +++ b/monitor/packet.c
+> @@ -104,7 +104,6 @@ static time_t time_offset = ((time_t) -1);
+>  static int priority_level = BTSNOOP_PRIORITY_INFO;
+>  static unsigned long filter_mask = 0;
+>  static bool index_filter = false;
+> -static uint16_t index_number = 0;
+>  static uint16_t index_current = 0;
+>
+>  #define UNKNOWN_MANUFACTURER 0xffff
+> @@ -259,8 +258,9 @@ void packet_select_index(uint16_t index)
+>  {
+>         filter_mask &= ~PACKET_FILTER_SHOW_INDEX;
+>
+> +       control_filter_index(index);
+> +
+>         index_filter = true;
+> -       index_number = index;
+>  }
+>
+>  #define print_space(x) printf("%*c", (x), ' ');
+> @@ -4039,9 +4039,6 @@ void packet_control(struct timeval *tv, struct ucred *cred,
+>                                         uint16_t index, uint16_t opcode,
+>                                         const void *data, uint16_t size)
+>  {
+> -       if (index_filter && index_number != index)
+> -               return;
+> -
+>         control_message(opcode, data, size);
+>  }
+>
+> @@ -4063,8 +4060,6 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+>         const char *ident;
+>
+>         if (index != HCI_DEV_NONE) {
+> -               if (index_filter && index_number != index)
+> -                       return;
+>                 index_current = index;
+>         }
+>
+> --
+> 2.13.3
 
-[Bala]: you are suggestion looks ok to me. i am thinking to optimize 
-further.
+ping
 
-static unsigned int qca_get_speed(struct hci_uart *hu,
-                                   enum qca_speed_type speed_type)
-{
-         unsigned int speed = 0;
 
-         if (speed_type == QCA_INIT_SPEED) {
-                 if (hu->init_speed)
-                         speed = hu->init_speed;
-                 else if (hu->proto->init_speed)
-                         speed = hu->proto->init_speed;
-         } else {
-                 if (hu->oper_speed)
-                         speed = hu->oper_speed;
-                 else if (hu->proto->oper_speed)
-                         speed = hu->proto->oper_speed;
-         }
-
-         return speed;
-}
-
-static int qca_set_speed(struct hci_uart *hu, unsigned int speed,
-                          enum qca_speed_type speed_type)
-{
-         unsigned int qca_baudrate;
-         int ret;
-
-         if (speed_type == QCA_OPER_SPEED) {
-                 qca_baudrate = qca_get_baudrate_value(speed);
-                 bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
-                 ret = qca_set_baudrate(hu->hdev, qca_baudrate);
-                 if (ret) {
-                         bt_dev_err(hu->hdev, "Failed to change the 
-baudrate (%d)",
-                                    ret);
-                         return ret;
-                 }
-         }
-
-         host_set_baudrate(hu, speed);
-
-         return ret;
-}
-
-  static int qca_setup(struct hci_uart *hu)
-  {
-  	...
-     /* Setup initial baudrate */
-         speed = qca_get_speed(hu, QCA_INIT_SPEED);
-         if (speed)
-                 qca_set_speed(hu, speed, QCA_INIT_SPEED);
-
-         /* Setup user speed if needed */
-         speed = qca_get_speed(hu, QCA_OPER_SPEED);
-         if (speed) {
-                 ret = qca_set_speed(hu, speed, QCA_OPER_SPEED);
-                 if (ret)
-                         return ret;
-
-                 qca_baudrate = qca_get_baudrate_value(speed);
-         }
-
-}
-
-will have two functions,
-qca_set_speed(): for setting speed
-qca_get_speed(): to get the speed.
-
-is this preferable?
 
 -- 
-Regards
-Balakrishna.
+Luiz Augusto von Dentz
