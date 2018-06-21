@@ -1,71 +1,268 @@
-Return-Path: <swboyd@chromium.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <mka@chromium.org>
+Date: Thu, 21 Jun 2018 15:09:39 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
 To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-From: Stephen Boyd <swboyd@chromium.org>
-In-Reply-To: <683e1475fa74c88614143456ad2cc85a@codeaurora.org>
-Cc: johan.hedberg@gmail.com, marcel@holtmann.org, mka@chromium.org,
- thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
- rtatiya@codeaurora.org, hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
+	rtatiya@codeaurora.org, hemantg@codeaurora.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v7 4/8] Bluetooth: btqca: Redefine qca_uart_setup() to
+ generic function.
+Message-ID: <20180621220939.GA129942@google.com>
 References: <20180616062718.29844-1-bgodavar@codeaurora.org>
- <20180616062718.29844-9-bgodavar@codeaurora.org>
- <152934015159.16708.15821626950761504540@swboyd.mtv.corp.google.com>
- <683e1475fa74c88614143456ad2cc85a@codeaurora.org>
-Message-ID: <152963092979.16708.15747731441619460587@swboyd.mtv.corp.google.com>
-Subject: Re: [PATCH v7 8/8] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
- chip wcn3990
-Date: Thu, 21 Jun 2018 18:28:49 -0700
+ <20180616062718.29844-5-bgodavar@codeaurora.org>
+ <20180618211942.GT88063@google.com>
+ <fdd4fd89b53ba0fb85a53e4d4d33b0d5@codeaurora.org>
+ <20180619200338.GD169030@google.com>
+ <f37214cb19823893f2679787139ec471@codeaurora.org>
+ <20180620233306.GK169030@google.com>
+ <ac99931766b3a12716c7e161057043ca@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <ac99931766b3a12716c7e161057043ca@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Quoting Balakrishna Godavarthi (2018-06-18 10:07:31)
-> Hi Stephen,
-> =
+On Thu, Jun 21, 2018 at 04:50:28PM +0530, Balakrishna Godavarthi wrote:
+> Hi Matthias,
+> 
+> On 2018-06-21 05:03, Matthias Kaehlcke wrote:
+> > Hi Balakrishna,
+> > 
+> > On Wed, Jun 20, 2018 at 04:23:25PM +0530, Balakrishna Godavarthi wrote:
+> > > Hi Matthias,
+> > > 
+> > > On 2018-06-20 01:33, Matthias Kaehlcke wrote:
+> > > > On Tue, Jun 19, 2018 at 12:39:07PM +0530, Balakrishna Godavarthi wrote:
+> > > > > Hi Matthias,
+> > > > >
+> > > > > Please find my comments inline.
+> > > > >
+> > > > > On 2018-06-19 02:49, Matthias Kaehlcke wrote:
+> > > > > > On Sat, Jun 16, 2018 at 11:57:14AM +0530, Balakrishna Godavarthi wrote:
+> > > > > >
+> > > > > > > @@ -337,19 +337,20 @@ int qca_uart_setup(struct hci_dev *hdev,
+> > > > > > > uint8_t baudrate)
+> > > > > > >
+> > > > > > >  	config.user_baud_rate = baudrate;
+> > > > > > >
+> > > > > > > -	/* Get QCA version information */
+> > > > > > > -	err = qca_read_soc_version(hdev, &rome_ver);
+> > > > > > > -	if (err < 0 || rome_ver == 0) {
+> > > > > > > -		bt_dev_err(hdev, "QCA Failed to get version %d", err);
+> > > > > > > -		return err;
+> > > > > > > +	if (!soc_ver) {
+> > > > > > > +		/* Get QCA version information */
+> > > > > > > +		err = qca_read_soc_version(hdev, &soc_ver);
+> > > > > > > +		if (err < 0 || soc_ver == 0) {
+> > > > > > > +			bt_dev_err(hdev, "QCA Failed to get version %d", err);
+> > > > > > > +			return err;
+> > > > > > > +		}
+> > > > > > > +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+> > > > > > >  	}
+> > > > > >
+> > > > > > Why is this needed? A caller that passes in soc_ver = 0 could just
+> > > > > > call qca_read_soc_version() themselves.
+> > > > > [Bala]: hci_qca support two chip one ROME (already up-streamed) and
+> > > > > other
+> > > > > wcn3990.
+> > > > >         there setup sequence differs.
+> > > > >
+> > > > >         wcn3900:
+> > > > >         1. set baudrate to 115200
+> > > > >         2. read soc version
+> > > > >         3. set baudarte to 3.2Mbps
+> > > > >         4. download firmware. (calls qca_uart_setup)
+> > > > >
+> > > > >        ROME:
+> > > > >        1. set baudrate to 3.0 mbps
+> > > > >        2. calls qca_uart_setup to read soc version and download
+> > > > > firmware.
+> > > > >
+> > > > >       so to make use of existing function qca_setup_uart(). passing
+> > > > > soc_ver
+> > > > > as argument.
+> > > > >       if soc_ver is zero, then read soc version (i.e. for ROME chip).
+> > > > >
+> > > > >       Pls let me know, if you have any queries.
+> > > >
+> > > > I don't really understand this argumentation. Let's look at the code
+> > > > at the end of this series, where both Rome and wcn3900 are supported:
+> > > >
+> > > > https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1059
+> > > >
+> > > > The version could be read (for Rome only) after setting the operating
+> > > > speed:
+> > > 
+> > > [Bala]: yes we can read SoC version after setting operating baud
+> > > rate. an
+> > > advice from SoC vendor that, read SoC version before setting operating
+> > > speed.
+> > >         one advantage from reading SoC version before setting
+> > > operating
+> > > baudrate,it will helps us to understand whether the soc is
+> > > responding to any
+> > > commands in default baud rate
+> > >         before setting operating speed.
+> > 
+> > Is the recommendation for Rome or wcn3990? I was referring to Rome and
+> > the current code sets the operating speed and then reads the SoC
+> > version (inside qca_uart_setup())
+> > 
+> 
+> [Bala]: my statement is wrt to wcn3990. yes, ROME will set operating speed
+> and read version.
+> 
+> > > > https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1111
+> > > >
+> > > > I concede that having two "if (qcadev->btsoc_type == XYZ)" branches in
+> > > > qca_setup() is kinda ugly, but I think it's still better than the
+> > > > conditional call of qca_read_soc_version() in qca_uart_setup().
+> > > 
+> > > [Bala]: we require an if-else block  for soc type.As wcn3900 support
+> > > hardware flow control where as ROME is not supporting hardware flow
+> > > control.
+> > 
+> > Since you mention if-else and flow control I'm not sure if you
+> > understood correctly what I suggested. My suggestion is to add
+> > something like this:
+> > 
+> > if (qcadev->btsoc_type == QCA_ROME) {
+> > 	ret = qca_read_soc_version(hdev, &soc_ver);
+> > 	if (ret < 0 || soc_ver == 0) {
+> > 	   	// Note mka@: we might want to skip this log,
+> > 		// qca_read_soc_version() already logs in all error paths
+> > 		bt_dev_err(hdev, "Failed to get version %d", ret);
+> > 		return ret;
+> > 	}
+> > }
+> > 
+> > right here:
+> > 
+> > https://chromium-review.googlesource.com/c/chromiumos/third_party/kernel/+/1045608/6/drivers/bluetooth/hci_qca.c#1111
+> > 
+> > which is functionally equivalent to the current code.
+> > 
+> > You could even do the error check in the common code (just checking
+> > for 'soc_ver == 0', assuming that qca_read_soc_version() doesn't set
+> > it to something different in case of error).
+> > 
+> > Anyway, I won't insist if you prefer it as is and Marcel is ok with it.
+> 
+> [Bala]: thanks for clarifying my doubt, but if remove the
+> qca_read_soc_version() from qca_uart_setup() and handle it qca_setup().
+>         in that case, we will have common blocks of code, when we integrate
+> wcn3990 into existing qca_setup()
 
-> Please find my comments inline.
-> =
+Excellent!
 
-> On 2018-06-18 22:12, Stephen Boyd wrote:
-> > Quoting Balakrishna Godavarthi (2018-06-15 23:27:18)
-> >> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> >> index 28ae6a17a595..1961e313aae7 100644
-> >> --- a/drivers/bluetooth/hci_qca.c
-> >> +++ b/drivers/bluetooth/hci_qca.c
-> >> @@ -1031,9 +1145,118 @@ static struct hci_uart_proto qca_proto =3D {
-> >>         .dequeue        =3D qca_dequeue,
-> >>  };
-> >> =
+>        static int qca_setup(struct hci_uart *hu)
+>       {
+>         ...
+> 
+>         qcadev = serdev_device_get_drvdata(hu->serdev);
+> 
+>         /* Patch downloading has to be done without IBS mode */
+>         clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+> 
+>         /* Setup initial baudrate */
+>         speed = qca_get_speed(hu, QCA_INIT_SPEED);
+>         if (speed)
+>                 qca_set_speed(hu, speed, QCA_INIT_SPEED);
 
-> >> +static const struct qca_vreg_data qca_cherokee_data =3D {
-> >> +       .soc_type =3D QCA_WCN3990,
-> >> +       .vregs =3D (struct qca_vreg []) {
-> >> +               { "vddio",   1352000, 1352000,  0 },
-> >> +               { "vddxtal", 1904000, 2040000,  0 },
-> >> +               { "vddcore", 1800000, 1800000,  1 },
-> >> +               { "vddpa",   1304000, 1304000,  1 },
-> >> +               { "vddldo",  3000000, 3312000,  1 },
-> > =
+I said earlier that a _set_speed() followed by a _get_speed() is a bit
+odd, and that it would be better to get the speed first and pass it as
+a parameter. After looking again over the larger code I'm not
+convinced anymore this is such a good idea, since the above pattern is
+repeated multiple times, when it could be just:
 
-> > Load of 0 and 1 seems sort of odd. Are these made up to indicate "some
-> > load" vs. "no load"?
-> > =
+qca_set_speed(hu, QCA_INIT_SPEED)
 
-> =
+(+ error handling, which is also missing in the code above)
 
-> [Bala]: this value specifies the output load current required to turn on =
+Just a thought, not asking you to change it back, do whatever seems
+best to you.
 
-> the wcn3990.
->          in struct defined vddio\vddxtal are smps, with fixed load.
->          regs from vddcore/vddpa/vddldo are programmable line regulators, =
+>         if (qcadev->btsoc_type == QCA_WCN3990) {
+>                 bt_dev_dbg(hdev, "setting up wcn3990");
+>                 hci_uart_set_flow_control(hu, true);
+>                 ret = qca_send_vendor_cmd(hdev, QCA_WCN3990_POWERON_PULSE);
+>                 if (ret) {
+>                         bt_dev_err(hdev, "failed to send power on command");
+>                         return ret;
+>                 }
+> 
+>                 serdev_device_close(hu->serdev);
+>                 ret = serdev_device_open(hu->serdev);
+>                 if (ret) {
+>                         bt_dev_err(hdev, "failed to open port");
+>                         return ret;
+>                 }
+> 
+>                 msleep(100);
+>                 speed = qca_get_speed(hu, QCA_INIT_SPEED);
+>                 if (speed)
+>                         qca_set_speed(hu, speed, QCA_INIT_SPEED);
+> 
+>                 hci_uart_set_flow_control(hu, false);
+>         } else {
+>                 bt_dev_info(hdev, "ROME setup");
+>                 /* Setup user speed if needed */
+>                 speed = qca_get_speed(hu, QCA_OPER_SPEED);
+>                 if (speed) {
+>                         ret = qca_set_speed(hu, speed, QCA_OPER_SPEED);
+>                         if (ret)
+>                                 return ret;
+> 
+>                         qca_baudrate = qca_get_baudrate_value(speed);
 
-> in which we need to set the basic load.
+It seems setting 'qca_baudrate' could also be done in the common
+path. Would require an extra qca_get_speed(hu, QCA_OPER_SPEED) call,
+in exchange this would be done in a single place closer to where
+'qca_baudrate' is actually used.
 
-I got that part, but a load of 1 still seems like a nonsensical value.
-Is it to workaround some issue with the regulator driver?
+Actually as it is now 'qca_baudrate' could remain uninitialized for
+Rome if no operating speed is defined, which judging from
+qca_get_baudrate_value() should result in QCA_BAUDRATE_115200.
 
-It's also pretty weird to be setting regulator voltages here in the
-driver. Typically that's configured on the board and then the DT has the
-right voltage already. The only case when the voltage may need to be set
-by the driver is if the hardware can dynamically scale the voltage for
-things like DVFS. It looks like here that the voltage is always fixed,
-so probably we don't need to have any sort of voltage setting in this
-driver and can rely on the DTS file to get things right.
+>                 }
+>         }
+> 
+>         ret = qca_read_soc_version(hdev, &soc_ver);
+>         if (ret < 0 || soc_ver == 0) {
+>                 bt_dev_err(hdev, "Failed to get version %d", ret);
+>                 return ret;
+>         }
+>         bt_dev_info(hdev, "wcn3990 controller version 0x%08x", soc_ver);
+> 
+> 
+>         if (qcadev->btsoc_type == QCA_WCN3990) {
+>                 hci_uart_set_flow_control(hu, true);
+>                 /* Setup user speed if needed */
+>                 speed = qca_get_speed(hu, QCA_OPER_SPEED);
+>                 if (speed) {
+>                         ret = qca_set_speed(hu, speed, QCA_OPER_SPEED);
+>                         if (ret)
+>                                 return ret;
+> 
+>                 qca_baudrate = qca_get_baudrate_value(speed);
+> 
+>         }
+> 
+>         /* Setup patch / NVM configurations */
+>         ret = qca_uart_setup(hdev, qca_baudrate, qcadev->btsoc_type,
+> soc_ver);
+>         if (!ret) {
+>                 set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>                 qca_debugfs_init(hdev);
+>         } else if (ret == -ENOENT) {
+>                 /* No patch/nvm-config found, run with original fw/config */
+>                 ret = 0;
+>         } else if (ret == -EAGAIN) {
+>                 /*
+>       ...
+>       }
+
+Overall looks good and should still become a bit more compact if the
+handling of flow control is done in _set_speed() as you suggested in
+"[PATCH v7 8/8] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
+chip wcn3990"
