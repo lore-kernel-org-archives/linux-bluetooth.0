@@ -2,86 +2,40 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH BlueZ] monitor: Use BPF to filter packets by index
+Subject: Re: [PATCH] Bluetooth: btusb: use irqsave() in URB's complete
+ callback
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZL011pcFsfLSJBLNgEU0aHqDGjuvqEvbU4xbaKHyiJmDg@mail.gmail.com>
-Date: Thu, 21 Jun 2018 14:49:17 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <A45809F0-CA1F-4ABA-B9C4-74634CD04C0E@holtmann.org>
-References: <20170726090632.16494-1-luiz.dentz@gmail.com>
- <CABBYNZL011pcFsfLSJBLNgEU0aHqDGjuvqEvbU4xbaKHyiJmDg@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <20180619215657.13745-1-bigeasy@linutronix.de>
+Date: Thu, 21 Jun 2018 14:43:41 +0200
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-usb@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <66D1D85C-A671-45CF-BBB4-974E3063B9F3@holtmann.org>
+References: <20180619215657.13745-1-bigeasy@linutronix.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Greg Kroah-Hartman <greg@kroah.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Sebastian,
 
->> This uses a BPF filter to filter packets to specific index.
->> ---
->> monitor/control.c | 36 ++++++++++++++++++++++++++++++++++++
->> monitor/control.h |  1 +
->> monitor/packet.c  |  9 ++-------
->> 3 files changed, 39 insertions(+), 7 deletions(-)
->> 
->> diff --git a/monitor/control.c b/monitor/control.c
->> index 9bbdc37dc..05cfc3aaa 100644
->> --- a/monitor/control.c
->> +++ b/monitor/control.c
->> @@ -28,6 +28,7 @@
->> 
->> #include <stdio.h>
->> #include <stdbool.h>
->> +#include <stddef.h>
->> #include <errno.h>
->> #include <unistd.h>
->> #include <stdlib.h>
->> @@ -39,6 +40,7 @@
->> #include <sys/stat.h>
->> #include <termios.h>
->> #include <fcntl.h>
->> +#include <linux/filter.h>
->> 
->> #include "lib/bluetooth.h"
->> #include "lib/hci.h"
->> @@ -58,6 +60,7 @@
->> static struct btsnoop *btsnoop_file = NULL;
->> static bool hcidump_fallback = false;
->> static bool decode_control = true;
->> +static uint16_t filter_index = HCI_DEV_NONE;
->> 
->> struct control_data {
->>        uint16_t channel;
->> @@ -1028,6 +1031,31 @@ static int open_socket(uint16_t channel)
->>        return fd;
->> }
->> 
->> +static void attach_index_filter(int fd, uint16_t index)
->> +{
->> +       struct sock_filter filters[] = {
->> +               /* A <- MGMT index */
->> +               BPF_STMT(BPF_LD + BPF_B + BPF_ABS,
->> +                                       offsetof(struct mgmt_hdr, index)),
->> +               /* A == HCI_DEV_NONE */
->> +               BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, HCI_DEV_NONE, 0, 1),
->> +               /* return */
->> +               BPF_STMT(BPF_RET|BPF_K, 0x0fffffff), /* pass */
->> +               /* A ==  index */
->> +               BPF_JUMP(BPF_JMP + BPF_JEQ + BPF_K, index, 0, 1),
->> +               /* returns */
->> +               BPF_STMT(BPF_RET|BPF_K, 0x0fffffff), /* pass */
->> +               BPF_STMT(BPF_RET|BPF_K, 0), /* reject */
->> +       };
->> +       struct sock_fprog fprog = {
->> +               .len = sizeof(filters) / sizeof(filters[0]),
->> +               /* casting const away: */
->> +               .filter = filters,
->> +       };
->> +
->> +       setsockopt(fd, SOL_SOCKET, SO_ATTACH_FILTER, &fprog, sizeof(fprog));
->> +}
->> +
+> The USB completion callback does not disable interrupts while acquiring
+> the ->lock. We want to remove the local_irq_disable() invocation from
+> __usb_hcd_giveback_urb() and therefore it is required for the callback
+> handler to disable the interrupts while acquiring the lock.
+> The callback may be invoked either in IRQ or BH context depending on the
+> USB host controller.
+> Use the _irqsave variant of the locking primitives.
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+> drivers/bluetooth/btusb.c | 20 ++++++++++++--------
+> 1 file changed, 12 insertions(+), 8 deletions(-)
 
-I would prefer a bit more comments on what the program is doing. So allow packets from HCI_DEV_NONE, filter for index etc.
+can I get an ACK from someone ensuring that this is the direction we are going with the USB host controllers?
 
 Regards
 
