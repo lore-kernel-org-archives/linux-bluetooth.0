@@ -1,104 +1,71 @@
-Return-Path: <jaganath.k.os@gmail.com>
+Return-Path: <swboyd@chromium.org>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <8ACDAD02-53CF-4D39-A533-918154485903@holtmann.org>
-References: <1528978884-3882-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1528978884-3882-2-git-send-email-jaganathx.kanakkassery@intel.com> <8ACDAD02-53CF-4D39-A533-918154485903@holtmann.org>
-From: Jaganath K <jaganath.k.os@gmail.com>
-Date: Fri, 22 Jun 2018 12:55:11 +0530
-Message-ID: <CAJzH+bo0GnRa-5uvkYHWekPWsjHVmm_6gZTgHhJQ_n6j7fLzBw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 01/11] doc/mgmt-api: Add support for Set Phy
- Configuration command
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+From: Stephen Boyd <swboyd@chromium.org>
+In-Reply-To: <683e1475fa74c88614143456ad2cc85a@codeaurora.org>
+Cc: johan.hedberg@gmail.com, marcel@holtmann.org, mka@chromium.org,
+ thierry.escande@linaro.org, linux-bluetooth@vger.kernel.org,
+ rtatiya@codeaurora.org, hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+References: <20180616062718.29844-1-bgodavar@codeaurora.org>
+ <20180616062718.29844-9-bgodavar@codeaurora.org>
+ <152934015159.16708.15821626950761504540@swboyd.mtv.corp.google.com>
+ <683e1475fa74c88614143456ad2cc85a@codeaurora.org>
+Message-ID: <152963092979.16708.15747731441619460587@swboyd.mtv.corp.google.com>
+Subject: Re: [PATCH v7 8/8] Bluetooth: hci_qca: Add support for Qualcomm Bluetooth
+ chip wcn3990
+Date: Thu, 21 Jun 2018 18:28:49 -0700
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Quoting Balakrishna Godavarthi (2018-06-18 10:07:31)
+> Hi Stephen,
+> =
 
-On Thu, Jun 21, 2018 at 7:57 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jaganath,
->
->> This also adds PHY Configuration Changed Event.
->> ---
->> doc/mgmt-api.txt | 81 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->> 1 file changed, 81 insertions(+)
->>
->> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
->> index 8e7de14..caba22d 100644
->> --- a/doc/mgmt-api.txt
->> +++ b/doc/mgmt-api.txt
->> @@ -2917,6 +2917,72 @@ Set Appearance Command
->>                               Invalid Index
->>
->>
->> +Get PHY Configuration Command
->> +==========================
->> +
->> +     Command Code:           0x0043
->> +     Controller Index:       <controller id>
->> +     Command Parameters:
->> +     Return Parameters:      Supported_phys (2 Octet)
->> +                             Selected_phys (2 Octet)
->> +
->> +     This command is used to retrieve the supported PHYs and currently
->> +     selected PHYs.
->> +
->> +     Supported_phys and Selected_phys is a bitmask with the following bits.
->> +             0       LE 1M TX
->> +             1       LE 1M RX
->> +             2       LE 2M TX
->> +             3       LE 2M RX
->> +             4       LE CODED TX
->> +             5       LE CODED RX
->> +
->> +     LE 1M TX and LE 1M RX would be supported by default.
->> +
->> +     This command is only available for LE capable controllers.
->> +        It will return Not Supported otherwise.
->> +
->> +        Possible errors:     Not Supported
->> +                             Invalid Index
->
-> so I spent some time thinking about how useful it is to make this LE specific or if we allow BR/EDR configuration as well. I concluded that we want to include BR/EDR as well and also tell exactly what options are configurable and which ones are static.
->
->         Command Code:           0x0043
->         Controller Index:       <controller id>
->         Command Parameters:
->         Return Parameters:      Supported_PHYs (4 Octets)
->                                 Configurable_PHYs (4 Octets)
->                                 Selected_PHYs (4 Octets)
->
->         The PHYs parameters are a bitmask with currently the
->         following available bits:
->
->                 0       BR 1M 1-Slot
->                 1       BR 1M 3-Slot
->                 2       BR 1M 5-Slot
->                 3       EDR 2M 1-Slot
->                 4       EDR 2M 3-Slot
->                 5       EDR 2M 5-Slot
->                 6       EDR 3M 1-Slot
->                 7       EDR 3M 3-Slot
->                 8       EDR 3M 5-Slot
+> Please find my comments inline.
+> =
 
-Accordingly set the packet type in "HCI CreateConnection"?
+> On 2018-06-18 22:12, Stephen Boyd wrote:
+> > Quoting Balakrishna Godavarthi (2018-06-15 23:27:18)
+> >> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> >> index 28ae6a17a595..1961e313aae7 100644
+> >> --- a/drivers/bluetooth/hci_qca.c
+> >> +++ b/drivers/bluetooth/hci_qca.c
+> >> @@ -1031,9 +1145,118 @@ static struct hci_uart_proto qca_proto =3D {
+> >>         .dequeue        =3D qca_dequeue,
+> >>  };
+> >> =
 
->                 9       LE 1M TX
->                 10      LE 1M RX
->                 11      LE 2M TX
->                 12      LE 2M RX
->                 13      LE Coded TX
->                 14      LE Coded RX
->
->         If BR/EDR is supported, then BR 1M 1-Slot is supported by
->         default and can also not be deselected. If LE is supported,
->         then LE 1M TX and LE 1M RX are supported by default and can
->         not be deselected.
->
+> >> +static const struct qca_vreg_data qca_cherokee_data =3D {
+> >> +       .soc_type =3D QCA_WCN3990,
+> >> +       .vregs =3D (struct qca_vreg []) {
+> >> +               { "vddio",   1352000, 1352000,  0 },
+> >> +               { "vddxtal", 1904000, 2040000,  0 },
+> >> +               { "vddcore", 1800000, 1800000,  1 },
+> >> +               { "vddpa",   1304000, 1304000,  1 },
+> >> +               { "vddldo",  3000000, 3312000,  1 },
+> > =
 
-I think in LE case user should be able to select only CODED and deselect
-1M as there can be use cases which need only LR.
+> > Load of 0 and 1 seems sort of odd. Are these made up to indicate "some
+> > load" vs. "no load"?
+> > =
 
-Thanks,
-Jaganath
+> =
+
+> [Bala]: this value specifies the output load current required to turn on =
+
+> the wcn3990.
+>          in struct defined vddio\vddxtal are smps, with fixed load.
+>          regs from vddcore/vddpa/vddldo are programmable line regulators, =
+
+> in which we need to set the basic load.
+
+I got that part, but a load of 1 still seems like a nonsensical value.
+Is it to workaround some issue with the regulator driver?
+
+It's also pretty weird to be setting regulator voltages here in the
+driver. Typically that's configured on the board and then the DT has the
+right voltage already. The only case when the voltage may need to be set
+by the driver is if the hardware can dynamically scale the voltage for
+things like DVFS. It looks like here that the voltage is always fixed,
+so probably we don't need to have any sort of voltage setting in this
+driver and can rely on the DTS file to get things right.
