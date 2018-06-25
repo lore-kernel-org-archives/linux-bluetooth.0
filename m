@@ -10,41 +10,151 @@ Cc: linux-kernel@vger.kernel.org,
 	hemantg@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v8 5/7] Bluetooth: hci_qca: Enable 3.2 Mbps operating speed.
-Date: Mon, 25 Jun 2018 19:10:11 +0530
-Message-Id: <20180625134013.19684-6-bgodavar@codeaurora.org>
+Subject: [PATCH v8 4/7] Bluetooth: hci_qca: Add wrapper functions for setting UART speed
+Date: Mon, 25 Jun 2018 19:10:10 +0530
+Message-Id: <20180625134013.19684-5-bgodavar@codeaurora.org>
 In-Reply-To: <20180625134013.19684-1-bgodavar@codeaurora.org>
 References: <20180625134013.19684-1-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+In function qca_setup, we set initial and operating speeds for Qualcomm
+Bluetooth SoC's. This block of code is common across different
+Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
+a wrapper function to set the speeds. So that future coming SoC's
+can use these wrapper functions to set speeds.
+
 Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 ---
- drivers/bluetooth/hci_qca.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Changes in v8:
+    * common function to set INIT and operating speeds.
+    * moved hardware flow control to qca_set_speed().
+	
+Changes in v7:
+    * initial patch
+    * created wrapper functions for init and operating speeds.
+---
+ drivers/bluetooth/hci_qca.c | 89 +++++++++++++++++++++++++++----------
+ 1 file changed, 65 insertions(+), 24 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 38b7dbe6c897..28187a89b850 100644
+index fe62420ef838..38b7dbe6c897 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -877,6 +877,8 @@ static uint8_t qca_get_baudrate_value(int speed)
- 		return QCA_BAUDRATE_2000000;
- 	case 3000000:
- 		return QCA_BAUDRATE_3000000;
-+	case 3200000:
-+		return QCA_BAUDRATE_3200000;
- 	case 3500000:
- 		return QCA_BAUDRATE_3500000;
- 	default:
-@@ -891,7 +893,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	struct sk_buff *skb;
- 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
+@@ -119,6 +119,11 @@ struct qca_data {
+ 	u64 votes_off;
+ };
  
--	if (baudrate > QCA_BAUDRATE_3000000)
-+	if (baudrate > QCA_BAUDRATE_3200000)
- 		return -EINVAL;
++enum qca_speed_type {
++	QCA_INIT_SPEED = 1,
++	QCA_OPER_SPEED
++};
++
+ struct qca_serdev {
+ 	struct hci_uart	 serdev_hu;
+ 	struct gpio_desc *bt_en;
+@@ -923,6 +928,60 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+ 		hci_uart_set_baudrate(hu, speed);
+ }
  
- 	cmd[4] = baudrate;
++static unsigned int qca_get_speed(struct hci_uart *hu,
++				  enum qca_speed_type speed_type)
++{
++	unsigned int speed = 0;
++
++	if (speed_type == QCA_INIT_SPEED) {
++		if (hu->init_speed)
++			speed = hu->init_speed;
++		else if (hu->proto->init_speed)
++			speed = hu->proto->init_speed;
++	} else {
++		if (hu->oper_speed)
++			speed = hu->oper_speed;
++		else if (hu->proto->oper_speed)
++			speed = hu->proto->oper_speed;
++	}
++
++	return speed;
++}
++
++static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
++{
++	unsigned int speed, qca_baudrate;
++	int ret;
++
++	if (speed_type == QCA_INIT_SPEED) {
++		speed = qca_get_speed(hu, QCA_INIT_SPEED);
++		if (speed)
++			host_set_baudrate(hu, speed);
++		else
++			bt_dev_err(hu->hdev, "Init speed should be non zero");
++
++		return 0;
++	}
++
++	speed = qca_get_speed(hu, QCA_OPER_SPEED);
++	if (!speed) {
++		bt_dev_err(hu->hdev, "operating speed should be non zero");
++		return 0;
++	}
++
++	qca_baudrate = qca_get_baudrate_value(speed);
++	bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
++	ret = qca_set_baudrate(hu->hdev, qca_baudrate);
++	if (ret) {
++		bt_dev_err(hu->hdev, "Failed to change the baudrate (%d)", ret);
++		return ret;
++	}
++
++	host_set_baudrate(hu, speed);
++
++	return ret;
++}
++
+ static int qca_setup(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
+@@ -937,35 +996,17 @@ static int qca_setup(struct hci_uart *hu)
+ 	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+ 
+ 	/* Setup initial baudrate */
+-	speed = 0;
+-	if (hu->init_speed)
+-		speed = hu->init_speed;
+-	else if (hu->proto->init_speed)
+-		speed = hu->proto->init_speed;
+-
+-	if (speed)
+-		host_set_baudrate(hu, speed);
++	qca_set_speed(hu, QCA_INIT_SPEED);
+ 
+ 	/* Setup user speed if needed */
+-	speed = 0;
+-	if (hu->oper_speed)
+-		speed = hu->oper_speed;
+-	else if (hu->proto->oper_speed)
+-		speed = hu->proto->oper_speed;
++	ret = qca_set_speed(hu, QCA_OPER_SPEED);
++	if (ret)
++		return ret;
+ 
+-	if (speed) {
++	speed = qca_get_speed(hu, QCA_OPER_SPEED);
++	if (speed)
+ 		qca_baudrate = qca_get_baudrate_value(speed);
+ 
+-		bt_dev_info(hdev, "Set UART speed to %d", speed);
+-		ret = qca_set_baudrate(hdev, qca_baudrate);
+-		if (ret) {
+-			bt_dev_err(hdev, "Failed to change the baud rate (%d)",
+-				   ret);
+-			return ret;
+-		}
+-		host_set_baudrate(hu, speed);
+-	}
+-
+ 	/* Setup patch / NVM configurations */
+ 	ret = qca_uart_setup(hdev, qca_baudrate, QCA_ROME, soc_ver);
+ 	if (!ret) {
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
 a Linux Foundation Collaborative Project
