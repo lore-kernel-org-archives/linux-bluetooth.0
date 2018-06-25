@@ -1,51 +1,75 @@
-Return-Path: <mka@chromium.org>
-Date: Mon, 25 Jun 2018 16:00:50 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
+Return-Path: <robherring2@gmail.com>
+Date: Mon, 25 Jun 2018 08:58:37 -0600
+From: Rob Herring <robh@kernel.org>
 To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
 	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
 	hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v8 2/7] Bluetooth: btqca: Rename ROME specific functions
- to Generic functions
-Message-ID: <20180625230050.GG129942@google.com>
+Subject: Re: [PATCH v8 1/7] dt-bindings: net: bluetooth: Add device tree
+ bindings for QTI chip wcn3990
+Message-ID: <20180625145837.GA21153@rob-hp-laptop>
 References: <20180625134013.19684-1-bgodavar@codeaurora.org>
- <20180625134013.19684-3-bgodavar@codeaurora.org>
+ <20180625134013.19684-2-bgodavar@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180625134013.19684-3-bgodavar@codeaurora.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180625134013.19684-2-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Seems you have to respin anyway due to comments in other patches, so I
-squeeze in some optional improvements of the commit message.
-
-> Subject: Rename ROME specific functions to Generic functions
-
-nit: s/Generic/generic/
-
-On Mon, Jun 25, 2018 at 07:10:08PM +0530, Balakrishna Godavarthi wrote:
-> Some of the QCA BTSoC ROME functions, are used for different versions
-> or different make of BTSoC's. Instead of duplicating the same functions
-> for new chip, updating names of the functions that are used for both
-
-nit: s/updating/update/
-
-> chip's to keep this generic and would help in future when we would have
-
-nit: s/chip's/chips/
-
-> new BT SoC
-
-nit: you might want to start a new sentence here, it's a long churn to
-read :) optionally you could just say 'logs' instead of 'bt_dev_info,
-bt_dev_err and bt_dev_dbg'.
-
-> and to have generic text in bt_dev_info, bt_dev_err and
-> bt_dev_dbg updated from ROME to QCA where ever possible. This avoids
-> confusion to user, when using the future Qualcomm Bluetooth SoC's.
-> Updated BT_DBG, BT_ERR and BT_INFO with bt_dev_dbg, bt_dev_err and
-> bt_dev_info where ever applicable.
+On Mon, Jun 25, 2018 at 07:10:07PM +0530, Balakrishna Godavarthi wrote:
+> This patch enables regulators for the Qualcomm Bluetooth wcn3990
+> controller.
 > 
 > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+> 
+> Changes in v8:
+>     * Separated the optional entries between two chips
+> 
+> Changes in v7:
+>     * no change.
+> 
+> Changes in v6:
+> 
+>     * Changed the oper-speed to max-speed.
+> 
+> Changes in v5:
+> 
+>     * Added entry for oper-speed and init-speed.
+> 
+> ---
+>  .../bindings/net/qualcomm-bluetooth.txt       | 30 +++++++++++++++++--
+>  1 file changed, 28 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> index 0ea18a53cc29..c2b09dd2bf31 100644
+> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> @@ -10,12 +10,23 @@ device the slave device is attached to.
+>  Required properties:
+>   - compatible: should contain one of the following:
+>     * "qcom,qca6174-bt"
+> +   * "qcom,wcn3990-bt"
+> +
+> +Optional properties for compatible string qcom,qca6174-bt:
+>  
+> -Optional properties:
+>   - enable-gpios: gpio specifier used to enable chip
+>   - clocks: clock provided to the controller (SUSCLK_32KHZ)
+>  
+> -Example:
+> +Optional properties for compatible string qcom,wcn3990-bt:
+> +
+> + - vddio-supply: Bluetooth VDD IO regulator handle.
+> + - vddxtal-supply: Bluetooth VDD XTAL regulator handle.
+> + - vddpa-supply: Bluetooth VDD PA regulator handle.
+> + - vddldo-supply: Bluetooth VDD LDO regulator handle.
+> + - vddcore-supply: Bluetooth VDD CORE regulator handle.
+> + - max-speed: Maximum operating speed of the chip.
 
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+This shouldn't be per compatible really. The definition here is wrong 
+too. You should know the max baud for the chip based on the compatible. 
+This property is for when the max is less than the max of either the 
+chip or host UART.
+
+Rob
