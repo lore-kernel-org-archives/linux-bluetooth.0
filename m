@@ -1,164 +1,204 @@
 Return-Path: <mka@chromium.org>
-Date: Tue, 26 Jun 2018 12:53:22 -0700
+Date: Tue, 26 Jun 2018 12:02:07 -0700
 From: Matthias Kaehlcke <mka@chromium.org>
 To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
 	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
 	hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v8 3/7] Bluetooth: btqca: Redefine qca_uart_setup() to
- generic function.
-Message-ID: <20180626195322.GO129942@google.com>
+Subject: Re: [PATCH v8 4/7] Bluetooth: hci_qca: Add wrapper functions for
+ setting UART speed
+Message-ID: <20180626190207.GN129942@google.com>
 References: <20180625134013.19684-1-bgodavar@codeaurora.org>
- <20180625134013.19684-4-bgodavar@codeaurora.org>
- <20180625232057.GH129942@google.com>
- <2ed980b7cd83a87dd76b05a4bca014ce@codeaurora.org>
+ <20180625134013.19684-5-bgodavar@codeaurora.org>
+ <20180625234354.GI129942@google.com>
+ <89b1e4ce98a26d79935bf2ba9a4bc278@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <2ed980b7cd83a87dd76b05a4bca014ce@codeaurora.org>
+In-Reply-To: <89b1e4ce98a26d79935bf2ba9a4bc278@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jun 26, 2018 at 06:53:47AM +0530, Balakrishna Godavarthi wrote:
+On Tue, Jun 26, 2018 at 07:01:18AM +0530, Balakrishna Godavarthi wrote:
 > Hi Matthias,
 > 
-> On 2018-06-26 04:50, Matthias Kaehlcke wrote:
-> > On Mon, Jun 25, 2018 at 07:10:09PM +0530, Balakrishna Godavarthi wrote:
-> > > Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
-> > > SoC, to use the same function instead of duplicating the function.
-> > > Added new arguments soc_type and soc_ver to the functions.
-> > > 
-> > > These arguments will help to decide type of firmware files
-> > > to be loaded into Bluetooth chip.
-> > > soc_type holds the Bluetooth chip connected to APPS processor.
-> > > soc_ver holds the Bluetooth chip version.
+> On 2018-06-26 05:13, Matthias Kaehlcke wrote:
+> > This is a nice improvement, a few remaining questions inline.
+> > 
+> > On Mon, Jun 25, 2018 at 07:10:10PM +0530, Balakrishna Godavarthi wrote:
+> > > In function qca_setup, we set initial and operating speeds for
+> > > Qualcomm
+> > > Bluetooth SoC's. This block of code is common across different
+> > > Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
+> > > a wrapper function to set the speeds. So that future coming SoC's
+> > > can use these wrapper functions to set speeds.
 > > > 
 > > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > > > ---
 > > > Changes in v8:
-> > >     * updated soc_type with enum.
+> > >     * common function to set INIT and operating speeds.
+> > >     * moved hardware flow control to qca_set_speed().
 > > > 
 > > > Changes in v7:
 > > >     * initial patch
-> > >     * redefined qca_uart_setup function to generic.
+> > >     * created wrapper functions for init and operating speeds.
 > > > ---
-> > >  drivers/bluetooth/btqca.c   | 23 ++++++++++++-----------
-> > >  drivers/bluetooth/btqca.h   | 13 +++++++++++--
-> > >  drivers/bluetooth/hci_qca.c |  3 ++-
-> > >  3 files changed, 25 insertions(+), 14 deletions(-)
+> > >  drivers/bluetooth/hci_qca.c | 89
+> > > +++++++++++++++++++++++++++----------
+> > >  1 file changed, 65 insertions(+), 24 deletions(-)
 > > > 
-> > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> > > index c5cf9cab438a..3b25be1be19c 100644
-> > > --- a/drivers/bluetooth/btqca.c
-> > > +++ b/drivers/bluetooth/btqca.c
-> > > @@ -327,9 +327,9 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,
-> > > const bdaddr_t *bdaddr)
+> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> > > index fe62420ef838..38b7dbe6c897 100644
+> > > --- a/drivers/bluetooth/hci_qca.c
+> > > +++ b/drivers/bluetooth/hci_qca.c
+> > > @@ -119,6 +119,11 @@ struct qca_data {
+> > >  	u64 votes_off;
+> > >  };
+> > > 
+> > > +enum qca_speed_type {
+> > > +	QCA_INIT_SPEED = 1,
+> > > +	QCA_OPER_SPEED
+> > > +};
+> > > +
+> > >  struct qca_serdev {
+> > >  	struct hci_uart	 serdev_hu;
+> > >  	struct gpio_desc *bt_en;
+> > > @@ -923,6 +928,60 @@ static inline void host_set_baudrate(struct
+> > > hci_uart *hu, unsigned int speed)
+> > >  		hci_uart_set_baudrate(hu, speed);
 > > >  }
-> > >  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
 > > > 
-> > > -int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
-> > > +int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> > > +		   enum qca_btsoc_type soc_type, u32 soc_ver)
+> > > +static unsigned int qca_get_speed(struct hci_uart *hu,
+> > > +				  enum qca_speed_type speed_type)
+> > > +{
+> > > +	unsigned int speed = 0;
+> > > +
+> > > +	if (speed_type == QCA_INIT_SPEED) {
+> > > +		if (hu->init_speed)
+> > > +			speed = hu->init_speed;
+> > > +		else if (hu->proto->init_speed)
+> > > +			speed = hu->proto->init_speed;
+> > > +	} else {
+> > > +		if (hu->oper_speed)
+> > > +			speed = hu->oper_speed;
+> > > +		else if (hu->proto->oper_speed)
+> > > +			speed = hu->proto->oper_speed;
+> > > +	}
+> > > +
+> > > +	return speed;
+> > > +}
+> > > +
+> > > +static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type
+> > > speed_type)
+> > > +{
+> > > +	unsigned int speed, qca_baudrate;
+> > > +	int ret;
+> > > +
+> > > +	if (speed_type == QCA_INIT_SPEED) {
+> > > +		speed = qca_get_speed(hu, QCA_INIT_SPEED);
+> > > +		if (speed)
+> > > +			host_set_baudrate(hu, speed);
+> > > +		else
+> > > +			bt_dev_err(hu->hdev, "Init speed should be non zero");
+> > 
+> > The check for 'speed == 0' is done in multiple places. From this
+> > code I deduce that it is expected that both INIT and OPER speed are
+> > set to non-zero values. What happens if either of them is zero? Is the
+> > driver still operational?
+> > 
+> [Bala]: yes in hci_uart_setup()(hci_serdev.c) function before calling
+> qca_setup().
+>         we actually set baudrate, but int  above code missed to restrict the
+> further call to qca_setup()
+>        if speed =0. so we are checking the same in the qca_setup().. i.e.
+> qca_get_speed().
+
+Sorry, didn't quite get you here. Yes, the driver is still operational?
+
+Breaking it down in multiple questions:
+
+1. Is it an error if one of the speeds isn't specified?
+
+If yes we should probably check this early once and return an error
+early, instead of doing the check repeatedly
+
+2. If it is not an error, what is the driver supposed to do?
+
+> > In the discussion on "[v7,8/8] Bluetooth: hci_qca: Add support for
+> > Qualcomm Bluetooth chip wcn3990" you mentioned the possbility to move
+> > the hci_uart_set_flow_control() calls into _set_speed(). This seemed
+> > interesting but finally it isn't done in this series. Did you
+> > encounter that it is not feasible/desirable for some reason?
+> > 
+> 
+> [Bala]: this patch is for rome where flow control is not used.
+>         after we integrate wcn3990, flow control is hidden in the
+> qca_set_speed()
+>         Pls check [v8 7/7] patch.
+
+Sorry, my confusion
+
+> > >  static int qca_setup(struct hci_uart *hu)
 > > >  {
-> > > -	u32 rome_ver = 0;
-> > >  	struct rome_config config;
-> > >  	int err;
+> > >  	struct hci_dev *hdev = hu->hdev;
+> > > @@ -937,35 +996,17 @@ static int qca_setup(struct hci_uart *hu)
+> > >  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
 > > > 
-> > > @@ -337,19 +337,20 @@ int qca_uart_setup(struct hci_dev *hdev,
-> > > uint8_t baudrate)
+> > >  	/* Setup initial baudrate */
+> > > -	speed = 0;
+> > > -	if (hu->init_speed)
+> > > -		speed = hu->init_speed;
+> > > -	else if (hu->proto->init_speed)
+> > > -		speed = hu->proto->init_speed;
+> > > -
+> > > -	if (speed)
+> > > -		host_set_baudrate(hu, speed);
+> > > +	qca_set_speed(hu, QCA_INIT_SPEED);
 > > > 
-> > >  	config.user_baud_rate = baudrate;
+> > >  	/* Setup user speed if needed */
+> > > -	speed = 0;
+> > > -	if (hu->oper_speed)
+> > > -		speed = hu->oper_speed;
+> > > -	else if (hu->proto->oper_speed)
+> > > -		speed = hu->proto->oper_speed;
+> > > +	ret = qca_set_speed(hu, QCA_OPER_SPEED);
+> > > +	if (ret)
+> > > +		return ret;
 > > > 
-> > > -	/* Get QCA version information */
-> > > -	err = qca_read_soc_version(hdev, &rome_ver);
-> > > -	if (err < 0 || rome_ver == 0) {
-> > > -		bt_dev_err(hdev, "QCA Failed to get version %d", err);
-> > > -		return err;
-> > > +	if (!soc_ver) {
-> > > +		/* Get QCA version information */
-> > > +		err = qca_read_soc_version(hdev, &soc_ver);
-> > > +		if (err < 0 || soc_ver == 0) {
-> > > +			bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
-> > > +			return err;
-> > > +		}
-> > > +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
-> > >  	}
+> > > -	if (speed) {
+> > > +	speed = qca_get_speed(hu, QCA_OPER_SPEED);
+> > > +	if (speed)
+> > >  		qca_baudrate = qca_get_baudrate_value(speed);
 > > 
-> > I thought we agreed in the discussion on "[v7,4/8] Bluetooth: btqca:
-> > Redefine qca_uart_setup() to generic function" to call
-> > qca_read_soc_version() in common code. Did I misinterpret that?
-> > 
-> [Bala]: After integrating wcn3990, calling qca_read_soc_version() in
-> qca_setup()
->         is not preferable. as we will have multiple common blocks of code in
-> qca_setup.
->         calling function to set an operator speed is required in the both
-> the if -else blcoks
+> > Is the check here necessary? qca_get_baudrate_value() returns
+> > QCA_BAUDRATE_115200 for a zero speed.
+> 
+> this if for no zero operating speed,
 
-We can probably agree that there is no ideal solution, there is some
-ugliness in on way or the other. IMO the conditional
-qca_read_soc_version() in qca_uart_setup() based on the vale of
-'soc_ver' is far worse than a small piece of redundant code.
-
-If qca_read_soc_version() was done in qca_setup() the code could look
-something like this:
+My point is:
 
 static int qca_setup(struct hci_uart *hu)
 {
-	...
-	if (qcadev->btsoc_type == QCA_WCN3990) {
-		...
-		qca_read_soc_version();
-		ret = qca_set_speed(hu, QCA_OPER_SPEED);
-                if (ret)
-                        return ret;
-	} else {
-		ret = qca_set_speed(hu, QCA_OPER_SPEED);
-                if (ret)
-                        return ret;
-                qca_read_soc_version();
-	}
+	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
 
-	speed = qca_get_speed(hu, QCA_OPER_SPEED);
-	qca_baudrate = qca_get_baudrate_value(speed);
-
-	 /* Setup patch / NVM configurations */
-        ret = qca_uart_setup(hdev, qca_baudrate, qcadev->btsoc_type, soc_ver);
 	...
+
+	if (speed)
+		qca_baudrate = qca_get_baudrate_value(speed);
 }
 
-Yes, 'qca_set_speed(hu, QCA_OPER_SPEED)' and the error handling is
-redundant, but it's only 3 lines of trivial code in exchange for
-making qca_uart_setup() more consistent and not spreading
-the qca_read_soc_version() calls over multiple files, depending on the
-SoC version.
+static uint8_t qca_get_baudrate_value(int speed)
+{
+        switch (speed) {
 
-If you are super-convinced that the split is superior leave it as is,
-I might already be doing too much bike-shedding, and after all it
-isn't my code.
+	...
 
-> > > diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> > > index 5c9851b11838..24d6667eecf1 100644
-> > > --- a/drivers/bluetooth/btqca.h
-> > > +++ b/drivers/bluetooth/btqca.h
-> > > ...
-> > > -static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t
-> > > baudrate)
-> > > +static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t
-> > > baudrate,
-> > > +				 enum qca_btsoc_type soc_type, u32 soc_ver);
-> > 
-> > Remove trailing semicolon.
-> 
-> [Bala]: i didn't get you.
+        default:
+                return QCA_BAUDRATE_115200;
+        }
+}
 
-Sorry, I should have left more context:
+If qca_get_baudrate_value() is called with 'speed == 0' it returns
+QCA_BAUDRATE_115200, which is the same value with which
+QCA_BAUDRATE_115200 is initialized.
 
-> static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> 				 enum qca_btsoc_type soc_type, u32 soc_ver);
-> {
-> 	return -EOPNOTSUPP;
-> }
-
-This is a function definition, not just a declaration. The semicolon
-would make it a declaration and make the compiler unhappy about a
-function body where it doesn't expect it.
+It seems the initialization and the check for 'speed == 0' could be removed.
