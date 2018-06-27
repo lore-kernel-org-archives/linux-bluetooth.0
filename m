@@ -1,95 +1,88 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <andy.shevchenko@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLRQZY3ownapZFQPhF766H+_h7Fd5phq933VYYAe4NOnA@mail.gmail.com>
-References: <CA+A7VXVEBULPWJpxMeED-QxxG25Az1ckWdL+cudqE0RL7he9Xg@mail.gmail.com>
- <5a3c473313387957bac050067857e22e62d544f5.camel@iki.fi> <CA+A7VXVy=1RjvaQgSyE5M9Hw=QRuy8Ejc0A=pFhtxn1=06ZC3Q@mail.gmail.com>
- <5731aaabb375e5b82945cabff8c315a2ef827cbe.camel@iki.fi> <CA+A7VXU30H_=aZw_Xi2S2iOkPp=nQxfMRTE9msAAX+oh7v1Qvw@mail.gmail.com>
- <CABBYNZ+w=iC=OYz8y=NyLuvdEXfWprDoMuZiqTs+SijU7med9w@mail.gmail.com>
- <CABBYNZKpB5FLDxu2PrAV4P+HGDY1=jWJU_3YjTmgcDjoj36ijg@mail.gmail.com>
- <CA+A7VXVJkGaZA3ZOb4F3dD1i1h9PQXXMpL2St+kRQdRJSq9g-A@mail.gmail.com>
- <CABBYNZ+FD1sJ7SwS1SP7qoQ-W4PMfYQoWvHZ0_TCbVyCpzKasw@mail.gmail.com>
- <CA+A7VXWVtfLNPckCprxKrSV+k20Pj-r+F_VkWu6h3iY+8qNwDA@mail.gmail.com> <CABBYNZLRQZY3ownapZFQPhF766H+_h7Fd5phq933VYYAe4NOnA@mail.gmail.com>
-From: =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-Date: Wed, 27 Jun 2018 15:55:05 -0700
-Message-ID: <CA+A7VXWFyCEkkZys-CX5q-823Q8w8vhqA6HrpWKTeq23zDmFMg@mail.gmail.com>
-Subject: Re: Failure to connect Sony headsets
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Tanu Kaskinen <tanuk@iki.fi>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        General PulseAudio Discussion
-        <pulseaudio-discuss@lists.freedesktop.org>,
-        =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>,
-        Linux Upstreaming Team <linux@endlessm.com>
+In-Reply-To: <CAHp75VehTeyyzR4bPKK3hFDTVqZnhdNy5vcBFJCSH_Zrx+QrKA@mail.gmail.com>
+References: <cover.1530004712.git.sean.wang@mediatek.com> <48215a1276c36af7ad581c3d83759fe9f55e3c4b.1530004712.git.sean.wang@mediatek.com>
+ <CAHp75VehTeyyzR4bPKK3hFDTVqZnhdNy5vcBFJCSH_Zrx+QrKA@mail.gmail.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Wed, 27 Jun 2018 20:04:19 +0300
+Message-ID: <CAHp75VedHLw52J_ymh3iYf2w=r8d+Kqg=fJZmBGnaCrEbNEPdQ@mail.gmail.com>
+Subject: Re: [PATCH v4 6/7] Bluetooth: mediatek: Add protocol support for
+ MediaTek serial devices
+To: sean.wang@mediatek.com
+Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	devicetree <devicetree@vger.kernel.org>, linux-bluetooth@vger.kernel.org,
+	linux-arm Mailing List <linux-arm-kernel@lists.infradead.org>,
+	"moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Jun 27, 2018 at 1:15 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Joao,
+On Wed, Jun 27, 2018 at 7:59 PM, Andy Shevchenko
+<andy.shevchenko@gmail.com> wrote:
+> On Wed, Jun 27, 2018 at 8:43 AM,  <sean.wang@mediatek.com> wrote:
+>> From: Sean Wang <sean.wang@mediatek.com>
 >>
-> Ive pushed the fix, at least MW600 reconnects properly.
 >
-
-Thanks, I tested it with my MW600 and it is working great! I'll let
-you know once I get results from QA with the other headsets.
-
-On Wed, Jun 27, 2018 at 12:08 AM, Tanu Kaskinen <tanuk@iki.fi> wrote:
-> On Tue, 2018-06-26 at 08:41 -0700, Jo=C3=A3o Paulo Rechi Vita wrote:
->> My initial thought is that module-card-restore does more harm then
->> good for UX with Bluetooth headsets, actually. It sure was useful when
->> module-bluetooth-policy did not exist, but I think a good user
->> experience is based on dynamically adapting according to which streams
->> are active at a certain moment, instead of user input. This is mostly
->> covered by module-bluetooth-policy + module-role-{cork,ducking}, but I
->> don't think anything switches the profile to A2DP when there is a
->> "high-quality" stream playing if module-card-restore initially set the
->> profile to headset_head_sink. Maybe this is more of a UI bug and a
->> user-focused UI should not expose means for the user to manually
->> select the profile, which is aligned with a previous comment from
->> Tanu:
->>
->> > On Thu, Jun 14, 2018 at 4:57 AM, Tanu Kaskinen <tanuk@iki.fi> wrote:
->> >
->> > If module-bluetooth-policy is sufficient, then module-card-restore
->> > won't do anything anyway, because you never set the profile manually.
->> > If you ever set the profile manually, that's an indication that module=
--
->> > bluetooth-policy isn't always good enough.
->>
->> Still, I think the general user will only manually change the profile
->> either if things go wrong for some reason, or before PulseAudio 12,
->> because HSP/HFP was selected by default. If they leave the setting on
->> the "wrong profile", it affects their experience next time using the
->> headset, despite if it is right afterwards or months later, or if the
->> headset has been removed and paired with a different machine in the
->> meantime. Again, it may be a UI issue after all, but comparing to
->> Android/iPhone (which is what a lot of users are likely to have
->> previous experience with), there is not even a way for users to
->> manually set the active profile for headsets. They can enable/disable
->> a profile for an specific headset on Android tho, which gives them
->> some sort of control. I don't think there is any client API for
->> disabling profiles on cards, but maybe that could be a good
->> alternative?
+>> +config BT_HCIBTUART_MTK
+>> +       tristate "MediaTek HCI UART driver"
+>> +       depends on BT_HCIBTUART
 >
-> I agree, it's not nice that setting the profile once will interfere
-> with automatic configuration forever. Do you want to make a patch for
-> module-card-restore that adds an option (enabled by default) for
-> disabling profile restoring for bluetooth?
+>> +       default y
 >
-
-Yes, I can do it.
-
-> Offering a UI for disabling profiles doesn't seem like a better
-> alternative to me, at least for this problem. If there's some other use
-> case for disabling profiles, I'm not against the idea in principle.
+> Perhaps it's an overkill for users which would like to have less
+> amount on stuff in kernel.
 >
+>
+>> +#include <asm/unaligned.h>
+>> +#include <linux/atomic.h>
+>> +#include <linux/clk.h>
+>> +#include <linux/firmware.h>
+>> +#include <linux/module.h>
+>> +#include <linux/pm_runtime.h>
+>> +#include <linux/serdev.h>
 
-I was thinking about users that only want to use their headset for
-HSP/HFP with VoIP applications, for example. But maybe
-module-stream-restore is enough in this case and I'm over-engineering,
-lets just leave this case aside for now.
+Perhaps alphabetically ordered?
 
---
-Jo=C3=A3o Paulo Rechi Vita
-http://about.me/jprvita
++ blank line.
+
+>
+>> +#include <net/bluetooth/bluetooth.h>
+>> +#include <net/bluetooth/hci_core.h>
+
+>> +       /* Enable the power domain and clock the device requires. */
+>> +       pm_runtime_enable(dev);
+>> +       err = pm_runtime_get_sync(dev);
+>> +       if (err < 0)
+>> +               goto err_pm2;
+
+Should be err_pm1 here.
+Yes, that's correct.
+
+>> +err_pm1:
+>> +       pm_runtime_put_sync(dev);
+>> +err_pm2:
+>> +       pm_runtime_disable(dev);
+
+>> +#define MTK_WMT_CMD_SIZE       (MTK_WMT_HDR_SIZE + MTK_STP_HDR_SIZE + \
+>> +                                MTK_STP_TLR_SIZE + HCI_ACL_HDR_SIZE)
+
+It would look slightly better if you start on new line like
+#define FOO \
+ (BAR + BAZ)
+
+>> +struct mtk_stp_hdr {
+>> +       __u8 prefix;
+>> +       __u8 dlen1:4;
+>> +       __u8 type:4;
+
+>> +       __u8 dlen2:8;
+
+u8 already 8 bit.
+
+>> +       __u8 cs;
+>> +} __packed;
+
+-- 
+With Best Regards,
+Andy Shevchenko
