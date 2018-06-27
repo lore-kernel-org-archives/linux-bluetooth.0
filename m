@@ -4,13 +4,10 @@ To: <robh+dt@kernel.org>, <mark.rutland@arm.com>, <marcel@holtmann.org>,
 	<johan.hedberg@gmail.com>
 CC: <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>, "Rob
- Herring" <robh@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
-	<linux-serial@vger.kernel.org>
-Subject: [PATCH v4 2/7] serdev: add dev_pm_domain_attach|detach()
-Date: Wed, 27 Jun 2018 13:43:20 +0800
-Message-ID: <ed497b2a9751df3b2f84cc9db6d6834816a6027f.1530004712.git.sean.wang@mediatek.com>
+	<linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
+Subject: [PATCH v4 4/7] Bluetooth: Add new quirk for non-persistent setup settings
+Date: Wed, 27 Jun 2018 13:43:22 +0800
+Message-ID: <14b169297439e55751acde25f7224e65a089f042.1530004712.git.sean.wang@mediatek.com>
 In-Reply-To: <cover.1530004712.git.sean.wang@mediatek.com>
 References: <cover.1530004712.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
@@ -19,64 +16,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-In order to open up the required power gate before any operation can be
-effectively performed over the serial bus between CPU and serdev, it's
-clearly essential to add common attach functions for PM domains to serdev
-at the probe phase.
-
-Similarly, the relevant dettach function for the PM domains should be
-properly and reversely added at the remove phase.
+Add a new quirk HCI_QUIRK_NON_PERSISTENT_SETUP allowing that a quirk that
+runs setup() after every open() and not just after the first open().
 
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Jiri Slaby <jslaby@suse.com>
-Cc: linux-serial@vger.kernel.org
 ---
- drivers/tty/serdev/core.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci.h | 9 +++++++++
+ net/bluetooth/hci_core.c    | 3 ++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-index df93b72..8096138 100644
---- a/drivers/tty/serdev/core.c
-+++ b/drivers/tty/serdev/core.c
-@@ -13,6 +13,7 @@
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/of_device.h>
-+#include <linux/pm_domain.h>
- #include <linux/serdev.h>
- #include <linux/slab.h>
- 
-@@ -330,8 +331,17 @@ EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
- static int serdev_drv_probe(struct device *dev)
- {
- 	const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
-+	int ret;
- 
--	return sdrv->probe(to_serdev_device(dev));
-+	ret = dev_pm_domain_attach(dev, true);
-+	if (ret)
-+		return ret;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1668211..b37d973 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -183,6 +183,15 @@ enum {
+ 	 * during the hdev->setup vendor callback.
+ 	 */
+ 	HCI_QUIRK_NON_PERSISTENT_DIAG,
 +
-+	ret = sdrv->probe(to_serdev_device(dev));
-+	if (ret)
-+		dev_pm_domain_detach(dev, true);
-+
-+	return ret;
- }
++	/* When this quirk is set, setup() would be run after every
++	 * open() and not just after the first open().
++	 *
++	 * This quirk can be set before hci_register_dev is called or
++	 * during the hdev->setup vendor callback.
++	 *
++	 */
++	HCI_QUIRK_NON_PERSISTENT_SETUP,
+ };
  
- static int serdev_drv_remove(struct device *dev)
-@@ -339,6 +349,9 @@ static int serdev_drv_remove(struct device *dev)
- 	const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
- 	if (sdrv->remove)
- 		sdrv->remove(to_serdev_device(dev));
-+
-+	dev_pm_domain_detach(dev, true);
-+
- 	return 0;
- }
+ /* HCI device flags */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ee8ef12..f2bf0c6 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1368,7 +1368,8 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 	atomic_set(&hdev->cmd_cnt, 1);
+ 	set_bit(HCI_INIT, &hdev->flags);
  
+-	if (hci_dev_test_flag(hdev, HCI_SETUP)) {
++	if (hci_dev_test_flag(hdev, HCI_SETUP) ||
++	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+ 		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+ 
+ 		if (hdev->setup)
 -- 
 2.7.4
