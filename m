@@ -1,91 +1,90 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <ulf.hansson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20180626114559.22560-1-luiz.dentz@gmail.com>
-References: <20180626114559.22560-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 27 Jun 2018 11:01:34 +0300
-Message-ID: <CABBYNZ+bFKi088dP-Xon7eJmL8=UFock_ksqAKtLX0SbRC03+A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] policy: Add logic to connect a Sink
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <ed497b2a9751df3b2f84cc9db6d6834816a6027f.1530004712.git.sean.wang@mediatek.com>
+References: <cover.1530004712.git.sean.wang@mediatek.com> <ed497b2a9751df3b2f84cc9db6d6834816a6027f.1530004712.git.sean.wang@mediatek.com>
+From: Ulf Hansson <ulf.hansson@linaro.org>
+Date: Wed, 27 Jun 2018 10:00:08 +0200
+Message-ID: <CAPDyKFp4kESPH4hcqgATYWBt3Kz3FhAOCpnrCc5PRSkMkBikEg@mail.gmail.com>
+Subject: Re: [PATCH v4 2/7] serdev: add dev_pm_domain_attach|detach()
+To: sean.wang@mediatek.com
+Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-mediatek@lists.infradead.org,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Rob Herring <robh@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
+	linux-serial@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On 27 June 2018 at 07:43,  <sean.wang@mediatek.com> wrote:
+> From: Sean Wang <sean.wang@mediatek.com>
+>
+> In order to open up the required power gate before any operation can be
+> effectively performed over the serial bus between CPU and serdev, it's
+> clearly essential to add common attach functions for PM domains to serdev
+> at the probe phase.
+>
+> Similarly, the relevant dettach function for the PM domains should be
+> properly and reversely added at the remove phase.
+>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> Cc: Rob Herring <robh@kernel.org>
+> Cc: Ulf Hansson <ulf.hansson@linaro.org>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Jiri Slaby <jslaby@suse.com>
+> Cc: linux-serial@vger.kernel.org
 
-On Tue, Jun 26, 2018 at 2:45 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> If HFP/HSP HS connects and the device also supports a Sink connect it
-> as well since some devices (e.g. Sony MW600) may not connect it
-> automatically.
+Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+
+Kind regards
+Uffe
+
 > ---
->  plugins/policy.c | 39 +++++++++++++++++++++++++++++++++++++++
->  1 file changed, 39 insertions(+)
+>  drivers/tty/serdev/core.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
 >
-> diff --git a/plugins/policy.c b/plugins/policy.c
-> index 1f5a506a2..de51e58b9 100644
-> --- a/plugins/policy.c
-> +++ b/plugins/policy.c
-> @@ -297,6 +297,42 @@ static void sink_cb(struct btd_service *service, btd_service_state_t old_state,
->         }
+> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+> index df93b72..8096138 100644
+> --- a/drivers/tty/serdev/core.c
+> +++ b/drivers/tty/serdev/core.c
+> @@ -13,6 +13,7 @@
+>  #include <linux/module.h>
+>  #include <linux/of.h>
+>  #include <linux/of_device.h>
+> +#include <linux/pm_domain.h>
+>  #include <linux/serdev.h>
+>  #include <linux/slab.h>
+>
+> @@ -330,8 +331,17 @@ EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
+>  static int serdev_drv_probe(struct device *dev)
+>  {
+>         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
+> +       int ret;
+>
+> -       return sdrv->probe(to_serdev_device(dev));
+> +       ret = dev_pm_domain_attach(dev, true);
+> +       if (ret)
+> +               return ret;
+> +
+> +       ret = sdrv->probe(to_serdev_device(dev));
+> +       if (ret)
+> +               dev_pm_domain_detach(dev, true);
+> +
+> +       return ret;
 >  }
 >
-> +static void hs_cb(struct btd_service *service, btd_service_state_t old_state,
-> +                                               btd_service_state_t new_state)
-> +{
-> +       struct btd_device *dev = btd_service_get_device(service);
-> +       struct policy_data *data;
-> +       struct btd_service *sink;
+>  static int serdev_drv_remove(struct device *dev)
+> @@ -339,6 +349,9 @@ static int serdev_drv_remove(struct device *dev)
+>         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
+>         if (sdrv->remove)
+>                 sdrv->remove(to_serdev_device(dev));
 > +
-> +       /* If the device supports Sink set a timer to connect it as well */
-> +       sink = btd_device_get_service(dev, A2DP_SINK_UUID);
-> +       if (sink == NULL)
-> +               return;
+> +       dev_pm_domain_detach(dev, true);
 > +
-> +       data = policy_get_data(dev);
-> +
-> +       switch (new_state) {
-> +       case BTD_SERVICE_STATE_UNAVAILABLE:
-> +               break;
-> +       case BTD_SERVICE_STATE_DISCONNECTED:
-> +               break;
-> +       case BTD_SERVICE_STATE_CONNECTING:
-> +               break;
-> +       case BTD_SERVICE_STATE_CONNECTED:
-> +               /* Check if service initiate the connection then proceed
-> +                * immediately otherwise set timer
-> +                */
-> +               if (old_state == BTD_SERVICE_STATE_CONNECTING)
-> +                       policy_connect(data, sink);
-> +               else if (btd_service_get_state(sink) !=
-> +                                               BTD_SERVICE_STATE_CONNECTED)
-> +                       policy_set_sink_timer(data);
-> +               break;
-> +       case BTD_SERVICE_STATE_DISCONNECTING:
-> +               break;
-> +       }
-> +}
-> +
->  static gboolean policy_connect_tg(gpointer user_data)
->  {
->         struct policy_data *data = user_data;
-> @@ -615,6 +651,9 @@ static void service_cb(struct btd_service *service,
->                 controller_cb(service, old_state, new_state);
->         else if (g_str_equal(profile->remote_uuid, AVRCP_TARGET_UUID))
->                 target_cb(service, old_state, new_state);
-> +       else if (g_str_equal(profile->remote_uuid, HFP_HS_UUID) ||
-> +                       g_str_equal(profile->remote_uuid, HSP_HS_UUID))
-> +               hs_cb(service, old_state, new_state);
+>         return 0;
+>  }
 >
->         /*
->          * Return if the reconnection feature is not enabled (all
 > --
-> 2.17.1
-
-Applied.
-
-
--- 
-Luiz Augusto von Dentz
+> 2.7.4
+>
