@@ -1,90 +1,78 @@
-Return-Path: <ulf.hansson@linaro.org>
-MIME-Version: 1.0
-In-Reply-To: <ed497b2a9751df3b2f84cc9db6d6834816a6027f.1530004712.git.sean.wang@mediatek.com>
-References: <cover.1530004712.git.sean.wang@mediatek.com> <ed497b2a9751df3b2f84cc9db6d6834816a6027f.1530004712.git.sean.wang@mediatek.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Wed, 27 Jun 2018 10:00:08 +0200
-Message-ID: <CAPDyKFp4kESPH4hcqgATYWBt3Kz3FhAOCpnrCc5PRSkMkBikEg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/7] serdev: add dev_pm_domain_attach|detach()
-To: sean.wang@mediatek.com
-Cc: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Linux ARM <linux-arm-kernel@lists.infradead.org>, linux-mediatek@lists.infradead.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Rob Herring <robh@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>,
-	linux-serial@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <564280aab3ce4b55b064e102e286cd112fa7085d.camel@iki.fi>
+Subject: Re: Failure to connect Sony headsets
+From: Tanu Kaskinen <tanuk@iki.fi>
+To: =?ISO-8859-1?Q?Jo=E3o?= Paulo Rechi Vita <jprvita@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        General PulseAudio Discussion
+        <pulseaudio-discuss@lists.freedesktop.org>,
+        =?ISO-8859-1?Q?Jo=E3o?= Paulo Rechi Vita
+        <jprvita@endlessm.com>, Linux Upstreaming Team <linux@endlessm.com>
+Date: Wed, 27 Jun 2018 10:08:51 +0300
+In-Reply-To: <CA+A7VXWVtfLNPckCprxKrSV+k20Pj-r+F_VkWu6h3iY+8qNwDA@mail.gmail.com>
+References: <CA+A7VXVEBULPWJpxMeED-QxxG25Az1ckWdL+cudqE0RL7he9Xg@mail.gmail.com>
+         <5a3c473313387957bac050067857e22e62d544f5.camel@iki.fi>
+         <CA+A7VXVy=1RjvaQgSyE5M9Hw=QRuy8Ejc0A=pFhtxn1=06ZC3Q@mail.gmail.com>
+         <5731aaabb375e5b82945cabff8c315a2ef827cbe.camel@iki.fi>
+         <CA+A7VXU30H_=aZw_Xi2S2iOkPp=nQxfMRTE9msAAX+oh7v1Qvw@mail.gmail.com>
+         <CABBYNZ+w=iC=OYz8y=NyLuvdEXfWprDoMuZiqTs+SijU7med9w@mail.gmail.com>
+         <CABBYNZKpB5FLDxu2PrAV4P+HGDY1=jWJU_3YjTmgcDjoj36ijg@mail.gmail.com>
+         <CA+A7VXVJkGaZA3ZOb4F3dD1i1h9PQXXMpL2St+kRQdRJSq9g-A@mail.gmail.com>
+         <CABBYNZ+FD1sJ7SwS1SP7qoQ-W4PMfYQoWvHZ0_TCbVyCpzKasw@mail.gmail.com>
+         <CA+A7VXWVtfLNPckCprxKrSV+k20Pj-r+F_VkWu6h3iY+8qNwDA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 27 June 2018 at 07:43,  <sean.wang@mediatek.com> wrote:
-> From: Sean Wang <sean.wang@mediatek.com>
->
-> In order to open up the required power gate before any operation can be
-> effectively performed over the serial bus between CPU and serdev, it's
-> clearly essential to add common attach functions for PM domains to serdev
-> at the probe phase.
->
-> Similarly, the relevant dettach function for the PM domains should be
-> properly and reversely added at the remove phase.
->
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> Cc: Rob Herring <robh@kernel.org>
-> Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Jiri Slaby <jslaby@suse.com>
-> Cc: linux-serial@vger.kernel.org
+On Tue, 2018-06-26 at 08:41 -0700, João Paulo Rechi Vita wrote:
+> My initial thought is that module-card-restore does more harm then
+> good for UX with Bluetooth headsets, actually. It sure was useful when
+> module-bluetooth-policy did not exist, but I think a good user
+> experience is based on dynamically adapting according to which streams
+> are active at a certain moment, instead of user input. This is mostly
+> covered by module-bluetooth-policy + module-role-{cork,ducking}, but I
+> don't think anything switches the profile to A2DP when there is a
+> "high-quality" stream playing if module-card-restore initially set the
+> profile to headset_head_sink. Maybe this is more of a UI bug and a
+> user-focused UI should not expose means for the user to manually
+> select the profile, which is aligned with a previous comment from
+> Tanu:
+> 
+> > On Thu, Jun 14, 2018 at 4:57 AM, Tanu Kaskinen <tanuk@iki.fi> wrote:
+> > 
+> > If module-bluetooth-policy is sufficient, then module-card-restore
+> > won't do anything anyway, because you never set the profile manually.
+> > If you ever set the profile manually, that's an indication that module-
+> > bluetooth-policy isn't always good enough.
+> 
+> Still, I think the general user will only manually change the profile
+> either if things go wrong for some reason, or before PulseAudio 12,
+> because HSP/HFP was selected by default. If they leave the setting on
+> the "wrong profile", it affects their experience next time using the
+> headset, despite if it is right afterwards or months later, or if the
+> headset has been removed and paired with a different machine in the
+> meantime. Again, it may be a UI issue after all, but comparing to
+> Android/iPhone (which is what a lot of users are likely to have
+> previous experience with), there is not even a way for users to
+> manually set the active profile for headsets. They can enable/disable
+> a profile for an specific headset on Android tho, which gives them
+> some sort of control. I don't think there is any client API for
+> disabling profiles on cards, but maybe that could be a good
+> alternative?
 
-Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
+I agree, it's not nice that setting the profile once will interfere
+with automatic configuration forever. Do you want to make a patch for
+module-card-restore that adds an option (enabled by default) for
+disabling profile restoring for bluetooth?
 
-Kind regards
-Uffe
+Offering a UI for disabling profiles doesn't seem like a better
+alternative to me, at least for this problem. If there's some other use
+case for disabling profiles, I'm not against the idea in principle.
 
-> ---
->  drivers/tty/serdev/core.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
-> index df93b72..8096138 100644
-> --- a/drivers/tty/serdev/core.c
-> +++ b/drivers/tty/serdev/core.c
-> @@ -13,6 +13,7 @@
->  #include <linux/module.h>
->  #include <linux/of.h>
->  #include <linux/of_device.h>
-> +#include <linux/pm_domain.h>
->  #include <linux/serdev.h>
->  #include <linux/slab.h>
->
-> @@ -330,8 +331,17 @@ EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
->  static int serdev_drv_probe(struct device *dev)
->  {
->         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
-> +       int ret;
->
-> -       return sdrv->probe(to_serdev_device(dev));
-> +       ret = dev_pm_domain_attach(dev, true);
-> +       if (ret)
-> +               return ret;
-> +
-> +       ret = sdrv->probe(to_serdev_device(dev));
-> +       if (ret)
-> +               dev_pm_domain_detach(dev, true);
-> +
-> +       return ret;
->  }
->
->  static int serdev_drv_remove(struct device *dev)
-> @@ -339,6 +349,9 @@ static int serdev_drv_remove(struct device *dev)
->         const struct serdev_device_driver *sdrv = to_serdev_device_driver(dev->driver);
->         if (sdrv->remove)
->                 sdrv->remove(to_serdev_device(dev));
-> +
-> +       dev_pm_domain_detach(dev, true);
-> +
->         return 0;
->  }
->
-> --
-> 2.7.4
->
+-- 
+Tanu
+
+https://liberapay.com/tanuk
+https://www.patreon.com/tanuk
