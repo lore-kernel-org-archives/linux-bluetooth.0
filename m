@@ -1,124 +1,73 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH BlueZ] doc/mgmt-api: Add BREDR PHYs in PHY Configuration Commands
-Date: Thu, 28 Jun 2018 11:19:50 +0530
-Message-Id: <1530164990-2148-1-git-send-email-jaganathx.kanakkassery@intel.com>
+From: "Stotland, Inga" <inga.stotland@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "Hedberg, Johan" <johan.hedberg@intel.com>,
+        "Gix, Brian" <brian.gix@intel.com>
+Subject: Re: [PATCH BlueZ 0/2] Directory re-org for meshctl tool
+Date: Thu, 28 Jun 2018 05:50:34 +0000
+Message-ID: <1530165033.4244.11.camel@intel.com>
+References: <20180622063200.7394-1-inga.stotland@intel.com>
+In-Reply-To: <20180622063200.7394-1-inga.stotland@intel.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 74 ++++++++++++++++++++++++++++++--------------------------
- 1 file changed, 40 insertions(+), 34 deletions(-)
-
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 87982e0..3ef367d 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2948,34 +2948,49 @@ Get PHY Configuration Command
- 	Command Code:		0x0043
- 	Controller Index:	<controller id>
- 	Command Parameters:
--	Return Parameters:	Supported_phys (2 Octet)
--				Selected_phys (2 Octet)
-+	Return Parameters:	Supported_phys (4 Octet)
-+				Configurable_PHYs (4 Octets)
-+				Selected_phys (4 Octet)
-+
-+	The PHYs parameters are a bitmask with currently the
-+	following available bits:
-+
-+		0	BR 1M 1-Slot
-+		1	BR 1M 3-Slot
-+		2	BR 1M 5-Slot
-+		3	EDR 2M 1-Slot
-+		4	EDR 2M 3-Slot
-+		5	EDR 2M 5-Slot
-+		6	EDR 3M 1-Slot
-+		7	EDR 3M 3-Slot
-+		8	EDR 3M 5-Slot
-+		9	LE 1M TX
-+		10	LE 1M RX
-+		11	LE 2M TX
-+		12	LE 2M RX
-+		13	LE Coded TX
-+		14	LE Coded RX
-+
-+	If BR/EDR is supported, then BR 1M 1-Slot is supported by
-+	default and can also not be deselected. If LE is supported,
-+	then LE 1M TX and LE 1M RX are supported by default.
-+
-+	Disabling BR/EDR completely or respectively LE has no impact
-+	on the PHY configuration. It is remembered over power cycles.
- 
--	This command is used to retrieve the supported PHYs and currently
--	selected PHYs.
--
--	Supported_phys and Selected_phys is a bitmask with the following bits.
--		0	LE 1M TX
--		1	LE 1M RX
--		2	LE 2M TX
--		3	LE 2M RX
--		4	LE CODED TX
--		5	LE CODED RX
--
--	LE 1M TX and LE 1M RX would be supported by default.
--
--	This command is only available for LE capable controllers.
--        It will return Not Supported otherwise.
-+	This command generates a Command Complete event on success
-+	or a Command Status event on failure.
- 
--        Possible errors:	Not Supported
-+        Possible errors:	Invalid Parameters
- 				Invalid Index
- 
-+
- Set PHY Configuration Command
- =============================
- 
- 	Command Code:		0x0044
- 	Controller Index:	<controller id>
--	Command Parameters: 	Default_phys (2 Octet)
-+	Command Parameters: 	Selected_PHYs (4 Octet)
- 	Return Parameters:
- 
- 	This command is used to set the default phy to the controller.
-@@ -2984,27 +2999,18 @@ Set PHY Configuration Command
- 	and connection initiation.
- 
- 	The list of supported PHYs can be retrieved via the
--	Get PHY Configuration command. Selecting unsupported PHYs will
--	result in an Invalid Parameters	error.
-+	Get PHY Configuration command. Selecting unsupported or
-+	deselecting default PHYs will result in an Invalid Parameter
-+	error.
- 
--	This can be called at any point to change the preferred PHYs.
-+	This can be called at any point to change the Selected PHYs.
- 
--	Default_phys is a bitmask with the following bits.
--		0	LE 1M TX
--		1	LE 1M RX
--		2	LE 2M TX
--		3	LE 2M RX
--		4	LE CODED TX
--		5	LE CODED RX
-+	Refer Get PHY Configuration command for PHYs parameter.
- 
- 	This command generates a Command Complete event on success
- 	or a Command Status event on failure.
- 
--	This command is only available for LE capable controllers.
--	It will return Not Supported otherwise.
--
--	Possible errors:	Not Supported
--				Invalid Parameters
-+	Possible errors:	Invalid Parameters
- 				Invalid Index
- 
- 
--- 
-2.7.4
-
+UGluZw0KDQpPbiBUaHUsIDIwMTgtMDYtMjEgYXQgMjM6MzEgLTA3MDAsIEluZ2EgU3RvdGxhbmQg
+d3JvdGU6DQo+IFRoaXMgc2V0IG9mIHBhdGNoZXMgbW92ZXMgbWVjaGN0bCB0b29sIGNvZGUgZnJv
+bSB1bmRlciBibHVlei9tZXNoDQo+IGludG8gdG9vbHMgZGlyZWN0b3J5Lg0KPiANCj4gbWVzaCBk
+aXJlY3Rvcnkgd2lsbCBiZSByZS1lc3RhYmxpc2hlZCB3aXRoIHRoZSBpbXBsZW1lbnRhdGlvbiBv
+ZiBtZXNoDQo+IGRhZW1vbi4NCj4gDQo+IEluZ2EgU3RvdGxhbmQgKDIpOg0KPiAgIHRvb2xzOiBN
+b3ZlIG1lc2hjdGwgdG9vbCB1bmRlciB0b29scyBkaXJlY3RvcnkNCj4gICB0b29sczogTW92ZSBt
+ZXNoY3RsIHNvdXJjZXMgdW5kZXIgdG9vbHMvbWVzaCBkaXJlY3RvcnkNCj4gDQo+ICBNYWtlZmls
+ZS50b29scyAgICAgICAgICAgICAgICAgICAgICAgfCA0OCArKysrKysrKysrKysrKysrKystLS0t
+LS0tLS0tLS0tLS0tLS0NCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L1JFQURNRSAgICAgICAgICB8
+ICAwDQo+ICB7bWVzaCA9PiB0b29scy9tZXNofS9hZ2VudC5jICAgICAgICAgfCAgNCArLS0NCj4g
+IHttZXNoID0+IHRvb2xzL21lc2h9L2FnZW50LmggICAgICAgICB8ICAwDQo+ICB7bWVzaCA9PiB0
+b29scy9tZXNofS9jb25maWctY2xpZW50LmMgfCAxNCArKysrKy0tLS0tLQ0KPiAge21lc2ggPT4g
+dG9vbHMvbWVzaH0vY29uZmlnLW1vZGVsLmggIHwgIDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9
+L2NvbmZpZy1zZXJ2ZXIuYyB8IDE0ICsrKysrLS0tLS0tDQo+ICB7bWVzaCA9PiB0b29scy9tZXNo
+fS9jcnlwdG8uYyAgICAgICAgfCAgNCArLS0NCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L2NyeXB0
+by5oICAgICAgICB8ICAwDQo+ICB7bWVzaCA9PiB0b29scy9tZXNofS9nYXR0LmMgICAgICAgICAg
+fCAxMCArKysrLS0tLQ0KPiAge21lc2ggPT4gdG9vbHMvbWVzaH0vZ2F0dC5oICAgICAgICAgIHwg
+IDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L2tleXMuaCAgICAgICAgICB8ICAwDQo+ICB7bWVz
+aCA9PiB0b29scy9tZXNofS9sb2NhbF9ub2RlLmpzb24gfCAgMA0KPiAge21lc2ggPT4gdG9vbHMv
+bWVzaH0vbWVzaC1uZXQuaCAgICAgIHwgIDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L25ldC5j
+ICAgICAgICAgICB8IDE2ICsrKysrKy0tLS0tLQ0KPiAge21lc2ggPT4gdG9vbHMvbWVzaH0vbmV0
+LmggICAgICAgICAgIHwgIDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L25vZGUuYyAgICAgICAg
+ICB8IDE2ICsrKysrKy0tLS0tLQ0KPiAge21lc2ggPT4gdG9vbHMvbWVzaH0vbm9kZS5oICAgICAg
+ICAgIHwgIDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L29ub2ZmLW1vZGVsLmMgICB8IDE0ICsr
+KysrLS0tLS0tDQo+ICB7bWVzaCA9PiB0b29scy9tZXNofS9vbm9mZi1tb2RlbC5oICAgfCAgMA0K
+PiAge21lc2ggPT4gdG9vbHMvbWVzaH0vcHJvdi1kYi5jICAgICAgIHwgMTQgKysrKystLS0tLS0N
+Cj4gIHttZXNoID0+IHRvb2xzL21lc2h9L3Byb3YtZGIuaCAgICAgICB8ICAwDQo+ICB7bWVzaCA9
+PiB0b29scy9tZXNofS9wcm92LmMgICAgICAgICAgfCAxNiArKysrKystLS0tLS0NCj4gIHttZXNo
+ID0+IHRvb2xzL21lc2h9L3Byb3YuaCAgICAgICAgICB8ICAwDQo+ICB7bWVzaCA9PiB0b29scy9t
+ZXNofS9wcm92X2RiLmpzb24gICAgfCAgMA0KPiAge21lc2ggPT4gdG9vbHMvbWVzaH0vdXRpbC5j
+ICAgICAgICAgIHwgIDYgKystLS0NCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L3V0aWwuaCAgICAg
+ICAgICB8ICAwDQo+ICBtZXNoL21haW4uYyA9PiB0b29scy9tZXNoY3RsLmMgICAgICAgfCAgMA0K
+PiAgMjggZmlsZXMgY2hhbmdlZCwgODggaW5zZXJ0aW9ucygrKSwgODggZGVsZXRpb25zKC0pDQo+
+ICByZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vUkVBRE1FICgxMDAlKQ0KPiAgcmVuYW1lIHtt
+ZXNoID0+IHRvb2xzL21lc2h9L2FnZW50LmMgKDk4JSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29s
+cy9tZXNofS9hZ2VudC5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L2Nv
+bmZpZy1jbGllbnQuYyAoOTklKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L2NvbmZp
+Zy1tb2RlbC5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L2NvbmZpZy1z
+ZXJ2ZXIuYyAoOTQlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L2NyeXB0by5jICg5
+OSUpDQo+ICByZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vY3J5cHRvLmggKDEwMCUpDQo+ICBy
+ZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vZ2F0dC5jICg5OCUpDQo+ICByZW5hbWUge21lc2gg
+PT4gdG9vbHMvbWVzaH0vZ2F0dC5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21l
+c2h9L2tleXMuaCAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9sb2NhbF9u
+b2RlLmpzb24gKDEwMCUpDQo+ICByZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vbWVzaC1uZXQu
+aCAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9uZXQuYyAoOTklKQ0KPiAg
+cmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L25ldC5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNo
+ID0+IHRvb2xzL21lc2h9L25vZGUuYyAoOTglKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21l
+c2h9L25vZGUuaCAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9vbm9mZi1t
+b2RlbC5jICg5NiUpDQo+ICByZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vb25vZmYtbW9kZWwu
+aCAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9wcm92LWRiLmMgKDk5JSkN
+Cj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9wcm92LWRiLmggKDEwMCUpDQo+ICByZW5h
+bWUge21lc2ggPT4gdG9vbHMvbWVzaH0vcHJvdi5jICg5OCUpDQo+ICByZW5hbWUge21lc2ggPT4g
+dG9vbHMvbWVzaH0vcHJvdi5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9
+L3Byb3ZfZGIuanNvbiAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS91dGls
+LmMgKDk4JSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS91dGlsLmggKDEwMCUpDQo+
+ICByZW5hbWUgbWVzaC9tYWluLmMgPT4gdG9vbHMvbWVzaGN0bC5jICgxMDAlKQ0KPiA=
