@@ -1,73 +1,69 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Stotland, Inga" <inga.stotland@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "Hedberg, Johan" <johan.hedberg@intel.com>,
-        "Gix, Brian" <brian.gix@intel.com>
-Subject: Re: [PATCH BlueZ 0/2] Directory re-org for meshctl tool
-Date: Thu, 28 Jun 2018 05:50:34 +0000
-Message-ID: <1530165033.4244.11.camel@intel.com>
-References: <20180622063200.7394-1-inga.stotland@intel.com>
-In-Reply-To: <20180622063200.7394-1-inga.stotland@intel.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <jhovold@gmail.com>
+Sender: Johan Hovold <jhovold@gmail.com>
+Date: Thu, 28 Jun 2018 07:19:41 +0200
+From: Johan Hovold <johan@kernel.org>
+To: Sean Wang <sean.wang@mediatek.com>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Mark Rutland <mark.rutland@arm.com>,
+	devicetree <devicetree@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	linux-bluetooth@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+	"moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>,
+	linux-arm Mailing List <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v4 6/7] Bluetooth: mediatek: Add protocol support for
+ MediaTek serial devices
+Message-ID: <20180628051941.GF629@localhost>
+References: <cover.1530004712.git.sean.wang@mediatek.com>
+ <48215a1276c36af7ad581c3d83759fe9f55e3c4b.1530004712.git.sean.wang@mediatek.com>
+ <CAHp75VehTeyyzR4bPKK3hFDTVqZnhdNy5vcBFJCSH_Zrx+QrKA@mail.gmail.com>
+ <CAHp75VedHLw52J_ymh3iYf2w=r8d+Kqg=fJZmBGnaCrEbNEPdQ@mail.gmail.com>
+ <1530155173.29697.48.camel@mtkswgap22>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1530155173.29697.48.camel@mtkswgap22>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-UGluZw0KDQpPbiBUaHUsIDIwMTgtMDYtMjEgYXQgMjM6MzEgLTA3MDAsIEluZ2EgU3RvdGxhbmQg
-d3JvdGU6DQo+IFRoaXMgc2V0IG9mIHBhdGNoZXMgbW92ZXMgbWVjaGN0bCB0b29sIGNvZGUgZnJv
-bSB1bmRlciBibHVlei9tZXNoDQo+IGludG8gdG9vbHMgZGlyZWN0b3J5Lg0KPiANCj4gbWVzaCBk
-aXJlY3Rvcnkgd2lsbCBiZSByZS1lc3RhYmxpc2hlZCB3aXRoIHRoZSBpbXBsZW1lbnRhdGlvbiBv
-ZiBtZXNoDQo+IGRhZW1vbi4NCj4gDQo+IEluZ2EgU3RvdGxhbmQgKDIpOg0KPiAgIHRvb2xzOiBN
-b3ZlIG1lc2hjdGwgdG9vbCB1bmRlciB0b29scyBkaXJlY3RvcnkNCj4gICB0b29sczogTW92ZSBt
-ZXNoY3RsIHNvdXJjZXMgdW5kZXIgdG9vbHMvbWVzaCBkaXJlY3RvcnkNCj4gDQo+ICBNYWtlZmls
-ZS50b29scyAgICAgICAgICAgICAgICAgICAgICAgfCA0OCArKysrKysrKysrKysrKysrKystLS0t
-LS0tLS0tLS0tLS0tLS0NCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L1JFQURNRSAgICAgICAgICB8
-ICAwDQo+ICB7bWVzaCA9PiB0b29scy9tZXNofS9hZ2VudC5jICAgICAgICAgfCAgNCArLS0NCj4g
-IHttZXNoID0+IHRvb2xzL21lc2h9L2FnZW50LmggICAgICAgICB8ICAwDQo+ICB7bWVzaCA9PiB0
-b29scy9tZXNofS9jb25maWctY2xpZW50LmMgfCAxNCArKysrKy0tLS0tLQ0KPiAge21lc2ggPT4g
-dG9vbHMvbWVzaH0vY29uZmlnLW1vZGVsLmggIHwgIDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9
-L2NvbmZpZy1zZXJ2ZXIuYyB8IDE0ICsrKysrLS0tLS0tDQo+ICB7bWVzaCA9PiB0b29scy9tZXNo
-fS9jcnlwdG8uYyAgICAgICAgfCAgNCArLS0NCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L2NyeXB0
-by5oICAgICAgICB8ICAwDQo+ICB7bWVzaCA9PiB0b29scy9tZXNofS9nYXR0LmMgICAgICAgICAg
-fCAxMCArKysrLS0tLQ0KPiAge21lc2ggPT4gdG9vbHMvbWVzaH0vZ2F0dC5oICAgICAgICAgIHwg
-IDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L2tleXMuaCAgICAgICAgICB8ICAwDQo+ICB7bWVz
-aCA9PiB0b29scy9tZXNofS9sb2NhbF9ub2RlLmpzb24gfCAgMA0KPiAge21lc2ggPT4gdG9vbHMv
-bWVzaH0vbWVzaC1uZXQuaCAgICAgIHwgIDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L25ldC5j
-ICAgICAgICAgICB8IDE2ICsrKysrKy0tLS0tLQ0KPiAge21lc2ggPT4gdG9vbHMvbWVzaH0vbmV0
-LmggICAgICAgICAgIHwgIDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L25vZGUuYyAgICAgICAg
-ICB8IDE2ICsrKysrKy0tLS0tLQ0KPiAge21lc2ggPT4gdG9vbHMvbWVzaH0vbm9kZS5oICAgICAg
-ICAgIHwgIDANCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L29ub2ZmLW1vZGVsLmMgICB8IDE0ICsr
-KysrLS0tLS0tDQo+ICB7bWVzaCA9PiB0b29scy9tZXNofS9vbm9mZi1tb2RlbC5oICAgfCAgMA0K
-PiAge21lc2ggPT4gdG9vbHMvbWVzaH0vcHJvdi1kYi5jICAgICAgIHwgMTQgKysrKystLS0tLS0N
-Cj4gIHttZXNoID0+IHRvb2xzL21lc2h9L3Byb3YtZGIuaCAgICAgICB8ICAwDQo+ICB7bWVzaCA9
-PiB0b29scy9tZXNofS9wcm92LmMgICAgICAgICAgfCAxNiArKysrKystLS0tLS0NCj4gIHttZXNo
-ID0+IHRvb2xzL21lc2h9L3Byb3YuaCAgICAgICAgICB8ICAwDQo+ICB7bWVzaCA9PiB0b29scy9t
-ZXNofS9wcm92X2RiLmpzb24gICAgfCAgMA0KPiAge21lc2ggPT4gdG9vbHMvbWVzaH0vdXRpbC5j
-ICAgICAgICAgIHwgIDYgKystLS0NCj4gIHttZXNoID0+IHRvb2xzL21lc2h9L3V0aWwuaCAgICAg
-ICAgICB8ICAwDQo+ICBtZXNoL21haW4uYyA9PiB0b29scy9tZXNoY3RsLmMgICAgICAgfCAgMA0K
-PiAgMjggZmlsZXMgY2hhbmdlZCwgODggaW5zZXJ0aW9ucygrKSwgODggZGVsZXRpb25zKC0pDQo+
-ICByZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vUkVBRE1FICgxMDAlKQ0KPiAgcmVuYW1lIHtt
-ZXNoID0+IHRvb2xzL21lc2h9L2FnZW50LmMgKDk4JSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29s
-cy9tZXNofS9hZ2VudC5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L2Nv
-bmZpZy1jbGllbnQuYyAoOTklKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L2NvbmZp
-Zy1tb2RlbC5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L2NvbmZpZy1z
-ZXJ2ZXIuYyAoOTQlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L2NyeXB0by5jICg5
-OSUpDQo+ICByZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vY3J5cHRvLmggKDEwMCUpDQo+ICBy
-ZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vZ2F0dC5jICg5OCUpDQo+ICByZW5hbWUge21lc2gg
-PT4gdG9vbHMvbWVzaH0vZ2F0dC5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21l
-c2h9L2tleXMuaCAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9sb2NhbF9u
-b2RlLmpzb24gKDEwMCUpDQo+ICByZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vbWVzaC1uZXQu
-aCAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9uZXQuYyAoOTklKQ0KPiAg
-cmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9L25ldC5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNo
-ID0+IHRvb2xzL21lc2h9L25vZGUuYyAoOTglKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21l
-c2h9L25vZGUuaCAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9vbm9mZi1t
-b2RlbC5jICg5NiUpDQo+ICByZW5hbWUge21lc2ggPT4gdG9vbHMvbWVzaH0vb25vZmYtbW9kZWwu
-aCAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9wcm92LWRiLmMgKDk5JSkN
-Cj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS9wcm92LWRiLmggKDEwMCUpDQo+ICByZW5h
-bWUge21lc2ggPT4gdG9vbHMvbWVzaH0vcHJvdi5jICg5OCUpDQo+ICByZW5hbWUge21lc2ggPT4g
-dG9vbHMvbWVzaH0vcHJvdi5oICgxMDAlKQ0KPiAgcmVuYW1lIHttZXNoID0+IHRvb2xzL21lc2h9
-L3Byb3ZfZGIuanNvbiAoMTAwJSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS91dGls
-LmMgKDk4JSkNCj4gIHJlbmFtZSB7bWVzaCA9PiB0b29scy9tZXNofS91dGlsLmggKDEwMCUpDQo+
-ICByZW5hbWUgbWVzaC9tYWluLmMgPT4gdG9vbHMvbWVzaGN0bC5jICgxMDAlKQ0KPiA=
+On Thu, Jun 28, 2018 at 11:06:13AM +0800, Sean Wang wrote:
+> On Wed, 2018-06-27 at 20:04 +0300, Andy Shevchenko wrote:
+> > On Wed, Jun 27, 2018 at 7:59 PM, Andy Shevchenko
+> > <andy.shevchenko@gmail.com> wrote:
+> > > On Wed, Jun 27, 2018 at 8:43 AM,  <sean.wang@mediatek.com> wrote:
+> > >> From: Sean Wang <sean.wang@mediatek.com>
+
+> > >> +#include <net/bluetooth/bluetooth.h>
+> > >> +#include <net/bluetooth/hci_core.h>
+> > 
+> > >> +       /* Enable the power domain and clock the device requires. */
+> > >> +       pm_runtime_enable(dev);
+> > >> +       err = pm_runtime_get_sync(dev);
+> > >> +       if (err < 0)
+> > >> +               goto err_pm2;
+
+> > >> +err_pm1:
+> > >> +       pm_runtime_put_sync(dev);
+> > >> +err_pm2:
+> > >> +       pm_runtime_disable(dev);
+
+Please name error labels after what they do, not using numbers (see
+CodingStyle). Here you could use err_disable_rpm instead of err_pm2, for
+example.
+
+Also, if you really want to undo pm_runtime_get_sync() failing above,
+you still need a pm_runtime_put_noidle() to balance the usage count.
+
+> > >> +struct mtk_stp_hdr {
+> > >> +       __u8 prefix;
+> > >> +       __u8 dlen1:4;
+> > >> +       __u8 type:4;
+> > 
+> > >> +       __u8 dlen2:8;
+> > >> +       __u8 cs;
+> > >> +} __packed;
+
+Perhaps too much context have been lost here, but unless you're sharing
+this struct with user space, you should be using u8 (without __) above
+(and elsewhere).
+
+Johan
