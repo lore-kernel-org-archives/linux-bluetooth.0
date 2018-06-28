@@ -2,18 +2,18 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH BlueZ v1] doc/mgmt-api: Add BREDR PHYs in PHY Configuration Commands
-Date: Thu, 28 Jun 2018 11:46:50 +0530
-Message-Id: <1530166610-2543-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH BlueZ] doc/mgmt-api: Add BREDR PHYs in PHY Configuration Commands
+Date: Thu, 28 Jun 2018 11:19:50 +0530
+Message-Id: <1530164990-2148-1-git-send-email-jaganathx.kanakkassery@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/mgmt-api.txt | 78 +++++++++++++++++++++++++++++++-------------------------
- 1 file changed, 43 insertions(+), 35 deletions(-)
+ doc/mgmt-api.txt | 74 ++++++++++++++++++++++++++++++--------------------------
+ 1 file changed, 40 insertions(+), 34 deletions(-)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 87982e0..15b4b17 100644
+index 87982e0..3ef367d 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
 @@ -2948,34 +2948,49 @@ Get PHY Configuration Command
@@ -119,21 +119,6 @@ index 87982e0..15b4b17 100644
  				Invalid Index
  
  
-@@ -3879,7 +3885,7 @@ PHY Configuration Changed Event
- 
- 	Event Code:		0x0026
- 	Controller Index:	<controller id>
--	Event Parameters:	Selected_phys (2 Octets)
-+	Event Parameters:	Selected_phys (4 Octets)
- 
- 	This event indicates that default PHYs have been updated.
- 
-@@ -3888,3 +3894,5 @@ PHY Configuration Changed Event
- 
- 	The event will only be sent to management sockets other than the
- 	one through which the change was triggered.
-+
-+	Refer Get PHY Configuration command for PHYs parameter.
 -- 
 2.7.4
 
