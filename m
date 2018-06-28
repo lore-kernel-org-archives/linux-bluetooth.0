@@ -1,69 +1,109 @@
-Return-Path: <jhovold@gmail.com>
-Sender: Johan Hovold <jhovold@gmail.com>
-Date: Thu, 28 Jun 2018 07:19:41 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Sean Wang <sean.wang@mediatek.com>
-Cc: Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	devicetree <devicetree@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
-	"moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>,
-	linux-arm Mailing List <linux-arm-kernel@lists.infradead.org>
+Return-Path: <sean.wang@mediatek.com>
+Message-ID: <1530155173.29697.48.camel@mtkswgap22>
 Subject: Re: [PATCH v4 6/7] Bluetooth: mediatek: Add protocol support for
  MediaTek serial devices
-Message-ID: <20180628051941.GF629@localhost>
+From: Sean Wang <sean.wang@mediatek.com>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+CC: Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, devicetree <devicetree@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>, linux-arm Mailing List
+	<linux-arm-kernel@lists.infradead.org>, "moderated list:ARM/Mediatek SoC
+ support" <linux-mediatek@lists.infradead.org>, Linux Kernel Mailing List
+	<linux-kernel@vger.kernel.org>
+Date: Thu, 28 Jun 2018 11:06:13 +0800
+In-Reply-To: <CAHp75VedHLw52J_ymh3iYf2w=r8d+Kqg=fJZmBGnaCrEbNEPdQ@mail.gmail.com>
 References: <cover.1530004712.git.sean.wang@mediatek.com>
- <48215a1276c36af7ad581c3d83759fe9f55e3c4b.1530004712.git.sean.wang@mediatek.com>
- <CAHp75VehTeyyzR4bPKK3hFDTVqZnhdNy5vcBFJCSH_Zrx+QrKA@mail.gmail.com>
- <CAHp75VedHLw52J_ymh3iYf2w=r8d+Kqg=fJZmBGnaCrEbNEPdQ@mail.gmail.com>
- <1530155173.29697.48.camel@mtkswgap22>
+	 <48215a1276c36af7ad581c3d83759fe9f55e3c4b.1530004712.git.sean.wang@mediatek.com>
+	 <CAHp75VehTeyyzR4bPKK3hFDTVqZnhdNy5vcBFJCSH_Zrx+QrKA@mail.gmail.com>
+	 <CAHp75VedHLw52J_ymh3iYf2w=r8d+Kqg=fJZmBGnaCrEbNEPdQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1530155173.29697.48.camel@mtkswgap22>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jun 28, 2018 at 11:06:13AM +0800, Sean Wang wrote:
-> On Wed, 2018-06-27 at 20:04 +0300, Andy Shevchenko wrote:
-> > On Wed, Jun 27, 2018 at 7:59 PM, Andy Shevchenko
-> > <andy.shevchenko@gmail.com> wrote:
-> > > On Wed, Jun 27, 2018 at 8:43 AM,  <sean.wang@mediatek.com> wrote:
-> > >> From: Sean Wang <sean.wang@mediatek.com>
+On Wed, 2018-06-27 at 20:04 +0300, Andy Shevchenko wrote:
+> On Wed, Jun 27, 2018 at 7:59 PM, Andy Shevchenko
+> <andy.shevchenko@gmail.com> wrote:
+> > On Wed, Jun 27, 2018 at 8:43 AM,  <sean.wang@mediatek.com> wrote:
+> >> From: Sean Wang <sean.wang@mediatek.com>
+> >>
+> >
+> >> +config BT_HCIBTUART_MTK
+> >> +       tristate "MediaTek HCI UART driver"
+> >> +       depends on BT_HCIBTUART
+> >
+> >> +       default y
+> >
+> > Perhaps it's an overkill for users which would like to have less
+> > amount on stuff in kernel.
+> >
 
-> > >> +#include <net/bluetooth/bluetooth.h>
-> > >> +#include <net/bluetooth/hci_core.h>
-> > 
-> > >> +       /* Enable the power domain and clock the device requires. */
-> > >> +       pm_runtime_enable(dev);
-> > >> +       err = pm_runtime_get_sync(dev);
-> > >> +       if (err < 0)
-> > >> +               goto err_pm2;
+Sure, the default y will be removed
 
-> > >> +err_pm1:
-> > >> +       pm_runtime_put_sync(dev);
-> > >> +err_pm2:
-> > >> +       pm_runtime_disable(dev);
+> >
+> >> +#include <asm/unaligned.h>
+> >> +#include <linux/atomic.h>
+> >> +#include <linux/clk.h>
+> >> +#include <linux/firmware.h>
+> >> +#include <linux/module.h>
+> >> +#include <linux/pm_runtime.h>
+> >> +#include <linux/serdev.h>
+> 
+> Perhaps alphabetically ordered?
+> 
 
-Please name error labels after what they do, not using numbers (see
-CodingStyle). Here you could use err_disable_rpm instead of err_pm2, for
-example.
+They seem already in alphabetically ordered
 
-Also, if you really want to undo pm_runtime_get_sync() failing above,
-you still need a pm_runtime_put_noidle() to balance the usage count.
+> + blank line.
+> 
 
-> > >> +struct mtk_stp_hdr {
-> > >> +       __u8 prefix;
-> > >> +       __u8 dlen1:4;
-> > >> +       __u8 type:4;
-> > 
-> > >> +       __u8 dlen2:8;
-> > >> +       __u8 cs;
-> > >> +} __packed;
+A blank line will be added here
 
-Perhaps too much context have been lost here, but unless you're sharing
-this struct with user space, you should be using u8 (without __) above
-(and elsewhere).
+> >
+> >> +#include <net/bluetooth/bluetooth.h>
+> >> +#include <net/bluetooth/hci_core.h>
+> 
+> >> +       /* Enable the power domain and clock the device requires. */
+> >> +       pm_runtime_enable(dev);
+> >> +       err = pm_runtime_get_sync(dev);
+> >> +       if (err < 0)
+> >> +               goto err_pm2;
+> 
+> Should be err_pm1 here.
 
-Johan
+Label err_pm1 and err_pm2 can be swapped for the readability and this
+doesn't have any effect on the logic.
+
+> Yes, that's correct.
+> 
+> >> +err_pm1:
+> >> +       pm_runtime_put_sync(dev);
+> >> +err_pm2:
+> >> +       pm_runtime_disable(dev);
+> 
+> >> +#define MTK_WMT_CMD_SIZE       (MTK_WMT_HDR_SIZE + MTK_STP_HDR_SIZE + \
+> >> +                                MTK_STP_TLR_SIZE + HCI_ACL_HDR_SIZE)
+> 
+> It would look slightly better if you start on new line like
+> #define FOO \
+>  (BAR + BAZ)
+> 
+
+Thanks for your pointing out. I also found that the macro is not being
+used by anyone, it can be removed freely.
+
+> >> +struct mtk_stp_hdr {
+> >> +       __u8 prefix;
+> >> +       __u8 dlen1:4;
+> >> +       __u8 type:4;
+> 
+> >> +       __u8 dlen2:8;
+> 
+> u8 already 8 bit.
+> 
+
+the superfluous :8 for dlen2 will be removed
+
+> >> +       __u8 cs;
+> >> +} __packed;
+> 
