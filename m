@@ -2,178 +2,180 @@ Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
-Date: Fri, 29 Jun 2018 23:07:22 +0530
+Date: Fri, 29 Jun 2018 21:02:54 +0530
 From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 To: Matthias Kaehlcke <mka@chromium.org>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
  linux-bluetooth@vger.kernel.org, rtatiya@codeaurora.org,
  hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v8 7/7] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth chip wcn3990
-In-Reply-To: <20180626010559.GK129942@google.com>
+Subject: Re: [PATCH v8 3/7] Bluetooth: btqca: Redefine qca_uart_setup() to
+ generic function.
+In-Reply-To: <20180626195322.GO129942@google.com>
 References: <20180625134013.19684-1-bgodavar@codeaurora.org>
- <20180625134013.19684-8-bgodavar@codeaurora.org>
- <20180626010559.GK129942@google.com>
-Message-ID: <364baccde12829e0c160a3ba2bbcdee0@codeaurora.org>
+ <20180625134013.19684-4-bgodavar@codeaurora.org>
+ <20180625232057.GH129942@google.com>
+ <2ed980b7cd83a87dd76b05a4bca014ce@codeaurora.org>
+ <20180626195322.GO129942@google.com>
+Message-ID: <aef5aa597133c47651d4e258fea41067@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Matthias,
 
-On 2018-06-26 06:35, Matthias Kaehlcke wrote:
-> On Mon, Jun 25, 2018 at 07:10:13PM +0530, Balakrishna Godavarthi wrote:
->> Add support to set voltage/current of various regulators
->> to power up/down Bluetooth chip wcn3990.
+On 2018-06-27 01:23, Matthias Kaehlcke wrote:
+> On Tue, Jun 26, 2018 at 06:53:47AM +0530, Balakrishna Godavarthi wrote:
+>> Hi Matthias,
 >> 
->> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> ---
->> changes in v8:
->>     * closing qca buffer, if qca_power_setup fails
->>     * chnaged ibs start timer function call location.
->>     * updated review comments.
->> 
->> changes in v7:
->>     * addressed review comments.
->> 
->> changes in v6:
->>     * Hooked up qca_power to qca_serdev.
->>     * renamed all the naming inconsistency functions with qca_*
->>     * leveraged common code of ROME for wcn3990.
->>     * created wrapper functions for re-usable blocks.
->>     * updated function of _*regulator_enable and _*regualtor_disable.
->>     * removed redundant comments and functions.
->>     * addressed review comments.
->> 
->> Changes in v5:
->>     * updated regulator vddpa min_uV to 1304000.
->>       * addressed review comments.
->> 
->> Changes in v4:
->>     * Segregated the changes of btqca from hci_qca
->>     * rebased all changes on top of bluetooth-next.
->>     * addressed review comments.
->> 
->> ---
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index 28187a89b850..bd4c9a78716f 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> ...
->> +static int qca_send_vendor_cmd(struct hci_dev *hdev, u8 cmd)
->> +{
->> +	struct hci_uart *hu = hci_get_drvdata(hdev);
->> +	struct qca_data *qca = hu->priv;
->> +	struct sk_buff *skb;
->> +
->> +	bt_dev_dbg(hdev, "sending command %02x to SoC", cmd);
->> +
->> +	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
->> +	if (!skb) {
->> +		bt_dev_err(hdev, "Failed to allocate memory for vendor packet");
+>> On 2018-06-26 04:50, Matthias Kaehlcke wrote:
+>> > On Mon, Jun 25, 2018 at 07:10:09PM +0530, Balakrishna Godavarthi wrote:
+>> > > Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
+>> > > SoC, to use the same function instead of duplicating the function.
+>> > > Added new arguments soc_type and soc_ver to the functions.
+>> > >
+>> > > These arguments will help to decide type of firmware files
+>> > > to be loaded into Bluetooth chip.
+>> > > soc_type holds the Bluetooth chip connected to APPS processor.
+>> > > soc_ver holds the Bluetooth chip version.
+>> > >
+>> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> > > ---
+>> > > Changes in v8:
+>> > >     * updated soc_type with enum.
+>> > >
+>> > > Changes in v7:
+>> > >     * initial patch
+>> > >     * redefined qca_uart_setup function to generic.
+>> > > ---
+>> > >  drivers/bluetooth/btqca.c   | 23 ++++++++++++-----------
+>> > >  drivers/bluetooth/btqca.h   | 13 +++++++++++--
+>> > >  drivers/bluetooth/hci_qca.c |  3 ++-
+>> > >  3 files changed, 25 insertions(+), 14 deletions(-)
+>> > >
+>> > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>> > > index c5cf9cab438a..3b25be1be19c 100644
+>> > > --- a/drivers/bluetooth/btqca.c
+>> > > +++ b/drivers/bluetooth/btqca.c
+>> > > @@ -327,9 +327,9 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,
+>> > > const bdaddr_t *bdaddr)
+>> > >  }
+>> > >  EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
+>> > >
+>> > > -int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
+>> > > +int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>> > > +		   enum qca_btsoc_type soc_type, u32 soc_ver)
+>> > >  {
+>> > > -	u32 rome_ver = 0;
+>> > >  	struct rome_config config;
+>> > >  	int err;
+>> > >
+>> > > @@ -337,19 +337,20 @@ int qca_uart_setup(struct hci_dev *hdev,
+>> > > uint8_t baudrate)
+>> > >
+>> > >  	config.user_baud_rate = baudrate;
+>> > >
+>> > > -	/* Get QCA version information */
+>> > > -	err = qca_read_soc_version(hdev, &rome_ver);
+>> > > -	if (err < 0 || rome_ver == 0) {
+>> > > -		bt_dev_err(hdev, "QCA Failed to get version %d", err);
+>> > > -		return err;
+>> > > +	if (!soc_ver) {
+>> > > +		/* Get QCA version information */
+>> > > +		err = qca_read_soc_version(hdev, &soc_ver);
+>> > > +		if (err < 0 || soc_ver == 0) {
+>> > > +			bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
+>> > > +			return err;
+>> > > +		}
+>> > > +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+>> > >  	}
+>> >
+>> > I thought we agreed in the discussion on "[v7,4/8] Bluetooth: btqca:
+>> > Redefine qca_uart_setup() to generic function" to call
+>> > qca_read_soc_version() in common code. Did I misinterpret that?
+>> >
+>> [Bala]: After integrating wcn3990, calling qca_read_soc_version() in
+>> qca_setup()
+>>         is not preferable. as we will have multiple common blocks of 
+>> code in
+>> qca_setup.
+>>         calling function to set an operator speed is required in the 
+>> both
+>> the if -else blcoks
 > 
-> As mentioned on v7, custom OOM messages should be avoided.
+> We can probably agree that there is no ideal solution, there is some
+> ugliness in on way or the other. IMO the conditional
+> qca_read_soc_version() in qca_uart_setup() based on the vale of
+> 'soc_ver' is far worse than a small piece of redundant code.
+> 
+> If qca_read_soc_version() was done in qca_setup() the code could look
+> something like this:
+> 
+> static int qca_setup(struct hci_uart *hu)
+> {
+> 	...
+> 	if (qcadev->btsoc_type == QCA_WCN3990) {
+> 		...
+> 		qca_read_soc_version();
+> 		ret = qca_set_speed(hu, QCA_OPER_SPEED);
+>                 if (ret)
+>                         return ret;
+> 	} else {
+> 		ret = qca_set_speed(hu, QCA_OPER_SPEED);
+>                 if (ret)
+>                         return ret;
+>                 qca_read_soc_version();
+> 	}
+> 
+> 	speed = qca_get_speed(hu, QCA_OPER_SPEED);
+> 	qca_baudrate = qca_get_baudrate_value(speed);
+> 
+> 	 /* Setup patch / NVM configurations */
+>         ret = qca_uart_setup(hdev, qca_baudrate, qcadev->btsoc_type, 
+> soc_ver);
+> 	...
+> }
+> 
+> Yes, 'qca_set_speed(hu, QCA_OPER_SPEED)' and the error handling is
+> redundant, but it's only 3 lines of trivial code in exchange for
+> making qca_uart_setup() more consistent and not spreading
+> the qca_read_soc_version() calls over multiple files, depending on the
+> SoC version.
+> 
+> If you are super-convinced that the split is superior leave it as is,
+> I might already be doing too much bike-shedding, and after all it
+> isn't my code.
 > 
 
-[Bala]: sry i might have missed it, will update.
+[Bala]: not a problem. will update as suggested.
 
->>  static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type 
->> speed_type)
->>  {
->> +	struct qca_serdev *qcadev;
->>  	unsigned int speed, qca_baudrate;
->>  	int ret;
+>> > > diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>> > > index 5c9851b11838..24d6667eecf1 100644
+>> > > --- a/drivers/bluetooth/btqca.h
+>> > > +++ b/drivers/bluetooth/btqca.h
+>> > > ...
+>> > > -static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t
+>> > > baudrate)
+>> > > +static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t
+>> > > baudrate,
+>> > > +				 enum qca_btsoc_type soc_type, u32 soc_ver);
+>> >
+>> > Remove trailing semicolon.
 >> 
->> @@ -971,6 +1054,13 @@ static int qca_set_speed(struct hci_uart *hu, 
->> enum qca_speed_type speed_type)
->>  		return 0;
->>  	}
->> 
->> +	qcadev = serdev_device_get_drvdata(hu->serdev);
->> +	/* Disabling hardware flow control is preferred while
->> +	 * sending change baud rate command to SoC.
->> +	 */
+>> [Bala]: i didn't get you.
 > 
-> Is it only preferred or must be?
+> Sorry, I should have left more context:
 > 
+>> static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+>> baudrate,
+>> 				 enum qca_btsoc_type soc_type, u32 soc_ver);
+>> {
+>> 	return -EOPNOTSUPP;
+>> }
+> 
+> This is a function definition, not just a declaration. The semicolon
+> would make it a declaration and make the compiler unhappy about a
+> function body where it doesn't expect it.
 
-[Bala]: must be. will update.
-
->> +	if (qcadev->btsoc_type == QCA_WCN3990)
->> +		hci_uart_set_flow_control(hu, true);
->> +
-> 
-> nit: consider doing this just before qca_set_baudrate(). It doesn't
-> make a difference but leaves it clearer what exactly needs to be
-> 'protected' (analogy to locking).
-
-[Bala] : will do it.
-
-> 
->>  	qca_baudrate = qca_get_baudrate_value(speed);
->>  	bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
->>  	ret = qca_set_baudrate(hu->hdev, qca_baudrate);
->> @@ -980,8 +1070,10 @@ static int qca_set_speed(struct hci_uart *hu, 
->> enum qca_speed_type speed_type)
->>  	}
->> 
->>  	host_set_baudrate(hu, speed);
->> +	if (qcadev->btsoc_type == QCA_WCN3990)
->> +		hci_uart_set_flow_control(hu, false);
-> 
->>  static int qca_setup(struct hci_uart *hu)
->> @@ -989,10 +1081,11 @@ static int qca_setup(struct hci_uart *hu)
->>  	struct hci_dev *hdev = hu->hdev;
->>  	struct qca_data *qca = hu->priv;
->>  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
->> +	struct qca_serdev *qcadev;
->>  	int ret;
->>  	int soc_ver = 0;
->> 
->> -	bt_dev_info(hdev, "ROME setup");
->> +	qcadev = serdev_device_get_drvdata(hu->serdev);
->> 
->>  	/* Patch downloading has to be done without IBS mode */
->>  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> @@ -1000,6 +1093,35 @@ static int qca_setup(struct hci_uart *hu)
->>  	/* Setup initial baudrate */
->>  	qca_set_speed(hu, QCA_INIT_SPEED);
->> 
->> +	if (qcadev->btsoc_type == QCA_WCN3990) {
->> +		bt_dev_dbg(hdev, "setting up wcn3990");
->> +		hci_uart_set_flow_control(hu, true);
->> +		ret = qca_send_vendor_cmd(hdev, QCA_WCN3990_POWERON_PULSE);
->> +		if (ret)
->> +			return ret;
->> +
->> +		hci_uart_set_flow_control(hu, false);
->> +		serdev_device_close(hu->serdev);
->> +		ret = serdev_device_open(hu->serdev);
->> +		if (ret) {
->> +			bt_dev_err(hdev, "failed to open port");
->> +			return ret;
->> +		}
->> +
->> +		msleep(100);
-> 
-> Is the sleep really related with _open() or is it rather that the
-> device needs to settle after the power on pulse? In the latter case
-> I'd suggest to do the sleep before _open(), if it doesn't make a
-> functional difference (makes the code a bit more self documenting).
-> 
->> +		/* Setup initial baudrate */
->> +		qca_set_speed(hu, QCA_INIT_SPEED);
->> +		hci_uart_set_flow_control(hu, false);
-> 
-> This is still a bit noisy with all the open/close and flow control
-> stuff. If I understand correctly this essentially switches the
-> controller on (or resets it?) and brings it (and the driver) into a
-> sane state. Would it make sense to move the above block into a
-> wcn3990_init/reset() or so?
-
-[Bala]: It is very good idea, may be future chips also will flow same 
-functions with some initial setup changes.
-         will group these functions into a common functions.
-
+[Bala]: i will update.
 
 -- 
 Regards
