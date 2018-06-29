@@ -1,78 +1,139 @@
-Return-Path: <sean.wang@mediatek.com>
-Message-ID: <1530265646.6245.6.camel@mtkswgap22>
-Subject: Re: [PATCH v4 6/7] Bluetooth: mediatek: Add protocol support for
- MediaTek serial devices
-From: Sean Wang <sean.wang@mediatek.com>
-To: Johan Hovold <johan@kernel.org>
-CC: Andy Shevchenko <andy.shevchenko@gmail.com>, Mark Rutland
-	<mark.rutland@arm.com>, devicetree <devicetree@vger.kernel.org>, "Johan
- Hedberg" <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	<linux-bluetooth@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	"moderated list:ARM/Mediatek SoC support"
-	<linux-mediatek@lists.infradead.org>, linux-arm Mailing List
-	<linux-arm-kernel@lists.infradead.org>
-Date: Fri, 29 Jun 2018 17:47:26 +0800
-In-Reply-To: <20180628051941.GF629@localhost>
-References: <cover.1530004712.git.sean.wang@mediatek.com>
-	 <48215a1276c36af7ad581c3d83759fe9f55e3c4b.1530004712.git.sean.wang@mediatek.com>
-	 <CAHp75VehTeyyzR4bPKK3hFDTVqZnhdNy5vcBFJCSH_Zrx+QrKA@mail.gmail.com>
-	 <CAHp75VedHLw52J_ymh3iYf2w=r8d+Kqg=fJZmBGnaCrEbNEPdQ@mail.gmail.com>
-	 <1530155173.29697.48.camel@mtkswgap22> <20180628051941.GF629@localhost>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Ankit Navik <ankit.p.navik@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.b.panda@intel.com, ankit.p.navik@intel.com
+Subject: [PATCH 2/2] Bluetooth: Add HCI command for clear Resolv list
+Date: Fri, 29 Jun 2018 12:13:20 +0530
+Message-Id: <1530254600-32499-1-git-send-email-ankit.p.navik@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2018-06-28 at 07:19 +0200, Johan Hovold wrote:
-> On Thu, Jun 28, 2018 at 11:06:13AM +0800, Sean Wang wrote:
-> > On Wed, 2018-06-27 at 20:04 +0300, Andy Shevchenko wrote:
-> > > On Wed, Jun 27, 2018 at 7:59 PM, Andy Shevchenko
-> > > <andy.shevchenko@gmail.com> wrote:
-> > > > On Wed, Jun 27, 2018 at 8:43 AM,  <sean.wang@mediatek.com> wrote:
-> > > >> From: Sean Wang <sean.wang@mediatek.com>
-> 
-> > > >> +#include <net/bluetooth/bluetooth.h>
-> > > >> +#include <net/bluetooth/hci_core.h>
-> > > 
-> > > >> +       /* Enable the power domain and clock the device requires. */
-> > > >> +       pm_runtime_enable(dev);
-> > > >> +       err = pm_runtime_get_sync(dev);
-> > > >> +       if (err < 0)
-> > > >> +               goto err_pm2;
-> 
-> > > >> +err_pm1:
-> > > >> +       pm_runtime_put_sync(dev);
-> > > >> +err_pm2:
-> > > >> +       pm_runtime_disable(dev);
-> 
-> Please name error labels after what they do, not using numbers (see
-> CodingStyle). Here you could use err_disable_rpm instead of err_pm2, for
-> example.
-> 
-> Also, if you really want to undo pm_runtime_get_sync() failing above,
-> you still need a pm_runtime_put_noidle() to balance the usage count.
-> 
+Check for Resolv list supported by controller. So check the supported
+commmand first before issuing this command i.e.,HCI_OP_LE_CLEAR_RESOLV_LIST
 
-I'll give a reasonable naming for these labels and add a
-pm_runtime_put_noidle() in the path undoing failing
-pm_runtime_get_sync().
+Before patch:
+< HCI Command: LE Read White List... (0x08|0x000f) plen 0  #55 [hci0] 13.338168
+> HCI Event: Command Complete (0x0e) plen 5                #56 [hci0] 13.338842
+      LE Read White List Size (0x08|0x000f) ncmd 1
+        Status: Success (0x00)
+        Size: 25
+< HCI Command: LE Clear White List (0x08|0x0010) plen 0    #57 [hci0] 13.339029
+> HCI Event: Command Complete (0x0e) plen 4                #58 [hci0] 13.339939
+      LE Clear White List (0x08|0x0010) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Read Resolving L.. (0x08|0x002a) plen 0  #59 [hci0] 13.340152
+> HCI Event: Command Complete (0x0e) plen 5                #60 [hci0] 13.340952
+      LE Read Resolving List Size (0x08|0x002a) ncmd 1
+        Status: Success (0x00)
+        Size: 25
+< HCI Command: LE Read Maximum Dat.. (0x08|0x002f) plen 0  #61 [hci0] 13.341180
+> HCI Event: Command Complete (0x0e) plen 12               #62 [hci0] 13.341898
+      LE Read Maximum Data Length (0x08|0x002f) ncmd 1
+        Status: Success (0x00)
+        Max TX octets: 251
+        Max TX time: 17040
+        Max RX octets: 251
+        Max RX time: 17040
 
-> > > >> +struct mtk_stp_hdr {
-> > > >> +       __u8 prefix;
-> > > >> +       __u8 dlen1:4;
-> > > >> +       __u8 type:4;
-> > > 
-> > > >> +       __u8 dlen2:8;
-> > > >> +       __u8 cs;
-> > > >> +} __packed;
-> 
-> Perhaps too much context have been lost here, but unless you're sharing
-> this struct with user space, you should be using u8 (without __) above
-> (and elsewhere).
-> 
+After patch:
+< HCI Command: LE Read White List... (0x08|0x000f) plen 0  #55 [hci0] 28.919131
+> HCI Event: Command Complete (0x0e) plen 5                #56 [hci0] 28.920016
+      LE Read White List Size (0x08|0x000f) ncmd 1
+        Status: Success (0x00)
+        Size: 25
+< HCI Command: LE Clear White List (0x08|0x0010) plen 0    #57 [hci0] 28.920164
+> HCI Event: Command Complete (0x0e) plen 4                #58 [hci0] 28.920873
+      LE Clear White List (0x08|0x0010) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Read Resolving L.. (0x08|0x002a) plen 0  #59 [hci0] 28.921109
+> HCI Event: Command Complete (0x0e) plen 5                #60 [hci0] 28.922016
+      LE Read Resolving List Size (0x08|0x002a) ncmd 1
+        Status: Success (0x00)
+        Size: 25
+< HCI Command: LE Clear Resolving... (0x08|0x0029) plen 0  #61 [hci0] 28.922166
+> HCI Event: Command Complete (0x0e) plen 4                #62 [hci0] 28.922872
+      LE Clear Resolving List (0x08|0x0029) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Read Maximum Dat.. (0x08|0x002f) plen 0  #63 [hci0] 28.923117
+> HCI Event: Command Complete (0x0e) plen 12               #64 [hci0] 28.924030
+      LE Read Maximum Data Length (0x08|0x002f) ncmd 1
+        Status: Success (0x00)
+        Max TX octets: 251
+        Max TX time: 17040
+        Max RX octets: 251
+        Max RX time: 17040
 
-These struct don't be shard with user space so I will turn __u8 into u8.
+Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
+---
+ include/net/bluetooth/hci.h |  2 ++
+ net/bluetooth/hci_core.c    |  5 +++++
+ net/bluetooth/hci_event.c   | 17 +++++++++++++++++
+ 3 files changed, 24 insertions(+)
 
-Thanks so much for all suggestions. 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 484f24c..4af1a3a 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1490,6 +1490,8 @@ struct hci_cp_le_write_def_data_len {
+ 	__le16	tx_time;
+ } __packed;
+ 
++#define HCI_OP_LE_CLEAR_RESOLV_LIST	0x2029
++
+ #define HCI_OP_LE_READ_RESOLV_LIST_SIZE	0x202a
+ struct hci_rp_le_read_resolv_list_size {
+ 	__u8	status;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 51efc4a..af1675d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -729,6 +729,11 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+ 				    0, NULL);
+ 		}
+ 
++		if (hdev->commands[34] & 0x20) {
++			/* Clear LE Resolv List */
++			hci_req_add(req, HCI_OP_LE_CLEAR_RESOLV_LIST, 0, NULL);
++		}
++
+ 		if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT) {
+ 			/* Read LE Maximum Data Length */
+ 			hci_req_add(req, HCI_OP_LE_READ_MAX_DATA_LEN, 0, NULL);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c57969a..3029d79 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1307,6 +1307,19 @@ static void hci_cc_le_write_def_data_len(struct hci_dev *hdev,
+ 	hdev->le_def_tx_time = le16_to_cpu(sent->tx_time);
+ }
+ 
++static void hci_cc_le_clear_resolv_list(struct hci_dev *hdev,
++				       struct sk_buff *skb)
++{
++	__u8 status = *((__u8 *) skb->data);
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	hci_bdaddr_list_clear(&hdev->le_resolv_list);
++}
++
+ static void hci_cc_le_read_resolv_list_size(struct hci_dev *hdev,
+ 					   struct sk_buff *skb)
+ {
+@@ -3029,6 +3042,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_le_write_def_data_len(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_CLEAR_RESOLV_LIST:
++		hci_cc_le_clear_resolv_list(hdev, skb);
++		break;
++
+ 	case HCI_OP_LE_READ_RESOLV_LIST_SIZE:
+ 		hci_cc_le_read_resolv_list_size(hdev, skb);
+ 		break;
+-- 
+1.9.1
 
-> Johan
