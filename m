@@ -1,95 +1,50 @@
-Return-Path: <johan.hedberg@intel.com>
-Date: Mon, 2 Jul 2018 19:08:34 +0300
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: "Stotland, Inga" <inga.stotland@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-	"marcel@holtmann.org" <marcel@holtmann.org>,
-	"Gix, Brian" <brian.gix@intel.com>
-Subject: Re: [PATCH BlueZ 0/2] Directory re-org for meshctl tool
-Message-ID: <20180702160834.GA17202@x1c.home>
-References: <20180622063200.7394-1-inga.stotland@intel.com>
- <1530165033.4244.11.camel@intel.com>
+Return-Path: <bigeasy@linutronix.de>
+Date: Sun, 1 Jul 2018 17:19:41 +0200
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Alan Stern <stern@rowland.harvard.edu>,
+	Greg Kroah-Hartman <greg@kroah.com>,
+	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+	linux-usb@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: use irqsave() in URB's complete
+ callback
+Message-ID: <20180701151940.cbtbgpv3vncwugqz@linutronix.de>
+References: <20180621125207.7xtz2jpnp2vdvaau@linutronix.de>
+ <Pine.LNX.4.44L0.1806211130460.2381-100000@iolanthe.rowland.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1530165033.4244.11.camel@intel.com>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <Pine.LNX.4.44L0.1806211130460.2381-100000@iolanthe.rowland.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
-
-The patches look fine to me, but we should get an ack from Marcel before
-applying.
-
-Johan
-
-On Thu, Jun 28, 2018, Stotland, Inga wrote:
-> Ping
+On 2018-06-21 11:34:15 [-0400], Alan Stern wrote:
+> On Thu, 21 Jun 2018, Sebastian Andrzej Siewior wrote:
 > 
-> On Thu, 2018-06-21 at 23:31 -0700, Inga Stotland wrote:
-> > This set of patches moves mechctl tool code from under bluez/mesh
-> > into tools directory.
+> > On 2018-06-21 14:43:41 [+0200], Marcel Holtmann wrote:
+> > > can I get an ACK from someone ensuring that this is the direction we are going with the USB host controllers?
+> > +Alan.
 > > 
-> > mesh directory will be re-established with the implementation of mesh
-> > daemon.
-> > 
-> > Inga Stotland (2):
-> >   tools: Move meshctl tool under tools directory
-> >   tools: Move meshctl sources under tools/mesh directory
-> > 
-> >  Makefile.tools                       | 48 ++++++++++++++++++------------------
-> >  {mesh => tools/mesh}/README          |  0
-> >  {mesh => tools/mesh}/agent.c         |  4 +--
-> >  {mesh => tools/mesh}/agent.h         |  0
-> >  {mesh => tools/mesh}/config-client.c | 14 +++++------
-> >  {mesh => tools/mesh}/config-model.h  |  0
-> >  {mesh => tools/mesh}/config-server.c | 14 +++++------
-> >  {mesh => tools/mesh}/crypto.c        |  4 +--
-> >  {mesh => tools/mesh}/crypto.h        |  0
-> >  {mesh => tools/mesh}/gatt.c          | 10 ++++----
-> >  {mesh => tools/mesh}/gatt.h          |  0
-> >  {mesh => tools/mesh}/keys.h          |  0
-> >  {mesh => tools/mesh}/local_node.json |  0
-> >  {mesh => tools/mesh}/mesh-net.h      |  0
-> >  {mesh => tools/mesh}/net.c           | 16 ++++++------
-> >  {mesh => tools/mesh}/net.h           |  0
-> >  {mesh => tools/mesh}/node.c          | 16 ++++++------
-> >  {mesh => tools/mesh}/node.h          |  0
-> >  {mesh => tools/mesh}/onoff-model.c   | 14 +++++------
-> >  {mesh => tools/mesh}/onoff-model.h   |  0
-> >  {mesh => tools/mesh}/prov-db.c       | 14 +++++------
-> >  {mesh => tools/mesh}/prov-db.h       |  0
-> >  {mesh => tools/mesh}/prov.c          | 16 ++++++------
-> >  {mesh => tools/mesh}/prov.h          |  0
-> >  {mesh => tools/mesh}/prov_db.json    |  0
-> >  {mesh => tools/mesh}/util.c          |  6 ++---
-> >  {mesh => tools/mesh}/util.h          |  0
-> >  mesh/main.c => tools/meshctl.c       |  0
-> >  28 files changed, 88 insertions(+), 88 deletions(-)
-> >  rename {mesh => tools/mesh}/README (100%)
-> >  rename {mesh => tools/mesh}/agent.c (98%)
-> >  rename {mesh => tools/mesh}/agent.h (100%)
-> >  rename {mesh => tools/mesh}/config-client.c (99%)
-> >  rename {mesh => tools/mesh}/config-model.h (100%)
-> >  rename {mesh => tools/mesh}/config-server.c (94%)
-> >  rename {mesh => tools/mesh}/crypto.c (99%)
-> >  rename {mesh => tools/mesh}/crypto.h (100%)
-> >  rename {mesh => tools/mesh}/gatt.c (98%)
-> >  rename {mesh => tools/mesh}/gatt.h (100%)
-> >  rename {mesh => tools/mesh}/keys.h (100%)
-> >  rename {mesh => tools/mesh}/local_node.json (100%)
-> >  rename {mesh => tools/mesh}/mesh-net.h (100%)
-> >  rename {mesh => tools/mesh}/net.c (99%)
-> >  rename {mesh => tools/mesh}/net.h (100%)
-> >  rename {mesh => tools/mesh}/node.c (98%)
-> >  rename {mesh => tools/mesh}/node.h (100%)
-> >  rename {mesh => tools/mesh}/onoff-model.c (96%)
-> >  rename {mesh => tools/mesh}/onoff-model.h (100%)
-> >  rename {mesh => tools/mesh}/prov-db.c (99%)
-> >  rename {mesh => tools/mesh}/prov-db.h (100%)
-> >  rename {mesh => tools/mesh}/prov.c (98%)
-> >  rename {mesh => tools/mesh}/prov.h (100%)
-> >  rename {mesh => tools/mesh}/prov_db.json (100%)
-> >  rename {mesh => tools/mesh}/util.c (98%)
-> >  rename {mesh => tools/mesh}/util.h (100%)
-> >  rename mesh/main.c => tools/meshctl.c (100%)
-> > 
+> > EHCI completes in BH since v3.12-rc1. In order to get rid of that
+> > local_irq_save() in USB core code I need to make sure that the USB
+> > device driver(s) use irqsave primitives. See
+> >   https://lkml.kernel.org/r/Pine.LNX.4.44L0.1806011629140.1404-100000@iolanthe.rowland.org
+> 
+> Hi, Marcel!
+Hi Marcel,
+
+> Yes, Sebastian is right.  We are aiming to make it possible for the USB 
+> core to invoke URB completion handlers with interrupts enabled, in 
+> order to reduce latency (since USB interrupt processing can take a 
+> fairly long time).  And of course, this means completion handlers have 
+> to work correctly regardless of whether interrupts are enabled or 
+> disabled.
+
+I don't see this patch in linux-next. Do you still need some kind of
+confirmation or has this been resolved?
+
+> Currently ehci-hcd supports this possibility.  Other host controller 
+> drivers may follow along; I'd like to see xhci-hcd do this too.
+> 
+> Alan Stern
+
+Sebastian
