@@ -1,43 +1,95 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 02 Jul 2018 19:31:28 -0400
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: David Krauser <david@krauser.org>
-Reply-To: David Krauser <david@krauser.org>
-Subject: Determine ATT MTU size over DBUS
-Message-ID: <Vd5Hg1KzgalysaxK8wZu5wyXhzrIeNpwpHrqD6JzDGdK6926uwNchApKq9lnhrOPr7Y6Xb0Cgzzu-vWt8lvB-JRRxXhAmSPzjikGfg5kkSc=@krauser.org>
+Date: Mon, 2 Jul 2018 17:31:40 -0400
+From: Alexander Aring <aring@mojatatu.com>
+To: Michael Scott <michael@opensourcefoundries.com>
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] 6lowpan: iphc: reset mac_header after decompress to fix
+ panic
+Message-ID: <20180702213140.noxt6vr46xpiwjaq@x220t>
+References: <20180619234406.8217-1-michael@opensourcefoundries.com>
+ <20180702185438.dqqjg6k45iefj5is@x220t>
+ <516fbc65-cc4b-8016-de5a-e2240b779d15@opensourcefoundries.com>
+ <20180702204346.d7bynetvzw3ayn5m@x220t>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180702204346.d7bynetvzw3ayn5m@x220t>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-I'm working on an application that uses the bluez D-Bus bindings to registe=
-r a GATT service and characteristic, but I'm having two issues:
+On Mon, Jul 02, 2018 at 04:43:46PM -0400, Alexander Aring wrote:
+> Hi,
+> 
+> On Mon, Jul 02, 2018 at 12:45:41PM -0700, Michael Scott wrote:
+> > Hello Alexander,
+> > 
+> ...
+> > > Question is for me: which upper layer wants access MAC header here on
+> > > receive path?
+> > > It cannot parsed anyhow because so far I know no upper layer can parse
+> > > at the moment 802.15.4 frames (which is a complex format). Maybe over
+> > > some header_ops callback?
+> > 
+> > I was testing a C program which performs NAT64 handling on packets
+> > destined to a certain IPv6 subnet (64:ff9b::). To do this, the application
+> > opens a RAW socket like this: sniff_sock = socket(PF_PACKET, SOCK_RAW,
+> > htons(ETH_P_ALL)); It then sets promiscuous mode and enters a looping call
+> > of:
+> > length = recv(sniff_sock, buffer, PACKET_BUFFER, MSG_TRUNC); My host PC
+> > kernel would then promptly crash on me. (I'm going to purposely avoid the
+> > obvious point of: this probably isn't the best way to parse packets for
+> > NAT64 translation as you will get every single packet incoming or outgoing
+> > on the host.) Turns out, testing the program on an 802.15.4 6lowpan
+> > interface exposed some of the issues which this mailing list (but not
+> > myself) is well aware of (no L2 data in the RAW packets) and also led me to
+> > debugging this patch to stop the kernel crash. TL;DR: To summarize, any
+> > PF_PACKET SOCK_RAW socket which recv()'s IPv6 data from a 6lowpan node will
+> > cause this kernel crash eventually (checked on kernel 4.15, 4.16, 4.17 and
+> > 4.18-rc1). - Mike
+> > > 
+> 
+> "any PF_PACKET SOCK_RAW" can't be otherwise I would also see it with my
+> sniffer programs e.g. wireshark or tcpdump which use libpcap.
+> 
+> There need to be some different in the handling. This is what I have
+> currently in my mind.
+> 
+> I currently not sure how to set skb->mac_header if interface is RAW_IP.
+> It seems there is an indicator that mac header is not set. Example:
+> 
+> diff --git a/net/6lowpan/iphc.c b/net/6lowpan/iphc.c
+> index 6b1042e21656..e6ec2df3afe0 100644
+> --- a/net/6lowpan/iphc.c
+> +++ b/net/6lowpan/iphc.c
+> @@ -770,6 +770,7 @@ int lowpan_header_decompress(struct sk_buff *skb, const struct net_device *dev,
+>                 hdr.hop_limit, &hdr.daddr);
+>  
+>         skb_push(skb, sizeof(hdr));
+> +       skb->mac_header = (typeof(skb->mac_header))~0U;
+>         skb_reset_network_header(skb);
+>         skb_copy_to_linear_data(skb, &hdr, sizeof(hdr));
+>  
+> 
+> Maybe we should lookup what skb->mac_header points to on tun interfaces
+> then do the same.
 
-1. I can't figure out how to get the negotiated MTU size for reads/writes t=
-o my characteristic.
+So far I see [0] tun does the same as your patch approach does. network
+header and mac header points to the same.
 
-I saw that the AcquireNotify and AcquireWrite calls provide an MTU in the o=
-ptions dictionary, but there's no MTU provided for the WriteValue or ReadVa=
-lue calls.
+I think then we should go with your patch.
 
-2. I can't figure out how to dynamically change the max MTU size to use wit=
-h my service.
+Then we just need to solve the issue to get mac header information on
+top of lowpan socket layer... out of scope issue but indeed we need to
+solve that. As we talked there exists even UDP protocols which needs mac
+header information. It's in a pretty early state, I have no idea how
+this fits sometimes with fragmentation handling together. At least for
+L2 address handling and fragmentation it should be fine (one of the
+fragment indentifier).
 
-I saw that you could change the max MTU size by changing some #define's in =
-the bluez source code, but I couldn't find a way to change it dynamically (=
-like how you can change the ACL/SCO MTU sizes).
+- Alex
 
-Is there something I'm missing? If not, would you all be open to a patch th=
-at adds the negotiated MTU size to the options dictionary on calls to ReadV=
-alue and WriteValue?
-
-Or even better, I could add a new method to the GattCharacteristic1 interfa=
-ce that is called during MTU negotiation. It would receive the requested MT=
-U size as an input, and the developer could choose to use that size, or ret=
-urn a different size to use.
-
-Thanks,
-
-- dk
+[0] https://elixir.bootlin.com/linux/v4.18-rc3/source/drivers/net/tun.c#L1912
