@@ -1,34 +1,54 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Thu, 05 Jul 2018 20:42:52 -0400
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From: David Krauser <david@krauser.org>
-Reply-To: David Krauser <david@krauser.org>
-Subject: [PATCH BlueZ 0/3] Provide MTU on GATT reads and writes.
-Message-ID: <3GnQ1PTiUy_muwmwh57SSbQhkJeTd7vqdz_O5V0PLRADpTmYtoJ4XcJvwGz76Pn8OxW3MCc8IklJhl9C-LISya-_vLYEas63C3eKZXD62XM=@krauser.org>
+Return-Path: <jacek.anaszewski@gmail.com>
+Subject: Re: [PATCH v7 02/16] leds: triggers: let struct
+ led_trigger::activate() return an error code
+To: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: Pavel Machek <pavel@ucw.cz>, kernel@pengutronix.de,
+ linux-leds@vger.kernel.org, kernel-patch-test@lists.linaro.org,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Johannes Berg <johannes@sipsolutions.net>, linux-bluetooth@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <a9b3548b-09c4-fae4-1bce-abf3392b9ceb@gmail.com>
+ <20180702200535.1337-2-u.kleine-koenig@pengutronix.de>
+From: Jacek Anaszewski <jacek.anaszewski@gmail.com>
+Message-ID: <1172a776-a951-28d5-fae4-824969f4a82b@gmail.com>
+Date: Thu, 5 Jul 2018 23:31:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20180702200535.1337-2-u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches will append the negotiated MTU to the options
-dictionary that is provided over DBus on characteristic reads
-and writes.
+Hi Uwe,
 
-These will also allow a user to configure the max mtu in main.conf
+On 07/02/2018 10:05 PM, Uwe Kleine-König wrote:
+> Given that activating a trigger can fail, let the callback return an
+> indication. This prevents to have a trigger active according to the
+> "trigger" sysfs attribute but not functional.
+> 
+> All users are changed accordingly to return 0 for now. There is no intended
+> change in behaviour.
+> 
+> Acked-by: Pavel Machek <pavel@ucw.cz>
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+[...]
+> -static void ieee80211_tx_led_activate(struct led_classdev *led_cdev)
+> +static int ieee80211_tx_led_activate(struct led_classdev *led_cdev)
+>   {
+>   	struct ieee80211_local *local = container_of(led_cdev->trigger,
+>   						     struct ieee80211_local,
+>   						     tx_led);
+>   
+>   	atomic_inc(&local->tx_led_active);
+> +
+> +	return 0
+[...]
 
-David Krauser (3):
-  src: provide MTU on GATT value reads and writes
-  doc: provide MTU on GATT value reads and writes
-  src: make att max le mtu configurable in main.conf
+s/return 0/return 0;/
 
- doc/gatt-api.txt    |  2 ++
- src/device.c        |  2 +-
- src/gatt-database.c | 23 +++++++----------------
- src/hcid.h          |  1 +
- src/main.c          | 16 ++++++++++++++++
- src/main.conf       |  5 +++++
- 6 files changed, 32 insertions(+), 17 deletions(-)
+Fixed it up and applied. I'm taking lack of net maintainer feedback
+as a tacit approval (or lack of interest).
 
---=20
-2.18.0
-
+-- 
+Best regards,
+Jacek Anaszewski
