@@ -1,54 +1,26 @@
-Return-Path: <jacek.anaszewski@gmail.com>
-Subject: Re: [PATCH v7 02/16] leds: triggers: let struct
- led_trigger::activate() return an error code
-To: =?UTF-8?Q?Uwe_Kleine-K=c3=b6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Pavel Machek <pavel@ucw.cz>, kernel@pengutronix.de,
- linux-leds@vger.kernel.org, kernel-patch-test@lists.linaro.org,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- "David S. Miller" <davem@davemloft.net>,
- Johannes Berg <johannes@sipsolutions.net>, linux-bluetooth@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <a9b3548b-09c4-fae4-1bce-abf3392b9ceb@gmail.com>
- <20180702200535.1337-2-u.kleine-koenig@pengutronix.de>
-From: Jacek Anaszewski <jacek.anaszewski@gmail.com>
-Message-ID: <1172a776-a951-28d5-fae4-824969f4a82b@gmail.com>
-Date: Thu, 5 Jul 2018 23:31:28 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Thu, 05 Jul 2018 16:49:48 -0400
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: David Krauser <david@krauser.org>
+Reply-To: David Krauser <david@krauser.org>
+Subject: Re: Determine ATT MTU size over DBUS
+Message-ID: <iS7SxR7oa4YuOfvr1RsofqR0CUll1WvX9o5ytKp6P4_CLRRcGsU3cCT20AAzWrGsZxKeynCmD4Ua8pxcxnVtuq-D4hzi851enc1cCLRt8j8=@krauser.org>
+In-Reply-To: <2X21xsgg8bEyTVVoBik7GT2JM5chtujJdSSpMBd-J7xIRMuRPqnF8Or25Al9oNj5R08x57BAEhkOUdT1-8FEmtoGVKXOB7X1DTlLztKep-8=@krauser.org>
+References: <Vd5Hg1KzgalysaxK8wZu5wyXhzrIeNpwpHrqD6JzDGdK6926uwNchApKq9lnhrOPr7Y6Xb0Cgzzu-vWt8lvB-JRRxXhAmSPzjikGfg5kkSc=@krauser.org>
+ <CABBYNZLHGQdpgZUGxaxhtWBG309WB9MVOXQxdRBWeMW+XuARBg@mail.gmail.com>
+ <-JmTPP9qq2ljmysdKs_4nDqzQMZH4NMScqdEFmY7eo4Eu5GDniGqk-lMiLXCo7O1RZgB4BI_UsKZS0KdET69HZksuaRIKE_0mrQJS885K-M=@krauser.org>
+ <2X21xsgg8bEyTVVoBik7GT2JM5chtujJdSSpMBd-J7xIRMuRPqnF8Or25Al9oNj5R08x57BAEhkOUdT1-8FEmtoGVKXOB7X1DTlLztKep-8=@krauser.org>
 MIME-Version: 1.0
-In-Reply-To: <20180702200535.1337-2-u.kleine-koenig@pengutronix.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Uwe,
+Sorry all, just realized that I didn't submit these patches in the proper f=
+ashion outlined in HACKING. Please forgive my mistake and disregard my prev=
+ious two emails.
 
-On 07/02/2018 10:05 PM, Uwe Kleine-König wrote:
-> Given that activating a trigger can fail, let the callback return an
-> indication. This prevents to have a trigger active according to the
-> "trigger" sysfs attribute but not functional.
-> 
-> All users are changed accordingly to return 0 for now. There is no intended
-> change in behaviour.
-> 
-> Acked-by: Pavel Machek <pavel@ucw.cz>
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-[...]
-> -static void ieee80211_tx_led_activate(struct led_classdev *led_cdev)
-> +static int ieee80211_tx_led_activate(struct led_classdev *led_cdev)
->   {
->   	struct ieee80211_local *local = container_of(led_cdev->trigger,
->   						     struct ieee80211_local,
->   						     tx_led);
->   
->   	atomic_inc(&local->tx_led_active);
-> +
-> +	return 0
-[...]
+I will submit them properly shortly.
 
-s/return 0/return 0;/
+Thanks,=20
 
-Fixed it up and applied. I'm taking lack of net maintainer feedback
-as a tacit approval (or lack of interest).
-
--- 
-Best regards,
-Jacek Anaszewski
+- dk
