@@ -1,116 +1,116 @@
-Return-Path: <robherring2@gmail.com>
-Date: Thu, 5 Jul 2018 14:42:50 -0600
-From: Rob Herring <robh@kernel.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
-	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v9 1/7] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI chip wcn3990
-Message-ID: <20180705204250.GA30484@rob-hp-laptop>
-References: <20180705165515.13340-1-bgodavar@codeaurora.org>
- <20180705165515.13340-2-bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Thu, 05 Jul 2018 14:49:13 -0400
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: David Krauser <david@krauser.org>
+Reply-To: David Krauser <david@krauser.org>
+Subject: Re: Determine ATT MTU size over DBUS
+Message-ID: <2X21xsgg8bEyTVVoBik7GT2JM5chtujJdSSpMBd-J7xIRMuRPqnF8Or25Al9oNj5R08x57BAEhkOUdT1-8FEmtoGVKXOB7X1DTlLztKep-8=@krauser.org>
+In-Reply-To: <-JmTPP9qq2ljmysdKs_4nDqzQMZH4NMScqdEFmY7eo4Eu5GDniGqk-lMiLXCo7O1RZgB4BI_UsKZS0KdET69HZksuaRIKE_0mrQJS885K-M=@krauser.org>
+References: <Vd5Hg1KzgalysaxK8wZu5wyXhzrIeNpwpHrqD6JzDGdK6926uwNchApKq9lnhrOPr7Y6Xb0Cgzzu-vWt8lvB-JRRxXhAmSPzjikGfg5kkSc=@krauser.org>
+ <CABBYNZLHGQdpgZUGxaxhtWBG309WB9MVOXQxdRBWeMW+XuARBg@mail.gmail.com>
+ <-JmTPP9qq2ljmysdKs_4nDqzQMZH4NMScqdEFmY7eo4Eu5GDniGqk-lMiLXCo7O1RZgB4BI_UsKZS0KdET69HZksuaRIKE_0mrQJS885K-M=@krauser.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180705165515.13340-2-bgodavar@codeaurora.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 05, 2018 at 10:25:09PM +0530, Balakrishna Godavarthi wrote:
-> This patch enables regulators for the Qualcomm Bluetooth wcn3990
-> controller.
-> 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> Changes in v9:
->     * updated with latest reg handle and names.
->     * updated max-speed definition. 
-> 
-> Changes in v8:
->     * Separated the optional entries between two chips
-> 
-> Changes in v7:
->     * no change.
-> 
-> Changes in v6:
-> 
->     * Changed the oper-speed to max-speed.
-> 
-> Changes in v5:
-> 
->     * Added entry for oper-speed and init-speed.
-> 
-> ---
->  .../bindings/net/qualcomm-bluetooth.txt       | 28 +++++++++++++++++--
->  1 file changed, 26 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> index 0ea18a53cc29..ced58575e2b8 100644
-> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> @@ -10,12 +10,22 @@ device the slave device is attached to.
->  Required properties:
->   - compatible: should contain one of the following:
->     * "qcom,qca6174-bt"
-> +   * "qcom,wcn3990-bt"
-> +
-> +Optional properties for compatible string qcom,qca6174-bt:
->  
-> -Optional properties:
->   - enable-gpios: gpio specifier used to enable chip
->   - clocks: clock provided to the controller (SUSCLK_32KHZ)
->  
-> -Example:
-> +Optional properties for compatible string qcom,wcn3990-bt:
-> +
-> + - vddio-supply: Bluetooth wcn3990 VDD_IO supply regulator handle.
-> + - vddxo-supply: Bluetooth wcn3990 VDD_XO supply regulator handle.
-> + - vddrf-supply: Bluetooth wcn3990 VDD_RF supply regulator handle.
-> + - vddch0-supply: Bluetooth wcn3990 VDD_CH0 supply regulator handle.
-> + - max-speed: see Documentation/devicetree/bindings/serial/slave-device.txt
-> +
-> +Examples:
->  
->  serial@7570000 {
->  	label = "BT-UART";
-> @@ -28,3 +38,17 @@ serial@7570000 {
->  		clocks = <&divclk4>;
->  	};
->  };
-> +
-> +serial@898000 {
-> +	label = "BT-UART";
+And here's a patch that lets the user know the MTU size over DBus:
 
-label is generally intended for when you need to identify the physical 
-connector which wouldn't apply here.
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 2a8da75b0..a0db65383 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -68,6 +68,7 @@ Methods=09=09array{byte} ReadValue(dict options)
+ =09=09=09operation was successful.
+=20
+ =09=09=09Possible options: "offset": uint16 offset
++=09=09=09=09=09  "MTU": Exchanged MTU (Server only)
+ =09=09=09=09=09  "device": Object Device (Server only)
+=20
+ =09=09=09Possible Errors: org.bluez.Error.Failed
+@@ -83,6 +84,7 @@ Methods=09=09array{byte} ReadValue(dict options)
+ =09=09=09characteristic.
+=20
+ =09=09=09Possible options: "offset": Start offset
++=09=09=09=09=09  "MTU": Exchanged MTU (Server only)
+ =09=09=09=09=09  "device": Device path (Server only)
+ =09=09=09=09=09  "link": Link type (Server only)
+ =09=09=09=09=09  "prepare-authorize": boolean Is prepare
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 99c8ea231..c34da2d71 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -1932,7 +1932,9 @@ static void append_options(DBusMessageIter *iter, voi=
+d *user_data)
+ {
+ =09struct pending_op *op =3D user_data;
+ =09const char *path =3D device_get_path(op->device);
++=09struct bt_gatt_server *server;
+ =09const char *link;
++=09uint16_t mtu;
+=20
+ =09switch (op->link_type) {
+ =09case BT_ATT_LINK_BREDR:
+@@ -1955,6 +1957,11 @@ static void append_options(DBusMessageIter *iter, vo=
+id *user_data)
+ =09if (op->prep_authorize)
+ =09=09dict_append_entry(iter, "prepare-authorize", DBUS_TYPE_BOOLEAN,
+ =09=09=09=09=09=09=09&op->prep_authorize);
++
++=09server =3D btd_device_get_gatt_server(op->device);
++=09mtu =3D bt_gatt_server_get_mtu(server);
++
++=09dict_append_entry(iter, "MTU", DBUS_TYPE_UINT16, &mtu);
+ }
+=20
+ static void read_setup_cb(DBusMessageIter *iter, void *user_data)
+@@ -2234,8 +2241,6 @@ static void acquire_write_setup(DBusMessageIter *iter=
+, void *user_data)
+ {
+ =09struct pending_op *op =3D user_data;
+ =09DBusMessageIter dict;
+-=09struct bt_gatt_server *server;
+-=09uint16_t mtu;
+=20
+ =09dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ =09=09=09=09=09DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+@@ -2246,12 +2251,6 @@ static void acquire_write_setup(DBusMessageIter *ite=
+r, void *user_data)
+=20
+ =09append_options(&dict, op);
+=20
+-=09server =3D btd_device_get_gatt_server(op->device);
+-
+-=09mtu =3D bt_gatt_server_get_mtu(server);
+-
+-=09dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &mtu);
+-
+ =09dbus_message_iter_close_container(iter, &dict);
+ }
+=20
+@@ -2320,8 +2319,6 @@ static void acquire_notify_setup(DBusMessageIter *ite=
+r, void *user_data)
+ {
+ =09DBusMessageIter dict;
+ =09struct pending_op *op =3D user_data;
+-=09struct bt_gatt_server *server;
+-=09uint16_t mtu;
+=20
+ =09dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ =09=09=09=09=09DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+@@ -2332,12 +2329,6 @@ static void acquire_notify_setup(DBusMessageIter *it=
+er, void *user_data)
+=20
+ =09append_options(&dict, op);
+=20
+-=09server =3D btd_device_get_gatt_server(op->device);
+-
+-=09mtu =3D bt_gatt_server_get_mtu(server);
+-
+-=09dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &mtu);
+-
+ =09dbus_message_iter_close_container(iter, &dict);
+ }
 
-> +	status = "okay";
 
-Don't show status in examples.
 
-> +
-> +	bluetooth {
-> +		compatible = "qcom,wcn3990-bt";
-> +		vddio-supply = <&vreg_s4a_1p8>;
-> +		vddxosupply = <&vreg_l7a_1p8>;
-
-Typo.
-
-With those fixed,
-
-Reviewed-by: Rob Herring <robh@kernel.org>
-
-> +		vddrf-supply = <&vreg_l17a_1p3>;
-> +		vddch0-supply = <&vreg_l25a_3p3>;
-> +		max-speed = <3200000>;
-> +	};
-> +};
-> -- 
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-> a Linux Foundation Collaborative Project
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe devicetree" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
