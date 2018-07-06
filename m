@@ -1,54 +1,212 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH v3 06/18] Bluetooth: Define PHY flags in hdev and set 1M
- as default
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1530876944-17453-7-git-send-email-jaganathx.kanakkassery@intel.com>
-Date: Fri, 6 Jul 2018 22:56:52 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Message-Id: <7642C481-01E5-430D-ACAC-CBB0FA47F595@holtmann.org>
-References: <1530876944-17453-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1530876944-17453-7-git-send-email-jaganathx.kanakkassery@intel.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <mka@chromium.org>
+Date: Fri, 6 Jul 2018 12:40:59 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
+	rtatiya@codeaurora.org, hemantg@codeaurora.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v9 4/7] Bluetooth: hci_qca: Add wrapper functions for
+ setting UART speed
+Message-ID: <20180706194059.GJ129942@google.com>
+References: <20180705165515.13340-1-bgodavar@codeaurora.org>
+ <20180705165515.13340-5-bgodavar@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180705165515.13340-5-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
-
-> 1M is mandatory to be supported by LE controllers and the same
-> would be set in power on. This patch defines hdev flags for
-> LE PHYs and set 1M to default.
+On Thu, Jul 05, 2018 at 10:25:12PM +0530, Balakrishna Godavarthi wrote:
+> In function qca_setup, we set initial and operating speeds for Qualcomm
+> Bluetooth SoC's. This block of code is common across different
+> Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
+> a wrapper function to set the speeds. So that future coming SoC's
+> can use these wrapper functions to set speeds.
 > 
-> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > ---
-> include/net/bluetooth/hci.h | 7 +++++++
-> net/bluetooth/hci_core.c    | 4 ++++
-> 2 files changed, 11 insertions(+)
+> Changes in v9:
+>     * added corner case to fail driver if speeds are missing.
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 73e48be..1b5d79b 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -261,6 +261,13 @@ enum {
-> 	HCI_FORCE_BREDR_SMP,
-> 	HCI_FORCE_STATIC_ADDR,
+> Changes in v8:
+>     * common function to set INIT and operating speeds.
 > 
-> +	HCI_LE_PHY_1M_TX,
-> +	HCI_LE_PHY_1M_RX,
-> +	HCI_LE_PHY_2M_TX,
-> +	HCI_LE_PHY_2M_RX,
-> +	HCI_LE_PHY_CODED_TX,
-> +	HCI_LE_PHY_CODED_RX,
+> Changes in v7:
+>     * initial patch
+>     * created wrapper functions for init and operating speeds.
+> ---
+>  drivers/bluetooth/hci_qca.c | 94 ++++++++++++++++++++++++++++---------
+>  1 file changed, 71 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index c02e1d465cca..9106547324fa 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -119,6 +119,11 @@ struct qca_data {
+>  	u64 votes_off;
+>  };
+>  
+> +enum qca_speed_type {
+> +	QCA_INIT_SPEED = 1,
+> +	QCA_OPER_SPEED
+> +};
 > +
-> 	__HCI_NUM_FLAGS,
-> };
+>  struct qca_serdev {
+>  	struct hci_uart	 serdev_hu;
+>  	struct gpio_desc *bt_en;
+> @@ -923,6 +928,62 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>  		hci_uart_set_baudrate(hu, speed);
+>  }
+>  
+> +static unsigned int qca_get_speed(struct hci_uart *hu,
+> +				  enum qca_speed_type speed_type)
+> +{
+> +	unsigned int speed = 0;
+> +
+> +	if (speed_type == QCA_INIT_SPEED) {
+> +		if (hu->init_speed)
+> +			speed = hu->init_speed;
+> +		else if (hu->proto->init_speed)
+> +			speed = hu->proto->init_speed;
+> +	} else {
+> +		if (hu->oper_speed)
+> +			speed = hu->oper_speed;
+> +		else if (hu->proto->oper_speed)
+> +			speed = hu->proto->oper_speed;
+> +	}
+> +
+> +	return speed;
+> +}
+> +
+> +static int qca_check_speeds(struct hci_uart *hu)
+> +{
+> +	/* One or the other speeds should be non zero. */
+> +	if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+> +	    !qca_get_speed(hu, QCA_OPER_SPEED))
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+> +{
+> +	unsigned int speed, qca_baudrate;
+> +	int ret;
+> +
+> +	if (speed_type == QCA_INIT_SPEED) {
+> +		speed = qca_get_speed(hu, QCA_INIT_SPEED);
+> +		if (speed)
+> +			host_set_baudrate(hu, speed);
 
-so first of all, these are not yet defined as of patch 05/18 and I am not sure that using flags is the best choice here. You need to provide some reasoning why you did it this way.
+mega-nit: for consistency with the 'else' branch you could return if
+'speed == 0'. Not important though, feel free to ignore.
 
-Regards
+> +	} else {
+> +		speed = qca_get_speed(hu, QCA_OPER_SPEED);
+> +		if (!speed)
+> +			return 0;
+> +
+> +		qca_baudrate = qca_get_baudrate_value(speed);
+> +		bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
+> +		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
+> +		if (ret)
+> +			return ret;
+> +
+> +		host_set_baudrate(hu, speed);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int qca_setup(struct hci_uart *hu)
+>  {
+>  	struct hci_dev *hdev = hu->hdev;
+> @@ -933,37 +994,24 @@ static int qca_setup(struct hci_uart *hu)
+>  
+>  	bt_dev_info(hdev, "ROME setup");
+>  
+> +	ret = qca_check_speeds(hu);
+> +	if (ret)
+> +		return ret;
+> +
+>  	/* Patch downloading has to be done without IBS mode */
+>  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>  
+>  	/* Setup initial baudrate */
+> -	speed = 0;
+> -	if (hu->init_speed)
+> -		speed = hu->init_speed;
+> -	else if (hu->proto->init_speed)
+> -		speed = hu->proto->init_speed;
+> -
+> -	if (speed)
+> -		host_set_baudrate(hu, speed);
+> +	qca_set_speed(hu, QCA_INIT_SPEED);
+>  
+>  	/* Setup user speed if needed */
+> -	speed = 0;
+> -	if (hu->oper_speed)
+> -		speed = hu->oper_speed;
+> -	else if (hu->proto->oper_speed)
+> -		speed = hu->proto->oper_speed;
+> -
+> +	speed = qca_get_speed(hu, QCA_OPER_SPEED);
+>  	if (speed) {
+> -		qca_baudrate = qca_get_baudrate_value(speed);
+> -
+> -		bt_dev_info(hdev, "Set UART speed to %d", speed);
+> -		ret = qca_set_baudrate(hdev, qca_baudrate);
+> -		if (ret) {
+> -			bt_dev_err(hdev, "Failed to change the baud rate (%d)",
+> -				   ret);
+> +		ret = qca_set_speed(hu, QCA_OPER_SPEED);
+> +		if (ret)
+>  			return ret;
+> -		}
+> -		host_set_baudrate(hu, speed);
+> +
+> +		qca_baudrate = qca_get_baudrate_value(speed);
+>  	}
 
-Marcel
+One doubt, the outcome of this change is:
 
+	qca_set_speed(hu, QCA_INIT_SPEED);
+
+	/* Setup user speed if needed */
+	speed = qca_get_speed(hu, QCA_OPER_SPEED);
+	if (speed) {
+		ret = qca_set_speed(hu, QCA_OPER_SPEED);
+		if (ret)
+			return ret;
+
+		qca_baudrate = qca_get_baudrate_value(speed);
+	}
+
+So we set the init speed and then directly switch to operating speed
+if it is defined.
+
+Couldn't we do this instead:
+
+	/* Setup user speed if needed */
+	speed = qca_get_speed(hu, QCA_OPER_SPEED);
+	if (speed) {
+		ret = qca_set_speed(hu, QCA_OPER_SPEED);
+		if (ret)
+			return ret;
+
+		qca_baudrate = qca_get_baudrate_value(speed);
+	} else {
+	       qca_set_speed(hu, QCA_INIT_SPEED);
+	}
+
+?
+
+Or is setting the init speed needed before the operating speed can be
+set? Sorry if we discussed this earlier in this series, I know I had a
+few doubts about the speed management but don't recall this one
+specifically.
+
+Other than that:
+
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
