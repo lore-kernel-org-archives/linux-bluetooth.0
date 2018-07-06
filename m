@@ -3,357 +3,55 @@ From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v3 07/18] Bluetooth: Implement Get PHY Configuration mgmt command
-Date: Fri,  6 Jul 2018 17:05:33 +0530
-Message-Id: <1530876944-17453-8-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v3 06/18] Bluetooth: Define PHY flags in hdev and set 1M as default
+Date: Fri,  6 Jul 2018 17:05:32 +0530
+Message-Id: <1530876944-17453-7-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1530876944-17453-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1530876944-17453-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This commands basically retrieve the supported packet types of
-BREDR and supported PHYs of the controller.
-
-BR_1M_1SLOT, LE_1M_TX and LE_1M_RX would be supported by default.
-Other PHYs are supported based on the local features.
-
-@ MGMT Command: Get PHY Configuration (0x0044) plen 0
-@ MGMT Event: Command Complete (0x0001) plen 15
-      Get PHY Configuration (0x0044) plen 12
-        Status: Success (0x00)
-        Supported PHYs: 0x7fff
-          BR 1M 1SLOT
-          BR 1M 3SLOT
-          BR 1M 5SLOT
-          EDR 2M 1SLOT
-          EDR 2M 3SLOT
-          EDR 2M 5SLOT
-          EDR 3M 1SLOT
-          EDR 3M 3SLOT
-          EDR 3M 5SLOT
-          LE 1M TX
-          LE 1M RX
-          LE 2M TX
-          LE 2M RX
-          LE CODED TX
-          LE CODED RX
-        Configurable PHYs: 0x79fe
-          BR 1M 3SLOT
-          BR 1M 5SLOT
-          EDR 2M 1SLOT
-          EDR 2M 3SLOT
-          EDR 2M 5SLOT
-          EDR 3M 1SLOT
-          EDR 3M 3SLOT
-          EDR 3M 5SLOT
-          LE 2M TX
-          LE 2M RX
-          LE CODED TX
-          LE CODED RX
-        Selected PHYs: 0x07ff
-          BR 1M 1SLOT
-          BR 1M 3SLOT
-          BR 1M 5SLOT
-          EDR 2M 1SLOT
-          EDR 2M 3SLOT
-          EDR 2M 5SLOT
-          EDR 3M 1SLOT
-          EDR 3M 3SLOT
-          EDR 3M 5SLOT
-          LE 1M TX
-          LE 1M RX
+1M is mandatory to be supported by LE controllers and the same
+would be set in power on. This patch defines hdev flags for
+LE PHYs and set 1M to default.
 
 Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- include/net/bluetooth/hci.h      |  14 ++++
- include/net/bluetooth/hci_core.h |   4 ++
- include/net/bluetooth/mgmt.h     |  24 +++++++
- net/bluetooth/mgmt.c             | 149 +++++++++++++++++++++++++++++++++++++++
- 4 files changed, 191 insertions(+)
+ include/net/bluetooth/hci.h | 7 +++++++
+ net/bluetooth/hci_core.c    | 4 ++++
+ 2 files changed, 11 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 1b5d79b..45a9076 100644
+index 73e48be..1b5d79b 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -298,6 +298,14 @@ enum {
- #define HCI_DH3		0x0800
- #define HCI_DH5		0x8000
+@@ -261,6 +261,13 @@ enum {
+ 	HCI_FORCE_BREDR_SMP,
+ 	HCI_FORCE_STATIC_ADDR,
  
-+/* HCI packet types inverted masks */
-+#define HCI_2DH1	0x0002
-+#define HCI_3DH1	0x0004
-+#define HCI_2DH3	0x0100
-+#define HCI_3DH3	0x0200
-+#define HCI_2DH5	0x1000
-+#define HCI_3DH5	0x2000
++	HCI_LE_PHY_1M_TX,
++	HCI_LE_PHY_1M_RX,
++	HCI_LE_PHY_2M_TX,
++	HCI_LE_PHY_2M_RX,
++	HCI_LE_PHY_CODED_TX,
++	HCI_LE_PHY_CODED_RX,
 +
- #define HCI_HV1		0x0020
- #define HCI_HV2		0x0040
- #define HCI_HV3		0x0080
-@@ -361,6 +369,8 @@ enum {
- #define LMP_PCONTROL	0x04
- #define LMP_TRANSPARENT	0x08
- 
-+#define LMP_EDR_2M		0x02
-+#define LMP_EDR_3M		0x04
- #define LMP_RSSI_INQ	0x40
- #define LMP_ESCO	0x80
- 
-@@ -368,7 +378,9 @@ enum {
- #define LMP_EV5		0x02
- #define LMP_NO_BREDR	0x20
- #define LMP_LE		0x40
-+#define LMP_EDR_3SLOT	0x80
- 
-+#define LMP_EDR_5SLOT	0x01
- #define LMP_SNIFF_SUBR	0x02
- #define LMP_PAUSE_ENC	0x04
- #define LMP_EDR_ESCO_2M	0x20
-@@ -406,6 +418,8 @@ enum {
- #define HCI_LE_PING			0x10
- #define HCI_LE_DATA_LEN_EXT		0x20
- #define HCI_LE_EXT_SCAN_POLICY		0x80
-+#define HCI_LE_PHY_2M			0x01
-+#define HCI_LE_PHY_CODED		0x08
- #define HCI_LE_CHAN_SEL_ALG2		0x40
- 
- /* Connection modes */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index afff677..768db91 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1138,6 +1138,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define lmp_inq_tx_pwr_capable(dev) ((dev)->features[0][7] & LMP_INQ_TX_PWR)
- #define lmp_ext_feat_capable(dev)  ((dev)->features[0][7] & LMP_EXTFEATURES)
- #define lmp_transp_capable(dev)    ((dev)->features[0][2] & LMP_TRANSPARENT)
-+#define lmp_edr_2m_capable(dev)    ((dev)->features[0][3] & LMP_EDR_2M)
-+#define lmp_edr_3m_capable(dev)    ((dev)->features[0][3] & LMP_EDR_3M)
-+#define lmp_edr_3slot_capable(dev) ((dev)->features[0][4] & LMP_EDR_3SLOT)
-+#define lmp_edr_5slot_capable(dev) ((dev)->features[0][5] & LMP_EDR_5SLOT)
- 
- /* ----- Extended LMP capabilities ----- */
- #define lmp_csb_master_capable(dev) ((dev)->features[2][0] & LMP_CSB_MASTER)
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index e7303ee..16dddb1 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -604,6 +604,30 @@ struct mgmt_cp_set_appearance {
- } __packed;
- #define MGMT_SET_APPEARANCE_SIZE	2
- 
-+#define MGMT_OP_GET_PHY_CONFIGURATION	0x0044
-+#define MGMT_GET_PHY_CONFIGURATION_SIZE		0
-+struct mgmt_rp_get_phy_confguration {
-+	__le32	supported_phys;
-+	__le32	configurable_phys;
-+	__le32	selected_phys;
-+} __packed;
-+
-+#define MGMT_PHY_BR_1M_1SLOT	0x00000001
-+#define MGMT_PHY_BR_1M_3SLOT	0x00000002
-+#define MGMT_PHY_BR_1M_5SLOT	0x00000004
-+#define MGMT_PHY_EDR_2M_1SLOT	0x00000008
-+#define MGMT_PHY_EDR_2M_3SLOT	0x00000010
-+#define MGMT_PHY_EDR_2M_5SLOT	0x00000020
-+#define MGMT_PHY_EDR_3M_1SLOT	0x00000040
-+#define MGMT_PHY_EDR_3M_3SLOT	0x00000080
-+#define MGMT_PHY_EDR_3M_5SLOT	0x00000100
-+#define MGMT_PHY_LE_1M_TX		0x00000200
-+#define MGMT_PHY_LE_1M_RX		0x00000400
-+#define MGMT_PHY_LE_2M_TX		0x00000800
-+#define MGMT_PHY_LE_2M_RX		0x00001000
-+#define MGMT_PHY_LE_CODED_TX	0x00002000
-+#define MGMT_PHY_LE_CODED_RX	0x00004000
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8a80d48..c0913a7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -617,6 +617,126 @@ static int read_config_info(struct sock *sk, struct hci_dev *hdev,
- 				 &rp, sizeof(rp));
- }
- 
-+static u32 get_supported_phys(struct hci_dev *hdev)
-+{
-+	u32 supported_phys = 0;
-+
-+	if (lmp_bredr_capable(hdev)) {
-+		supported_phys |= MGMT_PHY_BR_1M_1SLOT;
-+
-+		if (hdev->features[0][0] & LMP_3SLOT)
-+			supported_phys |= MGMT_PHY_BR_1M_3SLOT;
-+
-+		if (hdev->features[0][0] & LMP_5SLOT)
-+			supported_phys |= MGMT_PHY_BR_1M_5SLOT;
-+
-+		if (lmp_edr_2m_capable(hdev)) {
-+			supported_phys |= MGMT_PHY_EDR_2M_1SLOT;
-+
-+			if (lmp_edr_3slot_capable(hdev))
-+				supported_phys |= MGMT_PHY_EDR_2M_3SLOT;
-+
-+			if (lmp_edr_5slot_capable(hdev))
-+				supported_phys |= MGMT_PHY_EDR_2M_5SLOT;
-+
-+			if (lmp_edr_3m_capable(hdev)) {
-+				supported_phys |= MGMT_PHY_EDR_3M_1SLOT;
-+
-+				if (lmp_edr_3slot_capable(hdev))
-+					supported_phys |= MGMT_PHY_EDR_3M_3SLOT;
-+
-+				if (lmp_edr_5slot_capable(hdev))
-+					supported_phys |= MGMT_PHY_EDR_3M_5SLOT;
-+			}
-+		}
-+	}
-+
-+	if (lmp_le_capable(hdev)) {
-+		supported_phys |= MGMT_PHY_LE_1M_TX;
-+		supported_phys |= MGMT_PHY_LE_1M_RX;
-+
-+		if (hdev->le_features[1] & HCI_LE_PHY_2M) {
-+			supported_phys |= MGMT_PHY_LE_2M_TX;
-+			supported_phys |= MGMT_PHY_LE_2M_RX;
-+		}
-+		if (hdev->le_features[1] & HCI_LE_PHY_CODED) {
-+			supported_phys |= MGMT_PHY_LE_CODED_TX;
-+			supported_phys |= MGMT_PHY_LE_CODED_RX;
-+		}
-+	}
-+
-+	return supported_phys;
-+}
-+
-+static u32 get_selected_phys(struct hci_dev *hdev)
-+{
-+	u32 selected_phys = 0;
-+
-+	if (lmp_bredr_capable(hdev)) {
-+		selected_phys |= MGMT_PHY_BR_1M_1SLOT;
-+
-+		if (hdev->pkt_type & (HCI_DM3 | HCI_DH3))
-+			selected_phys |= MGMT_PHY_BR_1M_3SLOT;
-+
-+		if (hdev->pkt_type & (HCI_DM5 | HCI_DH5))
-+			selected_phys |= MGMT_PHY_BR_1M_5SLOT;
-+
-+		if (lmp_edr_2m_capable(hdev)) {
-+			if (!(hdev->pkt_type & HCI_2DH1))
-+				selected_phys |= MGMT_PHY_EDR_2M_1SLOT;
-+
-+			if (lmp_edr_3slot_capable(hdev) &&
-+				!(hdev->pkt_type & HCI_2DH3))
-+				selected_phys |= MGMT_PHY_EDR_2M_3SLOT;
-+
-+			if (lmp_edr_5slot_capable(hdev) &&
-+				!(hdev->pkt_type & HCI_2DH5))
-+				selected_phys |= MGMT_PHY_EDR_2M_5SLOT;
-+
-+			if (lmp_edr_3m_capable(hdev)) {
-+				if (!(hdev->pkt_type & HCI_3DH1))
-+					selected_phys |= MGMT_PHY_EDR_3M_1SLOT;
-+
-+				if (lmp_edr_3slot_capable(hdev) &&
-+					!(hdev->pkt_type & HCI_3DH3))
-+					selected_phys |= MGMT_PHY_EDR_3M_3SLOT;
-+
-+				if (lmp_edr_5slot_capable(hdev) &&
-+					!(hdev->pkt_type & HCI_3DH5))
-+					selected_phys |= MGMT_PHY_EDR_3M_5SLOT;
-+			}
-+		}
-+	}
-+
-+	if (lmp_le_capable(hdev)) {
-+		if (hci_dev_test_flag(hdev, HCI_LE_PHY_1M_TX))
-+			selected_phys |= MGMT_PHY_LE_1M_TX;
-+
-+		if (hci_dev_test_flag(hdev, HCI_LE_PHY_1M_RX))
-+			selected_phys |= MGMT_PHY_LE_1M_RX;
-+
-+		if (hci_dev_test_flag(hdev, HCI_LE_PHY_2M_TX))
-+			selected_phys |= MGMT_PHY_LE_2M_TX;
-+
-+		if (hci_dev_test_flag(hdev, HCI_LE_PHY_2M_RX))
-+			selected_phys |= MGMT_PHY_LE_2M_RX;
-+
-+		if (hci_dev_test_flag(hdev, HCI_LE_PHY_CODED_TX))
-+			selected_phys |= MGMT_PHY_LE_CODED_TX;
-+
-+		if (hci_dev_test_flag(hdev, HCI_LE_PHY_CODED_RX))
-+			selected_phys |= MGMT_PHY_LE_CODED_RX;
-+	}
-+
-+	return selected_phys;
-+}
-+
-+static u32 get_configurable_phys(struct hci_dev *hdev)
-+{
-+	return (get_supported_phys(hdev) & ~MGMT_PHY_BR_1M_1SLOT &
-+			~MGMT_PHY_LE_1M_TX & ~MGMT_PHY_LE_1M_RX);
-+}
-+
- static u32 get_supported_settings(struct hci_dev *hdev)
- {
- 	u32 settings = 0;
-@@ -654,6 +774,10 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 	    hdev->set_bdaddr)
- 		settings |= MGMT_SETTING_CONFIGURATION;
- 
-+	if (get_supported_phys(hdev) & ~(MGMT_PHY_BR_1M_1SLOT | MGMT_PHY_LE_1M_TX |
-+					MGMT_PHY_LE_1M_RX))
-+		settings |= MGMT_SETTING_PHY_CONFIGURATION;
-+
- 	return settings;
- }
- 
-@@ -722,6 +846,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 			settings |= MGMT_SETTING_STATIC_ADDRESS;
- 	}
- 
-+	if (phys_configured(hdev))
-+		settings |= MGMT_SETTING_PHY_CONFIGURATION;
-+
- 	return settings;
- }
- 
-@@ -3184,6 +3311,27 @@ static int set_appearance(struct sock *sk, struct hci_dev *hdev, void *data,
- 	return err;
- }
- 
-+static int get_phy_configuration(struct sock *sk, struct hci_dev *hdev,
-+				 void *data, u16 len)
-+{
-+	struct mgmt_rp_get_phy_confguration rp;
-+
-+	BT_DBG("sock %p %s", sk, hdev->name);
-+
-+	hci_dev_lock(hdev);
-+
-+	memset(&rp, 0, sizeof(rp));
-+
-+	rp.supported_phys = cpu_to_le32(get_supported_phys(hdev));
-+	rp.selected_phys = cpu_to_le32(get_selected_phys(hdev));
-+	rp.configurable_phys = cpu_to_le32(get_configurable_phys(hdev));
-+
-+	hci_dev_unlock(hdev);
-+
-+	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_PHY_CONFIGURATION, 0,
-+				 &rp, sizeof(rp));
-+}
-+
- static void read_local_oob_data_complete(struct hci_dev *hdev, u8 status,
- 				         u16 opcode, struct sk_buff *skb)
- {
-@@ -6544,6 +6692,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
- 	{ read_ext_controller_info,MGMT_READ_EXT_INFO_SIZE,
- 						HCI_MGMT_UNTRUSTED },
- 	{ set_appearance,	   MGMT_SET_APPEARANCE_SIZE },
-+	{ get_phy_configuration,   MGMT_GET_PHY_CONFIGURATION_SIZE },
+ 	__HCI_NUM_FLAGS,
  };
  
- void mgmt_index_added(struct hci_dev *hdev)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e19f7f3..be87d2a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -313,6 +313,10 @@ static void le_setup(struct hci_request *req)
+ 	/* LE-only controllers have LE implicitly enabled */
+ 	if (!lmp_bredr_capable(hdev))
+ 		hci_dev_set_flag(hdev, HCI_LE_ENABLED);
++
++	/* Set PHY to 1M for TX and RX */
++	hci_dev_set_flag(hdev, HCI_LE_PHY_1M_TX);
++	hci_dev_set_flag(hdev, HCI_LE_PHY_1M_RX);
+ }
+ 
+ static void hci_setup_event_mask(struct hci_request *req)
 -- 
 2.7.4
