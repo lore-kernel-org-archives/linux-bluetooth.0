@@ -1,86 +1,74 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <brian.gix@intel.com>
 From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-        inga.stotland@intel.com
-Subject: [PATCH BlueZ v5 14/14] Makefile for meshd
-Date: Fri,  6 Jul 2018 10:13:06 -0700
-Message-Id: <20180706171306.13501-15-brian.gix@intel.com>
+Cc: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	inga.stotland@intel.com
+Subject: [PATCH BlueZ v5 13/14] mesh: Sample device composition in JSON format
+Date: Fri,  6 Jul 2018 10:13:05 -0700
+Message-Id: <20180706171306.13501-14-brian.gix@intel.com>
 In-Reply-To: <20180706171306.13501-1-brian.gix@intel.com>
 References: <20180706171306.13501-1-brian.gix@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Inga Stotland <inga.stotland@intel.com>
 
+This is a sample unprovisioned device composition described
+in JSON format.
 ---
- Makefile.am   |  1 +
- Makefile.mesh | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+)
- create mode 100644 Makefile.mesh
+ mesh/config/composition.json | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
+ create mode 100644 mesh/config/composition.json
 
-diff --git a/Makefile.am b/Makefile.am
-index 2c9490f5f..0ccf393c6 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -235,6 +235,7 @@ unit_tests =
- include Makefile.tools
- include Makefile.obexd
- include android/Makefile.am
-+include Makefile.mesh
- 
- if HID2HCI
- rulesdir = @UDEV_DIR@/rules.d
-diff --git a/Makefile.mesh b/Makefile.mesh
+diff --git a/mesh/config/composition.json b/mesh/config/composition.json
 new file mode 100644
-index 000000000..aaf337579
+index 000000000..20c0d0c3a
 --- /dev/null
-+++ b/Makefile.mesh
++++ b/mesh/config/composition.json
 @@ -0,0 +1,44 @@
-+if MESH
-+mesh_json_sources = mesh/mesh-db.h mesh/mesh-db.c
-+mesh_common_sources = mesh/mesh-defs.h \
-+					mesh/util.h mesh/util.c
-+
-+mesh_sources = $(mesh_common_sources) $(mesh_json_sources) \
-+				mesh/mesh.h mesh/mesh.c \
-+				mesh/mesh-io.h mesh/mesh-io.c \
-+				mesh/mesh-io-api.h mesh/bt.h \
-+				mesh/mesh-io-generic.h \
-+				mesh/mesh-io-generic.c \
-+				mesh/hci.h mesh/hci.c \
-+				mesh/storage.h mesh/storage.c \
-+				mesh/net.h mesh/net.c \
-+				mesh/display.h mesh/display.c \
-+				mesh/crypto.h mesh/crypto.c \
-+				mesh/friend.h mesh/friend.c \
-+				mesh/appkeys.h mesh/appkey.c \
-+				mesh/node.h mesh/node.c \
-+				mesh/prov.h mesh/prov.c \
-+				mesh/provision.h mesh/provision.c \
-+				mesh/model.h mesh/model.c \
-+				mesh/cfgmod.h mesh/cfgmod-server.c
-+
-+libexec_PROGRAMS += mesh/meshd
-+
-+mesh_meshd_SOURCES = $(mesh_sources) \
-+						mesh/main.c
-+
-+mesh_meshd_LDADD = /usr/lib64/libell.la src/shared/ecc.lo \
-+			@DBUS_LIBS@ -lell -ljson-c -ldl
-+
-+noinst_PROGRAMS += mesh/btmesh
-+
-+mesh_btmesh_SOURCES = $(mesh_sources) \
-+						mesh/agent.h \
-+						mesh/agent.c \
-+						mesh/btmesh.c
-+
-+mesh_btmesh_LDADD = /usr/lib64/libell.la src/shared/ecc.lo \
-+						src/libshared-mainloop.la \
-+						-lreadline -lell -ljson-c -ldl
-+
-+endif
++{
++  "$schema":"file:\/\/\/BlueZ\/MeshD\/local_schema\/mesh.jsonschema",
++  "meshName":"BT Mesh sample node",
++  "UUID":"E0ED0F0200000000203C100200000000",
++  "cid":"0002",
++  "pid":"0010",
++  "vid":"0001",
++  "crpl":"000a",
++  "proxy":"unsupported",
++  "friend":"disabled",
++  "lowPower":"disabled",
++  "relay":{
++    "mode":"enabled"
++  },
++  "elements":[
++    {
++      "elementIndex":0,
++      "location":"0001",
++      "models":[
++        {
++          "modelId":"0000"
++        },
++        {
++          "modelId":"1001"
++        }
++      ]
++    }
++  ],
++  "provision": {
++    "privateKey": "729aa0670d72cd6497502ed473502b037e8803b5c60829a5a3caa219505530ba",
++    "algorithms": [ 0 ],
++	"inputOOB": {
++       "size": 8,
++       "actions": [ 2, 3]
++    },
++    "outputOOB": {
++      "size": 8,
++      "actions": [ 3, 4]
++    },
++    "publicType": false,
++    "staticType": false
++  },
++   }
++}
 -- 
 2.14.4
-
