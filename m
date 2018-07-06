@@ -1,484 +1,84 @@
-Return-Path: <mka@chromium.org>
-Date: Fri, 6 Jul 2018 15:21:10 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
-	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>
-Subject: Re: [PATCH v9 7/7] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth chip wcn3990
-Message-ID: <20180706222110.GK129942@google.com>
-References: <20180705165515.13340-1-bgodavar@codeaurora.org>
- <20180705165515.13340-8-bgodavar@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180705165515.13340-8-bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
+Subject: Re: [PATCH v3 05/18] Bluetooth: Use extended LE Connection if
+ supported
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1530876944-17453-6-git-send-email-jaganathx.kanakkassery@intel.com>
+Date: Fri, 6 Jul 2018 22:57:24 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Message-Id: <B9EAC95F-5A5C-455B-A586-C83E2C219B2F@holtmann.org>
+References: <1530876944-17453-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1530876944-17453-6-git-send-email-jaganathx.kanakkassery@intel.com>
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 05, 2018 at 10:25:15PM +0530, Balakrishna Godavarthi wrote:
-> Add support to set voltage/current of various regulators
-> to power up/down Bluetooth chip wcn3990.
+Hi Jaganath,
+
+> This implements extended LE craete connection and enhanced
+> LE conn complete event if the controller supports.
 > 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> For now it is as good as legacy LE connection and event as
+> no new features in the extended connection is handled.
+> 
+> < HCI Command: LE Extended Create Connection (0x08|0x0043) plen 26
+>        Filter policy: White list is not used (0x00)
+>        Own address type: Public (0x00)
+>        Peer address type: Random (0x01)
+>        Peer address: DB:7E:2E:1D:85:E8 (Static)
+>        Initiating PHYs: 0x01
+>        Entry 0: LE 1M
+>          Scan interval: 60.000 msec (0x0060)
+>          Scan window: 60.000 msec (0x0060)
+>          Min connection interval: 50.00 msec (0x0028)
+>          Max connection interval: 70.00 msec (0x0038)
+>          Connection latency: 0 (0x0000)
+>          Supervision timeout: 420 msec (0x002a)
+>          Min connection length: 0.000 msec (0x0000)
+>          Max connection length: 0.000 msec (0x0000)
+>> HCI Event: Command Status (0x0f) plen 4
+>      LE Extended Create Connection (0x08|0x0043) ncmd 2
+>        Status: Success (0x00)
+>> HCI Event: LE Meta Event (0x3e) plen 31
+>      LE Enhanced Connection Complete (0x0a)
+>        Status: Success (0x00)
+>        Handle: 3585
+>        Role: Master (0x00)
+>        Peer address type: Random (0x01)
+>        Peer address: DB:7E:2E:1D:85:E8 (Static)
+>        Local resolvable private address: 00:00:00:00:00:00 (Non-Resolvable)
+>        Peer resolvable private address: 00:00:00:00:00:00 (Non-Resolvable)
+>        Connection interval: 67.50 msec (0x0036)
+>        Connection latency: 0 (0x0000)
+>        Supervision timeout: 420 msec (0x002a)
+>        Master clock accuracy: 0x00
+> @ MGMT Event: Device Connected (0x000b) plen 40
+>        LE Address: DB:7E:2E:1D:85:E8 (Static)
+>        Flags: 0x00000000
+>        Data length: 27
+>        Name (complete): Designer Mouse
+>        Appearance: Mouse (0x03c2)
+>        Flags: 0x05
+>          LE Limited Discoverable Mode
+>          BR/EDR Not Supported
+>        16-bit Service UUIDs (complete): 1 entry
+>          Human Interface Device (0x1812)
+> 
+> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 > ---
-> changes in v9:
->     * moved flow control to vendor and set_baudarte functions.
->     * removed parent regs.
-> 
-> changes in v8:
->     * closing qca buffer, if qca_power_setup fails
->     * chnaged ibs start timer function call location.
->     * updated review comments.
->   
-> changes in v7:
->     * addressed review comments.
-> 
-> changes in v6:
->     * Hooked up qca_power to qca_serdev.
->     * renamed all the naming inconsistency functions with qca_*
->     * leveraged common code of ROME for wcn3990.
->     * created wrapper functions for re-usable blocks.
->     * updated function of _*regulator_enable and _*regualtor_disable.  
->     * removed redundant comments and functions.
->     * addressed review comments.
-> 
-> Changes in v5:
->     * updated regulator vddpa min_uV to 1304000.
->       * addressed review comments.
->  
-> Changes in v4:
->     * Segregated the changes of btqca from hci_qca
->     * rebased all changes on top of bluetooth-next.
->     * addressed review comments.
-> 
-> ---
->  drivers/bluetooth/btqca.h   |   3 +
->  drivers/bluetooth/hci_qca.c | 387 +++++++++++++++++++++++++++++++-----
->  2 files changed, 345 insertions(+), 45 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index a9c2779f3e07..0c01f375fe83 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -37,6 +37,9 @@
->  #define EDL_TAG_ID_HCI			(17)
->  #define EDL_TAG_ID_DEEP_SLEEP		(27)
->  
-> +#define QCA_WCN3990_POWERON_PULSE	0xFC
-> +#define QCA_WCN3990_POWEROFF_PULSE	0xC0
-> +
->  enum qca_bardrate {
->  	QCA_BAUDRATE_115200 	= 0,
->  	QCA_BAUDRATE_57600,
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 7ebfaa0edf3f..d62c7785a618 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -5,7 +5,7 @@
->   *  protocol extension to H4.
->   *
->   *  Copyright (C) 2007 Texas Instruments, Inc.
-> - *  Copyright (c) 2010, 2012 The Linux Foundation. All rights reserved.
-> + *  Copyright (c) 2010, 2012, 2018 The Linux Foundation. All rights reserved.
->   *
->   *  Acknowledgements:
->   *  This file is based on hci_ll.c, which was...
-> @@ -31,9 +31,14 @@
->  #include <linux/kernel.h>
->  #include <linux/clk.h>
->  #include <linux/debugfs.h>
-> +#include <linux/delay.h>
-> +#include <linux/device.h>
->  #include <linux/gpio/consumer.h>
->  #include <linux/mod_devicetable.h>
->  #include <linux/module.h>
-> +#include <linux/of_device.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/regulator/consumer.h>
->  #include <linux/serdev.h>
->  
->  #include <net/bluetooth/bluetooth.h>
-> @@ -124,12 +129,46 @@ enum qca_speed_type {
->  	QCA_OPER_SPEED
->  };
->  
-> +/*
-> + * Voltage regulator information required for configuring the
-> + * QCA Bluetooth chipset
-> + */
-> +struct qca_vreg {
-> +	const char *name;
-> +	unsigned int min_uV;
-> +	unsigned int max_uV;
-> +	unsigned int load_uA;
-> +};
-> +
-> +struct qca_vreg_data {
-> +	enum qca_btsoc_type soc_type;
-> +	struct qca_vreg *vregs;
-> +	size_t num_vregs;
-> +};
-> +
-> +/*
-> + * Platform data for the QCA Bluetooth power driver.
-> + */
-> +struct qca_power {
-> +	struct device *dev;
-> +	const struct qca_vreg_data *vreg_data;
-> +	struct regulator_bulk_data *vreg_bulk;
-> +	bool vregs_on;
-> +};
-> +
->  struct qca_serdev {
->  	struct hci_uart	 serdev_hu;
->  	struct gpio_desc *bt_en;
->  	struct clk	 *susclk;
-> +	enum qca_btsoc_type btsoc_type;
-> +	struct qca_power *bt_power;
-> +	u32 init_speed;
-> +	u32 oper_speed;
->  };
->  
-> +static int qca_power_setup(struct hci_uart *hu, bool on);
-> +static void qca_power_shutdown(struct hci_uart *hu);
-> +
->  static void __serial_clock_on(struct tty_struct *tty)
->  {
->  	/* TODO: Some chipset requires to enable UART clock on client
-> @@ -407,6 +446,7 @@ static int qca_open(struct hci_uart *hu)
->  {
->  	struct qca_serdev *qcadev;
->  	struct qca_data *qca;
-> +	int ret;
->  
->  	BT_DBG("hu %p qca_open", hu);
->  
-> @@ -458,19 +498,32 @@ static int qca_open(struct hci_uart *hu)
->  
->  	hu->priv = qca;
->  
-> -	timer_setup(&qca->wake_retrans_timer, hci_ibs_wake_retrans_timeout, 0);
-> -	qca->wake_retrans = IBS_WAKE_RETRANS_TIMEOUT_MS;
-> -
-> -	timer_setup(&qca->tx_idle_timer, hci_ibs_tx_idle_timeout, 0);
-> -	qca->tx_idle_delay = IBS_TX_IDLE_TIMEOUT_MS;
-> -
->  	if (hu->serdev) {
->  		serdev_device_open(hu->serdev);
->  
->  		qcadev = serdev_device_get_drvdata(hu->serdev);
-> -		gpiod_set_value_cansleep(qcadev->bt_en, 1);
-> +		if (qcadev->btsoc_type != QCA_WCN3990) {
-> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
-> +		} else {
-> +			hu->init_speed = qcadev->init_speed;
-> +			hu->oper_speed = qcadev->oper_speed;
-> +			ret = qca_power_setup(hu, true);
-> +			if (ret) {
-> +				destroy_workqueue(qca->workqueue);
-> +				kfree_skb(qca->rx_skb);
-> +				hu->priv = NULL;
-> +				kfree(qca);
-> +				return ret;
-> +			}
-> +		}
->  	}
->  
-> +	timer_setup(&qca->wake_retrans_timer, hci_ibs_wake_retrans_timeout, 0);
-> +	qca->wake_retrans = IBS_WAKE_RETRANS_TIMEOUT_MS;
-> +
-> +	timer_setup(&qca->tx_idle_timer, hci_ibs_tx_idle_timeout, 0);
-> +	qca->tx_idle_delay = IBS_TX_IDLE_TIMEOUT_MS;
-> +
->  	BT_DBG("HCI_UART_QCA open, tx_idle_delay=%u, wake_retrans=%u",
->  	       qca->tx_idle_delay, qca->wake_retrans);
->  
-> @@ -554,10 +607,13 @@ static int qca_close(struct hci_uart *hu)
->  	qca->hu = NULL;
->  
->  	if (hu->serdev) {
-> -		serdev_device_close(hu->serdev);
-> -
->  		qcadev = serdev_device_get_drvdata(hu->serdev);
-> -		gpiod_set_value_cansleep(qcadev->bt_en, 0);
-> +		if (qcadev->btsoc_type == QCA_WCN3990)
-> +			qca_power_shutdown(hu);
-> +		else
-> +			gpiod_set_value_cansleep(qcadev->bt_en, 0);
-> +
-> +		serdev_device_close(hu->serdev);
->  	}
->  
->  	kfree_skb(qca->rx_skb);
-> @@ -891,6 +947,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  	struct hci_uart *hu = hci_get_drvdata(hdev);
->  	struct qca_data *qca = hu->priv;
->  	struct sk_buff *skb;
-> +	struct qca_serdev *qcadev;
->  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
->  
->  	if (baudrate > QCA_BAUDRATE_3200000)
-> @@ -904,6 +961,13 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  		return -ENOMEM;
->  	}
->  
-> +	/* Disabling hardware flow control is mandate while
+> include/net/bluetooth/hci.h      | 36 ++++++++++++++++++++
+> include/net/bluetooth/hci_core.h |  2 ++
+> net/bluetooth/hci_conn.c         | 72 ++++++++++++++++++++++++++++++----------
+> net/bluetooth/hci_core.c         |  6 ++++
+> net/bluetooth/hci_event.c        | 47 ++++++++++++++++++++++++++
+> 5 files changed, 145 insertions(+), 18 deletions(-)
 
-nit: s/mandate/mandatory|required/
+patches 1-5 have been applied to bluetooth-next tree.
 
-> +	 * sending change baudrate request to wcn3990 SoC.
-> +	 */
-> +	qcadev = serdev_device_get_drvdata(hu->serdev);
-> +	if (qcadev->btsoc_type == QCA_WCN3990)
-> +		hci_uart_set_flow_control(hu, true);
-> +
->  	/* Assign commands to change baudrate and packet type. */
->  	skb_put_data(skb, cmd, sizeof(cmd));
->  	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-> @@ -919,6 +983,9 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
->  	set_current_state(TASK_RUNNING);
->  
-> +	if (qcadev->btsoc_type == QCA_WCN3990)
-> +		hci_uart_set_flow_control(hu, false);
-> +
->  	return 0;
->  }
->  
-> @@ -930,6 +997,36 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
->  		hci_uart_set_baudrate(hu, speed);
->  }
->  
-> +static int qca_send_vendor_cmd(struct hci_dev *hdev, u8 cmd)
-> +{
-> +	struct hci_uart *hu = hci_get_drvdata(hdev);
-> +	struct qca_data *qca = hu->priv;
-> +	struct sk_buff *skb;
-> +
-> +	bt_dev_dbg(hdev, "sending command %02x to SoC", cmd);
-> +
-> +	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
-> +	if (!skb)
-> +		return -ENOMEM;
-> +
-> +	/* Disabling hardware flow control is mandate while
+Regards
 
-Same nit as above
+Marcel
 
-> +	 * sending vendor power on and off pulse to SoC.
-> +	 */
-
-The function is called qca_send_vendor_cmd(), the comment about power
-on/off pulses seems misplaced here. Are there other 'vendor commands'
-that require a different flow control behavior?
-
-Perhaps the function should have a different name or we need another
-wrapper.
-
-> +	hci_uart_set_flow_control(hu, true);
-
-Should the changing of the flow control be limited to wcn3990? As of
-now the function is only called for wcn3990, however this is not
-stated as a requirement and might change in the future.
-
-> +	skb_put_u8(skb, cmd);
-> +	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-> +
-> +	skb_queue_tail(&qca->txq, skb);
-> +	hci_uart_tx_wakeup(hu);
-> +
-> +	/* Wait for 100 uS for SoC to settle down */
-> +	usleep_range(100, 200);
-
-Is this needed for any 'vendor command' or directly related with the
-power on/off pulses?
-
-> +	hci_uart_set_flow_control(hu, false);
-> +
-> +	return 0;
-> +}
-> +
->  static unsigned int qca_get_speed(struct hci_uart *hu,
->  				  enum qca_speed_type speed_type)
->  {
-> @@ -952,10 +1049,19 @@ static unsigned int qca_get_speed(struct hci_uart *hu,
->  
->  static int qca_check_speeds(struct hci_uart *hu)
->  {
-> -	/* One or the other speeds should be non zero. */
-> -	if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
-> -	    !qca_get_speed(hu, QCA_OPER_SPEED))
-> +	struct qca_serdev *qcadev;
-> +
-> +	qcadev = serdev_device_get_drvdata(hu->serdev);
-> +	if ((qcadev->btsoc_type == QCA_WCN3990 &&
-> +	    !qca_get_speed(hu, QCA_INIT_SPEED)) ||
-> +	    !qca_get_speed(hu, QCA_OPER_SPEED)) {
-> +		/* Both INIT and OPER speed should be non zero. */
->  		return -EINVAL;
-> +	} else if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
-> +		    !qca_get_speed(hu, QCA_OPER_SPEED)) {
-> +		/* One or the other speeds should be non zero. */
-> +		return -EINVAL;
-> +	}
-
-It is questionable if the comments are useful, they are basically
-stating the same as the conditions.
-
-if-else statements with a single statement in all branches shouldn't
-use curly braces. Personally I don't dislike them in this case with
-the multi-line conditions, but in principle they shoulnd't be there.
-
-nit: this would be easier to read with nested if statements:
-
-	if (qcadev->btsoc_type == QCA_WCN3990)
-		if (!qca_get_speed(hu, QCA_INIT_SPEED)) ||
-		    !qca_get_speed(hu, QCA_OPER_SPEED))
-			return -EINVAL;
-	else
-		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
-		    !qca_get_speed(hu, QCA_OPER_SPEED)) {
-			return -EINVAL;
-
->  	return 0;
->  }
-> @@ -986,15 +1092,40 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  	return 0;
->  }
->  
-> +static int qca_wcn3990_init(struct hci_uart *hu)
-> +{
-> +	int ret;
-> +
-> +	ret = qca_send_vendor_cmd(hu->hdev, QCA_WCN3990_POWERON_PULSE);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Wait for 100 ms for SoC to boot up */
-> +	msleep(100);
-> +	serdev_device_close(hu->serdev);
-> +	ret = serdev_device_open(hu->serdev);
-> +	if (ret) {
-> +		bt_dev_err(hu->hdev, "failed to open port");
-> +		return ret;
-> +	}
-> +
-> +	/* Setup initial baudrate */
-> +	qca_set_speed(hu, QCA_INIT_SPEED);
-
-The comment is a bit redundant.
-
-> +	hci_uart_set_flow_control(hu, false);
-> +
-> +	return 0;
-> +}
-> +
->  static int qca_setup(struct hci_uart *hu)
->  {
->  	struct hci_dev *hdev = hu->hdev;
->  	struct qca_data *qca = hu->priv;
->  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
-> +	struct qca_serdev *qcadev;
->  	int ret;
->  	int soc_ver = 0;
->  
-> -	bt_dev_info(hdev, "ROME setup");
-> +	qcadev = serdev_device_get_drvdata(hu->serdev);
->  
->  	ret = qca_check_speeds(hu);
->  	if (ret)
-> @@ -1006,6 +1137,21 @@ static int qca_setup(struct hci_uart *hu)
->  	/* Setup initial baudrate */
->  	qca_set_speed(hu, QCA_INIT_SPEED);
->  
-> +	if (qcadev->btsoc_type == QCA_WCN3990) {
-> +		bt_dev_dbg(hdev, "setting up wcn3990");
-
-Seems like this should be bt_dev_info() for consistency with Rome.
-
-> +		ret = qca_wcn3990_init(hu);
-> +		if (ret)
-> +			return ret;
-> +
-> +		ret = qca_read_soc_version(hdev, &soc_ver);
-> +		if (ret < 0 || soc_ver == 0) {
-> +			bt_dev_err(hdev, "Failed to get version %d", ret);
-> +			return ret;
-> +		}
-> +	} else {
-> +		bt_dev_info(hdev, "ROME setup");
-> +	}
-> +
->  	/* Setup user speed if needed */
->  	speed = qca_get_speed(hu, QCA_OPER_SPEED);
->  	if (speed) {
-> @@ -1016,16 +1162,18 @@ static int qca_setup(struct hci_uart *hu)
->  		qca_baudrate = qca_get_baudrate_value(speed);
->  	}
->  
-> -	/* Get QCA version information */
-> -	ret = qca_read_soc_version(hdev, &soc_ver);
-> -	if (ret < 0 || soc_ver == 0) {
-> -		bt_dev_err(hdev, "QCA Failed to get version (%d)", ret);
-> -		return ret;
-> +	if (!soc_ver) {
-
-
-The following would probably be clearer:
-
-  	if (qcadev->btsoc_type != QCA_WCN3990) {
-
-> +		/* Get QCA version information */
-> +		ret = qca_read_soc_version(hdev, &soc_ver);
-> +		if (ret < 0 || soc_ver == 0) {
-> +			bt_dev_err(hdev, "QCA Failed to get version (%d)", ret);
-> +			return ret;
-> +		}
-> +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
-
-Couldn't we hide some of this in qca_read_soc_version()?
-
-qca_read_soc_version() could at least do the logging in the error case
-(the 'soc_ver == 0' case could be handled there as well), which would
-leave us with:
-
-
-	ret = qca_read_soc_version(hdev, &soc_ver);
-	if (ret)
-		return ret;
-
-And the same above.
-
-The controller version can be logged outside of the branch for both
-wcn3990 and Rome.
-
->  	}
-> -	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
->  
->  	/* Setup patch / NVM configurations */
-> -	ret = qca_uart_setup(hdev, qca_baudrate, QCA_ROME, soc_ver);
-> +	ret = qca_uart_setup(hdev, qca_baudrate, qcadev->btsoc_type, soc_ver);
->  	if (!ret) {
->  		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->  		qca_debugfs_init(hdev);
-> @@ -1061,9 +1209,123 @@ static struct hci_uart_proto qca_proto = {
->  	.dequeue	= qca_dequeue,
->  };
->  
-> +static const struct qca_vreg_data qca_soc_data = {
-> +	.soc_type = QCA_WCN3990,
-> +	.vregs = (struct qca_vreg []) {
-> +		{ "vddio",   1800000, 1800000,  0 },
-> +		{ "vddxo",   1800000, 1800000,  1 },
-> +		{ "vddrf",   1304000, 1304000,  1 },
-> +		{ "vddch0",  3000000, 3312000,  1 },
-> +	},
-> +	.num_vregs = 4,
-> +};
-
-I didn't chime in earlier in the discussion with Stephen on the
-regulators (https://patchwork.kernel.org/patch/10467911/), however I
-agree with him that specifying at load of 1uA doesn't seem to make
-much sense. What would happen if the load remained unspecified (or 0)?
