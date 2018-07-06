@@ -1,34 +1,33 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH BlueZ 0/2] Directory re-org for meshctl tool
+Subject: Re: [PATCH] bluetooth: remove unused bt-nokia-h4p.h header
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180622063200.7394-1-inga.stotland@intel.com>
-Date: Fri, 6 Jul 2018 13:05:08 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-        Inga Stotland <inga.stotland@intel.com>
-Message-Id: <570536D2-06CA-4D34-A7FC-4E9EA6F03ECB@holtmann.org>
-References: <20180622063200.7394-1-inga.stotland@intel.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1528401038-36287-1-git-send-email-clabbe@baylibre.com>
+Date: Fri, 6 Jul 2018 12:52:41 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Message-Id: <521D496D-4F2A-4D78-AA86-9AA19B2C974D@holtmann.org>
+References: <1528401038-36287-1-git-send-email-clabbe@baylibre.com>
+To: Corentin Labbe <clabbe@baylibre.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
+Hi Corentin,
 
-> This set of patches moves mechctl tool code from under bluez/mesh
-> into tools directory.
+> Nothing in tree use this header which seems a remains of a staging
+> driver.
+> This patch remove it.
 > 
-> mesh directory will be re-established with the implementation of mesh
-> daemon.
-> 
-> Inga Stotland (2):
->  tools: Move meshctl tool under tools directory
->  tools: Move meshctl sources under tools/mesh directory
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+> include/linux/platform_data/bt-nokia-h4p.h | 38 ------------------------------
+> 1 file changed, 38 deletions(-)
+> delete mode 100644 include/linux/platform_data/bt-nokia-h4p.h
 
-both patches have been applied.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
-
