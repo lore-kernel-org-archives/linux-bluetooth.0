@@ -2,27 +2,75 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH BlueZ v1] doc/mgmt-api: Add BREDR PHYs in PHY
- Configuration Commands
+Subject: Re: [PATCH 1/2] Bluetooth: Store Resolv list size
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1530166610-2543-1-git-send-email-jaganathx.kanakkassery@intel.com>
-Date: Fri, 6 Jul 2018 12:46:27 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Message-Id: <05ECF21D-A174-4FDB-9446-83F4B4121C98@holtmann.org>
-References: <1530166610-2543-1-git-send-email-jaganathx.kanakkassery@intel.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+In-Reply-To: <1530254570-32458-1-git-send-email-ankit.p.navik@intel.com>
+Date: Fri, 6 Jul 2018 12:46:24 +0200
+Cc: linux-bluetooth@vger.kernel.org, bharat.b.panda@intel.com
+Message-Id: <56F0F952-2247-4632-BFA7-DECE239F3DAC@holtmann.org>
+References: <1530254570-32458-1-git-send-email-ankit.p.navik@intel.com>
+To: Ankit Navik <ankit.p.navik@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Ankit,
 
+> When the controller supports the Read LE Resolv List size feature, the
+> maximum list size are read and now stored.
 > 
+> Before patch:
+> < HCI Command: LE Read White List... (0x08|0x000f) plen 0  #55 [hci0] 17.979791
+>> HCI Event: Command Complete (0x0e) plen 5                #56 [hci0] 17.980629
+>      LE Read White List Size (0x08|0x000f) ncmd 1
+>        Status: Success (0x00)
+>        Size: 25
+> < HCI Command: LE Clear White List (0x08|0x0010) plen 0    #57 [hci0] 17.980786
+>> HCI Event: Command Complete (0x0e) plen 4                #58 [hci0] 17.981627
+>      LE Clear White List (0x08|0x0010) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: LE Read Maximum Dat.. (0x08|0x002f) plen 0  #59 [hci0] 17.981786
+>> HCI Event: Command Complete (0x0e) plen 12               #60 [hci0] 17.982636
+>      LE Read Maximum Data Length (0x08|0x002f) ncmd 1
+>        Status: Success (0x00)
+>        Max TX octets: 251
+>        Max TX time: 17040
+>        Max RX octets: 251
+>        Max RX time: 17040
+> 
+> After patch:
+> < HCI Command: LE Read White List... (0x08|0x000f) plen 0  #55 [hci0] 13.338168
+>> HCI Event: Command Complete (0x0e) plen 5                #56 [hci0] 13.338842
+>      LE Read White List Size (0x08|0x000f) ncmd 1
+>        Status: Success (0x00)
+>        Size: 25
+> < HCI Command: LE Clear White List (0x08|0x0010) plen 0    #57 [hci0] 13.339029
+>> HCI Event: Command Complete (0x0e) plen 4                #58 [hci0] 13.339939
+>      LE Clear White List (0x08|0x0010) ncmd 1
+>        Status: Success (0x00)
+> < HCI Command: LE Read Resolving L.. (0x08|0x002a) plen 0  #59 [hci0] 13.340152
+>> HCI Event: Command Complete (0x0e) plen 5                #60 [hci0] 13.340952
+>      LE Read Resolving List Size (0x08|0x002a) ncmd 1
+>        Status: Success (0x00)
+>        Size: 25
+> < HCI Command: LE Read Maximum Dat.. (0x08|0x002f) plen 0  #61 [hci0] 13.341180
+>> HCI Event: Command Complete (0x0e) plen 12               #62 [hci0] 13.341898
+>      LE Read Maximum Data Length (0x08|0x002f) ncmd 1
+>        Status: Success (0x00)
+>        Max TX octets: 251
+>        Max TX time: 17040
+>        Max RX octets: 251
+>        Max RX time: 17040
+> 
+> Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
 > ---
-> doc/mgmt-api.txt | 78 +++++++++++++++++++++++++++++++-------------------------
-> 1 file changed, 43 insertions(+), 35 deletions(-)
+> include/net/bluetooth/hci.h      |  6 ++++++
+> include/net/bluetooth/hci_core.h |  2 ++
+> net/bluetooth/hci_core.c         |  8 ++++++++
+> net/bluetooth/hci_debugfs.c      | 19 +++++++++++++++++++
+> net/bluetooth/hci_event.c        | 18 ++++++++++++++++++
+> 5 files changed, 53 insertions(+)
 
-patch has been applied.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
