@@ -3,203 +3,302 @@ From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v3 18/18] Bluetooth: Implement secondary advertising on different PHYs
-Date: Fri,  6 Jul 2018 17:05:44 +0530
-Message-Id: <1530876944-17453-19-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v3 17/18] Bluetooth: Implement Set ADV set random address
+Date: Fri,  6 Jul 2018 17:05:43 +0530
+Message-Id: <1530876944-17453-18-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1530876944-17453-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1530876944-17453-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for advertising in primary and secondary
-channel on different PHYs. User can add the phy preference in
-the flag based on which phy type will be added in extended
-advertising parameter would be set.
+This basically sets the random address for the instance 0.
+Random address can be set only if the instance is created which
+is done in Set ext adv param.
 
-@ MGMT Command: Add Advertising (0x003e) plen 11
-        Instance: 1
-        Flags: 0x00000200
-          Advertise in CODED on Secondary channel
-        Duration: 0
-        Timeout: 0
-        Advertising data length: 0
-        Scan response length: 0
-< HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 2
-        Extended advertising: Disabled (0x00)
-        Number of sets: Disable all sets (0x00)
+This introduces a hci_get_random_address() which returns the
+own address type and random address (rpa, nrpa or static) based
+on the instance flags and hdev flags. New function is required
+since own address type should be known before setting adv params
+but address can be set only after setting params.
+
+< HCI Command: LE Set Advertising Set Random Address (0x08|0x0035) plen 7
+        Advertising handle: 0x00
+        Advertising random address: 3C:8E:56:9B:77:84 (OUI 3C-8E-56)
 > HCI Event: Command Complete (0x0e) plen 4
-      LE Set Extended Advertising Enable (0x08|0x0039) ncmd 2
+      LE Set Advertising Set Random Address (0x08|0x0035) ncmd 1
         Status: Success (0x00)
-< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
-        Handle: 0x00
-        Properties: 0x0000
-        Min advertising interval: 1280.000 msec (0x0800)
-        Max advertising interval: 1280.000 msec (0x0800)
-        Channel map: 37, 38, 39 (0x07)
-        Own address type: Random (0x01)
-        Peer address type: Public (0x00)
-        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
-        TX power: 127 dbm (0x7f)
-        Primary PHY: LE Coded (0x03)
-        Secondary max skip: 0x00
-        Secondary PHY: LE Coded (0x03)
-        SID: 0x00
-        Scan request notifications: Disabled (0x00)
 
 Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- include/net/bluetooth/hci.h  |  4 ++++
- include/net/bluetooth/mgmt.h |  6 ++++++
- net/bluetooth/hci_request.c  | 39 +++++++++++++++++++++++++++++++--------
- net/bluetooth/mgmt.c         | 18 +++++++++++++++---
- 4 files changed, 56 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci.h |   6 +++
+ net/bluetooth/hci_conn.c    |  23 +++++++++
+ net/bluetooth/hci_event.c   |  24 ++++++++++
+ net/bluetooth/hci_request.c | 111 +++++++++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/hci_request.h |   3 ++
+ 5 files changed, 166 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 620cb5b..8ba3fb0 100644
+index f98bf73..620cb5b 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -418,6 +418,8 @@ enum {
- #define HCI_LE_SLAVE_FEATURES		0x08
- #define HCI_LE_PING			0x10
- #define HCI_LE_DATA_LEN_EXT		0x20
-+#define HCI_LE_PHY_2M			0x01
-+#define HCI_LE_PHY_CODED		0x08
- #define HCI_LE_EXT_ADV			0x10
- #define HCI_LE_EXT_SCAN_POLICY		0x80
- #define HCI_LE_PHY_2M			0x01
-@@ -1614,6 +1616,8 @@ struct hci_cp_le_set_ext_adv_params {
- } __packed;
+@@ -1662,6 +1662,12 @@ struct hci_cp_le_remove_adv_set {
  
- #define HCI_ADV_PHY_1M		0X01
-+#define HCI_ADV_PHY_2M		0x02
-+#define HCI_ADV_PHY_CODED	0x03
+ #define HCI_OP_LE_CLEAR_ADV_SETS	0x203d
  
- struct hci_rp_le_set_ext_adv_params {
- 	__u8  status;
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 047e98d..70b85a7 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -562,6 +562,12 @@ struct mgmt_rp_add_advertising {
- #define MGMT_ADV_FLAG_TX_POWER		BIT(4)
- #define MGMT_ADV_FLAG_APPEARANCE	BIT(5)
- #define MGMT_ADV_FLAG_LOCAL_NAME	BIT(6)
-+#define MGMT_ADV_FLAG_SEC_1M 		BIT(7)
-+#define MGMT_ADV_FLAG_SEC_2M 		BIT(8)
-+#define MGMT_ADV_FLAG_SEC_CODED 	BIT(9)
++#define HCI_OP_LE_SET_ADV_SET_RAND_ADDR	0x2035
++struct hci_cp_le_set_adv_set_rand_addr {
++	__u8  handle;
++	bdaddr_t  bdaddr;
++} __packed;
 +
-+#define MGMT_ADV_FLAG_SEC_MASK	(MGMT_ADV_FLAG_SEC_1M | MGMT_ADV_FLAG_SEC_2M | \
-+				 MGMT_ADV_FLAG_SEC_CODED)
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
  
- #define MGMT_OP_REMOVE_ADVERTISING	0x003F
- struct mgmt_cp_remove_advertising {
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index fc27bd8..cf180b24 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -875,6 +875,14 @@ static void hci_req_directed_advertising(struct hci_request *req,
+ 
+ 	if (ext_adv_capable(hdev)) {
+ 		struct hci_cp_le_set_ext_adv_params cp;
++		bdaddr_t random_addr;
++
++		/* Set require_privacy to false so that the remote device has a
++		 * chance of identifying us.
++		 */
++		if (hci_get_random_address(hdev, false, conn_use_rpa(conn),
++					   &own_addr_type, &random_addr) < 0)
++			return;
+ 
+ 		memset(&cp, 0, sizeof(cp));
+ 
+@@ -891,6 +899,21 @@ static void hci_req_directed_advertising(struct hci_request *req,
+ 
+ 		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
+ 
++		if (own_addr_type == ADDR_LE_DEV_RANDOM &&
++		    bacmp(&random_addr, BDADDR_ANY) &&
++		    bacmp(&random_addr, &hdev->random_addr)) {
++			struct hci_cp_le_set_adv_set_rand_addr cp;
++
++			memset(&cp, 0, sizeof(cp));
++
++			cp.handle = 0;
++			bacpy(&cp.bdaddr, &random_addr);
++
++			hci_req_add(req,
++				    HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
++				    sizeof(cp), &cp);
++		}
++
+ 		__hci_req_enable_ext_advertising(req);
+ 	} else {
+ 		struct hci_cp_le_set_adv_param cp;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 64268b6..e71db15 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1092,6 +1092,26 @@ static void hci_cc_le_set_default_phy(struct hci_dev *hdev, struct sk_buff *skb)
+ 			hci_dev_set_flag(hdev, HCI_LE_PHY_CODED_RX);
+ 	}
+ 
++        hci_dev_unlock(hdev);
++}
++
++static void hci_cc_le_set_adv_set_random_addr(struct hci_dev *hdev,
++                                              struct sk_buff *skb)
++{
++        __u8 status = *((__u8 *) skb->data);
++        struct hci_cp_le_set_adv_set_rand_addr *cp;
++
++	if (status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADV_SET_RAND_ADDR);
++	if (!cp)
++		return;
++
++	hci_dev_lock(hdev);
++
++	bacpy(&hdev->random_addr, &cp->bdaddr);
++
+ 	hci_dev_unlock(hdev);
+ }
+ 
+@@ -3303,6 +3323,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_le_set_ext_adv_enable(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_SET_ADV_SET_RAND_ADDR:
++		hci_cc_le_set_adv_set_random_addr(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
+ 		break;
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 6825a65..0a8ac3e 100644
+index 7051c5b..6825a65 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -1522,6 +1522,7 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- 	bdaddr_t random_addr;
- 	u8 own_addr_type;
- 	int err;
-+	bool secondary_adv;
+@@ -1427,6 +1427,87 @@ static void adv_timeout_expire(struct work_struct *work)
+ 	hci_dev_unlock(hdev);
+ }
+ 
++int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
++			   bool use_rpa, u8 *own_addr_type, bdaddr_t *rand_addr)
++{
++	int err;
++
++	bacpy(rand_addr, BDADDR_ANY);
++
++	/* If privacy is enabled use a resolvable private address. If
++	 * current RPA has expired then generate a new one.
++	 */
++	if (use_rpa) {
++		*own_addr_type = ADDR_LE_DEV_RANDOM;
++
++		if (!hci_dev_test_and_clear_flag(hdev, HCI_RPA_EXPIRED) &&
++		    !bacmp(&hdev->random_addr, &hdev->rpa))
++			return 0;
++
++		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
++		if (err < 0) {
++			BT_ERR("%s failed to generate new RPA", hdev->name);
++			return err;
++		}
++
++		bacpy(rand_addr, &hdev->rpa);
++
++		return 0;
++	}
++
++	/* In case of required privacy without resolvable private address,
++	 * use an non-resolvable private address. This is useful for active
++	 * scanning and non-connectable advertising.
++	 */
++	if (require_privacy) {
++		bdaddr_t nrpa;
++
++		while (true) {
++			/* The non-resolvable private address is generated
++			 * from random six bytes with the two most significant
++			 * bits cleared.
++			 */
++			get_random_bytes(&nrpa, 6);
++			nrpa.b[5] &= 0x3f;
++
++			/* The non-resolvable private address shall not be
++			 * equal to the public address.
++			 */
++			if (bacmp(&hdev->bdaddr, &nrpa))
++				break;
++		}
++
++		*own_addr_type = ADDR_LE_DEV_RANDOM;
++		bacpy(rand_addr, &nrpa);
++
++		return 0;
++	}
++
++	/* If forcing static address is in use or there is no public
++	 * address use the static address as random address
++	 *
++	 * In case BR/EDR has been disabled on a dual-mode controller
++	 * and a static address has been configured, then use that
++	 * address instead of the public BR/EDR address.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR) ||
++	    !bacmp(&hdev->bdaddr, BDADDR_ANY) ||
++	    (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED) &&
++	     bacmp(&hdev->static_addr, BDADDR_ANY))) {
++		*own_addr_type = ADDR_LE_DEV_RANDOM;
++		bacpy(rand_addr, &hdev->static_addr);
++
++		return 0;
++	}
++
++	/* Neither privacy nor static address is being used so use a
++	 * public address.
++	 */
++	*own_addr_type = ADDR_LE_DEV_PUBLIC;
++
++	return 0;
++}
++
+ void __hci_req_clear_ext_adv_sets(struct hci_request *req)
+ {
+ 	hci_req_add(req, HCI_OP_LE_REMOVE_ADV_SET, 0, NULL);
+@@ -1438,6 +1519,9 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	struct hci_dev *hdev = req->hdev;
+ 	bool connectable;
+ 	u32 flags;
++	bdaddr_t random_addr;
++	u8 own_addr_type;
++	int err;
  	/* In ext adv set param interval is 3 octets */
  	const u8 adv_interval[3] = { 0x00, 0x08, 0x00 };
  
-@@ -1551,20 +1552,42 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- 	memcpy(cp.min_interval, adv_interval, sizeof(cp.min_interval));
- 	memcpy(cp.max_interval, adv_interval, sizeof(cp.max_interval));
+@@ -1452,6 +1536,16 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	 if (!is_advertising_allowed(hdev, connectable))
+ 		return -EPERM;
  
--	if (connectable)
--		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
--	else if (get_adv_instance_scan_rsp_len(hdev, instance))
--		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_SCAN_IND);
--	else
--		cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
-+	secondary_adv = (flags & MGMT_ADV_FLAG_SEC_MASK);
++	/* Set require_privacy to true only when non-connectable
++	 * advertising is used. In that case it is fine to use a
++	 * non-resolvable private address.
++	 */
++	err = hci_get_random_address(hdev, !connectable,
++				     adv_use_rpa(hdev, flags),
++				     &own_addr_type, &random_addr);
++	if (err < 0)
++		return err;
 +
-+	if (connectable) {
-+		if (secondary_adv)
-+			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_CONN_IND);
-+		else
-+			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
-+	} else if (get_adv_instance_scan_rsp_len(hdev, instance)) {
-+		if (secondary_adv)
-+			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_SCAN_IND);
-+		else
-+			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_SCAN_IND);
-+	} else {
-+		if (secondary_adv)
-+			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_NON_CONN_IND);
-+		else
-+			cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
-+	}
+ 	memset(&cp, 0, sizeof(cp));
  
- 	cp.own_addr_type = own_addr_type;
+ 	memcpy(cp.min_interval, adv_interval, sizeof(cp.min_interval));
+@@ -1464,7 +1558,7 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	else
+ 		cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
+ 
+-	cp.own_addr_type = BDADDR_LE_PUBLIC;
++	cp.own_addr_type = own_addr_type;
  	cp.channel_map = hdev->le_adv_channel_map;
  	cp.tx_power = 127;
--	cp.primary_phy = HCI_ADV_PHY_1M;
--	cp.secondary_phy = HCI_ADV_PHY_1M;
- 	cp.handle = 0;
+ 	cp.primary_phy = HCI_ADV_PHY_1M;
+@@ -1473,6 +1567,21 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
  
-+	if (flags & MGMT_ADV_FLAG_SEC_2M) {
-+		cp.primary_phy = HCI_ADV_PHY_1M;
-+		cp.secondary_phy = HCI_ADV_PHY_2M;
-+	} else if (flags & MGMT_ADV_FLAG_SEC_CODED) {
-+		cp.primary_phy = HCI_ADV_PHY_CODED;
-+		cp.secondary_phy = HCI_ADV_PHY_CODED;
-+	} else {
-+		/* In all other cases use 1M */
-+		cp.primary_phy = HCI_ADV_PHY_1M;
-+		cp.secondary_phy = HCI_ADV_PHY_1M;
-+	}
-+
  	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
  
- 	if (own_addr_type == ADDR_LE_DEV_RANDOM &&
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c121f1e..67a581a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6356,6 +6356,16 @@ static u32 get_supported_adv_flags(struct hci_dev *hdev)
- 	    ext_adv_capable(hdev))
- 		flags |= MGMT_ADV_FLAG_TX_POWER;
- 
-+	if (ext_adv_capable(hdev)) {
-+		flags |= MGMT_ADV_FLAG_SEC_1M;
++	if (own_addr_type == ADDR_LE_DEV_RANDOM &&
++	    bacmp(&random_addr, BDADDR_ANY) &&
++	    bacmp(&random_addr, &hdev->random_addr)) {
++		struct hci_cp_le_set_adv_set_rand_addr cp;
 +
-+		if (hdev->le_features[1] & HCI_LE_PHY_2M)
-+			flags |= MGMT_ADV_FLAG_SEC_2M;
++		memset(&cp, 0, sizeof(cp));
 +
-+		if (hdev->le_features[1] & HCI_LE_PHY_CODED)
-+			flags |= MGMT_ADV_FLAG_SEC_CODED;
++		cp.handle = 0;
++		bacpy(&cp.bdaddr, &random_addr);
++
++		hci_req_add(req,
++			    HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
++			    sizeof(cp), &cp);
 +	}
 +
- 	return flags;
+ 	return 0;
  }
  
-@@ -6561,7 +6571,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 	struct mgmt_cp_add_advertising *cp = data;
- 	struct mgmt_rp_add_advertising rp;
- 	u32 flags;
--	u32 supported_flags;
-+	u32 supported_flags, phy_flags;
- 	u8 status;
- 	u16 timeout, duration;
- 	unsigned int prev_instance_cnt = hdev->adv_instance_cnt;
-@@ -6591,10 +6601,12 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 	duration = __le16_to_cpu(cp->duration);
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 2451861..5329faf 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -84,6 +84,9 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
+ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
+ void __hci_req_enable_ext_advertising(struct hci_request *req);
+ void __hci_req_clear_ext_adv_sets(struct hci_request *req);
++int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
++			   bool use_rpa, u8 *own_addr_type,
++			   bdaddr_t *rand_addr);
  
- 	/* The current implementation only supports a subset of the specified
--	 * flags.
-+	 * flags. Also need to check mutual exclusiveness of sec flags.
- 	 */
- 	supported_flags = get_supported_adv_flags(hdev);
--	if (flags & ~supported_flags)
-+	phy_flags = flags & MGMT_ADV_FLAG_SEC_MASK;
-+	if (flags & ~supported_flags ||
-+	    ((phy_flags && (phy_flags ^ (phy_flags & -phy_flags)))))
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
- 				       MGMT_STATUS_INVALID_PARAMS);
+ void __hci_req_update_class(struct hci_request *req);
  
 -- 
 2.7.4
