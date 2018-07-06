@@ -3,283 +3,212 @@ From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH BlueZ 7/8] mgmt-tester: Add tests for extended scanning and device found
-Date: Fri,  6 Jul 2018 16:58:04 +0530
-Message-Id: <1530876485-17218-8-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH BlueZ 6/8] mgmt-tester: Add PHY Configuration test cases
+Date: Fri,  6 Jul 2018 16:58:03 +0530
+Message-Id: <1530876485-17218-7-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1530876485-17218-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1530876485-17218-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/mgmt-tester.c | 245 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 245 insertions(+)
+ tools/mgmt-tester.c | 181 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 181 insertions(+)
 
 diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 20d939f..d4ebdb6 100644
+index 0136b93..20d939f 100644
 --- a/tools/mgmt-tester.c
 +++ b/tools/mgmt-tester.c
-@@ -8375,6 +8375,206 @@ static const struct generic_data set_phy_invalid_param = {
- 	.expect_status = MGMT_STATUS_INVALID_PARAMS,
+@@ -8216,6 +8216,166 @@ static const struct generic_data add_ext_advertising_conn_off_1m = {
+ 	.expect_hci_len = sizeof(set_connectable_off_ext_1m_adv_param),
  };
  
-+static const char start_discovery_valid_ext_scan_enable[] = {
-+	0x01,
-+	0x01,
-+	0x00, 0x00,
-+	0x00, 0x00
++static const uint8_t get_phy_param[] = {
++	0xff, 0x7f, 0x00, 0x00,	/* All PHYs */
++	0xfe, 0x79,	0x00, 0x00, /* All PHYs except BR 1M 1SLOT, LE 1M TX & LE 1M RX */
++	0xff, 0x07, 0x00, 0x00, /* All BREDR PHYs and LE 1M TX & LE 1M RX */
 +};
 +
-+static const struct generic_data start_discovery_bredrle_ext_scan_enable = {
++static const struct generic_data get_phy_success = {
 +	.setup_settings = settings_powered_le,
-+	.send_opcode = MGMT_OP_START_DISCOVERY,
-+	.send_param = start_discovery_bredrle_param,
-+	.send_len = sizeof(start_discovery_bredrle_param),
++	.send_opcode = MGMT_OP_GET_PHY_CONFIGURATION,
 +	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_discovery_bredrle_param,
-+	.expect_len = sizeof(start_discovery_bredrle_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE,
-+	.expect_hci_param = start_discovery_valid_ext_scan_enable,
-+	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_enable),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = start_discovery_evt,
-+	.expect_alt_ev_len = sizeof(start_discovery_evt),
++	.expect_param = get_phy_param,
++	.expect_len = sizeof(get_phy_param),
 +};
 +
-+static const struct generic_data start_discovery_le_ext_scan_enable = {
++static const uint8_t set_phy_2m_param[] = {
++	0xff, 0x1f,	0x00, 0x00	/* 1mtxrx 2mtxrx */
++};
++
++static const uint8_t set_default_phy_2m_param[] = {
++	0x00, 		/* preference is there for tx and rx */
++	0x03,		/* 1mtx, 2mtx */
++	0x03,		/* 1mrx, 2mrx */
++};
++
++static const struct generic_data set_phy_2m_success = {
 +	.setup_settings = settings_powered_le,
-+	.send_opcode = MGMT_OP_START_DISCOVERY,
-+	.send_param = start_discovery_le_param,
-+	.send_len = sizeof(start_discovery_le_param),
++	.send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
++	.send_param = set_phy_2m_param,
++	.send_len = sizeof(set_phy_2m_param),
 +	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_discovery_le_param,
-+	.expect_len = sizeof(start_discovery_le_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE,
-+	.expect_hci_param = start_discovery_valid_ext_scan_enable,
-+	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_enable),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = start_discovery_le_evt,
-+	.expect_alt_ev_len = sizeof(start_discovery_le_evt),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_DEFAULT_PHY,
++	.expect_hci_param = set_default_phy_2m_param,
++	.expect_hci_len = sizeof(set_default_phy_2m_param),
++	.expect_alt_ev = MGMT_EV_PHY_CONFIGURATION_CHANGED,
++	.expect_alt_ev_param = set_phy_2m_param,
++	.expect_alt_ev_len = sizeof(set_phy_2m_param),
++	.expect_settings_set = MGMT_SETTING_PHY_CONFIGURATION,
 +};
 +
-+static const char start_discovery_valid_ext_scan_param[] = {
-+	0x01,			/* Own Addr type*/
-+	0x00,			/* Scan filter policy*/
-+	0x01,			/*Phys - 1m */
-+	0x01,			/* Type */
-+	0x12, 0x00,		/* Interval */
-+	0x12, 0x00,		/* Window */
++static const uint8_t set_phy_coded_param[] = {
++	0xff, 0x67,	0x00, 0x00	/* 1mtx, 1m rx, codedtx codedrx */
 +};
 +
-+static const struct generic_data start_discovery_le_ext_scan_param = {
++static const uint8_t set_default_phy_coded_param[] = {
++	0x00, 		/* preference is there for tx and rx */
++	0x05,		/* 1mtx, codedtx */
++	0x05,		/* 1mrx, codedrx */
++};
++
++static const struct generic_data set_phy_coded_success = {
 +	.setup_settings = settings_powered_le,
-+	.send_opcode = MGMT_OP_START_DISCOVERY,
-+	.send_param = start_discovery_le_param,
-+	.send_len = sizeof(start_discovery_le_param),
++	.send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
++	.send_param = set_phy_coded_param,
++	.send_len = sizeof(set_phy_coded_param),
 +	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_discovery_le_param,
-+	.expect_len = sizeof(start_discovery_le_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
-+	.expect_hci_param = start_discovery_valid_ext_scan_param,
-+	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_param),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = start_discovery_le_evt,
-+	.expect_alt_ev_len = sizeof(start_discovery_le_evt),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_DEFAULT_PHY,
++	.expect_hci_param = set_default_phy_coded_param,
++	.expect_hci_len = sizeof(set_default_phy_coded_param),
++	.expect_alt_ev = MGMT_EV_PHY_CONFIGURATION_CHANGED,
++	.expect_alt_ev_param = set_phy_coded_param,
++	.expect_alt_ev_len = sizeof(set_phy_coded_param),
++	.expect_settings_set = MGMT_SETTING_PHY_CONFIGURATION,
 +};
 +
-+static const char stop_discovery_valid_ext_scan_disable[] = {
++static const uint8_t set_phy_all_param[] = {
++	0xff, 0x7f,	0x00, 0x00	/* All PHYs */
++};
++
++static const uint8_t set_default_phy_all_param[] = {
++	0x00, 		/* preference is there for tx and rx */
++	0x07,		/* 1m 2m coded tx */
++	0x07,		/* 1m 2m coded rx */
++};
++
++static const struct generic_data set_phy_all_success = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
++	.send_param = set_phy_all_param,
++	.send_len = sizeof(set_phy_all_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_hci_command = BT_HCI_CMD_LE_SET_DEFAULT_PHY,
++	.expect_hci_param = set_default_phy_all_param,
++	.expect_hci_len = sizeof(set_default_phy_all_param),
++	.expect_alt_ev = MGMT_EV_PHY_CONFIGURATION_CHANGED,
++	.expect_alt_ev_param = set_phy_all_param,
++	.expect_alt_ev_len = sizeof(set_phy_all_param),
++	.expect_settings_set = MGMT_SETTING_PHY_CONFIGURATION,
++};
++
++static const uint8_t set_phy_2m_tx_param[] = {
++	0xff, 0x0f,	0x00, 0x00	/* 1mtxrx, 2m tx */
++};
++
++static const uint8_t set_default_phy_2m_tx_param[] = {
 +	0x00,
++	0x03,		/* 1m, 2m tx */
++	0x01,		/* 1m rx */
++};
++
++static const uint8_t set_phy_2m_tx_evt_param[] = {
++	0xff, 0x0f,	0x00, 0x00		/*  2m tx  1m rx */
++};
++
++static const struct generic_data set_phy_2m_tx_success = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
++	.send_param = set_phy_2m_tx_param,
++	.send_len = sizeof(set_phy_2m_tx_param),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_hci_command = BT_HCI_CMD_LE_SET_DEFAULT_PHY,
++	.expect_hci_param = set_default_phy_2m_tx_param,
++	.expect_hci_len = sizeof(set_default_phy_2m_tx_param),
++	.expect_alt_ev = MGMT_EV_PHY_CONFIGURATION_CHANGED,
++	.expect_alt_ev_param = set_phy_2m_tx_evt_param,
++	.expect_alt_ev_len = sizeof(set_phy_2m_tx_evt_param),
++	.expect_settings_set = MGMT_SETTING_PHY_CONFIGURATION,
++};
++
++static const uint8_t set_phy_2m_rx_param[] = {
++	0xff, 0x17,	0x00, 0x00	/* 1mtxrx, 2m rx */
++};
++
++static const uint8_t set_default_phy_2m_rx_param[] = {
 +	0x00,
-+	0x00, 0x00,
-+	0x00, 0x00
++	0x01,
++	0x03,		/* 2m rx */
 +};
 +
-+static const struct generic_data stop_discovery_le_ext_scan_disable = {
++static const uint8_t set_phy_2m_rx_evt_param[] = {
++	0xff, 0x17,	0x00, 0x00		/*  2m rx  1m tx */
++};
++
++static const struct generic_data set_phy_2m_rx_success = {
 +	.setup_settings = settings_powered_le,
-+	.setup_send_opcode = MGMT_OP_START_DISCOVERY,
-+	.setup_send_param = start_discovery_bredrle_param,
-+	.setup_send_len = sizeof(start_discovery_bredrle_param),
-+	.send_opcode = MGMT_OP_STOP_DISCOVERY,
-+	.send_param = stop_discovery_bredrle_param,
-+	.send_len = sizeof(stop_discovery_bredrle_param),
++	.send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
++	.send_param = set_phy_2m_rx_param,
++	.send_len = sizeof(set_phy_2m_rx_param),
 +	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = stop_discovery_bredrle_param,
-+	.expect_len = sizeof(stop_discovery_bredrle_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE,
-+	.expect_hci_param = stop_discovery_valid_ext_scan_disable,
-+	.expect_hci_len = sizeof(stop_discovery_valid_ext_scan_disable),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = stop_discovery_evt,
-+	.expect_alt_ev_len = sizeof(stop_discovery_evt),
++	.expect_hci_command = BT_HCI_CMD_LE_SET_DEFAULT_PHY,
++	.expect_hci_param = set_default_phy_2m_rx_param,
++	.expect_hci_len = sizeof(set_default_phy_2m_rx_param),
++	.expect_alt_ev = MGMT_EV_PHY_CONFIGURATION_CHANGED,
++	.expect_alt_ev_param = set_phy_2m_rx_evt_param,
++	.expect_alt_ev_len = sizeof(set_phy_2m_rx_evt_param),
++	.expect_settings_set = MGMT_SETTING_PHY_CONFIGURATION,
 +};
 +
-+static const struct generic_data start_discovery_le_2m_scan_param = {
++static const uint8_t set_phy_param_invalid[] = {
++	0x79, 0xfe,	0x00, 0x00	/* Set unconfigurable phy*/
++};
++
++static const struct generic_data set_phy_invalid_param = {
 +	.setup_settings = settings_powered_le,
-+	.setup_send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
-+	.setup_send_param = set_phy_2m_param,
-+	.setup_send_len = sizeof(set_phy_2m_param),
-+	.send_opcode = MGMT_OP_START_DISCOVERY,
-+	.send_param = start_discovery_bredrle_param,
-+	.send_len = sizeof(start_discovery_bredrle_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_discovery_bredrle_param,
-+	.expect_len = sizeof(start_discovery_bredrle_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
-+	.expect_hci_param = start_discovery_valid_ext_scan_param,
-+	.expect_hci_len = sizeof(start_discovery_valid_ext_scan_param),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = start_discovery_evt,
-+	.expect_alt_ev_len = sizeof(start_discovery_evt),
++	.send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
++	.send_param = set_phy_param_invalid,
++	.send_len = sizeof(set_phy_param_invalid),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
 +};
 +
-+static const char start_discovery_valid_coded_scan_param[] = {
-+	0x01,			/* Own Addr type*/
-+	0x00,			/* Scan filter policy*/
-+	0x05,			/*Phys - 1m & coded */
-+	0x01,			/* Type */
-+	0x12, 0x00,		/* Interval */
-+	0x12, 0x00,		/* Window */
-+	0x01,			/* Type */
-+	0x12, 0x00,		/* Interval */
-+	0x12, 0x00,		/* Window */
-+};
 +
-+static const struct generic_data start_discovery_le_coded_scan_param = {
-+	.setup_settings = settings_powered_le,
-+	.setup_send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
-+	.setup_send_param = set_phy_coded_param,
-+	.setup_send_len = sizeof(set_phy_coded_param),
-+	.send_opcode = MGMT_OP_START_DISCOVERY,
-+	.send_param = start_discovery_bredrle_param,
-+	.send_len = sizeof(start_discovery_bredrle_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_discovery_bredrle_param,
-+	.expect_len = sizeof(start_discovery_bredrle_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
-+	.expect_hci_param = start_discovery_valid_coded_scan_param,
-+	.expect_hci_len = sizeof(start_discovery_valid_coded_scan_param),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = start_discovery_evt,
-+	.expect_alt_ev_len = sizeof(start_discovery_evt),
-+};
-+
-+static const char start_discovery_valid_1m_2m_coded_scan_param[] = {
-+	0x01,			/* Own Addr type*/
-+	0x00,			/* Scan filter policy*/
-+	0x05,			/*Phys - 1m, coded */
-+	0x01,			/* Type */
-+	0x12, 0x00,		/* Interval */
-+	0x12, 0x00,		/* Window */
-+	0x01,			/* Type */
-+	0x12, 0x00,		/* Interval */
-+	0x12, 0x00,		/* Window */
-+};
-+
-+static const struct generic_data start_discovery_le_1m_coded_scan_param = {
-+	.setup_settings = settings_powered_le,
-+	.setup_send_opcode = MGMT_OP_SET_PHY_CONFIGURATION,
-+	.setup_send_param = set_phy_all_param,
-+	.setup_send_len = sizeof(set_phy_all_param),
-+	.send_opcode = MGMT_OP_START_DISCOVERY,
-+	.send_param = start_discovery_bredrle_param,
-+	.send_len = sizeof(start_discovery_bredrle_param),
-+	.expect_status = MGMT_STATUS_SUCCESS,
-+	.expect_param = start_discovery_bredrle_param,
-+	.expect_len = sizeof(start_discovery_bredrle_param),
-+	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS,
-+	.expect_hci_param = start_discovery_valid_1m_2m_coded_scan_param,
-+	.expect_hci_len = sizeof(start_discovery_valid_1m_2m_coded_scan_param),
-+	.expect_alt_ev = MGMT_EV_DISCOVERING,
-+	.expect_alt_ev_param = start_discovery_evt,
-+	.expect_alt_ev_len = sizeof(start_discovery_evt),
-+};
-+
-+static void set_phy_callback(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		tester_setup_failed();
-+		return;
-+	}
-+
-+	tester_print("Set PHY Success");
-+
-+	tester_setup_complete();
-+}
-+
-+static void setup_phy_configuration(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct generic_data *test = data->test_data;
-+	const void *send_param = test->setup_send_param;
-+	uint16_t send_len = test->setup_send_len;
-+	unsigned int id;
-+
-+	id = mgmt_register(data->mgmt, MGMT_EV_DISCOVERING, data->mgmt_index,
-+			   discovering_event, NULL, NULL);
-+	data->mgmt_discov_ev_id = id;
-+
-+	mgmt_send(data->mgmt, test->setup_send_opcode, data->mgmt_index,
-+				send_len, send_param, set_phy_callback,
-+				NULL, NULL);
-+}
- 
  static bool power_off(uint16_t index)
  {
-@@ -8502,6 +8702,12 @@ static void trigger_device_found(void *user_data)
- 							test->adv_data_len);
+ 	int sk, err;
+@@ -9958,5 +10118,26 @@ int main(int argc, char *argv[])
+ 					setup_add_advertising_duration,
+ 					test_command_generic, 3);
  
- 		bthost_set_adv_enable(bthost, 0x01);
-+	} else if (data->hciemu_type == HCIEMU_TYPE_BREDRLE50) {
-+		if (test->set_adv)
-+			bthost_set_ext_adv_data(bthost, test->adv_data,
-+							test->adv_data_len);
++	test_bredrle50("Get PHY Success", &get_phy_success,
++					NULL, test_command_generic);
 +
-+		bthost_set_ext_adv_enable(bthost, 0x01);
- 	}
- 
- 	if (data->hciemu_type != HCIEMU_TYPE_LE)
-@@ -10139,5 +10345,44 @@ int main(int argc, char *argv[])
- 	test_bredrle50("Set PHY Invalid Param", &set_phy_invalid_param,
- 					NULL, test_command_generic);
- 
-+	test_bredrle50("Start Discovery BREDR LE - (Ext Scan Enable)",
-+					&start_discovery_bredrle_ext_scan_enable,
-+					NULL,
-+					test_command_generic);
++	test_bredrle50("Set PHY 2m Success", &set_phy_2m_success,
++					NULL, test_command_generic);
 +
-+	test_bredrle50("Start Discovery LE - (Ext Scan Enable)",
-+					&start_discovery_le_ext_scan_enable,
-+					NULL,
-+					test_command_generic);
++	test_bredrle50("Set PHY coded Succcess", &set_phy_coded_success,
++					NULL, test_command_generic);
 +
-+	test_bredrle50("Start Discovery LE - (Ext Scan Param)",
-+					&start_discovery_le_ext_scan_param,
-+					NULL,
-+					test_command_generic);
++	test_bredrle50("Set PHY 1m 2m coded Succcess", &set_phy_all_success,
++                                        NULL, test_command_generic);
 +
-+	test_bredrle50("Stop Discovery - (Ext Scan Disable)",
-+				&stop_discovery_le_ext_scan_disable,
-+				setup_start_discovery, test_command_generic);
++	test_bredrle50("Set PHY 2m tx success", &set_phy_2m_tx_success,
++					NULL, test_command_generic);
 +
-+	test_bredrle50("Start Discovery - (2m, Scan Param)",
-+				&start_discovery_le_2m_scan_param,
-+				setup_phy_configuration, test_command_generic);
++	test_bredrle50("Set PHY 2m rx success", &set_phy_2m_rx_success,
++					NULL, test_command_generic);
 +
-+	test_bredrle50("Start Discovery - (coded, Scan Param)",
-+				&start_discovery_le_coded_scan_param,
-+				setup_phy_configuration, test_command_generic);
-+
-+	test_bredrle50("Start Discovery - (1m, 2m, coded, Scan Param)",
-+				&start_discovery_le_1m_coded_scan_param,
-+				setup_phy_configuration, test_command_generic);
-+
-+	test_bredrle50("Ext Device Found - Advertising data - Zero padded",
-+				&device_found_gtag,
-+				NULL, test_device_found);
-+
-+	test_bredrle50("Ext Device Found - Advertising data - Invalid field",
-+				&device_found_invalid_field,
-+				NULL, test_device_found);
++	test_bredrle50("Set PHY Invalid Param", &set_phy_invalid_param,
++					NULL, test_command_generic);
 +
  	return tester_run();
  }
