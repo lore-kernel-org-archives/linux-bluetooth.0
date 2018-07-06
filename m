@@ -1,148 +1,29 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Brian Gix <brian.gix@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-        inga.stotland@intel.com, Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v5 00/14] Bluetooth Mesh Daemon
-Date: Fri,  6 Jul 2018 10:12:52 -0700
-Message-Id: <20180706171306.13501-1-brian.gix@intel.com>
+Date: Fri, 06 Jul 2018 09:34:01 -0400
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From: David Krauser <david@krauser.org>
+Reply-To: David Krauser <david@krauser.org>
+Subject: Re: Determine ATT MTU size over DBUS
+Message-ID: <ItIsS0qSiQBRm_d46ZW0jZvAxB9WABzkpJdr_ec5aYdLGTqb6S7s0ce8Z99SNylPJryv9oUnUgZDsDRBw5UjvPScF0QP4V5SWQmlUv14b7A=@krauser.org>
+In-Reply-To: <5401E5CE-7C2B-44D6-BF62-C98AC634F490@holtmann.org>
+References: <Vd5Hg1KzgalysaxK8wZu5wyXhzrIeNpwpHrqD6JzDGdK6926uwNchApKq9lnhrOPr7Y6Xb0Cgzzu-vWt8lvB-JRRxXhAmSPzjikGfg5kkSc=@krauser.org>
+ <CABBYNZLHGQdpgZUGxaxhtWBG309WB9MVOXQxdRBWeMW+XuARBg@mail.gmail.com>
+ <-JmTPP9qq2ljmysdKs_4nDqzQMZH4NMScqdEFmY7eo4Eu5GDniGqk-lMiLXCo7O1RZgB4BI_UsKZS0KdET69HZksuaRIKE_0mrQJS885K-M=@krauser.org>
+ <2X21xsgg8bEyTVVoBik7GT2JM5chtujJdSSpMBd-J7xIRMuRPqnF8Or25Al9oNj5R08x57BAEhkOUdT1-8FEmtoGVKXOB7X1DTlLztKep-8=@krauser.org>
+ <5401E5CE-7C2B-44D6-BF62-C98AC634F490@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Version 5 of this patch-set conforms to the new layout under a single
-flat mesh directory, after the reclassification of meshctl as a tool.
+Hi Marcel,
 
-Otherwise:
-This is our starting point for creating a stand-alone Mesh Daemon.
+On July 6, 2018 6:25 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> I prefer "mtu" as option name here. We kept them all lowercase. Other opt=
+ion is to use "max-transfer-unit".
 
-The Mesh Daemon (meshd) is intended to eventually co-exist beside the
-Bluetooth Daemon (bluetoothd), and either daemon may exist without the
-other. The Mesh Daemon will need full control/ownership of a
-BT Controller that supports at least Core Spec revision 4.0 or
-greater.  It works strictly over the Advertising bearer, but we
-have plans to extend it to support Mesh Proxy Server over GATT, at
-which point it will require support from bluetoothd.
+I agree; however, the AcquireWrite and AcquireNotify already provide "MTU" =
+as an option, and I figured it'd be better to be consistent with those. I c=
+ould change those to be lowercase, but don't want to break existing users.
 
-The current meshd, and it's companion Non-Background Command-line
-version btmesh, exists fully within user-space, but requires an
-HCI_USER socket to the kernel controler, and currently requires root
-privledges.
-
-This initial revision is intended to operate as a standard
-(non-provisioner) node.  It includes the Configuration Server model,
-and if it cannot find it's Mesh Configuration, will look for it's
-Composition data, and start up as unprovisioned, and accept an
-incoming PB-ADV provisioning session.
-
-Two of us (Inga and Brian) have been working on this, and will be
-the initial supporters and maintainers, and we gladly invite other
-interested parties to participate.
-
-Brian Gix (7):
-  mesh: Shared private meshd interfaces
-  mesh: Mesh crypto support
-  mesh: Infrastructure for Mesh daemon
-  mesh: Initial Mesh Friendship support
-  mesh: Provisioning logic for mesh
-  mesh: Upper and Lower mesh transport
-  mesh: Add Accessors to Transport layer data
-
-Inga Stotland (7):
-  mesh: Header files for mesh access layer and utilities
-  mesh: Source files for mesh access layer and utilities
-  mesh: Source code for handling access layer mux/demux
-  mesh: Mesh config server model
-  mesh: Read and write mesh configuration in JSON format
-  mesh: Sample device composition in JSON format
-  Makefile for meshd
-
- Makefile.am                  |    1 +
- Makefile.mesh                |   44 +
- mesh/agent.c                 |  229 +++
- mesh/agent.h                 |   42 +
- mesh/appkey.c                |  536 ++++++
- mesh/appkey.h                |   43 +
- mesh/btmesh.c                |  176 ++
- mesh/cfgmod-server.c         | 1194 ++++++++++++
- mesh/cfgmod.h                |   98 +
- mesh/config/composition.json |   44 +
- mesh/crypto.c                | 1607 ++++++++++++++++
- mesh/crypto.h                |  163 ++
- mesh/display.c               |   67 +
- mesh/display.h               |   28 +
- mesh/friend.c                | 1116 +++++++++++
- mesh/friend.h                |   57 +
- mesh/hci.c                   |  699 +++++++
- mesh/hci.h                   |   56 +
- mesh/main.c                  |  174 ++
- mesh/mesh-db.c               | 1360 ++++++++++++++
- mesh/mesh-db.h               |  144 ++
- mesh/mesh-defs.h             |   84 +
- mesh/mesh-io-api.h           |   58 +
- mesh/mesh-io-generic.c       |  660 +++++++
- mesh/mesh-io-generic.h       |   20 +
- mesh/mesh-io.c               |  187 ++
- mesh/mesh-io.h               |   99 +
- mesh/mesh.c                  |  184 ++
- mesh/mesh.h                  |   32 +
- mesh/model.c                 | 1274 +++++++++++++
- mesh/model.h                 |  146 ++
- mesh/net.c                   | 4188 ++++++++++++++++++++++++++++++++++++++++++
- mesh/net.h                   |  392 ++++
- mesh/node.c                  |  851 +++++++++
- mesh/node.h                  |   80 +
- mesh/prov.c                  |  722 ++++++++
- mesh/prov.h                  |  162 ++
- mesh/provision.c             | 1159 ++++++++++++
- mesh/provision.h             |   30 +
- mesh/storage.c               |  672 +++++++
- mesh/storage.h               |   51 +
- mesh/util.c                  |   71 +
- mesh/util.h                  |   24 +
- 43 files changed, 19024 insertions(+)
- create mode 100644 Makefile.mesh
- create mode 100644 mesh/agent.c
- create mode 100644 mesh/agent.h
- create mode 100644 mesh/appkey.c
- create mode 100644 mesh/appkey.h
- create mode 100644 mesh/btmesh.c
- create mode 100644 mesh/cfgmod-server.c
- create mode 100644 mesh/cfgmod.h
- create mode 100644 mesh/config/composition.json
- create mode 100644 mesh/crypto.c
- create mode 100644 mesh/crypto.h
- create mode 100644 mesh/display.c
- create mode 100644 mesh/display.h
- create mode 100644 mesh/friend.c
- create mode 100644 mesh/friend.h
- create mode 100644 mesh/hci.c
- create mode 100644 mesh/hci.h
- create mode 100644 mesh/main.c
- create mode 100644 mesh/mesh-db.c
- create mode 100644 mesh/mesh-db.h
- create mode 100644 mesh/mesh-defs.h
- create mode 100644 mesh/mesh-io-api.h
- create mode 100644 mesh/mesh-io-generic.c
- create mode 100644 mesh/mesh-io-generic.h
- create mode 100644 mesh/mesh-io.c
- create mode 100644 mesh/mesh-io.h
- create mode 100644 mesh/mesh.c
- create mode 100644 mesh/mesh.h
- create mode 100644 mesh/model.c
- create mode 100644 mesh/model.h
- create mode 100644 mesh/net.c
- create mode 100644 mesh/net.h
- create mode 100644 mesh/node.c
- create mode 100644 mesh/node.h
- create mode 100644 mesh/prov.c
- create mode 100644 mesh/prov.h
- create mode 100644 mesh/provision.c
- create mode 100644 mesh/provision.h
- create mode 100644 mesh/storage.c
- create mode 100644 mesh/storage.h
- create mode 100644 mesh/util.c
- create mode 100644 mesh/util.h
-
--- 
-2.14.4
-
+- dk
