@@ -1,31 +1,34 @@
-Return-Path: <jaganath.k.os@gmail.com>
-From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH BlueZ 0/8] Add BREDR PHYs in PHY configuration commands
-Date: Fri,  6 Jul 2018 16:57:57 +0530
-Message-Id: <1530876485-17218-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
+Subject: Re: [PATCH BlueZ 0/2] Directory re-org for meshctl tool
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180622063200.7394-1-inga.stotland@intel.com>
+Date: Fri, 6 Jul 2018 13:05:08 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+        Inga Stotland <inga.stotland@intel.com>
+Message-Id: <570536D2-06CA-4D34-A7FC-4E9EA6F03ECB@holtmann.org>
+References: <20180622063200.7394-1-inga.stotland@intel.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This also has mgmt-tester patches for 5.0 implementation
+Hi Inga,
 
-Jaganath Kanakkassery (8):
-  monitor: Fix 2-DH5 packet type print
-  btmgmt: Add BREDR PHYs in PHY Configuration commands
-  monitor: Add BREDR PHYs in PHY configuration commands
-  emulator: Add BREDR 2M & 3M, 3 & 5 Slot packet type support
-  mgmt-tester: Add extended advertising test cases
-  mgmt-tester: Add PHY Configuration test cases
-  mgmt-tester: Add tests for extended scanning and device found
-  mgmt-tester: Add support ext create connection and enh conn complete
+> This set of patches moves mechctl tool code from under bluez/mesh
+> into tools directory.
+> 
+> mesh directory will be re-established with the implementation of mesh
+> daemon.
+> 
+> Inga Stotland (2):
+>  tools: Move meshctl tool under tools directory
+>  tools: Move meshctl sources under tools/mesh directory
 
- emulator/btdev.c    |   10 +
- lib/mgmt.h          |   32 +-
- monitor/packet.c    |   41 +-
- tools/btmgmt.c      |   62 +-
- tools/mgmt-tester.c | 2255 ++++++++++++++++++++++++++++++++++++++++++++++++---
- 5 files changed, 2248 insertions(+), 152 deletions(-)
+both patches have been applied.
 
--- 
-2.7.4
+Regards
+
+Marcel
+
