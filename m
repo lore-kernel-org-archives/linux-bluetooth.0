@@ -1,33 +1,27 @@
-Return-Path: <brian.gix@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	inga.stotland@intel.com
-Subject: [PATCH BlueZ v6 12/14] mesh: Read and write mesh configuration in JSON format
-Date: Mon,  9 Jul 2018 11:32:09 -0700
-Message-Id: <20180709183211.16588-13-brian.gix@intel.com>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+        inga.stotland@intel.com, Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ v6 04/14] mesh: Initial Mesh Friendship support
+Date: Mon,  9 Jul 2018 11:32:01 -0700
+Message-Id: <20180709183211.16588-5-brian.gix@intel.com>
 In-Reply-To: <20180709183211.16588-1-brian.gix@intel.com>
 References: <20180709183211.16588-1-brian.gix@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Inga Stotland <inga.stotland@intel.com>
-
-This adds implementation for parsing and writing Mesh configuration
-into JSON format. Also, parse stored unprovisioned device composiotion.
 ---
- mesh/mesh-db.c | 1360 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- mesh/mesh-db.h |  144 ++++++
- 2 files changed, 1504 insertions(+)
- create mode 100644 mesh/mesh-db.c
- create mode 100644 mesh/mesh-db.h
+ mesh/friend.c | 1116 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 1116 insertions(+)
+ create mode 100644 mesh/friend.c
 
-diff --git a/mesh/mesh-db.c b/mesh/mesh-db.c
+diff --git a/mesh/friend.c b/mesh/friend.c
 new file mode 100644
-index 000000000..7bddab010
+index 000000000..5a4088ef1
 --- /dev/null
-+++ b/mesh/mesh-db.c
-@@ -0,0 +1,1360 @@
++++ b/mesh/friend.c
+@@ -0,0 +1,1116 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -44,7 +38,6 @@ index 000000000..7bddab010
 + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
 + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 + *  Lesser General Public License for more details.
-+ *
 + *
 + */
 +
@@ -52,1491 +45,1099 @@ index 000000000..7bddab010
 +#include <config.h>
 +#endif
 +
-+#include <errno.h>
-+#include <stdbool.h>
++#include <unistd.h>
 +#include <stdio.h>
-+#include <string.h>
-+
++#include <sys/time.h>
 +#include <ell/ell.h>
 +
 +#include "mesh/mesh-defs.h"
-+#include "mesh/util.h"
 +
-+#include "mesh/mesh-db.h"
++#include "mesh/mesh.h"
++#include "mesh/node.h"
++#include "mesh/net.h"
++#include "mesh/crypto.h"
++#include "mesh/model.h"
++#include "mesh/display.h"
 +
-+#define CHECK_KEY_IDX_RANGE(x) (((x) >= 0) && ((x) <= 4095))
++#include "mesh/friend.h"
 +
-+static bool get_int(json_object *jobj, const char *keyword, int *value)
++#define MAX_FRND_GROUPS		20
++#define FRND_RELAY_WINDOW	250		/* 250 ms */
++#define FRND_CACHE_SIZE		16
++#define FRND_SUB_LIST_SIZE	8
++
++#define RESPONSE_DELAY		(100 - 12)	/*  100  ms - 12ms hw delay */
++#define MIN_RESP_DELAY		10		/*   10  ms */
++#define MAX_RESP_DELAY		255		/*  255  ms */
++
++/* Absolute maximum time to wait for LPN to choose us. */
++#define RESPONSE_POLL_DELAY	1300		/* 1.300  s */
++
++static uint8_t frnd_relay_window = FRND_RELAY_WINDOW;
++static uint8_t frnd_cache_size = FRND_CACHE_SIZE;
++static uint8_t frnd_sublist_size = FRND_SUB_LIST_SIZE;
++
++struct frnd_negotiation {
++	struct l_timeout	*timeout;
++	struct mesh_net		*net;
++	struct mesh_key_set	key_set;
++	uint32_t		poll_timeout;
++	uint16_t		low_power_node;
++	uint16_t		old_relay;
++	uint8_t			num_ele;
++	uint8_t			lp_cnt;
++	uint8_t			fn_cnt;
++	uint8_t			wrfrw;
++	uint8_t			receive_delay;
++	int8_t			rssi;
++	bool			clearing;
++};
++
++static struct l_queue *frnd_negotiations;
++static uint16_t counter;
++
++static void response_timeout(struct l_timeout *timeout, void *user_data)
 +{
-+	json_object *jvalue;
++	struct frnd_negotiation *neg = user_data;
 +
-+	if (!json_object_object_get_ex(jobj, keyword, &jvalue))
-+		return false;
++	/* LPN did not choose us */
++	l_info("Did not win negotiation for %4.4x", neg->low_power_node);
 +
-+	*value = json_object_get_int(jvalue);
-+	if (errno == EINVAL)
-+		return false;
-+
-+	return true;
++	mesh_net_remove_keyset(neg->net, &neg->key_set);
++	l_queue_remove(frnd_negotiations, neg);
++	l_timeout_remove(timeout);
++	l_free(neg);
 +}
 +
-+static bool add_key(json_object *jobject, const char *desc,
-+					const uint8_t key[16])
++static void response_delay(struct l_timeout *timeout, void *user_data)
 +{
-+	json_object *jstring;
-+	char hexstr[33];
-+
-+	hex2str((uint8_t *) key, 16, hexstr, 33);
-+	jstring = json_object_new_string(hexstr);
-+	if (!jstring)
-+		return false;
-+
-+	json_object_object_add(jobject, desc, jstring);
-+	return true;
-+}
-+
-+static json_object *get_element_model(json_object *jnode, int ele_idx,
-+						uint32_t mod_id, bool vendor)
-+{
-+	json_object *jelements, *jelement, *jmodels;
-+	int i, num_mods;
-+	size_t len;
-+	char buf[9];
-+
-+	if (!vendor)
-+		snprintf(buf, 5, "%4.4x", (uint16_t)mod_id);
-+	else
-+		snprintf(buf, 9, "%8.8x", mod_id);
-+
-+	json_object_object_get_ex(jnode, "elements", &jelements);
-+	if (!jelements)
-+		return NULL;
-+
-+	jelement = json_object_array_get_idx(jelements, ele_idx);
-+	if (!jelement)
-+		return NULL;
-+
-+	json_object_object_get_ex(jelement, "models", &jmodels);
-+	if (!jmodels)
-+		return NULL;
-+
-+	num_mods = json_object_array_length(jmodels);
-+	if (!num_mods)
-+		return NULL;
-+
-+	if (!vendor) {
-+		snprintf(buf, 5, "%4.4x", mod_id);
-+		len = 4;
-+	} else {
-+		snprintf(buf, 9, "%8.8x", mod_id);
-+		len = 8;
-+	}
-+
-+	for (i = 0; i < num_mods; ++i) {
-+		json_object *jmodel, *jvalue;
-+		char *str;
-+
-+		jmodel = json_object_array_get_idx(jmodels, i);
-+		json_object_object_get_ex(jmodel, "modelId", &jvalue);
-+		if (!jvalue)
-+			return NULL;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str)
-+			return NULL;
-+
-+		if (!strncmp(str, buf, len))
-+			return jmodel;
-+	}
-+
-+	return NULL;
-+}
-+
-+static bool jarray_has_string(json_object *jarray, char *str, size_t len)
-+{
-+	int i, sz = json_object_array_length(jarray);
-+
-+	for (i = 0; i < sz; ++i) {
-+		json_object *jentry;
-+		char *str_entry;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+		str_entry = (char *)json_object_get_string(jentry);
-+		if (!str_entry)
-+			continue;
-+
-+		if (!strncmp(str, str_entry, len))
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+static json_object *jarray_string_del(json_object *jarray, char *str,
-+								size_t len)
-+{
-+	int i, sz = json_object_array_length(jarray);
-+	json_object *jarray_new;
-+
-+	jarray_new = json_object_new_array();
-+	if (!jarray_new)
-+		return NULL;
-+
-+	for (i = 0; i < sz; ++i) {
-+		json_object *jentry;
-+		char *str_entry;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+		str_entry = (char *)json_object_get_string(jentry);
-+		if (str_entry && !strncmp(str, str_entry, len))
-+			continue;
-+
-+		json_object_array_add(jarray_new, jentry);
-+	}
-+
-+	return jarray_new;
-+}
-+
-+static json_object *get_key_object(json_object *jarray, uint16_t idx)
-+{
-+	int i, sz = json_object_array_length(jarray);
-+
-+	for (i = 0; i < sz; ++i) {
-+		json_object *jentry, *jvalue;
-+		uint32_t jidx;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+		if (!json_object_object_get_ex(jentry, "index", &jvalue))
-+			return NULL;
-+
-+		jidx = json_object_get_int(jvalue);
-+
-+		if (jidx == idx)
-+			return jentry;
-+	}
-+
-+	return NULL;
-+}
-+
-+static json_object *jarray_key_del(json_object *jarray, int16_t idx)
-+{
-+	json_object *jarray_new;
-+	int i, sz = json_object_array_length(jarray);
-+	char idx_str[5];
-+
-+	snprintf(idx_str, 5, "%4.4x", idx);
-+
-+	jarray_new = json_object_new_array();
-+	if (!jarray_new)
-+		return NULL;
-+
-+	for (i = 0; i < sz; ++i) {
-+		json_object *jentry, *jvalue;
-+		char *str;
-+
-+		jentry = json_object_array_get_idx(jarray, i);
-+
-+		if (json_object_object_get_ex(jentry, "index", &jvalue)) {
-+			str = (char *)json_object_get_string(jvalue);
-+			if (str && !strncmp(str, idx_str, 4))
-+				continue;
-+		}
-+
-+		json_object_array_add(jarray_new, jentry);
-+	}
-+
-+	return jarray_new;
-+}
-+
-+bool mesh_db_read_iv_index(json_object *jobj, uint32_t *idx, bool *update)
-+{
-+	int tmp;
-+
-+	/* IV index */
-+	if (!get_int(jobj, "IVindex", &tmp))
-+		return false;
-+
-+	*idx = (uint32_t) tmp;
-+
-+	if (!get_int(jobj, "IVupdate", &tmp))
-+		return false;
-+
-+	*update = tmp ? true : false;
-+
-+	return true;
-+}
-+
-+bool mesh_db_read_device_key(json_object *jobj, uint8_t key_buf[16])
-+{
-+	json_object *jvalue;
-+	char *str;
-+
-+	if (!key_buf)
-+		return false;
-+
-+	if (!json_object_object_get_ex(jobj, "deviceKey", &jvalue) ||
-+								!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (!str2hex(str, strlen(str), key_buf, 16))
-+		return false;
-+
-+	return true;
-+}
-+
-+bool mesh_db_read_app_keys(json_object *jobj, mesh_db_app_key_cb cb,
-+							void *user_data)
-+{
-+	json_object *jarray;
-+	int len;
-+	int i;
-+
-+	if (!cb)
-+		return true;
-+
-+	json_object_object_get_ex(jobj, "appKeys", &jarray);
-+	if (!jarray || (json_object_get_type(jarray) != json_type_array))
-+		return false;
-+
-+	len = json_object_array_length(jarray);
-+
-+	for (i = 0; i < len; ++i) {
-+		json_object *jtemp, *jvalue;
-+		int app_idx, net_idx;
-+		bool key_refresh = false;
-+		char *str;
-+		uint8_t key[16];
-+		uint8_t new_key[16];
-+
-+		jtemp = json_object_array_get_idx(jarray, i);
-+
-+		if (!get_int(jtemp, "index", &app_idx))
-+			return false;
-+
-+		if (!CHECK_KEY_IDX_RANGE(app_idx))
-+			return false;
-+
-+		if (!get_int(jtemp, "boundNetKey", &net_idx))
-+			return false;
-+
-+		if (!CHECK_KEY_IDX_RANGE(net_idx))
-+			return false;
-+
-+		json_object_object_get_ex(jtemp, "oldKey", &jvalue);
-+		if (jvalue) {
-+			str = (char *)json_object_get_string(jvalue);
-+			if (!str2hex(str, strlen(str), key, 16))
-+				return false;
-+			key_refresh = true;
-+		}
-+
-+		json_object_object_get_ex(jtemp, "key", &jvalue);
-+		if (!jvalue)
-+			return false;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str2hex(str, strlen(str), key_refresh ? new_key : key, 16))
-+			return false;
-+
-+		if (!cb((uint16_t)net_idx, (uint16_t) app_idx, key,
-+				key_refresh ? new_key : NULL, user_data))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+bool mesh_db_read_net_keys(json_object *jobj, mesh_db_net_key_cb cb,
-+								void *user_data)
-+{
-+	json_object *jarray;
-+	int len;
-+	int i;
-+
-+	if (!cb)
-+		return true;
-+
-+	json_object_object_get_ex(jobj, "netKeys", &jarray);
-+	if (!jarray || (json_object_get_type(jarray) != json_type_array))
-+		return false;
-+
-+	len = json_object_array_length(jarray);
-+
-+	for (i = 0; i < len; ++i) {
-+		json_object *jtemp, *jvalue;
-+		int idx;
-+		char *str;
-+		bool key_refresh = false;
-+		int phase;
-+		uint8_t key[16];
-+		uint8_t new_key[16];
-+
-+		jtemp = json_object_array_get_idx(jarray, i);
-+
-+		if (!get_int(jtemp, "index", &idx))
-+			return false;
-+
-+		if (!CHECK_KEY_IDX_RANGE(idx))
-+			return false;
-+
-+		json_object_object_get_ex(jtemp, "oldKey", &jvalue);
-+		if (jvalue) {
-+			str = (char *)json_object_get_string(jvalue);
-+			if (!str2hex(str, strlen(str), key, 16))
-+				return false;
-+			key_refresh = true;
-+		}
-+
-+		json_object_object_get_ex(jtemp, "key", &jvalue);
-+		if (!jvalue)
-+			return false;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str2hex(str, strlen(str), key_refresh ? new_key : key, 16))
-+			return false;
-+
-+		json_object_object_get_ex(jtemp, "keyRefresh", &jvalue);
-+		if (!jvalue)
-+			phase = KEY_REFRESH_PHASE_NONE;
-+		else
-+			phase = json_object_get_int(jvalue);
-+
-+
-+		if (!cb((uint16_t)idx, key, key_refresh ? new_key : NULL, phase,
-+								user_data))
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
-+					const uint8_t key[16], int phase)
-+{
-+	json_object *jarray, *jentry = NULL, *jstring;
-+	char buf[5];
-+
-+	json_object_object_get_ex(jobj, "netKeys", &jarray);
-+	if (!jarray && (phase != KEY_REFRESH_PHASE_NONE))
-+		return false;
-+
-+	if (jarray)
-+		jentry = get_key_object(jarray, idx);
-+
-+	/*
-+	 * The key entry should exist if the key is updated
-+	 * (i.e., Key Refresh is underway)
++	struct frnd_negotiation *neg = user_data;
++	uint16_t net_idx = mesh_net_get_primary_idx(neg->net);
++	uint8_t key[16];
++	uint8_t p[9] = { 1 };
++	uint8_t msg[8];
++	uint16_t n = 0;
++	bool res;
++
++	l_timeout_remove(timeout);
++
++	/* Create key Set for this offer */
++	l_put_be16(neg->low_power_node, p + 1);
++	l_put_be16(mesh_net_get_address(neg->net), p + 3);
++	l_put_be16(neg->lp_cnt, p + 5);
++	l_put_be16(counter, p + 7);
++	res = mesh_net_get_key(neg->net, false, net_idx, key);
++	if (!res)
++		goto cleanup;
++
++	print_packet("Friend Key P =", p, 9);
++	res = mesh_crypto_k2(key, p, sizeof(p), &neg->key_set.nid,
++			neg->key_set.enc_key, neg->key_set.privacy_key);
++	if (!res)
++		goto cleanup;
++
++	print_packet("NID =", &neg->key_set.nid, 1);
++	print_packet("ENC_KEY =", neg->key_set.enc_key, 16);
++	print_packet("PRIV_KEY =", neg->key_set.privacy_key, 16);
++
++	neg->fn_cnt = counter++;
++	neg->key_set.frnd = true;
++	mesh_net_add_keyset(neg->net, &neg->key_set);
++
++	msg[n++] = NET_OP_FRND_OFFER;
++	msg[n++] = frnd_relay_window;
++	msg[n++] = frnd_cache_size;
++	msg[n++] = frnd_sublist_size;
++	msg[n++] = neg->rssi;
++	l_put_be16(neg->fn_cnt, msg + n);
++	n += 2;
++	print_packet("Tx-NET_OP_FRND_OFFER", msg, n);
++	mesh_net_transport_send(neg->net, NULL, true,
++			mesh_net_get_iv_index(neg->net), 0,
++			0, 0, neg->low_power_node,
++			msg, n);
++
++	/* Offer expires in 1.3 seconds, which is the max time for LPN to
++	 * receive all offers, 1 second to make decision, and a little extra
 +	 */
-+	if (!jentry && (phase != KEY_REFRESH_PHASE_NONE))
-+		return false;
++	neg->timeout = l_timeout_create_ms(1000 + MAX_RESP_DELAY,
++						response_timeout, neg, NULL);
 +
-+	if (jentry) {
-+		uint8_t buf[16];
-+		json_object *jvalue;
-+		char *str;
++	return;
 +
-+		json_object_object_get_ex(jentry, "key", &jvalue);
-+		if (!jvalue)
-+			return false;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str2hex(str, strlen(str), buf, sizeof(buf)))
-+			return false;
-+
-+		/* If the same key, return success */
-+		if (memcmp(key, buf, 16) == 0)
-+			return true;
-+
-+		return false;
-+	}
-+
-+	if (phase == KEY_REFRESH_PHASE_NONE) {
-+		jentry = json_object_new_object();
-+		if (!jentry)
-+			goto fail;
-+
-+		snprintf(buf, 5, "%4.4x", idx);
-+		jstring = json_object_new_string(buf);
-+		if (!jstring)
-+			goto fail;
-+
-+		json_object_object_add(jentry, "index", jstring);
-+
-+		snprintf(buf, 5, "%4.4x", idx);
-+		jstring = json_object_new_string(buf);
-+		if (!jstring)
-+			goto fail;
-+
-+		if (!add_key(jentry, "key", key))
-+			goto fail;
-+
-+		if (!jarray) {
-+			jarray = json_object_new_array();
-+			if (!jarray)
-+				goto fail;
-+			json_object_object_add(jobj, "netKeys", jarray);
-+		}
-+
-+		json_object_array_add(jarray, jentry);
-+
-+	} else {
-+
-+		if (!json_object_object_get_ex(jentry, "key", &jstring))
-+			return false;
-+
-+		json_object_object_add(jentry, "oldKey", jstring);
-+		json_object_object_del(jentry, "key");
-+
-+		if (!add_key(jentry, "key", key))
-+			return false;
-+	}
-+
-+
-+	json_object_object_add(jentry, "keyRefresh",
-+					json_object_new_int(phase));
-+
-+	return true;
-+fail:
-+
-+	if (jentry)
-+		json_object_put(jentry);
-+
-+	return false;
++cleanup:
++	mesh_net_remove_keyset(neg->net, &neg->key_set);
++	l_queue_remove(frnd_negotiations, neg);
++	l_free(neg);
 +}
 +
-+bool mesh_db_net_key_del(json_object *jobj, uint16_t idx)
++static uint8_t cache_size(uint8_t power)
 +{
-+	json_object *jarray, *jarray_new;
++	return 1 << power;
++}
 +
-+	json_object_object_get_ex(jobj, "netKeys", &jarray);
-+	if (!jarray)
-+		return true;
++static bool match_by_lpn(const void *a, const void *b)
++{
++	const struct frnd_negotiation *neg = a;
++	uint16_t lpn = L_PTR_TO_UINT(b);
 +
-+	/* Check if matching entry exists */
-+	if (!get_key_object(jarray, idx))
-+		return true;
++	return neg->low_power_node == lpn;
++}
 +
-+	if (json_object_array_length(jarray) == 1) {
-+		json_object_object_del(jobj, "netKeys");
-+		return true;
-+	}
++static bool match_by_dst(const void *a, const void *b)
++{
++	const struct mesh_friend *frnd = a;
++	uint16_t dst = L_PTR_TO_UINT(b);
 +
-+	/*
-+	 * There is no easy way to delete a value from json array.
-+	 * Create a new copy without specified element and
-+	 * then remove old array.
++	return frnd->dst == dst;
++}
++
++/* Scaling factors in 1/10 ms */
++static const int32_t scaling[] = {
++	10,
++	15,
++	20,
++	15,
++};
++
++void friend_request(struct mesh_net *net, uint16_t src,
++		uint8_t minReq, uint8_t delay, uint32_t timeout,
++		uint16_t prev, uint8_t num_ele, uint16_t cntr,
++		int8_t rssi)
++{
++	struct frnd_negotiation *neg;
++	uint8_t rssiScale = (minReq >> 5) & 3;
++	uint8_t winScale = (minReq >> 3) & 3;
++	uint8_t minCache = (minReq >> 0) & 7;
++	int32_t rsp_delay;
++
++	l_info("RSSI of Request: %d dbm", rssi);
++	l_info("Delay: %d ms", delay);
++	l_info("Poll Timeout of Request: %d ms", timeout * 100);
++	l_info("Previous Friend: %4.4x", prev);
++	l_info("Num Elem: %2.2x", num_ele);
++	l_info("Cache Requested: %d", cache_size(minCache));
++	l_info("Cache to offer: %d", frnd_cache_size);
++
++	/* Determine our own suitability before
++	 * deciding to participate in negotiation
 +	 */
-+	jarray_new = jarray_key_del(jarray, idx);
-+	if (!jarray_new)
-+		return false;
-+
-+	json_object_object_del(jobj, "netKeys");
-+	json_object_object_add(jobj, "netKeys", jarray_new);
-+
-+	return true;
-+}
-+
-+bool mesh_db_write_device_key(json_object *jnode, uint8_t *key)
-+{
-+	return add_key(jnode, "deviceKey", key);
-+}
-+
-+bool mesh_db_app_key_add(json_object *jobj, uint16_t net_idx, uint16_t app_idx,
-+			 const uint8_t key[16], bool update)
-+{
-+	json_object *jarray, *jentry = NULL, *jstring = NULL;
-+	char buf[5];
-+
-+	json_object_object_get_ex(jobj, "appKeys", &jarray);
-+	if (!jarray && update)
-+		return false;
-+
-+	if (jarray)
-+		jentry = get_key_object(jarray, app_idx);
-+
-+	/* The key entry should exist if the key is updated */
-+	if (!jentry  && update)
-+		return false;
-+
-+	if (jentry) {
-+		uint8_t buf[16];
-+		json_object *jvalue;
-+		char *str;
-+
-+		json_object_object_get_ex(jentry, "key", &jvalue);
-+		if (!jvalue)
-+			return false;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		if (!str2hex(str, strlen(str), buf, sizeof(buf)))
-+			return false;
-+
-+		/* If the same key, return success */
-+		if (memcmp(key, buf, 16) == 0)
-+			return true;
-+
-+		return false;
-+	}
-+
-+	if (!update) {
-+		jentry = json_object_new_object();
-+		if (!jentry)
-+			goto fail;
-+
-+		snprintf(buf, 5, "%4.4x", app_idx);
-+		jstring = json_object_new_string(buf);
-+		if (!jstring)
-+			goto fail;
-+
-+		json_object_object_add(jentry, "index", jstring);
-+
-+		snprintf(buf, 5, "%4.4x", net_idx);
-+		jstring = json_object_new_string(buf);
-+		if (!jstring)
-+			goto fail;
-+
-+		json_object_object_add(jentry, "boundNetKey", jstring);
-+
-+		if (!add_key(jentry, "key", key))
-+			goto fail;
-+
-+		if (!jarray) {
-+			jarray = json_object_new_array();
-+			if (!jarray)
-+				goto fail;
-+			json_object_object_add(jobj, "appKeys", jarray);
-+		}
-+
-+		json_object_array_add(jarray, jentry);
-+
-+	} else {
-+
-+		if (!json_object_object_get_ex(jentry, "key", &jstring))
-+			return false;
-+
-+		json_object_object_add(jentry, "oldKey", jstring);
-+		json_object_object_del(jentry, "key");
-+
-+		if (!add_key(jentry, "key", key))
-+			return false;
-+	}
-+
-+	return true;
-+fail:
-+
-+	if (jentry)
-+		json_object_put(jentry);
-+
-+	return false;
-+}
-+
-+bool mesh_db_app_key_del(json_object *jobj, uint16_t net_idx, uint16_t idx)
-+{
-+	json_object *jarray, *jarray_new;
-+
-+	json_object_object_get_ex(jobj, "appKeys", &jarray);
-+	if (!jarray)
-+		return true;
-+
-+	/* Check if matching entry exists */
-+	if (!get_key_object(jarray, idx))
-+		return true;
-+
-+	if (json_object_array_length(jarray) == 1) {
-+		json_object_object_del(jobj, "appKeys");
-+		return true;
-+	}
-+
-+	/*
-+	 * There is no easy way to delete a value from json array.
-+	 * Create a new copy without specified element and
-+	 * then remove old array.
-+	 */
-+	jarray_new = jarray_key_del(jarray, idx);
-+	if (!jarray_new)
-+		return false;
-+
-+	json_object_object_del(jobj, "appKeys");
-+	json_object_object_add(jobj, "appKeys", jarray_new);
-+
-+	return true;
-+}
-+
-+bool mesh_db_model_binding_add(json_object *jnode, uint8_t ele_idx, bool vendor,
-+				uint32_t mod_id, uint16_t app_idx)
-+{
-+	json_object *jmodel, *jstring, *jarray;
-+	char buf[5];
-+
-+	jmodel = get_element_model(jnode, ele_idx, mod_id, vendor);
-+	if (!jmodel)
-+		return false;
-+
-+	json_object_object_get_ex(jmodel, "bind", &jarray);
-+
-+	snprintf(buf, 5, "%4.4x", app_idx);
-+
-+	if (jarray && jarray_has_string(jarray, buf, 4))
-+		return true;
-+
-+	jstring = json_object_new_string(buf);
-+	if (!jstring)
-+		return false;
-+
-+	if (!jarray) {
-+		jarray = json_object_new_array();
-+		if (!jarray) {
-+			json_object_put(jstring);
-+			return false;
-+		}
-+		json_object_object_add(jmodel, "bind", jarray);
-+	}
-+
-+	json_object_array_add(jarray, jstring);
-+
-+	return true;
-+}
-+
-+bool mesh_db_model_binding_del(json_object *jnode, uint8_t ele_idx, bool vendor,
-+				uint32_t mod_id, uint16_t app_idx)
-+{
-+	json_object *jmodel, *jarray, *jarray_new;
-+	char buf[5];
-+
-+	jmodel = get_element_model(jnode, ele_idx, mod_id, vendor);
-+	if (!jmodel)
-+		return false;
-+
-+	json_object_object_get_ex(jmodel, "bind", &jarray);
-+
-+	snprintf(buf, 5, "%4.4x", app_idx);
-+
-+	if (!jarray || !jarray_has_string(jarray, buf, 4))
-+		return true;
-+
-+	if (json_object_array_length(jarray) == 1) {
-+		json_object_object_del(jmodel, "bind");
-+		return true;
-+	}
-+
-+	/*
-+	 * There is no easy way to delete a value from json array.
-+	 * Create a new copy without specified element and
-+	 * then remove old array.
-+	 */
-+	jarray_new = jarray_string_del(jarray, buf, 4);
-+	if (!jarray_new)
-+		return false;
-+
-+	json_object_object_del(jmodel, "bind");
-+	json_object_object_add(jmodel, "bind", jarray_new);
-+
-+	return true;
-+}
-+
-+static void free_model(void *data)
-+{
-+	struct mesh_db_model *mod = data;
-+
-+	l_free(mod->bindings);
-+	l_free(mod->subs);
-+	l_free(mod->pub);
-+	l_free(mod);
-+}
-+
-+static void free_element(void *data)
-+{
-+	struct mesh_db_element *ele = data;
-+
-+	l_queue_destroy(ele->models, free_model);
-+	l_free(ele);
-+}
-+
-+static bool parse_bindings(json_object *jbindings, struct mesh_db_model *mod)
-+{
-+	int cnt;
-+	int i;
-+
-+	cnt = json_object_array_length(jbindings);
-+	if (cnt > 0xffff)
-+		return false;
-+
-+	mod->num_subs = cnt;
-+
-+	/* Allow empty bindings list */
-+	if (!cnt)
-+		return true;
-+
-+	mod->bindings = l_new(uint16_t, cnt);
-+	if (!mod->bindings)
-+		return false;
-+
-+	for (i = 0; i < cnt; ++i) {
-+		int idx;
-+		json_object *jvalue;
-+
-+		jvalue = json_object_array_get_idx(jbindings, i);
-+		if (!jvalue)
-+			return false;
-+
-+		idx = json_object_get_int(jvalue);
-+		if (!CHECK_KEY_IDX_RANGE(idx))
-+			return false;
-+
-+		mod->bindings[i] = (uint16_t) idx;
-+	}
-+
-+	return true;
-+}
-+
-+static bool parse_models(json_object *jmodels, struct mesh_db_element *ele)
-+{
-+	int i, num_models;
-+
-+	num_models = json_object_array_length(jmodels);
-+	if (!num_models)
-+		return true;
-+
-+	for (i = 0; i < num_models; ++i) {
-+		json_object *jmodel, *jarray, *jvalue;
-+		struct mesh_db_model *mod;
-+		uint32_t id;
-+		int len;
-+		char *str;
-+
-+		jmodel = json_object_array_get_idx(jmodels, i);
-+		if (!jmodel)
-+			goto fail;
-+
-+		mod = l_new(struct mesh_db_model, 1);
-+		if (!ele)
-+			goto fail;
-+
-+		json_object_object_get_ex(jmodel, "modelId", &jvalue);
-+		str = (char *)json_object_get_string(jvalue);
-+
-+		len = strlen(str);
-+
-+		if (len != 4 && len != 8)
-+			goto fail;
-+
-+		if (len == 4) {
-+			if (sscanf(str, "%04x", &id) != 1)
-+				goto fail;
-+
-+			id |= VENDOR_ID_MASK;
-+		} else if (len == 8) {
-+			if (sscanf(str, "%08x", &id) != 1)
-+				goto fail;
-+		} else
-+			goto fail;
-+
-+		mod->id = id;
-+
-+		if (len == 8)
-+			mod->vendor = true;
-+
-+		json_object_object_get_ex(jmodel, "bind", &jarray);
-+
-+		if (jarray && (json_object_get_type(jmodels) != json_type_array
-+					|| !parse_bindings(jarray, mod)))
-+			goto fail;
-+
-+		/* TODO add pub/sub */
-+		l_queue_push_tail(ele->models, mod);
-+	}
-+
-+	return true;
-+
-+fail:
-+	l_queue_destroy(ele->models, free_model);
-+	return false;
-+}
-+
-+static bool parse_elements(json_object *jelements, struct mesh_db_node *node)
-+{
-+	int i, num_ele;
-+
-+	num_ele = json_object_array_length(jelements);
-+	if (!num_ele)
-+		/* Allow "empty" nodes */
-+		return true;
-+
-+	node->elements = l_queue_new();
-+	if (!node->elements)
-+		return false;
-+
-+	for (i = 0; i < num_ele; ++i) {
-+		json_object *jelement;
-+		json_object *jmodels;
-+		json_object *jvalue;
-+		struct mesh_db_element *ele;
-+		int index;
-+		char *str;
-+
-+		jelement = json_object_array_get_idx(jelements, i);
-+		if (!jelement)
-+			goto fail;
-+
-+		if (!get_int(jelement, "elementIndex", &index) ||
-+								index > num_ele)
-+			goto fail;
-+
-+		ele = l_new(struct mesh_db_element, 1);
-+		if (!ele)
-+			goto fail;
-+
-+		ele->index = index;
-+		ele->models = l_queue_new();
-+		if (!ele->models)
-+			goto fail;
-+
-+		json_object_object_get_ex(jelement, "location", &jvalue);
-+		str = (char *)json_object_get_string(jvalue);
-+		if (sscanf(str, "%04hx", &(ele->location)) != 1)
-+			goto fail;
-+
-+		json_object_object_get_ex(jelement, "models", &jmodels);
-+
-+		if (jmodels && (json_object_get_type(jmodels) != json_type_array
-+				|| !parse_models(jmodels, ele)))
-+			goto fail;
-+
-+		l_queue_push_tail(node->elements, ele);
-+	}
-+
-+	return true;
-+
-+fail:
-+	l_queue_destroy(node->elements, free_element);
-+	node->elements = NULL;
-+
-+	return false;
-+}
-+
-+static int get_mode(json_object *jvalue)
-+{
-+	const char *str;
-+
-+	str = json_object_get_string(jvalue);
-+	if (!str)
-+		return 0xffffffff;
-+
-+	if (!strncasecmp(str, "disabled", strlen("disabled")))
-+		return MESH_MODE_DISABLED;
-+
-+	if (!strncasecmp(str, "enabled", strlen("enabled")))
-+		return MESH_MODE_ENABLED;
-+
-+	if (!strncasecmp(str, "unsupported", strlen("unsupported")))
-+		return MESH_MODE_UNSUPPORTED;
-+
-+	return 0xffffffff;
-+}
-+
-+static void parse_features(json_object *jconfig, struct mesh_db_node *node)
-+{
-+	json_object *jvalue, *jrelay;
-+	int mode, count;
-+	uint16_t interval;
-+
-+	json_object_object_get_ex(jconfig, "proxy", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_UNSUPPORTED)
-+			node->modes.proxy = mode;
-+	}
-+
-+	json_object_object_get_ex(jconfig, "friend", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_UNSUPPORTED)
-+			node->modes.friend = mode;
-+	}
-+
-+	json_object_object_get_ex(jconfig, "lowPower", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_UNSUPPORTED)
-+			node->modes.friend = mode;
-+	}
-+
-+	json_object_object_get_ex(jconfig, "beacon", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_ENABLED)
-+			node->modes.beacon = mode;
-+	}
-+
-+	json_object_object_get_ex(jconfig, "relay", &jrelay);
-+	if (!jrelay)
++	if (minCache == 0 || num_ele == 0)
 +		return;
 +
-+	json_object_object_get_ex(jrelay, "mode", &jvalue);
-+	if (jvalue) {
-+		mode = get_mode(jvalue);
-+		if (mode <= MESH_MODE_UNSUPPORTED)
-+			node->modes.relay.state = mode;
-+		else
++	if (delay < 0x0A)
++		return;
++
++	if (timeout < 0x00000A || timeout > 0x34BBFF)
++		return;
++
++	if (cache_size(minCache) > frnd_cache_size)
++		return;
++
++	if (frnd_negotiations == NULL)
++		frnd_negotiations = l_queue_new();
++
++	/* TODO: Check RSSI, and then start Negotiation if appropriate */
++
++	/* We are participating in this Negotiation */
++	neg = l_new(struct frnd_negotiation, 1);
++	l_queue_push_head(frnd_negotiations, neg);
++
++	neg->net = net;
++	neg->low_power_node = src;
++	neg->lp_cnt = cntr;
++	neg->rssi = rssi;
++	neg->receive_delay = delay;
++	neg->poll_timeout = timeout;
++	neg->old_relay = prev;
++	neg->num_ele = num_ele;
++
++	/* RSSI (Negative Factor, larger values == less time)
++	 * Scaling factor 0-3 == multiplier of 1.0 - 2.5
++	 * Minimum factor of 1. Bit 1 adds additional factor
++	 * of 1, bit zero and additional 0.5
++	 */
++	rsp_delay = -(rssi * scaling[rssiScale]);
++	l_info("RSSI Factor: %d ms", rsp_delay / 10);
++
++	/* Relay Window (Positive Factor, larger values == more time)
++	 * Scaling factor 0-3 == multiplier of 1.0 - 2.5
++	 * Minimum factor of 1. Bit 1 adds additional factor
++	 * of 1, bit zero and additional 0.5
++	 */
++	rsp_delay += frnd_relay_window * scaling[winScale];
++	l_info("Win Size Factor: %d ms",
++			(frnd_relay_window * scaling[winScale]) / 10);
++
++	/* Normalize to ms */
++	rsp_delay /= 10;
++
++	/* Range limits are 10-255 ms */
++	if (rsp_delay < MIN_RESP_DELAY)
++		rsp_delay = MIN_RESP_DELAY;
++	else if (rsp_delay > MAX_RESP_DELAY)
++		rsp_delay = MAX_RESP_DELAY;
++
++	l_info("Total Response Delay: %d ms", rsp_delay);
++
++	/* Add in 100ms delay before start of "Offer Period" */
++	rsp_delay += RESPONSE_DELAY;
++
++	neg->timeout = l_timeout_create_ms(rsp_delay,
++						response_delay, neg, NULL);
++}
++
++static struct l_queue *retired_lpns;
++
++void friend_clear_confirm(struct mesh_net *net, uint16_t src,
++					uint16_t lpn, uint16_t lpnCounter)
++{
++	struct frnd_negotiation *neg = l_queue_remove_if(frnd_negotiations,
++					match_by_lpn, L_UINT_TO_PTR(lpn));
++
++	l_info("Friend Clear confirmed %4.4x (cnt %4.4x)", lpn, lpnCounter);
++
++	if (!neg)
++		return;
++
++	l_timeout_remove(neg->timeout);
++	l_queue_remove(frnd_negotiations, neg);
++	l_free(neg);
++}
++
++static void friend_poll_timeout(struct l_timeout *timeout, void *user_data)
++{
++	struct mesh_friend *frnd = user_data;
++
++	if (mesh_friend_clear(frnd->net, frnd))
++		l_info("Friend Poll Timeout %4.4x", frnd->dst);
++
++	l_timeout_remove(frnd->timeout);
++	frnd->timeout = NULL;
++
++	/* Friend may be in either Network or Retired list, so try both */
++	l_queue_remove(retired_lpns, frnd);
++	mesh_friend_free(frnd);
++}
++
++void friend_clear(struct mesh_net *net, uint16_t src, uint16_t lpn,
++				uint16_t lpnCounter, struct mesh_friend *frnd)
++{
++	uint8_t msg[5] = { NET_OP_FRND_CLEAR_CONFIRM };
++	bool removed = false;
++	uint16_t lpnDelta;
++
++	if (frnd) {
++		lpnDelta = lpnCounter - frnd->lp_cnt;
++
++		/* Ignore old Friend Clear commands */
++		if (lpnDelta > 0x100)
 +			return;
-+	} else
++
++		/* Move friend from Network list to Retired list */
++		removed = mesh_friend_clear(net, frnd);
++		if (removed) {
++			struct mesh_friend *old;
++			struct frnd_negotiation *neg = l_queue_remove_if(
++						frnd_negotiations,
++						match_by_lpn,
++						L_UINT_TO_PTR(frnd->dst));
++
++			/* Cancel any negotiations or clears */
++			if (neg) {
++				l_timeout_remove(neg->timeout);
++				l_free(neg);
++			}
++
++			/* Create Retired LPN list if needed */
++			if (retired_lpns == NULL)
++				retired_lpns = l_queue_new();
++
++			/* Find any duplicates */
++			old = l_queue_find(retired_lpns, match_by_dst,
++						L_UINT_TO_PTR(lpn));
++
++			/* Force time-out of old friendship */
++			if (old)
++				friend_poll_timeout(old->timeout, old);
++
++			/* Retire this LPN (keeps timeout running) */
++			l_queue_push_tail(retired_lpns, frnd);
++		}
++	} else {
++		frnd = l_queue_find(retired_lpns, match_by_dst,
++						L_UINT_TO_PTR(lpn));
++		if (!frnd)
++			return;
++
++		lpnDelta = lpnCounter - frnd->lp_cnt;
++
++		/* Ignore old Friend Clear commands */
++		if (!lpnDelta || (lpnDelta > 0x100))
++			return;
++	}
++
++	l_info("Friend Cleared %4.4x (%4.4x)", lpn, lpnCounter);
++
++	l_put_be16(lpn, msg + 1);
++	l_put_be16(lpnCounter, msg + 3);
++	mesh_net_transport_send(net, NULL, false,
++			mesh_net_get_iv_index(net), DEFAULT_TTL,
++			0, 0, src,
++			msg, sizeof(msg));
++}
++
++static void clear_retry(struct l_timeout *timeout, void *user_data)
++{
++	struct frnd_negotiation *neg = user_data;
++	uint8_t msg[5] = { NET_OP_FRND_CLEAR };
++	uint32_t secs = 1 << neg->receive_delay;
++
++
++	l_put_be16(neg->low_power_node, msg + 1);
++	l_put_be16(neg->lp_cnt, msg + 3);
++	mesh_net_transport_send(neg->net, NULL, false,
++			mesh_net_get_iv_index(neg->net), DEFAULT_TTL,
++			0, 0, neg->old_relay,
++			msg, sizeof(msg));
++
++	if (secs && ((secs << 1) < neg->poll_timeout/10)) {
++		neg->receive_delay++;
++		l_info("Try FRND_CLR again in %d seconds (total timeout %d)",
++						secs, neg->poll_timeout/10);
++		l_timeout_modify(neg->timeout, secs);
++	} else {
++		l_info("FRND_CLR timed out %d", secs);
++		l_timeout_remove(timeout);
++		l_queue_remove(frnd_negotiations, neg);
++		l_free(neg);
++	}
++}
++
++static void friend_delay_rsp(struct l_timeout *timeout, void *user_data)
++{
++	struct mesh_friend *frnd = user_data;
++	struct mesh_friend_msg *pkt = frnd->pkt;
++	struct mesh_net *net = frnd->net;
++	uint32_t net_seq, iv_index;
++	uint8_t upd[7] = { NET_OP_FRND_UPDATE };
++
++	l_timeout_remove(timeout);
++
++	if (pkt == NULL)
++		goto update;
++
++	if (pkt->ctl) {
++		/* Make sure we don't change the bit-sense of MD,
++		 * once it has been set because that would cause
++		 * a "Dirty Nonce" security violation
++		 */
++		if (((pkt->u.one[0].hdr >> OPCODE_HDR_SHIFT) & OPCODE_MASK) ==
++						NET_OP_SEG_ACKNOWLEDGE) {
++			bool rly = !!((pkt->u.one[0].hdr >> RELAY_HDR_SHIFT) &
++									true);
++			uint16_t seqZero = pkt->u.one[0].hdr >>
++							SEQ_ZERO_HDR_SHIFT;
++
++			seqZero &= SEQ_ZERO_MASK;
++
++			l_info("Fwd ACK pkt %6.6x-%8.8x",
++					pkt->u.one[0].seq,
++					pkt->iv_index);
++
++			pkt->u.one[0].sent = true;
++			mesh_net_ack_send(net, &frnd->key_set,
++					pkt->iv_index, pkt->ttl,
++					pkt->u.one[0].seq, pkt->src, pkt->dst,
++					rly, seqZero,
++					l_get_be32(pkt->u.one[0].data));
++
++
++		} else {
++			l_info("Fwd CTL pkt %6.6x-%8.8x",
++					pkt->u.one[0].seq,
++					pkt->iv_index);
++
++			print_packet("Frnd-CTL",
++					pkt->u.one[0].data, pkt->last_len);
++
++			pkt->u.one[0].sent = true;
++			mesh_net_transport_send(net, &frnd->key_set, false,
++					pkt->iv_index, pkt->ttl,
++					pkt->u.one[0].seq, pkt->src, pkt->dst,
++					pkt->u.one[0].data, pkt->last_len);
++		}
++	} else {
++		/* If segments after this one, then More Data must be TRUE */
++		uint8_t len;
++
++		if (pkt->cnt_out < pkt->cnt_in)
++			len = sizeof(pkt->u.s12[0].data);
++		else
++			len = pkt->last_len;
++
++		l_info("Fwd FRND pkt %6.6x",
++				pkt->u.s12[pkt->cnt_out].seq);
++
++		print_packet("Frnd-Msg", pkt->u.s12[pkt->cnt_out].data, len);
++
++		pkt->u.s12[pkt->cnt_out].sent = true;
++		mesh_net_send_seg(net, &frnd->key_set,
++				pkt->iv_index,
++				pkt->ttl,
++				pkt->u.s12[pkt->cnt_out].seq,
++				pkt->src, pkt->dst,
++				pkt->u.s12[pkt->cnt_out].hdr,
++				pkt->u.s12[pkt->cnt_out].data, len);
++	}
++
++	return;
++
++update:
++	// No More Data -- send Update message with md = false
++	net_seq = mesh_net_get_seq_num(net);
++	l_info("Fwd FRND UPDATE %6.6x with MD == 0", net_seq);
++
++	frnd->last = frnd->seq;
++	mesh_net_get_snb_state(net, upd + 1, &iv_index);
++	l_put_be32(iv_index, upd + 2);
++	upd[6] = false; // Queue is Empty
++	print_packet("Update", upd, sizeof(upd));
++	mesh_net_transport_send(net, &frnd->key_set, false,
++			mesh_net_get_iv_index(net), 0,
++			net_seq, 0, frnd->dst,
++			upd, sizeof(upd));
++	mesh_net_next_seq_num(net);
++}
++
++
++void friend_poll(struct mesh_net *net, uint16_t src, bool seq,
++					struct mesh_friend *frnd)
++{
++	struct frnd_negotiation *neg;
++	struct mesh_friend_msg *pkt;
++	bool md;
++
++	neg = l_queue_find(frnd_negotiations, match_by_lpn, L_UINT_TO_PTR(src));
++	if (neg && !neg->clearing) {
++		uint8_t msg[5] = { NET_OP_FRND_CLEAR };
++
++		l_info("Won negotiation for %4.4x", neg->low_power_node);
++
++		/* This call will clean-up and replace if already friends */
++		frnd = mesh_friend_new(net, src, neg->num_ele,
++						neg->receive_delay,
++						neg->wrfrw,
++						neg->poll_timeout,
++						neg->fn_cnt, neg->lp_cnt);
++
++		frnd->timeout = l_timeout_create_ms(
++					frnd->poll_timeout * 100,
++					friend_poll_timeout, frnd, NULL);
++
++		l_timeout_remove(neg->timeout);
++		mesh_net_remove_keyset(neg->net, &neg->key_set);
++
++		if (neg->old_relay == 0 ||
++				neg->old_relay == mesh_net_get_address(net)) {
++			l_queue_remove(frnd_negotiations, neg);
++			l_free(neg);
++		} else {
++			neg->clearing = true;
++			l_put_be16(neg->low_power_node, msg + 1);
++			l_put_be16(neg->lp_cnt, msg + 3);
++			mesh_net_transport_send(net, NULL, false,
++					mesh_net_get_iv_index(net), DEFAULT_TTL,
++					0, 0, neg->old_relay,
++					msg, sizeof(msg));
++
++			/* Reuse receive_delay as a shift counter to
++			 * time-out FRIEND_CLEAR
++			 */
++			neg->receive_delay = 1;
++			neg->timeout = l_timeout_create(1, clear_retry,
++								neg, NULL);
++		}
++	}
++
++	if (!frnd)
 +		return;
 +
-+	json_object_object_get_ex(jrelay, "count", &jvalue);
-+	if (!jvalue)
++	/* Reset Poll Timeout */
++	l_timeout_modify_ms(frnd->timeout, frnd->poll_timeout * 100);
++
++	if (!l_queue_length(frnd->pkt_cache))
++		goto update;
++
++	if (frnd->seq != frnd->last && frnd->seq != seq) {
++		pkt = l_queue_peek_head(frnd->pkt_cache);
++		if (pkt->cnt_out < pkt->cnt_in) {
++			pkt->cnt_out++;
++		} else {
++			pkt = l_queue_pop_head(frnd->pkt_cache);
++			l_free(pkt);
++		}
++	}
++
++	pkt = l_queue_peek_head(frnd->pkt_cache);
++
++	if (!pkt)
++		goto update;
++
++	frnd->seq = seq;
++	frnd->last = !seq;
++	md = !!(l_queue_length(frnd->pkt_cache) > 1);
++
++	if (pkt->ctl) {
++		/* Make sure we don't change the bit-sense of MD,
++		 * once it has been set because that would cause
++		 * a "Dirty Nonce" security violation
++		 */
++		if (!(pkt->u.one[0].sent))
++			pkt->u.one[0].md = md;
++	} else {
++		/* If segments after this one, then More Data must be TRUE */
++		if (pkt->cnt_out < pkt->cnt_in)
++			md = true;
++
++		/* Make sure we don't change the bit-sense of MD, once
++		 * it has been set because that would cause a
++		 * "Dirty Nonce" security violation
++		 */
++		if (!(pkt->u.s12[pkt->cnt_out].sent))
++			pkt->u.s12[pkt->cnt_out].md = md;
++	}
++	frnd->pkt = pkt;
++	l_timeout_create_ms(frnd->frd, friend_delay_rsp, frnd, NULL);
++
++	return;
++
++update:
++	frnd->pkt = NULL;
++	l_timeout_create_ms(frnd->frd, friend_delay_rsp, frnd, NULL);
++}
++
++void friend_sub_add(struct mesh_net *net, struct mesh_friend *frnd,
++					const uint8_t *pkt, uint8_t len)
++{
++	uint16_t *new_list;
++	uint32_t net_seq;
++	uint8_t plen = len;
++	uint8_t msg[] = { NET_OP_PROXY_SUB_CONFIRM, 0 };
++
++	if (!frnd || MAX_FRND_GROUPS < frnd->grp_cnt + (len/2))
 +		return;
 +
-+	/* TODO: check range */
-+	count = json_object_get_int(jvalue);
-+	node->modes.relay.cnt = count;
++	msg[1] = *pkt++;
++	plen--;
 +
-+	json_object_object_get_ex(jrelay, "interval", &jvalue);
-+	if (!jvalue)
++	/* Sanity Check Values, abort if any illegal */
++	while (plen >= 2) {
++		plen -= 2;
++		if (l_get_be16(pkt + plen) < 0x8000)
++			return;
++	}
++
++	new_list = l_malloc(frnd->grp_cnt * sizeof(uint16_t) + len);
++	if (frnd->grp_list)
++		memcpy(new_list, frnd->grp_list,
++				frnd->grp_cnt * sizeof(uint16_t));
++
++	while (len >= 2) {
++		new_list[frnd->grp_cnt++] = l_get_be16(pkt);
++		pkt += 2;
++		len -= 2;
++	}
++
++	l_free(frnd->grp_list);
++	frnd->grp_list = new_list;
++
++	print_packet("Tx-NET_OP_PROXY_SUB_CONFIRM", msg, sizeof(msg));
++	net_seq = mesh_net_get_seq_num(net);
++	mesh_net_transport_send(net, &frnd->key_set, false,
++			mesh_net_get_iv_index(net), 0,
++			net_seq, 0, frnd->dst,
++			msg, sizeof(msg));
++	mesh_net_next_seq_num(net);
++}
++
++void friend_sub_del(struct mesh_net *net, struct mesh_friend *frnd,
++					const uint8_t *pkt, uint8_t len)
++{
++	uint32_t net_seq;
++	uint8_t msg[] = { NET_OP_PROXY_SUB_CONFIRM, 0 };
++	int i;
++
++	if (!frnd)
 +		return;
 +
-+	/* TODO: check range */
-+	interval = json_object_get_int(jvalue);
-+	node->modes.relay.interval = interval;
++	msg[1] = *pkt++;
++	len--;
++
++	while (len >= 2) {
++		uint16_t grp = l_get_be16(pkt);
++
++		for (i = frnd->grp_cnt - 1; i >= 0; i--) {
++			if (frnd->grp_list[i] == grp) {
++				frnd->grp_cnt--;
++				memcpy(&frnd->grp_list[i],
++						&frnd->grp_list[i + 1],
++						(frnd->grp_cnt - i) * 2);
++				break;
++			}
++		}
++		len -= 2;
++		pkt += 2;
++	}
++
++	print_packet("Tx-NET_OP_PROXY_SUB_CONFIRM", msg, sizeof(msg));
++	net_seq = mesh_net_get_seq_num(net);
++	mesh_net_transport_send(net, &frnd->key_set, false,
++			mesh_net_get_iv_index(net), 0,
++			net_seq, 0, frnd->dst,
++			msg, sizeof(msg));
++	mesh_net_next_seq_num(net);
 +}
 +
-+static bool parse_composition(json_object *jcomp, struct mesh_db_node *node)
++/* Low-Power-Node role */
++struct frnd_offers {
++	uint16_t fn_cnt;
++	uint16_t src;
++	uint8_t window;
++	uint8_t cache;
++	uint8_t sub_list_size;
++	int8_t local_rssi;
++	int8_t remote_rssi;
++};
++
++#define MAX_POLL_RETRIES	5
++static bool quick_pick;
++static uint8_t poll_cnt;
++static struct l_queue *offers;
++static uint16_t old_friend;
++static uint16_t fn_cnt, cnt = 0xffff;
++static uint32_t poll_period_ms;
++static struct l_timeout *poll_retry_to;
++static struct l_timeout *poll_period_to;
++static struct mesh_key_set lpn_set;
++static struct mesh_key_set new_lpn_set;
++
++void frnd_offer(struct mesh_net *net, uint16_t src, uint8_t window,
++			uint8_t cache, uint8_t sub_list_size,
++			int8_t r_rssi, int8_t l_rssi, uint16_t fn_cnt)
 +{
-+	json_object *jvalue;
-+	char *str;
++	struct frnd_offers *offer;
 +
-+	/* All the fields in node composition are mandatory */
-+	json_object_object_get_ex(jcomp, "cid", &jvalue);
-+	if (!jvalue)
-+		return false;
++	l_info("RSSI of Offer: %d dbm", l_rssi);
 +
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node->cid) != 1)
-+		return false;
++	/* Ignore RFU window value 0 */
++	if (window == 0)
++		return;
 +
-+	json_object_object_get_ex(jcomp, "pid", &jvalue);
-+	if (!jvalue)
-+		return false;
++	if (mesh_net_get_friend(net))
++		return;
 +
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node->pid) != 1)
-+		return false;
++	if (quick_pick) {
++		if (mesh_net_set_friend(net, src)) {
++			old_friend = src;
++			frnd_poll(net, false);
++		}
++		return;
++	}
 +
-+	json_object_object_get_ex(jcomp, "vid", &jvalue);
-+	if (!jvalue)
-+		return false;
++	offer = l_new(struct frnd_offers, 1);
++	offer->src = src;
++	offer->window = window;
++	offer->cache = cache;
++	offer->sub_list_size = sub_list_size;
++	offer->local_rssi = l_rssi;
++	offer->remote_rssi = r_rssi;
++	offer->fn_cnt = fn_cnt;
 +
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node->vid) != 1)
-+		return false;
-+
-+	json_object_object_get_ex(jcomp, "crpl", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node->crpl) != 1)
-+		return false;
-+
-+	return true;
++	l_queue_push_tail(offers, offer);
 +}
 +
-+static uint16_t get_prov_flags(json_object *jarray, uint16_t max_value)
++static void frnd_poll_timeout(struct l_timeout *timeout, void *user_data)
 +{
-+	int i, cnt;
-+	uint16_t result = 0;
++	struct mesh_net *net = user_data;
 +
-+	cnt = json_object_array_length(jarray);
-+	if (!cnt)
-+		return 0;
-+
-+	for (i = 0; i < cnt; ++i) {
-+		json_object *jvalue;
-+		int value;
-+
-+		jvalue = json_object_array_get_idx(jarray, i);
-+		value = json_object_get_int(jvalue);
-+		if (value > 16)
-+			continue;
-+
-+		if ((1 << value) > max_value)
-+			continue;
-+
-+		result |= (1 << value);
-+	}
-+
-+	return result;
++	frnd_poll(net, true);
 +}
 +
-+bool mesh_db_read_node(json_object *jnode, mesh_db_node_cb cb, void *user_data)
++static void frnd_negotiated_to(struct l_timeout *timeout, void *user_data)
 +{
-+	struct mesh_db_node node;
-+	json_object *jvalue;
-+	char *str;
++	struct mesh_net *net = user_data;
 +
-+	if (!cb) {
-+		l_info("Node read callback is required");
-+		return false;
++	l_info("frnd_negotiated_to");
++	if (!mesh_net_get_friend(net)) {
++		l_timeout_remove(poll_period_to);
++		poll_period_to = NULL;
++		return;
 +	}
 +
-+	memset(&node, 0, sizeof(node));
-+
-+	if (!parse_composition(jnode, &node)) {
-+		l_info("Failed to parse local node composition");
-+		return false;
-+	}
-+
-+	parse_features(jnode, &node);
-+
-+	json_object_object_get_ex(jnode, "unicastAddress", &jvalue);
-+	if (!jvalue) {
-+		l_info("Bad config: Unicast address must be present");
-+		return false;
-+	}
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (sscanf(str, "%04hx", &node.unicast) != 1)
-+		return false;
-+
-+	json_object_object_get_ex(jnode, "defaultTTL", &jvalue);
-+	if (jvalue) {
-+		int ttl = json_object_get_int(jvalue);
-+
-+		if (ttl < 0 || ttl == 1 || ttl > DEFAULT_TTL)
-+			return false;
-+		node.ttl = (uint8_t) ttl;
-+	}
-+
-+	json_object_object_get_ex(jnode, "sequenceNumber", &jvalue);
-+	if (jvalue)
-+		node.seq_number = json_object_get_int(jvalue);
-+
-+	json_object_object_get_ex(jnode, "elements", &jvalue);
-+	if (jvalue && json_object_get_type(jvalue) == json_type_array) {
-+		if (!parse_elements(jvalue, &node))
-+			return false;
-+	}
-+
-+	return cb(&node, user_data);
++	if (!poll_retry_to)
++		frnd_poll(net, false);
 +}
 +
-+bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
-+								void *user_data)
++void frnd_poll_cancel(struct mesh_net *net)
 +{
-+	struct mesh_db_node node;
-+	json_object *jvalue;
-+	char *str;
++	l_timeout_remove(poll_retry_to);
++	poll_retry_to = NULL;
++}
 +
-+	if (!cb) {
-+		l_info("Device read callback is required");
-+		return false;
++void frnd_poll(struct mesh_net *net, bool retry)
++{
++	struct mesh_key_set *key_set = &lpn_set;
++	uint32_t net_seq;
++	uint8_t msg[2] = { NET_OP_FRND_POLL };
++	bool seq = mesh_net_get_frnd_seq(net);
++
++	/* Check if we are in Phase 2 of Key Refresh */
++	if (new_lpn_set.nid != 0xff) {
++		uint8_t phase;
++		uint16_t net_idx = mesh_net_get_primary_idx(net);
++		uint8_t status =
++			mesh_net_key_refresh_phase_get(net, net_idx, &phase);
++
++		if (status == MESH_STATUS_SUCCESS &&
++				phase == KEY_REFRESH_PHASE_TWO)
++			key_set = &new_lpn_set;
 +	}
 +
-+	memset(&node, 0, sizeof(node));
-+
-+	if (!parse_composition(jnode, &node)) {
-+		l_info("Failed to parse local device composition");
-+		return false;
++	if (!retry) {
++		poll_cnt = MAX_POLL_RETRIES;
++		seq = !seq;
++		mesh_net_set_frnd_seq(net, seq);
++	} else if (!(poll_cnt--)) {
++		l_info("Lost Friendship with %4.4x", old_friend);
++		l_timeout_remove(poll_period_to);
++		poll_period_to = NULL;
++		frnd_poll_cancel(net);
++		mesh_net_remove_keyset(net, &lpn_set);
++		mesh_net_remove_keyset(net, &new_lpn_set);
++		mesh_net_set_friend(net, 0);
++		return;
 +	}
 +
-+	parse_features(jnode, &node);
++	if (poll_retry_to)
++		l_timeout_remove(poll_retry_to);
 +
-+	json_object_object_get_ex(jnode, "elements", &jvalue);
-+	if (jvalue && json_object_get_type(jvalue) == json_type_array) {
-+		if (!parse_elements(jvalue, &node))
-+			return false;
++	l_info("TX-FRIEND POLL %d", seq);
++	msg[1] = seq;
++	net_seq = mesh_net_get_seq_num(net);
++	mesh_net_transport_send(net, key_set, true,
++			mesh_net_get_iv_index(net), 0,
++			net_seq, 0, mesh_net_get_friend(net),
++			msg, sizeof(msg));
++	mesh_net_next_seq_num(net);
++	poll_retry_to = l_timeout_create_ms(1000, frnd_poll_timeout, net, NULL);
++
++	/* Reset Poll Period for next "Wake Up" */
++	if (poll_period_to)
++		l_timeout_modify_ms(poll_period_to, poll_period_ms);
++	else
++		poll_period_to = l_timeout_create_ms(poll_period_ms,
++						frnd_negotiated_to, net, NULL);
++}
++
++void frnd_ack_poll(struct mesh_net *net)
++{
++	/* Start new POLL, but only if not already Polling */
++	if (poll_retry_to == NULL)
++		frnd_poll(net, false);
++}
++
++static void req_timeout(struct l_timeout *timeout, void *user_data)
++{
++	struct mesh_net *net = user_data;
++	struct frnd_offers *best;
++	struct frnd_offers *offer = l_queue_pop_head(offers);
++	uint8_t p[9] = { 1 };
++	uint8_t key[16];
++	bool res;
++
++	l_timeout_remove(timeout);
++
++	best = offer;
++	while (offer) {
++		/* Screen out clearly inferior RSSI friends first */
++		if (offer->local_rssi < -40 && offer->remote_rssi < -40) {
++			if (best->local_rssi + 20 < offer->local_rssi ||
++				best->remote_rssi + 20 < offer->remote_rssi) {
++
++				l_free(best);
++				best = offer;
++				offer = l_queue_pop_head(offers);
++				continue;
++			}
++		}
++
++		/* Otherwise use best Windows, with Cache size as tie breaker */
++		if (best->window > offer->window ||
++				(best->window == offer->window &&
++				 best->cache < offer->cache)) {
++			l_free(best);
++			best = offer;
++		} else if (best != offer)
++			l_free(offer);
++
++		offer = l_queue_pop_head(offers);
 +	}
 +
-+	json_object_object_get_ex(jnode, "UUID", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	str = (char *)json_object_get_string(jvalue);
-+	if (!str2hex(str, strlen(str), node.uuid, 16))
-+		return false;
-+
-+	return cb(&node, user_data);
-+}
-+
-+bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov)
-+{
-+	json_object *jprov, *jarray, *jvalue, *jobj;
-+	int value;
-+	char *str;
-+
-+	if (!prov)
-+		return false;
-+
-+	json_object_object_get_ex(jnode, "provision", &jprov);
-+	if (!jprov)
-+		return false;
-+
-+	json_object_object_get_ex(jprov, "algorithms", &jarray);
-+	if (!jarray || json_object_get_type(jarray) != json_type_array)
-+		return false;
-+
-+	prov->algorithm = get_prov_flags(jarray, ALG_FIPS_256_ECC);
-+	if (!prov->algorithm) {
-+		l_info("At least one algorithm must be indicated");
-+		return false;
++	mesh_net_remove_keyset(net, &lpn_set);
++	mesh_net_remove_keyset(net, &new_lpn_set);
++	if (mesh_net_get_friend(net)) {
++		l_free(best);
++		return;
++	} else if (!best) {
++		l_info("No Offers Received");
++		return;
 +	}
 +
-+	json_object_object_get_ex(jprov, "outputOOB", &jobj);
-+	json_object_object_get_ex(jobj, "size", &jvalue);
-+	value = json_object_get_int(jvalue);
-+	if (value > 8)
-+		return false;
++	fn_cnt = best->fn_cnt;
++	l_put_be16(mesh_net_get_address(net), p + 1);
++	l_put_be16(best->src, p + 3);
++	l_put_be16(cnt, p + 5);
++	l_put_be16(best->fn_cnt, p + 7);
++	print_packet("Friend Key P =", p, 9);
++	res = mesh_net_get_key(net, false, mesh_net_get_primary_idx(net), key);
++	if (!res)
++		return;
 +
-+	prov->output_oob.size = (uint8_t) value;
-+	json_object_object_get_ex(jobj, "actions", &jarray);
-+	if (!jarray || json_object_get_type(jarray) != json_type_array)
-+		return false;
++	res = mesh_crypto_k2(key, p, sizeof(p), &lpn_set.nid,
++			lpn_set.enc_key, lpn_set.privacy_key);
++	if (!res)
++		return;
 +
-+	prov->output_oob.actions = get_prov_flags(jarray, OOB_OUT_ALPHA);
++	print_packet("Cur-NID", &lpn_set.nid, 1);
++	print_packet("Cur-ENC_KEY", lpn_set.enc_key, 16);
++	print_packet("Cur-PRIV_KEY", lpn_set.privacy_key, 16);
 +
-+	json_object_object_get_ex(jprov, "inputOOB", &jobj);
-+	json_object_object_get_ex(jobj, "size", &jvalue);
-+	value = json_object_get_int(jvalue);
-+	if (value > 8)
-+		return false;
++	mesh_net_add_keyset(net, &lpn_set);
 +
-+	prov->input_oob.size = (uint8_t) value;
-+	json_object_object_get_ex(jobj, "actions", &jarray);
-+	if (!jarray || json_object_get_type(jarray) != json_type_array)
-+		return false;
++	res = mesh_net_get_key(net, true, mesh_net_get_primary_idx(net), key);
 +
-+	prov->input_oob.actions = get_prov_flags(jarray, OOB_IN_ALPHA);
++	if (res)
++		res = mesh_crypto_k2(key, p, sizeof(p), &new_lpn_set.nid,
++			new_lpn_set.enc_key, new_lpn_set.privacy_key);
++	if (!res) {
++		new_lpn_set.nid = 0xff;
++		goto old_keys_only;
++	}
 +
-+	json_object_object_get_ex(jprov, "publicType", &jvalue);
-+	prov->pub_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
++	print_packet("New-NID", &new_lpn_set.nid, 1);
++	print_packet("New-ENC_KEY", new_lpn_set.enc_key, 16);
++	print_packet("New-PRIV_KEY", new_lpn_set.privacy_key, 16);
 +
-+	json_object_object_get_ex(jprov, "staticType", &jvalue);
-+	prov->static_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
++	mesh_net_add_keyset(net, &new_lpn_set);
 +
-+	json_object_object_get_ex(jprov, "privateKey", &jvalue);
-+	if (!jvalue)
-+		return false;
++old_keys_only:
 +
-+	str = (char *)json_object_get_string(jvalue);
-+	if (!str2hex(str, strlen(str), prov->priv_key, 32))
-+		return false;
++	l_info("Winning offer %4.4x RSSI: %ddb Window: %dms Cache sz: %d",
++			best->src, best->local_rssi,
++			best->window, best->cache);
 +
-+	return true;
++	if (mesh_net_set_friend(net, best->src)) {
++		old_friend = best->src;
++		mesh_net_set_frnd_seq(net, true);
++		frnd_poll(net, false);
++	}
++
++	l_free(best);
 +}
 +
-+bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
-+								uint16_t value)
++void frnd_clear(struct mesh_net *net)
 +{
-+	json_object *jstring;
-+	char buf[5];
++	uint8_t msg[12];
++	uint8_t n = 0;
++	uint16_t frnd_addr = mesh_net_get_friend(net);
++	uint16_t my_addr = mesh_net_get_address(net);
 +
-+	snprintf(buf, 5, "%4.4x", value);
-+	jstring = json_object_new_string(buf);
-+	if (!jstring)
-+		return false;
++	msg[n++] = NET_OP_FRND_CLEAR;
++	l_put_be16(my_addr, msg + n);
++	n += 2;
++	l_put_be16(cnt, msg + n);
++	n += 2;
 +
-+	json_object_object_add(jobj, desc, jstring);
-+	return true;
++	mesh_net_remove_keyset(net, &lpn_set);
++	mesh_net_remove_keyset(net, &new_lpn_set);
++	mesh_net_set_friend(net, 0);
++
++	mesh_net_transport_send(net, NULL, false,
++			mesh_net_get_iv_index(net), 0,
++			0, 0, frnd_addr,
++			msg, n);
 +}
 +
-+bool mesh_db_write_int(json_object *jobj, const char *keyword, int value)
++void frnd_request_friend(struct mesh_net *net, uint8_t cache,
++			uint8_t offer_delay, uint8_t delay, uint32_t timeout)
 +{
-+	json_object *jvalue;
++	uint8_t msg[12];
++	uint8_t n = 0;
 +
-+	json_object_object_del(jobj, keyword);
++	if (offers == NULL)
++		offers = l_queue_new();
 +
-+	jvalue = json_object_new_int(value);
-+	if (!jvalue)
-+		return false;
-+
-+	json_object_object_add(jobj, keyword, jvalue);
-+	return true;
++	msg[n++] = NET_OP_FRND_REQUEST;
++	msg[n] = cache & 0x07;		// MinRequirements - Cache
++	msg[n++] |= (offer_delay & 0x0f) << 3;	// Offer Delay
++	poll_period_ms = (timeout * 300) / 4; // 3/4 of the time in ms
++	l_put_be32(timeout, msg + n);	// PollTimeout
++	msg[n++] = delay;		// ReceiveDelay
++	n += 3;
++	l_put_be16(old_friend, msg + n);	// PreviousAddress
++	n += 2;
++	msg[n++] = mesh_net_get_num_ele(net);	// NumElements
++	l_put_be16(cnt + 1, msg + n);	// Next counter
++	n += 2;
++	print_packet("Tx-NET_OP_FRND_REQUEST", msg, n);
++	mesh_net_transport_send(net, NULL, false,
++			mesh_net_get_iv_index(net), 0,
++			0, 0, FRIENDS_ADDRESS,
++			msg, n);
++	l_timeout_create_ms(1000, req_timeout, net, NULL); // 1000 ms
++	mesh_net_set_friend(net, 0);
++	cnt++;
 +}
 +
-+bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value)
++static uint8_t trans_id;
++void frnd_sub_add(struct mesh_net *net, uint32_t parms[7])
 +{
-+	json_object *jvalue;
++	struct mesh_key_set *key_set = &lpn_set;
++	uint32_t net_seq;
++	uint8_t msg[15] = { NET_OP_PROXY_SUB_ADD };
++	uint8_t i, n = 1;
 +
-+	json_object_object_del(jobj, keyword);
++	/* Check if we are in Phase 2 of Key Refresh */
++	if (new_lpn_set.nid != 0xff) {
++		uint8_t phase;
++		uint16_t net_idx = mesh_net_get_primary_idx(net);
++		uint8_t status = mesh_net_key_refresh_phase_get(net,
++							net_idx, &phase);
 +
-+	jvalue = json_object_new_boolean(value);
-+	if (!jvalue)
-+		return false;
++		if (status == MESH_STATUS_SUCCESS &&
++				phase == KEY_REFRESH_PHASE_TWO)
++			key_set = &new_lpn_set;
++	}
 +
-+	json_object_object_add(jobj, keyword, jvalue);
-+	return true;
++	msg[n++] = ++trans_id;
++	for (i = 0; i < 7; i++) {
++		if (parms[i] < 0x8000 || parms[i] > 0xffff)
++			break;
++
++		l_put_be16(parms[i], msg + n);
++		n += 2;
++	}
++
++	net_seq = mesh_net_get_seq_num(net);
++	print_packet("Friend Sub Add", msg, n);
++	mesh_net_transport_send(net, key_set, false,
++			mesh_net_get_iv_index(net), 0,
++			net_seq, 0, mesh_net_get_friend(net),
++			msg, n);
++	mesh_net_next_seq_num(net);
 +}
 +
-+bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value)
++void frnd_sub_del(struct mesh_net *net, uint32_t parms[7])
 +{
-+	json_object *jstring;
++	struct mesh_key_set *key_set = &lpn_set;
++	uint32_t net_seq;
++	uint8_t msg[15] = { NET_OP_PROXY_SUB_REMOVE };
++	uint8_t i, n = 1;
 +
-+	switch (value) {
-+	case MESH_MODE_DISABLED:
-+		jstring = json_object_new_string("disabled");
-+		break;
-+	case MESH_MODE_ENABLED:
-+		jstring = json_object_new_string("enabled");
-+		break;
-+	case MESH_MODE_UNSUPPORTED:
-+		jstring = json_object_new_string("unsupported");
-+		break;
++	/* Check if we are in Phase 2 of Key Refresh */
++	if (new_lpn_set.nid != 0xff) {
++		uint8_t phase;
++		uint16_t net_idx = mesh_net_get_primary_idx(net);
++		uint8_t status = mesh_net_key_refresh_phase_get(net,
++							net_idx, &phase);
++
++		if (status == MESH_STATUS_SUCCESS &&
++				phase == KEY_REFRESH_PHASE_TWO)
++			key_set = &new_lpn_set;
++	}
++
++	msg[n++] = ++trans_id;
++	for (i = 0; i < 7; i++) {
++		if (parms[i] < 0x8000 || parms[i] > 0xffff)
++			break;
++
++		l_put_be16(parms[i], msg + n);
++		n += 2;
++	}
++
++	net_seq = mesh_net_get_seq_num(net);
++	print_packet("Friend Sub Del", msg, n);
++	mesh_net_transport_send(net, key_set, false,
++			mesh_net_get_iv_index(net), 0,
++			net_seq, 0, mesh_net_get_friend(net),
++			msg, n);
++	mesh_net_next_seq_num(net);
++}
++
++void frnd_key_refresh(struct mesh_net *net, uint8_t phase)
++{
++	uint16_t net_idx = mesh_net_get_primary_idx(net);
++	uint8_t p[9] = { 1 };
++	uint8_t key[16];
++
++	switch (phase) {
 +	default:
-+		return false;
-+	};
++	case 0:
++	case 3:
++		if (new_lpn_set.nid != 0xff) {
++			l_info("LPN Retiring KeySet %2.2x", lpn_set.nid);
++			lpn_set = new_lpn_set;
++			new_lpn_set.nid = 0xff;
++			mesh_net_remove_keyset(net, &new_lpn_set);
++		}
++		return;
 +
-+	if (!jstring)
-+		return false;
++	case 1:
++		mesh_net_remove_keyset(net, &new_lpn_set);
++		if (!mesh_net_get_key(net, true, net_idx, key)) {
++			new_lpn_set.nid = 0xff;
++			return;
++		}
 +
-+	json_object_object_add(jobj, keyword, jstring);
++		l_put_be16(mesh_net_get_address(net), p + 1);
++		l_put_be16(mesh_net_get_friend(net), p + 3);
++		l_put_be16(cnt, p + 5);
++		l_put_be16(fn_cnt, p + 7);
++		print_packet("Friend Key P =", p, 9);
 +
-+	return true;
++		if (!mesh_crypto_k2(key, p, sizeof(p), &new_lpn_set.nid,
++					new_lpn_set.enc_key,
++					new_lpn_set.privacy_key)) {
++			new_lpn_set.nid = 0xff;
++			return;
++		}
++
++		print_packet("New-NID", &new_lpn_set.nid, 1);
++		print_packet("New-ENC_KEY", new_lpn_set.enc_key, 16);
++		print_packet("New-PRIV_KEY", new_lpn_set.privacy_key, 16);
++
++		mesh_net_add_keyset(net, &new_lpn_set);
++		return;
++
++	case 2:
++		/* Should we do anything here?  Maybe not */
++		return;
++	}
 +}
 +
-+bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
-+							uint16_t interval)
++struct mesh_key_set *frnd_get_key(struct mesh_net *net)
 +{
-+	json_object *jrelay;
++	uint8_t idx = mesh_net_get_primary_idx(net);
++	uint8_t phase = 0;
 +
-+	json_object_object_del(jnode, "relay");
++	mesh_net_key_refresh_phase_get(net, idx, &phase);
 +
-+	jrelay = json_object_new_object();
-+	if (jrelay)
-+		return false;
-+
-+	if (!mesh_db_write_mode(jrelay, "mode", mode))
-+		goto fail;
-+
-+	if (!mesh_db_write_int(jrelay, "count", count))
-+		goto fail;
-+
-+	if (!mesh_db_write_int(jrelay, "interval", interval))
-+		goto fail;
-+
-+	json_object_object_add(jnode, "relay", jrelay);
-+
-+	return true;
-+fail:
-+	json_object_put(jrelay);
-+	return false;
++	if (phase == 2)
++		return &new_lpn_set;
++	else
++		return &lpn_set;
 +}
-+
-+bool mesh_db_read_net_transmit(json_object *jobj, uint8_t *cnt,
-+							uint16_t *interval)
-+{
-+	json_object *jretransmit, *jvalue;
-+
-+	json_object_object_get_ex(jobj, "retransmit", &jretransmit);
-+	if (!jretransmit)
-+		return false;
-+
-+	json_object_object_get_ex(jretransmit, "count", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	*cnt = (uint8_t) json_object_get_int(jvalue);
-+
-+	json_object_object_get_ex(jretransmit, "interval", &jvalue);
-+	if (!jvalue)
-+		return false;
-+
-+	*interval = (uint16_t) json_object_get_int(jvalue);
-+
-+	return true;
-+}
-+
-+bool mesh_db_write_net_transmit(json_object *jobj, uint8_t cnt,
-+							uint16_t interval)
-+{
-+	json_object *jretransmit;
-+
-+	json_object_object_del(jobj, "retransmit");
-+
-+	jretransmit = json_object_new_object();
-+	if (jretransmit)
-+		return false;
-+
-+	if (!mesh_db_write_int(jretransmit, "count", cnt))
-+		goto fail;
-+
-+	if (!mesh_db_write_int(jretransmit, "interval", interval))
-+		goto fail;
-+
-+	json_object_object_add(jobj, "retransmit", jretransmit);
-+
-+	return true;
-+fail:
-+	json_object_put(jretransmit);
-+	return false;
-+
-+}
-+
-+bool mesh_db_write_iv_index(json_object *jobj, uint32_t idx, bool update)
-+{
-+	int tmp = update ? 1 : 0;
-+
-+	if (!mesh_db_write_int(jobj, "IVindex", idx))
-+		return false;
-+
-+	if (!mesh_db_write_int(jobj, "IVupdate", tmp))
-+		return false;
-+
-+	return true;
-+}
-+
-+void mesh_db_remove_property(json_object *jobj, const char *desc)
-+{
-+	json_object_object_del(jobj, desc);
-+}
-diff --git a/mesh/mesh-db.h b/mesh/mesh-db.h
-new file mode 100644
-index 000000000..336302f28
---- /dev/null
-+++ b/mesh/mesh-db.h
-@@ -0,0 +1,144 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *
-+ */
-+
-+#include <json-c/json.h>
-+
-+struct mesh_db_sub {
-+	bool virt;
-+	union {
-+		uint16_t addr;
-+		uint8_t	virt_addr[16];
-+	} src;
-+};
-+
-+struct mesh_db_pub {
-+	bool virt;
-+	uint16_t addr;
-+	uint16_t idx;
-+	uint8_t ttl;
-+	uint8_t credential;
-+	uint8_t period;
-+	uint8_t retransmit;
-+	uint8_t virt_addr[16];
-+};
-+
-+struct mesh_db_model {
-+	struct mesh_db_sub *subs;
-+	struct mesh_db_pub *pub;
-+	uint16_t *bindings;
-+	uint32_t id;
-+	bool vendor;
-+	uint32_t num_bindings;
-+	uint32_t num_subs;
-+};
-+
-+struct mesh_db_element {
-+	struct l_queue *models;
-+	uint16_t location;
-+	uint8_t index;
-+};
-+
-+struct mesh_db_modes {
-+	struct {
-+		uint16_t interval;
-+		uint8_t cnt;
-+		uint8_t state;
-+	} relay;
-+	uint8_t lpn;
-+	uint8_t friend;
-+	uint8_t proxy;
-+	uint8_t beacon;
-+};
-+
-+struct mesh_db_node {
-+	bool provisioner;
-+	uint32_t seq_number;
-+	struct mesh_db_modes modes;
-+	uint16_t cid;
-+	uint16_t pid;
-+	uint16_t vid;
-+	uint16_t crpl;
-+	uint16_t unicast;
-+	uint8_t ttl;
-+	struct l_queue *elements;
-+	uint8_t uuid[16];
-+};
-+
-+struct mesh_db_prov {
-+	uint16_t algorithm;
-+	struct {
-+		uint16_t actions;
-+		uint8_t size;
-+	} input_oob;
-+	uint8_t pub_type;
-+	struct {
-+		uint16_t actions;
-+		uint8_t size;
-+	} output_oob;
-+	uint8_t static_type;
-+	uint8_t priv_key[32];
-+};
-+
-+typedef bool (*mesh_db_net_key_cb)(uint16_t idx, uint8_t key[16],
-+			uint8_t new_key[16], int phase, void *user_data);
-+typedef bool (*mesh_db_app_key_cb)(uint16_t idx, uint16_t net_idx,
-+			uint8_t key[16], uint8_t new_key[16], void *user_data);
-+typedef bool (*mesh_db_node_cb)(struct mesh_db_node *node, void *user_data);
-+
-+bool mesh_db_read_node(json_object *jobj, mesh_db_node_cb cb, void *user_data);
-+bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
-+							void *user_data);
-+bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov);
-+bool mesh_db_read_iv_index(json_object *jobj, uint32_t *idx, bool *update);
-+bool mesh_db_read_device_key(json_object *jobj, uint8_t key_buf[16]);
-+bool mesh_db_read_net_transmit(json_object *jobj, uint8_t *cnt,
-+							uint16_t *interval);
-+bool mesh_db_write_net_transmit(json_object *jobj, uint8_t cnt,
-+							uint16_t interval);
-+bool mesh_db_read_net_keys(json_object *jobj, mesh_db_net_key_cb cb,
-+							void *user_data);
-+bool mesh_db_read_app_keys(json_object *jobj, mesh_db_app_key_cb cb,
-+							void *user_data);
-+bool mesh_db_write_device_key(json_object *jobj, uint8_t *key);
-+bool mesh_db_write_network_key(json_object *jobj, uint16_t idx, uint8_t *key,
-+						uint8_t *new_key, int phase);
-+bool mesh_db_write_app_key(json_object *jobj, uint16_t net_idx,
-+			uint16_t app_idx, uint8_t *key, uint8_t *new_key);
-+bool mesh_db_write_int(json_object *jobj, const char *keyword, int value);
-+bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
-+								uint16_t value);
-+bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value);
-+bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
-+							uint16_t interval);
-+bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value);
-+bool mesh_db_model_binding_add(json_object *jnode, uint8_t ele_idx, bool vendor,
-+					uint32_t mod_id, uint16_t app_idx);
-+bool mesh_db_model_binding_del(json_object *jnode, uint8_t ele_idx, bool vendor,
-+					uint32_t mod_id, uint16_t app_idx);
-+bool mesh_db_app_key_add(json_object *jnode, uint16_t net_idx, uint16_t app_idx,
-+					const uint8_t key[16], bool update);
-+bool mesh_db_app_key_del(json_object *jobj, uint16_t net_idx, uint16_t idx);
-+bool mesh_db_net_key_add(json_object *jobj, uint16_t net_idx,
-+					const uint8_t key[16], int phase);
-+bool mesh_db_net_key_del(json_object *jobj, uint16_t net_idx);
-+bool mesh_db_write_kr_phase(json_object *jobj, uint16_t net_idx, int phase);
-+bool mesh_db_write_address(json_object *jobj, uint16_t address);
-+bool mesh_db_write_iv_index(json_object *jobj, uint32_t idx, bool update);
-+void mesh_db_remove_property(json_object *jobj, const char *desc);
 -- 
 2.14.4
+
