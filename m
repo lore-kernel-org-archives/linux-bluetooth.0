@@ -1,57 +1,95 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 09 Jul 2018 12:26:08 -0400
+Date: Mon, 09 Jul 2018 12:25:01 -0400
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 From: David Krauser <david@krauser.org>
 Reply-To: David Krauser <david@krauser.org>
-Subject: [PATCH BlueZ 2/3] doc: provide MTU on GATT value reads and writes
-Message-ID: <zHLAnvtzV-cTdPzv2Z8O_R4BJu1_gxF4GdYvx4sZpDpVdw0iywvZQiHeE3SMwV-Flwi9XFm5oONYnbJc0qhPdSKwaBm77qFAWS4w4L9uqsA=@krauser.org>
+Subject: [PATCH v4 BlueZ 1/3] src: provide MTU on GATT value reads and writes
+Message-ID: <-IxonkAjFFza3nbM1_QKB4jDE0o58uFRz3beTnJMH8thHlNYZesVvpoR1a82Y9WpYD5t1Pkam5Op7i3shxU0dksj4sBvZmgejuouSzGGumw=@krauser.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/gatt-api.txt | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ src/gatt-database.c | 23 +++++++----------------
+ 1 file changed, 7 insertions(+), 16 deletions(-)
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index 2a8da75b0..7cb7c0d80 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -68,6 +68,7 @@ Methods=09=09array{byte} ReadValue(dict options)
- =09=09=09operation was successful.
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 99c8ea231..b96f5daf4 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -1932,7 +1932,9 @@ static void append_options(DBusMessageIter *iter, voi=
+d *user_data)
+ {
+ =09struct pending_op *op =3D user_data;
+ =09const char *path =3D device_get_path(op->device);
++=09struct bt_gatt_server *server;
+ =09const char *link;
++=09uint16_t mtu;
 =20
- =09=09=09Possible options: "offset": uint16 offset
-+=09=09=09=09=09  "mtu": Exchanged MTU (Server only)
- =09=09=09=09=09  "device": Object Device (Server only)
+ =09switch (op->link_type) {
+ =09case BT_ATT_LINK_BREDR:
+@@ -1955,6 +1957,11 @@ static void append_options(DBusMessageIter *iter, vo=
+id *user_data)
+ =09if (op->prep_authorize)
+ =09=09dict_append_entry(iter, "prepare-authorize", DBUS_TYPE_BOOLEAN,
+ =09=09=09=09=09=09=09&op->prep_authorize);
++
++=09server =3D btd_device_get_gatt_server(op->device);
++=09mtu =3D bt_gatt_server_get_mtu(server);
++
++=09dict_append_entry(iter, "mtu", DBUS_TYPE_UINT16, &mtu);
+ }
 =20
- =09=09=09Possible Errors: org.bluez.Error.Failed
-@@ -83,6 +84,7 @@ Methods=09=09array{byte} ReadValue(dict options)
- =09=09=09characteristic.
+ static void read_setup_cb(DBusMessageIter *iter, void *user_data)
+@@ -2234,8 +2241,6 @@ static void acquire_write_setup(DBusMessageIter *iter=
+, void *user_data)
+ {
+ =09struct pending_op *op =3D user_data;
+ =09DBusMessageIter dict;
+-=09struct bt_gatt_server *server;
+-=09uint16_t mtu;
 =20
- =09=09=09Possible options: "offset": Start offset
-+=09=09=09=09=09  "mtu": Exchanged MTU (Server only)
- =09=09=09=09=09  "device": Device path (Server only)
- =09=09=09=09=09  "link": Link type (Server only)
- =09=09=09=09=09  "prepare-authorize": boolean Is prepare
-@@ -120,7 +122,7 @@ Methods=09=09array{byte} ReadValue(dict options)
- =09=09=09reconnections as the MTU has to be renegotiated.
+ =09dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ =09=09=09=09=09DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+@@ -2246,12 +2251,6 @@ static void acquire_write_setup(DBusMessageIter *ite=
+r, void *user_data)
 =20
- =09=09=09Possible options: "device": Object Device (Server only)
--=09=09=09=09=09  "MTU": Exchanged MTU (Server only)
-+=09=09=09=09=09  "mtu": Exchanged MTU (Server only)
- =09=09=09=09=09  "link": Link type (Server only)
+ =09append_options(&dict, op);
 =20
- =09=09=09Possible Errors: org.bluez.Error.Failed
-@@ -156,7 +158,7 @@ Methods=09=09array{byte} ReadValue(dict options)
- =09=09=09reconnections as the MTU has to be renegotiated.
+-=09server =3D btd_device_get_gatt_server(op->device);
+-
+-=09mtu =3D bt_gatt_server_get_mtu(server);
+-
+-=09dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &mtu);
+-
+ =09dbus_message_iter_close_container(iter, &dict);
+ }
 =20
- =09=09=09Possible options: "device": Object Device (Server only)
--=09=09=09=09=09  "MTU": Exchanged MTU (Server only)
-+=09=09=09=09=09  "mtu": Exchanged MTU (Server only)
- =09=09=09=09=09  "link": Link type (Server only)
+@@ -2320,8 +2319,6 @@ static void acquire_notify_setup(DBusMessageIter *ite=
+r, void *user_data)
+ {
+ =09DBusMessageIter dict;
+ =09struct pending_op *op =3D user_data;
+-=09struct bt_gatt_server *server;
+-=09uint16_t mtu;
 =20
- =09=09=09Possible Errors: org.bluez.Error.Failed
+ =09dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+ =09=09=09=09=09DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+@@ -2332,12 +2329,6 @@ static void acquire_notify_setup(DBusMessageIter *it=
+er, void *user_data)
+=20
+ =09append_options(&dict, op);
+=20
+-=09server =3D btd_device_get_gatt_server(op->device);
+-
+-=09mtu =3D bt_gatt_server_get_mtu(server);
+-
+-=09dict_append_entry(&dict, "MTU", DBUS_TYPE_UINT16, &mtu);
+-
+ =09dbus_message_iter_close_container(iter, &dict);
+ }
+=20
 --=20
 2.18.0
 
