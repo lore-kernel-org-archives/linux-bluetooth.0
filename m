@@ -1,11 +1,11 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <7IJfxPVAI3OFibEao3WDjPS2j0dCVLH6IigW0Q6Xob_jViEwzBNQts9kf3ekqRt_Q6cTloeu6C8GLSuwBnGiRfGIoXmSKj5IEAEt1PTAMpM=@krauser.org>
-References: <7IJfxPVAI3OFibEao3WDjPS2j0dCVLH6IigW0Q6Xob_jViEwzBNQts9kf3ekqRt_Q6cTloeu6C8GLSuwBnGiRfGIoXmSKj5IEAEt1PTAMpM=@krauser.org>
+In-Reply-To: <zwvZX5AOgP4GvmJFQHUWMoqsFDMz7RVyW7rbyd54IxZ88ITxAgI3nIei-QvtRsT6AafMiNl9JbKgdYxftG_TY4hns3GEhmvhQXXWMK3ZFUE=@krauser.org>
+References: <zwvZX5AOgP4GvmJFQHUWMoqsFDMz7RVyW7rbyd54IxZ88ITxAgI3nIei-QvtRsT6AafMiNl9JbKgdYxftG_TY4hns3GEhmvhQXXWMK3ZFUE=@krauser.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 9 Jul 2018 17:24:46 +0300
-Message-ID: <CABBYNZLVCMT9cO=C6z3c2QJBjhQKhmzv_DENcZZji-iY0Gv5jw@mail.gmail.com>
-Subject: Re: [PATCH v3 BlueZ 4/4] src: rename MinEncKeySize
+Date: Mon, 9 Jul 2018 17:21:59 +0300
+Message-ID: <CABBYNZ+nOdHuYPYm9CQ_uPnK1J-mP_UHg7uvNKs=ypTnq4uStA@mail.gmail.com>
+Subject: Re: [PATCH v3 BlueZ 2/4] doc: provide MTU on GATT value reads and writes
 To: David Krauser <david@krauser.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -14,77 +14,58 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi David,
 
-On Sun, Jul 8, 2018 at 5:11 AM, David Krauser <david@krauser.org> wrote:
+On Sun, Jul 8, 2018 at 5:09 AM, David Krauser <david@krauser.org> wrote:
 > ---
->  src/main.c    | 16 +++++++++++++---
->  src/main.conf |  4 ++--
->  2 files changed, 15 insertions(+), 5 deletions(-)
+>  doc/gatt-api.txt | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
 >
-> diff --git a/src/main.c b/src/main.c
-> index b70e6044b..060c2cc33 100644
-> --- a/src/main.c
-> +++ b/src/main.c
-> @@ -104,7 +104,8 @@ static const char *policy_options[] = {
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index 2a8da75b0..ff4bc333a 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -68,6 +68,7 @@ Methods               array{byte} ReadValue(dict options)
+>                         operation was successful.
 >
->  static const char *gatt_options[] = {
->         "Cache",
-> -       "MinEncKeySize",
-> +       "MinEncKeySize", /* deprecated */
+>                         Possible options: "offset": uint16 offset
+> +                                         "mtu": Exchanged MTU (Server only)
+>                                           "device": Object Device (Server only)
+>
+>                         Possible Errors: org.bluez.Error.Failed
+> @@ -83,6 +84,7 @@ Methods               array{byte} ReadValue(dict options)
+>                         characteristic.
+>
+>                         Possible options: "offset": Start offset
+> +                                         "mtu": Exchanged MTU (Server only)
+>                                           "device": Device path (Server only)
+>                                           "link": Link type (Server only)
+>                                           "prepare-authorize": boolean Is prepare
+> @@ -120,7 +122,9 @@ Methods             array{byte} ReadValue(dict options)
+>                         reconnections as the MTU has to be renegotiated.
+>
+>                         Possible options: "device": Object Device (Server only)
+> -                                         "MTU": Exchanged MTU (Server only)
+> +                                         "mtu": Exchanged MTU (Server only)
+> +                                         "MTU": Exchanged MTU (Deprecated,
+> +                                                               Server only)
+>                                           "link": Link type (Server only)
+>
+>                         Possible Errors: org.bluez.Error.Failed
+> @@ -156,7 +160,9 @@ Methods             array{byte} ReadValue(dict options)
+>                         reconnections as the MTU has to be renegotiated.
+>
+>                         Possible options: "device": Object Device (Server only)
+> -                                         "MTU": Exchanged MTU (Server only)
+> +                                         "mtu": Exchanged MTU (Server only)
+> +                                         "MTU": Exchanged MTU (Deprecated,
+> +                                                               Server only)
 
-Afaik this was introduced just for testing purpose, so Id say we don't
-need to deprecate just change it directly, we never really did
-deprecation on the daemon options anyway.
+Id just changed these to mtu since these APIs were introduced recently
+I don't think there would be a problem, besides it should be possible
+to handle this in the client by just ignoring the casing.
 
-> +       "MinEncryptionKeySize",
->         "DefaultLeMtu",
->         NULL
->  };
-> @@ -411,12 +412,21 @@ static void parse_config(GKeyFile *config)
->         }
+>                                           "link": Link type (Server only)
 >
->         val = g_key_file_get_integer(config, "GATT",
-> -                                               "MinEncKeySize", &err);
-> +                                               "MinEncryptionKeySize", &err);
-> +
-> +       /* Retry with deprecated option on error. */
-> +       if (err) {
-> +               DBG("%s", err->message);
-> +               g_clear_error(&err);
-> +               val = g_key_file_get_integer(config, "GATT",
-> +                                                       "MinEncKeySize", &err);
-> +       }
-> +
->         if (err) {
->                 DBG("%s", err->message);
->                 g_clear_error(&err);
->         } else {
-> -               DBG("MinEncKeySize=%d", val);
-> +               DBG("MinEncryptionKeySize=%d", val);
->
->                 if (val >=7 && val <= 16)
->                         main_opts.min_enc_key_size = val;
-> diff --git a/src/main.conf b/src/main.conf
-> index c503040a5..4b0ae757b 100644
-> --- a/src/main.conf
-> +++ b/src/main.conf
-> @@ -63,7 +63,7 @@
->  # Possible values: "off", "device", "network"
->  # "network" option not supported currently
->  # Defaults to "off"
-> -# Privacy = off
-> +#Privacy = off
->
->  [GATT]
->  # GATT attribute cache.
-> @@ -80,7 +80,7 @@
->  # Minimum required Encryption Key Size for accessing secured characteristics.
->  # Possible values: 0 and 7-16. 0 means don't care.
->  # Defaults to 0
-> -# MinEncKeySize = 0
-> +#MinEncryptionKeySize = 0
->
->  # Default LE MTU size.
->  # Possible values: 23-517
+>                         Possible Errors: org.bluez.Error.Failed
 > --
 > 2.18.0
 >
