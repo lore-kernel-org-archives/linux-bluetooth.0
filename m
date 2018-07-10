@@ -1,28 +1,90 @@
-Return-Path: <ianwmorrison@gmail.com>
+Return-Path: <mka@chromium.org>
+Date: Tue, 10 Jul 2018 09:39:09 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
+	rtatiya@codeaurora.org, hemantg@codeaurora.org,
+	linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>
+Subject: Re: [PATCH v9 7/7] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth chip wcn3990
+Message-ID: <20180710163909.GQ129942@google.com>
+References: <20180705165515.13340-1-bgodavar@codeaurora.org>
+ <20180705165515.13340-8-bgodavar@codeaurora.org>
+ <20180706222110.GK129942@google.com>
+ <a5d87ad5d916df5b5ca7c0c69a786e4a@codeaurora.org>
 MIME-Version: 1.0
-References: <20180710081117.25078-1-hdegoede@redhat.com>
-In-Reply-To: <20180710081117.25078-1-hdegoede@redhat.com>
-From: Ian W MORRISON <ianwmorrison@gmail.com>
-Date: Wed, 11 Jul 2018 11:24:22 +1000
-Message-ID: <CAFXWsS8DLDpK1TmsFfeGZPH1xJGksVGRHbbp+b3sfkruwAZ6CQ@mail.gmail.com>
-Subject: Re: [PATCH v3 0/9] Bluetooth: Add RTL8723BS support
-To: Hans de Goede <hdegoede@redhat.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, Jeremy Cline <jeremy@jcline.org>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>, linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <a5d87ad5d916df5b5ca7c0c69a786e4a@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 10 Jul 2018 at 18:12, Hans de Goede <hdegoede@redhat.com> wrote:
->
->
-> New in v3:
-> -Fix build error when CONFIG_RTL_BT is not set, reported by Paul Cercueil
->
-Hi Hans,
+Hi Bala,
 
-Minor point but v3 fix is for CONFIG_BT_RTL.
+On Tue, Jul 10, 2018 at 06:22:02PM +0530, Balakrishna Godavarthi wrote:
+> Hi Matthias,
+> 
+> On 2018-07-07 03:51, Matthias Kaehlcke wrote:
+> > On Thu, Jul 05, 2018 at 10:25:15PM +0530, Balakrishna Godavarthi wrote:
+> > > +	 * sending vendor power on and off pulse to SoC.
+> > > +	 */
+> > 
+> > The function is called qca_send_vendor_cmd(), the comment about power
+> > on/off pulses seems misplaced here. Are there other 'vendor commands'
+> > that require a different flow control behavior?
+> > 
+> > Perhaps the function should have a different name or we need another
+> > wrapper.
+> > 
+> 
+> [Bala]: this function is used to send single byte vendor commands. like
+> power on and off pulse.
+>         and all single byte vendor commands require an flow control off and
+> on.
+>         so might be function name change is required.
+>         instead of qca_send_vendor_cmd(). i want to change function name to
+> qca_send_pulse() as this will be generic.
 
-Regards,
-Ian
+'pulse' covers power on/off pulses, is it also applicable to other
+single byte commands? How are these commands named in the QCA
+documentation?
+
+In any case the comment about 'vendor power on and off pulse' should
+be updated to refer to 'vendor commands'/'pulses' or whatever
+terminology we decide to use.
+
+> > > +	hci_uart_set_flow_control(hu, true);
+> > 
+> > Should the changing of the flow control be limited to wcn3990? As of
+> > now the function is only called for wcn3990, however this is not
+> > stated as a requirement and might change in the future.
+> > 
+> > > +	skb_put_u8(skb, cmd);
+> > > +	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+> > > +
+> > > +	skb_queue_tail(&qca->txq, skb);
+> > > +	hci_uart_tx_wakeup(hu);
+> > > +
+> > > +	/* Wait for 100 uS for SoC to settle down */
+> > > +	usleep_range(100, 200);
+> > 
+> > Is this needed for any 'vendor command' or directly related with the
+> > power on/off pulses?
+> > 
+> 
+> [Bala] : flow control  off/on is needed for power on and off pulses along
+> with
+>          command to set baudrate.. this is common across all the present
+> chips and chips which are in development stages.
+>          might be function name is confusing will update the function name.
+
+The current name *might* be ok, depending on if we come up with
+something better. If the QCA docs refer to them as 'vendor commands'
+and there are no other multi-byte 'vendor commands' I'm fine with it.
+
+Is the settling down of 100us specific to the power on/off pulses or
+also applicable to other commands?
+
+Thanks
+
+Matthias
