@@ -2,131 +2,293 @@ Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
-Date: Tue, 10 Jul 2018 18:02:31 +0530
+Date: Tue, 10 Jul 2018 17:49:20 +0530
 From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: Rob Herring <robh@kernel.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
  linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
  linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
  rtatiya@codeaurora.org, hemantg@codeaurora.org,
  linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v9 1/7] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI chip wcn3990
-In-Reply-To: <20180705204250.GA30484@rob-hp-laptop>
+Subject: Re: [PATCH v9 4/7] Bluetooth: hci_qca: Add wrapper functions for
+ setting UART speed
+In-Reply-To: <20180706194059.GJ129942@google.com>
 References: <20180705165515.13340-1-bgodavar@codeaurora.org>
- <20180705165515.13340-2-bgodavar@codeaurora.org>
- <20180705204250.GA30484@rob-hp-laptop>
-Message-ID: <afafe6e8055477020376f65dd14cc346@codeaurora.org>
+ <20180705165515.13340-5-bgodavar@codeaurora.org>
+ <20180706194059.GJ129942@google.com>
+Message-ID: <55c70cb40b421ab87c36dd2ecf886c1b@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Rob,
+Hi Matthias,
 
-On 2018-07-06 02:12, Rob Herring wrote:
-> On Thu, Jul 05, 2018 at 10:25:09PM +0530, Balakrishna Godavarthi wrote:
->> This patch enables regulators for the Qualcomm Bluetooth wcn3990
->> controller.
+On 2018-07-07 01:10, Matthias Kaehlcke wrote:
+> On Thu, Jul 05, 2018 at 10:25:12PM +0530, Balakrishna Godavarthi wrote:
+>> In function qca_setup, we set initial and operating speeds for 
+>> Qualcomm
+>> Bluetooth SoC's. This block of code is common across different
+>> Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
+>> a wrapper function to set the speeds. So that future coming SoC's
+>> can use these wrapper functions to set speeds.
 >> 
 >> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 >> ---
 >> Changes in v9:
->>     * updated with latest reg handle and names.
->>     * updated max-speed definition.
+>>     * added corner case to fail driver if speeds are missing.
 >> 
 >> Changes in v8:
->>     * Separated the optional entries between two chips
+>>     * common function to set INIT and operating speeds.
 >> 
 >> Changes in v7:
->>     * no change.
->> 
->> Changes in v6:
->> 
->>     * Changed the oper-speed to max-speed.
->> 
->> Changes in v5:
->> 
->>     * Added entry for oper-speed and init-speed.
->> 
+>>     * initial patch
+>>     * created wrapper functions for init and operating speeds.
 >> ---
->>  .../bindings/net/qualcomm-bluetooth.txt       | 28 
->> +++++++++++++++++--
->>  1 file changed, 26 insertions(+), 2 deletions(-)
+>>  drivers/bluetooth/hci_qca.c | 94 
+>> ++++++++++++++++++++++++++++---------
+>>  1 file changed, 71 insertions(+), 23 deletions(-)
 >> 
->> diff --git 
->> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt 
->> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->> index 0ea18a53cc29..ced58575e2b8 100644
->> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->> @@ -10,12 +10,22 @@ device the slave device is attached to.
->>  Required properties:
->>   - compatible: should contain one of the following:
->>     * "qcom,qca6174-bt"
->> +   * "qcom,wcn3990-bt"
->> +
->> +Optional properties for compatible string qcom,qca6174-bt:
->> 
->> -Optional properties:
->>   - enable-gpios: gpio specifier used to enable chip
->>   - clocks: clock provided to the controller (SUSCLK_32KHZ)
->> 
->> -Example:
->> +Optional properties for compatible string qcom,wcn3990-bt:
->> +
->> + - vddio-supply: Bluetooth wcn3990 VDD_IO supply regulator handle.
->> + - vddxo-supply: Bluetooth wcn3990 VDD_XO supply regulator handle.
->> + - vddrf-supply: Bluetooth wcn3990 VDD_RF supply regulator handle.
->> + - vddch0-supply: Bluetooth wcn3990 VDD_CH0 supply regulator handle.
->> + - max-speed: see 
->> Documentation/devicetree/bindings/serial/slave-device.txt
->> +
->> +Examples:
->> 
->>  serial@7570000 {
->>  	label = "BT-UART";
->> @@ -28,3 +38,17 @@ serial@7570000 {
->>  		clocks = <&divclk4>;
->>  	};
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index c02e1d465cca..9106547324fa 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -119,6 +119,11 @@ struct qca_data {
+>>  	u64 votes_off;
 >>  };
->> +
->> +serial@898000 {
->> +	label = "BT-UART";
-> 
-> label is generally intended for when you need to identify the physical
-> connector which wouldn't apply here.
-> 
->> +	status = "okay";
-> 
-> Don't show status in examples.
-> 
->> +
->> +	bluetooth {
->> +		compatible = "qcom,wcn3990-bt";
->> +		vddio-supply = <&vreg_s4a_1p8>;
->> +		vddxosupply = <&vreg_l7a_1p8>;
-> 
-> Typo.
-> 
-> With those fixed,
-> 
-> Reviewed-by: Rob Herring <robh@kernel.org>
-> 
->> +		vddrf-supply = <&vreg_l17a_1p3>;
->> +		vddch0-supply = <&vreg_l25a_3p3>;
->> +		max-speed = <3200000>;
->> +	};
->> +};
->> --
->> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
->> Forum,
->> a Linux Foundation Collaborative Project
 >> 
->> --
->> To unsubscribe from this list: send the line "unsubscribe devicetree" 
->> in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>> +enum qca_speed_type {
+>> +	QCA_INIT_SPEED = 1,
+>> +	QCA_OPER_SPEED
+>> +};
+>> +
+>>  struct qca_serdev {
+>>  	struct hci_uart	 serdev_hu;
+>>  	struct gpio_desc *bt_en;
+>> @@ -923,6 +928,62 @@ static inline void host_set_baudrate(struct 
+>> hci_uart *hu, unsigned int speed)
+>>  		hci_uart_set_baudrate(hu, speed);
+>>  }
+>> 
+>> +static unsigned int qca_get_speed(struct hci_uart *hu,
+>> +				  enum qca_speed_type speed_type)
+>> +{
+>> +	unsigned int speed = 0;
+>> +
+>> +	if (speed_type == QCA_INIT_SPEED) {
+>> +		if (hu->init_speed)
+>> +			speed = hu->init_speed;
+>> +		else if (hu->proto->init_speed)
+>> +			speed = hu->proto->init_speed;
+>> +	} else {
+>> +		if (hu->oper_speed)
+>> +			speed = hu->oper_speed;
+>> +		else if (hu->proto->oper_speed)
+>> +			speed = hu->proto->oper_speed;
+>> +	}
+>> +
+>> +	return speed;
+>> +}
+>> +
+>> +static int qca_check_speeds(struct hci_uart *hu)
+>> +{
+>> +	/* One or the other speeds should be non zero. */
+>> +	if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+>> +	    !qca_get_speed(hu, QCA_OPER_SPEED))
+>> +		return -EINVAL;
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type 
+>> speed_type)
+>> +{
+>> +	unsigned int speed, qca_baudrate;
+>> +	int ret;
+>> +
+>> +	if (speed_type == QCA_INIT_SPEED) {
+>> +		speed = qca_get_speed(hu, QCA_INIT_SPEED);
+>> +		if (speed)
+>> +			host_set_baudrate(hu, speed);
+> 
+> mega-nit: for consistency with the 'else' branch you could return if
+> 'speed == 0'. Not important though, feel free to ignore.
+> 
+>> +	} else {
+>> +		speed = qca_get_speed(hu, QCA_OPER_SPEED);
+>> +		if (!speed)
+>> +			return 0;
+>> +
+>> +		qca_baudrate = qca_get_baudrate_value(speed);
+>> +		bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
+>> +		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
+>> +		if (ret)
+>> +			return ret;
+>> +
+>> +		host_set_baudrate(hu, speed);
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static int qca_setup(struct hci_uart *hu)
+>>  {
+>>  	struct hci_dev *hdev = hu->hdev;
+>> @@ -933,37 +994,24 @@ static int qca_setup(struct hci_uart *hu)
+>> 
+>>  	bt_dev_info(hdev, "ROME setup");
+>> 
+>> +	ret = qca_check_speeds(hu);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>>  	/* Patch downloading has to be done without IBS mode */
+>>  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>> 
+>>  	/* Setup initial baudrate */
+>> -	speed = 0;
+>> -	if (hu->init_speed)
+>> -		speed = hu->init_speed;
+>> -	else if (hu->proto->init_speed)
+>> -		speed = hu->proto->init_speed;
+>> -
+>> -	if (speed)
+>> -		host_set_baudrate(hu, speed);
+>> +	qca_set_speed(hu, QCA_INIT_SPEED);
+>> 
+>>  	/* Setup user speed if needed */
+>> -	speed = 0;
+>> -	if (hu->oper_speed)
+>> -		speed = hu->oper_speed;
+>> -	else if (hu->proto->oper_speed)
+>> -		speed = hu->proto->oper_speed;
+>> -
+>> +	speed = qca_get_speed(hu, QCA_OPER_SPEED);
+>>  	if (speed) {
+>> -		qca_baudrate = qca_get_baudrate_value(speed);
+>> -
+>> -		bt_dev_info(hdev, "Set UART speed to %d", speed);
+>> -		ret = qca_set_baudrate(hdev, qca_baudrate);
+>> -		if (ret) {
+>> -			bt_dev_err(hdev, "Failed to change the baud rate (%d)",
+>> -				   ret);
+>> +		ret = qca_set_speed(hu, QCA_OPER_SPEED);
+>> +		if (ret)
+>>  			return ret;
+>> -		}
+>> -		host_set_baudrate(hu, speed);
+>> +
+>> +		qca_baudrate = qca_get_baudrate_value(speed);
+>>  	}
+> 
+> One doubt, the outcome of this change is:
+> 
+> 	qca_set_speed(hu, QCA_INIT_SPEED);
+> 
+> 	/* Setup user speed if needed */
+> 	speed = qca_get_speed(hu, QCA_OPER_SPEED);
+> 	if (speed) {
+> 		ret = qca_set_speed(hu, QCA_OPER_SPEED);
+> 		if (ret)
+> 			return ret;
+> 
+> 		qca_baudrate = qca_get_baudrate_value(speed);
+> 	}
+> 
+> So we set the init speed and then directly switch to operating speed
+> if it is defined.
+> 
+> Couldn't we do this instead:
+> 
+> 	/* Setup user speed if needed */
+> 	speed = qca_get_speed(hu, QCA_OPER_SPEED);
+> 	if (speed) {
+> 		ret = qca_set_speed(hu, QCA_OPER_SPEED);
+> 		if (ret)
+> 			return ret;
+> 
+> 		qca_baudrate = qca_get_baudrate_value(speed);
+> 	} else {
+> 	       qca_set_speed(hu, QCA_INIT_SPEED);
+> 	}
+> 
+> 
 
-Thanks for reviewing patch. will update those.
+[Bala]: above else block is not required.
+         if we have operating speed to set, then we need to send the baud 
+rate change request to BT chip on INIT baud rate. so before sending or 
+setting operating baud rate.. HOST driver should be on the HOST init 
+baud rate.
+         Pls refer below for more info how we set speed and hci driver 
+works.
+> 
+> Or is setting the init speed needed before the operating speed can be
+> set? Sorry if we discussed this earlier in this series, I know I had a
+> few doubts about the speed management but don't recall this one
+> specifically.
+> 
+
+[Bala]: Let me give a big picture how we make BT work via serdev HCI 
+arch. (qca chip is taken as reference)
+
+         1. first of all, probe is called when we have compatible string 
+matches in qca_bluetooth_of_match table.
+         2. that will call qca_serdev_probe() in which based on BT device 
+connected to the platform, we decide IO's
+            which required from HOST to chip i.e.. controls required to 
+turn ON/OFF BT. which includes clocks and regulators and GPIO's.
+         3. in qca_serdev_probe() we call  hci_uart_register_device() and 
+pass ops (operations handler) handler for driver registration.
+         4. in hci_uart_register_device(), we call qca_open().. where we 
+open the port via serdev_device_open() that
+            intern will call Qualcomm specific lower level UART driver 
+i.e.. where we read and write to port register address.
+            so serdev_device_open() is a common function to all BT chip 
+vendor, but the open routine in the low level driver is completely 
+vendor dependent.
+            for example, some vendors will set an default UART speed 
+(speed can be any) while opening the uart_port(). where as other will 
+not set. Just open the port with basic configurations.
+
+         5. coming back to qca_open(), we try to make chip to boot up by 
+enabling clock from HOST for BT chip to operate..  it is purely chip 
+defined.
+         6. moving back to hci_uart_register_device()... we will call 
+hci_register_dev() in that function we call hci_power_on().. that will 
+call hci_dev_do_open()
+         7. in hci_dev_do_open() we call hdev->setup() i.e. 
+hci_uart_setup() in that function we set initial baud rate and operating 
+bartender if we have protos defined for setting chip baud rate.(in our 
+case it is null)
+
+         8. so it will call setup function will be vendor specific.. as 
+we are using an UART, HOST and chip need to stick to the agreement of 
+initial UART speed for commands to send until and change baud rate 
+request is
+            sent.
+         9. now in qca_setup(), we setup an initial host baud rate i.e. 
+what we have agreement with BT chip for initial communication. Now here 
+the question comes why are we setting init speed again and again
+            i.e uart_open() and hci_uart_setup().. here is the answer, wt 
+ever layer we have are common to all vendors may also tend to change. we 
+can't take a risk, we will setup init baud rate in vendor layer i.e.
+            qca_setup().
+         10. then we need to change the baud rate of chip..so we need to 
+send commands to chip. at wt speed we need to send change baud rate 
+request is totally based on agreement with BT Chip. so here we use 
+initial
+             baud rate.
+         11. we need to change baud rate request command to chip on init 
+baud rate. if command sending is successful we change the host baud rate 
+from init to operating baud rate.. else we operate on init baud rate.
+
+
+         the above is based on my understanding. Pls let me know if i 
+have cleared your doubt.
+
+
+> Other than that:
+> 
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+
+
 
 -- 
 Regards
