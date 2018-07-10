@@ -1,289 +1,543 @@
-Return-Path: <mka@chromium.org>
-Date: Tue, 10 Jul 2018 09:12:46 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
-	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v9 4/7] Bluetooth: hci_qca: Add wrapper functions for
- setting UART speed
-Message-ID: <20180710161246.GP129942@google.com>
-References: <20180705165515.13340-1-bgodavar@codeaurora.org>
- <20180705165515.13340-5-bgodavar@codeaurora.org>
- <20180706194059.GJ129942@google.com>
- <55c70cb40b421ab87c36dd2ecf886c1b@codeaurora.org>
+Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <55c70cb40b421ab87c36dd2ecf886c1b@codeaurora.org>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Tue, 10 Jul 2018 18:22:02 +0530
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
+ rtatiya@codeaurora.org, hemantg@codeaurora.org,
+ linux-arm-msm@vger.kernel.org, Stephen Boyd <swboyd@chromium.org>
+Subject: Re: [PATCH v9 7/7] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth chip wcn3990
+In-Reply-To: <20180706222110.GK129942@google.com>
+References: <20180705165515.13340-1-bgodavar@codeaurora.org>
+ <20180705165515.13340-8-bgodavar@codeaurora.org>
+ <20180706222110.GK129942@google.com>
+Message-ID: <a5d87ad5d916df5b5ca7c0c69a786e4a@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 10, 2018 at 05:49:20PM +0530, Balakrishna Godavarthi wrote:
-> Hi Matthias,
-> 
-> On 2018-07-07 01:10, Matthias Kaehlcke wrote:
-> > On Thu, Jul 05, 2018 at 10:25:12PM +0530, Balakrishna Godavarthi wrote:
-> > > In function qca_setup, we set initial and operating speeds for
-> > > Qualcomm
-> > > Bluetooth SoC's. This block of code is common across different
-> > > Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
-> > > a wrapper function to set the speeds. So that future coming SoC's
-> > > can use these wrapper functions to set speeds.
-> > > 
-> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> > > ---
-> > > Changes in v9:
-> > >     * added corner case to fail driver if speeds are missing.
-> > > 
-> > > Changes in v8:
-> > >     * common function to set INIT and operating speeds.
-> > > 
-> > > Changes in v7:
-> > >     * initial patch
-> > >     * created wrapper functions for init and operating speeds.
-> > > ---
-> > >  drivers/bluetooth/hci_qca.c | 94
-> > > ++++++++++++++++++++++++++++---------
-> > >  1 file changed, 71 insertions(+), 23 deletions(-)
-> > > 
-> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > > index c02e1d465cca..9106547324fa 100644
-> > > --- a/drivers/bluetooth/hci_qca.c
-> > > +++ b/drivers/bluetooth/hci_qca.c
-> > > @@ -119,6 +119,11 @@ struct qca_data {
-> > >  	u64 votes_off;
-> > >  };
-> > > 
-> > > +enum qca_speed_type {
-> > > +	QCA_INIT_SPEED = 1,
-> > > +	QCA_OPER_SPEED
-> > > +};
-> > > +
-> > >  struct qca_serdev {
-> > >  	struct hci_uart	 serdev_hu;
-> > >  	struct gpio_desc *bt_en;
-> > > @@ -923,6 +928,62 @@ static inline void host_set_baudrate(struct
-> > > hci_uart *hu, unsigned int speed)
-> > >  		hci_uart_set_baudrate(hu, speed);
-> > >  }
-> > > 
-> > > +static unsigned int qca_get_speed(struct hci_uart *hu,
-> > > +				  enum qca_speed_type speed_type)
-> > > +{
-> > > +	unsigned int speed = 0;
-> > > +
-> > > +	if (speed_type == QCA_INIT_SPEED) {
-> > > +		if (hu->init_speed)
-> > > +			speed = hu->init_speed;
-> > > +		else if (hu->proto->init_speed)
-> > > +			speed = hu->proto->init_speed;
-> > > +	} else {
-> > > +		if (hu->oper_speed)
-> > > +			speed = hu->oper_speed;
-> > > +		else if (hu->proto->oper_speed)
-> > > +			speed = hu->proto->oper_speed;
-> > > +	}
-> > > +
-> > > +	return speed;
-> > > +}
-> > > +
-> > > +static int qca_check_speeds(struct hci_uart *hu)
-> > > +{
-> > > +	/* One or the other speeds should be non zero. */
-> > > +	if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
-> > > +	    !qca_get_speed(hu, QCA_OPER_SPEED))
-> > > +		return -EINVAL;
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type
-> > > speed_type)
-> > > +{
-> > > +	unsigned int speed, qca_baudrate;
-> > > +	int ret;
-> > > +
-> > > +	if (speed_type == QCA_INIT_SPEED) {
-> > > +		speed = qca_get_speed(hu, QCA_INIT_SPEED);
-> > > +		if (speed)
-> > > +			host_set_baudrate(hu, speed);
-> > 
-> > mega-nit: for consistency with the 'else' branch you could return if
-> > 'speed == 0'. Not important though, feel free to ignore.
-> > 
-> > > +	} else {
-> > > +		speed = qca_get_speed(hu, QCA_OPER_SPEED);
-> > > +		if (!speed)
-> > > +			return 0;
-> > > +
-> > > +		qca_baudrate = qca_get_baudrate_value(speed);
-> > > +		bt_dev_info(hu->hdev, "Set UART speed to %d", speed);
-> > > +		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
-> > > +		if (ret)
-> > > +			return ret;
-> > > +
-> > > +		host_set_baudrate(hu, speed);
-> > > +	}
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > >  static int qca_setup(struct hci_uart *hu)
-> > >  {
-> > >  	struct hci_dev *hdev = hu->hdev;
-> > > @@ -933,37 +994,24 @@ static int qca_setup(struct hci_uart *hu)
-> > > 
-> > >  	bt_dev_info(hdev, "ROME setup");
-> > > 
-> > > +	ret = qca_check_speeds(hu);
-> > > +	if (ret)
-> > > +		return ret;
-> > > +
-> > >  	/* Patch downloading has to be done without IBS mode */
-> > >  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
-> > > 
-> > >  	/* Setup initial baudrate */
-> > > -	speed = 0;
-> > > -	if (hu->init_speed)
-> > > -		speed = hu->init_speed;
-> > > -	else if (hu->proto->init_speed)
-> > > -		speed = hu->proto->init_speed;
-> > > -
-> > > -	if (speed)
-> > > -		host_set_baudrate(hu, speed);
-> > > +	qca_set_speed(hu, QCA_INIT_SPEED);
-> > > 
-> > >  	/* Setup user speed if needed */
-> > > -	speed = 0;
-> > > -	if (hu->oper_speed)
-> > > -		speed = hu->oper_speed;
-> > > -	else if (hu->proto->oper_speed)
-> > > -		speed = hu->proto->oper_speed;
-> > > -
-> > > +	speed = qca_get_speed(hu, QCA_OPER_SPEED);
-> > >  	if (speed) {
-> > > -		qca_baudrate = qca_get_baudrate_value(speed);
-> > > -
-> > > -		bt_dev_info(hdev, "Set UART speed to %d", speed);
-> > > -		ret = qca_set_baudrate(hdev, qca_baudrate);
-> > > -		if (ret) {
-> > > -			bt_dev_err(hdev, "Failed to change the baud rate (%d)",
-> > > -				   ret);
-> > > +		ret = qca_set_speed(hu, QCA_OPER_SPEED);
-> > > +		if (ret)
-> > >  			return ret;
-> > > -		}
-> > > -		host_set_baudrate(hu, speed);
-> > > +
-> > > +		qca_baudrate = qca_get_baudrate_value(speed);
-> > >  	}
-> > 
-> > One doubt, the outcome of this change is:
-> > 
-> > 	qca_set_speed(hu, QCA_INIT_SPEED);
-> > 
-> > 	/* Setup user speed if needed */
-> > 	speed = qca_get_speed(hu, QCA_OPER_SPEED);
-> > 	if (speed) {
-> > 		ret = qca_set_speed(hu, QCA_OPER_SPEED);
-> > 		if (ret)
-> > 			return ret;
-> > 
-> > 		qca_baudrate = qca_get_baudrate_value(speed);
-> > 	}
-> > 
-> > So we set the init speed and then directly switch to operating speed
-> > if it is defined.
-> > 
-> > Couldn't we do this instead:
-> > 
-> > 	/* Setup user speed if needed */
-> > 	speed = qca_get_speed(hu, QCA_OPER_SPEED);
-> > 	if (speed) {
-> > 		ret = qca_set_speed(hu, QCA_OPER_SPEED);
-> > 		if (ret)
-> > 			return ret;
-> > 
-> > 		qca_baudrate = qca_get_baudrate_value(speed);
-> > 	} else {
-> > 	       qca_set_speed(hu, QCA_INIT_SPEED);
-> > 	}
-> > 
-> > 
-> 
-> [Bala]: above else block is not required.
->         if we have operating speed to set, then we need to send the baud
-> rate change request to BT chip on INIT baud rate. so before sending or
-> setting operating baud rate.. HOST driver should be on the HOST init baud
-> rate.
->         Pls refer below for more info how we set speed and hci driver works.
-> > 
-> > Or is setting the init speed needed before the operating speed can be
-> > set? Sorry if we discussed this earlier in this series, I know I had a
-> > few doubts about the speed management but don't recall this one
-> > specifically.
-> > 
-> 
-> [Bala]: Let me give a big picture how we make BT work via serdev HCI arch.
-> (qca chip is taken as reference)
-> 
->         1. first of all, probe is called when we have compatible string
-> matches in qca_bluetooth_of_match table.
->         2. that will call qca_serdev_probe() in which based on BT device
-> connected to the platform, we decide IO's
->            which required from HOST to chip i.e.. controls required to turn
-> ON/OFF BT. which includes clocks and regulators and GPIO's.
->         3. in qca_serdev_probe() we call  hci_uart_register_device() and
-> pass ops (operations handler) handler for driver registration.
->         4. in hci_uart_register_device(), we call qca_open().. where we open
-> the port via serdev_device_open() that
->            intern will call Qualcomm specific lower level UART driver i.e..
-> where we read and write to port register address.
->            so serdev_device_open() is a common function to all BT chip
-> vendor, but the open routine in the low level driver is completely vendor
-> dependent.
->            for example, some vendors will set an default UART speed (speed
-> can be any) while opening the uart_port(). where as other will not set. Just
-> open the port with basic configurations.
-> 
->         5. coming back to qca_open(), we try to make chip to boot up by
-> enabling clock from HOST for BT chip to operate..  it is purely chip
-> defined.
->         6. moving back to hci_uart_register_device()... we will call
-> hci_register_dev() in that function we call hci_power_on().. that will call
-> hci_dev_do_open()
->         7. in hci_dev_do_open() we call hdev->setup() i.e. hci_uart_setup()
-> in that function we set initial baud rate and operating bartender if we have
-> protos defined for setting chip baud rate.(in our case it is null)
-> 
->         8. so it will call setup function will be vendor specific.. as we
-> are using an UART, HOST and chip need to stick to the agreement of initial
-> UART speed for commands to send until and change baud rate request is
->            sent.
->         9. now in qca_setup(), we setup an initial host baud rate i.e. what
-> we have agreement with BT chip for initial communication. Now here the
-> question comes why are we setting init speed again and again
->            i.e uart_open() and hci_uart_setup().. here is the answer, wt
-> ever layer we have are common to all vendors may also tend to change. we
-> can't take a risk, we will setup init baud rate in vendor layer i.e.
->            qca_setup().
->         10. then we need to change the baud rate of chip..so we need to send
-> commands to chip. at wt speed we need to send change baud rate request is
-> totally based on agreement with BT Chip. so here we use initial
->             baud rate.
->         11. we need to change baud rate request command to chip on init baud
-> rate. if command sending is successful we change the host baud rate from
-> init to operating baud rate.. else we operate on init baud rate.
-> 
-> 
->         the above is based on my understanding. Pls let me know if i have
-> cleared your doubt.
+Hi Matthias,
 
-Thanks for the explanation. I focussed on the final outcome (operating
-speed is set) and ignored that the host port needs to be at init speed
-in order to send the baud rate change command to the chip.
+On 2018-07-07 03:51, Matthias Kaehlcke wrote:
+> On Thu, Jul 05, 2018 at 10:25:15PM +0530, Balakrishna Godavarthi wrote:
+>> Add support to set voltage/current of various regulators
+>> to power up/down Bluetooth chip wcn3990.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>> changes in v9:
+>>     * moved flow control to vendor and set_baudarte functions.
+>>     * removed parent regs.
+>> 
+>> changes in v8:
+>>     * closing qca buffer, if qca_power_setup fails
+>>     * chnaged ibs start timer function call location.
+>>     * updated review comments.
+>> 
+>> changes in v7:
+>>     * addressed review comments.
+>> 
+>> changes in v6:
+>>     * Hooked up qca_power to qca_serdev.
+>>     * renamed all the naming inconsistency functions with qca_*
+>>     * leveraged common code of ROME for wcn3990.
+>>     * created wrapper functions for re-usable blocks.
+>>     * updated function of _*regulator_enable and _*regualtor_disable.
+>>     * removed redundant comments and functions.
+>>     * addressed review comments.
+>> 
+>> Changes in v5:
+>>     * updated regulator vddpa min_uV to 1304000.
+>>       * addressed review comments.
+>> 
+>> Changes in v4:
+>>     * Segregated the changes of btqca from hci_qca
+>>     * rebased all changes on top of bluetooth-next.
+>>     * addressed review comments.
+>> 
+>> ---
+>>  drivers/bluetooth/btqca.h   |   3 +
+>>  drivers/bluetooth/hci_qca.c | 387 
+>> +++++++++++++++++++++++++++++++-----
+>>  2 files changed, 345 insertions(+), 45 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>> index a9c2779f3e07..0c01f375fe83 100644
+>> --- a/drivers/bluetooth/btqca.h
+>> +++ b/drivers/bluetooth/btqca.h
+>> @@ -37,6 +37,9 @@
+>>  #define EDL_TAG_ID_HCI			(17)
+>>  #define EDL_TAG_ID_DEEP_SLEEP		(27)
+>> 
+>> +#define QCA_WCN3990_POWERON_PULSE	0xFC
+>> +#define QCA_WCN3990_POWEROFF_PULSE	0xC0
+>> +
+>>  enum qca_bardrate {
+>>  	QCA_BAUDRATE_115200 	= 0,
+>>  	QCA_BAUDRATE_57600,
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 7ebfaa0edf3f..d62c7785a618 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -5,7 +5,7 @@
+>>   *  protocol extension to H4.
+>>   *
+>>   *  Copyright (C) 2007 Texas Instruments, Inc.
+>> - *  Copyright (c) 2010, 2012 The Linux Foundation. All rights 
+>> reserved.
+>> + *  Copyright (c) 2010, 2012, 2018 The Linux Foundation. All rights 
+>> reserved.
+>>   *
+>>   *  Acknowledgements:
+>>   *  This file is based on hci_ll.c, which was...
+>> @@ -31,9 +31,14 @@
+>>  #include <linux/kernel.h>
+>>  #include <linux/clk.h>
+>>  #include <linux/debugfs.h>
+>> +#include <linux/delay.h>
+>> +#include <linux/device.h>
+>>  #include <linux/gpio/consumer.h>
+>>  #include <linux/mod_devicetable.h>
+>>  #include <linux/module.h>
+>> +#include <linux/of_device.h>
+>> +#include <linux/platform_device.h>
+>> +#include <linux/regulator/consumer.h>
+>>  #include <linux/serdev.h>
+>> 
+>>  #include <net/bluetooth/bluetooth.h>
+>> @@ -124,12 +129,46 @@ enum qca_speed_type {
+>>  	QCA_OPER_SPEED
+>>  };
+>> 
+>> +/*
+>> + * Voltage regulator information required for configuring the
+>> + * QCA Bluetooth chipset
+>> + */
+>> +struct qca_vreg {
+>> +	const char *name;
+>> +	unsigned int min_uV;
+>> +	unsigned int max_uV;
+>> +	unsigned int load_uA;
+>> +};
+>> +
+>> +struct qca_vreg_data {
+>> +	enum qca_btsoc_type soc_type;
+>> +	struct qca_vreg *vregs;
+>> +	size_t num_vregs;
+>> +};
+>> +
+>> +/*
+>> + * Platform data for the QCA Bluetooth power driver.
+>> + */
+>> +struct qca_power {
+>> +	struct device *dev;
+>> +	const struct qca_vreg_data *vreg_data;
+>> +	struct regulator_bulk_data *vreg_bulk;
+>> +	bool vregs_on;
+>> +};
+>> +
+>>  struct qca_serdev {
+>>  	struct hci_uart	 serdev_hu;
+>>  	struct gpio_desc *bt_en;
+>>  	struct clk	 *susclk;
+>> +	enum qca_btsoc_type btsoc_type;
+>> +	struct qca_power *bt_power;
+>> +	u32 init_speed;
+>> +	u32 oper_speed;
+>>  };
+>> 
+>> +static int qca_power_setup(struct hci_uart *hu, bool on);
+>> +static void qca_power_shutdown(struct hci_uart *hu);
+>> +
+>>  static void __serial_clock_on(struct tty_struct *tty)
+>>  {
+>>  	/* TODO: Some chipset requires to enable UART clock on client
+>> @@ -407,6 +446,7 @@ static int qca_open(struct hci_uart *hu)
+>>  {
+>>  	struct qca_serdev *qcadev;
+>>  	struct qca_data *qca;
+>> +	int ret;
+>> 
+>>  	BT_DBG("hu %p qca_open", hu);
+>> 
+>> @@ -458,19 +498,32 @@ static int qca_open(struct hci_uart *hu)
+>> 
+>>  	hu->priv = qca;
+>> 
+>> -	timer_setup(&qca->wake_retrans_timer, hci_ibs_wake_retrans_timeout, 
+>> 0);
+>> -	qca->wake_retrans = IBS_WAKE_RETRANS_TIMEOUT_MS;
+>> -
+>> -	timer_setup(&qca->tx_idle_timer, hci_ibs_tx_idle_timeout, 0);
+>> -	qca->tx_idle_delay = IBS_TX_IDLE_TIMEOUT_MS;
+>> -
+>>  	if (hu->serdev) {
+>>  		serdev_device_open(hu->serdev);
+>> 
+>>  		qcadev = serdev_device_get_drvdata(hu->serdev);
+>> -		gpiod_set_value_cansleep(qcadev->bt_en, 1);
+>> +		if (qcadev->btsoc_type != QCA_WCN3990) {
+>> +			gpiod_set_value_cansleep(qcadev->bt_en, 1);
+>> +		} else {
+>> +			hu->init_speed = qcadev->init_speed;
+>> +			hu->oper_speed = qcadev->oper_speed;
+>> +			ret = qca_power_setup(hu, true);
+>> +			if (ret) {
+>> +				destroy_workqueue(qca->workqueue);
+>> +				kfree_skb(qca->rx_skb);
+>> +				hu->priv = NULL;
+>> +				kfree(qca);
+>> +				return ret;
+>> +			}
+>> +		}
+>>  	}
+>> 
+>> +	timer_setup(&qca->wake_retrans_timer, hci_ibs_wake_retrans_timeout, 
+>> 0);
+>> +	qca->wake_retrans = IBS_WAKE_RETRANS_TIMEOUT_MS;
+>> +
+>> +	timer_setup(&qca->tx_idle_timer, hci_ibs_tx_idle_timeout, 0);
+>> +	qca->tx_idle_delay = IBS_TX_IDLE_TIMEOUT_MS;
+>> +
+>>  	BT_DBG("HCI_UART_QCA open, tx_idle_delay=%u, wake_retrans=%u",
+>>  	       qca->tx_idle_delay, qca->wake_retrans);
+>> 
+>> @@ -554,10 +607,13 @@ static int qca_close(struct hci_uart *hu)
+>>  	qca->hu = NULL;
+>> 
+>>  	if (hu->serdev) {
+>> -		serdev_device_close(hu->serdev);
+>> -
+>>  		qcadev = serdev_device_get_drvdata(hu->serdev);
+>> -		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+>> +		if (qcadev->btsoc_type == QCA_WCN3990)
+>> +			qca_power_shutdown(hu);
+>> +		else
+>> +			gpiod_set_value_cansleep(qcadev->bt_en, 0);
+>> +
+>> +		serdev_device_close(hu->serdev);
+>>  	}
+>> 
+>>  	kfree_skb(qca->rx_skb);
+>> @@ -891,6 +947,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
+>> uint8_t baudrate)
+>>  	struct hci_uart *hu = hci_get_drvdata(hdev);
+>>  	struct qca_data *qca = hu->priv;
+>>  	struct sk_buff *skb;
+>> +	struct qca_serdev *qcadev;
+>>  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
+>> 
+>>  	if (baudrate > QCA_BAUDRATE_3200000)
+>> @@ -904,6 +961,13 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
+>> uint8_t baudrate)
+>>  		return -ENOMEM;
+>>  	}
+>> 
+>> +	/* Disabling hardware flow control is mandate while
+> 
+> nit: s/mandate/mandatory|required/
+> 
+[Bala]: will update.
 
-Cheers
+>> +	 * sending change baudrate request to wcn3990 SoC.
+>> +	 */
+>> +	qcadev = serdev_device_get_drvdata(hu->serdev);
+>> +	if (qcadev->btsoc_type == QCA_WCN3990)
+>> +		hci_uart_set_flow_control(hu, true);
+>> +
+>>  	/* Assign commands to change baudrate and packet type. */
+>>  	skb_put_data(skb, cmd, sizeof(cmd));
+>>  	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+>> @@ -919,6 +983,9 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
+>> uint8_t baudrate)
+>>  	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
+>>  	set_current_state(TASK_RUNNING);
+>> 
+>> +	if (qcadev->btsoc_type == QCA_WCN3990)
+>> +		hci_uart_set_flow_control(hu, false);
+>> +
+>>  	return 0;
+>>  }
+>> 
+>> @@ -930,6 +997,36 @@ static inline void host_set_baudrate(struct 
+>> hci_uart *hu, unsigned int speed)
+>>  		hci_uart_set_baudrate(hu, speed);
+>>  }
+>> 
+>> +static int qca_send_vendor_cmd(struct hci_dev *hdev, u8 cmd)
+>> +{
+>> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+>> +	struct qca_data *qca = hu->priv;
+>> +	struct sk_buff *skb;
+>> +
+>> +	bt_dev_dbg(hdev, "sending command %02x to SoC", cmd);
+>> +
+>> +	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+>> +	if (!skb)
+>> +		return -ENOMEM;
+>> +
+>> +	/* Disabling hardware flow control is mandate while
+> 
+> Same nit as above
+> 
 
-Matthias
+[Bala]: will update.
+
+>> +	 * sending vendor power on and off pulse to SoC.
+>> +	 */
+> 
+> The function is called qca_send_vendor_cmd(), the comment about power
+> on/off pulses seems misplaced here. Are there other 'vendor commands'
+> that require a different flow control behavior?
+> 
+> Perhaps the function should have a different name or we need another
+> wrapper.
+> 
+
+[Bala]: this function is used to send single byte vendor commands. like 
+power on and off pulse.
+         and all single byte vendor commands require an flow control off 
+and on.
+         so might be function name change is required.
+         instead of qca_send_vendor_cmd(). i want to change function name 
+to qca_send_pulse() as this will be generic.
+
+>> +	hci_uart_set_flow_control(hu, true);
+> 
+> Should the changing of the flow control be limited to wcn3990? As of
+> now the function is only called for wcn3990, however this is not
+> stated as a requirement and might change in the future.
+> 
+>> +	skb_put_u8(skb, cmd);
+>> +	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+>> +
+>> +	skb_queue_tail(&qca->txq, skb);
+>> +	hci_uart_tx_wakeup(hu);
+>> +
+>> +	/* Wait for 100 uS for SoC to settle down */
+>> +	usleep_range(100, 200);
+> 
+> Is this needed for any 'vendor command' or directly related with the
+> power on/off pulses?
+> 
+
+[Bala] : flow control  off/on is needed for power on and off pulses 
+along with
+          command to set baudrate.. this is common across all the present 
+chips and chips which are in development stages.
+          might be function name is confusing will update the function 
+name.
+
+>> +	hci_uart_set_flow_control(hu, false);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static unsigned int qca_get_speed(struct hci_uart *hu,
+>>  				  enum qca_speed_type speed_type)
+>>  {
+>> @@ -952,10 +1049,19 @@ static unsigned int qca_get_speed(struct 
+>> hci_uart *hu,
+>> 
+>>  static int qca_check_speeds(struct hci_uart *hu)
+>>  {
+>> -	/* One or the other speeds should be non zero. */
+>> -	if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+>> -	    !qca_get_speed(hu, QCA_OPER_SPEED))
+>> +	struct qca_serdev *qcadev;
+>> +
+>> +	qcadev = serdev_device_get_drvdata(hu->serdev);
+>> +	if ((qcadev->btsoc_type == QCA_WCN3990 &&
+>> +	    !qca_get_speed(hu, QCA_INIT_SPEED)) ||
+>> +	    !qca_get_speed(hu, QCA_OPER_SPEED)) {
+>> +		/* Both INIT and OPER speed should be non zero. */
+>>  		return -EINVAL;
+>> +	} else if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+>> +		    !qca_get_speed(hu, QCA_OPER_SPEED)) {
+>> +		/* One or the other speeds should be non zero. */
+>> +		return -EINVAL;
+>> +	}
+> 
+> It is questionable if the comments are useful, they are basically
+> stating the same as the conditions.
+> 
+> if-else statements with a single statement in all branches shouldn't
+> use curly braces. Personally I don't dislike them in this case with
+> the multi-line conditions, but in principle they shoulnd't be there.
+> 
+> nit: this would be easier to read with nested if statements:
+> 
+[Bala]: will update
+
+> 	if (qcadev->btsoc_type == QCA_WCN3990)
+> 		if (!qca_get_speed(hu, QCA_INIT_SPEED)) ||
+> 		    !qca_get_speed(hu, QCA_OPER_SPEED))
+> 			return -EINVAL;
+> 	else
+> 		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+> 		    !qca_get_speed(hu, QCA_OPER_SPEED)) {
+> 			return -EINVAL;
+> 
+>>  	return 0;
+>>  }
+>> @@ -986,15 +1092,40 @@ static int qca_set_speed(struct hci_uart *hu, 
+>> enum qca_speed_type speed_type)
+>>  	return 0;
+>>  }
+>> 
+>> +static int qca_wcn3990_init(struct hci_uart *hu)
+>> +{
+>> +	int ret;
+>> +
+>> +	ret = qca_send_vendor_cmd(hu->hdev, QCA_WCN3990_POWERON_PULSE);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	/* Wait for 100 ms for SoC to boot up */
+>> +	msleep(100);
+>> +	serdev_device_close(hu->serdev);
+>> +	ret = serdev_device_open(hu->serdev);
+>> +	if (ret) {
+>> +		bt_dev_err(hu->hdev, "failed to open port");
+>> +		return ret;
+>> +	}
+>> +
+>> +	/* Setup initial baudrate */
+>> +	qca_set_speed(hu, QCA_INIT_SPEED);
+> 
+> The comment is a bit redundant.
+> 
+[Bala]: will update
+
+>> +	hci_uart_set_flow_control(hu, false);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static int qca_setup(struct hci_uart *hu)
+>>  {
+>>  	struct hci_dev *hdev = hu->hdev;
+>>  	struct qca_data *qca = hu->priv;
+>>  	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+>> +	struct qca_serdev *qcadev;
+>>  	int ret;
+>>  	int soc_ver = 0;
+>> 
+>> -	bt_dev_info(hdev, "ROME setup");
+>> +	qcadev = serdev_device_get_drvdata(hu->serdev);
+>> 
+>>  	ret = qca_check_speeds(hu);
+>>  	if (ret)
+>> @@ -1006,6 +1137,21 @@ static int qca_setup(struct hci_uart *hu)
+>>  	/* Setup initial baudrate */
+>>  	qca_set_speed(hu, QCA_INIT_SPEED);
+>> 
+>> +	if (qcadev->btsoc_type == QCA_WCN3990) {
+>> +		bt_dev_dbg(hdev, "setting up wcn3990");
+> 
+> Seems like this should be bt_dev_info() for consistency with Rome.
+> 
+[Bala]: will update
+
+>> +		ret = qca_wcn3990_init(hu);
+>> +		if (ret)
+>> +			return ret;
+>> +
+>> +		ret = qca_read_soc_version(hdev, &soc_ver);
+>> +		if (ret < 0 || soc_ver == 0) {
+>> +			bt_dev_err(hdev, "Failed to get version %d", ret);
+>> +			return ret;
+>> +		}
+>> +	} else {
+>> +		bt_dev_info(hdev, "ROME setup");
+>> +	}
+>> +
+>>  	/* Setup user speed if needed */
+>>  	speed = qca_get_speed(hu, QCA_OPER_SPEED);
+>>  	if (speed) {
+>> @@ -1016,16 +1162,18 @@ static int qca_setup(struct hci_uart *hu)
+>>  		qca_baudrate = qca_get_baudrate_value(speed);
+>>  	}
+>> 
+>> -	/* Get QCA version information */
+>> -	ret = qca_read_soc_version(hdev, &soc_ver);
+>> -	if (ret < 0 || soc_ver == 0) {
+>> -		bt_dev_err(hdev, "QCA Failed to get version (%d)", ret);
+>> -		return ret;
+>> +	if (!soc_ver) {
+> 
+> 
+> The following would probably be clearer:
+> 
+>   	if (qcadev->btsoc_type != QCA_WCN3990) {
+> 
+>> +		/* Get QCA version information */
+>> +		ret = qca_read_soc_version(hdev, &soc_ver);
+>> +		if (ret < 0 || soc_ver == 0) {
+>> +			bt_dev_err(hdev, "QCA Failed to get version (%d)", ret);
+>> +			return ret;
+>> +		}
+>> +		bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+> 
+> Couldn't we hide some of this in qca_read_soc_version()?
+> 
+
+[Bala]: we can hide soc_ver==0 in qca_read_soc_version()
+         will update.
+
+> qca_read_soc_version() could at least do the logging in the error case
+> (the 'soc_ver == 0' case could be handled there as well), which would
+> leave us with:
+> 
+> 
+> 	ret = qca_read_soc_version(hdev, &soc_ver);
+> 	if (ret)
+> 		return ret;
+> 
+> And the same above.
+> 
+> The controller version can be logged outside of the branch for both
+> wcn3990 and Rome.
+> 
+
+[Bala]: will update.
+
+
+>>  	}
+>> -	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
+>> 
+>>  	/* Setup patch / NVM configurations */
+>> -	ret = qca_uart_setup(hdev, qca_baudrate, QCA_ROME, soc_ver);
+>> +	ret = qca_uart_setup(hdev, qca_baudrate, qcadev->btsoc_type, 
+>> soc_ver);
+>>  	if (!ret) {
+>>  		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>>  		qca_debugfs_init(hdev);
+>> @@ -1061,9 +1209,123 @@ static struct hci_uart_proto qca_proto = {
+>>  	.dequeue	= qca_dequeue,
+>>  };
+>> 
+>> +static const struct qca_vreg_data qca_soc_data = {
+>> +	.soc_type = QCA_WCN3990,
+>> +	.vregs = (struct qca_vreg []) {
+>> +		{ "vddio",   1800000, 1800000,  0 },
+>> +		{ "vddxo",   1800000, 1800000,  1 },
+>> +		{ "vddrf",   1304000, 1304000,  1 },
+>> +		{ "vddch0",  3000000, 3312000,  1 },
+>> +	},
+>> +	.num_vregs = 4,
+>> +};
+> 
+> I didn't chime in earlier in the discussion with Stephen on the
+> regulators (https://patchwork.kernel.org/patch/10467911/), however I
+> agree with him that specifying at load of 1uA doesn't seem to make
+> much sense. What would happen if the load remained unspecified (or 0)?
+
+[Bala]: will test and get back to you on this.
+
+-- 
+Regards
+Balakrishna.
