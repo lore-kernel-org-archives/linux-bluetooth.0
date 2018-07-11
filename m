@@ -1,44 +1,50 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 11 Jul 2018 16:45:01 +0200
+Date: Wed, 11 Jul 2018 16:37:47 +0200
 From: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluez: dbus method call for switching endpoint
-Message-ID: <20180711144501.ovdxc2expa4bg6sc@pali>
-References: <20180711082352.oo6srapfnol5nkxq@pali>
- <CABBYNZJuGT5_zhg-BkAc4XjtVu5His92cHTujrin=SMOVbaodQ@mail.gmail.com>
+Subject: Re: bluez: A2DP backchannel
+Message-ID: <20180711143747.lg6ve2lxkfphkftt@pali>
+References: <20180711110406.hkcqfjkmxsqq5xqk@pali>
+ <CABBYNZJQPJOz75cZ4M8WZO0ZL29ePnsi1V1Y1Rc6S-=DT0ox+w@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <CABBYNZJuGT5_zhg-BkAc4XjtVu5His92cHTujrin=SMOVbaodQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJQPJOz75cZ4M8WZO0ZL29ePnsi1V1Y1Rc6S-=DT0ox+w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 11 July 2018 16:27:07 Luiz Augusto von Dentz wrote:
-> One way to solve all of these is that we would expose the remote
-> endpoints using MediaEndpoint1
+On Wednesday 11 July 2018 16:34:14 Luiz Augusto von Dentz wrote:
+> Hi Pali,
+> 
+> On Wed, Jul 11, 2018 at 2:04 PM, Pali Rohár <pali.rohar@gmail.com> wrote:
+> > Hi!
+> >
+> > Some vendor A2DP bluetooth codecs like FastStream or aptX Low Latency
+> > supports backchannel. Which means that they are bi-directional and in
+> > A2DP they supports not only (music) playback, but also receiving
+> > backchannel (microphone) voice.
+> >
+> > How to establish this bi-directional A2DP transfer with backchannel via
+> > bluez daemon?
+> 
+> There is no such thing as bi-directional in AVDTP, which is a screw up
+> from the spec authors,
 
-So client application (like pulseadio) would see list of remote
-endpoints (one for each codec) and choose one for connection?
+So it means that those vendor A2DP codecs somehow extends AVDTP, right?
+I would need to figure out how A2DP devices send voice data... At least
+backchannel activation for FastStream is via one bit in codec parameters
+like other codec parameters.
 
-Looks like this should solve this problem.
+> luckily we don't have to stick to it since our
+> sockets are bi-directional so you can send and receive data at same
+> time, though the configuration must be the same in either direction
+> otherwise we would have to support transport multiplexing to have
+> multiple configuration done using the same channel.
 
-> though only SelectConfiguration would
-> be really useful here and that doesn't contain the remote capabilities
-> that probably should be made into properties, along with codec type
-> and uuid.
-
-Remote capabilities are needed. And for codec type == vendor it is needed
-to know also vendor id and codec id.
-
-> Besides a good headset would probably
-> remember what codec you selected the last time and just connect with
-> it, this btw is what I would do when operating as a sink.
-
-I hope that Linux would support also not-so-good headsets.
-
-Anyway, dual booting between systems which support different set of
-codecs makes those "good headset" with remember support just
-"no-so-good" one.
+So does it mean that I can read from file descriptor received from dbus
+which is used for sending encoded A2DP audio samples? And if other side
+(e.g device with FastStream or aptX LL vendor codec) send voice via A2DP
+then I receive them on that file descriptor?
 
 -- 
 Pali Rohár
