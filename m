@@ -1,49 +1,47 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Date: Wed, 11 Jul 2018 10:23:52 +0200
+From: Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v4 00/13] Bluetooth: Extended Adv, Scan, Connection and PHY support 
-Date: Wed, 11 Jul 2018 15:01:22 +0530
-Message-Id: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: bluez: dbus method call for switching endpoint
+Message-ID: <20180711082352.oo6srapfnol5nkxq@pali>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implemented Get, Set PHY Configuration and setting of PHY in
-Advertising. Also implemented extended advertising,
-scanning and connection.
+Hi!
 
-v2: Fixed kbuild warnings
-v3: Added BREDR packet types in PHY Configurtion commands and events
-v4: Added default phys as variable in hdev and removed same from hci flags
+I prepared WIP patch for pulseaudio which adds support for A2DP aptX
+codec (using LGPL libopenaptx library) but there is a one big problem.
 
-Jaganath Kanakkassery (13):
-  Bluetooth: Define default phys in hdev and set 1M as default
-  Bluetooth: Implement Get PHY Configuration mgmt command
-  Bluetooth: Implement Set PHY Confguration command
-  Bluetooth: Set Scan PHYs based on selected PHYs by user
-  Bluetooth: Handle extended ADV PDU types
-  Bluetooth: Use selected PHYs in extended connect
-  Bluetooth: Read no of adv sets during init
-  Bluetooth: Impmlement extended adv enable
-  Bluetooth: Use Set ext adv/scan rsp data if controller supports
-  Bluetooth: Implement disable and removal of adv instance
-  Bluetooth: Use ext adv for directed adv
-  Bluetooth: Implement Set ADV set random address
-  Bluetooth: Implement secondary advertising on different PHYs
+https://patchwork.freedesktop.org/patch/236801/
+https://github.com/pali/libopenaptx
 
- include/net/bluetooth/hci.h      | 116 +++++++++-
- include/net/bluetooth/hci_core.h |  21 ++
- include/net/bluetooth/mgmt.h     |  55 +++++
- net/bluetooth/hci_conn.c         | 153 +++++++++----
- net/bluetooth/hci_core.c         |  25 ++-
- net/bluetooth/hci_event.c        | 182 ++++++++++++++--
- net/bluetooth/hci_request.c      | 456 ++++++++++++++++++++++++++++++++++-----
- net/bluetooth/hci_request.h      |   8 +
- net/bluetooth/hci_sock.c         |   1 +
- net/bluetooth/mgmt.c             | 420 +++++++++++++++++++++++++++++++++++-
- 10 files changed, 1314 insertions(+), 123 deletions(-)
+bluez dbus API does not provide a way to switch from one codec to
+another once A2DP connection is established.
+
+And to have support for more codecs in pulseaudio (e.g. both SBC and
+aptX) it is needed to export for each codec own endpoint.
+
+I was told that for new connections bluez choose first registered
+endpoint and therefore also codec. But when connection is initiated by
+A2DP device itself, then codec is chosen randomly. And once connection
+is active there is no way to change codec.
+
+Therefore client application (like pulseaudio) have no control on codec
+selection, nor it cannot change codes from one to other.
+
+So for supporting more then one codec in pulseaudio, which means
+anything different as mandatory SBC, it is needed that bluez exports
+some dbus API for changing currently selected codec.
+
+Can you extend bluez daemon for this support?
+
+Also I have an another question, how to get (via dbus API) list of all
+supported codecs by particular A2DP device? This is needed e.g. in GUI
+applications for selecting which codec to use for headset device. And
+select menu should contain only supported codecs.
 
 -- 
-2.7.4
-
+Pali Rohár
+pali.rohar@gmail.com
