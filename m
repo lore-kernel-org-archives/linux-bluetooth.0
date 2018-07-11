@@ -1,213 +1,205 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Ankit Navik <ankit.p.navik@intel.com>
+Return-Path: <jaganath.k.os@gmail.com>
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: bharat.b.panda@intel.com, ankit.p.navik@intel.com
-Subject: [PATCH] Bluetooth: Add definitions and track LE resolve list modification
-Date: Wed, 11 Jul 2018 15:20:39 +0530
-Message-Id: <1531302639-16648-1-git-send-email-ankit.p.navik@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: marcel@holtmann.org,
+	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v4 13/13] Bluetooth: Implement secondary advertising on different PHYs
+Date: Wed, 11 Jul 2018 15:01:35 +0530
+Message-Id: <1531301495-14479-14-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add the definitions for adding entries to the LE resolve list and
-removing entries from the LE resolve list. When the LE resolve list
-gets changed via HCI commands make sure that the internal storage of
-the resolve list entries gets updated.
+This patch adds support for advertising in primary and secondary
+channel on different PHYs. User can add the phy preference in
+the flag based on which phy type will be added in extended
+advertising parameter would be set.
 
-Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
+@ MGMT Command: Add Advertising (0x003e) plen 11
+        Instance: 1
+        Flags: 0x00000200
+          Advertise in CODED on Secondary channel
+        Duration: 0
+        Timeout: 0
+        Advertising data length: 0
+        Scan response length: 0
+< HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 2
+        Extended advertising: Disabled (0x00)
+        Number of sets: Disable all sets (0x00)
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Advertising Enable (0x08|0x0039) ncmd 2
+        Status: Success (0x00)
+< HCI Command: LE Set Extended Advertising Parameters (0x08|0x0036) plen 25
+        Handle: 0x00
+        Properties: 0x0000
+        Min advertising interval: 1280.000 msec (0x0800)
+        Max advertising interval: 1280.000 msec (0x0800)
+        Channel map: 37, 38, 39 (0x07)
+        Own address type: Random (0x01)
+        Peer address type: Public (0x00)
+        Peer address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
+        TX power: 127 dbm (0x7f)
+        Primary PHY: LE Coded (0x03)
+        Secondary max skip: 0x00
+        Secondary PHY: LE Coded (0x03)
+        SID: 0x00
+        Scan request notifications: Disabled (0x00)
+
+Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- include/net/bluetooth/hci.h      | 14 ++++++++++++
- include/net/bluetooth/hci_core.h |  5 +++-
- net/bluetooth/hci_core.c         |  9 +++++++-
- net/bluetooth/hci_event.c        | 49 +++++++++++++++++++++++++++++++++++++++-
- net/bluetooth/hci_sock.c         |  3 ++-
- net/bluetooth/mgmt.c             |  4 ++--
- 6 files changed, 78 insertions(+), 6 deletions(-)
+ include/net/bluetooth/hci.h  |  4 ++++
+ include/net/bluetooth/mgmt.h |  6 ++++++
+ net/bluetooth/hci_request.c  | 39 +++++++++++++++++++++++++++++++--------
+ net/bluetooth/mgmt.c         | 18 +++++++++++++++---
+ 4 files changed, 56 insertions(+), 11 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 4af1a3a..1abcd14 100644
+index 40a532a..2795c9e 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -1490,6 +1490,20 @@ struct hci_cp_le_write_def_data_len {
- 	__le16	tx_time;
+@@ -411,6 +411,8 @@ enum {
+ #define HCI_LE_SLAVE_FEATURES		0x08
+ #define HCI_LE_PING			0x10
+ #define HCI_LE_DATA_LEN_EXT		0x20
++#define HCI_LE_PHY_2M			0x01
++#define HCI_LE_PHY_CODED		0x08
+ #define HCI_LE_EXT_ADV			0x10
+ #define HCI_LE_EXT_SCAN_POLICY		0x80
+ #define HCI_LE_PHY_2M			0x01
+@@ -1607,6 +1609,8 @@ struct hci_cp_le_set_ext_adv_params {
  } __packed;
  
-+#define HCI_OP_LE_ADD_TO_RESOLV_LIST	0x2027
-+struct hci_cp_le_add_to_resolv_list {
-+	__u8	 bdaddr_type;
-+	bdaddr_t bdaddr;
-+	__u8	 peer_irk[16];
-+	__u8	 local_irk[16];
-+} __packed;
-+
-+#define HCI_OP_LE_DEL_FROM_RESOLV_LIST	0x2028
-+struct hci_cp_le_del_from_resolv_list {
-+	__u8	 bdaddr_type;
-+	bdaddr_t bdaddr;
-+} __packed;
-+
- #define HCI_OP_LE_CLEAR_RESOLV_LIST	0x2029
+ #define HCI_ADV_PHY_1M		0X01
++#define HCI_ADV_PHY_2M		0x02
++#define HCI_ADV_PHY_CODED	0x03
  
- #define HCI_OP_LE_READ_RESOLV_LIST_SIZE	0x202a
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3a1ae0d..9ab0fdf 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -101,6 +101,8 @@ struct bdaddr_list {
- 	struct list_head list;
- 	bdaddr_t bdaddr;
- 	u8 bdaddr_type;
-+	u8 peer_irk[16];
-+	u8 local_irk[16];
- };
- 
- struct bt_uuid {
-@@ -1050,7 +1052,8 @@ static inline void hci_set_drvdata(struct hci_dev *hdev, void *data)
- 
- struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
- 					   bdaddr_t *bdaddr, u8 type);
--int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type);
-+int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type,
-+			u8 *peer_irk, u8 *local_irk);
- int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type);
- void hci_bdaddr_list_clear(struct list_head *list);
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index af1675d..dcaef13 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2784,7 +2784,8 @@ void hci_bdaddr_list_clear(struct list_head *bdaddr_list)
- 	}
- }
- 
--int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type)
-+int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type,
-+			u8 *peer_irk, u8 *local_irk)
- {
- 	struct bdaddr_list *entry;
- 
-@@ -2801,6 +2802,12 @@ int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type)
- 	bacpy(&entry->bdaddr, bdaddr);
- 	entry->bdaddr_type = type;
- 
-+	if (peer_irk)
-+		memcpy(entry->peer_irk, peer_irk, 16);
+ struct hci_rp_le_set_ext_adv_params {
+ 	__u8  status;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 047e98d..70b85a7 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -562,6 +562,12 @@ struct mgmt_rp_add_advertising {
+ #define MGMT_ADV_FLAG_TX_POWER		BIT(4)
+ #define MGMT_ADV_FLAG_APPEARANCE	BIT(5)
+ #define MGMT_ADV_FLAG_LOCAL_NAME	BIT(6)
++#define MGMT_ADV_FLAG_SEC_1M 		BIT(7)
++#define MGMT_ADV_FLAG_SEC_2M 		BIT(8)
++#define MGMT_ADV_FLAG_SEC_CODED 	BIT(9)
 +
-+	if (local_irk)
-+		memcpy(entry->local_irk, local_irk, 16);
-+
- 	list_add(&entry->list, list);
++#define MGMT_ADV_FLAG_SEC_MASK	(MGMT_ADV_FLAG_SEC_1M | MGMT_ADV_FLAG_SEC_2M | \
++				 MGMT_ADV_FLAG_SEC_CODED)
  
- 	return 0;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 3029d79..e8d6df9 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1239,7 +1239,7 @@ static void hci_cc_le_add_to_white_list(struct hci_dev *hdev,
- 		return;
+ #define MGMT_OP_REMOVE_ADVERTISING	0x003F
+ struct mgmt_cp_remove_advertising {
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 6825a65..0a8ac3e 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1522,6 +1522,7 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	bdaddr_t random_addr;
+ 	u8 own_addr_type;
+ 	int err;
++	bool secondary_adv;
+ 	/* In ext adv set param interval is 3 octets */
+ 	const u8 adv_interval[3] = { 0x00, 0x08, 0x00 };
  
- 	hci_bdaddr_list_add(&hdev->le_white_list, &sent->bdaddr,
--			   sent->bdaddr_type);
-+			   sent->bdaddr_type, NULL, NULL);
- }
+@@ -1551,20 +1552,42 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	memcpy(cp.min_interval, adv_interval, sizeof(cp.min_interval));
+ 	memcpy(cp.max_interval, adv_interval, sizeof(cp.max_interval));
  
- static void hci_cc_le_del_from_white_list(struct hci_dev *hdev,
-@@ -1307,6 +1307,45 @@ static void hci_cc_le_write_def_data_len(struct hci_dev *hdev,
- 	hdev->le_def_tx_time = le16_to_cpu(sent->tx_time);
- }
+-	if (connectable)
+-		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
+-	else if (get_adv_instance_scan_rsp_len(hdev, instance))
+-		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_SCAN_IND);
+-	else
+-		cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
++	secondary_adv = (flags & MGMT_ADV_FLAG_SEC_MASK);
++
++	if (connectable) {
++		if (secondary_adv)
++			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_CONN_IND);
++		else
++			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
++	} else if (get_adv_instance_scan_rsp_len(hdev, instance)) {
++		if (secondary_adv)
++			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_SCAN_IND);
++		else
++			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_SCAN_IND);
++	} else {
++		if (secondary_adv)
++			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_NON_CONN_IND);
++		else
++			cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
++	}
  
-+static void hci_cc_le_add_to_resolv_list(struct hci_dev *hdev,
-+					 struct sk_buff *skb)
-+{
-+	struct hci_cp_le_add_to_resolv_list *sent;
-+	__u8 status = *((__u8 *) skb->data);
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	if (status)
-+		return;
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_RESOLV_LIST);
-+	if (!sent)
-+		return;
-+
-+	hci_bdaddr_list_add(&hdev->le_resolv_list, &sent->bdaddr,
-+				sent->bdaddr_type, sent->peer_irk,
-+				sent->local_irk);
-+}
-+
-+static void hci_cc_le_del_from_resolv_list(struct hci_dev *hdev,
-+					  struct sk_buff *skb)
-+{
-+	struct hci_cp_le_del_from_resolv_list *sent;
-+	__u8 status = *((__u8 *) skb->data);
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	if (status)
-+		return;
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_DEL_FROM_RESOLV_LIST);
-+	if (!sent)
-+		return;
-+
-+	hci_bdaddr_list_del(&hdev->le_resolv_list, &sent->bdaddr,
-+			    sent->bdaddr_type);
-+}
-+
- static void hci_cc_le_clear_resolv_list(struct hci_dev *hdev,
- 				       struct sk_buff *skb)
- {
-@@ -3042,6 +3081,14 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
- 		hci_cc_le_write_def_data_len(hdev, skb);
- 		break;
+ 	cp.own_addr_type = own_addr_type;
+ 	cp.channel_map = hdev->le_adv_channel_map;
+ 	cp.tx_power = 127;
+-	cp.primary_phy = HCI_ADV_PHY_1M;
+-	cp.secondary_phy = HCI_ADV_PHY_1M;
+ 	cp.handle = 0;
  
-+	case HCI_OP_LE_ADD_TO_RESOLV_LIST:
-+		hci_cc_le_add_to_resolv_list(hdev, skb);
-+		break;
++	if (flags & MGMT_ADV_FLAG_SEC_2M) {
++		cp.primary_phy = HCI_ADV_PHY_1M;
++		cp.secondary_phy = HCI_ADV_PHY_2M;
++	} else if (flags & MGMT_ADV_FLAG_SEC_CODED) {
++		cp.primary_phy = HCI_ADV_PHY_CODED;
++		cp.secondary_phy = HCI_ADV_PHY_CODED;
++	} else {
++		/* In all other cases use 1M */
++		cp.primary_phy = HCI_ADV_PHY_1M;
++		cp.secondary_phy = HCI_ADV_PHY_1M;
++	}
 +
-+	case HCI_OP_LE_DEL_FROM_RESOLV_LIST:
-+		hci_cc_le_del_from_resolv_list(hdev, skb);
-+		break;
-+
- 	case HCI_OP_LE_CLEAR_RESOLV_LIST:
- 		hci_cc_le_clear_resolv_list(hdev, skb);
- 		break;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 1506e16..1f6ae79 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -893,7 +893,8 @@ static int hci_sock_blacklist_add(struct hci_dev *hdev, void __user *arg)
+ 	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
  
- 	hci_dev_lock(hdev);
- 
--	err = hci_bdaddr_list_add(&hdev->blacklist, &bdaddr, BDADDR_BREDR);
-+	err = hci_bdaddr_list_add(&hdev->blacklist, &bdaddr, BDADDR_BREDR,
-+					NULL, NULL);
- 
- 	hci_dev_unlock(hdev);
- 
+ 	if (own_addr_type == ADDR_LE_DEV_RANDOM &&
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8a80d48..a99b8dd 100644
+index 4bc79ab..60f918a 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3791,7 +3791,7 @@ static int block_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	hci_dev_lock(hdev);
+@@ -6356,6 +6356,16 @@ static u32 get_supported_adv_flags(struct hci_dev *hdev)
+ 	    ext_adv_capable(hdev))
+ 		flags |= MGMT_ADV_FLAG_TX_POWER;
  
- 	err = hci_bdaddr_list_add(&hdev->blacklist, &cp->addr.bdaddr,
--				  cp->addr.type);
-+				  cp->addr.type, NULL, NULL);
- 	if (err < 0) {
- 		status = MGMT_STATUS_FAILED;
- 		goto done;
-@@ -5272,7 +5272,7 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 		}
++	if (ext_adv_capable(hdev)) {
++		flags |= MGMT_ADV_FLAG_SEC_1M;
++
++		if (hdev->le_features[1] & HCI_LE_PHY_2M)
++			flags |= MGMT_ADV_FLAG_SEC_2M;
++
++		if (hdev->le_features[1] & HCI_LE_PHY_CODED)
++			flags |= MGMT_ADV_FLAG_SEC_CODED;
++	}
++
+ 	return flags;
+ }
  
- 		err = hci_bdaddr_list_add(&hdev->whitelist, &cp->addr.bdaddr,
--					  cp->addr.type);
-+					  cp->addr.type, NULL, NULL);
- 		if (err)
- 			goto unlock;
+@@ -6561,7 +6571,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 	struct mgmt_cp_add_advertising *cp = data;
+ 	struct mgmt_rp_add_advertising rp;
+ 	u32 flags;
+-	u32 supported_flags;
++	u32 supported_flags, phy_flags;
+ 	u8 status;
+ 	u16 timeout, duration;
+ 	unsigned int prev_instance_cnt = hdev->adv_instance_cnt;
+@@ -6591,10 +6601,12 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 	duration = __le16_to_cpu(cp->duration);
+ 
+ 	/* The current implementation only supports a subset of the specified
+-	 * flags.
++	 * flags. Also need to check mutual exclusiveness of sec flags.
+ 	 */
+ 	supported_flags = get_supported_adv_flags(hdev);
+-	if (flags & ~supported_flags)
++	phy_flags = flags & MGMT_ADV_FLAG_SEC_MASK;
++	if (flags & ~supported_flags ||
++	    ((phy_flags && (phy_flags ^ (phy_flags & -phy_flags)))))
+ 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
+ 				       MGMT_STATUS_INVALID_PARAMS);
  
 -- 
-1.9.1
-
+2.7.4
