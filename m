@@ -1,619 +1,1100 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <brian.gix@intel.com>
 From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-        inga.stotland@intel.com, Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v7 07/14] mesh: Add Accessors to Transport layer data
-Date: Sat, 14 Jul 2018 12:58:56 -0700
-Message-Id: <20180714195903.7402-8-brian.gix@intel.com>
+Cc: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	inga.stotland@intel.com,
+	Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ v7 01/14] mesh: Shared private meshd interfaces
+Date: Sat, 14 Jul 2018 12:58:50 -0700
+Message-Id: <20180714195903.7402-2-brian.gix@intel.com>
 In-Reply-To: <20180714195903.7402-1-brian.gix@intel.com>
 References: <20180714195903.7402-1-brian.gix@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mesh/net.c | 549 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 549 insertions(+)
+ mesh/crypto.h          | 163 ++++++++++++++++++++
+ mesh/display.h         |  28 ++++
+ mesh/friend.h          |  57 +++++++
+ mesh/mesh-io-api.h     |  58 ++++++++
+ mesh/mesh-io-generic.h |  20 +++
+ mesh/mesh-io.h         |  99 +++++++++++++
+ mesh/net.h             | 392 +++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/prov.h            | 162 ++++++++++++++++++++
+ mesh/provision.h       |  30 ++++
+ 9 files changed, 1009 insertions(+)
+ create mode 100644 mesh/crypto.h
+ create mode 100644 mesh/display.h
+ create mode 100644 mesh/friend.h
+ create mode 100644 mesh/mesh-io-api.h
+ create mode 100644 mesh/mesh-io-generic.h
+ create mode 100644 mesh/mesh-io.h
+ create mode 100644 mesh/net.h
+ create mode 100644 mesh/prov.h
+ create mode 100644 mesh/provision.h
 
-diff --git a/mesh/net.c b/mesh/net.c
-index 0dafa1780..544f9efa5 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -828,6 +828,226 @@ void mesh_net_unref(struct mesh_net *net)
- 	l_free(net);
- }
- 
-+bool mesh_net_set_seq_num(struct mesh_net *net, uint32_t number)
-+{
-+	if (!net)
-+		return false;
+diff --git a/mesh/crypto.h b/mesh/crypto.h
+new file mode 100644
+index 000000000..ffd312231
+--- /dev/null
++++ b/mesh/crypto.h
+@@ -0,0 +1,163 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
-+	net->cached_seq_num = net->seq_num = number;
++#include <stdbool.h>
++#include <stdint.h>
 +
-+	return true;
-+}
++bool mesh_crypto_aes_ccm_encrypt(const uint8_t nonce[13], const uint8_t key[16],
++					const uint8_t *aad, uint16_t aad_len,
++					const uint8_t *msg, uint16_t msg_len,
++					uint8_t *out_msg,
++					void *out_mic, size_t mic_size);
++bool mesh_crypto_aes_ccm_decrypt(const uint8_t nonce[13], const uint8_t key[16],
++				const uint8_t *aad, uint16_t aad_len,
++				const uint8_t *enc_msg, uint16_t enc_msg_len,
++				uint8_t *out_msg,
++				void *out_mic, size_t mic_size);
++bool mesh_aes_ecb_one(const uint8_t key[16],
++			const uint8_t plaintext[16], uint8_t encrypted[16]);
++bool mesh_crypto_nkik(const uint8_t network_key[16], uint8_t identity_key[16]);
++bool mesh_crypto_nkbk(const uint8_t network_key[16], uint8_t beacon_key[16]);
++bool mesh_crypto_nkpk(const uint8_t network_key[16], uint8_t proxy_key[16]);
++bool mesh_crypto_identity(const uint8_t net_key[16], uint16_t addr,
++							uint8_t id[16]);
++bool mesh_crypto_beacon_cmac(const uint8_t encryption_key[16],
++				const uint8_t network_id[16],
++				uint32_t iv_index, bool kr,
++				bool iu, uint64_t *cmac);
++bool mesh_crypto_network_nonce(bool frnd, uint8_t ttl, uint32_t seq,
++				uint16_t src, uint32_t iv_index,
++				uint8_t nonce[13]);
++bool mesh_crypto_network_encrypt(bool ctl, uint8_t ttl,
++				uint32_t seq, uint16_t src,
++				uint32_t iv_index,
++				const uint8_t net_key[16],
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *net_mic);
++bool mesh_crypto_network_decrypt(bool frnd, uint8_t ttl,
++				uint32_t seq, uint16_t src,
++				uint32_t iv_index,
++				const uint8_t net_key[16],
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *net_mic, size_t mic_size);
++bool mesh_crypto_application_nonce(uint32_t seq, uint16_t src,
++				uint16_t dst, uint32_t iv_index,
++				bool aszmic, uint8_t nonce[13]);
++bool mesh_crypto_device_nonce(uint32_t seq, uint16_t src,
++				uint16_t dst, uint32_t iv_index,
++				bool aszmic, uint8_t nonce[13]);
++bool mesh_crypto_application_encrypt(uint8_t akf, uint32_t seq, uint16_t src,
++					uint16_t dst, uint32_t iv_index,
++					const uint8_t app_key[16],
++					const uint8_t *aad, uint8_t aad_len,
++					const uint8_t *msg, uint8_t msg_len,
++					uint8_t *out,
++					void *app_mic, size_t mic_size);
++bool mesh_crypto_application_decrypt(uint8_t akf, uint32_t seq, uint16_t src,
++				uint16_t dst, uint32_t iv_index,
++				const uint8_t app_key[16],
++				const uint8_t *aad, uint8_t aad_len,
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *app_mic, size_t mic_size);
++bool mesh_crypto_device_key(const uint8_t secret[32],
++						const uint8_t salt[16],
++						uint8_t device_key[16]);
++bool mesh_crypto_virtual_addr(const uint8_t virtual_label[16],
++						uint16_t *v_addr);
++bool mesh_crypto_nonce(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t nonce[13]);
++bool mesh_crypto_k1(const uint8_t ikm[16], const uint8_t salt[16],
++		const void *info, size_t info_len, uint8_t okm[16]);
++bool mesh_crypto_k2(const uint8_t n[16], const uint8_t *p, size_t p_len,
++							uint8_t net_id[1],
++							uint8_t enc_key[16],
++							uint8_t priv_key[16]);
++bool mesh_crypto_k3(const uint8_t n[16], uint8_t out64[8]);
++bool mesh_crypto_k4(const uint8_t a[16], uint8_t out5[1]);
++bool mesh_crypto_s1(const void *info, size_t len, uint8_t salt[16]);
++bool mesh_crypto_prov_prov_salt(const uint8_t conf_salt[16],
++					const uint8_t prov_rand[16],
++					const uint8_t dev_rand[16],
++					uint8_t prov_salt[16]);
++bool mesh_crypto_prov_conf_key(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t conf_key[16]);
++bool mesh_crypto_session_key(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t session_key[16]);
++bool mesh_crypto_privacy_counter(uint32_t iv_index,
++						const uint8_t *payload,
++						uint8_t privacy_counter[16]);
++bool mesh_crypto_network_obfuscate(const uint8_t privacy_key[16],
++					const uint8_t privacy_counter[16],
++					bool ctl, uint8_t ttl, uint32_t seq,
++					uint16_t src, uint8_t *out);
++bool mesh_crypto_network_clarify(const uint8_t privacy_key[16],
++				const uint8_t privacy_counter[16],
++				const uint8_t net_hdr[6],
++				bool *ctl, uint8_t *ttl,
++				uint32_t *seq, uint16_t *src);
 +
-+bool mesh_net_set_default_ttl(struct mesh_net *net, uint8_t ttl)
-+{
-+	if (!net)
-+		return false;
++bool mesh_crypto_packet_build(bool ctl, uint8_t ttl,
++				uint32_t seq,
++				uint16_t src, uint16_t dst,
++				uint8_t opcode,
++				bool segmented, uint8_t key_id,
++				bool szmic, bool relay, uint16_t seqZero,
++				uint8_t segO, uint8_t segN,
++				const uint8_t *payload, uint8_t payload_len,
++				uint8_t *packet, uint8_t *packet_len);
++bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
++				bool *ctl, uint8_t *ttl, uint32_t *seq,
++				uint16_t *src, uint16_t *dst,
++				uint32_t *cookie, uint8_t *opcode,
++				bool *segmented, uint8_t *key_id,
++				bool *szmic, bool *relay, uint16_t *seqZero,
++				uint8_t *segO, uint8_t *segN,
++				const uint8_t **payload, uint8_t *payload_len);
++bool mesh_crypto_payload_encrypt(uint8_t *aad, const uint8_t *payload,
++				uint8_t *out, uint16_t payload_len,
++				uint16_t src, uint16_t dst, uint8_t key_id,
++				uint32_t seq_num, uint32_t iv_index,
++				bool aszmic,
++				const uint8_t application_key[16]);
++bool mesh_crypto_payload_decrypt(uint8_t *aad, uint16_t aad_len,
++				const uint8_t *payload, uint16_t payload_len,
++				bool szmict,
++				uint16_t src, uint16_t dst, uint8_t key_id,
++				uint32_t seq_num, uint32_t iv_index,
++				uint8_t *out,
++				const uint8_t application_key[16]);
++bool mesh_crypto_packet_encode(uint8_t *packet, uint8_t packet_len,
++				const uint8_t network_key[16],
++				uint32_t iv_index,
++				const uint8_t privacy_key[16]);
++bool mesh_crypto_packet_decode(const uint8_t *packet, uint8_t packet_len,
++				bool proxy, uint8_t *out, uint32_t iv_index,
++				const uint8_t network_key[16],
++				const uint8_t privacy_key[16]);
++bool mesh_crypto_packet_label(uint8_t *packet, uint8_t packet_len,
++				uint16_t iv_index, uint8_t network_id);
 +
-+	net->default_ttl = ttl;
++uint8_t mesh_crypto_compute_fcs(const uint8_t *packet, uint8_t packet_len);
++bool mesh_crypto_check_fcs(const uint8_t *packet, uint8_t packet_len,
++							uint8_t received_fcs);
++bool mesh_crypto_aes_cmac(const uint8_t key[16], const uint8_t *msg,
++					size_t msg_len, uint8_t res[16]);
+diff --git a/mesh/display.h b/mesh/display.h
+new file mode 100644
+index 000000000..f5d1f7f79
+--- /dev/null
++++ b/mesh/display.h
+@@ -0,0 +1,28 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
-+	return true;
-+}
++#define COLOR_OFF	"\x1B[0m"
++#define COLOR_RED	"\x1B[0;91m"
++#define COLOR_GREEN	"\x1B[0;92m"
++#define COLOR_YELLOW	"\x1B[0;93m"
++#define COLOR_BLUE	"\x1B[0;94m"
 +
-+uint32_t mesh_net_get_seq_num(struct mesh_net *net)
-+{
-+	if (!net)
-+		return 0;
++unsigned int num_columns(void);
 +
-+	return net->seq_num;
-+}
++void print_packet(const char *label, const void *data, uint16_t size);
+diff --git a/mesh/friend.h b/mesh/friend.h
+new file mode 100644
+index 000000000..1fa6ec92a
+--- /dev/null
++++ b/mesh/friend.h
+@@ -0,0 +1,57 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
-+uint8_t mesh_net_get_default_ttl(struct mesh_net *net)
-+{
-+	if (!net)
-+		return 0;
++#define OP_FRND_REQUEST			0x8040
++#define OP_FRND_INQUIRY			0x8041
++#define OP_FRND_CONFIRM			0x8042
++#define OP_FRND_SUB_LIST_ADD		0x8043
++#define OP_FRND_SUB_LIST_CONFIRM	0x8044
++#define OP_FRND_SUB_LIST_REMOVE		0x8045
++#define OP_FRND_NEGOTIATE		0x8046
++#define OP_FRND_CLEAR			0x8047
 +
-+	return net->default_ttl;
-+}
++void friend_poll(struct mesh_net *net, uint16_t src, bool seq,
++						struct mesh_friend *frnd);
++void friend_request(struct mesh_net *net, uint16_t src, uint8_t minReq,
++			uint8_t delay, uint32_t timeout, uint16_t prev,
++			uint8_t num_elements, uint16_t cntr, int8_t rssi);
++void friend_clear_confirm(struct mesh_net *net, uint16_t src, uint16_t lpn,
++							uint16_t lpnCounter);
++void friend_clear(struct mesh_net *net, uint16_t src, uint16_t lpn,
++			uint16_t lpnCounter, struct mesh_friend *frnd);
++void friend_sub_add(struct mesh_net *net, struct mesh_friend *frnd,
++					const uint8_t *pkt, uint8_t len);
++void friend_sub_del(struct mesh_net *net, struct mesh_friend *frnd,
++					const uint8_t *pkt, uint8_t len);
++void mesh_friend_relay_init(struct mesh_net *net, uint16_t addr);
 +
-+uint16_t mesh_net_get_address(struct mesh_net *net)
-+{
-+	if (!net)
-+		return 0;
++/* Low-Power-Node role */
++void frnd_sub_add(struct mesh_net *net, uint32_t parms[7]);
++void frnd_sub_del(struct mesh_net *net, uint32_t parms[7]);
++void frnd_poll(struct mesh_net *net, bool retry);
++void frnd_clear(struct mesh_net *net);
++void frnd_ack_poll(struct mesh_net *net);
++void frnd_poll_cancel(struct mesh_net *net);
++void frnd_request_friend(struct mesh_net *net, uint8_t cache,
++			uint8_t offer_delay, uint8_t delay, uint32_t timeout);
++void frnd_offer(struct mesh_net *net, uint16_t src, uint8_t window,
++			uint8_t cache, uint8_t sub_list_size,
++			int8_t r_rssi, int8_t l_rssi, uint16_t fn_cnt);
++void frnd_key_refresh(struct mesh_net *net, uint8_t phase);
++struct mesh_key_set *frnd_get_key(struct mesh_net *net);
+diff --git a/mesh/mesh-io-api.h b/mesh/mesh-io-api.h
+new file mode 100644
+index 000000000..f69fceeb2
+--- /dev/null
++++ b/mesh/mesh-io-api.h
+@@ -0,0 +1,58 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
-+	return net->src_addr;
-+}
++struct mesh_io_private;
 +
-+bool mesh_net_register_unicast(struct mesh_net *net,
-+					uint16_t address, uint8_t num_ele)
-+{
-+	if (!net || !IS_UNICAST(address) || !num_ele)
-+		return false;
++typedef bool (*mesh_io_init_t)(uint16_t index, struct mesh_io *io);
++typedef bool (*mesh_io_destroy_t)(struct mesh_io *io);
++typedef bool (*mesh_io_caps_t)(struct mesh_io *io, struct mesh_io_caps *caps);
++typedef bool (*mesh_io_send_t)(struct mesh_io *io,
++					struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len);
++typedef bool (*mesh_io_register_t)(struct mesh_io *io, uint8_t filter_id,
++				mesh_io_recv_func_t cb, void *user_data);
++typedef bool (*mesh_io_deregister_t)(struct mesh_io *io, uint8_t filter_id);
++typedef bool (*mesh_io_filter_set_t)(struct mesh_io *io,
++			uint8_t filter_id, const uint8_t *data, uint8_t len,
++			mesh_io_status_func_t callback, void *user_data);
++typedef bool (*mesh_io_tx_cancel_t)(struct mesh_io *io, uint8_t *pattern,
++								uint8_t len);
 +
-+	l_info("mesh_net_set_address: 0x%x", address);
-+	net->src_addr = address;
-+	net->last_addr = address + num_ele - 1;
-+	if (net->last_addr < net->src_addr)
-+		return false;
++struct mesh_io_api {
++	mesh_io_init_t		init;
++	mesh_io_destroy_t	destroy;
++	mesh_io_caps_t		caps;
++	mesh_io_send_t		send;
++	mesh_io_register_t	reg;
++	mesh_io_deregister_t	dereg;
++	mesh_io_filter_set_t	set;
++	mesh_io_tx_cancel_t	cancel;
++};
 +
-+	do {
-+		mesh_net_dst_reg(net, address);
-+		address++;
-+		num_ele--;
-+	} while (num_ele > 0);
++struct mesh_io {
++	enum mesh_io_type		type;
++	uint16_t			index;
++	const struct mesh_io_api	*api;
++	struct mesh_io_private		*pvt;
++};
 +
-+	return true;
-+}
++struct mesh_io_table {
++	enum mesh_io_type		type;
++	const struct mesh_io_api	*api;
++};
+diff --git a/mesh/mesh-io-generic.h b/mesh/mesh-io-generic.h
+new file mode 100644
+index 000000000..4bf4d5cb7
+--- /dev/null
++++ b/mesh/mesh-io-generic.h
+@@ -0,0 +1,20 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
-+uint8_t mesh_net_get_num_ele(struct mesh_net *net)
-+{
-+	if (!net)
-+		return 0;
++extern const struct mesh_io_api mesh_io_generic;
+diff --git a/mesh/mesh-io.h b/mesh/mesh-io.h
+new file mode 100644
+index 000000000..754f6129c
+--- /dev/null
++++ b/mesh/mesh-io.h
+@@ -0,0 +1,99 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
-+	return net->last_addr - net->src_addr + 1;
-+}
++struct mesh_io;
 +
-+bool mesh_net_set_proxy_mode(struct mesh_net *net, bool enable)
-+{
-+	if (!net)
-+		return false;
++#define MESH_IO_FILTER_BEACON	1
++#define MESH_IO_FILTER_PROV	2
++#define MESH_IO_FILTER_NET	3
 +
-+	/* No support for proxy yet */
-+	if (enable) {
-+		l_error("Proxy not supported!");
-+		return false;
-+	}
++#define MESH_IO_TX_COUNT_UNLIMITED	0
 +
-+	trigger_heartbeat(net, FEATURE_PROXY, enable);
-+	return true;
-+}
++enum mesh_io_type {
++	MESH_IO_TYPE_NONE = 0,
++	MESH_IO_TYPE_GENERIC
++};
 +
-+bool mesh_net_set_friend_mode(struct mesh_net *net, bool enable)
-+{
-+	if (!net)
-+		return false;
++enum mesh_io_timing_type {
++	MESH_IO_TIMING_TYPE_GENERAL = 1,
++	MESH_IO_TIMING_TYPE_POLL,
++	MESH_IO_TIMING_TYPE_POLL_RSP
++};
 +
-+	if (net->friend_enable && !enable)
-+		l_queue_clear(net->friends, mesh_friend_free);
++struct mesh_io_recv_info {
++	uint32_t instant;
++	uint8_t chan;
++	int8_t rssi;
++};
 +
-+	net->friend_enable = enable;
-+	trigger_heartbeat(net, FEATURE_FRIEND, enable);
-+	return true;
-+}
++struct mesh_io_send_info {
++	enum mesh_io_timing_type type;
++	union {
++		struct {
++			uint16_t interval;
++			uint8_t cnt;
++			uint8_t min_delay;
++			uint8_t max_delay;
++		} gen;
 +
-+bool mesh_net_set_relay_mode(struct mesh_net *net, bool enable,
-+				uint8_t cnt, uint8_t interval)
-+{
-+	if (!net)
-+		return false;
++		struct {
++			uint16_t scan_duration;
++			uint8_t scan_delay;
++			uint8_t filter_ids[2];
++			uint8_t min_delay;
++			uint8_t max_delay;
++		} poll;
 +
-+	net->relay.enable = enable;
-+	net->relay.count = cnt;
-+	net->relay.interval = interval;
-+	trigger_heartbeat(net, FEATURE_RELAY, enable);
-+	return true;
-+}
++		struct {
++			uint32_t instant;
++			uint8_t delay;
++		} poll_rsp;
 +
-+struct mesh_net_prov_caps *mesh_net_prov_caps_get(struct mesh_net *net)
-+{
-+	if (net)
-+		return &net->prov_caps;
++	} u;
++};
 +
-+	return NULL;
-+}
++struct mesh_io_caps {
++	uint8_t max_num_filters;
++	uint8_t window_accuracy;
++};
 +
-+char *mesh_net_id_name(struct mesh_net *net)
-+{
-+	if (net && net->id_name[0])
-+		return net->id_name;
++typedef void (*mesh_io_recv_func_t)(void *user_data,
++					struct mesh_io_recv_info *info,
++					const uint8_t *data, uint16_t len);
 +
-+	return NULL;
-+}
++typedef void (*mesh_io_status_func_t)(void *user_data, int status,
++							uint8_t filter_id);
 +
-+bool mesh_net_id_uuid_set(struct mesh_net *net, uint8_t uuid[16])
-+{
-+	if (!net)
-+		return false;
++struct mesh_io *mesh_io_new(uint16_t index, enum mesh_io_type type);
++void mesh_io_destroy(struct mesh_io *io);
 +
-+	memcpy(net->id_uuid, uuid, 16);
++bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps);
 +
-+	return true;
-+}
++bool mesh_io_register_recv_cb(struct mesh_io *io, uint8_t filter_id,
++				mesh_io_recv_func_t cb, void *user_data);
 +
-+uint8_t *mesh_net_priv_key_get(struct mesh_net *net)
-+{
-+	if (net)
-+		return net->prov_priv_key;
++bool mesh_io_deregister_recv_cb(struct mesh_io *io, uint8_t filter_id);
 +
-+	return NULL;
-+}
++bool mesh_set_filter(struct mesh_io *io, uint8_t filter_id,
++				const uint8_t *data, uint8_t len,
++				mesh_io_status_func_t cb, void *user_data);
 +
-+bool mesh_net_priv_key_set(struct mesh_net *net, uint8_t key[32])
-+{
-+	if (!net)
-+		return false;
++bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len);
++bool mesh_io_send_cancel(struct mesh_io *io, uint8_t *pattern, uint8_t len);
+diff --git a/mesh/net.h b/mesh/net.h
+new file mode 100644
+index 000000000..e48380314
+--- /dev/null
++++ b/mesh/net.h
+@@ -0,0 +1,392 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
-+	memcpy(net->prov_priv_key, key, 32);
-+	return true;
-+}
++#include <stdbool.h>
++#include <stdint.h>
 +
-+uint8_t *mesh_net_test_addr(struct mesh_net *net)
-+{
-+	const uint8_t zero_addr[] = {0, 0, 0, 0, 0, 0};
++#ifndef __packed
++#define __packed __attribute__((packed))
++#endif
 +
-+	if (net && memcmp(net->test_bd_addr, zero_addr, 6))
-+		return net->test_bd_addr;
++struct mesh_io;
++struct mesh_node;
 +
-+	return NULL;
-+}
++#define DEV_ID	0
 +
-+uint8_t *mesh_net_prov_rand(struct mesh_net *net)
-+{
-+	if (net)
-+		return net->prov_rand;
++#define UNUSED_KEY_IDX	0xffff
 +
-+	return NULL;
-+}
++#define APP_ID_DEV	0
++#define APP_ID_ANY	((unsigned int) -1)
++#define NET_ID_ANY	(APP_ID_ANY - 1)
 +
-+uint16_t mesh_net_prov_uni(struct mesh_net *net, uint8_t ele_cnt)
-+{
-+	uint16_t uni;
++#define CTL		0x80
++#define TTL_MASK	0x7f
++#define SEQ_MASK	0xffffff
++
++#define CREDFLAG_MASK	0x1000
++#define APP_IDX_MASK	0x0fff
++#define APP_IDX_DEV	0x7fff
++#define APP_IDX_ANY	0x8000
++#define APP_IDX_NET	0xffff
++
++#define NET_IDX_INVALID	0xffff
++#define NET_NID_INVALID	0xff
++
++#define KEY_CACHE_SIZE	64
++#define FRND_CACHE_MAX	32
++
++#define MAX_UNSEG_LEN	15 /* msg_len == 11 + sizeof(MIC) */
++#define MAX_SEG_LEN	12 /* UnSeg length - 3 octets overhead */
++#define SEG_MAX(len)	(((len) <= MAX_UNSEG_LEN) ? 0 : \
++						(((len) - 1) / MAX_SEG_LEN))
++#define SEG_OFF(seg)	((seg) * MAX_SEG_LEN)
++#define MAX_SEG_TO_LEN(seg)	((seg) ? SEG_OFF((seg) + 1) : MAX_UNSEG_LEN)
++
++#define SEGMENTED	0x80
++#define UNSEGMENTED	0x00
++#define SEG_HDR_SHIFT	31
++#define IS_SEGMENTED(hdr)	(!!((hdr) & (true << SEG_HDR_SHIFT)))
++
++#define KEY_ID_MASK	0x7f
++#define KEY_AID_MASK	0x3f
++#define KEY_ID_AKF	0x40
++#define KEY_AID_SHIFT	0
++#define AKF_HDR_SHIFT	30
++#define KEY_HDR_SHIFT	24
++#define HAS_APP_KEY(hdr)	(!!((hdr) & (true << AKF_HDR_SHIFT)))
++
++#define OPCODE_MASK	0x7f
++#define OPCODE_HDR_SHIFT	24
++#define RELAY		0x80
++#define RELAY_HDR_SHIFT	23
++#define SZMIC		0x80
++#define SZMIC_HDR_SHIFT	23
++#define SEQ_ZERO_MASK	0x1fff
++#define SEQ_ZERO_HDR_SHIFT	10
++#define IS_RELAYED(hdr)	(!!((hdr) & (true << RELAY_HDR_SHIFT)))
++#define HAS_MIC64(hdr)	(!!((hdr) & (true << SZMIC_HDR_SHIFT)))
++
++#define SEG_MASK	0x1f
++#define SEGO_HDR_SHIFT	5
++#define SEGN_HDR_SHIFT	0
++#define SEG_TOTAL(hdr)	(((hdr) >> SEGN_HDR_SHIFT) & SEG_MASK)
++
++/* Mask of Hdr bits which must be constant over entire incoming SAR message */
++/* (SEG || AKF || AID || SZMIC || SeqZero || SegN) */
++#define HDR_KEY_MASK		((true << SEG_HDR_SHIFT) |		\
++				(KEY_ID_MASK << KEY_HDR_SHIFT) |	\
++				(true << SZMIC_HDR_SHIFT) |		\
++				(SEQ_ZERO_MASK << SEQ_ZERO_HDR_SHIFT) |	\
++				(SEG_MASK << SEGN_HDR_SHIFT))
++
++#define HDR_ACK_MASK		((OPCODE_MASK << OPCODE_HDR_SHIFT) |	\
++				(SEQ_ZERO_MASK << SEQ_ZERO_HDR_SHIFT))
++
++
++
++#define MSG_CACHE_SIZE		70
++#define REPLAY_CACHE_SIZE	10
++
++/* Proxy Configuration Opcodes */
++#define PROXY_OP_SET_FILTER_TYPE	0x00
++#define PROXY_OP_FILTER_ADD		0x01
++#define PROXY_OP_FILTER_DEL		0x02
++#define PROXY_OP_FILTER_STATUS		0x03
++
++/* Proxy Filter Defines */
++#define PROXY_FILTER_WHITELIST		0x00
++#define PROXY_FILTER_BLACKLIST		0x01
++
++/* Network Tranport Opcodes */
++#define NET_OP_SEG_ACKNOWLEDGE		0x00
++#define NET_OP_FRND_POLL		0x01
++#define NET_OP_FRND_UPDATE		0x02
++#define NET_OP_FRND_REQUEST		0x03
++#define NET_OP_FRND_OFFER		0x04
++#define NET_OP_FRND_CLEAR		0x05
++#define NET_OP_FRND_CLEAR_CONFIRM	0x06
++
++#define NET_OP_PROXY_SUB_ADD		0x07
++#define NET_OP_PROXY_SUB_REMOVE		0x08
++#define NET_OP_PROXY_SUB_CONFIRM	0x09
++#define NET_OP_HEARTBEAT		0x0a
++
++#define FRND_OPCODE(x) \
++		((x) >= NET_OP_FRND_POLL && (x) <= NET_OP_FRND_CLEAR_CONFIRM)
++
++struct mesh_net_addr_range {
++	uint16_t low;
++	uint16_t high;
 +	uint16_t next;
++};
 +
-+	if (!net)
-+		return 0;
++struct mesh_net_prov_caps {
++	uint8_t num_ele;
++	uint16_t algorithms;
++	uint8_t pub_type;
++	uint8_t static_type;
++	uint8_t output_size;
++	uint16_t output_action;
++	uint8_t input_size;
++	uint16_t input_action;
++} __packed;
 +
-+	next = net->prov_uni_addr.next + ele_cnt;
-+	if (next > 0x8000 || next > net->prov_uni_addr.high)
-+		return UNASSIGNED_ADDRESS;
++struct mesh_net_heartbeat {
++	struct l_timeout *pub_timer;
++	struct l_timeout *sub_timer;
++	struct timeval sub_time;
++	bool sub_enabled;
++	uint32_t pub_period;
++	uint32_t sub_period;
++	uint32_t sub_start;
++	uint16_t pub_dst;
++	uint16_t pub_count;
++	uint16_t pub_features;
++	uint16_t features;
++	uint16_t pub_net_idx;
++	uint16_t sub_src;
++	uint16_t sub_dst;
++	uint16_t sub_count;
++	uint8_t pub_ttl;
++	uint8_t sub_min_hops;
++	uint8_t sub_max_hops;
++};
 +
-+	uni = net->prov_uni_addr.next;
-+	net->prov_uni_addr.next = next;
++struct mesh_key_set {
++	bool frnd;
++	uint8_t nid;
++	uint8_t enc_key[16];
++	uint8_t privacy_key[16];
++};
 +
-+	return uni;
-+}
++struct mesh_friend {
++	struct mesh_net *net;
++	struct l_queue *pkt_cache;
++	struct l_timeout *timeout;
++	void *pkt;
++	uint16_t *grp_list;
++	uint32_t poll_timeout;
++	uint32_t last_hdr;
++	uint16_t dst; /* Primary Element unicast addr */
++	uint16_t fn_cnt;
++	uint16_t lp_cnt;
++	int16_t grp_cnt;
++	struct mesh_key_set key_set;
++	struct mesh_key_set new_key_set;
++	uint8_t ele_cnt;
++	uint8_t frd;
++	uint8_t frw;
++	bool seq;
++	bool last;
++};
 +
-+bool mesh_net_test_mode(struct mesh_net *net)
-+{
-+	if (net)
-+		return net->test_mode;
++struct mesh_frnd_pkt {
++	uint32_t iv_index;
++	uint32_t seq;
++	uint16_t src;
++	uint16_t dst;
++	uint16_t size;
++	uint8_t segN;
++	uint8_t segO;
++	uint8_t ttl;
++	uint8_t tc;
++	bool szmict;
++	union {
++		struct {
++			uint8_t key_id;
++		} m;
++		struct {
++			uint16_t seq0;
++		} a;
++		struct {
++			uint8_t opcode;
++		} c;
++	} u;
++	uint8_t data[];
++};
 +
-+	return false;
-+}
++struct mesh_friend_seg_one {
++	uint32_t hdr;
++	uint32_t seq;
++	bool sent;
++	bool md;
++	uint8_t data[15];
++};
 +
-+int mesh_net_get_identity_mode(struct mesh_net *net, uint16_t idx,
-+								uint8_t *mode)
-+{
-+	struct mesh_subnet *subnet;
++struct mesh_friend_seg_12 {
++	uint32_t hdr;
++	uint32_t seq;
++	bool sent;
++	bool md;
++	uint8_t data[12];
++};
 +
-+	if (!net)
-+		return MESH_STATUS_UNSPECIFIED_ERROR;
++struct mesh_friend_msg {
++	uint32_t iv_index;
++	uint32_t flags;
++	uint16_t src;
++	uint16_t dst;
++	uint8_t ttl;
++	uint8_t cnt_in;
++	uint8_t cnt_out;
++	uint8_t last_len;
++	bool done;
++	bool ctl;
++	union {
++		struct mesh_friend_seg_one one[1]; /* Single segment */
++		struct mesh_friend_seg_12 s12[0]; /* Array of segments */
++	} u;
++};
 +
-+	subnet = l_queue_find(net->subnets, match_key_index,
-+							L_UINT_TO_PTR(idx));
-+	if (!subnet)
-+		return MESH_STATUS_INVALID_NETKEY;
++typedef void (*mesh_status_func_t)(void *user_data, bool result);
++typedef void (*mesh_net_status_func_t)(uint16_t remote, uint8_t status,
++					void *data, uint16_t size,
++					void *user_data);
 +
-+	/* Currently, proxy mode is not supported */
-+	*mode = MESH_MODE_UNSUPPORTED;
-+
-+	return MESH_STATUS_SUCCESS;
-+}
-+
- int mesh_net_del_key(struct mesh_net *net, uint16_t idx)
- {
- 	struct mesh_subnet *subnet;
-@@ -924,6 +1144,98 @@ void mesh_net_flush_msg_queues(struct mesh_net *net)
- 	l_queue_clear(net->fast_cache, mesh_msg_free);
- }
- 
-+uint32_t mesh_net_get_iv_index(struct mesh_net *net)
-+{
-+	if (!net)
-+		return 0xffffffff;
-+
-+	return net->iv_index - (iv_is_updating(net) ? 1 : 0);
-+}
-+
-+/* TODO: net key index? */
-+void mesh_net_get_snb_state(struct mesh_net *net, uint8_t *flags,
-+							uint32_t *iv_index)
-+{
-+	struct mesh_subnet *subnet;
-+
-+	if (!net || !flags || !iv_index)
-+		return;
-+
-+	*iv_index = net->iv_index;
-+	*flags = (net->iv_upd_state == IV_UPD_UPDATING) ? 0x02 : 0x00;
-+
-+	subnet = get_primary_subnet(net);
-+	if (subnet)
-+		*flags |= subnet->key_refresh ? 0x01 : 0x00;
-+}
-+
++struct mesh_net *mesh_net_new(uint16_t index);
++struct mesh_net *mesh_net_ref(struct mesh_net *net);
++void mesh_net_unref(struct mesh_net *net);
++void mesh_net_flush_msg_queues(struct mesh_net *net);
++void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update);
++bool mesh_net_iv_index_update(struct mesh_net *net);
++bool mesh_net_set_seq_num(struct mesh_net *net, uint32_t number);
++uint32_t mesh_net_get_seq_num(struct mesh_net *net);
++uint32_t mesh_net_next_seq_num(struct mesh_net *net);
++bool mesh_net_set_default_ttl(struct mesh_net *net, uint8_t ttl);
++uint8_t mesh_net_get_default_ttl(struct mesh_net *net);
++bool mesh_net_get_frnd_seq(struct mesh_net *net);
++void mesh_net_set_frnd_seq(struct mesh_net *net, bool seq);
++uint16_t mesh_net_get_address(struct mesh_net *net);
++bool mesh_net_register_unicast(struct mesh_net *net,
++					uint16_t unicast, uint8_t num_ele);
++bool mesh_net_set_friend(struct mesh_net *net, uint16_t friend_addr);
++uint16_t mesh_net_get_friend(struct mesh_net *net);
++uint8_t mesh_net_get_num_ele(struct mesh_net *net);
++bool mesh_net_set_beacon_mode(struct mesh_net *net, bool enable);
++bool mesh_net_set_proxy_mode(struct mesh_net *net, bool enable);
++bool mesh_net_set_relay_mode(struct mesh_net *net, bool enable, uint8_t cnt,
++							uint8_t interval);
++bool mesh_net_set_friend_mode(struct mesh_net *net, bool enable);
++bool mesh_net_add_keyset(struct mesh_net *net, struct mesh_key_set *key_set);
++bool mesh_net_remove_keyset(struct mesh_net *net, struct mesh_key_set *key_set);
++int mesh_net_del_key(struct mesh_net *net, uint16_t net_idx);
++int mesh_net_add_key(struct mesh_net *net, bool update,
++					uint16_t net_idx, const void *key);
++uint32_t mesh_net_get_iv_index(struct mesh_net *net);
++void mesh_net_get_snb_state(struct mesh_net *net,
++					uint8_t *flags, uint32_t *iv_index);
 +bool mesh_net_get_key(struct mesh_net *net, bool new_key, uint16_t idx,
-+							uint8_t key_buf[16])
-+{
-+	struct mesh_subnet *subnet;
++							uint8_t key[16]);
++bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io);
++struct mesh_io *mesh_net_detach(struct mesh_net *net);
++struct l_queue *mesh_net_get_app_keys(struct mesh_net *net);
 +
-+	if (!net)
-+		return false;
++bool mesh_net_flush(struct mesh_net *net);
++void mesh_net_transport_send(struct mesh_net *net, struct mesh_key_set *key_set,
++				bool fast, uint32_t iv_index, uint8_t ttl,
++				uint32_t seq, uint16_t src, uint16_t dst,
++				const uint8_t *msg, uint16_t msg_len);
 +
-+	subnet = l_queue_find(net->subnets, match_key_index,
-+							L_UINT_TO_PTR(idx));
-+	if (!subnet)
-+		return false;
-+
-+	if (!new_key) {
-+		memcpy(key_buf, subnet->current.key, 16);
-+		return true;
-+	}
-+
-+	if (subnet->updated.key_set.nid == NET_NID_INVALID)
-+		return false;
-+
-+	memcpy(key_buf, subnet->updated.key, 16);
-+	return true;
-+}
-+
-+bool mesh_net_key_list_get(struct mesh_net *net, uint8_t *buf, uint16_t *size)
-+{
-+	const struct l_queue_entry *entry;
-+	uint16_t n, buf_size;
-+
-+	if (!net || !buf || !size)
-+		return false;
-+
-+	buf_size = *size;
-+	if (buf_size < l_queue_length(net->subnets) * 2)
-+		return false;
-+
-+	n = 0;
-+	entry = l_queue_get_entries(net->subnets);
-+
-+	for (; entry; entry = entry->next) {
-+		struct mesh_subnet *subnet = entry->data;
-+
-+		l_put_le16(subnet->idx, buf);
-+		n += 2;
-+	}
-+
-+	*size = n;
-+	return true;
-+}
-+
-+bool mesh_net_get_frnd_seq(struct mesh_net *net)
-+{
-+	if (!net)
-+		return false;
-+
-+	return net->friend_seq;
-+}
-+
-+void mesh_net_set_frnd_seq(struct mesh_net *net, bool seq)
-+{
-+	if (!net)
-+		return;
-+
-+	net->friend_seq = seq;
-+}
-+
- static bool match_cache(const void *a, const void *b)
- {
- 	const struct mesh_msg *msg = a;
-@@ -2865,6 +3177,34 @@ void mesh_net_sub_list_del(struct mesh_net *net, uint16_t addr)
- 			0, 0, 0, msg, n);
- }
- 
-+/* TODO: change to use net index */
-+bool mesh_net_set_friend(struct mesh_net *net, uint16_t friend_addr)
-+{
-+	if (!net)
-+		return false;
-+
-+	net->bea_id = 0;
-+
-+	l_info("Set Frnd addr: %4.4x", friend_addr);
-+	if (!friend_addr)
-+		trigger_heartbeat(net, FEATURE_LPN, false);
-+	else
-+		trigger_heartbeat(net, FEATURE_LPN, true);
-+
-+	net->friend_addr = friend_addr;
-+
-+	set_network_beacon(get_primary_subnet(net), net);
-+	return true;
-+}
-+
-+uint16_t mesh_net_get_friend(struct mesh_net *net)
-+{
-+	if (!net)
-+		return 0;
-+
-+	return net->friend_addr;
-+}
-+
- bool mesh_net_dst_reg(struct mesh_net *net, uint16_t dst)
- {
- 	struct mesh_destination *dest = l_queue_find(net->destinations,
-@@ -3518,6 +3858,27 @@ int mesh_net_key_refresh_finish(struct mesh_net *net, uint16_t idx)
- 	return MESH_STATUS_SUCCESS;
- }
- 
-+uint16_t mesh_net_get_features(struct mesh_net *net)
-+{
-+	uint16_t features = 0;
-+
-+	if (net->relay.enable)
-+		features |= FEATURE_RELAY;
-+	if (net->proxy_enable)
-+		features |= FEATURE_PROXY;
-+	if (!l_queue_isempty(net->friends))
-+		features |= FEATURE_FRIEND;
-+	if (net->friend_addr != UNASSIGNED_ADDRESS)
-+		features |= FEATURE_LPN;
-+
-+	return features;
-+}
-+
-+struct mesh_net_heartbeat *mesh_net_heartbeat_get(struct mesh_net *net)
-+{
-+	return &net->heartbeat;
-+}
-+
- void mesh_net_heartbeat_send(struct mesh_net *net)
- {
- 	struct mesh_net_heartbeat *hb = &net->heartbeat;
-@@ -3545,6 +3906,49 @@ void mesh_net_heartbeat_init(struct mesh_net *net)
- 	hb->features = mesh_net_get_features(net);
- }
- 
++unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
++				uint16_t src, uint16_t dst, uint8_t key_id,
++				uint8_t ttl, uint32_t seq, uint32_t iv_index,
++				bool szmic, const void *msg, uint16_t msg_len,
++				mesh_net_status_func_t status_func,
++				void *user_data);
++void mesh_net_app_send_cancel(struct mesh_net *net, unsigned int id);
++void mesh_net_ack_send(struct mesh_net *net, struct mesh_key_set *key_set,
++				uint32_t iv_index, uint8_t ttl, uint32_t seq,
++				uint16_t src, uint16_t dst, bool rly,
++				uint16_t seqZero, uint32_t ack_flags);
++struct mesh_net_prov_caps *mesh_net_prov_caps_get(struct mesh_net *net);
++uint8_t *mesh_net_priv_key_get(struct mesh_net *net);
++bool mesh_net_priv_key_set(struct mesh_net *net, uint8_t key[32]);
++uint8_t *mesh_net_prov_rand(struct mesh_net *net);
++uint16_t mesh_net_prov_uni(struct mesh_net *net, uint8_t ele_cnt);
++bool mesh_net_id_uuid_set(struct mesh_net *net, uint8_t uuid[16]);
++uint8_t *mesh_net_test_addr(struct mesh_net *net);
++int mesh_net_get_identity_mode(struct mesh_net *net, uint16_t idx,
++								uint8_t *mode);
++char *mesh_net_id_name(struct mesh_net *net);
++bool mesh_net_test_mode(struct mesh_net *net);
++bool mesh_net_dst_reg(struct mesh_net *net, uint16_t dst);
++bool mesh_net_dst_unreg(struct mesh_net *net, uint16_t dst);
++struct mesh_friend *mesh_friend_new(struct mesh_net *net, uint16_t dst,
++					uint8_t ele_cnt, uint8_t frd,
++					uint8_t frw, uint32_t fpt,
++					uint16_t fn_cnt, uint16_t lp_cnt);
++void mesh_friend_free(void *frnd);
++bool mesh_friend_clear(struct mesh_net *net, struct mesh_friend *frnd);
++void mesh_friend_sub_add(struct mesh_net *net, uint16_t lpn, uint8_t ele_cnt,
++							uint8_t grp_cnt,
++							const uint8_t *list);
++void mesh_friend_sub_del(struct mesh_net *net, uint16_t lpn, uint8_t cnt,
++						const uint8_t *del_list);
++uint8_t mesh_net_key_refresh_phase_set(struct mesh_net *net, uint16_t net_idx,
++							uint8_t transition);
++uint8_t mesh_net_key_refresh_phase_get(struct mesh_net *net, uint16_t net_idx,
++							uint8_t *phase);
++int mesh_net_kr_phase_one(struct mesh_net *net, uint16_t net_idx,
++							const uint8_t *key);
++int mesh_net_key_refresh_phase_two(struct mesh_net *net, uint16_t net_idx);
++int mesh_net_key_refresh_finish(struct mesh_net *net, uint16_t net_idx);
++void mesh_net_send_seg(struct mesh_net *net, struct mesh_key_set *key_set,
++				uint32_t iv_index, uint8_t ttl, uint32_t seq,
++				uint16_t src, uint16_t dst, uint32_t hdr,
++				const void *seg, uint16_t seg_len);
++uint16_t mesh_net_get_features(struct mesh_net *net);
++struct mesh_net_heartbeat *mesh_net_heartbeat_get(struct mesh_net *net);
++void mesh_net_heartbeat_init(struct mesh_net *net);
++void mesh_net_heartbeat_send(struct mesh_net *net);
 +void mesh_net_uni_range_set(struct mesh_net *net,
-+				struct mesh_net_addr_range *range)
-+{
-+	net->prov_uni_addr.low = range->low;
-+	net->prov_uni_addr.high = range->high;
-+	net->prov_uni_addr.next = range->next;
-+}
-+
-+struct mesh_net_addr_range mesh_net_uni_range_get(struct mesh_net *net)
-+{
-+	return net->prov_uni_addr;
-+}
-+
-+void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update)
-+{
-+	net->iv_index = index;
-+	net->iv_update = update;
-+}
-+
-+void mesh_net_provisioner_mode_set(struct mesh_net *net, bool mode)
-+{
-+	net->provisioner = mode;
-+}
-+
-+bool mesh_net_provisioner_mode_get(struct mesh_net *net)
-+{
-+	return net->provisioner;
-+}
-+
-+uint16_t mesh_net_get_primary_idx(struct mesh_net *net)
-+{
-+	struct mesh_subnet *subnet;
-+
-+	if (!net)
-+		return NET_IDX_INVALID;
-+
-+	subnet = get_primary_subnet(net);
-+	if (!subnet)
-+		return NET_IDX_INVALID;
-+
-+	return subnet->idx;
-+}
-+
- uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr)
- {
- 	struct mesh_friend *frnd = l_queue_find(net->friends, match_by_friend,
-@@ -3570,6 +3974,143 @@ bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
- 	return true;
- }
- 
-+struct mesh_node *mesh_net_local_node_get(struct mesh_net *net)
-+{
-+	return  net->local_node;
-+}
-+
-+bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl)
-+{
-+	if (!net)
-+		return false;
-+
-+	net->crpl = crpl;
-+	return true;
-+}
-+
-+uint16_t mesh_net_get_crpl(struct mesh_net *net)
-+{
-+	if (!net)
-+		return 0;
-+
-+	return net->crpl;
-+}
-+
-+struct l_queue *mesh_net_get_app_keys(struct mesh_net *net)
-+{
-+	if (!net)
-+		return NULL;
-+
-+	if (!net->app_keys)
-+		net->app_keys = l_queue_new();
-+
-+	return net->app_keys;
-+}
-+
-+bool mesh_net_have_key(struct mesh_net *net, uint16_t idx)
-+{
-+	if (!net)
-+		return false;
-+
-+	return (l_queue_find(net->subnets, match_key_index,
-+						L_UINT_TO_PTR(idx)) != NULL);
-+}
-+
-+bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig)
-+{
-+	if (!net)
-+		return false;
-+
-+	net->jconfig_local = jconfig;
-+	return true;
-+}
-+
-+void *mesh_net_jconfig_get(struct mesh_net *net)
-+{
-+	if (!net)
-+		return NULL;
-+
-+	return  net->jconfig_local;
-+}
-+
-+bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg)
-+{
-+	if (!net)
-+		return false;
-+
-+	net->cfg_file = cfg;
-+	return true;
-+}
-+
-+bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg)
-+{
-+	if (!net)
-+		return false;
-+
-+	*cfg = net->cfg_file;
-+	return true;
-+}
-+
-+bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr)
-+{
-+	if (!net)
-+		return false;
-+
-+	return (addr >= net->src_addr && addr <= net->last_addr);
-+}
-+
-+void mesh_net_set_window_accuracy(struct mesh_net *net, uint8_t accuracy)
-+{
-+	if (!net)
-+		return;
-+
-+	net->window_accuracy = accuracy;
-+}
-+
++				struct mesh_net_addr_range *range);
++struct mesh_net_addr_range mesh_net_uni_range_get(struct mesh_net *net);
++void mesh_net_provisioner_mode_set(struct mesh_net *net, bool mode);
++bool mesh_net_provisioner_mode_get(struct mesh_net *net);
++bool mesh_net_key_list_get(struct mesh_net *net, uint8_t *buf, uint16_t *count);
++uint16_t mesh_net_get_primary_idx(struct mesh_net *net);
++void mesh_net_sub_list_add(struct mesh_net *net, uint16_t addr);
++void mesh_net_sub_list_del(struct mesh_net *net, uint16_t addr);
++uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr);
++struct mesh_io *mesh_net_get_io(struct mesh_net *net);
++bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
++							bool provisioner);
++struct mesh_node *mesh_net_local_node_get(struct mesh_net *net);
++bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl);
++uint16_t mesh_net_get_crpl(struct mesh_net *net);
++bool mesh_net_have_key(struct mesh_net *net, uint16_t net_idx);
++bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig);
++void *mesh_net_jconfig_get(struct mesh_net *net);
++bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg);
++bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg);
++bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr);
++void mesh_net_set_window_accuracy(struct mesh_net *net, uint8_t accuracy);
 +void mesh_net_transmit_params_set(struct mesh_net *net, uint8_t count,
-+							uint16_t interval)
-+{
-+	if (!net)
-+		return;
-+
-+	net->tx_interval = interval;
-+	net->tx_cnt = count;
-+}
-+
++							uint16_t interval);
 +void mesh_net_transmit_params_get(struct mesh_net *net, uint8_t *count,
-+							uint16_t *interval)
-+{
-+	if (!net)
-+		return;
++							uint16_t *interval);
++struct mesh_prov *mesh_net_get_prov(struct mesh_net *net);
++void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov);
++void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned);
++bool mesh_net_provisioned_get(struct mesh_net *net);
++bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
++				uint16_t net_idx,  uint8_t net_key[16],
++				uint16_t unicast, uint16_t snb_flags,
++				uint32_t iv_index, mesh_status_func_t cb,
++				void *user_data);
+diff --git a/mesh/prov.h b/mesh/prov.h
+new file mode 100644
+index 000000000..09fe6c3cd
+--- /dev/null
++++ b/mesh/prov.h
+@@ -0,0 +1,162 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
-+	*interval = net->tx_interval;
-+	*count = net->tx_cnt;
-+}
++#ifndef __packed
++#define __packed __attribute__((packed))
++#endif
 +
-+struct mesh_io *mesh_net_get_io(struct mesh_net *net)
-+{
-+	if (!net)
-+		return NULL;
++struct mesh_net;
++struct mesh_dev;
 +
-+	return net->io;
-+}
++enum mesh_trans {
++	MESH_TRANS_IDLE,
++	MESH_TRANS_TX,
++	MESH_TRANS_RX,
++};
 +
-+struct mesh_prov *mesh_net_get_prov(struct mesh_net *net)
-+{
-+	if (!net)
-+		return NULL;
++enum mesh_bearer {
++	MESH_BEARER_IDLE,
++	MESH_BEARER_ADV,
++};
 +
-+	return net->prov;
-+}
++enum mesh_prov_mode {
++	MESH_PROV_MODE_NONE,
++	MESH_PROV_MODE_INITIATOR,
++	MESH_PROV_MODE_GATT_ACCEPTOR,
++	MESH_PROV_MODE_ADV_ACCEPTOR,
++	MESH_PROV_MODE_GATT_CLIENT,
++	MESH_PROV_MODE_MESH_SERVER,
++	MESH_PROV_MODE_MESH_CLIENT,
++	MESH_PROV_MODE_MESH_GATT_CLIENT,
++};
 +
-+void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov)
-+{
-+	if (!net)
-+		return;
++struct mesh_prov;
++typedef void (*mesh_prov_open_func_t)(struct mesh_prov *prov);
++typedef void (*mesh_prov_close_func_t)(struct mesh_prov *prov, uint8_t reason);
++typedef void (*mesh_prov_send_func_t)(bool success, struct mesh_prov *prov);
++typedef void (*mesh_prov_receive_func_t)(const void *data, uint16_t size,
++							struct mesh_prov *prov);
 +
-+	net->prov = prov;
-+}
++struct prov_invite {
++	uint8_t attention;
++} __packed;
 +
- bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
- 				uint16_t net_idx,  uint8_t net_key[16],
- 				uint16_t unicast, uint16_t snb_flags,
-@@ -3637,3 +4178,11 @@ void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned)
- 					acceptor_prov_receive, net);
- 	}
- }
++struct prov_start {
++	uint8_t algorithm;
++	uint8_t pub_key;
++	uint8_t auth_method;
++	uint8_t auth_action;
++	uint8_t auth_size;
++} __packed;
 +
-+bool mesh_net_provisioned_get(struct mesh_net *net)
-+{
-+	if (!net)
-+		return false;
++struct conf_input {
++	struct prov_invite		invite;
++	struct mesh_net_prov_caps	caps;
++	struct prov_start		start;
++	uint8_t				prv_pub_key[64];
++	uint8_t				dev_pub_key[64];
++} __packed;
 +
-+	return net->provisioned;
-+}
++struct mesh_prov {
++	int ref_count;
++	struct mesh_dev *dev;
++	struct mesh_net *net;
++	enum mesh_prov_mode mode;
++	enum mesh_trans trans;
++	enum mesh_bearer bearer;
++	uint8_t uuid[16];
++	uint8_t caps[12];
++
++	uint32_t conn_id;
++	uint16_t net_idx;
++	uint16_t remote;
++	uint16_t addr;
++	uint16_t expected_len;
++	uint16_t packet_len;
++	uint8_t local_msg_num;
++	uint8_t peer_msg_num;
++	uint8_t last_peer_msg_num;
++	uint8_t got_segs;
++	uint8_t expected_segs;
++	uint8_t expected_fcs;
++	uint8_t packet_buf[80];
++	uint8_t peer_buf[80];
++	struct timeval tx_start;
++	struct l_timeout *tx_timeout;
++
++	/* Provisioning credentials and crypto material */
++	struct conf_input conf_inputs;
++	uint8_t dev_key[16];
++	uint8_t conf_salt[16];
++	uint8_t s_key[16];
++	uint8_t s_nonce[13];
++	uint8_t conf_key[16];
++	uint8_t conf[16];
++	uint8_t r_conf[16];
++	uint8_t rand_auth[32];
++	uint8_t prov_salt[16];
++	uint8_t secret[32];
++	uint8_t r_public[64];
++	uint8_t l_public[64];
++	/* End Provisioning credentials and crypto material */
++
++	mesh_prov_open_func_t open_callback;
++	mesh_prov_close_func_t close_callback;
++	mesh_prov_receive_func_t receive_callback;
++	void *receive_data;
++	mesh_prov_send_func_t send_callback;
++	void *send_data;
++};
++
++struct mesh_prov *mesh_prov_new(struct mesh_net *net, uint16_t remote);
++
++struct mesh_prov *mesh_prov_ref(struct mesh_prov *prov);
++void mesh_prov_unref(struct mesh_prov *prov);
++
++bool mesh_prov_gatt_client(struct mesh_prov *prov, struct mesh_dev *dev,
++					uint8_t uuid[16],
++					mesh_prov_open_func_t open_callback,
++					mesh_prov_close_func_t close_callback,
++					mesh_prov_receive_func_t recv_callback,
++					void *user_data);
++
++bool mesh_prov_listen(struct mesh_net *net, uint8_t uuid[16], uint8_t caps[12],
++					mesh_prov_open_func_t open_callback,
++					mesh_prov_close_func_t close_callback,
++					mesh_prov_receive_func_t recv_callback,
++					void *user_data);
++
++bool mesh_prov_connect(struct mesh_prov *prov, struct mesh_dev *dev,
++					uint16_t net_idx, uint8_t uuid[16],
++					mesh_prov_open_func_t open_callback,
++					mesh_prov_close_func_t close_callback,
++					mesh_prov_receive_func_t recv_callback,
++					void *user_data);
++
++unsigned int mesh_prov_send(struct mesh_prov *prov,
++					const void *data, uint16_t size,
++					mesh_prov_send_func_t send_callback,
++					void *user_data);
++bool mesh_prov_cancel(struct mesh_prov *prov, unsigned int id);
++
++bool mesh_prov_close(struct mesh_prov *prov, uint8_t reason);
++void mesh_prov_set_addr(struct mesh_prov *prov, uint16_t addr);
++uint16_t mesh_prov_get_addr(struct mesh_prov *prov);
++void mesh_prov_set_idx(struct mesh_prov *prov, uint16_t net_idx);
++uint16_t mesh_prov_get_idx(struct mesh_prov *prov);
+diff --git a/mesh/provision.h b/mesh/provision.h
+new file mode 100644
+index 000000000..0c59bf037
+--- /dev/null
++++ b/mesh/provision.h
+@@ -0,0 +1,30 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++struct mesh_prov;
++struct l_queue;
++
++void initiator_prov_open(struct mesh_prov *prov);
++void initiator_prov_close(struct mesh_prov *prov, uint8_t reason);
++void initiator_prov_receive(const void *pkt, uint16_t size,
++							struct mesh_prov *prov);
++void acceptor_prov_open(struct mesh_prov *prov);
++void acceptor_prov_close(struct mesh_prov *prov, uint8_t reason);
++void acceptor_prov_receive(const void *pkt, uint16_t size,
++							struct mesh_prov *prov);
 -- 
 2.14.4
-
