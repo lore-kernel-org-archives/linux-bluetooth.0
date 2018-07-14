@@ -3,27 +3,99 @@ From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
         inga.stotland@intel.com, Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v7 05/14] mesh: Provisioning logic for mesh
-Date: Sat, 14 Jul 2018 12:58:54 -0700
-Message-Id: <20180714195903.7402-6-brian.gix@intel.com>
+Subject: [PATCH BlueZ v7 03/14] mesh: Infrastructure for Mesh daemon
+Date: Sat, 14 Jul 2018 12:58:52 -0700
+Message-Id: <20180714195903.7402-4-brian.gix@intel.com>
 In-Reply-To: <20180714195903.7402-1-brian.gix@intel.com>
 References: <20180714195903.7402-1-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- mesh/prov.c      |  722 ++++++++++++++++++++++++++++++++++
- mesh/provision.c | 1159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 1881 insertions(+)
- create mode 100644 mesh/prov.c
- create mode 100644 mesh/provision.c
+ mesh/display.c         |  64 +++++
+ mesh/mesh-io-generic.c | 660 +++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/mesh-io.c         | 188 ++++++++++++++
+ 3 files changed, 912 insertions(+)
+ create mode 100644 mesh/display.c
+ create mode 100644 mesh/mesh-io-generic.c
+ create mode 100644 mesh/mesh-io.c
 
-diff --git a/mesh/prov.c b/mesh/prov.c
+diff --git a/mesh/display.c b/mesh/display.c
 new file mode 100644
-index 000000000..45ced404c
+index 000000000..8238ae849
 --- /dev/null
-+++ b/mesh/prov.c
-@@ -0,0 +1,722 @@
++++ b/mesh/display.c
+@@ -0,0 +1,64 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#include <stdio.h>
++#include <unistd.h>
++#include <termios.h>
++#include <sys/ioctl.h>
++#include <sys/time.h>
++#include <ell/ell.h>
++
++#include "display.h"
++
++static unsigned int cached_num_columns;
++
++unsigned int num_columns(void)
++{
++	struct winsize ws;
++
++	if (cached_num_columns > 0)
++		return cached_num_columns;
++
++	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) < 0 || ws.ws_col == 0)
++		cached_num_columns = 80;
++	else
++		cached_num_columns = ws.ws_col;
++
++	return cached_num_columns;
++}
++
++void print_packet(const char *label, const void *data, uint16_t size)
++{
++	struct timeval pkt_time;
++
++	gettimeofday(&pkt_time, NULL);
++
++	if (size > 0) {
++		char *str;
++
++		str = l_util_hexstring(data, size);
++		l_debug("%05d.%03d %s: %s",
++				(uint32_t) pkt_time.tv_sec % 100000,
++				(uint32_t) pkt_time.tv_usec/1000, label, str);
++		l_free(str);
++	} else
++		l_debug("%05d.%03d %s: empty",
++				(uint32_t) pkt_time.tv_sec % 100000,
++				(uint32_t) pkt_time.tv_usec/1000, label);
++}
+diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
+new file mode 100644
+index 000000000..52514e280
+--- /dev/null
++++ b/mesh/mesh-io-generic.c
+@@ -0,0 +1,660 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -50,708 +122,646 @@ index 000000000..45ced404c
 +#include <sys/time.h>
 +#include <ell/ell.h>
 +
-+#include "mesh/mesh-defs.h"
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
 +
-+#include "mesh/mesh-io.h"
++#include "monitor/bt.h"
++#include "src/shared/hci.h"
++
 +#include "mesh/display.h"
-+#include "mesh/crypto.h"
-+#include "mesh/net.h"
-+#include "mesh/prov.h"
++#include "mesh/mesh-io.h"
++#include "mesh/mesh-io-api.h"
 +
-+#define PB_ADV_MTU	24
++#include "mesh/mesh-io-generic.h"
 +
-+#define DEFAULT_CONN_ID	0x00000000
-+#define DEFAULT_PROV_MSG_NUM	0x00
-+#define DEFAULT_DEV_MSG_NUM	0x80
++struct mesh_io_private {
++	uint16_t index;
++	struct bt_hci *hci;
++	struct l_timeout *tx_timeout;
++	struct l_queue *rx_regs;
++	struct l_queue *tx_pkts;
++	uint8_t filters[3]; /* Simple filtering on AD type only */
++	bool sending;
++	struct tx_pkt *tx;
++	uint16_t interval;
++};
 +
-+#define TX_TIMEOUT	30
++struct pvt_rx_reg {
++	uint8_t filter_id;
++	mesh_io_recv_func_t cb;
++	void *user_data;
++};
 +
-+struct mesh_prov *mesh_prov_new(struct mesh_net *net, uint16_t remote)
++struct process_data {
++	struct mesh_io_private		*pvt;
++	const uint8_t			*data;
++	uint8_t				len;
++	struct mesh_io_recv_info	info;
++};
++
++struct tx_pkt {
++	struct mesh_io_send_info	info;
++	bool				delete;
++	uint8_t				len;
++	uint8_t				pkt[30];
++};
++
++struct tx_pattern {
++	const uint8_t			*data;
++	uint8_t				len;
++};
++
++static uint32_t get_instant(void)
 +{
-+	struct mesh_prov *prov;
++	struct timeval tm;
++	uint32_t instant;
 +
-+	prov = l_new(struct mesh_prov, 1);
++	gettimeofday(&tm, NULL);
++	instant = tm.tv_sec * 1000;
++	instant += tm.tv_usec / 1000;
 +
-+	prov->remote = remote;
-+	prov->net = net;
-+
-+	return mesh_prov_ref(prov);
++	return instant;
 +}
 +
-+struct mesh_prov *mesh_prov_ref(struct mesh_prov *prov)
++static uint32_t instant_remaining_ms(uint32_t instant)
 +{
-+	if (!prov)
-+		return NULL;
-+
-+	__sync_fetch_and_add(&prov->ref_count, 1);
-+
-+	return prov;
++	instant -= get_instant();
++	return instant;
 +}
 +
-+void mesh_prov_unref(struct mesh_prov *prov)
++static void process_rx_callbacks(void *v_rx, void *v_reg)
 +{
-+	struct mesh_io *io;
-+	uint8_t type;
++	struct pvt_rx_reg *rx_reg = v_rx;
++	struct process_data *rx = v_reg;
++	uint8_t ad_type;
 +
-+	if (!prov)
-+		return;
++	ad_type = rx->pvt->filters[rx_reg->filter_id - 1];
 +
-+	if (__sync_sub_and_fetch(&prov->ref_count, 1))
-+		return;
-+
-+	io = mesh_net_get_io(prov->net);
-+	type = MESH_AD_TYPE_BEACON;
-+	mesh_io_send_cancel(io, &type, 1);
-+	type = MESH_AD_TYPE_PROVISION;
-+	mesh_io_send_cancel(io, &type, 1);
-+	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_PROV);
-+	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_BEACON);
-+	l_timeout_remove(prov->tx_timeout);
-+
-+
-+	l_info("Freed Prov Data");
-+	l_free(prov);
++	if (rx->data[0] == ad_type && rx_reg->cb)
++		rx_reg->cb(rx_reg->user_data, &rx->info, rx->data, rx->len);
 +}
 +
-+static void packet_received(struct mesh_prov *prov, const void *data,
-+						uint16_t size, uint8_t fcs)
++static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
++					uint32_t instant,
++					const uint8_t *data, uint8_t len)
 +{
-+	if (prov->receive_callback)
-+		prov->receive_callback(data, size, prov);
-+}
-+
-+static void send_open_req(struct mesh_prov *prov)
-+{
-+	struct mesh_io *io;
-+	uint8_t open_req[23] = { MESH_AD_TYPE_PROVISION };
-+	struct mesh_io_send_info info = {
-+		.type = MESH_IO_TIMING_TYPE_GENERAL,
-+		.u.gen.interval = 50,
-+		.u.gen.cnt = 1,
-+		.u.gen.min_delay = 0,
-+		.u.gen.max_delay = 0,
++	struct process_data rx = {
++		.pvt = pvt,
++		.data = data,
++		.len = len,
++		.info.instant = instant,
++		.info.chan = 7,
++		.info.rssi = rssi,
 +	};
 +
-+	if (!prov)
-+		return;
-+
-+	io = mesh_net_get_io(prov->net);
-+	if (!io)
-+		return;
-+
-+	l_put_be32(prov->conn_id, open_req + 1);
-+	open_req[1 + 4] = prov->local_msg_num = 0;
-+	open_req[1 + 4 + 1] = 0x03; /* OPEN_REQ */
-+	memcpy(open_req + 1 + 4 + 1 + 1, prov->uuid, 16);
-+
-+	/* print_packet("PB-TX", open_req + 1, sizeof(open_req) - 1); */
-+	mesh_io_send_cancel(io, open_req, 1);
-+	mesh_io_send(io, &info, open_req, sizeof(open_req));
++	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
 +}
 +
-+static void send_open_cfm(struct mesh_prov *prov)
++static void event_adv_report(struct mesh_io *io, const void *buf, uint8_t size)
 +{
-+	struct mesh_io *io;
-+	uint8_t open_cfm[7] = { MESH_AD_TYPE_PROVISION };
-+	struct mesh_io_send_info info = {
-+		.type = MESH_IO_TIMING_TYPE_GENERAL,
-+		.u.gen.interval = 50,
-+		.u.gen.cnt = 1,
-+		.u.gen.min_delay = 0,
-+		.u.gen.max_delay = 0,
-+	};
++	const struct bt_hci_evt_le_adv_report *evt = buf;
++	const uint8_t *adv;
++	uint32_t instant;
++	uint8_t adv_len;
++	uint16_t len = 0;
++	int8_t rssi;
 +
-+	if (!prov)
++	if (evt->event_type != 0x03)
 +		return;
 +
-+	io = mesh_net_get_io(prov->net);
-+	if (!io)
++	if (evt->addr_type != BDADDR_LE_PUBLIC &&
++			evt->addr_type != BDADDR_LE_RANDOM)
 +		return;
 +
-+	l_put_be32(prov->conn_id, open_cfm + 1);
-+	open_cfm[1 + 4] = 0;
-+	open_cfm[1 + 4 + 1] = 0x07; /* OPEN_CFM */
++	instant = get_instant();
++	adv = evt->data;
++	adv_len = evt->data_len;
 +
-+	/* print_packet("PB-TX", open_cfm + 1, sizeof(open_cfm) - 1); */
++	/* rssi is just beyond last byte of data */
++	rssi = (int8_t) adv[adv_len];
 +
-+	mesh_io_send_cancel(io, open_cfm, 1);
-+	mesh_io_send(io, &info, open_cfm, sizeof(open_cfm));
++	while (len < adv_len - 1) {
++		uint8_t field_len = adv[0];
++
++		/* Check for the end of advertising data */
++		if (field_len == 0)
++			break;
++
++		len += field_len + 1;
++
++		/* Do not continue data parsing if got incorrect length */
++		if (len > adv_len)
++			break;
++
++		/* TODO: Create an Instant to use */
++		process_rx(io->pvt, rssi, instant, adv + 1, adv[0]);
++
++		adv += field_len + 1;
++	}
 +}
 +
-+static void send_close_ind(struct mesh_prov *prov, uint8_t reason)
++static void event_callback(const void *buf, uint8_t size, void *user_data)
 +{
-+	uint8_t buf[8] = { MESH_AD_TYPE_PROVISION };
-+	struct mesh_io *io;
-+	struct mesh_io_send_info info = {
-+		.type = MESH_IO_TIMING_TYPE_GENERAL,
-+		.u.gen.interval = 50,
-+		.u.gen.cnt = 3,
-+		.u.gen.min_delay = 0,
-+		.u.gen.max_delay = 0,
-+	};
++	uint8_t event = l_get_u8(buf);
++	struct mesh_io *io = user_data;
 +
-+	if (!prov)
++	switch (event) {
++	case BT_HCI_EVT_LE_ADV_REPORT:
++		event_adv_report(io, buf + 1, size - 1);
++		break;
++
++	default:
++		l_info("Other Meta Evt - %d", event);
++	}
++}
++
++static bool dev_init(uint16_t index, struct mesh_io *io)
++{
++	struct mesh_io_private *tmp;
++
++	if (!io || io->pvt)
++		return false;
++
++	tmp = l_new(struct mesh_io_private, 1);
++
++	if (tmp == NULL)
++		return false;
++
++	tmp->rx_regs = l_queue_new();
++	tmp->tx_pkts = l_queue_new();
++	if (!tmp->rx_regs || !tmp->tx_pkts)
++		goto fail;
++
++	tmp->hci = bt_hci_new_user_channel(index);
++	if (!tmp->hci)
++		goto fail;
++
++	bt_hci_register(tmp->hci, BT_HCI_EVT_LE_META_EVENT,
++						event_callback, io, NULL);
++
++	io->pvt = tmp;
++	return true;
++
++fail:
++	l_queue_destroy(tmp->rx_regs, l_free);
++	l_queue_destroy(tmp->tx_pkts, l_free);
++	l_free(tmp);
++	return false;
++}
++
++static bool dev_destroy(struct mesh_io *io)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	if (!pvt)
++		return true;
++
++	bt_hci_unref(pvt->hci);
++	l_timeout_remove(pvt->tx_timeout);
++	l_queue_destroy(pvt->rx_regs, l_free);
++	l_queue_destroy(pvt->tx_pkts, l_free);
++	l_free(pvt);
++	io->pvt = NULL;
++
++	return true;
++}
++
++static bool dev_caps(struct mesh_io *io, struct mesh_io_caps *caps)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	if (!pvt || !caps)
++		return false;
++
++	caps->max_num_filters = sizeof(pvt->filters);
++	caps->window_accuracy = 50;
++
++	return true;
++}
++
++static void send_cancel_done(const void *buf, uint8_t size,
++							void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct bt_hci_cmd_le_set_random_address cmd;
++
++	if (!pvt)
 +		return;
 +
-+	if (prov->bearer == MESH_BEARER_ADV) {
-+		io = mesh_net_get_io(prov->net);
-+		if (!io)
-+			return;
++	pvt->sending = false;
 +
-+		l_put_be32(prov->conn_id, buf + 1);
-+		buf[5] = 0;
-+		buf[6] = 0x0B; /* CLOSE_IND */
-+		buf[7] = reason;
++	/* At end of any burst of ADVs, change random address */
++	l_getrandom(cmd.addr, 6);
++	cmd.addr[5] |= 0xc0;
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_RANDOM_ADDRESS,
++				&cmd, sizeof(cmd), NULL, NULL, NULL);
++}
 +
-+		/* print_packet("PB-TX", buf + 1, sizeof(buf) - 1); */
++static void send_cancel(struct mesh_io_private *pvt)
++{
++	struct bt_hci_cmd_le_set_adv_enable cmd;
 +
-+		mesh_io_send_cancel(io, buf, 1);
-+		mesh_io_send(io, &info, buf, sizeof(buf));
++	if (!pvt)
++		return;
++
++	if (!pvt->sending) {
++		send_cancel_done(NULL, 0, pvt);
++		return;
 +	}
 +
-+	prov->bearer = MESH_BEARER_IDLE;
++	cmd.enable = 0x00;	/* Disable advertising */
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
++				&cmd, sizeof(cmd),
++				send_cancel_done, pvt, NULL);
++}
++
++static void set_send_adv_enable(const void *buf, uint8_t size,
++							void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct bt_hci_cmd_le_set_adv_enable cmd;
++
++	if (!pvt)
++		return;
++
++	pvt->sending = true;
++	cmd.enable = 0x01;	/* Enable advertising */
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
++				&cmd, sizeof(cmd), NULL, NULL, NULL);
++}
++
++static void set_send_adv_data(const void *buf, uint8_t size,
++							void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	struct bt_hci_cmd_le_set_adv_data cmd;
++
++	if (!pvt || !pvt->tx)
++		return;
++
++	tx = pvt->tx;
++	if (tx->len >= sizeof(cmd.data))
++		goto done;
++
++	memset(&cmd, 0, sizeof(cmd));
++
++	cmd.len = tx->len + 1;
++	cmd.data[0] = tx->len;
++	memcpy(cmd.data + 1, tx->pkt, tx->len);
++
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_DATA,
++					&cmd, sizeof(cmd),
++					set_send_adv_enable, pvt, NULL);
++done:
++	if (tx->delete)
++		l_free(tx);
++
++	pvt->tx = NULL;
++}
++
++static void set_send_adv_params(const void *buf, uint8_t size,
++							void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct bt_hci_cmd_le_set_adv_parameters cmd;
++	uint16_t hci_interval;
++
++	if (!pvt)
++		return;
++
++	hci_interval = (pvt->interval * 16) / 10;
++	cmd.min_interval = L_CPU_TO_LE16(hci_interval);
++	cmd.max_interval = L_CPU_TO_LE16(hci_interval);
++	cmd.type = 0x03; /* ADV_NONCONN_IND */
++	cmd.own_addr_type = 0x01; /* ADDR_TYPE_RANDOM */
++	cmd.direct_addr_type = 0x00;
++	memset(cmd.direct_addr, 0, 6);
++	cmd.channel_map = 0x07;
++	cmd.filter_policy = 0x03;
++
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
++				&cmd, sizeof(cmd),
++				set_send_adv_data, pvt, NULL);
++}
++
++static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
++							uint16_t interval)
++{
++	struct bt_hci_cmd_le_set_adv_enable cmd;
++
++	pvt->tx = tx;
++	pvt->interval = interval;
++
++	if (!pvt->sending) {
++		set_send_adv_params(NULL, 0, pvt);
++		return;
++	}
++
++	cmd.enable = 0x00;	/* Disable advertising */
++	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
++				&cmd, sizeof(cmd),
++				set_send_adv_params, pvt, NULL);
 +}
 +
 +static void tx_timeout(struct l_timeout *timeout, void *user_data)
 +{
-+	struct mesh_prov *prov = user_data;
-+	uint8_t cancel[] = { MESH_AD_TYPE_PROVISION };
-+	struct mesh_io *io;
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	uint16_t ms;
++	uint8_t count;
 +
-+	if (!prov)
++	if (!pvt)
 +		return;
 +
-+	l_timeout_remove(prov->tx_timeout);
-+	prov->tx_timeout = NULL;
-+
-+	io = mesh_net_get_io(prov->net);
-+	if (!io)
++	tx = l_queue_pop_head(pvt->tx_pkts);
++	if (!tx) {
++		l_timeout_remove(timeout);
++		pvt->tx_timeout = NULL;
++		send_cancel(pvt);
 +		return;
++	}
 +
-+	mesh_io_send_cancel(io, cancel, sizeof(cancel));
-+
-+	l_info("TX timeout");
-+	mesh_prov_close(prov, 1);
-+}
-+
-+static void send_adv_segs(struct mesh_prov *prov)
-+{
-+	struct mesh_io *io = mesh_net_get_io(prov->net);
-+	struct mesh_io_send_info info = {
-+		.type = MESH_IO_TIMING_TYPE_GENERAL,
-+		.u.gen.interval = 50,
-+		.u.gen.cnt = MESH_IO_TX_COUNT_UNLIMITED,
-+		.u.gen.min_delay = 0,
-+		.u.gen.max_delay = 0,
-+	};
-+	const void *data = prov->packet_buf;
-+	uint16_t size = prov->packet_len;
-+	uint16_t init_size;
-+	uint8_t buf[1 + PB_ADV_MTU + 5] = { MESH_AD_TYPE_PROVISION };
-+	uint8_t max_seg;
-+	uint8_t consumed;
-+	int i;
-+
-+	if (!size)
-+		return;
-+
-+	mesh_io_send_cancel(io, buf, 1);
-+
-+	l_put_be32(prov->conn_id, buf + 1);
-+	buf[1 + 4] = prov->local_msg_num;
-+
-+	if (size > PB_ADV_MTU - 4) {
-+		max_seg = 1 +
-+			(((size - (PB_ADV_MTU - 4)) - 1) / (PB_ADV_MTU - 1));
-+		init_size = PB_ADV_MTU - 4;
++	if (tx->info.type == MESH_IO_TIMING_TYPE_GENERAL) {
++		ms = tx->info.u.gen.interval;
++		count = tx->info.u.gen.cnt;
++		if (count != MESH_IO_TX_COUNT_UNLIMITED)
++			tx->info.u.gen.cnt--;
 +	} else {
-+		max_seg = 0;
-+		init_size = size;
++		ms = 25;
++		count = 1;
 +	}
 +
-+	/* print_packet("FULL-TX", data, size); */
++	tx->delete = !!(count == 1);
 +
-+	l_debug("Sending %u fragments for %u octets", max_seg + 1, size);
++	send_pkt(pvt, tx, ms);
 +
-+	buf[1 + 4 + 1] = max_seg << 2;
-+	l_put_be16(size, buf + 1 + 4 + 1 + 1);
-+	buf[9] = mesh_crypto_compute_fcs(data, size);
-+	memcpy(buf + 1 + 4 + 1 + 1 + 2 + 1, data, init_size);
-+
-+	l_debug("max_seg: %2.2x", max_seg);
-+	l_debug("size: %2.2x, CRC: %2.2x", size, buf[9]);
-+
-+	/* print_packet("PB-TX", buf + 1, init_size + 9); */
-+	mesh_io_send(io, &info, buf, init_size + 10);
-+
-+	consumed = init_size;
-+
-+	for (i = 1; i <= max_seg; i++) {
-+		uint8_t seg_size; /* Amount of payload data being sent */
-+
-+		if (size - consumed > PB_ADV_MTU - 1)
-+			seg_size = PB_ADV_MTU - 1;
-+		else
-+			seg_size = size - consumed;
-+
-+		buf[6] = (i << 2) | 0x02;
-+		memcpy(buf + 7, data + consumed, seg_size);
-+
-+		/* print_packet("PB-TX", buf + 1, seg_size + 6); */
-+
-+		mesh_io_send(io, &info, buf, seg_size + 7);
-+
-+		consumed += seg_size;
-+	}
-+}
-+
-+static void send_adv_msg(struct mesh_prov *prov, const void *data,
-+								uint16_t size)
-+{
-+	l_timeout_remove(prov->tx_timeout);
-+	prov->tx_timeout = l_timeout_create(TX_TIMEOUT, tx_timeout, prov, NULL);
-+
-+	memcpy(prov->packet_buf, data, size);
-+	prov->packet_len = size;
-+
-+	send_adv_segs(prov);
-+}
-+
-+static void send_ack(struct mesh_prov *prov)
-+{
-+	struct mesh_io *io = mesh_net_get_io(prov->net);
-+	struct mesh_io_send_info info = {
-+		.type = MESH_IO_TIMING_TYPE_GENERAL,
-+		.u.gen.interval = 50,
-+		.u.gen.cnt = 1,
-+		.u.gen.min_delay = 0,
-+		.u.gen.max_delay = 0,
-+	};
-+	uint8_t ack[7] = { MESH_AD_TYPE_PROVISION };
-+
-+	l_put_be32(prov->conn_id, ack + 1);
-+	ack[1 + 4] = prov->last_peer_msg_num;
-+	ack[1 + 4 + 1] = 0x01; /* ACK */
-+
-+	/* print_packet("ADV-ACK", ack + 1, sizeof(ack) - 1); */
-+	mesh_io_send(io, &info, ack, sizeof(ack));
-+}
-+
-+static void adv_data_pkt(uint8_t type, const void *pkt, uint8_t size,
-+								void *user_data)
-+{
-+	const uint8_t *data = pkt;
-+	struct mesh_prov *prov = user_data;
-+	uint16_t offset = 0;
-+
-+	if ((type & 0x03) == 0x00) {
-+		uint8_t last_seg = type >> 2;
-+
-+		prov->expected_len = l_get_be16(data);
-+		prov->expected_fcs = l_get_u8(data + 2);
-+
-+		/* print_packet("Pkt", pkt, size); */
-+		data += 3;
-+		size -= 3;
-+
-+		prov->trans = MESH_TRANS_RX;
-+
-+		if (prov->expected_len > sizeof(prov->peer_buf)) {
-+			l_info("Incoming pkt exceeds storage %d > %ld",
-+				prov->expected_len, sizeof(prov->peer_buf));
-+			return;
-+		} else if (last_seg == 0)
-+			prov->trans = MESH_TRANS_IDLE;
-+
-+		prov->expected_segs = 0xff >> (7 - last_seg);
-+		prov->got_segs |= 1;
-+		memcpy(prov->peer_buf, data, size);
-+
-+	} else if ((type & 0x03) == 0x02) {
-+		offset = (PB_ADV_MTU - 4) + ((type >> 2) - 1) *
-+							(PB_ADV_MTU - 1);
-+
-+		if (offset + size > prov->expected_len) {
-+			l_info("Incoming pkt exceeds agreed len %d + %d > %d",
-+					offset, size, prov->expected_len);
-+			return;
++	if (count == 1) {
++		/* send_pkt will delete when done */
++		tx = l_queue_peek_head(pvt->tx_pkts);
++		if (tx && tx->info.type == MESH_IO_TIMING_TYPE_POLL_RSP) {
++			ms = instant_remaining_ms(tx->info.u.poll_rsp.instant +
++						tx->info.u.poll_rsp.delay);
 +		}
-+
-+		prov->trans = MESH_TRANS_RX;
-+
-+		l_debug("Processing fragment %u", type & 0x3f);
-+
-+		prov->got_segs |= 1 << (type >> 2);
-+		memcpy(prov->peer_buf + offset, data, size);
-+
-+	} else if (type == 0x01) {
-+		if (prov->send_callback) {
-+			void *data = prov->send_data;
-+			mesh_prov_send_func_t cb = prov->send_callback;
-+
-+			prov->trans = MESH_TRANS_IDLE;
-+			prov->send_callback = NULL;
-+			prov->send_data = NULL;
-+
-+			cb(true, data);
-+		}
-+		return;
 +	} else
-+		return;
++		l_queue_push_tail(pvt->tx_pkts, tx);
 +
-+	if (prov->got_segs != prov->expected_segs)
-+		return;
-+
-+	/* Validate RXed packet and pass up to Provisioning */
-+	if (!mesh_crypto_check_fcs(prov->peer_buf,
-+				prov->expected_len,
-+				prov->expected_fcs)) {
-+		l_debug("Invalid FCS");
-+		return;
-+	}
-+
-+	prov->last_peer_msg_num = prov->peer_msg_num;
-+	send_ack(prov);
-+
-+	prov->trans = MESH_TRANS_IDLE;
-+
-+	packet_received(prov, prov->peer_buf,
-+			prov->expected_len, prov->expected_fcs);
-+
-+	/* Reset Re-Assembly for next packet */
-+	prov->expected_len = sizeof(prov->peer_buf);
-+	prov->expected_fcs = 0;
-+	prov->expected_segs = 0;
-+	prov->got_segs = 0;
-+
++	if (timeout) {
++		pvt->tx_timeout = timeout;
++		l_timeout_modify_ms(timeout, ms);
++	} else
++		pvt->tx_timeout = l_timeout_create_ms(ms, tx_timeout,
++								pvt, NULL);
 +}
 +
-+static void adv_bearer_packet(void *user_data, struct mesh_io_recv_info *info,
-+					const uint8_t *pkt, uint16_t len)
++static void tx_worker(void *user_data)
 +{
-+	struct mesh_prov *prov = user_data;
-+	uint32_t conn_id;
-+	uint8_t msg_num;
-+	uint8_t type;
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	uint32_t delay;
 +
-+	if (len < 6) {
-+		l_info("  Too short packet");
++	tx = l_queue_peek_head(pvt->tx_pkts);
++	if (!tx)
++		return;
++
++	switch (tx->info.type) {
++	case MESH_IO_TIMING_TYPE_GENERAL:
++		if (tx->info.u.gen.min_delay == tx->info.u.gen.max_delay)
++			delay = tx->info.u.gen.min_delay;
++		else {
++			l_getrandom(&delay, sizeof(delay));
++			delay %= tx->info.u.gen.max_delay -
++						tx->info.u.gen.min_delay;
++			delay += tx->info.u.gen.min_delay;
++		}
++		break;
++
++	case MESH_IO_TIMING_TYPE_POLL:
++		if (tx->info.u.poll.min_delay == tx->info.u.poll.max_delay)
++			delay = tx->info.u.poll.min_delay;
++		else {
++			l_getrandom(&delay, sizeof(delay));
++			delay %= tx->info.u.poll.max_delay -
++						tx->info.u.poll.min_delay;
++			delay += tx->info.u.poll.min_delay;
++		}
++		break;
++
++	case MESH_IO_TIMING_TYPE_POLL_RSP:
++		/* Delay until Instant + Delay */
++		delay = instant_remaining_ms(tx->info.u.poll_rsp.instant +
++						tx->info.u.poll_rsp.delay);
++		if (delay > 255)
++			delay = 0;
++		break;
++
++	default:
 +		return;
 +	}
 +
-+	conn_id = l_get_be32(pkt + 1);
-+	msg_num = l_get_u8(pkt + 1 + 4);
-+	type = l_get_u8(pkt + 1 + 4 + 1);
-+
-+	/*if (prov->conn_id == conn_id) print_packet("ADV-RX", pkt, len); */
-+
-+	if (prov->conn_id != DEFAULT_CONN_ID) {
-+		if (prov->conn_id != conn_id) {
-+			l_debug("rxed unknown conn_id: %8.8x != %8.8x",
-+							conn_id, prov->conn_id);
-+			return;
-+		}
-+	} else if (type != 0x03)
-+		return;
-+
-+	/* print_packet("PB-ADV-RX", pkt, len); */
-+
-+	/* Normalize pkt to start of PROV pkt payload */
-+	pkt += 7;
-+	len -= 7;
-+
-+	if (type == 0x07) { /* OPEN_CFM */
-+		if (conn_id != prov->conn_id)
-+			return;
-+
-+		if (msg_num != prov->local_msg_num)
-+			return;
-+
-+		l_info("Link open confirmed");
-+
-+		prov->bearer = MESH_BEARER_ADV;
-+		if (prov->open_callback)
-+			prov->open_callback(prov->receive_data);
-+	} else if (type == 0x01) {
-+		if (conn_id != prov->conn_id)
-+			return;
-+
-+		if (msg_num != prov->local_msg_num)
-+			return;
-+
-+		l_debug("Got ACK %d", msg_num);
-+		adv_data_pkt(type, pkt, len, user_data);
-+	} else if (type == 0x03) {
-+		/*
-+		 * Ignore if:
-+		 * 1. We are already provisioning
-+		 * 2. We are not advertising that we are unprovisioned
-+		 * 3. Open request not addressed to us
-+		 */
-+		if (prov->conn_id != DEFAULT_CONN_ID &&
-+				prov->conn_id != conn_id)
-+			return;
-+
-+		if (prov->local_msg_num != (DEFAULT_DEV_MSG_NUM - 1))
-+			return;
-+
-+		if (memcmp(pkt, prov->uuid, 16))
-+			return;
-+
-+		l_info("Link open request");
-+
-+		prov->last_peer_msg_num = 0xFF;
-+		prov->bearer = MESH_BEARER_ADV;
-+		if (prov->open_callback && prov->conn_id == DEFAULT_CONN_ID)
-+			prov->open_callback(prov->receive_data);
-+
-+		prov->conn_id = conn_id;
-+		prov->peer_msg_num = msg_num;
-+		send_open_cfm(prov);
-+	} else if (type == 0x0B) {
-+		if (prov->conn_id != conn_id)
-+			return;
-+
-+		prov->conn_id = DEFAULT_CONN_ID;
-+		prov->local_msg_num = 0xFF;
-+		prov->peer_msg_num = 0xFF;
-+		prov->last_peer_msg_num = 0xFF;
-+
-+		l_timeout_remove(prov->tx_timeout);
-+		prov->tx_timeout = NULL;
-+
-+		l_info("Link closed notification: %2.2x", pkt[0]);
-+
-+		if (prov->close_callback)
-+			prov->close_callback(prov->receive_data, pkt[0]);
-+	} else if ((type & 0x03) == 0x00) {
-+		if (prov->conn_id != conn_id)
-+			return;
-+
-+		if (msg_num == prov->last_peer_msg_num) {
-+			send_ack(prov);
-+			return;
-+		}
-+
-+		prov->peer_msg_num = msg_num;
-+
-+		l_debug("Processing Data with %u fragments,%d octets",
-+						type >> 2, l_get_be16(pkt));
-+		adv_data_pkt(type, pkt, len, user_data);
-+
-+	} else if ((type & 0x03) == 0x02) {
-+		if (prov->conn_id != conn_id)
-+			return;
-+
-+		if (msg_num == prov->last_peer_msg_num) {
-+			send_ack(prov);
-+			return;
-+		}
-+
-+		prov->peer_msg_num = msg_num;
-+
-+		l_debug("Processing fragment %u", type >> 2);
-+		adv_data_pkt(type, pkt, len, user_data);
-+	}
++	if (!delay)
++		tx_timeout(pvt->tx_timeout, pvt);
++	else if (pvt->tx_timeout)
++		l_timeout_modify_ms(pvt->tx_timeout, delay);
++	else
++		pvt->tx_timeout = l_timeout_create_ms(delay, tx_timeout,
++								pvt, NULL);
 +}
 +
-+static void beacon_packet(void *user_data, struct mesh_io_recv_info *info,
-+					const uint8_t *pkt, uint16_t len)
++static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len)
 +{
-+	struct mesh_prov *prov = user_data;
-+	struct mesh_io *io;
++	struct mesh_io_private *pvt = io->pvt;
++	struct tx_pkt *tx;
++	bool sending = false;
 +
-+	pkt++;
-+	len--;
-+
-+	if (len < 19)
-+		return;
-+
-+	if (!pkt[0])
-+		print_packet("UnProv-BEACON-RX", pkt, len);
-+
-+	/* Ignore devices not matching UUID */
-+	if (pkt[0] || memcmp(pkt + 1, prov->uuid, 16))
-+		return;
-+
-+	io = mesh_net_get_io(prov->net);
-+	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_BEACON);
-+
-+	if ((prov->conn_id != DEFAULT_CONN_ID) ||
-+			(prov->bearer != MESH_BEARER_IDLE)) {
-+		l_info("PB-ADV: Already Provisioning");
-+		return;
-+	}
-+
-+	l_getrandom(&prov->conn_id, sizeof(prov->conn_id));
-+	prov->bearer = MESH_BEARER_ADV;
-+	send_open_req(prov);
-+}
-+
-+static bool mesh_prov_enable(struct mesh_prov *prov, enum mesh_prov_mode mode,
-+							uint8_t uuid[16])
-+{
-+	const uint8_t pb_adv_data[] = { MESH_AD_TYPE_BEACON, 0 };
-+	uint8_t adv_data[62];
-+	uint8_t adv_len, type;
-+	struct mesh_io *io;
-+	struct mesh_io_send_info tx_info = {
-+		.type = MESH_IO_TIMING_TYPE_GENERAL,
-+		.u.gen.interval = 1000,	/* ms */
-+		.u.gen.cnt = 0,		/* 0 == Infinite */
-+		.u.gen.min_delay = 0,	/* no delay */
-+		.u.gen.max_delay = 0,	/* no delay */
-+	};
-+
-+	if (!prov || !prov->net)
++	if (!info || !data || !len || len > sizeof(tx->pkt))
 +		return false;
 +
 +
-+	prov->mode = mode;
-+	memcpy(prov->uuid, uuid, 16);
-+	prov->conn_id = DEFAULT_CONN_ID;
-+	io = mesh_net_get_io(prov->net);
++	tx = l_new(struct tx_pkt, 1);
++	if (!tx)
++		return false;
 +
-+	switch (mode) {
-+	case MESH_PROV_MODE_NONE:
-+		break;
-+	case MESH_PROV_MODE_INITIATOR:
-+		print_packet("Searching for uuid", uuid, 16);
-+		prov->local_msg_num = DEFAULT_PROV_MSG_NUM;
-+		prov->peer_msg_num = DEFAULT_DEV_MSG_NUM;
-+		mesh_io_register_recv_cb(io, MESH_IO_FILTER_PROV,
-+						adv_bearer_packet, prov);
-+		mesh_io_register_recv_cb(io, MESH_IO_FILTER_BEACON,
-+						beacon_packet, prov);
-+		break;
++	memcpy(&tx->info, info, sizeof(tx->info));
++	memcpy(&tx->pkt, data, len);
++	tx->len = len;
 +
-+	case MESH_PROV_MODE_ADV_ACCEPTOR:
-+		prov->local_msg_num = DEFAULT_DEV_MSG_NUM - 1;
-+		prov->peer_msg_num = DEFAULT_PROV_MSG_NUM;
++	if (info->type == MESH_IO_TIMING_TYPE_POLL_RSP)
++		l_queue_push_head(pvt->tx_pkts, tx);
++	else {
++		sending = !l_queue_isempty(pvt->tx_pkts);
++		l_queue_push_tail(pvt->tx_pkts, tx);
++	}
 +
-+		print_packet("Beaconing as unProvisioned uuid", uuid, 16);
-+		adv_len = sizeof(pb_adv_data);
-+		memcpy(adv_data, pb_adv_data, adv_len);
-+		memcpy(adv_data + adv_len, uuid, 16);
-+		adv_len += 16;
-+		adv_len += 2;
-+		mesh_io_register_recv_cb(io, MESH_IO_FILTER_PROV,
-+						adv_bearer_packet, prov);
-+		type = MESH_AD_TYPE_BEACON;
-+		mesh_io_send_cancel(io, &type, 1);
-+		mesh_io_send(io, &tx_info, adv_data, adv_len);
-+		break;
-+
-+	case MESH_PROV_MODE_GATT_CLIENT:
-+	case MESH_PROV_MODE_MESH_GATT_CLIENT:
-+	case MESH_PROV_MODE_GATT_ACCEPTOR:
-+	case MESH_PROV_MODE_MESH_SERVER:
-+	case MESH_PROV_MODE_MESH_CLIENT:
-+	default:
-+		l_error("Unimplemented Prov Mode: %d", mode);
-+		break;
++	if (!sending) {
++		l_timeout_remove(pvt->tx_timeout);
++		pvt->tx_timeout = NULL;
++		l_idle_oneshot(tx_worker, pvt, NULL);
 +	}
 +
 +	return true;
 +}
 +
-+bool mesh_prov_listen(struct mesh_net *net, uint8_t uuid[16], uint8_t caps[12],
-+					mesh_prov_open_func_t open_callback,
-+					mesh_prov_close_func_t close_callback,
-+					mesh_prov_receive_func_t recv_callback,
-+					void *user_data)
++static bool find_by_ad_type(const void *a, const void *b)
 +{
-+	struct mesh_prov *prov = mesh_net_get_prov(net);
++	const struct tx_pkt *tx = a;
++	uint8_t ad_type = L_PTR_TO_UINT(b);
 +
-+	if (!prov) {
-+		prov = mesh_prov_new(net, 0);
-+		if (!prov)
-+			return false;
-+
-+		mesh_net_set_prov(net, prov);
-+	}
-+
-+	prov->open_callback = open_callback;
-+	prov->close_callback = close_callback;
-+	prov->receive_callback = recv_callback;
-+	prov->receive_data = prov; /* TODO: retink the callback placement */
-+	memcpy(prov->caps, caps, sizeof(prov->caps));
-+
-+	prov->trans = MESH_TRANS_IDLE;
-+
-+
-+	return mesh_prov_enable(prov, MESH_PROV_MODE_ADV_ACCEPTOR, uuid);
++	return !ad_type || ad_type == tx->pkt[0];
 +}
 +
-+unsigned int mesh_prov_send(struct mesh_prov *prov,
-+					const void *ptr, uint16_t size,
-+					mesh_prov_send_func_t send_callback,
-+					void *user_data)
++static bool find_by_pattern(const void *a, const void *b)
 +{
-+	const uint8_t *data = ptr;
++	const struct tx_pkt *tx = a;
++	const struct tx_pattern *pattern = b;
 +
-+	if (!prov)
-+		return 0;
-+
-+	if (prov->trans != MESH_TRANS_IDLE)
-+		return 0;
-+
-+	if (prov->remote) {
-+		/* TODO -- PB-Remote */
-+	} else {
-+		prov->send_callback = send_callback;
-+		prov->send_data = user_data;
-+		prov->trans = MESH_TRANS_TX;
-+		prov->local_msg_num++;
-+		send_adv_msg(prov, data, size);
-+	}
-+
-+	return 1;
-+}
-+
-+bool mesh_prov_close(struct mesh_prov *prov, uint8_t reason)
-+{
-+	if (!prov)
++	if (tx->len < pattern->len)
 +		return false;
 +
-+	prov->local_msg_num = 0;
-+	send_close_ind(prov, reason);
++	return (!memcmp(tx->pkt, pattern->data, pattern->len));
++}
 +
-+	prov->conn_id = DEFAULT_CONN_ID;
-+	prov->local_msg_num = 0xFF;
-+	prov->peer_msg_num = 0xFF;
-+	prov->last_peer_msg_num = 0xFF;
++static bool tx_cancel(struct mesh_io *io, uint8_t *data, uint8_t len)
++{
++	struct mesh_io_private *pvt = io->pvt;
++	struct tx_pkt *tx;
 +
-+	if (prov->tx_timeout) {
-+		l_timeout_remove(prov->tx_timeout);
++	if (!data)
++		return false;
 +
-+		/* If timing out, give Close indication 1 second of
-+		 * provisioning timing to get final Close indication out
-+		 */
-+		prov->tx_timeout = l_timeout_create(1, tx_timeout, prov, NULL);
++	if (len == 1) {
++		do {
++			tx = l_queue_remove_if(pvt->tx_pkts, find_by_ad_type,
++							L_UINT_TO_PTR(data[0]));
++			l_free(tx);
++		} while (tx);
++	}  else {
++		struct tx_pattern pattern = {
++			.data = data,
++			.len = len
++		};
++
++		do {
++			tx = l_queue_remove_if(pvt->tx_pkts, find_by_pattern,
++								&pattern);
++			l_free(tx);
++		} while (tx);
 +	}
 +
-+	if (prov->close_callback)
-+		prov->close_callback(prov->receive_data, reason);
++	if (l_queue_isempty(pvt->tx_pkts)) {
++		send_cancel(pvt);
++		l_timeout_remove(pvt->tx_timeout);
++		pvt->tx_timeout = NULL;
++	}
 +
-+	return false;
++	return true;
 +}
 +
-+void mesh_prov_set_addr(struct mesh_prov *prov, uint16_t addr)
++static bool find_by_filter_id(const void *a, const void *b)
 +{
-+	prov->addr = addr;
++	const struct pvt_rx_reg *rx_reg = a;
++	uint8_t filter_id = L_PTR_TO_UINT(b);
++
++	return rx_reg->filter_id == filter_id;
 +}
 +
-+uint16_t mesh_prov_get_idx(struct mesh_prov *prov)
++static bool recv_register(struct mesh_io *io, uint8_t filter_id,
++				mesh_io_recv_func_t cb, void *user_data)
 +{
-+	return prov->net_idx;
++	struct bt_hci_cmd_le_set_scan_enable cmd;
++	struct mesh_io_private *pvt = io->pvt;
++	struct pvt_rx_reg *rx_reg;
++	bool scanning;
++
++	l_info("%s %d", __func__, filter_id);
++	if (!cb || !filter_id || filter_id > sizeof(pvt->filters))
++		return false;
++
++	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
++						L_UINT_TO_PTR(filter_id));
++
++	if (!rx_reg) {
++		rx_reg = l_new(struct pvt_rx_reg, 1);
++		if (!rx_reg)
++			return false;
++	}
++
++	rx_reg->filter_id = filter_id;
++	rx_reg->cb = cb;
++	rx_reg->user_data = user_data;
++
++	scanning = !l_queue_isempty(pvt->rx_regs);
++
++	l_queue_push_head(pvt->rx_regs, rx_reg);
++
++	if (!scanning) {
++		cmd.enable = 0x01;	/* Enable scanning */
++		cmd.filter_dup = 0x00;	/* Report duplicates */
++		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++				&cmd, sizeof(cmd), NULL, NULL, NULL);
++	}
++
++	return true;
 +}
-diff --git a/mesh/provision.c b/mesh/provision.c
++
++static bool recv_deregister(struct mesh_io *io, uint8_t filter_id)
++{
++	struct bt_hci_cmd_le_set_scan_enable cmd;
++	struct mesh_io_private *pvt = io->pvt;
++
++	struct pvt_rx_reg *rx_reg;
++
++	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
++						L_UINT_TO_PTR(filter_id));
++
++	if (rx_reg)
++		l_free(rx_reg);
++
++	if (l_queue_isempty(pvt->rx_regs)) {
++		cmd.enable = 0x00;	/* Disable scanning */
++		cmd.filter_dup = 0x00;	/* Report duplicates */
++		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++				&cmd, sizeof(cmd), NULL, NULL, NULL);
++
++	}
++
++	return true;
++}
++
++static bool filter_set(struct mesh_io *io,
++		uint8_t filter_id, const uint8_t *data, uint8_t len,
++		mesh_io_status_func_t callback, void *user_data)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	l_info("%s id: %d, --> %2.2x", __func__, filter_id, data[0]);
++	if (!data || !len || !filter_id || filter_id > sizeof(pvt->filters))
++		return false;
++
++	pvt->filters[filter_id - 1] = data[0];
++
++	/* TODO: Delayed Call to successful status */
++
++	return true;
++}
++
++const struct mesh_io_api mesh_io_generic = {
++	.init = dev_init,
++	.destroy = dev_destroy,
++	.caps = dev_caps,
++	.send = send_tx,
++	.reg = recv_register,
++	.dereg = recv_deregister,
++	.set = filter_set,
++	.cancel = tx_cancel,
++};
+diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
 new file mode 100644
-index 000000000..c7cb5f160
+index 000000000..5cdfdc5ff
 --- /dev/null
-+++ b/mesh/provision.c
-@@ -0,0 +1,1159 @@
++++ b/mesh/mesh-io.c
+@@ -0,0 +1,188 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -775,1141 +785,170 @@ index 000000000..c7cb5f160
 +#include <config.h>
 +#endif
 +
-+#include <sys/select.h>
-+#include <sys/time.h>
-+#include <sys/types.h>
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include <termios.h>
-+
-+#include <ctype.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <getopt.h>
-+#include <time.h>
 +#include <ell/ell.h>
 +
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++
 +#include "mesh/mesh-defs.h"
-+#include "src/shared/ecc.h"
 +
-+#include "mesh/display.h"
-+#include "mesh/crypto.h"
-+#include "mesh/net.h"
-+#include "mesh/prov.h"
-+#include "mesh/provision.h"
-+#include "mesh/node.h"
++#include "mesh/mesh-io.h"
++#include "mesh/mesh-io-api.h"
 +
-+#define PROV_INVITE	0x00
-+#define PROV_CAPS	0x01
-+#define PROV_START	0x02
-+#define PROV_PUB_KEY	0x03
-+#define PROV_INP_CMPLT	0x04
-+#define PROV_CONFIRM	0x05
-+#define PROV_RANDOM	0x06
-+#define PROV_DATA	0x07
-+#define PROV_COMPLETE	0x08
-+#define PROV_FAILED	0x09
++/* List of Mesh-IO Type headers */
++#include "mesh/mesh-io-generic.h"
 +
-+#define PROV_ERR_INVALID_PDU		0x01
-+#define PROV_ERR_INVALID_FORMAT		0x02
-+#define PROV_ERR_UNEXPECTED_PDU		0x03
-+#define PROV_ERR_CONFIRM_FAILED		0x04
-+#define PROV_ERR_INSUF_RESOURCE		0x05
-+#define PROV_ERR_DECRYPT_FAILED		0x06
-+#define PROV_ERR_UNEXPECTED_ERR		0x07
-+#define PROV_ERR_CANT_ASSIGN_ADDR	0x08
-+
-+/* Expected Provisioning PDU sizes */
-+static const uint16_t expected_pdu_size[] = {
-+	1 + 1,					/* PROV_INVITE */
-+	1 + 1 + 2 + 1 + 1 + 1 + 2 + 1 + 2,	/* PROV_CAPS */
-+	1 + 1 + 1 + 1 + 1 + 1,			/* PROV_START */
-+	1 + 64,					/* PROV_PUB_KEY */
-+	1,					/* PROV_INP_CMPLT */
-+	1 + 16,					/* PROV_CONFIRM */
-+	1 + 16,					/* PROV_RANDOM */
-+	1 + 16 + 2 + 1 + 4 + 2 + 8,		/* PROV_DATA */
-+	1,					/* PROV_COMPLETE */
-+	1 + 1,					/* PROV_FAILED */
++/* List of Supported Mesh-IO Types */
++static const struct mesh_io_table table[] = {
++	{MESH_IO_TYPE_GENERIC,	&mesh_io_generic}
 +};
 +
-+static enum {
-+	PUB_KEY_TYPE_ephemeral,
-+	PUB_KEY_TYPE_available,
-+} pub_key_type = PUB_KEY_TYPE_ephemeral;
++static struct l_queue *io_list;
 +
-+static enum {
-+	AUTH_TYPE_3a,
-+	AUTH_TYPE_3b,
-+	AUTH_TYPE_3c,
-+} prov_auth_type = AUTH_TYPE_3c;
-+
-+enum {
-+	INT_PROV_IDLE,
-+	INT_PROV_INVITE_SENT,
-+	INT_PROV_INVITE_ACKED,
-+	INT_PROV_START_SENT,
-+	INT_PROV_START_ACKED,
-+	INT_PROV_KEY_SENT,
-+	INT_PROV_KEY_ACKED,
-+	INT_PROV_CONF_SENT,
-+	INT_PROV_CONF_ACKED,
-+	INT_PROV_RAND_SENT,
-+	INT_PROV_RAND_ACKED,
-+	INT_PROV_DATA_SENT,
-+	INT_PROV_DATA_ACKED,
-+} int_prov_state = INT_PROV_IDLE;
-+
-+enum {
-+	ACP_PROV_IDLE,
-+	ACP_PROV_CAPS_SENT,
-+	ACP_PROV_CAPS_ACKED,
-+	ACP_PROV_KEY_SENT,
-+	ACP_PROV_KEY_ACKED,
-+	ACP_PROV_INP_CMPLT_SENT,
-+	ACP_PROV_INP_CMPLT_ACKED,
-+	ACP_PROV_CONF_SENT,
-+	ACP_PROV_CONF_ACKED,
-+	ACP_PROV_RAND_SENT,
-+	ACP_PROV_RAND_ACKED,
-+	ACP_PROV_CMPLT_SENT,
-+	ACP_PROV_FAIL_SENT,
-+} acp_prov_state = ACP_PROV_IDLE;
-+
-+static uint8_t prov_expected;
-+static int8_t prov_last = -1;
-+
-+static void int_prov_send_cmplt(bool success, struct mesh_prov *prov);
-+static void acp_prov_send_cmplt(bool success, struct mesh_prov *prov);
-+
-+static void swap_u256_bytes(uint8_t *u256)
++static bool match_by_io(const void *a, const void *b)
 +{
-+	int i;
-+
-+	/* End-to-End byte reflection of 32 octet buffer */
-+	for (i = 0; i < 16; i++) {
-+		u256[i] ^= u256[31 - i];
-+		u256[31 - i] ^= u256[i];
-+		u256[i] ^= u256[31 - i];
-+	}
++	return a == b;
 +}
 +
-+static uint8_t u16_highest_bit(uint16_t mask)
++static bool match_by_index(const void *a, const void *b)
 +{
-+	uint8_t cnt = 0;
++	const struct mesh_io *io = a;
 +
-+	if (!mask)
-+		return 0xff;
-+
-+	while (mask & 0xfffe) {
-+		cnt++;
-+		mask >>= 1;
-+	}
-+
-+	return cnt;
++	return io->index == L_PTR_TO_UINT(b);
 +}
 +
-+static void send_prov_start(struct mesh_prov *prov)
++struct mesh_io *mesh_io_new(uint16_t index, enum mesh_io_type type)
 +{
-+	struct mesh_net *net = prov->net;
-+	struct mesh_net_prov_caps *caps = mesh_net_prov_caps_get(net);
-+	uint8_t prov_start[6] = { PROV_START };
++	const struct mesh_io_api *api = NULL;
++	struct mesh_io *io;
++	uint16_t i;
 +
-+	memset(prov_start + 1, 0, 1 + 1 + 1 + 1 + 1);
-+	if (!(caps->algorithms & 0x0001)) {
-+		/* We only support FIPS P-256 Elliptic Curve */
-+		l_error("Unrecognized Algorithm %4.4x", caps->algorithms);
-+		return;
-+	}
++	l_info("%s %d\n", __func__, type);
 +
-+	if (caps->pub_type) {
-+		/* Prov Step 2b: New device exposed PublicKey OOB */
-+		prov_start[2] = 0x01;
-+		pub_key_type = PUB_KEY_TYPE_available;
-+	} else {
-+		pub_key_type = PUB_KEY_TYPE_ephemeral;
-+	}
-+
-+	if (caps->output_size &&
-+			caps->output_action) {
-+		/* Prov Step 3a: Output OOB used */
-+		prov_start[3] = 0x02;
-+		prov_start[4] = u16_highest_bit(caps->output_action);
-+		prov_start[5] = caps->output_size > 8 ?
-+			8 : caps->output_size;
-+
-+		prov_auth_type = AUTH_TYPE_3a;
-+
-+	} else if (caps->input_size &&
-+			caps->input_action) {
-+		/* Prov Step 3b: Input OOB used */
-+		prov_start[3] = 0x03;
-+		prov_start[4] = u16_highest_bit(caps->input_action);
-+		prov_start[5] = caps->input_size > 8 ?
-+			8 : caps->input_size;
-+
-+		prov_auth_type = AUTH_TYPE_3b;
-+
-+	} else  {
-+		if (caps->static_type)
-+			prov_start[3] = 0x01;
-+
-+		/* Prov Step 3c: Static OOB used (or no OOB available) */
-+		prov_auth_type = AUTH_TYPE_3c;
-+	}
-+
-+	memcpy(&prov->conf_inputs.start, prov_start + 1,
-+					sizeof(prov->conf_inputs.start));
-+
-+	int_prov_state = INT_PROV_START_SENT;
-+	if (pub_key_type == PUB_KEY_TYPE_ephemeral)
-+		prov_expected = PROV_PUB_KEY;
-+	else if (prov_auth_type == AUTH_TYPE_3b)
-+		prov_expected = PROV_INP_CMPLT;
-+	else
-+		prov_expected = PROV_CONFIRM;
-+
-+	mesh_prov_send(prov, prov_start, 6,
-+			int_prov_send_cmplt, prov);
-+
-+}
-+
-+static void calculate_secrets(struct mesh_prov *prov, bool initiator)
-+{
-+	struct mesh_net *net = prov->net;
-+	uint8_t *priv_key = mesh_net_priv_key_get(net);
-+	bool test_mode = mesh_net_test_mode(net);
-+	uint8_t tmp[64];
-+
-+	if (initiator) {
-+		memcpy(prov->conf_inputs.prv_pub_key,
-+					prov->l_public, sizeof(prov->l_public));
-+		memcpy(prov->conf_inputs.dev_pub_key,
-+					prov->r_public, sizeof(prov->r_public));
-+	} else {
-+		memcpy(prov->conf_inputs.prv_pub_key,
-+					prov->r_public, sizeof(prov->r_public));
-+		memcpy(prov->conf_inputs.dev_pub_key,
-+					prov->l_public, sizeof(prov->l_public));
-+	}
-+
-+	/* Convert to Mesh byte order */
-+	memcpy(tmp, prov->r_public, 64);
-+	swap_u256_bytes(tmp);
-+	swap_u256_bytes(tmp + 32);
-+
-+	ecdh_shared_secret(tmp, priv_key, prov->secret);
-+
-+	/* Convert to Mesh byte order */
-+	swap_u256_bytes(prov->secret);
-+
-+	mesh_crypto_s1(&prov->conf_inputs,
-+			sizeof(prov->conf_inputs), prov->conf_salt);
-+
-+
-+	mesh_crypto_prov_conf_key(prov->secret, prov->conf_salt,
-+							prov->conf_key);
-+
-+	if (test_mode) {
-+		print_packet("PublicKeyRemote", prov->r_public, 64);
-+		print_packet("PublicKeyLocal", prov->l_public, 64);
-+		print_packet("PrivateKeyLocal", priv_key, 32);
-+		print_packet("ConfirmationInputs", &prov->conf_inputs,
-+						sizeof(prov->conf_inputs));
-+		print_packet("ECDHSecret", prov->secret,
-+						sizeof(prov->secret));
-+		print_packet("ConfirmationSalt", prov->conf_salt, 16);
-+		print_packet("ConfirmationKey", prov->conf_key,
-+						sizeof(prov->conf_key));
-+	}
-+}
-+
-+static void send_prov_key(struct mesh_prov *prov,
-+					mesh_prov_send_func_t send_callback)
-+{
-+	uint8_t send_pub_key[65] = { PROV_PUB_KEY };
-+
-+	memcpy(send_pub_key + 1, prov->l_public, 64);
-+	mesh_prov_send(prov, send_pub_key, 65,
-+			send_callback, prov);
-+}
-+
-+static void send_prov_data(struct mesh_prov *prov)
-+{
-+	struct mesh_net *net = prov->net;
-+	struct mesh_net_prov_caps *caps = mesh_net_prov_caps_get(net);
-+	uint64_t mic;
-+	uint32_t iv_index;
-+	uint8_t snb_flags;
-+	uint16_t net_idx = mesh_prov_get_idx(prov);
-+	uint8_t prov_data[1 + 16 + 2 + 1 + 4 + 2 + sizeof(mic)] = { PROV_DATA };
-+	uint16_t uni_addr = mesh_net_prov_uni(net, caps->num_ele);
-+	bool test_mode = mesh_net_test_mode(net);
-+
-+	/* Calculate Provisioning Data */
-+	prov_expected = PROV_COMPLETE;
-+	mesh_net_get_snb_state(net, &snb_flags, &iv_index);
-+
-+	mesh_net_get_key(net, !!(snb_flags & 0x01), net_idx, prov_data + 1);
-+	l_put_be16(net_idx, prov_data + 1 + 16);
-+	l_put_u8(snb_flags, prov_data + 1 + 16 + 2);
-+	l_put_be32(iv_index, prov_data + 1 + 16 + 2 + 1);
-+	l_put_be16(uni_addr, prov_data + 1 + 16 + 2 + 1 + 4);
-+
-+	if (test_mode)
-+		print_packet("Data", prov_data + 1, 16 + 2 + 1 + 4 + 2);
-+
-+	mesh_crypto_device_key(prov->secret, prov->prov_salt, prov->dev_key);
-+	if (test_mode) {
-+		print_packet("DevKey", prov->dev_key, 16);
-+		print_packet("NetworkKey", prov_data + 1, 16);
-+		print_packet("NetworkKey Index", prov_data + 1 + 16, 2);
-+		print_packet("SNB Flags", prov_data + 1 + 16 + 2, 1);
-+		print_packet("IVindex", prov_data + 1 + 16 + 2 + 1, 4);
-+		print_packet("Unicast Addr", prov_data + 1 + 16 + 2 + 1 + 4, 2);
-+	}
-+
-+	mesh_crypto_aes_ccm_encrypt(prov->s_nonce, prov->s_key,
-+					NULL, 0,
-+					&prov_data[1],
-+					sizeof(prov_data) - 1 - sizeof(mic),
-+					&prov_data[1],
-+					&mic, sizeof(mic));
-+	if (test_mode)
-+		print_packet("DataEncrypted + mic", prov_data + 1,
-+						sizeof(prov_data) - 1);
-+
-+	int_prov_state = INT_PROV_DATA_SENT;
-+	mesh_prov_send(prov, prov_data, sizeof(prov_data),
-+			int_prov_send_cmplt, prov);
-+	mesh_prov_set_addr(prov, uni_addr);
-+}
-+
-+static void send_prov_conf(struct mesh_prov *prov,
-+			mesh_prov_send_func_t send_callback)
-+{
-+	struct mesh_net *net = prov->net;
-+	uint8_t *test_rand = mesh_net_prov_rand(net);
-+	uint8_t prov_conf[1 + sizeof(prov->conf)] = { PROV_CONFIRM };
-+	bool test_mode = mesh_net_test_mode(net);
-+
-+	if (test_mode && test_rand[0])
-+		memcpy(prov->rand_auth, test_rand, 16);
-+	else
-+		l_getrandom(prov->rand_auth, 16);
-+
-+	/* Calculate Confirmation */
-+	mesh_crypto_aes_cmac(prov->conf_key, prov->rand_auth,
-+				sizeof(prov->rand_auth), prov->conf);
-+
-+	/* Marshal Confirmation */
-+	memcpy(prov_conf + 1, prov->conf, sizeof(prov->conf));
-+
-+	if (test_mode) {
-+		print_packet("ConfirmationKey", prov->conf_key,
-+						sizeof(prov->conf_key));
-+		print_packet("RandomAuthValue", prov->rand_auth,
-+						sizeof(prov->rand_auth));
-+		print_packet("Sending Confirmation", prov->conf,
-+						sizeof(prov->conf));
-+	}
-+
-+	mesh_prov_send(prov, prov_conf, sizeof(prov_conf),
-+					send_callback, prov);
-+}
-+
-+static void send_prov_rand(struct mesh_prov *prov,
-+			mesh_prov_send_func_t send_callback)
-+{
-+	struct mesh_net *net = prov->net;
-+	uint8_t prov_rand[17] = { PROV_RANDOM };
-+	bool test_mode = mesh_net_test_mode(net);
-+
-+	/* Marshal Random */
-+	memcpy(prov_rand + 1, prov->rand_auth, 16);
-+
-+	if (test_mode)
-+		print_packet("Sending Random", prov->rand_auth, 16);
-+
-+	mesh_prov_send(prov, prov_rand, sizeof(prov_rand),
-+					send_callback, prov);
-+}
-+
-+enum inputType {
-+	INP_key,
-+	INP_dec,
-+	INP_text,
-+};
-+
-+struct input_data {
-+	struct mesh_prov *prov;
-+	enum inputType type;
-+	bool initiator;
-+	void *dest;
-+	void *user_data;
-+	union {
-+		struct {
-+			uint8_t idx;
-+			char data[129];
-+		} key;
-+		struct {
-+			uint64_t value;
-+		} dec;
-+		struct {
-+			uint8_t idx;
-+			char str[16];
-+		} text;
-+	} u;
-+};
-+
-+static void collectInput(struct mesh_prov *prov, char *prompt,
-+					enum inputType type, bool initiator,
-+					void *dest, void *user_data)
-+{
-+	struct input_data *inp = l_new(struct input_data, 1);
-+
-+	inp->prov = prov;
-+	inp->type = type;
-+	inp->dest = dest;
-+	inp->initiator = initiator;
-+	inp->user_data = user_data;
-+
-+	if (prompt)
-+		l_info("%s", prompt);
-+
-+	/* TODO: Request agent get OOB data */
-+}
-+
-+static uint32_t digit_mod(uint8_t power)
-+{
-+	uint32_t ret = 1;
-+
-+	while (power--)
-+		ret *= 10;
-+
-+	return ret;
-+}
-+
-+static char *key_type(uint8_t type)
-+{
-+	switch (type) {
-+	case 0x01:
-+		return "QR-Code";
-+	case 0x02:
-+		return "Barcode";
-+	case 0x03:
-+		return "NFC Tag";
-+	case 0x04:
-+		return "Printed Number";
-+	default:
-+		return "unknown Source";
-+	}
-+}
-+
-+static void int_prov_send_cmplt(bool success, struct mesh_prov *prov)
-+{
-+	struct mesh_net *net = prov->net;
-+	struct mesh_net_prov_caps *caps = mesh_net_prov_caps_get(net);
-+
-+	l_debug("Provision sending complete");
-+
-+	switch (int_prov_state) {
-+	case INT_PROV_INVITE_SENT:
-+		int_prov_state = INT_PROV_INVITE_ACKED;
-+		if (acp_prov_state == ACP_PROV_CAPS_SENT)
-+			send_prov_start(prov);
-+		break;
-+	case INT_PROV_START_SENT:
-+		int_prov_state = INT_PROV_START_ACKED;
-+		if (pub_key_type == PUB_KEY_TYPE_ephemeral) {
-+			int_prov_state = INT_PROV_KEY_SENT;
-+			send_prov_key(prov, int_prov_send_cmplt);
-+		} else {
-+			collectInput(prov, NULL, INP_key, true,
-+						prov->r_public, prov);
-+			l_info("\n\nEnter key from %s:\n",
-+				key_type(caps->pub_type));
-+		}
-+		break;
-+	case INT_PROV_KEY_SENT:
-+		int_prov_state = INT_PROV_KEY_ACKED;
-+		if (pub_key_type == PUB_KEY_TYPE_ephemeral) {
-+			prov_expected = PROV_PUB_KEY;
++	for (i = 0; i < L_ARRAY_SIZE(table); i++) {
++		if (table[i].type == type) {
++			api = table[i].api;
 +			break;
 +		}
++	}
 +
-+		/* Start Step 3 */
-+		memset(prov->rand_auth + 16, 0, 16);
-+		if (prov_auth_type == AUTH_TYPE_3a)
-+			collectInput(prov,
-+				"\n\nEnter prompted number from device:",
-+				INP_dec, true,
-+				prov->rand_auth + 32 - sizeof(uint32_t),
-+				prov);
++	io = l_queue_find(io_list, match_by_index, L_UINT_TO_PTR(index));
 +
-+		else if (prov_auth_type == AUTH_TYPE_3b) {
-+			uint32_t oob_key;
++	if (!api || !api->init || io)
++		return NULL;
 +
-+			l_getrandom(&oob_key, sizeof(uint32_t));
-+			oob_key %= digit_mod(caps->input_size);
-+			l_put_be32(oob_key,
-+					prov->rand_auth + 32 -
-+					sizeof(uint32_t));
-+			l_info("\n\nEnter %d on Device\n", oob_key);
-+			prov_expected = PROV_INP_CMPLT;
++	io = l_new(struct mesh_io, 1);
 +
-+		} else if (caps->static_type) {
-+			collectInput(prov, NULL, INP_text, true,
-+					prov->rand_auth + 16, prov);
-+			l_info("\n\nstatic OOB str from %s:\n",
-+				key_type(caps->static_type));
++	if (!io)
++		return NULL;
 +
-+		} else {
-+			int_prov_state = INT_PROV_CONF_SENT;
-+			send_prov_conf(prov, int_prov_send_cmplt);
-+		}
++	io->type = type;
++	io->index = index;
++	io->api = api;
++	if (!api->init(index, io))
++		goto fail;
 +
-+		break;
-+	case INT_PROV_CONF_SENT:
-+		int_prov_state = INT_PROV_CONF_ACKED;
-+		if (acp_prov_state == ACP_PROV_CONF_SENT) {
-+			int_prov_state = INT_PROV_RAND_SENT;
-+			prov_expected = PROV_RANDOM;
-+			send_prov_rand(prov, int_prov_send_cmplt);
-+		}
-+		break;
-+	case INT_PROV_RAND_SENT:
-+		int_prov_state = INT_PROV_RAND_ACKED;
-+		if (acp_prov_state == ACP_PROV_RAND_SENT)
-+			send_prov_data(prov);
-+		break;
-+	case INT_PROV_DATA_SENT:
-+		int_prov_state = INT_PROV_DATA_ACKED;
-+		break;
-+	default:
-+	case INT_PROV_INVITE_ACKED:
-+	case INT_PROV_START_ACKED:
-+	case INT_PROV_KEY_ACKED:
-+	case INT_PROV_CONF_ACKED:
-+	case INT_PROV_RAND_ACKED:
-+	case INT_PROV_DATA_ACKED:
-+	case INT_PROV_IDLE:
-+		break;
++	if (!io_list)
++		io_list = l_queue_new();
++
++	if (api->set) {
++		uint8_t pkt = MESH_AD_TYPE_NETWORK;
++		uint8_t bec = MESH_AD_TYPE_BEACON;
++		uint8_t prv = MESH_AD_TYPE_PROVISION;
++
++		api->set(io, 1, &bec, 1, NULL, NULL);
++		api->set(io, 2, &prv, 1, NULL, NULL);
++		api->set(io, 3, &pkt, 1, NULL, NULL);
++	}
++
++	if (l_queue_push_head(io_list, io))
++		return io;
++
++fail:
++	if (api->destroy)
++		api->destroy(io);
++
++	l_free(io);
++	return NULL;
++}
++
++void mesh_io_destroy(struct mesh_io *io)
++{
++	io = l_queue_remove_if(io_list, match_by_io, io);
++
++	if (io && io->api && io->api->destroy)
++		io->api->destroy(io);
++
++	l_free(io);
++
++	if (l_queue_isempty(io_list)) {
++		l_queue_destroy(io_list, NULL);
++		io_list = NULL;
 +	}
 +}
 +
-+void initiator_prov_open(struct mesh_prov *prov)
++bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps)
 +{
-+	uint8_t invite[] = { PROV_INVITE, 30 };
-+	uint8_t *priv_key;
++	io = l_queue_find(io_list, match_by_io, io);
 +
-+	l_info("Provisioning link opened");
++	if (io && io->api && io->api->caps)
++		return io->api->caps(io, caps);
 +
-+	priv_key = mesh_net_priv_key_get(prov->net);
-+	ecc_make_key(prov->l_public, priv_key);
-+
-+	int_prov_state = INT_PROV_INVITE_SENT;
-+	prov_expected = PROV_CAPS;
-+	prov_last = -1;
-+	prov->conf_inputs.invite.attention = invite[1];
-+	mesh_prov_send(prov, invite, sizeof(invite),
-+					int_prov_send_cmplt, prov);
++	return false;
 +}
 +
-+void initiator_prov_close(struct mesh_prov *prov, uint8_t reason)
++bool mesh_io_register_recv_cb(struct mesh_io *io, uint8_t filter_id,
++				mesh_io_recv_func_t cb, void *user_data)
 +{
-+	struct mesh_net *net = prov->net;
-+	uint32_t iv_index;
-+	uint8_t snb_flags;
++	io = l_queue_find(io_list, match_by_io, io);
 +
-+	l_info("Provisioning link closed");
++	if (io && io->api && io->api->reg)
++		return io->api->reg(io, filter_id, cb, user_data);
 +
-+	/* Get the provisioned node's composition data*/
-+	if (reason == 0) {
-+		mesh_net_get_snb_state(net, &snb_flags, &iv_index);
-+
-+		l_info("Save provisioner's DB");
-+	}
++	return false;
 +}
 +
-+void initiator_prov_receive(const void *pkt, uint16_t size,
-+							struct mesh_prov *prov)
++bool mesh_io_deregister_recv_cb(struct mesh_io *io, uint8_t filter_id)
 +{
-+	struct mesh_net *net = prov->net;
-+	struct mesh_net_prov_caps *caps = mesh_net_prov_caps_get(net);
-+	bool test_mode = mesh_net_test_mode(net);
-+	const uint8_t *data = pkt;
-+	uint8_t tmp[16];
-+	uint8_t type = *data++;
-+	uint8_t err = 0;
++	io = l_queue_find(io_list, match_by_io, io);
 +
++	if (io && io->api && io->api->dereg)
++		return io->api->dereg(io, filter_id);
 +
-+	l_debug("Provisioning packet received type: %2.2x (%u octets)",
-+								type, size);
-+
-+	if (type == prov_last) {
-+		l_error("Ignore repeated %2.2x packet", type);
-+		return;
-+	} else if ((type > prov_expected || type < prov_last) &&
-+						type != PROV_FAILED) {
-+		l_error("Expected %2.2x, Got:%2.2x", prov_expected, type);
-+		err = PROV_ERR_UNEXPECTED_PDU;
-+		goto failure;
-+	}
-+
-+	if (type >= L_ARRAY_SIZE(expected_pdu_size) ||
-+					size != expected_pdu_size[type]) {
-+		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
-+					expected_pdu_size[type], size, type);
-+		err = PROV_ERR_INVALID_FORMAT;
-+		goto failure;
-+	}
-+
-+	prov_last = type;
-+
-+	switch (type) {
-+	case PROV_CAPS: /* Capabilities */
-+		int_prov_state = INT_PROV_INVITE_ACKED;
-+		acp_prov_state = ACP_PROV_CAPS_SENT;
-+		caps->num_ele = data[0];
-+		if (test_mode)
-+			l_info("Got Num Ele %d", data[0]);
-+
-+		caps->algorithms = l_get_be16(data + 1);
-+		if (test_mode)
-+			l_info("Got alg %d", caps->algorithms);
-+
-+		caps->pub_type = data[3];
-+		if (test_mode)
-+			l_info("Got pub_type %d", data[3]);
-+
-+		caps->static_type = data[4];
-+		if (test_mode)
-+			l_info("Got static_type %d", data[4]);
-+
-+		caps->output_size = data[5];
-+		if (test_mode)
-+			l_info("Got output_size %d", data[5]);
-+
-+		caps->output_action = l_get_be16(data + 6);
-+		if (test_mode)
-+			l_info("Got output_action %d", l_get_be16(data + 6));
-+
-+		caps->input_size = data[8];
-+		if (test_mode)
-+			l_info("Got input_size %d", data[8]);
-+
-+		caps->input_action = l_get_be16(data + 9);
-+		if (test_mode)
-+			l_info("Got input_action %d", l_get_be16(data + 9));
-+
-+		if (caps->algorithms != 0x0001) {
-+			l_error("Unsupported Algorithm");
-+			err = PROV_ERR_INVALID_FORMAT;
-+			goto failure;
-+		}
-+
-+		memcpy(&prov->conf_inputs.caps, data, 11);
-+
-+		if (int_prov_state == INT_PROV_INVITE_ACKED)
-+			send_prov_start(prov);
-+		break;
-+
-+	case PROV_PUB_KEY: /* Public Key */
-+		int_prov_state = INT_PROV_KEY_ACKED;
-+		acp_prov_state = ACP_PROV_KEY_SENT;
-+		memcpy(prov->r_public, data, 64);
-+		calculate_secrets(prov, true);
-+		prov_expected = PROV_CONFIRM;
-+
-+		memset(prov->rand_auth + 16, 0, 16);
-+		if (prov_auth_type == AUTH_TYPE_3a) {
-+			collectInput(prov,
-+				"\n\nEnter number from device:",
-+				INP_dec, true,
-+				prov->rand_auth + 32 - sizeof(uint32_t),
-+				prov);
-+
-+		} else if (prov_auth_type == AUTH_TYPE_3b) {
-+
-+			uint32_t oob_key;
-+
-+			l_getrandom(&oob_key, sizeof(uint32_t));
-+			oob_key %= digit_mod(caps->input_size);
-+			l_put_be32(oob_key,
-+					prov->rand_auth + 32 -
-+					sizeof(uint32_t));
-+			l_info("\n\nEnter %d on Device\n", oob_key);
-+			prov_expected = PROV_INP_CMPLT;
-+
-+		} else if (caps->static_type) {
-+			collectInput(prov, NULL, INP_dec, true,
-+					prov->rand_auth + 16, prov);
-+			l_info("\n\nstatic OOB str from %s:\n",
-+				key_type(caps->static_type));
-+
-+		} else
-+			send_prov_conf(prov, int_prov_send_cmplt);
-+		break;
-+
-+	case PROV_INP_CMPLT: /* Provisioning Input Complete */
-+		acp_prov_state = ACP_PROV_INP_CMPLT_SENT;
-+		prov_expected = PROV_CONFIRM;
-+		send_prov_conf(prov, int_prov_send_cmplt);
-+		break;
-+
-+	case PROV_CONFIRM: /* Confirmation */
-+		int_prov_state = INT_PROV_CONF_ACKED;
-+		acp_prov_state = ACP_PROV_CONF_SENT;
-+		/* RXed Device Confirmation */
-+		memcpy(prov->conf, data, sizeof(prov->conf));
-+		if (test_mode)
-+			print_packet("ConfirmationDevice", prov->conf,
-+							sizeof(prov->conf));
-+
-+		if (int_prov_state == INT_PROV_CONF_ACKED) {
-+			prov_expected = PROV_RANDOM;
-+			send_prov_rand(prov, int_prov_send_cmplt);
-+		}
-+		break;
-+
-+	case PROV_RANDOM: /* Random */
-+		int_prov_state = INT_PROV_RAND_ACKED;
-+		acp_prov_state = ACP_PROV_RAND_SENT;
-+
-+		/* Calculate SessionKey while the data is fresh */
-+		mesh_crypto_prov_prov_salt(prov->conf_salt,
-+						prov->rand_auth, data,
-+						prov->prov_salt);
-+		mesh_crypto_session_key(prov->secret, prov->prov_salt,
-+							prov->s_key);
-+		mesh_crypto_nonce(prov->secret, prov->prov_salt, prov->s_nonce);
-+		if (test_mode) {
-+			print_packet("SessionKey", prov->s_key,
-+					sizeof(prov->s_key));
-+			print_packet("Nonce", prov->s_nonce,
-+					sizeof(prov->s_nonce));
-+		}
-+
-+		/* RXed Device Confirmation */
-+		memcpy(prov->rand_auth, data, sizeof(prov->conf));
-+		if (test_mode)
-+			print_packet("RandomDevice", prov->rand_auth, 16);
-+
-+		mesh_crypto_aes_cmac(prov->conf_key, prov->rand_auth,
-+					sizeof(prov->rand_auth), tmp);
-+
-+		if (memcmp(tmp, prov->conf, sizeof(prov->conf))) {
-+			l_error("Provisioning Failed-Confirm compare)");
-+			err = PROV_ERR_CONFIRM_FAILED;
-+			goto failure;
-+		}
-+
-+		if (int_prov_state == INT_PROV_RAND_ACKED) {
-+			prov_expected = PROV_COMPLETE;
-+			send_prov_data(prov);
-+		}
-+		break;
-+
-+	case PROV_COMPLETE: /* Complete */
-+		l_info("Provisioning Complete");
-+		int_prov_state = INT_PROV_IDLE;
-+		mesh_prov_close(prov, 0);
-+		break;
-+
-+	case PROV_FAILED: /* Failed */
-+		l_error("Provisioning Failed (reason: %d)", data[0]);
-+		err = data[0];
-+		goto failure;
-+
-+	default:
-+		l_error("Unknown Pkt %2.2x", type);
-+		err = PROV_ERR_UNEXPECTED_PDU;
-+		goto failure;
-+	}
-+
-+	return;
-+
-+failure:
-+	int_prov_state = INT_PROV_IDLE;
-+	mesh_prov_close(prov, err);
++	return false;
 +}
 +
-+static void acp_prov_send_cmplt(bool success, struct mesh_prov *prov)
++bool mesh_set_filter(struct mesh_io *io, uint8_t filter_id,
++				const uint8_t *data, uint8_t len,
++				mesh_io_status_func_t cb, void *user_data)
 +{
-+	l_debug("Provision sending complete");
++	io = l_queue_find(io_list, match_by_io, io);
 +
-+	switch (acp_prov_state) {
-+	case ACP_PROV_CAPS_SENT:
-+		acp_prov_state = ACP_PROV_CAPS_ACKED;
-+		if (int_prov_state == INT_PROV_KEY_SENT) {
-+			acp_prov_state = ACP_PROV_KEY_SENT;
-+			prov_expected = PROV_CONFIRM;
-+			send_prov_key(prov, acp_prov_send_cmplt);
-+		}
-+		break;
-+	case ACP_PROV_KEY_SENT:
-+		acp_prov_state = ACP_PROV_KEY_ACKED;
-+		if (int_prov_state == INT_PROV_CONF_SENT) {
-+			acp_prov_state = ACP_PROV_CONF_SENT;
-+			prov_expected = PROV_RANDOM;
-+			send_prov_conf(prov, acp_prov_send_cmplt);
-+		}
-+		break;
-+	case ACP_PROV_INP_CMPLT_SENT:
-+		acp_prov_state = ACP_PROV_INP_CMPLT_ACKED;
-+		break;
-+	case ACP_PROV_CONF_SENT:
-+		acp_prov_state = ACP_PROV_CONF_ACKED;
-+		if (int_prov_state == INT_PROV_RAND_SENT) {
-+			acp_prov_state = ACP_PROV_RAND_SENT;
-+			prov_expected = PROV_DATA;
-+			send_prov_rand(prov, acp_prov_send_cmplt);
-+		}
-+		break;
-+	case ACP_PROV_RAND_SENT:
-+		acp_prov_state = ACP_PROV_RAND_ACKED;
-+		break;
-+	case ACP_PROV_CMPLT_SENT:
-+		acp_prov_state = ACP_PROV_IDLE;
-+		mesh_net_provisioned_set(prov->net, true);
-+	default:
-+	case ACP_PROV_IDLE:
-+	case ACP_PROV_CAPS_ACKED:
-+	case ACP_PROV_KEY_ACKED:
-+	case ACP_PROV_INP_CMPLT_ACKED:
-+	case ACP_PROV_CONF_ACKED:
-+	case ACP_PROV_RAND_ACKED:
-+	case ACP_PROV_FAIL_SENT:
-+		break;
-+	}
++	if (io && io->api && io->api->set)
++		return io->api->set(io, filter_id, data, len, cb, user_data);
++
++	return false;
 +}
 +
-+void acceptor_prov_open(struct mesh_prov *prov)
++bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len)
 +{
-+	uint8_t *priv_key;
++	io = l_queue_find(io_list, match_by_io, io);
 +
-+	l_info("Provisioning link opened");
++	if (io && io->api && io->api->send)
++		return io->api->send(io, info, data, len);
 +
-+	priv_key = mesh_net_priv_key_get(prov->net);
-+	ecc_make_key(prov->l_public, priv_key);
-+
-+	prov_expected = PROV_INVITE;
-+	prov_last = -1;
++	return false;
 +}
 +
-+void acceptor_prov_close(struct mesh_prov *prov, uint8_t reason)
++bool mesh_io_send_cancel(struct mesh_io *io, uint8_t *pattern, uint8_t len)
 +{
-+	l_info("Provisioning link closed");
-+	mesh_prov_unref(prov);
-+}
++	io = l_queue_find(io_list, match_by_io, io);
 +
-+static void prov_store_cfm(void *user_data, bool result)
-+{
-+	struct mesh_prov *prov = user_data;
-+	uint8_t out[2];
++	if (io && io->api && io->api->cancel)
++		return io->api->cancel(io, pattern, len);
 +
-+	if (result) {
-+		acp_prov_state = ACP_PROV_CMPLT_SENT;
-+		out[0] = PROV_COMPLETE;
-+		mesh_prov_send(prov, out, 1,
-+				acp_prov_send_cmplt,
-+				prov);
-+	} else {
-+		acp_prov_state = ACP_PROV_FAIL_SENT;
-+		out[0] = PROV_FAILED;
-+		out[1] = PROV_ERR_INSUF_RESOURCE;
-+		mesh_prov_send(prov, out, 2, NULL, NULL);
-+	}
-+}
-+
-+void acceptor_prov_receive(const void *pkt, uint16_t size,
-+							struct mesh_prov *prov)
-+{
-+	struct mesh_net *net = prov->net;
-+	struct mesh_net_prov_caps *caps = mesh_net_prov_caps_get(net);
-+	uint8_t *priv_key = mesh_net_priv_key_get(net);
-+	bool test_mode = mesh_net_test_mode(net);
-+	bool ret;
-+	const uint8_t *data = pkt;
-+	uint8_t type = *data++;
-+	uint8_t out[129];
-+	uint8_t tmp[16];
-+	uint8_t rand_dev[16];
-+	uint64_t rx_mic, decode_mic;
-+
-+	l_debug("Provisioning packet received type: %2.2x (%u octets)",
-+								type, size);
-+
-+	if (type == prov_last) {
-+		l_error("Ignore repeated %2.2x packet", type);
-+		return;
-+	} else if (type > prov_expected || type < prov_last) {
-+		l_error("Expected %2.2x, Got:%2.2x", prov_expected, type);
-+		out[1] = PROV_ERR_UNEXPECTED_PDU;
-+		goto failure;
-+	}
-+
-+	if (type >= L_ARRAY_SIZE(expected_pdu_size) ||
-+					size != expected_pdu_size[type]) {
-+		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
-+			size, expected_pdu_size[type], type);
-+		out[1] = PROV_ERR_INVALID_FORMAT;
-+		goto failure;
-+	}
-+
-+	prov_last = type;
-+
-+	switch (type) {
-+	case PROV_INVITE: /* Prov Invite */
-+		int_prov_state = INT_PROV_INVITE_SENT;
-+		/* Prov Capabilities */
-+		out[0] = PROV_CAPS;
-+		out[1] = caps->num_ele;
-+		l_put_be16(caps->algorithms, out + 2);
-+		out[4] = caps->pub_type;
-+		out[5] = caps->static_type;
-+		out[6] = caps->output_size;
-+		l_put_be16(caps->output_action, out + 7);
-+		out[9] = caps->input_size;
-+		l_put_be16(caps->input_action, out + 10);
-+
-+		prov->conf_inputs.invite.attention = data[0];
-+		memcpy(&prov->conf_inputs.caps, out + 1,
-+				sizeof(prov->conf_inputs.caps));
-+
-+		acp_prov_state = ACP_PROV_CAPS_SENT;
-+		prov_expected = PROV_START;
-+		mesh_prov_send(prov, out, sizeof(*caps) + 1,
-+				acp_prov_send_cmplt, prov);
-+		break;
-+
-+	case PROV_START: /* Prov Start */
-+		if (data[0]) {
-+			/* Only Algorithm 0x00 supported */
-+			l_error("Invalid Algorithm: %2.2x", data[0]);
-+			out[1] = PROV_ERR_INVALID_FORMAT;
-+			goto failure;
-+		}
-+
-+		acp_prov_state = ACP_PROV_CAPS_ACKED;
-+		int_prov_state = INT_PROV_START_SENT;
-+		prov_expected = PROV_PUB_KEY;
-+		memcpy(&prov->conf_inputs.start, data,
-+				sizeof(prov->conf_inputs.start));
-+		if (data[1] == 1 && caps->pub_type) {
-+			pub_key_type = PUB_KEY_TYPE_available;
-+			ecc_make_key(prov->l_public, priv_key);
-+		} else if (data[1] == 0) {
-+			pub_key_type = PUB_KEY_TYPE_ephemeral;
-+			/* Use Ephemeral Key */
-+			l_getrandom(priv_key, 32);
-+			ecc_make_key(prov->l_public, priv_key);
-+		} else {
-+			out[1] = PROV_ERR_INVALID_FORMAT;
-+			goto failure;
-+		}
-+
-+		swap_u256_bytes(prov->l_public);
-+		swap_u256_bytes(prov->l_public + 32);
-+
-+		switch (data[2]) {
-+		default:
-+			out[1] = PROV_ERR_INVALID_FORMAT;
-+			goto failure;
-+
-+		case 0x00:
-+		case 0x01:
-+			prov_auth_type = AUTH_TYPE_3c;
-+			break;
-+
-+		case 0x02:
-+			prov_auth_type = AUTH_TYPE_3a;
-+			caps->output_action = 1 << data[3];
-+			caps->output_size = data[4];
-+			break;
-+
-+		case 0x03:
-+			prov_auth_type = AUTH_TYPE_3b;
-+			caps->input_action = 1 << data[3];
-+			caps->input_size = data[4];
-+			break;
-+		}
-+		break;
-+
-+	case PROV_PUB_KEY: /* Public Key */
-+		int_prov_state = INT_PROV_KEY_SENT;
-+		prov_expected = PROV_CONFIRM;
-+		/* Save Key */
-+		memcpy(prov->r_public, data, 64);
-+		calculate_secrets(prov, false);
-+
-+		if (pub_key_type == PUB_KEY_TYPE_ephemeral) {
-+			acp_prov_state = ACP_PROV_KEY_SENT;
-+			send_prov_key(prov, acp_prov_send_cmplt);
-+		}
-+
-+		/* Start Step 3 */
-+		memset(prov->rand_auth + 16, 0, 16);
-+		if (prov_auth_type == AUTH_TYPE_3a) {
-+			uint32_t oob_key;
-+
-+			l_getrandom(&oob_key, sizeof(uint32_t));
-+			oob_key %= digit_mod(caps->output_size);
-+			l_put_be32(oob_key,
-+				prov->rand_auth + 32 - sizeof(uint32_t));
-+			l_info("\n\nEnter %d on Provisioner\n",
-+							oob_key);
-+
-+		} else if (prov_auth_type == AUTH_TYPE_3b) {
-+			if (caps->input_action == (1 << 3)) {
-+				/* TODO: Collect Text Input data */
-+				;
-+			} else {
-+				/* TODO: Collect Decimal Input data */
-+				;
-+			}
-+
-+		} else {
-+			if (caps->static_type) {
-+				/* TODO: Collect Static Input data */
-+				/* (If needed) */
-+				;
-+			}
-+		}
-+
-+		break;
-+
-+	case PROV_CONFIRM: /* Confirmation */
-+		int_prov_state = INT_PROV_CONF_SENT;
-+		acp_prov_state = ACP_PROV_KEY_ACKED;
-+		/* RXed Provision Confirmation */
-+		memcpy(prov->r_conf, data, sizeof(prov->r_conf));
-+		if (test_mode)
-+			print_packet("ConfirmationProvisioner",
-+					prov->r_conf,
-+					sizeof(prov->r_conf));
-+
-+		if (acp_prov_state == ACP_PROV_KEY_ACKED) {
-+			prov_expected = PROV_RANDOM;
-+			send_prov_conf(prov, acp_prov_send_cmplt);
-+		}
-+		break;
-+
-+	case PROV_RANDOM: /* Random */
-+		int_prov_state = INT_PROV_RAND_SENT;
-+		acp_prov_state = ACP_PROV_CONF_ACKED;
-+
-+		/* Calculate Session key while the data is fresh */
-+		mesh_crypto_prov_prov_salt(prov->conf_salt, data,
-+						prov->rand_auth,
-+						prov->prov_salt);
-+		mesh_crypto_session_key(prov->secret, prov->prov_salt,
-+							prov->s_key);
-+		mesh_crypto_nonce(prov->secret, prov->prov_salt, prov->s_nonce);
-+
-+		if (test_mode) {
-+			print_packet("SessionKey", prov->s_key,
-+					sizeof(prov->s_key));
-+			print_packet("Nonce", prov->s_nonce,
-+					sizeof(prov->s_nonce));
-+		}
-+
-+
-+		/* Save Local Random data to send after verification */
-+		memcpy(rand_dev, prov->rand_auth, 16);
-+		/* RXed Provisioner Confirmation */
-+		memcpy(prov->rand_auth, data, 16);
-+		if (test_mode)
-+			print_packet("RandomProvisioner", prov->rand_auth, 16);
-+
-+		mesh_crypto_aes_cmac(prov->conf_key, prov->rand_auth,
-+					sizeof(prov->rand_auth), tmp);
-+
-+		if (memcmp(tmp, prov->r_conf,
-+					sizeof(prov->r_conf))) {
-+			l_error("Provisioning Failed-Confirm compare");
-+			out[1] = PROV_ERR_CONFIRM_FAILED;
-+			goto failure;
-+		}
-+
-+
-+		memcpy(prov->rand_auth, rand_dev, 16);
-+		if (acp_prov_state == ACP_PROV_CONF_ACKED) {
-+			prov_expected = PROV_DATA;
-+			send_prov_rand(prov, acp_prov_send_cmplt);
-+		}
-+		break;
-+
-+	case PROV_DATA: /* Provisioning Data */
-+		int_prov_state = INT_PROV_DATA_SENT;
-+		acp_prov_state = ACP_PROV_RAND_ACKED;
-+		if (test_mode) {
-+			print_packet("DataEncrypted + mic", data, size - 1);
-+			print_packet("Rxed-mic", data + 16 + 2 + 1 + 4 + 2, 8);
-+		}
-+
-+		rx_mic = l_get_be64(data + 16 + 2 + 1 + 4 + 2);
-+		mesh_crypto_aes_ccm_decrypt(prov->s_nonce, prov->s_key,
-+				NULL, 0,
-+				data, size - 1, out + 1,
-+				&decode_mic, sizeof(decode_mic));
-+
-+		if (test_mode) {
-+			print_packet("Data", out + 1, 16 + 2 + 1 + 4 + 2);
-+			l_info("Calc-mic: %16.16lx", decode_mic);
-+		}
-+
-+		if (rx_mic == decode_mic) {
-+			mesh_crypto_device_key(prov->secret,
-+						prov->prov_salt,
-+						prov->dev_key);
-+			if (test_mode) {
-+				print_packet("DevKey", prov->dev_key, 16);
-+				print_packet("NetworkKey", out + 1, 16);
-+				print_packet("NetworkKey Index",
-+					out + 1 + 16, 2);
-+				print_packet("SNB Flags",
-+					out + 1 + 16 + 2, 1);
-+				print_packet("IVindex",
-+					out + 1 + 16 + 2 + 1, 4);
-+				print_packet("Unicast Addr",
-+					out + 1 + 16 + 2 + 1 + 4, 2);
-+			}
-+
-+			/* Set Provisioned Data */
-+			ret = mesh_net_provisioned_new(prov->net,
-+					prov->dev_key,
-+					l_get_be16(out + 17),
-+					out + 1,
-+					l_get_be16(out + 24),
-+					out[19],
-+					l_get_be32(out + 20),
-+					prov_store_cfm, prov);
-+
-+			if (!ret) {
-+				out[1] = PROV_ERR_INSUF_RESOURCE;
-+				goto failure;
-+			}
-+		} else {
-+			l_error("Provisioning Failed-MIC compare");
-+			out[1] = PROV_ERR_DECRYPT_FAILED;
-+			goto failure;
-+		}
-+		break;
-+
-+	default:
-+		l_error("Unknown Pkt %2.2x", type);
-+		out[1] = PROV_ERR_UNEXPECTED_PDU;
-+		goto failure;
-+	}
-+
-+	return;
-+
-+failure:
-+	acp_prov_state = ACP_PROV_FAIL_SENT;
-+	out[0] = PROV_FAILED;
-+	mesh_prov_send(prov, out, 2, acp_prov_send_cmplt, prov);
++	return false;
 +}
 -- 
 2.14.4
