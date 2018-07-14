@@ -1,955 +1,121 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Brian Gix <brian.gix@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-        inga.stotland@intel.com, Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v7 03/14] mesh: Infrastructure for Mesh daemon
-Date: Sat, 14 Jul 2018 12:58:52 -0700
-Message-Id: <20180714195903.7402-4-brian.gix@intel.com>
-In-Reply-To: <20180714195903.7402-1-brian.gix@intel.com>
-References: <20180714195903.7402-1-brian.gix@intel.com>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
+Subject: Re: [PATCH v4 11/13] Bluetooth: Use ext adv for directed adv
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1531301495-14479-12-git-send-email-jaganathx.kanakkassery@intel.com>
+Date: Sat, 14 Jul 2018 20:56:13 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Message-Id: <E64F7C6F-2280-466B-AB2B-2E68E4E4DC22@holtmann.org>
+References: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1531301495-14479-12-git-send-email-jaganathx.kanakkassery@intel.com>
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- mesh/display.c         |  64 +++++
- mesh/mesh-io-generic.c | 660 +++++++++++++++++++++++++++++++++++++++++++++++++
- mesh/mesh-io.c         | 188 ++++++++++++++
- 3 files changed, 912 insertions(+)
- create mode 100644 mesh/display.c
- create mode 100644 mesh/mesh-io-generic.c
- create mode 100644 mesh/mesh-io.c
+Hi Jaganath,
 
-diff --git a/mesh/display.c b/mesh/display.c
-new file mode 100644
-index 000000000..8238ae849
---- /dev/null
-+++ b/mesh/display.c
-@@ -0,0 +1,64 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <unistd.h>
-+#include <termios.h>
-+#include <sys/ioctl.h>
-+#include <sys/time.h>
-+#include <ell/ell.h>
-+
-+#include "display.h"
-+
-+static unsigned int cached_num_columns;
-+
-+unsigned int num_columns(void)
-+{
-+	struct winsize ws;
-+
-+	if (cached_num_columns > 0)
-+		return cached_num_columns;
-+
-+	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) < 0 || ws.ws_col == 0)
-+		cached_num_columns = 80;
-+	else
-+		cached_num_columns = ws.ws_col;
-+
-+	return cached_num_columns;
-+}
-+
-+void print_packet(const char *label, const void *data, uint16_t size)
-+{
-+	struct timeval pkt_time;
-+
-+	gettimeofday(&pkt_time, NULL);
-+
-+	if (size > 0) {
-+		char *str;
-+
-+		str = l_util_hexstring(data, size);
-+		l_debug("%05d.%03d %s: %s",
-+				(uint32_t) pkt_time.tv_sec % 100000,
-+				(uint32_t) pkt_time.tv_usec/1000, label, str);
-+		l_free(str);
-+	} else
-+		l_debug("%05d.%03d %s: empty",
-+				(uint32_t) pkt_time.tv_sec % 100000,
-+				(uint32_t) pkt_time.tv_usec/1000, label);
-+}
-diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
-new file mode 100644
-index 000000000..52514e280
---- /dev/null
-+++ b/mesh/mesh-io-generic.c
-@@ -0,0 +1,660 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <sys/time.h>
-+#include <ell/ell.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+
-+#include "monitor/bt.h"
-+#include "src/shared/hci.h"
-+
-+#include "mesh/display.h"
-+#include "mesh/mesh-io.h"
-+#include "mesh/mesh-io-api.h"
-+
-+#include "mesh/mesh-io-generic.h"
-+
-+struct mesh_io_private {
-+	uint16_t index;
-+	struct bt_hci *hci;
-+	struct l_timeout *tx_timeout;
-+	struct l_queue *rx_regs;
-+	struct l_queue *tx_pkts;
-+	uint8_t filters[3]; /* Simple filtering on AD type only */
-+	bool sending;
-+	struct tx_pkt *tx;
-+	uint16_t interval;
-+};
-+
-+struct pvt_rx_reg {
-+	uint8_t filter_id;
-+	mesh_io_recv_func_t cb;
-+	void *user_data;
-+};
-+
-+struct process_data {
-+	struct mesh_io_private		*pvt;
-+	const uint8_t			*data;
-+	uint8_t				len;
-+	struct mesh_io_recv_info	info;
-+};
-+
-+struct tx_pkt {
-+	struct mesh_io_send_info	info;
-+	bool				delete;
-+	uint8_t				len;
-+	uint8_t				pkt[30];
-+};
-+
-+struct tx_pattern {
-+	const uint8_t			*data;
-+	uint8_t				len;
-+};
-+
-+static uint32_t get_instant(void)
-+{
-+	struct timeval tm;
-+	uint32_t instant;
-+
-+	gettimeofday(&tm, NULL);
-+	instant = tm.tv_sec * 1000;
-+	instant += tm.tv_usec / 1000;
-+
-+	return instant;
-+}
-+
-+static uint32_t instant_remaining_ms(uint32_t instant)
-+{
-+	instant -= get_instant();
-+	return instant;
-+}
-+
-+static void process_rx_callbacks(void *v_rx, void *v_reg)
-+{
-+	struct pvt_rx_reg *rx_reg = v_rx;
-+	struct process_data *rx = v_reg;
-+	uint8_t ad_type;
-+
-+	ad_type = rx->pvt->filters[rx_reg->filter_id - 1];
-+
-+	if (rx->data[0] == ad_type && rx_reg->cb)
-+		rx_reg->cb(rx_reg->user_data, &rx->info, rx->data, rx->len);
-+}
-+
-+static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
-+					uint32_t instant,
-+					const uint8_t *data, uint8_t len)
-+{
-+	struct process_data rx = {
-+		.pvt = pvt,
-+		.data = data,
-+		.len = len,
-+		.info.instant = instant,
-+		.info.chan = 7,
-+		.info.rssi = rssi,
-+	};
-+
-+	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
-+}
-+
-+static void event_adv_report(struct mesh_io *io, const void *buf, uint8_t size)
-+{
-+	const struct bt_hci_evt_le_adv_report *evt = buf;
-+	const uint8_t *adv;
-+	uint32_t instant;
-+	uint8_t adv_len;
-+	uint16_t len = 0;
-+	int8_t rssi;
-+
-+	if (evt->event_type != 0x03)
-+		return;
-+
-+	if (evt->addr_type != BDADDR_LE_PUBLIC &&
-+			evt->addr_type != BDADDR_LE_RANDOM)
-+		return;
-+
-+	instant = get_instant();
-+	adv = evt->data;
-+	adv_len = evt->data_len;
-+
-+	/* rssi is just beyond last byte of data */
-+	rssi = (int8_t) adv[adv_len];
-+
-+	while (len < adv_len - 1) {
-+		uint8_t field_len = adv[0];
-+
-+		/* Check for the end of advertising data */
-+		if (field_len == 0)
-+			break;
-+
-+		len += field_len + 1;
-+
-+		/* Do not continue data parsing if got incorrect length */
-+		if (len > adv_len)
-+			break;
-+
-+		/* TODO: Create an Instant to use */
-+		process_rx(io->pvt, rssi, instant, adv + 1, adv[0]);
-+
-+		adv += field_len + 1;
-+	}
-+}
-+
-+static void event_callback(const void *buf, uint8_t size, void *user_data)
-+{
-+	uint8_t event = l_get_u8(buf);
-+	struct mesh_io *io = user_data;
-+
-+	switch (event) {
-+	case BT_HCI_EVT_LE_ADV_REPORT:
-+		event_adv_report(io, buf + 1, size - 1);
-+		break;
-+
-+	default:
-+		l_info("Other Meta Evt - %d", event);
-+	}
-+}
-+
-+static bool dev_init(uint16_t index, struct mesh_io *io)
-+{
-+	struct mesh_io_private *tmp;
-+
-+	if (!io || io->pvt)
-+		return false;
-+
-+	tmp = l_new(struct mesh_io_private, 1);
-+
-+	if (tmp == NULL)
-+		return false;
-+
-+	tmp->rx_regs = l_queue_new();
-+	tmp->tx_pkts = l_queue_new();
-+	if (!tmp->rx_regs || !tmp->tx_pkts)
-+		goto fail;
-+
-+	tmp->hci = bt_hci_new_user_channel(index);
-+	if (!tmp->hci)
-+		goto fail;
-+
-+	bt_hci_register(tmp->hci, BT_HCI_EVT_LE_META_EVENT,
-+						event_callback, io, NULL);
-+
-+	io->pvt = tmp;
-+	return true;
-+
-+fail:
-+	l_queue_destroy(tmp->rx_regs, l_free);
-+	l_queue_destroy(tmp->tx_pkts, l_free);
-+	l_free(tmp);
-+	return false;
-+}
-+
-+static bool dev_destroy(struct mesh_io *io)
-+{
-+	struct mesh_io_private *pvt = io->pvt;
-+
-+	if (!pvt)
-+		return true;
-+
-+	bt_hci_unref(pvt->hci);
-+	l_timeout_remove(pvt->tx_timeout);
-+	l_queue_destroy(pvt->rx_regs, l_free);
-+	l_queue_destroy(pvt->tx_pkts, l_free);
-+	l_free(pvt);
-+	io->pvt = NULL;
-+
-+	return true;
-+}
-+
-+static bool dev_caps(struct mesh_io *io, struct mesh_io_caps *caps)
-+{
-+	struct mesh_io_private *pvt = io->pvt;
-+
-+	if (!pvt || !caps)
-+		return false;
-+
-+	caps->max_num_filters = sizeof(pvt->filters);
-+	caps->window_accuracy = 50;
-+
-+	return true;
-+}
-+
-+static void send_cancel_done(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct bt_hci_cmd_le_set_random_address cmd;
-+
-+	if (!pvt)
-+		return;
-+
-+	pvt->sending = false;
-+
-+	/* At end of any burst of ADVs, change random address */
-+	l_getrandom(cmd.addr, 6);
-+	cmd.addr[5] |= 0xc0;
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_RANDOM_ADDRESS,
-+				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+}
-+
-+static void send_cancel(struct mesh_io_private *pvt)
-+{
-+	struct bt_hci_cmd_le_set_adv_enable cmd;
-+
-+	if (!pvt)
-+		return;
-+
-+	if (!pvt->sending) {
-+		send_cancel_done(NULL, 0, pvt);
-+		return;
-+	}
-+
-+	cmd.enable = 0x00;	/* Disable advertising */
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
-+				&cmd, sizeof(cmd),
-+				send_cancel_done, pvt, NULL);
-+}
-+
-+static void set_send_adv_enable(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct bt_hci_cmd_le_set_adv_enable cmd;
-+
-+	if (!pvt)
-+		return;
-+
-+	pvt->sending = true;
-+	cmd.enable = 0x01;	/* Enable advertising */
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
-+				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+}
-+
-+static void set_send_adv_data(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct tx_pkt *tx;
-+	struct bt_hci_cmd_le_set_adv_data cmd;
-+
-+	if (!pvt || !pvt->tx)
-+		return;
-+
-+	tx = pvt->tx;
-+	if (tx->len >= sizeof(cmd.data))
-+		goto done;
-+
-+	memset(&cmd, 0, sizeof(cmd));
-+
-+	cmd.len = tx->len + 1;
-+	cmd.data[0] = tx->len;
-+	memcpy(cmd.data + 1, tx->pkt, tx->len);
-+
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_DATA,
-+					&cmd, sizeof(cmd),
-+					set_send_adv_enable, pvt, NULL);
-+done:
-+	if (tx->delete)
-+		l_free(tx);
-+
-+	pvt->tx = NULL;
-+}
-+
-+static void set_send_adv_params(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct bt_hci_cmd_le_set_adv_parameters cmd;
-+	uint16_t hci_interval;
-+
-+	if (!pvt)
-+		return;
-+
-+	hci_interval = (pvt->interval * 16) / 10;
-+	cmd.min_interval = L_CPU_TO_LE16(hci_interval);
-+	cmd.max_interval = L_CPU_TO_LE16(hci_interval);
-+	cmd.type = 0x03; /* ADV_NONCONN_IND */
-+	cmd.own_addr_type = 0x01; /* ADDR_TYPE_RANDOM */
-+	cmd.direct_addr_type = 0x00;
-+	memset(cmd.direct_addr, 0, 6);
-+	cmd.channel_map = 0x07;
-+	cmd.filter_policy = 0x03;
-+
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
-+				&cmd, sizeof(cmd),
-+				set_send_adv_data, pvt, NULL);
-+}
-+
-+static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
-+							uint16_t interval)
-+{
-+	struct bt_hci_cmd_le_set_adv_enable cmd;
-+
-+	pvt->tx = tx;
-+	pvt->interval = interval;
-+
-+	if (!pvt->sending) {
-+		set_send_adv_params(NULL, 0, pvt);
-+		return;
-+	}
-+
-+	cmd.enable = 0x00;	/* Disable advertising */
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_ADV_ENABLE,
-+				&cmd, sizeof(cmd),
-+				set_send_adv_params, pvt, NULL);
-+}
-+
-+static void tx_timeout(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct tx_pkt *tx;
-+	uint16_t ms;
-+	uint8_t count;
-+
-+	if (!pvt)
-+		return;
-+
-+	tx = l_queue_pop_head(pvt->tx_pkts);
-+	if (!tx) {
-+		l_timeout_remove(timeout);
-+		pvt->tx_timeout = NULL;
-+		send_cancel(pvt);
-+		return;
-+	}
-+
-+	if (tx->info.type == MESH_IO_TIMING_TYPE_GENERAL) {
-+		ms = tx->info.u.gen.interval;
-+		count = tx->info.u.gen.cnt;
-+		if (count != MESH_IO_TX_COUNT_UNLIMITED)
-+			tx->info.u.gen.cnt--;
-+	} else {
-+		ms = 25;
-+		count = 1;
-+	}
-+
-+	tx->delete = !!(count == 1);
-+
-+	send_pkt(pvt, tx, ms);
-+
-+	if (count == 1) {
-+		/* send_pkt will delete when done */
-+		tx = l_queue_peek_head(pvt->tx_pkts);
-+		if (tx && tx->info.type == MESH_IO_TIMING_TYPE_POLL_RSP) {
-+			ms = instant_remaining_ms(tx->info.u.poll_rsp.instant +
-+						tx->info.u.poll_rsp.delay);
-+		}
-+	} else
-+		l_queue_push_tail(pvt->tx_pkts, tx);
-+
-+	if (timeout) {
-+		pvt->tx_timeout = timeout;
-+		l_timeout_modify_ms(timeout, ms);
-+	} else
-+		pvt->tx_timeout = l_timeout_create_ms(ms, tx_timeout,
-+								pvt, NULL);
-+}
-+
-+static void tx_worker(void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct tx_pkt *tx;
-+	uint32_t delay;
-+
-+	tx = l_queue_peek_head(pvt->tx_pkts);
-+	if (!tx)
-+		return;
-+
-+	switch (tx->info.type) {
-+	case MESH_IO_TIMING_TYPE_GENERAL:
-+		if (tx->info.u.gen.min_delay == tx->info.u.gen.max_delay)
-+			delay = tx->info.u.gen.min_delay;
-+		else {
-+			l_getrandom(&delay, sizeof(delay));
-+			delay %= tx->info.u.gen.max_delay -
-+						tx->info.u.gen.min_delay;
-+			delay += tx->info.u.gen.min_delay;
-+		}
-+		break;
-+
-+	case MESH_IO_TIMING_TYPE_POLL:
-+		if (tx->info.u.poll.min_delay == tx->info.u.poll.max_delay)
-+			delay = tx->info.u.poll.min_delay;
-+		else {
-+			l_getrandom(&delay, sizeof(delay));
-+			delay %= tx->info.u.poll.max_delay -
-+						tx->info.u.poll.min_delay;
-+			delay += tx->info.u.poll.min_delay;
-+		}
-+		break;
-+
-+	case MESH_IO_TIMING_TYPE_POLL_RSP:
-+		/* Delay until Instant + Delay */
-+		delay = instant_remaining_ms(tx->info.u.poll_rsp.instant +
-+						tx->info.u.poll_rsp.delay);
-+		if (delay > 255)
-+			delay = 0;
-+		break;
-+
-+	default:
-+		return;
-+	}
-+
-+	if (!delay)
-+		tx_timeout(pvt->tx_timeout, pvt);
-+	else if (pvt->tx_timeout)
-+		l_timeout_modify_ms(pvt->tx_timeout, delay);
-+	else
-+		pvt->tx_timeout = l_timeout_create_ms(delay, tx_timeout,
-+								pvt, NULL);
-+}
-+
-+static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
-+					const uint8_t *data, uint16_t len)
-+{
-+	struct mesh_io_private *pvt = io->pvt;
-+	struct tx_pkt *tx;
-+	bool sending = false;
-+
-+	if (!info || !data || !len || len > sizeof(tx->pkt))
-+		return false;
-+
-+
-+	tx = l_new(struct tx_pkt, 1);
-+	if (!tx)
-+		return false;
-+
-+	memcpy(&tx->info, info, sizeof(tx->info));
-+	memcpy(&tx->pkt, data, len);
-+	tx->len = len;
-+
-+	if (info->type == MESH_IO_TIMING_TYPE_POLL_RSP)
-+		l_queue_push_head(pvt->tx_pkts, tx);
-+	else {
-+		sending = !l_queue_isempty(pvt->tx_pkts);
-+		l_queue_push_tail(pvt->tx_pkts, tx);
-+	}
-+
-+	if (!sending) {
-+		l_timeout_remove(pvt->tx_timeout);
-+		pvt->tx_timeout = NULL;
-+		l_idle_oneshot(tx_worker, pvt, NULL);
-+	}
-+
-+	return true;
-+}
-+
-+static bool find_by_ad_type(const void *a, const void *b)
-+{
-+	const struct tx_pkt *tx = a;
-+	uint8_t ad_type = L_PTR_TO_UINT(b);
-+
-+	return !ad_type || ad_type == tx->pkt[0];
-+}
-+
-+static bool find_by_pattern(const void *a, const void *b)
-+{
-+	const struct tx_pkt *tx = a;
-+	const struct tx_pattern *pattern = b;
-+
-+	if (tx->len < pattern->len)
-+		return false;
-+
-+	return (!memcmp(tx->pkt, pattern->data, pattern->len));
-+}
-+
-+static bool tx_cancel(struct mesh_io *io, uint8_t *data, uint8_t len)
-+{
-+	struct mesh_io_private *pvt = io->pvt;
-+	struct tx_pkt *tx;
-+
-+	if (!data)
-+		return false;
-+
-+	if (len == 1) {
-+		do {
-+			tx = l_queue_remove_if(pvt->tx_pkts, find_by_ad_type,
-+							L_UINT_TO_PTR(data[0]));
-+			l_free(tx);
-+		} while (tx);
-+	}  else {
-+		struct tx_pattern pattern = {
-+			.data = data,
-+			.len = len
-+		};
-+
-+		do {
-+			tx = l_queue_remove_if(pvt->tx_pkts, find_by_pattern,
-+								&pattern);
-+			l_free(tx);
-+		} while (tx);
-+	}
-+
-+	if (l_queue_isempty(pvt->tx_pkts)) {
-+		send_cancel(pvt);
-+		l_timeout_remove(pvt->tx_timeout);
-+		pvt->tx_timeout = NULL;
-+	}
-+
-+	return true;
-+}
-+
-+static bool find_by_filter_id(const void *a, const void *b)
-+{
-+	const struct pvt_rx_reg *rx_reg = a;
-+	uint8_t filter_id = L_PTR_TO_UINT(b);
-+
-+	return rx_reg->filter_id == filter_id;
-+}
-+
-+static bool recv_register(struct mesh_io *io, uint8_t filter_id,
-+				mesh_io_recv_func_t cb, void *user_data)
-+{
-+	struct bt_hci_cmd_le_set_scan_enable cmd;
-+	struct mesh_io_private *pvt = io->pvt;
-+	struct pvt_rx_reg *rx_reg;
-+	bool scanning;
-+
-+	l_info("%s %d", __func__, filter_id);
-+	if (!cb || !filter_id || filter_id > sizeof(pvt->filters))
-+		return false;
-+
-+	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
-+						L_UINT_TO_PTR(filter_id));
-+
-+	if (!rx_reg) {
-+		rx_reg = l_new(struct pvt_rx_reg, 1);
-+		if (!rx_reg)
-+			return false;
-+	}
-+
-+	rx_reg->filter_id = filter_id;
-+	rx_reg->cb = cb;
-+	rx_reg->user_data = user_data;
-+
-+	scanning = !l_queue_isempty(pvt->rx_regs);
-+
-+	l_queue_push_head(pvt->rx_regs, rx_reg);
-+
-+	if (!scanning) {
-+		cmd.enable = 0x01;	/* Enable scanning */
-+		cmd.filter_dup = 0x00;	/* Report duplicates */
-+		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+	}
-+
-+	return true;
-+}
-+
-+static bool recv_deregister(struct mesh_io *io, uint8_t filter_id)
-+{
-+	struct bt_hci_cmd_le_set_scan_enable cmd;
-+	struct mesh_io_private *pvt = io->pvt;
-+
-+	struct pvt_rx_reg *rx_reg;
-+
-+	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter_id,
-+						L_UINT_TO_PTR(filter_id));
-+
-+	if (rx_reg)
-+		l_free(rx_reg);
-+
-+	if (l_queue_isempty(pvt->rx_regs)) {
-+		cmd.enable = 0x00;	/* Disable scanning */
-+		cmd.filter_dup = 0x00;	/* Report duplicates */
-+		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+
-+	}
-+
-+	return true;
-+}
-+
-+static bool filter_set(struct mesh_io *io,
-+		uint8_t filter_id, const uint8_t *data, uint8_t len,
-+		mesh_io_status_func_t callback, void *user_data)
-+{
-+	struct mesh_io_private *pvt = io->pvt;
-+
-+	l_info("%s id: %d, --> %2.2x", __func__, filter_id, data[0]);
-+	if (!data || !len || !filter_id || filter_id > sizeof(pvt->filters))
-+		return false;
-+
-+	pvt->filters[filter_id - 1] = data[0];
-+
-+	/* TODO: Delayed Call to successful status */
-+
-+	return true;
-+}
-+
-+const struct mesh_io_api mesh_io_generic = {
-+	.init = dev_init,
-+	.destroy = dev_destroy,
-+	.caps = dev_caps,
-+	.send = send_tx,
-+	.reg = recv_register,
-+	.dereg = recv_deregister,
-+	.set = filter_set,
-+	.cancel = tx_cancel,
-+};
-diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
-new file mode 100644
-index 000000000..5cdfdc5ff
---- /dev/null
-+++ b/mesh/mesh-io.c
-@@ -0,0 +1,188 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <ell/ell.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+
-+#include "mesh/mesh-defs.h"
-+
-+#include "mesh/mesh-io.h"
-+#include "mesh/mesh-io-api.h"
-+
-+/* List of Mesh-IO Type headers */
-+#include "mesh/mesh-io-generic.h"
-+
-+/* List of Supported Mesh-IO Types */
-+static const struct mesh_io_table table[] = {
-+	{MESH_IO_TYPE_GENERIC,	&mesh_io_generic}
-+};
-+
-+static struct l_queue *io_list;
-+
-+static bool match_by_io(const void *a, const void *b)
-+{
-+	return a == b;
-+}
-+
-+static bool match_by_index(const void *a, const void *b)
-+{
-+	const struct mesh_io *io = a;
-+
-+	return io->index == L_PTR_TO_UINT(b);
-+}
-+
-+struct mesh_io *mesh_io_new(uint16_t index, enum mesh_io_type type)
-+{
-+	const struct mesh_io_api *api = NULL;
-+	struct mesh_io *io;
-+	uint16_t i;
-+
-+	l_info("%s %d\n", __func__, type);
-+
-+	for (i = 0; i < L_ARRAY_SIZE(table); i++) {
-+		if (table[i].type == type) {
-+			api = table[i].api;
-+			break;
-+		}
-+	}
-+
-+	io = l_queue_find(io_list, match_by_index, L_UINT_TO_PTR(index));
-+
-+	if (!api || !api->init || io)
-+		return NULL;
-+
-+	io = l_new(struct mesh_io, 1);
-+
-+	if (!io)
-+		return NULL;
-+
-+	io->type = type;
-+	io->index = index;
-+	io->api = api;
-+	if (!api->init(index, io))
-+		goto fail;
-+
-+	if (!io_list)
-+		io_list = l_queue_new();
-+
-+	if (api->set) {
-+		uint8_t pkt = MESH_AD_TYPE_NETWORK;
-+		uint8_t bec = MESH_AD_TYPE_BEACON;
-+		uint8_t prv = MESH_AD_TYPE_PROVISION;
-+
-+		api->set(io, 1, &bec, 1, NULL, NULL);
-+		api->set(io, 2, &prv, 1, NULL, NULL);
-+		api->set(io, 3, &pkt, 1, NULL, NULL);
-+	}
-+
-+	if (l_queue_push_head(io_list, io))
-+		return io;
-+
-+fail:
-+	if (api->destroy)
-+		api->destroy(io);
-+
-+	l_free(io);
-+	return NULL;
-+}
-+
-+void mesh_io_destroy(struct mesh_io *io)
-+{
-+	io = l_queue_remove_if(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->destroy)
-+		io->api->destroy(io);
-+
-+	l_free(io);
-+
-+	if (l_queue_isempty(io_list)) {
-+		l_queue_destroy(io_list, NULL);
-+		io_list = NULL;
-+	}
-+}
-+
-+bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->caps)
-+		return io->api->caps(io, caps);
-+
-+	return false;
-+}
-+
-+bool mesh_io_register_recv_cb(struct mesh_io *io, uint8_t filter_id,
-+				mesh_io_recv_func_t cb, void *user_data)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->reg)
-+		return io->api->reg(io, filter_id, cb, user_data);
-+
-+	return false;
-+}
-+
-+bool mesh_io_deregister_recv_cb(struct mesh_io *io, uint8_t filter_id)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->dereg)
-+		return io->api->dereg(io, filter_id);
-+
-+	return false;
-+}
-+
-+bool mesh_set_filter(struct mesh_io *io, uint8_t filter_id,
-+				const uint8_t *data, uint8_t len,
-+				mesh_io_status_func_t cb, void *user_data)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->set)
-+		return io->api->set(io, filter_id, data, len, cb, user_data);
-+
-+	return false;
-+}
-+
-+bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
-+					const uint8_t *data, uint16_t len)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->send)
-+		return io->api->send(io, info, data, len);
-+
-+	return false;
-+}
-+
-+bool mesh_io_send_cancel(struct mesh_io *io, uint8_t *pattern, uint8_t len)
-+{
-+	io = l_queue_find(io_list, match_by_io, io);
-+
-+	if (io && io->api && io->api->cancel)
-+		return io->api->cancel(io, pattern, len);
-+
-+	return false;
-+}
--- 
-2.14.4
+> This patch does extended advertising for directed advertising
+> if the controller supportes. Instance 0 is used for directed
+> advertising.
+> 
+> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+> ---
+> net/bluetooth/hci_conn.c | 67 ++++++++++++++++++++++++++++++++----------------
+> 1 file changed, 45 insertions(+), 22 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 5d421a2..fc27bd8 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -870,35 +870,58 @@ static void hci_req_directed_advertising(struct hci_request *req,
+> 					 struct hci_conn *conn)
+> {
+> 	struct hci_dev *hdev = req->hdev;
+> -	struct hci_cp_le_set_adv_param cp;
+> 	u8 own_addr_type;
+> 	u8 enable;
+> 
+> -	/* Clear the HCI_LE_ADV bit temporarily so that the
+> -	 * hci_update_random_address knows that it's safe to go ahead
+> -	 * and write a new random address. The flag will be set back on
+> -	 * as soon as the SET_ADV_ENABLE HCI command completes.
+> -	 */
+> -	hci_dev_clear_flag(hdev, HCI_LE_ADV);
+> +	if (ext_adv_capable(hdev)) {
+> +		struct hci_cp_le_set_ext_adv_params cp;
+> 
+> -	/* Set require_privacy to false so that the remote device has a
+> -	 * chance of identifying us.
+> -	 */
+> -	if (hci_update_random_address(req, false, conn_use_rpa(conn),
+> -				      &own_addr_type) < 0)
+> -		return;
+> +		memset(&cp, 0, sizeof(cp));
+> 
+> -	memset(&cp, 0, sizeof(cp));
+> -	cp.type = LE_ADV_DIRECT_IND;
+> -	cp.own_address_type = own_addr_type;
+> -	cp.direct_addr_type = conn->dst_type;
+> -	bacpy(&cp.direct_addr, &conn->dst);
+> -	cp.channel_map = hdev->le_adv_channel_map;
+> +		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_DIRECT_IND);
+> +		cp.own_addr_type = own_addr_type;
+> +		cp.channel_map = hdev->le_adv_channel_map;
+> +		cp.tx_power = 127;
+
+Use the proper constant here. Or maybe we actually want to use hdev->adv_tx_power here instead. As I mentioned in early patches we want to keep the behavior of what legacy advertising does.
+
+> +		cp.primary_phy = HCI_ADV_PHY_1M;
+> +		cp.secondary_phy = HCI_ADV_PHY_1M;
+> +		cp.handle = 0; /* Use instance 0 for directed adv */
+> +		cp.own_addr_type = own_addr_type;
+> +		cp.peer_addr_type = conn->dst_type;
+> +		bacpy(&cp.peer_addr, &conn->dst);
+> +
+> +		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
+> 
+> -	hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
+> +		__hci_req_enable_ext_advertising(req);
+> +	} else {
+> +		struct hci_cp_le_set_adv_param cp;
+> +
+> +		/* Clear the HCI_LE_ADV bit temporarily so that the
+> +		 * hci_update_random_address knows that it's safe to go ahead
+> +		 * and write a new random address. The flag will be set back on
+> +		 * as soon as the SET_ADV_ENABLE HCI command completes.
+> +		 */
+> +		hci_dev_clear_flag(hdev, HCI_LE_ADV);
+> 
+> -	enable = 0x01;
+> -	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
+> +		/* Set require_privacy to false so that the remote device has a
+> +		 * chance of identifying us.
+> +		 */
+> +		if (hci_update_random_address(req, false, conn_use_rpa(conn),
+> +					      &own_addr_type) < 0)
+> +			return;
+> +
+> +		memset(&cp, 0, sizeof(cp));
+> +		cp.type = LE_ADV_DIRECT_IND;
+> +		cp.own_address_type = own_addr_type;
+> +		cp.direct_addr_type = conn->dst_type;
+> +		bacpy(&cp.direct_addr, &conn->dst);
+> +		cp.channel_map = hdev->le_adv_channel_map;
+> +
+> +		hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
+> +
+> +		enable = 0x01;
+> +		hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable),
+> +			    &enable);
+> +	}
+> 
+> 	conn->state = BT_CONNECT;
+> }
+
+Regards
+
+Marcel
 
