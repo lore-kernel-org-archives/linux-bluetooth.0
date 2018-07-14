@@ -1,326 +1,619 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH v4 12/13] Bluetooth: Implement Set ADV set random address
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1531301495-14479-13-git-send-email-jaganathx.kanakkassery@intel.com>
-Date: Sat, 14 Jul 2018 22:52:34 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Message-Id: <52A6E0AC-1A7D-4AD1-97C6-FDED78E38C78@holtmann.org>
-References: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1531301495-14479-13-git-send-email-jaganathx.kanakkassery@intel.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+From: Brian Gix <brian.gix@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+        inga.stotland@intel.com, Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ v7 07/14] mesh: Add Accessors to Transport layer data
+Date: Sat, 14 Jul 2018 12:58:56 -0700
+Message-Id: <20180714195903.7402-8-brian.gix@intel.com>
+In-Reply-To: <20180714195903.7402-1-brian.gix@intel.com>
+References: <20180714195903.7402-1-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+---
+ mesh/net.c | 549 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 549 insertions(+)
 
-> This basically sets the random address for the instance 0.
-> Random address can be set only if the instance is created which
-> is done in Set ext adv param.
-> 
-> This introduces a hci_get_random_address() which returns the
-> own address type and random address (rpa, nrpa or static) based
-> on the instance flags and hdev flags. New function is required
-> since own address type should be known before setting adv params
-> but address can be set only after setting params.
-> 
-> < HCI Command: LE Set Advertising Set Random Address (0x08|0x0035) plen 7
->        Advertising handle: 0x00
->        Advertising random address: 3C:8E:56:9B:77:84 (OUI 3C-8E-56)
->> HCI Event: Command Complete (0x0e) plen 4
->      LE Set Advertising Set Random Address (0x08|0x0035) ncmd 1
->        Status: Success (0x00)
-> 
-> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-> ---
-> include/net/bluetooth/hci.h |   6 +++
-> net/bluetooth/hci_conn.c    |  23 +++++++++
-> net/bluetooth/hci_event.c   |  24 ++++++++++
-> net/bluetooth/hci_request.c | 111 +++++++++++++++++++++++++++++++++++++++++++-
-> net/bluetooth/hci_request.h |   3 ++
-> 5 files changed, 166 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 1a68530..40a532a 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1655,6 +1655,12 @@ struct hci_cp_le_remove_adv_set {
-> 
-> #define HCI_OP_LE_CLEAR_ADV_SETS	0x203d
-> 
-> +#define HCI_OP_LE_SET_ADV_SET_RAND_ADDR	0x2035
-> +struct hci_cp_le_set_adv_set_rand_addr {
-> +	__u8  handle;
-> +	bdaddr_t  bdaddr;
-> +} __packed;
-> +
-> /* ---- HCI Events ---- */
-> #define HCI_EV_INQUIRY_COMPLETE		0x01
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index fc27bd8..cf180b24 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -875,6 +875,14 @@ static void hci_req_directed_advertising(struct hci_request *req,
-> 
-> 	if (ext_adv_capable(hdev)) {
-> 		struct hci_cp_le_set_ext_adv_params cp;
-> +		bdaddr_t random_addr;
-> +
-> +		/* Set require_privacy to false so that the remote device has a
-> +		 * chance of identifying us.
-> +		 */
-> +		if (hci_get_random_address(hdev, false, conn_use_rpa(conn),
-> +					   &own_addr_type, &random_addr) < 0)
-> +			return;
-> 
-> 		memset(&cp, 0, sizeof(cp));
-> 
-> @@ -891,6 +899,21 @@ static void hci_req_directed_advertising(struct hci_request *req,
-> 
-> 		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
-> 
-> +		if (own_addr_type == ADDR_LE_DEV_RANDOM &&
-> +		    bacmp(&random_addr, BDADDR_ANY) &&
-> +		    bacmp(&random_addr, &hdev->random_addr)) {
-> +			struct hci_cp_le_set_adv_set_rand_addr cp;
-> +
-> +			memset(&cp, 0, sizeof(cp));
-> +
-> +			cp.handle = 0;
-> +			bacpy(&cp.bdaddr, &random_addr);
-> +
-> +			hci_req_add(req,
-> +				    HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
-> +				    sizeof(cp), &cp);
-> +		}
-> +
-> 		__hci_req_enable_ext_advertising(req);
-> 	} else {
-> 		struct hci_cp_le_set_adv_param cp;
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index e703880..dfb2a82 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1061,6 +1061,26 @@ static void hci_cc_le_set_default_phy(struct hci_dev *hdev, struct sk_buff *skb)
-> 	hdev->le_tx_def_phys = cp->tx_phys;
-> 	hdev->le_rx_def_phys = cp->rx_phys;
-> 
-> +        hci_dev_unlock(hdev);
-
-We have some whitespace damage here.
-
-> +}
-> +
-> +static void hci_cc_le_set_adv_set_random_addr(struct hci_dev *hdev,
-> +                                              struct sk_buff *skb)
-> +{
-> +        __u8 status = *((__u8 *) skb->data);
-> +        struct hci_cp_le_set_adv_set_rand_addr *cp;
-> +
-> +	if (status)
-> +		return;
-> +
-> +	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADV_SET_RAND_ADDR);
-> +	if (!cp)
-> +		return;
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	bacpy(&hdev->random_addr, &cp->bdaddr);
-
-Same as with hdev->adv_tx_power, you can not do that. You need to store these per adv instance. I really like to keep the parts that we used for legacy commands different than others.
-
-> +
-> 	hci_dev_unlock(hdev);
-> }
-> 
-> @@ -3272,6 +3292,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 		hci_cc_le_set_ext_adv_enable(hdev, skb);
-> 		break;
-> 
-> +	case HCI_OP_LE_SET_ADV_SET_RAND_ADDR:
-> +		hci_cc_le_set_adv_set_random_addr(hdev, skb);
-> +		break;
-> +
-> 	default:
-> 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
-> 		break;
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index 7051c5b..6825a65 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -1427,6 +1427,87 @@ static void adv_timeout_expire(struct work_struct *work)
-> 	hci_dev_unlock(hdev);
-> }
-> 
-> +int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
-> +			   bool use_rpa, u8 *own_addr_type, bdaddr_t *rand_addr)
-> +{
-> +	int err;
-> +
-> +	bacpy(rand_addr, BDADDR_ANY);
-> +
-> +	/* If privacy is enabled use a resolvable private address. If
-> +	 * current RPA has expired then generate a new one.
-> +	 */
-> +	if (use_rpa) {
-> +		*own_addr_type = ADDR_LE_DEV_RANDOM;
-> +
-> +		if (!hci_dev_test_and_clear_flag(hdev, HCI_RPA_EXPIRED) &&
-> +		    !bacmp(&hdev->random_addr, &hdev->rpa))
-> +			return 0;
-> +
-> +		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
-> +		if (err < 0) {
-> +			BT_ERR("%s failed to generate new RPA", hdev->name);
-> +			return err;
-> +		}
-> +
-> +		bacpy(rand_addr, &hdev->rpa);
-> +
-> +		return 0;
-> +	}
-> +
-> +	/* In case of required privacy without resolvable private address,
-> +	 * use an non-resolvable private address. This is useful for active
-> +	 * scanning and non-connectable advertising.
-> +	 */
-> +	if (require_privacy) {
-> +		bdaddr_t nrpa;
-> +
-> +		while (true) {
-> +			/* The non-resolvable private address is generated
-> +			 * from random six bytes with the two most significant
-> +			 * bits cleared.
-> +			 */
-> +			get_random_bytes(&nrpa, 6);
-> +			nrpa.b[5] &= 0x3f;
-> +
-> +			/* The non-resolvable private address shall not be
-> +			 * equal to the public address.
-> +			 */
-> +			if (bacmp(&hdev->bdaddr, &nrpa))
-> +				break;
-> +		}
-> +
-> +		*own_addr_type = ADDR_LE_DEV_RANDOM;
-> +		bacpy(rand_addr, &nrpa);
-> +
-> +		return 0;
-> +	}
-> +
-> +	/* If forcing static address is in use or there is no public
-> +	 * address use the static address as random address
-> +	 *
-> +	 * In case BR/EDR has been disabled on a dual-mode controller
-> +	 * and a static address has been configured, then use that
-> +	 * address instead of the public BR/EDR address.
-> +	 */
-> +	if (hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR) ||
-> +	    !bacmp(&hdev->bdaddr, BDADDR_ANY) ||
-> +	    (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED) &&
-> +	     bacmp(&hdev->static_addr, BDADDR_ANY))) {
-> +		*own_addr_type = ADDR_LE_DEV_RANDOM;
-> +		bacpy(rand_addr, &hdev->static_addr);
-> +
-> +		return 0;
-> +	}
-> +
-> +	/* Neither privacy nor static address is being used so use a
-> +	 * public address.
-> +	 */
-> +	*own_addr_type = ADDR_LE_DEV_PUBLIC;
-> +
-> +	return 0;
-> +}
-> +
-
-So I am not convinced that we need all of this. For example we only use this for advertising. So our decision for active scanning is useless.
-
-What I think is best that we actually add rand_addr to the adv instance structure and just calculate what random address we want to use ahead of time and keep it stored in the instance. I mean, we want to rotate the address for each instance independently.
-
-> void __hci_req_clear_ext_adv_sets(struct hci_request *req)
-> {
-> 	hci_req_add(req, HCI_OP_LE_REMOVE_ADV_SET, 0, NULL);
-> @@ -1438,6 +1519,9 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
-> 	struct hci_dev *hdev = req->hdev;
-> 	bool connectable;
-> 	u32 flags;
-> +	bdaddr_t random_addr;
-> +	u8 own_addr_type;
-> +	int err;
-> 	/* In ext adv set param interval is 3 octets */
-> 	const u8 adv_interval[3] = { 0x00, 0x08, 0x00 };
-> 
-> @@ -1452,6 +1536,16 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
-> 	 if (!is_advertising_allowed(hdev, connectable))
-> 		return -EPERM;
-> 
-> +	/* Set require_privacy to true only when non-connectable
-> +	 * advertising is used. In that case it is fine to use a
-> +	 * non-resolvable private address.
-> +	 */
-> +	err = hci_get_random_address(hdev, !connectable,
-> +				     adv_use_rpa(hdev, flags),
-> +				     &own_addr_type, &random_addr);
-> +	if (err < 0)
-> +		return err;
-> +
-> 	memset(&cp, 0, sizeof(cp));
-> 
-> 	memcpy(cp.min_interval, adv_interval, sizeof(cp.min_interval));
-> @@ -1464,7 +1558,7 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
-> 	else
-> 		cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
-> 
-> -	cp.own_addr_type = BDADDR_LE_PUBLIC;
-> +	cp.own_addr_type = own_addr_type;
-> 	cp.channel_map = hdev->le_adv_channel_map;
-> 	cp.tx_power = 127;
-> 	cp.primary_phy = HCI_ADV_PHY_1M;
-> @@ -1473,6 +1567,21 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
-> 
-> 	hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
-> 
-> +	if (own_addr_type == ADDR_LE_DEV_RANDOM &&
-> +	    bacmp(&random_addr, BDADDR_ANY) &&
-> +	    bacmp(&random_addr, &hdev->random_addr)) {
-
-This really needs to have to compare it per instance. Which means we might actually track the settings for each adv set. So even while initially we only map all instances to a single adv set, we should still track what the current adv set has in it.
-
-> +		struct hci_cp_le_set_adv_set_rand_addr cp;
-> +
-> +		memset(&cp, 0, sizeof(cp));
-> +
-> +		cp.handle = 0;
-> +		bacpy(&cp.bdaddr, &random_addr);
-> +
-> +		hci_req_add(req,
-> +			    HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
-> +			    sizeof(cp), &cp);
-> +	}
-> +
-> 	return 0;
-> }
-> 
-> diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-> index 2451861..5329faf 100644
-> --- a/net/bluetooth/hci_request.h
-> +++ b/net/bluetooth/hci_request.h
-> @@ -84,6 +84,9 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
-> int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
-> void __hci_req_enable_ext_advertising(struct hci_request *req);
-> void __hci_req_clear_ext_adv_sets(struct hci_request *req);
-> +int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
-> +			   bool use_rpa, u8 *own_addr_type,
-> +			   bdaddr_t *rand_addr);
-> 
-
-Regards
-
-Marcel
+diff --git a/mesh/net.c b/mesh/net.c
+index 0dafa1780..544f9efa5 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -828,6 +828,226 @@ void mesh_net_unref(struct mesh_net *net)
+ 	l_free(net);
+ }
+ 
++bool mesh_net_set_seq_num(struct mesh_net *net, uint32_t number)
++{
++	if (!net)
++		return false;
++
++	net->cached_seq_num = net->seq_num = number;
++
++	return true;
++}
++
++bool mesh_net_set_default_ttl(struct mesh_net *net, uint8_t ttl)
++{
++	if (!net)
++		return false;
++
++	net->default_ttl = ttl;
++
++	return true;
++}
++
++uint32_t mesh_net_get_seq_num(struct mesh_net *net)
++{
++	if (!net)
++		return 0;
++
++	return net->seq_num;
++}
++
++uint8_t mesh_net_get_default_ttl(struct mesh_net *net)
++{
++	if (!net)
++		return 0;
++
++	return net->default_ttl;
++}
++
++uint16_t mesh_net_get_address(struct mesh_net *net)
++{
++	if (!net)
++		return 0;
++
++	return net->src_addr;
++}
++
++bool mesh_net_register_unicast(struct mesh_net *net,
++					uint16_t address, uint8_t num_ele)
++{
++	if (!net || !IS_UNICAST(address) || !num_ele)
++		return false;
++
++	l_info("mesh_net_set_address: 0x%x", address);
++	net->src_addr = address;
++	net->last_addr = address + num_ele - 1;
++	if (net->last_addr < net->src_addr)
++		return false;
++
++	do {
++		mesh_net_dst_reg(net, address);
++		address++;
++		num_ele--;
++	} while (num_ele > 0);
++
++	return true;
++}
++
++uint8_t mesh_net_get_num_ele(struct mesh_net *net)
++{
++	if (!net)
++		return 0;
++
++	return net->last_addr - net->src_addr + 1;
++}
++
++bool mesh_net_set_proxy_mode(struct mesh_net *net, bool enable)
++{
++	if (!net)
++		return false;
++
++	/* No support for proxy yet */
++	if (enable) {
++		l_error("Proxy not supported!");
++		return false;
++	}
++
++	trigger_heartbeat(net, FEATURE_PROXY, enable);
++	return true;
++}
++
++bool mesh_net_set_friend_mode(struct mesh_net *net, bool enable)
++{
++	if (!net)
++		return false;
++
++	if (net->friend_enable && !enable)
++		l_queue_clear(net->friends, mesh_friend_free);
++
++	net->friend_enable = enable;
++	trigger_heartbeat(net, FEATURE_FRIEND, enable);
++	return true;
++}
++
++bool mesh_net_set_relay_mode(struct mesh_net *net, bool enable,
++				uint8_t cnt, uint8_t interval)
++{
++	if (!net)
++		return false;
++
++	net->relay.enable = enable;
++	net->relay.count = cnt;
++	net->relay.interval = interval;
++	trigger_heartbeat(net, FEATURE_RELAY, enable);
++	return true;
++}
++
++struct mesh_net_prov_caps *mesh_net_prov_caps_get(struct mesh_net *net)
++{
++	if (net)
++		return &net->prov_caps;
++
++	return NULL;
++}
++
++char *mesh_net_id_name(struct mesh_net *net)
++{
++	if (net && net->id_name[0])
++		return net->id_name;
++
++	return NULL;
++}
++
++bool mesh_net_id_uuid_set(struct mesh_net *net, uint8_t uuid[16])
++{
++	if (!net)
++		return false;
++
++	memcpy(net->id_uuid, uuid, 16);
++
++	return true;
++}
++
++uint8_t *mesh_net_priv_key_get(struct mesh_net *net)
++{
++	if (net)
++		return net->prov_priv_key;
++
++	return NULL;
++}
++
++bool mesh_net_priv_key_set(struct mesh_net *net, uint8_t key[32])
++{
++	if (!net)
++		return false;
++
++	memcpy(net->prov_priv_key, key, 32);
++	return true;
++}
++
++uint8_t *mesh_net_test_addr(struct mesh_net *net)
++{
++	const uint8_t zero_addr[] = {0, 0, 0, 0, 0, 0};
++
++	if (net && memcmp(net->test_bd_addr, zero_addr, 6))
++		return net->test_bd_addr;
++
++	return NULL;
++}
++
++uint8_t *mesh_net_prov_rand(struct mesh_net *net)
++{
++	if (net)
++		return net->prov_rand;
++
++	return NULL;
++}
++
++uint16_t mesh_net_prov_uni(struct mesh_net *net, uint8_t ele_cnt)
++{
++	uint16_t uni;
++	uint16_t next;
++
++	if (!net)
++		return 0;
++
++	next = net->prov_uni_addr.next + ele_cnt;
++	if (next > 0x8000 || next > net->prov_uni_addr.high)
++		return UNASSIGNED_ADDRESS;
++
++	uni = net->prov_uni_addr.next;
++	net->prov_uni_addr.next = next;
++
++	return uni;
++}
++
++bool mesh_net_test_mode(struct mesh_net *net)
++{
++	if (net)
++		return net->test_mode;
++
++	return false;
++}
++
++int mesh_net_get_identity_mode(struct mesh_net *net, uint16_t idx,
++								uint8_t *mode)
++{
++	struct mesh_subnet *subnet;
++
++	if (!net)
++		return MESH_STATUS_UNSPECIFIED_ERROR;
++
++	subnet = l_queue_find(net->subnets, match_key_index,
++							L_UINT_TO_PTR(idx));
++	if (!subnet)
++		return MESH_STATUS_INVALID_NETKEY;
++
++	/* Currently, proxy mode is not supported */
++	*mode = MESH_MODE_UNSUPPORTED;
++
++	return MESH_STATUS_SUCCESS;
++}
++
+ int mesh_net_del_key(struct mesh_net *net, uint16_t idx)
+ {
+ 	struct mesh_subnet *subnet;
+@@ -924,6 +1144,98 @@ void mesh_net_flush_msg_queues(struct mesh_net *net)
+ 	l_queue_clear(net->fast_cache, mesh_msg_free);
+ }
+ 
++uint32_t mesh_net_get_iv_index(struct mesh_net *net)
++{
++	if (!net)
++		return 0xffffffff;
++
++	return net->iv_index - (iv_is_updating(net) ? 1 : 0);
++}
++
++/* TODO: net key index? */
++void mesh_net_get_snb_state(struct mesh_net *net, uint8_t *flags,
++							uint32_t *iv_index)
++{
++	struct mesh_subnet *subnet;
++
++	if (!net || !flags || !iv_index)
++		return;
++
++	*iv_index = net->iv_index;
++	*flags = (net->iv_upd_state == IV_UPD_UPDATING) ? 0x02 : 0x00;
++
++	subnet = get_primary_subnet(net);
++	if (subnet)
++		*flags |= subnet->key_refresh ? 0x01 : 0x00;
++}
++
++bool mesh_net_get_key(struct mesh_net *net, bool new_key, uint16_t idx,
++							uint8_t key_buf[16])
++{
++	struct mesh_subnet *subnet;
++
++	if (!net)
++		return false;
++
++	subnet = l_queue_find(net->subnets, match_key_index,
++							L_UINT_TO_PTR(idx));
++	if (!subnet)
++		return false;
++
++	if (!new_key) {
++		memcpy(key_buf, subnet->current.key, 16);
++		return true;
++	}
++
++	if (subnet->updated.key_set.nid == NET_NID_INVALID)
++		return false;
++
++	memcpy(key_buf, subnet->updated.key, 16);
++	return true;
++}
++
++bool mesh_net_key_list_get(struct mesh_net *net, uint8_t *buf, uint16_t *size)
++{
++	const struct l_queue_entry *entry;
++	uint16_t n, buf_size;
++
++	if (!net || !buf || !size)
++		return false;
++
++	buf_size = *size;
++	if (buf_size < l_queue_length(net->subnets) * 2)
++		return false;
++
++	n = 0;
++	entry = l_queue_get_entries(net->subnets);
++
++	for (; entry; entry = entry->next) {
++		struct mesh_subnet *subnet = entry->data;
++
++		l_put_le16(subnet->idx, buf);
++		n += 2;
++	}
++
++	*size = n;
++	return true;
++}
++
++bool mesh_net_get_frnd_seq(struct mesh_net *net)
++{
++	if (!net)
++		return false;
++
++	return net->friend_seq;
++}
++
++void mesh_net_set_frnd_seq(struct mesh_net *net, bool seq)
++{
++	if (!net)
++		return;
++
++	net->friend_seq = seq;
++}
++
+ static bool match_cache(const void *a, const void *b)
+ {
+ 	const struct mesh_msg *msg = a;
+@@ -2865,6 +3177,34 @@ void mesh_net_sub_list_del(struct mesh_net *net, uint16_t addr)
+ 			0, 0, 0, msg, n);
+ }
+ 
++/* TODO: change to use net index */
++bool mesh_net_set_friend(struct mesh_net *net, uint16_t friend_addr)
++{
++	if (!net)
++		return false;
++
++	net->bea_id = 0;
++
++	l_info("Set Frnd addr: %4.4x", friend_addr);
++	if (!friend_addr)
++		trigger_heartbeat(net, FEATURE_LPN, false);
++	else
++		trigger_heartbeat(net, FEATURE_LPN, true);
++
++	net->friend_addr = friend_addr;
++
++	set_network_beacon(get_primary_subnet(net), net);
++	return true;
++}
++
++uint16_t mesh_net_get_friend(struct mesh_net *net)
++{
++	if (!net)
++		return 0;
++
++	return net->friend_addr;
++}
++
+ bool mesh_net_dst_reg(struct mesh_net *net, uint16_t dst)
+ {
+ 	struct mesh_destination *dest = l_queue_find(net->destinations,
+@@ -3518,6 +3858,27 @@ int mesh_net_key_refresh_finish(struct mesh_net *net, uint16_t idx)
+ 	return MESH_STATUS_SUCCESS;
+ }
+ 
++uint16_t mesh_net_get_features(struct mesh_net *net)
++{
++	uint16_t features = 0;
++
++	if (net->relay.enable)
++		features |= FEATURE_RELAY;
++	if (net->proxy_enable)
++		features |= FEATURE_PROXY;
++	if (!l_queue_isempty(net->friends))
++		features |= FEATURE_FRIEND;
++	if (net->friend_addr != UNASSIGNED_ADDRESS)
++		features |= FEATURE_LPN;
++
++	return features;
++}
++
++struct mesh_net_heartbeat *mesh_net_heartbeat_get(struct mesh_net *net)
++{
++	return &net->heartbeat;
++}
++
+ void mesh_net_heartbeat_send(struct mesh_net *net)
+ {
+ 	struct mesh_net_heartbeat *hb = &net->heartbeat;
+@@ -3545,6 +3906,49 @@ void mesh_net_heartbeat_init(struct mesh_net *net)
+ 	hb->features = mesh_net_get_features(net);
+ }
+ 
++void mesh_net_uni_range_set(struct mesh_net *net,
++				struct mesh_net_addr_range *range)
++{
++	net->prov_uni_addr.low = range->low;
++	net->prov_uni_addr.high = range->high;
++	net->prov_uni_addr.next = range->next;
++}
++
++struct mesh_net_addr_range mesh_net_uni_range_get(struct mesh_net *net)
++{
++	return net->prov_uni_addr;
++}
++
++void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update)
++{
++	net->iv_index = index;
++	net->iv_update = update;
++}
++
++void mesh_net_provisioner_mode_set(struct mesh_net *net, bool mode)
++{
++	net->provisioner = mode;
++}
++
++bool mesh_net_provisioner_mode_get(struct mesh_net *net)
++{
++	return net->provisioner;
++}
++
++uint16_t mesh_net_get_primary_idx(struct mesh_net *net)
++{
++	struct mesh_subnet *subnet;
++
++	if (!net)
++		return NET_IDX_INVALID;
++
++	subnet = get_primary_subnet(net);
++	if (!subnet)
++		return NET_IDX_INVALID;
++
++	return subnet->idx;
++}
++
+ uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr)
+ {
+ 	struct mesh_friend *frnd = l_queue_find(net->friends, match_by_friend,
+@@ -3570,6 +3974,143 @@ bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
+ 	return true;
+ }
+ 
++struct mesh_node *mesh_net_local_node_get(struct mesh_net *net)
++{
++	return  net->local_node;
++}
++
++bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl)
++{
++	if (!net)
++		return false;
++
++	net->crpl = crpl;
++	return true;
++}
++
++uint16_t mesh_net_get_crpl(struct mesh_net *net)
++{
++	if (!net)
++		return 0;
++
++	return net->crpl;
++}
++
++struct l_queue *mesh_net_get_app_keys(struct mesh_net *net)
++{
++	if (!net)
++		return NULL;
++
++	if (!net->app_keys)
++		net->app_keys = l_queue_new();
++
++	return net->app_keys;
++}
++
++bool mesh_net_have_key(struct mesh_net *net, uint16_t idx)
++{
++	if (!net)
++		return false;
++
++	return (l_queue_find(net->subnets, match_key_index,
++						L_UINT_TO_PTR(idx)) != NULL);
++}
++
++bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig)
++{
++	if (!net)
++		return false;
++
++	net->jconfig_local = jconfig;
++	return true;
++}
++
++void *mesh_net_jconfig_get(struct mesh_net *net)
++{
++	if (!net)
++		return NULL;
++
++	return  net->jconfig_local;
++}
++
++bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg)
++{
++	if (!net)
++		return false;
++
++	net->cfg_file = cfg;
++	return true;
++}
++
++bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg)
++{
++	if (!net)
++		return false;
++
++	*cfg = net->cfg_file;
++	return true;
++}
++
++bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr)
++{
++	if (!net)
++		return false;
++
++	return (addr >= net->src_addr && addr <= net->last_addr);
++}
++
++void mesh_net_set_window_accuracy(struct mesh_net *net, uint8_t accuracy)
++{
++	if (!net)
++		return;
++
++	net->window_accuracy = accuracy;
++}
++
++void mesh_net_transmit_params_set(struct mesh_net *net, uint8_t count,
++							uint16_t interval)
++{
++	if (!net)
++		return;
++
++	net->tx_interval = interval;
++	net->tx_cnt = count;
++}
++
++void mesh_net_transmit_params_get(struct mesh_net *net, uint8_t *count,
++							uint16_t *interval)
++{
++	if (!net)
++		return;
++
++	*interval = net->tx_interval;
++	*count = net->tx_cnt;
++}
++
++struct mesh_io *mesh_net_get_io(struct mesh_net *net)
++{
++	if (!net)
++		return NULL;
++
++	return net->io;
++}
++
++struct mesh_prov *mesh_net_get_prov(struct mesh_net *net)
++{
++	if (!net)
++		return NULL;
++
++	return net->prov;
++}
++
++void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov)
++{
++	if (!net)
++		return;
++
++	net->prov = prov;
++}
++
+ bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
+ 				uint16_t net_idx,  uint8_t net_key[16],
+ 				uint16_t unicast, uint16_t snb_flags,
+@@ -3637,3 +4178,11 @@ void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned)
+ 					acceptor_prov_receive, net);
+ 	}
+ }
++
++bool mesh_net_provisioned_get(struct mesh_net *net)
++{
++	if (!net)
++		return false;
++
++	return net->provisioned;
++}
+-- 
+2.14.4
 
