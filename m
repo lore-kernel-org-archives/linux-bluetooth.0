@@ -1,79 +1,70 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH v5 5/7] Bluetooth: Extend btuart driver for join more
- vendor devices
+Subject: Re: [PATCH v5 4/7] Bluetooth: Add new quirk for non-persistent setup
+ settings
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <85d449cdd34bf47d72935a821915e825c64a2145.1531150733.git.sean.wang@mediatek.com>
-Date: Sat, 14 Jul 2018 18:44:49 +0200
+In-Reply-To: <4b188c8a508340598dda233f6d49a16c9ac8784e.1531150733.git.sean.wang@mediatek.com>
+Date: Sat, 14 Jul 2018 18:34:29 +0200
 Cc: robh+dt@kernel.org, mark.rutland@arm.com,
         Johan Hedberg <johan.hedberg@gmail.com>,
         devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org,
         linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Message-Id: <70616B99-5A2D-417A-8815-246700EEF4E2@holtmann.org>
+Message-Id: <2825B722-E75C-4A3C-8110-879205E46C0E@holtmann.org>
 References: <cover.1531150733.git.sean.wang@mediatek.com>
- <85d449cdd34bf47d72935a821915e825c64a2145.1531150733.git.sean.wang@mediatek.com>
+ <4b188c8a508340598dda233f6d49a16c9ac8784e.1531150733.git.sean.wang@mediatek.com>
 To: sean.wang@mediatek.com
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Sean,
 
-> Adding an independent btuart.h header allows these essential definitions
-> can be reused in vendor driver. Also, struct btuart_vnd is extended with
-> additional callbacks such as .init initializing vendor data, .shtudown,
-> .recv and .send supporting SoC specific framing for that btuart can
-> simply adapt to various Bluetooth uart-based devices.
+> Add a new quirk HCI_QUIRK_NON_PERSISTENT_SETUP allowing that a quirk that
+> runs setup() after every open() and not just after the first open().
 > 
 > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 > ---
-> drivers/bluetooth/btuart.c | 73 ++++++++++++++++++++++++----------------------
-> drivers/bluetooth/btuart.h | 30 +++++++++++++++++++
-> 2 files changed, 68 insertions(+), 35 deletions(-)
-> create mode 100644 drivers/bluetooth/btuart.h
+> include/net/bluetooth/hci.h | 9 +++++++++
+> net/bluetooth/hci_core.c    | 3 ++-
+> 2 files changed, 11 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/bluetooth/btuart.c b/drivers/bluetooth/btuart.c
-> index a900aac..65d0086 100644
-> --- a/drivers/bluetooth/btuart.c
-> +++ b/drivers/bluetooth/btuart.c
-> @@ -33,35 +33,11 @@
-> #include <net/bluetooth/hci_core.h>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 73e48be..d3ec5b2a8 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -183,6 +183,15 @@ enum {
+> 	 * during the hdev->setup vendor callback.
+> 	 */
+> 	HCI_QUIRK_NON_PERSISTENT_DIAG,
+> +
+> +	/* When this quirk is set, setup() would be run after every
+> +	 * open() and not just after the first open().
+> +	 *
+> +	 * This quirk can be set before hci_register_dev is called or
+> +	 * during the hdev->setup vendor callback.
+> +	 *
+> +	 */
+> +	HCI_QUIRK_NON_PERSISTENT_SETUP,
+> };
 > 
-> #include "h4_recv.h"
-> +#include "btuart.h"
-> #include "btbcm.h"
+> /* HCI device flags */
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index f5c21004..0111280 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1396,7 +1396,8 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+> 	atomic_set(&hdev->cmd_cnt, 1);
+> 	set_bit(HCI_INIT, &hdev->flags);
 > 
-> #define VERSION "1.0"
-> 
-> -struct btuart_vnd {
-> -	const struct h4_recv_pkt *recv_pkts;
-> -	int recv_pkts_cnt;
-> -	unsigned int manufacturer;
-> -	int (*open)(struct hci_dev *hdev);
-> -	int (*close)(struct hci_dev *hdev);
-> -	int (*setup)(struct hci_dev *hdev);
-> -};
-> -
-> -struct btuart_dev {
-> -	struct hci_dev *hdev;
-> -	struct serdev_device *serdev;
-> -
-> -	struct work_struct tx_work;
-> -	unsigned long tx_state;
-> -	struct sk_buff_head txq;
-> -
-> -	struct sk_buff *rx_skb;
-> -
-> -	const struct btuart_vnd *vnd;
-> -};
+> -	if (hci_dev_test_flag(hdev, HCI_SETUP)) {
+> +	if (hci_dev_test_flag(hdev, HCI_SETUP) ||
+> +	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+> 		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
 
-I really like to avoid this since it is not clean. Frankly I prefer to keep the btuart.c driver for drivers that really just use H:4 as transport protocol. If the protocol is only H:4 alike and has extra headers, then it should be a separate driver.
-
-The common H:4 handling is abstracted in h4_recv.h already anyway and we can add more pieces if needed. However I also wonder since you have extra framing that the complex H:4 state keeping might be not needed at all. So it could be simplified.
+can you include the extract of btmon on how the HCI_DEV_SETUP event shows up in the traces? I remember that I asked about something like that.
 
 Regards
 
 Marcel
-
