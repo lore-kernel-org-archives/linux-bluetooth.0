@@ -2,28 +2,26 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-        inga.stotland@intel.com
-Subject: [PATCH BlueZ v7 11/14] mesh: Mesh config server model
-Date: Sat, 14 Jul 2018 12:59:00 -0700
-Message-Id: <20180714195903.7402-12-brian.gix@intel.com>
+        inga.stotland@intel.com, Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ v7 02/14] mesh: Mesh crypto support
+Date: Sat, 14 Jul 2018 12:58:51 -0700
+Message-Id: <20180714195903.7402-3-brian.gix@intel.com>
 In-Reply-To: <20180714195903.7402-1-brian.gix@intel.com>
 References: <20180714195903.7402-1-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Inga Stotland <inga.stotland@intel.com>
-
 ---
- mesh/cfgmod-server.c | 1194 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 1194 insertions(+)
- create mode 100644 mesh/cfgmod-server.c
+ mesh/crypto.c | 1545 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 1545 insertions(+)
+ create mode 100644 mesh/crypto.c
 
-diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+diff --git a/mesh/crypto.c b/mesh/crypto.c
 new file mode 100644
-index 000000000..e982c79b3
+index 000000000..dda867924
 --- /dev/null
-+++ b/mesh/cfgmod-server.c
-@@ -0,0 +1,1194 @@
++++ b/mesh/crypto.c
+@@ -0,0 +1,1545 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -41,1182 +39,1533 @@ index 000000000..e982c79b3
 + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 + *  Lesser General Public License for more details.
 + *
-+ *
 + */
 +
 +#ifdef HAVE_CONFIG_H
 +#include <config.h>
 +#endif
 +
++#include <fcntl.h>
 +#include <unistd.h>
-+#include <stdio.h>
-+#include <sys/time.h>
++#include <string.h>
++#include <sys/socket.h>
 +#include <ell/ell.h>
 +
-+#include "mesh/mesh-defs.h"
++#include <linux/if_alg.h>
++
++#ifndef SOL_ALG
++#define SOL_ALG		279
++#endif
++
++#ifndef ALG_SET_AEAD_AUTHSIZE
++#define ALG_SET_AEAD_AUTHSIZE	5
++#endif
 +
 +#include "mesh/mesh.h"
 +#include "mesh/node.h"
 +#include "mesh/net.h"
-+#include "mesh/appkey.h"
-+#include "mesh/model.h"
-+#include "mesh/storage.h"
++#include "mesh/crypto.h"
 +
-+#include "mesh/cfgmod.h"
++/* Multiply used Zero array */
++static const uint8_t zero[16] = { 0, };
 +
-+#define CFG_MAX_MSG_LEN 380
-+
-+static void send_pub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
-+			uint8_t status, uint16_t ele_addr, uint16_t pub_addr,
-+			uint32_t mod_id, uint16_t idx, bool cred_flag,
-+			uint8_t ttl, uint8_t period, uint8_t retransmit)
++static int alg_new(int fd, const void *keyval, socklen_t keylen,
++							size_t mic_size)
 +{
-+	uint8_t msg[16];
-+	size_t n;
-+
-+	n = mesh_model_opcode_set(OP_CONFIG_MODEL_PUB_STATUS, msg);
-+	msg[n++] = status;
-+	l_put_le16(ele_addr, msg + n);
-+	n += 2;
-+	l_put_le16(pub_addr, msg + n);
-+	n += 2;
-+	idx |= cred_flag ? CREDFLAG_MASK : 0;
-+	l_put_le16(idx, msg + n);
-+	n += 2;
-+	msg[n++] = ttl;
-+	msg[n++] = period;
-+	msg[n++] = retransmit;
-+	if (mod_id < 0x10000) {
-+		l_put_le16(mod_id, msg + n);
-+		n += 2;
-+	} else {
-+		l_put_le16(mod_id >> 16, msg + n);
-+		n += 2;
-+		l_put_le16(mod_id, msg + n);
-+		n += 2;
-+	}
-+
-+	mesh_model_send(net, CONFIG_SRV_MODEL,
-+			dst, src,
-+			APP_IDX_DEV, DEFAULT_TTL, msg, n);
-+}
-+
-+static bool config_pub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
-+					const uint8_t *pkt, uint16_t size)
-+{
-+	uint32_t mod_id;
-+	uint16_t ele_addr;
-+	int ele_idx;
-+	struct mesh_model_pub *pub;
-+	int status;
-+
-+	if (size == 4)
-+		mod_id = l_get_le16(pkt + 2);
-+	else if (size == 6) {
-+		mod_id = l_get_le16(pkt + 2) << 16;
-+		mod_id |= l_get_le16(pkt + 4);
-+	} else
-+		return false;
-+
-+	ele_addr = l_get_le16(pkt);
-+	ele_idx = node_get_element_idx(mesh_net_local_node_get(net), ele_addr);
-+
-+	if (ele_idx >= 0)
-+		pub = mesh_model_pub_get(net, ele_idx, mod_id, &status);
-+	else
-+		status = MESH_STATUS_INVALID_ADDRESS;
-+
-+	if (pub && status == MESH_STATUS_SUCCESS)
-+		send_pub_status(net, src, dst, status, ele_addr, pub->addr,
-+				mod_id, pub->idx, pub->credential, pub->ttl,
-+						pub->period, pub->retransmit);
-+	else
-+		send_pub_status(net, src, dst, status, ele_addr, 0, mod_id,
-+								0, 0, 0, 0, 0);
-+	return true;
-+}
-+
-+static bool config_pub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
-+					const uint8_t *pkt, uint16_t size,
-+					bool unreliable)
-+{
-+	uint32_t mod_id;
-+	uint16_t ele_addr, idx, ota = 0;
-+	const uint8_t *pub_addr;
-+	uint16_t test_addr;
-+	uint8_t ttl, period;
-+	uint8_t retransmit;
-+	int status;
-+	bool cred_flag, b_virt = false;
-+
-+	switch (size) {
-+	default:
-+		return false;
-+
-+	case 11:
-+		idx = l_get_le16(pkt + 4);
-+		ttl = pkt[6];
-+		period = pkt[7];
-+		retransmit = pkt[8];
-+		mod_id = l_get_le16(pkt + 9);
-+		break;
-+
-+	case 13:
-+		idx = l_get_le16(pkt + 4);
-+		ttl = pkt[6];
-+		period = pkt[7];
-+		retransmit = pkt[8];
-+		mod_id = l_get_le16(pkt + 9) << 16;
-+		mod_id |= l_get_le16(pkt + 11);
-+		break;
-+
-+	case 25:
-+		b_virt = true;
-+		idx = l_get_le16(pkt + 18);
-+		ttl = pkt[20];
-+		period = pkt[21];
-+		retransmit = pkt[22];
-+		mod_id = l_get_le16(pkt + 23);
-+		break;
-+
-+	case 27:
-+		b_virt = true;
-+		idx = l_get_le16(pkt + 18);
-+		ttl = pkt[20];
-+		period = pkt[21];
-+		retransmit = pkt[22];
-+		mod_id = l_get_le16(pkt + 23) << 16;
-+		mod_id |= l_get_le16(pkt + 25);
-+		break;
-+	}
-+	ele_addr = l_get_le16(pkt);
-+	pub_addr = pkt + 2;
-+
-+	/* Doesn't accept out-of-range TTLs */
-+	if (ttl > TTL_MASK && ttl != DEFAULT_TTL)
-+		return false;
-+
-+	/* Get cred_flag */
-+	cred_flag = !!(CREDFLAG_MASK & idx);
-+
-+	/* Ignore non-IDX bits */
-+	idx &= APP_IDX_MASK;
-+
-+	/* Doesn't accept virtual seeming addresses */
-+	test_addr = l_get_le16(pub_addr);
-+	if (!b_virt && test_addr > 0x7fff && test_addr < 0xc000)
-+		return false;
-+
-+	status = mesh_model_pub_set(net, ele_addr, mod_id, pub_addr, idx,
-+					cred_flag, ttl, period, retransmit,
-+					b_virt, &ota);
-+
-+	l_info("pub_set: status %d, ea %4.4x, ota: %4.4x, mod: %x, idx: %3.3x",
-+					status, ele_addr, ota, mod_id, idx);
-+
-+	if (IS_UNASSIGNED(ota) && !b_virt)
-+		ttl = period = idx = 0;
-+
-+	if (status >= 0 && !unreliable)
-+		send_pub_status(net, src, dst, status, ele_addr, ota,
-+				mod_id, idx, cred_flag, ttl, period,
-+				retransmit);
-+	return true;
-+}
-+
-+static void send_sub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
-+					uint8_t status, uint16_t ele_addr,
-+					uint16_t addr, uint32_t mod)
-+{
-+	uint8_t msg[12];
-+	int n = mesh_model_opcode_set(OP_CONFIG_MODEL_SUB_STATUS, msg);
-+
-+	msg[n++] = status;
-+	l_put_le16(ele_addr, msg + n);
-+	n += 2;
-+	l_put_le16(addr, msg + n);
-+	n += 2;
-+	if (mod >= 0x10000) {
-+		l_put_le16(mod >> 16, msg + n);
-+		l_put_le16(mod, msg + n + 2);
-+		n += 4;
-+	} else {
-+		l_put_le16(mod, msg + n);
-+		n += 2;
-+	}
-+
-+	mesh_model_send(net, CONFIG_SRV_MODEL, dst, src, APP_IDX_DEV,
-+							DEFAULT_TTL, msg, n);
-+}
-+
-+static bool config_sub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
-+					const uint8_t *pkt, uint16_t size)
-+{
-+	uint16_t ele_addr;
-+	uint32_t mod_id;
-+	uint16_t n = 0;
-+	int ret = 0;
-+	uint8_t *status;
-+	uint16_t buf_size;
-+	uint8_t msg[5 + sizeof(uint16_t) * MAX_GRP_PER_MOD];
-+
-+	/* Incoming message has already been size-checked */
-+	ele_addr = l_get_le16(pkt);
-+
-+	switch (size) {
-+	default:
-+		l_debug("Bad Len Cfg_Pub_Set: %d", size);
-+		return false;
-+
-+	case 4:
-+		mod_id = l_get_le16(pkt + 2);
-+		n = mesh_model_opcode_set(OP_CONFIG_MODEL_SUB_LIST, msg);
-+		status = msg + n;
-+		msg[n++] = 0;
-+		l_put_le16(ele_addr, msg + n);
-+		n += 2;
-+		l_put_le16(mod_id, msg + n);
-+		n += 2;
-+		break;
-+
-+	case 6:
-+		mod_id = l_get_le16(pkt + 2) << 16;
-+		mod_id |= l_get_le16(pkt + 4);
-+		n = mesh_model_opcode_set(OP_CONFIG_VEND_MODEL_SUB_LIST, msg);
-+		status = msg + n;
-+		msg[n++] = 0;
-+		l_put_le16(ele_addr, msg + n);
-+		n += 2;
-+		l_put_le16(mod_id >> 16, msg + n);
-+		n += 2;
-+		l_put_le16(mod_id, msg + n);
-+		n += 2;
-+		break;
-+	}
-+
-+	buf_size = sizeof(uint16_t) * MAX_GRP_PER_MOD;
-+	ret = mesh_model_sub_get(net, ele_addr, mod_id, msg + n, buf_size,
-+									&size);
-+
-+	if (!ret)
-+		n += size;
-+	else if (ret > 0)
-+		*status = ret;
-+
-+	mesh_model_send(net, CONFIG_SRV_MODEL,
-+			dst, src, APP_IDX_DEV,
-+			DEFAULT_TTL, msg, n);
-+	return true;
-+}
-+
-+static void config_sub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
-+					const uint8_t *pkt, uint16_t size,
-+					bool virt, uint32_t opcode)
-+{
-+	uint16_t grp, ele_addr;
-+	bool unreliable = !!(opcode & OP_UNRELIABLE);
-+	uint32_t mod_id, func;
-+	const uint8_t *addr = NULL;
-+	int status = 0;
-+
-+	switch (size) {
-+	default:
-+		l_error("Bad Len Cfg_Sub_Set: %d", size);
-+		return;
-+	case 4:
-+		if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL)
-+			return;
-+		mod_id = l_get_le16(pkt + 2);
-+		break;
-+	case 6:
-+		if (virt)
-+			return;
-+		if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL)
-+			mod_id = l_get_le16(pkt + 4);
-+		else {
-+			mod_id = l_get_le16(pkt + 2) << 16;
-+			mod_id |= l_get_le16(pkt + 4);
-+		}
-+		break;
-+	case 8:
-+		if (virt)
-+			return;
-+		mod_id = l_get_le16(pkt + 4) << 16;
-+		mod_id |= l_get_le16(pkt + 6);
-+		break;
-+	case 20:
-+		if (!virt)
-+			return;
-+		mod_id = l_get_le16(pkt + 18);
-+		break;
-+	case 22:
-+		if (!virt)
-+			return;
-+		mod_id = l_get_le16(pkt + 18) << 16;
-+		mod_id |= l_get_le16(pkt + 20);
-+		break;
-+	}
-+	ele_addr = l_get_le16(pkt);
-+
-+	if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL) {
-+		addr = pkt + 2;
-+		grp = l_get_le16(addr);
-+	} else
-+		grp = UNASSIGNED_ADDRESS;
-+
-+	func = opcode & ~OP_UNRELIABLE;
-+	switch (func) {
-+	default:
-+		l_info("Bad opcode: %x", func);
-+		return;
-+
-+	case OP_CONFIG_MODEL_SUB_DELETE_ALL:
-+		status = mesh_model_sub_del_all(net, ele_addr, mod_id);
-+		break;
-+
-+	case OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE:
-+		grp = UNASSIGNED_ADDRESS;
-+		/* Fall Through */
-+	case OP_CONFIG_MODEL_SUB_OVERWRITE:
-+		status = mesh_model_sub_ovr(net, ele_addr, mod_id,
-+							addr, virt, &grp);
-+		break;
-+	case OP_CONFIG_MODEL_SUB_VIRT_ADD:
-+		grp = UNASSIGNED_ADDRESS;
-+		/* Fall Through */
-+	case OP_CONFIG_MODEL_SUB_ADD:
-+		status = mesh_model_sub_add(net, ele_addr, mod_id,
-+							addr, virt, &grp);
-+		break;
-+	case OP_CONFIG_MODEL_SUB_VIRT_DELETE:
-+		grp = UNASSIGNED_ADDRESS;
-+		/* Fall Through */
-+	case OP_CONFIG_MODEL_SUB_DELETE:
-+		status = mesh_model_sub_del(net, ele_addr, mod_id,
-+							addr, virt, &grp);
-+		break;
-+	}
-+
-+	if (!unreliable && status >= 0)
-+		send_sub_status(net, src, dst, status, ele_addr, grp, mod_id);
-+
-+}
-+
-+static void send_model_app_status(struct mesh_net *net, uint16_t src,
-+					uint16_t dst, uint8_t status,
-+					uint16_t addr, uint32_t id,
-+					uint16_t idx)
-+{
-+	uint8_t msg[12];
-+	size_t n = mesh_model_opcode_set(OP_MODEL_APP_STATUS, msg);
-+
-+	msg[n++] = status;
-+	l_put_le16(addr, msg + n);
-+	n += 2;
-+	l_put_le16(idx, msg + n);
-+	n += 2;
-+	if (id > 0xffff) {
-+		l_put_le16(id >> 16, msg + n);
-+		n += 2;
-+	}
-+	l_put_le16(id, msg + n);
-+	n += 2;
-+
-+	mesh_model_send(net, CONFIG_SRV_MODEL, dst, src, APP_IDX_DEV,
-+				DEFAULT_TTL, msg, n);
-+}
-+
-+static void model_app_list(struct mesh_net *net, uint16_t src, uint16_t dst,
-+					const uint8_t *pkt, uint16_t size)
-+{
-+	uint16_t ele_addr;
-+	uint32_t mod_id = 0xffff;
-+	uint8_t *msg = NULL;
-+	uint8_t *status;
-+	uint16_t n, buf_size;
-+	int result;
-+
-+	buf_size = MAX_BINDINGS * sizeof(uint16_t);
-+	msg = l_malloc(7 + buf_size);
-+	if (!msg)
-+		return;
-+
-+	ele_addr = l_get_le16(pkt);
-+
-+	switch (size) {
-+	default:
-+		l_free(msg);
-+		return;
-+	case 4:
-+		n = mesh_model_opcode_set(OP_MODEL_APP_LIST, msg);
-+		status = msg + n;
-+		mod_id = l_get_le16(pkt + 2);
-+		l_put_le16(ele_addr, msg + 1 + n);
-+		l_put_le16(mod_id, msg + 3 + n);
-+		n += 5;
-+		break;
-+	case 6:
-+		n = mesh_model_opcode_set(OP_VEND_MODEL_APP_LIST, msg);
-+		status = msg + n;
-+		mod_id = l_get_le16(pkt + 2) << 16;
-+		mod_id |= l_get_le16(pkt + 4);
-+
-+		l_put_le16(ele_addr, msg + 1 + n);
-+		l_put_le16(mod_id >> 16, msg + 3 + n);
-+		l_put_le16(mod_id, msg + 5 + n);
-+		n += 7;
-+		break;
-+	}
-+
-+
-+	result = mesh_model_get_bindings(net, ele_addr, mod_id, msg + n,
-+							buf_size, &size);
-+	n += size;
-+
-+	if (result >= 0) {
-+		*status = result;
-+		mesh_model_send(net, CONFIG_SRV_MODEL, dst, src, APP_IDX_DEV,
-+					DEFAULT_TTL, msg, n);
-+	}
-+
-+	l_free(msg);
-+}
-+
-+static bool model_app_bind(struct mesh_net *net, uint16_t src, uint16_t dst,
-+					const uint8_t *pkt, uint16_t size,
-+					bool unbind)
-+{
-+	uint16_t ele_addr;
-+	uint32_t mod_id;
-+	uint16_t idx;
-+	int result;
-+
-+	switch (size) {
-+	default:
-+		return false;
-+
-+	case 6:
-+		mod_id = l_get_le16(pkt + 4);
-+		break;
-+	case 8:
-+		mod_id = l_get_le16(pkt + 4) << 16;
-+		mod_id |= l_get_le16(pkt + 6);
-+		break;
-+	}
-+
-+	ele_addr = l_get_le16(pkt);
-+	idx = l_get_le16(pkt + 2);
-+
-+	if (idx > 0xfff)
-+		return false;
-+
-+	if (unbind)
-+		result = mesh_model_binding_del(net, ele_addr, mod_id, idx);
-+	else
-+		result = mesh_model_binding_add(net, ele_addr, mod_id, idx);
-+
-+	send_model_app_status(net, src, dst, result, ele_addr, mod_id, idx);
-+
-+	return true;
-+}
-+
-+static void hb_pub_timeout_func(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_net *net = user_data;
-+	struct mesh_net_heartbeat *hb = mesh_net_heartbeat_get(net);
-+
-+	mesh_net_heartbeat_send(net);
-+
-+	if (hb->pub_count != 0xffff)
-+		hb->pub_count--;
-+	if (hb->pub_count > 0)
-+		l_timeout_modify(hb->pub_timer, hb->pub_period);
-+	else {
-+		l_timeout_remove(hb->pub_timer);
-+		hb->pub_timer = NULL;
-+	}
-+	l_debug("%d left", hb->pub_count);
-+}
-+
-+static void update_hb_pub_timer(struct mesh_net *net,
-+						struct mesh_net_heartbeat *hb)
-+{
-+	if (IS_UNASSIGNED(hb->pub_dst) || hb->pub_count == 0) {
-+		l_timeout_remove(hb->pub_timer);
-+		hb->pub_timer = NULL;
-+		return;
-+	}
-+
-+	if (!hb->pub_timer)
-+		hb->pub_timer = l_timeout_create(hb->pub_period,
-+					hb_pub_timeout_func, net, NULL);
-+	else
-+		l_timeout_modify(hb->pub_timer, hb->pub_period);
-+}
-+
-+static void hb_sub_timeout_func(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_net *net = user_data;
-+	struct mesh_net_heartbeat *hb = mesh_net_heartbeat_get(net);
-+
-+	l_info("HB Subscription Ended");
-+	l_timeout_remove(hb->sub_timer);
-+	hb->sub_timer = NULL;
-+	hb->sub_enabled = false;
-+}
-+
-+static uint8_t uint32_to_log(uint32_t value)
-+{
-+	uint32_t val = 1;
-+	uint8_t ret = 1;
-+
-+	if (!value)
-+		return 0;
-+	else if (value > 0x10000)
-+		return 0xff;
-+
-+	while (val < value) {
-+		val <<= 1;
-+		ret++;
-+	}
-+
-+	return ret;
-+}
-+
-+static uint32_t log_to_uint32(uint8_t log, uint8_t offset)
-+{
-+	if (!log)
-+		return 0x0000;
-+	else if (log > 0x11)
-+		return 0xffff;
-+	else
-+		return (1 << (log - offset));
-+}
-+
-+
-+static int hb_subscription_set(struct mesh_net *net, uint16_t src,
-+					uint16_t dst, uint8_t period_log)
-+{
-+	struct mesh_net_heartbeat *hb = mesh_net_heartbeat_get(net);
-+	struct timeval time_now;
-+
-+	/* SRC must be Unicast, DST can be any legal address except Virtual */
-+	if ((!IS_UNASSIGNED(src) && !IS_UNICAST(src)) || IS_VIRTUAL(dst))
++	if (setsockopt(fd, SOL_ALG, ALG_SET_KEY, keyval, keylen) < 0)
 +		return -1;
 +
-+	/* Check if the subscription should be disabled */
-+	if (IS_UNASSIGNED(src) || IS_UNASSIGNED(dst)) {
-+		if (IS_GROUP(hb->sub_dst))
-+			mesh_net_dst_unreg(net, hb->sub_dst);
++	if (mic_size &&
++		setsockopt(fd, SOL_ALG, ALG_SET_AEAD_AUTHSIZE,
++							NULL, mic_size) < 0)
++		return -1;
 +
-+		l_timeout_remove(hb->sub_timer);
-+		hb->sub_timer = NULL;
-+		hb->sub_enabled = false;
-+		hb->sub_dst = UNASSIGNED_ADDRESS;
-+		hb->sub_src = UNASSIGNED_ADDRESS;
-+		hb->sub_count = 0;
-+		hb->sub_period = 0;
-+		hb->sub_min_hops = 0;
-+		hb->sub_max_hops = 0;
-+		return MESH_STATUS_SUCCESS;
-+	} else if (!period_log && src == hb->sub_src && dst == hb->sub_dst) {
-+		/* Preserve collected data, but disable */
-+		l_timeout_remove(hb->sub_timer);
-+		hb->sub_timer = NULL;
-+		hb->sub_enabled = false;
-+		hb->sub_period = 0;
-+		return MESH_STATUS_SUCCESS;
-+	}
-+
-+	if (hb->sub_dst != dst) {
-+		if (IS_GROUP(hb->sub_dst))
-+			mesh_net_dst_unreg(net, hb->sub_dst);
-+		if (IS_GROUP(dst))
-+			mesh_net_dst_reg(net, dst);
-+	}
-+
-+	hb->sub_enabled = !!period_log;
-+	hb->sub_src = src;
-+	hb->sub_dst = dst;
-+	hb->sub_count = 0;
-+	hb->sub_period = log_to_uint32(period_log, 1);
-+	hb->sub_min_hops = 0x00;
-+	hb->sub_max_hops = 0x00;
-+
-+	gettimeofday(&time_now, NULL);
-+	hb->sub_start = time_now.tv_sec;
-+
-+	if (!hb->sub_enabled) {
-+		l_timeout_remove(hb->sub_timer);
-+		hb->sub_timer = NULL;
-+		return MESH_STATUS_SUCCESS;
-+	}
-+
-+	hb->sub_min_hops = 0xff;
-+
-+	if (!hb->sub_timer)
-+		hb->sub_timer = l_timeout_create(hb->sub_period,
-+						hb_sub_timeout_func, net, NULL);
-+	else
-+		l_timeout_modify(hb->sub_timer, hb->sub_period);
-+
-+	return MESH_STATUS_SUCCESS;
++	/* FIXME: This should use accept4() with SOCK_CLOEXEC */
++	return accept(fd, NULL, 0);
 +}
 +
-+static void node_reset(struct l_timeout *timeout, void *user_data)
++static bool alg_encrypt(int fd, const void *inbuf, size_t inlen,
++						void *outbuf, size_t outlen)
 +{
-+	l_info("Node Reset");
-+	l_timeout_remove(timeout);
-+	l_main_quit();
-+}
++	__u32 alg_op = ALG_OP_ENCRYPT;
++	char cbuf[CMSG_SPACE(sizeof(alg_op))];
++	struct cmsghdr *cmsg;
++	struct msghdr msg;
++	struct iovec iov;
++	ssize_t len;
 +
-+static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
-+				uint16_t unicast, uint16_t idx,
-+				const uint8_t *data, uint16_t size,
-+				uint8_t ttl, const void *user_data)
-+{
-+	struct mesh_net *net = (struct mesh_net *) user_data;
-+	const uint8_t *pkt = data;
-+	struct timeval time_now;
-+	uint32_t opcode, tmp32;
-+	int b_res = MESH_STATUS_SUCCESS;
-+	uint8_t msg[11];
-+	uint8_t *long_msg = NULL;
-+	struct mesh_net_heartbeat *hb;
-+	uint16_t net_idx, app_idx;
-+	uint8_t state, status;
-+	uint8_t phase;
-+	bool virt = false;
-+	uint8_t count;
-+	uint16_t interval;
-+	struct mesh_node *node;
-+	uint16_t n;
++	memset(cbuf, 0, sizeof(cbuf));
++	memset(&msg, 0, sizeof(msg));
 +
-+	if (idx != APP_IDX_DEV)
++	msg.msg_control = cbuf;
++	msg.msg_controllen = sizeof(cbuf);
++
++	cmsg = CMSG_FIRSTHDR(&msg);
++	cmsg->cmsg_level = SOL_ALG;
++	cmsg->cmsg_type = ALG_SET_OP;
++	cmsg->cmsg_len = CMSG_LEN(sizeof(alg_op));
++	memcpy(CMSG_DATA(cmsg), &alg_op, sizeof(alg_op));
++
++	iov.iov_base = (void *) inbuf;
++	iov.iov_len = inlen;
++
++	msg.msg_iov = &iov;
++	msg.msg_iovlen = 1;
++
++	len = sendmsg(fd, &msg, 0);
++	if (len < 0)
 +		return false;
 +
-+	if (mesh_model_opcode_get(pkt, size, &opcode, &n)) {
-+		size -= n;
-+		pkt += n;
-+	} else
++	len = read(fd, outbuf, outlen);
++	if (len < 0)
 +		return false;
-+
-+	hb = mesh_net_heartbeat_get(net);
-+	l_debug("CONFIG-SRV-opcode 0x%x size %u idx %3.3x", opcode, size, idx);
-+
-+	node = mesh_net_local_node_get(net);
-+	n = 0;
-+
-+	switch (opcode) {
-+	default:
-+		return false;
-+
-+	case OP_DEV_COMP_GET:
-+		if (size != 1)
-+			return false;
-+
-+		/* Only page 0 is currently supported */
-+		if (pkt[0] != 0) {
-+			l_info("Unsupported page number %d", pkt[0]);
-+			l_info("Returning page number 0");
-+		}
-+		long_msg = l_malloc(CFG_MAX_MSG_LEN);
-+		n = mesh_model_opcode_set(OP_DEV_COMP_STATUS, long_msg);
-+		long_msg[n++] = 0;
-+		n += node_generate_comp(node, long_msg + n,
-+							CFG_MAX_MSG_LEN - n);
-+
-+		break;
-+
-+	case OP_CONFIG_DEFAULT_TTL_SET:
-+		if (size != 1 || pkt[0] > TTL_MASK || pkt[0] == 1)
-+			return true;
-+
-+		if (pkt[0] <= TTL_MASK)
-+			node_default_ttl_set(node, pkt[0]);
-+		/* Fall Through */
-+
-+	case OP_CONFIG_DEFAULT_TTL_GET:
-+		l_info("Get/Set Default TTL");
-+
-+		n = mesh_model_opcode_set(OP_CONFIG_DEFAULT_TTL_STATUS, msg);
-+		msg[n++] = node_default_ttl_get(node);
-+		break;
-+
-+	case OP_CONFIG_MODEL_PUB_VIRT_SET:
-+		if (size != 25 && size != 27)
-+			return true;
-+
-+		config_pub_set(net, src, unicast, pkt, size,
-+				!!(opcode & OP_UNRELIABLE));
-+		break;
-+
-+	case OP_CONFIG_MODEL_PUB_SET:
-+		if (size != 11 && size != 13)
-+			return true;
-+
-+		config_pub_set(net, src, unicast, pkt, size,
-+				!!(opcode & OP_UNRELIABLE));
-+		break;
-+
-+	case OP_CONFIG_MODEL_PUB_GET:
-+		config_pub_get(net, src, unicast, pkt, size);
-+		break;
-+
-+	case OP_CONFIG_VEND_MODEL_SUB_GET:
-+		if (size != 6)
-+			return true;
-+		config_sub_get(net, src, unicast, pkt, size);
-+		break;
-+
-+	case OP_CONFIG_MODEL_SUB_GET:
-+		if (size != 4)
-+			return true;
-+		config_sub_get(net, src, unicast, pkt, size);
-+		break;
-+
-+	case OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE:
-+	case OP_CONFIG_MODEL_SUB_VIRT_DELETE:
-+	case OP_CONFIG_MODEL_SUB_VIRT_ADD:
-+		virt = true;
-+		/* Fall Through */
-+	case OP_CONFIG_MODEL_SUB_OVERWRITE:
-+	case OP_CONFIG_MODEL_SUB_DELETE:
-+	case OP_CONFIG_MODEL_SUB_ADD:
-+	case OP_CONFIG_MODEL_SUB_DELETE_ALL:
-+		config_sub_set(net, src, unicast, pkt, size, virt, opcode);
-+		break;
-+
-+	case OP_CONFIG_RELAY_SET:
-+		if (size != 2 || pkt[0] > 0x01)
-+			return true;
-+
-+		count = (pkt[1] >> 5) + 1;
-+		interval = ((pkt[1] & 0x1f) + 1) * 10;
-+		node_relay_mode_set(node, !!pkt[0], pkt[1]>>5,
-+					pkt[1] & 0x1f);
-+		/* Fall Through */
-+
-+	case OP_CONFIG_RELAY_GET:
-+		n = mesh_model_opcode_set(OP_CONFIG_RELAY_STATUS, msg);
-+
-+		msg[n++] = node_relay_mode_get(node, &count, &interval);
-+		msg[n++] = ((count - 1) << 5) + ((interval/10 - 1) & 0x1f);
-+
-+		l_info("Get/Set Relay Config (%d)", msg[n-1]);
-+		break;
-+
-+	case OP_CONFIG_NETWORK_TRANSMIT_SET:
-+		if (size != 1)
-+			return true;
-+
-+		count = (pkt[0] >> 5) + 1;
-+		interval = ((pkt[0] & 0x1f) + 1) * 10;
-+		if (storage_local_set_transmit_params(net, count, interval))
-+			mesh_net_transmit_params_set(net, count, interval);
-+		/* Fall Through */
-+
-+	case OP_CONFIG_NETWORK_TRANSMIT_GET:
-+		n = mesh_model_opcode_set(OP_CONFIG_NETWORK_TRANSMIT_STATUS,
-+									msg);
-+		mesh_net_transmit_params_get(net, &count, &interval);
-+		msg[n++] = ((count - 1) << 5) + ((interval/10 - 1) & 0x1f);
-+
-+		l_info("Get/Set Network Transmit Config");
-+		break;
-+
-+	case OP_CONFIG_PROXY_SET:
-+		if (size != 1 || pkt[0] > 0x01)
-+			return true;
-+
-+		node_proxy_mode_set(node, !!pkt[0]);
-+		/* Fall Through */
-+
-+	case OP_CONFIG_PROXY_GET:
-+		n = mesh_model_opcode_set(OP_CONFIG_PROXY_STATUS, msg);
-+
-+		msg[n++] = node_proxy_mode_get(node);
-+		l_info("Get/Set Config Proxy (%d)", msg[n-1]);
-+		break;
-+
-+	case OP_NODE_IDENTITY_SET:
-+		if (size != 3 || pkt[2] > 0x01)
-+			return true;
-+
-+		net_idx = l_get_le16(pkt);
-+		if (net_idx > 0xfff)
-+			return true;
-+
-+		/*
-+		 * Currently no support for proxy: node identity not supported
-+		 */
-+
-+		/* Fall Through */
-+
-+	case OP_NODE_IDENTITY_GET:
-+		if (size < 2)
-+			return true;
-+
-+		net_idx = l_get_le16(pkt);
-+		if (net_idx > 0xfff)
-+			return true;
-+
-+		n = mesh_model_opcode_set(OP_NODE_IDENTITY_STATUS, msg);
-+
-+		status = mesh_net_get_identity_mode(net, net_idx, &state);
-+
-+		msg[n++] = status;
-+
-+		l_put_le16(net_idx, msg + n);
-+		n += 2;
-+
-+		msg[n++] = state;
-+		l_info("Get/Set Config Identity (%d)", state);
-+		break;
-+
-+	case OP_CONFIG_BEACON_SET:
-+		if (size != 1 || pkt[0] > 0x01)
-+			return true;
-+
-+		node_beacon_mode_set(node, !!pkt[0]);
-+		/* Fall Through */
-+
-+	case OP_CONFIG_BEACON_GET:
-+		n = mesh_model_opcode_set(OP_CONFIG_BEACON_STATUS, msg);
-+
-+		msg[n++] = node_beacon_mode_get(node);
-+		l_info("Get/Set Config Beacon (%d)", msg[n-1]);
-+		break;
-+
-+	case OP_CONFIG_FRIEND_SET:
-+		if (size != 1 || pkt[0] > 0x01)
-+			return true;
-+
-+		node_friend_mode_set(node, !!pkt[0]);
-+		/* Fall Through */
-+
-+	case OP_CONFIG_FRIEND_GET:
-+
-+		n = mesh_model_opcode_set(OP_CONFIG_FRIEND_STATUS, msg);
-+
-+		msg[n++] = node_friend_mode_get(node);
-+		l_info("Get/Set Friend (%d)", msg[n-1]);
-+		break;
-+
-+	case OP_CONFIG_KEY_REFRESH_PHASE_SET:
-+		if (size != 3 || pkt[2] > 0x03)
-+			return true;
-+
-+		b_res = mesh_net_key_refresh_phase_set(net, l_get_le16(pkt),
-+							pkt[2]);
-+		size = 2;
-+		/* Fall Through */
-+
-+	case OP_CONFIG_KEY_REFRESH_PHASE_GET:
-+		if (size != 2)
-+			return true;
-+
-+		net_idx = l_get_le16(pkt);
-+
-+		n = mesh_model_opcode_set(OP_CONFIG_KEY_REFRESH_PHASE_STATUS,
-+						msg);
-+
-+		/* State: 0x00-0x03 phase of key refresh */
-+		status = mesh_net_key_refresh_phase_get(net, net_idx,
-+							&phase);
-+		if (status != MESH_STATUS_SUCCESS) {
-+			b_res = status;
-+			phase = KEY_REFRESH_PHASE_NONE;
-+		}
-+
-+		msg[n++] = b_res;
-+		l_put_le16(net_idx, msg + n);
-+		n += 2;
-+		msg[n++] = phase;
-+
-+		l_info("Get/Set Key Refresh State (%d)", msg[n-1]);
-+		break;
-+
-+	case OP_APPKEY_ADD:
-+	case OP_APPKEY_UPDATE:
-+		if (size != 19)
-+			return true;
-+
-+		net_idx = l_get_le16(pkt) & 0xfff;
-+		app_idx = l_get_le16(pkt + 1) >> 4;
-+		b_res = appkey_key_add(net, net_idx, app_idx, pkt + 3,
-+						opcode == OP_APPKEY_UPDATE);
-+
-+		l_info("Add/Update AppKey %s: Net_Idx %3.3x, App_Idx %3.3x",
-+			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail",
-+							net_idx, app_idx);
-+
-+
-+		n = mesh_model_opcode_set(OP_APPKEY_STATUS, msg);
-+
-+		msg[n++] = b_res;
-+		msg[n++] = pkt[0];
-+		msg[n++] = pkt[1];
-+		msg[n++] = pkt[2];
-+		break;
-+
-+	case OP_APPKEY_DELETE:
-+		if (size != 3)
-+			return
-+				true;
-+
-+		net_idx = l_get_le16(pkt) & 0xfff;
-+		app_idx = l_get_le16(pkt + 1) >> 4;
-+		b_res = appkey_key_delete(net, net_idx, app_idx);
-+		if (b_res == MESH_STATUS_SUCCESS)
-+			node_app_key_delete(net, dst, net_idx, app_idx);
-+		l_info("Delete AppKey %s Net_Idx %3.3x to App_Idx %3.3x",
-+			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail",
-+							net_idx, app_idx);
-+
-+		n = mesh_model_opcode_set(OP_APPKEY_STATUS, msg);
-+		msg[n++] = b_res;
-+		msg[n++] = pkt[0];
-+		msg[n++] = pkt[1];
-+		msg[n++] = pkt[2];
-+		break;
-+
-+	case OP_APPKEY_GET:
-+		if (size != 2)
-+			return true;
-+		net_idx = l_get_le16(pkt);
-+
-+		long_msg = l_malloc(CFG_MAX_MSG_LEN);
-+		n = mesh_model_opcode_set(OP_APPKEY_LIST, long_msg);
-+
-+		status = appkey_list(net, net_idx, long_msg + n + 3,
-+						CFG_MAX_MSG_LEN - n - 3, &size);
-+
-+		long_msg[n] = status;
-+		l_put_le16(net_idx, long_msg + n + 1);
-+		n += (size + 3);
-+		break;
-+
-+	case OP_NETKEY_ADD:
-+	case OP_NETKEY_UPDATE:
-+		if (size != 18)
-+			return true;
-+
-+		b_res = mesh_net_add_key(net, opcode == OP_NETKEY_UPDATE,
-+						l_get_le16(pkt), pkt + 2);
-+
-+		l_info("NetKey Add/Update %s",
-+			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail");
-+
-+		n = mesh_model_opcode_set(OP_NETKEY_STATUS, msg);
-+		msg[n++] = b_res;
-+		l_put_le16(l_get_le16(pkt), msg + n);
-+		n += 2;
-+		break;
-+
-+	case OP_NETKEY_DELETE:
-+		if (size != 2)
-+			return true;
-+
-+		b_res = mesh_net_del_key(net, l_get_le16(pkt));
-+
-+		l_info("NetKey delete %s",
-+			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail");
-+
-+		n = mesh_model_opcode_set(OP_NETKEY_STATUS, msg);
-+		msg[n++] = b_res;
-+		l_put_le16(l_get_le16(pkt), msg + n);
-+		n += 2;
-+		break;
-+
-+	case OP_NETKEY_GET:
-+		long_msg = l_malloc(CFG_MAX_MSG_LEN);
-+		n = mesh_model_opcode_set(OP_NETKEY_LIST, long_msg);
-+		size = CFG_MAX_MSG_LEN - n;
-+
-+		if (mesh_net_key_list_get(net, long_msg + n, &size))
-+			n += size;
-+		else
-+			n = 0;
-+		break;
-+
-+	case OP_MODEL_APP_BIND:
-+	case OP_MODEL_APP_UNBIND:
-+		model_app_bind(net, src, unicast, pkt, size,
-+				opcode != OP_MODEL_APP_BIND);
-+		break;
-+
-+	case OP_VEND_MODEL_APP_GET:
-+		if (size != 6)
-+			return true;
-+		model_app_list(net, src, unicast, pkt, size);
-+		break;
-+
-+	case OP_MODEL_APP_GET:
-+		if (size != 4)
-+			return true;
-+		model_app_list(net, src, unicast, pkt, size);
-+		break;
-+
-+	case OP_CONFIG_HEARTBEAT_PUB_SET:
-+		l_info("OP_CONFIG_HEARTBEAT_PUB_SET");
-+		if (size != 9) {
-+			l_info("bad size %d", size);
-+			return true;
-+		}
-+		if (pkt[2] > 0x11 || pkt[3] > 0x10 || pkt[4] > 0x7f)
-+			return true;
-+		else if (IS_VIRTUAL(l_get_le16(pkt)))
-+			b_res = MESH_STATUS_INVALID_ADDRESS;
-+		else if (l_get_le16(pkt + 7) != mesh_net_get_primary_idx(net))
-+			/* Future work: check for valid subnets */
-+			b_res = MESH_STATUS_INVALID_NETKEY;
-+
-+		n = mesh_model_opcode_set(OP_CONFIG_HEARTBEAT_PUB_STATUS,
-+						msg);
-+		msg[n++] = b_res;
-+
-+		memcpy(&msg[n], pkt, 9);
-+
-+		/* Ignore RFU bits in features */
-+		l_put_le16(l_get_le16(pkt + 5) & 0xf, &msg[n + 5]);
-+
-+		/* Add octet count to status */
-+		n += 9;
-+
-+		if (b_res != MESH_STATUS_SUCCESS)
-+			break;
-+
-+		hb->pub_dst = l_get_le16(pkt);
-+		if (hb->pub_dst == UNASSIGNED_ADDRESS ||
-+				pkt[2] == 0 || pkt[3] == 0) {
-+			/*
-+			 * We might still have a pub_dst here in case
-+			 * we need it for State Change heartbeat
-+			 */
-+			hb->pub_count = 0;
-+			hb->pub_period = 0;
-+		} else {
-+			hb->pub_count = (pkt[2] != 0xff) ?
-+				log_to_uint32(pkt[2], 1) : 0xffff;
-+			hb->pub_period = log_to_uint32(pkt[3], 1);
-+		}
-+
-+		hb->pub_ttl = pkt[4];
-+		hb->pub_features = l_get_le16(pkt + 5) & 0xf;
-+		hb->pub_net_idx = l_get_le16(pkt + 7);
-+		update_hb_pub_timer(net, hb);
-+
-+		break;
-+
-+	case OP_CONFIG_HEARTBEAT_PUB_GET:
-+		n = mesh_model_opcode_set(OP_CONFIG_HEARTBEAT_PUB_STATUS, msg);
-+		msg[n++] = b_res;
-+		l_put_le16(hb->pub_dst, msg + n);
-+		n += 2;
-+		msg[n++] = uint32_to_log(hb->pub_count);
-+		msg[n++] = uint32_to_log(hb->pub_period);
-+		msg[n++] = hb->pub_ttl;
-+		l_put_le16(hb->pub_features, msg + n);
-+		n += 2;
-+		l_put_le16(hb->pub_net_idx, msg + n);
-+		n += 2;
-+		break;
-+
-+	case OP_CONFIG_HEARTBEAT_SUB_SET:
-+		if (size != 5)
-+			return true;
-+
-+		l_info("Set Sub Period (Log %2.2x) %d sec",
-+				pkt[4], log_to_uint32(pkt[4], 1));
-+
-+		b_res = hb_subscription_set(net, l_get_le16(pkt),
-+						l_get_le16(pkt + 2),
-+						pkt[4]);
-+		if (b_res < 0)
-+			return true;
-+
-+		/* Fall through */
-+
-+	case OP_CONFIG_HEARTBEAT_SUB_GET:
-+		gettimeofday(&time_now, NULL);
-+		time_now.tv_sec -= hb->sub_start;
-+
-+		if (time_now.tv_sec >= hb->sub_period)
-+			time_now.tv_sec = 0;
-+		else
-+			time_now.tv_sec = hb->sub_period - time_now.tv_sec;
-+
-+		l_info("Sub Period (Log %2.2x) %d sec",
-+				uint32_to_log(time_now.tv_sec),
-+				(int) time_now.tv_sec);
-+
-+		n = mesh_model_opcode_set(OP_CONFIG_HEARTBEAT_SUB_STATUS, msg);
-+		msg[n++] = b_res;
-+		l_put_le16(hb->sub_src, msg + n);
-+		n += 2;
-+		l_put_le16(hb->sub_dst, msg + n);
-+		n += 2;
-+		msg[n++] = uint32_to_log(time_now.tv_sec);
-+		msg[n++] = uint32_to_log(hb->sub_count);
-+		msg[n++] = hb->sub_count ? hb->sub_min_hops : 0;
-+		msg[n++] = hb->sub_max_hops;
-+		break;
-+
-+	case OP_CONFIG_POLL_TIMEOUT_LIST:
-+		if (size != 2 || l_get_le16(pkt) == 0 ||
-+						l_get_le16(pkt) > 0x7fff)
-+			return true;
-+
-+		n = mesh_model_opcode_set(OP_CONFIG_POLL_TIMEOUT_STATUS, msg);
-+		l_put_le16(l_get_le16(pkt), msg + n);
-+		n += 2;
-+		tmp32 = mesh_net_friend_timeout(net, l_get_le16(pkt));
-+		msg[n++] = tmp32;
-+		msg[n++] = tmp32 >> 8;
-+		msg[n++] = tmp32 >> 16;
-+		break;
-+
-+	case OP_NODE_RESET:
-+		n = mesh_model_opcode_set(OP_NODE_RESET_STATUS, msg);
-+		l_timeout_create(1, node_reset, net, NULL);
-+		break;
-+	}
-+
-+	if (n) {
-+		/* print_packet("App Tx", long_msg ? long_msg : msg, n); */
-+		mesh_model_send(net, CONFIG_SRV_MODEL,
-+				unicast, src,
-+				APP_IDX_DEV, DEFAULT_TTL,
-+				long_msg ? long_msg : msg, n);
-+	}
-+	l_free(long_msg);
 +
 +	return true;
 +}
 +
-+static void cfgmod_srv_unregister(void *user_data)
++static int aes_ecb_setup(const uint8_t key[16])
 +{
-+	struct mesh_net *net = user_data;
-+	struct mesh_net_heartbeat *hb = mesh_net_heartbeat_get(net);
++	struct sockaddr_alg salg;
++	int fd, nfd;
 +
-+	l_timeout_remove(hb->pub_timer);
-+	l_timeout_remove(hb->sub_timer);
-+	hb->pub_timer = hb->sub_timer = NULL;
++	fd = socket(PF_ALG, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
++	if (fd < 0)
++		return -1;
++
++	memset(&salg, 0, sizeof(salg));
++	salg.salg_family = AF_ALG;
++	strcpy((char *) salg.salg_type, "skcipher");
++	strcpy((char *) salg.salg_name, "ecb(aes)");
++
++	if (bind(fd, (struct sockaddr *) &salg, sizeof(salg)) < 0) {
++		close(fd);
++		return -1;
++	}
++
++	nfd = alg_new(fd, key, 16, 0);
++
++	close(fd);
++
++	return nfd;
 +}
 +
-+static const struct mesh_model_ops ops = {
-+	.unregister = cfgmod_srv_unregister,
-+	.recv = cfg_srv_pkt,
-+	.bind = NULL,
-+	.sub = NULL,
-+	.pub = NULL
++static bool aes_ecb(int fd, const uint8_t plaintext[16], uint8_t encrypted[16])
++{
++	return alg_encrypt(fd, plaintext, 16, encrypted, 16);
++}
++
++static void aes_ecb_destroy(int fd)
++{
++	close(fd);
++}
++
++static bool aes_ecb_one(const uint8_t key[16],
++			const uint8_t plaintext[16], uint8_t encrypted[16])
++{
++	bool result;
++	int fd;
++
++	fd = aes_ecb_setup(key);
++	if (fd < 0)
++		return false;
++
++	result = aes_ecb(fd, plaintext, encrypted);
++
++	aes_ecb_destroy(fd);
++
++	return result;
++}
++
++bool mesh_aes_ecb_one(const uint8_t key[16],
++			const uint8_t plaintext[16], uint8_t encrypted[16])
++{
++	return aes_ecb_one(key, plaintext, encrypted);
++}
++
++/* Maximum message length that can be passed to aes_cmac */
++#define CMAC_MSG_MAX	(64 + 64 + 17)
++
++static int aes_cmac_setup(const uint8_t key[16])
++{
++	struct sockaddr_alg salg;
++	int fd, nfd;
++
++	fd = socket(PF_ALG, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
++	if (fd < 0)
++		return -1;
++
++	memset(&salg, 0, sizeof(salg));
++	salg.salg_family = AF_ALG;
++	strcpy((char *) salg.salg_type, "hash");
++	strcpy((char *) salg.salg_name, "cmac(aes)");
++
++	if (bind(fd, (struct sockaddr *) &salg, sizeof(salg)) < 0) {
++		close(fd);
++		return -1;
++	}
++
++	nfd = alg_new(fd, key, 16, 0);
++
++	close(fd);
++
++	return nfd;
++}
++
++static bool aes_cmac(int fd, const uint8_t *msg,
++					size_t msg_len, uint8_t res[16])
++{
++	ssize_t len;
++
++	if (msg_len > CMAC_MSG_MAX)
++		return false;
++
++	len = send(fd, msg, msg_len, 0);
++	if (len < 0)
++		return false;
++
++	len = read(fd, res, 16);
++	if (len < 0)
++		return false;
++
++	return true;
++}
++
++static void aes_cmac_destroy(int fd)
++{
++	close(fd);
++}
++
++static int aes_cmac_N_start(const uint8_t N[16])
++{
++	int fd;
++
++	fd = aes_cmac_setup(N);
++	return fd;
++}
++
++static bool aes_cmac_one(const uint8_t key[16], const void *msg,
++					size_t msg_len, uint8_t res[16])
++{
++	bool result;
++	int fd;
++
++	fd = aes_cmac_setup(key);
++	if (fd < 0)
++		return false;
++
++	result = aes_cmac(fd, msg, msg_len, res);
++
++	aes_cmac_destroy(fd);
++
++	return result;
++}
++
++bool mesh_crypto_aes_cmac(const uint8_t key[16], const uint8_t *msg,
++					size_t msg_len, uint8_t res[16])
++{
++	return aes_cmac_one(key, msg, msg_len, res);
++}
++
++bool mesh_crypto_aes_ccm_encrypt(const uint8_t nonce[13], const uint8_t key[16],
++					const uint8_t *aad, uint16_t aad_len,
++					const uint8_t *msg, uint16_t msg_len,
++					uint8_t *out_msg,
++					void *out_mic, size_t mic_size)
++{
++	uint8_t pmsg[16], cmic[16], cmsg[16];
++	uint8_t mic[16], Xn[16];
++	uint16_t blk_cnt, last_blk;
++	bool result;
++	size_t i, j;
++	int fd;
++
++	/* Mesh limits AAD length to 16 */
++	if (aad_len > 16)
++		return false;
++
++	fd = aes_ecb_setup(key);
++	if (fd < 0)
++		return false;
++
++	/* C_mic = e(AppKey, 0x01 || nonce || 0x0000) */
++	pmsg[0] = 0x01;
++	memcpy(pmsg + 1, nonce, 13);
++	l_put_be16(0x0000, pmsg + 14);
++
++	result = aes_ecb(fd, pmsg, cmic);
++	if (!result)
++		goto done;
++
++	/* X_0 = e(AppKey, 0x09 || nonce || length) */
++	if (mic_size == 8)
++		pmsg[0] = 0x19 | (aad_len ? 0x40 : 0x00);
++	else
++		pmsg[0] = 0x09 | (aad_len ? 0x40 : 0x00);
++
++	memcpy(pmsg + 1, nonce, 13);
++	l_put_be16(msg_len, pmsg + 14);
++
++	result = aes_ecb(fd, pmsg, Xn);
++	if (!result)
++		goto done;
++
++	/* If AAD is being used to authenticate, include it here */
++	if (aad_len) {
++		l_put_be16(aad_len, pmsg);
++
++		for (i = 0; i < sizeof(uint16_t); i++)
++			pmsg[i] = Xn[i] ^ pmsg[i];
++
++		j = 0;
++		aad_len += sizeof(uint16_t);
++		while (aad_len > 16) {
++			do {
++				pmsg[i] = Xn[i] ^ aad[j];
++				i++, j++;
++			} while (i < 16);
++
++			aad_len -= 16;
++			i = 0;
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++		}
++
++		for (i = 0; i < aad_len; i++, j++)
++			pmsg[i] = Xn[i] ^ aad[j];
++
++		for (i = aad_len; i < 16; i++)
++			pmsg[i] = Xn[i];
++
++		result = aes_ecb(fd, pmsg, Xn);
++		if (!result)
++			goto done;
++	}
++
++	last_blk = msg_len % 16;
++	blk_cnt = (msg_len + 15) / 16;
++	if (!last_blk)
++		last_blk = 16;
++
++	for (j = 0; j < blk_cnt; j++) {
++		if (j + 1 == blk_cnt) {
++			/* X_1 = e(AppKey, X_0 ^ Payload[0-15]) */
++			for (i = 0; i < last_blk; i++)
++				pmsg[i] = Xn[i] ^ msg[(j * 16) + i];
++			for (i = last_blk; i < 16; i++)
++				pmsg[i] = Xn[i] ^ 0x00;
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++
++			/* MIC = C_mic ^ X_1 */
++			for (i = 0; i < sizeof(mic); i++)
++				mic[i] = cmic[i] ^ Xn[i];
++
++			/* C_1 = e(AppKey, 0x01 || nonce || 0x0001) */
++			pmsg[0] = 0x01;
++			memcpy(pmsg + 1, nonce, 13);
++			l_put_be16(j + 1, pmsg + 14);
++
++			result = aes_ecb(fd, pmsg, cmsg);
++			if (!result)
++				goto done;
++
++			if (out_msg) {
++				/* Encrypted = Payload[0-15] ^ C_1 */
++				for (i = 0; i < last_blk; i++)
++					out_msg[(j * 16) + i] =
++						msg[(j * 16) + i] ^ cmsg[i];
++
++			}
++		} else {
++			/* X_1 = e(AppKey, X_0 ^ Payload[0-15]) */
++			for (i = 0; i < 16; i++)
++				pmsg[i] = Xn[i] ^ msg[(j * 16) + i];
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++
++			/* C_1 = e(AppKey, 0x01 || nonce || 0x0001) */
++			pmsg[0] = 0x01;
++			memcpy(pmsg + 1, nonce, 13);
++			l_put_be16(j + 1, pmsg + 14);
++
++			result = aes_ecb(fd, pmsg, cmsg);
++			if (!result)
++				goto done;
++
++			if (out_msg) {
++				/* Encrypted = Payload[0-15] ^ C_N */
++				for (i = 0; i < 16; i++)
++					out_msg[(j * 16) + i] =
++						msg[(j * 16) + i] ^ cmsg[i];
++			}
++
++		}
++	}
++
++	if (out_msg)
++		memcpy(out_msg + msg_len, mic, mic_size);
++
++	if (out_mic) {
++		switch (mic_size) {
++		case 4:
++			*(uint32_t *)out_mic = l_get_be32(mic);
++			break;
++		case 8:
++			*(uint64_t *)out_mic = l_get_be64(mic);
++			break;
++		default:
++			/* Unsupported MIC size */
++			result = false;
++		}
++	}
++
++done:
++	aes_ecb_destroy(fd);
++
++	return result;
++}
++
++bool mesh_crypto_aes_ccm_decrypt(const uint8_t nonce[13], const uint8_t key[16],
++				const uint8_t *aad, uint16_t aad_len,
++				const uint8_t *enc_msg, uint16_t enc_msg_len,
++				uint8_t *out_msg,
++				void *out_mic, size_t mic_size)
++{
++	uint8_t msg[16], pmsg[16], cmic[16], cmsg[16], Xn[16];
++	uint8_t mic[16];
++	uint16_t msg_len = enc_msg_len - mic_size;
++	uint16_t last_blk, blk_cnt;
++	bool result;
++	size_t i, j;
++	int fd;
++
++	if (enc_msg_len < 5 || aad_len > 16)
++		return false;
++
++	fd = aes_ecb_setup(key);
++	if (fd < 0)
++		return false;
++
++	/* C_mic = e(AppKey, 0x01 || nonce || 0x0000) */
++	pmsg[0] = 0x01;
++	memcpy(pmsg + 1, nonce, 13);
++	l_put_be16(0x0000, pmsg + 14);
++
++	result = aes_ecb(fd, pmsg, cmic);
++	if (!result)
++		goto done;
++
++	/* X_0 = e(AppKey, 0x09 || nonce || length) */
++	if (mic_size == 8)
++		pmsg[0] = 0x19 | (aad_len ? 0x40 : 0x00);
++	else
++		pmsg[0] = 0x09 | (aad_len ? 0x40 : 0x00);
++
++	memcpy(pmsg + 1, nonce, 13);
++	l_put_be16(msg_len, pmsg + 14);
++
++	result = aes_ecb(fd, pmsg, Xn);
++	if (!result)
++		goto done;
++
++	/* If AAD is being used to authenticate, include it here */
++	if (aad_len) {
++		l_put_be16(aad_len, pmsg);
++
++		for (i = 0; i < sizeof(uint16_t); i++)
++			pmsg[i] = Xn[i] ^ pmsg[i];
++
++		j = 0;
++		aad_len += sizeof(uint16_t);
++		while (aad_len > 16) {
++			do {
++				pmsg[i] = Xn[i] ^ aad[j];
++				i++, j++;
++			} while (i < 16);
++
++			aad_len -= 16;
++			i = 0;
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++		}
++
++		for (i = 0; i < aad_len; i++, j++)
++			pmsg[i] = Xn[i] ^ aad[j];
++
++		for (i = aad_len; i < 16; i++)
++			pmsg[i] = Xn[i];
++
++		result = aes_ecb(fd, pmsg, Xn);
++		if (!result)
++			goto done;
++	}
++
++	last_blk = msg_len % 16;
++	blk_cnt = (msg_len + 15) / 16;
++	if (!last_blk)
++		last_blk = 16;
++
++	for (j = 0; j < blk_cnt; j++) {
++		if (j + 1 == blk_cnt) {
++			/* C_1 = e(AppKey, 0x01 || nonce || 0x0001) */
++			pmsg[0] = 0x01;
++			memcpy(pmsg + 1, nonce, 13);
++			l_put_be16(j + 1, pmsg + 14);
++
++			result = aes_ecb(fd, pmsg, cmsg);
++			if (!result)
++				goto done;
++
++			/* Encrypted = Payload[0-15] ^ C_1 */
++			for (i = 0; i < last_blk; i++)
++				msg[i] = enc_msg[(j * 16) + i] ^ cmsg[i];
++
++			if (out_msg)
++				memcpy(out_msg + (j * 16), msg, last_blk);
++
++			/* X_1 = e(AppKey, X_0 ^ Payload[0-15]) */
++			for (i = 0; i < last_blk; i++)
++				pmsg[i] = Xn[i] ^ msg[i];
++			for (i = last_blk; i < 16; i++)
++				pmsg[i] = Xn[i] ^ 0x00;
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++
++			/* MIC = C_mic ^ X_1 */
++			for (i = 0; i < sizeof(mic); i++)
++				mic[i] = cmic[i] ^ Xn[i];
++		} else {
++			/* C_1 = e(AppKey, 0x01 || nonce || 0x0001) */
++			pmsg[0] = 0x01;
++			memcpy(pmsg + 1, nonce, 13);
++			l_put_be16(j + 1, pmsg + 14);
++
++			result = aes_ecb(fd, pmsg, cmsg);
++			if (!result)
++				goto done;
++
++			/* Encrypted = Payload[0-15] ^ C_1 */
++			for (i = 0; i < 16; i++)
++				msg[i] = enc_msg[(j * 16) + i] ^ cmsg[i];
++
++			if (out_msg)
++				memcpy(out_msg + (j * 16), msg, 16);
++
++			/* X_1 = e(AppKey, X_0 ^ Payload[0-15]) */
++			for (i = 0; i < 16; i++)
++				pmsg[i] = Xn[i] ^ msg[i];
++
++			result = aes_ecb(fd, pmsg, Xn);
++			if (!result)
++				goto done;
++		}
++	}
++
++	if (out_mic) {
++		switch (mic_size) {
++		case 4:
++			*(uint32_t *)out_mic = l_get_be32(mic);
++			break;
++		case 8:
++			*(uint64_t *)out_mic = l_get_be64(mic);
++			break;
++		default:
++			/* Unsupported MIC size */
++			result = false;
++		}
++	}
++
++done:
++	aes_ecb_destroy(fd);
++
++	return result;
++}
++
++bool mesh_crypto_k1(const uint8_t ikm[16], const uint8_t salt[16],
++		const void *info, size_t info_len, uint8_t okm[16])
++{
++	uint8_t res[16];
++
++	if (!aes_cmac_one(salt, ikm, 16, res))
++		return false;
++
++	return aes_cmac_one(res, info, info_len, okm);
++}
++
++bool mesh_crypto_k2(const uint8_t n[16], const uint8_t *p, size_t p_len,
++							uint8_t net_id[1],
++							uint8_t enc_key[16],
++							uint8_t priv_key[16])
++{
++	int fd;
++	uint8_t output[16];
++	uint8_t t[16];
++	uint8_t *stage;
++	bool success = false;
++
++	stage = l_malloc(sizeof(output) + p_len + 1);
++	if (!stage)
++		return false;
++
++	if (!mesh_crypto_s1("smk2", 4, stage))
++		goto fail;
++
++	if (!aes_cmac_one(stage, n, 16, t))
++		goto fail;
++
++	fd = aes_cmac_N_start(t);
++	if (fd < 0)
++		goto fail;
++
++	memcpy(stage, p, p_len);
++	stage[p_len] = 1;
++
++	if (!aes_cmac(fd, stage, p_len + 1, output))
++		goto done;
++
++	net_id[0] = output[15] & 0x7f;
++
++	memcpy(stage, output, 16);
++	memcpy(stage + 16, p, p_len);
++	stage[p_len + 16] = 2;
++
++	if (!aes_cmac(fd, stage, p_len + 16 + 1, output))
++		goto done;
++
++	memcpy(enc_key, output, 16);
++
++	memcpy(stage, output, 16);
++	memcpy(stage + 16, p, p_len);
++	stage[p_len + 16] = 3;
++
++	if (!aes_cmac(fd, stage, p_len + 16 + 1, output))
++		goto done;
++
++	memcpy(priv_key, output, 16);
++	success = true;
++
++done:
++	aes_cmac_destroy(fd);
++fail:
++	l_free(stage);
++
++	return success;
++}
++
++static bool crypto_128(const uint8_t n[16], const char *s, uint8_t out128[16])
++{
++	const uint8_t id128[] = { 'i', 'd', '1', '2', '8', 0x01 };
++	uint8_t salt[16];
++
++	if (!mesh_crypto_s1(s, 4, salt))
++		return false;
++
++	return mesh_crypto_k1(n, salt, id128, sizeof(id128), out128);
++}
++
++bool mesh_crypto_nkik(const uint8_t n[16], uint8_t identity_key[16])
++{
++	return crypto_128(n, "nkik", identity_key);
++}
++
++bool mesh_crypto_identity(const uint8_t net_key[16], uint16_t addr,
++							uint8_t id[16])
++{
++	uint8_t id_key[16];
++	uint8_t tmp[16];
++
++	if (!mesh_crypto_nkik(net_key, id_key))
++		return false;
++
++	if (!l_get_be64(id + 8))
++		l_getrandom(id + 8, 8);
++
++	memset(tmp, 0, sizeof(tmp));
++	memcpy(tmp + 6, id + 8, 8);
++	l_put_be16(addr, tmp + 14);
++
++	if (!aes_ecb_one(id_key, tmp, tmp))
++		return false;
++
++	memcpy(id, tmp + 8, 8);
++	return true;
++}
++
++bool mesh_crypto_nkbk(const uint8_t n[16], uint8_t beacon_key[16])
++{
++	return crypto_128(n, "nkbk", beacon_key);
++}
++
++bool mesh_crypto_nkpk(const uint8_t n[16], uint8_t proxy_key[16])
++{
++	return crypto_128(n, "nkpk", proxy_key);
++}
++
++bool mesh_crypto_k3(const uint8_t n[16], uint8_t out64[8])
++{
++	const uint8_t id64[] = { 'i', 'd', '6', '4', 0x01 };
++	uint8_t tmp[16];
++	uint8_t t[16];
++
++	if (!mesh_crypto_s1("smk3", 4, tmp))
++		return false;
++
++	if (!aes_cmac_one(tmp, n, 16, t))
++		return false;
++
++	if (!aes_cmac_one(t, id64, sizeof(id64), tmp))
++		return false;
++
++	memcpy(out64, tmp + 8, 8);
++
++	return true;
++}
++
++bool mesh_crypto_k4(const uint8_t a[16], uint8_t out6[1])
++{
++	const uint8_t id6[] = { 'i', 'd', '6', 0x01 };
++	uint8_t tmp[16];
++	uint8_t t[16];
++
++	if (!mesh_crypto_s1("smk4", 4, tmp))
++		return false;
++
++	if (!aes_cmac_one(tmp, a, 16, t))
++		return false;
++
++	if (!aes_cmac_one(t, id6, sizeof(id6), tmp))
++		return false;
++
++	out6[0] = tmp[15] & 0x3f;
++	return true;
++}
++
++bool mesh_crypto_beacon_cmac(const uint8_t encryption_key[16],
++				const uint8_t network_id[8],
++				uint32_t iv_index, bool kr, bool iu,
++				uint64_t *cmac)
++{
++	uint8_t msg[13], tmp[16];
++
++	if (!cmac)
++		return false;
++
++	msg[0] = kr ? 0x01 : 0x00;
++	msg[0] |= iu ? 0x02 : 0x00;
++	memcpy(msg + 1, network_id, 8);
++	l_put_be32(iv_index, msg + 9);
++
++	if (!aes_cmac_one(encryption_key, msg, 13, tmp))
++		return false;
++
++	*cmac = l_get_be64(tmp);
++
++	return true;
++}
++
++bool mesh_crypto_network_nonce(bool ctl, uint8_t ttl, uint32_t seq,
++				uint16_t src, uint32_t iv_index,
++				uint8_t nonce[13])
++{
++	nonce[0] = 0;
++	nonce[1] = (ttl & TTL_MASK) | (ctl ? CTL : 0x00);
++	nonce[2] = (seq >> 16) & 0xff;
++	nonce[3] = (seq >> 8) & 0xff;
++	nonce[4] = seq & 0xff;
++
++	/* SRC */
++	l_put_be16(src, nonce + 5);
++
++	l_put_be16(0, nonce + 7);
++
++	/* IV Index */
++	l_put_be32(iv_index, nonce + 9);
++
++	return true;
++}
++
++bool mesh_crypto_network_encrypt(bool ctl, uint8_t ttl,
++				uint32_t seq, uint16_t src,
++				uint32_t iv_index,
++				const uint8_t net_key[16],
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *net_mic)
++{
++	uint8_t nonce[13];
++
++	if (!mesh_crypto_network_nonce(ctl, ttl, seq, src, iv_index, nonce))
++		return false;
++
++	return mesh_crypto_aes_ccm_encrypt(nonce, net_key, NULL, 0, enc_msg,
++				enc_msg_len, out, net_mic,
++				ctl ? 8 : 4);
++}
++
++bool mesh_crypto_network_decrypt(bool ctl, uint8_t ttl,
++				uint32_t seq, uint16_t src,
++				uint32_t iv_index,
++				const uint8_t net_key[16],
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *net_mic, size_t mic_size)
++{
++	uint8_t nonce[13];
++
++	if (!mesh_crypto_network_nonce(ctl, ttl, seq, src, iv_index, nonce))
++		return false;
++
++	return mesh_crypto_aes_ccm_decrypt(nonce, net_key, NULL, 0,
++						enc_msg, enc_msg_len, out,
++						net_mic, mic_size);
++}
++
++bool mesh_crypto_application_nonce(uint32_t seq, uint16_t src,
++					uint16_t dst, uint32_t iv_index,
++					bool aszmic, uint8_t nonce[13])
++{
++	nonce[0] = 0x01;
++	nonce[1] = aszmic ? 0x80 : 0x00;
++	nonce[2] = (seq & 0x00ff0000) >> 16;
++	nonce[3] = (seq & 0x0000ff00) >> 8;
++	nonce[4] = (seq & 0x000000ff);
++	nonce[5] = (src & 0xff00) >> 8;
++	nonce[6] = (src & 0x00ff);
++	nonce[7] = (dst & 0xff00) >> 8;
++	nonce[8] = (dst & 0x00ff);
++	l_put_be32(iv_index, nonce + 9);
++
++	return true;
++}
++
++bool mesh_crypto_device_nonce(uint32_t seq, uint16_t src,
++					uint16_t dst, uint32_t iv_index,
++					bool aszmic, uint8_t nonce[13])
++{
++	nonce[0] = 0x02;
++	nonce[1] = aszmic ? 0x80 : 0x00;
++	nonce[2] = (seq & 0x00ff0000) >> 16;
++	nonce[3] = (seq & 0x0000ff00) >> 8;
++	nonce[4] = (seq & 0x000000ff);
++	nonce[5] = (src & 0xff00) >> 8;
++	nonce[6] = (src & 0x00ff);
++	nonce[7] = (dst & 0xff00) >> 8;
++	nonce[8] = (dst & 0x00ff);
++	l_put_be32(iv_index, nonce + 9);
++
++	return true;
++}
++
++bool mesh_crypto_application_encrypt(uint8_t key_id, uint32_t seq, uint16_t src,
++					uint16_t dst, uint32_t iv_index,
++					const uint8_t app_key[16],
++					const uint8_t *aad, uint8_t aad_len,
++					const uint8_t *msg, uint8_t msg_len,
++					uint8_t *out,
++					void *app_mic, size_t mic_size)
++{
++	uint8_t nonce[13];
++	bool aszmic = (mic_size == 8) ? true : false;
++
++	if (!key_id && !mesh_crypto_device_nonce(seq, src, dst,
++						iv_index, aszmic, nonce))
++		return false;
++
++	if (key_id && !mesh_crypto_application_nonce(seq, src, dst,
++						iv_index, aszmic, nonce))
++		return false;
++
++	return mesh_crypto_aes_ccm_encrypt(nonce, app_key, aad, aad_len,
++						msg, msg_len,
++						out, app_mic, mic_size);
++}
++
++bool mesh_crypto_application_decrypt(uint8_t key_id, uint32_t seq, uint16_t src,
++				uint16_t dst, uint32_t iv_index,
++				const uint8_t app_key[16],
++				const uint8_t *aad, uint8_t aad_len,
++				const uint8_t *enc_msg, uint8_t enc_msg_len,
++				uint8_t *out, void *app_mic, size_t mic_size)
++{
++	uint8_t nonce[13];
++	bool aszmic = (mic_size == 8) ? true : false;
++
++	if (!key_id && !mesh_crypto_device_nonce(seq, src, dst,
++						iv_index, aszmic, nonce))
++		return false;
++
++	if (key_id && !mesh_crypto_application_nonce(seq, src, dst,
++						iv_index, aszmic, nonce))
++		return false;
++
++	return mesh_crypto_aes_ccm_decrypt(nonce, app_key,
++						aad, aad_len, enc_msg,
++						enc_msg_len, out,
++						app_mic, mic_size);
++}
++
++bool mesh_crypto_session_key(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t session_key[16])
++{
++	const uint8_t prsk[4] = "prsk";
++
++	if (!aes_cmac_one(salt, secret, 32, session_key))
++		return false;
++
++	return aes_cmac_one(session_key, prsk, 4, session_key);
++}
++
++bool mesh_crypto_nonce(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t nonce[13])
++{
++	const uint8_t prsn[4] = "prsn";
++	uint8_t tmp[16];
++	bool result;
++
++	if (!aes_cmac_one(salt, secret, 32, tmp))
++		return false;
++
++	result = aes_cmac_one(tmp, prsn, 4, tmp);
++
++	if (result)
++		memcpy(nonce, tmp + 3, 13);
++
++	return result;
++}
++
++bool mesh_crypto_s1(const void *info, size_t len, uint8_t salt[16])
++{
++	return aes_cmac_one(zero, info, len, salt);
++}
++
++bool mesh_crypto_prov_prov_salt(const uint8_t conf_salt[16],
++					const uint8_t prov_rand[16],
++					const uint8_t dev_rand[16],
++					uint8_t prov_salt[16])
++{
++	uint8_t tmp[16 * 3];
++
++	memcpy(tmp, conf_salt, 16);
++	memcpy(tmp + 16, prov_rand, 16);
++	memcpy(tmp + 32, dev_rand, 16);
++
++	return aes_cmac_one(zero, tmp, sizeof(tmp), prov_salt);
++}
++
++bool mesh_crypto_prov_conf_key(const uint8_t secret[32],
++					const uint8_t salt[16],
++					uint8_t conf_key[16])
++{
++	const uint8_t prck[4] = "prck";
++
++	if (!aes_cmac_one(salt, secret, 32, conf_key))
++		return false;
++
++	return aes_cmac_one(conf_key, prck, 4, conf_key);
++}
++
++bool mesh_crypto_device_key(const uint8_t secret[32],
++						const uint8_t salt[16],
++						uint8_t device_key[16])
++{
++	const uint8_t prdk[4] = "prdk";
++
++	if (!aes_cmac_one(salt, secret, 32, device_key))
++		return false;
++
++	return aes_cmac_one(device_key, prdk, 4, device_key);
++}
++
++bool mesh_crypto_virtual_addr(const uint8_t virtual_label[16],
++						uint16_t *addr)
++{
++	uint8_t tmp[16];
++
++	if (!mesh_crypto_s1("vtad", 4, tmp))
++		return false;
++
++	if (!addr || !aes_cmac_one(tmp, virtual_label, 16, tmp))
++		return false;
++
++	*addr = (l_get_be16(tmp + 14) & 0x3fff) | 0x8000;
++
++	return true;
++}
++
++bool mesh_crypto_privacy_counter(uint32_t iv_index,
++						const uint8_t *payload,
++						uint8_t privacy_counter[16])
++{
++	memset(privacy_counter, 0, 5);
++	l_put_be32(iv_index, privacy_counter + 5);
++	memcpy(privacy_counter + 9, payload, 7);
++
++	return true;
++}
++
++bool mesh_crypto_network_obfuscate(const uint8_t privacy_key[16],
++					const uint8_t privacy_counter[16],
++					bool ctl, uint8_t ttl, uint32_t seq,
++					uint16_t src, uint8_t *out)
++{
++	uint8_t ecb[16], tmp[16];
++	int i;
++
++	if (!aes_ecb_one(privacy_key, privacy_counter, ecb))
++		return false;
++
++	tmp[0] = ((!!ctl) << 7) | (ttl & TTL_MASK);
++	tmp[1] = (seq & 0xff0000) >> 16;
++	tmp[2] = (seq & 0x00ff00) >> 8;
++	tmp[3] = (seq & 0x0000ff);
++	tmp[4] = (src & 0xff00) >> 8;
++	tmp[5] = (src & 0x00ff);
++
++	if (out) {
++		for (i = 0; i < 6; i++)
++			out[i] = ecb[i] ^ tmp[i];
++	}
++
++	return true;
++}
++
++bool mesh_crypto_network_clarify(const uint8_t privacy_key[16],
++				const uint8_t privacy_counter[16],
++				const uint8_t net_hdr[6],
++				bool *ctl, uint8_t *ttl,
++				uint32_t *seq, uint16_t *src)
++{
++	uint8_t ecb[16], tmp[6];
++	int i;
++
++	if (!aes_ecb_one(privacy_key, privacy_counter, ecb))
++		return false;
++
++	for (i = 0; i < 6; i++)
++		tmp[i] = ecb[i] ^ net_hdr[i];
++
++	if (ctl)
++		*ctl = !!(tmp[0] & CTL);
++
++	if (ttl)
++		*ttl = tmp[0] & TTL_MASK;
++
++	if (seq)
++		*seq = l_get_be32(tmp) & SEQ_MASK;
++
++	if (src)
++		*src = l_get_be16(tmp + 4);
++
++	return true;
++}
++
++bool mesh_crypto_packet_build(bool ctl, uint8_t ttl,
++				uint32_t seq,
++				uint16_t src, uint16_t dst,
++				uint8_t opcode,
++				bool segmented, uint8_t key_id,
++				bool szmic, bool relay, uint16_t seqZero,
++				uint8_t segO, uint8_t segN,
++				const uint8_t *payload, uint8_t payload_len,
++				uint8_t *packet, uint8_t *packet_len)
++{
++	uint32_t hdr;
++	size_t n;
++
++	l_put_be32(seq, packet + 1);
++	packet[1] = (ctl ? CTL : 0) | (ttl & TTL_MASK);
++
++	l_put_be16(src, packet + 5);
++	l_put_be16(dst, packet + 7);
++	n = 9;
++
++	if (!ctl) {
++		hdr = segmented << SEG_HDR_SHIFT;
++		hdr |= (key_id & KEY_ID_MASK) << KEY_HDR_SHIFT;
++		if (segmented) {
++			hdr |= szmic << SZMIC_HDR_SHIFT;
++			hdr |= (seqZero & SEQ_ZERO_MASK) << SEQ_ZERO_HDR_SHIFT;
++			hdr |= (segO & SEG_MASK) << SEGO_HDR_SHIFT;
++			hdr |= (segN & SEG_MASK) << SEGN_HDR_SHIFT;
++		}
++		l_put_be32(hdr, packet + n);
++
++		/* Only first octet is valid for unsegmented messages */
++		if (segmented)
++			n += 4;
++		else
++			n += 1;
++
++		memcpy(packet + n, payload, payload_len);
++
++		l_put_be32(0x00000000, packet + payload_len + n);
++		if (packet_len)
++			*packet_len = payload_len + n + 4;
++	} else {
++		if ((opcode & OPCODE_MASK) != opcode)
++			return false;
++
++		hdr = opcode << KEY_HDR_SHIFT;
++		l_put_be32(hdr, packet + n);
++		n += 1;
++
++		memcpy(packet + n, payload, payload_len);
++		n += payload_len;
++
++		l_put_be64(0x0000000000000000, packet + n);
++		if (packet_len)
++			*packet_len = n + 8;
++	}
++
++
++	return true;
++}
++
++bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
++				bool *ctl, uint8_t *ttl, uint32_t *seq,
++				uint16_t *src, uint16_t *dst,
++				uint32_t *cookie, uint8_t *opcode,
++				bool *segmented, uint8_t *key_id,
++				bool *szmic, bool *relay, uint16_t *seqZero,
++				uint8_t *segO, uint8_t *segN,
++				const uint8_t **payload, uint8_t *payload_len)
++{
++	uint32_t hdr;
++	uint16_t this_dst;
++	bool is_segmented;
++
++	if (packet_len < 14)
++		return false;
++
++	this_dst = l_get_be16(packet + 7);
++
++	/* Try to keep bits in the order they exist within the packet */
++	if (ctl)
++		*ctl = !!(packet[1] & CTL);
++
++	if (ttl)
++		*ttl = packet[1] & TTL_MASK;
++
++	if (seq)
++		*seq = l_get_be32(packet + 1) & SEQ_MASK;
++
++	if (src)
++		*src = l_get_be16(packet + 5);
++
++	if (dst)
++		*dst = this_dst;
++
++	hdr = l_get_be32(packet + 9);
++
++	is_segmented = !!((hdr >> SEG_HDR_SHIFT) & true);
++	if (segmented)
++		*segmented = is_segmented;
++
++	if (packet[1] & CTL) {
++		uint8_t this_opcode = packet[9] & OPCODE_MASK;
++
++		if (cookie)
++			*cookie = l_get_be32(packet + 9);
++
++		if (opcode)
++			*opcode = this_opcode;
++
++		if (this_dst && this_opcode == NET_OP_SEG_ACKNOWLEDGE) {
++			if (relay)
++				*relay = !!((hdr >> RELAY_HDR_SHIFT) & true);
++
++			if (seqZero)
++				*seqZero = (hdr >> SEQ_ZERO_HDR_SHIFT) &
++								SEQ_ZERO_MASK;
++
++			if (payload)
++				*payload = packet + 9;
++
++			if (payload_len)
++				*payload_len = packet_len - 9 - 8;
++		} else {
++			if (payload)
++				*payload = packet + 10;
++
++			if (payload_len)
++				*payload_len = packet_len - 10 - 8;
++		}
++	} else {
++		if (cookie)
++			*cookie = l_get_be32(packet + packet_len - 8);
++
++		if (key_id)
++			*key_id = (hdr >> KEY_HDR_SHIFT) & KEY_ID_MASK;
++
++		if (is_segmented) {
++			if (szmic)
++				*szmic = !!((hdr >> SZMIC_HDR_SHIFT) & true);
++
++			if (seqZero)
++				*seqZero = (hdr >> SEQ_ZERO_HDR_SHIFT) &
++								SEQ_ZERO_MASK;
++
++			if (segO)
++				*segO = (hdr >> SEGO_HDR_SHIFT) & SEG_MASK;
++
++			if (segN)
++				*segN = (hdr >> SEGN_HDR_SHIFT) & SEG_MASK;
++
++			if (payload)
++				*payload = packet + 13;
++
++			if (payload_len)
++				*payload_len = packet_len - 13 - 4;
++		} else {
++			if (payload)
++				*payload = packet + 10;
++
++			if (payload_len)
++				*payload_len = packet_len - 10 - 4;
++		}
++	}
++
++	return true;
++}
++
++bool mesh_crypto_payload_encrypt(uint8_t *aad, const uint8_t *payload,
++				uint8_t *out, uint16_t payload_len,
++				uint16_t src, uint16_t dst, uint8_t key_id,
++				uint32_t seq_num, uint32_t iv_index,
++				bool aszmic,
++				const uint8_t application_key[16])
++{
++	uint8_t application_nonce[13] = { 0x01, };
++
++	if (payload_len < 1)
++		return false;
++
++	/* Key_ID == 0 means the Device Key is being used */
++	if (!key_id)
++		application_nonce[0] = 0x02;
++
++	/* Seq Num */
++	l_put_be32(seq_num, application_nonce + 1);
++
++	/* ASZMIC */
++	application_nonce[1] |= aszmic ? 0x80 : 0x00;
++
++	/* SRC */
++	l_put_be16(src, application_nonce + 5);
++
++	/* DST */
++	l_put_be16(dst, application_nonce + 7);
++
++	/* IV Index */
++	l_put_be32(iv_index, application_nonce + 9);
++
++	if (!mesh_crypto_aes_ccm_encrypt(application_nonce, application_key,
++					aad, aad ? 16 : 0,
++					payload, payload_len,
++					out, NULL,
++					aszmic ? 8 : 4))
++		return false;
++
++	return true;
++}
++
++bool mesh_crypto_payload_decrypt(uint8_t *aad, uint16_t aad_len,
++				const uint8_t *payload, uint16_t payload_len,
++				bool szmict,
++				uint16_t src, uint16_t dst,
++				uint8_t key_id, uint32_t seq_num,
++				uint32_t iv_index, uint8_t *out,
++				const uint8_t app_key[16])
++{
++	uint8_t app_nonce[13] = { 0x01, };
++	uint32_t mic32;
++	uint64_t mic64;
++
++	if (payload_len < 5 || !out)
++		return false;
++
++	/* Key_ID == 0 means the Device Key is being used */
++	if (!key_id)
++		app_nonce[0] = 0x02;
++
++	/* Seq Num */
++	l_put_be32(seq_num, app_nonce + 1);
++
++	/* ASZMIC */
++	app_nonce[1] |= szmict ? 0x80 : 0x00;
++
++	/* SRC */
++	l_put_be16(src, app_nonce + 5);
++
++	/* DST */
++	l_put_be16(dst, app_nonce + 7);
++
++	/* IV Index */
++	l_put_be32(iv_index, app_nonce + 9);
++
++	memcpy(out, payload, payload_len);
++
++	if (szmict) {
++		if (!mesh_crypto_aes_ccm_decrypt(app_nonce, app_key,
++					aad, aad_len,
++					payload, payload_len,
++					out, &mic64, sizeof(mic64)))
++			return false;
++
++		mic64 ^= l_get_be64(out + payload_len - 8);
++		l_put_be64(mic64, out + payload_len - 8);
++
++		if (mic64)
++			return false;
++	} else {
++		if (!mesh_crypto_aes_ccm_decrypt(app_nonce, app_key,
++					aad, aad_len,
++					payload, payload_len,
++					out, &mic32, sizeof(mic32)))
++			return false;
++
++		mic32 ^= l_get_be32(out + payload_len - 4);
++		l_put_be32(mic32, out + payload_len - 4);
++
++		if (mic32)
++			return false;
++	}
++
++	return true;
++}
++
++bool mesh_crypto_packet_encode(uint8_t *packet, uint8_t packet_len,
++				const uint8_t network_key[16],
++				uint32_t iv_index,
++				const uint8_t privacy_key[16])
++{
++	uint8_t network_nonce[13] = { 0x00, 0x00 };
++	uint8_t privacy_counter[16] = { 0x00, 0x00, 0x00, 0x00, 0x00, };
++	uint8_t tmp[16];
++	int i;
++
++	if (packet_len < 14)
++		return false;
++
++	/* Detect Proxy packet by CTL == true && DST == 0x0000 */
++	if ((packet[1] & CTL) && l_get_be16(packet + 7) == 0)
++		network_nonce[0] = 0x03; /* Proxy Nonce */
++	else
++		/* CTL + TTL */
++		network_nonce[1] = packet[1];
++
++	/* Seq Num */
++	network_nonce[2] = packet[2];
++	network_nonce[3] = packet[3];
++	network_nonce[4] = packet[4];
++
++	/* SRC */
++	network_nonce[5] = packet[5];
++	network_nonce[6] = packet[6];
++
++	/* DST not available */
++	network_nonce[7] = 0;
++	network_nonce[8] = 0;
++
++	/* IV Index */
++	l_put_be32(iv_index, network_nonce + 9);
++
++	/* Check for Long net-MIC */
++	if (packet[1] & CTL) {
++		if (!mesh_crypto_aes_ccm_encrypt(network_nonce, network_key,
++					NULL, 0,
++					packet + 7, packet_len - 7 - 8,
++					packet + 7, NULL, 8))
++			return false;
++	} else {
++		if (!mesh_crypto_aes_ccm_encrypt(network_nonce, network_key,
++					NULL, 0,
++					packet + 7, packet_len - 7 - 4,
++					packet + 7, NULL, 4))
++			return false;
++	}
++
++	l_put_be32(iv_index, privacy_counter + 5);
++	memcpy(privacy_counter + 9, packet + 7, 7);
++
++	if (!aes_ecb_one(privacy_key, privacy_counter, tmp))
++		return false;
++
++	for (i = 0; i < 6; i++)
++		packet[1 + i] ^= tmp[i];
++
++	return true;
++}
++
++bool mesh_crypto_packet_decode(const uint8_t *packet, uint8_t packet_len,
++				bool proxy, uint8_t *out, uint32_t iv_index,
++				const uint8_t network_key[16],
++				const uint8_t privacy_key[16])
++{
++	uint8_t privacy_counter[16] = { 0x00, 0x00, 0x00, 0x00, 0x00, };
++	uint8_t network_nonce[13] = { 0x00, 0x00, };
++	uint8_t tmp[16];
++	uint16_t src;
++	int i;
++
++	if (packet_len < 14)
++		return false;
++
++	l_put_be32(iv_index, privacy_counter + 5);
++	memcpy(privacy_counter + 9, packet + 7, 7);
++
++	if (!aes_ecb_one(privacy_key, privacy_counter, tmp))
++		return false;
++
++	memcpy(out, packet, packet_len);
++	for (i = 0; i < 6; i++)
++		out[1 + i] ^= tmp[i];
++
++	src = l_get_be16(out + 5);
++
++	/* Pre-check SRC address for illegal values */
++	if (!src || src >= 0x8000)
++		return false;
++
++	/* Detect Proxy packet by CTL == true && proxy == true */
++	if ((out[1] & CTL) && proxy)
++		network_nonce[0] = 0x03; /* Proxy Nonce */
++	else
++		/* CTL + TTL */
++		network_nonce[1] = out[1];
++
++	/* Seq Num */
++	network_nonce[2] = out[2];
++	network_nonce[3] = out[3];
++	network_nonce[4] = out[4];
++
++	/* SRC */
++	network_nonce[5] = out[5];
++	network_nonce[6] = out[6];
++
++	/* DST not available */
++	network_nonce[7] = 0;
++	network_nonce[8] = 0;
++
++	/* IV Index */
++	l_put_be32(iv_index, network_nonce + 9);
++
++	/* Check for Long MIC */
++	if (out[1] & CTL) {
++		uint64_t mic;
++
++		if (!mesh_crypto_aes_ccm_decrypt(network_nonce, network_key,
++					NULL, 0, packet + 7, packet_len - 7,
++					out + 7, &mic, sizeof(mic)))
++			return false;
++
++		mic ^= l_get_be64(out + packet_len - 8);
++		l_put_be64(mic, out + packet_len - 8);
++
++		if (mic)
++			return false;
++	} else {
++		uint32_t mic;
++
++		if (!mesh_crypto_aes_ccm_decrypt(network_nonce, network_key,
++					NULL, 0, packet + 7, packet_len - 7,
++					out + 7, &mic, sizeof(mic)))
++			return false;
++
++		mic ^= l_get_be32(out + packet_len - 4);
++		l_put_be32(mic, out + packet_len - 4);
++
++		if (mic)
++			return false;
++	}
++
++	return true;
++}
++
++bool mesh_crypto_packet_label(uint8_t *packet, uint8_t packet_len,
++				uint16_t iv_index, uint8_t network_id)
++{
++	packet[0] = (iv_index & 0x0001) << 7 | (network_id & 0x7f);
++
++	return true;
++}
++
++/* reversed, 8-bit, poly=0x07 */
++static const uint8_t crc_table[256] = {
++	0x00, 0x91, 0xe3, 0x72, 0x07, 0x96, 0xe4, 0x75,
++	0x0e, 0x9f, 0xed, 0x7c, 0x09, 0x98, 0xea, 0x7b,
++	0x1c, 0x8d, 0xff, 0x6e, 0x1b, 0x8a, 0xf8, 0x69,
++	0x12, 0x83, 0xf1, 0x60, 0x15, 0x84, 0xf6, 0x67,
++
++	0x38, 0xa9, 0xdb, 0x4a, 0x3f, 0xae, 0xdc, 0x4d,
++	0x36, 0xa7, 0xd5, 0x44, 0x31, 0xa0, 0xd2, 0x43,
++	0x24, 0xb5, 0xc7, 0x56, 0x23, 0xb2, 0xc0, 0x51,
++	0x2a, 0xbb, 0xc9, 0x58, 0x2d, 0xbc, 0xce, 0x5f,
++
++	0x70, 0xe1, 0x93, 0x02, 0x77, 0xe6, 0x94, 0x05,
++	0x7e, 0xef, 0x9d, 0x0c, 0x79, 0xe8, 0x9a, 0x0b,
++	0x6c, 0xfd, 0x8f, 0x1e, 0x6b, 0xfa, 0x88, 0x19,
++	0x62, 0xf3, 0x81, 0x10, 0x65, 0xf4, 0x86, 0x17,
++
++	0x48, 0xd9, 0xab, 0x3a, 0x4f, 0xde, 0xac, 0x3d,
++	0x46, 0xd7, 0xa5, 0x34, 0x41, 0xd0, 0xa2, 0x33,
++	0x54, 0xc5, 0xb7, 0x26, 0x53, 0xc2, 0xb0, 0x21,
++	0x5a, 0xcb, 0xb9, 0x28, 0x5d, 0xcc, 0xbe, 0x2f,
++
++	0xe0, 0x71, 0x03, 0x92, 0xe7, 0x76, 0x04, 0x95,
++	0xee, 0x7f, 0x0d, 0x9c, 0xe9, 0x78, 0x0a, 0x9b,
++	0xfc, 0x6d, 0x1f, 0x8e, 0xfb, 0x6a, 0x18, 0x89,
++	0xf2, 0x63, 0x11, 0x80, 0xf5, 0x64, 0x16, 0x87,
++
++	0xd8, 0x49, 0x3b, 0xaa, 0xdf, 0x4e, 0x3c, 0xad,
++	0xd6, 0x47, 0x35, 0xa4, 0xd1, 0x40, 0x32, 0xa3,
++	0xc4, 0x55, 0x27, 0xb6, 0xc3, 0x52, 0x20, 0xb1,
++	0xca, 0x5b, 0x29, 0xb8, 0xcd, 0x5c, 0x2e, 0xbf,
++
++	0x90, 0x01, 0x73, 0xe2, 0x97, 0x06, 0x74, 0xe5,
++	0x9e, 0x0f, 0x7d, 0xec, 0x99, 0x08, 0x7a, 0xeb,
++	0x8c, 0x1d, 0x6f, 0xfe, 0x8b, 0x1a, 0x68, 0xf9,
++	0x82, 0x13, 0x61, 0xf0, 0x85, 0x14, 0x66, 0xf7,
++
++	0xa8, 0x39, 0x4b, 0xda, 0xaf, 0x3e, 0x4c, 0xdd,
++	0xa6, 0x37, 0x45, 0xd4, 0xa1, 0x30, 0x42, 0xd3,
++	0xb4, 0x25, 0x57, 0xc6, 0xb3, 0x22, 0x50, 0xc1,
++	0xba, 0x2b, 0x59, 0xc8, 0xbd, 0x2c, 0x5e, 0xcf
 +};
 +
-+void mesh_config_srv_init(struct mesh_net *net, uint8_t ele_idx)
++uint8_t mesh_crypto_compute_fcs(const uint8_t *packet, uint8_t packet_len)
 +{
-+	l_debug("%2.2x", ele_idx);
-+	mesh_model_register(net, ele_idx, CONFIG_SRV_MODEL, &ops, net);
++	uint8_t fcs = 0xff;
++	int i;
++
++	for (i = 0; i < packet_len; i++)
++		fcs = crc_table[fcs ^ packet[i]];
++
++	return 0xff - fcs;
++}
++
++bool mesh_crypto_check_fcs(const uint8_t *packet, uint8_t packet_len,
++							uint8_t received_fcs)
++{
++	uint8_t fcs = 0xff;
++	int i;
++
++	for (i = 0; i < packet_len; i++)
++		fcs = crc_table[fcs ^ packet[i]];
++
++	fcs = crc_table[fcs ^ received_fcs];
++
++	return fcs == 0xcf;
 +}
 -- 
 2.14.4
