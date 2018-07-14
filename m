@@ -1,214 +1,152 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-serial-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH BlueZ v5 03/14] mesh: Infrastructure for Mesh daemon
+Subject: Re: [PATCH v3 4/9] Bluetooth: btrtl: add support for the RTL8723BS
+ and RTL8723DS chips
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1531062347.7346.18.camel@intel.com>
-Date: Sat, 14 Jul 2018 18:23:34 +0200
+In-Reply-To: <20180710081117.25078-5-hdegoede@redhat.com>
+Date: Sat, 14 Jul 2018 18:09:19 +0200
 Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Message-Id: <96DF0B8D-4B4D-4AA1-A637-E16A1B22009D@holtmann.org>
-References: <20180706171306.13501-1-brian.gix@intel.com>
- <20180706171306.13501-4-brian.gix@intel.com>
- <62AEAA3E-B88E-4D53-A113-3680C1F86047@holtmann.org>
- <1531062347.7346.18.camel@intel.com>
-To: Brian Gix <brian.gix@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Jeremy Cline <jeremy@jcline.org>,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-acpi@vger.kernel.org
+Message-Id: <6D5FE822-FF51-4502-956B-8993603021CC@holtmann.org>
+References: <20180710081117.25078-1-hdegoede@redhat.com>
+ <20180710081117.25078-5-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Hans,
 
->>> ---
->>> mesh/display.c         |  67 +++++
->>> mesh/hci.c             | 699 +++++++++++++++++++++++++++++++++++++++++++++++++
->>> mesh/mesh-io-generic.c | 660 ++++++++++++++++++++++++++++++++++++++++++++++
->>> mesh/mesh-io.c         | 187 +++++++++++++
->>> 4 files changed, 1613 insertions(+)
->>> create mode 100644 mesh/display.c
->>> create mode 100644 mesh/hci.c
->>> create mode 100644 mesh/mesh-io-generic.c
->>> create mode 100644 mesh/mesh-io.c
->>> 
->>> diff --git a/mesh/display.c b/mesh/display.c
->>> new file mode 100644
->>> index 000000000..adf92cae0
->>> --- /dev/null
->>> +++ b/mesh/display.c
->>> @@ -0,0 +1,67 @@
->>> +/*
->>> + *
->>> + *  BlueZ - Bluetooth protocol stack for Linux
->>> + *
->>> + *  Copyright (C) 2018  Intel Corporation. All rights reserved.++++
->>> + *
->>> + *
->>> + *  This library is free software; you can redistribute it and/or
->>> + *  modify it under the terms of the GNU Lesser General Public
->>> + *  License as published by the Free Software Foundation; either
->>> + *  version 2.1 of the License, or (at your option) any later version.
->>> + *
->>> + *  This library is distributed in the hope that it will be useful,
->>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->>> + *  Lesser General Public License for more details.
->>> + *
->>> + */
->>> +
->>> +#include <stdio.h>
->>> +#include <unistd.h>
->>> +#include <termios.h>
->>> +#include <sys/ioctl.h>
->>> +#include <sys/time.h>
->>> +#include <ell/ell.h>
->>> +
->>> +#include "display.h"
->>> +
->>> +#define likely(x)   __builtin_expect(!!(x), 1)
->>> +#define unlikely(x) __builtin_expect(!!(x), 0)
->> 
->> I highly doubt we will make good use of likely and unlikely. Just remove that. We can measure that at some
->> point, but right now it seems useless. On a side note, I am not convinced that our usage in ELL is actually
->> worth while doing.
+> The Realtek RTL8723BS and RTL8723DS chipsets are SDIO wifi chips. They
+> also contain a Bluetooth module which is connected via UART to the host.
 > 
-> This will be removed for v6 of patch-set
+> Realtek's userspace initialization tool (rtk_hciattach) differentiates
+> these two via the HCI version and revision returned by the
+> HCI_OP_READ_LOCAL_VERSION command.
+> Additionally we apply these checks only the for UART devices. Everything
+> else is assumed to be a "RTL8723B" which was originally supported by the
+> driver (communicating via USB).
 > 
->> 
->>> +
->>> +static unsigned int cached_num_columns;
->>> +
->>> +unsigned int num_columns(void)
->>> +{
->>> +	struct winsize ws;
->>> +
->>> +	if (likely(cached_num_columns > 0))
->>> +		return cached_num_columns;
->>> +
->>> +	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) < 0 || ws.ws_col == 0)
->>> +		cached_num_columns = 80;
->>> +	else
->>> +		cached_num_columns = ws.ws_col;
->>> +
->>> +	return cached_num_columns;
->>> +}
->>> +
->>> +void print_packet(const char *label, const void *data, uint16_t size)
->>> +{
->>> +	struct timeval pkt_time;
->>> +
->>> +	gettimeofday(&pkt_time, NULL);
->>> +
->>> +	if (size > 0) {
->>> +		char *str;
->>> +
->>> +		str = l_util_hexstring(data, size);
->>> +		l_info("%05d.%03d %s: %s",
->>> +				(uint32_t) pkt_time.tv_sec % 100000,
->>> +				(uint32_t) pkt_time.tv_usec/1000, label, str);
->>> +		l_free(str);
->>> +	} else
->>> +		l_info("%05d.%03d %s: empty",
->>> +				(uint32_t) pkt_time.tv_sec % 100000,
->>> +				(uint32_t) pkt_time.tv_usec/1000, label);
->>> +}
->> 
->> I have no idea why we are not using util_hexdump() or l_util_hexdump() since they are hooked up properly with
->> debug defines etc.
+> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+> Signed-off-by: Jeremy Cline <jeremy@jcline.org>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> Changes in v2 (Hans de Goede)
+> -Fix some minor style issues / checkpatch warnings
+> ---
+> drivers/bluetooth/btrtl.c | 51 ++++++++++++++++++++++++++++++++++++---
+> 1 file changed, 47 insertions(+), 4 deletions(-)
 > 
-> l_util_hexdump does not create strings in the format we most use, which is a form that can be fed back into
-> l_util_from_hexstring. l_util_hexdump adds whitespace between each octet, and ascii gorp at the end of the
-> line, while l_util_hexstring returns a tightly packed octets-to-asciihex.
-
-the l_util_hexdump is intentionally this way sine it is readable without making the brain hurt ;)
-
-> We can then use the output from this function to copy/paste strings between instances for example to:
-> 1. simulate "Out Of Band" public and static key exchange
-> 2. trade via email long ascii-hex strings to IOP and UPF partners
-> 3. paste repeated over-the-air packets to repeat exact test runs without preconditioning sequence numbers and
-> IV Indexs etc.
+> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> index 6c0d88d23d6d..8dacca64fe41 100644
+> --- a/drivers/bluetooth/btrtl.c
+> +++ b/drivers/bluetooth/btrtl.c
+> @@ -38,6 +38,8 @@
 > 
-> If you like, I can rework this to use l_debug, but the current output format of the data is more useful in this
-> form, than it is in hexdump format.
-
-Use l_debug or something where the output format can be changed quickly. Since I disagree with you that large streams of hex octets are useful. During development maybe, but unless you build a log decoder for it, it is useless.
-
-So if you want this kind, then abstract it properly and cleanly. Also be able to switch if off by default so that it doesn't clog your logs.
-
->>> diff --git a/mesh/hci.c b/mesh/hci.c
->>> new file mode 100644
->>> index 000000000..da6838a55
->>> --- /dev/null
->>> +++ b/mesh/hci.c
->>> @@ -0,0 +1,699 @@
->>> +/*
->>> + *
->>> + *  BlueZ - Bluetooth protocol stack for Linux
->>> + *
->>> + *  Copyright (C) 2018  Intel Corporation. All rights reserved.
->>> + *
->>> + *
->>> + *  This library is free software; you can redistribute it and/or
->>> + *  modify it under the terms of the GNU Lesser General Public
->>> + *  License as published by the Free Software Foundation; either
->>> + *  version 2.1 of the License, or (at your option) any later version.
->>> + *
->>> + *  This library is distributed in the hope that it will be useful,
->>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->>> + *  Lesser General Public License for more details.
->>> + *
->>> + */
->>> +
->>> +#ifdef HAVE_CONFIG_H
->>> +#include <config.h>
->>> +#endif
->>> +
->>> +#include <unistd.h>
->>> +#include <stdlib.h>
->>> +#include <sys/uio.h>
->>> +#include <sys/socket.h>
->>> +#include <ell/ell.h>
->>> +
->>> +#include "monitor/bt.h"
->>> +
->>> +#include "mesh/hci.h"
->>> +
->>> +#define BTPROTO_HCI	1
->>> +struct sockaddr_hci {
->>> +	sa_family_t	hci_family;
->>> +	unsigned short	hci_dev;
->>> +	unsigned short  hci_channel;
->>> +};
->>> +#define HCI_CHANNEL_USER	1
->>> +
->>> +struct bt_hci {
->>> +	int ref_count;
->>> +	struct l_io *io;
->>> +	bool is_stream;
->>> +	bool writer_active;
->>> +	uint8_t num_cmds;
->>> +	uint8_t num_pkts;
->>> +	unsigned int next_cmd_id;
->>> +	unsigned int next_evt_id;
->>> +	struct l_queue *cmd_queue;
->>> +	struct l_queue *rsp_queue;
->>> +	struct l_queue *evt_list;
->>> +	struct l_queue *pkt_queue;
->>> +	bt_hci_receive_func_t receive_callback;
->>> +	bt_hci_destroy_func_t receive_destroy;
->>> +	void *receive_data;
->>> +};
->> 
->> What is wrong with src/shared/hci.[ch] instead having a copy here?
+> #define IC_MATCH_FL_LMPSUBV	(1 << 0)
+> #define IC_MATCH_FL_HCIREV	(1 << 1)
+> +#define IC_MATCH_FL_HCIVER	(1 << 2)
+> +#define IC_MATCH_FL_HCIBUS	(1 << 3)
+> #define IC_INFO(lmps, hcir) \
+> 	.match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV, \
+> 	.lmp_subver = (lmps), \
+> @@ -47,6 +49,8 @@ struct id_table {
+> 	__u16 match_flags;
+> 	__u16 lmp_subver;
+> 	__u16 hci_rev;
+> +	__u8 hci_ver;
+> +	__u8 hci_bus;
+> 	bool config_needed;
+> 	bool has_rom_version;
+> 	char *fw_name;
+> @@ -75,6 +79,18 @@ static const struct id_table ic_id_table[] = {
+> 	  .fw_name = "rtl_bt/rtl8723a_fw.bin",
+> 	  .cfg_name = NULL },
 > 
-> The main barrier to this is that the src/shared/hci.[ch] uses glib conventions, and the mesh versions use ELL.
-> I agree that these should be a single hci.[ch], but it may need to wait until the rest of bluez is transitioned
-> to ELL.
+> +	/* 8723BS */
+> +	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
+> +			 IC_MATCH_FL_HCIVER | IC_MATCH_FL_HCIBUS,
+> +	  .lmp_subver = RTL_ROM_LMP_8723B,
+> +	  .hci_rev = 0xb,
+> +	  .hci_ver = 6,
+> +	  .hci_bus = HCI_UART,
+> +	  .config_needed = true,
+> +	  .has_rom_version = true,
+> +	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
+> +	  .cfg_name = "rtl_bt/rtl8723bs_config.bin" },
+> +
+> 	/* 8723B */
+> 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb),
+> 	  .config_needed = false,
+> @@ -89,6 +105,18 @@ static const struct id_table ic_id_table[] = {
+> 	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
+> 	  .cfg_name = "rtl_bt/rtl8723d_config.bin" },
 > 
-> I can add a /* TODO */ to the mesh version to ensure that this is eventually addressed (?).
+> +	/* 8723DS */
+> +	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
+> +			 IC_MATCH_FL_HCIVER | IC_MATCH_FL_HCIBUS,
+> +	  .lmp_subver = RTL_ROM_LMP_8723B,
+> +	  .hci_rev = 0xd,
+> +	  .hci_ver = 8,
+> +	  .hci_bus = HCI_UART,
+> +	  .config_needed = true,
+> +	  .has_rom_version = true,
+> +	  .fw_name  = "rtl_bt/rtl8723ds_fw.bin",
+> +	  .cfg_name = "rtl_bt/rtl8723ds_config.bin" },
+> +
+> 	/* 8821A */
+> 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa),
+> 	  .config_needed = false,
+> @@ -118,7 +146,8 @@ static const struct id_table ic_id_table[] = {
+> 	  .cfg_name = "rtl_bt/rtl8822b_config.bin" },
+> 	};
+> 
+> -static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev)
+> +static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
+> +					     u8 hci_ver, u8 hci_bus)
+> {
+> 	int i;
+> 
+> @@ -129,6 +158,12 @@ static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev)
+> 		if ((ic_id_table[i].match_flags & IC_MATCH_FL_HCIREV) &&
+> 		    (ic_id_table[i].hci_rev != hci_rev))
+> 			continue;
+> +		if ((ic_id_table[i].match_flags & IC_MATCH_FL_HCIVER) &&
+> +		    (ic_id_table[i].hci_ver != hci_ver))
+> +			continue;
+> +		if ((ic_id_table[i].match_flags & IC_MATCH_FL_HCIBUS) &&
+> +		    (ic_id_table[i].hci_bus != hci_bus))
+> +			continue;
+> 
+> 		break;
+> 	}
+> @@ -481,6 +516,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
+> 	struct sk_buff *skb;
+> 	struct hci_rp_read_local_version *resp;
+> 	u16 hci_rev, lmp_subver;
+> +	u8 hci_ver;
+> 	int ret;
+> 
+> 	btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
+> @@ -501,14 +537,17 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
+> 		    resp->hci_ver, resp->hci_rev,
+> 		    resp->lmp_ver, resp->lmp_subver);
+> 
+> +	hci_ver = resp->hci_ver;
+> 	hci_rev = le16_to_cpu(resp->hci_rev);
+> 	lmp_subver = le16_to_cpu(resp->lmp_subver);
+> 	kfree_skb(skb);
+> 
+> -	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev);
+> +	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
+> +					    hdev->bus);
+> +
 
-No. I am not buying your argument. src/shared/hci.c has no GLib in it. It is fully IO agnostic. Actually everything in src/shared is IO agnostic. It is that way for a reason. If you can not make this work with ELL, then lets address that problem and not paper over it.
+I am bit reluctant to let you use hdev->bus here since that should be essentially local to the core. I know you set it before calling hci_register_dev, but it was never really designed to be accessed again by the driver? Do you need access to it or can this be done internally in the driver?
 
 Regards
 
