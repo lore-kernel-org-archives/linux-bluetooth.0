@@ -2,46 +2,76 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH v4 01/13] Bluetooth: Define default phys in hdev and set
- 1M as default
+Subject: Re: [PATCH v5 5/7] Bluetooth: Extend btuart driver for join more
+ vendor devices
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1531301495-14479-2-git-send-email-jaganathx.kanakkassery@intel.com>
-Date: Sat, 14 Jul 2018 18:47:41 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Message-Id: <DF60112C-859A-4A2E-94EF-1BF6F7D879EC@holtmann.org>
-References: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1531301495-14479-2-git-send-email-jaganathx.kanakkassery@intel.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+In-Reply-To: <85d449cdd34bf47d72935a821915e825c64a2145.1531150733.git.sean.wang@mediatek.com>
+Date: Sat, 14 Jul 2018 18:44:49 +0200
+Cc: robh+dt@kernel.org, mark.rutland@arm.com,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Message-Id: <70616B99-5A2D-417A-8815-246700EEF4E2@holtmann.org>
+References: <cover.1531150733.git.sean.wang@mediatek.com>
+ <85d449cdd34bf47d72935a821915e825c64a2145.1531150733.git.sean.wang@mediatek.com>
+To: sean.wang@mediatek.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Sean,
 
-> 1M would be set as default and same would be set during power on
-> if controller support SetDefaultPHY.
+> Adding an independent btuart.h header allows these essential definitions
+> can be reused in vendor driver. Also, struct btuart_vnd is extended with
+> additional callbacks such as .init initializing vendor data, .shtudown,
+> .recv and .send supporting SoC specific framing for that btuart can
+> simply adapt to various Bluetooth uart-based devices.
 > 
-> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 > ---
-> include/net/bluetooth/hci.h      | 4 ++++
-> include/net/bluetooth/hci_core.h | 3 +++
-> net/bluetooth/hci_core.c         | 9 +++++----
-> 3 files changed, 12 insertions(+), 4 deletions(-)
+> drivers/bluetooth/btuart.c | 73 ++++++++++++++++++++++++----------------------
+> drivers/bluetooth/btuart.h | 30 +++++++++++++++++++
+> 2 files changed, 68 insertions(+), 35 deletions(-)
+> create mode 100644 drivers/bluetooth/btuart.h
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 73e48be..664fe1e 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1514,6 +1514,10 @@ struct hci_cp_le_set_default_phy {
-> 	__u8    rx_phys;
-> } __packed;
+> diff --git a/drivers/bluetooth/btuart.c b/drivers/bluetooth/btuart.c
+> index a900aac..65d0086 100644
+> --- a/drivers/bluetooth/btuart.c
+> +++ b/drivers/bluetooth/btuart.c
+> @@ -33,35 +33,11 @@
+> #include <net/bluetooth/hci_core.h>
 > 
-> +#define HCI_LE_SET_PHY_1M		0x01
-> +#define HCI_LE_SET_PHY_2M		0x02
-> +#define HCI_LE_SET_PHY_CODED		0x04
-> +
+> #include "h4_recv.h"
+> +#include "btuart.h"
+> #include "btbcm.h"
+> 
+> #define VERSION "1.0"
+> 
+> -struct btuart_vnd {
+> -	const struct h4_recv_pkt *recv_pkts;
+> -	int recv_pkts_cnt;
+> -	unsigned int manufacturer;
+> -	int (*open)(struct hci_dev *hdev);
+> -	int (*close)(struct hci_dev *hdev);
+> -	int (*setup)(struct hci_dev *hdev);
+> -};
+> -
+> -struct btuart_dev {
+> -	struct hci_dev *hdev;
+> -	struct serdev_device *serdev;
+> -
+> -	struct work_struct tx_work;
+> -	unsigned long tx_state;
+> -	struct sk_buff_head txq;
+> -
+> -	struct sk_buff *rx_skb;
+> -
+> -	const struct btuart_vnd *vnd;
+> -};
 
-scrap the _SET here since that make no sense to me. Just call out the PHY name.
+I really like to avoid this since it is not clean. Frankly I prefer to keep the btuart.c driver for drivers that really just use H:4 as transport protocol. If the protocol is only H:4 alike and has extra headers, then it should be a separate driver.
+
+The common H:4 handling is abstracted in h4_recv.h already anyway and we can add more pieces if needed. However I also wonder since you have extra framing that the complex H:4 state keeping might be not needed at all. So it could be simplified.
 
 Regards
 
