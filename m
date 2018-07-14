@@ -3,9 +3,9 @@ From: Brian Gix <brian.gix@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
         inga.stotland@intel.com
-Subject: [PATCH BlueZ v7 10/14] mesh: Source code for handling access layer mux/demux
-Date: Sat, 14 Jul 2018 12:58:59 -0700
-Message-Id: <20180714195903.7402-11-brian.gix@intel.com>
+Subject: [PATCH BlueZ v7 12/14] mesh: Read and write mesh configuration in JSON format
+Date: Sat, 14 Jul 2018 12:59:01 -0700
+Message-Id: <20180714195903.7402-13-brian.gix@intel.com>
 In-Reply-To: <20180714195903.7402-1-brian.gix@intel.com>
 References: <20180714195903.7402-1-brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,17 +13,21 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Inga Stotland <inga.stotland@intel.com>
 
+This adds implementation for parsing and writing Mesh configuration
+into JSON format. Also, parse stored unprovisioned device composiotion.
 ---
- mesh/model.c | 1274 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 1274 insertions(+)
- create mode 100644 mesh/model.c
+ mesh/mesh-db.c | 1360 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/mesh-db.h |  144 ++++++
+ 2 files changed, 1504 insertions(+)
+ create mode 100644 mesh/mesh-db.c
+ create mode 100644 mesh/mesh-db.h
 
-diff --git a/mesh/model.c b/mesh/model.c
+diff --git a/mesh/mesh-db.c b/mesh/mesh-db.c
 new file mode 100644
-index 000000000..d50817843
+index 000000000..7bddab010
 --- /dev/null
-+++ b/mesh/model.c
-@@ -0,0 +1,1274 @@
++++ b/mesh/mesh-db.c
+@@ -0,0 +1,1360 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -48,1256 +52,1492 @@ index 000000000..d50817843
 +#include <config.h>
 +#endif
 +
-+#include <sys/time.h>
++#include <errno.h>
++#include <stdbool.h>
++#include <stdio.h>
++#include <string.h>
++
 +#include <ell/ell.h>
 +
 +#include "mesh/mesh-defs.h"
++#include "mesh/util.h"
 +
-+#include "mesh/mesh.h"
-+#include "mesh/crypto.h"
-+#include "mesh/node.h"
-+#include "mesh/net.h"
-+#include "mesh/appkey.h"
-+#include "mesh/model.h"
-+#include "mesh/display.h"
-+#include "mesh/cfgmod.h"
-+#include "mesh/storage.h"
++#include "mesh/mesh-db.h"
 +
-+struct mesh_model {
-+	const struct mesh_model_ops *cbs;
-+	void *user_data;
-+	struct l_queue *bindings;
-+	struct l_queue *subs;
-+	struct l_queue *virtuals;
-+	struct mesh_model_pub *pub;
-+	uint32_t id;
-+	uint8_t ele_idx;
-+};
++#define CHECK_KEY_IDX_RANGE(x) (((x) >= 0) && ((x) <= 4095))
 +
-+struct mesh_virtual {
-+	uint32_t id; /*Identifier of internally stored addr, min val 0x10000 */
-+	uint16_t ota;
-+	uint16_t ref_cnt;
-+	uint8_t addr[16];
-+};
-+
-+/* These struct is used to pass lots of params to l_queue_foreach */
-+struct mod_forward {
-+	struct mesh_virtual *virt;
-+	const uint8_t *data;
-+	uint16_t src;
-+	uint16_t dst;
-+	uint16_t unicast;
-+	uint16_t idx;
-+	uint16_t size;
-+	uint8_t ttl;
-+	int8_t rssi;
-+	bool szmict;
-+	bool done;
-+};
-+
-+static struct l_queue *mesh_virtuals;
-+
-+static uint32_t virt_id_next = VIRTUAL_BASE;
-+static struct timeval tx_start;
-+
-+static void unref_virt(void *data)
++static bool get_int(json_object *jobj, const char *keyword, int *value)
 +{
-+	struct mesh_virtual *virt = data;
++	json_object *jvalue;
 +
-+	if (virt->ref_cnt > 0)
-+		virt->ref_cnt--;
-+
-+	if (virt->ref_cnt)
-+		return;
-+
-+	l_queue_remove(mesh_virtuals, virt);
-+	l_free(virt);
-+}
-+
-+static bool simple_match(const void *a, const void *b)
-+{
-+	return a == b;
-+}
-+
-+static bool find_virt_by_id(const void *a, const void *b)
-+{
-+	const struct mesh_virtual *virt = a;
-+	uint32_t id = L_PTR_TO_UINT(b);
-+
-+	return virt->id == id;
-+}
-+
-+static bool find_virt_by_addr(const void *a, const void *b)
-+{
-+	const struct mesh_virtual *virt = a;
-+	const uint8_t *addr = b;
-+
-+	return memcmp(virt->addr, addr, 16) == 0;
-+}
-+
-+static struct mesh_model *find_model(struct mesh_net *net, uint16_t addr,
-+						uint32_t mod_id, int *fail)
-+{
-+	int ele_idx;
-+	struct mesh_node *node;
-+
-+	node = mesh_net_local_node_get(net);
-+
-+	ele_idx = node_get_element_idx(node, addr);
-+
-+	if (ele_idx < 0) {
-+		if (fail)
-+			*fail = MESH_STATUS_INVALID_ADDRESS;
-+		return NULL;
-+	}
-+
-+	return node_get_model(node, (uint8_t) ele_idx, mod_id, fail);
-+}
-+
-+static void forward_model(void *a, void *b)
-+{
-+	struct mesh_model *mod = a;
-+	struct mod_forward *fwd = b;
-+	struct mesh_virtual *virt;
-+	uint32_t dst;
-+	bool has_dst = false;
-+
-+	if (!mod->cbs || !mod->cbs->recv)
-+		return;
-+
-+	l_debug("model %8.8x with idx %3.3x", mod->id, fwd->idx);
-+	if (fwd->idx != APP_IDX_DEV &&
-+		!l_queue_find(mod->bindings, simple_match,
-+						L_UINT_TO_PTR(fwd->idx)))
-+		return;
-+
-+	dst = fwd->dst;
-+	if (dst == fwd->unicast || IS_ALL_NODES(dst))
-+		has_dst = true;
-+	else if (fwd->virt) {
-+		virt = l_queue_find(mod->virtuals, simple_match, fwd->virt);
-+		if (virt) {
-+			/*
-+			 * Map Virtual addresses to a usable namespace that
-+			 * prevents us for forwarding a false positive
-+			 * (multiple Virtual Addresses that map to the same
-+			 * u16 OTA addr)
-+			 */
-+			has_dst = true;
-+			dst = virt->id;
-+		}
-+	} else {
-+		if (l_queue_find(mod->subs, simple_match, L_UINT_TO_PTR(dst)))
-+			has_dst = true;
-+	}
-+
-+
-+	if (!has_dst)
-+		return;
-+
-+	/*
-+	 * TODO: models shall be registered with a list of supported opcodes and
-+	 * element address. Iterate through the list of opcodes to see if the
-+	 * model is an addressee.
-+	 * If this is an internal registered model, check for a "bind" callback.
-+	 * For an external ("user") model, send D-Bus method (signal?) (TBD)
-+	 */
-+	if (mod->cbs->recv)
-+		mod->cbs->recv(fwd->src, dst, fwd->unicast, fwd->idx,
-+				fwd->data, fwd->size, fwd->ttl, mod->user_data);
-+
-+	if (dst == fwd->unicast)
-+		fwd->done = true;
-+}
-+
-+static int dev_packet_decrypt(struct mesh_net *net, const uint8_t *data,
-+				uint16_t size, bool szmict, uint16_t src,
-+				uint16_t dst, uint8_t key_id, uint32_t seq,
-+				uint32_t iv_idx, uint8_t *out)
-+{
-+	struct mesh_node *node;
-+	const uint8_t *dev_key;
-+
-+	node = mesh_net_local_node_get(net);
-+	dev_key = node_get_device_key(node);
-+	if (!dev_key)
++	if (!json_object_object_get_ex(jobj, keyword, &jvalue))
 +		return false;
 +
-+	if (mesh_crypto_payload_decrypt(NULL, 0, data, size, szmict, src,
-+					dst, key_id, seq, iv_idx, out, dev_key))
-+		return APP_IDX_DEV;
++	*value = json_object_get_int(jvalue);
++	if (errno == EINVAL)
++		return false;
 +
-+	return -1;
++	return true;
 +}
 +
-+static int virt_packet_decrypt(struct mesh_net *net, const uint8_t *data,
-+				uint16_t size, bool szmict, uint16_t src,
-+				uint16_t dst, uint8_t key_id, uint32_t seq,
-+				uint32_t iv_idx, uint8_t *out,
-+				struct mesh_virtual **decrypt_virt)
++static bool add_key(json_object *jobject, const char *desc,
++					const uint8_t key[16])
 +{
-+	const struct l_queue_entry *v;
++	json_object *jstring;
++	char hexstr[33];
 +
-+	for (v = l_queue_get_entries(mesh_virtuals); v; v = v->next) {
-+		struct mesh_virtual *virt = v->data;
-+		int decrypt_idx;
++	hex2str((uint8_t *) key, 16, hexstr, 33);
++	jstring = json_object_new_string(hexstr);
++	if (!jstring)
++		return false;
 +
-+		if (virt->ota != dst)
++	json_object_object_add(jobject, desc, jstring);
++	return true;
++}
++
++static json_object *get_element_model(json_object *jnode, int ele_idx,
++						uint32_t mod_id, bool vendor)
++{
++	json_object *jelements, *jelement, *jmodels;
++	int i, num_mods;
++	size_t len;
++	char buf[9];
++
++	if (!vendor)
++		snprintf(buf, 5, "%4.4x", (uint16_t)mod_id);
++	else
++		snprintf(buf, 9, "%8.8x", mod_id);
++
++	json_object_object_get_ex(jnode, "elements", &jelements);
++	if (!jelements)
++		return NULL;
++
++	jelement = json_object_array_get_idx(jelements, ele_idx);
++	if (!jelement)
++		return NULL;
++
++	json_object_object_get_ex(jelement, "models", &jmodels);
++	if (!jmodels)
++		return NULL;
++
++	num_mods = json_object_array_length(jmodels);
++	if (!num_mods)
++		return NULL;
++
++	if (!vendor) {
++		snprintf(buf, 5, "%4.4x", mod_id);
++		len = 4;
++	} else {
++		snprintf(buf, 9, "%8.8x", mod_id);
++		len = 8;
++	}
++
++	for (i = 0; i < num_mods; ++i) {
++		json_object *jmodel, *jvalue;
++		char *str;
++
++		jmodel = json_object_array_get_idx(jmodels, i);
++		json_object_object_get_ex(jmodel, "modelId", &jvalue);
++		if (!jvalue)
++			return NULL;
++
++		str = (char *)json_object_get_string(jvalue);
++		if (!str)
++			return NULL;
++
++		if (!strncmp(str, buf, len))
++			return jmodel;
++	}
++
++	return NULL;
++}
++
++static bool jarray_has_string(json_object *jarray, char *str, size_t len)
++{
++	int i, sz = json_object_array_length(jarray);
++
++	for (i = 0; i < sz; ++i) {
++		json_object *jentry;
++		char *str_entry;
++
++		jentry = json_object_array_get_idx(jarray, i);
++		str_entry = (char *)json_object_get_string(jentry);
++		if (!str_entry)
 +			continue;
 +
-+		decrypt_idx = appkey_packet_decrypt(net, szmict, seq,
-+							iv_idx, src, dst,
-+							virt->addr, 16, key_id,
-+							data, size, out);
-+
-+		if (decrypt_idx >= 0) {
-+			*decrypt_virt = virt;
-+			return decrypt_idx;
-+		}
++		if (!strncmp(str, str_entry, len))
++			return true;
 +	}
 +
-+	return -1;
++	return false;
 +}
 +
-+static void cmplt(uint16_t remote, uint8_t status,
-+					void *data, uint16_t size,
-+					void *user_data)
++static json_object *jarray_string_del(json_object *jarray, char *str,
++								size_t len)
 +{
-+	struct timeval tx_end;
-+
-+	if (status)
-+		l_info("Tx-->%4.4x (%d octets) Failed (%d)",
-+				remote, size, status);
-+	else
-+		l_info("Tx-->%4.4x (%d octets) Succeeded", remote, size);
-+
-+	/* print_packet("Sent Data", data, size); */
-+
-+	gettimeofday(&tx_end, NULL);
-+	if (tx_end.tv_sec == tx_start.tv_sec) {
-+		l_info("Duration 0.%zu seconds",
-+				tx_end.tv_usec - tx_start.tv_usec);
-+	} else {
-+		if (tx_start.tv_usec > tx_end.tv_usec)
-+			l_info("Duration %zu.%zu seconds",
-+				tx_end.tv_sec - tx_start.tv_sec - 1,
-+				tx_end.tv_usec + 1000000 - tx_start.tv_usec);
-+		else
-+			l_info("Duration %zu.%zu seconds",
-+					tx_end.tv_sec - tx_start.tv_sec,
-+					tx_end.tv_usec - tx_start.tv_usec);
-+	}
-+}
-+
-+static bool pub_frnd_cred(struct mesh_net *net, uint16_t src, uint32_t mod_id)
-+{
-+	struct mesh_model *mod = find_model(net, src, mod_id, NULL);
-+
-+	if (!mod || !mod->pub)
-+		return false;
-+
-+	return (mod->pub->credential != 0);
-+}
-+
-+static unsigned int msg_send(struct mesh_net *net, uint32_t mod_id,
-+				uint16_t src, uint32_t dst,
-+				uint8_t key_id, const uint8_t *key,
-+				uint8_t *aad, uint8_t ttl,
-+				const void *msg, uint16_t msg_len)
-+{
-+	unsigned int ret = 0;
-+	uint32_t iv_index, seq_num;
-+	uint8_t *out;
-+	bool szmic = false;
-+	uint16_t out_len = msg_len + sizeof(uint32_t);
-+
-+	/* Use large MIC if it doesn't affect segmentation */
-+	if (msg_len > 11 && msg_len <= 376) {
-+		if ((out_len / 12) == ((out_len + 4) / 12)) {
-+			szmic = true;
-+			out_len = msg_len + sizeof(uint64_t);
-+		}
-+	}
-+
-+	out = l_malloc(out_len);
-+
-+	iv_index = mesh_net_get_iv_index(net);
-+
-+	seq_num = mesh_net_get_seq_num(net);
-+	if (!mesh_crypto_payload_encrypt(aad, msg, out, msg_len,
-+				src, dst, key_id,
-+				seq_num, iv_index,
-+				szmic, key)) {
-+		l_error("Failed to Encrypt Payload");
-+		goto done;
-+	}
-+
-+	/* print_packet("Encrypted with", key, 16); */
-+
-+	ret = mesh_net_app_send(net, pub_frnd_cred(net, src, mod_id),
-+				src, dst, key_id, ttl,
-+				seq_num, iv_index,
-+				szmic,
-+				out, out_len,
-+				cmplt, NULL);
-+done:
-+	l_free(out);
-+	return ret;
-+}
-+
-+static void model_unbind_idx(void *a, void *b)
-+{
-+	struct mesh_model *mod = a;
-+	uint16_t idx = L_PTR_TO_UINT(b);
-+
-+	if (idx == mod->pub->idx) {
-+		mod->pub->addr = UNASSIGNED_ADDRESS;
-+		/*
-+		 * TODO: callback for internal model or
-+		 * D-Bus signal/method "model publication changed" (TBD)
-+		 */
-+	}
-+
-+	l_queue_remove(mod->bindings, b);
-+
-+	if (mod->cbs->bind)
-+		mod->cbs->bind(idx, ACTION_DELETE);
-+}
-+
-+static int model_bind_idx(struct mesh_model *mod, uint16_t idx)
-+{
-+	if (l_queue_length(mod->bindings) >= MAX_BINDINGS)
-+		return MESH_STATUS_INSUFF_RESOURCES;
-+
-+	if (!l_queue_push_tail(mod->bindings, L_UINT_TO_PTR(idx)))
-+		return MESH_STATUS_INSUFF_RESOURCES;
-+
-+	if (mod->cbs->bind)
-+		mod->cbs->bind(idx, ACTION_ADD);
-+
-+	return MESH_STATUS_SUCCESS;
-+
-+}
-+
-+static int update_binding(struct mesh_net *net, uint16_t addr, uint32_t id,
-+				uint16_t app_idx, bool unbind)
-+{
-+	int fail;
-+	struct mesh_model *mod;
-+	int status;
-+
-+	mod = find_model(net, addr, id, &fail);
-+	if (!mod) {
-+		l_info("model not found");
-+		return fail;
-+	}
-+
-+	if (id == CONFIG_SRV_MODEL || id == CONFIG_CLI_MODEL)
-+		return MESH_STATUS_INVALID_MODEL;
-+
-+	if (!l_queue_find(mod->bindings, simple_match, L_UINT_TO_PTR(app_idx)))
-+		return MESH_STATUS_CANNOT_BIND;
-+
-+	if (!appkey_have_key(net, app_idx))
-+		return MESH_STATUS_INVALID_APPKEY;
-+
-+	if (unbind) {
-+		model_unbind_idx(mod, &app_idx);
-+
-+		if (!storage_model_bind(net, addr, id, app_idx, true))
-+			return MESH_STATUS_STORAGE_FAIL;
-+
-+		return MESH_STATUS_SUCCESS;
-+	}
-+
-+	status = model_bind_idx(mod, app_idx);
-+	if (status != MESH_STATUS_SUCCESS)
-+		return status;
-+
-+	if (!storage_model_bind(net, addr, id, app_idx, false)) {
-+		model_unbind_idx(mod, &app_idx);
-+		return MESH_STATUS_STORAGE_FAIL;
-+	}
-+
-+	return MESH_STATUS_SUCCESS;
-+
-+}
-+
-+static int set_pub(struct mesh_model *mod, const uint8_t *mod_addr,
-+			uint16_t idx, bool cred_flag, uint8_t ttl,
-+			uint8_t period, uint8_t retransmit, bool b_virt,
-+			uint16_t *dst)
-+{
-+	struct mesh_virtual *virt;
-+	uint16_t grp;
-+
-+	if (dst) {
-+		if (b_virt)
-+			*dst = 0;
-+		else
-+			*dst = l_get_le16(mod_addr);
-+	}
-+
-+	if (b_virt) {
-+		if (!mesh_crypto_virtual_addr(mod_addr, &grp))
-+			return MESH_STATUS_STORAGE_FAIL;
-+	}
-+
-+	/* If old publication was Virtual, remove it */
-+	if (mod->pub && mod->pub->addr >= VIRTUAL_BASE) {
-+		virt = l_queue_find(mod->virtuals, find_virt_by_id,
-+						L_UINT_TO_PTR(mod->pub->addr));
-+		if (virt) {
-+			l_queue_remove(mod->virtuals, virt);
-+			unref_virt(virt);
-+		}
-+	}
-+
-+	if (b_virt) {
-+		virt = l_queue_find(mesh_virtuals, find_virt_by_addr, mod_addr);
-+		if (!virt) {
-+			virt = l_new(struct mesh_virtual, 1);
-+			virt->id = virt_id_next++;
-+			virt->ota = grp;
-+			memcpy(virt->addr, mod_addr, sizeof(virt->addr));
-+			l_queue_push_head(mesh_virtuals, virt);
-+		} else {
-+			grp = virt->ota;
-+		}
-+		virt->ref_cnt++;
-+		l_queue_push_head(mod->virtuals, virt);
-+		mod->pub->addr = virt->id;
-+	} else {
-+		grp = l_get_le16(mod_addr);
-+		mod->pub->addr = grp;
-+	}
-+
-+	if (dst)
-+		*dst = grp;
-+
-+	if (IS_UNASSIGNED(grp) && mod->pub) {
-+		l_free(mod->pub);
-+		mod->pub = NULL;
-+		/* Remove publication if Pub Addr is 0x0000 */
-+	} else {
-+		if (!mod->pub)
-+			mod->pub = l_new(struct mesh_model_pub, 1);
-+		if (!mod->pub)
-+			return MESH_STATUS_STORAGE_FAIL;
-+
-+		mod->pub->credential = cred_flag;
-+		mod->pub->idx = idx;
-+		mod->pub->ttl = ttl;
-+		mod->pub->period = period;
-+		mod->pub->retransmit = retransmit;
-+	}
-+
-+	return MESH_STATUS_SUCCESS;
-+}
-+
-+static int add_sub(struct mesh_net *net, struct mesh_model *mod,
-+			const uint8_t *group, bool b_virt, uint16_t *dst)
-+{
-+	struct mesh_virtual *virt;
-+	uint16_t grp;
-+
-+	if (b_virt) {
-+		virt = l_queue_find(mesh_virtuals, find_virt_by_addr, group);
-+		if (!virt) {
-+			if (!mesh_crypto_virtual_addr(group, &grp))
-+				return MESH_STATUS_STORAGE_FAIL;
-+
-+			virt = l_new(struct mesh_virtual, 1);
-+			virt->id = virt_id_next++;
-+			virt->ota = grp;
-+			memcpy(virt->addr, group, sizeof(virt->addr));
-+			if (!l_queue_push_head(mesh_virtuals, virt))
-+				return MESH_STATUS_STORAGE_FAIL;
-+		} else {
-+			grp = virt->ota;
-+		}
-+		virt->ref_cnt++;
-+		l_queue_push_head(mod->virtuals, virt);
-+	} else {
-+		grp = l_get_le16(group);
-+	}
-+
-+	if (dst)
-+		*dst = grp;
-+
-+	if (!mod->subs)
-+		mod->subs = l_queue_new();
-+	if (!mod->subs)
-+		return MESH_STATUS_STORAGE_FAIL;
-+
-+	if (l_queue_find(mod->subs, simple_match, L_UINT_TO_PTR(grp)))
-+		/* Group already exists */
-+		return MESH_STATUS_SUCCESS;
-+
-+	l_queue_push_tail(mod->subs, L_UINT_TO_PTR(grp));
-+
-+	l_info("Added %4.4x", grp);
-+	if (net)
-+		mesh_net_dst_reg(net, grp);
-+
-+	return MESH_STATUS_SUCCESS;
-+}
-+
-+bool mesh_model_rx(struct mesh_net *net, bool szmict, uint32_t seq0,
-+			uint32_t seq, uint32_t iv_index, uint8_t ttl,
-+			uint16_t src, uint16_t dst, uint8_t key_id,
-+			const uint8_t *data, uint16_t size)
-+{
-+	uint8_t *clear_text;
-+	struct mod_forward forward = {
-+		.src = src,
-+		.dst = dst,
-+		.data = NULL,
-+		.size = size - (szmict ? 8 : 4),
-+		.ttl = ttl,
-+		.virt = NULL,
-+		.done = false,
-+	};
-+
-+	struct mesh_node *node;
-+	uint8_t num_ele;
-+	int decrypt_idx, i, ele_idx;
-+	uint16_t addr;
-+	struct mesh_virtual *decrypt_virt = NULL;
-+
-+	l_debug("iv_index %8.8x key_id = %2.2x", iv_index, key_id);
-+	if (!dst)
-+		return false;
-+
-+	node = mesh_net_local_node_get(net);
-+	if (!node)
-+		return false;
-+
-+	ele_idx = node_get_element_idx(node, dst);
-+
-+	if (dst < 0x8000 && ele_idx < 0)
-+		/* Unicast and not addressed to us */
-+		return false;
-+
-+
-+	clear_text = l_malloc(size);
-+	if (!clear_text)
-+		return false;
-+
-+	forward.data = clear_text;
-+
-+	/*
-+	 * The packet needs to be decoded by the correct key which
-+	 * is hinted by key_id, but is not necessarily definitive
-+	 */
-+	if (key_id == APP_ID_DEV || mesh_net_provisioner_mode_get(net))
-+		decrypt_idx = dev_packet_decrypt(net, data, size, szmict, src,
-+						dst, key_id, seq0, iv_index,
-+						clear_text);
-+	else if ((dst & 0xc000) == 0x8000)
-+		decrypt_idx = virt_packet_decrypt(net, data, size, szmict, src,
-+							dst, key_id, seq0,
-+							iv_index, clear_text,
-+							&decrypt_virt);
-+	else
-+		decrypt_idx = appkey_packet_decrypt(net, szmict, seq0,
-+							iv_index, src, dst,
-+							NULL, 0, key_id, data,
-+							size, clear_text);
-+
-+	if (decrypt_idx < 0) {
-+		l_error("model.c - Failed to decrypt application payload");
-+		forward.done = false;
-+		goto done;
-+	}
-+
-+	/* print_packet("Clr Rx (pre-cache-check)", clear_text, size - 4); */
-+
-+	if (key_id != APP_ID_DEV) {
-+		uint16_t crpl = mesh_net_get_crpl(net);
-+
-+		if (appkey_msg_in_replay_cache(net, (uint16_t) decrypt_idx, src,
-+							crpl, seq, iv_index)) {
-+			forward.done = true;
-+			goto done;
-+		}
-+	}
-+
-+	print_packet("Clr Rx", clear_text, size - (szmict ? 8 : 4));
-+
-+	forward.virt = decrypt_virt;
-+	forward.idx = decrypt_idx;
-+	num_ele = node_get_num_elements(node);
-+	addr = node_get_primary(node);
-+
-+	if (!num_ele || IS_UNASSIGNED(addr))
-+		goto done;
-+
-+	for (i = 0; i < num_ele; i++) {
-+		struct l_queue *models;
-+
-+		if (dst < 0x8000 && ele_idx != i)
++	int i, sz = json_object_array_length(jarray);
++	json_object *jarray_new;
++
++	jarray_new = json_object_new_array();
++	if (!jarray_new)
++		return NULL;
++
++	for (i = 0; i < sz; ++i) {
++		json_object *jentry;
++		char *str_entry;
++
++		jentry = json_object_array_get_idx(jarray, i);
++		str_entry = (char *)json_object_get_string(jentry);
++		if (str_entry && !strncmp(str, str_entry, len))
 +			continue;
 +
-+		forward.unicast = addr + i;
-+		models = node_get_element_models(node, i, NULL);
-+		l_queue_foreach(models, forward_model, &forward);
-+
-+		if (dst < 0x8000 && ele_idx == i)
-+			break;
++		json_object_array_add(jarray_new, jentry);
 +	}
-+done:
-+	l_free(clear_text);
-+	return forward.done;
++
++	return jarray_new;
 +}
 +
-+unsigned int mesh_model_send(struct mesh_net *net, uint32_t mod_id,
-+				uint16_t src, uint32_t target,
-+				uint16_t app_idx, uint8_t ttl,
-+				const void *msg, uint16_t msg_len)
++static json_object *get_key_object(json_object *jarray, uint16_t idx)
 +{
-+	struct mesh_model *mod;
-+	uint8_t *aad = NULL;
-+	uint16_t dst;
-+	uint8_t key_id;
-+	const uint8_t *key;
++	int i, sz = json_object_array_length(jarray);
 +
-+	/* print_packet("Mod Tx", msg, msg_len); */
++	for (i = 0; i < sz; ++i) {
++		json_object *jentry, *jvalue;
++		uint32_t jidx;
 +
-+	if (!net || msg_len > 380)
-+		return 0;
++		jentry = json_object_array_get_idx(jarray, i);
++		if (!json_object_object_get_ex(jentry, "index", &jvalue))
++			return NULL;
 +
-+	/* If SRC is 0, use the Primary Element */
-+	if (src == 0)
-+		src = mesh_net_get_address(net);
++		jidx = json_object_get_int(jvalue);
 +
-+	mod = find_model(net, src, mod_id, NULL);
-+	if (!mod) {
-+		l_info("model %x not found", mod_id);
-+		return 0;
++		if (jidx == idx)
++			return jentry;
 +	}
 +
-+	gettimeofday(&tx_start, NULL);
++	return NULL;
++}
 +
-+	if (target == USE_PUB_VALUE) {
-+		target = mod->pub->addr;
-+		app_idx = mod->pub->idx;
-+	}
++static json_object *jarray_key_del(json_object *jarray, int16_t idx)
++{
++	json_object *jarray_new;
++	int i, sz = json_object_array_length(jarray);
++	char idx_str[5];
 +
-+	if (IS_UNASSIGNED(target))
-+		return 0;
++	snprintf(idx_str, 5, "%4.4x", idx);
 +
-+	if (target >= VIRTUAL_BASE) {
-+		struct mesh_virtual *virt = l_queue_find(mesh_virtuals,
-+				find_virt_by_id,
-+				L_UINT_TO_PTR(target));
++	jarray_new = json_object_new_array();
++	if (!jarray_new)
++		return NULL;
 +
-+		if (!virt)
-+			return 0;
++	for (i = 0; i < sz; ++i) {
++		json_object *jentry, *jvalue;
++		char *str;
 +
-+		aad = virt->addr;
-+		dst = virt->ota;
-+	} else
-+		dst = target;
++		jentry = json_object_array_get_idx(jarray, i);
 +
-+	l_debug("dst=%x", dst);
-+	if (app_idx == APP_IDX_DEV && mesh_net_provisioner_mode_get(net)) {
-+		key = node_get_device_key(mesh_net_local_node_get(net));
-+	} else if (app_idx == APP_IDX_DEV) {
-+		key = node_get_device_key(mesh_net_local_node_get(net));
-+		if (!key)
-+			return 0;
-+
-+		l_debug("(%x)", app_idx);
-+		key_id = APP_ID_DEV;
-+	} else {
-+		key = appkey_get_key(net, app_idx, &key_id);
-+		if (!key) {
-+			l_debug("no app key for (%x)", app_idx);
-+			return 0;
++		if (json_object_object_get_ex(jentry, "index", &jvalue)) {
++			str = (char *)json_object_get_string(jvalue);
++			if (str && !strncmp(str, idx_str, 4))
++				continue;
 +		}
 +
-+		l_debug("(%x) %p", app_idx, key);
-+		l_debug("key_id %x", key_id);
++		json_object_array_add(jarray_new, jentry);
 +	}
 +
-+	return msg_send(net, mod_id, src, dst, key_id, key, aad, ttl,
-+			msg, msg_len);
-+
++	return jarray_new;
 +}
 +
-+int mesh_model_pub_set(struct mesh_net *net, uint16_t addr, uint32_t id,
-+			const uint8_t *mod_addr, uint16_t idx, bool cred_flag,
-+			uint8_t ttl, uint8_t period, uint8_t retransmit,
-+			bool b_virt, uint16_t *dst)
++bool mesh_db_read_iv_index(json_object *jobj, uint32_t *idx, bool *update)
 +{
-+	int fail = MESH_STATUS_SUCCESS;
-+	int ele_idx = -1;
-+	struct mesh_model *mod;
-+	struct mesh_node *node;
++	int tmp;
 +
-+	node = mesh_net_local_node_get(net);
-+	if (node)
-+		ele_idx = node_get_element_idx(node, addr);
++	/* IV index */
++	if (!get_int(jobj, "IVindex", &tmp))
++		return false;
 +
-+	if (!node || ele_idx < 0) {
-+		fail = MESH_STATUS_INVALID_ADDRESS;
++	*idx = (uint32_t) tmp;
++
++	if (!get_int(jobj, "IVupdate", &tmp))
++		return false;
++
++	*update = tmp ? true : false;
++
++	return true;
++}
++
++bool mesh_db_read_device_key(json_object *jobj, uint8_t key_buf[16])
++{
++	json_object *jvalue;
++	char *str;
++
++	if (!key_buf)
++		return false;
++
++	if (!json_object_object_get_ex(jobj, "deviceKey", &jvalue) ||
++								!jvalue)
++		return false;
++
++	str = (char *)json_object_get_string(jvalue);
++	if (!str2hex(str, strlen(str), key_buf, 16))
++		return false;
++
++	return true;
++}
++
++bool mesh_db_read_app_keys(json_object *jobj, mesh_db_app_key_cb cb,
++							void *user_data)
++{
++	json_object *jarray;
++	int len;
++	int i;
++
++	if (!cb)
++		return true;
++
++	json_object_object_get_ex(jobj, "appKeys", &jarray);
++	if (!jarray || (json_object_get_type(jarray) != json_type_array))
++		return false;
++
++	len = json_object_array_length(jarray);
++
++	for (i = 0; i < len; ++i) {
++		json_object *jtemp, *jvalue;
++		int app_idx, net_idx;
++		bool key_refresh = false;
++		char *str;
++		uint8_t key[16];
++		uint8_t new_key[16];
++
++		jtemp = json_object_array_get_idx(jarray, i);
++
++		if (!get_int(jtemp, "index", &app_idx))
++			return false;
++
++		if (!CHECK_KEY_IDX_RANGE(app_idx))
++			return false;
++
++		if (!get_int(jtemp, "boundNetKey", &net_idx))
++			return false;
++
++		if (!CHECK_KEY_IDX_RANGE(net_idx))
++			return false;
++
++		json_object_object_get_ex(jtemp, "oldKey", &jvalue);
++		if (jvalue) {
++			str = (char *)json_object_get_string(jvalue);
++			if (!str2hex(str, strlen(str), key, 16))
++				return false;
++			key_refresh = true;
++		}
++
++		json_object_object_get_ex(jtemp, "key", &jvalue);
++		if (!jvalue)
++			return false;
++
++		str = (char *)json_object_get_string(jvalue);
++		if (!str2hex(str, strlen(str), key_refresh ? new_key : key, 16))
++			return false;
++
++		if (!cb((uint16_t)net_idx, (uint16_t) app_idx, key,
++				key_refresh ? new_key : NULL, user_data))
++			return false;
++	}
++
++	return true;
++}
++
++bool mesh_db_read_net_keys(json_object *jobj, mesh_db_net_key_cb cb,
++								void *user_data)
++{
++	json_object *jarray;
++	int len;
++	int i;
++
++	if (!cb)
++		return true;
++
++	json_object_object_get_ex(jobj, "netKeys", &jarray);
++	if (!jarray || (json_object_get_type(jarray) != json_type_array))
++		return false;
++
++	len = json_object_array_length(jarray);
++
++	for (i = 0; i < len; ++i) {
++		json_object *jtemp, *jvalue;
++		int idx;
++		char *str;
++		bool key_refresh = false;
++		int phase;
++		uint8_t key[16];
++		uint8_t new_key[16];
++
++		jtemp = json_object_array_get_idx(jarray, i);
++
++		if (!get_int(jtemp, "index", &idx))
++			return false;
++
++		if (!CHECK_KEY_IDX_RANGE(idx))
++			return false;
++
++		json_object_object_get_ex(jtemp, "oldKey", &jvalue);
++		if (jvalue) {
++			str = (char *)json_object_get_string(jvalue);
++			if (!str2hex(str, strlen(str), key, 16))
++				return false;
++			key_refresh = true;
++		}
++
++		json_object_object_get_ex(jtemp, "key", &jvalue);
++		if (!jvalue)
++			return false;
++
++		str = (char *)json_object_get_string(jvalue);
++		if (!str2hex(str, strlen(str), key_refresh ? new_key : key, 16))
++			return false;
++
++		json_object_object_get_ex(jtemp, "keyRefresh", &jvalue);
++		if (!jvalue)
++			phase = KEY_REFRESH_PHASE_NONE;
++		else
++			phase = json_object_get_int(jvalue);
++
++
++		if (!cb((uint16_t)idx, key, key_refresh ? new_key : NULL, phase,
++								user_data))
++			return false;
++	}
++
++	return true;
++}
++
++bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
++					const uint8_t key[16], int phase)
++{
++	json_object *jarray, *jentry = NULL, *jstring;
++	char buf[5];
++
++	json_object_object_get_ex(jobj, "netKeys", &jarray);
++	if (!jarray && (phase != KEY_REFRESH_PHASE_NONE))
++		return false;
++
++	if (jarray)
++		jentry = get_key_object(jarray, idx);
++
++	/*
++	 * The key entry should exist if the key is updated
++	 * (i.e., Key Refresh is underway)
++	 */
++	if (!jentry && (phase != KEY_REFRESH_PHASE_NONE))
++		return false;
++
++	if (jentry) {
++		uint8_t buf[16];
++		json_object *jvalue;
++		char *str;
++
++		json_object_object_get_ex(jentry, "key", &jvalue);
++		if (!jvalue)
++			return false;
++
++		str = (char *)json_object_get_string(jvalue);
++		if (!str2hex(str, strlen(str), buf, sizeof(buf)))
++			return false;
++
++		/* If the same key, return success */
++		if (memcmp(key, buf, 16) == 0)
++			return true;
++
 +		return false;
 +	}
 +
-+	mod = node_get_model(node, (uint8_t) ele_idx, id, &fail);
-+	if (!mod)
-+		return fail;
++	if (phase == KEY_REFRESH_PHASE_NONE) {
++		jentry = json_object_new_object();
++		if (!jentry)
++			goto fail;
 +
-+	if (id == CONFIG_SRV_MODEL || id == CONFIG_CLI_MODEL)
-+		return MESH_STATUS_INVALID_PUB_PARAM;
++		snprintf(buf, 5, "%4.4x", idx);
++		jstring = json_object_new_string(buf);
++		if (!jstring)
++			goto fail;
 +
-+	if (!appkey_have_key(net, idx))
-+		return MESH_STATUS_INVALID_APPKEY;
++		json_object_object_add(jentry, "index", jstring);
 +
-+	return set_pub(mod, mod_addr, idx, cred_flag, ttl, period, retransmit,
-+								b_virt, dst);
-+	/*
-+	 * TODO: Add standardized Publication Change notification to model
-+	 * definition
-+	 */
-+}
++		snprintf(buf, 5, "%4.4x", idx);
++		jstring = json_object_new_string(buf);
++		if (!jstring)
++			goto fail;
 +
-+struct mesh_model_pub *mesh_model_pub_get(struct mesh_net *net, uint8_t ele_idx,
-+						uint32_t mod_id, int *status)
-+{
-+	struct mesh_model *mod;
-+	struct mesh_node *node = mesh_net_local_node_get(net);
++		if (!add_key(jentry, "key", key))
++			goto fail;
 +
-+	if (!node) {
-+		*status = MESH_STATUS_INVALID_ADDRESS;
-+		return NULL;
++		if (!jarray) {
++			jarray = json_object_new_array();
++			if (!jarray)
++				goto fail;
++			json_object_object_add(jobj, "netKeys", jarray);
++		}
++
++		json_object_array_add(jarray, jentry);
++
++	} else {
++
++		if (!json_object_object_get_ex(jentry, "key", &jstring))
++			return false;
++
++		json_object_object_add(jentry, "oldKey", jstring);
++		json_object_object_del(jentry, "key");
++
++		if (!add_key(jentry, "key", key))
++			return false;
 +	}
 +
-+	mod = node_get_model(node, ele_idx, mod_id, status);
-+	if (!mod)
-+		return NULL;
 +
-+	return mod->pub;
++	json_object_object_add(jentry, "keyRefresh",
++					json_object_new_int(phase));
++
++	return true;
++fail:
++
++	if (jentry)
++		json_object_put(jentry);
++
++	return false;
 +}
 +
-+uint32_t mesh_model_get_model_id(const struct mesh_model *model)
++bool mesh_db_net_key_del(json_object *jobj, uint16_t idx)
 +{
-+	if (!model)
-+		return 0xffffffff; /* TODO: use define */
-+	return model->id;
++	json_object *jarray, *jarray_new;
++
++	json_object_object_get_ex(jobj, "netKeys", &jarray);
++	if (!jarray)
++		return true;
++
++	/* Check if matching entry exists */
++	if (!get_key_object(jarray, idx))
++		return true;
++
++	if (json_object_array_length(jarray) == 1) {
++		json_object_object_del(jobj, "netKeys");
++		return true;
++	}
++
++	/*
++	 * There is no easy way to delete a value from json array.
++	 * Create a new copy without specified element and
++	 * then remove old array.
++	 */
++	jarray_new = jarray_key_del(jarray, idx);
++	if (!jarray_new)
++		return false;
++
++	json_object_object_del(jobj, "netKeys");
++	json_object_object_add(jobj, "netKeys", jarray_new);
++
++	return true;
 +}
 +
-+void mesh_model_free(void *data)
++bool mesh_db_write_device_key(json_object *jnode, uint8_t *key)
 +{
-+	struct mesh_model *mod = data;
++	return add_key(jnode, "deviceKey", key);
++}
 +
-+	l_queue_destroy(mod->bindings, NULL);
-+	l_queue_destroy(mod->subs, NULL);
-+	l_queue_destroy(mod->virtuals, unref_virt);
++bool mesh_db_app_key_add(json_object *jobj, uint16_t net_idx, uint16_t app_idx,
++			 const uint8_t key[16], bool update)
++{
++	json_object *jarray, *jentry = NULL, *jstring = NULL;
++	char buf[5];
++
++	json_object_object_get_ex(jobj, "appKeys", &jarray);
++	if (!jarray && update)
++		return false;
++
++	if (jarray)
++		jentry = get_key_object(jarray, app_idx);
++
++	/* The key entry should exist if the key is updated */
++	if (!jentry  && update)
++		return false;
++
++	if (jentry) {
++		uint8_t buf[16];
++		json_object *jvalue;
++		char *str;
++
++		json_object_object_get_ex(jentry, "key", &jvalue);
++		if (!jvalue)
++			return false;
++
++		str = (char *)json_object_get_string(jvalue);
++		if (!str2hex(str, strlen(str), buf, sizeof(buf)))
++			return false;
++
++		/* If the same key, return success */
++		if (memcmp(key, buf, 16) == 0)
++			return true;
++
++		return false;
++	}
++
++	if (!update) {
++		jentry = json_object_new_object();
++		if (!jentry)
++			goto fail;
++
++		snprintf(buf, 5, "%4.4x", app_idx);
++		jstring = json_object_new_string(buf);
++		if (!jstring)
++			goto fail;
++
++		json_object_object_add(jentry, "index", jstring);
++
++		snprintf(buf, 5, "%4.4x", net_idx);
++		jstring = json_object_new_string(buf);
++		if (!jstring)
++			goto fail;
++
++		json_object_object_add(jentry, "boundNetKey", jstring);
++
++		if (!add_key(jentry, "key", key))
++			goto fail;
++
++		if (!jarray) {
++			jarray = json_object_new_array();
++			if (!jarray)
++				goto fail;
++			json_object_object_add(jobj, "appKeys", jarray);
++		}
++
++		json_object_array_add(jarray, jentry);
++
++	} else {
++
++		if (!json_object_object_get_ex(jentry, "key", &jstring))
++			return false;
++
++		json_object_object_add(jentry, "oldKey", jstring);
++		json_object_object_del(jentry, "key");
++
++		if (!add_key(jentry, "key", key))
++			return false;
++	}
++
++	return true;
++fail:
++
++	if (jentry)
++		json_object_put(jentry);
++
++	return false;
++}
++
++bool mesh_db_app_key_del(json_object *jobj, uint16_t net_idx, uint16_t idx)
++{
++	json_object *jarray, *jarray_new;
++
++	json_object_object_get_ex(jobj, "appKeys", &jarray);
++	if (!jarray)
++		return true;
++
++	/* Check if matching entry exists */
++	if (!get_key_object(jarray, idx))
++		return true;
++
++	if (json_object_array_length(jarray) == 1) {
++		json_object_object_del(jobj, "appKeys");
++		return true;
++	}
++
++	/*
++	 * There is no easy way to delete a value from json array.
++	 * Create a new copy without specified element and
++	 * then remove old array.
++	 */
++	jarray_new = jarray_key_del(jarray, idx);
++	if (!jarray_new)
++		return false;
++
++	json_object_object_del(jobj, "appKeys");
++	json_object_object_add(jobj, "appKeys", jarray_new);
++
++	return true;
++}
++
++bool mesh_db_model_binding_add(json_object *jnode, uint8_t ele_idx, bool vendor,
++				uint32_t mod_id, uint16_t app_idx)
++{
++	json_object *jmodel, *jstring, *jarray;
++	char buf[5];
++
++	jmodel = get_element_model(jnode, ele_idx, mod_id, vendor);
++	if (!jmodel)
++		return false;
++
++	json_object_object_get_ex(jmodel, "bind", &jarray);
++
++	snprintf(buf, 5, "%4.4x", app_idx);
++
++	if (jarray && jarray_has_string(jarray, buf, 4))
++		return true;
++
++	jstring = json_object_new_string(buf);
++	if (!jstring)
++		return false;
++
++	if (!jarray) {
++		jarray = json_object_new_array();
++		if (!jarray) {
++			json_object_put(jstring);
++			return false;
++		}
++		json_object_object_add(jmodel, "bind", jarray);
++	}
++
++	json_object_array_add(jarray, jstring);
++
++	return true;
++}
++
++bool mesh_db_model_binding_del(json_object *jnode, uint8_t ele_idx, bool vendor,
++				uint32_t mod_id, uint16_t app_idx)
++{
++	json_object *jmodel, *jarray, *jarray_new;
++	char buf[5];
++
++	jmodel = get_element_model(jnode, ele_idx, mod_id, vendor);
++	if (!jmodel)
++		return false;
++
++	json_object_object_get_ex(jmodel, "bind", &jarray);
++
++	snprintf(buf, 5, "%4.4x", app_idx);
++
++	if (!jarray || !jarray_has_string(jarray, buf, 4))
++		return true;
++
++	if (json_object_array_length(jarray) == 1) {
++		json_object_object_del(jmodel, "bind");
++		return true;
++	}
++
++	/*
++	 * There is no easy way to delete a value from json array.
++	 * Create a new copy without specified element and
++	 * then remove old array.
++	 */
++	jarray_new = jarray_string_del(jarray, buf, 4);
++	if (!jarray_new)
++		return false;
++
++	json_object_object_del(jmodel, "bind");
++	json_object_object_add(jmodel, "bind", jarray_new);
++
++	return true;
++}
++
++static void free_model(void *data)
++{
++	struct mesh_db_model *mod = data;
++
++	l_free(mod->bindings);
++	l_free(mod->subs);
 +	l_free(mod->pub);
 +	l_free(mod);
 +}
 +
-+struct mesh_model *mesh_model_new(uint8_t ele_idx, uint32_t id, bool vendor)
++static void free_element(void *data)
 +{
-+	struct mesh_model *mod = l_new(struct mesh_model, 1);
++	struct mesh_db_element *ele = data;
 +
-+	if (!mod)
-+		return NULL;
-+
-+	if (vendor)
-+		id |= VENDOR_ID_MASK;
-+
-+	mod->id = id;
-+	mod->ele_idx = ele_idx;
-+	mod->virtuals = l_queue_new();
-+	if (!mod->virtuals) {
-+		l_free(mod);
-+		return NULL;
-+	}
-+	return mod;
++	l_queue_destroy(ele->models, free_model);
++	l_free(ele);
 +}
 +
-+static void restore_model_state(void *data)
++static bool parse_bindings(json_object *jbindings, struct mesh_db_model *mod)
 +{
-+	struct mesh_model *mod = data;
-+	const struct mesh_model_ops *cbs;
-+	const struct l_queue_entry *b;
-+
-+	cbs = mod->cbs;
-+
-+	if (l_queue_isempty(mod->bindings) || !mod->cbs->bind) {
-+		for (b = l_queue_get_entries(mod->bindings); b; b = b->next) {
-+			if (cbs->bind(L_PTR_TO_UINT(b->data), ACTION_ADD) !=
-+				MESH_STATUS_SUCCESS)
-+				break;
-+		}
-+	}
-+
-+	if (mod->pub && cbs->pub)
-+		cbs->pub(mod->pub);
-+}
-+
-+bool mesh_model_vendor_register(struct mesh_net *net, uint8_t ele_idx,
-+					uint32_t mod_id,
-+					const struct mesh_model_ops *cbs,
-+					void *user_data)
-+{
-+	struct mesh_model *mod;
-+	struct mesh_node *node;
-+
-+	node = mesh_net_local_node_get(net);
-+	if (!node)
-+		return false;
-+
-+	mod = node_get_model(node, ele_idx, mod_id, NULL);
-+	if (!mod)
-+		return false;
-+
-+	mod->cbs = cbs;
-+	mod->user_data = user_data;
-+
-+	l_idle_oneshot(restore_model_state, mod, NULL);
-+
-+	return true;
-+}
-+
-+bool mesh_model_register(struct mesh_net *net, uint8_t ele_idx,
-+					uint32_t mod_id,
-+					const struct mesh_model_ops *cbs,
-+					void *user_data)
-+{
-+	uint32_t id = VENDOR_ID_MASK | mod_id;
-+
-+	return mesh_model_vendor_register(net, ele_idx, id, cbs, user_data);
-+}
-+
-+void mesh_model_app_key_delete(struct mesh_net *net, struct l_queue *models,
-+							uint16_t app_idx)
-+{
-+	l_queue_foreach(models, model_unbind_idx, L_UINT_TO_PTR(app_idx));
-+}
-+
-+int mesh_model_binding_del(struct mesh_net *net, uint16_t addr, uint32_t id,
-+						uint16_t app_idx)
-+{
-+	l_debug("0x%x, 0x%x, %d", addr, id, app_idx);
-+	return update_binding(net, addr, id, app_idx, true);
-+}
-+
-+int mesh_model_binding_add(struct mesh_net *net, uint16_t addr, uint32_t id,
-+						uint16_t app_idx)
-+{
-+	l_debug("0x%x, 0x%x, %d", addr, id, app_idx);
-+	return update_binding(net, addr, id, app_idx, false);
-+}
-+
-+int mesh_model_get_bindings(struct mesh_net *net, uint16_t addr, uint32_t id,
-+				uint8_t *buf, uint16_t buf_size, uint16_t *size)
-+{
-+	int fail;
-+	struct mesh_model *mod;
-+	const struct l_queue_entry *entry;
-+	uint16_t n;
-+	uint32_t idx_pair;
++	int cnt;
 +	int i;
 +
-+	mod = find_model(net, addr, id, &fail);
-+
-+	if (!mod) {
-+		*size = 0;
-+		return fail;
-+	}
-+
-+	entry = l_queue_get_entries(mod->bindings);
-+	n = 0;
-+	i = 0;
-+	idx_pair = 0;
-+
-+	for (; entry; entry = entry->next) {
-+		uint16_t app_idx = (uint16_t) (L_PTR_TO_UINT(entry->data));
-+
-+		if (!(i & 0x1)) {
-+			idx_pair = app_idx;
-+		} else {
-+			idx_pair <<= 12;
-+			idx_pair += app_idx;
-+			/* Unlikely, but check for overflow*/
-+			if ((n + 3) > buf_size) {
-+				l_warn("Binding list too large");
-+				goto done;
-+			}
-+			l_put_le32(idx_pair, buf);
-+			buf += 3;
-+			n += 3;
-+		}
-+		i++;
-+	}
-+
-+	/* Process the last app key if present */
-+	if (i & 0x1 && ((n + 2) <= buf_size)) {
-+		l_put_le16(idx_pair, buf);
-+		n += 2;
-+	}
-+
-+done:
-+	*size = n;
-+
-+	return MESH_STATUS_SUCCESS;
-+}
-+
-+int mesh_model_sub_get(struct mesh_net *net, uint16_t addr, uint32_t id,
-+			uint8_t *buf, uint16_t buf_size, uint16_t *size)
-+{
-+	int fail = MESH_STATUS_SUCCESS;
-+	int16_t n;
-+	struct mesh_model *mod;
-+	const struct l_queue_entry *entry;
-+
-+	mod = find_model(net, addr, id, &fail);
-+	if (!mod)
-+		return fail;
-+
-+	entry = l_queue_get_entries(mod->subs);
-+	*size = 0;
-+	n = 0;
-+
-+	for (; entry; entry = entry->next) {
-+		if ((n + 2) > buf_size)
-+			return MESH_STATUS_UNSPECIFIED_ERROR;
-+
-+		l_put_le16((uint16_t) L_PTR_TO_UINT(entry->data), buf);
-+		buf += 2;
-+		n += 2;
-+	}
-+
-+	*size = n;
-+	return MESH_STATUS_SUCCESS;
-+}
-+
-+int mesh_model_sub_add(struct mesh_net *net, uint16_t addr, uint32_t id,
-+			const uint8_t *group, bool b_virt, uint16_t *dst)
-+{
-+	int fail = MESH_STATUS_SUCCESS;
-+	int ele_idx = -1;
-+	struct mesh_model *mod;
-+	struct mesh_node *node;
-+
-+	node = mesh_net_local_node_get(net);
-+	if (node)
-+		ele_idx = node_get_element_idx(node, addr);
-+
-+	if (!node || ele_idx < 0) {
-+		fail = MESH_STATUS_INVALID_ADDRESS;
-+		return false;
-+	}
-+
-+	mod = node_get_model(node, (uint8_t) ele_idx, id, &fail);
-+	if (!mod)
-+		return fail;
-+
-+	return add_sub(net, mod, group, b_virt, dst);
-+	/* TODO: communicate to registered models that sub has changed */
-+}
-+
-+int mesh_model_sub_ovr(struct mesh_net *net, uint16_t addr, uint32_t id,
-+			const uint8_t *group, bool b_virt, uint16_t *dst)
-+{
-+	int fail = MESH_STATUS_SUCCESS;
-+	struct l_queue *virtuals, *subs;
-+	struct mesh_virtual *virt;
-+	struct mesh_model *mod;
-+
-+	mod = find_model(net, addr, id, &fail);
-+	if (!mod)
-+		return fail;
-+
-+	subs = mod->subs;
-+	virtuals = mod->virtuals;
-+	mod->subs = l_queue_new();
-+	mod->virtuals = l_queue_new();
-+
-+	if (!mod->subs || !mod->virtuals)
-+		return MESH_STATUS_INSUFF_RESOURCES;
-+
-+	/*
-+	 * When overwriting the Subscription List,
-+	 * make sure any virtual Publication address is preserved
-+	 */
-+	if (mod->pub && mod->pub->addr >= VIRTUAL_BASE) {
-+		virt = l_queue_find(virtuals, find_virt_by_id,
-+				L_UINT_TO_PTR(mod->pub->addr));
-+		if (virt) {
-+			virt->ref_cnt++;
-+			l_queue_push_head(mod->virtuals, virt);
-+		}
-+	}
-+
-+	fail = mesh_model_sub_add(net, addr, id, group, b_virt, dst);
-+
-+	if (fail) {
-+		/* Adding new group failed, so revert to old list */
-+		l_queue_destroy(mod->subs, NULL);
-+		mod->subs = subs;
-+		l_queue_destroy(mod->virtuals, unref_virt);
-+		mod->virtuals = virtuals;
-+	} else {
-+		const struct l_queue_entry *entry;
-+
-+		entry = l_queue_get_entries(subs);
-+		for (; entry; entry = entry->next)
-+			mesh_net_dst_unreg(net,
-+					(uint16_t) L_PTR_TO_UINT(entry->data));
-+
-+		l_queue_destroy(subs, NULL);
-+		l_queue_destroy(virtuals, unref_virt);
-+	}
-+
-+	return fail;
-+}
-+
-+int mesh_model_sub_del(struct mesh_net *net, uint16_t addr, uint32_t id,
-+			const uint8_t *group, bool b_virt, uint16_t *dst)
-+{
-+	int fail = MESH_STATUS_SUCCESS;
-+	uint16_t grp;
-+	struct mesh_model *mod;
-+
-+	mod = find_model(net, addr, id, &fail);
-+	if (!mod)
-+		return fail;
-+
-+	if (b_virt) {
-+		struct mesh_virtual *virt;
-+
-+		virt = l_queue_find(mod->virtuals, find_virt_by_addr, group);
-+		if (virt) {
-+			l_queue_remove(mod->virtuals, virt);
-+			grp = virt->ota;
-+			unref_virt(virt);
-+		} else {
-+			if (!mesh_crypto_virtual_addr(group, &grp))
-+				return MESH_STATUS_STORAGE_FAIL;
-+		}
-+	} else {
-+		grp = l_get_le16(group);
-+	}
-+
-+	*dst = grp;
-+
-+	if (l_queue_remove(mod->subs, L_UINT_TO_PTR(grp)))
-+		mesh_net_dst_unreg(net, grp);
-+
-+	return MESH_STATUS_SUCCESS;
-+}
-+
-+int mesh_model_sub_del_all(struct mesh_net *net, uint16_t addr, uint32_t id)
-+{
-+	int fail = MESH_STATUS_SUCCESS;
-+	struct mesh_model *mod;
-+	const struct l_queue_entry *entry;
-+
-+	mod = find_model(net, addr, id, &fail);
-+	if (!mod)
-+		return fail;
-+
-+	entry = l_queue_get_entries(mod->subs);
-+	for (; entry; entry = entry->next)
-+		mesh_net_dst_unreg(net, (uint16_t) L_PTR_TO_UINT(entry->data));
-+
-+	l_queue_destroy(mod->subs, NULL);
-+	l_queue_destroy(mod->virtuals, unref_virt);
-+	mod->virtuals = l_queue_new();
-+
-+	return fail;
-+}
-+
-+struct mesh_model *mesh_model_init(struct mesh_net *net, uint8_t ele_idx,
-+						struct mesh_db_model *db_mod)
-+{
-+	struct mesh_model *mod;
-+	uint32_t i;
-+
-+	mod = mesh_model_new(ele_idx, db_mod->id, db_mod->vendor);
-+	if (!mod)
-+		return NULL;
-+
-+	/* Implicitly bind config server model to device key */
-+	if (db_mod->id == CONFIG_SRV_MODEL) {
-+
-+		if (ele_idx != PRIMARY_ELE_IDX)
-+			return NULL;
-+
-+		l_queue_push_head(mod->bindings, L_UINT_TO_PTR(APP_IDX_DEV));
-+		return mod;
-+	}
-+
-+	if (db_mod->id == CONFIG_CLI_MODEL) {
-+		l_queue_push_head(mod->bindings, L_UINT_TO_PTR(APP_IDX_DEV));
-+		return mod;
-+	}
-+
-+	/* Add application key bindings if present */
-+	if (db_mod->bindings) {
-+		mod->bindings = l_queue_new();
-+
-+		if (!mod->bindings) {
-+			mesh_model_free(mod);
-+			return NULL;
-+		}
-+
-+		for (i = 0; i < db_mod->num_bindings; i++) {
-+			if (!model_bind_idx(mod, db_mod->bindings[i])) {
-+				mesh_model_free(mod);
-+				return NULL;
-+			}
-+		}
-+	}
-+
-+	/* Add publication if present */
-+	if (db_mod->pub) {
-+		uint16_t mod_addr;
-+		uint8_t *dst;
-+
-+		l_put_le16(db_mod->pub->addr, &mod_addr);
-+		dst = db_mod->pub->virt ? db_mod->pub->virt_addr :
-+							(uint8_t *) &mod_addr;
-+
-+		if (set_pub(mod, dst, db_mod->pub->idx, db_mod->pub->credential,
-+			db_mod->pub->ttl, db_mod->pub->period,
-+			db_mod->pub->retransmit, db_mod->pub->virt, NULL) !=
-+							MESH_STATUS_SUCCESS) {
-+			mesh_model_free(mod);
-+			return NULL;
-+		}
-+	}
-+
-+	/* Add subscriptions if present */
-+	if (!db_mod->subs)
-+		return mod;
-+
-+	for (i = 0; i < db_mod->num_subs; i++) {
-+		uint16_t group;
-+		uint8_t *src;
-+
-+		/*
-+		 * To keep calculations for virtual label coherent,
-+		 * convert to little endian.
-+		 */
-+		l_put_le16(db_mod->subs[i].src.addr, &group);
-+		src = db_mod->subs[i].virt ? db_mod->subs[i].src.virt_addr :
-+			(uint8_t *) &group;
-+
-+		if (add_sub(net, mod, src, db_mod->subs[i].virt, NULL) !=
-+							MESH_STATUS_SUCCESS) {
-+			mesh_model_free(mod);
-+			return NULL;
-+		}
-+	}
-+
-+	return mod;
-+}
-+
-+uint16_t mesh_model_opcode_set(uint32_t opcode, uint8_t *buf)
-+{
-+	if (opcode <= 0x7e) {
-+		buf[0] = opcode;
-+		return 1;
-+	}
-+
-+	if (opcode >= 0x8000 && opcode <= 0xbfff) {
-+		l_put_be16(opcode, buf);
-+		return 2;
-+	}
-+
-+	if (opcode >= 0xc00000 && opcode <= 0xffffff) {
-+		buf[0] = (opcode >> 16) & 0xff;
-+		l_put_be16(opcode, buf + 1);
-+		return 3;
-+	}
-+
-+	l_info("Illegal Opcode %x", opcode);
-+	return 0;
-+}
-+
-+bool mesh_model_opcode_get(const uint8_t *buf, uint16_t size,
-+					uint32_t *opcode, uint16_t *n)
-+{
-+	if (!n || !opcode || size < 1)
++	cnt = json_object_array_length(jbindings);
++	if (cnt > 0xffff)
 +		return false;
 +
-+	switch (buf[0] & 0xc0) {
-+	case 0x00:
-+	case 0x40:
-+		/* RFU */
-+		if (buf[0] == 0x7f)
-+			return false;
++	mod->num_subs = cnt;
 +
-+		*n = 1;
-+		*opcode = buf[0];
-+		break;
++	/* Allow empty bindings list */
++	if (!cnt)
++		return true;
 +
-+	case 0x80:
-+		if (size < 2)
-+			return false;
-+
-+		*n = 2;
-+		*opcode = l_get_be16(buf);
-+		break;
-+
-+	case 0xc0:
-+		if (size < 3)
-+			return false;
-+
-+		*n = 3;
-+		*opcode = l_get_be16(buf + 1);
-+		*opcode |= buf[0] << 16;
-+		break;
-+
-+	default:
-+		print_packet("Bad", buf, size);
++	mod->bindings = l_new(uint16_t, cnt);
++	if (!mod->bindings)
 +		return false;
++
++	for (i = 0; i < cnt; ++i) {
++		int idx;
++		json_object *jvalue;
++
++		jvalue = json_object_array_get_idx(jbindings, i);
++		if (!jvalue)
++			return false;
++
++		idx = json_object_get_int(jvalue);
++		if (!CHECK_KEY_IDX_RANGE(idx))
++			return false;
++
++		mod->bindings[i] = (uint16_t) idx;
 +	}
 +
 +	return true;
 +}
 +
-+void mesh_model_add_virtual(struct mesh_net *net, const uint8_t *v)
++static bool parse_models(json_object *jmodels, struct mesh_db_element *ele)
 +{
-+	struct mesh_virtual *virt = l_queue_find(mesh_virtuals,
-+						find_virt_by_addr, v);
++	int i, num_models;
 +
-+	if (virt) {
-+		virt->ref_cnt++;
-+		return;
++	num_models = json_object_array_length(jmodels);
++	if (!num_models)
++		return true;
++
++	for (i = 0; i < num_models; ++i) {
++		json_object *jmodel, *jarray, *jvalue;
++		struct mesh_db_model *mod;
++		uint32_t id;
++		int len;
++		char *str;
++
++		jmodel = json_object_array_get_idx(jmodels, i);
++		if (!jmodel)
++			goto fail;
++
++		mod = l_new(struct mesh_db_model, 1);
++		if (!ele)
++			goto fail;
++
++		json_object_object_get_ex(jmodel, "modelId", &jvalue);
++		str = (char *)json_object_get_string(jvalue);
++
++		len = strlen(str);
++
++		if (len != 4 && len != 8)
++			goto fail;
++
++		if (len == 4) {
++			if (sscanf(str, "%04x", &id) != 1)
++				goto fail;
++
++			id |= VENDOR_ID_MASK;
++		} else if (len == 8) {
++			if (sscanf(str, "%08x", &id) != 1)
++				goto fail;
++		} else
++			goto fail;
++
++		mod->id = id;
++
++		if (len == 8)
++			mod->vendor = true;
++
++		json_object_object_get_ex(jmodel, "bind", &jarray);
++
++		if (jarray && (json_object_get_type(jmodels) != json_type_array
++					|| !parse_bindings(jarray, mod)))
++			goto fail;
++
++		/* TODO add pub/sub */
++		l_queue_push_tail(ele->models, mod);
 +	}
 +
-+	virt = l_new(struct mesh_virtual, 1);
-+	if (!virt)
-+		return;
++	return true;
 +
-+	if (!mesh_crypto_virtual_addr(v, &virt->ota)) {
-+		l_free(virt);
-+		return; /* Storage Failure */
++fail:
++	l_queue_destroy(ele->models, free_model);
++	return false;
++}
++
++static bool parse_elements(json_object *jelements, struct mesh_db_node *node)
++{
++	int i, num_ele;
++
++	num_ele = json_object_array_length(jelements);
++	if (!num_ele)
++		/* Allow "empty" nodes */
++		return true;
++
++	node->elements = l_queue_new();
++	if (!node->elements)
++		return false;
++
++	for (i = 0; i < num_ele; ++i) {
++		json_object *jelement;
++		json_object *jmodels;
++		json_object *jvalue;
++		struct mesh_db_element *ele;
++		int index;
++		char *str;
++
++		jelement = json_object_array_get_idx(jelements, i);
++		if (!jelement)
++			goto fail;
++
++		if (!get_int(jelement, "elementIndex", &index) ||
++								index > num_ele)
++			goto fail;
++
++		ele = l_new(struct mesh_db_element, 1);
++		if (!ele)
++			goto fail;
++
++		ele->index = index;
++		ele->models = l_queue_new();
++		if (!ele->models)
++			goto fail;
++
++		json_object_object_get_ex(jelement, "location", &jvalue);
++		str = (char *)json_object_get_string(jvalue);
++		if (sscanf(str, "%04hx", &(ele->location)) != 1)
++			goto fail;
++
++		json_object_object_get_ex(jelement, "models", &jmodels);
++
++		if (jmodels && (json_object_get_type(jmodels) != json_type_array
++				|| !parse_models(jmodels, ele)))
++			goto fail;
++
++		l_queue_push_tail(node->elements, ele);
 +	}
 +
-+	memcpy(virt->addr, v, 16);
-+	virt->ref_cnt++;
-+	virt->id = virt_id_next++;
-+	l_queue_push_head(mesh_virtuals, virt);
++	return true;
++
++fail:
++	l_queue_destroy(node->elements, free_element);
++	node->elements = NULL;
++
++	return false;
 +}
 +
-+void mesh_model_del_virtual(struct mesh_net *net, uint32_t va24)
++static int get_mode(json_object *jvalue)
 +{
-+	struct mesh_virtual *virt = l_queue_remove_if(mesh_virtuals,
-+						find_virt_by_id,
-+						L_UINT_TO_PTR(va24));
++	const char *str;
 +
-+	if (virt)
-+		unref_virt(virt);
++	str = json_object_get_string(jvalue);
++	if (!str)
++		return 0xffffffff;
++
++	if (!strncasecmp(str, "disabled", strlen("disabled")))
++		return MESH_MODE_DISABLED;
++
++	if (!strncasecmp(str, "enabled", strlen("enabled")))
++		return MESH_MODE_ENABLED;
++
++	if (!strncasecmp(str, "unsupported", strlen("unsupported")))
++		return MESH_MODE_UNSUPPORTED;
++
++	return 0xffffffff;
 +}
++
++static void parse_features(json_object *jconfig, struct mesh_db_node *node)
++{
++	json_object *jvalue, *jrelay;
++	int mode, count;
++	uint16_t interval;
++
++	json_object_object_get_ex(jconfig, "proxy", &jvalue);
++	if (jvalue) {
++		mode = get_mode(jvalue);
++		if (mode <= MESH_MODE_UNSUPPORTED)
++			node->modes.proxy = mode;
++	}
++
++	json_object_object_get_ex(jconfig, "friend", &jvalue);
++	if (jvalue) {
++		mode = get_mode(jvalue);
++		if (mode <= MESH_MODE_UNSUPPORTED)
++			node->modes.friend = mode;
++	}
++
++	json_object_object_get_ex(jconfig, "lowPower", &jvalue);
++	if (jvalue) {
++		mode = get_mode(jvalue);
++		if (mode <= MESH_MODE_UNSUPPORTED)
++			node->modes.friend = mode;
++	}
++
++	json_object_object_get_ex(jconfig, "beacon", &jvalue);
++	if (jvalue) {
++		mode = get_mode(jvalue);
++		if (mode <= MESH_MODE_ENABLED)
++			node->modes.beacon = mode;
++	}
++
++	json_object_object_get_ex(jconfig, "relay", &jrelay);
++	if (!jrelay)
++		return;
++
++	json_object_object_get_ex(jrelay, "mode", &jvalue);
++	if (jvalue) {
++		mode = get_mode(jvalue);
++		if (mode <= MESH_MODE_UNSUPPORTED)
++			node->modes.relay.state = mode;
++		else
++			return;
++	} else
++		return;
++
++	json_object_object_get_ex(jrelay, "count", &jvalue);
++	if (!jvalue)
++		return;
++
++	/* TODO: check range */
++	count = json_object_get_int(jvalue);
++	node->modes.relay.cnt = count;
++
++	json_object_object_get_ex(jrelay, "interval", &jvalue);
++	if (!jvalue)
++		return;
++
++	/* TODO: check range */
++	interval = json_object_get_int(jvalue);
++	node->modes.relay.interval = interval;
++}
++
++static bool parse_composition(json_object *jcomp, struct mesh_db_node *node)
++{
++	json_object *jvalue;
++	char *str;
++
++	/* All the fields in node composition are mandatory */
++	json_object_object_get_ex(jcomp, "cid", &jvalue);
++	if (!jvalue)
++		return false;
++
++	str = (char *)json_object_get_string(jvalue);
++	if (sscanf(str, "%04hx", &node->cid) != 1)
++		return false;
++
++	json_object_object_get_ex(jcomp, "pid", &jvalue);
++	if (!jvalue)
++		return false;
++
++	str = (char *)json_object_get_string(jvalue);
++	if (sscanf(str, "%04hx", &node->pid) != 1)
++		return false;
++
++	json_object_object_get_ex(jcomp, "vid", &jvalue);
++	if (!jvalue)
++		return false;
++
++	str = (char *)json_object_get_string(jvalue);
++	if (sscanf(str, "%04hx", &node->vid) != 1)
++		return false;
++
++	json_object_object_get_ex(jcomp, "crpl", &jvalue);
++	if (!jvalue)
++		return false;
++
++	str = (char *)json_object_get_string(jvalue);
++	if (sscanf(str, "%04hx", &node->crpl) != 1)
++		return false;
++
++	return true;
++}
++
++static uint16_t get_prov_flags(json_object *jarray, uint16_t max_value)
++{
++	int i, cnt;
++	uint16_t result = 0;
++
++	cnt = json_object_array_length(jarray);
++	if (!cnt)
++		return 0;
++
++	for (i = 0; i < cnt; ++i) {
++		json_object *jvalue;
++		int value;
++
++		jvalue = json_object_array_get_idx(jarray, i);
++		value = json_object_get_int(jvalue);
++		if (value > 16)
++			continue;
++
++		if ((1 << value) > max_value)
++			continue;
++
++		result |= (1 << value);
++	}
++
++	return result;
++}
++
++bool mesh_db_read_node(json_object *jnode, mesh_db_node_cb cb, void *user_data)
++{
++	struct mesh_db_node node;
++	json_object *jvalue;
++	char *str;
++
++	if (!cb) {
++		l_info("Node read callback is required");
++		return false;
++	}
++
++	memset(&node, 0, sizeof(node));
++
++	if (!parse_composition(jnode, &node)) {
++		l_info("Failed to parse local node composition");
++		return false;
++	}
++
++	parse_features(jnode, &node);
++
++	json_object_object_get_ex(jnode, "unicastAddress", &jvalue);
++	if (!jvalue) {
++		l_info("Bad config: Unicast address must be present");
++		return false;
++	}
++
++	str = (char *)json_object_get_string(jvalue);
++	if (sscanf(str, "%04hx", &node.unicast) != 1)
++		return false;
++
++	json_object_object_get_ex(jnode, "defaultTTL", &jvalue);
++	if (jvalue) {
++		int ttl = json_object_get_int(jvalue);
++
++		if (ttl < 0 || ttl == 1 || ttl > DEFAULT_TTL)
++			return false;
++		node.ttl = (uint8_t) ttl;
++	}
++
++	json_object_object_get_ex(jnode, "sequenceNumber", &jvalue);
++	if (jvalue)
++		node.seq_number = json_object_get_int(jvalue);
++
++	json_object_object_get_ex(jnode, "elements", &jvalue);
++	if (jvalue && json_object_get_type(jvalue) == json_type_array) {
++		if (!parse_elements(jvalue, &node))
++			return false;
++	}
++
++	return cb(&node, user_data);
++}
++
++bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
++								void *user_data)
++{
++	struct mesh_db_node node;
++	json_object *jvalue;
++	char *str;
++
++	if (!cb) {
++		l_info("Device read callback is required");
++		return false;
++	}
++
++	memset(&node, 0, sizeof(node));
++
++	if (!parse_composition(jnode, &node)) {
++		l_info("Failed to parse local device composition");
++		return false;
++	}
++
++	parse_features(jnode, &node);
++
++	json_object_object_get_ex(jnode, "elements", &jvalue);
++	if (jvalue && json_object_get_type(jvalue) == json_type_array) {
++		if (!parse_elements(jvalue, &node))
++			return false;
++	}
++
++	json_object_object_get_ex(jnode, "UUID", &jvalue);
++	if (!jvalue)
++		return false;
++
++	str = (char *)json_object_get_string(jvalue);
++	if (!str2hex(str, strlen(str), node.uuid, 16))
++		return false;
++
++	return cb(&node, user_data);
++}
++
++bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov)
++{
++	json_object *jprov, *jarray, *jvalue, *jobj;
++	int value;
++	char *str;
++
++	if (!prov)
++		return false;
++
++	json_object_object_get_ex(jnode, "provision", &jprov);
++	if (!jprov)
++		return false;
++
++	json_object_object_get_ex(jprov, "algorithms", &jarray);
++	if (!jarray || json_object_get_type(jarray) != json_type_array)
++		return false;
++
++	prov->algorithm = get_prov_flags(jarray, ALG_FIPS_256_ECC);
++	if (!prov->algorithm) {
++		l_info("At least one algorithm must be indicated");
++		return false;
++	}
++
++	json_object_object_get_ex(jprov, "outputOOB", &jobj);
++	json_object_object_get_ex(jobj, "size", &jvalue);
++	value = json_object_get_int(jvalue);
++	if (value > 8)
++		return false;
++
++	prov->output_oob.size = (uint8_t) value;
++	json_object_object_get_ex(jobj, "actions", &jarray);
++	if (!jarray || json_object_get_type(jarray) != json_type_array)
++		return false;
++
++	prov->output_oob.actions = get_prov_flags(jarray, OOB_OUT_ALPHA);
++
++	json_object_object_get_ex(jprov, "inputOOB", &jobj);
++	json_object_object_get_ex(jobj, "size", &jvalue);
++	value = json_object_get_int(jvalue);
++	if (value > 8)
++		return false;
++
++	prov->input_oob.size = (uint8_t) value;
++	json_object_object_get_ex(jobj, "actions", &jarray);
++	if (!jarray || json_object_get_type(jarray) != json_type_array)
++		return false;
++
++	prov->input_oob.actions = get_prov_flags(jarray, OOB_IN_ALPHA);
++
++	json_object_object_get_ex(jprov, "publicType", &jvalue);
++	prov->pub_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
++
++	json_object_object_get_ex(jprov, "staticType", &jvalue);
++	prov->static_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
++
++	json_object_object_get_ex(jprov, "privateKey", &jvalue);
++	if (!jvalue)
++		return false;
++
++	str = (char *)json_object_get_string(jvalue);
++	if (!str2hex(str, strlen(str), prov->priv_key, 32))
++		return false;
++
++	return true;
++}
++
++bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
++								uint16_t value)
++{
++	json_object *jstring;
++	char buf[5];
++
++	snprintf(buf, 5, "%4.4x", value);
++	jstring = json_object_new_string(buf);
++	if (!jstring)
++		return false;
++
++	json_object_object_add(jobj, desc, jstring);
++	return true;
++}
++
++bool mesh_db_write_int(json_object *jobj, const char *keyword, int value)
++{
++	json_object *jvalue;
++
++	json_object_object_del(jobj, keyword);
++
++	jvalue = json_object_new_int(value);
++	if (!jvalue)
++		return false;
++
++	json_object_object_add(jobj, keyword, jvalue);
++	return true;
++}
++
++bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value)
++{
++	json_object *jvalue;
++
++	json_object_object_del(jobj, keyword);
++
++	jvalue = json_object_new_boolean(value);
++	if (!jvalue)
++		return false;
++
++	json_object_object_add(jobj, keyword, jvalue);
++	return true;
++}
++
++bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value)
++{
++	json_object *jstring;
++
++	switch (value) {
++	case MESH_MODE_DISABLED:
++		jstring = json_object_new_string("disabled");
++		break;
++	case MESH_MODE_ENABLED:
++		jstring = json_object_new_string("enabled");
++		break;
++	case MESH_MODE_UNSUPPORTED:
++		jstring = json_object_new_string("unsupported");
++		break;
++	default:
++		return false;
++	};
++
++	if (!jstring)
++		return false;
++
++	json_object_object_add(jobj, keyword, jstring);
++
++	return true;
++}
++
++bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
++							uint16_t interval)
++{
++	json_object *jrelay;
++
++	json_object_object_del(jnode, "relay");
++
++	jrelay = json_object_new_object();
++	if (jrelay)
++		return false;
++
++	if (!mesh_db_write_mode(jrelay, "mode", mode))
++		goto fail;
++
++	if (!mesh_db_write_int(jrelay, "count", count))
++		goto fail;
++
++	if (!mesh_db_write_int(jrelay, "interval", interval))
++		goto fail;
++
++	json_object_object_add(jnode, "relay", jrelay);
++
++	return true;
++fail:
++	json_object_put(jrelay);
++	return false;
++}
++
++bool mesh_db_read_net_transmit(json_object *jobj, uint8_t *cnt,
++							uint16_t *interval)
++{
++	json_object *jretransmit, *jvalue;
++
++	json_object_object_get_ex(jobj, "retransmit", &jretransmit);
++	if (!jretransmit)
++		return false;
++
++	json_object_object_get_ex(jretransmit, "count", &jvalue);
++	if (!jvalue)
++		return false;
++
++	*cnt = (uint8_t) json_object_get_int(jvalue);
++
++	json_object_object_get_ex(jretransmit, "interval", &jvalue);
++	if (!jvalue)
++		return false;
++
++	*interval = (uint16_t) json_object_get_int(jvalue);
++
++	return true;
++}
++
++bool mesh_db_write_net_transmit(json_object *jobj, uint8_t cnt,
++							uint16_t interval)
++{
++	json_object *jretransmit;
++
++	json_object_object_del(jobj, "retransmit");
++
++	jretransmit = json_object_new_object();
++	if (jretransmit)
++		return false;
++
++	if (!mesh_db_write_int(jretransmit, "count", cnt))
++		goto fail;
++
++	if (!mesh_db_write_int(jretransmit, "interval", interval))
++		goto fail;
++
++	json_object_object_add(jobj, "retransmit", jretransmit);
++
++	return true;
++fail:
++	json_object_put(jretransmit);
++	return false;
++
++}
++
++bool mesh_db_write_iv_index(json_object *jobj, uint32_t idx, bool update)
++{
++	int tmp = update ? 1 : 0;
++
++	if (!mesh_db_write_int(jobj, "IVindex", idx))
++		return false;
++
++	if (!mesh_db_write_int(jobj, "IVupdate", tmp))
++		return false;
++
++	return true;
++}
++
++void mesh_db_remove_property(json_object *jobj, const char *desc)
++{
++	json_object_object_del(jobj, desc);
++}
+diff --git a/mesh/mesh-db.h b/mesh/mesh-db.h
+new file mode 100644
+index 000000000..336302f28
+--- /dev/null
++++ b/mesh/mesh-db.h
+@@ -0,0 +1,144 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *
++ */
++
++#include <json-c/json.h>
++
++struct mesh_db_sub {
++	bool virt;
++	union {
++		uint16_t addr;
++		uint8_t	virt_addr[16];
++	} src;
++};
++
++struct mesh_db_pub {
++	bool virt;
++	uint16_t addr;
++	uint16_t idx;
++	uint8_t ttl;
++	uint8_t credential;
++	uint8_t period;
++	uint8_t retransmit;
++	uint8_t virt_addr[16];
++};
++
++struct mesh_db_model {
++	struct mesh_db_sub *subs;
++	struct mesh_db_pub *pub;
++	uint16_t *bindings;
++	uint32_t id;
++	bool vendor;
++	uint32_t num_bindings;
++	uint32_t num_subs;
++};
++
++struct mesh_db_element {
++	struct l_queue *models;
++	uint16_t location;
++	uint8_t index;
++};
++
++struct mesh_db_modes {
++	struct {
++		uint16_t interval;
++		uint8_t cnt;
++		uint8_t state;
++	} relay;
++	uint8_t lpn;
++	uint8_t friend;
++	uint8_t proxy;
++	uint8_t beacon;
++};
++
++struct mesh_db_node {
++	bool provisioner;
++	uint32_t seq_number;
++	struct mesh_db_modes modes;
++	uint16_t cid;
++	uint16_t pid;
++	uint16_t vid;
++	uint16_t crpl;
++	uint16_t unicast;
++	uint8_t ttl;
++	struct l_queue *elements;
++	uint8_t uuid[16];
++};
++
++struct mesh_db_prov {
++	uint16_t algorithm;
++	struct {
++		uint16_t actions;
++		uint8_t size;
++	} input_oob;
++	uint8_t pub_type;
++	struct {
++		uint16_t actions;
++		uint8_t size;
++	} output_oob;
++	uint8_t static_type;
++	uint8_t priv_key[32];
++};
++
++typedef bool (*mesh_db_net_key_cb)(uint16_t idx, uint8_t key[16],
++			uint8_t new_key[16], int phase, void *user_data);
++typedef bool (*mesh_db_app_key_cb)(uint16_t idx, uint16_t net_idx,
++			uint8_t key[16], uint8_t new_key[16], void *user_data);
++typedef bool (*mesh_db_node_cb)(struct mesh_db_node *node, void *user_data);
++
++bool mesh_db_read_node(json_object *jobj, mesh_db_node_cb cb, void *user_data);
++bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
++							void *user_data);
++bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov);
++bool mesh_db_read_iv_index(json_object *jobj, uint32_t *idx, bool *update);
++bool mesh_db_read_device_key(json_object *jobj, uint8_t key_buf[16]);
++bool mesh_db_read_net_transmit(json_object *jobj, uint8_t *cnt,
++							uint16_t *interval);
++bool mesh_db_write_net_transmit(json_object *jobj, uint8_t cnt,
++							uint16_t interval);
++bool mesh_db_read_net_keys(json_object *jobj, mesh_db_net_key_cb cb,
++							void *user_data);
++bool mesh_db_read_app_keys(json_object *jobj, mesh_db_app_key_cb cb,
++							void *user_data);
++bool mesh_db_write_device_key(json_object *jobj, uint8_t *key);
++bool mesh_db_write_network_key(json_object *jobj, uint16_t idx, uint8_t *key,
++						uint8_t *new_key, int phase);
++bool mesh_db_write_app_key(json_object *jobj, uint16_t net_idx,
++			uint16_t app_idx, uint8_t *key, uint8_t *new_key);
++bool mesh_db_write_int(json_object *jobj, const char *keyword, int value);
++bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
++								uint16_t value);
++bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value);
++bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
++							uint16_t interval);
++bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value);
++bool mesh_db_model_binding_add(json_object *jnode, uint8_t ele_idx, bool vendor,
++					uint32_t mod_id, uint16_t app_idx);
++bool mesh_db_model_binding_del(json_object *jnode, uint8_t ele_idx, bool vendor,
++					uint32_t mod_id, uint16_t app_idx);
++bool mesh_db_app_key_add(json_object *jnode, uint16_t net_idx, uint16_t app_idx,
++					const uint8_t key[16], bool update);
++bool mesh_db_app_key_del(json_object *jobj, uint16_t net_idx, uint16_t idx);
++bool mesh_db_net_key_add(json_object *jobj, uint16_t net_idx,
++					const uint8_t key[16], int phase);
++bool mesh_db_net_key_del(json_object *jobj, uint16_t net_idx);
++bool mesh_db_write_kr_phase(json_object *jobj, uint16_t net_idx, int phase);
++bool mesh_db_write_address(json_object *jobj, uint16_t address);
++bool mesh_db_write_iv_index(json_object *jobj, uint32_t idx, bool update);
++void mesh_db_remove_property(json_object *jobj, const char *desc);
 -- 
 2.14.4
 
