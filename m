@@ -1,14 +1,14 @@
 Return-Path: <jaganath.k.os@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1F22C5F5-1BC0-4135-9F67-4EAD186C5FA2@holtmann.org>
+In-Reply-To: <0D2F8A32-4CC7-4000-BC5B-9D89EA0B9561@holtmann.org>
 References: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1531301495-14479-8-git-send-email-jaganathx.kanakkassery@intel.com>
- <685125A7-C980-49FE-B614-29703E4F0936@holtmann.org> <CAJzH+brjqyHKuXdYHO1cjzvfRDxLE6Sfp-_V092mhiTs6VUeXQ@mail.gmail.com>
- <1F22C5F5-1BC0-4135-9F67-4EAD186C5FA2@holtmann.org>
+ <1531301495-14479-3-git-send-email-jaganathx.kanakkassery@intel.com>
+ <45DD34F0-0375-4EFB-B354-68EB373A3DE1@holtmann.org> <CAJzH+brmqSdFSZ+EkvtLc6yMk3C2FsveEnoU0+XcEF4Ks+1gDQ@mail.gmail.com>
+ <0D2F8A32-4CC7-4000-BC5B-9D89EA0B9561@holtmann.org>
 From: Jaganath K <jaganath.k.os@gmail.com>
-Date: Mon, 16 Jul 2018 19:21:12 +0530
-Message-ID: <CAJzH+boVxN-eHR1EVDyWsfOrCkrN03th_6+D1quezb8ac+cZSw@mail.gmail.com>
-Subject: Re: [PATCH v4 07/13] Bluetooth: Read no of adv sets during init
+Date: Mon, 16 Jul 2018 19:16:58 +0530
+Message-ID: <CAJzH+boUirOc0V2OjizuYms2x8Y=_Vph0p1JwYNWwZbbsLjtwg@mail.gmail.com>
+Subject: Re: [PATCH v4 02/13] Bluetooth: Implement Get PHY Configuration mgmt command
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
@@ -17,106 +17,420 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Mon, Jul 16, 2018 at 6:48 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Mon, Jul 16, 2018 at 6:38 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
 > Hi Jaganath,
 >
->>>> This patch reads the number of advertising sets in the controller
->>>> during init and save it in hdev.
+>>>> This commands basically retrieve the supported packet types of
+>>>> BREDR and supported PHYs of the controller.
 >>>>
->>>> This also checks ext adv support before send Read Adv TX Power
->>>> since legacy and extended Adv commands should not be mixed.
+>>>> BR_1M_1SLOT, LE_1M_TX and LE_1M_RX would be supported by default.
+>>>> Other PHYs are supported based on the local features.
 >>>>
->>>> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+>>>> @ MGMT Command: Get PHY Configuration (0x0044) plen 0
+>>>> @ MGMT Event: Command Complete (0x0001) plen 15
+>>>>     Get PHY Configuration (0x0044) plen 12
+>>>>       Status: Success (0x00)
+>>>>       Supported PHYs: 0x7fff
+>>>>         BR 1M 1SLOT
+>>>>         BR 1M 3SLOT
+>>>>         BR 1M 5SLOT
+>>>>         EDR 2M 1SLOT
+>>>>         EDR 2M 3SLOT
+>>>>         EDR 2M 5SLOT
+>>>>         EDR 3M 1SLOT
+>>>>         EDR 3M 3SLOT
+>>>>         EDR 3M 5SLOT
+>>>>         LE 1M TX
+>>>>         LE 1M RX
+>>>>         LE 2M TX
+>>>>         LE 2M RX
+>>>>         LE CODED TX
+>>>>         LE CODED RX
+>>>>       Configurable PHYs: 0x79fe
+>>>>         BR 1M 3SLOT
+>>>>         BR 1M 5SLOT
+>>>>         EDR 2M 1SLOT
+>>>>         EDR 2M 3SLOT
+>>>>         EDR 2M 5SLOT
+>>>>         EDR 3M 1SLOT
+>>>>         EDR 3M 3SLOT
+>>>>         EDR 3M 5SLOT
+>>>>         LE 2M TX
+>>>>         LE 2M RX
+>>>>         LE CODED TX
+>>>>         LE CODED RX
+>>>>       Selected PHYs: 0x07ff
+>>>>         BR 1M 1SLOT
+>>>>         BR 1M 3SLOT
+>>>>         BR 1M 5SLOT
+>>>>         EDR 2M 1SLOT
+>>>>         EDR 2M 3SLOT
+>>>>         EDR 2M 5SLOT
+>>>>         EDR 3M 1SLOT
+>>>>         EDR 3M 3SLOT
+>>>>         EDR 3M 5SLOT
+>>>>         LE 1M TX
+>>>>         LE 1M RX
+>>>>
+>>>> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com=
+>
 >>>> ---
->>>> include/net/bluetooth/hci.h      |  7 +++++++
->>>> include/net/bluetooth/hci_core.h |  4 ++++
->>>> net/bluetooth/hci_core.c         | 12 ++++++++++--
->>>> net/bluetooth/hci_event.c        | 18 ++++++++++++++++++
->>>> 4 files changed, 39 insertions(+), 2 deletions(-)
+>>>> include/net/bluetooth/hci.h      |  14 ++++
+>>>> include/net/bluetooth/hci_core.h |   4 ++
+>>>> include/net/bluetooth/mgmt.h     |  24 +++++++
+>>>> net/bluetooth/mgmt.c             | 149 +++++++++++++++++++++++++++++++=
+++++++++
+>>>> 4 files changed, 191 insertions(+)
 >>>>
 >>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>>> index fcd1d57..e584863 100644
+>>>> index 664fe1e..89bf800 100644
 >>>> --- a/include/net/bluetooth/hci.h
 >>>> +++ b/include/net/bluetooth/hci.h
->>>> @@ -411,6 +411,7 @@ enum {
->>>> #define HCI_LE_SLAVE_FEATURES         0x08
+>>>> @@ -291,6 +291,14 @@ enum {
+>>>> #define HCI_DH3               0x0800
+>>>> #define HCI_DH5               0x8000
+>>>>
+>>>> +/* HCI packet types inverted masks */
+>>>> +#define HCI_2DH1     0x0002
+>>>> +#define HCI_3DH1     0x0004
+>>>> +#define HCI_2DH3     0x0100
+>>>> +#define HCI_3DH3     0x0200
+>>>> +#define HCI_2DH5     0x1000
+>>>> +#define HCI_3DH5     0x2000
+>>>> +
+>>>> #define HCI_HV1               0x0020
+>>>> #define HCI_HV2               0x0040
+>>>> #define HCI_HV3               0x0080
+>>>> @@ -354,6 +362,8 @@ enum {
+>>>> #define LMP_PCONTROL  0x04
+>>>> #define LMP_TRANSPARENT       0x08
+>>>>
+>>>> +#define LMP_EDR_2M           0x02
+>>>> +#define LMP_EDR_3M           0x04
+>>>> #define LMP_RSSI_INQ  0x40
+>>>> #define LMP_ESCO      0x80
+>>>>
+>>>> @@ -361,7 +371,9 @@ enum {
+>>>> #define LMP_EV5               0x02
+>>>> #define LMP_NO_BREDR  0x20
+>>>> #define LMP_LE                0x40
+>>>> +#define LMP_EDR_3SLOT        0x80
+>>>>
+>>>> +#define LMP_EDR_5SLOT        0x01
+>>>> #define LMP_SNIFF_SUBR        0x02
+>>>> #define LMP_PAUSE_ENC 0x04
+>>>> #define LMP_EDR_ESCO_2M       0x20
+>>>> @@ -399,6 +411,8 @@ enum {
 >>>> #define HCI_LE_PING                   0x10
 >>>> #define HCI_LE_DATA_LEN_EXT           0x20
->>>> +#define HCI_LE_EXT_ADV                       0x10
 >>>> #define HCI_LE_EXT_SCAN_POLICY                0x80
->>>> #define HCI_LE_PHY_2M                 0x01
->>>> #define HCI_LE_PHY_CODED              0x08
->>>> @@ -1580,6 +1581,12 @@ struct hci_cp_le_ext_conn_param {
->>>>      __le16 max_ce_len;
->>>> } __packed;
+>>>> +#define HCI_LE_PHY_2M                        0x01
+>>>> +#define HCI_LE_PHY_CODED             0x08
+>>>> #define HCI_LE_CHAN_SEL_ALG2          0x40
+>>>
+>>> I see why you used _SET in the previous patch. Maybe it is ok to leave =
+it that way.
+>>>
 >>>>
->>>> +#define HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS        0x203b
->>>> +struct hci_rp_le_read_num_supported_adv_sets {
->>>> +     __u8  status;
->>>> +     __u8  num_of_sets;
->>>> +} __packed;
->>>> +
->>>> /* ---- HCI Events ---- */
->>>> #define HCI_EV_INQUIRY_COMPLETE               0x01
->>>>
->>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->>>> index 33aab89e..e845ca6 100644
+>>>> /* Connection modes */
+>>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/=
+hci_core.h
+>>>> index 71f79df..a64d13f 100644
 >>>> --- a/include/net/bluetooth/hci_core.h
 >>>> +++ b/include/net/bluetooth/hci_core.h
->>>> @@ -222,6 +222,7 @@ struct hci_dev {
->>>>      __u8            le_features[8];
->>>>      __u8            le_white_list_size;
->>>>      __u8            le_resolv_list_size;
->>>> +     __u8            le_no_of_adv_sets;
+>>>> @@ -1141,6 +1141,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+>>>> #define lmp_inq_tx_pwr_capable(dev) ((dev)->features[0][7] & LMP_INQ_T=
+X_PWR)
+>>>> #define lmp_ext_feat_capable(dev)  ((dev)->features[0][7] & LMP_EXTFEA=
+TURES)
+>>>> #define lmp_transp_capable(dev)    ((dev)->features[0][2] & LMP_TRANSP=
+ARENT)
+>>>> +#define lmp_edr_2m_capable(dev)    ((dev)->features[0][3] & LMP_EDR_2=
+M)
+>>>> +#define lmp_edr_3m_capable(dev)    ((dev)->features[0][3] & LMP_EDR_3=
+M)
+>>>> +#define lmp_edr_3slot_capable(dev) ((dev)->features[0][4] & LMP_EDR_3=
+SLOT)
+>>>> +#define lmp_edr_5slot_capable(dev) ((dev)->features[0][5] & LMP_EDR_5=
+SLOT)
 >>>
->>> I think our style was to use _num instead of _no. See num_iac for example.
+>>> Lets split the non-mgmt related changes from the mgmt ones into separat=
+e patches.
 >>>
->>>>      __u8            le_states[8];
->>>>      __u8            commands[64];
->>>>      __u8            hci_ver;
->>>> @@ -1180,6 +1181,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
->>>> /* Use ext create connection if command is supported */
->>>> #define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
 >>>>
->>>> +/* Extended advertising support */
->>>> +#define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
+>>>> /* ----- Extended LMP capabilities ----- */
+>>>> #define lmp_csb_master_capable(dev) ((dev)->features[2][0] & LMP_CSB_M=
+ASTER)
+>>>> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt=
+.h
+>>>> index e7303ee..16dddb1 100644
+>>>> --- a/include/net/bluetooth/mgmt.h
+>>>> +++ b/include/net/bluetooth/mgmt.h
+>>>> @@ -604,6 +604,30 @@ struct mgmt_cp_set_appearance {
+>>>> } __packed;
+>>>> #define MGMT_SET_APPEARANCE_SIZE      2
+>>>>
+>>>> +#define MGMT_OP_GET_PHY_CONFIGURATION        0x0044
+>>>> +#define MGMT_GET_PHY_CONFIGURATION_SIZE              0
+>>>> +struct mgmt_rp_get_phy_confguration {
+>>>> +     __le32  supported_phys;
+>>>> +     __le32  configurable_phys;
+>>>> +     __le32  selected_phys;
+>>>> +} __packed;
 >>>> +
->>>> /* ----- HCI protocols ----- */
->>>> #define HCI_PROTO_DEFER             0x01
+>>>> +#define MGMT_PHY_BR_1M_1SLOT 0x00000001
+>>>> +#define MGMT_PHY_BR_1M_3SLOT 0x00000002
+>>>> +#define MGMT_PHY_BR_1M_5SLOT 0x00000004
+>>>> +#define MGMT_PHY_EDR_2M_1SLOT        0x00000008
+>>>> +#define MGMT_PHY_EDR_2M_3SLOT        0x00000010
+>>>> +#define MGMT_PHY_EDR_2M_5SLOT        0x00000020
+>>>> +#define MGMT_PHY_EDR_3M_1SLOT        0x00000040
+>>>> +#define MGMT_PHY_EDR_3M_3SLOT        0x00000080
+>>>> +#define MGMT_PHY_EDR_3M_5SLOT        0x00000100
+>>>> +#define MGMT_PHY_LE_1M_TX            0x00000200
+>>>> +#define MGMT_PHY_LE_1M_RX            0x00000400
+>>>> +#define MGMT_PHY_LE_2M_TX            0x00000800
+>>>> +#define MGMT_PHY_LE_2M_RX            0x00001000
+>>>> +#define MGMT_PHY_LE_CODED_TX 0x00002000
+>>>> +#define MGMT_PHY_LE_CODED_RX 0x00004000
+>>>> +
+>>>> #define MGMT_EV_CMD_COMPLETE          0x0001
+>>>> struct mgmt_ev_cmd_complete {
+>>>>      __le16  opcode;
+>>>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>>>> index 8a80d48..4a31d4d 100644
+>>>> --- a/net/bluetooth/mgmt.c
+>>>> +++ b/net/bluetooth/mgmt.c
+>>>> @@ -617,6 +617,126 @@ static int read_config_info(struct sock *sk, str=
+uct hci_dev *hdev,
+>>>>                               &rp, sizeof(rp));
+>>>> }
 >>>>
->>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->>>> index 0d88dc9..b423587 100644
->>>> --- a/net/bluetooth/hci_core.c
->>>> +++ b/net/bluetooth/hci_core.c
->>>> @@ -715,8 +715,10 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
->>>>              hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
->>>>                          events);
->>>>
->>>> -             if (hdev->commands[25] & 0x40) {
->>>> -                     /* Read LE Advertising Channel TX Power */
->>>> +             if ((hdev->commands[25] & 0x40) && !ext_adv_capable(hdev)) {
->>>> +                     /* Read LE Advertising Channel TX Power only if
->>>> +                      * extended advertising is not supported
->>>> +                      */
->>>>                      hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
->>>>              }
+>>>> +static u32 get_supported_phys(struct hci_dev *hdev)
+>>>> +{
+>>>> +     u32 supported_phys =3D 0;
+>>>> +
+>>>> +     if (lmp_bredr_capable(hdev)) {
+>>>> +             supported_phys |=3D MGMT_PHY_BR_1M_1SLOT;
+>>>> +
+>>>> +             if (hdev->features[0][0] & LMP_3SLOT)
+>>>> +                     supported_phys |=3D MGMT_PHY_BR_1M_3SLOT;
+>>>> +
+>>>> +             if (hdev->features[0][0] & LMP_5SLOT)
+>>>> +                     supported_phys |=3D MGMT_PHY_BR_1M_5SLOT;
+>>>> +
+>>>> +             if (lmp_edr_2m_capable(hdev)) {
+>>>> +                     supported_phys |=3D MGMT_PHY_EDR_2M_1SLOT;
+>>>> +
+>>>> +                     if (lmp_edr_3slot_capable(hdev))
+>>>> +                             supported_phys |=3D MGMT_PHY_EDR_2M_3SLO=
+T;
+>>>> +
+>>>> +                     if (lmp_edr_5slot_capable(hdev))
+>>>> +                             supported_phys |=3D MGMT_PHY_EDR_2M_5SLO=
+T;
+>>>> +
+>>>> +                     if (lmp_edr_3m_capable(hdev)) {
+>>>> +                             supported_phys |=3D MGMT_PHY_EDR_3M_1SLO=
+T;
+>>>> +
+>>>> +                             if (lmp_edr_3slot_capable(hdev))
+>>>> +                                     supported_phys |=3D MGMT_PHY_EDR=
+_3M_3SLOT;
+>>>> +
+>>>> +                             if (lmp_edr_5slot_capable(hdev))
+>>>> +                                     supported_phys |=3D MGMT_PHY_EDR=
+_3M_5SLOT;
+>>>> +                     }
+>>>> +             }
+>>>> +     }
+>>>> +
+>>>> +     if (lmp_le_capable(hdev)) {
+>>>> +             supported_phys |=3D MGMT_PHY_LE_1M_TX;
+>>>> +             supported_phys |=3D MGMT_PHY_LE_1M_RX;
+>>>> +
+>>>> +             if (hdev->le_features[1] & HCI_LE_PHY_2M) {
+>>>> +                     supported_phys |=3D MGMT_PHY_LE_2M_TX;
+>>>> +                     supported_phys |=3D MGMT_PHY_LE_2M_RX;
+>>>> +             }
 >>>
->>> Why? I prefer that we read the adv TX power always. Even if we are not using it, it is good to have it in the traces.
+>>> Extra empty line here.
+>>>
+>>>> +             if (hdev->le_features[1] & HCI_LE_PHY_CODED) {
+>>>> +                     supported_phys |=3D MGMT_PHY_LE_CODED_TX;
+>>>> +                     supported_phys |=3D MGMT_PHY_LE_CODED_RX;
+>>>> +             }
+>>>> +     }
+>>>> +
+>>>> +     return supported_phys;
+>>>> +}
+>>>> +
+>>>> +static u32 get_selected_phys(struct hci_dev *hdev)
+>>>> +{
+>>>> +     u32 selected_phys =3D 0;
+>>>> +
+>>>> +     if (lmp_bredr_capable(hdev)) {
+>>>> +             selected_phys |=3D MGMT_PHY_BR_1M_1SLOT;
+>>>> +
+>>>> +             if (hdev->pkt_type & (HCI_DM3 | HCI_DH3))
+>>>> +                     selected_phys |=3D MGMT_PHY_BR_1M_3SLOT;
+>>>> +
+>>>> +             if (hdev->pkt_type & (HCI_DM5 | HCI_DH5))
+>>>> +                     selected_phys |=3D MGMT_PHY_BR_1M_5SLOT;
+>>>> +
+>>>> +             if (lmp_edr_2m_capable(hdev)) {
+>>>> +                     if (!(hdev->pkt_type & HCI_2DH1))
+>>>> +                             selected_phys |=3D MGMT_PHY_EDR_2M_1SLOT=
+;
+>>>> +
+>>>> +                     if (lmp_edr_3slot_capable(hdev) &&
+>>>> +                             !(hdev->pkt_type & HCI_2DH3))
+>>>
+>>> these need to align according to the netdev coding style.
+>>>
+>>>> +                             selected_phys |=3D MGMT_PHY_EDR_2M_3SLOT=
+;
+>>>> +
+>>>> +                     if (lmp_edr_5slot_capable(hdev) &&
+>>>> +                             !(hdev->pkt_type & HCI_2DH5))
+>>>> +                             selected_phys |=3D MGMT_PHY_EDR_2M_5SLOT=
+;
+>>>> +
+>>>> +                     if (lmp_edr_3m_capable(hdev)) {
+>>>> +                             if (!(hdev->pkt_type & HCI_3DH1))
+>>>> +                                     selected_phys |=3D MGMT_PHY_EDR_=
+3M_1SLOT;
+>>>> +
+>>>> +                             if (lmp_edr_3slot_capable(hdev) &&
+>>>> +                                     !(hdev->pkt_type & HCI_3DH3))
+>>>> +                                     selected_phys |=3D MGMT_PHY_EDR_=
+3M_3SLOT;
+>>>> +
+>>>> +                             if (lmp_edr_5slot_capable(hdev) &&
+>>>> +                                     !(hdev->pkt_type & HCI_3DH5))
+>>>> +                                     selected_phys |=3D MGMT_PHY_EDR_=
+3M_5SLOT;
+>>>> +                     }
+>>>> +             }
+>>>> +     }
+>>>> +
+>>>> +     if (lmp_le_capable(hdev)) {
+>>>> +             if (hdev->le_tx_def_phys & HCI_LE_SET_PHY_1M)
+>>>> +                     selected_phys |=3D MGMT_PHY_LE_1M_TX;
+>>>> +
+>>>> +             if (hdev->le_rx_def_phys & HCI_LE_SET_PHY_1M)
+>>>> +                     selected_phys |=3D MGMT_PHY_LE_1M_RX;
+>>>> +
+>>>> +             if (hdev->le_tx_def_phys & HCI_LE_SET_PHY_2M)
+>>>> +                     selected_phys |=3D MGMT_PHY_LE_2M_TX;
+>>>> +
+>>>> +             if (hdev->le_rx_def_phys & HCI_LE_SET_PHY_2M)
+>>>> +                     selected_phys |=3D MGMT_PHY_LE_2M_RX;
+>>>> +
+>>>> +             if (hdev->le_tx_def_phys & HCI_LE_SET_PHY_CODED)
+>>>> +                     selected_phys |=3D MGMT_PHY_LE_CODED_TX;
+>>>> +
+>>>> +             if (hdev->le_rx_def_phys & HCI_LE_SET_PHY_CODED)
+>>>> +                     selected_phys |=3D MGMT_PHY_LE_CODED_RX;
+>>>> +     }
+>>>> +
+>>>> +     return selected_phys;
+>>>> +}
+>>>> +
+>>>> +static u32 get_configurable_phys(struct hci_dev *hdev)
+>>>> +{
+>>>> +     return (get_supported_phys(hdev) & ~MGMT_PHY_BR_1M_1SLOT &
+>>>> +                     ~MGMT_PHY_LE_1M_TX & ~MGMT_PHY_LE_1M_RX);
+>>>
+>>> Here the alignment needs to be also corrected.
+>>>
+>>>> +}
+>>>> +
+>>>> static u32 get_supported_settings(struct hci_dev *hdev)
+>>>> {
+>>>>      u32 settings =3D 0;
+>>>> @@ -654,6 +774,10 @@ static u32 get_supported_settings(struct hci_dev =
+*hdev)
+>>>>          hdev->set_bdaddr)
+>>>>              settings |=3D MGMT_SETTING_CONFIGURATION;
+>>>>
+>>>> +     if (get_supported_phys(hdev) & ~(MGMT_PHY_BR_1M_1SLOT | MGMT_PHY=
+_LE_1M_TX |
+>>>> +                                     MGMT_PHY_LE_1M_RX))
+>>>
+>>> Same here.
+>>>
+>>>> +             settings |=3D MGMT_SETTING_PHY_CONFIGURATION;
+>>>> +
+>>>
+>>> Frankly I think that PHY configuration can be unconditionally be listed=
+ as supported here. Even on a 4.0 or just a 1.2 device we should hint that =
+PHY configuration is possible.
 >>
->> Mixing of legacy and extended commands is forbidden as per HCI TS spec
->> Please see  "HCI/GEV/BV-02-C [Disallow Mixing Legacy and Extended Advertising
->> Commands]"
+>> If a controller supports only BR 1M 1 SLOT and / or only LE 1M then
+>> PHY configuration should not be
+>> set (which is what the check is doing).
 >
-> and that also includes the Read Adv TX Power command? That is totally strange and I wonder how that affects anything here.
+> we could argue for that, but then I wonder if we are making of life more =
+complicated than it needs to be. I currently see no value in this. I might =
+have suggested something like that in the past, but I feel to see what valu=
+e we have with that.
 >
-> So is it that once you issued Read Adv TX Power you are no longer allowed to use ext adv commands? If that is really the case, then so be it, but this needs a larger comment in front of the if statement to explain what we are doing and why.
+> If the PHY configuration setting is not present, then it is BR/EDR wild g=
+uessing and LE 1M depending on the other settings bits. If PHY configuratio=
+n set, then you use Get PHY configuration and know exactly. You will never =
+try to interpret that setting bit anymore. You actually get the exact detai=
+ls. So I would always just set it.
+>
+> I am open for reasons here, but I am failing to see the benefit of anythi=
+ng complex at the moment.
 >
 
-Yes, it includes Read Adv TX Power command and once it is issued
-extended commands
-cannot be used.
+I was actually thinking PHY_CONFIGURATION bit in Settings to let user know =
+PHYs
+can be configured (using SetPHYConfiguration) and GetPHYConfiguration
+to be always
+supported (which user can know from for eg SupportedCommands).
 
-I will add larger comment for that.
+But since ConfigurablePHYs option is there in Get command its fine.
+
+So i will make it unconditional in next patch.
+>>
+>>>
+>>>>      return settings;
+>>>> }
+>>>>
+>>>> @@ -722,6 +846,9 @@ static u32 get_current_settings(struct hci_dev *hd=
+ev)
+>>>>                      settings |=3D MGMT_SETTING_STATIC_ADDRESS;
+>>>>      }
+>>>>
+>>>> +     if (phys_configured(hdev))
+>>>> +             settings |=3D MGMT_SETTING_PHY_CONFIGURATION;
+>>>> +
+>>>
+>>> What is this conditional doing? You need to add a comment here explaini=
+ng when we set configuration flag in current settings and when not.
+>>
+>> This checks whether any PHY is deselected in BREDR or selected in LE.
+>> Will add comment.
+>>
+>> So basically it will be set in supported settings if any PHYs other
+>> than the basic PHYs is supported
+>> and will set in current settings if any PHYs are configured
+>> (deselected in BREDR or selected in LE).
+>
+> So for MGMT_SETTING_CONFIGURATION, we also never expose it in the current=
+ settings, so until I figure out a need for this, we should not bother with=
+ complex code for this either.
+>
+> We can really figure out later on how we use the current settings info of=
+ the PHY configuration. Frankly, I have no idea what a default PHY config a=
+ctually looks like with the combination of BR, BR/EDR, single vs dual and L=
+E only controllers.
+>
+Ok, i will remove that in next patch.
 
 Thanks,
 Jaganath
