@@ -2,109 +2,113 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH] Bluetooth: Add definitions for LE set address resolution
+Subject: Re: [PATCH v4 07/13] Bluetooth: Read no of adv sets during init
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1531730009-7740-1-git-send-email-ankit.p.navik@intel.com>
-Date: Mon, 16 Jul 2018 15:21:25 +0200
-Cc: linux-bluetooth@vger.kernel.org, bharat.b.panda@intel.com
-Message-Id: <3A6916F8-8D54-4D19-AFC6-F6D366B64E0A@holtmann.org>
-References: <1531730009-7740-1-git-send-email-ankit.p.navik@intel.com>
-To: Ankit Navik <ankit.p.navik@intel.com>
+In-Reply-To: <CAJzH+brjqyHKuXdYHO1cjzvfRDxLE6Sfp-_V092mhiTs6VUeXQ@mail.gmail.com>
+Date: Mon, 16 Jul 2018 15:18:17 +0200
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Message-Id: <1F22C5F5-1BC0-4135-9F67-4EAD186C5FA2@holtmann.org>
+References: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1531301495-14479-8-git-send-email-jaganathx.kanakkassery@intel.com>
+ <685125A7-C980-49FE-B614-29703E4F0936@holtmann.org>
+ <CAJzH+brjqyHKuXdYHO1cjzvfRDxLE6Sfp-_V092mhiTs6VUeXQ@mail.gmail.com>
+To: Jaganath K <jaganath.k.os@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ankit,
+Hi Jaganath,
 
-> Add the definitions for LE address resolution enable HCI commands.
-> When the LE address resolution enable gets changed via HCI commands
-> make sure that flag gets updated.
+>>> This patch reads the number of advertising sets in the controller
+>>> during init and save it in hdev.
+>>> 
+>>> This also checks ext adv support before send Read Adv TX Power
+>>> since legacy and extended Adv commands should not be mixed.
+>>> 
+>>> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+>>> ---
+>>> include/net/bluetooth/hci.h      |  7 +++++++
+>>> include/net/bluetooth/hci_core.h |  4 ++++
+>>> net/bluetooth/hci_core.c         | 12 ++++++++++--
+>>> net/bluetooth/hci_event.c        | 18 ++++++++++++++++++
+>>> 4 files changed, 39 insertions(+), 2 deletions(-)
+>>> 
+>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+>>> index fcd1d57..e584863 100644
+>>> --- a/include/net/bluetooth/hci.h
+>>> +++ b/include/net/bluetooth/hci.h
+>>> @@ -411,6 +411,7 @@ enum {
+>>> #define HCI_LE_SLAVE_FEATURES         0x08
+>>> #define HCI_LE_PING                   0x10
+>>> #define HCI_LE_DATA_LEN_EXT           0x20
+>>> +#define HCI_LE_EXT_ADV                       0x10
+>>> #define HCI_LE_EXT_SCAN_POLICY                0x80
+>>> #define HCI_LE_PHY_2M                 0x01
+>>> #define HCI_LE_PHY_CODED              0x08
+>>> @@ -1580,6 +1581,12 @@ struct hci_cp_le_ext_conn_param {
+>>>      __le16 max_ce_len;
+>>> } __packed;
+>>> 
+>>> +#define HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS        0x203b
+>>> +struct hci_rp_le_read_num_supported_adv_sets {
+>>> +     __u8  status;
+>>> +     __u8  num_of_sets;
+>>> +} __packed;
+>>> +
+>>> /* ---- HCI Events ---- */
+>>> #define HCI_EV_INQUIRY_COMPLETE               0x01
+>>> 
+>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>>> index 33aab89e..e845ca6 100644
+>>> --- a/include/net/bluetooth/hci_core.h
+>>> +++ b/include/net/bluetooth/hci_core.h
+>>> @@ -222,6 +222,7 @@ struct hci_dev {
+>>>      __u8            le_features[8];
+>>>      __u8            le_white_list_size;
+>>>      __u8            le_resolv_list_size;
+>>> +     __u8            le_no_of_adv_sets;
+>> 
+>> I think our style was to use _num instead of _no. See num_iac for example.
+>> 
+>>>      __u8            le_states[8];
+>>>      __u8            commands[64];
+>>>      __u8            hci_ver;
+>>> @@ -1180,6 +1181,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+>>> /* Use ext create connection if command is supported */
+>>> #define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
+>>> 
+>>> +/* Extended advertising support */
+>>> +#define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
+>>> +
+>>> /* ----- HCI protocols ----- */
+>>> #define HCI_PROTO_DEFER             0x01
+>>> 
+>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>>> index 0d88dc9..b423587 100644
+>>> --- a/net/bluetooth/hci_core.c
+>>> +++ b/net/bluetooth/hci_core.c
+>>> @@ -715,8 +715,10 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
+>>>              hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
+>>>                          events);
+>>> 
+>>> -             if (hdev->commands[25] & 0x40) {
+>>> -                     /* Read LE Advertising Channel TX Power */
+>>> +             if ((hdev->commands[25] & 0x40) && !ext_adv_capable(hdev)) {
+>>> +                     /* Read LE Advertising Channel TX Power only if
+>>> +                      * extended advertising is not supported
+>>> +                      */
+>>>                      hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
+>>>              }
+>> 
+>> Why? I prefer that we read the adv TX power always. Even if we are not using it, it is good to have it in the traces.
 > 
-> Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
-> ---
-> include/net/bluetooth/hci.h |  2 ++
-> net/bluetooth/hci_event.c   | 40 ++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 42 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 1abcd14..c45fab5 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1512,6 +1512,8 @@ struct hci_rp_le_read_resolv_list_size {
-> 	__u8	size;
-> } __packed;
-> 
-> +#define HCI_OP_LE_SET_ADDR_RESOLUTION_ENABLE 0x202d
-> +
+> Mixing of legacy and extended commands is forbidden as per HCI TS spec
+> Please see  "HCI/GEV/BV-02-C [Disallow Mixing Legacy and Extended Advertising
+> Commands]"
 
-please shortcut this to ADDR_RESOLV_ENABLE.
+and that also includes the Read Adv TX Power command? That is totally strange and I wonder how that affects anything here.
 
-> #define HCI_OP_LE_READ_MAX_DATA_LEN	0x202f
-> struct hci_rp_le_read_max_data_len {
-> 	__u8	status;
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index e8d6df9..e930556 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1372,6 +1372,42 @@ static void hci_cc_le_read_resolv_list_size(struct hci_dev *hdev,
-> 	hdev->le_resolv_list_size = rp->size;
-> }
-> 
-> +static void hci_cc_le_set_addr_resolution_enable(struct hci_dev *hdev,
-> +						struct sk_buff *skb)
-> +{
-> +	__u8 *sent, status = *((__u8 *) skb->data);
-> +
-> +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-> +
-> +	if (status)
-> +		return;
-> +
-> +	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADDR_RESOLUTION_ENABLE);
-> +	if (!sent)
-> +		return;
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	/* If we're doing connection initiation as peripheral. Set a
-> +	 * timeout in case something goes wrong.
-> +	 */
-> +	if (*sent) {
-> +		struct hci_conn *conn;
-> +
-> +		hci_dev_set_flag(hdev, HCI_RPA_RESOLVING);
-
-Not sure we want to use the same flag here. Any concerns?
-
-> +
-> +		conn = hci_lookup_le_connect(hdev);
-> +		if (conn)
-> +			queue_delayed_work(hdev->workqueue,
-> +					   &conn->le_conn_timeout,
-> +					   conn->conn_timeout);
-
-And I do not get the timeout here.
-
-> +	} else {
-> +		hci_dev_clear_flag(hdev, HCI_RPA_RESOLVING);
-> +	}
-> +
-> +	hci_dev_unlock(hdev);
-> +}
-> +
-> static void hci_cc_le_read_max_data_len(struct hci_dev *hdev,
-> 					struct sk_buff *skb)
-> {
-> @@ -3097,6 +3133,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 		hci_cc_le_read_resolv_list_size(hdev, skb);
-> 		break;
-> 
-> +	case HCI_OP_LE_SET_ADDR_RESOLUTION_ENABLE:
-> +		hci_cc_le_set_addr_resolution_enable(hdev, skb);
-> +		break;
-> +
-> 	case HCI_OP_LE_READ_MAX_DATA_LEN:
-> 		hci_cc_le_read_max_data_len(hdev, skb);
-> 		break;
+So is it that once you issued Read Adv TX Power you are no longer allowed to use ext adv commands? If that is really the case, then so be it, but this needs a larger comment in front of the if statement to explain what we are doing and why.
 
 Regards
 
