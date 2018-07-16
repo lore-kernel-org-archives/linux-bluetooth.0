@@ -1,121 +1,119 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Navik, Ankit P" <ankit.p.navik@intel.com>
+Return-Path: <sean.wang@mediatek.com>
+Message-ID: <1531757738.8953.17.camel@mtkswgap22>
+Subject: Re: [SPAM]Re: [PATCH v5 4/7] Bluetooth: Add new quirk for
+ non-persistent setup settings
+From: Sean Wang <sean.wang@mediatek.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Panda, Bharat B" <bharat.b.panda@intel.com>
-Subject: RE: [PATCH] Bluetooth: Add definitions for LE set address resolution
-Date: Tue, 17 Jul 2018 06:33:12 +0000
-Message-ID: <2F886D5F95ED3A47BC8C177EADCD1CC72827B0CB@BGSMSX104.gar.corp.intel.com>
-References: <1531730009-7740-1-git-send-email-ankit.p.navik@intel.com>
- <3A6916F8-8D54-4D19-AFC6-F6D366B64E0A@holtmann.org>
-In-Reply-To: <3A6916F8-8D54-4D19-AFC6-F6D366B64E0A@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
+CC: <mark.rutland@arm.com>, <devicetree@vger.kernel.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, <linux-kernel@vger.kernel.org>,
+	<linux-bluetooth@vger.kernel.org>, <robh+dt@kernel.org>,
+	<linux-mediatek@lists.infradead.org>, <linux-arm-kernel@lists.infradead.org>
+Date: Tue, 17 Jul 2018 00:15:38 +0800
+In-Reply-To: <1531757114.8953.12.camel@mtkswgap22>
+References: <cover.1531150733.git.sean.wang@mediatek.com>
+	 <4b188c8a508340598dda233f6d49a16c9ac8784e.1531150733.git.sean.wang@mediatek.com>
+	 <2825B722-E75C-4A3C-8110-879205E46C0E@holtmann.org>
+	 <1531638169.3955.5.camel@mtkswgap22>
+	 <6571C864-B2EC-4806-BC5D-F531792737F6@holtmann.org>
+	 <1531757114.8953.12.camel@mtkswgap22>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel, 
+On Tue, 2018-07-17 at 00:05 +0800, Sean Wang wrote:
+> On Mon, 2018-07-16 at 14:56 +0200, Marcel Holtmann wrote:
+> > Hi Sean,
+> > 
+> > >>> Add a new quirk HCI_QUIRK_NON_PERSISTENT_SETUP allowing that a quirk that
+> > >>> runs setup() after every open() and not just after the first open().
+> > >>> 
+> > >>> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> > >>> ---
+> > >>> include/net/bluetooth/hci.h | 9 +++++++++
+> > >>> net/bluetooth/hci_core.c    | 3 ++-
+> > >>> 2 files changed, 11 insertions(+), 1 deletion(-)
+> > >>> 
+> > >>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > >>> index 73e48be..d3ec5b2a8 100644
+> > >>> --- a/include/net/bluetooth/hci.h
+> > >>> +++ b/include/net/bluetooth/hci.h
+> > >>> @@ -183,6 +183,15 @@ enum {
+> > >>> 	 * during the hdev->setup vendor callback.
+> > >>> 	 */
+> > >>> 	HCI_QUIRK_NON_PERSISTENT_DIAG,
+> > >>> +
+> > >>> +	/* When this quirk is set, setup() would be run after every
+> > >>> +	 * open() and not just after the first open().
+> > >>> +	 *
+> > >>> +	 * This quirk can be set before hci_register_dev is called or
+> > >>> +	 * during the hdev->setup vendor callback.
+> > >>> +	 *
+> > >>> +	 */
+> > >>> +	HCI_QUIRK_NON_PERSISTENT_SETUP,
+> > >>> };
+> > >>> 
+> > >>> /* HCI device flags */
+> > >>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > >>> index f5c21004..0111280 100644
+> > >>> --- a/net/bluetooth/hci_core.c
+> > >>> +++ b/net/bluetooth/hci_core.c
+> > >>> @@ -1396,7 +1396,8 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+> > >>> 	atomic_set(&hdev->cmd_cnt, 1);
+> > >>> 	set_bit(HCI_INIT, &hdev->flags);
+> > >>> 
+> > >>> -	if (hci_dev_test_flag(hdev, HCI_SETUP)) {
+> > >>> +	if (hci_dev_test_flag(hdev, HCI_SETUP) ||
+> > >>> +	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+> > >>> 		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+> > >> 
+> > >> can you include the extract of btmon on how the HCI_DEV_SETUP event shows up in the traces? I remember that I asked about something like that.
+> > >> 
+> > >> Regards
+> > >> 
+> > >> Marcel
+> > >> 
+> > > 
+> > > No, I cannot see any event about HCI_DEV_SETUP in btmon trace, the trace I posted as below is doing some rounds of power off and then on
+> > 
+> > it will result in this:
+> > 
+> >         case HCI_DEV_SETUP:
+> >                 if (hdev->manufacturer == 0xffff)
+> >                         return NULL;
+> >                                                                                  
+> >         case HCI_DEV_UP:
+> >                 skb = bt_skb_alloc(HCI_MON_INDEX_INFO_SIZE, GFP_ATOMIC);
+> > 
+> > So we will see extra index info events, but I assume that is just fine this we also see them on DEV_UP. They also do not hurt as long as not magically the manufacturer information changes.
+> > 
+> > I do wonder though if this quirk is set, then hdev->manufacturer needs to be reset and allow hdev->setup() to reset it. This goes with a log of other information as well. Maybe just a look if there are no races here.
+> > 
+> > Regards
+> > 
+> > Marcel
+> > 
+> 
+> I didn't set a value to hdev->manufacture.
+> 
+> Should I set it in hdev->setup() ? MediaTek is 0x46 according to [1].
 
-> > Add the definitions for LE address resolution enable HCI commands.
-> > When the LE address resolution enable gets changed via HCI commands
-> > make sure that flag gets updated.
-> >
-> > Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
-> > ---
-> > include/net/bluetooth/hci.h |  2 ++
-> > net/bluetooth/hci_event.c   | 40
-> ++++++++++++++++++++++++++++++++++++++++
-> > 2 files changed, 42 insertions(+)
-> >
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index 1abcd14..c45fab5 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -1512,6 +1512,8 @@ struct hci_rp_le_read_resolv_list_size {
-> > 	__u8	size;
-> > } __packed;
-> >
-> > +#define HCI_OP_LE_SET_ADDR_RESOLUTION_ENABLE 0x202d
-> > +
-> 
-> please shortcut this to ADDR_RESOLV_ENABLE.
-This will be taken care in follow up patch 
-> 
-> > #define HCI_OP_LE_READ_MAX_DATA_LEN	0x202f
-> > struct hci_rp_le_read_max_data_len {
-> > 	__u8	status;
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index e8d6df9..e930556 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -1372,6 +1372,42 @@ static void hci_cc_le_read_resolv_list_size(struct
-> hci_dev *hdev,
-> > 	hdev->le_resolv_list_size = rp->size; }
-> >
-> > +static void hci_cc_le_set_addr_resolution_enable(struct hci_dev *hdev,
-> > +						struct sk_buff *skb)
-> > +{
-> > +	__u8 *sent, status = *((__u8 *) skb->data);
-> > +
-> > +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-> > +
-> > +	if (status)
-> > +		return;
-> > +
-> > +	sent = hci_sent_cmd_data(hdev,
-> HCI_OP_LE_SET_ADDR_RESOLUTION_ENABLE);
-> > +	if (!sent)
-> > +		return;
-> > +
-> > +	hci_dev_lock(hdev);
-> > +
-> > +	/* If we're doing connection initiation as peripheral. Set a
-> > +	 * timeout in case something goes wrong.
-> > +	 */
-> > +	if (*sent) {
-> > +		struct hci_conn *conn;
-> > +
-> > +		hci_dev_set_flag(hdev, HCI_RPA_RESOLVING);
-> 
-> Not sure we want to use the same flag here. Any concerns?
-No concerns, we thought of reusing the existing flag but seems this is used for SMP RPA resolution. Shall I add a new flag (e.g. HCI_LL_RPA_RESOLUTION) for LL RPA resolving enablement?
-> 
-> > +
-> > +		conn = hci_lookup_le_connect(hdev);
-> > +		if (conn)
-> > +			queue_delayed_work(hdev->workqueue,
-> > +					   &conn->le_conn_timeout,
-> > +					   conn->conn_timeout);
-> 
-> And I do not get the timeout here.
-I misunderstood this to be HCI connection timeout, which I think should not be considered in this case. This will be taken care in follow up patch. 
-> 
-> > +	} else {
-> > +		hci_dev_clear_flag(hdev, HCI_RPA_RESOLVING);
-> > +	}
-> > +
-> > +	hci_dev_unlock(hdev);
-> > +}
-> > +
-> > static void hci_cc_le_read_max_data_len(struct hci_dev *hdev,
-> > 					struct sk_buff *skb)
-> > {
-> > @@ -3097,6 +3133,10 @@ static void hci_cmd_complete_evt(struct hci_dev
-> *hdev, struct sk_buff *skb,
-> > 		hci_cc_le_read_resolv_list_size(hdev, skb);
-> > 		break;
-> >
-> > +	case HCI_OP_LE_SET_ADDR_RESOLUTION_ENABLE:
-> > +		hci_cc_le_set_addr_resolution_enable(hdev, skb);
-> > +		break;
-> > +
-> > 	case HCI_OP_LE_READ_MAX_DATA_LEN:
-> > 		hci_cc_le_read_max_data_len(hdev, skb);
-> > 		break;
-> 
-> Regards
-> 
-> Marcel
+sorry, something needs be corrected.
 
-Regards, 
-Ankit
+what I means is that should I set hdev->manufacture as 0x46 at probe ? 
+
+> [1]
+> https://www.bluetooth.com/specifications/assigned-numbers/company-identifiers
+> 
+> 
+> > 
+> > _______________________________________________
+> > Linux-mediatek mailing list
+> > Linux-mediatek@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/linux-mediatek
+> 
+> 
+> 
+> _______________________________________________
+> Linux-mediatek mailing list
+> Linux-mediatek@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-mediatek
