@@ -1,46 +1,94 @@
-Return-Path: <gregkh@linuxfoundation.org>
-Date: Mon, 16 Jul 2018 11:50:18 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Johan Hovold <johan@kernel.org>
-Cc: sean.wang@mediatek.com, robh+dt@kernel.org, mark.rutland@arm.com,
-	marcel@holtmann.org, johan.hedberg@gmail.com,
-	devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Rob Herring <robh@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
-	Jiri Slaby <jslaby@suse.com>, linux-serial@vger.kernel.org
-Subject: Re: [PATCH v5 2/7] serdev: add dev_pm_domain_attach|detach()
-Message-ID: <20180716095018.GA11078@kroah.com>
-References: <cover.1531150733.git.sean.wang@mediatek.com>
- <d5904115ff1da38fe79b45fa3d59ef0688cea124.1531150733.git.sean.wang@mediatek.com>
- <20180715085628.GI10204@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180715085628.GI10204@localhost>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Ankit Navik <ankit.p.navik@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.b.panda@intel.com, ankit.p.navik@intel.com
+Subject: [PATCH] Bluetooth: Add definitions for LE set address resolution
+Date: Mon, 16 Jul 2018 14:03:29 +0530
+Message-Id: <1531730009-7740-1-git-send-email-ankit.p.navik@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jul 15, 2018 at 10:56:28AM +0200, Johan Hovold wrote:
-> On Mon, Jul 09, 2018 at 11:56:58PM +0800, sean.wang@mediatek.com wrote:
-> > From: Sean Wang <sean.wang@mediatek.com>
-> > 
-> > In order to open up the required power gate before any operation can be
-> > effectively performed over the serial bus between CPU and serdev, it's
-> > clearly essential to add common attach functions for PM domains to serdev
-> > at the probe phase.
-> > 
-> > Similarly, the relevant dettach function for the PM domains should be
-> > properly and reversely added at the remove phase.
-> > 
-> > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> > Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
-> > Cc: Rob Herring <robh@kernel.org>
-> > Cc: Ulf Hansson <ulf.hansson@linaro.org>
-> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Cc: Jiri Slaby <jslaby@suse.com>
-> > Cc: linux-serial@vger.kernel.org
-> 
-> Reviewed-by: Johan Hovold <johan@kernel.org>
+Add the definitions for LE address resolution enable HCI commands.
+When the LE address resolution enable gets changed via HCI commands
+make sure that flag gets updated.
 
-Thanks, now applied.
+Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
+---
+ include/net/bluetooth/hci.h |  2 ++
+ net/bluetooth/hci_event.c   | 40 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
 
-greg k-h
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1abcd14..c45fab5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1512,6 +1512,8 @@ struct hci_rp_le_read_resolv_list_size {
+ 	__u8	size;
+ } __packed;
+ 
++#define HCI_OP_LE_SET_ADDR_RESOLUTION_ENABLE 0x202d
++
+ #define HCI_OP_LE_READ_MAX_DATA_LEN	0x202f
+ struct hci_rp_le_read_max_data_len {
+ 	__u8	status;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index e8d6df9..e930556 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1372,6 +1372,42 @@ static void hci_cc_le_read_resolv_list_size(struct hci_dev *hdev,
+ 	hdev->le_resolv_list_size = rp->size;
+ }
+ 
++static void hci_cc_le_set_addr_resolution_enable(struct hci_dev *hdev,
++						struct sk_buff *skb)
++{
++	__u8 *sent, status = *((__u8 *) skb->data);
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_ADDR_RESOLUTION_ENABLE);
++	if (!sent)
++		return;
++
++	hci_dev_lock(hdev);
++
++	/* If we're doing connection initiation as peripheral. Set a
++	 * timeout in case something goes wrong.
++	 */
++	if (*sent) {
++		struct hci_conn *conn;
++
++		hci_dev_set_flag(hdev, HCI_RPA_RESOLVING);
++
++		conn = hci_lookup_le_connect(hdev);
++		if (conn)
++			queue_delayed_work(hdev->workqueue,
++					   &conn->le_conn_timeout,
++					   conn->conn_timeout);
++	} else {
++		hci_dev_clear_flag(hdev, HCI_RPA_RESOLVING);
++	}
++
++	hci_dev_unlock(hdev);
++}
++
+ static void hci_cc_le_read_max_data_len(struct hci_dev *hdev,
+ 					struct sk_buff *skb)
+ {
+@@ -3097,6 +3133,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_le_read_resolv_list_size(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_SET_ADDR_RESOLUTION_ENABLE:
++		hci_cc_le_set_addr_resolution_enable(hdev, skb);
++		break;
++
+ 	case HCI_OP_LE_READ_MAX_DATA_LEN:
+ 		hci_cc_le_read_max_data_len(hdev, skb);
+ 		break;
+-- 
+1.9.1
+
