@@ -2,131 +2,377 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH v4 05/13] Bluetooth: Handle extended ADV PDU types
+Subject: Re: [PATCH v4 02/13] Bluetooth: Implement Get PHY Configuration mgmt
+ command
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJzH+bqBaraAHGCSzMhY6sHgTLKfx=9i0T3S7vZgckeTGi7xnw@mail.gmail.com>
-Date: Mon, 16 Jul 2018 15:09:41 +0200
+In-Reply-To: <CAJzH+brmqSdFSZ+EkvtLc6yMk3C2FsveEnoU0+XcEF4Ks+1gDQ@mail.gmail.com>
+Date: Mon, 16 Jul 2018 15:08:02 +0200
 Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
         Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Message-Id: <3668EF79-8D9F-4538-B3F7-8FBB08D86171@holtmann.org>
+Message-Id: <0D2F8A32-4CC7-4000-BC5B-9D89EA0B9561@holtmann.org>
 References: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1531301495-14479-6-git-send-email-jaganathx.kanakkassery@intel.com>
- <FA5EB638-DC05-4F96-9234-A732E3FA1F3E@holtmann.org>
- <CAJzH+bqBaraAHGCSzMhY6sHgTLKfx=9i0T3S7vZgckeTGi7xnw@mail.gmail.com>
+ <1531301495-14479-3-git-send-email-jaganathx.kanakkassery@intel.com>
+ <45DD34F0-0375-4EFB-B354-68EB373A3DE1@holtmann.org>
+ <CAJzH+brmqSdFSZ+EkvtLc6yMk3C2FsveEnoU0+XcEF4Ks+1gDQ@mail.gmail.com>
 To: Jaganath K <jaganath.k.os@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jaganath,
 
->>> This patch defines the extended ADV types and handle it in ADV report.
+>>> This commands basically retrieve the supported packet types of
+>>> BREDR and supported PHYs of the controller.
+>>> 
+>>> BR_1M_1SLOT, LE_1M_TX and LE_1M_RX would be supported by default.
+>>> Other PHYs are supported based on the local features.
+>>> 
+>>> @ MGMT Command: Get PHY Configuration (0x0044) plen 0
+>>> @ MGMT Event: Command Complete (0x0001) plen 15
+>>>     Get PHY Configuration (0x0044) plen 12
+>>>       Status: Success (0x00)
+>>>       Supported PHYs: 0x7fff
+>>>         BR 1M 1SLOT
+>>>         BR 1M 3SLOT
+>>>         BR 1M 5SLOT
+>>>         EDR 2M 1SLOT
+>>>         EDR 2M 3SLOT
+>>>         EDR 2M 5SLOT
+>>>         EDR 3M 1SLOT
+>>>         EDR 3M 3SLOT
+>>>         EDR 3M 5SLOT
+>>>         LE 1M TX
+>>>         LE 1M RX
+>>>         LE 2M TX
+>>>         LE 2M RX
+>>>         LE CODED TX
+>>>         LE CODED RX
+>>>       Configurable PHYs: 0x79fe
+>>>         BR 1M 3SLOT
+>>>         BR 1M 5SLOT
+>>>         EDR 2M 1SLOT
+>>>         EDR 2M 3SLOT
+>>>         EDR 2M 5SLOT
+>>>         EDR 3M 1SLOT
+>>>         EDR 3M 3SLOT
+>>>         EDR 3M 5SLOT
+>>>         LE 2M TX
+>>>         LE 2M RX
+>>>         LE CODED TX
+>>>         LE CODED RX
+>>>       Selected PHYs: 0x07ff
+>>>         BR 1M 1SLOT
+>>>         BR 1M 3SLOT
+>>>         BR 1M 5SLOT
+>>>         EDR 2M 1SLOT
+>>>         EDR 2M 3SLOT
+>>>         EDR 2M 5SLOT
+>>>         EDR 3M 1SLOT
+>>>         EDR 3M 3SLOT
+>>>         EDR 3M 5SLOT
+>>>         LE 1M TX
+>>>         LE 1M RX
 >>> 
 >>> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 >>> ---
->>> include/net/bluetooth/hci.h |  8 ++++++++
->>> net/bluetooth/hci_event.c   | 49 +++++++++++++++++++++++++++++++--------------
->>> 2 files changed, 42 insertions(+), 15 deletions(-)
+>>> include/net/bluetooth/hci.h      |  14 ++++
+>>> include/net/bluetooth/hci_core.h |   4 ++
+>>> include/net/bluetooth/mgmt.h     |  24 +++++++
+>>> net/bluetooth/mgmt.c             | 149 +++++++++++++++++++++++++++++++++++++++
+>>> 4 files changed, 191 insertions(+)
 >>> 
 >>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>> index 3584632..fcd1d57 100644
+>>> index 664fe1e..89bf800 100644
 >>> --- a/include/net/bluetooth/hci.h
 >>> +++ b/include/net/bluetooth/hci.h
->>> @@ -1977,6 +1977,14 @@ struct hci_ev_le_conn_complete {
->>> #define LE_LEGACY_SCAN_RSP_ADV                0x001b
->>> #define LE_LEGACY_SCAN_RSP_ADV_SCAN   0x001a
+>>> @@ -291,6 +291,14 @@ enum {
+>>> #define HCI_DH3               0x0800
+>>> #define HCI_DH5               0x8000
 >>> 
->>> +/* Extended Advertising event types */
->>> +#define LE_EXT_ADV_NON_CONN_IND              0x0000
->>> +#define LE_EXT_ADV_CONN_IND          0x0001
->>> +#define LE_EXT_ADV_SCAN_IND          0x0002
->>> +#define LE_EXT_ADV_DIRECT_IND                0x0004
->>> +#define LE_EXT_ADV_SCAN_RSP          0x0008
->>> +#define LE_EXT_ADV_LEGACY_PDU                0x0010
+>>> +/* HCI packet types inverted masks */
+>>> +#define HCI_2DH1     0x0002
+>>> +#define HCI_3DH1     0x0004
+>>> +#define HCI_2DH3     0x0100
+>>> +#define HCI_3DH3     0x0200
+>>> +#define HCI_2DH5     0x1000
+>>> +#define HCI_3DH5     0x2000
 >>> +
->>> #define ADDR_LE_DEV_PUBLIC    0x00
->>> #define ADDR_LE_DEV_RANDOM    0x01
+>>> #define HCI_HV1               0x0020
+>>> #define HCI_HV2               0x0040
+>>> #define HCI_HV3               0x0080
+>>> @@ -354,6 +362,8 @@ enum {
+>>> #define LMP_PCONTROL  0x04
+>>> #define LMP_TRANSPARENT       0x08
 >>> 
->>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>> index 6942315..027abe6 100644
->>> --- a/net/bluetooth/hci_event.c
->>> +++ b/net/bluetooth/hci_event.c
->>> @@ -5137,20 +5137,39 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
->>>      hci_dev_unlock(hdev);
+>>> +#define LMP_EDR_2M           0x02
+>>> +#define LMP_EDR_3M           0x04
+>>> #define LMP_RSSI_INQ  0x40
+>>> #define LMP_ESCO      0x80
+>>> 
+>>> @@ -361,7 +371,9 @@ enum {
+>>> #define LMP_EV5               0x02
+>>> #define LMP_NO_BREDR  0x20
+>>> #define LMP_LE                0x40
+>>> +#define LMP_EDR_3SLOT        0x80
+>>> 
+>>> +#define LMP_EDR_5SLOT        0x01
+>>> #define LMP_SNIFF_SUBR        0x02
+>>> #define LMP_PAUSE_ENC 0x04
+>>> #define LMP_EDR_ESCO_2M       0x20
+>>> @@ -399,6 +411,8 @@ enum {
+>>> #define HCI_LE_PING                   0x10
+>>> #define HCI_LE_DATA_LEN_EXT           0x20
+>>> #define HCI_LE_EXT_SCAN_POLICY                0x80
+>>> +#define HCI_LE_PHY_2M                        0x01
+>>> +#define HCI_LE_PHY_CODED             0x08
+>>> #define HCI_LE_CHAN_SEL_ALG2          0x40
+>> 
+>> I see why you used _SET in the previous patch. Maybe it is ok to leave it that way.
+>> 
+>>> 
+>>> /* Connection modes */
+>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>>> index 71f79df..a64d13f 100644
+>>> --- a/include/net/bluetooth/hci_core.h
+>>> +++ b/include/net/bluetooth/hci_core.h
+>>> @@ -1141,6 +1141,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+>>> #define lmp_inq_tx_pwr_capable(dev) ((dev)->features[0][7] & LMP_INQ_TX_PWR)
+>>> #define lmp_ext_feat_capable(dev)  ((dev)->features[0][7] & LMP_EXTFEATURES)
+>>> #define lmp_transp_capable(dev)    ((dev)->features[0][2] & LMP_TRANSPARENT)
+>>> +#define lmp_edr_2m_capable(dev)    ((dev)->features[0][3] & LMP_EDR_2M)
+>>> +#define lmp_edr_3m_capable(dev)    ((dev)->features[0][3] & LMP_EDR_3M)
+>>> +#define lmp_edr_3slot_capable(dev) ((dev)->features[0][4] & LMP_EDR_3SLOT)
+>>> +#define lmp_edr_5slot_capable(dev) ((dev)->features[0][5] & LMP_EDR_5SLOT)
+>> 
+>> Lets split the non-mgmt related changes from the mgmt ones into separate patches.
+>> 
+>>> 
+>>> /* ----- Extended LMP capabilities ----- */
+>>> #define lmp_csb_master_capable(dev) ((dev)->features[2][0] & LMP_CSB_MASTER)
+>>> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+>>> index e7303ee..16dddb1 100644
+>>> --- a/include/net/bluetooth/mgmt.h
+>>> +++ b/include/net/bluetooth/mgmt.h
+>>> @@ -604,6 +604,30 @@ struct mgmt_cp_set_appearance {
+>>> } __packed;
+>>> #define MGMT_SET_APPEARANCE_SIZE      2
+>>> 
+>>> +#define MGMT_OP_GET_PHY_CONFIGURATION        0x0044
+>>> +#define MGMT_GET_PHY_CONFIGURATION_SIZE              0
+>>> +struct mgmt_rp_get_phy_confguration {
+>>> +     __le32  supported_phys;
+>>> +     __le32  configurable_phys;
+>>> +     __le32  selected_phys;
+>>> +} __packed;
+>>> +
+>>> +#define MGMT_PHY_BR_1M_1SLOT 0x00000001
+>>> +#define MGMT_PHY_BR_1M_3SLOT 0x00000002
+>>> +#define MGMT_PHY_BR_1M_5SLOT 0x00000004
+>>> +#define MGMT_PHY_EDR_2M_1SLOT        0x00000008
+>>> +#define MGMT_PHY_EDR_2M_3SLOT        0x00000010
+>>> +#define MGMT_PHY_EDR_2M_5SLOT        0x00000020
+>>> +#define MGMT_PHY_EDR_3M_1SLOT        0x00000040
+>>> +#define MGMT_PHY_EDR_3M_3SLOT        0x00000080
+>>> +#define MGMT_PHY_EDR_3M_5SLOT        0x00000100
+>>> +#define MGMT_PHY_LE_1M_TX            0x00000200
+>>> +#define MGMT_PHY_LE_1M_RX            0x00000400
+>>> +#define MGMT_PHY_LE_2M_TX            0x00000800
+>>> +#define MGMT_PHY_LE_2M_RX            0x00001000
+>>> +#define MGMT_PHY_LE_CODED_TX 0x00002000
+>>> +#define MGMT_PHY_LE_CODED_RX 0x00004000
+>>> +
+>>> #define MGMT_EV_CMD_COMPLETE          0x0001
+>>> struct mgmt_ev_cmd_complete {
+>>>      __le16  opcode;
+>>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>>> index 8a80d48..4a31d4d 100644
+>>> --- a/net/bluetooth/mgmt.c
+>>> +++ b/net/bluetooth/mgmt.c
+>>> @@ -617,6 +617,126 @@ static int read_config_info(struct sock *sk, struct hci_dev *hdev,
+>>>                               &rp, sizeof(rp));
 >>> }
 >>> 
->>> -static u8 convert_legacy_evt_type(u16 evt_type)
->>> -{
->>> -     switch (evt_type) {
->>> -     case LE_LEGACY_ADV_IND:
->>> -             return LE_ADV_IND;
->>> -     case LE_LEGACY_ADV_DIRECT_IND:
->>> -             return LE_ADV_DIRECT_IND;
->>> -     case LE_LEGACY_ADV_SCAN_IND:
->>> -             return LE_ADV_SCAN_IND;
->>> -     case LE_LEGACY_NONCONN_IND:
->>> -             return LE_ADV_NONCONN_IND;
->>> -     case LE_LEGACY_SCAN_RSP_ADV:
->>> -     case LE_LEGACY_SCAN_RSP_ADV_SCAN:
->>> -             return LE_ADV_SCAN_RSP;
->>> +static u8 convert_ext_evt_type(u16 evt_type)
+>>> +static u32 get_supported_phys(struct hci_dev *hdev)
 >>> +{
->>> +     if (evt_type & LE_EXT_ADV_LEGACY_PDU) {
->>> +             switch (evt_type) {
->>> +             case LE_LEGACY_ADV_IND:
->>> +                     return LE_ADV_IND;
->>> +             case LE_LEGACY_ADV_DIRECT_IND:
->>> +                     return LE_ADV_DIRECT_IND;
->>> +             case LE_LEGACY_ADV_SCAN_IND:
->>> +                     return LE_ADV_SCAN_IND;
->>> +             case LE_LEGACY_NONCONN_IND:
->>> +                     return LE_ADV_NONCONN_IND;
->>> +             case LE_LEGACY_SCAN_RSP_ADV:
->>> +             case LE_LEGACY_SCAN_RSP_ADV_SCAN:
->>> +                     return LE_ADV_SCAN_RSP;
+>>> +     u32 supported_phys = 0;
+>>> +
+>>> +     if (lmp_bredr_capable(hdev)) {
+>>> +             supported_phys |= MGMT_PHY_BR_1M_1SLOT;
+>>> +
+>>> +             if (hdev->features[0][0] & LMP_3SLOT)
+>>> +                     supported_phys |= MGMT_PHY_BR_1M_3SLOT;
+>>> +
+>>> +             if (hdev->features[0][0] & LMP_5SLOT)
+>>> +                     supported_phys |= MGMT_PHY_BR_1M_5SLOT;
+>>> +
+>>> +             if (lmp_edr_2m_capable(hdev)) {
+>>> +                     supported_phys |= MGMT_PHY_EDR_2M_1SLOT;
+>>> +
+>>> +                     if (lmp_edr_3slot_capable(hdev))
+>>> +                             supported_phys |= MGMT_PHY_EDR_2M_3SLOT;
+>>> +
+>>> +                     if (lmp_edr_5slot_capable(hdev))
+>>> +                             supported_phys |= MGMT_PHY_EDR_2M_5SLOT;
+>>> +
+>>> +                     if (lmp_edr_3m_capable(hdev)) {
+>>> +                             supported_phys |= MGMT_PHY_EDR_3M_1SLOT;
+>>> +
+>>> +                             if (lmp_edr_3slot_capable(hdev))
+>>> +                                     supported_phys |= MGMT_PHY_EDR_3M_3SLOT;
+>>> +
+>>> +                             if (lmp_edr_5slot_capable(hdev))
+>>> +                                     supported_phys |= MGMT_PHY_EDR_3M_5SLOT;
+>>> +                     }
+>>> +             }
+>>> +     }
+>>> +
+>>> +     if (lmp_le_capable(hdev)) {
+>>> +             supported_phys |= MGMT_PHY_LE_1M_TX;
+>>> +             supported_phys |= MGMT_PHY_LE_1M_RX;
+>>> +
+>>> +             if (hdev->le_features[1] & HCI_LE_PHY_2M) {
+>>> +                     supported_phys |= MGMT_PHY_LE_2M_TX;
+>>> +                     supported_phys |= MGMT_PHY_LE_2M_RX;
 >>> +             }
 >> 
->> I would do a return here since only the legacy part is special.
+>> Extra empty line here.
 >> 
->>> +     } else {
->>> +             if (evt_type & LE_EXT_ADV_CONN_IND) {
->>> +                     if (evt_type & LE_EXT_ADV_DIRECT_IND)
->>> +                             return LE_ADV_DIRECT_IND;
->>> +
->>> +                     return LE_ADV_IND;
+>>> +             if (hdev->le_features[1] & HCI_LE_PHY_CODED) {
+>>> +                     supported_phys |= MGMT_PHY_LE_CODED_TX;
+>>> +                     supported_phys |= MGMT_PHY_LE_CODED_RX;
 >>> +             }
+>>> +     }
 >>> +
->>> +             if (evt_type & LE_EXT_ADV_SCAN_RSP)
->>> +                     return LE_ADV_SCAN_RSP;
+>>> +     return supported_phys;
+>>> +}
 >>> +
->>> +             if (evt_type & LE_EXT_ADV_SCAN_IND)
->>> +                     return LE_ADV_SCAN_IND;
+>>> +static u32 get_selected_phys(struct hci_dev *hdev)
+>>> +{
+>>> +     u32 selected_phys = 0;
 >>> +
->>> +             if (evt_type == LE_EXT_ADV_NON_CONN_IND ||
->>> +                 evt_type & LE_EXT_ADV_DIRECT_IND)
->>> +                     return LE_ADV_NONCONN_IND;
+>>> +     if (lmp_bredr_capable(hdev)) {
+>>> +             selected_phys |= MGMT_PHY_BR_1M_1SLOT;
+>>> +
+>>> +             if (hdev->pkt_type & (HCI_DM3 | HCI_DH3))
+>>> +                     selected_phys |= MGMT_PHY_BR_1M_3SLOT;
+>>> +
+>>> +             if (hdev->pkt_type & (HCI_DM5 | HCI_DH5))
+>>> +                     selected_phys |= MGMT_PHY_BR_1M_5SLOT;
+>>> +
+>>> +             if (lmp_edr_2m_capable(hdev)) {
+>>> +                     if (!(hdev->pkt_type & HCI_2DH1))
+>>> +                             selected_phys |= MGMT_PHY_EDR_2M_1SLOT;
+>>> +
+>>> +                     if (lmp_edr_3slot_capable(hdev) &&
+>>> +                             !(hdev->pkt_type & HCI_2DH3))
 >> 
->> Why do we have one == match here and the rest are bit checks.
+>> these need to align according to the netdev coding style.
 >> 
+>>> +                             selected_phys |= MGMT_PHY_EDR_2M_3SLOT;
+>>> +
+>>> +                     if (lmp_edr_5slot_capable(hdev) &&
+>>> +                             !(hdev->pkt_type & HCI_2DH5))
+>>> +                             selected_phys |= MGMT_PHY_EDR_2M_5SLOT;
+>>> +
+>>> +                     if (lmp_edr_3m_capable(hdev)) {
+>>> +                             if (!(hdev->pkt_type & HCI_3DH1))
+>>> +                                     selected_phys |= MGMT_PHY_EDR_3M_1SLOT;
+>>> +
+>>> +                             if (lmp_edr_3slot_capable(hdev) &&
+>>> +                                     !(hdev->pkt_type & HCI_3DH3))
+>>> +                                     selected_phys |= MGMT_PHY_EDR_3M_3SLOT;
+>>> +
+>>> +                             if (lmp_edr_5slot_capable(hdev) &&
+>>> +                                     !(hdev->pkt_type & HCI_3DH5))
+>>> +                                     selected_phys |= MGMT_PHY_EDR_3M_5SLOT;
+>>> +                     }
+>>> +             }
+>>> +     }
+>>> +
+>>> +     if (lmp_le_capable(hdev)) {
+>>> +             if (hdev->le_tx_def_phys & HCI_LE_SET_PHY_1M)
+>>> +                     selected_phys |= MGMT_PHY_LE_1M_TX;
+>>> +
+>>> +             if (hdev->le_rx_def_phys & HCI_LE_SET_PHY_1M)
+>>> +                     selected_phys |= MGMT_PHY_LE_1M_RX;
+>>> +
+>>> +             if (hdev->le_tx_def_phys & HCI_LE_SET_PHY_2M)
+>>> +                     selected_phys |= MGMT_PHY_LE_2M_TX;
+>>> +
+>>> +             if (hdev->le_rx_def_phys & HCI_LE_SET_PHY_2M)
+>>> +                     selected_phys |= MGMT_PHY_LE_2M_RX;
+>>> +
+>>> +             if (hdev->le_tx_def_phys & HCI_LE_SET_PHY_CODED)
+>>> +                     selected_phys |= MGMT_PHY_LE_CODED_TX;
+>>> +
+>>> +             if (hdev->le_rx_def_phys & HCI_LE_SET_PHY_CODED)
+>>> +                     selected_phys |= MGMT_PHY_LE_CODED_RX;
+>>> +     }
+>>> +
+>>> +     return selected_phys;
+>>> +}
+>>> +
+>>> +static u32 get_configurable_phys(struct hci_dev *hdev)
+>>> +{
+>>> +     return (get_supported_phys(hdev) & ~MGMT_PHY_BR_1M_1SLOT &
+>>> +                     ~MGMT_PHY_LE_1M_TX & ~MGMT_PHY_LE_1M_RX);
+>> 
+>> Here the alignment needs to be also corrected.
+>> 
+>>> +}
+>>> +
+>>> static u32 get_supported_settings(struct hci_dev *hdev)
+>>> {
+>>>      u32 settings = 0;
+>>> @@ -654,6 +774,10 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+>>>          hdev->set_bdaddr)
+>>>              settings |= MGMT_SETTING_CONFIGURATION;
+>>> 
+>>> +     if (get_supported_phys(hdev) & ~(MGMT_PHY_BR_1M_1SLOT | MGMT_PHY_LE_1M_TX |
+>>> +                                     MGMT_PHY_LE_1M_RX))
+>> 
+>> Same here.
+>> 
+>>> +             settings |= MGMT_SETTING_PHY_CONFIGURATION;
+>>> +
+>> 
+>> Frankly I think that PHY configuration can be unconditionally be listed as supported here. Even on a 4.0 or just a 1.2 device we should hint that PHY configuration is possible.
+> 
+> If a controller supports only BR 1M 1 SLOT and / or only LE 1M then
+> PHY configuration should not be
+> set (which is what the check is doing).
+
+we could argue for that, but then I wonder if we are making of life more complicated than it needs to be. I currently see no value in this. I might have suggested something like that in the past, but I feel to see what value we have with that.
+
+If the PHY configuration setting is not present, then it is BR/EDR wild guessing and LE 1M depending on the other settings bits. If PHY configuration set, then you use Get PHY configuration and know exactly. You will never try to interpret that setting bit anymore. You actually get the exact details. So I would always just set it.
+
+I am open for reasons here, but I am failing to see the benefit of anything complex at the moment.
+
+> 
+>> 
+>>>      return settings;
+>>> }
+>>> 
+>>> @@ -722,6 +846,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+>>>                      settings |= MGMT_SETTING_STATIC_ADDRESS;
 >>>      }
 >>> 
->>>      BT_ERR_RATELIMITED("Unknown advertising packet type: 0x%02x",
->>> @@ -5172,7 +5191,7 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
->>>              u16 evt_type;
->>> 
->>>              evt_type = __le16_to_cpu(ev->evt_type);
->>> -             legacy_evt_type = convert_legacy_evt_type(evt_type);
->>> +             legacy_evt_type = convert_ext_evt_type(evt_type);
+>>> +     if (phys_configured(hdev))
+>>> +             settings |= MGMT_SETTING_PHY_CONFIGURATION;
+>>> +
 >> 
->> So ext_evt_type_to_legacy might be a better function name here.
->> 
->>>              if (legacy_evt_type != LE_ADV_INVALID) {
->> 
->> I might have asked this before, when are we reaching _INVALID here?
->> 
+>> What is this conditional doing? You need to add a comment here explaining when we set configuration flag in current settings and when not.
 > 
-> It will be hit in case of an unknown advertising pkt type.
+> This checks whether any PHY is deselected in BREDR or selected in LE.
+> Will add comment.
+> 
+> So basically it will be set in supported settings if any PHYs other
+> than the basic PHYs is supported
+> and will set in current settings if any PHYs are configured
+> (deselected in BREDR or selected in LE).
 
-I have no idea on how the controller can give us that until we explicitly enabled / asked for it, but if so, then please add a clear comment here.
+So for MGMT_SETTING_CONFIGURATION, we also never expose it in the current settings, so until I figure out a need for this, we should not bother with complex code for this either.
+
+We can really figure out later on how we use the current settings info of the PHY configuration. Frankly, I have no idea what a default PHY config actually looks like with the combination of BR, BR/EDR, single vs dual and LE only controllers.
 
 Regards
 
