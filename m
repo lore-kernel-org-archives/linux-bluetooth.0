@@ -2,194 +2,362 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH] Bluetooth: avoid killing an already killed socket
+Subject: Re: [PATCH v4 03/13] Bluetooth: Implement Set PHY Confguration
+ command
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180715193650.24747-1-sudipm.mukherjee@gmail.com>
-Date: Mon, 16 Jul 2018 15:15:52 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Message-Id: <AD0D779C-80D0-4212-A282-0B09CADEEAF4@holtmann.org>
-References: <20180715193650.24747-1-sudipm.mukherjee@gmail.com>
-To: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+In-Reply-To: <CAJzH+bov-8Ps-vsSFbyqj3-2=1TOSfq0jYuob7xLLpHJOquwRw@mail.gmail.com>
+Date: Mon, 16 Jul 2018 15:14:16 +0200
+Cc: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Message-Id: <0BCF014A-C9B6-437D-B79D-13611033E998@holtmann.org>
+References: <1531301495-14479-1-git-send-email-jaganathx.kanakkassery@intel.com>
+ <1531301495-14479-4-git-send-email-jaganathx.kanakkassery@intel.com>
+ <19EAAC1C-2659-4A58-9357-4E88FA1D8712@holtmann.org>
+ <CAJzH+bov-8Ps-vsSFbyqj3-2=1TOSfq0jYuob7xLLpHJOquwRw@mail.gmail.com>
+To: Jaganath K <jaganath.k.os@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sudip,
+Hi Jaganath,
 
-> slub debug reported:
+>>> This enables user to set phys which will be used in all subsequent
+>>> connections. Also host will use the same in LE scanning as well.
+>>> 
+>>> This patch also implements PHY Changed event which will be
+>>> triggered whenever default PHYs change.
+>>> 
+>>> This also adds PHY_CONFIGURATION to mgmt settings which set
+>>> in the supported settings if controller supports 2/3 slot
+>>> or 2M/#M in BREDR controller and 2M or CODED in case of LE
+>>> and set in current settings if any of them is selected
+>>> 
+>>> @ MGMT Command: Set PHY Configuration (0x0045) plen 4
+>>>       Selected PHYs: 0x7fff
+>>>         BR 1M 1SLOT
+>>>         BR 1M 3SLOT
+>>>         BR 1M 5SLOT
+>>>         EDR 2M 1SLOT
+>>>         EDR 2M 3SLOT
+>>>         EDR 2M 5SLOT
+>>>         EDR 3M 1SLOT
+>>>         EDR 3M 3SLOT
+>>>         EDR 3M 5SLOT
+>>>         LE 1M TX
+>>>         LE 1M RX
+>>>         LE 2M TX
+>>>         LE 2M RX
+>>>         LE CODED TX
+>>>         LE CODED RX
+>>> < HCI Command: LE Set Default PHY (0x08|0x0031) plen 3
+>>>       All PHYs preference: 0x00
+>>>       TX PHYs preference: 0x07
+>>>         LE 1M
+>>>         LE 2M
+>>>         LE Coded
+>>>       RX PHYs preference: 0x07
+>>>         LE 1M
+>>>         LE 2M
+>>>         LE Coded
+>>>> HCI Event: Command Complete (0x0e) plen 4
+>>>     LE Set Default PHY (0x08|0x0031) ncmd 1
+>>>       Status: Success (0x00)
+>>> @ MGMT Event: Command Complete (0x0001) plen 3
+>>>     Set PHY Configuration (0x0045) plen 0
+>>>       Status: Success (0x00)
+>>> @ MGMT Event: PHY Configuration Changed (0x0026) plen 4
+>>>       Selected PHYs: 0x7fff
+>>>         BR 1M 1SLOT
+>>>         BR 1M 3SLOT
+>>>         BR 1M 5SLOT
+>>>         EDR 2M 1SLOT
+>>>         EDR 2M 3SLOT
+>>>         EDR 2M 5SLOT
+>>>         EDR 3M 1SLOT
+>>>         EDR 3M 3SLOT
+>>>         EDR 3M 5SLOT
+>>>         LE 1M TX
+>>>         LE 1M RX
+>>>         LE 2M TX
+>>>         LE 2M RX
+>>>         LE CODED TX
+>>>         LE CODED RX
+>>> 
+>>> Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+>>> ---
+>>> include/net/bluetooth/hci.h      |   1 +
+>>> include/net/bluetooth/hci_core.h |   1 +
+>>> include/net/bluetooth/mgmt.h     |  25 +++++
+>>> net/bluetooth/hci_core.c         |   4 +
+>>> net/bluetooth/hci_event.c        |  26 +++++
+>>> net/bluetooth/hci_sock.c         |   1 +
+>>> net/bluetooth/mgmt.c             | 221 +++++++++++++++++++++++++++++++++++++++
+>>> 7 files changed, 279 insertions(+)
+>>> 
+>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+>>> index 89bf800..d0f7657 100644
+>>> --- a/include/net/bluetooth/hci.h
+>>> +++ b/include/net/bluetooth/hci.h
+>>> @@ -214,6 +214,7 @@ enum {
+>>>      HCI_MGMT_DEV_CLASS_EVENTS,
+>>>      HCI_MGMT_LOCAL_NAME_EVENTS,
+>>>      HCI_MGMT_OOB_DATA_EVENTS,
+>>> +     HCI_MGMT_PHY_CHANGED_EVENTS,
+>>> };
+>> 
+>> is this really needed? These flags are used for events that are conditional. Meaning they are send or not send depending on what mgmt command a given socket has called. Since PHY configuration is new and has now legacy commands it deprecates, I really wonder what this if for. So you need to explain that and if it is needed, split this out into a separate patch that explains it.
+>> 
+>>> 
+>>> /*
+>>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+>>> index a64d13f..ab5d494 100644
+>>> --- a/include/net/bluetooth/hci_core.h
+>>> +++ b/include/net/bluetooth/hci_core.h
+>>> @@ -1544,6 +1544,7 @@ void mgmt_advertising_added(struct sock *sk, struct hci_dev *hdev,
+>>>                          u8 instance);
+>>> void mgmt_advertising_removed(struct sock *sk, struct hci_dev *hdev,
+>>>                            u8 instance);
+>>> +int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip);
+>>> 
+>>> u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
+>>>                    u16 to_multiplier);
+>>> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+>>> index 16dddb1..047e98d 100644
+>>> --- a/include/net/bluetooth/mgmt.h
+>>> +++ b/include/net/bluetooth/mgmt.h
+>>> @@ -101,6 +101,7 @@ struct mgmt_rp_read_index_list {
+>>> #define MGMT_SETTING_PRIVACY          0x00002000
+>>> #define MGMT_SETTING_CONFIGURATION    0x00004000
+>>> #define MGMT_SETTING_STATIC_ADDRESS   0x00008000
+>>> +#define MGMT_SETTING_PHY_CONFIGURATION  0x00010000
+>> 
+>> You are already using this in patch 02/13 and that makes this patch series non-bisectable.
+>> 
+>>> 
+>>> #define MGMT_OP_READ_INFO             0x0004
+>>> #define MGMT_READ_INFO_SIZE           0
+>>> @@ -628,6 +629,25 @@ struct mgmt_rp_get_phy_confguration {
+>>> #define MGMT_PHY_LE_CODED_TX  0x00002000
+>>> #define MGMT_PHY_LE_CODED_RX  0x00004000
+>>> 
+>>> +#define MGMT_PHY_BREDR_MASK (MGMT_PHY_BR_1M_1SLOT | MGMT_PHY_BR_1M_3SLOT | \
+>>> +                             MGMT_PHY_BR_1M_5SLOT | MGMT_PHY_EDR_2M_1SLOT | \
+>>> +                             MGMT_PHY_EDR_2M_3SLOT | MGMT_PHY_EDR_2M_5SLOT | \
+>>> +                             MGMT_PHY_EDR_3M_1SLOT | MGMT_PHY_EDR_3M_3SLOT | \
+>>> +                             MGMT_PHY_EDR_3M_5SLOT)
+>>> +#define MGMT_PHY_LE_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_1M_RX | \
+>>> +                             MGMT_PHY_LE_2M_TX | MGMT_PHY_LE_2M_RX | \
+>>> +                             MGMT_PHY_LE_CODED_TX | MGMT_PHY_LE_CODED_RX)
+>>> +#define MGMT_PHY_LE_TX_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_2M_TX | \
+>>> +                          MGMT_PHY_LE_CODED_TX)
+>>> +#define MGMT_PHY_LE_RX_MASK (MGMT_PHY_LE_1M_RX | MGMT_PHY_LE_2M_RX | \
+>>> +                          MGMT_PHY_LE_CODED_RX)
+>>> +
+>>> +#define MGMT_OP_SET_PHY_CONFIGURATION        0x0045
+>>> +#define MGMT_SET_PHY_CONFIGURATION_SIZE              4
+>>> +struct mgmt_cp_set_phy_confguration {
+>>> +     __le32  selected_phys;
+>>> +} __packed;
+>> 
+>> The _SIZE constant is normally below the data structure. Please follow the existing style.
+>> 
+>>> +
+>>> #define MGMT_EV_CMD_COMPLETE          0x0001
+>>> struct mgmt_ev_cmd_complete {
+>>>      __le16  opcode;
+>>> @@ -848,3 +868,8 @@ struct mgmt_ev_ext_info_changed {
+>>>      __le16  eir_len;
+>>>      __u8    eir[0];
+>>> } __packed;
+>>> +
+>>> +#define MGMT_EV_PHY_CONFIGURATION_CHANGED    0x0026
+>>> +struct mgmt_ev_phy_configuration_changed {
+>>> +     __le32  selected_phys;
+>>> +} __packed;
+>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>>> index 432f89f..0d88dc9 100644
+>>> --- a/net/bluetooth/hci_core.c
+>>> +++ b/net/bluetooth/hci_core.c
+>>> @@ -1924,7 +1924,11 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+>>>              break;
+>>> 
+>>>      case HCISETPTYPE:
+>>> +             if (hdev->pkt_type == ((__u16) dr.dev_opt))
+>>> +                     break;
+>>> +
+>> 
+>> What is the extra () doing here? I doubt that is needed.
+>> 
+>>>              hdev->pkt_type = (__u16) dr.dev_opt;
+>>> +             mgmt_phy_configuration_changed(hdev, NULL);
+>>>              break;
+>> 
+>> Also I would do that as a separate patch with a clear commit message that this is for legacy behavior. But now I see why you might need that PHY changed event flag.
+>> 
+>> So lets really do that in a separate patch to clearly point out legacy behavior and the change needed for handling it. This includes the events flag etc. One question I have is if we care if the event is send all the time or not.
+>> 
+>> So for a client this is not conflicting information or duplicated information coming along. It just means that someone changed the PHY configuration. This can happen via ioctl or mgmt and frankly an observer mgmt client wouldn't be able to tell the difference anyway. So maybe this is just overkill with no purpose.
 > 
-> [  440.648642] =============================================================================
-> [  440.648649] BUG kmalloc-1024 (Tainted: G    BU     O   ): Poison overwritten
-> [  440.648651] -----------------------------------------------------------------------------
+> So you mean we dont need the new flag?
 > 
-> [  440.648655] INFO: 0xe70f4bec-0xe70f4bec. First byte 0x6a instead of 0x6b
-> [  440.648665] INFO: Allocated in sk_prot_alloc+0x6b/0xc6 age=33155 cpu=1 pid=1047
-> [  440.648671] 	___slab_alloc.constprop.24+0x1fc/0x292
-> [  440.648675] 	__slab_alloc.isra.18.constprop.23+0x1c/0x25
-> [  440.648677] 	__kmalloc+0xb6/0x17f
-> [  440.648680] 	sk_prot_alloc+0x6b/0xc6
-> [  440.648683] 	sk_alloc+0x1e/0xa1
-> [  440.648700] 	sco_sock_alloc.constprop.6+0x26/0xaf [bluetooth]
-> [  440.648716] 	sco_connect_cfm+0x166/0x281 [bluetooth]
-> [  440.648731] 	hci_conn_request_evt.isra.53+0x258/0x281 [bluetooth]
-> [  440.648746] 	hci_event_packet+0x28b/0x2326 [bluetooth]
-> [  440.648759] 	hci_rx_work+0x161/0x291 [bluetooth]
-> [  440.648764] 	process_one_work+0x163/0x2b2
-> [  440.648767] 	worker_thread+0x1a9/0x25c
-> [  440.648770] 	kthread+0xf8/0xfd
-> [  440.648774] 	ret_from_fork+0x2e/0x38
-> [  440.648779] INFO: Freed in __sk_destruct+0xd3/0xdf age=3815 cpu=1 pid=1047
-> [  440.648782] 	__slab_free+0x4b/0x27a
-> [  440.648784] 	kfree+0x12e/0x155
-> [  440.648787] 	__sk_destruct+0xd3/0xdf
-> [  440.648790] 	sk_destruct+0x27/0x29
-> [  440.648793] 	__sk_free+0x75/0x91
-> [  440.648795] 	sk_free+0x1c/0x1e
-> [  440.648810] 	sco_sock_kill+0x5a/0x5f [bluetooth]
-> [  440.648825] 	sco_conn_del+0x8e/0xba [bluetooth]
-> [  440.648840] 	sco_disconn_cfm+0x3a/0x41 [bluetooth]
-> [  440.648855] 	hci_event_packet+0x45e/0x2326 [bluetooth]
-> [  440.648868] 	hci_rx_work+0x161/0x291 [bluetooth]
-> [  440.648872] 	process_one_work+0x163/0x2b2
-> [  440.648875] 	worker_thread+0x1a9/0x25c
-> [  440.648877] 	kthread+0xf8/0xfd
-> [  440.648880] 	ret_from_fork+0x2e/0x38
-> [  440.648884] INFO: Slab 0xf4718580 objects=27 used=27 fp=0x  (null) flags=0x40008100
-> [  440.648886] INFO: Object 0xe70f4b88 @offset=19336 fp=0xe70f54f8
-> 
-> When KASAN was enabled, it reported:
-> 
-> [  210.096613] ==================================================================
-> [  210.096634] BUG: KASAN: use-after-free in ex_handler_refcount+0x5b/0x127
-> [  210.096641] Write of size 4 at addr ffff880107e17160 by task kworker/u9:1/2040
-> 
-> [  210.096651] CPU: 1 PID: 2040 Comm: kworker/u9:1 Tainted: G     U     O    4.14.47-20180606+ #2
-> [  210.096654] Hardware name: , BIOS 2017.01-00087-g43e04de 08/30/2017
-> [  210.096693] Workqueue: hci0 hci_rx_work [bluetooth]
-> [  210.096698] Call Trace:
-> [  210.096711]  dump_stack+0x46/0x59
-> [  210.096722]  print_address_description+0x6b/0x23b
-> [  210.096729]  ? ex_handler_refcount+0x5b/0x127
-> [  210.096736]  kasan_report+0x220/0x246
-> [  210.096744]  ex_handler_refcount+0x5b/0x127
-> [  210.096751]  ? ex_handler_clear_fs+0x85/0x85
-> [  210.096757]  fixup_exception+0x8c/0x96
-> [  210.096766]  do_trap+0x66/0x2c1
-> [  210.096773]  do_error_trap+0x152/0x180
-> [  210.096781]  ? fixup_bug+0x78/0x78
-> [  210.096817]  ? hci_debugfs_create_conn+0x244/0x26a [bluetooth]
-> [  210.096824]  ? __schedule+0x113b/0x1453
-> [  210.096830]  ? sysctl_net_exit+0xe/0xe
-> [  210.096837]  ? __wake_up_common+0x343/0x343
-> [  210.096843]  ? insert_work+0x107/0x163
-> [  210.096850]  invalid_op+0x1b/0x40
-> [  210.096888] RIP: 0010:hci_debugfs_create_conn+0x244/0x26a [bluetooth]
-> [  210.096892] RSP: 0018:ffff880094a0f970 EFLAGS: 00010296
-> [  210.096898] RAX: 0000000000000000 RBX: ffff880107e170e8 RCX: ffff880107e17160
-> [  210.096902] RDX: 000000000000002f RSI: ffff88013b80ed40 RDI: ffffffffa058b940
-> [  210.096906] RBP: ffff88011b2b0578 R08: 00000000852f0ec9 R09: ffffffff81cfcf9b
-> [  210.096909] R10: 00000000d21bdad7 R11: 0000000000000001 R12: ffff8800967b0488
-> [  210.096913] R13: ffff880107e17168 R14: 0000000000000068 R15: ffff8800949c0008
-> [  210.096920]  ? __sk_destruct+0x2c6/0x2d4
-> [  210.096959]  hci_event_packet+0xff5/0x7de2 [bluetooth]
-> [  210.096969]  ? __local_bh_enable_ip+0x43/0x5b
-> [  210.097004]  ? l2cap_sock_recv_cb+0x158/0x166 [bluetooth]
-> [  210.097039]  ? hci_le_meta_evt+0x2bb3/0x2bb3 [bluetooth]
-> [  210.097075]  ? l2cap_ertm_init+0x94e/0x94e [bluetooth]
-> [  210.097093]  ? xhci_urb_enqueue+0xbd8/0xcf5 [xhci_hcd]
-> [  210.097102]  ? __accumulate_pelt_segments+0x24/0x33
-> [  210.097109]  ? __accumulate_pelt_segments+0x24/0x33
-> [  210.097115]  ? __update_load_avg_se.isra.2+0x217/0x3a4
-> [  210.097122]  ? set_next_entity+0x7c3/0x12cd
-> [  210.097128]  ? pick_next_entity+0x25e/0x26c
-> [  210.097135]  ? pick_next_task_fair+0x2ca/0xc1a
-> [  210.097141]  ? switch_mm_irqs_off+0x346/0xb4f
-> [  210.097147]  ? __switch_to+0x769/0xbc4
-> [  210.097153]  ? compat_start_thread+0x66/0x66
-> [  210.097188]  ? hci_conn_check_link_mode+0x1cd/0x1cd [bluetooth]
-> [  210.097195]  ? finish_task_switch+0x392/0x431
-> [  210.097228]  ? hci_rx_work+0x154/0x487 [bluetooth]
-> [  210.097260]  hci_rx_work+0x154/0x487 [bluetooth]
-> [  210.097269]  process_one_work+0x579/0x9e9
-> [  210.097277]  worker_thread+0x68f/0x804
-> [  210.097285]  kthread+0x31c/0x32b
-> [  210.097292]  ? rescuer_thread+0x70c/0x70c
-> [  210.097299]  ? kthread_create_on_node+0xa3/0xa3
-> [  210.097306]  ret_from_fork+0x35/0x40
-> 
-> [  210.097314] Allocated by task 2040:
-> [  210.097323]  kasan_kmalloc.part.1+0x51/0xc7
-> [  210.097328]  __kmalloc+0x17f/0x1b6
-> [  210.097335]  sk_prot_alloc+0xf2/0x1a3
-> [  210.097340]  sk_alloc+0x22/0x297
-> [  210.097375]  sco_sock_alloc.constprop.7+0x23/0x202 [bluetooth]
-> [  210.097410]  sco_connect_cfm+0x2d0/0x566 [bluetooth]
-> [  210.097443]  hci_conn_request_evt.isra.53+0x6d3/0x762 [bluetooth]
-> [  210.097476]  hci_event_packet+0x85e/0x7de2 [bluetooth]
-> [  210.097507]  hci_rx_work+0x154/0x487 [bluetooth]
-> [  210.097512]  process_one_work+0x579/0x9e9
-> [  210.097517]  worker_thread+0x68f/0x804
-> [  210.097523]  kthread+0x31c/0x32b
-> [  210.097529]  ret_from_fork+0x35/0x40
-> 
-> [  210.097533] Freed by task 2040:
-> [  210.097539]  kasan_slab_free+0xb3/0x15e
-> [  210.097544]  kfree+0x103/0x1a9
-> [  210.097549]  __sk_destruct+0x2c6/0x2d4
-> [  210.097584]  sco_conn_del.isra.1+0xba/0x10e [bluetooth]
-> [  210.097617]  hci_event_packet+0xff5/0x7de2 [bluetooth]
-> [  210.097648]  hci_rx_work+0x154/0x487 [bluetooth]
-> [  210.097653]  process_one_work+0x579/0x9e9
-> [  210.097658]  worker_thread+0x68f/0x804
-> [  210.097663]  kthread+0x31c/0x32b
-> [  210.097670]  ret_from_fork+0x35/0x40
-> 
-> [  210.097676] The buggy address belongs to the object at ffff880107e170e8
-> which belongs to the cache kmalloc-1024 of size 1024
-> [  210.097681] The buggy address is located 120 bytes inside of
-> 1024-byte region [ffff880107e170e8, ffff880107e174e8)
-> [  210.097683] The buggy address belongs to the page:
-> [  210.097689] page:ffffea00041f8400 count:1 mapcount:0 mapping:          (null) index:0xffff880107e15b68 compound_mapcount: 0
-> [  210.110194] flags: 0x8000000000008100(slab|head)
-> [  210.115441] raw: 8000000000008100 0000000000000000 ffff880107e15b68 0000000100170016
-> [  210.115448] raw: ffffea0004a47620 ffffea0004b48e20 ffff88013b80ed40 0000000000000000
-> [  210.115451] page dumped because: kasan: bad access detected
-> 
-> [  210.115454] Memory state around the buggy address:
-> [  210.115460]  ffff880107e17000: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> [  210.115465]  ffff880107e17080: fc fc fc fc fc fc fc fc fc fc fc fc fc fb fb fb
-> [  210.115469] >ffff880107e17100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [  210.115472]                                                        ^
-> [  210.115477]  ffff880107e17180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [  210.115481]  ffff880107e17200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> [  210.115483] ==================================================================
-> 
-> And finally when BT_DBG() and ftrace was enabled it showed:
-> 
->       <...>-14979 [001] ....   186.104191: sco_sock_kill <-sco_sock_close
->       <...>-14979 [001] ....   186.104191: sco_sock_kill <-sco_sock_release
->       <...>-14979 [001] ....   186.104192: sco_sock_kill: sk ef0497a0 state 9
->       <...>-14979 [001] ....   186.104193: bt_sock_unlink <-sco_sock_kill
-> kworker/u9:2-792   [001] ....   186.104246: sco_sock_kill <-sco_conn_del
-> kworker/u9:2-792   [001] ....   186.104248: sco_sock_kill: sk ef0497a0 state 9
-> kworker/u9:2-792   [001] ....   186.104249: bt_sock_unlink <-sco_sock_kill
-> kworker/u9:2-792   [001] ....   186.104250: sco_sock_destruct <-__sk_destruct
-> kworker/u9:2-792   [001] ....   186.104250: sco_sock_destruct: sk ef0497a0
-> kworker/u9:2-792   [001] ....   186.104860: hci_conn_del <-hci_event_packet
-> kworker/u9:2-792   [001] ....   186.104864: hci_conn_del: hci0 hcon ef0484c0 handle 266
-> 
-> Only in the failed case, sco_sock_kill() gets called with the same sock
-> pointer two times. Add a check for SOCK_DEAD to avoid continue killing
-> a socket which has already been killed.
-> 
-> Signed-off-by: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-> ---
-> net/bluetooth/sco.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+>> 
+>> Also we might better make mgmt_phy_configuration_changed capable of checking if an event is needed or not. Meaning it should check by itself if something changed or not. Don't remember how we did this for other functions. So something to look into.
 
-patch has been applied to bluetooth-next tree.
+Lets put this in a separate patch and go first without it.
+
+>> 
+>>> 
+>>>      case HCISETACLMTU:
+>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>> index 6819215..6942315 100644
+>>> --- a/net/bluetooth/hci_event.c
+>>> +++ b/net/bluetooth/hci_event.c
+>>> @@ -1042,6 +1042,28 @@ static void hci_cc_le_set_random_addr(struct hci_dev *hdev, struct sk_buff *skb)
+>>>      hci_dev_unlock(hdev);
+>>> }
+>>> 
+>>> +static void hci_cc_le_set_default_phy(struct hci_dev *hdev, struct sk_buff *skb)
+>>> +{
+>>> +     __u8 status = *((__u8 *) skb->data);
+>>> +     struct hci_cp_le_set_default_phy *cp;
+>>> +
+>>> +     BT_DBG("%s status 0x%2.2x", hdev->name, status);
+>>> +
+>>> +     if (status)
+>>> +             return;
+>>> +
+>>> +     cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_DEFAULT_PHY);
+>>> +     if (!cp)
+>>> +             return;
+>>> +
+>>> +     hci_dev_lock(hdev);
+>>> +
+>>> +     hdev->le_tx_def_phys = cp->tx_phys;
+>>> +     hdev->le_rx_def_phys = cp->rx_phys;
+>>> +
+>>> +     hci_dev_unlock(hdev);
+>>> +}
+>>> +
+>>> static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
+>>> {
+>>>      __u8 *sent, status = *((__u8 *) skb->data);
+>>> @@ -3163,6 +3185,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+>>>              hci_cc_le_set_ext_scan_enable(hdev, skb);
+>>>              break;
+>>> 
+>>> +     case HCI_OP_LE_SET_DEFAULT_PHY:
+>>> +             hci_cc_le_set_default_phy(hdev, skb);
+>>> +             break;
+>>> +
+>>>      default:
+>>>              BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
+>>>              break;
+>>> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+>>> index 1506e16..476916c 100644
+>>> --- a/net/bluetooth/hci_sock.c
+>>> +++ b/net/bluetooth/hci_sock.c
+>>> @@ -1328,6 +1328,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+>>>                      hci_sock_set_flag(sk, HCI_MGMT_SETTING_EVENTS);
+>>>                      hci_sock_set_flag(sk, HCI_MGMT_DEV_CLASS_EVENTS);
+>>>                      hci_sock_set_flag(sk, HCI_MGMT_LOCAL_NAME_EVENTS);
+>>> +                     hci_sock_set_flag(sk, HCI_MGMT_PHY_CHANGED_EVENTS);
+>>>              }
+>>>              break;
+>>>      }
+>>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>>> index 4a31d4d..1c2ed42 100644
+>>> --- a/net/bluetooth/mgmt.c
+>>> +++ b/net/bluetooth/mgmt.c
+>>> @@ -737,6 +737,23 @@ static u32 get_configurable_phys(struct hci_dev *hdev)
+>>>                      ~MGMT_PHY_LE_1M_TX & ~MGMT_PHY_LE_1M_RX);
+>>> }
+>>> 
+>>> +static bool phys_configured(struct hci_dev *hdev)
+>>> +{
+>>> +     u32 selected_phys = get_selected_phys(hdev);
+>>> +     u32 supported_phys = get_supported_phys(hdev);
+>>> +
+>>> +     /* If any of BREDR supported PHYs are deselected or
+>>> +      *  LE PHYs other than 1M are selected
+>> 
+>> You have extra spaces in the front.
+>> 
+>>> +      */
+>>> +     if (((supported_phys & MGMT_PHY_BREDR_MASK) !=
+>>> +              (selected_phys & MGMT_PHY_BREDR_MASK)) ||
+>>> +             ((selected_phys & MGMT_PHY_LE_MASK) &
+>>> +               ~(MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_1M_RX)))
+>> 
+>> This alignment is not okay. Go over the character per line limit here if needed.
+>> 
+>> One question though, why are making an exception for LE_1M here?
+>> 
+> 
+> LE is supported will mean that LE_!M is supported and also cannot be
+> configured (deselected).
+
+Can you please add comments in front of these complex statements.
+
+> 
+>>> +             return true;
+>>> +
+>>> +     return false;
+>>> +}
+>>> +
+>>> static u32 get_supported_settings(struct hci_dev *hdev)
+>>> {
+>>>      u32 settings = 0;
+>>> @@ -3332,6 +3349,209 @@ static int get_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+>>>                               &rp, sizeof(rp));
+>>> }
+>>> 
+>>> +int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip)
+>>> +{
+>>> +     struct mgmt_ev_phy_configuration_changed ev;
+>>> +
+>>> +     memset(&ev, 0, sizeof(ev));
+>>> +
+>>> +     ev.selected_phys = cpu_to_le32(get_selected_phys(hdev));
+>>> +
+>>> +     return mgmt_limited_event(MGMT_EV_PHY_CONFIGURATION_CHANGED, hdev, &ev,
+>>> +                               sizeof(ev), HCI_MGMT_PHY_CHANGED_EVENTS,
+>>> +                               skip);
+>>> +}
+>>> +
+>>> +static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
+>>> +                                  u16 opcode, struct sk_buff *skb)
+>>> +{
+>>> +     struct mgmt_cp_set_phy_confguration *cp;
+>>> +     struct mgmt_pending_cmd *cmd;
+>>> +
+>>> +     BT_DBG("status 0x%02x", status);
+>>> +
+>>> +     hci_dev_lock(hdev);
+>>> +
+>>> +     cmd = pending_find(MGMT_OP_SET_PHY_CONFIGURATION, hdev);
+>>> +     if (!cmd)
+>>> +             goto unlock;
+>>> +
+>>> +     cp = cmd->param;
+>>> +
+>>> +     if (status) {
+>>> +             mgmt_cmd_status(cmd->sk, hdev->id,
+>>> +                             MGMT_OP_SET_PHY_CONFIGURATION,
+>>> +                             mgmt_status(status));
+>>> +     } else {
+>>> +             mgmt_cmd_complete(cmd->sk, hdev->id,
+>>> +                               MGMT_OP_SET_PHY_CONFIGURATION, 0,
+>>> +                               NULL, 0);
+>>> +
+>>> +             mgmt_phy_configuration_changed(hdev, cmd->sk);
+>>> +             new_settings(hdev, cmd->sk);
+>> 
+>> This new_settings we really need to discuss and document its behavior.
+> 
+> As per our initial discussion, NewSettings will have PHY Configuration bit set
+> if any PHYs other than 1M is selected. I have extended it to BREDR wherein it
+> will be set if any of the PHYs are deselected.
+
+And I think we scrap that for now with the new settings events. I fail to see the advantage and we can always do that later.
 
 Regards
 
