@@ -1,106 +1,232 @@
-Return-Path: <pp@emlix.com>
-From: Philipp Puschmann <pp@emlix.com>
-To: marcel@holtmann.org
-Cc: johan.hedberg@gmail.com,
-	davem@davemloft.net,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Philipp Puschmann <pp@emlix.com>
-Subject: [PATCH] Bluetooth: Use lock_sock_nested in bt_accept_enqueue
-Date: Tue, 17 Jul 2018 13:41:12 +0200
-Message-Id: <20180717114112.857-1-pp@emlix.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Navik, Ankit P" <ankit.p.navik@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "Navik, Ankit P" <ankit.p.navik@intel.com>,
+        "Panda, Bharat B" <bharat.b.panda@intel.com>
+Subject: RE: [PATCH] Bluetooth: Add definitions and track LE resolve list
+ modification
+Date: Tue, 17 Jul 2018 08:22:28 +0000
+Message-ID: <2F886D5F95ED3A47BC8C177EADCD1CC72827B155@BGSMSX104.gar.corp.intel.com>
+References: <1531302639-16648-1-git-send-email-ankit.p.navik@intel.com>
+In-Reply-To: <1531302639-16648-1-git-send-email-ankit.p.navik@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixes this warning that was provoked by a pairing:
-
-[60258.016221] WARNING: possible recursive locking detected
-[60258.021558] 4.15.0-RD1812-BSP #1 Tainted: G           O
-[60258.027146] --------------------------------------------
-[60258.032464] kworker/u5:0/70 is trying to acquire lock:
-[60258.037609]  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<87759073>] bt_accept_enqueue+0x3c/0x74
-[60258.046863]
-[60258.046863] but task is already holding lock:
-[60258.052704]  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<d22d7106>] l2cap_sock_new_connection_cb+0x1c/0x88
-[60258.062905]
-[60258.062905] other info that might help us debug this:
-[60258.069441]  Possible unsafe locking scenario:
-[60258.069441]
-[60258.075368]        CPU0
-[60258.077821]        ----
-[60258.080272]   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
-[60258.085510]   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
-[60258.090748]
-[60258.090748]  *** DEADLOCK ***
-[60258.090748]
-[60258.096676]  May be due to missing lock nesting notation
-[60258.096676]
-[60258.103472] 5 locks held by kworker/u5:0/70:
-[60258.107747]  #0:  ((wq_completion)%shdev->name#2){+.+.}, at: [<9460d092>] process_one_work+0x130/0x4fc
-[60258.117263]  #1:  ((work_completion)(&hdev->rx_work)){+.+.}, at: [<9460d092>] process_one_work+0x130/0x4fc
-[60258.126942]  #2:  (&conn->chan_lock){+.+.}, at: [<7877c8c3>] l2cap_connect+0x80/0x4f8
-[60258.134806]  #3:  (&chan->lock/2){+.+.}, at: [<2e16c724>] l2cap_connect+0x8c/0x4f8
-[60258.142410]  #4:  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<d22d7106>] l2cap_sock_new_connection_cb+0x1c/0x88
-[60258.153043]
-[60258.153043] stack backtrace:
-[60258.157413] CPU: 1 PID: 70 Comm: kworker/u5:0 Tainted: G           O     4.15.0-RD1812-BSP #1
-[60258.165945] Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
-[60258.172485] Workqueue: hci0 hci_rx_work
-[60258.176331] Backtrace:
-[60258.178797] [<8010c9fc>] (dump_backtrace) from [<8010ccbc>] (show_stack+0x18/0x1c)
-[60258.186379]  r7:80e55fe4 r6:80e55fe4 r5:20050093 r4:00000000
-[60258.192058] [<8010cca4>] (show_stack) from [<809864e8>] (dump_stack+0xb0/0xdc)
-[60258.199301] [<80986438>] (dump_stack) from [<8016ecc8>] (__lock_acquire+0xffc/0x11d4)
-[60258.207144]  r9:5e2bb019 r8:630f974c r7:ba8a5940 r6:ba8a5ed8 r5:815b5220 r4:80fa081c
-[60258.214901] [<8016dccc>] (__lock_acquire) from [<8016f620>] (lock_acquire+0x78/0x98)
-[60258.222655]  r10:00000040 r9:00000040 r8:808729f0 r7:00000001 r6:00000000 r5:60050013
-[60258.230491]  r4:00000000
-[60258.233045] [<8016f5a8>] (lock_acquire) from [<806ee974>] (lock_sock_nested+0x64/0x88)
-[60258.240970]  r7:00000000 r6:b796e870 r5:00000001 r4:b796e800
-[60258.246643] [<806ee910>] (lock_sock_nested) from [<808729f0>] (bt_accept_enqueue+0x3c/0x74)
-[60258.255004]  r8:00000001 r7:ba7d3c00 r6:ba7d3ea4 r5:ba7d2000 r4:b796e800
-[60258.261717] [<808729b4>] (bt_accept_enqueue) from [<808aa39c>] (l2cap_sock_new_connection_cb+0x68/0x88)
-[60258.271117]  r5:b796e800 r4:ba7d2000
-[60258.274708] [<808aa334>] (l2cap_sock_new_connection_cb) from [<808a294c>] (l2cap_connect+0x190/0x4f8)
-[60258.283933]  r5:00000001 r4:ba6dce00
-[60258.287524] [<808a27bc>] (l2cap_connect) from [<808a4a14>] (l2cap_recv_frame+0x744/0x2cf8)
-[60258.295800]  r10:ba6dcf24 r9:00000004 r8:b78d8014 r7:00000004 r6:bb05d000 r5:00000004
-[60258.303635]  r4:bb05d008
-[60258.306183] [<808a42d0>] (l2cap_recv_frame) from [<808a7808>] (l2cap_recv_acldata+0x210/0x214)
-[60258.314805]  r10:b78e7800 r9:bb05d960 r8:00000001 r7:bb05d000 r6:0000000c r5:b7957a80
-[60258.322641]  r4:ba6dce00
-[60258.325188] [<808a75f8>] (l2cap_recv_acldata) from [<8087630c>] (hci_rx_work+0x35c/0x4e8)
-[60258.333374]  r6:80e5743c r5:bb05d7c8 r4:b7957a80
-[60258.338004] [<80875fb0>] (hci_rx_work) from [<8013dc7c>] (process_one_work+0x1a4/0x4fc)
-[60258.346018]  r10:00000001 r9:00000000 r8:baabfef8 r7:ba997500 r6:baaba800 r5:baaa5d00
-[60258.353853]  r4:bb05d7c8
-[60258.356401] [<8013dad8>] (process_one_work) from [<8013e028>] (worker_thread+0x54/0x5cc)
-[60258.364503]  r10:baabe038 r9:baaba834 r8:80e05900 r7:00000088 r6:baaa5d18 r5:baaba800
-[60258.372338]  r4:baaa5d00
-[60258.374888] [<8013dfd4>] (worker_thread) from [<801448f8>] (kthread+0x134/0x160)
-[60258.382295]  r10:ba8310b8 r9:bb07dbfc r8:8013dfd4 r7:baaa5d00 r6:00000000 r5:baaa8ac0
-[60258.390130]  r4:ba831080
-[60258.392682] [<801447c4>] (kthread) from [<801080b4>] (ret_from_fork+0x14/0x20)
-[60258.399915]  r10:00000000 r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:801447c4
-[60258.407751]  r4:baaa8ac0 r3:baabe000
-
-Signed-off-by: Philipp Puschmann <pp@emlix.com>
----
- net/bluetooth/af_bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 3264e1873219..deacc52d7ff1 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -159,7 +159,7 @@ void bt_accept_enqueue(struct sock *parent, struct sock *sk)
- 	BT_DBG("parent %p, sk %p", parent, sk);
+Soft reminder.
  
- 	sock_hold(sk);
--	lock_sock(sk);
-+	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
- 	list_add_tail(&bt_sk(sk)->accept_q, &bt_sk(parent)->accept_q);
- 	bt_sk(sk)->parent = parent;
- 	release_sock(sk);
--- 
-2.18.0
+> Add the definitions for adding entries to the LE resolve list and removing entries
+> from the LE resolve list. When the LE resolve list gets changed via HCI
+> commands make sure that the internal storage of the resolve list entries gets
+> updated.
+> 
+> Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
+> ---
+>  include/net/bluetooth/hci.h      | 14 ++++++++++++
+>  include/net/bluetooth/hci_core.h |  5 +++-
+>  net/bluetooth/hci_core.c         |  9 +++++++-
+>  net/bluetooth/hci_event.c        | 49
+> +++++++++++++++++++++++++++++++++++++++-
+>  net/bluetooth/hci_sock.c         |  3 ++-
+>  net/bluetooth/mgmt.c             |  4 ++--
+>  6 files changed, 78 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h index
+> 4af1a3a..1abcd14 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -1490,6 +1490,20 @@ struct hci_cp_le_write_def_data_len {
+>  	__le16	tx_time;
+>  } __packed;
+> 
+> +#define HCI_OP_LE_ADD_TO_RESOLV_LIST	0x2027
+> +struct hci_cp_le_add_to_resolv_list {
+> +	__u8	 bdaddr_type;
+> +	bdaddr_t bdaddr;
+> +	__u8	 peer_irk[16];
+> +	__u8	 local_irk[16];
+> +} __packed;
+> +
+> +#define HCI_OP_LE_DEL_FROM_RESOLV_LIST	0x2028
+> +struct hci_cp_le_del_from_resolv_list {
+> +	__u8	 bdaddr_type;
+> +	bdaddr_t bdaddr;
+> +} __packed;
+> +
+>  #define HCI_OP_LE_CLEAR_RESOLV_LIST	0x2029
+> 
+>  #define HCI_OP_LE_READ_RESOLV_LIST_SIZE	0x202a
+> diff --git a/include/net/bluetooth/hci_core.h
+> b/include/net/bluetooth/hci_core.h
+> index 3a1ae0d..9ab0fdf 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -101,6 +101,8 @@ struct bdaddr_list {
+>  	struct list_head list;
+>  	bdaddr_t bdaddr;
+>  	u8 bdaddr_type;
+> +	u8 peer_irk[16];
+> +	u8 local_irk[16];
+>  };
+> 
+>  struct bt_uuid {
+> @@ -1050,7 +1052,8 @@ static inline void hci_set_drvdata(struct hci_dev
+> *hdev, void *data)
+> 
+>  struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
+>  					   bdaddr_t *bdaddr, u8 type);
+> -int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type);
+> +int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type,
+> +			u8 *peer_irk, u8 *local_irk);
+>  int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type);  void
+> hci_bdaddr_list_clear(struct list_head *list);
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c index
+> af1675d..dcaef13 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2784,7 +2784,8 @@ void hci_bdaddr_list_clear(struct list_head
+> *bdaddr_list)
+>  	}
+>  }
+> 
+> -int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type)
+> +int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type,
+> +			u8 *peer_irk, u8 *local_irk)
+>  {
+>  	struct bdaddr_list *entry;
+> 
+> @@ -2801,6 +2802,12 @@ int hci_bdaddr_list_add(struct list_head *list,
+> bdaddr_t *bdaddr, u8 type)
+>  	bacpy(&entry->bdaddr, bdaddr);
+>  	entry->bdaddr_type = type;
+> 
+> +	if (peer_irk)
+> +		memcpy(entry->peer_irk, peer_irk, 16);
+> +
+> +	if (local_irk)
+> +		memcpy(entry->local_irk, local_irk, 16);
+> +
+>  	list_add(&entry->list, list);
+> 
+>  	return 0;
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c index
+> 3029d79..e8d6df9 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1239,7 +1239,7 @@ static void hci_cc_le_add_to_white_list(struct
+> hci_dev *hdev,
+>  		return;
+> 
+>  	hci_bdaddr_list_add(&hdev->le_white_list, &sent->bdaddr,
+> -			   sent->bdaddr_type);
+> +			   sent->bdaddr_type, NULL, NULL);
+>  }
+> 
+>  static void hci_cc_le_del_from_white_list(struct hci_dev *hdev, @@ -1307,6
+> +1307,45 @@ static void hci_cc_le_write_def_data_len(struct hci_dev *hdev,
+>  	hdev->le_def_tx_time = le16_to_cpu(sent->tx_time);  }
+> 
+> +static void hci_cc_le_add_to_resolv_list(struct hci_dev *hdev,
+> +					 struct sk_buff *skb)
+> +{
+> +	struct hci_cp_le_add_to_resolv_list *sent;
+> +	__u8 status = *((__u8 *) skb->data);
+> +
+> +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+> +
+> +	if (status)
+> +		return;
+> +
+> +	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_RESOLV_LIST);
+> +	if (!sent)
+> +		return;
+> +
+> +	hci_bdaddr_list_add(&hdev->le_resolv_list, &sent->bdaddr,
+> +				sent->bdaddr_type, sent->peer_irk,
+> +				sent->local_irk);
+> +}
+> +
+> +static void hci_cc_le_del_from_resolv_list(struct hci_dev *hdev,
+> +					  struct sk_buff *skb)
+> +{
+> +	struct hci_cp_le_del_from_resolv_list *sent;
+> +	__u8 status = *((__u8 *) skb->data);
+> +
+> +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
+> +
+> +	if (status)
+> +		return;
+> +
+> +	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_DEL_FROM_RESOLV_LIST);
+> +	if (!sent)
+> +		return;
+> +
+> +	hci_bdaddr_list_del(&hdev->le_resolv_list, &sent->bdaddr,
+> +			    sent->bdaddr_type);
+> +}
+> +
+>  static void hci_cc_le_clear_resolv_list(struct hci_dev *hdev,
+>  				       struct sk_buff *skb)
+>  {
+> @@ -3042,6 +3081,14 @@ static void hci_cmd_complete_evt(struct hci_dev
+> *hdev, struct sk_buff *skb,
+>  		hci_cc_le_write_def_data_len(hdev, skb);
+>  		break;
+> 
+> +	case HCI_OP_LE_ADD_TO_RESOLV_LIST:
+> +		hci_cc_le_add_to_resolv_list(hdev, skb);
+> +		break;
+> +
+> +	case HCI_OP_LE_DEL_FROM_RESOLV_LIST:
+> +		hci_cc_le_del_from_resolv_list(hdev, skb);
+> +		break;
+> +
+>  	case HCI_OP_LE_CLEAR_RESOLV_LIST:
+>  		hci_cc_le_clear_resolv_list(hdev, skb);
+>  		break;
+> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c index
+> 1506e16..1f6ae79 100644
+> --- a/net/bluetooth/hci_sock.c
+> +++ b/net/bluetooth/hci_sock.c
+> @@ -893,7 +893,8 @@ static int hci_sock_blacklist_add(struct hci_dev *hdev,
+> void __user *arg)
+> 
+>  	hci_dev_lock(hdev);
+> 
+> -	err = hci_bdaddr_list_add(&hdev->blacklist, &bdaddr, BDADDR_BREDR);
+> +	err = hci_bdaddr_list_add(&hdev->blacklist, &bdaddr, BDADDR_BREDR,
+> +					NULL, NULL);
+> 
+>  	hci_dev_unlock(hdev);
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c index
+> 8a80d48..a99b8dd 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3791,7 +3791,7 @@ static int block_device(struct sock *sk, struct hci_dev
+> *hdev, void *data,
+>  	hci_dev_lock(hdev);
+> 
+>  	err = hci_bdaddr_list_add(&hdev->blacklist, &cp->addr.bdaddr,
+> -				  cp->addr.type);
+> +				  cp->addr.type, NULL, NULL);
+>  	if (err < 0) {
+>  		status = MGMT_STATUS_FAILED;
+>  		goto done;
+> @@ -5272,7 +5272,7 @@ static int add_device(struct sock *sk, struct hci_dev
+> *hdev,
+>  		}
+> 
+>  		err = hci_bdaddr_list_add(&hdev->whitelist, &cp->addr.bdaddr,
+> -					  cp->addr.type);
+> +					  cp->addr.type, NULL, NULL);
+>  		if (err)
+>  			goto unlock;
+> 
+> --
+> 1.9.1
+
+Regards, 
+Ankit
