@@ -1,41 +1,33 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH] Bluetooth:hci_bcm:Check return value from devm_clk_get
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180717120635.25259-1-raghuhack78@gmail.com>
-Date: Wed, 18 Jul 2018 14:09:55 +0200
-Cc: linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <5018E00B-7642-435F-AB9E-1EEB7DD5A885@holtmann.org>
-References: <5b4ddae5.1c69fb81.61055.042e.GMRIR@mx.google.com>
- <20180717120635.25259-1-raghuhack78@gmail.com>
-To: RAGHU Halharvi <raghuhack78@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-wpan-owner@vger.kernel.org>
+Date: Tue, 17 Jul 2018 17:26:20 +0200
+From: Rafael Vuijk <r.vuijk@sownet.nl>
+To: Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2 v2] ieee802154: assembly of 6LoWPAN fragments improvement
+Message-ID: <20180717152620.GB22664@Rafael-Mac.intra.sownet.nl>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Raghu,
+6LoWPAN reassembly fragment overlap checks.
 
-> * Check return value from devm_clk_get & return appropriate error.
-> ---
-> drivers/bluetooth/hci_bcm.c | 2 ++
-> 1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-> index 441f5e1deb11..1295cc89d702 100644
-> --- a/drivers/bluetooth/hci_bcm.c
-> +++ b/drivers/bluetooth/hci_bcm.c
-> @@ -910,6 +910,8 @@ static int bcm_get_resources(struct bcm_device *dev)
-> 		return 0;
-> 
-> 	dev->clk = devm_clk_get(dev->dev, NULL);
-> +	if (IS_ERR(dev->clk))
-> +		return PTR_ERR(dev->clk);
-
-so I assumed this was not done on purpose and allow for dev->clk = NULL since all other clock handling functions will cope with it. Can someone NAK or ACK this patch?
-
-Regards
-
-Marcel
+Signed-off-by: Rafael Vuijk <r.vuijk@sownet.nl>
+--- ./net/ieee802154/6lowpan/reassembly.c	2018-02-20 11:10:06.000000000 +0100
++++ ./net/ieee802154/6lowpan/reassembly.c	2018-02-21 09:13:29.000000000 +0100
+@@ -179,6 +170,13 @@ static int lowpan_frag_queue(struct lowp
+ 	}
+ 
+ found:
++	/* Current fragment overlaps with previous fragment? */
++	if (prev && (lowpan_802154_cb(prev)->d_offset << 3) + prev->len > offset)
++		goto err;
++	/* Current fragment overlaps with next fragment? */
++	if (next && offset + skb->len > lowpan_802154_cb(next)->d_offset << 3)
++		goto err;
++
+ 	/* Insert this fragment in the chain of fragments. */
+ 	skb->next = next;
+ 	if (!next)
 
