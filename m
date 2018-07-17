@@ -1,15 +1,14 @@
 Return-Path: <raghuhack78@gmail.com>
 From: RAGHU Halharvi <raghuhack78@gmail.com>
-To: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+To: inux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org
 Cc: RAGHU Halharvi <raghuhack78@gmail.com>,
 	marcel@holtmann.org,
 	johan.hedberg@gmail.com
 Subject: [PATCH] Bluetooth:hci_bcm:Check return value from devm_clk_get
-Date: Tue, 17 Jul 2018 17:36:35 +0530
-Message-Id: <20180717120635.25259-1-raghuhack78@gmail.com>
-In-Reply-To: <5b4ddae5.1c69fb81.61055.042e.GMRIR@mx.google.com>
-References: <5b4ddae5.1c69fb81.61055.042e.GMRIR@mx.google.com>
+Date: Tue, 17 Jul 2018 17:32:37 +0530
+Message-Id: <20180717120237.25030-1-raghuhack78@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 * Check return value from devm_clk_get & return appropriate error.
