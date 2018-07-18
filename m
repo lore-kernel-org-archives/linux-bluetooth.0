@@ -1,107 +1,103 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.4 \(3445.8.2\))
-Subject: Re: [PATCH v5 4/7] Bluetooth: Add new quirk for non-persistent setup
- settings
+Subject: Re: [PATCH] Bluetooth: Use lock_sock_nested in bt_accept_enqueue
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1531757114.8953.12.camel@mtkswgap22>
-Date: Wed, 18 Jul 2018 14:14:49 +0200
-Cc: mark.rutland@arm.com, devicetree@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        robh+dt@kernel.org, linux-mediatek@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org
-Message-Id: <E05CD0A8-B820-4900-970D-57F71E8E5583@holtmann.org>
-References: <cover.1531150733.git.sean.wang@mediatek.com>
- <4b188c8a508340598dda233f6d49a16c9ac8784e.1531150733.git.sean.wang@mediatek.com>
- <2825B722-E75C-4A3C-8110-879205E46C0E@holtmann.org>
- <1531638169.3955.5.camel@mtkswgap22>
- <6571C864-B2EC-4806-BC5D-F531792737F6@holtmann.org>
- <1531757114.8953.12.camel@mtkswgap22>
-To: Sean Wang <sean.wang@mediatek.com>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <20180717114112.857-1-pp@emlix.com>
+Date: Wed, 18 Jul 2018 14:11:04 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Message-Id: <9843EAA5-912F-408F-8ED2-D033376B1A10@holtmann.org>
+References: <20180717114112.857-1-pp@emlix.com>
+To: Philipp Puschmann <pp@emlix.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sean,
+Hi Philipp,
 
->>>>> Add a new quirk HCI_QUIRK_NON_PERSISTENT_SETUP allowing that a quirk that
->>>>> runs setup() after every open() and not just after the first open().
->>>>> 
->>>>> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
->>>>> ---
->>>>> include/net/bluetooth/hci.h | 9 +++++++++
->>>>> net/bluetooth/hci_core.c    | 3 ++-
->>>>> 2 files changed, 11 insertions(+), 1 deletion(-)
->>>>> 
->>>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>>>> index 73e48be..d3ec5b2a8 100644
->>>>> --- a/include/net/bluetooth/hci.h
->>>>> +++ b/include/net/bluetooth/hci.h
->>>>> @@ -183,6 +183,15 @@ enum {
->>>>> 	 * during the hdev->setup vendor callback.
->>>>> 	 */
->>>>> 	HCI_QUIRK_NON_PERSISTENT_DIAG,
->>>>> +
->>>>> +	/* When this quirk is set, setup() would be run after every
->>>>> +	 * open() and not just after the first open().
->>>>> +	 *
->>>>> +	 * This quirk can be set before hci_register_dev is called or
->>>>> +	 * during the hdev->setup vendor callback.
->>>>> +	 *
->>>>> +	 */
->>>>> +	HCI_QUIRK_NON_PERSISTENT_SETUP,
->>>>> };
->>>>> 
->>>>> /* HCI device flags */
->>>>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->>>>> index f5c21004..0111280 100644
->>>>> --- a/net/bluetooth/hci_core.c
->>>>> +++ b/net/bluetooth/hci_core.c
->>>>> @@ -1396,7 +1396,8 @@ static int hci_dev_do_open(struct hci_dev *hdev)
->>>>> 	atomic_set(&hdev->cmd_cnt, 1);
->>>>> 	set_bit(HCI_INIT, &hdev->flags);
->>>>> 
->>>>> -	if (hci_dev_test_flag(hdev, HCI_SETUP)) {
->>>>> +	if (hci_dev_test_flag(hdev, HCI_SETUP) ||
->>>>> +	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
->>>>> 		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
->>>> 
->>>> can you include the extract of btmon on how the HCI_DEV_SETUP event shows up in the traces? I remember that I asked about something like that.
->>>> 
->>>> Regards
->>>> 
->>>> Marcel
->>>> 
->>> 
->>> No, I cannot see any event about HCI_DEV_SETUP in btmon trace, the trace I posted as below is doing some rounds of power off and then on
->> 
->> it will result in this:
->> 
->>        case HCI_DEV_SETUP:
->>                if (hdev->manufacturer == 0xffff)
->>                        return NULL;
->> 
->>        case HCI_DEV_UP:
->>                skb = bt_skb_alloc(HCI_MON_INDEX_INFO_SIZE, GFP_ATOMIC);
->> 
->> So we will see extra index info events, but I assume that is just fine this we also see them on DEV_UP. They also do not hurt as long as not magically the manufacturer information changes.
->> 
->> I do wonder though if this quirk is set, then hdev->manufacturer needs to be reset and allow hdev->setup() to reset it. This goes with a log of other information as well. Maybe just a look if there are no races here.
->> 
->> Regards
->> 
->> Marcel
->> 
+> Fixes this warning that was provoked by a pairing:
 > 
-> I didn't set a value to hdev->manufacture.
+> [60258.016221] WARNING: possible recursive locking detected
+> [60258.021558] 4.15.0-RD1812-BSP #1 Tainted: G           O
+> [60258.027146] --------------------------------------------
+> [60258.032464] kworker/u5:0/70 is trying to acquire lock:
+> [60258.037609]  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<87759073>] bt_accept_enqueue+0x3c/0x74
+> [60258.046863]
+> [60258.046863] but task is already holding lock:
+> [60258.052704]  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<d22d7106>] l2cap_sock_new_connection_cb+0x1c/0x88
+> [60258.062905]
+> [60258.062905] other info that might help us debug this:
+> [60258.069441]  Possible unsafe locking scenario:
+> [60258.069441]
+> [60258.075368]        CPU0
+> [60258.077821]        ----
+> [60258.080272]   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
+> [60258.085510]   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
+> [60258.090748]
+> [60258.090748]  *** DEADLOCK ***
+> [60258.090748]
+> [60258.096676]  May be due to missing lock nesting notation
+> [60258.096676]
+> [60258.103472] 5 locks held by kworker/u5:0/70:
+> [60258.107747]  #0:  ((wq_completion)%shdev->name#2){+.+.}, at: [<9460d092>] process_one_work+0x130/0x4fc
+> [60258.117263]  #1:  ((work_completion)(&hdev->rx_work)){+.+.}, at: [<9460d092>] process_one_work+0x130/0x4fc
+> [60258.126942]  #2:  (&conn->chan_lock){+.+.}, at: [<7877c8c3>] l2cap_connect+0x80/0x4f8
+> [60258.134806]  #3:  (&chan->lock/2){+.+.}, at: [<2e16c724>] l2cap_connect+0x8c/0x4f8
+> [60258.142410]  #4:  (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}, at: [<d22d7106>] l2cap_sock_new_connection_cb+0x1c/0x88
+> [60258.153043]
+> [60258.153043] stack backtrace:
+> [60258.157413] CPU: 1 PID: 70 Comm: kworker/u5:0 Tainted: G           O     4.15.0-RD1812-BSP #1
+> [60258.165945] Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+> [60258.172485] Workqueue: hci0 hci_rx_work
+> [60258.176331] Backtrace:
+> [60258.178797] [<8010c9fc>] (dump_backtrace) from [<8010ccbc>] (show_stack+0x18/0x1c)
+> [60258.186379]  r7:80e55fe4 r6:80e55fe4 r5:20050093 r4:00000000
+> [60258.192058] [<8010cca4>] (show_stack) from [<809864e8>] (dump_stack+0xb0/0xdc)
+> [60258.199301] [<80986438>] (dump_stack) from [<8016ecc8>] (__lock_acquire+0xffc/0x11d4)
+> [60258.207144]  r9:5e2bb019 r8:630f974c r7:ba8a5940 r6:ba8a5ed8 r5:815b5220 r4:80fa081c
+> [60258.214901] [<8016dccc>] (__lock_acquire) from [<8016f620>] (lock_acquire+0x78/0x98)
+> [60258.222655]  r10:00000040 r9:00000040 r8:808729f0 r7:00000001 r6:00000000 r5:60050013
+> [60258.230491]  r4:00000000
+> [60258.233045] [<8016f5a8>] (lock_acquire) from [<806ee974>] (lock_sock_nested+0x64/0x88)
+> [60258.240970]  r7:00000000 r6:b796e870 r5:00000001 r4:b796e800
+> [60258.246643] [<806ee910>] (lock_sock_nested) from [<808729f0>] (bt_accept_enqueue+0x3c/0x74)
+> [60258.255004]  r8:00000001 r7:ba7d3c00 r6:ba7d3ea4 r5:ba7d2000 r4:b796e800
+> [60258.261717] [<808729b4>] (bt_accept_enqueue) from [<808aa39c>] (l2cap_sock_new_connection_cb+0x68/0x88)
+> [60258.271117]  r5:b796e800 r4:ba7d2000
+> [60258.274708] [<808aa334>] (l2cap_sock_new_connection_cb) from [<808a294c>] (l2cap_connect+0x190/0x4f8)
+> [60258.283933]  r5:00000001 r4:ba6dce00
+> [60258.287524] [<808a27bc>] (l2cap_connect) from [<808a4a14>] (l2cap_recv_frame+0x744/0x2cf8)
+> [60258.295800]  r10:ba6dcf24 r9:00000004 r8:b78d8014 r7:00000004 r6:bb05d000 r5:00000004
+> [60258.303635]  r4:bb05d008
+> [60258.306183] [<808a42d0>] (l2cap_recv_frame) from [<808a7808>] (l2cap_recv_acldata+0x210/0x214)
+> [60258.314805]  r10:b78e7800 r9:bb05d960 r8:00000001 r7:bb05d000 r6:0000000c r5:b7957a80
+> [60258.322641]  r4:ba6dce00
+> [60258.325188] [<808a75f8>] (l2cap_recv_acldata) from [<8087630c>] (hci_rx_work+0x35c/0x4e8)
+> [60258.333374]  r6:80e5743c r5:bb05d7c8 r4:b7957a80
+> [60258.338004] [<80875fb0>] (hci_rx_work) from [<8013dc7c>] (process_one_work+0x1a4/0x4fc)
+> [60258.346018]  r10:00000001 r9:00000000 r8:baabfef8 r7:ba997500 r6:baaba800 r5:baaa5d00
+> [60258.353853]  r4:bb05d7c8
+> [60258.356401] [<8013dad8>] (process_one_work) from [<8013e028>] (worker_thread+0x54/0x5cc)
+> [60258.364503]  r10:baabe038 r9:baaba834 r8:80e05900 r7:00000088 r6:baaa5d18 r5:baaba800
+> [60258.372338]  r4:baaa5d00
+> [60258.374888] [<8013dfd4>] (worker_thread) from [<801448f8>] (kthread+0x134/0x160)
+> [60258.382295]  r10:ba8310b8 r9:bb07dbfc r8:8013dfd4 r7:baaa5d00 r6:00000000 r5:baaa8ac0
+> [60258.390130]  r4:ba831080
+> [60258.392682] [<801447c4>] (kthread) from [<801080b4>] (ret_from_fork+0x14/0x20)
+> [60258.399915]  r10:00000000 r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:801447c4
+> [60258.407751]  r4:baaa8ac0 r3:baabe000
 > 
-> Should I set it in hdev->setup() ? MediaTek is 0x46 according to [1].
+> Signed-off-by: Philipp Puschmann <pp@emlix.com>
+> ---
+> net/bluetooth/af_bluetooth.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-it is generally useful so that it gets reported out in btmon and thus it can assign the correct vendor specific decoder. However you better set hdev->manufacturer = 70 in the probe() routine before calling hci_register_dev. You have a dedicated driver and thus will always know it.
-
-The core tries to figure this out at some point, but then you are missing btmon decoding for the earlier messages. See btusb.c and how other drivers set it early on.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
 Marcel
+
