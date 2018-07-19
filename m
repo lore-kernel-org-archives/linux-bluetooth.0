@@ -2,62 +2,47 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
-Subject: [PATCH BlueZ 1/1] device: Fix loading devices without Service Changed CCC
-Date: Thu, 19 Jul 2018 16:44:09 +0200
-Message-Id: <20180719144409.32563-2-andrzej.kaczmarek@codecoup.pl>
-In-Reply-To: <20180719144409.32563-1-andrzej.kaczmarek@codecoup.pl>
-References: <20180719144409.32563-1-andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH BlueZ 0/1] Fix iop with iOS after BlueZ upgrade
+Date: Thu, 19 Jul 2018 16:44:08 +0200
+Message-Id: <20180719144409.32563-1-andrzej.kaczmarek@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch provides fix for loading devices which were saved before
-support for storing Service Changed CCC was added (a0b886e26).
+Hi,
 
-Without this fix, after daemon is upgraded from pre-a0b886e26 to
-current version we do not indicate Service Changed to any previously
-bonded device since "loaded" CCC value is 0. This means that even if
-locla GATT database is changed, bonded peer can assume it did not
-change and continue to access structure which yields unexpected
-results and this is exactly what happens on iOS devices.
+A bit more information about included patch which fixes problem we
+enocuntered with one of our customers.
 
-With this patch, if "ServiceChanged" group (added by mentioned commit)
-does not exist in config file of a bonded device, we assume indications
-for Service Changed characteristic value were enabled by peer as per
-Core 5.0, Vol 3, Part G, 7.1:
+There are devices using BlueZ 5.49 which does not persist CCC state of
+Service Changed for bonded peers. These devices will be now upgrade to
+new sw version which has a bit different GATT database and is based on
+more recent BlueZ version with mentioned change.
+
+What happens after upgrade is that each bonded device has its Service
+Changed CCC state read as "0" since this information was not persisted
+by previous BlueZ version. After connection, database change will not
+be indicated to peer and thus peer can use cached database which yields
+really weird results. This especially applies to iOS devices as there
+is no way to force them to refresh cache other than unbond and bond
+again which is a bad user experience.
+
+As per Core spec (wrt Service Changed):
 	"This Characteristic Value shall be configured to be indicated,
 	 using the Client Characteristic Configuration descriptor by a
-	 client"
----
+	 client."
+So I think it is safe to assume that if device is bonded, it also
+configured Service Changed CCC for indications - this is what included
+patch does. After database change is indicated on 1st connection after
+upgrade, iOS will rediscover our database and will write CCC again so
+this information is persisted properly.
+
+
+Andrzej Kaczmarek (1):
+  device: Fix loading devices without Service Changed CCC
+
  src/device.c | 16 ++++++++++++++++
  1 file changed, 16 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index 716da53f5..77f94ff54 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -5481,6 +5481,22 @@ void device_load_svc_chng_ccc(struct btd_device *device, uint16_t *ccc_le,
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
- 
-+	/*
-+	 * If there is no "ServiceChanged" section we may be loading data from
-+	 * old version which did not persist Service Changed CCC values. Let's
-+	 * check if we are bonded and assume indications were enabled by peer
-+	 * in such case - it should have done this anyway.
-+	 */
-+	if (!g_key_file_has_group(key_file, "ServiceChanged")) {
-+		if (ccc_le)
-+			*ccc_le = device->le_state.bonded ? 0x0002 : 0x0000;
-+		if (ccc_bredr)
-+			*ccc_bredr = device->bredr_state.bonded ?
-+							0x0002 : 0x0000;
-+		g_key_file_free(key_file);
-+		return;
-+	}
-+
- 	if (ccc_le)
- 		*ccc_le = g_key_file_get_integer(key_file, "ServiceChanged",
- 							"CCC_LE", NULL);
 -- 
 2.18.0
 
