@@ -3,101 +3,103 @@ From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH BlueZ v1 7/7] mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
-Date: Thu, 19 Jul 2018 16:54:07 +0530
-Message-Id: <1531999447-3479-8-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH BlueZ v1 6/7] mgmt-tester: Add support ext create connection and enh conn complete
+Date: Thu, 19 Jul 2018 16:54:06 +0530
+Message-Id: <1531999447-3479-7-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/mgmt-tester.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ tools/mgmt-tester.c | 49 ++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 42 insertions(+), 7 deletions(-)
 
 diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 45281fb..855e2b2 100644
+index 0b050f4..45281fb 100644
 --- a/tools/mgmt-tester.c
 +++ b/tools/mgmt-tester.c
-@@ -401,7 +401,7 @@ static void test_condition_complete(struct test_data *data)
- 		user->test_data = data; \
- 		user->expected_version = 0x09; \
- 		user->expected_manufacturer = 0x003f; \
--		user->expected_supported_settings = 0x0000bfff; \
-+		user->expected_supported_settings = 0x0001bfff; \
- 		user->initial_settings = 0x00000080; \
- 		tester_add_full(name, data, \
- 				test_pre_setup, test_setup, func, NULL, \
-@@ -420,7 +420,7 @@ static void test_condition_complete(struct test_data *data)
- 		user->test_data = data; \
- 		user->expected_version = 0x03; \
- 		user->expected_manufacturer = 0x003f; \
--		user->expected_supported_settings = 0x000010bf; \
-+		user->expected_supported_settings = 0x000110bf; \
- 		user->initial_settings = 0x00000080; \
- 		tester_add_full(name, data, \
- 				test_pre_setup, test_setup, func, NULL, \
-@@ -436,7 +436,7 @@ static void test_condition_complete(struct test_data *data)
- 		user->test_data = data; \
- 		user->expected_version = 0x05; \
- 		user->expected_manufacturer = 0x003f; \
--		user->expected_supported_settings = 0x000011ff; \
-+		user->expected_supported_settings = 0x000111ff; \
- 		user->initial_settings = 0x00000080; \
- 		tester_add_full(name, data, \
- 				test_pre_setup, test_setup, func, NULL, \
-@@ -452,7 +452,7 @@ static void test_condition_complete(struct test_data *data)
- 		user->test_data = data; \
- 		user->expected_version = 0x09; \
- 		user->expected_manufacturer = 0x003f; \
--		user->expected_supported_settings = 0x0000be1b; \
-+		user->expected_supported_settings = 0x0001be1b; \
- 		user->initial_settings = 0x00000200; \
- 		tester_add_full(name, data, \
- 				test_pre_setup, test_setup, func, NULL, \
-@@ -5079,7 +5079,7 @@ static const char ext_ctrl_info1[] = {
- 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
- 	0x09, /* version */
- 	0x3f, 0x00, /* manufacturer */
--	0xff, 0xbf, 0x00, 0x00, /* supported settings */
-+	0xff, 0xbf, 0x01, 0x00, /* supported settings */
- 	0x80, 0x00, 0x00, 0x00, /* current settings */
- 	0x09, 0x00, /* eir length */
- 	0x04, /* dev class length */
-@@ -5124,7 +5124,7 @@ static const char ext_ctrl_info2[] = {
- 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
- 	0x09, /* version */
- 	0x3f, 0x00, /* manufacturer */
--	0xff, 0xbf, 0x00, 0x00, /* supported settings */
-+	0xff, 0xbf, 0x01, 0x00, /* supported settings */
- 	0x81, 0x02, 0x00, 0x00, /* current settings */
- 	0x0D, 0x00, /* eir length */
- 	0x04, /* dev class length */
-@@ -5155,7 +5155,7 @@ static const char ext_ctrl_info3[] = {
- 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
- 	0x09, /* version */
- 	0x3f, 0x00, /* manufacturer */
--	0xff, 0xbf, 0x00, 0x00, /* supported settings */
-+	0xff, 0xbf, 0x01, 0x00, /* supported settings */
- 	0x80, 0x02, 0x00, 0x00, /* current settings */
- 	0x16, 0x00, /* eir length */
- 	0x04, /* dev class length */
-@@ -5190,7 +5190,7 @@ static const char ext_ctrl_info4[] = {
- 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
- 	0x09, /* version */
- 	0x3f, 0x00, /* manufacturer */
--	0xff, 0xbf, 0x00, 0x00, /* supported settings */
-+	0xff, 0xbf, 0x01, 0x00, /* supported settings */
- 	0x80, 0x02, 0x00, 0x00, /* current settings */
- 	0x1a, 0x00, /* eir length */
- 	0x04, /* dev class length */
-@@ -5249,7 +5249,7 @@ static const char ext_ctrl_info5[] = {
- 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
- 	0x09, /* version */
- 	0x3f, 0x00, /* manufacturer */
--	0xff, 0xbf, 0x00, 0x00, /* supported settings */
-+	0xff, 0xbf, 0x01, 0x00, /* supported settings */
- 	0x81, 0x02, 0x00, 0x00, /* current settings */
- 	0x1a, 0x00, /* eir len */
- 	0x04, /* dev class len */
+@@ -5292,6 +5292,7 @@ static void client_cmd_complete(uint16_t opcode, uint8_t status,
+ 	switch (opcode) {
+ 	case BT_HCI_CMD_WRITE_SCAN_ENABLE:
+ 	case BT_HCI_CMD_LE_SET_ADV_ENABLE:
++	case BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE:
+ 		tester_print("Client set connectable: %s (0x%02x)",
+ 						mgmt_errstr(status), status);
+ 		if (!status && test->client_enable_ssp) {
+@@ -5321,9 +5322,14 @@ static void setup_bthost(void)
+ 
+ 	bthost = hciemu_client_get_host(data->hciemu);
+ 	bthost_set_cmd_complete_cb(bthost, client_cmd_complete, data);
+-	if (data->hciemu_type == HCIEMU_TYPE_LE || test->client_enable_adv)
+-		bthost_set_adv_enable(bthost, 0x01);
+-	else
++
++	if (data->hciemu_type == HCIEMU_TYPE_LE ||
++		test->client_enable_adv) {
++		if (data->hciemu_type == HCIEMU_TYPE_BREDRLE50)
++			bthost_set_ext_adv_enable(bthost, 0x01);
++		else
++			bthost_set_adv_enable(bthost, 0x01);
++	} else
+ 		bthost_write_scan_enable(bthost, 0x03);
+ }
+ 
+@@ -8863,9 +8869,15 @@ static void le_connected_event(uint16_t index, uint16_t length,
+ 	tester_print("Device connected");
+ 
+ 	test_add_condition(data);
+-	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_CMD,
+-						BT_HCI_CMD_LE_SET_ADV_ENABLE,
+-						test_adv_enable_hook, data);
++
++	if (data->hciemu_type == HCIEMU_TYPE_BREDRLE50)
++		hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_CMD,
++					BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE,
++					test_adv_enable_hook, data);
++	else
++		hciemu_add_hook(data->hciemu, HCIEMU_HOOK_POST_CMD,
++					BT_HCI_CMD_LE_SET_ADV_ENABLE,
++					test_adv_enable_hook, data);
+ 
+ 	/* Make sure we get not disconnected during the testaces */
+ 	mgmt_register(data->mgmt_alt, MGMT_EV_DEVICE_DISCONNECTED,
+@@ -8905,7 +8917,10 @@ static void add_device_callback(uint8_t status, uint16_t len, const void *param,
+ 	}
+ 
+ 	bthost = hciemu_client_get_host(data->hciemu);
+-	bthost_hci_connect(bthost, master_bdaddr, BDADDR_LE_PUBLIC);
++	if (data->hciemu_type == HCIEMU_TYPE_BREDRLE50)
++		bthost_hci_ext_connect(bthost, master_bdaddr, BDADDR_LE_PUBLIC);
++	else
++		bthost_hci_connect(bthost, master_bdaddr, BDADDR_LE_PUBLIC);
+ }
+ 
+ static void test_connected_and_advertising(const void *test_data)
+@@ -10379,5 +10394,25 @@ int main(int argc, char *argv[])
+ 				&device_found_invalid_field,
+ 				NULL, test_device_found);
+ 
++	test_bredrle50_full("Ext Adv. connectable & connected (slave) - Success",
++				&conn_slave_adv_conneactable_test,
++				setup_advertise_while_connected,
++				test_connected_and_advertising, 10);
++
++	test_bredrle50_full("Ext Adv. non-connectable & connected (slave) - Success",
++				&conn_slave_adv_non_conneactable_test,
++				setup_advertise_while_connected,
++				test_connected_and_advertising, 10);
++
++	test_bredrle50_full("Ext Adv. connectable & connected (master) - Success",
++				&conn_master_adv_conneactable_test,
++				setup_advertise_while_connected,
++				test_connected_and_advertising, 10);
++
++	test_bredrle50_full("Ext Adv. non-connectable & connected (master) - Success",
++				&conn_master_adv_non_conneactable_test,
++				setup_advertise_while_connected,
++				test_connected_and_advertising, 10);
++
+ 	return tester_run();
+ }
 -- 
 2.7.4
