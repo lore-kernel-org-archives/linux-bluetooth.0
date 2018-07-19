@@ -3,140 +3,110 @@ From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v5 09/16] Bluetooth: Read no of adv sets during init
-Date: Thu, 19 Jul 2018 17:09:40 +0530
-Message-Id: <1532000387-3649-10-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v5 08/16] Bluetooth: Use selected PHYs in extended connect
+Date: Thu, 19 Jul 2018 17:09:39 +0530
+Message-Id: <1532000387-3649-9-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1532000387-3649-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1532000387-3649-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch reads the number of advertising sets in the controller
-during init and save it in hdev.
+Use the selected PHYs by Set PHY Configuration management command
+in extended create connection.
 
 Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- include/net/bluetooth/hci.h      |  7 +++++++
- include/net/bluetooth/hci_core.h |  4 ++++
- net/bluetooth/hci_core.c         | 16 ++++++++++++++--
- net/bluetooth/hci_event.c        | 18 ++++++++++++++++++
- 4 files changed, 43 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_conn.c | 61 +++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 45 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 83a1593..3f93ae9 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -410,6 +410,7 @@ enum {
- #define HCI_LE_SLAVE_FEATURES		0x08
- #define HCI_LE_PING			0x10
- #define HCI_LE_DATA_LEN_EXT		0x20
-+#define HCI_LE_EXT_ADV			0x10
- #define HCI_LE_EXT_SCAN_POLICY		0x80
- #define HCI_LE_PHY_2M			0x01
- #define HCI_LE_PHY_CODED		0x08
-@@ -1579,6 +1580,12 @@ struct hci_cp_le_ext_conn_param {
- 	__le16 max_ce_len;
- } __packed;
- 
-+#define HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS	0x203b
-+struct hci_rp_le_read_num_supported_adv_sets {
-+	__u8  status;
-+	__u8  num_of_sets;
-+} __packed;
-+
- /* ---- HCI Events ---- */
- #define HCI_EV_INQUIRY_COMPLETE		0x01
- 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 113c9bb..2aad4a8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -222,6 +222,7 @@ struct hci_dev {
- 	__u8		le_features[8];
- 	__u8		le_white_list_size;
- 	__u8		le_resolv_list_size;
-+	__u8		le_num_of_adv_sets;
- 	__u8		le_states[8];
- 	__u8		commands[64];
- 	__u8		hci_ver;
-@@ -1180,6 +1181,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- /* Use ext create connection if command is supported */
- #define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
- 
-+/* Extended advertising support */
-+#define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
-+
- /* ----- HCI protocols ----- */
- #define HCI_PROTO_DEFER             0x01
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 523e91a..7b08b7f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -715,8 +715,14 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
- 		hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
- 			    events);
- 
--		if (hdev->commands[25] & 0x40) {
--			/* Read LE Advertising Channel TX Power */
-+		/* Read LE Advertising Channel TX Power */
-+		if ((hdev->commands[25] & 0x40) && !ext_adv_capable(hdev)) {
-+			/* HCI TS spec forbids mixing of legacy and extended
-+			 * advertising commands wherein READ_ADV_TX_POWER is
-+			 * also included. So do not call it if extended adv
-+			 * is supported otherwise controller will return
-+			 * COMMAND_DISALLOWED for extended commands.
-+			 */
- 			hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
- 		}
- 
-@@ -750,6 +756,12 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
- 			hci_req_add(req, HCI_OP_LE_READ_DEF_DATA_LEN, 0, NULL);
- 		}
- 
-+		if (ext_adv_capable(hdev)) {
-+			/* Read LE Number of Supported Advertising Sets */
-+			hci_req_add(req, HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS,
-+				    0, NULL);
-+		}
-+
- 		hci_set_le_support(req);
- 	}
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 5fa00f4..0ceb52e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1267,6 +1267,20 @@ static void hci_cc_le_set_ext_scan_enable(struct hci_dev *hdev,
- 	le_set_scan_enable_complete(hdev, cp->enable);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index cc967ca..64e828a 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -748,6 +748,26 @@ static bool conn_use_rpa(struct hci_conn *conn)
+ 	return hci_dev_test_flag(hdev, HCI_PRIVACY);
  }
  
-+static void hci_cc_le_read_num_adv_sets(struct hci_dev *hdev,
-+				      struct sk_buff *skb)
++static void set_ext_conn_params(struct hci_conn *conn,
++				struct hci_cp_le_ext_conn_param *p)
 +{
-+	struct hci_rp_le_read_num_supported_adv_sets *rp = (void *) skb->data;
++	struct hci_dev *hdev = conn->hdev;
 +
-+	BT_DBG("%s status 0x%2.2x No of Adv sets %u", hdev->name, rp->status,
-+	       rp->num_of_sets);
++	memset(p, 0, sizeof(*p));
 +
-+	if (rp->status)
-+		return;
-+
-+	hdev->le_num_of_adv_sets = rp->num_of_sets;
++	/* Set window to be the same value as the interval to
++	 * enable continuous scanning.
++	 */
++	p->scan_interval = cpu_to_le16(hdev->le_scan_interval);
++	p->scan_window = p->scan_interval;
++	p->conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
++	p->conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
++	p->conn_latency = cpu_to_le16(conn->le_conn_latency);
++	p->supervision_timeout = cpu_to_le16(conn->le_supv_timeout);
++	p->min_ce_len = cpu_to_le16(0x0000);
++	p->max_ce_len = cpu_to_le16(0x0000);
 +}
 +
- static void hci_cc_le_read_white_list_size(struct hci_dev *hdev,
- 					   struct sk_buff *skb)
- {
-@@ -3189,6 +3203,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
- 		hci_cc_le_set_default_phy(hdev, skb);
- 		break;
+ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 				       struct hci_conn *conn,
+ 				       bdaddr_t *direct_rpa)
+@@ -777,8 +797,8 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 	if (use_ext_conn(hdev)) {
+ 		struct hci_cp_le_ext_create_conn *cp;
+ 		struct hci_cp_le_ext_conn_param *p;
+-		/* As of now only LE 1M is supported */
+-		u8 data[sizeof(*cp) + sizeof(*p) * 1];
++		u8 data[sizeof(*cp) + sizeof(*p) * 3];
++		u32 plen;
  
-+	case HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS:
-+		hci_cc_le_read_num_adv_sets(hdev, skb);
-+		break;
+ 		cp = (void *) data;
+ 		p = (void *) cp->data;
+@@ -788,24 +808,33 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 		bacpy(&cp->peer_addr, &conn->dst);
+ 		cp->peer_addr_type = conn->dst_type;
+ 		cp->own_addr_type = own_addr_type;
+-		cp->phys = LE_SCAN_PHY_1M;
+ 
+-		memset(p, 0, sizeof(*p));
++		plen = sizeof(*cp);
+ 
+-		/* Set window to be the same value as the interval to enable
+-		 * continuous scanning.
+-		 */
++		if (scan_1m(hdev)) {
++			cp->phys |= LE_SCAN_PHY_1M;
++			set_ext_conn_params(conn, p);
 +
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
- 		break;
++			p++;
++			plen += sizeof(*p);
++		}
++
++		if (scan_2m(hdev)) {
++			cp->phys |= LE_SCAN_PHY_2M;
++			set_ext_conn_params(conn, p);
+ 
+-		p->scan_interval = cpu_to_le16(hdev->le_scan_interval);
+-		p->scan_window = p->scan_interval;
+-		p->conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
+-		p->conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
+-		p->conn_latency = cpu_to_le16(conn->le_conn_latency);
+-		p->supervision_timeout = cpu_to_le16(conn->le_supv_timeout);
+-		p->min_ce_len = cpu_to_le16(0x0000);
+-		p->max_ce_len = cpu_to_le16(0x0000);
++			p++;
++			plen += sizeof(*p);
++		}
++
++		if (scan_coded(hdev)) {
++			cp->phys |= LE_SCAN_PHY_CODED;
++			set_ext_conn_params(conn, p);
++
++			plen += sizeof(*p);
++		}
+ 
+-		hci_req_add(req, HCI_OP_LE_EXT_CREATE_CONN, sizeof(data), data);
++		hci_req_add(req, HCI_OP_LE_EXT_CREATE_CONN, plen, data);
+ 
+ 	} else {
+ 		struct hci_cp_le_create_conn cp;
 -- 
 2.7.4
