@@ -3,139 +3,176 @@ From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v5 06/16] Bluetooth: Set Scan PHYs based on selected PHYs by user
-Date: Thu, 19 Jul 2018 17:09:37 +0530
-Message-Id: <1532000387-3649-7-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH v5 05/16] Bluetooth: Implement PHY changed event
+Date: Thu, 19 Jul 2018 17:09:36 +0530
+Message-Id: <1532000387-3649-6-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1532000387-3649-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1532000387-3649-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use the PHYs selected in Set Phy Configuration management command
-while scanning.
+This defines and implement phy changed event and send it to user
+whenever selected PHYs changes using SET_PHY_CONFIGURATION.
 
-< HCI Command: LE Set Extended Scan Parameters (0x08|0x0041) plen 13
-        Own address type: Random (0x01)
-        Filter policy: Accept all advertisement (0x00)
-        PHYs: 0x05
-        Entry 0: LE 1M
-          Type: Active (0x01)
-          Interval: 11.250 msec (0x0012)
-          Window: 11.250 msec (0x0012)
-        Entry 1: LE Coded
-          Type: Active (0x01)
-          Interval: 11.250 msec (0x0012)
-          Window: 11.250 msec (0x0012)
+This will be also trigerred when BREDR pkt_type is changed using
+the legacy ioctl HCISETPTYPE.
+
+@ MGMT Command: Set PHY Configuration (0x0045) plen 4
+		Selected PHYs: 0x7fff
+		  BR 1M 1SLOT
+		  BR 1M 3SLOT
+		  BR 1M 5SLOT
+		  EDR 2M 1SLOT
+		  EDR 2M 3SLOT
+		  EDR 2M 5SLOT
+		  EDR 3M 1SLOT
+		  EDR 3M 3SLOT
+		  EDR 3M 5SLOT
+		  LE 1M TX
+		  LE 1M RX
+		  LE 2M TX
+		  LE 2M RX
+		  LE CODED TX
+		  LE CODED RX
+< HCI Command: LE Set Default PHY (0x08|0x0031) plen 3
+		All PHYs preference: 0x00
+		TX PHYs preference: 0x07
+		  LE 1M
+		  LE 2M
+		  LE Coded
+		RX PHYs preference: 0x07
+		  LE 1M
+		  LE 2M
+		  LE Coded
 > HCI Event: Command Complete (0x0e) plen 4
-      LE Set Extended Scan Parameters (0x08|0x0041) ncmd 1
-        Status: Success (0x00)
-< HCI Command: LE Set Extended Scan Enable (0x08|0x0042) plen 6
-        Extended scan: Enabled (0x01)
-        Filter duplicates: Enabled (0x01)
-        Duration: 0 msec (0x0000)
-        Period: 0.00 sec (0x0000)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Extended Scan Enable (0x08|0x0042) ncmd 2
-        Status: Success (0x00)
+	  LE Set Default PHY (0x08|0x0031) ncmd 1
+		Status: Success (0x00)
+@ MGMT Event: Command Complete (0x0001) plen 3
+	  Set PHY Configuration (0x0045) plen 0
+		Status: Success (0x00)
+@ MGMT Event: PHY Configuration Changed (0x0026) plen 4
+		Selected PHYs: 0x7fff
+		  BR 1M 1SLOT
+		  BR 1M 3SLOT
+		  BR 1M 5SLOT
+		  EDR 2M 1SLOT
+		  EDR 2M 3SLOT
+		  EDR 2M 5SLOT
+		  EDR 3M 1SLOT
+		  EDR 3M 3SLOT
+		  EDR 3M 5SLOT
+		  LE 1M TX
+		  LE 1M RX
+		  LE 2M TX
+		  LE 2M RX
+		  LE CODED TX
+		  LE CODED RX
 
 Signed-off-by: Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
 ---
- include/net/bluetooth/hci.h      |  4 +++-
- include/net/bluetooth/hci_core.h |  9 +++++++++
- net/bluetooth/hci_request.c      | 37 ++++++++++++++++++++++++++++---------
- 3 files changed, 40 insertions(+), 10 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ include/net/bluetooth/mgmt.h     |  5 +++++
+ net/bluetooth/hci_core.c         |  4 ++++
+ net/bluetooth/mgmt.c             | 22 +++++++++++++++++++++-
+ 4 files changed, 31 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 89bf800..0421145 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1540,7 +1540,9 @@ struct hci_cp_le_set_ext_scan_params {
- 	__u8    data[0];
- } __packed;
- 
--#define LE_SCAN_PHY_1M 0x01
-+#define LE_SCAN_PHY_1M		0x01
-+#define LE_SCAN_PHY_2M		0x02
-+#define LE_SCAN_PHY_CODED	0x04
- 
- struct hci_cp_le_scan_phy_params {
- 	__u8    type;
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ab5d494..113c9bb 100644
+index a64d13f..ab5d494 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1165,6 +1165,15 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define bredr_sc_enabled(dev)  (lmp_sc_capable(dev) && \
- 				hci_dev_test_flag(dev, HCI_SC_ENABLED))
+@@ -1544,6 +1544,7 @@ void mgmt_advertising_added(struct sock *sk, struct hci_dev *hdev,
+ 			    u8 instance);
+ void mgmt_advertising_removed(struct sock *sk, struct hci_dev *hdev,
+ 			      u8 instance);
++int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip);
  
-+#define scan_1m(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_1M) || \
-+		      ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_1M))
+ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
+ 		      u16 to_multiplier);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 0916e20..7f372e9 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -868,3 +868,8 @@ struct mgmt_ev_ext_info_changed {
+ 	__le16	eir_len;
+ 	__u8	eir[0];
+ } __packed;
 +
-+#define scan_2m(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_2M) || \
-+		      ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_2M))
-+
-+#define scan_coded(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_CODED) || \
-+			 ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_CODED))
-+
- /* Use ext scanning if set ext scan param and ext scan enable is supported */
- #define use_ext_scan(dev) (((dev)->commands[37] & 0x20) && \
- 			   ((dev)->commands[37] & 0x40))
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index faf7c71..215059a 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -790,8 +790,8 @@ static void hci_req_start_scan(struct hci_request *req, u8 type, u16 interval,
- 		struct hci_cp_le_set_ext_scan_params *ext_param_cp;
- 		struct hci_cp_le_set_ext_scan_enable ext_enable_cp;
- 		struct hci_cp_le_scan_phy_params *phy_params;
--		/* Ony single PHY (1M) is supported as of now */
--		u8 data[sizeof(*ext_param_cp) + sizeof(*phy_params) * 1];
-+		u8 data[sizeof(*ext_param_cp) + sizeof(*phy_params) * 2];
-+		u32 plen;
++#define MGMT_EV_PHY_CONFIGURATION_CHANGED	0x0026
++struct mgmt_ev_phy_configuration_changed {
++	__le32	selected_phys;
++} __packed;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 432f89f..523e91a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1924,7 +1924,11 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
+ 		break;
  
- 		ext_param_cp = (void *)data;
- 		phy_params = (void *)ext_param_cp->data;
-@@ -799,16 +799,35 @@ static void hci_req_start_scan(struct hci_request *req, u8 type, u16 interval,
- 		memset(ext_param_cp, 0, sizeof(*ext_param_cp));
- 		ext_param_cp->own_addr_type = own_addr_type;
- 		ext_param_cp->filter_policy = filter_policy;
--		ext_param_cp->scanning_phys = LE_SCAN_PHY_1M;
+ 	case HCISETPTYPE:
++		if (hdev->pkt_type == (__u16) dr.dev_opt)
++			break;
++
+ 		hdev->pkt_type = (__u16) dr.dev_opt;
++		mgmt_phy_configuration_changed(hdev, NULL);
+ 		break;
  
--		memset(phy_params, 0, sizeof(*phy_params));
--		phy_params->type = type;
--		phy_params->interval = cpu_to_le16(interval);
--		phy_params->window = cpu_to_le16(window);
-+		plen = sizeof(*ext_param_cp);
-+
-+		if (scan_1m(hdev) || scan_2m(hdev)) {
-+			ext_param_cp->scanning_phys |= LE_SCAN_PHY_1M;
-+
-+			memset(phy_params, 0, sizeof(*phy_params));
-+			phy_params->type = type;
-+			phy_params->interval = cpu_to_le16(interval);
-+			phy_params->window = cpu_to_le16(window);
-+
-+			plen += sizeof(*phy_params);
-+			phy_params++;
-+		}
-+
-+		if (scan_coded(hdev)) {
-+			ext_param_cp->scanning_phys |= LE_SCAN_PHY_CODED;
-+
-+			memset(phy_params, 0, sizeof(*phy_params));
-+			phy_params->type = type;
-+			phy_params->interval = cpu_to_le16(interval);
-+			phy_params->window = cpu_to_le16(window);
-+
-+			plen += sizeof(*phy_params);
-+			phy_params++;
-+		}
+ 	case HCISETACLMTU:
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 7cd6a37..1867aad 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3328,6 +3328,18 @@ static int get_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ 				 &rp, sizeof(rp));
+ }
  
- 		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_PARAMS,
--			    sizeof(*ext_param_cp) + sizeof(*phy_params),
--			    ext_param_cp);
-+			    plen, ext_param_cp);
++int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip)
++{
++	struct mgmt_ev_phy_configuration_changed ev;
++
++	memset(&ev, 0, sizeof(ev));
++
++	ev.selected_phys = cpu_to_le32(get_selected_phys(hdev));
++
++	return mgmt_event(MGMT_EV_PHY_CONFIGURATION_CHANGED, hdev, &ev,
++			  sizeof(ev), skip);
++}
++
+ static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
+ 				     u16 opcode, struct sk_buff *skb)
+ {
+@@ -3352,6 +3364,8 @@ static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
+ 		mgmt_cmd_complete(cmd->sk, hdev->id,
+ 				  MGMT_OP_SET_PHY_CONFIGURATION, 0,
+ 				  NULL, 0);
++
++		mgmt_phy_configuration_changed(hdev, cmd->sk);
+ 	}
  
- 		memset(&ext_enable_cp, 0, sizeof(ext_enable_cp));
- 		ext_enable_cp.enable = LE_SCAN_ENABLE;
+ 	mgmt_pending_remove(cmd);
+@@ -3369,6 +3383,7 @@ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ 	struct hci_request req;
+ 	u32 selected_phys, configurable_phys, supported_phys, unconfigure_phys;
+ 	u16 pkt_type = (HCI_DH1 | HCI_DM1);
++	bool changed = false;
+ 	int err;
+ 
+ 	BT_DBG("sock %p %s", sk, hdev->name);
+@@ -3450,11 +3465,16 @@ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ 	else
+ 		pkt_type |= HCI_3DH5;
+ 
+-	if (pkt_type != hdev->pkt_type)
++	if (pkt_type != hdev->pkt_type) {
+ 		hdev->pkt_type = pkt_type;
++		changed = true;
++	}
+ 
+ 	if ((selected_phys & MGMT_PHY_LE_MASK) ==
+ 	    (get_selected_phys(hdev) & MGMT_PHY_LE_MASK)) {
++		if (changed)
++			mgmt_phy_configuration_changed(hdev, sk);
++
+ 		err = mgmt_cmd_complete(sk, hdev->id,
+ 					MGMT_OP_SET_PHY_CONFIGURATION,
+ 					0, NULL, 0);
 -- 
 2.7.4
