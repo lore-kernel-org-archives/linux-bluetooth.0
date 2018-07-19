@@ -3,48 +3,101 @@ From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH v5 00/16] Bluetooth: Extended Adv, Scan, Connection and PHY support
-Date: Thu, 19 Jul 2018 17:09:31 +0530
-Message-Id: <1532000387-3649-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH BlueZ v1 7/7] mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
+Date: Thu, 19 Jul 2018 16:54:07 +0530
+Message-Id: <1531999447-3479-8-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Implemented Get, Set PHY Configuration and setting of PHY in
-Advertising. Also implemented extended advertising,
-scanning and connection.
+---
+ tools/mgmt-tester.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-v2: Fixed kbuild warnings
-v3: Added BREDR packet types in PHY Configurtion commands and events
-v4: Added default phys as variable in hdev and removed same from hci flags
-v5: Applied Marcel's comments
-
-Jaganath Kanakkassery (16):
-  Bluetooth: Define PHY flags in hdev and set 1M as default
-  Bluetooth: Add defines for BREDR pkt_type and LE PHYs
-  Bluetooth: Implement Get PHY Configuration mgmt command
-  Bluetooth: Implement Set PHY Confguration command
-  Bluetooth: Implement PHY changed event
-  Bluetooth: Set Scan PHYs based on selected PHYs by user
-  Bluetooth: Handle extended ADV PDU types
-  Bluetooth: Use selected PHYs in extended connect
-  Bluetooth: Read no of adv sets during init
-  Bluetooth: Impmlement extended adv enable
-  Bluetooth: Use Set ext adv/scan rsp data if controller supports
-  Bluetooth: Implement disable and removal of adv instance
-  Bluetooth: Use ext adv for directed adv
-  Bluetooth: Implement Set ADV set random address
-  Bluetooth: Handle ADv set terminated event
-  Bluetooth: Implement secondary advertising on different PHYs
-
- include/net/bluetooth/hci.h      | 118 +++++++++-
- include/net/bluetooth/hci_core.h |  26 ++
- include/net/bluetooth/mgmt.h     |  55 +++++
- net/bluetooth/hci_conn.c         | 151 +++++++++---
- net/bluetooth/hci_core.c         |  72 +++++-
- net/bluetooth/hci_event.c        | 250 ++++++++++++++++++--
- net/bluetooth/hci_request.c      | 498 ++++++++++++++++++++++++++++++++++-----
- net/bluetooth/hci_request.h      |   8 +
- net/bluetooth/mgmt.c             | 405 ++++++++++++++++++++++++++++++-
- 9 files changed, 1451 insertions(+), 132 deletions(-)
-
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 45281fb..855e2b2 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -401,7 +401,7 @@ static void test_condition_complete(struct test_data *data)
+ 		user->test_data = data; \
+ 		user->expected_version = 0x09; \
+ 		user->expected_manufacturer = 0x003f; \
+-		user->expected_supported_settings = 0x0000bfff; \
++		user->expected_supported_settings = 0x0001bfff; \
+ 		user->initial_settings = 0x00000080; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, test_setup, func, NULL, \
+@@ -420,7 +420,7 @@ static void test_condition_complete(struct test_data *data)
+ 		user->test_data = data; \
+ 		user->expected_version = 0x03; \
+ 		user->expected_manufacturer = 0x003f; \
+-		user->expected_supported_settings = 0x000010bf; \
++		user->expected_supported_settings = 0x000110bf; \
+ 		user->initial_settings = 0x00000080; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, test_setup, func, NULL, \
+@@ -436,7 +436,7 @@ static void test_condition_complete(struct test_data *data)
+ 		user->test_data = data; \
+ 		user->expected_version = 0x05; \
+ 		user->expected_manufacturer = 0x003f; \
+-		user->expected_supported_settings = 0x000011ff; \
++		user->expected_supported_settings = 0x000111ff; \
+ 		user->initial_settings = 0x00000080; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, test_setup, func, NULL, \
+@@ -452,7 +452,7 @@ static void test_condition_complete(struct test_data *data)
+ 		user->test_data = data; \
+ 		user->expected_version = 0x09; \
+ 		user->expected_manufacturer = 0x003f; \
+-		user->expected_supported_settings = 0x0000be1b; \
++		user->expected_supported_settings = 0x0001be1b; \
+ 		user->initial_settings = 0x00000200; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, test_setup, func, NULL, \
+@@ -5079,7 +5079,7 @@ static const char ext_ctrl_info1[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x80, 0x00, 0x00, 0x00, /* current settings */
+ 	0x09, 0x00, /* eir length */
+ 	0x04, /* dev class length */
+@@ -5124,7 +5124,7 @@ static const char ext_ctrl_info2[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x81, 0x02, 0x00, 0x00, /* current settings */
+ 	0x0D, 0x00, /* eir length */
+ 	0x04, /* dev class length */
+@@ -5155,7 +5155,7 @@ static const char ext_ctrl_info3[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x80, 0x02, 0x00, 0x00, /* current settings */
+ 	0x16, 0x00, /* eir length */
+ 	0x04, /* dev class length */
+@@ -5190,7 +5190,7 @@ static const char ext_ctrl_info4[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x80, 0x02, 0x00, 0x00, /* current settings */
+ 	0x1a, 0x00, /* eir length */
+ 	0x04, /* dev class length */
+@@ -5249,7 +5249,7 @@ static const char ext_ctrl_info5[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x81, 0x02, 0x00, 0x00, /* current settings */
+ 	0x1a, 0x00, /* eir len */
+ 	0x04, /* dev class len */
 -- 
 2.7.4
