@@ -1,75 +1,63 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH v3 5/9] Bluetooth: btrtl: Add support for a config
- filename postfix
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Jeremy Cline <jeremy@jcline.org>, linux-bluetooth@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-References: <20180710081117.25078-1-hdegoede@redhat.com>
- <20180710081117.25078-6-hdegoede@redhat.com>
- <330BDF4A-9729-4DFE-B9DA-F5A02EB6B09A@holtmann.org>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <5ae41511-a919-7aa8-d3bd-a65dea7a0eae@redhat.com>
-Date: Thu, 19 Jul 2018 18:12:23 +0200
-MIME-Version: 1.0
-In-Reply-To: <330BDF4A-9729-4DFE-B9DA-F5A02EB6B09A@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Subject: [PATCH BlueZ 1/1] device: Fix loading devices without Service Changed CCC
+Date: Thu, 19 Jul 2018 16:44:09 +0200
+Message-Id: <20180719144409.32563-2-andrzej.kaczmarek@codecoup.pl>
+In-Reply-To: <20180719144409.32563-1-andrzej.kaczmarek@codecoup.pl>
+References: <20180719144409.32563-1-andrzej.kaczmarek@codecoup.pl>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This patch provides fix for loading devices which were saved before
+support for storing Service Changed CCC was added (a0b886e26).
 
-Thank you for the review of the other patches, I will prepare
-a new version addressing your remarks on the other patches.
+Without this fix, after daemon is upgraded from pre-a0b886e26 to
+current version we do not indicate Service Changed to any previously
+bonded device since "loaded" CCC value is 0. This means that even if
+locla GATT database is changed, bonded peer can assume it did not
+change and continue to access structure which yields unexpected
+results and this is exactly what happens on iOS devices.
 
-On 14-07-18 18:06, Marcel Holtmann wrote:
-> Hi Hans,
-> 
->> The contents of the rtl_bt/rtlXXXX_config.bin file may be board specific
->> allow the caller of btrtl_initialize to specify a postfix identifying
->> the board, which if specified will make btrtl_initialize look for
->> rtl_bt/rtlXXXX_config-<postfix>.bin instead.
-> 
-> frankly I do not get this patch. Where would the <postfix> come from? Is that something we would put into DT or where? I think you need a bit more explanation here.
+With this patch, if "ServiceChanged" group (added by mentioned commit)
+does not exist in config file of a bonded device, we assume indications
+for Service Changed characteristic value were enabled by peer as per
+Core 5.0, Vol 3, Part G, 7.1:
+	"This Characteristic Value shall be configured to be indicated,
+	 using the Client Characteristic Configuration descriptor by a
+	 client"
+---
+ src/device.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-As mentioned before this patch-set only adds support for ACPI
-enumeration for now as I don't have hw to test the DT enumeration.
-
-For ACPI enumeration I use the ACPI HID, as can be seen in the
-"Bluetooth: hci_h5: Add vendor setup, open, and close callbacks"
-patch which does:
-
-+	if (has_acpi_companion(dev)) {
-+		match = acpi_match_device(dev->driver->acpi_match_table, dev);
-+		if (!match)
-+			return -ENODEV;
-+
-+		h5->vnd = (const struct h5_vnd *)match->driver_data;
-+		h5->id  = (char *)match->id;
+diff --git a/src/device.c b/src/device.c
+index 716da53f5..77f94ff54 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -5481,6 +5481,22 @@ void device_load_svc_chng_ccc(struct btd_device *device, uint16_t *ccc_le,
+ 	key_file = g_key_file_new();
+ 	g_key_file_load_from_file(key_file, filename, 0, NULL);
+ 
++	/*
++	 * If there is no "ServiceChanged" section we may be loading data from
++	 * old version which did not persist Service Changed CCC values. Let's
++	 * check if we are bonded and assume indications were enabled by peer
++	 * in such case - it should have done this anyway.
++	 */
++	if (!g_key_file_has_group(key_file, "ServiceChanged")) {
++		if (ccc_le)
++			*ccc_le = device->le_state.bonded ? 0x0002 : 0x0000;
++		if (ccc_bredr)
++			*ccc_bredr = device->bredr_state.bonded ?
++							0x0002 : 0x0000;
++		g_key_file_free(key_file);
++		return;
 +	}
 +
+ 	if (ccc_le)
+ 		*ccc_le = g_key_file_get_integer(key_file, "ServiceChanged",
+ 							"CCC_LE", NULL);
+-- 
+2.18.0
 
-And then the "Bluetooth: hci_h5: Add support for the RTL8723BS"
-passes h5->id as postfix:
-
-+static int h5_btrtl_setup(struct h5 *h5)
-+{
-+	struct btrtl_device_info *btrtl_dev;
-+	struct sk_buff *skb;
-+	__le32 baudrate_data;
-+	u32 device_baudrate;
-+	unsigned int controller_baudrate;
-+	bool flow_control;
-+	int err;
-+
-+	btrtl_dev = btrtl_initialize(h5->hu->hdev, h5->id);
-+
-
-For DT we could either use a property in the node
-describing the BT device as postfix, or since we want
-to have a unique per board name use the machine "compatible"
-string as postfix.
-
-Regards,
-
-Hans
