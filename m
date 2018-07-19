@@ -3,37 +3,103 @@ From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH BlueZ v1 2/7] emulator: Add BREDR 2M & 3M, 3 & 5 Slot packet type support
-Date: Thu, 19 Jul 2018 16:54:02 +0530
-Message-Id: <1531999447-3479-3-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH BlueZ v1 1/7] monitor: Add BREDR PHYs in PHY configuration commands
+Date: Thu, 19 Jul 2018 16:54:01 +0530
+Message-Id: <1531999447-3479-2-git-send-email-jaganathx.kanakkassery@intel.com>
 In-Reply-To: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
 References: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- emulator/btdev.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ monitor/packet.c | 39 +++++++++++++++++++++++++--------------
+ 1 file changed, 25 insertions(+), 14 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index f8289d0..9f07527 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -535,6 +535,16 @@ static void set_bredrle_features(struct btdev *btdev)
- 	btdev->features[7] |= 0x80;	/* Extended features */
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 68678f5..b359588 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -11749,12 +11749,21 @@ static void mgmt_set_apperance_cmd(const void *data, uint16_t size)
+ }
  
- 	if (btdev->type >= BTDEV_TYPE_BREDRLE50) {
-+		/* These BREDR features are added to test new configuration
-+		 * command. If this is added above it will break existing tests
-+		 */
-+		btdev->features[0] |= 0x01;	/* 3 slot Packets */
-+		btdev->features[0] |= 0x02;	/* 5 slot Packets */
-+		btdev->features[3] |= 0x02;	/* EDR ACL 2M mode */
-+		btdev->features[3] |= 0x04;	/* EDR ACL 3M mode */
-+		btdev->features[4] |= 0x80;	/* 3 slot EDR ACL packets */
-+		btdev->features[5] |= 0x01;	/* 5 slot EDR ACL packets */
-+
- 		btdev->le_features[1] |= 0x01;	/* LE 2M PHY */
- 		btdev->le_features[1] |= 0x08;	/* LE Coded PHY */
- 		btdev->le_features[1] |= 0x10;  /* LE EXT ADV */
+ static const struct bitfield_data mgmt_phy_table[] = {
+-	{  0, "1MTX"	},
+-	{  1, "1MRX"	},
+-	{  2, "2MTX"	},
+-	{  3, "2MRX"	},
+-	{  4, "CODEDTX"	},
+-	{  5, "CODEDRX"	},
++	{  0, "BR 1M 1SLOT"	},
++	{  1, "BR 1M 3SLOT"	},
++	{  2, "BR 1M 5SLOT"	},
++	{  3, "EDR 2M 1SLOT"	},
++	{  4, "EDR 2M 3SLOT"	},
++	{  5, "EDR 2M 5SLOT"	},
++	{  6, "EDR 3M 1SLOT"	},
++	{  7, "EDR 3M 3SLOT"	},
++	{  8, "EDR 3M 5SLOT"	},
++	{  9, "LE 1M TX"	},
++	{  10, "LE 1M RX"	},
++	{  11, "LE 2M TX"	},
++	{  12, "LE 2M RX"	},
++	{  13, "LE CODED TX"	},
++	{  14, "LE CODED RX"	},
+ 	{ }
+ };
+ 
+@@ -11772,18 +11781,20 @@ static void mgmt_print_phys(const char *label, uint16_t phys)
+ 
+ static void mgmt_get_phy_rsp(const void *data, uint16_t size)
+ {
+-	uint16_t supported_phys = get_le16(data);
+-	uint16_t selected_phys = get_le16(data + 2);
++	uint32_t supported_phys = get_le32(data);
++	uint32_t configurable_phys = get_le32(data + 4);
++	uint32_t selected_phys = get_le32(data + 8);
+ 
+ 	mgmt_print_phys("Supported PHYs", supported_phys);
++	mgmt_print_phys("Configurable PHYs", configurable_phys);
+ 	mgmt_print_phys("Selected PHYs", selected_phys);
+ }
+ 
+ static void mgmt_set_phy_cmd(const void *data, uint16_t size)
+ {
+-	uint16_t default_phys = get_le16(data);
++	uint32_t selected_phys = get_le32(data);
+ 
+-	mgmt_print_phys("Default PHYs", default_phys);
++	mgmt_print_phys("Selected PHYs", selected_phys);
+ }
+ 
+ struct mgmt_data {
+@@ -12001,9 +12012,9 @@ static const struct mgmt_data mgmt_command_table[] = {
+ 				mgmt_null_rsp, 0, true },
+ 	{ 0x0044, "Get PHY Configuration",
+ 				mgmt_null_cmd, 0, true,
+-				mgmt_get_phy_rsp, 4, true },
++				mgmt_get_phy_rsp, 12, true },
+ 	{ 0x0045, "Set PHY Configuration",
+-				mgmt_set_phy_cmd, 2, true,
++				mgmt_set_phy_cmd, 4, true,
+ 				mgmt_null_rsp, 0, true },
+ 	{ }
+ };
+@@ -12385,7 +12396,7 @@ static void mgmt_ext_controller_info_changed_evt(const void *data, uint16_t size
+ 
+ static void mgmt_phy_changed_evt(const void *data, uint16_t size)
+ {
+-	uint16_t selected_phys = get_le16(data);
++	uint32_t selected_phys = get_le32(data);
+ 
+ 	mgmt_print_phys("Selected PHYs", selected_phys);
+ }
+@@ -12466,7 +12477,7 @@ static const struct mgmt_data mgmt_event_table[] = {
+ 	{ 0x0025, "Extended Controller Information Changed",
+ 			mgmt_ext_controller_info_changed_evt, 2, false },
+ 	{ 0x0026, "PHY Configuration Changed",
+-			mgmt_phy_changed_evt, 2, true },
++			mgmt_phy_changed_evt, 4, true },
+ 	{ }
+ };
+ 
 -- 
 2.7.4
