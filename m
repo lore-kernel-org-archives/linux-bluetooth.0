@@ -1,46 +1,35 @@
-Return-Path: <sean.wang@mediatek.com>
-From: <sean.wang@mediatek.com>
-To: <robh+dt@kernel.org>, <mark.rutland@arm.com>, <marcel@holtmann.org>,
-	<johan.hedberg@gmail.com>
-CC: <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH v6 4/4] MAINTAINERS: add an entry for MediaTek Bluetooth driver
-Date: Fri, 20 Jul 2018 13:12:30 +0800
-Message-ID: <28888e6b95eb1dee15d9b841714a6eafcabe5252.1532060309.git.sean.wang@mediatek.com>
-In-Reply-To: <cover.1532060309.git.sean.wang@mediatek.com>
-References: <cover.1532060309.git.sean.wang@mediatek.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Gopal Tiwari <gtiwari@redhat.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: dzickus@redhat.com, gtiwari@redhat.com
+Subject: [PATCH BlueZ 2/2] Possible bug fix nsk replaced with sk
+Date: Fri, 20 Jul 2018 10:03:59 +0530
+Message-Id: <1532061239-22481-2-git-send-email-gtiwari@redhat.com>
+In-Reply-To: <1532061239-22481-1-git-send-email-gtiwari@redhat.com>
+References: <1532061239-22481-1-git-send-email-gtiwari@redhat.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sean Wang <sean.wang@mediatek.com>
-
-Add an entry for the MediaTek Bluetooth driver.
-
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+During the review of the code path found this scenario where
+seems like nsk is replaced with sk. Where as sk is already free.
+Fixing it.
 ---
- MAINTAINERS | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tools/rctest.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 20de9a5..5d81cc1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8780,6 +8780,14 @@ F:	include/uapi/linux/meye.h
- F:	include/uapi/linux/ivtv*
- F:	include/uapi/linux/uvcvideo.h
+diff --git a/tools/rctest.c b/tools/rctest.c
+index 6d84e07..909bc68 100644
+--- a/tools/rctest.c
++++ b/tools/rctest.c
+@@ -376,7 +376,7 @@ static void do_listen(void (*handler)(int sk))
+ 			//goto error;
+ 		}
  
-+MEDIATEK BLUETOOTH DRIVER
-+M:	Sean Wang <sean.wang@mediatek.com>
-+L:	linux-bluetooth@vger.kernel.org
-+L:	linux-mediatek@lists.infradead.org (moderated for non-subscribers)
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-+F:	drivers/bluetooth/btmtkuart.c
-+
- MEDIATEK CIR DRIVER
- M:	Sean Wang <sean.wang@mediatek.com>
- S:	Maintained
+-		if (priority > 0 && setsockopt(sk, SOL_SOCKET, SO_PRIORITY,
++		if (priority > 0 && setsockopt(nsk, SOL_SOCKET, SO_PRIORITY,
+ 					&priority, sizeof(priority)) < 0) {
+ 			syslog(LOG_ERR, "Can't set socket priority: %s (%d)",
+ 						strerror(errno), errno);
 -- 
-2.7.4
+2.7.5
+
