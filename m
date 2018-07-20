@@ -1,106 +1,112 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <sean.wang@mediatek.com>
+From: <sean.wang@mediatek.com>
+To: <robh+dt@kernel.org>, <mark.rutland@arm.com>, <marcel@holtmann.org>,
+	<johan.hedberg@gmail.com>
+CC: <devicetree@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
+Subject: [PATCH v6 0/4] add support for Bluetooth on MT7622 SoC
+Date: Fri, 20 Jul 2018 13:12:26 +0800
+Message-ID: <cover.1532060309.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
-In-Reply-To: <1532061239-22481-1-git-send-email-gtiwari@redhat.com>
-References: <1532061239-22481-1-git-send-email-gtiwari@redhat.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 20 Jul 2018 11:24:34 +0300
-Message-ID: <CABBYNZ+SuA7GsrsHeyBj+ypQ8b4a6dSQL=6rqWsxHQ=nn-tWtg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] Fixing possible use_after_free.
-To: Gopal Tiwari <gtiwari@redhat.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Don Zickus <dzickus@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gopal,
+From: Sean Wang <sean.wang@mediatek.com>
 
-On Fri, Jul 20, 2018 at 7:33 AM, Gopal Tiwari <gtiwari@redhat.com> wrote:
-> During the code review of code. Found some of the possible
-> double free scenario's. So fixing them.
+v6 and changes since v5:
+ - make btmtkuart become a separate driver.
+ - drop already applied patches and the patch for btuart driver
+ - refine comments in driver allowing people know that mtk extra header
+   + length doesn't indicate a full H:4 frame, things can fragment.
+ - enhance dt-binding document with removing mistaken added " and improve
+   English sentence.
+ - remove unnecessary '\n' with bt_dev_err.
+ - refine code style.
+ - set hdev->manufacturer as mtk id.
 
-Id like that you split the changes with possible traces when that
-happen, besides some changes seems questionable (see the comments
-bellow).
+v5 and changes since v4:
+ - add Reviewed-by Tag from Ulf Hansson for patch 2
+ - remove default y in Kconfig for btmtkuart selection to avoid overkill for
+   users which would like to have less an amount on stuff in kernel.
+ - list header declarations in alphabetical order and add a proper blank line
+   within.
+ - remove unused macro.
+ - use sizeof to calculate structure size instead of an aextra macro to hardcode.
+ - use struct hci_dev * as input paraments for mtk_hci_wmt_sync and mtk_setup_fw
+   for that can be reused in mtk bluetooth with other interfaces.
+ - remove unused local variabled in mtk_btuart_recv.
+ - remove superfluous :8 for dlen2 in struct mtk_stp_hdr definition.
+ - give a reasonable naming for these labels and add a pm_runtime_put_noidle()
+   in the path undoing failing pm_runtime_get_sync().
+ - Turn __u8 into u8 in struct mtk_stp_hdr.
 
-> ---
->  gobex/gobex-transfer.c | 6 ++++++
->  obexd/client/session.c | 6 +++++-
->  tools/mesh/prov-db.c   | 4 +++-
->  3 files changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-> index bc99306..11980d0 100644
-> --- a/gobex/gobex-transfer.c
-> +++ b/gobex/gobex-transfer.c
-> @@ -428,6 +428,12 @@ guint g_obex_put_rsp(GObex *obex, GObexPacket *req,
->         va_start(args, first_hdr_id);
->         transfer_put_req_first(transfer, req, first_hdr_id, args);
->         va_end(args);
-> +
-> +       /* Checking transfer in case transfer_put_req_first has
-> +        * freed it to avoid double free */
-> +       if(!transfer)
-> +               return 0;
+ Really thanks for these reviews by Johan Hovold and Andy Shevchenko
 
-Check the code style, the should be a space after like in: if (
+v4 and changes since v3:
+ - refine patch 2 based on commit 919b7308fcc4 to allow that
+   dev_pm_domain_attach() will return better error codes. 
 
->         if (!g_slist_find(transfers, transfer))
->                 return 0;
->
-> diff --git a/obexd/client/session.c b/obexd/client/session.c
-> index 5bd2d26..077224b 100644
-> --- a/obexd/client/session.c
-> +++ b/obexd/client/session.c
-> @@ -938,7 +938,11 @@ static void session_terminate_transfer(struct obc_session *session,
->         if (session->p == NULL)
->                 session_process_queue(session);
->
-> -       obc_session_unref(session);
-> +       /* Verifying the session variable for double free
-> +        */
-> +
-> +       if (session)
-> +               obc_session_unref(session);
+v3 and changes since v2
+* all changes happen on patch 6
+ - fix up SPDX license style for btmtkuart.h.
+ - change firmware download from in ACL data to in HCI commands
+   and then remove unused mtk_acl_wmt_sync and related code.
+ - add a workaround replacing bad vendor event id 0xe4 with 0xff every
+   vendor should use.
+ - add a sanity check for mtk_hci_wmt_sync to verifying if
+   input parameters are valid.
+ - add an atomic_inc(&bdev->hdev->cmd_cnt) for __hci_cmd_sync_ev.
+ - be changed to use firmware with a header called mt7622pr2h.bin.
 
-I don't think you are fixing anything here with checking the session
-pointer since any function altering it won't be able to reset the
-pointer to NULL. If is a chance of double free here then what should
-be done is have a extra reference to prevent it to be free before but
-given the function name that should never happen so I wonder where you
-got this from?
+v2 and changes since v1
+ - Dropped patches already being applied
+ - Rewirte the whole driver using btuart [1], and add slight extension
+   of btuart to fit into btmtkuart driver. Beware that [1] is also pulled
+   into one part of the series for avoiding any breakage when the patchset
+   is being compiled.
 
->  }
->
->  static void session_notify_complete(struct obc_session *session,
-> diff --git a/tools/mesh/prov-db.c b/tools/mesh/prov-db.c
-> index 05b2547..74915d2 100644
-> --- a/tools/mesh/prov-db.c
-> +++ b/tools/mesh/prov-db.c
-> @@ -876,8 +876,10 @@ bool prov_db_local_set_iv_index(uint32_t iv_index, bool update, bool prov)
->
->         res = true;
->  done:
-> +       /* Varify in_str for double free */
->
-> -       g_free(in_str);
-> +       if(in_str)
-> +               g_free(in_str);
+[1] btuart 
+	https://www.spinics.net/lists/linux-bluetooth/msg74918.html
 
-g_free is already NULL pointer safe.
+v1:
 
->
->         if(jmain)
->                 json_object_put(jmain);
-> --
-> 2.7.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Hi,
 
+This patchset introduces built-in Bluetooth support on MT7622 SoC.
+And, it should be simple to make an extension to support other
+MediaTek SoCs with adjusting a few of changes on the initialization
+sequence of the device.
 
+Before the main driver is being introduced, a few of things about
+power-domain management should be re-worked for serdev core and MediaTek
+SCPSYS to allow the Bluetooth to properly power up.
+
+Patch 2: add a generic way attaching power domain to serdev
+Patch 3 and 4: add cleanups with reuse APIs from Linux core
+Patch 5: fix a limitation about power enablement Bluetooth depends on
+Patch 1, 6 and 7: the major part of adding Bluetooth support to MT7622
+	
+	Sean
+
+Sean Wang (4):
+  dt-bindings: net: bluetooth: Add mediatek-bluetooth
+  Bluetooth: Add new quirk for non-persistent setup settings
+  Bluetooth: mediatek: Add protocol support for MediaTek serial devices
+  MAINTAINERS: add an entry for MediaTek Bluetooth driver
+
+ .../devicetree/bindings/net/mediatek-bluetooth.txt |  35 ++
+ MAINTAINERS                                        |   8 +
+ drivers/bluetooth/Kconfig                          |  11 +
+ drivers/bluetooth/Makefile                         |   2 +
+ drivers/bluetooth/btmtkuart.c                      | 552 +++++++++++++++++++++
+ drivers/bluetooth/btmtkuart.h                      |  83 ++++
+ include/net/bluetooth/hci.h                        |   9 +
+ net/bluetooth/hci_core.c                           |   3 +-
+ 8 files changed, 702 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+ create mode 100644 drivers/bluetooth/btmtkuart.c
+ create mode 100644 drivers/bluetooth/btmtkuart.h
 
 -- 
-Luiz Augusto von Dentz
+2.7.4
