@@ -1,74 +1,60 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <c26a02c4df73953ae486cf207036980f8263d3ae.camel@hadess.net>
-Subject: Fixing potential unwanted pairings
-From: Bastien Nocera <hadess@hadess.net>
-To: linux-bluetooth@vger.kernel.org
-Date: Fri, 20 Jul 2018 13:23:26 +0200
+MIME-Version: 1.0
+In-Reply-To: <20180719144409.32563-1-andrzej.kaczmarek@codecoup.pl>
+References: <20180719144409.32563-1-andrzej.kaczmarek@codecoup.pl>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 20 Jul 2018 13:28:19 +0300
+Message-ID: <CABBYNZK3TELfPoyDc-GjRz7DRsS8DTW6f5uxSC87HHXtZO7K9w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/1] Fix iop with iOS after BlueZ upgrade
+To: Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hey,
+Hi Andrzej,
 
-We recently ran into a problem with bluez' Discoverable property, and
-its interaction with DiscoverableTimeout:
-https://bugzilla.redhat.com/show_bug.cgi?id=1602985
+On Thu, Jul 19, 2018 at 5:44 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@codecoup.pl> wrote:
+> Hi,
+>
+> A bit more information about included patch which fixes problem we
+> enocuntered with one of our customers.
+>
+> There are devices using BlueZ 5.49 which does not persist CCC state of
+> Service Changed for bonded peers. These devices will be now upgrade to
+> new sw version which has a bit different GATT database and is based on
+> more recent BlueZ version with mentioned change.
+>
+> What happens after upgrade is that each bonded device has its Service
+> Changed CCC state read as "0" since this information was not persisted
+> by previous BlueZ version. After connection, database change will not
+> be indicated to peer and thus peer can use cached database which yields
+> really weird results. This especially applies to iOS devices as there
+> is no way to force them to refresh cache other than unbond and bond
+> again which is a bad user experience.
+>
+> As per Core spec (wrt Service Changed):
+>         "This Characteristic Value shall be configured to be indicated,
+>          using the Client Characteristic Configuration descriptor by a
+>          client."
+> So I think it is safe to assume that if device is bonded, it also
+> configured Service Changed CCC for indications - this is what included
+> patch does. After database change is indicated on 1st connection after
+> upgrade, iOS will rediscover our database and will write CCC again so
+> this information is persisted properly.
+>
+>
+> Andrzej Kaczmarek (1):
+>   device: Fix loading devices without Service Changed CCC
+>
+>  src/device.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>
+> --
+> 2.18.0
 
-Either through misuse of the API, or a bug in the daemon[1], we might
-have ended up with "Discoverable" being turned on[2], and no agent
-being running. We expect the GNOME Bluetooth Settings to turn on
-Discoverable (thus Pairable) and register an agent when the panel is
-opened, and unregister the agent and switch off Discoverable when the
-panel is gone.
+Applied, thanks.
 
-When no agent is registered and the adapter is Discoverable, the
-kernel's policy will make bluetoothd behave like an agent with the "No
-Input No Output" IO capability. Some devices will then be able to pair
-with the computer running bluetoothd without any confirmation necessary
-on the computer side, with an unauthenticated key.
-
-This means that a combination of a hard-to-use API for Discoverable[3],
-and the kernel's default policy, will allow devices such as iPhones to
-pair without any interaction on the computer/BlueZ side.
-
-This is obviously unwanted in a desktop/laptop use cases.
-
-I talked to Johan about all this, and we came up with a few different
-ways to fix this problem:
-- Never enable pairable or discoverable mode over mgmt if there's no
-agent registered, and immediately disable pairable/discoverable mode if
-an agent exits or unregisters itself. This could be a config policy,
-making it easy to return errors if that policy was turned on and a
-client tried to set it.
-or:
-- Disable pairable/discoverable by default, add an API for the agent,
-or a D-Bus client to be tracked to know the lifetime of the
-Pairable/Discoverable on state. This would be an additional API to
-either the agent, or the adapter.
-
-I prefer the first one, it makes it easy to avoid Discoverable/Pairable
-being turned on without an agent, still allows bluetoothctl to be used
-easily, and is easy to disable if the target device is embedded and
-doesn't have a UI to show an agent itself.
-
-I'm happy to work on this feature if developers can agree on a course
-of action, and on what the API/config should be.
-
-Cheers
-
-[1]: As the D-Bus API here behaves in ways that isn't how D-Bus APIs
-usually work, and this behaviour isn't documented, I firmly believe
-it's a bluetoothd bug.
-
-[2]: Pairable is turned on by default, and gnome-bluetooth doesn't
-touch this setting at all. Its value should only matter if Discoverable
-is turned on as well, as far as I understand.
-
-[3]: To explain a bit more about the Discoverable API being hard to
-use, it's currently not possible to make sure there are no window with
-no agent being available (Settings panel crashed for example) and
-Discoverable being off. Using a very short timeout would still leave
-that timeout's worth of a window without an agent, and requires setting
-Discoverable again, which might confuse remote devices, using 0 means a
-crash leaves the adapter Discoverable without an agent.
+-- 
+Luiz Augusto von Dentz
