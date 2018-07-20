@@ -11,105 +11,117 @@ Cc: linux-kernel@vger.kernel.org,
 	hemantg@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v10 1/7] dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn3990
-Date: Fri, 20 Jul 2018 19:02:37 +0530
-Message-Id: <20180720133243.6851-2-bgodavar@codeaurora.org>
-In-Reply-To: <20180720133243.6851-1-bgodavar@codeaurora.org>
-References: <20180720133243.6851-1-bgodavar@codeaurora.org>
+Subject: [PATCH v10 0/7] Enable Bluetooth functionality for WCN3990 
+Date: Fri, 20 Jul 2018 19:02:36 +0530
+Message-Id: <20180720133243.6851-1-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch enables regulators for the Qualcomm Bluetooth wcn3990
-controller.
+These patches enables Bluetooth functinalties for new Qualcomm
+Bluetooth chip wnc3990. As this is latest chip with new features, 
+along with some common features to old chip "qcom,qca6174-bt".
+we have updated names of functions that are used for both the chips 
+to keep this generic and would help in future when we would have new 
+BT SoC.
 
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Reviewed-by: Rob Herring <robh@kernel.org>
----
-Changes in v10:
-    * added entry for regulator currents
+The below are difference between new and old chips.
 
-Changes in v9:
-    * updated with latest reg handle and names.
-    * updated max-speed definition. 
+*Power:
+ *New chip: we use voltage regulators to turn on/off the chip and we 
+  must send a command on Tx line to turn on/off the chip completely.
+ *Old chip: We turn on/off by setting a GPIO.
 
-Changes in v8:
-    * Separated the optional entries between two chips
+ *Note: Turning on sequence differs between two chips.
 
-Changes in v7:
-    * no change.
+*Firmware download:
+  Only firmware file name differ from New and Old chip.
+  
+  So we reused some functions/structure/variables which are used for old 
+  chip to New chip by generic naming (may be future chips may use same functions).
 
-Changes in v6:
+ * As we have multiple changes for functions names,we have tested these patches 
+   on both chips.
 
-    * Changed the oper-speed to max-speed.
+v10:
+ * update current load with actual values of WCN3990.
+ * added support  for itterative connect with BT chip if it fails to respond to the HOST.
+ * Added regulator current dtbindings.
+ * addressed review comments.
 
-Changes in v5:
-
-    * Added entry for oper-speed and init-speed.
-
----
- .../bindings/net/qualcomm-bluetooth.txt       | 42 ++++++++++++++++++-
- 1 file changed, 40 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-index 0ea18a53cc29..ca04c4981048 100644
---- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-+++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-@@ -10,12 +10,34 @@ device the slave device is attached to.
- Required properties:
-  - compatible: should contain one of the following:
-    * "qcom,qca6174-bt"
-+   * "qcom,wcn3990-bt"
-+
-+Optional properties for compatible string qcom,qca6174-bt:
+v9:
+ * removed smps regs.
+ * hidded flow control in respective functions.
+ * moved qca_soc_ver to qca_setup
+ * addressed review comments.
  
--Optional properties:
-  - enable-gpios: gpio specifier used to enable chip
-  - clocks: clock provided to the controller (SUSCLK_32KHZ)
+v8:
+  * Squashed [v7 2/8] and [v7 3/8] to one patch.
+  * updated functions to set and get the UART speeds.
+  * addressed review comments.
+
+v7:
+  * Renamed all the possible function of ROME to generic.
+  * updated with review comments for hci_qca and btqca
+  * fixed kbuild errors.
+  * created wrapper functions for re-usable blocks.
  
--Example:
-+Optional properties for compatible string qcom,wcn3990-bt:
-+
-+ - vddio-supply: Bluetooth wcn3990 VDD_IO supply regulator handle.
-+ - vddxo-supply: Bluetooth wcn3990 VDD_XO supply regulator handle.
-+ - vddrf-supply: Bluetooth wcn3990 VDD_RF supply regulator handle.
-+ - vddch0-supply: Bluetooth wcn3990 VDD_CH0 supply regulator handle.
-+
-+ - If WCN3990 is connected to platform where RPMH PMIC processor is used
-+   then the load values will be 1uA. if it is connected to platform where RPM
-+   PMIC processor is used then load value will be 10000 uA.
-+   if it is connected to different platform, where current values are fixed
-+   as in data sheet then below property are not required.
-+
-+   - vddio-current: Bluetooth wcn3990 VDD_IO current level in uA.
-+   - vddxo-current: Bluetooth wcn3990 VDD_XO current level in uA.
-+   - vddrf-current: Bluetooth wcn3990 VDD_RF current level in uA.
-+   - vddch0-current: Bluetooth wcn3990 VDD_CH0 current level in uA.
-+
-+ - max-speed: see Documentation/devicetree/bindings/serial/slave-device.txt
-+
-+Examples:
+v6:
+  * Hooked up qca_power to qca_serdev.
+  * renamed all the naming inconsistency functions with qca_*
+  * leveraged common code of ROME for wcn3990.
+  * created wrapper functions for re-usable blocks.
+  * updated function of _*regulator_enable and _*regualtor_disable.  
+  * removed redundant comments and functions.
+  * add code to derive the firmware files based on ROM Version.
+  * created new patch for common function of ROME and wcn3990.
+  * enables Qualcomm chip to operate at 3.2Mbps.
+  * updated names of functions that are used for both the chips to keep this generic. 
+
+v5:
+  * updated with review comments for hci_qca and btqca
  
- serial@7570000 {
- 	label = "BT-UART";
-@@ -28,3 +50,19 @@ serial@7570000 {
- 		clocks = <&divclk4>;
- 	};
- };
-+
-+serial@898000 {
-+	bluetooth {
-+		compatible = "qcom,wcn3990-bt";
-+
-+		vddio-supply = <&vreg_s4a_1p8>;
-+		vddxo-supply = <&vreg_l7a_1p8>;
-+		vddrf-supply = <&vreg_l17a_1p3>;
-+		vddch0-supply = <&vreg_l25a_3p3>;
-+		vddio-current = <1>;
-+		vddxo-current = <1>;
-+		vddrf-current = <1>;
-+		vddch0-current = <1>;
-+		max-speed = <3200000>;
-+	};
-+};
+v4:
+  * rebased all changes on top of bluetooth-next.
+  * addressed review comments.
+  * New patch created for firmware download.
+
+v3:
+  * Rebased all changes on top of bluetooth-next.
+  * dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn3990
+    - added dt-binding snippet for bluetooth chip wcn3990.
+  * Bluetooth: Add support for wcn3990 soc.
+    - updated BT_INFO with bt_dev_info, where ever necessary.
+
+v2:
+   * Add support for wcn3990:
+    These changes are aligned as per serdev frame work.
+          We implemented these changes on top of https://patchwork.kernel.org/patch/10316093/
+        As this patch enable serdev for one of the Qualcomm BT chip.
+
+        The changes in the patch include.
+        - Adding support to voting up/down regulators for WCN3990.
+           - Bluetooth firmware download for wcn3990.
+
+  * Add device tree bindings for Atheros chips:
+          These changes are on top of https://patchwork.kernel.org/patch/10316097/.
+          - Description of device tree bindings.
+
+
+Balakrishna Godavarthi (7):
+  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
+    wcn3990
+  Bluetooth: btqca: Rename ROME specific functions to generic functions
+  Bluetooth: btqca: Redefine qca_uart_setup() to generic function.
+  Bluetooth: hci_qca: Add wrapper functions for setting UART speed
+  Bluetooth: hci_qca: Enable 3.2 Mbps operating speed.
+  Bluetooth: btqca: Add wcn3990 firmware download support.
+  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990
+
+ .../bindings/net/qualcomm-bluetooth.txt       |  42 +-
+ drivers/bluetooth/btqca.c                     | 116 ++--
+ drivers/bluetooth/btqca.h                     |  23 +-
+ drivers/bluetooth/hci_qca.c                   | 564 ++++++++++++++++--
+ 4 files changed, 629 insertions(+), 116 deletions(-)
+
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
 a Linux Foundation Collaborative Project
