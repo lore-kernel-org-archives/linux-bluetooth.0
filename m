@@ -1,73 +1,41 @@
-Return-Path: <mka@chromium.org>
-Date: Mon, 23 Jul 2018 10:40:18 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
-	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v10 3/7] Bluetooth: btqca: Redefine qca_uart_setup() to
- generic function.
-Message-ID: <20180723174018.GK129942@google.com>
-References: <20180720133243.6851-1-bgodavar@codeaurora.org>
- <20180720133243.6851-4-bgodavar@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180720133243.6851-4-bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: Re: [PATCH] bluetooth: btusb: Replace GFP_ATOMIC with GFP_KERNEL in
+ inject_cmd_complete()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180723033851.8141-1-baijiaju1990@gmail.com>
+Date: Mon, 23 Jul 2018 18:05:55 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-Id: <F636E201-BDBC-4D4E-9930-974C40831F03@holtmann.org>
+References: <20180723033851.8141-1-baijiaju1990@gmail.com>
+To: Jia-Ju Bai <baijiaju1990@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jul 20, 2018 at 07:02:39PM +0530, Balakrishna Godavarthi wrote:
-> Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
-> SoC, to use the same function instead of duplicating the function.
-> Added new arguments soc_type and soc_ver to the functions.
+Hi Jia-Ju,
+
+> inject_cmd_complete() is only called by btusb_send_frame_intel(), 
+> which is set to hdev->send, and hdev->send() is never 
+> called in atomic context.
 > 
-> These arguments will help to decide type of firmware files
-> to be loaded into Bluetooth chip.
-> soc_type holds the Bluetooth chip connected to APPS processor.
-> soc_ver holds the Bluetooth chip version.
+> inject_cmd_complete() calls bt_skb_alloc() with GFP_ATOMIC, 
+> which is not necessary.
+> GFP_ATOMIC can be replaced with GFP_KERNEL.
 > 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> This is found by a static analysis tool named DCNS written by myself.
+> I also manually check the kernel code before reporting it.
+> 
+> Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
 > ---
->  drivers/bluetooth/btqca.c   | 20 +++++++-------------
->  drivers/bluetooth/btqca.h   | 13 +++++++++++--
->  drivers/bluetooth/hci_qca.c | 10 +++++++++-
->  3 files changed, 27 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index c5cf9cab438a..b556710ee1bd 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -85,6 +85,9 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
->  out:
->  	kfree_skb(skb);
->  
-> +	if (err < 0 || *soc_version == 0)
-> +		bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
+> drivers/bluetooth/btusb.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-You also have to set 'err' if soc_version is 0, so the caller can skip
-the check for soc_version == 0
+all 6 patches have been applied to bluetooth-next tree.
 
-I'd suggest:
+Regards
 
-  // directly after setting soc_version
-  if (*soc_version == 0)
-    err = -EILSEQ; // or should it be a different error code?
+Marcel
 
-  ...
-
-  if (err)
-    bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
-
-You could also limit the error log to the 'if (*soc_version == 0)'
-branch, for all other errors there will already be a more specific log
-entry.
-
-> +
->  	return err;
->  }
-
-Cheers
-
-Matthias
