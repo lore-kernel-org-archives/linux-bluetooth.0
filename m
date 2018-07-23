@@ -1,26 +1,20 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Mon, 23 Jul 2018 05:06:21 -0400 (EDT)
-From: Gopal Tiwari <gtiwari@redhat.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, Don Zickus <dzickus@redhat.com>
-Message-ID: <904708069.36197568.1532336781814.JavaMail.zimbra@redhat.com>
-In-Reply-To: <CABBYNZKsjV8CDEkw0cP_U8qx0aQLvz6R8axVhfOEM=tDxZceuA@mail.gmail.com>
-References: <1532061239-22481-1-git-send-email-gtiwari@redhat.com> <CABBYNZ+SuA7GsrsHeyBj+ypQ8b4a6dSQL=6rqWsxHQ=nn-tWtg@mail.gmail.com> <1420266169.36169819.1532327338672.JavaMail.zimbra@redhat.com> <CABBYNZKsjV8CDEkw0cP_U8qx0aQLvz6R8axVhfOEM=tDxZceuA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] Fixing possible use_after_free.
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1420266169.36169819.1532327338672.JavaMail.zimbra@redhat.com>
+References: <1532061239-22481-1-git-send-email-gtiwari@redhat.com>
+ <CABBYNZ+SuA7GsrsHeyBj+ypQ8b4a6dSQL=6rqWsxHQ=nn-tWtg@mail.gmail.com> <1420266169.36169819.1532327338672.JavaMail.zimbra@redhat.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 23 Jul 2018 11:49:45 +0300
+Message-ID: <CABBYNZKsjV8CDEkw0cP_U8qx0aQLvz6R8axVhfOEM=tDxZceuA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] Fixing possible use_after_free.
+To: Gopal Tiwari <gtiwari@redhat.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Don Zickus <dzickus@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
->----- Original Message -----
->From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
->To: Gopal Tiwari <gtiwari@redhat.com>
->Cc: linux-bluetooth@vger.kernel.org, Don Zickus <dzickus@redhat.com>
->Sent: Mon, 23 Jul 2018 04:49:45 -0400 (EDT)
->Subject: Re: [PATCH BlueZ 1/2] Fixing possible use_after_free.
-
->Hi Gopal,
+Hi Gopal,
 
 On Mon, Jul 23, 2018 at 9:28 AM, Gopal Tiwari <gtiwari@redhat.com> wrote:
 > Hi Luiz,
@@ -98,27 +92,12 @@ On Mon, Jul 23, 2018 at 9:28 AM, Gopal Tiwari <gtiwari@redhat.com> wrote:
 > #  936|
 > #  937|->       obc_session_unref(session);
 
->If that is happening we have a reference problem in
->session_process_queue, that should never cause a session_free, and
->obviously checking for the pointer on the caller function doesn't work
->since that is never changed.
-
-Sure will remove following from my patch 
-
-+       /* Verifying the session variable for double free
-+        */
-+
-+       if (session)
-+               obc_session_unref(session);
-
-
->Both function do actually unref their own
->reference so either the session is already invalid to begin with or
->perhaps some callback is unrefing when it shouldn't.
-
-Ok, sure will try to take a look at  the call path again.
-
-Gopal..
+If that is happening we have a reference problem in
+session_process_queue, that should never cause a session_free, and
+obviously checking for the pointer on the caller function doesn't work
+since that is never changed. Both function do actually unref their own
+reference so either the session is already invalid to begin with or
+perhaps some callback is unrefing when it shouldn't.
 
 >
 >>I don't think you are fixing anything here with checking the session
@@ -176,4 +155,3 @@ Gopal..
 
 -- 
 Luiz Augusto von Dentz
-
