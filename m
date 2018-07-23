@@ -1,81 +1,109 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Tue, 24 Jul 2018 09:42:15 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: Re: [PATCH BlueZ v1 0/7] Add BREDR PHYs in PHY configuration commands
-Message-ID: <20180724064215.GA30169@x1c.home>
-References: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Return-Path: <mka@chromium.org>
+Date: Mon, 23 Jul 2018 15:32:36 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
+	rtatiya@codeaurora.org, hemantg@codeaurora.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v10 1/7] dt-bindings: net: bluetooth: Add device tree
+ bindings for QTI chip wcn3990
+Message-ID: <20180723223236.GN129942@google.com>
+References: <20180720133243.6851-1-bgodavar@codeaurora.org>
+ <20180720133243.6851-2-bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <20180720133243.6851-2-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
-
-On Thu, Jul 19, 2018, Jaganath Kanakkassery wrote:
-> Jaganath Kanakkassery (7):
->   monitor: Add BREDR PHYs in PHY configuration commands
->   emulator: Add BREDR 2M & 3M, 3 & 5 Slot packet type support
->   mgmt-tester: Add extended advertising test cases
->   mgmt-tester: Add PHY Configuration test cases
->   mgmt-tester: Add tests for extended scanning and device found
->   mgmt-tester: Add support ext create connection and enh conn complete
->   mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
+On Fri, Jul 20, 2018 at 07:02:37PM +0530, Balakrishna Godavarthi wrote:
+> This patch enables regulators for the Qualcomm Bluetooth wcn3990
+> controller.
 > 
->  emulator/btdev.c    |   10 +
->  monitor/packet.c    |   39 +-
->  tools/mgmt-tester.c | 2268 ++++++++++++++++++++++++++++++++++++++++++++++++---
->  3 files changed, 2200 insertions(+), 117 deletions(-)
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> Reviewed-by: Rob Herring <robh@kernel.org>
+> ---
+> Changes in v10:
+>     * added entry for regulator currents
+> 
+> Changes in v9:
+>     * updated with latest reg handle and names.
+>     * updated max-speed definition. 
+> 
+> Changes in v8:
+>     * Separated the optional entries between two chips
+> 
+> Changes in v7:
+>     * no change.
+> 
+> Changes in v6:
+> 
+>     * Changed the oper-speed to max-speed.
+> 
+> Changes in v5:
+> 
+>     * Added entry for oper-speed and init-speed.
+> 
+> ---
+>  .../bindings/net/qualcomm-bluetooth.txt       | 42 ++++++++++++++++++-
+>  1 file changed, 40 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> index 0ea18a53cc29..ca04c4981048 100644
+> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> @@ -10,12 +10,34 @@ device the slave device is attached to.
+>  Required properties:
+>   - compatible: should contain one of the following:
+>     * "qcom,qca6174-bt"
+> +   * "qcom,wcn3990-bt"
+> +
+> +Optional properties for compatible string qcom,qca6174-bt:
+>  
+> -Optional properties:
+>   - enable-gpios: gpio specifier used to enable chip
+>   - clocks: clock provided to the controller (SUSCLK_32KHZ)
+>  
+> -Example:
+> +Optional properties for compatible string qcom,wcn3990-bt:
+> +
+> + - vddio-supply: Bluetooth wcn3990 VDD_IO supply regulator handle.
+> + - vddxo-supply: Bluetooth wcn3990 VDD_XO supply regulator handle.
+> + - vddrf-supply: Bluetooth wcn3990 VDD_RF supply regulator handle.
+> + - vddch0-supply: Bluetooth wcn3990 VDD_CH0 supply regulator handle.
+> +
+> + - If WCN3990 is connected to platform where RPMH PMIC processor is used
+> +   then the load values will be 1uA. if it is connected to platform where RPM
+> +   PMIC processor is used then load value will be 10000 uA.
+> +   if it is connected to different platform, where current values are fixed
+> +   as in data sheet then below property are not required.
 
-I get a bunch of errors when trying to build this set:
+Please provide details why these magic values are needed for RPMh and
+RPM PMICs.
 
-  CC       tools/mgmt-tester.o
-tools/mgmt-tester.c:7839:36: error: ‘add_ext_advertising_mgmt_cmd_arr’ defined but not used [-Werror=unused-const-variable=]
- static const struct setup_mgmt_cmd add_ext_advertising_mgmt_cmd_arr[] = {
-                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7826:22: error: ‘add_ext_advertising_param_name_data_appear’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_name_data_appear[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7800:22: error: ‘add_ext_advertising_param_name_data_inv’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_name_data_inv[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7755:22: error: ‘add_ext_advertising_param_name_data_ok’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_name_data_ok[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7740:22: error: ‘set_ext_scan_rsp_data_short_name_fits’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t set_ext_scan_rsp_data_short_name_fits[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7672:22: error: ‘add_ext_advertising_param_name’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_name[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7636:22: error: ‘add_ext_advertising_empty_param’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_empty_param[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7614:22: error: ‘add_ext_advertising_param_scrsp_appear_null’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_scrsp_appear_null[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7587:22: error: ‘add_ext_advertising_param_scrsp_appear_data_too_long’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_scrsp_appear_data_too_long[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7560:22: error: ‘add_ext_advertising_param_scrsp_appear_data_ok’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_scrsp_appear_data_ok[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7535:22: error: ‘add_ext_advertising_param_scrsp_data_only_too_long’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_scrsp_data_only_too_long[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7510:22: error: ‘add_ext_advertising_param_scrsp_data_only_ok’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_scrsp_data_only_ok[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7488:22: error: ‘add_ext_advertising_param_empty’ defined but not used [-Werror=unused-const-variable=]
- static const uint8_t add_ext_advertising_param_empty[] = {
-                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:7364:34: error: ‘add_ext_advertising_power_off’ defined but not used [-Werror=unused-const-variable=]
- static const struct generic_data add_ext_advertising_power_off = {
-                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/mgmt-tester.c:6992:19: error: ‘set_powered_ext_adv_instance_settings_param’ defined but not used [-Werror=unused-const-variable=]
- static const char set_powered_ext_adv_instance_settings_param[] = {
-                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+For RPMh it looks like a value of 1uA would cause the regulator to
+enter idle mode:
 
-Johan
+static int rpmh_regulator_vrm_set_load(struct regulator_dev *rdev, int load_uA)
+{
+	struct rpmh_vreg *vreg = rdev_get_drvdata(rdev);
+	unsigned int mode;
+
+	if (load_uA >= vreg->hw_data->hpm_min_load_uA)
+		mode = REGULATOR_MODE_NORMAL;
+	else
+		mode = REGULATOR_MODE_IDLE;
+
+	return rpmh_regulator_vrm_set_mode(rdev, mode);
+}
+
+https://patchwork.kernel.org/patch/10524299/
+
+Is that really intended and if so why? It might make sense to save
+power when really in idle mode, but I assume you somehow have to tell
+the regulator to switch to normal mode when BT is used.
+
+I also commented about this on patch "[7/7] Bluetooth: hci_qca: Add
+support for Qualcomm Bluetooth chip wcn3990". I suggest to center the
+discussion here and reply with a link to the other patch.
