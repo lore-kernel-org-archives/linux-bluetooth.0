@@ -1,72 +1,49 @@
-Return-Path: <linux-wpan-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Subject: Re: [PATCH 2/2 v2] ieee802154: assembly of 6LoWPAN fragments
  improvement
-To: Alexander Aring <aring@mojatatu.com>,
-        Rafael Vuijk <r.vuijk@sownet.nl>
-Cc: Alexander Aring <alex.aring@gmail.com>,
+To: Rafael Vuijk <r.vuijk@sownet.nl>,
+        Alexander Aring <alex.aring@gmail.com>,
         Jukka Rissanen <jukka.rissanen@linux.intel.com>,
         linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
 References: <20180717152620.GB22664@Rafael-Mac.intra.sownet.nl>
- <20180718143015.y32gl5sesuwwb2ux@x220t>
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <d389ceea-dac2-2068-963b-711c6cb9a6b7@datenfreihafen.org>
-Date: Tue, 24 Jul 2018 15:08:38 +0200
+Message-ID: <7d765c8d-c235-1bd5-ba3a-a5dec7f1bda8@datenfreihafen.org>
+Date: Tue, 24 Jul 2018 15:04:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180718143015.y32gl5sesuwwb2ux@x220t>
+In-Reply-To: <20180717152620.GB22664@Rafael-Mac.intra.sownet.nl>
 Content-Type: text/plain; charset=utf-8
-Sender: linux-wpan-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hello.
 
-On 18.07.2018 16:30, Alexander Aring wrote:
-> Hi,
-> 
-> On Tue, Jul 17, 2018 at 05:26:20PM +0200, Rafael Vuijk wrote:
->> 6LoWPAN reassembly fragment overlap checks.
->>
->> Signed-off-by: Rafael Vuijk <r.vuijk@sownet.nl>
->> --- ./net/ieee802154/6lowpan/reassembly.c	2018-02-20 11:10:06.000000000 +0100
->> +++ ./net/ieee802154/6lowpan/reassembly.c	2018-02-21 09:13:29.000000000 +0100
->> @@ -179,6 +170,13 @@ static int lowpan_frag_queue(struct lowp
->>  	}
->>  
->>  found:
->> +	/* Current fragment overlaps with previous fragment? */
->> +	if (prev && (lowpan_802154_cb(prev)->d_offset << 3) + prev->len > offset)
->> +		goto err;
->> +	/* Current fragment overlaps with next fragment? */
->> +	if (next && offset + skb->len > lowpan_802154_cb(next)->d_offset << 3)
->> +		goto err;
->> +
-> 
-> I have some thought of mine when seeing this code. The function is
-> separated into two phases:
-> 
-> phase 0:
->  - finding the missing piece of fragment skb in the right order
->  - if found goto found:
-> 
-> phase 1:
->  - everything after found to reassemble everything if we have everything
->    together.
-> 
-> 
-> This patch moves parts which are belongs to "phase 0" to "phase 1". I
-> think the general idea in this algorithmn is to simple don't make checks
-> on invalid things at all. If "broken" fragments are inside the "fragment
-> bucket" then simple leave it there. There exists a garbage collector,
-> controlled by some expire parameter to drop them then (60 seconds by
-> default).
+On 17.07.2018 17:26, Rafael Vuijk wrote:
+> 6LoWPAN reassembly fragment overlap checks.
 
-I think Rafael looked around for the best place of these checks. The
-algorithm is buggy in this regard as they have seen in their testing and
-packet traces. If you have a better place for this check I am pretty
-sure they would be happy to test it and come back to you if it fixes
-their issue.
+A bit more explanation would not hurd here. :-)
 
-If we find no better place I will just use this patch and move forward
-to have at least the practical issue fixed.
+> Signed-off-by: Rafael Vuijk <r.vuijk@sownet.nl>
+> --- ./net/ieee802154/6lowpan/reassembly.c	2018-02-20 11:10:06.000000000 +0100
+> +++ ./net/ieee802154/6lowpan/reassembly.c	2018-02-21 09:13:29.000000000 +0100
+> @@ -179,6 +170,13 @@ static int lowpan_frag_queue(struct lowp
+>  	}
+>  
+>  found:
+> +	/* Current fragment overlaps with previous fragment? */
+> +	if (prev && (lowpan_802154_cb(prev)->d_offset << 3) + prev->len > offset)> +		goto err;
+> +	/* Current fragment overlaps with next fragment? */
+> +	if (next && offset + skb->len > lowpan_802154_cb(next)->d_offset << 3)
+
+To be honest, I am not sure I would get the operator priorities right in
+my head for this line without looking it up. :-) Could we get some () to
+help with the operator priorities? Even if that means we need to break
+this line into two.
+
+> +		goto err;
+> +
+>  	/* Insert this fragment in the chain of fragments. */
+>  	skb->next = next;
+>  	if (!next)
 
 regards
 Stefan Schmidt
