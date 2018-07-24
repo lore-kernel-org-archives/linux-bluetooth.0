@@ -1,119 +1,72 @@
 Return-Path: <linux-wpan-owner@vger.kernel.org>
-From: Michael Richardson <mcr@sandelman.ca>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-cc: Rafael Vuijk <r.vuijk@sownet.nl>,
-        Alexander Aring <alex.aring@gmail.com>,
+Subject: Re: [PATCH 2/2 v2] ieee802154: assembly of 6LoWPAN fragments
+ improvement
+To: Alexander Aring <aring@mojatatu.com>,
+        Rafael Vuijk <r.vuijk@sownet.nl>
+Cc: Alexander Aring <alex.aring@gmail.com>,
         Jukka Rissanen <jukka.rissanen@linux.intel.com>,
         linux-wpan@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2 v2] ieee802154: assembly of 6LoWPAN fragments improvement
-In-Reply-To: <78e7773b-c2b8-5070-d940-df0d8e35ae32@datenfreihafen.org>
-References: <20180717152546.GA22664@Rafael-Mac.intra.sownet.nl> <78e7773b-c2b8-5070-d940-df0d8e35ae32@datenfreihafen.org>
+References: <20180717152620.GB22664@Rafael-Mac.intra.sownet.nl>
+ <20180718143015.y32gl5sesuwwb2ux@x220t>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <d389ceea-dac2-2068-963b-711c6cb9a6b7@datenfreihafen.org>
+Date: Tue, 24 Jul 2018 15:08:38 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-        micalg=pgp-sha1; protocol="application/pgp-signature"
-Date: Tue, 24 Jul 2018 11:20:41 -0400
-Message-ID: <8714.1532445641@localhost>
+In-Reply-To: <20180718143015.y32gl5sesuwwb2ux@x220t>
+Content-Type: text/plain; charset=utf-8
 Sender: linux-wpan-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Hello.
 
+On 18.07.2018 16:30, Alexander Aring wrote:
+> Hi,
+> 
+> On Tue, Jul 17, 2018 at 05:26:20PM +0200, Rafael Vuijk wrote:
+>> 6LoWPAN reassembly fragment overlap checks.
+>>
+>> Signed-off-by: Rafael Vuijk <r.vuijk@sownet.nl>
+>> --- ./net/ieee802154/6lowpan/reassembly.c	2018-02-20 11:10:06.000000000 +0100
+>> +++ ./net/ieee802154/6lowpan/reassembly.c	2018-02-21 09:13:29.000000000 +0100
+>> @@ -179,6 +170,13 @@ static int lowpan_frag_queue(struct lowp
+>>  	}
+>>  
+>>  found:
+>> +	/* Current fragment overlaps with previous fragment? */
+>> +	if (prev && (lowpan_802154_cb(prev)->d_offset << 3) + prev->len > offset)
+>> +		goto err;
+>> +	/* Current fragment overlaps with next fragment? */
+>> +	if (next && offset + skb->len > lowpan_802154_cb(next)->d_offset << 3)
+>> +		goto err;
+>> +
+> 
+> I have some thought of mine when seeing this code. The function is
+> separated into two phases:
+> 
+> phase 0:
+>  - finding the missing piece of fragment skb in the right order
+>  - if found goto found:
+> 
+> phase 1:
+>  - everything after found to reassemble everything if we have everything
+>    together.
+> 
+> 
+> This patch moves parts which are belongs to "phase 0" to "phase 1". I
+> think the general idea in this algorithmn is to simple don't make checks
+> on invalid things at all. If "broken" fragments are inside the "fragment
+> bucket" then simple leave it there. There exists a garbage collector,
+> controlled by some expire parameter to drop them then (60 seconds by
+> default).
 
-Stefan Schmidt <stefan@datenfreihafen.org> wrote:
-    > "We have tested the 6LoWPAN modules in the Linux kernel and came to s=
-ome
-    > issue regarding fragmentation. We have seen aborted SCP transfers
-    > ("message authentication code incorrect") and tested TCP transfers as
-    > well and saw corruption on fragment-sized intervals. The current
-    > fragment assembling functions do not check enough for corrupted L2
-    > packets that might slip through L2 CRC check. (in our case IEEE802.15=
-.4
-    > which has only 16-bit CRC).
-    > As a result, overlapping fragments due to offset corruption are not
-    > detected and assembled incorrectly. Part of packets may have old data.
-    > At TCP-level, there is only a simple TCP-checksum which is not enough=
- in
-    > this case as the corruption occurs frequently (once every few minutes=
-).
+I think Rafael looked around for the best place of these checks. The
+algorithm is buggy in this regard as they have seen in their testing and
+packet traces. If you have a better place for this check I am pretty
+sure they would be happy to test it and come back to you if it fixes
+their issue.
 
-This is a common problem with checksums, fragments and "high" bandwidths.
-It can occur with some frequency, and has been a reason for much of the PMTU
-work (including PLMTUD) to get rid of IP-level fragmentation.
-A solution is better checksums: or rather integrity hashes.
+If we find no better place I will just use this patch and move forward
+to have at least the practical issue fixed.
 
-I'm curious if the problem would have been if the 802.15.4 network was
-encrypted, and thus had an cryptographic integrity check.
-
-    > After quickly analysing the code we saw some potential issues and
-    > created a patch that adds additional overlap checks and simplifies so=
-me
-    > conditional statements. After running tests again, TCP corruption was
-    > not seen again. The test was performed with SCP and keeps transferring
-    > large files now without error."
-
-    > It would be great if some of this finds it way into the commit log of
-    > these two patches. At a minimum I would require them to not have the
-    > same commit summary line.
-
-Agreed.
-
-    >> Signed-off-by: Rafael Vuijk <r.vuijk@sownet.nl>
-    >> --- ./net/ieee802154/6lowpan/reassembly.c	2018-02-20 11:10:06.000000=
-000 +0100
-    >> +++ ./net/ieee802154/6lowpan/reassembly.c	2018-02-21 09:13:29.000000=
-000 +0100
-    >> @@ -140,23 +140,14 @@ static int lowpan_frag_queue(struct lowp
-    >> offset =3D lowpan_802154_cb(skb)->d_offset << 3;
-    >> end =3D lowpan_802154_cb(skb)->d_size;
-    >>=20
-    >> +	if (fq->q.len =3D=3D 0)
-    >> +		fq->q.len =3D end;
-    >> +	if (fq->q.len !=3D end)
-    >> +		goto err;
-    >> +
-    >> /* Is this the final fragment? */
-    >> if (offset + skb->len =3D=3D end) {
-    >> -		/* If we already have some bits beyond end
-    >> -		 * or have different end, the segment is corrupted.
-    >> -		 */
-    >> -		if (end < fq->q.len ||
-    >> -		    ((fq->q.flags & INET_FRAG_LAST_IN) && end !=3D fq->q.len))
-    >> -			goto err;
-    fq-> q.flags |=3D INET_FRAG_LAST_IN;
-    >> -		fq->q.len =3D end;
-    >> -	} else {
-    >> -		if (end > fq->q.len) {
-    >> -			/* Some bits beyond end -> corruption. */
-    >> -			if (fq->q.flags & INET_FRAG_LAST_IN)
-    >> -				goto err;
-    >> -			fq->q.len =3D end;
-    >> -		}
-
-    > Some basic testing on my side has not revealed any issues on this. I
-    > will give it some longer testing with SCP now.
-
-    > regards
-    > Stefan Schmidt
-    > --
-    > To unsubscribe from this list: send the line "unsubscribe linux-wpan"=
- in
-    > the body of a message to majordomo@vger.kernel.org
-    > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQEVAwUBW1dDyICLcPvd0N1lAQLX2wgAm4N3HooRA2lANZQrsAThMhCar0dN+GwH
-JTXKpsXzViRcS6a317Txse8AYRulGRKBJw9d0GuVODD4hiAprG1DxtNMvgz3JqxE
-e7vwNexH+mLgUZUDvf7U6qa4CvjuKLoG92H91g1+Z1qCEuZtiy0MqKJoKDLZnp0W
-IQ9aQHMoecjtj9EzX8uR4bAgsTUaSa9699CpKHE5tAwlx8a+NQhIYl/bb+HJsuUz
-Ao4lajB+gft7vDJkT9n58qHR24r7b4XR+/cXc7mr3yTHYeJ2INe1XSojBlcxhc4X
-rwJnLJWBuSBJy0MkdNUpNQM7lltd7ZHhXOeXSie9qS4o46Jc81NJiQ==
-=Xn7A
------END PGP SIGNATURE-----
---=-=-=--
+regards
+Stefan Schmidt
