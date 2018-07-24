@@ -2,7 +2,7 @@ Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
-Date: Tue, 24 Jul 2018 12:32:36 +0530
+Date: Tue, 24 Jul 2018 12:26:50 +0530
 From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 To: Matthias Kaehlcke <mka@chromium.org>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
@@ -10,93 +10,82 @@ Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
  linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
  rtatiya@codeaurora.org, hemantg@codeaurora.org,
  linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v10 4/7] Bluetooth: hci_qca: Add wrapper functions for
- setting UART speed
-In-Reply-To: <20180723175611.GL129942@google.com>
+Subject: Re: [PATCH v10 3/7] Bluetooth: btqca: Redefine qca_uart_setup() to
+ generic function.
+In-Reply-To: <20180723174018.GK129942@google.com>
 References: <20180720133243.6851-1-bgodavar@codeaurora.org>
- <20180720133243.6851-5-bgodavar@codeaurora.org>
- <20180723175611.GL129942@google.com>
-Message-ID: <12b59e77a4ee99c3de7bbd73ff10ce4b@codeaurora.org>
+ <20180720133243.6851-4-bgodavar@codeaurora.org>
+ <20180723174018.GK129942@google.com>
+Message-ID: <d5764fcd8becc0b04373bc1113d2049a@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Matthias,
 
-On 2018-07-23 23:26, Matthias Kaehlcke wrote:
-> On Fri, Jul 20, 2018 at 07:02:40PM +0530, Balakrishna Godavarthi wrote:
->> In function qca_setup, we set initial and operating speeds for 
->> Qualcomm
->> Bluetooth SoC's. This block of code is common across different
->> Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
->> a wrapper function to set the speeds. So that future coming SoC's
->> can use these wrapper functions to set speeds.
+On 2018-07-23 23:10, Matthias Kaehlcke wrote:
+> On Fri, Jul 20, 2018 at 07:02:39PM +0530, Balakrishna Godavarthi wrote:
+>> Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
+>> SoC, to use the same function instead of duplicating the function.
+>> Added new arguments soc_type and soc_ver to the functions.
+>> 
+>> These arguments will help to decide type of firmware files
+>> to be loaded into Bluetooth chip.
+>> soc_type holds the Bluetooth chip connected to APPS processor.
+>> soc_ver holds the Bluetooth chip version.
 >> 
 >> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 >> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 >> ---
->>  drivers/bluetooth/hci_qca.c | 93 
->> ++++++++++++++++++++++++++++---------
->>  1 file changed, 70 insertions(+), 23 deletions(-)
+>>  drivers/bluetooth/btqca.c   | 20 +++++++-------------
+>>  drivers/bluetooth/btqca.h   | 13 +++++++++++--
+>>  drivers/bluetooth/hci_qca.c | 10 +++++++++-
+>>  3 files changed, 27 insertions(+), 16 deletions(-)
 >> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index 5f1c0a8fd5cd..5f8a74d65bec 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -119,6 +119,11 @@ struct qca_data {
->>  	u64 votes_off;
->>  };
+>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>> index c5cf9cab438a..b556710ee1bd 100644
+>> --- a/drivers/bluetooth/btqca.c
+>> +++ b/drivers/bluetooth/btqca.c
+>> @@ -85,6 +85,9 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 
+>> *soc_version)
+>>  out:
+>>  	kfree_skb(skb);
 >> 
->> +enum qca_speed_type {
->> +	QCA_INIT_SPEED = 1,
->> +	QCA_OPER_SPEED
->> +};
+>> +	if (err < 0 || *soc_version == 0)
+>> +		bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
+> 
+> You also have to set 'err' if soc_version is 0, so the caller can skip
+> the check for soc_version == 0
+> 
+> I'd suggest:
+> 
+>   // directly after setting soc_version
+>   if (*soc_version == 0)
+>     err = -EILSEQ; // or should it be a different error code?
+> 
+>   ...
+> 
+>   if (err)
+>     bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
+> 
+> You could also limit the error log to the 'if (*soc_version == 0)'
+> branch, for all other errors there will already be a more specific log
+> entry.
+> 
+
+[Bala]: will update.
+
+     if(!err && *soc_version == 0)
+         err = -EINVAL; // as soc_version zero is invalid.
+
+    if (err)
+       bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
+
 >> +
->>  struct qca_serdev {
->>  	struct hci_uart	 serdev_hu;
->>  	struct gpio_desc *bt_en;
->> @@ -923,6 +928,61 @@ static inline void host_set_baudrate(struct 
->> hci_uart *hu, unsigned int speed)
->>  		hci_uart_set_baudrate(hu, speed);
+>>  	return err;
 >>  }
->> 
->> +static unsigned int qca_get_speed(struct hci_uart *hu,
->> +				  enum qca_speed_type speed_type)
->> +{
->> +	unsigned int speed = 0;
->> +
->> +	if (speed_type == QCA_INIT_SPEED) {
->> +		if (hu->init_speed)
->> +			speed = hu->init_speed;
->> +		else if (hu->proto->init_speed)
->> +			speed = hu->proto->init_speed;
->> +	} else {
->> +		if (hu->oper_speed)
->> +			speed = hu->oper_speed;
->> +		else if (hu->proto->oper_speed)
->> +			speed = hu->proto->oper_speed;
->> +	}
->> +
->> +	return speed;
->> +}
->> +
->> +static int qca_check_speeds(struct hci_uart *hu)
->> +{
->> +	if (!qca_get_speed(hu, QCA_INIT_SPEED) ||
->> +	    !qca_get_speed(hu, QCA_OPER_SPEED))
->> +		return -EINVAL;
 > 
-> You changed this from:
+> Cheers
 > 
-> 	/* One or the other speeds should be non zero. */
-> 	if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
-> 	    !qca_get_speed(hu, QCA_OPER_SPEED))
-> 		return -EINVAL;
-> 
-> There is no entry in the change log. What is the reason for this
-> change?
-
-[Bala] : My bad i missed to add the log,as the above  if for ROME chip, 
-having INIT or OPER speed is fine.
-
+> Matthias
 -- 
 Regards
 Balakrishna.
