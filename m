@@ -1,91 +1,81 @@
-Return-Path: <bgodavar@codeaurora.org>
+Return-Path: <johan.hedberg@gmail.com>
+Date: Tue, 24 Jul 2018 09:42:15 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: Re: [PATCH BlueZ v1 0/7] Add BREDR PHYs in PHY configuration commands
+Message-ID: <20180724064215.GA30169@x1c.home>
+References: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Date: Tue, 24 Jul 2018 12:26:50 +0530
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
- rtatiya@codeaurora.org, hemantg@codeaurora.org,
- linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v10 3/7] Bluetooth: btqca: Redefine qca_uart_setup() to
- generic function.
-In-Reply-To: <20180723174018.GK129942@google.com>
-References: <20180720133243.6851-1-bgodavar@codeaurora.org>
- <20180720133243.6851-4-bgodavar@codeaurora.org>
- <20180723174018.GK129942@google.com>
-Message-ID: <d5764fcd8becc0b04373bc1113d2049a@codeaurora.org>
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1531999447-3479-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Matthias,
+Hi Jaganath,
 
-On 2018-07-23 23:10, Matthias Kaehlcke wrote:
-> On Fri, Jul 20, 2018 at 07:02:39PM +0530, Balakrishna Godavarthi wrote:
->> Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
->> SoC, to use the same function instead of duplicating the function.
->> Added new arguments soc_type and soc_ver to the functions.
->> 
->> These arguments will help to decide type of firmware files
->> to be loaded into Bluetooth chip.
->> soc_type holds the Bluetooth chip connected to APPS processor.
->> soc_ver holds the Bluetooth chip version.
->> 
->> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
->> ---
->>  drivers/bluetooth/btqca.c   | 20 +++++++-------------
->>  drivers/bluetooth/btqca.h   | 13 +++++++++++--
->>  drivers/bluetooth/hci_qca.c | 10 +++++++++-
->>  3 files changed, 27 insertions(+), 16 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
->> index c5cf9cab438a..b556710ee1bd 100644
->> --- a/drivers/bluetooth/btqca.c
->> +++ b/drivers/bluetooth/btqca.c
->> @@ -85,6 +85,9 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 
->> *soc_version)
->>  out:
->>  	kfree_skb(skb);
->> 
->> +	if (err < 0 || *soc_version == 0)
->> +		bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
+On Thu, Jul 19, 2018, Jaganath Kanakkassery wrote:
+> Jaganath Kanakkassery (7):
+>   monitor: Add BREDR PHYs in PHY configuration commands
+>   emulator: Add BREDR 2M & 3M, 3 & 5 Slot packet type support
+>   mgmt-tester: Add extended advertising test cases
+>   mgmt-tester: Add PHY Configuration test cases
+>   mgmt-tester: Add tests for extended scanning and device found
+>   mgmt-tester: Add support ext create connection and enh conn complete
+>   mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
 > 
-> You also have to set 'err' if soc_version is 0, so the caller can skip
-> the check for soc_version == 0
-> 
-> I'd suggest:
-> 
->   // directly after setting soc_version
->   if (*soc_version == 0)
->     err = -EILSEQ; // or should it be a different error code?
-> 
->   ...
-> 
->   if (err)
->     bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
-> 
-> You could also limit the error log to the 'if (*soc_version == 0)'
-> branch, for all other errors there will already be a more specific log
-> entry.
-> 
+>  emulator/btdev.c    |   10 +
+>  monitor/packet.c    |   39 +-
+>  tools/mgmt-tester.c | 2268 ++++++++++++++++++++++++++++++++++++++++++++++++---
+>  3 files changed, 2200 insertions(+), 117 deletions(-)
 
-[Bala]: will update.
+I get a bunch of errors when trying to build this set:
 
-     if(!err && *soc_version == 0)
-         err = -EINVAL; // as soc_version zero is invalid.
+  CC       tools/mgmt-tester.o
+tools/mgmt-tester.c:7839:36: error: ‘add_ext_advertising_mgmt_cmd_arr’ defined but not used [-Werror=unused-const-variable=]
+ static const struct setup_mgmt_cmd add_ext_advertising_mgmt_cmd_arr[] = {
+                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7826:22: error: ‘add_ext_advertising_param_name_data_appear’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_name_data_appear[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7800:22: error: ‘add_ext_advertising_param_name_data_inv’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_name_data_inv[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7755:22: error: ‘add_ext_advertising_param_name_data_ok’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_name_data_ok[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7740:22: error: ‘set_ext_scan_rsp_data_short_name_fits’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t set_ext_scan_rsp_data_short_name_fits[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7672:22: error: ‘add_ext_advertising_param_name’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_name[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7636:22: error: ‘add_ext_advertising_empty_param’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_empty_param[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7614:22: error: ‘add_ext_advertising_param_scrsp_appear_null’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_scrsp_appear_null[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7587:22: error: ‘add_ext_advertising_param_scrsp_appear_data_too_long’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_scrsp_appear_data_too_long[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7560:22: error: ‘add_ext_advertising_param_scrsp_appear_data_ok’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_scrsp_appear_data_ok[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7535:22: error: ‘add_ext_advertising_param_scrsp_data_only_too_long’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_scrsp_data_only_too_long[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7510:22: error: ‘add_ext_advertising_param_scrsp_data_only_ok’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_scrsp_data_only_ok[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7488:22: error: ‘add_ext_advertising_param_empty’ defined but not used [-Werror=unused-const-variable=]
+ static const uint8_t add_ext_advertising_param_empty[] = {
+                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:7364:34: error: ‘add_ext_advertising_power_off’ defined but not used [-Werror=unused-const-variable=]
+ static const struct generic_data add_ext_advertising_power_off = {
+                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+tools/mgmt-tester.c:6992:19: error: ‘set_powered_ext_adv_instance_settings_param’ defined but not used [-Werror=unused-const-variable=]
+ static const char set_powered_ext_adv_instance_settings_param[] = {
+                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    if (err)
-       bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
-
->> +
->>  	return err;
->>  }
-> 
-> Cheers
-> 
-> Matthias
--- 
-Regards
-Balakrishna.
+Johan
