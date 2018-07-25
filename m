@@ -1,102 +1,104 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 25 Jul 2018 10:02:33 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
-        rtatiya@codeaurora.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v10 4/7] Bluetooth: hci_qca: Add wrapper functions for
- setting UART speed
-Message-ID: <20180725170233.GP129942@google.com>
-References: <20180720133243.6851-1-bgodavar@codeaurora.org>
- <20180720133243.6851-5-bgodavar@codeaurora.org>
- <20180723175611.GL129942@google.com>
- <12b59e77a4ee99c3de7bbd73ff10ce4b@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <12b59e77a4ee99c3de7bbd73ff10ce4b@codeaurora.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <jaganath.k.os@gmail.com>
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: [PATCH BlueZ v2 7/7] mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
+Date: Wed, 25 Jul 2018 15:51:26 +0530
+Message-Id: <1532514086-14790-8-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
+References: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 24, 2018 at 12:32:36PM +0530, Balakrishna Godavarthi wrote:
-> Hi Matthias,
-> 
-> On 2018-07-23 23:26, Matthias Kaehlcke wrote:
-> > On Fri, Jul 20, 2018 at 07:02:40PM +0530, Balakrishna Godavarthi wrote:
-> > > In function qca_setup, we set initial and operating speeds for
-> > > Qualcomm
-> > > Bluetooth SoC's. This block of code is common across different
-> > > Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
-> > > a wrapper function to set the speeds. So that future coming SoC's
-> > > can use these wrapper functions to set speeds.
-> > > 
-> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> > > Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
-> > > ---
-> > >  drivers/bluetooth/hci_qca.c | 93
-> > > ++++++++++++++++++++++++++++---------
-> > >  1 file changed, 70 insertions(+), 23 deletions(-)
-> > > 
-> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > > index 5f1c0a8fd5cd..5f8a74d65bec 100644
-> > > --- a/drivers/bluetooth/hci_qca.c
-> > > +++ b/drivers/bluetooth/hci_qca.c
-> > > @@ -119,6 +119,11 @@ struct qca_data {
-> > >  	u64 votes_off;
-> > >  };
-> > > 
-> > > +enum qca_speed_type {
-> > > +	QCA_INIT_SPEED = 1,
-> > > +	QCA_OPER_SPEED
-> > > +};
-> > > +
-> > >  struct qca_serdev {
-> > >  	struct hci_uart	 serdev_hu;
-> > >  	struct gpio_desc *bt_en;
-> > > @@ -923,6 +928,61 @@ static inline void host_set_baudrate(struct
-> > > hci_uart *hu, unsigned int speed)
-> > >  		hci_uart_set_baudrate(hu, speed);
-> > >  }
-> > > 
-> > > +static unsigned int qca_get_speed(struct hci_uart *hu,
-> > > +				  enum qca_speed_type speed_type)
-> > > +{
-> > > +	unsigned int speed = 0;
-> > > +
-> > > +	if (speed_type == QCA_INIT_SPEED) {
-> > > +		if (hu->init_speed)
-> > > +			speed = hu->init_speed;
-> > > +		else if (hu->proto->init_speed)
-> > > +			speed = hu->proto->init_speed;
-> > > +	} else {
-> > > +		if (hu->oper_speed)
-> > > +			speed = hu->oper_speed;
-> > > +		else if (hu->proto->oper_speed)
-> > > +			speed = hu->proto->oper_speed;
-> > > +	}
-> > > +
-> > > +	return speed;
-> > > +}
-> > > +
-> > > +static int qca_check_speeds(struct hci_uart *hu)
-> > > +{
-> > > +	if (!qca_get_speed(hu, QCA_INIT_SPEED) ||
-> > > +	    !qca_get_speed(hu, QCA_OPER_SPEED))
-> > > +		return -EINVAL;
-> > 
-> > You changed this from:
-> > 
-> > 	/* One or the other speeds should be non zero. */
-> > 	if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
-> > 	    !qca_get_speed(hu, QCA_OPER_SPEED))
-> > 		return -EINVAL;
-> > 
-> > There is no entry in the change log. What is the reason for this
-> > change?
-> 
-> [Bala] : My bad i missed to add the log,as the above  if for ROME chip,
-> having INIT or OPER speed is fine.
+---
+ tools/mgmt-tester.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-Ok, thanks for the clarification, I recall this was discussed earlier.
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 0f8371c..337a05b 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -401,7 +401,7 @@ static void test_condition_complete(struct test_data *data)
+ 		user->test_data = data; \
+ 		user->expected_version = 0x09; \
+ 		user->expected_manufacturer = 0x003f; \
+-		user->expected_supported_settings = 0x0000bfff; \
++		user->expected_supported_settings = 0x0001bfff; \
+ 		user->initial_settings = 0x00000080; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, test_setup, func, NULL, \
+@@ -420,7 +420,7 @@ static void test_condition_complete(struct test_data *data)
+ 		user->test_data = data; \
+ 		user->expected_version = 0x03; \
+ 		user->expected_manufacturer = 0x003f; \
+-		user->expected_supported_settings = 0x000010bf; \
++		user->expected_supported_settings = 0x000110bf; \
+ 		user->initial_settings = 0x00000080; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, test_setup, func, NULL, \
+@@ -436,7 +436,7 @@ static void test_condition_complete(struct test_data *data)
+ 		user->test_data = data; \
+ 		user->expected_version = 0x05; \
+ 		user->expected_manufacturer = 0x003f; \
+-		user->expected_supported_settings = 0x000011ff; \
++		user->expected_supported_settings = 0x000111ff; \
+ 		user->initial_settings = 0x00000080; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, test_setup, func, NULL, \
+@@ -452,7 +452,7 @@ static void test_condition_complete(struct test_data *data)
+ 		user->test_data = data; \
+ 		user->expected_version = 0x09; \
+ 		user->expected_manufacturer = 0x003f; \
+-		user->expected_supported_settings = 0x0000be1b; \
++		user->expected_supported_settings = 0x0001be1b; \
+ 		user->initial_settings = 0x00000200; \
+ 		tester_add_full(name, data, \
+ 				test_pre_setup, test_setup, func, NULL, \
+@@ -5079,7 +5079,7 @@ static const char ext_ctrl_info1[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x80, 0x00, 0x00, 0x00, /* current settings */
+ 	0x09, 0x00, /* eir length */
+ 	0x04, /* dev class length */
+@@ -5124,7 +5124,7 @@ static const char ext_ctrl_info2[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x81, 0x02, 0x00, 0x00, /* current settings */
+ 	0x0D, 0x00, /* eir length */
+ 	0x04, /* dev class length */
+@@ -5155,7 +5155,7 @@ static const char ext_ctrl_info3[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x80, 0x02, 0x00, 0x00, /* current settings */
+ 	0x16, 0x00, /* eir length */
+ 	0x04, /* dev class length */
+@@ -5190,7 +5190,7 @@ static const char ext_ctrl_info4[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x80, 0x02, 0x00, 0x00, /* current settings */
+ 	0x1a, 0x00, /* eir length */
+ 	0x04, /* dev class length */
+@@ -5249,7 +5249,7 @@ static const char ext_ctrl_info5[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+ 	0x3f, 0x00, /* manufacturer */
+-	0xff, 0xbf, 0x00, 0x00, /* supported settings */
++	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x81, 0x02, 0x00, 0x00, /* current settings */
+ 	0x1a, 0x00, /* eir len */
+ 	0x04, /* dev class len */
+-- 
+2.7.4
