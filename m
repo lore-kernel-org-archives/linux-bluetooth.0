@@ -1,32 +1,57 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: [PATCH BlueZ v2 0/7] Add BREDR PHYs in PHY configuration commands
-Date: Wed, 25 Jul 2018 15:51:19 +0530
-Message-Id: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Subject: [PATCH BlueZ 4/4] adapter: Check pending when setting DiscoverableTimeout
+Date: Wed, 25 Jul 2018 13:20:35 +0300
+Message-Id: <20180725102035.19439-4-luiz.dentz@gmail.com>
+In-Reply-To: <20180725102035.19439-1-luiz.dentz@gmail.com>
+References: <20180725102035.19439-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This also has mgmt-tester patches for 5.0 implementation
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-v2-> Fixed -Werror=unused-const-variable build error
+This makes DiscoverableTimeout check if discoverable is already pending
+and don't attempt to set it once again which may cause discoverable to
+be re-enabled when in fact the application just want to set the timeout
+alone.
+---
+ src/adapter.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-Jaganath Kanakkassery (7):
-  monitor: Add BREDR PHYs in PHY configuration commands
-  emulator: Add BREDR 2M & 3M, 3 & 5 Slot packet type support
-  mgmt-tester: Add extended advertising test cases
-  mgmt-tester: Add PHY Configuration test cases
-  mgmt-tester: Add tests for extended scanning and device found
-  mgmt-tester: Add support ext create connection and enh conn complete
-  mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
-
- emulator/btdev.c    |   10 +
- monitor/packet.c    |   39 +-
- tools/mgmt-tester.c | 2085 ++++++++++++++++++++++++++++++++++++++++++++++++---
- 3 files changed, 2015 insertions(+), 119 deletions(-)
-
+diff --git a/src/adapter.c b/src/adapter.c
+index 20c20f9e9..f92c897c7 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2901,6 +2901,7 @@ static void property_set_discoverable_timeout(
+ 				GDBusPendingPropertySet id, void *user_data)
+ {
+ 	struct btd_adapter *adapter = user_data;
++	bool enabled;
+ 	dbus_uint32_t value;
+ 
+ 	dbus_message_iter_get_basic(iter, &value);
+@@ -2914,8 +2915,19 @@ static void property_set_discoverable_timeout(
+ 	g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 				ADAPTER_INTERFACE, "DiscoverableTimeout");
+ 
++	if (adapter->pending_settings & MGMT_SETTING_DISCOVERABLE) {
++		if (adapter->current_settings & MGMT_SETTING_DISCOVERABLE)
++			enabled = false;
++		else
++			enabled = true;
++	} else {
++		if (adapter->current_settings & MGMT_SETTING_DISCOVERABLE)
++			enabled = true;
++		else
++			enabled = false;
++	}
+ 
+-	if (adapter->current_settings & MGMT_SETTING_DISCOVERABLE)
++	if (enabled)
+ 		set_discoverable(adapter, 0x01, adapter->discoverable_timeout);
+ }
+ 
 -- 
-2.7.4
+2.17.1
 
