@@ -1,161 +1,102 @@
-Return-Path: <mka@chromium.org>
-Date: Wed, 25 Jul 2018 11:31:44 -0700
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Wed, 25 Jul 2018 10:02:33 -0700
 From: Matthias Kaehlcke <mka@chromium.org>
 To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
-	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v10 7/7] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth chip wcn3990
-Message-ID: <20180725183144.GQ129942@google.com>
+        linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
+        rtatiya@codeaurora.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v10 4/7] Bluetooth: hci_qca: Add wrapper functions for
+ setting UART speed
+Message-ID: <20180725170233.GP129942@google.com>
 References: <20180720133243.6851-1-bgodavar@codeaurora.org>
- <20180720133243.6851-8-bgodavar@codeaurora.org>
- <20180723195441.GM129942@google.com>
- <81c324ee9104508cf5c862de3f697e4c@codeaurora.org>
+ <20180720133243.6851-5-bgodavar@codeaurora.org>
+ <20180723175611.GL129942@google.com>
+ <12b59e77a4ee99c3de7bbd73ff10ce4b@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <81c324ee9104508cf5c862de3f697e4c@codeaurora.org>
+In-Reply-To: <12b59e77a4ee99c3de7bbd73ff10ce4b@codeaurora.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 24, 2018 at 09:25:16PM +0530, Balakrishna Godavarthi wrote:
+On Tue, Jul 24, 2018 at 12:32:36PM +0530, Balakrishna Godavarthi wrote:
 > Hi Matthias,
 > 
-> On 2018-07-24 01:24, Matthias Kaehlcke wrote:
-> > On Fri, Jul 20, 2018 at 07:02:43PM +0530, Balakrishna Godavarthi wrote:
-> > > +	 * sometimes we will face communication synchronization issues,
-> > > +	 * like reading version command timeouts. In which HCI_SETUP fails,
-> > > +	 * to overcome these issues, we try to communicate by performing an
-> > > +	 * COLD power OFF and ON.
-> > > +	 */
-> > > +	for (i = 1; i <= 10 && ret; i++) {
-> > 
-> > Is it really that bad that more than say 3 iterations might be needed?
-> > 
-> [Bala]: will restrict to 3 iterations.
-
-Is 3x expected to be enough to 'guarantee' as successful
-initialization? Just wondered about the 10x since it suddendly changed
-from 1x. What is the failure rate without retries?
-
-Could you provide more information about the 'communication
-synchronization issues'? Is the root cause understood? Maybe there is
-a better way than retries.
-
-> > > +static void qca_regulator_get_current(struct device *dev,
-> > > +				      struct qca_vreg *vregs)
-> > > +{
-> > > +	char prop_name[32]; /* 32 is max size of property name */
+> On 2018-07-23 23:26, Matthias Kaehlcke wrote:
+> > On Fri, Jul 20, 2018 at 07:02:40PM +0530, Balakrishna Godavarthi wrote:
+> > > In function qca_setup, we set initial and operating speeds for
+> > > Qualcomm
+> > > Bluetooth SoC's. This block of code is common across different
+> > > Qualcomm Bluetooth SoC's. Instead of duplicating the code, created
+> > > a wrapper function to set the speeds. So that future coming SoC's
+> > > can use these wrapper functions to set speeds.
+> > > 
+> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> > > Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> > > ---
+> > >  drivers/bluetooth/hci_qca.c | 93
+> > > ++++++++++++++++++++++++++++---------
+> > >  1 file changed, 70 insertions(+), 23 deletions(-)
+> > > 
+> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> > > index 5f1c0a8fd5cd..5f8a74d65bec 100644
+> > > --- a/drivers/bluetooth/hci_qca.c
+> > > +++ b/drivers/bluetooth/hci_qca.c
+> > > @@ -119,6 +119,11 @@ struct qca_data {
+> > >  	u64 votes_off;
+> > >  };
+> > > 
+> > > +enum qca_speed_type {
+> > > +	QCA_INIT_SPEED = 1,
+> > > +	QCA_OPER_SPEED
+> > > +};
 > > > +
-> > > +	/* We have different platforms where the load value is controlled
-> > > +	 * via PMIC controllers. In such cases load required to power ON
-> > > +	 * Bluetooth chips are defined in the PMIC. We have option to set
-> > > +	 * operation mode like high or low power modes.
-> > > +	 * We do have some platforms where driver need to enable the load
-> > > for
-> > > +	 * WCN3990. Based on the current property value defined for the
-> > > +	 * regulators, driver will decide the regulator output load.
-> > > +	 * If the current property for the regulator is defined in the dts
-> > > +	 * we will read from dts tree, else from the default load values.
-> > > +	 */
+> > >  struct qca_serdev {
+> > >  	struct hci_uart	 serdev_hu;
+> > >  	struct gpio_desc *bt_en;
+> > > @@ -923,6 +928,61 @@ static inline void host_set_baudrate(struct
+> > > hci_uart *hu, unsigned int speed)
+> > >  		hci_uart_set_baudrate(hu, speed);
+> > >  }
+> > > 
+> > > +static unsigned int qca_get_speed(struct hci_uart *hu,
+> > > +				  enum qca_speed_type speed_type)
+> > > +{
+> > > +	unsigned int speed = 0;
+> > > +
+> > > +	if (speed_type == QCA_INIT_SPEED) {
+> > > +		if (hu->init_speed)
+> > > +			speed = hu->init_speed;
+> > > +		else if (hu->proto->init_speed)
+> > > +			speed = hu->proto->init_speed;
+> > > +	} else {
+> > > +		if (hu->oper_speed)
+> > > +			speed = hu->oper_speed;
+> > > +		else if (hu->proto->oper_speed)
+> > > +			speed = hu->proto->oper_speed;
+> > > +	}
+> > > +
+> > > +	return speed;
+> > > +}
+> > > +
+> > > +static int qca_check_speeds(struct hci_uart *hu)
+> > > +{
+> > > +	if (!qca_get_speed(hu, QCA_INIT_SPEED) ||
+> > > +	    !qca_get_speed(hu, QCA_OPER_SPEED))
+> > > +		return -EINVAL;
 > > 
-> > Let's make sure we all really understand why this is needed. You
-> > mentioned RPMh regulators earlier and said a special value of 1uA
-> > would be needed to enable high power mode. Later when I pointed to the
-> > RPMh regulator code you agreed that this special value wouldn't make
-> > any difference.
+> > You changed this from:
 > > 
-> > Now the defaults are higher:
+> > 	/* One or the other speeds should be non zero. */
+> > 	if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+> > 	    !qca_get_speed(hu, QCA_OPER_SPEED))
+> > 		return -EINVAL;
 > > 
-> [Bala]: today i got the info from the power teams here, currently in the
-> downstream what we have is different wrt to the
->         patch "https://patchwork.kernel.org/patch/10524299/" by David
-> Collins.
->         prior to his patch we have different architecture where 1uA will
-> change the mode to HPM mode.
->         which is not valid, so 1uA will not work any more. we have go with
-> actual current values.
-
-Ok, in any case downstream drivers shouldn't impact the design of
-upstream drivers. If there are incompatibilities the BT driver needs
-to be hacked in the downstream tree.
-
->         coming back to reading current values from dts. we have reason for
-> it.
->         let us assume that later stages of wcn3990 if we have less current
-> values than default values.
->         instead of updating the driver again, we can assign the current no
-> in the dts, which we will read.
+> > There is no entry in the change log. What is the reason for this
+> > change?
 > 
->         This is how it works.
-> 
->         if(current value for the reg is declared in dts tree)
->               consider the current value from the dts.
->         else
->            go with default value.
-> 
->       pls let me know if you any queries.
+> [Bala] : My bad i missed to add the log,as the above  if for ROME chip,
+> having INIT or OPER speed is fine.
 
-If I understand correctly you describe a hypothetical situation of a
-future wcn3990 variant having lower power requirements. I'd say let's
-deal with this when these chips actually exist and need to be
-supported by Linux. As of now it seems there is no need for current
-limits in the DT.
-
-> > > +	if (device_property_read_bool(dev, prop_name))
-> > > +		device_property_read_u32(dev, prop_name, &vregs->load_uA);
-> > 
-> > Why device_property_read_bool()?
-> > 
-> [Bala]: if the current prop is present we read from dts. else we go with
-> default current no's.
->         if block  is used to check whether the property is present in dts or
-> not.
->         this is required because before calling _regualtor_get_current() we
-> hold the default current in the vregs[].
->         if we skip the read bool here, if the current property is not
-> present then the function call of device_property_read_u32() will assign
-> zero the vregs[].
->         so we miss the default current values.
-> 
->         this how it work if we miss read_bool check
-> 
->         //vregs hold default current
->          device_property_read_u32(dev, prop_name, &vregs->load_uA);
->          the above will read the current property value from dts store in
-> the vregs.. if the property is missing in dts it will store zero.
-
-Where does of_property_read_u32() set the value to zero when the
-property does not exist?
-
-A simple test in a probe function:
-
-{
-	u32 v = 123;
-	of_property_read_u32(node, "no-such-property", &v);
-	printk("DBG: v = %d\n", v);
-}
-
-[    7.598366] DBG: v = 123
-
-And looking at the code, of_property_read_u32() ends up in a call to
-of_property_read_variable_u32_array():
-
-int of_property_read_variable_u32_array(const struct device_node *np,
-			       const char *propname, u32 *out_values,
-			       size_t sz_min, size_t sz_max)
-{
-	size_t sz, count;
-	const __be32 *val = of_find_property_value_of_size(np, propname,
-						(sz_min * sizeof(*out_values)),
-						(sz_max * sizeof(*out_values)),
-						&sz);
-
-	if (IS_ERR(val))
-		return PTR_ERR(val);
-
-	...
-}
-
-i.e. 'out_values' is not modified when the property does not exit.
+Ok, thanks for the clarification, I recall this was discussed earlier.
