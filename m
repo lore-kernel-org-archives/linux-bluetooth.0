@@ -2,8 +2,8 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH BlueZ 1/4] client: Add discoverable-timeout command
-Date: Wed, 25 Jul 2018 13:20:32 +0300
-Message-Id: <20180725102035.19439-1-luiz.dentz@gmail.com>
+Date: Wed, 25 Jul 2018 13:20:23 +0300
+Message-Id: <20180725102027.19319-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
