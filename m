@@ -1,40 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/5] doc/adapter-api: Add Discoverable option to SetDiscoveryFilter
-Date: Thu, 26 Jul 2018 17:17:19 +0300
-Message-Id: <20180726141723.20199-1-luiz.dentz@gmail.com>
+Message-ID: <43a125d60469ce919959790a88bce71707b05306.camel@hadess.net>
+Subject: Re: [PATCH BlueZ 3/4] adapter: Track pending settings
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Date: Thu, 26 Jul 2018 14:43:29 +0200
+In-Reply-To: <20180725102035.19439-3-luiz.dentz@gmail.com>
+References: <20180725102035.19439-1-luiz.dentz@gmail.com>
+         <20180725102035.19439-3-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Wed, 2018-07-25 at 13:20 +0300, Luiz Augusto von Dentz wrote:
+> -                               property_set_mode_complete, data, g_free) > 0)
+> +                       property_set_mode_complete, data, g_free) > 0)
 
-This enables the client to set its discoverable setting while
-discovering which is very typical situation as usually the setings
-application would allow incoming pairing request while scanning, so
-this would reduce the number of calls setting Discoverable and
-DiscoverableTimeout and restoring after done with discovery.
----
- doc/adapter-api.txt | 6 ++++++
- 1 file changed, 6 insertions(+)
+White space change is probably not needed here.
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index d14d0ca50..4791af2c7 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -113,6 +113,12 @@ Methods		void StartDiscovery()
- 				generated for either ManufacturerData and
- 				ServiceData everytime they are discovered.
- 
-+			bool Discoverable (Default: false)
-+
-+				Make adapter discoverable while discovering,
-+				if the adapter is already discoverable this
-+				setting this filter won't do anything.
-+
- 			When discovery filter is set, Device objects will be
- 			created as new devices with matching criteria are
- 			discovered regardless of they are connectable or
--- 
-2.17.1
+This patch and 4/4 don't work as expected though. I use this set of 2
+commands to replicate what gnome-bluetooth did:
 
+dbus-send  --system --dest=org.bluez /org/bluez/hci0
+org.freedesktop.DBus.Properties.Set string:org.bluez.Adapter1
+string:Discoverable variant:boolean:false ; dbus-send  --system --
+dest=org.bluez /org/bluez/hci0 org.freedesktop.DBus.Properties.Set
+string:org.bluez.Adapter1 string:DiscoverableTimeout variant:uint32:0
+
+You can add a "print-reply" which will wait for the caller to return.
+In my case, without the --print-reply, property_set_mode will never be
+called.
