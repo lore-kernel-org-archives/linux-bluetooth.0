@@ -1,47 +1,56 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Thu, 26 Jul 2018 11:02:28 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: Re: [PATCH BlueZ v2 0/7] Add BREDR PHYs in PHY configuration commands
-Message-ID: <20180726080228.GA7342@x1c.lan>
-References: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Cinaed Simson <cinaed.simson@gmail.com>
+Subject: Re: print_bitfield
+To: linux-bluetooth@vger.kernel.org
+References: <4b6731b3-a13c-babf-8ccf-2e1d68150521@GMail.COM>
+Message-ID: <838088d7-5df0-23a1-5508-e24a9ef257bb@GMail.COM>
+Date: Thu, 26 Jul 2018 00:50:09 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
+In-Reply-To: <4b6731b3-a13c-babf-8ccf-2e1d68150521@GMail.COM>
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Oops - I had to leave the
 
-On Wed, Jul 25, 2018, Jaganath Kanakkassery wrote:
-> This also has mgmt-tester patches for 5.0 implementation
+  struct bitfield_data
+
+in
+
+  monitor/display.h
+
+and move
+
+  inline uint64_t print_bitfield()
+
+from display.h to
+
+   monitor/packet.c
+
+-- Cinaed
+
+On 07/25/2018 11:10 PM, Cinaed Simson wrote:
 > 
-> v2-> Fixed -Werror=unused-const-variable build error
+> After installing ell, the latest git version builds on jessie provided I
+> move both
 > 
-> Jaganath Kanakkassery (7):
->   monitor: Add BREDR PHYs in PHY configuration commands
->   emulator: Add BREDR 2M & 3M, 3 & 5 Slot packet type support
->   mgmt-tester: Add extended advertising test cases
->   mgmt-tester: Add PHY Configuration test cases
->   mgmt-tester: Add tests for extended scanning and device found
->   mgmt-tester: Add support ext create connection and enh conn complete
->   mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
+>    struct bitfield_data
+>    inline uint64_t print_bitfield()
 > 
->  emulator/btdev.c    |   10 +
->  monitor/packet.c    |   39 +-
->  tools/mgmt-tester.c | 2085 ++++++++++++++++++++++++++++++++++++++++++++++++---
->  3 files changed, 2015 insertions(+), 119 deletions(-)
+> from
+> 
+>    monitor/display.h
+> 
+> to near the top of
+> 
+>    monitor/packet.c
+> 
+> Jessie is using
+> 
+>    gcc (Debian 4.9.2-10+deb8u1) 4.9.2
+> 
+> - maybe it's a compiler problem with jessie?
+> 
+> -- Cinaed
+> 
 
-Thanks, this time it builds fine. All the mgmt-tester tests pass, but
-there's something missing from the emulator:
-
-Adv. connectable & connected (slave) - Success - init
-Adv. connectable & connected (slave) - Success - setup
-Unsupported command 0x0c6d
-            01 00                                            ..
-Adv. connectable & connected (slave) - Success - setup complete
-
-That would be good to get fixed as well.
-
-Johan
