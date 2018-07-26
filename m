@@ -1,46 +1,115 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <43a125d60469ce919959790a88bce71707b05306.camel@hadess.net>
-References: <20180725102035.19439-1-luiz.dentz@gmail.com> <20180725102035.19439-3-luiz.dentz@gmail.com>
- <43a125d60469ce919959790a88bce71707b05306.camel@hadess.net>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 26 Jul 2018 17:19:14 +0300
-Message-ID: <CABBYNZ+14JwEN1=pTVaLYOzRa-PzUH=feD_X9LepFnyhTgs4xg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/4] adapter: Track pending settings
-To: Bastien Nocera <hadess@hadess.net>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 5/5] adapter: Fix not keeping discovery filters
+Date: Thu, 26 Jul 2018 17:17:23 +0300
+Message-Id: <20180726141723.20199-5-luiz.dentz@gmail.com>
+In-Reply-To: <20180726141723.20199-1-luiz.dentz@gmail.com>
+References: <20180726141723.20199-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Jul 26, 2018 at 3:43 PM, Bastien Nocera <hadess@hadess.net> wrote:
-> On Wed, 2018-07-25 at 13:20 +0300, Luiz Augusto von Dentz wrote:
->> -                               property_set_mode_complete, data, g_free) > 0)
->> +                       property_set_mode_complete, data, g_free) > 0)
->
-> White space change is probably not needed here.
->
-> This patch and 4/4 don't work as expected though. I use this set of 2
-> commands to replicate what gnome-bluetooth did:
->
-> dbus-send  --system --dest=org.bluez /org/bluez/hci0
-> org.freedesktop.DBus.Properties.Set string:org.bluez.Adapter1
-> string:Discoverable variant:boolean:false ; dbus-send  --system --
-> dest=org.bluez /org/bluez/hci0 org.freedesktop.DBus.Properties.Set
-> string:org.bluez.Adapter1 string:DiscoverableTimeout variant:uint32:0
->
-> You can add a "print-reply" which will wait for the caller to return.
-> In my case, without the --print-reply, property_set_mode will never be
-> called.
+If the discovery has been stopped and the client has set filters those
+should be put back into filter list since the client may still be
+interested in using them the next time it start a scanning.
+---
+ src/adapter.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
-It looks like dbus-send cannot be used since it exits immediately,
-anyway I tried by modifying bluetoothctl and it seems to be working
-properly:
-
-https://gist.github.com/Vudentz/69737e4cc236f24d33404fffc5e51ff4
-
-
+diff --git a/src/adapter.c b/src/adapter.c
+index bd9edddc6..822bd3472 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1854,7 +1854,7 @@ static bool set_filtered_discoverable(struct btd_adapter *adapter, bool enable)
+ 	return set_discoverable(adapter, enable, 0);
+ }
+ 
+-static void discovery_remove(struct watch_client *client)
++static void discovery_remove(struct watch_client *client, bool exit)
+ {
+ 	struct btd_adapter *adapter = client->adapter;
+ 
+@@ -1882,7 +1882,11 @@ static void discovery_remove(struct watch_client *client)
+ 			set_filtered_discoverable(adapter, false);
+ 	}
+ 
+-	discovery_free(client);
++	if (!exit && client->discovery_filter)
++		adapter->set_filter_list = g_slist_prepend(
++					adapter->set_filter_list, client);
++	else
++		discovery_free(client);
+ 
+ 	/*
+ 	 * If there are other client discoveries in progress, then leave
+@@ -1911,8 +1915,11 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
+ 		goto done;
+ 	}
+ 
+-	if (client->msg)
++	if (client->msg) {
+ 		g_dbus_send_reply(dbus_conn, client->msg, DBUS_TYPE_INVALID);
++		dbus_message_unref(client->msg);
++		client->msg = NULL;
++	}
+ 
+ 	adapter->discovery_type = 0x00;
+ 	adapter->discovery_enable = 0x00;
+@@ -1925,7 +1932,7 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
+ 	trigger_passive_scanning(adapter);
+ 
+ done:
+-	discovery_remove(client);
++	discovery_remove(client, false);
+ }
+ 
+ static int compare_sender(gconstpointer a, gconstpointer b)
+@@ -2146,14 +2153,14 @@ static int update_discovery_filter(struct btd_adapter *adapter)
+ 	return -EINPROGRESS;
+ }
+ 
+-static int discovery_stop(struct watch_client *client)
++static int discovery_stop(struct watch_client *client, bool exit)
+ {
+ 	struct btd_adapter *adapter = client->adapter;
+ 	struct mgmt_cp_stop_discovery cp;
+ 
+ 	/* Check if there are more client discovering */
+ 	if (g_slist_next(adapter->discovery_list)) {
+-		discovery_remove(client);
++		discovery_remove(client, exit);
+ 		update_discovery_filter(adapter);
+ 		return 0;
+ 	}
+@@ -2163,7 +2170,7 @@ static int discovery_stop(struct watch_client *client)
+ 	 * and so it is enough to send out the signal and just return.
+ 	 */
+ 	if (adapter->discovery_enable == 0x00) {
+-		discovery_remove(client);
++		discovery_remove(client, exit);
+ 		adapter->discovering = false;
+ 		g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 					ADAPTER_INTERFACE, "Discovering");
+@@ -2188,7 +2195,7 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
+ 
+ 	DBG("owner %s", client->owner);
+ 
+-	discovery_stop(client);
++	discovery_stop(client, true);
+ }
+ 
+ /*
+@@ -2586,7 +2593,7 @@ static DBusMessage *stop_discovery(DBusConnection *conn,
+ 	if (client->msg)
+ 		return btd_error_busy(msg);
+ 
+-	err = discovery_stop(client);
++	err = discovery_stop(client, false);
+ 	switch (err) {
+ 	case 0:
+ 		return dbus_message_new_method_return(msg);
 -- 
-Luiz Augusto von Dentz
+2.17.1
+
