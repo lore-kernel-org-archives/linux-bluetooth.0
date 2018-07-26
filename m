@@ -1,55 +1,30 @@
 Return-Path: <jaganath.k.os@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <20180726080228.GA7342@x1c.lan>
-References: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <20180726080228.GA7342@x1c.lan>
-From: Jaganath K <jaganath.k.os@gmail.com>
-Date: Thu, 26 Jul 2018 16:55:44 +0530
-Message-ID: <CAJzH+bqOsUkC048h_b1atxiBFTgQxYcGpAPqiy0ZvpRCQuSPDA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 0/7] Add BREDR PHYs in PHY configuration commands
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>,
-	"open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+From: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
 	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH BlueZ] emulator: Fix unsupported command for WRITE_LE_HOST_SUPPORTED
+Date: Thu, 26 Jul 2018 16:53:29 +0530
+Message-Id: <1532604209-32633-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+WRITE_LE_HOST_SUPPORTED command needs check for BTDEV_TYPE_LE as well.
+---
+ emulator/btdev.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-On Thu, Jul 26, 2018 at 1:32 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jaganath,
->
-> On Wed, Jul 25, 2018, Jaganath Kanakkassery wrote:
->> This also has mgmt-tester patches for 5.0 implementation
->>
->> v2-> Fixed -Werror=unused-const-variable build error
->>
->> Jaganath Kanakkassery (7):
->>   monitor: Add BREDR PHYs in PHY configuration commands
->>   emulator: Add BREDR 2M & 3M, 3 & 5 Slot packet type support
->>   mgmt-tester: Add extended advertising test cases
->>   mgmt-tester: Add PHY Configuration test cases
->>   mgmt-tester: Add tests for extended scanning and device found
->>   mgmt-tester: Add support ext create connection and enh conn complete
->>   mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
->>
->>  emulator/btdev.c    |   10 +
->>  monitor/packet.c    |   39 +-
->>  tools/mgmt-tester.c | 2085 ++++++++++++++++++++++++++++++++++++++++++++++++---
->>  3 files changed, 2015 insertions(+), 119 deletions(-)
->
-> Thanks, this time it builds fine. All the mgmt-tester tests pass, but
-> there's something missing from the emulator:
->
-> Adv. connectable & connected (slave) - Success - init
-> Adv. connectable & connected (slave) - Success - setup
-> Unsupported command 0x0c6d
->             01 00                                            ..
-> Adv. connectable & connected (slave) - Success - setup complete
->
-> That would be good to get fixed as well.
-
-This seems a bug in existing code and not related to 5.0 change.
-I have sent a separate patch for it.
-
-Thanks,
-Jaganath
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index f8289d0..ae30950 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -2960,6 +2960,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 
+ 	case BT_HCI_CMD_WRITE_LE_HOST_SUPPORTED:
+ 		if (btdev->type != BTDEV_TYPE_BREDRLE &&
++				btdev->type != BTDEV_TYPE_LE &&
+ 				btdev->type != BTDEV_TYPE_BREDRLE50)
+ 			goto unsupported;
+ 		wlhs = data;
+-- 
+2.7.4
