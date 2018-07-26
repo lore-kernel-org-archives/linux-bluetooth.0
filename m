@@ -1,61 +1,47 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <johan.hedberg@gmail.com>
+Date: Thu, 26 Jul 2018 11:02:28 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
+Subject: Re: [PATCH BlueZ v2 0/7] Add BREDR PHYs in PHY configuration commands
+Message-ID: <20180726080228.GA7342@x1c.lan>
+References: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20180725200728.11835-2-2@0x2c.org>
-References: <20180725200728.11835-1-2@0x2c.org> <20180725200728.11835-2-2@0x2c.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 26 Jul 2018 11:40:39 +0300
-Message-ID: <CABBYNZLDY1g6HuOfqpK=s_2chmCMioDqCP0t8y99+9qhm_iY=A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/1] input/hog-lib: set notify bit on every connection
-To: Simon Schubert <2@0x2c.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Simon,
+Hi Jaganath,
 
-On Wed, Jul 25, 2018 at 11:07 PM, Simon Schubert <2@0x2c.org> wrote:
-> At least the Microsoft Bluetooth Mobile Mouse 3600 does not persist
-> the CCC.  To work around this bug, we check and process the CCC like
-> we would do for an initial discovery.
-> ---
->  profiles/input/hog-lib.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-> index d9ed80689..d3439b8ba 100644
-> --- a/profiles/input/hog-lib.c
-> +++ b/profiles/input/hog-lib.c
-> @@ -1610,10 +1610,10 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
->         for (l = hog->reports; l; l = l->next) {
->                 struct report *r = l->data;
->
-> -               r->notifyid = g_attrib_register(hog->attrib,
-> -                                       ATT_OP_HANDLE_NOTIFY,
-> -                                       r->value_handle,
-> -                                       report_value_cb, r, NULL);
-> +               if (r->type == HOG_REPORT_TYPE_INPUT) {
-> +                       read_char(r->hog, r->hog->attrib,
-> +                                 r->ccc_handle, ccc_read_cb, r);
-> +               }
+On Wed, Jul 25, 2018, Jaganath Kanakkassery wrote:
+> This also has mgmt-tester patches for 5.0 implementation
+> 
+> v2-> Fixed -Werror=unused-const-variable build error
+> 
+> Jaganath Kanakkassery (7):
+>   monitor: Add BREDR PHYs in PHY configuration commands
+>   emulator: Add BREDR 2M & 3M, 3 & 5 Slot packet type support
+>   mgmt-tester: Add extended advertising test cases
+>   mgmt-tester: Add PHY Configuration test cases
+>   mgmt-tester: Add tests for extended scanning and device found
+>   mgmt-tester: Add support ext create connection and enh conn complete
+>   mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
+> 
+>  emulator/btdev.c    |   10 +
+>  monitor/packet.c    |   39 +-
+>  tools/mgmt-tester.c | 2085 ++++++++++++++++++++++++++++++++++++++++++++++++---
+>  3 files changed, 2015 insertions(+), 119 deletions(-)
 
-There is a task to convert bt_hog instance to use bt_gatt_client
-instead of GAttrib, that would fix this problem since
-bt_gatt_client_register_notify always write to the CCC for the first
-subscription.
+Thanks, this time it builds fine. All the mgmt-tester tests pass, but
+there's something missing from the emulator:
 
->         }
->
->         return true;
-> --
-> 2.18.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Adv. connectable & connected (slave) - Success - init
+Adv. connectable & connected (slave) - Success - setup
+Unsupported command 0x0c6d
+            01 00                                            ..
+Adv. connectable & connected (slave) - Success - setup complete
 
+That would be good to get fixed as well.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
