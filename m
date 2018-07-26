@@ -1,59 +1,45 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Message-ID: <1e1374adbbf31387ff5f2b36951cba9d7f4f8949.camel@hadess.net>
-Subject: Re: [PATCH BlueZ 3/4] adapter: Track pending settings
-From: Bastien Nocera <hadess@hadess.net>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 26 Jul 2018 16:28:39 +0200
-In-Reply-To: <CABBYNZ+14JwEN1=pTVaLYOzRa-PzUH=feD_X9LepFnyhTgs4xg@mail.gmail.com>
-References: <20180725102035.19439-1-luiz.dentz@gmail.com>
-         <20180725102035.19439-3-luiz.dentz@gmail.com>
-         <43a125d60469ce919959790a88bce71707b05306.camel@hadess.net>
-         <CABBYNZ+14JwEN1=pTVaLYOzRa-PzUH=feD_X9LepFnyhTgs4xg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@codecoup.pl>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@codecoup.pl>
+Subject: [PATCH] shared/gatt-client: Fix crash on ext prop read failure
+Date: Thu, 26 Jul 2018 16:25:22 +0200
+Message-Id: <20180726142522.19485-1-szymon.janc@codecoup.pl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, 2018-07-26 at 17:19 +0300, Luiz Augusto von Dentz wrote:
-> Hi,
-> 
-> On Thu, Jul 26, 2018 at 3:43 PM, Bastien Nocera <hadess@hadess.net>
-> wrote:
-> > On Wed, 2018-07-25 at 13:20 +0300, Luiz Augusto von Dentz wrote:
-> > > -                               property_set_mode_complete, data,
-> > > g_free) > 0)
-> > > +                       property_set_mode_complete, data, g_free)
-> > > > 0)
-> > 
-> > White space change is probably not needed here.
-> > 
-> > This patch and 4/4 don't work as expected though. I use this set of
-> > 2
-> > commands to replicate what gnome-bluetooth did:
-> > 
-> > dbus-send  --system --dest=org.bluez /org/bluez/hci0
-> > org.freedesktop.DBus.Properties.Set string:org.bluez.Adapter1
-> > string:Discoverable variant:boolean:false ; dbus-send  --system --
-> > dest=org.bluez /org/bluez/hci0 org.freedesktop.DBus.Properties.Set
-> > string:org.bluez.Adapter1 string:DiscoverableTimeout
-> > variant:uint32:0
-> > 
-> > You can add a "print-reply" which will wait for the caller to
-> > return.
-> > In my case, without the --print-reply, property_set_mode will never
-> > be
-> > called.
-> 
-> It looks like dbus-send cannot be used since it exits immediately,
-> anyway I tried by modifying bluetoothctl and it seems to be working
-> properly:
-> 
-> https://gist.github.com/Vudentz/69737e4cc236f24d33404fffc5e51ff4
+Program received signal SIGSEGV, Segmentation fault.
+ext_prop_read_cb (success=false, att_ecode=0 '\000', value=0x0,
+    length=0, user_data=0x72ad30) at src/shared/gatt-client.c:711
+(gdb) bt
+    length=0, user_data=0x72ad30) at src/shared/gatt-client.c:711
+    at src/shared/att.c:547
+                                         user_data=0x716070)
+    at src/shared/att.c:580
+                                          cond=<optimized out>,
+                                          user_data=<optimized out>)
+    at src/shared/io-glib.c:170
+    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+    from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+    from /lib/x86_64-linux-gnu/libglib-2.
+---
+ src/shared/gatt-client.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-I think it's a bug in bluetoothd that it would drop property change
-requests when the caller goes away, but as you said, it works as
-expected when both properties are called from a single, long-running,
-client.
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 2e153db5c..3c2aa293b 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -708,6 +708,9 @@ static void ext_prop_read_cb(bool success, uint8_t att_ecode,
+ 	bool discovering;
+ 	struct gatt_db_attribute *desc_attr = NULL;
+ 
++	if (!success)
++		goto done;
++
+ 	util_debug(client->debug_callback, client->debug_data,
+ 				"Ext. prop value: 0x%04x", (uint16_t)value[0]);
+ 
+-- 
+2.17.1
 
-Looks good
