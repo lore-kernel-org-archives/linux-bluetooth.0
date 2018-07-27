@@ -1,54 +1,32 @@
-Return-Path: <bgodavar@qualcomm.com>
-From: Balakrishna Godavarthi <bgodavar@bgodavar-linux.qualcomm.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	mka@chromium.org
-Cc: linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	thierry.escande@linaro.org,
-	rtatiya@codeaurora.org,
-	hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org,
-	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v11 5/7] Bluetooth: hci_qca: Enable 3.2 Mbps operating speed.
-Date: Fri, 27 Jul 2018 19:43:18 +0530
-Message-Id: <20180727141320.25218-6-bgodavar@bgodavar-linux.qualcomm.com>
-In-Reply-To: <20180727141320.25218-1-bgodavar@bgodavar-linux.qualcomm.com>
-References: <20180727141320.25218-1-bgodavar@bgodavar-linux.qualcomm.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <c2af6e7ef9add1c109c25c02887e08334b05479d.camel@hadess.net>
+Subject: Re: [PATCH BlueZ 2/5] adapter: Discovery filter discoverable
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Date: Fri, 27 Jul 2018 16:13:08 +0200
+In-Reply-To: <20180726141723.20199-2-luiz.dentz@gmail.com>
+References: <20180726141723.20199-1-luiz.dentz@gmail.com>
+         <20180726141723.20199-2-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+On Thu, 2018-07-26 at 17:17 +0300, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This implements the discovery filter discoverable and tracks which
+> clients had enabled it and restores the settings when the last client
+> enabling it exits.
 
-Enable Qualcomm chips to operate at 3.2Mbps.
+As mentioned on IRC, this does not work if the Discoverable filter is
+set after the discovery has started. So:
+discoverable off
+scan on
+scan.discoverable on
+show <- this will show "Discoverable" still off.
 
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
----
- drivers/bluetooth/hci_qca.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 5f8a74d65bec..a6e7d38ef931 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -877,6 +877,8 @@ static uint8_t qca_get_baudrate_value(int speed)
- 		return QCA_BAUDRATE_2000000;
- 	case 3000000:
- 		return QCA_BAUDRATE_3000000;
-+	case 3200000:
-+		return QCA_BAUDRATE_3200000;
- 	case 3500000:
- 		return QCA_BAUDRATE_3500000;
- 	default:
-@@ -891,7 +893,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	struct sk_buff *skb;
- 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
- 
--	if (baudrate > QCA_BAUDRATE_3000000)
-+	if (baudrate > QCA_BAUDRATE_3200000)
- 		return -EINVAL;
- 
- 	cmd[4] = baudrate;
--- 
-2.17.1
+Once this works, I'll re-test and push this patch to gnome-bluetooth
+which uses the new functionality when available:
+https://gitlab.gnome.org/GNOME/gnome-bluetooth/merge_requests/1
