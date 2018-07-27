@@ -11,93 +11,44 @@ Cc: linux-kernel@vger.kernel.org,
 	hemantg@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v11 1/7] dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn3990
-Date: Fri, 27 Jul 2018 19:43:14 +0530
-Message-Id: <20180727141320.25218-2-bgodavar@bgodavar-linux.qualcomm.com>
+Subject: [PATCH v11 5/7] Bluetooth: hci_qca: Enable 3.2 Mbps operating speed.
+Date: Fri, 27 Jul 2018 19:43:18 +0530
+Message-Id: <20180727141320.25218-6-bgodavar@bgodavar-linux.qualcomm.com>
 In-Reply-To: <20180727141320.25218-1-bgodavar@bgodavar-linux.qualcomm.com>
 References: <20180727141320.25218-1-bgodavar@bgodavar-linux.qualcomm.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 
-This patch enables regulators for the Qualcomm Bluetooth wcn3990
-controller.
+Enable Qualcomm chips to operate at 3.2Mbps.
 
 Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Reviewed-by: Rob Herring <robh@kernel.org>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 ---
-Changes in v11:
-    * removed entries of regulator currents.
+ drivers/bluetooth/hci_qca.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Changes in v10:
-    * added entry for regulator currents
-
-Changes in v9:
-    * updated with latest reg handle and names.
-    * updated max-speed definition. 
-
-Changes in v8:
-    * Separated the optional entries between two chips
-
-Changes in v7:
-    * no change.
-
-Changes in v6:
-
-    * Changed the oper-speed to max-speed.
-
-Changes in v5:
-
-    * Added entry for oper-speed and init-speed.
-
----
- .../bindings/net/qualcomm-bluetooth.txt       | 26 +++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-index 0ea18a53cc29..2175174415ee 100644
---- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-+++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-@@ -10,12 +10,22 @@ device the slave device is attached to.
- Required properties:
-  - compatible: should contain one of the following:
-    * "qcom,qca6174-bt"
-+   * "qcom,wcn3990-bt"
-+
-+Optional properties for compatible string qcom,qca6174-bt:
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 5f8a74d65bec..a6e7d38ef931 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -877,6 +877,8 @@ static uint8_t qca_get_baudrate_value(int speed)
+ 		return QCA_BAUDRATE_2000000;
+ 	case 3000000:
+ 		return QCA_BAUDRATE_3000000;
++	case 3200000:
++		return QCA_BAUDRATE_3200000;
+ 	case 3500000:
+ 		return QCA_BAUDRATE_3500000;
+ 	default:
+@@ -891,7 +893,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	struct sk_buff *skb;
+ 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
  
--Optional properties:
-  - enable-gpios: gpio specifier used to enable chip
-  - clocks: clock provided to the controller (SUSCLK_32KHZ)
+-	if (baudrate > QCA_BAUDRATE_3000000)
++	if (baudrate > QCA_BAUDRATE_3200000)
+ 		return -EINVAL;
  
--Example:
-+Optional properties for compatible string qcom,wcn3990-bt:
-+
-+ - vddio-supply: Bluetooth wcn3990 VDD_IO supply regulator handle.
-+ - vddxo-supply: Bluetooth wcn3990 VDD_XO supply regulator handle.
-+ - vddrf-supply: Bluetooth wcn3990 VDD_RF supply regulator handle.
-+ - vddch0-supply: Bluetooth wcn3990 VDD_CH0 supply regulator handle.
-+ - max-speed: see Documentation/devicetree/bindings/serial/slave-device.txt
-+
-+Examples:
- 
- serial@7570000 {
- 	label = "BT-UART";
-@@ -28,3 +38,15 @@ serial@7570000 {
- 		clocks = <&divclk4>;
- 	};
- };
-+
-+serial@898000 {
-+	bluetooth {
-+		compatible = "qcom,wcn3990-bt";
-+
-+		vddio-supply = <&vreg_s4a_1p8>;
-+		vddxo-supply = <&vreg_l7a_1p8>;
-+		vddrf-supply = <&vreg_l17a_1p3>;
-+		vddch0-supply = <&vreg_l25a_3p3>;
-+		max-speed = <3200000>;
-+	};
-+};
+ 	cmd[4] = baudrate;
 -- 
 2.17.1
