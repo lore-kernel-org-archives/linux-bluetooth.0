@@ -10,122 +10,157 @@ Cc: linux-kernel@vger.kernel.org,
 	rtatiya@codeaurora.org,
 	hemantg@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
-	Balakrishna Godavarthi <bgodavar@bgodavar-linux.qualcomm.com>
-Subject: [PATCH v11 0/7] Enable Bluetooth functionality for WCN3990 
-Date: Fri, 27 Jul 2018 19:43:13 +0530
-Message-Id: <20180727141320.25218-1-bgodavar@bgodavar-linux.qualcomm.com>
+	Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [PATCH v11 3/7] Bluetooth: btqca: Redefine qca_uart_setup() to generic function.
+Date: Fri, 27 Jul 2018 19:43:16 +0530
+Message-Id: <20180727141320.25218-4-bgodavar@bgodavar-linux.qualcomm.com>
+In-Reply-To: <20180727141320.25218-1-bgodavar@bgodavar-linux.qualcomm.com>
+References: <20180727141320.25218-1-bgodavar@bgodavar-linux.qualcomm.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 
-These patches enables Bluetooth functinalties for new Qualcomm
-Bluetooth chip wnc3990. As this is latest chip with new features, 
-along with some common features to old chip "qcom,qca6174-bt".
-we have updated names of functions that are used for both the chips 
-to keep this generic and would help in future when we would have new 
-BT SoC.
+Redefinition of qca_uart_setup will help future Qualcomm Bluetooth
+SoC, to use the same function instead of duplicating the function.
+Added new arguments soc_type and soc_ver to the functions.
 
-The below are difference between new and old chips.
+These arguments will help to decide type of firmware files
+to be loaded into Bluetooth chip.
+soc_type holds the Bluetooth chip connected to APPS processor.
+soc_ver holds the Bluetooth chip version.
 
-*Power:
- *New chip: we use voltage regulators to turn on/off the chip and we 
-  must send a command on Tx line to turn on/off the chip completely.
- *Old chip: We turn on/off by setting a GPIO.
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+---
+Changes in v11:
+      * added error log in qca_read_soc_version() instead of qca_setup() 
+---
+ drivers/bluetooth/btqca.c   | 23 ++++++++++-------------
+ drivers/bluetooth/btqca.h   | 13 +++++++++++--
+ drivers/bluetooth/hci_qca.c | 10 +++++++++-
+ 3 files changed, 30 insertions(+), 16 deletions(-)
 
- *Note: Turning on sequence differs between two chips.
-
-*Firmware download:
-  Only firmware file name differ from New and Old chip.
-  
-  So we reused some functions/structure/variables which are used for old 
-  chip to New chip by generic naming (may be future chips may use same functions).
-
- * As we have multiple changes for functions names,we have tested these patches 
-   on both chips.
-
-v11:
- * removed regulator current from dtbindings
- * addressed review comments.
-
-v10:
- * update current load with actual values of WCN3990.
- * added support  for itterative connect with BT chip if it fails to respond to the HOST.
- * Added regulator current dtbindings.
- * addressed review comments.
-
-v9:
- * removed smps regs.
- * hidded flow control in respective functions.
- * moved qca_soc_ver to qca_setup
- * addressed review comments.
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index c5cf9cab438a..b2163bf75b95 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -85,6 +85,12 @@ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
+ out:
+ 	kfree_skb(skb);
  
-v8:
-  * Squashed [v7 2/8] and [v7 3/8] to one patch.
-  * updated functions to set and get the UART speeds.
-  * addressed review comments.
-
-v7:
-  * Renamed all the possible function of ROME to generic.
-  * updated with review comments for hci_qca and btqca
-  * fixed kbuild errors.
-  * created wrapper functions for re-usable blocks.
++	if (!err && *soc_version == 0)
++		err = -EILSEQ;
++
++	if (err)
++		bt_dev_err(hdev, "QCA Failed to get version (%d)", err);
++
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(qca_read_soc_version);
+@@ -327,9 +333,9 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+ }
+ EXPORT_SYMBOL_GPL(qca_set_bdaddr_rome);
  
-v6:
-  * Hooked up qca_power to qca_serdev.
-  * renamed all the naming inconsistency functions with qca_*
-  * leveraged common code of ROME for wcn3990.
-  * created wrapper functions for re-usable blocks.
-  * updated function of _*regulator_enable and _*regualtor_disable.  
-  * removed redundant comments and functions.
-  * add code to derive the firmware files based on ROM Version.
-  * created new patch for common function of ROME and wcn3990.
-  * enables Qualcomm chip to operate at 3.2Mbps.
-  * updated names of functions that are used for both the chips to keep this generic. 
-
-v5:
-  * updated with review comments for hci_qca and btqca
+-int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
++int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
++		   enum qca_btsoc_type soc_type, u32 soc_ver)
+ {
+-	u32 rome_ver = 0;
+ 	struct rome_config config;
+ 	int err;
  
-v4:
-  * rebased all changes on top of bluetooth-next.
-  * addressed review comments.
-  * New patch created for firmware download.
-
-v3:
-  * Rebased all changes on top of bluetooth-next.
-  * dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn3990
-    - added dt-binding snippet for bluetooth chip wcn3990.
-  * Bluetooth: Add support for wcn3990 soc.
-    - updated BT_INFO with bt_dev_info, where ever necessary.
-
-v2:
-   * Add support for wcn3990:
-    These changes are aligned as per serdev frame work.
-          We implemented these changes on top of https://patchwork.kernel.org/patch/10316093/
-        As this patch enable serdev for one of the Qualcomm BT chip.
-
-        The changes in the patch include.
-        - Adding support to voting up/down regulators for WCN3990.
-           - Bluetooth firmware download for wcn3990.
-
-  * Add device tree bindings for Atheros chips:
-          These changes are on top of https://patchwork.kernel.org/patch/10316097/.
-          - Description of device tree bindings.
-
-
-Balakrishna Godavarthi (7):
-  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
-    wcn3990
-  Bluetooth: btqca: Rename ROME specific functions to generic functions
-  Bluetooth: btqca: Redefine qca_uart_setup() to generic function.
-  Bluetooth: hci_qca: Add wrapper functions for setting UART speed
-  Bluetooth: hci_qca: Enable 3.2 Mbps operating speed.
-  Bluetooth: btqca: Add wcn3990 firmware download support.
-  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990
-
- .../bindings/net/qualcomm-bluetooth.txt       |  26 +-
- drivers/bluetooth/btqca.c                     | 119 +++--
- drivers/bluetooth/btqca.h                     |  22 +-
- drivers/bluetooth/hci_qca.c                   | 505 ++++++++++++++++--
- 4 files changed, 556 insertions(+), 116 deletions(-)
-
+@@ -337,19 +343,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
+ 
+ 	config.user_baud_rate = baudrate;
+ 
+-	/* Get QCA version information */
+-	err = qca_read_soc_version(hdev, &rome_ver);
+-	if (err < 0 || rome_ver == 0) {
+-		bt_dev_err(hdev, "QCA Failed to get version %d", err);
+-		return err;
+-	}
+-
+-	bt_dev_info(hdev, "QCA controller version 0x%08x", rome_ver);
+-
+ 	/* Download rampatch file */
+ 	config.type = TLV_TYPE_PATCH;
+ 	snprintf(config.fwname, sizeof(config.fwname), "qca/rampatch_%08x.bin",
+-		 rome_ver);
++		 soc_ver);
+ 	err = qca_download_firmware(hdev, &config);
+ 	if (err < 0) {
+ 		bt_dev_err(hdev, "QCA Failed to download patch (%d)", err);
+@@ -359,7 +356,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
+ 	/* Download NVM configuration */
+ 	config.type = TLV_TYPE_NVM;
+ 	snprintf(config.fwname, sizeof(config.fwname), "qca/nvm_%08x.bin",
+-		 rome_ver);
++		 soc_ver);
+ 	err = qca_download_firmware(hdev, &config);
+ 	if (err < 0) {
+ 		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 5c9851b11838..a9c2779f3e07 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -124,10 +124,18 @@ struct tlv_type_hdr {
+ 	__u8   data[0];
+ } __packed;
+ 
++enum qca_btsoc_type {
++	QCA_INVALID = -1,
++	QCA_AR3002,
++	QCA_ROME,
++	QCA_WCN3990
++};
++
+ #if IS_ENABLED(CONFIG_BT_QCA)
+ 
+ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+-int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate);
++int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
++		   enum qca_btsoc_type soc_type, u32 soc_ver);
+ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+ 
+ #else
+@@ -137,7 +145,8 @@ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdad
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate)
++static inline int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
++				 enum qca_btsoc_type soc_type, u32 soc_ver)
+ {
+ 	return -EOPNOTSUPP;
+ }
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index d7b60669b656..5f1c0a8fd5cd 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -929,6 +929,7 @@ static int qca_setup(struct hci_uart *hu)
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned int speed, qca_baudrate = QCA_BAUDRATE_115200;
+ 	int ret;
++	int soc_ver = 0;
+ 
+ 	bt_dev_info(hdev, "ROME setup");
+ 
+@@ -965,8 +966,15 @@ static int qca_setup(struct hci_uart *hu)
+ 		host_set_baudrate(hu, speed);
+ 	}
+ 
++	/* Get QCA version information */
++	ret = qca_read_soc_version(hdev, &soc_ver);
++	if (ret)
++		return ret;
++
++	bt_dev_info(hdev, "QCA controller version 0x%08x", soc_ver);
++
+ 	/* Setup patch / NVM configurations */
+-	ret = qca_uart_setup(hdev, qca_baudrate);
++	ret = qca_uart_setup(hdev, qca_baudrate, QCA_ROME, soc_ver);
+ 	if (!ret) {
+ 		set_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+ 		qca_debugfs_init(hdev);
 -- 
 2.17.1
