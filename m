@@ -1,42 +1,27 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-References: <df27512d09d5be118ef4228a559b770f3bd0e2e4.1531830577.git.sean.wang@mediatek.com>
-In-Reply-To: <df27512d09d5be118ef4228a559b770f3bd0e2e4.1531830577.git.sean.wang@mediatek.com>
-From: Josh Boyer <jwboyer@kernel.org>
-Date: Fri, 27 Jul 2018 11:11:54 -0400
-Message-ID: <CA+5PVA4D=1GAzs9k3pxyqOE7eruhuoWz=5T4sh2EQzRUkYAvhA@mail.gmail.com>
-Subject: Re: [RESEND PATCH] linux-firmware: mediatek: add MT7622 Bluetooth
- firmwares and license file
-To: sean.wang@mediatek.com
-Cc: David Woodhouse <dwmw2@infradead.org>,
-        Ben Hutchings <ben@decadent.org.uk>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Firmware <linux-firmware@kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org,
-        "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+Message-ID: <b22c52f2a72344e284ad555b13526f7f887354de.camel@hadess.net>
+Subject: Re: [PATCH BlueZ 1/2] core: Add AlwaysPairable to main.conf
+From: Bastien Nocera <hadess@hadess.net>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Date: Fri, 27 Jul 2018 16:17:43 +0200
+In-Reply-To: <20180727130218.16975-1-luiz.dentz@gmail.com>
+References: <20180727130218.16975-1-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 17, 2018 at 8:32 AM <sean.wang@mediatek.com> wrote:
->
-> From: Sean Wang <sean.wang@mediatek.com>
->
-> Add MT7622 Bluetooth firmware files, along with the corresponding MediaTek
-> license file.
->
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
->  LICENCE.mediatek        |   9 +++++++++
->  WHENCE                  |   9 +++++++++
->  mediatek/mt7622pr2h.bin | Bin 0 -> 78158 bytes
->  3 files changed, 18 insertions(+)
->  create mode 100644 LICENCE.mediatek
->  create mode 100755 mediatek/mt7622pr2h.bin
+On Fri, 2018-07-27 at 16:02 +0300, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds a new option called AlwaysPairable to main.conf, it can be
+> used to enable Adapter.Pairable even in case there is no Agent
+> available.
+> 
+> Since that could be consider a security problem to allow pairing
+> without user's consent the option defaults to false.
 
-Applied and pushed out.  Thanks.
-
-josh
+This seems to work as expected. After disabling the agent in
+bluetoothctl, and making the adapter discoverable, I can't start a
+pairing from an iPhone, as was tested.
