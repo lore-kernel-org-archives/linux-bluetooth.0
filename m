@@ -1,63 +1,49 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: [PATCH v5 00/16] Bluetooth: Extended Adv, Scan, Connection and
- PHY support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1532000387-3649-1-git-send-email-jaganathx.kanakkassery@intel.com>
-Date: Mon, 30 Jul 2018 13:58:26 +0200
-Cc: linux-bluetooth@vger.kernel.org,
-        Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Message-Id: <9B5300EA-EA7B-46E7-A171-84A69F4578AC@holtmann.org>
-References: <1532000387-3649-1-git-send-email-jaganathx.kanakkassery@intel.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hidp: Fix handling of strncpy for hid->name information
+Date: Mon, 30 Jul 2018 13:57:41 +0200
+Message-Id: <20180730115741.80946-1-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+This fixes two issues with setting hid->name information.
 
-> Implemented Get, Set PHY Configuration and setting of PHY in
-> Advertising. Also implemented extended advertising,
-> scanning and connection.
-> 
-> v2: Fixed kbuild warnings
-> v3: Added BREDR packet types in PHY Configurtion commands and events
-> v4: Added default phys as variable in hdev and removed same from hci flags
-> v5: Applied Marcel's comments
-> 
-> Jaganath Kanakkassery (16):
->  Bluetooth: Define PHY flags in hdev and set 1M as default
->  Bluetooth: Add defines for BREDR pkt_type and LE PHYs
->  Bluetooth: Implement Get PHY Configuration mgmt command
->  Bluetooth: Implement Set PHY Confguration command
->  Bluetooth: Implement PHY changed event
->  Bluetooth: Set Scan PHYs based on selected PHYs by user
->  Bluetooth: Handle extended ADV PDU types
->  Bluetooth: Use selected PHYs in extended connect
->  Bluetooth: Read no of adv sets during init
->  Bluetooth: Impmlement extended adv enable
->  Bluetooth: Use Set ext adv/scan rsp data if controller supports
->  Bluetooth: Implement disable and removal of adv instance
->  Bluetooth: Use ext adv for directed adv
->  Bluetooth: Implement Set ADV set random address
->  Bluetooth: Handle ADv set terminated event
->  Bluetooth: Implement secondary advertising on different PHYs
-> 
-> include/net/bluetooth/hci.h      | 118 +++++++++-
-> include/net/bluetooth/hci_core.h |  26 ++
-> include/net/bluetooth/mgmt.h     |  55 +++++
-> net/bluetooth/hci_conn.c         | 151 +++++++++---
-> net/bluetooth/hci_core.c         |  72 +++++-
-> net/bluetooth/hci_event.c        | 250 ++++++++++++++++++--
-> net/bluetooth/hci_request.c      | 498 ++++++++++++++++++++++++++++++++++-----
-> net/bluetooth/hci_request.h      |   8 +
-> net/bluetooth/mgmt.c             | 405 ++++++++++++++++++++++++++++++-
-> 9 files changed, 1451 insertions(+), 132 deletions(-)
+  CC      net/bluetooth/hidp/core.o
+In function ‘hidp_setup_hid’,
+    inlined from ‘hidp_session_dev_init’ at net/bluetooth/hidp/core.c:815:9,
+    inlined from ‘hidp_session_new’ at net/bluetooth/hidp/core.c:953:8,
+    inlined from ‘hidp_connection_add’ at net/bluetooth/hidp/core.c:1366:8:
+net/bluetooth/hidp/core.c:778:2: warning: ‘strncpy’ output may be truncated copying 127 bytes from a string of length 127 [-Wstringop-truncation]
+  strncpy(hid->name, req->name, sizeof(req->name) - 1);
+  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-all 16 patches have been applied to bluetooth-next tree.
+  CC      net/bluetooth/hidp/core.o
+net/bluetooth/hidp/core.c: In function ‘hidp_setup_hid’:
+net/bluetooth/hidp/core.c:778:38: warning: argument to ‘sizeof’ in ‘strncpy’ call is the same expression as the source; did you mean to use the size of the destination? [-Wsizeof-pointer-memaccess]
+  strncpy(hid->name, req->name, sizeof(req->name));
+                                      ^
 
-Regards
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hidp/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Marcel
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 1036e4fa1ea2..6f3eaf2fb94f 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -775,7 +775,7 @@ static int hidp_setup_hid(struct hidp_session *session,
+ 	hid->version = req->version;
+ 	hid->country = req->country;
+ 
+-	strncpy(hid->name, req->name, sizeof(req->name) - 1);
++	strncpy(hid->name, req->name, sizeof(hid->name));
+ 
+ 	snprintf(hid->phys, sizeof(hid->phys), "%pMR",
+ 		 &l2cap_pi(session->ctrl_sock->sk)->chan->src);
+-- 
+2.17.1
 
