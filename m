@@ -1,40 +1,31 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/5] doc/adapter-api: Add Discoverable option to SetDiscoveryFilter
-Date: Mon, 30 Jul 2018 09:44:20 +0300
-Message-Id: <20180730064424.13996-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <andrea.parri@amarulasolutions.com>
+Date: Mon, 30 Jul 2018 05:10:30 +0200
+From: Andrea Parri <andrea.parri@amarulasolutions.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeffy Chen <jeffy.chen@rock-chips.com>,
+	Brian Norris <briannorris@chromium.org>,
+	AL Yu-Chen Cho <acho@suse.com>
+Subject: [Question] bluetooth/{bnep,cmtp,hidp}: memory barriers
+Message-ID: <20180730031030.GA9430@andrea>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-This enables the client to set its discoverable setting while
-discovering which is very typical situation as usually the setings
-application would allow incoming pairing request while scanning, so
-this would reduce the number of calls setting Discoverable and
-DiscoverableTimeout and restoring after done with discovery.
----
- doc/adapter-api.txt | 6 ++++++
- 1 file changed, 6 insertions(+)
+I'm currently puzzled by the the three calls to smp_mb__before_atomic()
+in bnep_session(), cmtp_session() and hidp_session_run() respectively:
 
-diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-index d14d0ca50..4791af2c7 100644
---- a/doc/adapter-api.txt
-+++ b/doc/adapter-api.txt
-@@ -113,6 +113,12 @@ Methods		void StartDiscovery()
- 				generated for either ManufacturerData and
- 				ServiceData everytime they are discovered.
- 
-+			bool Discoverable (Default: false)
-+
-+				Make adapter discoverable while discovering,
-+				if the adapter is already discoverable this
-+				setting this filter won't do anything.
-+
- 			When discovery filter is set, Device objects will be
- 			created as new devices with matching criteria are
- 			discovered regardless of they are connectable or
--- 
-2.17.1
+On the one hand, these barriers provide no guarantee on the subsequent
+atomic_read(s->terminate) (as the comments preceding the barriers seem
+to suggest), because atomic_read() is not a read-modify-write.
 
+On the other hand, I'm currently unable to say *why such an "mb" would
+be required: not being too familiar with this code, I figured I should
+ask before sending a patch.  ;-)
+
+  Andrea
