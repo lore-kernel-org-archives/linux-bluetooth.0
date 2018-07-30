@@ -1,9 +1,9 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 6/6] client: Commit changes to scan filter if active
-Date: Mon, 30 Jul 2018 14:14:27 +0300
-Message-Id: <20180730111427.29947-6-luiz.dentz@gmail.com>
+Subject: [PATCH v3 5/6] adapter: Fix not keeping discovery filters
+Date: Mon, 30 Jul 2018 14:14:26 +0300
+Message-Id: <20180730111427.29947-5-luiz.dentz@gmail.com>
 In-Reply-To: <20180730111427.29947-1-luiz.dentz@gmail.com>
 References: <20180730111427.29947-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,131 +11,105 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This detects if the command scan has been triggered and if so commit
-changes to filter immediatelly so they take effect in the current
-session.
+If the discovery has been stopped and the client has set filters those
+should be put back into filter list since the client may still be
+interested in using them the next time it start a scanning.
 ---
- client/main.c | 55 +++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 38 insertions(+), 17 deletions(-)
+ src/adapter.c | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/client/main.c b/client/main.c
-index 1a66a3ab4..4d848176c 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1139,6 +1139,24 @@ static void cmd_default_agent(int argc, char *argv[])
- 	agent_default(dbus_conn, agent_manager);
+diff --git a/src/adapter.c b/src/adapter.c
+index ecd2c40ae..c24432125 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -1858,7 +1858,7 @@ static bool set_discovery_discoverable(struct btd_adapter *adapter, bool enable)
+ 	return set_discoverable(adapter, enable, 0);
  }
  
-+#define	DISTANCE_VAL_INVALID	0x7FFF
-+
-+static struct set_discovery_filter_args {
-+	char *transport;
-+	dbus_uint16_t rssi;
-+	dbus_int16_t pathloss;
-+	char **uuids;
-+	size_t uuids_len;
-+	dbus_bool_t duplicate;
-+	dbus_bool_t discoverable;
-+	bool set;
-+	bool active;
-+} filter = {
-+	.rssi = DISTANCE_VAL_INVALID,
-+	.pathloss = DISTANCE_VAL_INVALID,
-+	.set = true,
-+};
-+
- static void start_discovery_reply(DBusMessage *message, void *user_data)
+-static void discovery_remove(struct watch_client *client)
++static void discovery_remove(struct watch_client *client, bool exit)
  {
- 	dbus_bool_t enable = GPOINTER_TO_UINT(user_data);
-@@ -1154,26 +1172,11 @@ static void start_discovery_reply(DBusMessage *message, void *user_data)
+ 	struct btd_adapter *adapter = client->adapter;
+ 
+@@ -1870,7 +1870,11 @@ static void discovery_remove(struct watch_client *client)
+ 	adapter->discovery_list = g_slist_remove(adapter->discovery_list,
+ 								client);
+ 
+-	discovery_free(client);
++	if (!exit && client->discovery_filter)
++		adapter->set_filter_list = g_slist_prepend(
++					adapter->set_filter_list, client);
++	else
++		discovery_free(client);
+ 
+ 	/*
+ 	 * If there are other client discoveries in progress, then leave
+@@ -1899,8 +1903,11 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
+ 		goto done;
  	}
  
- 	bt_shell_printf("Discovery %s\n", enable ? "started" : "stopped");
-+
-+	filter.active = enable;
- 	/* Leave the discovery running even on noninteractive mode */
+-	if (client->msg)
++	if (client->msg) {
+ 		g_dbus_send_reply(dbus_conn, client->msg, DBUS_TYPE_INVALID);
++		dbus_message_unref(client->msg);
++		client->msg = NULL;
++	}
+ 
+ 	adapter->discovery_type = 0x00;
+ 	adapter->discovery_enable = 0x00;
+@@ -1913,7 +1920,7 @@ static void stop_discovery_complete(uint8_t status, uint16_t length,
+ 	trigger_passive_scanning(adapter);
+ 
+ done:
+-	discovery_remove(client);
++	discovery_remove(client, false);
  }
  
--#define	DISTANCE_VAL_INVALID	0x7FFF
--
--static struct set_discovery_filter_args {
--	char *transport;
--	dbus_uint16_t rssi;
--	dbus_int16_t pathloss;
--	char **uuids;
--	size_t uuids_len;
--	dbus_bool_t duplicate;
--	dbus_bool_t discoverable;
--	bool set;
--} filter = {
--	.rssi = DISTANCE_VAL_INVALID,
--	.pathloss = DISTANCE_VAL_INVALID,
--	.set = true,
--};
--
- static void set_discovery_filter_setup(DBusMessageIter *iter, void *user_data)
+ static int compare_sender(gconstpointer a, gconstpointer b)
+@@ -2148,14 +2155,14 @@ static int update_discovery_filter(struct btd_adapter *adapter)
+ 	return -EINPROGRESS;
+ }
+ 
+-static int discovery_stop(struct watch_client *client)
++static int discovery_stop(struct watch_client *client, bool exit)
  {
- 	struct set_discovery_filter_args *args = user_data;
-@@ -1302,6 +1305,9 @@ static void cmd_scan_filter_uuids(int argc, char *argv[])
+ 	struct btd_adapter *adapter = client->adapter;
+ 	struct mgmt_cp_stop_discovery cp;
  
- commit:
- 	filter.set = false;
-+
-+	if (filter.active)
-+		set_discovery_filter();
- }
- 
- static void cmd_scan_filter_rssi(int argc, char *argv[])
-@@ -1316,6 +1322,9 @@ static void cmd_scan_filter_rssi(int argc, char *argv[])
- 	filter.rssi = atoi(argv[1]);
- 
- 	filter.set = false;
-+
-+	if (filter.active)
-+		set_discovery_filter();
- }
- 
- static void cmd_scan_filter_pathloss(int argc, char *argv[])
-@@ -1331,6 +1340,9 @@ static void cmd_scan_filter_pathloss(int argc, char *argv[])
- 	filter.pathloss = atoi(argv[1]);
- 
- 	filter.set = false;
-+
-+	if (filter.active)
-+		set_discovery_filter();
- }
- 
- static void cmd_scan_filter_transport(int argc, char *argv[])
-@@ -1346,6 +1358,9 @@ static void cmd_scan_filter_transport(int argc, char *argv[])
- 	filter.transport = g_strdup(argv[1]);
- 
- 	filter.set = false;
-+
-+	if (filter.active)
-+		set_discovery_filter();
- }
- 
- static void cmd_scan_filter_duplicate_data(int argc, char *argv[])
-@@ -1366,6 +1381,9 @@ static void cmd_scan_filter_duplicate_data(int argc, char *argv[])
+ 	/* Check if there are more client discovering */
+ 	if (g_slist_next(adapter->discovery_list)) {
+-		discovery_remove(client);
++		discovery_remove(client, exit);
+ 		update_discovery_filter(adapter);
+ 		return 0;
  	}
+@@ -2168,7 +2175,7 @@ static int discovery_stop(struct watch_client *client)
+ 	 * and so it is enough to send out the signal and just return.
+ 	 */
+ 	if (adapter->discovery_enable == 0x00) {
+-		discovery_remove(client);
++		discovery_remove(client, exit);
+ 		adapter->discovering = false;
+ 		g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 					ADAPTER_INTERFACE, "Discovering");
+@@ -2193,7 +2200,7 @@ static void discovery_disconnect(DBusConnection *conn, void *user_data)
  
- 	filter.set = false;
-+
-+	if (filter.active)
-+		set_discovery_filter();
+ 	DBG("owner %s", client->owner);
+ 
+-	discovery_stop(client);
++	discovery_stop(client, true);
  }
  
- static void cmd_scan_filter_discoverable(int argc, char *argv[])
-@@ -1386,6 +1404,9 @@ static void cmd_scan_filter_discoverable(int argc, char *argv[])
- 	}
+ /*
+@@ -2583,7 +2590,7 @@ static DBusMessage *stop_discovery(DBusConnection *conn,
+ 	if (client->msg)
+ 		return btd_error_busy(msg);
  
- 	filter.set = false;
-+
-+	if (filter.active)
-+		set_discovery_filter();
- }
- 
- static void filter_clear_uuids(void)
+-	err = discovery_stop(client);
++	err = discovery_stop(client, false);
+ 	switch (err) {
+ 	case 0:
+ 		return dbus_message_new_method_return(msg);
 -- 
 2.17.1
 
