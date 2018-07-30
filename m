@@ -1,49 +1,80 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: [PATCH v2 1/5] doc/adapter-api: Add Discoverable option to
- SetDiscoveryFilter
+Subject: Re: bluez: A2DP backchannel
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180730064424.13996-1-luiz.dentz@gmail.com>
-Date: Mon, 30 Jul 2018 13:09:39 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4D53D61B-794E-43C5-9D3B-79FBF1175208@holtmann.org>
-References: <20180730064424.13996-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <20180728192649.7aryivyczpr2ek47@pali>
+Date: Mon, 30 Jul 2018 13:05:33 +0200
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <4BA0F4BA-1CA9-46F1-8A86-212321742D4B@holtmann.org>
+References: <20180711110406.hkcqfjkmxsqq5xqk@pali>
+ <CABBYNZJQPJOz75cZ4M8WZO0ZL29ePnsi1V1Y1Rc6S-=DT0ox+w@mail.gmail.com>
+ <20180711143747.lg6ve2lxkfphkftt@pali> <20180728192649.7aryivyczpr2ek47@pali>
+To: =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Pali,
 
-> This enables the client to set its discoverable setting while
-> discovering which is very typical situation as usually the setings
-> application would allow incoming pairing request while scanning, so
-> this would reduce the number of calls setting Discoverable and
-> DiscoverableTimeout and restoring after done with discovery.
-> ---
-> doc/adapter-api.txt | 6 ++++++
-> 1 file changed, 6 insertions(+)
+>>>> Some vendor A2DP bluetooth codecs like FastStream or aptX Low Latency
+>>>> supports backchannel. Which means that they are bi-directional and in
+>>>> A2DP they supports not only (music) playback, but also receiving
+>>>> backchannel (microphone) voice.
+>>>> 
+>>>> How to establish this bi-directional A2DP transfer with backchannel via
+>>>> bluez daemon?
+>>> 
+>>> There is no such thing as bi-directional in AVDTP, which is a screw up
+>>> from the spec authors,
+>> 
+>> So it means that those vendor A2DP codecs somehow extends AVDTP, right?
+>> I would need to figure out how A2DP devices send voice data... At least
+>> backchannel activation for FastStream is via one bit in codec parameters
+>> like other codec parameters.
+>> 
+>>> luckily we don't have to stick to it since our
+>>> sockets are bi-directional so you can send and receive data at same
+>>> time, though the configuration must be the same in either direction
+>>> otherwise we would have to support transport multiplexing to have
+>>> multiple configuration done using the same channel.
+>> 
+>> So does it mean that I can read from file descriptor received from dbus
+>> which is used for sending encoded A2DP audio samples? And if other side
+>> (e.g device with FastStream or aptX LL vendor codec) send voice via A2DP
+>> then I receive them on that file descriptor?
 > 
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index d14d0ca50..4791af2c7 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -113,6 +113,12 @@ Methods		void StartDiscovery()
-> 				generated for either ManufacturerData and
-> 				ServiceData everytime they are discovered.
+> Now I established A2DP connection with FastStream codec and in btmon I
+> see that my headset started sending some data to channel 65 in this A2DP
+> mode.
 > 
-> +			bool Discoverable (Default: false)
-> +
-> +				Make adapter discoverable while discovering,
-> +				if the adapter is already discoverable this
-> +				setting this filter won't do anything.
-> +
-> 			When discovery filter is set, Device objects will be
-> 			created as new devices with matching criteria are
-> 			discovered regardless of they are connectable or
+> So definitely it is possible to send data from headset to computer (that
+> backchannel) in A2DP mode despite what A2DP specification says.
+> 
+> I managed to modify pulseaudio code to start encoding and streaming
+> FastStream data to headset and it is working.
+> 
+> Now the challenge would be how to get those data which headset send to
+> channel 65? Is bluez really sending them via file descriptor which is
+> used for writing from host to headset?
+> 
+> Via btmon I was able to dump data from this channel 65 and via some
+> sed/perl magic I converted received voice data and played it:
+> 
+> $ btmon > /tmp/dump
+> CTRL+C
+> $ grep 'Channel: 65' -A 14 /tmp/dump | grep '^        ' | sed 's/^        //;s/  .*//' | tr ' ' '\n' | perl -ne 'print chr(hex($_))' > /tmp/voice.sbc
+> $ sbcdec -f /tmp/voice.snd /tmp/voice.sbc
+> $ play /tmp/voice.snd
+> 
+> And I heard clear voice. So FastStream is really just rebranded SBC
+> codec (with fixed parameters; without RTP) and in A2DP bluetooth profile
+> provides nice bi-directional channels.
 
-I am now regretting that we didn’t add a uint32 Flags parameter to Start Service Discovery mgmt command if this is something that is often done. Letting the kernel coordinate this properly for the lifetime of the discovery would be best. Otherwise things start to get racy eventually. Meaning that when implementing this in bluetoothd, we need to be careful to handle other mgmt commands correctly that might be issued from non-bluetoothd applications.
+can you show us at least a few of these channel 65 frames from btmon decoding. If it is via L2CAP fixed PSM, then in theory there needs to be some sort of channel establishment. Or if this via L2CAP fixed CID, then it is essentially unicast connectionless data. Both can be handled via L2CAP sockets, but you need to create sockets for these to receive the data.
+
+On a side note, fixed CID 65 and fixed PSM 65 are both Bluetooth SIG reserved values, so seems like this codec is still violating the standard.
 
 Regards
 
