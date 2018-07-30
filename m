@@ -1,212 +1,156 @@
-Return-Path: <mka@chromium.org>
-Date: Mon, 30 Jul 2018 13:07:03 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
-	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v10 7/7] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth chip wcn3990
-Message-ID: <20180730200703.GB68975@google.com>
-References: <20180720133243.6851-1-bgodavar@codeaurora.org>
- <20180720133243.6851-8-bgodavar@codeaurora.org>
- <20180723195441.GM129942@google.com>
- <81c324ee9104508cf5c862de3f697e4c@codeaurora.org>
- <20180725183144.GQ129942@google.com>
- <0666f40967de21db9ef3df9d94517ac1@codeaurora.org>
- <20180726195129.GW129942@google.com>
- <ba5c7f6cc8ba7c010ccd6c3573a5d234@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <ba5c7f6cc8ba7c010ccd6c3573a5d234@codeaurora.org>
+In-Reply-To: <E042522B-87CF-4885-86A6-ADC9EF349991@holtmann.org>
+References: <20180711110406.hkcqfjkmxsqq5xqk@pali> <CABBYNZJQPJOz75cZ4M8WZO0ZL29ePnsi1V1Y1Rc6S-=DT0ox+w@mail.gmail.com>
+ <20180711143747.lg6ve2lxkfphkftt@pali> <20180728192649.7aryivyczpr2ek47@pali>
+ <4BA0F4BA-1CA9-46F1-8A86-212321742D4B@holtmann.org> <20180730171001.gehfsvgcnlf4jzzi@pali>
+ <1449F90F-E5EE-43E3-8E3F-77DC50B1A722@holtmann.org> <20180730182532.abvthspuafhdbdl5@pali>
+ <E042522B-87CF-4885-86A6-ADC9EF349991@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 30 Jul 2018 22:54:02 +0300
+Message-ID: <CABBYNZLah==i4KYcH1QEXFZTbCrJzn=XdBhGnGrrRsy-m6ogkQ@mail.gmail.com>
+Subject: Re: bluez: A2DP backchannel
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jul 27, 2018 at 05:09:02PM +0530, Balakrishna Godavarthi wrote:
-> Hi Matthias,
-> 
-> On 2018-07-27 01:21, Matthias Kaehlcke wrote:
-> > On Thu, Jul 26, 2018 at 07:51:13PM +0530, Balakrishna Godavarthi wrote:
-> > > Hi Matthias,
-> > > 
-> > > On 2018-07-26 00:01, Matthias Kaehlcke wrote:
-> > > > On Tue, Jul 24, 2018 at 09:25:16PM +0530, Balakrishna Godavarthi wrote:
-> > > > > Hi Matthias,
-> > > > >
-> > > > > On 2018-07-24 01:24, Matthias Kaehlcke wrote:
-> > > > > > On Fri, Jul 20, 2018 at 07:02:43PM +0530, Balakrishna Godavarthi wrote:
-> > > > > > > +	 * sometimes we will face communication synchronization issues,
-> > > > > > > +	 * like reading version command timeouts. In which HCI_SETUP fails,
-> > > > > > > +	 * to overcome these issues, we try to communicate by performing an
-> > > > > > > +	 * COLD power OFF and ON.
-> > > > > > > +	 */
-> > > > > > > +	for (i = 1; i <= 10 && ret; i++) {
-> > > > > >
-> > > > > > Is it really that bad that more than say 3 iterations might be needed?
-> > > > > >
-> > > > > [Bala]: will restrict to 3 iterations.
-> > > >
-> > > > Is 3x expected to be enough to 'guarantee' as successful
-> > > > initialization? Just wondered about the 10x since it suddendly changed
-> > > > from 1x. What is the failure rate without retries?
-> > > >
-> > > > Could you provide more information about the 'communication
-> > > > synchronization issues'? Is the root cause understood? Maybe there is
-> > > > a better way than retries.
-> > > >
-> > > 
-> > > [Bala]: basically before sending a every patch series we run a
-> > > stress test
-> > > to the driver to detect the bugs.
-> > >         in recent test results found one interesting bug that BT
-> > > setups
-> > > fails with version request timeouts,
-> > >         after we do a reboot for the device.
-> > >         we debugged the issue and found that wcn3900 is not
-> > > responding to
-> > > the version request commands
-> > >         sent by HOST. this is because before reboot, wcn3990 is in
-> > > on state
-> > > i.e. we are communicating to device.
-> > >         then we did a reboot and HOST is not sending a power off
-> > > request to
-> > > the regulators to turn off.
-> > >         so after reboot wcn3990 is still in ON state where it will not
-> > > respond to version request commands which in turn fails HCI_SETUP.
-> > >         so we are sending the power off pulse and then sending the
-> > > power on
-> > > pulse.
-> > >         coming back to 3x or 10x iteration this is to avoid any such
-> > > synchronization issues.
-> > >         i agreed for 3x because of stress test results. we have
-> > > success rate
-> > > of 99% for single iteration, where as 3x iterations will helps to
-> > > handle 1%
-> > > fails cases.
-> > 
-> > Thanks for the clarification. Couldn't you assure the device is in a
-> > defined state by calling qca_power_shutdown() as one of the first
-> > things in qca_wcn3990_init()?
-> 
-> [Bala]:  we have reasons behind writing qca_power_setup(true) at the start.
-> 
->         1. the reason to add iteration here, is to handle BT fails cases
-> either due to communication failure of wcn3900 or due to regulator issues.
->            before calling qca_setup(), we have our regulator turned on and
-> in qca_setup i.e. init routine if we added power_shutdown as first statement
-> before
->            communicating with chip then regulator will be off and again we
-> need to call function to ON regulators.
->            so it could be some thing like this
-> 
->            init(){
-> 
->                for () {
->                      shutdown() // regs are off
->                      poweron(true) // regs are on.
->                      if(!start communicating with chip()) {
->                         break;
->                       }
-> 
->                }
->            }
->            as the reason to add the iteration handling is to overcome 1% of
-> fail cases, so every time when we call it will turn off the regs and turn it
-> back. which require an turning in off regs and on it back for 99% pass
->             cases.
+Hi Marcel,
 
-But would turning off the regs really add a significant delay here?
-The setup is already really slow, with a 100ms delay in the
-loop (still wonder if booting the chip without loading firmware really
-takes that long) and later the firmware is loaded.
+On Mon, Jul 30, 2018 at 10:39 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Pali,
+>
+>>>>>>>>> Some vendor A2DP bluetooth codecs like FastStream or aptX Low Lat=
+ency
+>>>>>>>>> supports backchannel. Which means that they are bi-directional an=
+d in
+>>>>>>>>> A2DP they supports not only (music) playback, but also receiving
+>>>>>>>>> backchannel (microphone) voice.
+>>>>>>>>>
+>>>>>>>>> How to establish this bi-directional A2DP transfer with backchann=
+el via
+>>>>>>>>> bluez daemon?
+>>>>>>>>
+>>>>>>>> There is no such thing as bi-directional in AVDTP, which is a scre=
+w up
+>>>>>>>> from the spec authors,
+>>>>>>>
+>>>>>>> So it means that those vendor A2DP codecs somehow extends AVDTP, ri=
+ght?
+>>>>>>> I would need to figure out how A2DP devices send voice data... At l=
+east
+>>>>>>> backchannel activation for FastStream is via one bit in codec param=
+eters
+>>>>>>> like other codec parameters.
+>>>>>>>
+>>>>>>>> luckily we don't have to stick to it since our
+>>>>>>>> sockets are bi-directional so you can send and receive data at sam=
+e
+>>>>>>>> time, though the configuration must be the same in either directio=
+n
+>>>>>>>> otherwise we would have to support transport multiplexing to have
+>>>>>>>> multiple configuration done using the same channel.
+>>>>>>>
+>>>>>>> So does it mean that I can read from file descriptor received from =
+dbus
+>>>>>>> which is used for sending encoded A2DP audio samples? And if other =
+side
+>>>>>>> (e.g device with FastStream or aptX LL vendor codec) send voice via=
+ A2DP
+>>>>>>> then I receive them on that file descriptor?
+>>>>>>
+>>>>>> Now I established A2DP connection with FastStream codec and in btmon=
+ I
+>>>>>> see that my headset started sending some data to channel 65 in this =
+A2DP
+>>>>>> mode.
+>>>>>>
+>>>>>> So definitely it is possible to send data from headset to computer (=
+that
+>>>>>> backchannel) in A2DP mode despite what A2DP specification says.
+>>>>>>
+>>>>>> I managed to modify pulseaudio code to start encoding and streaming
+>>>>>> FastStream data to headset and it is working.
+>>>>>>
+>>>>>> Now the challenge would be how to get those data which headset send =
+to
+>>>>>> channel 65? Is bluez really sending them via file descriptor which i=
+s
+>>>>>> used for writing from host to headset?
+>>>>>>
+>>>>>> Via btmon I was able to dump data from this channel 65 and via some
+>>>>>> sed/perl magic I converted received voice data and played it:
+>>>>>>
+>>>>>> $ btmon > /tmp/dump
+>>>>>> CTRL+C
+>>>>>> $ grep 'Channel: 65' -A 14 /tmp/dump | grep '^        ' | sed 's/^  =
+      //;s/  .*//' | tr ' ' '\n' | perl -ne 'print chr(hex($_))' > /tmp/voi=
+ce.sbc
+>>>>>> $ sbcdec -f /tmp/voice.snd /tmp/voice.sbc
+>>>>>> $ play /tmp/voice.snd
+>>>>>>
+>>>>>> And I heard clear voice. So FastStream is really just rebranded SBC
+>>>>>> codec (with fixed parameters; without RTP) and in A2DP bluetooth pro=
+file
+>>>>>> provides nice bi-directional channels.
+>>>>>
+>>>>> can you show us at least a few of these channel 65 frames from btmon =
+decoding. If it is via L2CAP fixed PSM, then in theory there needs to be so=
+me sort of channel establishment. Or if this via L2CAP fixed CID, then it i=
+s essentially unicast connectionless data. Both can be handled via L2CAP so=
+ckets, but you need to create sockets for these to receive the data.
+>>>>>
+>>>>> On a side note, fixed CID 65 and fixed PSM 65 are both Bluetooth SIG =
+reserved values, so seems like this codec is still violating the standard.
+>>>>
+>>>> Hi! In attachment is btmon dump with codec negotiation, connect, both
+>>>> sink and source data and disconnect. Interesting is that now channel 6=
+5
+>>>> is used for both sink and source. Yesterday when I was doing tests I
+>>>> remember that different channel was used for microphone input and audi=
+o
+>>>> playback.
+>>>
+>>> so the Channel: 65 is a CID and is assigned dynamically. They can be di=
+fferent in each direction and by chance you get Source CID: 65 and Destinat=
+ion CID: 65. What I am seeing is that you get TX and RX on that PSM 25 whic=
+h seems to be the established media channel. This means the file descriptor=
+ you already have for sending audio, just read from it and you should be ge=
+tting the back channel receiving audio. L2CAP channels are always bi-direct=
+ional.
+>>
+>> Interesting. Now I repeated my tests again and channels 77 and 64 are
+>> used (64 for voice microphone). Just in case, btmon output is attached.
+>
+> that is fine. As I said, different CID numbers are assigned for each dire=
+ction. They are negotiated when the L2CAP channel is created. That they are=
+ the same rarely happens, but it can. Anyhow, the L2CAP socket from the ker=
+nel will map CID 64 into recv and CID 77 into send.
+>
+>> I would try to read directly from file descriptor used for sending data
+>> and see if I can easily decode it in pulseaudio. As sbcdec was able to
+>> decode it I hope that there would not be problem with libsbc in
+>> pulseaudio.
+>
+> No idea why it would be SBC encoded, but sure. I don=E2=80=99t know enoug=
+h detail about Fast Stream codec.
 
-If the chip needs to be in a defined state we should make sure to put
-in into that state, unless there is a significant overhead wrt 'try
-first and only reset in case of failure'. As a nice side effect the
-code would be cleaner and we probably could get rid of the loop
-completely, since it's supposed to address the case where the chip
-wasn't properly reset on a reboot.
+It appears Fast Strem uses SBC in both directions, though this is not
+'supported' in AVDTP since endpoint can only be source or sink, not
+both and having both ways configure would require 2 channels but
+apparently they got away with L2CAP being bi-directional. The input
+side is most like mSBC so they don't have to configure anything since
+mSBC uses fixed parameters.
 
->         2. this is the one of the main reason for adding
-> qca_power_setup(true) in the init() function first.
->            as we know that power management is so critical for long lasting
-> of battery.
->            now present implementation is when we off BT from UI i.e. hci0
-> down, we put BT into an suspend or low power mode, as soon as we turn ON the
-> BT back from UI we make hci0 up.
->            the above is putting device into suspend state and bring it back
-> where the regulator are still on state. so we will have leakage currents
-> which can be minimal or may be in few mA.
->            to over come the above case, we want to do an cold on/off for BT
-> chip wcn3990. i.e. when bt is off from UI, we will off the regulators and
-> turn on it again once the BT is ON from UI.
->            every time we disable i.e. off BT from UI we will call
-> hdev->shutdown() i.e. completely powering off the chip.
->            so it require an reprogram again, when we turn ON BT from UI. it
-> will call qca_setup()--> init().. so here actually qca_power_on(true) will
-> turn on the chip and dump the fw files into it.
->            so that is also a reason behind to write power on first.
-> 
->            the above feature is under testing state, will post a patch
-> series once the driver code merged to bt-next.
+> Regards
+>
+> Marcel
+>
 
-Thanks for the info.
 
-If I understand correctly what you describe isn't incompatible with
-performing a proper reset. 'vregs_on' can be checked to avoid
-disabling already disabled regulators:
 
-  if (qcadev->bt_power->vregs_on)
-          qca_power_shutdown(hdev);
-
-  // short delay needed here?
-
-  qca_power_setup(hu, true);
-
-Unless there are drawbacks that I'm missing I think that's preferable
-over the retry loop.
-
-> > The code flow with the gotos and the error handling at the end of the
-> > loop is a bit messy. Moving the power down to the top of the loop
-> > (basically in line with my comment above to get rid of the loop) would
-> > help here. In this case checking 'ret' in the loop condition (which I
-> > suggested to remove) would make sense, since it elimninates the need
-> > for the break/return in the success case. But if we can do without the
-> > loop even better :)
-> > 
-> 
-> [Bala]: there is a reason to add the loop here, here we go with reason to
-> add.
->         let us assume that qca_setup fails to establish a communication with
-> wcn3990
->         then next steps will not be pass and we can't populate hci0 rfkill
-> entry.
->         in traditional bluez stack i.e. bluetoothd daemon will looks for
-> hci0, if we have entry for hci0
->         then only BT option is visible in UI or else BT option will not be
-> available in UI.
->         we don't have any mechanism handled in bluez user space to
-> reinitiate the communication at latest to try for second time to make hci0
-> up.
->         so that is reason behind to add so that we can handle fault handling
-> of wcn3990 and establish the communication to make BT option available in
-> BT.
-
-The loop is supposed to address the following case (quoting you from
-earlier discussion in the thread):
-
-> found one interesting bug that BT setups fails with version request
-> timeouts, after we do a reboot for the device. we debugged the issue
-> and found that wcn3900 is not responding to the version request
-> commands sent by HOST. this is because before reboot, wcn3990 is in
-> on state i.e. we are communicating to device. then we did a reboot
-> and HOST is not sending a power off request to the regulators to
-> turn off. so after reboot wcn3990 is still in ON state where it will
-> not respond to version request commands which in turn fails
-> HCI_SETUP. so we are sending the power off pulse and then sending the
-> power on pulse.
-
-My suggestion to address this failure case is to reset/power off the
-chip before initializing it. With that the loop shouldn't be needed,
-actually it wasn't there before you found this specific error.
+--=20
+Luiz Augusto von Dentz
