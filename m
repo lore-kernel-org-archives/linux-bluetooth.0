@@ -1,113 +1,212 @@
 Return-Path: <mka@chromium.org>
-Date: Mon, 30 Jul 2018 13:55:02 -0700
+Date: Mon, 30 Jul 2018 13:07:03 -0700
 From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@bgodavar-linux.qualcomm.com>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
 	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
 	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org,
-	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: Re: [PATCH v11 7/7] Bluetooth: hci_qca: Add support for Qualcomm
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v10 7/7] Bluetooth: hci_qca: Add support for Qualcomm
  Bluetooth chip wcn3990
-Message-ID: <20180730205502.GC68975@google.com>
-References: <20180727141320.25218-1-bgodavar@bgodavar-linux.qualcomm.com>
- <20180727141320.25218-8-bgodavar@bgodavar-linux.qualcomm.com>
+Message-ID: <20180730200703.GB68975@google.com>
+References: <20180720133243.6851-1-bgodavar@codeaurora.org>
+ <20180720133243.6851-8-bgodavar@codeaurora.org>
+ <20180723195441.GM129942@google.com>
+ <81c324ee9104508cf5c862de3f697e4c@codeaurora.org>
+ <20180725183144.GQ129942@google.com>
+ <0666f40967de21db9ef3df9d94517ac1@codeaurora.org>
+ <20180726195129.GW129942@google.com>
+ <ba5c7f6cc8ba7c010ccd6c3573a5d234@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180727141320.25218-8-bgodavar@bgodavar-linux.qualcomm.com>
+In-Reply-To: <ba5c7f6cc8ba7c010ccd6c3573a5d234@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jul 27, 2018 at 07:43:20PM +0530, Balakrishna Godavarthi wrote:
-> From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+On Fri, Jul 27, 2018 at 05:09:02PM +0530, Balakrishna Godavarthi wrote:
+> Hi Matthias,
 > 
-> Add support to set voltage/current of various regulators
-> to power up/down Bluetooth chip wcn3990.
+> On 2018-07-27 01:21, Matthias Kaehlcke wrote:
+> > On Thu, Jul 26, 2018 at 07:51:13PM +0530, Balakrishna Godavarthi wrote:
+> > > Hi Matthias,
+> > > 
+> > > On 2018-07-26 00:01, Matthias Kaehlcke wrote:
+> > > > On Tue, Jul 24, 2018 at 09:25:16PM +0530, Balakrishna Godavarthi wrote:
+> > > > > Hi Matthias,
+> > > > >
+> > > > > On 2018-07-24 01:24, Matthias Kaehlcke wrote:
+> > > > > > On Fri, Jul 20, 2018 at 07:02:43PM +0530, Balakrishna Godavarthi wrote:
+> > > > > > > +	 * sometimes we will face communication synchronization issues,
+> > > > > > > +	 * like reading version command timeouts. In which HCI_SETUP fails,
+> > > > > > > +	 * to overcome these issues, we try to communicate by performing an
+> > > > > > > +	 * COLD power OFF and ON.
+> > > > > > > +	 */
+> > > > > > > +	for (i = 1; i <= 10 && ret; i++) {
+> > > > > >
+> > > > > > Is it really that bad that more than say 3 iterations might be needed?
+> > > > > >
+> > > > > [Bala]: will restrict to 3 iterations.
+> > > >
+> > > > Is 3x expected to be enough to 'guarantee' as successful
+> > > > initialization? Just wondered about the 10x since it suddendly changed
+> > > > from 1x. What is the failure rate without retries?
+> > > >
+> > > > Could you provide more information about the 'communication
+> > > > synchronization issues'? Is the root cause understood? Maybe there is
+> > > > a better way than retries.
+> > > >
+> > > 
+> > > [Bala]: basically before sending a every patch series we run a
+> > > stress test
+> > > to the driver to detect the bugs.
+> > >         in recent test results found one interesting bug that BT
+> > > setups
+> > > fails with version request timeouts,
+> > >         after we do a reboot for the device.
+> > >         we debugged the issue and found that wcn3900 is not
+> > > responding to
+> > > the version request commands
+> > >         sent by HOST. this is because before reboot, wcn3990 is in
+> > > on state
+> > > i.e. we are communicating to device.
+> > >         then we did a reboot and HOST is not sending a power off
+> > > request to
+> > > the regulators to turn off.
+> > >         so after reboot wcn3990 is still in ON state where it will not
+> > > respond to version request commands which in turn fails HCI_SETUP.
+> > >         so we are sending the power off pulse and then sending the
+> > > power on
+> > > pulse.
+> > >         coming back to 3x or 10x iteration this is to avoid any such
+> > > synchronization issues.
+> > >         i agreed for 3x because of stress test results. we have
+> > > success rate
+> > > of 99% for single iteration, where as 3x iterations will helps to
+> > > handle 1%
+> > > fails cases.
+> > 
+> > Thanks for the clarification. Couldn't you assure the device is in a
+> > defined state by calling qca_power_shutdown() as one of the first
+> > things in qca_wcn3990_init()?
 > 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> Changes in v11:
->     * removed support to read regulator currents from dts.	
->     * updated review comments.
+> [Bala]:  we have reasons behind writing qca_power_setup(true) at the start.
+> 
+>         1. the reason to add iteration here, is to handle BT fails cases
+> either due to communication failure of wcn3900 or due to regulator issues.
+>            before calling qca_setup(), we have our regulator turned on and
+> in qca_setup i.e. init routine if we added power_shutdown as first statement
+> before
+>            communicating with chip then regulator will be off and again we
+> need to call function to ON regulators.
+>            so it could be some thing like this
+> 
+>            init(){
+> 
+>                for () {
+>                      shutdown() // regs are off
+>                      poweron(true) // regs are on.
+>                      if(!start communicating with chip()) {
+>                         break;
+>                       }
+> 
+>                }
+>            }
+>            as the reason to add the iteration handling is to overcome 1% of
+> fail cases, so every time when we call it will turn off the regs and turn it
+> back. which require an turning in off regs and on it back for 99% pass
+>             cases.
 
-Updated regulator voltage ranges?
+But would turning off the regs really add a significant delay here?
+The setup is already really slow, with a 100ms delay in the
+loop (still wonder if booting the chip without loading firmware really
+takes that long) and later the firmware is loaded.
 
-> +static int qca_wcn3990_init(struct hci_uart *hu, u32 *soc_ver)
-> +{
-> +	struct hci_dev *hdev = hu->hdev;
-> +	int i, ret;
-> +
-> +	/* wcn3990 is a discrete Bluetooth chip connected to SoC.
-> +	 * sometimes we will face communication synchronization issues,
-> +	 * like reading version command timeouts. In which HCI_SETUP fails,
-> +	 * to overcome these issues, we try to communicate by performing an
-> +	 * cold power off and on.
-> +	 */
-> +	for (i = 0; i <= 3; i++) {
-> +		ret = qca_power_setup(hu, true);
-> +		if (ret)
-> +			goto regs_off;
-> +
-> +		/* Forcefully enable wcn3990 to enter in to boot mode. */
-> +		host_set_baudrate(hu, 2400);
-> +		ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
-> +		if (ret)
-> +			goto regs_off;
-> +
-> +		qca_set_speed(hu, QCA_INIT_SPEED);
-> +		ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWERON_PULSE);
-> +		if (ret)
-> +			goto regs_off;
-> +
-> +		/* Wait for 100 ms for SoC to boot */
-> +		msleep(100);
-> +
-> +		/* Now the device is in ready state to communicate with host.
-> +		 * To sync host with device we need to reopen port.
-> +		 * Without this, we will have RTS and CTS synchronization
-> +		 * issues.
-> +		 */
-> +		serdev_device_close(hu->serdev);
-> +		ret = serdev_device_open(hu->serdev);
-> +		if (ret) {
-> +			bt_dev_err(hu->hdev, "failed to open port");
-> +			break;
-> +		}
-> +
-> +		hci_uart_set_flow_control(hu, false);
-> +		ret = qca_read_soc_version(hdev, soc_ver);
-> +
-> +		if (!ret)
-> +			break;
-> +
-> +regs_off:
-> +		bt_dev_err(hdev, "retrying to establish communication: %d",
-> +			   i + 1);
-> +		qca_power_shutdown(hdev);
-> +	}
-> +
-> +	return ret;
-> +}
+If the chip needs to be in a defined state we should make sure to put
+in into that state, unless there is a significant overhead wrt 'try
+first and only reset in case of failure'. As a nice side effect the
+code would be cleaner and we probably could get rid of the loop
+completely, since it's supposed to address the case where the chip
+wasn't properly reset on a reboot.
 
-I'm still not convinced that the retry loop is needed/desirable, I
-commented on the discussion on v10.
+>         2. this is the one of the main reason for adding
+> qca_power_setup(true) in the init() function first.
+>            as we know that power management is so critical for long lasting
+> of battery.
+>            now present implementation is when we off BT from UI i.e. hci0
+> down, we put BT into an suspend or low power mode, as soon as we turn ON the
+> BT back from UI we make hci0 up.
+>            the above is putting device into suspend state and bring it back
+> where the regulator are still on state. so we will have leakage currents
+> which can be minimal or may be in few mA.
+>            to over come the above case, we want to do an cold on/off for BT
+> chip wcn3990. i.e. when bt is off from UI, we will off the regulators and
+> turn on it again once the BT is ON from UI.
+>            every time we disable i.e. off BT from UI we will call
+> hdev->shutdown() i.e. completely powering off the chip.
+>            so it require an reprogram again, when we turn ON BT from UI. it
+> will call qca_setup()--> init().. so here actually qca_power_on(true) will
+> turn on the chip and dump the fw files into it.
+>            so that is also a reason behind to write power on first.
+> 
+>            the above feature is under testing state, will post a patch
+> series once the driver code merged to bt-next.
 
-> +static const struct qca_vreg_data qca_soc_data = {
-> +	.soc_type = QCA_WCN3990,
-> +	.vregs = (struct qca_vreg []) {
-> +		{ "vddio",   1800000, 1900000,  15000  },
-> +		{ "vddxo",   1800000, 1900000,  80000  },
-> +		{ "vddrf",   1300000, 1350000,  300000 },
-> +		{ "vddch0",  3300000, 3400000,  450000 },
-> +	},
+Thanks for the info.
 
-In v10 this was:
+If I understand correctly what you describe isn't incompatible with
+performing a proper reset. 'vregs_on' can be checked to avoid
+disabling already disabled regulators:
 
-		{ "vddio",   1800000, 1800000,  15000  },
-		{ "vddxo",   1800000, 1800000,  80000  },
-		{ "vddrf",   1304000, 1304000,  300000 },
-		{ "vddch0",  3000000, 3312000,  450000 },
+  if (qcadev->bt_power->vregs_on)
+          qca_power_shutdown(hdev);
 
-I don't have concerns about the new voltage ranges, but you should
-mention such changes in the changelog, ideally with a brief
-description why the change was made.
+  // short delay needed here?
+
+  qca_power_setup(hu, true);
+
+Unless there are drawbacks that I'm missing I think that's preferable
+over the retry loop.
+
+> > The code flow with the gotos and the error handling at the end of the
+> > loop is a bit messy. Moving the power down to the top of the loop
+> > (basically in line with my comment above to get rid of the loop) would
+> > help here. In this case checking 'ret' in the loop condition (which I
+> > suggested to remove) would make sense, since it elimninates the need
+> > for the break/return in the success case. But if we can do without the
+> > loop even better :)
+> > 
+> 
+> [Bala]: there is a reason to add the loop here, here we go with reason to
+> add.
+>         let us assume that qca_setup fails to establish a communication with
+> wcn3990
+>         then next steps will not be pass and we can't populate hci0 rfkill
+> entry.
+>         in traditional bluez stack i.e. bluetoothd daemon will looks for
+> hci0, if we have entry for hci0
+>         then only BT option is visible in UI or else BT option will not be
+> available in UI.
+>         we don't have any mechanism handled in bluez user space to
+> reinitiate the communication at latest to try for second time to make hci0
+> up.
+>         so that is reason behind to add so that we can handle fault handling
+> of wcn3990 and establish the communication to make BT option available in
+> BT.
+
+The loop is supposed to address the following case (quoting you from
+earlier discussion in the thread):
+
+> found one interesting bug that BT setups fails with version request
+> timeouts, after we do a reboot for the device. we debugged the issue
+> and found that wcn3900 is not responding to the version request
+> commands sent by HOST. this is because before reboot, wcn3990 is in
+> on state i.e. we are communicating to device. then we did a reboot
+> and HOST is not sending a power off request to the regulators to
+> turn off. so after reboot wcn3990 is still in ON state where it will
+> not respond to version request commands which in turn fails
+> HCI_SETUP. so we are sending the power off pulse and then sending the
+> power on pulse.
+
+My suggestion to address this failure case is to reset/power off the
+chip before initializing it. With that the loop shouldn't be needed,
+actually it wasn't there before you found this specific error.
