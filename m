@@ -1,38 +1,38 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Mon, 30 Jul 2018 15:03:57 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jaganath Kanakkassery <jaganath.k.os@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>
-Subject: Re: [PATCH BlueZ v2 0/7] Add BREDR PHYs in PHY configuration commands
-Message-ID: <20180730120357.GA31474@x1c.home>
-References: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1532514086-14790-1-git-send-email-jaganathx.kanakkassery@intel.com>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: Re: [PATCH v6 2/4] Bluetooth: Add new quirk for non-persistent setup
+ settings
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <d20e070679bb40bff011f5a74f531e1b662d08a5.1532060309.git.sean.wang@mediatek.com>
+Date: Mon, 30 Jul 2018 14:01:31 +0200
+Cc: Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Message-Id: <A25EEA4C-6A6D-4189-B259-2ABB8A4D1A59@holtmann.org>
+References: <cover.1532060309.git.sean.wang@mediatek.com>
+ <d20e070679bb40bff011f5a74f531e1b662d08a5.1532060309.git.sean.wang@mediatek.com>
+To: sean.wang@mediatek.com
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
+Hi Sean,
 
-On Wed, Jul 25, 2018, Jaganath Kanakkassery wrote:
-> This also has mgmt-tester patches for 5.0 implementation
+> Add a new quirk HCI_QUIRK_NON_PERSISTENT_SETUP allowing that a quirk that
+> runs setup() after every open() and not just after the first open().
 > 
-> v2-> Fixed -Werror=unused-const-variable build error
-> 
-> Jaganath Kanakkassery (7):
->   monitor: Add BREDR PHYs in PHY configuration commands
->   emulator: Add BREDR 2M & 3M, 3 & 5 Slot packet type support
->   mgmt-tester: Add extended advertising test cases
->   mgmt-tester: Add PHY Configuration test cases
->   mgmt-tester: Add tests for extended scanning and device found
->   mgmt-tester: Add support ext create connection and enh conn complete
->   mgmt-tester: Update Supported_settings to reflect PHY_CONFIGURATION
-> 
->  emulator/btdev.c    |   10 +
->  monitor/packet.c    |   39 +-
->  tools/mgmt-tester.c | 2085 ++++++++++++++++++++++++++++++++++++++++++++++++---
->  3 files changed, 2015 insertions(+), 119 deletions(-)
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> ---
+> include/net/bluetooth/hci.h | 9 +++++++++
+> net/bluetooth/hci_core.c    | 3 ++-
+> 2 files changed, 11 insertions(+), 1 deletion(-)
 
-All patches in this set have been applied. Thanks.
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
