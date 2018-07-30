@@ -1,82 +1,64 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: bluez: A2DP backchannel
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180728192649.7aryivyczpr2ek47@pali>
-Date: Mon, 30 Jul 2018 13:05:33 +0200
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <4BA0F4BA-1CA9-46F1-8A86-212321742D4B@holtmann.org>
-References: <20180711110406.hkcqfjkmxsqq5xqk@pali>
- <CABBYNZJQPJOz75cZ4M8WZO0ZL29ePnsi1V1Y1Rc6S-=DT0ox+w@mail.gmail.com>
- <20180711143747.lg6ve2lxkfphkftt@pali> <20180728192649.7aryivyczpr2ek47@pali>
-To: =?utf-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <961904947d3f021b8ed4f7a00dc1241761974060.camel@hadess.net>
+References: <20180730064424.13996-1-luiz.dentz@gmail.com> <20180730064424.13996-3-luiz.dentz@gmail.com>
+ <961904947d3f021b8ed4f7a00dc1241761974060.camel@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 30 Jul 2018 13:45:32 +0300
+Message-ID: <CABBYNZL8GGNkKthwOgRHmC+LmkQuG26OwvwBB4dYHWG8n-EB6g@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] client: Add scan.discoverable command
+To: Bastien Nocera <hadess@hadess.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pali,
+Hi Bastien,
 
->>>> Some vendor A2DP bluetooth codecs like FastStream or aptX Low Latency
->>>> supports backchannel. Which means that they are bi-directional and in
->>>> A2DP they supports not only (music) playback, but also receiving
->>>> backchannel (microphone) voice.
->>>> 
->>>> How to establish this bi-directional A2DP transfer with backchannel via
->>>> bluez daemon?
->>> 
->>> There is no such thing as bi-directional in AVDTP, which is a screw up
->>> from the spec authors,
->> 
->> So it means that those vendor A2DP codecs somehow extends AVDTP, right?
->> I would need to figure out how A2DP devices send voice data... At least
->> backchannel activation for FastStream is via one bit in codec parameters
->> like other codec parameters.
->> 
->>> luckily we don't have to stick to it since our
->>> sockets are bi-directional so you can send and receive data at same
->>> time, though the configuration must be the same in either direction
->>> otherwise we would have to support transport multiplexing to have
->>> multiple configuration done using the same channel.
->> 
->> So does it mean that I can read from file descriptor received from dbus
->> which is used for sending encoded A2DP audio samples? And if other side
->> (e.g device with FastStream or aptX LL vendor codec) send voice via A2DP
->> then I receive them on that file descriptor?
-> 
-> Now I established A2DP connection with FastStream codec and in btmon I
-> see that my headset started sending some data to channel 65 in this A2DP
-> mode.
-> 
-> So definitely it is possible to send data from headset to computer (that
-> backchannel) in A2DP mode despite what A2DP specification says.
-> 
-> I managed to modify pulseaudio code to start encoding and streaming
-> FastStream data to headset and it is working.
-> 
-> Now the challenge would be how to get those data which headset send to
-> channel 65? Is bluez really sending them via file descriptor which is
-> used for writing from host to headset?
-> 
-> Via btmon I was able to dump data from this channel 65 and via some
-> sed/perl magic I converted received voice data and played it:
-> 
-> $ btmon > /tmp/dump
-> CTRL+C
-> $ grep 'Channel: 65' -A 14 /tmp/dump | grep '^        ' | sed 's/^        //;s/  .*//' | tr ' ' '\n' | perl -ne 'print chr(hex($_))' > /tmp/voice.sbc
-> $ sbcdec -f /tmp/voice.snd /tmp/voice.sbc
-> $ play /tmp/voice.snd
-> 
-> And I heard clear voice. So FastStream is really just rebranded SBC
-> codec (with fixed parameters; without RTP) and in A2DP bluetooth profile
-> provides nice bi-directional channels.
+On Mon, Jul 30, 2018 at 1:21 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> On Mon, 2018-07-30 at 09:44 +0300, Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This adds discoverable command to scan menu which can be used to set
+>> if adapter should become discoverable while scanning:
+>>
+>> [bluetooth]# scan.discoverable on
+>> [bluetooth]# scan on
+>> SetDiscoveryFilter success
+>> [CHG] Controller XX:XX:XX:XX:XX:XX Discoverable: yes
+>> Discovery started
+>> [CHG] Controller XX:XX:XX:XX:XX:XX Discovering: yes
+>> [bluetooth]# scan off
+>> Discovery stopped
+>> [CHG] Controller XX:XX:XX:XX:XX:XX Discoverable: no
+>
+> This doesn't call SetDiscoverFilter() when the scan as already started,
+> meaning that my earlier test still fails.
+>
+>> As mentioned on IRC, this does not work if the Discoverable filter is
+>> set after the discovery has started. So:
+>> discoverable off
+>> scan on
+>> scan.discoverable on
+>> show <- this will show "Discoverable" still off.
+>
+> Doing a quick "scan off" / "scan on" will show "SetDiscoveryFilter
+> success" appearing, this should also appear when the filter is changed
+> while scanning is on-going.
+>
+> If you don't want to change the currently filter, it might be good for
+> the client to show a "Filter change queued" or similar message that
+> would show that the setting hasn't been applied, but would be for the
+> next run.
 
-can you show us at least a few of these channel 65 frames from btmon decoding. If it is via L2CAP fixed PSM, then in theory there needs to be some sort of channel establishment. Or if this via L2CAP fixed CID, then it is essentially unicast connectionless data. Both can be handled via L2CAP sockets, but you need to create sockets for these to receive the data.
+Yep, I can add a message that it would be set when the scan if
+enabled, in fact I don't think it is a good practice to change things
+like discoverable in the middle of the discovery since may interfere
+with what the controller is scheduling over the air, but since we
+allow thing like UUID and RSSI it makes sense to allow everything to
+be changed.
 
-On a side note, fixed CID 65 and fixed PSM 65 are both Bluetooth SIG reserved values, so seems like this codec is still violating the standard.
 
-Regards
 
-Marcel
-
+-- 
+Luiz Augusto von Dentz
