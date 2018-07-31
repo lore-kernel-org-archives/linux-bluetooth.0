@@ -1,26 +1,71 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Hermida, Isaac" <Isaac.Hermida@digi.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: How to do authenticated connections in BLE?
-Date: Mon, 4 Jun 2018 09:01:10 +0000
-Message-ID: <5B14FFD5.3060602@digi.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <keescook@google.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: keescook@google.com
+In-Reply-To: <20180731220225.159741-1-salyzyn@android.com>
+References: <20180731220225.159741-1-salyzyn@android.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 31 Jul 2018 16:41:35 -0700
+Message-ID: <CAGXu5jKoEB5AOVqkAnqq9SjGRU+qSgxdk2ZBWkwZxZOkK8Fn1A@mail.gmail.com>
+Subject: Re: [PATCH] HID: Bluetooth: hidp: buffer overflow in hidp_process_report
+To: Mark Salyzyn <salyzyn@android.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Benjamin Tissoires <benjamin.tissoires@redhat.com>, linux-bluetooth@vger.kernel.org,
+	Network Development <netdev@vger.kernel.org>, Security Officers <security@kernel.org>,
+	Android Kernel Team <kernel-team@android.com>, Jiri Kosina <jkosina@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgdGhlcmUsDQoNCkkgaGF2ZSB0aGUgYnRnYXR0LXNlcnZlciBydW5uaW5nIHdoZXJlIEkgY2Fu
-IGludGVyYWN0IHdpdGggaXQuIE5vdyBJIA0KaW5jcmVhc2UgdGhlIHNlY3VyaXR5IChidGdhdHQt
-c2VydmVyIC1zIGhpZ2ggLi4uKSBhbmQgd2hlbiBJIHRyeSB0byANCmNvbm5lY3QgdG8gdGhlIHNl
-cnZlciBJIGdvdCBpdCByZWplY3RlZCAoYnRtZ210IC0gYXV0aCBmYWlsZWQgd2l0aCANCnN0YXR1
-cyAweDA1IChBdXRoZW50aWNhdGlvbiBGYWlsZWQpKS4NCg0KQWZ0ZXIgdGhhdCBJIG1hbnVhbGx5
-IHBhaXJlZCBhbmQgdHJ1c3RlZCBib3RoIGRldmljZXMgKGJsdWV0b290Y3RsIC0gDQphZ2VudCAt
-IC4uLikgYW5kIEkgc2VlIHRoZW0gYXMgcGFpcmVkLWRldmljZXMuIFRoZW4gSSByZXBlYXQgdGhl
-IHByb2Nlc3MgDQooLXMgaGlnaCksIGFuZCBhZ2FpbiwgSSBnb3QgdGhlIHNhbWUgYXV0aGVudGlj
-YXRpb24gZXJyb3IuIFNob3VsZCB0aGF0IA0KdGhpcyBzZWNvbmQgdHJ5IHdvcms/IGFtIEkgbWlz
-c2luZyBzb21ldGhpbmc/DQooSSB0cmllZCBibHVlei01LjQxIGFuZCA1LjQ2IHZlcnNpb25zKQ0K
-DQpQcm9iYWJseSBJIGFtIG1pc3NpbmcvbWlzc3VuZGVyc3RhbmRpbmcgc29tZXRoaW5nLCBzbyB0
-byBwdXQgY29udGV4dCBvbiANCndoYXQgSSBhbSBkb2luZywgd2hhdCBJIGFtIGxvb2tpbmcgZm9y
-IGlzIGEgd2F5IHRvIG9ubHkgYWNjZXB0IA0KY29ubmVjdGlvbnMgb2YgYXV0aGVudGljYXRlZC9w
-YWlyZWQgZGV2aWNlcyAoZG9uZSBiZWZvcmVoYW5kIG9yIG5vdCBkb2VzIA0Kbm90IG1hdHRlciku
-DQo=
+On Tue, Jul 31, 2018 at 3:02 PM, Mark Salyzyn <salyzyn@android.com> wrote:
+> CVE-2018-9363
+>
+> The buffer length is unsigned at all layers, but gets cast to int and
+> checked in hidp_process_report and can lead to a buffer overflow.
+> Switch len parameter to unsigned int to resolve issue.
+>
+> This affects 3.18 and newer kernels.
+>
+> Signed-off-by: Mark Salyzyn <salyzyn@android.com>
+> Fixes: a4b1b5877b514b276f0f31efe02388a9c2836728 ("HID: Bluetooth: hidp: make sure input buffers are big enough")
+
+nit: normally just first 12 of the sha is used.
+
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: security@kernel.org
+> Cc: kernel-team@android.com
+> ---
+>  net/bluetooth/hidp/core.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index 1036e4fa1ea2..3bba8f4b08a9 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -431,8 +431,8 @@ static void hidp_del_timer(struct hidp_session *session)
+>                 del_timer(&session->timer);
+>  }
+>
+> -static void hidp_process_report(struct hidp_session *session,
+> -                               int type, const u8 *data, int len, int intr)
+> +static void hidp_process_report(struct hidp_session *session, int type,
+> +                               const u8 *data, unsigned int len, int intr)
+>  {
+>         if (len > HID_MAX_BUFFER_SIZE)
+>                 len = HID_MAX_BUFFER_SIZE;
+
+Acked-by: Kees Cook <keescook@chromium.org>
+
+Thanks!
+
+-Kees
+
+-- 
+Kees Cook
+Pixel Security
