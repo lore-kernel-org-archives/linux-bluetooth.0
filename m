@@ -1,164 +1,126 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH v3 4/9] Bluetooth: btrtl: add support for the RTL8723BS
- and RTL8723DS chips
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Jeremy Cline <jeremy@jcline.org>, linux-bluetooth@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-References: <20180710081117.25078-1-hdegoede@redhat.com>
- <20180710081117.25078-5-hdegoede@redhat.com>
- <6D5FE822-FF51-4502-956B-8993603021CC@holtmann.org>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <16b8ad27-747f-4ab3-bd86-09571724d4f1@redhat.com>
-Date: Tue, 31 Jul 2018 16:59:09 +0200
+Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <6D5FE822-FF51-4502-956B-8993603021CC@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Date: Tue, 31 Jul 2018 20:13:52 +0530
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
+ rtatiya@codeaurora.org, hemantg@codeaurora.org,
+ linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v11 7/7] Bluetooth: hci_qca: Add support for Qualcomm
+ Bluetooth chip wcn3990
+In-Reply-To: <20180730205502.GC68975@google.com>
+References: <20180727141320.25218-1-bgodavar@bgodavar-linux.qualcomm.com>
+ <20180727141320.25218-8-bgodavar@bgodavar-linux.qualcomm.com>
+ <20180730205502.GC68975@google.com>
+Message-ID: <8a8c786f2c668681032a59888ffc020d@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI,
+Hi Matthias,
 
-On 14-07-18 18:09, Marcel Holtmann wrote:
-> Hi Hans,
-> 
->> The Realtek RTL8723BS and RTL8723DS chipsets are SDIO wifi chips. They
->> also contain a Bluetooth module which is connected via UART to the host.
->>
->> Realtek's userspace initialization tool (rtk_hciattach) differentiates
->> these two via the HCI version and revision returned by the
->> HCI_OP_READ_LOCAL_VERSION command.
->> Additionally we apply these checks only the for UART devices. Everything
->> else is assumed to be a "RTL8723B" which was originally supported by the
->> driver (communicating via USB).
->>
->> Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
->> Signed-off-by: Jeremy Cline <jeremy@jcline.org>
->> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+On 2018-07-31 02:25, Matthias Kaehlcke wrote:
+> On Fri, Jul 27, 2018 at 07:43:20PM +0530, Balakrishna Godavarthi wrote:
+>> From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> 
+>> Add support to set voltage/current of various regulators
+>> to power up/down Bluetooth chip wcn3990.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 >> ---
->> Changes in v2 (Hans de Goede)
->> -Fix some minor style issues / checkpatch warnings
->> ---
->> drivers/bluetooth/btrtl.c | 51 ++++++++++++++++++++++++++++++++++++---
->> 1 file changed, 47 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
->> index 6c0d88d23d6d..8dacca64fe41 100644
->> --- a/drivers/bluetooth/btrtl.c
->> +++ b/drivers/bluetooth/btrtl.c
->> @@ -38,6 +38,8 @@
->>
->> #define IC_MATCH_FL_LMPSUBV	(1 << 0)
->> #define IC_MATCH_FL_HCIREV	(1 << 1)
->> +#define IC_MATCH_FL_HCIVER	(1 << 2)
->> +#define IC_MATCH_FL_HCIBUS	(1 << 3)
->> #define IC_INFO(lmps, hcir) \
->> 	.match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV, \
->> 	.lmp_subver = (lmps), \
->> @@ -47,6 +49,8 @@ struct id_table {
->> 	__u16 match_flags;
->> 	__u16 lmp_subver;
->> 	__u16 hci_rev;
->> +	__u8 hci_ver;
->> +	__u8 hci_bus;
->> 	bool config_needed;
->> 	bool has_rom_version;
->> 	char *fw_name;
->> @@ -75,6 +79,18 @@ static const struct id_table ic_id_table[] = {
->> 	  .fw_name = "rtl_bt/rtl8723a_fw.bin",
->> 	  .cfg_name = NULL },
->>
->> +	/* 8723BS */
->> +	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
->> +			 IC_MATCH_FL_HCIVER | IC_MATCH_FL_HCIBUS,
->> +	  .lmp_subver = RTL_ROM_LMP_8723B,
->> +	  .hci_rev = 0xb,
->> +	  .hci_ver = 6,
->> +	  .hci_bus = HCI_UART,
->> +	  .config_needed = true,
->> +	  .has_rom_version = true,
->> +	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
->> +	  .cfg_name = "rtl_bt/rtl8723bs_config.bin" },
->> +
->> 	/* 8723B */
->> 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb),
->> 	  .config_needed = false,
->> @@ -89,6 +105,18 @@ static const struct id_table ic_id_table[] = {
->> 	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
->> 	  .cfg_name = "rtl_bt/rtl8723d_config.bin" },
->>
->> +	/* 8723DS */
->> +	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
->> +			 IC_MATCH_FL_HCIVER | IC_MATCH_FL_HCIBUS,
->> +	  .lmp_subver = RTL_ROM_LMP_8723B,
->> +	  .hci_rev = 0xd,
->> +	  .hci_ver = 8,
->> +	  .hci_bus = HCI_UART,
->> +	  .config_needed = true,
->> +	  .has_rom_version = true,
->> +	  .fw_name  = "rtl_bt/rtl8723ds_fw.bin",
->> +	  .cfg_name = "rtl_bt/rtl8723ds_config.bin" },
->> +
->> 	/* 8821A */
->> 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa),
->> 	  .config_needed = false,
->> @@ -118,7 +146,8 @@ static const struct id_table ic_id_table[] = {
->> 	  .cfg_name = "rtl_bt/rtl8822b_config.bin" },
->> 	};
->>
->> -static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev)
->> +static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
->> +					     u8 hci_ver, u8 hci_bus)
->> {
->> 	int i;
->>
->> @@ -129,6 +158,12 @@ static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev)
->> 		if ((ic_id_table[i].match_flags & IC_MATCH_FL_HCIREV) &&
->> 		    (ic_id_table[i].hci_rev != hci_rev))
->> 			continue;
->> +		if ((ic_id_table[i].match_flags & IC_MATCH_FL_HCIVER) &&
->> +		    (ic_id_table[i].hci_ver != hci_ver))
->> +			continue;
->> +		if ((ic_id_table[i].match_flags & IC_MATCH_FL_HCIBUS) &&
->> +		    (ic_id_table[i].hci_bus != hci_bus))
->> +			continue;
->>
->> 		break;
->> 	}
->> @@ -481,6 +516,7 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
->> 	struct sk_buff *skb;
->> 	struct hci_rp_read_local_version *resp;
->> 	u16 hci_rev, lmp_subver;
->> +	u8 hci_ver;
->> 	int ret;
->>
->> 	btrtl_dev = kzalloc(sizeof(*btrtl_dev), GFP_KERNEL);
->> @@ -501,14 +537,17 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
->> 		    resp->hci_ver, resp->hci_rev,
->> 		    resp->lmp_ver, resp->lmp_subver);
->>
->> +	hci_ver = resp->hci_ver;
->> 	hci_rev = le16_to_cpu(resp->hci_rev);
->> 	lmp_subver = le16_to_cpu(resp->lmp_subver);
->> 	kfree_skb(skb);
->>
->> -	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev);
->> +	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
->> +					    hdev->bus);
->> +
+>> Changes in v11:
+>>     * removed support to read regulator currents from dts.
+>>     * updated review comments.
 > 
-> I am bit reluctant to let you use hdev->bus here since that should be essentially local to the core. I know you set it before calling hci_register_dev, but it was never really designed to be accessed again by the driver? Do you need access to it or can this be done internally in the driver?
+> Updated regulator voltage ranges?
+> 
+>> +static int qca_wcn3990_init(struct hci_uart *hu, u32 *soc_ver)
+>> +{
+>> +	struct hci_dev *hdev = hu->hdev;
+>> +	int i, ret;
+>> +
+>> +	/* wcn3990 is a discrete Bluetooth chip connected to SoC.
+>> +	 * sometimes we will face communication synchronization issues,
+>> +	 * like reading version command timeouts. In which HCI_SETUP fails,
+>> +	 * to overcome these issues, we try to communicate by performing an
+>> +	 * cold power off and on.
+>> +	 */
+>> +	for (i = 0; i <= 3; i++) {
+>> +		ret = qca_power_setup(hu, true);
+>> +		if (ret)
+>> +			goto regs_off;
+>> +
+>> +		/* Forcefully enable wcn3990 to enter in to boot mode. */
+>> +		host_set_baudrate(hu, 2400);
+>> +		ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
+>> +		if (ret)
+>> +			goto regs_off;
+>> +
+>> +		qca_set_speed(hu, QCA_INIT_SPEED);
+>> +		ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWERON_PULSE);
+>> +		if (ret)
+>> +			goto regs_off;
+>> +
+>> +		/* Wait for 100 ms for SoC to boot */
+>> +		msleep(100);
+>> +
+>> +		/* Now the device is in ready state to communicate with host.
+>> +		 * To sync host with device we need to reopen port.
+>> +		 * Without this, we will have RTS and CTS synchronization
+>> +		 * issues.
+>> +		 */
+>> +		serdev_device_close(hu->serdev);
+>> +		ret = serdev_device_open(hu->serdev);
+>> +		if (ret) {
+>> +			bt_dev_err(hu->hdev, "failed to open port");
+>> +			break;
+>> +		}
+>> +
+>> +		hci_uart_set_flow_control(hu, false);
+>> +		ret = qca_read_soc_version(hdev, soc_ver);
+>> +
+>> +		if (!ret)
+>> +			break;
+>> +
+>> +regs_off:
+>> +		bt_dev_err(hdev, "retrying to establish communication: %d",
+>> +			   i + 1);
+>> +		qca_power_shutdown(hdev);
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+> 
+> I'm still not convinced that the retry loop is needed/desirable, I
+> commented on the discussion on v10.
+> 
+[Bala] : replied on v10 patch.
 
-hdev->bus is only used to differentiate between the USB 8723B and the SDIO 8723BS
-devices when looking up the info in the ic_id_table[]. As such all that is done
-is a "hdev->bus == HCI_UART" comparison, which seems innocent enough and not
-prone to breakage if the core changes its use of bus a bit.
+>> +static const struct qca_vreg_data qca_soc_data = {
+>> +	.soc_type = QCA_WCN3990,
+>> +	.vregs = (struct qca_vreg []) {
+>> +		{ "vddio",   1800000, 1900000,  15000  },
+>> +		{ "vddxo",   1800000, 1900000,  80000  },
+>> +		{ "vddrf",   1300000, 1350000,  300000 },
+>> +		{ "vddch0",  3300000, 3400000,  450000 },
+>> +	},
+> 
+> In v10 this was:
+> 
+> 		{ "vddio",   1800000, 1800000,  15000  },
+> 		{ "vddxo",   1800000, 1800000,  80000  },
+> 		{ "vddrf",   1304000, 1304000,  300000 },
+> 		{ "vddch0",  3000000, 3312000,  450000 },
+> 
+> I don't have concerns about the new voltage ranges, but you should
+> mention such changes in the changelog, ideally with a brief
+> description why the change was made.
 
-The alternative would be to pass the bus-type from the USB / UART specific
-probe() functions as parameter to the various intermediate functions until
-we end up in btrtl_initialize() but that seems a but silly since we have
-it available in hdev->bus already.
+[Bala]: I missed to add, I just updated with latest values from 
+datasheet.
 
-Regards,
-
-Hans
+-- 
+Regards
+Balakrishna.
