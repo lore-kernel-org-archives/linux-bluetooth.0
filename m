@@ -1,74 +1,39 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Cinaed Simson <cinaed.simson@gmail.com>
+From: "Stotland, Inga" <inga.stotland@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "cinaed.simson@gmail.com" <cinaed.simson@gmail.com>
 Subject: Re: bluetooth faq
-To: "Stotland, Inga" <inga.stotland@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 31 Jul 2018 19:46:20 +0000
+Message-ID: <1533066378.3353.13.camel@intel.com>
 References: <14979653-a357-02f1-25f3-a86231a608d2@GMail.COM>
- <1533066378.3353.13.camel@intel.com>
-Message-ID: <eb4688c9-4fbf-7324-d47d-09f44ad0462a@GMail.COM>
-Date: Tue, 31 Jul 2018 13:15:19 -0700
+In-Reply-To: <14979653-a357-02f1-25f3-a86231a608d2@GMail.COM>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <1533066378.3353.13.camel@intel.com>
-Content-Type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 07/31/2018 12:46 PM, Stotland, Inga wrote:
-> Hi  Cinaed,
-> 
-> On Wed, 2018-07-25 at 21:07 -0700, Cinaed Simson wrote:
->> The FAQ on the Wiki appears to indicate that you need to build the
->> source is a kernel version > 2.6.
->>
->> However, the build fails on Jessie running kernel version 3.16.51-3
->> because of no ell.
->>
->> Not big deal.
->>
->> I was able to download it and build it but the ell web page suggests I
->> need the latest kernel version - 4.17 for things to work.
->>
->> I haven't actually installed ell to see if that was only requirement for
->> the build which wasn't mentioned in the README.
->>
->> So am I wasting my time the release from
->>
->>   https://git.kernel.org/pub/scm/bluetooth/bluez.git
->>
->> ? I don't mind installing additional packages from source provided it
->> fixes the known problems with bluetooth.
->>
->> I am currently using 5.49 from
->>
->>    https://github.com/Vudentz/BlueZ.git
->>
->> It doesn't require ell to build.
->>
->> The following URL
->>
->>    https://www.theregister.co.uk/2018/07/24/bluetooth_cryptography_bug/
->>
->> which is what got me started looking for information and possible fixes.
->>
->> Any help would be greatly appreciated.
->>
->> -- Cinaed
->>
-> 
-> If you want to leave out the requirement for ell, you can run
-> bootstrap-configure with --enable-mesh=no option. Alternatively, you
-> can remove line "--enable-mesh" in your bootstrap-configure file
-> altogether.
-> 
-> Regards,
-> Inga
-> 
-
-Hi Inga - thanks for the reply. I misinterpreted what I read on the ell
-web page.
-
-I was able to build ell and the git version of bluez.
-
--- Cinaed
-
-
+SGkgIENpbmFlZCwNCg0KT24gV2VkLCAyMDE4LTA3LTI1IGF0IDIxOjA3IC0wNzAwLCBDaW5hZWQg
+U2ltc29uIHdyb3RlOg0KPiBUaGUgRkFRIG9uIHRoZSBXaWtpIGFwcGVhcnMgdG8gaW5kaWNhdGUg
+dGhhdCB5b3UgbmVlZCB0byBidWlsZCB0aGUNCj4gc291cmNlIGlzIGEga2VybmVsIHZlcnNpb24g
+PiAyLjYuDQo+IA0KPiBIb3dldmVyLCB0aGUgYnVpbGQgZmFpbHMgb24gSmVzc2llIHJ1bm5pbmcg
+a2VybmVsIHZlcnNpb24gMy4xNi41MS0zDQo+IGJlY2F1c2Ugb2Ygbm8gZWxsLg0KPiANCj4gTm90
+IGJpZyBkZWFsLg0KPiANCj4gSSB3YXMgYWJsZSB0byBkb3dubG9hZCBpdCBhbmQgYnVpbGQgaXQg
+YnV0IHRoZSBlbGwgd2ViIHBhZ2Ugc3VnZ2VzdHMgSQ0KPiBuZWVkIHRoZSBsYXRlc3Qga2VybmVs
+IHZlcnNpb24gLSA0LjE3IGZvciB0aGluZ3MgdG8gd29yay4NCj4gDQo+IEkgaGF2ZW4ndCBhY3R1
+YWxseSBpbnN0YWxsZWQgZWxsIHRvIHNlZSBpZiB0aGF0IHdhcyBvbmx5IHJlcXVpcmVtZW50IGZv
+cg0KPiB0aGUgYnVpbGQgd2hpY2ggd2Fzbid0IG1lbnRpb25lZCBpbiB0aGUgUkVBRE1FLg0KPiAN
+Cj4gU28gYW0gSSB3YXN0aW5nIG15IHRpbWUgdGhlIHJlbGVhc2UgZnJvbQ0KPiANCj4gICBodHRw
+czovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vYmx1ZXRvb3RoL2JsdWV6LmdpdA0KPiANCj4gPyBJ
+IGRvbid0IG1pbmQgaW5zdGFsbGluZyBhZGRpdGlvbmFsIHBhY2thZ2VzIGZyb20gc291cmNlIHBy
+b3ZpZGVkIGl0DQo+IGZpeGVzIHRoZSBrbm93biBwcm9ibGVtcyB3aXRoIGJsdWV0b290aC4NCj4g
+DQo+IEkgYW0gY3VycmVudGx5IHVzaW5nIDUuNDkgZnJvbQ0KPiANCj4gICAgaHR0cHM6Ly9naXRo
+dWIuY29tL1Z1ZGVudHovQmx1ZVouZ2l0DQo+IA0KPiBJdCBkb2Vzbid0IHJlcXVpcmUgZWxsIHRv
+IGJ1aWxkLg0KPiANCj4gVGhlIGZvbGxvd2luZyBVUkwNCj4gDQo+ICAgIGh0dHBzOi8vd3d3LnRo
+ZXJlZ2lzdGVyLmNvLnVrLzIwMTgvMDcvMjQvYmx1ZXRvb3RoX2NyeXB0b2dyYXBoeV9idWcvDQo+
+IA0KPiB3aGljaCBpcyB3aGF0IGdvdCBtZSBzdGFydGVkIGxvb2tpbmcgZm9yIGluZm9ybWF0aW9u
+IGFuZCBwb3NzaWJsZSBmaXhlcy4NCj4gDQo+IEFueSBoZWxwIHdvdWxkIGJlIGdyZWF0bHkgYXBw
+cmVjaWF0ZWQuDQo+IA0KPiAtLSBDaW5hZWQNCj4gDQoNCklmIHlvdSB3YW50IHRvIGxlYXZlIG91
+dCB0aGUgcmVxdWlyZW1lbnQgZm9yIGVsbCwgeW91IGNhbiBydW4NCmJvb3RzdHJhcC1jb25maWd1
+cmUgd2l0aCAtLWVuYWJsZS1tZXNoPW5vIG9wdGlvbi4gQWx0ZXJuYXRpdmVseSwgeW91DQpjYW4g
+cmVtb3ZlIGxpbmUgIi0tZW5hYmxlLW1lc2giIGluIHlvdXIgYm9vdHN0cmFwLWNvbmZpZ3VyZSBm
+aWxlDQphbHRvZ2V0aGVyLg0KDQpSZWdhcmRzLA0KSW5nYQ0K
