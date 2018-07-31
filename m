@@ -1,61 +1,58 @@
-Return-Path: <salyzyn@android.com>
-From: Mark Salyzyn <salyzyn@android.com>
-To: linux-kernel@vger.kernel.org
-Cc: Mark Salyzyn <salyzyn@android.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Kees Cook <keescook@chromium.org>,
-	Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	security@kernel.org,
-	kernel-team@android.com,
-	Jiri Kosina <jkosina@suse.cz>
-Subject: [PATCH] HID: Bluetooth: hidp: buffer overflow in hidp_process_report
-Date: Tue, 31 Jul 2018 15:02:13 -0700
-Message-Id: <20180731220225.159741-1-salyzyn@android.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: web and mobile app development
+Message-ID: <9f248d16025733d36720d4b52261f31c@tigermedical.com>
+Date: Tue, 31 Jul 2018 09:48:38 +0200
+From: "Vivek Shah" <tekofoter@kellyshomecenter.com>
+Reply-To: cengjaos@aliyun.com
 MIME-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-CVE-2018-9363
+Hello,
 
-The buffer length is unsigned at all layers, but gets cast to int and
-checked in hidp_process_report and can lead to a buffer overflow.
-Switch len parameter to unsigned int to resolve issue.
+Are you in search of a suitable app development agency to nurture and
+transform your creative app idea into reality?
 
-This affects 3.18 and newer kernels.
+Well, your search ends here.
 
-Signed-off-by: Mark Salyzyn <salyzyn@android.com>
-Fixes: a4b1b5877b514b276f0f31efe02388a9c2836728 ("HID: Bluetooth: hidp: make sure input buffers are big enough")
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: security@kernel.org
-Cc: kernel-team@android.com
----
- net/bluetooth/hidp/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+We are based in India. We are in the mobile app development domain for last
+seven years and with
+a team of 120+ web and mobile app development professionals, we have served
+the global clientele.
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 1036e4fa1ea2..3bba8f4b08a9 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -431,8 +431,8 @@ static void hidp_del_timer(struct hidp_session *session)
- 		del_timer(&session->timer);
- }
- 
--static void hidp_process_report(struct hidp_session *session,
--				int type, const u8 *data, int len, int intr)
-+static void hidp_process_report(struct hidp_session *session, int type,
-+				const u8 *data, unsigned int len, int intr)
- {
- 	if (len > HID_MAX_BUFFER_SIZE)
- 		len = HID_MAX_BUFFER_SIZE;
--- 
-2.18.0.345.g5c9ce644c3-goog
+Talking about the mobile apps, we have built over 350 mobile apps ranging
+from a simple business
+app to complex enterprise app to date.
+
+Our expertise in iOS, Android, Ionic, and PhoneGap-based platforms and
+various libraries can help
+you reach a huge smartphone-using audience with the following services:
+
+• Mobile App Consulting
+• Mobile App UI/UX Designing
+• Mobile App Development
+• Mobile App Maintenance & Support
+• Website and eCommerce portal Development
+
+We render our enterprise-grade app development services across different
+industry sectors including
+retail, games and entertainment, lifestyle, social media, healthcare and
+hospitality, BFSI, eCommerce
+(m-commerce), food and beverages, and the like.
+
+We will gladly share the references of our work on your demand.
+
+Here is how you can start expanding your business online:
+1. Respond to this email
+2. We will provide an Action Plan and Quote
+3. Get your Mobile App Development started
+
+That's it for now! Thanks for your time.
+
+Awaiting your reply,
+
+Regards,
+Vivek Shah
+
