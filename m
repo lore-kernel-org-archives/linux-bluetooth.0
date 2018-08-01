@@ -1,63 +1,89 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Wed, 1 Aug 2018 23:33:24 +0200
-From: Dominik 'Rathann' Mierzejewski <dominik@greysector.net>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [BlueZ] connection failure or profile unavailability when
- connecting two devices with overlapping profiles
-Message-ID: <20180801213324.GF10915@sakura.greysector.net>
-References: <20180801140618.GD10915@sakura.greysector.net>
- <CABBYNZ+LF6v6zkHypAtKBqyat1YA=BvyuKaJ2252ysZfVBk1BA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZ+LF6v6zkHypAtKBqyat1YA=BvyuKaJ2252ysZfVBk1BA@mail.gmail.com>
+From: George Karabin <gjkhwl@gmail.com>
+Date: Wed, 1 Aug 2018 15:01:42 -0400
+Message-ID: <CACEz+owZW84BSguv+RfQgkBZhDd8x2huc4Drx2tYOLiPzB5iVg@mail.gmail.com>
+Subject: Calling DBUS ConnectProfile to a non-discoverable but pageable device
+ with an invalid link key
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello, Luiz.
-Thank you for the quick reply.
+Hello!
 
-On Wednesday, 01 August 2018 at 17:08, Luiz Augusto von Dentz wrote:
-> Hi Dominik,
-> 
-> On Wed, Aug 1, 2018 at 5:06 PM, Dominik 'Rathann' Mierzejewski
-> <dominik@greysector.net> wrote:
-> > Dear list,
-> > I reported this originally in Fedora 27
-> > (https://bugzilla.redhat.com/show_bug.cgi?id=1541575), but maybe someone
-> > here has a better idea, since it's still reproducible on Fedora 28 with
-> > newer versions of bluez and pulseaudio.
-> >
-> > Description of problem:
-> > I'm unable to connect the Creative MUVO 2c speaker if a Jabra Evolve 65
-> > headset is connected already. If I connect the speaker first, then I'm
-> > able to connect the Jabra headset, but only HFP profile works (A2DP sink
-> > is not selectable). There are no issues adding an Android phone to the
-> > mix in any order, seemingly because it only has non-overlapping profiles
-> > A2DP source and HFP audio gateway).
-> 
-> PA only register one A2DP sink and one A2DP source, so you can only
-> connect to one headset at time.
+I would like to use the BlueZ 5.x DBUS API to establish a profile
+connection to a device that is not discoverable, but is pageable, for
+which I do not have a current link key. I don't think that this can be
+done using only the DBUS API today. If you call ConnectProfile after
+the connection drops the connection will be rejected. If you call
+RemoveDevice on the Adapter to remove the device and its stale pairing
+information, then you no longer have a device object to call
+ConnectProfile on.
 
-Well, that sucks. I'd like to use the speaker for music and the headset
-for audio conferencing. It doesn't seem like an unusual setup to me and
-having to connect/disconnect devices manually when someone calls me
-feels like a lot of unnecessary hassle. But maybe I'm mistaken.
+I can work around this issue by calling RemoveDevice to remove the old
+pairing, then using the btmgmt API to establish a pairing to the
+non-discoverable device prior to calling ConnectProfile on it. I'd
+prefer not to do that if I can avoid it. Instead, I'd rather find a
+DBUS solution from bluetoothd.
 
-> We could in theory not publish the
-> in_use flag of endpoints, but afaik we tried that some years ago and
-> that caused some problems, so perhaps adding more endpoints to PA
-> would work.
+>From an API point of view, it would seem natural to make the "Paired"
+property on a device object readwrite, so that you can remove its
+pairing without also removing the device object associated with the
+device. I'm sure there are other approaches that would make sense as
+well - I don't yet have a handle on the internal data structures and
+states that might be impacted by changing that assumption.
 
-Could you find some reference or at least suggest some keywords I could
-search on? I'm not that familiar with either Bluetooth or Pulseaudio.
+I would be willing to try to implement the patch if it didn't sound
+like a terrible idea, or if there were a simpler approach. I'd be
+happier still if someone could suggest an approach that already works
+(using DBUS API only) but I don't think I'll be that lucky.
 
-Shall I file a bug against pulseaudio at the new gitlab issue tracker
-(https://gitlab.freedesktop.org/pulseaudio/pulseaudio/issues/)?
+Thanks!
 
-Regards,
-Dominik
--- 
-Fedora   https://getfedora.org  |  RPMFusion   http://rpmfusion.org
-There should be a science of discontent. People need hard times and
-oppression to develop psychic muscles.
-        -- from "Collected Sayings of Muad'Dib" by the Princess Irulan
+- Josh Karabin
+
+----
+
+If you are wondering if there's a real use case behind this request, I
+apologize for the length of the use case that I'm about to describe,
+but I hope that you'll bear with me.
+
+A user of a master headless (no GUI) computer originally started an
+operation to find a slave with discovery and established a connection
+to the slave with ConnectProfile. After a time that connection was
+terminated, and the device goes into a non-discoverable, pageable
+mode, optimized for reconnection to the master which already has a
+link key. The user put the master down, and gave the slave to someone
+else.
+
+The slave was put into a discoverable mode by the new user, who then
+used another master headless computer to connect to the slave, which
+deleted the link key from the first master. After a time the second
+master dropped its connection, and the device stays in a
+non-discoverable, pageable state, optimized for reconnection from the
+second headless computer.
+
+Later, another user picks up the first master would like to connect,
+but it cannot do so with its current link key. If I call the DBUS
+RemoveDevice API, I can delete the link key but then I no longer have
+a Device object to call ConnectProfile on. I have not found a DBUS API
+to remove the link key without also removing the slave device. Since
+the slave device is not discoverable at this point in time, the first
+master cannot re-establish a connection.
+
+Usability testing proved that this was a problem. Users had a hard
+time remembering to put the slave device into a discoverable mode at
+this point. If they did, what often happened is that a third headless
+computer some distance away discovered the device and connected to it.
+The solution (for our non-BlueZ/DBUS master computers) has been to
+allow the master computers to connect to a profile directly to the
+known device address from a previous session, bypassing inquiry and
+going straight to paging.
+
+The slave devices are in the field, and management doesn't want to
+change their firmware to change their behavior as part of the process
+of selling replacement computers running BlueZ. I'll probably
+implement the workaround unless I can find a clean DBUS-only approach.
+
+If you made it this far, thanks again!
