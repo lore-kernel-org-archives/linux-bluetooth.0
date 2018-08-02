@@ -8,117 +8,158 @@ Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
 	linux-acpi@vger.kernel.org
-Subject: [PATCH v4 07/10] Bluetooth: hci_h5: Add support for serdev enumerated devices
-Date: Thu,  2 Aug 2018 16:57:18 +0200
-Message-Id: <20180802145721.31390-8-hdegoede@redhat.com>
+Subject: [PATCH v4 06/10] Bluetooth: btrtl: Add support for a config filename postfix
+Date: Thu,  2 Aug 2018 16:57:17 +0200
+Message-Id: <20180802145721.31390-7-hdegoede@redhat.com>
 In-Reply-To: <20180802145721.31390-1-hdegoede@redhat.com>
 References: <20180802145721.31390-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add basic support for serdev enumerated devices, note sine this does
-not (yet) declare any of / ACPI ids to bind to atm this is a nop.
+The contents of the rtl_bt/rtlXXXX_config.bin file may be board specific
+allow the caller of btrtl_initialize to specify a postfix identifying
+the board, which if specified will make btrtl_initialize look for
+rtl_bt/rtlXXXX_config-<postfix>.bin instead.
 
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/hci_h5.c | 52 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 48 insertions(+), 4 deletions(-)
+ drivers/bluetooth/btrtl.c | 32 ++++++++++++++++++++------------
+ drivers/bluetooth/btrtl.h |  6 ++++--
+ 2 files changed, 24 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 6a8d0d06aba7..672f63623bf7 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -23,6 +23,7 @@
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index fa9fd60e93aa..7f9ea8e4c1b2 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -89,21 +89,21 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723bs_config.bin" },
++	  .cfg_name = "rtl_bt/rtl8723bs_config" },
  
- #include <linux/kernel.h>
- #include <linux/errno.h>
-+#include <linux/serdev.h>
- #include <linux/skbuff.h>
+ 	/* 8723B */
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723b_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723b_config.bin" },
++	  .cfg_name = "rtl_bt/rtl8723b_config" },
  
- #include <net/bluetooth/bluetooth.h>
-@@ -65,6 +66,9 @@ enum {
- };
+ 	/* 8723D */
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723d_config.bin" },
++	  .cfg_name = "rtl_bt/rtl8723d_config" },
  
- struct h5 {
-+	/* Must be the first member, hci_serdev.c expects this. */
-+	struct hci_uart		serdev_hu;
-+
- 	struct sk_buff_head	unack;		/* Unack'ed packets queue */
- 	struct sk_buff_head	rel;		/* Reliable packets queue */
- 	struct sk_buff_head	unrel;		/* Unreliable packets queue */
-@@ -193,9 +197,13 @@ static int h5_open(struct hci_uart *hu)
+ 	/* 8723DS */
+ 	{ .match_flags = IC_MATCH_FL_LMPSUBV | IC_MATCH_FL_HCIREV |
+@@ -115,35 +115,35 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723ds_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723ds_config.bin" },
++	  .cfg_name = "rtl_bt/rtl8723ds_config" },
  
- 	BT_DBG("hu %p", hu);
+ 	/* 8821A */
+ 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8821a_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8821a_config.bin" },
++	  .cfg_name = "rtl_bt/rtl8821a_config" },
  
--	h5 = kzalloc(sizeof(*h5), GFP_KERNEL);
--	if (!h5)
--		return -ENOMEM;
-+	if (hu->serdev) {
-+		h5 = serdev_device_get_drvdata(hu->serdev);
-+	} else {
-+		h5 = kzalloc(sizeof(*h5), GFP_KERNEL);
-+		if (!h5)
-+			return -ENOMEM;
-+	}
+ 	/* 8821C */
+ 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8821c_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8821c_config.bin" },
++	  .cfg_name = "rtl_bt/rtl8821c_config" },
  
- 	hu->priv = h5;
- 	h5->hu = hu;
-@@ -229,7 +237,8 @@ static int h5_close(struct hci_uart *hu)
- 	skb_queue_purge(&h5->rel);
- 	skb_queue_purge(&h5->unrel);
+ 	/* 8761A */
+ 	{ IC_MATCH_FL_LMPSUBV, RTL_ROM_LMP_8761A, 0x0,
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8761a_config.bin" },
++	  .cfg_name = "rtl_bt/rtl8761a_config" },
  
--	kfree(h5);
-+	if (!hu->serdev)
-+		kfree(h5);
+ 	/* 8822B */
+ 	{ IC_INFO(RTL_ROM_LMP_8822B, 0xb),
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8822b_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8822b_config.bin" },
++	  .cfg_name = "rtl_bt/rtl8822b_config" },
+ 	};
  
- 	return 0;
+ static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
+@@ -507,11 +507,13 @@ void btrtl_free(struct btrtl_device_info *btrtl_dev)
  }
-@@ -750,12 +759,47 @@ static const struct hci_uart_proto h5p = {
- 	.flush		= h5_flush,
- };
+ EXPORT_SYMBOL_GPL(btrtl_free);
  
-+static int h5_serdev_probe(struct serdev_device *serdev)
-+{
-+	struct device *dev = &serdev->dev;
-+	struct h5 *h5;
-+
-+	h5 = devm_kzalloc(dev, sizeof(*h5), GFP_KERNEL);
-+	if (!h5)
-+		return -ENOMEM;
-+
-+	set_bit(HCI_UART_RESET_ON_INIT, &h5->serdev_hu.flags);
-+
-+	h5->hu = &h5->serdev_hu;
-+	h5->serdev_hu.serdev = serdev;
-+	serdev_device_set_drvdata(serdev, h5);
-+
-+	return hci_uart_register_device(&h5->serdev_hu, &h5p);
-+}
-+
-+static void h5_serdev_remove(struct serdev_device *serdev)
-+{
-+	struct h5 *h5 = serdev_device_get_drvdata(serdev);
-+
-+	hci_uart_unregister_device(&h5->serdev_hu);
-+}
-+
-+static struct serdev_device_driver h5_serdev_driver = {
-+	.probe = h5_serdev_probe,
-+	.remove = h5_serdev_remove,
-+	.driver = {
-+		.name = "hci_uart_h5",
-+	},
-+};
-+
- int __init h5_init(void)
+-struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
++struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
++					   const char *postfix)
  {
-+	serdev_device_driver_register(&h5_serdev_driver);
- 	return hci_uart_register_proto(&h5p);
- }
+ 	struct btrtl_device_info *btrtl_dev;
+ 	struct sk_buff *skb;
+ 	struct hci_rp_read_local_version *resp;
++	char cfg_name[40];
+ 	u16 hci_rev, lmp_subver;
+ 	u8 hci_ver;
+ 	int ret;
+@@ -564,8 +566,14 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
+ 	}
  
- int __exit h5_deinit(void)
+ 	if (btrtl_dev->ic_info->cfg_name) {
+-		btrtl_dev->cfg_len = rtl_load_file(hdev,
+-						   btrtl_dev->ic_info->cfg_name,
++		if (postfix) {
++			snprintf(cfg_name, sizeof(cfg_name), "%s-%s.bin",
++				 btrtl_dev->ic_info->cfg_name, postfix);
++		} else {
++			snprintf(cfg_name, sizeof(cfg_name), "%s.bin",
++				 btrtl_dev->ic_info->cfg_name);
++		}
++		btrtl_dev->cfg_len = rtl_load_file(hdev, cfg_name,
+ 						   &btrtl_dev->cfg_data);
+ 		if (btrtl_dev->ic_info->config_needed &&
+ 		    btrtl_dev->cfg_len <= 0) {
+@@ -615,7 +623,7 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+ 	struct btrtl_device_info *btrtl_dev;
+ 	int ret;
+ 
+-	btrtl_dev = btrtl_initialize(hdev);
++	btrtl_dev = btrtl_initialize(hdev, NULL);
+ 	if (IS_ERR(btrtl_dev))
+ 		return PTR_ERR(btrtl_dev);
+ 
+diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+index 9249ad1e9a1d..f5e36f3993a8 100644
+--- a/drivers/bluetooth/btrtl.h
++++ b/drivers/bluetooth/btrtl.h
+@@ -59,7 +59,8 @@ struct rtl_vendor_config {
+ 
+ #if IS_ENABLED(CONFIG_BT_RTL)
+ 
+-struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev);
++struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
++					   const char *postfix);
+ void btrtl_free(struct btrtl_device_info *btrtl_dev);
+ int btrtl_download_firmware(struct hci_dev *hdev,
+ 			    struct btrtl_device_info *btrtl_dev);
+@@ -71,7 +72,8 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+ 
+ #else
+ 
+-static inline struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev)
++static inline struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
++							 const char *postfix)
  {
-+	serdev_device_driver_unregister(&h5_serdev_driver);
- 	return hci_uart_unregister_proto(&h5p);
+ 	return ERR_PTR(-EOPNOTSUPP);
  }
 -- 
 2.18.0
