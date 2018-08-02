@@ -8,40 +8,42 @@ Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
 	linux-acpi@vger.kernel.org
-Subject: [PATCH v4 01/10] Bluetooth: btrtl: add MODULE_FIRMWARE declarations
-Date: Thu,  2 Aug 2018 16:57:12 +0200
-Message-Id: <20180802145721.31390-2-hdegoede@redhat.com>
-In-Reply-To: <20180802145721.31390-1-hdegoede@redhat.com>
-References: <20180802145721.31390-1-hdegoede@redhat.com>
+Subject: [PATCH v4 0/10] Bluetooth: Add RTL8723BS support
+Date: Thu,  2 Aug 2018 16:57:11 +0200
+Message-Id: <20180802145721.31390-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Hi All,
 
-This makes the firmware names show up in modinfo.
+Here is v4 of my series of patches adding support for RTL8723BS'
+bluetooth component through serdev enumeration.
 
-Signed-off-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Signed-off-by: Jeremy Cline <jeremy@jcline.org>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/btrtl.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+This builds on the great work done on this by Martin Blumenstingl
+which makes the btrtl.c code also support firmware+config loading
+for the RTL8723BS, as well as Jeremy's Cline work to add ACPI
+enumeration support on top of this.
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 437f080deaab..c08f63e3bc14 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -528,3 +528,12 @@ MODULE_AUTHOR("Daniel Drake <drake@endlessm.com>");
- MODULE_DESCRIPTION("Bluetooth support for Realtek devices ver " VERSION);
- MODULE_VERSION(VERSION);
- MODULE_LICENSE("GPL");
-+MODULE_FIRMWARE("rtl_bt/rtl8723a_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8723b_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8723b_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8821a_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8821a_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8822b_config.bin");
--- 
-2.18.0
+New in v4:
+-Add new rtl_dev_err, rtl_dev_info, etc. helper macros and use those
+ instead of bt_dev_err, etc
+-Add a new patch replacing all existing BT_ERR, bt_dev_err, etc. calls
+ in btrtl.c with the new helpers
+
+New in v3:
+-Fix build error when CONFIG_RTL_BT is not set, reported by Paul Cercueil
+
+New in v2:
+-Dropped devicetree specific patches
+ (these can be reposted later by someone who can actually test them)
+-Add the option to pass a postfix for the config firmware filename,
+ to btrtl_initialize() (new patch). For ACPI serdev enumerated
+ devies this will be set to the ACPI HID, so the filename becomes e.g.
+ rtl_bt/rtl8732bs_config-OBDA8723.bin
+ This is done because the config is board specific and we may need a
+ different file for e.g. ARM boards
+
+I've tested this series on several Intel boards with a RTL8723BS chip.
+
+Regards,
+
+Hans
