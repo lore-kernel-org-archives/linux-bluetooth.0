@@ -1,83 +1,132 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Bag, Amit K" <amit.k.bag@intel.com>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Message-ID: <1533205495.3472.144.camel@mtkswgap22>
+Subject: Re: [PATCH v7 2/3] Bluetooth: mediatek: Add protocol support for
+ MediaTek serial devices
+From: Sean Wang <sean.wang@mediatek.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>
-Subject: RE: [PATCH] Bluetooth: btusb: Release RF resource on BT shutdown
-Date: Thu, 2 Aug 2018 11:36:47 +0000
-Message-ID: <EFE6F46E14A5F445949D76A8CAC2240058312B34@PGSMSX105.gar.corp.intel.com>
-Content-Type: text/plain; charset="utf-8"
+CC: Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Date: Thu, 2 Aug 2018 18:24:55 +0800
+In-Reply-To: <9526E5D9-50BA-4D57-80F5-083DB7D28AFE@holtmann.org>
+References: <cover.1533056925.git.sean.wang@mediatek.com>
+         <c92ed10cf16f36d9a3b390e864af92e2dfe7b771.1533056925.git.sean.wang@mediatek.com>
+         <1707FFA1-A294-4A95-A3BF-0910CE455232@holtmann.org>
+         <1533192799.3472.122.camel@mtkswgap22>
+         <FF45A90A-F9F1-47CB-AB1F-1E92BF587FBE@holtmann.org>
+         <1533199720.3472.136.camel@mtkswgap22>
+         <9526E5D9-50BA-4D57-80F5-083DB7D28AFE@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQo+IEhpIEFtaXQsDQo+DQo+ID4gSW4gY2FzZSBvZiBCVCB0dXJuIG9mZiBm
-cm9tIFVJIGl0IGlzIHNhZmUgdG8gYWRkIEhDSSByZXNldCBjb21tYW5kIA0KPiA+IHdoaWNoIHdp
-bGwgbWFpbnRhaW4gdGhlIGNvbnRyb2xsZXIgc3RhdGUuDQo+DQo+IHRoaXMgbmVlZHMgdG8gYmUg
-YSBiaXQgbW9yZSBkZXRhaWxzIHNpbmNlIGhkZXYtPnNodXRkb3duIGhhbmRsaW5nIGlzIHJlYWxs
-eSBvbmx5IGZvciB0aGUgb2xkZXIgSW50ZWwgY29udHJvbGxlcnMuDQoNCj4gQWxzbyBJIGFtIGZh
-aWxpbmcgdG8gc2VlIHdoeSBIQ0kgUmVzZXQgaGVscHMgb3Igd2hhdCBpdCBkb2VzIGhlcmUuIEl0
-IGlzIGdvaW5nIHRvIGJlIGNhbGxlZCBhZ2FpbiBvbiBoZGV2LT5vcGVuIHRoZSBuZXh0IHRpbWUg
-dGhlIGNvbnRyb2xsZXIgaXMgYWN0aXZhdGVkLg0KPg0KPiA+IA0KPiA+IFNpZ25lZC1vZmYtYnk6
-IEFtaXQgSyBCYWcgPGFtaXQuay5iYWdAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+IGRyaXZlcnMv
-Ymx1ZXRvb3RoL2J0dXNiLmMgfCAxMiArKysrKysrKysrKysNCj4gPiAxIGZpbGUgY2hhbmdlZCwg
-MTIgaW5zZXJ0aW9ucygrKQ0KPiA+IA0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290
-aC9idHVzYi5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyANCj4gPiBpbmRleCA1NzJmZDc1
-ZmJjZjYuLjU5OWVjOWIxMmQzZiAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9i
-dHVzYi5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+IEBAIC0yMzY5
-LDYgKzIzNjksMTggQEAgc3RhdGljIGludCBidHVzYl9zaHV0ZG93bl9pbnRlbChzdHJ1Y3QgaGNp
-X2RldiAqaGRldikNCj4gPiAJc3RydWN0IHNrX2J1ZmYgKnNrYjsNCj4gPiAJbG9uZyByZXQ7DQo+
-ID4gDQo+ID4gKwkvKiBJbiBjYXNlIG9mIEJUIG9mZiBmcm9tIFVJIGl0IGlzIHNhZmUgdG8gZG8g
-SENJIHJlc2V0Lg0KPiA+ICsJICogVGhpcyB3aWxsIG1haW50YWluIHRoZSBjb250cm9sbGVyIHN0
-YXRlLg0KPiA+ICsJICovDQo+DQo+IEkgZG8gbm90IGNhcmUgd2hhdCB0aGUgVUkgZG9lcyBoZXJl
-LiBUaGlzIGlzIHBvd2VyIGRvd24gb3BlcmF0aW9uIGFuZCBzbyBpdCBuZWVkcyB0byBiZSBleHBs
-YWluZWQgcHJvcGVybHkuIEFuZCB3aXRoIGEgbG90IG1vcmUgZGV0YWlscyBzaW5jZSBJIGFtIGZh
-aWxpbmcgdG8gdW5kZXJzdGFuZCB3aGF0IHN0YXRlIGlzIG1haW50YWluZWQgb24gSENJIFJlc2V0
-LiBBcyBwZXIgc3BlY2lmaWNhdGlvbiBpdCB3aWxsIHJlc2V0IGFsbCBCbHVldG9vdGggPiA+IHN0
-YXRlcyBiYWNrIHRvIHRoZSBkZWZhdWx0cy4NCj4NCj4gPiArCXNrYiA9IF9faGNpX2NtZF9zeW5j
-KGhkZXYsIEhDSV9PUF9SRVNFVCwgMCwgTlVMTCwgSENJX0lOSVRfVElNRU9VVCk7DQo+ID4gKyAg
-ICAgICAgaWYgKElTX0VSUihza2IpKSB7DQo+ID4gKwkJcmV0ID0gUFRSX0VSUihza2IpOw0KPiA+
-ICsJCUJUX0VSUigiJXM6IEJUIGNvbnRyb2xsZXIgIEhDSSByZXNldCBmYWlsZWQgKCVsZCkiLA0K
-PiA+ICsJCSAgICAgICBoZGV2LT5uYW1lLCByZXQpOw0KPiA+ICsJCXJldHVybiByZXQ7DQo+ID4g
-Kwl9DQo+ID4gKwlrZnJlZV9za2Ioc2tiKTsNCj4gPiArDQo+DQo+ID4gVGhlcmUgaXMgd2hpdGVz
-cGFjZSBkYW1hZ2UgaGVyZS4gQW5kIGlmIHRoaXMgaGFzbuKAmXQgYmVlbiBkb25lIHlldCwgcGxl
-YXNlIGZpcnN0IHN0YXJ0IHVzaW5nIGJ0X2Rldl9lcnIgaW5zdGVhZCBvZiBCVF9FUlIgZm9yIHRo
-ZSBJbnRlbCBwYXJ0cy4NCj4NCj4gPiAJLyogU29tZSBwbGF0Zm9ybXMgaGF2ZSBhbiBpc3N1ZSB3
-aXRoIEJUIExFRCB3aGVuIHRoZSBpbnRlcmZhY2UgaXMNCj4gPiAJICogZG93biBvciBCVCByYWRp
-byBpcyB0dXJuZWQgb2ZmLCB3aGljaCB0YWtlcyA1IHNlY29uZHMgdG8gQlQgTEVEDQo+ID4gCSAq
-IGdvZXMgb2ZmLiBUaGlzIGNvbW1hbmQgdHVybnMgb2ZmIHRoZSBCVCBMRUQgaW1tZWRpYXRlbHku
-DQo+DQo+IFJlZ2FyZHMNCj4NCj4gTWFyY2VsDQoNCg0KSSBoYXZlIHVwZGF0ZWQgdGhlIHBhdGNo
-IGFzIHBlciB5b3VyIGNvbW1lbnRzLiBQbGVhc2UgZmluZCB0aGUgcGF0Y2ggYXMgYmVsb3cuDQoN
-Cklzc3VlIGRlc2NyaXB0aW9uOiBJbnRlbCAyNzY1IHNoYXJlcyB0aGUgc2FtZSBSRiB3aXRoIFdp
-ZmkgYW5kIEJULg0KSW4gdGhlIHNodXRkb3duIHNjZW5hcmlvIHR1cm4gb2ZmIEJULCBmb2xsb3dl
-ZCBieSB0dXJuIFdpRmkgb2ZmDQphbmQgb24gY2F1c2luZyBlcnJvciBpbiBSRiBjYWxpYnJhdGlv
-biBpbiBXaUZpIE1vZHVsZQ0KDQpTb2x1dGlvbjogYmVmb3JlIHNodXRkb3duIEJUIGVuc3VyZSBh
-bnkgUkYgYWN0aXZpdHkgdG8gY2xlYXIgYnkNCkhDSSByZXNldCBjb21tYW5kLg0KDQpSZWZlcmVu
-Y2UgTG9nczoNCkVSUiBrZXJuZWw6IFsgMzg2LjE5MzI4NF0gaXdsd2lmaSAwMDAwOjAxOjAwLjA6
-IEZhaWxlZCB0byBydW4gSU5JVCBjYWxpYnJhdGlvbnM6IC01DQpFUlIga2VybmVsOiBbIDM4Ni4x
-OTMyOThdIGl3bHdpZmkgMDAwMDowMTowMC4wOiBGYWlsZWQgdG8gcnVuIElOSVQgdWNvZGU6IC01
-DQpFUlIga2VybmVsOiBbIDM4Ni4xOTMzMDldIGl3bHdpZmkgMDAwMDowMTowMC4wOiBGYWlsZWQg
-dG8gc3RhcnQgUlQgdWNvZGU6IC01DQoNClNpZ25lZC1vZmYtYnk6IEFtaXQgSyBCYWcgPGFtaXQu
-ay5iYWdAaW50ZWwuY29tPg0KLS0tDQogZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyB8IDE1ICsr
-KysrKysrKysrKysrKw0KIDEgZmlsZSBjaGFuZ2VkLCAxNSBpbnNlcnRpb25zKCspDQoNCmRpZmYg
-LS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1
-c2IuYw0KaW5kZXggNTcyZmQ3NWZiY2Y2Li40YTNiNmE3ZGM4NmYgMTAwNjQ0DQotLS0gYS9kcml2
-ZXJzL2JsdWV0b290aC9idHVzYi5jDQorKysgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQpA
-QCAtMjM2OSw2ICsyMzY5LDIxIEBAIHN0YXRpYyBpbnQgYnR1c2Jfc2h1dGRvd25faW50ZWwoc3Ry
-dWN0IGhjaV9kZXYgKmhkZXYpDQogICAgICAgIHN0cnVjdCBza19idWZmICpza2I7DQogICAgICAg
-IGxvbmcgcmV0Ow0KDQorICAgICAgIC8qIElTU1VFOiBJbiBzaHV0ZG93biBzZXF1ZW5jZSB3aGVy
-ZSBCVCB0dXJuIG9mZiBhbmQgZm9sbG93ZWQNCisgICAgICAgICogYnkgV2lGaSB0dXJuIG9mZiwg
-YW5kIGlmIFdpZmkgaXMgdHVybiBvbiBiYWNrLCBXaWZpIGlzIHVuYWJsZQ0KKyAgICAgICAgKiB0
-byBkbyB0aGUgUkYgY2FsaWJyYXRpb24uKG9ic2VydmUgdGhpcyBvbiBJTlRFTCA3MjY1KQ0KKyAg
-ICAgICAgKg0KKyAgICAgICAgKiBTb2x1dGlvbjogYmVmb3JlIHNodXRkb3duIEJUIGVuc3VyZSBh
-bnkgUkYgYWN0aXZpdHkgdG8gY2xlYXINCisgICAgICAgICogYnkgc2VuZCB0aGlzIGNvbW1hbmQu
-DQorICAgICAgICAqLw0KKyAgICAgICBza2IgPSBfX2hjaV9jbWRfc3luYyhoZGV2LCBIQ0lfT1Bf
-UkVTRVQsIDAsIE5VTEwsIEhDSV9JTklUX1RJTUVPVVQpOw0KKyAgICAgICBpZiAoSVNfRVJSKHNr
-YikpIHsNCisgICAgICAgICAgICAgICByZXQgPSBQVFJfRVJSKHNrYik7DQorICAgICAgICAgICAg
-ICAgYnRfZGV2X2VycihoZGV2LCAiJXM6IEhDSSByZXNldCBmYWlsZWRcbiIsIF9fZnVuY19fKTsN
-CisgICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KKyAgICAgICB9DQorICAgICAgIGtmcmVlX3Nr
-Yihza2IpOw0KKw0KICAgICAgICAvKiBTb21lIHBsYXRmb3JtcyBoYXZlIGFuIGlzc3VlIHdpdGgg
-QlQgTEVEIHdoZW4gdGhlIGludGVyZmFjZSBpcw0KICAgICAgICAgKiBkb3duIG9yIEJUIHJhZGlv
-IGlzIHR1cm5lZCBvZmYsIHdoaWNoIHRha2VzIDUgc2Vjb25kcyB0byBCVCBMRUQNCiAgICAgICAg
-ICogZ29lcyBvZmYuIFRoaXMgY29tbWFuZCB0dXJucyBvZmYgdGhlIEJUIExFRCBpbW1lZGlhdGVs
-eS4NCi0tDQoyLjcuNA0KDQo=
+On Thu, 2018-08-02 at 11:45 +0200, Marcel Holtmann wrote:
+> Hi Sean,
+> 
+> >>>>> +
+> >>>>> +static int mtk_hci_wmt_sync(struct hci_dev *hdev, u8 op, u8 flag, u16 plen,
+> >>>>> +			    const void *param)
+> >>>>> +{
+> >>>>> +	struct mtk_hci_wmt_cmd wc;
+> >>>>> +	struct mtk_wmt_hdr *hdr;
+> >>>>> +	struct sk_buff *skb;
+> >>>>> +	u32 hlen;
+> >>>>> +
+> >>>>> +	hlen = sizeof(*hdr) + plen;
+> >>>>> +	if (hlen > 255)
+> >>>>> +		return -EINVAL;
+> >>>>> +
+> >>>>> +	hdr = (struct mtk_wmt_hdr *)&wc;
+> >>>>> +	hdr->dir = 1;
+> >>>>> +	hdr->op = op;
+> >>>>> +	hdr->dlen = cpu_to_le16(plen + 1);
+> >>>>> +	hdr->flag = flag;
+> >>>>> +	memcpy(wc.data, param, plen);
+> >>>>> +
+> >>>>> +	atomic_inc(&hdev->cmd_cnt);
+> >>>> 
+> >>>> Why are you doing this one. It will need a comment here if really needed. However I doubt that this is needed. You are only using it from hdev->setup and hdev->shutdown callbacks.
+> >>>> 
+> >>> 
+> >>> An increment on cmd_cnt is really needed because hci_cmd_work would check whether cmd_cnt is positive and then has a decrement on cmd_cnt before a packet is being sent out.
+> >>> 
+> >>> okay will add a comment.
+> >> 
+> >> but you are in ->setup callback this time. So if you need this, then all the other ->setup routines would actually fail as well. Either this is leftover from when you did things in ->probe or ->open or this is some thing we might better fix properly in the core instead of papering over it. Can you recheck if this is really needed.
+> >> 
+> > 
+> > I added a counter print and the counter increments as below
+> > 
+> > 	/* atomic_inc(&hdev->cmd_cnt); */
+> >        pr_info("cmd_cnt = %d\n" , atomic_read(&hdev->cmd_cnt));
+> > 
+> >        skb = __hci_cmd_sync_ev(hdev, 0xfc6f, hlen, &wc, HCI_VENDOR_PKT,
+> >                                HCI_INIT_TIMEOUT);
+> > 
+> > and the log show up that 
+> > 
+> > 
+> > [  334.049156] Bluetooth: hci0: command 0xfc6f tx timeout
+> > [  334.054840] cmd_cnt = 0
+> > [  336.065076] Bluetooth: hci0: command 0xfc6f tx timeout
+> > [  336.070795] cmd_cnt = 0
+> > [  338.080997] Bluetooth: hci0: command 0xfc6f tx timeout
+> > [  338.086683] cmd_cnt = 0
+> > [  340.096907] Bluetooth: hci0: command 0xfc6f tx timeout
+> > [  340.102609] cmd_cnt = 0
+> > [  342.112824] Bluetooth: hci0: command 0xfc6f tx timeout
+> > [  342.118520] cmd_cnt = 0
+> > [  344.128747] Bluetooth: hci0: command 0xfc6f tx timeout
+> > [  344.134454] cmd_cnt = 0
+> > [  346.144667] Bluetooth: hci0: command 0xfc6f tx timeout
+> > [  346.150372] cmd_cnt = 0
+> > 
+> > 
+> > The packet is dropped by hci_cmd_work at [1], so I also wondered why the
+> > other vendor driver works, it seems the counter needs to be incremented
+> > before every skb is being queued to cmd_q.
+> > 
+> > 4257 static void hci_cmd_work(struct work_struct *work)
+> > 4258 {
+> > 4259         struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_work);
+> > 4260         struct sk_buff *skb;
+> > 4261
+> > 4262         BT_DBG("%s cmd_cnt %d cmd queued %d", hdev->name,
+> > 4263                atomic_read(&hdev->cmd_cnt), skb_queue_len(&hdev->cmd_q));
+> > 4264
+> > 4265         /* Send queued commands */
+> > 
+> > [1]
+> > 4266         if (atomic_read(&hdev->cmd_cnt)) { /* dropped when cmd_cnt is zero */
+> > 4267                 skb = skb_dequeue(&hdev->cmd_q);
+> > 4268                 if (!skb)
+> > 4269                         return;
+> > 4270
+> > 4271                 kfree_skb(hdev->sent_cmd);
+> > 4272
+> > 4273                 hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
+> > 4274                 if (hdev->sent_cmd) {
+> > 4275                         atomic_dec(&hdev->cmd_cnt);  /* cmd_cnt-- */
+> > 4276                         hci_send_frame(hdev, skb);
+> 
+> actually the command also needs to better go via the raw_q anyway since it doesn’t come back with the cmd status or cmd complete. You have it waiting for a vendor event. Maybe with is something we need to consider with __hci_cmd_sync_ev anyway.
+> 
+> Johan would know best since he wrote that code. Anyway, we should fix that in the core and not have you hack around it.
+> 
+
+yes, my case is that received event is neither cmd status nor cmd complete. It is completely a vendor event.
+
+if it wants to be solved by the core layer, do you permit that I remove the hack and then send it in the next version?
+
+	Sean
+
+> Regards
+> 
+> Marcel
+> 
