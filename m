@@ -1,131 +1,83 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: [PATCH] Bluetooth: btusb: Release RF resource on BT shutdown
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <EFE6F46E14A5F445949D76A8CAC2240058312B34@PGSMSX105.gar.corp.intel.com>
-Date: Thu, 2 Aug 2018 14:29:59 +0200
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+From: "Bag, Amit K" <amit.k.bag@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>
-Message-Id: <E73127F5-D0B0-41C8-8025-0F2D3E836D3E@holtmann.org>
-References: <EFE6F46E14A5F445949D76A8CAC2240058312B34@PGSMSX105.gar.corp.intel.com>
-To: "Bag, Amit K" <amit.k.bag@intel.com>
+Subject: RE: [PATCH] Bluetooth: btusb: Release RF resource on BT shutdown
+Date: Thu, 2 Aug 2018 11:36:47 +0000
+Message-ID: <EFE6F46E14A5F445949D76A8CAC2240058312B34@PGSMSX105.gar.corp.intel.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Amit,
-
->>> In case of BT turn off from UI it is safe to add HCI reset command 
->>> which will maintain the controller state.
->> 
->> this needs to be a bit more details since hdev->shutdown handling is really only for the older Intel controllers.
-> 
->> Also I am failing to see why HCI Reset helps or what it does here. It is going to be called again on hdev->open the next time the controller is activated.
->> 
->>> 
->>> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
->>> ---
->>> drivers/bluetooth/btusb.c | 12 ++++++++++++
->>> 1 file changed, 12 insertions(+)
->>> 
->>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c 
->>> index 572fd75fbcf6..599ec9b12d3f 100644
->>> --- a/drivers/bluetooth/btusb.c
->>> +++ b/drivers/bluetooth/btusb.c
->>> @@ -2369,6 +2369,18 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
->>> 	struct sk_buff *skb;
->>> 	long ret;
->>> 
->>> +	/* In case of BT off from UI it is safe to do HCI reset.
->>> +	 * This will maintain the controller state.
->>> +	 */
->> 
->> I do not care what the UI does here. This is power down operation and so it needs to be explained properly. And with a lot more details since I am failing to understand what state is maintained on HCI Reset. As per specification it will reset all Bluetooth > > states back to the defaults.
->> 
->>> +	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
->>> +        if (IS_ERR(skb)) {
->>> +		ret = PTR_ERR(skb);
->>> +		BT_ERR("%s: BT controller  HCI reset failed (%ld)",
->>> +		       hdev->name, ret);
->>> +		return ret;
->>> +	}
->>> +	kfree_skb(skb);
->>> +
->> 
->>> There is whitespace damage here. And if this hasnât been done yet, please first start using bt_dev_err instead of BT_ERR for the Intel parts.
->> 
->>> 	/* Some platforms have an issue with BT LED when the interface is
->>> 	 * down or BT radio is turned off, which takes 5 seconds to BT LED
->>> 	 * goes off. This command turns off the BT LED immediately.
->> 
->> Regards
->> 
->> Marcel
-> 
-> 
-> I have updated the patch as per your comments. Please find the patch as below.
-> 
-> Issue description: Intel 2765 shares the same RF with Wifi and BT.
-
-7265 ?
-
-> In the shutdown scenario turn off BT, followed by turn WiFi off
-> and on causing error in RF calibration in WiFi Module
-> 
-> Solution: before shutdown BT ensure any RF activity to clear by
-> HCI reset command.
-> 
-> Reference Logs:
-> ERR kernel: [ 386.193284] iwlwifi 0000:01:00.0: Failed to run INIT calibrations: -5
-> ERR kernel: [ 386.193298] iwlwifi 0000:01:00.0: Failed to run INIT ucode: -5
-> ERR kernel: [ 386.193309] iwlwifi 0000:01:00.0: Failed to start RT ucode: -5
-> 
-> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
-> ---
-> drivers/bluetooth/btusb.c | 15 +++++++++++++++
-> 1 file changed, 15 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 572fd75fbcf6..4a3b6a7dc86f 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2369,6 +2369,21 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
->        struct sk_buff *skb;
->        long ret;
-> 
-> +       /* ISSUE: In shutdown sequence where BT turn off and followed
-
-Scrap the word ISSUE: since that is not needed. Just describe why we are doing this.
-
-> +        * by WiFi turn off, and if Wifi is turn on back, Wifi is unable
-> +        * to do the RF calibration.(observe this on INTEL 7265)
-
-No need for the text in ()
-
-> +        *
-> +        * Solution: before shutdown BT ensure any RF activity to clear
-> +        * by send this command.
-> +        */
-
-Scrap the Solution: and bring this in as proper sentence.
-
-> +       skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
-> +       if (IS_ERR(skb)) {
-> +               ret = PTR_ERR(skb);
-> +               bt_dev_err(hdev, "%s: HCI reset failed\n", __func__);
-
-Scrap the __func__ usage. We are not doing this. Also no \n with the bt_dev_err. If you want this clear then "HCI reset on shutdown failed”.
-
-> +               return ret;
-> +       }
-> +       kfree_skb(skb);
-> +
->        /* Some platforms have an issue with BT LED when the interface is
->         * down or BT radio is turned off, which takes 5 seconds to BT LED
->         * goes off. This command turns off the BT LED immediately.
-
-Regards
-
-Marcel
-
+SGkgTWFyY2VsLA0KDQo+IEhpIEFtaXQsDQo+DQo+ID4gSW4gY2FzZSBvZiBCVCB0dXJuIG9mZiBm
+cm9tIFVJIGl0IGlzIHNhZmUgdG8gYWRkIEhDSSByZXNldCBjb21tYW5kIA0KPiA+IHdoaWNoIHdp
+bGwgbWFpbnRhaW4gdGhlIGNvbnRyb2xsZXIgc3RhdGUuDQo+DQo+IHRoaXMgbmVlZHMgdG8gYmUg
+YSBiaXQgbW9yZSBkZXRhaWxzIHNpbmNlIGhkZXYtPnNodXRkb3duIGhhbmRsaW5nIGlzIHJlYWxs
+eSBvbmx5IGZvciB0aGUgb2xkZXIgSW50ZWwgY29udHJvbGxlcnMuDQoNCj4gQWxzbyBJIGFtIGZh
+aWxpbmcgdG8gc2VlIHdoeSBIQ0kgUmVzZXQgaGVscHMgb3Igd2hhdCBpdCBkb2VzIGhlcmUuIEl0
+IGlzIGdvaW5nIHRvIGJlIGNhbGxlZCBhZ2FpbiBvbiBoZGV2LT5vcGVuIHRoZSBuZXh0IHRpbWUg
+dGhlIGNvbnRyb2xsZXIgaXMgYWN0aXZhdGVkLg0KPg0KPiA+IA0KPiA+IFNpZ25lZC1vZmYtYnk6
+IEFtaXQgSyBCYWcgPGFtaXQuay5iYWdAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+IGRyaXZlcnMv
+Ymx1ZXRvb3RoL2J0dXNiLmMgfCAxMiArKysrKysrKysrKysNCj4gPiAxIGZpbGUgY2hhbmdlZCwg
+MTIgaW5zZXJ0aW9ucygrKQ0KPiA+IA0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2JsdWV0b290
+aC9idHVzYi5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyANCj4gPiBpbmRleCA1NzJmZDc1
+ZmJjZjYuLjU5OWVjOWIxMmQzZiAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9i
+dHVzYi5jDQo+ID4gKysrIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYw0KPiA+IEBAIC0yMzY5
+LDYgKzIzNjksMTggQEAgc3RhdGljIGludCBidHVzYl9zaHV0ZG93bl9pbnRlbChzdHJ1Y3QgaGNp
+X2RldiAqaGRldikNCj4gPiAJc3RydWN0IHNrX2J1ZmYgKnNrYjsNCj4gPiAJbG9uZyByZXQ7DQo+
+ID4gDQo+ID4gKwkvKiBJbiBjYXNlIG9mIEJUIG9mZiBmcm9tIFVJIGl0IGlzIHNhZmUgdG8gZG8g
+SENJIHJlc2V0Lg0KPiA+ICsJICogVGhpcyB3aWxsIG1haW50YWluIHRoZSBjb250cm9sbGVyIHN0
+YXRlLg0KPiA+ICsJICovDQo+DQo+IEkgZG8gbm90IGNhcmUgd2hhdCB0aGUgVUkgZG9lcyBoZXJl
+LiBUaGlzIGlzIHBvd2VyIGRvd24gb3BlcmF0aW9uIGFuZCBzbyBpdCBuZWVkcyB0byBiZSBleHBs
+YWluZWQgcHJvcGVybHkuIEFuZCB3aXRoIGEgbG90IG1vcmUgZGV0YWlscyBzaW5jZSBJIGFtIGZh
+aWxpbmcgdG8gdW5kZXJzdGFuZCB3aGF0IHN0YXRlIGlzIG1haW50YWluZWQgb24gSENJIFJlc2V0
+LiBBcyBwZXIgc3BlY2lmaWNhdGlvbiBpdCB3aWxsIHJlc2V0IGFsbCBCbHVldG9vdGggPiA+IHN0
+YXRlcyBiYWNrIHRvIHRoZSBkZWZhdWx0cy4NCj4NCj4gPiArCXNrYiA9IF9faGNpX2NtZF9zeW5j
+KGhkZXYsIEhDSV9PUF9SRVNFVCwgMCwgTlVMTCwgSENJX0lOSVRfVElNRU9VVCk7DQo+ID4gKyAg
+ICAgICAgaWYgKElTX0VSUihza2IpKSB7DQo+ID4gKwkJcmV0ID0gUFRSX0VSUihza2IpOw0KPiA+
+ICsJCUJUX0VSUigiJXM6IEJUIGNvbnRyb2xsZXIgIEhDSSByZXNldCBmYWlsZWQgKCVsZCkiLA0K
+PiA+ICsJCSAgICAgICBoZGV2LT5uYW1lLCByZXQpOw0KPiA+ICsJCXJldHVybiByZXQ7DQo+ID4g
+Kwl9DQo+ID4gKwlrZnJlZV9za2Ioc2tiKTsNCj4gPiArDQo+DQo+ID4gVGhlcmUgaXMgd2hpdGVz
+cGFjZSBkYW1hZ2UgaGVyZS4gQW5kIGlmIHRoaXMgaGFzbuKAmXQgYmVlbiBkb25lIHlldCwgcGxl
+YXNlIGZpcnN0IHN0YXJ0IHVzaW5nIGJ0X2Rldl9lcnIgaW5zdGVhZCBvZiBCVF9FUlIgZm9yIHRo
+ZSBJbnRlbCBwYXJ0cy4NCj4NCj4gPiAJLyogU29tZSBwbGF0Zm9ybXMgaGF2ZSBhbiBpc3N1ZSB3
+aXRoIEJUIExFRCB3aGVuIHRoZSBpbnRlcmZhY2UgaXMNCj4gPiAJICogZG93biBvciBCVCByYWRp
+byBpcyB0dXJuZWQgb2ZmLCB3aGljaCB0YWtlcyA1IHNlY29uZHMgdG8gQlQgTEVEDQo+ID4gCSAq
+IGdvZXMgb2ZmLiBUaGlzIGNvbW1hbmQgdHVybnMgb2ZmIHRoZSBCVCBMRUQgaW1tZWRpYXRlbHku
+DQo+DQo+IFJlZ2FyZHMNCj4NCj4gTWFyY2VsDQoNCg0KSSBoYXZlIHVwZGF0ZWQgdGhlIHBhdGNo
+IGFzIHBlciB5b3VyIGNvbW1lbnRzLiBQbGVhc2UgZmluZCB0aGUgcGF0Y2ggYXMgYmVsb3cuDQoN
+Cklzc3VlIGRlc2NyaXB0aW9uOiBJbnRlbCAyNzY1IHNoYXJlcyB0aGUgc2FtZSBSRiB3aXRoIFdp
+ZmkgYW5kIEJULg0KSW4gdGhlIHNodXRkb3duIHNjZW5hcmlvIHR1cm4gb2ZmIEJULCBmb2xsb3dl
+ZCBieSB0dXJuIFdpRmkgb2ZmDQphbmQgb24gY2F1c2luZyBlcnJvciBpbiBSRiBjYWxpYnJhdGlv
+biBpbiBXaUZpIE1vZHVsZQ0KDQpTb2x1dGlvbjogYmVmb3JlIHNodXRkb3duIEJUIGVuc3VyZSBh
+bnkgUkYgYWN0aXZpdHkgdG8gY2xlYXIgYnkNCkhDSSByZXNldCBjb21tYW5kLg0KDQpSZWZlcmVu
+Y2UgTG9nczoNCkVSUiBrZXJuZWw6IFsgMzg2LjE5MzI4NF0gaXdsd2lmaSAwMDAwOjAxOjAwLjA6
+IEZhaWxlZCB0byBydW4gSU5JVCBjYWxpYnJhdGlvbnM6IC01DQpFUlIga2VybmVsOiBbIDM4Ni4x
+OTMyOThdIGl3bHdpZmkgMDAwMDowMTowMC4wOiBGYWlsZWQgdG8gcnVuIElOSVQgdWNvZGU6IC01
+DQpFUlIga2VybmVsOiBbIDM4Ni4xOTMzMDldIGl3bHdpZmkgMDAwMDowMTowMC4wOiBGYWlsZWQg
+dG8gc3RhcnQgUlQgdWNvZGU6IC01DQoNClNpZ25lZC1vZmYtYnk6IEFtaXQgSyBCYWcgPGFtaXQu
+ay5iYWdAaW50ZWwuY29tPg0KLS0tDQogZHJpdmVycy9ibHVldG9vdGgvYnR1c2IuYyB8IDE1ICsr
+KysrKysrKysrKysrKw0KIDEgZmlsZSBjaGFuZ2VkLCAxNSBpbnNlcnRpb25zKCspDQoNCmRpZmYg
+LS1naXQgYS9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jIGIvZHJpdmVycy9ibHVldG9vdGgvYnR1
+c2IuYw0KaW5kZXggNTcyZmQ3NWZiY2Y2Li40YTNiNmE3ZGM4NmYgMTAwNjQ0DQotLS0gYS9kcml2
+ZXJzL2JsdWV0b290aC9idHVzYi5jDQorKysgYi9kcml2ZXJzL2JsdWV0b290aC9idHVzYi5jDQpA
+QCAtMjM2OSw2ICsyMzY5LDIxIEBAIHN0YXRpYyBpbnQgYnR1c2Jfc2h1dGRvd25faW50ZWwoc3Ry
+dWN0IGhjaV9kZXYgKmhkZXYpDQogICAgICAgIHN0cnVjdCBza19idWZmICpza2I7DQogICAgICAg
+IGxvbmcgcmV0Ow0KDQorICAgICAgIC8qIElTU1VFOiBJbiBzaHV0ZG93biBzZXF1ZW5jZSB3aGVy
+ZSBCVCB0dXJuIG9mZiBhbmQgZm9sbG93ZWQNCisgICAgICAgICogYnkgV2lGaSB0dXJuIG9mZiwg
+YW5kIGlmIFdpZmkgaXMgdHVybiBvbiBiYWNrLCBXaWZpIGlzIHVuYWJsZQ0KKyAgICAgICAgKiB0
+byBkbyB0aGUgUkYgY2FsaWJyYXRpb24uKG9ic2VydmUgdGhpcyBvbiBJTlRFTCA3MjY1KQ0KKyAg
+ICAgICAgKg0KKyAgICAgICAgKiBTb2x1dGlvbjogYmVmb3JlIHNodXRkb3duIEJUIGVuc3VyZSBh
+bnkgUkYgYWN0aXZpdHkgdG8gY2xlYXINCisgICAgICAgICogYnkgc2VuZCB0aGlzIGNvbW1hbmQu
+DQorICAgICAgICAqLw0KKyAgICAgICBza2IgPSBfX2hjaV9jbWRfc3luYyhoZGV2LCBIQ0lfT1Bf
+UkVTRVQsIDAsIE5VTEwsIEhDSV9JTklUX1RJTUVPVVQpOw0KKyAgICAgICBpZiAoSVNfRVJSKHNr
+YikpIHsNCisgICAgICAgICAgICAgICByZXQgPSBQVFJfRVJSKHNrYik7DQorICAgICAgICAgICAg
+ICAgYnRfZGV2X2VycihoZGV2LCAiJXM6IEhDSSByZXNldCBmYWlsZWRcbiIsIF9fZnVuY19fKTsN
+CisgICAgICAgICAgICAgICByZXR1cm4gcmV0Ow0KKyAgICAgICB9DQorICAgICAgIGtmcmVlX3Nr
+Yihza2IpOw0KKw0KICAgICAgICAvKiBTb21lIHBsYXRmb3JtcyBoYXZlIGFuIGlzc3VlIHdpdGgg
+QlQgTEVEIHdoZW4gdGhlIGludGVyZmFjZSBpcw0KICAgICAgICAgKiBkb3duIG9yIEJUIHJhZGlv
+IGlzIHR1cm5lZCBvZmYsIHdoaWNoIHRha2VzIDUgc2Vjb25kcyB0byBCVCBMRUQNCiAgICAgICAg
+ICogZ29lcyBvZmYuIFRoaXMgY29tbWFuZCB0dXJucyBvZmYgdGhlIEJUIExFRCBpbW1lZGlhdGVs
+eS4NCi0tDQoyLjcuNA0KDQo=
