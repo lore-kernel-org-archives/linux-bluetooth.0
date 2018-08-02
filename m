@@ -1,163 +1,191 @@
-Return-Path: <mka@chromium.org>
-Date: Thu, 2 Aug 2018 10:15:18 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org, thierry.escande@linaro.org,
-	rtatiya@codeaurora.org, hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v12 7/7] Bluetooth: hci_qca: Add support for Qualcomm
- Bluetooth chip wcn3990
-Message-ID: <20180802171518.GM68975@google.com>
-References: <20180802132518.8680-1-bgodavar@codeaurora.org>
- <20180802132518.8680-8-bgodavar@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180802132518.8680-8-bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: Re: [PATCH] Bluetooth: btusb: Release RF resource on BT shutdown
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <EFE6F46E14A5F445949D76A8CAC2240058312CE6@PGSMSX105.gar.corp.intel.com>
+Date: Thu, 2 Aug 2018 18:21:30 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
+Message-Id: <1367E628-2E75-417A-9F55-B395DA9DB379@holtmann.org>
+References: <EFE6F46E14A5F445949D76A8CAC2240058312B34@PGSMSX105.gar.corp.intel.com>
+ <E73127F5-D0B0-41C8-8025-0F2D3E836D3E@holtmann.org>
+ <EFE6F46E14A5F445949D76A8CAC2240058312CE6@PGSMSX105.gar.corp.intel.com>
+To: "Bag, Amit K" <amit.k.bag@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Balakrishna,
+Hi Amit,
 
-only two minor comments, though I hate to make you respin once more
-for nits. I also noticed a possible error in the DT bindings, so maybe
-you'd have to respin anyway ...
-
-On Thu, Aug 02, 2018 at 06:55:18PM +0530, Balakrishna Godavarthi wrote:
-> Add support to set voltage/current of various regulators
-> to power up/down Bluetooth chip wcn3990.
+>>>>> In case of BT turn off from UI it is safe to add HCI reset command 
+>>>>> which will maintain the controller state.
+>>>> 
+>>>> this needs to be a bit more details since hdev->shutdown handling is really only for the older Intel controllers.
+>>> 
+>>>> Also I am failing to see why HCI Reset helps or what it does here. It is going to be called again on hdev->open the next time the controller is activated.
+>>>> 
+>>>>> 
+>>>>> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+>>>>> ---
+>>>>> drivers/bluetooth/btusb.c | 12 ++++++++++++
+>>>>> 1 file changed, 12 insertions(+)
+>>>>> 
+>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c 
+>>>>> index 572fd75fbcf6..599ec9b12d3f 100644
+>>>>> --- a/drivers/bluetooth/btusb.c
+>>>>> +++ b/drivers/bluetooth/btusb.c
+>>>>> @@ -2369,6 +2369,18 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
+>>>>> 	struct sk_buff *skb;
+>>>>> 	long ret;
+>>>>> 
+>>>>> +	/* In case of BT off from UI it is safe to do HCI reset.
+>>>>> +	 * This will maintain the controller state.
+>>>>> +	 */
+>>>> 
+>>>> I do not care what the UI does here. This is power down operation and so it needs to be explained properly. And with a lot more details since I am failing to understand what state is maintained on HCI Reset. As per specification it will reset all Bluetooth >> > states back to the defaults.
+>>>> 
+>>>>> +	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+>>>>> +        if (IS_ERR(skb)) {
+>>>>> +		ret = PTR_ERR(skb);
+>>>>> +		BT_ERR("%s: BT controller  HCI reset failed (%ld)",
+>>>>> +		       hdev->name, ret);
+>>>>> +		return ret;
+>>>>> +	}
+>>>>> +	kfree_skb(skb);
+>>>>> +
+>>>> 
+>>>>> There is whitespace damage here. And if this hasnât been done yet, please first start using bt_dev_err instead of BT_ERR for the Intel parts.
+>>>> 
+>>>>> 	/* Some platforms have an issue with BT LED when the interface is
+>>>>> 	 * down or BT radio is turned off, which takes 5 seconds to BT LED
+>>>>> 	 * goes off. This command turns off the BT LED immediately.
+>>>> 
+>>>> Regards
+>>>> 
+>>>> Marcel
+>>> 
+>>> 
+>>> I have updated the patch as per your comments. Please find the patch as below.
+>>> 
+>>> Issue description: Intel 2765 shares the same RF with Wifi and BT.
+>> 
+>> 7265 ?
+>> 
+>>> In the shutdown scenario turn off BT, followed by turn WiFi off and on 
+>>> causing error in RF calibration in WiFi Module
+>>> 
+>>> Solution: before shutdown BT ensure any RF activity to clear by HCI 
+>>> reset command.
+>>> 
+>>> Reference Logs:
+>>> ERR kernel: [ 386.193284] iwlwifi 0000:01:00.0: Failed to run INIT 
+>>> calibrations: -5 ERR kernel: [ 386.193298] iwlwifi 0000:01:00.0: 
+>>> Failed to run INIT ucode: -5 ERR kernel: [ 386.193309] iwlwifi 
+>>> 0000:01:00.0: Failed to start RT ucode: -5
+>>> 
+>>> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
+>>> ---
+>>> drivers/bluetooth/btusb.c | 15 +++++++++++++++
+>>> 1 file changed, 15 insertions(+)
+>>> 
+>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c 
+>>> index 572fd75fbcf6..4a3b6a7dc86f 100644
+>>> --- a/drivers/bluetooth/btusb.c
+>>> +++ b/drivers/bluetooth/btusb.c
+>>> @@ -2369,6 +2369,21 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
+>>>       struct sk_buff *skb;
+>>>       long ret;
+>>> 
+>>> +       /* ISSUE: In shutdown sequence where BT turn off and followed
+>> 
+>> Scrap the word ISSUE: since that is not needed. Just describe why we are doing this.
+>> 
+>>> +        * by WiFi turn off, and if Wifi is turn on back, Wifi is unable
+>>> +        * to do the RF calibration.(observe this on INTEL 7265)
+>> 
+>> No need for the text in ()
+>> 
+>>> +        *
+>>> +        * Solution: before shutdown BT ensure any RF activity to clear
+>>> +        * by send this command.
+>>> +        */
+>> 
+>> Scrap the Solution: and bring this in as proper sentence.
+>> 
+>>> +       skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+>>> +       if (IS_ERR(skb)) {
+>>> +               ret = PTR_ERR(skb);
+>>> +               bt_dev_err(hdev, "%s: HCI reset failed\n", __func__);
+>> 
+>> Scrap the __func__ usage. We are not doing this. Also no \n with the bt_dev_err. If you want this clear then "HCI reset on shutdown failed”.
+>> 
+>>> +               return ret;
+>>> +       }
+>>> +       kfree_skb(skb);
+>>> +
+>>>       /* Some platforms have an issue with BT LED when the interface is
+>>>        * down or BT radio is turned off, which takes 5 seconds to BT LED
+>>>        * goes off. This command turns off the BT LED immediately.
 > 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> I have updated the patch as per your comments. Please find the patch as below.
+> 
+> Issue description: Intel 7265 shares the same RF with Wifi and BT.
+> In the shutdown scenario turn off BT, followed by turn WiFi off
+> and on causing error in RF calibration in WiFi Module
+> 
+> Solution: HCI reset command should clear any RF activity  before shutdown BT.
+> 
+> Reference Logs:
+> ERR kernel: [ 386.193284] iwlwifi 0000:01:00.0: Failed to run INIT calibrations: -5
+> ERR kernel: [ 386.193298] iwlwifi 0000:01:00.0: Failed to run INIT ucode: -5
+> ERR kernel: [ 386.193309] iwlwifi 0000:01:00.0: Failed to start RT ucode: -5
+> 
+> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
 > ---
-> Changes in v12:
->     * removed retrying iteration loop in qca_wcn3990_init.
->  
-> Changes in v11:
->     * removed support to read regulator currents from dts.	
->     * updated review comments.
+> drivers/bluetooth/btusb.c | 14 ++++++++++++++
+> 1 file changed, 14 insertions(+)
 > 
-> Changes in v10:
->     * added support to read regulator currents from dts.
->     * added support to try to connect with chip if it fails to respond to initial commands
->     * updated review comments.
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 572fd75fbcf6..5a59dd91062d 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2369,6 +2369,20 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
+>        struct sk_buff *skb;
+>        long ret;
 > 
-> changes in v9:
->     * moved flow control to vendor and set_baudarte functions.
->     * removed parent regs.
-> 
-> changes in v8:
->     * closing qca buffer, if qca_power_setup fails
->     * chnaged ibs start timer function call location.
->     * updated review comments.
->   
-> changes in v7:
->     * addressed review comments.
-> 
-> changes in v6:
->     * Hooked up qca_power to qca_serdev.
+> +       /* In shutdown sequence where BT turn off and followed
+> +        * by WiFi turn off, and if Wifi is turn on back, Wifi is unable
+> +        * to do the RF calibration.
+> +        *
+> +        * This command should clear any RF activity  before shutdown BT.
+> +        */
 
->     * renamed all the naming inconsistency functions with qca_*
->     * leveraged common code of ROME for wcn3990.
->     * created wrapper functions for re-usable blocks.
->     * updated function of _*regulator_enable and _*regualtor_disable.  
->     * removed redundant comments and functions.
->     * addressed review comments.
-> 
-> Changes in v5:
->     * updated regulator vddpa min_uV to 1304000.
->       * addressed review comments.
->  
-> Changes in v4:
->     * Segregated the changes of btqca from hci_qca
->     * rebased all changes on top of bluetooth-next.
->     * addressed review comments.
-> 
-> ---
->  drivers/bluetooth/btqca.h   |   3 +
->  drivers/bluetooth/hci_qca.c | 404 +++++++++++++++++++++++++++++++-----
->  2 files changed, 360 insertions(+), 47 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index a9c2779f3e07..0c01f375fe83 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -37,6 +37,9 @@
->  #define EDL_TAG_ID_HCI			(17)
->  #define EDL_TAG_ID_DEEP_SLEEP		(27)
->  
-> +#define QCA_WCN3990_POWERON_PULSE	0xFC
-> +#define QCA_WCN3990_POWEROFF_PULSE	0xC0
-> +
->  enum qca_bardrate {
->  	QCA_BAUDRATE_115200 	= 0,
->  	QCA_BAUDRATE_57600,
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index a6e7d38ef931..24ce42babe6d 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
->
-> ...
->
-> +static int qca_wcn3990_init(struct hci_uart *hu, u32 *soc_ver)
-> +{
-> +	struct hci_dev *hdev = hu->hdev;
-> +	int ret;
-> +
-> +	/* Forcefully enable wcn3990 to enter in to boot mode. */
-> +	host_set_baudrate(hu, 2400);
-> +	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
-> +	if (ret)
-> +		return ret;
-> +
-> +	qca_set_speed(hu, QCA_INIT_SPEED);
-> +	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWERON_PULSE);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Wait for 100 ms for SoC to boot */
-> +	msleep(100);
-> +
-> +	/* Now the device is in ready state to communicate with host.
-> +	 * To sync host with device we need to reopen port.
-> +	 * Without this, we will have RTS and CTS synchronization
-> +	 * issues.
-> +	 */
-> +	serdev_device_close(hu->serdev);
-> +	ret = serdev_device_open(hu->serdev);
-> +	if (ret) {
-> +		bt_dev_err(hu->hdev, "failed to open port");
-> +		return ret;
-> +	}
-> +
-> +	hci_uart_set_flow_control(hu, false);
-> +	ret = qca_read_soc_version(hdev, soc_ver);
-> +
-> +	return ret;
+	/* In the shutdown sequence where Bluetooth is turned off followed
+	 * by WiFi being turned off, turning WiFi back on causes issue with
+	 * the RF calibration.
+	 *
+	 * To ensure that any RF activity has been stopped, issue HCI Reset
+	 * command to clear all ongoing activity including advertising,
+	 * scanning etc.
+	 */
 
-return qca_read_soc_version(hdev, soc_ver);
-
-> +static int qca_power_setup(struct hci_uart *hu, bool on)
-> +{
-> +	struct qca_vreg *vregs;
-> +	struct regulator_bulk_data *vreg_bulk;
-> +	struct qca_serdev *qcadev;
-> +	int i, num_vregs, ret = 0;
+> +       skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+> +       if (IS_ERR(skb)) {
+> +               ret = PTR_ERR(skb);
+> +               bt_dev_err(hdev, "HCI reset on shutdown failed");
+> +               return ret;
+> +       }
+> +       kfree_skb(skb);
 > +
-> +	qcadev = serdev_device_get_drvdata(hu->serdev);
-> +	if (!qcadev || !qcadev->bt_power || !qcadev->bt_power->vreg_data ||
-> +	    !qcadev->bt_power->vreg_bulk)
-> +		return -EINVAL;
-> +
-> +	vregs = qcadev->bt_power->vreg_data->vregs;
-> +	vreg_bulk = qcadev->bt_power->vreg_bulk;
-> +	num_vregs = qcadev->bt_power->vreg_data->num_vregs;
-> +	BT_DBG("on: %d", on);
-> +	if (on  && !qcadev->bt_power->vregs_on) {
+>        /* Some platforms have an issue with BT LED when the interface is
+>         * down or BT radio is turned off, which takes 5 seconds to BT LED
+>         * goes off. This command turns off the BT LED immediately.
 
-Remove extra blank after 'on'
+And then send a proper v2 of the patch.
 
-Other than that:
+Regards
 
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+Marcel
 
-Thanks for following through!
