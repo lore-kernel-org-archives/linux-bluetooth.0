@@ -8,115 +8,127 @@ Cc: Hans de Goede <hdegoede@redhat.com>,
 	linux-bluetooth@vger.kernel.org,
 	linux-serial@vger.kernel.org,
 	linux-acpi@vger.kernel.org
-Subject: [PATCH v4 09/10] Bluetooth: hci_h5: Add support for the RTL8723BS
-Date: Thu,  2 Aug 2018 16:57:20 +0200
-Message-Id: <20180802145721.31390-10-hdegoede@redhat.com>
+Subject: [PATCH v4 08/10] Bluetooth: hci_h5: Add vendor setup, open, and close callbacks
+Date: Thu,  2 Aug 2018 16:57:19 +0200
+Message-Id: <20180802145721.31390-9-hdegoede@redhat.com>
 In-Reply-To: <20180802145721.31390-1-hdegoede@redhat.com>
 References: <20180802145721.31390-1-hdegoede@redhat.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Jeremy Cline <jeremy@jcline.org>
 
-Implement support for the RTL8723BS chip.
+Allow vendor-specific setup, open, and close functions to be defined.
 
 Signed-off-by: Jeremy Cline <jeremy@jcline.org>
-[hdegoede@redhat.com: Port from bt3wire.c to hci_h5.c, drop broken GPIO code]
+[hdegoede@redhat.com: Port from bt3wire.c to hci_h5.c, drop dt support]
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/hci_h5.c | 69 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
+Changes in v4:
+-Add missing #include <linux/mod_devicetable.h> to fix compile errors on
+ non ACPI platforms (reported-by kbuild test robot <lkp@intel.com>)
+---
+ drivers/bluetooth/hci_h5.c | 40 +++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 39 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index b3f762291e7f..3513dad43f3c 100644
+index 672f63623bf7..b3f762291e7f 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -31,6 +31,7 @@
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
+@@ -21,8 +21,10 @@
+  *
+  */
  
-+#include "btrtl.h"
- #include "hci_uart.h"
+-#include <linux/kernel.h>
++#include <linux/acpi.h>
+ #include <linux/errno.h>
++#include <linux/kernel.h>
++#include <linux/mod_devicetable.h>
+ #include <linux/serdev.h>
+ #include <linux/skbuff.h>
  
- #define HCI_3WIRE_ACK_PKT	0
-@@ -822,11 +823,79 @@ static void h5_serdev_remove(struct serdev_device *serdev)
- 	hci_uart_unregister_device(&h5->serdev_hu);
+@@ -99,6 +101,15 @@ struct h5 {
+ 		H5_SLEEPING,
+ 		H5_WAKING_UP,
+ 	} sleep;
++
++	const struct h5_vnd *vnd;
++	const char *id;
++};
++
++struct h5_vnd {
++	int (*setup)(struct h5 *h5);
++	void (*open)(struct h5 *h5);
++	void (*close)(struct h5 *h5);
+ };
+ 
+ static void h5_reset_rx(struct h5 *h5);
+@@ -218,6 +229,9 @@ static int h5_open(struct hci_uart *hu)
+ 
+ 	h5->tx_win = H5_TX_WIN_MAX;
+ 
++	if (h5->vnd && h5->vnd->open)
++		h5->vnd->open(h5);
++
+ 	set_bit(HCI_UART_INIT_PENDING, &hu->hdev_flags);
+ 
+ 	/* Send initial sync request */
+@@ -237,12 +251,25 @@ static int h5_close(struct hci_uart *hu)
+ 	skb_queue_purge(&h5->rel);
+ 	skb_queue_purge(&h5->unrel);
+ 
++	if (h5->vnd && h5->vnd->close)
++		h5->vnd->close(h5);
++
+ 	if (!hu->serdev)
+ 		kfree(h5);
+ 
+ 	return 0;
  }
  
-+static int h5_btrtl_setup(struct h5 *h5)
++static int h5_setup(struct hci_uart *hu)
 +{
-+	struct btrtl_device_info *btrtl_dev;
-+	struct sk_buff *skb;
-+	__le32 baudrate_data;
-+	u32 device_baudrate;
-+	unsigned int controller_baudrate;
-+	bool flow_control;
-+	int err;
++	struct h5 *h5 = hu->priv;
 +
-+	btrtl_dev = btrtl_initialize(h5->hu->hdev, h5->id);
-+	if (IS_ERR(btrtl_dev))
-+		return PTR_ERR(btrtl_dev);
++	if (h5->vnd && h5->vnd->setup)
++		return h5->vnd->setup(h5);
 +
-+	err = btrtl_get_uart_settings(h5->hu->hdev, btrtl_dev,
-+				      &controller_baudrate, &device_baudrate,
-+				      &flow_control);
-+	if (err)
-+		goto out_free;
++	return 0;
++}
 +
-+	baudrate_data = cpu_to_le32(device_baudrate);
-+	skb = __hci_cmd_sync(h5->hu->hdev, 0xfc17, sizeof(baudrate_data),
-+			     &baudrate_data, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		rtl_dev_err(h5->hu->hdev, "set baud rate command failed\n");
-+		err = PTR_ERR(skb);
-+		goto out_free;
-+	} else {
-+		kfree_skb(skb);
+ static void h5_pkt_cull(struct h5 *h5)
+ {
+ 	struct sk_buff *skb, *tmp;
+@@ -753,6 +780,7 @@ static const struct hci_uart_proto h5p = {
+ 	.name		= "Three-wire (H5)",
+ 	.open		= h5_open,
+ 	.close		= h5_close,
++	.setup		= h5_setup,
+ 	.recv		= h5_recv,
+ 	.enqueue	= h5_enqueue,
+ 	.dequeue	= h5_dequeue,
+@@ -761,6 +789,7 @@ static const struct hci_uart_proto h5p = {
+ 
+ static int h5_serdev_probe(struct serdev_device *serdev)
+ {
++	const struct acpi_device_id *match;
+ 	struct device *dev = &serdev->dev;
+ 	struct h5 *h5;
+ 
+@@ -774,6 +803,15 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+ 	h5->serdev_hu.serdev = serdev;
+ 	serdev_device_set_drvdata(serdev, h5);
+ 
++	if (has_acpi_companion(dev)) {
++		match = acpi_match_device(dev->driver->acpi_match_table, dev);
++		if (!match)
++			return -ENODEV;
++
++		h5->vnd = (const struct h5_vnd *)match->driver_data;
++		h5->id  = (char *)match->id;
 +	}
-+	/* Give the device some time to set up the new baudrate. */
-+	usleep_range(10000, 20000);
 +
-+	serdev_device_set_baudrate(h5->hu->serdev, controller_baudrate);
-+	serdev_device_set_flow_control(h5->hu->serdev, flow_control);
-+
-+	err = btrtl_download_firmware(h5->hu->hdev, btrtl_dev);
-+	/* Give the device some time before the hci-core sends it a reset */
-+	usleep_range(10000, 20000);
-+
-+out_free:
-+	btrtl_free(btrtl_dev);
-+
-+	return err;
-+}
-+
-+static void h5_btrtl_open(struct h5 *h5)
-+{
-+	/* Devices always start with these fixed parameters */
-+	serdev_device_set_flow_control(h5->hu->serdev, false);
-+	serdev_device_set_parity(h5->hu->serdev, SERDEV_PARITY_EVEN);
-+	serdev_device_set_baudrate(h5->hu->serdev, 115200);
-+}
-+
-+static struct h5_vnd rtl_vnd = {
-+	.setup		= h5_btrtl_setup,
-+	.open		= h5_btrtl_open,
-+};
-+
-+#ifdef CONFIG_ACPI
-+static const struct acpi_device_id h5_acpi_match[] = {
-+	{ "OBDA8723", (kernel_ulong_t)&rtl_vnd },
-+	{ },
-+};
-+MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
-+#endif
-+
- static struct serdev_device_driver h5_serdev_driver = {
- 	.probe = h5_serdev_probe,
- 	.remove = h5_serdev_remove,
- 	.driver = {
- 		.name = "hci_uart_h5",
-+		.acpi_match_table = ACPI_PTR(h5_acpi_match),
- 	},
- };
+ 	return hci_uart_register_device(&h5->serdev_hu, &h5p);
+ }
  
 -- 
 2.18.0
