@@ -11,71 +11,43 @@ Cc: linux-kernel@vger.kernel.org,
 	hemantg@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v13 6/7] Bluetooth: btqca: Add wcn3990 firmware download support.
-Date: Fri,  3 Aug 2018 00:37:31 +0530
-Message-Id: <20180802190732.4811-7-bgodavar@codeaurora.org>
+Subject: [PATCH v13 5/7] Bluetooth: hci_qca: Enable 3.2 Mbps operating speed.
+Date: Fri,  3 Aug 2018 00:37:30 +0530
+Message-Id: <20180802190732.4811-6-bgodavar@codeaurora.org>
 In-Reply-To: <20180802190732.4811-1-bgodavar@codeaurora.org>
 References: <20180802190732.4811-1-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch enables the RAM and NV patch download for wcn3990.
+Enable Qualcomm chips to operate at 3.2Mbps.
 
 Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 ---
- drivers/bluetooth/btqca.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ drivers/bluetooth/hci_qca.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index 479179c54dcf..488f5e7521dd 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -336,6 +336,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- {
- 	struct rome_config config;
- 	int err;
-+	u8 rom_ver;
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 5f8a74d65bec..a6e7d38ef931 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -877,6 +877,8 @@ static uint8_t qca_get_baudrate_value(int speed)
+ 		return QCA_BAUDRATE_2000000;
+ 	case 3000000:
+ 		return QCA_BAUDRATE_3000000;
++	case 3200000:
++		return QCA_BAUDRATE_3200000;
+ 	case 3500000:
+ 		return QCA_BAUDRATE_3500000;
+ 	default:
+@@ -891,7 +893,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	struct sk_buff *skb;
+ 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
  
- 	bt_dev_dbg(hdev, "QCA setup on UART");
+-	if (baudrate > QCA_BAUDRATE_3000000)
++	if (baudrate > QCA_BAUDRATE_3200000)
+ 		return -EINVAL;
  
-@@ -343,8 +344,19 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 
- 	/* Download rampatch file */
- 	config.type = TLV_TYPE_PATCH;
--	snprintf(config.fwname, sizeof(config.fwname), "qca/rampatch_%08x.bin",
--		 soc_ver);
-+	if (soc_type == QCA_WCN3990) {
-+		/* Firmware files to download are based on ROM version.
-+		 * ROM version is derived from last two bytes of soc_ver.
-+		 */
-+		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) |
-+			    (soc_ver & 0x0000000f);
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/crbtfw%02x.tlv", rom_ver);
-+	} else {
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/rampatch_%08x.bin", soc_ver);
-+	}
-+
- 	err = qca_download_firmware(hdev, &config);
- 	if (err < 0) {
- 		bt_dev_err(hdev, "QCA Failed to download patch (%d)", err);
-@@ -353,8 +365,13 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 
- 	/* Download NVM configuration */
- 	config.type = TLV_TYPE_NVM;
--	snprintf(config.fwname, sizeof(config.fwname), "qca/nvm_%08x.bin",
--		 soc_ver);
-+	if (soc_type == QCA_WCN3990)
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/crnv%02x.bin", rom_ver);
-+	else
-+		snprintf(config.fwname, sizeof(config.fwname),
-+			 "qca/nvm_%08x.bin", soc_ver);
-+
- 	err = qca_download_firmware(hdev, &config);
- 	if (err < 0) {
- 		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
+ 	cmd[4] = baudrate;
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
 a Linux Foundation Collaborative Project
