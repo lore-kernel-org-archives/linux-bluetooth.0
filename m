@@ -1,140 +1,60 @@
-Return-Path: <bgodavar@codeaurora.org>
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	mka@chromium.org
-Cc: linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	thierry.escande@linaro.org,
-	rtatiya@codeaurora.org,
-	hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org,
-	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v15 0/7] Enable Bluetooth functionality for WCN3990 
-Date: Fri,  3 Aug 2018 17:46:25 +0530
-Message-Id: <20180803121632.30689-1-bgodavar@codeaurora.org>
+Return-Path: <linux-serial-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: Re: [PATCH v4 0/10] Bluetooth: Add RTL8723BS support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180802145721.31390-1-hdegoede@redhat.com>
+Date: Fri, 3 Aug 2018 14:11:10 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        Jeremy Cline <jeremy@jcline.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
+Message-Id: <E299C667-DF12-4F96-9E57-BCF72864BC5C@holtmann.org>
+References: <20180802145721.31390-1-hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>
+Sender: linux-serial-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches enables Bluetooth functinalties for new Qualcomm
-Bluetooth chip wnc3990. As this is latest chip with new features, 
-along with some common features to old chip "qcom,qca6174-bt".
-we have updated names of functions that are used for both the chips 
-to keep this generic and would help in future when we would have new 
-BT SoC.
+Hi Hans,
 
-The below are difference between new and old chips.
+> Here is v4 of my series of patches adding support for RTL8723BS'
+> bluetooth component through serdev enumeration.
+> 
+> This builds on the great work done on this by Martin Blumenstingl
+> which makes the btrtl.c code also support firmware+config loading
+> for the RTL8723BS, as well as Jeremy's Cline work to add ACPI
+> enumeration support on top of this.
+> 
+> New in v4:
+> -Add new rtl_dev_err, rtl_dev_info, etc. helper macros and use those
+> instead of bt_dev_err, etc
+> -Add a new patch replacing all existing BT_ERR, bt_dev_err, etc. calls
+> in btrtl.c with the new helpers
+> 
+> New in v3:
+> -Fix build error when CONFIG_RTL_BT is not set, reported by Paul Cercueil
+> 
+> New in v2:
+> -Dropped devicetree specific patches
+> (these can be reposted later by someone who can actually test them)
+> -Add the option to pass a postfix for the config firmware filename,
+> to btrtl_initialize() (new patch). For ACPI serdev enumerated
+> devies this will be set to the ACPI HID, so the filename becomes e.g.
+> rtl_bt/rtl8732bs_config-OBDA8723.bin
+> This is done because the config is board specific and we may need a
+> different file for e.g. ARM boards
+> 
+> I've tested this series on several Intel boards with a RTL8723BS chip.
 
-*Power:
- *New chip: we use voltage regulators to turn on/off the chip and we 
-  must send a command on Tx line to turn on/off the chip completely.
- *Old chip: We turn on/off by setting a GPIO.
+so I applied all 10 patches to bluetooth-next tree.
 
- *Note: Turning on sequence differs between two chips.
+However I am bit disappointed that we couldn’t get bt3wire.c fixed to be used for this hardware. Having to hack this into hci_h5.c is a step back in my book. And I know what happens now. Nobody is going to work on it and we keep adding hacks and hacks on top of hci_ldisc.c that was never really designed for this. Maybe the next time around I have to be hardline and just reject unclean driver support.
 
-*Firmware download:
-  Only firmware file name differ from New and Old chip.
-  
-  So we reused some functions/structure/variables which are used for old 
-  chip to New chip by generic naming (may be future chips may use same functions).
+In addition I am not happy with the -postfix firmware naming support. I think that is dangerous and might get us into a bad spot. Assuming anything about vendor firmware names and policies is bad. And from what I have seen with Realtek drivers, they are not consistent and are really hacking things together to make it just work for a single design. I really hope this is not coming back to haunt us.
 
- * As we have multiple changes for functions names,we have tested these patches 
-   on both chips.
+Regards
 
-v15:
- * fixed nit issue in hci_qca.
+Marcel
 
-v13:
- * Segregated optional and required properties for wcn3990.
-
-v12:
- * removed iteration loop in qca_init_wcn3990 
- * updated review comments.
-
-v11:
- * removed regulator current from dtbindings
- * addressed review comments.
-
-v10:
- * update current load with actual values of WCN3990.
- * added support  for itterative connect with BT chip if it fails to respond to the HOST.
- * Added regulator current dtbindings.
- * addressed review comments.
-
-v9:
- * removed smps regs.
- * hidded flow control in respective functions.
- * moved qca_soc_ver to qca_setup
- * addressed review comments.
- 
-v8:
-  * Squashed [v7 2/8] and [v7 3/8] to one patch.
-  * updated functions to set and get the UART speeds.
-  * addressed review comments.
-
-v7:
-  * Renamed all the possible function of ROME to generic.
-  * updated with review comments for hci_qca and btqca
-  * fixed kbuild errors.
-  * created wrapper functions for re-usable blocks.
- 
-v6:
-  * Hooked up qca_power to qca_serdev.
-  * renamed all the naming inconsistency functions with qca_*
-  * leveraged common code of ROME for wcn3990.
-  * created wrapper functions for re-usable blocks.
-  * updated function of _*regulator_enable and _*regualtor_disable.  
-  * removed redundant comments and functions.
-  * add code to derive the firmware files based on ROM Version.
-  * created new patch for common function of ROME and wcn3990.
-  * enables Qualcomm chip to operate at 3.2Mbps.
-  * updated names of functions that are used for both the chips to keep this generic. 
-
-v5:
-  * updated with review comments for hci_qca and btqca
- 
-v4:
-  * rebased all changes on top of bluetooth-next.
-  * addressed review comments.
-  * New patch created for firmware download.
-
-v3:
-  * Rebased all changes on top of bluetooth-next.
-  * dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn3990
-    - added dt-binding snippet for bluetooth chip wcn3990.
-  * Bluetooth: Add support for wcn3990 soc.
-    - updated BT_INFO with bt_dev_info, where ever necessary.
-
-v2:
-   * Add support for wcn3990:
-    These changes are aligned as per serdev frame work.
-          We implemented these changes on top of https://patchwork.kernel.org/patch/10316093/
-        As this patch enable serdev for one of the Qualcomm BT chip.
-
-        The changes in the patch include.
-        - Adding support to voting up/down regulators for WCN3990.
-           - Bluetooth firmware download for wcn3990.
-
-  * Add device tree bindings for Atheros chips:
-          These changes are on top of https://patchwork.kernel.org/patch/10316097/.
-          - Description of device tree bindings.
-
-Balakrishna Godavarthi (7):
-  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
-    wcn3990
-  Bluetooth: btqca: Rename ROME specific functions to generic functions
-  Bluetooth: btqca: Redefine qca_uart_setup() to generic function.
-  Bluetooth: hci_qca: Add wrapper functions for setting UART speed
-  Bluetooth: hci_qca: Enable 3.2 Mbps operating speed.
-  Bluetooth: btqca: Add wcn3990 firmware download support.
-  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990
-
- .../bindings/net/qualcomm-bluetooth.txt       |  29 +-
- drivers/bluetooth/btqca.c                     | 117 +++--
- drivers/bluetooth/btqca.h                     |  22 +-
- drivers/bluetooth/hci_qca.c                   | 486 +++++++++++++++---
- 4 files changed, 539 insertions(+), 115 deletions(-)
-
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
