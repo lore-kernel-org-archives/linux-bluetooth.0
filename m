@@ -1,137 +1,256 @@
-Return-Path: <bgodavar@codeaurora.org>
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	mka@chromium.org
-Cc: linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	thierry.escande@linaro.org,
-	rtatiya@codeaurora.org,
-	hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org,
-	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v14 0/7] Enable Bluetooth functionality for WCN3990
-Date: Fri,  3 Aug 2018 16:31:24 +0530
-Message-Id: <20180803110131.11090-1-bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Use bt_dev_err for Intel firmware loading errors
+Date: Fri,  3 Aug 2018 11:20:49 +0200
+Message-Id: <20180803092049.14837-1-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These patches enables Bluetooth functinalties for new Qualcomm
-Bluetooth chip wnc3990. As this is latest chip with new features, 
-along with some common features to old chip "qcom,qca6174-bt".
-we have updated names of functions that are used for both the chips 
-to keep this generic and would help in future when we would have new 
-BT SoC.
+Replace the BT_ERR functions with bt_dev_err to get a consistent error
+printout that always prefixes the HCI device identifier.
 
-The below are difference between new and old chips.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btusb.c | 77 +++++++++++++++++++--------------------
+ 1 file changed, 37 insertions(+), 40 deletions(-)
 
-*Power:
- *New chip: we use voltage regulators to turn on/off the chip and we 
-  must send a command on Tx line to turn on/off the chip completely.
- *Old chip: We turn on/off by setting a GPIO.
-
- *Note: Turning on sequence differs between two chips.
-
-*Firmware download:
-  Only firmware file name differ from New and Old chip.
-  
-  So we reused some functions/structure/variables which are used for old 
-  chip to New chip by generic naming (may be future chips may use same functions).
-
- * As we have multiple changes for functions names,we have tested these patches 
-   on both chips.
-
-v13:
- * Segregated optional and required properties for wcn3990.
-
-v12:
- * removed iteration loop in qca_init_wcn3990 
- * updated review comments.
-
-v11:
- * removed regulator current from dtbindings
- * addressed review comments.
-
-v10:
- * update current load with actual values of WCN3990.
- * added support  for itterative connect with BT chip if it fails to respond to the HOST.
- * Added regulator current dtbindings.
- * addressed review comments.
-
-v9:
- * removed smps regs.
- * hidded flow control in respective functions.
- * moved qca_soc_ver to qca_setup
- * addressed review comments.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f99fc6bfd1da..cd2e5cf14ea5 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1598,13 +1598,13 @@ static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
+ 	ret = request_firmware(&fw, fwname, &hdev->dev);
+ 	if (ret < 0) {
+ 		if (ret == -EINVAL) {
+-			BT_ERR("%s Intel firmware file request failed (%d)",
+-			       hdev->name, ret);
++			bt_dev_err(hdev, "Intel firmware file request failed (%d)",
++				   ret);
+ 			return NULL;
+ 		}
  
-v8:
-  * Squashed [v7 2/8] and [v7 3/8] to one patch.
-  * updated functions to set and get the UART speeds.
-  * addressed review comments.
-
-v7:
-  * Renamed all the possible function of ROME to generic.
-  * updated with review comments for hci_qca and btqca
-  * fixed kbuild errors.
-  * created wrapper functions for re-usable blocks.
+-		BT_ERR("%s failed to open Intel firmware file: %s(%d)",
+-		       hdev->name, fwname, ret);
++		bt_dev_err(hdev, "failed to open Intel firmware file: %s (%d)",
++			   fwname, ret);
  
-v6:
-  * Hooked up qca_power to qca_serdev.
-  * renamed all the naming inconsistency functions with qca_*
-  * leveraged common code of ROME for wcn3990.
-  * created wrapper functions for re-usable blocks.
-  * updated function of _*regulator_enable and _*regualtor_disable.  
-  * removed redundant comments and functions.
-  * add code to derive the firmware files based on ROM Version.
-  * created new patch for common function of ROME and wcn3990.
-  * enables Qualcomm chip to operate at 3.2Mbps.
-  * updated names of functions that are used for both the chips to keep this generic. 
-
-v5:
-  * updated with review comments for hci_qca and btqca
+ 		/* If the correct firmware patch file is not found, use the
+ 		 * default firmware patch file instead
+@@ -1612,8 +1612,8 @@ static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
+ 		snprintf(fwname, sizeof(fwname), "intel/ibt-hw-%x.%x.bseq",
+ 			 ver->hw_platform, ver->hw_variant);
+ 		if (request_firmware(&fw, fwname, &hdev->dev) < 0) {
+-			BT_ERR("%s failed to open default Intel fw file: %s",
+-			       hdev->name, fwname);
++			bt_dev_err(hdev, "failed to open default fw file: %s",
++				   fwname);
+ 			return NULL;
+ 		}
+ 	}
+@@ -1642,7 +1642,7 @@ static int btusb_setup_intel_patching(struct hci_dev *hdev,
+ 	 * process.
+ 	 */
+ 	if (remain > HCI_COMMAND_HDR_SIZE && *fw_ptr[0] != 0x01) {
+-		BT_ERR("%s Intel fw corrupted: invalid cmd read", hdev->name);
++		bt_dev_err(hdev, "Intel fw corrupted: invalid cmd read");
+ 		return -EINVAL;
+ 	}
+ 	(*fw_ptr)++;
+@@ -1656,7 +1656,7 @@ static int btusb_setup_intel_patching(struct hci_dev *hdev,
+ 	 * of command parameter. If not, the firmware file is corrupted.
+ 	 */
+ 	if (remain < cmd->plen) {
+-		BT_ERR("%s Intel fw corrupted: invalid cmd len", hdev->name);
++		bt_dev_err(hdev, "Intel fw corrupted: invalid cmd len");
+ 		return -EFAULT;
+ 	}
  
-v4:
-  * rebased all changes on top of bluetooth-next.
-  * addressed review comments.
-  * New patch created for firmware download.
-
-v3:
-  * Rebased all changes on top of bluetooth-next.
-  * dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn3990
-    - added dt-binding snippet for bluetooth chip wcn3990.
-  * Bluetooth: Add support for wcn3990 soc.
-    - updated BT_INFO with bt_dev_info, where ever necessary.
-
-v2:
-   * Add support for wcn3990:
-    These changes are aligned as per serdev frame work.
-          We implemented these changes on top of https://patchwork.kernel.org/patch/10316093/
-        As this patch enable serdev for one of the Qualcomm BT chip.
-
-        The changes in the patch include.
-        - Adding support to voting up/down regulators for WCN3990.
-           - Bluetooth firmware download for wcn3990.
-
-  * Add device tree bindings for Atheros chips:
-          These changes are on top of https://patchwork.kernel.org/patch/10316097/.
-          - Description of device tree bindings.
-
-Balakrishna Godavarthi (7):
-  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
-    wcn3990
-  Bluetooth: btqca: Rename ROME specific functions to generic functions
-  Bluetooth: btqca: Redefine qca_uart_setup() to generic function.
-  Bluetooth: hci_qca: Add wrapper functions for setting UART speed
-  Bluetooth: hci_qca: Enable 3.2 Mbps operating speed.
-  Bluetooth: btqca: Add wcn3990 firmware download support.
-  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990
-
- .../bindings/net/qualcomm-bluetooth.txt       |  29 +-
- drivers/bluetooth/btqca.c                     | 117 +++--
- drivers/bluetooth/btqca.h                     |  22 +-
- drivers/bluetooth/hci_qca.c                   | 486 +++++++++++++++---
- 4 files changed, 539 insertions(+), 115 deletions(-)
-
+@@ -1689,8 +1689,7 @@ static int btusb_setup_intel_patching(struct hci_dev *hdev,
+ 		remain -= sizeof(*evt);
+ 
+ 		if (remain < evt->plen) {
+-			BT_ERR("%s Intel fw corrupted: invalid evt len",
+-			       hdev->name);
++			bt_dev_err(hdev, "Intel fw corrupted: invalid evt len");
+ 			return -EFAULT;
+ 		}
+ 
+@@ -1704,15 +1703,15 @@ static int btusb_setup_intel_patching(struct hci_dev *hdev,
+ 	 * file is corrupted.
+ 	 */
+ 	if (!evt || !evt_param || remain < 0) {
+-		BT_ERR("%s Intel fw corrupted: invalid evt read", hdev->name);
++		bt_dev_err(hdev, "Intel fw corrupted: invalid evt read");
+ 		return -EFAULT;
+ 	}
+ 
+ 	skb = __hci_cmd_sync_ev(hdev, le16_to_cpu(cmd->opcode), cmd->plen,
+ 				cmd_param, evt->evt, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s sending Intel patch command (0x%4.4x) failed (%ld)",
+-		       hdev->name, cmd->opcode, PTR_ERR(skb));
++		bt_dev_err(hdev, "sending Intel patch command (0x%4.4x) failed (%ld)",
++			   cmd->opcode, PTR_ERR(skb));
+ 		return PTR_ERR(skb);
+ 	}
+ 
+@@ -1721,15 +1720,15 @@ static int btusb_setup_intel_patching(struct hci_dev *hdev,
+ 	 * the contents of the event.
+ 	 */
+ 	if (skb->len != evt->plen) {
+-		BT_ERR("%s mismatch event length (opcode 0x%4.4x)", hdev->name,
+-		       le16_to_cpu(cmd->opcode));
++		bt_dev_err(hdev, "mismatch event length (opcode 0x%4.4x)",
++			   le16_to_cpu(cmd->opcode));
+ 		kfree_skb(skb);
+ 		return -EFAULT;
+ 	}
+ 
+ 	if (memcmp(skb->data, evt_param, evt->plen)) {
+-		BT_ERR("%s mismatch event parameter (opcode 0x%4.4x)",
+-		       hdev->name, le16_to_cpu(cmd->opcode));
++		bt_dev_err(hdev, "mismatch event parameter (opcode 0x%4.4x)",
++			   le16_to_cpu(cmd->opcode));
+ 		kfree_skb(skb);
+ 		return -EFAULT;
+ 	}
+@@ -1758,8 +1757,8 @@ static int btusb_setup_intel(struct hci_dev *hdev)
+ 	 */
+ 	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+-		BT_ERR("%s sending initial HCI reset command failed (%ld)",
+-		       hdev->name, PTR_ERR(skb));
++		bt_dev_err(hdev, "sending initial HCI reset command failed (%ld)",
++			   PTR_ERR(skb));
+ 		return PTR_ERR(skb);
+ 	}
+ 	kfree_skb(skb);
+@@ -2089,8 +2088,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	 * for now only accept this single value.
+ 	 */
+ 	if (ver.hw_platform != 0x37) {
+-		BT_ERR("%s: Unsupported Intel hardware platform (%u)",
+-		       hdev->name, ver.hw_platform);
++		bt_dev_err(hdev, "Unsupported Intel hardware platform (%u)",
++			   ver.hw_platform);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -2109,8 +2108,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	case 0x14:	/* QnJ, IcP */
+ 		break;
+ 	default:
+-		BT_ERR("%s: Unsupported Intel hardware variant (%u)",
+-		       hdev->name, ver.hw_variant);
++		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
++			   ver.hw_variant);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -2139,8 +2138,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	 * choice is to return an error and abort the device initialization.
+ 	 */
+ 	if (ver.fw_variant != 0x06) {
+-		BT_ERR("%s: Unsupported Intel firmware variant (%u)",
+-		       hdev->name, ver.fw_variant);
++		bt_dev_err(hdev, "Unsupported Intel firmware variant (%u)",
++			   ver.fw_variant);
+ 		return -ENODEV;
+ 	}
+ 
+@@ -2156,8 +2155,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	 * that this bootloader does not send them, then abort the setup.
+ 	 */
+ 	if (params.limited_cce != 0x00) {
+-		BT_ERR("%s: Unsupported Intel firmware loading method (%u)",
+-		       hdev->name, params.limited_cce);
++		bt_dev_err(hdev, "Unsupported Intel firmware loading method (%u)",
++			   params.limited_cce);
+ 		return -EINVAL;
+ 	}
+ 
+@@ -2207,14 +2206,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 			 le16_to_cpu(ver.fw_revision));
+ 		break;
+ 	default:
+-		BT_ERR("%s: Unsupported Intel firmware naming", hdev->name);
++		bt_dev_err(hdev, "Unsupported Intel firmware naming");
+ 		return -EINVAL;
+ 	}
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+ 	if (err < 0) {
+-		BT_ERR("%s: Failed to load Intel firmware file (%d)",
+-		       hdev->name, err);
++		bt_dev_err(hdev, "Failed to load Intel firmware file (%d)", err);
+ 		return err;
+ 	}
+ 
+@@ -2240,13 +2238,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 			 le16_to_cpu(ver.fw_revision));
+ 		break;
+ 	default:
+-		BT_ERR("%s: Unsupported Intel firmware naming", hdev->name);
++		bt_dev_err(hdev, "Unsupported Intel firmware naming");
+ 		return -EINVAL;
+ 	}
+ 
+ 	if (fw->size < 644) {
+-		BT_ERR("%s: Invalid size of firmware file (%zu)",
+-		       hdev->name, fw->size);
++		bt_dev_err(hdev, "Invalid size of firmware file (%zu)",
++			   fw->size);
+ 		err = -EBADF;
+ 		goto done;
+ 	}
+@@ -2277,18 +2275,18 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 				  TASK_INTERRUPTIBLE,
+ 				  msecs_to_jiffies(5000));
+ 	if (err == -EINTR) {
+-		BT_ERR("%s: Firmware loading interrupted", hdev->name);
++		bt_dev_err(hdev, "Firmware loading interrupted");
+ 		goto done;
+ 	}
+ 
+ 	if (err) {
+-		BT_ERR("%s: Firmware loading timeout", hdev->name);
++		bt_dev_err(hdev, "Firmware loading timeout");
+ 		err = -ETIMEDOUT;
+ 		goto done;
+ 	}
+ 
+ 	if (test_bit(BTUSB_FIRMWARE_FAILED, &data->flags)) {
+-		BT_ERR("%s: Firmware loading failed", hdev->name);
++		bt_dev_err(hdev, "Firmware loading failed");
+ 		err = -ENOEXEC;
+ 		goto done;
+ 	}
+@@ -2327,12 +2325,12 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 				  msecs_to_jiffies(1000));
+ 
+ 	if (err == -EINTR) {
+-		BT_ERR("%s: Device boot interrupted", hdev->name);
++		bt_dev_err(hdev, "Device boot interrupted");
+ 		return -EINTR;
+ 	}
+ 
+ 	if (err) {
+-		BT_ERR("%s: Device boot timeout", hdev->name);
++		bt_dev_err(hdev, "Device boot timeout");
+ 		return -ETIMEDOUT;
+ 	}
+ 
+@@ -2392,8 +2390,7 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
+ 	skb = __hci_cmd_sync(hdev, 0xfc3f, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+ 		ret = PTR_ERR(skb);
+-		BT_ERR("%s: turning off Intel device LED failed (%ld)",
+-		       hdev->name, ret);
++		bt_dev_err(hdev, "turning off Intel device LED failed");
+ 		return ret;
+ 	}
+ 	kfree_skb(skb);
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+2.17.1
+
