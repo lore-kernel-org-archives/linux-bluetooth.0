@@ -1,132 +1,149 @@
 Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: [PATCH v7 2/3] Bluetooth: mediatek: Add protocol support for
- MediaTek serial devices
+Subject: Re: [PATCH v15 0/7] Enable Bluetooth functionality for WCN3990 
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1533205495.3472.144.camel@mtkswgap22>
-Date: Fri, 3 Aug 2018 14:51:03 +0200
-Cc: Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20180803121632.30689-1-bgodavar@codeaurora.org>
+Date: Fri, 3 Aug 2018 14:46:19 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         devicetree <devicetree@vger.kernel.org>,
         "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Message-Id: <A6D48D49-52CE-405D-8C5D-C4D54CE67221@holtmann.org>
-References: <cover.1533056925.git.sean.wang@mediatek.com>
- <c92ed10cf16f36d9a3b390e864af92e2dfe7b771.1533056925.git.sean.wang@mediatek.com>
- <1707FFA1-A294-4A95-A3BF-0910CE455232@holtmann.org>
- <1533192799.3472.122.camel@mtkswgap22>
- <FF45A90A-F9F1-47CB-AB1F-1E92BF587FBE@holtmann.org>
- <1533199720.3472.136.camel@mtkswgap22>
- <9526E5D9-50BA-4D57-80F5-083DB7D28AFE@holtmann.org>
- <1533205495.3472.144.camel@mtkswgap22>
-To: Sean Wang <sean.wang@mediatek.com>
+        Thierry Escande <thierry.escande@linaro.org>,
+        rtatiya@codeaurora.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org
+Message-Id: <9348C715-71AE-416B-8460-55135FFDAC7E@holtmann.org>
+References: <20180803121632.30689-1-bgodavar@codeaurora.org>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sean,
+Hi Balakrishna,
 
->>>>>>> +
->>>>>>> +static int mtk_hci_wmt_sync(struct hci_dev *hdev, u8 op, u8 flag, u16 plen,
->>>>>>> +			    const void *param)
->>>>>>> +{
->>>>>>> +	struct mtk_hci_wmt_cmd wc;
->>>>>>> +	struct mtk_wmt_hdr *hdr;
->>>>>>> +	struct sk_buff *skb;
->>>>>>> +	u32 hlen;
->>>>>>> +
->>>>>>> +	hlen = sizeof(*hdr) + plen;
->>>>>>> +	if (hlen > 255)
->>>>>>> +		return -EINVAL;
->>>>>>> +
->>>>>>> +	hdr = (struct mtk_wmt_hdr *)&wc;
->>>>>>> +	hdr->dir = 1;
->>>>>>> +	hdr->op = op;
->>>>>>> +	hdr->dlen = cpu_to_le16(plen + 1);
->>>>>>> +	hdr->flag = flag;
->>>>>>> +	memcpy(wc.data, param, plen);
->>>>>>> +
->>>>>>> +	atomic_inc(&hdev->cmd_cnt);
->>>>>> 
->>>>>> Why are you doing this one. It will need a comment here if really needed. However I doubt that this is needed. You are only using it from hdev->setup and hdev->shutdown callbacks.
->>>>>> 
->>>>> 
->>>>> An increment on cmd_cnt is really needed because hci_cmd_work would check whether cmd_cnt is positive and then has a decrement on cmd_cnt before a packet is being sent out.
->>>>> 
->>>>> okay will add a comment.
->>>> 
->>>> but you are in ->setup callback this time. So if you need this, then all the other ->setup routines would actually fail as well. Either this is leftover from when you did things in ->probe or ->open or this is some thing we might better fix properly in the core instead of papering over it. Can you recheck if this is really needed.
->>>> 
->>> 
->>> I added a counter print and the counter increments as below
->>> 
->>> 	/* atomic_inc(&hdev->cmd_cnt); */
->>>       pr_info("cmd_cnt = %d\n" , atomic_read(&hdev->cmd_cnt));
->>> 
->>>       skb = __hci_cmd_sync_ev(hdev, 0xfc6f, hlen, &wc, HCI_VENDOR_PKT,
->>>                               HCI_INIT_TIMEOUT);
->>> 
->>> and the log show up that 
->>> 
->>> 
->>> [  334.049156] Bluetooth: hci0: command 0xfc6f tx timeout
->>> [  334.054840] cmd_cnt = 0
->>> [  336.065076] Bluetooth: hci0: command 0xfc6f tx timeout
->>> [  336.070795] cmd_cnt = 0
->>> [  338.080997] Bluetooth: hci0: command 0xfc6f tx timeout
->>> [  338.086683] cmd_cnt = 0
->>> [  340.096907] Bluetooth: hci0: command 0xfc6f tx timeout
->>> [  340.102609] cmd_cnt = 0
->>> [  342.112824] Bluetooth: hci0: command 0xfc6f tx timeout
->>> [  342.118520] cmd_cnt = 0
->>> [  344.128747] Bluetooth: hci0: command 0xfc6f tx timeout
->>> [  344.134454] cmd_cnt = 0
->>> [  346.144667] Bluetooth: hci0: command 0xfc6f tx timeout
->>> [  346.150372] cmd_cnt = 0
->>> 
->>> 
->>> The packet is dropped by hci_cmd_work at [1], so I also wondered why the
->>> other vendor driver works, it seems the counter needs to be incremented
->>> before every skb is being queued to cmd_q.
->>> 
->>> 4257 static void hci_cmd_work(struct work_struct *work)
->>> 4258 {
->>> 4259         struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_work);
->>> 4260         struct sk_buff *skb;
->>> 4261
->>> 4262         BT_DBG("%s cmd_cnt %d cmd queued %d", hdev->name,
->>> 4263                atomic_read(&hdev->cmd_cnt), skb_queue_len(&hdev->cmd_q));
->>> 4264
->>> 4265         /* Send queued commands */
->>> 
->>> [1]
->>> 4266         if (atomic_read(&hdev->cmd_cnt)) { /* dropped when cmd_cnt is zero */
->>> 4267                 skb = skb_dequeue(&hdev->cmd_q);
->>> 4268                 if (!skb)
->>> 4269                         return;
->>> 4270
->>> 4271                 kfree_skb(hdev->sent_cmd);
->>> 4272
->>> 4273                 hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
->>> 4274                 if (hdev->sent_cmd) {
->>> 4275                         atomic_dec(&hdev->cmd_cnt);  /* cmd_cnt-- */
->>> 4276                         hci_send_frame(hdev, skb);
->> 
->> actually the command also needs to better go via the raw_q anyway since it doesn’t come back with the cmd status or cmd complete. You have it waiting for a vendor event. Maybe with is something we need to consider with __hci_cmd_sync_ev anyway.
->> 
->> Johan would know best since he wrote that code. Anyway, we should fix that in the core and not have you hack around it.
->> 
+> These patches enables Bluetooth functinalties for new Qualcomm
+> Bluetooth chip wnc3990. As this is latest chip with new features, 
+> along with some common features to old chip "qcom,qca6174-bt".
+> we have updated names of functions that are used for both the chips 
+> to keep this generic and would help in future when we would have new 
+> BT SoC.
 > 
-> yes, my case is that received event is neither cmd status nor cmd complete. It is completely a vendor event.
+> The below are difference between new and old chips.
 > 
-> if it wants to be solved by the core layer, do you permit that I remove the hack and then send it in the next version?
+> *Power:
+> *New chip: we use voltage regulators to turn on/off the chip and we 
+>  must send a command on Tx line to turn on/off the chip completely.
+> *Old chip: We turn on/off by setting a GPIO.
+> 
+> *Note: Turning on sequence differs between two chips.
+> 
+> *Firmware download:
+>  Only firmware file name differ from New and Old chip.
+> 
+>  So we reused some functions/structure/variables which are used for old 
+>  chip to New chip by generic naming (may be future chips may use same functions).
+> 
+> * As we have multiple changes for functions names,we have tested these patches 
+>   on both chips.
+> 
+> v15:
+> * fixed nit issue in hci_qca.
+> 
+> v13:
+> * Segregated optional and required properties for wcn3990.
+> 
+> v12:
+> * removed iteration loop in qca_init_wcn3990 
+> * updated review comments.
+> 
+> v11:
+> * removed regulator current from dtbindings
+> * addressed review comments.
+> 
+> v10:
+> * update current load with actual values of WCN3990.
+> * added support  for itterative connect with BT chip if it fails to respond to the HOST.
+> * Added regulator current dtbindings.
+> * addressed review comments.
+> 
+> v9:
+> * removed smps regs.
+> * hidded flow control in respective functions.
+> * moved qca_soc_ver to qca_setup
+> * addressed review comments.
+> 
+> v8:
+>  * Squashed [v7 2/8] and [v7 3/8] to one patch.
+>  * updated functions to set and get the UART speeds.
+>  * addressed review comments.
+> 
+> v7:
+>  * Renamed all the possible function of ROME to generic.
+>  * updated with review comments for hci_qca and btqca
+>  * fixed kbuild errors.
+>  * created wrapper functions for re-usable blocks.
+> 
+> v6:
+>  * Hooked up qca_power to qca_serdev.
+>  * renamed all the naming inconsistency functions with qca_*
+>  * leveraged common code of ROME for wcn3990.
+>  * created wrapper functions for re-usable blocks.
+>  * updated function of _*regulator_enable and _*regualtor_disable.  
+>  * removed redundant comments and functions.
+>  * add code to derive the firmware files based on ROM Version.
+>  * created new patch for common function of ROME and wcn3990.
+>  * enables Qualcomm chip to operate at 3.2Mbps.
+>  * updated names of functions that are used for both the chips to keep this generic. 
+> 
+> v5:
+>  * updated with review comments for hci_qca and btqca
+> 
+> v4:
+>  * rebased all changes on top of bluetooth-next.
+>  * addressed review comments.
+>  * New patch created for firmware download.
+> 
+> v3:
+>  * Rebased all changes on top of bluetooth-next.
+>  * dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn3990
+>    - added dt-binding snippet for bluetooth chip wcn3990.
+>  * Bluetooth: Add support for wcn3990 soc.
+>    - updated BT_INFO with bt_dev_info, where ever necessary.
+> 
+> v2:
+>   * Add support for wcn3990:
+>    These changes are aligned as per serdev frame work.
+>          We implemented these changes on top of https://patchwork.kernel.org/patch/10316093/
+>        As this patch enable serdev for one of the Qualcomm BT chip.
+> 
+>        The changes in the patch include.
+>        - Adding support to voting up/down regulators for WCN3990.
+>           - Bluetooth firmware download for wcn3990.
+> 
+>  * Add device tree bindings for Atheros chips:
+>          These changes are on top of https://patchwork.kernel.org/patch/10316097/.
+>          - Description of device tree bindings.
+> 
+> Balakrishna Godavarthi (7):
+>  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
+>    wcn3990
+>  Bluetooth: btqca: Rename ROME specific functions to generic functions
+>  Bluetooth: btqca: Redefine qca_uart_setup() to generic function.
+>  Bluetooth: hci_qca: Add wrapper functions for setting UART speed
+>  Bluetooth: hci_qca: Enable 3.2 Mbps operating speed.
+>  Bluetooth: btqca: Add wcn3990 firmware download support.
+>  Bluetooth: hci_qca: Add support for Qualcomm Bluetooth chip wcn3990
+> 
+> .../bindings/net/qualcomm-bluetooth.txt       |  29 +-
+> drivers/bluetooth/btqca.c                     | 117 +++--
+> drivers/bluetooth/btqca.h                     |  22 +-
+> drivers/bluetooth/hci_qca.c                   | 486 +++++++++++++++---
+> 4 files changed, 539 insertions(+), 115 deletions(-)
 
-we need to have a __hci_raw_sync_ev that uses the hdev->raw_q and waits for the specified event to come back. I never realized that you are missing the cmd status or cmd complete. So this is similar to the original CSR vendor commands which had the same behavior.
+all 7 patches have been applied to bluetooth-next tree.
 
-I have the feeling that you hdev->cmd_cnt increment is just hiding the problem here. If you really think that it is not chains any side effects we can merge the driver with a big warning and fix this up. However the clean way would be for you to create a patch that introduces __hci_raw_sync_ev as describe above.
+If we need to fix things, we fix them with additional patches instead of respinning the series.
 
 Regards
 
