@@ -1,42 +1,78 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: h5: Fix missing dependency on BT_HCIUART_SERDEV
-Date: Sat,  4 Aug 2018 23:40:26 +0300
-Message-Id: <20180804204026.9746-1-johan.hedberg@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <6e0e8b33-84cc-dafd-cf43-dfbe2fc13109@64b.de>
+References: <6e0e8b33-84cc-dafd-cf43-dfbe2fc13109@64b.de>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sat, 4 Aug 2018 08:00:29 +0300
+Message-ID: <CABBYNZKHdAYT6nG5BjSRfPiFPn8K_31JhzL+7np18H2NFPY_xg@mail.gmail.com>
+Subject: Re: Bug in D-BUS bluez agent API (potentially)
+To: =?UTF-8?Q?Bj=C3=B6rn_Hauffe?= <bjoern@64b.de>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Bjorn,
 
-This driver was recently updated to use serdev, so add the appropriate
-dependency. Without this one can get compiler warnings like this if
-CONFIG_SERIAL_DEV_BUS is not enabled:
+On Fri, Aug 3, 2018 at 5:15 PM, Bj=C3=B6rn Hauffe <bjoern@64b.de> wrote:
+> Hello Folks,
+>
+> i hope this is the right place to report this bug. If i try to pair a
+> Bluetooth 4.0 Keyboard with the bluez daemon and the first try wasn't
+> successful, the successful try after that won't displayed by the register=
+ed
+> bluetooth Agent (e.g. GUI). The Pin is still displayed by the Bluetooth t=
+ool
+> forever. I think the problem is, that the registered reply method is neve=
+r
+> called by the bluez daemon (over  D-Bus).
 
-  CC [M]  drivers/bluetooth/hci_h5.o
-drivers/bluetooth/hci_h5.c:934:36: warning: ‘h5_serdev_driver’ defined but not used [-Wunused-variable]
- static struct serdev_device_driver h5_serdev_driver = {
-                                    ^~~~~~~~~~~~~~~~
+I guess you are talking about the method call not reply here, do you
+have the daemon logs when that happens? Perhaps you are saying the the
+daemon never calls Cancel so the agent stay in DisplayPasskey forever?
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- drivers/bluetooth/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+> Tested with Bluetooth GUI tool from Ubuntu 18.04.1 and Fedora 28 (Bluez
+> 5.49). Also tested with a self written D-Bus based pairing agent.
+>
+> My hardware for testing: Logitech K850, Microsoft Designer Keyboard
+>
+>
+> Steps to reproduce:
+>
+> 1. made a pairing try with a bluetooth 4.0 Keyboard, but let it fail (wro=
+ng
+> pin for example)
+>
+> 2. the second pin will displayed by the bluetooth tool
+>
+> 3. enter the new displayed pin correct to successful finish the pairing
+> process
+>
+> 4. you can't see that the pairing process is finish, because the GUI will
+> not show any feedback.
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index f3c643a0473c..5f953ca8ac5b 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -159,6 +159,7 @@ config BT_HCIUART_LL
- config BT_HCIUART_3WIRE
- 	bool "Three-wire UART (H5) protocol support"
- 	depends on BT_HCIUART
-+	depends on BT_HCIUART_SERDEV
- 	help
- 	  The HCI Three-wire UART Transport Layer makes it possible to
- 	  user the Bluetooth HCI over a serial port interface. The HCI
--- 
-2.17.1
+What feedback do you expect here, that Paired is set to true?
 
+> 5. open bluetoothctl and check that the keyboard is paired.
+
+Does the keyboard pairs or not?
+
+>
+> If i miss something, please let me know.
+>
+>
+> Best regards
+>
+> Bj=C3=B6rn
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth=
+"
+> in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+--=20
+Luiz Augusto von Dentz
