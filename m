@@ -1,70 +1,30 @@
-Return-Path: <yuehaibing@huawei.com>
-From: YueHaibing <yuehaibing@huawei.com>
-To: <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <linux-bluetooth@vger.kernel.org>, YueHaibing
-	<yuehaibing@huawei.com>
-Subject: [PATCH] Bluetooth: remove redundant variables 'adv_set' and 'cp'
-Date: Mon, 6 Aug 2018 19:08:51 +0800
-Message-ID: <20180806110851.8568-1-yuehaibing@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Return-Path: <netdev-owner@vger.kernel.org>
+Date: Sun, 05 Aug 2018 17:30:31 -0700 (PDT)
+Message-Id: <20180805.173031.1874089830274434087.davem@davemloft.net>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2018-08-05
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20180805061430.GA14496@x1c.home>
+References: <20180805061430.GA14496@x1c.home>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Variables 'adv_set' and 'cp'  are being assigned but are never used hence
-they are redundant and can be removed.
+From: Johan Hedberg <johan.hedberg@gmail.com>
+Date: Sun, 5 Aug 2018 09:14:30 +0300
 
-Cleans up clang warnings:
-net/bluetooth/hci_event.c:1135:29: warning: variable 'adv_set' set but not used [-Wunused-but-set-variable]
-net/bluetooth/mgmt.c:3359:39: warning: variable 'cp' set but not used [-Wunused-but-set-variable]
+> Here's the main bluetooth-next pull request for the 4.19 kernel.
+> 
+>  - Added support for Bluetooth Advertising Extensions
+>  - Added vendor driver support to hci_h5 HCI driver
+>  - Added serdev support to hci_h5 driver
+>  - Added support for Qualcomm wcn3990 controller
+>  - Added support for RTL8723BS and RTL8723DS controllers
+>  - btusb: Added new ID for Realtek 8723DE
+>  - Several other smaller fixes & cleanups
+> 
+> Please let me know if there are any issues pulling. Thanks.
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- net/bluetooth/hci_event.c | 3 ---
- net/bluetooth/mgmt.c      | 3 ---
- 2 files changed, 6 deletions(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 754714c..8078587 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1132,7 +1132,6 @@ static void hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev,
- 					 struct sk_buff *skb)
- {
- 	struct hci_cp_le_set_ext_adv_enable *cp;
--	struct hci_cp_ext_adv_set *adv_set;
- 	__u8 status = *((__u8 *) skb->data);
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-@@ -1144,8 +1143,6 @@ static void hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev,
- 	if (!cp)
- 		return;
- 
--	adv_set = (void *) cp->data;
--
- 	hci_dev_lock(hdev);
- 
- 	if (cp->enable) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 231602f7..3bdc8f3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3356,7 +3356,6 @@ int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip)
- static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
- 				     u16 opcode, struct sk_buff *skb)
- {
--	struct mgmt_cp_set_phy_confguration *cp;
- 	struct mgmt_pending_cmd *cmd;
- 
- 	BT_DBG("status 0x%02x", status);
-@@ -3367,8 +3366,6 @@ static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
- 	if (!cmd)
- 		goto unlock;
- 
--	cp = cmd->param;
--
- 	if (status) {
- 		mgmt_cmd_status(cmd->sk, hdev->id,
- 				MGMT_OP_SET_PHY_CONFIGURATION,
--- 
-2.7.0
+Pulled, thanks Johan.
