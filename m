@@ -1,242 +1,68 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Navik, Ankit P" <ankit.p.navik@intel.com>
-To: "'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-CC: "Panda, Bharat B" <bharat.b.panda@intel.com>,
-        "Navik, Ankit P" <ankit.p.navik@intel.com>
-Subject: RE: [PATCH] Bluetooth: Add definitions and track LE resolve list
- modification
-Date: Tue, 7 Aug 2018 07:46:51 +0000
-Message-ID: <2F886D5F95ED3A47BC8C177EADCD1CC728283F18@BGSMSX104.gar.corp.intel.com>
-References: <1531302639-16648-1-git-send-email-ankit.p.navik@intel.com>
- <2F886D5F95ED3A47BC8C177EADCD1CC72827B155@BGSMSX104.gar.corp.intel.com>
-In-Reply-To: <2F886D5F95ED3A47BC8C177EADCD1CC72827B155@BGSMSX104.gar.corp.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Date: Mon, 6 Aug 2018 23:42:57 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: martin.blumenstingl@googlemail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [bug report] Bluetooth: btrtl: split the device initialization into
+ smaller parts
+Message-ID: <20180806204257.hqrwgufmu6ukq2sj@kili.mountain>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Soft reminder
+Hello Martin Blumenstingl,
 
-> 
-> Soft reminder.
-> 
-> > Add the definitions for adding entries to the LE resolve list and
-> > removing entries from the LE resolve list. When the LE resolve list
-> > gets changed via HCI commands make sure that the internal storage of
-> > the resolve list entries gets updated.
-> >
-> > Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
-> > ---
-> >  include/net/bluetooth/hci.h      | 14 ++++++++++++
-> >  include/net/bluetooth/hci_core.h |  5 +++-
-> >  net/bluetooth/hci_core.c         |  9 +++++++-
-> >  net/bluetooth/hci_event.c        | 49
-> > +++++++++++++++++++++++++++++++++++++++-
-> >  net/bluetooth/hci_sock.c         |  3 ++-
-> >  net/bluetooth/mgmt.c             |  4 ++--
-> >  6 files changed, 78 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index
-> > 4af1a3a..1abcd14 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -1490,6 +1490,20 @@ struct hci_cp_le_write_def_data_len {
-> >  	__le16	tx_time;
-> >  } __packed;
-> >
-> > +#define HCI_OP_LE_ADD_TO_RESOLV_LIST	0x2027
-> > +struct hci_cp_le_add_to_resolv_list {
-> > +	__u8	 bdaddr_type;
-> > +	bdaddr_t bdaddr;
-> > +	__u8	 peer_irk[16];
-> > +	__u8	 local_irk[16];
-> > +} __packed;
-> > +
-> > +#define HCI_OP_LE_DEL_FROM_RESOLV_LIST	0x2028
-> > +struct hci_cp_le_del_from_resolv_list {
-> > +	__u8	 bdaddr_type;
-> > +	bdaddr_t bdaddr;
-> > +} __packed;
-> > +
-> >  #define HCI_OP_LE_CLEAR_RESOLV_LIST	0x2029
-> >
-> >  #define HCI_OP_LE_READ_RESOLV_LIST_SIZE	0x202a
-> > diff --git a/include/net/bluetooth/hci_core.h
-> > b/include/net/bluetooth/hci_core.h
-> > index 3a1ae0d..9ab0fdf 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -101,6 +101,8 @@ struct bdaddr_list {
-> >  	struct list_head list;
-> >  	bdaddr_t bdaddr;
-> >  	u8 bdaddr_type;
-> > +	u8 peer_irk[16];
-> > +	u8 local_irk[16];
-> >  };
-> >
-> >  struct bt_uuid {
-> > @@ -1050,7 +1052,8 @@ static inline void hci_set_drvdata(struct
-> > hci_dev *hdev, void *data)
-> >
-> >  struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
-> >  					   bdaddr_t *bdaddr, u8 type);
-> > -int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8
-> > type);
-> > +int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type,
-> > +			u8 *peer_irk, u8 *local_irk);
-> >  int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8
-> > type);  void hci_bdaddr_list_clear(struct list_head *list);
-> >
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c index
-> > af1675d..dcaef13 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -2784,7 +2784,8 @@ void hci_bdaddr_list_clear(struct list_head
-> > *bdaddr_list)
-> >  	}
-> >  }
-> >
-> > -int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8
-> > type)
-> > +int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type,
-> > +			u8 *peer_irk, u8 *local_irk)
-> >  {
-> >  	struct bdaddr_list *entry;
-> >
-> > @@ -2801,6 +2802,12 @@ int hci_bdaddr_list_add(struct list_head *list,
-> > bdaddr_t *bdaddr, u8 type)
-> >  	bacpy(&entry->bdaddr, bdaddr);
-> >  	entry->bdaddr_type = type;
-> >
-> > +	if (peer_irk)
-> > +		memcpy(entry->peer_irk, peer_irk, 16);
-> > +
-> > +	if (local_irk)
-> > +		memcpy(entry->local_irk, local_irk, 16);
-> > +
-> >  	list_add(&entry->list, list);
-> >
-> >  	return 0;
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index
-> > 3029d79..e8d6df9 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -1239,7 +1239,7 @@ static void hci_cc_le_add_to_white_list(struct
-> > hci_dev *hdev,
-> >  		return;
-> >
-> >  	hci_bdaddr_list_add(&hdev->le_white_list, &sent->bdaddr,
-> > -			   sent->bdaddr_type);
-> > +			   sent->bdaddr_type, NULL, NULL);
-> >  }
-> >
-> >  static void hci_cc_le_del_from_white_list(struct hci_dev *hdev, @@
-> > -1307,6
-> > +1307,45 @@ static void hci_cc_le_write_def_data_len(struct hci_dev
-> > +*hdev,
-> >  	hdev->le_def_tx_time = le16_to_cpu(sent->tx_time);  }
-> >
-> > +static void hci_cc_le_add_to_resolv_list(struct hci_dev *hdev,
-> > +					 struct sk_buff *skb)
-> > +{
-> > +	struct hci_cp_le_add_to_resolv_list *sent;
-> > +	__u8 status = *((__u8 *) skb->data);
-> > +
-> > +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-> > +
-> > +	if (status)
-> > +		return;
-> > +
-> > +	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_RESOLV_LIST);
-> > +	if (!sent)
-> > +		return;
-> > +
-> > +	hci_bdaddr_list_add(&hdev->le_resolv_list, &sent->bdaddr,
-> > +				sent->bdaddr_type, sent->peer_irk,
-> > +				sent->local_irk);
-> > +}
-> > +
-> > +static void hci_cc_le_del_from_resolv_list(struct hci_dev *hdev,
-> > +					  struct sk_buff *skb)
-> > +{
-> > +	struct hci_cp_le_del_from_resolv_list *sent;
-> > +	__u8 status = *((__u8 *) skb->data);
-> > +
-> > +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-> > +
-> > +	if (status)
-> > +		return;
-> > +
-> > +	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_DEL_FROM_RESOLV_LIST);
-> > +	if (!sent)
-> > +		return;
-> > +
-> > +	hci_bdaddr_list_del(&hdev->le_resolv_list, &sent->bdaddr,
-> > +			    sent->bdaddr_type);
-> > +}
-> > +
-> >  static void hci_cc_le_clear_resolv_list(struct hci_dev *hdev,
-> >  				       struct sk_buff *skb)
-> >  {
-> > @@ -3042,6 +3081,14 @@ static void hci_cmd_complete_evt(struct hci_dev
-> > *hdev, struct sk_buff *skb,
-> >  		hci_cc_le_write_def_data_len(hdev, skb);
-> >  		break;
-> >
-> > +	case HCI_OP_LE_ADD_TO_RESOLV_LIST:
-> > +		hci_cc_le_add_to_resolv_list(hdev, skb);
-> > +		break;
-> > +
-> > +	case HCI_OP_LE_DEL_FROM_RESOLV_LIST:
-> > +		hci_cc_le_del_from_resolv_list(hdev, skb);
-> > +		break;
-> > +
-> >  	case HCI_OP_LE_CLEAR_RESOLV_LIST:
-> >  		hci_cc_le_clear_resolv_list(hdev, skb);
-> >  		break;
-> > diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c index
-> > 1506e16..1f6ae79 100644
-> > --- a/net/bluetooth/hci_sock.c
-> > +++ b/net/bluetooth/hci_sock.c
-> > @@ -893,7 +893,8 @@ static int hci_sock_blacklist_add(struct hci_dev
-> > *hdev, void __user *arg)
-> >
-> >  	hci_dev_lock(hdev);
-> >
-> > -	err = hci_bdaddr_list_add(&hdev->blacklist, &bdaddr, BDADDR_BREDR);
-> > +	err = hci_bdaddr_list_add(&hdev->blacklist, &bdaddr, BDADDR_BREDR,
-> > +					NULL, NULL);
-> >
-> >  	hci_dev_unlock(hdev);
-> >
-> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c index
-> > 8a80d48..a99b8dd 100644
-> > --- a/net/bluetooth/mgmt.c
-> > +++ b/net/bluetooth/mgmt.c
-> > @@ -3791,7 +3791,7 @@ static int block_device(struct sock *sk, struct
-> > hci_dev *hdev, void *data,
-> >  	hci_dev_lock(hdev);
-> >
-> >  	err = hci_bdaddr_list_add(&hdev->blacklist, &cp->addr.bdaddr,
-> > -				  cp->addr.type);
-> > +				  cp->addr.type, NULL, NULL);
-> >  	if (err < 0) {
-> >  		status = MGMT_STATUS_FAILED;
-> >  		goto done;
-> > @@ -5272,7 +5272,7 @@ static int add_device(struct sock *sk, struct
-> > hci_dev *hdev,
-> >  		}
-> >
-> >  		err = hci_bdaddr_list_add(&hdev->whitelist, &cp->addr.bdaddr,
-> > -					  cp->addr.type);
-> > +					  cp->addr.type, NULL, NULL);
-> >  		if (err)
-> >  			goto unlock;
-> >
-> > --
-> > 1.9.1
-> 
-> Regards,
-> Ankit
+The patch 26503ad25de8: "Bluetooth: btrtl: split the device
+initialization into smaller parts" from Aug 2, 2018, leads to the
+following static checker warning:
+
+	drivers/bluetooth/btrtl.c:592 btrtl_initialize()
+	warn: passing zero to 'ERR_PTR'
+
+drivers/bluetooth/btrtl.c
+   559          btrtl_dev->fw_len = rtl_load_file(hdev, btrtl_dev->ic_info->fw_name,
+   560                                            &btrtl_dev->fw_data);
+   561          if (btrtl_dev->fw_len < 0) {
+   562                  rtl_dev_err(hdev, "firmware file %s not found\n",
+   563                              btrtl_dev->ic_info->fw_name);
+   564                  ret = btrtl_dev->fw_len;
+   565                  goto err_free;
+   566          }
+   567  
+   568          if (btrtl_dev->ic_info->cfg_name) {
+   569                  if (postfix) {
+   570                          snprintf(cfg_name, sizeof(cfg_name), "%s-%s.bin",
+   571                                   btrtl_dev->ic_info->cfg_name, postfix);
+   572                  } else {
+   573                          snprintf(cfg_name, sizeof(cfg_name), "%s.bin",
+   574                                   btrtl_dev->ic_info->cfg_name);
+   575                  }
+   576                  btrtl_dev->cfg_len = rtl_load_file(hdev, cfg_name,
+   577                                                     &btrtl_dev->cfg_data);
+   578                  if (btrtl_dev->ic_info->config_needed &&
+   579                      btrtl_dev->cfg_len <= 0) {
+                            ^^^^^^^^^^^^^^^^^^^^^^^
+Assume btrtl_dev->cfg_len == 0
+
+   580                          rtl_dev_err(hdev, "mandatory config file %s not found\n",
+   581                                      btrtl_dev->ic_info->cfg_name);
+   582                          ret = btrtl_dev->cfg_len;
+   583                          goto err_free;
+   584                  }
+   585          }
+   586  
+   587          return btrtl_dev;
+   588  
+   589  err_free:
+   590          btrtl_free(btrtl_dev);
+   591  err_alloc:
+   592          return ERR_PTR(ret);
+                               ^^^
+Then we would end up returning ERR_PTR(0) which is NULL and would result
+in a NULL dereference in the error pointer.
+
+   593  }
+
+regards,
+dan carpenter
