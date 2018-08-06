@@ -1,66 +1,34 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v9 1/3] dt-bindings: net: bluetooth: Add mediatek-bluetooth
-Date: Mon,  6 Aug 2018 17:34:56 +0200
-Message-Id: <20180806153458.23494-1-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <johan.hedberg@gmail.com>
+Date: Mon, 6 Aug 2018 17:09:22 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: YueHaibing <yuehaibing@huawei.com>
+Cc: marcel@holtmann.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: remove redundant variables 'adv_set' and 'cp'
+Message-ID: <20180806140922.GA18195@x1c.home>
+References: <20180806110851.8568-1-yuehaibing@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20180806110851.8568-1-yuehaibing@huawei.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sean Wang <sean.wang@mediatek.com>
+Hi YueHaibing,
 
-Add binding document for a SoC built-in device using MediaTek protocol.
-Which could be found on MT7622 SoC or other similar MediaTek SoCs.
+On Mon, Aug 06, 2018, YueHaibing wrote:
+> Variables 'adv_set' and 'cp'  are being assigned but are never used hence
+> they are redundant and can be removed.
+> 
+> Cleans up clang warnings:
+> net/bluetooth/hci_event.c:1135:29: warning: variable 'adv_set' set but not used [-Wunused-but-set-variable]
+> net/bluetooth/mgmt.c:3359:39: warning: variable 'cp' set but not used [-Wunused-but-set-variable]
+> 
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+>  net/bluetooth/hci_event.c | 3 ---
+>  net/bluetooth/mgmt.c      | 3 ---
+>  2 files changed, 6 deletions(-)
 
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-Reviewed-by: Rob Herring <robh@kernel.org>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- .../bindings/net/mediatek-bluetooth.txt       | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+Applied to bluetooth-next. Thanks.
 
-diff --git a/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-new file mode 100644
-index 000000000000..14ceb2a5b4e8
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
-@@ -0,0 +1,35 @@
-+MediaTek SoC built-in Bluetooth Devices
-+==================================
-+
-+This device is a serial attached device to BTIF device and thus it must be a
-+child node of the serial node with BTIF. The dt-bindings details for BTIF
-+device can be known via Documentation/devicetree/bindings/serial/8250.txt.
-+
-+Required properties:
-+
-+- compatible:	Must be
-+		  "mediatek,mt7622-bluetooth": for MT7622 SoC
-+- clocks:	Should be the clock specifiers corresponding to the entry in
-+		clock-names property.
-+- clock-names:	Should contain "ref" entries.
-+- power-domains: Phandle to the power domain that the device is part of
-+
-+Example:
-+
-+	btif: serial@1100c000 {
-+		compatible = "mediatek,mt7622-btif",
-+			     "mediatek,mtk-btif";
-+		reg = <0 0x1100c000 0 0x1000>;
-+		interrupts = <GIC_SPI 90 IRQ_TYPE_LEVEL_LOW>;
-+		clocks = <&pericfg CLK_PERI_BTIF_PD>;
-+		clock-names = "main";
-+		reg-shift = <2>;
-+		reg-io-width = <4>;
-+
-+		bluetooth {
-+			compatible = "mediatek,mt7622-bluetooth";
-+			power-domains = <&scpsys MT7622_POWER_DOMAIN_WB>;
-+			clocks = <&clk25m>;
-+			clock-names = "ref";
-+		};
-+	};
--- 
-2.17.1
-
+Johan
