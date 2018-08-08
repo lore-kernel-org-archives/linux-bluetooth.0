@@ -1,86 +1,60 @@
-Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH] Bluetooth: Add Kconfig option to enable Realtek protocol
- for serial devices
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
- Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
- Jeremy Cline <jeremy@jcline.org>, linux-bluetooth@vger.kernel.org,
- linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-References: <20180808145205.26230-1-hdegoede@redhat.com>
- <E5533307-A9A1-452C-B629-B44211F18861@holtmann.org>
-From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <5f6a5437-f20f-199b-8ecd-780245367201@redhat.com>
-Date: Wed, 8 Aug 2018 18:22:59 +0200
-MIME-Version: 1.0
-In-Reply-To: <E5533307-A9A1-452C-B629-B44211F18861@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Message-ID: <5d03b0011c48dccc4e835a03b9c9fd3de467f719.camel@hadess.net>
+Subject: Re: bt "server" how to configure requiring passkey from connecting
+ clients
+From: Bastien Nocera <hadess@hadess.net>
+To: Libor Peltan <lpeltan@insys-tec.de>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Wed, 08 Aug 2018 17:14:52 +0200
+In-Reply-To: <VI1PR0601MB2128F10733B846A0ACCBA78C9A260@VI1PR0601MB2128.eurprd06.prod.outlook.com>
+References: <VI1PR0601MB21287F56810A923C8881893C9A270@VI1PR0601MB2128.eurprd06.prod.outlook.com>
+         <ba6964a183f45af588e7c93bd2cf834cc0c1c5a4.camel@hadess.net>
+         <VI1PR0601MB2128F10733B846A0ACCBA78C9A260@VI1PR0601MB2128.eurprd06.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On 08/08/2018 05:13 PM, Marcel Holtmann wrote:
-> Hi Hans,
+On Wed, 2018-08-08 at 14:31 +0000, Libor Peltan wrote:
+> Hi Bastien,
+> Thanks much for your answer.
 > 
->> Add a new BT_HCIUART_RTL Kconfig option to enable the Realtek protocol for
->> Bluetooth HCI over serial port interface, mirroring the existing
->> BT_HCIUART_BCM Kconfig option.
->>
->> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
->> ---
->> drivers/bluetooth/Kconfig | 14 ++++++++++++++
->> 1 file changed, 14 insertions(+)
->>
->> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
->> index 5f953ca8ac5b..1124034d1c7e 100644
->> --- a/drivers/bluetooth/Kconfig
->> +++ b/drivers/bluetooth/Kconfig
->> @@ -195,6 +195,20 @@ config BT_HCIUART_BCM
->>
->> 	  Say Y here to compile support for Broadcom protocol.
->>
->> +config BT_HCIUART_RTL
->> +	bool "Realtek protocol support"
->> +	depends on BT_HCIUART
->> +	depends on BT_HCIUART_SERDEV
->> +	depends on (!ACPI || SERIAL_DEV_CTRL_TTYPORT)
+> Even if programmed my own pairing agent, I can't see how I could
+> achieve having fixed PIN for incomming requests.
 > 
-> is this one really needed?
-
-I mirrored this from the equivalent BCM Kconfig option, this bit comes from:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=4294625e02902
-
-Reading the commit message it seems that this indeed is not necessary for the
-RTL_BT case.
-
->> +	depends on GPIOLIB
->> +	select BT_HCIUART_3WIRE
->> +	select BT_RTL
->> +	help
->> +	  The Realtek protocol support enables Bluetooth HCI over serial
->> +	  port interface for Realtek Bluetooth controllers.
+> When I register my agent, I can choose one of following capability
+> options [accorging to BlueZ Agent API]:
+>  - NoInputNoOutput, DisplayYesNo, KeyboardOnly: I can just
+> programatically decide based on the client's BD address if I accept
+> the pairing or not
+>  - DisplayOnly, KeyboardDisplay: at the time of pairing, the agent
+> receives already the PIN, and can just decide if it's accepted. But
+> this PIN is not entered by the mobile phone (client) user, it's just
+> fabriqued (randomly?) somewhere inside the pairing process. Actually,
+> the mobile phone user is queried with the same PIN and can only
+> accept it too.
 > 
-> I like the text from my patch better since it mentions 3-Wire serial which is what this one is using.
-
-I've not seen your patch (I'm not subscribed to the list) but if you think
-your version is better feel free to go with it.
-
-Regards,
-
-Hans
-
-
-
-
+> All in all, my agent is never asked to return the PIN.
 > 
->> +
->> +	  Say Y here to compile support for the Realtek protocol.
->> +
->> config BT_HCIUART_QCA
->> 	bool "Qualcomm Atheros protocol support"
->> 	depends on BT_HCIUART
+> The agents built-in in bluetoothctl or the bluez-tools you pointed
+> to, behave rouhly the same.
 > 
-> Regards
+> Am I missing something, some other usecase of pairing agent?
 > 
-> Marcel
-> 
+> It seems weird to me that for old version of BlueZ (4?), I have found
+> something like 'bluetooth-agent 1234' command instantly doing what I
+> need... But I don't know exactly.
+
+This, up to line 100:
+https://github.com/hadess/CHIP-bluetooth-speaker/blob/master/setup.sh#L73
+is the example of a script that creates a fixed PIN, for all clients,
+with bluez-tools' bt-agent running as a service. Ideally, you would
+start this after some sort of physical interaction with your device, or
+have an "uncommon" pincode (a password of sorts, eg. not 0000 or 1111),
+otherwise your neighbours will be able to pair with your device.
+
+If you want to use a fixed pin code in your agent, you'd need to use
+the NoInputNoOutput capability, and implement the RequestPasskey
+function so that you can provide the passkey to be used.
+
+Cheers
