@@ -1,73 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Libor Peltan <lpeltan@insys-tec.de>
-To: Bastien Nocera <hadess@hadess.net>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: bt "server" how to configure requiring passkey from connecting
- clients
-Date: Wed, 8 Aug 2018 14:31:30 +0000
-Message-ID: <VI1PR0601MB2128F10733B846A0ACCBA78C9A260@VI1PR0601MB2128.eurprd06.prod.outlook.com>
-References: <VI1PR0601MB21287F56810A923C8881893C9A270@VI1PR0601MB2128.eurprd06.prod.outlook.com>
- <ba6964a183f45af588e7c93bd2cf834cc0c1c5a4.camel@hadess.net>
-In-Reply-To: <ba6964a183f45af588e7c93bd2cf834cc0c1c5a4.camel@hadess.net>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Introduce BT_HCIUART_RTL configuration option
+Date: Wed,  8 Aug 2018 16:27:12 +0200
+Message-Id: <20180808142712.88122-1-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQmFzdGllbiwNClRoYW5rcyBtdWNoIGZvciB5b3VyIGFuc3dlci4NCg0KRXZlbiBpZiBwcm9n
-cmFtbWVkIG15IG93biBwYWlyaW5nIGFnZW50LCBJIGNhbid0IHNlZSBob3cgSSBjb3VsZCBhY2hp
-ZXZlIGhhdmluZyBmaXhlZCBQSU4gZm9yIGluY29tbWluZyByZXF1ZXN0cy4NCg0KV2hlbiBJIHJl
-Z2lzdGVyIG15IGFnZW50LCBJIGNhbiBjaG9vc2Ugb25lIG9mIGZvbGxvd2luZyBjYXBhYmlsaXR5
-IG9wdGlvbnMgW2FjY29yZ2luZyB0byBCbHVlWiBBZ2VudCBBUEldOg0KIC0gTm9JbnB1dE5vT3V0
-cHV0LCBEaXNwbGF5WWVzTm8sIEtleWJvYXJkT25seTogSSBjYW4ganVzdCBwcm9ncmFtYXRpY2Fs
-bHkgZGVjaWRlIGJhc2VkIG9uIHRoZSBjbGllbnQncyBCRCBhZGRyZXNzIGlmIEkgYWNjZXB0IHRo
-ZSBwYWlyaW5nIG9yIG5vdA0KIC0gRGlzcGxheU9ubHksIEtleWJvYXJkRGlzcGxheTogYXQgdGhl
-IHRpbWUgb2YgcGFpcmluZywgdGhlIGFnZW50IHJlY2VpdmVzIGFscmVhZHkgdGhlIFBJTiwgYW5k
-IGNhbiBqdXN0IGRlY2lkZSBpZiBpdCdzIGFjY2VwdGVkLiBCdXQgdGhpcyBQSU4gaXMgbm90IGVu
-dGVyZWQgYnkgdGhlIG1vYmlsZSBwaG9uZSAoY2xpZW50KSB1c2VyLCBpdCdzIGp1c3QgZmFicmlx
-dWVkIChyYW5kb21seT8pIHNvbWV3aGVyZSBpbnNpZGUgdGhlIHBhaXJpbmcgcHJvY2Vzcy4gQWN0
-dWFsbHksIHRoZSBtb2JpbGUgcGhvbmUgdXNlciBpcyBxdWVyaWVkIHdpdGggdGhlIHNhbWUgUElO
-IGFuZCBjYW4gb25seSBhY2NlcHQgaXQgdG9vLg0KDQpBbGwgaW4gYWxsLCBteSBhZ2VudCBpcyBu
-ZXZlciBhc2tlZCB0byByZXR1cm4gdGhlIFBJTi4NCg0KVGhlIGFnZW50cyBidWlsdC1pbiBpbiBi
-bHVldG9vdGhjdGwgb3IgdGhlIGJsdWV6LXRvb2xzIHlvdSBwb2ludGVkIHRvLCBiZWhhdmUgcm91
-aGx5IHRoZSBzYW1lLg0KDQpBbSBJIG1pc3Npbmcgc29tZXRoaW5nLCBzb21lIG90aGVyIHVzZWNh
-c2Ugb2YgcGFpcmluZyBhZ2VudD8NCg0KSXQgc2VlbXMgd2VpcmQgdG8gbWUgdGhhdCBmb3Igb2xk
-IHZlcnNpb24gb2YgQmx1ZVogKDQ/KSwgSSBoYXZlIGZvdW5kIHNvbWV0aGluZyBsaWtlICdibHVl
-dG9vdGgtYWdlbnQgMTIzNCcgY29tbWFuZCBpbnN0YW50bHkgZG9pbmcgd2hhdCBJIG5lZWQuLi4g
-QnV0IEkgZG9uJ3Qga25vdyBleGFjdGx5Lg0KDQpUaGFuayB5b3UhDQoNCkxpYm9yIFBlbHRhbg0K
-DQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogQmFzdGllbiBOb2NlcmEgW21haWx0
-bzpoYWRlc3NAaGFkZXNzLm5ldF0gDQpTZW50OiBNaXR0d29jaCwgOC4gQXVndXN0IDIwMTggMTQ6
-MTkNClRvOiBMaWJvciBQZWx0YW4gPGxwZWx0YW5AaW5zeXMtdGVjLmRlPjsgbGludXgtYmx1ZXRv
-b3RoQHZnZXIua2VybmVsLm9yZw0KU3ViamVjdDogUmU6IGJ0ICJzZXJ2ZXIiIGhvdyB0byBjb25m
-aWd1cmUgcmVxdWlyaW5nIHBhc3NrZXkgZnJvbSBjb25uZWN0aW5nIGNsaWVudHMNCg0KT24gVHVl
-LCAyMDE4LTA4LTA3IGF0IDA5OjQzICswMDAwLCBMaWJvciBQZWx0YW4gd3JvdGU6DQo+IEhlbGxv
-LA0KPiBJJ20gcHJlcGFyaW5nIGEgYmx1ZXRvb3RoICJhY2Nlc3MgcG9pbnQiIHVzaW5nIEJsdWVa
-IDUuNDcsIHNvIHRoYXQgZm9yIA0KPiBleGFtcGxlIG1vYmlsZSBwaG9uZXMgY2FuIGNvbm5lY3Qg
-dG8gaXQsIGFuZCBmdXJ0aGVyIHVzZSBQQU4gcHJvZmlsZSANCj4gKHdoaWNoIGlzIG5vdCBwYXJ0
-IG9mIHRoaXMgcXVlc3Rpb24pLiBTbyBmYXIgaXQgd29ya3Mgd2VsbCwganVzdCB1c2luZyANCj4g
-dGhlIEp1c3RXb3JrcyBwYWlyaW5nIG1ldGhvZC4NCj4gDQo+IEknZCBsaWtlIHRvIHNlY3VyZSB0
-aGlzIGEgbGl0dGxlIGJpdCwgbm90IGFsbG93aW5nIGFueW9uZSB0byBwYWlyLCANCj4gcmF0aGVy
-IHRvIHJlcXVlc3QgcGFzc2tleSAobGV0J3Mgc2F5IGhhcmRjb2RlZCBzdHJpbmcpIGJlZm9yZSAN
-Cj4gYWNjZXB0aW5nIHBhaXJpbmcgcmVxdWVzdGVkIGJ5IGEgY2xpZW50IG1vYmlsZSBwaG9uZS4N
-Cj4gDQo+IEFmdGVyIHNlYXJjaGluZyB0aHJvdWdoIGRvY3VtZW50YXRpb24gYW5kIG11Y2ggZ29v
-Z2xpbmcsIEkgZG9uJ3Qgc2VlIA0KPiBhbnkgaGludHMgaG93IHRvIGFjaGlldmUgdGhpcy4NCj4g
-DQo+IEkgZm91bmQgc29tZSBpbmZvcm1hdGlvbiBhYm91dCBwYWlyaW5nIGFnZW50cyBpbiBCbHVl
-WjUsIGJvdGggaW4gDQo+IGJsdWV0b290aGN0bCBhbmQgY3VzdG9tIChwcm9ncmFtbWluZyB0aGVt
-IHNlZW1zIGNvbXBsaWNhdGVkIGJ1dCB2aWFibGUgDQo+IGFuZCBJIGNhbm5vdCB1c2Ugc2ltcGxl
-LWFnZW50IHNpbmNlIEkgZG9uJ3QgaGF2ZSBweXRob24gb24gbXkgDQo+IG1hY2hpbmUpLCBidXQg
-YWxsIHRoZSB1c2VjYXNlcyBzZWVtIHRvIHRhcmdldCBvbiBCbHVlWiBiZWluZyB0aGUgDQo+IGNs
-aWVudCwgd2hvIGluaXRpYXRlcyBwYWlyaW5nLCBhbmQgdGhlIGFnZW50IHRha2VzIGNhcmUgb2Yg
-aW5wdXR0aW5nIA0KPiBwYXNza2V5IHJlcXVpcmVkIGJ5IHRoZSBvdGhlciBzaWRlIC0gd2hpY2gg
-aXMgdGhlIG9wcG9zaXRlIG9mIHdoYXQgSSANCj4gbmVlZC4NCj4gDQo+IEhvdyB0byBjb25maWd1
-cmUgQmx1ZVo1IHRvIHJlcXVpcmUgcGFzc2tleSBmcm9tIGFueSBpbmNvbW1pbmcgcGFpcmluZyAN
-Cj4gcmVxdWVzdHM/DQo+IA0KPiBUaGFua3MgdmVyeSBtdWNoIGZvciB5b3VyIGFuc3dlcnMhDQoN
-CllvdSBuZWVkIGEgcGFpcmluZyBhZ2VudCB0byBkbyB0aGlzIHNvcnQgb2YgdGhpbmcsIGFuZCBi
-bHVleiBpdHNlbGYgZG9lc24ndCBzaGlwIGFueSBzdWNoIHRvb2xzIGZvciBoZWFkbGVzcyB1c2Uu
-IFlvdXIgYmVzdCBiZXQgaXMgdXNpbmcgdGhlICJibHVlei10b29scyIgcmVwbzoNCmh0dHBzOi8v
-Z2l0aHViLmNvbS9raHZ6YWsvYmx1ZXotdG9vbHMNCg0KSSd2ZSB1c2VkIHRoZW0gc3VjY2Vzc2Z1
-bGx5IG9uIGhlYWRsZXNzIGRldmljZXMuIEluIHlvdXIgY2FzZSwgeW91IGNvdWxkIGhhdmUgdGhl
-IHBhaXJpbmcgYWdlbnQgKGJ0LWFnZW50KSBiZSBzdGFydGVkIGZvciBYIHNlY29uZHMgYWZ0ZXIg
-YSBidXR0b24gcHJlc3MgZm9yIGV4YW1wbGUuDQoNCklmIHlvdSB3YW50IHNvbWV0aGluZyBtb3Jl
-IGNvbXBsaWNhdGVkLCB5b3UnbGwgbmVlZCB0byBpbXBsZW1lbnQgeW91ciBvd24gYWdlbnQsIHRo
-ZSB0ZXN0L3NpbXBsZS1hZ2VudCBQeXRob24gc2NyaXB0IGluIHRoZSBibHVleiBzb3VyY2VzIGlz
-IHByb2JhYmx5IGEgZ29vZCBzdGFydC4NCg0KQ2hlZXJzDQo=
+Like all the other UART protocols, introduce a configuration option for
+Realtek based serial devices.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/Kconfig | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index c3736103c2ac..3a050e02bcb3 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -159,7 +159,6 @@ config BT_HCIUART_LL
+ config BT_HCIUART_3WIRE
+ 	bool "Three-wire UART (H5) protocol support"
+ 	depends on BT_HCIUART
+-	depends on BT_HCIUART_SERDEV
+ 	help
+ 	  The HCI Three-wire UART Transport Layer makes it possible to
+ 	  user the Bluetooth HCI over a serial port interface. The HCI
+@@ -195,6 +194,19 @@ config BT_HCIUART_BCM
+ 
+ 	  Say Y here to compile support for Broadcom protocol.
+ 
++config BT_HCIUART_RTL
++	bool "Realtek protocol support"
++	depends on BT_HCIUART
++	depends on BT_HCIUART_SERDEV
++	depends on GPIOLIB
++	select BT_HCIUART_3WIRE
++	select BT_RTL
++	help
++	  The Realtek protocol support enables Bluetooth HCI over 3-Wire
++	  serial port internface for Realtek Bluetooth controllers.
++
++	  Say Y here to compile support for Realtek protocol.
++
+ config BT_HCIUART_QCA
+ 	bool "Qualcomm Atheros protocol support"
+ 	depends on BT_HCIUART
+-- 
+2.17.1
+
