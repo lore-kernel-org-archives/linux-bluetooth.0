@@ -1,122 +1,67 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: [PATCH v7 2/3] Bluetooth: mediatek: Add protocol support for
- MediaTek serial devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1533715447.3472.251.camel@mtkswgap22>
-Date: Wed, 8 Aug 2018 16:07:08 +0200
-Cc: Mark Rutland <mark.rutland@arm.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
-Message-Id: <78F5F65C-F155-473A-BC94-809683FB9BDA@holtmann.org>
-References: <cover.1533056925.git.sean.wang@mediatek.com>
- <c92ed10cf16f36d9a3b390e864af92e2dfe7b771.1533056925.git.sean.wang@mediatek.com>
- <1707FFA1-A294-4A95-A3BF-0910CE455232@holtmann.org>
- <1533192799.3472.122.camel@mtkswgap22>
- <FF45A90A-F9F1-47CB-AB1F-1E92BF587FBE@holtmann.org>
- <1533199720.3472.136.camel@mtkswgap22>
- <9526E5D9-50BA-4D57-80F5-083DB7D28AFE@holtmann.org>
- <1533205495.3472.144.camel@mtkswgap22>
- <A6D48D49-52CE-405D-8C5D-C4D54CE67221@holtmann.org>
- <1533303749.3472.160.camel@mtkswgap22>
- <D2336CD2-B69B-4B5B-8125-F0CAD29E3243@holtmann.org>
- <1533319214.3472.187.camel@mtkswgap22>
- <7A3537C5-5940-45AD-AB80-77418CCFE130@holtmann.org>
- <1533652445.3472.230.camel@mtkswgap22>
- <8AF72CFC-4978-42AD-8ECC-752EB137DD2A@holtmann.org>
- <1533715447.3472.251.camel@mtkswgap22>
-To: Sean Wang <sean.wang@mediatek.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <ba6964a183f45af588e7c93bd2cf834cc0c1c5a4.camel@hadess.net>
+References: <VI1PR0601MB21287F56810A923C8881893C9A270@VI1PR0601MB2128.eurprd06.prod.outlook.com>
+ <ba6964a183f45af588e7c93bd2cf834cc0c1c5a4.camel@hadess.net>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 8 Aug 2018 15:41:13 +0300
+Message-ID: <CABBYNZK35915f9rV-d7i9PpK7xtJx-HuDaEKEHigR9bMOK4_qg@mail.gmail.com>
+Subject: Re: bt "server" how to configure requiring passkey from connecting clients
+To: Bastien Nocera <hadess@hadess.net>
+Cc: Libor Peltan <lpeltan@insys-tec.de>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sean,
+Hi,
 
->>>>>> this is even more hackish since the __hci_cmd_sync_ev command is really meant to get a cmd status first before waiting for that event.
->>>>>> 
->>>>> 
->>>>> Understood.
->>>>> 
->>>>> I've stopped the hack in v8. could we merge v8 first ? and then I will a fix up with __hci_raw_sync_ev that uses the hdev->raw_q instead of __hci_cmd_sync_ev in TODO.
->>>> 
->>>> so I looked into this a bit more. We actually added __hci_cmd_send for a Qualcomm firmware loader that was doing something similar. So instead of trying to add a yet another command to the core, I actually used that and implemented the wait for vendor event in the driver.
->>>> 
->>>> You will see my v9 on the mailing list. I also did a bunch of cosmetic minor cleanup and spelling correction. Please test this version. I also make __le16 dlen instead of dlen1 + dlen2 since I think that is what your hardware does.
->>> 
->>> Only one thing needs to be corrected in v9. that is __be16 is required instead of dlen1 + dlen2. I will fix it up in v10 and the other changes all look good to me.
->>> 
->>>> If this version of the driver works for you then I am happy to merge it. You can then add support for hdev->set_bdaddr and hdev->set_diag in later patches. I also like to clean up the STP receive handler since it can be done a lot simpler and smaller, but that has to wait.
->>>> 
->>> 
->>> hopefully v10 also can be merged :)
->> 
->> send me a v10 and I can merge it.
->> 
->>> I will investigate more about how to add ->set_bdaddr, ->set_diag and STP receive enhancement in later patches.
->>> 
->>> but so far I have not much idea about how to make STP multiplexer be a independent driver.
->>> 
->>> my thought is that it would be really better and cleaner a chain of serdev is be used as the base of mtkbtuart. something like
->>> 
->>> 8250 serial bus <----> STP multiplexer serdev <----> mtkbtuart serdev
->>> 
->>> however, STP multiplexer serdev is not a real device, that doesn't no request any resource. I think it should not be allowed to be added in a device tree and even in dt-binding document.
->> 
->> Before we do that, lets get a cleaner parser for it. I just don’t have enough time to wrap my head around this one yet.
->> 
->>>>>> Are all Mediatek vendor commands this way? Or just the ones for loading the firmware? So only the WMT ones?
->>>>>> 
->>>>> 
->>>>> Only the WMT ones, WMT commands/events are usually used in system controlling, for example, global function on/off, firmware download, reset and so on. most only appear on device initialization
->>>> 
->>>> Since you never checked the result of the vendor event, I opted for just signaling that it arrived. If they can report success or failure, we need to add some extra code for that.
->>>> 
->>> 
->>> I will consider more WMT event status when I add more Bluetooth devices such as MT7668U usb based Bluetooth which I plan to add the support in later patches in the next weeks 
->> 
->> Are the USB ones also using STP or are they H:2 based like all the others. What are prominent MT7668U based ones that I could buy?
->> 
-> 1.
-> USB ones don't use any STP framing, which is totally dedicated to the
-> serial based device.
-> 
-> I don't exactly know what the term H:2 means you mentioned here. I only
-> know the btusb driver can be reused for M7668U and just only one weird
-> thing to solve in btusb driver. That is HCI WMT event coming through
-> control in pipe, not through interrupt pipe :(
-> 
-> And as for the others generic hci/acl/sco data, they all work well as
-> btusb usually work. I will show you the code to let you exactly know
-> what I'm meaning instead of just talking :)
+On Wed, Aug 8, 2018 at 3:19 PM, Bastien Nocera <hadess@hadess.net> wrote:
+> On Tue, 2018-08-07 at 09:43 +0000, Libor Peltan wrote:
+>> Hello,
+>> I'm preparing a bluetooth "access point" using BlueZ 5.47, so that
+>> for example mobile phones can connect to it, and further use PAN
+>> profile (which is not part of this question). So far it works well,
+>> just using the JustWorks pairing method.
+>>
+>> I'd like to secure this a little bit, not allowing anyone to pair,
+>> rather to request passkey (let's say hardcoded string) before
+>> accepting pairing requested by a client mobile phone.
+>>
+>> After searching through documentation and much googling, I don't see
+>> any hints how to achieve this.
+>>
+>> I found some information about pairing agents in BlueZ5, both in
+>> bluetoothctl and custom (programming them seems complicated but
+>> viable and I cannot use simple-agent since I don't have python on my
+>> machine), but all the usecases seem to target on BlueZ being the
+>> client, who initiates pairing, and the agent takes care of inputting
+>> passkey required by the other side - which is the opposite of what I
+>> need.
+>>
+>> How to configure BlueZ5 to require passkey from any incomming pairing
+>> requests?
+>>
+>> Thanks very much for your answers!
+>
+> You need a pairing agent to do this sort of thing, and bluez itself
+> doesn't ship any such tools for headless use. Your best bet is using
+> the "bluez-tools" repo:
+> https://github.com/khvzak/bluez-tools
+>
+> I've used them successfully on headless devices. In your case, you
+> could have the pairing agent (bt-agent) be started for X seconds after
+> a button press for example.
+>
+> If you want something more complicated, you'll need to implement your
+> own agent, the test/simple-agent Python script in the bluez sources is
+> probably a good start.
 
-Bluetooth USB transport was originally section H:2 in the specification (and UART was section H:4) that is where this naming comes wrong. The btusb.c driver is implementing H:2 transport.
+I was wondering about this while hacking the AlwaysPairable option, we
+could perhaps add a third option there for hardcoding a pincode that
+way it would not be limited to just works since that does not offer
+main in the middle protection. Obviously if the system does have an
+agent then it should stick to AlwaysPairable = false.
 
-How does /sys/kernel/debug/usb/devices look for these devices? And I don’t recall that there is a control in pipe. That concept doesn’t really exist in USB.
-
-> 2.
-> Another thing is I think it's better if the core layer can support
-> __hci_raw_sync_ev-like APIs to allow each transport driver not to care
-> the details about cmd/event synchronization. If it can be done in this
-> way, that helps to help WMT cmd/event handling can be put into a
-> commonplace to allow btmtkuart and btusb for mtk port to have the same
-> codeshare.
-
-Such a core API will not help you. The btusb.c driver has already bunch of examples where it has to fix up things. Qualcomm/Atheros have done there fun way of firmware download and Intel also has done fun stuff with event over bulk endpoints.
-
-> 3. 
-> MT7668U should always be bundled with CE product, I am not really sure
-> whether it is easy to get from the retailer. Or you really like to want
-> a sample, maybe I can try to contact with internal people to make it
-> happen.
-
-If it is some NGFF mPCI card that I can plug into an adapter card and attach it to USB, or if you have some dev board, that would be interesting.
-
-Regards
-
-Marcel
+-- 
+Luiz Augusto von Dentz
