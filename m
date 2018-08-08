@@ -1,57 +1,122 @@
-Return-Path: <linux-serial-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: [PATCH] Bluetooth: hci_h5: Add Kconfig dependencies on SERDEV and
- GPIOLIB
+Subject: Re: [PATCH v7 2/3] Bluetooth: mediatek: Add protocol support for
+ MediaTek serial devices
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180808100703.GA25042@x1c.lan>
-Date: Wed, 8 Aug 2018 16:08:50 +0200
-Cc: Hans de Goede <hdegoede@redhat.com>,
-        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
-        Jeremy Cline <jeremy@jcline.org>,
+In-Reply-To: <1533715447.3472.251.camel@mtkswgap22>
+Date: Wed, 8 Aug 2018 16:07:08 +0200
+Cc: Mark Rutland <mark.rutland@arm.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-Message-Id: <5A28D5E1-CCE4-49A0-B58D-C953EE8C120E@holtmann.org>
-References: <20180808084825.12120-1-hdegoede@redhat.com>
- <20180808094711.GA23325@x1c.lan> <20180808100703.GA25042@x1c.lan>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-serial-owner@vger.kernel.org
+        Rob Herring <robh+dt@kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Message-Id: <78F5F65C-F155-473A-BC94-809683FB9BDA@holtmann.org>
+References: <cover.1533056925.git.sean.wang@mediatek.com>
+ <c92ed10cf16f36d9a3b390e864af92e2dfe7b771.1533056925.git.sean.wang@mediatek.com>
+ <1707FFA1-A294-4A95-A3BF-0910CE455232@holtmann.org>
+ <1533192799.3472.122.camel@mtkswgap22>
+ <FF45A90A-F9F1-47CB-AB1F-1E92BF587FBE@holtmann.org>
+ <1533199720.3472.136.camel@mtkswgap22>
+ <9526E5D9-50BA-4D57-80F5-083DB7D28AFE@holtmann.org>
+ <1533205495.3472.144.camel@mtkswgap22>
+ <A6D48D49-52CE-405D-8C5D-C4D54CE67221@holtmann.org>
+ <1533303749.3472.160.camel@mtkswgap22>
+ <D2336CD2-B69B-4B5B-8125-F0CAD29E3243@holtmann.org>
+ <1533319214.3472.187.camel@mtkswgap22>
+ <7A3537C5-5940-45AD-AB80-77418CCFE130@holtmann.org>
+ <1533652445.3472.230.camel@mtkswgap22>
+ <8AF72CFC-4978-42AD-8ECC-752EB137DD2A@holtmann.org>
+ <1533715447.3472.251.camel@mtkswgap22>
+To: Sean Wang <sean.wang@mediatek.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Sean,
 
->>> diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
->>> index f3c643a0473c..8969d3d5d86c 100644
->>> --- a/drivers/bluetooth/Kconfig
->>> +++ b/drivers/bluetooth/Kconfig
->>> @@ -159,6 +159,8 @@ config BT_HCIUART_LL
->>> config BT_HCIUART_3WIRE
->>> 	bool "Three-wire UART (H5) protocol support"
->>> 	depends on BT_HCIUART
->>> +	depends on BT_HCIUART_SERDEV
->>> +	depends on GPIOLIB
->>> 	help
->>> 	  The HCI Three-wire UART Transport Layer makes it possible to
->>> 	  user the Bluetooth HCI over a serial port interface. The HCI
+>>>>>> this is even more hackish since the __hci_cmd_sync_ev command is really meant to get a cmd status first before waiting for that event.
+>>>>>> 
+>>>>> 
+>>>>> Understood.
+>>>>> 
+>>>>> I've stopped the hack in v8. could we merge v8 first ? and then I will a fix up with __hci_raw_sync_ev that uses the hdev->raw_q instead of __hci_cmd_sync_ev in TODO.
+>>>> 
+>>>> so I looked into this a bit more. We actually added __hci_cmd_send for a Qualcomm firmware loader that was doing something similar. So instead of trying to add a yet another command to the core, I actually used that and implemented the wait for vendor event in the driver.
+>>>> 
+>>>> You will see my v9 on the mailing list. I also did a bunch of cosmetic minor cleanup and spelling correction. Please test this version. I also make __le16 dlen instead of dlen1 + dlen2 since I think that is what your hardware does.
+>>> 
+>>> Only one thing needs to be corrected in v9. that is __be16 is required instead of dlen1 + dlen2. I will fix it up in v10 and the other changes all look good to me.
+>>> 
+>>>> If this version of the driver works for you then I am happy to merge it. You can then add support for hdev->set_bdaddr and hdev->set_diag in later patches. I also like to clean up the STP receive handler since it can be done a lot simpler and smaller, but that has to wait.
+>>>> 
+>>> 
+>>> hopefully v10 also can be merged :)
 >> 
->> The missing BT_HCIUART_SERDEV is already fixed in bluetooth-next.
->> Please send an updated patch for the GPIOLIB however.
+>> send me a v10 and I can merge it.
+>> 
+>>> I will investigate more about how to add ->set_bdaddr, ->set_diag and STP receive enhancement in later patches.
+>>> 
+>>> but so far I have not much idea about how to make STP multiplexer be a independent driver.
+>>> 
+>>> my thought is that it would be really better and cleaner a chain of serdev is be used as the base of mtkbtuart. something like
+>>> 
+>>> 8250 serial bus <----> STP multiplexer serdev <----> mtkbtuart serdev
+>>> 
+>>> however, STP multiplexer serdev is not a real device, that doesn't no request any resource. I think it should not be allowed to be added in a device tree and even in dt-binding document.
+>> 
+>> Before we do that, lets get a cleaner parser for it. I just don’t have enough time to wrap my head around this one yet.
+>> 
+>>>>>> Are all Mediatek vendor commands this way? Or just the ones for loading the firmware? So only the WMT ones?
+>>>>>> 
+>>>>> 
+>>>>> Only the WMT ones, WMT commands/events are usually used in system controlling, for example, global function on/off, firmware download, reset and so on. most only appear on device initialization
+>>>> 
+>>>> Since you never checked the result of the vendor event, I opted for just signaling that it arrived. If they can report success or failure, we need to add some extra code for that.
+>>>> 
+>>> 
+>>> I will consider more WMT event status when I add more Bluetooth devices such as MT7668U usb based Bluetooth which I plan to add the support in later patches in the next weeks 
+>> 
+>> Are the USB ones also using STP or are they H:2 based like all the others. What are prominent MT7668U based ones that I could buy?
+>> 
+> 1.
+> USB ones don't use any STP framing, which is totally dedicated to the
+> serial based device.
 > 
-> Actually the GPIOLIB dependency is related to BT_RTL usage, if I
-> understand the code right. There's much more to be fixed though:
-> currently all "btrtl" code in hci_h5.c is unconditionally compiled in,
-> which it shouldn't be (it should depend on BT_RTL). There should
-> probably be a similar Kconfig option to select BT_RTL for
-> BT_HCIUART_3WIRE like there is for btusb with BT_HCIBTUSB_RTL.
+> I don't exactly know what the term H:2 means you mentioned here. I only
+> know the btusb driver can be reused for M7668U and just only one weird
+> thing to solve in btusb driver. That is HCI WMT event coming through
+> control in pipe, not through interrupt pipe :(
 > 
-> Would you, or perhaps Jeremy (who introduced this code) be willing to
-> submit a patch for it? We need to get this fixed for the last 4.19
-> bluetooth-next pull request, which is due this week.
+> And as for the others generic hci/acl/sco data, they all work well as
+> btusb usually work. I will show you the code to let you exactly know
+> what I'm meaning instead of just talking :)
 
-I really wanted that the new bt3wire.c gets fixed up and used for this and I am slightly regretting that I merged the hci_h5.c changes :(
+Bluetooth USB transport was originally section H:2 in the specification (and UART was section H:4) that is where this naming comes wrong. The btusb.c driver is implementing H:2 transport.
+
+How does /sys/kernel/debug/usb/devices look for these devices? And I don’t recall that there is a control in pipe. That concept doesn’t really exist in USB.
+
+> 2.
+> Another thing is I think it's better if the core layer can support
+> __hci_raw_sync_ev-like APIs to allow each transport driver not to care
+> the details about cmd/event synchronization. If it can be done in this
+> way, that helps to help WMT cmd/event handling can be put into a
+> commonplace to allow btmtkuart and btusb for mtk port to have the same
+> codeshare.
+
+Such a core API will not help you. The btusb.c driver has already bunch of examples where it has to fix up things. Qualcomm/Atheros have done there fun way of firmware download and Intel also has done fun stuff with event over bulk endpoints.
+
+> 3. 
+> MT7668U should always be bundled with CE product, I am not really sure
+> whether it is easy to get from the retailer. Or you really like to want
+> a sample, maybe I can try to contact with internal people to make it
+> happen.
+
+If it is some NGFF mPCI card that I can plug into an adapter card and attach it to USB, or if you have some dev board, that would be interesting.
 
 Regards
 
 Marcel
-
