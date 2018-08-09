@@ -1,40 +1,19 @@
-Return-Path: <johan.hedberg@gmail.com>
-Date: Thu, 9 Aug 2018 10:11:32 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Introduce BT_HCIUART_RTL configuration option
-Message-ID: <20180809071132.GA11618@x1c.lan>
-References: <20180808142712.88122-1-marcel@holtmann.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Jamie Mccrae <Jamie.Mccrae@lairdtech.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Diffie-Hellman vulnerability note on CERT
+Date: Thu, 9 Aug 2018 06:33:53 +0000
+Message-ID: <SN1PR02MB37262EB4E2CDA30680DB07FB82250@SN1PR02MB3726.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <20180808142712.88122-1-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Wed, Aug 08, 2018, Marcel Holtmann wrote:
-> --- a/drivers/bluetooth/Kconfig
-> +++ b/drivers/bluetooth/Kconfig
-> @@ -159,7 +159,6 @@ config BT_HCIUART_LL
->  config BT_HCIUART_3WIRE
->  	bool "Three-wire UART (H5) protocol support"
->  	depends on BT_HCIUART
-> -	depends on BT_HCIUART_SERDEV
->  	help
->  	  The HCI Three-wire UART Transport Layer makes it possible to
->  	  user the Bluetooth HCI over a serial port interface. The HCI
-
-This still doesn't prevent someone from explicitly selecting
-BT_HCIUART_3WIRE (since it's not a virtual option like BT_RTL) but not
-selecting BT_HCIUART_SERDEV. Doing that will still result in this
-compiler warning:
-
-drivers/bluetooth/hci_h5.c:934:36: warning: ‘h5_serdev_driver’ defined but not used [-Wunused-variable]
- static struct serdev_device_driver h5_serdev_driver = {
-                                    ^~~~~~~~~~~~~~~~
-
-So I think the dependency needs to either stay there, or then some
-#ifdefs need to be added to hci_h5.c.
-
-Johan
+Hi,
+It seems that CERT now has a public disclosure page about the recent Diffie=
+-Hellman curve encryption vulnerability detailing software revisions that h=
+ave the issue and versions that have it fixed. It currently shows unknown n=
+ext to the Linux Kernel so might be a good idea to update this with the cor=
+rect information? https://www.kb.cert.org/vuls/id/304725=20
+Thanks,
+Jamie
