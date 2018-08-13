@@ -1,93 +1,83 @@
-Return-Path: <computersforpeace@gmail.com>
-Date: Mon, 13 Aug 2018 16:18:54 -0700
-From: Brian Norris <computersforpeace@gmail.com>
-To: Andrea Parri <andrea.parri@amarulasolutions.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jeffy Chen <jeffy.chen@rock-chips.com>,
-	Brian Norris <briannorris@chromium.org>,
-	AL Yu-Chen Cho <acho@suse.com>
-Subject: Re: [Question] bluetooth/{bnep,cmtp,hidp}: memory barriers
-Message-ID: <20180813231854.GA173912@ban.mtv.corp.google.com>
-References: <20180730031030.GA9430@andrea>
+Return-Path: <keescook@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180730031030.GA9430@andrea>
+In-Reply-To: <20180813220419.4168133-1-arnd@arndb.de>
+References: <20180813220419.4168133-1-arnd@arndb.de>
+From: Kees Cook <keescook@chromium.org>
+Date: Mon, 13 Aug 2018 15:36:28 -0700
+Message-ID: <CAGXu5jKJ2xHHn9w-H3N-Xc6cFHyDadcvUhoKJe0t44N6HEE3tQ@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: hci_h5: avoid unused variable warnings
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Hans de Goede <hdegoede@redhat.com>, Jeremy Cline <jeremy@jcline.org>, linux-bluetooth@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 30, 2018 at 05:10:30AM +0200, Andrea Parri wrote:
-> Hi,
+On Mon, Aug 13, 2018 at 3:04 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> When CONFIG_BT_HCIUART_RTL is disabled, the hci_h5 driver produces a build
+> warning because of an incorrect set of #ifdef guards:
+>
+> drivers/bluetooth/hci_h5.c:920:22: error: 'rtl_vnd' defined but not used [-Werror=unused-variable]
+>
+> Replacing the #ifdef with an IS_ENABLED() check shuts up the error
+> and simplifies the logic.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Hi!
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-> I'm currently puzzled by the the three calls to smp_mb__before_atomic()
-> in bnep_session(), cmtp_session() and hidp_session_run() respectively:
+-Kees
 
-For the curious: I believe Jeffy Chen added all of those.
+> ---
+>  drivers/bluetooth/hci_h5.c | 10 +++-------
+>  1 file changed, 3 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index 8eede1197cd2..b10e64ba0ff4 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -841,7 +841,6 @@ static void h5_serdev_remove(struct serdev_device *serdev)
+>         hci_uart_unregister_device(&h5->serdev_hu);
+>  }
+>
+> -#ifdef CONFIG_BT_HCIUART_RTL
+>  static int h5_btrtl_setup(struct h5 *h5)
+>  {
+>         struct btrtl_device_info *btrtl_dev;
+> @@ -923,24 +922,21 @@ static struct h5_vnd rtl_vnd = {
+>         .close          = h5_btrtl_close,
+>         .acpi_gpio_map  = acpi_btrtl_gpios,
+>  };
+> -#endif
+>
+> -#ifdef CONFIG_ACPI
+>  static const struct acpi_device_id h5_acpi_match[] = {
+> -#ifdef CONFIG_BT_HCIUART_RTL
+>         { "OBDA8723", (kernel_ulong_t)&rtl_vnd },
+> -#endif
+>         { },
+>  };
+>  MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
+> -#endif
+>
+>  static struct serdev_device_driver h5_serdev_driver = {
+>         .probe = h5_serdev_probe,
+>         .remove = h5_serdev_remove,
+>         .driver = {
+>                 .name = "hci_uart_h5",
+> -               .acpi_match_table = ACPI_PTR(h5_acpi_match),
+> +               .acpi_match_table = (IS_ENABLED(CONFIG_BT_HCIUART_RTL) &&
+> +                                    IS_ENABLED(CONFIG_ACPI)) ?
+> +                                       h5_acpi_match : 0,
+>         },
+>  };
+>
+> --
+> 2.18.0
+>
 
-> On the one hand, these barriers provide no guarantee on the subsequent
-> atomic_read(s->terminate) (as the comments preceding the barriers seem
-> to suggest), because atomic_read() is not a read-modify-write.
-
-I'll admit, I didn't notice that piece of the documentation when
-reviewing this the first time:
-
-Documentation/atomic_t.txt
-<quote>
-The barriers:
-
-  smp_mb__{before,after}_atomic()
-
-only apply to the RMW ops and can be used to augment/upgrade the ordering
-inherent to the used atomic op.
-</quote>
-
-> On the other hand, I'm currently unable to say *why such an "mb" would
-> be required: not being too familiar with this code, I figured I should
-> ask before sending a patch.  ;-)
-
-I can't fully speak for Jeffy, but I expect based on the initial
-development of his patches like this one
-
-commit 5da8e47d849d3d37b14129f038782a095b9ad049
-Author: Jeffy Chen <jeffy.chen@rock-chips.com>
-Date:   Tue Jun 27 17:34:44 2017 +0800
-
-    Bluetooth: hidp: fix possible might sleep error in hidp_session_thread
-
-that *some* kind of barrier was stuck in there simply as a response to
-comments like this, that were going away:
-
--                *
--                * Note: set_current_state() performs any necessary
--                * memory-barriers for us.
-                 */
--               set_current_state(TASK_INTERRUPTIBLE);
-
-+               /* Ensure session->terminate is updated */
-+               smp_mb__before_atomic();
 
 
-It was probably an attempt to fill in the gap for the
-set_current_state() (and comment) which was being removed. I believe
-Jeffy originally added more barriers in other places, but I convinced
-him not to.
-
-I have to say, I'm not really up-to-speed on the use of manual barriers
-in Linux (it's much preferable when they're wrapped into higher-level
-data structures already), but I believe the main intention here is to
-ensure that any change to 'terminate' that happened during the previous
-"wait_woken()" would be visible to our atomic_read().
-
-Looking into wait_woken(), I'm feeling like none of these additional
-barriers are necessary at all. I believe wait_woken() handles the
-visibility issues we care about (that if we were woken for termination,
-we'll see the terminating condition).
-
-That's my two cents, even if it's only worth about two cents.
-
-HTH,
-Brian
+-- 
+Kees Cook
+Pixel Security
