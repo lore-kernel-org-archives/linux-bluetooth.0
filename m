@@ -1,45 +1,49 @@
-Return-Path: <hdegoede@redhat.com>
-From: Hans de Goede <hdegoede@redhat.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	Jeremy Cline <jeremy@jcline.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-acpi@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] Bluetooth: Make BT_HCIUART_RTL configuration option depend on ACPI
-Date: Tue, 14 Aug 2018 11:57:07 +0200
-Message-Id: <20180814095707.5674-1-hdegoede@redhat.com>
+Return-Path: <arndbergmann@gmail.com>
+MIME-Version: 1.0
+References: <20180813220419.4168133-1-arnd@arndb.de> <60279ff9-95a7-c2d8-dcd3-6e505c22a0e6@redhat.com>
+In-Reply-To: <60279ff9-95a7-c2d8-dcd3-6e505c22a0e6@redhat.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Tue, 14 Aug 2018 10:42:31 +0200
+Message-ID: <CAK8P3a3QwP9qA-sjCn8UFKHPFzku0epxi6BWETpH9YTEfjQ5jA@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: hci_h5: avoid unused variable warnings
+To: Hans de Goede <hdegoede@redhat.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, jeremy@jcline.org,
+	Kees Cook <keescook@chromium.org>,
+	Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-At the moment we only support ACPI enumeration for serial port attached
-RTL bluetooth controllers.
+On Tue, Aug 14, 2018 at 9:22 AM Hans de Goede <hdegoede@redhat.com> wrote:
+>
+> Hi Arnd,
+>
+> On 14-08-18 00:04, Arnd Bergmann wrote:
+> > When CONFIG_BT_HCIUART_RTL is disabled, the hci_h5 driver produces a build
+> > warning because of an incorrect set of #ifdef guards:
+> >
+> > drivers/bluetooth/hci_h5.c:920:22: error: 'rtl_vnd' defined but not used [-Werror=unused-variable]
+> >
+> > Replacing the #ifdef with an IS_ENABLED() check shuts up the error
+> > and simplifies the logic.
+> >
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>
+> Hmm, so now you're counting on dead code elimination to remove
+> references to unavailable symbols.
 
-This commit adds a dependency on ACPI to the BT_HCIUART_RTL configuration
-option, fixing the following warning when ACPI is not enabled:
+Generally depending on dead code elimination is very reliable, as this
+is easy for gcc to get right. However, you are right that this is actually
+an exception since the MODULE_DEVICE_TABLE() entry will keep
+a reference around that prevents the compiler from eliminating it.
 
-drivers/bluetooth/hci_h5.c:920:22: warning: 'rtl_vnd' defined but not used
+> I'm not sure I like this and
+> since Marcel has also indicated the does not like this fix I
+> believe we need another fix.
+>
+> I will write another fix for this.
+>
 
-Cc: Arnd Bergmann <arnd@arndb.de>
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- drivers/bluetooth/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+Ok, thanks!
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 933eb90d1ce2..709ed3f7dfe8 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -200,6 +200,7 @@ config BT_HCIUART_RTL
- 	depends on BT_HCIUART
- 	depends on BT_HCIUART_SERDEV
- 	depends on GPIOLIB
-+	depends on ACPI
- 	select BT_HCIUART_3WIRE
- 	select BT_RTL
- 	help
--- 
-2.18.0
+      Arnd
