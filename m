@@ -1,138 +1,89 @@
 Return-Path: <andrea.parri@amarulasolutions.com>
+Date: Tue, 14 Aug 2018 20:33:28 +0200
 From: Andrea Parri <andrea.parri@amarulasolutions.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
+To: JeffyChen <jeffy.chen@rock-chips.com>
+Cc: Brian Norris <computersforpeace@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Jeffy Chen <jeffy.chen@rock-chips.com>,
 	Brian Norris <briannorris@chromium.org>,
-	AL Yu-Chen Cho <acho@suse.com>,
-	Andrea Parri <andrea.parri@amarulasolutions.com>
-Subject: [PATCH] bluetooth/{bnep,cmtp,hidp}: Remove unnecessary smp_mb__{before,after}_atomic
-Date: Tue, 14 Aug 2018 20:41:06 +0200
-Message-Id: <1534272066-9366-1-git-send-email-andrea.parri@amarulasolutions.com>
+	AL Yu-Chen Cho <acho@suse.com>
+Subject: Re: [Question] bluetooth/{bnep,cmtp,hidp}: memory barriers
+Message-ID: <20180814183328.GA8874@andrea>
+References: <20180730031030.GA9430@andrea>
+ <20180813231854.GA173912@ban.mtv.corp.google.com>
+ <5B725A12.8050409@rock-chips.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5B725A12.8050409@rock-chips.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The barriers are unneeded; wait_woken() and woken_wake_function()
-already provide us with the required synchronization: remove them
-and document that we're relying on the (implicit) synchronization
-provided by wait_woken() and woken_wake_function().
+Hi Jeffy, Brian,
 
-Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
----
- net/bluetooth/bnep/core.c |  7 ++++---
- net/bluetooth/cmtp/core.c | 14 ++++++++------
- net/bluetooth/hidp/core.c | 13 ++++++++-----
- 3 files changed, 20 insertions(+), 14 deletions(-)
+On Tue, Aug 14, 2018 at 12:26:58PM +0800, JeffyChen wrote:
+> Hi guys,
+> 
+> Thanks for your mails, and sorry for the late response..
+> 
+> On 08/14/2018 07:18 AM, Brian Norris wrote:
+> >
+> >commit 5da8e47d849d3d37b14129f038782a095b9ad049
+> >Author: Jeffy Chen<jeffy.chen@rock-chips.com>
+> >Date:   Tue Jun 27 17:34:44 2017 +0800
+> >
+> >     Bluetooth: hidp: fix possible might sleep error in hidp_session_thread
+> >
+> >that*some*  kind of barrier was stuck in there simply as a response to
+> >comments like this, that were going away:
+> >
+> >-                *
+> >-                * Note: set_current_state() performs any necessary
+> >-                * memory-barriers for us.
+> >                  */
+> >-               set_current_state(TASK_INTERRUPTIBLE);
+> >
+> >+               /* Ensure session->terminate is updated */
+> >+               smp_mb__before_atomic();
+> >
+> >
+> >It was probably an attempt to fill in the gap for the
+> >set_current_state() (and comment) which was being removed. I believe
+> >Jeffy originally added more barriers in other places, but I convinced
+> >him not to.
+> 
+> right, i was trying to avoid losing memory-barriers when removing
+> set_current_state and changing wake_up_process to wake_up_interruptible.
+> 
+> and checking these code again, it's true the smp_mb__before_atomic before
+> atomic_read is not needed, the smp_mb after atomic_inc(&session->terminate)
+> should be enough.
+> 
+> and as Brian point out, there's already an smp_store_mb at the end of
+> wait_woken, i agree we can remove all the smp_mb__{before,after}_atomic() i
+> wrongly added :)
 
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index 7b3965861013c..43c284158f63e 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -489,9 +489,6 @@ static int bnep_session(void *arg)
- 
- 	add_wait_queue(sk_sleep(sk), &wait);
- 	while (1) {
--		/* Ensure session->terminate is updated */
--		smp_mb__before_atomic();
--
- 		if (atomic_read(&s->terminate))
- 			break;
- 		/* RX */
-@@ -512,6 +509,10 @@ static int bnep_session(void *arg)
- 				break;
- 		netif_wake_queue(dev);
- 
-+		/*
-+		 * wait_woken() performs the necessary memory barriers
-+		 * for us; see the header comment for this primitive.
-+		 */
- 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
- 	}
- 	remove_wait_queue(sk_sleep(sk), &wait);
-diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-index 7f26a5a19ff6d..07cfa3249f83a 100644
---- a/net/bluetooth/cmtp/core.c
-+++ b/net/bluetooth/cmtp/core.c
-@@ -288,9 +288,6 @@ static int cmtp_session(void *arg)
- 
- 	add_wait_queue(sk_sleep(sk), &wait);
- 	while (1) {
--		/* Ensure session->terminate is updated */
--		smp_mb__before_atomic();
--
- 		if (atomic_read(&session->terminate))
- 			break;
- 		if (sk->sk_state != BT_CONNECTED)
-@@ -306,6 +303,10 @@ static int cmtp_session(void *arg)
- 
- 		cmtp_process_transmit(session);
- 
-+		/*
-+		 * wait_woken() performs the necessary memory barriers
-+		 * for us; see the header comment for this primitive.
-+		 */
- 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
- 	}
- 	remove_wait_queue(sk_sleep(sk), &wait);
-@@ -431,9 +432,10 @@ int cmtp_del_connection(struct cmtp_conndel_req *req)
- 		/* Stop session thread */
- 		atomic_inc(&session->terminate);
- 
--		/* Ensure session->terminate is updated */
--		smp_mb__after_atomic();
--
-+		/*
-+		 * See the comment preceding the call to wait_woken()
-+		 * in cmtp_session().
-+		 */
- 		wake_up_interruptible(sk_sleep(session->sock->sk));
- 	} else
- 		err = -ENOENT;
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 1036e4fa1ea28..e621551712f59 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -1074,6 +1074,10 @@ static int hidp_session_start_sync(struct hidp_session *session)
- static void hidp_session_terminate(struct hidp_session *session)
- {
- 	atomic_inc(&session->terminate);
-+	/*
-+	 * See the comment preceding the call to wait_woken()
-+	 * in hidp_session_run().
-+	 */
- 	wake_up_interruptible(&hidp_session_wq);
- }
- 
-@@ -1193,8 +1197,6 @@ static void hidp_session_run(struct hidp_session *session)
- 		 *    thread is woken up by ->sk_state_changed().
- 		 */
- 
--		/* Ensure session->terminate is updated */
--		smp_mb__before_atomic();
- 		if (atomic_read(&session->terminate))
- 			break;
- 
-@@ -1228,14 +1230,15 @@ static void hidp_session_run(struct hidp_session *session)
- 		hidp_process_transmit(session, &session->ctrl_transmit,
- 				      session->ctrl_sock);
- 
-+		/*
-+		 * wait_woken() performs the necessary memory barriers
-+		 * for us; see the header comment for this primitive.
-+		 */
- 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
- 	}
- 	remove_wait_queue(&hidp_session_wq, &wait);
- 
- 	atomic_inc(&session->terminate);
--
--	/* Ensure session->terminate is updated */
--	smp_mb__after_atomic();
- }
- 
- static int hidp_session_wake_function(wait_queue_entry_t *wait,
--- 
-2.7.4
+Thank you for checking this once again.  I'll send out a patch removing
+these barriers shortly.
+
+  Andrea
+
+P.S. I'm out of office for the next two weeks, so my replies could come
+with some delay until ~ -rc1...
+
+
+> 
+> >
+> >I have to say, I'm not really up-to-speed on the use of manual barriers
+> >in Linux (it's much preferable when they're wrapped into higher-level
+> >data structures already), but I believe the main intention here is to
+> >ensure that any change to 'terminate' that happened during the previous
+> >"wait_woken()" would be visible to our atomic_read().
+> >
+> >Looking into wait_woken(), I'm feeling like none of these additional
+> >barriers are necessary at all. I believe wait_woken() handles the
+> >visibility issues we care about (that if we were woken for termination,
+> >we'll see the terminating condition).
+> 
+> 
