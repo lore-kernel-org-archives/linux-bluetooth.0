@@ -1,41 +1,37 @@
 Return-Path: <hdegoede@redhat.com>
-Subject: Re: [PATCH] Use default .cfg file name for RTL8723BS devices with id
- of OBDA8723
-To: Ian W MORRISON <ianwmorrison@gmail.com>, marcel@holtmann.org,
- johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20180814064742.14519-1-ianwmorrison@gmail.com>
+Subject: Re: [PATCH] bluetooth: hci_h5: avoid unused variable warnings
+To: Arnd Bergmann <arnd@arndb.de>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Jeremy Cline <jeremy@jcline.org>, Kees Cook <keescook@chromium.org>,
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20180813220419.4168133-1-arnd@arndb.de>
 From: Hans de Goede <hdegoede@redhat.com>
-Message-ID: <29a87a37-6dda-62c2-01b1-d4a806e19cf2@redhat.com>
-Date: Tue, 14 Aug 2018 09:28:25 +0200
+Message-ID: <60279ff9-95a7-c2d8-dcd3-6e505c22a0e6@redhat.com>
+Date: Tue, 14 Aug 2018 09:22:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <20180814064742.14519-1-ianwmorrison@gmail.com>
+In-Reply-To: <20180813220419.4168133-1-arnd@arndb.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Arnd,
 
-On 14-08-18 08:47, Ian W MORRISON wrote:
-> For RTL8723BS devices the current config file name is a composite of
-> both the config name (rtl8723bs) and a postfix of the device-id.
+On 14-08-18 00:04, Arnd Bergmann wrote:
+> When CONFIG_BT_HCIUART_RTL is disabled, the hci_h5 driver produces a build
+> warning because of an incorrect set of #ifdef guards:
 > 
-> Given the majority of RTL8723BS devices use a device-id of OBDA8723
-> this simplifies the config file name to use "rtl8723bs_config.bin"
-> as a default of for these devices.
+> drivers/bluetooth/hci_h5.c:920:22: error: 'rtl_vnd' defined but not used [-Werror=unused-variable]
+> 
+> Replacing the #ifdef with an IS_ENABLED() check shuts up the error
+> and simplifies the logic.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-NACK, the device id is in there for a reason, once someone writes
-support for it we will also need a rtl8723bs_config file on ARM
-boards, which will definitely be board specific. I don't want us
-to pretend there is one config to rule them all.
+Hmm, so now you're counting on dead code elimination to remove
+references to unavailable symbols. I'm not sure I like this and
+since Marcel has also indicated the does not like this fix I
+believe we need another fix.
 
-Specifically I plan to submit both the firmware and
-rtl8723bs_config-OBDA8723.bin to linux-firmware soon, if the kernel
-instead looks for just rtl8723bs_config.bin then I need to give
-it that name in linux-firmware and then when we get ARM support
-and the kernel complains about e.g. rtl8723bs_config-NextThingCo-CHIP.bin
-not being there people may be tempted to think they can just link
-to the "generic" one from linux-firmware which then turns out
-to not be generic at all.
+I will write another fix for this.
 
 Regards,
 
@@ -43,25 +39,48 @@ Hans
 
 
 
-> 
-> Signed-off-by: Ian W MORRISON <ianwmorrison@gmail.com>
 > ---
->   drivers/bluetooth/hci_h5.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+>   drivers/bluetooth/hci_h5.c | 10 +++-------
+>   1 file changed, 3 insertions(+), 7 deletions(-)
 > 
 > diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> index 8eede1197cd2..cce422dc1b8d 100644
+> index 8eede1197cd2..b10e64ba0ff4 100644
 > --- a/drivers/bluetooth/hci_h5.c
 > +++ b/drivers/bluetooth/hci_h5.c
-> @@ -852,7 +852,9 @@ static int h5_btrtl_setup(struct h5 *h5)
->   	bool flow_control;
->   	int err;
+> @@ -841,7 +841,6 @@ static void h5_serdev_remove(struct serdev_device *serdev)
+>   	hci_uart_unregister_device(&h5->serdev_hu);
+>   }
 >   
-> -	btrtl_dev = btrtl_initialize(h5->hu->hdev, h5->id);
-> +	btrtl_dev = strcmp("OBDA8723", h5->id) ?
-> +		btrtl_initialize(h5->hu->hdev, h5->id) :
-> +			btrtl_initialize(h5->hu->hdev, NULL);
->   	if (IS_ERR(btrtl_dev))
->   		return PTR_ERR(btrtl_dev);
+> -#ifdef CONFIG_BT_HCIUART_RTL
+>   static int h5_btrtl_setup(struct h5 *h5)
+>   {
+>   	struct btrtl_device_info *btrtl_dev;
+> @@ -923,24 +922,21 @@ static struct h5_vnd rtl_vnd = {
+>   	.close		= h5_btrtl_close,
+>   	.acpi_gpio_map	= acpi_btrtl_gpios,
+>   };
+> -#endif
+>   
+> -#ifdef CONFIG_ACPI
+>   static const struct acpi_device_id h5_acpi_match[] = {
+> -#ifdef CONFIG_BT_HCIUART_RTL
+>   	{ "OBDA8723", (kernel_ulong_t)&rtl_vnd },
+> -#endif
+>   	{ },
+>   };
+>   MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
+> -#endif
+>   
+>   static struct serdev_device_driver h5_serdev_driver = {
+>   	.probe = h5_serdev_probe,
+>   	.remove = h5_serdev_remove,
+>   	.driver = {
+>   		.name = "hci_uart_h5",
+> -		.acpi_match_table = ACPI_PTR(h5_acpi_match),
+> +		.acpi_match_table = (IS_ENABLED(CONFIG_BT_HCIUART_RTL) &&
+> +				     IS_ENABLED(CONFIG_ACPI)) ?
+> +					h5_acpi_match : 0,
+>   	},
+>   };
 >   
 > 
