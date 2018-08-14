@@ -1,61 +1,138 @@
-Return-Path: <sean.wang@mediatek.com>
-Message-ID: <1534272320.31978.28.camel@mtkswgap22>
-Subject: Re: [PATCH] Bluetooth: mediatek: Fix memory leak
-From: Sean Wang <sean.wang@mediatek.com>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-CC: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>, <linux-mediatek@lists.infradead.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Date: Wed, 15 Aug 2018 02:45:20 +0800
-In-Reply-To: <20180814151031.GA25096@embeddedor.com>
-References: <20180814151031.GA25096@embeddedor.com>
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
+Return-Path: <andrea.parri@amarulasolutions.com>
+From: Andrea Parri <andrea.parri@amarulasolutions.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeffy Chen <jeffy.chen@rock-chips.com>,
+	Brian Norris <briannorris@chromium.org>,
+	AL Yu-Chen Cho <acho@suse.com>,
+	Andrea Parri <andrea.parri@amarulasolutions.com>
+Subject: [PATCH] bluetooth/{bnep,cmtp,hidp}: Remove unnecessary smp_mb__{before,after}_atomic
+Date: Tue, 14 Aug 2018 20:41:06 +0200
+Message-Id: <1534272066-9366-1-git-send-email-andrea.parri@amarulasolutions.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, Gustavo
+The barriers are unneeded; wait_woken() and woken_wake_function()
+already provide us with the required synchronization: remove them
+and document that we're relying on the (implicit) synchronization
+provided by wait_woken() and woken_wake_function().
 
-thanks for the catch up
+Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
+---
+ net/bluetooth/bnep/core.c |  7 ++++---
+ net/bluetooth/cmtp/core.c | 14 ++++++++------
+ net/bluetooth/hidp/core.c | 13 ++++++++-----
+ 3 files changed, 20 insertions(+), 14 deletions(-)
 
-Acked-by: Sean Wang <sean.wang@mediatek.com>
-
-
-On Tue, 2018-08-14 at 10:10 -0500, Gustavo A. R. Silva wrote:
-> In case memory resources for *fw* were allocated, release them before
-> return.
-> 
-> Addresses-Coverity-ID: 1472611 ("Resource leak")
-> Fixes: 7237c4c9ec92 ("Bluetooth: mediatek: Add protocol support for MediaTek serial devices")
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-> ---
->  drivers/bluetooth/btmtkuart.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btmtkuart.c b/drivers/bluetooth/btmtkuart.c
-> index ed2a5c7..4593baf 100644
-> --- a/drivers/bluetooth/btmtkuart.c
-> +++ b/drivers/bluetooth/btmtkuart.c
-> @@ -144,8 +144,10 @@ static int mtk_setup_fw(struct hci_dev *hdev)
->  	fw_size = fw->size;
->  
->  	/* The size of patch header is 30 bytes, should be skip */
-> -	if (fw_size < 30)
-> -		return -EINVAL;
-> +	if (fw_size < 30) {
-> +		err = -EINVAL;
-> +		goto free_fw;
-> +	}
->  
->  	fw_size -= 30;
->  	fw_ptr += 30;
-> @@ -172,8 +174,8 @@ static int mtk_setup_fw(struct hci_dev *hdev)
->  		fw_ptr += dlen;
->  	}
->  
-> +free_fw:
->  	release_firmware(fw);
-> -
->  	return err;
->  }
->  
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 7b3965861013c..43c284158f63e 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -489,9 +489,6 @@ static int bnep_session(void *arg)
+ 
+ 	add_wait_queue(sk_sleep(sk), &wait);
+ 	while (1) {
+-		/* Ensure session->terminate is updated */
+-		smp_mb__before_atomic();
+-
+ 		if (atomic_read(&s->terminate))
+ 			break;
+ 		/* RX */
+@@ -512,6 +509,10 @@ static int bnep_session(void *arg)
+ 				break;
+ 		netif_wake_queue(dev);
+ 
++		/*
++		 * wait_woken() performs the necessary memory barriers
++		 * for us; see the header comment for this primitive.
++		 */
+ 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
+ 	}
+ 	remove_wait_queue(sk_sleep(sk), &wait);
+diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
+index 7f26a5a19ff6d..07cfa3249f83a 100644
+--- a/net/bluetooth/cmtp/core.c
++++ b/net/bluetooth/cmtp/core.c
+@@ -288,9 +288,6 @@ static int cmtp_session(void *arg)
+ 
+ 	add_wait_queue(sk_sleep(sk), &wait);
+ 	while (1) {
+-		/* Ensure session->terminate is updated */
+-		smp_mb__before_atomic();
+-
+ 		if (atomic_read(&session->terminate))
+ 			break;
+ 		if (sk->sk_state != BT_CONNECTED)
+@@ -306,6 +303,10 @@ static int cmtp_session(void *arg)
+ 
+ 		cmtp_process_transmit(session);
+ 
++		/*
++		 * wait_woken() performs the necessary memory barriers
++		 * for us; see the header comment for this primitive.
++		 */
+ 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
+ 	}
+ 	remove_wait_queue(sk_sleep(sk), &wait);
+@@ -431,9 +432,10 @@ int cmtp_del_connection(struct cmtp_conndel_req *req)
+ 		/* Stop session thread */
+ 		atomic_inc(&session->terminate);
+ 
+-		/* Ensure session->terminate is updated */
+-		smp_mb__after_atomic();
+-
++		/*
++		 * See the comment preceding the call to wait_woken()
++		 * in cmtp_session().
++		 */
+ 		wake_up_interruptible(sk_sleep(session->sock->sk));
+ 	} else
+ 		err = -ENOENT;
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 1036e4fa1ea28..e621551712f59 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -1074,6 +1074,10 @@ static int hidp_session_start_sync(struct hidp_session *session)
+ static void hidp_session_terminate(struct hidp_session *session)
+ {
+ 	atomic_inc(&session->terminate);
++	/*
++	 * See the comment preceding the call to wait_woken()
++	 * in hidp_session_run().
++	 */
+ 	wake_up_interruptible(&hidp_session_wq);
+ }
+ 
+@@ -1193,8 +1197,6 @@ static void hidp_session_run(struct hidp_session *session)
+ 		 *    thread is woken up by ->sk_state_changed().
+ 		 */
+ 
+-		/* Ensure session->terminate is updated */
+-		smp_mb__before_atomic();
+ 		if (atomic_read(&session->terminate))
+ 			break;
+ 
+@@ -1228,14 +1230,15 @@ static void hidp_session_run(struct hidp_session *session)
+ 		hidp_process_transmit(session, &session->ctrl_transmit,
+ 				      session->ctrl_sock);
+ 
++		/*
++		 * wait_woken() performs the necessary memory barriers
++		 * for us; see the header comment for this primitive.
++		 */
+ 		wait_woken(&wait, TASK_INTERRUPTIBLE, MAX_SCHEDULE_TIMEOUT);
+ 	}
+ 	remove_wait_queue(&hidp_session_wq, &wait);
+ 
+ 	atomic_inc(&session->terminate);
+-
+-	/* Ensure session->terminate is updated */
+-	smp_mb__after_atomic();
+ }
+ 
+ static int hidp_session_wake_function(wait_queue_entry_t *wait,
+-- 
+2.7.4
