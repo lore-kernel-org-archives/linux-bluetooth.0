@@ -1,64 +1,51 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Libor Peltan <lpeltan@insys-tec.de>
-To: Bastien Nocera <hadess@hadess.net>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: bt "server" how to configure requiring passkey from connecting
+Message-ID: <4a44b86eb47892c67126d3d66159add3be168e02.camel@hadess.net>
+Subject: Re: bt "server" how to configure requiring passkey from connecting
  clients
-Date: Tue, 14 Aug 2018 13:15:02 +0000
-Message-ID: <VI1PR0601MB2128134F3BABC4390E18295F9A380@VI1PR0601MB2128.eurprd06.prod.outlook.com>
+From: Bastien Nocera <hadess@hadess.net>
+To: Libor Peltan <lpeltan@insys-tec.de>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 14 Aug 2018 14:25:44 +0200
+In-Reply-To: <VI1PR0601MB212835A9675785A5ED2258629A380@VI1PR0601MB2128.eurprd06.prod.outlook.com>
 References: <VI1PR0601MB21287F56810A923C8881893C9A270@VI1PR0601MB2128.eurprd06.prod.outlook.com>
          <ba6964a183f45af588e7c93bd2cf834cc0c1c5a4.camel@hadess.net>
          <VI1PR0601MB2128F10733B846A0ACCBA78C9A260@VI1PR0601MB2128.eurprd06.prod.outlook.com>
          <5d03b0011c48dccc4e835a03b9c9fd3de467f719.camel@hadess.net>
          <VI1PR0601MB212835A9675785A5ED2258629A380@VI1PR0601MB2128.eurprd06.prod.outlook.com>
- <4a44b86eb47892c67126d3d66159add3be168e02.camel@hadess.net>
-In-Reply-To: <4a44b86eb47892c67126d3d66159add3be168e02.camel@hadess.net>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VGhhbmsgeW91IGZvciB0aGUgYW5zd2VyIGFnYWluLg0KDQpJJ20gcmVnaXN0ZXJpbmcgdGhlIGFn
-ZW50IHdpdGg6DQogICAgZGJ1c19jb25uZWN0aW9uX3RyeV9yZWdpc3Rlcl9vYmplY3RfcGF0aChh
-Z2VudF9jb25uLCAiL2J0cGFuZF9hZ2VudCIsICZhZ2VudF90YWJsZSwgTlVMTCwgJmVycik7DQoN
-CiAgICAib3JnLmJsdWV6IiAiL29yZy9ibHVleiIgIm9yZy5ibHVlei5BZ2VudE1hbmFnZXIxIiAi
-UmVnaXN0ZXJBZ2VudCIgIm8iICIvYnRwYW5kX2FnZW50IiAicyIgIk5vSW5wdXROb091dHB1dCIN
-Cg0KICAgICJvcmcuYmx1ZXoiICIvb3JnL2JsdWV6IiAib3JnLmJsdWV6LkFnZW50TWFuYWdlcjEi
-ICJSZXF1ZXN0RGVmYXVsdEFnZW50IiAibyIgIi9idHBhbmRfYWdlbnQiDQoNClRoaXMgZ29lcyB3
-aXRob3V0IGFueSBlcnJvciBhbmQgSSBndWVzcyBpdCBpcyBjb3JyZWN0IHNpbmNlIHRoZSBBdXRo
-b3JpemVTZXJ2aWNlIG1ldGhvZCBpcyBjYWxsZWQgcHJvcGVybHkuDQoNClRvIGJlIGV4YWN0LCBJ
-IGNvcnJlY3QgdGhhdCB0aGUgQXV0aG9yaXplU2VydmljZSBtZXRob2QgaXMgbm90IGNhbGxlZCBh
-dCB0aGUgdGltZSBvZiBwYWlyaW5nLCBidXQgb25seSB3aGVuIEkgcmVxdWVzdCBQQU4gcHJvZmls
-IGFjdGl2YXRpb24gb24gdGhlIG1vYmlsZSBwaG9uZS4gQnV0IHRoZSBSZXF1ZXN0UGFzc2tleSBt
-ZXRob2QgaXMgc3RpbGwgbmV2ZXIgY2FsbGVkLg0KDQpTdXJlLCBJIGFsd2F5cyB1bnBhaXIgYm90
-aCBzaWRlcyBiZWZvcmUgSSB0ZXN0IGFueXRoaW5nLg0KDQpBbnkgb3RoZXIgaWRlYXMsIHBsZWFz
-ZT8NCg0KTGlib3INCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEJhc3RpZW4g
-Tm9jZXJhIFttYWlsdG86aGFkZXNzQGhhZGVzcy5uZXRdIA0KU2VudDogRGllbnN0YWcsIDE0LiBB
-dWd1c3QgMjAxOCAxNDoyNg0KVG86IExpYm9yIFBlbHRhbiA8bHBlbHRhbkBpbnN5cy10ZWMuZGU+
-OyBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpTdWJqZWN0OiBSZTogYnQgInNlcnZl
-ciIgaG93IHRvIGNvbmZpZ3VyZSByZXF1aXJpbmcgcGFzc2tleSBmcm9tIGNvbm5lY3RpbmcgY2xp
-ZW50cw0KDQpPbiBUdWUsIDIwMTgtMDgtMTQgYXQgMTI6MTQgKzAwMDAsIExpYm9yIFBlbHRhbiB3
-cm90ZToNCj4gVGhhbmtzIEJhc3RpZW4gZm9yIHlvdXIgYnJpZWYsIGJ1dCBsZWFkaW5nIGFuc3dl
-ci4NCj4gDQo+IFN0aWxsLCBJIGZlZWwgbGlrZSBJJ20gbWlzc2luZyBzb21ldGhpbmcgOigNCj4g
-DQo+IEkndmUgcmVhZCB0aGUgbGlua3MgY2FyZWZ1bGx5LiBUaGUgIkNISVAtYmx1ZXRvb3RoLXNw
-ZWFrZXIiIHVzZXMgDQo+IGJsdWV6LXRvb2xzJyBidC1hZ2VudCB3aXRoIHBhcmFtZXRlcnMgc2V0
-IHNvIHRoYXQgaXQncyB1c2luZyANCj4gTm9JbnB1dE5vT3V0cHV0IGNhcGFiaWxpdGl5LCBidXQg
-cmVxdWlyaW5nIFBhc3NrZXkgYXQgdGhlIHNhbWUgdGltZS4NCj4gVGhpcyBpcyBleGFjdGx5IHdo
-YXQgSSB3YW50IQ0KPiANCj4gTm8gaGF2aW5nIGJsdWV6LXRvb2xzIGluIG15IHNldHVwLCBJIHRy
-aWVkIHRvIG1ha2UgbXkgb3duIHByb2dyYW1tZWQgDQo+IGFnZW50IGJlaGF2ZSBzaW1pbGFybHks
-IGkuZS4gYWNjb3JkaW5nIHRvIHlvdXIgaGludCwgaW1wbGVtZW50IHRoZSANCj4gUmVxdWVzdFBh
-c3NrZXkgbWV0aG9kIGluIG15IGFnZW50LiBIb3dldmVyLCB0aGlzIG1ldGhvZCBpcyBuZXZlciAN
-Cj4gY2FsbGVkISBXaGVuIHBhaXJpbmcgYSBwaG9uZSwgQmx1ZVogb25seSBjYWxscyB0aGUgQXV0
-aG9yaXplU2VydmljZSANCj4gbWV0aG9kIG9mIG15IGFnZW50Lg0KPiANCj4gSG93IGNhbiBJIGZv
-cmNlIEJsdWVaICB0byBjYWxsIHRoZSBSZXF1ZXN0UGFzc2tleSBtZXRob2Qgb2YgbXkgYWdlbnQ/
-DQo+IA0KPiBJIHRyaWVkIHRvIGFuYWx5emUgaG93IGJsdWV6LXRvb2xzIGRvIGl0LCBidXQgSSBo
-YXZlbid0IGZpbmQgYW55dGhpbmcgDQo+IGluIHRoZWlyIGNvZGUuIFRoZXkgc2VlbSB0byBzaW1w
-bHkgd29yay4uLg0KDQpZb3Ugd2lsbCBhbHNvIG5lZWQgdG8gcmVnaXN0ZXIgdGhlIGFnZW50LCBh
-bmQgbWFrZSBzdXJlIGl0J3MgdGhlIGRlZmF1bHQgb25lICh5b3UnbGwgcHJvYmFibHkgd2FudCB0
-byBkaXNhYmxlIHdoYXRldmVyIG90aGVyIG9uZSB5b3UgaGF2ZSBydW5uaW5nKS4NCg0KWW91IHdv
-dWxkIHByb2JhYmx5IG9ubHkgZXZlciBnZXQgQXV0aG9yaXplU2VydmljZSBpZiB0aGUgZGV2aWNl
-IGlzIGFscmVhZHkgcGFpcmVkLiBZb3Ugd291bGQgbmVlZCB0byB1bnBhaXIgaXQsIGFuZCBvbmNl
-IHBhaXJlZCwgbWFyayBpdCBhcyB0cnVzdGVkIHNvIHRoYXQgQXV0aG9yaXplU2VydmljZSBpcyBu
-b3QgY2FsbGVkIGFuZCB0aGUgc2VydmljZSBpcyBhdXRob3Jpc2VkIHdpdGhvdXQgYW55IGZ1cnRo
-ZXIgcHJvbXB0cyAob3IgY2hlY2sgdGhhdCB0aGUgZGV2aWNlIGlzIHBhaXJlZCBpbiB5b3VyIEF1
-dGhvcml6ZVNlcnZpY2UgaW1wbGVtZW50YXRpb24pLg0KDQpIVEgNCg0K
+On Tue, 2018-08-14 at 12:14 +0000, Libor Peltan wrote:
+> Thanks Bastien for your brief, but leading answer.
+> 
+> Still, I feel like I'm missing something :(
+> 
+> I've read the links carefully. The "CHIP-bluetooth-speaker" uses
+> bluez-tools' bt-agent with parameters set so that it's using
+> NoInputNoOutput capabilitiy, but requiring Passkey at the same time.
+> This is exactly what I want!
+> 
+> No having bluez-tools in my setup, I tried to make my own programmed
+> agent behave similarly, i.e. according to your hint, implement the
+> RequestPasskey method in my agent. However, this method is never
+> called! When pairing a phone, BlueZ only calls the AuthorizeService
+> method of my agent.
+> 
+> How can I force BlueZ  to call the RequestPasskey method of my agent?
+> 
+> I tried to analyze how bluez-tools do it, but I haven't find anything
+> in their code. They seem to simply work...
+
+You will also need to register the agent, and make sure it's the
+default one (you'll probably want to disable whatever other one you
+have running).
+
+You would probably only ever get AuthorizeService if the device is
+already paired. You would need to unpair it, and once paired, mark it
+as trusted so that AuthorizeService is not called and the service is
+authorised without any further prompts (or check that the device is
+paired in your AuthorizeService implementation).
+
+HTH
