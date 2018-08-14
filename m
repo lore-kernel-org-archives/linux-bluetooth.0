@@ -1,39 +1,37 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <computersforpeace@gmail.com>
+Date: Tue, 14 Aug 2018 13:16:02 -0700
+From: Brian Norris <computersforpeace@gmail.com>
+To: Andrea Parri <andrea.parri@amarulasolutions.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeffy Chen <jeffy.chen@rock-chips.com>,
+	Brian Norris <briannorris@chromium.org>,
+	AL Yu-Chen Cho <acho@suse.com>
+Subject: Re: [PATCH] bluetooth/{bnep,cmtp,hidp}: Remove unnecessary
+ smp_mb__{before,after}_atomic
+Message-ID: <20180814201602.GA159642@ban.mtv.corp.google.com>
+References: <1534272066-9366-1-git-send-email-andrea.parri@amarulasolutions.com>
 MIME-Version: 1.0
-References: <1532951815-9726-1-git-send-email-amit.k.bag@intel.com>
- <1532951815-9726-5-git-send-email-amit.k.bag@intel.com> <EFE6F46E14A5F445949D76A8CAC224005832797D@PGSMSX105.gar.corp.intel.com>
- <CA+5PVA58CC+NcrUAKrPdPn2ArXpXu9M8Wsjy6eA2NMg9Og1ZJw@mail.gmail.com>
-In-Reply-To: <CA+5PVA58CC+NcrUAKrPdPn2ArXpXu9M8Wsjy6eA2NMg9Og1ZJw@mail.gmail.com>
-From: Josh Boyer <jwboyer@kernel.org>
-Date: Tue, 14 Aug 2018 20:17:54 -0400
-Message-ID: <CA+5PVA7dn7SLrE8g9X4n_yhbqDUbFt_f=u6=CJ7vRbHA2QxbLg@mail.gmail.com>
-Subject: Re: [PATCH 5/5] linux-firmware:Update firmware patch for Intel
- Bluetooth 7265 (D1)
-To: "Bag, Amit K" <amit.k.bag@intel.com>
-Cc: Linux Firmware <linux-firmware@kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        ravishankar.srivatsa@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1534272066-9366-1-git-send-email-andrea.parri@amarulasolutions.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Aug 14, 2018 at 10:03 AM Josh Boyer <jwboyer@kernel.org> wrote:
->
-> On Mon, Aug 13, 2018 at 8:12 AM Bag, Amit K <amit.k.bag@intel.com> wrote:
-> >
-> > Hello All,
-> >
-> > This patch I have raised more than 1 month ago but it is not yet merged.
->
-> 1/2 a month, technically.
->
-> > Could you please merge the changes.
->
-> Today.  Does this series resolve CVE-2018-5383 for the specific Intel
-> devices?  If it does, I'd like to include that in the changelog.
+On Tue, Aug 14, 2018 at 08:41:06PM +0200, Andrea Parri wrote:
+> The barriers are unneeded; wait_woken() and woken_wake_function()
+> already provide us with the required synchronization: remove them
+> and document that we're relying on the (implicit) synchronization
+> provided by wait_woken() and woken_wake_function().
+> 
+> Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
+> ---
+>  net/bluetooth/bnep/core.c |  7 ++++---
+>  net/bluetooth/cmtp/core.c | 14 ++++++++------
+>  net/bluetooth/hidp/core.c | 13 ++++++++-----
+>  3 files changed, 20 insertions(+), 14 deletions(-)
 
-I've applied all 5 patches and pushed them out.  Missed the chance to
-note the CVE if it's fixed.  If not and you have patches pending for
-it, I promise to be more responsive when you send them.
+Seems good to me:
 
-josh
+Reviewed-by: Brian Norris <computersforpeace@gmail.com>
