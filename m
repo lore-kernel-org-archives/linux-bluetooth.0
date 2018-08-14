@@ -1,37 +1,34 @@
-Return-Path: <computersforpeace@gmail.com>
-Date: Tue, 14 Aug 2018 13:16:02 -0700
-From: Brian Norris <computersforpeace@gmail.com>
-To: Andrea Parri <andrea.parri@amarulasolutions.com>
+Return-Path: <gustavo@embeddedor.com>
+Subject: Re: [PATCH] Bluetooth: mediatek: Fix memory leak
+To: Sean Wang <sean.wang@mediatek.com>
 Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jeffy Chen <jeffy.chen@rock-chips.com>,
-	Brian Norris <briannorris@chromium.org>,
-	AL Yu-Chen Cho <acho@suse.com>
-Subject: Re: [PATCH] bluetooth/{bnep,cmtp,hidp}: Remove unnecessary
- smp_mb__{before,after}_atomic
-Message-ID: <20180814201602.GA159642@ban.mtv.corp.google.com>
-References: <1534272066-9366-1-git-send-email-andrea.parri@amarulasolutions.com>
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20180814151031.GA25096@embeddedor.com>
+ <1534272320.31978.28.camel@mtkswgap22>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Message-ID: <129805ff-0408-f4f5-a8df-97ec54f20041@embeddedor.com>
+Date: Tue, 14 Aug 2018 13:59:18 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1534272066-9366-1-git-send-email-andrea.parri@amarulasolutions.com>
+In-Reply-To: <1534272320.31978.28.camel@mtkswgap22>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Aug 14, 2018 at 08:41:06PM +0200, Andrea Parri wrote:
-> The barriers are unneeded; wait_woken() and woken_wake_function()
-> already provide us with the required synchronization: remove them
-> and document that we're relying on the (implicit) synchronization
-> provided by wait_woken() and woken_wake_function().
+
+
+On 8/14/18 1:45 PM, Sean Wang wrote:
+> Hi, Gustavo
 > 
-> Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
-> ---
->  net/bluetooth/bnep/core.c |  7 ++++---
->  net/bluetooth/cmtp/core.c | 14 ++++++++------
->  net/bluetooth/hidp/core.c | 13 ++++++++-----
->  3 files changed, 20 insertions(+), 14 deletions(-)
+> thanks for the catch up
 
-Seems good to me:
+Glad to help. :)
 
-Reviewed-by: Brian Norris <computersforpeace@gmail.com>
+> 
+> Acked-by: Sean Wang <sean.wang@mediatek.com>
+> 
+
+Thanks
+--
+Gustavo
