@@ -1,77 +1,50 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <linux-kernel-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: [PATCH] bluetooth: hci_h5: avoid unused variable warnings
+Subject: Re: [PATCH] Use default .cfg file name for RTL8723BS devices with id
+ of OBDA8723
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180813220419.4168133-1-arnd@arndb.de>
-Date: Tue, 14 Aug 2018 09:02:46 +0200
+In-Reply-To: <20180814064742.14519-1-ianwmorrison@gmail.com>
+Date: Tue, 14 Aug 2018 09:00:43 +0200
 Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Jeremy Cline <jeremy@jcline.org>,
-        Kees Cook <keescook@chromium.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <8F488B14-4425-44A4-9E6D-58513FED5256@holtmann.org>
-References: <20180813220419.4168133-1-arnd@arndb.de>
-To: Arnd Bergmann <arnd@arndb.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        hdegoede@redhat.com
+Message-Id: <B7F47DB8-B3B9-4F20-9DA1-3756B20ED866@holtmann.org>
+References: <20180814064742.14519-1-ianwmorrison@gmail.com>
+To: Ian W MORRISON <ianwmorrison@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arnd,
+Hi Ian,
 
-> When CONFIG_BT_HCIUART_RTL is disabled, the hci_h5 driver produces a build
-> warning because of an incorrect set of #ifdef guards:
+> For RTL8723BS devices the current config file name is a composite of
+> both the config name (rtl8723bs) and a postfix of the device-id.
 > 
-> drivers/bluetooth/hci_h5.c:920:22: error: 'rtl_vnd' defined but not used [-Werror=unused-variable]
+> Given the majority of RTL8723BS devices use a device-id of OBDA8723
+> this simplifies the config file name to use "rtl8723bs_config.bin"
+> as a default of for these devices.
 > 
-> Replacing the #ifdef with an IS_ENABLED() check shuts up the error
-> and simplifies the logic.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Ian W MORRISON <ianwmorrison@gmail.com>
 > ---
-> drivers/bluetooth/hci_h5.c | 10 +++-------
-> 1 file changed, 3 insertions(+), 7 deletions(-)
+> drivers/bluetooth/hci_h5.c | 4 +++-
+> 1 file changed, 3 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> index 8eede1197cd2..b10e64ba0ff4 100644
+> index 8eede1197cd2..cce422dc1b8d 100644
 > --- a/drivers/bluetooth/hci_h5.c
 > +++ b/drivers/bluetooth/hci_h5.c
-> @@ -841,7 +841,6 @@ static void h5_serdev_remove(struct serdev_device *serdev)
-> 	hci_uart_unregister_device(&h5->serdev_hu);
-> }
+> @@ -852,7 +852,9 @@ static int h5_btrtl_setup(struct h5 *h5)
+> 	bool flow_control;
+> 	int err;
 > 
-> -#ifdef CONFIG_BT_HCIUART_RTL
-> static int h5_btrtl_setup(struct h5 *h5)
-> {
-> 	struct btrtl_device_info *btrtl_dev;
-> @@ -923,24 +922,21 @@ static struct h5_vnd rtl_vnd = {
-> 	.close		= h5_btrtl_close,
-> 	.acpi_gpio_map	= acpi_btrtl_gpios,
-> };
-> -#endif
-> 
-> -#ifdef CONFIG_ACPI
-> static const struct acpi_device_id h5_acpi_match[] = {
-> -#ifdef CONFIG_BT_HCIUART_RTL
-> 	{ "OBDA8723", (kernel_ulong_t)&rtl_vnd },
-> -#endif
-> 	{ },
-> };
-> MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
-> -#endif
-> 
-> static struct serdev_device_driver h5_serdev_driver = {
-> 	.probe = h5_serdev_probe,
-> 	.remove = h5_serdev_remove,
-> 	.driver = {
-> 		.name = "hci_uart_h5",
-> -		.acpi_match_table = ACPI_PTR(h5_acpi_match),
-> +		.acpi_match_table = (IS_ENABLED(CONFIG_BT_HCIUART_RTL) &&
-> +				     IS_ENABLED(CONFIG_ACPI)) ?
-> +					h5_acpi_match : 0,
-> 	},
+> -	btrtl_dev = btrtl_initialize(h5->hu->hdev, h5->id);
+> +	btrtl_dev = strcmp("OBDA8723", h5->id) ?
+> +		btrtl_initialize(h5->hu->hdev, h5->id) :
+> +			btrtl_initialize(h5->hu->hdev, NULL);
 
-I do not like this construct at all. It will also blow up once we have a second vendor with H:5 support. We need to find another way to solve this.
+I am not letting you duplicate the PNPID here. This needs to be done cleanly with the device table that is already present.
 
 Regards
 
