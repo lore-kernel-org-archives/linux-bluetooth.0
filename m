@@ -1,49 +1,67 @@
-Return-Path: <arndbergmann@gmail.com>
+Return-Path: <hdegoede@redhat.com>
+Subject: Re: [PATCH] Use default .cfg file name for RTL8723BS devices with id
+ of OBDA8723
+To: Ian W MORRISON <ianwmorrison@gmail.com>, marcel@holtmann.org,
+ johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20180814064742.14519-1-ianwmorrison@gmail.com>
+From: Hans de Goede <hdegoede@redhat.com>
+Message-ID: <29a87a37-6dda-62c2-01b1-d4a806e19cf2@redhat.com>
+Date: Tue, 14 Aug 2018 09:28:25 +0200
 MIME-Version: 1.0
-References: <20180813220419.4168133-1-arnd@arndb.de> <60279ff9-95a7-c2d8-dcd3-6e505c22a0e6@redhat.com>
-In-Reply-To: <60279ff9-95a7-c2d8-dcd3-6e505c22a0e6@redhat.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Tue, 14 Aug 2018 10:42:31 +0200
-Message-ID: <CAK8P3a3QwP9qA-sjCn8UFKHPFzku0epxi6BWETpH9YTEfjQ5jA@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: hci_h5: avoid unused variable warnings
-To: Hans de Goede <hdegoede@redhat.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>, jeremy@jcline.org,
-	Kees Cook <keescook@chromium.org>,
-	Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20180814064742.14519-1-ianwmorrison@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Aug 14, 2018 at 9:22 AM Hans de Goede <hdegoede@redhat.com> wrote:
->
-> Hi Arnd,
->
-> On 14-08-18 00:04, Arnd Bergmann wrote:
-> > When CONFIG_BT_HCIUART_RTL is disabled, the hci_h5 driver produces a build
-> > warning because of an incorrect set of #ifdef guards:
-> >
-> > drivers/bluetooth/hci_h5.c:920:22: error: 'rtl_vnd' defined but not used [-Werror=unused-variable]
-> >
-> > Replacing the #ifdef with an IS_ENABLED() check shuts up the error
-> > and simplifies the logic.
-> >
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->
-> Hmm, so now you're counting on dead code elimination to remove
-> references to unavailable symbols.
+Hi,
 
-Generally depending on dead code elimination is very reliable, as this
-is easy for gcc to get right. However, you are right that this is actually
-an exception since the MODULE_DEVICE_TABLE() entry will keep
-a reference around that prevents the compiler from eliminating it.
+On 14-08-18 08:47, Ian W MORRISON wrote:
+> For RTL8723BS devices the current config file name is a composite of
+> both the config name (rtl8723bs) and a postfix of the device-id.
+> 
+> Given the majority of RTL8723BS devices use a device-id of OBDA8723
+> this simplifies the config file name to use "rtl8723bs_config.bin"
+> as a default of for these devices.
 
-> I'm not sure I like this and
-> since Marcel has also indicated the does not like this fix I
-> believe we need another fix.
->
-> I will write another fix for this.
->
+NACK, the device id is in there for a reason, once someone writes
+support for it we will also need a rtl8723bs_config file on ARM
+boards, which will definitely be board specific. I don't want us
+to pretend there is one config to rule them all.
 
-Ok, thanks!
+Specifically I plan to submit both the firmware and
+rtl8723bs_config-OBDA8723.bin to linux-firmware soon, if the kernel
+instead looks for just rtl8723bs_config.bin then I need to give
+it that name in linux-firmware and then when we get ARM support
+and the kernel complains about e.g. rtl8723bs_config-NextThingCo-CHIP.bin
+not being there people may be tempted to think they can just link
+to the "generic" one from linux-firmware which then turns out
+to not be generic at all.
 
-      Arnd
+Regards,
+
+Hans
+
+
+
+> 
+> Signed-off-by: Ian W MORRISON <ianwmorrison@gmail.com>
+> ---
+>   drivers/bluetooth/hci_h5.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index 8eede1197cd2..cce422dc1b8d 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -852,7 +852,9 @@ static int h5_btrtl_setup(struct h5 *h5)
+>   	bool flow_control;
+>   	int err;
+>   
+> -	btrtl_dev = btrtl_initialize(h5->hu->hdev, h5->id);
+> +	btrtl_dev = strcmp("OBDA8723", h5->id) ?
+> +		btrtl_initialize(h5->hu->hdev, h5->id) :
+> +			btrtl_initialize(h5->hu->hdev, NULL);
+>   	if (IS_ERR(btrtl_dev))
+>   		return PTR_ERR(btrtl_dev);
+>   
+> 
