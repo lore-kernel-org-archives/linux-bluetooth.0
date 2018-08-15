@@ -1,42 +1,96 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>
-To: Josh Boyer <jwboyer@kernel.org>,
-        "Bag, Amit K" <amit.k.bag@intel.com>
-CC: Linux Firmware <linux-firmware@kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH 5/5] linux-firmware:Update firmware patch for Intel
- Bluetooth 7265 (D1)
-Date: Thu, 16 Aug 2018 04:36:37 +0000
-Message-ID: <13D6C427519DDD45827BD3C8810152237EC0A221@BGSMSX104.gar.corp.intel.com>
-References: <1532951815-9726-1-git-send-email-amit.k.bag@intel.com>
- <1532951815-9726-5-git-send-email-amit.k.bag@intel.com>
- <EFE6F46E14A5F445949D76A8CAC224005832797D@PGSMSX105.gar.corp.intel.com>
- <CA+5PVA58CC+NcrUAKrPdPn2ArXpXu9M8Wsjy6eA2NMg9Og1ZJw@mail.gmail.com>
- <CA+5PVA7dn7SLrE8g9X4n_yhbqDUbFt_f=u6=CJ7vRbHA2QxbLg@mail.gmail.com>
-In-Reply-To: <CA+5PVA7dn7SLrE8g9X4n_yhbqDUbFt_f=u6=CJ7vRbHA2QxbLg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Inga Stotland <inga.stotland@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ v2] tools/mesh: Fix reclaiming address range
+Date: Wed, 15 Aug 2018 13:16:52 -0700
+Message-Id: <20180815201652.25952-1-inga.stotland@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQm95ZXIsIA0KDQpZZXMuIHRoZSBwYXRjaCBoYXMgZml4IGZvciBDVkUuIA0KDQpSZWdhcmRz
-DQpSYXZpDQoNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCkZyb206IEpvc2ggQm95ZXIg
-W21haWx0bzpqd2JveWVyQGtlcm5lbC5vcmddIA0KU2VudDogV2VkbmVzZGF5LCBBdWd1c3QgMTUs
-IDIwMTggNTo0OCBBTQ0KVG86IEJhZywgQW1pdCBLIDxhbWl0LmsuYmFnQGludGVsLmNvbT4NCkNj
-OiBMaW51eCBGaXJtd2FyZSA8bGludXgtZmlybXdhcmVAa2VybmVsLm9yZz47IEJsdWVaIGRldmVs
-b3BtZW50IDxsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnPjsgU3JpdmF0c2EsIFJhdmlz
-aGFua2FyIDxyYXZpc2hhbmthci5zcml2YXRzYUBpbnRlbC5jb20+DQpTdWJqZWN0OiBSZTogW1BB
-VENIIDUvNV0gbGludXgtZmlybXdhcmU6VXBkYXRlIGZpcm13YXJlIHBhdGNoIGZvciBJbnRlbCBC
-bHVldG9vdGggNzI2NSAoRDEpDQoNCk9uIFR1ZSwgQXVnIDE0LCAyMDE4IGF0IDEwOjAzIEFNIEpv
-c2ggQm95ZXIgPGp3Ym95ZXJAa2VybmVsLm9yZz4gd3JvdGU6DQo+DQo+IE9uIE1vbiwgQXVnIDEz
-LCAyMDE4IGF0IDg6MTIgQU0gQmFnLCBBbWl0IEsgPGFtaXQuay5iYWdAaW50ZWwuY29tPiB3cm90
-ZToNCj4gPg0KPiA+IEhlbGxvIEFsbCwNCj4gPg0KPiA+IFRoaXMgcGF0Y2ggSSBoYXZlIHJhaXNl
-ZCBtb3JlIHRoYW4gMSBtb250aCBhZ28gYnV0IGl0IGlzIG5vdCB5ZXQgbWVyZ2VkLg0KPg0KPiAx
-LzIgYSBtb250aCwgdGVjaG5pY2FsbHkuDQo+DQo+ID4gQ291bGQgeW91IHBsZWFzZSBtZXJnZSB0
-aGUgY2hhbmdlcy4NCj4NCj4gVG9kYXkuICBEb2VzIHRoaXMgc2VyaWVzIHJlc29sdmUgQ1ZFLTIw
-MTgtNTM4MyBmb3IgdGhlIHNwZWNpZmljIEludGVsIA0KPiBkZXZpY2VzPyAgSWYgaXQgZG9lcywg
-SSdkIGxpa2UgdG8gaW5jbHVkZSB0aGF0IGluIHRoZSBjaGFuZ2Vsb2cuDQoNCkkndmUgYXBwbGll
-ZCBhbGwgNSBwYXRjaGVzIGFuZCBwdXNoZWQgdGhlbSBvdXQuICBNaXNzZWQgdGhlIGNoYW5jZSB0
-byBub3RlIHRoZSBDVkUgaWYgaXQncyBmaXhlZC4gIElmIG5vdCBhbmQgeW91IGhhdmUgcGF0Y2hl
-cyBwZW5kaW5nIGZvciBpdCwgSSBwcm9taXNlIHRvIGJlIG1vcmUgcmVzcG9uc2l2ZSB3aGVuIHlv
-dSBzZW5kIHRoZW0uDQoNCmpvc2gNCg==
+The computations for reclaiming released unicast addresses back
+into address pool were off by 1. Also, the adjacent pools need
+to be merged, if the released range fills the gap between two
+address pools.
+---
+ tools/mesh/net.c | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
+
+diff --git a/tools/mesh/net.c b/tools/mesh/net.c
+index d1b3f79dd..f1ef23ab8 100644
+--- a/tools/mesh/net.c
++++ b/tools/mesh/net.c
+@@ -730,7 +730,7 @@ static int match_address_range(const void *a, const void *b)
+ 	uint16_t max = range >> 16;
+ 	uint16_t min = range & 0xffff;
+ 
+-	return ((max - min) >= (num_elements - 1)) ? 0 : -1;
++	return ((max - min + 1) >= num_elements) ? 0 : -1;
+ 
+ }
+ 
+@@ -749,13 +749,14 @@ uint16_t net_obtain_address(uint8_t num_eles)
+ 		addr = min;
+ 		min += num_eles;
+ 
+-		if (min > max)
++		if (min > max) {
+ 			net.address_pool = g_list_delete_link(net.address_pool,
+ 								l);
+-		else {
++		} else {
+ 			range = min + (max << 16);
+ 			l->data = GUINT_TO_POINTER(range);
+ 		}
++
+ 		return addr;
+ 	}
+ 
+@@ -775,23 +776,42 @@ void net_release_address(uint16_t addr, uint8_t num_elements)
+ 	GList *l;
+ 	uint32_t range;
+ 
++	if (addr == UNASSIGNED_ADDRESS)
++		return;
++
+ 	for (l = net.address_pool; l != NULL; l = l->next)
+ 	{
+ 		uint16_t max;
+ 		uint16_t min;
++		GList *l1 = l->next;
+ 
+ 		range = GPOINTER_TO_UINT(l->data);
+ 
+ 		max = range >> 16;
+ 		min = range & 0xffff;
+ 
+-		if (min == (addr + num_elements + 1))
++		if (min == (addr + num_elements))
+ 			min  = addr;
+-		else if (addr && max == (addr - 1))
+-			max = addr + num_elements + 1;
++		else if (max == (addr - 1))
++			max = addr + num_elements;
+ 		else
+ 			continue;
+ 
++		/* Check if range pools need to be merged */
++		if (l1) {
++			uint16_t min1;
++
++			range = GPOINTER_TO_UINT(l1->data);
++			min1 = range & 0xffff;
++
++			if (min1 == (max + 1)) {
++				max = range >> 16;
++				l->next = l1->next;
++				net.address_pool = g_list_delete_link(
++							net.address_pool, l1);
++			}
++		}
++
+ 		range = min + (max << 16);
+ 		l->data = GUINT_TO_POINTER(range);
+ 		return;
+-- 
+2.17.1
