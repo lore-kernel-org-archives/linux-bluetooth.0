@@ -1,329 +1,46 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Mime-Version: 1.0
-Subject: RE: Re: Re: Not able to set Default PHY configuration
-Reply-To: anupam.r@samsung.com
-From: Anupam Roy <anupam.r@samsung.com>
-To: Jaganath K <jaganath.k.os@gmail.com>
-CC: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        SACHIN DEV SHARMA <sachin.dev@samsung.com>,
-        Anupam Roy <anupam.r@samsung.com>
-In-Reply-To: <CAJzH+bp17Qg4hRwN_tubjVgxho5Csk2u23weCzdqhpzQBr=frQ@mail.gmail.com>
-Message-ID: <20180817163129epcms5p7f98762805872e00f7e0ecf8d083214e4@epcms5p7>
-Date: Sat, 18 Aug 2018 01:31:29 +0900
+From: "Karabin, Josh" <George.Karabin@Honeywell.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [External] Re: [PATCH BlueZ 0/2] Change ConnectDevice to
+ optionally connect services
+Date: Fri, 17 Aug 2018 14:40:26 +0000
+Message-ID: <BN7PR07MB4305B7FEA951E3B64B9EF84A9D3D0@BN7PR07MB4305.namprd07.prod.outlook.com>
+References: <BN7PR07MB4305C0AA4DBCB0136D7F72199D3E0@BN7PR07MB4305.namprd07.prod.outlook.com>
+ <CABBYNZKSuDMX38OszjLZOEt9L_f5YM1L000-hb0Gv9LqcGSPOA@mail.gmail.com>
+ <BN7PR07MB430513DBD3BF38324AB5D1A19D3D0@BN7PR07MB4305.namprd07.prod.outlook.com>
+ <CABBYNZLrkfqv1LZ057k6Og-F9+zO+yWpHvLiwRJgOqvK9daELg@mail.gmail.com>
+In-Reply-To: <CABBYNZLrkfqv1LZ057k6Og-F9+zO+yWpHvLiwRJgOqvK9daELg@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-References: <CAJzH+bp17Qg4hRwN_tubjVgxho5Csk2u23weCzdqhpzQBr=frQ@mail.gmail.com>
-        <1533912735-3878-1-git-send-email-anupam.r@samsung.com>
-        <CAJzH+bpXfDxmS4hZSi8836HUhWOTnwP9hG0Y6Qfyb89DKRPqOQ@mail.gmail.com>
-        <86206570.650879.1534433068088.JavaMail.jboss@ep1ml504>
-        <CGME20180810145329epcas2p28873946a2150bb9949f8877119ba4d3a@epcms5p7>
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jaganath,
-
->--------- Original Message ---------
->Sender : Jaganath K <jaganath.k.os@gmail.com>
->Date   : 2018-08-17 15:16 (GMT+9)
->Title  : Re: Re: Not able to set Default PHY configuration
-> 
->Hi Anupam,
->
->On Thu, Aug 16, 2018, 8:55 PM Anupam Roy <anupam.r@samsung.com> wrote:
->Hi Jaganath,
->
->
->>--------- Original Message ---------
->
->>Sender : Jaganath K <jaganath.k.os@gmail.com>
->
->>Date   : 2018-08-11 17:50 (GMT+9)
->
->>Title  : Re: Not able to set Default PHY configuration
->
->> 
->
->>Hi Anupam,
->
->>
->
->>>On Fri, Aug 10, 2018, 8:26 PM Anupam Roy <anupam.r@samsung.com> wrote:
->
->>>Hello list,
->
->>>
->
->>> Regarding the Set PHY configuration management command, I have a following observation during my test with a BT 5.0 LE Only controller
->
->>>
->
->>>I am encountering error on SET PHY (2MTX) MGMT command from btmgmt.
->
->>>
->
->>>
->
->>>[hci1]# phy
->
->>>
->
->>>Supported phys: [0x7e00] [1MTX 1MRX 2MTX 2MRX CODEDTX CODEDRX ]
->
->>>
->
->>>Configurable phys: [0x7800] [2MTX 2MRX CODEDTX CODEDRX ]
->
->>>
->
->>>Selected phys: [0x600] [1MTX 1MRX ]
->
->>>
->
->>>
->
->>>@ MGMT Command: Get PHY Configuration (0x0044) plen 0    
->
->>>
->
->>>@ MGMT Event: Command Complete (0x0001) plen 15  
->
->>>
->
->>>      Get PHY Configuration (0x0044) plen 12
->
->>>
->
->>>        Status: Success (0x00)
->
->>>
->
->>>        Supported PHYs: 0x7e00
->
->>>
->
->>>          LE 1M TX
->
->>>
->
->>>          LE 1M RX
->
->>>
->
->>>          LE 2M TX
->
->>>
->
->>>          LE 2M RX
->
->>>
->
->>>          LE CODED TX
->
->>>
->
->>>          LE CODED RX
->
->>>
->
->>>        Configurable PHYs: 0x7800
->
->>>
->
->>>          LE 2M TX
->
->>>
->
->>>          LE 2M RX
->
->>>
->
->>>          LE CODED TX
->
->>>
->
->>>          LE CODED RX
->
->>>
->
->>>        Selected PHYs: 0x0600
->
->>>
->
->>>          LE 1M TX
->
->>>
->
->>>          LE 1M RX
->
->>>
->
->>>
->
->>>
->
->>>[hci1]# phy 2MTX
->
->>>
->
->>>Could not set PHY Configuration with status 0x0d (Invalid Parameters)
->
->>>
->
->>>
->
->>> MGMT Command: Set PHY Configuration (0x0045) plen 4 
->
->>>
->
->>>        Selected PHYs: 0x0800
->
->>>
->
->>>          LE 2M TX
->
->>>
->
->>>@ MGMT Event: Command Status (0x0002) plen 3 
->
->>>
->
->>>      Set PHY Configuration (0x0045)
->
->>>
->
->>>        Status: Invalid Parameters (0x0d)
->
->>>
->
->>>
->
->>>
->
->>>As per https://kernel.googlesource.com/pub/scm/linux/kernel/git/bluetooth/bluetooth-next/+/master/net/bluetooth/mgmt.c#3412
->
->>>
->
->>>
->
->>>if ((selected_phys & unconfigure_phys) != unconfigure_phys)
->
->>>
->
->>>        return mgmt_cmd_status(INVALID_PARAMS)
->
->>>
->
->>>
->
->>>In my case, unconfigurable PHY is 0x600(1MTX and 1MRX) [supported_phys(0x7e00) &  ~configure_phys (0x7FF) = 0x600]
->
->>>
->
->>>If from btmgmt, user wants to select 2MTX (0x800), then the above condition returns error to user, 
->
->>>
->
->>>whereas I think, out intention here is to allow kernel to set preference of 2MTX to controller, as 2MTX is a configurable PHY? Am I missing something here?
->
->>>
->
->>>
->
->>>Actually, I am not sure if unconfigure_phys logic is added to prevent user to select one of the unconfigureable PHY's.
->
->>>
->
->>>If above is the case, then will not be the following logic correct?
->
->>>
->
->>>
->
->>>
->
->>>   + if (selected_phys & unconfigure_phys)
->
->>>
->
->>>   +            return ERROR
->
->>>
->
->>>   + else
->
->>>
->
->>>   +            proceed
->
->>>
->
->>>
->
->>>which will basically mean if any of the bits in the user's selected bit field matches with that of the unconfigurable PHY's bits, then we may return error to user, otherwise proceed normally?
->
->>>
->
->>>Please share your opinion. Thank you very much!
->
->>>
->
->>>
->
->>>BR,
->
->>>
->
->>>-Anupam Roy
->
->>
->
->>Currently LE 1M TX and LE 1M RX is unconfigurable meaning it shall not be deselected.
->
->
->Ok, got it, Much thanks for the clarification!
->
->
->>
->
->>So if you want to select 2M TX, then the command should be
->
->>phy LE_1M_TX LE_2M_TX LE_1M_RX
->
->
->Although, btmgmt is currently not supported to accept more than one PHY as input option, I enabled it for my test and managed to verify the Default PHY Set command. 
->
->Further to this, I will raise changes for btmgmt to accept more than one PHY option.
->
->
->>
->
->>Thanks,
->
->>Jaganath
->
->> 
->
->>>BR,
->
->>>-Anupam Roy
->
->
->Are you sure that you are testing with latest upstream because it was working for me.
->
-
-Below is the output of 'phy' commands from btmgmt of latest upstream.
-
-pi@raspberrypi:~/bluez/tools $ sudo ./btmgmt -i 1
-[hci1]# phy
-Supported phys: 
-Selected phys: 
-[hci1]# phy 1MTX 1MRX 2MTX
-Too many arguments: 3 > 1
-
-In case of 'phy' command, Supported phys and Selected phys are blank outputs, because, considering latest kernel patches, macro values of PHY MGMT defines are mismatched in bluez lib/mgmt.h.
-Above is fixed with https://marc.info/?l=linux-bluetooth&m=153443599303477&w=4
-
-In case of 'phy 1MTX 1MRX 2MTX' command, my intention here is to set 2MTX as default PHY. However, btmgmt reports error, as a reason of which I had sent https://marc.info/?l=linux-bluetooth&m=153443619303530&w=2.
-Please let me know if I am missing something? Thanks!
-
->Thanks,
->Jaganath
+PiBGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IFttYWlsdG86bHVpei5kZW50ekBnbWFpbC5j
+b21dDQo+IFNlbnQ6IEZyaWRheSwgQXVndXN0IDE3LCAyMDE4IDEwOjMyIEFNDQoNCj4gPj4gSSB3
+b25kZXIgaG93IHRoaXMgaXMgc3VwcG9zZSB0byB3b3JrIHNpbmNlIHdoYXQgeW91IGFyZSBzdWdn
+ZXN0aW5nIGlzDQo+ID4+IHRvIG5vdCBhdXRvLWNvbm5lY3QgbWF0Y2hpbmcgcHJvZmlsZXMvc2Vy
+dmljZXMsIGJ1dCB0aGF0IHdvdWxkIGxlYXZlDQo+ID4+IHRoZSBBQ0wgbGluayB3aXRoIG5vIGNo
+YW5uZWxzIGluIHVzZSAoYXQgbGVhc3Qgb24gQlIvRURSKSBzbyB0aGUgbGluaw0KPiA+PiB3b3Vs
+ZCBkaXNjb25uZWN0IGFueXdheS4NCj4gPg0KPiA+IEluIG15IHVzZSBjYXNlLCB0aGUgY2xpZW50
+IGFwcGxpY2F0aW9uIHdpbGwgd2FpdCBmb3IgdGhlIGFwcGVhcmFuY2Ugb2YNCj4gPiBhIGRldmlj
+ZSBvYmplY3Qgd2l0aCBhIG1hdGNoaW5nIGFkZHJlc3MgdG8gYXBwZWFyIG9uIHRoZSBEZXZpY2Ux
+DQo+ID4gaW50ZXJmYWNlLiBJZiB0aGF0IGRldmljZSBjb250YWlucyBhIHByb2ZpbGUgdGhhdCB0
+aGF0IHRoZSBhcHBsaWNhdGlvbg0KPiA+IHN1cHBvcnRzLCBpdCB3aWxsIGNhbGwgQ29ubmVjdFBy
+b2ZpbGUgb24gdGhlIGRldmljZSBvYmplY3QuIEluIGdlbmVyYWwsDQo+ID4gdGhlIGxpbmsgd29u
+J3QgdGltZSBvdXQgYmVmb3JlIHRoZSBhcHBsaWNhdGlvbiBoYXMgYSBjaGFuY2UgdG8NCj4gPiBy
+ZXNwb25kLCBidXQgaXQgd291bGQgYmUgZmluZSBpZiBpdCBkaWQgLSB0aGUgQ29ubmVjdFByb2Zp
+bGUgY2FsbCB3b3VsZA0KPiA+IGVuZCB1cCByZS1lc3RhYmxpc2hpbmcgdGhlIGxpbmsgaW4gdGhh
+dCBjYXNlLg0KPiA+DQo+ID4gSSBjb3VsZCBub3RlIHRoYXQgYmVoYXZpb3IgaW4gdGhlIGFkYXB0
+ZXIgYXBpIGRvY3VtZW50IGlmIHlvdSB0aGluaw0KPiA+IEl0IHdvdWxkIGhlbHAgdG8gY2xhcmlm
+eSB0aGUgaW50ZW50Lg0KPiANCj4gV291bGRuJ3QgaXQgYmUgYmV0dGVyIHRvIGhhdmUgYSBsaXN0
+IG9mIHByb2ZpbGVzIHRvIGNvbm5lY3QgdGhlbj8gVGhhdA0KPiB3b3VsZCBtYWtlIGEgbmljZSBh
+ZGRpdGlvbiB0byB0aGUgQVBJIHNpbmNlIENvbm5lY3RQcm9maWxlIG9ubHkNCj4gY29ubmVjdCBv
+bmUgcHJvZmlsZSBhdCB0aW1lLCB0aGF0IHdheSB3ZSBjb3VsZCBoYXZlIGF1dG8tY29ubmVjdCBi
+ZSBhDQo+IGxpc3QgYW5kIGluIGNhc2UgaXQgaXMgZW1wdHkgd2UgY29ubmVjdCBhbGwgb3RoZXJ3
+aXNlIHdlIGp1c3QgY29ubmVjdA0KPiB0aGUgcHJvZmlsZXMgaW4gdGhhdCBsaXN0LCBob3cgYWJv
+dXQgdGhhdD8NCg0KSSBhZ3JlZSAtIHRoYXQgaXMgYSBuaWNlIGltcHJvdmVtZW50LiBBcHBsaWNh
+dGlvbnMgdGhhdCB1c2UgdGhpcw0KYXBwcm9hY2ggd2lsbCBiZSBhIGxvdCBzaW1wbGVyIC0gbW9u
+aXRvcmluZyB0aGUgZGV2aWNlIG9iamVjdCBsaXN0DQp3b3VsZCBub3QgYmUgc3RyaWN0bHkgbmVj
+ZXNzYXJ5IGZvciBiYXNpYyBmdW5jdGlvbmFsaXR5LiBJIHdpbGwNCnN0YXJ0IG9uIHRoYXQgdG9k
+YXkuDQoNCiANCg==
