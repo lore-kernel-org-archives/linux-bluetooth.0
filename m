@@ -1,48 +1,33 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <BN7PR07MB430513DBD3BF38324AB5D1A19D3D0@BN7PR07MB4305.namprd07.prod.outlook.com>
-References: <BN7PR07MB4305C0AA4DBCB0136D7F72199D3E0@BN7PR07MB4305.namprd07.prod.outlook.com>
- <CABBYNZKSuDMX38OszjLZOEt9L_f5YM1L000-hb0Gv9LqcGSPOA@mail.gmail.com> <BN7PR07MB430513DBD3BF38324AB5D1A19D3D0@BN7PR07MB4305.namprd07.prod.outlook.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 17 Aug 2018 17:32:22 +0300
-Message-ID: <CABBYNZLrkfqv1LZ057k6Og-F9+zO+yWpHvLiwRJgOqvK9daELg@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH BlueZ 0/2] Change ConnectDevice to
+From: "Karabin, Josh" <George.Karabin@Honeywell.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [External] Re: [PATCH BlueZ 0/2] Change ConnectDevice to
  optionally connect services
-To: "Karabin, Josh" <George.Karabin@honeywell.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 17 Aug 2018 13:35:09 +0000
+Message-ID: <BN7PR07MB430513DBD3BF38324AB5D1A19D3D0@BN7PR07MB4305.namprd07.prod.outlook.com>
+References: <BN7PR07MB4305C0AA4DBCB0136D7F72199D3E0@BN7PR07MB4305.namprd07.prod.outlook.com>
+ <CABBYNZKSuDMX38OszjLZOEt9L_f5YM1L000-hb0Gv9LqcGSPOA@mail.gmail.com>
+In-Reply-To: <CABBYNZKSuDMX38OszjLZOEt9L_f5YM1L000-hb0Gv9LqcGSPOA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Josh,
-
-On Fri, Aug 17, 2018 at 4:35 PM, Karabin, Josh
-<George.Karabin@honeywell.com> wrote:
->> -----Original Message-----
->> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
->> Sent: Friday, August 17, 2018 2:15 AM
->
->> I wonder how this is suppose to work since what you are suggesting is
->> to not auto-connect matching profiles/services, but that would leave
->> the ACL link with no channels in use (at least on BR/EDR) so the link
->> would disconnect anyway.
->
-> In my use case, the client application will wait for the appearance of
-> a device object with a matching address to appear on the Device1
-> interface. If that device contains a profile that that the application
-> supports, it will call ConnectProfile on the device object. In general,
-> the link won't time out before the application has a chance to
-> respond, but it would be fine if it did - the ConnectProfile call would
-> end up re-establishing the link in that case.
->
-> I could note that behavior in the adapter api document if you think
-> It would help to clarify the intent.
-
-Wouldn't it be better to have a list of profiles to connect then? That
-would make a nice addition to the API since ConnectProfile only
-connect one profile at time, that way we could have auto-connect be a
-list and in case it is empty we connect all otherwise we just connect
-the profiles in that list, how about that?
-
--- 
-Luiz Augusto von Dentz
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERl
+bnR6IFttYWlsdG86bHVpei5kZW50ekBnbWFpbC5jb21dDQo+IFNlbnQ6IEZyaWRheSwgQXVndXN0
+IDE3LCAyMDE4IDI6MTUgQU0NCg0KPiBJIHdvbmRlciBob3cgdGhpcyBpcyBzdXBwb3NlIHRvIHdv
+cmsgc2luY2Ugd2hhdCB5b3UgYXJlIHN1Z2dlc3RpbmcgaXMNCj4gdG8gbm90IGF1dG8tY29ubmVj
+dCBtYXRjaGluZyBwcm9maWxlcy9zZXJ2aWNlcywgYnV0IHRoYXQgd291bGQgbGVhdmUNCj4gdGhl
+IEFDTCBsaW5rIHdpdGggbm8gY2hhbm5lbHMgaW4gdXNlIChhdCBsZWFzdCBvbiBCUi9FRFIpIHNv
+IHRoZSBsaW5rDQo+IHdvdWxkIGRpc2Nvbm5lY3QgYW55d2F5Lg0KDQpJbiBteSB1c2UgY2FzZSwg
+dGhlIGNsaWVudCBhcHBsaWNhdGlvbiB3aWxsIHdhaXQgZm9yIHRoZSBhcHBlYXJhbmNlIG9mDQph
+IGRldmljZSBvYmplY3Qgd2l0aCBhIG1hdGNoaW5nIGFkZHJlc3MgdG8gYXBwZWFyIG9uIHRoZSBE
+ZXZpY2UxDQppbnRlcmZhY2UuIElmIHRoYXQgZGV2aWNlIGNvbnRhaW5zIGEgcHJvZmlsZSB0aGF0
+IHRoYXQgdGhlIGFwcGxpY2F0aW9uDQpzdXBwb3J0cywgaXQgd2lsbCBjYWxsIENvbm5lY3RQcm9m
+aWxlIG9uIHRoZSBkZXZpY2Ugb2JqZWN0LiBJbiBnZW5lcmFsLA0KdGhlIGxpbmsgd29uJ3QgdGlt
+ZSBvdXQgYmVmb3JlIHRoZSBhcHBsaWNhdGlvbiBoYXMgYSBjaGFuY2UgdG8NCnJlc3BvbmQsIGJ1
+dCBpdCB3b3VsZCBiZSBmaW5lIGlmIGl0IGRpZCAtIHRoZSBDb25uZWN0UHJvZmlsZSBjYWxsIHdv
+dWxkDQplbmQgdXAgcmUtZXN0YWJsaXNoaW5nIHRoZSBsaW5rIGluIHRoYXQgY2FzZS4NCg0KSSBj
+b3VsZCBub3RlIHRoYXQgYmVoYXZpb3IgaW4gdGhlIGFkYXB0ZXIgYXBpIGRvY3VtZW50IGlmIHlv
+dSB0aGluaw0KSXQgd291bGQgaGVscCB0byBjbGFyaWZ5IHRoZSBpbnRlbnQuDQo=
