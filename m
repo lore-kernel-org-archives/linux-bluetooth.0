@@ -1,152 +1,238 @@
-Return-Path: <ankit.p.navik@intel.com>
-From: "Navik, Ankit P" <ankit.p.navik@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>, "Panda,
- Bharat B" <bharat.b.panda@intel.com>
-Subject: RE: [PATCH] Bluetooth: Add definitions and track LE resolve list
- modification
-Date: Fri, 17 Aug 2018 05:39:06 +0000
-Message-ID: <2F886D5F95ED3A47BC8C177EADCD1CC72829D09D@BGSMSX104.gar.corp.intel.com>
-References: <1531302639-16648-1-git-send-email-ankit.p.navik@intel.com>
- <3A49CC03-4429-4A38-B72C-20A7D6B3038F@holtmann.org>
-In-Reply-To: <3A49CC03-4429-4A38-B72C-20A7D6B3038F@holtmann.org>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Ankit Navik <ankit.p.navik@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: bharat.b.panda@intel.com, ankit.p.navik@intel.com
+Subject: [PATCH v2] Bluetooth: Add definitions and track LE resolve list modification
+Date: Fri, 17 Aug 2018 07:29:19 +0530
+Message-Id: <1534471159-26476-1-git-send-email-ankit.p.navik@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLCANCg0KSSBoYXZlIHN1Ym1pdHRlZCBwYXRjaCB2MiBmb3Igc2FtZSwgaW5jb3Jw
-b3JhdGluZyBhbGwgeW91ciByZXZpZXcgY29tbWVudHMuDQpUaGFua3MhDQoNCj4gSGkgQW5raXQs
-DQo+IA0KPiA+IEFkZCB0aGUgZGVmaW5pdGlvbnMgZm9yIGFkZGluZyBlbnRyaWVzIHRvIHRoZSBM
-RSByZXNvbHZlIGxpc3QgYW5kDQo+ID4gcmVtb3ZpbmcgZW50cmllcyBmcm9tIHRoZSBMRSByZXNv
-bHZlIGxpc3QuIFdoZW4gdGhlIExFIHJlc29sdmUgbGlzdA0KPiA+IGdldHMgY2hhbmdlZCB2aWEg
-SENJIGNvbW1hbmRzIG1ha2Ugc3VyZSB0aGF0IHRoZSBpbnRlcm5hbCBzdG9yYWdlIG9mDQo+ID4g
-dGhlIHJlc29sdmUgbGlzdCBlbnRyaWVzIGdldHMgdXBkYXRlZC4NCj4gPg0KPiA+IFNpZ25lZC1v
-ZmYtYnk6IEFua2l0IE5hdmlrIDxhbmtpdC5wLm5hdmlrQGludGVsLmNvbT4NCj4gPiAtLS0NCj4g
-PiBpbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmggICAgICB8IDE0ICsrKysrKysrKysrKw0KPiA+
-IGluY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oIHwgIDUgKysrLQ0KPiA+IG5ldC9ibHVl
-dG9vdGgvaGNpX2NvcmUuYyAgICAgICAgIHwgIDkgKysrKysrKy0NCj4gPiBuZXQvYmx1ZXRvb3Ro
-L2hjaV9ldmVudC5jICAgICAgICB8IDQ5DQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKy0NCj4gPiBuZXQvYmx1ZXRvb3RoL2hjaV9zb2NrLmMgICAgICAgICB8ICAzICsr
-LQ0KPiA+IG5ldC9ibHVldG9vdGgvbWdtdC5jICAgICAgICAgICAgIHwgIDQgKystLQ0KPiA+IDYg
-ZmlsZXMgY2hhbmdlZCwgNzggaW5zZXJ0aW9ucygrKSwgNiBkZWxldGlvbnMoLSkNCj4gPg0KPiA+
-IGRpZmYgLS1naXQgYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpLmggYi9pbmNsdWRlL25ldC9i
-bHVldG9vdGgvaGNpLmgNCj4gPiBpbmRleCA0YWYxYTNhLi4xYWJjZDE0IDEwMDY0NA0KPiA+IC0t
-LSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2kuaA0KPiA+ICsrKyBiL2luY2x1ZGUvbmV0L2Js
-dWV0b290aC9oY2kuaA0KPiA+IEBAIC0xNDkwLDYgKzE0OTAsMjAgQEAgc3RydWN0IGhjaV9jcF9s
-ZV93cml0ZV9kZWZfZGF0YV9sZW4gew0KPiA+IAlfX2xlMTYJdHhfdGltZTsNCj4gPiB9IF9fcGFj
-a2VkOw0KPiA+DQo+ID4gKyNkZWZpbmUgSENJX09QX0xFX0FERF9UT19SRVNPTFZfTElTVAkweDIw
-MjcNCj4gPiArc3RydWN0IGhjaV9jcF9sZV9hZGRfdG9fcmVzb2x2X2xpc3Qgew0KPiA+ICsJX191
-OAkgYmRhZGRyX3R5cGU7DQo+ID4gKwliZGFkZHJfdCBiZGFkZHI7DQo+ID4gKwlfX3U4CSBwZWVy
-X2lya1sxNl07DQo+ID4gKwlfX3U4CSBsb2NhbF9pcmtbMTZdOw0KPiA+ICt9IF9fcGFja2VkOw0K
-PiA+ICsNCj4gPiArI2RlZmluZSBIQ0lfT1BfTEVfREVMX0ZST01fUkVTT0xWX0xJU1QJMHgyMDI4
-DQo+ID4gK3N0cnVjdCBoY2lfY3BfbGVfZGVsX2Zyb21fcmVzb2x2X2xpc3Qgew0KPiA+ICsJX191
-OAkgYmRhZGRyX3R5cGU7DQo+ID4gKwliZGFkZHJfdCBiZGFkZHI7DQo+ID4gK30gX19wYWNrZWQ7
-DQo+ID4gKw0KPiA+ICNkZWZpbmUgSENJX09QX0xFX0NMRUFSX1JFU09MVl9MSVNUCTB4MjAyOQ0K
-PiA+DQo+ID4gI2RlZmluZSBIQ0lfT1BfTEVfUkVBRF9SRVNPTFZfTElTVF9TSVpFCTB4MjAyYQ0K
-PiA+IGRpZmYgLS1naXQgYS9pbmNsdWRlL25ldC9ibHVldG9vdGgvaGNpX2NvcmUuaA0KPiA+IGIv
-aW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgNCj4gPiBpbmRleCAzYTFhZTBkLi45YWIw
-ZmRmIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9oY2lfY29yZS5oDQo+
-ID4gKysrIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmgNCj4gPiBAQCAtMTAxLDYg
-KzEwMSw4IEBAIHN0cnVjdCBiZGFkZHJfbGlzdCB7DQo+ID4gCXN0cnVjdCBsaXN0X2hlYWQgbGlz
-dDsNCj4gPiAJYmRhZGRyX3QgYmRhZGRyOw0KPiA+IAl1OCBiZGFkZHJfdHlwZTsNCj4gPiArCXU4
-IHBlZXJfaXJrWzE2XTsNCj4gPiArCXU4IGxvY2FsX2lya1sxNl07DQo+ID4gfTsNCj4gDQo+IHRo
-aXMgaXMgYSBiaXQgd2FzdGVmdWwgc2luY2Ugbm93IGV2ZXJ5IGFkZHJlc3MgZW50cnkgY2Fycmll
-cyBhbiBleHRyYSAzMiBieXRlcy4NCj4gVGhhdCBpcyBtb3JlIHRoYW4gZG91YmxlIHdoYXQgdGhl
-IHN0cnVjdCBpcyBjdXJyZW50bHkgaW4gc2l6ZS4gSSBhbSBub3QgY29udmluY2VkDQo+IHRoYXQg
-aXMgYSBnb29kIGlkZWEuDQo+IA0KPiA+IHN0cnVjdCBidF91dWlkIHsNCj4gPiBAQCAtMTA1MCw3
-ICsxMDUyLDggQEAgc3RhdGljIGlubGluZSB2b2lkIGhjaV9zZXRfZHJ2ZGF0YShzdHJ1Y3QNCj4g
-PiBoY2lfZGV2ICpoZGV2LCB2b2lkICpkYXRhKQ0KPiA+DQo+ID4gc3RydWN0IGJkYWRkcl9saXN0
-ICpoY2lfYmRhZGRyX2xpc3RfbG9va3VwKHN0cnVjdCBsaXN0X2hlYWQgKmxpc3QsDQo+ID4gCQkJ
-CQkgICBiZGFkZHJfdCAqYmRhZGRyLCB1OCB0eXBlKTsNCj4gPiAtaW50IGhjaV9iZGFkZHJfbGlz
-dF9hZGQoc3RydWN0IGxpc3RfaGVhZCAqbGlzdCwgYmRhZGRyX3QgKmJkYWRkciwgdTgNCj4gPiB0
-eXBlKTsNCj4gPiAraW50IGhjaV9iZGFkZHJfbGlzdF9hZGQoc3RydWN0IGxpc3RfaGVhZCAqbGlz
-dCwgYmRhZGRyX3QgKmJkYWRkciwgdTggdHlwZSwNCj4gPiArCQkJdTggKnBlZXJfaXJrLCB1OCAq
-bG9jYWxfaXJrKTsNCj4gDQo+IEluc3RlYWQgb2YgZG9pbmcgdGhpcyBhbmQgY2hhbmdpbmcgZXZl
-cnkgY2FsbGVyIHRoYXQgcmVhbGx5IGRvZXNu4oCZdCBjYXJlIGFib3V0DQo+IElSS3MsIGJldHRl
-ciBoYXZlIGEgbmV3IGhjaV9iZGFkZHJfbGlzdF9hZGRfd2l0aF9pcmsgb3Igc29tZXRoaW5nIGxp
-a2UgdGhhdC4NCj4gDQo+ID4gaW50IGhjaV9iZGFkZHJfbGlzdF9kZWwoc3RydWN0IGxpc3RfaGVh
-ZCAqbGlzdCwgYmRhZGRyX3QgKmJkYWRkciwgdTgNCj4gPiB0eXBlKTsgdm9pZCBoY2lfYmRhZGRy
-X2xpc3RfY2xlYXIoc3RydWN0IGxpc3RfaGVhZCAqbGlzdCk7DQo+ID4NCj4gPiBkaWZmIC0tZ2l0
-IGEvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jIGIvbmV0L2JsdWV0b290aC9oY2lfY29yZS5jIGlu
-ZGV4DQo+ID4gYWYxNjc1ZC4uZGNhZWYxMyAxMDA2NDQNCj4gPiAtLS0gYS9uZXQvYmx1ZXRvb3Ro
-L2hjaV9jb3JlLmMNCj4gPiArKysgYi9uZXQvYmx1ZXRvb3RoL2hjaV9jb3JlLmMNCj4gPiBAQCAt
-Mjc4NCw3ICsyNzg0LDggQEAgdm9pZCBoY2lfYmRhZGRyX2xpc3RfY2xlYXIoc3RydWN0IGxpc3Rf
-aGVhZA0KPiAqYmRhZGRyX2xpc3QpDQo+ID4gCX0NCj4gPiB9DQo+ID4NCj4gPiAtaW50IGhjaV9i
-ZGFkZHJfbGlzdF9hZGQoc3RydWN0IGxpc3RfaGVhZCAqbGlzdCwgYmRhZGRyX3QgKmJkYWRkciwg
-dTgNCj4gPiB0eXBlKQ0KPiA+ICtpbnQgaGNpX2JkYWRkcl9saXN0X2FkZChzdHJ1Y3QgbGlzdF9o
-ZWFkICpsaXN0LCBiZGFkZHJfdCAqYmRhZGRyLCB1OCB0eXBlLA0KPiA+ICsJCQl1OCAqcGVlcl9p
-cmssIHU4ICpsb2NhbF9pcmspDQo+ID4gew0KPiA+IAlzdHJ1Y3QgYmRhZGRyX2xpc3QgKmVudHJ5
-Ow0KPiA+DQo+ID4gQEAgLTI4MDEsNiArMjgwMiwxMiBAQCBpbnQgaGNpX2JkYWRkcl9saXN0X2Fk
-ZChzdHJ1Y3QgbGlzdF9oZWFkICpsaXN0LA0KPiBiZGFkZHJfdCAqYmRhZGRyLCB1OCB0eXBlKQ0K
-PiA+IAliYWNweSgmZW50cnktPmJkYWRkciwgYmRhZGRyKTsNCj4gPiAJZW50cnktPmJkYWRkcl90
-eXBlID0gdHlwZTsNCj4gPg0KPiA+ICsJaWYgKHBlZXJfaXJrKQ0KPiA+ICsJCW1lbWNweShlbnRy
-eS0+cGVlcl9pcmssIHBlZXJfaXJrLCAxNik7DQo+ID4gKw0KPiA+ICsJaWYgKGxvY2FsX2lyaykN
-Cj4gPiArCQltZW1jcHkoZW50cnktPmxvY2FsX2lyaywgbG9jYWxfaXJrLCAxNik7DQo+ID4gKw0K
-PiA+IAlsaXN0X2FkZCgmZW50cnktPmxpc3QsIGxpc3QpOw0KPiA+DQo+ID4gCXJldHVybiAwOw0K
-PiA+IGRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jIGIvbmV0L2JsdWV0b290
-aC9oY2lfZXZlbnQuYw0KPiA+IGluZGV4IDMwMjlkNzkuLmU4ZDZkZjkgMTAwNjQ0DQo+ID4gLS0t
-IGEvbmV0L2JsdWV0b290aC9oY2lfZXZlbnQuYw0KPiA+ICsrKyBiL25ldC9ibHVldG9vdGgvaGNp
-X2V2ZW50LmMNCj4gPiBAQCAtMTIzOSw3ICsxMjM5LDcgQEAgc3RhdGljIHZvaWQgaGNpX2NjX2xl
-X2FkZF90b193aGl0ZV9saXN0KHN0cnVjdA0KPiBoY2lfZGV2ICpoZGV2LA0KPiA+IAkJcmV0dXJu
-Ow0KPiA+DQo+ID4gCWhjaV9iZGFkZHJfbGlzdF9hZGQoJmhkZXYtPmxlX3doaXRlX2xpc3QsICZz
-ZW50LT5iZGFkZHIsDQo+ID4gLQkJCSAgIHNlbnQtPmJkYWRkcl90eXBlKTsNCj4gPiArCQkJICAg
-c2VudC0+YmRhZGRyX3R5cGUsIE5VTEwsIE5VTEwpOw0KPiA+IH0NCj4gPg0KPiA+IHN0YXRpYyB2
-b2lkIGhjaV9jY19sZV9kZWxfZnJvbV93aGl0ZV9saXN0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBA
-QA0KPiA+IC0xMzA3LDYgKzEzMDcsNDUgQEAgc3RhdGljIHZvaWQgaGNpX2NjX2xlX3dyaXRlX2Rl
-Zl9kYXRhX2xlbihzdHJ1Y3QgaGNpX2Rldg0KPiAqaGRldiwNCj4gPiAJaGRldi0+bGVfZGVmX3R4
-X3RpbWUgPSBsZTE2X3RvX2NwdShzZW50LT50eF90aW1lKTsgfQ0KPiA+DQo+ID4gK3N0YXRpYyB2
-b2lkIGhjaV9jY19sZV9hZGRfdG9fcmVzb2x2X2xpc3Qoc3RydWN0IGhjaV9kZXYgKmhkZXYsDQo+
-ID4gKwkJCQkJIHN0cnVjdCBza19idWZmICpza2IpDQo+ID4gK3sNCj4gPiArCXN0cnVjdCBoY2lf
-Y3BfbGVfYWRkX3RvX3Jlc29sdl9saXN0ICpzZW50Ow0KPiA+ICsJX191OCBzdGF0dXMgPSAqKChf
-X3U4ICopIHNrYi0+ZGF0YSk7DQo+ID4gKw0KPiA+ICsJQlRfREJHKCIlcyBzdGF0dXMgMHglMi4y
-eCIsIGhkZXYtPm5hbWUsIHN0YXR1cyk7DQo+ID4gKw0KPiA+ICsJaWYgKHN0YXR1cykNCj4gPiAr
-CQlyZXR1cm47DQo+ID4gKw0KPiA+ICsJc2VudCA9IGhjaV9zZW50X2NtZF9kYXRhKGhkZXYsIEhD
-SV9PUF9MRV9BRERfVE9fUkVTT0xWX0xJU1QpOw0KPiA+ICsJaWYgKCFzZW50KQ0KPiA+ICsJCXJl
-dHVybjsNCj4gPiArDQo+ID4gKwloY2lfYmRhZGRyX2xpc3RfYWRkKCZoZGV2LT5sZV9yZXNvbHZf
-bGlzdCwgJnNlbnQtPmJkYWRkciwNCj4gPiArCQkJCXNlbnQtPmJkYWRkcl90eXBlLCBzZW50LT5w
-ZWVyX2lyaywNCj4gPiArCQkJCXNlbnQtPmxvY2FsX2lyayk7DQo+ID4gK30NCj4gPiArDQo+ID4g
-K3N0YXRpYyB2b2lkIGhjaV9jY19sZV9kZWxfZnJvbV9yZXNvbHZfbGlzdChzdHJ1Y3QgaGNpX2Rl
-diAqaGRldiwNCj4gPiArCQkJCQkgIHN0cnVjdCBza19idWZmICpza2IpDQo+ID4gK3sNCj4gPiAr
-CXN0cnVjdCBoY2lfY3BfbGVfZGVsX2Zyb21fcmVzb2x2X2xpc3QgKnNlbnQ7DQo+ID4gKwlfX3U4
-IHN0YXR1cyA9ICooKF9fdTggKikgc2tiLT5kYXRhKTsNCj4gPiArDQo+ID4gKwlCVF9EQkcoIiVz
-IHN0YXR1cyAweCUyLjJ4IiwgaGRldi0+bmFtZSwgc3RhdHVzKTsNCj4gPiArDQo+ID4gKwlpZiAo
-c3RhdHVzKQ0KPiA+ICsJCXJldHVybjsNCj4gPiArDQo+ID4gKwlzZW50ID0gaGNpX3NlbnRfY21k
-X2RhdGEoaGRldiwgSENJX09QX0xFX0RFTF9GUk9NX1JFU09MVl9MSVNUKTsNCj4gPiArCWlmICgh
-c2VudCkNCj4gPiArCQlyZXR1cm47DQo+ID4gKw0KPiA+ICsJaGNpX2JkYWRkcl9saXN0X2RlbCgm
-aGRldi0+bGVfcmVzb2x2X2xpc3QsICZzZW50LT5iZGFkZHIsDQo+ID4gKwkJCSAgICBzZW50LT5i
-ZGFkZHJfdHlwZSk7DQo+ID4gK30NCj4gPiArDQo+ID4gc3RhdGljIHZvaWQgaGNpX2NjX2xlX2Ns
-ZWFyX3Jlc29sdl9saXN0KHN0cnVjdCBoY2lfZGV2ICpoZGV2LA0KPiA+IAkJCQkgICAgICAgc3Ry
-dWN0IHNrX2J1ZmYgKnNrYikNCj4gPiB7DQo+ID4gQEAgLTMwNDIsNiArMzA4MSwxNCBAQCBzdGF0
-aWMgdm9pZCBoY2lfY21kX2NvbXBsZXRlX2V2dChzdHJ1Y3QgaGNpX2Rldg0KPiAqaGRldiwgc3Ry
-dWN0IHNrX2J1ZmYgKnNrYiwNCj4gPiAJCWhjaV9jY19sZV93cml0ZV9kZWZfZGF0YV9sZW4oaGRl
-diwgc2tiKTsNCj4gPiAJCWJyZWFrOw0KPiA+DQo+ID4gKwljYXNlIEhDSV9PUF9MRV9BRERfVE9f
-UkVTT0xWX0xJU1Q6DQo+ID4gKwkJaGNpX2NjX2xlX2FkZF90b19yZXNvbHZfbGlzdChoZGV2LCBz
-a2IpOw0KPiA+ICsJCWJyZWFrOw0KPiA+ICsNCj4gPiArCWNhc2UgSENJX09QX0xFX0RFTF9GUk9N
-X1JFU09MVl9MSVNUOg0KPiA+ICsJCWhjaV9jY19sZV9kZWxfZnJvbV9yZXNvbHZfbGlzdChoZGV2
-LCBza2IpOw0KPiA+ICsJCWJyZWFrOw0KPiA+ICsNCj4gPiAJY2FzZSBIQ0lfT1BfTEVfQ0xFQVJf
-UkVTT0xWX0xJU1Q6DQo+ID4gCQloY2lfY2NfbGVfY2xlYXJfcmVzb2x2X2xpc3QoaGRldiwgc2ti
-KTsNCj4gPiAJCWJyZWFrOw0KPiA+IGRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2hjaV9zb2Nr
-LmMgYi9uZXQvYmx1ZXRvb3RoL2hjaV9zb2NrLmMgaW5kZXgNCj4gPiAxNTA2ZTE2Li4xZjZhZTc5
-IDEwMDY0NA0KPiA+IC0tLSBhL25ldC9ibHVldG9vdGgvaGNpX3NvY2suYw0KPiA+ICsrKyBiL25l
-dC9ibHVldG9vdGgvaGNpX3NvY2suYw0KPiA+IEBAIC04OTMsNyArODkzLDggQEAgc3RhdGljIGlu
-dCBoY2lfc29ja19ibGFja2xpc3RfYWRkKHN0cnVjdCBoY2lfZGV2DQo+ID4gKmhkZXYsIHZvaWQg
-X191c2VyICphcmcpDQo+ID4NCj4gPiAJaGNpX2Rldl9sb2NrKGhkZXYpOw0KPiA+DQo+ID4gLQll
-cnIgPSBoY2lfYmRhZGRyX2xpc3RfYWRkKCZoZGV2LT5ibGFja2xpc3QsICZiZGFkZHIsIEJEQURE
-Ul9CUkVEUik7DQo+ID4gKwllcnIgPSBoY2lfYmRhZGRyX2xpc3RfYWRkKCZoZGV2LT5ibGFja2xp
-c3QsICZiZGFkZHIsIEJEQUREUl9CUkVEUiwNCj4gPiArCQkJCQlOVUxMLCBOVUxMKTsNCj4gPg0K
-PiA+IAloY2lfZGV2X3VubG9jayhoZGV2KTsNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS9uZXQvYmx1
-ZXRvb3RoL21nbXQuYyBiL25ldC9ibHVldG9vdGgvbWdtdC5jIGluZGV4DQo+ID4gOGE4MGQ0OC4u
-YTk5YjhkZCAxMDA2NDQNCj4gPiAtLS0gYS9uZXQvYmx1ZXRvb3RoL21nbXQuYw0KPiA+ICsrKyBi
-L25ldC9ibHVldG9vdGgvbWdtdC5jDQo+ID4gQEAgLTM3OTEsNyArMzc5MSw3IEBAIHN0YXRpYyBp
-bnQgYmxvY2tfZGV2aWNlKHN0cnVjdCBzb2NrICpzaywgc3RydWN0DQo+IGhjaV9kZXYgKmhkZXYs
-IHZvaWQgKmRhdGEsDQo+ID4gCWhjaV9kZXZfbG9jayhoZGV2KTsNCj4gPg0KPiA+IAllcnIgPSBo
-Y2lfYmRhZGRyX2xpc3RfYWRkKCZoZGV2LT5ibGFja2xpc3QsICZjcC0+YWRkci5iZGFkZHIsDQo+
-ID4gLQkJCQkgIGNwLT5hZGRyLnR5cGUpOw0KPiA+ICsJCQkJICBjcC0+YWRkci50eXBlLCBOVUxM
-LCBOVUxMKTsNCj4gPiAJaWYgKGVyciA8IDApIHsNCj4gPiAJCXN0YXR1cyA9IE1HTVRfU1RBVFVT
-X0ZBSUxFRDsNCj4gPiAJCWdvdG8gZG9uZTsNCj4gPiBAQCAtNTI3Miw3ICs1MjcyLDcgQEAgc3Rh
-dGljIGludCBhZGRfZGV2aWNlKHN0cnVjdCBzb2NrICpzaywgc3RydWN0IGhjaV9kZXYNCj4gKmhk
-ZXYsDQo+ID4gCQl9DQo+ID4NCj4gPiAJCWVyciA9IGhjaV9iZGFkZHJfbGlzdF9hZGQoJmhkZXYt
-PndoaXRlbGlzdCwgJmNwLT5hZGRyLmJkYWRkciwNCj4gPiAtCQkJCQkgIGNwLT5hZGRyLnR5cGUp
-Ow0KPiA+ICsJCQkJCSAgY3AtPmFkZHIudHlwZSwgTlVMTCwgTlVMTCk7DQo+ID4gCQlpZiAoZXJy
-KQ0KPiA+IAkJCWdvdG8gdW5sb2NrOw0KPiANCj4gUmVnYXJkcw0KPiANCj4gTWFyY2VsDQoNClJl
-Z2FyZHMsIA0KQW5raXQNCg==
+Add the definitions for adding entries to the LE resolve list and
+removing entries from the LE resolve list. When the LE resolve list
+gets changed via HCI commands make sure that the internal storage of
+the resolve list entries gets updated.
+
+Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
+---
+ include/net/bluetooth/hci.h      | 14 +++++++++
+ include/net/bluetooth/hci_core.h | 15 ++++++++++
+ net/bluetooth/hci_core.c         | 63 ++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        | 47 ++++++++++++++++++++++++++++++
+ 4 files changed, 139 insertions(+)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 4af1a3a..1abcd14 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1490,6 +1490,20 @@ struct hci_cp_le_write_def_data_len {
+ 	__le16	tx_time;
+ } __packed;
+ 
++#define HCI_OP_LE_ADD_TO_RESOLV_LIST	0x2027
++struct hci_cp_le_add_to_resolv_list {
++	__u8	 bdaddr_type;
++	bdaddr_t bdaddr;
++	__u8	 peer_irk[16];
++	__u8	 local_irk[16];
++} __packed;
++
++#define HCI_OP_LE_DEL_FROM_RESOLV_LIST	0x2028
++struct hci_cp_le_del_from_resolv_list {
++	__u8	 bdaddr_type;
++	bdaddr_t bdaddr;
++} __packed;
++
+ #define HCI_OP_LE_CLEAR_RESOLV_LIST	0x2029
+ 
+ #define HCI_OP_LE_READ_RESOLV_LIST_SIZE	0x202a
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 3a1ae0d..89580de 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -103,6 +103,14 @@ struct bdaddr_list {
+ 	u8 bdaddr_type;
+ };
+ 
++struct bdaddr_list_with_irk {
++	struct list_head list;
++	bdaddr_t bdaddr;
++	u8 bdaddr_type;
++	u8 peer_irk[16];
++	u8 local_irk[16];
++};
++
+ struct bt_uuid {
+ 	struct list_head list;
+ 	u8 uuid[16];
+@@ -1050,8 +1058,15 @@ static inline void hci_set_drvdata(struct hci_dev *hdev, void *data)
+ 
+ struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
+ 					   bdaddr_t *bdaddr, u8 type);
++struct bdaddr_list_with_irk *hci_bdaddr_list_lookup_with_irk(
++				    struct list_head *list, bdaddr_t *bdaddr,
++				    u8 type);
+ int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type);
++int hci_bdaddr_list_add_with_irk(struct list_head *list, bdaddr_t *bdaddr,
++					u8 type, u8 *peer_irk, u8 *local_irk);
+ int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type);
++int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
++								u8 type);
+ void hci_bdaddr_list_clear(struct list_head *list);
+ 
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index af1675d..d74dd1c8 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2774,6 +2774,20 @@ struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *bdaddr_list,
+ 	return NULL;
+ }
+ 
++struct bdaddr_list_with_irk *hci_bdaddr_list_lookup_with_irk(
++				struct list_head *bdaddr_list, bdaddr_t *bdaddr,
++				u8 type)
++{
++	struct bdaddr_list_with_irk *b;
++
++	list_for_each_entry(b, bdaddr_list, list) {
++		if (!bacmp(&b->bdaddr, bdaddr) && b->bdaddr_type == type)
++			return b;
++	}
++
++	return NULL;
++}
++
+ void hci_bdaddr_list_clear(struct list_head *bdaddr_list)
+ {
+ 	struct bdaddr_list *b, *n;
+@@ -2806,6 +2820,35 @@ int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type)
+ 	return 0;
+ }
+ 
++int hci_bdaddr_list_add_with_irk(struct list_head *list, bdaddr_t *bdaddr,
++					u8 type, u8 *peer_irk, u8 *local_irk)
++{
++	struct bdaddr_list_with_irk *entry;
++
++	if (!bacmp(bdaddr, BDADDR_ANY))
++		return -EBADF;
++
++	if (hci_bdaddr_list_lookup(list, bdaddr, type))
++		return -EEXIST;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return -ENOMEM;
++
++	bacpy(&entry->bdaddr, bdaddr);
++	entry->bdaddr_type = type;
++
++	if (peer_irk)
++		memcpy(entry->peer_irk, peer_irk, 16);
++
++	if (local_irk)
++		memcpy(entry->local_irk, local_irk, 16);
++
++	list_add(&entry->list, list);
++
++	return 0;
++}
++
+ int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type)
+ {
+ 	struct bdaddr_list *entry;
+@@ -2825,6 +2868,26 @@ int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type)
+ 	return 0;
+ }
+ 
++int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
++							u8 type)
++{
++	struct bdaddr_list_with_irk *entry;
++
++	if (!bacmp(bdaddr, BDADDR_ANY)) {
++		hci_bdaddr_list_clear(list);
++		return 0;
++	}
++
++	entry = hci_bdaddr_list_lookup_with_irk(list, bdaddr, type);
++	if (!entry)
++		return -ENOENT;
++
++	list_del(&entry->list);
++	kfree(entry);
++
++	return 0;
++}
++
+ /* This function requires the caller holds hdev->lock */
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 					       bdaddr_t *addr, u8 addr_type)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3029d79..188ab46 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1307,6 +1307,45 @@ static void hci_cc_le_write_def_data_len(struct hci_dev *hdev,
+ 	hdev->le_def_tx_time = le16_to_cpu(sent->tx_time);
+ }
+ 
++static void hci_cc_le_add_to_resolv_list(struct hci_dev *hdev,
++					 struct sk_buff *skb)
++{
++	struct hci_cp_le_add_to_resolv_list *sent;
++	__u8 status = *((__u8 *) skb->data);
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_RESOLV_LIST);
++	if (!sent)
++		return;
++
++	hci_bdaddr_list_add_with_irk(&hdev->le_resolv_list, &sent->bdaddr,
++				sent->bdaddr_type, sent->peer_irk,
++				sent->local_irk);
++}
++
++static void hci_cc_le_del_from_resolv_list(struct hci_dev *hdev,
++					  struct sk_buff *skb)
++{
++	struct hci_cp_le_del_from_resolv_list *sent;
++	__u8 status = *((__u8 *) skb->data);
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (status)
++		return;
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_DEL_FROM_RESOLV_LIST);
++	if (!sent)
++		return;
++
++	hci_bdaddr_list_del_with_irk(&hdev->le_resolv_list, &sent->bdaddr,
++			    sent->bdaddr_type);
++}
++
+ static void hci_cc_le_clear_resolv_list(struct hci_dev *hdev,
+ 				       struct sk_buff *skb)
+ {
+@@ -3042,6 +3081,14 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_le_write_def_data_len(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_ADD_TO_RESOLV_LIST:
++		hci_cc_le_add_to_resolv_list(hdev, skb);
++		break;
++
++	case HCI_OP_LE_DEL_FROM_RESOLV_LIST:
++		hci_cc_le_del_from_resolv_list(hdev, skb);
++		break;
++
+ 	case HCI_OP_LE_CLEAR_RESOLV_LIST:
+ 		hci_cc_le_clear_resolv_list(hdev, skb);
+ 		break;
+-- 
+1.9.1
