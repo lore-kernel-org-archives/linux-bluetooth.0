@@ -1,60 +1,37 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
+MIME-Version: 1.0
+From: Raul Piper <raulpblooper@gmail.com>
+Date: Sun, 19 Aug 2018 03:03:26 +0530
+Message-ID: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
+Subject: Failed to parse provisioning database file prov_db.json :
+ BlueZ,Meshctl V5.50
 To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] tools/meshctl: Fix default directory for JSON files
-Date: Sun, 19 Aug 2018 14:30:26 -0700
-Message-Id: <20180819213026.28429-1-inga.stotland@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes the name of default directory that contains sample JSON files.
----
- tools/meshctl.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+Hello ,
+I have built and BlueZ 5.50 from the source and installed it on
+raspberry PI 3 W0, but when I am trying to launch the meshctl tool -
+using ./meshctl (from within or out side the mesh directory) i am
+getting the below error  :
 
-diff --git a/tools/meshctl.c b/tools/meshctl.c
-index 3e1484f61..a8468b716 100644
---- a/tools/meshctl.c
-+++ b/tools/meshctl.c
-@@ -1913,21 +1913,20 @@ int main(int argc, char *argv[])
- 	bt_shell_set_prompt(PROMPT_OFF);
- 
- 	if (!mesh_config_dir) {
--		bt_shell_printf("Local config directory not provided.\n");
--		mesh_config_dir = "";
--	} else {
--		bt_shell_printf("Reading prov_db.json and local_node.json from"
--				" %s\n", mesh_config_dir);
-+		printf("Local config directory not provided.\n");
-+		mesh_config_dir = "mesh";
- 	}
- 
-+	printf("Reading prov_db.json and local_node.json from"
-+				" %s directory\n", mesh_config_dir);
-+
- 	len = strlen(mesh_config_dir);
--	if (len && mesh_config_dir[len - 1] != '/') {
-+
-+	if (len && mesh_config_dir[len - 1] != '/')
- 		extra = 1;
--		bt_shell_printf("mesh_config_dir[%d] %s\n", len,
--						&mesh_config_dir[len - 1]);
--	} else {
-+	else
- 		extra = 0;
--	}
-+
- 	mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
- 									+ 2);
- 	if (!mesh_local_config_filename)
-@@ -1956,6 +1955,7 @@ int main(int argc, char *argv[])
- 
- 	sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
- 	len = strlen(mesh_config_dir);
-+
- 	if (extra)
- 		sprintf(mesh_prov_db_filename + len , "%c", '/');
- 
--- 
-2.14.4
+Failed to parse provisioning database file prov_db.json
+
+I checked the online sanity onfthe above json file and it seems correct.
+
+
+
+I tried doing the sudo hcitool -lescan - it shows the LE devices and also
+
+bluetoothd -v gives 5.50 which shows my compilation and loading of the
+new BlueZ is alteast correct.
+
+I have already installed the c-json lib .
+
+Is this a bug in meshctl?
+
+Please assist !
+
+
+Thanks in Advance !
