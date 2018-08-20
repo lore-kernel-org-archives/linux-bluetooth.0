@@ -1,180 +1,83 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2] tools/meshctl: Fix default directory for JSON files
-Date: Mon, 20 Aug 2018 23:19:29 -0700
-Message-Id: <20180821061929.1914-1-inga.stotland@intel.com>
+From: "Stotland, Inga" <inga.stotland@intel.com>
+To: "raulpblooper@gmail.com" <raulpblooper@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Failed to parse provisioning database file prov_db.json :
+ BlueZ,Meshctl V5.50
+Date: Mon, 20 Aug 2018 21:07:50 +0000
+Message-ID: <1534799268.5879.34.camel@intel.com>
+References: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
+         <1534714610.5879.11.camel@intel.com>
+         <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
+         <1534792605.5879.17.camel@intel.com>
+         <CAEwN+MBxzZg8UyeqTfRPizfzjH07iD6_hL=7UPxHw1ZnOC8gMA@mail.gmail.com>
+In-Reply-To: <CAEwN+MBxzZg8UyeqTfRPizfzjH07iD6_hL=7UPxHw1ZnOC8gMA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes the name of default directory that contains sample JSON files.
-README file is updated to describe the default location.
----
- tools/mesh/README | 19 ++++++++++++++++++-
- tools/meshctl.c   | 52 +++++++++++++++++++++++++++++++---------------------
- 2 files changed, 49 insertions(+), 22 deletions(-)
-
-diff --git a/tools/mesh/README b/tools/mesh/README
-index ea561efc8..bdb171f77 100644
---- a/tools/mesh/README
-+++ b/tools/mesh/README
-@@ -1,5 +1,5 @@
- MeshCtl - BlueZ GATT based Bluetooth Mesh Provisioner
--******************************************
-+*****************************************************
- 
- Copyright (C) 2017  Intel Corporation. All rights reserved.
- 
-@@ -16,6 +16,23 @@ Configuration and options
- 
- 		Build meshctl and other Bluetooth Mesh based tools and utils
- 
-+Example configuration files
-+===========================
-+
-+The MeshCtl tool requires two input configuration files in JSON format:
-+	- local_node.json
-+		Local mesh node configuration
-+	- prov_db.json
-+		Provisoner's database for all the configured nodes in the mesh
-+
-+The default directory for MeshCtl configuration files is
-+/home/<username>/.config/mesh
-+
-+To use .json configuration files either copy them to the default directory
-+or, to specify a custom storage directory, run meshctl tool as:
-+
-+	meshctl -c <config_dir_name>
-+
- Information
- ===========
- 
-diff --git a/tools/meshctl.c b/tools/meshctl.c
-index 3e1484f61..1a77aa881 100644
---- a/tools/meshctl.c
-+++ b/tools/meshctl.c
-@@ -72,6 +72,8 @@
- #define MESH_PROXY_DATA_IN_UUID_STR	"00002add-0000-1000-8000-00805f9b34fb"
- #define MESH_PROXY_DATA_OUT_UUID_STR	"00002ade-0000-1000-8000-00805f9b34fb"
- 
-+#define MESHCTL_DIR	".config/meshctl"
-+
- static DBusConnection *dbus_conn;
- 
- struct adapter {
-@@ -1873,7 +1875,7 @@ static const struct bt_shell_menu main_menu = {
- 	{ } },
- };
- 
--static const char *mesh_config_dir;
-+static const char *config_dir;
- 
- static const struct option options[] = {
- 	{ "config",	required_argument, 0, 'c' },
-@@ -1881,7 +1883,7 @@ static const struct option options[] = {
- };
- 
- static const char **optargs[] = {
--	&mesh_config_dir
-+	&config_dir
- };
- 
- static const char *help[] = {
-@@ -1907,38 +1909,44 @@ int main(int argc, char *argv[])
- 	int status;
- 	int len;
- 	int extra;
-+	char *mesh_dir = NULL;
- 
- 	bt_shell_init(argc, argv, &opt);
- 	bt_shell_set_menu(&main_menu);
- 	bt_shell_set_prompt(PROMPT_OFF);
- 
--	if (!mesh_config_dir) {
--		bt_shell_printf("Local config directory not provided.\n");
--		mesh_config_dir = "";
-+	if (!config_dir) {
-+		const char *home = getenv("HOME");
-+		if (!home) {
-+			g_printerr("Config dir not given and $HOME not set up");
-+			goto fail;
-+		}
-+
-+		mesh_dir = g_strdup_printf("%s/%s", home, MESHCTL_DIR);
- 	} else {
--		bt_shell_printf("Reading prov_db.json and local_node.json from"
--				" %s\n", mesh_config_dir);
-+		mesh_dir = g_strdup_printf("%s", config_dir);
- 	}
- 
--	len = strlen(mesh_config_dir);
--	if (len && mesh_config_dir[len - 1] != '/') {
-+	printf("Reading prov_db.json and local_node.json from %s directory\n",
-+								mesh_dir);
-+
-+	len = strlen(mesh_dir);
-+
-+	if (len && mesh_dir[len - 1] != '/')
- 		extra = 1;
--		bt_shell_printf("mesh_config_dir[%d] %s\n", len,
--						&mesh_config_dir[len - 1]);
--	} else {
-+	else
- 		extra = 0;
--	}
-+
- 	mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
- 									+ 2);
- 	if (!mesh_local_config_filename)
- 		goto fail;
- 
- 	mesh_prov_db_filename = g_malloc(len + strlen("prov_db.json") + 2);
--	if (!mesh_prov_db_filename) {
-+	if (!mesh_prov_db_filename)
- 		goto fail;
--	}
- 
--	sprintf(mesh_local_config_filename, "%s", mesh_config_dir);
-+	sprintf(mesh_local_config_filename, "%s", mesh_dir);
- 
- 	if (extra)
- 		sprintf(mesh_local_config_filename + len , "%c", '/');
-@@ -1946,7 +1954,6 @@ int main(int argc, char *argv[])
- 	sprintf(mesh_local_config_filename + len + extra, "%s",
- 							"local_node.json");
- 	len = len + extra + strlen("local_node.json");
--	sprintf(mesh_local_config_filename + len, "%c", '\0');
- 
- 	if (!prov_db_read_local_node(mesh_local_config_filename, true)) {
- 		g_printerr("Failed to parse local node configuration file %s\n",
-@@ -1954,14 +1961,15 @@ int main(int argc, char *argv[])
- 		goto fail;
- 	}
- 
--	sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
--	len = strlen(mesh_config_dir);
-+	sprintf(mesh_prov_db_filename, "%s", mesh_dir);
-+	len = strlen(mesh_dir);
-+
-+	g_free(mesh_dir);
-+
- 	if (extra)
- 		sprintf(mesh_prov_db_filename + len , "%c", '/');
- 
- 	sprintf(mesh_prov_db_filename + len + extra, "%s", "prov_db.json");
--	sprintf(mesh_prov_db_filename + len + extra + strlen("prov_db.json"),
--								"%c", '\0');
- 
- 	if (!prov_db_read(mesh_prov_db_filename)) {
- 		g_printerr("Failed to parse provisioning database file %s\n",
-@@ -2006,5 +2014,7 @@ int main(int argc, char *argv[])
- 
- fail:
- 	bt_shell_cleanup();
-+	g_free(mesh_dir);
-+
- 	return EXIT_FAILURE;
- }
--- 
-2.14.4
+SGkgUmF1bCwNCg0KT24gVHVlLCAyMDE4LTA4LTIxIGF0IDAxOjE0ICswNTMwLCBSYXVsIFBpcGVy
+IHdyb3RlOg0KPiBIZWxsbyBJbmdhLA0KPiBBdHRhY2hlZCwNCj4gUmdkcywNCj4gUnANCj4gDQo+
+IE9uIFR1ZSwgQXVnIDIxLCAyMDE4IGF0IDEyOjQ2IEFNLCBTdG90bGFuZCwgSW5nYQ0KPiA8aW5n
+YS5zdG90bGFuZEBpbnRlbC5jb20+IHdyb3RlOg0KPiA+IEhpIFJhdWwsDQo+ID4gDQo+ID4gT24g
+VHVlLCAyMDE4LTA4LTIxIGF0IDAwOjEzICswNTMwLCBSYXVsIFBpcGVyIHdyb3RlOg0KPiA+ID4g
+SGVsbG8gSW5nYSwNCj4gPiA+IGl0IGdpdmVzIHRoZSBiZWxvdyBsb2dzIDoNCj4gPiA+IA0KPiA+
+ID4gcGlAcmFzcGJlcnJ5cGk6fi9ibHVlWiAkIG1lc2hjdGwgLWMgbWVzaA0KPiA+ID4gDQo+ID4g
+PiBGYWlsZWQgdG8gcGFyc2UgbG9jYWwgbm9kZSBjb25maWd1cmF0aW9uIGZpbGUNCj4gPiA+IG1l
+c2gvbG9jYWxfbm9kZS5qc29uDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiBwaUByYXNw
+YmVycnlwaTp+L2JsdWVaICQgbWVzaGN0bCAtdg0KPiA+ID4gDQo+ID4gPiBtZXNoY3RsOiA1LjUw
+DQo+ID4gPiANCj4gPiA+IGkgbmVlZCB0byBkbyBleHBvcnQgYmVmb3JlIGV4ZWN1dGluZyBhYm92
+ZSBjb21tYW5kcw0KPiA+ID4gDQo+ID4gPiBwaUByYXNwYmVycnlwaTp+ICQgTERfTElCUkFSWV9Q
+QVRIPS91c3IvbG9jYWwvbGliDQo+ID4gPiANCj4gPiA+IHBpQHJhc3BiZXJyeXBpOn4gJCBleHBv
+cnQgTERfTElCUkFSWV9QQVRIDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiB0byBhdm9p
+ZCB0aGUgYmVsb3cgZXJyb3IgOg0KPiA+ID4gDQo+ID4gPiBwaUByYXNwYmVycnlwaTp+ICQgbWVz
+aGN0bCAtdg0KPiA+ID4gDQo+ID4gPiBtZXNoY3RsOiBlcnJvciB3aGlsZSBsb2FkaW5nIHNoYXJl
+ZCBsaWJyYXJpZXM6IGxpYmpzb24tYy5zby40Og0KPiA+ID4gY2Fubm90DQo+ID4gPiBvcGVuIHNo
+YXJlZCBvYmplY3QgZmlsZTogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQ0KPiA+ID4gDQo+ID4g
+PiANCj4gPiA+IGNhbiB5b3UgcGxlYXNlIGFzc2lzdD8NCj4gPiA+IG9yIGFueSAgZXhwZXJpbWVu
+dGFsIHBhdGNoIEkgY291bGQgdXNlIG9uIEJsdWVaDQo+ID4gPiANCj4gPiA+IFRoYW5rcyBpbiBh
+ZHZhbmNlDQo+ID4gPiBCZXN0IFJlZ2FyZHMsDQo+ID4gPiBScA0KPiA+ID4gDQo+ID4gPiBPbiBN
+b24sIEF1ZyAyMCwgMjAxOCBhdCAzOjA2IEFNLCBTdG90bGFuZCwgSW5nYSA8aW5nYS5zdG90bGFu
+ZEBpbg0KPiA+ID4gdGVsLg0KPiA+ID4gY29tPiB3cm90ZToNCj4gPiA+ID4gSGkgUmF1bCwNCj4g
+PiA+ID4gT24gU3VuLCAyMDE4LTA4LTE5IGF0IDAzOjAzICswNTMwLCBSYXVsIFBpcGVyIHdyb3Rl
+Og0KPiA+ID4gPiA+IEhlbGxvICwNCj4gPiA+ID4gPiBJIGhhdmUgYnVpbHQgYW5kIEJsdWVaIDUu
+NTAgZnJvbSB0aGUgc291cmNlIGFuZCBpbnN0YWxsZWQgaXQNCj4gPiA+ID4gPiBvbg0KPiA+ID4g
+PiA+IHJhc3BiZXJyeSBQSSAzIFcwLCBidXQgd2hlbiBJIGFtIHRyeWluZyB0byBsYXVuY2ggdGhl
+IG1lc2hjdGwNCj4gPiA+ID4gPiB0b29sIC0NCj4gPiA+ID4gPiB1c2luZyAuL21lc2hjdGwgKGZy
+b20gd2l0aGluIG9yIG91dCBzaWRlIHRoZSBtZXNoIGRpcmVjdG9yeSkNCj4gPiA+ID4gPiBpIGFt
+DQo+ID4gPiA+ID4gZ2V0dGluZyB0aGUgYmVsb3cgZXJyb3IgIDoNCj4gPiA+ID4gPiANCj4gPiA+
+ID4gPiBGYWlsZWQgdG8gcGFyc2UgcHJvdmlzaW9uaW5nIGRhdGFiYXNlIGZpbGUgcHJvdl9kYi5q
+c29uDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gSSBjaGVja2VkIHRoZSBvbmxpbmUgc2FuaXR5IG9u
+ZnRoZSBhYm92ZSBqc29uIGZpbGUgYW5kIGl0DQo+ID4gPiA+ID4gc2VlbXMNCj4gPiA+ID4gPiBj
+b3JyZWN0Lg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IEkg
+dHJpZWQgZG9pbmcgdGhlIHN1ZG8gaGNpdG9vbCAtbGVzY2FuIC0gaXQgc2hvd3MgdGhlIExFDQo+
+ID4gPiA+ID4gZGV2aWNlcw0KPiA+ID4gPiA+IGFuZCBhbHNvDQo+ID4gPiA+ID4gDQo+ID4gPiA+
+ID4gYmx1ZXRvb3RoZCAtdiBnaXZlcyA1LjUwIHdoaWNoIHNob3dzIG15IGNvbXBpbGF0aW9uIGFu
+ZA0KPiA+ID4gPiA+IGxvYWRpbmcNCj4gPiA+ID4gPiBvZiB0aGUNCj4gPiA+ID4gPiBuZXcgQmx1
+ZVogaXMgYWx0ZWFzdCBjb3JyZWN0Lg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IEkgaGF2ZSBhbHJl
+YWR5IGluc3RhbGxlZCB0aGUgYy1qc29uIGxpYiAuDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gSXMg
+dGhpcyBhIGJ1ZyBpbiBtZXNoY3RsPw0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IFBsZWFzZSBhc3Np
+c3QgIQ0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IFRoYW5rcyBpbiBBZHZhbmNl
+ICENCj4gPiA+ID4gDQo+ID4gPiA+IEFyZSB5b3UgdXNpbmcgdGhlIGRlZmF1bHQganNvbiBmaWxl
+PyBJZiBzbywgdGhlcmUncyBhIGJ1ZyBpbg0KPiA+ID4gPiBtZXNoY3RsDQo+ID4gPiA+IGZvciBy
+ZWFkaW5nIGZyb20gZGVmYXVsdCBsb2NhdGlvbiAoanVzdCBzdWJpbW10ZWQgYSBwYXRjaCBmb3IN
+Cj4gPiA+ID4gdGhhdCkuDQo+ID4gPiA+IA0KPiA+ID4gPiBNZWFud2hpbGUsIHRyeSBydW5uaW5n
+Og0KPiA+ID4gPiAgLi9tZXNoY3RsIC1jIG1lc2gNCj4gPiA+ID4gDQo+ID4gPiA+IFJlZ2FyZHMs
+DQo+ID4gPiA+IEluZ2ENCj4gPiA+ID4gDQo+ID4gDQo+ID4gSSBhbSBub3QgYW4gZXhwZXJ0IG9u
+IHN5c3RlbSBzZXR1cCwgYnV0IGNvdWxkIHlvdSBwbGVhc2UgcnVuDQo+ID4gc3VkbyAvc2Jpbi9s
+ZGNvbmZpZyAtdg0KPiA+IA0KPiA+IFJlZ2FyZHMsDQo+ID4gSW5nYQ0KPiANCj4gDQoNClRoZXJl
+IGlzIG5vIHJlY29yZCBvZiBsaWJqc29uLWMgaW4geW91ciBsZGNvbmZpZyBvdXRwdXQuIFNvIG15
+IGd1ZXNzDQp3b3VsZCBiZSB0aGF0IHNvbWV0aGluZyBpcyB0byBkbyB3aXRoIHRoZSBpbnN0YWxs
+YXRpb24gb2YganNvbi1jDQpsaWJyYXJ5IG9uIHJwaS4NCg0KSWYgeW91IGhhZCB0byBidWlsZCB0
+aGUganNvbi1jIGZyb20gc291cmNlIGFuZCB0aGVuIHJ1biBtYWtlIGluc3RhbGwsDQp5b3UgbWF5
+IHdhbnQgdG8gbW9kaWZ5IHRoZSBpbnN0YWxsYXRpb24gcGF0aCB0byBiZSBzb21ldGhpbmcgc3Rh
+bmRhcmQNCm9uIHlvdXIgc3lzdGVtIGZyb20gd2hlcmUgbGRjb25maWcgd2lsbCBiZSBhYmxlIHRv
+IHBpY2sgaXQgdXAuDQouL2NvbmZpZ3VyZSAtLXByZWZpeD0vc29tZXdoZXJlL25vdC91c3IvbG9j
+YWwgcHJpb3IgdG8gbWFrZSBpbnN0YWxsDQoNCkFsdGVybmF0aXZlbHksIHlvdSBtYXkgdHJ5IHRv
+IHJ1biB0aGlzIGNvbW1hbmQ6DQogDQogbGRjb25maWcgLWwgL3BhdGgtdG8tbGlianNvbi1jLnNv
+Lnh4eA0KDQpSZS1ydW4gbGRjb25maWcgYWZ0ZXJ3YXJkcyBhbmQgc2VlIGlmIHRoZSBsaWJqc29u
+LWMgc2hvd2VkIHVwLg0KDQpSZWdhcmRzLA0KDQpJbmdhDQoNClAuUy4gSnVzdCBGWUksIHRoZSBz
+dGFuZGFyZCB3YXkgdG8gcmVzcG9uZCB0byBlbWFpbHMgb24gYmx1ZXogbWFpbGluZw0KbGlzdCBp
+cyB0byBpbmNsdWRlIHRoZSBib2R5IG9mIHlvdSByZXBseSBhdCB0aGUgdGFpbCBvZiB0aGUgbWVz
+c2FnZS4NCg0K
