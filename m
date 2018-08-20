@@ -1,56 +1,90 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Stotland, Inga" <inga.stotland@intel.com>
-To: "raulpblooper@gmail.com" <raulpblooper@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <1534714610.5879.11.camel@intel.com>
+References: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
+ <1534714610.5879.11.camel@intel.com>
+From: Raul Piper <raulpblooper@gmail.com>
+Date: Tue, 21 Aug 2018 00:13:05 +0530
+Message-ID: <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
 Subject: Re: Failed to parse provisioning database file prov_db.json :
  BlueZ,Meshctl V5.50
-Date: Mon, 20 Aug 2018 19:16:47 +0000
-Message-ID: <1534792605.5879.17.camel@intel.com>
-References: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
-         <1534714610.5879.11.camel@intel.com>
-         <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
-In-Reply-To: <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+To: "Stotland, Inga" <inga.stotland@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgUmF1bCwNCg0KT24gVHVlLCAyMDE4LTA4LTIxIGF0IDAwOjEzICswNTMwLCBSYXVsIFBpcGVy
-IHdyb3RlOg0KPiBIZWxsbyBJbmdhLA0KPiBpdCBnaXZlcyB0aGUgYmVsb3cgbG9ncyA6DQo+IA0K
-PiBwaUByYXNwYmVycnlwaTp+L2JsdWVaICQgbWVzaGN0bCAtYyBtZXNoDQo+IA0KPiBGYWlsZWQg
-dG8gcGFyc2UgbG9jYWwgbm9kZSBjb25maWd1cmF0aW9uIGZpbGUgbWVzaC9sb2NhbF9ub2RlLmpz
-b24NCj4gDQo+IA0KPiANCj4gcGlAcmFzcGJlcnJ5cGk6fi9ibHVlWiAkIG1lc2hjdGwgLXYNCj4g
-DQo+IG1lc2hjdGw6IDUuNTANCj4gDQo+IGkgbmVlZCB0byBkbyBleHBvcnQgYmVmb3JlIGV4ZWN1
-dGluZyBhYm92ZSBjb21tYW5kcw0KPiANCj4gcGlAcmFzcGJlcnJ5cGk6fiAkIExEX0xJQlJBUllf
-UEFUSD0vdXNyL2xvY2FsL2xpYg0KPiANCj4gcGlAcmFzcGJlcnJ5cGk6fiAkIGV4cG9ydCBMRF9M
-SUJSQVJZX1BBVEgNCj4gDQo+IA0KPiANCj4gdG8gYXZvaWQgdGhlIGJlbG93IGVycm9yIDoNCj4g
-DQo+IHBpQHJhc3BiZXJyeXBpOn4gJCBtZXNoY3RsIC12DQo+IA0KPiBtZXNoY3RsOiBlcnJvciB3
-aGlsZSBsb2FkaW5nIHNoYXJlZCBsaWJyYXJpZXM6IGxpYmpzb24tYy5zby40OiBjYW5ub3QNCj4g
-b3BlbiBzaGFyZWQgb2JqZWN0IGZpbGU6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkNCj4gDQo+
-IA0KPiBjYW4geW91IHBsZWFzZSBhc3Npc3Q/DQo+IG9yIGFueSAgZXhwZXJpbWVudGFsIHBhdGNo
-IEkgY291bGQgdXNlIG9uIEJsdWVaDQo+IA0KPiBUaGFua3MgaW4gYWR2YW5jZQ0KPiBCZXN0IFJl
-Z2FyZHMsDQo+IFJwDQo+IA0KPiBPbiBNb24sIEF1ZyAyMCwgMjAxOCBhdCAzOjA2IEFNLCBTdG90
-bGFuZCwgSW5nYSA8aW5nYS5zdG90bGFuZEBpbnRlbC4NCj4gY29tPiB3cm90ZToNCj4gPiBIaSBS
-YXVsLA0KPiA+IE9uIFN1biwgMjAxOC0wOC0xOSBhdCAwMzowMyArMDUzMCwgUmF1bCBQaXBlciB3
-cm90ZToNCj4gPiA+IEhlbGxvICwNCj4gPiA+IEkgaGF2ZSBidWlsdCBhbmQgQmx1ZVogNS41MCBm
-cm9tIHRoZSBzb3VyY2UgYW5kIGluc3RhbGxlZCBpdCBvbg0KPiA+ID4gcmFzcGJlcnJ5IFBJIDMg
-VzAsIGJ1dCB3aGVuIEkgYW0gdHJ5aW5nIHRvIGxhdW5jaCB0aGUgbWVzaGN0bA0KPiA+ID4gdG9v
-bCAtDQo+ID4gPiB1c2luZyAuL21lc2hjdGwgKGZyb20gd2l0aGluIG9yIG91dCBzaWRlIHRoZSBt
-ZXNoIGRpcmVjdG9yeSkgaSBhbQ0KPiA+ID4gZ2V0dGluZyB0aGUgYmVsb3cgZXJyb3IgIDoNCj4g
-PiA+IA0KPiA+ID4gRmFpbGVkIHRvIHBhcnNlIHByb3Zpc2lvbmluZyBkYXRhYmFzZSBmaWxlIHBy
-b3ZfZGIuanNvbg0KPiA+ID4gDQo+ID4gPiBJIGNoZWNrZWQgdGhlIG9ubGluZSBzYW5pdHkgb25m
-dGhlIGFib3ZlIGpzb24gZmlsZSBhbmQgaXQgc2VlbXMNCj4gPiA+IGNvcnJlY3QuDQo+ID4gPiAN
-Cj4gPiA+IA0KPiA+ID4gDQo+ID4gPiBJIHRyaWVkIGRvaW5nIHRoZSBzdWRvIGhjaXRvb2wgLWxl
-c2NhbiAtIGl0IHNob3dzIHRoZSBMRSBkZXZpY2VzDQo+ID4gPiBhbmQgYWxzbw0KPiA+ID4gDQo+
-ID4gPiBibHVldG9vdGhkIC12IGdpdmVzIDUuNTAgd2hpY2ggc2hvd3MgbXkgY29tcGlsYXRpb24g
-YW5kIGxvYWRpbmcNCj4gPiA+IG9mIHRoZQ0KPiA+ID4gbmV3IEJsdWVaIGlzIGFsdGVhc3QgY29y
-cmVjdC4NCj4gPiA+IA0KPiA+ID4gSSBoYXZlIGFscmVhZHkgaW5zdGFsbGVkIHRoZSBjLWpzb24g
-bGliIC4NCj4gPiA+IA0KPiA+ID4gSXMgdGhpcyBhIGJ1ZyBpbiBtZXNoY3RsPw0KPiA+ID4gDQo+
-ID4gPiBQbGVhc2UgYXNzaXN0ICENCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiBUaGFua3MgaW4gQWR2
-YW5jZSAhDQo+ID4gDQo+ID4gQXJlIHlvdSB1c2luZyB0aGUgZGVmYXVsdCBqc29uIGZpbGU/IElm
-IHNvLCB0aGVyZSdzIGEgYnVnIGluDQo+ID4gbWVzaGN0bA0KPiA+IGZvciByZWFkaW5nIGZyb20g
-ZGVmYXVsdCBsb2NhdGlvbiAoanVzdCBzdWJpbW10ZWQgYSBwYXRjaCBmb3INCj4gPiB0aGF0KS4N
-Cj4gPiANCj4gPiBNZWFud2hpbGUsIHRyeSBydW5uaW5nOg0KPiA+ICAuL21lc2hjdGwgLWMgbWVz
-aA0KPiA+IA0KPiA+IFJlZ2FyZHMsDQo+ID4gSW5nYQ0KPiA+IA0KPiANCg0KSSBhbSBub3QgYW4g
-ZXhwZXJ0IG9uIHN5c3RlbSBzZXR1cCwgYnV0IGNvdWxkIHlvdSBwbGVhc2UgcnVuDQpzdWRvIC9z
-YmluL2xkY29uZmlnIC12DQoNClJlZ2FyZHMsDQpJbmdhDQo=
+Hello Inga,
+it gives the below logs :
+
+pi@raspberrypi:~/blueZ $ meshctl -c mesh
+
+Failed to parse local node configuration file mesh/local_node.json
+
+
+
+pi@raspberrypi:~/blueZ $ meshctl -v
+
+meshctl: 5.50
+
+i need to do export before executing above commands
+
+pi@raspberrypi:~ $ LD_LIBRARY_PATH=/usr/local/lib
+
+pi@raspberrypi:~ $ export LD_LIBRARY_PATH
+
+
+
+to avoid the below error :
+
+pi@raspberrypi:~ $ meshctl -v
+
+meshctl: error while loading shared libraries: libjson-c.so.4: cannot
+open shared object file: No such file or directory
+
+
+can you please assist?
+or any  experimental patch I could use on BlueZ
+
+Thanks in advance
+Best Regards,
+Rp
+
+On Mon, Aug 20, 2018 at 3:06 AM, Stotland, Inga <inga.stotland@intel.com> wrote:
+> Hi Raul,
+> On Sun, 2018-08-19 at 03:03 +0530, Raul Piper wrote:
+>> Hello ,
+>> I have built and BlueZ 5.50 from the source and installed it on
+>> raspberry PI 3 W0, but when I am trying to launch the meshctl tool -
+>> using ./meshctl (from within or out side the mesh directory) i am
+>> getting the below error  :
+>>
+>> Failed to parse provisioning database file prov_db.json
+>>
+>> I checked the online sanity onfthe above json file and it seems correct.
+>>
+>>
+>>
+>> I tried doing the sudo hcitool -lescan - it shows the LE devices and also
+>>
+>> bluetoothd -v gives 5.50 which shows my compilation and loading of the
+>> new BlueZ is alteast correct.
+>>
+>> I have already installed the c-json lib .
+>>
+>> Is this a bug in meshctl?
+>>
+>> Please assist !
+>>
+>>
+>> Thanks in Advance !
+>
+> Are you using the default json file? If so, there's a bug in meshctl
+> for reading from default location (just subimmted a patch for that).
+>
+> Meanwhile, try running:
+>  ./meshctl -c mesh
+>
+> Regards,
+> Inga
+>
