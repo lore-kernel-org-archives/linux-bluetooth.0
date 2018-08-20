@@ -1,83 +1,43 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Stotland, Inga" <inga.stotland@intel.com>
-To: "raulpblooper@gmail.com" <raulpblooper@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Failed to parse provisioning database file prov_db.json :
- BlueZ,Meshctl V5.50
-Date: Mon, 20 Aug 2018 21:07:50 +0000
-Message-ID: <1534799268.5879.34.camel@intel.com>
-References: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
-         <1534714610.5879.11.camel@intel.com>
-         <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
-         <1534792605.5879.17.camel@intel.com>
-         <CAEwN+MBxzZg8UyeqTfRPizfzjH07iD6_hL=7UPxHw1ZnOC8gMA@mail.gmail.com>
-In-Reply-To: <CAEwN+MBxzZg8UyeqTfRPizfzjH07iD6_hL=7UPxHw1ZnOC8gMA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <geert.uytterhoeven@gmail.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+References: <20180814095707.5674-1-hdegoede@redhat.com>
+In-Reply-To: <20180814095707.5674-1-hdegoede@redhat.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 20 Aug 2018 22:54:50 +0200
+Message-ID: <CAMuHMdUbbgtEEdZ-nm5i+Z7QejnaK7LQWtMUe_ysYau_08gg0w@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Make BT_HCIUART_RTL configuration option
+ depend on ACPI
+To: Hans de Goede <hdegoede@redhat.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>, jeremy@jcline.org,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	"open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+	ACPI Devel Maling List <linux-acpi@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgUmF1bCwNCg0KT24gVHVlLCAyMDE4LTA4LTIxIGF0IDAxOjE0ICswNTMwLCBSYXVsIFBpcGVy
-IHdyb3RlOg0KPiBIZWxsbyBJbmdhLA0KPiBBdHRhY2hlZCwNCj4gUmdkcywNCj4gUnANCj4gDQo+
-IE9uIFR1ZSwgQXVnIDIxLCAyMDE4IGF0IDEyOjQ2IEFNLCBTdG90bGFuZCwgSW5nYQ0KPiA8aW5n
-YS5zdG90bGFuZEBpbnRlbC5jb20+IHdyb3RlOg0KPiA+IEhpIFJhdWwsDQo+ID4gDQo+ID4gT24g
-VHVlLCAyMDE4LTA4LTIxIGF0IDAwOjEzICswNTMwLCBSYXVsIFBpcGVyIHdyb3RlOg0KPiA+ID4g
-SGVsbG8gSW5nYSwNCj4gPiA+IGl0IGdpdmVzIHRoZSBiZWxvdyBsb2dzIDoNCj4gPiA+IA0KPiA+
-ID4gcGlAcmFzcGJlcnJ5cGk6fi9ibHVlWiAkIG1lc2hjdGwgLWMgbWVzaA0KPiA+ID4gDQo+ID4g
-PiBGYWlsZWQgdG8gcGFyc2UgbG9jYWwgbm9kZSBjb25maWd1cmF0aW9uIGZpbGUNCj4gPiA+IG1l
-c2gvbG9jYWxfbm9kZS5qc29uDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiBwaUByYXNw
-YmVycnlwaTp+L2JsdWVaICQgbWVzaGN0bCAtdg0KPiA+ID4gDQo+ID4gPiBtZXNoY3RsOiA1LjUw
-DQo+ID4gPiANCj4gPiA+IGkgbmVlZCB0byBkbyBleHBvcnQgYmVmb3JlIGV4ZWN1dGluZyBhYm92
-ZSBjb21tYW5kcw0KPiA+ID4gDQo+ID4gPiBwaUByYXNwYmVycnlwaTp+ICQgTERfTElCUkFSWV9Q
-QVRIPS91c3IvbG9jYWwvbGliDQo+ID4gPiANCj4gPiA+IHBpQHJhc3BiZXJyeXBpOn4gJCBleHBv
-cnQgTERfTElCUkFSWV9QQVRIDQo+ID4gPiANCj4gPiA+IA0KPiA+ID4gDQo+ID4gPiB0byBhdm9p
-ZCB0aGUgYmVsb3cgZXJyb3IgOg0KPiA+ID4gDQo+ID4gPiBwaUByYXNwYmVycnlwaTp+ICQgbWVz
-aGN0bCAtdg0KPiA+ID4gDQo+ID4gPiBtZXNoY3RsOiBlcnJvciB3aGlsZSBsb2FkaW5nIHNoYXJl
-ZCBsaWJyYXJpZXM6IGxpYmpzb24tYy5zby40Og0KPiA+ID4gY2Fubm90DQo+ID4gPiBvcGVuIHNo
-YXJlZCBvYmplY3QgZmlsZTogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQ0KPiA+ID4gDQo+ID4g
-PiANCj4gPiA+IGNhbiB5b3UgcGxlYXNlIGFzc2lzdD8NCj4gPiA+IG9yIGFueSAgZXhwZXJpbWVu
-dGFsIHBhdGNoIEkgY291bGQgdXNlIG9uIEJsdWVaDQo+ID4gPiANCj4gPiA+IFRoYW5rcyBpbiBh
-ZHZhbmNlDQo+ID4gPiBCZXN0IFJlZ2FyZHMsDQo+ID4gPiBScA0KPiA+ID4gDQo+ID4gPiBPbiBN
-b24sIEF1ZyAyMCwgMjAxOCBhdCAzOjA2IEFNLCBTdG90bGFuZCwgSW5nYSA8aW5nYS5zdG90bGFu
-ZEBpbg0KPiA+ID4gdGVsLg0KPiA+ID4gY29tPiB3cm90ZToNCj4gPiA+ID4gSGkgUmF1bCwNCj4g
-PiA+ID4gT24gU3VuLCAyMDE4LTA4LTE5IGF0IDAzOjAzICswNTMwLCBSYXVsIFBpcGVyIHdyb3Rl
-Og0KPiA+ID4gPiA+IEhlbGxvICwNCj4gPiA+ID4gPiBJIGhhdmUgYnVpbHQgYW5kIEJsdWVaIDUu
-NTAgZnJvbSB0aGUgc291cmNlIGFuZCBpbnN0YWxsZWQgaXQNCj4gPiA+ID4gPiBvbg0KPiA+ID4g
-PiA+IHJhc3BiZXJyeSBQSSAzIFcwLCBidXQgd2hlbiBJIGFtIHRyeWluZyB0byBsYXVuY2ggdGhl
-IG1lc2hjdGwNCj4gPiA+ID4gPiB0b29sIC0NCj4gPiA+ID4gPiB1c2luZyAuL21lc2hjdGwgKGZy
-b20gd2l0aGluIG9yIG91dCBzaWRlIHRoZSBtZXNoIGRpcmVjdG9yeSkNCj4gPiA+ID4gPiBpIGFt
-DQo+ID4gPiA+ID4gZ2V0dGluZyB0aGUgYmVsb3cgZXJyb3IgIDoNCj4gPiA+ID4gPiANCj4gPiA+
-ID4gPiBGYWlsZWQgdG8gcGFyc2UgcHJvdmlzaW9uaW5nIGRhdGFiYXNlIGZpbGUgcHJvdl9kYi5q
-c29uDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gSSBjaGVja2VkIHRoZSBvbmxpbmUgc2FuaXR5IG9u
-ZnRoZSBhYm92ZSBqc29uIGZpbGUgYW5kIGl0DQo+ID4gPiA+ID4gc2VlbXMNCj4gPiA+ID4gPiBj
-b3JyZWN0Lg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IEkg
-dHJpZWQgZG9pbmcgdGhlIHN1ZG8gaGNpdG9vbCAtbGVzY2FuIC0gaXQgc2hvd3MgdGhlIExFDQo+
-ID4gPiA+ID4gZGV2aWNlcw0KPiA+ID4gPiA+IGFuZCBhbHNvDQo+ID4gPiA+ID4gDQo+ID4gPiA+
-ID4gYmx1ZXRvb3RoZCAtdiBnaXZlcyA1LjUwIHdoaWNoIHNob3dzIG15IGNvbXBpbGF0aW9uIGFu
-ZA0KPiA+ID4gPiA+IGxvYWRpbmcNCj4gPiA+ID4gPiBvZiB0aGUNCj4gPiA+ID4gPiBuZXcgQmx1
-ZVogaXMgYWx0ZWFzdCBjb3JyZWN0Lg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IEkgaGF2ZSBhbHJl
-YWR5IGluc3RhbGxlZCB0aGUgYy1qc29uIGxpYiAuDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gSXMg
-dGhpcyBhIGJ1ZyBpbiBtZXNoY3RsPw0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IFBsZWFzZSBhc3Np
-c3QgIQ0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IFRoYW5rcyBpbiBBZHZhbmNl
-ICENCj4gPiA+ID4gDQo+ID4gPiA+IEFyZSB5b3UgdXNpbmcgdGhlIGRlZmF1bHQganNvbiBmaWxl
-PyBJZiBzbywgdGhlcmUncyBhIGJ1ZyBpbg0KPiA+ID4gPiBtZXNoY3RsDQo+ID4gPiA+IGZvciBy
-ZWFkaW5nIGZyb20gZGVmYXVsdCBsb2NhdGlvbiAoanVzdCBzdWJpbW10ZWQgYSBwYXRjaCBmb3IN
-Cj4gPiA+ID4gdGhhdCkuDQo+ID4gPiA+IA0KPiA+ID4gPiBNZWFud2hpbGUsIHRyeSBydW5uaW5n
-Og0KPiA+ID4gPiAgLi9tZXNoY3RsIC1jIG1lc2gNCj4gPiA+ID4gDQo+ID4gPiA+IFJlZ2FyZHMs
-DQo+ID4gPiA+IEluZ2ENCj4gPiA+ID4gDQo+ID4gDQo+ID4gSSBhbSBub3QgYW4gZXhwZXJ0IG9u
-IHN5c3RlbSBzZXR1cCwgYnV0IGNvdWxkIHlvdSBwbGVhc2UgcnVuDQo+ID4gc3VkbyAvc2Jpbi9s
-ZGNvbmZpZyAtdg0KPiA+IA0KPiA+IFJlZ2FyZHMsDQo+ID4gSW5nYQ0KPiANCj4gDQoNClRoZXJl
-IGlzIG5vIHJlY29yZCBvZiBsaWJqc29uLWMgaW4geW91ciBsZGNvbmZpZyBvdXRwdXQuIFNvIG15
-IGd1ZXNzDQp3b3VsZCBiZSB0aGF0IHNvbWV0aGluZyBpcyB0byBkbyB3aXRoIHRoZSBpbnN0YWxs
-YXRpb24gb2YganNvbi1jDQpsaWJyYXJ5IG9uIHJwaS4NCg0KSWYgeW91IGhhZCB0byBidWlsZCB0
-aGUganNvbi1jIGZyb20gc291cmNlIGFuZCB0aGVuIHJ1biBtYWtlIGluc3RhbGwsDQp5b3UgbWF5
-IHdhbnQgdG8gbW9kaWZ5IHRoZSBpbnN0YWxsYXRpb24gcGF0aCB0byBiZSBzb21ldGhpbmcgc3Rh
-bmRhcmQNCm9uIHlvdXIgc3lzdGVtIGZyb20gd2hlcmUgbGRjb25maWcgd2lsbCBiZSBhYmxlIHRv
-IHBpY2sgaXQgdXAuDQouL2NvbmZpZ3VyZSAtLXByZWZpeD0vc29tZXdoZXJlL25vdC91c3IvbG9j
-YWwgcHJpb3IgdG8gbWFrZSBpbnN0YWxsDQoNCkFsdGVybmF0aXZlbHksIHlvdSBtYXkgdHJ5IHRv
-IHJ1biB0aGlzIGNvbW1hbmQ6DQogDQogbGRjb25maWcgLWwgL3BhdGgtdG8tbGlianNvbi1jLnNv
-Lnh4eA0KDQpSZS1ydW4gbGRjb25maWcgYWZ0ZXJ3YXJkcyBhbmQgc2VlIGlmIHRoZSBsaWJqc29u
-LWMgc2hvd2VkIHVwLg0KDQpSZWdhcmRzLA0KDQpJbmdhDQoNClAuUy4gSnVzdCBGWUksIHRoZSBz
-dGFuZGFyZCB3YXkgdG8gcmVzcG9uZCB0byBlbWFpbHMgb24gYmx1ZXogbWFpbGluZw0KbGlzdCBp
-cyB0byBpbmNsdWRlIHRoZSBib2R5IG9mIHlvdSByZXBseSBhdCB0aGUgdGFpbCBvZiB0aGUgbWVz
-c2FnZS4NCg0K
+On Tue, Aug 14, 2018 at 12:01 PM Hans de Goede <hdegoede@redhat.com> wrote:
+> At the moment we only support ACPI enumeration for serial port attached
+> RTL bluetooth controllers.
+>
+> This commit adds a dependency on ACPI to the BT_HCIUART_RTL configuration
+> option, fixing the following warning when ACPI is not enabled:
+>
+> drivers/bluetooth/hci_h5.c:920:22: warning: 'rtl_vnd' defined but not used
+>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Reported-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
