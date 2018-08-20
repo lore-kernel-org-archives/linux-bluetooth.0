@@ -1,52 +1,83 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: <sean.wang@mediatek.com>
-To: <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH v2 0/2] Bluetooth: mediatek: Add protocol support for MediaTek USB devices
-Date: Mon, 20 Aug 2018 17:12:53 +0800
-Message-ID: <cover.1534752578.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20180819213026.28429-1-inga.stotland@intel.com>
+References: <20180819213026.28429-1-inga.stotland@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 20 Aug 2018 11:01:46 +0300
+Message-ID: <CABBYNZKZii3sQv-mv-xyiko9t=KaV7iQ2v8Arat5sR5NbNM-sA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] tools/meshctl: Fix default directory for JSON files
+To: Inga Stotland <inga.stotland@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sean Wang <sean.wang@mediatek.com>
+Hi Inga,
 
-v2:
+On Mon, Aug 20, 2018 at 12:30 AM, Inga Stotland <inga.stotland@intel.com> wrote:
+> This fixes the name of default directory that contains sample JSON files.
 
-add fixes and enhancements based on [1]
-* include /sys/kernel/debug/usb/devices portion in the commit message.
-* turn default into n for config BT_HCIBTUSB_MTK in Kconfig
-* only add MediaTek support to btusb.c
-* drop cmd_sync callback usage
-* use __hci_cmd_send to send WMT commands
-* add wait event handling similar to what is being done in btmtkuart.c
-* submit a control IN URB similar to interrupt IN URB on demand for the WMT
-  commands during setup 
-* add cosmetic changes
+Just a note regarding modifying/using files on the tree, as we
+experience here it is a bad idea since once we move or it is changed
+this code would have to be changed as well. Also I remember commenting
+that if the configuration is changed by meshctl your tree will then
+contain changes that shall not be applied, so instead of changing the
+file in place Id make a default location something like
+~/.config/meshctl/ and copy over the .json files there if they don't
+exist, that way we avoid having to carry changes in the tree.
 
-[1]
-http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014650.html
-http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014656.html
+> ---
+>  tools/meshctl.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
+>
+> diff --git a/tools/meshctl.c b/tools/meshctl.c
+> index 3e1484f61..a8468b716 100644
+> --- a/tools/meshctl.c
+> +++ b/tools/meshctl.c
+> @@ -1913,21 +1913,20 @@ int main(int argc, char *argv[])
+>         bt_shell_set_prompt(PROMPT_OFF);
+>
+>         if (!mesh_config_dir) {
+> -               bt_shell_printf("Local config directory not provided.\n");
+> -               mesh_config_dir = "";
+> -       } else {
+> -               bt_shell_printf("Reading prov_db.json and local_node.json from"
+> -                               " %s\n", mesh_config_dir);
+> +               printf("Local config directory not provided.\n");
+> +               mesh_config_dir = "mesh";
+>         }
+>
+> +       printf("Reading prov_db.json and local_node.json from"
+> +                               " %s directory\n", mesh_config_dir);
+> +
+>         len = strlen(mesh_config_dir);
+> -       if (len && mesh_config_dir[len - 1] != '/') {
+> +
+> +       if (len && mesh_config_dir[len - 1] != '/')
+>                 extra = 1;
+> -               bt_shell_printf("mesh_config_dir[%d] %s\n", len,
+> -                                               &mesh_config_dir[len - 1]);
+> -       } else {
+> +       else
+>                 extra = 0;
+> -       }
+> +
+>         mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
+>                                                                         + 2);
+>         if (!mesh_local_config_filename)
+> @@ -1956,6 +1955,7 @@ int main(int argc, char *argv[])
+>
+>         sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
+>         len = strlen(mesh_config_dir);
+> +
+>         if (extra)
+>                 sprintf(mesh_prov_db_filename + len , "%c", '/');
+>
+> --
+> 2.14.4
+>
 
-v1:
 
-This adds the support of enabling MT7668U and MT7663U Bluetooth
-function running on the top of btusb driver. The patch also adds
-a newly created file mtkbt.c able to be reused independently from
-the transport type such as UART, USB and SDIO.
-
-Sean Wang (2):
-  Bluetooth: mediatek: Add protocol support for MediaTek MT7668U USB
-    devices
-  Bluetooth: mediatek: Add protocol support for MediaTek MT7663U USB
-    devices
-
- drivers/bluetooth/Kconfig |  11 +
- drivers/bluetooth/btusb.c | 554 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 565 insertions(+)
 
 -- 
-2.7.4
+Luiz Augusto von Dentz
