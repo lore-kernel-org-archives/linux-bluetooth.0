@@ -1,90 +1,195 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1534714610.5879.11.camel@intel.com>
-References: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
- <1534714610.5879.11.camel@intel.com>
-From: Raul Piper <raulpblooper@gmail.com>
-Date: Tue, 21 Aug 2018 00:13:05 +0530
-Message-ID: <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
-Subject: Re: Failed to parse provisioning database file prov_db.json :
- BlueZ,Meshctl V5.50
-To: "Stotland, Inga" <inga.stotland@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1534771920-4437-2-git-send-email-sathish.narasimman@intel.com>
+References: <1534771920-4437-1-git-send-email-sathish.narasimman@intel.com> <1534771920-4437-2-git-send-email-sathish.narasimman@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Mon, 20 Aug 2018 19:05:08 +0300
+Message-ID: <CABBYNZ+zQhj_vUpkggkMcF9y5zvgdh9h9gj3qunbRVUx9akzuQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: hci_event: handle msbc audio over USB Endpoints
+To: Sathish Narasimman <nsathish41@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Sathish Narasimman <sathish.narasimman@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Inga,
-it gives the below logs :
+Hi Sathish,
 
-pi@raspberrypi:~/blueZ $ meshctl -c mesh
-
-Failed to parse local node configuration file mesh/local_node.json
-
-
-
-pi@raspberrypi:~/blueZ $ meshctl -v
-
-meshctl: 5.50
-
-i need to do export before executing above commands
-
-pi@raspberrypi:~ $ LD_LIBRARY_PATH=/usr/local/lib
-
-pi@raspberrypi:~ $ export LD_LIBRARY_PATH
-
-
-
-to avoid the below error :
-
-pi@raspberrypi:~ $ meshctl -v
-
-meshctl: error while loading shared libraries: libjson-c.so.4: cannot
-open shared object file: No such file or directory
-
-
-can you please assist?
-or any  experimental patch I could use on BlueZ
-
-Thanks in advance
-Best Regards,
-Rp
-
-On Mon, Aug 20, 2018 at 3:06 AM, Stotland, Inga <inga.stotland@intel.com> wrote:
-> Hi Raul,
-> On Sun, 2018-08-19 at 03:03 +0530, Raul Piper wrote:
->> Hello ,
->> I have built and BlueZ 5.50 from the source and installed it on
->> raspberry PI 3 W0, but when I am trying to launch the meshctl tool -
->> using ./meshctl (from within or out side the mesh directory) i am
->> getting the below error  :
->>
->> Failed to parse provisioning database file prov_db.json
->>
->> I checked the online sanity onfthe above json file and it seems correct.
->>
->>
->>
->> I tried doing the sudo hcitool -lescan - it shows the LE devices and also
->>
->> bluetoothd -v gives 5.50 which shows my compilation and loading of the
->> new BlueZ is alteast correct.
->>
->> I have already installed the c-json lib .
->>
->> Is this a bug in meshctl?
->>
->> Please assist !
->>
->>
->> Thanks in Advance !
+On Mon, Aug 20, 2018 at 4:32 PM, Sathish Narasimman
+<nsathish41@gmail.com> wrote:
+> For msbc encoded audio stream over usb transport, btusb driver
+> to be set to alternate settings 6 as per BT core spec 5.0. This
+> done from  hci_sync_conn_complete_evt. The type of air mode is known
+> during this event. For this reason the btusb is to be notifed
+> about the TRANSPARENT air mode and the ALT setting 6 is selected.
+> The changes are made considering some discussion over the similar
+> patch submitted earlier from Kuba Pawlak(link below)
+> https://www.spinics.net/lists/linux-bluetooth/msg64577.html
 >
-> Are you using the default json file? If so, there's a bug in meshctl
-> for reading from default location (just subimmted a patch for that).
+> Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+> ---
+>  drivers/bluetooth/btusb.c   | 95 +++++++++++++++++++++++++--------------------
+>  include/net/bluetooth/hci.h |  1 +
+>  net/bluetooth/hci_event.c   |  5 +++
+>  3 files changed, 59 insertions(+), 42 deletions(-)
 >
-> Meanwhile, try running:
->  ./meshctl -c mesh
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index cd2e5cf..ae924b6 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1390,18 +1390,6 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>         return -EILSEQ;
+>  }
 >
-> Regards,
-> Inga
+> -static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+> -{
+> -       struct btusb_data *data = hci_get_drvdata(hdev);
+> -
+> -       BT_DBG("%s evt %d", hdev->name, evt);
+> -
+> -       if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
+> -               data->sco_num = hci_conn_num(hdev, SCO_LINK);
+> -               schedule_work(&data->work);
+> -       }
+> -}
+> -
+>  static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+>  {
+>         struct btusb_data *data = hci_get_drvdata(hdev);
+> @@ -1445,6 +1433,58 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+>         return 0;
+>  }
 >
+> +static void bt_switch_alt_setting(struct hci_dev *hdev, int new_alts)
+> +{
+> +       struct btusb_data *data = hci_get_drvdata(hdev);
+> +
+> +       if (data->isoc_altsetting != new_alts) {
+> +               unsigned long flags;
+> +
+> +               clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> +               usb_kill_anchored_urbs(&data->isoc_anchor);
+> +
+> +               /* When isochronous alternate setting needs to be
+> +                * changed, because SCO connection has been added
+> +                * or removed, a packet fragment may be left in the
+> +                * reassembling state. This could lead to wrongly
+> +                * assembled fragments.
+> +                *
+> +                * Clear outstanding fragment when selecting a new
+> +                * alternate setting.
+> +                */
+> +               spin_lock_irqsave(&data->rxlock, flags);
+> +               kfree_skb(data->sco_skb);
+> +               data->sco_skb = NULL;
+> +               spin_unlock_irqrestore(&data->rxlock, flags);
+> +
+> +               if (__set_isoc_interface(hdev, new_alts) < 0)
+> +                       return;
+> +       }
+> +       if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
+> +               if (btusb_submit_isoc_urb(hdev, GFP_KERNEL) < 0)
+> +                       clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> +               else
+> +                       btusb_submit_isoc_urb(hdev, GFP_KERNEL);
+> +       }
+> +}
+> +
+> +static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+> +{
+> +       struct btusb_data *data = hci_get_drvdata(hdev);
+> +
+> +       BT_DBG("%s evt %d", hdev->name, evt);
+> +
+> +       if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
+> +               data->sco_num = hci_conn_num(hdev, SCO_LINK);
+> +               schedule_work(&data->work);
+> +       }
+> +
+> +       if (evt == HCI_NOTIFY_AIR_MODE_TRANSP) {
+> +               /* Alt setting 6 is for msbc encoded audio channel */
+> +               bt_switch_alt_setting(hdev, 6);
+
+Have you checked that this works on older controllers? I suppose those
+don't have alt_set 6.
+
+> +       }
+> +}
+> +
+>  static void btusb_work(struct work_struct *work)
+>  {
+>         struct btusb_data *data = container_of(work, struct btusb_data, work);
+> @@ -1472,36 +1512,7 @@ static void btusb_work(struct work_struct *work)
+>                         new_alts = data->sco_num;
+>                 }
+>
+> -               if (data->isoc_altsetting != new_alts) {
+> -                       unsigned long flags;
+> -
+> -                       clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> -                       usb_kill_anchored_urbs(&data->isoc_anchor);
+> -
+> -                       /* When isochronous alternate setting needs to be
+> -                        * changed, because SCO connection has been added
+> -                        * or removed, a packet fragment may be left in the
+> -                        * reassembling state. This could lead to wrongly
+> -                        * assembled fragments.
+> -                        *
+> -                        * Clear outstanding fragment when selecting a new
+> -                        * alternate setting.
+> -                        */
+> -                       spin_lock_irqsave(&data->rxlock, flags);
+> -                       kfree_skb(data->sco_skb);
+> -                       data->sco_skb = NULL;
+> -                       spin_unlock_irqrestore(&data->rxlock, flags);
+> -
+> -                       if (__set_isoc_interface(hdev, new_alts) < 0)
+> -                               return;
+> -               }
+> -
+> -               if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
+> -                       if (btusb_submit_isoc_urb(hdev, GFP_KERNEL) < 0)
+> -                               clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> -                       else
+> -                               btusb_submit_isoc_urb(hdev, GFP_KERNEL);
+> -               }
+> +               bt_switch_alt_setting(hdev, new_alts);
+>         } else {
+>                 clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+>                 usb_kill_anchored_urbs(&data->isoc_anchor);
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index cdd9f1f..3498c6b 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -52,6 +52,7 @@
+>  #define HCI_NOTIFY_CONN_ADD            1
+>  #define HCI_NOTIFY_CONN_DEL            2
+>  #define HCI_NOTIFY_VOICE_SETTING       3
+> +#define HCI_NOTIFY_AIR_MODE_TRANSP     4
+>
+>  /* HCI bus types */
+>  #define HCI_VIRTUAL    0
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index f12555f..8ef5220 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4100,6 +4100,11 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+>                 break;
+>         }
+>
+> +       if (ev->air_mode == SCO_AIRMODE_TRANSP) {
+> +               if (hdev->notify)
+> +                       hdev->notify(hdev, HCI_NOTIFY_AIR_MODE_TRANSP);
+> +       }
+> +
+>         hci_connect_cfm(conn, ev->status);
+>         if (ev->status)
+>                 hci_conn_del(conn);
+> --
+> 2.7.4
+>
+
+
+
+-- 
+Luiz Augusto von Dentz
