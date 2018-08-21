@@ -2,158 +2,150 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: [PATCH 1/2] Bluetooth: btintel: Add platform device for rfkill
- signal
+Subject: Re: [PATCH] Bluetooth: btusb: hci_event: handle msbc audio over USB
+ Endpoints
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1534844080-31240-1-git-send-email-raghuram.hegde@intel.com>
-Date: Tue, 21 Aug 2018 16:13:10 +0200
-Cc: linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
-        sukumar.ghorai@intel.com, amit.k.bag@intel.com
-Message-Id: <CF4E3B3B-C3A4-4037-A2F1-ECB4B01FAC6D@holtmann.org>
-References: <1534844080-31240-1-git-send-email-raghuram.hegde@intel.com>
-To: Raghuram Hegde <raghuram.hegde@intel.com>
+In-Reply-To: <CAOVXEJLGue-6G3p9ZyVGSN-N4WaW16yC3WTYMN-9d+M_AsGevQ@mail.gmail.com>
+Date: Tue, 21 Aug 2018 15:58:35 +0200
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Sathish Narasimman <sathish.narasimman@intel.com>
+Message-Id: <DCE1C199-A03D-414E-8EAC-01BC71871766@holtmann.org>
+References: <1534771920-4437-1-git-send-email-sathish.narasimman@intel.com>
+ <1534771920-4437-2-git-send-email-sathish.narasimman@intel.com>
+ <CABBYNZ+zQhj_vUpkggkMcF9y5zvgdh9h9gj3qunbRVUx9akzuQ@mail.gmail.com>
+ <CAOVXEJ+CLxgr-eZ-98U_U=JFCCu6eiVnuv=R_VwewiOE=PXsmg@mail.gmail.com>
+ <CABBYNZ+M9suggQOa5dWrWS9SU5=qDijMXymVK44d=2Pu-FV1zg@mail.gmail.com>
+ <CAOVXEJLGue-6G3p9ZyVGSN-N4WaW16yC3WTYMN-9d+M_AsGevQ@mail.gmail.com>
+To: Sathish Narasimman <nsathish41@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Raghuram,
+Hi Sathish,
 
-> Driver to add INTL6205 platform ACPI device to enable out
-> of band GPIO signalling to handle rfkill and reset the
-> bluetooth controller. Expose an interface in kernel to
-> assert GPIO signal.
-> 
-> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> Signed-off-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
-> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
-> ---
-> drivers/bluetooth/btintel.c | 68 +++++++++++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/btintel.h |  6 ++++
-> 2 files changed, 74 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 5270d5513201..538cd6b6c524 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -24,6 +24,9 @@
-> #include <linux/module.h>
-> #include <linux/firmware.h>
-> #include <linux/regmap.h>
-> +#include <linux/acpi.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/gpio/consumer.h>
-> #include <asm/unaligned.h>
-> 
-> #include <net/bluetooth/bluetooth.h>
-> @@ -375,6 +378,71 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
-> }
-> EXPORT_SYMBOL_GPL(btintel_read_version);
-> 
-> +static struct gpio_desc *reset_gpio_handler;
+>>>>> For msbc encoded audio stream over usb transport, btusb driver
+>>>>> to be set to alternate settings 6 as per BT core spec 5.0. This
+>>>>> done from  hci_sync_conn_complete_evt. The type of air mode is known
+>>>>> during this event. For this reason the btusb is to be notifed
+>>>>> about the TRANSPARENT air mode and the ALT setting 6 is selected.
+>>>>> The changes are made considering some discussion over the similar
+>>>>> patch submitted earlier from Kuba Pawlak(link below)
+>>>>> https://www.spinics.net/lists/linux-bluetooth/msg64577.html
+>>>>> 
+>>>>> Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+>>>>> ---
+>>>>> drivers/bluetooth/btusb.c   | 95
+>>>>> +++++++++++++++++++++++++--------------------
+>>>>> include/net/bluetooth/hci.h |  1 +
+>>>>> net/bluetooth/hci_event.c   |  5 +++
+>>>>> 3 files changed, 59 insertions(+), 42 deletions(-)
+>>>>> 
+>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>>>> index cd2e5cf..ae924b6 100644
+>>>>> --- a/drivers/bluetooth/btusb.c
+>>>>> +++ b/drivers/bluetooth/btusb.c
+>>>>> @@ -1390,18 +1390,6 @@ static int btusb_send_frame(struct hci_dev *hdev,
+>>>>> struct sk_buff *skb)
+>>>>>        return -EILSEQ;
+>>>>> }
+>>>>> 
+>>>>> -static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+>>>>> -{
+>>>>> -       struct btusb_data *data = hci_get_drvdata(hdev);
+>>>>> -
+>>>>> -       BT_DBG("%s evt %d", hdev->name, evt);
+>>>>> -
+>>>>> -       if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
+>>>>> -               data->sco_num = hci_conn_num(hdev, SCO_LINK);
+>>>>> -               schedule_work(&data->work);
+>>>>> -       }
+>>>>> -}
+>>>>> -
+>>>>> static inline int __set_isoc_interface(struct hci_dev *hdev, int
+>>>>> altsetting)
+>>>>> {
+>>>>>        struct btusb_data *data = hci_get_drvdata(hdev);
+>>>>> @@ -1445,6 +1433,58 @@ static inline int __set_isoc_interface(struct
+>>>>> hci_dev *hdev, int altsetting)
+>>>>>        return 0;
+>>>>> }
+>>>>> 
+>>>>> +static void bt_switch_alt_setting(struct hci_dev *hdev, int new_alts)
+>>>>> +{
+>>>>> +       struct btusb_data *data = hci_get_drvdata(hdev);
+>>>>> +
+>>>>> +       if (data->isoc_altsetting != new_alts) {
+>>>>> +               unsigned long flags;
+>>>>> +
+>>>>> +               clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+>>>>> +               usb_kill_anchored_urbs(&data->isoc_anchor);
+>>>>> +
+>>>>> +               /* When isochronous alternate setting needs to be
+>>>>> +                * changed, because SCO connection has been added
+>>>>> +                * or removed, a packet fragment may be left in the
+>>>>> +                * reassembling state. This could lead to wrongly
+>>>>> +                * assembled fragments.
+>>>>> +                *
+>>>>> +                * Clear outstanding fragment when selecting a new
+>>>>> +                * alternate setting.
+>>>>> +                */
+>>>>> +               spin_lock_irqsave(&data->rxlock, flags);
+>>>>> +               kfree_skb(data->sco_skb);
+>>>>> +               data->sco_skb = NULL;
+>>>>> +               spin_unlock_irqrestore(&data->rxlock, flags);
+>>>>> +
+>>>>> +               if (__set_isoc_interface(hdev, new_alts) < 0)
+>>>>> +                       return;
+> If controller does not support ALT 6. above function will return negative.
+> will take care of falling back to ALT 2.
+>>>>> +       }
+>>>>> +       if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
+>>>>> +               if (btusb_submit_isoc_urb(hdev, GFP_KERNEL) < 0)
+>>>>> +                       clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+>>>>> +               else
+>>>>> +                       btusb_submit_isoc_urb(hdev, GFP_KERNEL);
+>>>>> +       }
+>>>>> +}
+>>>>> +
+>>>>> +static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+>>>>> +{
+>>>>> +       struct btusb_data *data = hci_get_drvdata(hdev);
+>>>>> +
+>>>>> +       BT_DBG("%s evt %d", hdev->name, evt);
+>>>>> +
+>>>>> +       if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
+>>>>> +               data->sco_num = hci_conn_num(hdev, SCO_LINK);
+>>>>> +               schedule_work(&data->work);
+>>>>> +       }
+>>>>> +
+>>>>> +       if (evt == HCI_NOTIFY_AIR_MODE_TRANSP) {
+>>>>> +               /* Alt setting 6 is for msbc encoded audio channel */
+>>>>> +               bt_switch_alt_setting(hdev, 6);
+>>>> 
+>>>> Have you checked that this works on older controllers? I suppose those
+>>>> don't have alt_set 6.
+>>> 
+>>> I took the reference from the core spec 5, Vol 4, Part B, Table 2.1
+>>> For USB transport the ALT setting 6 should be used for one msbc voice
+>>> channel.
+>>> Yes, for the controllers that does not support ALT setting 6. this patch
+>>> will not work.
+>> 
+>> It _must_ keep working with controller that don't support such
+>> setting, there is no option on that, so there should be a way to just
+>> read what supported alt settings that are supported and fallback if 6
+>> is not supported.
+>> 
+> If we trying to set to ALT SET 6 and controller does not support. in
+> btusb.c __set_isoc_interface function
+> will through error and returns negative if fails to set. So the error
+> check was available already.
+> I need to take care of returning to ALT Setting 2 if controller fails
+> to set ALT 6.
+> This can be done. will update the patch. please take a look into patch
+> v2 where the 7.5ms time interval is maintained.
 
-this thing is so inherent broken. Please never ever do that. If there are two reset handlers or two Intel USB devices connected things will go horrible wrong.
-
-> +void btintel_reset_bt(struct hci_dev *hdev, unsigned char code)
-> +{
-> +	if (!reset_gpio_handler)
-> +		return;
-> +
-> +	gpiod_set_value(reset_gpio_handler, 0);
-> +	mdelay(100);
-> +	gpiod_set_value(reset_gpio_handler, 1);
-> +}
-> +EXPORT_SYMBOL_GPL(btintel_reset_bt);
-
-What happens here when you do this? Does the Bluetooth USB device disconnect from the USB bus and gets re-enumerated and the btusb_probe() routine gets called again?
-
-If this is the case, then I have no idea how many times I have to explain. It is a platfrom reset switch and using RFKILL for this is acceptable.
-
-> +
-> +static const struct acpi_gpio_params reset_gpios = { 0, 0, false };
-> +static const struct acpi_gpio_mapping acpi_btintel_gpios[] = {
-> +	{ "reset-gpios", &reset_gpios, 1 },
-> +	{ },
-> +};
-> +
-> +static int btintel_probe(struct platform_device *pdev)
-> +{
-> +	struct device *hdev;
-> +
-> +	hdev = devm_kzalloc(&pdev->dev, sizeof(*hdev), GFP_KERNEL);
-> +	if (!hdev)
-> +		return -ENOMEM;
-
-What is this doing. This makes no sense.
-
-> +
-> +	if (!ACPI_HANDLE(&pdev->dev))
-> +		return -ENODEV;
-> +
-> +	if (acpi_dev_add_driver_gpios(ACPI_COMPANION(&pdev->dev),
-> +				     acpi_btintel_gpios))
-> +		return -EINVAL;
-> +
-> +	reset_gpio_handler = devm_gpiod_get_optional(&pdev->dev,
-> +					"reset", GPIOD_OUT_HIGH);
-> +	if (IS_ERR(reset_gpio_handler))
-> +		return PTR_ERR(reset_gpio_handler);
-> +
-> +	return 0;
-> +}
-> +
-> +static int btintel_remove(struct platform_device *pdev)
-> +{
-> +	acpi_dev_remove_driver_gpios(ACPI_COMPANION(&pdev->dev));
-> +	return 0;
-> +}
-> +
-> +#ifdef CONFIG_ACPI
-> +static const struct acpi_device_id btintel_acpi_match[] = {
-> +	{ "INTL6205", 0 },
-> +	{ },
-> +};
-> +MODULE_DEVICE_TABLE(acpi, btintel_acpi_match);
-> +#endif
-> +
-> +static struct platform_driver btintel_driver = {
-> +	.probe = btintel_probe,
-> +	.remove = btintel_remove,
-> +	.driver = {
-> +		.name = "btintel",
-> +		.acpi_match_table = ACPI_PTR(btintel_acpi_match),
-> +	},
-> +};
-> +module_platform_driver(btintel_driver);
-
-I am not convinced this actually works since now we have two module_init and module_exit functions.
-
-> +
-> /* ------- REGMAP IBT SUPPORT ------- */
-> 
-> #define IBT_REG_MODE_8BIT  0x00
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index 41c642cc523f..7686fab52054 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -94,6 +94,7 @@ int btintel_load_ddc_config(struct hci_dev *hdev, const char *ddc_name);
-> int btintel_set_event_mask(struct hci_dev *hdev, bool debug);
-> int btintel_set_event_mask_mfg(struct hci_dev *hdev, bool debug);
-> int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver);
-> +void btintel_reset_bt(struct hci_dev *hdev, unsigned char code);
-> 
-> struct regmap *btintel_regmap_init(struct hci_dev *hdev, u16 opcode_read,
-> 				   u16 opcode_write);
-> @@ -171,6 +172,11 @@ static inline int btintel_read_version(struct hci_dev *hdev,
-> 	return -EOPNOTSUPP;
-> }
-> 
-> +static inline void btintel_reset_bt(struct hci_dev *hdev, unsigned char code)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> static inline struct regmap *btintel_regmap_init(struct hci_dev *hdev,
-> 						 u16 opcode_read,
-> 						 u16 opcode_write)
+we are not doing try-and-error here. In probe() do a proper enumeration of the alternate settings and check if setting 6 is available.
 
 Regards
 
