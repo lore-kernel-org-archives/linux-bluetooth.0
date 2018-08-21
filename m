@@ -1,170 +1,238 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <1534799268.5879.34.camel@intel.com>
-References: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
- <1534714610.5879.11.camel@intel.com> <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
- <1534792605.5879.17.camel@intel.com> <CAEwN+MBxzZg8UyeqTfRPizfzjH07iD6_hL=7UPxHw1ZnOC8gMA@mail.gmail.com>
- <1534799268.5879.34.camel@intel.com>
-From: Raul Piper <raulpblooper@gmail.com>
-Date: Tue, 21 Aug 2018 13:29:53 +0530
-Message-ID: <CAEwN+MD_MxqKp0Lfn6H-YNNa99x7Wme_du9+2myyA_5Xrj690A@mail.gmail.com>
-Subject: Re: Failed to parse provisioning database file prov_db.json :
- BlueZ,Meshctl V5.50
-To: "Stotland, Inga" <inga.stotland@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From: Sathish Narasimman <nsathish41@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: luiz.dentz@gmail.com,
+        Sathish Narasimman <sathish.narasimman@intel.com>
+Subject: [PATCH v2] Bluetooth: btusb: hci_event: handle msbc audio over USB Endpoints
+Date: Tue, 21 Aug 2018 13:00:33 +0530
+Message-Id: <1534836633-8846-1-git-send-email-sathish.narasimman@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Inga,
+For msbc encoded audio stream over usb transport, btusb driver
+to be set to alternate settings 6 as per BT core spec 5.0. This
+done from  hci_sync_conn_complete_evt. The type of air mode is known
+during this event. For this reason the btusb is to be notifed
+about the TRANSPARENT air mode and the ALT setting 6 is selected.
+The changes are made considering some discussion over the similar
+patch submitted earlier from Kuba Pawlak(link below)
+https://www.spinics.net/lists/linux-bluetooth/msg64577.html
 
+Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+---
+ drivers/bluetooth/btusb.c   | 135 ++++++++++++++++++++++++++++++--------------
+ include/net/bluetooth/hci.h |   1 +
+ net/bluetooth/hci_event.c   |   5 ++
+ 3 files changed, 98 insertions(+), 43 deletions(-)
 
-On Tue, Aug 21, 2018 at 2:37 AM, Stotland, Inga <inga.stotland@intel.com> wrote:
-> Hi Raul,
->
-> On Tue, 2018-08-21 at 01:14 +0530, Raul Piper wrote:
->> Hello Inga,
->> Attached,
->> Rgds,
->> Rp
->>
->> On Tue, Aug 21, 2018 at 12:46 AM, Stotland, Inga
->> <inga.stotland@intel.com> wrote:
->> > Hi Raul,
->> >
->> > On Tue, 2018-08-21 at 00:13 +0530, Raul Piper wrote:
->> > > Hello Inga,
->> > > it gives the below logs :
->> > >
->> > > pi@raspberrypi:~/blueZ $ meshctl -c mesh
->> > >
->> > > Failed to parse local node configuration file
->> > > mesh/local_node.json
->> > >
->> > >
->> > >
->> > > pi@raspberrypi:~/blueZ $ meshctl -v
->> > >
->> > > meshctl: 5.50
->> > >
->> > > i need to do export before executing above commands
->> > >
->> > > pi@raspberrypi:~ $ LD_LIBRARY_PATH=/usr/local/lib
->> > >
->> > > pi@raspberrypi:~ $ export LD_LIBRARY_PATH
->> > >
->> > >
->> > >
->> > > to avoid the below error :
->> > >
->> > > pi@raspberrypi:~ $ meshctl -v
->> > >
->> > > meshctl: error while loading shared libraries: libjson-c.so.4:
->> > > cannot
->> > > open shared object file: No such file or directory
->> > >
->> > >
->> > > can you please assist?
->> > > or any  experimental patch I could use on BlueZ
->> > >
->> > > Thanks in advance
->> > > Best Regards,
->> > > Rp
->> > >
->> > > On Mon, Aug 20, 2018 at 3:06 AM, Stotland, Inga <inga.stotland@in
->> > > tel.
->> > > com> wrote:
->> > > > Hi Raul,
->> > > > On Sun, 2018-08-19 at 03:03 +0530, Raul Piper wrote:
->> > > > > Hello ,
->> > > > > I have built and BlueZ 5.50 from the source and installed it
->> > > > > on
->> > > > > raspberry PI 3 W0, but when I am trying to launch the meshctl
->> > > > > tool -
->> > > > > using ./meshctl (from within or out side the mesh directory)
->> > > > > i am
->> > > > > getting the below error  :
->> > > > >
->> > > > > Failed to parse provisioning database file prov_db.json
->> > > > >
->> > > > > I checked the online sanity onfthe above json file and it
->> > > > > seems
->> > > > > correct.
->> > > > >
->> > > > >
->> > > > >
->> > > > > I tried doing the sudo hcitool -lescan - it shows the LE
->> > > > > devices
->> > > > > and also
->> > > > >
->> > > > > bluetoothd -v gives 5.50 which shows my compilation and
->> > > > > loading
->> > > > > of the
->> > > > > new BlueZ is alteast correct.
->> > > > >
->> > > > > I have already installed the c-json lib .
->> > > > >
->> > > > > Is this a bug in meshctl?
->> > > > >
->> > > > > Please assist !
->> > > > >
->> > > > >
->> > > > > Thanks in Advance !
->> > > >
->> > > > Are you using the default json file? If so, there's a bug in
->> > > > meshctl
->> > > > for reading from default location (just subimmted a patch for
->> > > > that).
->> > > >
->> > > > Meanwhile, try running:
->> > > >  ./meshctl -c mesh
->> > > >
->> > > > Regards,
->> > > > Inga
->> > > >
->> >
->> > I am not an expert on system setup, but could you please run
->> > sudo /sbin/ldconfig -v
->> >
->> > Regards,
->> > Inga
->>
->>
->
-> There is no record of libjson-c in your ldconfig output. So my guess
-> would be that something is to do with the installation of json-c
-> library on rpi.
->
-> If you had to build the json-c from source and then run make install,
-> you may want to modify the installation path to be something standard
-> on your system from where ldconfig will be able to pick it up.
-> ./configure --prefix=/somewhere/not/usr/local prior to make install
->
-> Alternatively, you may try to run this command:
->
->  ldconfig -l /path-to-libjson-c.so.xxx
->
-> Re-run ldconfig afterwards and see if the libjson-c showed up.
->
-> Regards,
->
-> Inga
->
-> P.S. Just FYI, the standard way to respond to emails on bluez mailing
-> list is to include the body of you reply at the tail of the message.
->
-
-Sorry for Top posting.
-I reinstalled the blueZ  (with --enable-mesh) , installed json-c from the git
-I can see the entry of the libjson-c unlike previously but it still
-gives the same error.
-Don't we have to link the libjson-c with the BlueZ while building by
-setting some Linker flags(LD) in the Makefile of the BlueZ.Is there
-any such option?
-How will I come to know that it has built successfully with the
-reference to the libjson-c.
-I believe we must have json-c pre-installed before building the  BlueZ
-and Build setup of BlueZ must know where is the libjson-c.
-
-Rgards,
-Rp
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index cd2e5cf..e922f24 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -69,6 +69,9 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_BCM2045		0x40000
+ #define BTUSB_IFNUM_2		0x80000
+ #define BTUSB_CW6622		0x100000
++#define BTUSB_ALT6_FLOW_CNTRL	6
++
++static int set_hci_packet_interval_flow = BTUSB_ALT6_FLOW_CNTRL;
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -906,6 +909,37 @@ static void btusb_isoc_complete(struct urb *urb)
+ 	}
+ }
+ 
++static inline void __fill_isoc_descriptor_msbc(struct urb *urb, int len, int mtu)
++{
++	int i, offset = 0;
++
++	/* For msbc ALT 6 setting the host will send the packet at continuous flow
++	 * As per core spec 5, vol 4, part B, table 2.1. For ALT setting 6 the
++	 * HCI PACKET INTERVAL should be 7.5ms for every usb packets.
++	 * To maintain the rate we send 63bytes of usb packets alternatively for
++	 * 7ms and 8ms to maintain the rate as 7.5ms.
++	 */
++	if (set_hci_packet_interval_flow == 6)
++		set_hci_packet_interval_flow = 7;
++	else if (set_hci_packet_interval_flow == 7)
++		set_hci_packet_interval_flow = 6;
++
++	BT_DBG("len %d mtu %d", len, mtu);
++
++	for (i = 0; i < set_hci_packet_interval_flow; i++) {
++		urb->iso_frame_desc[i].offset = offset;
++		urb->iso_frame_desc[i].length = offset;
++	}
++
++	if (len && i < BTUSB_MAX_ISOC_FRAMES) {
++		urb->iso_frame_desc[i].offset = offset;
++		urb->iso_frame_desc[i].length = len;
++		i++;
++	}
++
++	urb->number_of_packets = i;
++}
++
+ static inline void __fill_isoc_descriptor(struct urb *urb, int len, int mtu)
+ {
+ 	int i, offset = 0;
+@@ -1300,7 +1334,11 @@ static struct urb *alloc_isoc_urb(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	urb->transfer_flags  = URB_ISO_ASAP;
+ 
+-	__fill_isoc_descriptor(urb, skb->len,
++	if (data->isoc_altsetting == 6)
++		__fill_isoc_descriptor_msbc(urb, skb->len,
++			       le16_to_cpu(data->isoc_tx_ep->wMaxPacketSize));
++	else
++		__fill_isoc_descriptor(urb, skb->len,
+ 			       le16_to_cpu(data->isoc_tx_ep->wMaxPacketSize));
+ 
+ 	skb->dev = (void *)hdev;
+@@ -1390,18 +1428,6 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return -EILSEQ;
+ }
+ 
+-static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
+-{
+-	struct btusb_data *data = hci_get_drvdata(hdev);
+-
+-	BT_DBG("%s evt %d", hdev->name, evt);
+-
+-	if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
+-		data->sco_num = hci_conn_num(hdev, SCO_LINK);
+-		schedule_work(&data->work);
+-	}
+-}
+-
+ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -1445,6 +1471,58 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
+ 	return 0;
+ }
+ 
++static void bt_switch_alt_setting(struct hci_dev *hdev, int new_alts)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++
++	if (data->isoc_altsetting != new_alts) {
++		unsigned long flags;
++
++		clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
++		usb_kill_anchored_urbs(&data->isoc_anchor);
++
++		/* When isochronous alternate setting needs to be
++		 * changed, because SCO connection has been added
++		 * or removed, a packet fragment may be left in the
++		 * reassembling state. This could lead to wrongly
++		 * assembled fragments.
++		 *
++		 * Clear outstanding fragment when selecting a new
++		 * alternate setting.
++		 */
++		spin_lock_irqsave(&data->rxlock, flags);
++		kfree_skb(data->sco_skb);
++		data->sco_skb = NULL;
++		spin_unlock_irqrestore(&data->rxlock, flags);
++
++		if (__set_isoc_interface(hdev, new_alts) < 0)
++			return;
++	}
++	if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
++		if (btusb_submit_isoc_urb(hdev, GFP_KERNEL) < 0)
++			clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
++		else
++			btusb_submit_isoc_urb(hdev, GFP_KERNEL);
++	}
++}
++
++static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++
++	BT_DBG("%s evt %d", hdev->name, evt);
++
++	if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
++		data->sco_num = hci_conn_num(hdev, SCO_LINK);
++		schedule_work(&data->work);
++	}
++
++	if (evt == HCI_NOTIFY_AIR_MODE_TRANSP) {
++		/* Alt setting 6 is for msbc encoded audio channel */
++		bt_switch_alt_setting(hdev, 6);
++	}
++}
++
+ static void btusb_work(struct work_struct *work)
+ {
+ 	struct btusb_data *data = container_of(work, struct btusb_data, work);
+@@ -1472,36 +1550,7 @@ static void btusb_work(struct work_struct *work)
+ 			new_alts = data->sco_num;
+ 		}
+ 
+-		if (data->isoc_altsetting != new_alts) {
+-			unsigned long flags;
+-
+-			clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+-			usb_kill_anchored_urbs(&data->isoc_anchor);
+-
+-			/* When isochronous alternate setting needs to be
+-			 * changed, because SCO connection has been added
+-			 * or removed, a packet fragment may be left in the
+-			 * reassembling state. This could lead to wrongly
+-			 * assembled fragments.
+-			 *
+-			 * Clear outstanding fragment when selecting a new
+-			 * alternate setting.
+-			 */
+-			spin_lock_irqsave(&data->rxlock, flags);
+-			kfree_skb(data->sco_skb);
+-			data->sco_skb = NULL;
+-			spin_unlock_irqrestore(&data->rxlock, flags);
+-
+-			if (__set_isoc_interface(hdev, new_alts) < 0)
+-				return;
+-		}
+-
+-		if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
+-			if (btusb_submit_isoc_urb(hdev, GFP_KERNEL) < 0)
+-				clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+-			else
+-				btusb_submit_isoc_urb(hdev, GFP_KERNEL);
+-		}
++		bt_switch_alt_setting(hdev, new_alts);
+ 	} else {
+ 		clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+ 		usb_kill_anchored_urbs(&data->isoc_anchor);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index cdd9f1f..3498c6b 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -52,6 +52,7 @@
+ #define HCI_NOTIFY_CONN_ADD		1
+ #define HCI_NOTIFY_CONN_DEL		2
+ #define HCI_NOTIFY_VOICE_SETTING	3
++#define HCI_NOTIFY_AIR_MODE_TRANSP	4
+ 
+ /* HCI bus types */
+ #define HCI_VIRTUAL	0
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f12555f..8ef5220 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4100,6 +4100,11 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 		break;
+ 	}
+ 
++	if (ev->air_mode == SCO_AIRMODE_TRANSP) {
++		if (hdev->notify)
++			hdev->notify(hdev, HCI_NOTIFY_AIR_MODE_TRANSP);
++	}
++
+ 	hci_connect_cfm(conn, ev->status);
+ 	if (ev->status)
+ 		hci_conn_del(conn);
+-- 
+2.7.4
