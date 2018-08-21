@@ -1,31 +1,52 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: "Karabin, Josh" <George.Karabin@Honeywell.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [External] Re: [PATCH BlueZ 2/2] Update the Adapter1 API to match
- the change to ConnectDevice
-Date: Tue, 21 Aug 2018 15:46:02 +0000
-Message-ID: <BN7PR07MB43053FD5194498F9C67E059C9D310@BN7PR07MB4305.namprd07.prod.outlook.com>
-References: <BN7PR07MB4305C4EE248EACC3F5F262889D3E0@BN7PR07MB4305.namprd07.prod.outlook.com>
- <CABBYNZLJz7bq9165mgS4K7WY5jzGSC5rTxOD9_oUmxqs0KiPag@mail.gmail.com>
-In-Reply-To: <CABBYNZLJz7bq9165mgS4K7WY5jzGSC5rTxOD9_oUmxqs0KiPag@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH BlueZ v2 2/2] Update the Adapter1 API to match the change to
+ ConnectDevice
+Date: Tue, 21 Aug 2018 15:37:57 +0000
+Message-ID: <BN7PR07MB4305A707230A12C278D4765F9D310@BN7PR07MB4305.namprd07.prod.outlook.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTHVpcywNCg0KPiBGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IFttYWlsdG86bHVpei5k
-ZW50ekBnbWFpbC5jb21dDQo+IA0KPiBIaSBKb3NoLA0KPiANCj4gT24gVGh1LCBBdWcgMTYsIDIw
-MTggYXQgMTE6MjkgUE0sIEthcmFiaW4sIEpvc2gNCj4gPEdlb3JnZS5LYXJhYmluQGhvbmV5d2Vs
-bC5jb20+IHdyb3RlOg0KPiA+ICsgICAgICAgICAgICAgICBib29sZWFuIENvbm5lY3RBbGxQcm9m
-aWxlcw0KLi4uDQogDQo+IElkIGtlZXAgdGhlIG9yaWdpbmFsIGJlaGF2aW91ciBhbmQganVzdCBk
-aXNhYmxlIHdpdGggQXV0b0Nvbm5lY3Qgd2hpY2gNCj4gYnkgZGVmYXVsdCwgYWN0dWFsbHkgc2lu
-Y2UgdGhpcyBpcyBhbiBvcHRpb24gdXN1YWxseSB3ZSBkb24ndCB1c2UNCj4gY2FtZWxjYXNlIHNv
-IGluc3RlYWQgaXQgc2hvdWxkIGJlIGF1dG8tY29ubmVjdC4NCg0KSW4gdGhlIHYyIHZlcnNpb24g
-b2YgdGhlIHBhdGNoLCBJIG1hZGUgdGhlIG5ldyBVVUlEcyBrZXkgb2YgdGhlDQpDb25uZWN0RGV2
-aWNlIG1ldGhvZCdzIGRpY3Rpb25hcnkgYXJndW1lbnQgdXNlIHRoZSBleGlzdGluZyBjYXNlIA0K
-Q29udmVudGlvbiBvZiBVVUlEcywgcmF0aGVyIHRoYW4sIHNheSwgInV1aWRzIi4gSSBub3RpY2Vk
-IHRoYXQNCk90aGVyIGtleXMgaW4gdGhhdCBkaWN0aW9uYXJ5IGFyZSBjYW1lbC1jYXNlZCwgbGlr
-ZSAiQWRkcmVzcyINCmFuZCAiQWRkcmVzc1R5cGUiLCBzbyBJIHRoaW5rIHRoYXQncyB0aGUgY29y
-cmVjdCBjb252ZW50aW9uLg0KDQpJIGp1c3Qgd2FudGVkIHRvIHBvaW50IHRoaXMgb3V0LCBzaW5j
-ZSB5b3UgYWxyZWFkeSBtYWRlIHRoZQ0KY29tbWVudC4NCg0KVGhhbmtzLA0KDQotIEpvc2gNCg==
+---
+ doc/adapter-api.txt | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
+
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 2afd61bc3..fe3c86a5a 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -158,11 +158,11 @@ Methods		void StartDiscovery()
+ 			similar to Connect method from Device1 interface with
+ 			exception that this method returns success when physical
+ 			connection is established. After this method returns,
+-			services discovery will continue and any supported
+-			profile will be connected. There is no need for calling
+-			Connect on Device1 after this call. If connection was
+-			successful this method returns object path to created
+-			device object.
++			services discovery will continue.
++
++			There is no need for calling Connect on Device1 after
++			this call. If connection was successful this method
++			returns object path to created device object.
+=20
+ 			Parameters that may be set in the filter dictionary
+ 			include the following:
+@@ -183,6 +183,12 @@ Methods		void StartDiscovery()
+ 					"public" - Public address
+ 					"random" - Random address
+=20
++			array{string} UUIDs
++
++				If present, only connect service UUIDs that
++				are both provided by the device and in this
++				list. This parameter is optional.
++
+ 			Possible errors: org.bluez.Error.InvalidArguments
+ 					 org.bluez.Error.AlreadyExists
+ 					 org.bluez.Error.NotSupported
+--=20
+2.17.1
