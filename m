@@ -1,117 +1,38 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Stotland, Inga" <inga.stotland@intel.com>
-To: "raulpblooper@gmail.com" <raulpblooper@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Failed to parse provisioning database file prov_db.json :
- BlueZ,Meshctl V5.50
-Date: Tue, 21 Aug 2018 17:25:09 +0000
-Message-ID: <1534872308.5879.48.camel@intel.com>
-References: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
-         <1534714610.5879.11.camel@intel.com>
-         <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
-         <1534792605.5879.17.camel@intel.com>
-         <CAEwN+MBxzZg8UyeqTfRPizfzjH07iD6_hL=7UPxHw1ZnOC8gMA@mail.gmail.com>
-         <1534799268.5879.34.camel@intel.com>
-         <CAEwN+MD_MxqKp0Lfn6H-YNNa99x7Wme_du9+2myyA_5Xrj690A@mail.gmail.com>
-In-Reply-To: <CAEwN+MD_MxqKp0Lfn6H-YNNa99x7Wme_du9+2myyA_5Xrj690A@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Date: Wed, 22 Aug 2018 00:55:29 +0800
+From: kbuild test robot <lkp@intel.com>
+To: Raghuram Hegde <raghuram.hegde@intel.com>
+Cc: kbuild-all@01.org, linux-bluetooth@vger.kernel.org,
+        raghuram.hegde@intel.com, chethan.tumkur.narayan@intel.com,
+        sukumar.ghorai@intel.com, amit.k.bag@intel.com
+Subject: Re: [PATCH 1/2] Bluetooth: btintel: Add platform device for rfkill
+ signal
+Message-ID: <201808220036.6FX5Scvn%fengguang.wu@intel.com>
+References: <1534844080-31240-1-git-send-email-raghuram.hegde@intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1534844080-31240-1-git-send-email-raghuram.hegde@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgUmF1bCwNCg0KT24gVHVlLCAyMDE4LTA4LTIxIGF0IDEzOjI5ICswNTMwLCBSYXVsIFBpcGVy
-IHdyb3RlOg0KPiBIZWxsbyBJbmdhLA0KPiANCj4gDQo+IE9uIFR1ZSwgQXVnIDIxLCAyMDE4IGF0
-IDI6MzcgQU0sIFN0b3RsYW5kLCBJbmdhIDxpbmdhLnN0b3RsYW5kQGludGVsLg0KPiBjb20+IHdy
-b3RlOg0KPiA+IEhpIFJhdWwsDQo+ID4gDQo+ID4gT24gVHVlLCAyMDE4LTA4LTIxIGF0IDAxOjE0
-ICswNTMwLCBSYXVsIFBpcGVyIHdyb3RlOg0KPiA+ID4gSGVsbG8gSW5nYSwNCj4gPiA+IEF0dGFj
-aGVkLA0KPiA+ID4gUmdkcywNCj4gPiA+IFJwDQo+ID4gPiANCj4gPiA+IE9uIFR1ZSwgQXVnIDIx
-LCAyMDE4IGF0IDEyOjQ2IEFNLCBTdG90bGFuZCwgSW5nYQ0KPiA+ID4gPGluZ2Euc3RvdGxhbmRA
-aW50ZWwuY29tPiB3cm90ZToNCj4gPiA+ID4gSGkgUmF1bCwNCj4gPiA+ID4gDQo+ID4gPiA+IE9u
-IFR1ZSwgMjAxOC0wOC0yMSBhdCAwMDoxMyArMDUzMCwgUmF1bCBQaXBlciB3cm90ZToNCj4gPiA+
-ID4gPiBIZWxsbyBJbmdhLA0KPiA+ID4gPiA+IGl0IGdpdmVzIHRoZSBiZWxvdyBsb2dzIDoNCj4g
-PiA+ID4gPiANCj4gPiA+ID4gPiBwaUByYXNwYmVycnlwaTp+L2JsdWVaICQgbWVzaGN0bCAtYyBt
-ZXNoDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gRmFpbGVkIHRvIHBhcnNlIGxvY2FsIG5vZGUgY29u
-ZmlndXJhdGlvbiBmaWxlDQo+ID4gPiA+ID4gbWVzaC9sb2NhbF9ub2RlLmpzb24NCj4gPiA+ID4g
-PiANCj4gPiA+ID4gPiANCj4gPiA+ID4gPiANCj4gPiA+ID4gPiBwaUByYXNwYmVycnlwaTp+L2Js
-dWVaICQgbWVzaGN0bCAtdg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IG1lc2hjdGw6IDUuNTANCj4g
-PiA+ID4gPiANCj4gPiA+ID4gPiBpIG5lZWQgdG8gZG8gZXhwb3J0IGJlZm9yZSBleGVjdXRpbmcg
-YWJvdmUgY29tbWFuZHMNCj4gPiA+ID4gPiANCj4gPiA+ID4gPiBwaUByYXNwYmVycnlwaTp+ICQg
-TERfTElCUkFSWV9QQVRIPS91c3IvbG9jYWwvbGliDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gcGlA
-cmFzcGJlcnJ5cGk6fiAkIGV4cG9ydCBMRF9MSUJSQVJZX1BBVEgNCj4gPiA+ID4gPiANCj4gPiA+
-ID4gPiANCj4gPiA+ID4gPiANCj4gPiA+ID4gPiB0byBhdm9pZCB0aGUgYmVsb3cgZXJyb3IgOg0K
-PiA+ID4gPiA+IA0KPiA+ID4gPiA+IHBpQHJhc3BiZXJyeXBpOn4gJCBtZXNoY3RsIC12DQo+ID4g
-PiA+ID4gDQo+ID4gPiA+ID4gbWVzaGN0bDogZXJyb3Igd2hpbGUgbG9hZGluZyBzaGFyZWQgbGli
-cmFyaWVzOiBsaWJqc29uLQ0KPiA+ID4gPiA+IGMuc28uNDoNCj4gPiA+ID4gPiBjYW5ub3QNCj4g
-PiA+ID4gPiBvcGVuIHNoYXJlZCBvYmplY3QgZmlsZTogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9y
-eQ0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IGNhbiB5b3UgcGxlYXNlIGFzc2lz
-dD8NCj4gPiA+ID4gPiBvciBhbnkgIGV4cGVyaW1lbnRhbCBwYXRjaCBJIGNvdWxkIHVzZSBvbiBC
-bHVlWg0KPiA+ID4gPiA+IA0KPiA+ID4gPiA+IFRoYW5rcyBpbiBhZHZhbmNlDQo+ID4gPiA+ID4g
-QmVzdCBSZWdhcmRzLA0KPiA+ID4gPiA+IFJwDQo+ID4gPiA+ID4gDQo+ID4gPiA+ID4gT24gTW9u
-LCBBdWcgMjAsIDIwMTggYXQgMzowNiBBTSwgU3RvdGxhbmQsIEluZ2EgPGluZ2Euc3RvdGxhbg0K
-PiA+ID4gPiA+IGRAaW4NCj4gPiA+ID4gPiB0ZWwuDQo+ID4gPiA+ID4gY29tPiB3cm90ZToNCj4g
-PiA+ID4gPiA+IEhpIFJhdWwsDQo+ID4gPiA+ID4gPiBPbiBTdW4sIDIwMTgtMDgtMTkgYXQgMDM6
-MDMgKzA1MzAsIFJhdWwgUGlwZXIgd3JvdGU6DQo+ID4gPiA+ID4gPiA+IEhlbGxvICwNCj4gPiA+
-ID4gPiA+ID4gSSBoYXZlIGJ1aWx0IGFuZCBCbHVlWiA1LjUwIGZyb20gdGhlIHNvdXJjZSBhbmQg
-aW5zdGFsbGVkDQo+ID4gPiA+ID4gPiA+IGl0DQo+ID4gPiA+ID4gPiA+IG9uDQo+ID4gPiA+ID4g
-PiA+IHJhc3BiZXJyeSBQSSAzIFcwLCBidXQgd2hlbiBJIGFtIHRyeWluZyB0byBsYXVuY2ggdGhl
-DQo+ID4gPiA+ID4gPiA+IG1lc2hjdGwNCj4gPiA+ID4gPiA+ID4gdG9vbCAtDQo+ID4gPiA+ID4g
-PiA+IHVzaW5nIC4vbWVzaGN0bCAoZnJvbSB3aXRoaW4gb3Igb3V0IHNpZGUgdGhlIG1lc2gNCj4g
-PiA+ID4gPiA+ID4gZGlyZWN0b3J5KQ0KPiA+ID4gPiA+ID4gPiBpIGFtDQo+ID4gPiA+ID4gPiA+
-IGdldHRpbmcgdGhlIGJlbG93IGVycm9yICA6DQo+ID4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4g
-PiBGYWlsZWQgdG8gcGFyc2UgcHJvdmlzaW9uaW5nIGRhdGFiYXNlIGZpbGUgcHJvdl9kYi5qc29u
-DQo+ID4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gPiBJIGNoZWNrZWQgdGhlIG9ubGluZSBzYW5p
-dHkgb25mdGhlIGFib3ZlIGpzb24gZmlsZSBhbmQgaXQNCj4gPiA+ID4gPiA+ID4gc2VlbXMNCj4g
-PiA+ID4gPiA+ID4gY29ycmVjdC4NCj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+IA0KPiA+
-ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gSSB0cmllZCBkb2luZyB0aGUgc3VkbyBoY2l0b29s
-IC1sZXNjYW4gLSBpdCBzaG93cyB0aGUgTEUNCj4gPiA+ID4gPiA+ID4gZGV2aWNlcw0KPiA+ID4g
-PiA+ID4gPiBhbmQgYWxzbw0KPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gYmx1ZXRvb3Ro
-ZCAtdiBnaXZlcyA1LjUwIHdoaWNoIHNob3dzIG15IGNvbXBpbGF0aW9uIGFuZA0KPiA+ID4gPiA+
-ID4gPiBsb2FkaW5nDQo+ID4gPiA+ID4gPiA+IG9mIHRoZQ0KPiA+ID4gPiA+ID4gPiBuZXcgQmx1
-ZVogaXMgYWx0ZWFzdCBjb3JyZWN0Lg0KPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gSSBo
-YXZlIGFscmVhZHkgaW5zdGFsbGVkIHRoZSBjLWpzb24gbGliIC4NCj4gPiA+ID4gPiA+ID4gDQo+
-ID4gPiA+ID4gPiA+IElzIHRoaXMgYSBidWcgaW4gbWVzaGN0bD8NCj4gPiA+ID4gPiA+ID4gDQo+
-ID4gPiA+ID4gPiA+IFBsZWFzZSBhc3Npc3QgIQ0KPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+
-ID4gDQo+ID4gPiA+ID4gPiA+IFRoYW5rcyBpbiBBZHZhbmNlICENCj4gPiA+ID4gPiA+IA0KPiA+
-ID4gPiA+ID4gQXJlIHlvdSB1c2luZyB0aGUgZGVmYXVsdCBqc29uIGZpbGU/IElmIHNvLCB0aGVy
-ZSdzIGEgYnVnDQo+ID4gPiA+ID4gPiBpbg0KPiA+ID4gPiA+ID4gbWVzaGN0bA0KPiA+ID4gPiA+
-ID4gZm9yIHJlYWRpbmcgZnJvbSBkZWZhdWx0IGxvY2F0aW9uIChqdXN0IHN1YmltbXRlZCBhIHBh
-dGNoDQo+ID4gPiA+ID4gPiBmb3INCj4gPiA+ID4gPiA+IHRoYXQpLg0KPiA+ID4gPiA+ID4gDQo+
-ID4gPiA+ID4gPiBNZWFud2hpbGUsIHRyeSBydW5uaW5nOg0KPiA+ID4gPiA+ID4gIC4vbWVzaGN0
-bCAtYyBtZXNoDQo+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+IFJlZ2FyZHMsDQo+ID4gPiA+ID4g
-PiBJbmdhDQo+ID4gPiA+ID4gPiANCj4gPiA+ID4gDQo+ID4gPiA+IEkgYW0gbm90IGFuIGV4cGVy
-dCBvbiBzeXN0ZW0gc2V0dXAsIGJ1dCBjb3VsZCB5b3UgcGxlYXNlIHJ1bg0KPiA+ID4gPiBzdWRv
-IC9zYmluL2xkY29uZmlnIC12DQo+ID4gPiA+IA0KPiA+ID4gPiBSZWdhcmRzLA0KPiA+ID4gPiBJ
-bmdhDQo+ID4gPiANCj4gPiA+IA0KPiA+IA0KPiA+IFRoZXJlIGlzIG5vIHJlY29yZCBvZiBsaWJq
-c29uLWMgaW4geW91ciBsZGNvbmZpZyBvdXRwdXQuIFNvIG15DQo+ID4gZ3Vlc3MNCj4gPiB3b3Vs
-ZCBiZSB0aGF0IHNvbWV0aGluZyBpcyB0byBkbyB3aXRoIHRoZSBpbnN0YWxsYXRpb24gb2YganNv
-bi1jDQo+ID4gbGlicmFyeSBvbiBycGkuDQo+ID4gDQo+ID4gSWYgeW91IGhhZCB0byBidWlsZCB0
-aGUganNvbi1jIGZyb20gc291cmNlIGFuZCB0aGVuIHJ1biBtYWtlDQo+ID4gaW5zdGFsbCwNCj4g
-PiB5b3UgbWF5IHdhbnQgdG8gbW9kaWZ5IHRoZSBpbnN0YWxsYXRpb24gcGF0aCB0byBiZSBzb21l
-dGhpbmcNCj4gPiBzdGFuZGFyZA0KPiA+IG9uIHlvdXIgc3lzdGVtIGZyb20gd2hlcmUgbGRjb25m
-aWcgd2lsbCBiZSBhYmxlIHRvIHBpY2sgaXQgdXAuDQo+ID4gLi9jb25maWd1cmUgLS1wcmVmaXg9
-L3NvbWV3aGVyZS9ub3QvdXNyL2xvY2FsIHByaW9yIHRvIG1ha2UgaW5zdGFsbA0KPiA+IA0KPiA+
-IEFsdGVybmF0aXZlbHksIHlvdSBtYXkgdHJ5IHRvIHJ1biB0aGlzIGNvbW1hbmQ6DQo+ID4gDQo+
-ID4gIGxkY29uZmlnIC1sIC9wYXRoLXRvLWxpYmpzb24tYy5zby54eHgNCj4gPiANCj4gPiBSZS1y
-dW4gbGRjb25maWcgYWZ0ZXJ3YXJkcyBhbmQgc2VlIGlmIHRoZSBsaWJqc29uLWMgc2hvd2VkIHVw
-Lg0KPiA+IA0KPiA+IFJlZ2FyZHMsDQo+ID4gDQo+ID4gSW5nYQ0KPiA+IA0KPiA+IFAuUy4gSnVz
-dCBGWUksIHRoZSBzdGFuZGFyZCB3YXkgdG8gcmVzcG9uZCB0byBlbWFpbHMgb24gYmx1ZXoNCj4g
-PiBtYWlsaW5nDQo+ID4gbGlzdCBpcyB0byBpbmNsdWRlIHRoZSBib2R5IG9mIHlvdSByZXBseSBh
-dCB0aGUgdGFpbCBvZiB0aGUNCj4gPiBtZXNzYWdlLg0KPiA+IA0KPiANCj4gU29ycnkgZm9yIFRv
-cCBwb3N0aW5nLg0KPiBJIHJlaW5zdGFsbGVkIHRoZSBibHVlWiAgKHdpdGggLS1lbmFibGUtbWVz
-aCkgLCBpbnN0YWxsZWQganNvbi1jIGZyb20NCj4gdGhlIGdpdA0KPiBJIGNhbiBzZWUgdGhlIGVu
-dHJ5IG9mIHRoZSBsaWJqc29uLWMgdW5saWtlIHByZXZpb3VzbHkgYnV0IGl0IHN0aWxsDQo+IGdp
-dmVzIHRoZSBzYW1lIGVycm9yLg0KDQpCeSB0aGUgc2FtZSBlcnJvciB5b3UgbWVhbiAiZXJyb3Ig
-bG9hZGluZyBzaGFyZWQgbGlicmFyeSIgb3IgImZhaWxlZCB0bw0KcGFyc2UiPw0KDQo+IERvbid0
-IHdlIGhhdmUgdG8gbGluayB0aGUgbGlianNvbi1jIHdpdGggdGhlIEJsdWVaIHdoaWxlIGJ1aWxk
-aW5nIGJ5DQo+IHNldHRpbmcgc29tZSBMaW5rZXIgZmxhZ3MoTEQpIGluIHRoZSBNYWtlZmlsZSBv
-ZiB0aGUgQmx1ZVouSXMgdGhlcmUNCj4gYW55IHN1Y2ggb3B0aW9uPw0KPiBIb3cgd2lsbCBJIGNv
-bWUgdG8ga25vdyB0aGF0IGl0IGhhcyBidWlsdCBzdWNjZXNzZnVsbHkgd2l0aCB0aGUNCj4gcmVm
-ZXJlbmNlIHRvIHRoZSBsaWJqc29uLWMuDQo+IEkgYmVsaWV2ZSB3ZSBtdXN0IGhhdmUganNvbi1j
-IHByZS1pbnN0YWxsZWQgYmVmb3JlIGJ1aWxkaW5nDQo+IHRoZSAgQmx1ZVoNCj4gYW5kIEJ1aWxk
-IHNldHVwIG9mIEJsdWVaIG11c3Qga25vdyB3aGVyZSBpcyB0aGUgbGlianNvbi1jLg0KDQpCb3Ro
-IGNvbmZpZ3VyZSBhbmQgTWFrZWZpbGUudG9vbHMgcmVmZXJlbmNlIGxqc29uLWMuIG1lc2hjdGwg
-ZXhlY3V0YWJsZQ0Kd291bGQgbm90IGJlIGJ1aWx0IGlmIGxpYmpzb24tYyB3YXNuJ3QgZm91bmQg
-ZHVyaW5nIGJ1aWxkIHRpbWUuDQoNCkluIGNhc2UgeW91IGFyZSBzdGlsbCBleHBlcmllbmNpbmcg
-ImxvYWRpbmcgc2hhcmVkIGxpYnJhcnkiIGVycm9yLCBteQ0KZ3Vlc3MgaXMgdGhhdCB0aGUgbGli
-anNvbi1jIGxvY2F0aW9uIGlzIG5vdCBvbiB0aGUgc2VhcmNoIHBhdGguDQoNClJlZ2FyZHMsDQpJ
-bmdh
+Hi Sukumar,
+
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on v4.18 next-20180821]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Raghuram-Hegde/Bluetooth-btintel-Add-platform-device-for-rfkill-signal/20180821-195829
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+
+
+coccinelle warnings: (new ones prefixed by >>)
+
+>> drivers/bluetooth/btintel.c:416:1-3: WARNING: PTR_ERR_OR_ZERO can be used
+
+Please review and possibly fold the followup patch.
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
