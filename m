@@ -1,238 +1,67 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Sathish Narasimman <nsathish41@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: luiz.dentz@gmail.com,
-        Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH v2] Bluetooth: btusb: hci_event: handle msbc audio over USB Endpoints
-Date: Tue, 21 Aug 2018 13:00:33 +0530
-Message-Id: <1534836633-8846-1-git-send-email-sathish.narasimman@intel.com>
+From: "Stotland, Inga" <inga.stotland@intel.com>
+To: "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ] tools/meshctl: Fix default directory for JSON
+ files
+Date: Tue, 21 Aug 2018 06:28:22 +0000
+Message-ID: <1534832900.5879.36.camel@intel.com>
+References: <20180819213026.28429-1-inga.stotland@intel.com>
+         <CABBYNZKZii3sQv-mv-xyiko9t=KaV7iQ2v8Arat5sR5NbNM-sA@mail.gmail.com>
+In-Reply-To: <CABBYNZKZii3sQv-mv-xyiko9t=KaV7iQ2v8Arat5sR5NbNM-sA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For msbc encoded audio stream over usb transport, btusb driver
-to be set to alternate settings 6 as per BT core spec 5.0. This
-done from  hci_sync_conn_complete_evt. The type of air mode is known
-during this event. For this reason the btusb is to be notifed
-about the TRANSPARENT air mode and the ALT setting 6 is selected.
-The changes are made considering some discussion over the similar
-patch submitted earlier from Kuba Pawlak(link below)
-https://www.spinics.net/lists/linux-bluetooth/msg64577.html
-
-Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
----
- drivers/bluetooth/btusb.c   | 135 ++++++++++++++++++++++++++++++--------------
- include/net/bluetooth/hci.h |   1 +
- net/bluetooth/hci_event.c   |   5 ++
- 3 files changed, 98 insertions(+), 43 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index cd2e5cf..e922f24 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -69,6 +69,9 @@ static struct usb_driver btusb_driver;
- #define BTUSB_BCM2045		0x40000
- #define BTUSB_IFNUM_2		0x80000
- #define BTUSB_CW6622		0x100000
-+#define BTUSB_ALT6_FLOW_CNTRL	6
-+
-+static int set_hci_packet_interval_flow = BTUSB_ALT6_FLOW_CNTRL;
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -906,6 +909,37 @@ static void btusb_isoc_complete(struct urb *urb)
- 	}
- }
- 
-+static inline void __fill_isoc_descriptor_msbc(struct urb *urb, int len, int mtu)
-+{
-+	int i, offset = 0;
-+
-+	/* For msbc ALT 6 setting the host will send the packet at continuous flow
-+	 * As per core spec 5, vol 4, part B, table 2.1. For ALT setting 6 the
-+	 * HCI PACKET INTERVAL should be 7.5ms for every usb packets.
-+	 * To maintain the rate we send 63bytes of usb packets alternatively for
-+	 * 7ms and 8ms to maintain the rate as 7.5ms.
-+	 */
-+	if (set_hci_packet_interval_flow == 6)
-+		set_hci_packet_interval_flow = 7;
-+	else if (set_hci_packet_interval_flow == 7)
-+		set_hci_packet_interval_flow = 6;
-+
-+	BT_DBG("len %d mtu %d", len, mtu);
-+
-+	for (i = 0; i < set_hci_packet_interval_flow; i++) {
-+		urb->iso_frame_desc[i].offset = offset;
-+		urb->iso_frame_desc[i].length = offset;
-+	}
-+
-+	if (len && i < BTUSB_MAX_ISOC_FRAMES) {
-+		urb->iso_frame_desc[i].offset = offset;
-+		urb->iso_frame_desc[i].length = len;
-+		i++;
-+	}
-+
-+	urb->number_of_packets = i;
-+}
-+
- static inline void __fill_isoc_descriptor(struct urb *urb, int len, int mtu)
- {
- 	int i, offset = 0;
-@@ -1300,7 +1334,11 @@ static struct urb *alloc_isoc_urb(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	urb->transfer_flags  = URB_ISO_ASAP;
- 
--	__fill_isoc_descriptor(urb, skb->len,
-+	if (data->isoc_altsetting == 6)
-+		__fill_isoc_descriptor_msbc(urb, skb->len,
-+			       le16_to_cpu(data->isoc_tx_ep->wMaxPacketSize));
-+	else
-+		__fill_isoc_descriptor(urb, skb->len,
- 			       le16_to_cpu(data->isoc_tx_ep->wMaxPacketSize));
- 
- 	skb->dev = (void *)hdev;
-@@ -1390,18 +1428,6 @@ static int btusb_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return -EILSEQ;
- }
- 
--static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
--{
--	struct btusb_data *data = hci_get_drvdata(hdev);
--
--	BT_DBG("%s evt %d", hdev->name, evt);
--
--	if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
--		data->sco_num = hci_conn_num(hdev, SCO_LINK);
--		schedule_work(&data->work);
--	}
--}
--
- static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
-@@ -1445,6 +1471,58 @@ static inline int __set_isoc_interface(struct hci_dev *hdev, int altsetting)
- 	return 0;
- }
- 
-+static void bt_switch_alt_setting(struct hci_dev *hdev, int new_alts)
-+{
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+
-+	if (data->isoc_altsetting != new_alts) {
-+		unsigned long flags;
-+
-+		clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
-+		usb_kill_anchored_urbs(&data->isoc_anchor);
-+
-+		/* When isochronous alternate setting needs to be
-+		 * changed, because SCO connection has been added
-+		 * or removed, a packet fragment may be left in the
-+		 * reassembling state. This could lead to wrongly
-+		 * assembled fragments.
-+		 *
-+		 * Clear outstanding fragment when selecting a new
-+		 * alternate setting.
-+		 */
-+		spin_lock_irqsave(&data->rxlock, flags);
-+		kfree_skb(data->sco_skb);
-+		data->sco_skb = NULL;
-+		spin_unlock_irqrestore(&data->rxlock, flags);
-+
-+		if (__set_isoc_interface(hdev, new_alts) < 0)
-+			return;
-+	}
-+	if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
-+		if (btusb_submit_isoc_urb(hdev, GFP_KERNEL) < 0)
-+			clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
-+		else
-+			btusb_submit_isoc_urb(hdev, GFP_KERNEL);
-+	}
-+}
-+
-+static void btusb_notify(struct hci_dev *hdev, unsigned int evt)
-+{
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+
-+	BT_DBG("%s evt %d", hdev->name, evt);
-+
-+	if (hci_conn_num(hdev, SCO_LINK) != data->sco_num) {
-+		data->sco_num = hci_conn_num(hdev, SCO_LINK);
-+		schedule_work(&data->work);
-+	}
-+
-+	if (evt == HCI_NOTIFY_AIR_MODE_TRANSP) {
-+		/* Alt setting 6 is for msbc encoded audio channel */
-+		bt_switch_alt_setting(hdev, 6);
-+	}
-+}
-+
- static void btusb_work(struct work_struct *work)
- {
- 	struct btusb_data *data = container_of(work, struct btusb_data, work);
-@@ -1472,36 +1550,7 @@ static void btusb_work(struct work_struct *work)
- 			new_alts = data->sco_num;
- 		}
- 
--		if (data->isoc_altsetting != new_alts) {
--			unsigned long flags;
--
--			clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
--			usb_kill_anchored_urbs(&data->isoc_anchor);
--
--			/* When isochronous alternate setting needs to be
--			 * changed, because SCO connection has been added
--			 * or removed, a packet fragment may be left in the
--			 * reassembling state. This could lead to wrongly
--			 * assembled fragments.
--			 *
--			 * Clear outstanding fragment when selecting a new
--			 * alternate setting.
--			 */
--			spin_lock_irqsave(&data->rxlock, flags);
--			kfree_skb(data->sco_skb);
--			data->sco_skb = NULL;
--			spin_unlock_irqrestore(&data->rxlock, flags);
--
--			if (__set_isoc_interface(hdev, new_alts) < 0)
--				return;
--		}
--
--		if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
--			if (btusb_submit_isoc_urb(hdev, GFP_KERNEL) < 0)
--				clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
--			else
--				btusb_submit_isoc_urb(hdev, GFP_KERNEL);
--		}
-+		bt_switch_alt_setting(hdev, new_alts);
- 	} else {
- 		clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
- 		usb_kill_anchored_urbs(&data->isoc_anchor);
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index cdd9f1f..3498c6b 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -52,6 +52,7 @@
- #define HCI_NOTIFY_CONN_ADD		1
- #define HCI_NOTIFY_CONN_DEL		2
- #define HCI_NOTIFY_VOICE_SETTING	3
-+#define HCI_NOTIFY_AIR_MODE_TRANSP	4
- 
- /* HCI bus types */
- #define HCI_VIRTUAL	0
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f12555f..8ef5220 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4100,6 +4100,11 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
- 		break;
- 	}
- 
-+	if (ev->air_mode == SCO_AIRMODE_TRANSP) {
-+		if (hdev->notify)
-+			hdev->notify(hdev, HCI_NOTIFY_AIR_MODE_TRANSP);
-+	}
-+
- 	hci_connect_cfm(conn, ev->status);
- 	if (ev->status)
- 		hci_conn_del(conn);
--- 
-2.7.4
+SGkgTHVpeiwNCg0KT24gTW9uLCAyMDE4LTA4LTIwIGF0IDExOjAxICswMzAwLCBMdWl6IEF1Z3Vz
+dG8gdm9uIERlbnR6IHdyb3RlOg0KPiBIaSBJbmdhLA0KPiANCj4gT24gTW9uLCBBdWcgMjAsIDIw
+MTggYXQgMTI6MzAgQU0sIEluZ2EgU3RvdGxhbmQgPGluZ2Euc3RvdGxhbmRAaW50ZWwuDQo+IGNv
+bT4gd3JvdGU6DQo+ID4gVGhpcyBmaXhlcyB0aGUgbmFtZSBvZiBkZWZhdWx0IGRpcmVjdG9yeSB0
+aGF0IGNvbnRhaW5zIHNhbXBsZSBKU09ODQo+ID4gZmlsZXMuDQo+IA0KPiBKdXN0IGEgbm90ZSBy
+ZWdhcmRpbmcgbW9kaWZ5aW5nL3VzaW5nIGZpbGVzIG9uIHRoZSB0cmVlLCBhcyB3ZQ0KPiBleHBl
+cmllbmNlIGhlcmUgaXQgaXMgYSBiYWQgaWRlYSBzaW5jZSBvbmNlIHdlIG1vdmUgb3IgaXQgaXMg
+Y2hhbmdlZA0KPiB0aGlzIGNvZGUgd291bGQgaGF2ZSB0byBiZSBjaGFuZ2VkIGFzIHdlbGwuIEFs
+c28gSSByZW1lbWJlcg0KPiBjb21tZW50aW5nDQo+IHRoYXQgaWYgdGhlIGNvbmZpZ3VyYXRpb24g
+aXMgY2hhbmdlZCBieSBtZXNoY3RsIHlvdXIgdHJlZSB3aWxsIHRoZW4NCj4gY29udGFpbiBjaGFu
+Z2VzIHRoYXQgc2hhbGwgbm90IGJlIGFwcGxpZWQsIHNvIGluc3RlYWQgb2YgY2hhbmdpbmcgdGhl
+DQo+IGZpbGUgaW4gcGxhY2UgSWQgbWFrZSBhIGRlZmF1bHQgbG9jYXRpb24gc29tZXRoaW5nIGxp
+a2UNCj4gfi8uY29uZmlnL21lc2hjdGwvIGFuZCBjb3B5IG92ZXIgdGhlIC5qc29uIGZpbGVzIHRo
+ZXJlIGlmIHRoZXkgZG9uJ3QNCj4gZXhpc3QsIHRoYXQgd2F5IHdlIGF2b2lkIGhhdmluZyB0byBj
+YXJyeSBjaGFuZ2VzIGluIHRoZSB0cmVlLg0KPiANCj4gPiAtLS0NCj4gPiAgdG9vbHMvbWVzaGN0
+bC5jIHwgMjAgKysrKysrKysrKy0tLS0tLS0tLS0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDEwIGlu
+c2VydGlvbnMoKyksIDEwIGRlbGV0aW9ucygtKQ0KPiA+IA0KPiA+IGRpZmYgLS1naXQgYS90b29s
+cy9tZXNoY3RsLmMgYi90b29scy9tZXNoY3RsLmMNCj4gPiBpbmRleCAzZTE0ODRmNjEuLmE4NDY4
+YjcxNiAxMDA2NDQNCj4gPiAtLS0gYS90b29scy9tZXNoY3RsLmMNCj4gPiArKysgYi90b29scy9t
+ZXNoY3RsLmMNCj4gPiBAQCAtMTkxMywyMSArMTkxMywyMCBAQCBpbnQgbWFpbihpbnQgYXJnYywg
+Y2hhciAqYXJndltdKQ0KPiA+ICAgICAgICAgYnRfc2hlbGxfc2V0X3Byb21wdChQUk9NUFRfT0ZG
+KTsNCj4gPiANCj4gPiAgICAgICAgIGlmICghbWVzaF9jb25maWdfZGlyKSB7DQo+ID4gLSAgICAg
+ICAgICAgICAgIGJ0X3NoZWxsX3ByaW50ZigiTG9jYWwgY29uZmlnIGRpcmVjdG9yeSBub3QNCj4g
+PiBwcm92aWRlZC5cbiIpOw0KPiA+IC0gICAgICAgICAgICAgICBtZXNoX2NvbmZpZ19kaXIgPSAi
+IjsNCj4gPiAtICAgICAgIH0gZWxzZSB7DQo+ID4gLSAgICAgICAgICAgICAgIGJ0X3NoZWxsX3By
+aW50ZigiUmVhZGluZyBwcm92X2RiLmpzb24gYW5kDQo+ID4gbG9jYWxfbm9kZS5qc29uIGZyb20i
+DQo+ID4gLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiICVzXG4iLCBtZXNoX2NvbmZp
+Z19kaXIpOw0KPiA+ICsgICAgICAgICAgICAgICBwcmludGYoIkxvY2FsIGNvbmZpZyBkaXJlY3Rv
+cnkgbm90IHByb3ZpZGVkLlxuIik7DQo+ID4gKyAgICAgICAgICAgICAgIG1lc2hfY29uZmlnX2Rp
+ciA9ICJtZXNoIjsNCj4gPiAgICAgICAgIH0NCj4gPiANCj4gPiArICAgICAgIHByaW50ZigiUmVh
+ZGluZyBwcm92X2RiLmpzb24gYW5kIGxvY2FsX25vZGUuanNvbiBmcm9tIg0KPiA+ICsgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgIiAlcyBkaXJlY3RvcnlcbiIsDQo+ID4gbWVzaF9jb25m
+aWdfZGlyKTsNCj4gPiArDQo+ID4gICAgICAgICBsZW4gPSBzdHJsZW4obWVzaF9jb25maWdfZGly
+KTsNCj4gPiAtICAgICAgIGlmIChsZW4gJiYgbWVzaF9jb25maWdfZGlyW2xlbiAtIDFdICE9ICcv
+Jykgew0KPiA+ICsNCj4gPiArICAgICAgIGlmIChsZW4gJiYgbWVzaF9jb25maWdfZGlyW2xlbiAt
+IDFdICE9ICcvJykNCj4gPiAgICAgICAgICAgICAgICAgZXh0cmEgPSAxOw0KPiA+IC0gICAgICAg
+ICAgICAgICBidF9zaGVsbF9wcmludGYoIm1lc2hfY29uZmlnX2RpclslZF0gJXNcbiIsIGxlbiwN
+Cj4gPiAtICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAmbWVz
+aF9jb25maWdfZGlyW2xlDQo+ID4gbiAtIDFdKTsNCj4gPiAtICAgICAgIH0gZWxzZSB7DQo+ID4g
+KyAgICAgICBlbHNlDQo+ID4gICAgICAgICAgICAgICAgIGV4dHJhID0gMDsNCj4gPiAtICAgICAg
+IH0NCj4gPiArDQo+ID4gICAgICAgICBtZXNoX2xvY2FsX2NvbmZpZ19maWxlbmFtZSA9IGdfbWFs
+bG9jKGxlbiArDQo+ID4gc3RybGVuKCJsb2NhbF9ub2RlLmpzb24iKQ0KPiA+ICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAN
+Cj4gPiAgICAgICsgMik7DQo+ID4gICAgICAgICBpZiAoIW1lc2hfbG9jYWxfY29uZmlnX2ZpbGVu
+YW1lKQ0KPiA+IEBAIC0xOTU2LDYgKzE5NTUsNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
+YXJndltdKQ0KPiA+IA0KPiA+ICAgICAgICAgc3ByaW50ZihtZXNoX3Byb3ZfZGJfZmlsZW5hbWUs
+ICIlcyIsIG1lc2hfY29uZmlnX2Rpcik7DQo+ID4gICAgICAgICBsZW4gPSBzdHJsZW4obWVzaF9j
+b25maWdfZGlyKTsNCj4gPiArDQo+ID4gICAgICAgICBpZiAoZXh0cmEpDQo+ID4gICAgICAgICAg
+ICAgICAgIHNwcmludGYobWVzaF9wcm92X2RiX2ZpbGVuYW1lICsgbGVuICwgIiVjIiwgJy8nKTsN
+Cj4gPiANCj4gPiAtLQ0KPiA+IDIuMTQuNA0KPiA+IA0KDQpUaGFua3MgZm9yIHRoZSBmZWVkYmFj
+ay4gSSBhZ3JlZS4NClNlbnQgcGF0Y2ggc2V0IHYyLg0KDQpSZWdhcmRzLA0KSW5nYQ==
