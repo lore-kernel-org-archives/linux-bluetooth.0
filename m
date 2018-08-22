@@ -1,42 +1,31 @@
-Return-Path: <bgodavar@codeaurora.org>
-From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Cc: mka@chromium.org,
-	linux-kernel@vger.kernel.org,
-	linux-bluetooth@vger.kernel.org,
-	hemantg@codeaurora.org,
-	linux-arm-msm@vger.kernel.org,
-	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v1 0/2] Fix for proto races in hci_serdev.
-Date: Wed, 22 Aug 2018 17:34:10 +0530
-Message-Id: <20180822120412.20285-1-bgodavar@codeaurora.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Wed, 22 Aug 2018 14:35:00 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Raghuram Hegde <raghuram.hegde@intel.com>, amit.k.bag@intel.com,
+        linux-bluetooth@vger.kernel.org, kbuild-all@01.org,
+        sukumar.ghorai@intel.com, chethan.tumkur.narayan@intel.com,
+        Philip Li <philip.li@intel.com>
+Subject: Re: [PATCH] Bluetooth: btintel: fix ptr_ret.cocci warnings
+Message-ID: <20180822063500.jjugs2gerob7mxfq@wfg-t540p.sh.intel.com>
+References: <1534844080-31240-1-git-send-email-raghuram.hegde@intel.com>
+ <20180822015950.cgvy5wvcdwarka7r@wfg-t540p.sh.intel.com>
+ <CD7560BA-BAFD-4C3B-9591-B6CA213052D6@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <CD7560BA-BAFD-4C3B-9591-B6CA213052D6@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In recent testing we found that while removing hci_uart, we have seen
-execution of hci_uart_write_work() after calling vendor specific
-proto close. As we are freeing the vendor specific Tx and Rx buffers
-in vendor close, execution of functions i.e. Rx or Tx functions may cause
-a crash.
+Marcel,
 
-we already have a commit for hci_ldisc.c "e508e6026b19" and "048e1bd3a27f"
-to overcome the race condition.
+>this does not apply cleanly to bluetooth-next tree. And then I
+>realized this is against a patch that I have not applied. So sorry
+>for the noise.
 
-Changes of v1:
- 
-  * clearing flag HCI_UART_PROTO_READY while mnodule deinit such that
-    we will not have any tractions further on Tx or Rx.
-  * added check of HCI_UART_PROTO_READY while dequeuing an packet.
-  
+Ah never mind, that should be the typical case. As the robot works on
+bleeding edge commits and patches, trying to find regressions before
+they are merged into maintainer and mainline trees.  :)
 
-Balakrishna Godavarthi (2):
-  Bluetooth: hci_serdev: clear HCI_UART_PROTO_READY to avoid closing
-    proto races
-  Bluetooth: hci_serdev: Add protocol check in hci_uart_dequeue().
-
- drivers/bluetooth/hci_serdev.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Regards,
+Fengguang
