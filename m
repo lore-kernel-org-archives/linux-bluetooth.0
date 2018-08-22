@@ -8,102 +8,42 @@ Cc: mka@chromium.org,
 	hemantg@codeaurora.org,
 	linux-arm-msm@vger.kernel.org,
 	Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v1 2/2] Bluetooth: hci_qca: Remove hdev dereference in qca_close().
-Date: Wed, 22 Aug 2018 17:50:05 +0530
-Message-Id: <20180822122005.11218-3-bgodavar@codeaurora.org>
+Subject: [PATCH v1 1/2] Bluetooth: hci_qca: Remove serdev_device_open/close function calls
+Date: Wed, 22 Aug 2018 17:50:04 +0530
+Message-Id: <20180822122005.11218-2-bgodavar@codeaurora.org>
 In-Reply-To: <20180822122005.11218-1-bgodavar@codeaurora.org>
 References: <20180822122005.11218-1-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When flag KASAN is set, we are seeing an following crash while removing
-hci_uart module.
-
-[   50.589909] Unable to handle kernel paging request at virtual address 6b6b6b6b6b6b73
-[   50.597902] Mem abort info:
-[   50.600846]   Exception class = DABT (current EL), IL = 32 bits
-[   50.606959]   SET = 0, FnV = 0
-[   50.610142]   EA = 0, S1PTW = 0
-[   50.613396] Data abort info:
-[   50.616401]   ISV = 0, ISS = 0x00000004
-[   50.620373]   CM = 0, WnR = 0
-[   50.623466] [006b6b6b6b6b6b73] address between user and kernel address ranges
-[   50.630818] Internal error: Oops: 96000004 [#1] PREEMPT SMP
-
-[   50.671670] PC is at qca_power_shutdown+0x28/0x100 [hci_uart]
-[   50.677593] LR is at qca_close+0x74/0xb0 [hci_uart]
-[   50.775689] Process rmmod (pid: 2144, stack limit = 0xffffff801ba90000)
-[   50.782493] Call trace:
-
-[   50.872150] [<ffffff8000c3c81c>] qca_power_shutdown+0x28/0x100 [hci_uart]
-[   50.879138] [<ffffff8000c3c968>] qca_close+0x74/0xb0 [hci_uart]
-[   50.885238] [<ffffff8000c3a71c>] hci_uart_unregister_device+0x44/0x50 [hci_uart]
-[   50.892846] [<ffffff8000c3c9f4>] qca_serdev_remove+0x50/0x5c [hci_uart]
-[   50.899654] [<ffffff800844f630>] serdev_drv_remove+0x28/0x38
-[   50.905489] [<ffffff800850fc44>] device_release_driver_internal+0x140/0x1e4
-[   50.912653] [<ffffff800850fd94>] driver_detach+0x78/0x84
-[   50.918121] [<ffffff800850edac>] bus_remove_driver+0x80/0xa8
-[   50.923942] [<ffffff80085107dc>] driver_unregister+0x4c/0x58
-[   50.929768] [<ffffff8000c3ca8c>] qca_deinit+0x24/0x598 [hci_uart]
-[   50.936045] [<ffffff8000c3ca10>] hci_uart_exit+0x10/0x48 [hci_uart]
-[   50.942495] [<ffffff8008136630>] SyS_delete_module+0x17c/0x224
-
-This crash is due to dereference of hdev, after freeing it.
+Removed serdev_device_open/close functions from qca_open/close as
+they are called in hci_uart_register_device() and
+hci_uart_unregister_device() functions.
 
 Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 ---
- drivers/bluetooth/hci_qca.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ drivers/bluetooth/hci_qca.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index a740d5703914..74f5fede0274 100644
+index e182f6019f68..a740d5703914 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -167,7 +167,7 @@ struct qca_serdev {
- };
+@@ -499,7 +499,6 @@ static int qca_open(struct hci_uart *hu)
+ 	hu->priv = qca;
  
- static int qca_power_setup(struct hci_uart *hu, bool on);
--static void qca_power_shutdown(struct hci_dev *hdev);
-+static void qca_power_shutdown(struct hci_uart *hu);
- 
- static void __serial_clock_on(struct tty_struct *tty)
- {
-@@ -608,7 +608,7 @@ static int qca_close(struct hci_uart *hu)
  	if (hu->serdev) {
+-		serdev_device_open(hu->serdev);
+ 
  		qcadev = serdev_device_get_drvdata(hu->serdev);
- 		if (qcadev->btsoc_type == QCA_WCN3990)
--			qca_power_shutdown(hu->hdev);
-+			qca_power_shutdown(hu);
+ 		if (qcadev->btsoc_type != QCA_WCN3990) {
+@@ -613,7 +612,6 @@ static int qca_close(struct hci_uart *hu)
  		else
  			gpiod_set_value_cansleep(qcadev->bt_en, 0);
  
-@@ -1230,12 +1230,15 @@ static const struct qca_vreg_data qca_soc_data = {
- 	.num_vregs = 4,
- };
+-		serdev_device_close(hu->serdev);
+ 	}
  
--static void qca_power_shutdown(struct hci_dev *hdev)
-+static void qca_power_shutdown(struct hci_uart *hu)
- {
--	struct hci_uart *hu = hci_get_drvdata(hdev);
-+	struct serdev_device *serdev = hu->serdev;
-+	unsigned char cmd = QCA_WCN3990_POWEROFF_PULSE;
- 
- 	host_set_baudrate(hu, 2400);
--	qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
-+	hci_uart_set_flow_control(hu, true);
-+	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
-+	hci_uart_set_flow_control(hu, false);
- 	qca_power_setup(hu, false);
- }
- 
-@@ -1411,7 +1414,7 @@ static void qca_serdev_remove(struct serdev_device *serdev)
- 	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
- 
- 	if (qcadev->btsoc_type == QCA_WCN3990)
--		qca_power_shutdown(qcadev->serdev_hu.hdev);
-+		qca_power_shutdown(&qcadev->serdev_hu);
- 	else
- 		clk_disable_unprepare(qcadev->susclk);
- 
+ 	kfree_skb(qca->rx_skb);
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
 a Linux Foundation Collaborative Project
