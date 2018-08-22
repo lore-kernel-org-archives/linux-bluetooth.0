@@ -1,98 +1,109 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Mime-Version: 1.0
-Subject: RE: Re: [PATCH BlueZ] btmgmt: Add support to accept multiple PHY
- options
-Reply-To: anupam.r@samsung.com
-From: Anupam Roy <anupam.r@samsung.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        SACHIN DEV SHARMA <sachin.dev@samsung.com>
-In-Reply-To: <CABBYNZL7Z7QdukS3ESKu_Ask6t6zi=8vVmx5gFcrpbwK_Qf1tA@mail.gmail.com>
-Message-ID: <20180822134019epcms5p3b647daada4e3d08afc40dac388b3c4cf@epcms5p3>
-Date: Wed, 22 Aug 2018 22:40:19 +0900
-Content-Type: text/plain; charset="utf-8"
-References: <CABBYNZL7Z7QdukS3ESKu_Ask6t6zi=8vVmx5gFcrpbwK_Qf1tA@mail.gmail.com>
-        <1534436174-12419-1-git-send-email-anupam.r@samsung.com>
-        <CGME20180816161626epcas2p19b94fa1df67344b01a4aa301323580c2@epcms5p3>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <bgodavar@codeaurora.org>
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com
+Cc: mka@chromium.org,
+	linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	hemantg@codeaurora.org,
+	linux-arm-msm@vger.kernel.org,
+	Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [PATCH v1 2/2] Bluetooth: hci_qca: Remove hdev dereference in qca_close().
+Date: Wed, 22 Aug 2018 17:50:05 +0530
+Message-Id: <20180822122005.11218-3-bgodavar@codeaurora.org>
+In-Reply-To: <20180822122005.11218-1-bgodavar@codeaurora.org>
+References: <20180822122005.11218-1-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+When flag KASAN is set, we are seeing an following crash while removing
+hci_uart module.
 
->--------- Original Message ---------
->Sender : Luiz Augusto von Dentz <luiz.dentz@gmail.com>
->Date   : 2018-08-17 15:04 (GMT+9)
->Title  : Re: [PATCH BlueZ] btmgmt: Add support to accept multiple PHY options
-> 
->Hi Anupam,
-> 
->On Thu, Aug 16, 2018 at 7:16 PM, Anupam Roy <anupam.r@samsung.com> wrote:
->> Before fix -
->>  [hci1]# phy 1MTX 1MRX 2MTX
->>  Too many arguments: 3 > 1
->>
->> After Fix -
->>  [hci1]# phy 1MRX 1MTX 2MTX
->>  PHY Configuration successfully set
->>
->> btmon output after fix -
->> @ MGMT Command: Set PHY Configuration (0x0045) plen 4
->>         Selected PHYs: 0x0e00
->>           LE 1M TX
->>           LE 1M RX
->>           LE 2M TX
->> < HCI Command: LE Set Default PHY (0x08|0x0031) plen 3
->>         All PHYs preference: 0x00
->>         TX PHYs preference: 0x03
->>           LE 1M
->>           LE 2M
->>         RX PHYs preference: 0x01
->>           LE 1M
->>> HCI Event: Command Complete (0x0e) plen 4
->>       LE Set Default PHY (0x08|0x0031) ncmd 1
->>         Status: Success (0x00)
->> @ MGMT Event: Command Complete (0x0001) plen 3
->>       Set PHY Configuration (0x0045) plen 0
->>         Status: Success (0x00)
->> @ MGMT Event: PHY Configuration Changed (0x0026) plen 4
->>         Selected PHYs: 0x0e00
->>           LE 1M TX
->>           LE 1M RX
->>           LE 2M TX
->> ---
->>  tools/btmgmt.c | 5 ++++-
->>  1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
->> index 9101882..62b86f4 100644
->> --- a/tools/btmgmt.c
->> +++ b/tools/btmgmt.c
->> @@ -4539,7 +4539,10 @@ static const struct bt_shell_menu main_menu = {
->>                 cmd_clr_adv,            "Clear advertising instances"   },
->>         { "appearance",         "<appearance>",
->>                 cmd_appearance,         "Set appearance"                },
->> -       { "phy",                "[phys]",
->> +       { "phy",                "[1MTX] [1MRX] [2MTX] [2MRX] [CODEDTX] [CODEDRX] \
->> +                                [BR1M1SLOT] [BR1M3SLOT] [BR1M5SLOT] \
->> +                                [EDR2M1SLOT] [EDR2M3SLOT] [EDR2M5SLOT] \
->> +                                [EDR3M1SLOT] [EDR3M3SLOT] [EDR3M5SLOT]",
-> 
->Usually we format multi-line strings by ending it on each like and
->continue on the following, the \ is only used in macros.
->
-Sure, I will send updated patch. Thanks for the review.
+[   50.589909] Unable to handle kernel paging request at virtual address 6b6b6b6b6b6b73
+[   50.597902] Mem abort info:
+[   50.600846]   Exception class = DABT (current EL), IL = 32 bits
+[   50.606959]   SET = 0, FnV = 0
+[   50.610142]   EA = 0, S1PTW = 0
+[   50.613396] Data abort info:
+[   50.616401]   ISV = 0, ISS = 0x00000004
+[   50.620373]   CM = 0, WnR = 0
+[   50.623466] [006b6b6b6b6b6b73] address between user and kernel address ranges
+[   50.630818] Internal error: Oops: 96000004 [#1] PREEMPT SMP
 
->>                 cmd_phy,                "Get/Set PHY Configuration"     },
->>         {} },
->>  };
->> --
->> 1.9.1
->>
-> 
-> 
-> 
->-- 
->Luiz Augusto von Dentz
+[   50.671670] PC is at qca_power_shutdown+0x28/0x100 [hci_uart]
+[   50.677593] LR is at qca_close+0x74/0xb0 [hci_uart]
+[   50.775689] Process rmmod (pid: 2144, stack limit = 0xffffff801ba90000)
+[   50.782493] Call trace:
 
-BR,
--Anupam Roy
+[   50.872150] [<ffffff8000c3c81c>] qca_power_shutdown+0x28/0x100 [hci_uart]
+[   50.879138] [<ffffff8000c3c968>] qca_close+0x74/0xb0 [hci_uart]
+[   50.885238] [<ffffff8000c3a71c>] hci_uart_unregister_device+0x44/0x50 [hci_uart]
+[   50.892846] [<ffffff8000c3c9f4>] qca_serdev_remove+0x50/0x5c [hci_uart]
+[   50.899654] [<ffffff800844f630>] serdev_drv_remove+0x28/0x38
+[   50.905489] [<ffffff800850fc44>] device_release_driver_internal+0x140/0x1e4
+[   50.912653] [<ffffff800850fd94>] driver_detach+0x78/0x84
+[   50.918121] [<ffffff800850edac>] bus_remove_driver+0x80/0xa8
+[   50.923942] [<ffffff80085107dc>] driver_unregister+0x4c/0x58
+[   50.929768] [<ffffff8000c3ca8c>] qca_deinit+0x24/0x598 [hci_uart]
+[   50.936045] [<ffffff8000c3ca10>] hci_uart_exit+0x10/0x48 [hci_uart]
+[   50.942495] [<ffffff8008136630>] SyS_delete_module+0x17c/0x224
+
+This crash is due to dereference of hdev, after freeing it.
+
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index a740d5703914..74f5fede0274 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -167,7 +167,7 @@ struct qca_serdev {
+ };
+ 
+ static int qca_power_setup(struct hci_uart *hu, bool on);
+-static void qca_power_shutdown(struct hci_dev *hdev);
++static void qca_power_shutdown(struct hci_uart *hu);
+ 
+ static void __serial_clock_on(struct tty_struct *tty)
+ {
+@@ -608,7 +608,7 @@ static int qca_close(struct hci_uart *hu)
+ 	if (hu->serdev) {
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 		if (qcadev->btsoc_type == QCA_WCN3990)
+-			qca_power_shutdown(hu->hdev);
++			qca_power_shutdown(hu);
+ 		else
+ 			gpiod_set_value_cansleep(qcadev->bt_en, 0);
+ 
+@@ -1230,12 +1230,15 @@ static const struct qca_vreg_data qca_soc_data = {
+ 	.num_vregs = 4,
+ };
+ 
+-static void qca_power_shutdown(struct hci_dev *hdev)
++static void qca_power_shutdown(struct hci_uart *hu)
+ {
+-	struct hci_uart *hu = hci_get_drvdata(hdev);
++	struct serdev_device *serdev = hu->serdev;
++	unsigned char cmd = QCA_WCN3990_POWEROFF_PULSE;
+ 
+ 	host_set_baudrate(hu, 2400);
+-	qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
++	hci_uart_set_flow_control(hu, true);
++	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
++	hci_uart_set_flow_control(hu, false);
+ 	qca_power_setup(hu, false);
+ }
+ 
+@@ -1411,7 +1414,7 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+ 	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+ 
+ 	if (qcadev->btsoc_type == QCA_WCN3990)
+-		qca_power_shutdown(qcadev->serdev_hu.hdev);
++		qca_power_shutdown(&qcadev->serdev_hu);
+ 	else
+ 		clk_disable_unprepare(qcadev->susclk);
+ 
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
