@@ -1,72 +1,255 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Date: Thu, 23 Aug 2018 08:34:40 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: davem@davemloft.net
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2018-08-23
-Message-ID: <20180823053440.GA12312@x1c.home>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="YZ5djTAD1cGYuMQK"
+References: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
+ <1534714610.5879.11.camel@intel.com> <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
+ <1534792605.5879.17.camel@intel.com> <CAEwN+MBxzZg8UyeqTfRPizfzjH07iD6_hL=7UPxHw1ZnOC8gMA@mail.gmail.com>
+ <1534799268.5879.34.camel@intel.com> <CAEwN+MD_MxqKp0Lfn6H-YNNa99x7Wme_du9+2myyA_5Xrj690A@mail.gmail.com>
+ <1534872308.5879.48.camel@intel.com>
+In-Reply-To: <1534872308.5879.48.camel@intel.com>
+From: Raul Piper <raulpblooper@gmail.com>
+Date: Thu, 23 Aug 2018 00:58:42 +0530
+Message-ID: <CAEwN+MDWnmOSxt_Y3aLD6idwxvv3HnAfaaOHH3JaHJLUWLy_5A@mail.gmail.com>
+Subject: Re: Failed to parse provisioning database file prov_db.json :
+ BlueZ,Meshctl V5.50
+To: "Stotland, Inga" <inga.stotland@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hello Inga,
+On Tue, Aug 21, 2018 at 10:55 PM Stotland, Inga <inga.stotland@intel.com> wrote:
+>
+> Hi Raul,
+>
+> On Tue, 2018-08-21 at 13:29 +0530, Raul Piper wrote:
+> > Hello Inga,
+> >
+> >
+> > On Tue, Aug 21, 2018 at 2:37 AM, Stotland, Inga <inga.stotland@intel.
+> > com> wrote:
+> > > Hi Raul,
+> > >
+> > > On Tue, 2018-08-21 at 01:14 +0530, Raul Piper wrote:
+> > > > Hello Inga,
+> > > > Attached,
+> > > > Rgds,
+> > > > Rp
+> > > >
+> > > > On Tue, Aug 21, 2018 at 12:46 AM, Stotland, Inga
+> > > > <inga.stotland@intel.com> wrote:
+> > > > > Hi Raul,
+> > > > >
+> > > > > On Tue, 2018-08-21 at 00:13 +0530, Raul Piper wrote:
+> > > > > > Hello Inga,
+> > > > > > it gives the below logs :
+> > > > > >
+> > > > > > pi@raspberrypi:~/blueZ $ meshctl -c mesh
+> > > > > >
+> > > > > > Failed to parse local node configuration file
+> > > > > > mesh/local_node.json
+> > > > > >
+> > > > > >
+> > > > > >
+> > > > > > pi@raspberrypi:~/blueZ $ meshctl -v
+> > > > > >
+> > > > > > meshctl: 5.50
+> > > > > >
+> > > > > > i need to do export before executing above commands
+> > > > > >
+> > > > > > pi@raspberrypi:~ $ LD_LIBRARY_PATH=/usr/local/lib
+> > > > > >
+> > > > > > pi@raspberrypi:~ $ export LD_LIBRARY_PATH
+> > > > > >
+> > > > > >
+> > > > > >
+> > > > > > to avoid the below error :
+> > > > > >
+> > > > > > pi@raspberrypi:~ $ meshctl -v
+> > > > > >
+> > > > > > meshctl: error while loading shared libraries: libjson-
+> > > > > > c.so.4:
+> > > > > > cannot
+> > > > > > open shared object file: No such file or directory
+> > > > > >
+> > > > > >
+> > > > > > can you please assist?
+> > > > > > or any  experimental patch I could use on BlueZ
+> > > > > >
+> > > > > > Thanks in advance
+> > > > > > Best Regards,
+> > > > > > Rp
+> > > > > >
+> > > > > > On Mon, Aug 20, 2018 at 3:06 AM, Stotland, Inga <inga.stotlan
+> > > > > > d@in
+> > > > > > tel.
+> > > > > > com> wrote:
+> > > > > > > Hi Raul,
+> > > > > > > On Sun, 2018-08-19 at 03:03 +0530, Raul Piper wrote:
+> > > > > > > > Hello ,
+> > > > > > > > I have built and BlueZ 5.50 from the source and installed
+> > > > > > > > it
+> > > > > > > > on
+> > > > > > > > raspberry PI 3 W0, but when I am trying to launch the
+> > > > > > > > meshctl
+> > > > > > > > tool -
+> > > > > > > > using ./meshctl (from within or out side the mesh
+> > > > > > > > directory)
+> > > > > > > > i am
+> > > > > > > > getting the below error  :
+> > > > > > > >
+> > > > > > > > Failed to parse provisioning database file prov_db.json
+> > > > > > > >
+> > > > > > > > I checked the online sanity onfthe above json file and it
+> > > > > > > > seems
+> > > > > > > > correct.
+> > > > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > I tried doing the sudo hcitool -lescan - it shows the LE
+> > > > > > > > devices
+> > > > > > > > and also
+> > > > > > > >
+> > > > > > > > bluetoothd -v gives 5.50 which shows my compilation and
+> > > > > > > > loading
+> > > > > > > > of the
+> > > > > > > > new BlueZ is alteast correct.
+> > > > > > > >
+> > > > > > > > I have already installed the c-json lib .
+> > > > > > > >
+> > > > > > > > Is this a bug in meshctl?
+> > > > > > > >
+> > > > > > > > Please assist !
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > Thanks in Advance !
+> > > > > > >
+> > > > > > > Are you using the default json file? If so, there's a bug
+> > > > > > > in
+> > > > > > > meshctl
+> > > > > > > for reading from default location (just subimmted a patch
+> > > > > > > for
+> > > > > > > that).
+> > > > > > >
+> > > > > > > Meanwhile, try running:
+> > > > > > >  ./meshctl -c mesh
+> > > > > > >
+> > > > > > > Regards,
+> > > > > > > Inga
+> > > > > > >
+> > > > >
+> > > > > I am not an expert on system setup, but could you please run
+> > > > > sudo /sbin/ldconfig -v
+> > > > >
+> > > > > Regards,
+> > > > > Inga
+> > > >
+> > > >
+> > >
+> > > There is no record of libjson-c in your ldconfig output. So my
+> > > guess
+> > > would be that something is to do with the installation of json-c
+> > > library on rpi.
+> > >
+> > > If you had to build the json-c from source and then run make
+> > > install,
+> > > you may want to modify the installation path to be something
+> > > standard
+> > > on your system from where ldconfig will be able to pick it up.
+> > > ./configure --prefix=/somewhere/not/usr/local prior to make install
+> > >
+> > > Alternatively, you may try to run this command:
+> > >
+> > >  ldconfig -l /path-to-libjson-c.so.xxx
+> > >
+> > > Re-run ldconfig afterwards and see if the libjson-c showed up.
+> > >
+> > > Regards,
+> > >
+> > > Inga
+> > >
+> > > P.S. Just FYI, the standard way to respond to emails on bluez
+> > > mailing
+> > > list is to include the body of you reply at the tail of the
+> > > message.
+> > >
+> >
+> > Sorry for Top posting.
+> > I reinstalled the blueZ  (with --enable-mesh) , installed json-c from
+> > the git
+> > I can see the entry of the libjson-c unlike previously but it still
+> > gives the same error.
+>
+> By the same error you mean "error loading shared library" or "failed to
+> parse"?
+>
+> > Don't we have to link the libjson-c with the BlueZ while building by
+> > setting some Linker flags(LD) in the Makefile of the BlueZ.Is there
+> > any such option?
+> > How will I come to know that it has built successfully with the
+> > reference to the libjson-c.
+> > I believe we must have json-c pre-installed before building
+> > the  BlueZ
+> > and Build setup of BlueZ must know where is the libjson-c.
+>
+> Both configure and Makefile.tools reference ljson-c. meshctl executable
+> would not be built if libjson-c wasn't found during build time.
+>
+> In case you are still experiencing "loading shared library" error, my
+> guess is that the libjson-c location is not on the search path.
+>
+> Regards,
+> Inga
 
---YZ5djTAD1cGYuMQK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+The error I meant  is below (on executing meshctl -c mesh):
+"Failed to parse local node configuration file mesh/local_node.json"
 
-Hi Dave,
 
-Here are two important Bluetooth fixes for the MediaTek and RealTek HCI
-drivers.
 
-Please let me know if there are any issues pulling, thanks.
+ldconfig -v | grep json command gives the below  logs :
 
-Johan
+====================
+ldconfig: Path `/lib/arm-linux-gnueabihf' given more than once
 
----
-The following changes since commit ab08dcd724543896303eae7de6288242bbaff458:
+ldconfig: Path `/usr/lib/arm-linux-gnueabihf' given more than once
 
-  rhashtable: remove duplicated include from rhashtable.c (2018-08-20 19:18:50 -0700)
+libjson-c.so.3 -> libjson-c.so.3.0.1
 
-are available in the Git repository at:
+ldconfig: /lib/arm-linux-gnueabihf/ld-2.24.so is the dynamic linker, ignoring
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
 
-for you to fetch changes up to addb3ffbca66954fb1d1791d2db2153c403f81af:
+libjson-glib-1.0.so.0 -> libjson-glib-1.0.so.0.200.6
 
-  Bluetooth: mediatek: Fix memory leak (2018-08-21 16:56:20 +0200)
+libfastjson.so.4 -> libfastjson.so.4.0.0
 
-----------------------------------------------------------------
-Gustavo A. R. Silva (1):
-      Bluetooth: mediatek: Fix memory leak
+libjson-c.so.4 -> libjson-c.so.4.0.0
 
-Hans de Goede (1):
-      Bluetooth: Make BT_HCIUART_RTL configuration option depend on ACPI
 
- drivers/bluetooth/Kconfig     | 1 +
- drivers/bluetooth/btmtkuart.c | 8 +++++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
 
---YZ5djTAD1cGYuMQK
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+whereis libjson-c.so.4 gives the below  logs :
 
-iQIcBAEBAgAGBQJbfkdwAAoJECQj9vv5qNQSG2YQAK55gikW8lPaR7fKdiB4bfaJ
-otQqYa8a+0y7OCIqYSOz5D/g1qX2rCaUuyIWey82VhCd8oe7BuywuAJ7U2ivZ2OC
-By3ZWsss8A8v0F3CzyOFtpmmkbLLDfnhf1ssT5EARHfLQPMNuhceH7FtpaVvDfOw
-v2gVlPDsuQBHk+cIUXxkWSO2PRiFCfVUHyrSZeni5zHIIg+Y/N/1IbffJhDqFBHV
-rS+7KWb6vi4OoXwjm+w1iz6kq16ElH+Oj77oitNR184erqqGpT1lPNmas7/DJxTC
-zh2uftyuC/sFGnwbd/jrR0ig2wGdZNLEePxuXdRxTYAm5pH4x/GYxBZmrUPyQGDT
-erGl+f0cokqxUrBfnL2LT926knHltQCvx3D67kiS+tzI+Q/MWP1LiNeQ/X7QlPoE
-jz6LGYOfxkjNkOfunuV2Alt8yqB+Tgxg0+Lwk26dZFNhA6pB2Yd3rA71fZsJw2Dt
-DONRgRksCP5txKNLwhuXSSy8fDBpnk7A3jMlhcVEZADk/e2WoiEMq/4xlxJjvd+P
-xHT+Mw27XfzUPa7neVWloT5qBVoPXBkX6w3cfyZF9HovreFLdsh9q/MxPxehb9a1
-znqVH01eFqfdlkKMl1MJwtNTKylwgSOh6RSn/7IQKjGNmBgvACp8N0ThPbD8FFta
-ZN5ctJmgBCzaKcVWRMRM
-=K5ad
------END PGP SIGNATURE-----
+===============================
 
---YZ5djTAD1cGYuMQK--
+libjson-c.so: /usr/local/lib/libjson-c.so /usr/local/lib/libjson-c.so.4
+
+whereis libjson-c.so.4.0.0 gives the below  logs :
+
+==============================
+
+libjson-c.so.4.0: /usr/local/lib/libjson-c.so.4.0.0
+
+I have added the /usr/local/lib to the PATH
+
+echo $PATH gives the below  logs :
+===========================
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games:/usr/local/lib:/home/pi/opt/bin
+
+
+what possibly could be wrong?
+Do you have a set of steps to test the "meshctl -c mesh " command
+starting from the installation
+of json-c and BlueZ . I can start fresh .
+
+Thanks in advance !
+Rp
