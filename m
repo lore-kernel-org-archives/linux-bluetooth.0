@@ -1,69 +1,48 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Brian Gix <brian.gix@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
-        inga.stotland@intel.com, johan.hedberg@intel.com,
-        luiz.von.dentz@intel.com, Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v2 1/1] mesh: Fixed warning-to-error from GCC 8.1.1
-Date: Thu, 23 Aug 2018 13:08:54 -0700
-Message-Id: <20180823200854.19103-1-brian.gix@intel.com>
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: Re: [PATCH 1/1] mesh: Fixed warning-to-error from GCC 8.1.1
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180823191324.12712-1-brian.gix@intel.com>
+Date: Thu, 23 Aug 2018 21:57:45 +0200
+Cc: linux-bluetooth@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        inga.stotland@intel.com, Johan Hedberg <johan.hedberg@intel.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Message-Id: <9C902AA8-FEF4-4819-AC35-42B3EC5835EF@holtmann.org>
+References: <20180823191324.12712-1-brian.gix@intel.com>
+To: Brian Gix <brian.gix@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fixed compiler flagged unsafe usage of strncpy
----
- mesh/storage.c | 21 ++++++++-------------
- 1 file changed, 8 insertions(+), 13 deletions(-)
+Hi Brian,
 
-diff --git a/mesh/storage.c b/mesh/storage.c
-index 85fa81dda..937f801a6 100644
---- a/mesh/storage.c
-+++ b/mesh/storage.c
-@@ -298,13 +298,11 @@ bool storage_parse_config(struct mesh_net *net, const char *config_name)
- 	result = parse_config(net, config_name, false);
- 
- 	if (!result) {
--		char *bak = (char *) l_malloc(strlen(config_name) + 5);
--
--		if (!bak)
--			goto done;
-+		size_t len = strlen(config_name) + 5;
-+		char *bak = l_malloc(len);
- 
- 		/* Fall-back to Backup version */
--		strncpy(bak, config_name, strlen(config_name) + 1);
-+		strncpy(bak, config_name, len);
- 		bak = strncat(bak, ".bak", 5);
- 
- 		remove(config_name);
-@@ -592,15 +590,13 @@ struct write_info {
- static void idle_save_config(void *user_data)
- {
- 	struct write_info *info = user_data;
--	char *tmp = (char *) l_malloc(strlen(info->config_name) + 5);
--	char *bak = (char *) l_malloc(strlen(info->config_name) + 5);
-+	size_t len = strlen(info->config_name) + 5;
-+	char *tmp = l_malloc(len);
-+	char *bak = l_malloc(len);
- 	bool result = false;
- 
--	if (!tmp || !bak)
--		goto done;
--
--	strncpy(tmp, info->config_name, strlen(info->config_name)  + 1);
--	strncpy(bak, info->config_name, strlen(info->config_name)  + 1);
-+	strncpy(tmp, info->config_name, len);
-+	strncpy(bak, info->config_name, len);
- 	tmp = strncat(tmp, ".tmp", 5);
- 	bak = strncat(bak, ".bak", 5);
- 	remove(tmp);
-@@ -615,7 +611,6 @@ static void idle_save_config(void *user_data)
- 	}
- 
- 	remove(tmp);
--done:
- 	l_free(tmp);
- 	l_free(bak);
- 
--- 
-2.17.1
+> Fixed compiler flagged unsafe usage of strncpy
+> ---
+> mesh/storage.c | 14 ++++++++------
+> 1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/mesh/storage.c b/mesh/storage.c
+> index 85fa81dda..1be403297 100644
+> --- a/mesh/storage.c
+> +++ b/mesh/storage.c
+> @@ -298,13 +298,14 @@ bool storage_parse_config(struct mesh_net *net, const char *config_name)
+> 	result = parse_config(net, config_name, false);
+> 
+> 	if (!result) {
+> -		char *bak = (char *) l_malloc(strlen(config_name) + 5);
+> +		size_t len = strlen(config_name) + 5;
+> +		char *bak = (char *) l_malloc(len);
+
+The (char *) cast is utterly pointless since l_malloc return void *.
+
+> 
+> 		if (!bak)
+> 			goto done;
+
+So why are we still doing? l_malloc will abort if no memory can be allocated. We need to stop dealing with memory allocation error handling. If you need that large memory then malloc should be used. If you use l_malloc then expect the daemon might be killed. Which is fine systemd can restart it.
+
+Regards
+
+Marcel
