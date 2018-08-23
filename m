@@ -1,197 +1,173 @@
-Return-Path: <jaganath.k.os@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Stotland, Inga" <inga.stotland@intel.com>
+To: "raulpblooper@gmail.com" <raulpblooper@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Failed to parse provisioning database file prov_db.json :
+ BlueZ,Meshctl V5.50
+Date: Thu, 23 Aug 2018 06:19:22 +0000
+Message-ID: <1535005160.2983.15.camel@intel.com>
+References: <CAEwN+MBjU=ZmbVyppH6_t45ZLaCRe_8FE7XFDSCnDoSBKKrAag@mail.gmail.com>
+         <1534714610.5879.11.camel@intel.com>
+         <CAEwN+MC+33Te21rHpKVcE0HV1c_zugJ1FVR+2uj1vcBrygUQBg@mail.gmail.com>
+         <1534792605.5879.17.camel@intel.com>
+         <CAEwN+MBxzZg8UyeqTfRPizfzjH07iD6_hL=7UPxHw1ZnOC8gMA@mail.gmail.com>
+         <1534799268.5879.34.camel@intel.com>
+         <CAEwN+MD_MxqKp0Lfn6H-YNNa99x7Wme_du9+2myyA_5Xrj690A@mail.gmail.com>
+         <1534872308.5879.48.camel@intel.com>
+         <CAEwN+MDWnmOSxt_Y3aLD6idwxvv3HnAfaaOHH3JaHJLUWLy_5A@mail.gmail.com>
+In-Reply-To: <CAEwN+MDWnmOSxt_Y3aLD6idwxvv3HnAfaaOHH3JaHJLUWLy_5A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <1530876485-17218-1-git-send-email-jaganathx.kanakkassery@intel.com>
- <1530876485-17218-3-git-send-email-jaganathx.kanakkassery@intel.com>
-In-Reply-To: <1530876485-17218-3-git-send-email-jaganathx.kanakkassery@intel.com>
-From: Jaganath K <jaganath.k.os@gmail.com>
-Date: Thu, 23 Aug 2018 14:54:51 +0530
-Message-ID: <CAJzH+bpd1R+toU2e8w07YGdHzKUvWQcSkAJkyBWVeVf_S5948w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 2/8] btmgmt: Add BREDR PHYs in PHY Configuration commands
-To: "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Jaganath Kanakkassery <jaganathx.kanakkassery@intel.com>, Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-
-On Fri, Jul 6, 2018 at 5:03 PM Jaganath Kanakkassery
-<jaganath.k.os@gmail.com> wrote:
->
-> ---
->  lib/mgmt.h     | 32 +++++++++++++++++++-----------
->  tools/btmgmt.c | 62 ++++++++++++++++++++++++++++------------------------------
->  2 files changed, 51 insertions(+), 43 deletions(-)
->
-> diff --git a/lib/mgmt.h b/lib/mgmt.h
-> index ec6a380..570dec9 100644
-> --- a/lib/mgmt.h
-> +++ b/lib/mgmt.h
-> @@ -552,16 +552,26 @@ struct mgmt_cp_set_appearance {
->
->  #define MGMT_OP_GET_PHY_CONFIGURATION  0x0044
->  struct mgmt_rp_get_phy_confguration {
-> -       uint16_t        supported_phys;
-> -       uint16_t        selected_phys;
-> -} __packed;
-> -
-> -#define MGMT_PHY_LE_1M_TX              0x0001
-> -#define MGMT_PHY_LE_1M_RX              0x0002
-> -#define MGMT_PHY_LE_2M_TX              0x0004
-> -#define MGMT_PHY_LE_2M_RX              0x0008
-> -#define MGMT_PHY_LE_CODED_TX           0x0010
-> -#define MGMT_PHY_LE_CODED_RX           0x0020
-> +       uint32_t        supported_phys;
-> +       uint32_t        configurable_phys;
-> +       uint32_t        selected_phys;
-> +} __packed;
-> +
-> +#define MGMT_PHY_BR_1M_1SLOT   0x00000001
-> +#define MGMT_PHY_BR_1M_3SLOT   0x00000002
-> +#define MGMT_PHY_BR_1M_5SLOT   0x00000004
-> +#define MGMT_PHY_EDR_2M_1SLOT  0x00000008
-> +#define MGMT_PHY_EDR_2M_3SLOT  0x00000010
-> +#define MGMT_PHY_EDR_2M_5SLOT  0x00000020
-> +#define MGMT_PHY_EDR_3M_1SLOT  0x00000040
-> +#define MGMT_PHY_EDR_3M_3SLOT  0x00000080
-> +#define MGMT_PHY_EDR_3M_5SLOT  0x00000100
-> +#define MGMT_PHY_LE_1M_TX              0x00000200
-> +#define MGMT_PHY_LE_1M_RX              0x00000400
-> +#define MGMT_PHY_LE_2M_TX              0x00000800
-> +#define MGMT_PHY_LE_2M_RX              0x00001000
-> +#define MGMT_PHY_LE_CODED_TX   0x00002000
-> +#define MGMT_PHY_LE_CODED_RX   0x00004000
->
->  #define MGMT_PHY_LE_TX_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_2M_TX | \
->                              MGMT_PHY_LE_CODED_TX)
-> @@ -570,7 +580,7 @@ struct mgmt_rp_get_phy_confguration {
->
->  #define MGMT_OP_SET_PHY_CONFIGURATION  0x0045
->  struct mgmt_cp_set_phy_confguration {
-> -       uint16_t        default_phys;
-> +       uint32_t        selected_phys;
->  } __packed;
->
->
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> index f5bef63..9dc6712 100644
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -4181,15 +4181,24 @@ static void cmd_appearance(int argc, char **argv)
->  }
->
->  static const char *phys_str[] = {
-> -       "1MTX",
-> -       "1MRX",
-> -       "2MTX",
-> -       "2MRX",
-> -       "CODEDTX",
-> -       "CODEDRX",
-> +       "BR_1M_1SLOT",
-> +       "BR_1M_3SLOT",
-> +       "BR_1M_5SLOT",
-> +       "EDR_2M_1SLOT",
-> +       "EDR_2M_3SLOT",
-> +       "EDR_2M_5SLOT",
-> +       "EDR_3M_1SLOT",
-> +       "EDR_3M_3SLOT",
-> +       "EDR_3M_5SLOT",
-> +       "LE_1M_TX",
-> +       "LE_1M_RX",
-> +       "LE_2M_TX",
-> +       "LE_2M_RX",
-> +       "LE_CODED_TX",
-> +       "LE_CODED_RX",
->  };
->
-> -static const char *phys2str(uint16_t phys)
-> +static const char *phys2str(uint32_t phys)
->  {
->         static char str[256];
->         unsigned int i;
-> @@ -4211,7 +4220,7 @@ static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
->                                                         void *user_data)
->  {
->         const struct mgmt_rp_get_phy_confguration *rp = param;
-> -       uint16_t supported_flags, selected_phys;
-> +       uint32_t supported_phys, selected_phys, configurable_phys;
->
->         if (status != 0) {
->                 error("Get PHY Configuration failed with status 0x%02x (%s)",
-> @@ -4224,10 +4233,12 @@ static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->         }
->
-> -       supported_flags = get_le16(&rp->supported_phys);
-> -       selected_phys = get_le16(&rp->selected_phys);
-> +       supported_phys = get_le32(&rp->supported_phys);
-> +       configurable_phys = get_le32(&rp->configurable_phys);
-> +       selected_phys = get_le32(&rp->selected_phys);
->
-> -       print("Supported phys: %s", phys2str(supported_flags));
-> +       print("Supported phys: %s", phys2str(supported_phys));
-> +       print("Configurable phys: %s", phys2str(configurable_phys));
->         print("Selected phys: %s", phys2str(selected_phys));
->
->         bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> @@ -4265,34 +4276,21 @@ static void set_phy_rsp(uint8_t status, uint16_t len, const void *param,
->  static void cmd_phy(int argc, char **argv)
->  {
->         struct mgmt_cp_set_phy_confguration cp;
-> -       int i;
-> -       uint16_t phys = 0;
-> +       int i, j;
-> +       uint32_t phys = 0;
->         uint16_t index;
->
->         if (argc < 2)
->                 return get_phy();
->
->         for (i = 1; i < argc; i++) {
-> -               if (strcasecmp(argv[i], "1MTX") == 0)
-> -                       phys |= MGMT_PHY_LE_1M_TX;
-> -
-> -               if (strcasecmp(argv[i], "1MRX") == 0)
-> -                       phys |= MGMT_PHY_LE_1M_RX;
-> -
-> -               if (strcasecmp(argv[i], "2MTX") == 0)
-> -                       phys |= MGMT_PHY_LE_2M_TX;
-> -
-> -               if (strcasecmp(argv[i], "2MRX") == 0)
-> -                       phys |= MGMT_PHY_LE_2M_RX;
-> -
-> -               if (strcasecmp(argv[i], "CODEDTX") == 0)
-> -                       phys |= MGMT_PHY_LE_CODED_TX;
-> -
-> -               if (strcasecmp(argv[i], "CODEDRX") == 0)
-> -                       phys |= MGMT_PHY_LE_CODED_RX;
-> +               for (j = 0; j < NELEM(phys_str); j++) {
-> +                       if (strcasecmp(argv[i], phys_str[j]) == 0)
-> +                               phys |= (1 << j);
-> +               }
->         }
->
-> -       cp.default_phys = cpu_to_le16(phys);
-> +       cp.selected_phys = cpu_to_le32(phys);
->
->         index = mgmt_index;
->         if (index == MGMT_INDEX_NONE)
-> @@ -4501,7 +4499,7 @@ static const struct bt_shell_menu main_menu = {
->                 cmd_clr_adv,            "Clear advertising instances"   },
->         { "appearance",         "<appearance>",
->                 cmd_appearance,         "Set appearance"                },
-> -       { "phy",                "[phys]",
-> +       { "phy",                "[phys ...]",
->                 cmd_phy,                "Get/Set PHY Configuration"     },
->         {} },
->  };
-> --
-> 2.7.4
->
-
-This patch somehow got missed in the latest patchset which got merged.
-Plz review this as well as this without this it cannot be tested with btmgmt.
-
-Thanks,
-Jaganath
+SGkgUmF1bCwNCg0KT24gVGh1LCAyMDE4LTA4LTIzIGF0IDAwOjU4ICswNTMwLCBSYXVsIFBpcGVy
+IHdyb3RlOg0KPiBIZWxsbyBJbmdhLA0KPiBPbiBUdWUsIEF1ZyAyMSwgMjAxOCBhdCAxMDo1NSBQ
+TSBTdG90bGFuZCwgSW5nYSA8aW5nYS5zdG90bGFuZEBpbnRlbC4NCj4gY29tPiB3cm90ZToNCj4g
+PiANCj4gPiBIaSBSYXVsLA0KPiA+IA0KPiA+IE9uIFR1ZSwgMjAxOC0wOC0yMSBhdCAxMzoyOSAr
+MDUzMCwgUmF1bCBQaXBlciB3cm90ZToNCj4gPiA+IEhlbGxvIEluZ2EsDQo+ID4gPiANCj4gPiA+
+IA0KPiA+ID4gT24gVHVlLCBBdWcgMjEsIDIwMTggYXQgMjozNyBBTSwgU3RvdGxhbmQsIEluZ2Eg
+PGluZ2Euc3RvdGxhbmRAaW4NCj4gPiA+IHRlbC4NCj4gPiA+IGNvbT4gd3JvdGU6DQo+ID4gPiA+
+IEhpIFJhdWwsDQo+ID4gPiA+IA0KPiA+ID4gPiBPbiBUdWUsIDIwMTgtMDgtMjEgYXQgMDE6MTQg
+KzA1MzAsIFJhdWwgUGlwZXIgd3JvdGU6DQo+ID4gPiA+ID4gSGVsbG8gSW5nYSwNCj4gPiA+ID4g
+PiBBdHRhY2hlZCwNCj4gPiA+ID4gPiBSZ2RzLA0KPiA+ID4gPiA+IFJwDQo+ID4gPiA+ID4gDQo+
+ID4gPiA+ID4gT24gVHVlLCBBdWcgMjEsIDIwMTggYXQgMTI6NDYgQU0sIFN0b3RsYW5kLCBJbmdh
+DQo+ID4gPiA+ID4gPGluZ2Euc3RvdGxhbmRAaW50ZWwuY29tPiB3cm90ZToNCj4gPiA+ID4gPiA+
+IEhpIFJhdWwsDQo+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+IE9uIFR1ZSwgMjAxOC0wOC0yMSBh
+dCAwMDoxMyArMDUzMCwgUmF1bCBQaXBlciB3cm90ZToNCj4gPiA+ID4gPiA+ID4gSGVsbG8gSW5n
+YSwNCj4gPiA+ID4gPiA+ID4gaXQgZ2l2ZXMgdGhlIGJlbG93IGxvZ3MgOg0KPiA+ID4gPiA+ID4g
+PiANCj4gPiA+ID4gPiA+ID4gcGlAcmFzcGJlcnJ5cGk6fi9ibHVlWiAkIG1lc2hjdGwgLWMgbWVz
+aA0KPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gRmFpbGVkIHRvIHBhcnNlIGxvY2FsIG5v
+ZGUgY29uZmlndXJhdGlvbiBmaWxlDQo+ID4gPiA+ID4gPiA+IG1lc2gvbG9jYWxfbm9kZS5qc29u
+DQo+ID4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+
+ID4gPiA+IHBpQHJhc3BiZXJyeXBpOn4vYmx1ZVogJCBtZXNoY3RsIC12DQo+ID4gPiA+ID4gPiA+
+IA0KPiA+ID4gPiA+ID4gPiBtZXNoY3RsOiA1LjUwDQo+ID4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+
+ID4gPiBpIG5lZWQgdG8gZG8gZXhwb3J0IGJlZm9yZSBleGVjdXRpbmcgYWJvdmUgY29tbWFuZHMN
+Cj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+IHBpQHJhc3BiZXJyeXBpOn4gJCBMRF9MSUJS
+QVJZX1BBVEg9L3Vzci9sb2NhbC9saWINCj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+IHBp
+QHJhc3BiZXJyeXBpOn4gJCBleHBvcnQgTERfTElCUkFSWV9QQVRIDQo+ID4gPiA+ID4gPiA+IA0K
+PiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+IHRvIGF2b2lkIHRo
+ZSBiZWxvdyBlcnJvciA6DQo+ID4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gPiBwaUByYXNwYmVy
+cnlwaTp+ICQgbWVzaGN0bCAtdg0KPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gbWVzaGN0
+bDogZXJyb3Igd2hpbGUgbG9hZGluZyBzaGFyZWQgbGlicmFyaWVzOiBsaWJqc29uLQ0KPiA+ID4g
+PiA+ID4gPiBjLnNvLjQ6DQo+ID4gPiA+ID4gPiA+IGNhbm5vdA0KPiA+ID4gPiA+ID4gPiBvcGVu
+IHNoYXJlZCBvYmplY3QgZmlsZTogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQ0KPiA+ID4gPiA+
+ID4gPiANCj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+IGNhbiB5b3UgcGxlYXNlIGFzc2lz
+dD8NCj4gPiA+ID4gPiA+ID4gb3IgYW55ICBleHBlcmltZW50YWwgcGF0Y2ggSSBjb3VsZCB1c2Ug
+b24gQmx1ZVoNCj4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+IFRoYW5rcyBpbiBhZHZhbmNl
+DQo+ID4gPiA+ID4gPiA+IEJlc3QgUmVnYXJkcywNCj4gPiA+ID4gPiA+ID4gUnANCj4gPiA+ID4g
+PiA+ID4gDQo+ID4gPiA+ID4gPiA+IE9uIE1vbiwgQXVnIDIwLCAyMDE4IGF0IDM6MDYgQU0sIFN0
+b3RsYW5kLCBJbmdhDQo+ID4gPiA+ID4gPiA+IDxpbmdhLnN0b3RsYW4NCj4gPiA+ID4gPiA+ID4g
+ZEBpbg0KPiA+ID4gPiA+ID4gPiB0ZWwuDQo+ID4gPiA+ID4gPiA+IGNvbT4gd3JvdGU6DQo+ID4g
+PiA+ID4gPiA+ID4gSGkgUmF1bCwNCj4gPiA+ID4gPiA+ID4gPiBPbiBTdW4sIDIwMTgtMDgtMTkg
+YXQgMDM6MDMgKzA1MzAsIFJhdWwgUGlwZXIgd3JvdGU6DQo+ID4gPiA+ID4gPiA+ID4gPiBIZWxs
+byAsDQo+ID4gPiA+ID4gPiA+ID4gPiBJIGhhdmUgYnVpbHQgYW5kIEJsdWVaIDUuNTAgZnJvbSB0
+aGUgc291cmNlIGFuZA0KPiA+ID4gPiA+ID4gPiA+ID4gaW5zdGFsbGVkDQo+ID4gPiA+ID4gPiA+
+ID4gPiBpdA0KPiA+ID4gPiA+ID4gPiA+ID4gb24NCj4gPiA+ID4gPiA+ID4gPiA+IHJhc3BiZXJy
+eSBQSSAzIFcwLCBidXQgd2hlbiBJIGFtIHRyeWluZyB0byBsYXVuY2ggdGhlDQo+ID4gPiA+ID4g
+PiA+ID4gPiBtZXNoY3RsDQo+ID4gPiA+ID4gPiA+ID4gPiB0b29sIC0NCj4gPiA+ID4gPiA+ID4g
+PiA+IHVzaW5nIC4vbWVzaGN0bCAoZnJvbSB3aXRoaW4gb3Igb3V0IHNpZGUgdGhlIG1lc2gNCj4g
+PiA+ID4gPiA+ID4gPiA+IGRpcmVjdG9yeSkNCj4gPiA+ID4gPiA+ID4gPiA+IGkgYW0NCj4gPiA+
+ID4gPiA+ID4gPiA+IGdldHRpbmcgdGhlIGJlbG93IGVycm9yICA6DQo+ID4gPiA+ID4gPiA+ID4g
+PiANCj4gPiA+ID4gPiA+ID4gPiA+IEZhaWxlZCB0byBwYXJzZSBwcm92aXNpb25pbmcgZGF0YWJh
+c2UgZmlsZQ0KPiA+ID4gPiA+ID4gPiA+ID4gcHJvdl9kYi5qc29uDQo+ID4gPiA+ID4gPiA+ID4g
+PiANCj4gPiA+ID4gPiA+ID4gPiA+IEkgY2hlY2tlZCB0aGUgb25saW5lIHNhbml0eSBvbmZ0aGUg
+YWJvdmUganNvbiBmaWxlDQo+ID4gPiA+ID4gPiA+ID4gPiBhbmQgaXQNCj4gPiA+ID4gPiA+ID4g
+PiA+IHNlZW1zDQo+ID4gPiA+ID4gPiA+ID4gPiBjb3JyZWN0Lg0KPiA+ID4gPiA+ID4gPiA+ID4g
+DQo+ID4gPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gPiA+
+ID4gSSB0cmllZCBkb2luZyB0aGUgc3VkbyBoY2l0b29sIC1sZXNjYW4gLSBpdCBzaG93cyB0aGUN
+Cj4gPiA+ID4gPiA+ID4gPiA+IExFDQo+ID4gPiA+ID4gPiA+ID4gPiBkZXZpY2VzDQo+ID4gPiA+
+ID4gPiA+ID4gPiBhbmQgYWxzbw0KPiA+ID4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+ID4g
+PiBibHVldG9vdGhkIC12IGdpdmVzIDUuNTAgd2hpY2ggc2hvd3MgbXkgY29tcGlsYXRpb24NCj4g
+PiA+ID4gPiA+ID4gPiA+IGFuZA0KPiA+ID4gPiA+ID4gPiA+ID4gbG9hZGluZw0KPiA+ID4gPiA+
+ID4gPiA+ID4gb2YgdGhlDQo+ID4gPiA+ID4gPiA+ID4gPiBuZXcgQmx1ZVogaXMgYWx0ZWFzdCBj
+b3JyZWN0Lg0KPiA+ID4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+ID4gPiBJIGhhdmUgYWxy
+ZWFkeSBpbnN0YWxsZWQgdGhlIGMtanNvbiBsaWIgLg0KPiA+ID4gPiA+ID4gPiA+ID4gDQo+ID4g
+PiA+ID4gPiA+ID4gPiBJcyB0aGlzIGEgYnVnIGluIG1lc2hjdGw/DQo+ID4gPiA+ID4gPiA+ID4g
+PiANCj4gPiA+ID4gPiA+ID4gPiA+IFBsZWFzZSBhc3Npc3QgIQ0KPiA+ID4gPiA+ID4gPiA+ID4g
+DQo+ID4gPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gPiA+IFRoYW5rcyBpbiBBZHZhbmNl
+ICENCj4gPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gPiBBcmUgeW91IHVzaW5nIHRoZSBk
+ZWZhdWx0IGpzb24gZmlsZT8gSWYgc28sIHRoZXJlJ3MgYQ0KPiA+ID4gPiA+ID4gPiA+IGJ1Zw0K
+PiA+ID4gPiA+ID4gPiA+IGluDQo+ID4gPiA+ID4gPiA+ID4gbWVzaGN0bA0KPiA+ID4gPiA+ID4g
+PiA+IGZvciByZWFkaW5nIGZyb20gZGVmYXVsdCBsb2NhdGlvbiAoanVzdCBzdWJpbW10ZWQgYQ0K
+PiA+ID4gPiA+ID4gPiA+IHBhdGNoDQo+ID4gPiA+ID4gPiA+ID4gZm9yDQo+ID4gPiA+ID4gPiA+
+ID4gdGhhdCkuDQo+ID4gPiA+ID4gPiA+ID4gDQo+ID4gPiA+ID4gPiA+ID4gTWVhbndoaWxlLCB0
+cnkgcnVubmluZzoNCj4gPiA+ID4gPiA+ID4gPiAgLi9tZXNoY3RsIC1jIG1lc2gNCj4gPiA+ID4g
+PiA+ID4gPiANCj4gPiA+ID4gPiA+ID4gPiBSZWdhcmRzLA0KPiA+ID4gPiA+ID4gPiA+IEluZ2EN
+Cj4gPiA+ID4gPiA+ID4gPiANCj4gPiA+ID4gPiA+IA0KPiA+ID4gPiA+ID4gSSBhbSBub3QgYW4g
+ZXhwZXJ0IG9uIHN5c3RlbSBzZXR1cCwgYnV0IGNvdWxkIHlvdSBwbGVhc2UNCj4gPiA+ID4gPiA+
+IHJ1bg0KPiA+ID4gPiA+ID4gc3VkbyAvc2Jpbi9sZGNvbmZpZyAtdg0KPiA+ID4gPiA+ID4gDQo+
+ID4gPiA+ID4gPiBSZWdhcmRzLA0KPiA+ID4gPiA+ID4gSW5nYQ0KPiA+ID4gPiA+IA0KPiA+ID4g
+PiA+IA0KPiA+ID4gPiANCj4gPiA+ID4gVGhlcmUgaXMgbm8gcmVjb3JkIG9mIGxpYmpzb24tYyBp
+biB5b3VyIGxkY29uZmlnIG91dHB1dC4gU28gbXkNCj4gPiA+ID4gZ3Vlc3MNCj4gPiA+ID4gd291
+bGQgYmUgdGhhdCBzb21ldGhpbmcgaXMgdG8gZG8gd2l0aCB0aGUgaW5zdGFsbGF0aW9uIG9mIGpz
+b24tDQo+ID4gPiA+IGMNCj4gPiA+ID4gbGlicmFyeSBvbiBycGkuDQo+ID4gPiA+IA0KPiA+ID4g
+PiBJZiB5b3UgaGFkIHRvIGJ1aWxkIHRoZSBqc29uLWMgZnJvbSBzb3VyY2UgYW5kIHRoZW4gcnVu
+IG1ha2UNCj4gPiA+ID4gaW5zdGFsbCwNCj4gPiA+ID4geW91IG1heSB3YW50IHRvIG1vZGlmeSB0
+aGUgaW5zdGFsbGF0aW9uIHBhdGggdG8gYmUgc29tZXRoaW5nDQo+ID4gPiA+IHN0YW5kYXJkDQo+
+ID4gPiA+IG9uIHlvdXIgc3lzdGVtIGZyb20gd2hlcmUgbGRjb25maWcgd2lsbCBiZSBhYmxlIHRv
+IHBpY2sgaXQgdXAuDQo+ID4gPiA+IC4vY29uZmlndXJlIC0tcHJlZml4PS9zb21ld2hlcmUvbm90
+L3Vzci9sb2NhbCBwcmlvciB0byBtYWtlDQo+ID4gPiA+IGluc3RhbGwNCj4gPiA+ID4gDQo+ID4g
+PiA+IEFsdGVybmF0aXZlbHksIHlvdSBtYXkgdHJ5IHRvIHJ1biB0aGlzIGNvbW1hbmQ6DQo+ID4g
+PiA+IA0KPiA+ID4gPiAgbGRjb25maWcgLWwgL3BhdGgtdG8tbGlianNvbi1jLnNvLnh4eA0KPiA+
+ID4gPiANCj4gPiA+ID4gUmUtcnVuIGxkY29uZmlnIGFmdGVyd2FyZHMgYW5kIHNlZSBpZiB0aGUg
+bGlianNvbi1jIHNob3dlZCB1cC4NCj4gPiA+ID4gDQo+ID4gPiA+IFJlZ2FyZHMsDQo+ID4gPiA+
+IA0KPiA+ID4gPiBJbmdhDQo+ID4gPiA+IA0KPiA+ID4gPiBQLlMuIEp1c3QgRllJLCB0aGUgc3Rh
+bmRhcmQgd2F5IHRvIHJlc3BvbmQgdG8gZW1haWxzIG9uIGJsdWV6DQo+ID4gPiA+IG1haWxpbmcN
+Cj4gPiA+ID4gbGlzdCBpcyB0byBpbmNsdWRlIHRoZSBib2R5IG9mIHlvdSByZXBseSBhdCB0aGUg
+dGFpbCBvZiB0aGUNCj4gPiA+ID4gbWVzc2FnZS4NCj4gPiA+ID4gDQo+ID4gPiANCj4gPiA+IFNv
+cnJ5IGZvciBUb3AgcG9zdGluZy4NCj4gPiA+IEkgcmVpbnN0YWxsZWQgdGhlIGJsdWVaICAod2l0
+aCAtLWVuYWJsZS1tZXNoKSAsIGluc3RhbGxlZCBqc29uLWMNCj4gPiA+IGZyb20NCj4gPiA+IHRo
+ZSBnaXQNCj4gPiA+IEkgY2FuIHNlZSB0aGUgZW50cnkgb2YgdGhlIGxpYmpzb24tYyB1bmxpa2Ug
+cHJldmlvdXNseSBidXQgaXQNCj4gPiA+IHN0aWxsDQo+ID4gPiBnaXZlcyB0aGUgc2FtZSBlcnJv
+ci4NCj4gPiANCj4gPiBCeSB0aGUgc2FtZSBlcnJvciB5b3UgbWVhbiAiZXJyb3IgbG9hZGluZyBz
+aGFyZWQgbGlicmFyeSIgb3INCj4gPiAiZmFpbGVkIHRvDQo+ID4gcGFyc2UiPw0KPiA+IA0KPiA+
+ID4gRG9uJ3Qgd2UgaGF2ZSB0byBsaW5rIHRoZSBsaWJqc29uLWMgd2l0aCB0aGUgQmx1ZVogd2hp
+bGUgYnVpbGRpbmcNCj4gPiA+IGJ5DQo+ID4gPiBzZXR0aW5nIHNvbWUgTGlua2VyIGZsYWdzKExE
+KSBpbiB0aGUgTWFrZWZpbGUgb2YgdGhlIEJsdWVaLklzDQo+ID4gPiB0aGVyZQ0KPiA+ID4gYW55
+IHN1Y2ggb3B0aW9uPw0KPiA+ID4gSG93IHdpbGwgSSBjb21lIHRvIGtub3cgdGhhdCBpdCBoYXMg
+YnVpbHQgc3VjY2Vzc2Z1bGx5IHdpdGggdGhlDQo+ID4gPiByZWZlcmVuY2UgdG8gdGhlIGxpYmpz
+b24tYy4NCj4gPiA+IEkgYmVsaWV2ZSB3ZSBtdXN0IGhhdmUganNvbi1jIHByZS1pbnN0YWxsZWQg
+YmVmb3JlIGJ1aWxkaW5nDQo+ID4gPiB0aGUgIEJsdWVaDQo+ID4gPiBhbmQgQnVpbGQgc2V0dXAg
+b2YgQmx1ZVogbXVzdCBrbm93IHdoZXJlIGlzIHRoZSBsaWJqc29uLWMuDQo+ID4gDQo+ID4gQm90
+aCBjb25maWd1cmUgYW5kIE1ha2VmaWxlLnRvb2xzIHJlZmVyZW5jZSBsanNvbi1jLiBtZXNoY3Rs
+DQo+ID4gZXhlY3V0YWJsZQ0KPiA+IHdvdWxkIG5vdCBiZSBidWlsdCBpZiBsaWJqc29uLWMgd2Fz
+bid0IGZvdW5kIGR1cmluZyBidWlsZCB0aW1lLg0KPiA+IA0KPiA+IEluIGNhc2UgeW91IGFyZSBz
+dGlsbCBleHBlcmllbmNpbmcgImxvYWRpbmcgc2hhcmVkIGxpYnJhcnkiIGVycm9yLA0KPiA+IG15
+DQo+ID4gZ3Vlc3MgaXMgdGhhdCB0aGUgbGlianNvbi1jIGxvY2F0aW9uIGlzIG5vdCBvbiB0aGUg
+c2VhcmNoIHBhdGguDQo+ID4gDQo+ID4gUmVnYXJkcywNCj4gPiBJbmdhDQo+IA0KPiBUaGUgZXJy
+b3IgSSBtZWFudCAgaXMgYmVsb3cgKG9uIGV4ZWN1dGluZyBtZXNoY3RsIC1jIG1lc2gpOg0KPiAi
+RmFpbGVkIHRvIHBhcnNlIGxvY2FsIG5vZGUgY29uZmlndXJhdGlvbiBmaWxlIG1lc2gvbG9jYWxf
+bm9kZS5qc29uIg0KPiANCj4gDQo+IA0KPiBsZGNvbmZpZyAtdiB8IGdyZXAganNvbiBjb21tYW5k
+IGdpdmVzIHRoZSBiZWxvdyAgbG9ncyA6DQo+IA0KPiA9PT09PT09PT09PT09PT09PT09PQ0KPiBs
+ZGNvbmZpZzogUGF0aCBgL2xpYi9hcm0tbGludXgtZ251ZWFiaWhmJyBnaXZlbiBtb3JlIHRoYW4g
+b25jZQ0KPiANCj4gbGRjb25maWc6IFBhdGggYC91c3IvbGliL2FybS1saW51eC1nbnVlYWJpaGYn
+IGdpdmVuIG1vcmUgdGhhbiBvbmNlDQo+IA0KPiBsaWJqc29uLWMuc28uMyAtPiBsaWJqc29uLWMu
+c28uMy4wLjENCj4gDQo+IGxkY29uZmlnOiAvbGliL2FybS1saW51eC1nbnVlYWJpaGYvbGQtMi4y
+NC5zbyBpcyB0aGUgZHluYW1pYyBsaW5rZXIsDQo+IGlnbm9yaW5nDQo+IA0KPiANCj4gbGlianNv
+bi1nbGliLTEuMC5zby4wIC0+IGxpYmpzb24tZ2xpYi0xLjAuc28uMC4yMDAuNg0KPiANCj4gbGli
+ZmFzdGpzb24uc28uNCAtPiBsaWJmYXN0anNvbi5zby40LjAuMA0KPiANCj4gbGlianNvbi1jLnNv
+LjQgLT4gbGlianNvbi1jLnNvLjQuMC4wDQo+IA0KPiANCj4gDQo+IA0KPiB3aGVyZWlzIGxpYmpz
+b24tYy5zby40IGdpdmVzIHRoZSBiZWxvdyAgbG9ncyA6DQo+IA0KPiA9PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09DQo+IA0KPiBsaWJqc29uLWMuc286IC91c3IvbG9jYWwvbGliL2xpYmpz
+b24tYy5zbyAvdXNyL2xvY2FsL2xpYi9saWJqc29uLQ0KPiBjLnNvLjQNCj4gDQo+IHdoZXJlaXMg
+bGlianNvbi1jLnNvLjQuMC4wIGdpdmVzIHRoZSBiZWxvdyAgbG9ncyA6DQo+IA0KPiA9PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT0NCj4gDQo+IGxpYmpzb24tYy5zby40LjA6IC91c3IvbG9j
+YWwvbGliL2xpYmpzb24tYy5zby40LjAuMA0KPiANCj4gSSBoYXZlIGFkZGVkIHRoZSAvdXNyL2xv
+Y2FsL2xpYiB0byB0aGUgUEFUSA0KPiANCj4gZWNobyAkUEFUSCBnaXZlcyB0aGUgYmVsb3cgIGxv
+Z3MgOg0KPiA9PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gL3Vzci9sb2NhbC9zYmluOi91
+c3IvbG9jYWwvYmluOi91c3Ivc2JpbjovdXNyL2Jpbjovc2JpbjovYmluOi91c3IvbG9jDQo+IGFs
+L2dhbWVzOi91c3IvZ2FtZXM6L3Vzci9sb2NhbC9saWI6L2hvbWUvcGkvb3B0L2Jpbg0KPiANCj4g
+DQo+IHdoYXQgcG9zc2libHkgY291bGQgYmUgd3Jvbmc/DQo+IERvIHlvdSBoYXZlIGEgc2V0IG9m
+IHN0ZXBzIHRvIHRlc3QgdGhlICJtZXNoY3RsIC1jIG1lc2ggIiBjb21tYW5kDQo+IHN0YXJ0aW5n
+IGZyb20gdGhlIGluc3RhbGxhdGlvbg0KPiBvZiBqc29uLWMgYW5kIEJsdWVaIC4gSSBjYW4gc3Rh
+cnQgZnJlc2ggLg0KPiANCj4gVGhhbmtzIGluIGFkdmFuY2UgIQ0KPiBScA0KDQogDQpJdCBzZWVt
+cyB0aGF0IG5vdyBqc2Nvbi1jIGxpYnJhcnkgaXMgbG9hZGVkIChvdGhlcndpc2UsIHlvdSB3b3Vs
+ZCd2ZQ0Kc2VlbiBhbiBlcnJvciAiZmFpbGVkIHRvIGxvYWQgc2hhcmVkIC4uLiIpDQoNCkkganVz
+dCByZWFsaXplZCB0aGF0IHlvdSdyZSBvbiA1LjUwIHJlbGVhc2UuIA0KQ291bGQgeW91IGNvbmZp
+cm0gdGhhdCBibHVlei9tZXNoIGRpcmVjdG9yeSBjb250YWlucyBsb2NhbF9ub2RlLmpzb24gJg0K
+cHJvdl9kYi5qc29uPw0KDQpTaW1wbHkgcnVubmluZyAiLi9tZXNoY3RsIiBmcm9tIGJsdWV6L21l
+c2ggZGlyZWN0b3J5IHNob3VsZCB3b3JrLg0KDQpZb3UgY2FuIHJ1biBtZXNoY3RsIGZyb20gb3V0
+c2lkZSBtZXNoIGRpcmVjdG9yeSBidXQgdGhlbiB5b3UgbmVlZCB0bw0KcHJvdmlkZSAtYyBvcHRp
+b24sIGkuZS4gIi1jIDxwYXRoX3RvX2pzb25fZmlsZXM+Ii4NCg0KUmVnYXJkcywNCkluZ2ENCg0K
+DQo=
