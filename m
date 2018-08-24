@@ -1,49 +1,59 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
+Subject: Re: [PATCH] unit/test-gatt: Fix hung issue
+To: <linux-bluetooth@vger.kernel.org>
+References: <20180824053001.102917-1-mingli.yu@windriver.com>
+ <5B7F979A.1060806@windriver.com>
+From: "Yu, Mingli" <mingli.yu@windriver.com>
+Message-ID: <5B7F9F60.5090106@windriver.com>
+Date: Fri, 24 Aug 2018 14:02:08 +0800
 MIME-Version: 1.0
-To: Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        johan.hedberg@gmail.com, marcel@holtmann.org
-From: Stephen Boyd <swboyd@chromium.org>
-In-Reply-To: <20180823112935.17342-2-bgodavar@codeaurora.org>
-Cc: mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-References: <20180823112935.17342-1-bgodavar@codeaurora.org>
- <20180823112935.17342-2-bgodavar@codeaurora.org>
-Message-ID: <153509324560.28926.8058929411568681471@swboyd.mtv.corp.google.com>
-Subject: Re: [PATCH v1 1/1] Bluetooth: hci_qca: Add poweroff support during hci down
- for wcn3990
-Date: Thu, 23 Aug 2018 23:47:25 -0700
+In-Reply-To: <5B7F979A.1060806@windriver.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Quoting Balakrishna Godavarthi (2018-08-23 04:29:35)
-> This patch enables power off support for hci down and power on support
-> for hci up. As wcn3990 power sources are ignited by regulators, we will
-> turn off them during hci down, i.e. an complete power off of wcn3990.
-> So while hci up, we will call vendor specific open/close and setup which
-> will turn on the regulators, requests BT chip version and download the
-> firmware.
-> =
+Correct the commit author.
 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
->  drivers/bluetooth/hci_qca.c | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
-> =
+Thanks,
 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index e182f6019f68..98d33c6b8909 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -595,6 +595,9 @@ static int qca_close(struct hci_uart *hu)
->         struct qca_serdev *qcadev;
->         struct qca_data *qca =3D hu->priv;
->  =
-
-> +       if (!qca)
-> +               return 0;
-
-Does this happen? If it does it seems like a failure in the caller to
-know what's going on.
+On 2018年08月24日 13:28, Yu, Mingli wrote:
+> Please ignore this.
+>
+> Thanks,
+>
+>
+> On 2018年08月24日 13:30, mingli.yu@windriver.com wrote:
+>> From: Brian Gix <brian.gix@intel.com>
+>>
+>> The below test hangs infinitely
+>> $ unit/test-gatt -p  /robustness/unkown-request -d
+>> /robustness/unkown-request - init
+>> /robustness/unkown-request - setup
+>> /robustness/unkown-request - setup complete
+>> /robustness/unkown-request - run
+>>    GATT: < 02 17 00                                         ...
+>>    bt_gatt_server:MTU exchange complete, with MTU: 23
+>>    GATT: > 03 00 02                                         ...
+>>    PDU: = 03 00 02                                         ...
+>>    GATT: < bf 00
+>>
+>> Actually, the /robustness/unkown-request test does
+>> no action.
+>> ---
+>>   unit/test-gatt.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+>> index c7e28f865..b57373b07 100644
+>> --- a/unit/test-gatt.c
+>> +++ b/unit/test-gatt.c
+>> @@ -4463,7 +4463,7 @@ int main(int argc, char *argv[])
+>>               test_server, service_db_1, NULL,
+>>               raw_pdu(0x03, 0x00, 0x02),
+>>               raw_pdu(0xbf, 0x00),
+>> -            raw_pdu(0x01, 0xbf, 0x00, 0x00, 0x06));
+>> +            raw_pdu());
+>>
+>>       define_test_server("/robustness/unkown-command",
+>>               test_server, service_db_1, NULL,
+>>
