@@ -1,90 +1,78 @@
-Return-Path: <luiz.dentz@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKN6pUh2LCO36aFvsX8KLW8XrT+j6o78SsTjYON12RUcw@mail.gmail.com>
-References: <20180823200854.19103-1-brian.gix@intel.com> <CABBYNZKN6pUh2LCO36aFvsX8KLW8XrT+j6o78SsTjYON12RUcw@mail.gmail.com>
+In-Reply-To: <1534948975-9033-1-git-send-email-anupam.r@samsung.com>
+References: <CGME20180822144312epcas1p13df1df140fdbc88c1047ae78903f2607@epcas1p1.samsung.com>
+ <1534948975-9033-1-git-send-email-anupam.r@samsung.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 24 Aug 2018 17:52:52 +0300
-Message-ID: <CABBYNZ+n8SwvgCSgTUdVf2ZzDpBEpF=ukRrr=L8sPEdNf3KtYQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/1] mesh: Fixed warning-to-error from GCC 8.1.1
-To: Brian Gix <brian.gix@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, "Stotland, Inga" <inga.stotland@intel.com>,
-	Johan Hedberg <johan.hedberg@intel.com>, Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>
+Date: Fri, 24 Aug 2018 17:51:03 +0300
+Message-ID: <CABBYNZLX9KBUhDqAzwvfi5fjZgg4nwiZgn5PtrEn80HOzfCvpQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] btmgmt: Add support to accept multiple PHY options
+To: Anupam Roy <anupam.r@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        SACHIN DEV SHARMA <sachin.dev@samsung.com>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Brian,
+Hi Anupam,
 
-On Fri, Aug 24, 2018 at 10:48 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Brian,
+On Wed, Aug 22, 2018 at 5:42 PM, Anupam Roy <anupam.r@samsung.com> wrote:
+> Before fix-
+>   [hci1]# phy 1MTX 1MRX 2MTX
+>   Too many arguments: 3 > 1
 >
-> On Thu, Aug 23, 2018 at 11:08 PM, Brian Gix <brian.gix@intel.com> wrote:
->> Fixed compiler flagged unsafe usage of strncpy
->> ---
->>  mesh/storage.c | 21 ++++++++-------------
->>  1 file changed, 8 insertions(+), 13 deletions(-)
->>
->> diff --git a/mesh/storage.c b/mesh/storage.c
->> index 85fa81dda..937f801a6 100644
->> --- a/mesh/storage.c
->> +++ b/mesh/storage.c
->> @@ -298,13 +298,11 @@ bool storage_parse_config(struct mesh_net *net, const char *config_name)
->>         result = parse_config(net, config_name, false);
->>
->>         if (!result) {
->> -               char *bak = (char *) l_malloc(strlen(config_name) + 5);
->> -
->> -               if (!bak)
->> -                       goto done;
->> +               size_t len = strlen(config_name) + 5;
->> +               char *bak = l_malloc(len);
+> After Fix-
+>   [hci1]# phy 1MRX 1MTX 2MTX
+>   PHY Configuration successfully set
 >
-> I would consider allocating bak in the stack, or perhaps use alloca if
-> you don't want to waste stack space, that way we don't have to free
-> these string that are just used temporarily.
+>  btmon output -
+>  @ MGMT Command: Set PHY Configuration (0x0045) plen 4
+>          Selected PHYs: 0x0e00
+>            LE 1M TX
+>            LE 1M RX
+>            LE 2M TX
+>  < HCI Command: LE Set Default PHY (0x08|0x0031) plen 3
+>          All PHYs preference: 0x00
+>          TX PHYs preference: 0x03
+>            LE 1M
+>            LE 2M
+>          RX PHYs preference: 0x01
+>            LE 1M
+>  > HCI Event: Command Complete (0x0e) plen 4
+>         LE Set Default PHY (0x08|0x0031) ncmd 1
+>          Status: Success (0x00)
+>  @ MGMT Event: Command Complete (0x0001) plen 3
+>         Set PHY Configuration (0x0045) plen 0
+>          Status: Success (0x00)
+>  @ MGMT Event: PHY Configuration Changed (0x0026) plen 4
+>          Selected PHYs: 0x0e00
+>            LE 1M TX
+>            LE 1M RX
+>            LE 2M TX
 >
->>
->>                 /* Fall-back to Backup version */
->> -               strncpy(bak, config_name, strlen(config_name) + 1);
->> +               strncpy(bak, config_name, len);
->>                 bak = strncat(bak, ".bak", 5);
->>
->>                 remove(config_name);
->> @@ -592,15 +590,13 @@ struct write_info {
->>  static void idle_save_config(void *user_data)
->>  {
->>         struct write_info *info = user_data;
->> -       char *tmp = (char *) l_malloc(strlen(info->config_name) + 5);
->> -       char *bak = (char *) l_malloc(strlen(info->config_name) + 5);
->> +       size_t len = strlen(info->config_name) + 5;
->> +       char *tmp = l_malloc(len);
->> +       char *bak = l_malloc(len);
+> ---
+>  tools/btmgmt.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 >
-> Same here.
+> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+> index 9101882..f0e4984 100644
+> --- a/tools/btmgmt.c
+> +++ b/tools/btmgmt.c
+> @@ -4539,7 +4539,10 @@ static const struct bt_shell_menu main_menu = {
+>                 cmd_clr_adv,            "Clear advertising instances"   },
+>         { "appearance",         "<appearance>",
+>                 cmd_appearance,         "Set appearance"                },
+> -       { "phy",                "[phys]",
+> +       { "phy",                "[1MTX] [1MRX] [2MTX] [2MRX] [CODEDTX] [CODEDRX]"
+> +                               "[BR1M1SLOT] [BR1M3SLOT] [BR1M5SLOT]"
+> +                               "[EDR2M1SLOT] [EDR2M3SLOT] [EDR2M5SLOT]"
+> +                               "[EDR3M1SLOT] [EDR3M3SLOT] [EDR3M5SLOT]",
+>                 cmd_phy,                "Get/Set PHY Configuration"     },
+>         {} },
+>  };
+> --
+> 1.9.1
 >
->>         bool result = false;
->>
->> -       if (!tmp || !bak)
->> -               goto done;
->> -
->> -       strncpy(tmp, info->config_name, strlen(info->config_name)  + 1);
->> -       strncpy(bak, info->config_name, strlen(info->config_name)  + 1);
->> +       strncpy(tmp, info->config_name, len);
->> +       strncpy(bak, info->config_name, len);
->>         tmp = strncat(tmp, ".tmp", 5);
->>         bak = strncat(bak, ".bak", 5);
->>         remove(tmp);
->> @@ -615,7 +611,6 @@ static void idle_save_config(void *user_data)
->>         }
->>
->>         remove(tmp);
->> -done:
->>         l_free(tmp);
->>         l_free(bak);
->>
->> --
->> 2.17.1
 
 Applied, thanks.
 
