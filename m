@@ -4,23 +4,21 @@ To: marcel@holtmann.org,
 	johan.hedberg@gmail.com,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH V2] Bluetooth: bt3c_cs: Fix obsolete function
-Date: Fri, 24 Aug 2018 06:44:25 -0400
-Message-Id: <1535107465-5470-1-git-send-email-dingxiang@cmss.chinamobile.com>
+Subject: [PATCH] Bluetooth: bt3c_cs: Fix obsolete function
+Date: Fri, 24 Aug 2018 06:23:32 -0400
+Message-Id: <1535106212-21514-1-git-send-email-dingxiang@cmss.chinamobile.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 simple_strtol and simple_strtoul are obsolete, both place
 use kstrtoul instead.
 
-V2: fix error tmp += tn
-
 Signed-off-by: Ding Xiang <dingxiang@cmss.chinamobile.com>
 ---
- drivers/bluetooth/bt3c_cs.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/bluetooth/bt3c_cs.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index 25b0cf9..8f03774 100644
+index 25b0cf9..5e4800d 100644
 --- a/drivers/bluetooth/bt3c_cs.c
 +++ b/drivers/bluetooth/bt3c_cs.c
 @@ -449,7 +449,7 @@ static int bt3c_load_firmware(struct bt3c_info *info,
@@ -43,13 +41,14 @@ index 25b0cf9..8f03774 100644
  		}
  
  		if (((tmp + fcs) & 0xff) != 0xff) {
-@@ -505,7 +507,8 @@ static int bt3c_load_firmware(struct bt3c_info *info,
+@@ -505,7 +507,9 @@ static int bt3c_load_firmware(struct bt3c_info *info,
  			memset(b, 0, sizeof(b));
  			for (i = 0; i < (size - 4) / 2; i++) {
  				memcpy(b, ptr + (i * 4) + 12, 4);
 -				tmp = simple_strtoul(b, NULL, 16);
-+				if (kstrtoul(b, 16, &tmp))
++				if (kstrtoul(b, 16, &tn))
 +					return -EINVAL;
++				tmp += tn;
  				bt3c_put(iobase, tmp);
  			}
  		}
