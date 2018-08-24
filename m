@@ -1,56 +1,67 @@
-Return-Path: <dingxiang@cmss.chinamobile.com>
-From: Ding Xiang <dingxiang@cmss.chinamobile.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: bt3c_cs: Fix obsolete function
-Date: Fri, 24 Aug 2018 06:23:32 -0400
-Message-Id: <1535106212-21514-1-git-send-email-dingxiang@cmss.chinamobile.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <5B7F662D.5010903@mail.zabtrans.ru>
+References: <5B7F662D.5010903@mail.zabtrans.ru>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 24 Aug 2018 11:19:57 +0300
+Message-ID: <CABBYNZ+ee5BTR_gqjP3XJFMCfoSxGZNCVBuDA3mraS0hN5LkNg@mail.gmail.com>
+Subject: Re: Problem with StopDiscovery() via dbus-send
+To: ProklovAV@mail.zabtrans.ru
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-simple_strtol and simple_strtoul are obsolete, both place
-use kstrtoul instead.
+Hi,
 
-Signed-off-by: Ding Xiang <dingxiang@cmss.chinamobile.com>
----
- drivers/bluetooth/bt3c_cs.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+On Fri, Aug 24, 2018 at 4:58 AM, =D0=9F=D1=80=D0=BE=D0=BA=D0=BB=D0=BE=D0=B2=
+ =D0=90=D0=BB=D0=B5=D0=BA=D1=81=D0=B0=D0=BD=D0=B4=D1=80 =D0=92=D0=B0=D0=BB=
+=D0=B5=D1=80=D1=8C=D0=B5=D0=B2=D0=B8=D1=87
+<ProklovAV@mail.zabtrans.ru> wrote:
+>  Hello All,
+>
+> Thanks for your work. Since version bluez-5.50 start-stop discovery work
+> from command line and scripts:
+> #bluetoothctl scan on
+> #bluetoothctl scan off
+> (see mail-list "Problem with StopDiscovery() via dbus-send")
+>
+> --------------------------------------------
+>
+> My next task is to do pair with device from bash script. I tried several
+> ways:
+> 1. #bluetoothctl pair 11:22:33:44:55:66 does not work because the agent i=
+s
+> not created.
+> 2. Make  agent via Dbus:
+> #dbus-send --system --print-reply --type=3Dmethod_call --dest=3Dorg.bluez
+> /org/bluez org.bluez.AgentManager1.RegisterAgent objpath:/org/bluez/agent=
+1
+> string:KeyboardOnly
+> the command works, but I do not see in Dbus /org/bluez/agent1 created.
+> 3. Make agent via bluetoothctl:
+> [bluetooth]#agent on
+> the command works, but I do not see in Dbus agent path!.
 
-diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
-index 25b0cf9..5e4800d 100644
---- a/drivers/bluetooth/bt3c_cs.c
-+++ b/drivers/bluetooth/bt3c_cs.c
-@@ -449,7 +449,7 @@ static int bt3c_load_firmware(struct bt3c_info *info,
- 	char *ptr = (char *) firmware;
- 	char b[9];
- 	unsigned int iobase, tmp;
--	unsigned long size, addr, fcs;
-+	unsigned long size, addr, fcs, tn;
- 	int i, err = 0;
- 
- 	iobase = info->p_dev->resource[0]->start;
-@@ -490,7 +490,9 @@ static int bt3c_load_firmware(struct bt3c_info *info,
- 		memset(b, 0, sizeof(b));
- 		for (tmp = 0, i = 0; i < size; i++) {
- 			memcpy(b, ptr + (i * 2) + 2, 2);
--			tmp += simple_strtol(b, NULL, 16);
-+			if (kstrtoul(b, 16, &tn))
-+				return -EINVAL;
-+			tmp += tn;
- 		}
- 
- 		if (((tmp + fcs) & 0xff) != 0xff) {
-@@ -505,7 +507,9 @@ static int bt3c_load_firmware(struct bt3c_info *info,
- 			memset(b, 0, sizeof(b));
- 			for (i = 0; i < (size - 4) / 2; i++) {
- 				memcpy(b, ptr + (i * 4) + 12, 4);
--				tmp = simple_strtoul(b, NULL, 16);
-+				if (kstrtoul(b, 16, &tn))
-+					return -EINVAL;
-+				tmp += tn;
- 				bt3c_put(iobase, tmp);
- 			}
- 		}
--- 
-1.8.3.1
+Im not sure Im following, you would like to have non-interactive mode
+working for bluetoothctl pair? The point number 2 don't make much
+sense since dbus-send normally disconnected after the reply that means
+the agent would be gone, also regarding 3 if you use a more recent
+version of bluetootctl it registers and agent automatically nowadays.
+
+> May be possible to set a default pin code via /etc/bluetooth/main.conf
+> if it is available, do not make a request for a pin from the command line=
+? I
+> think that then #bluetoothctl pair 11:22:33:44:55:66 will be able to work
+> fine.
+
+That is something I had in mind, lets see if I can come up with something.
+
+> ---------------------
+> Best regards,
+> Aleksandr Proklov
+
+
+
+--=20
+Luiz Augusto von Dentz
