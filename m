@@ -1,180 +1,97 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Inga Stotland <inga.stotland@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Inga Stotland <inga.stotland@intel.com>, luiz.dentz@gmail.com
-Subject: [PATCH BlueZ v3] tools/meshctl: Fix default directory for JSON files
-Date: Fri, 24 Aug 2018 14:08:13 -0700
-Message-Id: <20180824210813.28141-1-inga.stotland@intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <linux-kernel-owner@vger.kernel.org>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: Re: [PATCH v1 1/1] Bluetooth: hci_qca: Add poweroff support during
+ hci down for wcn3990
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180823112935.17342-2-bgodavar@codeaurora.org>
+Date: Fri, 24 Aug 2018 20:50:46 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Message-Id: <E6C34892-0C0F-45E7-AC05-79A4A409FC48@holtmann.org>
+References: <20180823112935.17342-1-bgodavar@codeaurora.org>
+ <20180823112935.17342-2-bgodavar@codeaurora.org>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes the name of default directory that contains sample JSON files.
-README file is updated to describe the default location.
----
- tools/mesh/README | 19 ++++++++++++++++-
- tools/meshctl.c   | 52 ++++++++++++++++++++++++++++-------------------
- 2 files changed, 49 insertions(+), 22 deletions(-)
+Hi Balakrishna,
 
-diff --git a/tools/mesh/README b/tools/mesh/README
-index ea561efc8..44d633313 100644
---- a/tools/mesh/README
-+++ b/tools/mesh/README
-@@ -1,5 +1,5 @@
- MeshCtl - BlueZ GATT based Bluetooth Mesh Provisioner
--******************************************
-+*****************************************************
- 
- Copyright (C) 2017  Intel Corporation. All rights reserved.
- 
-@@ -16,6 +16,23 @@ Configuration and options
- 
- 		Build meshctl and other Bluetooth Mesh based tools and utils
- 
-+Example configuration files
-+===========================
-+
-+The MeshCtl tool requires two input configuration files in JSON format:
-+	- local_node.json
-+		Local mesh node configuration
-+	- prov_db.json
-+		Provisoner's database for all the configured nodes in the mesh
-+
-+The default directory for MeshCtl configuration files is
-+/home/<username>/.config/meshctl
-+
-+To use .json configuration files either copy them to the default directory
-+or, to specify a custom storage directory, run meshctl tool as:
-+
-+	meshctl -c <config_dir_name>
-+
- Information
- ===========
- 
-diff --git a/tools/meshctl.c b/tools/meshctl.c
-index 3e1484f61..1a77aa881 100644
---- a/tools/meshctl.c
-+++ b/tools/meshctl.c
-@@ -72,6 +72,8 @@
- #define MESH_PROXY_DATA_IN_UUID_STR	"00002add-0000-1000-8000-00805f9b34fb"
- #define MESH_PROXY_DATA_OUT_UUID_STR	"00002ade-0000-1000-8000-00805f9b34fb"
- 
-+#define MESHCTL_DIR	".config/meshctl"
-+
- static DBusConnection *dbus_conn;
- 
- struct adapter {
-@@ -1873,7 +1875,7 @@ static const struct bt_shell_menu main_menu = {
- 	{ } },
- };
- 
--static const char *mesh_config_dir;
-+static const char *config_dir;
- 
- static const struct option options[] = {
- 	{ "config",	required_argument, 0, 'c' },
-@@ -1881,7 +1883,7 @@ static const struct option options[] = {
- };
- 
- static const char **optargs[] = {
--	&mesh_config_dir
-+	&config_dir
- };
- 
- static const char *help[] = {
-@@ -1907,38 +1909,44 @@ int main(int argc, char *argv[])
- 	int status;
- 	int len;
- 	int extra;
-+	char *mesh_dir = NULL;
- 
- 	bt_shell_init(argc, argv, &opt);
- 	bt_shell_set_menu(&main_menu);
- 	bt_shell_set_prompt(PROMPT_OFF);
- 
--	if (!mesh_config_dir) {
--		bt_shell_printf("Local config directory not provided.\n");
--		mesh_config_dir = "";
-+	if (!config_dir) {
-+		const char *home = getenv("HOME");
-+		if (!home) {
-+			g_printerr("Config dir not given and $HOME not set up");
-+			goto fail;
-+		}
-+
-+		mesh_dir = g_strdup_printf("%s/%s", home, MESHCTL_DIR);
- 	} else {
--		bt_shell_printf("Reading prov_db.json and local_node.json from"
--				" %s\n", mesh_config_dir);
-+		mesh_dir = g_strdup_printf("%s", config_dir);
- 	}
- 
--	len = strlen(mesh_config_dir);
--	if (len && mesh_config_dir[len - 1] != '/') {
-+	printf("Reading prov_db.json and local_node.json from %s directory\n",
-+								mesh_dir);
-+
-+	len = strlen(mesh_dir);
-+
-+	if (len && mesh_dir[len - 1] != '/')
- 		extra = 1;
--		bt_shell_printf("mesh_config_dir[%d] %s\n", len,
--						&mesh_config_dir[len - 1]);
--	} else {
-+	else
- 		extra = 0;
--	}
-+
- 	mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
- 									+ 2);
- 	if (!mesh_local_config_filename)
- 		goto fail;
- 
- 	mesh_prov_db_filename = g_malloc(len + strlen("prov_db.json") + 2);
--	if (!mesh_prov_db_filename) {
-+	if (!mesh_prov_db_filename)
- 		goto fail;
--	}
- 
--	sprintf(mesh_local_config_filename, "%s", mesh_config_dir);
-+	sprintf(mesh_local_config_filename, "%s", mesh_dir);
- 
- 	if (extra)
- 		sprintf(mesh_local_config_filename + len , "%c", '/');
-@@ -1946,7 +1954,6 @@ int main(int argc, char *argv[])
- 	sprintf(mesh_local_config_filename + len + extra, "%s",
- 							"local_node.json");
- 	len = len + extra + strlen("local_node.json");
--	sprintf(mesh_local_config_filename + len, "%c", '\0');
- 
- 	if (!prov_db_read_local_node(mesh_local_config_filename, true)) {
- 		g_printerr("Failed to parse local node configuration file %s\n",
-@@ -1954,14 +1961,15 @@ int main(int argc, char *argv[])
- 		goto fail;
- 	}
- 
--	sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
--	len = strlen(mesh_config_dir);
-+	sprintf(mesh_prov_db_filename, "%s", mesh_dir);
-+	len = strlen(mesh_dir);
-+
-+	g_free(mesh_dir);
-+
- 	if (extra)
- 		sprintf(mesh_prov_db_filename + len , "%c", '/');
- 
- 	sprintf(mesh_prov_db_filename + len + extra, "%s", "prov_db.json");
--	sprintf(mesh_prov_db_filename + len + extra + strlen("prov_db.json"),
--								"%c", '\0');
- 
- 	if (!prov_db_read(mesh_prov_db_filename)) {
- 		g_printerr("Failed to parse provisioning database file %s\n",
-@@ -2006,5 +2014,7 @@ int main(int argc, char *argv[])
- 
- fail:
- 	bt_shell_cleanup();
-+	g_free(mesh_dir);
-+
- 	return EXIT_FAILURE;
- }
--- 
-2.17.1
+> This patch enables power off support for hci down and power on support
+> for hci up. As wcn3990 power sources are ignited by regulators, we will
+> turn off them during hci down, i.e. an complete power off of wcn3990.
+> So while hci up, we will call vendor specific open/close and setup which
+> will turn on the regulators, requests BT chip version and download the
+> firmware.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+> drivers/bluetooth/hci_qca.c | 34 ++++++++++++++++++++++++++++++++++
+> 1 file changed, 34 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index e182f6019f68..98d33c6b8909 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -595,6 +595,9 @@ static int qca_close(struct hci_uart *hu)
+> 	struct qca_serdev *qcadev;
+> 	struct qca_data *qca = hu->priv;
+> 
+> +	if (!qca)
+> +		return 0;
+> +
+> 	BT_DBG("hu %p qca close", hu);
+> 
+> 	serial_clock_vote(HCI_IBS_VOTE_STATS_UPDATE, hu);
+> @@ -1098,6 +1101,32 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+> 	return 0;
+> }
+> 
+> +static int hci_uart_open(struct hci_dev *hdev)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +
+> +	BT_DBG("%s %p", hdev->name, hdev);
+> +	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+> +
+> +	return qca_open(hu);
+> +}
+> +
+> +static int hci_uart_close(struct hci_dev *hdev)
+> +{
+> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +
+> +	BT_DBG("%s %p", hdev->name, hdev);
+> +
+> +	/* After this step, we should not allow Tx and Rx work
+> +	 * function to execute. As we are freeing qca tx and rx
+> +	 * buffers which may cause kernel crash.
+> +	 */
+> +	clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+> +	qca_close(hu);
+> +
+> +	return 0;
+> +}
+> +
+> static int qca_wcn3990_init(struct hci_uart *hu)
+> {
+> 	struct hci_dev *hdev = hu->hdev;
+> @@ -1154,6 +1183,11 @@ static int qca_setup(struct hci_uart *hu)
+> 
+> 	if (qcadev->btsoc_type == QCA_WCN3990) {
+> 		bt_dev_info(hdev, "setting up wcn3990");
+> +
+> +		hdev->open  = hci_uart_open;
+> +		hdev->close = hci_uart_close;
+> +		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+> +
+
+I do not get this change and I am also against it. Once hdev->open and hdev->close are assigned, don’t re-assign them. You called hci_register_dev and you are not changing the basic transport open/close functions after that. If you need some vendor specific things to open and close the transport, then do it properly.
+
+When I posted the btuart.c serdev driver, it would be a lot easier to add vendor specific things then to hci_serdev.c which is still kinda hacked onto a line discipline driver.
+
+Regards
+
+Marcel
