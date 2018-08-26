@@ -1,254 +1,147 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Navik, Ankit P" <ankit.p.navik@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: "Panda, Bharat B" <bharat.b.panda@intel.com>,
-        "Navik, Ankit P" <ankit.p.navik@intel.com>
-Subject: RE: [PATCH v2] Bluetooth: Add definitions and track LE resolve list
- modification
-Date: Sun, 26 Aug 2018 14:39:05 +0000
-Message-ID: <2F886D5F95ED3A47BC8C177EADCD1CC72829EC38@BGSMSX104.gar.corp.intel.com>
-References: <1534471159-26476-1-git-send-email-ankit.p.navik@intel.com>
-In-Reply-To: <1534471159-26476-1-git-send-email-ankit.p.navik@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+Return-Path: <lkp@intel.com>
+Date: Sun, 26 Aug 2018 17:00:46 +0800
+From: kbuild test robot <lkp@intel.com>
+To: Ding Xiang <dingxiang@cmss.chinamobile.com>
+Cc: kbuild-all@01.org, marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V2] Bluetooth: bt3c_cs: Fix obsolete function
+Message-ID: <201808261649.k4zGe5cR%fengguang.wu@intel.com>
+References: <1535107465-5470-1-git-send-email-dingxiang@cmss.chinamobile.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1535107465-5470-1-git-send-email-dingxiang@cmss.chinamobile.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Soft reminder.
- 
-> Add the definitions for adding entries to the LE resolve list and removing entries
-> from the LE resolve list. When the LE resolve list gets changed via HCI
-> commands make sure that the internal storage of the resolve list entries gets
-> updated.
-> 
-> Signed-off-by: Ankit Navik <ankit.p.navik@intel.com>
-> ---
->  include/net/bluetooth/hci.h      | 14 +++++++++
->  include/net/bluetooth/hci_core.h | 15 ++++++++++
->  net/bluetooth/hci_core.c         | 63
-> ++++++++++++++++++++++++++++++++++++++++
->  net/bluetooth/hci_event.c        | 47 ++++++++++++++++++++++++++++++
->  4 files changed, 139 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h index
-> 4af1a3a..1abcd14 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1490,6 +1490,20 @@ struct hci_cp_le_write_def_data_len {
->  	__le16	tx_time;
->  } __packed;
-> 
-> +#define HCI_OP_LE_ADD_TO_RESOLV_LIST	0x2027
-> +struct hci_cp_le_add_to_resolv_list {
-> +	__u8	 bdaddr_type;
-> +	bdaddr_t bdaddr;
-> +	__u8	 peer_irk[16];
-> +	__u8	 local_irk[16];
-> +} __packed;
-> +
-> +#define HCI_OP_LE_DEL_FROM_RESOLV_LIST	0x2028
-> +struct hci_cp_le_del_from_resolv_list {
-> +	__u8	 bdaddr_type;
-> +	bdaddr_t bdaddr;
-> +} __packed;
-> +
->  #define HCI_OP_LE_CLEAR_RESOLV_LIST	0x2029
-> 
->  #define HCI_OP_LE_READ_RESOLV_LIST_SIZE	0x202a
-> diff --git a/include/net/bluetooth/hci_core.h
-> b/include/net/bluetooth/hci_core.h
-> index 3a1ae0d..89580de 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -103,6 +103,14 @@ struct bdaddr_list {
->  	u8 bdaddr_type;
->  };
-> 
-> +struct bdaddr_list_with_irk {
-> +	struct list_head list;
-> +	bdaddr_t bdaddr;
-> +	u8 bdaddr_type;
-> +	u8 peer_irk[16];
-> +	u8 local_irk[16];
-> +};
-> +
->  struct bt_uuid {
->  	struct list_head list;
->  	u8 uuid[16];
-> @@ -1050,8 +1058,15 @@ static inline void hci_set_drvdata(struct hci_dev
-> *hdev, void *data)
-> 
->  struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
->  					   bdaddr_t *bdaddr, u8 type);
-> +struct bdaddr_list_with_irk *hci_bdaddr_list_lookup_with_irk(
-> +				    struct list_head *list, bdaddr_t *bdaddr,
-> +				    u8 type);
->  int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type);
-> +int hci_bdaddr_list_add_with_irk(struct list_head *list, bdaddr_t *bdaddr,
-> +					u8 type, u8 *peer_irk, u8 *local_irk);
->  int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type);
-> +int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
-> +								u8 type);
->  void hci_bdaddr_list_clear(struct list_head *list);
-> 
->  struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev, diff --
-> git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c index
-> af1675d..d74dd1c8 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2774,6 +2774,20 @@ struct bdaddr_list *hci_bdaddr_list_lookup(struct
-> list_head *bdaddr_list,
->  	return NULL;
->  }
-> 
-> +struct bdaddr_list_with_irk *hci_bdaddr_list_lookup_with_irk(
-> +				struct list_head *bdaddr_list, bdaddr_t
-> *bdaddr,
-> +				u8 type)
-> +{
-> +	struct bdaddr_list_with_irk *b;
-> +
-> +	list_for_each_entry(b, bdaddr_list, list) {
-> +		if (!bacmp(&b->bdaddr, bdaddr) && b->bdaddr_type == type)
-> +			return b;
-> +	}
-> +
-> +	return NULL;
-> +}
-> +
->  void hci_bdaddr_list_clear(struct list_head *bdaddr_list)  {
->  	struct bdaddr_list *b, *n;
-> @@ -2806,6 +2820,35 @@ int hci_bdaddr_list_add(struct list_head *list,
-> bdaddr_t *bdaddr, u8 type)
->  	return 0;
->  }
-> 
-> +int hci_bdaddr_list_add_with_irk(struct list_head *list, bdaddr_t *bdaddr,
-> +					u8 type, u8 *peer_irk, u8 *local_irk) {
-> +	struct bdaddr_list_with_irk *entry;
-> +
-> +	if (!bacmp(bdaddr, BDADDR_ANY))
-> +		return -EBADF;
-> +
-> +	if (hci_bdaddr_list_lookup(list, bdaddr, type))
-> +		return -EEXIST;
-> +
-> +	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-> +	if (!entry)
-> +		return -ENOMEM;
-> +
-> +	bacpy(&entry->bdaddr, bdaddr);
-> +	entry->bdaddr_type = type;
-> +
-> +	if (peer_irk)
-> +		memcpy(entry->peer_irk, peer_irk, 16);
-> +
-> +	if (local_irk)
-> +		memcpy(entry->local_irk, local_irk, 16);
-> +
-> +	list_add(&entry->list, list);
-> +
-> +	return 0;
-> +}
-> +
->  int hci_bdaddr_list_del(struct list_head *list, bdaddr_t *bdaddr, u8 type)  {
->  	struct bdaddr_list *entry;
-> @@ -2825,6 +2868,26 @@ int hci_bdaddr_list_del(struct list_head *list,
-> bdaddr_t *bdaddr, u8 type)
->  	return 0;
->  }
-> 
-> +int hci_bdaddr_list_del_with_irk(struct list_head *list, bdaddr_t *bdaddr,
-> +							u8 type)
-> +{
-> +	struct bdaddr_list_with_irk *entry;
-> +
-> +	if (!bacmp(bdaddr, BDADDR_ANY)) {
-> +		hci_bdaddr_list_clear(list);
-> +		return 0;
-> +	}
-> +
-> +	entry = hci_bdaddr_list_lookup_with_irk(list, bdaddr, type);
-> +	if (!entry)
-> +		return -ENOENT;
-> +
-> +	list_del(&entry->list);
-> +	kfree(entry);
-> +
-> +	return 0;
-> +}
-> +
->  /* This function requires the caller holds hdev->lock */  struct hci_conn_params
-> *hci_conn_params_lookup(struct hci_dev *hdev,
->  					       bdaddr_t *addr, u8 addr_type) diff
-> --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c index
-> 3029d79..188ab46 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1307,6 +1307,45 @@ static void hci_cc_le_write_def_data_len(struct
-> hci_dev *hdev,
->  	hdev->le_def_tx_time = le16_to_cpu(sent->tx_time);  }
-> 
-> +static void hci_cc_le_add_to_resolv_list(struct hci_dev *hdev,
-> +					 struct sk_buff *skb)
-> +{
-> +	struct hci_cp_le_add_to_resolv_list *sent;
-> +	__u8 status = *((__u8 *) skb->data);
-> +
-> +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-> +
-> +	if (status)
-> +		return;
-> +
-> +	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_RESOLV_LIST);
-> +	if (!sent)
-> +		return;
-> +
-> +	hci_bdaddr_list_add_with_irk(&hdev->le_resolv_list, &sent->bdaddr,
-> +				sent->bdaddr_type, sent->peer_irk,
-> +				sent->local_irk);
-> +}
-> +
-> +static void hci_cc_le_del_from_resolv_list(struct hci_dev *hdev,
-> +					  struct sk_buff *skb)
-> +{
-> +	struct hci_cp_le_del_from_resolv_list *sent;
-> +	__u8 status = *((__u8 *) skb->data);
-> +
-> +	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-> +
-> +	if (status)
-> +		return;
-> +
-> +	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_DEL_FROM_RESOLV_LIST);
-> +	if (!sent)
-> +		return;
-> +
-> +	hci_bdaddr_list_del_with_irk(&hdev->le_resolv_list, &sent->bdaddr,
-> +			    sent->bdaddr_type);
-> +}
-> +
->  static void hci_cc_le_clear_resolv_list(struct hci_dev *hdev,
->  				       struct sk_buff *skb)
->  {
-> @@ -3042,6 +3081,14 @@ static void hci_cmd_complete_evt(struct hci_dev
-> *hdev, struct sk_buff *skb,
->  		hci_cc_le_write_def_data_len(hdev, skb);
->  		break;
-> 
-> +	case HCI_OP_LE_ADD_TO_RESOLV_LIST:
-> +		hci_cc_le_add_to_resolv_list(hdev, skb);
-> +		break;
-> +
-> +	case HCI_OP_LE_DEL_FROM_RESOLV_LIST:
-> +		hci_cc_le_del_from_resolv_list(hdev, skb);
-> +		break;
-> +
->  	case HCI_OP_LE_CLEAR_RESOLV_LIST:
->  		hci_cc_le_clear_resolv_list(hdev, skb);
->  		break;
-> --
-> 1.9.1
+Hi Ding,
 
-Regards, 
-Ankit
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on v4.18 next-20180824]
+[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+
+url:    https://github.com/0day-ci/linux/commits/Ding-Xiang/Bluetooth-bt3c_cs-Fix-obsolete-function/20180824-184743
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+reproduce:
+        # apt-get install sparse
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF=-D__CHECK_ENDIAN__
+
+
+sparse warnings: (new ones prefixed by >>)
+
+>> drivers/bluetooth/bt3c_cs.c:510:54: sparse: incorrect type in argument 3 (different type sizes) @@    expected unsigned long *res @@    got nsigned long *res @@
+   drivers/bluetooth/bt3c_cs.c:510:54:    expected unsigned long *res
+   drivers/bluetooth/bt3c_cs.c:510:54:    got unsigned int *<noident>
+   drivers/bluetooth/bt3c_cs.c: In function 'bt3c_load_firmware':
+   drivers/bluetooth/bt3c_cs.c:510:25: error: passing argument 3 of 'kstrtoul' from incompatible pointer type [-Werror=incompatible-pointer-types]
+        if (kstrtoul(b, 16, &tmp))
+                            ^
+   In file included from include/linux/list.h:9:0,
+                    from include/linux/module.h:9,
+                    from drivers/bluetooth/bt3c_cs.c:24:
+   include/linux/kernel.h:333:32: note: expected 'long unsigned int *' but argument is of type 'unsigned int *'
+    static inline int __must_check kstrtoul(const char *s, unsigned int base, unsigned long *res)
+                                   ^~~~~~~~
+   cc1: some warnings being treated as errors
+
+vim +510 drivers/bluetooth/bt3c_cs.c
+
+   443	
+   444	
+   445	static int bt3c_load_firmware(struct bt3c_info *info,
+   446				      const unsigned char *firmware,
+   447				      int count)
+   448	{
+   449		char *ptr = (char *) firmware;
+   450		char b[9];
+   451		unsigned int iobase, tmp;
+   452		unsigned long size, addr, fcs, tn;
+   453		int i, err = 0;
+   454	
+   455		iobase = info->p_dev->resource[0]->start;
+   456	
+   457		/* Reset */
+   458		bt3c_io_write(iobase, 0x8040, 0x0404);
+   459		bt3c_io_write(iobase, 0x8040, 0x0400);
+   460	
+   461		udelay(1);
+   462	
+   463		bt3c_io_write(iobase, 0x8040, 0x0404);
+   464	
+   465		udelay(17);
+   466	
+   467		/* Load */
+   468		while (count) {
+   469			if (ptr[0] != 'S') {
+   470				BT_ERR("Bad address in firmware");
+   471				err = -EFAULT;
+   472				goto error;
+   473			}
+   474	
+   475			memset(b, 0, sizeof(b));
+   476			memcpy(b, ptr + 2, 2);
+   477			if (kstrtoul(b, 16, &size) < 0)
+   478				return -EINVAL;
+   479	
+   480			memset(b, 0, sizeof(b));
+   481			memcpy(b, ptr + 4, 8);
+   482			if (kstrtoul(b, 16, &addr) < 0)
+   483				return -EINVAL;
+   484	
+   485			memset(b, 0, sizeof(b));
+   486			memcpy(b, ptr + (size * 2) + 2, 2);
+   487			if (kstrtoul(b, 16, &fcs) < 0)
+   488				return -EINVAL;
+   489	
+   490			memset(b, 0, sizeof(b));
+   491			for (tmp = 0, i = 0; i < size; i++) {
+   492				memcpy(b, ptr + (i * 2) + 2, 2);
+   493				if (kstrtoul(b, 16, &tn))
+   494					return -EINVAL;
+   495				tmp += tn;
+   496			}
+   497	
+   498			if (((tmp + fcs) & 0xff) != 0xff) {
+   499				BT_ERR("Checksum error in firmware");
+   500				err = -EILSEQ;
+   501				goto error;
+   502			}
+   503	
+   504			if (ptr[1] == '3') {
+   505				bt3c_address(iobase, addr);
+   506	
+   507				memset(b, 0, sizeof(b));
+   508				for (i = 0; i < (size - 4) / 2; i++) {
+   509					memcpy(b, ptr + (i * 4) + 12, 4);
+ > 510					if (kstrtoul(b, 16, &tmp))
+   511						return -EINVAL;
+   512					bt3c_put(iobase, tmp);
+   513				}
+   514			}
+   515	
+   516			ptr   += (size * 2) + 6;
+   517			count -= (size * 2) + 6;
+   518		}
+   519	
+   520		udelay(17);
+   521	
+   522		/* Boot */
+   523		bt3c_address(iobase, 0x3000);
+   524		outb(inb(iobase + CONTROL) | 0x40, iobase + CONTROL);
+   525	
+   526	error:
+   527		udelay(17);
+   528	
+   529		/* Clear */
+   530		bt3c_io_write(iobase, 0x7006, 0x0000);
+   531		bt3c_io_write(iobase, 0x7005, 0x0000);
+   532		bt3c_io_write(iobase, 0x7001, 0x0000);
+   533	
+   534		return err;
+   535	}
+   536	
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
