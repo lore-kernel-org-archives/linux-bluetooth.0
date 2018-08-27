@@ -1,39 +1,130 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Reply-To: ProklovAV@mail.zabtrans.ru
-Subject: Re: Problem with StopDiscovery() via dbus-send
-References: <5B7F662D.5010903@mail.zabtrans.ru>
- <CABBYNZ+ee5BTR_gqjP3XJFMCfoSxGZNCVBuDA3mraS0hN5LkNg@mail.gmail.com>
- <5B833EBD.8050003@mail.zabtrans.ru>
- <CABBYNZKeotBdqAzsKkw-jN4tmcpBdYPC34C-71S4gzCkcdDM3g@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
-         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
-Message-ID: <5B84B663.2010906@mail.zabtrans.ru>
-Date: Tue, 28 Aug 2018 10:41:39 +0800
+Return-Path: <bgodavar@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZKeotBdqAzsKkw-jN4tmcpBdYPC34C-71S4gzCkcdDM3g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Mon, 27 Aug 2018 18:38:31 +0530
+From: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+ linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+ hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v1 1/1] Bluetooth: hci_qca: Add poweroff support during
+ hci down for wcn3990
+In-Reply-To: <E6C34892-0C0F-45E7-AC05-79A4A409FC48@holtmann.org>
+References: <20180823112935.17342-1-bgodavar@codeaurora.org>
+ <20180823112935.17342-2-bgodavar@codeaurora.org>
+ <E6C34892-0C0F-45E7-AC05-79A4A409FC48@holtmann.org>
+Message-ID: <6ac01029af09b131523e8c0e27d56a2c@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-27.08.2018 15:24, Luiz Augusto von Dentz пишет:
-> Afaik that only works for legacy pairing, normally devices without any
-> input/output should rely on just works pairing which is what you would
-> usually see in headset, etc, though that are not always pairable so
-> you have to switch it on with a button or something like it.
+Hi Marcel,
 
-Now my pair process with non-android phone:
-#bluetoothctl
-[bluetooth] pair 11:22:33:44:55:66
+On 2018-08-25 00:20, Marcel Holtmann wrote:
+> Hi Balakrishna,
+> 
+>> This patch enables power off support for hci down and power on support
+>> for hci up. As wcn3990 power sources are ignited by regulators, we 
+>> will
+>> turn off them during hci down, i.e. an complete power off of wcn3990.
+>> So while hci up, we will call vendor specific open/close and setup 
+>> which
+>> will turn on the regulators, requests BT chip version and download the
+>> firmware.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>> drivers/bluetooth/hci_qca.c | 34 ++++++++++++++++++++++++++++++++++
+>> 1 file changed, 34 insertions(+)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index e182f6019f68..98d33c6b8909 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -595,6 +595,9 @@ static int qca_close(struct hci_uart *hu)
+>> 	struct qca_serdev *qcadev;
+>> 	struct qca_data *qca = hu->priv;
+>> 
+>> +	if (!qca)
+>> +		return 0;
+>> +
+>> 	BT_DBG("hu %p qca close", hu);
+>> 
+>> 	serial_clock_vote(HCI_IBS_VOTE_STATS_UPDATE, hu);
+>> @@ -1098,6 +1101,32 @@ static int qca_set_speed(struct hci_uart *hu, 
+>> enum qca_speed_type speed_type)
+>> 	return 0;
+>> }
+>> 
+>> +static int hci_uart_open(struct hci_dev *hdev)
+>> +{
+>> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+>> +
+>> +	BT_DBG("%s %p", hdev->name, hdev);
+>> +	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+>> +
+>> +	return qca_open(hu);
+>> +}
+>> +
+>> +static int hci_uart_close(struct hci_dev *hdev)
+>> +{
+>> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+>> +
+>> +	BT_DBG("%s %p", hdev->name, hdev);
+>> +
+>> +	/* After this step, we should not allow Tx and Rx work
+>> +	 * function to execute. As we are freeing qca tx and rx
+>> +	 * buffers which may cause kernel crash.
+>> +	 */
+>> +	clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+>> +	qca_close(hu);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> static int qca_wcn3990_init(struct hci_uart *hu)
+>> {
+>> 	struct hci_dev *hdev = hu->hdev;
+>> @@ -1154,6 +1183,11 @@ static int qca_setup(struct hci_uart *hu)
+>> 
+>> 	if (qcadev->btsoc_type == QCA_WCN3990) {
+>> 		bt_dev_info(hdev, "setting up wcn3990");
+>> +
+>> +		hdev->open  = hci_uart_open;
+>> +		hdev->close = hci_uart_close;
+>> +		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+>> +
+> 
+> I do not get this change and I am also against it. Once hdev->open and
+> hdev->close are assigned, don’t re-assign them. You called
+> hci_register_dev and you are not changing the basic transport
+> open/close functions after that. If you need some vendor specific
+> things to open and close the transport, then do it properly.
+> 
 
-I intering pin code in command shell: 1234
-Phone shows a window for entering the code.
-I intering pin code on phone. Device pair.
+[Bala]: the reason to re-assign hdev->close & hdev->open is, when we do 
+an hci0 down we are
+         shutting down the regulators to turn off wcn3990 and closing the 
+vendor proto i.e.clearing the memory too.,
+         So we are re-assigning the hdev->close to proto close. Here is 
+the use case of the above change wrt mobile handset.
+         we will setup BT during bootup, i.e. we enable the clocks or 
+regulators to turn on BT chip connected.
+         let us assume that we turn off the BT chip i.e. hci0 down. so to 
+current implementation we will down the HCI0,
+         but still we have our uart clocks or BT clocks are regulators 
+are enabled. This is causing power and memory consumption.
 
-Step with the input of the code in the terminal can be skipped if the 
-code is given in main.conf
+> When I posted the btuart.c serdev driver, it would be a lot easier to
+> add vendor specific things then to hci_serdev.c which is still kinda
+> hacked onto a line discipline driver.
+> 
 
-the reverse process, when the code transmits the phone to the computer, 
-I have not considered so far. I think this through the script will be 
-difficult to implement.
+[Bala]: when can we expect btuart.c serdev driver.
+
+> Regards
+> 
+> Marcel
+
+-- 
+Regards
+Balakrishna.
