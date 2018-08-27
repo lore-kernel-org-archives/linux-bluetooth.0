@@ -1,46 +1,58 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <5B833EBD.8050003@mail.zabtrans.ru>
-References: <5B7F662D.5010903@mail.zabtrans.ru> <CABBYNZ+ee5BTR_gqjP3XJFMCfoSxGZNCVBuDA3mraS0hN5LkNg@mail.gmail.com>
- <5B833EBD.8050003@mail.zabtrans.ru>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 27 Aug 2018 10:24:00 +0300
-Message-ID: <CABBYNZKeotBdqAzsKkw-jN4tmcpBdYPC34C-71S4gzCkcdDM3g@mail.gmail.com>
-Subject: Re: Problem with StopDiscovery() via dbus-send
-To: ProklovAV@mail.zabtrans.ru
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <dingxiang@cmss.chinamobile.com>
+From: Ding Xiang <dingxiang@cmss.chinamobile.com>
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH V3] Bluetooth: bt3c_cs: Fix obsolete function
+Date: Sun, 26 Aug 2018 22:55:00 -0400
+Message-Id: <1535338500-7682-1-git-send-email-dingxiang@cmss.chinamobile.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+simple_strtol and simple_strtoul are obsolete, both place
+use kstrtouint instead.
 
-On Mon, Aug 27, 2018 at 2:58 AM, =D0=9F=D1=80=D0=BE=D0=BA=D0=BB=D0=BE=D0=B2=
- =D0=90=D0=BB=D0=B5=D0=BA=D1=81=D0=B0=D0=BD=D0=B4=D1=80 =D0=92=D0=B0=D0=BB=
-=D0=B5=D1=80=D1=8C=D0=B5=D0=B2=D0=B8=D1=87
-<ProklovAV@mail.zabtrans.ru> wrote:
-> 24.08.2018 16:19, Luiz Augusto von Dentz =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
->
->>> May be possible to set a default pin code via /etc/bluetooth/main.conf
->>> if it is available, do not make a request for a pin from the command
->>> line? I
->>> think that then #bluetoothctl pair 11:22:33:44:55:66 will be able to wo=
-rk
->>> fine.
->>
->>
->> That is something I had in mind, lets see if I can come up with somethin=
-g.
->>
->
-> Yes. Non-interactive mode needed.
-> But I think in bluez 3 was main.conf parameter to specify the default PIN
-> code.
+V2: fix error tmp += tn
+V3: fix compile error
 
-Afaik that only works for legacy pairing, normally devices without any
-input/output should rely on just works pairing which is what you would
-usually see in headset, etc, though that are not always pairable so
-you have to switch it on with a button or something like it.
+Signed-off-by: Ding Xiang <dingxiang@cmss.chinamobile.com>
+---
+ drivers/bluetooth/bt3c_cs.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
---=20
-Luiz Augusto von Dentz
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index 25b0cf9..5471383 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -448,7 +448,7 @@ static int bt3c_load_firmware(struct bt3c_info *info,
+ {
+ 	char *ptr = (char *) firmware;
+ 	char b[9];
+-	unsigned int iobase, tmp;
++	unsigned int iobase, tmp, tn;
+ 	unsigned long size, addr, fcs;
+ 	int i, err = 0;
+ 
+@@ -490,7 +490,9 @@ static int bt3c_load_firmware(struct bt3c_info *info,
+ 		memset(b, 0, sizeof(b));
+ 		for (tmp = 0, i = 0; i < size; i++) {
+ 			memcpy(b, ptr + (i * 2) + 2, 2);
+-			tmp += simple_strtol(b, NULL, 16);
++			if (kstrtouint(b, 16, &tn))
++				return -EINVAL;
++			tmp += tn;
+ 		}
+ 
+ 		if (((tmp + fcs) & 0xff) != 0xff) {
+@@ -505,7 +507,8 @@ static int bt3c_load_firmware(struct bt3c_info *info,
+ 			memset(b, 0, sizeof(b));
+ 			for (i = 0; i < (size - 4) / 2; i++) {
+ 				memcpy(b, ptr + (i * 4) + 12, 4);
+-				tmp = simple_strtoul(b, NULL, 16);
++				if (kstrtouint(b, 16, &tmp))
++					return -EINVAL;
+ 				bt3c_put(iobase, tmp);
+ 			}
+ 		}
+-- 
+1.8.3.1
