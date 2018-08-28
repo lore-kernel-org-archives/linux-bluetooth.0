@@ -1,39 +1,179 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
-Subject: Re: BlueZ: How to avoid fixed Coordinate Invalid Curve Attack
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <AM6PR0402MB38483C66931FD452B32A8096940A0@AM6PR0402MB3848.eurprd04.prod.outlook.com>
-Date: Tue, 28 Aug 2018 20:35:32 +0200
-Cc: Andy Duan <fugang.duan@nxp.com>,
-        "rtatiya@codeaurora.org" <rtatiya@codeaurora.org>,
+From: NXP psirt <psirt@nxp.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+        Andy Duan <fugang.duan@nxp.com>
+CC: "rtatiya@codeaurora.org" <rtatiya@codeaurora.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Johan Hedberg <johan.hedberg@intel.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <2C1879AB-5D93-4F31-BC7A-4DFBBC946A3A@holtmann.org>
+Subject: RE: BlueZ: How to avoid fixed Coordinate Invalid Curve Attack
+Date: Tue, 28 Aug 2018 17:33:45 +0000
+Message-ID: <AM6PR0402MB38483C66931FD452B32A8096940A0@AM6PR0402MB3848.eurprd04.prod.outlook.com>
 References: <VI1PR0402MB3600BAF04C81783B3A119AB6FF0A0@VI1PR0402MB3600.eurprd04.prod.outlook.com>
  <2A6353B1-324D-4D3B-BE3F-F06DE314961B@holtmann.org>
- <AM6PR0402MB38483C66931FD452B32A8096940A0@AM6PR0402MB3848.eurprd04.prod.outlook.com>
-To: NXP psirt <psirt@nxp.com>
+In-Reply-To: <2A6353B1-324D-4D3B-BE3F-F06DE314961B@holtmann.org>
+Content-Type: multipart/signed;
+        protocol="application/x-pkcs7-signature";
+        micalg=SHA1;
+        boundary="----=_NextPart_000_0B53_01D43ECB.5AA56920"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Asim,
+------=_NextPart_000_0B53_01D43ECB.5AA56920
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Is this the patch you are referring to?
-> 
-> https://patchwork.kernel.org/patch/9976233/
+Hi Marcel,
 
-no it is not. The patch you are looking for is this:
+Is this the patch you are referring to?
 
-commit ea169a30a6bf6782a05a51d2b9cf73db151eab8b
-Author: Stephan Mueller <smueller@chronox.de>
-Date:   Mon Jun 25 12:00:18 2018 +0200
+https://patchwork.kernel.org/patch/9976233/
 
-    crypto: ecdh - add public key verification test
 
-It follows closely the NIST recommendation for public key remmomen
+If not can you kindly point us to the patch that has been accepted in =
+the mainline to address this vulnerability.
+
+Kind Regards
+
+Asim
+
+NXP PSIRT
+
+-----Original Message-----
+From: Marcel Holtmann <marcel@holtmann.org>=20
+Sent: Tuesday, August 28, 2018 4:56 AM
+To: Andy Duan <fugang.duan@nxp.com>
+Cc: rtatiya@codeaurora.org; Luiz Augusto von Dentz =
+<luiz.von.dentz@intel.com>; Johan Hedberg <johan.hedberg@intel.com>; =
+Asim Zaidi <asim.zaidi@nxp.com>; linux-bluetooth@vger.kernel.org
+Subject: Re: BlueZ: How to avoid fixed Coordinate Invalid Curve Attack
+
+Hi Andy,
+
+> Do you have patches for BlueZ to avoid Bluetooth curve attack ?
+>=20
+> As I know, Many vendors supply Android Flueride host fixes & Firmware =
+fixes to avoid the curve attack, but BlueZ community doesn=E2=80=99t =
+have the topic. Does there have plan to fix the hole ?=20
+
+the Linux kernel crypto subsystem and its ECDH support has a patch to =
+ensure that the public key is validated before calculating the shared =
+secret.
+
 Regards
 
 Marcel
+
+
+------=_NextPart_000_0B53_01D43ECB.5AA56920
+Content-Type: application/pkcs7-signature;
+	name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment;
+	filename="smime.p7s"
+
+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
+bGZvcmQxGjAYBgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENs
+aWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEF
+AAOCAQ8AMIIBCgKCAQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmE
+atrQPTRI5Or1u6zf+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivl
+JTRENf+RKwrB6vcfWlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrx
+pZxyb4o4yNNwTqzaaPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/
+VCJv5ym6Q0mdCbDKCMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgw
+HwYDVR0jBBgwFoAUu69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0r
+cUhexIvAMA4GA1UdDwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYE
+VR0gADBMBgNVHR8ERTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FD
+ZXJ0aWZpY2F0aW9uQXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0
+dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzAB
+hhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9W
+zp+XVuyPomsX9vP2SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb
+6txM1n/y78e/4ZOs0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbj
+OKkDamxlpZ4TKSDMKVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqG
+OncjZjaaSOGTTFB+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7
+VFNYG+I31gnMrwfHM5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL
+580ul+9hz9D0S0U4jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZu
+tLbZdRJ5PDEJM/1tyZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VY
+nwtx7cJUmpvVdZ4ognzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/b
+RaTKTlL8YXLI8nAbR9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMIIGIzCCBQugAwIB
+AgIRAJVFNEkki0g/BWSr9NCxYPkwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNVBAYTAkdCMRswGQYD
+VQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNVBAoTEUNPTU9E
+TyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBh
+bmQgU2VjdXJlIEVtYWlsIENBMB4XDTE4MDMyMjAwMDAwMFoXDTE5MDMyMjIzNTk1OVowggEvMQsw
+CQYDVQQGEwJOTDEQMA4GA1UEERMHNTY1NiBBRzEWMBQGA1UECBMNTm9vcmQtQnJhYmFudDESMBAG
+A1UEBxMJRWluZGhvdmVuMRwwGgYDVQQJExNIaWdoIFRlY2ggQ2FtcHVzIDYwMRswGQYDVQQKExJO
+WFAgU2VtaWNvbmR1Y3RvcnMxGjAYBgNVBAsTEUlUIEluZnJhc3RydWN0dXJlMTgwNgYDVQQLEy9J
+c3N1ZWQgdGhyb3VnaCBOWFAgU2VtaWNvbmR1Y3RvcnMgRS1QS0kgTWFuYWdlcjEfMB0GA1UECxMW
+Q29ycG9yYXRlIFNlY3VyZSBFbWFpbDESMBAGA1UEAxMJTlhQIHBzaXJ0MRwwGgYJKoZIhvcNAQkB
+Fg1wc2lydEBueHAuY29tMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA9aY6K855RDIg
+ryPeqHiwTYPZoEESpkc7U8awsIfA4wONfLi5GZ4vi/nbXEbei62qby1VNTcAMvUBLYFJ8pg/z3iE
+czbhdiiuzYwSvFy/2xl+4d8b50gssvInDw+HwySgwka6slXHYwC6uIPW26Odt82B2qyLPaN5Jxmt
+XCAl2p9Y5kQQE9I62QB4lHs9M3G+24+19ka+nJ3SY3dkDyX3VK9qpUMCtARdkfTM2hoAgXLHOhDo
+Gj+FoKQYqSmblCgW56oph5Qi9sN/K0AmHpJAhGfonG2F25KEpJ+E5LY84h57QCj4xKYIc3hUsYy3
+LwaD5ytiPtoY3WTnRfiq3Cy/3QIDAQABo4IBzTCCAckwHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgf
+PStxSF7Ei8AwHQYDVR0OBBYEFLz+WiXm/VV37Pz62gt5OJavAXM0MA4GA1UdDwEB/wQEAwIFoDAM
+BgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUFBwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsG
+DCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1odHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQ
+UzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGll
+bnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYI
+KwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2EuY29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRp
+Y2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9k
+b2NhLmNvbTAYBgNVHREEETAPgQ1wc2lydEBueHAuY29tMA0GCSqGSIb3DQEBCwUAA4IBAQBgjJDE
+gbp286tUTcGd63skKCuFoq+P8zOhSDZ92c95KZ/1P/8uOKFoFSX84FnBz7rtSDV928UHLQWxQ69Q
+0TwdJq9CaHV9w2/M9IPN6VP5envK2mEbWI118+8xi05ZODTnaPX8UlayZECN1DsdLibT/WRBgYyt
+4LwJxoQUltu+LN5dtcQhbtW2sla7pEGKwH96ZX+2fVIVicGgLK4rlbiDrVhWfXEuuWlC2pKWFHkp
+dH28YfbrEiowphD4dcOjr0O4UfRdeTThP5z7Zgg8Yipp/wF4Th7oiKbCE06leWCCC3+fEXyfesXh
+5WAi0vEEDlnrHuvEx+/RvTiQ7TYe9cUsMYIEUDCCBEwCAQEwga0wgZcxCzAJBgNVBAYTAkdCMRsw
+GQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNVBAoTEUNP
+TU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50aWNhdGlv
+biBhbmQgU2VjdXJlIEVtYWlsIENBAhEAlUU0SSSLSD8FZKv00LFg+TAJBgUrDgMCGgUAoIICdzAY
+BgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEPFw0xODA4MjgxNzMzNDJaMCMG
+CSqGSIb3DQEJBDEWBBQUbgfsnlpgGt781pV6bGeg8fz4ZjCBkwYJKoZIhvcNAQkPMYGFMIGCMAsG
+CWCGSAFlAwQBKjALBglghkgBZQMEARYwCgYIKoZIhvcNAwcwCwYJYIZIAWUDBAECMA4GCCqGSIb3
+DQMCAgIAgDANBggqhkiG9w0DAgIBQDAHBgUrDgMCGjALBglghkgBZQMEAgMwCwYJYIZIAWUDBAIC
+MAsGCWCGSAFlAwQCATCBvgYJKwYBBAGCNxAEMYGwMIGtMIGXMQswCQYDVQQGEwJHQjEbMBkGA1UE
+CBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRowGAYDVQQKExFDT01PRE8g
+Q0EgTGltaXRlZDE9MDsGA1UEAxM0Q09NT0RPIFJTQSBDbGllbnQgQXV0aGVudGljYXRpb24gYW5k
+IFNlY3VyZSBFbWFpbCBDQQIRAJVFNEkki0g/BWSr9NCxYPkwgcAGCyqGSIb3DQEJEAILMYGwoIGt
+MIGXMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdT
+YWxmb3JkMRowGAYDVQQKExFDT01PRE8gQ0EgTGltaXRlZDE9MDsGA1UEAxM0Q09NT0RPIFJTQSBD
+bGllbnQgQXV0aGVudGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAJVFNEkki0g/BWSr9NCx
+YPkwDQYJKoZIhvcNAQEBBQAEggEA6KGmAkhyJpgVLt4h7c6DntVA7lTXv0LbjtR8z5SSnFeP6/0x
+AKIu1s8VX6SPcg2QQtzQdm5IiYvCCvy4AW40iqw/CN1yUU4YuJTN11GiM0vyrES7+/O0fvrkaQ1r
+A2uCXjjmI29hhv6ctGZgztJwT+KGZRqCfJnYoo69cbExz+vlAN3dsHdOn08YbaPOj32O3QQsg3g1
+G91GFdkdo4bWCdGovKRr2HTcNYBQKuLqMsnIPl1wnwjGZ0VD/08jAy1Ed+7p6x7VkAder9xcWaZj
+sHTA915wW2Mkt3/jSo/lnzG91b8v4vNZRL7zbTjZHHyAINNnb3MrdZJ6UHWukXZKqwAAAAAAAA==
+
+------=_NextPart_000_0B53_01D43ECB.5AA56920--
