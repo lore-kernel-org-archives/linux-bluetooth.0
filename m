@@ -1,62 +1,39 @@
-Return-Path: <chenhui.zhang@axis.com>
-From: Hermes Zhang <chenhui.zhang@axis.com>
-To: marcel@holtmann.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	ronald@innovation.ch,
-	Hermes Zhang <chenhuiz@axis.com>
-Subject: [PATCH] Bluetooth: hci_ldisc: Free rw_semaphore on close
-Date: Tue, 28 Aug 2018 09:48:30 +0800
-Message-Id: <20180828014830.13529-1-chenhui.zhang@axis.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Reply-To: ProklovAV@mail.zabtrans.ru
+Subject: Re: Problem with StopDiscovery() via dbus-send
+References: <5B7F662D.5010903@mail.zabtrans.ru>
+ <CABBYNZ+ee5BTR_gqjP3XJFMCfoSxGZNCVBuDA3mraS0hN5LkNg@mail.gmail.com>
+ <5B833EBD.8050003@mail.zabtrans.ru>
+ <CABBYNZKeotBdqAzsKkw-jN4tmcpBdYPC34C-71S4gzCkcdDM3g@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+From: =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
+         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
+Message-ID: <5B84B663.2010906@mail.zabtrans.ru>
+Date: Tue, 28 Aug 2018 10:41:39 +0800
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZKeotBdqAzsKkw-jN4tmcpBdYPC34C-71S4gzCkcdDM3g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Hermes Zhang <chenhuiz@axis.com>
+27.08.2018 15:24, Luiz Augusto von Dentz пишет:
+> Afaik that only works for legacy pairing, normally devices without any
+> input/output should rely on just works pairing which is what you would
+> usually see in headset, etc, though that are not always pairable so
+> you have to switch it on with a button or something like it.
 
-The percpu_rw_semaphore is not currently freed, and this leads to
-a crash when the stale rcu callback is invoked.  DEBUG_OBJECTS
-detects this.
+Now my pair process with non-android phone:
+#bluetoothctl
+[bluetooth] pair 11:22:33:44:55:66
 
- ODEBUG: free active (active state 1) object type: rcu_head hint: (null)
- ------------[ cut here ]------------
- WARNING: CPU: 1 PID: 2024 at debug_print_object+0xac/0xc8
- PC is at debug_print_object+0xac/0xc8
- LR is at debug_print_object+0xac/0xc8
- Call trace:
- [<ffffff80082e2c2c>] debug_print_object+0xac/0xc8
- [<ffffff80082e40b0>] debug_check_no_obj_freed+0x1e8/0x228
- [<ffffff8008191254>] kfree+0x1cc/0x250
- [<ffffff80083cc03c>] hci_uart_tty_close+0x54/0x108
- [<ffffff800832e118>] tty_ldisc_close.isra.1+0x40/0x58
- [<ffffff800832e14c>] tty_ldisc_kill+0x1c/0x40
- [<ffffff800832e3dc>] tty_ldisc_release+0x94/0x170
- [<ffffff8008325554>] tty_release_struct+0x1c/0x58
- [<ffffff8008326400>] tty_release+0x3b0/0x490
- [<ffffff80081a3fe8>] __fput+0x88/0x1d0
- [<ffffff80081a418c>] ____fput+0xc/0x18
- [<ffffff80080c0624>] task_work_run+0x9c/0xc0
- [<ffffff80080a9e24>] do_exit+0x24c/0x8a0
- [<ffffff80080aa4e0>] do_group_exit+0x38/0xa0
- [<ffffff80080aa558>] __wake_up_parent+0x0/0x28
- [<ffffff8008082c00>] el0_svc_naked+0x34/0x38
- ---[ end trace bfe08cbd89098cdf ]---
+I intering pin code in command shell: 1234
+Phone shows a window for entering the code.
+I intering pin code on phone. Device pair.
 
-Signed-off-by: Hermes Zhang <chenhuiz@axis.com>
----
- drivers/bluetooth/hci_ldisc.c | 2 ++
- 1 file changed, 2 insertions(+)
+Step with the input of the code in the terminal can be skipped if the 
+code is given in main.conf
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 963bb0309e25..ea6238ed5c0e 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -543,6 +543,8 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	}
- 	clear_bit(HCI_UART_PROTO_SET, &hu->flags);
- 
-+	percpu_free_rwsem(&hu->proto_lock);
-+
- 	kfree(hu);
- }
- 
--- 
-2.11.0
+the reverse process, when the code transmits the phone to the computer, 
+I have not considered so far. I think this through the script will be 
+difficult to implement.
