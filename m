@@ -1,24 +1,25 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <asim.zaidi@nxp.com>
 From: NXP psirt <psirt@nxp.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-        Andy Duan <fugang.duan@nxp.com>
-CC: "rtatiya@codeaurora.org" <rtatiya@codeaurora.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Johan Hedberg <johan.hedberg@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Marcel Holtmann <marcel@holtmann.org>, Andy Duan <fugang.duan@nxp.com>
+CC: "rtatiya@codeaurora.org" <rtatiya@codeaurora.org>, Luiz Augusto von Dentz
+	<luiz.von.dentz@intel.com>, Johan Hedberg <johan.hedberg@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: RE: BlueZ: How to avoid fixed Coordinate Invalid Curve Attack
+Sender: Asim Zaidi <asim.zaidi@nxp.com>
 Date: Tue, 28 Aug 2018 17:33:45 +0000
-Message-ID: <AM6PR0402MB38483C66931FD452B32A8096940A0@AM6PR0402MB3848.eurprd04.prod.outlook.com>
-References: <VI1PR0402MB3600BAF04C81783B3A119AB6FF0A0@VI1PR0402MB3600.eurprd04.prod.outlook.com>
+Message-ID:
+ <AM6PR0402MB38483C66931FD452B32A8096940A0@AM6PR0402MB3848.eurprd04.prod.outlook.com>
+References: 
+ <VI1PR0402MB3600BAF04C81783B3A119AB6FF0A0@VI1PR0402MB3600.eurprd04.prod.outlook.com>
  <2A6353B1-324D-4D3B-BE3F-F06DE314961B@holtmann.org>
 In-Reply-To: <2A6353B1-324D-4D3B-BE3F-F06DE314961B@holtmann.org>
 Content-Type: multipart/signed;
-        protocol="application/x-pkcs7-signature";
-        micalg=SHA1;
-        boundary="----=_NextPart_000_0B53_01D43ECB.5AA56920"
+	protocol="application/x-pkcs7-signature";
+	micalg=SHA1;
+	boundary="----=_NextPart_000_0B53_01D43ECB.5AA56920"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+Message-ID: <20180828173345.xhOIZhvz1q0vm_vTxNWjRdCLxDk511dSSGVI-Tj0rlM@z>
 
 ------=_NextPart_000_0B53_01D43ECB.5AA56920
 Content-Type: text/plain;
