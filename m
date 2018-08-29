@@ -1,203 +1,66 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20180829051251.13549-1-inga.stotland@intel.com>
-References: <20180829051251.13549-1-inga.stotland@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 29 Aug 2018 15:31:14 +0300
-Message-ID: <CABBYNZK4GzoJUG3Ths+fZoJ+UVE6G9+sa6SvE6KAfU=rDrjM=w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4] tools/meshctl: Fix default directory for JSON files
-To: Inga Stotland <inga.stotland@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <siva8118@gmail.com>
+From: Siva Rebbagondla <siva8118@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	Sasidhar Mudigonda <sasidhar.mudigonda@redpinesignals.com>,
+	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+	Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
+Subject: [PATCH] Bluetooth: btrsi: fix bt tx timeout issue
+Date: Wed, 29 Aug 2018 14:28:31 +0530
+Message-Id: <1535533111-18301-1-git-send-email-siva8118@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Inga,
+From: Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
 
-On Wed, Aug 29, 2018 at 8:12 AM, Inga Stotland <inga.stotland@intel.com> wrote:
-> This fixes the name of default directory that contains sample JSON files.
-> README file is updated to describe the default location.
-> ---
->  tools/mesh/README | 19 +++++++++++++++-
->  tools/meshctl.c   | 56 +++++++++++++++++++++++++++++------------------
->  2 files changed, 53 insertions(+), 22 deletions(-)
->
-> diff --git a/tools/mesh/README b/tools/mesh/README
-> index ea561efc8..44d633313 100644
-> --- a/tools/mesh/README
-> +++ b/tools/mesh/README
-> @@ -1,5 +1,5 @@
->  MeshCtl - BlueZ GATT based Bluetooth Mesh Provisioner
-> -******************************************
-> +*****************************************************
->
->  Copyright (C) 2017  Intel Corporation. All rights reserved.
->
-> @@ -16,6 +16,23 @@ Configuration and options
->
->                 Build meshctl and other Bluetooth Mesh based tools and utils
->
-> +Example configuration files
-> +===========================
-> +
-> +The MeshCtl tool requires two input configuration files in JSON format:
-> +       - local_node.json
-> +               Local mesh node configuration
-> +       - prov_db.json
-> +               Provisoner's database for all the configured nodes in the mesh
-> +
-> +The default directory for MeshCtl configuration files is
-> +/home/<username>/.config/meshctl
-> +
-> +To use .json configuration files either copy them to the default directory
-> +or, to specify a custom storage directory, run meshctl tool as:
-> +
-> +       meshctl -c <config_dir_name>
-> +
->  Information
->  ===========
->
-> diff --git a/tools/meshctl.c b/tools/meshctl.c
-> index 3e1484f61..89960ac2b 100644
-> --- a/tools/meshctl.c
-> +++ b/tools/meshctl.c
-> @@ -72,6 +72,8 @@
->  #define MESH_PROXY_DATA_IN_UUID_STR    "00002add-0000-1000-8000-00805f9b34fb"
->  #define MESH_PROXY_DATA_OUT_UUID_STR   "00002ade-0000-1000-8000-00805f9b34fb"
->
-> +#define MESHCTL_DIR    ".config/meshctl"
-> +
->  static DBusConnection *dbus_conn;
->
->  struct adapter {
-> @@ -1873,7 +1875,7 @@ static const struct bt_shell_menu main_menu = {
->         { } },
->  };
->
-> -static const char *mesh_config_dir;
-> +static const char *config_dir;
->
->  static const struct option options[] = {
->         { "config",     required_argument, 0, 'c' },
-> @@ -1881,7 +1883,7 @@ static const struct option options[] = {
->  };
->
->  static const char **optargs[] = {
-> -       &mesh_config_dir
-> +       &config_dir
->  };
->
->  static const char *help[] = {
-> @@ -1907,38 +1909,48 @@ int main(int argc, char *argv[])
->         int status;
->         int len;
->         int extra;
-> +       char *mesh_dir = NULL;
->
->         bt_shell_init(argc, argv, &opt);
->         bt_shell_set_menu(&main_menu);
->         bt_shell_set_prompt(PROMPT_OFF);
->
-> -       if (!mesh_config_dir) {
-> -               bt_shell_printf("Local config directory not provided.\n");
-> -               mesh_config_dir = "";
-> +       if (!config_dir) {
-> +               char *home = getenv("XDG_CONFIG_HOME");
-> +
-> +               if (!home)
-> +                       home = getenv("HOME");
-> +
-> +               if (!home) {
-> +                       g_printerr("Configuration not found\n");
-> +                       goto fail;
-> +               }
+observed sometimes data is coming with unaligned address from kernel
+BT stack. If unaligned address is passed, some data in payload is
+stripped when packet is loading to firmware and this results, BT
+connection timeout is happening.
 
-You should probably move the above statement inside if (!home).
+sh# hciconfig hci0 up
+Can't init device hci0: hci0 command 0x0c03 tx timeout
 
-> +               mesh_dir = g_strdup_printf("%s/%s", home, MESHCTL_DIR);
+Fixed this by moving the data to aligned address.
 
-XDG_CONFIG_HOME shall not be appended with .config portion, if it is
-present it contain the full path to the config direction so you should
-use it as is.
+Signed-off-by: Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
+Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+---
+ drivers/bluetooth/btrsi.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-> -               bt_shell_printf("Reading prov_db.json and local_node.json from"
-> -                               " %s\n", mesh_config_dir);
-> +               mesh_dir = g_strdup_printf("%s", config_dir);
->         }
->
-> -       len = strlen(mesh_config_dir);
-> -       if (len && mesh_config_dir[len - 1] != '/') {
-> +       printf("Reading prov_db.json and local_node.json from %s directory\n",
-> +                                                               mesh_dir);
-> +
-> +       len = strlen(mesh_dir);
-> +
-> +       if (len && mesh_dir[len - 1] != '/')
->                 extra = 1;
-> -               bt_shell_printf("mesh_config_dir[%d] %s\n", len,
-> -                                               &mesh_config_dir[len - 1]);
-> -       } else {
-> +       else
->                 extra = 0;
-> -       }
-> +
->         mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
->                                                                         + 2);
->         if (!mesh_local_config_filename)
->                 goto fail;
->
->         mesh_prov_db_filename = g_malloc(len + strlen("prov_db.json") + 2);
-> -       if (!mesh_prov_db_filename) {
-> +       if (!mesh_prov_db_filename)
->                 goto fail;
-> -       }
->
-> -       sprintf(mesh_local_config_filename, "%s", mesh_config_dir);
-> +       sprintf(mesh_local_config_filename, "%s", mesh_dir);
->
->         if (extra)
->                 sprintf(mesh_local_config_filename + len , "%c", '/');
-> @@ -1946,7 +1958,6 @@ int main(int argc, char *argv[])
->         sprintf(mesh_local_config_filename + len + extra, "%s",
->                                                         "local_node.json");
->         len = len + extra + strlen("local_node.json");
-> -       sprintf(mesh_local_config_filename + len, "%c", '\0');
->
->         if (!prov_db_read_local_node(mesh_local_config_filename, true)) {
->                 g_printerr("Failed to parse local node configuration file %s\n",
-> @@ -1954,14 +1965,15 @@ int main(int argc, char *argv[])
->                 goto fail;
->         }
->
-> -       sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
-> -       len = strlen(mesh_config_dir);
-> +       sprintf(mesh_prov_db_filename, "%s", mesh_dir);
-> +       len = strlen(mesh_dir);
-> +
-> +       g_free(mesh_dir);
-> +
->         if (extra)
->                 sprintf(mesh_prov_db_filename + len , "%c", '/');
->
->         sprintf(mesh_prov_db_filename + len + extra, "%s", "prov_db.json");
-> -       sprintf(mesh_prov_db_filename + len + extra + strlen("prov_db.json"),
-> -                                                               "%c", '\0');
->
->         if (!prov_db_read(mesh_prov_db_filename)) {
->                 g_printerr("Failed to parse provisioning database file %s\n",
-> @@ -2006,5 +2018,7 @@ int main(int argc, char *argv[])
->
->  fail:
->         bt_shell_cleanup();
-> +       g_free(mesh_dir);
-> +
->         return EXIT_FAILURE;
->  }
-> --
-> 2.17.1
->
-
-
-
+diff --git a/drivers/bluetooth/btrsi.c b/drivers/bluetooth/btrsi.c
+index 60d1419..3951f7b 100644
+--- a/drivers/bluetooth/btrsi.c
++++ b/drivers/bluetooth/btrsi.c
+@@ -21,8 +21,9 @@
+ #include <net/rsi_91x.h>
+ #include <net/genetlink.h>
+ 
+-#define RSI_HEADROOM_FOR_BT_HAL	16
++#define RSI_DMA_ALIGN	8
+ #define RSI_FRAME_DESC_SIZE	16
++#define RSI_HEADROOM_FOR_BT_HAL	(RSI_FRAME_DESC_SIZE + RSI_DMA_ALIGN)
+ 
+ struct rsi_hci_adapter {
+ 	void *priv;
+@@ -70,6 +71,16 @@ static int rsi_hci_send_pkt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		bt_cb(new_skb)->pkt_type = hci_skb_pkt_type(skb);
+ 		kfree_skb(skb);
+ 		skb = new_skb;
++		if (!IS_ALIGNED((unsigned long)skb->data, RSI_DMA_ALIGN)) {
++			u8 *skb_data = skb->data;
++			int skb_len = skb->len;
++
++			skb_push(skb, RSI_DMA_ALIGN);
++			skb_pull(skb, PTR_ALIGN(skb->data,
++						RSI_DMA_ALIGN) - skb->data);
++			memmove(skb->data, skb_data, skb_len);
++			skb_trim(skb, skb_len);
++		}
+ 	}
+ 
+ 	return h_adapter->proto_ops->coex_send_pkt(h_adapter->priv, skb,
 -- 
-Luiz Augusto von Dentz
+2.7.4
