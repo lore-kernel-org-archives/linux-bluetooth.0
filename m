@@ -1,66 +1,42 @@
-Return-Path: <siva8118@gmail.com>
-From: Siva Rebbagondla <siva8118@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	Sasidhar Mudigonda <sasidhar.mudigonda@redpinesignals.com>,
-	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
-	Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
-Subject: [PATCH] Bluetooth: btrsi: fix bt tx timeout issue
-Date: Wed, 29 Aug 2018 14:28:31 +0530
-Message-Id: <1535533111-18301-1-git-send-email-siva8118@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Andy Duan <fugang.duan@nxp.com>
+To: Marcel Holtmann <marcel@holtmann.org>, NXP psirt <psirt@nxp.com>
+CC: "rtatiya@codeaurora.org" <rtatiya@codeaurora.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Johan Hedberg <johan.hedberg@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: BlueZ: How to avoid fixed Coordinate Invalid Curve Attack
+Date: Wed, 29 Aug 2018 05:44:29 +0000
+Message-ID: <VI1PR0402MB36006169B509A62419342284FF090@VI1PR0402MB3600.eurprd04.prod.outlook.com>
+References: <VI1PR0402MB3600BAF04C81783B3A119AB6FF0A0@VI1PR0402MB3600.eurprd04.prod.outlook.com>
+ <2A6353B1-324D-4D3B-BE3F-F06DE314961B@holtmann.org>
+ <AM6PR0402MB38483C66931FD452B32A8096940A0@AM6PR0402MB3848.eurprd04.prod.outlook.com>
+ <2C1879AB-5D93-4F31-BC7A-4DFBBC946A3A@holtmann.org>
+In-Reply-To: <2C1879AB-5D93-4F31-BC7A-4DFBBC946A3A@holtmann.org>
+Content-Type: text/plain; charset="gb2312"
+MIME-Version: 1.0
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
-
-observed sometimes data is coming with unaligned address from kernel
-BT stack. If unaligned address is passed, some data in payload is
-stripped when packet is loading to firmware and this results, BT
-connection timeout is happening.
-
-sh# hciconfig hci0 up
-Can't init device hci0: hci0 command 0x0c03 tx timeout
-
-Fixed this by moving the data to aligned address.
-
-Signed-off-by: Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
-Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
----
- drivers/bluetooth/btrsi.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btrsi.c b/drivers/bluetooth/btrsi.c
-index 60d1419..3951f7b 100644
---- a/drivers/bluetooth/btrsi.c
-+++ b/drivers/bluetooth/btrsi.c
-@@ -21,8 +21,9 @@
- #include <net/rsi_91x.h>
- #include <net/genetlink.h>
- 
--#define RSI_HEADROOM_FOR_BT_HAL	16
-+#define RSI_DMA_ALIGN	8
- #define RSI_FRAME_DESC_SIZE	16
-+#define RSI_HEADROOM_FOR_BT_HAL	(RSI_FRAME_DESC_SIZE + RSI_DMA_ALIGN)
- 
- struct rsi_hci_adapter {
- 	void *priv;
-@@ -70,6 +71,16 @@ static int rsi_hci_send_pkt(struct hci_dev *hdev, struct sk_buff *skb)
- 		bt_cb(new_skb)->pkt_type = hci_skb_pkt_type(skb);
- 		kfree_skb(skb);
- 		skb = new_skb;
-+		if (!IS_ALIGNED((unsigned long)skb->data, RSI_DMA_ALIGN)) {
-+			u8 *skb_data = skb->data;
-+			int skb_len = skb->len;
-+
-+			skb_push(skb, RSI_DMA_ALIGN);
-+			skb_pull(skb, PTR_ALIGN(skb->data,
-+						RSI_DMA_ALIGN) - skb->data);
-+			memmove(skb->data, skb_data, skb_len);
-+			skb_trim(skb, skb_len);
-+		}
- 	}
- 
- 	return h_adapter->proto_ops->coex_send_pkt(h_adapter->priv, skb,
--- 
-2.7.4
+RnJvbTogTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPiAgU2VudDogMjAxOMTq
+ONTCMjnI1SAyOjM2DQo+IEhpIEFzaW0sDQo+IA0KPiA+IElzIHRoaXMgdGhlIHBhdGNoIHlvdSBh
+cmUgcmVmZXJyaW5nIHRvPw0KPiA+DQo+ID4NCj4gaHR0cHM6Ly9lbWVhMDEuc2FmZWxpbmtzLnBy
+b3RlY3Rpb24ub3V0bG9vay5jb20vP3VybD1odHRwcyUzQSUyRiUyRnANCj4gYXQNCj4gPg0KPiBj
+aHdvcmsua2VybmVsLm9yZyUyRnBhdGNoJTJGOTk3NjIzMyUyRiZhbXA7ZGF0YT0wMiU3QzAxJTdD
+ZnVnDQo+IGFuZy5kdWFuJQ0KPiA+DQo+IDQwbnhwLmNvbSU3Q2VjZjQxMTlkNjAxMjQ4YzI0OWI5
+MDhkNjBkMTUxMzhmJTdDNjg2ZWExZDNiYzINCj4gYjRjNmZhOTJjZDk5DQo+ID4NCj4gYzVjMzAx
+NjM1JTdDMCU3QzAlN0M2MzY3MTA3ODE1MDc5NzAzMjAmYW1wO3NkYXRhPVAlMkZxVXlFDQo+IFJL
+WG9meWlDTEUlMkYNCj4gPiBUcU04Z2pjVDhUNktJcE9OaWRVNkE5MXRjTSUzRCZhbXA7cmVzZXJ2
+ZWQ9MA0KPiANCj4gbm8gaXQgaXMgbm90LiBUaGUgcGF0Y2ggeW91IGFyZSBsb29raW5nIGZvciBp
+cyB0aGlzOg0KPiANCj4gY29tbWl0IGVhMTY5YTMwYTZiZjY3ODJhMDVhNTFkMmI5Y2Y3M2RiMTUx
+ZWFiOGINCj4gQXV0aG9yOiBTdGVwaGFuIE11ZWxsZXIgPHNtdWVsbGVyQGNocm9ub3guZGU+DQo+
+IERhdGU6ICAgTW9uIEp1biAyNSAxMjowMDoxOCAyMDE4ICswMjAwDQo+IA0KPiAgICAgY3J5cHRv
+OiBlY2RoIC0gYWRkIHB1YmxpYyBrZXkgdmVyaWZpY2F0aW9uIHRlc3QNCj4gDQo+IEl0IGZvbGxv
+d3MgY2xvc2VseSB0aGUgTklTVCByZWNvbW1lbmRhdGlvbiBmb3IgcHVibGljIGtleSByZW1tb21l
+bg0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCg0KSGkgTWFjZWwsDQoNClRoYW5rcyBmb3IgeW91
+ciBpbmZvcm1hdGlvbiAhDQoNCkZvciB2NC4xNC92NC45IHN0YWJsZSB0cmVlLCAgd2h5IGRvZXMg
+dGhlIHBhdGNoIG5vdCBhcHBseSBpbiB2NC4xNCwgIGRvIHlvdSBoYXZlIHBsYW4gdG8gZG8gYmFj
+a3BvcnRpbmcgdG8gdjQuMTQgc3RhYmxlIHRyZWWjvyANCkkgcGxhbiBjaGVycnkgcGljayBjcnlw
+dG8vZWNjLmMgc29tZSBwYXRjaCBhbmQgdGhlIHBhdGNoICJjcnlwdG86IGVjZGggLSBhZGQgcHVi
+bGljIGtleSB2ZXJpZmljYXRpb24gdGVzdCAiIHRvIHY0LjkgYW5kIHY0LjE0IE5YUCBJTVgga2Vy
+bmVsIHRyZWUuDQoNCkFuZHkgRHVhbg0K
