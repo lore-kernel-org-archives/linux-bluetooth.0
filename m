@@ -1,60 +1,193 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
-MIME-Version: 1.0
-References: <20180829130308.3504560-1-arnd@arndb.de>
-In-Reply-To: <20180829130308.3504560-1-arnd@arndb.de>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Thu, 30 Aug 2018 16:09:31 -0400
-Message-ID: <CAF=yD-J7-GumUmonrZt7s44e3bsjY2DCD6ZpmhtCx6FOBV5BNA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Network Development <netdev@vger.kernel.org>,
-        David Miller <davem@davemloft.net>, linux-arch@vger.kernel.org,
-        y2038 Mailman List <y2038@lists.linaro.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Willem de Bruijn <willemb@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
-        dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-kernel-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Inga Stotland <inga.stotland@intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Inga Stotland <inga.stotland@intel.com>, luiz.dentz@gmail.com
+Subject: [PATCH BlueZ v5] tools/meshctl: Fix default directory for JSON files
+Date: Wed, 29 Aug 2018 11:25:55 -0700
+Message-Id: <20180829182555.23712-1-inga.stotland@intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Aug 29, 2018 at 9:05 AM Arnd Bergmann <arnd@arndb.de> wrote:
->
-> The SIOCGSTAMP/SIOCGSTAMPNS ioctl commands are implemented by many
-> socket protocol handlers, and all of those end up calling the same
-> sock_get_timestamp()/sock_get_timestampns() helper functions, which
-> results in a lot of duplicate code.
->
-> With the introduction of 64-bit time_t on 32-bit architectures, this
-> gets worse, as we then need four different ioctl commands in each
-> socket protocol implementation.
->
-> To simplify that, let's add a new .gettstamp() operation in
-> struct proto_ops, and move ioctl implementation into the common
-> sock_ioctl()/compat_sock_ioctl_trans() functions that these all go
-> through.
->
-> We can reuse the sock_get_timestamp() implementation, but generalize
-> it so it can deal with both native and compat mode, as well as
-> timeval and timespec structures.
->
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+This fixes the name of default directory that contains sample JSON files.
+README file is updated to describe the default location.
+---
+ tools/mesh/README | 19 +++++++++++++-
+ tools/meshctl.c   | 65 ++++++++++++++++++++++++++++++++---------------
+ 2 files changed, 62 insertions(+), 22 deletions(-)
 
-This also will simplify fixing a recently reported race condition with
-sock_get_timestamp [1]. That calls sock_enable_timestamp, which
-modifies sk->sk_flags, without taking the socket lock. Currently some
-callers of sock_get_timestamp hold the lock (ax25, netrom, qrtr), many
-don't. See also how this patch removes the lock_sock in the netrom
-case. Moving the call to sock_gettstamp outside the protocol handlers
-will allow taking the lock inside the function.
-
-If this is the only valid implementation of .gettstamp, the indirect
-call could be avoided in favor of a simple branch.
-
-Thanks,
-
-Acked-by: Willem de Bruijn <willemb@google.com>
-
-[1] http://lkml.kernel.org/r/20180518080308.GA28587@dragonet.kaist.ac.kr
+diff --git a/tools/mesh/README b/tools/mesh/README
+index ea561efc8..44d633313 100644
+--- a/tools/mesh/README
++++ b/tools/mesh/README
+@@ -1,5 +1,5 @@
+ MeshCtl - BlueZ GATT based Bluetooth Mesh Provisioner
+-******************************************
++*****************************************************
+ 
+ Copyright (C) 2017  Intel Corporation. All rights reserved.
+ 
+@@ -16,6 +16,23 @@ Configuration and options
+ 
+ 		Build meshctl and other Bluetooth Mesh based tools and utils
+ 
++Example configuration files
++===========================
++
++The MeshCtl tool requires two input configuration files in JSON format:
++	- local_node.json
++		Local mesh node configuration
++	- prov_db.json
++		Provisoner's database for all the configured nodes in the mesh
++
++The default directory for MeshCtl configuration files is
++/home/<username>/.config/meshctl
++
++To use .json configuration files either copy them to the default directory
++or, to specify a custom storage directory, run meshctl tool as:
++
++	meshctl -c <config_dir_name>
++
+ Information
+ ===========
+ 
+diff --git a/tools/meshctl.c b/tools/meshctl.c
+index 3e1484f61..55e25a56e 100644
+--- a/tools/meshctl.c
++++ b/tools/meshctl.c
+@@ -72,6 +72,8 @@
+ #define MESH_PROXY_DATA_IN_UUID_STR	"00002add-0000-1000-8000-00805f9b34fb"
+ #define MESH_PROXY_DATA_OUT_UUID_STR	"00002ade-0000-1000-8000-00805f9b34fb"
+ 
++#define MESHCTL_CONFIG_DIR	"meshctl"
++
+ static DBusConnection *dbus_conn;
+ 
+ struct adapter {
+@@ -1873,7 +1875,7 @@ static const struct bt_shell_menu main_menu = {
+ 	{ } },
+ };
+ 
+-static const char *mesh_config_dir;
++static const char *config_dir;
+ 
+ static const struct option options[] = {
+ 	{ "config",	required_argument, 0, 'c' },
+@@ -1881,7 +1883,7 @@ static const struct option options[] = {
+ };
+ 
+ static const char **optargs[] = {
+-	&mesh_config_dir
++	&config_dir
+ };
+ 
+ static const char *help[] = {
+@@ -1907,38 +1909,57 @@ int main(int argc, char *argv[])
+ 	int status;
+ 	int len;
+ 	int extra;
++	char *mesh_dir = NULL;
+ 
+ 	bt_shell_init(argc, argv, &opt);
+ 	bt_shell_set_menu(&main_menu);
+ 	bt_shell_set_prompt(PROMPT_OFF);
+ 
+-	if (!mesh_config_dir) {
+-		bt_shell_printf("Local config directory not provided.\n");
+-		mesh_config_dir = "";
++	if (!config_dir) {
++		char *home;
++
++		home = getenv("XDG_CONFIG_HOME");
++		if (home) {
++			mesh_dir = g_strdup_printf("%s/%s", home,
++							MESHCTL_CONFIG_DIR);
++		}
++
++		if (!mesh_dir) {
++			home = getenv("HOME");
++			mesh_dir = g_strdup_printf("%s/.config/%s", home,
++							MESHCTL_CONFIG_DIR);
++		}
++
++		if (!mesh_dir) {
++			g_printerr("Configuration directory not found\n");
++			goto fail;
++		}
++
+ 	} else {
+-		bt_shell_printf("Reading prov_db.json and local_node.json from"
+-				" %s\n", mesh_config_dir);
++		mesh_dir = g_strdup_printf("%s", config_dir);
+ 	}
+ 
+-	len = strlen(mesh_config_dir);
+-	if (len && mesh_config_dir[len - 1] != '/') {
++
++	g_print("Reading prov_db.json and local_node.json from %s directory\n",
++								mesh_dir);
++
++	len = strlen(mesh_dir);
++
++	if (len && mesh_dir[len - 1] != '/')
+ 		extra = 1;
+-		bt_shell_printf("mesh_config_dir[%d] %s\n", len,
+-						&mesh_config_dir[len - 1]);
+-	} else {
++	else
+ 		extra = 0;
+-	}
++
+ 	mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
+ 									+ 2);
+ 	if (!mesh_local_config_filename)
+ 		goto fail;
+ 
+ 	mesh_prov_db_filename = g_malloc(len + strlen("prov_db.json") + 2);
+-	if (!mesh_prov_db_filename) {
++	if (!mesh_prov_db_filename)
+ 		goto fail;
+-	}
+ 
+-	sprintf(mesh_local_config_filename, "%s", mesh_config_dir);
++	sprintf(mesh_local_config_filename, "%s", mesh_dir);
+ 
+ 	if (extra)
+ 		sprintf(mesh_local_config_filename + len , "%c", '/');
+@@ -1946,7 +1967,6 @@ int main(int argc, char *argv[])
+ 	sprintf(mesh_local_config_filename + len + extra, "%s",
+ 							"local_node.json");
+ 	len = len + extra + strlen("local_node.json");
+-	sprintf(mesh_local_config_filename + len, "%c", '\0');
+ 
+ 	if (!prov_db_read_local_node(mesh_local_config_filename, true)) {
+ 		g_printerr("Failed to parse local node configuration file %s\n",
+@@ -1954,14 +1974,15 @@ int main(int argc, char *argv[])
+ 		goto fail;
+ 	}
+ 
+-	sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
+-	len = strlen(mesh_config_dir);
++	sprintf(mesh_prov_db_filename, "%s", mesh_dir);
++	len = strlen(mesh_dir);
++
++	g_free(mesh_dir);
++
+ 	if (extra)
+ 		sprintf(mesh_prov_db_filename + len , "%c", '/');
+ 
+ 	sprintf(mesh_prov_db_filename + len + extra, "%s", "prov_db.json");
+-	sprintf(mesh_prov_db_filename + len + extra + strlen("prov_db.json"),
+-								"%c", '\0');
+ 
+ 	if (!prov_db_read(mesh_prov_db_filename)) {
+ 		g_printerr("Failed to parse provisioning database file %s\n",
+@@ -2006,5 +2027,7 @@ int main(int argc, char *argv[])
+ 
+ fail:
+ 	bt_shell_cleanup();
++	g_free(mesh_dir);
++
+ 	return EXIT_FAILURE;
+ }
+-- 
+2.17.1
