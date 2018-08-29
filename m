@@ -1,22 +1,23 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <fugang.duan@nxp.com>
 From: Andy Duan <fugang.duan@nxp.com>
 To: Marcel Holtmann <marcel@holtmann.org>, NXP psirt <psirt@nxp.com>
-CC: "rtatiya@codeaurora.org" <rtatiya@codeaurora.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Johan Hedberg <johan.hedberg@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: "rtatiya@codeaurora.org" <rtatiya@codeaurora.org>, Luiz Augusto von Dentz
+	<luiz.von.dentz@intel.com>, Johan Hedberg <johan.hedberg@intel.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: RE: BlueZ: How to avoid fixed Coordinate Invalid Curve Attack
 Date: Wed, 29 Aug 2018 05:44:29 +0000
-Message-ID: <VI1PR0402MB36006169B509A62419342284FF090@VI1PR0402MB3600.eurprd04.prod.outlook.com>
-References: <VI1PR0402MB3600BAF04C81783B3A119AB6FF0A0@VI1PR0402MB3600.eurprd04.prod.outlook.com>
+Message-ID:
+ <VI1PR0402MB36006169B509A62419342284FF090@VI1PR0402MB3600.eurprd04.prod.outlook.com>
+References: 
+ <VI1PR0402MB3600BAF04C81783B3A119AB6FF0A0@VI1PR0402MB3600.eurprd04.prod.outlook.com>
  <2A6353B1-324D-4D3B-BE3F-F06DE314961B@holtmann.org>
  <AM6PR0402MB38483C66931FD452B32A8096940A0@AM6PR0402MB3848.eurprd04.prod.outlook.com>
  <2C1879AB-5D93-4F31-BC7A-4DFBBC946A3A@holtmann.org>
 In-Reply-To: <2C1879AB-5D93-4F31-BC7A-4DFBBC946A3A@holtmann.org>
 Content-Type: text/plain; charset="gb2312"
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+Message-ID: <20180829054429.tZ6PPHd8lOGNWIn5D_3MCWxkMZDPnfIbrzdiIwCAVCI@z>
 
 RnJvbTogTWFyY2VsIEhvbHRtYW5uIDxtYXJjZWxAaG9sdG1hbm4ub3JnPiAgU2VudDogMjAxOMTq
 ONTCMjnI1SAyOjM2DQo+IEhpIEFzaW0sDQo+IA0KPiA+IElzIHRoaXMgdGhlIHBhdGNoIHlvdSBh
