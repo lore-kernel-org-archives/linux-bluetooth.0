@@ -1,101 +1,80 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <siva8118@gmail.com>
 MIME-Version: 1.0
-References: <20180829130308.3504560-1-arnd@arndb.de> <CAF=yD-J7-GumUmonrZt7s44e3bsjY2DCD6ZpmhtCx6FOBV5BNA@mail.gmail.com>
- <CAK8P3a2XTUZJUqGu6v=SZqcoJTqM3fgtDAWBnBopX3=4NJYcRA@mail.gmail.com>
-In-Reply-To: <CAK8P3a2XTUZJUqGu6v=SZqcoJTqM3fgtDAWBnBopX3=4NJYcRA@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Fri, 31 Aug 2018 09:37:57 -0400
-Message-ID: <CAF=yD-+9yc838Y_DO1S4HsBpLrBk8iNt0oAj1ceO1S6sE+tCdg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Network Development <netdev@vger.kernel.org>,
-        David Miller <davem@davemloft.net>, linux-arch@vger.kernel.org,
-        y2038 Mailman List <y2038@lists.linaro.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Willem de Bruijn <willemb@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
-        dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
+References: <1535533111-18301-1-git-send-email-siva8118@gmail.com>
+In-Reply-To: <1535533111-18301-1-git-send-email-siva8118@gmail.com>
+From: Siva Rebbagondla <siva8118@gmail.com>
+Date: Fri, 31 Aug 2018 18:50:27 +0530
+Message-ID: <CANGSkXTRHFF7VYso5-X16OL=xJMBu2ELd_CLrcBtfoSP0KdSQg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btrsi: fix bt tx timeout issue
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Linux Wireless <linux-wireless@vger.kernel.org>,
+	Sasidhar Mudigonda <sasidhar.mudigonda@redpinesignals.com>,
+	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+	Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
 Content-Type: text/plain; charset="UTF-8"
-Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Aug 31, 2018 at 6:31 AM Arnd Bergmann <arnd@arndb.de> wrote:
+On Wed, Aug 29, 2018 at 2:24 PM Siva Rebbagondla <siva8118@gmail.com> wrote:
 >
-> On Thu, Aug 30, 2018 at 10:10 PM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > On Wed, Aug 29, 2018 at 9:05 AM Arnd Bergmann <arnd@arndb.de> wrote:
-> > >
-> > > The SIOCGSTAMP/SIOCGSTAMPNS ioctl commands are implemented by many
-> > > socket protocol handlers, and all of those end up calling the same
-> > > sock_get_timestamp()/sock_get_timestampns() helper functions, which
-> > > results in a lot of duplicate code.
-> > >
-> > > With the introduction of 64-bit time_t on 32-bit architectures, this
-> > > gets worse, as we then need four different ioctl commands in each
-> > > socket protocol implementation.
-> > >
-> > > To simplify that, let's add a new .gettstamp() operation in
-> > > struct proto_ops, and move ioctl implementation into the common
-> > > sock_ioctl()/compat_sock_ioctl_trans() functions that these all go
-> > > through.
-> > >
-> > > We can reuse the sock_get_timestamp() implementation, but generalize
-> > > it so it can deal with both native and compat mode, as well as
-> > > timeval and timespec structures.
-> > >
-> > > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> >
-> > This also will simplify fixing a recently reported race condition with
-> > sock_get_timestamp [1]. That calls sock_enable_timestamp, which
-> > modifies sk->sk_flags, without taking the socket lock. Currently some
-> > callers of sock_get_timestamp hold the lock (ax25, netrom, qrtr), many
-> > don't. See also how this patch removes the lock_sock in the netrom
-> > case. Moving the call to sock_gettstamp outside the protocol handlers
-> > will allow taking the lock inside the function.
+> From: Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
 >
-> I suppose it would be best to always take that lock then, rather than
-> removing the lock as my patch does at the moment.
-
-Yes, although that can also be a separate follow-on patch. The
-patch as is better matches the existing behavior of the majority
-of protocols.
-
-> > If this is the only valid implementation of .gettstamp, the indirect
-> > call could be avoided in favor of a simple branch.
+> observed sometimes data is coming with unaligned address from kernel
+> BT stack. If unaligned address is passed, some data in payload is
+> stripped when packet is loading to firmware and this results, BT
+> connection timeout is happening.
 >
-> I thought about that as well, but I could not come up with a
-> good way to encode the difference between socket protocols
-> that allow timestamping and those that don't.
+> sh# hciconfig hci0 up
+> Can't init device hci0: hci0 command 0x0c03 tx timeout
 >
-> I think ideally we would just call sock_gettstamp() unconditonally
-> on every socket, and have that function decide whether timestamps
-> make sense or not. The part I did not understand is which ones
-> actually want the timestamps or not. Most protocols that
-> implement the ioctls also assign skb->tstamp, but there are some
-> protocols in which I could not see skb->tstamp ever being set,
-> and some that set it but don't seem to have the ioctls.
-
-These probably only use cmsgs SCM_TIMESTAMP(NS|IMG)
-to read timestamps.
-
-> Looking at it again, it seems that sock_gettstamp() should
-> actually deal with this gracefully: it will return a -EINVAL
-> error condition if the timestamp remains at the
-> SK_DEFAULT_STAMP initial value, which is probably
-> just as appropriate (or better) as the current -ENOTTY
-> default, and if we are actually recording timestamps, we
-> might just as well report them.
-
-Yes, that's a nice solution. There is always some risk in changing
-error codes. But ioctl callers should be able to support newly
-implemented functionality. Even if partially implemented and
-returning ENOENT instead of ENOIOCTLCMD.
-
-> > Acked-by: Willem de Bruijn <willemb@google.com>
+> Fixed this by moving the data to aligned address.
 >
-> Thanks,
+> Signed-off-by: Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
+> Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+> ---
+>  drivers/bluetooth/btrsi.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
 >
->       Arnd
+> diff --git a/drivers/bluetooth/btrsi.c b/drivers/bluetooth/btrsi.c
+> index 60d1419..3951f7b 100644
+> --- a/drivers/bluetooth/btrsi.c
+> +++ b/drivers/bluetooth/btrsi.c
+> @@ -21,8 +21,9 @@
+>  #include <net/rsi_91x.h>
+>  #include <net/genetlink.h>
+>
+> -#define RSI_HEADROOM_FOR_BT_HAL        16
+> +#define RSI_DMA_ALIGN  8
+>  #define RSI_FRAME_DESC_SIZE    16
+> +#define RSI_HEADROOM_FOR_BT_HAL        (RSI_FRAME_DESC_SIZE + RSI_DMA_ALIGN)
+>
+>  struct rsi_hci_adapter {
+>         void *priv;
+> @@ -70,6 +71,16 @@ static int rsi_hci_send_pkt(struct hci_dev *hdev, struct sk_buff *skb)
+>                 bt_cb(new_skb)->pkt_type = hci_skb_pkt_type(skb);
+>                 kfree_skb(skb);
+>                 skb = new_skb;
+> +               if (!IS_ALIGNED((unsigned long)skb->data, RSI_DMA_ALIGN)) {
+> +                       u8 *skb_data = skb->data;
+> +                       int skb_len = skb->len;
+> +
+> +                       skb_push(skb, RSI_DMA_ALIGN);
+> +                       skb_pull(skb, PTR_ALIGN(skb->data,
+> +                                               RSI_DMA_ALIGN) - skb->data);
+> +                       memmove(skb->data, skb_data, skb_len);
+> +                       skb_trim(skb, skb_len);
+> +               }
+>         }
+>
+>         return h_adapter->proto_ops->coex_send_pkt(h_adapter->priv, skb,
+> --
+> 2.7.4
+>
+Kindly ignore this.
+Instead of adding linux-kernel@vger.kernel.org, I have added
+linux-wireless@vger.kernel.org, which results, this
+patch is showing in linux-wireless patch work.
+I will resend this patch by removing, "linux-wireless" from mailing list.
+
+Thanks,
+Siva Rebbagondla.
