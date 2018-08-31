@@ -1,50 +1,206 @@
-Return-Path: <linux-kernel-owner@vger.kernel.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <20180829130308.3504560-1-arnd@arndb.de> <CAF=yD-J7-GumUmonrZt7s44e3bsjY2DCD6ZpmhtCx6FOBV5BNA@mail.gmail.com>
- <CAK8P3a2XTUZJUqGu6v=SZqcoJTqM3fgtDAWBnBopX3=4NJYcRA@mail.gmail.com>
- <CAF=yD-+9yc838Y_DO1S4HsBpLrBk8iNt0oAj1ceO1S6sE+tCdg@mail.gmail.com> <CAK8P3a00DLR9JyfKwbYXnKCpRf+YWuUyMbC+UfXZTfdnAJxRtg@mail.gmail.com>
-In-Reply-To: <CAK8P3a00DLR9JyfKwbYXnKCpRf+YWuUyMbC+UfXZTfdnAJxRtg@mail.gmail.com>
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Fri, 31 Aug 2018 11:08:09 -0400
-Message-ID: <CAF=yD-+tiVeP0FA1CUrT4Jyn28tnT+bett+Dq2frvU5eS1ANPw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Network Development <netdev@vger.kernel.org>,
-        David Miller <davem@davemloft.net>, linux-arch@vger.kernel.org,
-        y2038 Mailman List <y2038@lists.linaro.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Willem de Bruijn <willemb@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
-        dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
+In-Reply-To: <20180829182555.23712-1-inga.stotland@intel.com>
+References: <20180829182555.23712-1-inga.stotland@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 31 Aug 2018 17:27:15 +0300
+Message-ID: <CABBYNZKMLXhiKRWg4KQ3RAePQ9r3LZ0KsXy4tWVpz7Tu4h4oUg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5] tools/meshctl: Fix default directory for JSON files
+To: Inga Stotland <inga.stotland@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> > > Looking at it again, it seems that sock_gettstamp() should
-> > > actually deal with this gracefully: it will return a -EINVAL
-> > > error condition if the timestamp remains at the
-> > > SK_DEFAULT_STAMP initial value, which is probably
-> > > just as appropriate (or better) as the current -ENOTTY
-> > > default, and if we are actually recording timestamps, we
-> > > might just as well report them.
-> >
-> > Yes, that's a nice solution. There is always some risk in changing
-> > error codes. But ioctl callers should be able to support newly
-> > implemented functionality. Even if partially implemented and
-> > returning ENOENT instead of ENOIOCTLCMD.
->
-> Ok, so do you think we should stay with the current version
-> for now, and change the two points later, or should I rework
-> it to integrate the locking and removing the callback?
->
-> I suppose the series actually gets nicer without the
-> callback, since I can simply add the generic timestamping
-> implementation first, and then remove the dead ioctl
-> handlers.
+Hi Inga,
 
-Agreed. I would add the locks in a separate patch, if only on the
-off-chance that lockdep discovers something and it will be easier
-to bisect and revise independently. I can also follow up with that
-patch outside this set, of course.
+On Wed, Aug 29, 2018 at 9:25 PM, Inga Stotland <inga.stotland@intel.com> wrote:
+> This fixes the name of default directory that contains sample JSON files.
+> README file is updated to describe the default location.
+> ---
+>  tools/mesh/README | 19 +++++++++++++-
+>  tools/meshctl.c   | 65 ++++++++++++++++++++++++++++++++---------------
+>  2 files changed, 62 insertions(+), 22 deletions(-)
+>
+> diff --git a/tools/mesh/README b/tools/mesh/README
+> index ea561efc8..44d633313 100644
+> --- a/tools/mesh/README
+> +++ b/tools/mesh/README
+> @@ -1,5 +1,5 @@
+>  MeshCtl - BlueZ GATT based Bluetooth Mesh Provisioner
+> -******************************************
+> +*****************************************************
+>
+>  Copyright (C) 2017  Intel Corporation. All rights reserved.
+>
+> @@ -16,6 +16,23 @@ Configuration and options
+>
+>                 Build meshctl and other Bluetooth Mesh based tools and utils
+>
+> +Example configuration files
+> +===========================
+> +
+> +The MeshCtl tool requires two input configuration files in JSON format:
+> +       - local_node.json
+> +               Local mesh node configuration
+> +       - prov_db.json
+> +               Provisoner's database for all the configured nodes in the mesh
+> +
+> +The default directory for MeshCtl configuration files is
+> +/home/<username>/.config/meshctl
+> +
+> +To use .json configuration files either copy them to the default directory
+> +or, to specify a custom storage directory, run meshctl tool as:
+> +
+> +       meshctl -c <config_dir_name>
+> +
+>  Information
+>  ===========
+>
+> diff --git a/tools/meshctl.c b/tools/meshctl.c
+> index 3e1484f61..55e25a56e 100644
+> --- a/tools/meshctl.c
+> +++ b/tools/meshctl.c
+> @@ -72,6 +72,8 @@
+>  #define MESH_PROXY_DATA_IN_UUID_STR    "00002add-0000-1000-8000-00805f9b34fb"
+>  #define MESH_PROXY_DATA_OUT_UUID_STR   "00002ade-0000-1000-8000-00805f9b34fb"
+>
+> +#define MESHCTL_CONFIG_DIR     "meshctl"
+> +
+>  static DBusConnection *dbus_conn;
+>
+>  struct adapter {
+> @@ -1873,7 +1875,7 @@ static const struct bt_shell_menu main_menu = {
+>         { } },
+>  };
+>
+> -static const char *mesh_config_dir;
+> +static const char *config_dir;
+>
+>  static const struct option options[] = {
+>         { "config",     required_argument, 0, 'c' },
+> @@ -1881,7 +1883,7 @@ static const struct option options[] = {
+>  };
+>
+>  static const char **optargs[] = {
+> -       &mesh_config_dir
+> +       &config_dir
+>  };
+>
+>  static const char *help[] = {
+> @@ -1907,38 +1909,57 @@ int main(int argc, char *argv[])
+>         int status;
+>         int len;
+>         int extra;
+> +       char *mesh_dir = NULL;
+>
+>         bt_shell_init(argc, argv, &opt);
+>         bt_shell_set_menu(&main_menu);
+>         bt_shell_set_prompt(PROMPT_OFF);
+>
+> -       if (!mesh_config_dir) {
+> -               bt_shell_printf("Local config directory not provided.\n");
+> -               mesh_config_dir = "";
+> +       if (!config_dir) {
+> +               char *home;
+> +
+> +               home = getenv("XDG_CONFIG_HOME");
+> +               if (home) {
+> +                       mesh_dir = g_strdup_printf("%s/%s", home,
+> +                                                       MESHCTL_CONFIG_DIR);
+> +               }
+> +
+> +               if (!mesh_dir) {
+> +                       home = getenv("HOME");
+> +                       mesh_dir = g_strdup_printf("%s/.config/%s", home,
+> +                                                       MESHCTL_CONFIG_DIR);
+> +               }
+> +
+> +               if (!mesh_dir) {
+> +                       g_printerr("Configuration directory not found\n");
+> +                       goto fail;
+> +               }
+> +
+>         } else {
+> -               bt_shell_printf("Reading prov_db.json and local_node.json from"
+> -                               " %s\n", mesh_config_dir);
+> +               mesh_dir = g_strdup_printf("%s", config_dir);
+>         }
+>
+> -       len = strlen(mesh_config_dir);
+> -       if (len && mesh_config_dir[len - 1] != '/') {
+> +
+> +       g_print("Reading prov_db.json and local_node.json from %s directory\n",
+> +                                                               mesh_dir);
+> +
+> +       len = strlen(mesh_dir);
+> +
+> +       if (len && mesh_dir[len - 1] != '/')
+>                 extra = 1;
+> -               bt_shell_printf("mesh_config_dir[%d] %s\n", len,
+> -                                               &mesh_config_dir[len - 1]);
+> -       } else {
+> +       else
+>                 extra = 0;
+> -       }
+> +
+>         mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
+>                                                                         + 2);
+>         if (!mesh_local_config_filename)
+>                 goto fail;
+>
+>         mesh_prov_db_filename = g_malloc(len + strlen("prov_db.json") + 2);
+> -       if (!mesh_prov_db_filename) {
+> +       if (!mesh_prov_db_filename)
+>                 goto fail;
+> -       }
+>
+> -       sprintf(mesh_local_config_filename, "%s", mesh_config_dir);
+> +       sprintf(mesh_local_config_filename, "%s", mesh_dir);
+>
+>         if (extra)
+>                 sprintf(mesh_local_config_filename + len , "%c", '/');
+> @@ -1946,7 +1967,6 @@ int main(int argc, char *argv[])
+>         sprintf(mesh_local_config_filename + len + extra, "%s",
+>                                                         "local_node.json");
+>         len = len + extra + strlen("local_node.json");
+> -       sprintf(mesh_local_config_filename + len, "%c", '\0');
+>
+>         if (!prov_db_read_local_node(mesh_local_config_filename, true)) {
+>                 g_printerr("Failed to parse local node configuration file %s\n",
+> @@ -1954,14 +1974,15 @@ int main(int argc, char *argv[])
+>                 goto fail;
+>         }
+>
+> -       sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
+> -       len = strlen(mesh_config_dir);
+> +       sprintf(mesh_prov_db_filename, "%s", mesh_dir);
+> +       len = strlen(mesh_dir);
+> +
+> +       g_free(mesh_dir);
+> +
+>         if (extra)
+>                 sprintf(mesh_prov_db_filename + len , "%c", '/');
+>
+>         sprintf(mesh_prov_db_filename + len + extra, "%s", "prov_db.json");
+> -       sprintf(mesh_prov_db_filename + len + extra + strlen("prov_db.json"),
+> -                                                               "%c", '\0');
+>
+>         if (!prov_db_read(mesh_prov_db_filename)) {
+>                 g_printerr("Failed to parse provisioning database file %s\n",
+> @@ -2006,5 +2027,7 @@ int main(int argc, char *argv[])
+>
+>  fail:
+>         bt_shell_cleanup();
+> +       g_free(mesh_dir);
+> +
+>         return EXIT_FAILURE;
+>  }
+> --
+> 2.17.1
+
+Applied, thanks.
+
+
+-- 
+Luiz Augusto von Dentz
