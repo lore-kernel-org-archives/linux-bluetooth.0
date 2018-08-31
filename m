@@ -1,73 +1,69 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Karabin, Josh" <George.Karabin@Honeywell.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [External] [PATCH BlueZ v2 0/2] Change ConnectDevice to connect a
+ subset of services
+Date: Fri, 31 Aug 2018 14:25:39 +0000
+Message-ID: <BN7PR07MB43059F85DCA473194231320A9D0F0@BN7PR07MB4305.namprd07.prod.outlook.com>
+References: <BN7PR07MB4305F612204DE3F155FDF7329D310@BN7PR07MB4305.namprd07.prod.outlook.com>
+ <BN7PR07MB430554B9AF5693730B7A4F6C9D0F0@BN7PR07MB4305.namprd07.prod.outlook.com>
+ <CABBYNZ+ae4m5p6MroLovcEAM32daUQekDNDa9-RDq-K69H5DLQ@mail.gmail.com>
+ <CABBYNZLAypMvpL-U7Mm=T4r=fabQ+4nLwUcBj5QYHsPi9Wt_Jg@mail.gmail.com>
+In-Reply-To: <CABBYNZLAypMvpL-U7Mm=T4r=fabQ+4nLwUcBj5QYHsPi9Wt_Jg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20180827114105.10471-1-luiz.dentz@gmail.com>
-References: <20180827114105.10471-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 31 Aug 2018 17:26:26 +0300
-Message-ID: <CABBYNZK=KWHW-HWfCB3f-k_BMLZB6oF8nXB=1g0FOXGb0AeePA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] unit: Fix out of bounds
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Mon, Aug 27, 2018 at 2:41 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Test /gobex/test_stream_put_req requires 5 buffers to complete.
-> ---
->  unit/util.c | 5 +++++
->  unit/util.h | 6 ++++--
->  2 files changed, 9 insertions(+), 2 deletions(-)
->
-> diff --git a/unit/util.c b/unit/util.c
-> index 8e3115fe3..ce4d65add 100644
-> --- a/unit/util.c
-> +++ b/unit/util.c
-> @@ -188,6 +188,11 @@ send:
->                 goto failed;
->         }
->
-> +       if (d->count >= TEST_BUF_MAX) {
-> +               g_print("io_cb count %u\n", d->count);
-> +               goto failed;
-> +       }
-> +
->         if (d->recv[d->count].len < 0 || (gssize) expect_len < 0)
->                 return test_io_cb(io, G_IO_OUT, user_data);
->
-> diff --git a/unit/util.h b/unit/util.h
-> index 6783c524e..b13fd2f16 100644
-> --- a/unit/util.h
-> +++ b/unit/util.h
-> @@ -19,6 +19,8 @@
->   *
->   */
->
-> +#define TEST_BUF_MAX 5
-> +
->  enum {
->         TEST_ERROR_TIMEOUT,
->         TEST_ERROR_UNEXPECTED,
-> @@ -32,8 +34,8 @@ struct test_buf {
->  struct test_data {
->         guint count;
->         GError *err;
-> -       struct test_buf recv[4];
-> -       struct test_buf send[4];
-> +       struct test_buf recv[TEST_BUF_MAX];
-> +       struct test_buf send[TEST_BUF_MAX];
->         guint provide_delay;
->         GObex *obex;
->         guint id;
-> --
-> 2.17.1
-
-Applied.
-
-
--- 
-Luiz Augusto von Dentz
+PiBGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IFttYWlsdG86bHVpei5kZW50ekBnbWFpbC5j
+b21dDQo+IFNlbnQ6IEZyaWRheSwgQXVndXN0IDMxLCAyMDE4IDEwOjA0IEFNDQo+IFRvOiBLYXJh
+YmluLCBKb3NoIDxHZW9yZ2UuS2FyYWJpbkBIb25leXdlbGwuY29tPg0KPiBDYzogbGludXgtYmx1
+ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW0V4dGVybmFsXSBbUEFUQ0gg
+Qmx1ZVogdjIgMC8yXSBDaGFuZ2UgQ29ubmVjdERldmljZSB0bw0KPiBjb25uZWN0IGEgc3Vic2V0
+IG9mIHNlcnZpY2VzDQo+IA0KPiBIaSBKb3NoLA0KPiANCj4gT24gRnJpLCBBdWcgMzEsIDIwMTgg
+YXQgNDo1OCBQTSwgTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0KPiA8bHVpei5kZW50ekBnbWFpbC5j
+b20+IHdyb3RlOg0KPiA+IEhpIEpvc2gsDQo+ID4NCj4gPiBPbiBGcmksIEF1ZyAzMSwgMjAxOCBh
+dCA0OjQ3IFBNLCBLYXJhYmluLCBKb3NoDQo+ID4gPEdlb3JnZS5LYXJhYmluQGhvbmV5d2VsbC5j
+b20+IHdyb3RlOg0KPiA+PiBIZWxsbyBhbGwgLSBJIHdvdWxkIGxpa2UgdG8gcG9pbnQgeW91ciBh
+dHRlbnRpb24gdG8gdGhpcw0KPiA+PiBwYXRjaCBzZXQgYWdhaW4uIEkgcmVhbGl6ZSBpdCdzIG1v
+cmUgY29tcGxpY2F0ZWQgdGhhbiB2MSwgYW5kIGxpa2VseQ0KPiA+PiBuZWVkcyBtb3JlIHRpbWUg
+Zm9yIHJldmlldy4NCj4gPg0KPiA+IENvdWxkIHlvdSBwbGVhc2UgYWRkIGRlc2NyaXB0aW9uIHRv
+IGVhY2ggcGF0Y2gsIGFsc28gaXMgeW91ciBlbWFpbCBjb3JyZWN0Pw0KDQpXaWxsIGRvLiBNeSBl
+bWFpbCBJcyBjb3JyZWN0IC0gSm9zaCBpcyBteSBtaWRkbGUgbmFtZSBhbmQgdGhlIG5hbWUNCnRo
+YXQgSSBjb21tb25seSB1c2UsIGJ1dCBvdXIgY29ycG9yYXRlIGFkZHJlc3MgYXNzaWdubWVudCBk
+ZWZhdWx0cyB0bw0KbXkgZmlyc3QgbmFtZS4NCg0KIA0KPiBJIGZvcmdvdCB0byBtZW50aW9uIHRo
+YXQgdGhlIGRvY3VtZW50YXRpb24gc2hvdWxkIGNvbWUgZmlyc3QgYW5kDQo+IHBlcmhhcHMgaXQg
+bWFrZXMgc2VuZCB0aGF0IHdlIHVzZSBDb25uZWN0RGV2aWNlIGluIGJsdWV0b290aGN0bCwgbWF5
+DQo+IGFkZCBhbiBvcHRpb25hbCBwYXJhbWV0ZXIgZm9yIFVVSURzIGxpc3Qgd2hpY2ggaW4gY2Fz
+ZSBpdCBpcyBzZXQgdGhlDQo+IHVzZSBBZGFwdGVyLkNvbm5lY3REZXZpY2UgaW5zdGVhZCBvZiBE
+ZXZpY2UuQ29ubmVjdC4NCg0KV2lsbCBkby4gVGhhbmtzLg0KDQo+ID4+PiBGcm9tOiBsaW51eC1i
+bHVldG9vdGgtb3duZXJAdmdlci5rZXJuZWwub3JnIFttYWlsdG86bGludXgtYmx1ZXRvb3RoLQ0K
+PiA+Pj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgS2FyYWJpbiwgSm9zaA0K
+PiA+Pj4gU2VudDogVHVlc2RheSwgQXVndXN0IDIxLCAyMDE4IDExOjM3IEFNDQo+ID4+PiBUbzog
+bGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPiA+Pj4gU3ViamVjdDogW0V4dGVybmFs
+XSBbUEFUQ0ggQmx1ZVogdjIgMC8yXSBDaGFuZ2UgQ29ubmVjdERldmljZSB0bw0KPiBjb25uZWN0
+IGENCj4gPj4+IHN1YnNldCBvZiBzZXJ2aWNlcw0KPiA+Pj4NCj4gPj4+IFRoaXMgcGF0Y2ggc2V0
+IG1ha2VzIGl0IHBvc3NpYmxlIHRvIHVzZSB0aGUgZXhwZXJpbWVudGFsIEFkYXB0ZXIxDQo+ID4+
+PiBDb25uZWN0RGV2aWNlIERCVVMgQVBJIHRvIGNvbm5lY3QgdG8gYSBkZXZpY2Ugd2l0aG91dCBh
+bHNvDQo+ID4+PiBjb25uZWN0aW5nIGVhY2ggb2YgdGhlIGRldmljZSdzIHNlcnZpY2VzLiBUaGlz
+IGVuYWJsZXMgdGhlIG91dC1vZi1iYW5kDQo+ID4+PiBkaXNjb3Zlcnkgb2YgYW4gYWRkcmVzcyBh
+bmQgZXhwZWN0ZWQgc2VydmljZSBzZXQgd2l0aG91dCBhDQo+ID4+PiBnZW5lcmFsIGRpc2NvdmVy
+eSBwcm9jZWR1cmUuDQo+ID4+Pg0KPiA+Pj4gVGhpcyBwYXRjaCBidWlsZHMgb24gdGhpcyBwcmV2
+aW91cyBjb21taXQ6DQo+ID4+Pg0KPiA+Pj4gY29tbWl0IGMzZjdiNjczM2M1ZiAoImFkYXB0ZXI6
+IEFkZCBDb25uZWN0RGV2aWNlIG1ldGhvZCIpDQo+ID4+Pg0KPiA+Pj4gYW5kIHJldmlldyBmZWVk
+YmFjayBvbiBhbiBlYXJsaWVyIHBhdGNoIGhlcmU6DQo+ID4+Pg0KPiA+Pj4gaHR0cHM6Ly9tYXJj
+LmluZm8vP2w9bGludXgtYmx1ZXRvb3RoJm09MTUzNDUxNjM0NjA1MDY5Jnc9Mg0KPiA+Pj4NCj4g
+Pj4+IEdlb3JnZSBKb3NoIEthcmFiaW4gKDIpOg0KPiA+Pj4gICBBbGxvdyBBZGFwdGVyMSBDb25u
+ZWN0RGV2aWNlIG1ldGhvZCB0byBjb25uZWN0IGEgbGltaXRlZCBzZXQgb2YNCj4gPj4+ICAgICBz
+ZXJ2aWNlIFVVSURzDQo+ID4+PiAgIFVwZGF0ZSB0aGUgQWRhcHRlcjEgQVBJIHRvIG1hdGNoIHRo
+ZSBjaGFuZ2UgdG8gQ29ubmVjdERldmljZS4NCj4gPj4+DQo+ID4+PiBHZW9yZ2UgSm9zaCBLYXJh
+YmluICgyKToNCj4gPj4+ICAgQWxsb3cgQWRhcHRlcjEgQ29ubmVjdERldmljZSBtZXRob2QgdG8g
+Y29ubmVjdCBhIGxpbWl0ZWQgc2V0IG9mDQo+ID4+PiAgICAgc2VydmljZSBVVUlEcw0KPiA+Pj4g
+ICBVcGRhdGUgdGhlIEFkYXB0ZXIxIEFQSSB0byBtYXRjaCB0aGUgY2hhbmdlIHRvIENvbm5lY3RE
+ZXZpY2UuDQo+ID4+Pg0KPiA+Pj4gIGRvYy9hZGFwdGVyLWFwaS50eHQgfCAxNiArKysrKy0tLQ0K
+PiA+Pj4gIHNyYy9hZGFwdGVyLmMgICAgICAgfCA5MQ0KPiArKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKysrKysrKy0tDQo+ID4+PiAtLQ0KPiA+Pj4gIDIgZmlsZXMgY2hhbmdlZCwg
+OTUgaW5zZXJ0aW9ucygrKSwgMTIgZGVsZXRpb25zKC0pDQo+ID4+Pg0KPiA+Pj4gLS0NCj4gPj4+
+IDIuMTcuMQ0KPiA+DQo+ID4NCj4gPg0KPiA+IC0tDQo+ID4gTHVpeiBBdWd1c3RvIHZvbiBEZW50
+eg0KPiANCj4gDQo+IA0KPiAtLQ0KPiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo=
