@@ -1,62 +1,65 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: <sean.wang@mediatek.com>
-To: <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
-Subject: [PATCH v3 0/2] Bluetooth: mediatek: Add protocol support for MediaTek USB devices
-Date: Mon, 3 Sep 2018 20:53:38 +0800
-Message-ID: <cover.1535978548.git.sean.wang@mediatek.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <siva8118@gmail.com>
+From: Siva Rebbagondla <siva8118@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Sasidhar Mudigonda <sasidhar.mudigonda@redpinesignals.com>,
+	Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+	Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
+Subject: [PATCH RESEND] Bluetooth: btrsi: fix bt tx timeout issue
+Date: Mon,  3 Sep 2018 11:27:46 +0530
+Message-Id: <1535954266-6339-1-git-send-email-siva8118@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Sean Wang <sean.wang@mediatek.com>
+From: Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
 
-v3:
-add fixes and enhancements based on [1]
-* reuse flags and evt_skb btusb already had
-* add ctrl_anchor and the corresponding handling
-* apply mtk specific recv function
-* add more comments explaining wmt ctrl urbs behavior.
+observed sometimes data is coming with unaligned address from kernel
+BT stack. If unaligned address is passed, some data in payload is
+stripped when packet is loading to firmware and this results, BT
+connection timeout is happening.
 
-[1]
-http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014724.html
+sh# hciconfig hci0 up
+Can't init device hci0: hci0 command 0x0c03 tx timeout
 
-v2:
+Fixed this by moving the data to aligned address.
 
-add fixes and enhancements based on [1]
-* include /sys/kernel/debug/usb/devices portion in the commit message.
-* turn default into n for config BT_HCIBTUSB_MTK in Kconfig
-* only add MediaTek support to btusb.c
-* drop cmd_sync callback usage
-* use __hci_cmd_send to send WMT commands
-* add wait event handling similar to what is being done in btmtkuart.c
-* submit a control IN URB similar to interrupt IN URB on demand for the WMT
-  commands during setup 
-* add cosmetic changes
+Signed-off-by: Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
+Signed-off-by: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+---
+ drivers/bluetooth/btrsi.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-[1]
-http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014650.html
-http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014656.html
-
-v1:
-
-This adds the support of enabling MT7668U and MT7663U Bluetooth
-function running on the top of btusb driver. The patch also adds
-a newly created file mtkbt.c able to be reused independently from
-the transport type such as UART, USB and SDIO.
-
-Sean Wang (2):
-  Bluetooth: mediatek: Add protocol support for MediaTek MT7668U USB
-    devices
-  Bluetooth: mediatek: Add protocol support for MediaTek MT7663U USB
-    devices
-
- drivers/bluetooth/Kconfig |  11 +
- drivers/bluetooth/btusb.c | 552 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 563 insertions(+)
-
+diff --git a/drivers/bluetooth/btrsi.c b/drivers/bluetooth/btrsi.c
+index 60d1419..3951f7b 100644
+--- a/drivers/bluetooth/btrsi.c
++++ b/drivers/bluetooth/btrsi.c
+@@ -21,8 +21,9 @@
+ #include <net/rsi_91x.h>
+ #include <net/genetlink.h>
+ 
+-#define RSI_HEADROOM_FOR_BT_HAL	16
++#define RSI_DMA_ALIGN	8
+ #define RSI_FRAME_DESC_SIZE	16
++#define RSI_HEADROOM_FOR_BT_HAL	(RSI_FRAME_DESC_SIZE + RSI_DMA_ALIGN)
+ 
+ struct rsi_hci_adapter {
+ 	void *priv;
+@@ -70,6 +71,16 @@ static int rsi_hci_send_pkt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		bt_cb(new_skb)->pkt_type = hci_skb_pkt_type(skb);
+ 		kfree_skb(skb);
+ 		skb = new_skb;
++		if (!IS_ALIGNED((unsigned long)skb->data, RSI_DMA_ALIGN)) {
++			u8 *skb_data = skb->data;
++			int skb_len = skb->len;
++
++			skb_push(skb, RSI_DMA_ALIGN);
++			skb_pull(skb, PTR_ALIGN(skb->data,
++						RSI_DMA_ALIGN) - skb->data);
++			memmove(skb->data, skb_data, skb_len);
++			skb_trim(skb, skb_len);
++		}
+ 	}
+ 
+ 	return h_adapter->proto_ops->coex_send_pkt(h_adapter->priv, skb,
 -- 
-2.7.4
+2.5.5
