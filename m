@@ -1,93 +1,43 @@
-Return-Path: <linux-mmc-owner@vger.kernel.org>
-From: Jaejoong Kim <climbbb.kim@gmail.com>
-To: linux-um@lists.infradead.org, netdev@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-s390@vger.kernel.org,
-        devel@driverdev.osuosl.org, greybus-dev@lists.linaro.org,
-        linuxppc-dev@lists.ozlabs.org, linux-serial@vger.kernel.org,
-        sparclinux@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jslaby@suse.com>
-Subject: [PATCH 00/25] Change tty_port(standard)_install's return type
-Date: Tue,  4 Sep 2018 11:44:26 +0900
-Message-Id: <1536029091-4426-1-git-send-email-climbbb.kim@gmail.com>
-Sender: linux-mmc-owner@vger.kernel.org
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: L2CAP: Detect if remote is not able to use the whole MPS
+Date: Mon,  3 Sep 2018 20:12:17 +0300
+Message-Id: <20180903171217.4408-3-luiz.dentz@gmail.com>
+In-Reply-To: <20180903171217.4408-1-luiz.dentz@gmail.com>
+References: <20180903171217.4408-1-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Many drivers with tty use the tty_stand_install(). But, there is no
-need to handle the error, since it always returns 0. So, change the
-return type of tty_standard_install() and tty_port_install() to void
-type and remove unnecessary exception handling where we use these
-functions.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Change return type for tty functions. Patch No.01
-  tty: Change return type to void
+If the remote is not able to fully utilize the MPS choosen recalculate
+the credits based on the actual amount it is sending that way it can
+still send packets of MTU size without credits dropping to 0.
 
-Apply tty_port_install() changes. Patch No.02~14
-  isdn: i4l: isdn_tty: Change return type to void
-  ...
-  Bluetooth: Change return type to void
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/l2cap_core.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Apply tty_standard_install() changes. Patch No.15~25
-  um: Change return type to void
-  ...
-  usb: usb-serial: Change return type to void
-
-Jaejoong Kim (25):
-  tty: Change return type to void
-  isdn: i4l: isdn_tty: Change return type to void
-  s390: char: con3215: Change return type to void
-  s390: char: tty3270: Change return type to void
-  tty: hvc: hvc_console: Change return type to void
-  tty: hvc: hvcs: Change return type to void
-  tty: mips_ejtag_fdc: Change return type to void
-  tty: n_gsm: Change return type to void
-  tty: serial: kgdb_nmi: Change return type to void
-  tty: synclink: Change return type to void
-  tty: synclinkmp: Change return type to void
-  tty: vt: Change return type to void
-  usb: xhci: dbc: Change return type to void
-  Bluetooth: Change return type to void
-  um: Change return type to void
-  isdn: capi: Change return type to void
-  misc: pti: Change return type to void
-  mmc: core: sdio_uart: Change return type to void
-  staging: fwserial: Change return type to void
-  staging: gdm724x: gdm_tty: Change return type to void
-  staging: greybus: uart: Change return type to void
-  tty: nozomi: Change return type to void
-  tty: vcc: Change return type to void
-  usb: cdc-acm: Change return type to void
-  usb: usb-serial: Change return type to void
-
- arch/um/drivers/line.c              |  7 +------
- drivers/isdn/capi/capi.c            | 10 ++++------
- drivers/isdn/i4l/isdn_tty.c         |  3 ++-
- drivers/misc/pti.c                  | 28 +++++++++++++---------------
- drivers/mmc/core/sdio_uart.c        | 11 ++++-------
- drivers/s390/char/con3215.c         |  3 ++-
- drivers/s390/char/tty3270.c         |  7 +------
- drivers/staging/fwserial/fwserial.c | 22 ++++++++--------------
- drivers/staging/gdm724x/gdm_tty.c   | 11 +++--------
- drivers/staging/greybus/uart.c      | 10 ++--------
- drivers/tty/hvc/hvc_console.c       |  7 ++-----
- drivers/tty/hvc/hvcs.c              | 10 ++--------
- drivers/tty/mips_ejtag_fdc.c        |  4 +++-
- drivers/tty/n_gsm.c                 |  9 +--------
- drivers/tty/nozomi.c                |  8 +++-----
- drivers/tty/serial/kgdb_nmi.c       | 11 +----------
- drivers/tty/synclink.c              |  3 ++-
- drivers/tty/synclinkmp.c            |  3 ++-
- drivers/tty/tty_io.c                | 10 ++++++----
- drivers/tty/tty_port.c              |  4 ++--
- drivers/tty/vcc.c                   |  5 +----
- drivers/tty/vt/vt.c                 |  5 +----
- drivers/usb/class/cdc-acm.c         | 10 +---------
- drivers/usb/host/xhci-dbgtty.c      |  3 ++-
- drivers/usb/serial/usb-serial.c     |  6 +-----
- include/linux/tty.h                 |  4 ++--
- net/bluetooth/rfcomm/tty.c          |  7 +------
- 27 files changed, 73 insertions(+), 148 deletions(-)
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 3fb2d757df88..79226374c0d8 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6787,6 +6787,14 @@ static int l2cap_le_data_rcv(struct l2cap_chan *chan, struct sk_buff *skb)
+ 		chan->sdu_len = sdu_len;
+ 		chan->sdu_last_frag = skb;
+ 
++		/* Detect if remote is not able to use the selected MPS */
++		if (skb->len < chan->mps) {
++			/* Adjust the number of credits */
++			BT_DBG("chan->mps %u -> %u", chan->mps, skb->len);
++			chan->mps = skb->len;
++			l2cap_chan_le_send_credits(chan);
++		}
++
+ 		return 0;
+ 	}
+ 
 -- 
-2.7.4
+2.17.1
