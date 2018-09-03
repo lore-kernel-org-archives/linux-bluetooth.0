@@ -1,102 +1,65 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: L2CAP: Derive MPS from connection MTU
-Date: Mon,  3 Sep 2018 20:12:15 +0300
-Message-Id: <20180903171217.4408-1-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <sean.wang@mediatek.com>
+From: <sean.wang@mediatek.com>
+To: <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
+Subject: [PATCH v4 0/2] Bluetooth: mediatek: Add protocol support for MediaTek USB devices
+Date: Mon, 3 Sep 2018 22:08:22 +0800
+Message-ID: <cover.1535983416.git.sean.wang@mediatek.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Sean Wang <sean.wang@mediatek.com>
 
-This ensures the MPS can fit in a single HCI fragment so each
-segment don't have to be reassembled at HCI level, in addition to
-that also remove the debugfs entry to configure the MPS.
+v4:
+* use new BTUSB_TX_WAIT_VND_EVT instead of BTMTKUSB_TX_WAIT_VND_EVT
+  to avoid definition conflict and to fix bulk data transfer fails.
+* use the bluetooth-next as the base
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/l2cap.h |  1 -
- net/bluetooth/l2cap_core.c    | 14 +++++++-------
- 2 files changed, 7 insertions(+), 8 deletions(-)
+v3:
+add fixes and enhancements based on [1]
+* reuse flags and evt_skb btusb already had
+* add ctrl_anchor and the corresponding handling
+* apply mtk specific recv function
+* add more comments explaining wmt ctrl urbs behavior.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 0697fd413087..17296675a0b1 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -456,7 +456,6 @@ struct l2cap_conn_param_update_rsp {
- #define L2CAP_CONN_PARAM_REJECTED	0x0001
- 
- #define L2CAP_LE_MAX_CREDITS		10
--#define L2CAP_LE_DEFAULT_MPS		230
- 
- struct l2cap_le_conn_req {
- 	__le16     psm;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d17a4736e47c..8a60db6261f7 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -52,7 +52,6 @@ static LIST_HEAD(chan_list);
- static DEFINE_RWLOCK(chan_list_lock);
- 
- static u16 le_max_credits = L2CAP_LE_MAX_CREDITS;
--static u16 le_default_mps = L2CAP_LE_DEFAULT_MPS;
- 
- static struct sk_buff *l2cap_build_cmd(struct l2cap_conn *conn,
- 				       u8 code, u8 ident, u16 dlen, void *data);
-@@ -520,7 +519,8 @@ static void l2cap_le_flowctl_init(struct l2cap_chan *chan)
- 	chan->sdu_len = 0;
- 	chan->tx_credits = 0;
- 	chan->rx_credits = le_max_credits;
--	chan->mps = min_t(u16, chan->imtu, le_default_mps);
-+	/* Derive MPS from connection MTU to stop HCI fragmentation */
-+	chan->mps = min_t(u16, chan->imtu, chan->conn->mtu - L2CAP_HDR_SIZE);
- 
- 	skb_queue_head_init(&chan->tx_q);
- }
-@@ -1282,6 +1282,8 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
- 	if (test_and_set_bit(FLAG_LE_CONN_REQ_SENT, &chan->flags))
- 		return;
- 
-+	l2cap_le_flowctl_init(chan);
-+
- 	req.psm     = chan->psm;
- 	req.scid    = cpu_to_le16(chan->scid);
- 	req.mtu     = cpu_to_le16(chan->imtu);
-@@ -5493,8 +5495,6 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
- 		goto response_unlock;
- 	}
- 
--	l2cap_le_flowctl_init(chan);
--
- 	bacpy(&chan->src, &conn->hcon->src);
- 	bacpy(&chan->dst, &conn->hcon->dst);
- 	chan->src_type = bdaddr_src_type(conn->hcon);
-@@ -5506,6 +5506,9 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
- 	chan->tx_credits = __le16_to_cpu(req->credits);
- 
- 	__l2cap_chan_add(conn, chan);
-+
-+	l2cap_le_flowctl_init(chan);
-+
- 	dcid = chan->scid;
- 	credits = chan->rx_credits;
- 
-@@ -7102,7 +7105,6 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 	case L2CAP_MODE_BASIC:
- 		break;
- 	case L2CAP_MODE_LE_FLOWCTL:
--		l2cap_le_flowctl_init(chan);
- 		break;
- 	case L2CAP_MODE_ERTM:
- 	case L2CAP_MODE_STREAMING:
-@@ -7647,8 +7649,6 @@ int __init l2cap_init(void)
- 
- 	debugfs_create_u16("l2cap_le_max_credits", 0644, bt_debugfs,
- 			   &le_max_credits);
--	debugfs_create_u16("l2cap_le_default_mps", 0644, bt_debugfs,
--			   &le_default_mps);
- 
- 	return 0;
- }
+[1]
+http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014724.html
+
+v2:
+
+add fixes and enhancements based on [1]
+* include /sys/kernel/debug/usb/devices portion in the commit message.
+* turn default into n for config BT_HCIBTUSB_MTK in Kconfig
+* only add MediaTek support to btusb.c
+* drop cmd_sync callback usage
+* use __hci_cmd_send to send WMT commands
+* add wait event handling similar to what is being done in btmtkuart.c
+* submit a control IN URB similar to interrupt IN URB on demand for the WMT
+  commands during setup 
+* add cosmetic changes
+
+[1]
+http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014650.html
+http://lists.infradead.org/pipermail/linux-mediatek/2018-August/014656.html
+
+v1:
+
+This adds the support of enabling MT7668U and MT7663U Bluetooth
+function running on the top of btusb driver. The patch also adds
+a newly created file mtkbt.c able to be reused independently from
+the transport type such as UART, USB and SDIO.
+
+Sean Wang (2):
+  Bluetooth: mediatek: Add protocol support for MediaTek MT7668U USB
+    devices
+  Bluetooth: mediatek: Add protocol support for MediaTek MT7663U USB
+    devices
+
+ drivers/bluetooth/Kconfig |  11 +
+ drivers/bluetooth/btusb.c | 552 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 563 insertions(+)
+
 -- 
-2.17.1
+2.7.4
