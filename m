@@ -1,66 +1,40 @@
-Return-Path: <christianshewitt@gmail.com>
-From: Christian Hewitt <christianshewitt@gmail.com>
-To: 
-Cc: christianshewitt@gmail.com,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btbcm: Add entry for BCM4335C0 UART bluetooth
-Date: Tue,  4 Sep 2018 21:50:57 +0400
-Message-Id: <1536083457-28895-1-git-send-email-christianshewitt@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: Tanu Kaskinen <tanuk@iki.fi>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH][sbc] sbc: fix frame_length and codesize documentation
+Date: Tue,  4 Sep 2018 19:29:55 +0300
+Message-Id: <20180904162955.28855-1-tanuk@iki.fi>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the device ID for the AMPAK AP6335 combo module used
-in the 1st generation WeTek Hub Android/LibreELEC HTPC box. The WiFI
-chip identifies itself as BCM4339, while Bluetooth identifies itself
-as BCM4335 (rev C0):
-
-```
-[    4.864248] Bluetooth: hci0: BCM: chip id 86
-[    4.866388] Bluetooth: hci0: BCM: features 0x2f
-[    4.889317] Bluetooth: hci0: BCM4335C0
-[    4.889332] Bluetooth: hci0: BCM4335C0 (003.001.009) build 0000
-[    9.778383] Bluetooth: hci0: BCM4335C0 (003.001.009) build 0268
-```
-
-Output from hciconfig:
-
-```
-hci0:	Type: Primary  Bus: UART
-	BD Address: 43:39:00:00:1F:AC  ACL MTU: 1021:8  SCO MTU: 64:1
-	UP RUNNING
-	RX bytes:7567 acl:234 sco:0 events:386 errors:0
-	TX bytes:53844 acl:77 sco:0 commands:304 errors:0
-	Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-	Link policy: RSWITCH SNIFF
-	Link mode: SLAVE ACCEPT
-	Name: 'HUB'
-	Class: 0x0c0000
-	Service Classes: Rendering, Capturing
-	Device Class: Miscellaneous,
-	HCI Version: 4.0 (0x6)  Revision: 0x10c
-	LMP Version: 4.0 (0x6)  Subversion: 0x6109
-	Manufacturer: Broadcom Corporation (15)
-```
-
-Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+frame_length is the output block size when encoding and the input block
+size when decoding, with codesize it's vice versa. The documentation was
+inaccurate regarding this. Using the terms "compressed" and
+"uncompressed" instead of "output" and "input" should make the function
+semantics clear.
 ---
- drivers/bluetooth/btbcm.c | 1 +
- 1 file changed, 1 insertion(+)
+ sbc/sbc.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 99cde1f..e3e4d92 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -324,6 +324,7 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
- 	{ 0x4103, "BCM4330B1"	},	/* 002.001.003 */
- 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
- 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
-+	{ 0x6109, "BCM4335C0"	},	/* 003.001.009 */
- 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
- 	{ 0x2122, "BCM4343A0"	},	/* 001.001.034 */
- 	{ 0x2209, "BCM43430A1"  },	/* 001.002.009 */
+diff --git a/sbc/sbc.h b/sbc/sbc.h
+index d6f123e..835460a 100644
+--- a/sbc/sbc.h
++++ b/sbc/sbc.h
+@@ -100,13 +100,13 @@ ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
+ ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
+ 			void *output, size_t output_len, ssize_t *written);
+ 
+-/* Returns the output block size in bytes */
++/* Returns the compressed block size in bytes */
+ size_t sbc_get_frame_length(sbc_t *sbc);
+ 
+ /* Returns the time one input/output block takes to play in msec*/
+ unsigned sbc_get_frame_duration(sbc_t *sbc);
+ 
+-/* Returns the input block size in bytes */
++/* Returns the uncompressed block size in bytes */
+ size_t sbc_get_codesize(sbc_t *sbc);
+ 
+ const char *sbc_get_implementation_info(sbc_t *sbc);
 -- 
-2.7.4
+2.18.0
