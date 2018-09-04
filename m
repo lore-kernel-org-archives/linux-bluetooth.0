@@ -2,15 +2,15 @@ Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Inga Stotland <inga.stotland@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2] mesh: Add start up management command chain
-Date: Tue,  4 Sep 2018 17:20:34 -0700
-Message-Id: <20180905002034.9984-1-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 1/1] mesh: Add start up management command chain
+Date: Tue,  4 Sep 2018 13:00:43 -0700
+Message-Id: <20180904200043.7240-1-inga.stotland@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This allows co-existense of meshd and bluetoothd. meshd will
 automatically take control of the first available LE-capable
-controller that is powered down.
+controller that is not in use , i.e., is poered down.
 ---
  Makefile.mesh |   4 +-
  mesh/btmesh.c |   5 +-
