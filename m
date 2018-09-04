@@ -1,40 +1,49 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Tanu Kaskinen <tanuk@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH][sbc] sbc: fix frame_length and codesize documentation
-Date: Tue,  4 Sep 2018 19:29:55 +0300
-Message-Id: <20180904162955.28855-1-tanuk@iki.fi>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Return-Path: <colin.king@canonical.com>
+From: Colin King <colin.king@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: btrtl: make array extension_sig static, shrinks object size
+Date: Tue,  4 Sep 2018 17:01:10 +0100
+Message-Id: <20180904160110.27837-1-colin.king@canonical.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-frame_length is the output block size when encoding and the input block
-size when decoding, with codesize it's vice versa. The documentation was
-inaccurate regarding this. Using the terms "compressed" and
-"uncompressed" instead of "output" and "input" should make the function
-semantics clear.
----
- sbc/sbc.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+From: Colin Ian King <colin.king@canonical.com>
 
-diff --git a/sbc/sbc.h b/sbc/sbc.h
-index d6f123e..835460a 100644
---- a/sbc/sbc.h
-+++ b/sbc/sbc.h
-@@ -100,13 +100,13 @@ ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
- ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
- 			void *output, size_t output_len, ssize_t *written);
- 
--/* Returns the output block size in bytes */
-+/* Returns the compressed block size in bytes */
- size_t sbc_get_frame_length(sbc_t *sbc);
- 
- /* Returns the time one input/output block takes to play in msec*/
- unsigned sbc_get_frame_duration(sbc_t *sbc);
- 
--/* Returns the input block size in bytes */
-+/* Returns the uncompressed block size in bytes */
- size_t sbc_get_codesize(sbc_t *sbc);
- 
- const char *sbc_get_implementation_info(sbc_t *sbc);
+Don't populate the array extension_sig on the stack but instead make it
+static. Makes the object code smaller by 59 bytes:
+
+Before:
+   text	   data	    bss	    dec	    hex	filename
+  14366	   4920	      0	  19286	   4b56	linux/drivers/bluetooth/btrtl.o
+
+After:
+   text	   data	    bss	    dec	    hex	filename
+  14243	   4984	      0	  19227	   4b1b	linux/drivers/bluetooth/btrtl.o
+
+(gcc version 8.2.0 x86_64)
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/bluetooth/btrtl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 7f9ea8e4c1b2..52a9a55057c0 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -206,7 +206,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 				struct btrtl_device_info *btrtl_dev,
+ 				unsigned char **_buf)
+ {
+-	const u8 extension_sig[] = { 0x51, 0x04, 0xfd, 0x77 };
++	static const u8 extension_sig[] = { 0x51, 0x04, 0xfd, 0x77 };
+ 	struct rtl_epatch_header *epatch_info;
+ 	unsigned char *buf;
+ 	int i, len;
 -- 
-2.18.0
+2.17.1
