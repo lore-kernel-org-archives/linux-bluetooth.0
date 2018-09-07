@@ -1,71 +1,46 @@
 Return-Path: <lramos.prof@yahoo.com.br>
-Date: Fri, 7 Sep 2018 20:36:03 -0300
+Date: Fri, 7 Sep 2018 20:35:49 -0300
 From: Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] ath3k: add more information to error message
-Message-ID: <20180907233603.GF3379@giustizia.org>
+Subject: [PATCH] ath3k: add warning when switch pid is not working
+Message-ID: <20180907233549.GE3379@giustizia.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When there is an error in either ath3k_load_firmware() or
-ath3k_load_fwfile(), the inlined function ath3k_log_failed_loading() is
-called receiving the error returned and both the block size requested to
-load and the size actually loaded. These values are printed in an error
-message using the macro BT_ERR.
+This patch adds a warning message in the ath3k driver when
+ath3k_switch_pid() returns error.
 
-This patch creates a new function which does the same but also receives
-the "count" variable, in order to show more information when a failing
-firmware loading happens. The calls to the older function were changed
-to the new one.
+This event happens in a specific laptop, with an adapter which
+identifies itself as 0cf3:0036. Surprisingly, the adapter works even
+after this event - hence a warning is chosen instead of an error.
 
-This event is being monitored in a laptop with an adapter which
-identifies itself as 0cf3:0036, where sometimes there are errors in the
-firmware loading process.
+The current version of ath3k doesn't check the return value of
+ath3k_switch_pid() and so this event may remain undetected in the
+original version.
 
 Signed-off-by: Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
 ---
- drivers/bluetooth/ath3k.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/bluetooth/ath3k.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 3a8c47efea55..ebc312cb4412 100644
+index 3d7a5c149af3..3a8c47efea55 100644
 --- a/drivers/bluetooth/ath3k.c
 +++ b/drivers/bluetooth/ath3k.c
-@@ -209,6 +209,14 @@ static inline void ath3k_log_failed_loading(int err, int len, int size)
- 			err, len, size);
- }
- 
-+static inline void ath3k_log_failed_loading_2(int err, int len, int size,
-+						int count)
-+{
-+	BT_ERR("%s err = %d, len = %d, size = %d, count = %d",
-+			"Error in firmware loading",
-+			err, len, size, count);
-+}
+@@ -546,7 +546,10 @@ static int ath3k_probe(struct usb_interface *intf,
+ 			BT_ERR("Set normal mode failed");
+ 			return ret;
+ 		}
+-		ath3k_switch_pid(udev);
++		ret = ath3k_switch_pid(udev);
++		if (ret < 0)
++			BT_WARN("Warning: switch pid failed (ret=%d)", ret);
 +
- #define USB_REQ_DFU_DNLOAD	1
- #define BULK_SIZE		4096
- #define FW_HDR_SIZE		20
-@@ -257,7 +265,7 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 					&len, 3000);
+ 		return 0;
+ 	}
  
- 		if (err || (len != size)) {
--			ath3k_log_failed_loading(err, len, size);
-+			ath3k_log_failed_loading_2(err, len, size, count);
- 			goto error;
- 		}
- 
-@@ -356,7 +364,7 @@ static int ath3k_load_fwfile(struct usb_device *udev,
- 		err = usb_bulk_msg(udev, pipe, send_buf, size,
- 					&len, 3000);
- 		if (err || (len != size)) {
--			ath3k_log_failed_loading(err, len, size);
-+			ath3k_log_failed_loading_2(err, len, size, count);
- 			kfree(send_buf);
- 			return err;
- 		}
 -- 
 2.14.4
