@@ -1,71 +1,81 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Stotland, Inga" <inga.stotland@intel.com>
-To: "andri@yngvason.is" <andri@yngvason.is>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ v2] tools/mesh: Add basic sensor model
-Date: Fri, 7 Sep 2018 20:13:04 +0000
-Message-ID: <d1177e1d602bdcb434d0ad11029f6d1d27299bd7.camel@intel.com>
-References: <20180817143545.26700-1-andri@yngvason.is>
-         <7f2b35cd6792989b5fb8ca7231dc7dbba7d7a0e7.camel@intel.com>
-         <CAFNQBQyc_ugja=Eo--wMB26F7wzP-EYwpEznOF32kSroZvkRNg@mail.gmail.com>
-In-Reply-To: <CAFNQBQyc_ugja=Eo--wMB26F7wzP-EYwpEznOF32kSroZvkRNg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+In-Reply-To: <7f2b35cd6792989b5fb8ca7231dc7dbba7d7a0e7.camel@intel.com>
+References: <20180817143545.26700-1-andri@yngvason.is> <7f2b35cd6792989b5fb8ca7231dc7dbba7d7a0e7.camel@intel.com>
+From: Andri Yngvason <andri@yngvason.is>
+Date: Fri, 7 Sep 2018 18:19:59 +0000
+Message-ID: <CAFNQBQyc_ugja=Eo--wMB26F7wzP-EYwpEznOF32kSroZvkRNg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] tools/mesh: Add basic sensor model
+To: "Stotland, Inga" <inga.stotland@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgQW5kcmksDQoNCk9uIEZyaSwgMjAxOC0wOS0wNyBhdCAxODoxOSArMDAwMCwgQW5kcmkgWW5n
-dmFzb24gd3JvdGU6DQo+IEhpIEluZ2EsDQo+IA0KPiAyMDE4LTA4LTI0IDc6MTAgR01UKzAwOjAw
-IFN0b3RsYW5kLCBJbmdhIDxpbmdhLnN0b3RsYW5kQGludGVsLmNvbT46DQo+IGRpZmYgLS1naXQg
-YS90b29scy9tZXNoL3NlbnNvci1tb2RlbC5jIGIvdG9vbHMvbWVzaC9zZW5zb3ItbW9kZWwuYw0K
-PiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPiBpbmRleCAwMDAwMDAwMDAuLjM3Y2E1NTYzMQ0KPiAt
-LS0gL2Rldi9udWxsDQo+ICsrKyBiL3Rvb2xzL21lc2gvc2Vuc29yLW1vZGVsLmMNCj4gQEAgLTAs
-MCArMSwyNTUgQEANCj4gKy8qDQo+ICsgKg0KPiArICogIEJsdWVaIC0gQmx1ZXRvb3RoIHByb3Rv
-Y29sIHN0YWNrIGZvciBMaW51eA0KPiArICoNCj4gKyAqICBDb3B5cmlnaHQgKEMpIDIwMTcgIElu
-dGVsIENvcnBvcmF0aW9uLiBBbGwgcmlnaHRzIHJlc2VydmVkLg0KPiArICogIENvcHlyaWdodCAo
-QykgMjAxOCAgQW5kcmkgWW5ndmFzb24gPGFuZHJpQHluZ3Zhc29uLmlzPg0KPiArICoNCj4gKyAq
-DQo+ICsgKiAgVGhpcyBsaWJyYXJ5IGlzIGZyZWUgc29mdHdhcmU7IHlvdSBjYW4gcmVkaXN0cmli
-dXRlIGl0IGFuZC9vcg0KPiArICogIG1vZGlmeSBpdCB1bmRlciB0aGUgdGVybXMgb2YgdGhlIEdO
-VSBMZXNzZXIgR2VuZXJhbCBQdWJsaWMNCj4gKyAqICBMaWNlbnNlIGFzIHB1Ymxpc2hlZCBieSB0
-aGUgRnJlZSBTb2Z0d2FyZSBGb3VuZGF0aW9uOyBlaXRoZXINCj4gKyAqICB2ZXJzaW9uIDIuMSBv
-ZiB0aGUgTGljZW5zZSwgb3IgKGF0IHlvdXIgb3B0aW9uKSBhbnkgbGF0ZXIgdmVyc2lvbi4NCj4g
-KyAqDQo+ICsgKiAgVGhpcyBsaWJyYXJ5IGlzIGRpc3RyaWJ1dGVkIGluIHRoZSBob3BlIHRoYXQg
-aXQgd2lsbCBiZSB1c2VmdWwsDQo+ICsgKiAgYnV0IFdJVEhPVVQgQU5ZIFdBUlJBTlRZOyB3aXRo
-b3V0IGV2ZW4gdGhlIGltcGxpZWQgd2FycmFudHkgb2YNCj4gKyAqICBNRVJDSEFOVEFCSUxJVFkg
-b3IgRklUTkVTUyBGT1IgQSBQQVJUSUNVTEFSIFBVUlBPU0UuICBTZWUgdGhlIEdOVQ0KPiArICog
-IExlc3NlciBHZW5lcmFsIFB1YmxpYyBMaWNlbnNlIGZvciBtb3JlIGRldGFpbHMuDQo+ICsgKg0K
-PiArICogIFlvdSBzaG91bGQgaGF2ZSByZWNlaXZlZCBhIGNvcHkgb2YgdGhlIEdOVSBMZXNzZXIg
-R2VuZXJhbCBQdWJsaWMNCj4gKyAqICBMaWNlbnNlIGFsb25nIHdpdGggdGhpcyBsaWJyYXJ5OyBp
-ZiBub3QsIHNlZSA8aHR0cDovL3d3dy5nbnUub3JnL2xpY2Vuc2VzLz4uDQo+IA0KPiBMZXQncyBz
-dGF5IGNvbnNpc3RlbnQgd2l0aCB0aGUgcmVzdCBvZiBibHVleiBhbmQgbm90IGludHJvZHVjZSBu
-ZXcNCj4gc3R5bGUgZm9yIHRoZSBsaWNlbnNlIHRleHQuDQo+IExpbnV4J3MgY2hlY2stcGF0Y2gg
-c2NyaXB0IGNvbXBsYWlucyB0aGF0IHRoZSBhZGRyZXNzIG1heSBjaGFuZ2UuIElzDQo+IHRoaXMg
-bm90IGEgY29uY2Vybj8NCj4gWy4uLl0NCg0KWWVzIEkga25vdyB0aGF0IGNoZWNrLXBhdGNoIGNv
-bXBsYWlucyBhYm91dCB0aGlzLCBidXQgd2UgZG9uJ3Qgd2FudCB0bw0KaW50cm9kdWNlIG5ldyB3
-b3JkaW5nIGF0IHRoaXMgcG9pbnQuDQpLZWVwaW5nIGl0IGNvbnNpc3RlbnQgd2l0aCB0aGUgd2hh
-ZXRldmVyIGlzIGluIGN1cnJlbnQgQmx1ZVogbWFrZXMgaXQNCmVhc2llciB0byBkbyB0aGUgd2hv
-bGVzYWxlIHVwZGF0ZSBpbiBmdXR1cmUuDQoNCj4gZGlmZiAtLWdpdCBhL3Rvb2xzL21lc2hjdGwu
-YyBiL3Rvb2xzL21lc2hjdGwuYw0KPiBpbmRleCAzZTE0ODRmNjEuLjA4YmJhOWExMyAxMDA2NDQN
-Cj4gLS0tIGEvdG9vbHMvbWVzaGN0bC5jDQo+ICsrKyBiL3Rvb2xzL21lc2hjdGwuYw0KPiBAQCAt
-NTgsNiArNTgsNyBAQA0KPiAgI2luY2x1ZGUgIm1lc2gvcHJvdi1kYi5oIg0KPiAgI2luY2x1ZGUg
-Im1lc2gvY29uZmlnLW1vZGVsLmgiDQo+ICAjaW5jbHVkZSAibWVzaC9vbm9mZi1tb2RlbC5oIg0K
-PiArI2luY2x1ZGUgIm1lc2gvc2Vuc29yLW1vZGVsLmgiDQo+IA0KPiAgLyogU3RyaW5nIGRpc3Bs
-YXkgY29uc3RhbnRzICovDQo+ICAjZGVmaW5lIENPTE9SRURfTkVXICBDT0xPUl9HUkVFTiAiTkVX
-IiBDT0xPUl9PRkYNCj4gQEAgLTE5OTAsNiArMTk5MSw5IEBAIGludCBtYWluKGludCBhcmdjLCBj
-aGFyICphcmd2W10pDQo+ICAgICAgIGlmICghb25vZmZfY2xpZW50X2luaXQoUFJJTUFSWV9FTEVN
-RU5UX0lEWCkpDQo+ICAgICAgICAgICAgICAgZ19wcmludGVycigiRmFpbGVkIHRvIGluaXRpYWxp
-emUgbWVzaCBnZW5lcmljIE9uL09mZiBjbGllbnRcbiIpOw0KPiANCj4gKyAgICAgaWYgKCFzZW5z
-b3JfY2xpZW50X2luaXQoUFJJTUFSWV9FTEVNRU5UX0lEWCkpDQo+ICsgICAgICAgICAgICAgZ19w
-cmludGVycigiRmFpbGVkIHRvIGluaXRpYWxpemUgbWVzaCBzZW5zb3IgY2xpZW50XG4iKTsNCj4g
-Kw0KPiANCj4gSSBzdWdnZXN0IHRoYXQgeW91IGFkZCB0aGUgbW9kZWwgaWQgZm9yIHNlbnNvciBj
-bGllbnQgdG8gdGhlIGRldmljZQ0KPiBjb21wb3NpdGlvbiBzZWN0aW9uIGluIGxvY2FsX25vZGUu
-anNvbi4NCj4gT3RoZXJ3aXNlLCBtZXNoY3RsIHdpbGwgcHJpbnQgdGhlIGFib3ZlIGVycm9yIGFu
-ZCBmYWlsIHRvIGluaXRpYWxpemUNCj4gc2Vuc29yIG1lbnUuDQo+IFllYWgsIEkgbWFuYWdlZCB0
-byBnZXQgdGhpcyB3b3JraW5nLCBidXQgSSB3YXNuJ3QgcXVpdGUgc3VyZSBob3cgdGhlDQo+IGNv
-bmZpZ3VyYXRpb24uZWxlbWVudHMgc2VjdGlvbiB3YXMgc3VwcG9zZWQgdG8gbG9vaywgc28gSSAg
-anVzdA0KPiByZXBsYWNlZCB0aGUgb24tb2ZmIGluZGV4IHdpdGggdGhlIHNlbnNvciBtb2RlbCBp
-bmRleCBhbmQgdGhhdCB3b3JrZWQNCj4gZm9yIG1lLg0KPiBJcyB0aGUgZm9ybWF0IGRvY3VtZW50
-ZWQgc29tZXdoZXJlPw0KDQpDdXJyZW50bHkgdGhlcmUgaXMgbm8gZG9jdW1lbnQgZGVzY3JpYmlu
-ZyB0aGUgZm9ybWF0LCBqdXN0IHRoZSBpbXBsZW1lbnRhdGlvbiBjb2RlLg0KWW91IGNhbiBqdXN0
-IGR1cGxpY2F0ZSB0aGUgZW50cnkgb2Ygb24tb2ZmIG1vZGVsIGFuZCByZXBsYWNlIHRoZSBtb2Rl
-bCBpZCB3aXRoIHNlbnNvci4NCg0KUmVnYXJkcywNCkluZ2ENCg==
+Hi Inga,
+
+2018-08-24 7:10 GMT+00:00 Stotland, Inga <inga.stotland@intel.com>:
+>> diff --git a/tools/mesh/sensor-model.c b/tools/mesh/sensor-model.c
+>> new file mode 100644
+>> index 000000000..37ca55631
+>> --- /dev/null
+>> +++ b/tools/mesh/sensor-model.c
+>> @@ -0,0 +1,255 @@
+>> +/*
+>> + *
+>> + *  BlueZ - Bluetooth protocol stack for Linux
+>> + *
+>> + *  Copyright (C) 2017  Intel Corporation. All rights reserved.
+>> + *  Copyright (C) 2018  Andri Yngvason <andri@yngvason.is>
+>> + *
+>> + *
+>> + *  This library is free software; you can redistribute it and/or
+>> + *  modify it under the terms of the GNU Lesser General Public
+>> + *  License as published by the Free Software Foundation; either
+>> + *  version 2.1 of the License, or (at your option) any later version.
+>> + *
+>> + *  This library is distributed in the hope that it will be useful,
+>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>> + *  Lesser General Public License for more details.
+>> + *
+>> + *  You should have received a copy of the GNU Lesser General Public
+>> + *  License along with this library; if not, see <http://www.gnu.org/licenses/>.
+>
+> Let's stay consistent with the rest of bluez and not introduce new
+> style for the license text.
+Linux's check-patch script complains that the address may change. Is
+this not a concern?
+[...]
+>> diff --git a/tools/meshctl.c b/tools/meshctl.c
+>> index 3e1484f61..08bba9a13 100644
+>> --- a/tools/meshctl.c
+>> +++ b/tools/meshctl.c
+>> @@ -58,6 +58,7 @@
+>>  #include "mesh/prov-db.h"
+>>  #include "mesh/config-model.h"
+>>  #include "mesh/onoff-model.h"
+>> +#include "mesh/sensor-model.h"
+>>
+>>  /* String display constants */
+>>  #define COLORED_NEW  COLOR_GREEN "NEW" COLOR_OFF
+>> @@ -1990,6 +1991,9 @@ int main(int argc, char *argv[])
+>>       if (!onoff_client_init(PRIMARY_ELEMENT_IDX))
+>>               g_printerr("Failed to initialize mesh generic On/Off client\n");
+>>
+>> +     if (!sensor_client_init(PRIMARY_ELEMENT_IDX))
+>> +             g_printerr("Failed to initialize mesh sensor client\n");
+>> +
+>
+> I suggest that you add the model id for sensor client to the device
+> composition section in local_node.json.
+> Otherwise, meshctl will print the above error and fail to initialize
+> sensor menu.
+Yeah, I managed to get this working, but I wasn't quite sure how the
+configuration.elements section was supposed to look, so I  just
+replaced the on-off index with the sensor model index and that worked
+for me.
+Is the format documented somewhere?
+
+Regards,
+Andri
