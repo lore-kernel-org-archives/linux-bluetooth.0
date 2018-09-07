@@ -1,46 +1,52 @@
-Return-Path: <lramos.prof@yahoo.com.br>
-Date: Fri, 7 Sep 2018 20:35:49 -0300
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Fri, 7 Sep 2018 20:35:31 -0300
 From: Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
 To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
+        Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] ath3k: add warning when switch pid is not working
-Message-ID: <20180907233549.GE3379@giustizia.org>
+Subject: Patches for ath3k with possible issues
+Message-ID: <20180907233531.GD3379@giustizia.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a warning message in the ath3k driver when
-ath3k_switch_pid() returns error.
+Hello,
 
-This event happens in a specific laptop, with an adapter which
-identifies itself as 0cf3:0036. Surprisingly, the adapter works even
-after this event - hence a warning is chosen instead of an error.
+I think I have found some smaller problems related to a specific
+Bluetooth adapter that isn't working fine in a laptop that is with me
+from some time. In fact, only now I've found enough time to dig into the
+code and try to make some experiments.
 
-The current version of ath3k doesn't check the return value of
-ath3k_switch_pid() and so this event may remain undetected in the
-original version.
+The Bluetooth adapter is an Atheros, identified by VID/PID 0cf3:0036,
+running in a x86_64 laptop.
 
-Signed-off-by: Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
----
- drivers/bluetooth/ath3k.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+The problems are just like that:
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 3d7a5c149af3..3a8c47efea55 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -546,7 +546,10 @@ static int ath3k_probe(struct usb_interface *intf,
- 			BT_ERR("Set normal mode failed");
- 			return ret;
- 		}
--		ath3k_switch_pid(udev);
-+		ret = ath3k_switch_pid(udev);
-+		if (ret < 0)
-+			BT_WARN("Warning: switch pid failed (ret=%d)", ret);
-+
- 		return 0;
- 	}
- 
--- 
-2.14.4
+1- when the laptop starts, Bluetooth always work; however, I found that
+the "switch vid/pid" operation doesn't work, returning -32 ("EPIPE")
+
+2- after a suspend or hibernate, when it resumes, sometimes the firmware
+download doesn't work. It stops before sending all pieces and when it
+happens, it returns code -32 ("EPIPE")
+
+3- there are cases also where after a resume, the switch VID/PID works
+and the adapter changes its identification to 0cf3:3007
+
+4- in cases 2 and 3, sometimes the bluetooth daemon doesn't recognize
+the adapter anymore. In my tests, I can restore operation doing in
+sequence: rmmod ath3k, insmod ath3k, kill bluetooth daemon and start
+bluetooth daemon again
+
+Even not knowing the problem in detail right now, I can send some
+patches which helped me to collect the information above, specially the
+return code of the switch VID/PID operation and the state of the
+firmware load when the error happens. I'll send you next two patches
+which addresses these two things, and hopefully this can help someone
+else that stays in trouble with problems like those.
+
+Many thanks,
+
+Luiz Carlos Ramos
+lramos dot prof at yahoo dot com dot br
+São Paulo - Brazil
