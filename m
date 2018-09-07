@@ -1,146 +1,61 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Christian Hewitt <christianshewitt@gmail.com>
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 11.5 \(3445.9.1\))
+Subject: How to handle multiple firmwares for 0x2209 device?
+Message-Id: <799A0BE4-CF46-4656-9AD3-60D9E8E92849@gmail.com>
+Date: Fri, 7 Sep 2018 07:48:02 +0400
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/shell: Print commands when --help option is given
-Date: Fri,  7 Sep 2018 11:18:59 +0300
-Message-Id: <20180907081859.19943-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+The Khadas VIM(1) SBC uses an AMPAK AP6212 module with device ID 0x2209; =
+resulting in BCM43430A1 firmware being loaded (as per current code) =
+instead of BCM43438A1 which is needed for the BT module to work. The =
+following patch is required:
 
-This enables the user to see what command could be given in the
-non-interactive mode e.g:
+--- a/drivers/bluetooth/btbcm.c	2018-07-09 00:34:02.000000000 +0100
++++ b/drivers/bluetooth/btbcm.c	2018-07-12 11:38:12.323462430 +0100
+@@ -326,7 +326,7 @@ static const struct bcm_subver_table bcm
+ 	{ 0x4406, "BCM4324B3"	},	/* 002.004.006 */
+ 	{ 0x610c, "BCM4354"	},	/* 003.001.012 */
+ 	{ 0x2122, "BCM4343A0"	},	/* 001.001.034 */
+-	{ 0x2209, "BCM43430A1"  },	/* 001.002.009 */
++	{ 0x2209, "BCM43438A1"  },	/* 001.002.009 */
+ 	{ 0x6119, "BCM4345C0"	},	/* 003.001.025 */
+ 	{ 0x230f, "BCM4356A2"	},	/* 001.003.015 */
+ 	{ }
 
-> bluetooth-player --help
-bluetooth-player ver 5.50
-Usage:
-	bluetooth-player [--options] [commands]
-Options:
-	--timeout 	Timeout in seconds for non-interactive mode
-	--version 	Display version
-	--help 		Display help
-Commands:
-	list		List available players
-	show		Player information
-	select		Select default player
-	play		Start playback
-	pause		Pause playback
-	stop		Stop playback
-	next		Jump to next item
-	previous	Jump to previous item
-	fast-forward	Fast forward playback
-	rewind		Rewind playback
-	equalizer	Enable/Disable equalizer
-	repeat		Set repeat mode
-	shuffle		Set shuffle mode
-	scan		Set scan mode
-	change-folder	Change current folder
-	list-items	List items of current folder
-	search		Search items containing string
-	queue		Add item to playlist queue
-	show-item	Show item information
----
- src/shared/shell.c | 54 +++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 49 insertions(+), 5 deletions(-)
+I=E2=80=99m not versed in the minutiae of these firmwares. Is BCM43438A1 =
+simply a newer version of firmware that could be used by all devices =
+(and the above patch can be submitted to effect the change) .. or is =
+something more complicated required?
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 53f513613..9b0125579 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -61,6 +61,8 @@ struct bt_shell_env {
- 	void *value;
- };
- 
-+static char *cmplt = "help";
-+
- static struct {
- 	bool init;
- 	char *name;
-@@ -97,9 +99,41 @@ static void cmd_quit(int argc, char *argv[])
- 	mainloop_quit();
- }
- 
-+static void print_cmds(void)
-+{
-+	const struct bt_shell_menu_entry *entry;
-+	const struct queue_entry *submenu;
-+
-+	if (!data.menu)
-+		return;
-+
-+	printf("Commands:\n");
-+
-+	for (entry = data.menu->entries; entry->cmd; entry++) {
-+		printf("\t%s%s\t%s\n", entry->cmd,
-+			strlen(entry->cmd) < 8 ? "\t" : "", entry->desc);
-+	}
-+
-+	for (submenu = queue_get_entries(data.submenus); submenu;
-+					submenu = submenu->next) {
-+		struct bt_shell_menu *menu = submenu->data;
-+
-+		printf("\n\t%s.:\n", menu->name);
-+
-+		for (entry = menu->entries; entry->cmd; entry++) {
-+			printf("\t\t%s%s\t%s\n", entry->cmd,
-+				strlen(entry->cmd) < 8 ? "\t" : "",
-+				entry->desc);
-+		}
-+	}
-+}
-+
- static void cmd_help(int argc, char *argv[])
- {
--	shell_print_menu();
-+	if (argv[0] == cmplt)
-+		print_cmds();
-+	else
-+		shell_print_menu();
- 
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
-@@ -955,11 +989,18 @@ static const struct option main_options[] = {
- 
- static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
- {
-+	const char *name;
- 	unsigned int i;
- 
--	printf("%s ver %s\n", argv[0], VERSION);
-+	name = strrchr(argv[0], '/');
-+	if (!name)
-+		name = argv[0];
-+	else
-+		name++;
-+
-+	printf("%s ver %s\n", name, VERSION);
- 	printf("Usage:\n"
--		"\t%s [options]\n", argv[0]);
-+		"\t%s [--options] [commands]\n", name);
- 
- 	printf("Options:\n");
- 
-@@ -997,8 +1038,10 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 			return;
- 		case 'h':
- 			usage(argc, argv, opt);
--			exit(EXIT_SUCCESS);
--			return;
-+			data.argc = 1;
-+			data.argv = &cmplt;
-+			data.mode = 1;
-+			goto done;
- 		case 't':
- 			data.timeout = atoi(optarg);
- 			break;
-@@ -1030,6 +1073,7 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 	optind = 0;
- 	data.mode = (data.argc > 0);
- 
-+done:
- 	if (data.mode)
- 		bt_shell_set_env("NON_INTERACTIVE", &data.mode);
- 
--- 
-2.17.1
+BCM43438A1 firmware: =
+(https://github.com/chewitt/brcmfmac_sdio-firmware-aml)
+
+[    9.447310] Bluetooth: hci0: BCM: chip id 94
+[    9.449226] Bluetooth: hci0: BCM: features 0x2e
+[    9.471969] Bluetooth: hci0: BCM43430A1
+[    9.471983] Bluetooth: hci0: BCM43438A1 (001.002.009) build 0000
+[   12.946499] Bluetooth: hci0: BCM43438A1 (001.002.009) build 0106
+
+hci0:	Type: Primary  Bus: UART
+	BD Address: CC:B8:A8:B5:9F:87  ACL MTU: 1021:8  SCO MTU: 64:1
+	UP RUNNING=20
+	RX bytes:2265 acl:0 sco:0 events:216 errors:0
+	TX bytes:36326 acl:0 sco:0 commands:214 errors:0
+	Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3=20
+	Link policy: RSWITCH SNIFF=20
+	Link mode: SLAVE ACCEPT=20
+	Name: 'LibreELEC'
+	Class: 0x0c0000
+	Service Classes: Rendering, Capturing
+	Device Class: Miscellaneous,=20
+	HCI Version: 4.0 (0x6)  Revision: 0x6a
+	LMP Version: 4.0 (0x6)  Subversion: 0x2209
+	Manufacturer: Broadcom Corporation (15)
+
+Christian=
