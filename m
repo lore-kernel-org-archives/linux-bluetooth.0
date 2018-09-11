@@ -1,54 +1,140 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <raghuram.hegde@intel.com>
+From: "Hegde, Raghuram" <raghuram.hegde@intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>, "Ghorai,
+ Sukumar" <sukumar.ghorai@intel.com>, "Bag, Amit K" <amit.k.bag@intel.com>,
+	chethan tn <chethantn@gmail.com>
+Subject: RE: [PATCH 1/2] Bluetooth: btintel: Add platform device for rfkill
+ signal
+Date: Tue, 11 Sep 2018 05:13:51 +0000
+Message-ID: <E5FA71999F8E8845A748D0B68F0A4BDF966495@BGSMSX103.gar.corp.intel.com>
+References: <1534844080-31240-1-git-send-email-raghuram.hegde@intel.com>
+ <CF4E3B3B-C3A4-4037-A2F1-ECB4B01FAC6D@holtmann.org>
+ <CAMH2TCpppynorUSW7bh6Qq-y3p3q38ppSX2Hj0w851+2OtTXZA@mail.gmail.com>
+ <3296D1DD-DC70-4685-BDF9-F27576C09F68@holtmann.org>
+ <CAMH2TCpMoQShFcAUrsQ_yzcbM4dE1S+akPvoLgda-HfGyhfE=A@mail.gmail.com>
+In-Reply-To: <CAMH2TCpMoQShFcAUrsQ_yzcbM4dE1S+akPvoLgda-HfGyhfE=A@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20180904162955.28855-1-tanuk@iki.fi>
-References: <20180904162955.28855-1-tanuk@iki.fi>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 11 Sep 2018 11:10:23 +0300
-Message-ID: <CABBYNZ+gQ90MOPaOHFsZmKoTjbma-zbDw_bwxskSNnBWa_AGXg@mail.gmail.com>
-Subject: Re: [PATCH][sbc] sbc: fix frame_length and codesize documentation
-To: Tanu Kaskinen <tanuk@iki.fi>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tanu,
-
-On Tue, Sep 4, 2018 at 7:29 PM, Tanu Kaskinen <tanuk@iki.fi> wrote:
-> frame_length is the output block size when encoding and the input block
-> size when decoding, with codesize it's vice versa. The documentation was
-> inaccurate regarding this. Using the terms "compressed" and
-> "uncompressed" instead of "output" and "input" should make the function
-> semantics clear.
-> ---
->  sbc/sbc.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/sbc/sbc.h b/sbc/sbc.h
-> index d6f123e..835460a 100644
-> --- a/sbc/sbc.h
-> +++ b/sbc/sbc.h
-> @@ -100,13 +100,13 @@ ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
->  ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
->                         void *output, size_t output_len, ssize_t *written);
->
-> -/* Returns the output block size in bytes */
-> +/* Returns the compressed block size in bytes */
->  size_t sbc_get_frame_length(sbc_t *sbc);
->
->  /* Returns the time one input/output block takes to play in msec*/
->  unsigned sbc_get_frame_duration(sbc_t *sbc);
->
-> -/* Returns the input block size in bytes */
-> +/* Returns the uncompressed block size in bytes */
->  size_t sbc_get_codesize(sbc_t *sbc);
->
->  const char *sbc_get_implementation_info(sbc_t *sbc);
-> --
-> 2.18.0
-
-Applied, thanks.
-
-
--- 
-Luiz Augusto von Dentz
+SGkgTWFyY2VsLA0KPiBIaSBNYXJjZWwsDQoNCj4gT24gVHVlLCBBdWcgMjEsIDIwMTggYXQgODoz
+OSBQTSBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+IHdyb3RlOg0KPiA+DQo+
+ID4gSGkgQ2hldGhhbiwNCj4gPg0KPiA+ID4+PiBEcml2ZXIgdG8gYWRkIElOVEw2MjA1IHBsYXRm
+b3JtIEFDUEkgZGV2aWNlIHRvIGVuYWJsZSBvdXQgb2YgYmFuZCANCj4gPiA+Pj4gR1BJTyBzaWdu
+YWxsaW5nIHRvIGhhbmRsZSByZmtpbGwgYW5kIHJlc2V0IHRoZSBibHVldG9vdGggDQo+ID4+PiBj
+b250cm9sbGVyLiBFeHBvc2UgYW4gaW50ZXJmYWNlIGluIGtlcm5lbCB0byBhc3NlcnQgR1BJTyBz
+aWduYWwuDQo+ID4gPj4+DQo+ID4gPj4+IFNpZ25lZC1vZmYtYnk6IENoZXRoYW4gVCBOIDxjaGV0
+aGFuLnR1bWt1ci5uYXJheWFuQGludGVsLmNvbT4NCj4gPiA+Pj4gU2lnbmVkLW9mZi1ieTogU3Vr
+dW1hciBHaG9yYWkgPHN1a3VtYXIuZ2hvcmFpQGludGVsLmNvbT4NCj4gPiA+Pj4gU2lnbmVkLW9m
+Zi1ieTogUmFnaHVyYW0gSGVnZGUgPHJhZ2h1cmFtLmhlZ2RlQGludGVsLmNvbT4NCj4gPiA+Pj4g
+LS0tDQo+ID4gPj4+IGRyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuYyB8IDY4IA0KPiA+ID4+PiAr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiA+Pj4gZHJp
+dmVycy9ibHVldG9vdGgvYnRpbnRlbC5oIHwgIDYgKysrKw0KPiA+ID4+PiAyIGZpbGVzIGNoYW5n
+ZWQsIDc0IGluc2VydGlvbnMoKykNCj4gPiA+Pj4NCj4gPiA+Pj4gZGlmZiAtLWdpdCBhL2RyaXZl
+cnMvYmx1ZXRvb3RoL2J0aW50ZWwuYyANCj4gPiA+Pj4gYi9kcml2ZXJzL2JsdWV0b290aC9idGlu
+dGVsLmMgaW5kZXggNTI3MGQ1NTEzMjAxLi41MzhjZDZiNmM1MjQgDQo+ID4gPj4+IDEwMDY0NA0K
+PiA+ID4+PiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9idGludGVsLmMNCj4gPiA+Pj4gKysrIGIv
+ZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbC5jDQo+ID4gPj4+IEBAIC0yNCw2ICsyNCw5IEBADQo+
+ID4gPj4+ICNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4NCj4gPiA+Pj4gI2luY2x1ZGUgPGxpbnV4
+L2Zpcm13YXJlLmg+DQo+ID4gPj4+ICNpbmNsdWRlIDxsaW51eC9yZWdtYXAuaD4NCj4gPiA+Pj4g
+KyNpbmNsdWRlIDxsaW51eC9hY3BpLmg+DQo+ID4gPj4+ICsjaW5jbHVkZSA8bGludXgvcGxhdGZv
+cm1fZGV2aWNlLmg+ICNpbmNsdWRlIA0KPiA+ID4+PiArPGxpbnV4L2dwaW8vY29uc3VtZXIuaD4N
+Cj4gPiA+Pj4gI2luY2x1ZGUgPGFzbS91bmFsaWduZWQuaD4NCj4gPiA+Pj4NCj4gPiA+Pj4gI2lu
+Y2x1ZGUgPG5ldC9ibHVldG9vdGgvYmx1ZXRvb3RoLmg+IEBAIC0zNzUsNiArMzc4LDcxIEBAIGlu
+dCANCj4gPiA+Pj4gYnRpbnRlbF9yZWFkX3ZlcnNpb24oc3RydWN0IGhjaV9kZXYgKmhkZXYsIHN0
+cnVjdCBpbnRlbF92ZXJzaW9uIA0KPiA+ID4+PiAqdmVyKSB9IEVYUE9SVF9TWU1CT0xfR1BMKGJ0
+aW50ZWxfcmVhZF92ZXJzaW9uKTsNCj4gPiA+Pj4NCj4gPiA+Pj4gK3N0YXRpYyBzdHJ1Y3QgZ3Bp
+b19kZXNjICpyZXNldF9ncGlvX2hhbmRsZXI7DQo+ID4gPj4NCj4gPiA+PiB0aGlzIHRoaW5nIGlz
+IHNvIGluaGVyZW50IGJyb2tlbi4gUGxlYXNlIG5ldmVyIGV2ZXIgZG8gdGhhdC4gSWYgdGhlcmUg
+YXJlIHR3byByZXNldCBoYW5kbGVycyBvciB0d28gSW50ZWwgVVNCIGRldmljZXMgY29ubmVjdGVk
+IHRoaW5ncyB3aWxsIGdvIGhvcnJpYmxlIHdyb25nLg0KPiA+ID4gSXMgaXQgZmluZSB0byBrZWVw
+IGxpc3Qgb2YgdGhlIGRlc2NyaXB0b3JzIGhhbmRsZXJzIGZvciBhbGwgdGhlIA0KPiA+ID4gSW50
+ZWwgZGV2aWNlcyBjb25uZWN0ZWQ/DQo+ID4gPj4NCj4gPiA+Pj4gK3ZvaWQgYnRpbnRlbF9yZXNl
+dF9idChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgdW5zaWduZWQgY2hhciBjb2RlKSB7DQo+ID4gPj4+
+ICsgICAgIGlmICghcmVzZXRfZ3Bpb19oYW5kbGVyKQ0KPiA+ID4+PiArICAgICAgICAgICAgIHJl
+dHVybjsNCj4gPiA+Pj4gKw0KPiA+ID4+PiArICAgICBncGlvZF9zZXRfdmFsdWUocmVzZXRfZ3Bp
+b19oYW5kbGVyLCAwKTsNCj4gPiA+Pj4gKyAgICAgbWRlbGF5KDEwMCk7DQo+ID4gPj4+ICsgICAg
+IGdwaW9kX3NldF92YWx1ZShyZXNldF9ncGlvX2hhbmRsZXIsIDEpOyB9IA0KPiA+ID4+PiArRVhQ
+T1JUX1NZTUJPTF9HUEwoYnRpbnRlbF9yZXNldF9idCk7DQo+ID4gPj4NCj4gPiA+PiBXaGF0IGhh
+cHBlbnMgaGVyZSB3aGVuIHlvdSBkbyB0aGlzPyBEb2VzIHRoZSBCbHVldG9vdGggVVNCIGRldmlj
+ZSBkaXNjb25uZWN0IGZyb20gdGhlIFVTQiBidXMgYW5kIGdldHMgcmUtZW51bWVyYXRlZCBhbmQg
+dGhlIGJ0dXNiX3Byb2JlKCkgcm91dGluZSBnZXRzIGNhbGxlZCBhZ2Fpbj8NCj4gPiA+IFllcywg
+VVNCIHJlLWVudW1lcmF0aW9uIHdpbGwgYmUgZG9uZSBhbmQgYnR1c2JfcHJvYmxlKCkgZnVuY3Rp
+b24gd2lsbCBiZSBjYWxsZWQuDQo+ID4NCj4gPiBBcyBJIHNhaWQsIGluIHRoYXQgY2FzZSBpdCBp
+cyBmaW5lIHRvIGltcGxlbWVudCB0aGlzIGFuIFJGS0lMTCBzd2l0Y2guIEl0IGlzIHBsYXRmb3Jt
+IFJGS0lMTCBzd2l0Y2guIFRoZSBVU0IgZGV2aWNlIGFjdHVhbGx5IGdldHMgdmlydHVhbGx5IGRp
+c2Nvbm5lY3RlZC4NCj4gPg0KPiA+ID4+DQo+ID4gPj4gSWYgdGhpcyBpcyB0aGUgY2FzZSwgdGhl
+biBJIGhhdmUgbm8gaWRlYSBob3cgbWFueSB0aW1lcyBJIGhhdmUgdG8gZXhwbGFpbi4gSXQgaXMg
+YSBwbGF0ZnJvbSByZXNldCBzd2l0Y2ggYW5kIHVzaW5nIFJGS0lMTCBmb3IgdGhpcyBpcyBhY2Nl
+cHRhYmxlLg0KPiA+ID4gVGhvdWdodCBvZiBtYWtlIHRoaXMgcGxhdGZvcm0gaW5kZXBlbmRlbnQg
+YnkgZXhwb3NpbmcgQUNQSSBvYmplY3QgDQo+ID4gPiAiSU5UTDYyMDUiLCBieSBkb2luZyBzbyBp
+biBjYXNlIGRpZmZlcmVudCBwbGF0Zm9ybXMgaWYgdGhlIEFDUEkgDQo+ID4gPiBvYmplY3QgaXMg
+ZXhwb3NlZCBieSB0aGUgcGxhdGZvcm0gdGhlbiB0aGlzIGRyaXZlciB3b3VsZCBiZSBsb2FkZWQu
+DQo+ID4gPiBLaW5kbHkgcGxlYXNlIGRvIHN1Z2dlc3QuDQo+ID4NCj4gPiBTZWUgYWJvdmUuIEkg
+cmVhbGx5IGRvbid0IGtub3cgd2hhdCBlbHNlIHRvIHNheS4gWW91IGNhbiBub3QgaGFuZGxlIHRo
+aXMgaW5zaWRlIGhjaV9kZXYgc2luY2UgdGhlIGhjaV9kZXYgd2lsbCBiZSBhY3R1YWxseSBkZXN0
+cm95ZWQgaWYgeW91IHB1bGwgdGhlIEdQSU8uDQo+IFBsZWFzZSBub3RlIHRoYXQgdGhlIGltcGxl
+bWVudGF0aW9uIGlzIHNpbWlsYXIgdG8gdGhlIFJGIGtpbGwgc3dpdGNoLCBqdXN0IHRoYXQgaXRz
+IGltcGxlbWVudGVkIGluIGJ0aW50ZWwuYy4gT3VyIHVuZGVyc3RhbmRpbmcgaXMgaGNpX2RldiBk
+b2VzIGV4aXN0IHdoZW4gR1BJTyB0b2dnbGUgaGFzIHRvIGJlIGRvbmUsIG9ubHkgYWZ0ZXIgdGhh
+dCB3aWxsIGJlIGRlc3Ryb3llZC4NCj4gTGF0ZXIgYWdhaW4gaGNpX2RldiB3b3VsZCBiZSBjcmVh
+dGVkIGFuZCB0aGUgaGRldi0+aHdfcmVzZXQgc2hhbGwgYmUgcmUtYXNzaWduZWQuDQo+IEFzIHlv
+dSBzdWdnZXN0IGlmIGl0cyBub3QgdG8gYmUgaW5jbHVkZWQgaW4gaGNpX2RldiwgY291bGQgeW91
+IHBsZWFzZSBsZXQgdXMga25vdyBob3cgdG8gaW52b2tlIHRoZSBHUElPIHRvZ2dsZSB3aXRob3V0
+IHJlZ2lzdGVyaW5nIHRoZSBjYWxsYmFjayhoZGV2LT5od19yZXNldCkuDQo+DQpXZSBoYXZlIGV4
+cGxvcmVkIHJlZ2lzdGVyaW5nIHRoZSAnSU5UTDYyMDUnIEFDUEkgb2JqZWN0IHRocm91Z2ggUmZr
+aWxsIGRyaXZlciBhbmQgaW1wbGVtZW50aW5nIEdQSU8gdG9nZ2xlIGluIHRoZSAnLnNldF9ibG9j
+aycgZnVuY3Rpb24gb2YgUmZraWxsLiBCdXQsIHdlIGFyZSBzdHVjayBpbiBob3cgdG8gaW52b2tl
+IHRoZSAnLnNldF9ibG9jaycgZnVuY3Rpb24gZnJvbSBoY2lfY29yZSwNCndoZW5ldmVyIHRoZXJl
+IGlzIGEgSENJIGNvbW1hbmQgdGltZW91dC4gQ291bGQgeW91IHBsZWFzZSBwcm92aWRlIHNvbWUg
+cG9pbnRlcnMgb24gaG93IHRvIGltcGxlbWVudCB0aGlzLg0KPiA+ID4+DQo+ID4gPj4+ICsNCj4g
+PiA+Pj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9ncGlvX3BhcmFtcyByZXNldF9ncGlvcyA9
+IHsgMCwgMCwgZmFsc2UgDQo+ID4gPj4+ICt9OyBzdGF0aWMgY29uc3Qgc3RydWN0IGFjcGlfZ3Bp
+b19tYXBwaW5nIGFjcGlfYnRpbnRlbF9ncGlvc1tdID0gew0KPiA+ID4+PiArICAgICB7ICJyZXNl
+dC1ncGlvcyIsICZyZXNldF9ncGlvcywgMSB9LA0KPiA+ID4+PiArICAgICB7IH0sDQo+ID4gPj4+
+ICt9Ow0KPiA+ID4+PiArDQo+ID4gPj4+ICtzdGF0aWMgaW50IGJ0aW50ZWxfcHJvYmUoc3RydWN0
+IHBsYXRmb3JtX2RldmljZSAqcGRldikgew0KPiA+ID4+PiArICAgICBzdHJ1Y3QgZGV2aWNlICpo
+ZGV2Ow0KPiA+ID4+PiArDQo+ID4gPj4+ICsgICAgIGhkZXYgPSBkZXZtX2t6YWxsb2MoJnBkZXYt
+PmRldiwgc2l6ZW9mKCpoZGV2KSwgR0ZQX0tFUk5FTCk7DQo+ID4gPj4+ICsgICAgIGlmICghaGRl
+dikNCj4gPiA+Pj4gKyAgICAgICAgICAgICByZXR1cm4gLUVOT01FTTsNCj4gPiA+Pg0KPiA+ID4+
+IFdoYXQgaXMgdGhpcyBkb2luZy4gVGhpcyBtYWtlcyBubyBzZW5zZS4NCj4gPiA+Pg0KPiA+ID4+
+PiArDQo+ID4gPj4+ICsgICAgIGlmICghQUNQSV9IQU5ETEUoJnBkZXYtPmRldikpDQo+ID4gPj4+
+ICsgICAgICAgICAgICAgcmV0dXJuIC1FTk9ERVY7DQo+ID4gPj4+ICsNCj4gPiA+Pj4gKyAgICAg
+aWYgKGFjcGlfZGV2X2FkZF9kcml2ZXJfZ3Bpb3MoQUNQSV9DT01QQU5JT04oJnBkZXYtPmRldiks
+DQo+ID4gPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYWNwaV9idGludGVs
+X2dwaW9zKSkNCj4gPiA+Pj4gKyAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPiA+Pj4g
+Kw0KPiA+ID4+PiArICAgICByZXNldF9ncGlvX2hhbmRsZXIgPSBkZXZtX2dwaW9kX2dldF9vcHRp
+b25hbCgmcGRldi0+ZGV2LA0KPiA+ID4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICJyZXNldCIsIEdQSU9EX09VVF9ISUdIKTsNCj4gPiA+Pj4gKyAgICAgaWYgKElTX0VS
+UihyZXNldF9ncGlvX2hhbmRsZXIpKQ0KPiA+ID4+PiArICAgICAgICAgICAgIHJldHVybiBQVFJf
+RVJSKHJlc2V0X2dwaW9faGFuZGxlcik7DQo+ID4gPj4+ICsNCj4gPiA+Pj4gKyAgICAgcmV0dXJu
+IDA7DQo+ID4gPj4+ICt9DQo+ID4gPj4+ICsNCj4gPiA+Pj4gK3N0YXRpYyBpbnQgYnRpbnRlbF9y
+ZW1vdmUoc3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikgew0KPiA+ID4+PiArICAgICBhY3Bp
+X2Rldl9yZW1vdmVfZHJpdmVyX2dwaW9zKEFDUElfQ09NUEFOSU9OKCZwZGV2LT5kZXYpKTsNCj4g
+PiA+Pj4gKyAgICAgcmV0dXJuIDA7DQo+ID4gPj4+ICt9DQo+ID4gPj4+ICsNCj4gPiA+Pj4gKyNp
+ZmRlZiBDT05GSUdfQUNQSQ0KPiA+ID4+PiArc3RhdGljIGNvbnN0IHN0cnVjdCBhY3BpX2Rldmlj
+ZV9pZCBidGludGVsX2FjcGlfbWF0Y2hbXSA9IHsNCj4gPiA+Pj4gKyAgICAgeyAiSU5UTDYyMDUi
+LCAwIH0sDQo+ID4gPj4+ICsgICAgIHsgfSwNCj4gPiA+Pj4gK307DQo+ID4gPj4+ICtNT0RVTEVf
+REVWSUNFX1RBQkxFKGFjcGksIGJ0aW50ZWxfYWNwaV9tYXRjaCk7ICNlbmRpZg0KPiA+ID4+PiAr
+DQo+ID4gPj4+ICtzdGF0aWMgc3RydWN0IHBsYXRmb3JtX2RyaXZlciBidGludGVsX2RyaXZlciA9
+IHsNCj4gPiA+Pj4gKyAgICAgLnByb2JlID0gYnRpbnRlbF9wcm9iZSwNCj4gPiA+Pj4gKyAgICAg
+LnJlbW92ZSA9IGJ0aW50ZWxfcmVtb3ZlLA0KPiA+ID4+PiArICAgICAuZHJpdmVyID0gew0KPiA+
+ID4+PiArICAgICAgICAgICAgIC5uYW1lID0gImJ0aW50ZWwiLA0KPiA+ID4+PiArICAgICAgICAg
+ICAgIC5hY3BpX21hdGNoX3RhYmxlID0gQUNQSV9QVFIoYnRpbnRlbF9hY3BpX21hdGNoKSwNCj4g
+PiA+Pj4gKyAgICAgfSwNCj4gPiA+Pj4gK307DQo+ID4gPj4+ICttb2R1bGVfcGxhdGZvcm1fZHJp
+dmVyKGJ0aW50ZWxfZHJpdmVyKTsNCj4gPiA+Pg0KPiA+ID4+IEkgYW0gbm90IGNvbnZpbmNlZCB0
+aGlzIGFjdHVhbGx5IHdvcmtzIHNpbmNlIG5vdyB3ZSBoYXZlIHR3byBtb2R1bGVfaW5pdCBhbmQg
+bW9kdWxlX2V4aXQgZnVuY3Rpb25zLg0KPiA+ID4gV2UgaGF2ZSB0ZXN0ZWQgdGhlc2UgY2hhbmdl
+cyBvbiB0d28gZGlmZmVyZW50IHBsYXRmb3JtIGFuZCBpdCBpcyB3b3JraW5nLg0KPiA+DQo+ID4g
+VGhlbiBicmluZyBhIHNlY29uZCBJbnRlbCBCbHVldG9vdGggY29udHJvbGxlciBpbnRvIHlvdXIg
+cGxhdGZvcm0gYW5kIHNlZSB3aGF0IGhhcHBlbnMuIE9uZSBjb250cm9sbGVyIGhkZXYtPmh3X3Jl
+c2V0IGNhbiBpbmZsdWVuY2UgdGhlIG90aGVyPw0KPiBGb3IgdGhlIHNlY29uZCBpbnRlbCBibHVl
+dG9vdGggd2lsbCBub3QgYmUgY29ubmVjdGVkIHRvIHRoZSBQbGF0Zm9ybSBHUElPIGFuZCBoZW5j
+ZSB0aGVyZSBpcyBub3QgaW5mbHVlbmNlIG9uIGl0LiBIb3dldmVyIHRoZXJlIGlzIGNoYW5jZSBv
+ZiB0aGUgZmlyc3QgY29udHJvbGxlciB0byBiZSByZXNldC4NCj4gUGxlYXNlIGRvIHN1Z2dlc3Qg
+aG93IGRvIHdlIGRpZmZlcmVudGlhdGUgdGhlIEludGVsIGNvbnRyb2xsZXIgY29ubmVjdGVkIHRv
+IHBsYXRmb3JtIHdpdGggdGhlIG90aGVyLg0KPiA+DQo+ID4gUmVnYXJkcw0KPiA+DQo+ID4gTWFy
+Y2VsDQo+ID4NCj4gVGhhbmtzIGFuZCBSZWdhcmRzDQo+IENoZXRoYW4NCg0KVGhhbmtzDQpSYWdo
+dXJhbQ0K
