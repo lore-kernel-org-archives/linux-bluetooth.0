@@ -1,46 +1,54 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180221192800.254383-1-jkessinger@google.com>
-References: <20180221192800.254383-1-jkessinger@google.com>
+In-Reply-To: <20180904162955.28855-1-tanuk@iki.fi>
+References: <20180904162955.28855-1-tanuk@iki.fi>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 11 Sep 2018 11:11:49 +0300
-Message-ID: <CABBYNZ+zYHmLxKbsqvoRPnWCWmVD8VYY=6eUMwzWwZsOS4n0cA@mail.gmail.com>
-Subject: Re: [PATCH 1/1] sbc: Fix stack overflow read in sbc_crc8.
-To: Joshua Kessinger <jkessinger@google.com>
+Date: Tue, 11 Sep 2018 11:10:23 +0300
+Message-ID: <CABBYNZ+gQ90MOPaOHFsZmKoTjbma-zbDw_bwxskSNnBWa_AGXg@mail.gmail.com>
+Subject: Re: [PATCH][sbc] sbc: fix frame_length and codesize documentation
+To: Tanu Kaskinen <tanuk@iki.fi>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Joshua,
+Hi Tanu,
 
-On Wed, Feb 21, 2018 at 9:28 PM, Joshua Kessinger <jkessinger@google.com> wrote:
-> When encoding or decoding with JOINT_STEREO and 8 subbands the crc_pos is 88
-> bits. In this case there are no extra bits which need to be added to the CRC,
-> but there is still a read 1 byte past the end of the crc_header stack variable.
->
-> Signed-off-by: Joshua Kessinger <jkessinger@google.com>
+On Tue, Sep 4, 2018 at 7:29 PM, Tanu Kaskinen <tanuk@iki.fi> wrote:
+> frame_length is the output block size when encoding and the input block
+> size when decoding, with codesize it's vice versa. The documentation was
+> inaccurate regarding this. Using the terms "compressed" and
+> "uncompressed" instead of "output" and "input" should make the function
+> semantics clear.
 > ---
->  sbc/sbc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  sbc/sbc.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/sbc/sbc.c b/sbc/sbc.c
-> index 606f11c..7f1efaa 100644
-> --- a/sbc/sbc.c
-> +++ b/sbc/sbc.c
-> @@ -190,7 +190,7 @@ static uint8_t sbc_crc8(const uint8_t *data, size_t len)
->         for (i = 0; i < len / 8; i++)
->                 crc = crc_table[crc ^ data[i]];
+> diff --git a/sbc/sbc.h b/sbc/sbc.h
+> index d6f123e..835460a 100644
+> --- a/sbc/sbc.h
+> +++ b/sbc/sbc.h
+> @@ -100,13 +100,13 @@ ssize_t sbc_decode(sbc_t *sbc, const void *input, size_t input_len,
+>  ssize_t sbc_encode(sbc_t *sbc, const void *input, size_t input_len,
+>                         void *output, size_t output_len, ssize_t *written);
 >
-> -       octet = data[i];
-> +       octet = len % 8 ? data[i] : 0;
->         for (i = 0; i < len % 8; i++) {
->                 char bit = ((octet ^ crc) & 0x80) >> 7;
+> -/* Returns the output block size in bytes */
+> +/* Returns the compressed block size in bytes */
+>  size_t sbc_get_frame_length(sbc_t *sbc);
 >
+>  /* Returns the time one input/output block takes to play in msec*/
+>  unsigned sbc_get_frame_duration(sbc_t *sbc);
+>
+> -/* Returns the input block size in bytes */
+> +/* Returns the uncompressed block size in bytes */
+>  size_t sbc_get_codesize(sbc_t *sbc);
+>
+>  const char *sbc_get_implementation_info(sbc_t *sbc);
 > --
+> 2.18.0
 
-Looks like we forgot about this one, it is now applied after removing
-the signed-off-by line.
+Applied, thanks.
+
 
 -- 
 Luiz Augusto von Dentz
