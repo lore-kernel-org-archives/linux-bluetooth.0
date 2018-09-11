@@ -1,72 +1,23 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: SMP: Fix trying to use non-existent local OOB data
-Date: Tue, 11 Sep 2018 14:10:12 +0300
-Message-Id: <20180911111013.2739-2-johan.hedberg@gmail.com>
-In-Reply-To: <20180911111013.2739-1-johan.hedberg@gmail.com>
-References: <20180911111013.2739-1-johan.hedberg@gmail.com>
+Subject: [PATCH 0/2] Bluetooth: Two OOB related fixes
+Date: Tue, 11 Sep 2018 14:10:11 +0300
+Message-Id: <20180911111013.2739-1-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-A remote device may claim that it has received our OOB data, even
-though we never geneated it. Add a new flag to track whether we
-actually have OOB data, and ignore the remote peer's flag if haven't
-generated OOB data.
+Here are two patches fixing handling of local OOB data.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Johan Hedberg (1):
+      Bluetooth: SMP: Fix trying to use non-existent local OOB data
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index ae91e2d40056..9752879fdd3a 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -83,6 +83,7 @@ enum {
- 
- struct smp_dev {
- 	/* Secure Connections OOB data */
-+	bool			local_oob;
- 	u8			local_pk[64];
- 	u8			local_rand[16];
- 	bool			debug_key;
-@@ -599,6 +600,8 @@ int smp_generate_oob(struct hci_dev *hdev, u8 hash[16], u8 rand[16])
- 
- 	memcpy(rand, smp->local_rand, 16);
- 
-+	smp->local_oob = true;
-+
- 	return 0;
- }
- 
-@@ -1785,7 +1788,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	 * successfully received our local OOB data - therefore set the
- 	 * flag to indicate that local OOB is in use.
- 	 */
--	if (req->oob_flag == SMP_OOB_PRESENT)
-+	if (req->oob_flag == SMP_OOB_PRESENT && SMP_DEV(hdev)->local_oob)
- 		set_bit(SMP_FLAG_LOCAL_OOB, &smp->flags);
- 
- 	/* SMP over BR/EDR requires special treatment */
-@@ -1967,7 +1970,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 	 * successfully received our local OOB data - therefore set the
- 	 * flag to indicate that local OOB is in use.
- 	 */
--	if (rsp->oob_flag == SMP_OOB_PRESENT)
-+	if (rsp->oob_flag == SMP_OOB_PRESENT && SMP_DEV(hdev)->local_oob)
- 		set_bit(SMP_FLAG_LOCAL_OOB, &smp->flags);
- 
- 	smp->prsp[0] = SMP_CMD_PAIRING_RSP;
-@@ -3230,6 +3233,7 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
- 		return ERR_CAST(tfm_ecdh);
- 	}
- 
-+	smp->local_oob = false;
- 	smp->tfm_aes = tfm_aes;
- 	smp->tfm_cmac = tfm_cmac;
- 	smp->tfm_ecdh = tfm_ecdh;
--- 
-2.17.1
+Matias Karhumaa (1):
+      Bluetooth: Use correct tfm to generate OOB data
+
+ net/bluetooth/smp.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+Johan
