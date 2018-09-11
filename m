@@ -1,140 +1,168 @@
-Return-Path: <raghuram.hegde@intel.com>
-From: "Hegde, Raghuram" <raghuram.hegde@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>, "Ghorai,
- Sukumar" <sukumar.ghorai@intel.com>, "Bag, Amit K" <amit.k.bag@intel.com>,
-	chethan tn <chethantn@gmail.com>
-Subject: RE: [PATCH 1/2] Bluetooth: btintel: Add platform device for rfkill
- signal
-Date: Tue, 11 Sep 2018 05:13:51 +0000
-Message-ID: <E5FA71999F8E8845A748D0B68F0A4BDF966495@BGSMSX103.gar.corp.intel.com>
-References: <1534844080-31240-1-git-send-email-raghuram.hegde@intel.com>
- <CF4E3B3B-C3A4-4037-A2F1-ECB4B01FAC6D@holtmann.org>
- <CAMH2TCpppynorUSW7bh6Qq-y3p3q38ppSX2Hj0w851+2OtTXZA@mail.gmail.com>
- <3296D1DD-DC70-4685-BDF9-F27576C09F68@holtmann.org>
- <CAMH2TCpMoQShFcAUrsQ_yzcbM4dE1S+akPvoLgda-HfGyhfE=A@mail.gmail.com>
-In-Reply-To: <CAMH2TCpMoQShFcAUrsQ_yzcbM4dE1S+akPvoLgda-HfGyhfE=A@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <chethantn@gmail.com>
 MIME-Version: 1.0
+References: <1534844080-31240-1-git-send-email-raghuram.hegde@intel.com>
+ <CF4E3B3B-C3A4-4037-A2F1-ECB4B01FAC6D@holtmann.org> <CAMH2TCpppynorUSW7bh6Qq-y3p3q38ppSX2Hj0w851+2OtTXZA@mail.gmail.com>
+ <3296D1DD-DC70-4685-BDF9-F27576C09F68@holtmann.org>
+In-Reply-To: <3296D1DD-DC70-4685-BDF9-F27576C09F68@holtmann.org>
+From: chethan tn <chethantn@gmail.com>
+Date: Tue, 11 Sep 2018 10:15:21 +0530
+Message-ID: <CAMH2TCpMoQShFcAUrsQ_yzcbM4dE1S+akPvoLgda-HfGyhfE=A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: btintel: Add platform device for rfkill signal
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Raghuram Hegde <raghuram.hegde@intel.com>, linux-bluetooth@vger.kernel.org,
+	chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com,
+	amit.k.bag@intel.com
+Content-Type: text/plain; charset="UTF-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KPiBIaSBNYXJjZWwsDQoNCj4gT24gVHVlLCBBdWcgMjEsIDIwMTggYXQgODoz
-OSBQTSBNYXJjZWwgSG9sdG1hbm4gPG1hcmNlbEBob2x0bWFubi5vcmc+IHdyb3RlOg0KPiA+DQo+
-ID4gSGkgQ2hldGhhbiwNCj4gPg0KPiA+ID4+PiBEcml2ZXIgdG8gYWRkIElOVEw2MjA1IHBsYXRm
-b3JtIEFDUEkgZGV2aWNlIHRvIGVuYWJsZSBvdXQgb2YgYmFuZCANCj4gPiA+Pj4gR1BJTyBzaWdu
-YWxsaW5nIHRvIGhhbmRsZSByZmtpbGwgYW5kIHJlc2V0IHRoZSBibHVldG9vdGggDQo+ID4+PiBj
-b250cm9sbGVyLiBFeHBvc2UgYW4gaW50ZXJmYWNlIGluIGtlcm5lbCB0byBhc3NlcnQgR1BJTyBz
-aWduYWwuDQo+ID4gPj4+DQo+ID4gPj4+IFNpZ25lZC1vZmYtYnk6IENoZXRoYW4gVCBOIDxjaGV0
-aGFuLnR1bWt1ci5uYXJheWFuQGludGVsLmNvbT4NCj4gPiA+Pj4gU2lnbmVkLW9mZi1ieTogU3Vr
-dW1hciBHaG9yYWkgPHN1a3VtYXIuZ2hvcmFpQGludGVsLmNvbT4NCj4gPiA+Pj4gU2lnbmVkLW9m
-Zi1ieTogUmFnaHVyYW0gSGVnZGUgPHJhZ2h1cmFtLmhlZ2RlQGludGVsLmNvbT4NCj4gPiA+Pj4g
-LS0tDQo+ID4gPj4+IGRyaXZlcnMvYmx1ZXRvb3RoL2J0aW50ZWwuYyB8IDY4IA0KPiA+ID4+PiAr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gPiA+Pj4gZHJp
-dmVycy9ibHVldG9vdGgvYnRpbnRlbC5oIHwgIDYgKysrKw0KPiA+ID4+PiAyIGZpbGVzIGNoYW5n
-ZWQsIDc0IGluc2VydGlvbnMoKykNCj4gPiA+Pj4NCj4gPiA+Pj4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvYmx1ZXRvb3RoL2J0aW50ZWwuYyANCj4gPiA+Pj4gYi9kcml2ZXJzL2JsdWV0b290aC9idGlu
-dGVsLmMgaW5kZXggNTI3MGQ1NTEzMjAxLi41MzhjZDZiNmM1MjQgDQo+ID4gPj4+IDEwMDY0NA0K
-PiA+ID4+PiAtLS0gYS9kcml2ZXJzL2JsdWV0b290aC9idGludGVsLmMNCj4gPiA+Pj4gKysrIGIv
-ZHJpdmVycy9ibHVldG9vdGgvYnRpbnRlbC5jDQo+ID4gPj4+IEBAIC0yNCw2ICsyNCw5IEBADQo+
-ID4gPj4+ICNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4NCj4gPiA+Pj4gI2luY2x1ZGUgPGxpbnV4
-L2Zpcm13YXJlLmg+DQo+ID4gPj4+ICNpbmNsdWRlIDxsaW51eC9yZWdtYXAuaD4NCj4gPiA+Pj4g
-KyNpbmNsdWRlIDxsaW51eC9hY3BpLmg+DQo+ID4gPj4+ICsjaW5jbHVkZSA8bGludXgvcGxhdGZv
-cm1fZGV2aWNlLmg+ICNpbmNsdWRlIA0KPiA+ID4+PiArPGxpbnV4L2dwaW8vY29uc3VtZXIuaD4N
-Cj4gPiA+Pj4gI2luY2x1ZGUgPGFzbS91bmFsaWduZWQuaD4NCj4gPiA+Pj4NCj4gPiA+Pj4gI2lu
-Y2x1ZGUgPG5ldC9ibHVldG9vdGgvYmx1ZXRvb3RoLmg+IEBAIC0zNzUsNiArMzc4LDcxIEBAIGlu
-dCANCj4gPiA+Pj4gYnRpbnRlbF9yZWFkX3ZlcnNpb24oc3RydWN0IGhjaV9kZXYgKmhkZXYsIHN0
-cnVjdCBpbnRlbF92ZXJzaW9uIA0KPiA+ID4+PiAqdmVyKSB9IEVYUE9SVF9TWU1CT0xfR1BMKGJ0
-aW50ZWxfcmVhZF92ZXJzaW9uKTsNCj4gPiA+Pj4NCj4gPiA+Pj4gK3N0YXRpYyBzdHJ1Y3QgZ3Bp
-b19kZXNjICpyZXNldF9ncGlvX2hhbmRsZXI7DQo+ID4gPj4NCj4gPiA+PiB0aGlzIHRoaW5nIGlz
-IHNvIGluaGVyZW50IGJyb2tlbi4gUGxlYXNlIG5ldmVyIGV2ZXIgZG8gdGhhdC4gSWYgdGhlcmUg
-YXJlIHR3byByZXNldCBoYW5kbGVycyBvciB0d28gSW50ZWwgVVNCIGRldmljZXMgY29ubmVjdGVk
-IHRoaW5ncyB3aWxsIGdvIGhvcnJpYmxlIHdyb25nLg0KPiA+ID4gSXMgaXQgZmluZSB0byBrZWVw
-IGxpc3Qgb2YgdGhlIGRlc2NyaXB0b3JzIGhhbmRsZXJzIGZvciBhbGwgdGhlIA0KPiA+ID4gSW50
-ZWwgZGV2aWNlcyBjb25uZWN0ZWQ/DQo+ID4gPj4NCj4gPiA+Pj4gK3ZvaWQgYnRpbnRlbF9yZXNl
-dF9idChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgdW5zaWduZWQgY2hhciBjb2RlKSB7DQo+ID4gPj4+
-ICsgICAgIGlmICghcmVzZXRfZ3Bpb19oYW5kbGVyKQ0KPiA+ID4+PiArICAgICAgICAgICAgIHJl
-dHVybjsNCj4gPiA+Pj4gKw0KPiA+ID4+PiArICAgICBncGlvZF9zZXRfdmFsdWUocmVzZXRfZ3Bp
-b19oYW5kbGVyLCAwKTsNCj4gPiA+Pj4gKyAgICAgbWRlbGF5KDEwMCk7DQo+ID4gPj4+ICsgICAg
-IGdwaW9kX3NldF92YWx1ZShyZXNldF9ncGlvX2hhbmRsZXIsIDEpOyB9IA0KPiA+ID4+PiArRVhQ
-T1JUX1NZTUJPTF9HUEwoYnRpbnRlbF9yZXNldF9idCk7DQo+ID4gPj4NCj4gPiA+PiBXaGF0IGhh
-cHBlbnMgaGVyZSB3aGVuIHlvdSBkbyB0aGlzPyBEb2VzIHRoZSBCbHVldG9vdGggVVNCIGRldmlj
-ZSBkaXNjb25uZWN0IGZyb20gdGhlIFVTQiBidXMgYW5kIGdldHMgcmUtZW51bWVyYXRlZCBhbmQg
-dGhlIGJ0dXNiX3Byb2JlKCkgcm91dGluZSBnZXRzIGNhbGxlZCBhZ2Fpbj8NCj4gPiA+IFllcywg
-VVNCIHJlLWVudW1lcmF0aW9uIHdpbGwgYmUgZG9uZSBhbmQgYnR1c2JfcHJvYmxlKCkgZnVuY3Rp
-b24gd2lsbCBiZSBjYWxsZWQuDQo+ID4NCj4gPiBBcyBJIHNhaWQsIGluIHRoYXQgY2FzZSBpdCBp
-cyBmaW5lIHRvIGltcGxlbWVudCB0aGlzIGFuIFJGS0lMTCBzd2l0Y2guIEl0IGlzIHBsYXRmb3Jt
-IFJGS0lMTCBzd2l0Y2guIFRoZSBVU0IgZGV2aWNlIGFjdHVhbGx5IGdldHMgdmlydHVhbGx5IGRp
-c2Nvbm5lY3RlZC4NCj4gPg0KPiA+ID4+DQo+ID4gPj4gSWYgdGhpcyBpcyB0aGUgY2FzZSwgdGhl
-biBJIGhhdmUgbm8gaWRlYSBob3cgbWFueSB0aW1lcyBJIGhhdmUgdG8gZXhwbGFpbi4gSXQgaXMg
-YSBwbGF0ZnJvbSByZXNldCBzd2l0Y2ggYW5kIHVzaW5nIFJGS0lMTCBmb3IgdGhpcyBpcyBhY2Nl
-cHRhYmxlLg0KPiA+ID4gVGhvdWdodCBvZiBtYWtlIHRoaXMgcGxhdGZvcm0gaW5kZXBlbmRlbnQg
-YnkgZXhwb3NpbmcgQUNQSSBvYmplY3QgDQo+ID4gPiAiSU5UTDYyMDUiLCBieSBkb2luZyBzbyBp
-biBjYXNlIGRpZmZlcmVudCBwbGF0Zm9ybXMgaWYgdGhlIEFDUEkgDQo+ID4gPiBvYmplY3QgaXMg
-ZXhwb3NlZCBieSB0aGUgcGxhdGZvcm0gdGhlbiB0aGlzIGRyaXZlciB3b3VsZCBiZSBsb2FkZWQu
-DQo+ID4gPiBLaW5kbHkgcGxlYXNlIGRvIHN1Z2dlc3QuDQo+ID4NCj4gPiBTZWUgYWJvdmUuIEkg
-cmVhbGx5IGRvbid0IGtub3cgd2hhdCBlbHNlIHRvIHNheS4gWW91IGNhbiBub3QgaGFuZGxlIHRo
-aXMgaW5zaWRlIGhjaV9kZXYgc2luY2UgdGhlIGhjaV9kZXYgd2lsbCBiZSBhY3R1YWxseSBkZXN0
-cm95ZWQgaWYgeW91IHB1bGwgdGhlIEdQSU8uDQo+IFBsZWFzZSBub3RlIHRoYXQgdGhlIGltcGxl
-bWVudGF0aW9uIGlzIHNpbWlsYXIgdG8gdGhlIFJGIGtpbGwgc3dpdGNoLCBqdXN0IHRoYXQgaXRz
-IGltcGxlbWVudGVkIGluIGJ0aW50ZWwuYy4gT3VyIHVuZGVyc3RhbmRpbmcgaXMgaGNpX2RldiBk
-b2VzIGV4aXN0IHdoZW4gR1BJTyB0b2dnbGUgaGFzIHRvIGJlIGRvbmUsIG9ubHkgYWZ0ZXIgdGhh
-dCB3aWxsIGJlIGRlc3Ryb3llZC4NCj4gTGF0ZXIgYWdhaW4gaGNpX2RldiB3b3VsZCBiZSBjcmVh
-dGVkIGFuZCB0aGUgaGRldi0+aHdfcmVzZXQgc2hhbGwgYmUgcmUtYXNzaWduZWQuDQo+IEFzIHlv
-dSBzdWdnZXN0IGlmIGl0cyBub3QgdG8gYmUgaW5jbHVkZWQgaW4gaGNpX2RldiwgY291bGQgeW91
-IHBsZWFzZSBsZXQgdXMga25vdyBob3cgdG8gaW52b2tlIHRoZSBHUElPIHRvZ2dsZSB3aXRob3V0
-IHJlZ2lzdGVyaW5nIHRoZSBjYWxsYmFjayhoZGV2LT5od19yZXNldCkuDQo+DQpXZSBoYXZlIGV4
-cGxvcmVkIHJlZ2lzdGVyaW5nIHRoZSAnSU5UTDYyMDUnIEFDUEkgb2JqZWN0IHRocm91Z2ggUmZr
-aWxsIGRyaXZlciBhbmQgaW1wbGVtZW50aW5nIEdQSU8gdG9nZ2xlIGluIHRoZSAnLnNldF9ibG9j
-aycgZnVuY3Rpb24gb2YgUmZraWxsLiBCdXQsIHdlIGFyZSBzdHVjayBpbiBob3cgdG8gaW52b2tl
-IHRoZSAnLnNldF9ibG9jaycgZnVuY3Rpb24gZnJvbSBoY2lfY29yZSwNCndoZW5ldmVyIHRoZXJl
-IGlzIGEgSENJIGNvbW1hbmQgdGltZW91dC4gQ291bGQgeW91IHBsZWFzZSBwcm92aWRlIHNvbWUg
-cG9pbnRlcnMgb24gaG93IHRvIGltcGxlbWVudCB0aGlzLg0KPiA+ID4+DQo+ID4gPj4+ICsNCj4g
-PiA+Pj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9ncGlvX3BhcmFtcyByZXNldF9ncGlvcyA9
-IHsgMCwgMCwgZmFsc2UgDQo+ID4gPj4+ICt9OyBzdGF0aWMgY29uc3Qgc3RydWN0IGFjcGlfZ3Bp
-b19tYXBwaW5nIGFjcGlfYnRpbnRlbF9ncGlvc1tdID0gew0KPiA+ID4+PiArICAgICB7ICJyZXNl
-dC1ncGlvcyIsICZyZXNldF9ncGlvcywgMSB9LA0KPiA+ID4+PiArICAgICB7IH0sDQo+ID4gPj4+
-ICt9Ow0KPiA+ID4+PiArDQo+ID4gPj4+ICtzdGF0aWMgaW50IGJ0aW50ZWxfcHJvYmUoc3RydWN0
-IHBsYXRmb3JtX2RldmljZSAqcGRldikgew0KPiA+ID4+PiArICAgICBzdHJ1Y3QgZGV2aWNlICpo
-ZGV2Ow0KPiA+ID4+PiArDQo+ID4gPj4+ICsgICAgIGhkZXYgPSBkZXZtX2t6YWxsb2MoJnBkZXYt
-PmRldiwgc2l6ZW9mKCpoZGV2KSwgR0ZQX0tFUk5FTCk7DQo+ID4gPj4+ICsgICAgIGlmICghaGRl
-dikNCj4gPiA+Pj4gKyAgICAgICAgICAgICByZXR1cm4gLUVOT01FTTsNCj4gPiA+Pg0KPiA+ID4+
-IFdoYXQgaXMgdGhpcyBkb2luZy4gVGhpcyBtYWtlcyBubyBzZW5zZS4NCj4gPiA+Pg0KPiA+ID4+
-PiArDQo+ID4gPj4+ICsgICAgIGlmICghQUNQSV9IQU5ETEUoJnBkZXYtPmRldikpDQo+ID4gPj4+
-ICsgICAgICAgICAgICAgcmV0dXJuIC1FTk9ERVY7DQo+ID4gPj4+ICsNCj4gPiA+Pj4gKyAgICAg
-aWYgKGFjcGlfZGV2X2FkZF9kcml2ZXJfZ3Bpb3MoQUNQSV9DT01QQU5JT04oJnBkZXYtPmRldiks
-DQo+ID4gPj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYWNwaV9idGludGVs
-X2dwaW9zKSkNCj4gPiA+Pj4gKyAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPiA+Pj4g
-Kw0KPiA+ID4+PiArICAgICByZXNldF9ncGlvX2hhbmRsZXIgPSBkZXZtX2dwaW9kX2dldF9vcHRp
-b25hbCgmcGRldi0+ZGV2LA0KPiA+ID4+PiArICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICJyZXNldCIsIEdQSU9EX09VVF9ISUdIKTsNCj4gPiA+Pj4gKyAgICAgaWYgKElTX0VS
-UihyZXNldF9ncGlvX2hhbmRsZXIpKQ0KPiA+ID4+PiArICAgICAgICAgICAgIHJldHVybiBQVFJf
-RVJSKHJlc2V0X2dwaW9faGFuZGxlcik7DQo+ID4gPj4+ICsNCj4gPiA+Pj4gKyAgICAgcmV0dXJu
-IDA7DQo+ID4gPj4+ICt9DQo+ID4gPj4+ICsNCj4gPiA+Pj4gK3N0YXRpYyBpbnQgYnRpbnRlbF9y
-ZW1vdmUoc3RydWN0IHBsYXRmb3JtX2RldmljZSAqcGRldikgew0KPiA+ID4+PiArICAgICBhY3Bp
-X2Rldl9yZW1vdmVfZHJpdmVyX2dwaW9zKEFDUElfQ09NUEFOSU9OKCZwZGV2LT5kZXYpKTsNCj4g
-PiA+Pj4gKyAgICAgcmV0dXJuIDA7DQo+ID4gPj4+ICt9DQo+ID4gPj4+ICsNCj4gPiA+Pj4gKyNp
-ZmRlZiBDT05GSUdfQUNQSQ0KPiA+ID4+PiArc3RhdGljIGNvbnN0IHN0cnVjdCBhY3BpX2Rldmlj
-ZV9pZCBidGludGVsX2FjcGlfbWF0Y2hbXSA9IHsNCj4gPiA+Pj4gKyAgICAgeyAiSU5UTDYyMDUi
-LCAwIH0sDQo+ID4gPj4+ICsgICAgIHsgfSwNCj4gPiA+Pj4gK307DQo+ID4gPj4+ICtNT0RVTEVf
-REVWSUNFX1RBQkxFKGFjcGksIGJ0aW50ZWxfYWNwaV9tYXRjaCk7ICNlbmRpZg0KPiA+ID4+PiAr
-DQo+ID4gPj4+ICtzdGF0aWMgc3RydWN0IHBsYXRmb3JtX2RyaXZlciBidGludGVsX2RyaXZlciA9
-IHsNCj4gPiA+Pj4gKyAgICAgLnByb2JlID0gYnRpbnRlbF9wcm9iZSwNCj4gPiA+Pj4gKyAgICAg
-LnJlbW92ZSA9IGJ0aW50ZWxfcmVtb3ZlLA0KPiA+ID4+PiArICAgICAuZHJpdmVyID0gew0KPiA+
-ID4+PiArICAgICAgICAgICAgIC5uYW1lID0gImJ0aW50ZWwiLA0KPiA+ID4+PiArICAgICAgICAg
-ICAgIC5hY3BpX21hdGNoX3RhYmxlID0gQUNQSV9QVFIoYnRpbnRlbF9hY3BpX21hdGNoKSwNCj4g
-PiA+Pj4gKyAgICAgfSwNCj4gPiA+Pj4gK307DQo+ID4gPj4+ICttb2R1bGVfcGxhdGZvcm1fZHJp
-dmVyKGJ0aW50ZWxfZHJpdmVyKTsNCj4gPiA+Pg0KPiA+ID4+IEkgYW0gbm90IGNvbnZpbmNlZCB0
-aGlzIGFjdHVhbGx5IHdvcmtzIHNpbmNlIG5vdyB3ZSBoYXZlIHR3byBtb2R1bGVfaW5pdCBhbmQg
-bW9kdWxlX2V4aXQgZnVuY3Rpb25zLg0KPiA+ID4gV2UgaGF2ZSB0ZXN0ZWQgdGhlc2UgY2hhbmdl
-cyBvbiB0d28gZGlmZmVyZW50IHBsYXRmb3JtIGFuZCBpdCBpcyB3b3JraW5nLg0KPiA+DQo+ID4g
-VGhlbiBicmluZyBhIHNlY29uZCBJbnRlbCBCbHVldG9vdGggY29udHJvbGxlciBpbnRvIHlvdXIg
-cGxhdGZvcm0gYW5kIHNlZSB3aGF0IGhhcHBlbnMuIE9uZSBjb250cm9sbGVyIGhkZXYtPmh3X3Jl
-c2V0IGNhbiBpbmZsdWVuY2UgdGhlIG90aGVyPw0KPiBGb3IgdGhlIHNlY29uZCBpbnRlbCBibHVl
-dG9vdGggd2lsbCBub3QgYmUgY29ubmVjdGVkIHRvIHRoZSBQbGF0Zm9ybSBHUElPIGFuZCBoZW5j
-ZSB0aGVyZSBpcyBub3QgaW5mbHVlbmNlIG9uIGl0LiBIb3dldmVyIHRoZXJlIGlzIGNoYW5jZSBv
-ZiB0aGUgZmlyc3QgY29udHJvbGxlciB0byBiZSByZXNldC4NCj4gUGxlYXNlIGRvIHN1Z2dlc3Qg
-aG93IGRvIHdlIGRpZmZlcmVudGlhdGUgdGhlIEludGVsIGNvbnRyb2xsZXIgY29ubmVjdGVkIHRv
-IHBsYXRmb3JtIHdpdGggdGhlIG90aGVyLg0KPiA+DQo+ID4gUmVnYXJkcw0KPiA+DQo+ID4gTWFy
-Y2VsDQo+ID4NCj4gVGhhbmtzIGFuZCBSZWdhcmRzDQo+IENoZXRoYW4NCg0KVGhhbmtzDQpSYWdo
-dXJhbQ0K
+Hi Marcel,
+
+On Tue, Aug 21, 2018 at 8:39 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Chethan,
+>
+> >>> Driver to add INTL6205 platform ACPI device to enable out
+> >>> of band GPIO signalling to handle rfkill and reset the
+> >>> bluetooth controller. Expose an interface in kernel to
+> >>> assert GPIO signal.
+> >>>
+> >>> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> >>> Signed-off-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
+> >>> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+> >>> ---
+> >>> drivers/bluetooth/btintel.c | 68 +++++++++++++++++++++++++++++++++++++++++++++
+> >>> drivers/bluetooth/btintel.h |  6 ++++
+> >>> 2 files changed, 74 insertions(+)
+> >>>
+> >>> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> >>> index 5270d5513201..538cd6b6c524 100644
+> >>> --- a/drivers/bluetooth/btintel.c
+> >>> +++ b/drivers/bluetooth/btintel.c
+> >>> @@ -24,6 +24,9 @@
+> >>> #include <linux/module.h>
+> >>> #include <linux/firmware.h>
+> >>> #include <linux/regmap.h>
+> >>> +#include <linux/acpi.h>
+> >>> +#include <linux/platform_device.h>
+> >>> +#include <linux/gpio/consumer.h>
+> >>> #include <asm/unaligned.h>
+> >>>
+> >>> #include <net/bluetooth/bluetooth.h>
+> >>> @@ -375,6 +378,71 @@ int btintel_read_version(struct hci_dev *hdev, struct intel_version *ver)
+> >>> }
+> >>> EXPORT_SYMBOL_GPL(btintel_read_version);
+> >>>
+> >>> +static struct gpio_desc *reset_gpio_handler;
+> >>
+> >> this thing is so inherent broken. Please never ever do that. If there are two reset handlers or two Intel USB devices connected things will go horrible wrong.
+> > Is it fine to keep list of the descriptors handlers for all the Intel
+> > devices connected?
+> >>
+> >>> +void btintel_reset_bt(struct hci_dev *hdev, unsigned char code)
+> >>> +{
+> >>> +     if (!reset_gpio_handler)
+> >>> +             return;
+> >>> +
+> >>> +     gpiod_set_value(reset_gpio_handler, 0);
+> >>> +     mdelay(100);
+> >>> +     gpiod_set_value(reset_gpio_handler, 1);
+> >>> +}
+> >>> +EXPORT_SYMBOL_GPL(btintel_reset_bt);
+> >>
+> >> What happens here when you do this? Does the Bluetooth USB device disconnect from the USB bus and gets re-enumerated and the btusb_probe() routine gets called again?
+> > Yes, USB re-enumeration will be done and btusb_proble() function will be called.
+>
+> As I said, in that case it is fine to implement this an RFKILL switch. It is platform RFKILL switch. The USB device actually gets virtually disconnected.
+>
+> >>
+> >> If this is the case, then I have no idea how many times I have to explain. It is a platfrom reset switch and using RFKILL for this is acceptable.
+> > Thought of make this platform independent by exposing ACPI object
+> > "INTL6205", by doing so in case different platforms if the ACPI object
+> > is exposed by the platform then this driver would be loaded.
+> > Kindly please do suggest.
+>
+> See above. I really don't know what else to say. You can not handle this inside hci_dev since the hci_dev will be actually destroyed if you pull the GPIO.
+Please note that the implementation is similar to the RF kill switch,
+just that its implemented in btintel.c. Our understanding is hci_dev
+does exist when GPIO toggle has to be done, only after that will be
+destroyed.
+Later again hci_dev would be created and the hdev->hw_reset shall be
+re-assigned.
+As you suggest if its not to be included in hci_dev, could you please
+let us know how to invoke the GPIO toggle without registering the
+callback(hdev->hw_reset).
+>
+> >>
+> >>> +
+> >>> +static const struct acpi_gpio_params reset_gpios = { 0, 0, false };
+> >>> +static const struct acpi_gpio_mapping acpi_btintel_gpios[] = {
+> >>> +     { "reset-gpios", &reset_gpios, 1 },
+> >>> +     { },
+> >>> +};
+> >>> +
+> >>> +static int btintel_probe(struct platform_device *pdev)
+> >>> +{
+> >>> +     struct device *hdev;
+> >>> +
+> >>> +     hdev = devm_kzalloc(&pdev->dev, sizeof(*hdev), GFP_KERNEL);
+> >>> +     if (!hdev)
+> >>> +             return -ENOMEM;
+> >>
+> >> What is this doing. This makes no sense.
+> >>
+> >>> +
+> >>> +     if (!ACPI_HANDLE(&pdev->dev))
+> >>> +             return -ENODEV;
+> >>> +
+> >>> +     if (acpi_dev_add_driver_gpios(ACPI_COMPANION(&pdev->dev),
+> >>> +                                  acpi_btintel_gpios))
+> >>> +             return -EINVAL;
+> >>> +
+> >>> +     reset_gpio_handler = devm_gpiod_get_optional(&pdev->dev,
+> >>> +                                     "reset", GPIOD_OUT_HIGH);
+> >>> +     if (IS_ERR(reset_gpio_handler))
+> >>> +             return PTR_ERR(reset_gpio_handler);
+> >>> +
+> >>> +     return 0;
+> >>> +}
+> >>> +
+> >>> +static int btintel_remove(struct platform_device *pdev)
+> >>> +{
+> >>> +     acpi_dev_remove_driver_gpios(ACPI_COMPANION(&pdev->dev));
+> >>> +     return 0;
+> >>> +}
+> >>> +
+> >>> +#ifdef CONFIG_ACPI
+> >>> +static const struct acpi_device_id btintel_acpi_match[] = {
+> >>> +     { "INTL6205", 0 },
+> >>> +     { },
+> >>> +};
+> >>> +MODULE_DEVICE_TABLE(acpi, btintel_acpi_match);
+> >>> +#endif
+> >>> +
+> >>> +static struct platform_driver btintel_driver = {
+> >>> +     .probe = btintel_probe,
+> >>> +     .remove = btintel_remove,
+> >>> +     .driver = {
+> >>> +             .name = "btintel",
+> >>> +             .acpi_match_table = ACPI_PTR(btintel_acpi_match),
+> >>> +     },
+> >>> +};
+> >>> +module_platform_driver(btintel_driver);
+> >>
+> >> I am not convinced this actually works since now we have two module_init and module_exit functions.
+> > We have tested these changes on two different platform and it is working.
+>
+> Then bring a second Intel Bluetooth controller into your platform and see what happens. One controller hdev->hw_reset can influence the other?
+For the second intel bluetooth will not be connected to the Platform
+GPIO and hence there is not influence on it. However there is chance
+of the first controller to be reset.
+Please do suggest how do we differentiate the Intel controller
+connected to platform with the other.
+>
+> Regards
+>
+> Marcel
+>
+Thanks and Regards
+Chethan
