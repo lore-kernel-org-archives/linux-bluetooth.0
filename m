@@ -1,216 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Hunt, Preston" <preston.hunt@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH BlueZ] test/example-advertisement: add shutdown code
+Date: Wed, 12 Sep 2018 14:57:34 +0000
+Message-ID: <DBD047A0-7CFC-4A66-B721-6BDC717D644A@intel.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20180829182555.23712-1-inga.stotland@intel.com> <CABBYNZKMLXhiKRWg4KQ3RAePQ9r3LZ0KsXy4tWVpz7Tu4h4oUg@mail.gmail.com>
-In-Reply-To: <CABBYNZKMLXhiKRWg4KQ3RAePQ9r3LZ0KsXy4tWVpz7Tu4h4oUg@mail.gmail.com>
-From: Raul Piper <raulpblooper@gmail.com>
-Date: Wed, 12 Sep 2018 23:03:00 +0530
-Message-ID: <CAEwN+MBr=T+QS+bgBTymtc5SJj4nukkhzJsm_WXRy9HBo+1Ghg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v5] tools/meshctl: Fix default directory for JSON files
-To: luiz.dentz@gmail.com
-Cc: "Stotland, Inga" <inga.stotland@intel.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello ,
-On Fri, Aug 31, 2018 at 7:57 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Inga,
->
-> On Wed, Aug 29, 2018 at 9:25 PM, Inga Stotland <inga.stotland@intel.com> wrote:
-> > This fixes the name of default directory that contains sample JSON files.
-> > README file is updated to describe the default location.
-> > ---
-> >  tools/mesh/README | 19 +++++++++++++-
-> >  tools/meshctl.c   | 65 ++++++++++++++++++++++++++++++++---------------
-> >  2 files changed, 62 insertions(+), 22 deletions(-)
-> >
-> > diff --git a/tools/mesh/README b/tools/mesh/README
-> > index ea561efc8..44d633313 100644
-> > --- a/tools/mesh/README
-> > +++ b/tools/mesh/README
-> > @@ -1,5 +1,5 @@
-> >  MeshCtl - BlueZ GATT based Bluetooth Mesh Provisioner
-> > -******************************************
-> > +*****************************************************
-> >
-> >  Copyright (C) 2017  Intel Corporation. All rights reserved.
-> >
-> > @@ -16,6 +16,23 @@ Configuration and options
-> >
-> >                 Build meshctl and other Bluetooth Mesh based tools and utils
-> >
-> > +Example configuration files
-> > +===========================
-> > +
-> > +The MeshCtl tool requires two input configuration files in JSON format:
-> > +       - local_node.json
-> > +               Local mesh node configuration
-> > +       - prov_db.json
-> > +               Provisoner's database for all the configured nodes in the mesh
-> > +
-> > +The default directory for MeshCtl configuration files is
-> > +/home/<username>/.config/meshctl
-> > +
-> > +To use .json configuration files either copy them to the default directory
-> > +or, to specify a custom storage directory, run meshctl tool as:
-> > +
-> > +       meshctl -c <config_dir_name>
-> > +
-> >  Information
-> >  ===========
-> >
-> > diff --git a/tools/meshctl.c b/tools/meshctl.c
-> > index 3e1484f61..55e25a56e 100644
-> > --- a/tools/meshctl.c
-> > +++ b/tools/meshctl.c
-> > @@ -72,6 +72,8 @@
-> >  #define MESH_PROXY_DATA_IN_UUID_STR    "00002add-0000-1000-8000-00805f9b34fb"
-> >  #define MESH_PROXY_DATA_OUT_UUID_STR   "00002ade-0000-1000-8000-00805f9b34fb"
-> >
-> > +#define MESHCTL_CONFIG_DIR     "meshctl"
-> > +
-> >  static DBusConnection *dbus_conn;
-> >
-> >  struct adapter {
-> > @@ -1873,7 +1875,7 @@ static const struct bt_shell_menu main_menu = {
-> >         { } },
-> >  };
-> >
-> > -static const char *mesh_config_dir;
-> > +static const char *config_dir;
-> >
-> >  static const struct option options[] = {
-> >         { "config",     required_argument, 0, 'c' },
-> > @@ -1881,7 +1883,7 @@ static const struct option options[] = {
-> >  };
-> >
-> >  static const char **optargs[] = {
-> > -       &mesh_config_dir
-> > +       &config_dir
-> >  };
-> >
-> >  static const char *help[] = {
-> > @@ -1907,38 +1909,57 @@ int main(int argc, char *argv[])
-> >         int status;
-> >         int len;
-> >         int extra;
-> > +       char *mesh_dir = NULL;
-> >
-> >         bt_shell_init(argc, argv, &opt);
-> >         bt_shell_set_menu(&main_menu);
-> >         bt_shell_set_prompt(PROMPT_OFF);
-> >
-> > -       if (!mesh_config_dir) {
-> > -               bt_shell_printf("Local config directory not provided.\n");
-> > -               mesh_config_dir = "";
-> > +       if (!config_dir) {
-> > +               char *home;
-> > +
-> > +               home = getenv("XDG_CONFIG_HOME");
-> > +               if (home) {
-> > +                       mesh_dir = g_strdup_printf("%s/%s", home,
-> > +                                                       MESHCTL_CONFIG_DIR);
-> > +               }
-> > +
-> > +               if (!mesh_dir) {
-> > +                       home = getenv("HOME");
-> > +                       mesh_dir = g_strdup_printf("%s/.config/%s", home,
-> > +                                                       MESHCTL_CONFIG_DIR);
-> > +               }
-> > +
-> > +               if (!mesh_dir) {
-> > +                       g_printerr("Configuration directory not found\n");
-> > +                       goto fail;
-> > +               }
-> > +
-> >         } else {
-> > -               bt_shell_printf("Reading prov_db.json and local_node.json from"
-> > -                               " %s\n", mesh_config_dir);
-> > +               mesh_dir = g_strdup_printf("%s", config_dir);
-> >         }
-> >
-> > -       len = strlen(mesh_config_dir);
-> > -       if (len && mesh_config_dir[len - 1] != '/') {
-> > +
-> > +       g_print("Reading prov_db.json and local_node.json from %s directory\n",
-> > +                                                               mesh_dir);
-> > +
-> > +       len = strlen(mesh_dir);
-> > +
-> > +       if (len && mesh_dir[len - 1] != '/')
-> >                 extra = 1;
-> > -               bt_shell_printf("mesh_config_dir[%d] %s\n", len,
-> > -                                               &mesh_config_dir[len - 1]);
-> > -       } else {
-> > +       else
-> >                 extra = 0;
-> > -       }
-> > +
-> >         mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
-> >                                                                         + 2);
-> >         if (!mesh_local_config_filename)
-> >                 goto fail;
-> >
-> >         mesh_prov_db_filename = g_malloc(len + strlen("prov_db.json") + 2);
-> > -       if (!mesh_prov_db_filename) {
-> > +       if (!mesh_prov_db_filename)
-> >                 goto fail;
-> > -       }
-> >
-> > -       sprintf(mesh_local_config_filename, "%s", mesh_config_dir);
-> > +       sprintf(mesh_local_config_filename, "%s", mesh_dir);
-> >
-> >         if (extra)
-> >                 sprintf(mesh_local_config_filename + len , "%c", '/');
-> > @@ -1946,7 +1967,6 @@ int main(int argc, char *argv[])
-> >         sprintf(mesh_local_config_filename + len + extra, "%s",
-> >                                                         "local_node.json");
-> >         len = len + extra + strlen("local_node.json");
-> > -       sprintf(mesh_local_config_filename + len, "%c", '\0');
-> >
-> >         if (!prov_db_read_local_node(mesh_local_config_filename, true)) {
-> >                 g_printerr("Failed to parse local node configuration file %s\n",
-> > @@ -1954,14 +1974,15 @@ int main(int argc, char *argv[])
-> >                 goto fail;
-> >         }
-> >
-> > -       sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
-> > -       len = strlen(mesh_config_dir);
-> > +       sprintf(mesh_prov_db_filename, "%s", mesh_dir);
-> > +       len = strlen(mesh_dir);
-> > +
-> > +       g_free(mesh_dir);
-> > +
-> >         if (extra)
-> >                 sprintf(mesh_prov_db_filename + len , "%c", '/');
-> >
-> >         sprintf(mesh_prov_db_filename + len + extra, "%s", "prov_db.json");
-> > -       sprintf(mesh_prov_db_filename + len + extra + strlen("prov_db.json"),
-> > -                                                               "%c", '\0');
-> >
-> >         if (!prov_db_read(mesh_prov_db_filename)) {
-> >                 g_printerr("Failed to parse provisioning database file %s\n",
-> > @@ -2006,5 +2027,7 @@ int main(int argc, char *argv[])
-> >
-> >  fail:
-> >         bt_shell_cleanup();
-> > +       g_free(mesh_dir);
-> > +
-> >         return EXIT_FAILURE;
-> >  }
-> > --
-> > 2.17.1
->
-> Applied, thanks.
->
->
-> --
-> Luiz Augusto von Dentz
-
-Is there a PB_ADV support in meshctl for provisioning?If not any plan in future?
-
-Br,
-Rp
+VGhlIHByZXZpb3VzIHNhbXBsZSBjb2RlIGRpZCBub3QgcmVsZWFzZSBhbGwgcmVzb3VyY2VzIHdo
+ZW4gc2h1dHRpbmcNCmRvd24uIFRoaXMgaXMgZmluZSB3aGVuIGl0J3MgYSBzdGFuZGFsb25lIHBy
+b2dyYW0gc2luY2UgUHl0aG9uIHdpbGwgZnJlZQ0KYWxsIHJlc291cmNlcyBhdXRvbWF0aWNhbGx5
+IHdoZW4gdGhlIHByb2Nlc3MgdGVybWluYXRlcy4gSG93ZXZlciwgaW4gYQ0KbG9uZy1ydW5uaW5n
+IHByb2Nlc3MsIHRoaXMgd2lsbCBldmVudHVhbGx5IGNhdXNlIHByb2JsZW1zLg0KDQpUaGlzIGNo
+YW5nZXNldCBzaG93cyBob3cgdG8gcHJvcGVybHkgcmVsZWFzZSBhbGwgcmVzb3VyY2VzLg0KLS0t
+DQogdGVzdC9leGFtcGxlLWFkdmVydGlzZW1lbnQgfCAyNSArKysrKysrKysrKysrKysrKystLS0t
+LS0tDQogMSBmaWxlIGNoYW5nZWQsIDE4IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQoN
+CmRpZmYgLS1naXQgYS90ZXN0L2V4YW1wbGUtYWR2ZXJ0aXNlbWVudCBiL3Rlc3QvZXhhbXBsZS1h
+ZHZlcnRpc2VtZW50DQppbmRleCBmZDg0ZWFjLi4xZGI2MWQ2IDEwMDc1NQ0KLS0tIGEvdGVzdC9l
+eGFtcGxlLWFkdmVydGlzZW1lbnQNCisrKyBiL3Rlc3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQpA
+QCAtNiwxNSArNiwxMyBAQCBpbXBvcnQgZGJ1cw0KIGltcG9ydCBkYnVzLmV4Y2VwdGlvbnMNCiBp
+bXBvcnQgZGJ1cy5tYWlubG9vcC5nbGliDQogaW1wb3J0IGRidXMuc2VydmljZQ0KLQ0KLWltcG9y
+dCBhcnJheQ0KK2ltcG9ydCB0aW1lDQoraW1wb3J0IHRocmVhZGluZw0KIA0KIHRyeToNCi0gIGZy
+b20gZ2kucmVwb3NpdG9yeSBpbXBvcnQgR09iamVjdCAgIyBweXRob24zDQorICAgIGZyb20gZ2ku
+cmVwb3NpdG9yeSBpbXBvcnQgR09iamVjdCAgIyBweXRob24zDQogZXhjZXB0IEltcG9ydEVycm9y
+Og0KLSAgaW1wb3J0IGdvYmplY3QgYXMgR09iamVjdCAgIyBweXRob24yDQotDQotZnJvbSByYW5k
+b20gaW1wb3J0IHJhbmRpbnQNCisgICAgaW1wb3J0IGdvYmplY3QgYXMgR09iamVjdCAgIyBweXRo
+b24yDQogDQogbWFpbmxvb3AgPSBOb25lDQogDQpAQCAtMTM2LDYgKzEzNCw3IEBAIGNsYXNzIEFk
+dmVydGlzZW1lbnQoZGJ1cy5zZXJ2aWNlLk9iamVjdCk6DQogICAgIGRlZiBSZWxlYXNlKHNlbGYp
+Og0KICAgICAgICAgcHJpbnQoJyVzOiBSZWxlYXNlZCEnICUgc2VsZi5wYXRoKQ0KIA0KKw0KIGNs
+YXNzIFRlc3RBZHZlcnRpc2VtZW50KEFkdmVydGlzZW1lbnQpOg0KIA0KICAgICBkZWYgX19pbml0
+X18oc2VsZiwgYnVzLCBpbmRleCk6DQpAQCAtMTcwLDYgKzE2OSwxMiBAQCBkZWYgZmluZF9hZGFw
+dGVyKGJ1cyk6DQogICAgIHJldHVybiBOb25lDQogDQogDQorZGVmIHNodXRkb3duKCk6DQorICAg
+IHByaW50KCdBZHZlcnRpc2luZyBmb3IgMTAgc2Vjb25kcy4uLicpDQorICAgIHRpbWUuc2xlZXAo
+MTApDQorICAgIG1haW5sb29wLnF1aXQoKQ0KKw0KKw0KIGRlZiBtYWluKCk6DQogICAgIGdsb2Jh
+bCBtYWlubG9vcA0KIA0KQEAgLTE4Myw3ICsxODgsNyBAQCBkZWYgbWFpbigpOg0KICAgICAgICAg
+cmV0dXJuDQogDQogICAgIGFkYXB0ZXJfcHJvcHMgPSBkYnVzLkludGVyZmFjZShidXMuZ2V0X29i
+amVjdChCTFVFWl9TRVJWSUNFX05BTUUsIGFkYXB0ZXIpLA0KLSAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIm9yZy5mcmVlZGVza3RvcC5EQnVzLlByb3BlcnRpZXMiKTsNCisgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJvcmcuZnJlZWRlc2t0b3AuREJ1cy5Qcm9w
+ZXJ0aWVzIikNCiANCiAgICAgYWRhcHRlcl9wcm9wcy5TZXQoIm9yZy5ibHVlei5BZGFwdGVyMSIs
+ICJQb3dlcmVkIiwgZGJ1cy5Cb29sZWFuKDEpKQ0KIA0KQEAgLTE5OCw3ICsyMDMsMTMgQEAgZGVm
+IG1haW4oKToNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVwbHlfaGFu
+ZGxlcj1yZWdpc3Rlcl9hZF9jYiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgZXJyb3JfaGFuZGxlcj1yZWdpc3Rlcl9hZF9lcnJvcl9jYikNCiANCisgICAgdGhyZWFkaW5n
+LlRocmVhZCh0YXJnZXQ9c2h1dGRvd24pLnN0YXJ0KCkNCisNCiAgICAgbWFpbmxvb3AucnVuKCkN
+CiANCisgICAgYWRfbWFuYWdlci5VbnJlZ2lzdGVyQWR2ZXJ0aXNlbWVudCh0ZXN0X2FkdmVydGlz
+ZW1lbnQpDQorICAgIHByaW50KCdBZHZlcnRpc2VtZW50IHVucmVnaXN0ZXJlZCcpDQorICAgIGRi
+dXMuc2VydmljZS5PYmplY3QucmVtb3ZlX2Zyb21fY29ubmVjdGlvbih0ZXN0X2FkdmVydGlzZW1l
+bnQpDQorDQogaWYgX19uYW1lX18gPT0gJ19fbWFpbl9fJzoNCiAgICAgbWFpbigpDQotLSANCjIu
+Ny40DQoNCg==
