@@ -1,170 +1,216 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Gix, Brian" <brian.gix@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Raul Piper" <raulpblooper@gmail.com>
-CC: "Stotland, Inga" <inga.stotland@intel.com>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
-Subject: RE: [PATCH BlueZ v5] tools/meshctl: Fix default directory for JSON
- files
-Date: Wed, 12 Sep 2018 19:32:43 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4375C0EB8EF@ORSMSX103.amr.corp.intel.com>
-References: <20180829182555.23712-1-inga.stotland@intel.com>
- <CABBYNZKMLXhiKRWg4KQ3RAePQ9r3LZ0KsXy4tWVpz7Tu4h4oUg@mail.gmail.com>
- <CAEwN+MBr=T+QS+bgBTymtc5SJj4nukkhzJsm_WXRy9HBo+1Ghg@mail.gmail.com>
- <D6866572D7A1DB48A0D22000C21836C75C61C902@ORSMSX103.amr.corp.intel.com>
-In-Reply-To: <D6866572D7A1DB48A0D22000C21836C75C61C902@ORSMSX103.amr.corp.intel.com>
-Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+References: <20180829182555.23712-1-inga.stotland@intel.com> <CABBYNZKMLXhiKRWg4KQ3RAePQ9r3LZ0KsXy4tWVpz7Tu4h4oUg@mail.gmail.com>
+In-Reply-To: <CABBYNZKMLXhiKRWg4KQ3RAePQ9r3LZ0KsXy4tWVpz7Tu4h4oUg@mail.gmail.com>
+From: Raul Piper <raulpblooper@gmail.com>
+Date: Wed, 12 Sep 2018 23:03:00 +0530
+Message-ID: <CAEwN+MBr=T+QS+bgBTymtc5SJj4nukkhzJsm_WXRy9HBo+1Ghg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v5] tools/meshctl: Fix default directory for JSON files
+To: luiz.dentz@gmail.com
+Cc: "Stotland, Inga" <inga.stotland@intel.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgUmF1bCwNCg0KLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGludXgtYmx1
-ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290aC0NCj4g
-b3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgUmF1bCBQaXBlcg0KPiBTZW50OiBX
-ZWRuZXNkYXksIFNlcHRlbWJlciAxMiwgMjAxOCAxMDozMyBBTQ0KPiBUbzogbHVpei5kZW50ekBn
-bWFpbC5jb20NCj4gQ2M6IFN0b3RsYW5kLCBJbmdhIDxpbmdhLnN0b3RsYW5kQGludGVsLmNvbT47
-IGxpbnV4LQ0KPiBibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFJlOiBbUEFU
-Q0ggQmx1ZVogdjVdIHRvb2xzL21lc2hjdGw6IEZpeCBkZWZhdWx0IGRpcmVjdG9yeSBmb3IgSlNP
-Tg0KPiBmaWxlcw0KPiANCj4gSGVsbG8gLA0KPiBPbiBGcmksIEF1ZyAzMSwgMjAxOCBhdCA3OjU3
-IFBNIEx1aXogQXVndXN0byB2b24gRGVudHoNCj4gPGx1aXouZGVudHpAZ21haWwuY29tPiB3cm90
-ZToNCj4gPg0KPiA+IEhpIEluZ2EsDQo+ID4NCj4gPiBPbiBXZWQsIEF1ZyAyOSwgMjAxOCBhdCA5
-OjI1IFBNLCBJbmdhIFN0b3RsYW5kIDxpbmdhLnN0b3RsYW5kQGludGVsLmNvbT4NCj4gd3JvdGU6
-DQo+ID4gPiBUaGlzIGZpeGVzIHRoZSBuYW1lIG9mIGRlZmF1bHQgZGlyZWN0b3J5IHRoYXQgY29u
-dGFpbnMgc2FtcGxlIEpTT04gZmlsZXMuDQo+ID4gPiBSRUFETUUgZmlsZSBpcyB1cGRhdGVkIHRv
-IGRlc2NyaWJlIHRoZSBkZWZhdWx0IGxvY2F0aW9uLg0KPiA+ID4gLS0tDQo+ID4gPiAgdG9vbHMv
-bWVzaC9SRUFETUUgfCAxOSArKysrKysrKysrKysrLQ0KPiA+ID4gIHRvb2xzL21lc2hjdGwuYyAg
-IHwgNjUgKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0tLQ0KPiAtLS0t
-DQo+ID4gPiAgMiBmaWxlcyBjaGFuZ2VkLCA2MiBpbnNlcnRpb25zKCspLCAyMiBkZWxldGlvbnMo
-LSkNCj4gPiA+DQo+ID4gPiBkaWZmIC0tZ2l0IGEvdG9vbHMvbWVzaC9SRUFETUUgYi90b29scy9t
-ZXNoL1JFQURNRSBpbmRleA0KPiA+ID4gZWE1NjFlZmM4Li40NGQ2MzMzMTMgMTAwNjQ0DQo+ID4g
-PiAtLS0gYS90b29scy9tZXNoL1JFQURNRQ0KPiA+ID4gKysrIGIvdG9vbHMvbWVzaC9SRUFETUUN
-Cj4gPiA+IEBAIC0xLDUgKzEsNSBAQA0KPiA+ID4gIE1lc2hDdGwgLSBCbHVlWiBHQVRUIGJhc2Vk
-IEJsdWV0b290aCBNZXNoIFByb3Zpc2lvbmVyDQo+ID4gPiAtKioqKioqKioqKioqKioqKioqKioq
-KioqKioqKioqKioqKioqKioqKioqDQo+ID4gPiArKioqKioqKioqKioqKioqKioqKioqKioqKioq
-KioqKioqKioqKioqKioqKioqKioqKioqKioNCj4gPiA+DQo+ID4gPiAgQ29weXJpZ2h0IChDKSAy
-MDE3ICBJbnRlbCBDb3Jwb3JhdGlvbi4gQWxsIHJpZ2h0cyByZXNlcnZlZC4NCj4gPiA+DQo+ID4g
-PiBAQCAtMTYsNiArMTYsMjMgQEAgQ29uZmlndXJhdGlvbiBhbmQgb3B0aW9ucw0KPiA+ID4NCj4g
-PiA+ICAgICAgICAgICAgICAgICBCdWlsZCBtZXNoY3RsIGFuZCBvdGhlciBCbHVldG9vdGggTWVz
-aCBiYXNlZCB0b29scw0KPiA+ID4gYW5kIHV0aWxzDQo+ID4gPg0KPiA+ID4gK0V4YW1wbGUgY29u
-ZmlndXJhdGlvbiBmaWxlcw0KPiA+ID4gKz09PT09PT09PT09PT09PT09PT09PT09PT09PQ0KPiA+
-ID4gKw0KPiA+ID4gK1RoZSBNZXNoQ3RsIHRvb2wgcmVxdWlyZXMgdHdvIGlucHV0IGNvbmZpZ3Vy
-YXRpb24gZmlsZXMgaW4gSlNPTiBmb3JtYXQ6DQo+ID4gPiArICAgICAgIC0gbG9jYWxfbm9kZS5q
-c29uDQo+ID4gPiArICAgICAgICAgICAgICAgTG9jYWwgbWVzaCBub2RlIGNvbmZpZ3VyYXRpb24N
-Cj4gPiA+ICsgICAgICAgLSBwcm92X2RiLmpzb24NCj4gPiA+ICsgICAgICAgICAgICAgICBQcm92
-aXNvbmVyJ3MgZGF0YWJhc2UgZm9yIGFsbCB0aGUgY29uZmlndXJlZCBub2Rlcw0KPiA+ID4gK2lu
-IHRoZSBtZXNoDQo+ID4gPiArDQo+ID4gPiArVGhlIGRlZmF1bHQgZGlyZWN0b3J5IGZvciBNZXNo
-Q3RsIGNvbmZpZ3VyYXRpb24gZmlsZXMgaXMNCj4gPiA+ICsvaG9tZS88dXNlcm5hbWU+Ly5jb25m
-aWcvbWVzaGN0bA0KPiA+ID4gKw0KPiA+ID4gK1RvIHVzZSAuanNvbiBjb25maWd1cmF0aW9uIGZp
-bGVzIGVpdGhlciBjb3B5IHRoZW0gdG8gdGhlIGRlZmF1bHQNCj4gPiA+ICtkaXJlY3Rvcnkgb3Is
-IHRvIHNwZWNpZnkgYSBjdXN0b20gc3RvcmFnZSBkaXJlY3RvcnksIHJ1biBtZXNoY3RsIHRvb2wg
-YXM6DQo+ID4gPiArDQo+ID4gPiArICAgICAgIG1lc2hjdGwgLWMgPGNvbmZpZ19kaXJfbmFtZT4N
-Cj4gPiA+ICsNCj4gPiA+ICBJbmZvcm1hdGlvbg0KPiA+ID4gID09PT09PT09PT09DQo+ID4gPg0K
-PiA+ID4gZGlmZiAtLWdpdCBhL3Rvb2xzL21lc2hjdGwuYyBiL3Rvb2xzL21lc2hjdGwuYyBpbmRl
-eA0KPiA+ID4gM2UxNDg0ZjYxLi41NWUyNWE1NmUgMTAwNjQ0DQo+ID4gPiAtLS0gYS90b29scy9t
-ZXNoY3RsLmMNCj4gPiA+ICsrKyBiL3Rvb2xzL21lc2hjdGwuYw0KPiA+ID4gQEAgLTcyLDYgKzcy
-LDggQEANCj4gPiA+ICAjZGVmaW5lIE1FU0hfUFJPWFlfREFUQV9JTl9VVUlEX1NUUiAgICAiMDAw
-MDJhZGQtMDAwMC0xMDAwLQ0KPiA4MDAwLTAwODA1ZjliMzRmYiINCj4gPiA+ICAjZGVmaW5lIE1F
-U0hfUFJPWFlfREFUQV9PVVRfVVVJRF9TVFIgICAiMDAwMDJhZGUtMDAwMC0xMDAwLQ0KPiA4MDAw
-LTAwODA1ZjliMzRmYiINCj4gPiA+DQo+ID4gPiArI2RlZmluZSBNRVNIQ1RMX0NPTkZJR19ESVIg
-ICAgICJtZXNoY3RsIg0KPiA+ID4gKw0KPiA+ID4gIHN0YXRpYyBEQnVzQ29ubmVjdGlvbiAqZGJ1
-c19jb25uOw0KPiA+ID4NCj4gPiA+ICBzdHJ1Y3QgYWRhcHRlciB7DQo+ID4gPiBAQCAtMTg3Myw3
-ICsxODc1LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCBidF9zaGVsbF9tZW51IG1haW5fbWVudSA9
-DQo+IHsNCj4gPiA+ICAgICAgICAgeyB9IH0sDQo+ID4gPiAgfTsNCj4gPiA+DQo+ID4gPiAtc3Rh
-dGljIGNvbnN0IGNoYXIgKm1lc2hfY29uZmlnX2RpcjsNCj4gPiA+ICtzdGF0aWMgY29uc3QgY2hh
-ciAqY29uZmlnX2RpcjsNCj4gPiA+DQo+ID4gPiAgc3RhdGljIGNvbnN0IHN0cnVjdCBvcHRpb24g
-b3B0aW9uc1tdID0gew0KPiA+ID4gICAgICAgICB7ICJjb25maWciLCAgICAgcmVxdWlyZWRfYXJn
-dW1lbnQsIDAsICdjJyB9LA0KPiA+ID4gQEAgLTE4ODEsNyArMTg4Myw3IEBAIHN0YXRpYyBjb25z
-dCBzdHJ1Y3Qgb3B0aW9uIG9wdGlvbnNbXSA9IHsgIH07DQo+ID4gPg0KPiA+ID4gIHN0YXRpYyBj
-b25zdCBjaGFyICoqb3B0YXJnc1tdID0gew0KPiA+ID4gLSAgICAgICAmbWVzaF9jb25maWdfZGly
-DQo+ID4gPiArICAgICAgICZjb25maWdfZGlyDQo+ID4gPiAgfTsNCj4gPiA+DQo+ID4gPiAgc3Rh
-dGljIGNvbnN0IGNoYXIgKmhlbHBbXSA9IHsNCj4gPiA+IEBAIC0xOTA3LDM4ICsxOTA5LDU3IEBA
-IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pDQo+ID4gPiAgICAgICAgIGludCBzdGF0
-dXM7DQo+ID4gPiAgICAgICAgIGludCBsZW47DQo+ID4gPiAgICAgICAgIGludCBleHRyYTsNCj4g
-PiA+ICsgICAgICAgY2hhciAqbWVzaF9kaXIgPSBOVUxMOw0KPiA+ID4NCj4gPiA+ICAgICAgICAg
-YnRfc2hlbGxfaW5pdChhcmdjLCBhcmd2LCAmb3B0KTsNCj4gPiA+ICAgICAgICAgYnRfc2hlbGxf
-c2V0X21lbnUoJm1haW5fbWVudSk7DQo+ID4gPiAgICAgICAgIGJ0X3NoZWxsX3NldF9wcm9tcHQo
-UFJPTVBUX09GRik7DQo+ID4gPg0KPiA+ID4gLSAgICAgICBpZiAoIW1lc2hfY29uZmlnX2Rpcikg
-ew0KPiA+ID4gLSAgICAgICAgICAgICAgIGJ0X3NoZWxsX3ByaW50ZigiTG9jYWwgY29uZmlnIGRp
-cmVjdG9yeSBub3QgcHJvdmlkZWQuXG4iKTsNCj4gPiA+IC0gICAgICAgICAgICAgICBtZXNoX2Nv
-bmZpZ19kaXIgPSAiIjsNCj4gPiA+ICsgICAgICAgaWYgKCFjb25maWdfZGlyKSB7DQo+ID4gPiAr
-ICAgICAgICAgICAgICAgY2hhciAqaG9tZTsNCj4gPiA+ICsNCj4gPiA+ICsgICAgICAgICAgICAg
-ICBob21lID0gZ2V0ZW52KCJYREdfQ09ORklHX0hPTUUiKTsNCj4gPiA+ICsgICAgICAgICAgICAg
-ICBpZiAoaG9tZSkgew0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgbWVzaF9kaXIgPSBn
-X3N0cmR1cF9wcmludGYoIiVzLyVzIiwgaG9tZSwNCj4gPiA+ICsgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgTUVTSENUTF9DT05GSUdfRElSKTsN
-Cj4gPiA+ICsgICAgICAgICAgICAgICB9DQo+ID4gPiArDQo+ID4gPiArICAgICAgICAgICAgICAg
-aWYgKCFtZXNoX2Rpcikgew0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgaG9tZSA9IGdl
-dGVudigiSE9NRSIpOw0KPiA+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgbWVzaF9kaXIgPSBn
-X3N0cmR1cF9wcmludGYoIiVzLy5jb25maWcvJXMiLCBob21lLA0KPiA+ID4gKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBNRVNIQ1RMX0NPTkZJ
-R19ESVIpOw0KPiA+ID4gKyAgICAgICAgICAgICAgIH0NCj4gPiA+ICsNCj4gPiA+ICsgICAgICAg
-ICAgICAgICBpZiAoIW1lc2hfZGlyKSB7DQo+ID4gPiArICAgICAgICAgICAgICAgICAgICAgICBn
-X3ByaW50ZXJyKCJDb25maWd1cmF0aW9uIGRpcmVjdG9yeSBub3QgZm91bmRcbiIpOw0KPiA+ID4g
-KyAgICAgICAgICAgICAgICAgICAgICAgZ290byBmYWlsOw0KPiA+ID4gKyAgICAgICAgICAgICAg
-IH0NCj4gPiA+ICsNCj4gPiA+ICAgICAgICAgfSBlbHNlIHsNCj4gPiA+IC0gICAgICAgICAgICAg
-ICBidF9zaGVsbF9wcmludGYoIlJlYWRpbmcgcHJvdl9kYi5qc29uIGFuZCBsb2NhbF9ub2RlLmpz
-b24NCj4gZnJvbSINCj4gPiA+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIiAlc1xu
-IiwgbWVzaF9jb25maWdfZGlyKTsNCj4gPiA+ICsgICAgICAgICAgICAgICBtZXNoX2RpciA9IGdf
-c3RyZHVwX3ByaW50ZigiJXMiLCBjb25maWdfZGlyKTsNCj4gPiA+ICAgICAgICAgfQ0KPiA+ID4N
-Cj4gPiA+IC0gICAgICAgbGVuID0gc3RybGVuKG1lc2hfY29uZmlnX2Rpcik7DQo+ID4gPiAtICAg
-ICAgIGlmIChsZW4gJiYgbWVzaF9jb25maWdfZGlyW2xlbiAtIDFdICE9ICcvJykgew0KPiA+ID4g
-Kw0KPiA+ID4gKyAgICAgICBnX3ByaW50KCJSZWFkaW5nIHByb3ZfZGIuanNvbiBhbmQgbG9jYWxf
-bm9kZS5qc29uIGZyb20gJXMNCj4gPiA+ICsgZGlyZWN0b3J5XG4iLA0KPiA+ID4gKw0KPiA+ID4g
-KyBtZXNoX2Rpcik7DQo+ID4gPiArDQo+ID4gPiArICAgICAgIGxlbiA9IHN0cmxlbihtZXNoX2Rp
-cik7DQo+ID4gPiArDQo+ID4gPiArICAgICAgIGlmIChsZW4gJiYgbWVzaF9kaXJbbGVuIC0gMV0g
-IT0gJy8nKQ0KPiA+ID4gICAgICAgICAgICAgICAgIGV4dHJhID0gMTsNCj4gPiA+IC0gICAgICAg
-ICAgICAgICBidF9zaGVsbF9wcmludGYoIm1lc2hfY29uZmlnX2RpclslZF0gJXNcbiIsIGxlbiwN
-Cj4gPiA+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICZt
-ZXNoX2NvbmZpZ19kaXJbbGVuIC0gMV0pOw0KPiA+ID4gLSAgICAgICB9IGVsc2Ugew0KPiA+ID4g
-KyAgICAgICBlbHNlDQo+ID4gPiAgICAgICAgICAgICAgICAgZXh0cmEgPSAwOw0KPiA+ID4gLSAg
-ICAgICB9DQo+ID4gPiArDQo+ID4gPiAgICAgICAgIG1lc2hfbG9jYWxfY29uZmlnX2ZpbGVuYW1l
-ID0gZ19tYWxsb2MobGVuICsNCj4gc3RybGVuKCJsb2NhbF9ub2RlLmpzb24iKQ0KPiA+ID4gICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgKyAyKTsNCj4gPiA+ICAgICAgICAgaWYgKCFtZXNoX2xvY2FsX2NvbmZpZ19m
-aWxlbmFtZSkNCj4gPiA+ICAgICAgICAgICAgICAgICBnb3RvIGZhaWw7DQo+ID4gPg0KPiA+ID4g
-ICAgICAgICBtZXNoX3Byb3ZfZGJfZmlsZW5hbWUgPSBnX21hbGxvYyhsZW4gKyBzdHJsZW4oInBy
-b3ZfZGIuanNvbiIpICsNCj4gMik7DQo+ID4gPiAtICAgICAgIGlmICghbWVzaF9wcm92X2RiX2Zp
-bGVuYW1lKSB7DQo+ID4gPiArICAgICAgIGlmICghbWVzaF9wcm92X2RiX2ZpbGVuYW1lKQ0KPiA+
-ID4gICAgICAgICAgICAgICAgIGdvdG8gZmFpbDsNCj4gPiA+IC0gICAgICAgfQ0KPiA+ID4NCj4g
-PiA+IC0gICAgICAgc3ByaW50ZihtZXNoX2xvY2FsX2NvbmZpZ19maWxlbmFtZSwgIiVzIiwgbWVz
-aF9jb25maWdfZGlyKTsNCj4gPiA+ICsgICAgICAgc3ByaW50ZihtZXNoX2xvY2FsX2NvbmZpZ19m
-aWxlbmFtZSwgIiVzIiwgbWVzaF9kaXIpOw0KPiA+ID4NCj4gPiA+ICAgICAgICAgaWYgKGV4dHJh
-KQ0KPiA+ID4gICAgICAgICAgICAgICAgIHNwcmludGYobWVzaF9sb2NhbF9jb25maWdfZmlsZW5h
-bWUgKyBsZW4gLCAiJWMiLA0KPiA+ID4gJy8nKTsgQEAgLTE5NDYsNyArMTk2Nyw2IEBAIGludCBt
-YWluKGludCBhcmdjLCBjaGFyICphcmd2W10pDQo+ID4gPiAgICAgICAgIHNwcmludGYobWVzaF9s
-b2NhbF9jb25maWdfZmlsZW5hbWUgKyBsZW4gKyBleHRyYSwgIiVzIiwNCj4gPiA+ICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgImxvY2FsX25v
-ZGUuanNvbiIpOw0KPiA+ID4gICAgICAgICBsZW4gPSBsZW4gKyBleHRyYSArIHN0cmxlbigibG9j
-YWxfbm9kZS5qc29uIik7DQo+ID4gPiAtICAgICAgIHNwcmludGYobWVzaF9sb2NhbF9jb25maWdf
-ZmlsZW5hbWUgKyBsZW4sICIlYyIsICdcMCcpOw0KPiA+ID4NCj4gPiA+ICAgICAgICAgaWYgKCFw
-cm92X2RiX3JlYWRfbG9jYWxfbm9kZShtZXNoX2xvY2FsX2NvbmZpZ19maWxlbmFtZSwgdHJ1ZSkp
-IHsNCj4gPiA+ICAgICAgICAgICAgICAgICBnX3ByaW50ZXJyKCJGYWlsZWQgdG8gcGFyc2UgbG9j
-YWwgbm9kZSBjb25maWd1cmF0aW9uDQo+ID4gPiBmaWxlICVzXG4iLCBAQCAtMTk1NCwxNCArMTk3
-NCwxNSBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQ0KPiA+ID4gICAgICAgICAg
-ICAgICAgIGdvdG8gZmFpbDsNCj4gPiA+ICAgICAgICAgfQ0KPiA+ID4NCj4gPiA+IC0gICAgICAg
-c3ByaW50ZihtZXNoX3Byb3ZfZGJfZmlsZW5hbWUsICIlcyIsIG1lc2hfY29uZmlnX2Rpcik7DQo+
-ID4gPiAtICAgICAgIGxlbiA9IHN0cmxlbihtZXNoX2NvbmZpZ19kaXIpOw0KPiA+ID4gKyAgICAg
-ICBzcHJpbnRmKG1lc2hfcHJvdl9kYl9maWxlbmFtZSwgIiVzIiwgbWVzaF9kaXIpOw0KPiA+ID4g
-KyAgICAgICBsZW4gPSBzdHJsZW4obWVzaF9kaXIpOw0KPiA+ID4gKw0KPiA+ID4gKyAgICAgICBn
-X2ZyZWUobWVzaF9kaXIpOw0KPiA+ID4gKw0KPiA+ID4gICAgICAgICBpZiAoZXh0cmEpDQo+ID4g
-PiAgICAgICAgICAgICAgICAgc3ByaW50ZihtZXNoX3Byb3ZfZGJfZmlsZW5hbWUgKyBsZW4gLCAi
-JWMiLCAnLycpOw0KPiA+ID4NCj4gPiA+ICAgICAgICAgc3ByaW50ZihtZXNoX3Byb3ZfZGJfZmls
-ZW5hbWUgKyBsZW4gKyBleHRyYSwgIiVzIiwNCj4gInByb3ZfZGIuanNvbiIpOw0KPiA+ID4gLSAg
-ICAgICBzcHJpbnRmKG1lc2hfcHJvdl9kYl9maWxlbmFtZSArIGxlbiArIGV4dHJhICsNCj4gc3Ry
-bGVuKCJwcm92X2RiLmpzb24iKSwNCj4gPiA+IC0gICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAiJWMiLCAnXDAnKTsNCj4gPiA+DQo+
-ID4gPiAgICAgICAgIGlmICghcHJvdl9kYl9yZWFkKG1lc2hfcHJvdl9kYl9maWxlbmFtZSkpIHsN
-Cj4gPiA+ICAgICAgICAgICAgICAgICBnX3ByaW50ZXJyKCJGYWlsZWQgdG8gcGFyc2UgcHJvdmlz
-aW9uaW5nIGRhdGFiYXNlDQo+ID4gPiBmaWxlICVzXG4iLCBAQCAtMjAwNiw1ICsyMDI3LDcgQEAg
-aW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkNCj4gPiA+DQo+ID4gPiAgZmFpbDoNCj4g
-PiA+ICAgICAgICAgYnRfc2hlbGxfY2xlYW51cCgpOw0KPiA+ID4gKyAgICAgICBnX2ZyZWUobWVz
-aF9kaXIpOw0KPiA+ID4gKw0KPiA+ID4gICAgICAgICByZXR1cm4gRVhJVF9GQUlMVVJFOw0KPiA+
-ID4gIH0NCj4gPiA+IC0tDQo+ID4gPiAyLjE3LjENCj4gPg0KPiA+IEFwcGxpZWQsIHRoYW5rcy4N
-Cj4gPg0KPiA+DQo+ID4gLS0NCj4gPiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6DQo+IA0KPiBJcyB0
-aGVyZSBhIFBCX0FEViBzdXBwb3J0IGluIG1lc2hjdGwgZm9yIHByb3Zpc2lvbmluZz9JZiBub3Qg
-YW55IHBsYW4gaW4NCj4gZnV0dXJlPw0KDQpQQi1BRFYgc3VwcG9ydCB3aWxsICpub3QqIGJlIGFk
-ZGVkIHRvIG1lc2hjdGwsIGhvd2V2ZXIsIHdlICp3aWxsKiBiZSBhZGRpbmcgUHJvdmlzaW9uaW5n
-IHN1cHBvcnQgdG8gYnRtZXNoIGFuZCBtZXNoZC4gVGhpcyB3b3JrIGlzIHVuZGVyd2F5IG5vdywg
-YWx0aG91Z2ggd2UgZG8gbmVlZCB0byB3YWl0IGZvciBhIGZldyB0aGluZ3MgaW4gdGhlIFdvcmtp
-bmcgR3JvdXAgdG8gYmVjb21lICJPZmZpY2lhbCIgcmVnYXJkaW5nIHRoZSBkYXRhYmFzZS4NCg0K
-PiANCj4gQnIsDQo+IFJwDQo=
+Hello ,
+On Fri, Aug 31, 2018 at 7:57 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Inga,
+>
+> On Wed, Aug 29, 2018 at 9:25 PM, Inga Stotland <inga.stotland@intel.com> wrote:
+> > This fixes the name of default directory that contains sample JSON files.
+> > README file is updated to describe the default location.
+> > ---
+> >  tools/mesh/README | 19 +++++++++++++-
+> >  tools/meshctl.c   | 65 ++++++++++++++++++++++++++++++++---------------
+> >  2 files changed, 62 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/tools/mesh/README b/tools/mesh/README
+> > index ea561efc8..44d633313 100644
+> > --- a/tools/mesh/README
+> > +++ b/tools/mesh/README
+> > @@ -1,5 +1,5 @@
+> >  MeshCtl - BlueZ GATT based Bluetooth Mesh Provisioner
+> > -******************************************
+> > +*****************************************************
+> >
+> >  Copyright (C) 2017  Intel Corporation. All rights reserved.
+> >
+> > @@ -16,6 +16,23 @@ Configuration and options
+> >
+> >                 Build meshctl and other Bluetooth Mesh based tools and utils
+> >
+> > +Example configuration files
+> > +===========================
+> > +
+> > +The MeshCtl tool requires two input configuration files in JSON format:
+> > +       - local_node.json
+> > +               Local mesh node configuration
+> > +       - prov_db.json
+> > +               Provisoner's database for all the configured nodes in the mesh
+> > +
+> > +The default directory for MeshCtl configuration files is
+> > +/home/<username>/.config/meshctl
+> > +
+> > +To use .json configuration files either copy them to the default directory
+> > +or, to specify a custom storage directory, run meshctl tool as:
+> > +
+> > +       meshctl -c <config_dir_name>
+> > +
+> >  Information
+> >  ===========
+> >
+> > diff --git a/tools/meshctl.c b/tools/meshctl.c
+> > index 3e1484f61..55e25a56e 100644
+> > --- a/tools/meshctl.c
+> > +++ b/tools/meshctl.c
+> > @@ -72,6 +72,8 @@
+> >  #define MESH_PROXY_DATA_IN_UUID_STR    "00002add-0000-1000-8000-00805f9b34fb"
+> >  #define MESH_PROXY_DATA_OUT_UUID_STR   "00002ade-0000-1000-8000-00805f9b34fb"
+> >
+> > +#define MESHCTL_CONFIG_DIR     "meshctl"
+> > +
+> >  static DBusConnection *dbus_conn;
+> >
+> >  struct adapter {
+> > @@ -1873,7 +1875,7 @@ static const struct bt_shell_menu main_menu = {
+> >         { } },
+> >  };
+> >
+> > -static const char *mesh_config_dir;
+> > +static const char *config_dir;
+> >
+> >  static const struct option options[] = {
+> >         { "config",     required_argument, 0, 'c' },
+> > @@ -1881,7 +1883,7 @@ static const struct option options[] = {
+> >  };
+> >
+> >  static const char **optargs[] = {
+> > -       &mesh_config_dir
+> > +       &config_dir
+> >  };
+> >
+> >  static const char *help[] = {
+> > @@ -1907,38 +1909,57 @@ int main(int argc, char *argv[])
+> >         int status;
+> >         int len;
+> >         int extra;
+> > +       char *mesh_dir = NULL;
+> >
+> >         bt_shell_init(argc, argv, &opt);
+> >         bt_shell_set_menu(&main_menu);
+> >         bt_shell_set_prompt(PROMPT_OFF);
+> >
+> > -       if (!mesh_config_dir) {
+> > -               bt_shell_printf("Local config directory not provided.\n");
+> > -               mesh_config_dir = "";
+> > +       if (!config_dir) {
+> > +               char *home;
+> > +
+> > +               home = getenv("XDG_CONFIG_HOME");
+> > +               if (home) {
+> > +                       mesh_dir = g_strdup_printf("%s/%s", home,
+> > +                                                       MESHCTL_CONFIG_DIR);
+> > +               }
+> > +
+> > +               if (!mesh_dir) {
+> > +                       home = getenv("HOME");
+> > +                       mesh_dir = g_strdup_printf("%s/.config/%s", home,
+> > +                                                       MESHCTL_CONFIG_DIR);
+> > +               }
+> > +
+> > +               if (!mesh_dir) {
+> > +                       g_printerr("Configuration directory not found\n");
+> > +                       goto fail;
+> > +               }
+> > +
+> >         } else {
+> > -               bt_shell_printf("Reading prov_db.json and local_node.json from"
+> > -                               " %s\n", mesh_config_dir);
+> > +               mesh_dir = g_strdup_printf("%s", config_dir);
+> >         }
+> >
+> > -       len = strlen(mesh_config_dir);
+> > -       if (len && mesh_config_dir[len - 1] != '/') {
+> > +
+> > +       g_print("Reading prov_db.json and local_node.json from %s directory\n",
+> > +                                                               mesh_dir);
+> > +
+> > +       len = strlen(mesh_dir);
+> > +
+> > +       if (len && mesh_dir[len - 1] != '/')
+> >                 extra = 1;
+> > -               bt_shell_printf("mesh_config_dir[%d] %s\n", len,
+> > -                                               &mesh_config_dir[len - 1]);
+> > -       } else {
+> > +       else
+> >                 extra = 0;
+> > -       }
+> > +
+> >         mesh_local_config_filename = g_malloc(len + strlen("local_node.json")
+> >                                                                         + 2);
+> >         if (!mesh_local_config_filename)
+> >                 goto fail;
+> >
+> >         mesh_prov_db_filename = g_malloc(len + strlen("prov_db.json") + 2);
+> > -       if (!mesh_prov_db_filename) {
+> > +       if (!mesh_prov_db_filename)
+> >                 goto fail;
+> > -       }
+> >
+> > -       sprintf(mesh_local_config_filename, "%s", mesh_config_dir);
+> > +       sprintf(mesh_local_config_filename, "%s", mesh_dir);
+> >
+> >         if (extra)
+> >                 sprintf(mesh_local_config_filename + len , "%c", '/');
+> > @@ -1946,7 +1967,6 @@ int main(int argc, char *argv[])
+> >         sprintf(mesh_local_config_filename + len + extra, "%s",
+> >                                                         "local_node.json");
+> >         len = len + extra + strlen("local_node.json");
+> > -       sprintf(mesh_local_config_filename + len, "%c", '\0');
+> >
+> >         if (!prov_db_read_local_node(mesh_local_config_filename, true)) {
+> >                 g_printerr("Failed to parse local node configuration file %s\n",
+> > @@ -1954,14 +1974,15 @@ int main(int argc, char *argv[])
+> >                 goto fail;
+> >         }
+> >
+> > -       sprintf(mesh_prov_db_filename, "%s", mesh_config_dir);
+> > -       len = strlen(mesh_config_dir);
+> > +       sprintf(mesh_prov_db_filename, "%s", mesh_dir);
+> > +       len = strlen(mesh_dir);
+> > +
+> > +       g_free(mesh_dir);
+> > +
+> >         if (extra)
+> >                 sprintf(mesh_prov_db_filename + len , "%c", '/');
+> >
+> >         sprintf(mesh_prov_db_filename + len + extra, "%s", "prov_db.json");
+> > -       sprintf(mesh_prov_db_filename + len + extra + strlen("prov_db.json"),
+> > -                                                               "%c", '\0');
+> >
+> >         if (!prov_db_read(mesh_prov_db_filename)) {
+> >                 g_printerr("Failed to parse provisioning database file %s\n",
+> > @@ -2006,5 +2027,7 @@ int main(int argc, char *argv[])
+> >
+> >  fail:
+> >         bt_shell_cleanup();
+> > +       g_free(mesh_dir);
+> > +
+> >         return EXIT_FAILURE;
+> >  }
+> > --
+> > 2.17.1
+>
+> Applied, thanks.
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+Is there a PB_ADV support in meshctl for provisioning?If not any plan in future?
+
+Br,
+Rp
