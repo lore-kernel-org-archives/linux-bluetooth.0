@@ -1,53 +1,35 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Hunt, Preston" <preston.hunt@intel.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH BlueZ] test/example-advertisement: add shutdown code
-Date: Wed, 12 Sep 2018 14:57:34 +0000
-Message-ID: <DBD047A0-7CFC-4A66-B721-6BDC717D644A@intel.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <linux-mmc-owner@vger.kernel.org>
+Date: Wed, 12 Sep 2018 15:41:19 +0100
+From: Alan Cox <gnomes@lxorguk.ukuu.org.uk>
+To: Jaejoong Kim <climbbb.kim@gmail.com>
+Cc: linux-um@lists.infradead.org, netdev@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-s390@vger.kernel.org,
+        devel@driverdev.osuosl.org, greybus-dev@lists.linaro.org,
+        linuxppc-dev@lists.ozlabs.org, linux-serial@vger.kernel.org,
+        sparclinux@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jslaby@suse.com>
+Subject: Re: [PATCH 00/25] Change tty_port(standard)_install's return type
+Message-ID: <20180912154119.1fce639d@alans-desktop>
+In-Reply-To: <1536029091-4426-1-git-send-email-climbbb.kim@gmail.com>
+References: <1536029091-4426-1-git-send-email-climbbb.kim@gmail.com>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-mmc-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VGhlIHByZXZpb3VzIHNhbXBsZSBjb2RlIGRpZCBub3QgcmVsZWFzZSBhbGwgcmVzb3VyY2VzIHdo
-ZW4gc2h1dHRpbmcNCmRvd24uIFRoaXMgaXMgZmluZSB3aGVuIGl0J3MgYSBzdGFuZGFsb25lIHBy
-b2dyYW0gc2luY2UgUHl0aG9uIHdpbGwgZnJlZQ0KYWxsIHJlc291cmNlcyBhdXRvbWF0aWNhbGx5
-IHdoZW4gdGhlIHByb2Nlc3MgdGVybWluYXRlcy4gSG93ZXZlciwgaW4gYQ0KbG9uZy1ydW5uaW5n
-IHByb2Nlc3MsIHRoaXMgd2lsbCBldmVudHVhbGx5IGNhdXNlIHByb2JsZW1zLg0KDQpUaGlzIGNo
-YW5nZXNldCBzaG93cyBob3cgdG8gcHJvcGVybHkgcmVsZWFzZSBhbGwgcmVzb3VyY2VzLg0KLS0t
-DQogdGVzdC9leGFtcGxlLWFkdmVydGlzZW1lbnQgfCAyNSArKysrKysrKysrKysrKysrKystLS0t
-LS0tDQogMSBmaWxlIGNoYW5nZWQsIDE4IGluc2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQoN
-CmRpZmYgLS1naXQgYS90ZXN0L2V4YW1wbGUtYWR2ZXJ0aXNlbWVudCBiL3Rlc3QvZXhhbXBsZS1h
-ZHZlcnRpc2VtZW50DQppbmRleCBmZDg0ZWFjLi4xZGI2MWQ2IDEwMDc1NQ0KLS0tIGEvdGVzdC9l
-eGFtcGxlLWFkdmVydGlzZW1lbnQNCisrKyBiL3Rlc3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQpA
-QCAtNiwxNSArNiwxMyBAQCBpbXBvcnQgZGJ1cw0KIGltcG9ydCBkYnVzLmV4Y2VwdGlvbnMNCiBp
-bXBvcnQgZGJ1cy5tYWlubG9vcC5nbGliDQogaW1wb3J0IGRidXMuc2VydmljZQ0KLQ0KLWltcG9y
-dCBhcnJheQ0KK2ltcG9ydCB0aW1lDQoraW1wb3J0IHRocmVhZGluZw0KIA0KIHRyeToNCi0gIGZy
-b20gZ2kucmVwb3NpdG9yeSBpbXBvcnQgR09iamVjdCAgIyBweXRob24zDQorICAgIGZyb20gZ2ku
-cmVwb3NpdG9yeSBpbXBvcnQgR09iamVjdCAgIyBweXRob24zDQogZXhjZXB0IEltcG9ydEVycm9y
-Og0KLSAgaW1wb3J0IGdvYmplY3QgYXMgR09iamVjdCAgIyBweXRob24yDQotDQotZnJvbSByYW5k
-b20gaW1wb3J0IHJhbmRpbnQNCisgICAgaW1wb3J0IGdvYmplY3QgYXMgR09iamVjdCAgIyBweXRo
-b24yDQogDQogbWFpbmxvb3AgPSBOb25lDQogDQpAQCAtMTM2LDYgKzEzNCw3IEBAIGNsYXNzIEFk
-dmVydGlzZW1lbnQoZGJ1cy5zZXJ2aWNlLk9iamVjdCk6DQogICAgIGRlZiBSZWxlYXNlKHNlbGYp
-Og0KICAgICAgICAgcHJpbnQoJyVzOiBSZWxlYXNlZCEnICUgc2VsZi5wYXRoKQ0KIA0KKw0KIGNs
-YXNzIFRlc3RBZHZlcnRpc2VtZW50KEFkdmVydGlzZW1lbnQpOg0KIA0KICAgICBkZWYgX19pbml0
-X18oc2VsZiwgYnVzLCBpbmRleCk6DQpAQCAtMTcwLDYgKzE2OSwxMiBAQCBkZWYgZmluZF9hZGFw
-dGVyKGJ1cyk6DQogICAgIHJldHVybiBOb25lDQogDQogDQorZGVmIHNodXRkb3duKCk6DQorICAg
-IHByaW50KCdBZHZlcnRpc2luZyBmb3IgMTAgc2Vjb25kcy4uLicpDQorICAgIHRpbWUuc2xlZXAo
-MTApDQorICAgIG1haW5sb29wLnF1aXQoKQ0KKw0KKw0KIGRlZiBtYWluKCk6DQogICAgIGdsb2Jh
-bCBtYWlubG9vcA0KIA0KQEAgLTE4Myw3ICsxODgsNyBAQCBkZWYgbWFpbigpOg0KICAgICAgICAg
-cmV0dXJuDQogDQogICAgIGFkYXB0ZXJfcHJvcHMgPSBkYnVzLkludGVyZmFjZShidXMuZ2V0X29i
-amVjdChCTFVFWl9TRVJWSUNFX05BTUUsIGFkYXB0ZXIpLA0KLSAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIm9yZy5mcmVlZGVza3RvcC5EQnVzLlByb3BlcnRpZXMiKTsNCisgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJvcmcuZnJlZWRlc2t0b3AuREJ1cy5Qcm9w
-ZXJ0aWVzIikNCiANCiAgICAgYWRhcHRlcl9wcm9wcy5TZXQoIm9yZy5ibHVlei5BZGFwdGVyMSIs
-ICJQb3dlcmVkIiwgZGJ1cy5Cb29sZWFuKDEpKQ0KIA0KQEAgLTE5OCw3ICsyMDMsMTMgQEAgZGVm
-IG1haW4oKToNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgcmVwbHlfaGFu
-ZGxlcj1yZWdpc3Rlcl9hZF9jYiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgZXJyb3JfaGFuZGxlcj1yZWdpc3Rlcl9hZF9lcnJvcl9jYikNCiANCisgICAgdGhyZWFkaW5n
-LlRocmVhZCh0YXJnZXQ9c2h1dGRvd24pLnN0YXJ0KCkNCisNCiAgICAgbWFpbmxvb3AucnVuKCkN
-CiANCisgICAgYWRfbWFuYWdlci5VbnJlZ2lzdGVyQWR2ZXJ0aXNlbWVudCh0ZXN0X2FkdmVydGlz
-ZW1lbnQpDQorICAgIHByaW50KCdBZHZlcnRpc2VtZW50IHVucmVnaXN0ZXJlZCcpDQorICAgIGRi
-dXMuc2VydmljZS5PYmplY3QucmVtb3ZlX2Zyb21fY29ubmVjdGlvbih0ZXN0X2FkdmVydGlzZW1l
-bnQpDQorDQogaWYgX19uYW1lX18gPT0gJ19fbWFpbl9fJzoNCiAgICAgbWFpbigpDQotLSANCjIu
-Ny40DQoNCg==
+On Tue,  4 Sep 2018 11:44:26 +0900
+Jaejoong Kim <climbbb.kim@gmail.com> wrote:
+
+> Many drivers with tty use the tty_stand_install(). But, there is no
+> need to handle the error, since it always returns 0.
+
+
+And what happens if another change means it can fail again. It's just a
+property of the current implementation that it can't. It used to fail.
+
+This seems to be a ton of unneccessary churn that will end up just having
+to be reversed again some day in the future.
+
+Alan
