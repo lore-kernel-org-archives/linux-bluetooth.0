@@ -1,105 +1,92 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <DBD047A0-7CFC-4A66-B721-6BDC717D644A@intel.com>
-References: <DBD047A0-7CFC-4A66-B721-6BDC717D644A@intel.com>
+In-Reply-To: <20180912114817.32369-1-luiz.dentz@gmail.com>
+References: <20180912114817.32369-1-luiz.dentz@gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 17 Sep 2018 16:13:38 +0300
-Message-ID: <CABBYNZ+5_0DEDUqvzU61Ru8VqjkTBc+3r4wNyFCaHBNdzMdUaQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] test/example-advertisement: add shutdown code
-To: "Hunt, Preston" <preston.hunt@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Mon, 17 Sep 2018 09:44:22 +0300
+Message-ID: <CABBYNZLVyp3qmqztZq=b0K78LyLHD0mtD-KpeoDDgPJEM5kSjQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/shell: Set rl_readline_name
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Preston,
+Hi,
 
-On Wed, Sep 12, 2018 at 5:57 PM, Hunt, Preston <preston.hunt@intel.com> wrote:
-> The previous sample code did not release all resources when shutting
-> down. This is fine when it's a standalone program since Python will free
-> all resources automatically when the process terminates. However, in a
-> long-running process, this will eventually cause problems.
-
-I would add the timeout as argument to the tool e.g.
-example-advertisement --timeout=10
-
+On Wed, Sep 12, 2018 at 2:48 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> This changeset shows how to properly release all resources.
+> Set rl_readline_name so the binary name can be used in inputrc.
 > ---
->  test/example-advertisement | 25 ++++++++++++++++++-------
->  1 file changed, 18 insertions(+), 7 deletions(-)
+>  src/shared/shell.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
 >
-> diff --git a/test/example-advertisement b/test/example-advertisement
-> index fd84eac..1db61d6 100755
-> --- a/test/example-advertisement
-> +++ b/test/example-advertisement
-> @@ -6,15 +6,13 @@ import dbus
->  import dbus.exceptions
->  import dbus.mainloop.glib
->  import dbus.service
+> diff --git a/src/shared/shell.c b/src/shared/shell.c
+> index 9b0125579..7c3c2daa7 100644
+> --- a/src/shared/shell.c
+> +++ b/src/shared/shell.c
+> @@ -972,6 +972,9 @@ static void rl_init(void)
+>         if (data.mode)
+>                 return;
+>
+> +       /* Allow conditional parsing of the ~/.inputrc file. */
+> +       rl_readline_name = data.name;
+> +
+>         setlinebuf(stdout);
+>         rl_attempted_completion_function = shell_completion;
+>
+> @@ -989,18 +992,11 @@ static const struct option main_options[] = {
+>
+>  static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
+>  {
+> -       const char *name;
+>         unsigned int i;
+>
+> -       name = strrchr(argv[0], '/');
+> -       if (!name)
+> -               name = argv[0];
+> -       else
+> -               name++;
 > -
-> -import array
-> +import time
-> +import threading
+> -       printf("%s ver %s\n", name, VERSION);
+> +       printf("%s ver %s\n", data.name, VERSION);
+>         printf("Usage:\n"
+> -               "\t%s [--options] [commands]\n", name);
+> +               "\t%s [--options] [commands]\n", data.name);
 >
->  try:
-> -  from gi.repository import GObject  # python3
-> +    from gi.repository import GObject  # python3
->  except ImportError:
-> -  import gobject as GObject  # python2
-> -
-> -from random import randint
-> +    import gobject as GObject  # python2
+>         printf("Options:\n");
 >
->  mainloop = None
+> @@ -1030,10 +1026,16 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+>         } else
+>                 snprintf(optstr, sizeof(optstr), "+hvt:");
 >
-> @@ -136,6 +134,7 @@ class Advertisement(dbus.service.Object):
->      def Release(self):
->          print('%s: Released!' % self.path)
->
+> +       data.name = strrchr(argv[0], '/');
+> +       if (!data.name)
+> +               data.name = strdup(argv[0]);
+> +       else
+> +               data.name = strdup(data.name++);
 > +
->  class TestAdvertisement(Advertisement):
+>         while ((c = getopt_long(argc, argv, optstr, options, &index)) != -1) {
+>                 switch (c) {
+>                 case 'v':
+> -                       printf("%s: %s\n", argv[0], VERSION);
+> +                       printf("%s: %s\n", data.name, VERSION);
+>                         exit(EXIT_SUCCESS);
+>                         return;
+>                 case 'h':
+> @@ -1065,7 +1067,6 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+>                 index = -1;
+>         }
 >
->      def __init__(self, bus, index):
-> @@ -170,6 +169,12 @@ def find_adapter(bus):
->      return None
+> -       data.name = strdup(argv[0]);
+>         bt_shell_set_env("SHELL", data.name);
 >
->
-> +def shutdown():
-> +    print('Advertising for 10 seconds...')
-> +    time.sleep(10)
-> +    mainloop.quit()
-> +
-> +
->  def main():
->      global mainloop
->
-> @@ -183,7 +188,7 @@ def main():
->          return
->
->      adapter_props = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-> -                                   "org.freedesktop.DBus.Properties");
-> +                                   "org.freedesktop.DBus.Properties")
->
->      adapter_props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(1))
->
-> @@ -198,7 +203,13 @@ def main():
->                                       reply_handler=register_ad_cb,
->                                       error_handler=register_ad_error_cb)
->
-> +    threading.Thread(target=shutdown).start()
-> +
->      mainloop.run()
->
-> +    ad_manager.UnregisterAdvertisement(test_advertisement)
-> +    print('Advertisement unregistered')
-> +    dbus.service.Object.remove_from_connection(test_advertisement)
-> +
->  if __name__ == '__main__':
->      main()
+>         data.argc = argc - optind;
 > --
-> 2.7.4
->
+> 2.17.1
+
+Pushed.
 
 
 
