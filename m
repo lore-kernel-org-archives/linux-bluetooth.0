@@ -1,84 +1,89 @@
-Return-Path: <lramos.prof@yahoo.com.br>
-Date: Wed, 19 Sep 2018 09:18:49 -0300
-From: Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [PINGBACK] Patches for ath3k with possible issues
-Message-ID: <20180919121849.GA29863@giustizia.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1537350714-32105-1-git-send-email-mallikarjun.phulari@intel.com>
+References: <1537350714-32105-1-git-send-email-mallikarjun.phulari@intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Wed, 19 Sep 2018 15:06:34 +0300
+Message-ID: <CABBYNZ+CAujgpF_8T_xyeu=+Zfzkocuwb5Df0YMT9YDv7M9-4w@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth : Errata Service Release 8 Erratum 3253
+To: Mallikarjun Phulari <mallikarjun.phulari@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Mallikarjun,
 
-I sent these messages some time ago and as I am not a frequent patch
-developer and hence not used to send patches to the community, I'd like
-to know if you have been aware of them.
+On Wed, Sep 19, 2018 at 12:51 PM, Mallikarjun Phulari
+<mallikarjun.phulari@intel.com> wrote:
+> L2CAP: Changes include the new result codes for the l2cap channel
+> create/connect request. The new result code are:
+> 0x0006 - sent in the response when the CID is not in valid dynamic range.
+> 0x0007 sent in the response when the CID is already allocated.
 
-I haven't received any replies so far.
+It would be a good idea to quote the erratum with page number where
+the new errors come from. Btw, you should include a signed of by in
+the kernel patches.
 
-The patches were sent in sequence of this "heading" message and are
-trivial, however, very useful for my case. Only to remember, they print
-messages in case of errors in two specific operations in the ath3k
-kernel module.
+> ---
+>  include/net/bluetooth/l2cap.h |  6 ++++++
+>  net/bluetooth/l2cap_core.c    | 12 ++++++++++++
+>  2 files changed, 18 insertions(+)
+>
+> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+> index 0697fd4..eb0c8d0 100644
+> --- a/include/net/bluetooth/l2cap.h
+> +++ b/include/net/bluetooth/l2cap.h
+> @@ -284,6 +284,12 @@ struct l2cap_conn_rsp {
+>  #define L2CAP_CR_INVALID_SCID  0x0009
+>  #define L2CAP_CR_SCID_IN_USE   0x000A
+>
+> +/* connect/create channel results
+> + * As per Erratum 3253
+> + */
+> +#define L2CAP_CR_BREDR_INVALID_SCID    0x0006
+> +#define L2CAP_CR_BREDR_SCID_IN_USE     0x0007
 
+Weird, are L2CAP_CR_INVALID_SCID and L2CAP_CR_SCID_IN_USE specific to
+LE? If they are we should probably fix their names.
 
-Many thanks,
+>  /* connect/create channel status */
+>  #define L2CAP_CS_NO_INFO       0x0000
+>  #define L2CAP_CS_AUTHEN_PEND   0x0001
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 9b7907e..85887df 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -3814,9 +3814,21 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+>         }
+>
+>         result = L2CAP_CR_NO_MEM;
+> +       /* As per Erratum 3253, check the CID is in valid dynamic range and
+> +        *  is not allocated already. Send the new result codes accordingly
+> +        */
+> +
+> +       /* Check for valid dynamic CID range */
+> +       if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
+> +               result = L2CAP_CR_BREDR_INVALID_SCID;
+> +               chan = NULL;
+> +               goto response;
+> +       }
+>
+>         /* Check if we already have channel with that dcid */
+>         if (__l2cap_get_chan_by_dcid(conn, scid))
+> +               result = L2CAP_CR_BREDR_SCID_IN_USE;
+> +               chan = NULL;
+>                 goto response;
 
-Luiz Carlos Ramos
-lramos dot prof at yahoo dot com dot br
-São Paulo - Brazil
+Missing { } above?
 
-
------ Forwarded message from Luiz Carlos Ramos <lramos.prof@yahoo.com.br> -----
-
-Date: Fri, 7 Sep 2018 20:35:31 -0300
-From: Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Patches for ath3k with possible issues
-User-Agent: Mutt/1.10.1 (2018-07-13)
-
-Hello,
-
-I think I have found some smaller problems related to a specific
-Bluetooth adapter that isn't working fine in a laptop that is with me
-from some time. In fact, only now I've found enough time to dig into the
-code and try to make some experiments.
-
-The Bluetooth adapter is an Atheros, identified by VID/PID 0cf3:0036,
-running in a x86_64 laptop.
-
-The problems are just like that:
-
-1- when the laptop starts, Bluetooth always work; however, I found that
-the "switch vid/pid" operation doesn't work, returning -32 ("EPIPE")
-
-2- after a suspend or hibernate, when it resumes, sometimes the firmware
-download doesn't work. It stops before sending all pieces and when it
-happens, it returns code -32 ("EPIPE")
-
-3- there are cases also where after a resume, the switch VID/PID works
-and the adapter changes its identification to 0cf3:3007
-
-4- in cases 2 and 3, sometimes the bluetooth daemon doesn't recognize
-the adapter anymore. In my tests, I can restore operation doing in
-sequence: rmmod ath3k, insmod ath3k, kill bluetooth daemon and start
-bluetooth daemon again
-
-Even not knowing the problem in detail right now, I can send some
-patches which helped me to collect the information above, specially the
-return code of the switch VID/PID operation and the state of the
-firmware load when the error happens. I'll send you next two patches
-which addresses these two things, and hopefully this can help someone
-else that stays in trouble with problems like those.
-
-Many thanks,
-
-Luiz Carlos Ramos
-lramos dot prof at yahoo dot com dot br
-São Paulo - Brazil
+>
+>         chan = pchan->ops->new_connection(pchan);
+> --
+> 2.7.4
+>
 
 
------ End forwarded message -----
+
+-- 
+Luiz Augusto von Dentz
