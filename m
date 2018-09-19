@@ -1,37 +1,53 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Wed, 19 Sep 2018 16:03:54 +0200
+From: Pavel Machek <pavel@ucw.cz>
+To: linux-bluetooth@vger.kernel.org
+Cc: szymon.janc@codecoup.pl
+Subject: setting random address on a bluetooth low-energy adapter
+Message-ID: <20180919140354.GA2739@amd>
 MIME-Version: 1.0
-In-Reply-To: <20180919140354.GA2739@amd>
-References: <20180919140354.GA2739@amd>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 19 Sep 2018 17:41:49 +0300
-Message-ID: <CABBYNZKAHk_bi+LaKi55EVeW5LfLFKMqpXLGsfrsVVLQM9geew@mail.gmail.com>
-Subject: Re: setting random address on a bluetooth low-energy adapter
-To: Pavel Machek <pavel@ucw.cz>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Szymon Janc <szymon.janc@codecoup.pl>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="dDRMvlgZJXvWKvBx"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavel,
 
-On Wed, Sep 19, 2018 at 5:03 PM, Pavel Machek <pavel@ucw.cz> wrote:
-> Hi!
->
-> I'm trying to use PC (with usb dongle) as a bluetooth low-energy
-> device -- similar to heart rate sensor. But the device I'm trying to
-> emulate is using random address and its control software seems to
-> expect it.
->
-> Is there way to override the address / set the random address?
-> https://elinux.org/images/3/32/Doing_Bluetooth_Low_Energy_on_Linux.pdf
-> says patch might be needed...
->
-> Pointer to the patch would be welcome.
+--dDRMvlgZJXvWKvBx
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=206bee144e2b7e3190677ffbf4f231dd2e728f5c
+Hi!
 
+I'm trying to use PC (with usb dongle) as a bluetooth low-energy
+device -- similar to heart rate sensor. But the device I'm trying to
+emulate is using random address and its control software seems to
+expect it.
 
+Is there way to override the address / set the random address?
+https://elinux.org/images/3/32/Doing_Bluetooth_Low_Energy_on_Linux.pdf
+says patch might be needed...
 
--- 
-Luiz Augusto von Dentz
+Pointer to the patch would be welcome.
+
+Thanks,
+									Pavel
+
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--dDRMvlgZJXvWKvBx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAluiV0oACgkQMOfwapXb+vKycwCePes77U/IeBFhnVbFTCJW5mQO
+/nAAnj1DnBIJywFhk+TouQeo6ln6OTKL
+=QbHU
+-----END PGP SIGNATURE-----
+
+--dDRMvlgZJXvWKvBx--
