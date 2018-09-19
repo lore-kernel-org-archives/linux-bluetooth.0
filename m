@@ -1,39 +1,39 @@
-Return-Path: <brian.gix@intel.com>
-From: Brian Gix <brian.gix@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	johan.hedberg@gmail.com,
-	inga.stotland@intel.com,
-	Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ 0/2] Central Net Key storage cache for multiple Nodes
-Date: Wed, 19 Sep 2018 13:40:03 -0700
-Message-Id: <20180919204005.19267-1-brian.gix@intel.com>
+Return-Path: <mka@chromium.org>
+Date: Wed, 19 Sep 2018 10:26:48 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+To: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com,
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v2 0/1] Cold on & off support for Qualcomm BT chip wcn3990
+Message-ID: <20180919172648.GR22824@google.com>
+References: <20180919152113.7611-1-bgodavar@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20180919152113.7611-1-bgodavar@codeaurora.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The strategy for Bluetooth Mesh is to allow each application that want to use
-mesh services to operate as an independant Node on one or more Mesh networks.
+nit: Not sure there is much value in a cover letter for a 'series'
+with a single patch. The changelog and additional comments (if needed)
+can be placed in the post with the patch below '---'.
 
-To enable this, at the lowest network layer, we are creating a cache of Network
-Keys and associated credentials (NIDs, Privacy Keys, Encryption Keys, etc).
-This will allow Network decryption to be done once per incoming packets,
-without requiring each "Node" on the local device to handle them redundantly.
-
-
-Brian Gix (2):
-  mesh: Add centralized caching Net Key management
-  mesh: Refactor friend.c and net.c for central key DB
-
- Makefile.mesh    |   1 +
- mesh/friend.c    | 188 +++++++++-------------
- mesh/friend.h    |   2 +-
- mesh/net.c       | 476 +++++++++++++++----------------------------------------
- mesh/net.h       |  14 +-
- mesh/net_keys.c  | 326 +++++++++++++++++++++++++++++++++++++
- mesh/net_keys.h  |  33 ++++
- mesh/provision.c |   5 +-
- 8 files changed, 572 insertions(+), 473 deletions(-)
- create mode 100644 mesh/net_keys.c
- create mode 100644 mesh/net_keys.h
-
--- 
-2.14.4
+On Wed, Sep 19, 2018 at 08:51:12PM +0530, Balakrishna Godavarthi wrote:
+> This patch will power off regulators while hci0 down and turn on them 
+> back on hci0 up. Every time we power off we call proto specific close
+> function, so that we will free the memory of Qualcomm BT specific buffers.
+> Will call proto open to assign the memory and turn on the regulators, before
+> calling qualcomm setup.
+> 
+> v2:
+>    * Removed vendor specific hdev->open and close functions.
+>    * Added hdev->shutdown function to turn off the regs.	
+> 	
+> v1:
+>    * initial patch.
+> 
+> Balakrishna Godavarthi (1):
+>   Bluetooth: hci_qca: Add poweroff support during hci down for wcn3990
+> 
+>  drivers/bluetooth/hci_qca.c | 33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
+> 
