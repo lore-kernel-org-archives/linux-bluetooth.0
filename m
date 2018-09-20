@@ -1,39 +1,54 @@
-Return-Path: <okaya@codeaurora.org>
-Subject: Re: [PATCH 0/2] Add API to retrieve the Bluetooth Device Address
- (BD_ADDR)
-To: Matthias Kaehlcke <mka@chromium.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J . Wysocki" <rafael@kernel.org>,
- Sakari Ailus <sakari.ailus@linux.intel.com>, Marcin Wojtas
- <mw@semihalf.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- Balakrishna Godavarthi <bgodavar@codeaurora.org>,
- Loic Poulain <loic.poulain@linaro.org>,
- Brian Norris <briannorris@chromium.org>
-References: <20180920223436.202454-1-mka@chromium.org>
-From: Sinan Kaya <okaya@codeaurora.org>
-Message-ID: <0ea65ca1-8d06-72d8-3bbe-693e09605a8a@codeaurora.org>
-Date: Thu, 20 Sep 2018 18:45:58 -0400
-MIME-Version: 1.0
+Return-Path: <mka@chromium.org>
+From: Matthias Kaehlcke <mka@chromium.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Marcin Wojtas <mw@semihalf.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Sinan Kaya <okaya@codeaurora.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Brian Norris <briannorris@chromium.org>,
+	Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH 2/2] Bluetooth: btqcomsmd: Get the BD address with device_get_bd_address()
+Date: Thu, 20 Sep 2018 15:34:36 -0700
+Message-Id: <20180920223436.202454-3-mka@chromium.org>
 In-Reply-To: <20180920223436.202454-1-mka@chromium.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+References: <20180920223436.202454-1-mka@chromium.org>
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 9/20/2018 6:34 PM, Matthias Kaehlcke wrote:
-> On some systems the Bluetooth Device Address (BD_ADDR) isn't stored
-> on the Bluetooth chip itself. One way to configure the BD address is
-> through the device tree. The btqcomsmd driver is an example, it can
-> read the BD address from the DT property 'local-bd-address'. It is
-> also planned to extend the hci_qca driver to support setting the BD
-> address through the DT.
-> 
-> To avoid redundant open-coded reading of 'local-bd-address' and error
-> handling this series adds an API to retrieve the BD address of a device
-> and adapts the btqcomsmd driver to use this API.
+Use the new API to get the BD address instead of reading it directly
+from the device tree.
 
-I don't think you have got enough number of line savings to make this
-code to be folded into property.c
+Also remove an unncessary pair of braces in the same area of code.
 
-Not my call but seems redundant IMO.
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ drivers/bluetooth/btqcomsmd.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+index 7df3eed1ef5e..1f2de6aeb3dd 100644
+--- a/drivers/bluetooth/btqcomsmd.c
++++ b/drivers/bluetooth/btqcomsmd.c
+@@ -172,11 +172,10 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+ 	/* The local-bd-address property is usually injected by the
+ 	 * bootloader which has access to the allocated BD address.
+ 	 */
+-	if (!of_property_read_u8_array(pdev->dev.of_node, "local-bd-address",
+-				       (u8 *)&btq->bdaddr, sizeof(bdaddr_t))) {
++	if (!device_get_bd_address(&pdev->dev, (u8 *)&btq->bdaddr,
++				   sizeof(bdaddr_t)))
+ 		dev_info(&pdev->dev, "BD address %pMR retrieved from device-tree",
+ 			 &btq->bdaddr);
+-	}
+ 
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev)
+-- 
+2.19.0.444.g18242da7ef-goog
