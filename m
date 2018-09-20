@@ -1,48 +1,35 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CACjvaw=rr-MDiBZH6rM1BORBH372ZXLkSrxpPsKjP6dMGo4TZg@mail.gmail.com>
-References: <CACjvaw=rr-MDiBZH6rM1BORBH372ZXLkSrxpPsKjP6dMGo4TZg@mail.gmail.com>
+In-Reply-To: <20180919225522.GF23038@fattuba.com>
+References: <20180919225522.GF23038@fattuba.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 20 Sep 2018 12:15:34 +0300
-Message-ID: <CABBYNZLTfTLUavm6uELEx-Xvei__+7qv-zb+=ih9ckHUvPmOMw@mail.gmail.com>
-Subject: Re: Problem with two dongle simultaneously
-To: Nazmul Alam <fadedreamz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 20 Sep 2018 11:31:18 +0300
+Message-ID: <CABBYNZJx7gY=6G2YHOcEPJag5rUeHPM3ZEdmhWvLqFhdbaxbOg@mail.gmail.com>
+Subject: Re: BLE out of band mgmt over dbus?
+To: Ryan Nowakowski <tubaman@fattuba.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        ryan.nowakowski@arm.com, marcus.chang@arm.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Nazmul,
+Hi Ryan,
 
-On Thu, Sep 20, 2018 at 1:11 AM, Nazmul Alam <fadedreamz@gmail.com> wrote:
-> I am trying to run two bluetooth dongles simultaneously for two
-> separate devices.
-> One device is communicating over classic BT while the other one is using BLE.
-> When both devices are running (approximately 250hz sampling rate), the
-> BLE is dropping packets (most of the samples are gone).
-> I am using pygatt to capture the data and it appears to happen when
-> the pygatt chokes and python takes 100% of a single cpu core.
+On Thu, Sep 20, 2018 at 1:55 AM, Ryan Nowakowski <tubaman@fattuba.com> wrote:
+> Hello bluez devs!
 >
-> bluetoothctl also shows strange behavior with two controllers. Even
-> when a particular controller is selected, it can not show the
-> paired-devices correctly, unless the other one is plugged out (the mac
-> is different on both dongles).
+> It seems like the mgmt API, particularly the out of band management[1]
+> isn't available via dbus.  Is there a particular reason that the mgmt
+> stuff isn't exposed via dbus?
 
-Try with a more recent version, there were some improvement to handle
-multiple adapters better.
+We have a plugin for neard, which is probably outdated by now, to do
+OOB, not sure if that is your use case though.
 
-> Now, the question is, in bluez is it problematic to run two dongles
-> simultaneously considering both of them are active and pushing data?
+> Thanks!
 >
-> I am trying to get a more experienced opinion to pinpoint the
-> problematic part of the setup (pygatt or bluez).
-
-Btw, pygatt appears to be using gatttool which is deprecated, not idea
-why people keep using that.
-
-> bluez - 5.41
-> arm64 - kernel 4.4+
-> dongles - csr 4.0
+> Ryan
+>
+> [1] https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt#n1279
 
 
 
