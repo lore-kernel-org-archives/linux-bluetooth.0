@@ -1,33 +1,36 @@
-Return-Path: <gregkh@linuxfoundation.org>
-Date: Fri, 21 Sep 2018 06:26:40 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: "Rafael J . Wysocki" <rafael@kernel.org>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
-	Marcin Wojtas <mw@semihalf.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Sinan Kaya <okaya@codeaurora.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Brian Norris <briannorris@chromium.org>
-Subject: Re: [PATCH 1/2] device property: Add device_get_bd_address() and
- fwnode_get_bd_address()
-Message-ID: <20180921042640.GA9222@kroah.com>
-References: <20180920223436.202454-1-mka@chromium.org>
- <20180920223436.202454-2-mka@chromium.org>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Date: Thu, 20 Sep 2018 18:30:33 -0500
+From: Ryan Nowakowski <tubaman@fattuba.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcus.chang@arm.com
+Subject: Re: BLE out of band mgmt over dbus?
+Message-ID: <20180920233033.GK23038@fattuba.com>
+References: <20180919225522.GF23038@fattuba.com>
+ <CABBYNZJx7gY=6G2YHOcEPJag5rUeHPM3ZEdmhWvLqFhdbaxbOg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20180920223436.202454-2-mka@chromium.org>
+In-Reply-To: <CABBYNZJx7gY=6G2YHOcEPJag5rUeHPM3ZEdmhWvLqFhdbaxbOg@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Sep 20, 2018 at 03:34:35PM -0700, Matthias Kaehlcke wrote:
-> +EXPORT_SYMBOL(fwnode_get_bd_address);
+On Thu, Sep 20, 2018 at 11:31:18AM +0300, Luiz Augusto von Dentz wrote:
+> Hi Ryan,
+> 
+> On Thu, Sep 20, 2018 at 1:55 AM, Ryan Nowakowski <tubaman@fattuba.com> wrote:
+> > Hello bluez devs!
+> >
+> > It seems like the mgmt API, particularly the out of band management[1]
+> > isn't available via dbus.  Is there a particular reason that the mgmt
+> > stuff isn't exposed via dbus?
+> 
+> We have a plugin for neard, which is probably outdated by now, to do
+> OOB, not sure if that is your use case though.
 
-EXPORT_SYMBOL_GPL()?  That matches the majority in this file.
+We've looked at the neard plugin and it doesn't quiet fit our
+situation.  It looks like some other mgmt commands are already available via
+dbus(discovery, etc).  I'm thinking about writing a patch that would
+add the OOB mgmt commands to dbus.  Is this a terrible idea?
 
-thanks,
+- Ryan
 
-greg k-h
+> > [1] https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt#n1279
