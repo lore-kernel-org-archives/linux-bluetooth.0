@@ -1,39 +1,50 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180904103922.25504-1-luiz.dentz@gmail.com>
-References: <20180904103922.25504-1-luiz.dentz@gmail.com>
+In-Reply-To: <CACjvaw=rr-MDiBZH6rM1BORBH372ZXLkSrxpPsKjP6dMGo4TZg@mail.gmail.com>
+References: <CACjvaw=rr-MDiBZH6rM1BORBH372ZXLkSrxpPsKjP6dMGo4TZg@mail.gmail.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 20 Sep 2018 12:26:19 +0300
-Message-ID: <CABBYNZJ-Ry4JN_f9sxFVAhHcQ5BY7LMdgeZ=tSpt9WFKr_QYpA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] Bluetooth: L2CAP: Improve credits logic
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Thu, 20 Sep 2018 12:15:34 +0300
+Message-ID: <CABBYNZLTfTLUavm6uELEx-Xvei__+7qv-zb+=ih9ckHUvPmOMw@mail.gmail.com>
+Subject: Re: Problem with two dongle simultaneously
+To: Nazmul Alam <fadedreamz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Nazmul,
 
-On Tue, Sep 4, 2018 at 1:39 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Thu, Sep 20, 2018 at 1:11 AM, Nazmul Alam <fadedreamz@gmail.com> wrote:
+> I am trying to run two bluetooth dongles simultaneously for two
+> separate devices.
+> One device is communicating over classic BT while the other one is using BLE.
+> When both devices are running (approximately 250hz sampling rate), the
+> BLE is dropping packets (most of the samples are gone).
+> I am using pygatt to capture the data and it appears to happen when
+> the pygatt chokes and python takes 100% of a single cpu core.
 >
-> These changes replace the existing threshold logic with a limpler logic
-> that gives back credits after receiving an SDU. It also removes the
-> debugfs entries to configure the MPS and credits with auto selected one
-> derived from the MTU and MPS.
->
-> v2: Account from the SDU length when adjusting the MPS.
->
-> Luiz Augusto von Dentz (3):
->   Bluetooth: L2CAP: Derive MPS from connection MTU
->   Bluetooth: L2CAP: Derive rx credits from MTU and MPS
->   Bluetooth: L2CAP: Detect if remote is not able to use the whole MPS
->
->  include/net/bluetooth/l2cap.h |  3 --
->  net/bluetooth/l2cap_core.c    | 66 +++++++++++++++++++++++------------
->  2 files changed, 44 insertions(+), 25 deletions(-)
+> bluetoothctl also shows strange behavior with two controllers. Even
+> when a particular controller is selected, it can not show the
+> paired-devices correctly, unless the other one is plugged out (the mac
+> is different on both dongles).
 
-Ping.
+Try with a more recent version, there were some improvement to handle
+multiple adapters better.
+
+> Now, the question is, in bluez is it problematic to run two dongles
+> simultaneously considering both of them are active and pushing data?
+>
+> I am trying to get a more experienced opinion to pinpoint the
+> problematic part of the setup (pygatt or bluez).
+
+Btw, pygatt appears to be using gatttool which is deprecated, not idea
+why people keep using that.
+
+> bluez - 5.41
+> arm64 - kernel 4.4+
+> dongles - csr 4.0
+
+
 
 -- 
 Luiz Augusto von Dentz
