@@ -1,126 +1,85 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
+To: Arnd Bergmann <arnd@arndb.de>, netdev@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>
+Cc: linux-arch@vger.kernel.org, y2038@lists.linaro.org,
+        Eric Dumazet <edumazet@google.com>,
+        Willem de Bruijn <willemb@google.com>,
+        linux-kernel@vger.kernel.org, linux-hams@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
+        dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
+        linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
+References: <20180829130308.3504560-1-arnd@arndb.de>
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <5cca03b6-8d3d-5f18-778f-a5d5e70c2218@datenfreihafen.org>
+Date: Fri, 21 Sep 2018 11:14:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <70C091497DE2844DBD9E143B2282ABDA9BE5DA@BGSMSX105.gar.corp.intel.com>
-References: <1537350714-32105-1-git-send-email-mallikarjun.phulari@intel.com>
- <CABBYNZ+CAujgpF_8T_xyeu=+Zfzkocuwb5Df0YMT9YDv7M9-4w@mail.gmail.com> <70C091497DE2844DBD9E143B2282ABDA9BE5DA@BGSMSX105.gar.corp.intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 21 Sep 2018 14:44:22 +0300
-Message-ID: <CABBYNZKb8qZKbP45Pk1=3OyJUUz95MDP9h8Vd_dyt+iL5A3f7A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth : Errata Service Release 8 Erratum 3253
-To: "Phulari, Mallikarjun" <mallikarjun.phulari@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20180829130308.3504560-1-arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mallikarjun,
+Hello Arnd.
 
-On Fri, Sep 21, 2018 at 7:37 AM, Phulari, Mallikarjun
-<mallikarjun.phulari@intel.com> wrote:
-> Hi Luiz,
-> Please find the new patch with review comments incorporated.
+On 8/29/18 2:59 PM, Arnd Bergmann wrote:
+> The SIOCGSTAMP/SIOCGSTAMPNS ioctl commands are implemented by many
+> socket protocol handlers, and all of those end up calling the same
+> sock_get_timestamp()/sock_get_timestampns() helper functions, which
+> results in a lot of duplicate code.
+> 
+> With the introduction of 64-bit time_t on 32-bit architectures, this
+> gets worse, as we then need four different ioctl commands in each
+> socket protocol implementation.
+> 
+> To simplify that, let's add a new .gettstamp() operation in
+> struct proto_ops, and move ioctl implementation into the common
+> sock_ioctl()/compat_sock_ioctl_trans() functions that these all go
+> through.
+> 
+> We can reuse the sock_get_timestamp() implementation, but generalize
+> it so it can deal with both native and compat mode, as well as
+> timeval and timespec structures.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  include/linux/net.h          |  2 ++
+>  include/net/compat.h         |  3 --
+>  include/net/sock.h           |  4 +--
+>  net/appletalk/ddp.c          |  7 +----
+>  net/atm/ioctl.c              | 16 -----------
+>  net/atm/pvc.c                |  1 +
+>  net/atm/svc.c                |  1 +
+>  net/ax25/af_ax25.c           |  9 +-----
+>  net/bluetooth/af_bluetooth.c |  8 ------
+>  net/bluetooth/l2cap_sock.c   |  1 +
+>  net/bluetooth/rfcomm/sock.c  |  1 +
+>  net/bluetooth/sco.c          |  1 +
+>  net/can/af_can.c             |  6 ----
+>  net/can/bcm.c                |  1 +
+>  net/can/raw.c                |  1 +
+>  net/compat.c                 | 54 ------------------------------------
+>  net/core/sock.c              | 38 +++++++++++--------------
+>  net/dccp/ipv4.c              |  1 +
+>  net/dccp/ipv6.c              |  1 +
+>  net/ieee802154/socket.c      |  6 ++--
+>  net/ipv4/af_inet.c           |  9 ++----
+>  net/ipv6/af_inet6.c          |  8 ++----
+>  net/ipv6/raw.c               |  1 +
+>  net/l2tp/l2tp_ip.c           |  1 +
+>  net/l2tp/l2tp_ip6.c          |  1 +
+>  net/netrom/af_netrom.c       | 14 +---------
+>  net/packet/af_packet.c       |  7 ++---
+>  net/qrtr/qrtr.c              |  4 +--
+>  net/rose/af_rose.c           |  7 +----
+>  net/sctp/ipv6.c              |  1 +
+>  net/sctp/protocol.c          |  1 +
+>  net/socket.c                 | 48 ++++++++++----------------------
+>  net/x25/af_x25.c             | 27 +-----------------
+>  33 files changed, 63 insertions(+), 228 deletions(-)
 
-Please send a proper patch not as attachment.
+For the net/ieee802154/socket. part I am fine with this change.
 
-> *I have added the Page number of Core Specification for reference in the commit message and included the "signed of by" in the patch.
->
-> *L2CAP_CR_INVALID_SCID and L2CAP_CR_SCID_IN_USE are specific to LE with different result values as:
->  L2CAP_CR_INVALID_SCID  -  0x0009
->  L2CAP_CR_SCID_IN_USE   -  0x000A
+Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
-Alright, so they probably need to be renamed to
-L2CAP_CR_LE_INVALID_SCID and L2CAP_CR_LE_SCID_IN_USE so we don't
-confuse these with BR codes.
-
-> It is already implemented.
->
-> Thanks & Regards
-> Mallikarjun Phulari
->
-> _____________________________________
-> From: Luiz Augusto von Dentz [luiz.dentz@gmail.com]
-> Sent: Wednesday, September 19, 2018 5:06 AM
-> To: Phulari, Mallikarjun
-> Cc: linux-bluetooth@vger.kernel.org
-> Subject: Re: [PATCH] Bluetooth : Errata Service Release 8 Erratum 3253
->
-> Hi Mallikarjun,
->
-> On Wed, Sep 19, 2018 at 12:51 PM, Mallikarjun Phulari
-> <mallikarjun.phulari@intel.com> wrote:
->> L2CAP: Changes include the new result codes for the l2cap channel
->> create/connect request. The new result code are:
->> 0x0006 - sent in the response when the CID is not in valid dynamic range.
->> 0x0007 sent in the response when the CID is already allocated.
->
-> It would be a good idea to quote the erratum with page number where
-> the new errors come from. Btw, you should include a signed of by in
-> the kernel patches.
->
->> ---
->>  include/net/bluetooth/l2cap.h |  6 ++++++
->>  net/bluetooth/l2cap_core.c    | 12 ++++++++++++
->>  2 files changed, 18 insertions(+)
->>
->> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
->> index 0697fd4..eb0c8d0 100644
->> --- a/include/net/bluetooth/l2cap.h
->> +++ b/include/net/bluetooth/l2cap.h
->> @@ -284,6 +284,12 @@ struct l2cap_conn_rsp {
->>  #define L2CAP_CR_INVALID_SCID  0x0009
->>  #define L2CAP_CR_SCID_IN_USE   0x000A
->>
->> +/* connect/create channel results
->> + * As per Erratum 3253
->> + */
->> +#define L2CAP_CR_BREDR_INVALID_SCID    0x0006
->> +#define L2CAP_CR_BREDR_SCID_IN_USE     0x0007
->
-> Weird, are L2CAP_CR_INVALID_SCID and L2CAP_CR_SCID_IN_USE specific to
-> LE? If they are we should probably fix their names.
->
->>  /* connect/create channel status */
->>  #define L2CAP_CS_NO_INFO       0x0000
->>  #define L2CAP_CS_AUTHEN_PEND   0x0001
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index 9b7907e..85887df 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -3814,9 +3814,21 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
->>         }
->>
->>         result = L2CAP_CR_NO_MEM;
->> +       /* As per Erratum 3253, check the CID is in valid dynamic range and
->> +        *  is not allocated already. Send the new result codes accordingly
->> +        */
->> +
->> +       /* Check for valid dynamic CID range */
->> +       if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
->> +               result = L2CAP_CR_BREDR_INVALID_SCID;
->> +               chan = NULL;
->> +               goto response;
->> +       }
->>
->>         /* Check if we already have channel with that dcid */
->>         if (__l2cap_get_chan_by_dcid(conn, scid))
->> +               result = L2CAP_CR_BREDR_SCID_IN_USE;
->> +               chan = NULL;
->>                 goto response;
->
-> Missing { } above?
->
->>
->>         chan = pchan->ops->new_connection(pchan);
->> --
->> 2.7.4
->>
->
->
->
-> --
-> Luiz Augusto von Dentz
-
-
-
--- 
-Luiz Augusto von Dentz
+regards
+Stefan Schmidt
