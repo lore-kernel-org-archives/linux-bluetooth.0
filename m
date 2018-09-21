@@ -1,75 +1,38 @@
-Return-Path: <linux-bluetooth-owner@vger.kernel.org>
-From: "Hunt, Preston" <preston.hunt@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ] test/example-advertisement: add shutdown code
-Date: Fri, 21 Sep 2018 16:50:23 +0000
-Message-ID: <F98449A8-8DC8-433F-A2D6-634C15A0A3CD@intel.com>
-References: <DBD047A0-7CFC-4A66-B721-6BDC717D644A@intel.com>
- <CABBYNZ+5_0DEDUqvzU61Ru8VqjkTBc+3r4wNyFCaHBNdzMdUaQ@mail.gmail.com>
-In-Reply-To: <CABBYNZ+5_0DEDUqvzU61Ru8VqjkTBc+3r4wNyFCaHBNdzMdUaQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
+Return-Path: <okaya@codeaurora.org>
+Subject: Re: [PATCH 0/2] Add API to retrieve the Bluetooth Device Address
+ (BD_ADDR)
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J . Wysocki" <rafael@kernel.org>,
+ Sakari Ailus <sakari.ailus@linux.intel.com>, Marcin Wojtas
+ <mw@semihalf.com>, Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org,
+ Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+ Loic Poulain <loic.poulain@linaro.org>,
+ Brian Norris <briannorris@chromium.org>
+References: <20180920223436.202454-1-mka@chromium.org>
+ <0ea65ca1-8d06-72d8-3bbe-693e09605a8a@codeaurora.org>
+ <20180920230121.GT22824@google.com>
+ <36e5d881-a45e-c879-c275-e6e18bc99ed5@codeaurora.org>
+ <20180920231947.GU22824@google.com>
+ <124b6f76-a65f-e304-6c60-fbb9104415f4@codeaurora.org>
+ <20180921164541.GX22824@google.com>
+From: Sinan Kaya <okaya@codeaurora.org>
+Message-ID: <a1f8d4de-04e5-c150-531b-7d2ceee6325c@codeaurora.org>
+Date: Fri, 21 Sep 2018 12:49:24 -0400
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20180921164541.GX22824@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-VGhhbmtzIEx1aXogZm9yIHRoZSBmZWVkYmFjayEgSSB3aWxsIHN1Ym1pdCBhIG5ldyBwYXRjaCBz
-aG9ydGx5IHdpdGggdGhlIHByb3Bvc2VkIGNoYW5nZXMsIGUuZy4sIGFkZGl0aW9uIG9mIGFuIG9w
-dGlvbmFsIC0tdGltZW91dCBhcmd1bWVudCB3aGljaCB3aWxsIHNwZWNpZnkgdGhlIHRpbWVvdXQg
-ZHVyYXRpb24uDQoNCldpdGggYmVzdCByZWdhcmRzLA0KLVByZXN0b24NCiANCg0K77u/T24gOS8x
-Ny8xOCwgNjoxNCBBTSwgIkx1aXogQXVndXN0byB2b24gRGVudHoiIDxsdWl6LmRlbnR6QGdtYWls
-LmNvbT4gd3JvdGU6DQoNCiAgICBIaSBQcmVzdG9uLA0KICAgIA0KICAgIE9uIFdlZCwgU2VwIDEy
-LCAyMDE4IGF0IDU6NTcgUE0sIEh1bnQsIFByZXN0b24gPHByZXN0b24uaHVudEBpbnRlbC5jb20+
-IHdyb3RlOg0KICAgID4gVGhlIHByZXZpb3VzIHNhbXBsZSBjb2RlIGRpZCBub3QgcmVsZWFzZSBh
-bGwgcmVzb3VyY2VzIHdoZW4gc2h1dHRpbmcNCiAgICA+IGRvd24uIFRoaXMgaXMgZmluZSB3aGVu
-IGl0J3MgYSBzdGFuZGFsb25lIHByb2dyYW0gc2luY2UgUHl0aG9uIHdpbGwgZnJlZQ0KICAgID4g
-YWxsIHJlc291cmNlcyBhdXRvbWF0aWNhbGx5IHdoZW4gdGhlIHByb2Nlc3MgdGVybWluYXRlcy4g
-SG93ZXZlciwgaW4gYQ0KICAgID4gbG9uZy1ydW5uaW5nIHByb2Nlc3MsIHRoaXMgd2lsbCBldmVu
-dHVhbGx5IGNhdXNlIHByb2JsZW1zLg0KICAgIA0KICAgIEkgd291bGQgYWRkIHRoZSB0aW1lb3V0
-IGFzIGFyZ3VtZW50IHRvIHRoZSB0b29sIGUuZy4NCiAgICBleGFtcGxlLWFkdmVydGlzZW1lbnQg
-LS10aW1lb3V0PTEwDQogICAgDQogICAgPg0KICAgID4gVGhpcyBjaGFuZ2VzZXQgc2hvd3MgaG93
-IHRvIHByb3Blcmx5IHJlbGVhc2UgYWxsIHJlc291cmNlcy4NCiAgICA+IC0tLQ0KICAgID4gIHRl
-c3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50IHwgMjUgKysrKysrKysrKysrKysrKysrLS0tLS0tLQ0K
-ICAgID4gIDEgZmlsZSBjaGFuZ2VkLCAxOCBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQ0K
-ICAgID4NCiAgICA+IGRpZmYgLS1naXQgYS90ZXN0L2V4YW1wbGUtYWR2ZXJ0aXNlbWVudCBiL3Rl
-c3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQogICAgPiBpbmRleCBmZDg0ZWFjLi4xZGI2MWQ2IDEw
-MDc1NQ0KICAgID4gLS0tIGEvdGVzdC9leGFtcGxlLWFkdmVydGlzZW1lbnQNCiAgICA+ICsrKyBi
-L3Rlc3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQogICAgPiBAQCAtNiwxNSArNiwxMyBAQCBpbXBv
-cnQgZGJ1cw0KICAgID4gIGltcG9ydCBkYnVzLmV4Y2VwdGlvbnMNCiAgICA+ICBpbXBvcnQgZGJ1
-cy5tYWlubG9vcC5nbGliDQogICAgPiAgaW1wb3J0IGRidXMuc2VydmljZQ0KICAgID4gLQ0KICAg
-ID4gLWltcG9ydCBhcnJheQ0KICAgID4gK2ltcG9ydCB0aW1lDQogICAgPiAraW1wb3J0IHRocmVh
-ZGluZw0KICAgID4NCiAgICA+ICB0cnk6DQogICAgPiAtICBmcm9tIGdpLnJlcG9zaXRvcnkgaW1w
-b3J0IEdPYmplY3QgICMgcHl0aG9uMw0KICAgID4gKyAgICBmcm9tIGdpLnJlcG9zaXRvcnkgaW1w
-b3J0IEdPYmplY3QgICMgcHl0aG9uMw0KICAgID4gIGV4Y2VwdCBJbXBvcnRFcnJvcjoNCiAgICA+
-IC0gIGltcG9ydCBnb2JqZWN0IGFzIEdPYmplY3QgICMgcHl0aG9uMg0KICAgID4gLQ0KICAgID4g
-LWZyb20gcmFuZG9tIGltcG9ydCByYW5kaW50DQogICAgPiArICAgIGltcG9ydCBnb2JqZWN0IGFz
-IEdPYmplY3QgICMgcHl0aG9uMg0KICAgID4NCiAgICA+ICBtYWlubG9vcCA9IE5vbmUNCiAgICA+
-DQogICAgPiBAQCAtMTM2LDYgKzEzNCw3IEBAIGNsYXNzIEFkdmVydGlzZW1lbnQoZGJ1cy5zZXJ2
-aWNlLk9iamVjdCk6DQogICAgPiAgICAgIGRlZiBSZWxlYXNlKHNlbGYpOg0KICAgID4gICAgICAg
-ICAgcHJpbnQoJyVzOiBSZWxlYXNlZCEnICUgc2VsZi5wYXRoKQ0KICAgID4NCiAgICA+ICsNCiAg
-ICA+ICBjbGFzcyBUZXN0QWR2ZXJ0aXNlbWVudChBZHZlcnRpc2VtZW50KToNCiAgICA+DQogICAg
-PiAgICAgIGRlZiBfX2luaXRfXyhzZWxmLCBidXMsIGluZGV4KToNCiAgICA+IEBAIC0xNzAsNiAr
-MTY5LDEyIEBAIGRlZiBmaW5kX2FkYXB0ZXIoYnVzKToNCiAgICA+ICAgICAgcmV0dXJuIE5vbmUN
-CiAgICA+DQogICAgPg0KICAgID4gK2RlZiBzaHV0ZG93bigpOg0KICAgID4gKyAgICBwcmludCgn
-QWR2ZXJ0aXNpbmcgZm9yIDEwIHNlY29uZHMuLi4nKQ0KICAgID4gKyAgICB0aW1lLnNsZWVwKDEw
-KQ0KICAgID4gKyAgICBtYWlubG9vcC5xdWl0KCkNCiAgICA+ICsNCiAgICA+ICsNCiAgICA+ICBk
-ZWYgbWFpbigpOg0KICAgID4gICAgICBnbG9iYWwgbWFpbmxvb3ANCiAgICA+DQogICAgPiBAQCAt
-MTgzLDcgKzE4OCw3IEBAIGRlZiBtYWluKCk6DQogICAgPiAgICAgICAgICByZXR1cm4NCiAgICA+
-DQogICAgPiAgICAgIGFkYXB0ZXJfcHJvcHMgPSBkYnVzLkludGVyZmFjZShidXMuZ2V0X29iamVj
-dChCTFVFWl9TRVJWSUNFX05BTUUsIGFkYXB0ZXIpLA0KICAgID4gLSAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIm9yZy5mcmVlZGVza3RvcC5EQnVzLlByb3BlcnRpZXMiKTsNCiAg
-ICA+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICJvcmcuZnJlZWRlc2t0b3Au
-REJ1cy5Qcm9wZXJ0aWVzIikNCiAgICA+DQogICAgPiAgICAgIGFkYXB0ZXJfcHJvcHMuU2V0KCJv
-cmcuYmx1ZXouQWRhcHRlcjEiLCAiUG93ZXJlZCIsIGRidXMuQm9vbGVhbigxKSkNCiAgICA+DQog
-ICAgPiBAQCAtMTk4LDcgKzIwMywxMyBAQCBkZWYgbWFpbigpOg0KICAgID4gICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICByZXBseV9oYW5kbGVyPXJlZ2lzdGVyX2FkX2NiLA0K
-ICAgID4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBlcnJvcl9oYW5kbGVy
-PXJlZ2lzdGVyX2FkX2Vycm9yX2NiKQ0KICAgID4NCiAgICA+ICsgICAgdGhyZWFkaW5nLlRocmVh
-ZCh0YXJnZXQ9c2h1dGRvd24pLnN0YXJ0KCkNCiAgICA+ICsNCiAgICA+ICAgICAgbWFpbmxvb3Au
-cnVuKCkNCiAgICA+DQogICAgPiArICAgIGFkX21hbmFnZXIuVW5yZWdpc3RlckFkdmVydGlzZW1l
-bnQodGVzdF9hZHZlcnRpc2VtZW50KQ0KICAgID4gKyAgICBwcmludCgnQWR2ZXJ0aXNlbWVudCB1
-bnJlZ2lzdGVyZWQnKQ0KICAgID4gKyAgICBkYnVzLnNlcnZpY2UuT2JqZWN0LnJlbW92ZV9mcm9t
-X2Nvbm5lY3Rpb24odGVzdF9hZHZlcnRpc2VtZW50KQ0KICAgID4gKw0KICAgID4gIGlmIF9fbmFt
-ZV9fID09ICdfX21haW5fXyc6DQogICAgPiAgICAgIG1haW4oKQ0KICAgID4gLS0NCiAgICA+IDIu
-Ny40DQogICAgPg0KICAgIA0KICAgIA0KICAgIA0KICAgIC0tIA0KICAgIEx1aXogQXVndXN0byB2
-b24gRGVudHoNCiAgICANCg0K
+On 9/21/2018 12:45 PM, Matthias Kaehlcke wrote:
+> Well, there is a generic binding
+> (https://elixir.bootlin.com/linux/v4.18/source/Documentation/devicetree/bindings/net/bluetooth.txt),
+> the fact that there are drivers that aren't adhering to it doesn't
+> change that.
+
+OK. If there is some soft of a "standard" naming convention, we should be good.
+Otherwise, as Sakari also raised the concern; common code becomes a dumping
+ground for drivers.
