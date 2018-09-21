@@ -1,126 +1,64 @@
 Return-Path: <linux-bluetooth-owner@vger.kernel.org>
+From: "Hunt, Preston" <preston.hunt@intel.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH BlueZ] test/example-advertisement: add shutdown code
+Date: Fri, 21 Sep 2018 16:53:34 +0000
+Message-ID: <5EDC8785-AB89-452A-AC80-E31A244A4467@intel.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <5EDC8785-AB89-452A-AC80-E31A244A4467@intel.com>
-References: <5EDC8785-AB89-452A-AC80-E31A244A4467@intel.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 21 Sep 2018 21:47:31 +0300
-Message-ID: <CABBYNZKArwJcBQG+45=5VHnQ9aEb1YLz_5Of74K2sRO==VcFYw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] test/example-advertisement: add shutdown code
-To: "Hunt, Preston" <preston.hunt@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Preston,
-
-On Fri, Sep 21, 2018 at 7:53 PM, Hunt, Preston <preston.hunt@intel.com> wrote:
-> The previous sample code did not release all resources when shutting
-> down. This is fine when it's a standalone program since Python will free
-> all resources automatically when the process terminates. However, in a
-> long-running process, this will eventually cause problems.
->
-> This changeset shows how to properly release all resources. An optional
-> command-line timeout argument controls the duration (if any).
-> ---
->  test/example-advertisement | 40 +++++++++++++++++++++++++++++++---------
->  1 file changed, 31 insertions(+), 9 deletions(-)
->
-> diff --git a/test/example-advertisement b/test/example-advertisement
-> index fd84eac..3d7873e 100755
-> --- a/test/example-advertisement
-> +++ b/test/example-advertisement
-> @@ -2,19 +2,18 @@
->
->  from __future__ import print_function
->
-> +import argparse
->  import dbus
->  import dbus.exceptions
->  import dbus.mainloop.glib
->  import dbus.service
-> -
-> -import array
-> +import time
-> +import threading
->
->  try:
-> -  from gi.repository import GObject  # python3
-> +    from gi.repository import GObject  # python3
->  except ImportError:
-> -  import gobject as GObject  # python2
-> -
-> -from random import randint
-> +    import gobject as GObject  # python2
->
->  mainloop = None
->
-> @@ -136,6 +135,7 @@ class Advertisement(dbus.service.Object):
->      def Release(self):
->          print('%s: Released!' % self.path)
->
-> +
->  class TestAdvertisement(Advertisement):
->
->      def __init__(self, bus, index):
-> @@ -170,7 +170,16 @@ def find_adapter(bus):
->      return None
->
->
-> -def main():
-> +def shutdown(timeout):
-> +    if timeout == 0:
-> +        print('Advertising forever...')
-> +        return
-> +    print('Advertising for {} seconds...'.format(timeout))
-> +    time.sleep(timeout)
-> +    mainloop.quit()
-> +
-> +
-> +def main(timeout):
->      global mainloop
->
->      dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-> @@ -183,7 +192,7 @@ def main():
->          return
->
->      adapter_props = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, adapter),
-> -                                   "org.freedesktop.DBus.Properties");
-> +                                   "org.freedesktop.DBus.Properties")
->
->      adapter_props.Set("org.bluez.Adapter1", "Powered", dbus.Boolean(1))
->
-> @@ -198,7 +207,20 @@ def main():
->                                       reply_handler=register_ad_cb,
->                                       error_handler=register_ad_error_cb)
->
-> +    threading.Thread(target=shutdown, args=(timeout,)).start()
-> +
->      mainloop.run()
->
-> +    ad_manager.UnregisterAdvertisement(test_advertisement)
-> +    print('Advertisement unregistered')
-> +    dbus.service.Object.remove_from_connection(test_advertisement)
-> +
-> +
->  if __name__ == '__main__':
-> -    main()
-> +    parser = argparse.ArgumentParser()
-> +    parser.add_argument('--timeout', default=10, type=int, help="advertise " +
-> +                        "for this many seconds then stop, 0=run forever " +
-> +                        "(default: 10)")
-
-Lets default to 0 so we maintain the same behavior as before.
-
-> +    args = parser.parse_args()
-> +
-> +    main(args.timeout)
-> --
-> 2.7.4
->
->
-
-
-
--- 
-Luiz Augusto von Dentz
+VGhlIHByZXZpb3VzIHNhbXBsZSBjb2RlIGRpZCBub3QgcmVsZWFzZSBhbGwgcmVzb3VyY2VzIHdo
+ZW4gc2h1dHRpbmcNCmRvd24uIFRoaXMgaXMgZmluZSB3aGVuIGl0J3MgYSBzdGFuZGFsb25lIHBy
+b2dyYW0gc2luY2UgUHl0aG9uIHdpbGwgZnJlZQ0KYWxsIHJlc291cmNlcyBhdXRvbWF0aWNhbGx5
+IHdoZW4gdGhlIHByb2Nlc3MgdGVybWluYXRlcy4gSG93ZXZlciwgaW4gYQ0KbG9uZy1ydW5uaW5n
+IHByb2Nlc3MsIHRoaXMgd2lsbCBldmVudHVhbGx5IGNhdXNlIHByb2JsZW1zLg0KDQpUaGlzIGNo
+YW5nZXNldCBzaG93cyBob3cgdG8gcHJvcGVybHkgcmVsZWFzZSBhbGwgcmVzb3VyY2VzLiBBbiBv
+cHRpb25hbA0KY29tbWFuZC1saW5lIHRpbWVvdXQgYXJndW1lbnQgY29udHJvbHMgdGhlIGR1cmF0
+aW9uIChpZiBhbnkpLg0KLS0tDQogdGVzdC9leGFtcGxlLWFkdmVydGlzZW1lbnQgfCA0MCArKysr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tDQogMSBmaWxlIGNoYW5nZWQsIDMx
+IGluc2VydGlvbnMoKyksIDkgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS90ZXN0L2V4YW1w
+bGUtYWR2ZXJ0aXNlbWVudCBiL3Rlc3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQppbmRleCBmZDg0
+ZWFjLi4zZDc4NzNlIDEwMDc1NQ0KLS0tIGEvdGVzdC9leGFtcGxlLWFkdmVydGlzZW1lbnQNCisr
+KyBiL3Rlc3QvZXhhbXBsZS1hZHZlcnRpc2VtZW50DQpAQCAtMiwxOSArMiwxOCBAQA0KIA0KIGZy
+b20gX19mdXR1cmVfXyBpbXBvcnQgcHJpbnRfZnVuY3Rpb24NCiANCitpbXBvcnQgYXJncGFyc2UN
+CiBpbXBvcnQgZGJ1cw0KIGltcG9ydCBkYnVzLmV4Y2VwdGlvbnMNCiBpbXBvcnQgZGJ1cy5tYWlu
+bG9vcC5nbGliDQogaW1wb3J0IGRidXMuc2VydmljZQ0KLQ0KLWltcG9ydCBhcnJheQ0KK2ltcG9y
+dCB0aW1lDQoraW1wb3J0IHRocmVhZGluZw0KIA0KIHRyeToNCi0gIGZyb20gZ2kucmVwb3NpdG9y
+eSBpbXBvcnQgR09iamVjdCAgIyBweXRob24zDQorICAgIGZyb20gZ2kucmVwb3NpdG9yeSBpbXBv
+cnQgR09iamVjdCAgIyBweXRob24zDQogZXhjZXB0IEltcG9ydEVycm9yOg0KLSAgaW1wb3J0IGdv
+YmplY3QgYXMgR09iamVjdCAgIyBweXRob24yDQotDQotZnJvbSByYW5kb20gaW1wb3J0IHJhbmRp
+bnQNCisgICAgaW1wb3J0IGdvYmplY3QgYXMgR09iamVjdCAgIyBweXRob24yDQogDQogbWFpbmxv
+b3AgPSBOb25lDQogDQpAQCAtMTM2LDYgKzEzNSw3IEBAIGNsYXNzIEFkdmVydGlzZW1lbnQoZGJ1
+cy5zZXJ2aWNlLk9iamVjdCk6DQogICAgIGRlZiBSZWxlYXNlKHNlbGYpOg0KICAgICAgICAgcHJp
+bnQoJyVzOiBSZWxlYXNlZCEnICUgc2VsZi5wYXRoKQ0KIA0KKw0KIGNsYXNzIFRlc3RBZHZlcnRp
+c2VtZW50KEFkdmVydGlzZW1lbnQpOg0KIA0KICAgICBkZWYgX19pbml0X18oc2VsZiwgYnVzLCBp
+bmRleCk6DQpAQCAtMTcwLDcgKzE3MCwxNiBAQCBkZWYgZmluZF9hZGFwdGVyKGJ1cyk6DQogICAg
+IHJldHVybiBOb25lDQogDQogDQotZGVmIG1haW4oKToNCitkZWYgc2h1dGRvd24odGltZW91dCk6
+DQorICAgIGlmIHRpbWVvdXQgPT0gMDoNCisgICAgICAgIHByaW50KCdBZHZlcnRpc2luZyBmb3Jl
+dmVyLi4uJykNCisgICAgICAgIHJldHVybg0KKyAgICBwcmludCgnQWR2ZXJ0aXNpbmcgZm9yIHt9
+IHNlY29uZHMuLi4nLmZvcm1hdCh0aW1lb3V0KSkNCisgICAgdGltZS5zbGVlcCh0aW1lb3V0KQ0K
+KyAgICBtYWlubG9vcC5xdWl0KCkNCisNCisNCitkZWYgbWFpbih0aW1lb3V0KToNCiAgICAgZ2xv
+YmFsIG1haW5sb29wDQogDQogICAgIGRidXMubWFpbmxvb3AuZ2xpYi5EQnVzR01haW5Mb29wKHNl
+dF9hc19kZWZhdWx0PVRydWUpDQpAQCAtMTgzLDcgKzE5Miw3IEBAIGRlZiBtYWluKCk6DQogICAg
+ICAgICByZXR1cm4NCiANCiAgICAgYWRhcHRlcl9wcm9wcyA9IGRidXMuSW50ZXJmYWNlKGJ1cy5n
+ZXRfb2JqZWN0KEJMVUVaX1NFUlZJQ0VfTkFNRSwgYWRhcHRlciksDQotICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAib3JnLmZyZWVkZXNrdG9wLkRCdXMuUHJvcGVydGllcyIpOw0K
+KyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIm9yZy5mcmVlZGVza3RvcC5EQnVz
+LlByb3BlcnRpZXMiKQ0KIA0KICAgICBhZGFwdGVyX3Byb3BzLlNldCgib3JnLmJsdWV6LkFkYXB0
+ZXIxIiwgIlBvd2VyZWQiLCBkYnVzLkJvb2xlYW4oMSkpDQogDQpAQCAtMTk4LDcgKzIwNywyMCBA
+QCBkZWYgbWFpbigpOg0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICByZXBs
+eV9oYW5kbGVyPXJlZ2lzdGVyX2FkX2NiLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBlcnJvcl9oYW5kbGVyPXJlZ2lzdGVyX2FkX2Vycm9yX2NiKQ0KIA0KKyAgICB0aHJl
+YWRpbmcuVGhyZWFkKHRhcmdldD1zaHV0ZG93biwgYXJncz0odGltZW91dCwpKS5zdGFydCgpDQor
+DQogICAgIG1haW5sb29wLnJ1bigpDQogDQorICAgIGFkX21hbmFnZXIuVW5yZWdpc3RlckFkdmVy
+dGlzZW1lbnQodGVzdF9hZHZlcnRpc2VtZW50KQ0KKyAgICBwcmludCgnQWR2ZXJ0aXNlbWVudCB1
+bnJlZ2lzdGVyZWQnKQ0KKyAgICBkYnVzLnNlcnZpY2UuT2JqZWN0LnJlbW92ZV9mcm9tX2Nvbm5l
+Y3Rpb24odGVzdF9hZHZlcnRpc2VtZW50KQ0KKw0KKw0KIGlmIF9fbmFtZV9fID09ICdfX21haW5f
+Xyc6DQotICAgIG1haW4oKQ0KKyAgICBwYXJzZXIgPSBhcmdwYXJzZS5Bcmd1bWVudFBhcnNlcigp
+DQorICAgIHBhcnNlci5hZGRfYXJndW1lbnQoJy0tdGltZW91dCcsIGRlZmF1bHQ9MTAsIHR5cGU9
+aW50LCBoZWxwPSJhZHZlcnRpc2UgIiArDQorICAgICAgICAgICAgICAgICAgICAgICAgImZvciB0
+aGlzIG1hbnkgc2Vjb25kcyB0aGVuIHN0b3AsIDA9cnVuIGZvcmV2ZXIgIiArDQorICAgICAgICAg
+ICAgICAgICAgICAgICAgIihkZWZhdWx0OiAxMCkiKQ0KKyAgICBhcmdzID0gcGFyc2VyLnBhcnNl
+X2FyZ3MoKQ0KKw0KKyAgICBtYWluKGFyZ3MudGltZW91dCkNCi0tIA0KMi43LjQNCg0KDQo=
