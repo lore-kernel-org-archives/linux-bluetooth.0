@@ -1,85 +1,53 @@
-Return-Path: <netdev-owner@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/3] net: rework SIOCGSTAMP ioctl handling
-To: Arnd Bergmann <arnd@arndb.de>, netdev@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>
-Cc: linux-arch@vger.kernel.org, y2038@lists.linaro.org,
-        Eric Dumazet <edumazet@google.com>,
-        Willem de Bruijn <willemb@google.com>,
-        linux-kernel@vger.kernel.org, linux-hams@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
-        dccp@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
-References: <20180829130308.3504560-1-arnd@arndb.de>
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <5cca03b6-8d3d-5f18-778f-a5d5e70c2218@datenfreihafen.org>
-Date: Fri, 21 Sep 2018 11:14:36 +0200
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20180829130308.3504560-1-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <20180920233033.GK23038@fattuba.com>
+References: <20180919225522.GF23038@fattuba.com> <CABBYNZJx7gY=6G2YHOcEPJag5rUeHPM3ZEdmhWvLqFhdbaxbOg@mail.gmail.com>
+ <20180920233033.GK23038@fattuba.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 21 Sep 2018 11:22:50 +0300
+Message-ID: <CABBYNZJzebXGNaN-9jRM+9aAgN-ffBnrzHZ3ePjPaTaboeMTdA@mail.gmail.com>
+Subject: Re: BLE out of band mgmt over dbus?
+To: Ryan Nowakowski <tubaman@fattuba.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        marcus.chang@arm.com
+Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Arnd.
+Hi Ryan,
 
-On 8/29/18 2:59 PM, Arnd Bergmann wrote:
-> The SIOCGSTAMP/SIOCGSTAMPNS ioctl commands are implemented by many
-> socket protocol handlers, and all of those end up calling the same
-> sock_get_timestamp()/sock_get_timestampns() helper functions, which
-> results in a lot of duplicate code.
-> 
-> With the introduction of 64-bit time_t on 32-bit architectures, this
-> gets worse, as we then need four different ioctl commands in each
-> socket protocol implementation.
-> 
-> To simplify that, let's add a new .gettstamp() operation in
-> struct proto_ops, and move ioctl implementation into the common
-> sock_ioctl()/compat_sock_ioctl_trans() functions that these all go
-> through.
-> 
-> We can reuse the sock_get_timestamp() implementation, but generalize
-> it so it can deal with both native and compat mode, as well as
-> timeval and timespec structures.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  include/linux/net.h          |  2 ++
->  include/net/compat.h         |  3 --
->  include/net/sock.h           |  4 +--
->  net/appletalk/ddp.c          |  7 +----
->  net/atm/ioctl.c              | 16 -----------
->  net/atm/pvc.c                |  1 +
->  net/atm/svc.c                |  1 +
->  net/ax25/af_ax25.c           |  9 +-----
->  net/bluetooth/af_bluetooth.c |  8 ------
->  net/bluetooth/l2cap_sock.c   |  1 +
->  net/bluetooth/rfcomm/sock.c  |  1 +
->  net/bluetooth/sco.c          |  1 +
->  net/can/af_can.c             |  6 ----
->  net/can/bcm.c                |  1 +
->  net/can/raw.c                |  1 +
->  net/compat.c                 | 54 ------------------------------------
->  net/core/sock.c              | 38 +++++++++++--------------
->  net/dccp/ipv4.c              |  1 +
->  net/dccp/ipv6.c              |  1 +
->  net/ieee802154/socket.c      |  6 ++--
->  net/ipv4/af_inet.c           |  9 ++----
->  net/ipv6/af_inet6.c          |  8 ++----
->  net/ipv6/raw.c               |  1 +
->  net/l2tp/l2tp_ip.c           |  1 +
->  net/l2tp/l2tp_ip6.c          |  1 +
->  net/netrom/af_netrom.c       | 14 +---------
->  net/packet/af_packet.c       |  7 ++---
->  net/qrtr/qrtr.c              |  4 +--
->  net/rose/af_rose.c           |  7 +----
->  net/sctp/ipv6.c              |  1 +
->  net/sctp/protocol.c          |  1 +
->  net/socket.c                 | 48 ++++++++++----------------------
->  net/x25/af_x25.c             | 27 +-----------------
->  33 files changed, 63 insertions(+), 228 deletions(-)
+On Fri, Sep 21, 2018 at 2:30 AM, Ryan Nowakowski <tubaman@fattuba.com> wrote:
+> On Thu, Sep 20, 2018 at 11:31:18AM +0300, Luiz Augusto von Dentz wrote:
+>> Hi Ryan,
+>>
+>> On Thu, Sep 20, 2018 at 1:55 AM, Ryan Nowakowski <tubaman@fattuba.com> wrote:
+>> > Hello bluez devs!
+>> >
+>> > It seems like the mgmt API, particularly the out of band management[1]
+>> > isn't available via dbus.  Is there a particular reason that the mgmt
+>> > stuff isn't exposed via dbus?
+>>
+>> We have a plugin for neard, which is probably outdated by now, to do
+>> OOB, not sure if that is your use case though.
+>
+> We've looked at the neard plugin and it doesn't quiet fit our
+> situation.  It looks like some other mgmt commands are already available via
+> dbus(discovery, etc).  I'm thinking about writing a patch that would
+> add the OOB mgmt commands to dbus.  Is this a terrible idea?
 
-For the net/ieee802154/socket. part I am fine with this change.
+Perhaps you are referring to ConnectDevice:
 
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n154
 
-regards
-Stefan Schmidt
+We could perhaps introduce an optional property for the application to
+include the OOB data, but that should be validated by connecting and
+attempting to encrypt, if that fails the OOB should be discarded.
+
+> - Ryan
+>
+>> > [1] https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt#n1279
+
+
+
+-- 
+Luiz Augusto von Dentz
