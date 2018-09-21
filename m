@@ -1,152 +1,126 @@
-Return-Path: <andy.shevchenko@gmail.com>
+Return-Path: <linux-bluetooth-owner@vger.kernel.org>
 MIME-Version: 1.0
-References: <20180920223436.202454-1-mka@chromium.org> <20180920223436.202454-2-mka@chromium.org>
- <20180921071312.gg7xshwa2ro3hiix@kekkonen.localdomain>
-In-Reply-To: <20180921071312.gg7xshwa2ro3hiix@kekkonen.localdomain>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Fri, 21 Sep 2018 15:47:54 +0300
-Message-ID: <CAHp75Vc-evA6MCxGN+Ho+XQkBqtQ_JpMEpPUmMGxMxUSmL1LMA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] device property: Add device_get_bd_address() and fwnode_get_bd_address()
-To: Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc: Matthias Kaehlcke <mka@chromium.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>, mw@semihalf.com,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Sinan Kaya <okaya@codeaurora.org>,
-	Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-bluetooth@vger.kernel.org,
-	bgodavar@codeaurora.org, Loic Poulain <loic.poulain@linaro.org>,
-	Brian Norris <briannorris@chromium.org>
+In-Reply-To: <70C091497DE2844DBD9E143B2282ABDA9BE5DA@BGSMSX105.gar.corp.intel.com>
+References: <1537350714-32105-1-git-send-email-mallikarjun.phulari@intel.com>
+ <CABBYNZ+CAujgpF_8T_xyeu=+Zfzkocuwb5Df0YMT9YDv7M9-4w@mail.gmail.com> <70C091497DE2844DBD9E143B2282ABDA9BE5DA@BGSMSX105.gar.corp.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 21 Sep 2018 14:44:22 +0300
+Message-ID: <CABBYNZKb8qZKbP45Pk1=3OyJUUz95MDP9h8Vd_dyt+iL5A3f7A@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth : Errata Service Release 8 Erratum 3253
+To: "Phulari, Mallikarjun" <mallikarjun.phulari@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 21, 2018 at 10:16 AM Sakari Ailus
-<sakari.ailus@linux.intel.com> wrote:
->
-> Hi Matthias,
->
-> On Thu, Sep 20, 2018 at 03:34:35PM -0700, Matthias Kaehlcke wrote:
-> > Provide an API for Bluetooth drivers to retrieve the Bluetooth Device
-> > address (BD_ADDR) for a device. If the device node has a property
-> > 'local-bd-address' the BD address is read from this property.
-> >
+Hi Mallikarjun,
 
-I have nothing to object for the idea and agree fully on Sakari's comments.
+On Fri, Sep 21, 2018 at 7:37 AM, Phulari, Mallikarjun
+<mallikarjun.phulari@intel.com> wrote:
+> Hi Luiz,
+> Please find the new patch with review comments incorporated.
 
-After addressing them, fill free to add my
+Please send a proper patch not as attachment.
 
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+> *I have added the Page number of Core Specification for reference in the commit message and included the "signed of by" in the patch.
+>
+> *L2CAP_CR_INVALID_SCID and L2CAP_CR_SCID_IN_USE are specific to LE with different result values as:
+>  L2CAP_CR_INVALID_SCID  -  0x0009
+>  L2CAP_CR_SCID_IN_USE   -  0x000A
 
-> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> > ---
-> >  drivers/base/property.c  | 49 ++++++++++++++++++++++++++++++++++++++++
-> >  include/linux/property.h |  4 ++++
-> >  2 files changed, 53 insertions(+)
-> >
-> > diff --git a/drivers/base/property.c b/drivers/base/property.c
-> > index 240ab5230ff6..8fe546b9805a 100644
-> > --- a/drivers/base/property.c
-> > +++ b/drivers/base/property.c
-> > @@ -18,6 +18,8 @@
-> >  #include <linux/etherdevice.h>
-> >  #include <linux/phy.h>
-> >
-> > +#define BD_ADDR_LEN  6
-> > +
-> >  struct property_set {
-> >       struct device *dev;
-> >       struct fwnode_handle fwnode;
-> > @@ -1315,6 +1317,53 @@ void *device_get_mac_address(struct device *dev, char *addr, int alen)
-> >  }
-> >  EXPORT_SYMBOL(device_get_mac_address);
-> >
-> > +/**
-> > + * fwnode_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) from the
-> > + *                         firmware node
-> > + * @fwnode:  Pointer to the firmware node
-> > + * @addr:    Address of buffer to store the BD address in
-> > + * @alen:    Length of the buffer pointed to by addr, should be BD_ADDR_LEN
-> > + *
-> > + * Search the firmware node for 'local-bd-address'.
-> > + *
-> > + * All-zero BD addresses are rejected, because those could be properties
-> > + * that exist in the firmware tables, but were not updated by the firmware. For
-> > + * example, the DTS could define 'local-bd-address', with zero BD addresses.
-> > + */
-> > +int fwnode_get_bd_address(struct fwnode_handle *fwnode, u8 *addr, int alen)
+Alright, so they probably need to be renamed to
+L2CAP_CR_LE_INVALID_SCID and L2CAP_CR_LE_SCID_IN_USE so we don't
+confuse these with BR codes.
+
+> It is already implemented.
 >
-> How about using bdaddr_t instead? The original caller was casting it to u8
-> probably just because there was no function specifically for this purpose.
+> Thanks & Regards
+> Mallikarjun Phulari
 >
-> I wonder if this also should be made depend on CONFIG_BT. The fwnode
-> framework is unconditionally a part of the kernel and it's not very big at
-> the moment but adding stuff little by little will add up eventually.
+> _____________________________________
+> From: Luiz Augusto von Dentz [luiz.dentz@gmail.com]
+> Sent: Wednesday, September 19, 2018 5:06 AM
+> To: Phulari, Mallikarjun
+> Cc: linux-bluetooth@vger.kernel.org
+> Subject: Re: [PATCH] Bluetooth : Errata Service Release 8 Erratum 3253
 >
-> > +{
-> > +     u8 buf[BD_ADDR_LEN];
-> > +     int ret;
-> > +
-> > +     if (alen != BD_ADDR_LEN)
-> > +             return -EINVAL;
-> > +
-> > +     ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
-> > +                                         buf, alen);
-> > +     if (ret < 0)
-> > +             return ret;
-> > +     if (is_zero_ether_addr(buf))
-> > +             return -ENODATA;
-> > +
-> > +     memcpy(addr, buf, BD_ADDR_LEN);
-> > +
-> > +     return 0;
-> > +}
-> > +EXPORT_SYMBOL(fwnode_get_bd_address);
-> > +
-> > +/**
-> > + * device_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) for a
-> > + *                         given device
-> > + * @dev:     Pointer to the device
-> > + * @addr:    Address of buffer to store the BD address in
-> > + * @alen:    Length of the buffer pointed to by addr, should be BD_ADDR_LEN
-> > + */
-> > +int device_get_bd_address(struct device *dev, u8 *addr, int alen)
-> > +{
-> > +     return fwnode_get_bd_address(dev_fwnode(dev), addr, alen);
-> > +}
-> > +EXPORT_SYMBOL(device_get_bd_address);
-> > +
-> >  /**
-> >   * fwnode_irq_get - Get IRQ directly from a fwnode
-> >   * @fwnode:  Pointer to the firmware node
-> > diff --git a/include/linux/property.h b/include/linux/property.h
-> > index ac8a1ebc4c1b..4e2f1b276f4f 100644
-> > --- a/include/linux/property.h
-> > +++ b/include/linux/property.h
-> > @@ -287,9 +287,13 @@ int device_get_phy_mode(struct device *dev);
-> >
-> >  void *device_get_mac_address(struct device *dev, char *addr, int alen);
-> >
-> > +int device_get_bd_address(struct device *dev, u8 *addr, int alen);
-> > +
-> >  int fwnode_get_phy_mode(struct fwnode_handle *fwnode);
-> >  void *fwnode_get_mac_address(struct fwnode_handle *fwnode,
-> >                            char *addr, int alen);
-> > +int fwnode_get_bd_address(struct fwnode_handle *fwnode,
-> > +                       u8 *addr, int alen);
+> Hi Mallikarjun,
 >
-> This would be a good opportunity to add a newline here, and avoid adding
-> one after device_get_mac_address().
+> On Wed, Sep 19, 2018 at 12:51 PM, Mallikarjun Phulari
+> <mallikarjun.phulari@intel.com> wrote:
+>> L2CAP: Changes include the new result codes for the l2cap channel
+>> create/connect request. The new result code are:
+>> 0x0006 - sent in the response when the CID is not in valid dynamic range.
+>> 0x0007 sent in the response when the CID is already allocated.
 >
-> >  struct fwnode_handle *fwnode_graph_get_next_endpoint(
-> >       const struct fwnode_handle *fwnode, struct fwnode_handle *prev);
-> >  struct fwnode_handle *
+> It would be a good idea to quote the erratum with page number where
+> the new errors come from. Btw, you should include a signed of by in
+> the kernel patches.
+>
+>> ---
+>>  include/net/bluetooth/l2cap.h |  6 ++++++
+>>  net/bluetooth/l2cap_core.c    | 12 ++++++++++++
+>>  2 files changed, 18 insertions(+)
+>>
+>> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+>> index 0697fd4..eb0c8d0 100644
+>> --- a/include/net/bluetooth/l2cap.h
+>> +++ b/include/net/bluetooth/l2cap.h
+>> @@ -284,6 +284,12 @@ struct l2cap_conn_rsp {
+>>  #define L2CAP_CR_INVALID_SCID  0x0009
+>>  #define L2CAP_CR_SCID_IN_USE   0x000A
+>>
+>> +/* connect/create channel results
+>> + * As per Erratum 3253
+>> + */
+>> +#define L2CAP_CR_BREDR_INVALID_SCID    0x0006
+>> +#define L2CAP_CR_BREDR_SCID_IN_USE     0x0007
+>
+> Weird, are L2CAP_CR_INVALID_SCID and L2CAP_CR_SCID_IN_USE specific to
+> LE? If they are we should probably fix their names.
+>
+>>  /* connect/create channel status */
+>>  #define L2CAP_CS_NO_INFO       0x0000
+>>  #define L2CAP_CS_AUTHEN_PEND   0x0001
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 9b7907e..85887df 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -3814,9 +3814,21 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+>>         }
+>>
+>>         result = L2CAP_CR_NO_MEM;
+>> +       /* As per Erratum 3253, check the CID is in valid dynamic range and
+>> +        *  is not allocated already. Send the new result codes accordingly
+>> +        */
+>> +
+>> +       /* Check for valid dynamic CID range */
+>> +       if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
+>> +               result = L2CAP_CR_BREDR_INVALID_SCID;
+>> +               chan = NULL;
+>> +               goto response;
+>> +       }
+>>
+>>         /* Check if we already have channel with that dcid */
+>>         if (__l2cap_get_chan_by_dcid(conn, scid))
+>> +               result = L2CAP_CR_BREDR_SCID_IN_USE;
+>> +               chan = NULL;
+>>                 goto response;
+>
+> Missing { } above?
+>
+>>
+>>         chan = pchan->ops->new_connection(pchan);
+>> --
+>> 2.7.4
+>>
+>
+>
 >
 > --
-> Regards,
->
-> Sakari Ailus
-> sakari.ailus@linux.intel.com
+> Luiz Augusto von Dentz
 
 
 
 -- 
-With Best Regards,
-Andy Shevchenko
+Luiz Augusto von Dentz
