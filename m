@@ -1,45 +1,148 @@
 Return-Path: <mka@chromium.org>
-Date: Fri, 21 Sep 2018 09:45:41 -0700
+Date: Fri, 21 Sep 2018 09:40:58 -0700
 From: Matthias Kaehlcke <mka@chromium.org>
-To: Sinan Kaya <okaya@codeaurora.org>
+To: Sakari Ailus <sakari.ailus@linux.intel.com>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Sakari Ailus <sakari.ailus@linux.intel.com>,
 	Marcin Wojtas <mw@semihalf.com>,
 	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Sinan Kaya <okaya@codeaurora.org>,
 	Marcel Holtmann <marcel@holtmann.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	Balakrishna Godavarthi <bgodavar@codeaurora.org>,
 	Loic Poulain <loic.poulain@linaro.org>,
 	Brian Norris <briannorris@chromium.org>
-Subject: Re: [PATCH 0/2] Add API to retrieve the Bluetooth Device Address
- (BD_ADDR)
-Message-ID: <20180921164541.GX22824@google.com>
+Subject: Re: [PATCH 1/2] device property: Add device_get_bd_address() and
+ fwnode_get_bd_address()
+Message-ID: <20180921164058.GW22824@google.com>
 References: <20180920223436.202454-1-mka@chromium.org>
- <0ea65ca1-8d06-72d8-3bbe-693e09605a8a@codeaurora.org>
- <20180920230121.GT22824@google.com>
- <36e5d881-a45e-c879-c275-e6e18bc99ed5@codeaurora.org>
- <20180920231947.GU22824@google.com>
- <124b6f76-a65f-e304-6c60-fbb9104415f4@codeaurora.org>
+ <20180920223436.202454-2-mka@chromium.org>
+ <20180921071312.gg7xshwa2ro3hiix@kekkonen.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-In-Reply-To: <124b6f76-a65f-e304-6c60-fbb9104415f4@codeaurora.org>
+In-Reply-To: <20180921071312.gg7xshwa2ro3hiix@kekkonen.localdomain>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Sep 21, 2018 at 01:25:45AM -0400, Sinan Kaya wrote:
-> On 9/20/2018 7:19 PM, Matthias Kaehlcke wrote:
-> > If the existing users populate a custom property with the BD address
-> > in the bootloader you could roll out a bootloader change. You'd have
-> > to make sure that bootloader and kernel match. The bootloader could
-> > still populate the custom property to be compatible with 'old'
-> > kernels.
-> 
-> If there is no standard about the name of the property, this probably
-> doesn't belong to property.c but should rather be hosted in bluetooth
-> directory for consumption among the bluetooth drivers.
+Hi Sakari,
 
-Well, there is a generic binding
-(https://elixir.bootlin.com/linux/v4.18/source/Documentation/devicetree/bindings/net/bluetooth.txt),
-the fact that there are drivers that aren't adhering to it doesn't
-change that.
+On Fri, Sep 21, 2018 at 10:13:12AM +0300, Sakari Ailus wrote:
+> Hi Matthias,
+> 
+> On Thu, Sep 20, 2018 at 03:34:35PM -0700, Matthias Kaehlcke wrote:
+> > Provide an API for Bluetooth drivers to retrieve the Bluetooth Device
+> > address (BD_ADDR) for a device. If the device node has a property
+> > 'local-bd-address' the BD address is read from this property.
+> > 
+> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> > ---
+> >  drivers/base/property.c  | 49 ++++++++++++++++++++++++++++++++++++++++
+> >  include/linux/property.h |  4 ++++
+> >  2 files changed, 53 insertions(+)
+> > 
+> > diff --git a/drivers/base/property.c b/drivers/base/property.c
+> > index 240ab5230ff6..8fe546b9805a 100644
+> > --- a/drivers/base/property.c
+> > +++ b/drivers/base/property.c
+> > @@ -18,6 +18,8 @@
+> >  #include <linux/etherdevice.h>
+> >  #include <linux/phy.h>
+> >  
+> > +#define BD_ADDR_LEN	6
+> > +
+> >  struct property_set {
+> >  	struct device *dev;
+> >  	struct fwnode_handle fwnode;
+> > @@ -1315,6 +1317,53 @@ void *device_get_mac_address(struct device *dev, char *addr, int alen)
+> >  }
+> >  EXPORT_SYMBOL(device_get_mac_address);
+> >  
+> > +/**
+> > + * fwnode_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) from the
+> > + *                         firmware node
+> > + * @fwnode:	Pointer to the firmware node
+> > + * @addr:	Address of buffer to store the BD address in
+> > + * @alen:	Length of the buffer pointed to by addr, should be BD_ADDR_LEN
+> > + *
+> > + * Search the firmware node for 'local-bd-address'.
+> > + *
+> > + * All-zero BD addresses are rejected, because those could be properties
+> > + * that exist in the firmware tables, but were not updated by the firmware. For
+> > + * example, the DTS could define 'local-bd-address', with zero BD addresses.
+> > + */
+> > +int fwnode_get_bd_address(struct fwnode_handle *fwnode, u8 *addr, int alen)
+> 
+> How about using bdaddr_t instead? The original caller was casting it to u8
+> probably just because there was no function specifically for this purpose.
+
+I was considering that, but wasn't sure if it would be 'correct' to
+include net/bluetooth/bluetooth.h (with the typdef of bdaddr_t) from
+property.h since it is very frugal on headers and complex types.
+
+That said I'd also prefer to use bdaddr_t if the API isn't limited to
+basic data types on purpose.
+
+> I wonder if this also should be made depend on CONFIG_BT. The fwnode
+> framework is unconditionally a part of the kernel and it's not very big at
+> the moment but adding stuff little by little will add up eventually.
+
+Sounds good!
+
+> > +{
+> > +	u8 buf[BD_ADDR_LEN];
+> > +	int ret;
+> > +
+> > +	if (alen != BD_ADDR_LEN)
+> > +		return -EINVAL;
+> > +
+> > +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
+> > +					    buf, alen);
+> > +	if (ret < 0)
+> > +		return ret;
+> > +	if (is_zero_ether_addr(buf))
+> > +		return -ENODATA;
+> > +
+> > +	memcpy(addr, buf, BD_ADDR_LEN);
+> > +
+> > +	return 0;
+> > +}
+> > +EXPORT_SYMBOL(fwnode_get_bd_address);
+> > +
+> > +/**
+> > + * device_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) for a
+> > + *                         given device
+> > + * @dev:	Pointer to the device
+> > + * @addr:	Address of buffer to store the BD address in
+> > + * @alen:	Length of the buffer pointed to by addr, should be BD_ADDR_LEN
+> > + */
+> > +int device_get_bd_address(struct device *dev, u8 *addr, int alen)
+> > +{
+> > +	return fwnode_get_bd_address(dev_fwnode(dev), addr, alen);
+> > +}
+> > +EXPORT_SYMBOL(device_get_bd_address);
+> > +
+> >  /**
+> >   * fwnode_irq_get - Get IRQ directly from a fwnode
+> >   * @fwnode:	Pointer to the firmware node
+> > diff --git a/include/linux/property.h b/include/linux/property.h
+> > index ac8a1ebc4c1b..4e2f1b276f4f 100644
+> > --- a/include/linux/property.h
+> > +++ b/include/linux/property.h
+> > @@ -287,9 +287,13 @@ int device_get_phy_mode(struct device *dev);
+> >  
+> >  void *device_get_mac_address(struct device *dev, char *addr, int alen);
+> >  
+> > +int device_get_bd_address(struct device *dev, u8 *addr, int alen);
+> > +
+> >  int fwnode_get_phy_mode(struct fwnode_handle *fwnode);
+> >  void *fwnode_get_mac_address(struct fwnode_handle *fwnode,
+> >  			     char *addr, int alen);
+> > +int fwnode_get_bd_address(struct fwnode_handle *fwnode,
+> > +			  u8 *addr, int alen);
+> 
+> This would be a good opportunity to add a newline here, and avoid adding
+> one after device_get_mac_address().
+
+Will do
+
+Thanks for the review!
