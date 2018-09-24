@@ -2,118 +2,159 @@ Return-Path: <SRS0=ctyp=MG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7248ECE561
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Sep 2018 09:21:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68DADECE561
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Sep 2018 14:45:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 528522148C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Sep 2018 09:21:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 528522148C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 237E7214AB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Sep 2018 14:45:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="h4dnC6wj";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="KooIkFF/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 237E7214AB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbeIXPW6 (ORCPT
+        id S1729830AbeIXUrZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Sep 2018 11:22:58 -0400
-Received: from mga14.intel.com ([192.55.52.115]:43110 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725935AbeIXPW6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Sep 2018 11:22:58 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Sep 2018 02:21:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.54,297,1534834800"; 
-   d="scan'208";a="265180214"
-Received: from mallikarjun-h270m-d3h.iind.intel.com ([10.223.96.120])
-  by fmsmga005.fm.intel.com with ESMTP; 24 Sep 2018 02:18:28 -0700
-From:   Mallikarjun Phulari <mallikarjun.phulari@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth : Errata Service Release 8, Erratum 3253
-Date:   Mon, 24 Sep 2018 14:46:40 +0530
-Message-Id: <1537780600-4098-1-git-send-email-mallikarjun.phulari@intel.com>
-X-Mailer: git-send-email 2.7.4
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Mon, 24 Sep 2018 16:47:25 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:50994 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727337AbeIXUrZ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 24 Sep 2018 16:47:25 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 82FD5602BC; Mon, 24 Sep 2018 14:44:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1537800295;
+        bh=caxpheRFBJZNAcnF3y4qAuxpT8JVCleqzlLDdYBDD4U=;
+        h=From:To:Cc:Subject:Date:From;
+        b=h4dnC6wjdG1lVUI9Oqig8W7e2b6RpwfXeJEL1Id86CArdMNqCCW+IgG9Ml1ABdlWP
+         +EpZEbt9pOQpuJaSyFFcy/DcRps8X4uHlmEt0ReeJGZaaVUcHrlzfSFbo7JUalcEoV
+         5vZzmmFME24I2mVlvWOirxEWIe8js0GZ2ks+F4hw=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 2019B602BC;
+        Mon, 24 Sep 2018 14:44:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1537800294;
+        bh=caxpheRFBJZNAcnF3y4qAuxpT8JVCleqzlLDdYBDD4U=;
+        h=From:To:Cc:Subject:Date:From;
+        b=KooIkFF/QLI43Cg8sR2lCHdeJBtBjkgtN+UQBhhOTqU2RroYQ9NISF1wHI+7kUjbW
+         vILqC/RdhLav4EnINBsGOoQHpvLqLOJyTtPJcm9DVFvAeoBHw55c9YULFdqiZPGdy5
+         erWnbGgClMuPDfrgFnDdgeSD2HKzFpDTQnX7P6Cs=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 2019B602BC
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [PATCH v3] Bluetooth: hci_qca: Add poweroff support during hci down for wcn3990
+Date:   Mon, 24 Sep 2018 20:14:45 +0530
+Message-Id: <20180924144445.3857-1-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.18.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-L2CAP: New result values
-	0x0006 - Connection refused – Invalid Source CID
-	0x0007 - Connection refused – Source CID already allocated
+This patch enables power off support for hci down and power on support
+for hci up. As wcn3990 power sources are ignited by regulators, we will
+turn off them during hci down, i.e. an complete power off of wcn3990.
+So while hci up, will call vendor setup which will turn on the regulators,
+requests BT chip version and download the firmware.
 
-As per the ESR08_V1.0.0, 1.11.2 Erratum 3253, Page No. 54,
-"Remote CID invalid Issue".
-Applies to Core Specification versions: V5.0, V4.2, v4.1, v4.0, and v3.0 + HS
-Vol 3, Part A, Section 4.2, 4.3, 4.14, 4.15.
-
-Core Specification Version 5.0, Page No.1753, Table 4.6 and
-Page No. 1767, Table 4.14
-
-New result values are added to l2cap connect/create channel response as
-0x0006 - Connection refused – Invalid Source CID
-0x0007 - Connection refused – Source CID already allocated
-
-Signed-off-by: Mallikarjun Phulari <mallikarjun.phulari@intel.com>
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 ---
- include/net/bluetooth/l2cap.h |  6 ++++++
- net/bluetooth/l2cap_core.c    | 17 ++++++++++++++++-
- 2 files changed, 22 insertions(+), 1 deletion(-)
+v3:
+  * addressed reviewer comments.
+v2:
+   * Removed vendor specific hdev->open and close functions.
+   * Added hdev->shutdown function to turn off the regs.
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 0697fd4..c7f97cc 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -284,6 +284,12 @@ struct l2cap_conn_rsp {
- #define L2CAP_CR_INVALID_SCID	0x0009
- #define L2CAP_CR_SCID_IN_USE	0x000A
+v1:
+   * initial patch.
+---
+ drivers/bluetooth/hci_qca.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 74f5fede0274..d98ed0442201 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -168,6 +168,7 @@ struct qca_serdev {
  
-+/* connect/create channel results
-+ * New result codesAs per ESR08_V1.0.0, Erratum 3253
-+ */
-+#define L2CAP_CR_BREDR_INVALID_SCID	0x0006
-+#define L2CAP_CR_BREDR_SCID_IN_USE	0x0007
-+
- /* connect/create channel status */
- #define L2CAP_CS_NO_INFO	0x0000
- #define L2CAP_CS_AUTHEN_PEND	0x0001
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d17a473..d605748 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3815,9 +3815,24 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ static int qca_power_setup(struct hci_uart *hu, bool on);
+ static void qca_power_shutdown(struct hci_uart *hu);
++static int qca_power_off(struct hci_dev *hdev);
  
- 	result = L2CAP_CR_NO_MEM;
+ static void __serial_clock_on(struct tty_struct *tty)
+ {
+@@ -1099,8 +1100,26 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ static int qca_wcn3990_init(struct hci_uart *hu)
+ {
+ 	struct hci_dev *hdev = hu->hdev;
++	struct qca_serdev *qcadev;
+ 	int ret;
  
-+	/* As per ESR08_V1.0.0, Erratum 3253, check the CID is in valid
-+	 * dynamic range and is not allocated already.
-+	 * Send the new result codes accordingly
++	/* Check for vregs status, may be hci down has turned
++	 * off the voltage regulator.
 +	 */
++	qcadev = serdev_device_get_drvdata(hu->serdev);
++	if (!qcadev->bt_power->vregs_on) {
++		serdev_device_close(hu->serdev);
++		ret = qca_power_setup(hu, true);
++		if (ret)
++			return ret;
 +
-+	/* Check for valid dynamic CID range */
-+	if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
-+		result = L2CAP_CR_BREDR_INVALID_SCID;
-+		chan = NULL;
-+		goto response;
++		ret = serdev_device_open(hu->serdev);
++		if (ret) {
++			bt_dev_err(hu->hdev, "failed to open port");
++			return ret;
++		}
 +	}
 +
- 	/* Check if we already have channel with that dcid */
--	if (__l2cap_get_chan_by_dcid(conn, scid))
-+	if (__l2cap_get_chan_by_dcid(conn, scid)) {
-+		result = L2CAP_CR_BREDR_SCID_IN_USE;
-+		chan = NULL;
- 		goto response;
-+	}
+ 	/* Forcefully enable wcn3990 to enter in to boot mode. */
+ 	host_set_baudrate(hu, 2400);
+ 	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
+@@ -1152,6 +1171,12 @@ static int qca_setup(struct hci_uart *hu)
  
- 	chan = pchan->ops->new_connection(pchan);
- 	if (!chan)
+ 	if (qcadev->btsoc_type == QCA_WCN3990) {
+ 		bt_dev_info(hdev, "setting up wcn3990");
++
++		/* Enable NON_PERSISTENT_SETUP QUIRK to ensure to execute
++		 * setup for every hci up.
++		 */
++		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
++		hu->hdev->shutdown = qca_power_off;
+ 		ret = qca_wcn3990_init(hu);
+ 		if (ret)
+ 			return ret;
+@@ -1242,6 +1267,14 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 	qca_power_setup(hu, false);
+ }
+ 
++static int qca_power_off(struct hci_dev *hdev)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++
++	qca_power_shutdown(hu);
++	return 0;
++}
++
+ static int qca_enable_regulator(struct qca_vreg vregs,
+ 				struct regulator *regulator)
+ {
 -- 
-2.7.4
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
