@@ -1,111 +1,119 @@
-Return-Path: <SRS0=jMVX=ME=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=ctyp=MG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 164A3ECE560
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Sep 2018 00:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7248ECE561
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Sep 2018 09:21:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C51DA2159E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Sep 2018 00:19:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C51DA2159E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=decadent.org.uk
+	by mail.kernel.org (Postfix) with ESMTP id 528522148C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Sep 2018 09:21:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 528522148C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392171AbeIVGKz (ORCPT
+        id S1726133AbeIXPW6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 22 Sep 2018 02:10:55 -0400
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:44371 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2392140AbeIVGKz (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 22 Sep 2018 02:10:55 -0400
-Received: from [2a02:8011:400e:2:cbab:f00:c93f:614] (helo=deadeye)
-        by shadbolt.decadent.org.uk with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.84_2)
-        (envelope-from <ben@decadent.org.uk>)
-        id 1g3Ve1-0008BR-2L; Sat, 22 Sep 2018 01:19:33 +0100
-Received: from ben by deadeye with local (Exim 4.91)
-        (envelope-from <ben@decadent.org.uk>)
-        id 1g3Vdn-0000rN-Ol; Sat, 22 Sep 2018 01:19:19 +0100
-Content-Type: text/plain; charset="UTF-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+        Mon, 24 Sep 2018 11:22:58 -0400
+Received: from mga14.intel.com ([192.55.52.115]:43110 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725935AbeIXPW6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 24 Sep 2018 11:22:58 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Sep 2018 02:21:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.54,297,1534834800"; 
+   d="scan'208";a="265180214"
+Received: from mallikarjun-h270m-d3h.iind.intel.com ([10.223.96.120])
+  by fmsmga005.fm.intel.com with ESMTP; 24 Sep 2018 02:18:28 -0700
+From:   Mallikarjun Phulari <mallikarjun.phulari@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth : Errata Service Release 8, Erratum 3253
+Date:   Mon, 24 Sep 2018 14:46:40 +0530
+Message-Id: <1537780600-4098-1-git-send-email-mallikarjun.phulari@intel.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-From:   Ben Hutchings <ben@decadent.org.uk>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-CC:     akpm@linux-foundation.org, netdev@vger.kernel.org,
-        "Benjamin Tissoires" <benjamin.tissoires@redhat.com>,
-        "Kees Cook" <keescook@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, kernel-team@android.com,
-        security@kernel.org, "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "Marcel Holtmann" <marcel@holtmann.org>,
-        "Mark Salyzyn" <salyzyn@android.com>
-Date:   Sat, 22 Sep 2018 01:15:42 +0100
-Message-ID: <lsq.1537575342.858007707@decadent.org.uk>
-X-Mailer: LinuxStableQueue (scripts by bwh)
-Subject: [PATCH 3.16 21/63] Bluetooth: hidp: buffer overflow in
- hidp_process_report
-In-Reply-To: <lsq.1537575341.194909669@decadent.org.uk>
-X-SA-Exim-Connect-IP: 2a02:8011:400e:2:cbab:f00:c93f:614
-X-SA-Exim-Mail-From: ben@decadent.org.uk
-X-SA-Exim-Scanned: No (on shadbolt.decadent.org.uk); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
-Message-ID: <20180922001542.oMjCz_FWuPh3KJSy0nJhWbdt6HWNhz-V00NVVWAuwtI@z>
 
-3.16.58-rc1 review patch.  If anyone has any objections, please let me know.
+L2CAP: New result values
+	0x0006 - Connection refused – Invalid Source CID
+	0x0007 - Connection refused – Source CID already allocated
 
-------------------
+As per the ESR08_V1.0.0, 1.11.2 Erratum 3253, Page No. 54,
+"Remote CID invalid Issue".
+Applies to Core Specification versions: V5.0, V4.2, v4.1, v4.0, and v3.0 + HS
+Vol 3, Part A, Section 4.2, 4.3, 4.14, 4.15.
 
-From: Mark Salyzyn <salyzyn@android.com>
+Core Specification Version 5.0, Page No.1753, Table 4.6 and
+Page No. 1767, Table 4.14
 
-commit 7992c18810e568b95c869b227137a2215702a805 upstream.
+New result values are added to l2cap connect/create channel response as
+0x0006 - Connection refused – Invalid Source CID
+0x0007 - Connection refused – Source CID already allocated
 
-CVE-2018-9363
-
-The buffer length is unsigned at all layers, but gets cast to int and
-checked in hidp_process_report and can lead to a buffer overflow.
-Switch len parameter to unsigned int to resolve issue.
-
-This affects 3.18 and newer kernels.
-
-Signed-off-by: Mark Salyzyn <salyzyn@android.com>
-Fixes: a4b1b5877b514b276f0f31efe02388a9c2836728 ("HID: Bluetooth: hidp: make sure input buffers are big enough")
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: security@kernel.org
-Cc: kernel-team@android.com
-Acked-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+Signed-off-by: Mallikarjun Phulari <mallikarjun.phulari@intel.com>
 ---
- net/bluetooth/hidp/core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/net/bluetooth/l2cap.h |  6 ++++++
+ net/bluetooth/l2cap_core.c    | 17 ++++++++++++++++-
+ 2 files changed, 22 insertions(+), 1 deletion(-)
 
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -429,8 +429,8 @@ static void hidp_del_timer(struct hidp_s
- 		del_timer(&session->timer);
- }
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 0697fd4..c7f97cc 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -284,6 +284,12 @@ struct l2cap_conn_rsp {
+ #define L2CAP_CR_INVALID_SCID	0x0009
+ #define L2CAP_CR_SCID_IN_USE	0x000A
  
--static void hidp_process_report(struct hidp_session *session,
--				int type, const u8 *data, int len, int intr)
-+static void hidp_process_report(struct hidp_session *session, int type,
-+				const u8 *data, unsigned int len, int intr)
- {
- 	if (len > HID_MAX_BUFFER_SIZE)
- 		len = HID_MAX_BUFFER_SIZE;
++/* connect/create channel results
++ * New result codesAs per ESR08_V1.0.0, Erratum 3253
++ */
++#define L2CAP_CR_BREDR_INVALID_SCID	0x0006
++#define L2CAP_CR_BREDR_SCID_IN_USE	0x0007
++
+ /* connect/create channel status */
+ #define L2CAP_CS_NO_INFO	0x0000
+ #define L2CAP_CS_AUTHEN_PEND	0x0001
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index d17a473..d605748 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3815,9 +3815,24 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 
+ 	result = L2CAP_CR_NO_MEM;
+ 
++	/* As per ESR08_V1.0.0, Erratum 3253, check the CID is in valid
++	 * dynamic range and is not allocated already.
++	 * Send the new result codes accordingly
++	 */
++
++	/* Check for valid dynamic CID range */
++	if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
++		result = L2CAP_CR_BREDR_INVALID_SCID;
++		chan = NULL;
++		goto response;
++	}
++
+ 	/* Check if we already have channel with that dcid */
+-	if (__l2cap_get_chan_by_dcid(conn, scid))
++	if (__l2cap_get_chan_by_dcid(conn, scid)) {
++		result = L2CAP_CR_BREDR_SCID_IN_USE;
++		chan = NULL;
+ 		goto response;
++	}
+ 
+ 	chan = pchan->ops->new_connection(pchan);
+ 	if (!chan)
+-- 
+2.7.4
 
