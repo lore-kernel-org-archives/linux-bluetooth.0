@@ -1,11 +1,7 @@
 Return-Path: <bluez-users-admin@lists.sourceforge.net>
-From: Marc-Andre Laverdiere-Papineau <m_laverd@alcor.concordia.ca>
-To: jawbt@yahoogroups.com, <bluez-users@lists.sourceforge.net>
-Message-ID: <Pine.OSF.4.44.0402141959300.358746-100000@alcor.concordia.ca>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: [Bluez-users] Major slowdown when service discovery+opening a service happens on
- two systems trying to talk to each other
+From: grpmind+bluez.users@boromir.vpop.net
+To: bluez-users@lists.sourceforge.net
+Subject: [Bluez-users] How to configure a 723kbps connection?
 Sender: bluez-users-admin@lists.sourceforge.net
 Errors-To: bluez-users-admin@lists.sourceforge.net
 List-Unsubscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
@@ -16,45 +12,20 @@ List-Help: <mailto:bluez-users-request@lists.sourceforge.net?subject=help>
 List-Subscribe: <https://lists.sourceforge.net/lists/listinfo/bluez-users>,
 	<mailto:bluez-users-request@lists.sourceforge.net?subject=subscribe>
 List-Archive: <http://sourceforge.net/mailarchive/forum.php?forum=bluez-users>
-Date: Sat, 14 Feb 2004 20:20:41 -0500 (EST)
+Date: Sat Feb 14 17:06:12 2004
+Message-Id: <20040215000300.0C48932D37@mail.rvs.uni-bielefeld.de>
 
-Hello all!
+I'd like to configure a linux box using a USB bt dongle to talk to an ipaq    
+at 723kbps for streaming video. So two questions:
 
-I'm working on an application where every Bluetooth device is trying to
-scan for every other one around, and check if it runs my custom service.
-At the same time, said service is running in another thread, waiting to be
-connected to.
+1. How can I tell at what rate the two bluetooth devices are talking? I could   
+use l2test if I could run linux on the ipaq, but I can't (yet).
 
-I am using Rococo with Bluez. Kernel RH2.4.28, latest version of BlueZ.
-Belkin FT003 dongles.
-
-When I have one computer having the service opened+performing the scan,
-while the other just performs the scan, things go fine. The scans are
-timely and I can send a message.
-
-However, then I have both computers running the service+the service scan,
-things slow down to a crawl. Actually, it depends on its mood.
- It can take a full minute to have a device scan and a service scan
-completing, or less than 20 seconds! Sometimes, computer a  will be able
-to detect computer b, while B still shows no sign of life.
-
-On top of things, if I manage to get it to send a message to its peer, the
-peer will get an Exception :( I was able to fix this by preventing the
-application from doing a service scan at the moment it would send, but
-that didn't fix the weird behaviour on service discovery. This hackaround
-is not sturdy and I don't like it as a general thing.
-
-Has such thing ever happened to any of you? What can I do to fix it?
-
-It looks like Bluetooth won't let me open a connection while doing a
-service scan. Is there limitations on what can be running simultaneously?
-It looks like service scan + opening connections is no good. Should I
-know other ones like that?
-
-Thanks
-
-MA
-
+2. How can I configure the two to talk at the assymetric 723kbps rate? 
+ 
+Thanks for any help you can give.
+ 
+Matt
 
 
 -------------------------------------------------------
