@@ -2,106 +2,123 @@ Return-Path: <SRS0=Mlcw=MI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8BDC43382
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 11:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B100EC43382
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 11:37:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66D4720843
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 11:28:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t2EDK/5r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66D4720843
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 729FA214C5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 11:37:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 729FA214C5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727482AbeIZRkg (ORCPT
+        id S1727250AbeIZRtj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Sep 2018 13:40:36 -0400
-Received: from mail-lj1-f171.google.com ([209.85.208.171]:35312 "EHLO
-        mail-lj1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726593AbeIZRkg (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Sep 2018 13:40:36 -0400
-Received: by mail-lj1-f171.google.com with SMTP id w4-v6so1439668ljd.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Sep 2018 04:28:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=TYNRul1nqj273xxZErsEPZwj86AFP6QpqDfDj0nQVxs=;
-        b=t2EDK/5rrzSKrDBf6KT7SZ9tfg/DW3EmS0nM/Orfied236EQE/ZsnilVgaL0kvmUNG
-         APCfoSVRg0mbu0UoGsMh3wAgfiwm4pzZMIC+6eVLVlAUlqzaq7UqlI1oQdRcSz7Uihvn
-         2rPnEHC/xHryqZ86/M2awIzQ9SQ4FICvjBTDzUQN3X4/N6/wqZXAg6rp/1koDb5DJD24
-         crvqU3TabkcP3DWQNf1Q1MQfSt0ouzJfcc/BA92LqCk2k/NsEDPMpcVm5syDVAkhx6sd
-         go4zElunlulCr0o4DbEGTp56mutKt9LZKH548La5aI1hOjt9IVIOqCwbeyQwiFPSo18c
-         KOkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=TYNRul1nqj273xxZErsEPZwj86AFP6QpqDfDj0nQVxs=;
-        b=tLmoGK3xS3dgku0rubRgBSJ5VwJgEId1psUpfHpR8UcvdJyGYwlxriXANeq1RpAm4f
-         J4YehzLfEV2+nABqh3fze7ChJQ/8kD1YOlluRWOm3P3CecU+uYe5Mx7LPZr8ZhZ5MITO
-         jOks7QFFW/HsqBxrOI0rJXfrh0ymRGlZRdbtVWtTN67TyC0qv8n/I/vDanj/BnC0dtH/
-         wa+LEgoPKDWolpt9dgio+tVPit8/Z+5ibrSVqRnKb2E5s5M6+CwvgywKEkJXGCgqKIyM
-         qEyykVZSQiLUuEPlnH+V3DMQ3D/AFSVY/MagzCO0pnfLiuiflDkXK5ncDNAl4iGyj0Xw
-         APdg==
-X-Gm-Message-State: ABuFfoieQ73sCVsXnme/XoXCfEyXLNO1qSKSIKOhtvFH+EQXtsYPhw5Z
-        C7NmFonIzpVAmcsqHy4X5FU=
-X-Google-Smtp-Source: ACcGV62hp/kknr2is7rK1rhEMZlAgudPwgqZVs8q6tmcmOmCunUWENyrWjKWK8hkvHr05nL7LwnhQA==
-X-Received: by 2002:a2e:9b88:: with SMTP id z8-v6mr1655180lji.112.1537961284339;
-        Wed, 26 Sep 2018 04:28:04 -0700 (PDT)
-Received: from x1c.lan (85-76-70-99-nat.elisa-mobile.fi. [85.76.70.99])
-        by smtp.gmail.com with ESMTPSA id d126-v6sm671908lfe.75.2018.09.26.04.28.02
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 26 Sep 2018 04:28:03 -0700 (PDT)
-Date:   Wed, 26 Sep 2018 14:28:01 +0300
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     fabien dvlt <fabiendvlt@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: Security block and Bluez - connection issue with Android
-Message-ID: <20180926112801.GA8013@x1c.lan>
-Mail-Followup-To: fabien dvlt <fabiendvlt@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-References: <CAOiLkfOuenvh5ZLQD_k-yi7mL1Epr+gGJZ65zr2Fcp2SzE9F7w@mail.gmail.com>
+        Wed, 26 Sep 2018 13:49:39 -0400
+Received: from mga14.intel.com ([192.55.52.115]:39696 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727003AbeIZRtj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 26 Sep 2018 13:49:39 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2018 04:37:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.54,306,1534834800"; 
+   d="scan'208";a="93394694"
+Received: from kuha.fi.intel.com ([10.237.72.189])
+  by fmsmga001.fm.intel.com with SMTP; 26 Sep 2018 04:36:26 -0700
+Received: by kuha.fi.intel.com (sSMTP sendmail emulation); Wed, 26 Sep 2018 14:36:25 +0300
+Date:   Wed, 26 Sep 2018 14:36:25 +0300
+From:   Heikki Krogerus <heikki.krogerus@linux.intel.com>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Marcin Wojtas <mw@semihalf.com>,
+        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Sinan Kaya <okaya@codeaurora.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Pekka Enberg <penberg@kernel.org>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Brian Norris <briannorris@chromium.org>
+Subject: Re: [PATCH v3.1 1/2] device property: Add device_get_bd_address()
+ and fwnode_get_bd_address()
+Message-ID: <20180926113625.GM11965@kuha.fi.intel.com>
+References: <20180925191014.85573-1-mka@chromium.org>
+ <20180925191014.85573-2-mka@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOiLkfOuenvh5ZLQD_k-yi7mL1Epr+gGJZ65zr2Fcp2SzE9F7w@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20180925191014.85573-2-mka@chromium.org>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Fabien,
+On Tue, Sep 25, 2018 at 12:10:13PM -0700, Matthias Kaehlcke wrote:
+> +/**
+> + * fwnode_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) from the
+> + *                         firmware node
+> + * @fwnode:	Pointer to the firmware node
+> + * @bd_addr:	Pointer to struct to store the BD address in
+> + *
+> + * Search the firmware node for 'local-bd-address'.
+> + *
+> + * All-zero BD addresses are rejected, because those could be properties
+> + * that exist in the firmware tables, but were not updated by the firmware. For
+> + * example, the DTS could define 'local-bd-address', with zero BD addresses.
+> + */
+> +int fwnode_get_bd_address(struct fwnode_handle *fwnode, bdaddr_t *bd_addr)
+> +{
+> +	bdaddr_t ba;
+> +	int ret;
+> +
+> +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
+> +					    (u8 *)&ba, sizeof(bdaddr_t));
+> +	if (ret < 0)
+> +		return ret;
+> +	if (is_zero_ether_addr((u8 *)&ba))
+> +		return -ENODATA;
+> +
+> +	memcpy(bd_addr, &ba, sizeof(bdaddr_t));
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(fwnode_get_bd_address);
+> +
+> +/**
+> + * device_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) for a
+> + *                         given device
+> + * @dev:	Pointer to the device
+> + * @bd_addr:	Pointer to struct to store the BD address in
+> + */
+> +int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr)
+> +{
+> +	return fwnode_get_bd_address(dev_fwnode(dev), bd_addr);
+> +}
+> +EXPORT_SYMBOL_GPL(device_get_bd_address);
 
-On Tue, Sep 25, 2018, fabien dvlt wrote:
-> > ACL Data RX: Handle 13 flags 0x02 dlen 12           #198 [hci0] 21.813116
->       L2CAP: Connection Request (0x02) ident 7 len 4
->         PSM: 25 (0x0019)
->         Source CID: 75
-> > HCI Event: Encryption Change (0x08) plen 4          #199 [hci0] 21.813155
->         Status: Success (0x00)
->         Handle: 13
->         Encryption: Enabled with AES-CCM (0x02)
-> < ACL Data TX: Handle 13 flags 0x00 dlen 16           #200 [hci0]
->       L2CAP: Connection Response (0x03) ident 7 len 8
->         Destination CID: 0
->         Source CID: 75
->         Result: Connection refused - security block (0x0003)
->         Status: No further information available (0x0000)
+Let's not fill property.c with framework specific helper functions any
+more!
 
-This looks like the well-known race condition for ACL data and HCI
-events on USB where the two come through different endpoints. From the
-host perspective there's not much we can do since we can't make
-assumptions that the connection request was sent over an encrypted
-connection if we haven't seen the encryption change request at that
-point.
+Those functions are completely bluetooth specific, so they do not
+belong here. The fact that some other framework already managed to
+slip their helpers in does not justify others to do the same.
 
-Johan
+
+Thanks,
+
+-- 
+heikki
