@@ -1,181 +1,261 @@
-Return-Path: <SRS0=tqgc=MH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Mlcw=MI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0877AC43382
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Sep 2018 23:50:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D08CC43382
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 06:13:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B2B5B20843
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Sep 2018 23:50:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00D8D2089D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 06:13:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fewHYY+J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2B5B20843
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nMxeRPjf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00D8D2089D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726704AbeIZGAs (ORCPT
+        id S1726991AbeIZMZI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Sep 2018 02:00:48 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:34050 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726010AbeIZGAo (ORCPT
+        Wed, 26 Sep 2018 08:25:08 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46386 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726978AbeIZMZI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Sep 2018 02:00:44 -0400
-Received: by mail-pg1-f195.google.com with SMTP id d19-v6so12726650pgv.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Sep 2018 16:50:43 -0700 (PDT)
+        Wed, 26 Sep 2018 08:25:08 -0400
+Received: by mail-wr1-f68.google.com with SMTP id z3-v6so13801269wrr.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Sep 2018 23:13:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=pEupypS0Swd7HrPPPlVvTZZOaRzgMD5elzeZZtca8qQ=;
-        b=fewHYY+JLIcAAI6piWFekHwlDWPmN2C/elNWFXnwjYHgQRPQ++yU17KJPpD2DjXnyI
-         QMO2s8mktcNY/3XIFN9gr8lRK3j68JZkfk3hILGFUHDqGsMyZ+GfRrggc8BQnUj4LtCq
-         mHVP1xB7u05rV7VEVnjQnofQ+PdUTSG0MaemI=
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=WOzgkNGYSLqA5VsFimMNWWcriRec+HJOyKyM6vX+Odo=;
+        b=nMxeRPjfqrBz6x16RM+q+MkZ8h6+vffsBCknmOqsio/uUQ8RyrZ1CzKycO/zVKnSaD
+         qf1nDE+Y4hBuBgLF0Ce7n5HCHhXWXaH3/UCO1y264gPJ5zkLA03UgZDHcq9CMh4tzfVX
+         zrRrlbK226JK9ovUFSE9b/oSy/hevcWpX9OB65sSG3jOY2DLPnklpy1O3/eGEsTNglLg
+         HzSGqoIaeQuq35m/G7w8041AzAIMwRU9YGfyX0Fu2chySNMs/YK4bfLr/AdEUaKA94cy
+         UCNSiMEE3ermzXiTfkPybK4E1JQcsLoI7MoeMXRqJTZsIHqAxzjdh9mR/clgLyQDssz1
+         tbTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=pEupypS0Swd7HrPPPlVvTZZOaRzgMD5elzeZZtca8qQ=;
-        b=FtYIzL379WHS81aAgb8XSIONuVlGLfOwD5yVb7XPS2JDJL2rFYpuBhGyqZ7SZzgOof
-         qd70efnTSmC7fzyc/POEuUs8FAo9kfyLDgciucjpGp9h33oJfuugIpWnZJc75s4gnDXT
-         p0VBRd95HGCMjB57+0IH2e+7qoIts7gNlLEtki/c8s5TutNfPlpdFSYuaAPG5K22Qeq3
-         jjIPcmI2e7JdNTIE6fJ/p/uHyHsBmmLHUucTNGwQDoiadjzR8BdOmFyuud8+JQOXJ+Kp
-         gh0fSy9rNQoY8osC5wz0hYO9OnFSWHeprgdlwkG+FvQTnsvbXVgktR8OZ++zme7VL6XB
-         B8Yg==
-X-Gm-Message-State: ABuFfogzW4V5r2NRoYYRAz61UM8ZRN0Crqqd/os5J+BRBTb0aHH0AuOS
-        2p+vf5/B3lG630BKPExH/O3r9A==
-X-Google-Smtp-Source: ACcGV60US9BK2wIJtfcT/SgCxoDIjolcvbjs3ddDG1xkXNzIIwrRwemiZSmSuHQRb+7XixdUdEYmnA==
-X-Received: by 2002:a63:1148:: with SMTP id 8-v6mr3205951pgr.172.1537919443125;
-        Tue, 25 Sep 2018 16:50:43 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
-        by smtp.gmail.com with ESMTPSA id v8-v6sm4260583pfl.6.2018.09.25.16.50.42
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 25 Sep 2018 16:50:42 -0700 (PDT)
-Date:   Tue, 25 Sep 2018 16:50:41 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Marcin Wojtas <mw@semihalf.com>,
-        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Sinan Kaya <okaya@codeaurora.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Pekka Enberg <penberg@kernel.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Brian Norris <briannorris@chromium.org>
-Subject: Re: [PATCH v3.1 1/2] device property: Add device_get_bd_address()
- and fwnode_get_bd_address()
-Message-ID: <20180925235041.GC22824@google.com>
-References: <20180925191014.85573-1-mka@chromium.org>
- <20180925191014.85573-2-mka@chromium.org>
- <20180925213321.buotrpzlvokem24n@kekkonen.localdomain>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=WOzgkNGYSLqA5VsFimMNWWcriRec+HJOyKyM6vX+Odo=;
+        b=cGvHtsGmPMffZqSOrkCa6FNfJXDNySCi5a2qR/HqKN6dSKzhl3jpi+GgyW107s9Opy
+         JL6TUbGT1r7G+9BewfeT5J/kCX1N30PsjZFOl3vS4QEQhbmS6MUUyRlobgnPIAEAJJ5t
+         BDO8m+YW4NLuPv2MmzFlCTLf+TvV+XiLbG8SscTlxNNlqHaHjcdopY6Z/GqG4p0i3CxM
+         +ivWhL29bBNFVwiTnDR1xtTSqvbP8oOaODOAfc4j2Ij3GOrmHZnZF8PBxCtc73qop64h
+         NRyNMrukYbXvy9uFszpdEOTwBy6eEYWkqdEJa6qp3wt1DV/Itas9WOpwMOlzYHolS5Xi
+         /sEA==
+X-Gm-Message-State: ABuFfoh2GwsTWmT477PTXq9U8BxlRTfNaFYhK/FSRKtU2fzWx52g1miz
+        J+3v4M/qFKpuu9AavTJ/pZKv2t9D
+X-Google-Smtp-Source: ACcGV60GjG+Ag5UOgJj0B7sV8jnTnDRxc0P1Jx2A8ZLyMoizdvNI5iw7put6mhoUoEB0pUdz3awu0A==
+X-Received: by 2002:adf:a481:: with SMTP id g1-v6mr3280343wrb.167.1537942428957;
+        Tue, 25 Sep 2018 23:13:48 -0700 (PDT)
+Received: from makarhum-Latitude-E5440 ([2a00:1d50:3:0:9138:6811:5d:71dd])
+        by smtp.gmail.com with ESMTPSA id 204-v6sm5426984wmh.25.2018.09.25.23.13.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 25 Sep 2018 23:13:47 -0700 (PDT)
+Date:   Wed, 26 Sep 2018 09:13:46 +0300
+From:   Matias Karhumaa <matias.karhumaa@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     johan.hedberg@intel.com
+Subject: [PATCH] Bluetooth: SMP: fix crash in unpairing
+Message-ID: <20180926061346.GA13570@makarhum-Latitude-E5440>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180925213321.buotrpzlvokem24n@kekkonen.localdomain>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sakari,
+In case unpair_device() was called through mgmt interface at the same time
+when pairing was in progress, Bluetooth kernel module crash was seen.
 
-thanks for the reviews
+[  600.351225] general protection fault: 0000 [#1] SMP PTI
+[  600.351235] CPU: 1 PID: 11096 Comm: btmgmt Tainted: G           OE     4.19.0-rc1+ #1
+[  600.351238] Hardware name: Dell Inc. Latitude E5440/08RCYC, BIOS A18 05/14/2017
+[  600.351272] RIP: 0010:smp_chan_destroy.isra.10+0xce/0x2c0 [bluetooth]
+[  600.351276] Code: c0 0f 84 b4 01 00 00 80 78 28 04 0f 84 53 01 00 00 4d 85 ed 0f 85 ab 00 00 00 48 8b 08 48 8b 50 08 be 10 00 00 00 48 89 51 08 <48> 89 0a 48 b9 00 02 00 00 00 00 ad de 48 89 48 08 48 8b 83 00 01
+[  600.351279] RSP: 0018:ffffa9be839b3b50 EFLAGS: 00010246
+[  600.351282] RAX: ffff9c999ac565a0 RBX: ffff9c9996e98c00 RCX: ffff9c999aa28b60
+[  600.351285] RDX: dead000000000200 RSI: 0000000000000010 RDI: ffff9c999e403500
+[  600.351287] RBP: ffffa9be839b3b70 R08: 0000000000000000 R09: ffffffff92a25c00
+[  600.351290] R10: ffffa9be839b3ae8 R11: 0000000000000001 R12: ffff9c995375b800
+[  600.351292] R13: 0000000000000000 R14: ffff9c99619a5000 R15: ffff9c9962a01c00
+[  600.351295] FS:  00007fb2be27c700(0000) GS:ffff9c999e880000(0000) knlGS:0000000000000000
+[  600.351298] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  600.351300] CR2: 00007fb2bdadbad0 CR3: 000000041c328001 CR4: 00000000001606e0
+[  600.351302] Call Trace:
+[  600.351325]  smp_failure+0x4f/0x70 [bluetooth]
+[  600.351345]  smp_cancel_pairing+0x74/0x80 [bluetooth]
+[  600.351370]  unpair_device+0x1c1/0x330 [bluetooth]
+[  600.351399]  hci_sock_sendmsg+0x960/0x9f0 [bluetooth]
+[  600.351409]  ? apparmor_socket_sendmsg+0x1e/0x20
+[  600.351417]  sock_sendmsg+0x3e/0x50
+[  600.351422]  sock_write_iter+0x85/0xf0
+[  600.351429]  do_iter_readv_writev+0x12b/0x1b0
+[  600.351434]  do_iter_write+0x87/0x1a0
+[  600.351439]  vfs_writev+0x98/0x110
+[  600.351443]  ? ep_poll+0x16d/0x3d0
+[  600.351447]  ? ep_modify+0x73/0x170
+[  600.351451]  do_writev+0x61/0xf0
+[  600.351455]  ? do_writev+0x61/0xf0
+[  600.351460]  __x64_sys_writev+0x1c/0x20
+[  600.351465]  do_syscall_64+0x5a/0x110
+[  600.351471]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[  600.351474] RIP: 0033:0x7fb2bdb62fe0
+[  600.351477] Code: 73 01 c3 48 8b 0d b8 6e 2c 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d 69 c7 2c 00 00 75 10 b8 14 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 de 80 01 00 48 89 04 24
+[  600.351479] RSP: 002b:00007ffe062cb8f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
+[  600.351484] RAX: ffffffffffffffda RBX: 000000000255b3d0 RCX: 00007fb2bdb62fe0
+[  600.351487] RDX: 0000000000000001 RSI: 00007ffe062cb920 RDI: 0000000000000004
+[  600.351490] RBP: 00007ffe062cb920 R08: 000000000255bd80 R09: 0000000000000000
+[  600.351494] R10: 0000000000000353 R11: 0000000000000246 R12: 0000000000000001
+[  600.351497] R13: 00007ffe062cbbe0 R14: 0000000000000000 R15: 0000000000000000
+[  600.351501] Modules linked in: algif_hash algif_skcipher af_alg cmac ipt_MASQUERADE nf_conntrack_netlink nfnetlink xfrm_user xfrm_algo iptable_nat nf_nat_ipv4 xt_addrtype iptable_filter ip_tables xt_conntrack x_tables nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 libcrc32c br_netfilter bridge stp llc overlay arc4 nls_iso8859_1 dm_crypt intel_rapl x86_pkg_temp_thermal intel_powerclamp coretemp dell_laptop kvm_intel crct10dif_pclmul dell_smm_hwmon crc32_pclmul ghash_clmulni_intel pcbc aesni_intel aes_x86_64 crypto_simd cryptd glue_helper intel_cstate intel_rapl_perf uvcvideo videobuf2_vmalloc videobuf2_memops videobuf2_v4l2 videobuf2_common videodev media hid_multitouch input_leds joydev serio_raw dell_wmi snd_hda_codec_hdmi snd_hda_codec_realtek snd_hda_codec_generic dell_smbios dcdbas sparse_keymap
+[  600.351569]  snd_hda_intel btusb snd_hda_codec btrtl btbcm btintel snd_hda_core bluetooth(OE) snd_hwdep snd_pcm iwlmvm ecdh_generic wmi_bmof dell_wmi_descriptor snd_seq_midi mac80211 snd_seq_midi_event lpc_ich iwlwifi snd_rawmidi snd_seq snd_seq_device snd_timer cfg80211 snd soundcore mei_me mei dell_rbtn dell_smo8800 mac_hid parport_pc ppdev lp parport autofs4 hid_generic usbhid hid i915 nouveau kvmgt vfio_mdev mdev vfio_iommu_type1 vfio kvm irqbypass i2c_algo_bit ttm drm_kms_helper syscopyarea sysfillrect sysimgblt mxm_wmi psmouse ahci sdhci_pci cqhci libahci fb_sys_fops sdhci drm e1000e video wmi
+[  600.351637] ---[ end trace e49e9f1df09c94fb ]---
+[  600.351664] RIP: 0010:smp_chan_destroy.isra.10+0xce/0x2c0 [bluetooth]
+[  600.351666] Code: c0 0f 84 b4 01 00 00 80 78 28 04 0f 84 53 01 00 00 4d 85 ed 0f 85 ab 00 00 00 48 8b 08 48 8b 50 08 be 10 00 00 00 48 89 51 08 <48> 89 0a 48 b9 00 02 00 00 00 00 ad de 48 89 48 08 48 8b 83 00 01
+[  600.351669] RSP: 0018:ffffa9be839b3b50 EFLAGS: 00010246
+[  600.351672] RAX: ffff9c999ac565a0 RBX: ffff9c9996e98c00 RCX: ffff9c999aa28b60
+[  600.351674] RDX: dead000000000200 RSI: 0000000000000010 RDI: ffff9c999e403500
+[  600.351676] RBP: ffffa9be839b3b70 R08: 0000000000000000 R09: ffffffff92a25c00
+[  600.351679] R10: ffffa9be839b3ae8 R11: 0000000000000001 R12: ffff9c995375b800
+[  600.351681] R13: 0000000000000000 R14: ffff9c99619a5000 R15: ffff9c9962a01c00
+[  600.351684] FS:  00007fb2be27c700(0000) GS:ffff9c999e880000(0000) knlGS:0000000000000000
+[  600.351686] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  600.351689] CR2: 00007fb2bdadbad0 CR3: 000000041c328001 CR4: 00000000001606e0
 
-On Wed, Sep 26, 2018 at 12:33:22AM +0300, Sakari Ailus wrote:
-> Hi Matthias,
-> 
-> On Tue, Sep 25, 2018 at 12:10:13PM -0700, Matthias Kaehlcke wrote:
-> > Provide an API for Bluetooth drivers to retrieve the Bluetooth Device
-> > address (BD_ADDR) for a device. If the device node has a property
-> > 'local-bd-address' the BD address is read from this property.
-> > 
-> > The definition of bdaddr_t is moved to types.h to make it visible in
-> > property.h without having to include (the mostly unrelated) bluetooth.h
-> > 
-> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> > Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-> > ---
-> > Changes in v3:
-> > - move definition of bdaddr_t to types.h to avoid include of
-> >   bluetooth.h from property.h
-> > - add stubs for the new functions
-> > 
-> > Changes in v2:
-> > - use bdaddr_t instead of byte pointer + len
-> > - use EXPORT_SYMBOL_GPL for the new functions instead of EXPORT_SYMBOL
-> > - put new functions inside #if IS_ENABLED(CONFIG_BT)
-> > - some new line juggling in property.h
-> > - added 'Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>' tag
-> > ---
-> >  drivers/base/property.c           | 46 +++++++++++++++++++++++++++++++
-> >  include/linux/property.h          | 18 ++++++++++++
-> >  include/linux/types.h             |  5 ++++
-> >  include/net/bluetooth/bluetooth.h |  5 ----
-> >  4 files changed, 69 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/drivers/base/property.c b/drivers/base/property.c
-> > index 240ab5230ff6..afe412133188 100644
-> > --- a/drivers/base/property.c
-> > +++ b/drivers/base/property.c
-> > @@ -1315,6 +1315,52 @@ void *device_get_mac_address(struct device *dev, char *addr, int alen)
-> >  }
-> >  EXPORT_SYMBOL(device_get_mac_address);
-> >  
-> > +#if IS_ENABLED(CONFIG_BT)
-> > +
-> > +/**
-> > + * fwnode_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) from the
-> > + *                         firmware node
-> > + * @fwnode:	Pointer to the firmware node
-> > + * @bd_addr:	Pointer to struct to store the BD address in
-> > + *
-> > + * Search the firmware node for 'local-bd-address'.
-> > + *
-> > + * All-zero BD addresses are rejected, because those could be properties
-> > + * that exist in the firmware tables, but were not updated by the firmware. For
-> > + * example, the DTS could define 'local-bd-address', with zero BD addresses.
-> > + */
-> > +int fwnode_get_bd_address(struct fwnode_handle *fwnode, bdaddr_t *bd_addr)
-> > +{
-> > +	bdaddr_t ba;
-> > +	int ret;
-> > +
-> > +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
-> > +					    (u8 *)&ba, sizeof(bdaddr_t));
-> 
-> sizeof(ba)
-> 
-> > +	if (ret < 0)
-> > +		return ret;
-> > +	if (is_zero_ether_addr((u8 *)&ba))
-> > +		return -ENODATA;
-> > +
-> > +	memcpy(bd_addr, &ba, sizeof(bdaddr_t));
-> 
-> How about simply:
-> 
-> 	*bd_addr = ba;
-> 
-> Either way,
-> 
-> Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+Crash happened because list_del_rcu() was called twice for smp->ltk. This
+was possible if unpair_device was called right after ltk was generated
+but before keys were distributed.
 
-Thanks I'll address your comments in v4. I'll wait a day or two before
-re-spinning for if others have additional feedback.
+In this commit smp_cancel_pairing was refactored to cancel pairing if it
+is in progress and otherwise just removes keys. Once keys are removed from
+rcu list, pointers to smp context's keys are set to NULL to make sure
+removed list items are not accessed later.
 
-Cheers
+This commit also adjusts the functionality of mgmt unpair_device() little
+bit. Previously pairing was canceled only if pairing was in state that
+keys were already generated. With this commit unpair_device() cancels
+pairing already in earlier states.
 
-Matthias
+Bug was found by fuzzing kernel SMP implementation using Synopsys
+Defensics.
+
+Reported-by: Pekka Oikarainen <pekka.oikarainen@synopsys.com>
+Signed-off-by: Matias Karhumaa <matias.karhumaa@gmail.com>
+---
+ net/bluetooth/mgmt.c |  7 ++-----
+ net/bluetooth/smp.c  | 29 +++++++++++++++++++++++++----
+ net/bluetooth/smp.h  |  3 ++-
+ 3 files changed, 29 insertions(+), 10 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3bdc8f3..ccce954 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2434,9 +2434,8 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	/* LE address type */
+ 	addr_type = le_addr_type(cp->addr.type);
+ 
+-	hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
+-
+-	err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
++	/* Abort any ongoing SMP pairing. Removes ltk and irk if they exist. */
++	err = smp_cancel_and_remove_pairing(hdev, &cp->addr.bdaddr, addr_type);
+ 	if (err < 0) {
+ 		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_UNPAIR_DEVICE,
+ 					MGMT_STATUS_NOT_PAIRED, &rp,
+@@ -2450,8 +2449,6 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto done;
+ 	}
+ 
+-	/* Abort any ongoing SMP pairing */
+-	smp_cancel_pairing(conn);
+ 
+ 	/* Defer clearing up the connection parameters until closing to
+ 	 * give a chance of keeping them if a repairing happens.
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 09339b0..2db295c 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -2420,30 +2420,51 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 	return ret;
+ }
+ 
+-void smp_cancel_pairing(struct hci_conn *hcon)
++int smp_cancel_and_remove_pairing(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				  u8 addr_type)
+ {
+-	struct l2cap_conn *conn = hcon->l2cap_data;
++	struct hci_conn *hcon;
++	struct l2cap_conn *conn;
+ 	struct l2cap_chan *chan;
+ 	struct smp_chan *smp;
++	int err;
++
++	err = hci_remove_ltk(hdev, bdaddr, addr_type);
++	hci_remove_irk(hdev, bdaddr, addr_type);
++
++	hcon = hci_conn_hash_lookup_le(hdev, bdaddr, addr_type);
++	if (!hcon)
++		goto done;
+ 
++	conn = hcon->l2cap_data;
+ 	if (!conn)
+-		return;
++		goto done;
+ 
+ 	chan = conn->smp;
+ 	if (!chan)
+-		return;
++		goto done;
+ 
+ 	l2cap_chan_lock(chan);
+ 
+ 	smp = chan->data;
+ 	if (smp) {
++		/* Set keys to NULL to make sure smp_failure() does not try to
++		 * remove and free already invalidated rcu list entries. */
++		smp->ltk = NULL;
++		smp->slave_ltk = NULL;
++		smp->remote_irk = NULL;
++
+ 		if (test_bit(SMP_FLAG_COMPLETE, &smp->flags))
+ 			smp_failure(conn, 0);
+ 		else
+ 			smp_failure(conn, SMP_UNSPECIFIED);
++		err = 0;
+ 	}
+ 
+ 	l2cap_chan_unlock(chan);
++
++done:
++	return err;
+ }
+ 
+ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index 0ff6247..121edad 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -181,7 +181,8 @@ enum smp_key_pref {
+ };
+ 
+ /* SMP Commands */
+-void smp_cancel_pairing(struct hci_conn *hcon);
++int smp_cancel_and_remove_pairing(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				  u8 addr_type);
+ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level,
+ 			     enum smp_key_pref key_pref);
+ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level);
+-- 
+2.7.4
+
