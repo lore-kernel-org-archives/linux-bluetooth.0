@@ -2,147 +2,91 @@ Return-Path: <SRS0=Mlcw=MI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF0DC43382
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 21:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BAF1C43382
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 22:35:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B71FA2156F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 21:03:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RqqpRrj8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B71FA2156F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTP id 3CAC82154B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Sep 2018 22:35:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CAC82154B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726953AbeI0DSa (ORCPT
+        id S1726635AbeI0Euq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Sep 2018 23:18:30 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:46499 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726453AbeI0DSa (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Sep 2018 23:18:30 -0400
-Received: by mail-pf1-f194.google.com with SMTP id d8-v6so197391pfo.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Sep 2018 14:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=qbJIzsd4Q/+x+E4ubrNYqmJxLbyIfI9qzr+o+90Fmkw=;
-        b=RqqpRrj8wzHHuhWckXCf2Cruo/v5XpHb1IusrzKg6D12xEva+wNWpgUTsZnF8Rzf1f
-         NTujcF+bszIypQ9di74i+NyX9CtSVH2sZ8M8bGT4/IcIEtC8Otr+HeN/37/tVA6S+qfn
-         aGfeAuDm68dvCvDIXDqR2IwDF1JuWUnWzirc8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=qbJIzsd4Q/+x+E4ubrNYqmJxLbyIfI9qzr+o+90Fmkw=;
-        b=V0EG3jNjdhv+GVLGSeWr9M/wKHCqNC4vkXhY3Zq4PGeFGGmMyMF8vwLNsOG7W2Fa7l
-         +R6EMs+2JhxT6m1xlPdtBcU1abcbumnwUpeL1WcOziZTdRU1NK9yWq0dWtRNJMSez2CX
-         v9NHH67eX5HIs+keenleklD+MjqWiNkIChyruZLZRvZvjp8Ee80e147V5uvM+VeLCN6q
-         xMvmIKE/yGxBYrqTaijsNy0a+QAAgceDdQYePPpH1IyqaBzRfrkj4EhrlXB3zXx/R+PM
-         JrwevAu3IEfpyEXK74P3I7syD9PVx0jlfZmkv+ZMPXnLJV8B4C6ZiKjYDG39gqri6Epz
-         tJug==
-X-Gm-Message-State: ABuFfohnrKKjVtYMX8r0RLnVmDCFVnIcbTVNwR0aF5db5y26UcCrtYhs
-        H0udGcLFk+m2AYpM0THTXbUzRw==
-X-Google-Smtp-Source: ACcGV60HR6FYPpzV7chjRgKsS16Su2G2gdmD5eFw0PC4mJ5bhHSEZvRgPGSYL6tfS71gLXhY3Khy4g==
-X-Received: by 2002:a62:280a:: with SMTP id o10-v6mr7921178pfo.129.1537995821030;
-        Wed, 26 Sep 2018 14:03:41 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
-        by smtp.gmail.com with ESMTPSA id g3-v6sm68284pfi.9.2018.09.26.14.03.40
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 26 Sep 2018 14:03:40 -0700 (PDT)
-Date:   Wed, 26 Sep 2018 14:03:39 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Marcin Wojtas <mw@semihalf.com>,
-        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Sinan Kaya <okaya@codeaurora.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Pekka Enberg <penberg@kernel.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Brian Norris <briannorris@chromium.org>
-Subject: Re: [PATCH v3.1 1/2] device property: Add device_get_bd_address()
- and fwnode_get_bd_address()
-Message-ID: <20180926210339.GE22824@google.com>
-References: <20180925191014.85573-1-mka@chromium.org>
- <20180925191014.85573-2-mka@chromium.org>
- <20180926113625.GM11965@kuha.fi.intel.com>
+        Thu, 27 Sep 2018 00:50:46 -0400
+Received: from mout.gmx.net ([212.227.17.20]:49559 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726049AbeI0Eup (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 27 Sep 2018 00:50:45 -0400
+Received: from [192.168.178.36] ([95.91.253.176]) by mail.gmx.com (mrgmx103
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 0LvlWS-1fgFax0Pdc-017YPe; Thu, 27
+ Sep 2018 00:35:34 +0200
+Subject: Re: XBox One S controller, Bluetooth support (was Re: hid: microsoft:
+ Add rumble support for Xbox One S controller)
+To:     Bastien Nocera <hadess@hadess.net>, andrew.smirnov@gmail.com
+Cc:     linux-kernel@vger.kernel.org,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        linux-input@vger.kernel.org
+References: <20180810001714.14659-1-andrew.smirnov@gmail.com>
+ <20180926125130.974-1-dollinger.florian@gmx.de>
+ <701e5f0fc3b24adf4b1ca4d817b3091fe73102ba.camel@hadess.net>
+ <b455a236b677c03f623ddbd5c28e602def439bc9.camel@hadess.net>
+From:   Florian Dollinger <dollinger.florian@gmx.de>
+Message-ID: <73a5acce-37cd-1ca4-333c-d02ce48fb644@gmx.de>
+Date:   Thu, 27 Sep 2018 00:35:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20180926113625.GM11965@kuha.fi.intel.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+In-Reply-To: <b455a236b677c03f623ddbd5c28e602def439bc9.camel@hadess.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-HK
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:xnWmAY1OLPLvUeUsNDccjsgGJtLsK1FSJ5xTae++9ZpcQuXmuCR
+ XTkEKuVdyW4UZeq70GhPmkQg/oUCTPyxNWagX9LjmPEy5ecYp3rdmRZe11vsof2qnAAb+Kz
+ QAaNhnjWuoGeKjifPlAZ1/Gf4+/zgQkgvI0Z7l3TPmVNrDscecymj4Q5rk5yFSpAHfkeEEg
+ a2j9F2uGW+LRAsKHibViw==
+X-UI-Out-Filterresults: notjunk:1;V01:K0:Tg/CIq13afI=:oSN3JPyxIbm3Lr3qKELxMY
+ DqWnnnet+7WG/cRT40LdCcePh6rns5qdwibA1KKM+4pFBPtxm9kw7lr9TTrcc/OG8xW2BkcJa
+ I3gaOuy3ysdDPVPJY8JrU7KgYEbgMj5G2T1L7XXJ/lkOuItVxhaj2qbY0yJu5xeWS2++bO2u6
+ CIRZPFQLFFZ3XGt8EXK59HKTBWCYXfe7CIdsMxwrfaHQk1KHTGg7FSd0l6tSMeYeoB8leWGE7
+ +P3Z8XypZ7emijzE6Dr2KITqYZw2JuFpTMbBM9R5T8jd4/bQqPyRrwI6kZcDPZDRe53e7a7Y2
+ 3F5TfLMUItYaIbWvVkJXn9xPxqRSPqBCgHVwdY7lRsrXy7yxxi1Y7B81XkDWjbU3QlWX1PULy
+ txPwpQldmLLm5QRh4t9OttqU7ItX1DZmVvH/5LO+6Mpjza5Q3U6OsdBleF+8u0LHsfVCL06eH
+ 74YYwmXBsTdTVCg3InONassX05fNBO183/4T10NGq7jujGDnXns8qzrBvfANm7t5VU49oOjoe
+ AkSd9rQoGoTdQJbqyD5NmQCJqnIjQlky9mnYmt/1pxzWSKzIlevyZI23WL0cPhsnO5KW0dmCc
+ rF4wRO4N6kQYcJ4mPoYypGjQaQAtwYdz7mB67QVcXvEEOVU7aC6MukIHCdEjkjfUdapWurr7L
+ TgSGAWb2ZXFbeOgiPUbQLufn2hPC5C2kdrM6QoGE5txs07p7XI/7qxEAan0aNdSkBkD0KQ3Ya
+ c7TxPFk243h+Pc8bXrAVM6dVMrFOhNCpB3MtoEW7oH+MqlRYzl7ArPyn1592vWrHS++UyXYNe
+ WSfMu81X1zjQbibbecVEMauaa4q+DXPRCvEq2Q3M8ksiE3i+Ac=
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Sep 26, 2018 at 02:36:25PM +0300, Heikki Krogerus wrote:
-> On Tue, Sep 25, 2018 at 12:10:13PM -0700, Matthias Kaehlcke wrote:
-> > +/**
-> > + * fwnode_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) from the
-> > + *                         firmware node
-> > + * @fwnode:	Pointer to the firmware node
-> > + * @bd_addr:	Pointer to struct to store the BD address in
-> > + *
-> > + * Search the firmware node for 'local-bd-address'.
-> > + *
-> > + * All-zero BD addresses are rejected, because those could be properties
-> > + * that exist in the firmware tables, but were not updated by the firmware. For
-> > + * example, the DTS could define 'local-bd-address', with zero BD addresses.
-> > + */
-> > +int fwnode_get_bd_address(struct fwnode_handle *fwnode, bdaddr_t *bd_addr)
-> > +{
-> > +	bdaddr_t ba;
-> > +	int ret;
-> > +
-> > +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
-> > +					    (u8 *)&ba, sizeof(bdaddr_t));
-> > +	if (ret < 0)
-> > +		return ret;
-> > +	if (is_zero_ether_addr((u8 *)&ba))
-> > +		return -ENODATA;
-> > +
-> > +	memcpy(bd_addr, &ba, sizeof(bdaddr_t));
-> > +
-> > +	return 0;
-> > +}
-> > +EXPORT_SYMBOL_GPL(fwnode_get_bd_address);
-> > +
-> > +/**
-> > + * device_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) for a
-> > + *                         given device
-> > + * @dev:	Pointer to the device
-> > + * @bd_addr:	Pointer to struct to store the BD address in
-> > + */
-> > +int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr)
-> > +{
-> > +	return fwnode_get_bd_address(dev_fwnode(dev), bd_addr);
-> > +}
-> > +EXPORT_SYMBOL_GPL(device_get_bd_address);
+> For this patch, after speaking with the Bluetooth maintainers, we would
+> need to:
+> - add relevant btmon outputs before and after the patch in the commit
+> message
+> - remove the mention of "many devices" (if you've seen other devices
+> with that problem in the wild, please mention them, otherwise mention
+> that it's for "XBox One S" controllers, and clones)
+> - run the patch against the "Profile Tuning Suite Tool" from the
+> Bluetooth SIG. This requires a Windows laptop, and a piece of hardware
+> from the Bluetooth SIG, see below.
 > 
-> Let's not fill property.c with framework specific helper functions any
-> more!
+> The first 2 should be pretty easy to do, just send your patch using
+> "git send-email" to the linux-bluetooth list (CC:ed), with the data
+> attached.
 > 
-> Those functions are completely bluetooth specific, so they do not
-> belong here. The fact that some other framework already managed to
-> slip their helpers in does not justify others to do the same.
+> For the qualification test, I was told Szymon has a test suite that he
+> could use to double-check the tests. If not, I should be able to buy
+> the adapter and run that test suite locally.
+> 
+> Cheers
 
-You have a point, I'll see if I can find a better place.
+Thanks, I will give it a try tomorrow (later) :)
 
-Thanks
-
-Matthias
