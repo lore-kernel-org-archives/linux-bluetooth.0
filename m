@@ -2,103 +2,185 @@ Return-Path: <SRS0=a08L=MJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC06C43382
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 16:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA5E3C43382
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 16:41:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AFD12216FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 16:14:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B0122168B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 16:41:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com.br header.i=@yahoo.com.br header.b="ddaTAFY+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFD12216FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com.br
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="JI0T5Q3j";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="fTagY7NZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B0122168B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727597AbeI0Wdr (ORCPT
+        id S1727587AbeI0XAS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 18:33:47 -0400
-Received: from sonic303-21.consmr.mail.ne1.yahoo.com ([66.163.188.147]:40902
-        "EHLO sonic303-21.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727262AbeI0Wdr (ORCPT
+        Thu, 27 Sep 2018 19:00:18 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:47996 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727338AbeI0XAS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 18:33:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com.br; s=s2048; t=1538064886; bh=8iWjVyH2MtBf6YVadhIOJQHCBO1NmbWDyU5stUIAwu4=; h=Date:From:To:Cc:Subject:References:In-Reply-To:From:Subject; b=ddaTAFY+2XqDxxy0s2vF8NjDqNb60Iiqdt+H1UcriXB2VsbJzr+0aq5KYP5w3FUN5c2U9LjFiChesxvUjJwzcRNyd4cp7VWMIB0fdQ6bZsJ4z9tfDNw3umN82t9a3coAF2QBty2gw2Itv/dEoUMg0WYDMXSAIuKitSpvatcVK/cMikNG8bmT+pXuz80xJU7QdYR0y1kFsjkGEPJMUmPjkqOumu0AUqIO2BOSuSFLh03thBHbI+CfpN/RB97L3B+ZuQz7LfW6kV0fSUtW8RDEDVCX7qErk4hvpAnfNz+ZNjhUgDRyqExj9D0v+TTvAb9E5btPiNLBHR47MG3glj7A3g==
-X-YMail-OSG: iOx2YGEVM1n83DuvaGLStv63lJva50OUuj3v7NSBb5FGbCoZoGOFr0npdocqFol
- uBnNXiq1WHRdqKjiWmvi4_DnLLQYkB0FPQqtpxM0W4FMviquvUFjLeruNTaulHj3HwcFccSborat
- 2EvAe8OwYudLqaYOdhpDlXRBBjQRa9p.BfX.d3yIs1OhutM2ocK5dVpQvn6shUows5GaVgAbbtSg
- dFQIkLx0prKiFQo.v5xsikd677X1v8RvvwT6mtjIRZwNey8OmKO6NmoA4E3I2sLXKcudUrpmeSOw
- 281jC1vHwhoi6BgmuShL9v1wuCS5NJy.qlcauvTdZHmLWCxb6fHzg_V1HWBDM1kk0COXZYrvEV.h
- rFnijMTwWpXUrUlsaWTpAf6CyaW_MRJeMeD57b63MqUSi3xp9i4Va4E29oqoTwh.GVBpFnfwciDI
- NMmrdw3RNNFND62BkAoqDrtgbjOSoy5h0FUG9VLzESMXIHkeCvogHY12Bsc65HnndBwIVNSQ0mWQ
- clZ7Cm6w4TJEEhr.JNOQtyf5v0ukwyoJs8oXU2SxDaILk7Ep4g9f68uNDQZSiL39tNhjbh.._3zm
- LnHS6b4OMl9tvRc_RYKlNRAOP7ImtH.FtpigJBTzbP_Fr7.nQRNWTfrwOWbPSRNBAa0yPV_5IsIC
- H9O_IkeAB6i2rfb6QVg0qrF3gPmKmjZPL.ZNOq79NyuD9qM_esXqac3MGrgWwuh9ZtyF1JJRsGyq
- b0Y3JxLCH2bHnjcQRYs3An7682Rymcz6K6P1j5nz0LH0tL2rQj.GemYkIGKoz3HZzSZAlJRGQxyZ
- 8zRYojVdZY.pDY9kv00yvsdl2q1hHt0FwYwdCNA395onOjKPkptxKN1pAaEtCWatdtl6NSOjYV46
- oHq6e3qCNt7MIxPXAMWACdwiDM70Mby6yRZAVgzO6XoFPLUEdSOQQN077wg6zIN1.Z7YCXrdk088
- MrF7FufbcuY.BTCIKPaQm97OqnBxuayfFB451Pkr3rW_oClPrVjkybaF2rli2J4sGFPQ-
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic303.consmr.mail.ne1.yahoo.com with HTTP; Thu, 27 Sep 2018 16:14:46 +0000
-Received: from 177.81.17.223 (EHLO giustizia.org) ([177.81.17.223])
-          by smtp415.mail.ne1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID 0fcb3ef72484f4fbc915e1a8a79552a3;
-          Thu, 27 Sep 2018 16:14:43 +0000 (UTC)
-Date:   Thu, 27 Sep 2018 13:15:13 -0300
-From:   Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] ath3k: add warning when switch pid is not working
-Message-ID: <20180927161513.GD23822@giustizia.org>
-References: <20180907233549.GE3379@giustizia.org>
- <BE213F03-E020-4046-BF60-8723902BCD71@holtmann.org>
+        Thu, 27 Sep 2018 19:00:18 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 72BE1605FF; Thu, 27 Sep 2018 16:41:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1538066471;
+        bh=8lHHPy2z1uiGwv+/qmUouiS8IzTdiybfQfffdZkv088=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=JI0T5Q3jkFVUWhEEPJ9Rc3ztAHVJ7HGrNFTGaCFu2TOosqVbvJ9qlvoAdgFyNnDuA
+         JTKNdWSlIjwVB9BUsBG5SntYLRyE4oGGeRbRK+KB4LLp/CXBCK1qIJBSCUMGBtxHCx
+         iP00dnZg4cJIk64BGEYmy58FQ+6RGqQtjlIc0llY=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id 6CF8960275;
+        Thu, 27 Sep 2018 16:41:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1538066470;
+        bh=8lHHPy2z1uiGwv+/qmUouiS8IzTdiybfQfffdZkv088=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=fTagY7NZOyfvU5G/r2lmWoUNDXEOF4PE54Odp6R4yY86YqtPY4vs89LrK/KB8QhhJ
+         18lwSxQGmzbSU9z5LMFddZrgpy5pSvz80ZiMoxt64jbhmGH0xAk4wk4PikohiiORpq
+         8+29N+opLosw//MLJXgwp9iadqX1XyyMIERzFo88=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BE213F03-E020-4046-BF60-8723902BCD71@holtmann.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 27 Sep 2018 22:11:10 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Marcin Wojtas <mw@semihalf.com>,
+        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Sinan Kaya <okaya@codeaurora.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Brian Norris <briannorris@chromium.org>
+Subject: Re: [PATCH v4 1/2] Bluetooth: Add device_get_bd_address()
+In-Reply-To: <20180927004810.124185-2-mka@chromium.org>
+References: <20180927004810.124185-1-mka@chromium.org>
+ <20180927004810.124185-2-mka@chromium.org>
+Message-ID: <b28c34475e447cc29a139f9121b3c1d9@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi, Marcel,
+Hi Matthias,
 
-On Thu, Sep 27, 2018 at 12:48:17PM +0200, Marcel Holtmann wrote:
-> Hi Luiz,
+On 2018-09-27 06:18, Matthias Kaehlcke wrote:
+> Provide an API for Bluetooth drivers to retrieve the Bluetooth Device
+> address (BD_ADDR) for a device. If the firmware node of the device
+> has a property 'local-bd-address' the BD address is read from this
+> property.
 > 
-> > This patch adds a warning message in the ath3k driver when
-> > ath3k_switch_pid() returns error.
-> > 
-> > This event happens in a specific laptop, with an adapter which
-> > identifies itself as 0cf3:0036. Surprisingly, the adapter works even
-> > after this event - hence a warning is chosen instead of an error.
-> > 
-> > The current version of ath3k doesn't check the return value of
-> > ath3k_switch_pid() and so this event may remain undetected in the
-> > original version.
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+> Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> ---
+> Changes in v4:
+> - move code from driver/base/property.c to net/bluetooth/lib.c
+> - undo move of bdaddr_t declaration
+> - merge fwnode_get_bd_address() into device_get_bd_address(). as of now
+>   the function is not needed, it can be created later if necessary
+> - minor improvements suggested by Sakari
+> - updated commit message
+> - added 'Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>' tag
 > 
-> if works anyway, why bother with a warning? I have no idea what benefit this has.
+> Changes in v3:
+> - move definition of bdaddr_t to types.h to avoid include of
+>   bluetooth.h from property.h
+> - add stubs for the new functions
 > 
+> Changes in v2:
+> - use bdaddr_t instead of byte pointer + len
+> - use EXPORT_SYMBOL_GPL for the new functions instead of EXPORT_SYMBOL
+> - put new functions inside #if IS_ENABLED(CONFIG_BT)
+> - some new line juggling in property.h
+> - added 'Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>' tag
+> ---
+>  include/net/bluetooth/bluetooth.h |  2 ++
+>  net/bluetooth/lib.c               | 34 +++++++++++++++++++++++++++++++
+>  2 files changed, 36 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h
+> b/include/net/bluetooth/bluetooth.h
+> index ec9d6bc65855..6c4cecfda816 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -413,4 +413,6 @@ void mgmt_exit(void);
+> 
+>  void bt_sock_reclassify_lock(struct sock *sk, int proto);
+> 
+> +int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr);
+> +
+>  #endif /* __BLUETOOTH_H */
+> diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+> index 63e65d9b4b24..78a58ea586c6 100644
+> --- a/net/bluetooth/lib.c
+> +++ b/net/bluetooth/lib.c
+> @@ -26,7 +26,10 @@
+> 
+>  #define pr_fmt(fmt) "Bluetooth: " fmt
+> 
+> +#include <linux/etherdevice.h>
+>  #include <linux/export.h>
+> +#include <linux/fwnode.h>
+> +#include <linux/property.h>
+> 
+>  #include <net/bluetooth/bluetooth.h>
+> 
+> @@ -198,3 +201,34 @@ void bt_err_ratelimited(const char *format, ...)
+>  	va_end(args);
+>  }
+>  EXPORT_SYMBOL(bt_err_ratelimited);
+> +
+> +/**
+> + * device_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) 
+> for a
+> + *                         given device
+> + * @dev:	Pointer to the device
+> + * @bd_addr:	Pointer to struct to store the BD address in
+> + *
+> + * Search the firmware node of the device for 'local-bd-address'.
+> + *
+> + * All-zero BD addresses are rejected, because those could be 
+> properties
+> + * that exist in the firmware tables, but were not updated by the 
+> firmware. For
+> + * example, the DTS could define 'local-bd-address', with zero BD 
+> addresses.
+> + */
+> +int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr)
+> +{
+> +	struct fwnode_handle *fwnode = dev_fwnode(dev);
+> +	bdaddr_t ba;
+> +	int ret;
+> +
+> +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
+> +					    (u8 *)&ba, sizeof(ba));
+> +	if (ret < 0)
+> +		return ret;
+> +	if (is_zero_ether_addr((u8 *)&ba))
+> +		return -ENODATA;
+> +
+> +	*bd_addr = ba;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(device_get_bd_address);
 
-I analyze this issue as having three possible cases:
+Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 
-(1) the function works, and so, no problems, no warnings;
-
-(2) (my case) the function fails but the system works as it should do;
-in this case I would agree with you, but
-
-(3) the function fails and this affects the whole system (let's say, the
-VID:PID doesn't change as intended); in this case there's a problem and
-the admin should be in a better position if one can be watched by this
-warning.
-
-Based on the code, there's no way to diferentiate (2) and (3), so IMHO a
-warning would be justified.
-
-
-Best regards,
-
-Luiz
+-- 
+Regards
+Balakrishna.
