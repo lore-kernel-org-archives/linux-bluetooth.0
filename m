@@ -2,182 +2,104 @@ Return-Path: <SRS0=a08L=MJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C61F3C43382
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 00:49:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A04C43382
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 06:50:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75F8321566
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 00:49:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="m3tkLILb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75F8321566
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTP id A53DC2156D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 06:50:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53DC2156D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726948AbeI0HE0 (ORCPT
+        id S1727154AbeI0NG6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 03:04:26 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40760 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726687AbeI0HE0 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 03:04:26 -0400
-Received: by mail-pf1-f196.google.com with SMTP id s5-v6so554000pfj.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Sep 2018 17:48:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=5REZXXpcj+68mcIHPkGrgZEdADbEUsZWPA7Jej+JYQ4=;
-        b=m3tkLILbDSqJuLyGHBXfp6FY4TS7WkokaTy+u9/+Usg4bEE1wAeZL1qVTeq6SsIWLx
-         onj8Wltks21QW4nu/gaUB7r1qM72LxOCKYc5/wwYDUTbDBSDQUZoUTQBNUO3+V/WDIf4
-         sHsKkTJaS+7Y/aBAbsIU4UUcgD7nsBUYHzn98=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=5REZXXpcj+68mcIHPkGrgZEdADbEUsZWPA7Jej+JYQ4=;
-        b=kRP5xpYxzS5C8Zaag+QtIeQQGjYge1zQsgCHphsYHwySGt2aa3mbZboXWuEjBys7mD
-         Izo27xIiuXr0FGa/aylCIehRkgdn8fYaxGWZm390fnsBvwybudZykbCDuARYvnGaZc4/
-         kTmBdB1Pwam19qpiDFK1Qdh2wnEyfW2rrhBTskbI3uWTKFP+NsJ7Elum0ansuRaJ0Jb7
-         GQZjypxTDZfVkEGJTqLc9GcRa0H5Q4H3JmXd3bcfesgNj5uIMw+RSIgonpvus00TvC/I
-         KTRZi25+lGfabYbTJXuuupq6JHLGjvBIpNYIi5+QdmiE0kbD5XX0PwEOzf4T2mJ49wFP
-         Lfdw==
-X-Gm-Message-State: ABuFfojasxDpy3RkUnRyiuFV8iGL0Eo19XjQ1tEzK5/dKhRBOz9r9ylJ
-        pS0z3Z4ZzlEV5Y0U0+TJEAhPmg==
-X-Google-Smtp-Source: ACcGV60bFenmjD/2KB8fYBuxqK57Dyr1xEgnOLxsTcarhiEV93BwpNTi6iZcPmEOUqYokQ38zv7WOg==
-X-Received: by 2002:a63:fd06:: with SMTP id d6-v6mr7647309pgh.348.1538009331602;
-        Wed, 26 Sep 2018 17:48:51 -0700 (PDT)
-Received: from mka.mtv.corp.google.com ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
-        by smtp.gmail.com with ESMTPSA id g3-v6sm404173pfi.9.2018.09.26.17.48.50
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 Sep 2018 17:48:51 -0700 (PDT)
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Thu, 27 Sep 2018 09:06:58 -0400
+Received: from mga14.intel.com ([192.55.52.115]:60416 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726760AbeI0NG6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 27 Sep 2018 09:06:58 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2018 23:50:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.54,309,1534834800"; 
+   d="scan'208";a="95202105"
+Received: from paasikivi.fi.intel.com ([10.237.72.42])
+  by orsmga002.jf.intel.com with ESMTP; 26 Sep 2018 23:50:03 -0700
+Received: by paasikivi.fi.intel.com (Postfix, from userid 1000)
+        id ECCD9209BC; Thu, 27 Sep 2018 09:50:02 +0300 (EEST)
+Date:   Thu, 27 Sep 2018 09:50:02 +0300
+From:   Sakari Ailus <sakari.ailus@linux.intel.com>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "Rafael J . Wysocki" <rafael@kernel.org>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
         Marcin Wojtas <mw@semihalf.com>,
         Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
         Sinan Kaya <okaya@codeaurora.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         Balakrishna Godavarthi <bgodavar@codeaurora.org>,
         Loic Poulain <loic.poulain@linaro.org>,
-        Brian Norris <briannorris@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v4 1/2] Bluetooth: Add device_get_bd_address()
-Date:   Wed, 26 Sep 2018 17:48:09 -0700
-Message-Id: <20180927004810.124185-2-mka@chromium.org>
-X-Mailer: git-send-email 2.19.0.605.g01d371f741-goog
-In-Reply-To: <20180927004810.124185-1-mka@chromium.org>
+        Brian Norris <briannorris@chromium.org>
+Subject: Re: [PATCH v4 1/2] Bluetooth: Add device_get_bd_address()
+Message-ID: <20180927065002.3yzxg6xquapldaqz@paasikivi.fi.intel.com>
 References: <20180927004810.124185-1-mka@chromium.org>
+ <20180927004810.124185-2-mka@chromium.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180927004810.124185-2-mka@chromium.org>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Provide an API for Bluetooth drivers to retrieve the Bluetooth Device
-address (BD_ADDR) for a device. If the firmware node of the device
-has a property 'local-bd-address' the BD address is read from this
-property.
+On Wed, Sep 26, 2018 at 05:48:09PM -0700, Matthias Kaehlcke wrote:
+> Provide an API for Bluetooth drivers to retrieve the Bluetooth Device
+> address (BD_ADDR) for a device. If the firmware node of the device
+> has a property 'local-bd-address' the BD address is read from this
+> property.
+> 
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+> Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> ---
+> Changes in v4:
+> - move code from driver/base/property.c to net/bluetooth/lib.c
+> - undo move of bdaddr_t declaration
+> - merge fwnode_get_bd_address() into device_get_bd_address(). as of now
+>   the function is not needed, it can be created later if necessary
+> - minor improvements suggested by Sakari
+> - updated commit message
+> - added 'Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>' tag
+> 
+> Changes in v3:
+> - move definition of bdaddr_t to types.h to avoid include of
+>   bluetooth.h from property.h
+> - add stubs for the new functions
+> 
+> Changes in v2:
+> - use bdaddr_t instead of byte pointer + len
+> - use EXPORT_SYMBOL_GPL for the new functions instead of EXPORT_SYMBOL
+> - put new functions inside #if IS_ENABLED(CONFIG_BT)
+> - some new line juggling in property.h
+> - added 'Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>' tag
+> ---
+>  include/net/bluetooth/bluetooth.h |  2 ++
+>  net/bluetooth/lib.c               | 34 +++++++++++++++++++++++++++++++
 
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>
----
-Changes in v4:
-- move code from driver/base/property.c to net/bluetooth/lib.c
-- undo move of bdaddr_t declaration
-- merge fwnode_get_bd_address() into device_get_bd_address(). as of now
-  the function is not needed, it can be created later if necessary
-- minor improvements suggested by Sakari
-- updated commit message
-- added 'Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>' tag
+Yeah, this seems like a better place for this stuff indeed.
 
-Changes in v3:
-- move definition of bdaddr_t to types.h to avoid include of
-  bluetooth.h from property.h
-- add stubs for the new functions
+Thanks!
 
-Changes in v2:
-- use bdaddr_t instead of byte pointer + len
-- use EXPORT_SYMBOL_GPL for the new functions instead of EXPORT_SYMBOL
-- put new functions inside #if IS_ENABLED(CONFIG_BT)
-- some new line juggling in property.h
-- added 'Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>' tag
----
- include/net/bluetooth/bluetooth.h |  2 ++
- net/bluetooth/lib.c               | 34 +++++++++++++++++++++++++++++++
- 2 files changed, 36 insertions(+)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index ec9d6bc65855..6c4cecfda816 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -413,4 +413,6 @@ void mgmt_exit(void);
- 
- void bt_sock_reclassify_lock(struct sock *sk, int proto);
- 
-+int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr);
-+
- #endif /* __BLUETOOTH_H */
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 63e65d9b4b24..78a58ea586c6 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -26,7 +26,10 @@
- 
- #define pr_fmt(fmt) "Bluetooth: " fmt
- 
-+#include <linux/etherdevice.h>
- #include <linux/export.h>
-+#include <linux/fwnode.h>
-+#include <linux/property.h>
- 
- #include <net/bluetooth/bluetooth.h>
- 
-@@ -198,3 +201,34 @@ void bt_err_ratelimited(const char *format, ...)
- 	va_end(args);
- }
- EXPORT_SYMBOL(bt_err_ratelimited);
-+
-+/**
-+ * device_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) for a
-+ *                         given device
-+ * @dev:	Pointer to the device
-+ * @bd_addr:	Pointer to struct to store the BD address in
-+ *
-+ * Search the firmware node of the device for 'local-bd-address'.
-+ *
-+ * All-zero BD addresses are rejected, because those could be properties
-+ * that exist in the firmware tables, but were not updated by the firmware. For
-+ * example, the DTS could define 'local-bd-address', with zero BD addresses.
-+ */
-+int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr)
-+{
-+	struct fwnode_handle *fwnode = dev_fwnode(dev);
-+	bdaddr_t ba;
-+	int ret;
-+
-+	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
-+					    (u8 *)&ba, sizeof(ba));
-+	if (ret < 0)
-+		return ret;
-+	if (is_zero_ether_addr((u8 *)&ba))
-+		return -ENODATA;
-+
-+	*bd_addr = ba;
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(device_get_bd_address);
 -- 
-2.19.0.605.g01d371f741-goog
-
+Sakari Ailus
+sakari.ailus@linux.intel.com
