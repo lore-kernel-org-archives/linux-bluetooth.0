@@ -2,81 +2,120 @@ Return-Path: <SRS0=a08L=MJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DACF2C43382
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 09:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5110C43382
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:24:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FEDE21582
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 09:59:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FEDE21582
+	by mail.kernel.org (Postfix) with ESMTP id A140021582
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:24:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A140021582
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727064AbeI0QQj convert rfc822-to-8bit (ORCPT
+        id S1727401AbeI0QmL convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 12:16:39 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41379 "EHLO
+        Thu, 27 Sep 2018 12:42:11 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:42161 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727018AbeI0QQj (ORCPT
+        with ESMTP id S1727145AbeI0QmL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 12:16:39 -0400
+        Thu, 27 Sep 2018 12:42:11 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC9BB.dip0.t-ipconnect.de [79.239.201.187])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 55710CF16A;
-        Thu, 27 Sep 2018 12:06:25 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 2E8D7CF16A;
+        Thu, 27 Sep 2018 12:31:51 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Subject: Re: [PATCH] btsdio: Do not bind to non-removable BCM43430
+Subject: Re: [PATCH v3.1 1/2] device property: Add device_get_bd_address() and
+ fwnode_get_bd_address()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180927095455.32247-1-acho@suse.com>
-Date:   Thu, 27 Sep 2018 11:59:08 +0200
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>, jlee@suse.com
+In-Reply-To: <20180926113625.GM11965@kuha.fi.intel.com>
+Date:   Thu, 27 Sep 2018 12:24:33 +0200
+Cc:     Matthias Kaehlcke <mka@chromium.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Marcin Wojtas <mw@semihalf.com>,
+        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Sinan Kaya <okaya@codeaurora.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Pekka Enberg <penberg@kernel.org>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Brian Norris <briannorris@chromium.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <DE21BFD5-3A79-4D64-9DB1-4A2DCDBBE359@holtmann.org>
-References: <20180927095455.32247-1-acho@suse.com>
-To:     "Cho, Yu-Chen" <acho@suse.com>
+Message-Id: <DCD95AC8-D216-4CCE-B305-605A25B6B23A@holtmann.org>
+References: <20180925191014.85573-1-mka@chromium.org>
+ <20180925191014.85573-2-mka@chromium.org>
+ <20180926113625.GM11965@kuha.fi.intel.com>
+To:     Heikki Krogerus <heikki.krogerus@linux.intel.com>
 X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Yu-Chen,
+Hi Heikki,
 
-> BCM43430 devices soldered onto the PCB (non-removable)
-> use an UART connection for bluetooth.
-> But also advertise btsdio support on their 3th sdio function.
+>> +/**
+>> + * fwnode_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) from the
+>> + *                         firmware node
+>> + * @fwnode:	Pointer to the firmware node
+>> + * @bd_addr:	Pointer to struct to store the BD address in
+>> + *
+>> + * Search the firmware node for 'local-bd-address'.
+>> + *
+>> + * All-zero BD addresses are rejected, because those could be properties
+>> + * that exist in the firmware tables, but were not updated by the firmware. For
+>> + * example, the DTS could define 'local-bd-address', with zero BD addresses.
+>> + */
+>> +int fwnode_get_bd_address(struct fwnode_handle *fwnode, bdaddr_t *bd_addr)
+>> +{
+>> +	bdaddr_t ba;
+>> +	int ret;
+>> +
+>> +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
+>> +					    (u8 *)&ba, sizeof(bdaddr_t));
+>> +	if (ret < 0)
+>> +		return ret;
+>> +	if (is_zero_ether_addr((u8 *)&ba))
+>> +		return -ENODATA;
+>> +
+>> +	memcpy(bd_addr, &ba, sizeof(bdaddr_t));
+>> +
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(fwnode_get_bd_address);
+>> +
+>> +/**
+>> + * device_get_bd_address - Get the Bluetooth Device Address (BD_ADDR) for a
+>> + *                         given device
+>> + * @dev:	Pointer to the device
+>> + * @bd_addr:	Pointer to struct to store the BD address in
+>> + */
+>> +int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr)
+>> +{
+>> +	return fwnode_get_bd_address(dev_fwnode(dev), bd_addr);
+>> +}
+>> +EXPORT_SYMBOL_GPL(device_get_bd_address);
 > 
-> Signed-off-by: Cho, Yu-Chen <acho@suse.com>
-> ---
-> drivers/bluetooth/btsdio.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> Let's not fill property.c with framework specific helper functions any
+> more!
 > 
-> diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
-> index 20142bc77554..84d23d786ce5 100644
-> --- a/drivers/bluetooth/btsdio.c
-> +++ b/drivers/bluetooth/btsdio.c
-> @@ -297,7 +297,8 @@ static int btsdio_probe(struct sdio_func *func,
-> 	 * uart connection for bluetooth, ignore the BT SDIO interface.
-> 	 */
-> 	if (func->vendor == SDIO_VENDOR_ID_BROADCOM &&
-> -	    func->device == SDIO_DEVICE_ID_BROADCOM_43341 &&
-> +	    (func->device == SDIO_DEVICE_ID_BROADCOM_43341 ||
-> +	    func->device == SDIO_DEVICE_ID_BROADCOM_43430) &&
-> 	    !mmc_card_is_removable(func->card->host))
-> 		return -ENODEV;
+> Those functions are completely bluetooth specific, so they do not
+> belong here. The fact that some other framework already managed to
+> slip their helpers in does not justify others to do the same.
 
-This will turn quickly unreadable. Can we turn the func->device test into a switch statement.
+so? The firmware guys decided to put MAC addresses and BD addresses into the firmware. So you have to deal with that.
 
-	if (!mmc_card_is_rem.. && func->vendor == SDIO_ID..) {
-		switch (func->device) {
-		case SDIO_DEV..
-			return -ENODEV;
-	}
+Moving this into the Bluetooth subsystem is as pointless. I rather keep the accessor function to firmware specific data in one place and not spread around the whole tree. Especially once this is also provided via ACPI or some other means. I assumed that is what the whole device_get part was suppose to abstract.
 
 Regards
 
