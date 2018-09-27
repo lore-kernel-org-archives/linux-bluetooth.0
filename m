@@ -3,69 +3,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A3A0C43382
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:27:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C99C43382
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:29:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D64920843
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:27:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D64920843
+	by mail.kernel.org (Postfix) with ESMTP id E8E6E2159D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:29:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8E6E2159D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727077AbeI0Qoy (ORCPT
+        id S1727027AbeI0Qqj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 12:44:54 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:43783 "EHLO
+        Thu, 27 Sep 2018 12:46:39 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53081 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726948AbeI0Qoy (ORCPT
+        with ESMTP id S1726947AbeI0Qqj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 12:44:54 -0400
+        Thu, 27 Sep 2018 12:46:39 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC9BB.dip0.t-ipconnect.de [79.239.201.187])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 45DC2CF170;
-        Thu, 27 Sep 2018 12:34:34 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id CE2F0CF170;
+        Thu, 27 Sep 2018 12:36:18 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Subject: Re: [PATCH] Bluetooth: btrtl: Make array extension_sig static,
- shrinks object size
+Subject: Re: [PATCH] Bluetooth: btusb: Add quirk for BTUSB_INTEL_NEW
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180926083208.13632-1-colin.king@canonical.com>
-Date:   Thu, 27 Sep 2018 12:27:17 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+In-Reply-To: <20180925170457.33979-1-teravest@google.com>
+Date:   Thu, 27 Sep 2018 12:29:02 +0200
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        jpawlowski@google.com, Johan Hedberg <johan.hedberg@intel.com>
 Content-Transfer-Encoding: 7bit
-Message-Id: <B3D4C07F-E8A1-44B1-A221-FEE87F69C485@holtmann.org>
-References: <20180926083208.13632-1-colin.king@canonical.com>
-To:     Colin King <colin.king@canonical.com>
+Message-Id: <8674BF84-BE2E-466F-8A9C-2D9DC3F86F67@holtmann.org>
+References: <20180925170457.33979-1-teravest@google.com>
+To:     Justin TerAvest <teravest@google.com>
 X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Colin,
+Hi Justin,
 
-> Don't populate the array extension_sig on the stack but instead make it
-> static. Makes the object code smaller by 75 bytes:
+> Intel "new" controllers can do both LE scan and BR/EDR inquiry at once.
 > 
-> Before:
->   text	   data	    bss	    dec	    hex	filename
->  14325	   4920	      0	  19245	   4b2d	drivers/bluetooth/btrtl.o
-> 
-> After:
->   text	   data	    bss	    dec	    hex	filename
->  14186	   4984	      0	  19170	   4ae2	drivers/bluetooth/btrtl.o
-> 
-> (gcc version 8.2.0 x86_64)
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Signed-off-by: Justin TerAvest <teravest@google.com>
 > ---
-> drivers/bluetooth/btrtl.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> drivers/bluetooth/btusb.c | 1 +
+> 1 file changed, 1 insertion(+)
 
 patch has been applied to bluetooth-next tree.
 
