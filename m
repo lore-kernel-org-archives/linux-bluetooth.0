@@ -2,104 +2,65 @@ Return-Path: <SRS0=a08L=MJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0A04C43382
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 06:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B89FC43382
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 09:55:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A53DC2156D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 06:50:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53DC2156D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTP id E91F820843
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 09:55:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E91F820843
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727154AbeI0NG6 (ORCPT
+        id S1727197AbeI0QMl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 09:06:58 -0400
-Received: from mga14.intel.com ([192.55.52.115]:60416 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726760AbeI0NG6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 09:06:58 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Sep 2018 23:50:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.54,309,1534834800"; 
-   d="scan'208";a="95202105"
-Received: from paasikivi.fi.intel.com ([10.237.72.42])
-  by orsmga002.jf.intel.com with ESMTP; 26 Sep 2018 23:50:03 -0700
-Received: by paasikivi.fi.intel.com (Postfix, from userid 1000)
-        id ECCD9209BC; Thu, 27 Sep 2018 09:50:02 +0300 (EEST)
-Date:   Thu, 27 Sep 2018 09:50:02 +0300
-From:   Sakari Ailus <sakari.ailus@linux.intel.com>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Marcin Wojtas <mw@semihalf.com>,
-        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Sinan Kaya <okaya@codeaurora.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Brian Norris <briannorris@chromium.org>
-Subject: Re: [PATCH v4 1/2] Bluetooth: Add device_get_bd_address()
-Message-ID: <20180927065002.3yzxg6xquapldaqz@paasikivi.fi.intel.com>
-References: <20180927004810.124185-1-mka@chromium.org>
- <20180927004810.124185-2-mka@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180927004810.124185-2-mka@chromium.org>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Thu, 27 Sep 2018 12:12:41 -0400
+Received: from smtp.nue.novell.com ([195.135.221.5]:34497 "EHLO
+        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727163AbeI0QMl (ORCPT
+        <rfc822;groupwise-linux-bluetooth@vger.kernel.org:0:0>);
+        Thu, 27 Sep 2018 12:12:41 -0400
+Received: from linux-dvef.suse.de (unknown.telstraglobal.net [134.159.103.118])
+        by smtp.nue.novell.com with ESMTP (NOT encrypted); Thu, 27 Sep 2018 11:55:09 +0200
+From:   "Cho, Yu-Chen" <acho@suse.com>
+To:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, acho@suse.com,
+        jlee@suse.com
+Subject: [PATCH] btsdio: Do not bind to non-removable BCM43430
+Date:   Thu, 27 Sep 2018 17:54:55 +0800
+Message-Id: <20180927095455.32247-1-acho@suse.com>
+X-Mailer: git-send-email 2.18.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Sep 26, 2018 at 05:48:09PM -0700, Matthias Kaehlcke wrote:
-> Provide an API for Bluetooth drivers to retrieve the Bluetooth Device
-> address (BD_ADDR) for a device. If the firmware node of the device
-> has a property 'local-bd-address' the BD address is read from this
-> property.
-> 
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-> Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>
-> ---
-> Changes in v4:
-> - move code from driver/base/property.c to net/bluetooth/lib.c
-> - undo move of bdaddr_t declaration
-> - merge fwnode_get_bd_address() into device_get_bd_address(). as of now
->   the function is not needed, it can be created later if necessary
-> - minor improvements suggested by Sakari
-> - updated commit message
-> - added 'Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>' tag
-> 
-> Changes in v3:
-> - move definition of bdaddr_t to types.h to avoid include of
->   bluetooth.h from property.h
-> - add stubs for the new functions
-> 
-> Changes in v2:
-> - use bdaddr_t instead of byte pointer + len
-> - use EXPORT_SYMBOL_GPL for the new functions instead of EXPORT_SYMBOL
-> - put new functions inside #if IS_ENABLED(CONFIG_BT)
-> - some new line juggling in property.h
-> - added 'Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>' tag
-> ---
->  include/net/bluetooth/bluetooth.h |  2 ++
->  net/bluetooth/lib.c               | 34 +++++++++++++++++++++++++++++++
+BCM43430 devices soldered onto the PCB (non-removable)
+use an UART connection for bluetooth.
+But also advertise btsdio support on their 3th sdio function.
 
-Yeah, this seems like a better place for this stuff indeed.
+Signed-off-by: Cho, Yu-Chen <acho@suse.com>
+---
+ drivers/bluetooth/btsdio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thanks!
-
+diff --git a/drivers/bluetooth/btsdio.c b/drivers/bluetooth/btsdio.c
+index 20142bc77554..84d23d786ce5 100644
+--- a/drivers/bluetooth/btsdio.c
++++ b/drivers/bluetooth/btsdio.c
+@@ -297,7 +297,8 @@ static int btsdio_probe(struct sdio_func *func,
+ 	 * uart connection for bluetooth, ignore the BT SDIO interface.
+ 	 */
+ 	if (func->vendor == SDIO_VENDOR_ID_BROADCOM &&
+-	    func->device == SDIO_DEVICE_ID_BROADCOM_43341 &&
++	    (func->device == SDIO_DEVICE_ID_BROADCOM_43341 ||
++	    func->device == SDIO_DEVICE_ID_BROADCOM_43430) &&
+ 	    !mmc_card_is_removable(func->card->host))
+ 		return -ENODEV;
+ 
 -- 
-Sakari Ailus
-sakari.ailus@linux.intel.com
+2.18.0
+
