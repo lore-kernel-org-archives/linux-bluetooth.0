@@ -2,59 +2,60 @@ Return-Path: <SRS0=a08L=MJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F24DC43382
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 00:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4568CC004D1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 00:49:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1644521566
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 00:48:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0056C2156F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 00:49:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nsec8cYE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1644521566
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SRhFElSo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0056C2156F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbeI0HEZ (ORCPT
+        id S1727032AbeI0HE2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 03:04:25 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:33066 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726614AbeI0HEZ (ORCPT
+        Thu, 27 Sep 2018 03:04:28 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:35650 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726952AbeI0HE1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 03:04:25 -0400
-Received: by mail-pg1-f194.google.com with SMTP id y18-v6so592317pge.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Sep 2018 17:48:51 -0700 (PDT)
+        Thu, 27 Sep 2018 03:04:27 -0400
+Received: by mail-pf1-f193.google.com with SMTP id p12-v6so570853pfh.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Sep 2018 17:48:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xUL1ep5YulCv8tYmJ085iDc7GTmTFmf9XugNtYkFpvo=;
-        b=nsec8cYEhUD0W9Bp+gLbaplSSfAodml6GWgnL/rhcReGG3/7q3fyyx4G5AQmh9NNfo
-         ZmkGI5r6KaPbysE8cfrR+7gh9gug0oeiAgPTTa2Wh+rV6B3nLN0q1aJZvuvNt0QOTYmG
-         r9PDgA/63af64Q7KgX1KMNhADh+VC2GJV0k08=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=fWYnNtZ4a6D8LyJB9LjwUCYzhe7IWzyM7UwIqps5/hs=;
+        b=SRhFElSocMu8D3UWzkzHzHJ3uZfTcieZLbfnUE33wZ/jqaT9n7P4DfXlelYrhJoGhn
+         micCEpRenFOghg0cMhxnDPWbhTm6s1mEuWSOClzeRH+3/4rby4zBZRvdg+2X0rDs3DK+
+         pGgOHFbNS5L6XZJCExxxozvMtH2VGpzXOfCO0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xUL1ep5YulCv8tYmJ085iDc7GTmTFmf9XugNtYkFpvo=;
-        b=kxotjfBXw14q2JTbvqTK2xw/QzPhL+fLoiz7d+IdNH4k/5Xm68EhmXXvnAEuRs1ARm
-         E+cQb2hUnK10GVmXU3S5nuyJuTRdMMB3G/O7+/4ACWEAZL0zPFtzmzip8QrtyXFTNdlN
-         3112MjXXwysIHYtg7isPkxIEvZAWcWtFVuahmp07yTWZL+lJfDObFMWtkloPA3/JlX2I
-         ypLxpH+DX2WPUFehklmqhK9kRspunEIBAXoHJ3LmGHA4aznDX5b3Zag0btlw8BflIVvZ
-         AjCmRD2n3jYEVTgu3AIl5b29DoeVCl2hDH7nph+F/0j8A8WRy9FdP/P48ig6hzZXXG7y
-         HUQA==
-X-Gm-Message-State: ABuFfogBmOqEu1nuincPpGbXVo6EboekXNkom5d963czneWyScemAO3j
-        vvbFmgqFu+LXttJnJ9jjQ9YvIQ==
-X-Google-Smtp-Source: ACcGV63BCrZJi5Da6bgQQwNO303kxSKITkhPU4mLfH9y5hTFjVigf/c6VwFrp1FcYTaQdsCuBzbXkw==
-X-Received: by 2002:a62:25c5:: with SMTP id l188-v6mr8482081pfl.179.1538009330683;
-        Wed, 26 Sep 2018 17:48:50 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=fWYnNtZ4a6D8LyJB9LjwUCYzhe7IWzyM7UwIqps5/hs=;
+        b=e6MXsEPtWMgYXmqvfci2kpjG6mLFDYSzAR8tANMslN0GmmEcEClkgtn0iiYA7dkQPI
+         wxX3f0N/2PdAXgcI6D98Ib4hS7CGIJ2H4YMVEGtrpE6fq92PDXruHMd0UjowvJM0EYsr
+         lciBoKaT73ZqwIouRrFvs+BYrywUFkyu3cT9SfiG+hEUg/pux0sYQ4zSQ0+dHD1HMall
+         g/Z2i9/hk0lMyqZHh+hhZ8H4vSAFdrX9FR/WDJbNzs7IALgKeskPpx67RNFo5gGAOZ+j
+         6lB+yrkdORU4F6Zsd+XiYYVnT0UV3GmE13x0qh9hiB1/Db2+zodX9C5wmS5kKtkCm7tZ
+         FhTA==
+X-Gm-Message-State: ABuFfohX+mwLsvFF7C4r+ohWoOI1qzhE/CYqnojo7EypLRgBi549eL2G
+        sPvJRw26RX7adCnYr4NyUyJQBdKOma//UA==
+X-Google-Smtp-Source: ACcGV61eBwlDseiX1qB1V5mDs2SaQ+uJ6fdx3t/6A9CVVNdWiKkSoU2FvLO2h0SFbtGtXjSBYzKQCQ==
+X-Received: by 2002:a62:9402:: with SMTP id m2-v6mr8503794pfe.3.1538009332749;
+        Wed, 26 Sep 2018 17:48:52 -0700 (PDT)
 Received: from mka.mtv.corp.google.com ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
-        by smtp.gmail.com with ESMTPSA id g3-v6sm404173pfi.9.2018.09.26.17.48.49
+        by smtp.gmail.com with ESMTPSA id g3-v6sm404173pfi.9.2018.09.26.17.48.51
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 Sep 2018 17:48:49 -0700 (PDT)
+        Wed, 26 Sep 2018 17:48:52 -0700 (PDT)
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "Rafael J . Wysocki" <rafael@kernel.org>,
@@ -69,10 +70,12 @@ Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         Loic Poulain <loic.poulain@linaro.org>,
         Brian Norris <briannorris@chromium.org>,
         Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v4 0/2] Add API to retrieve the Bluetooth Device Address (BD_ADDR)
-Date:   Wed, 26 Sep 2018 17:48:08 -0700
-Message-Id: <20180927004810.124185-1-mka@chromium.org>
+Subject: [PATCH v4 2/2] Bluetooth: btqcomsmd: Get the BD address with device_get_bd_address()
+Date:   Wed, 26 Sep 2018 17:48:10 -0700
+Message-Id: <20180927004810.124185-3-mka@chromium.org>
 X-Mailer: git-send-email 2.19.0.605.g01d371f741-goog
+In-Reply-To: <20180927004810.124185-1-mka@chromium.org>
+References: <20180927004810.124185-1-mka@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -80,26 +83,44 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On some systems the Bluetooth Device Address (BD_ADDR) isn't stored
-on the Bluetooth chip itself. One way to configure the address is
-through the device tree. The btqcomsmd driver is an example, it can
-read the address from the DT property 'local-bd-address'. It is also
-planned to extend the hci_qca driver to support setting the BD address
-through the DT.
+Use the new API to get the BD address instead of reading it directly
+from the device tree.
 
-To avoid redundant open-coded reading of 'local-bd-address' and error
-handling this series adds an API to retrieve the BD address of a device
-and adapts the btqcomsmd driver to use this API.
+Also remove an unncessary pair of braces in the same area of code.
 
-Matthias Kaehlcke (2):
-  Bluetooth: Add device_get_bd_address()
-  Bluetooth: btqcomsmd: Get the BD address with device_get_bd_address()
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+---
+Changes in v4:
+- added 'Reviewed-by: Sakari Ailus <sakari.ailus@linux.intel.com>' tag
 
- drivers/bluetooth/btqcomsmd.c     |  4 +---
- include/net/bluetooth/bluetooth.h |  2 ++
- net/bluetooth/lib.c               | 34 +++++++++++++++++++++++++++++++
- 3 files changed, 37 insertions(+), 3 deletions(-)
+Changes in v3:
+- added 'Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>' tag
 
+Changes in v2:
+- pass bdaddr_t instead of byte pointer + len
+---
+ drivers/bluetooth/btqcomsmd.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+index 7df3eed1ef5e..ff74d2c46991 100644
+--- a/drivers/bluetooth/btqcomsmd.c
++++ b/drivers/bluetooth/btqcomsmd.c
+@@ -172,11 +172,9 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+ 	/* The local-bd-address property is usually injected by the
+ 	 * bootloader which has access to the allocated BD address.
+ 	 */
+-	if (!of_property_read_u8_array(pdev->dev.of_node, "local-bd-address",
+-				       (u8 *)&btq->bdaddr, sizeof(bdaddr_t))) {
++	if (!device_get_bd_address(&pdev->dev, &btq->bdaddr))
+ 		dev_info(&pdev->dev, "BD address %pMR retrieved from device-tree",
+ 			 &btq->bdaddr);
+-	}
+ 
+ 	hdev = hci_alloc_dev();
+ 	if (!hdev)
 -- 
 2.19.0.605.g01d371f741-goog
 
