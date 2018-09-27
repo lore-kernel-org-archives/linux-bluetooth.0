@@ -3,56 +3,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C99C43382
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D4FC43382
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:31:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8E6E2159D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:29:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8E6E2159D
+	by mail.kernel.org (Postfix) with ESMTP id F0DE82150B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 10:31:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0DE82150B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727027AbeI0Qqj (ORCPT
+        id S1727187AbeI0Qs0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 12:46:39 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:53081 "EHLO
+        Thu, 27 Sep 2018 12:48:26 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:37815 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726947AbeI0Qqj (ORCPT
+        with ESMTP id S1726959AbeI0QsZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 12:46:39 -0400
+        Thu, 27 Sep 2018 12:48:25 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC9BB.dip0.t-ipconnect.de [79.239.201.187])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CE2F0CF170;
-        Thu, 27 Sep 2018 12:36:18 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id C05D1CF170;
+        Thu, 27 Sep 2018 12:38:03 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Subject: Re: [PATCH] Bluetooth: btusb: Add quirk for BTUSB_INTEL_NEW
+Subject: Re: [PATCH v3] Bluetooth: hci_qca: Add poweroff support during hci
+ down for wcn3990
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180925170457.33979-1-teravest@google.com>
-Date:   Thu, 27 Sep 2018 12:29:02 +0200
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        jpawlowski@google.com, Johan Hedberg <johan.hedberg@intel.com>
+In-Reply-To: <20180924144445.3857-1-bgodavar@codeaurora.org>
+Date:   Thu, 27 Sep 2018 12:30:47 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <8674BF84-BE2E-466F-8A9C-2D9DC3F86F67@holtmann.org>
-References: <20180925170457.33979-1-teravest@google.com>
-To:     Justin TerAvest <teravest@google.com>
+Message-Id: <9032220F-6F66-4364-9C7F-038C06097658@holtmann.org>
+References: <20180924144445.3857-1-bgodavar@codeaurora.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
 X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Justin,
+Hi Balakrishna,
 
-> Intel "new" controllers can do both LE scan and BR/EDR inquiry at once.
+> This patch enables power off support for hci down and power on support
+> for hci up. As wcn3990 power sources are ignited by regulators, we will
+> turn off them during hci down, i.e. an complete power off of wcn3990.
+> So while hci up, will call vendor setup which will turn on the regulators,
+> requests BT chip version and download the firmware.
 > 
-> Signed-off-by: Justin TerAvest <teravest@google.com>
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > ---
-> drivers/bluetooth/btusb.c | 1 +
-> 1 file changed, 1 insertion(+)
+> v3:
+>  * addressed reviewer comments.
+> v2:
+>   * Removed vendor specific hdev->open and close functions.
+>   * Added hdev->shutdown function to turn off the regs.
+> 
+> v1:
+>   * initial patch.
+> ---
+> drivers/bluetooth/hci_qca.c | 33 +++++++++++++++++++++++++++++++++
+> 1 file changed, 33 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
