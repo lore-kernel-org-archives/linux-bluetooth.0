@@ -2,135 +2,116 @@ Return-Path: <SRS0=a08L=MJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 434B3C43382
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 18:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A5AC43382
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 20:13:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC41121708
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 18:28:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D949216E3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 20:13:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3Q4ExTq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC41121708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=yahoo.com.br header.i=@yahoo.com.br header.b="e23GMW01"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D949216E3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com.br
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728161AbeI1AsS (ORCPT
+        id S1727340AbeI1Cd1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 20:48:18 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:35310 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727307AbeI1AsS (ORCPT
+        Thu, 27 Sep 2018 22:33:27 -0400
+Received: from sonic302-22.consmr.mail.gq1.yahoo.com ([98.137.68.148]:38245
+        "EHLO sonic302-22.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727295AbeI1Cd1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 20:48:18 -0400
-Received: by mail-lf1-f68.google.com with SMTP id r191-v6so2994889lff.2;
-        Thu, 27 Sep 2018 11:28:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
-         :content-disposition:user-agent;
-        bh=eyOrzsFYZ+Q620aFUz6QLahfBm/Y5X4FXCdq3SeJt+s=;
-        b=O3Q4ExTqGU81bFRKgHO21scBC7Qf8D9igXB+JOoW7Z1TaPCt5sgKXtjbhN6pXobW1F
-         9rD5mkrxsGlXWqDydJFuugco4ZD0Szu5RXJRhLz6IOmCh85rRWp+u9E2+Sy/AHk8dFw5
-         Nidd9I3U/4PNn53ciXGaFCu8054JybMKtGRh/UQ1LMVuQIFoxzsHBrjXCIqmzeo8Lp7I
-         HQI1MlTOlPVj7ZTSv/PfMOfP8X5GA0oMtricidkou4OEqjxCDyYgi6B/gXQ9F3uE2dAA
-         +muQu+LqVq7Lzt5lKtuMnobQN1/ugoq1m2DooV8FuTWhztjZx9QknMR7H/5YZ1GWQCVT
-         kEBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:mime-version:content-disposition:user-agent;
-        bh=eyOrzsFYZ+Q620aFUz6QLahfBm/Y5X4FXCdq3SeJt+s=;
-        b=iF2lxZ6BRa++c40CZupnVqiPzDH8UcwzBM5PcHJO6K+gVp1s52QnBfxE6t078/hLV5
-         /81ijrP/xzpqiUv92U3MdKfRlNXtR+CRjdtrGQN9LKTmoMB0nljJ2AkRqRRVhkgcUqhr
-         MiAxzwBZs1G+apUwkKAI0fvJyc7f1B08AkdSgwUh84DaGWke/W52kVUSrT/ttRIkoPO1
-         inmgsyBB9AcCnKvtn3mVzYYze8dblkO8Ks6al7Gt1pZDngUCLe4CmqqINrbX4uEC59N8
-         2ZNPd/fUPLpLLbA7DoZrsA3oKmrpvV0TvslZRDWCCdais68dusbevGEA/a+Gtvw9BcPt
-         aH4Q==
-X-Gm-Message-State: ABuFfoiyZ0pOQr58I/rxgy66Tsa+7StQFwQVKV2B7kywSrq6UckN3HS2
-        LxPhibFlnVThnSlnJ/oNc3z7JrNS2xU=
-X-Google-Smtp-Source: ACcGV609hNTz3eXRoP8Xs0Ic3XytM2Qc8WoK2FKqfRniZcVcavXhIwhFuHTfwNoL59ibmjF7nDBSKA==
-X-Received: by 2002:a19:3855:: with SMTP id d21-v6mr8467880lfj.148.1538072923269;
-        Thu, 27 Sep 2018 11:28:43 -0700 (PDT)
-Received: from x1c.home (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
-        by smtp.gmail.com with ESMTPSA id a4-v6sm558336lfe.54.2018.09.27.11.28.41
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 27 Sep 2018 11:28:41 -0700 (PDT)
-Date:   Thu, 27 Sep 2018 21:28:40 +0300
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     davem@davemloft.net
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2018-09-27
-Message-ID: <20180927182840.GA31151@x1c.home>
-Mail-Followup-To: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
+        Thu, 27 Sep 2018 22:33:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com.br; s=s2048; t=1538079207; bh=0IA22sytR9BgZP9P5aTau9WymlBT/WsNeAZI3KVn/cQ=; h=Date:From:To:Cc:Subject:References:In-Reply-To:From:Subject; b=e23GMW01DpyNuCNVbnEDYQ+IS+5tK6ghuiFQIHCi81eBBGTOT3InZH1l20SEUGDzOoLuxnLvIx/W2OZAhlKkZ0MkLlkCRAO9PvNygHHl14xQNdT2DEaMDBcgPICxQLSRA3HBwJR3XuRttfoADdCwPsdxQJVnAXq2AOn0q4yEfXU3Grk6gy0OJXNwhu18+SP3iScv5ZkbZNrFyNg0Vp5inaovhcC7Z53i34BUnbPupA6SubgPxORqHchfTrEaul+EFFEa5pLHl5DPOcFnkeQKjRHGCMuCzucXPrJykj7eNZosZ2K+1AvTgynC2sHW7LcBVL/hiUsTv/PirUAG2Fo18g==
+X-YMail-OSG: 9klGuS8VM1mMfSPLjvwyDdAi5PRWgk9mJSLrKt5bUMtluIc.jOcQDQyk9pY56Zj
+ M2gTxsSU2UaQdvvGuM8PWzXUmOJn7J5yjubT3xlUkvzJ6F1y2TY236C1YdLnMRESF5rtAghtjlKi
+ tKoE5HFqg3b1sjFK83pKa3xq_zwLhdfKpaftqQeTGROn3E0llgJpZiV38QIzQKJpbCfm3qPR.mV3
+ 5jKH6RMuynvSGQ4zdq5S5xWN4urGO91RUC97KcTaF86vPzkRfQnd6PsZL8QRqVgyTRpnjZ5UxxjH
+ uM3snUBE_HWbol38HVcbCJGjJeRJWJ.R1DrTwLmClAWjWY_0ono1_6M_hn4VdwQpKzPq8xHnh6ze
+ sd8FOo0vuRQg8CIYWHx21Tio4fkghaVuHqYT4ywNfkg4mWBrBw9vO3cPX_DuYbWJM9w4ErNeoEUi
+ 1D_7UxXsK5tVz7yud8.eqdNz35oX4zHMdIYjbaYSjnMdS_UBjYLqnmSijI3HwjKWsI57C8AvWcv_
+ AQFEge.s_o155iU8svnXVMEbN6Zkz7H_g2kZyZ.fAUxxAPpvS4GVuSqSHONKHWBqBh2f29EHCP.D
+ nxkbKaZDubJoG7JWMVJGvUaixCkOTjtUd4czyZ1dnihs_SXGES3G3xb8w4o09X4OIf_uPqnPsZ6Y
+ _k0VsHkfFPO4khOYdEiueW0PMz6xEHxBzNURecTy7QTCXx9p_El8OE47XCLhM5AZifHHLJl1ARCf
+ IWc4je85GJZM0ruCmuCWJLkZl9jTaUvZc9tm3sG.tAm_6YjWpm2UJRpTBIXc9tmYK92OiVLK_4O8
+ RuWO_xId7w.15urYtuqvUIU4kRShEfMEuUbyO_.Drnt9UjBD8VzsAyPi_yp9YN4m6mlkc1CCNpq4
+ K3HLmAd2aLnw0_NWCuoCsdE1_Yxt_46GoAA29o3cVG.GV80_fUU81zGRUB1NopBkaAyDaBMfrhBg
+ ub8GMw296AT8VctUpfHIEx_e1Xj27fquQO1yCnPl0WAZ7mcT_4p2OrBN4AIFFEOMLTRd_
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic302.consmr.mail.gq1.yahoo.com with HTTP; Thu, 27 Sep 2018 20:13:27 +0000
+Received: from 177.81.17.223 (EHLO giustizia.org) ([177.81.17.223])
+          by smtp401.mail.gq1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID a0b42890f20093135d91920e28fb057f;
+          Thu, 27 Sep 2018 20:13:23 +0000 (UTC)
+Date:   Thu, 27 Sep 2018 17:13:50 -0300
+From:   Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] ath3k: add more information to error message
+Message-ID: <20180927201350.GA19318@giustizia.org>
+References: <20180907233603.GF3379@giustizia.org>
+ <5CF8F067-C9A1-4028-847A-0B25DB00F61A@holtmann.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="J2SCkAp4GZ/dPZZf"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <5CF8F067-C9A1-4028-847A-0B25DB00F61A@holtmann.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi, Marcel,
 
---J2SCkAp4GZ/dPZZf
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Hi Dave,
+On Thu, Sep 27, 2018 at 12:47:11PM +0200, Marcel Holtmann wrote:
+> Hi Luiz,
+> 
+> > When there is an error in either ath3k_load_firmware() or
+> > ath3k_load_fwfile(), the inlined function ath3k_log_failed_loading() is
+> > called receiving the error returned and both the block size requested to
+> > load and the size actually loaded. These values are printed in an error
+> > message using the macro BT_ERR.
+> > 
+> > This patch creates a new function which does the same but also receives
+> > the "count" variable, in order to show more information when a failing
+> > firmware loading happens. The calls to the older function were changed
+> > to the new one.
+> > 
+> > This event is being monitored in a laptop with an adapter which
+> > identifies itself as 0cf3:0036, where sometimes there are errors in the
+> > firmware loading process.
+> > 
+> > Signed-off-by: Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
+> > ---
+> > drivers/bluetooth/ath3k.c | 12 ++++++++++--
+> > 1 file changed, 10 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> > index 3a8c47efea55..ebc312cb4412 100644
+> > --- a/drivers/bluetooth/ath3k.c
+> > +++ b/drivers/bluetooth/ath3k.c
+> > @@ -209,6 +209,14 @@ static inline void ath3k_log_failed_loading(int err, int len, int size)
+> > 			err, len, size);
+> > }
+> > 
+> > +static inline void ath3k_log_failed_loading_2(int err, int len, int size,
+> > +						int count)
+> > +{
+> > +	BT_ERR("%s err = %d, len = %d, size = %d, count = %d",
+> > +			"Error in firmware loading",
+> > +			err, len, size, count);
+> > +}
+> > +
+> 
+> just change the the original ath3k_log_failed_loading to include the count parameter.
+> 
 
-Here's one more Bluetooth fix for 4.19, fixing the handling of an
-attempt to unpair a device while pairing is in progress.
+Ok, fine. I'll send it in a next message.
 
-Let me know if there are any issues pulling. Thanks.
+Many thanks,
 
-Johan
-
----
-The following changes since commit 3f32d0be6c16b902b687453c962d17eea5b8ea19:
-
-  tipc: lock wakeup & inputq at tipc_link_reset() (2018-09-25 20:48:56 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to cb28c306b93b71f2741ce1a5a66289db26715f4d:
-
-  Bluetooth: SMP: fix crash in unpairing (2018-09-26 12:39:32 +0300)
-
-----------------------------------------------------------------
-Matias Karhumaa (1):
-      Bluetooth: SMP: fix crash in unpairing
-
- net/bluetooth/mgmt.c |  7 ++-----
- net/bluetooth/smp.c  | 29 +++++++++++++++++++++++++----
- net/bluetooth/smp.h  |  3 ++-
- 3 files changed, 29 insertions(+), 10 deletions(-)
-
---J2SCkAp4GZ/dPZZf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJbrSFXAAoJECQj9vv5qNQSjHoP/3TpFwaPXFWg9u/F03yRrIkm
-SPvDlp+W5tlhY1fSAgG3NqmXInWt4a4K1dNPzf3Th7BQMLBYGCXMA3HePWC3siVw
-8YMrnjbdgzFtY3YJuEABtXIk0VPv73hOvOrHx0szx0yctIcXQQt8PngiYUeL1p5Q
-p6pEMHo7DKm6/Opv2Mifz2vwpPjg2ichw+U6w/4HDBSBLr9kbowI9odP40Uy47sM
-Crtcdo95Xd9V/lunsrnDed1zuWxphXb9UkNK2GCZYxGG/TabMcAlzhZIhWdmkXK5
-aj0bQQG8dQ2Gf34TXWfPGPttmRO5RGUGWSOb+xWkMtSd+9sqvsPYVC35S+9ykuWM
-fpXcJDoFatJG4FsIw0nxCnU6Zonw6KpiXvc5KQqto+EePQa5o5RZoqo/Hc33/V46
-PlZkyunldLYJNeARBEsY1xYqYp1QQoMnjhJzb/FbRENX7bvbF5nVkiwFZGoXawGg
-5APsiosqHKPVnGxWTnipWL63Siiyfj5+U6uMTmorOgWfO+bBIsXE70hvXLWLhBLl
-i8GGKhpgNqYhy/OnVQftYI4hxiwA4OvOLJDKg9J9vQPDnt/JcKmlT368ddPYTVCx
-c/JcZk1zS98PWl3Bhc8HZ9DSSOPTOqZHTyeMWNnAPXVafMxkmTo20kKKYusNbV+e
-0ncBYxW1hbFi5L6agPkb
-=khKY
------END PGP SIGNATURE-----
-
---J2SCkAp4GZ/dPZZf--
+Luiz
