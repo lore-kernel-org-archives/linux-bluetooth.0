@@ -2,115 +2,103 @@ Return-Path: <SRS0=a08L=MJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A710DC43382
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 13:17:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 043E9C43382
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 15:24:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69420215EB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 13:17:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69420215EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 9DCE821571
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 15:24:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pA1VDGbl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DCE821571
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lwfinger.net
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727553AbeI0TfJ (ORCPT
+        id S1727289AbeI0Vnk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 15:35:09 -0400
-Received: from mga09.intel.com ([134.134.136.24]:10040 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727270AbeI0TfI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 15:35:08 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Sep 2018 06:16:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.54,310,1534834800"; 
-   d="scan'208";a="260771880"
-Received: from paasikivi.fi.intel.com ([10.237.72.42])
-  by orsmga005.jf.intel.com with ESMTP; 27 Sep 2018 06:15:55 -0700
-Received: by paasikivi.fi.intel.com (Postfix, from userid 1000)
-        id 2E8662068E; Thu, 27 Sep 2018 16:15:54 +0300 (EEST)
-Date:   Thu, 27 Sep 2018 16:15:54 +0300
-From:   Sakari Ailus <sakari.ailus@linux.intel.com>
-To:     Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Marcin Wojtas <mw@semihalf.com>,
-        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
-        Sinan Kaya <okaya@codeaurora.org>,
+        Thu, 27 Sep 2018 17:43:40 -0400
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:41105 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727270AbeI0Vnk (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 27 Sep 2018 17:43:40 -0400
+Received: by mail-oi1-f196.google.com with SMTP id l197-v6so2495192oib.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Sep 2018 08:24:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=1jvo3ABXrAGFAyloD5H0PAQ/r8mYrexb0ISOoqDOJbc=;
+        b=pA1VDGbl++7Hh8clInfTRG+xKaMrm+TW335tEGD5ZXrdrMfgQ+euhe/JKYrJAeT2P9
+         zMZja/qeVYrA+h8pSuGaR+cfA3r/6VMw9rPfrJ7zXIRyj0Pee1N61oH0YKOStlEnjbYn
+         p+WRnsXEUya6tSk2PGMjBw6Ct7LWShEGH22l+JTMBaB4AIQl8ezt0Kn85wHi+1EASm7j
+         21BBtwcjdEYqJyQwFlr6/hBNAEwUmmQESaNEkCrLOFdpKcuDepXfuMktTJy8cXVCCX5y
+         YuFoBziKtAgKE4XZ/f8LLDbTOJsVLsxfrLZR3ytI+fXni6Hls2bH4L9xdyUP1cBGpPmo
+         Sx7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1jvo3ABXrAGFAyloD5H0PAQ/r8mYrexb0ISOoqDOJbc=;
+        b=jb0HfJXUgsLTEpEHK76UgEpZOLAmYrLGxiE6+8FJ3CZ/JR1S0xI1njdQicsqTZuu9v
+         BWmjAZxjuMrXv3cYANQPc9FhlFIZ3mxVAPtyzKR+p4OydC3rCed9y0UqT19U2O5Yh76J
+         sFEDfqKQ7EzICvzYCxNMkYgl5fyq9/6xEKPlnXjj0UpiI+7pEVEP4PSNOxH5OWgNQKkt
+         cemrWEKTXRPgNfW17hj9933fjnnh8fqKf48JXb7wXI+rbH0zmVz/ZO1b0o9Q/Vqm6iqg
+         fLjC3Qr9+wFQeL29kzfrJjvw7/Q2uQW3lGafXe7zfuH81ExMXYOesSjntthv7GLTDfXH
+         FVZQ==
+X-Gm-Message-State: ABuFfojzu2Q9E0D80HdN90Wt4OPzVMcFqrE456Pl3AaodAdtKbQmdlAO
+        iXHWFZTg7lIjXPuGxCxfZ8g=
+X-Google-Smtp-Source: ACcGV62H4hDvMzZb0Kw32NW7kq7W1tVguzb3J5g84rsZPxjAu2YXE4834cM9g3IVR2UnBP1WR8SXDA==
+X-Received: by 2002:aca:bf83:: with SMTP id p125-v6mr426649oif.228.1538061894049;
+        Thu, 27 Sep 2018 08:24:54 -0700 (PDT)
+Received: from [192.168.1.107] (cpe-24-31-245-230.kc.res.rr.com. [24.31.245.230])
+        by smtp.gmail.com with ESMTPSA id d5-v6sm707901oia.57.2018.09.27.08.24.51
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 27 Sep 2018 08:24:51 -0700 (PDT)
+Subject: Re: [PATCH] Bluetooth: btrtl: Add support for RTL8822C with USB
+ interface
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Pekka Enberg <penberg@kernel.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Brian Norris <briannorris@chromium.org>
-Subject: Re: [PATCH v3.1 1/2] device property: Add device_get_bd_address()
- and fwnode_get_bd_address()
-Message-ID: <20180927131553.slg6m3cv77l7b7eu@paasikivi.fi.intel.com>
-References: <20180925191014.85573-1-mka@chromium.org>
- <20180925191014.85573-2-mka@chromium.org>
- <20180926113625.GM11965@kuha.fi.intel.com>
- <DCD95AC8-D216-4CCE-B305-605A25B6B23A@holtmann.org>
- <20180927113829.GQ11965@kuha.fi.intel.com>
+        linux-bluetooth@vger.kernel.org, Alex Lu <alex_lu@realsil.com.cn>
+References: <20180908170559.11070-1-Larry.Finger@lwfinger.net>
+ <244BD45C-09DA-4243-B847-D164507CAA85@holtmann.org>
+From:   Larry Finger <Larry.Finger@lwfinger.net>
+Message-ID: <7cfcf07a-d5af-a4fd-52b3-b8babffb12c8@lwfinger.net>
+Date:   Thu, 27 Sep 2018 10:24:51 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20180927113829.GQ11965@kuha.fi.intel.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <244BD45C-09DA-4243-B847-D164507CAA85@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi guys,
-
-On Thu, Sep 27, 2018 at 02:38:29PM +0300, Heikki Krogerus wrote:
-> Hi Marcel,
+On 9/27/18 5:45 AM, Marcel Holtmann wrote:
+> Hi Larry,
 > 
-> On Thu, Sep 27, 2018 at 12:24:33PM +0200, Marcel Holtmann wrote:
-> > > Let's not fill property.c with framework specific helper functions any
-> > > more!
-> > > 
-> > > Those functions are completely bluetooth specific, so they do not
-> > > belong here. The fact that some other framework already managed to
-> > > slip their helpers in does not justify others to do the same.
-> > 
-> > so? The firmware guys decided to put MAC addresses and BD addresses into the
-> > firmware. So you have to deal with that.
+>> This device is included in the RTL8822CU combination wifi and BT part,
+>> as well as the BT part of the RTL8822CE.
+>> The necessary firmware has been submitted to the linux-firmware
+>> project.
+>>
+>> Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
+>> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+>> ---
+>> drivers/bluetooth/btrtl.c | 8 ++++++++
+>> 1 file changed, 8 insertions(+)
 > 
-> I think you have misunderstood the point.
-> 
-> > Moving this into the Bluetooth subsystem is as pointless. I rather keep the
-> > accessor function to firmware specific data in one place and not spread around
-> > the whole tree. Especially once this is also provided via ACPI or some other
-> > means. I assumed that is what the whole device_get part was suppose to
-> > abstract.
-> 
-> Unified device property API defines a _generic_ API that can be used
-> by any type of device to access the device properties regardless of
-> the way the hardware is described.
-> 
-> Any device can use device_property_read_u8/u16/u32/u64/string()
-> functions, but only bluetooth devices can use device_get_bd_address().
-> Therefore that function does not belong to drivers/base/properties.c.
+> patch has been applied to bluetooth-next tree.
 
-FWIW, what's been relevant for V4L2 devices has always been parsed within
-the V4L2 framework. It's way more than needed by BT here though; see:
+Thanks,
 
-	drivers/media/v4l2-core/v4l2-fwnode.c
+Larry
 
-I wouldn't think of putting this under drivers/base.
-
--- 
-Regards,
-
-Sakari Ailus
-sakari.ailus@linux.intel.com
