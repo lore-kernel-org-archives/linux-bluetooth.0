@@ -1,125 +1,158 @@
-Return-Path: <SRS0=a08L=MJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=5peh=MK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF29FC04E87
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 20:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E086AC43382
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 06:52:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A566521708
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Sep 2018 20:19:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com.br header.i=@yahoo.com.br header.b="JML9ly9e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A566521708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=yahoo.com.br
+	by mail.kernel.org (Postfix) with ESMTP id A4C6221746
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 06:52:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4C6221746
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728122AbeI1Ci7 (ORCPT
+        id S1728903AbeI1NOh convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Sep 2018 22:38:59 -0400
-Received: from sonic304-22.consmr.mail.ne1.yahoo.com ([66.163.191.148]:43119
-        "EHLO sonic304-22.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727358AbeI1Ci6 (ORCPT
+        Fri, 28 Sep 2018 09:14:37 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:49200 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728787AbeI1NOh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Sep 2018 22:38:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com.br; s=s2048; t=1538079537; bh=E0pv0AIxGeX4l+GbCxPEkANA0BmgEo+SeZLPKWsQBok=; h=Date:From:To:Cc:Subject:From:Subject; b=JML9ly9e1q9O6ZqW0dSoACmY6iKFVCBTnWzEP7JtMYCc0nvPy91aaaLYetCTLnW8xj0G+bpS2lygdU1nAPaivu636aFbYM2SnjpMt7Znvnz7FgiiY4L4cAXV5cHapeIfobZqgRksNvi8Kagpi3KxzjTsZHHipkpXY4d+dQ07/T+MgnGzyqGwXSoQtTyW0nkRsP1L57MLRUwxcfqS7r12sR7rZmGCVfueCJjcLzcMkERd+pgNTlon29hloSi8q8NAw+5nKuNRB6GjS9URi6imw8k8KEmCvq35COLGcrTdo74mlnFjEXf99/Yz4zv+mXfcutZkm8yf2YsJIbK3kumSOQ==
-X-YMail-OSG: erlRp_QVM1m18sZM4OUThLSJuzqLP4B8dHn.YPMWO5RtH6oS_6HUkIglqO47wEr
- h4unwZsDKmpwRF.PIfQyi.x4J8I9Pu63n4bcL6f6xLrPuSXCOhJ99IBQ140zsnu2mV6TGQo9USIN
- LwkhWxLKlaRObXVA.S8PtgzXG8VPJr81yOpTZVadTLZaN0uNct2gZkycWtobgVT7UbqrBeT6IYwV
- _XoHMwVSQ0Hc7pbU4zA2XdDkt21iwrOC6ZxjmUMqpSHqI1JPWJFk5L2pACI6OlI6vCNGbmg47KJa
- oEOHBYOiI_Gy1LxEFFly4XfN9LCwYNC29kaFKTpgvaLdkAWkjozNThPqkROnZYWvaYvdUFlcnwq0
- VbYvWvlGU27knV_zaIFPEUpGCWwPnowEA90ydqyyX8UKqZ9.i6yuWfI2uPKaxLQjGrqcX2oPr2bn
- 5UoFSWlSndgRYaFBsDzaklUq.fRWevNBWag.6dcK5rRXvuKMadpUrRNK7Pe4kr_LDc_Y6JCO985u
- O49xFuUsjoyqzDyUvjPYqGR3aNLutsudj8A6lZnR.r2BgdlfdPzvqFFARbNycD2.v.gg4i.Wb0LE
- Vi.MtNtkIKzX7cDLh_7l5ZhnqZTgq9GnVkDem7osup6F73pOxbfL8nezgLsUyhVNDS75dMoBvHCi
- eroAcLXsLmCauTQdUOLYwc.Dbn2KqhxQYPcbeETVCpm9fVTfFt_joSkP60_OKM0NcuETsPs4RlX8
- IpVEGq5Cf0C9ZsYTiJgWVj1IXMj7D8NahAkIqMO.UEhLW27cyQo_aJhfSjcgWqDPzD0h8NMdEEoo
- nljKbF4MA00SOdgyPaV3qPcg9KViMy1qH1p8MnOY3jS7xGQCjaIorO4xxK7iad6FOMZ_BQ9eKU4q
- KtIwM1I7oasWD2kyjAjRI_i9xthuVuBoxVJnZu.7pQe6hJxwyS6NtmF9a2OhqhGDuAUcNy92gilT
- d0sPCCl7SjtO2UjzMY7ZvcWRsdTrnq1Kfhmlq9nUxiS_u2bh4X4spRNPTU9fI6.RDFiiNPH6BaPo
- -
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic304.consmr.mail.ne1.yahoo.com with HTTP; Thu, 27 Sep 2018 20:18:57 +0000
-Received: from 177.81.17.223 (EHLO giustizia.org) ([177.81.17.223])
-          by smtp420.mail.ne1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID f0a5e3192dfd6e5660bc0cbdefed84b5;
-          Thu, 27 Sep 2018 20:18:55 +0000 (UTC)
-Date:   Thu, 27 Sep 2018 17:19:26 -0300
-From:   Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] ath3k: add more information to error message
-Message-ID: <20180927201926.GB19318@giustizia.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Fri, 28 Sep 2018 09:14:37 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC9BB.dip0.t-ipconnect.de [79.239.201.187])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 0BE53CF233;
+        Fri, 28 Sep 2018 08:59:37 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
+Subject: Re: [PATCH] Bluetooth: Fix debugfs NULL pointer dereference
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20180928041039.GA18262@makarhum-Latitude-E5440>
+Date:   Fri, 28 Sep 2018 08:52:19 +0200
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <50D59765-3CFF-432D-9C8C-40F2044B45B9@holtmann.org>
+References: <20180928041039.GA18262@makarhum-Latitude-E5440>
+To:     Matias Karhumaa <matias.karhumaa@gmail.com>
+X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When there is an error in either ath3k_load_firmware() or
-ath3k_load_fwfile(), the inlined function ath3k_log_failed_loading() is
-called receiving the error returned and both the block size requested to
-load and the size actually loaded. These values are printed in an error
-message using the macro BT_ERR.
+Hi Matias,
 
-This patch changes that function in order to print the variable "count"
-as well, to show more information when a failing firmware loading
-operation happens. The calls to the older function were changed to the
-new one.
+> Fix crash caused by NULL pointer dereference when debugfs functions
+> le_max_key_read, le_max_key_size_write, le_min_key_size_read or
+> le_min_key_size_write and Bluetooth adapter was powered off.
+> 
+> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=201253
+> 
+> BUG: unable to handle kernel NULL pointer dereference at 00000000000002e8
+> PGD 0 P4D 0
+> Oops: 0000 [#24] SMP PTI
+> CPU: 2 PID: 6255 Comm: cat Tainted: G      D    OE     4.18.9-200.fc28.x86_64 #1
+> Hardware name: LENOVO 4286CTO/4286CTO, BIOS 8DET76WW (1.46 ) 06/21/2018
+> RIP: 0010:le_max_key_size_read+0x45/0xb0 [bluetooth]
+> Code: 00 00 00 48 83 ec 10 65 48 8b 04 25 28 00 00 00 48 89 44 24 08 31 c0 48 8b 87 c8 00 00 00 48 8d 7c 24 04 48 8b 80 48 0a 00 00 <48> 8b 80 e8 02 00 00 0f b6 48 52 e8 fb b6 b3 ed be 04 00 00 00 48
+> RSP: 0018:ffffab23c3ff3df0 EFLAGS: 00010246
+> RAX: 0000000000000000 RBX: 00007f0b4ca2e000 RCX: ffffab23c3ff3f08
+> RDX: ffffffffc0ddb033 RSI: 0000000000000004 RDI: ffffab23c3ff3df4
+> RBP: 0000000000020000 R08: 0000000000000000 R09: 0000000000000000
+> R10: ffffab23c3ff3ed8 R11: 0000000000000000 R12: ffffab23c3ff3f08
+> R13: 00007f0b4ca2e000 R14: 0000000000020000 R15: ffffab23c3ff3f08
+> FS:  00007f0b4ca0f540(0000) GS:ffff91bd5e280000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00000000000002e8 CR3: 00000000629fa006 CR4: 00000000000606e0
+> Call Trace:
+> full_proxy_read+0x53/0x80
+> __vfs_read+0x36/0x180
+> vfs_read+0x8a/0x140
+> ksys_read+0x4f/0xb0
+> do_syscall_64+0x5b/0x160
+> entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> 
+> Signed-off-by: Matias Karhumaa <matias.karhumaa@gmail.com>
+> ---
+> net/bluetooth/smp.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++-----
+> 1 file changed, 57 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index 3a7b077..0da3754 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -3368,9 +3368,22 @@ static ssize_t le_min_key_size_read(struct file *file,
+> 				     size_t count, loff_t *ppos)
+> {
+> 	struct hci_dev *hdev = file->private_data;
+> +	struct l2cap_chan *chan;
+> +	struct smp_dev *smp;
+> 	char buf[4];
+> 
+> -	snprintf(buf, sizeof(buf), "%2u\n", SMP_DEV(hdev)->min_key_size);
+> +	if (!hdev)
+> +		return -EFAULT;
 
-This event is being monitored in a laptop with an adapter which
-identifies itself as 0cf3:0036, where sometimes there are errors in the
-firmware loading process.
+the -EFAULT is never the right error unless you have some memory access error. And frankly I have no idea what you are checking !hdev here. If that would ever happen, then we have serious other problems.
 
-Signed-off-by: Luiz Carlos Ramos <lramos.prof@yahoo.com.br>
----
- drivers/bluetooth/ath3k.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+> +
+> +	chan = hdev->smp_data;
+> +	if (!chan)
+> +		return -EFAULT;
+> +
+> +	smp = chan->data;
+> +	if (!smp)
+> +		return -EFAULT;
+> +
+> +	snprintf(buf, sizeof(buf), "%2u\n", smp->min_key_size);
+> 
+> 	return simple_read_from_buffer(user_buf, count, ppos, buf, strlen(buf));
+> }
+> @@ -3380,10 +3393,23 @@ static ssize_t le_min_key_size_write(struct file *file,
+> 				      size_t count, loff_t *ppos)
+> {
+> 	struct hci_dev *hdev = file->private_data;
+> +	struct l2cap_chan *chan;
+> +	struct smp_dev *smp;
+> 	char buf[32];
+> 	size_t buf_size = min(count, (sizeof(buf) - 1));
+> 	u8 key_size;
+> 
+> +	if (!hdev)
+> +		return -EFAULT;
+> +
+> +	chan = hdev->smp_data;
+> +	if (!chan)
+> +		return -EFAULT;
+> +
+> +	smp = chan->data;
+> +	if (!smp)
+> +		return -EFAULT;
+> +
+> 	if (copy_from_user(buf, user_buf, buf_size))
+> 		return -EFAULT;
+> 
+> @@ -3391,11 +3417,11 @@ static ssize_t le_min_key_size_write(struct file *file,
+> 
+> 	sscanf(buf, "%hhu", &key_size);
+> 
+> -	if (key_size > SMP_DEV(hdev)->max_key_size ||
+> +	if (key_size > smp->max_key_size ||
+> 	    key_size < SMP_MIN_ENC_KEY_SIZE)
+> 		return -EINVAL;
+> 
+> -	SMP_DEV(hdev)->min_key_size = key_size;
+> +	smp->min_key_size = key_size;
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 3a8c47efea55..73453fdff4e7 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -203,10 +203,12 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
- 	{ }	/* Terminating entry */
- };
- 
--static inline void ath3k_log_failed_loading(int err, int len, int size)
-+static inline void ath3k_log_failed_loading(int err, int len, int size,
-+						int count)
- {
--	BT_ERR("Error in firmware loading err = %d, len = %d, size = %d",
--			err, len, size);
-+	BT_ERR("%s err = %d, len = %d, size = %d, count = %d",
-+			"Error in firmware loading",
-+			err, len, size, count);
- }
- 
- #define USB_REQ_DFU_DNLOAD	1
-@@ -257,7 +259,7 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 					&len, 3000);
- 
- 		if (err || (len != size)) {
--			ath3k_log_failed_loading(err, len, size);
-+			ath3k_log_failed_loading(err, len, size, count);
- 			goto error;
- 		}
- 
-@@ -356,7 +358,7 @@ static int ath3k_load_fwfile(struct usb_device *udev,
- 		err = usb_bulk_msg(udev, pipe, send_buf, size,
- 					&len, 3000);
- 		if (err || (len != size)) {
--			ath3k_log_failed_loading(err, len, size);
-+			ath3k_log_failed_loading(err, len, size, count);
- 			kfree(send_buf);
- 			return err;
- 		}
--- 
-2.14.4
+Maybe we just need to store min and max key sizes in hdev instead of trying to store them in the SMP object. Maybe Johan has some other idea, but I think that debugfs command should always work and remember the value even when SMP gets only created later.
+
+Regards
+
+Marcel
 
