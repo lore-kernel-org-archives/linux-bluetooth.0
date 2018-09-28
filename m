@@ -2,94 +2,175 @@ Return-Path: <SRS0=5peh=MK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17BBFC04AA5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 18:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 276DDC64E93
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 22:38:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D514D206B8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 18:55:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D514D206B8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
+	by mail.kernel.org (Postfix) with ESMTP id D8367206B8
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 22:38:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ziath-com.20150623.gappssmtp.com header.i=@ziath-com.20150623.gappssmtp.com header.b="yO9WtQ1u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8367206B8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ziath.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726191AbeI2BU3 convert rfc822-to-8bit (ORCPT
+        id S1727344AbeI2FEb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Sep 2018 21:20:29 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:56918 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726145AbeI2BU3 (ORCPT
+        Sat, 29 Sep 2018 01:04:31 -0400
+Received: from mail-lf1-f50.google.com ([209.85.167.50]:34595 "EHLO
+        mail-lf1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726517AbeI2FEb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Sep 2018 21:20:29 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC9BB.dip0.t-ipconnect.de [79.239.201.187])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 76D88CF29E;
-        Fri, 28 Sep 2018 21:02:37 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Subject: Re: [PATCH v3] Bluetooth: Fix debugfs NULL pointer dereference
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20180928185430.GA75415@Matias-MacBook-Air.local>
-Date:   Fri, 28 Sep 2018 20:55:20 +0200
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <4B0F7B7E-3D59-4441-8FBE-DE72E41A8B53@holtmann.org>
-References: <20180928185430.GA75415@Matias-MacBook-Air.local>
-To:     Matias Karhumaa <matias.karhumaa@gmail.com>
-X-Mailer: Apple Mail (2.3445.100.39)
+        Sat, 29 Sep 2018 01:04:31 -0400
+Received: by mail-lf1-f50.google.com with SMTP id y10-v6so6144612lfj.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Sep 2018 15:38:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziath-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=RTq1OKP5eBXLQuDLd6fxb1FapgILNrcgyQK5XTA/nJc=;
+        b=yO9WtQ1uG49eLe9pvrY3aPWpedK/l+joVWkw6gMn1Vhd95hKQJpIfpguItfIZ53RbP
+         ELH8JDCKfcVuAsAanIf16gYv/M7v7AvA0yDE/VRDX7vIc9J7852g8BkNCYDJNzw1tFyP
+         TjoKCsb6Kry2nqthhDNA4Uq3LlX8b+I5CbnkSVRkaZwCBEd9XphSeMZiYTKS/CiJr1+g
+         KvxyK+dc00/zmk+n/Dv+lYE8zQsKLB0ZhDe+x9UHHLvWFZiS3Cnzt9uuMCCKsvMlruXH
+         fZy9mvZYiHKtfrw5rAW1L8yKKTcBcZ7MYPm3KxoZf/e9vv0S9rzHQ309gLNerUBoY90b
+         07gw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=RTq1OKP5eBXLQuDLd6fxb1FapgILNrcgyQK5XTA/nJc=;
+        b=ShkRmLoR0EKvyNtr+m0p84G1Ef5s2tUzcc5jb9TkyKB4QDhzn0WyIPgV6yenYHVlIa
+         agdO96mSnh/0ZRpeoVtUxw4dxZf+RLtxukHV+sbKhUIbbfIqUI7+HbEoiNHmL4N96tYl
+         c5+Q0wQYABnWQD30nrrQI8UekRjVQWztT/Zf/Q1ATqeCw6w3oJTQoDwg62iTwt1kGRS6
+         WPJ103P5XwmMEke51dD1WoXa35qZIi04gD8QQlIqV22KMVwznbAdi4XwYxnXlmASkX1t
+         /AWKn193N3Gsfs0S4Uj9CjmVaer3NGPihD64LNWOkiYoojmC6puPWwVlDLNN/hZUxgYt
+         zE7Q==
+X-Gm-Message-State: ABuFfojOFM4yyWKgHi2R2lcHeBpbFHkXJ7FUNV6Cm+ujczUHsSNfhv6y
+        MUFDJuKggJu6S4ZDFeO0ypgBrD3p3zbZKCpK7IeOxefKxBBoxA==
+X-Google-Smtp-Source: ACcGV62bly9qdX2MInNYP3zBoMo0iYB9F3bjpGA8yy8Kw6Ku6PMSB8KXN7OT3v5KWoPxD7Rw4SktBIwkqkdmFZlsiRY=
+X-Received: by 2002:a19:c189:: with SMTP id r131-v6mr286132lff.59.1538174315950;
+ Fri, 28 Sep 2018 15:38:35 -0700 (PDT)
+MIME-Version: 1.0
+From:   Neil Benn <neil.benn@ziath.com>
+Date:   Fri, 28 Sep 2018 23:38:16 +0100
+Message-ID: <CADckva-V-8PeMDAVxJFFuVcq1zppCBEqrJdwH32PPf1nKVw=CQ@mail.gmail.com>
+Subject: Registering a profile
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matias,
+Hello,
 
-> Fix crash caused by NULL pointer dereference when debugfs functions
-> le_max_key_read, le_max_key_size_write, le_min_key_size_read or
-> le_min_key_size_write and Bluetooth adapter was powered off.
-> 
-> Fix is to move max_key_size and min_key_size from smp_dev to hci_dev.
-> At the same time they were renamed to le_max_key_size and
-> le_min_key_size.
-> 
-> BUG: unable to handle kernel NULL pointer dereference at 00000000000002e8
-> PGD 0 P4D 0
-> Oops: 0000 [#24] SMP PTI
-> CPU: 2 PID: 6255 Comm: cat Tainted: G      D    OE     4.18.9-200.fc28.x86_64 #1
-> Hardware name: LENOVO 4286CTO/4286CTO, BIOS 8DET76WW (1.46 ) 06/21/2018
-> RIP: 0010:le_max_key_size_read+0x45/0xb0 [bluetooth]
-> Code: 00 00 00 48 83 ec 10 65 48 8b 04 25 28 00 00 00 48 89 44 24 08 31 c0 48 8b 87 c8 00 00 00 48 8d 7c 24 04 48 8b 80 48 0a 00 00 <48> 8b 80 e8 02 00 00 0f b6 48 52 e8 fb b6 b3 ed be 04 00 00 00 48
-> RSP: 0018:ffffab23c3ff3df0 EFLAGS: 00010246
-> RAX: 0000000000000000 RBX: 00007f0b4ca2e000 RCX: ffffab23c3ff3f08
-> RDX: ffffffffc0ddb033 RSI: 0000000000000004 RDI: ffffab23c3ff3df4
-> RBP: 0000000000020000 R08: 0000000000000000 R09: 0000000000000000
-> R10: ffffab23c3ff3ed8 R11: 0000000000000000 R12: ffffab23c3ff3f08
-> R13: 00007f0b4ca2e000 R14: 0000000000020000 R15: ffffab23c3ff3f08
-> FS:  00007f0b4ca0f540(0000) GS:ffff91bd5e280000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00000000000002e8 CR3: 00000000629fa006 CR4: 00000000000606e0
-> Call Trace:
-> full_proxy_read+0x53/0x80
-> __vfs_read+0x36/0x180
-> vfs_read+0x8a/0x140
-> ksys_read+0x4f/0xb0
-> do_syscall_64+0x5b/0x160
-> entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> 
-> Signed-off-by: Matias Karhumaa <matias.karhumaa@gmail.com>
-> ---
-> include/net/bluetooth/hci_core.h |  2 ++
-> net/bluetooth/hci_core.c         |  2 ++
-> net/bluetooth/smp.c              | 23 +++++++++--------------
-> 3 files changed, 13 insertions(+), 14 deletions(-)
+  I'm trying to setup a RPi0 operating a Bluetooth device; I've setup
+the device using the following call:
+---
+    #configure the bluetooth hardware device
+    def init_bt_device(self):
 
-patch has been applied to bluetooth-next tree.
+        print("Configuring for name " + BTKbDevice.MY_DEV_NAME)
 
-Regards
+        #set the device class to a barcode scanner and set the name
+        os.system("hciconfig hcio class 0x002560")
+        os.system("hciconfig hcio name " + BTKbDevice.MY_DEV_NAME)
 
-Marcel
+        #make the device discoverable
+        os.system("hciconfig hcio piscan")
 
+  Then after that I attempt to setup the profile using the following code:
+---
+    #set up a bluez profile to advertise device capabilities from a
+loaded service record
+    def init_bluez_profile(self):
+
+        print("Configuring Bluez Profile")
+
+        #setup profile options
+        service_record=self.read_sdp_service_record()
+
+        opts = {
+            "ServiceRecord":service_record,
+            "Role":"server",
+            "RequireAuthentication":False,
+            "RequireAuthorization":False,
+            "Name":BTKbDevice.MY_DEV_NAME,
+            "AutoConnect":True
+        }
+
+        #retrieve a proxy for the bluez profile interface
+        bus = dbus.SystemBus()
+        self.manager =
+dbus.Interface(bus.get_object("org.bluez","/org/bluez"),
+"org.bluez.ProfileManager1")
+        self.profile = BTKbBluezProfile(bus, BTKbDevice.PROFILE_DBUS_PATH)
+        self.manager.RegisterProfile(BTKbDevice.PROFILE_DBUS_PATH,
+BTKbDevice.UUID, opts)
+        print("Profile registered ")
+---
+  The sdp record is available from https://textuploader.com/dv8xt.
+The profile in question is basically the same as the one defined in
+the test-profile as shown below:
+---
+class BTKbBluezProfile(dbus.service.Object):
+    fd = -1
+
+    @dbus.service.method("org.bluez.Profile1",
+                                    in_signature="", out_signature="")
+    def Release(self):
+            print("Release")
+            mainloop.quit()
+
+    @dbus.service.method("org.bluez.Profile1",
+                                    in_signature="", out_signature="")
+    def Cancel(self):
+            print("Cancel")
+
+    @dbus.service.method("org.bluez.Profile1", in_signature="oha{sv}",
+out_signature="")
+    def NewConnection(self, path, fd, properties):
+            self.fd = fd.take()
+            print("NewConnection(%s, %d)" % (path, self.fd))
+            for key in properties.keys():
+                    print ('key ' + key + ' value ' + properties[key])
+                    if key == "Version" or key == "Features":
+                            print("  %s = 0x%04x" % (key, properties[key]))
+                    else:
+                            print("  %s = %s" % (key, properties[key]))
+
+    @dbus.service.method("org.bluez.Profile1", in_signature="o",
+out_signature="")
+    def RequestDisconnection(self, path):
+            print("RequestDisconnection(%s)" % (path))
+
+            if (self.fd > 0):
+                    os.close(self.fd)
+                    self.fd = -1
+
+    def __init__(self, bus, path):
+            dbus.service.Object.__init__(self, bus, path)
+---
+  However it seems like the profile is not being registered, or least
+the methods in the profile are not being called.  I'm sorry to ask
+such a basic question but can someone please point me in the right
+direction as to why the profile is either not being registered or the
+callbacks on the profile are not being called.
+
+  Thank you very much for reading this far and any and all help is
+most appreciated!
+
+Cheers,
+
+Neil
+
+-- 
+
+Neil Benn MSc
+Ziath Ltd
+Phone: +44 (0) 1223 855021
+http://www.ziath.com
+
+Please consider the environment before printing this email.
