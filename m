@@ -2,111 +2,68 @@ Return-Path: <SRS0=5peh=MK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EABEAC43382
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 16:10:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F786ECE560
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 17:20:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0DFC20666
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 16:10:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dVNHaEVJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0DFC20666
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTP id 3F4CA204FD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Sep 2018 17:20:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F4CA204FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729193AbeI1WfT (ORCPT
+        id S1729436AbeI1Xot (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Sep 2018 18:35:19 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:42410 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727870AbeI1WfT (ORCPT
+        Fri, 28 Sep 2018 19:44:49 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:49166 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726121AbeI1Xot (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Sep 2018 18:35:19 -0400
-Received: by mail-pf1-f196.google.com with SMTP id l9-v6so4622403pff.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Sep 2018 09:10:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:content-transfer-encoding:to:from:in-reply-to:cc
-         :references:message-id:user-agent:subject:date;
-        bh=UGERV6c6Esm9VZNCOyoPxprsFTqZGgm9xgQYAqHXrSQ=;
-        b=dVNHaEVJW2pepdiKEgPCQwnPrzZp1MjQ79GimG1AauVOxlneLmoVWvqLZumzYgzISg
-         4pRlJDNF//oogbKid0TNPTHar4op9tPp+D8lfFX9BLkLfkAbPVMbdQtmoAnKspKEetF7
-         JBk4AOXfpw4Wmc1/6UJU7oNR1B3jLlx8CgG4g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:content-transfer-encoding:to:from
-         :in-reply-to:cc:references:message-id:user-agent:subject:date;
-        bh=UGERV6c6Esm9VZNCOyoPxprsFTqZGgm9xgQYAqHXrSQ=;
-        b=iMf+FjSsy//Yu0NLUtJ74/6xyWwCWJ4ZRYkQt5Rb+anQqd1gNw5fKoec9xpleTQo7O
-         i1gW7CNKiNEXXn0HQnxgCbS0clYwVqmVSc+VjgZi8OULeAX24XMd5v+ke7vLgE7DNOUT
-         WZ6iM+vy5yeXygJXpRyEVcLbPThivnk9lXn9MkS7BZ+KoiUg/ZQOJ0ZtTTH1xKniUEDM
-         Q29spyJyUSr1CajAb/9q63jrQj/6YJmkyhAqLEOxMmeaHgP3y6ua67RYBQme8sEcQ0As
-         YHffUpkFmj4yDQrhUbhUaRYuPYPcgTQ96ztp/HXxDNa0yCUfs/sN4D5sHPsq+BtmIQqb
-         fBow==
-X-Gm-Message-State: ABuFfohorzxhMZKxrU53GKDJ9ihhkY3Y8L0rzaHIlM+6QjwTj5B0Hx6T
-        mHdG96GeSemr/ISHK+t1ZsZIbA==
-X-Google-Smtp-Source: ACcGV6263HGdFBiBxTBbmHVhxiYxRQ4/PNarq0yD/9eJvsNi2rvDkW83lAj+KxObHvto+LOAVmZZag==
-X-Received: by 2002:a17:902:b7cb:: with SMTP id v11-v6mr2584600plz.79.1538151051546;
-        Fri, 28 Sep 2018 09:10:51 -0700 (PDT)
-Received: from localhost ([2620:15c:202:201:7e28:b9f3:6afc:5326])
-        by smtp.gmail.com with ESMTPSA id c1-v6sm6213157pgp.34.2018.09.28.09.10.50
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 28 Sep 2018 09:10:50 -0700 (PDT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-To:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-From:   Stephen Boyd <swboyd@chromium.org>
-In-Reply-To: <20180626170654.96831-1-swboyd@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Fri, 28 Sep 2018 19:44:49 -0400
+Received: from marcel-macbook.fritz.box (p4FEFC9BB.dip0.t-ipconnect.de [79.239.201.187])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 396F3CF29E;
+        Fri, 28 Sep 2018 19:27:20 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
+Subject: Re: [PATCH] Bluetooth: hci_qca: Replace open-coded msleep()
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <153815104962.119890.13155451003978822980@swboyd.mtv.corp.google.com>
+Date:   Fri, 28 Sep 2018 19:20:03 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         linux-arm-msm@vger.kernel.org,
         Thierry Escande <thierry.escande@linaro.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <820F0357-DBD1-4278-8488-8C97A4107C19@holtmann.org>
 References: <20180626170654.96831-1-swboyd@chromium.org>
-Message-ID: <153815104962.119890.13155451003978822980@swboyd.mtv.corp.google.com>
-User-Agent: alot/0.7
-Subject: Re: [PATCH] Bluetooth: hci_qca: Replace open-coded msleep()
-Date:   Fri, 28 Sep 2018 09:10:49 -0700
+ <153815104962.119890.13155451003978822980@swboyd.mtv.corp.google.com>
+To:     Stephen Boyd <swboyd@chromium.org>
+X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Quoting Stephen Boyd (2018-06-26 10:06:54)
-> These three lines make up what msleep() already does, i.e. setting the
-> task to uninterruptible, sleeping for so many jiffies, and then
-> schedule() already puts the task state back to TASK_RUNNING when it
-> returns. Make things clearer by just calling msleep() instead.
-> =
+Hi Stephen,
 
-> Cc: Thierry Escande <thierry.escande@linaro.org>
-> Signed-off-by: Stephen Boyd <swboyd@chromium.org>
-> ---
+>> These three lines make up what msleep() already does, i.e. setting the
+>> task to uninterruptible, sleeping for so many jiffies, and then
+>> schedule() already puts the task state back to TASK_RUNNING when it
+>> returns. Make things clearer by just calling msleep() instead.
+>> 
+>> Cc: Thierry Escande <thierry.escande@linaro.org>
+>> Signed-off-by: Stephen Boyd <swboyd@chromium.org>
+>> ---
+> 
+> Marcel, can you pick this patch up?
 
-Marcel, can you pick this patch up?
+I would do that, but unfortunately it does apply against bluetooth-next tree.
 
->  drivers/bluetooth/hci_qca.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-> =
+Regards
 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 51790dd02afb..ef2b00bdf06d 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -908,9 +908,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uin=
-t8_t baudrate)
->          * controller will come back after they receive this HCI command
->          * then host can communicate with new baudrate to controller
->          */
-> -       set_current_state(TASK_UNINTERRUPTIBLE);
-> -       schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
-> -       set_current_state(TASK_RUNNING);
-> +       msleep(BAUDRATE_SETTLE_TIMEOUT_MS);
->  =
+Marcel
 
->         return 0;
->  }
