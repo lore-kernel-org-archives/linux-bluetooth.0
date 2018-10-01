@@ -2,385 +2,127 @@ Return-Path: <SRS0=AfC+=MN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08350C43143
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 08:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A709AC43143
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 09:26:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA56C20652
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 08:52:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZBp+RO/C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA56C20652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 6C64020C0A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 09:26:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C64020C0A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728978AbeJAP30 (ORCPT
+        id S1729044AbeJAQDj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Oct 2018 11:29:26 -0400
-Received: from mail-oi1-f175.google.com ([209.85.167.175]:42280 "EHLO
-        mail-oi1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728918AbeJAP30 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Oct 2018 11:29:26 -0400
-Received: by mail-oi1-f175.google.com with SMTP id w81-v6so8804754oiw.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Oct 2018 01:52:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-         :cc;
-        bh=e5/Hy1JIw8vfVgBVRMgMms2nLos2/+eJu8CM1LXVmgk=;
-        b=ZBp+RO/CcLiUiSp8fPnqJO4W0hUf0pQQJGePfRvxOcsiEdAW4TZgtrljmYLeCyA2u1
-         vOP9kHtAtWTnSw4/OOHx2wYlSE6zkrILtO3aya7lW5CNx8EUuXYqDSMORE5EVir6VlY7
-         zleZy/QIIu5ZxyoQ4JubpqDmiY01bkNFrNULgvxyKvgRJRDzkHD2wv0XLjLLhF/A1POr
-         2M/Bck//TQT7ZuJwi4ExUcTT1BNV5KLnsvuDZgNV6beX+EbwfLVXYhH20KrIFjmTA+TL
-         P1Ff1Sn3vVD5srtOldfgRdCeQFUtikpWr5jWBTDeBSIxA0GyG/y8XH4YG9h9lkljhZLV
-         GfMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:in-reply-to:references:from:date
-         :message-id:subject:to:cc;
-        bh=e5/Hy1JIw8vfVgBVRMgMms2nLos2/+eJu8CM1LXVmgk=;
-        b=Uf1afsm8mEAxahfMYirUR93nIcy65m+A7shbn5GPQ6yfCqgd3S2/UCakqFfYPprZwq
-         KbU6TkiEA25O/Jj9hevyBRvVev0gQUoH1dDzNicbXkYwy7gljpejcqrn/I8HlWHDaiOx
-         ERHaXKEgJ/NVLbPQArHWxoAixCqrLGC//nU3hXs1JVyciHqU98uh0Pian3lttEvmxaMx
-         rvJvok12rsa7ieCWuEJKM18aufLGVzvQ1mW4hl7hdOEMl9861g9ia6hwKGLWEKSN5s3Y
-         sLm+OoER0f7F2amg9MYvzJQGT1BUYZCiQw/bfby+zwTYHxSofpJGtKi6W5R3b+NQQpRj
-         HNzQ==
-X-Gm-Message-State: ABuFfojUCtSNsiCqthY7cSibiknYXRClIBn31gtbIRtI77b49O7immhu
-        hKMIgQ6gjFCW11kO4OcG8aAs5MBOjjisX3lf7BqISA==
-X-Google-Smtp-Source: ACcGV62F71BTc50iKgwt4P+wWjsDy2CmgJ0ETst5DOdhTX+TlQqIi4zylCGUhJvJfiuLEZbw3zeKnImvajNZfxsKDTU=
-X-Received: by 2002:aca:f409:: with SMTP id s9-v6mr4865539oih.102.1538383964505;
- Mon, 01 Oct 2018 01:52:44 -0700 (PDT)
+        Mon, 1 Oct 2018 12:03:39 -0400
+Received: from mga06.intel.com ([134.134.136.31]:37330 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729028AbeJAQDj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 1 Oct 2018 12:03:39 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Oct 2018 02:26:46 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.54,327,1534834800"; 
+   d="scan'208";a="267380772"
+Received: from fmsmsx106.amr.corp.intel.com ([10.18.124.204])
+  by fmsmga005.fm.intel.com with ESMTP; 01 Oct 2018 02:26:46 -0700
+Received: from fmsmsx126.amr.corp.intel.com (10.18.125.43) by
+ FMSMSX106.amr.corp.intel.com (10.18.124.204) with Microsoft SMTP Server (TLS)
+ id 14.3.319.2; Mon, 1 Oct 2018 02:26:46 -0700
+Received: from bgsmsx154.gar.corp.intel.com (10.224.48.47) by
+ FMSMSX126.amr.corp.intel.com (10.18.125.43) with Microsoft SMTP Server (TLS)
+ id 14.3.319.2; Mon, 1 Oct 2018 02:26:45 -0700
+Received: from bgsmsx105.gar.corp.intel.com ([169.254.3.9]) by
+ BGSMSX154.gar.corp.intel.com ([169.254.7.90]) with mapi id 14.03.0319.002;
+ Mon, 1 Oct 2018 14:56:43 +0530
+From:   "Phulari, Mallikarjun" <mallikarjun.phulari@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [PATCH] Bluetooth : Errata Service Release 8, Erratum 3253
+Thread-Topic: [PATCH] Bluetooth : Errata Service Release 8, Erratum 3253
+Thread-Index: AQHUVk4v5YfhXKFLGE2D0LWU1vNTYqUKIuNg
+Date:   Mon, 1 Oct 2018 09:26:42 +0000
+Message-ID: <70C091497DE2844DBD9E143B2282ABDA9C2A9C@BGSMSX105.gar.corp.intel.com>
+References: <1537780600-4098-1-git-send-email-mallikarjun.phulari@intel.com>
+ <6855B2F4-544E-4CE7-A3C9-6324877E25F9@holtmann.org>
+In-Reply-To: <6855B2F4-544E-4CE7-A3C9-6324877E25F9@holtmann.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZDQ2ZjNmMTgtZDJkYy00MjRhLWExYTItOWEyZmQ0MTgyNGM4IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiUzRSRVhBdDRqOER6N0tTTFYyT3dkeCtRcUFCZXB1YWlpcTZ6M2hWUkR6eVBiWWVPc2xNejQyTEdzdkp4WHhCSSJ9
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.223.10.10]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Received: by 2002:a8a:550:0:0:0:0:0 with HTTP; Mon, 1 Oct 2018 01:52:43 -0700 (PDT)
-In-Reply-To: <CALvjcs-vHT2XnXVbqVcpFATrXWUopMnHZwGG7aEoDE0Us51rXw@mail.gmail.com>
-References: <CAE+ULpAgSuUp-TT-cM5vnBw-bh653KB_WkYP+XViesSn_Hhvpg@mail.gmail.com>
- <CALvjcs-vHT2XnXVbqVcpFATrXWUopMnHZwGG7aEoDE0Us51rXw@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 1 Oct 2018 11:52:43 +0300
-Message-ID: <CABBYNZ+o+ZW7FnKQ6qFDbUKsGuQjZgMf6_ZdMtOwo4Z0VAWu=w@mail.gmail.com>
-Subject: Re: Gatt: Subscriptions are not cleared after disconnection from a
- temporary device
-To:     Yunhan Wang <yunhanw@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Sukesh Srikakula <sukeshs@google.com>
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-
-On Mon, Oct 1, 2018 at 10:51 AM, Yunhan Wang <yunhanw@google.com> wrote:
-> Hi, Luiz
->
-> It seem bluez remove GATT, but does not trigger att layer disconnect
-> and the corresponding att_disconnected_cb for private/random addressed
-> devices, what is your idea here?
-
-Hmm, so the device is removed locally or it does disconnect? Either
-way we should cleanup properly so that is indeed a bug.
-
-
-> Thanks
-> Best wishes
-> Yunhan
-> On Thu, Sep 20, 2018 at 2:34 PM Sukesh Srikakula <sukeshs@google.com> wrote:
->>
->> Hi Luiz,
->>
->> It seems, you added the functionality to clear subscriptions for a
->> device which is no longer paired with below patch.
->> This patch is working fine for the devices which are using public addresses.
->> But, for private/random addressed devices (which are treated as
->> temporary devices in bluez code), this code is not getting called,
->> leaving the subscription state to persist even after disconnection.
->> This is leading to issues with subsequent connections. Can you please
->> help fix this issue?
->>
->> Relevant log snippet from private/random addressed central
->> disconnecting from peripheral running bluez stack
->>
->> daemon.debug bluetoothd[6284]:
->> src/adapter.c:adapter_remove_connection() Removing temporary device
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93
->> daemon.debug bluetoothd[6284]: src/device.c:device_remove() Removing
->> device /org/bluez/hci0/dev_4A_46_4F_6E_7B_93
->> daemon.debug bluetoothd[6284]: src/service.c:change_state() 0x87fda0:
->> device 4A:46:4F:6E:7B:93 profile gap-profile state changed: connected
->> -> disconnected (-103)
->> daemon.debug bluetoothd[6284]: src/service.c:change_state() 0x87fda0:
->> device 4A:46:4F:6E:7B:93 profile gap-profile state changed:
->> disconnected -> unavailable (0)
->> daemon.debug bluetoothd[6284]: profiles/gap/gas.c:gap_remove() GAP
->> profile remove (4A:46:4F:6E:7B:93)
->> daemon.debug bluetoothd[6284]: src/service.c:btd_service_unref() 0x87fda0: ref=0
->> daemon.debug bluetoothd[6284]: src/service.c:change_state() 0x880390:
->> device 4A:46:4F:6E:7B:93 profile deviceinfo state changed: connected
->> -> disconnected (-103)
->> daemon.debug bluetoothd[6284]: src/service.c:change_state() 0x880390:
->> device 4A:46:4F:6E:7B:93 profile deviceinfo state changed:
->> disconnected -> unavailable (0)
->> daemon.debug bluetoothd[6284]: src/service.c:btd_service_unref() 0x880390: ref=0
->> daemon.debug bluetoothd[6284]: src/device.c:btd_device_unref() Freeing
->> device /org/bluez/hci0/dev_4A_46_4F_6E_7B_93
->> daemon.debug bluetoothd[6284]: src/gatt-client.c:unregister_service()
->> Removing GATT service:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0006
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0006/char0007
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0006/char0007/desc0009
->> daemon.debug bluetoothd[6284]: src/gatt-client.c:unregister_service()
->> Removing GATT service:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service000a
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service000a/char000b
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service000a/char000b/desc000d
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service000a/char000b/desc000e
->> daemon.debug bluetoothd[6284]: src/gatt-client.c:unregister_service()
->> Removing GATT service:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service000f
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service000f/char0010
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service000f/char0010/desc0012
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service000f/char0010/desc0013
->> daemon.debug bluetoothd[6284]: src/gatt-client.c:unregister_service()
->> Removing GATT service:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0014
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0014/char0015
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0014/char0015/desc0017
->> daemon.debug bluetoothd[6284]: src/gatt-client.c:unregister_service()
->> Removing GATT service:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0018
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0018/char0019
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0018/char0019/desc001b
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0018/char001c
->> daemon.debug bluetoothd[6284]: src/gatt-client.c:unregister_service()
->> Removing GATT service:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service001e
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service001e/char001f
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service001e/char0021
->> daemon.debug bluetoothd[6284]: src/gatt-client.c:unregister_service()
->> Removing GATT service:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0023
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0023/char0024
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0023/char0024/desc0026
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0023/char0027
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0023/char0027/desc0029
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0023/char002a
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service0023/char002a/desc002c
->> daemon.debug bluetoothd[6284]: src/gatt-client.c:unregister_service()
->> Removing GATT service:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service002d
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service002d/char002e
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service002d/char002e/desc0030
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service002d/char002e/desc0031
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service002d/char0032
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service002d/char0032/desc0034
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service002d/char0032/desc0035
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_characteristic() Removing GATT
->> characteristic:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service002d/char0036
->> daemon.debug bluetoothd[6284]:
->> src/gatt-client.c:unregister_descriptor() Removing GATT descriptor:
->> /org/bluez/hci0/dev_4A_46_4F_6E_7B_93/service002d/char0036/desc0038
->> daemon.debug bluetoothd[6284]: attrib/gattrib.c:g_attrib_unref()
->> 0x875a88: g_attrib_unref=0
->> daemon.debug bluetoothd[6284]: src/device.c:device_free() 0x87c5c8
->> daemon.debug bluetoothd[6284]: plugins/policy.c:disconnect_cb() reason 3
->> daemon.debug bluetoothd[6284]:
->> src/adapter.c:bonding_attempt_complete() hci0 bdaddr 4A:46:4F:6E:7B:93
->> type 2 status 0xe
->> daemon.debug bluetoothd[6284]: src/adapter.c:resume_discovery()
->>
->>
->>
->>
->> Relevant log snippet from public addressed central disconnecting from
->> peripheral running bluez stack
->>
->> daemon.debug bluetoothd[4047]: src/adapter.c:dev_disconnected() Device
->> 98:01:A7:B1:40:2C disconnected, reason 3
->> daemon.debug bluetoothd[4047]: src/adapter.c:adapter_remove_connection()
->> daemon.debug bluetoothd[4047]: plugins/policy.c:disconnect_cb() reason 3
->> daemon.debug bluetoothd[4047]:
->> src/adapter.c:bonding_attempt_complete() hci0 bdaddr 98:01:A7:B1:40:2C
->> type 1 status 0xe
->> daemon.debug bluetoothd[4047]: src/device.c:device_bonding_complete()
->> bonding (nil) status 0x0e
->> daemon.debug bluetoothd[4047]: src/device.c:device_bonding_failed() status 14
->> daemon.debug bluetoothd[4047]: src/adapter.c:resume_discovery()
->> daemon.debug bluetoothd[4047]: src/gatt-database.c:conf_cb() GATT
->> server received confirmation
->> daemon.debug bluetoothd[4047]: src/device.c:att_disconnected_cb()
->> daemon.debug bluetoothd[4047]: src/device.c:att_disconnected_cb()
->> Connection reset by peer (104)
->> daemon.debug bluetoothd[4047]: src/service.c:change_state() 0x9e6978:
->> device 98:01:A7:B1:40:2C profile gap-profile state changed: connected
->> -> disconnecting (0)
->> daemon.debug bluetoothd[4047]: src/service.c:change_state() 0x9e6978:
->> device 98:01:A7:B1:40:2C profile gap-profile state changed:
->> disconnecting -> disconnected (0)
->> daemon.debug bluetoothd[4047]: src/service.c:change_state() 0x9e6d10:
->> device 98:01:A7:B1:40:2C profile deviceinfo state changed: connected
->> -> disconnecting (0)
->> daemon.debug bluetoothd[4047]: src/service.c:change_state() 0x9e6d10:
->> device 98:01:A7:B1:40:2C profile deviceinfo state changed:
->> disconnecting -> disconnected (0)
->> daemon.debug bluetoothd[4047]:
->> src/gatt-client.c:btd_gatt_client_disconnected() Device disconnected.
->> Cleaning up.
->> daemon.debug bluetoothd[4047]: src/device.c:att_disconnected_cb()
->> Automatic connection disabled
->> daemon.debug bluetoothd[4047]: attrib/gattrib.c:g_attrib_unref()
->> 0x9de000: g_attrib_unref=0
->> daemon.debug bluetoothd[4047]: src/gatt-database.c:att_disconnected()
->> daemon.debug bluetoothd[4047]: src/gatt-database.c:clear_ccc_state()
->> daemon.debug bluetoothd[4047]: src/gatt-database.c:clear_ccc_state()
->>
->> Regards,
->> Sukesh.
->>
->> > Begin forwarded message:
->> >
->> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
->> > Subject: [PATCH BlueZ] gatt: Clear subscriptions for device not paired
->> > Date: October 20, 2017 at 5:21:14 AM PDT
->> > To: linux-bluetooth@vger.kernel.org
->> >
->> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->> >
->> > If the device is no longer valid or is not considered bonded anymore
->> > clear its CCC states before removing otherwise application may continue
->> > to notify when there are no devices listening.
->> > ---
->> > src/gatt-database.c | 22 +++++++++++++++++++++-
->> > 1 file changed, 21 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/src/gatt-database.c b/src/gatt-database.c
->> > index 47304704a..d6d1e4d13 100644
->> > --- a/src/gatt-database.c
->> > +++ b/src/gatt-database.c
->> > @@ -891,6 +891,23 @@ static void conf_cb(void *user_data)
->> > }
->> > }
->> >
->> > +static void clear_ccc_state(void *data, void *user_data)
->> > +{
->> > + struct ccc_state *ccc = data;
->> > + struct btd_gatt_database *db = user_data;
->> > + struct ccc_cb_data *ccc_cb;
->> > +
->> > + if (!ccc->value[0])
->> > + return;
->> > +
->> > + ccc_cb = queue_find(db->ccc_callbacks, ccc_cb_match_handle,
->> > + UINT_TO_PTR(ccc->handle));
->> > + if (!ccc_cb)
->> > + return;
->> > +
->> > + ccc_cb->callback(NULL, 0, ccc_cb->user_data);
->> > +}
->> > +
->> > static void send_notification_to_device(void *data, void *user_data)
->> > {
->> > struct device_state *device_state = data;
->> > @@ -940,8 +957,11 @@ static void send_notification_to_device(void *data,
->> > void *user_data)
->> >
->> > remove:
->> > /* Remove device state if device no longer exists or is not paired */
->> > - if (queue_remove(notify->database->device_states, device_state))
->> > + if (queue_remove(notify->database->device_states, device_state)) {
->> > + queue_foreach(device_state->ccc_states, clear_ccc_state,
->> > + notify->database);
->> > device_state_free(device_state);
->> > + }
->> > }
->> >
->> > static void send_notification_to_devices(struct btd_gatt_database *database,
->> > --
->> > 2.13.6
->> >
->> > --
->> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
->> > in
->> > the body of a message to majordomo@vger.kernel.org
->> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> >
->> >
-
-
-
--- 
-Luiz Augusto von Dentz
+SGkgTWFyY2VsLA0KDQo+IEhpIE1hbGxpa2FyanVuLA0KPiANCj4gPiBMMkNBUDogTmV3IHJlc3Vs
+dCB2YWx1ZXMNCj4gPiAJMHgwMDA2IC0gQ29ubmVjdGlvbiByZWZ1c2VkIOKAkyBJbnZhbGlkIFNv
+dXJjZSBDSUQNCj4gPiAJMHgwMDA3IC0gQ29ubmVjdGlvbiByZWZ1c2VkIOKAkyBTb3VyY2UgQ0lE
+IGFscmVhZHkgYWxsb2NhdGVkDQo+ID4NCj4gPiBBcyBwZXIgdGhlIEVTUjA4X1YxLjAuMCwgMS4x
+MS4yIEVycmF0dW0gMzI1MywgUGFnZSBOby4gNTQsICJSZW1vdGUgQ0lEDQo+ID4gaW52YWxpZCBJ
+c3N1ZSIuDQo+ID4gQXBwbGllcyB0byBDb3JlIFNwZWNpZmljYXRpb24gdmVyc2lvbnM6IFY1LjAs
+IFY0LjIsIHY0LjEsIHY0LjAsIGFuZA0KPiA+IHYzLjAgKyBIUyBWb2wgMywgUGFydCBBLCBTZWN0
+aW9uIDQuMiwgNC4zLCA0LjE0LCA0LjE1Lg0KPiA+DQo+ID4gQ29yZSBTcGVjaWZpY2F0aW9uIFZl
+cnNpb24gNS4wLCBQYWdlIE5vLjE3NTMsIFRhYmxlIDQuNiBhbmQgUGFnZSBOby4NCj4gPiAxNzY3
+LCBUYWJsZSA0LjE0DQo+ID4NCj4gPiBOZXcgcmVzdWx0IHZhbHVlcyBhcmUgYWRkZWQgdG8gbDJj
+YXAgY29ubmVjdC9jcmVhdGUgY2hhbm5lbCByZXNwb25zZQ0KPiA+IGFzDQo+ID4gMHgwMDA2IC0g
+Q29ubmVjdGlvbiByZWZ1c2VkIOKAkyBJbnZhbGlkIFNvdXJjZSBDSUQNCj4gPiAweDAwMDcgLSBD
+b25uZWN0aW9uIHJlZnVzZWQg4oCTIFNvdXJjZSBDSUQgYWxyZWFkeSBhbGxvY2F0ZWQNCj4gPg0K
+PiA+IFNpZ25lZC1vZmYtYnk6IE1hbGxpa2FyanVuIFBodWxhcmkgPG1hbGxpa2FyanVuLnBodWxh
+cmlAaW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+IGluY2x1ZGUvbmV0L2JsdWV0b290aC9sMmNhcC5o
+IHwgIDYgKysrKysrDQo+ID4gbmV0L2JsdWV0b290aC9sMmNhcF9jb3JlLmMgICAgfCAxNyArKysr
+KysrKysrKysrKysrLQ0KPiA+IDIgZmlsZXMgY2hhbmdlZCwgMjIgaW5zZXJ0aW9ucygrKSwgMSBk
+ZWxldGlvbigtKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9s
+MmNhcC5oDQo+ID4gYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvbDJjYXAuaCBpbmRleCAwNjk3ZmQ0
+Li5jN2Y5N2NjIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbmV0L2JsdWV0b290aC9sMmNhcC5o
+DQo+ID4gKysrIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmgNCj4gPiBAQCAtMjg0LDYg
+KzI4NCwxMiBAQCBzdHJ1Y3QgbDJjYXBfY29ubl9yc3Agew0KPiA+ICNkZWZpbmUgTDJDQVBfQ1Jf
+SU5WQUxJRF9TQ0lECTB4MDAwOQ0KPiA+ICNkZWZpbmUgTDJDQVBfQ1JfU0NJRF9JTl9VU0UJMHgw
+MDBBDQo+ID4NCj4gPiArLyogY29ubmVjdC9jcmVhdGUgY2hhbm5lbCByZXN1bHRzDQo+ID4gKyAq
+IE5ldyByZXN1bHQgY29kZXNBcyBwZXIgRVNSMDhfVjEuMC4wLCBFcnJhdHVtIDMyNTMgICovDQo+
+ID4gKyNkZWZpbmUgTDJDQVBfQ1JfQlJFRFJfSU5WQUxJRF9TQ0lECTB4MDAwNg0KPiA+ICsjZGVm
+aW5lIEwyQ0FQX0NSX0JSRURSX1NDSURfSU5fVVNFCTB4MDAwNw0KPiA+ICsNCj4gDQo+IEkgYW0g
+Y29uZnVzZWQgaGVyZS4gV2UgY3VycmVudGx5IGhhdmUgdGhpcyBsaXN0Og0KPiANCj4gLyogY29u
+bmVjdC9jcmVhdGUgY2hhbm5lbCByZXN1bHRzICovDQo+ICNkZWZpbmUgTDJDQVBfQ1JfU1VDQ0VT
+UyAgICAgICAgMHgwMDAwDQo+ICNkZWZpbmUgTDJDQVBfQ1JfUEVORCAgICAgICAgICAgMHgwMDAx
+DQo+ICNkZWZpbmUgTDJDQVBfQ1JfQkFEX1BTTSAgICAgICAgMHgwMDAyDQo+ICNkZWZpbmUgTDJD
+QVBfQ1JfU0VDX0JMT0NLICAgICAgMHgwMDAzDQo+ICNkZWZpbmUgTDJDQVBfQ1JfTk9fTUVNICAg
+ICAgICAgMHgwMDA0DQo+ICNkZWZpbmUgTDJDQVBfQ1JfQkFEX0FNUCAgICAgICAgMHgwMDA1DQo+
+ICNkZWZpbmUgTDJDQVBfQ1JfQVVUSEVOVElDQVRJT04gMHgwMDA1DQo+ICNkZWZpbmUgTDJDQVBf
+Q1JfQVVUSE9SSVpBVElPTiAgMHgwMDA2DQo+ICNkZWZpbmUgTDJDQVBfQ1JfQkFEX0tFWV9TSVpF
+ICAgMHgwMDA3DQo+ICNkZWZpbmUgTDJDQVBfQ1JfRU5DUllQVElPTiAgICAgMHgwMDA4DQo+ICNk
+ZWZpbmUgTDJDQVBfQ1JfSU5WQUxJRF9TQ0lEICAgMHgwMDA5DQo+ICNkZWZpbmUgTDJDQVBfQ1Jf
+U0NJRF9JTl9VU0UgICAgMHgwMDBBDQo+IA0KPiBOb3cgaGVyZSB3ZSBoYXZlIDB4MDAwNiBhbmQg
+MHgwMDA3IHRha2VuLiBIYXZlIHRoZXNlIGJlZW4gY2hhbmdlZCBub3cuDQo+IFRoZSBMMkNBUF9D
+Ul9BVVRIT1JJWkFUSU9OIHdlIGFjdHVhbGx5IGRvIHVzZSBpbiBMRSBhbmQgaWYgdGhpcyB0YWJs
+ZSBpcyBub3QNCj4gdHJlYXRlZCB3aXRoIGluZGVwZW5kZW50IG5hbWUgc3BhY2VzIGZvciBCUi9F
+RFIgdnMgTEUsIHRoZW4gd2UgbmVlZCB0byBzcGxpdA0KPiB0aGlzIG9uZSBmaXJzdCBhbmQgZ2V0
+IHRoZSBMRSBvbmx5IG9uZXMgcHJvcGVyIG5hbWVzIGFuZCBmaXggdGhlaXIgdXNhZ2UuDQo+IA0K
+VGhlIGN1cnJlbnQgbmFtZSBzcGFjZXMgdGhhdCB5b3UgaGF2ZSBtZW50aW9uZWQgYWJvdmUsIGhh
+dmUgdGhlIGNvbWJpbmVkIHJlc3VsdCB2YWx1ZXMgZm9yIExFIENyZWRpdCBiYXNlIENvbm5lY3Rp
+b24gKFZPTCAzLCBQYXJ0IEEsIDQuMjMsIFRhYmxlIDQuMjApIGFuZCBmb3IgTDJDQVAgQ3JlYXRl
+L0Nvbm5lY3QgKFZPTDMsIFBhcnQgQSwgNC4zIC80LjE1LCBUYWJsZSA0LjYvNC4xNCkuDQpUbyBj
+cmVhdGUgc2VwYXJhdGUgbmFtZSBzcGFjZXMgZm9yIGVhY2ggc2V0IG9mIGVycm9yIGNvZGVzIGZv
+ciBMMkNBUCBjaGFubmVsIHJlcXVlc3QsIEwyQ0FQIGNyZWF0ZSBDb25uZWN0aW9uIGFuZCBMRSBj
+cmVkaXQgYmFzZWQgY3JlYXRlIGNvbm5lY3Rpb24gd2lsbCBhZGQgbW9yZSByZXdvcmsgdG8gcmVw
+bGFjZSB0aGUgZXJyb3IgY29kZXMgd2hlcmUgdGhlc2UgYXJlIGJlaW5nIHVzZWQuDQoNClRoZXJl
+Zm9yZSwgdG8gYXZvaWQgdGhlIHJld29yayAsIEkgaGFkIHVzZWQgdGhlIHJlc3VsdCB2YWx1ZXMg
+YXM6DQoNCiNkZWZpbmUgTDJDQVBfQ1JfQlJFRFJfSU5WQUxJRF9TQ0lECTB4MDAwNg0KI2RlZmlu
+ZSBMMkNBUF9DUl9CUkVEUl9TQ0lEX0lOX1VTRQkweDAwMDcNCg0KSWYgeW91IHN1Z2dlc3QgdG8g
+c2VwYXJhdGUgdGhlIG5hbWUgc3BhY2VzIGZvciBMRSBhbmQgQlJFRFIgcmVzdWx0IHZhbHVlcywg
+SSBzaGFsbCByZS1zZW5kIHRoZSB2MyBwYXRjaCB3aXRoIHRoZSBjaGFuZ2VzLg0KDQo+IFJlZ2Fy
+ZHMNCj4gDQo+IE1hcmNlbA0KDQpSZWdhcmRzLA0KTWFsbGlrYXJqdW4gUGh1bGFyaQ0K
