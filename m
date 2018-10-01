@@ -2,148 +2,179 @@ Return-Path: <SRS0=AfC+=MN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 514BDC43143
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 13:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05558C43143
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 13:53:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10778208AE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 13:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA7F5208AE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 13:53:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="EJi71KkL";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="BYil3AUH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10778208AE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mx5fiK9b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA7F5208AE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729327AbeJAU3K (ORCPT
+        id S1729371AbeJAUbO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Oct 2018 16:29:10 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:50016 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729253AbeJAU3K (ORCPT
+        Mon, 1 Oct 2018 16:31:14 -0400
+Received: from mail-it1-f169.google.com ([209.85.166.169]:37488 "EHLO
+        mail-it1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729253AbeJAUbO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Oct 2018 16:29:10 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 59DB860128; Mon,  1 Oct 2018 13:51:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1538401875;
-        bh=ExW6SnUp8lMc7bPWEfR1QYwUAsuREaNx3m3j625zmWs=;
-        h=From:To:Cc:Subject:Date:From;
-        b=EJi71KkLxH6vokVFkxmZ5XDkAQLqNqBXUVACpVhXevybKqWYvDc/JvGn83S3wt8Qz
-         05GQQeX9B/p6RQ6KNWu5+DmSyhL0YBWyN4vVvXEctdrsy0k9S/cFbrxH+EUEBSSG6l
-         brCPQl1pD+j0x3i692n4oaUE1+21A4yycF5weTKE=
-Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 094B160866;
-        Mon,  1 Oct 2018 13:51:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1538401874;
-        bh=ExW6SnUp8lMc7bPWEfR1QYwUAsuREaNx3m3j625zmWs=;
-        h=From:To:Cc:Subject:Date:From;
-        b=BYil3AUHuxcw/ZM9MyBMAXSVP5goBhPabgS/y5/773n3GrHOOLAUXw7J0Az/o5v6u
-         YcecpOuY7GnKSD4XT44pROUra8WoGKKxAxoeEpy5ovGCTRlrIjYdhLXRV6Y0zAs2wh
-         urhxr2TI3EtI5c0KjqlbER4m+U3/yGg8HgdETNsQ=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 094B160866
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Harish Bandi <c-hbandi@codeaurora.org>
-Subject: [PATCH v1] Bluetooth: hci_qca: Add support for controller debug logs.
-Date:   Mon,  1 Oct 2018 19:21:02 +0530
-Message-Id: <20181001135102.17453-1-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.18.0
+        Mon, 1 Oct 2018 16:31:14 -0400
+Received: by mail-it1-f169.google.com with SMTP id m9-v6so11486140ita.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Oct 2018 06:53:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SefswlylmvuGrAK148iLwgdRy4ntVzmMwH9jsu2uf1g=;
+        b=Mx5fiK9bwSemCPeLVkptpvxWTr0ka4ekpb6cMhnOnvR/YxpiPrXPTXA9LINMjvuU38
+         Xxg/6/swARckvZCC9syKmo2RxJNlL2ZER/OW4Jl/VmxtdWeRlsxzBYsTfaA+Y1/yJuVB
+         e7MRMsSwcAgFB88AKIDlD9M8iexdxAM/nDEALMEAEmrWhwpz+Kp8DoM5IVJ5S58y5ZxZ
+         24BzRnf4J0+w1j537dGypvXSJ1ml6FraXtRaX6ftypYJoEissXlrQeCMUv1XHPwS9k9e
+         TjzXgPKVoMHFRPogFAUYXqLN1wk05hDwj1hQGFGZ6NQ00wllbztLvvphAArHE/y4f4x8
+         8H0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SefswlylmvuGrAK148iLwgdRy4ntVzmMwH9jsu2uf1g=;
+        b=YwBvvAuuKrZiFM1Ro9QTjsXxvtMY+H7OG1O7kr+EOItsvfAoIaTPmL6uFvyfrGKhbG
+         t/E/46ehTxcmJ6URlewocp4/CVgibiI/Ob4U2k309iULlHyP3J6rEyD3bntXdcmHjeHY
+         2f4HBcYt7JD63Y2k6pvQpx2Se35GL7b0+mzIISk6u8K9oOfwGs8PElrs53igQJohhmjS
+         I7AORXuIDH06fFB3Mvn6tS2S7LRB/7otnBrWXkKmFnG/jfAeZzm2ZdDEEAL6hjAxPrOT
+         KhFWpjm9rs/bQeqEckGQs74Tui8HPqIzjzq3sRCbbpQYbqSxjiXPh60IqR3XXAcMs9kF
+         xT/Q==
+X-Gm-Message-State: ABuFfoh8gQBtWgSNNAlXxG59QUs8ccyLkc55H01w7na5xI1GJT8M9OlM
+        pLYVSYVEi87roLq+BDdi5iAY1VrslFCfdr3W0Xc=
+X-Google-Smtp-Source: ACcGV62nSR31O9JiaLcpUkqkSbctF455tTWd7QuQg4NmQzOl6xJgVm65dUZasm6JIVA7yJVC1tITV1b+iHfF7Q20gLw=
+X-Received: by 2002:a24:ac44:: with SMTP id m4-v6mr9675691iti.90.1538401998979;
+ Mon, 01 Oct 2018 06:53:18 -0700 (PDT)
+MIME-Version: 1.0
+References: <20181001102430.GA6708@amd>
+In-Reply-To: <20181001102430.GA6708@amd>
+From:   Barry Byford <31baz66@gmail.com>
+Date:   Mon, 1 Oct 2018 14:53:07 +0100
+Message-ID: <CAAu3APYAmr9M5NQkvqsG1-J_zn=Jiq4M18NYLx50WAAU3eb93w@mail.gmail.com>
+Subject: Re: low energy: does gatt client/server work in current version? How
+ to test?
+To:     pavel@ucw.cz
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        marcel@holtmann.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch will prevent error messages splashing on console.
+There has been a discussion on the mailing previously that covered some of this.
 
-[   78.426697] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
-[   78.436682] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
-[   78.446639] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
-[   78.456596] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
+Is there anything in this thread that helps:
+https://marc.info/?t=149208458400001&r=1&w=2
 
-QCA wcn3990 will send the debug logs in the form of ACL packets.
-While decoding packet in qca_recv(), marking the received debug log
-packet as diagnostic packet.
-
-Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
----
- drivers/bluetooth/hci_qca.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index d98ed0442201..a00910aaed54 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -63,6 +63,10 @@
- /* susclk rate */
- #define SUSCLK_RATE_32KHZ	32768
- 
-+/* Controller debug log header */
-+#define QCA_DEBUG_HDR_MSB	0xDC
-+#define QCA_DEBUG_HDR_LSB	0x2E
-+
- /* HCI_IBS transmit side sleep protocol states */
- enum tx_ibs_states {
- 	HCI_IBS_TX_ASLEEP,
-@@ -849,6 +853,20 @@ static int qca_ibs_wake_ack(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
- }
- 
-+static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	/* We receive debug logs from chip as an ACL packets.
-+	 * Instead of sending the data to ACL to decode the
-+	 * received data, we are pushing them to the above layers
-+	 * as a diagnostic packet.
-+	 */
-+	if ((skb->len > 2) && (skb->data[0] == QCA_DEBUG_HDR_MSB) &&
-+	    (skb->data[1] == QCA_DEBUG_HDR_LSB))
-+		return hci_recv_diag(hdev, skb);
-+	else
-+		return hci_recv_frame(hdev, skb);
-+}
-+
- #define QCA_IBS_SLEEP_IND_EVENT \
- 	.type = HCI_IBS_SLEEP_IND, \
- 	.hlen = 0, \
-@@ -870,13 +888,20 @@ static int qca_ibs_wake_ack(struct hci_dev *hdev, struct sk_buff *skb)
- 	.lsize = 0, \
- 	.maxlen = HCI_MAX_IBS_SIZE
- 
-+#define QCA_RECV_ACL_DATA \
-+	.type = HCI_ACLDATA_PKT, \
-+	.hlen = HCI_ACL_HDR_SIZE, \
-+	.loff = 2, \
-+	.lsize = 2, \
-+	.maxlen = HCI_MAX_FRAME_SIZE
-+
- static const struct h4_recv_pkt qca_recv_pkts[] = {
--	{ H4_RECV_ACL,             .recv = hci_recv_frame    },
- 	{ H4_RECV_SCO,             .recv = hci_recv_frame    },
- 	{ H4_RECV_EVENT,           .recv = hci_recv_frame    },
- 	{ QCA_IBS_WAKE_IND_EVENT,  .recv = qca_ibs_wake_ind  },
- 	{ QCA_IBS_WAKE_ACK_EVENT,  .recv = qca_ibs_wake_ack  },
- 	{ QCA_IBS_SLEEP_IND_EVENT, .recv = qca_ibs_sleep_ind },
-+	{ QCA_RECV_ACL_DATA,       .recv = qca_recv_acl_data },
- };
- 
- static int qca_recv(struct hci_uart *hu, const void *data, int count)
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
-
+On Mon, 1 Oct 2018 at 11:25, Pavel Machek <pavel@ucw.cz> wrote:
+>
+> Hi!
+>
+> I'm trying to get gatt client/server to run; my ultimate goal is to
+> turn Linux machine into "low-energy device", providing services
+> similar to heartbeat measurement.
+>
+> I do have existing qt application (running on Android and PC) I'd like
+> "device" to talk to.
+>
+> TODO says:
+>
+> - Add complete GATT test coverage in unit/test-gatt following the GATT
+>   test
+>     spec. This could use shared/gatt-client and shared/gatt-server at
+>   the same
+>     time to test both against each other. We should definitely have
+>   tests for
+>     gatt-server and gatt-client simultaneously on one side of the
+>   connection.
+>
+>   Priority: High
+>     Complexity: C4
+>
+> Which tells me that maybe I should consider helping with that. But so
+> far I was not able to get it to work...
+>
+> I can use gatt-server and connect to it using gatttool, but depending
+> on details during the server start (?) and phase of moon, either
+> device is not enumerated by the QT code, or it is not detected as
+> low-energy device, or no UUIDs are detected.
+>
+> My attempt at launching server is below (using python gatt-server, (1)
+> ). I was doing "hciconfig leadv 0" manually at some point.
+>
+> Using hciconfig while bluetoothd is running sounds kind-of
+> dangerous. Stackoverflow (2) suggests using btmgmt (3) instead, and
+> things got slightly different, but did not start to work for me. Is
+> there documentation how to get this to work somewhere?
+>
+> Thanks and best regards,
+>                                                         Pavel
+>
+> (3)
+> sudo tools/btmgmt -i hci0 power off
+> sudo tools/btmgmt -i hci0 le on
+> sudo tools/btmgmt -i hci0 connectable on
+> sudo tools/btmgmt -i hci0 name "some friendly name"
+> sudo tools/btmgmt -i hci0 advertising on
+> sudo tools/btmgmt -i hci0 power on
+> tools/btgatt-server -i hci0 -s low -t public -r -v
+>
+> (2)
+> https://stackoverflow.com/questions/29128586/bluetooth-low-energy-in-c-using-bluez-to-create-a-gatt-server#31030321
+>
+> (1)
+> #!/usr/bin/python3
+> # -*- python -*-
+>
+> import os
+> import re
+> import time
+>
+> def pcmd(c):
+>     return os.popen(c).readline()[:-1]
+>
+> class Ble:
+>     def down(m):
+>         print("Shutting down BLEE")
+>         os.system("sudo killall bluetoohd")
+>         os.system("sudo killall gatt-server")
+>         os.system("sudo hciconfig hci0 down")
+>
+>     def up(m):
+>         print("Starting up BLEE")
+>         os.system("sudo ../bluez/src/bluetoothd -d -n &")
+>         time.sleep(2)
+>         os.system("sudo ./gatt-server &")
+>         time.sleep(2)
+>         os.system("sudo hciconfig hci0 up")
+>         ##os.system("../bluez/test/example-gatt-server &")
+>         while True:
+>             #os.system("sudo hciconfig hci0 leadv 0")
+>             time.sleep(5)
+>
+>     def run(m):
+>         m.down()
+>         time.sleep(1)
+>         m.up()
+>
+> b = Ble()
+> b.run()
+>
+>
+>
+>                                                                         Pavel
+> --
+> (english) http://www.livejournal.com/~pavelmachek
+> (cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
