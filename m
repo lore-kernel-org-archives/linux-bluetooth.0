@@ -2,159 +2,148 @@ Return-Path: <SRS0=AfC+=MN=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A59C43143
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 11:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 514BDC43143
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 13:51:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 54EF82089C
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 11:53:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10778208AE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Oct 2018 13:51:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rMitJsne"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54EF82089C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="EJi71KkL";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="BYil3AUH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10778208AE
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728999AbeJASa4 (ORCPT
+        id S1729327AbeJAU3K (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Oct 2018 14:30:56 -0400
-Received: from mail-ed1-f41.google.com ([209.85.208.41]:36608 "EHLO
-        mail-ed1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728921AbeJASaz (ORCPT
+        Mon, 1 Oct 2018 16:29:10 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:50016 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729253AbeJAU3K (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Oct 2018 14:30:55 -0400
-Received: by mail-ed1-f41.google.com with SMTP id f4-v6so13921372edq.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Oct 2018 04:53:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=cnznC1QOgCgEI4ETCozZcC2TM6zJ1kX74NWbWeskU5M=;
-        b=rMitJsneZJBmFZoWVrt5o755FGTbQ+XIInYDABi5zpz2mleQAIuciDmElJEtQYUEF2
-         I/z4qazS2c5nemlJFG7MDnEGgx5lr3gsAGE6bKQOt2qskFiEZcysHOuZD0tSeAzaZH/T
-         p+X3xv2p4lfpdulDiGTE6Hu6rUgB7p6XVCrEpe2IwYDnvkSKlPFwXwOlw7gGrIiQ6ffH
-         5SQMrTAu6khSh/cjEdfBGOJL48kVKn7VzgKt2OV5QLwRUgYWaidyLkHDPxhK0mzcRewe
-         VnWaeg5i3awDfM7ULq8yRoPOnWGE9pYfg0qRkB7BorjFCQ4MAvtHLxSZQp+HTMZf57JX
-         TWOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=cnznC1QOgCgEI4ETCozZcC2TM6zJ1kX74NWbWeskU5M=;
-        b=Y4GvPxzWjMp9n74brwz3PFHEmqtK8F3Bjsmkrc97ZYeLih4xEQqQecMplrnPXsOMzW
-         Lr2OuwzNeQ05x8Bnq2Ss2RMb80Hi34rlH44QngxJkuBKa2s3Lo0/DmRCeOSu+gd0AOZi
-         mC8f24ZX8TCbWvF5eQO4E1IDzNT0GHnc/6u/+basSMtiGUHMqk1Nh/JnMt8nIb4tyuXk
-         hQoKdk7X+Xsby04NlmzM2bCKvrPdTJaZftVqS1k7m05BpGtvauiyeXSRG/UDcTipOm0E
-         +4NJjQypIohyB7juQfM6bzGVqREHSyi0kH1oBJm7sfe9pVmvzyCfhJ4T2BcHwrVz2r5W
-         KrCw==
-X-Gm-Message-State: ABuFfoj+mxq9zqF07IxADW/Gkrzzw+qSmVZXacYB3mNe4SqdmDXHUhfM
-        jNIcaTlRmaOui6U5qKoW6EIvh5YS
-X-Google-Smtp-Source: ACcGV60iRufX6vGIUjB5CYSPj0SO0zmeJlqbbIDJS8OpFCGAE4PbxxLyEhrfefLsLR8NFjX3J8UjOg==
-X-Received: by 2002:a17:906:5fce:: with SMTP id k14-v6mr14199658ejv.10.1538394808131;
-        Mon, 01 Oct 2018 04:53:28 -0700 (PDT)
-Received: from vudentzs-t460s.fi.intel.com ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id 94-v6sm4382570edc.59.2018.10.01.04.53.26
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 01 Oct 2018 04:53:27 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] gatt: Fix not cleaning up device state properly
-Date:   Mon,  1 Oct 2018 14:53:25 +0300
-Message-Id: <20181001115325.17082-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 1 Oct 2018 16:29:10 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 59DB860128; Mon,  1 Oct 2018 13:51:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1538401875;
+        bh=ExW6SnUp8lMc7bPWEfR1QYwUAsuREaNx3m3j625zmWs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=EJi71KkLxH6vokVFkxmZ5XDkAQLqNqBXUVACpVhXevybKqWYvDc/JvGn83S3wt8Qz
+         05GQQeX9B/p6RQ6KNWu5+DmSyhL0YBWyN4vVvXEctdrsy0k9S/cFbrxH+EUEBSSG6l
+         brCPQl1pD+j0x3i692n4oaUE1+21A4yycF5weTKE=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 094B160866;
+        Mon,  1 Oct 2018 13:51:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1538401874;
+        bh=ExW6SnUp8lMc7bPWEfR1QYwUAsuREaNx3m3j625zmWs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=BYil3AUHuxcw/ZM9MyBMAXSVP5goBhPabgS/y5/773n3GrHOOLAUXw7J0Az/o5v6u
+         YcecpOuY7GnKSD4XT44pROUra8WoGKKxAxoeEpy5ovGCTRlrIjYdhLXRV6Y0zAs2wh
+         urhxr2TI3EtI5c0KjqlbER4m+U3/yGg8HgdETNsQ=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 094B160866
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Harish Bandi <c-hbandi@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Add support for controller debug logs.
+Date:   Mon,  1 Oct 2018 19:21:02 +0530
+Message-Id: <20181001135102.17453-1-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.18.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This patch will prevent error messages splashing on console.
 
-If the device is removed locally device_free would end up calling
-bt_att_unref which won't trigger any disconnect callback necessary
-to remove device states.
+[   78.426697] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
+[   78.436682] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
+[   78.446639] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
+[   78.456596] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
+
+QCA wcn3990 will send the debug logs in the form of ACL packets.
+While decoding packet in qca_recv(), marking the received debug log
+packet as diagnostic packet.
+
+Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 ---
-v2: Fix glib warning if att is already disconnected.
+ drivers/bluetooth/hci_qca.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
- src/device.c        |  3 +++
- src/gatt-database.c | 29 +++++++++++++++++++++++++++++
- src/gatt-database.h |  2 ++
- 3 files changed, 34 insertions(+)
-
-diff --git a/src/device.c b/src/device.c
-index ef5b8f86a..5ddfb9266 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -580,6 +580,9 @@ static void gatt_server_cleanup(struct btd_device *device)
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index d98ed0442201..a00910aaed54 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -63,6 +63,10 @@
+ /* susclk rate */
+ #define SUSCLK_RATE_32KHZ	32768
  
- 	bt_gatt_server_unref(device->server);
- 	device->server = NULL;
++/* Controller debug log header */
++#define QCA_DEBUG_HDR_MSB	0xDC
++#define QCA_DEBUG_HDR_LSB	0x2E
 +
-+	btd_gatt_database_att_disconnected(
-+			btd_adapter_get_database(device->adapter), device->att);
+ /* HCI_IBS transmit side sleep protocol states */
+ enum tx_ibs_states {
+ 	HCI_IBS_TX_ASLEEP,
+@@ -849,6 +853,20 @@ static int qca_ibs_wake_ack(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return 0;
  }
  
- static void attio_cleanup(struct btd_device *device)
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index abcf7b759..911c674d3 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -357,6 +357,11 @@ static bool get_dst_info(struct bt_att *att, bdaddr_t *dst, uint8_t *dst_type)
- {
- 	GIOChannel *io = NULL;
- 	GError *gerr = NULL;
-+	int fd;
-+
-+	fd = bt_att_get_fd(att);
-+	if (fd < 0)
-+		return false;
- 
- 	io = g_io_channel_unix_new(bt_att_get_fd(att));
- 	if (!io)
-@@ -3349,6 +3354,30 @@ void btd_gatt_database_att_connected(struct btd_gatt_database *database,
- 	state->pending = NULL;
- }
- 
-+void btd_gatt_database_att_disconnected(struct btd_gatt_database *database,
-+						struct bt_att *att)
++static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	struct device_state *state;
-+	bdaddr_t bdaddr;
-+	uint8_t bdaddr_type;
-+
-+	DBG("");
-+
-+	if (!get_dst_info(att, &bdaddr, &bdaddr_type))
-+		return;
-+
-+	state = find_device_state(database, &bdaddr, bdaddr_type);
-+	if (!state)
-+		return;
-+
-+	if (state->disc_id) {
-+		bt_att_unregister_disconnect(att, state->disc_id);
-+		state->disc_id = 0;
-+	}
-+
-+	att_disconnected(0, state);
++	/* We receive debug logs from chip as an ACL packets.
++	 * Instead of sending the data to ACL to decode the
++	 * received data, we are pushing them to the above layers
++	 * as a diagnostic packet.
++	 */
++	if ((skb->len > 2) && (skb->data[0] == QCA_DEBUG_HDR_MSB) &&
++	    (skb->data[1] == QCA_DEBUG_HDR_LSB))
++		return hci_recv_diag(hdev, skb);
++	else
++		return hci_recv_frame(hdev, skb);
 +}
 +
- static void restore_ccc(struct btd_gatt_database *database,
- 			const bdaddr_t *addr, uint8_t addr_type, uint16_t value)
- {
-diff --git a/src/gatt-database.h b/src/gatt-database.h
-index a6c3139c4..9e7cda8c2 100644
---- a/src/gatt-database.h
-+++ b/src/gatt-database.h
-@@ -25,5 +25,7 @@ void btd_gatt_database_destroy(struct btd_gatt_database *database);
- struct gatt_db *btd_gatt_database_get_db(struct btd_gatt_database *database);
- void btd_gatt_database_att_connected(struct btd_gatt_database *database,
- 						struct bt_att *att);
-+void btd_gatt_database_att_disconnected(struct btd_gatt_database *database,
-+						struct bt_att *att);
+ #define QCA_IBS_SLEEP_IND_EVENT \
+ 	.type = HCI_IBS_SLEEP_IND, \
+ 	.hlen = 0, \
+@@ -870,13 +888,20 @@ static int qca_ibs_wake_ack(struct hci_dev *hdev, struct sk_buff *skb)
+ 	.lsize = 0, \
+ 	.maxlen = HCI_MAX_IBS_SIZE
  
- void btd_gatt_database_restore_svc_chng_ccc(struct btd_gatt_database *database);
++#define QCA_RECV_ACL_DATA \
++	.type = HCI_ACLDATA_PKT, \
++	.hlen = HCI_ACL_HDR_SIZE, \
++	.loff = 2, \
++	.lsize = 2, \
++	.maxlen = HCI_MAX_FRAME_SIZE
++
+ static const struct h4_recv_pkt qca_recv_pkts[] = {
+-	{ H4_RECV_ACL,             .recv = hci_recv_frame    },
+ 	{ H4_RECV_SCO,             .recv = hci_recv_frame    },
+ 	{ H4_RECV_EVENT,           .recv = hci_recv_frame    },
+ 	{ QCA_IBS_WAKE_IND_EVENT,  .recv = qca_ibs_wake_ind  },
+ 	{ QCA_IBS_WAKE_ACK_EVENT,  .recv = qca_ibs_wake_ack  },
+ 	{ QCA_IBS_SLEEP_IND_EVENT, .recv = qca_ibs_sleep_ind },
++	{ QCA_RECV_ACL_DATA,       .recv = qca_recv_acl_data },
+ };
+ 
+ static int qca_recv(struct hci_uart *hu, const void *data, int count)
 -- 
-2.17.1
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
