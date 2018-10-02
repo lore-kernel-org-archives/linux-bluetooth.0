@@ -2,104 +2,85 @@ Return-Path: <SRS0=6kNt=MO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D071CC43143
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Oct 2018 11:29:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52207C43143
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Oct 2018 12:09:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89C5220652
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Oct 2018 11:29:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iD894d7+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89C5220652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id F1F7F2082A
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Oct 2018 12:09:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F7F2082A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ucw.cz
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727463AbeJBSM0 (ORCPT
+        id S1727510AbeJBSwz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Oct 2018 14:12:26 -0400
-Received: from mail-oi1-f180.google.com ([209.85.167.180]:45387 "EHLO
-        mail-oi1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727434AbeJBSMZ (ORCPT
+        Tue, 2 Oct 2018 14:52:55 -0400
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:48536 "EHLO
+        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727434AbeJBSwy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Oct 2018 14:12:25 -0400
-Received: by mail-oi1-f180.google.com with SMTP id e17-v6so1165908oig.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Oct 2018 04:29:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9I9s+U5UlqYnB5Bko5RfJUR1zqxO9n1QLzUPkwXVuUg=;
-        b=iD894d7+GwCyQLGKYfDEqsVDEjocrkNcyqbkACPaegq8D9F3/GZDXnkVfLOR2N71JP
-         mJshowhyYoVo++ZNcPxKJ0rVQEUQNTu4yAdntW/WB1kYbnR0aD07CiY7C6Rgy/8hJZwC
-         yMSAj0+XuCq7GrrOS3bqXklrj5sc01rx8IG94W2NCn9nT3pYRDQuma41uo/yXvaOZQYD
-         EkDBNzwK1PfB3vOfUiuMZiqK3yWkmDfVhSpefWwVnGDYZ1SbuRSJaHEh3f9fQb02fKDw
-         q+mAJpnVymL5m/hku1+WTA11sT8+2hzdkzu9pqXVdy4x3Dt0qC+VpQBYoHDlfGL/FcA9
-         RfwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9I9s+U5UlqYnB5Bko5RfJUR1zqxO9n1QLzUPkwXVuUg=;
-        b=Bexf5R0RA8zdFxdi4LT32m7TDnpy5llDVxNh8JcJuEg5Tm7V9qz+9ArYeuY1QMiLHB
-         Uj9qSeONIwdP+1BznGeJ6cEqKMwMEgd4Xhbf4/2DhGHcsBZycpnABTynyahA+xDC1ayo
-         PNdS/+wOJsTkYxzRSTgZObQpZapRPAbBRkHW5IE7399RfRJu24qNt40eVNY/JyKoUJ+D
-         9so1EhmdmhS9JiXVYwSN5Lz+onDY8gA4i6r5ZRU9XiPFZtIPP+7nj0GAYxPdogVeTlFm
-         50sVZMgT95aUqruelys3KKhJ3Yjy2SX9W04wa8xLQ6k6GSbvjeXWeWRiObL0xOWddXOB
-         yogQ==
-X-Gm-Message-State: ABuFfogSemb8bNVFtF4bAPMo9/SZYTbQZRzhdNc8fPTAiJfW+A8nnPK4
-        A/6IAwFwNgerMFr+L7mOwnQZVJxpm2vr0XQ/y01kAA==
-X-Google-Smtp-Source: ACcGV61A3gE7jf/80n7weDx7JetPFo4YemNRrBOhCwgkxxp4rpmZDH3awQmfajaHHsgl0dvEVPdW3EE+jr23knejcZw=
-X-Received: by 2002:aca:c42:: with SMTP id i2-v6mr7657237oiy.219.1538479775727;
- Tue, 02 Oct 2018 04:29:35 -0700 (PDT)
+        Tue, 2 Oct 2018 14:52:54 -0400
+Received: by atrey.karlin.mff.cuni.cz (Postfix, from userid 512)
+        id 357DF80775; Tue,  2 Oct 2018 14:09:53 +0200 (CEST)
+Date:   Tue, 2 Oct 2018 14:09:52 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Barry Byford <31baz66@gmail.com>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        marcel@holtmann.org
+Subject: Re: low energy: does gatt client/server work in current version? How
+ to test?
+Message-ID: <20181002120952.GA27177@amd>
+References: <20181001102430.GA6708@amd>
+ <CAAu3APYAmr9M5NQkvqsG1-J_zn=Jiq4M18NYLx50WAAU3eb93w@mail.gmail.com>
 MIME-Version: 1.0
-References: <20181002082442.20802-1-luiz.dentz@gmail.com>
-In-Reply-To: <20181002082442.20802-1-luiz.dentz@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 2 Oct 2018 14:29:24 +0300
-Message-ID: <CABBYNZJPcxQ+1FBU4Gc1qj_Gf7yDcEx84ft6BRksJrgbEE85+g@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] shared/att: Reset fd when disconnected
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     Yunhan Wang <yunhanw@google.com>,
-        Sukesh Srikakula <sukeshs@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="ew6BAiZeqk4r7MaW"
+Content-Disposition: inline
+In-Reply-To: <CAAu3APYAmr9M5NQkvqsG1-J_zn=Jiq4M18NYLx50WAAU3eb93w@mail.gmail.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Oct 2, 2018 at 11:24 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> Set att->fd to -1 when considered disconnected.
-> ---
-> v3: Pass btd_device instead of bt_att since the later may have been
-> disconnected already.
->
->  src/shared/att.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 8bf3f4611..04577eddd 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -570,6 +570,7 @@ static bool disconnect_cb(struct io *io, void *user_data)
->
->         io_destroy(att->io);
->         att->io = NULL;
-> +       att->fd = -1;
->
->         /* Notify request callbacks */
->         queue_remove_all(att->req_queue, NULL, NULL, disc_att_send_op);
-> --
-> 2.17.1
->
 
+--ew6BAiZeqk4r7MaW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Luiz Augusto von Dentz
+Hi!
+
+> There has been a discussion on the mailing previously that covered some o=
+f this.
+>=20
+> Is there anything in this thread that helps:
+> https://marc.info/?t=3D149208458400001&r=3D1&w=3D2
+
+Thanks for the pointer; it indeed tells me how it is suppossed to
+work. (It does not, but now I understand that advertising is quite
+separate from the gatt protocol).
+
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--ew6BAiZeqk4r7MaW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAluzYBAACgkQMOfwapXb+vKA0wCglQXnC/tGQ0qSz7CxmGBsr0Um
+2HMAoLzj0Uj9fVUwuNVwVe+Me6USFMmH
+=FYie
+-----END PGP SIGNATURE-----
+
+--ew6BAiZeqk4r7MaW--
