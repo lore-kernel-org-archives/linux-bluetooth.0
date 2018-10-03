@@ -2,75 +2,76 @@ Return-Path: <SRS0=yBkr=MP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA430C00449
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 09:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 858AFC00449
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 09:58:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B0D92098A
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 09:47:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A9CE213A2
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 09:58:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="bMmqdax7";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="lzal4T3s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B0D92098A
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="IRAPLirT";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="IRAPLirT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9CE213A2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727499AbeJCQff (ORCPT
+        id S1726630AbeJCQpn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Oct 2018 12:35:35 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:55122 "EHLO
+        Wed, 3 Oct 2018 12:45:43 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:59360 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726807AbeJCQff (ORCPT
+        with ESMTP id S1725746AbeJCQpn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Oct 2018 12:35:35 -0400
+        Wed, 3 Oct 2018 12:45:43 -0400
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 04C9D6031A; Wed,  3 Oct 2018 09:47:56 +0000 (UTC)
+        id 668E96079C; Wed,  3 Oct 2018 09:58:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1538560076;
-        bh=knTaC0tLyqPmeu1k4ziI4HRQv2fomAU3z+x+v/GqAzw=;
+        s=default; t=1538560682;
+        bh=9tBJ1/LvggrCHA/EPLB6ubAGRzeC9XUtM9E9G40VkFA=;
         h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=bMmqdax7HMEqKZomOCz0+m/VKWIsTSnS32lCtxOvcpwCbn6c/+nyHYMbs2uX38Wa9
-         KygiLaPTgd4iEL8P3goQuU7hG+U4MgsPsnzaZIWnqqoDyiKR3uYTmGKsu9OuLM8Diq
-         jwKZ4XkDaufUNYrlBOKE6VzXsUCr3uciqYY/pMJY=
+        b=IRAPLirTdKo0HsKJQ7gk5OKWQzmGCl/8fhF7gx6ABYZRurjyO8HrX044Ua6FjxRe6
+         a/GML/jG4jrDw89n412Y3Corl8n2h3n9tPMLlHbNpW6vV1Qx5sE5UX2Ix/eIn2zwAx
+         tIXlvdknln9w3duXIPVkRszruH8HsxJOq/w/aQGg=
 Received: from potku.adurom.net (88-114-240-52.elisa-laajakaista.fi [88.114.240.52])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: kvalo@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id D8FAD6021C;
-        Wed,  3 Oct 2018 09:47:52 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id B326860275;
+        Wed,  3 Oct 2018 09:57:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1538560075;
-        bh=knTaC0tLyqPmeu1k4ziI4HRQv2fomAU3z+x+v/GqAzw=;
+        s=default; t=1538560682;
+        bh=9tBJ1/LvggrCHA/EPLB6ubAGRzeC9XUtM9E9G40VkFA=;
         h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=lzal4T3sEtxpNTTeHMDK6ElLJ01BJaie3Uc4XRpqC/11TwxWlYcnvIWFTY7mXo6LA
-         lZPLqP3YJ46dELJRiXuJB8/+Lw9rHK/mZUIoYCnFwTHIWTOZRfQW90A3NSqcAExugS
-         vJm/IKu5lWbY0due3EiTuY4HiSVws0PjkJQOjN4Y=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org D8FAD6021C
+        b=IRAPLirTdKo0HsKJQ7gk5OKWQzmGCl/8fhF7gx6ABYZRurjyO8HrX044Ua6FjxRe6
+         a/GML/jG4jrDw89n412Y3Corl8n2h3n9tPMLlHbNpW6vV1Qx5sE5UX2Ix/eIn2zwAx
+         tIXlvdknln9w3duXIPVkRszruH8HsxJOq/w/aQGg=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org B326860275
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=kvalo@codeaurora.org
 From:   Kalle Valo <kvalo@codeaurora.org>
-To:     Kai Heng Feng <kai.heng.feng@canonical.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        Luca Coelho <luciano.coelho@intel.com>,
-        Intel Linux Wireless <linuxwifi@intel.com>,
+To:     "Grumbach\, Emmanuel" <emmanuel.grumbach@intel.com>
+Cc:     Kai Heng Feng <kai.heng.feng@canonical.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Berg\, Johannes" <johannes.berg@intel.com>,
+        "Coelho\, Luciano" <luciano.coelho@intel.com>,
+        linuxwifi <linuxwifi@intel.com>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+        "linux-wireless\@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "netdev\@vger.kernel.org" <netdev@vger.kernel.org>,
         linux-bluetooth@vger.kernel.org
 Subject: Re: [RESEND] [PATCH 3/3] iwlwifi: Load firmware exclusively for Intel WiFi
 References: <20181003073556.28154-1-kai.heng.feng@canonical.com>
         <20181003073556.28154-3-kai.heng.feng@canonical.com>
         <87y3bfiees.fsf@kamboji.qca.qualcomm.com>
         <265BAF93-4BFF-4850-92F7-80AC39496473@canonical.com>
-        <87tvm3id0f.fsf@kamboji.qca.qualcomm.com>
-Date:   Wed, 03 Oct 2018 12:47:50 +0300
-In-Reply-To: <87tvm3id0f.fsf@kamboji.qca.qualcomm.com> (Kalle Valo's message
-        of "Wed, 03 Oct 2018 12:40:48 +0300")
-Message-ID: <875zyjicop.fsf@kamboji.qca.qualcomm.com>
+        <0BA3FCBA62E2DC44AF3030971E174FB301336D868D@HASMSX111.ger.corp.intel.com>
+Date:   Wed, 03 Oct 2018 12:57:57 +0300
+In-Reply-To: <0BA3FCBA62E2DC44AF3030971E174FB301336D868D@HASMSX111.ger.corp.intel.com>
+        (Emmanuel Grumbach's message of "Wed, 3 Oct 2018 09:50:58 +0000")
+Message-ID: <871s97ic7u.fsf@kamboji.qca.qualcomm.com>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/24.5 (gnu/linux)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -80,41 +81,65 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Kalle Valo <kvalo@codeaurora.org> writes:
++ linux-bluetooth
 
-> Kai Heng Feng <kai.heng.feng@canonical.com> writes:
->
->>> On Oct 3, 2018, at 5:10 PM, Kalle Valo <kvalo@codeaurora.org> wrote:
->>>=20
->>> Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
->>>=20
->>>> To avoid the firmware loading race between Bluetooth and WiFi on Intel
->>>> 8260, load firmware exclusively when BT_INTEL is enabled.
->>>>=20
->>>> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
->>>=20
->>> Still the commit log tells nothing about the actual problem which makes
->>> review impossible.
->>
+"Grumbach, Emmanuel" <emmanuel.grumbach@intel.com> writes:
+
+>>=20
+>> > On Oct 3, 2018, at 5:10 PM, Kalle Valo <kvalo@codeaurora.org> wrote:
+>> >
+>> > Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
+>> >
+>> >> To avoid the firmware loading race between Bluetooth and WiFi on
+>> >> Intel 8260, load firmware exclusively when BT_INTEL is enabled.
+>> >>
+>> >> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+>> >
+>> > Still the commit log tells nothing about the actual problem which
+>> > makes review impossible.
+>>=20
 >> Sorry for that. The first two patches [1] only sends to linux-bluetooth =
-and LMKL.
->
-> For a patchset like this you should CC linux-wireless for all patches,
-> otherwise people just get confused. And even more so as patch 3 seems to
-> depend on the other patches.
->
->> I don=E2=80=99t know what really happened at hardware/firmware level, but
->> making btusb and iwlwifi load firmware sequentially can workaround the
->> issue.
->
-> We don't apply ugly workarounds without understanding the issue.
->
+and
+>> LMKL.
+>>=20
+>> I don=E2=80=99t know what really happened at hardware/firmware level, bu=
+t making
+>> btusb and iwlwifi load firmware sequentially can workaround the issue.
+>>=20
 >> Matt Chen may be able to explain this issue with more detail.
+>>=20
+>> [1] https://lkml.org/lkml/2018/10/3/322
+>>
 >
-> Then you need to work with Matt so that the issue is properly explained
-> in the commit log.
-
-linux-bluetooth was not CCed, adding that.
+> I just read the code of this patch and I don't quite understand.
+> You have a function that is declared as a non-inline function in two diff=
+erent header files?
+> btintel_firmware_lock is declared here:
+>
+> --- /dev/null
+> +++ b/include/linux/intel-wifi-bt.h
+> @@ -0,0 +1,8 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __INTEL_WIFI_BT_H__
+> +#define __INTEL_WIFI_BT_H__
+> +
+> +void btintel_firmware_lock(void);
+>
+> And ...
+>
+> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+> index 41c642cc523f..1373ffc2b575 100644
+> --- a/drivers/bluetooth/btintel.h
+> +++ b/drivers/bluetooth/btintel.h
+> @@ -102,6 +102,8 @@ int btintel_read_boot_params(struct hci_dev *hdev,
+>  			     struct intel_boot_params *params);
+>  int btintel_download_firmware(struct hci_dev *dev, const struct firmware=
+ *fw,
+>  			      u32 *boot_param);
+> +void btintel_firmware_lock(void);
+>
+>
+> This can't be right.
 
 --=20
 Kalle Valo
