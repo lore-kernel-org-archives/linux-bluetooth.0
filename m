@@ -3,40 +3,42 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 676F7C00449
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 07:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CE05C00449
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 07:36:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 372A42089F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 07:15:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 372A42089F
+	by mail.kernel.org (Postfix) with ESMTP id 2DE9D20835
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 07:36:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DE9D20835
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726751AbeJCOCj (ORCPT
+        id S1727167AbeJCOXU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Oct 2018 10:02:39 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:55883 "EHLO
+        Wed, 3 Oct 2018 10:23:20 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:56144 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726521AbeJCOCj (ORCPT
+        with ESMTP id S1726672AbeJCOXT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Oct 2018 10:02:39 -0400
+        Wed, 3 Oct 2018 10:23:19 -0400
 Received: from 61-220-137-37.hinet-ip.hinet.net ([61.220.137.37] helo=localhost)
         by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
         (Exim 4.76)
         (envelope-from <kai.heng.feng@canonical.com>)
-        id 1g7bNb-0007CH-9G; Wed, 03 Oct 2018 07:15:31 +0000
+        id 1g7bhW-00089F-9D; Wed, 03 Oct 2018 07:36:06 +0000
 From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     Kai-Heng Feng <kai.heng.feng@canonical.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: btusb: Load firmware exclusively for Intel BT
-Date:   Wed,  3 Oct 2018 15:15:11 +0800
-Message-Id: <20181003071513.13004-2-kai.heng.feng@canonical.com>
+Subject: [RESEND] [PATCH 2/3] Bluetooth: btusb: Load firmware exclusively for Intel BT
+Date:   Wed,  3 Oct 2018 15:35:55 +0800
+Message-Id: <20181003073556.28154-2-kai.heng.feng@canonical.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20181003073556.28154-1-kai.heng.feng@canonical.com>
+References: <20181003073556.28154-1-kai.heng.feng@canonical.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
