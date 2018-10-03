@@ -2,827 +2,273 @@ Return-Path: <SRS0=yBkr=MP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4D0C00449
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 14:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F285C00449
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 14:20:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16AE82098A
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 14:04:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4567213A2
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 14:20:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LAg5u09m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16AE82098A
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ucij32ix"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4567213A2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726806AbeJCUwk (ORCPT
+        id S1726694AbeJCVIl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Oct 2018 16:52:40 -0400
-Received: from mail-oi1-f176.google.com ([209.85.167.176]:43486 "EHLO
-        mail-oi1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726769AbeJCUwk (ORCPT
+        Wed, 3 Oct 2018 17:08:41 -0400
+Received: from mail-wm1-f43.google.com ([209.85.128.43]:51484 "EHLO
+        mail-wm1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726543AbeJCVIl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Oct 2018 16:52:40 -0400
-Received: by mail-oi1-f176.google.com with SMTP id s69-v6so4581000oie.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Oct 2018 07:04:06 -0700 (PDT)
+        Wed, 3 Oct 2018 17:08:41 -0400
+Received: by mail-wm1-f43.google.com with SMTP id 143-v6so5888348wmf.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Oct 2018 07:20:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XOqaEXbFiH/AC/M8PiQEsvIYeCI1BIi3BzF7/JrfUsQ=;
-        b=LAg5u09mRb4n/Fq5OwUhUYSehUwOQA20/lsgIvyi/KsOjGyk3VE+8GooQbASEyKlrP
-         vRsmU7cBJYw8F2/QN/NT9fdKLzem90Aa7pXpImPUBghjNHsVHPicBQDyTRJXEWz1+J7L
-         w0A4C0X9MTN9rQdqPHJJvFORtfAv4OA/grITwjdt+NsU++e2lV3XC15E+M79BjWg2BSL
-         irmu0pgLRxGnEPRH7N7nBKjhUYLUK4niLHAUJ41IQawrp7rTyYdgDLauZ/3h0vKRBNE3
-         dLWg4lnP80IDEvwVfVqQDZyvInLcunlr3ah9tNtvlmjBVcofQmHwl/cZCpLjbhzsHtL+
-         ZG5Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=U7UCl0UQ9bveRuZvE5ZrxpTwu9GcNMGiaoCETVrQDMQ=;
+        b=ucij32ixO/vKtPczVn17aHhqf30R1qdFhMiyAQsLLsiebGy1U/sbOge4eytTdyhQaR
+         lBdNvl8/FJ74mJy/ILiJB6XJldkKu+flAF5lP7hxFuilt9KnrZju6ocXacTOSDdc92+Y
+         rz04vdD5HziMAddigVOW/Tr3kzlgQVDNP6NadoVvktpo5Urrn/hvaQkRObx/2RWZmXtS
+         2D/xXQm/1lZInJ8tqil20R4qbXzzzxOP7gXsloWuydEN3OzANwJEAEfC1oXHiQNYh92F
+         wZazFJoM1w8GwmAZZfUdiisnfIJIPBVNWvp74RtrtCSLHivmCp6/byYcBUJHQt1w2CD0
+         g6qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XOqaEXbFiH/AC/M8PiQEsvIYeCI1BIi3BzF7/JrfUsQ=;
-        b=QGgDoJNR/jashHGorbQr2BDoQ4IFIBgimx2tiQ/u7f8R0WLJTjuXow0ZWj/3tej7oF
-         migfA6I+ZUP7zRjQSuuUxiHTzilHhBDSr0KKsAl1L2iu/NViFlOoBCjgdJ1hOL8bGCKg
-         MOMigftw5E6P9DFaDurnHixMClIs8nmXWNLRIPRCOFhAtj9gZbHUmsiiisS+ILOgsKSE
-         Tp9oFy/2aI4gl3ws18kLA+z1NyJHUQwBIbKerE7o3cromXnzlxi/tNtsA9cU4ODZMJ7k
-         zvSwJ1BCx/lTkeZHvXW+j9nWkCfq5F0SdIv1oXbfTE8uEnaFECm34xkYQNDJAVy9tpuO
-         OKOw==
-X-Gm-Message-State: ABuFfogb3z6F19BaVUhJNUmmyJ3pFZDAKrB2h5aMrz7HKJvaWAK/TzSS
-        ly6vb4i4vTavToXsTDurHnL9/+FmSADYItP73hdPqw==
-X-Google-Smtp-Source: ACcGV605W8cBMP3NxgaVFkxiHaOcioar1hOwq23dnBiarWCDLPGPeSYskwLdF5wvLnPsAEpc1WxkQtjvS68ZlCNDCc0=
-X-Received: by 2002:aca:c42:: with SMTP id i2-v6mr831653oiy.219.1538575445995;
- Wed, 03 Oct 2018 07:04:05 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=U7UCl0UQ9bveRuZvE5ZrxpTwu9GcNMGiaoCETVrQDMQ=;
+        b=BjQfxpO2/PrqsBZHLBssb/ve4BOGTjKRZr4pXYGjEnXYfoZZQQr1MbAXGxVLnzFFE4
+         YHkozp7Lyq1/1LfpFc5cK0Hgpi9O0KssBoNQ8TrbkXvm88f1bSheqwGUeAg18aLEaSmL
+         l/KEnaWa8sllSakEjFsxonTnIaVKOtBWc/HSJVpottlkflKxUFDqDDDSPLX0Cza430iq
+         Lw3kHzxTBa8k7UitEAdzyd3IRbKsuCJ8A7rbdEXkqnsqvjk56XEYLYXa+UHjzsj4pxt8
+         xr5s5eRWAJo7qUPdp2ZZwURoOb7H6ESGOK0PTpGMgQTFTsKTvfVCDcpZBzP/mg8OcP5e
+         8cJQ==
+X-Gm-Message-State: ABuFfoiYwVyKN7aNNEYk8SEt637FPhkrAM5bQy9UliEPuo+8oQdBMrAP
+        BHtbp2epN5djuBR+fqTIpnE=
+X-Google-Smtp-Source: ACcGV62ikZX7M39Yb9Q52NJ73EUKsnqnaCitGF+0eyT3WWac4s00akZ+xzBiF/6kMMzLJYbBj6+baw==
+X-Received: by 2002:a1c:9616:: with SMTP id y22-v6mr1612098wmd.72.1538576403009;
+        Wed, 03 Oct 2018 07:20:03 -0700 (PDT)
+Received: from xps.lan (static-css-csd-151233.business.bouyguestelecom.com. [176.162.151.233])
+        by smtp.gmail.com with ESMTPSA id a6-v6sm1948533wmf.22.2018.10.03.07.20.02
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 03 Oct 2018 07:20:02 -0700 (PDT)
+Date:   Wed, 3 Oct 2018 16:20:00 +0200
+From:   fabien dvlt <fabiendvlt@gmail.com>
+To:     Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: Re: Security block and Bluez - connection issue with Android
+Message-ID: <20181003141959.GA5359@xps.lan>
+References: <CAOiLkfOuenvh5ZLQD_k-yi7mL1Epr+gGJZ65zr2Fcp2SzE9F7w@mail.gmail.com>
+ <20180926112801.GA8013@x1c.lan>
 MIME-Version: 1.0
-References: <CADckva-V-8PeMDAVxJFFuVcq1zppCBEqrJdwH32PPf1nKVw=CQ@mail.gmail.com>
- <CADckva9qPjqEjH=06cCLkkgJi+qYbR6cz5ki3whXOV1qP5BRvg@mail.gmail.com>
- <CABBYNZKaJc46C4Phu5HE18JXcYjfdD_kxS5Q7hOJJC4ZTsTyQA@mail.gmail.com>
- <CADckva9c-Nw85gH3yRBEvu_OD+J7EcccAjBZHB8ZQw92CndQZA@mail.gmail.com>
- <CABBYNZ+CmQ7KvjgDZzZ7sRPxLMmLi0L7pfMVEgz359Rb-Phwwg@mail.gmail.com>
- <CADckva_Xsa4euhy27qHQSQas2aoMKnK0pSvWndjoxLq2gohdTg@mail.gmail.com>
- <CABBYNZ+x2jzBRVNuLp-BpOAbdMk+xayrR61edPs2pEJ22cRFhw@mail.gmail.com>
- <CAAu3APae6fWN6U5-+ohubUk6JQH7Urvox2CVU9WHJexD3h+upg@mail.gmail.com>
- <CABBYNZKD7CVFj=ncqi0Xk0qvQNxMHv-NzHoDzDQLtXSbFOMycg@mail.gmail.com> <CADckva9RVVk-+8pAvqFwDd0DWL-uyKjQZ1_1JPATUa4CFNOLcg@mail.gmail.com>
-In-Reply-To: <CADckva9RVVk-+8pAvqFwDd0DWL-uyKjQZ1_1JPATUa4CFNOLcg@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 3 Oct 2018 17:03:54 +0300
-Message-ID: <CABBYNZK-L1_JEyr+CExiDYNkLF6TcT0HZrRN7QNngj9sns+OiQ@mail.gmail.com>
-Subject: Re: Registering a profile
-To:     neil.benn@ziath.com
-Cc:     Barry Byford <31baz66@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20180926112801.GA8013@x1c.lan>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Neil,
-On Wed, Oct 3, 2018 at 4:49 PM Neil Benn <neil.benn@ziath.com> wrote:
->
-> Hello,
->
->   Thanks; I followed Barry's example on making the device discoverable
-> via bluetoothd and that can now be found so the profile is registered
-> without needing the sdp_record.  However the profile isn't getting
-> callbacks still except in one case where I kill the bluetoothd process
-> and the release method on the profile is called which is strange.
->
->   Looking at the output from dbus when a connection happens; we have
-> the following:
->
-> signal time=1538574206.428425 sender=:1.0 -> destination=(null
-> destination) serial=314 path=/org/freedesktop/systemd1;
-> interface=org.freedesktop.systemd1.Manager; member=UnitNew
->    string "sys-devices-platform-soc-20201000.serial-tty-ttyAMA0-hci0-hci0:11.device"
->    object path "/org/freedesktop/systemd1/unit/sys_2ddevices_2dplatform_2dsoc_2d20201000_2eserial_2dtty_2dttyAMA0_2dhci0_2dhci0_3a11_2edevice"
-> signal time=1538574206.431862 sender=:1.0 -> destination=(null
-> destination) serial=315 path=/org/freedesktop/systemd1;
-> interface=org.freedesktop.systemd1.Manager; member=UnitNew
->    string "sys-subsystem-bluetooth-devices-hci0:11.device"
->    object path "/org/freedesktop/systemd1/unit/sys_2dsubsystem_2dbluetooth_2ddevices_2dhci0_3a11_2edevice"
-> signal time=1538574206.463318 sender=:1.22 -> destination=(null
-> destination) serial=17 path=/org/bluez/hci0/dev_C8_FF_28_79_05_D4;
-> interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
->    string "org.bluez.Device1"
->    array [
->       dict entry(
->          string "Connected"
->          variant             boolean true
->       )
->    ]
->    array [
->    ]
-> signal time=1538574210.618465 sender=:1.22 -> destination=(null
-> destination) serial=18 path=/org/bluez/hci0/dev_C8_FF_28_79_05_D4;
-> interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
->    string "org.bluez.Device1"
->    array [
->       dict entry(
->          string "Connected"
->          variant             boolean false
->       )
->    ]
->    array [
->    ]
-> signal time=1538574210.629705 sender=:1.0 -> destination=(null
-> destination) serial=316
-> path=/org/freedesktop/systemd1/unit/sys_2dsubsystem_2dbluetooth_2ddevices_2dhci0_3a11_2edevice;
-> interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
->    string "org.freedesktop.systemd1.Device"
->    array [
->       dict entry(
->          string "SysFSPath"
->          variant             string
-> "/sys/devices/platform/soc/20201000.serial/tty/ttyAMA0/hci0/hci0:11"
->       )
->    ]
->    array [
->    ]
-> signal time=1538574210.640715 sender=:1.0 -> destination=(null
-> destination) serial=317
-> path=/org/freedesktop/systemd1/unit/sys_2dsubsystem_2dbluetooth_2ddevices_2dhci0_3a11_2edevice;
-> interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
->    string "org.freedesktop.systemd1.Unit"
->    array [
->       dict entry(
->          string "ActiveState"
->          variant             string "inactive"
->       )
->       dict entry(
->          string "SubState"
->          variant             string "dead"
->       )
->       dict entry(
->          string "StateChangeTimestamp"
->          variant             uint64 1538574210626509
->       )
->       dict entry(
->          string "StateChangeTimestampMonotonic"
->          variant             uint64 2940864110
->       )
->       dict entry(
->          string "InactiveExitTimestamp"
->          variant             uint64 1538574206426852
->       )
->       dict entry(
->          string "InactiveExitTimestampMonotonic"
->          variant             uint64 2936664452
->       )
->       dict entry(
->          string "ActiveEnterTimestamp"
->          variant             uint64 1538574206426852
->       )
->       dict entry(
->          string "ActiveEnterTimestampMonotonic"
->          variant             uint64 2936664452
->       )
->       dict entry(
->          string "ActiveExitTimestamp"
->          variant             uint64 1538574210626509
->       )
->       dict entry(
->          string "ActiveExitTimestampMonotonic"
->          variant             uint64 2940864110
->       )
->       dict entry(
->          string "InactiveEnterTimestamp"
->          variant             uint64 1538574210626509
->       )
->       dict entry(
->          string "InactiveEnterTimestampMonotonic"
->          variant             uint64 2940864110
->       )
->       dict entry(
->          string "Job"
->          variant             struct {
->                uint32 0
->                object path "/"
->             }
->       )
->       dict entry(
->          string "ConditionResult"
->          variant             boolean false
->       )
->       dict entry(
->          string "AssertResult"
->          variant             boolean false
->       )
->       dict entry(
->          string "ConditionTimestamp"
->          variant             uint64 0
->       )
->       dict entry(
->          string "ConditionTimestampMonotonic"
->          variant             uint64 0
->       )
->       dict entry(
->          string "AssertTimestamp"
->          variant             uint64 0
->       )
->       dict entry(
->          string "AssertTimestampMonotonic"
->          variant             uint64 0
->       )
->    ]
->    array [
->    ]
-> signal time=1538574210.668073 sender=:1.0 -> destination=(null
-> destination) serial=318 path=/org/freedesktop/systemd1;
-> interface=org.freedesktop.systemd1.Manager; member=UnitRemoved
->    string "sys-subsystem-bluetooth-devices-hci0:11.device"
->    object path "/org/freedesktop/systemd1/unit/sys_2dsubsystem_2dbluetooth_2ddevices_2dhci0_3a11_2edevice"
-> signal time=1538574210.670654 sender=:1.0 -> destination=(null
-> destination) serial=319
-> path=/org/freedesktop/systemd1/unit/sys_2ddevices_2dplatform_2dsoc_2d20201000_2eserial_2dtty_2dttyAMA0_2dhci0_2dhci0_3a11_2edevice;
-> interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
->    string "org.freedesktop.systemd1.Device"
->    array [
->       dict entry(
->          string "SysFSPath"
->          variant             string
-> "/sys/devices/platform/soc/20201000.serial/tty/ttyAMA0/hci0/hci0:11"
->       )
->    ]
->    array [
->    ]
-> signal time=1538574210.677890 sender=:1.0 -> destination=(null
-> destination) serial=320
-> path=/org/freedesktop/systemd1/unit/sys_2ddevices_2dplatform_2dsoc_2d20201000_2eserial_2dtty_2dttyAMA0_2dhci0_2dhci0_3a11_2edevice;
-> interface=org.freedesktop.DBus.Properties; member=PropertiesChanged
->    string "org.freedesktop.systemd1.Unit"
->    array [
->       dict entry(
->          string "ActiveState"
->          variant             string "inactive"
->       )
->       dict entry(
->          string "SubState"
->          variant             string "dead"
->       )
->       dict entry(
->          string "StateChangeTimestamp"
->          variant             uint64 1538574210626572
->       )
->       dict entry(
->          string "StateChangeTimestampMonotonic"
->          variant             uint64 2940864171
->       )
->       dict entry(
->          string "InactiveExitTimestamp"
->          variant             uint64 1538574206426942
->       )
->       dict entry(
->          string "InactiveExitTimestampMonotonic"
->          variant             uint64 2936664542
->       )
->       dict entry(
->          string "ActiveEnterTimestamp"
->          variant             uint64 1538574206426942
->       )
->       dict entry(
->          string "ActiveEnterTimestampMonotonic"
->          variant             uint64 2936664542
->       )
->       dict entry(
->          string "ActiveExitTimestamp"
->          variant             uint64 1538574210626572
->       )
->       dict entry(
->          string "ActiveExitTimestampMonotonic"
->          variant             uint64 2940864171
->       )
->       dict entry(
->          string "InactiveEnterTimestamp"
->          variant             uint64 1538574210626572
->       )
->       dict entry(
->          string "InactiveEnterTimestampMonotonic"
->          variant             uint64 2940864171
->       )
->       dict entry(
->          string "Job"
->          variant             struct {
->                uint32 0
->                object path "/"
->             }
->       )
->       dict entry(
->          string "ConditionResult"
->          variant             boolean false
->       )
->       dict entry(
->          string "AssertResult"
->          variant             boolean false
->       )
->       dict entry(
->          string "ConditionTimestamp"
->          variant             uint64 0
->       )
->       dict entry(
->          string "ConditionTimestampMonotonic"
->          variant             uint64 0
->       )
->       dict entry(
->          string "AssertTimestamp"
->          variant             uint64 0
->       )
->       dict entry(
->          string "AssertTimestampMonotonic"
->          variant             uint64 0
->       )
->    ]
->    array [
->    ]
-> signal time=1538574210.699336 sender=:1.0 -> destination=(null
-> destination) serial=321 path=/org/freedesktop/systemd1;
-> interface=org.freedesktop.systemd1.Manager; member=UnitRemoved
->    string "sys-devices-platform-soc-20201000.serial-tty-ttyAMA0-hci0-hci0:11.device"
->    object path "/org/freedesktop/systemd1/unit/sys_2ddevices_2dplatform_2dsoc_2d20201000_2eserial_2dtty_2dttyAMA0_2dhci0_2dhci0_3a11_2edevice"
->
->   So there are events being fired just not the ones that connect to my
-> registered profile.  In addition I've tried to register the profile
-> and listen for connections on the device PSM of 17 and 19 which HID
-> uses but nothing happens there either - though I'm not sure this is
-> the best way to communicate as it feels 'wrong' tbh.
+Thank you both for your reply. Since you and Luiz answered, I have
+been trying to do a better workaround at USB/HCI level instead of
+L2CAP.
 
-Have you read my responses? It _wont_ work for these PSMs, those are
-already taken by the daemon except if you are not loading the input
-plugin. Can't you try with something simpler like SPP, which is what
-this interface is for?
+I understand this issue is more related to the firmware implementation
+but for those who really need it, I think the patch below is a better
+approach than the first I have submitted.
 
->   Thanks again - I'm still basically not getting any events fired on
-> the profile except for Release which isn't really that useful as it
-> only notifies me if the bluetooth stack goes down!
->
->   Any ideas?
->
-> Cheers,
->
-> Neil
-> On Wed, 3 Oct 2018 at 11:35, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Barry,
-> > On Tue, Oct 2, 2018 at 5:57 PM Barry Byford <31baz66@gmail.com> wrote:
-> > >
-> > > Hi Luiz,
-> > >
-> > > On Tue, 2 Oct 2018 at 13:48, Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > Hi Neil,
-> > > > On Tue, Oct 2, 2018 at 3:29 PM Neil Benn <neil.benn@ziath.com> wrote:
-> > > > >
-> > > > > Hello,
-> > > > >
-> > > > >   Thanks for that please see inline below:
-> > > > >
-> > > > >
-> > > > > On Tue, 2 Oct 2018, 12:28 Luiz Augusto von Dentz, <luiz.dentz@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Neil,
-> > > > > > On Tue, Oct 2, 2018 at 1:39 PM Neil Benn <neil.benn@ziath.com> wrote:
-> > > > > > >
-> > > > > > > Hello,
-> > > > > > >
-> > > > > > >   Thanks for that; I'll change the config file for this and for the
-> > > > > > > name can that be in the main.conf file?  The same for the
-> > > > > > > discoverable; set the timeout to zero - there is no security needed
-> > > > > > > for this device at all.  Can this all be done with the conf file?
-> > > > > > >
-> > > > > > >   On the connection; yes it connects.  This is a HID device connecting
-> > > > > > > via L2CAP with the interrupt on 19 and the control on 17 and the
-> > > > > > > windows PC correctly connects to the device, queries the service
-> > > > > > > record, identifies it as a HID and connects on both the control and
-> > > > > > > interrupt psm ports but none of the dbus methods are being called.  At
-> > > > > > > the moment I am using the pybluez library with the BluetoothSocket and
-> > > > > > > calling listen and accept which is a bit 'manual'.  To detect a
-> > > > > > > disconnect I'm calling hcitool con and parsing the response - which is
-> > > > > > > again a bit manual.  Please see below for my current 'hack':
-> > > > > >
-> > > > > > I don't think that will work since the input plugin is already
-> > > > > > listening in those PSM,
-> > > > >
-> > > > > It does connect and work but it doesn't register the profile.  If I
-> > > > > don't register the profile the default name in the config is used
-> > > > > >
-> > > > > > in fact I don't think RegisterProfile would
-> > > > > > parse the values from the record since you don't seem to be using the
-> > > > > > PSM:
-> > > > > >
-> > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/profile-api.txt#n54
-> > > > >
-> > > > >
-> > > > > The PSM is defined in the service record
-> > > > > >
-> > > > > >
-> > > > > >
-> > > > > > Btw, why would you want to replace the HID profile? Is that not working?
-> > > > >
-> > > > > I'm using an sdp profile provided in some sample code I found, is
-> > > > > there a default one that is supported?  Is that default one selected
-> > > > > when I pick my uuid?
-> > > >
-> > > > You are not suppose to use existing UUIDs that the daemon already
-> > > > registers, the fact that you are able to register it without cause a
-> > > > problem might be a bug and we should probably check if the UUID is
-> > > > already registered and fail if it does.
-> > > >
-> > > > The HID profile is implementation is under profiles/input/, it
-> > > > actually hooks with kernel HID drivers.
-> > > >
-> > > > If you just want to test it you should probably have a look at
-> > > > test-profile in python:
-> > >
-> > > Do you have any example invocations of test-profile for common profiles?
-> >
-> > test-profile is just a sample, but yes we do have many instances of
-> > common profiles using RegisterProfile:
-> >
-> > OBEX Daemon:
-> > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/obexd/plugins/bluetooth.c#n256
-> >
-> > Ofono (HFP):
-> > https://git.kernel.org/pub/scm/network/ofono/ofono.git/tree/plugins/bluez5.c#n104
-> >
-> > PulseAudio (HSP):
-> > https://gitlab.freedesktop.org/pulseaudio/pulseaudio/blob/master/src/modules/bluetooth/backend-native.c#L332
-> >
-> > > It can be difficult to know where the issue is if you are not
-> > > confident with what settings should work.
-> >
-> > Well test-profile is not exactly a library just a convenient sample on
-> > how to use the interface, it was used mostly for testing SPP which is
-> > quite common way to register external profiles. HID is probably a no
-> > go due to reason already stated.
-> >
-> > > >
-> > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/test-profile
-> > > >
-> > > > >   If so then I think it has been overcomplicated by this sdp profile?
-> > > > > How do I use the default in-built profile - is it just the uuid?
-> > > > > On Tue, 2 Oct 2018 at 12:28, Luiz Augusto von Dentz
-> > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Neil,
-> > > > > > On Tue, Oct 2, 2018 at 1:39 PM Neil Benn <neil.benn@ziath.com> wrote:
-> > > > > > >
-> > > > > > > Hello,
-> > > > > > >
-> > > > > > >   Thanks for that; I'll change the config file for this and for the
-> > > > > > > name can that be in the main.conf file?  The same for the
-> > > > > > > discoverable; set the timeout to zero - there is no security needed
-> > > > > > > for this device at all.  Can this all be done with the conf file?
-> > > > > > >
-> > > > > > >   On the connection; yes it connects.  This is a HID device connecting
-> > > > > > > via L2CAP with the interrupt on 19 and the control on 17 and the
-> > > > > > > windows PC correctly connects to the device, queries the service
-> > > > > > > record, identifies it as a HID and connects on both the control and
-> > > > > > > interrupt psm ports but none of the dbus methods are being called.  At
-> > > > > > > the moment I am using the pybluez library with the BluetoothSocket and
-> > > > > > > calling listen and accept which is a bit 'manual'.  To detect a
-> > > > > > > disconnect I'm calling hcitool con and parsing the response - which is
-> > > > > > > again a bit manual.  Please see below for my current 'hack':
-> > > > > >
-> > > > > > I don't think that will work since the input plugin is already
-> > > > > > listening in those PSM, in fact I don't think RegisterProfile would
-> > > > > > parse the values from the record since you don't seem to be using the
-> > > > > > PSM:
-> > > > > >
-> > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/profile-api.txt#n54
-> > > > > >
-> > > > > > Btw, why would you want to replace the HID profile? Is that not working?
-> > > > > >
-> > > > > > > ---
-> > > > > > >     #listen for incoming client connections
-> > > > > > >     #ideally this would be handled by the Bluez 5 profile
-> > > > > > >     #but that didn't seem to work
-> > > > > > >     def listen(self):
-> > > > > > >
-> > > > > > >         print("Waiting for connections")
-> > > > > > >         self.scontrol=BluetoothSocket(L2CAP)
-> > > > > > >         self.sinterrupt=BluetoothSocket(L2CAP)
-> > > > > > >
-> > > > > > >         self.scontrol.bind((self.MY_ADDRESS,self.P_CTRL))
-> > > > > > >         self.sinterrupt.bind((self.MY_ADDRESS,self.P_INTR ))
-> > > > > > >         #Start listening on the server sockets
-> > > > > > >         self.scontrol.listen(1) # Limit of 1 connection
-> > > > > > >         self.sinterrupt.listen(1)
-> > > > > > >
-> > > > > > >         self.ccontrol,cinfo = self.scontrol.accept()
-> > > > > > >         self.controlClientMac = cinfo[0]
-> > > > > > >         self.controlClientPsm = cinfo[1]
-> > > > > > >         print ('control is ' + self.controlClientMac + " " +
-> > > > > > > str(self.controlClientPsm))
-> > > > > > >
-> > > > > > >         self.cinterrupt, cinfo = self.sinterrupt.accept()
-> > > > > > >         self.interruptClientMac = cinfo[0]
-> > > > > > >         self.interruptClientPsm = cinfo[1]
-> > > > > > >         print ('interrupt is ' + self.interruptClientMac + " " +
-> > > > > > > str(self.interruptClientPsm))
-> > > > > > >
-> > > > > > >         thread.start_new_thread(self.check_connection, ())
-> > > > > > >
-> > > > > > >     def check_connection(self):
-> > > > > > >         halt = False
-> > > > > > >         while not halt:
-> > > > > > >             stdoutdata = subprocess.check_output(["hcitool", "con"])
-> > > > > > >
-> > > > > > >             if self.controlClientMac in stdoutdata.split():
-> > > > > > >                 time.sleep(0.1)
-> > > > > > >             else:
-> > > > > > >                 print('got disconnection')
-> > > > > > >                 self.scontrol.shutdown(2);
-> > > > > > >                 self.sinterrupt.shutdown(2)
-> > > > > > >                 halt = True
-> > > > > > >         thread.start_new_thread(self.listen, ())
-> > > > > > >
-> > > > > > >   Obviously this is a very clumsy way of doing it and calling back on
-> > > > > > > the profile is the correct way to do it, I just can't work out why the
-> > > > > > > profile is not being called.  I'm trying to spy on the dbus comms to
-> > > > > > > see if anything is being sent but I can't see any bluez profile
-> > > > > > > messages being sent at all.  Thanks for your response and any advice
-> > > > > > > is greatly appreciated.
-> > > > > > >
-> > > > > > > Cheers,
-> > > > > > >
-> > > > > > > Neil
-> > > > > > > On Tue, 2 Oct 2018 at 09:37, Luiz Augusto von Dentz
-> > > > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > Hi Neil,
-> > > > > > > > On Tue, Oct 2, 2018 at 1:32 AM Neil Benn <neil.benn@ziath.com> wrote:
-> > > > > > > > >
-> > > > > > > > > Hello,
-> > > > > > > > >
-> > > > > > > > >   I've been running a dbus-monitor and I can't see the interface being
-> > > > > > > > > called of 'org.bluez.Profile1' - I can see 'org.bluez.Device1' and
-> > > > > > > > > I've tried listening to that interface and also on the path with
-> > > > > > > > > dev_<ADAPTER-MAC> but I'm clearly doing something fundamentally wrong.
-> > > > > > > > > IF anyone has any advance I'd be very grateful and there is 100 rep
-> > > > > > > > > points up on Stack Overflow for any advice too!
-> > > > > > > > >
-> > > > > > > > >   Thanks; it's late here and I'll not be home till gone 1am so I'll be off now!
-> > > > > > > > >
-> > > > > > > > > Cheers,
-> > > > > > > > >
-> > > > > > > > > Neil
-> > > > > > > > > On Fri, 28 Sep 2018 at 23:38, Neil Benn <neil.benn@ziath.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > Hello,
-> > > > > > > > > >
-> > > > > > > > > >   I'm trying to setup a RPi0 operating a Bluetooth device; I've setup
-> > > > > > > > > > the device using the following call:
-> > > > > > > > > > ---
-> > > > > > > > > >     #configure the bluetooth hardware device
-> > > > > > > > > >     def init_bt_device(self):
-> > > > > > > > > >
-> > > > > > > > > >         print("Configuring for name " + BTKbDevice.MY_DEV_NAME)
-> > > > > > > > > >
-> > > > > > > > > >         #set the device class to a barcode scanner and set the name
-> > > > > > > > > >         os.system("hciconfig hcio class 0x002560")
-> > > > > > > > > >         os.system("hciconfig hcio name " + BTKbDevice.MY_DEV_NAME)
-> > > > > > > > > >
-> > > > > > > > > >         #make the device discoverable
-> > > > > > > > > >         os.system("hciconfig hcio piscan")
-> > > > > > > > > >
-> > > > > > > >
-> > > > > > > > You shouldn't be using hciconfig, instead do the following:
-> > > > > > > >
-> > > > > > > > The class is automatically set by bluetoothd based on the
-> > > > > > > > services/profiles registered and the setting in the main.conf:
-> > > > > > > >
-> > > > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/main.conf#n9
-> > > > > > > >
-> > > > > > > > For the name use D-Bus property Alias:
-> > > > > > > >
-> > > > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n216
-> > > > > > > >
-> > > > > > > > To make the adapter discoverable use D-Bus property Discoverable:
-> > > > > > > >
-> > > > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n252
-> > > > > > > >
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > > >   Then after that I attempt to setup the profile using the following code:
-> > > > > > > > > > ---
-> > > > > > > > > >     #set up a bluez profile to advertise device capabilities from a
-> > > > > > > > > > loaded service record
-> > > > > > > > > >     def init_bluez_profile(self):
-> > > > > > > > > >
-> > > > > > > > > >         print("Configuring Bluez Profile")
-> > > > > > > > > >
-> > > > > > > > > >         #setup profile options
-> > > > > > > > > >         service_record=self.read_sdp_service_record()
-> > > > > > > > > >
-> > > > > > > > > >         opts = {
-> > > > > > > > > >             "ServiceRecord":service_record,
-> > > > > > > > > >             "Role":"server",
-> > > > > > > > > >             "RequireAuthentication":False,
-> > > > > > > > > >             "RequireAuthorization":False,
-> > > > > > > > > >             "Name":BTKbDevice.MY_DEV_NAME,
-> > > > > > > > > >             "AutoConnect":True
-> > > > > > > > > >         }
-> > > > > > > > > >
-> > > > > > > > > >         #retrieve a proxy for the bluez profile interface
-> > > > > > > > > >         bus = dbus.SystemBus()
-> > > > > > > > > >         self.manager =
-> > > > > > > > > > dbus.Interface(bus.get_object("org.bluez","/org/bluez"),
-> > > > > > > > > > "org.bluez.ProfileManager1")
-> > > > > > > > > >         self.profile = BTKbBluezProfile(bus, BTKbDevice.PROFILE_DBUS_PATH)
-> > > > > > > > > >         self.manager.RegisterProfile(BTKbDevice.PROFILE_DBUS_PATH,
-> > > > > > > > > > BTKbDevice.UUID, opts)
-> > > > > > > > > >         print("Profile registered ")
-> > > > > > > > > > ---
-> > > > > > > > > >   The sdp record is available from https://textuploader.com/dv8xt.
-> > > > > > > > > > The profile in question is basically the same as the one defined in
-> > > > > > > > > > the test-profile as shown below:
-> > > > > > > > > > ---
-> > > > > > > > > > class BTKbBluezProfile(dbus.service.Object):
-> > > > > > > > > >     fd = -1
-> > > > > > > > > >
-> > > > > > > > > >     @dbus.service.method("org.bluez.Profile1",
-> > > > > > > > > >                                     in_signature="", out_signature="")
-> > > > > > > > > >     def Release(self):
-> > > > > > > > > >             print("Release")
-> > > > > > > > > >             mainloop.quit()
-> > > > > > > > > >
-> > > > > > > > > >     @dbus.service.method("org.bluez.Profile1",
-> > > > > > > > > >                                     in_signature="", out_signature="")
-> > > > > > > > > >     def Cancel(self):
-> > > > > > > > > >             print("Cancel")
-> > > > > > > > > >
-> > > > > > > > > >     @dbus.service.method("org.bluez.Profile1", in_signature="oha{sv}",
-> > > > > > > > > > out_signature="")
-> > > > > > > > > >     def NewConnection(self, path, fd, properties):
-> > > > > > > > > >             self.fd = fd.take()
-> > > > > > > > > >             print("NewConnection(%s, %d)" % (path, self.fd))
-> > > > > > > > > >             for key in properties.keys():
-> > > > > > > > > >                     print ('key ' + key + ' value ' + properties[key])
-> > > > > > > > > >                     if key == "Version" or key == "Features":
-> > > > > > > > > >                             print("  %s = 0x%04x" % (key, properties[key]))
-> > > > > > > > > >                     else:
-> > > > > > > > > >                             print("  %s = %s" % (key, properties[key]))
-> > > > > > > > > >
-> > > > > > > > > >     @dbus.service.method("org.bluez.Profile1", in_signature="o",
-> > > > > > > > > > out_signature="")
-> > > > > > > > > >     def RequestDisconnection(self, path):
-> > > > > > > > > >             print("RequestDisconnection(%s)" % (path))
-> > > > > > > > > >
-> > > > > > > > > >             if (self.fd > 0):
-> > > > > > > > > >                     os.close(self.fd)
-> > > > > > > > > >                     self.fd = -1
-> > > > > > > > > >
-> > > > > > > > > >     def __init__(self, bus, path):
-> > > > > > > > > >             dbus.service.Object.__init__(self, bus, path)
-> > > > > > > > > > ---
-> > > > > > > > > >   However it seems like the profile is not being registered, or least
-> > > > > > > > > > the methods in the profile are not being called.  I'm sorry to ask
-> > > > > > > > > > such a basic question but can someone please point me in the right
-> > > > > > > > > > direction as to why the profile is either not being registered or the
-> > > > > > > > > > callbacks on the profile are not being called.
-> > > > > > > >
-> > > > > > > > They would be called only when there is a connection to the profile,
-> > > > > > > > did you actually connect? If this is something like a serial port the
-> > > > > > > > remote should lookup the SDP record and connect to the channel listed
-> > > > > > > > there.
-> > > > > > > >
-> > > > > > > > > >   Thank you very much for reading this far and any and all help is
-> > > > > > > > > > most appreciated!
-> > > > > > > > > >
-> > > > > > > > > > Cheers,
-> > > > > > > > > >
-> > > > > > > > > > Neil
-> > > > > > > > > >
-> > > > > > > > > > --
-> > > > > > > > > >
-> > > > > > > > > > Neil Benn MSc
-> > > > > > > > > > Ziath Ltd
-> > > > > > > > > > Phone: +44 (0) 1223 855021
-> > > > > > > > > > http://www.ziath.com
-> > > > > > > > > >
-> > > > > > > > > > Please consider the environment before printing this email.
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > --
-> > > > > > > > >
-> > > > > > > > > Neil Benn MSc
-> > > > > > > > > Ziath Ltd
-> > > > > > > > > Phone: +44 (0) 1223 855021
-> > > > > > > > > http://www.ziath.com
-> > > > > > > > >
-> > > > > > > > > Please consider the environment before printing this email.
-> > > > > > > > >
-> > > > > > > > > Follow us on Facebook, Twitter or LinkedIn
-> > > > > > > > >
-> > > > > > > > > IMPORTANT NOTICE: This message, including any attached documents, is
-> > > > > > > > > intended only for the use of the individual or entity to which it is
-> > > > > > > > > addressed, and may contain information that is privileged,
-> > > > > > > > > confidential and exempt from disclosure under applicable law. If the
-> > > > > > > > > reader of this message is not the intended recipient, or the employee
-> > > > > > > > > or agent responsible for delivering the message to the intended
-> > > > > > > > > recipient, you are hereby notified that any dissemination,
-> > > > > > > > > distribution or copying of this communication is strictly prohibited.
-> > > > > > > > > If you have received this communication in error, please notify Ziath
-> > > > > > > > > Ltd immediately by email at info@ziath.com. Thank you.
-> > > > > > > >
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > --
-> > > > > > > > Luiz Augusto von Dentz
-> > > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > > --
-> > > > > > >
-> > > > > > > Neil Benn MSc
-> > > > > > > Ziath Ltd
-> > > > > > > Phone: +44 (0) 1223 855021
-> > > > > > > http://www.ziath.com
-> > > > > > >
-> > > > > > > Please consider the environment before printing this email.
-> > > > > > >
-> > > > > > > Follow us on Facebook, Twitter or LinkedIn
-> > > > > > >
-> > > > > > > IMPORTANT NOTICE: This message, including any attached documents, is
-> > > > > > > intended only for the use of the individual or entity to which it is
-> > > > > > > addressed, and may contain information that is privileged,
-> > > > > > > confidential and exempt from disclosure under applicable law. If the
-> > > > > > > reader of this message is not the intended recipient, or the employee
-> > > > > > > or agent responsible for delivering the message to the intended
-> > > > > > > recipient, you are hereby notified that any dissemination,
-> > > > > > > distribution or copying of this communication is strictly prohibited.
-> > > > > > > If you have received this communication in error, please notify Ziath
-> > > > > > > Ltd immediately by email at info@ziath.com. Thank you.
-> > > > > >
-> > > > > >
-> > > > > >
-> > > > > > --
-> > > > > > Luiz Augusto von Dentz
-> > > > >
-> > > > >
-> > > > >
-> > > > > --
-> > > > >
-> > > > > Neil Benn MSc
-> > > > > Ziath Ltd
-> > > > > Phone: +44 (0) 1223 855021
-> > > > > http://www.ziath.com
-> > > > >
-> > > > > Please consider the environment before printing this email.
-> > > > >
-> > > > > Follow us on Facebook, Twitter or LinkedIn
-> > > > >
-> > > > > IMPORTANT NOTICE: This message, including any attached documents, is
-> > > > > intended only for the use of the individual or entity to which it is
-> > > > > addressed, and may contain information that is privileged,
-> > > > > confidential and exempt from disclosure under applicable law. If the
-> > > > > reader of this message is not the intended recipient, or the employee
-> > > > > or agent responsible for delivering the message to the intended
-> > > > > recipient, you are hereby notified that any dissemination,
-> > > > > distribution or copying of this communication is strictly prohibited.
-> > > > > If you have received this communication in error, please notify Ziath
-> > > > > Ltd immediately by email at info@ziath.com. Thank you.
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > > Luiz Augusto von Dentz
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
->
->
-> --
->
-> Neil Benn MSc
-> Ziath Ltd
-> Phone: +44 (0) 1223 855021
-> http://www.ziath.com
->
-> Please consider the environment before printing this email.
->
-> Follow us on Facebook, Twitter or LinkedIn
->
-> IMPORTANT NOTICE: This message, including any attached documents, is
-> intended only for the use of the individual or entity to which it is
-> addressed, and may contain information that is privileged,
-> confidential and exempt from disclosure under applicable law. If the
-> reader of this message is not the intended recipient, or the employee
-> or agent responsible for delivering the message to the intended
-> recipient, you are hereby notified that any dissemination,
-> distribution or copying of this communication is strictly prohibited.
-> If you have received this communication in error, please notify Ziath
-> Ltd immediately by email at info@ziath.com. Thank you.
+It will start queueing ACL packets when link key exchange begins until
+the next HCI event. It still have some limitations I wish to fix soon
+(see patch below).
 
+I have a question about what I have read in bluetooth specifications:
+ 
+ Version 5.0, Vol 2, Part C, - 4.2.5.1 Encryption Mode
 
+   "ACL-U logical link traffic shall only be resumed after the attempt
+   to encrypt or decrypt the logical transport is completed"
 
+I was wondering if this would guarantee that no unencrypted connection
+request could be forwarded to other layer once the link key exchange
+has started.
+
+Thank you
+
+---
+
+From bd17d5e519c2ad76ef1761b2d066d98ec4c723d1 Mon Sep 17 00:00:00 2001
+From: fabien filhol <fabien.filhol@devialet.com>
+Date: Wed, 3 Oct 2018 12:06:30 +0200
+Subject: [PATCH] Bluetooth: btusb: Fix race condition between BT events and
+ ACL
+
+Workaround for a race condition observed with Android phones which makes
+fail some connections (30% with a Oneplus 6).
+
+After link key reply it is expected that HCI_EV_ENCRYPT_CHANGE is received
+before any ACL connection request or it will be dropped by bluez L2CAP
+layer.
+
+The events are received from usb interrupt transfer and ACL packet from usb
+bulk transfer. I guess the bluetooth controller does not handle correctly
+write ordering between those two transfer types.
+
+The workaround will start queueing ACL packets when link key are exchanged until
+the next real event (other than HCI_EV_CMD_COMPLETE) is received, it should
+be HCI_EV_ENCRYPT_CHANGE.
+
+LIMITATIONS:
+
+An unencrypted connection request forwarded by the controller at
+"ACL queueing time" could pass. Bluetooth specification says that ACL
+transfer is paused until encryption is setup so I hope it is safe to queue
+ACL between HCI_EV_LINK_KEY_REQ and HCI_EV_CMD_COMPLETE.
+
+With concurrent connections from multiple bluetooth devices the workaround
+could not work as any event from any device would flush the queue.
+---
+ drivers/bluetooth/btusb.c | 50 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 49 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index bff67c5a5fe7..c55096fa8c4e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -406,6 +406,9 @@ struct btusb_data {
+ 	struct sk_buff *acl_skb;
+ 	struct sk_buff *sco_skb;
+ 
++	struct sk_buff_head acl_deferred_q;
++	int acl_deferred;
++
+ 	struct usb_endpoint_descriptor *intr_ep;
+ 	struct usb_endpoint_descriptor *bulk_tx_ep;
+ 	struct usb_endpoint_descriptor *bulk_rx_ep;
+@@ -449,6 +452,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ {
+ 	struct sk_buff *skb;
+ 	int err = 0;
++	int event = HCI_OP_NOP;
+ 
+ 	spin_lock(&data->rxlock);
+ 	skb = data->evt_skb;
+@@ -488,6 +492,9 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 		}
+ 
+ 		if (!hci_skb_expect(skb)) {
++			struct hci_event_hdr *hdr = (struct hci_event_hdr *)skb->data;
++			event = hdr->evt;
++
+ 			/* Complete frame */
+ 			data->recv_event(data->hdev, skb);
+ 			skb = NULL;
+@@ -495,6 +502,39 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 	}
+ 
+ 	data->evt_skb = skb;
++
++	/*
++	 * Workaround for a race condition observed with Android phones. After link
++	 * key reply it is expected that HCI_EV_ENCRYPT_CHANGE is received before
++	 * any ACL connection request or it will be dropped by bluez L2CAP layer.
++	 *
++	 * The events are received from usb interrupt transfer and ACL packet from
++	 * usb bulk transfer. I guess the bluetooth controller does not handle
++	 * correctly write ordering between those two transfer types.
++	 *
++	 * The workaround will start queueing ACL packets when link key are exchanged
++	 * until the next real event (not an HCI_EV_CMD_COMPLETE) is received, it
++	 * should be HCI_EV_ENCRYPT_CHANGE.
++	 *
++	 * LIMITATIONS:
++	 *
++	 * An unencrypted connection request forwarded by the controller at
++	 * "ACL queueing time" would pass. Bluetooth specification says that ACL
++	 * transfer is paused until encryption is setup so I hope it is safe to queue
++	 * ACL between HCI_EV_LINK_KEY_REQ and HCI_EV_CMD_COMPLETE.
++	 *
++	 * With concurrent connections from multiple bluetooth devices the workaround
++	 * could not work as any event from any device would flush the queue.
++	 */
++	if (event == HCI_EV_LINK_KEY_REQ) {
++		data->acl_deferred = 1;
++	} else if (data->acl_deferred && event != HCI_EV_CMD_COMPLETE) {
++		while ((skb = skb_dequeue(&data->acl_deferred_q)))
++			hci_recv_frame(data->hdev, skb);
++		skb = NULL;
++		data->acl_deferred = 0;
++	}
++
+ 	spin_unlock(&data->rxlock);
+ 
+ 	return err;
+@@ -546,7 +586,10 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			hci_recv_frame(data->hdev, skb);
++			if (data->acl_deferred)
++				skb_queue_tail(&data->acl_deferred_q, skb);
++			else
++				hci_recv_frame(data->hdev, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -2815,6 +2858,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 	data->udev = interface_to_usbdev(intf);
+ 	data->intf = intf;
+ 
++	data->acl_deferred = 0;
++	skb_queue_head_init(&data->acl_deferred_q);
++
+ 	INIT_WORK(&data->work, btusb_work);
+ 	INIT_WORK(&data->waker, btusb_waker);
+ 	init_usb_anchor(&data->deferred);
+@@ -3051,6 +3097,8 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 	if (!data)
+ 		return;
+ 
++	skb_queue_purge(&data->acl_deferred_q);
++
+ 	hdev = data->hdev;
+ 	usb_set_intfdata(data->intf, NULL);
+ 
 -- 
-Luiz Augusto von Dentz
+2.17.1
+
+
+On Wed, Sep 26, 2018 at 02:28:01PM +0300, Johan Hedberg wrote:
+> Hi Fabien,
+> 
+> On Tue, Sep 25, 2018, fabien dvlt wrote:
+> > > ACL Data RX: Handle 13 flags 0x02 dlen 12           #198 [hci0] 21.813116
+> >       L2CAP: Connection Request (0x02) ident 7 len 4
+> >         PSM: 25 (0x0019)
+> >         Source CID: 75
+> > > HCI Event: Encryption Change (0x08) plen 4          #199 [hci0] 21.813155
+> >         Status: Success (0x00)
+> >         Handle: 13
+> >         Encryption: Enabled with AES-CCM (0x02)
+> > < ACL Data TX: Handle 13 flags 0x00 dlen 16           #200 [hci0]
+> >       L2CAP: Connection Response (0x03) ident 7 len 8
+> >         Destination CID: 0
+> >         Source CID: 75
+> >         Result: Connection refused - security block (0x0003)
+> >         Status: No further information available (0x0000)
+> 
+> This looks like the well-known race condition for ACL data and HCI
+> events on USB where the two come through different endpoints. From the
+> host perspective there's not much we can do since we can't make
+> assumptions that the connection request was sent over an encrypted
+> connection if we haven't seen the encryption change request at that
+> point.
+> 
+> Johan
