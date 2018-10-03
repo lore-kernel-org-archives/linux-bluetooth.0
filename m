@@ -2,122 +2,69 @@ Return-Path: <SRS0=yBkr=MP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1F90C00449
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 16:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F8DC00449
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 16:58:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 861E62089F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 16:56:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 861E62089F
+	by mail.kernel.org (Postfix) with ESMTP id 001D62089F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 16:58:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 001D62089F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726912AbeJCXqB convert rfc822-to-8bit (ORCPT
+        id S1727221AbeJCXrV convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Oct 2018 19:46:01 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47029 "EHLO
+        Wed, 3 Oct 2018 19:47:21 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:58614 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726842AbeJCXqB (ORCPT
+        with ESMTP id S1726842AbeJCXrV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Oct 2018 19:46:01 -0400
+        Wed, 3 Oct 2018 19:47:21 -0400
 Received: from marcel-macbook.fritz.box (p4FEFC9BB.dip0.t-ipconnect.de [79.239.201.187])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 47D0CCF358;
-        Wed,  3 Oct 2018 19:04:05 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 08BB8CF359;
+        Wed,  3 Oct 2018 19:05:25 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Subject: Re: [PATCH v2] Bluetooth: hci_qca: Add support for controller debug
- logs.
+Subject: Re: [PATCH v3] Bluetooth : Errata Service Release 8, Erratum 3253
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20181003151144.10537-1-bgodavar@codeaurora.org>
-Date:   Wed, 3 Oct 2018 18:56:45 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org,
-        Harish Bandi <c-hbandi@codeaurora.org>
+In-Reply-To: <1538574034-31184-1-git-send-email-mallikarjun.phulari@intel.com>
+Date:   Wed, 3 Oct 2018 18:58:06 +0200
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <2206464E-FA01-4A5A-8BC4-5CF70A0B9765@holtmann.org>
-References: <20181003151144.10537-1-bgodavar@codeaurora.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Message-Id: <9BB9F76D-A318-4B6E-ACB3-9E30CEAD4B84@holtmann.org>
+References: <1538574034-31184-1-git-send-email-mallikarjun.phulari@intel.com>
+To:     Mallikarjun Phulari <mallikarjun.phulari@intel.com>
 X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+Hi Mallikarjun,
 
-> This patch will prevent error messages splashing on console.
+> L2CAP: New result values
+> 	0x0006 - Connection refused – Invalid Source CID
+> 	0x0007 - Connection refused – Source CID already allocated
 > 
-> [   78.426697] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
-> [   78.436682] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
-> [   78.446639] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
-> [   78.456596] Bluetooth: hci_core.c:hci_acldata_packet() hci0: ACL packet for unknown connection handle 3804
+> As per the ESR08_V1.0.0, 1.11.2 Erratum 3253, Page No. 54,
+> "Remote CID invalid Issue".
+> Applies to Core Specification versions: V5.0, V4.2, v4.1, v4.0, and v3.0 + HS
+> Vol 3, Part A, Section 4.2, 4.3, 4.14, 4.15.
 > 
-> QCA wcn3990 will send the debug logs in the form of ACL packets.
-> While decoding packet in qca_recv(), marking the received debug log
-> packet as diagnostic packet.
+> Core Specification Version 5.0, Page No.1753, Table 4.6 and
+> Page No. 1767, Table 4.14
 > 
-> Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> v2: 
->  * Addressed reviewer comments.
-> v1: 
->  * initial patch
-> ---
-> drivers/bluetooth/hci_qca.c | 20 +++++++++++++++++++-
-> 1 file changed, 19 insertions(+), 1 deletion(-)
+> New result values are added to l2cap connect/create channel response as
+> 0x0006 - Connection refused – Invalid Source CID
+> 0x0007 - Connection refused – Source CID already allocated
 > 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index d98ed0442201..63ac3c6b4149 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -63,6 +63,10 @@
-> /* susclk rate */
-> #define SUSCLK_RATE_32KHZ	32768
-> 
-> +/* Controller debug log header */
-> +#define QCA_DEBUG_HDR_MSB	0xDC
-> +#define QCA_DEBUG_HDR_LSB	0x2E
-> +
+> And also renamed the result values specific to LE Credit based Connection
+> as L2CAP_CR_LE_* and changed the old names wherever they were used.
 
-since this is actually the ACL handle, why not call it QCA_DEBUG_HANDLE.
-
-> /* HCI_IBS transmit side sleep protocol states */
-> enum tx_ibs_states {
-> 	HCI_IBS_TX_ASLEEP,
-> @@ -849,6 +853,20 @@ static int qca_ibs_wake_ack(struct hci_dev *hdev, struct sk_buff *skb)
-> 	return 0;
-> }
-> 
-> +static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +	/* We receive debug logs from chip as an ACL packets.
-> +	 * Instead of sending the data to ACL to decode the
-> +	 * received data, we are pushing them to the above layers
-> +	 * as a diagnostic packet.
-> +	 */
-> +	if ((skb->len > 2) && (skb->data[0] == QCA_DEBUG_HDR_MSB) &&
-> +	    (skb->data[1] == QCA_DEBUG_HDR_LSB))
-
-Skip the individual () since they are not needed. Also the skb->len check is not needed since the H4_RECV_ACL already ensures the proper length of the header.
-
-And just use get_unaligned_le16(skb->data) here (or be16 if that is the byte order).
-
-> +		return hci_recv_diag(hdev, skb);
-
-Is there any reason to keep the 4 octets hci_acl_hdr with this SKB? Or would it be better to be stripped off. Mainly asking are they any other magic handles that we might want to feed through the diag channel?
-
-> +
-> +	return hci_recv_frame(hdev, skb);
-> +}
-> +
+I want this as two separate patches. First do the naming changes to existing code and then in a second patch add the new changes from the erratum.
 
 Regards
 
