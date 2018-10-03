@@ -2,65 +2,134 @@ Return-Path: <SRS0=yBkr=MP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A560C00449
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 07:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9ADC64EBC
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 07:15:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ED7B920652
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 07:00:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED7B920652
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
+	by mail.kernel.org (Postfix) with ESMTP id 5D0C82089F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Oct 2018 07:15:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D0C82089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726748AbeJCNrw (ORCPT
+        id S1726617AbeJCOC2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Oct 2018 09:47:52 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:44716 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726710AbeJCNrw (ORCPT
+        Wed, 3 Oct 2018 10:02:28 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:55876 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726521AbeJCOC2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Oct 2018 09:47:52 -0400
-Received: from marcel-macbook.fritz.box (p4FEFC9BB.dip0.t-ipconnect.de [79.239.201.187])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 67473CF353;
-        Wed,  3 Oct 2018 09:08:06 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Subject: Re: [PATCH v2] btsdio: Do not bind to non-removable BCM43430
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20181002095704.22472-1-acho@suse.com>
-Date:   Wed, 3 Oct 2018 09:00:48 +0200
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>, jlee@suse.com
-Content-Transfer-Encoding: 7bit
-Message-Id: <B1BB2FA6-9753-4924-B4E0-8CDE462A802A@holtmann.org>
-References: <DE21BFD5-3A79-4D64-9DB1-4A2DCDBBE359@holtmann.org>
- <20181002095704.22472-1-acho@suse.com>
-To:     "Cho, Yu-Chen" <acho@suse.com>
-X-Mailer: Apple Mail (2.3445.100.39)
+        Wed, 3 Oct 2018 10:02:28 -0400
+Received: from 61-220-137-37.hinet-ip.hinet.net ([61.220.137.37] helo=localhost)
+        by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+        (Exim 4.76)
+        (envelope-from <kai.heng.feng@canonical.com>)
+        id 1g7bNP-0007C0-Hi; Wed, 03 Oct 2018 07:15:20 +0000
+From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] Bluetooth: btintel: Add firmware lock function
+Date:   Wed,  3 Oct 2018 15:15:10 +0800
+Message-Id: <20181003071513.13004-1-kai.heng.feng@canonical.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Yu-Chen,
+When Intel 8260 starts to load Bluetooth firmware and WiFi firmware, by
+calling btintel_download_firmware() and iwl_pcie_load_given_ucode_8000()
+respectively, the Bluetooth btintel_download_firmware() aborts half way:
+[   11.950216] Bluetooth: hci0: Failed to send firmware data (-38)
 
-> BCM43430 devices soldered onto the PCB (non-removable)
-> use an UART connection for bluetooth.
-> But also advertise btsdio support on their 3th sdio function.
-> 
-> Signed-off-by: Cho, Yu-Chen <acho@suse.com>
-> ---
-> drivers/bluetooth/btsdio.c | 12 +++++++++---
-> 1 file changed, 9 insertions(+), 3 deletions(-)
+Let btusb and iwlwifi load firmwares exclusively can avoid the issue, so
+introduce a lock to use in btusb and iwlwifi.
 
-patch (with slight modifications) has been applied to bluetooth-next tree.
+Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+---
+ drivers/bluetooth/btintel.c   | 14 ++++++++++++++
+ drivers/bluetooth/btintel.h   | 10 ++++++++++
+ include/linux/intel-wifi-bt.h |  8 ++++++++
+ 3 files changed, 32 insertions(+)
+ create mode 100644 include/linux/intel-wifi-bt.h
 
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 5270d5513201..2d2a983a6641 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -35,6 +35,8 @@
+ 
+ #define BDADDR_INTEL (&(bdaddr_t) {{0x00, 0x8b, 0x9e, 0x19, 0x03, 0x00}})
+ 
++static DEFINE_MUTEX(firmware_lock);
++
+ int btintel_check_bdaddr(struct hci_dev *hdev)
+ {
+ 	struct hci_rp_read_bd_addr *bda;
+@@ -724,6 +726,18 @@ int btintel_download_firmware(struct hci_dev *hdev, const struct firmware *fw,
+ }
+ EXPORT_SYMBOL_GPL(btintel_download_firmware);
+ 
++void btintel_firmware_lock(void)
++{
++	mutex_lock(&firmware_lock);
++}
++EXPORT_SYMBOL_GPL(btintel_firmware_lock);
++
++void btintel_firmware_unlock(void)
++{
++	mutex_unlock(&firmware_lock);
++}
++EXPORT_SYMBOL_GPL(btintel_firmware_unlock);
++
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index 41c642cc523f..1373ffc2b575 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -102,6 +102,8 @@ int btintel_read_boot_params(struct hci_dev *hdev,
+ 			     struct intel_boot_params *params);
+ int btintel_download_firmware(struct hci_dev *dev, const struct firmware *fw,
+ 			      u32 *boot_param);
++void btintel_firmware_lock(void);
++void btintel_firmware_unlock(void);
+ #else
+ 
+ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+@@ -196,4 +198,12 @@ static inline int btintel_download_firmware(struct hci_dev *dev,
+ {
+ 	return -EOPNOTSUPP;
+ }
++
++static inline void btintel_firmware_lock(void)
++{
++}
++
++static inline void btintel_firmware_unlock(void)
++{
++}
+ #endif
+diff --git a/include/linux/intel-wifi-bt.h b/include/linux/intel-wifi-bt.h
+new file mode 100644
+index 000000000000..260ed628d19b
+--- /dev/null
++++ b/include/linux/intel-wifi-bt.h
+@@ -0,0 +1,8 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __INTEL_WIFI_BT_H__
++#define __INTEL_WIFI_BT_H__
++
++void btintel_firmware_lock(void);
++void btintel_firmware_unlock(void);
++
++#endif
+-- 
+2.17.1
 
