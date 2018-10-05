@@ -7,63 +7,66 @@ X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EE2C65BA7
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Oct 2018 09:00:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1ADC00449
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Oct 2018 09:00:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EBD2F20652
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Oct 2018 09:00:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2BF620652
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Oct 2018 09:00:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hqhqUpmv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBD2F20652
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyuhc5zN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2BF620652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728608AbeJEP6U (ORCPT
+        id S1728641AbeJEP6W (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Oct 2018 11:58:20 -0400
-Received: from mail-lf1-f50.google.com ([209.85.167.50]:39233 "EHLO
-        mail-lf1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727942AbeJEP6U (ORCPT
+        Fri, 5 Oct 2018 11:58:22 -0400
+Received: from mail-lf1-f54.google.com ([209.85.167.54]:34162 "EHLO
+        mail-lf1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728524AbeJEP6W (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Oct 2018 11:58:20 -0400
-Received: by mail-lf1-f50.google.com with SMTP id w21-v6so8829210lff.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Oct 2018 02:00:30 -0700 (PDT)
+        Fri, 5 Oct 2018 11:58:22 -0400
+Received: by mail-lf1-f54.google.com with SMTP id y10-v6so8828964lfj.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Oct 2018 02:00:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=jrkeAE3U17Jed6f85Smy2EZ45Dy5njnIPlAEuNOLMbE=;
-        b=hqhqUpmvesEiVhOpWjvm+4clkvykPoksQXLfSMaU93EEPIyQKOMhNDgpoYGf/8vmJU
-         CwYYwnMdqLBVvPFOMplS0MCZiaI54SqYwY32ELom6LjUOaKBXp6LudnrPjvKf2Ty7sRn
-         FQMwlDLQZFpRDnXCCRYi67lLvtqQUo/z6ZaeTgHJZdEJKcna/UTewdm0Ule4DILtXE2f
-         P9484luc3Ola/AMIO+7LZ7tG7y7vuGXoT/1YRVnGjShPnjj1H8NN5CvRm4ZlCKR6qCnb
-         3mY0+GZd7yorZ6y0auc6guHeuM2QhJV+xXUz109ZhUTyvGsgh6lTfYJdNEsCuEO/MehN
-         m4Pg==
+        h=from:to:subject:date:message-id:in-reply-to:references;
+        bh=H20thavih0MQKoVL60EbAbsRKQAxJPO9G52b/qEP5pg=;
+        b=kyuhc5zN+39gno/YimPpZCUlMKSzIZa8Y3c6nSPnI8T7YGGQJhnjh6yNUzHG5HJ9wq
+         3QnFO2aM+qeRbnEMNjA8N6nW7J7+xBvA0CPbLuuS1D6Q7Zkw1vIg0t0uOdNkUvis9/fM
+         lqAHCwOWOWUmC8izh5RNC25rg0spXxG9Zb6hEHQ4ulKmQEtQU1TW+4TB/27TbSSZwAgB
+         3EiqX/LvabfE5mtoWldnMThuu70Hct+/4byr1kMID9ztb4pNEMm3Fn6JfSDK4btDwr8v
+         tLk1XuWy49xisfeA74VCSjdLeBTlZKundK7FyC3yXbEwzuniPirSV9oK/j9KjTbUe1x+
+         JuBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=jrkeAE3U17Jed6f85Smy2EZ45Dy5njnIPlAEuNOLMbE=;
-        b=DtZGQmhY/m3Kqi1sS21yyVPdxt/Hg/+yp29Q7okI4O02VrtwTA9fIClG9AUDMxMw7b
-         5fc7hAlOF9YqiMjtXmXQW0nhes4INSGHWmdCWkC/k8JmZZA2DMlz7e8++4Hm0VpVz3VQ
-         nS8dyRkhFMOEhIrLG1Lp7dAK5avN1cyLBdWLGlnkgQmThrbX9PfHZ5ZDOpY7i761kMd0
-         hfGY8wFrQsM6NPIPDwK3Pv3c4uuajuQG1j8zcV/pBwrtWqEZmu9EjP1Sk02qEM64K29G
-         LUlpOvRZvyCEFu+ZslRjYbwQ0ZVgwbNShXoz96FYAD3OA7X6qMjG1SJQuIgNq/krwmIr
-         q4Tw==
-X-Gm-Message-State: ABuFfojuuAwjda6t5C8XJjSVrwifZK7vSF2dwrjSQ3wGX5SMuLWDVZjC
-        2TMKq0QCRUG8IsLoxp6b7PFLwI5f
-X-Google-Smtp-Source: ACcGV61PgnwJluL2HOEWWp0ocCXn1SYOz3GKGAnms4IxNhsDH8lpyVBwCfBMQ+dPGZqhUMYBEjuuEg==
-X-Received: by 2002:a19:9d8d:: with SMTP id g135-v6mr6406215lfe.3.1538730028865;
-        Fri, 05 Oct 2018 02:00:28 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references;
+        bh=H20thavih0MQKoVL60EbAbsRKQAxJPO9G52b/qEP5pg=;
+        b=olynNUIOGE5nWTj5Ts4lrC1K2RCkhwnkeMYIR3MN+Kp31+QVmEM+aZPSGPlncH2Dx6
+         Cfyp/RAdu2qETwyB/HhuuAmIuCzR7Fov4CoGr0o6be343bE7XhvSWGTyGjoV+SGlTKjj
+         ZEbbr00kzzaFcPG3hRbE6/sihnqxccEGAhGAk6B6fVhsrU7U0kA76mqF03JOJIemALaa
+         dfPCcneKy3GvEY0iUXH5ynFwBloicXPLvN6gFBoxArxxZGuSnicdAwMcvkvrB6jRybsN
+         ycSz6Fi2cBv3ImPLty08DsEnhSO5axGHboIQs8kfCitUIX209F9eOVcRJ0SzIj+GXf4S
+         BkwQ==
+X-Gm-Message-State: ABuFfoiR4MdzSrpATkmqYm2GM83VX/sloGcsdALhvFrXTXJboGEmqBDU
+        eV+AaC65biiF2Ht9Vr1xG7t+vKYk
+X-Google-Smtp-Source: ACcGV60DiI+XCUt4kFRyW5I2Mvy43auEDsWlR2qx/o3KTb9NzI/qgtnL4YLBB68KsC0h+o+fWnpqSg==
+X-Received: by 2002:a19:1346:: with SMTP id j67-v6mr5736509lfi.93.1538730031257;
+        Fri, 05 Oct 2018 02:00:31 -0700 (PDT)
 Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
-        by smtp.gmail.com with ESMTPSA id a12-v6sm241355lfe.73.2018.10.05.02.00.27
+        by smtp.gmail.com with ESMTPSA id a12-v6sm241355lfe.73.2018.10.05.02.00.29
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 05 Oct 2018 02:00:27 -0700 (PDT)
+        Fri, 05 Oct 2018 02:00:30 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] shared/tester: Add option to print to monitor
-Date:   Fri,  5 Oct 2018 12:00:24 +0300
-Message-Id: <20181005090026.7535-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/3] unit: Make use of tester_monitor to print input/output PDUs
+Date:   Fri,  5 Oct 2018 12:00:26 +0300
+Message-Id: <20181005090026.7535-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20181005090026.7535-1-luiz.dentz@gmail.com>
+References: <20181005090026.7535-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -71,407 +74,228 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds option -m/--monitor that can be used toguether with
-tester_monitor to send protocol data to be decoded by btmon.
+tester_monitor will forward the data to btmon when -m/--monitor is
+enabled which will attempt to decode the PDUs:
 
-In addition to that this also logs the tester output into btmon since
-that has support to store its output on file this can be quite
-convenient for reporting.
+= test-gatt: /robustness/unkown-command - init                                                                                                                        11:44:53.464325
+= test-gatt: /robustness/unkown-command - setup
+= test-gatt: /robustness/unkown-command - setup complete
+= test-gatt: /robustness/unkown-command - run
+< test-gatt: User Data TX
+      ATT: Exchange MTU Request (0x02) len 2
+        Client RX MTU: 23
+> test-gatt: User Data RX
+      ATT: Exchange MTU Response (0x03) len 2
+        Server RX MTU: 512
+< test-gatt: User Data TX
+      ATT: Unknown (0xff) len 1
+        00                                               .
+= test-gatt: /robustness/unkown-command - test passed
+= test-gatt: /robustness/unkown-command - teardown
+= test-gatt: /robustness/unkown-command - teardown complete
+= test-gatt: /robustness/unkown-command - done
 ---
- src/shared/tester.c | 237 ++++++++++++++++++++++++++++++++++++++++----
- src/shared/tester.h |   4 +
- 2 files changed, 220 insertions(+), 21 deletions(-)
+ unit/test-avctp.c | 11 ++---------
+ unit/test-avdtp.c | 11 ++---------
+ unit/test-avrcp.c | 21 +++++++--------------
+ unit/test-gatt.c  |  6 +++---
+ unit/test-sdp.c   | 11 ++---------
+ 5 files changed, 16 insertions(+), 44 deletions(-)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 80d65110b..05c81a66d 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -27,14 +27,19 @@
+diff --git a/unit/test-avctp.c b/unit/test-avctp.c
+index 3bc35696d..60fd6ad71 100644
+--- a/unit/test-avctp.c
++++ b/unit/test-avctp.c
+@@ -81,13 +81,6 @@ struct context {
+ 		tester_add(name, &data, NULL, function, NULL);		\
+ 	} while (0)
  
- #include <stdio.h>
- #include <errno.h>
-+#include <syslog.h>
- #include <unistd.h>
- #include <stdlib.h>
- #include <string.h>
- #include <signal.h>
- #include <sys/signalfd.h>
-+#include <sys/socket.h>
+-static void test_debug(const char *str, void *user_data)
+-{
+-	const char *prefix = user_data;
+-
+-	tester_debug("%s%s", prefix, str);
+-}
+-
+ static void test_free(gconstpointer user_data)
+ {
+ 	const struct test_data *data = user_data;
+@@ -131,7 +124,7 @@ static gboolean send_pdu(gpointer user_data)
  
- #include <glib.h>
+ 	len = write(context->fd, pdu->data, pdu->size);
  
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+
- #ifdef HAVE_VALGRIND_MEMCHECK_H
- #include <valgrind/memcheck.h>
- #endif
-@@ -54,15 +59,15 @@
- #define COLOR_HIGHLIGHT	"\x1B[1;39m"
+-	util_hexdump('<', pdu->data, len, test_debug, "AVCTP: ");
++	tester_monitor('<', 0x0000, 0x0017, pdu->data, len);
  
- #define print_text(color, fmt, args...) \
--		printf(color fmt COLOR_OFF "\n", ## args)
-+		tester_log(color fmt COLOR_OFF, ## args)
+ 	g_assert_cmpint(len, ==, pdu->size);
  
- #define print_summary(label, color, value, fmt, args...) \
--			printf("%-52s " color "%-10s" COLOR_OFF fmt "\n", \
-+		tester_log("%-52s " color "%-10s" COLOR_OFF fmt, \
- 							label, value, ## args)
+@@ -172,7 +165,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
  
- #define print_progress(name, color, fmt, args...) \
--		printf(COLOR_HIGHLIGHT "%s" COLOR_OFF " - " \
--				color fmt COLOR_OFF "\n", name, ## args)
-+		tester_log(COLOR_HIGHLIGHT "%s" COLOR_OFF " - " \
-+				color fmt COLOR_OFF, name, ## args)
+ 	g_assert(len > 0);
  
- enum test_result {
- 	TEST_RESULT_NOT_RUN,
-@@ -100,6 +105,7 @@ struct test_case {
+-	util_hexdump('>', buf, len, test_debug, "AVCTP: ");
++	tester_monitor('>', 0x0000, 0x0017, buf, len);
+ 
+ 	g_assert_cmpint(len, ==, pdu->size);
+ 
+diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+index dd8aed73c..176852ae7 100644
+--- a/unit/test-avdtp.c
++++ b/unit/test-avdtp.c
+@@ -99,13 +99,6 @@ struct context {
+ 	const struct test_data *data;
  };
  
- static GMainLoop *main_loop;
-+static char *tester_name;
- 
- static GList *test_list;
- static GList *test_current;
-@@ -108,9 +114,25 @@ static GTimer *test_timer;
- static gboolean option_version = FALSE;
- static gboolean option_quiet = FALSE;
- static gboolean option_debug = FALSE;
-+static gboolean option_monitor = FALSE;
- static gboolean option_list = FALSE;
- static const char *option_prefix = NULL;
- 
-+struct monitor_hdr {
-+	uint16_t opcode;
-+	uint16_t index;
-+	uint16_t len;
-+	uint8_t  priority;
-+	uint8_t  ident_len;
-+} __attribute__((packed));
-+
-+struct monitor_l2cap_hdr {
-+	uint16_t cid;
-+	uint16_t psm;
-+} __attribute__((packed));
-+
-+static int monitor_fd = -1;
-+
- static void test_destroy(gpointer data)
+-static void test_debug(const char *str, void *user_data)
+-{
+-	const char *prefix = user_data;
+-
+-	tester_debug("%s%s", prefix, str);
+-}
+-
+ static void test_free(gconstpointer user_data)
  {
- 	struct test_case *test = data;
-@@ -128,43 +150,208 @@ static void test_destroy(gpointer data)
- 	free(test);
- }
+ 	const struct test_data *data = user_data;
+@@ -158,7 +151,7 @@ static gboolean send_pdu(gpointer user_data)
  
--void tester_print(const char *format, ...)
-+static int monitor_open(void)
+ 	len = write(context->fd, pdu->data, pdu->size);
+ 
+-	util_hexdump('<', pdu->data, len, test_debug, "AVDTP: ");
++	tester_monitor('<', 0x0000, 0x0019, pdu->data, len);
+ 
+ 	g_assert_cmpint(len, ==, pdu->size);
+ 
+@@ -215,7 +208,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+ 
+ 	g_assert(len > 0);
+ 
+-	util_hexdump('>', buf, len, test_debug, "AVDTP: ");
++	tester_monitor('>', 0x0000, 0x0019, buf, len);
+ 
+ 	g_assert_cmpint(len, ==, pdu->size);
+ 
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 01307e679..9ffd44cfd 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -113,13 +113,6 @@ struct context {
+ 		tester_add(name, &data, NULL, function, NULL);		\
+ 	} while (0)
+ 
+-static void test_debug(const char *str, void *user_data)
+-{
+-	const char *prefix = user_data;
+-
+-	tester_debug("%s%s", prefix, str);
+-}
+-
+ static void test_free(gconstpointer user_data)
  {
--	va_list ap;
-+	struct sockaddr_hci addr;
-+	int fd;
-+
-+	if (!option_monitor)
-+		return -1;
-+
-+	if (monitor_fd >= 0)
-+		return monitor_fd;
-+
-+	fd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
-+	if (fd < 0)
-+		return fd;
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.hci_family = AF_BLUETOOTH;
-+	addr.hci_dev = HCI_DEV_NONE;
-+	addr.hci_channel = HCI_CHANNEL_LOGGING;
-+
-+	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		option_monitor = FALSE;
-+		tester_debug("Failed to open monitor socket: %s",
-+			     strerror(errno));
-+		close(fd);
-+		return -1;
-+	}
-+
-+	monitor_fd = fd;
-+
-+	return fd;
-+}
-+
-+static void monitor_sendmsg(const char *label, int level, struct iovec *io,
-+							size_t io_len)
-+{
-+	struct monitor_hdr hdr;
-+	struct msghdr msg;
-+	struct iovec iov[5];
-+	size_t i;
-+
-+	monitor_fd = monitor_open();
-+	if (monitor_fd < 0 || io_len > 3)
-+		return;
-+
-+	hdr.opcode = cpu_to_le16(0x0000);
-+	hdr.index = cpu_to_le16(0xffff);
-+	hdr.ident_len = strlen(label) + 1;
-+	hdr.len = cpu_to_le16(2 + hdr.ident_len);
-+	hdr.priority = level;
-+
-+	iov[0].iov_base = &hdr;
-+	iov[0].iov_len = sizeof(hdr);
-+
-+	iov[1].iov_base = (void *) label;
-+	iov[1].iov_len = hdr.ident_len;
-+
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = iov;
-+	msg.msg_iovlen = 2;
-+
-+	for (i = 0; i < io_len; i++) {
-+		iov[i + 2] = io[i];
-+		hdr.len += io[i].iov_len;
-+		msg.msg_iovlen++;
+ 	const struct test_data *data = user_data;
+@@ -164,12 +157,13 @@ static gboolean send_pdu(gpointer user_data)
+ 
+ 	pdu = &context->data->pdu_list[context->pdu_offset++];
+ 
+-	if (pdu->browse)
++	if (pdu->browse) {
+ 		len = write(context->browse_fd, pdu->data, pdu->size);
+-	else
++		tester_monitor('<', 0x0000, 0x001b, pdu->data, len);
++	} else {
+ 		len = write(context->fd, pdu->data, pdu->size);
+-
+-	util_hexdump('<', pdu->data, len, test_debug, "AVRCP: ");
++		tester_monitor('<', 0x0000, 0x0017, pdu->data, len);
 +	}
  
-+	if (sendmsg(monitor_fd, &msg, 0) < 0) {
-+		/* Disable monitor */
-+		option_monitor = FALSE;
-+		tester_debug("Failed to send to monitor: %s", strerror(errno));
-+		close(monitor_fd);
-+		monitor_fd = -1;
-+	}
-+}
-+
-+static void monitor_vprintf(const char *id, int level, const char *format,
-+								va_list ap)
-+{
-+	struct iovec iov;
-+	char *str;
-+
-+	if (!option_monitor)
-+		return;
-+
-+	if (vasprintf(&str, format, ap) < 0)
-+		return;
-+
-+	iov.iov_base = str;
-+	iov.iov_len = strlen(str) + 1;
-+
-+	monitor_sendmsg(id, level, &iov, 1);
-+
-+	free(str);
-+}
-+
-+static void tester_vprintf(const char *format, va_list ap)
-+{
- 	if (tester_use_quiet())
- 		return;
+ 	g_assert_cmpint(len, ==, pdu->size);
  
- 	printf("  %s", COLOR_WHITE);
-+	vprintf(format, ap);
-+	printf("%s\n", COLOR_OFF);
-+}
-+
-+static void tester_log(const char *format, ...)
-+{
-+	va_list ap;
-+
- 	va_start(ap, format);
- 	vprintf(format, ap);
-+	printf("\n");
-+	va_end(ap);
-+
-+	va_start(ap, format);
-+	monitor_vprintf(tester_name, LOG_INFO, format, ap);
-+	va_end(ap);
-+}
-+
-+void tester_print(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+	tester_vprintf(format, ap);
-+	va_end(ap);
-+
-+	va_start(ap, format);
-+	monitor_vprintf(tester_name, LOG_INFO, format, ap);
- 	va_end(ap);
--	printf("%s\n", COLOR_OFF);
+@@ -215,8 +209,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+ 
+ 	g_assert(len > 0);
+ 
+-	if (g_test_verbose())
+-		util_hexdump('>', buf, len, test_debug, "AVRCP: ");
++	tester_monitor('>', 0x0000, 0x0017, buf, len);
+ 
+ 	if (!pdu->continuing)
+ 		g_assert_cmpint(len, ==, pdu->size);
+@@ -254,7 +247,7 @@ static gboolean browse_test_handler(GIOChannel *channel, GIOCondition cond,
+ 
+ 	g_assert(len > 0);
+ 
+-	util_hexdump('>', buf, len, test_debug, "AVRCP: ");
++	tester_monitor('>', 0x0000, 0x001b, buf, len);
+ 
+ 	g_assert_cmpint(len, ==, pdu->size);
+ 
+diff --git a/unit/test-gatt.c b/unit/test-gatt.c
+index c7e28f865..d8d007386 100644
+--- a/unit/test-gatt.c
++++ b/unit/test-gatt.c
+@@ -382,7 +382,7 @@ static gboolean send_pdu(gpointer user_data)
+ 
+ 	len = write(context->fd, pdu->data, pdu->size);
+ 
+-	util_hexdump('<', pdu->data, len, test_debug, "GATT: ");
++	tester_monitor('<', 0x0004, 0x0000, pdu->data, len);
+ 
+ 	g_assert_cmpint(len, ==, pdu->size);
+ 
+@@ -440,7 +440,7 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+ 
+ 	g_assert(len > 0);
+ 
+-	util_hexdump('>', buf, len, test_debug, "GATT: ");
++	tester_monitor('>', 0x0004, 0x0000, buf, len);
+ 
+ 	util_hexdump('=', pdu->data, pdu->size, test_debug, "PDU: ");
+ 
+@@ -1910,7 +1910,7 @@ static void test_server(gconstpointer data)
+ 
+ 	g_assert_cmpint(len, ==, pdu.size);
+ 
+-	util_hexdump('<', pdu.data, len, test_debug, "GATT: ");
++	tester_monitor('<', 0x0004, 0x0000, pdu.data, len);
  }
  
- void tester_debug(const char *format, ...)
+ static void test_search_primary(gconstpointer data)
+diff --git a/unit/test-sdp.c b/unit/test-sdp.c
+index ac921a9a0..b67a55189 100644
+--- a/unit/test-sdp.c
++++ b/unit/test-sdp.c
+@@ -120,13 +120,6 @@ struct context {
+ 	const struct test_data *data;
+ };
+ 
+-static void sdp_debug(const char *str, void *user_data)
+-{
+-	const char *prefix = user_data;
+-
+-	tester_debug("%s%s\n", prefix, str);
+-}
+-
+ static void destroy_context(struct context *context)
  {
- 	va_list ap;
- 
--	if (!tester_use_debug())
--		return;
-+	va_start(ap, format);
-+	tester_vprintf(format, ap);
-+	va_end(ap);
- 
--	printf("  %s", COLOR_WHITE);
- 	va_start(ap, format);
--	vprintf(format, ap);
-+	monitor_vprintf(tester_name, LOG_DEBUG, format, ap);
- 	va_end(ap);
--	printf("%s\n", COLOR_OFF);
- }
- 
- void tester_warn(const char *format, ...)
- {
- 	va_list ap;
- 
--	printf("  %s", COLOR_WHITE);
- 	va_start(ap, format);
--	vprintf(format, ap);
-+	tester_vprintf(format, ap);
-+	va_end(ap);
-+
-+	va_start(ap, format);
-+	monitor_vprintf(tester_name, LOG_WARNING, format, ap);
- 	va_end(ap);
--	printf("%s\n", COLOR_OFF);
-+}
-+
-+static void monitor_debug(const char *str, void *user_data)
-+{
-+	const char *label = user_data;
-+
-+	tester_debug("%s: %s", label, str);
-+}
-+
-+static void monitor_log(char dir, uint16_t cid, uint16_t psm, const void *data,
-+								size_t len)
-+{
-+	struct iovec iov[3];
-+	struct monitor_l2cap_hdr hdr;
-+	uint8_t term = 0x00;
-+	char label[16];
-+
-+	if (snprintf(label, sizeof(label), "%c %s", dir, tester_name) < 0)
-+		return;
-+
-+	hdr.cid = cpu_to_le16(cid);
-+	hdr.psm = cpu_to_le16(psm);
-+
-+	iov[0].iov_base = &hdr;
-+	iov[0].iov_len = sizeof(hdr);
-+
-+	iov[1].iov_base = (void *) data;
-+	iov[1].iov_len = len;
-+
-+	/* Kernel won't forward if data is no NULL terminated */
-+	iov[2].iov_base = &term;
-+	iov[2].iov_len = sizeof(term);
-+
-+	monitor_sendmsg(label, LOG_INFO, iov, 3);
-+}
-+
-+void tester_monitor(char dir, uint16_t cid, uint16_t psm, const void *data,
-+								size_t len)
-+{
-+	monitor_log(dir, cid, psm, data, len);
-+
-+	if (!tester_use_debug())
-+		return;
-+
-+	util_hexdump(dir, data, len, monitor_debug, (void *) tester_name);
- }
- 
- static void default_pre_setup(const void *test_data)
-@@ -208,7 +395,7 @@ void tester_add_full(const char *name, const void *test_data,
+ 	sdp_svcdb_collect_all(context->fd);
+@@ -186,7 +179,7 @@ static gboolean server_handler(GIOChannel *channel, GIOCondition cond,
+ 		return FALSE;
  	}
  
- 	if (option_list) {
--		printf("%s\n", name);
-+		tester_log("%s", name);
- 		if (destroy)
- 			destroy(user_data);
- 		return;
-@@ -278,7 +465,7 @@ static int tester_summarize(void)
- 	gdouble execution_time;
- 	GList *list;
+-	util_hexdump('<', buf, len, sdp_debug, "SDP: ");
++	tester_monitor('<', 0x0000, 0x0001, buf, len);
  
--	printf("\n");
-+	tester_log("");
- 	print_text(COLOR_HIGHLIGHT, "");
- 	print_text(COLOR_HIGHLIGHT, "Test Summary");
- 	print_text(COLOR_HIGHLIGHT, "------------");
-@@ -312,17 +499,17 @@ static int tester_summarize(void)
- 		}
-         }
+ 	handle_internal_request(fd, context->data->mtu, buf, len);
  
--	printf("\nTotal: %d, "
-+	tester_log("Total: %d, "
- 		COLOR_GREEN "Passed: %d (%.1f%%)" COLOR_OFF ", "
- 		COLOR_RED "Failed: %d" COLOR_OFF ", "
--		COLOR_YELLOW "Not Run: %d" COLOR_OFF "\n",
-+		COLOR_YELLOW "Not Run: %d" COLOR_OFF,
- 			not_run + passed + failed, passed,
- 			(not_run + passed + failed) ?
- 			(float) passed * 100 / (not_run + passed + failed) : 0,
- 			failed, not_run);
+@@ -254,7 +247,7 @@ static gboolean client_handler(GIOChannel *channel, GIOCondition cond,
+ 	if (len < 0)
+ 		return FALSE;
  
- 	execution_time = g_timer_elapsed(test_timer, NULL);
--	printf("Overall execution time: %.3g seconds\n", execution_time);
-+	tester_log("Overall execution time: %.3g seconds", execution_time);
+-	util_hexdump('>', buf, len, sdp_debug, "SDP: ");
++	tester_monitor('>', 0x0000, 0x0001, buf, len);
  
- 	return failed;
- }
-@@ -379,7 +566,7 @@ static void next_test_case(void)
- 
- 	test = test_current->data;
- 
--	printf("\n");
-+	tester_log("");
- 	print_progress(test->name, COLOR_BLACK, "init");
- 
- 	test->start_time = g_timer_elapsed(test_timer, NULL);
-@@ -774,6 +961,8 @@ static GOptionEntry options[] = {
- 				"Run tests without logging" },
- 	{ "debug", 'd', 0, G_OPTION_ARG_NONE, &option_debug,
- 				"Run tests with debug output" },
-+	{ "monitor", 'm', 0, G_OPTION_ARG_NONE, &option_monitor,
-+				"Enable monitor output" },
- 	{ "list", 'l', 0, G_OPTION_ARG_NONE, &option_list,
- 				"Only list the tests to be run" },
- 	{ "prefix", 'p', 0, G_OPTION_ARG_STRING, &option_prefix,
-@@ -807,6 +996,12 @@ void tester_init(int *argc, char ***argv)
- 
- 	main_loop = g_main_loop_new(NULL, FALSE);
- 
-+	tester_name = strrchr(*argv[0], '/');
-+	if (!tester_name)
-+		tester_name = strdup(*argv[0]);
-+	else
-+		tester_name = strdup(++tester_name);
-+
- 	test_list = NULL;
- 	test_current = NULL;
- }
-diff --git a/src/shared/tester.h b/src/shared/tester.h
-index 83ef5de7a..96e8dc901 100644
---- a/src/shared/tester.h
-+++ b/src/shared/tester.h
-@@ -22,6 +22,8 @@
-  */
- 
- #include <stdbool.h>
-+#include <stddef.h>
-+#include <stdint.h>
- 
- void tester_init(int *argc, char ***argv);
- int tester_run(void);
-@@ -35,6 +37,8 @@ void tester_warn(const char *format, ...)
- 				__attribute__((format(printf, 1, 2)));
- void tester_debug(const char *format, ...)
- 				__attribute__((format(printf, 1, 2)));
-+void tester_monitor(char dir, uint16_t cid, uint16_t psm, const void *data,
-+								size_t len);
- 
- typedef void (*tester_destroy_func_t)(void *user_data);
- typedef void (*tester_data_func_t)(const void *test_data);
+ 	g_assert(len > 0);
+ 	g_assert((size_t) len == rsp_pdu->raw_size + rsp_pdu->cont_len);
 -- 
 2.17.1
 
