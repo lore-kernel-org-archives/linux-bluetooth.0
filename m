@@ -2,72 +2,68 @@ Return-Path: <SRS0=1XHc=MR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BBCFC00449
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Oct 2018 09:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EE2C65BA7
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Oct 2018 09:00:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FD0F208E7
+	by mail.kernel.org (Postfix) with ESMTP id EBD2F20652
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Oct 2018 09:00:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ujGPJXeX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD0F208E7
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hqhqUpmv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBD2F20652
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728596AbeJEP6T (ORCPT
+        id S1728608AbeJEP6U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Oct 2018 11:58:19 -0400
-Received: from mail-lf1-f48.google.com ([209.85.167.48]:35012 "EHLO
-        mail-lf1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728509AbeJEP6T (ORCPT
+        Fri, 5 Oct 2018 11:58:20 -0400
+Received: from mail-lf1-f50.google.com ([209.85.167.50]:39233 "EHLO
+        mail-lf1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727942AbeJEP6U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Oct 2018 11:58:19 -0400
-Received: by mail-lf1-f48.google.com with SMTP id r191-v6so8834381lff.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Oct 2018 02:00:31 -0700 (PDT)
+        Fri, 5 Oct 2018 11:58:20 -0400
+Received: by mail-lf1-f50.google.com with SMTP id w21-v6so8829210lff.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Oct 2018 02:00:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=TpwWCpHenp/GogILBCyRX+o266wqgOyKW0+hlqSLLNk=;
-        b=ujGPJXeX27e7B1c+lFtiCvhfLGfrCmFtRlaW98F/fr/HVa+RYaceLfMSUtSfJ/M0/s
-         pWyiPVMy/j5j0j+WWv8TcGQxnWyyB6Xa7huvxIT4mb2HNRP8hFJzvsyyaOKvRE9Fpri7
-         Ze3WRgWMX1HEBiglxTnRAt48MA7dFVVOsKUauoNdJHaWUj0Tany2GG+8QaBESFWWadbo
-         RfrEhSWtJDzxvn0GE9WZrFiWWr5Ck2MQMulNmGn8BqIt/J6/F71LtPOoBAA0igmdLqsu
-         KB2+Lu6wPnRIcHo/hFQL3Xlb3IWkMEN5juq4A6S7ZyZzhR3f0riJbOqs8qas5d0DCTPw
-         mjcA==
+        h=from:to:subject:date:message-id;
+        bh=jrkeAE3U17Jed6f85Smy2EZ45Dy5njnIPlAEuNOLMbE=;
+        b=hqhqUpmvesEiVhOpWjvm+4clkvykPoksQXLfSMaU93EEPIyQKOMhNDgpoYGf/8vmJU
+         CwYYwnMdqLBVvPFOMplS0MCZiaI54SqYwY32ELom6LjUOaKBXp6LudnrPjvKf2Ty7sRn
+         FQMwlDLQZFpRDnXCCRYi67lLvtqQUo/z6ZaeTgHJZdEJKcna/UTewdm0Ule4DILtXE2f
+         P9484luc3Ola/AMIO+7LZ7tG7y7vuGXoT/1YRVnGjShPnjj1H8NN5CvRm4ZlCKR6qCnb
+         3mY0+GZd7yorZ6y0auc6guHeuM2QhJV+xXUz109ZhUTyvGsgh6lTfYJdNEsCuEO/MehN
+         m4Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references;
-        bh=TpwWCpHenp/GogILBCyRX+o266wqgOyKW0+hlqSLLNk=;
-        b=eUp6A6Y3CewVEvlE2rVe34ORXzCJw0sKjd9UHK+eBSnfcTJoQIPdmRjS6VuikNjV4y
-         OjP1rvE4q4qMaAKkSvWY7mhukG9GR+7Ffh4UJWzuYzxa2KD1Te4YlNjjDyh4ciDBMYQv
-         4Q9VsKl0orIt5apg0H2tEQVIYboIGcMpf01JZKUQ3druxGj6fXL2XdI9QqDc2Y1NAgrO
-         cf9Kg7g07kDvF5KCjufvJTCNHdvRPZ/8TmddUJ3aO/qkfprbeq1X7DfkesYbe+jGql6p
-         Z3+keIyolQt8ykx4wHLSqRZQUZkzSHk23rNzSFCrGbG4r1maqiDTz2Ci6UnM/hY/jkhb
-         9fow==
-X-Gm-Message-State: ABuFfogheIidHGOUzDHMkXJPJ5bmGDzTN+FUk6ARbDFHHwJUV2KS/Sy3
-        +qmDBiKr19TDUi5rfFmWkBrfQtjq
-X-Google-Smtp-Source: ACcGV61t0tqi1Y6GtRvbA10QeVgqDXmlJB2oPLsuCB5sIPTeULh8P/GguvT29fJVsW+cXIkJWu8dpA==
-X-Received: by 2002:a19:6544:: with SMTP id c4-v6mr5836118lfj.31.1538730029865;
-        Fri, 05 Oct 2018 02:00:29 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=jrkeAE3U17Jed6f85Smy2EZ45Dy5njnIPlAEuNOLMbE=;
+        b=DtZGQmhY/m3Kqi1sS21yyVPdxt/Hg/+yp29Q7okI4O02VrtwTA9fIClG9AUDMxMw7b
+         5fc7hAlOF9YqiMjtXmXQW0nhes4INSGHWmdCWkC/k8JmZZA2DMlz7e8++4Hm0VpVz3VQ
+         nS8dyRkhFMOEhIrLG1Lp7dAK5avN1cyLBdWLGlnkgQmThrbX9PfHZ5ZDOpY7i761kMd0
+         hfGY8wFrQsM6NPIPDwK3Pv3c4uuajuQG1j8zcV/pBwrtWqEZmu9EjP1Sk02qEM64K29G
+         LUlpOvRZvyCEFu+ZslRjYbwQ0ZVgwbNShXoz96FYAD3OA7X6qMjG1SJQuIgNq/krwmIr
+         q4Tw==
+X-Gm-Message-State: ABuFfojuuAwjda6t5C8XJjSVrwifZK7vSF2dwrjSQ3wGX5SMuLWDVZjC
+        2TMKq0QCRUG8IsLoxp6b7PFLwI5f
+X-Google-Smtp-Source: ACcGV61PgnwJluL2HOEWWp0ocCXn1SYOz3GKGAnms4IxNhsDH8lpyVBwCfBMQ+dPGZqhUMYBEjuuEg==
+X-Received: by 2002:a19:9d8d:: with SMTP id g135-v6mr6406215lfe.3.1538730028865;
+        Fri, 05 Oct 2018 02:00:28 -0700 (PDT)
 Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
-        by smtp.gmail.com with ESMTPSA id a12-v6sm241355lfe.73.2018.10.05.02.00.28
+        by smtp.gmail.com with ESMTPSA id a12-v6sm241355lfe.73.2018.10.05.02.00.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 05 Oct 2018 02:00:29 -0700 (PDT)
+        Fri, 05 Oct 2018 02:00:27 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] monitor: Add support for user input/output data
-Date:   Fri,  5 Oct 2018 12:00:25 +0300
-Message-Id: <20181005090026.7535-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] shared/tester: Add option to print to monitor
+Date:   Fri,  5 Oct 2018 12:00:24 +0300
+Message-Id: <20181005090026.7535-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20181005090026.7535-1-luiz.dentz@gmail.com>
-References: <20181005090026.7535-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -75,239 +71,407 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This detects if the user logging is an input/output and then proceed to
-decode the header which inform for which CID and PSM the data is for.
----
- monitor/l2cap.c  | 35 ++++++++++++++++++++---------------
- monitor/l2cap.h  |  3 +++
- monitor/packet.c | 41 ++++++++++++++++++++++++++++++++++++++---
- monitor/packet.h |  3 ++-
- 4 files changed, 63 insertions(+), 19 deletions(-)
+This adds option -m/--monitor that can be used toguether with
+tester_monitor to send protocol data to be decoded by btmon.
 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index ef2a14410..05a33b903 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -1384,7 +1384,8 @@ static const struct sig_opcode_data le_sig_opcode_table[] = {
+In addition to that this also logs the tester output into btmon since
+that has support to store its output on file this can be quite
+convenient for reporting.
+---
+ src/shared/tester.c | 237 ++++++++++++++++++++++++++++++++++++++++----
+ src/shared/tester.h |   4 +
+ 2 files changed, 220 insertions(+), 21 deletions(-)
+
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index 80d65110b..05c81a66d 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -27,14 +27,19 @@
  
- static void l2cap_frame_init(struct l2cap_frame *frame, uint16_t index, bool in,
- 				uint16_t handle, uint8_t ident,
--				uint16_t cid, const void *data, uint16_t size)
-+				uint16_t cid, uint16_t psm,
-+				const void *data, uint16_t size)
- {
- 	frame->index   = index;
- 	frame->in      = in;
-@@ -1393,10 +1394,10 @@ static void l2cap_frame_init(struct l2cap_frame *frame, uint16_t index, bool in,
- 	frame->cid     = cid;
- 	frame->data    = data;
- 	frame->size    = size;
--	frame->psm     = get_psm(frame);
-+	frame->psm     = psm ? psm : get_psm(frame);
- 	frame->mode    = get_mode(frame);
- 	frame->chan    = get_chan(frame);
--	frame->seq_num = get_seq_num(frame);
-+	frame->seq_num = psm ? 1 : get_seq_num(frame);
- }
+ #include <stdio.h>
+ #include <errno.h>
++#include <syslog.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <string.h>
+ #include <signal.h>
+ #include <sys/signalfd.h>
++#include <sys/socket.h>
  
- static void bredr_sig_packet(uint16_t index, bool in, uint16_t handle,
-@@ -1479,7 +1480,7 @@ static void bredr_sig_packet(uint16_t index, bool in, uint16_t handle,
- 			}
- 		}
+ #include <glib.h>
  
--		l2cap_frame_init(&frame, index, in, handle, hdr->ident, cid,
-+		l2cap_frame_init(&frame, index, in, handle, hdr->ident, cid, 0,
- 								data, len);
- 		opcode_data->func(&frame);
- 
-@@ -1561,7 +1562,8 @@ static void le_sig_packet(uint16_t index, bool in, uint16_t handle,
- 		}
- 	}
- 
--	l2cap_frame_init(&frame, index, in, handle, hdr->ident, cid, data, len);
-+	l2cap_frame_init(&frame, index, in, handle, hdr->ident, cid, 0,
-+							data, len);
- 	opcode_data->func(&frame);
- }
- 
-@@ -1592,7 +1594,7 @@ static void connless_packet(uint16_t index, bool in, uint16_t handle,
- 		break;
- 	}
- 
--	l2cap_frame_init(&frame, index, in, handle, 0, cid, data, size);
-+	l2cap_frame_init(&frame, index, in, handle, 0, cid, 0, data, size);
- }
- 
- static void print_controller_list(const uint8_t *data, uint16_t size)
-@@ -1961,7 +1963,7 @@ static void amp_packet(uint16_t index, bool in, uint16_t handle,
- 		}
- 	}
- 
--	l2cap_frame_init(&frame, index, in, handle, 0, cid, data + 6, len);
-+	l2cap_frame_init(&frame, index, in, handle, 0, cid, 0, data + 6, len);
- 	opcode_data->func(&frame);
- }
- 
-@@ -2544,7 +2546,8 @@ static void att_packet(uint16_t index, bool in, uint16_t handle,
- 		}
- 	}
- 
--	l2cap_frame_init(&frame, index, in, handle, 0, cid, data + 1, size - 1);
-+	l2cap_frame_init(&frame, index, in, handle, 0, cid, 0,
-+						data + 1, size - 1);
- 	opcode_data->func(&frame);
- }
- 
-@@ -3000,12 +3003,13 @@ static void smp_packet(uint16_t index, bool in, uint16_t handle,
- 		}
- 	}
- 
--	l2cap_frame_init(&frame, index, in, handle, 0, cid, data + 1, size - 1);
-+	l2cap_frame_init(&frame, index, in, handle, 0, cid, 0,
-+						data + 1, size - 1);
- 	opcode_data->func(&frame);
- }
- 
--static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
--			uint16_t cid, const void *data, uint16_t size)
-+void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
-+			uint16_t psm, const void *data, uint16_t size)
- {
- 	struct l2cap_frame frame;
- 	uint32_t ctrl32 = 0;
-@@ -3033,7 +3037,8 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
- 		smp_packet(index, in, handle, cid, data, size);
- 		break;
- 	default:
--		l2cap_frame_init(&frame, index, in, handle, 0, cid, data, size);
-+		l2cap_frame_init(&frame, index, in, handle, 0, cid, psm,
-+							data, size);
- 
- 		if (frame.mode > 0) {
- 			ext_ctrl = get_ext_ctrl(&frame);
-@@ -3136,7 +3141,7 @@ void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
- 
- 		if (len == size) {
- 			/* complete frame */
--			l2cap_frame(index, in, handle, cid, data, len);
-+			l2cap_frame(index, in, handle, cid, 0, data, len);
- 			return;
- 		}
- 
-@@ -3181,7 +3186,7 @@ void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
- 		if (!index_list[index][in].frag_len) {
- 			/* complete frame */
- 			l2cap_frame(index, in, handle,
--					index_list[index][in].frag_cid,
-+					index_list[index][in].frag_cid, 0,
- 					index_list[index][in].frag_buf,
- 					index_list[index][in].frag_pos);
- 			clear_fragment_buffer(index, in);
-@@ -3216,7 +3221,7 @@ void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
- 		}
- 
- 		/* complete frame */
--		l2cap_frame(index, in, handle, cid, data, len);
-+		l2cap_frame(index, in, handle, cid, 0, data, len);
- 		break;
- 
- 	default:
-diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-index 813c7932a..07864caee 100644
---- a/monitor/l2cap.h
-+++ b/monitor/l2cap.h
-@@ -170,6 +170,9 @@ static inline bool l2cap_frame_get_be128(struct l2cap_frame *frame,
- 	return true;
- }
- 
-+void l2cap_frame(uint16_t index, bool in, uint16_t handle, uint16_t cid,
-+		uint16_t psm, const void *data, uint16_t size);
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
 +
- void l2cap_packet(uint16_t index, bool in, uint16_t handle, uint8_t flags,
- 					const void *data, uint16_t size);
+ #ifdef HAVE_VALGRIND_MEMCHECK_H
+ #include <valgrind/memcheck.h>
+ #endif
+@@ -54,15 +59,15 @@
+ #define COLOR_HIGHLIGHT	"\x1B[1;39m"
  
-diff --git a/monitor/packet.c b/monitor/packet.c
-index aca0761fd..6932f592d 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -3947,7 +3947,8 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 		ident = ul->ident_len ? data + sizeof(*ul) : NULL;
+ #define print_text(color, fmt, args...) \
+-		printf(color fmt COLOR_OFF "\n", ## args)
++		tester_log(color fmt COLOR_OFF, ## args)
  
- 		packet_user_logging(tv, cred, index, ul->priority, ident,
--					data + sizeof(*ul) + ul->ident_len);
-+					data + sizeof(*ul) + ul->ident_len,
-+					size - (sizeof(*ul) + ul->ident_len));
- 		break;
- 	case BTSNOOP_OPCODE_CTRL_OPEN:
- 		control_disable_decoding();
-@@ -9873,9 +9874,36 @@ void packet_system_note(struct timeval *tv, struct ucred *cred,
- 					"Note", message, NULL);
- }
+ #define print_summary(label, color, value, fmt, args...) \
+-			printf("%-52s " color "%-10s" COLOR_OFF fmt "\n", \
++		tester_log("%-52s " color "%-10s" COLOR_OFF fmt, \
+ 							label, value, ## args)
  
+ #define print_progress(name, color, fmt, args...) \
+-		printf(COLOR_HIGHLIGHT "%s" COLOR_OFF " - " \
+-				color fmt COLOR_OFF "\n", name, ## args)
++		tester_log(COLOR_HIGHLIGHT "%s" COLOR_OFF " - " \
++				color fmt COLOR_OFF, name, ## args)
+ 
+ enum test_result {
+ 	TEST_RESULT_NOT_RUN,
+@@ -100,6 +105,7 @@ struct test_case {
+ };
+ 
+ static GMainLoop *main_loop;
++static char *tester_name;
+ 
+ static GList *test_list;
+ static GList *test_current;
+@@ -108,9 +114,25 @@ static GTimer *test_timer;
+ static gboolean option_version = FALSE;
+ static gboolean option_quiet = FALSE;
+ static gboolean option_debug = FALSE;
++static gboolean option_monitor = FALSE;
+ static gboolean option_list = FALSE;
+ static const char *option_prefix = NULL;
+ 
++struct monitor_hdr {
++	uint16_t opcode;
++	uint16_t index;
++	uint16_t len;
++	uint8_t  priority;
++	uint8_t  ident_len;
++} __attribute__((packed));
++
 +struct monitor_l2cap_hdr {
 +	uint16_t cid;
 +	uint16_t psm;
-+};
++} __attribute__((packed));
 +
-+static void packet_decode(struct timeval *tv, struct ucred *cred, char dir,
-+				uint16_t index, const char *color,
-+				const char *label, const void *data,
-+				uint16_t size)
-+{
-+	const struct monitor_l2cap_hdr *hdr = data;
++static int monitor_fd = -1;
 +
-+	if (size < sizeof(*hdr)) {
-+		print_packet(tv, cred, '*', index, NULL, COLOR_ERROR,
-+			"Malformed User Data packet", NULL, NULL);
-+	}
-+
-+	print_packet(tv, cred, dir, index, NULL, COLOR_HCI_ACLDATA, label,
-+				dir == '>' ? "User Data RX" : "User Data TX",
-+				NULL);
-+
-+	/* Discard last byte since it just a filler */
-+	l2cap_frame(index, dir == '>', 0, hdr->cid, hdr->psm,
-+			data + sizeof(*hdr), size - (sizeof(*hdr) + 1));
-+}
-+
- void packet_user_logging(struct timeval *tv, struct ucred *cred,
- 					uint16_t index, uint8_t priority,
--					const char *ident, const char *message)
-+					const char *ident, const void *data,
-+					uint16_t size)
+ static void test_destroy(gpointer data)
  {
- 	char pid_str[140];
- 	const char *label;
-@@ -9930,7 +9958,14 @@ void packet_user_logging(struct timeval *tv, struct ucred *cred,
- 			label = "Message";
- 	}
- 
--	print_packet(tv, cred, '=', index, NULL, color, label, message, NULL);
-+	if (ident[0] == '<' || ident[0] == '>') {
-+		packet_decode(tv, cred, ident[0], index, color,
-+				label == ident ? &ident[2] : label,
-+				data, size);
-+		return;
-+	}
-+
-+	print_packet(tv, cred, '=', index, NULL, color, label, data, NULL);
+ 	struct test_case *test = data;
+@@ -128,43 +150,208 @@ static void test_destroy(gpointer data)
+ 	free(test);
  }
  
- void packet_hci_command(struct timeval *tv, struct ucred *cred, uint16_t index,
-diff --git a/monitor/packet.h b/monitor/packet.h
-index 03279e114..199e15e58 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -83,7 +83,8 @@ void packet_system_note(struct timeval *tv, struct ucred *cred,
- 					uint16_t index, const void *message);
- void packet_user_logging(struct timeval *tv, struct ucred *cred,
- 					uint16_t index, uint8_t priority,
--					const char *ident, const char *message);
-+					const char *ident, const void *data,
-+					uint16_t size);
+-void tester_print(const char *format, ...)
++static int monitor_open(void)
+ {
+-	va_list ap;
++	struct sockaddr_hci addr;
++	int fd;
++
++	if (!option_monitor)
++		return -1;
++
++	if (monitor_fd >= 0)
++		return monitor_fd;
++
++	fd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
++	if (fd < 0)
++		return fd;
++
++	memset(&addr, 0, sizeof(addr));
++	addr.hci_family = AF_BLUETOOTH;
++	addr.hci_dev = HCI_DEV_NONE;
++	addr.hci_channel = HCI_CHANNEL_LOGGING;
++
++	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		option_monitor = FALSE;
++		tester_debug("Failed to open monitor socket: %s",
++			     strerror(errno));
++		close(fd);
++		return -1;
++	}
++
++	monitor_fd = fd;
++
++	return fd;
++}
++
++static void monitor_sendmsg(const char *label, int level, struct iovec *io,
++							size_t io_len)
++{
++	struct monitor_hdr hdr;
++	struct msghdr msg;
++	struct iovec iov[5];
++	size_t i;
++
++	monitor_fd = monitor_open();
++	if (monitor_fd < 0 || io_len > 3)
++		return;
++
++	hdr.opcode = cpu_to_le16(0x0000);
++	hdr.index = cpu_to_le16(0xffff);
++	hdr.ident_len = strlen(label) + 1;
++	hdr.len = cpu_to_le16(2 + hdr.ident_len);
++	hdr.priority = level;
++
++	iov[0].iov_base = &hdr;
++	iov[0].iov_len = sizeof(hdr);
++
++	iov[1].iov_base = (void *) label;
++	iov[1].iov_len = hdr.ident_len;
++
++	memset(&msg, 0, sizeof(msg));
++	msg.msg_iov = iov;
++	msg.msg_iovlen = 2;
++
++	for (i = 0; i < io_len; i++) {
++		iov[i + 2] = io[i];
++		hdr.len += io[i].iov_len;
++		msg.msg_iovlen++;
++	}
  
- void packet_hci_command(struct timeval *tv, struct ucred *cred, uint16_t index,
- 					const void *data, uint16_t size);
++	if (sendmsg(monitor_fd, &msg, 0) < 0) {
++		/* Disable monitor */
++		option_monitor = FALSE;
++		tester_debug("Failed to send to monitor: %s", strerror(errno));
++		close(monitor_fd);
++		monitor_fd = -1;
++	}
++}
++
++static void monitor_vprintf(const char *id, int level, const char *format,
++								va_list ap)
++{
++	struct iovec iov;
++	char *str;
++
++	if (!option_monitor)
++		return;
++
++	if (vasprintf(&str, format, ap) < 0)
++		return;
++
++	iov.iov_base = str;
++	iov.iov_len = strlen(str) + 1;
++
++	monitor_sendmsg(id, level, &iov, 1);
++
++	free(str);
++}
++
++static void tester_vprintf(const char *format, va_list ap)
++{
+ 	if (tester_use_quiet())
+ 		return;
+ 
+ 	printf("  %s", COLOR_WHITE);
++	vprintf(format, ap);
++	printf("%s\n", COLOR_OFF);
++}
++
++static void tester_log(const char *format, ...)
++{
++	va_list ap;
++
+ 	va_start(ap, format);
+ 	vprintf(format, ap);
++	printf("\n");
++	va_end(ap);
++
++	va_start(ap, format);
++	monitor_vprintf(tester_name, LOG_INFO, format, ap);
++	va_end(ap);
++}
++
++void tester_print(const char *format, ...)
++{
++	va_list ap;
++
++	va_start(ap, format);
++	tester_vprintf(format, ap);
++	va_end(ap);
++
++	va_start(ap, format);
++	monitor_vprintf(tester_name, LOG_INFO, format, ap);
+ 	va_end(ap);
+-	printf("%s\n", COLOR_OFF);
+ }
+ 
+ void tester_debug(const char *format, ...)
+ {
+ 	va_list ap;
+ 
+-	if (!tester_use_debug())
+-		return;
++	va_start(ap, format);
++	tester_vprintf(format, ap);
++	va_end(ap);
+ 
+-	printf("  %s", COLOR_WHITE);
+ 	va_start(ap, format);
+-	vprintf(format, ap);
++	monitor_vprintf(tester_name, LOG_DEBUG, format, ap);
+ 	va_end(ap);
+-	printf("%s\n", COLOR_OFF);
+ }
+ 
+ void tester_warn(const char *format, ...)
+ {
+ 	va_list ap;
+ 
+-	printf("  %s", COLOR_WHITE);
+ 	va_start(ap, format);
+-	vprintf(format, ap);
++	tester_vprintf(format, ap);
++	va_end(ap);
++
++	va_start(ap, format);
++	monitor_vprintf(tester_name, LOG_WARNING, format, ap);
+ 	va_end(ap);
+-	printf("%s\n", COLOR_OFF);
++}
++
++static void monitor_debug(const char *str, void *user_data)
++{
++	const char *label = user_data;
++
++	tester_debug("%s: %s", label, str);
++}
++
++static void monitor_log(char dir, uint16_t cid, uint16_t psm, const void *data,
++								size_t len)
++{
++	struct iovec iov[3];
++	struct monitor_l2cap_hdr hdr;
++	uint8_t term = 0x00;
++	char label[16];
++
++	if (snprintf(label, sizeof(label), "%c %s", dir, tester_name) < 0)
++		return;
++
++	hdr.cid = cpu_to_le16(cid);
++	hdr.psm = cpu_to_le16(psm);
++
++	iov[0].iov_base = &hdr;
++	iov[0].iov_len = sizeof(hdr);
++
++	iov[1].iov_base = (void *) data;
++	iov[1].iov_len = len;
++
++	/* Kernel won't forward if data is no NULL terminated */
++	iov[2].iov_base = &term;
++	iov[2].iov_len = sizeof(term);
++
++	monitor_sendmsg(label, LOG_INFO, iov, 3);
++}
++
++void tester_monitor(char dir, uint16_t cid, uint16_t psm, const void *data,
++								size_t len)
++{
++	monitor_log(dir, cid, psm, data, len);
++
++	if (!tester_use_debug())
++		return;
++
++	util_hexdump(dir, data, len, monitor_debug, (void *) tester_name);
+ }
+ 
+ static void default_pre_setup(const void *test_data)
+@@ -208,7 +395,7 @@ void tester_add_full(const char *name, const void *test_data,
+ 	}
+ 
+ 	if (option_list) {
+-		printf("%s\n", name);
++		tester_log("%s", name);
+ 		if (destroy)
+ 			destroy(user_data);
+ 		return;
+@@ -278,7 +465,7 @@ static int tester_summarize(void)
+ 	gdouble execution_time;
+ 	GList *list;
+ 
+-	printf("\n");
++	tester_log("");
+ 	print_text(COLOR_HIGHLIGHT, "");
+ 	print_text(COLOR_HIGHLIGHT, "Test Summary");
+ 	print_text(COLOR_HIGHLIGHT, "------------");
+@@ -312,17 +499,17 @@ static int tester_summarize(void)
+ 		}
+         }
+ 
+-	printf("\nTotal: %d, "
++	tester_log("Total: %d, "
+ 		COLOR_GREEN "Passed: %d (%.1f%%)" COLOR_OFF ", "
+ 		COLOR_RED "Failed: %d" COLOR_OFF ", "
+-		COLOR_YELLOW "Not Run: %d" COLOR_OFF "\n",
++		COLOR_YELLOW "Not Run: %d" COLOR_OFF,
+ 			not_run + passed + failed, passed,
+ 			(not_run + passed + failed) ?
+ 			(float) passed * 100 / (not_run + passed + failed) : 0,
+ 			failed, not_run);
+ 
+ 	execution_time = g_timer_elapsed(test_timer, NULL);
+-	printf("Overall execution time: %.3g seconds\n", execution_time);
++	tester_log("Overall execution time: %.3g seconds", execution_time);
+ 
+ 	return failed;
+ }
+@@ -379,7 +566,7 @@ static void next_test_case(void)
+ 
+ 	test = test_current->data;
+ 
+-	printf("\n");
++	tester_log("");
+ 	print_progress(test->name, COLOR_BLACK, "init");
+ 
+ 	test->start_time = g_timer_elapsed(test_timer, NULL);
+@@ -774,6 +961,8 @@ static GOptionEntry options[] = {
+ 				"Run tests without logging" },
+ 	{ "debug", 'd', 0, G_OPTION_ARG_NONE, &option_debug,
+ 				"Run tests with debug output" },
++	{ "monitor", 'm', 0, G_OPTION_ARG_NONE, &option_monitor,
++				"Enable monitor output" },
+ 	{ "list", 'l', 0, G_OPTION_ARG_NONE, &option_list,
+ 				"Only list the tests to be run" },
+ 	{ "prefix", 'p', 0, G_OPTION_ARG_STRING, &option_prefix,
+@@ -807,6 +996,12 @@ void tester_init(int *argc, char ***argv)
+ 
+ 	main_loop = g_main_loop_new(NULL, FALSE);
+ 
++	tester_name = strrchr(*argv[0], '/');
++	if (!tester_name)
++		tester_name = strdup(*argv[0]);
++	else
++		tester_name = strdup(++tester_name);
++
+ 	test_list = NULL;
+ 	test_current = NULL;
+ }
+diff --git a/src/shared/tester.h b/src/shared/tester.h
+index 83ef5de7a..96e8dc901 100644
+--- a/src/shared/tester.h
++++ b/src/shared/tester.h
+@@ -22,6 +22,8 @@
+  */
+ 
+ #include <stdbool.h>
++#include <stddef.h>
++#include <stdint.h>
+ 
+ void tester_init(int *argc, char ***argv);
+ int tester_run(void);
+@@ -35,6 +37,8 @@ void tester_warn(const char *format, ...)
+ 				__attribute__((format(printf, 1, 2)));
+ void tester_debug(const char *format, ...)
+ 				__attribute__((format(printf, 1, 2)));
++void tester_monitor(char dir, uint16_t cid, uint16_t psm, const void *data,
++								size_t len);
+ 
+ typedef void (*tester_destroy_func_t)(void *user_data);
+ typedef void (*tester_data_func_t)(const void *test_data);
 -- 
 2.17.1
 
