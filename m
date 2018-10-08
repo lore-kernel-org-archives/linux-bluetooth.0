@@ -2,100 +2,71 @@ Return-Path: <SRS0=+CIn=MU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2184C00449
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Oct 2018 10:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8018DC65C20
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Oct 2018 14:34:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4831F20858
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Oct 2018 10:34:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mRYrV5DV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4831F20858
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=intel.corp-partner.google.com
+	by mail.kernel.org (Postfix) with ESMTP id 384002075C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Oct 2018 14:34:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 384002075C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m-reimer.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726511AbeJHRpu (ORCPT
+        id S1726391AbeJHVqc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Oct 2018 13:45:50 -0400
-Received: from mail-ua1-f47.google.com ([209.85.222.47]:38112 "EHLO
-        mail-ua1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726193AbeJHRpt (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Oct 2018 13:45:49 -0400
-Received: by mail-ua1-f47.google.com with SMTP id r20so4489136uam.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Oct 2018 03:34:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=78R+JaVGnYOic9ylLsWyiUF18RjXyIwOegPsMHZuucg=;
-        b=mRYrV5DV1lEJge1wMLqvPuiKQKWYDlW/d9wHT5MoujlUNNUNTg0EAvfIKtfy2JVDKO
-         VaC0R6pLcs7z03Yyr1r6lK5OIK7WH+bD84S6a0wp/XWdlZi908ifxECCqadDZv1C2QXG
-         9mMdAOtmeaeNTbedM4v4CaPQu2PsN+NZ8wkmARA19cZgpPkQJqSAFafJsJS+5OMJZUko
-         AttxCYNb46/KSWCRqZEUoNM0AcNbNyGNDWdXQbXo8IRVnlOqE/hsrRAP6FwWBCCqUz/9
-         ADn0yLtdC+96r7MY26NG6zdXRjLOi4rLjzBTdaCaX5ZK+wtgkL2N2zHRclOzchetL+j0
-         H8dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=78R+JaVGnYOic9ylLsWyiUF18RjXyIwOegPsMHZuucg=;
-        b=NP9xuJisUdAwsgwuU8Kju2KZk1UhppikHp3M1rIGe9i7wgv2CtbpX6zBWugdUAsmhZ
-         FEwTPg9jSZwgcWMgwKGbk35OXq1Hs7b/v5kUZHCztWwmAWcHRz8gjy5ELian4F6eIJRN
-         hy6RDOyQZwK9ZhsDJ+nlih90jreaFEFnK+oKnWEj/5wCnz0jpV4kaXMbHD4Miqd22svv
-         uM8oPLRikJZEotLJYRUQp2tt3XFJpFpOFAJdtafbiQnUF0Agok0ykcLzRRZbOyR7tQtd
-         g9Kl9H45rfDf3rIGgJqArksj48ItQL26r96pQZrbKGtoM4KG9bR5QVfff4HaJkUaCt7j
-         fj8g==
-X-Gm-Message-State: ABuFfoh3kAXF7VqWYbPQQ6ut1qNnx9NI9b16AUFSoyc29+kyDCs3fJ1j
-        aVtdQhuUzqF5mKzxD6uxbRgXB7t31rG6Ut6HBGnF07G7rOM=
-X-Google-Smtp-Source: ACcGV63ZWnYKI/Dwm3ByiNHX+lJ0TI5OHGR+/W6w9G6SETM3iXxWn873YeV16TausQ5ITHvmfegUNGUoa/NQB5JNIB0=
-X-Received: by 2002:ab0:2444:: with SMTP id g4mr9189552uan.67.1538994886700;
- Mon, 08 Oct 2018 03:34:46 -0700 (PDT)
-MIME-Version: 1.0
-From:   Amit K Bag <amit.k.bag@intel.corp-partner.google.com>
-Date:   Mon, 8 Oct 2018 16:04:35 +0530
-Message-ID: <CAANRJtyETNy2GMYfRtFDFm6TJs94W+oXGmY_zdR9RRx_1tFpNA@mail.gmail.com>
-Subject: scan stopped after log hours of stress test
+        Mon, 8 Oct 2018 17:46:32 -0400
+Received: from mx1.mailbox.org ([80.241.60.212]:45706 "EHLO mx1.mailbox.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726078AbeJHVqc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Oct 2018 17:46:32 -0400
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [80.241.60.241])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.mailbox.org (Postfix) with ESMTPS id 1B6B64A44F
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Oct 2018 16:34:30 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at heinlein-support.de
+Received: from smtp2.mailbox.org ([80.241.60.241])
+        by spamfilter02.heinlein-hosting.de (spamfilter02.heinlein-hosting.de [80.241.56.116]) (amavisd-new, port 10030)
+        with ESMTP id ABXIBoXX57hq for <linux-bluetooth@vger.kernel.org>;
+        Mon,  8 Oct 2018 16:34:29 +0200 (CEST)
+Date:   Mon, 8 Oct 2018 16:34:28 +0200 (CEST)
+From:   mail+bluetooth@m-reimer.de
 To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <214921089.58360.1539009269108@office.mailbox.org>
+Subject: Problems with Bluetooth built into BCM4313 WLAN card
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Medium
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
- Scan_Stop.7z
-Hello all,
+Hello,
 
-I am running some stress test on chromebook with 5.44 bluez version
-and 4.4 kernel version.
-In this test it will scan for device connect to device do some data
-transfer enable disable advertisement and repeat this in a loop. But
-after hours of test scan request never sent to controller. From the
-log I can see last time kernel sent the scan stop request to
-controller and the scan stooped from controller side.
+In my Laptop, I have the following WLAN card built in:
 
-In this log  mgmt discovering stop callback event  at some point is
-not received at Bluez adapter .So that
-Kernel and bluez host lost the sync on the discovery state .And
-further Discovery_start() request has been ignored .
+# lspci | grep Wireless
+02:00.0 Network controller: Broadcom Limited BCM4313 802.11bgn Wireless Network Adapter (rev 01)
 
-In previous success case I can see the below 2 logs
-Line 79243: 2018-09-11T11:50:41.724644+05:30 DEBUG kernel: [
-105.371680] mgmt.c:mgmt_discovering() hci0 discovering 0
-Line 79284: 2018-09-11T11:50:41.725959+05:30 DEBUG bluetoothd[2265]:
-src/adapter.c:discovering_callback() hci0 type 6 discovering 0 method
-0
+The Bluetooth part of this adapter "somehow" seems to be available:
 
-But in issue case only kernel debug message is seen in messag log as
-below but bluez log is not seen.
-Line 4048575: 2018-09-11T12:03:59.350884+05:30 DEBUG kernel: [
-634.306257] mgmt.c:mgmt_discovering() hci0 discovering 0
+# rfkill list
+0: ideapad_wlan: Wireless LAN
+	Soft blocked: no
+	Hard blocked: no
+1: ideapad_bluetooth: Bluetooth
+	Soft blocked: no
+	Hard blocked: no
 
-Further when bluez try to start scanning in kernel its always called
-stop_discovery().
+While the WLAN part works well, I don't have access to the Bluetooth part of this card. It is not visible anywhere, so I currently have a small USB Bluetooth stick on my laptop.
 
-please suggest how to fix this issue.
+Is this a known problem? Can someone give me some information if Bluetooth should work and if so, how to get it working?
 
-Thanks & Regards,
-Amit Bag
+Thanks in advance.
+
+Manuel
