@@ -2,104 +2,92 @@ Return-Path: <SRS0=otBP=MV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D2B4C64EB8
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Oct 2018 12:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF1EC64EB0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Oct 2018 19:45:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCA07214C5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Oct 2018 12:35:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCA07214C5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bugzilla.kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 1B361214C4
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Oct 2018 19:45:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B361214C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=chicoree.fr
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726486AbeJITv6 convert rfc822-to-8bit (ORCPT
+        id S1726991AbeJJDEQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Oct 2018 15:51:58 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:35868 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726393AbeJITv6 (ORCPT
+        Tue, 9 Oct 2018 23:04:16 -0400
+Received: from 3.mo177.mail-out.ovh.net ([46.105.36.172]:39359 "EHLO
+        3.mo177.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726476AbeJJDEQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Oct 2018 15:51:58 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 718D628BB4
-        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Oct 2018 12:35:13 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 6464528BD7; Tue,  9 Oct 2018 12:35:13 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Tue, 9 Oct 2018 23:04:16 -0400
+X-Greylist: delayed 932 seconds by postgrey-1.27 at vger.kernel.org; Tue, 09 Oct 2018 23:04:15 EDT
+Received: from player699.ha.ovh.net (unknown [10.109.160.76])
+        by mo177.mail-out.ovh.net (Postfix) with ESMTP id 8E7FFCE146
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Oct 2018 21:30:13 +0200 (CEST)
+Received: from [10.129.36.18] (reverse-177-9.fdn.fr [80.67.177.9])
+        (Authenticated sender: sylvain@chicoree.fr)
+        by player699.ha.ovh.net (Postfix) with ESMTPSA id AD5B82400B1;
+        Tue,  9 Oct 2018 21:30:11 +0200 (CEST)
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 201361] New: BT mouse getting reset during operation
-Date:   Tue, 09 Oct 2018 12:35:13 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: caravena@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-201361-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+From:   Sylvain Leroux <sylvain@chicoree.fr>
+Subject: Serial communication over BT using the DBus API
+Message-ID: <7246fd0d-022f-0d7b-ab09-1030ac06e0fa@chicoree.fr>
+Date:   Tue, 9 Oct 2018 21:30:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 127508165000138382
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedtkedrudeggddugedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenuc
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=201361
+Hi everyone,
 
-            Bug ID: 201361
-           Summary: BT mouse getting reset during operation
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: Ubuntu 4.18.0-7.8-generic 4.18.5
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: caravena@gmail.com
-        Regression: No
+I'm trying to establish a serial communication between two hosts over
+Bluetooth.
 
-Hello,
+Things go well if I start the `bluetoothd` on the server in
+_compatibility mode_. That way, I can attach the "serial port" profile
+to the channel. Then, using `rfcomm watch` and `rfcomm connect` to
+establish the connection between the server and the client, I can
+receive "raw" data sent by the server:
 
-Open bug in launchpad.net
-https://bugs.launchpad.net/bugs/1796553
+----
+# Server side
+/usr/lib/bluetooth/bluetoothd -C
+sdptool add --channel=1 SP
+rfcomm watch hci0 1 bash -c 'cat somefile > /dev/rfcomm0'
+----
 
-"(note: It's unclear to me if that's a kernel regression or an issue with
-bluez)
+----
+#Client side
+sudo rfcomm connect /dev/rfcomm0 BB:CC:DD:EE:FF:11 1
+sudo cat /dev/rfcomm0
+-----
 
-I've been using this particular combination of Bluetooth mouse ("TECKNET
-BM306") & laptop ("Dell Latitude E7240") for over a year now.
+If I do _not_ run the `bluetoothd` server in compatibility mode, SDP is
+no longer supported and the data I receive seems to modified by the BT
+stack, leading to my data being mixed with garbage--exactly like when I
+don't set the "serial port" profile while running in compatibility mode.
 
-It used to work with 18.04 and 17.10, but with 18.10 I'm encountering a strange
-disconnect behaviour:
 
-1) Mouse is working ok
-2) Mouse suddenly stops
-3) Disabling and enabling bluetooth on the laptop makes the mouse work again."
+I don't like the idea of depending on a deprecated interface. And from
+what I read, I understand the new way to go is to use the DBus API.  Any
+solution using bluetoothctl, busctl, dbus-send or similar tools would do
+the trick. But I can't manage to understand the sequence of operations
+required to transmit raw data between the server and the client *from a
+shell script* using that new API.
 
-Best regards,
---
-Cristian Aravena Romero (caravena)
+Could you give me some example or point me to the relevant documentation?
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Regards,
+- Sylvain Leroux
