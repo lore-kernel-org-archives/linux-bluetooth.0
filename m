@@ -2,217 +2,210 @@ Return-Path: <SRS0=J5Jk=MY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F67AC6783C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Oct 2018 08:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D97C43441
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Oct 2018 10:07:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5603B20868
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Oct 2018 08:20:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NIJ8nwQf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5603B20868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id BB8AE20868
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Oct 2018 10:07:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB8AE20868
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fronius.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727510AbeJLPvy (ORCPT
+        id S1728194AbeJLRjB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Oct 2018 11:51:54 -0400
-Received: from mail-ot1-f42.google.com ([209.85.210.42]:33126 "EHLO
-        mail-ot1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727484AbeJLPvy (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Oct 2018 11:51:54 -0400
-Received: by mail-ot1-f42.google.com with SMTP id q50so11646060otd.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Oct 2018 01:20:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=gnlRI/wB2jPr5y58Z5StZ/CP7VViabjNtgBpn0PoKKw=;
-        b=NIJ8nwQfOJ6FgpH7c0MimIFCYvP0EYypYdy3uxLacJv275hHQUWD9km/zdkeSRPpRe
-         9BM7hSk6ZMfDiIMyEI6LNcoibUQ/UreL8xj49I3Wnx0Repy6sjsmhHbIS0Mpoyc3CIPk
-         z+YgUor4ZUfc7CfvZhJrE0m3DzfOyGvs8AWNIBev0fm6rL3gjk4T3Mbu11iKs1qiYgfE
-         Wi7JzYsoyFS8UZ/5sfg4TyZd9+Ev/4RJadLaemokKZ/9R8teXq1XnWtEJYBZwkVRSMaM
-         XE1y6GMBdY40pfKs4eibQac13ceQEYrUqwbN02mThtnhxpPSadn5cX5m9RliXaDwFOMa
-         G4Ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=gnlRI/wB2jPr5y58Z5StZ/CP7VViabjNtgBpn0PoKKw=;
-        b=MlV3SWUAS6GUibupRHjaVXFdtRHYcQG8q/RMdkrq9NKdlB7fbWkuuJvWcvVEanc33X
-         0jC5HcyOpmWZf/hcBdul27b4xfJTWiA5Vi7/MrYcCBa5YS0tUyZDTsrIYcBI7sk7GC+V
-         7dydy2wjMWrFwZT3NY+f0EXjS3JrfoIVc7aHx398M/qFdM7eLbZL4k7apy5lpGzbxRSq
-         bdt9/hYhxblO7GS4uFEBz9IUMizyaaXZYQXZxqZkD7W3AMR5QcAQPL3U+SfuvaZR0KoO
-         DOA80EKVXlGCxPjVCZicXIaCtGSKv/tLfcjNwQAC8ZDXnJnQhGhRn2VLtLAypoJTIhve
-         FHOQ==
-X-Gm-Message-State: ABuFfoiELzxcfb4vEGDbhwEhnRVAYCnBVsUwdF+vudJqv0XMiPkGEnuP
-        jAFiUU0kXHM8I+MI7VCdiBAPW1HbT3CzhiJWS2Hqr+nc
-X-Google-Smtp-Source: ACcGV63zcZoSrBe9Xs2CnN/weB7+FV9LO7LF7rL29KGWfas1nQQFOM7b2JyJoKEzkadCYaTvW+C0B0LcDGlvt69gPtk=
-X-Received: by 2002:a9d:44ca:: with SMTP id p10mr3059663otg.291.1539332435998;
- Fri, 12 Oct 2018 01:20:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <da781fd16860492a9b4d28334a593b77@fronius.com> <CABBYNZKWhK5NKQqpgXqTAFcaBkVM=CrSLtuxzD=MPyw6p-es7A@mail.gmail.com>
- <bed1213e3c6d4d3abe06be95ef9aba79@fronius.com>
-In-Reply-To: <bed1213e3c6d4d3abe06be95ef9aba79@fronius.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 12 Oct 2018 11:20:22 +0300
-Message-ID: <CABBYNZ+dx3SCqsZF=cdpm0cnx=Nc2O-hSyKQF9Euq57G-BBCCw@mail.gmail.com>
-Subject: Re: Bluetooth: Is it possible to operate Bluez concurrent in central
+        Fri, 12 Oct 2018 13:39:01 -0400
+Received: from mx01.fronius.com ([213.33.117.78]:15765 "EHLO mx01.fronius.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728149AbeJLRjB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 12 Oct 2018 13:39:01 -0400
+IronPort-PHdr: =?us-ascii?q?9a23=3ArpQfIh01V0lXcuHwsmDT+DRfVm0co7zxezQtwd8Z?=
+ =?us-ascii?q?sesWK/zxwZ3uMQTl6Ol3ixeRBMOHs60C07KempujcFRI2YyGvnEGfc4EfD4+ou?=
+ =?us-ascii?q?JSoTYdBtWYA1bwNv/gYn9yNs1DUFh44yPzahANS47xaFLIv3K98yMZFAnhOgpp?=
+ =?us-ascii?q?POT1HZPZg9iq2+yo9JDffwdFiCChbb9uMR67sRjfus4KjIV4N60/0AHJonxGe+?=
+ =?us-ascii?q?RXwWNnO1eelAvi68mz4ZBu7T1et+ou+MBcX6r6eb84TaFDAzQ9L281/szrugLd?=
+ =?us-ascii?q?QgaJ+3ART38ZkhtMAwjC8RH6QpL8uTb0u+ZhxCWXO9D9QKsqUjq+8ahkVB7oiD?=
+ =?us-ascii?q?8GNzEn9mHXltdwh79frB64uhBz35LYbISTOfFjfK3SYMkaSHJBUMhPSiJBHo2y?=
+ =?us-ascii?q?YYgBD+UDPOZXs4bzqFQVoBuiHgasBv/jxiNUinL026AxzuQvERvB3AwlB98Av3?=
+ =?us-ascii?q?XUrM7rO6cUUuC1y63Iwi7eZP1I2Tf9743IfQo6ofqRWr9+fsvRyVIxGAPDjVWQ?=
+ =?us-ascii?q?rojlMCiP2uoTs2ib6O9gWvi0i2M8pQFxuD+vxsEtionUnYIZ0EzL9SJ8wIssI9?=
+ =?us-ascii?q?CzVUB1YdmhEJRKtiGaMZN7QsclQ2Fnoio6y7sGtJimdyYJ0JQq3wPTZ+Cdf4SW?=
+ =?us-ascii?q?+B7uVfydLSpliH59Zb6zmwy+/Va6xuHiVsS4yktGojdYntXUuHACyR/e5tSCR/?=
+ =?us-ascii?q?Z45Uis2jSC2gLW5+xELk05mqTbJps6zbMwl5cfrUHOEyH4mErsg6KbcFgv9PKy?=
+ =?us-ascii?q?5OT9eLrmo4eRN4pzig7jLKsjgte/AeEkMggWWGib5Pi82KXj/ULnRLVKieU7n7?=
+ =?us-ascii?q?XHvpzDKsoVu6+2DABS3Io66huzEiqq3M4WnXkdK1JFfhOHj5XyO13UPP/4CvK/?=
+ =?us-ascii?q?j0ytkDdt2f/GIqXsDojRInTZjrvtZ7dw51RBxAYu1dxf4ohbCrAFIPL9QE/xs9?=
+ =?us-ascii?q?nYAwc2PQy12OboFtN91oAZWWKLGaCVKr3csV+P5uIqOeaMf5QYuDjnK/gi4f7u?=
+ =?us-ascii?q?jGI5mUQHcaa12psXbWi0Hu56LEWBfXrsntABHH8OvgojTezriUeOXiNNaHa0Q6?=
+ =?us-ascii?q?I95yo2CI2jDYjZR4CthKaN0zu8Hp1TfmpGEEyDEW/0d4WYXPcBcCaSIs5nkjwZ?=
+ =?us-ascii?q?WrmtUpQu1RWztADk17pnKe3U+jEYtZ/4yth16PPclQso+Tx3EcudyWeNQH9wnm?=
+ =?us-ascii?q?8SQD82xq9/8gRBzQKnzKlqy9VFGsFI+/QBTAA8fbLRyfBoQ4T2RwPTONuETkq0?=
+ =?us-ascii?q?atqjCDA1CNk2xoldTVx6HoCPjwvO2SmtB7Vdq7yMAZUvuvbx3mP8IcV6z3yA6K?=
+ =?us-ascii?q?kmilA9asVVMmunm7U5/A/WUd2a236FnrqnIPxPlBXG832OmC/X5BlV?=
+X-IPAS-Result: =?us-ascii?q?A2EgAAC0ccBb/wsGAgpkGwEBAQEDAQEBBwMBAQGBUQYBAQE?=
+ =?us-ascii?q?LAYFUBYI3CoNriBaOR4M/k0iBegwBhGwCF4RhNA0NAQMBAQEBAQECAQECgRGCN?=
+ =?us-ascii?q?iQBgl8BAQICASMEDR8mBQsCARULAgImAgICMBUQAQEEDgUIE4I6gkWlYnszGoR?=
+ =?us-ascii?q?dhGuBC4FwiiM/gRKCZIVkAoJHglcCiFuHHI4lBwKCD4dahmcfiT0DhlaTXIIhA?=
+ =?us-ascii?q?gQCBAUCFIFDgg4zGiODPIImFxFrAQeNFW+LOIEfAQE?=
+X-IronPort-AV: E=Sophos;i="5.54,371,1534802400"; 
+   d="scan'208";a="45878609"
+Received: from unknown (HELO AT-ESXVM-611.fronius.com) ([10.2.6.11])
+  by mx01.fronius.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Oct 2018 12:07:17 +0200
+Received: from AT-ESXVM-612.fronius.com (10.2.6.12) by
+ AT-ESXVM-611.fronius.com (10.2.6.11) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1466.3; Fri, 12 Oct 2018 12:07:16 +0200
+Received: from AT-ESXVM-612.fronius.com ([fe80::b877:544f:b560:3fa4]) by
+ AT-ESXVM-612.fronius.com ([fe80::b877:544f:b560:3fa4%5]) with mapi id
+ 15.01.1466.003; Fri, 12 Oct 2018 12:07:16 +0200
+From:   Eisenkolb Thomas <Eisenkolb.Thomas@fronius.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: AW: Bluetooth: Is it possible to operate Bluez concurrent in central
  and peripheral role?
-To:     Eisenkolb.Thomas@fronius.com
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Thread-Topic: Bluetooth: Is it possible to operate Bluez concurrent in central
+ and peripheral role?
+Thread-Index: AdRhJz0atnowo1DfR/6vOpl/HVQE+AACoMowAA/1V4AAIrU4IP//7noA///OILA=
+Date:   Fri, 12 Oct 2018 10:07:16 +0000
+Message-ID: <9390ebceb54942d9999693bb0ff08949@fronius.com>
+References: <da781fd16860492a9b4d28334a593b77@fronius.com>
+ <CABBYNZKWhK5NKQqpgXqTAFcaBkVM=CrSLtuxzD=MPyw6p-es7A@mail.gmail.com>
+ <bed1213e3c6d4d3abe06be95ef9aba79@fronius.com>
+ <CABBYNZ+dx3SCqsZF=cdpm0cnx=Nc2O-hSyKQF9Euq57G-BBCCw@mail.gmail.com>
+In-Reply-To: <CABBYNZ+dx3SCqsZF=cdpm0cnx=Nc2O-hSyKQF9Euq57G-BBCCw@mail.gmail.com>
+Accept-Language: de-AT, en-US
+Content-Language: de-DE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.2.25.111]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Thomas,
-
-On Fri, Oct 12, 2018 at 10:36 AM Eisenkolb Thomas
-<Eisenkolb.Thomas@fronius.com> wrote:
->
-> Hello,
->
-> Thanks for the answer.
->
-> I have recorded logs of the exact use cases which I have to realize.
->
-> The following MAC-Addresses of the devices are important:
->         - Embedded Linux device: "78-C4-0E-80-07-CD"
->         - Smartphone: "4C-D6-A9-48-CA-0C"
->         - Sensor device: "88-6B-0F-94-C2-38"
->
-> I wanted to shorten the logs that no information gets lost.
->
-> To produce this log I did the following operations in chronological order=
-:
->         1) start btmgt tool (embedded linux)
-
-You shouldn't need to btmgmt for these use cases, bluetoothctl can
-manage advertisements.
-
->         2) call btmgt info (embedded linux)
->         3) Register advertising instances (embedded linux as peripheral)
->         4) Scan for advertising devices (Smartphone as central)
->         5) Stop scan for advertising devices(Smartphone as central)
->         6) Connect to embedded linux device (Smartphone as central)
->         -> established
->         7) Start scan for advertising devices(embedded linux as central)
->         8) Stop scan for advertising devices(embedded linux as central)
->         9) Connect to sensor(embedded linux as central)
->         -> Failed
-
-I don't see the connection request, perhaps it doesn't happen because
-we never found it while scanning? Does the connection timeout?
-
->         10) Disconnect from embedded Linux(Smartphone as central)
->         11) Connect to sensor(embedded linux as central)
->         -> established
->         12) Connect to embedded linux device(Smartphone as central)
->         -> failed
->         13) Tray again connect to embedded linux device(Smartphone as cen=
-tral)
->         -> failed
-
-Same thing here, perhaps bluetoothd logs would tell why it has failed.
-
->
-> There are three log files in the attachments which have been recorded con=
-current.
-> One from "btmgt", "bluetoothctl" and "btmon".
-
-Don't mix btmgmt with bluetoothd, btmgmt is more of a debug tool for
-testing the kernel interface directly instead of using D-Bus but using
-both is not recommended.
-
-> As you will see in the logs from the sight of the embedded device I was j=
-ust able to establish one connection concurrent.
-> Whether peripheral connection or a central connection but not both at the=
- same time.
-
-I see a lot of reports which means we are scanning but it looks like
-there is never a connection attempt, except for the ones that does
-succeed.
-
-> If the embedded device acts just as central device, it is possible to est=
-ablish more connections to different sensors at the same time.
-
-That is really weird because the only difference is that you would not
-be advertising, this could be a problem with the controller though,
-have you tried any other controller to see if it has the same
-behaviour?
-
-> Thanks for your help.
->
-> Best Regards,
-> Thomas
->
-> Hi Thomas,
-> On Thu, Oct 11, 2018 at 10:18 AM Eisenkolb Thomas <Eisenkolb.Thomas@froni=
-us.com> wrote:
-> >
-> > Hello,
-> >
-> > I am working with blueZ 5.50 on a linux embedded device with kernel 4.1=
-4.
-> >
-> > Now I have to implement a use case where the linux embedded device comm=
-unicates as a central device with a few sensors through Bluetooth LE charac=
-teristics and at the same time it should advertise some data and accept at =
-least one incoming connection from a Smartphone as a peripheral device for =
-maintenance cases.
-> >
-> > I haven't found any information about blueZ is supporting both LE roles=
- at the same time.
-> > I have already tried it now for 2 days to get this use case to work and=
- I found a few limitations for which I didn't find any solution.
-> >
-> > I was not able to advertise any data while my device had an active conn=
-ection to a peripheral device.
-> > Also while the Smartphone is connected to my embedded device(peripheral=
-), I don't receive any advertised Data from any sensor and I cannot connect=
- to any sensor.
-> >
-> > The Bluetooth Hardware Module which I am using on the embedded Linux Sy=
-stem supports Bluetooth 4.2. From the Bluetooth Standard I have found that =
-concurrent use of both Bluetooth Low Energy Roles should be supported since=
- Bluetooth 4.1.
-> >
-> > Is it possible from blueZ Stack side to implement this use-case?
->
-> BlueZ should work as dual roles already, if it doesn't there could bugs o=
-r the controller preventing commands to work properly.
->
-> > If yes, can you give me some hints what I have to consider to get this =
-case working?
->
-> Do you have HCI logs of the problem(s)?
->
-> > If no, have you got a timeline when it will be supported or is this no =
-planned to implement in near future?
->
-> Most of upstream effort is on mesh and updates to include 5.0 features, b=
-ut dual-role is something that we might consider high priority if that is n=
-ot working properly.
->
-> >
-> > Thanks for your answer,
-> > Thomas
-> >
-> >
->
->
-> --
-> Luiz Augusto von Dentz
-
-
-
---=20
-Luiz Augusto von Dentz
+PiBIaSBUaG9tYXMsDQo+DQo+IE9uIEZyaSwgT2N0IDEyLCAyMDE4IGF0IDEwOjM2IEFNIEVpc2Vu
+a29sYiBUaG9tYXMgPEVpc2Vua29sYi5UaG9tYXNAZnJvbml1cy5jb20+IHdyb3RlOg0KPiA+DQo+
+ID4gSGVsbG8sDQo+ID4NCj4gPiBUaGFua3MgZm9yIHRoZSBhbnN3ZXIuDQo+ID4NCj4gPiBJIGhh
+dmUgcmVjb3JkZWQgbG9ncyBvZiB0aGUgZXhhY3QgdXNlIGNhc2VzIHdoaWNoIEkgaGF2ZSB0byBy
+ZWFsaXplLg0KPiA+DQo+ID4gVGhlIGZvbGxvd2luZyBNQUMtQWRkcmVzc2VzIG9mIHRoZSBkZXZp
+Y2VzIGFyZSBpbXBvcnRhbnQ6DQo+ID4gICAgICAgICAtIEVtYmVkZGVkIExpbnV4IGRldmljZTog
+Ijc4LUM0LTBFLTgwLTA3LUNEIg0KPiA+ICAgICAgICAgLSBTbWFydHBob25lOiAiNEMtRDYtQTkt
+NDgtQ0EtMEMiDQo+ID4gICAgICAgICAtIFNlbnNvciBkZXZpY2U6ICI4OC02Qi0wRi05NC1DMi0z
+OCINCj4gPg0KPiA+IEkgd2FudGVkIHRvIHNob3J0ZW4gdGhlIGxvZ3MgdGhhdCBubyBpbmZvcm1h
+dGlvbiBnZXRzIGxvc3QuDQo+ID4NCj4gPiBUbyBwcm9kdWNlIHRoaXMgbG9nIEkgZGlkIHRoZSBm
+b2xsb3dpbmcgb3BlcmF0aW9ucyBpbiBjaHJvbm9sb2dpY2FsIG9yZGVyOg0KPiA+ICAgICAgICAg
+MSkgc3RhcnQgYnRtZ3QgdG9vbCAoZW1iZWRkZWQgbGludXgpDQo+DQo+IFlvdSBzaG91bGRuJ3Qg
+bmVlZCB0byBidG1nbXQgZm9yIHRoZXNlIHVzZSBjYXNlcywgYmx1ZXRvb3RoY3RsIGNhbiBtYW5h
+Z2UgYWR2ZXJ0aXNlbWVudHMuDQoNClRoYW5rcyBmb3IgdGhlIGhpbnQuIEkganVzdCBzdGFydGVk
+IGJ0bWdtdCB0byBnZXQgZGV0YWlsZWQgaW5mb3JtYXRpb24gYWJvdXQgbXkgc3lzdGVtIGluIHRo
+ZSBidG1vbiBsb2cuDQoNCj4NCj4gPiAgICAgICAgIDIpIGNhbGwgYnRtZ3QgaW5mbyAoZW1iZWRk
+ZWQgbGludXgpDQo+ID4gICAgICAgICAzKSBSZWdpc3RlciBhZHZlcnRpc2luZyBpbnN0YW5jZXMg
+KGVtYmVkZGVkIGxpbnV4IGFzIHBlcmlwaGVyYWwpDQo+ID4gICAgICAgICA0KSBTY2FuIGZvciBh
+ZHZlcnRpc2luZyBkZXZpY2VzIChTbWFydHBob25lIGFzIGNlbnRyYWwpDQo+ID4gICAgICAgICA1
+KSBTdG9wIHNjYW4gZm9yIGFkdmVydGlzaW5nIGRldmljZXMoU21hcnRwaG9uZSBhcyBjZW50cmFs
+KQ0KPiA+ICAgICAgICAgNikgQ29ubmVjdCB0byBlbWJlZGRlZCBsaW51eCBkZXZpY2UgKFNtYXJ0
+cGhvbmUgYXMgY2VudHJhbCkNCj4gPiAgICAgICAgIC0+IGVzdGFibGlzaGVkDQo+ID4gICAgICAg
+ICA3KSBTdGFydCBzY2FuIGZvciBhZHZlcnRpc2luZyBkZXZpY2VzKGVtYmVkZGVkIGxpbnV4IGFz
+IGNlbnRyYWwpDQo+ID4gICAgICAgICA4KSBTdG9wIHNjYW4gZm9yIGFkdmVydGlzaW5nIGRldmlj
+ZXMoZW1iZWRkZWQgbGludXggYXMgY2VudHJhbCkNCj4gPiAgICAgICAgIDkpIENvbm5lY3QgdG8g
+c2Vuc29yKGVtYmVkZGVkIGxpbnV4IGFzIGNlbnRyYWwpDQo+ID4gICAgICAgICAtPiBGYWlsZWQN
+Cj4NCj4gSSBkb24ndCBzZWUgdGhlIGNvbm5lY3Rpb24gcmVxdWVzdCwgcGVyaGFwcyBpdCBkb2Vz
+bid0IGhhcHBlbiBiZWNhdXNlIHdlIG5ldmVyIGZvdW5kIGl0IHdoaWxlIHNjYW5uaW5nPyBEb2Vz
+IHRoZSBjb25uZWN0aW9uIHRpbWVvdXQ/DQo+DQoNCkJsdWV0b290aGN0bC5sb2c6DQpUaGUgU2Vu
+c29yIGRldmljZSBpcyBmb3VuZCB3aGlsZSBzY2FubmluZy4gSXQgaW4gbGluZSA3OC4NClRoZSBj
+b25uZWN0aW9uIGF0dGVtcHQgaXMgdmlzaWJsZSBpbiB0aGUgc2FtZSBsb2cgaW4gbGluZSAxMDMg
+YW5kIGFsc28gdGhlIGVycm9yIHRoYXQgb2NjdXJyZWQgaW4gbGluZSAxMDUuDQoNCkluIGJ0bW9u
+LmxvZyB0aGUgZGV2aWNlIHdhcyBmaXJzdCB0aW1lIGRpc2NvdmVyZWQgYXQgbGluZSAzNDUxIGFu
+ZCB0aGVuIGV2ZXJ5IDEvMiBzZWNvbmQuDQpEaXNjb3ZlcnkgZ2V0cyBkaXNhYmxlZCBhdCBsaW5l
+IDExODI0Lg0KQWZ0ZXIgdGhhdCB0aGVyZSBzaG91bGQgYmUgdGhlIGNvbm5lY3Rpb24gYXR0ZW1w
+dCBoY2kgY29tbWFuZCBhcyBpdCBjYW4gYmUgc2VlbiBpbiBCbHVldG9vdGhjdGwubG9nLg0KSW4g
+bGluZSAxMTg4NSB0aGUgdXNlZCBkZXZpY2UgaXMgYWRkZWQgdG8gdGhlIHdoaXRlbGlzdCB3aGlj
+aCBzZWVtcyB0byBzdWNjZXNzLihBdCB0aGlzIHBsYWNlIEkgZXhwZWN0ZWQgdG8gZ2V0IGFuIGNv
+bm5lY3Rpb24gYXR0ZW1wdCkNCg0KQXMgeW91IHNhaWQgdGhpcyBpcyBzdHJhbmdlIGJlY2F1c2Ug
+bm8gY29ubmVjdGlvbiBhdHRlbXB0IHJlYWNoZXMgdGhlIGhjaSBpbnRlcmZhY2UuDQoNCj4gPiAg
+ICAgICAgIDEwKSBEaXNjb25uZWN0IGZyb20gZW1iZWRkZWQgTGludXgoU21hcnRwaG9uZSBhcyBj
+ZW50cmFsKQ0KVGhpcyBNR01UIEV2ZW50IGlzIGF0IGxpbmUgMTI1ODcuIFRoZSBzbWFydHBob25l
+IHN1Y2Nlc3NmdWxseSBkaXNjb25uZWN0ZWQgZnJvbSB0aGUgZW1iZWRkZWQgbGludXggZGV2aWNl
+Lg0KDQo+ID4gICAgICAgICAxMSkgQ29ubmVjdCB0byBzZW5zb3IoZW1iZWRkZWQgbGludXggYXMg
+Y2VudHJhbCkNCj4gPiAgICAgICAgIC0+IGVzdGFibGlzaGVkDQpUaGUgc3VjY2Vzc2Z1bCBjb25u
+ZWN0aW9uIGV2ZW50IHRvIHRoZSBzZW5zb3IgaXMgYXQgbGluZSAxMjczNS4NCg0KPiA+ICAgICAg
+ICAgMTIpIENvbm5lY3QgdG8gZW1iZWRkZWQgbGludXggZGV2aWNlKFNtYXJ0cGhvbmUgYXMgY2Vu
+dHJhbCkNCj4gPiAgICAgICAgIC0+IGZhaWxlZA0KPiA+ICAgICAgICAgMTMpIFRyYXkgYWdhaW4g
+Y29ubmVjdCB0byBlbWJlZGRlZCBsaW51eCBkZXZpY2UoU21hcnRwaG9uZSBhcyBjZW50cmFsKQ0K
+PiA+ICAgICAgICAgLT4gZmFpbGVkDQo+DQo+IFNhbWUgdGhpbmcgaGVyZSwgcGVyaGFwcyBibHVl
+dG9vdGhkIGxvZ3Mgd291bGQgdGVsbCB3aHkgaXQgaGFzIGZhaWxlZC4NCg0KWWVzIHRoaXMgaXMg
+YWxzbyBzdHJhbmdlLg0KRm9yIHRoaXMgSSB3aWxsIGhhdmUgYSBsb29rIGF0IHRoZSBibHVldG9v
+dGhkIGxvZ3MuDQoNCj4NCj4gPg0KPiA+IFRoZXJlIGFyZSB0aHJlZSBsb2cgZmlsZXMgaW4gdGhl
+IGF0dGFjaG1lbnRzIHdoaWNoIGhhdmUgYmVlbiByZWNvcmRlZCBjb25jdXJyZW50Lg0KPiA+IE9u
+ZSBmcm9tICJidG1ndCIsICJibHVldG9vdGhjdGwiIGFuZCAiYnRtb24iLg0KPg0KPiBEb24ndCBt
+aXggYnRtZ210IHdpdGggYmx1ZXRvb3RoZCwgYnRtZ210IGlzIG1vcmUgb2YgYSBkZWJ1ZyB0b29s
+IGZvciB0ZXN0aW5nIHRoZSBrZXJuZWwgaW50ZXJmYWNlIGRpcmVjdGx5IGluc3RlYWQgb2YgdXNp
+bmcgRC1CdXMgYnV0IHVzaW5nIGJvdGggaXMgbm90IHJlY29tbWVuZGVkLg0KDQpUaGFua3MgZm9y
+IHRoZSBoaW50LiBGb3IgZnV0dXJlIEkgd2lsbCBqdXN0IHVzZSBibHVldG9vdGhjdGwuDQoNCj4N
+Cj4gPiBBcyB5b3Ugd2lsbCBzZWUgaW4gdGhlIGxvZ3MgZnJvbSB0aGUgc2lnaHQgb2YgdGhlIGVt
+YmVkZGVkIGRldmljZSBJIHdhcyBqdXN0IGFibGUgdG8gZXN0YWJsaXNoIG9uZSBjb25uZWN0aW9u
+IGNvbmN1cnJlbnQuDQo+ID4gV2hldGhlciBwZXJpcGhlcmFsIGNvbm5lY3Rpb24gb3IgYSBjZW50
+cmFsIGNvbm5lY3Rpb24gYnV0IG5vdCBib3RoIGF0IHRoZSBzYW1lIHRpbWUuDQo+DQo+IEkgc2Vl
+IGEgbG90IG9mIHJlcG9ydHMgd2hpY2ggbWVhbnMgd2UgYXJlIHNjYW5uaW5nIGJ1dCBpdCBsb29r
+cyBsaWtlIHRoZXJlIGlzIG5ldmVyIGEgY29ubmVjdGlvbiBhdHRlbXB0LCBleGNlcHQgZm9yIHRo
+ZSBvbmVzIHRoYXQgZG9lcyBzdWNjZWVkLg0KDQpJIGZ1bGx5IGFncmVlLiBJIGp1c3Qgc2VlIHRo
+ZSBhdHRlbXB0IGluIHRoZSBsb2dzIG9mIGJsdWV0b290aGN0bCBidXQgbm8gYXR0ZW1wdCByZWFj
+aGVzIHRoZSBoY2kgaW50ZXJmYWNlLg0KSXMgaXQgaW4gZ2VuZXJhbCBmcm9tIHRoZSBibHVlWiBz
+aWRlIHBvc3NpYmxlIHRvIGhhdmUgYSBjZW50cmFsIGFuZCBhIHBlcmlwaGVyYWwgY29ubmVjdGlv
+biBvcGVuZWQgcGFyYWxsZWwgYXQgdGhlIHNhbWUgdGltZT8NCkkganVzdCBnZXQgbW9yZSB0aGFu
+IG9uZSBjb25uZWN0aW9ucyB0byBwZXJpcGhlcmFscyBhdCB0aGUgc2FtZSB0aW1lIGFuZCB0aGlz
+IHdvcmtzIGZpbmUuDQoNCj4NCj4gPiBJZiB0aGUgZW1iZWRkZWQgZGV2aWNlIGFjdHMganVzdCBh
+cyBjZW50cmFsIGRldmljZSwgaXQgaXMgcG9zc2libGUgdG8gZXN0YWJsaXNoIG1vcmUgY29ubmVj
+dGlvbnMgdG8gZGlmZmVyZW50IHNlbnNvcnMgYXQgdGhlIHNhbWUgdGltZS4NCj4NCj4gVGhhdCBp
+cyByZWFsbHkgd2VpcmQgYmVjYXVzZSB0aGUgb25seSBkaWZmZXJlbmNlIGlzIHRoYXQgeW91IHdv
+dWxkIG5vdCBiZSBhZHZlcnRpc2luZywgdGhpcyBjb3VsZCBiZSBhIHByb2JsZW0gd2l0aCB0aGUg
+Y29udHJvbGxlciB0aG91Z2gsIGhhdmUgeW91IHRyaWVkIGFueSBvdGhlciBjb250cm9sbGVyIHRv
+IHNlZSBpZiBpdCBoYXMgdGhlIHNhbWUgYmVoYXZpb3VyPw0KDQpBY3R1YWxseSBJIGFtIHVzaW5n
+IHRoZSBTUEIyMDlBIE1vZHVsZSBmcm9tIEhEIFdpcmVsZXNzLiANCkkgZG9uJ3QgaGF2ZSBhbnkg
+b3RoZXIgbW9kdWxlIHRoYXQgc3VwcG9ydHMgQmx1ZXRvb3RoID49IDQuMShBcyBJIGZvdW5kIHRo
+aXMgaXMgdGhlIG1pbmltdW0gcmVxdWlyZWQgc3RhbmRhcmQgdGhhdCBzdXBwb3J0cyBjb25jdXJy
+ZW50IEJMRSByb2xlcykgDQoNCj4NCj4gPiBUaGFua3MgZm9yIHlvdXIgaGVscC4NCj4gPg0KPiA+
+IEJlc3QgUmVnYXJkcywNCj4gPiBUaG9tYXMNCj4gPg0KPiA+IEhpIFRob21hcywNCj4gPiBPbiBU
+aHUsIE9jdCAxMSwgMjAxOCBhdCAxMDoxOCBBTSBFaXNlbmtvbGIgVGhvbWFzIDxFaXNlbmtvbGIu
+VGhvbWFzQGZyb25pdXMuY29tPiB3cm90ZToNCj4gPiA+DQo+ID4gPiBIZWxsbywNCj4gPiA+DQo+
+ID4gPiBJIGFtIHdvcmtpbmcgd2l0aCBibHVlWiA1LjUwIG9uIGEgbGludXggZW1iZWRkZWQgZGV2
+aWNlIHdpdGgga2VybmVsIDQuMTQuDQo+ID4gPg0KPiA+ID4gTm93IEkgaGF2ZSB0byBpbXBsZW1l
+bnQgYSB1c2UgY2FzZSB3aGVyZSB0aGUgbGludXggZW1iZWRkZWQgZGV2aWNlIGNvbW11bmljYXRl
+cyBhcyBhIGNlbnRyYWwgZGV2aWNlIHdpdGggYSBmZXcgc2Vuc29ycyB0aHJvdWdoIEJsdWV0b290
+aCBMRSBjaGFyYWN0ZXJpc3RpY3MgYW5kIGF0IHRoZSBzYW1lIHRpbWUgaXQgc2hvdWxkIGFkdmVy
+dGlzZSBzb21lIGRhdGEgYW5kIGFjY2VwdCBhdCBsZWFzdCBvbmUgaW5jb21pbmcgY29ubmVjdGlv
+biBmcm9tIGEgU21hcnRwaG9uZSBhcyBhIHBlcmlwaGVyYWwgZGV2aWNlIGZvciBtYWludGVuYW5j
+ZSBjYXNlcy4NCj4gPiA+DQo+ID4gPiBJIGhhdmVuJ3QgZm91bmQgYW55IGluZm9ybWF0aW9uIGFi
+b3V0IGJsdWVaIGlzIHN1cHBvcnRpbmcgYm90aCBMRSByb2xlcyBhdCB0aGUgc2FtZSB0aW1lLg0K
+PiA+ID4gSSBoYXZlIGFscmVhZHkgdHJpZWQgaXQgbm93IGZvciAyIGRheXMgdG8gZ2V0IHRoaXMg
+dXNlIGNhc2UgdG8gd29yayBhbmQgSSBmb3VuZCBhIGZldyBsaW1pdGF0aW9ucyBmb3Igd2hpY2gg
+SSBkaWRuJ3QgZmluZCBhbnkgc29sdXRpb24uDQo+ID4gPg0KPiA+ID4gSSB3YXMgbm90IGFibGUg
+dG8gYWR2ZXJ0aXNlIGFueSBkYXRhIHdoaWxlIG15IGRldmljZSBoYWQgYW4gYWN0aXZlIGNvbm5l
+Y3Rpb24gdG8gYSBwZXJpcGhlcmFsIGRldmljZS4NCj4gPiA+IEFsc28gd2hpbGUgdGhlIFNtYXJ0
+cGhvbmUgaXMgY29ubmVjdGVkIHRvIG15IGVtYmVkZGVkIGRldmljZShwZXJpcGhlcmFsKSwgSSBk
+b24ndCByZWNlaXZlIGFueSBhZHZlcnRpc2VkIERhdGEgZnJvbSBhbnkgc2Vuc29yIGFuZCBJIGNh
+bm5vdCBjb25uZWN0IHRvIGFueSBzZW5zb3IuDQo+ID4gPg0KPiA+ID4gVGhlIEJsdWV0b290aCBI
+YXJkd2FyZSBNb2R1bGUgd2hpY2ggSSBhbSB1c2luZyBvbiB0aGUgZW1iZWRkZWQgTGludXggU3lz
+dGVtIHN1cHBvcnRzIEJsdWV0b290aCA0LjIuIEZyb20gdGhlIEJsdWV0b290aCBTdGFuZGFyZCBJ
+IGhhdmUgZm91bmQgdGhhdCBjb25jdXJyZW50IHVzZSBvZiBib3RoIEJsdWV0b290aCBMb3cgRW5l
+cmd5IFJvbGVzIHNob3VsZCBiZSBzdXBwb3J0ZWQgc2luY2UgQmx1ZXRvb3RoIDQuMS4NCj4gPiA+
+DQo+ID4gPiBJcyBpdCBwb3NzaWJsZSBmcm9tIGJsdWVaIFN0YWNrIHNpZGUgdG8gaW1wbGVtZW50
+IHRoaXMgdXNlLWNhc2U/DQo+ID4NCj4gPiBCbHVlWiBzaG91bGQgd29yayBhcyBkdWFsIHJvbGVz
+IGFscmVhZHksIGlmIGl0IGRvZXNuJ3QgdGhlcmUgY291bGQgYnVncyBvciB0aGUgY29udHJvbGxl
+ciBwcmV2ZW50aW5nIGNvbW1hbmRzIHRvIHdvcmsgcHJvcGVybHkuDQo+ID4NCj4gPiA+IElmIHll
+cywgY2FuIHlvdSBnaXZlIG1lIHNvbWUgaGludHMgd2hhdCBJIGhhdmUgdG8gY29uc2lkZXIgdG8g
+Z2V0IHRoaXMgY2FzZSB3b3JraW5nPw0KPiA+DQo+ID4gRG8geW91IGhhdmUgSENJIGxvZ3Mgb2Yg
+dGhlIHByb2JsZW0ocyk/DQo+ID4NCj4gPiA+IElmIG5vLCBoYXZlIHlvdSBnb3QgYSB0aW1lbGlu
+ZSB3aGVuIGl0IHdpbGwgYmUgc3VwcG9ydGVkIG9yIGlzIHRoaXMgbm8gcGxhbm5lZCB0byBpbXBs
+ZW1lbnQgaW4gbmVhciBmdXR1cmU/DQo+ID4NCj4gPiBNb3N0IG9mIHVwc3RyZWFtIGVmZm9ydCBp
+cyBvbiBtZXNoIGFuZCB1cGRhdGVzIHRvIGluY2x1ZGUgNS4wIGZlYXR1cmVzLCBidXQgZHVhbC1y
+b2xlIGlzIHNvbWV0aGluZyB0aGF0IHdlIG1pZ2h0IGNvbnNpZGVyIGhpZ2ggcHJpb3JpdHkgaWYg
+dGhhdCBpcyBub3Qgd29ya2luZyBwcm9wZXJseS4NCj4gPg0KPiA+ID4NCj4gPiA+IFRoYW5rcyBm
+b3IgeW91ciBhbnN3ZXIsDQo+ID4gPiBUaG9tYXMNCj4gPiA+DQo+ID4gPg0KPiA+DQo+ID4NCj4g
+PiAtLQ0KPiA+IEx1aXogQXVndXN0byB2b24gRGVudHoNCj4NCj4NCj4NCj4gLS0NCj4gTHVpeiBB
+dWd1c3RvIHZvbiBEZW50eg0KDQpCZXN0IFJlZ2FyZHMsDQpUaG9tYXMgRWlzZW5rb2xiDQo=
