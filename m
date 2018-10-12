@@ -5,207 +5,62 @@ X-Spam-Level:
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00D97C43441
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Oct 2018 10:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F38C43441
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Oct 2018 10:56:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB8AE20868
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Oct 2018 10:07:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB8AE20868
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fronius.com
+	by mail.kernel.org (Postfix) with ESMTP id 8346820868
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Oct 2018 10:56:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8346820868
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=chicoree.fr
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728194AbeJLRjB (ORCPT
+        id S1727853AbeJLS2R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Oct 2018 13:39:01 -0400
-Received: from mx01.fronius.com ([213.33.117.78]:15765 "EHLO mx01.fronius.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728149AbeJLRjB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Oct 2018 13:39:01 -0400
-IronPort-PHdr: =?us-ascii?q?9a23=3ArpQfIh01V0lXcuHwsmDT+DRfVm0co7zxezQtwd8Z?=
- =?us-ascii?q?sesWK/zxwZ3uMQTl6Ol3ixeRBMOHs60C07KempujcFRI2YyGvnEGfc4EfD4+ou?=
- =?us-ascii?q?JSoTYdBtWYA1bwNv/gYn9yNs1DUFh44yPzahANS47xaFLIv3K98yMZFAnhOgpp?=
- =?us-ascii?q?POT1HZPZg9iq2+yo9JDffwdFiCChbb9uMR67sRjfus4KjIV4N60/0AHJonxGe+?=
- =?us-ascii?q?RXwWNnO1eelAvi68mz4ZBu7T1et+ou+MBcX6r6eb84TaFDAzQ9L281/szrugLd?=
- =?us-ascii?q?QgaJ+3ART38ZkhtMAwjC8RH6QpL8uTb0u+ZhxCWXO9D9QKsqUjq+8ahkVB7oiD?=
- =?us-ascii?q?8GNzEn9mHXltdwh79frB64uhBz35LYbISTOfFjfK3SYMkaSHJBUMhPSiJBHo2y?=
- =?us-ascii?q?YYgBD+UDPOZXs4bzqFQVoBuiHgasBv/jxiNUinL026AxzuQvERvB3AwlB98Av3?=
- =?us-ascii?q?XUrM7rO6cUUuC1y63Iwi7eZP1I2Tf9743IfQo6ofqRWr9+fsvRyVIxGAPDjVWQ?=
- =?us-ascii?q?rojlMCiP2uoTs2ib6O9gWvi0i2M8pQFxuD+vxsEtionUnYIZ0EzL9SJ8wIssI9?=
- =?us-ascii?q?CzVUB1YdmhEJRKtiGaMZN7QsclQ2Fnoio6y7sGtJimdyYJ0JQq3wPTZ+Cdf4SW?=
- =?us-ascii?q?+B7uVfydLSpliH59Zb6zmwy+/Va6xuHiVsS4yktGojdYntXUuHACyR/e5tSCR/?=
- =?us-ascii?q?Z45Uis2jSC2gLW5+xELk05mqTbJps6zbMwl5cfrUHOEyH4mErsg6KbcFgv9PKy?=
- =?us-ascii?q?5OT9eLrmo4eRN4pzig7jLKsjgte/AeEkMggWWGib5Pi82KXj/ULnRLVKieU7n7?=
- =?us-ascii?q?XHvpzDKsoVu6+2DABS3Io66huzEiqq3M4WnXkdK1JFfhOHj5XyO13UPP/4CvK/?=
- =?us-ascii?q?j0ytkDdt2f/GIqXsDojRInTZjrvtZ7dw51RBxAYu1dxf4ohbCrAFIPL9QE/xs9?=
- =?us-ascii?q?nYAwc2PQy12OboFtN91oAZWWKLGaCVKr3csV+P5uIqOeaMf5QYuDjnK/gi4f7u?=
- =?us-ascii?q?jGI5mUQHcaa12psXbWi0Hu56LEWBfXrsntABHH8OvgojTezriUeOXiNNaHa0Q6?=
- =?us-ascii?q?I95yo2CI2jDYjZR4CthKaN0zu8Hp1TfmpGEEyDEW/0d4WYXPcBcCaSIs5nkjwZ?=
- =?us-ascii?q?WrmtUpQu1RWztADk17pnKe3U+jEYtZ/4yth16PPclQso+Tx3EcudyWeNQH9wnm?=
- =?us-ascii?q?8SQD82xq9/8gRBzQKnzKlqy9VFGsFI+/QBTAA8fbLRyfBoQ4T2RwPTONuETkq0?=
- =?us-ascii?q?atqjCDA1CNk2xoldTVx6HoCPjwvO2SmtB7Vdq7yMAZUvuvbx3mP8IcV6z3yA6K?=
- =?us-ascii?q?kmilA9asVVMmunm7U5/A/WUd2a236FnrqnIPxPlBXG832OmC/X5BlV?=
-X-IPAS-Result: =?us-ascii?q?A2EgAAC0ccBb/wsGAgpkGwEBAQEDAQEBBwMBAQGBUQYBAQE?=
- =?us-ascii?q?LAYFUBYI3CoNriBaOR4M/k0iBegwBhGwCF4RhNA0NAQMBAQEBAQECAQECgRGCN?=
- =?us-ascii?q?iQBgl8BAQICASMEDR8mBQsCARULAgImAgICMBUQAQEEDgUIE4I6gkWlYnszGoR?=
- =?us-ascii?q?dhGuBC4FwiiM/gRKCZIVkAoJHglcCiFuHHI4lBwKCD4dahmcfiT0DhlaTXIIhA?=
- =?us-ascii?q?gQCBAUCFIFDgg4zGiODPIImFxFrAQeNFW+LOIEfAQE?=
-X-IronPort-AV: E=Sophos;i="5.54,371,1534802400"; 
-   d="scan'208";a="45878609"
-Received: from unknown (HELO AT-ESXVM-611.fronius.com) ([10.2.6.11])
-  by mx01.fronius.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Oct 2018 12:07:17 +0200
-Received: from AT-ESXVM-612.fronius.com (10.2.6.12) by
- AT-ESXVM-611.fronius.com (10.2.6.11) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1466.3; Fri, 12 Oct 2018 12:07:16 +0200
-Received: from AT-ESXVM-612.fronius.com ([fe80::b877:544f:b560:3fa4]) by
- AT-ESXVM-612.fronius.com ([fe80::b877:544f:b560:3fa4%5]) with mapi id
- 15.01.1466.003; Fri, 12 Oct 2018 12:07:16 +0200
-From:   Eisenkolb Thomas <Eisenkolb.Thomas@fronius.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: AW: Bluetooth: Is it possible to operate Bluez concurrent in central
- and peripheral role?
-Thread-Topic: Bluetooth: Is it possible to operate Bluez concurrent in central
- and peripheral role?
-Thread-Index: AdRhJz0atnowo1DfR/6vOpl/HVQE+AACoMowAA/1V4AAIrU4IP//7noA///OILA=
-Date:   Fri, 12 Oct 2018 10:07:16 +0000
-Message-ID: <9390ebceb54942d9999693bb0ff08949@fronius.com>
-References: <da781fd16860492a9b4d28334a593b77@fronius.com>
- <CABBYNZKWhK5NKQqpgXqTAFcaBkVM=CrSLtuxzD=MPyw6p-es7A@mail.gmail.com>
- <bed1213e3c6d4d3abe06be95ef9aba79@fronius.com>
- <CABBYNZ+dx3SCqsZF=cdpm0cnx=Nc2O-hSyKQF9Euq57G-BBCCw@mail.gmail.com>
-In-Reply-To: <CABBYNZ+dx3SCqsZF=cdpm0cnx=Nc2O-hSyKQF9Euq57G-BBCCw@mail.gmail.com>
-Accept-Language: de-AT, en-US
-Content-Language: de-DE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.2.25.111]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Fri, 12 Oct 2018 14:28:17 -0400
+Received: from 18.mo5.mail-out.ovh.net ([178.33.45.10]:33529 "EHLO
+        18.mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727640AbeJLS2R (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 12 Oct 2018 14:28:17 -0400
+X-Greylist: delayed 1078 seconds by postgrey-1.27 at vger.kernel.org; Fri, 12 Oct 2018 14:28:16 EDT
+Received: from player730.ha.ovh.net (unknown [10.109.160.143])
+        by mo5.mail-out.ovh.net (Postfix) with ESMTP id 191851F5E9F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Oct 2018 12:38:30 +0200 (CEST)
+Received: from [10.129.36.18] (reverse-177-9.fdn.fr [80.67.177.9])
+        (Authenticated sender: sylvain@chicoree.fr)
+        by player730.ha.ovh.net (Postfix) with ESMTPSA id 2DAAE4400A6;
+        Fri, 12 Oct 2018 12:38:29 +0200 (CEST)
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+From:   Sylvain Leroux <sylvain@chicoree.fr>
+Subject: How do you pronounce BlueZ?
+Message-ID: <e0c92bc0-5a44-ffbb-ec04-05742ee53e7a@chicoree.fr>
+Date:   Fri, 12 Oct 2018 12:38:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Ovh-Tracer-Id: 8765693728993873550
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedtkedrvddugddthecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecu
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-PiBIaSBUaG9tYXMsDQo+DQo+IE9uIEZyaSwgT2N0IDEyLCAyMDE4IGF0IDEwOjM2IEFNIEVpc2Vu
-a29sYiBUaG9tYXMgPEVpc2Vua29sYi5UaG9tYXNAZnJvbml1cy5jb20+IHdyb3RlOg0KPiA+DQo+
-ID4gSGVsbG8sDQo+ID4NCj4gPiBUaGFua3MgZm9yIHRoZSBhbnN3ZXIuDQo+ID4NCj4gPiBJIGhh
-dmUgcmVjb3JkZWQgbG9ncyBvZiB0aGUgZXhhY3QgdXNlIGNhc2VzIHdoaWNoIEkgaGF2ZSB0byBy
-ZWFsaXplLg0KPiA+DQo+ID4gVGhlIGZvbGxvd2luZyBNQUMtQWRkcmVzc2VzIG9mIHRoZSBkZXZp
-Y2VzIGFyZSBpbXBvcnRhbnQ6DQo+ID4gICAgICAgICAtIEVtYmVkZGVkIExpbnV4IGRldmljZTog
-Ijc4LUM0LTBFLTgwLTA3LUNEIg0KPiA+ICAgICAgICAgLSBTbWFydHBob25lOiAiNEMtRDYtQTkt
-NDgtQ0EtMEMiDQo+ID4gICAgICAgICAtIFNlbnNvciBkZXZpY2U6ICI4OC02Qi0wRi05NC1DMi0z
-OCINCj4gPg0KPiA+IEkgd2FudGVkIHRvIHNob3J0ZW4gdGhlIGxvZ3MgdGhhdCBubyBpbmZvcm1h
-dGlvbiBnZXRzIGxvc3QuDQo+ID4NCj4gPiBUbyBwcm9kdWNlIHRoaXMgbG9nIEkgZGlkIHRoZSBm
-b2xsb3dpbmcgb3BlcmF0aW9ucyBpbiBjaHJvbm9sb2dpY2FsIG9yZGVyOg0KPiA+ICAgICAgICAg
-MSkgc3RhcnQgYnRtZ3QgdG9vbCAoZW1iZWRkZWQgbGludXgpDQo+DQo+IFlvdSBzaG91bGRuJ3Qg
-bmVlZCB0byBidG1nbXQgZm9yIHRoZXNlIHVzZSBjYXNlcywgYmx1ZXRvb3RoY3RsIGNhbiBtYW5h
-Z2UgYWR2ZXJ0aXNlbWVudHMuDQoNClRoYW5rcyBmb3IgdGhlIGhpbnQuIEkganVzdCBzdGFydGVk
-IGJ0bWdtdCB0byBnZXQgZGV0YWlsZWQgaW5mb3JtYXRpb24gYWJvdXQgbXkgc3lzdGVtIGluIHRo
-ZSBidG1vbiBsb2cuDQoNCj4NCj4gPiAgICAgICAgIDIpIGNhbGwgYnRtZ3QgaW5mbyAoZW1iZWRk
-ZWQgbGludXgpDQo+ID4gICAgICAgICAzKSBSZWdpc3RlciBhZHZlcnRpc2luZyBpbnN0YW5jZXMg
-KGVtYmVkZGVkIGxpbnV4IGFzIHBlcmlwaGVyYWwpDQo+ID4gICAgICAgICA0KSBTY2FuIGZvciBh
-ZHZlcnRpc2luZyBkZXZpY2VzIChTbWFydHBob25lIGFzIGNlbnRyYWwpDQo+ID4gICAgICAgICA1
-KSBTdG9wIHNjYW4gZm9yIGFkdmVydGlzaW5nIGRldmljZXMoU21hcnRwaG9uZSBhcyBjZW50cmFs
-KQ0KPiA+ICAgICAgICAgNikgQ29ubmVjdCB0byBlbWJlZGRlZCBsaW51eCBkZXZpY2UgKFNtYXJ0
-cGhvbmUgYXMgY2VudHJhbCkNCj4gPiAgICAgICAgIC0+IGVzdGFibGlzaGVkDQo+ID4gICAgICAg
-ICA3KSBTdGFydCBzY2FuIGZvciBhZHZlcnRpc2luZyBkZXZpY2VzKGVtYmVkZGVkIGxpbnV4IGFz
-IGNlbnRyYWwpDQo+ID4gICAgICAgICA4KSBTdG9wIHNjYW4gZm9yIGFkdmVydGlzaW5nIGRldmlj
-ZXMoZW1iZWRkZWQgbGludXggYXMgY2VudHJhbCkNCj4gPiAgICAgICAgIDkpIENvbm5lY3QgdG8g
-c2Vuc29yKGVtYmVkZGVkIGxpbnV4IGFzIGNlbnRyYWwpDQo+ID4gICAgICAgICAtPiBGYWlsZWQN
-Cj4NCj4gSSBkb24ndCBzZWUgdGhlIGNvbm5lY3Rpb24gcmVxdWVzdCwgcGVyaGFwcyBpdCBkb2Vz
-bid0IGhhcHBlbiBiZWNhdXNlIHdlIG5ldmVyIGZvdW5kIGl0IHdoaWxlIHNjYW5uaW5nPyBEb2Vz
-IHRoZSBjb25uZWN0aW9uIHRpbWVvdXQ/DQo+DQoNCkJsdWV0b290aGN0bC5sb2c6DQpUaGUgU2Vu
-c29yIGRldmljZSBpcyBmb3VuZCB3aGlsZSBzY2FubmluZy4gSXQgaW4gbGluZSA3OC4NClRoZSBj
-b25uZWN0aW9uIGF0dGVtcHQgaXMgdmlzaWJsZSBpbiB0aGUgc2FtZSBsb2cgaW4gbGluZSAxMDMg
-YW5kIGFsc28gdGhlIGVycm9yIHRoYXQgb2NjdXJyZWQgaW4gbGluZSAxMDUuDQoNCkluIGJ0bW9u
-LmxvZyB0aGUgZGV2aWNlIHdhcyBmaXJzdCB0aW1lIGRpc2NvdmVyZWQgYXQgbGluZSAzNDUxIGFu
-ZCB0aGVuIGV2ZXJ5IDEvMiBzZWNvbmQuDQpEaXNjb3ZlcnkgZ2V0cyBkaXNhYmxlZCBhdCBsaW5l
-IDExODI0Lg0KQWZ0ZXIgdGhhdCB0aGVyZSBzaG91bGQgYmUgdGhlIGNvbm5lY3Rpb24gYXR0ZW1w
-dCBoY2kgY29tbWFuZCBhcyBpdCBjYW4gYmUgc2VlbiBpbiBCbHVldG9vdGhjdGwubG9nLg0KSW4g
-bGluZSAxMTg4NSB0aGUgdXNlZCBkZXZpY2UgaXMgYWRkZWQgdG8gdGhlIHdoaXRlbGlzdCB3aGlj
-aCBzZWVtcyB0byBzdWNjZXNzLihBdCB0aGlzIHBsYWNlIEkgZXhwZWN0ZWQgdG8gZ2V0IGFuIGNv
-bm5lY3Rpb24gYXR0ZW1wdCkNCg0KQXMgeW91IHNhaWQgdGhpcyBpcyBzdHJhbmdlIGJlY2F1c2Ug
-bm8gY29ubmVjdGlvbiBhdHRlbXB0IHJlYWNoZXMgdGhlIGhjaSBpbnRlcmZhY2UuDQoNCj4gPiAg
-ICAgICAgIDEwKSBEaXNjb25uZWN0IGZyb20gZW1iZWRkZWQgTGludXgoU21hcnRwaG9uZSBhcyBj
-ZW50cmFsKQ0KVGhpcyBNR01UIEV2ZW50IGlzIGF0IGxpbmUgMTI1ODcuIFRoZSBzbWFydHBob25l
-IHN1Y2Nlc3NmdWxseSBkaXNjb25uZWN0ZWQgZnJvbSB0aGUgZW1iZWRkZWQgbGludXggZGV2aWNl
-Lg0KDQo+ID4gICAgICAgICAxMSkgQ29ubmVjdCB0byBzZW5zb3IoZW1iZWRkZWQgbGludXggYXMg
-Y2VudHJhbCkNCj4gPiAgICAgICAgIC0+IGVzdGFibGlzaGVkDQpUaGUgc3VjY2Vzc2Z1bCBjb25u
-ZWN0aW9uIGV2ZW50IHRvIHRoZSBzZW5zb3IgaXMgYXQgbGluZSAxMjczNS4NCg0KPiA+ICAgICAg
-ICAgMTIpIENvbm5lY3QgdG8gZW1iZWRkZWQgbGludXggZGV2aWNlKFNtYXJ0cGhvbmUgYXMgY2Vu
-dHJhbCkNCj4gPiAgICAgICAgIC0+IGZhaWxlZA0KPiA+ICAgICAgICAgMTMpIFRyYXkgYWdhaW4g
-Y29ubmVjdCB0byBlbWJlZGRlZCBsaW51eCBkZXZpY2UoU21hcnRwaG9uZSBhcyBjZW50cmFsKQ0K
-PiA+ICAgICAgICAgLT4gZmFpbGVkDQo+DQo+IFNhbWUgdGhpbmcgaGVyZSwgcGVyaGFwcyBibHVl
-dG9vdGhkIGxvZ3Mgd291bGQgdGVsbCB3aHkgaXQgaGFzIGZhaWxlZC4NCg0KWWVzIHRoaXMgaXMg
-YWxzbyBzdHJhbmdlLg0KRm9yIHRoaXMgSSB3aWxsIGhhdmUgYSBsb29rIGF0IHRoZSBibHVldG9v
-dGhkIGxvZ3MuDQoNCj4NCj4gPg0KPiA+IFRoZXJlIGFyZSB0aHJlZSBsb2cgZmlsZXMgaW4gdGhl
-IGF0dGFjaG1lbnRzIHdoaWNoIGhhdmUgYmVlbiByZWNvcmRlZCBjb25jdXJyZW50Lg0KPiA+IE9u
-ZSBmcm9tICJidG1ndCIsICJibHVldG9vdGhjdGwiIGFuZCAiYnRtb24iLg0KPg0KPiBEb24ndCBt
-aXggYnRtZ210IHdpdGggYmx1ZXRvb3RoZCwgYnRtZ210IGlzIG1vcmUgb2YgYSBkZWJ1ZyB0b29s
-IGZvciB0ZXN0aW5nIHRoZSBrZXJuZWwgaW50ZXJmYWNlIGRpcmVjdGx5IGluc3RlYWQgb2YgdXNp
-bmcgRC1CdXMgYnV0IHVzaW5nIGJvdGggaXMgbm90IHJlY29tbWVuZGVkLg0KDQpUaGFua3MgZm9y
-IHRoZSBoaW50LiBGb3IgZnV0dXJlIEkgd2lsbCBqdXN0IHVzZSBibHVldG9vdGhjdGwuDQoNCj4N
-Cj4gPiBBcyB5b3Ugd2lsbCBzZWUgaW4gdGhlIGxvZ3MgZnJvbSB0aGUgc2lnaHQgb2YgdGhlIGVt
-YmVkZGVkIGRldmljZSBJIHdhcyBqdXN0IGFibGUgdG8gZXN0YWJsaXNoIG9uZSBjb25uZWN0aW9u
-IGNvbmN1cnJlbnQuDQo+ID4gV2hldGhlciBwZXJpcGhlcmFsIGNvbm5lY3Rpb24gb3IgYSBjZW50
-cmFsIGNvbm5lY3Rpb24gYnV0IG5vdCBib3RoIGF0IHRoZSBzYW1lIHRpbWUuDQo+DQo+IEkgc2Vl
-IGEgbG90IG9mIHJlcG9ydHMgd2hpY2ggbWVhbnMgd2UgYXJlIHNjYW5uaW5nIGJ1dCBpdCBsb29r
-cyBsaWtlIHRoZXJlIGlzIG5ldmVyIGEgY29ubmVjdGlvbiBhdHRlbXB0LCBleGNlcHQgZm9yIHRo
-ZSBvbmVzIHRoYXQgZG9lcyBzdWNjZWVkLg0KDQpJIGZ1bGx5IGFncmVlLiBJIGp1c3Qgc2VlIHRo
-ZSBhdHRlbXB0IGluIHRoZSBsb2dzIG9mIGJsdWV0b290aGN0bCBidXQgbm8gYXR0ZW1wdCByZWFj
-aGVzIHRoZSBoY2kgaW50ZXJmYWNlLg0KSXMgaXQgaW4gZ2VuZXJhbCBmcm9tIHRoZSBibHVlWiBz
-aWRlIHBvc3NpYmxlIHRvIGhhdmUgYSBjZW50cmFsIGFuZCBhIHBlcmlwaGVyYWwgY29ubmVjdGlv
-biBvcGVuZWQgcGFyYWxsZWwgYXQgdGhlIHNhbWUgdGltZT8NCkkganVzdCBnZXQgbW9yZSB0aGFu
-IG9uZSBjb25uZWN0aW9ucyB0byBwZXJpcGhlcmFscyBhdCB0aGUgc2FtZSB0aW1lIGFuZCB0aGlz
-IHdvcmtzIGZpbmUuDQoNCj4NCj4gPiBJZiB0aGUgZW1iZWRkZWQgZGV2aWNlIGFjdHMganVzdCBh
-cyBjZW50cmFsIGRldmljZSwgaXQgaXMgcG9zc2libGUgdG8gZXN0YWJsaXNoIG1vcmUgY29ubmVj
-dGlvbnMgdG8gZGlmZmVyZW50IHNlbnNvcnMgYXQgdGhlIHNhbWUgdGltZS4NCj4NCj4gVGhhdCBp
-cyByZWFsbHkgd2VpcmQgYmVjYXVzZSB0aGUgb25seSBkaWZmZXJlbmNlIGlzIHRoYXQgeW91IHdv
-dWxkIG5vdCBiZSBhZHZlcnRpc2luZywgdGhpcyBjb3VsZCBiZSBhIHByb2JsZW0gd2l0aCB0aGUg
-Y29udHJvbGxlciB0aG91Z2gsIGhhdmUgeW91IHRyaWVkIGFueSBvdGhlciBjb250cm9sbGVyIHRv
-IHNlZSBpZiBpdCBoYXMgdGhlIHNhbWUgYmVoYXZpb3VyPw0KDQpBY3R1YWxseSBJIGFtIHVzaW5n
-IHRoZSBTUEIyMDlBIE1vZHVsZSBmcm9tIEhEIFdpcmVsZXNzLiANCkkgZG9uJ3QgaGF2ZSBhbnkg
-b3RoZXIgbW9kdWxlIHRoYXQgc3VwcG9ydHMgQmx1ZXRvb3RoID49IDQuMShBcyBJIGZvdW5kIHRo
-aXMgaXMgdGhlIG1pbmltdW0gcmVxdWlyZWQgc3RhbmRhcmQgdGhhdCBzdXBwb3J0cyBjb25jdXJy
-ZW50IEJMRSByb2xlcykgDQoNCj4NCj4gPiBUaGFua3MgZm9yIHlvdXIgaGVscC4NCj4gPg0KPiA+
-IEJlc3QgUmVnYXJkcywNCj4gPiBUaG9tYXMNCj4gPg0KPiA+IEhpIFRob21hcywNCj4gPiBPbiBU
-aHUsIE9jdCAxMSwgMjAxOCBhdCAxMDoxOCBBTSBFaXNlbmtvbGIgVGhvbWFzIDxFaXNlbmtvbGIu
-VGhvbWFzQGZyb25pdXMuY29tPiB3cm90ZToNCj4gPiA+DQo+ID4gPiBIZWxsbywNCj4gPiA+DQo+
-ID4gPiBJIGFtIHdvcmtpbmcgd2l0aCBibHVlWiA1LjUwIG9uIGEgbGludXggZW1iZWRkZWQgZGV2
-aWNlIHdpdGgga2VybmVsIDQuMTQuDQo+ID4gPg0KPiA+ID4gTm93IEkgaGF2ZSB0byBpbXBsZW1l
-bnQgYSB1c2UgY2FzZSB3aGVyZSB0aGUgbGludXggZW1iZWRkZWQgZGV2aWNlIGNvbW11bmljYXRl
-cyBhcyBhIGNlbnRyYWwgZGV2aWNlIHdpdGggYSBmZXcgc2Vuc29ycyB0aHJvdWdoIEJsdWV0b290
-aCBMRSBjaGFyYWN0ZXJpc3RpY3MgYW5kIGF0IHRoZSBzYW1lIHRpbWUgaXQgc2hvdWxkIGFkdmVy
-dGlzZSBzb21lIGRhdGEgYW5kIGFjY2VwdCBhdCBsZWFzdCBvbmUgaW5jb21pbmcgY29ubmVjdGlv
-biBmcm9tIGEgU21hcnRwaG9uZSBhcyBhIHBlcmlwaGVyYWwgZGV2aWNlIGZvciBtYWludGVuYW5j
-ZSBjYXNlcy4NCj4gPiA+DQo+ID4gPiBJIGhhdmVuJ3QgZm91bmQgYW55IGluZm9ybWF0aW9uIGFi
-b3V0IGJsdWVaIGlzIHN1cHBvcnRpbmcgYm90aCBMRSByb2xlcyBhdCB0aGUgc2FtZSB0aW1lLg0K
-PiA+ID4gSSBoYXZlIGFscmVhZHkgdHJpZWQgaXQgbm93IGZvciAyIGRheXMgdG8gZ2V0IHRoaXMg
-dXNlIGNhc2UgdG8gd29yayBhbmQgSSBmb3VuZCBhIGZldyBsaW1pdGF0aW9ucyBmb3Igd2hpY2gg
-SSBkaWRuJ3QgZmluZCBhbnkgc29sdXRpb24uDQo+ID4gPg0KPiA+ID4gSSB3YXMgbm90IGFibGUg
-dG8gYWR2ZXJ0aXNlIGFueSBkYXRhIHdoaWxlIG15IGRldmljZSBoYWQgYW4gYWN0aXZlIGNvbm5l
-Y3Rpb24gdG8gYSBwZXJpcGhlcmFsIGRldmljZS4NCj4gPiA+IEFsc28gd2hpbGUgdGhlIFNtYXJ0
-cGhvbmUgaXMgY29ubmVjdGVkIHRvIG15IGVtYmVkZGVkIGRldmljZShwZXJpcGhlcmFsKSwgSSBk
-b24ndCByZWNlaXZlIGFueSBhZHZlcnRpc2VkIERhdGEgZnJvbSBhbnkgc2Vuc29yIGFuZCBJIGNh
-bm5vdCBjb25uZWN0IHRvIGFueSBzZW5zb3IuDQo+ID4gPg0KPiA+ID4gVGhlIEJsdWV0b290aCBI
-YXJkd2FyZSBNb2R1bGUgd2hpY2ggSSBhbSB1c2luZyBvbiB0aGUgZW1iZWRkZWQgTGludXggU3lz
-dGVtIHN1cHBvcnRzIEJsdWV0b290aCA0LjIuIEZyb20gdGhlIEJsdWV0b290aCBTdGFuZGFyZCBJ
-IGhhdmUgZm91bmQgdGhhdCBjb25jdXJyZW50IHVzZSBvZiBib3RoIEJsdWV0b290aCBMb3cgRW5l
-cmd5IFJvbGVzIHNob3VsZCBiZSBzdXBwb3J0ZWQgc2luY2UgQmx1ZXRvb3RoIDQuMS4NCj4gPiA+
-DQo+ID4gPiBJcyBpdCBwb3NzaWJsZSBmcm9tIGJsdWVaIFN0YWNrIHNpZGUgdG8gaW1wbGVtZW50
-IHRoaXMgdXNlLWNhc2U/DQo+ID4NCj4gPiBCbHVlWiBzaG91bGQgd29yayBhcyBkdWFsIHJvbGVz
-IGFscmVhZHksIGlmIGl0IGRvZXNuJ3QgdGhlcmUgY291bGQgYnVncyBvciB0aGUgY29udHJvbGxl
-ciBwcmV2ZW50aW5nIGNvbW1hbmRzIHRvIHdvcmsgcHJvcGVybHkuDQo+ID4NCj4gPiA+IElmIHll
-cywgY2FuIHlvdSBnaXZlIG1lIHNvbWUgaGludHMgd2hhdCBJIGhhdmUgdG8gY29uc2lkZXIgdG8g
-Z2V0IHRoaXMgY2FzZSB3b3JraW5nPw0KPiA+DQo+ID4gRG8geW91IGhhdmUgSENJIGxvZ3Mgb2Yg
-dGhlIHByb2JsZW0ocyk/DQo+ID4NCj4gPiA+IElmIG5vLCBoYXZlIHlvdSBnb3QgYSB0aW1lbGlu
-ZSB3aGVuIGl0IHdpbGwgYmUgc3VwcG9ydGVkIG9yIGlzIHRoaXMgbm8gcGxhbm5lZCB0byBpbXBs
-ZW1lbnQgaW4gbmVhciBmdXR1cmU/DQo+ID4NCj4gPiBNb3N0IG9mIHVwc3RyZWFtIGVmZm9ydCBp
-cyBvbiBtZXNoIGFuZCB1cGRhdGVzIHRvIGluY2x1ZGUgNS4wIGZlYXR1cmVzLCBidXQgZHVhbC1y
-b2xlIGlzIHNvbWV0aGluZyB0aGF0IHdlIG1pZ2h0IGNvbnNpZGVyIGhpZ2ggcHJpb3JpdHkgaWYg
-dGhhdCBpcyBub3Qgd29ya2luZyBwcm9wZXJseS4NCj4gPg0KPiA+ID4NCj4gPiA+IFRoYW5rcyBm
-b3IgeW91ciBhbnN3ZXIsDQo+ID4gPiBUaG9tYXMNCj4gPiA+DQo+ID4gPg0KPiA+DQo+ID4NCj4g
-PiAtLQ0KPiA+IEx1aXogQXVndXN0byB2b24gRGVudHoNCj4NCj4NCj4NCj4gLS0NCj4gTHVpeiBB
-dWd1c3RvIHZvbiBEZW50eg0KDQpCZXN0IFJlZ2FyZHMsDQpUaG9tYXMgRWlzZW5rb2xiDQo=
+Hi everyone,
+
+I will make a presentation about the Linux Bluetooth support soon, and I
+wonder how I am supposed to pronounce BlueZ (I think this is the correct
+spelling)?
+
+So:
+- is it "blues" like the music genre,
+- or "blue" "zee" (like the color and a "bee")
+- or something else?
+
+
+;)
+- Sylvain
