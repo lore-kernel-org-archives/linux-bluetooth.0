@@ -1,123 +1,114 @@
-Return-Path: <SRS0=msOO=M2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=/MJP=M3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C44BC7112A
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 14 Oct 2018 21:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8962AC28CF8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 06:48:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1507A20835
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 14 Oct 2018 21:40:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1507A20835
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ucw.cz
+	by mail.kernel.org (Postfix) with ESMTP id 3DEE92086A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 06:48:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DEE92086A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726262AbeJOFWb (ORCPT
+        id S1726515AbeJOOcc convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Oct 2018 01:22:31 -0400
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:43773 "EHLO
-        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726084AbeJOFWb (ORCPT
+        Mon, 15 Oct 2018 10:32:32 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:50515 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726397AbeJOOcc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Oct 2018 01:22:31 -0400
-Received: by atrey.karlin.mff.cuni.cz (Postfix, from userid 512)
-        id 92D49807DA; Sun, 14 Oct 2018 23:40:07 +0200 (CEST)
-Date:   Sun, 14 Oct 2018 23:40:07 +0200
-From:   Pavel Machek <pavel@ucw.cz>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Barry Byford <31baz66@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: low energy: does gatt client/server work in current version? How
- to test?
-Message-ID: <20181014214007.GA17602@amd>
-References: <20181001102430.GA6708@amd>
- <CAAu3APYAmr9M5NQkvqsG1-J_zn=Jiq4M18NYLx50WAAU3eb93w@mail.gmail.com>
- <CABBYNZ+R5M+gDyFZ6+fuJyXtNbvPiM7bh+BVeYQOn8oP9JJgSQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="sdtB3X0nJg68CQEu"
-Content-Disposition: inline
-In-Reply-To: <CABBYNZ+R5M+gDyFZ6+fuJyXtNbvPiM7bh+BVeYQOn8oP9JJgSQ@mail.gmail.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+        Mon, 15 Oct 2018 10:32:32 -0400
+Received: from marcel-macbook.fritz.box (p4FF9F655.dip0.t-ipconnect.de [79.249.246.85])
+        by mail.holtmann.org (Postfix) with ESMTPSA id ED733CF35B;
+        Mon, 15 Oct 2018 08:55:56 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
+Subject: Re: [PATCH] Bluetooth: Rockchip: Give nodes for registering in the
+ device tree
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <a83b2172-0a83-988e-d09f-ad5a39720cc9@davidjohnsummers.uk>
+Date:   Mon, 15 Oct 2018 08:48:34 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F459D7EE-8AEF-404E-9572-004FCA8180B2@holtmann.org>
+References: <20181014125014.3976-1-beagleboard@davidjohnsummers.uk>
+ <F8F77105-FF67-4A23-BABE-7B0D70BD4DF5@holtmann.org>
+ <a83b2172-0a83-988e-d09f-ad5a39720cc9@davidjohnsummers.uk>
+To:     David Summers <beagleboard@davidjohnsummers.uk>
+X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi David,
 
---sdtB3X0nJg68CQEu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>>> This patch adds the compatbility flags, so the Rockchip Bluetooth can
+>>> be referenced in the device tree
+>>> 
+>>> Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
+>>> ---
+>>> drivers/bluetooth/btrtl.c | 17 +++++++++++++++++
+>>> 1 file changed, 17 insertions(+)
+>>> 
+>>> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+>>> index 7f9ea8e4c1b2..4cc89c9fe371 100644
+>>> --- a/drivers/bluetooth/btrtl.c
+>>> +++ b/drivers/bluetooth/btrtl.c
+>>> @@ -20,6 +20,8 @@
+>>> #include <asm/unaligned.h>
+>>> #include <linux/usb.h>
+>>> 
+>>> +#include <linux/of.h>
+>>> +
+>>> #include <net/bluetooth/bluetooth.h>
+>>> #include <net/bluetooth/hci_core.h>
+>>> 
+>>> @@ -743,6 +745,21 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+>>> }
+>>> EXPORT_SYMBOL_GPL(btrtl_get_uart_settings);
+>>> 
+>>> +static const struct of_device_id hci_rtl_of_match[] = {
+>>> +	{ .compatible = "realtek,rtl8723a" },
+>>> +	{ .compatible = "realtek,rtl8723bs" },
+>>> +	{ .compatible = "realtek,rtl8723b" },
+>>> +	{ .compatible = "realtek,rtl8723d" },
+>>> +	{ .compatible = "realtek,rtl8723ds" },
+>>> +	{ .compatible = "realtek,rtl8821a" },
+>>> +	{ .compatible = "realtek,rtl8821c" },
+>>> +	{ .compatible = "realtek,rtl8761a" },
+>>> +	{ .compatible = "realtek,rtl8822b" },
+>>> +	{},
+>>> +};
+>>> +MODULE_DEVICE_TABLE(of, hci_rtl_of_match);
+>> this makes no sense in btrtl.c driver. This needs to be in hci_h5.c and bound to h5_serdev_driver.
+>> 
+>> Regards
+>> 
+>> Marcel
+>> 
+> Now I'm confused. hci_h5.c looks like the general 3 wire uart connection to bluetooth, which probably covers sdio devices like the 8723bs which uses sdio.
+> 
+> But what of the 8723b, which looks like a typo earlier in the code for the 8723bu which is usb device. Or say the 8723be which is PCIe.
 
-Hi!
+the cards might be PCIe or SDIO for WiFi, but normally the Bluetooth part is connected either via USB or UART. I have not seen a PCIe Bluetooth card and the SDIO Bluetooth ones are existed only in the early Bluetooth 1.1 days.
 
-> > > Using hciconfig while bluetoothd is running sounds kind-of
-> > > dangerous. Stackoverflow (2) suggests using btmgmt (3) instead, and
-> > > things got slightly different, but did not start to work for me. Is
-> > > there documentation how to get this to work somewhere?
->=20
-> Have a look at bluetoothctl first, all the necessary commands are
-> there to enable to act as peripheral:
+> So if all sdio hci blue tooth cards should be specified with the hci_h5.c driver, and that is general 3 wire uart, then how should this be specified in the device tree?  Surely that should need a specification that says "hci uart", rather than a specific chip.
 
-First, thanks a lot. With bluetoothctl, it indeed works.
+The hci_h5.c was actually a hack to support Realtek devices. I was against it, but it seems nobody wanted to actually work on my bt3wire.c proposal that I send around. The bt3wire.c was suppose to be a clean serdev based driver for all 3-Wire UART cards.
 
-> > > (3)
-> > > sudo tools/btmgmt -i hci0 power off
-> > > sudo tools/btmgmt -i hci0 le on
-> > > sudo tools/btmgmt -i hci0 connectable on
-> > > sudo tools/btmgmt -i hci0 name "some friendly name"
-> > > sudo tools/btmgmt -i hci0 advertising on
-> > > sudo tools/btmgmt -i hci0 power on
-> > > tools/btgatt-server -i hci0 -s low -t public -r -v
->=20
-> No need to use btmgmt, applications should use the D-Bus API which has
-> pretty much everything you are doing with btmgmt.
+> The btrtl.c code looks like it loads drivers, so is it that drivers aren't needed in the hci uart devices made by realtek?
 
-Pretty much, yes.
+The btrtl.c is for common Realtek code shared between USB and UART. The same applies to btbcm.c, btintel.c etc. These modules will be loaded by dependencies on the drivers using them.
 
-There's one piece I'm missing. I need to use "random address", because
-that's what other side of link wants to talk to. "privacy on" from
-btmgmt does randomize address (and sets the right bit). I have not
-found equivalent in bluetoothctl.
+Regards
 
-Plus... I'd really like to use "random, but fixed for given machine"
-address, as this is device other side is expected to pair with.
+Marcel
 
-Ideas woudl be welcome.
-
-> > >     def up(m):
-> > >         print("Starting up BLEE")
-> > >         os.system("sudo ../bluez/src/bluetoothd -d -n &")
-> > >         time.sleep(2)
-> > >         os.system("sudo ./gatt-server &")
->=20
-> bluetoothd is already acting as a GATT server.
-
-I may have misnamed the component, but something needs to tell which
-attributes to implement to bluetoothd.
-
-Thanks,
-									Pavel
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
-
---sdtB3X0nJg68CQEu
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlvDt7cACgkQMOfwapXb+vKHdgCgh1XH+uldJQmjSZvvzUxHbT0e
-EMMAoMJZPcQ8a0yG0CGTYMvCa524hy+o
-=1zPn
------END PGP SIGNATURE-----
-
---sdtB3X0nJg68CQEu--
