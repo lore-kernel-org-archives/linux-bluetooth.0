@@ -2,92 +2,67 @@ Return-Path: <SRS0=/MJP=M3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 783A2C04AA5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 10:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5743C04AA5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 10:53:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3468720652
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 10:53:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3468720652
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bugzilla.kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 8774D20652
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 10:53:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8774D20652
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=chicoree.fr
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726421AbeJOSiD convert rfc822-to-8bit (ORCPT
+        id S1726469AbeJOSi3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Oct 2018 14:38:03 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:44496 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726319AbeJOSiD (ORCPT
+        Mon, 15 Oct 2018 14:38:29 -0400
+Received: from 7.mo68.mail-out.ovh.net ([46.105.63.230]:35425 "EHLO
+        7.mo68.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726319AbeJOSi3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Oct 2018 14:38:03 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 451FF28524
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Oct 2018 10:53:20 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 396E928DAF; Mon, 15 Oct 2018 10:53:20 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 200039] BT advertising packet wakes up the system from S3 and
- suspend-to-idle
-Date:   Mon, 15 Oct 2018 10:53:20 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: raghuram.hegde@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-200039-62941-j84e3IWE3M@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-200039-62941@https.bugzilla.kernel.org/>
-References: <bug-200039-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 15 Oct 2018 14:38:29 -0400
+X-Greylist: delayed 606 seconds by postgrey-1.27 at vger.kernel.org; Mon, 15 Oct 2018 14:38:28 EDT
+Received: from player773.ha.ovh.net (unknown [10.109.146.82])
+        by mo68.mail-out.ovh.net (Postfix) with ESMTP id C4CE8FF988
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Oct 2018 12:35:47 +0200 (CEST)
+Received: from [10.129.36.18] (reverse-177-9.fdn.fr [80.67.177.9])
+        (Authenticated sender: sylvain@chicoree.fr)
+        by player773.ha.ovh.net (Postfix) with ESMTPSA id 251B76000C3;
+        Mon, 15 Oct 2018 12:35:45 +0200 (CEST)
+Subject: Re: How do you pronounce BlueZ?
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <e0c92bc0-5a44-ffbb-ec04-05742ee53e7a@chicoree.fr>
+ <CABBYNZL+YePJrp1C=O5bK3J5QGhrABcKVV2DOWTX5xhF-HMX-Q@mail.gmail.com>
+From:   Sylvain Leroux <sylvain@chicoree.fr>
+Message-ID: <b428a690-35f7-3310-c3e9-9003006b1bd9@chicoree.fr>
+Date:   Mon, 15 Oct 2018 12:35:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+In-Reply-To: <CABBYNZL+YePJrp1C=O5bK3J5QGhrABcKVV2DOWTX5xhF-HMX-Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Ovh-Tracer-Id: 7891150973276884622
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedtkedrvdejgdefudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=200039
+On 10/12/2018 02:35 PM, Luiz Augusto von Dentz wrote:
+> Hi Sylvain, On Fri, Oct 12, 2018 at 1:58 PM Sylvain Leroux
+> <sylvain@chicoree.fr> wrote:
+>> So: - is it "blues" like the music genre, - or "blue" "zee" (like
+>> the color and a "bee") - or something else?
+>
+> Most of us use the second form, though Ive seem people using the
+> first form perhaps it 'sounds' better them :D
 
---- Comment #20 from Raghuram Hegde (raghuram.hegde@intel.com) ---
-(In reply to AceLan Kao from comment #18)
-> Created attachment 279021 [details]
-> full log of btmon
-> 
-> Here is the full log of btmon
-> 
-> 1. run "sudo btmon"
-> 2. Open BT settings dialog
-> 3. Connect and pair with Designer Mouse(BT4)
-> 4. Disconnect the BT mouse
-> 5. Close the BT settings dialog
-> 6. Enter S3
-> 7. System wakes up in couple seconds automatically
-> 8. Stop "sudo btmon"
+Thanks Luiz. I will try to stick with "blue zee" then.
 
-
-As explained in my previous comment, this is a normal/expected behavior as the
-passive scan is running in background.
-
-Request you to close this bug.
-
-Thanks,
-Raghu
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+- Sylvain
