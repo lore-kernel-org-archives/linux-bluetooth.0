@@ -2,84 +2,125 @@ Return-Path: <SRS0=/MJP=M3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E99CC04AA5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 17:25:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7916CC71133
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 18:03:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F2E17208E4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 17:25:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2E17208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
+	by mail.kernel.org (Postfix) with ESMTP id 449B92064A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Oct 2018 18:03:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CmCBMp8r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 449B92064A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726691AbeJPBLr convert rfc822-to-8bit (ORCPT
+        id S1726715AbeJPBtp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Oct 2018 21:11:47 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47886 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726594AbeJPBLr (ORCPT
+        Mon, 15 Oct 2018 21:49:45 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:44399 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726703AbeJPBtp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Oct 2018 21:11:47 -0400
-Received: from marcel-macbook.fritz.box (p4FF9F655.dip0.t-ipconnect.de [79.249.246.85])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 04CE0CF361;
-        Mon, 15 Oct 2018 19:32:59 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Subject: Re: Problems with Bluetooth built into BCM4313 WLAN card
-From:   Marcel Holtmann <marcel@holtmann.org>
-X-Priority: 3
-In-Reply-To: <1558948929.49279.1539619240770@office.mailbox.org>
-Date:   Mon, 15 Oct 2018 19:25:36 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <50691311-913F-4AB0-AF3A-DD280EC0ECB9@holtmann.org>
-References: <214921089.58360.1539009269108@office.mailbox.org>
- <7601015A-9193-4992-AA58-3925937CDEB0@holtmann.org>
- <1558948929.49279.1539619240770@office.mailbox.org>
-To:     mail+bluetooth@m-reimer.de
-X-Mailer: Apple Mail (2.3445.100.39)
+        Mon, 15 Oct 2018 21:49:45 -0400
+Received: by mail-pf1-f195.google.com with SMTP id r9-v6so10067795pff.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Oct 2018 11:03:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=qOxFujzbXf8YZAlgFAV+Pi1Bg2i72lRl+Yf2EFdt664=;
+        b=CmCBMp8rNRdDbqsaUTjS4tr9IhE0h/ZB1pQX5jqWeyvTqEk6sZuXQZy1RO7AMnSygg
+         BxJGhUpE+YgDDaPSLpwNKhkHMP7CYthoRBgBPq/mQ5WUw4O6nskISBHqlKUr4d3KmxR+
+         b2EGBEic/6QnLUe6uSAy4nM51bzYhKHFFLLAg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=qOxFujzbXf8YZAlgFAV+Pi1Bg2i72lRl+Yf2EFdt664=;
+        b=QRisIaeHT+lY1kASGzpt2ngUqIno+TY84iaBZQ8hl2j25/CG0i6x0FXkno+syCmYE+
+         A18WSUxX1lVbil6Q5+BrKsZM0bVVBghD94hFE/WZoueTaELR6mbiTsoyhwhnhfj6pQ9X
+         2FjpGZg5tKFIgPRJapA6Wt7+ckJXOsdDuw4r/jwK6GQ1UXDLgrmMEsox1eBfkGoW1joU
+         foWubhvyBcqarK4zQwkqYneckLcD6Al2qFqr54o+3T2nrxLlzgHCrzh4uA0PIDTOLyzL
+         PCgnVoBSyR6nuY7e8uXrSfodD46egI3mtlLoypow4JosXmQo48OnhL0TaNqtaRJrMwFV
+         zf1w==
+X-Gm-Message-State: ABuFfoiryRhQ+8H7DwwBmnTCA8r3zm3fCbysYrage9+OMizOSWtBLcrF
+        PXLtA/xiHGBpLt9c4AuAEXrLYg==
+X-Google-Smtp-Source: ACcGV60y9KmXc0KQyH25cdaUigqGJaZbLbtzotJdihQsmLW7L9f9UliFs0jFCICR55GJIls+7453ig==
+X-Received: by 2002:a62:9015:: with SMTP id a21-v6mr18645789pfe.49.1539626606600;
+        Mon, 15 Oct 2018 11:03:26 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
+        by smtp.gmail.com with ESMTPSA id b62-v6sm23282552pfa.159.2018.10.15.11.03.25
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 15 Oct 2018 11:03:25 -0700 (PDT)
+Date:   Mon, 15 Oct 2018 11:03:25 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Marcin Wojtas <mw@semihalf.com>,
+        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Sinan Kaya <okaya@codeaurora.org>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Brian Norris <briannorris@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>
+Subject: Re: [PATCH v4 1/2] Bluetooth: Add device_get_bd_address()
+Message-ID: <20181015180325.GS22824@google.com>
+References: <20180927004810.124185-1-mka@chromium.org>
+ <20180927004810.124185-2-mka@chromium.org>
+ <b28c34475e447cc29a139f9121b3c1d9@codeaurora.org>
+ <e6752d4b-b22a-d951-e9db-1ae7445dc403@codeaurora.org>
+ <20180927171305.GG22824@google.com>
+ <20181004173338.GL22824@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181004173338.GL22824@google.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manuel,
+Hi Marcel,
 
-> I've tried with unblocked bluetooth but don't get anyting in lsusb:
+please let me know if any changes are needed to get this patch applied
+to bluetooth-next.
+
+Thanks
+
+Matthias
+
+On Thu, Oct 04, 2018 at 10:33:38AM -0700, Matthias Kaehlcke wrote:
+> On Thu, Sep 27, 2018 at 10:13:05AM -0700, Matthias Kaehlcke wrote:
+> > On Thu, Sep 27, 2018 at 12:47:06PM -0400, Sinan Kaya wrote:
+> > > On 9/27/2018 12:41 PM, Balakrishna Godavarthi wrote:
+> > > >   void bt_sock_reclassify_lock(struct sock *sk, int proto);
+> > > > 
+> > > > +int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr);
+> > > 
+> > > Maybe change the API name to start with bt_ and get rid of device_?
+> > 
+> > device_ indicates that we get the BD_ADDR for a 'struct device' and
+> > not for e.g. a 'struct fwnode_handle'.
+> > 
+> > Anyway with this version of the patch fwnode_get_bd_address() has been
+> > scrapped and it might never be introduced again, so I'm open to change
+> > the name to bt_ if there is a general preference for it.
 > 
-> # rfkill list
-> 0: ideapad_wlan: Wireless LAN
-> 	Soft blocked: no
-> 	Hard blocked: no
-> 1: ideapad_bluetooth: Bluetooth
-> 	Soft blocked: no
-> 	Hard blocked: no
-> 3: phy0: Wireless LAN
-> 	Soft blocked: no
-> 	Hard blocked: no
-> [root@manuelslaptop ~]# lsusb
-> Bus 002 Device 003: ID 04f2:b2e2 Chicony Electronics Co., Ltd 
-> Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-> Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-> Bus 001 Device 004: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card Reader Controller
-> Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-> Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-> Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-> Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> Marcel, can you live with this being added to the Bluetooth code base
+> instead of property? Also if you'd prefer the function to be named
+> bt_get_bd_address() let me know.
 > 
+> Cheers
 > 
-> The WLAN part is also not the greatest (open source driver).
-> 
-> I've ordered a new card with Atheros chipset some days ago and will try if this solves this issue.
-
-Then use acpidump etc to look at your ACPI tables and see if a Bluetooth UART device is described there. There is sadly no simple lsacpi to list your devices.
-
-What is the WiFi chipset anyway? Is this Realtek based or what?
-
-Regards
-
-Marcel
-
+> Matthias
