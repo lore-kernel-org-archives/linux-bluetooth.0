@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54683C5ACCC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 883F0C5ACC6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:17:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A7F120869
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E48420869
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:17:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GyFu94Hz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A7F120869
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="csPhNRjn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E48420869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726622AbeJQEIt (ORCPT
+        id S1726697AbeJQEJU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Oct 2018 00:08:49 -0400
-Received: from mail-lj1-f180.google.com ([209.85.208.180]:35980 "EHLO
-        mail-lj1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725960AbeJQEIt (ORCPT
+        Wed, 17 Oct 2018 00:09:20 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:38139 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726691AbeJQEJU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Oct 2018 00:08:49 -0400
-Received: by mail-lj1-f180.google.com with SMTP id p89-v6so22179021ljb.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 13:16:43 -0700 (PDT)
+        Wed, 17 Oct 2018 00:09:20 -0400
+Received: by mail-lj1-f193.google.com with SMTP id v7-v6so22169931ljg.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 13:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:subject:message-id:mime-version:content-disposition
          :user-agent;
-        bh=9O+krNfhWZ3vjz6GXnXnl9KtYqkk9TWlzVOq5UtNYVQ=;
-        b=GyFu94HzU52f5A0WIhgx///ge87V3D06ggexWeDynV/yO1WsXYb2WKfvrHdgPLK3lH
-         nyvWB4ifLTvBLIqBi/fhaR1sHKNqkSfi2X02A6dmE6ZXOApBqX1gwNWgZM5fD8R4oyn/
-         Z+O5hNJF8OuPYr1H9akGYblvgXQLl3kKfjfsJjEe88g3C19OibuglQrBPjQAmUgBLizI
-         EsiuVZYP4FIP2/o75i3/BAA4GP3VhQ0htzjiArMR0FhaLjrXwefQllNmQdgHOasuC3Kd
-         rlwl8p7mIHRqczk50uUUWMF7c4DFAysD6n+7swdRgTF9K2ys3ynpX52UJasEdyIE2sCe
-         47pA==
+        bh=a3JUq7dYuZMyvSjVxLoa73zcAjR3chYoz/9+Mu9/P9Q=;
+        b=csPhNRjnOW5aZKm974KmbLi7yxY0gxrWteplwK+elnxhxBusqFOVqJcjwW1ZpBTMFa
+         Xb9YAZK2+rpv+RUqSLHv+j8fEePjFhilFV4jo54nbE7846QxPnM9Tov0ceUmseLk/fOX
+         unQQZcHY6FdHVQT2YV+iP+NSNFzxypnOWfLIkpJIMsqJWQJCx+cBaOHc8fyASpB+nQmu
+         WP/fdR/Dpz5mAx7BnGKvDsLURvx+btX35WmmGk9KZJKgVQtOPhlfj//0uNBGIb4RMh1N
+         Ehi3bHnRKCUrGR72+x4YwFHJrY5hK8LZzH3IE1N7isJaHNrKP1t40MCX4zMg6aGh/E+J
+         B5Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:subject:message-id:mime-version
          :content-disposition:user-agent;
-        bh=9O+krNfhWZ3vjz6GXnXnl9KtYqkk9TWlzVOq5UtNYVQ=;
-        b=HcKC65Qks8mdUeZFtDifSOr7kQe+Y6ogwbPVcoTH+wmg9PT7hAJ1zRsmZXno026YNv
-         s9GHEaf++FvQCmG5y2p0EOQkKAJPINuVkNZEpfcOkPLx+YocHzDqUSYBlPeN2ceewf9t
-         vEu1B9uDnf5lhffoq12l2r3UIbvNqtb+LvtS1ASorfJ2NOAbikotxMUD0Dv6JDxgoEce
-         26u/OJ1rA2hsIap8RJTzT98RCchBpGO8zSESeeLf/9ot8d9vhwBtVCAPECq+Q83n0suK
-         iQlZpZqCRZADllYOhh8p4wMi7tuZhdGR2cJaQ0kT6tmBHu3ve1tJe1+O02w+ToDAG3V1
-         JJ0w==
-X-Gm-Message-State: ABuFfohrs+yAXuZTkkdiKHj6kqxlwCnT7ZTAf2LSWjYwuaFOW0cBtXh4
-        OXUyXApgAL/Ba6x5ndEpnM+SaDgf3WI=
-X-Google-Smtp-Source: ACcGV63aN4Dg3m1SP+/xLNU3puxnofbarnBtDdP4FUQKz3b/iWvDHwBdLAYv084F/L4jINtBBUc75A==
-X-Received: by 2002:a2e:6598:: with SMTP id e24-v6mr13106977ljf.99.1539721002215;
-        Tue, 16 Oct 2018 13:16:42 -0700 (PDT)
+        bh=a3JUq7dYuZMyvSjVxLoa73zcAjR3chYoz/9+Mu9/P9Q=;
+        b=BaYmWxXhUHaTMPWoEStjrs2HNbwvCrpU5pN6GgAYQxzxfUrFAHV48WFOlNsAdixKtV
+         qZPKjWlwirU8y+/Cx+nFR2ElybwV71URKsGVA+axx7P3uLVIqt1obnXJtN3t+fnaz/8o
+         eM3speSi/G1XeljI0LsECVJEFDvMbr+XwbHhHsijO9/aWP5dc0mFtErZTmWqIi0ESk0E
+         o5p7G3vAiuTCOAlpXjjCOQ1A7b9tHOaPfhCaBFR8ZT9VnMdxwuJJSoaA+XTeSNvpuyvO
+         cYg5gHmAKIff4MCcT6Yr2sxoWbcqG+KouPEpvtIWAZbBea8rbtUJWyHdmd1NUXSuZSfl
+         f0ow==
+X-Gm-Message-State: ABuFfoiIIhCD021I6SzRDE32Q6doZYAuOOJ+Qxerei7m9NohCoTh1C2W
+        wEIaL5O2aiGBKcr9qag3VByd9iw/VYc=
+X-Google-Smtp-Source: ACcGV62DZL19lFvW7QUcmU1c7TfzUq4xwoyYPz9NAJ9z5xlgfrTAPl5VluaaCweWoiVOdXOrO/zAaA==
+X-Received: by 2002:a2e:82c9:: with SMTP id n9-v6mr14433104ljh.137.1539721033799;
+        Tue, 16 Oct 2018 13:17:13 -0700 (PDT)
 Received: from Matias-MacBook-Air.local (85-23-86-144.bb.dnainternet.fi. [85.23.86.144])
-        by smtp.gmail.com with ESMTPSA id d126-v6sm3296643lfe.75.2018.10.16.13.16.41
+        by smtp.gmail.com with ESMTPSA id e21-v6sm2552161lfc.48.2018.10.16.13.17.12
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Oct 2018 13:16:41 -0700 (PDT)
-Date:   Tue, 16 Oct 2018 23:20:08 +0300
+        Tue, 16 Oct 2018 13:17:13 -0700 (PDT)
+Date:   Tue, 16 Oct 2018 23:20:40 +0300
 From:   Matias Karhumaa <matias.karhumaa@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 02/12] btmon: fix segfault caused by buffer over-read
-Message-ID: <20181016202008.GA84991@Matias-MacBook-Air.local>
+Subject: [PATCH 03/12] btmon: fix segfault caused by buffer over-read
+Message-ID: <20181016202040.GA85000@Matias-MacBook-Air.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -74,43 +74,32 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix segmentation fault caused by buffer over-read in packet_ctrl_open().
+Fix segfault caused by buffer over-read in packet_hci_scodata function
+of monitor/packet.c.
 
-Fix is to check that ident_len is not bigger than size.
+Fix is to check that index is not bigger than MAX_INDEX.
 
-This bug was found by fuzzing btmon with AFL.
-
-Program received signal SIGSEGV, Segmentation fault.
-0x0000000000419e88 in packet_hexdump (buf=0x7fffffffda7e "22", len=<optimized out>) at monitor/packet.c:3813
-3813			str[((i % 16) * 3) + 1] = hexdigits[buf[i] & 0xf];
-(gdb) bt
- #0  0x0000000000419e88 in packet_hexdump (buf=0x7fffffffda7e "22", len=<optimized out>) at monitor/packet.c:3813
- #1  0x000000000041eda4 in packet_ctrl_open (tv=<optimized out>, cred=<optimized out>, index=<optimized out>, data=0x7fffffffda7e, size=<optimized out>) at monitor/packet.c:10286
- #2  0x000000000041b193 in packet_monitor (tv=0x7fffffffda50, cred=<optimized out>, index=65535, opcode=<optimized out>, data=0x7fffffffda60, size=14) at monitor/packet.c:3957
- #3  0x000000000040e177 in control_reader (path=<optimized out>, pager=true) at monitor/control.c:1462
- #4  0x0000000000403b00 in main (argc=<optimized out>, argv=<optimized out>) at monitor/main.c:243
-(gdb)
+This bug was found by fuzzing with AFL.
 ---
- monitor/packet.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ monitor/packet.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 64faceca1..3e2a08a1c 100644
+index 3e2a08a1c..fb6d7e46c 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -10241,6 +10241,12 @@ void packet_ctrl_open(struct timeval *tv, struct ucred *cred, uint16_t index,
- 		flags = get_le32(data + 3);
- 		ident_len = get_u8(data + 7);
+@@ -10170,6 +10170,11 @@ void packet_hci_scodata(struct timeval *tv, struct ucred *cred, uint16_t index,
+ 	uint8_t flags = acl_flags(handle);
+ 	char handle_str[16], extra_str[32];
  
-+		if (ident_len > size) {
-+			print_packet(tv, cred, '*', index, NULL, COLOR_ERROR,
-+                                "Malformed Control Open packet", NULL, NULL);
-+			return;
-+		}
++	if (index > MAX_INDEX) {
++		print_field("Invalid index (%d).", index);
++		return;
++	}
 +
- 		data += 8;
- 		size -= 8;
+ 	index_list[index].frame++;
  
+ 	if (size < HCI_SCO_HDR_SIZE) {
 -- 
 2.17.1
 
