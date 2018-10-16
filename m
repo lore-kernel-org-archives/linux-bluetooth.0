@@ -3,106 +3,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14FDDC04EBD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 07:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E361C04EBD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 13:07:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF87E20866
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 07:49:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF87E20866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m-reimer.de
+	by mail.kernel.org (Postfix) with ESMTP id 1B70120866
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 13:07:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B70120866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=condalo.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727000AbeJPPiJ (ORCPT
+        id S1727016AbeJPU54 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Oct 2018 11:38:09 -0400
-Received: from mx1.mailbox.org ([80.241.60.212]:18476 "EHLO mx1.mailbox.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726729AbeJPPiJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Oct 2018 11:38:09 -0400
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [80.241.60.240])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx1.mailbox.org (Postfix) with ESMTPS id EB45B40573;
-        Tue, 16 Oct 2018 09:48:58 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at heinlein-support.de
-Received: from smtp1.mailbox.org ([80.241.60.240])
-        by hefe.heinlein-support.de (hefe.heinlein-support.de [91.198.250.172]) (amavisd-new, port 10030)
-        with ESMTP id NhhkHp2QaX5T; Tue, 16 Oct 2018 09:48:57 +0200 (CEST)
-Date:   Tue, 16 Oct 2018 09:48:57 +0200 (CEST)
-From:   mail+bluetooth@m-reimer.de
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Message-ID: <1681973667.42596.1539676137500@office.mailbox.org>
-In-Reply-To: <50691311-913F-4AB0-AF3A-DD280EC0ECB9@holtmann.org>
-References: <214921089.58360.1539009269108@office.mailbox.org>
- <7601015A-9193-4992-AA58-3925937CDEB0@holtmann.org>
- <1558948929.49279.1539619240770@office.mailbox.org>
- <50691311-913F-4AB0-AF3A-DD280EC0ECB9@holtmann.org>
-Subject: Re: Problems with Bluetooth built into BCM4313 WLAN card
+        Tue, 16 Oct 2018 16:57:56 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:46327 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726778AbeJPU54 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Oct 2018 16:57:56 -0400
+Received: from null ([172.19.249.22]) by mrelayeu.kundenserver.de (mreue108
+ [212.227.15.183]) with ESMTPSA (Nemesis) id 1MDhth-1gKLZ628XP-00AoF3 for
+ <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 15:07:31 +0200
+Received: from null ([172.19.249.22]) by mrelayeu.kundenserver.de (mreue108
+ [212.227.15.183]) with ESMTPSA (Nemesis) id 1MDhth-1gKLZ628XP-00AoF3 for
+ <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 15:07:31 +0200
+Date:   Tue, 16 Oct 2018 15:07:31 +0200 (CEST)
+From:   =?UTF-8?Q?Martin_F=C3=BCrst?= <martin.fuerst@condalo.de>
+Reply-To: =?UTF-8?Q?Martin_F=C3=BCrst?= <martin.fuerst@condalo.de>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <1807385296.119430.1539695251426@email.1und1.de>
+Subject: Bluetooth Advertisment Notifications over DBUS
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
 X-Priority: 3
 Importance: Medium
+X-Mailer: Open-Xchange Mailer v7.8.4-Rev39
+X-Originating-Client: open-xchange-appsuite
+X-Provags-ID: V03:K1:GwTuMZvZO52+N58xUBgcFzPmqXfDK9VDA1K0UwGzrQq5uNuAHry
+ G/5dKxMWDqGFEwqG21pd6TT8NgfOs+MXrij7v7YmlaUQfK4/7vECUUXdDPQXdmHAQrKS3hN
+ yFLH/ScTgT+XJjA3bgQDVthh1LIb8HwtMWGrZBOfmihhgpRb0xikISErV8CraqFD2iVj7Th
+ IpCVGG0ztb6PfWWekhpmw==
+X-UI-Out-Filterresults: notjunk:1;V01:K0:Fm9lHL8ZokA=:Mw70R4dnfQWVVPGFpNKsEr
+ 0R4SLCEc5KsqHzp7ee4V2YC6Aadbh8BEuta/blwRrO0RYUNZuYO+MSqMpJ//UbOZZbI28iqPB
+ aJL7Re780iJawn+p+MgxZUT0rgl2coN7Oz9eXpy+DbiAUqcGjGF6/5GgmebsNj/9/Hy47rU3V
+ KBy3z7zJ+MCrdxMPplSig06H2lcB+iUegV3he+GBpuONEMkoImMQMfJxkUm901FQryppp0oHj
+ YSgWjtwV8FJ26Q261uui7DVcdjhcW62mY1r7CinTblI/ng8Bsm0RprL+IeTLrOAUUHVe/77cr
+ YlCBJnymmRvuNtO5FkNYIAmgcxRGhTcIZvTYZKgWRV3rpMxpeN6X0I7SPQAea3JjdeDnwP45B
+ At4P8Tz65mvKAK38DxYtNWixatna2+j4HuuZU1naW45zWgS8dhpbpai64qg5UO2H44UTScgm9
+ zEZ24H9a6UFDUeATGuDdnc/u1dtiPegGPMruGqueJGEBDqe3vMg9fiQkPgsyew07wlw/tcrej
+ TxabD88WWkDLbdqlj6MGVZ7a5jD4pyOCk7Q4BCbW6AAx9eH0FqCLhIZlwbJxQOkTi5RCXesMN
+ pPbMl99rP9wjk7WkktW2TIb1z6gz9cpQrrx0KNvlrTdvGDweccCA5ZEedj0wFJLo55Pgm2b2i
+ 3nluv2Z23WTc8eXSIhqluzt3MYJQTxCqKXZ8lvSj21GVEESsQYDTD3oL+JOBcO+4JyRQ2sKCu
+ EBS0GmznKDM19xVT
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+my Bluez-Version: 5.50
+we wanted to have all advertisement data available over D-Bus connection. Up to now only manufacturer data is available via "ManufacturerData" and "AdvertisingData" Properties. I now modified bluez 5.50 in "eir.c" to call "eir_parse_data" by default in "eir_parse" function and send the list with "AdvertisingData"-Property to DBus. I dont know if this is the right way, but for us it is neccesarry to get notified if an advertisment packet is received. As far as i could see the "AdvertisingData"-Property is introduced to get more information about advertising over DBUS Interface.
 
-my acpidump output doesn't seem to have anything about "bluetooth" and I even don't see anything about my BCM4313 card.
-
-About the Wifi chipset, I think it should be Broadcom (BCM4313)
-
-I've tried to load the "thinkpad-acpi" module, but sadly it doesn't detect my ideapad laptop. No way to configure Bluetooth there. I also don't have bluetooth in the BIOS setup to enable it there.
-
-If I'm right, then ACPI/BIOS can somehow block Bluetooth and so even if I get my new card, Bluetooth could still be disabled?
-
-Is there any other way to enable Bluetooth besides booting Windows on this machine to do it there?
-
-Manuel
-
-> Marcel Holtmann <marcel@holtmann.org> hat am 15. Oktober 2018 um 19:25 geschrieben:
-> 
-> 
-> Hi Manuel,
-> 
-> > I've tried with unblocked bluetooth but don't get anyting in lsusb:
-> > 
-> > # rfkill list
-> > 0: ideapad_wlan: Wireless LAN
-> > 	Soft blocked: no
-> > 	Hard blocked: no
-> > 1: ideapad_bluetooth: Bluetooth
-> > 	Soft blocked: no
-> > 	Hard blocked: no
-> > 3: phy0: Wireless LAN
-> > 	Soft blocked: no
-> > 	Hard blocked: no
-> > [root@manuelslaptop ~]# lsusb
-> > Bus 002 Device 003: ID 04f2:b2e2 Chicony Electronics Co., Ltd 
-> > Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-> > Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-> > Bus 001 Device 004: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card Reader Controller
-> > Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
-> > Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-> > Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
-> > Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-> > 
-> > 
-> > The WLAN part is also not the greatest (open source driver).
-> > 
-> > I've ordered a new card with Atheros chipset some days ago and will try if this solves this issue.
-> 
-> Then use acpidump etc to look at your ACPI tables and see if a Bluetooth UART device is described there. There is sadly no simple lsacpi to list your devices.
-> 
-> What is the WiFi chipset anyway? Is this Realtek based or what?
-> 
-> Regards
-> 
-> Marcel
->
+Cheers
+Martin Fürst
