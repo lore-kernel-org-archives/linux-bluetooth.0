@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D444C5ACCC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51244C5ACC6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:19:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C495121470
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:19:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A58E20869
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:19:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hj4+eJTi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C495121470
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uxUA0CJB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A58E20869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727005AbeJQELW (ORCPT
+        id S1726067AbeJQELw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Oct 2018 00:11:22 -0400
-Received: from mail-lf1-f42.google.com ([209.85.167.42]:44174 "EHLO
-        mail-lf1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726067AbeJQELW (ORCPT
+        Wed, 17 Oct 2018 00:11:52 -0400
+Received: from mail-lf1-f46.google.com ([209.85.167.46]:46735 "EHLO
+        mail-lf1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725960AbeJQELw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Oct 2018 00:11:22 -0400
-Received: by mail-lf1-f42.google.com with SMTP id m18-v6so18009398lfl.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 13:19:15 -0700 (PDT)
+        Wed, 17 Oct 2018 00:11:52 -0400
+Received: by mail-lf1-f46.google.com with SMTP id p143-v6so6974664lfp.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 13:19:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:subject:message-id:mime-version:content-disposition
          :user-agent;
-        bh=/SMxhNdPafmNuFlpdqQ/8guO9enxUPM84bL4Mqb89SE=;
-        b=Hj4+eJTi9o7CTqWKBFfD9LoXYRicg8DD+IzO/AiZOmvXfPwWTS1AW1bWi5/tPOdtzh
-         KBDsnWNvjEm1Vvo111GkY8tYbrtGqBMXT3twyJGzhqEAH+RKobxPePYEnj/5yj9S2YFv
-         qBsQBWBkmsRzJibqz8blEoy5H1YFF/g7sI1V+BOK+/fQNOmka664zVP816qnuvz5g+PR
-         7vnymwsmZSGqrwYQJEBNc6jDGiHiuD7aMPY2n1L4k3NpQo1OjttJlA7lVWkKizCprmgF
-         hYKIiVQwVkb4LiW5/e5MRRyj5y2Xp7gTg6u+ANx6tpD9mHNSwmeDW5PBFd+Et/C4CHZR
-         4x1A==
+        bh=NQp6a0OtxGqkJQye144uIiwbfkKtHbJxuCprtE7mHUc=;
+        b=uxUA0CJB2muFbnxkmQ6FcGdIjR0MAA5GtTenz+35CyUvMLegklOktbwLu2Lt0Y33eT
+         hC9SYu8Wz4hugRZk/Xr78wVTqRIE6QhvZTV5lEam4DygJtiROPbPP104SPvtDoV7Oytd
+         vFXt6E5Mg8rrXNPlNLEMyGVslF1Z9tSvc62p+BCoYIlZoWjdZfCPSvncv4J/4oZEbdn3
+         E+GoZbifo0BA6HKqavvdL3KIB34xk13EMZyAJLTy9fOAYP5cvX6UosAQyCtyon1wpzNH
+         Xy/KkHH0ewx4SnUzFVlXrlVAMd14omkZ72eYWtKjuFwxUonUVGwzui+bPVOoFIGcwpan
+         Q92Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:subject:message-id:mime-version
          :content-disposition:user-agent;
-        bh=/SMxhNdPafmNuFlpdqQ/8guO9enxUPM84bL4Mqb89SE=;
-        b=k44RICl3YJwTJM8fh/mIk0H1ETUA+as/2PgW1Zgz4kjirklckf7QKeCyiBW8cwya7T
-         VVKSAe4EfOYsTFV8LVL9x+FapQIOKLM53ijuX83RV4ytt1HWv1Kp1IYlZ0QtZes6lwQk
-         38i7aJgMjinUaNcJtwgXT92ywmQYfGibSMtmp0WTmh3FYh97wBz8/ijZPtQ+gBLcs2TP
-         fOREb8wo54d+IwF9dL3CEPYKB6ZmsFokvgkvkK+NVurMNpndq1DKeKjFqXawjVarVvPj
-         eWwC0iEq/zQJc/QnsLLxi0xGRFW9rhfG+VVx2lYrWp+Y7kU0GgFJYkXTvZ3iugFrYEdH
-         kiLw==
-X-Gm-Message-State: ABuFfoiB7LytCsnQI2c8YJlOnb2PLs+kS8qMYQmENdTC3qWRXQRjrjYR
-        6bP1UXPHPd/0mLYsMMvw5AHfDZzhq7w=
-X-Google-Smtp-Source: ACcGV60iQ6LITYfgl4ttK1rE4ljjbxQ0mN7JHpb8O+IA1biYQR5+viGuvYO2V5K3tUtDT4olBNF2AA==
-X-Received: by 2002:a19:274b:: with SMTP id n72-v6mr13266831lfn.153.1539721154835;
-        Tue, 16 Oct 2018 13:19:14 -0700 (PDT)
+        bh=NQp6a0OtxGqkJQye144uIiwbfkKtHbJxuCprtE7mHUc=;
+        b=Ff4JdTUwq8m5RjfdOXQeAJd6L8sk30ULdMYyRIL7ju8k//HETIGSIC+cwi1ygpS7UO
+         OeA3OZPj+rRGuNRmIo7LvWEqRkHBcHu7LXlcKJnX/QmBy2DBhxyphTbVUotRkP6emVAA
+         tN0vix5yPGu5crJiNdWwJ3s4B7DBNO/GQNM+zAX/gqrbslNMea3VJztKHqhwVrAExS0Z
+         UXVxrqY28wIewRzJINd6Jft+IJMu3a6MoQFpVrqBaHUUCFwV4isYBValj7SgnMXX2gzB
+         PZ8L/5+fp+B/xlznezdL/AcTaVwRk5JZFmjdb10p3XvUa+NNxA1hkFJ2WAJUyZmVUot6
+         Xr6Q==
+X-Gm-Message-State: ABuFfogVtuY1Vsw21qo79kWVY6j3X51r26SoDjuyPbgTuVfUj5vCRSRa
+        S92gz1bqZoRy5uwfHid29IzO8Z/NncI=
+X-Google-Smtp-Source: ACcGV60ujACPHXj3OZexRMebr+rUbvT22aCZKmdxqCzevCdFtIc87F8Mbz3FVZKIH3famJPtdFAo+Q==
+X-Received: by 2002:a19:2095:: with SMTP id g143-v6mr8011698lfg.62.1539721185215;
+        Tue, 16 Oct 2018 13:19:45 -0700 (PDT)
 Received: from Matias-MacBook-Air.local (85-23-86-144.bb.dnainternet.fi. [85.23.86.144])
-        by smtp.gmail.com with ESMTPSA id 2-v6sm3392642ljv.83.2018.10.16.13.19.13
+        by smtp.gmail.com with ESMTPSA id h2-v6sm3274902lfb.27.2018.10.16.13.19.44
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Oct 2018 13:19:14 -0700 (PDT)
-Date:   Tue, 16 Oct 2018 23:22:42 +0300
+        Tue, 16 Oct 2018 13:19:44 -0700 (PDT)
+Date:   Tue, 16 Oct 2018 23:23:12 +0300
 From:   Matias Karhumaa <matias.karhumaa@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/12] btmon: fix segfault caused by integer underflow
-Message-ID: <20181016202242.GA85013@Matias-MacBook-Air.local>
+Subject: [PATCH 08/12] btmon: fix segfault caused by integer undeflow
+Message-ID: <20181016202312.GA85016@Matias-MacBook-Air.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -74,52 +74,30 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix segfault caused by integer underflow in set_event_filter_cmd().
-Fix is to check that size is big enough before subtracting to prevent
-underflow.
+Fix segfault caused by integer underflow. Fix is to check that
+rsp->num_codecs + 3 is not bigger than size before subtracting.
 
 Crash was found by fuzzing btmon with AFL.
 ---
- monitor/packet.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ monitor/packet.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index abdc18aa2..461f5e84b 100644
+index 461f5e84b..1e9f9d9e4 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -4726,6 +4726,10 @@ static void set_event_filter_cmd(const void *data, uint8_t size)
- 		break;
+@@ -5832,6 +5832,11 @@ static void read_local_codecs_rsp(const void *data, uint8_t size)
+ 	const struct bt_hci_rsp_read_local_codecs *rsp = data;
+ 	uint8_t i, num_vnd_codecs;
  
- 	case 0x01:
-+		if (size < 2) {
-+			print_text(COLOR_ERROR, "  invalid parameter size");
-+			break;
-+		}
- 		filter = *((const uint8_t *) (data + 1));
- 
- 		switch (filter) {
-@@ -4765,11 +4769,21 @@ static void set_event_filter_cmd(const void *data, uint8_t size)
- 			break;
- 		}
- 
-+		if (size < 2) {
-+                        print_text(COLOR_ERROR, "  invalid parameter size");
-+                        break;
-+                }
++	if (rsp->num_codecs + 3 > size) {
++		print_field("Invalid number of codecs.");
++		return;
++	}
 +
- 		print_field("Filter: %s (0x%2.2x)", str, filter);
- 		packet_hexdump(data + 2, size - 2);
- 		break;
+ 	print_status(rsp->status);
+ 	print_field("Number of supported codecs: %d", rsp->num_codecs);
  
- 	default:
-+		if (size < 2) {
-+                        print_text(COLOR_ERROR, "  invalid parameter size");
-+                        break;
-+                }
-+
- 		filter = *((const uint8_t *) (data + 1));
- 
- 		print_field("Filter: Reserved (0x%2.2x)", filter);
 -- 
 2.17.1
 
