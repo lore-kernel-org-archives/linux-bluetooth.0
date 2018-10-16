@@ -2,105 +2,212 @@ Return-Path: <SRS0=78jX=M4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B8AC5ACC6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF642C5ACC6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 21:02:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 96D7520869
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:21:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6582921471
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 21:02:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVUq76rp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D7520869
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="HG19WnjP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6582921471
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726325AbeJQENs (ORCPT
+        id S1727020AbeJQEzB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Oct 2018 00:13:48 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:36697 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725960AbeJQENs (ORCPT
+        Wed, 17 Oct 2018 00:55:01 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:36249 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726994AbeJQEzB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Oct 2018 00:13:48 -0400
-Received: by mail-lf1-f66.google.com with SMTP id d4-v6so18039991lfa.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 13:21:41 -0700 (PDT)
+        Wed, 17 Oct 2018 00:55:01 -0400
+Received: by mail-pg1-f196.google.com with SMTP id f18-v6so11439181pgv.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 14:02:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=zsMv1OReyLqDZtRu4eGAL1N0V7ngiXexAvU52nTAEeA=;
-        b=mVUq76rpvSxjvF5LbV/lJjm8xdSVuty9JNj2gN9lRM+4nCryckW5U5FNUfUPiQA+03
-         tpuSsM+tdcbwB192LQlWOTHiwoeZ9no1K/ESyVgn7j9JuD7QIksMYf5T0uadjqfdOzSR
-         nnlH0Xr7+JbIRwZbXgwgl6wVgfYsC9CVQeFots+AVSF0WBCszHQG1nWbLuz7CER5Ybuz
-         iV42CsdanBbLiJaN4HE5VlcDMHj6sQ5kIAHuXxzzWfPBWNSrio6W78yNIAnkgvTzV5Du
-         wrAbBYQrd3UOozjAvlY+7os1AL1Txchw+PfJLD5imwKKaB9p6YJOjC7SeB8BwSUrtYE2
-         RXhg==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=p9MokN1AKnRN4mepWaB8sA/0JJyICRGM5sbyv88okSU=;
+        b=HG19WnjP68rECEeuqSmFU5uVHNO5pspSLbMjFfiz6Cq69Cr4hm0tztiDAeigEYnWgx
+         H8G8rNid1fmzyclYepE6wwORDJd/CueiPDjn8koKmE0lT11NsV/8gjJCM3yQEpAiQVtd
+         VSHB+e+rsY0426hGFQOAXOzXI450IvvRCuJME=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=zsMv1OReyLqDZtRu4eGAL1N0V7ngiXexAvU52nTAEeA=;
-        b=lE2QscmgN32cepHDhTKHZQm0JTm8sMJ9qMZwf+bjNSuGfbrmi0aVGxRCbHTeJY3PcN
-         ob23PBXfwpBdErHABJi+3m9W/Ns369UDUGjmP9O+RKyjGOg84mAukZdt3NofyDhIgQ7a
-         pdGH2FXhFn0RcP0sBHMhG1HG3CQPsFTBCdAT7f030TxXPVRNbVs/M9lR4JyjVaPN6p1w
-         IXxqVoYKKIwj1o6EbO3pYQ8B1rBSugcmHK+/6G//0FSiBEoWmWiTP/QjpQlBFSfFe08g
-         olUJ5QWWLD3n1UK33RVFYSmh7DsjZw7mmJ3JBXEB20Rts4P+xymftLwh3FT+nX3grKy6
-         Au5A==
-X-Gm-Message-State: ABuFfog3V+m2uhAe5Z7Dlr8auqyukJ89zYOUMRuD9OJvbtpC0J3r4Yzt
-        CM16a3CnxkQsKNDGzbw7wbP5PYE/044=
-X-Google-Smtp-Source: ACcGV63sLQbsnX9HTncGqri9+a1flKgJiXnI+5ZS23gSRzrA77Lmow+pXMTwlDtwKsxUYAtI3bUigw==
-X-Received: by 2002:a19:6458:: with SMTP id b24-v6mr5166143lfj.5.1539721300572;
-        Tue, 16 Oct 2018 13:21:40 -0700 (PDT)
-Received: from Matias-MacBook-Air.local (85-23-86-144.bb.dnainternet.fi. [85.23.86.144])
-        by smtp.gmail.com with ESMTPSA id a63-v6sm3507055ljf.54.2018.10.16.13.21.39
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Oct 2018 13:21:39 -0700 (PDT)
-Date:   Tue, 16 Oct 2018 23:25:08 +0300
-From:   Matias Karhumaa <matias.karhumaa@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 12/12] btmon: fix segfault caused by buffer over-read
-Message-ID: <20181016202508.GA85028@Matias-MacBook-Air.local>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=p9MokN1AKnRN4mepWaB8sA/0JJyICRGM5sbyv88okSU=;
+        b=ooye4l89z5GkNtDi8vzHYh+cAyQtYKRQEt2olldWfurphYohkyazoSd7tzX+SOC7ZG
+         DlxRwL+xjsgniHlKOOYb5klHUq5dZZLaCZ+ZWhUl0Sx+qQ6d/TJMll1XwyKZREYBFCuV
+         heGxt5h75LnDCPQrOawhr2FKPtwYg4McIexonR+kMyIgMxFYveASwheBMO5kyFwxF9N1
+         g3pEO3lvJeT9lCWulnbXiaBNcsR4DojHbrwWxvylad+w8ohrEkYc5jVESV0dZ0tn5gv5
+         tBFaO1yauW0iahQPAxTlp3UGo4eCgj/74y5F0itZdeCKBy8CQ6655QBrV+evuvPFhh4z
+         MC6g==
+X-Gm-Message-State: ABuFfoiMXvgVZuCCmmETI9mCaTwdY1iWCNXpANabjd7eXlfvB73Zr4ga
+        P5bq4cOE3HaiFTgdcE7I4Ks38g==
+X-Google-Smtp-Source: ACcGV62ygpnrK90+CJr0EMGI/BW6L2nvRRsu2bSWdihax9w17FjCROQp2Lw2jiCWmsF3xZYNOcs4AQ==
+X-Received: by 2002:a63:4952:: with SMTP id y18-v6mr21738957pgk.32.1539723767103;
+        Tue, 16 Oct 2018 14:02:47 -0700 (PDT)
+Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
+        by smtp.gmail.com with ESMTPSA id o7-v6sm24803853pgq.14.2018.10.16.14.02.45
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 16 Oct 2018 14:02:46 -0700 (PDT)
+Date:   Tue, 16 Oct 2018 14:02:45 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "Rafael J . Wysocki" <rafael@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Sinan Kaya <okaya@codeaurora.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Marcin Wojtas <mw@semihalf.com>,
+        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Brian Norris <briannorris@chromium.org>
+Subject: Re: [PATCH v4 1/2] Bluetooth: Add device_get_bd_address()
+Message-ID: <20181016210245.GU22824@google.com>
+References: <20180927004810.124185-1-mka@chromium.org>
+ <20180927004810.124185-2-mka@chromium.org>
+ <b28c34475e447cc29a139f9121b3c1d9@codeaurora.org>
+ <e6752d4b-b22a-d951-e9db-1ae7445dc403@codeaurora.org>
+ <20180927171305.GG22824@google.com>
+ <20181004173338.GL22824@google.com>
+ <9B742DB5-F584-4A47-A04B-4F72EB17519C@holtmann.org>
+ <20181015185128.GT22824@google.com>
+ <8D254888-52A9-4201-882C-EDE71EE4CF5C@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-User-Agent: Mutt/1.6.1 (2016-04-27)
+In-Reply-To: <8D254888-52A9-4201-882C-EDE71EE4CF5C@holtmann.org>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix segfault caused by buffer over-read in service_rsp function of
-monitor/sdp.c.
+Hi Marcel,
 
-This bug can be triggered locally reading malformed btmon capture file
-and also over the air by sending specifically crafted SDP Search
-Attribute response to device running btmon.
+On Tue, Oct 16, 2018 at 08:52:07AM +0200, Marcel Holtmann wrote:
+> Hi Matthias,
+> 
+> >>>>>> void bt_sock_reclassify_lock(struct sock *sk, int proto);
+> >>>>>> 
+> >>>>>> +int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr);
+> >>>>> 
+> >>>>> Maybe change the API name to start with bt_ and get rid of device_?
+> >>>> 
+> >>>> device_ indicates that we get the BD_ADDR for a 'struct device' and
+> >>>> not for e.g. a 'struct fwnode_handle'.
+> >>>> 
+> >>>> Anyway with this version of the patch fwnode_get_bd_address() has been
+> >>>> scrapped and it might never be introduced again, so I'm open to change
+> >>>> the name to bt_ if there is a general preference for it.
+> >>> 
+> >>> Marcel, can you live with this being added to the Bluetooth code base
+> >>> instead of property? Also if you'd prefer the function to be named
+> >>> bt_get_bd_address() let me know.
+> >> 
+> >> explain to me again why this is useful?
+> > 
+> > The official binding for providing the BD_ADDR through the device tree
+> > is the property 'local-bd-address'. device_get_bd_address() provides a
+> > common API to retrieve the BD_ADDR instead of requiring BT drivers to
+> > use the lower level fwnode_property_read_u8_array(). It also avoids
+> > repeating the check for an all zeroes BD_ADDR in multiple drivers.
+> > 
+> >> I am failing to see the benefit if this is not part of the property.h API.
+> > 
+> > My understanding is that the intention of property.h it to provide an
+> > API for common property types used by drivers from different
+> > subsystems, hence the implementation 'lives' in drivers/base.
+> > Obtaining the BD_ADDR is clearly limited to the Bluetooth subsystem,
+> > and drivers/base doesn't seem to be the right place for it. It's true,
+> > device_get_mac_address() lives in the common property code, but that
+> > doesn't necessarily mean it really should be there and we should do
+> > the same. I agree with Sakari that the the approach taken by V4L2
+> > (drivers/media/v4l2-core/v4l2-fwnode.c) seems more appropriate.
+> > 
+> > That said I wouldn't raise opposition if the maintainers of
+> > drivers/base agreed to add device_get_mac_address() there, however so
+> > far several recent authors of property.[ch] have raised objections.
+> 
+> so if this is not in drivers/base/ then what is the point in making
+> each driver do this? If it is a common property, then it can be well
+> handled in the Bluetooth core when setting up the hardware.
 
-Bug was found by fuzzing btmon with AFL.
----
- monitor/sdp.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Agreed, it would be better if this can be handled in the Bluetooth core.
 
-diff --git a/monitor/sdp.c b/monitor/sdp.c
-index 13a8807c7..36708f426 100644
---- a/monitor/sdp.c
-+++ b/monitor/sdp.c
-@@ -585,6 +585,10 @@ static void service_rsp(const struct l2cap_frame *frame, struct tid_data *tid)
- 	}
- 
- 	count = get_be16(frame->data + 2);
-+	if (count * 4 > frame->size) {
-+		print_text(COLOR_ERROR, "invalid record count");
-+                return;
-+	}
- 
- 	print_field("Total record count: %d", get_be16(frame->data));
- 	print_field("Current record count: %d", count);
--- 
-2.17.1
+> This whole BD_ADDR via DT is stupid anyway. Just so that is clear
+> up-front. It has been a total hack and fully relies on boot loaders
+> doing too much magic and then using DT to hide this magic. The
+> BD_ADDR is required to be unique and that means no user will ever
+> create a DT with that set. The boot loader always has to read some
+> magic value and then convert it and merge it into the actual DT
+> provided to the kernel. The clean part would be just to have proper
+> APIs to read the memory of the persistent / programmed BD_ADDR and
+> then access that.
 
+Yes, the DT approach relies on the bootloader which isn't ideal. Part
+of the problem is that AFAIK there is currently no standard way for
+storing/retrieving persistent, board specific values like BD ADDR, so
+different custom mechanisms are used, which tend to be incompatible
+with each other (e.g. Chrome OS uses VPD:
+https://chromium.googlesource.com/chromiumos/platform/vpd/)
+
+Using the bootloader & DT is a pragmatic approach, since the DT is
+well established and the bootloader often already has DT awareness.
+
+That said I agree that a common solution would make our lives easier.
+
+> That all said, we have hdev->set_bdaddr address and the
+> HCI_QUIRK_INVALID_BDADDR to mark the controller as not fully set
+> up. And then actually user space can deal with getting the correct
+> address and providing it. The code is already there that handles all
+> of this if the BD_ADDR comes from user space. Actually hacking this
+> into the driver and doing that in the hdev->setup callback is quirky
+> to begin with. A user space provided address will just overwrite
+> that.
+> 
+> If you really want to make this generic, then introduce
+> HCI_QUIRK_USE_BDADDR_PROPERTY that a driver can set and then do that
+> all in hci_dev_do_open() so that if no user space provided BD_ADDR
+> is available, it is read from local-bt-address property and if that
+> is not available or empty, then mark the the device as unconfigured.
+> 
+> I am intentionally saying unconfigured when you set
+> HCI_QUIRK_USE_BDADDR_PROPERTY since I assume that the logic that we
+> have behind HCI_QUIRK_INVALID_BDADDR is implied and whatever address
+> comes back via Read_BD_Address is invalid. Otherwise this hardware
+> should not set HCI_QUIRK_USE_BDADDR_PROPERTY at all.
+
+Thanks for proposing this generic alternative solution and providing
+details!
+
+I'm not really experienced with hacking the Bluetooth core and don't
+understand your proposal entirely:
+
+I get the part of setting the quirk in the driver, checking for it in
+hci_dev_do_open(), reading the address from 'local-bd-address',
+setting it with hdev->bd_addr and marking the device as unconfigured
+if the address is empty/unavailable. I interpret that you suggest that
+'local-bd-address' should only be used if user space doesn't provide a
+BD_ADDR. It is not evident to me where a user space provided address
+is set, in any case it doesn't seem to be in hci_dev_do_open(), my
+uneducated guess is that the address is set with the management
+command SET_PUBLIC_ADDRESS. Could you clarify on this?
+
+I also wonder how to identify the DT node corresponding to an HCI
+device, for hci_qca it's the node of hdev->dev.parent, but I'm not
+sure if that is universally true. If it isn't looking for the first
+parent with a DT node could be an option.
+
+Thanks
+
+Matthias
