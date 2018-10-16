@@ -2,103 +2,119 @@ Return-Path: <SRS0=78jX=M4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88ADDC04EBD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 06:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AA2C04EBD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 06:52:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 41B7B208B3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 06:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41B7B208B3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bugzilla.kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 4343520866
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 06:52:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4343520866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727162AbeJPORr convert rfc822-to-8bit (ORCPT
+        id S1727304AbeJPOlI convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Oct 2018 10:17:47 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:48868 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727047AbeJPORr (ORCPT
+        Tue, 16 Oct 2018 10:41:08 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52408 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727289AbeJPOlI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Oct 2018 10:17:47 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id AF341298DE
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 06:28:53 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id A3809298FE; Tue, 16 Oct 2018 06:28:53 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 200039] BT advertising packet wakes up the system from S3 and
- suspend-to-idle
-Date:   Tue, 16 Oct 2018 06:28:53 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: raghuram.hegde@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-200039-62941-2z0tY0YAVk@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-200039-62941@https.bugzilla.kernel.org/>
-References: <bug-200039-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 16 Oct 2018 10:41:08 -0400
+Received: from marcel-macbook.fritz.box (p4FF9F655.dip0.t-ipconnect.de [79.249.246.85])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3FE52CF367;
+        Tue, 16 Oct 2018 08:59:30 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
+Subject: Re: [PATCH v4 1/2] Bluetooth: Add device_get_bd_address()
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20181015185128.GT22824@google.com>
+Date:   Tue, 16 Oct 2018 08:52:07 +0200
+Cc:     "Rafael J . Wysocki" <rafael@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Sinan Kaya <okaya@codeaurora.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Sakari Ailus <sakari.ailus@linux.intel.com>,
+        Marcin Wojtas <mw@semihalf.com>,
+        Andy Shevchenko Andy Shevchenko <andy.shevchenko@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Brian Norris <briannorris@chromium.org>
 Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Message-Id: <8D254888-52A9-4201-882C-EDE71EE4CF5C@holtmann.org>
+References: <20180927004810.124185-1-mka@chromium.org>
+ <20180927004810.124185-2-mka@chromium.org>
+ <b28c34475e447cc29a139f9121b3c1d9@codeaurora.org>
+ <e6752d4b-b22a-d951-e9db-1ae7445dc403@codeaurora.org>
+ <20180927171305.GG22824@google.com> <20181004173338.GL22824@google.com>
+ <9B742DB5-F584-4A47-A04B-4F72EB17519C@holtmann.org>
+ <20181015185128.GT22824@google.com>
+To:     Matthias Kaehlcke <mka@chromium.org>
+X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=200039
+Hi Matthias,
 
---- Comment #23 from Raghuram Hegde (raghuram.hegde@intel.com) ---
-(In reply to AceLan Kao from comment #22)
-> I think the behavior should be normal.
-> When BT dialog is opened, it start accepting all advertisement, and stop
-> receiving packet after it's closed. This behavior is easy to be observed.
-> From the full log, packets before #219 are received when the BT dialog is
-> opened, and #220 is received during S3.
+>>>>>> void bt_sock_reclassify_lock(struct sock *sk, int proto);
+>>>>>> 
+>>>>>> +int device_get_bd_address(struct device *dev, bdaddr_t *bd_addr);
+>>>>> 
+>>>>> Maybe change the API name to start with bt_ and get rid of device_?
+>>>> 
+>>>> device_ indicates that we get the BD_ADDR for a 'struct device' and
+>>>> not for e.g. a 'struct fwnode_handle'.
+>>>> 
+>>>> Anyway with this version of the patch fwnode_get_bd_address() has been
+>>>> scrapped and it might never be introduced again, so I'm open to change
+>>>> the name to bt_ if there is a general preference for it.
+>>> 
+>>> Marcel, can you live with this being added to the Bluetooth code base
+>>> instead of property? Also if you'd prefer the function to be named
+>>> bt_get_bd_address() let me know.
+>> 
+>> explain to me again why this is useful?
 > 
-> But the issue is, the advertising packets are only be received after there
-> is a paired BT4 device(no matter it's connected or not).
-> It very simple to verify.
+> The official binding for providing the BD_ADDR through the device tree
+> is the property 'local-bd-address'. device_get_bd_address() provides a
+> common API to retrieve the BD_ADDR instead of requiring BT drivers to
+> use the lower level fwnode_property_read_u8_array(). It also avoids
+> repeating the check for an all zeroes BD_ADDR in multiple drivers.
 > 
-> 1. remove all BT devices from BT dialog and close the BT dialog
-> 2. run "btmon" and got nothing
+>> I am failing to see the benefit if this is not part of the property.h API.
 > 
-> 1. pair non-BT4 devices(you can leave it connected) and close BT dialog
-> 2. nothing from "btmon" if you don't touch the paired device.
+> My understanding is that the intention of property.h it to provide an
+> API for common property types used by drivers from different
+> subsystems, hence the implementation 'lives' in drivers/base.
+> Obtaining the BD_ADDR is clearly limited to the Bluetooth subsystem,
+> and drivers/base doesn't seem to be the right place for it. It's true,
+> device_get_mac_address() lives in the common property code, but that
+> doesn't necessarily mean it really should be there and we should do
+> the same. I agree with Sakari that the the approach taken by V4L2
+> (drivers/media/v4l2-core/v4l2-fwnode.c) seems more appropriate.
 > 
-> 1. pair BT4 devices and disconnected them(even power off them)
-> 2. we got advertising packet from other BT4 devices.
-> 
-> I'm not sure if "Accept all advertisement" is the culprit, but I'm willing
-> to know if there is any command we can try to disable it to see if it helps.
+> That said I wouldn't raise opposition if the maintainers of
+> drivers/base agreed to add device_get_mac_address() there, however so
+> far several recent authors of property.[ch] have raised objections.
+
+so if this is not in drivers/base/ then what is the point in making each driver do this? If it is a common property, then it can be well handled in the Bluetooth core when setting up the hardware.
+
+This whole BD_ADDR via DT is stupid anyway. Just so that is clear up-front. It has been a total hack and fully relies on boot loaders doing too much magic and then using DT to hide this magic. The BD_ADDR is required to be unique and that means no user will ever create a DT with that set. The boot loader always has to read some magic value and then convert it and merge it into the actual DT provided to the kernel. The clean part would be just to have proper APIs to read the memory of the persistent / programmed BD_ADDR and then access that.
+
+That all said, we have hdev->set_bdaddr address and the HCI_QUIRK_INVALID_BDADDR to mark the controller as not fully set up. And then actually user space can deal with getting the correct address and providing it. The code is already there that handles all of this if the BD_ADDR comes from user space. Actually hacking this into the driver and doing that in the hdev->setup callback is quirky to begin with. A user space provided address will just overwrite that.
+
+If you really want to make this generic, then introduce HCI_QUIRK_USE_BDADDR_PROPERTY that a driver can set and then do that all in hci_dev_do_open() so that if no user space provided BD_ADDR is available, it is read from local-bt-address property and if that is not available or empty, then mark the the device as unconfigured.
+
+I am intentionally saying unconfigured when you set HCI_QUIRK_USE_BDADDR_PROPERTY since I assume that the logic that we have behind HCI_QUIRK_INVALID_BDADDR is implied and whatever address comes back via Read_BD_Address is invalid. Otherwise this hardware should not set HCI_QUIRK_USE_BDADDR_PROPERTY at all.
 
 
-In the full log, you can see that after #123, MGMT command 'Add Device' is sent
-with Action parameter set to 'Auto-connect remote device (0x02)'. So, when
-pairing with a LE device, 'HCI_AUTO_CONN_ALWAYS' flag is set.
+Regards
 
-In the HCI Disconnection Complete Event handler (hci_disconn_complete_evt in
-net/bluetooth/hci_event.c), you can see that if the 'HCI_AUTO_CONN_ALWAYS' flag
-is set, LE passive scan will be started.
+Marcel
 
-Since for a paired LE device, 'HCI_AUTO_CONN_ALWAYS' flag is set, when we
-disconnect it, LE passive scan will be started.
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
