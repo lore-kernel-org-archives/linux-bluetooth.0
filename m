@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51244C5ACC6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E54BAC5ACCC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:20:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A58E20869
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:19:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96A8620869
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Oct 2018 20:20:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uxUA0CJB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A58E20869
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u9mP7oqK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A8620869
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726067AbeJQELw (ORCPT
+        id S1727020AbeJQEM1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Oct 2018 00:11:52 -0400
-Received: from mail-lf1-f46.google.com ([209.85.167.46]:46735 "EHLO
-        mail-lf1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725960AbeJQELw (ORCPT
+        Wed, 17 Oct 2018 00:12:27 -0400
+Received: from mail-lj1-f182.google.com ([209.85.208.182]:38816 "EHLO
+        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725960AbeJQEM1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Oct 2018 00:11:52 -0400
-Received: by mail-lf1-f46.google.com with SMTP id p143-v6so6974664lfp.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 13:19:46 -0700 (PDT)
+        Wed, 17 Oct 2018 00:12:27 -0400
+Received: by mail-lj1-f182.google.com with SMTP id v7-v6so22178053ljg.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Oct 2018 13:20:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:subject:message-id:mime-version:content-disposition
          :user-agent;
-        bh=NQp6a0OtxGqkJQye144uIiwbfkKtHbJxuCprtE7mHUc=;
-        b=uxUA0CJB2muFbnxkmQ6FcGdIjR0MAA5GtTenz+35CyUvMLegklOktbwLu2Lt0Y33eT
-         hC9SYu8Wz4hugRZk/Xr78wVTqRIE6QhvZTV5lEam4DygJtiROPbPP104SPvtDoV7Oytd
-         vFXt6E5Mg8rrXNPlNLEMyGVslF1Z9tSvc62p+BCoYIlZoWjdZfCPSvncv4J/4oZEbdn3
-         E+GoZbifo0BA6HKqavvdL3KIB34xk13EMZyAJLTy9fOAYP5cvX6UosAQyCtyon1wpzNH
-         Xy/KkHH0ewx4SnUzFVlXrlVAMd14omkZ72eYWtKjuFwxUonUVGwzui+bPVOoFIGcwpan
-         Q92Q==
+        bh=J80eSmA4ZEhPM8rl0v8PFmbZW6xrPRuvkzJIvtNYE2g=;
+        b=u9mP7oqKdgWzFpcvcqjyg2ko4i8+nTVq22HCgivtf92/pI8ey7NuGImv+XvofnPL++
+         vX1gv7Xj1HDI5A7oDGflYwFYIBvyLm05lbcHOm5kwcmdwdZpBifEFfCxBGhj05i1vqdQ
+         UKO+Pjx/1AfjY4Rczh+z16H23Lo2bpFdVrZs8CK7ln/d5wpueydx+nU4ZUulZoABL+u3
+         w3sPtppnYzIH3zdQWWzfE4F4LVJsKeVdpNWyn9ypozXb616G6t5eMG+n8CugrRiRPZC7
+         AN3m6RtHMK4yppa4bjQ51Gmi+HIjq++7xrlMJ2Bn4vYsjh5jqDsWgmR5bIRD6guktC4N
+         ZYEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:subject:message-id:mime-version
          :content-disposition:user-agent;
-        bh=NQp6a0OtxGqkJQye144uIiwbfkKtHbJxuCprtE7mHUc=;
-        b=Ff4JdTUwq8m5RjfdOXQeAJd6L8sk30ULdMYyRIL7ju8k//HETIGSIC+cwi1ygpS7UO
-         OeA3OZPj+rRGuNRmIo7LvWEqRkHBcHu7LXlcKJnX/QmBy2DBhxyphTbVUotRkP6emVAA
-         tN0vix5yPGu5crJiNdWwJ3s4B7DBNO/GQNM+zAX/gqrbslNMea3VJztKHqhwVrAExS0Z
-         UXVxrqY28wIewRzJINd6Jft+IJMu3a6MoQFpVrqBaHUUCFwV4isYBValj7SgnMXX2gzB
-         PZ8L/5+fp+B/xlznezdL/AcTaVwRk5JZFmjdb10p3XvUa+NNxA1hkFJ2WAJUyZmVUot6
-         Xr6Q==
-X-Gm-Message-State: ABuFfogVtuY1Vsw21qo79kWVY6j3X51r26SoDjuyPbgTuVfUj5vCRSRa
-        S92gz1bqZoRy5uwfHid29IzO8Z/NncI=
-X-Google-Smtp-Source: ACcGV60ujACPHXj3OZexRMebr+rUbvT22aCZKmdxqCzevCdFtIc87F8Mbz3FVZKIH3famJPtdFAo+Q==
-X-Received: by 2002:a19:2095:: with SMTP id g143-v6mr8011698lfg.62.1539721185215;
-        Tue, 16 Oct 2018 13:19:45 -0700 (PDT)
+        bh=J80eSmA4ZEhPM8rl0v8PFmbZW6xrPRuvkzJIvtNYE2g=;
+        b=K6TJUuluUnbWPKMhnP1xCmihYQHzsh4Dsync9Hd3jSzJ1hEDLcOKTGh1x/SgvhejIp
+         9dbPhsc3rv6ZxrOjLWNB5npgYJ3WRYwB6wLvHQg1+IPC0/72bL4qLGnwL92cCFScPz7O
+         Q+SbK3zt3Ql6epGjd7IkTw2Dud86TfHhvKH7Vt5oHLI26ZcIry8bb2sngiJn7jkkxBlt
+         5TWyLFRl6i4rJcqeOmBmQ950UzOPQzTDppGNijl331tiGa+YTZbK8ISNpEgnd0e6YJRl
+         2q1QMgKb+Z8anwQocN6MqHZy0EWJUE9ydHGU4mLr4t86p6idkDSI2J7nLTkFpp0WQDCu
+         Mk7Q==
+X-Gm-Message-State: ABuFfois51mQzKI0EHLLaEnRujNP9HsBXiLhLqC2xhCHm5wenc/wfVkX
+        QbE57MFxV9DVQQWVhQ8A0I7wQ9tvUEA=
+X-Google-Smtp-Source: ACcGV61H1Ilg7kjjbOMMWH/zc4pJSRRw615VZULFWOwEp6ufS6Zpt99jhXZoHgn1fYly8TNYOnpTDQ==
+X-Received: by 2002:a2e:5109:: with SMTP id f9-v6mr14778229ljb.155.1539721219626;
+        Tue, 16 Oct 2018 13:20:19 -0700 (PDT)
 Received: from Matias-MacBook-Air.local (85-23-86-144.bb.dnainternet.fi. [85.23.86.144])
-        by smtp.gmail.com with ESMTPSA id h2-v6sm3274902lfb.27.2018.10.16.13.19.44
+        by smtp.gmail.com with ESMTPSA id q124-v6sm3394535ljb.89.2018.10.16.13.20.18
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Oct 2018 13:19:44 -0700 (PDT)
-Date:   Tue, 16 Oct 2018 23:23:12 +0300
+        Tue, 16 Oct 2018 13:20:18 -0700 (PDT)
+Date:   Tue, 16 Oct 2018 23:23:47 +0300
 From:   Matias Karhumaa <matias.karhumaa@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/12] btmon: fix segfault caused by integer undeflow
-Message-ID: <20181016202312.GA85016@Matias-MacBook-Air.local>
+Subject: [PATCH 09/12] btmon: fix segfault caused by buffer over-read
+Message-ID: <20181016202347.GA85019@Matias-MacBook-Air.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -74,8 +74,9 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix segfault caused by integer underflow. Fix is to check that
-rsp->num_codecs + 3 is not bigger than size before subtracting.
+Fix segfault caused by buffer over-read in btmon. Fix is to check in
+packet_monitor() that index is not bigger than MAX_INDEX before accessing
+index_list.
 
 Crash was found by fuzzing btmon with AFL.
 ---
@@ -83,20 +84,20 @@ Crash was found by fuzzing btmon with AFL.
  1 file changed, 5 insertions(+)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 461f5e84b..1e9f9d9e4 100644
+index 1e9f9d9e4..2d8e15597 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -5832,6 +5832,11 @@ static void read_local_codecs_rsp(const void *data, uint8_t size)
- 	const struct bt_hci_rsp_read_local_codecs *rsp = data;
- 	uint8_t i, num_vnd_codecs;
+@@ -3864,6 +3864,11 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
+ 		index_current = index;
+ 	}
  
-+	if (rsp->num_codecs + 3 > size) {
-+		print_field("Invalid number of codecs.");
++	if (index != HCI_DEV_NONE && index > MAX_INDEX) {
++		print_field("Invalid index (%d)", index);
 +		return;
 +	}
 +
- 	print_status(rsp->status);
- 	print_field("Number of supported codecs: %d", rsp->num_codecs);
+ 	if (tv && time_offset == ((time_t) -1))
+ 		time_offset = tv->tv_sec;
  
 -- 
 2.17.1
