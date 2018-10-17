@@ -2,83 +2,80 @@ Return-Path: <SRS0=K0Cw=M5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 984ACC04EB9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Oct 2018 05:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB8AECDE32
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Oct 2018 07:05:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 53D47204FD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Oct 2018 05:27:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D47204FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bugzilla.kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 5C66921526
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Oct 2018 07:05:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C66921526
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727045AbeJQNVf convert rfc822-to-8bit (ORCPT
+        id S1727547AbeJQO7z convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Oct 2018 09:21:35 -0400
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:48282 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726210AbeJQNVf (ORCPT
+        Wed, 17 Oct 2018 10:59:55 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:33332 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727162AbeJQO7z (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Oct 2018 09:21:35 -0400
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id E69562A52F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Oct 2018 05:27:41 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id D8FBF2A69A; Wed, 17 Oct 2018 05:27:41 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 200039] BT advertising packet wakes up the system from S3 and
- suspend-to-idle
-Date:   Wed, 17 Oct 2018 05:27:42 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: acelan@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-200039-62941-HlwIzCetOH@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-200039-62941@https.bugzilla.kernel.org/>
-References: <bug-200039-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 17 Oct 2018 10:59:55 -0400
+Received: from marcel-macbook.fritz.box (p4FF9F655.dip0.t-ipconnect.de [79.249.246.85])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4E048CEEAD;
+        Wed, 17 Oct 2018 09:13:02 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
+Subject: Re: [PATCH v1] Bluetooth: btusb: Add support for 0cf3:535b QCA_ROME
+ device
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <BYAPR04MB4824479589D351B829CF3391C0FF0@BYAPR04MB4824.namprd04.prod.outlook.com>
+Date:   Wed, 17 Oct 2018 09:05:39 +0200
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
 Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Message-Id: <5BDD6490-7BE9-45FE-8DFA-6343294BEF9B@holtmann.org>
+References: <BYAPR04MB4824479589D351B829CF3391C0FF0@BYAPR04MB4824.namprd04.prod.outlook.com>
+To:     Owen Lin <olin@rivetnetworks.com>
+X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=200039
+Hi Owen,
 
---- Comment #24 from AceLan Kao (acelan@gmail.com) ---
-Setup 'HCI_AUTO_CONN_ALWAYS' flag and "Accept all advertisement" do not mean
-the advertising packet should wake up the system. We even powered off the
-paired device, but the system still be waken up by advertising packets from
-other random BT4 devices.
+> From 83372e39753124ab1afbe651a45e3416bede25a6 Mon Sep 17 00:00:00 2001
+> From: Owen Lin <olin@rivetnetworks.com>
+> Date: Wed, 17 Oct 2018 11:36:03 +0800
+> Subject: [PATCH v1] Bluetooth: btusb: Add support for 0cf3:535b QCA_ROME device
 
-I got some questions for you and would like to figure out a feasible solution
-for the issue.
-1. Do you have any idea about who decide to wake up the system when the
-advertising packet is received? Firmware or driver?
-2. Do you know how windows handle this? Does the advertising packet wake up
-windows?
-3. Is there any drawback if we remove 'HCI_AUTO_CONN_ALWAYS' flag when
-suspending?
-Thanks.
+please include the content from /sys/kernel/debug/usb/devices for this hardware in the commit message.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+> 
+> Signed-off-by: Owen Lin <olin@rivetnetworks.com>
+> ---
+> drivers/bluetooth/btusb.c | 1 +
+> 1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index cd2e5cf14ea5..838af7dd5b73 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -264,6 +264,7 @@ static const struct usb_device_id blacklist_table[] = {
+> 	{ USB_DEVICE(0x0489, 0xe03c), .driver_info = BTUSB_ATH3012 },
+> 
+> 	/* QCA ROME chipset */
+> +	{ USB_DEVICE(0x0cf3, 0x535b), .driver_info = BTUSB_QCA_ROME },
+> 	{ USB_DEVICE(0x0cf3, 0xe007), .driver_info = BTUSB_QCA_ROME },
+> 	{ USB_DEVICE(0x0cf3, 0xe009), .driver_info = BTUSB_QCA_ROME },
+> 	{ USB_DEVICE(0x0cf3, 0xe010), .driver_info = BTUSB_QCA_ROME },
+
+Regards
+
+Marcel
+
