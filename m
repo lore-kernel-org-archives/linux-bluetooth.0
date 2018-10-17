@@ -7,316 +7,113 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5005EECDE32
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Oct 2018 19:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB1B6ECDE3B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Oct 2018 22:04:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E28F8213A2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Oct 2018 19:27:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89B7521473
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Oct 2018 22:04:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FdXYxDWD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E28F8213A2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fFkj4WTg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89B7521473
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728141AbeJRDYV (ORCPT
+        id S1727377AbeJRGBx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Oct 2018 23:24:21 -0400
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:39705 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727128AbeJRDYV (ORCPT
+        Thu, 18 Oct 2018 02:01:53 -0400
+Received: from mail-it1-f177.google.com ([209.85.166.177]:35409 "EHLO
+        mail-it1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727028AbeJRGBx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Oct 2018 23:24:21 -0400
-Received: by mail-oi1-f193.google.com with SMTP id y81-v6so22045479oia.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Oct 2018 12:27:12 -0700 (PDT)
+        Thu, 18 Oct 2018 02:01:53 -0400
+Received: by mail-it1-f177.google.com with SMTP id p64-v6so4565122itp.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Oct 2018 15:04:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=+B1AUrgMVLTJ465XR6clX+Tt7AMdBP+waY+WzBHLcGo=;
-        b=FdXYxDWD9JxGChHAbFA94EmNUl9vylxRjSD9aQtPXurtFvjpGgdw6RJuCgyBwCHBdi
-         QwGcaUiT53gopptRUJZYcMUL+HbpgQDWR3Yr9xt8S5XW7cN+JmdNsoYf30DSsoXISspi
-         BbGbqQNeXGbH0F5n7IlBw8u7f209Hn9xzJ60spuajEDuIvcdE+n/wRGXnnzv7RePvXvT
-         I/AAJE5E+tT6TUOSQ42OeF37WtP9MFYWe+joac1xvFiVwsHvOF0RWxoXvlLJZr9EAIFG
-         jMwqtH4UXkAa68VjqoNz09aX0FBy0HSnIso20QU3titnc77wcIkJlYSuc78ADVkgMQ1W
-         0SGQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=CRKkAvdbvnAdmiye4hdOS3ngnSAq4/0HmmX21ejzUds=;
+        b=fFkj4WTgVMH468EOiE9o2PUBXsCXkR8bK9OqNJkQyJk1CFRdEhCbX1iJMgErGpD507
+         tIfnY7VsfXVc75EU1+UfYEUdBdid+WJeyGHb6wihu1Ye2dgXMSQZlDIjkhO4gHRpgu8u
+         hwmK7ZelujZBYpX1H+V3p/cLqup1d4R2X5t2Ez0eXvEmV+bcGzIV+BGtiLIm8Gc4T+AW
+         kcumbxgOd/XraR4w4+MaJvN5H1aw98MlLYwDqrycjiWjcI1RF4aOeIfs1vU7rLW80rC+
+         kx1LHNFBHtP9ShnLf8ezkbumwiYuYPZmvwTn02zqG49GFjG8hlDmmaEiiOtmmiEtZGyi
+         /bkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=+B1AUrgMVLTJ465XR6clX+Tt7AMdBP+waY+WzBHLcGo=;
-        b=pq/rrHpJuHbQ0zhip9fyhxuVuIYKMoNCxklATRpAt2PnQ4e2MEcX8vYMiXvBca5Wvt
-         xWbu+dS8/L6IbkPSf/z+C1sqyAj1Jfxq5qPr9ST/m9TEYsOraBzX108JPGeE3Rrq+4cy
-         JMeQaghXPHNdk3qxa5seoP8uyZC9KblDXTcUN62ikXEsr63n3+AMkwf1VDVTbOseqJ2l
-         0/CSxcrXbarjeifeOO9qB4bpN+UOziiIzNyDEmf3aV2cLFqAingvLHVaV9c9auhfz/Ie
-         EsHADXDnra/3Yn76pwAUhhmPd2s2zgGhM3/mFX0+L/AuYlrBV93yvl8EgF0vpdR69lxt
-         xKKQ==
-X-Gm-Message-State: ABuFfoh26vl3C80YmDpHouJA2A8VqsDIhRVx5IA9yL7TiKMP743rsEfW
-        Dx4AEFkI+HRfBircdUoNv6IFi4XnxodWFXzk6zYin6QQbvLWkQ==
-X-Google-Smtp-Source: ACcGV60HoRKy711WMNlZzx9YPB+42sKtPfAsyyb9rUtW05O6OgebbIQay2cYtZgNHMVcOu7TFBB0pBv8eJ2DlAwZ99U=
-X-Received: by 2002:aca:f5d3:: with SMTP id t202-v6mr15067583oih.29.1539804431509;
- Wed, 17 Oct 2018 12:27:11 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=CRKkAvdbvnAdmiye4hdOS3ngnSAq4/0HmmX21ejzUds=;
+        b=ietnaEnndOQ198b0w0PgL8W8YoNIQmWshi8Mr5asCj0oCbbXT6oxlsQSyR6sn7aIc7
+         EJ0TNuPrE+fRm9XX0OQH5BKQ9Rg4u7n+Frl0dSVM84Q1VsALj968vSfL9xaMAK04aUOb
+         zgAgUaC+4S/gH/IkL5IXdzg0FuLntOjO5804CKRQeWkQdU/20AN04QDX6ik9tltUQMea
+         zy3UJ5ltU7TU1kSyDeFRSTk3POQa8D9AvKJd396P/1sDBPvSIFlXjq34ao9JfsL0sCTI
+         rIpPzX1Lf+esOz+ijNa1vcc6rRihJb+sYsOpTWMdofrvTYjb6BJBZotYFq6I2UM7dUFc
+         LhPQ==
+X-Gm-Message-State: ABuFfojXJOBOZGXJ4O9rnOXMRQ3V5iv21ZmgjhGRG3W+WDVQle3F8to9
+        OGqaIFZzPcZpHJHTID+3VWJF3yVjj80I/yKQHGSyfw==
+X-Google-Smtp-Source: ACcGV63yKRWAV/7ge2Lwfha965WPtpY/W6m0ZOvdMIL4kHwbae0Zp2QogaFjyiTiDZvinAd9t4KWEKNFRBnAUoQ6ckE=
+X-Received: by 2002:a24:554c:: with SMTP id e73-v6mr2983077itb.157.1539813851421;
+ Wed, 17 Oct 2018 15:04:11 -0700 (PDT)
 MIME-Version: 1.0
-From:   el es <lsharkey602@gmail.com>
-Date:   Wed, 17 Oct 2018 20:26:57 +0100
-Message-ID: <CADC+9YC41FbhWCNF7Df3tKH7KAgxH0mXcQY5Xg3fAksJMz-9Rw@mail.gmail.com>
-Subject: Connection to phone drops after a few seconds
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: multipart/mixed; boundary="0000000000002a0c8b057871a8f0"
+References: <CAAu3APZEbVricfhZr5jSuAc8wpp31=dxYA305qfG5T_2v=qXGQ@mail.gmail.com>
+In-Reply-To: <CAAu3APZEbVricfhZr5jSuAc8wpp31=dxYA305qfG5T_2v=qXGQ@mail.gmail.com>
+From:   Barry Byford <31baz66@gmail.com>
+Date:   Wed, 17 Oct 2018 23:04:00 +0100
+Message-ID: <CAAu3APYGPE9Wtfn3aX1qDBk+E0YpXFBRa_WWRwvhhJrLabo9Eg@mail.gmail.com>
+Subject: Register HID Profile
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---0000000000002a0c8b057871a8f0
-Content-Type: text/plain; charset="UTF-8"
+Hello,
 
-Hi,
+I am still experiencing difficulties registering a profile and getting
+BlueZ to call the NewConnection method when a connection attempt is
+made to it.
+When I try to connect from another computer, it connects briefly
+before disconnecting again.
 
-I have been trying to connect to a phone with bluetooth to use dial-up
-networking.
+I am starting the server with the input plugin removed using:
+sudo /usr/lib/bluetooth/bluetoothd -P input
 
-Pairing is successful, but the connection drops after a few seconds.
-No mobile connection shows up on network-manager.
+A btmon log of the session is available at:
+https://drive.google.com/uc?authuser=0&id=1CgPcEtj1g3Um-1qBuQ8hEImKR28bVmnx&export=download
 
-I have attached some output from syslog, and the main error seems to be:
+I have looked through the log but there is nothing in there that I am
+understanding to be an indicator of the issue.
 
-Oct 16 17:37:47 luke-Satellite-L635 kernel: [  121.005940] Bluetooth:
-hci0: last event is not cmd complete (0x0f)
-Oct 16 17:37:47 luke-Satellite-L635 bluetoothd[809]:
-src/adapter.c:dev_disconnected() Device 00:19:2D:04:02:64
-disconnected, reason 2
+I have had some success if I set up the sockets to listen for
+connections with the code below. However I still don't get the
+NewConnection method called in the profile I have setup.
 
-The bluetooth adapter is recorded by lsusb as:
-Bus 002 Device 003: ID 0a12:0001 Cambridge Silicon Radio, Ltd
-Bluetooth Dongle (HCI mode)
+Any guidance would be greatly appreciated.
 
-Is there anything else I should do?
+Thanks,
+Barry
 
-I am not sure what other logs I should attach, but I will happily do so if told.
 
-Thank you,
+        print('Waiting for connections')
+        self.scontrol = socket.socket(socket.AF_BLUETOOTH,
+                                      socket.SOCK_SEQPACKET,
+                                      socket.BTPROTO_L2CAP)
+        self.scontrol.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.sinterrupt = socket.socket(socket.AF_BLUETOOTH,
+                                        socket.SOCK_SEQPACKET,
+                                        socket.BTPROTO_L2CAP)
+        self.sinterrupt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # bind these sockets to a port
+        self.scontrol.bind((self.address, self.P_CTRL))
+        self.sinterrupt.bind((self.address, self.P_INTR ))
 
---0000000000002a0c8b057871a8f0
-Content-Type: text/plain; charset="US-ASCII"; name="Bluetooth - bluez error.txt"
-Content-Disposition: attachment; filename="Bluetooth - bluez error.txt"
-Content-Transfer-Encoding: base64
-Content-ID: <f_jndjs51e0>
-X-Attachment-Id: f_jndjs51e0
+        # Start listening on the server sockets
+        self.scontrol.listen(1)  # Limit of 1 connection
+        self.sinterrupt.listen(1)
 
-T2N0IDE2IDE3OjM3OjM3IGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMv
-YWRhcHRlci5jOmRldmljZV9mb3VuZF9jYWxsYmFjaygpIGhjaTAgYWRkciA0ODo5RDoyNDo3Njo2
-NjpEQywgcnNzaSAtODMgZmxhZ3MgMHgwMDAzIGVpcl9sZW4gNQ0KT2N0IDE2IDE3OjM3OjM3IGx1
-a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvZGV2aWNlLmM6ZGV2aWNlX2Ny
-ZWF0ZSgpIGRzdCA0ODo5RDoyNDo3Njo2NjpEQw0KT2N0IDE2IDE3OjM3OjM3IGx1a2UtU2F0ZWxs
-aXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvZGV2aWNlLmM6ZGV2aWNlX25ldygpIGFkZHJl
-c3MgNDg6OUQ6MjQ6NzY6NjY6REMNCk9jdCAxNiAxNzozNzozNyBsdWtlLVNhdGVsbGl0ZS1MNjM1
-IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9uZXcoKSBDcmVhdGluZyBkZXZp
-Y2UgL29yZy9ibHVlei9oY2kwL2Rldl80OF85RF8yNF83Nl82Nl9EQw0KT2N0IDE2IDE3OjM3OjM3
-IGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvZGV2aWNlLmM6ZGV2aWNl
-X3NldF9sZWdhY3koKSBsZWdhY3kgMQ0KT2N0IDE2IDE3OjM3OjM3IGx1a2UtU2F0ZWxsaXRlLUw2
-MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvZGV2aWNlLmM6ZGV2aWNlX3NldF9yc3NpX3dpdGhfZGVs
-dGEoKSByc3NpIC04Mw0KT2N0IDE2IDE3OjM3OjM3IGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRv
-b3RoZFs4MDldOiBzcmMvZGV2aWNlLmM6ZGV2aWNlX3NldF9jbGFzcygpIC9vcmcvYmx1ZXovaGNp
-MC9kZXZfNDhfOURfMjRfNzZfNjZfREMgMHg3QTAyMEMNCk9jdCAxNiAxNzozNzozNyBsdWtlLVNh
-dGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpjb25maXJtX25hbWUo
-KSBoY2kwIGJkYWRkciA0ODo5RDoyNDo3Njo2NjpEQyBuYW1lX2tub3duIDENCk9jdCAxNiAxNzoz
-NzozNyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpj
-b25maXJtX25hbWVfY29tcGxldGUoKSBDb25maXJtIG5hbWUgY29tcGxldGUgZm9yIGhjaTANCk9j
-dCAxNiAxNzozNzozOCBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2Fk
-YXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6
-NjQsIHJzc2kgLTQyIGZsYWdzIDB4MDAwMyBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzozOCBsdWtl
-LVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRf
-bGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzozOCBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJs
-dWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfcnNzaV93aXRoX2RlbHRhKCkg
-cnNzaSAtNDINCk9jdCAxNiAxNzozNzozOCBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRb
-ODA5XTogc3JjL2FkYXB0ZXIuYzpjb25maXJtX25hbWUoKSBoY2kwIGJkYWRkciAwMDoxOToyRDow
-NDowMjo2NCBuYW1lX2tub3duIDENCk9jdCAxNiAxNzozNzozOCBsdWtlLVNhdGVsbGl0ZS1MNjM1
-IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpjb25maXJtX25hbWVfY29tcGxldGUoKSBD
-b25maXJtIG5hbWUgY29tcGxldGUgZm9yIGhjaTANCk9jdCAxNiAxNzozNzozOCBsdWtlLVNhdGVs
-bGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2Fs
-bGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTM5IGZsYWdzIDB4MDAw
-MiBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzozOCBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290
-aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAx
-NiAxNzozNzozOCBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0
-ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQs
-IHJzc2kgLTM5IGZsYWdzIDB4MDAwMiBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzozOCBsdWtlLVNh
-dGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVn
-YWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzozOCBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0
-b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFk
-ZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQzIGZsYWdzIDB4MDAwMiBlaXJfbGVuIDUNCk9j
-dCAxNiAxNzozNzozOCBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2Rl
-dmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzozOSBsdWtl
-LVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91
-bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQzIGZsYWdz
-IDB4MDAwMiBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzozOSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJs
-dWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDEN
-Ck9jdCAxNiAxNzozNzozOSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3Jj
-L2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6
-MDI6NjQsIHJzc2kgLTQ0IGZsYWdzIDB4MDAwMiBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzozOSBs
-dWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9z
-ZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzo0MSBsdWtlLVNhdGVsbGl0ZS1MNjM1
-IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBo
-Y2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQyIGZsYWdzIDB4MDAwMiBlaXJfbGVu
-IDUNCk9jdCAxNiAxNzozNzo0MSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTog
-c3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzo0
-MSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZp
-Y2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQz
-IGZsYWdzIDB4MDAwMiBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzo0MSBsdWtlLVNhdGVsbGl0ZS1M
-NjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVn
-YWN5IDENCk9jdCAxNiAxNzozNzo0MSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5
-XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6
-MkQ6MDQ6MDI6NjQsIHJzc2kgLTQyIGZsYWdzIDB4MDAwMiBlaXJfbGVuIDUNCk9jdCAxNiAxNzoz
-Nzo0MSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRl
-dmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzo0MSBsdWtlLVNhdGVsbGl0
-ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmNvbm5lY3RfcHJvZmlsZXMoKSAv
-b3JnL2JsdWV6L2hjaTAvZGV2XzAwXzE5XzJEXzA0XzAyXzY0IChhbGwpLCBjbGllbnQgOjEuNjAN
-Ck9jdCAxNiAxNzozNzo0MSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3Jj
-L2RldmljZS5jOmNvbm5lY3RfcHJvZmlsZXMoKSBSZXNvbHZpbmcgc2VydmljZXMgZm9yIC9vcmcv
-Ymx1ZXovaGNpMC9kZXZfMDBfMTlfMkRfMDRfMDJfNjQNCk9jdCAxNiAxNzozNzo0MSBsdWtlLVNh
-dGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkaXNjb3ZlcmluZ19j
-YWxsYmFjaygpIGhjaTAgdHlwZSAxIGRpc2NvdmVyaW5nIDAgbWV0aG9kIDANCk9jdCAxNiAxNzoz
-Nzo0MSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzp0
-cmlnZ2VyX3N0YXJ0X2Rpc2NvdmVyeSgpDQpPY3QgMTYgMTc6Mzc6NDIgbHVrZS1TYXRlbGxpdGUt
-TDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6Y29ubmVjdGVkX2NhbGxiYWNrKCkg
-aGNpMCBkZXZpY2UgMDA6MTk6MkQ6MDQ6MDI6NjQgY29ubmVjdGVkIGVpcl9sZW4gMTYNCk9jdCAx
-NiAxNzozNzo0MiBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2Rldmlj
-ZS5jOnNlYXJjaF9jYigpIDAwOjE5OjJEOjA0OjAyOjY0OiBObyBzZXJ2aWNlIHVwZGF0ZQ0KT2N0
-IDE2IDE3OjM3OjQyIGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvZGV2
-aWNlLmM6ZGV2aWNlX3N2Y19yZXNvbHZlZCgpIC9vcmcvYmx1ZXovaGNpMC9kZXZfMDBfMTlfMkRf
-MDRfMDJfNjQgZXJyIDANCk9jdCAxNiAxNzozNzo0MiBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0
-b290aGRbODA5XTogc3JjL2RldmljZS5jOmNvbm5lY3RfcHJvZmlsZXMoKSAvb3JnL2JsdWV6L2hj
-aTAvZGV2XzAwXzE5XzJEXzA0XzAyXzY0IChhbGwpLCBjbGllbnQgOjEuNjANCk9jdCAxNiAxNzoz
-Nzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpz
-dGFydF9kaXNjb3ZlcnlfdGltZW91dCgpDQpPY3QgMTYgMTc6Mzc6NDcgbHVrZS1TYXRlbGxpdGUt
-TDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6c3RhcnRfZGlzY292ZXJ5X3RpbWVv
-dXQoKSBhZGFwdGVyLT5jdXJyZW50X2Rpc2NvdmVyeV9maWx0ZXIgPT0gMA0KT2N0IDE2IDE3OjM3
-OjQ3IGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvYWRhcHRlci5jOnN0
-YXJ0X2Rpc2NvdmVyeV9jb21wbGV0ZSgpIHN0YXR1cyAweDAwDQpPY3QgMTYgMTc6Mzc6NDcgbHVr
-ZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6ZGlzY292ZXJp
-bmdfY2FsbGJhY2soKSBoY2kwIHR5cGUgMSBkaXNjb3ZlcmluZyAxIG1ldGhvZCAwDQpPY3QgMTYg
-MTc6Mzc6NDcgbHVrZS1TYXRlbGxpdGUtTDYzNSBrZXJuZWw6IFsgIDEyMS4wMDU5NDBdIEJsdWV0
-b290aDogaGNpMDogbGFzdCBldmVudCBpcyBub3QgY21kIGNvbXBsZXRlICgweDBmKQ0KT2N0IDE2
-IDE3OjM3OjQ3IGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvYWRhcHRl
-ci5jOmRldl9kaXNjb25uZWN0ZWQoKSBEZXZpY2UgMDA6MTk6MkQ6MDQ6MDI6NjQgZGlzY29ubmVj
-dGVkLCByZWFzb24gMg0KT2N0IDE2IDE3OjM3OjQ3IGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRv
-b3RoZFs4MDldOiBzcmMvYWRhcHRlci5jOmFkYXB0ZXJfcmVtb3ZlX2Nvbm5lY3Rpb24oKQ0KT2N0
-IDE2IDE3OjM3OjQ3IGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBwbHVnaW5z
-L3BvbGljeS5jOmRpc2Nvbm5lY3RfY2IoKSByZWFzb24gMg0KT2N0IDE2IDE3OjM3OjQ3IGx1a2Ut
-U2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvYWRhcHRlci5jOmJvbmRpbmdfYXR0
-ZW1wdF9jb21wbGV0ZSgpIGhjaTAgYmRhZGRyIDAwOjE5OjJEOjA0OjAyOjY0IHR5cGUgMCBzdGF0
-dXMgMHhlDQpPY3QgMTYgMTc6Mzc6NDcgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgw
-OV06IHNyYy9kZXZpY2UuYzpkZXZpY2VfYm9uZGluZ19jb21wbGV0ZSgpIGJvbmRpbmcgKG5pbCkg
-c3RhdHVzIDB4MGUNCk9jdCAxNiAxNzozNzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290
-aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9ib25kaW5nX2ZhaWxlZCgpIHN0YXR1cyAxNA0K
-T2N0IDE2IDE3OjM3OjQ3IGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMv
-YWRhcHRlci5jOnJlc3VtZV9kaXNjb3ZlcnkoKQ0KT2N0IDE2IDE3OjM3OjQ3IGx1a2UtU2F0ZWxs
-aXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvYWRhcHRlci5jOnRyaWdnZXJfc3RhcnRfZGlz
-Y292ZXJ5KCkNCk9jdCAxNiAxNzozNzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRb
-ODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6
-MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQyIGZsYWdzIDB4MDAwMyBlaXJfbGVuIDUNCk9jdCAxNiAx
-NzozNzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5j
-OmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzo0NyBsdWtlLVNhdGVs
-bGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2Fs
-bGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQzIGZsYWdzIDB4MDAw
-MyBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290
-aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAx
-NiAxNzozNzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0
-ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQs
-IHJzc2kgLTQxIGZsYWdzIDB4MDAwMyBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzo0NyBsdWtlLVNh
-dGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVn
-YWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0
-b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFk
-ZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQ1IGZsYWdzIDB4MDAwMyBlaXJfbGVuIDUNCk9j
-dCAxNiAxNzozNzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2Rl
-dmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzo0NyBsdWtl
-LVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91
-bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQzIGZsYWdz
-IDB4MDAwMyBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJs
-dWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDEN
-Ck9jdCAxNiAxNzozNzo0NyBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3Jj
-L2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgNDg6OUQ6MjQ6NzY6
-NjY6REMsIHJzc2kgLTg1IGZsYWdzIDB4MDAwMyBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzo0NyBs
-dWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9z
-ZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzo0OCBsdWtlLVNhdGVsbGl0ZS1MNjM1
-IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBo
-Y2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQ0IGZsYWdzIDB4MDAwMyBlaXJfbGVu
-IDUNCk9jdCAxNiAxNzozNzo0OCBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTog
-c3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzo0
-OCBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZp
-Y2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQz
-IGZsYWdzIDB4MDAwMyBlaXJfbGVuIDUNCk9jdCAxNiAxNzozNzo0OCBsdWtlLVNhdGVsbGl0ZS1M
-NjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVn
-YWN5IDENCk9jdCAxNiAxNzozNzo0OSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5
-XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJhY2soKSBoY2kwIGFkZHIgMDA6MTk6
-MkQ6MDQ6MDI6NjQsIHJzc2kgLTQxIGZsYWdzIDB4MDAwMyBlaXJfbGVuIDUNCk9jdCAxNiAxNzoz
-Nzo0OSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2RldmljZS5jOmRl
-dmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAxNzozNzo0OSBsdWtlLVNhdGVsbGl0
-ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIuYzpkZXZpY2VfZm91bmRfY2FsbGJh
-Y2soKSBoY2kwIGFkZHIgMDA6MTk6MkQ6MDQ6MDI6NjQsIHJzc2kgLTQxIGZsYWdzIDB4MDAwMyBl
-aXJfbGVuIDUNCk9jdCAxNiAxNzozNzo0OSBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRb
-ODA5XTogc3JjL2RldmljZS5jOmRldmljZV9zZXRfbGVnYWN5KCkgbGVnYWN5IDENCk9jdCAxNiAx
-NzozNzo1MiBsdWtlLVNhdGVsbGl0ZS1MNjM1IGJsdWV0b290aGRbODA5XTogc3JjL2FkYXB0ZXIu
-YzpzdGFydF9kaXNjb3ZlcnlfdGltZW91dCgpDQpPY3QgMTYgMTc6Mzc6NTIgbHVrZS1TYXRlbGxp
-dGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6c3RhcnRfZGlzY292ZXJ5X3Rp
-bWVvdXQoKSBhZGFwdGVyLT5jdXJyZW50X2Rpc2NvdmVyeV9maWx0ZXIgPT0gMA0KT2N0IDE2IDE3
-OjM3OjUyIGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvYWRhcHRlci5j
-OmRldmljZV9mb3VuZF9jYWxsYmFjaygpIGhjaTAgYWRkciAwMDoxOToyRDowNDowMjo2NCwgcnNz
-aSAtNDEgZmxhZ3MgMHgwMDAzIGVpcl9sZW4gNQ0KT2N0IDE2IDE3OjM3OjUyIGx1a2UtU2F0ZWxs
-aXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvZGV2aWNlLmM6ZGV2aWNlX3NldF9sZWdhY3ko
-KSBsZWdhY3kgMQ0KT2N0IDE2IDE3OjM3OjUyIGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3Ro
-ZFs4MDldOiBzcmMvYWRhcHRlci5jOmRldmljZV9mb3VuZF9jYWxsYmFjaygpIGhjaTAgYWRkciAw
-MDoxOToyRDowNDowMjo2NCwgcnNzaSAtNDEgZmxhZ3MgMHgwMDAzIGVpcl9sZW4gNQ0KT2N0IDE2
-IDE3OjM3OjUyIGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvZGV2aWNl
-LmM6ZGV2aWNlX3NldF9sZWdhY3koKSBsZWdhY3kgMQ0KT2N0IDE2IDE3OjM3OjUyIGx1a2UtU2F0
-ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvYWRhcHRlci5jOmRldmljZV9mb3VuZF9j
-YWxsYmFjaygpIGhjaTAgYWRkciAwMDoxOToyRDowNDowMjo2NCwgcnNzaSAtNDIgZmxhZ3MgMHgw
-MDAzIGVpcl9sZW4gNQ0KT2N0IDE2IDE3OjM3OjUyIGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRv
-b3RoZFs4MDldOiBzcmMvZGV2aWNlLmM6ZGV2aWNlX3NldF9sZWdhY3koKSBsZWdhY3kgMQ0KT2N0
-IDE2IDE3OjM3OjUyIGx1a2UtU2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvYWRh
-cHRlci5jOmRldmljZV9mb3VuZF9jYWxsYmFjaygpIGhjaTAgYWRkciAwMDoxOToyRDowNDowMjo2
-NCwgcnNzaSAtNDEgZmxhZ3MgMHgwMDAzIGVpcl9sZW4gNQ0KT2N0IDE2IDE3OjM3OjUyIGx1a2Ut
-U2F0ZWxsaXRlLUw2MzUgYmx1ZXRvb3RoZFs4MDldOiBzcmMvZGV2aWNlLmM6ZGV2aWNlX3NldF9s
-ZWdhY3koKSBsZWdhY3kgMQ0KT2N0IDE2IDE3OjM3OjUzIGx1a2UtU2F0ZWxsaXRlLUw2MzUgZGJ1
-cy1kYWVtb25bMTI2MF06IFtzZXNzaW9uIHVpZD0xMDAwIHBpZD0xMjYwXSBBY3RpdmF0aW5nIHZp
-YSBzeXN0ZW1kOiBzZXJ2aWNlIG5hbWU9J29yZy5nbm9tZS5UZXJtaW5hbCcgdW5pdD0nZ25vbWUt
-dGVybWluYWwtc2VydmVyLnNlcnZpY2UnIHJlcXVlc3RlZCBieSAnOjEuODMnICh1aWQ9MTAwMCBw
-aWQ9MzEwMyBjb21tPSIvdXNyL2Jpbi9nbm9tZS10ZXJtaW5hbC5yZWFsICIgbGFiZWw9InVuY29u
-ZmluZWQiKQ0KT2N0IDE2IDE3OjM3OjUzIGx1a2UtU2F0ZWxsaXRlLUw2MzUgc3lzdGVtZFsxMDc3
-XTogU3RhcnRpbmcgR05PTUUgVGVybWluYWwgU2VydmVyLi4uDQpPY3QgMTYgMTc6Mzc6NTMgbHVr
-ZS1TYXRlbGxpdGUtTDYzNSBkYnVzLWRhZW1vblsxMjYwXTogW3Nlc3Npb24gdWlkPTEwMDAgcGlk
-PTEyNjBdIFN1Y2Nlc3NmdWxseSBhY3RpdmF0ZWQgc2VydmljZSAnb3JnLmdub21lLlRlcm1pbmFs
-Jw0KT2N0IDE2IDE3OjM3OjUzIGx1a2UtU2F0ZWxsaXRlLUw2MzUgc3lzdGVtZFsxMDc3XTogU3Rh
-cnRlZCBHTk9NRSBUZXJtaW5hbCBTZXJ2ZXIuDQpPY3QgMTYgMTc6Mzc6NTUgbHVrZS1TYXRlbGxp
-dGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6ZGV2aWNlX2ZvdW5kX2NhbGxi
-YWNrKCkgaGNpMCBhZGRyIDAwOjE5OjJEOjA0OjAyOjY0LCByc3NpIC00MyBmbGFncyAweDAwMDMg
-ZWlyX2xlbiA1DQpPY3QgMTYgMTc6Mzc6NTUgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhk
-WzgwOV06IHNyYy9kZXZpY2UuYzpkZXZpY2Vfc2V0X2xlZ2FjeSgpIGxlZ2FjeSAxDQpPY3QgMTYg
-MTc6Mzc6NTYgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9hZGFwdGVy
-LmM6ZGV2aWNlX2ZvdW5kX2NhbGxiYWNrKCkgaGNpMCBhZGRyIDAwOjE5OjJEOjA0OjAyOjY0LCBy
-c3NpIC00NCBmbGFncyAweDAwMDMgZWlyX2xlbiA1DQpPY3QgMTYgMTc6Mzc6NTYgbHVrZS1TYXRl
-bGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9kZXZpY2UuYzpkZXZpY2Vfc2V0X2xlZ2Fj
-eSgpIGxlZ2FjeSAxDQpPY3QgMTYgMTc6Mzc6NTYgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVldG9v
-dGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6ZGV2aWNlX2ZvdW5kX2NhbGxiYWNrKCkgaGNpMCBhZGRy
-IDQ4OjlEOjI0Ojc2OjY2OkRDLCByc3NpIC04NSBmbGFncyAweDAwMDMgZWlyX2xlbiA1DQpPY3Qg
-MTYgMTc6Mzc6NTYgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9kZXZp
-Y2UuYzpkZXZpY2Vfc2V0X2xlZ2FjeSgpIGxlZ2FjeSAxDQpPY3QgMTYgMTc6Mzc6NTYgbHVrZS1T
-YXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6ZGV2aWNlX2ZvdW5k
-X2NhbGxiYWNrKCkgaGNpMCBhZGRyIDAwOjE5OjJEOjA0OjAyOjY0LCByc3NpIC00MyBmbGFncyAw
-eDAwMDMgZWlyX2xlbiA1DQpPY3QgMTYgMTc6Mzc6NTYgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVl
-dG9vdGhkWzgwOV06IHNyYy9kZXZpY2UuYzpkZXZpY2Vfc2V0X2xlZ2FjeSgpIGxlZ2FjeSAxDQpP
-Y3QgMTYgMTc6Mzc6NTYgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9h
-ZGFwdGVyLmM6ZGV2aWNlX2ZvdW5kX2NhbGxiYWNrKCkgaGNpMCBhZGRyIDAwOjE5OjJEOjA0OjAy
-OjY0LCByc3NpIC00NCBmbGFncyAweDAwMDMgZWlyX2xlbiA1DQpPY3QgMTYgMTc6Mzc6NTYgbHVr
-ZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9kZXZpY2UuYzpkZXZpY2Vfc2V0
-X2xlZ2FjeSgpIGxlZ2FjeSAxDQpPY3QgMTYgMTc6Mzc6NTYgbHVrZS1TYXRlbGxpdGUtTDYzNSBi
-bHVldG9vdGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6ZGV2aWNlX2ZvdW5kX2NhbGxiYWNrKCkgaGNp
-MCBhZGRyIDQ4OjlEOjI0Ojc2OjY2OkRDLCByc3NpIC04NSBmbGFncyAweDAwMDMgZWlyX2xlbiA1
-DQpPY3QgMTYgMTc6Mzc6NTYgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNy
-Yy9kZXZpY2UuYzpkZXZpY2Vfc2V0X2xlZ2FjeSgpIGxlZ2FjeSAxDQpPY3QgMTYgMTc6Mzc6NTcg
-bHVrZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6ZGV2aWNl
-X2ZvdW5kX2NhbGxiYWNrKCkgaGNpMCBhZGRyIDAwOjE5OjJEOjA0OjAyOjY0LCByc3NpIC00MSBm
-bGFncyAweDAwMDMgZWlyX2xlbiA1DQpPY3QgMTYgMTc6Mzc6NTcgbHVrZS1TYXRlbGxpdGUtTDYz
-NSBibHVldG9vdGhkWzgwOV06IHNyYy9kZXZpY2UuYzpkZXZpY2Vfc2V0X2xlZ2FjeSgpIGxlZ2Fj
-eSAxDQpPY3QgMTYgMTc6Mzc6NTcgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVldG9vdGhkWzgwOV06
-IHNyYy9hZGFwdGVyLmM6ZGlzY292ZXJpbmdfY2FsbGJhY2soKSBoY2kwIHR5cGUgMSBkaXNjb3Zl
-cmluZyAwIG1ldGhvZCAwDQpPY3QgMTYgMTc6Mzc6NTcgbHVrZS1TYXRlbGxpdGUtTDYzNSBibHVl
-dG9vdGhkWzgwOV06IHNyYy9hZGFwdGVyLmM6dHJpZ2dlcl9zdGFydF9kaXNjb3ZlcnkoKQ0KDQo=
---0000000000002a0c8b057871a8f0--
+        self.ccontrol, cinfo = self.scontrol.accept()
+        print('Got a connection on the control channel from ' + cinfo[0])
+
+        self.cinterrupt, cinfo = self.sinterrupt.accept()
+        print('Got a connection on the interrupt channel from ' + cinfo[0])
