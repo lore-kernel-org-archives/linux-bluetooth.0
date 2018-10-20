@@ -1,206 +1,156 @@
-Return-Path: <SRS0=2EdK=M7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=5noO=NA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF81ECDE3D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Oct 2018 21:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 414B8C67863
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Oct 2018 09:03:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5DEEB21476
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Oct 2018 21:07:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D11C42150F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Oct 2018 09:03:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sw9dXNiq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DEEB21476
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlWpixLj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D11C42150F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726462AbeJTFPf (ORCPT
+        id S1727297AbeJTRNc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 20 Oct 2018 01:15:35 -0400
-Received: from mail-oi1-f173.google.com ([209.85.167.173]:45551 "EHLO
-        mail-oi1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726353AbeJTFPf (ORCPT
+        Sat, 20 Oct 2018 13:13:32 -0400
+Received: from mail-lf1-f50.google.com ([209.85.167.50]:35263 "EHLO
+        mail-lf1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727289AbeJTRNc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 20 Oct 2018 01:15:35 -0400
-Received: by mail-oi1-f173.google.com with SMTP id e17-v6so27880632oig.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Oct 2018 14:07:49 -0700 (PDT)
+        Sat, 20 Oct 2018 13:13:32 -0400
+Received: by mail-lf1-f50.google.com with SMTP id d7-v6so6319972lfi.2;
+        Sat, 20 Oct 2018 02:03:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=x1GU8fJNefCotwejIh3FAL3w1wRo5WgPJRqRukUmWpM=;
-        b=Sw9dXNiq0K5DBXzNaU826L113uvF4I9kbIwlEvfTwpBsXqQ7ibXfl7HEqjr1RYqEhD
-         c8S4XtOWJMrRqcS8sRDxbJ2JRfKMF4AsFzAMdVd9o4beQiJeev2IHw6e7L1FrxgCut36
-         X9obY+rfzTdSKDOI+Ge/bLIm8d+OjXQsB8uIavr+LtGBeaMS4fbByWmrf/KeacwPRtQL
-         BVBtADkQNWWLw1JTOmFOXi4oCFC421yHuDIXwM0GZr/yWn+S8Nj9IPmiEhHImYtMV95j
-         GTIL7f1d2Szuflu2RaiLPBtkVAJ3ep6Gmc5HMSWoVyHE3zV1HiVkCDpwzO0DTXYkK8gw
-         nHEQ==
+        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
+         :content-disposition:user-agent;
+        bh=O+BcuUr3u6hNdESXf8kNpE75V2ulNKAlyUx+FP6mDF0=;
+        b=OlWpixLjd9j4BToCR4+/wER5tM7aoXKCNM0TmxlhAOrYVT5evm0dZ05UYZGkiqITJM
+         JKYtTwlfevgssWJCPmtA5hovLhOTCHBKAbrrk7D2VQKCkD/0Q3KeKOLr1+wPuXFstXEb
+         C5DRY6fmrvctMHUC3hdtr6qkVqwYVij6w4pMjt6kXzhOZMI97rdJYUVIdUVuHbxVPH1K
+         CySnWnPAOdVbmJdNsxDAiW1PQDv8zA3/GrNfZey3XocCvYAedSd6TfeEUTq9mqsnkFC0
+         VeK2lZldraef5Uu7A3IZuZd8Bbb4AukZP9bWOdEYlADZXwM7A9njnhg1lv6dv3GHcFm1
+         bXfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=x1GU8fJNefCotwejIh3FAL3w1wRo5WgPJRqRukUmWpM=;
-        b=j8cHO1eDol14DYl9Ea/wJbliYfecOS9nMcHXHyIz+KmuLWeSHSJBAR+kKGXvBPyjRc
-         FBU1o+6LIXDbFpx14MRx1+5c+6RVXA73Vl2DIQ+fiNDh6+odvtNs4ph4+ZxgYeD1m6sd
-         ZKpc+oIZ0k8zDGL8aPrnYro0sZk/e6JIsHdtG0a2dMg+pe2bOVB8RbR7LvX6V6FNuRw3
-         FsLuRN29hjlJhoT+33FW3zRjKE8PxCRK7MMX8nygXgd/ktmF7iEaKxxWnmMPcckWFuEN
-         7Q7I20WLwaW3jBedg2DFKEjT2S0ga8rcwli+sZvt6600duTtdKMnPyZKxt+Nr4bXoWlK
-         Mxrw==
-X-Gm-Message-State: ABuFfojAt8A1gt5GFH4xOXK/CI6pS1CVHEvkIsesbiX/MI9JHPnvunaU
-        9v28s5m0Qk85B5j4Sn4H8bZZs391ecuTRDRRAiLbqQ==
-X-Google-Smtp-Source: ACcGV639aY4pnbOO3FyO0xW9IaYZivvwhbkRX/1/D0vSr5ztPZP63sHMvOQTtBkWCiV2IAiOd1LU7CHU4ubgOa4tUOk=
-X-Received: by 2002:aca:f5d3:: with SMTP id t202-v6mr19971221oih.29.1539983268568;
- Fri, 19 Oct 2018 14:07:48 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:mime-version:content-disposition:user-agent;
+        bh=O+BcuUr3u6hNdESXf8kNpE75V2ulNKAlyUx+FP6mDF0=;
+        b=WTs95XOf4+w2srdwomOYN84V7aJk1i5gqYo38UDufwVDnSz3C984wp/12Mmrqb9olf
+         08bXdnkj3Jjar77ieG7nbbu3RJoI/KnJCBlDFVgLU59owSYrbQuS81Ir6MUiVoB5f1Tf
+         VxxSGIDTQ23MV0FnG5iV3SI5lYU/qaDgy3l0bcCMFxMAszCH8Z5SIfOffjBntwNmI1sN
+         I+QW4MrsHqHETfY3oAhcJwZ6srAnvUm851Bc63HK2a/X9ywFQvNK9jOMzMpB3Dg86VfV
+         6Lc2QhZrOv+821U+xhm0tbUnZTIbIG7U0+wJU9tcx3MCf0QBKW/HZBV2siZWiwMRON2g
+         QevQ==
+X-Gm-Message-State: ABuFfojnAm48UQ5rSH9rKbVRARG0bM/kXt2bORrVxfDqzE1uGmY8SF4H
+        cWBb1ktHISZL7PW02Ssi+5PLSLY6
+X-Google-Smtp-Source: ACcGV62lkJFe5WbxMRzTs3pFDCBkbdw6kBd/uSh6yqLHOO65Hg/uzPuJyRql8Ua5N0XyRYSC5W7Q0g==
+X-Received: by 2002:a19:cf8d:: with SMTP id f135-v6mr4893887lfg.53.1540026227055;
+        Sat, 20 Oct 2018 02:03:47 -0700 (PDT)
+Received: from x1c.home (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
+        by smtp.gmail.com with ESMTPSA id g92-v6sm5845674lji.24.2018.10.20.02.03.44
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sat, 20 Oct 2018 02:03:44 -0700 (PDT)
+Date:   Sat, 20 Oct 2018 12:03:42 +0300
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     davem@davemloft.net
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2018-10-20
+Message-ID: <20181020090342.GA14926@x1c.home>
+Mail-Followup-To: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
 MIME-Version: 1.0
-Received: by 2002:a4a:17c2:0:0:0:0:0 with HTTP; Fri, 19 Oct 2018 14:07:47
- -0700 (PDT)
-From:   el es <lsharkey602@gmail.com>
-Date:   Fri, 19 Oct 2018 22:07:47 +0100
-Message-ID: <CADC+9YCD3ACFHYxxG3mf2vr-gNnP-4P6USSyer9K93k-bgUZMA@mail.gmail.com>
-Subject: Re: Connection to phone drops after a few seconds
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000af079405789b4b9b"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="ibTvN161/egqYuK8"
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---000000000000af079405789b4b9b
-Content-Type: text/plain; charset="UTF-8"
 
-I neglected to give some important information, I'm sorry...
+--ibTvN161/egqYuK8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Ubuntu  18.04 x86_64
-Kernel:  4.15.0.36
-Bluez:   5.50 (from ppa)
-Desktop:  Budgie (GTK2 based) / Xfce4
+Hi Dave,
 
-Also from btmon -w.
+Here's one more bluetooth-next pull request for the 4.20 kernel.
 
-Please let me know if there is anything else I can do.
+ - Added new USB ID for QCA_ROME controller
+ - Added debug trace support from QCA wcn3990 controllers
+ - Updated L2CAP to conform to latest Errata Service Release
+ - Fix binding to non-removable BCM43430 devices
 
-Thanks,
+Please let me know if there are any issues pulling. Thanks.
 
-L
+Johan
 
---000000000000af079405789b4b9b
-Content-Type: application/octet-stream; name=btmon_w
-Content-Disposition: attachment; filename=btmon_w
-Content-Transfer-Encoding: base64
-X-Attachment-Id: file0
+---
+The following changes since commit d864991b220b7c62e81d21209e1fd978fd67352c:
 
-YnRzbm9vcAAAAAABAAAH0QAAACkAAAAp//8ADAAAAAAA4lZOvCRR9UxpbnV4IHZlcnNpb24gNC4x
-NS4wLTM2LWdlbmVyaWMgKHg4Nl82NCkAAAAAIQAAACH//wAMAAAAAADiVk68JFH7Qmx1ZXRvb3Ro
-IHN1YnN5c3RlbSB2ZXJzaW9uIDIuMjIAAAAAEAAAABAAAAAAAAAAAADiVk68JFH9AAHLNu6DFQBo
-Y2kwAAAAAAAAAAAAAAAAAAAACAAAAAAA4lZOvCRR/gAAAAgAAAAIAAAACgAAAAAA4lZOvCRR/8s2
-7oMVAAoAAAAAHgAAAB7//wAOAAAAAADiVk68JFIBAQAAAAIAAQ4AAQAAABBibHVldG9vdGhkAAAA
-AAAAAAAAHgAAAB7//wAOAAAAAADiVk68JFKZAgAAAAIAAQ4AAQAAABBidG1vbgAAAAAAAAAAAAAA
-AAAAZwAAAGf//wANAAAAAADiVk68V7X3BwtibHVldG9vdGhkAHNyYy9kZXZpY2UuYzpjb25uZWN0
-X3Byb2ZpbGVzKCkgL29yZy9ibHVlei9oY2kwL2Rldl8wMF8xOV8yRF8wNF8wMl82NCAoYWxsKSwg
-Y2xpZW50IDoxLjU3AAAAAGoAAABq//8ADQAAAAAA4lZOvFe2GQcLYmx1ZXRvb3RoZABzcmMvZGV2
-aWNlLmM6Y29ubmVjdF9wcm9maWxlcygpIFJlc29sdmluZyBzZXJ2aWNlcyBmb3IgL29yZy9ibHVl
-ei9oY2kwL2Rldl8wMF8xOV8yRF8wNF8wMl82NAAAAAAQAAAAEAAAAAIAAAAAAOJWTrxXs1IFBA1k
-AgQtGQAYzAIAAAABAAAABgAAAAYAAAADAAAAAADiVk68V+IKDwQAAQUEAAAANgAAADb//wANAAAA
-AADiVk68d6F4BwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6c3RhcnRfZGlzY292ZXJ5X3RpbWVv
-dXQoKSAAAAAAXAAAAFz//wANAAAAAADiVk68d6G2BwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6
-c3RhcnRfZGlzY292ZXJ5X3RpbWVvdXQoKSBhZGFwdGVyLT5jdXJyZW50X2Rpc2NvdmVyeV9maWx0
-ZXIgPT0gMAAAAAAHAAAABwAAABAAAAAAAOJWTrx3oUEBAAAAIwABAAAACAAAAAgAAAACAAAAAADi
-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
-BgAAAAMAAAAAAOJWTrzUC0kPBAABBgQAAAAGAAAABgAAAAMAAAAAAOJWTrzUGvwFBAAqABYAAAAO
-AAAADgAAABEAAAAAAOJWTrzUGzUCAAAADABkAgQtGQAAAgAAAA4AAAAOAAAAEQAAAAAA4lZOvNQb
-NQEAAAAMAGQCBC0ZAAACAAAAXgAAAF7//wANAAAAAADiVk681B1CBwtibHVldG9vdGhkAHNyYy9h
-ZGFwdGVyLmM6ZGV2X2Rpc2Nvbm5lY3RlZCgpIERldmljZSAwMDoxOToyRDowNDowMjo2NCBkaXNj
-b25uZWN0ZWQsIHJlYXNvbiAyAAAAADgAAAA4//8ADQAAAAAA4lZOvNQdUwcLYmx1ZXRvb3RoZABz
-cmMvYWRhcHRlci5jOmFkYXB0ZXJfcmVtb3ZlX2Nvbm5lY3Rpb24oKSAAAAAANwAAADf//wANAAAA
-AADiVk681B1fBwtibHVldG9vdGhkAHBsdWdpbnMvcG9saWN5LmM6ZGlzY29ubmVjdF9jYigpIHJl
-YXNvbiAyAAAAAGYAAABm//8ADQAAAAAA4lZOvNQdagcLYmx1ZXRvb3RoZABzcmMvYWRhcHRlci5j
-OmJvbmRpbmdfYXR0ZW1wdF9jb21wbGV0ZSgpIGhjaTAgYmRhZGRyIDAwOjE5OjJEOjA0OjAyOjY0
-IHR5cGUgMCBzdGF0dXMgMHhlAAAAAE4AAABO//8ADQAAAAAA4lZOvNQddQcLYmx1ZXRvb3RoZABz
-cmMvZGV2aWNlLmM6ZGV2aWNlX2JvbmRpbmdfY29tcGxldGUoKSBib25kaW5nIChuaWwpIHN0YXR1
-cyAweDBlAAAAADwAAAA8//8ADQAAAAAA4lZOvNQdgAcLYmx1ZXRvb3RoZABzcmMvZGV2aWNlLmM6
-ZGV2aWNlX2JvbmRpbmdfZmFpbGVkKCkgc3RhdHVzIDE0AAAAAC8AAAAv//8ADQAAAAAA4lZOvNQd
-iwcLYmx1ZXRvb3RoZABzcmMvYWRhcHRlci5jOnJlc3VtZV9kaXNjb3ZlcnkoKSAAAAAANgAAADb/
-/wANAAAAAADiVk681B2WBwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6dHJpZ2dlcl9zdGFydF9k
-aXNjb3ZlcnkoKSAAAAAANgAAADb//wANAAAAAADiVk69H4baBwtibHVldG9vdGhkAHNyYy9hZGFw
-dGVyLmM6c3RhcnRfZGlzY292ZXJ5X3RpbWVvdXQoKSAAAAAAXAAAAFz//wANAAAAAADiVk69H4cZ
-BwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6c3RhcnRfZGlzY292ZXJ5X3RpbWVvdXQoKSBhZGFw
-dGVyLT5jdXJyZW50X2Rpc2NvdmVyeV9maWx0ZXIgPT0gMAAAAAAHAAAABwAAABAAAAAAAOJWTr0f
-hpUBAAAAIwABAAAACAAAAAgAAAACAAAAAADiVk69H4a/AQQFM4ueCAAAAAAGAAAABgAAAAMAAAAA
-AOJWTr0fkzwPBAABAQQAAAAKAAAACgAAABEAAAAAAOJWTr0fk4sBAAAAAQAjAAABAAAACAAAAAgA
-AAARAAAAAADiVk69H5OeAgAAABMAAQEAAAAIAAAACAAAABEAAAAAAOJWTr0fk54BAAAAEwABAQAA
-AEIAAABC//8ADQAAAAAA4lZOvR+UpAcLYmx1ZXRvb3RoZABzcmMvYWRhcHRlci5jOnN0YXJ0X2Rp
-c2NvdmVyeV9jb21wbGV0ZSgpIHN0YXR1cyAweDAwAAAAAFUAAABV//8ADQAAAAAA4lZOvR+UtwcL
-Ymx1ZXRvb3RoZABzcmMvYWRhcHRlci5jOmRpc2NvdmVyaW5nX2NhbGxiYWNrKCkgaGNpMCB0eXBl
-IDEgZGlzY292ZXJpbmcgMSBtZXRob2QgMAAAAAARAAAAEQAAAAMAAAAAAOJWTr0hyboiDwFkAgQt
-GQABAgQCUvxPxwAAABkAAAAZAAAAEQAAAAAA4lZOvSHJ4wIAAAASAGQCBC0ZAADHAwAAAAUABA0E
-AlIAAAAZAAAAGQAAABEAAAAAAOJWTr0hyeMBAAAAEgBkAgQtGQAAxwMAAAAFAAQNBAJSAAAAcAAA
-AHD//wANAAAAAADiVk69Ic2vBwtibHVldG9vdGhkAHNyYy9hZGFwdGVyLmM6ZGV2aWNlX2ZvdW5k
-X2NhbGxiYWNrKCkgaGNpMCBhZGRyIDAwOjE5OjJEOjA0OjAyOjY0LCByc3NpIC01NyBmbGFncyAw
-eDAwMDMgZWlyX2xlbiA1AAAAADcAAAA3//8ADQAAAAAA4lZOvSHNyAcLYmx1ZXRvb3RoZABzcmMv
-ZGV2aWNlLmM6ZGV2aWNlX3NldF9sZWdhY3koKSBsZWdhY3kgMQA=
---000000000000af079405789b4b9b--
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net (2018-10-12 21:38:46 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to c614ca3f7476934de54dd731e09d094ad822696c:
+
+  Bluetooth: hci_qca: Add support for controller debug logs. (2018-10-18 09:55:16 +0200)
+
+----------------------------------------------------------------
+Balakrishna Godavarthi (1):
+      Bluetooth: hci_qca: Add support for controller debug logs.
+
+Cho, Yu-Chen (1):
+      Bluetooth: btsdio: Do not bind to non-removable BCM43430
+
+Colin Ian King (1):
+      Bluetooth: Remove redundant check on status
+
+Mallikarjun Phulari (2):
+      Bluetooth: Use separate L2CAP LE credit based connection result values
+      Bluetooth: Errata Service Release 8, Erratum 3253
+
+Owen Lin (1):
+      Bluetooth: btusb: Add support for 0cf3:535b QCA_ROME device
+
+ drivers/bluetooth/btsdio.c    | 14 +++++++++-----
+ drivers/bluetooth/btusb.c     |  1 +
+ drivers/bluetooth/hci_qca.c   | 19 ++++++++++++++++++-
+ include/net/bluetooth/l2cap.h | 19 +++++++++++++------
+ net/bluetooth/hci_event.c     | 38 +++++++++++++++++---------------------
+ net/bluetooth/l2cap_core.c    | 36 ++++++++++++++++++++++--------------
+ 6 files changed, 80 insertions(+), 47 deletions(-)
+
+--ibTvN161/egqYuK8
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJbyu9uAAoJECQj9vv5qNQSm3YP/i2e58dvgaf2ZYRvRe1gJZli
+uLvIa/EmXw1ukSky2D4XVtDXRmJhW3ra9eTQ/2b17gX+MyvNSON54YdHPSfAuvq2
+aFT0SWhtpvjKsdrEnAlZydQO/7VzgMylDWJZsMVByCE901RFnIF3Zs89oV/j2reW
+CTdGg7jpuidpST+aJJbsQlpmRsdUr+fmEKmoXdOya242L7F0JKZJIlfjSSXXL/KR
+93nbkscYvLlcqTyDsep/pdA+femJ8N7qMJiyoAWOz4u/gYI0Q7DxH40xmmUmhfI2
+e7iWQSddIcAFPe5RauA9nQX78m04oQRTiQ2p6ZsQrjXzHQ9oBTawRpWTuMpKIeo8
+EulJc48UXjC0tvZgE9zPVZ5DIIQieQTqp+IHL0w2/EIre/qkMs9hzgi4+MYZeIdC
+8l54yZMBsxf5G1A1pRBbGkVfJ6/nXgx3lyqRbdfSlZ4tIpPg34jeOtxECjhhnJPV
+n2FBITxFURfi8HYMrbyotlyan07K/hP6WerZwffTH5kMrC10Y4ocGJbIk5u2nDj+
+YDrL7HqkQ/YJR38uiiBsuClbtqavPmF5B8Rx/T/6LtdwNGhL0T9cvNv3FBIFbbba
+Fn5H4iv/xViyKvLQbUxqQybEyoRty9KZm17ECZ8r8ub+TZbkqHm8eBlvs+jFn7o9
+3/sgOhPxYpvw6z8VjpDZ
+=Au/N
+-----END PGP SIGNATURE-----
+
+--ibTvN161/egqYuK8--
