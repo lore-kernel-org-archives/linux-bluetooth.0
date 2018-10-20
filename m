@@ -2,155 +2,131 @@ Return-Path: <SRS0=5noO=NA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 414B8C67863
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Oct 2018 09:03:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 456C3C67863
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Oct 2018 09:29:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D11C42150F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Oct 2018 09:03:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OlWpixLj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D11C42150F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id E785C2150C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Oct 2018 09:29:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E785C2150C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=m-reimer.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727297AbeJTRNc (ORCPT
+        id S1727377AbeJTRjH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 20 Oct 2018 13:13:32 -0400
-Received: from mail-lf1-f50.google.com ([209.85.167.50]:35263 "EHLO
-        mail-lf1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727289AbeJTRNc (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 20 Oct 2018 13:13:32 -0400
-Received: by mail-lf1-f50.google.com with SMTP id d7-v6so6319972lfi.2;
-        Sat, 20 Oct 2018 02:03:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
-         :content-disposition:user-agent;
-        bh=O+BcuUr3u6hNdESXf8kNpE75V2ulNKAlyUx+FP6mDF0=;
-        b=OlWpixLjd9j4BToCR4+/wER5tM7aoXKCNM0TmxlhAOrYVT5evm0dZ05UYZGkiqITJM
-         JKYtTwlfevgssWJCPmtA5hovLhOTCHBKAbrrk7D2VQKCkD/0Q3KeKOLr1+wPuXFstXEb
-         C5DRY6fmrvctMHUC3hdtr6qkVqwYVij6w4pMjt6kXzhOZMI97rdJYUVIdUVuHbxVPH1K
-         CySnWnPAOdVbmJdNsxDAiW1PQDv8zA3/GrNfZey3XocCvYAedSd6TfeEUTq9mqsnkFC0
-         VeK2lZldraef5Uu7A3IZuZd8Bbb4AukZP9bWOdEYlADZXwM7A9njnhg1lv6dv3GHcFm1
-         bXfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:mime-version:content-disposition:user-agent;
-        bh=O+BcuUr3u6hNdESXf8kNpE75V2ulNKAlyUx+FP6mDF0=;
-        b=WTs95XOf4+w2srdwomOYN84V7aJk1i5gqYo38UDufwVDnSz3C984wp/12Mmrqb9olf
-         08bXdnkj3Jjar77ieG7nbbu3RJoI/KnJCBlDFVgLU59owSYrbQuS81Ir6MUiVoB5f1Tf
-         VxxSGIDTQ23MV0FnG5iV3SI5lYU/qaDgy3l0bcCMFxMAszCH8Z5SIfOffjBntwNmI1sN
-         I+QW4MrsHqHETfY3oAhcJwZ6srAnvUm851Bc63HK2a/X9ywFQvNK9jOMzMpB3Dg86VfV
-         6Lc2QhZrOv+821U+xhm0tbUnZTIbIG7U0+wJU9tcx3MCf0QBKW/HZBV2siZWiwMRON2g
-         QevQ==
-X-Gm-Message-State: ABuFfojnAm48UQ5rSH9rKbVRARG0bM/kXt2bORrVxfDqzE1uGmY8SF4H
-        cWBb1ktHISZL7PW02Ssi+5PLSLY6
-X-Google-Smtp-Source: ACcGV62lkJFe5WbxMRzTs3pFDCBkbdw6kBd/uSh6yqLHOO65Hg/uzPuJyRql8Ua5N0XyRYSC5W7Q0g==
-X-Received: by 2002:a19:cf8d:: with SMTP id f135-v6mr4893887lfg.53.1540026227055;
-        Sat, 20 Oct 2018 02:03:47 -0700 (PDT)
-Received: from x1c.home (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
-        by smtp.gmail.com with ESMTPSA id g92-v6sm5845674lji.24.2018.10.20.02.03.44
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 20 Oct 2018 02:03:44 -0700 (PDT)
-Date:   Sat, 20 Oct 2018 12:03:42 +0300
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     davem@davemloft.net
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2018-10-20
-Message-ID: <20181020090342.GA14926@x1c.home>
-Mail-Followup-To: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
+        Sat, 20 Oct 2018 13:39:07 -0400
+Received: from mx1.mailbox.org ([80.241.60.212]:10526 "EHLO mx1.mailbox.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727375AbeJTRjH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 20 Oct 2018 13:39:07 -0400
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [80.241.60.240])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx1.mailbox.org (Postfix) with ESMTPS id BCB9840561;
+        Sat, 20 Oct 2018 11:29:18 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at heinlein-support.de
+Received: from smtp1.mailbox.org ([80.241.60.240])
+        by spamfilter02.heinlein-hosting.de (spamfilter02.heinlein-hosting.de [80.241.56.116]) (amavisd-new, port 10030)
+        with ESMTP id gjzsxiFarjfM; Sat, 20 Oct 2018 11:29:17 +0200 (CEST)
+Date:   Sat, 20 Oct 2018 11:29:17 +0200 (CEST)
+From:   Manuel Reimer <mail@m-reimer.de>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Message-ID: <1843143565.101877.1540027757763@office.mailbox.org>
+In-Reply-To: <1681973667.42596.1539676137500@office.mailbox.org>
+References: <214921089.58360.1539009269108@office.mailbox.org>
+ <7601015A-9193-4992-AA58-3925937CDEB0@holtmann.org>
+ <1558948929.49279.1539619240770@office.mailbox.org>
+ <50691311-913F-4AB0-AF3A-DD280EC0ECB9@holtmann.org>
+ <1681973667.42596.1539676137500@office.mailbox.org>
+Subject: Re: Problems with Bluetooth built into BCM4313 WLAN card
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="ibTvN161/egqYuK8"
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Priority: 3
+Importance: Medium
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hello,
 
---ibTvN161/egqYuK8
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+My new WLAN mini PCI card has arrived and is installed into my laptop.
 
-Hi Dave,
+I hope this at least fixes the unstable WLAN but unfortunately Bluetooth keeps absent.
 
-Here's one more bluetooth-next pull request for the 4.20 kernel.
+While searching, I've found something that may be interesting:
 
- - Added new USB ID for QCA_ROME controller
- - Added debug trace support from QCA wcn3990 controllers
- - Updated L2CAP to conform to latest Errata Service Release
- - Fix binding to non-removable BCM43430 devices
+Oct 20 11:08:07 manuelslaptop kernel: usb 1-1.3: Product: Bluetooth USB Host Controller
+Oct 20 11:08:07 manuelslaptop kernel: usb 1-1.3: Manufacturer: Atheros Communications
+Oct 20 11:08:07 manuelslaptop kernel: usb 1-1.3: SerialNumber: Alaska Day 2006
+...
+Oct 20 11:08:07 manuelslaptop kernel: usb 1-1.3: USB disconnect, device number 3
 
-Please let me know if there are any issues pulling. Thanks.
+So yes, on this card the bluetooth controller is connected via USB. I just cant see it in lsusb as it, for some reason, disconnects itself. I have no idea what is causing this...
 
-Johan
+Maybe I should just stick with my USB dongle. Linux and MiniPCI Bluetooth doesn't seem to be a good combination.
 
----
-The following changes since commit d864991b220b7c62e81d21209e1fd978fd67352c:
+Manuel
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net (2018-10-12 21:38:46 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to c614ca3f7476934de54dd731e09d094ad822696c:
-
-  Bluetooth: hci_qca: Add support for controller debug logs. (2018-10-18 09:55:16 +0200)
-
-----------------------------------------------------------------
-Balakrishna Godavarthi (1):
-      Bluetooth: hci_qca: Add support for controller debug logs.
-
-Cho, Yu-Chen (1):
-      Bluetooth: btsdio: Do not bind to non-removable BCM43430
-
-Colin Ian King (1):
-      Bluetooth: Remove redundant check on status
-
-Mallikarjun Phulari (2):
-      Bluetooth: Use separate L2CAP LE credit based connection result values
-      Bluetooth: Errata Service Release 8, Erratum 3253
-
-Owen Lin (1):
-      Bluetooth: btusb: Add support for 0cf3:535b QCA_ROME device
-
- drivers/bluetooth/btsdio.c    | 14 +++++++++-----
- drivers/bluetooth/btusb.c     |  1 +
- drivers/bluetooth/hci_qca.c   | 19 ++++++++++++++++++-
- include/net/bluetooth/l2cap.h | 19 +++++++++++++------
- net/bluetooth/hci_event.c     | 38 +++++++++++++++++---------------------
- net/bluetooth/l2cap_core.c    | 36 ++++++++++++++++++++++--------------
- 6 files changed, 80 insertions(+), 47 deletions(-)
-
---ibTvN161/egqYuK8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJbyu9uAAoJECQj9vv5qNQSm3YP/i2e58dvgaf2ZYRvRe1gJZli
-uLvIa/EmXw1ukSky2D4XVtDXRmJhW3ra9eTQ/2b17gX+MyvNSON54YdHPSfAuvq2
-aFT0SWhtpvjKsdrEnAlZydQO/7VzgMylDWJZsMVByCE901RFnIF3Zs89oV/j2reW
-CTdGg7jpuidpST+aJJbsQlpmRsdUr+fmEKmoXdOya242L7F0JKZJIlfjSSXXL/KR
-93nbkscYvLlcqTyDsep/pdA+femJ8N7qMJiyoAWOz4u/gYI0Q7DxH40xmmUmhfI2
-e7iWQSddIcAFPe5RauA9nQX78m04oQRTiQ2p6ZsQrjXzHQ9oBTawRpWTuMpKIeo8
-EulJc48UXjC0tvZgE9zPVZ5DIIQieQTqp+IHL0w2/EIre/qkMs9hzgi4+MYZeIdC
-8l54yZMBsxf5G1A1pRBbGkVfJ6/nXgx3lyqRbdfSlZ4tIpPg34jeOtxECjhhnJPV
-n2FBITxFURfi8HYMrbyotlyan07K/hP6WerZwffTH5kMrC10Y4ocGJbIk5u2nDj+
-YDrL7HqkQ/YJR38uiiBsuClbtqavPmF5B8Rx/T/6LtdwNGhL0T9cvNv3FBIFbbba
-Fn5H4iv/xViyKvLQbUxqQybEyoRty9KZm17ECZ8r8ub+TZbkqHm8eBlvs+jFn7o9
-3/sgOhPxYpvw6z8VjpDZ
-=Au/N
------END PGP SIGNATURE-----
-
---ibTvN161/egqYuK8--
+> mail+bluetooth@m-reimer.de hat am 16. Oktober 2018 um 09:48 geschrieben:
+> 
+> 
+> Hello,
+> 
+> my acpidump output doesn't seem to have anything about "bluetooth" and I even don't see anything about my BCM4313 card.
+> 
+> About the Wifi chipset, I think it should be Broadcom (BCM4313)
+> 
+> I've tried to load the "thinkpad-acpi" module, but sadly it doesn't detect my ideapad laptop. No way to configure Bluetooth there. I also don't have bluetooth in the BIOS setup to enable it there.
+> 
+> If I'm right, then ACPI/BIOS can somehow block Bluetooth and so even if I get my new card, Bluetooth could still be disabled?
+> 
+> Is there any other way to enable Bluetooth besides booting Windows on this machine to do it there?
+> 
+> Manuel
+> 
+> > Marcel Holtmann <marcel@holtmann.org> hat am 15. Oktober 2018 um 19:25 geschrieben:
+> > 
+> > 
+> > Hi Manuel,
+> > 
+> > > I've tried with unblocked bluetooth but don't get anyting in lsusb:
+> > > 
+> > > # rfkill list
+> > > 0: ideapad_wlan: Wireless LAN
+> > > 	Soft blocked: no
+> > > 	Hard blocked: no
+> > > 1: ideapad_bluetooth: Bluetooth
+> > > 	Soft blocked: no
+> > > 	Hard blocked: no
+> > > 3: phy0: Wireless LAN
+> > > 	Soft blocked: no
+> > > 	Hard blocked: no
+> > > [root@manuelslaptop ~]# lsusb
+> > > Bus 002 Device 003: ID 04f2:b2e2 Chicony Electronics Co., Ltd 
+> > > Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+> > > Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> > > Bus 001 Device 004: ID 0bda:0129 Realtek Semiconductor Corp. RTS5129 Card Reader Controller
+> > > Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+> > > Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> > > Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+> > > Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+> > > 
+> > > 
+> > > The WLAN part is also not the greatest (open source driver).
+> > > 
+> > > I've ordered a new card with Atheros chipset some days ago and will try if this solves this issue.
+> > 
+> > Then use acpidump etc to look at your ACPI tables and see if a Bluetooth UART device is described there. There is sadly no simple lsacpi to list your devices.
+> > 
+> > What is the WiFi chipset anyway? Is this Realtek based or what?
+> > 
+> > Regards
+> > 
+> > Marcel
+> >
