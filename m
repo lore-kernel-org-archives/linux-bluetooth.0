@@ -1,61 +1,107 @@
-Return-Path: <SRS0=5noO=NA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=WS9e=NB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFEF1C67863
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Oct 2018 19:34:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D534ECDE3D
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Oct 2018 10:08:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8378F215E6
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Oct 2018 19:34:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8378F215E6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=davemloft.net
+	by mail.kernel.org (Postfix) with ESMTP id 1640620838
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Oct 2018 10:08:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1640620838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727713AbeJUDpl (ORCPT
+        id S1727095AbeJUSWo convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 20 Oct 2018 23:45:41 -0400
-Received: from shards.monkeyblade.net ([23.128.96.9]:34282 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727417AbeJUDpl (ORCPT
+        Sun, 21 Oct 2018 14:22:44 -0400
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:33890 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726982AbeJUSWo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 20 Oct 2018 23:45:41 -0400
-Received: from localhost (unknown [IPv6:2601:601:9f80:35cd::cf9])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 361EC13ADDDFC;
-        Sat, 20 Oct 2018 12:34:12 -0700 (PDT)
-Date:   Sat, 20 Oct 2018 12:34:11 -0700 (PDT)
-Message-Id: <20181020.123411.1116183885730251618.davem@davemloft.net>
-To:     johan.hedberg@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2018-10-20
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20181020090342.GA14926@x1c.home>
-References: <20181020090342.GA14926@x1c.home>
-X-Mailer: Mew version 6.7 on Emacs 26 / Mule 6.0 (HANACHIRUSATO)
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Sat, 20 Oct 2018 12:34:12 -0700 (PDT)
+        Sun, 21 Oct 2018 14:22:44 -0400
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 89BAC28711
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Oct 2018 10:08:56 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 7C2B028757; Sun, 21 Oct 2018 10:08:56 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 201479] New: Dell WK717 keyboard causes crashes of Bluetooth
+ daemon 5.50
+Date:   Sun, 21 Oct 2018 10:08:56 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: dieter.vanderfaeillie@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-201479-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: Sat, 20 Oct 2018 12:03:42 +0300
+https://bugzilla.kernel.org/show_bug.cgi?id=201479
 
-> Here's one more bluetooth-next pull request for the 4.20 kernel.
-> 
->  - Added new USB ID for QCA_ROME controller
->  - Added debug trace support from QCA wcn3990 controllers
->  - Updated L2CAP to conform to latest Errata Service Release
->  - Fix binding to non-removable BCM43430 devices
-> 
-> Please let me know if there are any issues pulling. Thanks.
+            Bug ID: 201479
+           Summary: Dell WK717 keyboard causes crashes of Bluetooth daemon
+                    5.50
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.15.0-36-generic
+          Hardware: x86-64
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: dieter.vanderfaeillie@gmail.com
+        Regression: No
 
-Pulled, thanks Johan.
+Created attachment 279107
+  --> https://bugzilla.kernel.org/attachment.cgi?id=279107&action=edit
+Journalctl log
+
+I installed Elementary OS Juno (5.0) and tried pairing my Bluetooth mouse and
+Dell WK717 keyboard. The mouse works without issues, but after pairing the
+keyboard the Bluetooth service seems to crash, restart, crash, restart etc..
+
+
+I've upgraded the Bluetooth driver to version 5.50 because 5.48 was the default
+on the fresh Elementary OS install.
+The update was done through: https://launchpad.net/ubuntu/+source/bluez
+
+
+Now 
+> $ bluetoothd --version returns 5.50
+
+
+
+I'm running this on a Dell XPS 13 (9360)
+https://wiki.archlinux.org/index.php/Dell_XPS_13_(9360)
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
