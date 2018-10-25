@@ -1,231 +1,104 @@
-Return-Path: <SRS0=W/a7=NE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=5QOG=NF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F064C67863
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Oct 2018 14:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E429CECDE46
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Oct 2018 00:21:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A6D32082F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Oct 2018 14:56:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3ED4320831
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Oct 2018 00:21:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="JmAUZPze";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="JmAUZPze"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A6D32082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gSqHil6l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ED4320831
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726850AbeJXXYU (ORCPT
+        id S1726852AbeJYIwG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Oct 2018 19:24:20 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:51144 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726457AbeJXXYU (ORCPT
+        Thu, 25 Oct 2018 04:52:06 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:46695 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726117AbeJYIwG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Oct 2018 19:24:20 -0400
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 90F4560C5F; Wed, 24 Oct 2018 14:55:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1540392953;
-        bh=5qxJ1ECucaLRVbkAyvJ/6cvvyESt93lQXolXbKd1ddk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JmAUZPzepi0UZdMgs10RmQbJPvXGDSfbvaPHcV0RRs1Pjt+7UMCQGiIEs5ZEq+Pnc
-         hwnEtFCI+L6+cYa7PpdRFO98/AzRjeKLScOIDQHJZr+7nO2TMjDhZHW8BfsALtWLPX
-         /GGyZxWtg5XLWMk0hygPn7GVKcwBHFT0MEFzNyBE=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 060DF60246;
-        Wed, 24 Oct 2018 14:55:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1540392953;
-        bh=5qxJ1ECucaLRVbkAyvJ/6cvvyESt93lQXolXbKd1ddk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JmAUZPzepi0UZdMgs10RmQbJPvXGDSfbvaPHcV0RRs1Pjt+7UMCQGiIEs5ZEq+Pnc
-         hwnEtFCI+L6+cYa7PpdRFO98/AzRjeKLScOIDQHJZr+7nO2TMjDhZHW8BfsALtWLPX
-         /GGyZxWtg5XLWMk0hygPn7GVKcwBHFT0MEFzNyBE=
+        Thu, 25 Oct 2018 04:52:06 -0400
+Received: by mail-pl1-f194.google.com with SMTP id bb7-v6so2986991plb.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Oct 2018 17:21:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5kvGDsk1E536QwTcSPrMfemgdruUKz0tl3b/ApdZ+kw=;
+        b=gSqHil6lAdBtIa51yQx0MdJF0R3JP1wauwlrvbkda0sZzTI0+jdGkis1zs1qJ7nFWW
+         uWRElPCaMISugL8EjuvaUiuoGK6XgZ2NcDJxEUGJ9KwV8ekzXl1VTM0VOOfzSw/XLNKo
+         5/0CB5wHSlmTr6dMcyyhEfaXx7/BmdMWNP/Lg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5kvGDsk1E536QwTcSPrMfemgdruUKz0tl3b/ApdZ+kw=;
+        b=cAwzViJq2Qz7dJPO9BAY/WmIdIqlq+V4Nw/Ysw2hkB47pPO5aSAEjqxDVwEJnQBqRw
+         E0DG+P9lafxU+ZQxGl3c6Va/uV0tBduZ0/VK9xj7ZpFUwVF693z3dnnZFfyUzoFEZkI5
+         kP3UOvO/5IndSadJx9Jmmi/7/7nQV/dj+2ZB42W6oSL/mG2/EEoFUn9SWVvmLXMyCxkd
+         jQ61qdAZ9V6vCqobF06Nx1NVFIkFhS8k+B1KavC5Fhoxd2P0XmvTwZhCL3e2Ku7+hO+v
+         x5lx1Agt16hVLkze5ZGnzzdFehJmcteAd9B+NXB82WTYGy/HBKMhJNJO1Ky5gSx0Neai
+         n7UA==
+X-Gm-Message-State: AGRZ1gIS4aNDv6Xp2B6ZvaC+N8Q1ytAdBIalEk55pclqvdMxyc3pPNbD
+        czhBwFAKJVY/LOd6C6aAoGN3QA==
+X-Google-Smtp-Source: AJdET5eYeQelNGqXEkR6MNf4EAt9P4T491yr9/imxNMvso6tacw2AUQkGP0ltg07/flZCmQbadyKWQ==
+X-Received: by 2002:a17:902:32a4:: with SMTP id z33-v6mr4443182plb.85.1540426910161;
+        Wed, 24 Oct 2018 17:21:50 -0700 (PDT)
+Received: from mka.mtv.corp.google.com ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
+        by smtp.gmail.com with ESMTPSA id w2-v6sm8410181pfk.140.2018.10.24.17.21.49
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 24 Oct 2018 17:21:49 -0700 (PDT)
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Loic Poulain <loic.poulain@linaro.org>
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Brian Norris <briannorris@chromium.org>,
+        Dmitry Grinberg <dmitrygr@google.com>,
+        Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH 0/2] Add quirk for reading BD_ADDR from fwnode property
+Date:   Wed, 24 Oct 2018 17:21:32 -0700
+Message-Id: <20181025002134.256791-1-mka@chromium.org>
+X-Mailer: git-send-email 2.19.1.568.g152ad8e336-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
 Content-Transfer-Encoding: 8bit
-Date:   Wed, 24 Oct 2018 20:25:52 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org,
-        Harish Bandi <c-hbandi@codeaurora.org>
-Subject: Re: [PATCH v2] Bluetooth: hci_qca: Add support for controller debug
- logs.
-In-Reply-To: <A1A25EBE-925D-4952-AE5E-4A6C2BA6FD9E@holtmann.org>
-References: <20181003151144.10537-1-bgodavar@codeaurora.org>
- <2206464E-FA01-4A5A-8BC4-5CF70A0B9765@holtmann.org>
- <eca6c8832017269881709e51eadcf543@codeaurora.org>
- <EC27FDED-638A-4055-A861-C4AAD842F124@holtmann.org>
- <fed90ab28af93bc27a07c0b4e8ca933c@codeaurora.org>
- <01616379-E0FF-49AC-8C69-DA498DA9F51F@holtmann.org>
- <540262ec6c6f1c5f3a9baf18b6f40d47@codeaurora.org>
- <9261133E-226E-42E7-B2F6-15489CCC7CF1@holtmann.org>
- <b59f1fdb359f74bcd3d932339c41f9f3@codeaurora.org>
- <A1A25EBE-925D-4952-AE5E-4A6C2BA6FD9E@holtmann.org>
-Message-ID: <9cd7bbd5c6d620399f4562ec4f406725@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+On some systems the Bluetooth Device Address (BD_ADDR) isn't stored
+on the Bluetooth chip itself. One way to configure the address is
+through the device tree (patched in by the bootloader). The btqcomsmd
+driver is an example, it can read the address from the DT property
+'local-bd-address'. It is also planned to extend the hci_qca driver
+to support setting the BD address through the DT.
 
-On 2018-10-18 13:28, Marcel Holtmann wrote:
-> Hi Balakrishna,
-> 
->>>>>>>>>> This patch will prevent error messages splashing on console.
->>>>>>>>>> [   78.426697] Bluetooth: hci_core.c:hci_acldata_packet() 
->>>>>>>>>> hci0: ACL packet for unknown connection handle 3804
->>>>>>>>>> [   78.436682] Bluetooth: hci_core.c:hci_acldata_packet() 
->>>>>>>>>> hci0: ACL packet for unknown connection handle 3804
->>>>>>>>>> [   78.446639] Bluetooth: hci_core.c:hci_acldata_packet() 
->>>>>>>>>> hci0: ACL packet for unknown connection handle 3804
->>>>>>>>>> [   78.456596] Bluetooth: hci_core.c:hci_acldata_packet() 
->>>>>>>>>> hci0: ACL packet for unknown connection handle 3804
->>>>>>>>>> QCA wcn3990 will send the debug logs in the form of ACL 
->>>>>>>>>> packets.
->>>>>>>>>> While decoding packet in qca_recv(), marking the received 
->>>>>>>>>> debug log
->>>>>>>>>> packet as diagnostic packet.
->>>>>>>>>> Signed-off-by: Harish Bandi <c-hbandi@codeaurora.org>
->>>>>>>>>> Signed-off-by: Balakrishna Godavarthi 
->>>>>>>>>> <bgodavar@codeaurora.org>
->>>>>>>>>> ---
->>>>>>>>>> v2:
->>>>>>>>>> * Addressed reviewer comments.
->>>>>>>>>> v1:
->>>>>>>>>> * initial patch
->>>>>>>>>> ---
->>>>>>>>>> drivers/bluetooth/hci_qca.c | 20 +++++++++++++++++++-
->>>>>>>>>> 1 file changed, 19 insertions(+), 1 deletion(-)
->>>>>>>>>> diff --git a/drivers/bluetooth/hci_qca.c 
->>>>>>>>>> b/drivers/bluetooth/hci_qca.c
->>>>>>>>>> index d98ed0442201..63ac3c6b4149 100644
->>>>>>>>>> --- a/drivers/bluetooth/hci_qca.c
->>>>>>>>>> +++ b/drivers/bluetooth/hci_qca.c
->>>>>>>>>> @@ -63,6 +63,10 @@
->>>>>>>>>> /* susclk rate */
->>>>>>>>>> #define SUSCLK_RATE_32KHZ	32768
->>>>>>>>>> +/* Controller debug log header */
->>>>>>>>>> +#define QCA_DEBUG_HDR_MSB	0xDC
->>>>>>>>>> +#define QCA_DEBUG_HDR_LSB	0x2E
->>>>>>>>>> +
->>>>>>>>> since this is actually the ACL handle, why not call it 
->>>>>>>>> QCA_DEBUG_HANDLE.
->>>>>>>> [Bala]: will update.
->>>>>>>>>> /* HCI_IBS transmit side sleep protocol states */
->>>>>>>>>> enum tx_ibs_states {
->>>>>>>>>> 	HCI_IBS_TX_ASLEEP,
->>>>>>>>>> @@ -849,6 +853,20 @@ static int qca_ibs_wake_ack(struct 
->>>>>>>>>> hci_dev *hdev, struct sk_buff *skb)
->>>>>>>>>> 	return 0;
->>>>>>>>>> }
->>>>>>>>>> +static int qca_recv_acl_data(struct hci_dev *hdev, struct 
->>>>>>>>>> sk_buff *skb)
->>>>>>>>>> +{
->>>>>>>>>> +	/* We receive debug logs from chip as an ACL packets.
->>>>>>>>>> +	 * Instead of sending the data to ACL to decode the
->>>>>>>>>> +	 * received data, we are pushing them to the above layers
->>>>>>>>>> +	 * as a diagnostic packet.
->>>>>>>>>> +	 */
->>>>>>>>>> +	if ((skb->len > 2) && (skb->data[0] == QCA_DEBUG_HDR_MSB) &&
->>>>>>>>>> +	    (skb->data[1] == QCA_DEBUG_HDR_LSB))
->>>>>>>>> Skip the individual () since they are not needed. Also the 
->>>>>>>>> skb->len
->>>>>>>>> check is not needed since the H4_RECV_ACL already ensures the 
->>>>>>>>> proper
->>>>>>>>> length of the header.
->>>>>>>>> And just use get_unaligned_le16(skb->data) here (or be16 if 
->>>>>>>>> that is
->>>>>>>>> the byte order).
->>>>>>>> [Bala] : will update condition with _le16()
->>>>>>>>>> +		return hci_recv_diag(hdev, skb);
->>>>>>>>> Is there any reason to keep the 4 octets hci_acl_hdr with this 
->>>>>>>>> SKB? Or
->>>>>>>>> would it be better to be stripped off. Mainly asking are they 
->>>>>>>>> any
->>>>>>>>> other magic handles that we might want to feed through the diag
->>>>>>>>> channel?
->>>>>>>> [Bala]: yes we need header in the stack, to  differentiate 
->>>>>>>> between actual diagnostic packet and debug packet.
->>>>>>> please explain that a bit more. There is just one debug handle or 
->>>>>>> do
->>>>>>> you have more special handles?
->>>>>> [Bala]: Qualcomm bluetooth chip sends the debug data of the chip 
->>>>>> with ACL header along with fixed handler i.e. 0x2edc..
->>>>>>      this handler is dedicated for the debug logs sent by qcomm bt 
->>>>>> chip and it is not used for any other connection handlers.
->>>>>>      so here we are checking this handler and sending to stack as 
->>>>>> an
->>>>>>      a diagnostic packet.. so during the log capture we will read 
->>>>>> this diagnostic packet and handler,to decode the debug packet.
->>>>>>      that is the  reason why we don't remove handler during 
->>>>>> condition check,  in future, if qualcomm chip sends diagnostic 
->>>>>> packet,
->>>>>>      then this will create an problem to upper layers to decide 
->>>>>> whether it is an diagnostic packet or the debug packet.
->>>>>>     this is how we do it.
->>>>>>    if( diagnostic packet && handler == 0x2edc)
->>>>>>       treat them as an ddebug packet
->>>>>>    else
->>>>>>        treat as diagnostic packet.
->>>>> let me interpret this answer. Besides debug handle 0x2edc, there 
->>>>> are
->>>>> other handles that are not connection handles. And in future 
->>>>> updates
->>>>> you want to send these handles also via hci_recv_diag channel.
->>>> No, 0x2edc is an dedicated handle for debug logs, i don't really 
->>>> think they we will have an new handle coming up.
->>>> this is only the handle we will send via hci_recv_diag channel to 
->>>> the stack.
->>>> what i mean in my previous answer was,we don't to remove debug 
->>>> connection handle from the skb, because in the stack
->>>> we look for a diagnostic packet and debug connection handler to 
->>>> decode the message.
->>> if 0x2edc is the only magic connection handle, then lets strip the 
->>> SKB
->>> of the ACL packet header and send only the payload to via
->>> hci_recv_diag. All the information is present and you would be just
->>> sending the ACL packet header for no reason. The diagnostic packets
->>> get a separate channel on the monitor interface.
->> [Bala]: even we the felt the same to remove ACL packet header before 
->> sending to stack via an diagnostic channel,
->> 
->>        here is the case, let us assume that an in future qaulcomm bt 
->> chip want to send diagnosis data as a diagnostic packet.
->>        if we remove ACL header for ACL debug packet, how can the stack 
->> differentiate between debug packet and diagnosis packet.
-> 
-> fair enough. Can we also do the same for the other Qualcomm / Atheros
-> devices on USB and SMD bus? And what about implementing hdev->set_diag
-> to enable / disable sending of debug logs. And of course the addition
-> to btmon to decode the diagnostic channel.
-> 
-[Bala]:
-        Does thing change need to be done for other Qualcomm/Atheros 
-device on USB and smd:  For the legacy Qualcomm/Atheros Chips 
-(Rome/AR30x2/AR30x3), they don’t have this ACL data debug log feature.
-        hdev->set_diag implementation to enable or disable the debug logs 
-from controller: will study further and get back to you on this
-        Qualcomm specific file in Bluez stack to decode the bypassed 
-debug packets in btmon: soon we will be posting the parsing file.
+To avoid redundant open-coded reading of 'local-bd-address' and error
+handling this series adds the quirk HCI_QUIRK_USE_BDADDR_PROPERTY to
+retrieve the BD address of a device from the DT and adapts the
+btqcomsmd driver to use this quirk.
 
+Matthias Kaehlcke (2):
+  Bluetooth: Add quirk for reading BD_ADDR from fwnode property
+  Bluetooth: btqcomsmd: use HCI_QUIRK_USE_BDADDR_PROPERTY
 
-> Regards
-> 
-> Marcel
+ drivers/bluetooth/btqcomsmd.c | 28 +++--------------------
+ include/net/bluetooth/hci.h   | 12 ++++++++++
+ net/bluetooth/hci_core.c      | 42 +++++++++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c          |  6 +++--
+ 4 files changed, 61 insertions(+), 27 deletions(-)
 
 -- 
-Regards
-Balakrishna.
+2.19.1.568.g152ad8e336-goog
+
