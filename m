@@ -2,181 +2,106 @@ Return-Path: <SRS0=luki=NG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E55BAECDE44
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Oct 2018 18:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0702FECDE46
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Oct 2018 20:20:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A18172085B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Oct 2018 18:53:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE56B2064A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Oct 2018 20:20:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="SXT/0O+j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A18172085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=goldelico.com header.i=@goldelico.com header.b="W+mlhna5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE56B2064A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=goldelico.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727948AbeJ0Db0 (ORCPT
+        id S1727791AbeJ0E6z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Oct 2018 23:31:26 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:36861 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727772AbeJ0Db0 (ORCPT
+        Sat, 27 Oct 2018 00:58:55 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.219]:34512 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727636AbeJ0E6z (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Oct 2018 23:31:26 -0400
-Received: by mail-pg1-f196.google.com with SMTP id z17-v6so951171pgv.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Oct 2018 11:53:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=cQmOOJ/rN1/JPprUB1D77Z8TtrDa67iiG6AT33srIeg=;
-        b=SXT/0O+jlxYauE+2Mnh1ke5s7xV9ZKtVTE9P7F2MKKWJJtnxBtt6Cu3b6kzMXHa0C+
-         EtJLHabKJY4Mi+nq6cOZ35S59we5QdT/7ikZ36o6BaiuEnA1H3UXVxVK2pNVw+/FeMFO
-         0Vw18mzUCxh6R/EY9SxtRpr2UDscIgH5HYLXg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=cQmOOJ/rN1/JPprUB1D77Z8TtrDa67iiG6AT33srIeg=;
-        b=ctKnJXUN9QfixzcFqtsUGemvCI39gVb+R57r/cxwZ9rLSNZGO5xoApyPx+aJkvVXNG
-         f9J9ZQM0UqcYO0FNvn7gtgKXcamcRkli75Y/wWa7JtxKgTT9MP0AQlh3W+/gYPEssYsA
-         wV2/GRjnMhcxm5LsmteZBbo1eJndk5QgoMaBXk6jdhzDQfvBw7eD7kLYEEr9tnyd+/Np
-         WUv35yjR7i2MNBzp2OduCFeyL7ajHRtBQofgKcOmkOP74ZO63wy2noD9P05G9WpBAQkV
-         1c3Jc8fNubjIPLuWGX7D8V41ZX9kqgIHl6WMEJxhZlfUnPAVQMLWY2eKKOIp87uHGG8H
-         gQBg==
-X-Gm-Message-State: AGRZ1gJWnMOBQhdizVBUVSiBlTtVA1QQcP36txDSIT4Xx6o5B01eUWGh
-        IVPq0Pq1SeraYbdkDDmPoWdlsw==
-X-Google-Smtp-Source: AJdET5c+AfeQMduHXJyy0OY05zwR0t7Hs5iA74giJaPi5YklZ1ZN6UMpZ3OF+88e9RUSllFNsKlQPw==
-X-Received: by 2002:a63:561b:: with SMTP id k27mr4590475pgb.271.1540579995569;
-        Fri, 26 Oct 2018 11:53:15 -0700 (PDT)
-Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
-        by smtp.gmail.com with ESMTPSA id p7-v6sm15940835pfb.101.2018.10.26.11.53.14
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 26 Oct 2018 11:53:15 -0700 (PDT)
-Date:   Fri, 26 Oct 2018 11:53:14 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v1] Bluetooth: hci_qca: Add helper to set device address.
-Message-ID: <20181026185314.GD22824@google.com>
-References: <20181026140450.13172-1-bgodavar@codeaurora.org>
-MIME-Version: 1.0
+        Sat, 27 Oct 2018 00:58:55 -0400
+X-Greylist: delayed 366 seconds by postgrey-1.27 at vger.kernel.org; Sat, 27 Oct 2018 00:58:54 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1540585228;
+        s=strato-dkim-0002; d=goldelico.com;
+        h=To:Cc:Message-Id:Date:Subject:From:X-RZG-CLASS-ID:X-RZG-AUTH:From:
+        Subject:Sender;
+        bh=Zbz8mYIUZx3lzdjEJRHXLvFJO4WJ+IW7WstDz6YMsdM=;
+        b=W+mlhna5JDh7aEwh7pz+liDMZ2eukuZaEEVB1j0U/9Zd4yj2ge/wnaH0ZVYVYlzG/G
+        hy+cMBoVA/kOa2wOwNDS49BpU5PEnauUM7jLYLbGARLk4wGKNibfVjstS1Y8rwOvqC70
+        o1bNVkBJghmQPhc7GjvpMY0hq6Xc+tzJ8bVMN/IS92R+i3ejWfn8eBOO3OVNvICdJQAy
+        MStPvJK4d4DYxD5ljQ4YNxZtgvnJ19+bc8jVfo/2NrkXtibezJ1uvBu6cBBV3qPZUrQe
+        4n/nFCY9jLAO2DMwYtMC9cmSzQ0BEOiduFXTS4aLTBm/TlHekX1BlYwoBEQZD5WJiwrX
+        xkqA==
+X-RZG-AUTH: ":JGIXVUS7cutRB/49FwqZ7WcJeFKiMgPgp8VKxflSZ1P34KBj7wpz8NMGH/PvwDOtBEA="
+X-RZG-CLASS-ID: mo00
+Received: from imac.fritz.box
+        by smtp.strato.de (RZmta 44.3 DYNA|AUTH)
+        with ESMTPSA id J0aaadu9QKEDtFl
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Fri, 26 Oct 2018 22:14:13 +0200 (CEST)
+From:   "H. Nikolaus Schaller" <hns@goldelico.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181026140450.13172-1-bgodavar@codeaurora.org>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+Content-Transfer-Encoding: quoted-printable
+Subject: bluetooth serdev driver for wi2wi w2cbw003?
+Date:   Fri, 26 Oct 2018 22:14:13 +0200
+Message-Id: <A82238EF-4EAE-4B6D-94A7-A098622B57E5@goldelico.com>
+Cc:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Discussions about the Letux Kernel 
+        <letux-kernel@openphoenux.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+X-Mailer: Apple Mail (2.3124)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Oct 26, 2018 at 07:34:50PM +0530, Balakrishna Godavarthi wrote:
-> This patch add qca_set_device_bdaddr() to set the device
-> address for latest Qualcomm Bluetooth chipset wcn3990 and above.
-> 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
->  drivers/bluetooth/btqca.c   | 21 +++++++++++++++++++++
->  drivers/bluetooth/btqca.h   |  9 ++++++++-
->  drivers/bluetooth/hci_qca.c |  5 ++++-
->  3 files changed, 33 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index ec9e03a6b778..132dc6ceb174 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -391,6 +391,27 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  }
->  EXPORT_SYMBOL_GPL(qca_uart_setup);
->  
-> +int qca_set_device_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+Hi,
+what is the best strategy to support the above mentioned
+bluetooth (+ wlan combo) chip by a serdev driver?
 
-nit: just qca_set_bdaddr() ? That would be consistent with
-qca_set_bdaddr_rome() and ->set_bdaddr().
+We have the chip up and running for long time with using
+hciattach on the serial port (and no vendor specific
+functions like firmware download). And our own out-of-tree
+driver to control the power on/off.
 
-> +{
-> +	struct sk_buff *skb;
-> +	u8 cmd[6];
+But we now want to be able to use hcicontrol hci0 up/down
+to control a regulator like the hci_ll.c driver is doing
+with a gpio.
 
-nit: this doesn't really contain the command (which is
-EDL_WRITE_BD_ADDR_OPCODE). Name it 'buf', 'ba' or similar?
+Which means we would like to use this DT:
 
-re-nit: in the memcpy below 'sizeof(bdaddr_t)' is used, do the same in
-the declaration?
+&uart1 {
+	pinctrl-names =3D "default";
+	pinctrl-0 =3D <&uart1_pins>;
 
-> +	int err;
-> +
-> +	memcpy(cmd, bdaddr, sizeof(bdaddr_t));
-> +	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, sizeof(cmd),
-> +				cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		err = PTR_ERR(skb);
-> +		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
-> +		return err;
-> +	}
-> +
-> +	kfree_skb(skb);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(qca_set_device_bdaddr);
-> +
->  MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
->  MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver " VERSION);
->  MODULE_VERSION(VERSION);
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index 0c01f375fe83..8771fc2b193d 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -20,6 +20,7 @@
->  
->  #define EDL_PATCH_CMD_OPCODE		(0xFC00)
->  #define EDL_NVM_ACCESS_OPCODE		(0xFC0B)
-> +#define EDL_WRITE_BD_ADDR_OPCODE	(0xFC14)
->  #define EDL_PATCH_CMD_LEN		(1)
->  #define EDL_PATCH_VER_REQ_CMD		(0x19)
->  #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
-> @@ -140,7 +141,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
->  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  		   enum qca_btsoc_type soc_type, u32 soc_ver);
->  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
-> -
-> +int qca_set_device_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
->  #else
->  
->  static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-> @@ -159,4 +160,10 @@ static inline int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
->  	return -EOPNOTSUPP;
->  }
->  
-> +static inline int qca_set_device_bdaddr(struct hci_dev *hdev,
-> +					const bdaddr_t *bdaddr)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
->  #endif
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index f036c8f98ea3..f18d9f5a7782 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1241,7 +1241,10 @@ static int qca_setup(struct hci_uart *hu)
->  	}
->  
->  	/* Setup bdaddr */
-> -	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
-> +	if (qcadev->btsoc_type == QCA_WCN3990)
-> +		hu->hdev->set_bdaddr = qca_set_device_bdaddr;
-> +	else
-> +		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
->  
->  	return ret;
->  }
+	bluetooth: bluetooth {
+		compatible =3D "wi2wi,w2cbw003-bt";
+		vdd-supply =3D <&vaux4>;
+	};
+};
 
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
-Tested-by: Matthias Kaehlcke <mka@chromium.org>
+Does such a driver already exist so that we just have to add
+.compatible =3D "wi2wi,w2cbw003-bt" or should we start to
+make one based on by hci_ll.c by removing firmware download
+and special ti protocol handling?
+
+Other maybe relevant information from the w2cbw003 data sheet:
+- Bluetooth technology based on CSR BC04-ROM
+- Data rate up to 3 Mbps for Bluetooth EDR
+- It uses a standard HCI interface =E2=80=93 any commercial stack or =
+profile supporting the standard interface will work with W2CBW003.
+
+Any directions are welcome.
+
+BR and thanks,
+Nikolaus
+
