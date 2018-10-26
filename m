@@ -2,239 +2,164 @@ Return-Path: <SRS0=luki=NG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13634ECDE46
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Oct 2018 05:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A367C6786E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Oct 2018 14:05:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5C772084D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Oct 2018 05:01:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B52F20665
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Oct 2018 14:05:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="aNlRHGWe";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="pFPeaBOl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5C772084D
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="n5pqX3dk";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="cAjdCKMt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B52F20665
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726020AbeJZNhH (ORCPT
+        id S1726254AbeJZWmQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Oct 2018 09:37:07 -0400
-Received: from smtp.codeaurora.org ([198.145.29.96]:44842 "EHLO
+        Fri, 26 Oct 2018 18:42:16 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:47022 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725849AbeJZNhH (ORCPT
+        with ESMTP id S1726014AbeJZWmP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Oct 2018 09:37:07 -0400
+        Fri, 26 Oct 2018 18:42:15 -0400
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 0C328606DC; Fri, 26 Oct 2018 05:01:40 +0000 (UTC)
+        id 1E25061308; Fri, 26 Oct 2018 14:05:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1540530100;
-        bh=HvP6NIuStzxtERa3AfLdXR6c1tvH3B0t/dgHnlzc8GE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=aNlRHGWefIDY/nAVFT2ZtY3cAek4eoUYeIIVIESIo03sOYOtXzFjP1JzGPsk46r+E
-         sPcBlR56mfmZVerJuBLPTMUMYYPoSAoiv3V84HNHpbUtnrSKZRZoS/NUfB4EXqNMIo
-         IgF5TA4hg44Ov60rKFJ1ZHvQbstN0cRrGLQGOPaM=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id EC40A60A33;
-        Fri, 26 Oct 2018 05:01:37 +0000 (UTC)
+        s=default; t=1540562703;
+        bh=E2oy0H/3YQk4why8fNP7iQ89n+sxnlceowphcC0QjTc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=n5pqX3dkuveGZpOplhffrjoyr535BXP26RCHHb2j0qmN1E6FuTsYlAS2HqsyZm1Lk
+         1DlXalvjw0WSvS3eCFFuKNyJoFllk14yyIPyYsmhHXMojvTw4WmnGpYAv+IeibOmeE
+         faM6xLoutm7vVynkwdtzjdUDMMhdJC2CZDWXd7+c=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 5992660A33;
+        Fri, 26 Oct 2018 14:04:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1540530098;
-        bh=HvP6NIuStzxtERa3AfLdXR6c1tvH3B0t/dgHnlzc8GE=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=pFPeaBOl7wGt3/1WtiQVT+wvZE1Co0jRLwlp8zZ0bOaJYfWSsDHz2lzDYlFBliwMj
-         gWtnU0l4IfvVTQ5BGcbR0YaB0SEKfnUTtXVOkKcGv1N/Px0orEP8oF4PW1qCuG2Zj7
-         Vz7vzEYRZ3NsVsb4tqnOpZRXxfa0iAkcCv6Ku9XA=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Fri, 26 Oct 2018 10:31:37 +0530
+        s=default; t=1540562701;
+        bh=E2oy0H/3YQk4why8fNP7iQ89n+sxnlceowphcC0QjTc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=cAjdCKMtIRpK/qWueDKoIqqDfU/KhQAV6ctbhA/Ls/0eANSfWnpFrL6OcIm6uW7x+
+         WM1dQEAuS6K8+SRvUlbnHJJCvS/n2rBROBFmMJNxooHxbmyESHxOtTvC1f1zhetMvE
+         uVBGrOQzy+8Bs0V4/LSB6gJ9Qn82HU7YFSkm8Cys=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 5992660A33
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
 From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Brian Norris <briannorris@chromium.org>,
-        Dmitry Grinberg <dmitrygr@google.com>, hemantg@codeaurora.org
-Subject: Re: [PATCH 1/2] Bluetooth: Add quirk for reading BD_ADDR from fwnode
- property
-In-Reply-To: <4041ef05cdd70d28d665d3288c4d4c43@codeaurora.org>
-References: <20181025002134.256791-1-mka@chromium.org>
- <20181025002134.256791-2-mka@chromium.org>
- <4041ef05cdd70d28d665d3288c4d4c43@codeaurora.org>
-Message-ID: <7462a1b91c84454290eb09ff33bee8ee@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: Add helper to set device address.
+Date:   Fri, 26 Oct 2018 19:34:50 +0530
+Message-Id: <20181026140450.13172-1-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+This patch add qca_set_device_bdaddr() to set the device
+address for latest Qualcomm Bluetooth chipset wcn3990 and above.
 
-I missed to add a point here.
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+---
+ drivers/bluetooth/btqca.c   | 21 +++++++++++++++++++++
+ drivers/bluetooth/btqca.h   |  9 ++++++++-
+ drivers/bluetooth/hci_qca.c |  5 ++++-
+ 3 files changed, 33 insertions(+), 2 deletions(-)
 
-On 2018-10-25 20:06, Balakrishna Godavarthi wrote:
-> On 2018-10-25 05:51, Matthias Kaehlcke wrote:
->> Add HCI_QUIRK_USE_BDADDR_PROPERTY to allow controllers to retrieve
->> the public Bluetooth address from the firmware node property
->> 'local-bd-address'. If quirk is set and the property does not exist
->> or is invalid the controller is marked as unconfigured.
->> 
->> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
->> ---
->> hci_dev_get_bd_addr_from_property() currently assumes that the
->> firmware node with 'local-bd-address' is from hdev->dev.parent, not
->> sure if this universally true. However if it is true for existing
->> device that might use this interface we can assume this for now
->> (unless there is a clear solution now), and cross the bridge of
->> finding an alternative when we actually encounter the situation.
->> One option could be to look for the first parent that has a fwnode.
->> ---
->>  include/net/bluetooth/hci.h | 12 +++++++++++
->>  net/bluetooth/hci_core.c    | 42 
->> +++++++++++++++++++++++++++++++++++++
->>  net/bluetooth/mgmt.c        |  6 ++++--
->>  3 files changed, 58 insertions(+), 2 deletions(-)
->> 
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->> index cdd9f1fe7cfa..a5d748099752 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -158,6 +158,18 @@ enum {
->>  	 */
->>  	HCI_QUIRK_INVALID_BDADDR,
->> 
->> +	/* When this quirk is set, the public Bluetooth address
->> +	 * initially reported by HCI Read BD Address command
->> +	 * is considered invalid. The public BD Address can be
->> +	 * specified in the fwnode property 'local-bd-address'.
->> +	 * If this property does not exist or is invalid controller
->> +	 * configuration is required before this device can be used.
->> +	 *
->> +	 * This quirk can be set before hci_register_dev is called or
->> +	 * during the hdev->setup vendor callback.
->> +	 */
->> +	HCI_QUIRK_USE_BDADDR_PROPERTY,
->> +
->>  	/* When this quirk is set, the duplicate filtering during
->>  	 * scanning is based on Bluetooth devices addresses. To allow
->>  	 * RSSI based updates, restart scanning if needed.
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 74b29c7d841c..97214262c4fb 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -30,6 +30,7 @@
->>  #include <linux/rfkill.h>
->>  #include <linux/debugfs.h>
->>  #include <linux/crypto.h>
->> +#include <linux/property.h>
->>  #include <asm/unaligned.h>
->> 
->>  #include <net/bluetooth/bluetooth.h>
->> @@ -1355,9 +1356,40 @@ int hci_inquiry(void __user *arg)
->>  	return err;
->>  }
->> 
->> +/**
->> + * hci_dev_get_bd_addr_from_property - Get the Bluetooth Device 
->> Address
->> + *				       (BD_ADDR) for a HCI device from
->> + *				       a firmware node property.
->> + * @hdev:	The HCI device
->> + *
->> + * Search the firmware node for 'local-bd-address'.
->> + *
->> + * All-zero BD addresses are rejected, because those could be 
->> properties
->> + * that exist in the firmware tables, but were not updated by the 
->> firmware. For
->> + * example, the DTS could define 'local-bd-address', with zero BD 
->> addresses.
->> + */
->> +static int hci_dev_get_bd_addr_from_property(struct hci_dev *hdev)
->> +{
->> +	struct fwnode_handle *fwnode = dev_fwnode(hdev->dev.parent);
->> +	bdaddr_t ba;
->> +	int ret;
->> +
->> +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
->> +					    (u8 *)&ba, sizeof(ba));
->> +	if (ret < 0)
->> +		return ret;
->> +	if (!bacmp(&ba, BDADDR_ANY))
->> +		return -ENODATA;
->> +
->> +	hdev->public_addr = ba;
->> +
->> +	return 0;
->> +}
->> +
->>  static int hci_dev_do_open(struct hci_dev *hdev)
->>  {
->>  	int ret = 0;
->> +	bool bd_addr_set = false;
->> 
->>  	BT_DBG("%s %p", hdev->name, hdev);
->> 
->> @@ -1422,6 +1454,16 @@ static int hci_dev_do_open(struct hci_dev 
->> *hdev)
->>  		if (hdev->setup)
->>  			ret = hdev->setup(hdev);
->> 
->> +		if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
->> +			if (!hci_dev_get_bd_addr_from_property(hdev))
->> +				if (hdev->set_bdaddr &&
->> +				    !hdev->set_bdaddr(hdev, &hdev->public_addr))
->> +					bd_addr_set = true;
-
-Can we check the return status of hdev->setup() before calling 
-hdev->set_bdaddr().
-some vendors assign hdev->set_baddr helper before calling hdev->setup().
-https://elixir.bootlin.com/linux/v4.19-rc8/source/drivers/bluetooth/btqcomsmd.c#L194
-There will no use in calling hdev->set_baddr() if hdev->setup() fails.
-
->> +
->> +			if (!bd_addr_set)
->> +				hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
->> +		}
->> +
->>  		/* The transport driver can set these quirks before
->>  		 * creating the HCI device or in its setup callback.
->>  		 *
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 3bdc8f3ca259..3d9edb752403 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -551,7 +551,8 @@ static bool is_configured(struct hci_dev *hdev)
->>  	    !hci_dev_test_flag(hdev, HCI_EXT_CONFIGURED))
->>  		return false;
->> 
->> -	if (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
->> +	if ((test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) ||
->> +	     test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) &&
->>  	    !bacmp(&hdev->public_addr, BDADDR_ANY))
->>  		return false;
->> 
->> @@ -566,7 +567,8 @@ static __le32 get_missing_options(struct hci_dev 
->> *hdev)
->>  	    !hci_dev_test_flag(hdev, HCI_EXT_CONFIGURED))
->>  		options |= MGMT_OPTION_EXTERNAL_CONFIG;
->> 
->> -	if (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
->> +	if ((test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) ||
->> +	     test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) &&
->>  	    !bacmp(&hdev->public_addr, BDADDR_ANY))
->>  		options |= MGMT_OPTION_PUBLIC_ADDRESS;
-> 
-> Looks fine to me.
-> 
-> Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index ec9e03a6b778..132dc6ceb174 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -391,6 +391,27 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ }
+ EXPORT_SYMBOL_GPL(qca_uart_setup);
+ 
++int qca_set_device_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	struct sk_buff *skb;
++	u8 cmd[6];
++	int err;
++
++	memcpy(cmd, bdaddr, sizeof(bdaddr_t));
++	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, sizeof(cmd),
++				cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
++		return err;
++	}
++
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(qca_set_device_bdaddr);
++
+ MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
+ MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 0c01f375fe83..8771fc2b193d 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -20,6 +20,7 @@
+ 
+ #define EDL_PATCH_CMD_OPCODE		(0xFC00)
+ #define EDL_NVM_ACCESS_OPCODE		(0xFC0B)
++#define EDL_WRITE_BD_ADDR_OPCODE	(0xFC14)
+ #define EDL_PATCH_CMD_LEN		(1)
+ #define EDL_PATCH_VER_REQ_CMD		(0x19)
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+@@ -140,7 +141,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		   enum qca_btsoc_type soc_type, u32 soc_ver);
+ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+-
++int qca_set_device_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ #else
+ 
+ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+@@ -159,4 +160,10 @@ static inline int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int qca_set_device_bdaddr(struct hci_dev *hdev,
++					const bdaddr_t *bdaddr)
++{
++	return -EOPNOTSUPP;
++}
++
+ #endif
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index f036c8f98ea3..f18d9f5a7782 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1241,7 +1241,10 @@ static int qca_setup(struct hci_uart *hu)
+ 	}
+ 
+ 	/* Setup bdaddr */
+-	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
++	if (qcadev->btsoc_type == QCA_WCN3990)
++		hu->hdev->set_bdaddr = qca_set_device_bdaddr;
++	else
++		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+ 
+ 	return ret;
+ }
 -- 
-Regards
-Balakrishna.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
