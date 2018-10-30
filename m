@@ -3,148 +3,166 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CD2C6786F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 13:17:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA23DC2BC61
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 13:42:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 856392084A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 13:17:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 856392084A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 70198205F4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 13:42:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70198205F4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728089AbeJ3WLM (ORCPT
+        id S1727759AbeJ3WgQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Oct 2018 18:11:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36746 "EHLO mx1.redhat.com"
+        Tue, 30 Oct 2018 18:36:16 -0400
+Received: from mga03.intel.com ([134.134.136.65]:40034 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725853AbeJ3WLL (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Oct 2018 18:11:11 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4316E76200;
-        Tue, 30 Oct 2018 13:17:47 +0000 (UTC)
-Received: from shalem.localdomain.com (ovpn-117-37.ams2.redhat.com [10.36.117.37])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BFDC35F703;
-        Tue, 30 Oct 2018 13:17:45 +0000 (UTC)
-From:   Hans de Goede <hdegoede@redhat.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     Hans de Goede <hdegoede@redhat.com>,
-        Jeremy Cline <jeremy@jcline.org>,
-        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-        linux-acpi@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: hci_h5: Turn off RTL8723BS on suspend, reprobe on resume
-Date:   Tue, 30 Oct 2018 14:17:23 +0100
-Message-Id: <20181030131723.4589-2-hdegoede@redhat.com>
-In-Reply-To: <20181030131723.4589-1-hdegoede@redhat.com>
-References: <20181030131723.4589-1-hdegoede@redhat.com>
+        id S1727450AbeJ3WgQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Oct 2018 18:36:16 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Oct 2018 06:42:42 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.54,444,1534834800"; 
+   d="scan'208";a="92386619"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by FMSMGA003.fm.intel.com with ESMTP; 30 Oct 2018 06:42:41 -0700
+Received: from fmsmsx158.amr.corp.intel.com (10.18.116.75) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Tue, 30 Oct 2018 06:42:41 -0700
+Received: from bgsmsx151.gar.corp.intel.com (10.224.48.42) by
+ fmsmsx158.amr.corp.intel.com (10.18.116.75) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Tue, 30 Oct 2018 06:42:41 -0700
+Received: from bgsmsx102.gar.corp.intel.com ([169.254.2.202]) by
+ BGSMSX151.gar.corp.intel.com ([169.254.3.245]) with mapi id 14.03.0415.000;
+ Tue, 30 Oct 2018 19:12:37 +0530
+From:   "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Bag, Amit K" <amit.k.bag@intel.com>,
+        "Hegde, Raghuram" <raghuram.hegde@intel.com>,
+        "Ghorai, Sukumar" <sukumar.ghorai@intel.com>
+Subject: RE: [PATCH 1/2] Bluetooth: Add Rfkill driver for Intel Bluetooth
+ controller
+Thread-Topic: [PATCH 1/2] Bluetooth: Add Rfkill driver for Intel Bluetooth
+ controller
+Thread-Index: AQHUcD6lWd2/N15BdkC4XEtkpGLI/6U3RREAgACGuWA=
+Date:   Tue, 30 Oct 2018 13:42:37 +0000
+Message-ID: <431554D50C88CC439737EC4A9A8AFB8C82324567@BGSMSX102.gar.corp.intel.com>
+References: <1540896634-17173-1-git-send-email-chethan.tumkur.narayan@intel.com>
+ <808682A2-B3E5-4269-A3A3-CDF302CB2CF6@holtmann.org>
+In-Reply-To: <808682A2-B3E5-4269-A3A3-CDF302CB2CF6@holtmann.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.223.10.10]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 30 Oct 2018 13:17:47 +0000 (UTC)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On many devices the RTL8723BS device gets reset during suspend/resume,
-causing it to lose its firmware and all state.
-
-Testing has shown it drops back to communicating at 115200 bps and sends
-sync-request packages, indicating it has been fully reset.
-
-This commit fixes this by queueing a reprobe on resume.
-
-This mirrors how USB RTL BT devices, which have the same problem, are
-handled in the btusb driver, there we set the USB_QUIRK_RESET_RESUME for
-all RTL devices, which also causes a reprobe on resume. The only difference
-is that here we need to do the reprobe ourselves.
-
-Since we are doing a full reprobe on resume now, we can also turn off the
-device on suspend to save power while suspended.
-
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
-Changes in v2:
--Fix some spelling errors in the commit message and in a comment
----
- drivers/bluetooth/hci_h5.c | 52 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
-
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index beddb89a00f2..069d1c8fde73 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -931,6 +931,56 @@ static void h5_btrtl_close(struct h5 *h5)
- 	gpiod_set_value_cansleep(h5->enable_gpio, 0);
- }
- 
-+/* Suspend/resume support. On many devices the RTL BT device loses power during
-+ * suspend/resume, causing it to lose its firmware and all state. So we simply
-+ * turn it off on suspend and reprobe on resume.  This mirrors how RTL devices
-+ * are handled in the USB driver, where the USB_QUIRK_RESET_RESUME is used which
-+ * also causes a reprobe on resume.
-+ */
-+static int h5_btrtl_suspend(struct h5 *h5)
-+{
-+	serdev_device_set_flow_control(h5->hu->serdev, false);
-+	gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
-+	gpiod_set_value_cansleep(h5->enable_gpio, 0);
-+	return 0;
-+}
-+
-+struct h5_btrtl_reprobe {
-+	struct device *dev;
-+	struct work_struct work;
-+};
-+
-+static void h5_btrtl_reprobe_worker(struct work_struct *work)
-+{
-+	struct h5_btrtl_reprobe *reprobe =
-+		container_of(work, struct h5_btrtl_reprobe, work);
-+	int ret;
-+
-+	ret = device_reprobe(reprobe->dev);
-+	if (ret && ret != -EPROBE_DEFER)
-+		dev_err(reprobe->dev, "Reprobe error %d\n", ret);
-+
-+	put_device(reprobe->dev);
-+	kfree(reprobe);
-+	module_put(THIS_MODULE);
-+}
-+
-+static int h5_btrtl_resume(struct h5 *h5)
-+{
-+	struct h5_btrtl_reprobe *reprobe;
-+
-+	reprobe = kzalloc(sizeof(*reprobe), GFP_KERNEL);
-+	if (!reprobe)
-+		return -ENOMEM;
-+
-+	__module_get(THIS_MODULE);
-+
-+	INIT_WORK(&reprobe->work, h5_btrtl_reprobe_worker);
-+	reprobe->dev = get_device(&h5->hu->serdev->dev);
-+	queue_work(system_long_wq, &reprobe->work);
-+	return 0;
-+}
-+
- static const struct acpi_gpio_params btrtl_device_wake_gpios = { 0, 0, false };
- static const struct acpi_gpio_params btrtl_enable_gpios = { 1, 0, false };
- static const struct acpi_gpio_params btrtl_host_wake_gpios = { 2, 0, false };
-@@ -945,6 +995,8 @@ static struct h5_vnd rtl_vnd = {
- 	.setup		= h5_btrtl_setup,
- 	.open		= h5_btrtl_open,
- 	.close		= h5_btrtl_close,
-+	.suspend	= h5_btrtl_suspend,
-+	.resume		= h5_btrtl_resume,
- 	.acpi_gpio_map	= acpi_btrtl_gpios,
- };
- #endif
--- 
-2.19.0
-
+SGkgTWFyY2VsLA0KDQpUaGFua3MgZm9yIHlvdXIgaW5wdXRzLCBJIHdpbGwgY3JlYXRlIHYxIHBh
+dGNoIHdpdGggdGhlIG1vZGlmaWNhdGlvbiBhbmQgc2VudCBpdCBhZ2Fpbi4NCkJlc3QgIFJlZ2Fy
+ZHMNCkNoZXRoYW4NCg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogTWFyY2Vs
+IEhvbHRtYW5uIFttYWlsdG86bWFyY2VsQGhvbHRtYW5uLm9yZ10gDQpTZW50OiBUdWVzZGF5LCBP
+Y3RvYmVyIDMwLCAyMDE4IDQ6MzggUE0NClRvOiBUdW1rdXIgTmFyYXlhbiwgQ2hldGhhbiA8Y2hl
+dGhhbi50dW1rdXIubmFyYXlhbkBpbnRlbC5jb20+DQpDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIu
+a2VybmVsLm9yZzsgQmFnLCBBbWl0IEsgPGFtaXQuay5iYWdAaW50ZWwuY29tPjsgSGVnZGUsIFJh
+Z2h1cmFtIDxyYWdodXJhbS5oZWdkZUBpbnRlbC5jb20+OyBHaG9yYWksIFN1a3VtYXIgPHN1a3Vt
+YXIuZ2hvcmFpQGludGVsLmNvbT4NClN1YmplY3Q6IFJlOiBbUEFUQ0ggMS8yXSBCbHVldG9vdGg6
+IEFkZCBSZmtpbGwgZHJpdmVyIGZvciBJbnRlbCBCbHVldG9vdGggY29udHJvbGxlcg0KDQpIaSBD
+aGV0aGFuLA0KDQo+IFJlZ2lzdGVyIEFDUEkgb2JqZWN0IElOVEw2MjA1IGFzIHBsYXRmb3JtIEJs
+dWV0b290aCBSZktpbGwgZHJpdmVyIHRvIA0KPiBhdHRhY2gvZGV0YWNoIEludGVsIEJsdWV0b290
+aCBjb250cm9sbGVyIGZyb20gcGxhdGZvcm0gVVNCIGJ1cy4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6
+IFJhZ2h1cmFtIEhlZ2RlIDxyYWdodXJhbS5oZWdkZUBpbnRlbC5jb20+DQo+IFNpZ25lZC1vZmYt
+Ynk6IENoZXRoYW4gVCBOIDxjaGV0aGFuLnR1bWt1ci5uYXJheWFuQGludGVsLmNvbT4NCj4gU2ln
+bmVkLW9mZi1ieTogU3VrdW1hciBHaG9yYWkgPHN1a3VtYXIuZ2hvcmFpQGludGVsLmNvbT4NCj4g
+LS0tDQo+IGRyaXZlcnMvcGxhdGZvcm0veDg2L2ludGVsX2J0X3Jma2lsbC5jIHwgMTMzIA0KPiAr
+KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysNCj4gMSBmaWxlIGNoYW5nZWQsIDEzMyBp
+bnNlcnRpb25zKCspDQo+IGNyZWF0ZSBtb2RlIDEwMDY0NCBkcml2ZXJzL3BsYXRmb3JtL3g4Ni9p
+bnRlbF9idF9yZmtpbGwuYw0KDQpJIHdvdWxkIGluY2x1ZGUgdGhlIEtjb25maWcgYW5kIE1ha2Vm
+aWxlIGNoYW5nZXMgaGVyZSBzaW5jZSBpdCBpcyBhIHNtYWxsIGRyaXZlci4NCg0KPiBkaWZmIC0t
+Z2l0IGEvZHJpdmVycy9wbGF0Zm9ybS94ODYvaW50ZWxfYnRfcmZraWxsLmMgDQo+IGIvZHJpdmVy
+cy9wbGF0Zm9ybS94ODYvaW50ZWxfYnRfcmZraWxsLmMNCj4gbmV3IGZpbGUgbW9kZSAxMDA2NDQN
+Cj4gaW5kZXggMDAwMDAwMDAwMDAwLi44OWEzZDdmNGIzMmMNCj4gLS0tIC9kZXYvbnVsbA0KPiAr
+KysgYi9kcml2ZXJzL3BsYXRmb3JtL3g4Ni9pbnRlbF9idF9yZmtpbGwuYw0KPiBAQCAtMCwwICsx
+LDEzMyBAQA0KPiArLyoNCj4gKyAqICBJbnRlbCBCbHVldG9vdGggUmZraWxsIERyaXZlcg0KPiAr
+ICovDQo+ICsNCj4gKyNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4NCj4gKyNpbmNsdWRlIDxsaW51
+eC9hY3BpLmg+DQo+ICsjaW5jbHVkZSA8bGludXgvcGxhdGZvcm1fZGV2aWNlLmg+DQo+ICsjaW5j
+bHVkZSA8bGludXgvcmZraWxsLmg+DQo+ICsjaW5jbHVkZSA8bGludXgvZ3Bpby9jb25zdW1lci5o
+Pg0KPiArDQo+ICtzdHJ1Y3QgYnRpbnRlbF9yZmtpbGxfZGV2IHsNCj4gKwlzdHJ1Y3QgcmZraWxs
+ICpyZms7DQoNCk1vc3QgZHJpdmVycyB1c2VkIHJma2lsbCBoZXJlIGluc3RlYWQgb2YgcmZrLiBJ
+IG9ubHkgZm91bmQgb25lIHRoYXQgdXNlZCB0aGlzIGFiYnJldmlhdGlvbi4NCg0KPiArCXN0cnVj
+dCBncGlvX2Rlc2MgKnJlc2V0X2dwaW9faGFuZGxlcjsgfTsNCj4gKw0KPiArc3RhdGljIGNvbnN0
+IHN0cnVjdCBhY3BpX2dwaW9fcGFyYW1zIHJlc2V0X2dwaW9zID0geyAwLCAwLCBmYWxzZSB9OyAN
+Cj4gK3N0YXRpYyBjb25zdCBzdHJ1Y3QgYWNwaV9ncGlvX21hcHBpbmcgYWNwaV9idGludGVsX2dw
+aW9zW10gPSB7DQo+ICsJeyAicmVzZXQtZ3Bpb3MiLCAmcmVzZXRfZ3Bpb3MsIDEgfSwNCj4gKwl7
+IH0sDQo+ICt9Ow0KPiArDQo+ICtzdGF0aWMgY29uc3Qgc3RydWN0IGFjcGlfZGV2aWNlX2lkIGJ0
+aW50ZWxfYWNwaV9tYXRjaFtdID0gew0KPiArCXsgIklOVEw2MjA1IiwgMCB9LA0KPiArCXsgfSwN
+Cj4gK307DQo+ICtNT0RVTEVfREVWSUNFX1RBQkxFKGFjcGksIGJ0aW50ZWxfYWNwaV9tYXRjaCk7
+DQoNClBlcnNvbmFsbHkgSSBwdXQgdGhlc2UgYWJvdmUgdGhlIHBsYXRmb3JtX2RyaXZlciBzdHJ1
+Y3QgcmlnaHQgYmVmb3JlIGl0IGlzIHVzZWQuDQoNCj4gKw0KPiArc3RhdGljIGludCBidGludGVs
+X2Rpc2FibGVfYnQoc3RydWN0IGdwaW9fZGVzYyAqcmVzZXRfZ3Bpbykgew0KPiArCWlmICghcmVz
+ZXRfZ3BpbykNCj4gKwkJcmV0dXJuIC1FSU5WQUw7DQo+ICsNCj4gKwkvKiBUaGlzIHdpbGwgZGV0
+YWNoIHRoZSBJbnRlbCBCVCBjb250cm9sbGVyICovDQo+ICsJZ3Bpb2Rfc2V0X3ZhbHVlKHJlc2V0
+X2dwaW8sIDApOw0KPiArCXJldHVybiAwOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgaW50IGJ0aW50
+ZWxfZW5hYmxlX2J0KHN0cnVjdCBncGlvX2Rlc2MgKnJlc2V0X2dwaW8pIHsNCj4gKwlpZiAoIXJl
+c2V0X2dwaW8pDQo+ICsJCXJldHVybiAtRUlOVkFMOw0KPiArDQo+ICsJLyogVGhpcyB3aWxsIHJl
+LWF0dGFjaCB0aGUgSW50ZWwgQlQgY29udHJvbGxlciAqLw0KPiArCWdwaW9kX3NldF92YWx1ZShy
+ZXNldF9ncGlvLCAxKTsNCj4gKwlyZXR1cm4gMDsNCj4gK30NCj4gKw0KPiArLyogUkZLaWxsIGhh
+bmRsZXJzICovDQo+ICtzdGF0aWMgaW50IGJ0X3Jma2lsbF9zZXRfYmxvY2sodm9pZCAqZGF0YSwg
+Ym9vbCBibG9ja2VkKSB7DQo+ICsJc3RydWN0IGJ0aW50ZWxfcmZraWxsX2RldiAqYnRfZGV2ID0g
+ZGF0YTsNCj4gKwlpbnQgcmV0Ow0KDQpUaGlzIGRyaXZlciBuZWVkcyBhIGJpdCBtb3JlIGNvbnNp
+c3RlbmN5LiBFaXRoZXIgYnRpbnRlbF9yZmtpbGwgb3IgaW50ZWxfYnRfcmZraWxsLCBidXQgbGV0
+cyBub3QgZ2V0IHRoaXMgY29uZnVzZWQgd2l0aCBhY3R1YWwgYnRpbnRlbF8gY29kZSB0aGF0IHdl
+IGFscmVhZHkgaGF2ZS4NCg0KPiArDQo+ICsJaWYgKGJsb2NrZWQpDQo+ICsJCXJldCA9IGJ0aW50
+ZWxfZGlzYWJsZV9idChidF9kZXYtPnJlc2V0X2dwaW9faGFuZGxlcik7DQo+ICsJZWxzZQ0KPiAr
+CQlyZXQgPSBidGludGVsX2VuYWJsZV9idChidF9kZXYtPnJlc2V0X2dwaW9faGFuZGxlcik7DQo+
+ICsNCj4gKwlyZXR1cm4gcmV0Ow0KPiArfQ0KPiArc3RhdGljIGNvbnN0IHN0cnVjdCByZmtpbGxf
+b3BzIHJma19vcHMgPSB7DQo+ICsJLnNldF9ibG9jayA9IGJ0X3Jma2lsbF9zZXRfYmxvY2ssDQo+
+ICt9Ow0KPiArDQo+ICsvKiBBQ1BJIG9iamVjdCBwcm9iZSAqLw0KPiArc3RhdGljIGludCBidGlu
+dGVsX3Byb2JlKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpIHsNCj4gKwlzdHJ1Y3QgYnRp
+bnRlbF9yZmtpbGxfZGV2ICpidF9kZXY7DQo+ICsJaW50IHJlc3VsdDsNCj4gKw0KPiArCWJ0X2Rl
+diA9IGt6YWxsb2Moc2l6ZW9mKCpidF9kZXYpLCBHRlBfS0VSTkVMKTsNCj4gKwlpZiAoIWJ0X2Rl
+dikNCj4gKwkJcmV0dXJuIC1FTk9NRU07DQoNCldvdWxk4oCZdCBpdCBiZXR0ZXIgdG8ganVzdCB1
+c2UgdGhlIGRldm1fIHZlcnNpb24gaGVyZSBhbmQgbGV0IGl0IGhhbmRsZSB0aGUgbGlmZXRpbWUg
+dHJhY2tpbmcgb2YgdGhlIGFzc29jaWF0ZWQgbWVtb3J5Lg0KDQo+ICsNCj4gKwlkZXZfc2V0X2Ry
+dmRhdGEoJnBkZXYtPmRldiwgYnRfZGV2KTsNCj4gKw0KPiArCWlmIChhY3BpX2Rldl9hZGRfZHJp
+dmVyX2dwaW9zKEFDUElfQ09NUEFOSU9OKCZwZGV2LT5kZXYpLA0KPiArCQkJCSAgICAgYWNwaV9i
+dGludGVsX2dwaW9zKSkgew0KPiArCQlrZnJlZShidF9kZXYpOw0KPiArCQlyZXR1cm4gLUVJTlZB
+TDsNCj4gKwl9DQo+ICsNCj4gKwlidF9kZXYtPnJlc2V0X2dwaW9faGFuZGxlciA9IGRldm1fZ3Bp
+b2RfZ2V0X29wdGlvbmFsKCZwZGV2LT5kZXYsDQo+ICsJCQkJCSJyZXNldCIsIEdQSU9EX09VVF9I
+SUdIKTsNCj4gKwlpZiAoSVNfRVJSKGJ0X2Rldi0+cmVzZXRfZ3Bpb19oYW5kbGVyKSkgew0KPiAr
+CQlrZnJlZShidF9kZXYpOw0KPiArCQlyZXR1cm4gUFRSX0VSUihidF9kZXYtPnJlc2V0X2dwaW9f
+aGFuZGxlcik7DQo+ICsJfQ0KPiArDQo+ICsJYnRfZGV2LT5yZmsgPSByZmtpbGxfYWxsb2MoImlu
+dGVsX2JsdWV0b290aCIsDQo+ICsJCQkJICAgJnBkZXYtPmRldiwNCj4gKwkJCQkgICBSRktJTExf
+VFlQRV9CTFVFVE9PVEgsDQo+ICsJCQkJICAgJnJma19vcHMsDQo+ICsJCQkJICAgYnRfZGV2KTsN
+Cj4gKwlpZiAoIWJ0X2Rldi0+cmZrKSB7DQo+ICsJCWtmcmVlKGJ0X2Rldik7DQo+ICsJCXJldHVy
+biAtRU5PTUVNOw0KPiArCX0NCj4gKw0KPiArCXJlc3VsdCA9IHJma2lsbF9yZWdpc3RlcihidF9k
+ZXYtPnJmayk7DQo+ICsJaWYgKHJlc3VsdCkgew0KPiArCQlyZmtpbGxfZGVzdHJveShidF9kZXYt
+PnJmayk7DQo+ICsJCWtmcmVlKGJ0X2Rldik7DQo+ICsJfQ0KPiArDQo+ICsJcmV0dXJuIHJlc3Vs
+dDsNCj4gK30NCj4gKw0KPiArc3RhdGljIGludCBidGludGVsX3JlbW92ZShzdHJ1Y3QgcGxhdGZv
+cm1fZGV2aWNlICpwZGV2KSB7DQo+ICsJc3RydWN0IGJ0aW50ZWxfcmZraWxsX2RldiAqYnRfZGV2
+ID0gZGV2X2dldF9kcnZkYXRhKCZwZGV2LT5kZXYpOw0KPiArDQo+ICsJaWYgKGJ0X2Rldi0+cmZr
+KSB7DQo+ICsJCXJma2lsbF91bnJlZ2lzdGVyKGJ0X2Rldi0+cmZrKTsNCj4gKwkJcmZraWxsX2Rl
+c3Ryb3koYnRfZGV2LT5yZmspOw0KPiArCX0NCj4gKw0KPiArCWtmcmVlKGJ0X2Rldik7DQo+ICsN
+Cj4gKwlhY3BpX2Rldl9yZW1vdmVfZHJpdmVyX2dwaW9zKEFDUElfQ09NUEFOSU9OKCZwZGV2LT5k
+ZXYpKTsNCj4gKw0KPiArCXJldHVybiAwOw0KPiArfQ0KPiArDQo+ICtzdGF0aWMgc3RydWN0IHBs
+YXRmb3JtX2RyaXZlciBidGludGVsX2RyaXZlciA9IHsNCj4gKwkucHJvYmUgPSBidGludGVsX3By
+b2JlLA0KPiArCS5yZW1vdmUgPSBidGludGVsX3JlbW92ZSwNCj4gKwkuZHJpdmVyID0gew0KPiAr
+CQkubmFtZSA9ICJidGludGVs4oCdLA0KDQpJIGRvbuKAmXQgbGlrZSB0aGlzIG5hbWUgc2luY2Ug
+aXQgaXMgdG9vIGdlbmVyaWMuIENhbGwgaXQgYnRpbnRlbF9yZmtpbGwgb3IgaW50ZWxfYnRfcmZr
+aWxsLg0KDQo+ICsJCS5hY3BpX21hdGNoX3RhYmxlID0gQUNQSV9QVFIoYnRpbnRlbF9hY3BpX21h
+dGNoKSwNCj4gKwl9LA0KPiArfTsNCj4gK21vZHVsZV9wbGF0Zm9ybV9kcml2ZXIoYnRpbnRlbF9k
+cml2ZXIpOw0KDQpSZWdhcmRzDQoNCk1hcmNlbA0KDQo=
