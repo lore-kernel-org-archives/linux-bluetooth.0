@@ -2,134 +2,117 @@ Return-Path: <SRS0=qOEI=NK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A348C2BC61
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 09:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 076CBC2BC61
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 10:08:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D058120657
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 09:21:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="WHPOYbYe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D058120657
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codecoup.pl
+	by mail.kernel.org (Postfix) with ESMTP id B44B620827
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 10:08:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B44B620827
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726828AbeJ3SOg (ORCPT
+        id S1726451AbeJ3TBd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Oct 2018 14:14:36 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:35451 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726225AbeJ3SOg (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Oct 2018 14:14:36 -0400
-Received: by mail-lj1-f195.google.com with SMTP id x85-v6so6408718ljb.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Oct 2018 02:21:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:organization:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=moxRxeoiQrILAzxewJz7sp7qmbe+aZlJlipm4UhOj+k=;
-        b=WHPOYbYejky9KqpLPtLYVIvhSAU8gQ73jzTmZ9BUP/kvIXSw4cQKJ0GwZp+gL1iRYn
-         BkLxa2UATunB9cPnBFrPUrtx+2BerFSRr8MMtAkG+P/2HGGHg0Y6a25Pb1QIxPdLVLJH
-         qRxmItMTRPZD3OHa3bGpT0f/qGD1T+MfmkAAyJ3VQGru+ubUaz4WN0SZwdROrhy2vDSq
-         +aK/9kKxdljIhbEmk9jeUnGSp8SWvWtlaGAGr2OjEI5X1mlKb/KvmLvfLJl3cu/qasxT
-         mV2XZWtasdyhT1BtaoNu1A7KgGA0Gt8zWRa1w21rP82XpzNAv+BVknZyBVd2EQj6g+kq
-         SVXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=moxRxeoiQrILAzxewJz7sp7qmbe+aZlJlipm4UhOj+k=;
-        b=Zs36FiY4jI4CRmOgcxCaUm3JCCIdZgJau+GedZQSScEjamTRjPwHq/p387v1q3Cjhf
-         BlJmVQkBtUmcJQR2BCaNj7aaiifCTFWEJ1Ym+B8IaULlg7HR9XVtlYQJJmtxbWRnF9Ng
-         6H/Fuo03AbEtxZyTzfZt90wuyC2KZF8xZP5FSteHrizB+b7ko9Fkq/7M0sVFlcW4HDAL
-         1bFC5TkyaJCC7414ageCBUDktW6qRGZybkKCleHJS/vsYGomrrTl9cwZq/oOLQ/+z6sf
-         oLTqkWJSc7UJ2KtZ/+faCTho8c/x8pGUO/O2yOeL5+/8F0tysEq3Q4gELz6LnfrDBX2E
-         Jn4A==
-X-Gm-Message-State: AGRZ1gLDY3unZd9l4qcmdfZ3u5V8x48cnnIKgWycX0DcFcxd3ActwFRq
-        SO7SRbACF9VJjUPOxfCwxo/C1sDgNuA=
-X-Google-Smtp-Source: AJdET5cRNytvcvdbapz2jfbtJCOBNvv682K5vjzhaKlGgKPRw6iezjlRlr/gN8scmiCn6IjRW7nTBg==
-X-Received: by 2002:a2e:7e07:: with SMTP id z7-v6mr11553184ljc.84.1540891316199;
-        Tue, 30 Oct 2018 02:21:56 -0700 (PDT)
-Received: from ix.localnet ([95.143.243.62])
-        by smtp.gmail.com with ESMTPSA id t6-v6sm3369067ljd.2.2018.10.30.02.21.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 30 Oct 2018 02:21:55 -0700 (PDT)
-From:   Szymon Janc <szymon.janc@codecoup.pl>
-To:     =?utf-8?B?xYF1a2Fzeg==?= Rymanowski 
-        <lukasz.rymanowski@codecoup.pl>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] btmon: Add colors to data status in extended adv report
-Date:   Tue, 30 Oct 2018 10:21:53 +0100
-Message-ID: <1719606.xSmM3C9bhQ@ix>
-Organization: CODECOUP
-In-Reply-To: <20181024101718.26695-1-lukasz.rymanowski@codecoup.pl>
-References: <20181024101718.26695-1-lukasz.rymanowski@codecoup.pl>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 30 Oct 2018 15:01:33 -0400
+Received: from mga14.intel.com ([192.55.52.115]:50122 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726225AbeJ3TBd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Oct 2018 15:01:33 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Oct 2018 03:08:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.54,444,1534834800"; 
+   d="scan'208";a="101872101"
+Received: from bpanda-all-series.iind.intel.com ([10.223.96.45])
+  by fmsmga004.fm.intel.com with ESMTP; 30 Oct 2018 03:08:43 -0700
+From:   Bharat Bhusan Panda <bharat.b.panda@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Support fast advertising interval
+Date:   Tue, 30 Oct 2018 15:54:36 +0530
+Message-Id: <1540895076-6046-1-git-send-email-bharat.b.panda@intel.com>
+X-Mailer: git-send-email 1.9.1
+In-Reply-To: <marcel@holtmann.org>
+References: <marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi =C5=81ukasz,
+Changes made to add support for fast advertising interval as per
+core 4.1 specification, section 9.3.11.2.
 
-On Wednesday, 24 October 2018 12:17:18 CET =C5=81ukasz Rymanowski wrote:
-> This patch gives color indicators to data status in extended
-> advertising reports. This gives better visibility on which advertising
-> events were completed or truncated.
-> ---
->  monitor/packet.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->=20
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index cf4a64362..eabd21914 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -9323,6 +9323,7 @@ static void print_ext_adv_report_evt_type(const char
-> *indent, uint16_t flags) uint16_t props =3D flags;
->  	uint8_t data_status;
->  	const char *str;
-> +	const char *color_on;
->  	int i;
->=20
->  	print_field("%sEvent type: 0x%4.4x", indent, flags);
-> @@ -9343,19 +9344,23 @@ static void print_ext_adv_report_evt_type(const c=
-har
-> *indent, uint16_t flags) switch (data_status) {
->  	case 0x00:
->  		str =3D "Complete";
-> +		color_on =3D COLOR_GREEN;
->  		break;
->  	case 0x01:
->  		str =3D "Incomplete, more data to come";
-> +		color_on =3D COLOR_YELLOW;
->  		break;
->  	case 0x02:
->  		str =3D "Incomplete, data truncated, no more to come";
-> +		color_on =3D COLOR_RED;
->  		break;
->  	default:
->  		str =3D "Reserved";
-> +		color_on =3D COLOR_RED;
->  		break;
->  	}
->=20
-> -	print_field("%s  Data status: %s", indent, str);
-> +	print_field("%s  Data status: %s%s%s", indent, color_on, str, COLOR_OFF=
-);
->=20
->  	if (mask)
->  		print_text(COLOR_UNKNOWN_ADV_FLAG,
+A peripheral device entering any of the following GAP modes and
+sending either non-connectable advertising events or scannable undirected
+advertising events should use adv_fast_interval2(100ms - 150ms)
+for adv_fast_period(30s).
+         - Non-Discoverable Mode
+         - Non-Connectable Mode
+         - Limited Discoverable Mode
+         - General Discoverable Mode
 
-Patch applied, thanks.
+Signed-off-by: Bharat Bhusan Panda <bharat.b.panda@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_request.c      | 27 +++++++++++++++++++++++++++
+ 2 files changed, 29 insertions(+)
 
-=2D-=20
-pozdrawiam
-Szymon Janc
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 0db1b9b..868c2fb 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1491,6 +1491,8 @@ struct hci_mgmt_chan {
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
+ #define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/* msec */
++#define DISCOV_LE_FAST_ADV_INT_MIN	100	/* msec */
++#define DISCOV_LE_FAST_ADV_INT_MAX	150	/* msec */
+ 
+ void mgmt_fill_version_info(void *ver);
+ int mgmt_new_settings(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index e8c9ef1..fe43498 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1092,6 +1092,33 @@ void __hci_req_enable_advertising(struct hci_request *req)
+ 	else
+ 		cp.type = LE_ADV_NONCONN_IND;
+ 
++	/* As per core 4.1 spec, section 9.3.11.2: A peripheral device
++	 * entering any of the following GAP modes and sending either
++	 * non-connectable advertising events or scannable undirected
++	 * advertising events should use adv_fast_interval2(100ms - 150ms)
++	 * for adv_fast_period(30s).
++	 *
++	 * 	- Non-Discoverable Mode
++	 *	- Non-Connectable Mode
++	 * 	- Limited Discoverable Mode
++	 * 	- General Discoverable Mode
++	 */
++	if (cp.type == LE_ADV_NONCONN_IND || cp.type == LE_ADV_SCAN_IND) {
++		/* Set the suggested min and max fast advertising interval,
++		 * only if the peripheral device has entered any of the modes
++		 * such as non-discoverable, non-connectable or limited-
++		 * discoverable.
++		 */
++		if (!hci_dev_test_flag(hdev, HCI_DISCOVERABLE) ||
++			!hci_dev_test_flag(hdev, HCI_CONNECTABLE) ||
++			hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE)) {
++			cp.min_interval =
++				cpu_to_le16(DISCOV_LE_FAST_ADV_INT_MIN);
++			cp.max_interval =
++				cpu_to_le16(DISCOV_LE_FAST_ADV_INT_MAX);
++		}
++	}
++
+ 	cp.own_address_type = own_addr_type;
+ 	cp.channel_map = hdev->le_adv_channel_map;
+ 
+-- 
+1.9.1
 
