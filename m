@@ -2,785 +2,120 @@ Return-Path: <SRS0=qOEI=NK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA8AC2BC61
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 12:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E8E7C2BC61
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 13:17:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B2B4220831
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 12:52:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qaBJGDMF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2B4220831
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 41B052081B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Oct 2018 13:17:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41B052081B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727818AbeJ3Vp6 (ORCPT
+        id S1728084AbeJ3WLK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Oct 2018 17:45:58 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:33805 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727804AbeJ3Vp6 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Oct 2018 17:45:58 -0400
-Received: by mail-ot1-f65.google.com with SMTP id e9so9430978oti.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Oct 2018 05:52:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=ZemKr5yEAxWlf6St+6e6aLTpl3hdk6mnPABIA8OZRzo=;
-        b=qaBJGDMFnkoiTIavlvvIWHyHnAKTe/qOTlejLAn5JtLqlD4+q1+SFr1B98e+ZXLrQN
-         6TQhsuXgVarTADSv77iGb5LoCGDWj3LHrJtbcREaVzdVZKinhvdJPhBKbGEnyK14+s5K
-         Vf8SotJcWwfCzTboiQkGhc2MKWe8edb+MntDiXh5b2xm3ikfcM84JZjc4KFs6GSONZ+f
-         fIqfLghs7ulcpFQNbjGriNJ5DfuC+OKJ72sl0kHtBVUxy3DrD9/qtqbk+vLTvQAYPXrx
-         sWpMBfkswyxKrcP5PXQ3JTSAxz+PmsSiXxPCMiCxC1BFwXOWNcjdxFLoHgFmeyGy1ybP
-         X7ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ZemKr5yEAxWlf6St+6e6aLTpl3hdk6mnPABIA8OZRzo=;
-        b=Xe9fDs9GXLG0ADDERY7a+2Pj6oChQpUysf/xZuuKx4URGNyTqfWtAhIrg43xlAwmla
-         /5lFTYQWuM2boPOBJr/9DrPeSpIkcsmSCJgd+M/LKYesNZ8bm2ROdr8/JG4+zKS0DKcp
-         +wvM//+u7ZyJFyGn3m44sgkf6QvCJFmTr6M4ZvF69uDYy0dsSDLDHd/aHiGA5N1QPCnu
-         D+ExMpzVGUd2KD/gPZpcYwknuWi364/baokUvZoSn77TopW3r20lxlTgvS01kl2nlHlA
-         eB0SQnoauvDknzXJuf6/gfVN3STDkgzrdiX+qdwNn3wUWPeR9BzGKPFiRETKsIk3pv17
-         ITmA==
-X-Gm-Message-State: AGRZ1gKUTKzQIuzuN0GeRH0eoFlY7XZKNPrAwIq59hx9WdXLaLSsPi8B
-        kMB8MHfWzfJHBCrT+WQcMmxzx3cADaFXW+SNVJCgK2ea
-X-Google-Smtp-Source: AJdET5ddSyAzMuIRWBPQFklz53FSK9WX1VwANJwKDMF2365hUBbNN7ebxyPwLrOHSYUetErJ8dSMqQUMPgfDZXZmAUY=
-X-Received: by 2002:a9d:4c01:: with SMTP id l1mr1326846otf.242.1540903957639;
- Tue, 30 Oct 2018 05:52:37 -0700 (PDT)
+        Tue, 30 Oct 2018 18:11:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52401 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727742AbeJ3WLJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Oct 2018 18:11:09 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7C26C307CDCB;
+        Tue, 30 Oct 2018 13:17:45 +0000 (UTC)
+Received: from shalem.localdomain.com (ovpn-117-37.ams2.redhat.com [10.36.117.37])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3FF7561B98;
+        Tue, 30 Oct 2018 13:17:29 +0000 (UTC)
+From:   Hans de Goede <hdegoede@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        Jeremy Cline <jeremy@jcline.org>,
+        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
+        linux-acpi@vger.kernel.org
+Subject: [PATCH v2 1/2] Bluetooth: hci_h5: Add suspend / resume ops
+Date:   Tue, 30 Oct 2018 14:17:22 +0100
+Message-Id: <20181030131723.4589-1-hdegoede@redhat.com>
 MIME-Version: 1.0
-References: <20181025004210.177441-1-yunhanw@google.com> <CALvjcs83c2B0aq7Vz8WU4DC=ikQfB5W_XfYh+S_rkydi=6agMw@mail.gmail.com>
- <CABBYNZ+5i=tv-dcnMr+21D28NZL9ayWVTLkC8DfWQA9jZUWXQg@mail.gmail.com>
- <CALvjcs_-_DuXJWt8zWj4wH32Dz2w41UdPKxfOqQ5ZwA-gqO1mw@mail.gmail.com>
- <CALvjcs_YPhcg4GEVvRrsnS=auzzA_=AxmFt_Nx2UO5Rw1rY0cg@mail.gmail.com>
- <CABBYNZ+YKck9btAU=qkohHT0C__RF-0pf2vK2eF14XB8K6x9WQ@mail.gmail.com>
- <CABBYNZKQ_jFUA7PBuW_oc3eU22SV4hyy4nBeSEDNtWTk+mWhnw@mail.gmail.com>
- <CALvjcs9_ssfyVGjfg8b836_D=poy-W1F16uLNXZ=1_8rAK9b-A@mail.gmail.com>
- <CABBYNZLZEdc7_zd2XcLgvQZZqkFp_Z+xDZdzNHrWx9p6Bm45OQ@mail.gmail.com>
- <CALvjcs-CTXUNAw_p4rTW6cCeX1LV4Rh5=+eQGAPqTf5L0T827A@mail.gmail.com>
- <CABBYNZK67PN5v1GSnCP=_RYkAjy+o_vfPHoTOHywOv9_-+xRiw@mail.gmail.com>
- <CALvjcs-XMCMQh=Xz2jXYJZO0b0b4MCFWegn_hKmtNHwor+8eUg@mail.gmail.com> <CALvjcs-J4gpmvdLk4n6uOKGDiJYQSGs6vQjYSnOWmuDDd9UyGg@mail.gmail.com>
-In-Reply-To: <CALvjcs-J4gpmvdLk4n6uOKGDiJYQSGs6vQjYSnOWmuDDd9UyGg@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 30 Oct 2018 14:52:24 +0200
-Message-ID: <CABBYNZLd_ms7SbjEx2t_a52KVwBDVJMhVhv8YXM=Dvw8tq5WjA@mail.gmail.com>
-Subject: Re: [PATCH] gatt: Fix double att_disconnected issue on disconnection
-To:     Yunhan Wang <yunhanw@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Tue, 30 Oct 2018 13:17:45 +0000 (UTC)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Yunhan,
+Add support for vendor specific suspend / resume callbacks.
 
-On Tue, Oct 30, 2018 at 9:21 AM Yunhan Wang <yunhanw@google.com> wrote:
->
-> Hi, Luiz
->
-> I am still seeing the bluetoothd crash when disconnect happens on this
-> issue. Here I reproduce using btvirt and add characteristic with
-> indicate in ble peripheral, put notify on for this characteristic in
-> ble central
-> crash is as below:
->
-> #0  __memcmp_sse4_1 () at ../sysdeps/x86_64/multiarch/memcmp-sse4.S:943
-> #1  0x00005555555cfd3a in bacmp (ba2=3D0x7fffffffdfe9, ba1=3D0xb) at
-> bluez/repo/lib/bluetooth.h:317
-> #2  device_addr_type_cmp (a=3D0x0, b=3D0x7fffffffdfe9) at
-> /bluez/repo/src/device.c:4216
-> #3  0x00007ffff7b2e3d1 in g_slist_find_custom () from
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> #4  0x00005555555bcf18 in btd_adapter_find_device (adapter=3D<optimized
-> out>, dst=3Ddst@entry=3D0x555555876038, bdaddr_type=3D<optimized out>)
->     at bluez/repo/src/adapter.c:845
-> #5  0x00005555555ab89e in att_disconnected (err=3D<optimized out>,
-> user_data=3D0x555555876030)
->     at bluez/repo/src/gatt-database.c:329
-> #6  0x00005555555eabb8 in queue_foreach (queue=3D0x555555874460,
-> function=3Dfunction@entry=3D0x5555555ee600 <disconn_handler>,
-> user_data=3D0x68)
->     at bluez/repo/src/shared/queue.c:220
-> #7  0x00005555555ef829 in disconnect_cb (io=3D<optimized out>,
-> user_data=3D0x5555558742a0)
->     at /bluez/repo/src/shared/att.c:592
-> #8  0x00005555555f89b3 in watch_callback (channel=3D<optimized out>,
-> cond=3D<optimized out>, user_data=3D<optimized out>)
->     at /bluez/repo/src/shared/io-glib.c:170
-> #9  0x00007ffff7b0fe35 in g_main_context_dispatch () from
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> #10 0x00007ffff7b10200 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so=
-.0
-> #11 0x00007ffff7b10512 in g_main_loop_run () from
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> #12 0x0000555555572238 in main (argc=3D<optimized out>, argv=3D<optimized
-> out>) at /bluez/repo/src/main.c:808
->
-> Peripheral:
->
-> [bluetooth]# select 00:AA:01:01:00:24
-> Controller 00:AA:01:01:00:24 N0001 [default]
-> [bluetooth]# system-alias N0001
-> Changing N0001 succeeded
-> [bluetooth]# power on
-> Changing power on succeeded
-> [bluetooth]# name N0001
-> [bluetooth]# uuids FEAF
-> [bluetooth]# discoverable on
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/hci_h5.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-Hmm, are you connecting over BR/EDR, normally you would need to
-advertise in order to connect? I guess I haven't tried that, but at
-least with LE Im pretty sure it doesn't crash anymore, it is worth
-checking if it is not connecting on multiple bearers at the same time
-though.
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 8eede1197cd2..beddb89a00f2 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -115,6 +115,8 @@ struct h5_vnd {
+ 	int (*setup)(struct h5 *h5);
+ 	void (*open)(struct h5 *h5);
+ 	void (*close)(struct h5 *h5);
++	int (*suspend)(struct h5 *h5);
++	int (*resume)(struct h5 *h5);
+ 	const struct acpi_gpio_mapping *acpi_gpio_map;
+ };
+ 
+@@ -841,6 +843,28 @@ static void h5_serdev_remove(struct serdev_device *serdev)
+ 	hci_uart_unregister_device(&h5->serdev_hu);
+ }
+ 
++static int __maybe_unused h5_serdev_suspend(struct device *dev)
++{
++	struct h5 *h5 = dev_get_drvdata(dev);
++	int ret = 0;
++
++	if (h5->vnd && h5->vnd->suspend)
++		ret = h5->vnd->suspend(h5);
++
++	return ret;
++}
++
++static int __maybe_unused h5_serdev_resume(struct device *dev)
++{
++	struct h5 *h5 = dev_get_drvdata(dev);
++	int ret = 0;
++
++	if (h5->vnd && h5->vnd->resume)
++		ret = h5->vnd->resume(h5);
++
++	return ret;
++}
++
+ #ifdef CONFIG_BT_HCIUART_RTL
+ static int h5_btrtl_setup(struct h5 *h5)
+ {
+@@ -935,12 +959,17 @@ static const struct acpi_device_id h5_acpi_match[] = {
+ MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
+ #endif
+ 
++static const struct dev_pm_ops h5_serdev_pm_ops = {
++	SET_SYSTEM_SLEEP_PM_OPS(h5_serdev_suspend, h5_serdev_resume)
++};
++
+ static struct serdev_device_driver h5_serdev_driver = {
+ 	.probe = h5_serdev_probe,
+ 	.remove = h5_serdev_remove,
+ 	.driver = {
+ 		.name = "hci_uart_h5",
+ 		.acpi_match_table = ACPI_PTR(h5_acpi_match),
++		.pm = &h5_serdev_pm_ops,
+ 	},
+ };
+ 
+-- 
+2.19.0
 
-> [bluetooth]# back
-> [bluetooth]# register-service 0000feaf-0000-1000-8000-00805f9b34fb
-> [NEW] Primary Service
-> /org/bluez/app/service0x562f48a31860
-> 0000feaf-0000-1000-8000-00805f9b34fb
-> Nest Labs Inc.
-> [/org/bluez/app/service0x562f48a31860] Primary (yes/no): yees
-> Invalid option: yees
-> [DEL] Primary Service
-> /org/bluez/app/service0x562f48a31860
-> 0000feaf-0000-1000-8000-00805f9b34fb
-> Nest Labs Inc.
-> [bluetooth]# register-service 0000feaf-0000-1000-8000-00805f9b34fb
-> [NEW] Primary Service
-> /org/bluez/app/service0x562f48a34e70
-> 0000feaf-0000-1000-8000-00805f9b34fb
-> Nest Labs Inc.
-> [/org/bluez/app/service0x562f48a34e70] Primary (yes/no): yes
->
-> [bluetooth]# register-characteristic
-> 18ee2ef5-263d-4559-959f-4f9c429f9d11 read,indicate
-> [NEW] Characteristic
-> /org/bluez/app/service0x562f48a34e70/chrc0x562f48a437c0
-> 18ee2ef5-263d-4559-959f-4f9c429f9d11
-> Vendor specific
-> [/org/bluez/app/service0x562f48a34e70/chrc0x562f48a437c0] Enter value: 1
->
-> [bluetooth]# register-application
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001800-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001801-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000110e-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001200-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000110c-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000feaf-0000-1000-8000-00805f9=
-b34fb
-> Application registered
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001800-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001801-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000110e-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001200-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000110c-0000-1000-8000-00805f9=
-b34fb
-> [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000feaf-0000-1000-8000-00805f9=
-b34fb
-> [bluetooth]# back
->
-> [bluetooth]# advertise peripheral
-> [CHG] Controller 00:AA:01:01:00:24 SupportedInstances: 0x04
-> [CHG] Controller 00:AA:01:01:00:24 ActiveInstances: 0x01
-> Advertising object registered
-> UUID: (FEAF)
-> Tx Power: off
-> LocalName: N0001
-> Apperance: off
-> Discoverable: on
-> [CHG] Controller 00:AA:01:00:00:23 Powered: yes
-> [CHG] Controller 00:AA:01:00:00:23 Discovering: yes
-> [CHG] Controller 00:AA:01:00:00:23 Discovering: no
-> [CHG] Controller 00:AA:01:00:00:23 Discovering: yes
-> [CHG] Device 00:AA:01:00:00:23 Connected: yes
-> [NEW] Primary Service
-> /org/bluez/hci2/dev_00_AA_01_00_00_23/service0006
-> 00001801-0000-1000-8000-00805f9b34fb
-> Generic Attribute Profile
-> [NEW] Characteristic
-> /org/bluez/hci2/dev_00_AA_01_00_00_23/service0006/char0007
-> 00002a05-0000-1000-8000-00805f9b34fb
-> Service Changed
-> [NEW] Descriptor
-> /org/bluez/hci2/dev_00_AA_01_00_00_23/service0006/char0007/desc0009
-> 00002902-0000-1000-8000-00805f9b34fb
-> Client Characteristic Configuration
-> [CHG] Device 00:AA:01:00:00:23 ServicesResolved: yes
->
->
-> Central:
->
-> [bluetooth]# select 00:AA:01:00:00:23
-> Discovery stopped
-> [bluetooth]# scan on
-> Discovery started
-> [CHG] Controller 00:AA:01:00:00:23 Discovering: yes
-> [bluetooth]# connect 00:AA:01:01:00:24
-> Attempting to connect to 00:AA:01:01:00:24
-> [CHG] Device 00:AA:01:01:00:24 Connected: yes
-> Connection successful
-> [CHG] Device 00:AA:01:01:00:24 UUIDs: 00001800-0000-1000-8000-00805f9b34f=
-b
-> [CHG] Device 00:AA:01:01:00:24 UUIDs: 00001801-0000-1000-8000-00805f9b34f=
-b
-> [NEW] Primary Service
-> /org/bluez/hci1/dev_00_AA_01_01_00_24/service0006
-> 00001801-0000-1000-8000-00805f9b34fb
-> Generic Attribute Profile
-> [NEW] Characteristic
-> /org/bluez/hci1/dev_00_AA_01_01_00_24/service0006/char0007
-> 00002a05-0000-1000-8000-00805f9b34fb
-> Service Changed
-> [NEW] Descriptor
-> /org/bluez/hci1/dev_00_AA_01_01_00_24/service0006/char0007/desc0009
-> 00002902-0000-1000-8000-00805f9b34fb
-> Client Characteristic Configuration
-> [NEW] Primary Service
-> /org/bluez/hci1/dev_00_AA_01_01_00_24/service000d
-> 0000feaf-0000-1000-8000-00805f9b34fb
-> Nest Labs Inc.
-> [NEW] Characteristic
-> /org/bluez/hci1/dev_00_AA_01_01_00_24/service000d/char000e
-> 18ee2ef5-263d-4559-959f-4f9c429f9d11
-> Vendor specific
-> [CHG] Device 00:AA:01:01:00:24 UUIDs: 00001800-0000-1000-8000-00805f9b34f=
-b
-> [CHG] Device 00:AA:01:01:00:24 UUIDs: 00001801-0000-1000-8000-00805f9b34f=
-b
-> [CHG] Device 00:AA:01:01:00:24 UUIDs: 0000feaf-0000-1000-8000-00805f9b34f=
-b
-> [CHG] Device 00:AA:01:01:00:24 ServicesResolved: yes
->
-> [N0001]# select-attribute 00002a05-0000-1000-8000-00805f9b34fb
-> [CHG] Device 00:AA:01:01:00:24 RSSI: 127
-> [CHG] Device 00:AA:01:01:00:24 AdvertisingFlags:
->   06                                               .
-> [N0001:/service0006/char0007]# notify on
-> [CHG] Attribute
-> /org/bluez/hci1/dev_00_AA_01_01_00_24/service0006/char0007 Notifying:
-> yes
-> Notify started
->
->
-> [N0001]# disconnect 00:AA:01:01:00:24
-> Attempting to disconnect from 00:AA:01:01:00:24
-> [CHG] Device 00:AA:01:01:00:24 ServicesResolved: no
-> Successful disconnected
-
-After this all I got was:
-
-bluetoothd[31908]: src/gatt-client.c:btd_gatt_client_disconnected()
-Device disconnected. Cleaning up.
-bluetoothd[31908]: src/device.c:att_disconnected_cb() Automatic
-connection disabled
-bluetoothd[31908]: src/gatt-database.c:btd_gatt_database_att_disconnected()
-bluetoothd[31908]: src/gatt-database.c:att_disconnected()
-bluetoothd[31908]: attrib/gattrib.c:g_attrib_unref() 0x99b3ba0: g_attrib_un=
-ref=3D0
-
->
-> Thanks
-> Best wishes
-> Yunhan
-> On Mon, Oct 29, 2018 at 1:05 PM Yunhan Wang <yunhanw@google.com> wrote:
-> >
-> > Hi, Luiz
-> >
-> > Great, thanks. It is working now.
-> >
-> > Best wishes
-> > Yunhan
-> > On Mon, Oct 29, 2018 at 6:28 AM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Yunhan,
-> > > On Fri, Oct 26, 2018 at 5:00 AM Yunhan Wang <yunhanw@google.com> wrot=
-e:
-> > > >
-> > > > Hi, Luiz
-> > > >
-> > > > On Thu, Oct 25, 2018 at 2:41 PM Luiz Augusto von Dentz
-> > > > <luiz.dentz@gmail.com> wrote:
-> > > > >
-> > > > > Hi Yunhan,
-> > > > > On Fri, Oct 26, 2018 at 12:06 AM Yunhan Wang <yunhanw@google.com>=
- wrote:
-> > > > > >
-> > > > > > Hi, Luiz
-> > > > > >
-> > > > > > I am using latest bluez master without any change for this issu=
-e, I
-> > > > > > think I am not missing any changes....The issue is there.
-> > > > >
-> > > > > Then we have a problem on bt_att, but that is tracking if the han=
-dler
-> > > > > is removed so I wonder how it is still reproducible for you.
-> > > > >
-> > > > It is reproducible using real ble dongles, It is also reproducible
-> > > > using btvirt.....
-> > > > Using btvirt -L -l2  and bluetoothctl
-> > > >
-> > > > Following the below instructions, when central issue ble disconnect=
-ion
-> > > > to peripheral, the bluetoothd would crash as I show before.
-> > > >
-> > > > Peripheral:
-> > > >
-> > > > [bluetooth]# select 00:AA:01:01:00:24
-> > > > Controller 00:AA:01:01:00:24 N0001 [default]
-> > > > [bluetooth]# system-alias N0001
-> > > > Changing N0001 succeeded
-> > > > [bluetooth]# power on
-> > > > Changing power on succeeded
-> > > > [bluetooth]# name N0001
-> > > > [bluetooth]# uuids FEAF
-> > > > [bluetooth]# discoverable on
-> > > > [bluetooth]# back
-> > > > [bluetooth]# register-service 0000feaf-0000-1000-8000-00805f9b34fb
-> > > > [NEW] Primary Service
-> > > > /org/bluez/app/service0x562f48a31860
-> > > > 0000feaf-0000-1000-8000-00805f9b34fb
-> > > > Nest Labs Inc.
-> > > > [/org/bluez/app/service0x562f48a31860] Primary (yes/no): yees
-> > > > Invalid option: yees
-> > > > [DEL] Primary Service
-> > > > /org/bluez/app/service0x562f48a31860
-> > > > 0000feaf-0000-1000-8000-00805f9b34fb
-> > > > Nest Labs Inc.
-> > > > [bluetooth]# register-service 0000feaf-0000-1000-8000-00805f9b34fb
-> > > > [NEW] Primary Service
-> > > > /org/bluez/app/service0x562f48a34e70
-> > > > 0000feaf-0000-1000-8000-00805f9b34fb
-> > > > Nest Labs Inc.
-> > > > [/org/bluez/app/service0x562f48a34e70] Primary (yes/no): yes
-> > > >
-> > > > [bluetooth]# register-characteristic
-> > > > 18ee2ef5-263d-4559-959f-4f9c429f9d11 read,write
-> > > > [NEW] Characteristic
-> > > > /org/bluez/app/service0x562f48a34e70/chrc0x562f48a437c0
-> > > > 18ee2ef5-263d-4559-959f-4f9c429f9d11
-> > > > Vendor specific
-> > > > [/org/bluez/app/service0x562f48a34e70/chrc0x562f48a437c0] Enter val=
-ue: 1
-> > > >
-> > > > [bluetooth]# register-application
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001800-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001801-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000110e-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001200-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000110c-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000feaf-0000-1000-8000-0=
-0805f9b34fb
-> > > > Application registered
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001800-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001801-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000110e-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 00001200-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000110c-0000-1000-8000-0=
-0805f9b34fb
-> > > > [CHG] Controller 00:AA:01:01:00:24 UUIDs: 0000feaf-0000-1000-8000-0=
-0805f9b34fb
-> > > > [bluetooth]# back
-> > > >
-> > > > [bluetooth]# advertise peripheral
-> > > > [CHG] Controller 00:AA:01:01:00:24 SupportedInstances: 0x04
-> > > > [CHG] Controller 00:AA:01:01:00:24 ActiveInstances: 0x01
-> > > > Advertising object registered
-> > > > UUID: (FEAF)
-> > > > Tx Power: off
-> > > > LocalName: N0001
-> > > > Apperance: off
-> > > > Discoverable: on
-> > > > [CHG] Controller 00:AA:01:00:00:23 Powered: yes
-> > > > [CHG] Controller 00:AA:01:00:00:23 Discovering: yes
-> > > > [CHG] Controller 00:AA:01:00:00:23 Discovering: no
-> > > > [CHG] Controller 00:AA:01:00:00:23 Discovering: yes
-> > > > [CHG] Device 00:AA:01:00:00:23 Connected: yes
-> > > > [NEW] Primary Service
-> > > > /org/bluez/hci2/dev_00_AA_01_00_00_23/service0006
-> > > > 00001801-0000-1000-8000-00805f9b34fb
-> > > > Generic Attribute Profile
-> > > > [NEW] Characteristic
-> > > > /org/bluez/hci2/dev_00_AA_01_00_00_23/service0006/char0007
-> > > > 00002a05-0000-1000-8000-00805f9b34fb
-> > > > Service Changed
-> > > > [NEW] Descriptor
-> > > > /org/bluez/hci2/dev_00_AA_01_00_00_23/service0006/char0007/desc0009
-> > > > 00002902-0000-1000-8000-00805f9b34fb
-> > > > Client Characteristic Configuration
-> > > > [CHG] Device 00:AA:01:00:00:23 ServicesResolved: yes
-> > > >
-> > > >
-> > > > Central:
-> > > >
-> > > > [bluetooth]# select 00:AA:01:00:00:23
-> > > > Discovery stopped
-> > > > [bluetooth]# scan on
-> > > > Discovery started
-> > > > [CHG] Controller 00:AA:01:00:00:23 Discovering: yes
-> > > > [bluetooth]# connect 00:AA:01:01:00:24
-> > > > Attempting to connect to 00:AA:01:01:00:24
-> > > > [CHG] Device 00:AA:01:01:00:24 Connected: yes
-> > > > Connection successful
-> > > > [CHG] Device 00:AA:01:01:00:24 UUIDs: 00001800-0000-1000-8000-00805=
-f9b34fb
-> > > > [CHG] Device 00:AA:01:01:00:24 UUIDs: 00001801-0000-1000-8000-00805=
-f9b34fb
-> > > > [NEW] Primary Service
-> > > > /org/bluez/hci1/dev_00_AA_01_01_00_24/service0006
-> > > > 00001801-0000-1000-8000-00805f9b34fb
-> > > > Generic Attribute Profile
-> > > > [NEW] Characteristic
-> > > > /org/bluez/hci1/dev_00_AA_01_01_00_24/service0006/char0007
-> > > > 00002a05-0000-1000-8000-00805f9b34fb
-> > > > Service Changed
-> > > > [NEW] Descriptor
-> > > > /org/bluez/hci1/dev_00_AA_01_01_00_24/service0006/char0007/desc0009
-> > > > 00002902-0000-1000-8000-00805f9b34fb
-> > > > Client Characteristic Configuration
-> > > > [NEW] Primary Service
-> > > > /org/bluez/hci1/dev_00_AA_01_01_00_24/service000d
-> > > > 0000feaf-0000-1000-8000-00805f9b34fb
-> > > > Nest Labs Inc.
-> > > > [NEW] Characteristic
-> > > > /org/bluez/hci1/dev_00_AA_01_01_00_24/service000d/char000e
-> > > > 18ee2ef5-263d-4559-959f-4f9c429f9d11
-> > > > Vendor specific
-> > > > [CHG] Device 00:AA:01:01:00:24 UUIDs: 00001800-0000-1000-8000-00805=
-f9b34fb
-> > > > [CHG] Device 00:AA:01:01:00:24 UUIDs: 00001801-0000-1000-8000-00805=
-f9b34fb
-> > > > [CHG] Device 00:AA:01:01:00:24 UUIDs: 0000feaf-0000-1000-8000-00805=
-f9b34fb
-> > > > [CHG] Device 00:AA:01:01:00:24 ServicesResolved: yes
-> > > >
-> > > > [N0001]# disconnect 00:AA:01:01:00:24
-> > > > Attempting to disconnect from 00:AA:01:01:00:24
-> > > > [CHG] Device 00:AA:01:01:00:24 ServicesResolved: no
-> > > > Successful disconnected
-> > >
-> > > It should be fixed now, the problem was that the bt_gatt_server was
-> > > set to NULL already thus the bt_att_unregister_disconnect did nothing=
-,
-> > > Ive might have tested a version were I passed bt_att directly but
-> > > later I changed to use bt_gatt_server to access the bt_att instance
-> > > from btd_device.
-> > >
-> > > >
-> > > > > > It is not for chrome os. I am currently trying bring up bluez v=
-ersion
-> > > > > > from commit in Jan 19 11:37:07 2018 to latest master in Open we=
-ave
-> > > > > > project(https://github.com/openweave/openweave-core/blob/master=
-/repos.conf),
-> > > > > > where we are using BLE for weave pairing in iot products, and c=
-reate
-> > > > > > two GATT characteristics for Tx and Rx and the TCP-like control
-> > > > > > protocol  to control BLE packet flow. Periodically I would sync=
- Bluez
-> > > > > > revision in openweave against Bluez Upstream.
-> > > > >
-> > > > > All major mobile OS support LE L2CAP CoC channels, no idea why
-> > > > > companies want to keep using GATT for emulating serial like
-> > > > > communication special when L2CAP does have support for fragmentat=
-ion
-> > > > > and flow control.
-> > > > >
-> > > > Yes, L2CAP do have support for fragmentation and flow control, but =
-for
-> > > > some platforms, it may not have bluez, and its L2CAP is not good, t=
-hen
-> > > > GATT layer fragmentation and flow control is needed. In addition, t=
-he
-> > > > L2CAP API is available on neither Android nor iOS when we did this
-> > > > implementation in the past...then GATT layer fragmentation and flow
-> > > > control is also needed.
-> > >
-> > > Sure, though moving to L2CAP is a lot simpler... anyway it was just a
-> > > recommendation given that L2CAP is now supported.
-> > >
-> > > > Thanks
-> > > > Best wishes
-> > > > Yunhan
-> > > > > > Thanks
-> > > > > > Best wishes
-> > > > > > Yunhan
-> > > > > >
-> > > > > > On Thu, Oct 25, 2018 at 1:22 PM Luiz Augusto von Dentz
-> > > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > > >
-> > > > > > > Hi Yunhan,
-> > > > > > >
-> > > > > > > On Thu, Oct 25, 2018 at 9:24 PM Luiz Augusto von Dentz
-> > > > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > Hi Yunhan,
-> > > > > > > >
-> > > > > > > > We might be better of removing the handler altogether and j=
-ust leave device.c handler instead then.
-> > > > > > > >
-> > > > > > > > On Thu, 25 Oct 2018, 20:19 Yunhan Wang, <yunhanw@google.com=
-> wrote:
-> > > > > > > >>
-> > > > > > > >> Hi, Luiz
-> > > > > > > >>
-> > > > > > > >> Actually before I submit my patch, I tried your way to unr=
-egister the
-> > > > > > > >> handler, it is failing. That is why I use random address c=
-heck in
-> > > > > > > >> btd_gatt_database_att_disconnected to workaround this issu=
-e.
-> > > > > > > >>
-> > > > > > > >> Thanks
-> > > > > > > >> Best wishes
-> > > > > > > >> Yunhan
-> > > > > > > >>
-> > > > > > > >>
-> > > > > > > >>
-> > > > > > > >> On Thu, Oct 25, 2018 at 10:49 AM Yunhan Wang <yunhanw@goog=
-le.com> wrote:
-> > > > > > > >> >
-> > > > > > > >> > Hi, Luiz
-> > > > > > > >> >
-> > > > > > > >> > Just have a test with your patch in master branch, both =
-crashes are
-> > > > > > > >> > still there, and att_disconnected has been called for tw=
-o times even
-> > > > > > > >> > though unregistering the handler....
-> > > > > > >
-> > > > > > > Actually you may be missing the following patch:
-> > > > > > >
-> > > > > > > commit 261cf78db4be79a0f7d44798a57730b159c9be91
-> > > > > > > Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > > > > > Date:   Mon Oct 23 14:13:59 2017 +0300
-> > > > > > >
-> > > > > > >     shared/att: Fix crash when calling disconnect handlers
-> > > > > > >
-> > > > > > > This is quite old btw, what version is Chrome OS shipping?
-> > > > > > >
-> > > > > > > >> > Thanks
-> > > > > > > >> > Best wishes
-> > > > > > > >> > Yunhan
-> > > > > > > >> >
-> > > > > > > >> > Program received signal SIGSEGV, Segmentation fault.
-> > > > > > > >> > btd_adapter_find_device (adapter=3D0x72657664612f6372,
-> > > > > > > >> > dst=3Ddst@entry=3D0x555555872998, bdaddr_type=3D0 '\000'=
-)
-> > > > > > > >> >     at bluez/repo/src/adapter.c:845
-> > > > > > > >> > 845 list =3D g_slist_find_custom(adapter->devices, &addr=
-,
-> > > > > > > >> > (gdb) bt
-> > > > > > > >> > #0  btd_adapter_find_device (adapter=3D0x72657664612f637=
-2,
-> > > > > > > >> > dst=3Ddst@entry=3D0x555555872998, bdaddr_type=3D0 '\000'=
-)
-> > > > > > > >> >     at bluez/repo/src/adapter.c:845
-> > > > > > > >> > #1  0x00005555555ab890 in att_disconnected (err=3D<optim=
-ized out>,
-> > > > > > > >> > user_data=3D0x555555872990)
-> > > > > > > >> >     at bluez/repo/src/gatt-database.c:329
-> > > > > > > >> > #2  0x00005555555eaba8 in queue_foreach (queue=3D0x55555=
-585de60,
-> > > > > > > >> > function=3Dfunction@entry=3D0x5555555ee5f0 <disconn_hand=
-ler>,
-> > > > > > > >> > user_data=3D0x68)
-> > > > > > > >> >     at bluez/repo/src/shared/queue.c:220
-> > > > > > > >> > #3  0x00005555555ef819 in disconnect_cb (io=3D<optimized=
- out>,
-> > > > > > > >> > user_data=3D0x555555869d50)
-> > > > > > > >> >     at bluez/repo/src/shared/att.c:592
-> > > > > > > >> > #4  0x00005555555f89a3 in watch_callback (channel=3D<opt=
-imized out>,
-> > > > > > > >> > cond=3D<optimized out>, user_data=3D<optimized out>)
-> > > > > > > >> >     at bluez/repo/src/shared/io-glib.c:170
-> > > > > > > >> > #5  0x00007ffff7b0fe35 in g_main_context_dispatch () fro=
-m
-> > > > > > > >> > /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> > > > > > > >> > #6  0x00007ffff7b10200 in ?? () from /lib/x86_64-linux-g=
-nu/libglib-2.0.so.0
-> > > > > > > >> > #7  0x00007ffff7b10512 in g_main_loop_run () from
-> > > > > > > >> > /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> > > > > > > >> > #8  0x0000555555572238 in main (argc=3D<optimized out>, =
-argv=3D<optimized
-> > > > > > > >> > out>) at bluez/repo/src/main.c:808
-> > > > > > > >> >
-> > > > > > > >> >
-> > > > > > > >> > Program received signal SIGSEGV, Segmentation fault.
-> > > > > > > >> > queue_remove (queue=3D0x30, data=3Ddata@entry=3D0x555555=
-873740) at
-> > > > > > > >> > bluez/repo/src/shared/queue.c:256
-> > > > > > > >> > 256 for (entry =3D queue->head, prev =3D NULL; entry;
-> > > > > > > >> > (gdb) bt
-> > > > > > > >> > #0  queue_remove (queue=3D0x30, data=3Ddata@entry=3D0x55=
-5555873740) at
-> > > > > > > >> > bluez/repo/src/shared/queue.c:256
-> > > > > > > >> > #1  0x00005555555ab8c5 in att_disconnected (err=3D<optim=
-ized out>,
-> > > > > > > >> > user_data=3D0x555555873740)
-> > > > > > > >> >     at bluez/repo/src/gatt-database.c:350
-> > > > > > > >> > #2  0x00005555555eabb8 in queue_foreach (queue=3D0x55555=
-586e670,
-> > > > > > > >> > function=3Dfunction@entry=3D0x5555555ee600 <disconn_hand=
-ler>,
-> > > > > > > >> > user_data=3D0x68)
-> > > > > > > >> >     at bluez/repo/src/shared/queue.c:220
-> > > > > > > >> > #3  0x00005555555ef829 in disconnect_cb (io=3D<optimized=
- out>,
-> > > > > > > >> > user_data=3D0x555555865f50)
-> > > > > > > >> >     at bluez/repo/src/shared/att.c:592
-> > > > > > > >> > #4  0x00005555555f89b3 in watch_callback (channel=3D<opt=
-imized out>,
-> > > > > > > >> > cond=3D<optimized out>, user_data=3D<optimized out>)
-> > > > > > > >> >     at bluez/repo/src/shared/io-glib.c:170
-> > > > > > > >> > #5  0x00007ffff7b0fe35 in g_main_context_dispatch () fro=
-m
-> > > > > > > >> > /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> > > > > > > >> > #6  0x00007ffff7b10200 in ?? () from /lib/x86_64-linux-g=
-nu/libglib-2.0.so.0
-> > > > > > > >> > #7  0x00007ffff7b10512 in g_main_loop_run () from
-> > > > > > > >> > /lib/x86_64-linux-gnu/libglib-2.0.so.0
-> > > > > > > >> > #8  0x0000555555572238 in main (argc=3D<optimized out>, =
-argv=3D<optimized
-> > > > > > > >> > out>) at  bluez/repo/src/main.c:808
-> > > > > > > >> > On Thu, Oct 25, 2018 at 2:20 AM Luiz Augusto von Dentz
-> > > > > > > >> > <luiz.dentz@gmail.com> wrote:
-> > > > > > > >> > >
-> > > > > > > >> > > Hi Yunhan,
-> > > > > > > >> > >
-> > > > > > > >> > > On Thu, Oct 25, 2018 at 4:47 AM Yunhan Wang <yunhanw@g=
-oogle.com> wrote:
-> > > > > > > >> > > >
-> > > > > > > >> > > > Hi, Luiz
-> > > > > > > >> > > >
-> > > > > > > >> > > > I am observing the multiple crashes when doing BLE d=
-isconnection using
-> > > > > > > >> > > > latest bluez master..It looks like the two att_disco=
-nnect are
-> > > > > > > >> > > > triggered from your last gatt commit.. Please help t=
-ake a look at this
-> > > > > > > >> > > > workaround and comments.. the better solution might =
-be to figure out
-> > > > > > > >> > > > how to handle the disconnection along with random ad=
-dress and public
-> > > > > > > >> > > > address together regarding the previous issue, Gatt:=
- Subscriptions are
-> > > > > > > >> > > > not cleared after disconnection from a temporary dev=
-ice
-> > > > > > > >> > >
-> > > > > > > >> > > Ive pushed a similar fix, it should remove the handler=
- before calling
-> > > > > > > >> > > att_disconnected.
-> > > > > > > >> > >
-> > > > > > > >> > > > Thanks
-> > > > > > > >> > > > Best wishes
-> > > > > > > >> > > > Yunhan
-> > > > > > > >> > > > On Wed, Oct 24, 2018 at 5:42 PM yunhanw <yunhanw@goo=
-gle.com> wrote:
-> > > > > > > >> > > > >
-> > > > > > > >> > > > > When BLE disconnection happens, att_disconnect is =
-triggered from two locations, the new added location is gatt_server_cleanup=
-, it would cause several blueetoothd crashes. This bus is introduced from c=
-ommit 634f0a6e1125af8d5959bff119d9336a8d81c028, where gatt fix, gatt subscr=
-iptions are not cleared after disconnection from a temporary device with pr=
-ivate/random address. In order to workaround this issue, btd_gatt_database_=
-att_disconnected can only be triggered when address type is random, and for=
- others, it can continue to use original disconnect code path.
-> > > > > > > >> > > > >
-> > > > > > > >> > > > >     crash 1
-> > > > > > > >> > > > >     Program received signal SIGSEGV, Segmentation =
-fault.
-> > > > > > > >> > > > >     queue_remove (queue=3D0x30, data=3Ddata@entry=
-=3D0x555555872a40) at /repo/src/shared/queue.c:256
-> > > > > > > >> > > > >     256     for (entry =3D queue->head, prev =3D N=
-ULL; entry;
-> > > > > > > >> > > > >     (gdb) backtrace
-> > > > > > > >> > > > >         at /bluez/repo/src/gatt-database.c:350
-> > > > > > > >> > > > >         at bluez/repo/src/shared/queue.c:220
-> > > > > > > >> > > > >         at bluez/repo/src/shared/att.c:592
-> > > > > > > >> > > > >         at bluez/repo/src/shared/io-glib.c:170
-> > > > > > > >> > > > >
-> > > > > > > >> > > > >     crash 2
-> > > > > > > >> > > > >         at bluez/repo/src/shared/queue.c:220
-> > > > > > > >> > > > >         at bluez/repo/src/shared/att.c:592
-> > > > > > > >> > > > >         at bluez/repo/src/shared/io-glib.c:170
-> > > > > > > >> > > > >
-> > > > > > > >> > > > >     (gdb) print state->db->adapter
-> > > > > > > >> > > > >     Cannot access memory at address 0x61672f626972=
-7474
-> > > > > > > >> > > > > ---
-> > > > > > > >> > > > >  src/gatt-database.c | 2 ++
-> > > > > > > >> > > > >  1 file changed, 2 insertions(+)
-> > > > > > > >> > > > >
-> > > > > > > >> > > > > diff --git a/src/gatt-database.c b/src/gatt-databa=
-se.c
-> > > > > > > >> > > > > index 783b692d5..2f0eb83b5 100644
-> > > > > > > >> > > > > --- a/src/gatt-database.c
-> > > > > > > >> > > > > +++ b/src/gatt-database.c
-> > > > > > > >> > > > > @@ -3365,6 +3365,8 @@ void btd_gatt_database_att_d=
-isconnected(struct btd_gatt_database *database,
-> > > > > > > >> > > > >
-> > > > > > > >> > > > >         addr =3D device_get_address(device);
-> > > > > > > >> > > > >         type =3D btd_device_get_bdaddr_type(device=
-);
-> > > > > > > >> > > > > +    if (type !=3D BDADDR_LE_RANDOM)
-> > > > > > > >> > > > > +        return;
-> > > > > > > >> > > > >
-> > > > > > > >> > > > >         state =3D find_device_state(database, addr=
-, type);
-> > > > > > > >> > > > >         if (!state)
-> > > > > > > >> > > > > --
-> > > > > > > >> > > > > 2.19.1.568.g152ad8e336-goog
-> > > > > > > >> > > > >
-> > > > > > > >> > >
-> > > > > > > >> > >
-> > > > > > > >> > >
-> > > > > > > >> > > --
-> > > > > > > >> > > Luiz Augusto von Dentz
-> > > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > > --
-> > > > > > > Luiz Augusto von Dentz
-> > > > >
-> > > > >
-> > > > >
-> > > > > --
-> > > > > Luiz Augusto von Dentz
-> > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
-
-
-
---=20
-Luiz Augusto von Dentz
