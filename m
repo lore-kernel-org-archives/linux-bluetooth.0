@@ -2,65 +2,191 @@ Return-Path: <SRS0=39h9=NL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3873ECDE44
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Oct 2018 08:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E897C0044C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Oct 2018 13:36:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75AF32080A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Oct 2018 08:15:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75AF32080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
+	by mail.kernel.org (Postfix) with ESMTP id 5B08B2081B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Oct 2018 13:36:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Zlrl+gwL";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Dh+oyHKL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B08B2081B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727417AbeJaRMb (ORCPT
+        id S1729217AbeJaWez (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 Oct 2018 13:12:31 -0400
-Received: from smtp.nue.novell.com ([195.135.221.5]:59090 "EHLO
-        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726665AbeJaRMb (ORCPT
-        <rfc822;groupwise-linux-bluetooth@vger.kernel.org:0:0>);
-        Wed, 31 Oct 2018 13:12:31 -0400
-Received: from linux-vvou.apac.novell.com (unknown.telstraglobal.net [134.159.103.118])
-        by smtp.nue.novell.com with ESMTP (NOT encrypted); Wed, 31 Oct 2018 09:15:25 +0100
-From:   "Cho, Yu-Chen" <acho@suse.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     acho@suse.com, jlee@suse.com
-Subject: [PATCH 3/3 BlueZ] hcidump: Fix set_ext_ctrl() global buffer overflow
-Date:   Wed, 31 Oct 2018 16:15:08 +0800
-Message-Id: <20181031081508.25927-4-acho@suse.com>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20181031081508.25927-1-acho@suse.com>
-References: <20181031081508.25927-1-acho@suse.com>
+        Wed, 31 Oct 2018 18:34:55 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:34710 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728828AbeJaWez (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 31 Oct 2018 18:34:55 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 683F160767; Wed, 31 Oct 2018 13:36:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1540993010;
+        bh=7g7rWHaUbX4iK4y6RMA4SlsxAcUAB2QDnfDr4puMUas=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Zlrl+gwL4WEHd0dyClRCqTFXc5Ky7zKW1iJp2KNlUetGSgbmDtpBpifbFL36AgBAb
+         stwzXODOmHx+RhB/JsqLozVk8bnnXNtr5SAdIbEny3A3Dg8VuGWIRWYjWKWxZ+qeUn
+         S/hVPGo0AnLa81McL8f+aE0lG0EolIOS1EeUlQy0=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id 7698E602BD;
+        Wed, 31 Oct 2018 13:36:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1540993009;
+        bh=7g7rWHaUbX4iK4y6RMA4SlsxAcUAB2QDnfDr4puMUas=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Dh+oyHKLJFOsRSdKMz0Y3Mh+XU7VccL/lb2uVPDWpSmg0JGW2OZ3ssTEcUbmE8M4u
+         Si0aIBDMr0GPFJ/ZVF4q18UX1yA7ugtwn0XGuKrzUBSk4R3rfoOoEx6NkyK/ODIUfZ
+         dtRJ31p524B6EWnRTFjAopZDonXO/zcpzk+WfIi4=
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 31 Oct 2018 19:06:49 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Add helper to set device address.
+In-Reply-To: <20181026185314.GD22824@google.com>
+References: <20181026140450.13172-1-bgodavar@codeaurora.org>
+ <20181026185314.GD22824@google.com>
+Message-ID: <e2785ffd2c5c614ba92d170afef3ea3b@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix set_ext_ctrl() global buffer overflow.
+Hi Matthias,
 
-Signed-off-by: Cho, Yu-Chen <acho@suse.com>
----
- tools/parser/l2cap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 2018-10-27 00:23, Matthias Kaehlcke wrote:
+> On Fri, Oct 26, 2018 at 07:34:50PM +0530, Balakrishna Godavarthi wrote:
+>> This patch add qca_set_device_bdaddr() to set the device
+>> address for latest Qualcomm Bluetooth chipset wcn3990 and above.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>>  drivers/bluetooth/btqca.c   | 21 +++++++++++++++++++++
+>>  drivers/bluetooth/btqca.h   |  9 ++++++++-
+>>  drivers/bluetooth/hci_qca.c |  5 ++++-
+>>  3 files changed, 33 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>> index ec9e03a6b778..132dc6ceb174 100644
+>> --- a/drivers/bluetooth/btqca.c
+>> +++ b/drivers/bluetooth/btqca.c
+>> @@ -391,6 +391,27 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+>> baudrate,
+>>  }
+>>  EXPORT_SYMBOL_GPL(qca_uart_setup);
+>> 
+>> +int qca_set_device_bdaddr(struct hci_dev *hdev, const bdaddr_t 
+>> *bdaddr)
+> 
+> nit: just qca_set_bdaddr() ? That would be consistent with
+> qca_set_bdaddr_rome() and ->set_bdaddr().
+> 
 
-diff --git a/tools/parser/l2cap.c b/tools/parser/l2cap.c
-index a05796482..5daefcbaa 100644
---- a/tools/parser/l2cap.c
-+++ b/tools/parser/l2cap.c
-@@ -56,7 +56,7 @@ typedef struct {
- 	uint8_t mode;
- 	uint8_t ext_ctrl;
- } cid_info;
--#define CID_TABLE_SIZE 20
-+#define CID_TABLE_SIZE 32
- 
- static cid_info cid_table[2][CID_TABLE_SIZE];
- 
+[Bala]: will update.
+
+>> +{
+>> +	struct sk_buff *skb;
+>> +	u8 cmd[6];
+> 
+> nit: this doesn't really contain the command (which is
+> EDL_WRITE_BD_ADDR_OPCODE). Name it 'buf', 'ba' or similar?
+> 
+[Bala]: will update with ba.
+> re-nit: in the memcpy below 'sizeof(bdaddr_t)' is used, do the same in
+> the declaration?
+> 
+>> +	int err;
+>> +
+>> +	memcpy(cmd, bdaddr, sizeof(bdaddr_t));
+>> +	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, sizeof(cmd),
+>> +				cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
+>> +	if (IS_ERR(skb)) {
+>> +		err = PTR_ERR(skb);
+>> +		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
+>> +		return err;
+>> +	}
+>> +
+>> +	kfree_skb(skb);
+>> +
+>> +	return 0;
+>> +}
+>> +EXPORT_SYMBOL_GPL(qca_set_device_bdaddr);
+>> +
+>>  MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
+>>  MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver 
+>> " VERSION);
+>>  MODULE_VERSION(VERSION);
+>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>> index 0c01f375fe83..8771fc2b193d 100644
+>> --- a/drivers/bluetooth/btqca.h
+>> +++ b/drivers/bluetooth/btqca.h
+>> @@ -20,6 +20,7 @@
+>> 
+>>  #define EDL_PATCH_CMD_OPCODE		(0xFC00)
+>>  #define EDL_NVM_ACCESS_OPCODE		(0xFC0B)
+>> +#define EDL_WRITE_BD_ADDR_OPCODE	(0xFC14)
+>>  #define EDL_PATCH_CMD_LEN		(1)
+>>  #define EDL_PATCH_VER_REQ_CMD		(0x19)
+>>  #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+>> @@ -140,7 +141,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, 
+>> const bdaddr_t *bdaddr);
+>>  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>  		   enum qca_btsoc_type soc_type, u32 soc_ver);
+>>  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+>> -
+>> +int qca_set_device_bdaddr(struct hci_dev *hdev, const bdaddr_t 
+>> *bdaddr);
+>>  #else
+>> 
+>>  static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const 
+>> bdaddr_t *bdaddr)
+>> @@ -159,4 +160,10 @@ static inline int qca_read_soc_version(struct 
+>> hci_dev *hdev, u32 *soc_version)
+>>  	return -EOPNOTSUPP;
+>>  }
+>> 
+>> +static inline int qca_set_device_bdaddr(struct hci_dev *hdev,
+>> +					const bdaddr_t *bdaddr)
+>> +{
+>> +	return -EOPNOTSUPP;
+>> +}
+>> +
+>>  #endif
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index f036c8f98ea3..f18d9f5a7782 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -1241,7 +1241,10 @@ static int qca_setup(struct hci_uart *hu)
+>>  	}
+>> 
+>>  	/* Setup bdaddr */
+>> -	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+>> +	if (qcadev->btsoc_type == QCA_WCN3990)
+>> +		hu->hdev->set_bdaddr = qca_set_device_bdaddr;
+>> +	else
+>> +		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+>> 
+>>  	return ret;
+>>  }
+> 
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> Tested-by: Matthias Kaehlcke <mka@chromium.org>
+
 -- 
-2.19.1
-
+Regards
+Balakrishna.
