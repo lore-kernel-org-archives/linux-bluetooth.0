@@ -2,111 +2,166 @@ Return-Path: <SRS0=ihQD=NM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E87D8C0044C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 14:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60AD8C6786F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 14:34:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 984CB205F4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 14:27:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22E6B20820
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 14:34:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="raLz4GeQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 984CB205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Z83arXip";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Z83arXip"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22E6B20820
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728110AbeKAXan (ORCPT
+        id S1728753AbeKAXhf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Nov 2018 19:30:43 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:34759 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728089AbeKAXan (ORCPT
+        Thu, 1 Nov 2018 19:37:35 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:60288 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728016AbeKAXhf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Nov 2018 19:30:43 -0400
-Received: by mail-ot1-f66.google.com with SMTP id e9so16402450oti.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Nov 2018 07:27:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XWd75SP4Lo2E25HAB7Xb2517i6N34GevPDAIZdLF6bc=;
-        b=raLz4GeQKykpyM+6EobWhQJ3RuwTzLjfWBlCAU7q8s+W3bvzYtcE0ka5DEEYENq6bk
-         A5Nj6QfPWJqj28Sq85tkKqiKuzuO4z/Y/2jvXbV+8ve0d5gRuUP4Rbv3EJRm8jXuTQRO
-         YhpIulYfZdY3c+YzawnDRAuwqX7H5kya+FdthK4W3whS1CVqeww5lpZyb95Gza/ews3Y
-         +V7NhNLMvGpB/9XAI92G+R9TqEEny10bivSE1cfMbfTxqJP6s9oW841h7d+n4+qr12oe
-         WLeZ0QP2XYzyqguiszWukZkWno76NP/uTDfdrGmQ4OwfLcp88FW+aIgPmfiI0ML5Lc8s
-         pckA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XWd75SP4Lo2E25HAB7Xb2517i6N34GevPDAIZdLF6bc=;
-        b=iKERV3Ep5o/LmpsC9IFum4hITjhv6Qv/c6Rc1G4rfoAOtS3RIwqgyK5UZZySLgRKln
-         up2eBXZrXYrY9Xa4p285iv93bwYGbwCKS8TAk45RRUjCEr+C8KlEhWJSeJdtFdPMMPCy
-         H6vjU2pByToptkOE2qwssF8MxtL+aqFZ4VXe+/Zx+t7Uv1Fh7AvgPWt3+jzsKh6wbwbX
-         Huks20Rez9AF79LgEPW5SKDv/sWythWtIuSgC4ALhMWXfeMm9XiKJ2VJP6YKyWc5G3zP
-         PsQWgwo+XKlbUjcX93o+PLIGe2p4IQZTaz75nV/DB4c4/EkO0eHxHYYF8cegucDVwK/L
-         8WwA==
-X-Gm-Message-State: AGRZ1gKYXQ6CSU+ogrI7kt6m8Szgy8vgTytsAysCyEOC52M0z2yzpxQ+
-        EVBvlbP1m7PFG5GqOC7DRSkJWzA5oZ3P0sQGKgk=
-X-Google-Smtp-Source: AJdET5ePhgioPlVt7FBoKmR+S6eW7M8Dm/9QexWhLzvjAy9m0MNE1tSANFuEpGR/QFBjnbMUJweJ5JLC1NK0TIGGp90=
-X-Received: by 2002:a9d:7749:: with SMTP id t9mr4928544otl.342.1541082450531;
- Thu, 01 Nov 2018 07:27:30 -0700 (PDT)
+        Thu, 1 Nov 2018 19:37:35 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id EDE5860B19; Thu,  1 Nov 2018 14:34:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1541082860;
+        bh=e9A71YFGN4EAGGFIj6In4wnBi23/O8HU8avNM9NxrZ4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Z83arXipk8mmsJgadgC3D/F3XCnfEB/YS9bvg8HzNqFzVpqiKiIZjghr6dI5w1fgR
+         Q5jVfZa5Sy5bVTR0pXhsK19PIpJxfZ3bieDy8pw2Lhwv8nBI4jtcaEo02CBY87KEVh
+         iEvUZ7ouh22oKg+t0hgLTl588p6fSiimtypqR+5U=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id C268D60744;
+        Thu,  1 Nov 2018 14:34:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1541082860;
+        bh=e9A71YFGN4EAGGFIj6In4wnBi23/O8HU8avNM9NxrZ4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Z83arXipk8mmsJgadgC3D/F3XCnfEB/YS9bvg8HzNqFzVpqiKiIZjghr6dI5w1fgR
+         Q5jVfZa5Sy5bVTR0pXhsK19PIpJxfZ3bieDy8pw2Lhwv8nBI4jtcaEo02CBY87KEVh
+         iEvUZ7ouh22oKg+t0hgLTl588p6fSiimtypqR+5U=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org C268D60744
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [PATCH v2] Bluetooth: hci_qca: Add helper to set device address.
+Date:   Thu,  1 Nov 2018 20:04:10 +0530
+Message-Id: <20181101143410.31531-1-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-References: <CGME20181101075451epcms5p466176e62713906cef4d5aa41ef8cfc2e@epcms5p4>
- <20181101075451epcms5p466176e62713906cef4d5aa41ef8cfc2e@epcms5p4>
-In-Reply-To: <20181101075451epcms5p466176e62713906cef4d5aa41ef8cfc2e@epcms5p4>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 1 Nov 2018 16:27:19 +0200
-Message-ID: <CABBYNZ+f5nsJnqa85EBt2GDv2ZL-kE9pa5NsjuJEwjTnm=qdCA@mail.gmail.com>
-Subject: Re: Kernel interace for LE Set/Read PHY API's
-To:     Anupam Roy <anupam.r@samsung.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Anupam,
-On Thu, Nov 1, 2018 at 10:26 AM Anupam Roy <anupam.r@samsung.com> wrote:
->
-> Hi,
->  Is there is any plan or on-going work to support kernel interface for BT 5.0 PHY based HCI commands - 'LE Set PHY', 'LE Read PHY'?
-> Actually, we would want to have support for the above, such that PHY parameters can be updated\indicated from user space BlueZ for any particular connection.
-> As I see, currently there is no kernel interface via which application can change PHY or atleast request controller to change PHY (for a particular connection)
->
-> In order to support these via kernel interface, I think following could be possible approaches.
->  - via kernel's MGMT interface (I am not sure if this would be ideal approach to set PHY preferrence from user space)
->  - via L2CAP socket options (Bluez user space would be able to read\Set Preference for a particular connection handle)
->  - via kernel internal logic (Don't expose control to user space and handle Read/Set PHY internally inside kernel. Choose 2M always, irrespective of user's preference.
->        But, i am not sure, if this would conflict with different application's requirement for a particular PHY.
+This patch add qca_set_bdaddr() to set the device
+address for latest Qualcomm Bluetooth chipset wcn3990 and above.
 
-I think it might be better to have a QoS option per socket since it
-probably need to accessible at application level, that way the
-application can configure its preference which may or may not be
-attended in case there are more channels, for instance if app A
-request 1Mbit/s and app B request 2Mbit/s than we probably should go
-with 2Mbit/s but this is a policy that could probably go into the
-kernel directly. This could also be extended to connection parameters
-as well, in fact I think we would benefit more from starting with
-connection parameters and then add PHY field later on.
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+Tested-by: Matthias Kaehlcke <mka@chromium.org>
+---
+v2: addressed review comments
+v1: intial patch
+---
+ drivers/bluetooth/btqca.c   | 19 +++++++++++++++++++
+ drivers/bluetooth/btqca.h   |  8 +++++++-
+ drivers/bluetooth/hci_qca.c |  5 ++++-
+ 3 files changed, 30 insertions(+), 2 deletions(-)
 
-> Also please suggest if there is any other better way to support these?
->
-> Why we would require these support?:  Even though LE Set Default PHY can be used to indicate controller about preferrence/mix of certain PHY's, it will be applied (unless controller denies it based on Connection interval or other requirements)
-> for all subsequent connections and hence no per connection(application) control over PHY.
->
-> Please provide your suggestions/comments on how to go about with these!
-> Thank You very much!
->
-> BR,
-> -Anupam Roy
-
-
-
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index ec9e03a6b778..612268574fc7 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -391,6 +391,25 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ }
+ EXPORT_SYMBOL_GPL(qca_uart_setup);
+ 
++int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	struct sk_buff *skb;
++	int err;
++
++	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6, bdaddr,
++				HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
++		return err;
++	}
++
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(qca_set_bdaddr);
++
+ MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
+ MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 0c01f375fe83..c72c56ea7480 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -20,6 +20,7 @@
+ 
+ #define EDL_PATCH_CMD_OPCODE		(0xFC00)
+ #define EDL_NVM_ACCESS_OPCODE		(0xFC0B)
++#define EDL_WRITE_BD_ADDR_OPCODE	(0xFC14)
+ #define EDL_PATCH_CMD_LEN		(1)
+ #define EDL_PATCH_VER_REQ_CMD		(0x19)
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+@@ -140,7 +141,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		   enum qca_btsoc_type soc_type, u32 soc_ver);
+ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+-
++int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ #else
+ 
+ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+@@ -159,4 +160,9 @@ static inline int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	return -EOPNOTSUPP;
++}
++
+ #endif
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index f036c8f98ea3..53ac5ade532b 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1241,7 +1241,10 @@ static int qca_setup(struct hci_uart *hu)
+ 	}
+ 
+ 	/* Setup bdaddr */
+-	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
++	if (qcadev->btsoc_type == QCA_WCN3990)
++		hu->hdev->set_bdaddr = qca_set_bdaddr;
++	else
++		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+ 
+ 	return ret;
+ }
 -- 
-Luiz Augusto von Dentz
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
