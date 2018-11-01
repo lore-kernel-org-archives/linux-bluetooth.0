@@ -1,80 +1,44 @@
-Return-Path: <SRS0=39h9=NL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=W/WI=NM=linkscen.top=info5@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Level: *
+X-Spam-Status: No, score=1.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MIME_HTML_ONLY,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36DBDECDE44
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Oct 2018 14:49:41 +0000 (UTC)
-Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D043020664
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Oct 2018 14:49:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=logic8.org header.i=@logic8.org header.b="WlIqmD4y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D043020664
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=logic8.org
-Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729650AbeJaXr7 (ORCPT
-        <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 Oct 2018 19:47:59 -0400
-Received: from logic8.org ([94.156.174.12]:33736 "EHLO mail.logic8.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729570AbeJaXr7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 Oct 2018 19:47:59 -0400
-X-Greylist: delayed 575 seconds by postgrey-1.27 at vger.kernel.org; Wed, 31 Oct 2018 19:47:59 EDT
-To:     linux-bluetooth@vger.kernel.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=logic8.org; s=default;
-        t=1540996805; h=from:from:sender:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:in-reply-to:
-         references; bh=PZ6x+81dcnVO4Mu4WDPlO2NLbN0g/+V4eCOrO+sbLgA=;
-        b=WlIqmD4yBLn9EiyT+uFkX6ZbrbI0PE6yI1QR5P6N1hUuCIgyEGuKQJoqMIRnMcOX+CHGbN
-        9YTdXe7j1JWXrUSNsw3ZexNe02UxWulfjKFT3AVZik0xOCrPez9csN1xwwqSM0aFXF4wqq
-        fR0EYYPeZsIW08Zkhs4Qulfg0UFyYSk=
-From:   bluez@logic8.org
-Subject: Mesh network using multiple Raspberry Pis
-Message-ID: <df20f73a-2a5a-bbeb-7829-867fe9fc33c2@logic8.org>
-Date:   Wed, 31 Oct 2018 15:40:04 +0100
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B20EECDE46
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 01:32:07 +0000 (UTC)
+X-Greylist: delayed 625 seconds by postgrey-1.34 at mail.kernel.org; Thu, 01 Nov 2018 01:31:59 UTC
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03F8A204FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hikun.cn
+Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=info5@linkscen.top
+Received: from server1.osppcc.top (unknown [114.64.249.72])
+	by mail.kernel.org (Postfix) with ESMTP id 03F8A204FD
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 01:31:59 +0000 (UTC)
+Received: from DESKTOP-3THC5MT (183.17.124.172) by server1.osppcc.top id hr9bp60e97cr for <linux-bluetooth@archiver.kernel.org>; Thu, 1 Nov 2018 09:21:37 +0800 (envelope-from <info5@linkscen.top>)
+From: "Lisa Gao" <lisa@hikun.cn>
+Subject: Re:Re:chargers and adapters in European Market.
+To: linux-bluetooth@archiver.kernel.org
+Content-Type: text/html; charset=UTF-8
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=logic8.org;
-        s=default; t=1540996805;
-        h=from:from:sender:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:in-reply-to:
-         references; bh=PZ6x+81dcnVO4Mu4WDPlO2NLbN0g/+V4eCOrO+sbLgA=;
-        b=XjgHqwKPlWhw3XtnSGINMnWh8EaDbB+oBnCz+m2SA1GeVgxfNWGSP40tqVmMWHT1UwfW2I
-        Z5NRKm52/a0SrCGB5DTeSPmmp+iDMj0NzouHkJOZ7z+zrMlI5WGse5kxOCj69bKoRt32i1
-        9RvJ5zIluUlbUG8wyetwFAZqj/W/j+I=
-ARC-Seal: i=1; s=default; d=logic8.org; t=1540996805; a=rsa-sha256;
-        cv=none;
-        b=k3WD11nnIx/S8Qevvb57aMDnF3PJyX/6beuxh73mNLGdW+v+q0HOSN+m/uo44NKVkXeemIcVmSeAt5sZxjFqjbgWFvEsxXN9aUng4wvsCj3j5qpOC1Pe2Iddn/7C8ZEw5dDEiYSBXJCwYM5XEu6kkdOy0UsRueqMRePhOA03k4c=
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=catchall@logic8.org smtp.mailfrom=bluez@logic8.org
-Authentication-Results: ORIGINATING;
-        auth=pass smtp.auth=catchall@logic8.org smtp.mailfrom=bluez@logic8.org
-Sender: linux-bluetooth-owner@vger.kernel.org
-Precedence: bulk
-List-ID: <linux-bluetooth.vger.kernel.org>
-X-Mailing-List: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: base64
+Sender: info5@linkscen.top
+Reply-To: lisa@hikun.cn
+Date: Thu, 1 Nov 2018 09:21:31 +0800
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.3790.4913
+Content-Disposition: inline
+Message-Id: <20181101013159.03F8A204FD@mail.kernel.org>
+List-Id: <linux-bluetooth.vger.kernel.org>
 
-Hello,
-
-I want to set up a Bluetooth Mesh network with multiple Raspberry Pi 3 devices, using the on-board Bluetooth and meshctl. I have bluez 5.50 installed and running without errors, however I struggle with setting up the network.
-
-The problem that I face is that all available examples and documentation uses one Raspberry Pi with meshctl and one other device, usually some kind of development board (e.g. NRF52840). I have not found an example that uses meshctl to set up a mesh network using only Raspberry Pis.
-
-As a first step it would be desired that one board shows up on the other once discover-unprovisioned is enabled.
-
-Thank you for your help.
-
-Best regards,
-Laurenz
+PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMCBUcmFuc2l0aW9uYWwv
+L0VOIj4NCjxIVE1MPjxIRUFEPg0KPE1FVEEgbmFtZT1HRU5FUkFUT1IgY29udGVudD0iTVNIVE1M
+IDExLjAwLjEwNTcwLjEwMDEiPjwvSEVBRD4NCjxCT0RZPg0KPFA+PEZPTlQgZmFjZT1BcmlhbD5I
+aSBtYW5hZ2Vy77yMPC9GT05UPjxGT05UIGZhY2U9QXJpYWw+PEJSPk5pY2UmbmJzcDtkYXkhIDxC
+Uj5XZSBhcmUmbmJzcDtjaGFyZ2VycyBhbmQgYWRhcHRvcnMmbmJzcDtzdXBwbGllcixhbmQgd2Ug
+aGF2ZSByZXNlYXJjaGVkICZhbXA7IGRlc2lnbmVkIHNvbWUgbmV3IHByb2R1Y3RzLjwvRk9OVD48
+Rk9OVCBmYWNlPUFyaWFsPjxCUj5JZiB5b3UgYXJlIGludGVyZXN0ZWQgaW4sIEkgJ2xsIHNlbmQg
+eW91IG91ciBjYXRhbG9ndWUuJm5ic3A7PEJSPlRoYW5rcyBmb3IgeW91ciB2YWx1YWJsZSB0aW1l
+LiA8QlI+PEJSPlJlZ2FyZHMuPC9GT05UPiA8L1A+DQo8UD5MaXNhJm5ic3A7R2FvPC9QPg0KPFA+
+d3d3LmNucG93ZXJhZGFwdGVyLmNvbSA8L1A+PC9CT0RZPjwvSFRNTD4NCg==
