@@ -1,44 +1,82 @@
-Return-Path: <SRS0=W/WI=NM=linkscen.top=info5@kernel.org>
+Return-Path: <SRS0=ihQD=NM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,MIME_HTML_ONLY,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Level: 
+X-Spam-Status: No, score=-0.6 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B20EECDE46
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 01:32:07 +0000 (UTC)
-X-Greylist: delayed 625 seconds by postgrey-1.34 at mail.kernel.org; Thu, 01 Nov 2018 01:31:59 UTC
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03F8A204FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hikun.cn
-Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=info5@linkscen.top
-Received: from server1.osppcc.top (unknown [114.64.249.72])
-	by mail.kernel.org (Postfix) with ESMTP id 03F8A204FD
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 01:31:59 +0000 (UTC)
-Received: from DESKTOP-3THC5MT (183.17.124.172) by server1.osppcc.top id hr9bp60e97cr for <linux-bluetooth@archiver.kernel.org>; Thu, 1 Nov 2018 09:21:37 +0800 (envelope-from <info5@linkscen.top>)
-From: "Lisa Gao" <lisa@hikun.cn>
-Subject: Re:Re:chargers and adapters in European Market.
-To: linux-bluetooth@archiver.kernel.org
-Content-Type: text/html; charset=UTF-8
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B566C0044C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 02:44:09 +0000 (UTC)
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.kernel.org (Postfix) with ESMTP id A8B5E20821
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 02:44:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8B5E20821
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mail.zabtrans.ru
+Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1726023AbeKALpF (ORCPT
+        <rfc822;linux-bluetooth@archiver.kernel.org>);
+        Thu, 1 Nov 2018 07:45:05 -0400
+Received: from ns.zabtrans.ru ([195.39.228.131]:54078 "EHLO carat.zabtrans.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725978AbeKALpF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 1 Nov 2018 07:45:05 -0400
+Received: from proxy.zrw.oao.rzd (proxy.zabtrans.ru [195.39.228.154]) 
+        by carat.zabtrans.ru ASSAMail sm-mta  with ESMTPS id wA12hxcc031428
+        for <linux-bluetooth@vger.kernel.org>; Thu, 1 Nov 2018 11:44:04 +0900
+Received: from [10.123.236.115] ([10.123.236.115]) 
+        by proxy.zrw.oao.rzd ASSAMail sm-mta-lst  with ESMTP id wA12hwHC009017
+        for <linux-bluetooth@vger.kernel.org>; Thu, 1 Nov 2018 11:43:59 +0900
+From:   =?UTF-8?B?0J/RgNC+0LrQu9C+0LIg0JDQu9C10LrRgdCw0L3QtNGAINCS0LDQu9C10YA=?=
+         =?UTF-8?B?0YzQtdCy0LjRhw==?= <ProklovAV@mail.zabtrans.ru>
+Subject: Re: Serial communication over BT using the DBus API
+Reply-To: ProklovAV@mail.zabtrans.ru
+References: <5B7F662D.5010903@mail.zabtrans.ru>
+ <CABBYNZ+ee5BTR_gqjP3XJFMCfoSxGZNCVBuDA3mraS0hN5LkNg@mail.gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <5BDA76AF.1050202@mail.zabtrans.ru>
+Date:   Thu, 1 Nov 2018 11:44:47 +0800
+User-Agent: Microsoft Outlook Express 6.00.2900.5931
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
-Sender: info5@linkscen.top
-Reply-To: lisa@hikun.cn
-Date: Thu, 1 Nov 2018 09:21:31 +0800
-X-Priority: 3
-X-MSMail-Priority: Normal
-X-MimeOLE: Produced By Microsoft MimeOLE V6.00.3790.4913
-Content-Disposition: inline
-Message-Id: <20181101013159.03F8A204FD@mail.kernel.org>
-List-Id: <linux-bluetooth.vger.kernel.org>
+In-Reply-To: <CABBYNZ+ee5BTR_gqjP3XJFMCfoSxGZNCVBuDA3mraS0hN5LkNg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-KLMS-Rule-ID: 7
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, 2018/10/31 12:54:24
+X-KLMS-AntiVirus: Kaspersky Security 8.0 for Linux Mail Server, version 8.0.1.705, bases: 2018/10/31 19:15:00 #8918321; khse: 2014-01-23 rollback
+X-KLMS-AntiVirus-Status: Clean, skipped
+Sender: linux-bluetooth-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-bluetooth.vger.kernel.org>
+X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMCBUcmFuc2l0aW9uYWwv
-L0VOIj4NCjxIVE1MPjxIRUFEPg0KPE1FVEEgbmFtZT1HRU5FUkFUT1IgY29udGVudD0iTVNIVE1M
-IDExLjAwLjEwNTcwLjEwMDEiPjwvSEVBRD4NCjxCT0RZPg0KPFA+PEZPTlQgZmFjZT1BcmlhbD5I
-aSBtYW5hZ2Vy77yMPC9GT05UPjxGT05UIGZhY2U9QXJpYWw+PEJSPk5pY2UmbmJzcDtkYXkhIDxC
-Uj5XZSBhcmUmbmJzcDtjaGFyZ2VycyBhbmQgYWRhcHRvcnMmbmJzcDtzdXBwbGllcixhbmQgd2Ug
-aGF2ZSByZXNlYXJjaGVkICZhbXA7IGRlc2lnbmVkIHNvbWUgbmV3IHByb2R1Y3RzLjwvRk9OVD48
-Rk9OVCBmYWNlPUFyaWFsPjxCUj5JZiB5b3UgYXJlIGludGVyZXN0ZWQgaW4sIEkgJ2xsIHNlbmQg
-eW91IG91ciBjYXRhbG9ndWUuJm5ic3A7PEJSPlRoYW5rcyBmb3IgeW91ciB2YWx1YWJsZSB0aW1l
-LiA8QlI+PEJSPlJlZ2FyZHMuPC9GT05UPiA8L1A+DQo8UD5MaXNhJm5ic3A7R2FvPC9QPg0KPFA+
-d3d3LmNucG93ZXJhZGFwdGVyLmNvbSA8L1A+PC9CT0RZPjwvSFRNTD4NCg==
+Hi Sylvain Leroux,
+
+Some time ago I also asked this question here.
+I think no one knows how to do it without rfcomm util.
+
+I use dbus-send for read dbus properties and now work non-interactive 
+mode bluetoothctl.
+
+
+
+> I tried something like that:
+>
+>
+> ----
+> busctl call \
+>     org.bluez /org/bluez org.bluez.ProfileManager1 RegisterProfile \
+>     'osa{sv}' \
+>     /bluez \
+>     "00001101-0000-1000-8000-00805f9b34fb" \
+>     3 'Role' s server 'Channel' u 1 Name s 'SerialPort'
+> ----
+
+
+-----------
+Best regards,
+Aleksandr Proklov
