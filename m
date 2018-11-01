@@ -7,63 +7,70 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9250EC0044C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 14:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CBAC6786F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 14:17:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E4692064C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 14:17:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DDF02064C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Nov 2018 14:17:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f4Tvn2/f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E4692064C
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sX0TxsER"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DDF02064C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728626AbeKAXUz (ORCPT
+        id S1728632AbeKAXU5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Nov 2018 19:20:55 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:38761 "EHLO
+        Thu, 1 Nov 2018 19:20:57 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:44311 "EHLO
         mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728562AbeKAXUz (ORCPT
+        with ESMTP id S1728627AbeKAXU5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Nov 2018 19:20:55 -0400
-Received: by mail-ed1-f66.google.com with SMTP id c1-v6so16680546ede.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Nov 2018 07:17:45 -0700 (PDT)
+        Thu, 1 Nov 2018 19:20:57 -0400
+Received: by mail-ed1-f66.google.com with SMTP id n19-v6so5704354edq.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Nov 2018 07:17:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=BMoJdJBlS0/Tyeck7eg5vs6zf6QBGuUM6CwU44UfYcQ=;
-        b=f4Tvn2/fWDO/5uhpqwOed82xVw4QF837pELuvvN79PTqX56lR1DfiUVc1fFtcDNNxz
-         SIROuCZ4YmQU5QqvY+NKKql3LdYIyjrO3o35f9JLdaZwyBfotaANuKU/cmMnmxL1hxyf
-         DATxhnX8d2q1fhy7uQG2RlxbXmdGS6ZGav1KXpHnoy6erH86S3jp0SqWxjKbllAS8zXT
-         dlgNWqGs8l+JX/EtO0FQjJSTpzCUWG2wgepUZI2qzvIzf3Mg/fWSfIefoqPHFYOdJg/g
-         mP+x94DWOkSOkP+qJhFAWOTM9IkoCzEfsYUrglvGrcQWdrcYX6U/+yVqI/m2Dh4+t6W6
-         d5wg==
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=3TtYVsOvX91E45dtR/rlfhVJqaP8hvwZZwjnFW9KXsw=;
+        b=sX0TxsERjDPfz9AIePBhe8Vex4ongkI8bl9uWa5r9YCeurk00VgZKx/opKFm0CADzR
+         CUe5woFfVJ/RP8UgzqR1pFCEb7/HzdpzqkZJlbeA0i21wBDxIBW1i4zCSJq5gIKTji5f
+         xfblA/zOh5wbfEjMQkqgiOGShMP01lcU7juIRMYwRdZuEHCuL67Anr188tAffzSLSCUb
+         zBXIhSkoFBbJhJDHwPbqU7EAMmfEp7mKBKEWD3fVzs2AHvGjIVPa6bHX2kPBLeaHb1Ex
+         eH9Z/A9mJulSitaWn7hJHY4lZuarhmyhS8Qix8ZZgRLD3p9LzdHZlImBI7DWKnKqCyE6
+         plLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=BMoJdJBlS0/Tyeck7eg5vs6zf6QBGuUM6CwU44UfYcQ=;
-        b=rcfa1c3LWqBXzb19HGSBM3j1shFGDBjEosjJj6iVPeBgzCXhdSE0vFc3TZpvgZTCTa
-         9YLR+sdBdQsysxve3Qjj0pGyPBFMz+D4YSfRAANMZxLgl3nyi9YVZALWKFGAV4WVIcmN
-         lhFl+DaDq24ytes40afGNLN+7ljf64OoZ3YoXI49RvDYF0lUwF+9ZSvudh5BZWZVWvwQ
-         MiWYkgGjv6E5LE3Vado3v+/WlWCVOpkn9p0S2DUWHnFxGfctfefSHsr1Lrnwf6vsGiL4
-         agCbCjS8YqN0RE3U4p+/T6475CEtHpdYbapRZesRB7Vw0x+fvHqr/0cn5qipC/w22ZpA
-         84/Q==
-X-Gm-Message-State: AGRZ1gLzPnTPg4qWbPfbbslq+NHe/quJDfmK8owA/vS8/3Xyyv7HTtj1
-        j56hHZ6KPN8fj9XIQgjB8T63SJrE
-X-Google-Smtp-Source: AJdET5cKMMp6pn+bNWU3ujg5MuAkqJbP+nsj1F74ikRQy9zW1aFBO51ou1jCvjXaAY180Qw/EGXPiw==
-X-Received: by 2002:aa7:d9cf:: with SMTP id v15-v6mr5209226eds.25.1541081864437;
-        Thu, 01 Nov 2018 07:17:44 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=3TtYVsOvX91E45dtR/rlfhVJqaP8hvwZZwjnFW9KXsw=;
+        b=lHHt7e8Ges80TGTaEdsrv12xDouvEy9fznRTGTPiGU8PRNdUI1gvZWB3Ss0YcbhFxy
+         PhEqxzQ8MItfRkOOMhj2Jz2b2nJONS04Lrl4BUrAuEcsqtCU1o/jlN9QQsjOFcGeknQ5
+         wxc4IqRZTiTeNeectYrv1qcb4uYUFjY/LBlENfzXKGdW64I2YEaaFYi/EpQ/zLl5MVK1
+         W/lNIZ87kCFvpAPlGAOXJBmcEpT1O128RHyTuVK9hgHkyBHtfHEo5Allzv1gJwKAlMcy
+         3W0KSOp+vkjy/i+DgL3MOp7WbrYn7rZNlsYKsffUg+m2eviUXtcn50lkqY8wt0Zuz3uw
+         dc4A==
+X-Gm-Message-State: AGRZ1gLNeXXHEl7acm0otcI0+fTmy3hwjsC6fzMMTEQfAE5xOLsasl7S
+        1iGAh9ws1EyUg49NXHwtNk7746LV
+X-Google-Smtp-Source: AJdET5fvd5YPBO9jN4PUkY7H6151rFiyHf6JnVsuj+B7l/SOxKB/3zV3gCNfv8dpVV30UPGK2NMZ1g==
+X-Received: by 2002:a50:b2e1:: with SMTP id p88-v6mr5192291edd.155.1541081866515;
+        Thu, 01 Nov 2018 07:17:46 -0700 (PDT)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id g15-v6sm5452219ejj.67.2018.11.01.07.17.43
+        by smtp.gmail.com with ESMTPSA id g15-v6sm5452219ejj.67.2018.11.01.07.17.45
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 01 Nov 2018 07:17:43 -0700 (PDT)
+        Thu, 01 Nov 2018 07:17:46 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] monitor: Decode error response
-Date:   Thu,  1 Nov 2018 16:17:38 +0200
-Message-Id: <20181101141741.11449-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] sdp: Fix buffer overflow
+Date:   Thu,  1 Nov 2018 16:17:40 +0200
+Message-Id: <20181101141741.11449-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
+In-Reply-To: <20181101141741.11449-1-luiz.dentz@gmail.com>
+References: <20181101141741.11449-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -71,54 +78,33 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds decoding for the error code in the error response:
+sdp_append_buf shall check if there is enough space to store the data
+before copying it.
 
-> test-sdp: User Data RX
-      Channel: 0 len 7 [PSM 1 mode 0] {chan 0}
-      SDP: Error Response (0x01) tid 2 len 2
-        Error code: Invalid Continuation State (0x0005)
+An independent security researcher, Julian Rauchberger, has reported
+this vulnerability to Beyond Security’s SecuriTeam Secure Disclosure
+program.
 ---
- monitor/sdp.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ lib/sdp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/monitor/sdp.c b/monitor/sdp.c
-index 36708f426..1df26a0ca 100644
---- a/monitor/sdp.c
-+++ b/monitor/sdp.c
-@@ -532,6 +532,24 @@ static uint16_t common_rsp(const struct l2cap_frame *frame,
- 	return bytes;
- }
- 
-+static const char *error_str(uint16_t code)
-+{
-+	switch (code) {
-+	case 0x0001:
-+		return "Invalid Version";
-+	case 0x0002:
-+		return "Invalid Record Handle";
-+	case 0x0003:
-+		return "Invalid Syntax";
-+	case 0x0004:
-+		return "Invalid PDU Size";
-+	case 0x0005:
-+		return "Invalid Continuation State";
-+	default:
-+		return "Unknown";
-+	}
-+}
+diff --git a/lib/sdp.c b/lib/sdp.c
+index eb408a948..84311eda1 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -2834,6 +2834,12 @@ void sdp_append_to_buf(sdp_buf_t *dst, uint8_t *data, uint32_t len)
+ 	SDPDBG("Append src size: %d", len);
+ 	SDPDBG("Append dst size: %d", dst->data_size);
+ 	SDPDBG("Dst buffer size: %d", dst->buf_size);
 +
- static void error_rsp(const struct l2cap_frame *frame, struct tid_data *tid)
- {
- 	uint16_t error;
-@@ -546,7 +564,7 @@ static void error_rsp(const struct l2cap_frame *frame, struct tid_data *tid)
- 
- 	error = get_be16(frame->data);
- 
--	print_field("Error code: 0x%2.2x", error);
-+	print_field("Error code: %s (0x%4.4x)", error_str(error), error);
- }
- 
- static void service_req(const struct l2cap_frame *frame, struct tid_data *tid)
++	if (dst->data_size + len > dst->buf_size) {
++		SDPERR("Cannot append");
++		return;
++	}
++
+ 	if (dst->data_size == 0 && dtd == 0) {
+ 		/* create initial sequence */
+ 		*p = SDP_SEQ8;
 -- 
 2.17.2
 
