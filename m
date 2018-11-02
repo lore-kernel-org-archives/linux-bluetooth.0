@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 727E0C65C22
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Nov 2018 11:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42FCCC65C22
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Nov 2018 11:12:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 382A320657
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Nov 2018 11:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00DC220657
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Nov 2018 11:12:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cs22uzup"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 382A320657
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N8yL7fgc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00DC220657
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726377AbeKBUS4 (ORCPT
+        id S1726381AbeKBUTO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Nov 2018 16:18:56 -0400
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:41483 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725935AbeKBUS4 (ORCPT
+        Fri, 2 Nov 2018 16:19:14 -0400
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:40336 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725935AbeKBUTO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Nov 2018 16:18:56 -0400
-Received: by mail-ot1-f66.google.com with SMTP id c32so1338264otb.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Nov 2018 04:12:08 -0700 (PDT)
+        Fri, 2 Nov 2018 16:19:14 -0400
+Received: by mail-oi1-f195.google.com with SMTP id u130-v6so1262161oie.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Nov 2018 04:12:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kjISakEAgDGBrXMaj3dRnC6zNM87Io2tOczcayFWRDk=;
-        b=cs22uzupVwHxrAhCIOxs+X0pVIGRjDEuTnJ5bO9Qc2VV48c3ou3D88z0gkUoOdGTgi
-         hYk8NzM1YutDABogpE0DZhwR4uXavmJ1vDQn5O33aOZyNEX6unkbZZCVrbKGHwSkAwqU
-         AA87ALUsPFgGuppVBUSeKYEOFAIeiHL2A9EX72PBQZ0aSOskvaN/ajEJSUE6fIu38Oks
-         YUJPQrUMCJE4XupWaN/0hk1midY0aYc5oRs9NshrqQu6Ag3R8vi2pT6kfy+0gDysH4Wl
-         QLHxmtupv4bYR4jdPEMcshLOiixXjb8Gad32IO6b2FkWZwKeodHnGz3sVQN+lOW5Idms
-         EfdA==
+        bh=fWHNp20dNsNQGtnISjbyyetIM9tcX690l0qKgdk5mC0=;
+        b=N8yL7fgcLMd19FP+0cAJZfMDYZvJzi0Pp8hUFe4M37g2HObhiuIxSOPUaLG0Tx8QQy
+         YvjJ+DOz9ezrmMRgB1arXXykdP478VBKivPhsaR01eqZq0uHtrTI9MuRzkXTixLIFd0s
+         G9jlLgjG84lmcy1thPXxx7D9KJJ4RiSZxMpz1rCabqoLLMc1XB64Muu5bz4+98aVJ1ZT
+         redEi9xu/IYqxBDfOFIADMZMHdRj2IkxsFLPWXYkgx5GdTMjeRjGlqmakmA1MVpAE3Nv
+         gZv2dC4lm6xvN2OVHXat5TwNsimvR2fdp8Jbj0L8CfeFQjrmCvdyQwqeOKBEK3DUoBu+
+         z24g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kjISakEAgDGBrXMaj3dRnC6zNM87Io2tOczcayFWRDk=;
-        b=qavoGeo5XL9G0cn3ePJH99qlaN/pWVB+XwmXaVo3IhreuKY+PRCuj7/wAMjBihF2dV
-         x8dxqbq6dclUW/kMSbeLtNkEFmqVHNpNo2cYLKspAVg+F7BWEccimWy8jCxjfMJmq1mI
-         lXY3TlImEisHlxt7A+jZsfNeW2baMskoFNPJYQtMEt2dvfmtl0pCdGVfVODvDie5dyBs
-         9rBp6S6Ho7DqOfkySl+/DCzpJgNQ3KF+jhWoZSyRF9OEiwYxfamWu1xcUNq02W4xK6ca
-         DCfM6AuPDI14KXasf4p/PAS+TmAFf3t8+fQ3OkgEpTdnP6IJVM3baBGJICh4iYohAyG/
-         Odqg==
-X-Gm-Message-State: AGRZ1gLriWH04eMlFlf4eZN8SfLXzIMa5US1XenZg4pEnFncI/lY3ZjJ
-        nrBjl5zpBor64EihMPdbAG1oUMEy3hCrPpYxcvg=
-X-Google-Smtp-Source: AJdET5fWvbQtimCr24xW7vSS/WSFxSuWzfVgCSn1Bq7E54hJFyEwr1QyxcA1LCMdy51+BlcThRaCfrXe/EdHD+eo9zg=
-X-Received: by 2002:a9d:4a22:: with SMTP id h31mr6511544otf.254.1541157128340;
- Fri, 02 Nov 2018 04:12:08 -0700 (PDT)
+        bh=fWHNp20dNsNQGtnISjbyyetIM9tcX690l0qKgdk5mC0=;
+        b=CaBJKnqDpJlrAhG5IbvmayvUWikSzsDcq29PAvmO5X1U4RrXhl5KTE7KgA1TxXbtG3
+         HYRtxvAGHI95NALOCd3XrLIYBOBdfYcyAVgHPFz/cTyf8iB3nsDG5Nrbmrx6ElW91n9n
+         DAuXcvi4MScdhUYOZQhrfdwSag64X8J/oxD+uBE7dAiWGwWjMUOBbuAvQAcR1fkbBs7r
+         +EDQf0mg/sZEu7VJOxkq3eFMmTQomM9JOj1Dtx6vTKVO9JHznwaoLa5ePHEXGfnwjXpX
+         db/gAnCFPhkeIcD9gvqkSPeY3x7cOGaAT0cGDGqiP8P8FFqvvJSVEWZEB5jqPFQ+Csrx
+         F5Bw==
+X-Gm-Message-State: AGRZ1gKTxuKxD09nnf2pw52js8RKveQ0qwJm98Mhrhs8TEjoIAPREgTM
+        sa/1J+TLyQ9WHQXQFGpQ4oS3In9S5xAcWmtTbYg=
+X-Google-Smtp-Source: AJdET5dOsc6ZFPjE09VLgVXykNnHzngnO2bztIu2BUiDSxE1F1JktSEVKQTyWjV/CBFtODdOpq5tLz84RE5kAK7ttP0=
+X-Received: by 2002:aca:bb54:: with SMTP id l81-v6mr5971622oif.153.1541157146624;
+ Fri, 02 Nov 2018 04:12:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20181031081508.25927-1-acho@suse.com> <20181031081508.25927-3-acho@suse.com>
-In-Reply-To: <20181031081508.25927-3-acho@suse.com>
+References: <20181031081508.25927-1-acho@suse.com> <20181031081508.25927-4-acho@suse.com>
+In-Reply-To: <20181031081508.25927-4-acho@suse.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 2 Nov 2018 13:11:56 +0200
-Message-ID: <CABBYNZLVcAnnuPmr7YbWAnifMCa+Q8RW=jPh0sXHn9WC7ekk-w@mail.gmail.com>
-Subject: Re: [PATCH 2/3 BlueZ] hcidump:fixed hci frame dump stack-buffer-overflow
+Date:   Fri, 2 Nov 2018 13:12:15 +0200
+Message-ID: <CABBYNZL+1aGZtxAW+uOErYaAs=EhxZTCUd-L4V-C46ovsBW9BA@mail.gmail.com>
+Subject: Re: [PATCH 3/3 BlueZ] hcidump: Fix set_ext_ctrl() global buffer overflow
 To:     "Cho, Yu-Chen" <acho@suse.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         jlee@suse.com
@@ -72,34 +72,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
-On Wed, Oct 31, 2018 at 10:39 AM Cho, Yu-Chen <acho@suse.com> wrote:
+On Wed, Oct 31, 2018 at 10:38 AM Cho, Yu-Chen <acho@suse.com> wrote:
 >
-> hci_dump() didn't check the length of frame, and it would be
-> a stack-buffer-overflow error.
+> Fix set_ext_ctrl() global buffer overflow.
 >
 > Signed-off-by: Cho, Yu-Chen <acho@suse.com>
 > ---
->  tools/parser/hci.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  tools/parser/l2cap.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/tools/parser/hci.c b/tools/parser/hci.c
-> index 8c7bd2581..4e6c36040 100644
-> --- a/tools/parser/hci.c
-> +++ b/tools/parser/hci.c
-> @@ -4107,6 +4107,9 @@ void hci_dump(int level, struct frame *frm)
+> diff --git a/tools/parser/l2cap.c b/tools/parser/l2cap.c
+> index a05796482..5daefcbaa 100644
+> --- a/tools/parser/l2cap.c
+> +++ b/tools/parser/l2cap.c
+> @@ -56,7 +56,7 @@ typedef struct {
+>         uint8_t mode;
+>         uint8_t ext_ctrl;
+>  } cid_info;
+> -#define CID_TABLE_SIZE 20
+> +#define CID_TABLE_SIZE 32
 >
->         frm->ptr++; frm->len--;
+>  static cid_info cid_table[2][CID_TABLE_SIZE];
 >
-> +       if (frm->len == 0)
-> +               return;
-> +
->         switch (type) {
->         case HCI_COMMAND_PKT:
->                 command_dump(level, frm);
 > --
 > 2.19.1
 
-Applied.
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
