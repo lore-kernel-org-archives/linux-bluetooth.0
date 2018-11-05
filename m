@@ -2,111 +2,84 @@ Return-Path: <SRS0=YgmP=NQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80350C46475
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Nov 2018 17:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5261C0044C
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Nov 2018 20:31:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EC4D20883
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Nov 2018 17:57:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EC4D20883
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 78C3F20827
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Nov 2018 20:31:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=logic8.org header.i=@logic8.org header.b="YEeKUCgE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C3F20827
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=logic8.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387791AbeKFDSJ (ORCPT
+        id S1726976AbeKFFw3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Nov 2018 22:18:09 -0500
-Received: from mga04.intel.com ([192.55.52.120]:9767 "EHLO mga04.intel.com"
+        Tue, 6 Nov 2018 00:52:29 -0500
+Received: from logic8.org ([94.156.174.12]:41814 "EHLO mail.logic8.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387687AbeKFDSJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Nov 2018 22:18:09 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Nov 2018 09:54:20 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.54,468,1534834800"; 
-   d="scan'208";a="83504698"
-Received: from stinkbox.fi.intel.com (HELO stinkbox) ([10.237.72.174])
-  by fmsmga007.fm.intel.com with SMTP; 05 Nov 2018 09:54:17 -0800
-Received: by stinkbox (sSMTP sendmail emulation); Mon, 05 Nov 2018 19:54:16 +0200
-Date:   Mon, 5 Nov 2018 19:54:16 +0200
-From:   Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>
+        id S1725910AbeKFFw3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 6 Nov 2018 00:52:29 -0500
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Kay Sievers <kay.sievers@vrfy.org>,
-        Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] hid2hci: Fix udev rules for linux-4.14+
-Message-ID: <20181105175416.GO9144@intel.com>
-References: <20180507130638.3516-1-ville.syrjala@linux.intel.com>
- <20180620164240.6535-1-ville.syrjala@linux.intel.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=logic8.org; s=default;
+        t=1541449862; h=from:from:sender:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:in-reply-to:
+         references; bh=ammuDzFrPpY/Mm7AERNNO1UXF/oj34bCA6oLin3zMl8=;
+        b=YEeKUCgEIr9M2/im0D3BkC5o1ngPRpAM2T4+MGzqApoCFHfhQV6+28SEPJivoO/qkcwMu/
+        pBHgg061CttV3gjU/IcJZEHAeNIGVjDi3yjmTUUFF/QBFH65NQECZJ7rURh25SSH7GotkH
+        b5XeqFcpu8FfTiw3Ppo3VbOcvYZnk+M=
+From:   bluez@logic8.org
+Subject: [PATCH] mesh: Fix check for MAX_APP_KEYS
+Message-ID: <0672e88c-227e-aad4-48a0-ae482a92a970@logic8.org>
+Date:   Mon, 5 Nov 2018 21:29:53 +0100
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20180620164240.6535-1-ville.syrjala@linux.intel.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=logic8.org;
+        s=default; t=1541449862;
+        h=from:from:sender:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:in-reply-to:
+         references; bh=ammuDzFrPpY/Mm7AERNNO1UXF/oj34bCA6oLin3zMl8=;
+        b=VG64jGmlTe81zZkRk2BM8n5rYzgP2x/Cb1p/5um8LQYz3yX7l0kP0mWsoSKS+1YDVi2qea
+        pRJ1DV1Y9B/XX570Fm0ubLOOyL2+GhVK5QB5lBx+IuUWFi417tgzN96KYJ4aOKvXWYaU1z
+        F9Ln1+4l3t/vfnXuIUHwE8AIh8QXrGA=
+ARC-Seal: i=1; s=default; d=logic8.org; t=1541449862; a=rsa-sha256;
+        cv=none;
+        b=O/xX18YtIrxiG9yBMU4wcbA64bd17DNHJls1Lr+0BZzbl84z04H+YwKEEfsOy6mvhWF2KKJ4pS0U5nkOQj2cTyVVAz5P6QGgKmgP0SIwSArDvzPZLj7ByqOX9JTufbbuO5f9CP4Jcp9ZtgII/UVkZilEHWvBXebN6xLWNnFVH9k=
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=catchall@logic8.org smtp.mailfrom=bluez@logic8.org
+Authentication-Results: ORIGINATING;
+        auth=pass smtp.auth=catchall@logic8.org smtp.mailfrom=bluez@logic8.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jun 20, 2018 at 07:42:40PM +0300, Ville Syrjala wrote:
-> From: Ville Syrjälä <ville.syrjala@linux.intel.com>
-> 
-> Since commit 1455cf8dbfd0 ("driver core: emit uevents when
-> device is bound to a driver") the kernel started emitting
-> "bind" and "unbind" uevents which confuse the hid2hci
-> udev rules.
-> 
-> The symptoms on an affected machine (Dell E5400 in my case)
-> include bluetooth devices not appearing and udev hogging
-> the cpu as it's busy processing a constant stream of these
-> "bind"+"unbind" uevents.
-> 
-> Change the udev rules not do anything except for "add" and
-> "change" events. This seems to cure my machine at least.
-> 
-> v2: Don't mess up "change" (Zbyszek)
->     Fix up the commit message a bit
+appkey_key_add() checks if the number of known appkeys is smaller or equal than MAX_APP_KEYS, but it should check if it is equal or larger than MAX_APP_KEYS.
+---
+ mesh/appkey.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ping. Can someone push this?
-
-> 
-> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Kay Sievers <kay.sievers@vrfy.org>
-> Cc: Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl>
-> Cc: systemd-devel@lists.freedesktop.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-bluetooth@vger.kernel.org
-> Signed-off-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
-> ---
->  tools/hid2hci.rules | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/hid2hci.rules b/tools/hid2hci.rules
-> index db6bb03d2ef3..5c7208af7a02 100644
-> --- a/tools/hid2hci.rules
-> +++ b/tools/hid2hci.rules
-> @@ -1,6 +1,6 @@
->  # do not edit this file, it will be overwritten on update
->  
-> -ACTION=="remove", GOTO="hid2hci_end"
-> +ACTION!="add|change", GOTO="hid2hci_end"
->  SUBSYSTEM!="usb*", GOTO="hid2hci_end"
->  
->  # Variety of Dell Bluetooth devices - match on a mouse device that is
-> -- 
-> 2.16.4
-
--- 
-Ville Syrjälä
-Intel
+diff --git a/mesh/appkey.c b/mesh/appkey.c
+index 2ddb1eb..7578118 100644
+--- a/mesh/appkey.c
++++ b/mesh/appkey.c
+@@ -398,7 +398,7 @@ int appkey_key_add(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
+        }
+ 
+        if (!key) {
+-               if (l_queue_length(app_keys) <= MAX_APP_KEYS)
++               if (l_queue_length(app_keys) >= MAX_APP_KEYS)
+                        return MESH_STATUS_INSUFF_RESOURCES;
+ 
+                key = app_key_new();
