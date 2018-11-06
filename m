@@ -1,85 +1,154 @@
-Return-Path: <SRS0=YgmP=NQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=bD4U=NR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5261C0044C
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Nov 2018 20:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 708E1C46464
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 06:57:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78C3F20827
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Nov 2018 20:31:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=logic8.org header.i=@logic8.org header.b="YEeKUCgE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78C3F20827
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=logic8.org
+	by mail.kernel.org (Postfix) with ESMTP id 4513020827
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 06:57:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4513020827
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726976AbeKFFw3 (ORCPT
+        id S2387568AbeKFQVW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Nov 2018 00:52:29 -0500
-Received: from logic8.org ([94.156.174.12]:41814 "EHLO mail.logic8.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725910AbeKFFw3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Nov 2018 00:52:29 -0500
-To:     linux-bluetooth@vger.kernel.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=logic8.org; s=default;
-        t=1541449862; h=from:from:sender:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:in-reply-to:
-         references; bh=ammuDzFrPpY/Mm7AERNNO1UXF/oj34bCA6oLin3zMl8=;
-        b=YEeKUCgEIr9M2/im0D3BkC5o1ngPRpAM2T4+MGzqApoCFHfhQV6+28SEPJivoO/qkcwMu/
-        pBHgg061CttV3gjU/IcJZEHAeNIGVjDi3yjmTUUFF/QBFH65NQECZJ7rURh25SSH7GotkH
-        b5XeqFcpu8FfTiw3Ppo3VbOcvYZnk+M=
-From:   bluez@logic8.org
-Subject: [PATCH] mesh: Fix check for MAX_APP_KEYS
-Message-ID: <0672e88c-227e-aad4-48a0-ae482a92a970@logic8.org>
-Date:   Mon, 5 Nov 2018 21:29:53 +0100
+        Tue, 6 Nov 2018 11:21:22 -0500
+Received: from smtp.nue.novell.com ([195.135.221.5]:35102 "EHLO
+        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387566AbeKFQVW (ORCPT
+        <rfc822;groupwise-linux-bluetooth@vger.kernel.org:0:0>);
+        Tue, 6 Nov 2018 11:21:22 -0500
+Received: from linux-vvou.apac.novell.com (unknown.telstraglobal.net [134.159.103.118])
+        by smtp.nue.novell.com with ESMTP (NOT encrypted); Tue, 06 Nov 2018 07:57:33 +0100
+From:   "Cho, Yu-Chen" <acho@suse.com>
+To:     luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, acho@suse.com, jlee@suse.com
+Subject: [PATCH 1/3 BlueZ] hcidump: fixed AMP Assoc dump heap-over-flow
+Date:   Tue,  6 Nov 2018 14:57:24 +0800
+Message-Id: <20181106065724.26107-1-acho@suse.com>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <CABBYNZKNiqLDAnV0hB0tZ_=fCr6RK8Q7Wyn3UTWk=PXSREMupg@mail.gmail.com>
+References: <CABBYNZKNiqLDAnV0hB0tZ_=fCr6RK8Q7Wyn3UTWk=PXSREMupg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: 7bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=logic8.org;
-        s=default; t=1541449862;
-        h=from:from:sender:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:in-reply-to:
-         references; bh=ammuDzFrPpY/Mm7AERNNO1UXF/oj34bCA6oLin3zMl8=;
-        b=VG64jGmlTe81zZkRk2BM8n5rYzgP2x/Cb1p/5um8LQYz3yX7l0kP0mWsoSKS+1YDVi2qea
-        pRJ1DV1Y9B/XX570Fm0ubLOOyL2+GhVK5QB5lBx+IuUWFi417tgzN96KYJ4aOKvXWYaU1z
-        F9Ln1+4l3t/vfnXuIUHwE8AIh8QXrGA=
-ARC-Seal: i=1; s=default; d=logic8.org; t=1541449862; a=rsa-sha256;
-        cv=none;
-        b=O/xX18YtIrxiG9yBMU4wcbA64bd17DNHJls1Lr+0BZzbl84z04H+YwKEEfsOy6mvhWF2KKJ4pS0U5nkOQj2cTyVVAz5P6QGgKmgP0SIwSArDvzPZLj7ByqOX9JTufbbuO5f9CP4Jcp9ZtgII/UVkZilEHWvBXebN6xLWNnFVH9k=
-ARC-Authentication-Results: i=1;
-        ORIGINATING;
-        auth=pass smtp.auth=catchall@logic8.org smtp.mailfrom=bluez@logic8.org
-Authentication-Results: ORIGINATING;
-        auth=pass smtp.auth=catchall@logic8.org smtp.mailfrom=bluez@logic8.org
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-appkey_key_add() checks if the number of known appkeys is smaller or equal than MAX_APP_KEYS, but it should check if it is equal or larger than MAX_APP_KEYS.
----
- mesh/appkey.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+amp_assoc_dump() didn't check the length of amp assoc struct of
+Type-Length-Value (TLV) triplets, and the Connected Chan List
+(number of triplets) is also need to check, or there are wrong
+length for the number of triplets.
 
-diff --git a/mesh/appkey.c b/mesh/appkey.c
-index 2ddb1eb..7578118 100644
---- a/mesh/appkey.c
-+++ b/mesh/appkey.c
-@@ -398,7 +398,7 @@ int appkey_key_add(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
-        }
+Signed-off-by: Cho, Yu-Chen <acho@suse.com>
+---
+ tools/parser/amp.c | 69 +++++++++++++++++++++++++---------------------
+ 1 file changed, 38 insertions(+), 31 deletions(-)
+
+diff --git a/tools/parser/amp.c b/tools/parser/amp.c
+index 158ca4a75..420099c90 100644
+--- a/tools/parser/amp.c
++++ b/tools/parser/amp.c
+@@ -33,7 +33,7 @@ static void amp_dump_chanlist(int level, struct amp_tlv *tlv, char *prefix)
+ 	struct amp_country_triplet *triplet;
+ 	int i, num;
  
-        if (!key) {
--               if (l_queue_length(app_keys) <= MAX_APP_KEYS)
-+               if (l_queue_length(app_keys) >= MAX_APP_KEYS)
-                        return MESH_STATUS_INSUFF_RESOURCES;
+-	num = (tlv->len - sizeof(*chan_list)) / sizeof(*triplet);
++	num = sizeof(*chan_list->triplets) / sizeof(*chan_list->triplets[0]);
  
-                key = app_key_new();
+ 	printf("%s (number of triplets %d)\n", prefix, num);
+ 
+@@ -80,47 +80,54 @@ void amp_assoc_dump(int level, uint8_t *assoc, uint16_t len)
+ 
+ 		p_indent(level+1, 0);
+ 
+-		switch (tlv->type) {
+-		case A2MP_MAC_ADDR_TYPE:
+-			if (tlvlen != 6)
+-				break;
+-			printf("MAC: %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X\n",
++		if (tlvlen != 0) {
++			switch (tlv->type) {
++			case A2MP_MAC_ADDR_TYPE:
++				if (tlvlen != 6)
++					break;
++				printf("MAC: ");
++				printf("%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X\n",
+ 					tlv->val[0], tlv->val[1], tlv->val[2],
+ 					tlv->val[3], tlv->val[4], tlv->val[5]);
+-			break;
+-
+-		case A2MP_PREF_CHANLIST_TYPE:
+-			amp_dump_chanlist(level, tlv, "Preferred Chan List");
+-			break;
++				break;
+ 
+-		case A2MP_CONNECTED_CHAN:
+-			amp_dump_chanlist(level, tlv, "Connected Chan List");
+-			break;
++			case A2MP_PREF_CHANLIST_TYPE:
++				amp_dump_chanlist(level, tlv,
++						   "Preferred Chan List");
++				break;
+ 
+-		case A2MP_PAL_CAP_TYPE:
+-			if (tlvlen != 4)
++			case A2MP_CONNECTED_CHAN:
++				amp_dump_chanlist(level, tlv,
++						   "Connected Chan List");
+ 				break;
+-			printf("PAL CAP: %2.2x %2.2x %2.2x %2.2x\n",
++
++			case A2MP_PAL_CAP_TYPE:
++				if (tlvlen != 4)
++					break;
++				printf("PAL CAP: %2.2x %2.2x %2.2x %2.2x\n",
+ 					tlv->val[0], tlv->val[1], tlv->val[2],
+ 					tlv->val[3]);
+-			break;
+-
+-		case A2MP_PAL_VER_INFO:
+-			if (tlvlen != 5)
+ 				break;
+-			ver = (struct amp_pal_ver *) tlv->val;
+-			printf("PAL VER: %2.2x Comp ID: %4.4x SubVer: %4.4x\n",
++
++			case A2MP_PAL_VER_INFO:
++				if (tlvlen != 5)
++					break;
++				ver = (struct amp_pal_ver *) tlv->val;
++				printf("PAL VER: ");
++				printf("%2.2x Comp ID: %4.4x SubVer: %4.4x\n",
+ 					ver->ver, btohs(ver->company_id),
+ 					btohs(ver->sub_ver));
+-			break;
++				break;
+ 
+-		default:
+-			printf("Unrecognized type %d\n", tlv->type);
+-			break;
+-		}
++			default:
++				printf("Unrecognized type %d\n", tlv->type);
++				break;
++			}
+ 
+-		len -= tlvlen + sizeof(*tlv);
+-		assoc += tlvlen + sizeof(*tlv);
+-		tlv = (struct amp_tlv *) assoc;
++			len -= tlvlen + sizeof(*tlv);
++			assoc += tlvlen + sizeof(*tlv);
++			tlv = (struct amp_tlv *) assoc;
++		} else
++			break;
+ 	}
+ }
+-- 
+2.19.1
+
