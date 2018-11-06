@@ -4,51 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C720C46464
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 12:05:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 953D6C32789
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 12:05:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1359620862
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 12:05:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C59B20862
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 12:05:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="LDh/WAIc";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="LDh/WAIc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1359620862
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Wx40riLZ";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="J7y0Uomd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C59B20862
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730774AbeKFVah (ORCPT
+        id S2387612AbeKFVas (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Nov 2018 16:30:37 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:51888 "EHLO
+        Tue, 6 Nov 2018 16:30:48 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:52196 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726976AbeKFVah (ORCPT
+        with ESMTP id S1726976AbeKFVar (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Nov 2018 16:30:37 -0500
+        Tue, 6 Nov 2018 16:30:47 -0500
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id D7244605A2; Tue,  6 Nov 2018 12:05:42 +0000 (UTC)
+        id 8823160741; Tue,  6 Nov 2018 12:05:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1541505942;
-        bh=mLG9ZCaIJ8+4gofyelc0OXDiSRL2Xx/TlW0/WvtaCfI=;
+        s=default; t=1541505953;
+        bh=4WiXbwc0e4U0WOflxnS1rA4ueY5zCIJjjTBvbcP1RIg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LDh/WAIc36pStvXStyp5aKItL1+qEe42g4o33cW5SYFlwbLhqcdIbLah3z+fD/bHA
-         hLU+dXrnQKNRr8I6vskFfDiB1ePIEkhsVsh+aIvRXLlQgMWwCqycwURP+CZw9zeBrj
-         L3szbsqh0oGjO8FD1/uBsOR7+I24bOZYrdAMP5J4=
+        b=Wx40riLZjwVGh2j63lEFcG5DLXz5P98dgxUzNXt2SitZON8HlS++JCND2RGs6HP4l
+         ucoqel0vR3bQ8LSz6ekEWaknJOOkLzZr4fL3wRvSbJ3DOtcEg1oNfwNltGSBV7z4sT
+         Dy9z33vIc1gs7MhscnQ5p8YTxNkJxCuvxyjisFGQ=
 Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id A9F6960591;
-        Tue,  6 Nov 2018 12:05:39 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id D1E0C60B7F;
+        Tue,  6 Nov 2018 12:05:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1541505942;
-        bh=mLG9ZCaIJ8+4gofyelc0OXDiSRL2Xx/TlW0/WvtaCfI=;
+        s=default; t=1541505951;
+        bh=4WiXbwc0e4U0WOflxnS1rA4ueY5zCIJjjTBvbcP1RIg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LDh/WAIc36pStvXStyp5aKItL1+qEe42g4o33cW5SYFlwbLhqcdIbLah3z+fD/bHA
-         hLU+dXrnQKNRr8I6vskFfDiB1ePIEkhsVsh+aIvRXLlQgMWwCqycwURP+CZw9zeBrj
-         L3szbsqh0oGjO8FD1/uBsOR7+I24bOZYrdAMP5J4=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org A9F6960591
+        b=J7y0Uomds4pxJpILGVnk2WK16badwXtYEILlkU/OJtlUEjL3L3ERshLfLIjkE/nre
+         HitBKK+PkHbtpoLHMqkrTpXnMypFtM7UEAmEQcp2ESSZy1oBIs1bpaf9E5vfMRq5bu
+         xWs3RWGNvguRw1w7iviCyrkaBApEeSTk3L2csB8E=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org D1E0C60B7F
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
 From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
@@ -57,9 +58,9 @@ Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
         linux-arm-msm@vger.kernel.org,
         Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v1 1/4] Bluetooth: hci_qca: use wait_until_sent() for power pulses
-Date:   Tue,  6 Nov 2018 17:35:25 +0530
-Message-Id: <20181106120528.30342-2-bgodavar@codeaurora.org>
+Subject: [PATCH v1 4/4] Bluetooth: hci_qca: Fix frame reassembly errors for wcn3990
+Date:   Tue,  6 Nov 2018 17:35:28 +0530
+Message-Id: <20181106120528.30342-5-bgodavar@codeaurora.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181106120528.30342-1-bgodavar@codeaurora.org>
 References: <20181106120528.30342-1-bgodavar@codeaurora.org>
@@ -70,66 +71,84 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-wcn3990 requires a power pulse to turn ON/OFF along with
-regulators. Sometimes we are observing the power pulses are sent
-out with some time delay, due to queuing these commands. This is
-causing synchronization issues with chip, which intern delay the
-chip setup or may end up with communication issues.
+[  176.929612] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
+[  176.945734] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
+[  176.953298] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
+[  177.010660] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
+[  177.067633] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
+
+The above errors log on console due to receiving of stray bytes
+when wcn3990 boot up's i.e. when during initial setup procedure.
 
 Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 ---
- drivers/bluetooth/hci_qca.c | 22 +++++++++-------------
- 1 file changed, 9 insertions(+), 13 deletions(-)
+ drivers/bluetooth/hci_qca.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f72ded4ec9ae..051f081d1835 100644
+index 97b57e0f4725..341f80606574 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -1016,8 +1016,7 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
- static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
--	struct qca_data *qca = hu->priv;
--	struct sk_buff *skb;
-+	int ret;
+@@ -56,6 +56,7 @@
  
- 	/* These power pulses are single byte command which are sent
- 	 * at required baudrate to wcn3990. On wcn3990, we have an external
-@@ -1030,18 +1029,14 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
- 	 * sending power pulses to SoC.
- 	 */
- 	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
--
--	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
--	if (!skb)
--		return -ENOMEM;
--
+ /* Controller states */
+ #define STATE_IN_BAND_SLEEP_ENABLED	1
++#define STATE_DISCARD_RX		2
+ 
+ #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+ #define IBS_TX_IDLE_TIMEOUT_MS		2000
+@@ -511,6 +512,7 @@ static int qca_open(struct hci_uart *hu)
+ 		} else {
+ 			hu->init_speed = qcadev->init_speed;
+ 			hu->oper_speed = qcadev->oper_speed;
++			set_bit(STATE_DISCARD_RX, &qca->flags);
+ 			ret = qca_power_setup(hu, true);
+ 			if (ret) {
+ 				destroy_workqueue(qca->workqueue);
+@@ -903,6 +905,13 @@ static int qca_recv(struct hci_uart *hu, const void *data, int count)
+ 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
+ 		return -EUNATCH;
+ 
++	/* We discard Rx data received while device is in booting
++	 * stage, this is due multiple baudrate switch is causing
++	 * UART to read some garbage data.
++	 */
++	if (test_bit(STATE_DISCARD_RX, &qca->flags))
++		return 0;
++
+ 	qca->rx_skb = h4_recv_buf(hu->hdev, qca->rx_skb, data, count,
+ 				  qca_recv_pkts, ARRAY_SIZE(qca_recv_pkts));
+ 	if (IS_ERR(qca->rx_skb)) {
+@@ -1192,10 +1201,12 @@ static int qca_setup(struct hci_uart *hu)
+ 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+ 		clear_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+ 		hu->hdev->shutdown = qca_power_off;
++
+ 		ret = qca_wcn3990_init(hu);
+ 		if (ret)
+ 			return ret;
+ 
++		clear_bit(STATE_DISCARD_RX, &qca->flags);
+ 		ret = qca_read_soc_version(hdev, &soc_ver);
+ 		if (ret)
+ 			return ret;
+@@ -1278,8 +1289,15 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 	struct serdev_device *serdev = hu->serdev;
+ 	unsigned char cmd = QCA_WCN3990_POWEROFF_PULSE;
+ 
+-	host_set_baudrate(hu, 2400);
++	/* From this point we go into power off state,
++	 * disable IBS and discard all the queued data.
++	 */
++	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++	set_bit(STATE_DISCARD_RX, &qca->flags);
++	qca_flush(hu);
++
  	hci_uart_set_flow_control(hu, true);
-+	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
-+	if (ret < 0) {
-+		bt_dev_err(hdev, "failed to send power pulse %02x to SoC", cmd);
-+		return ret;
-+	}
- 
--	skb_put_u8(skb, cmd);
--	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
--
--	skb_queue_tail(&qca->txq, skb);
--	hci_uart_tx_wakeup(hu);
-+	serdev_device_wait_until_sent(hu->serdev, 0);
- 
- 	/* Wait for 100 uS for SoC to settle down */
- 	usleep_range(100, 200);
-@@ -1283,7 +1278,8 @@ static void qca_power_shutdown(struct hci_uart *hu)
- 
- 	host_set_baudrate(hu, 2400);
- 	hci_uart_set_flow_control(hu, true);
--	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
-+	serdev_device_write(serdev, &cmd, sizeof(cmd), 0);
-+	serdev_device_wait_until_sent(serdev, 0);
++	host_set_baudrate(hu, 2400);
+ 	serdev_device_write(serdev, &cmd, sizeof(cmd), 0);
+ 	serdev_device_wait_until_sent(serdev, 0);
  	hci_uart_set_flow_control(hu, false);
- 	qca_power_setup(hu, false);
- }
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
 a Linux Foundation Collaborative Project
