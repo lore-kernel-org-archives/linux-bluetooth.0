@@ -2,128 +2,88 @@ Return-Path: <SRS0=bD4U=NR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C49CC32789
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 12:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC484C32789
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 12:33:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0463720869
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 12:06:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="U79hYD7O";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="U79hYD7O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0463720869
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	by mail.kernel.org (Postfix) with ESMTP id 8D2352085B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 12:33:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D2352085B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730739AbeKFVae (ORCPT
+        id S1730477AbeKFV6q convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Nov 2018 16:30:34 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:51786 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726976AbeKFVae (ORCPT
+        Tue, 6 Nov 2018 16:58:46 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:58342 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729711AbeKFV6q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Nov 2018 16:30:34 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id AD11560A9B; Tue,  6 Nov 2018 12:05:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1541505939;
-        bh=9XcqcoQIl66wkg4Cv19DEr7EaBsWGg1TyfHpf2DHk6M=;
-        h=From:To:Cc:Subject:Date:From;
-        b=U79hYD7O5FYEghhVxLIEPBWNN5ApNReYK3VFT+uhVNtKeZBIzjECnbRL6O+VpUBo4
-         PsszvU7NrAJxRAbaNjtKcY2ehTWWfV/SR9zNW5+XjphdVg+ZyEyQQrVK2dy+9kojO+
-         5zc/c0cOGBFTbwZR9MjydZvHCM47gIBjjVrCs5/Q=
-Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id B9ECA6053D;
-        Tue,  6 Nov 2018 12:05:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1541505939;
-        bh=9XcqcoQIl66wkg4Cv19DEr7EaBsWGg1TyfHpf2DHk6M=;
-        h=From:To:Cc:Subject:Date:From;
-        b=U79hYD7O5FYEghhVxLIEPBWNN5ApNReYK3VFT+uhVNtKeZBIzjECnbRL6O+VpUBo4
-         PsszvU7NrAJxRAbaNjtKcY2ehTWWfV/SR9zNW5+XjphdVg+ZyEyQQrVK2dy+9kojO+
-         5zc/c0cOGBFTbwZR9MjydZvHCM47gIBjjVrCs5/Q=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org B9ECA6053D
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        Tue, 6 Nov 2018 16:58:46 -0500
+Received: from marcel-macbook.fritz.box (p4FF9F655.dip0.t-ipconnect.de [79.249.246.85])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 2DE44CF2A2;
+        Tue,  6 Nov 2018 13:41:12 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
+Subject: Re: [PATCH v1 3/4] Bluetooth: hci_qca: clear HCI_QUIRK_RESET_ON_CLOSE
+ flag
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20181106120528.30342-4-bgodavar@codeaurora.org>
+Date:   Tue, 6 Nov 2018 13:33:43 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        open list <linux-kernel@vger.kernel.org>,
         linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: Bug fixes for Qualcomm BT chip wcn3990 
-Date:   Tue,  6 Nov 2018 17:35:24 +0530
-Message-Id: <20181106120528.30342-1-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.19.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        linux-arm-msm@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <462C4F58-E6E2-4B20-B074-72DDFA6D7364@holtmann.org>
+References: <20181106120528.30342-1-bgodavar@codeaurora.org>
+ <20181106120528.30342-4-bgodavar@codeaurora.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+X-Mailer: Apple Mail (2.3445.101.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The below issues are found in the recent testing.
+Hi Balakrishna,
 
-1. Observed device is not going into off state or not responding.
-    As wcn3990 require a power pulses to turn on the irrespctive of
-    igniting regulators, it was observed that power on or power off
-    pulses are not in sync with respective to chip.
-    The below patch will help us to wait until byte is pushed on to wires. 		 
+> During hci down we are sending reset command to chip, which
+> is not required for wcn3990, as hdev->shutdown() will turn off the
+> regulators.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+> drivers/bluetooth/hci_qca.c | 1 +
+> 1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 8301663f0004..97b57e0f4725 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1190,6 +1190,7 @@ static int qca_setup(struct hci_uart *hu)
+> 		 */
+> 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+> 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+> +		clear_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+> 		hu->hdev->shutdown = qca_power_off;
+> 		ret = qca_wcn3990_init(hu);
+> 		if (ret)
 
-    * Bluetooth: hci_qca: use wait_until_sent() for power pulses
+I am pretty certain that you didn’t want this quirk:
 
-2. Observed Chip responding when we are in sleep.
-   This is due to turn on flow control during change baudrate request.
-   The below patch will only pull the RTS line high instead of turning off
-   the flow.
+        /* When this quirk is set, the HCI Reset command is send when            
+         * closing the transport instead of when opening it.
 
-   * Bluetooth: hci_qca: Pull RTS line high for baudrate change command.
+This quirk is for Bluetooth 1.0b devices where the HCI_Reset behavior was not clear or for devices that actually misbehave with the initial HCI_Reset.
 
+In addition, you commit message is totally misleading. That is not what is happening with this quirk.
 
-3. Observed stray bytes observed after hdev->shutdown.
-   Qualcomm bt chip wcn3990, will turn of regulators when hci down.
-   This is via hdev->shutdown(), once hdev->shutdown() is called,
-   it is not required to send reset command.
+Regards
 
-   * Bluetooth: hci_qca: clear HCI_QUIRK_RESET_ON_CLOSE flag.
-
-4. Frame reassembly errors splashing on console.
-   wcn3990 requires will use multiple baudrates during booting stage.
-   i.e. 2400 bps while sending power off pulse
-	115200 bps while sending power on pulse
-	port close
-	port open
-	set baudrate to 115200 request the chip version.
-
-  during above process, we are seeing some stray bytes coming up
-  on the UART Rx FIFO it could be due to frequent baudrate change.
-
-  This patch will stop the frame reassembly errors.
-
-  * Bluetooth: hci_qca: Fix frame reassembly errors for wcn3990
-
-Note: 
-   This patches are on top of below patches posted in patch work for hci_qca
-   https://lore.kernel.org/patchwork/patch/1005631/
-   https://lore.kernel.org/patchwork/patch/1004372/
-    
-
-Balakrishna Godavarthi (4):
-  Bluetooth: hci_qca: use wait_until_sent() for power pulses
-  Bluetooth: hci_qca: Pull RTS line high for baudrate change command
-  Bluetooth: hci_qca: clear HCI_QUIRK_RESET_ON_CLOSE flag
-  Bluetooth: hci_qca: Fix frame reassembly errors for wcn3990
-
- drivers/bluetooth/hci_qca.c | 66 +++++++++++++++++++++++--------------
- 1 file changed, 41 insertions(+), 25 deletions(-)
-
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Marcel
 
