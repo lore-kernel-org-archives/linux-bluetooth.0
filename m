@@ -2,155 +2,95 @@ Return-Path: <SRS0=bD4U=NR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00A41C32789
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 13:36:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 125E7C32789
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 16:30:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BDF822081D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 13:36:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAC432085B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Nov 2018 16:30:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="ko0cPpJI";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="k8clx5ow"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDF822081D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="InU2oLIM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC432085B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388116AbeKFXBo (ORCPT
+        id S2389214AbeKGB4S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Nov 2018 18:01:44 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:34640 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388021AbeKFXBo (ORCPT
+        Tue, 6 Nov 2018 20:56:18 -0500
+Received: from mail-lj1-f181.google.com ([209.85.208.181]:40088 "EHLO
+        mail-lj1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388658AbeKGB4S (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Nov 2018 18:01:44 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 85D8960767; Tue,  6 Nov 2018 13:36:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1541511387;
-        bh=sE1hNBrdmxqpgSfGEGnA3bg7ra4H2Ji/KI4yt4TbaoA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ko0cPpJIw4gwXr+4EECiI351FSM5bd4TOJrCLIjI/rfR46LN+7a+DV6LLFxq71PP2
-         yo49eWv3fS0jKdGZrUhV3NvfD4/z8t2kP/qHfguf8gv7JyaW7LcwT1+zfuilzi1GFo
-         qjM4kM0Hzjcp76CZkBNx/TIUwuQdhudR0DYEDR+I=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 6B899601D4;
-        Tue,  6 Nov 2018 13:36:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1541511385;
-        bh=sE1hNBrdmxqpgSfGEGnA3bg7ra4H2Ji/KI4yt4TbaoA=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=k8clx5owTkvz+QNCivgFVqplFT9qCKAjLbvjaEmQyLT/CH79E2c9OAtbXgpQuO4rA
-         +Vw3Mwx+FB+nQkpkXxMBDcBwz+txDJeFh+rlKeLDGyJUCfMsUI3/N7pBUcFaPIegup
-         7wnfnJHSnumyNDsCgMl+siSvl4roIe9W4HdDWCAg=
+        Tue, 6 Nov 2018 20:56:18 -0500
+Received: by mail-lj1-f181.google.com with SMTP id t22-v6so11999649lji.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Nov 2018 08:30:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=3/PttDuZnei6BXEnvYrFteQMix1B5JMc3k5I8i6eToQ=;
+        b=InU2oLIMetb6UqPzjdNczEGfSBYwYJnaQMXFZ5cx4rKOvNHdj+PB8j7la9+FJkMt1V
+         l1TVGRlhTuz+F4k4mYTpv48/nqAk0RYgQHC8ZNm+Af9OPf8OFMWb9q1XP+y5OXJ/DXqL
+         pPtD/VYMWczdTxG90Q8W860DxdeV5bDKdLXmNBGxrwu1yNQOmBEehx63AD4uKyQ+J129
+         3wJkjLEdFDKLGmWHDJyRpQqKaPSGmVsHmKJaIVvTqmJwz+0OAm6scijsRd/vx2Qirry7
+         Ruxgxv4yHaAernI+vkbdoTvdO5kroT5nSkrSru3g9Q0N1ZlBNWV3XTk3A6AukHE8wX55
+         bFng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=3/PttDuZnei6BXEnvYrFteQMix1B5JMc3k5I8i6eToQ=;
+        b=QNYjYo1IxWpunBgeP2i2AaKcFYeC7HfDMWV/IQCslJCFMYtU+MZmCtClZhuKUTFafl
+         PmmMviR+8aIImu4R2QJKeUdRNqTZT1VeKaWAuujDKV6Tb81tJOKTYMxGyZExaJ5HI0lJ
+         OmjrvfPSF4fJnlWvLJTFtH14wxbn5lGXXSom61BxXv61v38nVtoPFj+jpQTlMxzgj4e3
+         xO9MHJUXGmdSUXqqcogjOs0joqhMQhqn7Y7hwqvPy5++TEvjCfyP9E7A7i3sxvA48LkS
+         F4sdPc8u5FRd/J6SFnqdAKTodQQiQVVXxyv6PtxT5xXDeoHKdJ+TRz1JyWvxNM6HnhMn
+         ERJQ==
+X-Gm-Message-State: AGRZ1gLQkeQzN4Zgm41FWvLTVWS3icTCmU43WsynHFrcDlh2W0eaQxzf
+        57/YTXtNGQts07+BtY42/z03Pxekj+bvTRK9Uyra6TE9
+X-Google-Smtp-Source: AJdET5c/RPeW9IBDKPxTa/m27OSrQI1Oi7tQwP0wZvRKAPrqlBhQVVmvN+0p0jKmxj/S7QZ8pJNywZuThsG5pb46a1A=
+X-Received: by 2002:a2e:6e08:: with SMTP id j8-v6mr19252528ljc.61.1541521817001;
+ Tue, 06 Nov 2018 08:30:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Tue, 06 Nov 2018 19:06:25 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v1 3/4] Bluetooth: hci_qca: clear HCI_QUIRK_RESET_ON_CLOSE
- flag
-In-Reply-To: <c4ced688b33ad82b61a705908393a0a6@codeaurora.org>
-References: <20181106120528.30342-1-bgodavar@codeaurora.org>
- <20181106120528.30342-4-bgodavar@codeaurora.org>
- <462C4F58-E6E2-4B20-B074-72DDFA6D7364@holtmann.org>
- <170e0419929840109d349b5df5e38364@codeaurora.org>
- <0CE81F0B-B122-4793-817F-F0F4738C44E0@holtmann.org>
- <c4ced688b33ad82b61a705908393a0a6@codeaurora.org>
-Message-ID: <3c9684ec5fcc9f5d99be7e9b2e705514@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+From:   dhananjay gj <dhguja@gmail.com>
+Date:   Tue, 6 Nov 2018 17:30:05 +0100
+Message-ID: <CAKOuF3dMz7THOgEzOAF0GdfUeDoXp0K6-xZiJNCRA0DTd7L5_g@mail.gmail.com>
+Subject: Compatibility issue with Zephyr BLE
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hello All,
+       I am working on BLE based barcode scanner which will send the
+data via HID over GATT profile. I am using Nordic based nRF52840
+device and Zephyr 1.13 BLE stack with default connection interval
+parameters set by the peer system.
 
-On 2018-11-06 18:44, Balakrishna Godavarthi wrote:
-> Hi Marcel,
-> 
-> On 2018-11-06 18:32, Marcel Holtmann wrote:
->> Hi Balakrishna,
->> 
->>>>> During hci down we are sending reset command to chip, which
->>>>> is not required for wcn3990, as hdev->shutdown() will turn off the
->>>>> regulators.
->>>>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->>>>> ---
->>>>> drivers/bluetooth/hci_qca.c | 1 +
->>>>> 1 file changed, 1 insertion(+)
->>>>> diff --git a/drivers/bluetooth/hci_qca.c 
->>>>> b/drivers/bluetooth/hci_qca.c
->>>>> index 8301663f0004..97b57e0f4725 100644
->>>>> --- a/drivers/bluetooth/hci_qca.c
->>>>> +++ b/drivers/bluetooth/hci_qca.c
->>>>> @@ -1190,6 +1190,7 @@ static int qca_setup(struct hci_uart *hu)
->>>>> 		 */
->>>>> 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
->>>>> 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
->>>>> +		clear_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
->>>>> 		hu->hdev->shutdown = qca_power_off;
->>>>> 		ret = qca_wcn3990_init(hu);
->>>>> 		if (ret)
->>>> I am pretty certain that you didn’t want this quirk:
->>>>        /* When this quirk is set, the HCI Reset command is send when
->>>>         * closing the transport instead of when opening it.
->>>> This quirk is for Bluetooth 1.0b devices where the HCI_Reset 
->>>> behavior
->>>> was not clear or for devices that actually misbehave with the 
->>>> initial
->>>> HCI_Reset.
->>>> In addition, you commit message is totally misleading. That is not
->>>> what is happening with this quirk.
->>>> Regards
->>>> Marcel
->>> 
->>> My intention was reset command is not required when we do an hci 
->>> down.
->>> this is because of hdev->shutdown will turn off the regulators.
->>> It is like turning off the chip. sending reset command after turning 
->>> off the chip is not required.
->>> 
->>> I understand the usage of the quirk, will update the commit text.
->> 
->> you are papering over the issue. Actually
->> hci_serdev.c:hci_uart_register_device() is the culprit with the legacy
->> code copied over from hci_ldisc.c:hci_uart_register_dev(). I think
->> there is no point doing all this legacy line discipline quirk handling
->> until it is really needed. The serdev drivers are all for recent
->> hardware.
->> 
->> That said, having moved over to a btuart.c approach and killed the
->> whole hci_serdev.c thing would have been a lot better here. You will
->> keep running in weird situations where 18 year old code keeps
->> surprising you.
-> 
-> [Bala]: even i feel the same. they are lot such kind of HACK's we need
-> to do with current arch.
->         when can we expect btuart.c merged to bt-next. i think having
-> btuart will helps us to have the control of
->         vendor porto's call's like in btusb.c
-> 
->> 
->> Regards
->> 
->> Marcel
+My device uses 5 BLE Tx buffers so that my HID application works fast
+since more HID characters can be sent per connection interval. This
+works as expected in Android, iOS Host devices. But on Windows 10 and
+Ubuntu system the behavior seen is that HID characters are not
+accepted after some point. The last character that is sent before
+hanging is printed continuously until the connection is closed. The
+common factor between both these laptops is Intel BLE chipsets. I also
+posted a similar question in zephyr but my application works fine in
+Android and iOS device with increased buffers. The suggestion was that
+peer is not handling data transfers in "connection event length" for
+some reason. Most of the time the disconnect reason is either 0x22 or
+0x08.
 
-I need some clarification, do you expect some thing like this 
-https://github.com/torvalds/linux/blob/master/drivers/bluetooth/btmtkuart.c 
-for Qualcomm BT chip too.
-it looks it is completely avoided hci_serdev.c interface.
+When only one packet is sent per connection interval then there is no
+problem with this connection. But this affects my throughput sending
+press and release keys for every HID character.
 
--- 
-Regards
-Balakrishna.
+Has anyone else faced similar issue with data stopped receiving
+abruptly in Intel chipsets in either Windows or Linux systems due to
+increased Tx buffers on the peripheral side.
+
+Regards,
+Dhananjay G J
