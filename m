@@ -2,87 +2,83 @@ Return-Path: <SRS0=TbT7=NS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB252C0044C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A111CC0044C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:51:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 846F02081D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 846F02081D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
+	by mail.kernel.org (Postfix) with ESMTP id 670AC20827
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:51:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aQFhozzj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 670AC20827
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730853AbeKGTsu (ORCPT
+        id S1726830AbeKGUV1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Nov 2018 14:48:50 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:45500 "EHLO
-        wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730832AbeKGTst (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Nov 2018 14:48:49 -0500
-Received: by wens.csie.org (Postfix, from userid 1000)
-        id A976C5FD95; Wed,  7 Nov 2018 18:13:16 +0800 (CST)
-From:   Chen-Yu Tsai <wens@csie.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
+        Wed, 7 Nov 2018 15:21:27 -0500
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:39124 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726218AbeKGUV1 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 7 Nov 2018 15:21:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=armlinux.org.uk; s=pandora-2014; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=QnNk0YeMROty7L17O57/dvyZMVFLdjfFBr7aoHKIuFQ=; b=aQFhozzjI+ny6aPzug0B18ZL3
+        Se6fDO1YQuc7igp965HIkYIEoSHjrWndi/WiEypq7p1TGYWI6bwciM2Jvv4TgRIB6Dnr3rEZlz8Ee
+        TJaLiqn2Ikhk2YBO2TbKbcZD1mK0d6ByhCAZvMi+PGFST6bBXv9XdLOvsHrdabCZi+zmA=;
+Received: from n2100.armlinux.org.uk ([fd8f:7570:feb6:1:214:fdff:fe10:4f86]:38658)
+        by pandora.armlinux.org.uk with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.90_1)
+        (envelope-from <linux@armlinux.org.uk>)
+        id 1gKLQi-0005ty-At; Wed, 07 Nov 2018 10:51:24 +0000
+Received: from linux by n2100.armlinux.org.uk with local (Exim 4.90_1)
+        (envelope-from <linux@n2100.armlinux.org.uk>)
+        id 1gKLQf-0000VR-Ls; Wed, 07 Nov 2018 10:51:21 +0000
+Date:   Wed, 7 Nov 2018 10:51:19 +0000
+From:   Russell King - ARM Linux <linux@armlinux.org.uk>
+To:     Chen-Yu Tsai <wens@csie.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
-        Maxime Ripard <maxime.ripard@bootlin.com>
-Cc:     linux-sunxi@googlegroups.com, Chen-Yu Tsai <wens@csie.org>,
+        Maxime Ripard <maxime.ripard@bootlin.com>,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-sunxi@googlegroups.com,
         Loic Poulain <loic.poulain@gmail.com>,
-        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 10/15] Bluetooth: hci_bcm: Wait for device to come out of reset after power on
-Date:   Wed,  7 Nov 2018 18:13:03 +0800
-Message-Id: <20181107101308.7626-11-wens@csie.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20181107101308.7626-1-wens@csie.org>
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 06/15] Bluetooth: hci_bcm: Simplify clk_get error handling
+Message-ID: <20181107105119.GT30658@n2100.armlinux.org.uk>
 References: <20181107101308.7626-1-wens@csie.org>
+ <20181107101308.7626-7-wens@csie.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181107101308.7626-7-wens@csie.org>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The datasheets for BCM20702 and BCM43438 both have power up time
-sequence graphs, however they are slightly different. Both chips
-also have an internal power-on-reset, which holds the chip in reset
-for a short time after the regulators are enabled.
+On Wed, Nov 07, 2018 at 06:12:59PM +0800, Chen-Yu Tsai wrote:
+> @@ -911,6 +911,10 @@ static int bcm_get_resources(struct bcm_device *dev)
+>  	if (IS_ERR(dev->clk) && PTR_ERR(dev->clk) == -EPROBE_DEFER)
 
-For the BCM20702, the time period from when the regulators are enabled,
-until the chip settles and comes out of sleep state, is 6564 ~ 8171 us.
+You can also simplify the above test to:
 
-For the BCM43438, the graph only shows the time period from when the
-regulators are enabled until the chip responds by driving the host's
-CTS line low, assuming the host has already driven its RTS line low.
-This is shown to be 6.5 sleep cycles, with the sleep clock at 32.768
-kHz. This is around 2 ms.
+	if (dev->clk == ERR_PTR(-EPROBE_DEFER))
 
-Wait a full 10 ms after the regulators are enabled to account for signal
-rising times.
+as error pointers are uniquely different from normal pointers.
 
-Signed-off-by: Chen-Yu Tsai <wens@csie.org>
----
- drivers/bluetooth/hci_bcm.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 060001f11a98..bf5dee9b04d8 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -256,6 +256,9 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
- 		regulator_bulk_disable(BCM_NUM_SUPPLIES, dev->supplies);
- 	}
- 
-+	/* wait for device to power on and come out of reset */
-+	usleep_range(10000, 20000);
-+
- 	dev->res_enabled = powered;
- 
- 	return 0;
 -- 
-2.19.1
-
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 12.1Mbps down 622kbps up
+According to speedtest.net: 11.9Mbps down 500kbps up
