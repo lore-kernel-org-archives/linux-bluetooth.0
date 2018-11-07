@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E988C0044C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:19:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11899C0044C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:19:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB0572081D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:19:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB0572081D
+	by mail.kernel.org (Postfix) with ESMTP id D7E7D2086B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:19:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7E7D2086B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387881AbeKGTsy (ORCPT
+        id S2387841AbeKGTsy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 7 Nov 2018 14:48:54 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:45516 "EHLO
+Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:45548 "EHLO
         wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730906AbeKGTsx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S2387517AbeKGTsx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 7 Nov 2018 14:48:53 -0500
 Received: by wens.csie.org (Postfix, from userid 1000)
-        id 609925FC7A; Wed,  7 Nov 2018 18:13:16 +0800 (CST)
+        id BBB605FDA6; Wed,  7 Nov 2018 18:13:16 +0800 (CST)
 From:   Chen-Yu Tsai <wens@csie.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -34,9 +34,9 @@ Cc:     linux-sunxi@googlegroups.com, Chen-Yu Tsai <wens@csie.org>,
         Loic Poulain <loic.poulain@gmail.com>,
         linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 04/15] dt-bindings: net: broadcom-bluetooth: Add BCM4330 compatible string
-Date:   Wed,  7 Nov 2018 18:12:57 +0800
-Message-Id: <20181107101308.7626-5-wens@csie.org>
+Subject: [PATCH 13/15] Bluetooth: btbcm: Add default address for BCM43430A0
+Date:   Wed,  7 Nov 2018 18:13:06 +0800
+Message-Id: <20181107101308.7626-14-wens@csie.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181107101308.7626-1-wens@csie.org>
 References: <20181107101308.7626-1-wens@csie.org>
@@ -47,32 +47,49 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The BCM4330 is a 802.11 a/b/g/n WiFi + Bluetooth 4.0 chip from Broadcom.
-It is found in the Ampak AP6330 WiFi+BT module. The partiular one I have
-identifies as BCM4330B1 for Bluetooth and BCM4330/4 for WiFi.
+The BCM43430A0 has the default MAC address 43:43:A0:12:1F:AC if none
+is given. This address was found when enabling Bluetooth on a bunch of
+boards with the AMPAK AP6210 module, all sharing the same address. It
+also contains the sequence 4343A0, which is suspicious as that is also
+the name the chip identifies itself as.
 
-It is unclear if the AP6330 module uses this revision of the BCM4330, or
-if there are multiple revisions. The module does not have revision
-markings. This patch elects to use just BCM4330 for the compatible
-string.
+Add this to the list of default MAC addresses and leave it to the user
+to configure a valid one.
 
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/bluetooth/btbcm.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-index cb50931a6506..33423002c8c2 100644
---- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-+++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-@@ -11,6 +11,7 @@ Required properties:
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 22d4b530da03..08e1f3dd4e03 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -34,6 +34,7 @@
  
-  - compatible: should contain one of the following:
-    * "brcm,bcm20702a1"
-+   * "brcm,bcm4330-bt"
-    * "brcm,bcm43438-bt"
+ #define BDADDR_BCM20702A0 (&(bdaddr_t) {{0x00, 0xa0, 0x02, 0x70, 0x20, 0x00}})
+ #define BDADDR_BCM20702A1 (&(bdaddr_t) {{0x00, 0x00, 0xa0, 0x02, 0x70, 0x20}})
++#define BDADDR_BCM43430A0 (&(bdaddr_t) {{0xac, 0x1f, 0x12, 0xa0, 0x43, 0x43}})
+ #define BDADDR_BCM4324B3 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb3, 0x24, 0x43}})
+ #define BDADDR_BCM4330B1 (&(bdaddr_t) {{0x00, 0x00, 0x00, 0xb1, 0x30, 0x43}})
  
- Optional properties:
+@@ -73,11 +74,15 @@ int btbcm_check_bdaddr(struct hci_dev *hdev)
+ 	 *
+ 	 * The address 43:30:B1:00:00:00 indicates a BCM4330B1 controller
+ 	 * with waiting for configuration state.
++	 *
++	 * The address 43:43:A0:12:1F:AC indicates a BCM43430A0 controller
++	 * with no configured address.
+ 	 */
+ 	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM20702A1) ||
+ 	    !bacmp(&bda->bdaddr, BDADDR_BCM4324B3) ||
+-	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1)) {
++	    !bacmp(&bda->bdaddr, BDADDR_BCM4330B1) ||
++	    !bacmp(&bda->bdaddr, BDADDR_BCM43430A0)) {
+ 		bt_dev_info(hdev, "BCM: Using default device address (%pMR)",
+ 			    &bda->bdaddr);
+ 		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
 -- 
 2.19.1
 
