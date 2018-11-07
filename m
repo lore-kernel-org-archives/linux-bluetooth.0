@@ -2,103 +2,297 @@ Return-Path: <SRS0=TbT7=NS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D06FEC0044C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 18:01:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E14F6C0044C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 18:24:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6C2E2081D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 18:01:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C2E2081D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id A273E20862
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 18:24:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A273E20862
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727520AbeKHDdJ (ORCPT
+        id S1727836AbeKHD4F convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Nov 2018 22:33:09 -0500
-Received: from mga03.intel.com ([134.134.136.65]:54471 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727168AbeKHDdJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Nov 2018 22:33:09 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Nov 2018 10:01:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.54,476,1534834800"; 
-   d="scan'208";a="84089446"
-Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
-  by fmsmga007.fm.intel.com with ESMTP; 07 Nov 2018 10:01:38 -0800
-Received: from orsmsx113.amr.corp.intel.com (10.22.240.9) by
- ORSMSX109.amr.corp.intel.com (10.22.240.7) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Wed, 7 Nov 2018 10:01:37 -0800
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.166]) by
- ORSMSX113.amr.corp.intel.com ([169.254.9.125]) with mapi id 14.03.0415.000;
- Wed, 7 Nov 2018 10:01:37 -0800
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     Michal Hobot <michal.hobot@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: mesh: configuration.json question
-Thread-Topic: mesh: configuration.json question
-Thread-Index: AQHUdruiVE1KssIogUeOH+ns9Lu0OKVEmPrw
-Date:   Wed, 7 Nov 2018 18:01:36 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4375C130F54@ORSMSX103.amr.corp.intel.com>
-References: <8781652A-AACD-4912-9A12-D7458DB85F94@silvair.com>
- <E7A583DC-3A5B-4500-881C-E22CF5C1AA17@silvair.com>
-In-Reply-To: <E7A583DC-3A5B-4500-881C-E22CF5C1AA17@silvair.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTNiMmFhODgtNjIwNC00NWU1LWE5YWMtNmY0NjI1MDhiODVjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoidno1U1FMeDQ1YXRsT2I1MVpWWW52NlwvUjVwVjQ2d3R0cEJzQWFhK2Q0aWFtU0FVYjJPZWN5NFpIWk1oUEJRKzUifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.22.254.139]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        Wed, 7 Nov 2018 22:56:05 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:44010 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726356AbeKHD4F (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 7 Nov 2018 22:56:05 -0500
+Received: from marcel-macbook.fritz.box (p4FF9F655.dip0.t-ipconnect.de [79.249.246.85])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 32C8ECF2B1;
+        Wed,  7 Nov 2018 19:31:57 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
+Subject: Re: [PATCH BlueZ 1/3] shared/monitor: Add common code to interface
+ with monitor
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20181107161432.13081-1-luiz.dentz@gmail.com>
+Date:   Wed, 7 Nov 2018 19:24:28 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <9FA12570-7CC6-4635-B163-8FC6A0E73159@holtmann.org>
+References: <20181107161432.13081-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3445.101.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWljaGFsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4
-LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgt
-DQo+IG93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIE1pY2hhbCBIb2JvdA0KPiBT
-ZW50OiBXZWRuZXNkYXksIE5vdmVtYmVyIDcsIDIwMTggOTowMiBBTQ0KPiBUbzogbGludXgtYmx1
-ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBtZXNoOiBjb25maWd1cmF0aW9uLmpz
-b24gcXVlc3Rpb24NCj4gDQo+IERlYXIgYWxsLA0KPiBXaGVyZSBjYW4gSSBnZXQgYSBzYW1wbGUg
-Y29uZmlndXJhdGlvbi5qc29uIGZpbGU/IEkgZm91bmQgYSBzYW1wbGUNCj4gY29tcG9zaXRpb24u
-anNvbiwgYnV0IG5vdGhpbmcgZm9yIGNvbmZpZ3VyYXRpb24uanNvbi4NCg0KQXJlIHlvdSBsb29r
-aW5nIGZvciBKU09OIGZpbGVzIGZvciBhIG5vbi1wcm92aXNpb25lciBOb2RlLCB0aGF0IHJlZmxl
-Y3RzIHRoZSBzZXR1cCBvZiB0aGUgbG9jYWwgbm9kZT8gDQoNCgkqIEJlY2F1c2UgdGhpcyBpcyBu
-b3QgY29udHJvbGxlZCBieSB0aGUgU0lHLCBhbmQgd2UgY2FuIHdvcmsgb24gdGhhdCB3aXRoIHlv
-dS4NCg0KDQpPciBmb3IgYSBKU09OIG9mIGEgQ29uZmlndXJhdGlvbiBEYXRhYmFzZSwgdGhhdCBp
-cyB0aGUgUHJvdmlzaW9uZXIncyB2aWV3IG9mIGFsbCB0aGUgb3RoZXIgTm9kZXMgaW4gdGhlIE1l
-c2ggTmV0d29yaz8NCg0KCSogVGhpcyBpcyBhIGxpdHRsZSB0cmlja2llciwgYmVjYXVzZSB0aGUg
-U0lHIGhhcyBub3QgeWV0IGZpbmFsaXplZCBpdC4NCg0KDQo+IFRoYW5rcyBpbiBhZHZhbmNlLA0K
-PiAtLQ0KPiBNaWNoYWwgSG9ib3QNCj4gVlAgb2YgUHJvZHVjdA0KPiANCj4gKzQ4IDYwMyA3NDQg
-NjY4DQo+IA0KPiBTaWx2YWlyLCBJbmMuDQo+IDcxNyBNYXJrZXQgU3RyZWV0LCBTdWl0ZSAxMDAg
-ICAgICAgICAgICAgICAgICAgICAgIHVsLiBKYXNub2dvcnNrYSA0NA0KPiBDQSA5NDEwMywgU2Fu
-IEZyYW5jaXNjbyAgICAgICAgICAgICAgICAgICAgICAgICAgICAzMS0zNTggS3Jha293DQo+IFVT
-QSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgUG9sYW5kDQo+IA0KPiB3d3cuc2lsdmFpci5jb20NCj4gDQo+IE5PVElDRSBUTyBSRUNJ
-UElFTlQNCj4gDQo+IFdlIGluZm9ybSB5b3UgdGhhdCBTaWx2YWlyIHNwLiB6IG8uby4gd2l0aCBp
-dHMgcmVnaXN0ZXJlZCBvZmZpY2UgaW4gS3Jha8OzdyAoMzEtDQo+IDM1OCksIGF0IEphc25vZ8Oz
-cnNrYSBTdHJlZXQgNDQgaXMgdGhlIGNvbnRyb2xsZXIgb2YgeW91ciBwZXJzb25hbCBkYXRhLiBZ
-b3UgY2FuDQo+IGZpbmQgbW9yZSBpbmZvcm1hdGlvbiBhYm91dCBwcm9jZXNzaW5nIHBlcnNvbmFs
-IGRhdGEgYW5kIHlvdXIgcmlnaHRzIGhlcmUNCj4gVGhpcyBlLW1haWwgbWVzc2FnZSBhbmQgYW55
-IGRvY3VtZW50cyBhY2NvbXBhbnlpbmcgaXQgY29udGFpbiBpbmZvcm1hdGlvbg0KPiB0aGF0IGJl
-bG9uZ3MgdG8gU0lMVkFJUi4gVGhpcyBlLW1haWwgaXMgbWVhbnQgZm9yIG9ubHkgdGhlIGludGVu
-ZGVkIHJlY2lwaWVudA0KPiBvZiB0aGUgdHJhbnNtaXNzaW9uLCBhbmQgbWF5IGJlIGEgY29tbXVu
-aWNhdGlvbiBwcml2aWxlZ2VkIGJ5IGxhdywNCj4gY29uZmlkZW50aWFsIGFuZC9vciBvdGhlcndp
-c2UgcHJvdGVjdGVkIGZyb20gZGlzY2xvc3VyZS4gSWYgeW91IHJlY2VpdmVkIHRoaXMNCj4gZS1t
-YWlsIGluIGVycm9yIGFuZCB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50LCBhbnkg
-cmV2aWV3LCB1c2UsDQo+IGRpc3NlbWluYXRpb24sIGRpc3RyaWJ1dGlvbiwgb3IgY29weWluZyBv
-ZiB0aGlzIGUtbWFpbCBvciBhdHRhY2htZW50IGlzIHN0cmljdGx5DQo+IHByb2hpYml0ZWQuIFBs
-ZWFzZSBub3RpZnkgdXMgaW1tZWRpYXRlbHkgb2YgdGhlIGVycm9yIGJ5IHJldHVybiBlLW1haWwg
-YW5kDQo+IHBsZWFzZSBkZWxldGUgdGhpcyBtZXNzYWdlIGZyb20geW91ciBzeXN0ZW0uDQoNCg==
+Hi Luiz,
+
+> This enables any code using shared to log into monitor.
+> ---
+> Makefile.am          |   1 +
+> src/shared/monitor.c | 177 +++++++++++++++++++++++++++++++++++++++++++
+> src/shared/monitor.h |  30 ++++++++
+> 3 files changed, 208 insertions(+)
+> create mode 100644 src/shared/monitor.c
+> create mode 100644 src/shared/monitor.h
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index 0ccf393c6..2243248aa 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -119,6 +119,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+> 			src/shared/gatt-server.h src/shared/gatt-server.c \
+> 			src/shared/gatt-db.h src/shared/gatt-db.c \
+> 			src/shared/gap.h src/shared/gap.c \
+> +			src/shared/monitor.h src/shared/monitor.c \
+> 			src/shared/tty.h
+> 
+> if READLINE
+> diff --git a/src/shared/monitor.c b/src/shared/monitor.c
+> new file mode 100644
+> index 000000000..78766ed1a
+> --- /dev/null
+> +++ b/src/shared/monitor.c
+> @@ -0,0 +1,177 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2018  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdio.h>
+> +#include <errno.h>
+> +#include <inttypes.h>
+> +#include <unistd.h>
+> +#include <stdlib.h>
+> +#include <stdarg.h>
+> +#include <string.h>
+> +#include <signal.h>
+> +#include <sys/socket.h>
+> +
+> +#include "lib/bluetooth.h"
+> +#include "lib/hci.h"
+> +
+> +#include "src/shared/util.h"
+> +#include "src/shared/monitor.h"
+> +
+> +struct monitor_hdr {
+> +	uint16_t opcode;
+> +	uint16_t index;
+> +	uint16_t len;
+> +	uint8_t  priority;
+> +	uint8_t  ident_len;
+> +} __attribute__((packed));
+> +
+> +struct monitor_l2cap_hdr {
+> +	uint16_t cid;
+> +	uint16_t psm;
+> +} __attribute__((packed));
+> +
+> +static int monitor_fd = -1;
+> +
+> +int bt_monitor_sendmsg(const char *label, int level, struct iovec *io,
+> +							size_t io_len)
+> +{
+> +	struct monitor_hdr hdr;
+> +	struct msghdr msg;
+> +	struct iovec iov[5];
+> +	size_t i;
+> +	int err;
+> +
+> +	if (io_len > 3)
+> +		return -EMSGSIZE;
+> +
+> +	monitor_fd = bt_monitor_open();
+> +	if (monitor_fd < 0)
+> +		return monitor_fd;
+> +
+> +	hdr.opcode = cpu_to_le16(0x0000);
+> +	hdr.index = cpu_to_le16(0xffff);
+> +	hdr.ident_len = strlen(label) + 1;
+> +	hdr.len = cpu_to_le16(2 + hdr.ident_len);
+> +	hdr.priority = level;
+> +
+> +	iov[0].iov_base = &hdr;
+> +	iov[0].iov_len = sizeof(hdr);
+> +
+> +	iov[1].iov_base = (void *) label;
+> +	iov[1].iov_len = hdr.ident_len;
+> +
+> +	memset(&msg, 0, sizeof(msg));
+> +	msg.msg_iov = iov;
+> +	msg.msg_iovlen = 2;
+> +
+> +	for (i = 0; i < io_len; i++) {
+> +		iov[i + 2] = io[i];
+> +		hdr.len += io[i].iov_len;
+> +		msg.msg_iovlen++;
+> +	}
+> +
+> +	err = sendmsg(monitor_fd, &msg, 0);
+> +	if (err < 0) {
+> +		err = -errno;
+> +		close(monitor_fd);
+> +		monitor_fd = -1;
+> +	}
+> +
+> +	return err;
+> +}
+> +
+> +int bt_monitor_open(void)
+> +{
+> +	struct sockaddr_hci addr;
+> +	int fd;
+> +	int err;
+> +
+> +	if (monitor_fd >= 0)
+> +		return monitor_fd;
+> +
+> +	fd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+> +	if (fd < 0)
+> +		return -errno;
+> +
+> +	memset(&addr, 0, sizeof(addr));
+> +	addr.hci_family = AF_BLUETOOTH;
+> +	addr.hci_dev = HCI_DEV_NONE;
+> +	addr.hci_channel = HCI_CHANNEL_LOGGING;
+> +
+> +	err = bind(fd, (struct sockaddr *) &addr, sizeof(addr));
+> +	if (err < 0 ){
+> +		err = -errno;
+> +		close(fd);
+> +		return err;
+> +	}
+> +
+> +	monitor_fd = fd;
+> +
+> +	return fd;
+> +}
+> +
+> +int bt_monitor_vprintf(const char *label, int level, const char *format,
+> +								va_list ap)
+> +{
+> +	struct iovec iov;
+> +	char *str;
+> +	int err;
+> +
+> +	err = vasprintf(&str, format, ap);
+> +	if (err < 0)
+> +		return errno;
+> +
+> +	iov.iov_base = str;
+> +	iov.iov_len = strlen(str) + 1;
+> +
+> +	err = bt_monitor_sendmsg(label, level, &iov, 1);
+> +
+> +	free(str);
+> +
+> +	return err;
+> +}
+> +
+> +int bt_monitor_printf(const char *label, int level, const char *format, ...)
+> +{
+> +	va_list ap;
+> +	int err;
+> +
+> +	va_start(ap, format);
+> +	err = bt_monitor_vprintf(label, level, format, ap);
+> +	va_end(ap);
+> +
+> +	return err;
+> +}
+> +
+> +void bt_monitor_close(void)
+> +{
+> +	if (monitor_fd < 0)
+> +		return;
+> +
+> +	close(monitor_fd);
+> +	monitor_fd = -1;
+> +}
+> diff --git a/src/shared/monitor.h b/src/shared/monitor.h
+> new file mode 100644
+> index 000000000..0aa538e36
+> --- /dev/null
+> +++ b/src/shared/monitor.h
+> @@ -0,0 +1,30 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2018  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +int bt_monitor_open(void);
+> +int bt_monitor_sendmsg(const char *label, int level, struct iovec *io,
+> +							size_t io_len);
+> +int bt_monitor_vprintf(const char *label, int level, const char *format,
+> +								va_list ap);
+> +int bt_monitor_printf(const char *label, int level, const char *format, ...);
+> +void bt_monitor_close(void);
+
+so I do not like the naming here. This has nothing to do with the monitor actually. It is the logging into the kernel API. So better make this src/shared/log.[ch] and the bt_log_.
+
+Essentially you want a generic logging that does the right thing with sending data to the logging interface and optionally also sending it to syslog / stdout.
+
+Regards
+
+Marcel
+
