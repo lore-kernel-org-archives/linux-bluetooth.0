@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D431C0044C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04922C0044C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2EF762086C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EF762086C
+	by mail.kernel.org (Postfix) with ESMTP id C975B2081D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C975B2081D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731111AbeKGTtq (ORCPT
+        id S1730647AbeKGTuO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Nov 2018 14:49:46 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:45546 "EHLO
+        Wed, 7 Nov 2018 14:50:14 -0500
+Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:45514 "EHLO
         wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387401AbeKGTsy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Nov 2018 14:48:54 -0500
+        id S1730832AbeKGTsw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 7 Nov 2018 14:48:52 -0500
 Received: by wens.csie.org (Postfix, from userid 1000)
-        id 52CD75FC49; Wed,  7 Nov 2018 18:13:16 +0800 (CST)
+        id 6E4B95FCC3; Wed,  7 Nov 2018 18:13:16 +0800 (CST)
 From:   Chen-Yu Tsai <wens@csie.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -34,9 +34,9 @@ Cc:     linux-sunxi@googlegroups.com, Chen-Yu Tsai <wens@csie.org>,
         Loic Poulain <loic.poulain@gmail.com>,
         linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 02/15] dt-bindings: net: broadcom-bluetooth: Add VBAT and VDDIO supplies
-Date:   Wed,  7 Nov 2018 18:12:55 +0800
-Message-Id: <20181107101308.7626-3-wens@csie.org>
+Subject: [PATCH 05/15] Bluetooth: hci_bcm: Handle deferred probing for the clock supply
+Date:   Wed,  7 Nov 2018 18:12:58 +0800
+Message-Id: <20181107101308.7626-6-wens@csie.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181107101308.7626-1-wens@csie.org>
 References: <20181107101308.7626-1-wens@csie.org>
@@ -47,31 +47,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The Broadcom Bluetooth chips have two power inputs, VBAT and VDDIO.
-The former provides overall power for the chip, while the latter powers
-the I/O pins and buffers.
+On some systems that actually have the bluetooth controller wired up
+with an extra clock signal, it's possible the bluetooth controller
+probes before the clock provider. clk_get would return a defer probe
+error, which was not handled by this driver.
 
-This patch adds properties for the two so we can describe the power
-supply relationships.
+Handle this properly, so that these systems can work reliably.
 
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-index 2535e54219af..f6ff1a60ab3e 100644
---- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-+++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-@@ -23,6 +23,8 @@ Optional properties:
-    - "extclk": deprecated, replaced by "txco"
-    - "lpo": external low power 32.768 kHz clock
-  - clock-names: should be "extclk"
-+ - vbat-supply: phandle to regulator supply for VBAT
-+ - vddio-supply: phandle to regulator supply for VDDIO
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index ddbd8c6a0ceb..0a20ad48b511 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -907,6 +907,10 @@ static int bcm_get_resources(struct bcm_device *dev)
  
+ 	dev->clk = devm_clk_get(dev->dev, NULL);
  
- Example:
++	/* Handle deferred probing */
++	if (IS_ERR(dev->clk) && PTR_ERR(dev->clk) == -EPROBE_DEFER)
++		return PTR_ERR(dev->clk);
++
+ 	dev->device_wakeup = devm_gpiod_get_optional(dev->dev, "device-wakeup",
+ 						     GPIOD_OUT_LOW);
+ 	if (IS_ERR(dev->device_wakeup))
 -- 
 2.19.1
 
