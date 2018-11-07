@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C93C0044C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98FE9C46465
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4A372086B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4A372086B
+	by mail.kernel.org (Postfix) with ESMTP id 633D12086B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 10:20:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 633D12086B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387556AbeKGTsw (ORCPT
+        id S2387484AbeKGTsw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 7 Nov 2018 14:48:52 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:45512 "EHLO
+Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:45504 "EHLO
         wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730845AbeKGTsu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1730834AbeKGTsu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 7 Nov 2018 14:48:50 -0500
 Received: by wens.csie.org (Postfix, from userid 1000)
-        id 46F395F863; Wed,  7 Nov 2018 18:13:16 +0800 (CST)
+        id 7A6E85FCCF; Wed,  7 Nov 2018 18:13:16 +0800 (CST)
 From:   Chen-Yu Tsai <wens@csie.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -34,9 +34,9 @@ Cc:     linux-sunxi@googlegroups.com, Chen-Yu Tsai <wens@csie.org>,
         Loic Poulain <loic.poulain@gmail.com>,
         linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 01/15] dt-bindings: net: broadcom-bluetooth: Fix external clock names
-Date:   Wed,  7 Nov 2018 18:12:54 +0800
-Message-Id: <20181107101308.7626-2-wens@csie.org>
+Subject: [PATCH 06/15] Bluetooth: hci_bcm: Simplify clk_get error handling
+Date:   Wed,  7 Nov 2018 18:12:59 +0800
+Message-Id: <20181107101308.7626-7-wens@csie.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181107101308.7626-1-wens@csie.org>
 References: <20181107101308.7626-1-wens@csie.org>
@@ -47,40 +47,63 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The Broadcom Bluetooth controllers can take up to two external clocks:
-an external frequency reference, substituting the main crystal, and a
-LPO clock at 32.768 kHz substituting the internal LPO clock.
+The driver currently checks the clk pointer for an error condition, as
+returned by clk_get, before every invocation of the clk consumer API.
+This is redundant if the goal is simply to ignore the errors, thereby
+making the clk optional. The clk consumer API already checks if the
+pointer is NULL or not.
 
-In particular, the external LPO clock must be used when the controller
-does not have NVRAM connected, and the main reference frequency is not
-the default 20 MHz. This is described in detail in the datasheet.
-
-The original "extclk" clock name is ambiguous as to which of these it
-refers to, and some designs might even require both.
-
-This patch deprecates the existing name, and adds "txco" and "lpo".
+Simplify the code a bit by assigning NULL to the clk pointer if the
+error condition is one we want to ignore, which is every error except
+deferred probing.
 
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_bcm.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-index 4194ff7e6ee6..2535e54219af 100644
---- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-+++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-@@ -18,7 +18,10 @@ Optional properties:
-  - shutdown-gpios: GPIO specifier, used to enable the BT module
-  - device-wakeup-gpios: GPIO specifier, used to wakeup the controller
-  - host-wakeup-gpios: GPIO specifier, used to wakeup the host processor
-- - clocks: clock specifier if external clock provided to the controller
-+ - clocks and clock-names: clock specifier if external clocks are provided
-+   - "txco": external reference clock
-+   - "extclk": deprecated, replaced by "txco"
-+   - "lpo": external low power 32.768 kHz clock
-  - clock-names: should be "extclk"
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 0a20ad48b511..7f21d9ab5029 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -214,7 +214,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+ {
+ 	int err;
  
+-	if (powered && !IS_ERR(dev->clk) && !dev->clk_enabled) {
++	if (powered && !dev->clk_enabled) {
+ 		err = clk_prepare_enable(dev->clk);
+ 		if (err)
+ 			return err;
+@@ -228,7 +228,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+ 	if (err)
+ 		goto err_revert_shutdown;
  
+-	if (!powered && !IS_ERR(dev->clk) && dev->clk_enabled)
++	if (!powered && dev->clk_enabled)
+ 		clk_disable_unprepare(dev->clk);
+ 
+ 	dev->clk_enabled = powered;
+@@ -238,7 +238,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+ err_revert_shutdown:
+ 	dev->set_shutdown(dev, !powered);
+ err_clk_disable:
+-	if (powered && !IS_ERR(dev->clk) && !dev->clk_enabled)
++	if (powered && !dev->clk_enabled)
+ 		clk_disable_unprepare(dev->clk);
+ 	return err;
+ }
+@@ -911,6 +911,10 @@ static int bcm_get_resources(struct bcm_device *dev)
+ 	if (IS_ERR(dev->clk) && PTR_ERR(dev->clk) == -EPROBE_DEFER)
+ 		return PTR_ERR(dev->clk);
+ 
++	/* Ignore all other errors as before */
++	if (IS_ERR(dev->clk))
++		dev->clk = NULL;
++
+ 	dev->device_wakeup = devm_gpiod_get_optional(dev->dev, "device-wakeup",
+ 						     GPIOD_OUT_LOW);
+ 	if (IS_ERR(dev->device_wakeup))
 -- 
 2.19.1
 
