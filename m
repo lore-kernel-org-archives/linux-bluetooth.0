@@ -1,94 +1,92 @@
-Return-Path: <SRS0=TbT7=NS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=LpJm=NT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A602AC0044C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 20:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCBC2C46465
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Nov 2018 05:50:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 774682081D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Nov 2018 20:36:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 774682081D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bootlin.com
+	by mail.kernel.org (Postfix) with ESMTP id 8DE9D2086A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Nov 2018 05:50:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DE9D2086A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726775AbeKHGIM (ORCPT
+        id S1726173AbeKHPYd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Nov 2018 01:08:12 -0500
-Received: from mail.bootlin.com ([62.4.15.54]:44597 "EHLO mail.bootlin.com"
+        Thu, 8 Nov 2018 10:24:33 -0500
+Received: from mail5.windriver.com ([192.103.53.11]:56864 "EHLO mail5.wrs.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726517AbeKHGIL (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Nov 2018 01:08:11 -0500
-Received: by mail.bootlin.com (Postfix, from userid 110)
-        id A91A2207B8; Wed,  7 Nov 2018 21:36:08 +0100 (CET)
-Received: from localhost (lfbn-1-10718-76.w90-89.abo.wanadoo.fr [90.89.68.76])
-        by mail.bootlin.com (Postfix) with ESMTPSA id 768D020712;
-        Wed,  7 Nov 2018 21:36:08 +0100 (CET)
-Date:   Wed, 7 Nov 2018 21:36:08 +0100
-From:   Maxime Ripard <maxime.ripard@bootlin.com>
-To:     Chen-Yu Tsai <wens@csie.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-sunxi@googlegroups.com,
-        Loic Poulain <loic.poulain@gmail.com>,
-        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 11/15] Bluetooth: hci_bcm: Add BCM20702A1 variant
-Message-ID: <20181107203608.ff32gmb4u54kcvep@flea>
-References: <20181107101308.7626-1-wens@csie.org>
- <20181107101308.7626-12-wens@csie.org>
+        id S1726143AbeKHPYd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 8 Nov 2018 10:24:33 -0500
+Received: from ALA-HCB.corp.ad.wrs.com (ala-hcb.corp.ad.wrs.com [147.11.189.41])
+        by mail5.wrs.com (8.15.2/8.15.2) with ESMTPS id wA85noAS023656
+        (version=TLSv1 cipher=AES128-SHA bits=128 verify=FAIL);
+        Wed, 7 Nov 2018 21:50:01 -0800
+Received: from pek-lpggp4.wrs.com (128.224.153.77) by ALA-HCB.corp.ad.wrs.com
+ (147.11.189.41) with Microsoft SMTP Server id 14.3.408.0; Wed, 7 Nov 2018
+ 21:49:33 -0800
+From:   Zumeng Chen <zumeng.chen@gmail.com>
+To:     <linux-bluetooth@vger.kernel.org>
+CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <linux-kernel@vger.kernel.org>, Zumeng Chen <zumeng.chen@gmail.com>
+Subject: [PATCH 1/1] Bluetooth: make the balance of judgement condition to fix a false report
+Date:   Thu, 8 Nov 2018 13:47:45 +0800
+Message-ID: <1541656065-111693-1-git-send-email-zumeng.chen@gmail.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="mf6se6s5b6tdxb5f"
-Content-Disposition: inline
-In-Reply-To: <20181107101308.7626-12-wens@csie.org>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This patch is to balance the condition scope between hci_get_cmd_complete and
+hci_event_packet about orig_skb as follows: 
 
---mf6se6s5b6tdxb5f
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+        if (req_complete_skb || event == HCI_EV_CMD_STATUS ||
+            event == HCI_EV_CMD_COMPLETE)
+                orig_skb = skb_clone(skb, GFP_KERNEL);
 
-Hi!
+And hci_get_cmd_complete will bt_dev_err out when HCI_EV_CMD_STATUS, so a lot
+of asymmetric conditions are triggered. Since both of them are the entry into
+hci_get_cmd_complete, we'd better get STATUS into judge the false out there.
 
-On Wed, Nov 07, 2018 at 06:13:04PM +0800, Chen-Yu Tsai wrote:
-> From: Maxime Ripard <maxime.ripard@free-electrons.com>
->=20
-> The BCM20702A1 chip is a single-chip Bluetooth 4.0 controller and
-> transceiver. It is found in the AMPAK AP6210 WiFi+BT package.
->=20
-> Signed-off-by: Maxime Ripard <maxime.ripard@free-electrons.com>
-> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+Signed-off-by: Zumeng Chen <zumeng.chen@gmail.com>
+---
 
-if you resubmit it, could you do s/free-electrons/bootlin/ ?
+Hi expert,
 
-Thanks!
-Maxime
+This issue existed whether or not T_DBG had been changed into bt_dev_err, which
+just shows the issue explicitly. I noticed actually that opcode doesn't match
+ev->opcode either at the same time. And there might be some logic issue about
+HCI_EV_CMD_COMPLETE between protocol and drivers. I'm not familar with the whole
+bluetooth protocol, and not gonna to dig more, so all yours guys~
 
---=20
-Maxime Ripard, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Cheers,
+Zumeng
 
---mf6se6s5b6tdxb5f
-Content-Type: application/pgp-signature; name="signature.asc"
+ net/bluetooth/hci_event.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
------BEGIN PGP SIGNATURE-----
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 235b5aa..d848663 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5217,7 +5217,8 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
+ 		return true;
+ 	}
+ 
+-	if (hdr->evt != HCI_EV_CMD_COMPLETE) {
++	if (!((hdr->evt == HCI_EV_CMD_COMPLETE) ||
++		(hdr->evt == HCI_EV_CMD_STATUS))) {
+ 		bt_dev_err(hdev, "last event is not cmd complete (0x%2.2x)",
+ 			   hdr->evt);
+ 		return false;
+-- 
+2.7.4
 
-iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCW+NMuAAKCRDj7w1vZxhR
-xZ9TAP0XC5cSi5OLifkzszkxT84RBo2POjE1FhBS++2wQWay/gEA0MR7BCtk6Lgp
-6H2yoSMYiB0AQzDrmt7nKTzJX5PrmAI=
-=mfGb
------END PGP SIGNATURE-----
-
---mf6se6s5b6tdxb5f--
