@@ -2,168 +2,266 @@ Return-Path: <SRS0=dX+b=NU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF21C43610
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Nov 2018 00:12:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA1EC43441
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Nov 2018 06:43:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D91F20855
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Nov 2018 00:12:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 384B220883
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Nov 2018 06:43:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nz1Schec"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D91F20855
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p3EtHfrs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 384B220883
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727203AbeKIJuH (ORCPT
+        id S1727637AbeKIQWu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Nov 2018 04:50:07 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:44639 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725922AbeKIJuH (ORCPT
+        Fri, 9 Nov 2018 11:22:50 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:45294 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727598AbeKIQWu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Nov 2018 04:50:07 -0500
-Received: by mail-pg1-f194.google.com with SMTP id w3-v6so38845pgs.11;
-        Thu, 08 Nov 2018 16:12:05 -0800 (PST)
+        Fri, 9 Nov 2018 11:22:50 -0500
+Received: by mail-pg1-f196.google.com with SMTP id y4so431294pgc.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Nov 2018 22:43:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=y6G3fJWoHOThjb5/JbAxsM3dEjjUKXbWiLs3zdGUVPU=;
-        b=Nz1Schecg2Bbr5yaR4tZMmZSH3oMem7pfdH4Z03ifZJ6jLgvGvmwbxHdOWSSy9TI7S
-         fzb8sQGoJHFHXO0LHBT27WRkf9N9XAG2kfCbKw4kKVyViVWIAeI1VBJUfwofZfbhcnTK
-         tbDmVYXV8FbtP0Nxbqjtsmwctpvipv03LySpQv+qfA/7Hqebdg+AGtYNd1Qea9U+/lMR
-         rzI7viNZjguPaywcDEQZfkWmPOzTnhxzS94ywQD+YnvfRwcm2E08oO3f4wze1HRhZ+h3
-         GLgP7o3uhwHeNGosRTDRY6CJrtpCB6pHZfNgdKz+nkPHBPt0PR1dPI8ORSFwLFT1wKPR
-         FvzA==
+        h=from:to:cc:subject:date:message-id;
+        bh=lnMiBQuaug1hmFz/PSTokFZxMHAp0G4VPqFOcwAUJ4s=;
+        b=p3EtHfrsSEg3D9ye0QXoiN94EjaJKl+AJufzUFKTWMHwATU4WFDPp2HYwh/hSv/sh4
+         9+esXUIuk4Mp+JaSnj631wlByvwT48xbvExYECBB0Cb2YL0qnUDG8jEMk5rg4d0KvvBU
+         cBnXuhI4h60APVCHCY8Aesssg/n6+n8s3Dn7xnH1zsH+zJqQn8f3GnlD1UXQC16FBQzC
+         HLhZty7hxCdjCq8+2aP0oah5vi2wdP1VtPLAzQIq8XeBfgqKvEj4d3I1fUuLG/EaKjVz
+         e+9CBMLNZ83i+Q1DSsMHzi74i4LaI3EjHrjQSV/CVZ071vMhhKCMdIVHcJnlIR/AGaJT
+         AmbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=y6G3fJWoHOThjb5/JbAxsM3dEjjUKXbWiLs3zdGUVPU=;
-        b=Jt6vdyBlOIqT4iu0kmmRMABOAGC/Mj48w9by58NuiP7YBr8ZF1NmrhaMvlHMKiI1Gw
-         miQ23kxV0M+cWxtim1CUevWdVAeL3c8lSTkmb2ewBJn67cq3MHYvIdWORx21x61LjRtV
-         RO0bZEQSihVmD72diVRoHBmn0xnonl1pOLq5UQt8tXeRWi8vYbeplGCUmEgy8ctViRxD
-         PT+4L9b0FocAEho8GLDfHVxJFZabhuHLe5bmBeBHdTZR40enMjFRKyr6oB/kEiRUHJfU
-         bsJfK/uhzqD0whU6BipoV27tYVmcmpJxCPJbt0WXKaskp4dYpxW0hCyiTJ5e8+FT6Z1B
-         h8Pw==
-X-Gm-Message-State: AGRZ1gLoKG/yzWHsNZ/OphHs/s5wlkmTPyzZD4dl1egLTREi755zJ8vB
-        r336VVbTsoy1WuxwLpkv9LpSvCr5oZVjg9/6cxg=
-X-Google-Smtp-Source: AJdET5dZgJvOIm77JwKBWIp33lnOdZ+REl8qIaCpiMFzOCRLDeLqSUTs2aJWL5xuOUkRUSj5DRaAVTQjPBnVNyLPoRc=
-X-Received: by 2002:a62:c184:: with SMTP id i126-v6mr6750841pfg.53.1541722325133;
- Thu, 08 Nov 2018 16:12:05 -0800 (PST)
-MIME-Version: 1.0
-References: <910F8A29-3141-422F-87EE-7BFBCDE9060C@holtmann.org> <20181109000800.15431-1-jprvita@gmail.com>
-In-Reply-To: <20181109000800.15431-1-jprvita@gmail.com>
-From:   =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
-Date:   Thu, 8 Nov 2018 16:11:28 -0800
-Message-ID: <CA+A7VXXDuxo2=mndMFgHHRUJHPXOaupt+0eN9DS0zvwGL2hrLQ@mail.gmail.com>
-Subject: Re: [PATCH 3/3] iwlwifi: Load firmware exclusively for Intel WiFi
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     kai.heng.feng@canonical.com,
-        Luca Coelho <luciano.coelho@intel.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Intel Linux Wireless <linuxwifi@intel.com>,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux@endlessm.com,
-        =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessm.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=lnMiBQuaug1hmFz/PSTokFZxMHAp0G4VPqFOcwAUJ4s=;
+        b=JbbBiXDAvkVAbKItxjwiXeaEbGg9Wk32jUqFSaW4AGztVvFVn8dT2hrvGpx94iNro1
+         PvFcTfQPhVtjcyfOz2L2J32BQnMRveFZoJcVZPTsfy5O1O0wnU7HGkIuAil4XVF6hQ+9
+         MD2gaqTSa0qthcziJTVSIC1UED2lGRWbXU90id+SZ+pWB0mW00o/FaTSw7rd8TtlPSJc
+         JBccqRnZ6MSX0PkqS6gWoLEPNgHEwIT01cB8xaDXQh7pcTJOum3aXHzimAuXJDFnCF4/
+         b9ue7IjAGC0cNemC3AZf9D2z+S+MyEN3bZ1bXov9V4KZP0SFfR4F284yasMg5midSqX5
+         JBvg==
+X-Gm-Message-State: AGRZ1gLlC+sAbZHwWR4lHag46WxElrDFQXSdVZg7ty7HCe1Isfm7/IAy
+        Cd2iOzFRjxflebqxyYWxxpNR4qX7ViM=
+X-Google-Smtp-Source: AJdET5cUUEWkBzVdZsgMduM9P9HxRNa+Dky+8fGz91DDRBI9NqcMeW032zX8xoK285vQlSv9nnZEDw==
+X-Received: by 2002:a62:d8c3:: with SMTP id e186-v6mr7968011pfg.52.1541745821850;
+        Thu, 08 Nov 2018 22:43:41 -0800 (PST)
+Received: from wcs0336-Latitude-E5440.iind.intel.com ([192.55.54.41])
+        by smtp.gmail.com with ESMTPSA id c7-v6sm7006805pfh.25.2018.11.08.22.43.39
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 08 Nov 2018 22:43:41 -0800 (PST)
+From:   Jaganath Kanakkassery <jaganath.k.os@gmail.com>
+X-Google-Original-From: Jaganath Kanakkassery <jaganath.kanakkassery@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Jaganath Kanakkassery <jaganath.kanakkassery@intel.com>
+Subject: [PATCH v2 BlueZ] btmgmt: Add BREDR PHYs in PHY Configuration commands
+Date:   Fri,  9 Nov 2018 12:07:09 +0530
+Message-Id: <1541745429-13105-1-git-send-email-jaganath.kanakkassery@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-+ linux-bluetooth
+This basically adds BREDR packet types also in the PHY confiuration
+commands & events and makes the PHYs 32 bit so that it can be
+extended in future. This also add configurable PHYs in the GetPhy
+command wherein only those can be selected or deselected in SetPhy.
 
-On Thu, Nov 8, 2018 at 4:08 PM Jo=C3=A3o Paulo Rechi Vita <jprvita@gmail.co=
-m> wrote:
->
-> Hello Marcel,
->
-> > On Oct 4, 2018, at 2:25 AM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> >
-> > Hi Kai-Heng,
-> >
-> >>> I think Canonical were facing some wifi fw load error from some 8260
-> >>> earlier module during the BT still loading the fw.
-> >>> I believe we had later 8260 sku that fixed this issue.
-> >>
-> >> But there are already 8260 that is affected by this bug in the wild.
-> >>
-> >> Search "Bluetooth: hci0: Failed to send firmware data (-38)=E2=80=9D a=
-nd there are lots of user are affected.
-> >
-> > which SKUs are these actually. What are the initial details about the b=
-oot loader. For the Bluetooth side, you should be able to grab them from dm=
-esg or by running btmon.
-> >
-> > So I am not in favor of this kind of hack and creating dependencies bet=
-ween drivers. If you only have a hammer, then everything looks like a nail.=
- And this is a massive hammer trying to squash everything. This problem nee=
-ds to be debugged. And this starts by providing affected SKU information an=
-d firmware information. So get the details about the SKU and its Bluetooth =
-and WiFi boot loaders.
-> >
->
-> I have a Lenovo Yoga 900 which presents this problem and has the same boo=
-tloader / firmware information as Kai-Heng already posted:
->
-> [    5.992426] Bluetooth: Core ver 2.22
-> [    5.992438] Bluetooth: HCI device and connection manager initialized
-> [    5.992442] Bluetooth: HCI socket layer initialized
-> [    5.992444] Bluetooth: L2CAP socket layer initialized
-> [    5.992450] Bluetooth: SCO socket layer initialized
-> [    6.004941] Bluetooth: hci0: Bootloader revision 0.0 build 2 week 52 2=
-014
-> [    6.010922] Bluetooth: hci0: Device revision is 5
-> [    6.010923] Bluetooth: hci0: Secure boot is enabled
-> [    6.010924] Bluetooth: hci0: OTP lock is enabled
-> [    6.010925] Bluetooth: hci0: API lock is enabled
-> [    6.010926] Bluetooth: hci0: Debug lock is disabled
-> [    6.010927] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-> [    6.014253] bluetooth hci0: firmware: direct-loading firmware intel/ib=
-t-11-5.sfi
-> [    6.014256] Bluetooth: hci0: Found device firmware: intel/ibt-11-5.sfi
-> [    6.613961] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-> [    6.613966] Bluetooth: BNEP filters: protocol multicast
-> [    6.613974] Bluetooth: BNEP socket layer initialized
-> [    6.983804] Bluetooth: hci0: Failed to send firmware data (-38)
->
-> And the following product id and revision, from usb-devices:
->
-> T:  Bus=3D01 Lev=3D01 Prnt=3D01 Port=3D06 Cnt=3D02 Dev#=3D  3 Spd=3D12  M=
-xCh=3D 0
-> D:  Ver=3D 2.00 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
-> P:  Vendor=3D8087 ProdID=3D0a2b Rev=3D00.01
-> C:  #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
-> I:  If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
-> I:  If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Driver=
-=3Dbtusb
->
-> I understand the drawbacks with the approach presented here and lack of c=
-lear explanation of the problem, but I can confirm these patches work aroun=
-d the problem on my machine. Is there any extra info or test result I can p=
-rovide to help debug this? I can also dedicate time to help write a differe=
-nt solution if some guidance is provided.
->
-> Kai-Heng, did you end up filling a Bugzilla entry for this?
->
-> Please CC-me on the replies as I'm not receiving emails from linux-blueto=
-oth or linux-wireless anymore.
->
-> Thanks,
->
-> --
-> Jo=C3=A3o Paulo Rechi Vita
-> http://about.me/jprvita
+This also adds LE prefix for LE phys to make it more
+descriptive
+---
+ lib/mgmt.h     | 32 ++++++++++++++++---------
+ tools/btmgmt.c | 75 ++++++++++++++++++++++++++++++++++------------------------
+ 2 files changed, 65 insertions(+), 42 deletions(-)
+
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index ec6a380..570dec9 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -552,16 +552,26 @@ struct mgmt_cp_set_appearance {
+ 
+ #define MGMT_OP_GET_PHY_CONFIGURATION	0x0044
+ struct mgmt_rp_get_phy_confguration {
+-	uint16_t	supported_phys;
+-	uint16_t	selected_phys;
+-} __packed;
+-
+-#define MGMT_PHY_LE_1M_TX		0x0001
+-#define MGMT_PHY_LE_1M_RX		0x0002
+-#define MGMT_PHY_LE_2M_TX		0x0004
+-#define MGMT_PHY_LE_2M_RX		0x0008
+-#define MGMT_PHY_LE_CODED_TX		0x0010
+-#define MGMT_PHY_LE_CODED_RX		0x0020
++	uint32_t	supported_phys;
++	uint32_t	configurable_phys;
++	uint32_t	selected_phys;
++} __packed;
++
++#define MGMT_PHY_BR_1M_1SLOT	0x00000001
++#define MGMT_PHY_BR_1M_3SLOT	0x00000002
++#define MGMT_PHY_BR_1M_5SLOT	0x00000004
++#define MGMT_PHY_EDR_2M_1SLOT	0x00000008
++#define MGMT_PHY_EDR_2M_3SLOT	0x00000010
++#define MGMT_PHY_EDR_2M_5SLOT	0x00000020
++#define MGMT_PHY_EDR_3M_1SLOT	0x00000040
++#define MGMT_PHY_EDR_3M_3SLOT	0x00000080
++#define MGMT_PHY_EDR_3M_5SLOT	0x00000100
++#define MGMT_PHY_LE_1M_TX		0x00000200
++#define MGMT_PHY_LE_1M_RX		0x00000400
++#define MGMT_PHY_LE_2M_TX		0x00000800
++#define MGMT_PHY_LE_2M_RX		0x00001000
++#define MGMT_PHY_LE_CODED_TX	0x00002000
++#define MGMT_PHY_LE_CODED_RX	0x00004000
+ 
+ #define MGMT_PHY_LE_TX_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_2M_TX | \
+ 			     MGMT_PHY_LE_CODED_TX)
+@@ -570,7 +580,7 @@ struct mgmt_rp_get_phy_confguration {
+ 
+ #define MGMT_OP_SET_PHY_CONFIGURATION	0x0045
+ struct mgmt_cp_set_phy_confguration {
+-	uint16_t	default_phys;
++	uint32_t	selected_phys;
+ } __packed;
+ 
+ 
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 9e3a3ca..6922f3d 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -4181,15 +4181,24 @@ static void cmd_appearance(int argc, char **argv)
+ }
+ 
+ static const char *phys_str[] = {
+-	"1MTX",
+-	"1MRX",
+-	"2MTX",
+-	"2MRX",
+-	"CODEDTX",
+-	"CODEDRX",
++	"BR1M1SLOT",
++	"BR1M3SLOT",
++	"BR1M5SLOT",
++	"EDR2M1SLOT",
++	"EDR2M3SLOT",
++	"EDR2M5SLOT",
++	"EDR3M1SLOT",
++	"EDR3M3SLOT",
++	"EDR3M5SLOT",
++	"LE1MTX",
++	"LE1MRX",
++	"LE2MTX",
++	"LE2MRX",
++	"LECODEDTX",
++	"LECODEDRX",
+ };
+ 
+-static const char *phys2str(uint16_t phys)
++static const char *phys2str(uint32_t phys)
+ {
+ 	static char str[256];
+ 	unsigned int i;
+@@ -4207,11 +4216,25 @@ static const char *phys2str(uint16_t phys)
+ 	return str;
+ }
+ 
++static bool str2phy(const char *phy_str, uint32_t *phy_val)
++{
++	unsigned int i;
++
++	for (i = 0; i < NELEM(phys_str); i++) {
++		if (strcasecmp(phys_str[i], phy_str) == 0) {
++			*phy_val = (1 << i);
++			return true;
++		}
++	}
++
++	return false;
++}
++
+ static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
+ 							void *user_data)
+ {
+ 	const struct mgmt_rp_get_phy_confguration *rp = param;
+-	uint16_t supported_flags, selected_phys;
++	uint32_t supported_phys, selected_phys, configurable_phys;
+ 
+ 	if (status != 0) {
+ 		error("Get PHY Configuration failed with status 0x%02x (%s)",
+@@ -4224,10 +4247,12 @@ static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	supported_flags = get_le16(&rp->supported_phys);
+-	selected_phys = get_le16(&rp->selected_phys);
++	supported_phys = get_le32(&rp->supported_phys);
++	configurable_phys = get_le32(&rp->configurable_phys);
++	selected_phys = get_le32(&rp->selected_phys);
+ 
+-	print("Supported phys: %s", phys2str(supported_flags));
++	print("Supported phys: %s", phys2str(supported_phys));
++	print("Configurable phys: %s", phys2str(configurable_phys));
+ 	print("Selected phys: %s", phys2str(selected_phys));
+ 
+ 	bt_shell_noninteractive_quit(EXIT_SUCCESS);
+@@ -4266,33 +4291,20 @@ static void cmd_phy(int argc, char **argv)
+ {
+ 	struct mgmt_cp_set_phy_confguration cp;
+ 	int i;
+-	uint16_t phys = 0;
++	uint32_t phys = 0;
+ 	uint16_t index;
+ 
+ 	if (argc < 2)
+ 		return get_phy();
+ 
+ 	for (i = 1; i < argc; i++) {
+-		if (strcasecmp(argv[i], "1MTX") == 0)
+-			phys |= MGMT_PHY_LE_1M_TX;
+-
+-		if (strcasecmp(argv[i], "1MRX") == 0)
+-			phys |= MGMT_PHY_LE_1M_RX;
+-
+-		if (strcasecmp(argv[i], "2MTX") == 0)
+-			phys |= MGMT_PHY_LE_2M_TX;
+-
+-		if (strcasecmp(argv[i], "2MRX") == 0)
+-			phys |= MGMT_PHY_LE_2M_RX;
+-
+-		if (strcasecmp(argv[i], "CODEDTX") == 0)
+-			phys |= MGMT_PHY_LE_CODED_TX;
++		uint32_t phy_val;
+ 
+-		if (strcasecmp(argv[i], "CODEDRX") == 0)
+-			phys |= MGMT_PHY_LE_CODED_RX;
++		if (str2phy(argv[i], &phy_val))
++			phys |= phy_val;
+ 	}
+ 
+-	cp.default_phys = cpu_to_le16(phys);
++	cp.selected_phys = cpu_to_le32(phys);
+ 
+ 	index = mgmt_index;
+ 	if (index == MGMT_INDEX_NONE)
+@@ -4501,8 +4513,9 @@ static const struct bt_shell_menu main_menu = {
+ 		cmd_clr_adv,		"Clear advertising instances"	},
+ 	{ "appearance",		"<appearance>",
+ 		cmd_appearance,		"Set appearance"		},
+-	{ "phy",		"[1MTX] [1MRX] [2MTX] [2MRX] [CODEDTX] "
+-				"[CODEDRX] [BR1M1SLOT] [BR1M3SLOT] [BR1M5SLOT]"
++	{ "phy",		"[LE1MTX] [LE1MRX] [LE2MTX] [LE2MRX] "
++				"[LECODEDTX] [LECODEDRX] "
++				"[BR1M1SLOT] [BR1M3SLOT] [BR1M5SLOT]"
+ 				"[EDR2M1SLOT] [EDR2M3SLOT] [EDR2M5SLOT]"
+ 				"[EDR3M1SLOT] [EDR3M3SLOT] [EDR3M5SLOT]",
+ 		cmd_phy,		"Get/Set PHY Configuration"	},
+-- 
+2.7.4
+
