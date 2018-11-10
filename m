@@ -2,69 +2,68 @@ Return-Path: <SRS0=nRr/=NV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A20C43441
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Nov 2018 17:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 677A1C43441
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Nov 2018 18:03:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 393E120840
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Nov 2018 17:58:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2409E20840
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Nov 2018 18:03:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IbK5xi0b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 393E120840
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RUC0vWF4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2409E20840
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726342AbeKKDoI (ORCPT
+        id S1726342AbeKKDtf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 10 Nov 2018 22:44:08 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:46346 "EHLO
+        Sat, 10 Nov 2018 22:49:35 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:46678 "EHLO
         mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726244AbeKKDoH (ORCPT
+        with ESMTP id S1726292AbeKKDtf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 10 Nov 2018 22:44:07 -0500
-Received: by mail-ot1-f68.google.com with SMTP id w25so3791994otm.13
-        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Nov 2018 09:58:16 -0800 (PST)
+        Sat, 10 Nov 2018 22:49:35 -0500
+Received: by mail-ot1-f68.google.com with SMTP id w25so3799780otm.13
+        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Nov 2018 10:03:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=iORXXL/RUFw+d9U3aY+y0DrQPiQjNJ5yl9wWohBXHC8=;
-        b=IbK5xi0bFr8qigoFNv7gZQSPM3nkvU/ScsttBgCkOLIYntmD7yt83rm2bMupA/2cTK
-         lsy8LsOS2ZGNHfZ8YeiM+xXplOAdRQ3krd2w4duHXo8g1zfdRgQZUrY8312brUHR6kQi
-         gG6b5FgbhR0utTSnEz8lJDE0umaDTtS2kzcjrm0SM1OZ2lF9IA7UbUYpKgHkN5XPQWBV
-         g8Hou1Svtjlfvr2dzTOc3022NvVA5A8/jbT2sPd13TDZMK9bx90e2Fh2rfKvIEP1URbV
-         L+UqLJY8os8H7ymMagaDeAJMahfaG/HNaKwewuNY4GkihXSbUKoOOBZb/uj9MGILqPon
-         BRYQ==
+        bh=TLCUksrBKxZCNojQpcNq2IuGNs/ODqtty94ersFz3vs=;
+        b=RUC0vWF4+B8mtBlTYt0SviDxQqDL9qUk7Swk4Bpi1nxKupwd9+gcdP59t7HG5Hp+El
+         5auYkKGC8KP/xXKwYDRg2TFd88hHHwuFiWPocCafRuhSHt3Htunhdhc6fdE0e/lbpaY1
+         DITf1XpirspX53WTqJbIjnW9DgKJ1OOBJQWSoDSeligoz9S51oDqjxuXIKHxm/rt02d5
+         sV+g9AeelA9zbEPkahLLRovoMbbXle8r6B/8wJeoVDqxeN8t6F55Z5QHSZWryrQbCZK4
+         wnUTsnNpevrnFR8mqPepevJfOsfOfseHvr5QE2Rt3hyHuMjfzNQ2mfof+aMaaFD1jRId
+         5RoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=iORXXL/RUFw+d9U3aY+y0DrQPiQjNJ5yl9wWohBXHC8=;
-        b=NUaQ7RPDr/mHSnU6wEEudX0IS8Sv6jhR448ehsx2VKL+2xBN89XwjzsfNMFcHStJXg
-         jYTBvie4RBzaWRK0Zy3Bl+YjIGvQ7kTSOAivsxh/7ZtO0ipM7tGkGbImL2THMjUHmWmZ
-         MDR9LLsmFwUmW2RcRAfjZx5E8Bb3lkkvig9/KhzWiWFrUyNr69LkllsATcB0veJ7YUxQ
-         E396iOJULjr2BZ2nmxuBT5CPHxJexXnphiRtFzUh4CId4nvKIgieaCRPDb6YLMqQEKdB
-         VpPg+R5NY51LatnTxm0wbMrnJtXOYE2hRZp9zRuqLvYiSgmOsYT/4YBAxaqXQFOhlUdl
-         Secg==
-X-Gm-Message-State: AGRZ1gKuT3TQ1chcQmDj3CdDZGC0RajaqSX37JbJks0Gfm/Dp2Pz/qU+
-        MV6z0gV/vJrt6Bp3JxHgvXTOKIkVLg+8UWjmn67p+g==
-X-Google-Smtp-Source: AJdET5cBW0SG7qAjhD4uS+1NJBRNnMTLYPVVFePPSKu1CKOXuGmSWKl0TIykUufd6A+6LEXKqQ594ghLcfv5BPr8aII=
-X-Received: by 2002:a9d:2831:: with SMTP id m46mr7717600otb.291.1541872695949;
- Sat, 10 Nov 2018 09:58:15 -0800 (PST)
+        bh=TLCUksrBKxZCNojQpcNq2IuGNs/ODqtty94ersFz3vs=;
+        b=AvPSNQ7BMPyec94xTjo+PX68EvUJqosf4LiQLfDfIfuOm17ShFerfvz/qpknwiz0ox
+         NvlhxtjlSJ33vaf3ba0jUTHa0mUcnZ41EK099rtAY39D19TM0CfTtvKeNaYXHtOx1pX+
+         ONAFxo5QPUmxdOcAQ2b602Tj4meWHD2UNLsfd4tPcsMGNUiDZY40lLJJZ/pp17/VqKem
+         jD6vksBFlYBdXt1CBc7d7TOJo5z+pHOkj6sWfCAF6I6S460YgIQKjcoox2CyUQ3JP6h8
+         C/G1luUa7OwqmlsiCYFvAdie8XZ8R7JXG5zC+Vec4+d2ppFHQcink2yaSMymVEj56n6K
+         CLvQ==
+X-Gm-Message-State: AGRZ1gJSb7qzSdpZPevVlYEUiq4dCGXQDgQLn50DVxTCmdunQc7ZdMry
+        jHb3ma/be8rxKldfRAjeXWikb3HrnTUeLUZbm63snWRq
+X-Google-Smtp-Source: AJdET5dWQ0O2zsMP7dJOnVoKNu08T9arje2QphotwcOvH3/8wGL4A9qbQavYILcqYVLnpa/F+86aY/ZUFNHBbO7wMKw=
+X-Received: by 2002:a9d:2831:: with SMTP id m46mr7728576otb.291.1541873024050;
+ Sat, 10 Nov 2018 10:03:44 -0800 (PST)
 MIME-Version: 1.0
-References: <20181105160342.29434-1-zimmermach@gmail.com> <CABBYNZ+A+iU4wAw6LVy6toi+Qb7=2trkbx+HJmQYtdYyTHwSEA@mail.gmail.com>
- <447CAA92-87E8-4E79-B850-EA22A682E5C5@gmail.com>
-In-Reply-To: <447CAA92-87E8-4E79-B850-EA22A682E5C5@gmail.com>
+References: <CABatt_x1aNftgFVuDxrhyZVs4bGmOZFccjPKU_BpfbGmMWTazA@mail.gmail.com>
+ <CABatt_zHbVz+cbb6Vig820W5bdXd+Cd1Jjh02MdqnBiX0WQuEg@mail.gmail.com>
+In-Reply-To: <CABatt_zHbVz+cbb6Vig820W5bdXd+Cd1Jjh02MdqnBiX0WQuEg@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sat, 10 Nov 2018 19:58:03 +0200
-Message-ID: <CABBYNZLs5Aw=+dkBuid_YbQvkyiHLiAvHG9muQJRnXXwve7qtQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] src/adapter: Removed obsolete conversion functions
- for persistant settings
-To:     zimmermach@gmail.com
+Date:   Sat, 10 Nov 2018 20:03:30 +0200
+Message-ID: <CABBYNZJ0uT-qX2njVfFan2vVWaEveDR+waOC3FSZrTfpaBkHew@mail.gmail.com>
+Subject: Re: Operating central and peripheral roles concurrently
+To:     mtownsend1973@gmail.com
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -72,933 +71,111 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Christian,
-On Sat, Nov 10, 2018 at 4:34 PM Christian Zimmermann
-<zimmermach@gmail.com> wrote:
+Hi Martin,
+On Fri, Nov 9, 2018 at 7:57 PM Martin Townsend <mtownsend1973@gmail.com> wrote:
 >
-> Hi Luiz,
+> On Fri, Nov 9, 2018 at 4:32 PM Martin Townsend <mtownsend1973@gmail.com> wrote:
+> >
+> > Hi,
+> >
+> > I see someone has already asked this question not long ago but I am
+> > seeing the same problem.  I have an embedded platform running 4.9
+> > kernel and Bluez 5.50 and the bluetooth device is the BroadCom
+> > BCM4343W which supports bluetooth 4.1.
+> >
+> > I can run the btgatt-server and example-gatt-server fine and connect
+> > to it from my phone using nRF and read the relevant attributes.  This
+> > I believe is where my device is in the peripheral role.  If I close
+> > the GATT server down I can use gatttool to query the characteristics
+> > of another GATT server setup on my PC, I think this is then acting as
+> > central role.
+> >
+> > But if I can't do both at the same time, once the GATT server is
+> > running and I try and query the other GATT server, I get
+> > root@mach-cw-rnet-ppm-1717:~# gatttool -b 5D:3C:72:B5:23:BE -t random
+> > --characteristics
+> > connect error: Connection refused (111)
+> >
+> > I've noticed that if I start bluetoothctl whilst the GATT server is
+> > running it looks as if it has connected to my phone
+> >
+> > root@mach-cw-rnet-ppm-1717:~# bluetoothctl
+> > Agent registered
+> > [LG K8 (2017)]#
+> >
+> > Maybe this is expected but it does look like it has made a connection
+> > back to the phone and I'm wondering if this is stopping it from acting
+> > in the central role?
+> >
+> > Not really knowing much about the bluetooth stack I was wondering if
+> > anyone has any pointers on how to debug this or let me know if I'm
+> > doing something wrong?  I'm quite comfortable putting debug code into
+> > the kernel and/or bluez5 and recompiling to get more information if
+> > required.
+> >
+> > Any help would be greatly appreciated,
+> > Martin.
 >
-> thank you for your response.
-> How about having a shell or python script which does the necessary conversion during bluez install? Would this be sufficient?
+> I turned on DEBUG for a few of the hci_.c files and here's the output
+> of the failed connect in case it helps
+>
+> These occur on connect from gatttool:
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: 00:00:00:00:00:00 ->
+> 7b:bd:e7:6a:8a:8d
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 orig refcnt 9
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: requesting refresh of dst_addr
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 dst 7b:bd:e7:6a:8a:8d
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 orig refcnt 10
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: addr 7b:bd:e7:6a:8a:8d (type 1)
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: addr 7b:bd:e7:6a:8a:8d
+> (type 1) auto_connect 5
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hcon 97310400 orig refcnt 0
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 hcon 97310400
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 cmd_cnt 1 cmd queued 2
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 type 1 len 10
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 Event packet
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 opcode 0x200b
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: opcode 0x200b status 0x00
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 opcode 0x200b
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 cmd_cnt 1 cmd queued 1
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 type 1 len 5
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 Event packet
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 opcode 0x200c
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: opcode 0x200c status 0x00
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 opcode 0x200c
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0
+> Nov 09 08:03:00 mach-cw-rnet-ppm-1717 kernel: hci0 Event packet
+>
+>
+> Then just before Error: connect error: Connection refused (111) many
+> seconds later:
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hcon 97310400 state BT_CONNECT
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 hcon 97310400
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 orig refcnt 10
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 hcon 97310400
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: addr 7b:bd:e7:6a:8a:8d (type 1)
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hcon 97310400
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 hcon 97310400 chan 97421c80
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 orig refcnt 11
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 cmd_cnt 1 cmd queued 1
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 type 1 len 5
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 orig refcnt 10
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 Event packet
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 opcode 0x200c
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: opcode 0x200c status 0x00
+> Nov 09 08:03:41 mach-cw-rnet-ppm-1717 kernel: hci0 opcode 0x200c
 
-Yep, that way the distro can actually run those in case of updating an
-old installation.
+Not sure if it is exactly the same problem but you can try checking if
+the following like is causing the problem:
 
-> Regards,
-> Christian
->
-> > Am 07.11.2018 um 12:37 schrieb Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
-> >
-> > Hi Christian,
-> >
-> > On Mon, Nov 5, 2018 at 6:10 PM Christian Zimmermann
-> > <zimmermach@gmail.com> wrote:
-> >>
-> >> According to TODO file:
-> >> Removal of conversion functions for persistant settings
-> >> since they're obsolete with Bluez5 after certain time of it's first release
-> >
-> > We probably need to consider if there are still platforms using BlueZ
-> > 4 then removing this code would make the transition, perhaps we could
-> > have a tool to do that so we can remove this from the daemon.
-> >
-> >> ---
-> >> TODO          |   6 -
-> >> src/adapter.c | 832 ----------------------------------------------------------
-> >> 2 files changed, 838 deletions(-)
-> >>
-> >> diff --git a/TODO b/TODO
-> >> index d88349e06..ae2d69dfa 100644
-> >> --- a/TODO
-> >> +++ b/TODO
-> >> @@ -37,12 +37,6 @@ General
-> >>   Priority: Medium
-> >>   Complexity: C2
-> >>
-> >> -- Function in src/adapter.c to convert old storage files to new ini-file format
-> >> -  should be removed 6-8 months after first BlueZ 5 release.
-> >> -
-> >> -  Priority: Low
-> >> -  Complexity: C1
-> >> -
-> >> - Remove usage of symlinks for drivers, such as profiles/input/suspend.c and
-> >>   profiles/sap/sap.c. Instead, select drivers at runtime by using config
-> >>   options or probing for running D-Bus services (using e.g.
-> >> diff --git a/src/adapter.c b/src/adapter.c
-> >> index c24432125..5709ee956 100644
-> >> --- a/src/adapter.c
-> >> +++ b/src/adapter.c
-> >> @@ -423,18 +423,6 @@ void btd_adapter_set_class(struct btd_adapter *adapter, uint8_t major,
-> >>        set_dev_class(adapter);
-> >> }
-> >>
-> >> -static uint8_t get_mode(const char *mode)
-> >> -{
-> >> -       if (strcasecmp("off", mode) == 0)
-> >> -               return MODE_OFF;
-> >> -       else if (strcasecmp("connectable", mode) == 0)
-> >> -               return MODE_CONNECTABLE;
-> >> -       else if (strcasecmp("discoverable", mode) == 0)
-> >> -               return MODE_DISCOVERABLE;
-> >> -       else
-> >> -               return MODE_UNKNOWN;
-> >> -}
-> >> -
-> >> const char *btd_adapter_get_storage_dir(struct btd_adapter *adapter)
-> >> {
-> >>        static char dir[25];
-> >> @@ -4927,824 +4915,10 @@ void btd_adapter_unref(struct btd_adapter *adapter)
-> >>                                                ADAPTER_INTERFACE);
-> >> }
-> >>
-> >> -static void convert_names_entry(char *key, char *value, void *user_data)
-> >> -{
-> >> -       char *address = user_data;
-> >> -       char *str = key;
-> >> -       char filename[PATH_MAX];
-> >> -       GKeyFile *key_file;
-> >> -       char *data;
-> >> -       gsize length = 0;
-> >> -
-> >> -       if (strchr(key, '#'))
-> >> -               str[17] = '\0';
-> >> -
-> >> -       if (bachk(str) != 0)
-> >> -               return;
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", address, str);
-> >> -       create_file(filename, S_IRUSR | S_IWUSR);
-> >> -
-> >> -       key_file = g_key_file_new();
-> >> -       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >> -       g_key_file_set_string(key_file, "General", "Name", value);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       g_file_set_contents(filename, data, length, NULL);
-> >> -       g_free(data);
-> >> -
-> >> -       g_key_file_free(key_file);
-> >> -}
-> >> -
-> >> -struct device_converter {
-> >> -       char *address;
-> >> -       void (*cb)(GKeyFile *key_file, void *value);
-> >> -       gboolean force;
-> >> -};
-> >> -
-> >> -static void set_device_type(GKeyFile *key_file, char type)
-> >> -{
-> >> -       char *techno;
-> >> -       char *addr_type = NULL;
-> >> -       char *str;
-> >> -
-> >> -       switch (type) {
-> >> -       case BDADDR_BREDR:
-> >> -               techno = "BR/EDR";
-> >> -               break;
-> >> -       case BDADDR_LE_PUBLIC:
-> >> -               techno = "LE";
-> >> -               addr_type = "public";
-> >> -               break;
-> >> -       case BDADDR_LE_RANDOM:
-> >> -               techno = "LE";
-> >> -               addr_type = "static";
-> >> -               break;
-> >> -       default:
-> >> -               return;
-> >> -       }
-> >> -
-> >> -       str = g_key_file_get_string(key_file, "General",
-> >> -                                       "SupportedTechnologies", NULL);
-> >> -       if (!str)
-> >> -               g_key_file_set_string(key_file, "General",
-> >> -                                       "SupportedTechnologies", techno);
-> >> -       else if (!strstr(str, techno))
-> >> -               g_key_file_set_string(key_file, "General",
-> >> -                                       "SupportedTechnologies", "BR/EDR;LE");
-> >> -
-> >> -       g_free(str);
-> >> -
-> >> -       if (addr_type)
-> >> -               g_key_file_set_string(key_file, "General", "AddressType",
-> >> -                                       addr_type);
-> >> -}
-> >> -
-> >> -static void convert_aliases_entry(GKeyFile *key_file, void *value)
-> >> -{
-> >> -       g_key_file_set_string(key_file, "General", "Alias", value);
-> >> -}
-> >> -
-> >> -static void convert_trusts_entry(GKeyFile *key_file, void *value)
-> >> -{
-> >> -       g_key_file_set_boolean(key_file, "General", "Trusted", TRUE);
-> >> -}
-> >> -
-> >> -static void convert_classes_entry(GKeyFile *key_file, void *value)
-> >> -{
-> >> -       g_key_file_set_string(key_file, "General", "Class", value);
-> >> -}
-> >> -
-> >> -static void convert_blocked_entry(GKeyFile *key_file, void *value)
-> >> -{
-> >> -       g_key_file_set_boolean(key_file, "General", "Blocked", TRUE);
-> >> -}
-> >> -
-> >> -static void convert_did_entry(GKeyFile *key_file, void *value)
-> >> -{
-> >> -       char *vendor_str, *product_str, *version_str;
-> >> -       uint16_t val;
-> >> -
-> >> -       vendor_str = strchr(value, ' ');
-> >> -       if (!vendor_str)
-> >> -               return;
-> >> -
-> >> -       *(vendor_str++) = 0;
-> >> -
-> >> -       if (g_str_equal(value, "FFFF"))
-> >> -               return;
-> >> -
-> >> -       product_str = strchr(vendor_str, ' ');
-> >> -       if (!product_str)
-> >> -               return;
-> >> -
-> >> -       *(product_str++) = 0;
-> >> -
-> >> -       version_str = strchr(product_str, ' ');
-> >> -       if (!version_str)
-> >> -               return;
-> >> -
-> >> -       *(version_str++) = 0;
-> >> -
-> >> -       val = (uint16_t) strtol(value, NULL, 16);
-> >> -       g_key_file_set_integer(key_file, "DeviceID", "Source", val);
-> >> -
-> >> -       val = (uint16_t) strtol(vendor_str, NULL, 16);
-> >> -       g_key_file_set_integer(key_file, "DeviceID", "Vendor", val);
-> >> -
-> >> -       val = (uint16_t) strtol(product_str, NULL, 16);
-> >> -       g_key_file_set_integer(key_file, "DeviceID", "Product", val);
-> >> -
-> >> -       val = (uint16_t) strtol(version_str, NULL, 16);
-> >> -       g_key_file_set_integer(key_file, "DeviceID", "Version", val);
-> >> -}
-> >> -
-> >> -static void convert_linkkey_entry(GKeyFile *key_file, void *value)
-> >> -{
-> >> -       char *type_str, *length_str, *str;
-> >> -       int val;
-> >> -
-> >> -       type_str = strchr(value, ' ');
-> >> -       if (!type_str)
-> >> -               return;
-> >> -
-> >> -       *(type_str++) = 0;
-> >> -
-> >> -       length_str = strchr(type_str, ' ');
-> >> -       if (!length_str)
-> >> -               return;
-> >> -
-> >> -       *(length_str++) = 0;
-> >> -
-> >> -       str = g_strconcat("0x", value, NULL);
-> >> -       g_key_file_set_string(key_file, "LinkKey", "Key", str);
-> >> -       g_free(str);
-> >> -
-> >> -       val = strtol(type_str, NULL, 16);
-> >> -       g_key_file_set_integer(key_file, "LinkKey", "Type", val);
-> >> -
-> >> -       val = strtol(length_str, NULL, 16);
-> >> -       g_key_file_set_integer(key_file, "LinkKey", "PINLength", val);
-> >> -}
-> >> -
-> >> -static void convert_ltk_entry(GKeyFile *key_file, void *value)
-> >> -{
-> >> -       char *auth_str, *rand_str, *str;
-> >> -       int i, ret;
-> >> -       unsigned char auth, master, enc_size;
-> >> -       unsigned short ediv;
-> >> -
-> >> -       auth_str = strchr(value, ' ');
-> >> -       if (!auth_str)
-> >> -               return;
-> >> -
-> >> -       *(auth_str++) = 0;
-> >> -
-> >> -       for (i = 0, rand_str = auth_str; i < 4; i++) {
-> >> -               rand_str = strchr(rand_str, ' ');
-> >> -               if (!rand_str || rand_str[1] == '\0')
-> >> -                       return;
-> >> -
-> >> -               rand_str++;
-> >> -       }
-> >> -
-> >> -       ret = sscanf(auth_str, " %hhd %hhd %hhd %hd", &auth, &master,
-> >> -                                                       &enc_size, &ediv);
-> >> -       if (ret < 4)
-> >> -               return;
-> >> -
-> >> -       str = g_strconcat("0x", value, NULL);
-> >> -       g_key_file_set_string(key_file, "LongTermKey", "Key", str);
-> >> -       g_free(str);
-> >> -
-> >> -       g_key_file_set_integer(key_file, "LongTermKey", "Authenticated", auth);
-> >> -       g_key_file_set_integer(key_file, "LongTermKey", "Master", master);
-> >> -       g_key_file_set_integer(key_file, "LongTermKey", "EncSize", enc_size);
-> >> -       g_key_file_set_integer(key_file, "LongTermKey", "EDiv", ediv);
-> >> -
-> >> -       str = g_strconcat("0x", rand_str, NULL);
-> >> -       g_key_file_set_string(key_file, "LongTermKey", "Rand", str);
-> >> -       g_free(str);
-> >> -}
-> >> -
-> >> -static void convert_profiles_entry(GKeyFile *key_file, void *value)
-> >> -{
-> >> -       g_strdelimit(value, " ", ';');
-> >> -       g_key_file_set_string(key_file, "General", "Services", value);
-> >> -}
-> >> -
-> >> -static void convert_appearances_entry(GKeyFile *key_file, void *value)
-> >> -{
-> >> -       g_key_file_set_string(key_file, "General", "Appearance", value);
-> >> -}
-> >> -
-> >> -static void convert_entry(char *key, char *value, void *user_data)
-> >> -{
-> >> -       struct device_converter *converter = user_data;
-> >> -       char type = BDADDR_BREDR;
-> >> -       char filename[PATH_MAX];
-> >> -       GKeyFile *key_file;
-> >> -       char *data;
-> >> -       gsize length = 0;
-> >> -
-> >> -       if (strchr(key, '#')) {
-> >> -               key[17] = '\0';
-> >> -               type = key[18] - '0';
-> >> -       }
-> >> -
-> >> -       if (bachk(key) != 0)
-> >> -               return;
-> >> -
-> >> -       if (converter->force == FALSE) {
-> >> -               struct stat st;
-> >> -               int err;
-> >> -
-> >> -               snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s",
-> >> -                               converter->address, key);
-> >> -
-> >> -               err = stat(filename, &st);
-> >> -               if (err || !S_ISDIR(st.st_mode))
-> >> -                       return;
-> >> -       }
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
-> >> -                       converter->address, key);
-> >> -
-> >> -       key_file = g_key_file_new();
-> >> -       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >> -
-> >> -       set_device_type(key_file, type);
-> >> -
-> >> -       converter->cb(key_file, value);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       if (length > 0) {
-> >> -               create_file(filename, S_IRUSR | S_IWUSR);
-> >> -               g_file_set_contents(filename, data, length, NULL);
-> >> -       }
-> >> -
-> >> -       g_free(data);
-> >> -
-> >> -       g_key_file_free(key_file);
-> >> -}
-> >> -
-> >> -static void convert_file(char *file, char *address,
-> >> -                               void (*cb)(GKeyFile *key_file, void *value),
-> >> -                               gboolean force)
-> >> -{
-> >> -       char filename[PATH_MAX];
-> >> -       struct device_converter converter;
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s", address, file);
-> >> -
-> >> -       converter.address = address;
-> >> -       converter.cb = cb;
-> >> -       converter.force = force;
-> >> -
-> >> -       textfile_foreach(filename, convert_entry, &converter);
-> >> -}
-> >> -
-> >> -static gboolean record_has_uuid(const sdp_record_t *rec,
-> >> -                               const char *profile_uuid)
-> >> -{
-> >> -       sdp_list_t *pat;
-> >> -
-> >> -       for (pat = rec->pattern; pat != NULL; pat = pat->next) {
-> >> -               char *uuid;
-> >> -               int ret;
-> >> -
-> >> -               uuid = bt_uuid2string(pat->data);
-> >> -               if (!uuid)
-> >> -                       continue;
-> >> -
-> >> -               ret = strcasecmp(uuid, profile_uuid);
-> >> -
-> >> -               free(uuid);
-> >> -
-> >> -               if (ret == 0)
-> >> -                       return TRUE;
-> >> -       }
-> >> -
-> >> -       return FALSE;
-> >> -}
-> >> -
-> >> -static void store_attribute_uuid(GKeyFile *key_file, uint16_t start,
-> >> -                                       uint16_t end, char *att_uuid,
-> >> -                                       uuid_t uuid)
-> >> -{
-> >> -       char handle[6], uuid_str[33];
-> >> -       int i;
-> >> -
-> >> -       switch (uuid.type) {
-> >> -       case SDP_UUID16:
-> >> -               sprintf(uuid_str, "%4.4X", uuid.value.uuid16);
-> >> -               break;
-> >> -       case SDP_UUID32:
-> >> -               sprintf(uuid_str, "%8.8X", uuid.value.uuid32);
-> >> -               break;
-> >> -       case SDP_UUID128:
-> >> -               for (i = 0; i < 16; i++)
-> >> -                       sprintf(uuid_str + (i * 2), "%2.2X",
-> >> -                                       uuid.value.uuid128.data[i]);
-> >> -               break;
-> >> -       default:
-> >> -               uuid_str[0] = '\0';
-> >> -       }
-> >> -
-> >> -       sprintf(handle, "%hu", start);
-> >> -       g_key_file_set_string(key_file, handle, "UUID", att_uuid);
-> >> -       g_key_file_set_string(key_file, handle, "Value", uuid_str);
-> >> -       g_key_file_set_integer(key_file, handle, "EndGroupHandle", end);
-> >> -}
-> >> -
-> >> -static void store_sdp_record(char *local, char *peer, int handle, char *value)
-> >> -{
-> >> -       char filename[PATH_MAX];
-> >> -       GKeyFile *key_file;
-> >> -       char handle_str[11];
-> >> -       char *data;
-> >> -       gsize length = 0;
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", local, peer);
-> >> -
-> >> -       key_file = g_key_file_new();
-> >> -       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >> -
-> >> -       sprintf(handle_str, "0x%8.8X", handle);
-> >> -       g_key_file_set_string(key_file, "ServiceRecords", handle_str, value);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       if (length > 0) {
-> >> -               create_file(filename, S_IRUSR | S_IWUSR);
-> >> -               g_file_set_contents(filename, data, length, NULL);
-> >> -       }
-> >> -
-> >> -       g_free(data);
-> >> -
-> >> -       g_key_file_free(key_file);
-> >> -}
-> >> -
-> >> -static void convert_sdp_entry(char *key, char *value, void *user_data)
-> >> -{
-> >> -       char *src_addr = user_data;
-> >> -       char dst_addr[18];
-> >> -       char type = BDADDR_BREDR;
-> >> -       int handle, ret;
-> >> -       char filename[PATH_MAX];
-> >> -       GKeyFile *key_file;
-> >> -       struct stat st;
-> >> -       sdp_record_t *rec;
-> >> -       uuid_t uuid;
-> >> -       char *att_uuid, *prim_uuid;
-> >> -       uint16_t start = 0, end = 0, psm = 0;
-> >> -       int err;
-> >> -       char *data;
-> >> -       gsize length = 0;
-> >> -
-> >> -       ret = sscanf(key, "%17s#%hhu#%08X", dst_addr, &type, &handle);
-> >> -       if (ret < 3) {
-> >> -               ret = sscanf(key, "%17s#%08X", dst_addr, &handle);
-> >> -               if (ret < 2)
-> >> -                       return;
-> >> -       }
-> >> -
-> >> -       if (bachk(dst_addr) != 0)
-> >> -               return;
-> >> -
-> >> -       /* Check if the device directory has been created as records should
-> >> -        * only be converted for known devices */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s", src_addr, dst_addr);
-> >> -
-> >> -       err = stat(filename, &st);
-> >> -       if (err || !S_ISDIR(st.st_mode))
-> >> -               return;
-> >> -
-> >> -       /* store device records in cache */
-> >> -       store_sdp_record(src_addr, dst_addr, handle, value);
-> >> -
-> >> -       /* Retrieve device record and check if there is an
-> >> -        * attribute entry in it */
-> >> -       sdp_uuid16_create(&uuid, ATT_UUID);
-> >> -       att_uuid = bt_uuid2string(&uuid);
-> >> -
-> >> -       sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
-> >> -       prim_uuid = bt_uuid2string(&uuid);
-> >> -
-> >> -       rec = record_from_string(value);
-> >> -
-> >> -       if (record_has_uuid(rec, att_uuid))
-> >> -               goto failed;
-> >> -
-> >> -       /* TODO: Do this through btd_gatt_database */
-> >> -       if (!gatt_parse_record(rec, &uuid, &psm, &start, &end))
-> >> -               goto failed;
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes", src_addr,
-> >> -                                                               dst_addr);
-> >> -
-> >> -       key_file = g_key_file_new();
-> >> -       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >> -
-> >> -       store_attribute_uuid(key_file, start, end, prim_uuid, uuid);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       if (length > 0) {
-> >> -               create_file(filename, S_IRUSR | S_IWUSR);
-> >> -               g_file_set_contents(filename, data, length, NULL);
-> >> -       }
-> >> -
-> >> -       g_free(data);
-> >> -       g_key_file_free(key_file);
-> >> -
-> >> -failed:
-> >> -       sdp_record_free(rec);
-> >> -       free(prim_uuid);
-> >> -       free(att_uuid);
-> >> -}
-> >> -
-> >> -static void convert_primaries_entry(char *key, char *value, void *user_data)
-> >> -{
-> >> -       char *address = user_data;
-> >> -       int device_type = -1;
-> >> -       uuid_t uuid;
-> >> -       char **services, **service, *prim_uuid;
-> >> -       char filename[PATH_MAX];
-> >> -       GKeyFile *key_file;
-> >> -       int ret;
-> >> -       uint16_t start, end;
-> >> -       char uuid_str[MAX_LEN_UUID_STR + 1];
-> >> -       char *data;
-> >> -       gsize length = 0;
-> >> -
-> >> -       if (strchr(key, '#')) {
-> >> -               key[17] = '\0';
-> >> -               device_type = key[18] - '0';
-> >> -       }
-> >> -
-> >> -       if (bachk(key) != 0)
-> >> -               return;
-> >> -
-> >> -       services = g_strsplit(value, " ", 0);
-> >> -       if (services == NULL)
-> >> -               return;
-> >> -
-> >> -       sdp_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
-> >> -       prim_uuid = bt_uuid2string(&uuid);
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/attributes", address,
-> >> -                                                                       key);
-> >> -       key_file = g_key_file_new();
-> >> -       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >> -
-> >> -       for (service = services; *service; service++) {
-> >> -               ret = sscanf(*service, "%04hX#%04hX#%s", &start, &end,
-> >> -                                                               uuid_str);
-> >> -               if (ret < 3)
-> >> -                       continue;
-> >> -
-> >> -               bt_string2uuid(&uuid, uuid_str);
-> >> -               sdp_uuid128_to_uuid(&uuid);
-> >> -
-> >> -               store_attribute_uuid(key_file, start, end, prim_uuid, uuid);
-> >> -       }
-> >> -
-> >> -       g_strfreev(services);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       if (length == 0)
-> >> -               goto end;
-> >> -
-> >> -       create_file(filename, S_IRUSR | S_IWUSR);
-> >> -       g_file_set_contents(filename, data, length, NULL);
-> >> -
-> >> -       if (device_type < 0)
-> >> -               goto end;
-> >> -
-> >> -       g_free(data);
-> >> -       g_key_file_free(key_file);
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info", address, key);
-> >> -
-> >> -       key_file = g_key_file_new();
-> >> -       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >> -       set_device_type(key_file, device_type);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       if (length > 0) {
-> >> -               create_file(filename, S_IRUSR | S_IWUSR);
-> >> -               g_file_set_contents(filename, data, length, NULL);
-> >> -       }
-> >> -
-> >> -end:
-> >> -       g_free(data);
-> >> -       free(prim_uuid);
-> >> -       g_key_file_free(key_file);
-> >> -}
-> >> -
-> >> -static void convert_ccc_entry(char *key, char *value, void *user_data)
-> >> -{
-> >> -       char *src_addr = user_data;
-> >> -       char dst_addr[18];
-> >> -       char type = BDADDR_BREDR;
-> >> -       uint16_t handle;
-> >> -       int ret, err;
-> >> -       char filename[PATH_MAX];
-> >> -       GKeyFile *key_file;
-> >> -       struct stat st;
-> >> -       char group[6];
-> >> -       char *data;
-> >> -       gsize length = 0;
-> >> -
-> >> -       ret = sscanf(key, "%17s#%hhu#%04hX", dst_addr, &type, &handle);
-> >> -       if (ret < 3)
-> >> -               return;
-> >> -
-> >> -       if (bachk(dst_addr) != 0)
-> >> -               return;
-> >> -
-> >> -       /* Check if the device directory has been created as records should
-> >> -        * only be converted for known devices */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s", src_addr, dst_addr);
-> >> -
-> >> -       err = stat(filename, &st);
-> >> -       if (err || !S_ISDIR(st.st_mode))
-> >> -               return;
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/ccc", src_addr,
-> >> -                                                               dst_addr);
-> >> -       key_file = g_key_file_new();
-> >> -       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >> -
-> >> -       sprintf(group, "%hu", handle);
-> >> -       g_key_file_set_string(key_file, group, "Value", value);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       if (length > 0) {
-> >> -               create_file(filename, S_IRUSR | S_IWUSR);
-> >> -               g_file_set_contents(filename, data, length, NULL);
-> >> -       }
-> >> -
-> >> -       g_free(data);
-> >> -       g_key_file_free(key_file);
-> >> -}
-> >> -
-> >> -static void convert_gatt_entry(char *key, char *value, void *user_data)
-> >> -{
-> >> -       char *src_addr = user_data;
-> >> -       char dst_addr[18];
-> >> -       char type = BDADDR_BREDR;
-> >> -       uint16_t handle;
-> >> -       int ret, err;
-> >> -       char filename[PATH_MAX];
-> >> -       GKeyFile *key_file;
-> >> -       struct stat st;
-> >> -       char group[6];
-> >> -       char *data;
-> >> -       gsize length = 0;
-> >> -
-> >> -       ret = sscanf(key, "%17s#%hhu#%04hX", dst_addr, &type, &handle);
-> >> -       if (ret < 3)
-> >> -               return;
-> >> -
-> >> -       if (bachk(dst_addr) != 0)
-> >> -               return;
-> >> -
-> >> -       /* Check if the device directory has been created as records should
-> >> -        * only be converted for known devices */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s", src_addr, dst_addr);
-> >> -
-> >> -       err = stat(filename, &st);
-> >> -       if (err || !S_ISDIR(st.st_mode))
-> >> -               return;
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/gatt", src_addr,
-> >> -                                                               dst_addr);
-> >> -       key_file = g_key_file_new();
-> >> -       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >> -
-> >> -       sprintf(group, "%hu", handle);
-> >> -       g_key_file_set_string(key_file, group, "Value", value);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       if (length > 0) {
-> >> -               create_file(filename, S_IRUSR | S_IWUSR);
-> >> -               g_file_set_contents(filename, data, length, NULL);
-> >> -       }
-> >> -
-> >> -       g_free(data);
-> >> -       g_key_file_free(key_file);
-> >> -}
-> >> -
-> >> -static void convert_proximity_entry(char *key, char *value, void *user_data)
-> >> -{
-> >> -       char *src_addr = user_data;
-> >> -       char *alert;
-> >> -       char filename[PATH_MAX];
-> >> -       GKeyFile *key_file;
-> >> -       struct stat st;
-> >> -       int err;
-> >> -       char *data;
-> >> -       gsize length = 0;
-> >> -
-> >> -       if (!strchr(key, '#'))
-> >> -               return;
-> >> -
-> >> -       key[17] = '\0';
-> >> -       alert = &key[18];
-> >> -
-> >> -       if (bachk(key) != 0)
-> >> -               return;
-> >> -
-> >> -       /* Check if the device directory has been created as records should
-> >> -        * only be converted for known devices */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s", src_addr, key);
-> >> -
-> >> -       err = stat(filename, &st);
-> >> -       if (err || !S_ISDIR(st.st_mode))
-> >> -               return;
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/proximity", src_addr,
-> >> -                                                                       key);
-> >> -       key_file = g_key_file_new();
-> >> -       g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >> -
-> >> -       g_key_file_set_string(key_file, alert, "Level", value);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       if (length > 0) {
-> >> -               create_file(filename, S_IRUSR | S_IWUSR);
-> >> -               g_file_set_contents(filename, data, length, NULL);
-> >> -       }
-> >> -
-> >> -       g_free(data);
-> >> -       g_key_file_free(key_file);
-> >> -}
-> >> -
-> >> -static void convert_device_storage(struct btd_adapter *adapter)
-> >> -{
-> >> -       char filename[PATH_MAX];
-> >> -       char address[18];
-> >> -
-> >> -       ba2str(&adapter->bdaddr, address);
-> >> -
-> >> -       /* Convert device's name cache */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/names", address);
-> >> -       textfile_foreach(filename, convert_names_entry, address);
-> >> -
-> >> -       /* Convert aliases */
-> >> -       convert_file("aliases", address, convert_aliases_entry, TRUE);
-> >> -
-> >> -       /* Convert trusts */
-> >> -       convert_file("trusts", address, convert_trusts_entry, TRUE);
-> >> -
-> >> -       /* Convert blocked */
-> >> -       convert_file("blocked", address, convert_blocked_entry, TRUE);
-> >> -
-> >> -       /* Convert profiles */
-> >> -       convert_file("profiles", address, convert_profiles_entry, TRUE);
-> >> -
-> >> -       /* Convert primaries */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/primaries", address);
-> >> -       textfile_foreach(filename, convert_primaries_entry, address);
-> >> -
-> >> -       /* Convert linkkeys */
-> >> -       convert_file("linkkeys", address, convert_linkkey_entry, TRUE);
-> >> -
-> >> -       /* Convert longtermkeys */
-> >> -       convert_file("longtermkeys", address, convert_ltk_entry, TRUE);
-> >> -
-> >> -       /* Convert classes */
-> >> -       convert_file("classes", address, convert_classes_entry, FALSE);
-> >> -
-> >> -       /* Convert device ids */
-> >> -       convert_file("did", address, convert_did_entry, FALSE);
-> >> -
-> >> -       /* Convert sdp */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/sdp", address);
-> >> -       textfile_foreach(filename, convert_sdp_entry, address);
-> >> -
-> >> -       /* Convert ccc */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/ccc", address);
-> >> -       textfile_foreach(filename, convert_ccc_entry, address);
-> >> -
-> >> -       /* Convert appearances */
-> >> -       convert_file("appearances", address, convert_appearances_entry, FALSE);
-> >> -
-> >> -       /* Convert gatt */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/gatt", address);
-> >> -       textfile_foreach(filename, convert_gatt_entry, address);
-> >> -
-> >> -       /* Convert proximity */
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/proximity", address);
-> >> -       textfile_foreach(filename, convert_proximity_entry, address);
-> >> -}
-> >> -
-> >> -static void convert_config(struct btd_adapter *adapter, const char *filename,
-> >> -                                                       GKeyFile *key_file)
-> >> -{
-> >> -       char address[18];
-> >> -       char str[MAX_NAME_LENGTH + 1];
-> >> -       char config_path[PATH_MAX];
-> >> -       int timeout;
-> >> -       uint8_t mode;
-> >> -       char *data;
-> >> -       gsize length = 0;
-> >> -
-> >> -       ba2str(&adapter->bdaddr, address);
-> >> -       snprintf(config_path, PATH_MAX, STORAGEDIR "/%s/config", address);
-> >> -
-> >> -       if (read_pairable_timeout(address, &timeout) == 0)
-> >> -               g_key_file_set_integer(key_file, "General",
-> >> -                                               "PairableTimeout", timeout);
-> >> -
-> >> -       if (read_discoverable_timeout(address, &timeout) == 0)
-> >> -               g_key_file_set_integer(key_file, "General",
-> >> -                                               "DiscoverableTimeout", timeout);
-> >> -
-> >> -       if (read_on_mode(address, str, sizeof(str)) == 0) {
-> >> -               mode = get_mode(str);
-> >> -               g_key_file_set_boolean(key_file, "General", "Discoverable",
-> >> -                                       mode == MODE_DISCOVERABLE);
-> >> -       }
-> >> -
-> >> -       if (read_local_name(&adapter->bdaddr, str) == 0)
-> >> -               g_key_file_set_string(key_file, "General", "Alias", str);
-> >> -
-> >> -       create_file(filename, S_IRUSR | S_IWUSR);
-> >> -
-> >> -       data = g_key_file_to_data(key_file, &length, NULL);
-> >> -       g_file_set_contents(filename, data, length, NULL);
-> >> -       g_free(data);
-> >> -}
-> >> -
-> >> -static void fix_storage(struct btd_adapter *adapter)
-> >> -{
-> >> -       char filename[PATH_MAX];
-> >> -       char address[18];
-> >> -       char *converted;
-> >> -
-> >> -       ba2str(&adapter->bdaddr, address);
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/config", address);
-> >> -       converted = textfile_get(filename, "converted");
-> >> -       if (!converted)
-> >> -               return;
-> >> -
-> >> -       free(converted);
-> >> -
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/names", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/aliases", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/trusts", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/blocked", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/profiles", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/primaries", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/linkkeys", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/longtermkeys", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/classes", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/did", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/sdp", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/ccc", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/appearances", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/gatt", address);
-> >> -       textfile_del(filename, "converted");
-> >> -
-> >> -       snprintf(filename, PATH_MAX, STORAGEDIR "/%s/proximity", address);
-> >> -       textfile_del(filename, "converted");
-> >> -}
-> >> -
-> >> static void load_config(struct btd_adapter *adapter)
-> >> {
-> >>        GKeyFile *key_file;
-> >>        char filename[PATH_MAX];
-> >> -       struct stat st;
-> >>        GError *gerr = NULL;
-> >>
-> >>        key_file = g_key_file_new();
-> >> @@ -5752,11 +4926,6 @@ static void load_config(struct btd_adapter *adapter)
-> >>        snprintf(filename, PATH_MAX, STORAGEDIR "/%s/settings",
-> >>                                        btd_adapter_get_storage_dir(adapter));
-> >>
-> >> -       if (stat(filename, &st) < 0) {
-> >> -               convert_config(adapter, filename, key_file);
-> >> -               convert_device_storage(adapter);
-> >> -       }
-> >> -
-> >>        g_key_file_load_from_file(key_file, filename, 0, NULL);
-> >>
-> >>        /* Get alias */
-> >> @@ -8124,7 +7293,6 @@ static int adapter_register(struct btd_adapter *adapter)
-> >>
-> >> load:
-> >>        load_config(adapter);
-> >> -       fix_storage(adapter);
-> >>        load_drivers(adapter);
-> >>        btd_profile_foreach(probe_profile, adapter);
-> >>        clear_blocked(adapter);
-> >> --
-> >> 2.11.0
-> >>
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/hci_event.c#n5075
+
+So we cannot be both slave and central, or at least that is what the
+code suggests, though I think we should drop that line and leave the
+controller to fail if that is the case.
 
 
 
