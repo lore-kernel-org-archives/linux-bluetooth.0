@@ -2,122 +2,107 @@ Return-Path: <SRS0=MLMp=NW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F56C43441
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 11 Nov 2018 02:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 930F0C43441
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 11 Nov 2018 10:07:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E1E1320989
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 11 Nov 2018 02:47:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1E1320989
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=collabora.com
+	by mail.kernel.org (Postfix) with ESMTP id 1AE8420854
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 11 Nov 2018 10:07:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AE8420854
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727184AbeKKMeG (ORCPT
+        id S1727446AbeKKTzR convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 11 Nov 2018 07:34:06 -0500
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:48728 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726945AbeKKMeG (ORCPT
+        Sun, 11 Nov 2018 14:55:17 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:55379 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727344AbeKKTzR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 11 Nov 2018 07:34:06 -0500
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: sre)
-        with ESMTPSA id B3B0326406F
-Received: by earth.universe (Postfix, from userid 1000)
-        id 027EF3C08D6; Sun, 11 Nov 2018 03:46:48 +0100 (CET)
-Date:   Sun, 11 Nov 2018 03:46:48 +0100
-From:   Sebastian Reichel <sebastian.reichel@collabora.com>
-To:     Andreas Kemnade <andreas@kemnade.info>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, letux-kernel@openphoenux.org
-Subject: Re: [PATCH RFC] bluetooth: add uart h4 devices via serdev/devicetree
-Message-ID: <20181111024648.7rt7rlhaqihtqecv@earth.universe>
-References: <20181110232034.17277-1-andreas@kemnade.info>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="k52q5scznxewnt47"
-Content-Disposition: inline
-In-Reply-To: <20181110232034.17277-1-andreas@kemnade.info>
-User-Agent: NeoMutt/20180716
+        Sun, 11 Nov 2018 14:55:17 -0500
+Received: from marcel-macbook.fritz.box (p4FF9F655.dip0.t-ipconnect.de [79.249.246.85])
+        by mail.holtmann.org (Postfix) with ESMTPSA id DB918CF359;
+        Sun, 11 Nov 2018 11:14:37 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
+Subject: Re: [PATCH BlueZ] doc: Initial Bluetooth Mesh API
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <c2485caca3145e8aaaa1a8396b294b46a55b97e3.camel@intel.com>
+Date:   Sun, 11 Nov 2018 11:07:08 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Brian Gix <brian.gix@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <DFAA7E3E-A9CB-40DD-A959-FA23DE8B41F5@holtmann.org>
+References: <20181107004950.9153-1-inga.stotland@intel.com>
+ <4DBB63ED-41C4-4F27-B2BC-1ADB090B1656@gmail.com>
+ <c2485caca3145e8aaaa1a8396b294b46a55b97e3.camel@intel.com>
+To:     "Stotland, Inga" <inga.stotland@intel.com>
+X-Mailer: Apple Mail (2.3445.101.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Inga,
 
---k52q5scznxewnt47
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> At first glance this looks quite good to me, just some cosmetic
+>> comments:
+>> 
+>>> On 7 Nov 2018, at 2.49, Inga Stotland <inga.stotland@intel.com>
+>>> wrote:
+>>> +Service	org.bluez.mesh1
+>> 
+>> I don’t think we’ve had the habit of versioning well-known bus names
+>> so far. Or did you see this somewhere? So I’d just leave away the
+>> version here.
+>> 
+> 
+> From D-Bus Api Design Guidelines: (
+> https://dbus.freedesktop.org/doc/dbus-api-design.html#api-versioning):
+> 
+> "In summary, version numbers should be included in all service names,
+> interface names and object paths:
+> 
+>    com.example.MyService1
+> 
+>    com.example.MyService1.InterestingInterface
+> 
+>    com.example.MyService1.OtherInterface
+> 
+>    /com/example/MyService1/Manager
+> 
+>    /com/example/MyService1/OtherObject
+> "
+> 
+> I chose to do the name versioning based on the official guidelines.
+> However, if we want to preserve the historical bluez approach, I don't
+> mind changing it.
 
-Hi,
+so a long time ago, I looked at this and considered it pointless. It a total bloat that serves no practical purpose. Versioning the interface names makes sense since it allows to upgrade an interface and remove method or change its behavior if that would ever be really needed.
 
-On Sun, Nov 11, 2018 at 12:20:34AM +0100, Andreas Kemnade wrote:
-> This is a first try to be able to use h4 devices specified in
-> the devicetree, so you do not need to call hciattach and
-> it can be automatically probed.
->=20
-> Of course, proper devicetree bindings documentation is
-> missing. And also you would extend that by regulator/
-> enable gpio settings.
->=20
-> But before proceeding further it should be checked if the
-> general way of doing things is right.
->=20
-> Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
-> ---
+Reality is that we will never write a second daemon for version 2 and that is what versioning essentially implies here. Everything is versioned in a manor that service1 and service2 are totally independent. However what is the point in a technology like Bluetooth. 90% of the methods, properties and behaviors will not change. So we are duplicating everything for 10% or less optimization. That just makes no sense.
 
-Patch looks good to me, just one note
+>>> +			PossibleErrors:
+>>> +				org.bluez.mesh1.Error.Failed,
+>>> +				org.bluez.mesh1.Error.Canceled,
+>>> +				org.bluez.mesh1.Error.InvalidArguments
+>>> +				org.bluez.mesh1.Error.Timeout
+>> 
+>> We’ve never versioned errors either, or did you see this done
+>> somewhere? So just leave it out from here.
+> 
+> So you can see a number of services following the above mentioned D-Bus 
+> API Guidelines by running d-feet: e..g., org.freedesktop.GeoClue2 or
+> org.freedesktop.UDisks2 or org.fedoraprojectFirewallD1
 
->  drivers/bluetooth/hci_h4.c | 78 ++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 78 insertions(+)
->=20
+Blindly following some recommendations is dangerous and that is what is happening here. It is blindly following or the project is implement in a memory eating language like Python in the first place.
 
-[...]
+Regards
 
-> +	return hci_uart_register_device(hu, &h4p);
-> +}
-> +
-> +static void hci_h4_remove(struct serdev_device *serdev)
-> +{
-> +	struct h4_device *h4dev =3D serdev_device_get_drvdata(serdev);
-> +
-> +	hci_uart_unregister_device(&h4dev->hu);
-> +}
+Marcel
 
-I suggest to add a patch introducing
-
-devm_hci_uart_register_device()
-
-All existing users of hci_uart_register_device() could use it
-(your driver, hci_bcm, hci_h5, hci_ll, hci_nokia and hci_qca)
-and all drivers but hci_qca can drop their remove function.
-
--- Sebastian
-
---k52q5scznxewnt47
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlvnmBUACgkQ2O7X88g7
-+pqzMQ//VqC1GTpZhAWWF3ZfWkVRrzBBUvcFGws0Mjlvc56FUJVD//VCGWmBm9Q4
-H4jgogFIpjAtdxOQj3TnjqMcGO4XaWkj2hV+3X/NxkgBdAZYOR6Pz4nkcZQRL01R
-l1CR4gCF7K9zGd+yj2XTOM4Rs8HmUvkU37rlaALe7J4tzd2fPf6wafztAKSDTOmL
-1vw8c9/hT2jeadfrlK8QED0a2C+d3PE0fcWrpY0SU+lBI2CgT/fb7cEHk1xpJ9BC
-ALIYxXKWOLoBPe67FrNvghoQre4SPu4BUfoQJZJ4uC9st8B16RgaomoBk1Y2rUHr
-iTxxyBoFyX0lTB5lMTKPscHTNsawpAq1wf9ENkEjNztLn2d8hk4N68H5SGfTXpH6
-rgw2081hRP/dUe3oADItWIRJ6jFRSUuorE/KeLpZHPN+arJwFGK292hkCvPbQzn2
-ncTpxSfdSQDlHc5lhPH2v7ylhmrRhnkwmAdyRuwkIEYkKLyxwDH++GlkGxLKyVc7
-aOqQ8VVKDlos1u+vbXWew8OaMWfKS5PCLbAdTuSb8ntHSdouIacbv+ZeSarxgTl/
-HV0mLjr1haU8JPRJE7KNetQyANoR2mUEB4cw7pxwjaTA45Uf14wuhNYN81I/R7VF
-NZ29WLtHf8BHf7h/MgU6xF1/mv9jJD8rTojrlXzy4extkVmuvQ4=
-=WtdZ
------END PGP SIGNATURE-----
-
---k52q5scznxewnt47--
