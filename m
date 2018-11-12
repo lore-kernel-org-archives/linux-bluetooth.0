@@ -7,69 +7,82 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D09C43441
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 05:26:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 646BEC43441
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 09:51:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BCB67214DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 05:26:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BDA1223C8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 09:51:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="emQv54f7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCB67214DB
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FGVL3wZt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BDA1223C8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730481AbeKLPRj (ORCPT
+        id S1726433AbeKLTnl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Nov 2018 10:17:39 -0500
-Received: from mail-ot1-f54.google.com ([209.85.210.54]:37444 "EHLO
-        mail-ot1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726626AbeKLPRi (ORCPT
+        Mon, 12 Nov 2018 14:43:41 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:40305 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725873AbeKLTnl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Nov 2018 10:17:38 -0500
-Received: by mail-ot1-f54.google.com with SMTP id 40so6903667oth.4
-        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Nov 2018 21:26:04 -0800 (PST)
+        Mon, 12 Nov 2018 14:43:41 -0500
+Received: by mail-ot1-f67.google.com with SMTP id s5so7401593oth.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Nov 2018 01:51:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=UOdMofPKybpJd1WR05TuZwwDU4oI7gsDKhZNN6CxYmQ=;
-        b=emQv54f71aX8/543fLCraB6OOXP/sDuDmRKac9WJg8ejT4AqxtAb/QPOq/Si5FChwO
-         6PSkJwdK0twef2cqVPSQ69dsZ57qiZ8bA6rJxD8JLrzUmQHMH8yvmz7agaO+n//0fCUe
-         cfQsYgtLSLyRt9FV686f+FylxdRTbMsH4cF4zCZ3PTB2jhPKfuNqspPVtNK8Nf/6VpHw
-         xeNm35Mk8zOuz2apKitdS31g+N1v7DmEj7x6pC1kGDsbi/Y3Hbc9t+Uu5Ta6EVC/VxI7
-         Su9LhsuUlQhxDuVLDVcFWxpcrSCnv9szRhdhxDRinWfs4JArQbsvkRXHDDXTRtEcH1Wv
-         Oj8Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lKDsHj8tIYaNjxBtwxyhOmhrgREZRNJyam0NGL2/994=;
+        b=FGVL3wZtCN+s2OvNfVH6mHrHnhMLcOKL5SNjm1kNuA3wuj65QWQDYIWuoBDGPbf2Za
+         SAbCnjMk52uutOxs2p3S0CAKZxdB6njDoEZoi+xotQ1UKlLxOFh8gFxhDgtBvjfqnejX
+         yYijaNRShRo62i+SKqxMl+hYzo4gLa6TtMqBZXjEZmiXoj39zeHsN0HanEe6Dagpeoue
+         e4iCZzbLP7KH+1ESL1XMt4huvsbuMXowDnMWhUgE8EP88wDQNwkzGo9DcCZkpPadB7RS
+         de0b4NLrA2zZskTRFdnmWqt4HNMBc1PfIVe1pb7kW1ow2CAd6rBb5YDlIGzY6F4m1K7b
+         W57g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=UOdMofPKybpJd1WR05TuZwwDU4oI7gsDKhZNN6CxYmQ=;
-        b=RPprBQp+nhXsS/3nirusSo8i67PMYus0hqYLAuiYfi6GyUKOmYplmJnZjsdEhPbFRG
-         k2DsX2eWY4kAjBy9hcBaFtUNtJxEBSndt3HONGbPZEZ4wNxWQb4XXiyraAFfAbAiwJJZ
-         308DU119ZL7frVx96f39gf16DjphK3b2Ot9lcde50HeIgNoaQ8hiR5ZTkTDq2Sl3NeMX
-         aPyTSGbiiHFysfdJFAzGs1CPeAy5RURrWGpyHyhbtJfpVfSpdUnRMs3aEDk8ClTiVg9r
-         ZsCvLOXe/J6lXEz9B90N9HsK45y+C0iKHmZRvLGCDcEjN96iO49SY2xYSsKsfHSHdxyH
-         R5eg==
-X-Gm-Message-State: AGRZ1gITwk4E3PA/rhT4uYhkOx7McmKqQRTyNH6DV5dGBi47c/Spp2D1
-        x85Kwzi+fo5XCoHVTOJKgSSUo/41HbwrtaPWUp7t7N1y
-X-Google-Smtp-Source: AJdET5dcKt2yHz28KNf2V5/Gq9hNIF+VA9pMEY9TbL6WlmzQdkCuieocFNLChe42UKveWizzt6fcCd5XWuSg7uumrEQ=
-X-Received: by 2002:a9d:2831:: with SMTP id m46mr10649567otb.291.1542000363974;
- Sun, 11 Nov 2018 21:26:03 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=lKDsHj8tIYaNjxBtwxyhOmhrgREZRNJyam0NGL2/994=;
+        b=JMjUdjNKmLV+/Wt6VVbAidmy3cJXRlnfaydzGiRSLWdXxh3ppbvuDUB9LhuCIoCYQ+
+         VDCeEtgJ/iQLS4GUGxHawcoE+fPietfDAonuIH64FjmlcEwwxIYjpVC87AcqrHTEZRuE
+         tCE8Recb3OMnu3VEVrWMEOzZQhNIHTMw0S//ZcFH+mrYuqSU5hBgnm2Nz0QffPwbd0Oz
+         dqGXMcEpCt88ICgeBg+RvL/hASsg5OwymxzII8e60FXgaB7vmJgAnuKDmEaPiWi12ya+
+         7etfiKC4Nf0n1wygjQEM1LjjS/o8cJ832q6gtYX587J/o0YcIDkUqjnEE8x81TxLo+d4
+         h/Kg==
+X-Gm-Message-State: AGRZ1gIltZ7TtX+/+HtHgV4lpjBNsMbP3PvAQxtWKrRxUegCUn/CeCN5
+        spxtm+Fm5Qk4rmGjlkNqeORqD9zGm0FbvUmMmdcKWHBD
+X-Google-Smtp-Source: AJdET5cscHdOvaPEFEWdHSJMHQK8BG37Nze+habThvKPqnR/SyCkokfXS27IzZIYqO9aHIWtCqplRct7/lNNYTSDy4I=
+X-Received: by 2002:a9d:4c01:: with SMTP id l1mr155661otf.242.1542016274220;
+ Mon, 12 Nov 2018 01:51:14 -0800 (PST)
 MIME-Version: 1.0
 References: <CAKz1w-==yXd4EL39ULE6bcYU3fTpZB9D0EqdgRhq4L38kVzYEg@mail.gmail.com>
- <CAKz1w-kFDGH-zfYu1GjoJqfs+9uvHvxnG=qwgj8EscAidDNd1w@mail.gmail.com>
-In-Reply-To: <CAKz1w-kFDGH-zfYu1GjoJqfs+9uvHvxnG=qwgj8EscAidDNd1w@mail.gmail.com>
-From:   Dylan Taft <dylanetaft@gmail.com>
-Date:   Mon, 12 Nov 2018 00:25:52 -0500
-Message-ID: <CAKz1w-nQRUOKU3WaTLBOY7nExfG6Lv59PpFddbvintyLRmduAg@mail.gmail.com>
+ <CAKz1w-kFDGH-zfYu1GjoJqfs+9uvHvxnG=qwgj8EscAidDNd1w@mail.gmail.com> <CAKz1w-nQRUOKU3WaTLBOY7nExfG6Lv59PpFddbvintyLRmduAg@mail.gmail.com>
+In-Reply-To: <CAKz1w-nQRUOKU3WaTLBOY7nExfG6Lv59PpFddbvintyLRmduAg@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 12 Nov 2018 11:51:02 +0200
+Message-ID: <CABBYNZLRrpSB4-RJLQ0SJODC2yJYioFCoWFRhm_G4WTv0iOg1g@mail.gmail.com>
 Subject: Re: Odd l2cap_sock.c Code?
-To:     linux-bluetooth@vger.kernel.org
+To:     dylanetaft@gmail.com
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I think I was able to figure my own confusion out after browsing the
-bluez userspace tools.  The kernel does not handle anything above the
-L2CAP layer.  This is ATT and that negotiation is in user space,
-nothing to do with sockopts!
+Hi Dylan,
+On Mon, Nov 12, 2018 at 7:28 AM Dylan Taft <dylanetaft@gmail.com> wrote:
+>
+> I think I was able to figure my own confusion out after browsing the
+> bluez userspace tools.  The kernel does not handle anything above the
+> L2CAP layer.  This is ATT and that negotiation is in user space,
+> nothing to do with sockopts!
+
+Yep, there a procedure to set the ATT MTU called Exchange MTU, note
+that when ATT is used over BR/EDR it does use the so L2CAP basic mode
+so the MTU will be negotiated over L2CAP, Exchange MTU is not allowed
+over BR/EDR.
+
+-- 
+Luiz Augusto von Dentz
