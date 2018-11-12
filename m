@@ -2,119 +2,109 @@ Return-Path: <SRS0=dtqE=NX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E73FC43441
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 20:59:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3171C43441
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 21:19:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6ADD224E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 20:59:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="Jm+4Ie3z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6ADD224E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
+	by mail.kernel.org (Postfix) with ESMTP id 393A02243E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 21:19:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 393A02243E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=goldelico.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725907AbeKMGym (ORCPT
+        id S1727595AbeKMHOR convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Nov 2018 01:54:42 -0500
-Received: from mail.andi.de1.cc ([85.214.239.24]:33622 "EHLO
-        h2641619.stratoserver.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725861AbeKMGym (ORCPT
+        Tue, 13 Nov 2018 02:14:17 -0500
+Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.164]:17371 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727267AbeKMHOR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Nov 2018 01:54:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=kemnade.info; s=20180802; h=Content-Type:MIME-Version:References:
-        In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=tGOAz8gw/uAQySRartYdRIvcbf1KlRooSE+XehrA7Eg=; b=Jm+4Ie3ztGhHpE8OCN9aoV+Xg
-        HI2zEW8HbyBNQbvULYE5/0axg08j8hxATfMzU/svlw/4N9aKl6X9e6zE8xrm6rjq9cbrq5i+5TxwZ
-        mGYXsZ1aHZRHTfv1+10XoLlBirRny7PNuuJQ4G/bKp9u9vKZULfsSjVJlZguzV84STjDU=;
-Received: from pd9e2f2f1.dip0.t-ipconnect.de ([217.226.242.241] helo=aktux)
-        by h2641619.stratoserver.net with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <andreas@kemnade.info>)
-        id 1gMJJ8-0004NB-UJ; Mon, 12 Nov 2018 21:59:43 +0100
-Date:   Mon, 12 Nov 2018 21:59:34 +0100
-From:   Andreas Kemnade <andreas@kemnade.info>
-To:     Sebastian Reichel <sebastian.reichel@collabora.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, letux-kernel@openphoenux.org
-Subject: Re: [PATCH RFC] bluetooth: add uart h4 devices via
- serdev/devicetree
-Message-ID: <20181112215812.18ebca35@aktux>
-In-Reply-To: <20181111024648.7rt7rlhaqihtqecv@earth.universe>
-References: <20181110232034.17277-1-andreas@kemnade.info>
-        <20181111024648.7rt7rlhaqihtqecv@earth.universe>
-X-Mailer: Claws Mail 3.14.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/aWdB_CefDoLhkjCidefch86"; protocol="application/pgp-signature"
+        Tue, 13 Nov 2018 02:14:17 -0500
+X-RZG-AUTH: ":JGIXVUS7cutRB/49FwqZ7WcJeFKiMgPgp8VKxflSZ1P34KBj5Qpw97WFDlSUXA0LOA=="
+X-RZG-CLASS-ID: mo00
+Received: from imac.fritz.box
+        by smtp.strato.de (RZmta 44.3 AUTH)
+        with ESMTPSA id J0aaaduACLJ3xGQ
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Mon, 12 Nov 2018 22:19:03 +0100 (CET)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [Letux-kernel] [PATCH RFC] bluetooth: add uart h4 devices via serdev/devicetree
+From:   "H. Nikolaus Schaller" <hns@goldelico.com>
+In-Reply-To: <20181112215812.18ebca35@aktux>
+Date:   Mon, 12 Nov 2018 22:19:02 +0100
+Cc:     Sebastian Reichel <sebastian.reichel@collabora.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        Discussions about the Letux Kernel 
+        <letux-kernel@openphoenux.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com>
+References: <20181110232034.17277-1-andreas@kemnade.info> <20181111024648.7rt7rlhaqihtqecv@earth.universe> <20181112215812.18ebca35@aktux>
+To:     Andreas Kemnade <andreas@kemnade.info>
+X-Mailer: Apple Mail (2.3124)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---Sig_/aWdB_CefDoLhkjCidefch86
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On Sun, 11 Nov 2018 03:46:48 +0100
-Sebastian Reichel <sebastian.reichel@collabora.com> wrote:
-
+> Am 12.11.2018 um 21:59 schrieb Andreas Kemnade <andreas@kemnade.info>:
+> 
 > Hi,
->=20
-> On Sun, Nov 11, 2018 at 12:20:34AM +0100, Andreas Kemnade wrote:
-> > This is a first try to be able to use h4 devices specified in
-> > the devicetree, so you do not need to call hciattach and
-> > it can be automatically probed.
-> >=20
-> > Of course, proper devicetree bindings documentation is
-> > missing. And also you would extend that by regulator/
-> > enable gpio settings.
-> >=20
-> > But before proceeding further it should be checked if the
-> > general way of doing things is right.
-> >=20
-> > Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
-> > --- =20
->=20
-> Patch looks good to me, just one note
->=20
-I found one thing myself:
-Shouldn't we have a generic compatible string like "generic-h4".
-ehci-platform.c has for example:
-        { .compatible =3D "generic-ehci", },
+> 
+> On Sun, 11 Nov 2018 03:46:48 +0100
+> Sebastian Reichel <sebastian.reichel@collabora.com> wrote:
+> 
+>> Hi,
+>> 
+>> On Sun, Nov 11, 2018 at 12:20:34AM +0100, Andreas Kemnade wrote:
+>>> This is a first try to be able to use h4 devices specified in
+>>> the devicetree, so you do not need to call hciattach and
+>>> it can be automatically probed.
+>>> 
+>>> Of course, proper devicetree bindings documentation is
+>>> missing. And also you would extend that by regulator/
+>>> enable gpio settings.
+>>> 
+>>> But before proceeding further it should be checked if the
+>>> general way of doing things is right.
+>>> 
+>>> Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
+>>> ---  
+>> 
+>> Patch looks good to me, just one note
+>> 
+> I found one thing myself:
+> Shouldn't we have a generic compatible string like "generic-h4".
+> ehci-platform.c has for example:
+>        { .compatible = "generic-ehci", },
 
-Regards,
-Andreas
+There might be differences in h4 compatible devices (e.g. default
+baud rate) so that I would not bet there a "generic-h4" suffices
+in the long run.
 
---Sig_/aWdB_CefDoLhkjCidefch86
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+And, shouldn't there be a vendor prefix anyways?
 
------BEGIN PGP SIGNATURE-----
+I.e. something like "bluetooth,h4"? Because it seems to be defined in
+https://www.bluetooth.org/docman/handlers/DownloadDoc.ashx?doc_id=41266
 
-iQIzBAEBCAAdFiEE7sDbhY5mwNpwYgrAfb1qx03ikyQFAlvp6bcACgkQfb1qx03i
-kyQjnBAAvdRtlj7zGjvLbgzTX7vCh9rFv3v3Nw28EezbMuaKmMAZmp3FSibfRUbx
-D6BkAHc2244r8gy3cizNUzOCeN3w2MjDFCp3ZBka1ff+oonW7nQTiV4fZt/XCW5h
-ieSMHH8pem5fpuGdgYVSnH51VbrDcSB2adw1Y1SHBTAeYpSIl4AGtx+Yavn8qS+9
-RsbUTGd1fAE38KbpOoRNgjN/UtagBD8a9rrj39c+6l44RX4YioLFivY8xP21cZNW
-pEgUFEhr6hCs4EathF5vmmMVYjwA6Tx69rPjuAfd+Cle14FcAQVgVrDa8y8J/s4X
-dMpEYc1ZJL2JTkvBW+TqKmhs3TQiR0gbGLDgdRyf3DLJGRFbcqskzErk1ZhyWqnu
-E5R/cwjBTuSu5JEN7guPefrbfN9slKnfTOdYWG+33v0U47uftt7F+zGNDBG2zjoL
-sznthXrDLsLoqoCXsnmqQp/RHUB80gzk1tPtFe2jMj0QvHJi53EVd5GLqsK7/7B3
-Ai7OOMuF34KMSvZ9I/sMkw6Yg9nwtdL09NHyfJXABbNgkFskseGV849JngeyeLiT
-Dlrc3l08yovs3dYZBJnDCD8U1iaXBaXx653B1+m0xtVeY9o+wfRbtgL/tDNsaqBf
-4KlfOWUxWUvhojh7MPSfD4oMji0QDeEpSM3BvY6WhVTXrLkeZGc=
-=49KN
------END PGP SIGNATURE-----
+On the other hand, with hci-ll protocol the compatible strings are chip variants.
+Well, this seems to be required to decide which firmware to download.
 
---Sig_/aWdB_CefDoLhkjCidefch86--
+So it boils down to if DT compatibility should be compatible to generic
+functions or specific chips? AFAI see this is more or less random and
+there seems to be no general rule.
+
+Just some thoughts but no strong preference.
+
+BR,
+Nikolaus
+
