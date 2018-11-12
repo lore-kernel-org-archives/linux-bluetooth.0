@@ -2,108 +2,106 @@ Return-Path: <SRS0=dtqE=NX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E4BC43441
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 14:40:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E9C1C43441
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 16:05:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA98A223CB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 14:40:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6Mv9uDN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA98A223CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 1049022419
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 16:05:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1049022419
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729807AbeKMAeT (ORCPT
+        id S1727824AbeKMB67 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Nov 2018 19:34:19 -0500
-Received: from mail-oi1-f179.google.com ([209.85.167.179]:36407 "EHLO
-        mail-oi1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729619AbeKMAeS (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Nov 2018 19:34:18 -0500
-Received: by mail-oi1-f179.google.com with SMTP id r127-v6so7330331oie.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Nov 2018 06:40:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=e/Ll0jvh3hjxrTnvLE3NNHvRT0UluTdHv/MrTLfe+WY=;
-        b=V6Mv9uDNUppjal7XHnUb9Y83CsL1j6ngA50Kq8AW0kJOp5GLe/HzPKoJVRidRc33r4
-         sPVhsVupJd5XXAPRGhVf7eRPbxozTeByzNFaAkexeVvPFNMkzPA0NvoYCGkcZe23qi59
-         3ofwb5ZUs7Sakztx/LGgT5DXc20OFqdefoENHf1ds4VKc79BUbFxQZ+blkgJqIuI+ZYs
-         /x47ZjUV63orlP+bMxCN/U1dvRRe1VdugnPGsl1yN7+T4nR7+iz6CFs/Q7WT8cR1ltSd
-         QvQ/na06I3jIian9CDm7brQUXpVCs01PqgkLGc82WYMBWjol9M7Gdiwv/DfSdaPCuIK8
-         cLuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=e/Ll0jvh3hjxrTnvLE3NNHvRT0UluTdHv/MrTLfe+WY=;
-        b=sJP33HWlobbVs2IqTg5lXdZaeqKHNtaBe0l13Pt7iVsPEOOUV5aaPNx0g1Gg20CK6b
-         alRlY6jmW7XtUnDyo9E4/lR1zwhkGqhK/Gr8wtMkzZ+CBLazUbABKx5cERxDkdFhWdB5
-         0iviwE8CN16otqfmc9y5yjctnxTYsJeel+a52Fr+Njrru0zcn2ysuuxhXes0LqwJxTZC
-         jNNvMRu8wGvx0oYof4na+Naox/yQIrdBA5yPYmDBZ4xGx4ItK5stgX05gFXE5Mp1ryUL
-         1GyFa3tu07JIvFKN/NimiqCig1+hCJRVZusi1ITKXk47Fr4wiokAhj/mCmzdoszPPZq9
-         Ozbg==
-X-Gm-Message-State: AGRZ1gKcahiFdOasPDCfdUOt6zTAFB3YRdH/H3t/MisVn45fZSr6Pxkd
-        1Jwowvrr5WVomj1bTSKJWhAAbloxz/a+OuFJSss=
-X-Google-Smtp-Source: AJdET5e02a0bA980/GCI/TdFy2LcqJCAZ7CyCYelejF25dcGHZ65RgrDIEH6pjpJ4mXMXtgqt3kamPXdsHFii0OJwr4=
-X-Received: by 2002:aca:32c6:: with SMTP id y189-v6mr586551oiy.153.1542033645183;
- Mon, 12 Nov 2018 06:40:45 -0800 (PST)
-MIME-Version: 1.0
-References: <20181112013317.5714-1-inga.stotland@intel.com>
- <CABBYNZJLLxNC3BQvyDxzTFLppe25ke=VK_9QtvJsNbCFjnUW2A@mail.gmail.com> <4C0377DF-430B-4A2C-BA6E-CC4B9C6ED9F6@gmail.com>
-In-Reply-To: <4C0377DF-430B-4A2C-BA6E-CC4B9C6ED9F6@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 12 Nov 2018 16:40:33 +0200
-Message-ID: <CABBYNZ+1RqUJm3c_mQjF0DNDy1GWTKRP-v-66VN1ihEpf6Y3iw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] doc: Initial Bluetooth Mesh API
-To:     Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     "Stotland, Inga" <inga.stotland@intel.com>,
+        Mon, 12 Nov 2018 20:58:59 -0500
+Received: from mga07.intel.com ([134.134.136.100]:38274 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726221AbeKMB67 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 12 Nov 2018 20:58:59 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 12 Nov 2018 08:05:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.54,495,1534834800"; 
+   d="scan'208";a="249073474"
+Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
+  by orsmga004.jf.intel.com with ESMTP; 12 Nov 2018 08:05:07 -0800
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.166]) by
+ ORSMSX101.amr.corp.intel.com ([169.254.8.195]) with mapi id 14.03.0415.000;
+ Mon, 12 Nov 2018 08:05:07 -0800
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+CC:     "Stotland, Inga" <inga.stotland@intel.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "Gix, Brian" <brian.gix@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        "Marcel Holtmann" <marcel@holtmann.org>
+Subject: RE: [PATCH BlueZ v2] doc: Initial Bluetooth Mesh API
+Thread-Topic: [PATCH BlueZ v2] doc: Initial Bluetooth Mesh API
+Thread-Index: AQHUeiezLw8+xn0WNEaLOucalm9UcaVMly0AgAAJVoCAAByegP//jWew
+Date:   Mon, 12 Nov 2018 16:05:06 +0000
+Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4375C132AB0@ORSMSX103.amr.corp.intel.com>
+References: <20181112013317.5714-1-inga.stotland@intel.com>
+ <CABBYNZJLLxNC3BQvyDxzTFLppe25ke=VK_9QtvJsNbCFjnUW2A@mail.gmail.com>
+ <4C0377DF-430B-4A2C-BA6E-CC4B9C6ED9F6@gmail.com>
+ <CABBYNZ+1RqUJm3c_mQjF0DNDy1GWTKRP-v-66VN1ihEpf6Y3iw@mail.gmail.com>
+In-Reply-To: <CABBYNZ+1RqUJm3c_mQjF0DNDy1GWTKRP-v-66VN1ihEpf6Y3iw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ctpclassification: CTP_NT
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZWIyMmEwYjgtNDJhYi00YzE5LTgxYWEtODg1Yzg4MGU0ZTVmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiK0lkOVwvUE1wMDJqclNJZ29LT29aOTMxOWFTbUF4dlZPYTRVZGI3WHFqbFFWUzBxMmJzbVgxNGY0WGpSTXl4QnQifQ==
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-originating-ip: [10.22.254.140]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Johan,
-
-On Mon, Nov 12, 2018 at 2:58 PM Johan Hedberg <johan.hedberg@gmail.com> wro=
-te:
->
-> Hi Luiz
->
-> > On 12 Nov 2018, at 13.24, Luiz Augusto von Dentz <luiz.dentz@gmail.com>=
- wrote:
-> >
-> > It seems wrong  to me to have to send your own object as method
-> > argument, usually this sort of communication goes as a Signal but it
-> > seems the Element interface has no signal to be able to do something
-> > like that.
->
-> The problem with signals is that they cannot return an error, and I do th=
-ink we=E2=80=99d want to have the daemon return an error if it cannot send =
-the given message. Also, by default signals are broadcast, and it feels a b=
-it hawkish to do unicast destinations for them.
-
-Well unicast signals is not a new thing, though we never used it that
-would be possible to do something like that, anyway D-Bus signals are
-subscription based which is the reason we haven't consider it to be
-problem to emit signal for Value changes in case of GATT attributes,
-that said the lack of error result could indeed be a problem but some
-of the errors are actually due to the checking object_path is valid?
-Other errors Im not sure, Ive assume if there is a response that would
-then call MessageReceived, but perhaps we want to validate the
-transmission itself, but I though that wasn't possible in BlueZ.
-
---=20
-Luiz Augusto von Dentz
+SGkgTHVpeiwgSm9oYW4sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTog
+THVpeiBBdWd1c3RvIHZvbiBEZW50eiBbbWFpbHRvOmx1aXouZGVudHpAZ21haWwuY29tXQ0KPiAN
+Cj4gSGkgSm9oYW4sDQo+IA0KPiBPbiBNb24sIE5vdiAxMiwgMjAxOCBhdCAyOjU4IFBNIEpvaGFu
+IEhlZGJlcmcNCj4gPGpvaGFuLmhlZGJlcmdAZ21haWwuY29tPiB3cm90ZToNCj4gPg0KPiA+IEhp
+IEx1aXoNCj4gPg0KPiA+ID4gT24gMTIgTm92IDIwMTgsIGF0IDEzLjI0LCBMdWl6IEF1Z3VzdG8g
+dm9uIERlbnR6DQo+IDxsdWl6LmRlbnR6QGdtYWlsLmNvbT4gd3JvdGU6DQo+ID4gPg0KPiA+ID4g
+SXQgc2VlbXMgd3JvbmcgIHRvIG1lIHRvIGhhdmUgdG8gc2VuZCB5b3VyIG93biBvYmplY3QgYXMg
+bWV0aG9kDQo+ID4gPiBhcmd1bWVudCwgdXN1YWxseSB0aGlzIHNvcnQgb2YgY29tbXVuaWNhdGlv
+biBnb2VzIGFzIGEgU2lnbmFsIGJ1dCBpdA0KPiA+ID4gc2VlbXMgdGhlIEVsZW1lbnQgaW50ZXJm
+YWNlIGhhcyBubyBzaWduYWwgdG8gYmUgYWJsZSB0byBkbyBzb21ldGhpbmcNCj4gPiA+IGxpa2Ug
+dGhhdC4NCj4gPg0KPiA+IFRoZSBwcm9ibGVtIHdpdGggc2lnbmFscyBpcyB0aGF0IHRoZXkgY2Fu
+bm90IHJldHVybiBhbiBlcnJvciwgYW5kIEkgZG8gdGhpbmsNCj4gd2XigJlkIHdhbnQgdG8gaGF2
+ZSB0aGUgZGFlbW9uIHJldHVybiBhbiBlcnJvciBpZiBpdCBjYW5ub3Qgc2VuZCB0aGUgZ2l2ZW4N
+Cj4gbWVzc2FnZS4gQWxzbywgYnkgZGVmYXVsdCBzaWduYWxzIGFyZSBicm9hZGNhc3QsIGFuZCBp
+dCBmZWVscyBhIGJpdCBoYXdraXNoIHRvDQo+IGRvIHVuaWNhc3QgZGVzdGluYXRpb25zIGZvciB0
+aGVtLg0KPiANCj4gV2VsbCB1bmljYXN0IHNpZ25hbHMgaXMgbm90IGEgbmV3IHRoaW5nLCB0aG91
+Z2ggd2UgbmV2ZXIgdXNlZCBpdCB0aGF0IHdvdWxkIGJlDQo+IHBvc3NpYmxlIHRvIGRvIHNvbWV0
+aGluZyBsaWtlIHRoYXQsIGFueXdheSBELUJ1cyBzaWduYWxzIGFyZSBzdWJzY3JpcHRpb24NCj4g
+YmFzZWQgd2hpY2ggaXMgdGhlIHJlYXNvbiB3ZSBoYXZlbid0IGNvbnNpZGVyIGl0IHRvIGJlIHBy
+b2JsZW0gdG8gZW1pdCBzaWduYWwNCj4gZm9yIFZhbHVlIGNoYW5nZXMgaW4gY2FzZSBvZiBHQVRU
+IGF0dHJpYnV0ZXMsIHRoYXQgc2FpZCB0aGUgbGFjayBvZiBlcnJvciByZXN1bHQNCj4gY291bGQg
+aW5kZWVkIGJlIGEgcHJvYmxlbSBidXQgc29tZSBvZiB0aGUgZXJyb3JzIGFyZSBhY3R1YWxseSBk
+dWUgdG8gdGhlDQo+IGNoZWNraW5nIG9iamVjdF9wYXRoIGlzIHZhbGlkPw0KPiBPdGhlciBlcnJv
+cnMgSW0gbm90IHN1cmUsIEl2ZSBhc3N1bWUgaWYgdGhlcmUgaXMgYSByZXNwb25zZSB0aGF0IHdv
+dWxkIHRoZW4NCj4gY2FsbCBNZXNzYWdlUmVjZWl2ZWQsIGJ1dCBwZXJoYXBzIHdlIHdhbnQgdG8g
+dmFsaWRhdGUgdGhlIHRyYW5zbWlzc2lvbg0KPiBpdHNlbGYsIGJ1dCBJIHRob3VnaCB0aGF0IHdh
+c24ndCBwb3NzaWJsZSBpbiBCbHVlWi4NCg0KQWZ0ZXIgYSBudW1iZXIgb2YgbmVnb3RpYXRpb25z
+LCB3ZSBkZWNpZGVkIG9uOg0KDQoqIE1ldGhvZHMgb24gRWxlbWVudCBPYmplY3QgUGF0aHMgZm9y
+IGluY29taW5nIG1lc3NhZ2VzICAoZnJvbSANCk1lc2gtLT5EYWVtb24tLT5BcHApIGZvciBTZWN1
+cml0eSBhbmQgZGlmZmVyZW50aWF0aW9uIGJldHdlZW4gZGVzdGluYXRpb24NCmVsZW1lbnRzIChh
+biBBcHAgY2FuIGltcGxlbWVudCBtdWx0aXBsZSBlbGVtZW50cykuIFdoaWxlIHdlIG1heSBoYXZl
+DQpiZWVuIGFibGUgdG8gZ2V0IFNpZ25hbHMgdG8gd29yayBTZWN1cmVseSwgdGhlIGRlbGl2ZXJ5
+IG9mIGluY29taW5nIG1lc3NhZ2VzIGlzDQoqYWx3YXlzKiB0byBhICpzcGVjaWZpYyogZWxlbWVu
+dCwgYW5kIHJlYWxseSBzaG91bGRuJ3QgYmUgdXNpbmcgYSBicm9hZGNhc3QgbWVjaGFuaXNtLg0K
+DQoqIFVzaW5nIHRoZSBBcHAncyBlbGVtZW50IE9iamVjdCBwYXRoIGFzIHRoZSBwYXJhbSAoQXBw
+IC0tPiBEYWVtb24gLS0+IE1lc2gpDQp0byBzcGVjaWZ5IHRoZSBTb3VyY2UgYWRkcmVzcy4gIFRo
+aXMgd2FzIGRvbmUgdG8gbWluaW1pemUgdGhlIHVuaXF1ZSB3YXlzIG9mDQpyZWZlcnJpbmcgdG8g
+dGhlIEVsZW1lbnQNCg0KDQoNCj4gDQo+IC0tDQo+IEx1aXogQXVndXN0byB2b24gRGVudHoNCg==
