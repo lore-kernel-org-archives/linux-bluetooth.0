@@ -2,133 +2,171 @@ Return-Path: <SRS0=WHZG=NY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DECE8C43441
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Nov 2018 11:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC0D7C43441
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Nov 2018 16:02:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5FC420685
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Nov 2018 11:21:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88ACF216FD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Nov 2018 16:02:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FJrZHNtb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5FC420685
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="ZANlDEpC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88ACF216FD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732673AbeKMVTG (ORCPT
+        id S2387892AbeKNCAy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Nov 2018 16:19:06 -0500
-Received: from mail-ot1-f46.google.com ([209.85.210.46]:33489 "EHLO
-        mail-ot1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732037AbeKMVTG (ORCPT
+        Tue, 13 Nov 2018 21:00:54 -0500
+Received: from mail.andi.de1.cc ([85.214.239.24]:36058 "EHLO
+        h2641619.stratoserver.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387659AbeKNCAy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Nov 2018 16:19:06 -0500
-Received: by mail-ot1-f46.google.com with SMTP id i20so4499772otl.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Nov 2018 03:21:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=C2sY9i+ZxoW45MUuuwCMegkAr0aMZEQY7owpQK3GJIg=;
-        b=FJrZHNtbQrepulPJXFSkgp99+RhmfB0f/mHbl5KPnpTpRQhcLNzmKH3vDJOE+4I5Tz
-         0Qd3elFHQCkxshO4QXae9iK3mfu3GZpoAFXmXtqshpmm73LTM9uN6QCiSd+GoCzS1LWV
-         RcE3idVPisTWtXlr85PY9V+mZrCE6PPpShqjP+fRgTqBQRUgCpiKK8y9qMKMX98o2FAx
-         cVCGgAA+ipFQqks2OQIdY4zuLkDnZnH57R173xxUOmqBDeP+sIlXu/9CNZ+f/69ZPyfo
-         KC8lFFXxlF2gDbMZRpoz+QOijRW3HGSMhGmcfSgCe8n52u+k+LNglRvE+XYFXgmrlFd3
-         EGnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=C2sY9i+ZxoW45MUuuwCMegkAr0aMZEQY7owpQK3GJIg=;
-        b=QAK0jwiMAsMhcRnQT8gYk+9bRaKr6Z069ngFFXeJc9EKRMVGiJanAAPX/zJjw5686y
-         0UlJP68lCWzQ5T9Mg3uCAGKjP4HPr/HHbvv6DT4TXjfrqKf65MuTwew06tgFwQ8tJI/Z
-         pYLXXD1fAw5+xeVKYnaGs4apkpKxCYQmf5llVbgkZp91dZejZ2FIrh1I3b/TBbAIam6L
-         kq+XD4loNQE9e4F+92fAVooUsIQ3uAH8b4E5hTk1TgvNAzsggMycnKBz+DcaMb6WUWVk
-         PGuZcvgOaIwIxXaqPqzUjQF66Y5rPHdF76bFlLtI7R0sti5dDnEz/HUJvu3E6neieJ4r
-         Rwdg==
-X-Gm-Message-State: AGRZ1gIUPtWEfqEnKhdvW5o4MFOaG1ARu/ey4IPHdFPjOfWnELWopXqy
-        mQal9YBhQkmadOJQ7/a2UC01be6H2s46YgwAR+wz2Q==
-X-Google-Smtp-Source: AJdET5cDO/Q/Ikel8KXnI29n6VKYyFTgUnWr2KfdufiRAkrQwtte6olfMGxef7LIdNQiNujOdpn1MbO9GbtDi/BhIa4=
-X-Received: by 2002:a9d:4a22:: with SMTP id h31mr2722685otf.254.1542108086090;
- Tue, 13 Nov 2018 03:21:26 -0800 (PST)
+        Tue, 13 Nov 2018 21:00:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=kemnade.info; s=20180802; h=Content-Type:MIME-Version:References:
+        In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=VQssOANATFsGw4L5A82QdDx12Yme6rB94QmRny/G5r8=; b=ZANlDEpCGjujNvIeGMJ0TGSvp
+        nylB94BoFVB1pV/Tsft8fJ8TxpWvSTzj349NgJGfwVgm0P9A+HPrVUF0wX4RKD2T7ZBaKpz18s52b
+        mwurMeJcfMLls1JjnwOytgMwz3srs+LFtS3rwFs1kCPtTqloxdW3KJR3KVsFeOiDL7CrU=;
+Received: from x590fecab.dyn.telefonica.de ([89.15.236.171] helo=localhost)
+        by h2641619.stratoserver.net with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <andreas@kemnade.info>)
+        id 1gMb8h-0001Pb-0g; Tue, 13 Nov 2018 17:02:07 +0100
+Received: from localhost ([::1])
+        by localhost with esmtp (Exim 4.89)
+        (envelope-from <andreas@kemnade.info>)
+        id 1gMb8d-0001y2-R7; Tue, 13 Nov 2018 17:02:03 +0100
+Date:   Tue, 13 Nov 2018 17:01:28 +0100
+From:   Andreas Kemnade <andreas@kemnade.info>
+To:     Rob Herring <robh@kernel.org>
+Cc:     sebastian.reichel@collabora.com, hns@goldelico.com,
+        devicetree@vger.kernel.org, johan.hedberg@gmail.com,
+        marcel@holtmann.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org, letux-kernel@openphoenux.org
+Subject: Re: [Letux-kernel] [PATCH RFC] bluetooth: add uart h4 devices via
+ serdev/devicetree
+Message-ID: <20181113170128.0f59ef0e@kemnade.info>
+In-Reply-To: <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com>
+References: <20181110232034.17277-1-andreas@kemnade.info>
+        <20181111024648.7rt7rlhaqihtqecv@earth.universe>
+        <20181112215812.18ebca35@aktux>
+        <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com>
+        <20181112222726.73m2oca7hankvcjs@earth.universe>
+        <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com>
+X-Mailer: Claws Mail 3.14.1 (GTK+ 2.24.31; i686-pc-linux-gnu)
 MIME-Version: 1.0
-References: <CABatt_x1aNftgFVuDxrhyZVs4bGmOZFccjPKU_BpfbGmMWTazA@mail.gmail.com>
- <CABatt_zHbVz+cbb6Vig820W5bdXd+Cd1Jjh02MdqnBiX0WQuEg@mail.gmail.com>
- <CABBYNZJ0uT-qX2njVfFan2vVWaEveDR+waOC3FSZrTfpaBkHew@mail.gmail.com>
- <CABatt_wSMSiW+Fmi5cccAnejMbAAHdNWb-jW0qLcijtdWETHzw@mail.gmail.com>
- <CABatt_yhozRuFjtSsmvHJNyFoFR7tstfuZp9jPdcZpxuCx7z=A@mail.gmail.com>
- <CABatt_zEv6Cksm5buiaiacOdxY4nurmbiX2OdPuQYjqUDKkRCw@mail.gmail.com> <CAO1O6sdawagz6nfL0J=4EZ7YbLGUd2YmMbiJZVqd-BtyqLN0GA@mail.gmail.com>
-In-Reply-To: <CAO1O6sdawagz6nfL0J=4EZ7YbLGUd2YmMbiJZVqd-BtyqLN0GA@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 13 Nov 2018 13:21:13 +0200
-Message-ID: <CABBYNZJJoLbWC5Dm3Gmd23TdFG1KJQUUKL4e+hGit4CzM5Rp5w@mail.gmail.com>
-Subject: Re: Operating central and peripheral roles concurrently
-To:     Emil Lenngren <emil.lenngren@gmail.com>
-Cc:     Martin Townsend <mtownsend1973@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/j5HQM3BtDpk6Uv4sir_Rhdt"; protocol="application/pgp-signature"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Emil, Martin,
-On Tue, Nov 13, 2018 at 12:47 PM Emil Lenngren <emil.lenngren@gmail.com> wr=
-ote:
->
-> Hi,
->
-> Den m=C3=A5n 12 nov. 2018 kl 17:19 skrev Martin Townsend <mtownsend1973@g=
-mail.com>:
-> > I've just been reading the 4.1 spec on GAP and on page 224 it states:
-> >
-> >
-> > "In LE, GAP defines four specific roles: Broadcaster, Observer, Periphe=
-ral, and
-> > Central. A device may support multiple LE GAP roles provided that the u=
-nderly-
-> > ing Controller supports those roles or role combinations. However, only=
- one LE
-> > GAP role may be supported at a given time. Each role specifies the requ=
-ire-
-> > ments for the underlying Controller. This allows for Controllers to be =
-optimized
-> > for specific use cases."
-> >
-> > Now to me that says a device can support being a central and
-> > peripheral but doesn't have to support them concurrently so I'm
-> > guessing if the device is in the peripheral role and then wanted to
-> > connect to another device you would have to stop being a peripheral
-> > (ie drop this connection) and then become a central, make the
-> > connection and when finished disconnect and become a peripheral again
-> > and wait for the other devices to reconnect to you.  Or am I
-> > mis-reading this?
->
-> This restriction is lifted in newer versions of the spec. The same
-> section in version 4.2 says this:
-> "In LE, GAP defines four specific roles: Broadcaster, Observer, Periphera=
-l, and
-> Central. A device may support multiple LE GAP roles provided that the
-> underlying Controller supports those roles or role combinations. Each rol=
-e
-> specifies the requirements for the underlying Controller. This allows for
-> Controllers to be optimized for specific use cases."
->
-> If you use the btmon tool you can easily see what combination of
-> supported states the controller supports. If you have btmon running
-> while you initiate bluetoothd you will see the packet LE Read
-> Supported States Command, which contains this info.
+--Sig_/j5HQM3BtDpk6Uv4sir_Rhdt
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-In that case we should definitely use these states to determine
-instead of assuming the controller don't support Master & Slave state,
-though it would be great if Martin provides the HCI traces where it is
-failing and if indeed is the controller not support it or some other
-bug.
+On Mon, 12 Nov 2018 18:17:38 -0600
+Rob Herring <robh@kernel.org> wrote:
 
---=20
-Luiz Augusto von Dentz
+> On Mon, Nov 12, 2018 at 4:27 PM Sebastian Reichel
+> <sebastian.reichel@collabora.com> wrote:
+> >
+> > Hi,
+> >
+> > On Mon, Nov 12, 2018 at 10:19:02PM +0100, H. Nikolaus Schaller wrote: =
+=20
+> > > > Am 12.11.2018 um 21:59 schrieb Andreas Kemnade <andreas@kemnade.inf=
+o>:
+> > > > On Sun, 11 Nov 2018 03:46:48 +0100
+> > > > Sebastian Reichel <sebastian.reichel@collabora.com> wrote: =20
+> > > >> On Sun, Nov 11, 2018 at 12:20:34AM +0100, Andreas Kemnade wrote: =
+=20
+> > > >>> This is a first try to be able to use h4 devices specified in
+> > > >>> the devicetree, so you do not need to call hciattach and
+> > > >>> it can be automatically probed.
+> > > >>>
+> > > >>> Of course, proper devicetree bindings documentation is
+> > > >>> missing. And also you would extend that by regulator/
+> > > >>> enable gpio settings.
+> > > >>>
+> > > >>> But before proceeding further it should be checked if the
+> > > >>> general way of doing things is right.
+> > > >>>
+> > > >>> Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
+> > > >>> --- =20
+> > > >>
+> > > >> Patch looks good to me, just one note
+> > > >> =20
+> > > > I found one thing myself:
+> > > > Shouldn't we have a generic compatible string like "generic-h4".
+> > > > ehci-platform.c has for example:
+> > > >        { .compatible =3D "generic-ehci", }, =20
+> > >
+> > > There might be differences in h4 compatible devices (e.g. default
+> > > baud rate) so that I would not bet there a "generic-h4" suffices
+> > > in the long run. =20
+>=20
+> It will not because that doesn't define clocks, resets, gpios,
+> supplies, etc. and the interactions of all those.
+>=20
+well, we need a simple supply being on when the device is on.
+Nothing more.
+
+> > My suggestion is to use this in DT:
+> >
+> > compatible =3D "wi2wi,w2cbw003-bluetooth", "<something generic>";
+> >
+That would be my slight preference here.
+
+> > The driver can start with supporting just the generic compatible
+> > string. If somebody finds some incompatible differences, the driver
+> > can add a custom handler for the wi2wi chip without breaking DT
+> > ABI. =20
+>=20
+> Any idea how many H4 devices there are? Somehow I doubt there are that
+> many to be unmanageable.
+>=20
+Well, many devices are h4 devices with some more or less important
+vendor-specific commands. Well, "hciattach any" uses simple h4 protocol.
+
+those firmware download commands and they have their own drivers.
+Most devices I had used bluetooth uart from the command line with, were
+simple enough. The other question is whether those devices will run a
+modern kernel.
+
+No strong opinion here.=20
+
+Regards,
+Andreas
+
+--Sig_/j5HQM3BtDpk6Uv4sir_Rhdt
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE7sDbhY5mwNpwYgrAfb1qx03ikyQFAlvq9VgACgkQfb1qx03i
+kyS5nBAAxlvnsfTEFAxI0BcKanS38HpbBcXP8k1/aPlkYpgHeVPGgZeyd8Cj1aGn
+e8gdITUsT2IA3Jlph2V2+W+QuHynUaW+pZgsvVJ8EwgxHoUqhcw4EgghkerHHnLf
+/ykN/hNS9Pz+PeDJz4mmVl6bqjD0T494GVfR63Z1iQXmvaK3QgsbKC5N+q8kZqgx
+JMdbS2ZRrF7gvoyfNtzP390hmqcZ+UpN3p5Dx6Lm6pM/SzI9Gt+3z8qYwnw3Qg4r
+EWlg/Hmj6xDQnS1J8rPCBA2VCFOLP2EgEc+kr+HpND/mXrpfw5gClBXVKd+X9XWO
+I2ZubzUTy5mE7xHpAhJT0e8B66CfZ1Kb/hmnLY941N24nqoB5ynu1/JZiXsn304r
+6HHMwdsY5+Dsxrc7zvA4s8g322vIMR5Zx0FDD4n+1mryBRPJL/b4iiComnyTgBxQ
+rJA5nYKc8GRN8QsOGpFGL2r2YphSAGnwa8H/616jxvZhzqH0CO6D0OAY6wP6tF71
+C96bnoXS8XXbpID8jbFMbPjil4AEGiNX3plUNUe0viFqhz6x4kYqI0FYKuZW+8qA
+7jwYVkQy9QXVw91COg0KAUkGXfYhQAapeTKPhHtI75Xpq9xoAXTRKHw77+HreZjs
+zdafAAz9IhXG0cilaGbNxtEUU5iRAhAQkfe7rYrITcw0Nn/472c=
+=/9mK
+-----END PGP SIGNATURE-----
+
+--Sig_/j5HQM3BtDpk6Uv4sir_Rhdt--
