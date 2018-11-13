@@ -1,129 +1,118 @@
-Return-Path: <SRS0=dtqE=NX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=WHZG=NY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E018AC43441
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 22:27:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B71B9C43441
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Nov 2018 00:17:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9853223D8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Nov 2018 22:27:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9853223D8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=collabora.com
+	by mail.kernel.org (Postfix) with ESMTP id 78ACB22510
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Nov 2018 00:17:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="JmX7LdtF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78ACB22510
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729581AbeKMIWl (ORCPT
+        id S1727570AbeKMKNV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Nov 2018 03:22:41 -0500
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:56494 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726006AbeKMIWk (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Nov 2018 03:22:40 -0500
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: sre)
-        with ESMTPSA id C1B9D263974
-Received: by earth.universe (Postfix, from userid 1000)
-        id BC4793C08D6; Mon, 12 Nov 2018 23:27:26 +0100 (CET)
-Date:   Mon, 12 Nov 2018 23:27:26 +0100
-From:   Sebastian Reichel <sebastian.reichel@collabora.com>
-To:     "H. Nikolaus Schaller" <hns@goldelico.com>
-Cc:     Andreas Kemnade <andreas@kemnade.info>,
-        devicetree <devicetree@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        Discussions about the Letux Kernel 
-        <letux-kernel@openphoenux.org>
-Subject: Re: [Letux-kernel] [PATCH RFC] bluetooth: add uart h4 devices via
- serdev/devicetree
-Message-ID: <20181112222726.73m2oca7hankvcjs@earth.universe>
-References: <20181110232034.17277-1-andreas@kemnade.info>
- <20181111024648.7rt7rlhaqihtqecv@earth.universe>
- <20181112215812.18ebca35@aktux>
- <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com>
+        Tue, 13 Nov 2018 05:13:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47820 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726028AbeKMKNV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 13 Nov 2018 05:13:21 -0500
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3CA2922513
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Nov 2018 00:17:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1542068271;
+        bh=VJXRssMjUBid54GFDjXxLrLek8w4ubGoHOxMsppJLyg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=JmX7LdtF9OAEPVlmZdzDoPqSKI2JYZ5TjHfUx3pxWWLDbWwRERWYZWOu2rGe8Dwlc
+         NXFsH+pWpVSblmMkibdZyVWc/EP8GY5fzF0s9fjvJRpZUyKFNBZ+70NY9AkxAgbMXH
+         JKVxu/TUtl1CG7KlZktToyXT8lnBWYPy+omApmA4=
+Received: by mail-wm1-f53.google.com with SMTP id u13-v6so9776953wmc.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Nov 2018 16:17:51 -0800 (PST)
+X-Gm-Message-State: AGRZ1gLfIqRbuEzWTfJBHOI3zeosXf8q9u0R59Il6ml3Yau5RDMWHs0G
+        cor7AuYQOZhUcEIJRZgHuE4zZzW5PNBERBuY4PDeNA==
+X-Google-Smtp-Source: AJdET5dK22sasz3zQ25hECLYzkOWw1yqRTRcn9j4rMpqqc6eL59acIV5CU/ghEw+AhmsRdc0lmnbfR+kyJ98qpDnBn8=
+X-Received: by 2002:a1c:1f43:: with SMTP id f64mr1402920wmf.64.1542068269632;
+ Mon, 12 Nov 2018 16:17:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="ze4zhyyztanyefel"
-Content-Disposition: inline
-In-Reply-To: <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com>
-User-Agent: NeoMutt/20180716
+References: <20181110232034.17277-1-andreas@kemnade.info> <20181111024648.7rt7rlhaqihtqecv@earth.universe>
+ <20181112215812.18ebca35@aktux> <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com>
+ <20181112222726.73m2oca7hankvcjs@earth.universe>
+In-Reply-To: <20181112222726.73m2oca7hankvcjs@earth.universe>
+From:   Rob Herring <robh@kernel.org>
+Date:   Mon, 12 Nov 2018 18:17:38 -0600
+X-Gmail-Original-Message-ID: <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com>
+Message-ID: <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com>
+Subject: Re: [Letux-kernel] [PATCH RFC] bluetooth: add uart h4 devices via serdev/devicetree
+To:     sebastian.reichel@collabora.com
+Cc:     hns@goldelico.com, andreas@kemnade.info,
+        devicetree@vger.kernel.org, johan.hedberg@gmail.com,
+        marcel@holtmann.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org, letux-kernel@openphoenux.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Mon, Nov 12, 2018 at 4:27 PM Sebastian Reichel
+<sebastian.reichel@collabora.com> wrote:
+>
+> Hi,
+>
+> On Mon, Nov 12, 2018 at 10:19:02PM +0100, H. Nikolaus Schaller wrote:
+> > > Am 12.11.2018 um 21:59 schrieb Andreas Kemnade <andreas@kemnade.info>:
+> > > On Sun, 11 Nov 2018 03:46:48 +0100
+> > > Sebastian Reichel <sebastian.reichel@collabora.com> wrote:
+> > >> On Sun, Nov 11, 2018 at 12:20:34AM +0100, Andreas Kemnade wrote:
+> > >>> This is a first try to be able to use h4 devices specified in
+> > >>> the devicetree, so you do not need to call hciattach and
+> > >>> it can be automatically probed.
+> > >>>
+> > >>> Of course, proper devicetree bindings documentation is
+> > >>> missing. And also you would extend that by regulator/
+> > >>> enable gpio settings.
+> > >>>
+> > >>> But before proceeding further it should be checked if the
+> > >>> general way of doing things is right.
+> > >>>
+> > >>> Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
+> > >>> ---
+> > >>
+> > >> Patch looks good to me, just one note
+> > >>
+> > > I found one thing myself:
+> > > Shouldn't we have a generic compatible string like "generic-h4".
+> > > ehci-platform.c has for example:
+> > >        { .compatible = "generic-ehci", },
+> >
+> > There might be differences in h4 compatible devices (e.g. default
+> > baud rate) so that I would not bet there a "generic-h4" suffices
+> > in the long run.
 
---ze4zhyyztanyefel
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+It will not because that doesn't define clocks, resets, gpios,
+supplies, etc. and the interactions of all those.
 
-Hi,
+> My suggestion is to use this in DT:
+>
+> compatible = "wi2wi,w2cbw003-bluetooth", "<something generic>";
+>
+> The driver can start with supporting just the generic compatible
+> string. If somebody finds some incompatible differences, the driver
+> can add a custom handler for the wi2wi chip without breaking DT
+> ABI.
 
-On Mon, Nov 12, 2018 at 10:19:02PM +0100, H. Nikolaus Schaller wrote:
-> > Am 12.11.2018 um 21:59 schrieb Andreas Kemnade <andreas@kemnade.info>:
-> > On Sun, 11 Nov 2018 03:46:48 +0100
-> > Sebastian Reichel <sebastian.reichel@collabora.com> wrote:
-> >> On Sun, Nov 11, 2018 at 12:20:34AM +0100, Andreas Kemnade wrote:
-> >>> This is a first try to be able to use h4 devices specified in
-> >>> the devicetree, so you do not need to call hciattach and
-> >>> it can be automatically probed.
-> >>>=20
-> >>> Of course, proper devicetree bindings documentation is
-> >>> missing. And also you would extend that by regulator/
-> >>> enable gpio settings.
-> >>>=20
-> >>> But before proceeding further it should be checked if the
-> >>> general way of doing things is right.
-> >>>=20
-> >>> Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
-> >>> --- =20
-> >>=20
-> >> Patch looks good to me, just one note
-> >>=20
-> > I found one thing myself:
-> > Shouldn't we have a generic compatible string like "generic-h4".
-> > ehci-platform.c has for example:
-> >        { .compatible =3D "generic-ehci", },
->=20
-> There might be differences in h4 compatible devices (e.g. default
-> baud rate) so that I would not bet there a "generic-h4" suffices
-> in the long run.
+Any idea how many H4 devices there are? Somehow I doubt there are that
+many to be unmanageable.
 
-My suggestion is to use this in DT:
-
-compatible =3D "wi2wi,w2cbw003-bluetooth", "<something generic>";
-
-The driver can start with supporting just the generic compatible
-string. If somebody finds some incompatible differences, the driver
-can add a custom handler for the wi2wi chip without breaking DT
-ABI.
-
--- Sebastian
-
---ze4zhyyztanyefel
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlvp/ksACgkQ2O7X88g7
-+poHVg/7BoyvAyCiJONVG/I/lUUFzZO05ADwRgWs1GsR4Q1HwTy5in8qptYBNgU3
-MR8xJ5ou91KrarNONScppcqfhMpl3HIGi/u15OIy86lU2ZjLdU4G4tEgAthY8Fgj
-B+lNyiEd4j6omKrf2Y/2yXACS3J61n8goVL8X9aOx1EtuQxkU0MFRLsabRwMWLD1
-wmAHUTFkrxLC2NAGJIElUyu3MxsWyoVAlGvxdBseFJjADk2tjwwUJIvz284CJ2qn
-MG30ZsEiXrhBSSBFz6tJ9x7zI5ty55Uhtgtsro/R2lEdSL2IrdNxML9QxavzA/Q1
-DfMfBBaFdeEBmIVycj8eaNJriP07dKqxwVnoy81bwE9V5DQF7yeSlHTDZJoz36Y5
-1qIpKcTdx4EEK2Z6TMXY7kshGlg/MB4gxsaJspTtUszgFgVxJ9uN59ZW3yca+RYL
-YYxfQkA4wnCC+FqyFJKgPqzoR1Xy6l3iJiRDRIgb8EmvRFwRPqhW2ygVmLJOS3iG
-Ai0AscnY9IUoOynEcpt1WD06mlpYQSHhG5TU+ZXqxG1wPMzCckRsalVfeQNUd3YF
-k/9jUoipLHgTw/m085aT2N5HTFM6W3uOteADUoG8fAAuGSbELON5Og3tMhe86WSi
-4uRJrN7O2ZcivXtd6+mqnfcfei3k+oAIHAe/34DmzE9YcUKZ7Hk=
-=ngpR
------END PGP SIGNATURE-----
-
---ze4zhyyztanyefel--
+Rob
