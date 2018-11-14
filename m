@@ -5,152 +5,169 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D67AC43610
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 00:17:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFFA5C43441
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 01:55:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4484620871
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 00:17:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A41CB2175B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 01:55:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JMHMlt7D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4484620871
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="GwYppH7D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A41CB2175B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727974AbeKNKSE (ORCPT
+        id S1732014AbeKNL4H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Nov 2018 05:18:04 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:39301 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727005AbeKNKSD (ORCPT
+        Wed, 14 Nov 2018 06:56:07 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33986 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731940AbeKNL4H (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Nov 2018 05:18:03 -0500
-Received: by mail-pg1-f193.google.com with SMTP id r9-v6so6483246pgv.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Nov 2018 16:17:19 -0800 (PST)
+        Wed, 14 Nov 2018 06:56:07 -0500
+Received: by mail-pl1-f194.google.com with SMTP id f12-v6so6967613plo.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Nov 2018 17:55:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=vaPrL5AVs+QSJPGBukt1u2S4cdrUJEqxE7lIf1OY0cE=;
-        b=JMHMlt7DSeuFoHJkZRU/5VdGNV/jn//Sg91XrMlmkkg8b4h+eEtwZBMc50VXXKz/VL
-         0Y2I4cIi4iwg70wqeyGhIa6wWal2qZ61Btc2jiSa6b+Yl5ZmiVjyNCuIvOCSE8kl8Rdy
-         qn/Ys7gUMh8VcgKKQJXCO3ERNEc0Zd5EEpxTQ=
+        bh=mkDhlP+vnX9nlcZ05WMCnjnXQtdM1dvqSuPMuNK8H8g=;
+        b=GwYppH7DxBaANVuE/9CpvdsInLaNmJUFdk5cDHduveMa85uwtv1/SLEZTs4gphalpA
+         tqHrJqGwpX72t+N8TTArvjyv9svJ3t9cEu0qGfofuqoN4cMmXoj7bJbG6/xAlSnG7ew6
+         9LzPQL2OTcnNkGPVI4bZQJ43sc9bUBFaZx/J0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=vaPrL5AVs+QSJPGBukt1u2S4cdrUJEqxE7lIf1OY0cE=;
-        b=W/Nt5SUqLdbEoVV+LS2W9TrweKQiNxzSglcUmzuDdsQEUEFcVC1uuxaP9L3rQ671RR
-         CR65jnGkpAilfRmwACerbAEvp2c60Mvg46tXA3W52/h2X44LTEPwE26GCOmgYd+AgL5T
-         RhJ1x2TspfwvlX8A79RgENujD9wxS3oabYbbn+mSoNU/ug2GMIEHdSWp7sag/Ch2CIg2
-         cj05ARwp5Tfd9yWY6FGVugzzulhjzJtrVGDpM2sFP6uHolyylRZ4eZW1/rhhemNtsZ2h
-         nq4G+uqd4gRbGjukpkM2QzZFUHVO0eWH/GD7CxcxwPLOESjrt2KWsW7L1orJB0f1qVGK
-         9seQ==
-X-Gm-Message-State: AGRZ1gKoVX7Ta5lqg7T65Jle1H8cBHNKca6K0tJELN4cc8wG0UIVAuLc
-        1d0OG0WswZoAFBJTObEgX7YSbA==
-X-Google-Smtp-Source: AJdET5ez3IrF06E+5fy+JSrcX4gco41KzioLzdsgd8C02DFCXvWlcIL+jD1BWVZxxtWuI5JCLD1MfQ==
-X-Received: by 2002:a63:c447:: with SMTP id m7mr6731822pgg.27.1542154639355;
-        Tue, 13 Nov 2018 16:17:19 -0800 (PST)
+        bh=mkDhlP+vnX9nlcZ05WMCnjnXQtdM1dvqSuPMuNK8H8g=;
+        b=QG2g84SJaNfmlHbyEdPi39ME6dpn4rc2sqJi6nCgg5OdqJZvwPvpW/hPklJw46zacr
+         E8ZIdPltLDMGdepHdMJCYRSFhOm5r6qAWjp1hCOmvdqqmjTLtG6HR15F1zgr4QXISMMV
+         piFzsJSlw99iRiuyHPO+OoRP3mFebTghPhDwydLpT+kbYaq3p0K4/u00qAH9xJo8ctEb
+         h9a2EXNovqoNxU7FCR0HjD/8vmV1Jt99jxDibui3apM49BCCHjJ5Pj0SomDEXvZCn8Xo
+         OIaUbTkfzlYA2Huxkx1UP9+DgbvJlLF1vX32O27MiQS0yI4EPjraVEkH4KESJnardHvm
+         aY8Q==
+X-Gm-Message-State: AGRZ1gJw5heAe5z70yObuMjjYn2JRZCsYLd5PoBs6DAk2SE/kWpTgSTd
+        0aRgQYEiZ5HB0QbG5WHaWxwWVw==
+X-Google-Smtp-Source: AJdET5ehskN547xGoFPBB3qc2LzXzISQGt6bpnAqoIuRkU7XV/ZO0XPlWjp9WjYMVpZCTd5gZetDCA==
+X-Received: by 2002:a17:902:bd8e:: with SMTP id q14mr3195633pls.146.1542160506513;
+        Tue, 13 Nov 2018 17:55:06 -0800 (PST)
 Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
-        by smtp.gmail.com with ESMTPSA id x63-v6sm28278005pfk.14.2018.11.13.16.17.18
+        by smtp.gmail.com with ESMTPSA id q195sm21810305pgq.7.2018.11.13.17.55.05
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 13 Nov 2018 16:17:18 -0800 (PST)
-Date:   Tue, 13 Nov 2018 16:17:17 -0800
+        Tue, 13 Nov 2018 17:55:05 -0800 (PST)
+Date:   Tue, 13 Nov 2018 17:55:04 -0800
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v1 1/4] Bluetooth: hci_qca: use wait_until_sent() for
- power pulses
-Message-ID: <20181114001717.GG22824@google.com>
+Subject: Re: [PATCH v1 2/4] Bluetooth: hci_qca: Pull RTS line high for
+ baudrate change command
+Message-ID: <20181114015504.GH22824@google.com>
 References: <20181106120528.30342-1-bgodavar@codeaurora.org>
- <20181106120528.30342-2-bgodavar@codeaurora.org>
+ <20181106120528.30342-3-bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181106120528.30342-2-bgodavar@codeaurora.org>
+In-Reply-To: <20181106120528.30342-3-bgodavar@codeaurora.org>
 User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Nov 06, 2018 at 05:35:25PM +0530, Balakrishna Godavarthi wrote:
-> wcn3990 requires a power pulse to turn ON/OFF along with
-> regulators. Sometimes we are observing the power pulses are sent
-> out with some time delay, due to queuing these commands. This is
-> causing synchronization issues with chip, which intern delay the
-> chip setup or may end up with communication issues.
-> 
+On Tue, Nov 06, 2018 at 05:35:26PM +0530, Balakrishna Godavarthi wrote:
+> This patch will pull the RTS line high instead of turning off the
+> flow control, while changing baudrate of host and chip.
+
+Please don't only describe what is changed, but also why this change
+is necessary.
+
+IIUC the BT chip honors flow control during baudrate changes, however
+it sometimes sends 'garbage' which results in "Bluetooth: hci0: Frame
+reassembly failed (-84)" messages.
+
 > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > ---
->  drivers/bluetooth/hci_qca.c | 22 +++++++++-------------
->  1 file changed, 9 insertions(+), 13 deletions(-)
+>  drivers/bluetooth/hci_qca.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
 > 
 > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index f72ded4ec9ae..051f081d1835 100644
+> index 051f081d1835..8301663f0004 100644
 > --- a/drivers/bluetooth/hci_qca.c
 > +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1016,8 +1016,7 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
->  static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
->  {
+> @@ -963,7 +963,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
 >  	struct hci_uart *hu = hci_get_drvdata(hdev);
-> -	struct qca_data *qca = hu->priv;
-> -	struct sk_buff *skb;
-> +	int ret;
+>  	struct qca_data *qca = hu->priv;
+>  	struct sk_buff *skb;
+> -	struct qca_serdev *qcadev;
+>  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
 >  
->  	/* These power pulses are single byte command which are sent
->  	 * at required baudrate to wcn3990. On wcn3990, we have an external
-> @@ -1030,18 +1029,14 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
->  	 * sending power pulses to SoC.
->  	 */
->  	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+>  	if (baudrate > QCA_BAUDRATE_3200000)
+> @@ -977,13 +976,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+>  		return -ENOMEM;
+>  	}
+>  
+> -	/* Disabling hardware flow control is mandatory while
+> -	 * sending change baudrate request to wcn3990 SoC.
+> -	 */
+> -	qcadev = serdev_device_get_drvdata(hu->serdev);
+> -	if (qcadev->btsoc_type == QCA_WCN3990)
+> -		hci_uart_set_flow_control(hu, true);
 > -
-> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
-> -	if (!skb)
-> -		return -ENOMEM;
+>  	/* Assign commands to change baudrate and packet type. */
+>  	skb_put_data(skb, cmd, sizeof(cmd));
+>  	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+> @@ -999,9 +991,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+>  	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
+>  	set_current_state(TASK_RUNNING);
+>  
+> -	if (qcadev->btsoc_type == QCA_WCN3990)
+> -		hci_uart_set_flow_control(hu, false);
 > -
->  	hci_uart_set_flow_control(hu, true);
-> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
-> +	if (ret < 0) {
-> +		bt_dev_err(hdev, "failed to send power pulse %02x to SoC", cmd);
-> +		return ret;
-> +	}
+>  	return 0;
+>  }
 >  
-> -	skb_put_u8(skb, cmd);
-> -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-> -
-> -	skb_queue_tail(&qca->txq, skb);
-> -	hci_uart_tx_wakeup(hu);
-> +	serdev_device_wait_until_sent(hu->serdev, 0);
+> @@ -1086,6 +1075,7 @@ static int qca_check_speeds(struct hci_uart *hu)
+>  static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+>  {
+>  	unsigned int speed, qca_baudrate;
+> +	struct qca_serdev *qcadev;
+>  	int ret;
 >  
->  	/* Wait for 100 uS for SoC to settle down */
->  	usleep_range(100, 200);
-
-Is the delay still needed now that we wait for the pulse to be sent? I
-didn't observe any problems without it in a few dozens of iterations.
-
-> @@ -1283,7 +1278,8 @@ static void qca_power_shutdown(struct hci_uart *hu)
+>  	if (speed_type == QCA_INIT_SPEED) {
+> @@ -1097,6 +1087,14 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+>  		if (!speed)
+>  			return 0;
 >  
->  	host_set_baudrate(hu, 2400);
->  	hci_uart_set_flow_control(hu, true);
-> -	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
-> +	serdev_device_write(serdev, &cmd, sizeof(cmd), 0);
-> +	serdev_device_wait_until_sent(serdev, 0);
->  	hci_uart_set_flow_control(hu, false);
+> +		/* Pulling RTS line to high is mandatory while sending change
+> +		 * baudrate request to SoC and also while setting the host
+> +		 * baudrate.
+> +		 */
 
-You could call qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE)
-instead, as an earlier patch set did before skbs were used to send the
-power pulse.
+Instead of just stating that this is 'mandatory' explain why it is
+needed. Also better say 'Deassert RTS' instead of the more lower level
+'Pulling RTS line to high'. It could be something like 'Deassert RTS
+to prevent the BT controller from sending garbage during the baudrate
+change.'
 
-You can also consider to set the baudrate in qca_send_power_pulse()
-depending on the power pulse. On the plus side this would reduce a bit
-of clutter in the callers of qca_send_power_pulse(), on the negative
-side it would be harder to follow when baudrate changes occur (not
-sure this is a problem). Up to you, just an idea.
+> +		qcadev = serdev_device_get_drvdata(hu->serdev);
+> +		if (qcadev->btsoc_type == QCA_WCN3990)
+> +			serdev_device_set_rts(hu->serdev, false);
+> +
+>  		qca_baudrate = qca_get_baudrate_value(speed);
+>  		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
+>  		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
+> @@ -1104,6 +1102,9 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+>  			return ret;
+>  
+>  		host_set_baudrate(hu, speed);
+> +
+> +		if (qcadev->btsoc_type == QCA_WCN3990)
+> +			serdev_device_set_rts(hu->serdev, true);
+>  	}
+>  
+>  	return 0;
 
-Thanks
-
-Matthias
+Tested-by: Matthias Kaehlcke <mka@chromium.org>
