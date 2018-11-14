@@ -1,172 +1,156 @@
-Return-Path: <SRS0=WHZG=NY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=ohN3=NZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC0D7C43441
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Nov 2018 16:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D67AC43610
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 00:17:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88ACF216FD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Nov 2018 16:02:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4484620871
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 00:17:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="ZANlDEpC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88ACF216FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JMHMlt7D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4484620871
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387892AbeKNCAy (ORCPT
+        id S1727974AbeKNKSE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Nov 2018 21:00:54 -0500
-Received: from mail.andi.de1.cc ([85.214.239.24]:36058 "EHLO
-        h2641619.stratoserver.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387659AbeKNCAy (ORCPT
+        Wed, 14 Nov 2018 05:18:04 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:39301 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727005AbeKNKSD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Nov 2018 21:00:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=kemnade.info; s=20180802; h=Content-Type:MIME-Version:References:
-        In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=VQssOANATFsGw4L5A82QdDx12Yme6rB94QmRny/G5r8=; b=ZANlDEpCGjujNvIeGMJ0TGSvp
-        nylB94BoFVB1pV/Tsft8fJ8TxpWvSTzj349NgJGfwVgm0P9A+HPrVUF0wX4RKD2T7ZBaKpz18s52b
-        mwurMeJcfMLls1JjnwOytgMwz3srs+LFtS3rwFs1kCPtTqloxdW3KJR3KVsFeOiDL7CrU=;
-Received: from x590fecab.dyn.telefonica.de ([89.15.236.171] helo=localhost)
-        by h2641619.stratoserver.net with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <andreas@kemnade.info>)
-        id 1gMb8h-0001Pb-0g; Tue, 13 Nov 2018 17:02:07 +0100
-Received: from localhost ([::1])
-        by localhost with esmtp (Exim 4.89)
-        (envelope-from <andreas@kemnade.info>)
-        id 1gMb8d-0001y2-R7; Tue, 13 Nov 2018 17:02:03 +0100
-Date:   Tue, 13 Nov 2018 17:01:28 +0100
-From:   Andreas Kemnade <andreas@kemnade.info>
-To:     Rob Herring <robh@kernel.org>
-Cc:     sebastian.reichel@collabora.com, hns@goldelico.com,
-        devicetree@vger.kernel.org, johan.hedberg@gmail.com,
-        marcel@holtmann.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, letux-kernel@openphoenux.org
-Subject: Re: [Letux-kernel] [PATCH RFC] bluetooth: add uart h4 devices via
- serdev/devicetree
-Message-ID: <20181113170128.0f59ef0e@kemnade.info>
-In-Reply-To: <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com>
-References: <20181110232034.17277-1-andreas@kemnade.info>
-        <20181111024648.7rt7rlhaqihtqecv@earth.universe>
-        <20181112215812.18ebca35@aktux>
-        <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com>
-        <20181112222726.73m2oca7hankvcjs@earth.universe>
-        <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com>
-X-Mailer: Claws Mail 3.14.1 (GTK+ 2.24.31; i686-pc-linux-gnu)
+        Wed, 14 Nov 2018 05:18:03 -0500
+Received: by mail-pg1-f193.google.com with SMTP id r9-v6so6483246pgv.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Nov 2018 16:17:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=vaPrL5AVs+QSJPGBukt1u2S4cdrUJEqxE7lIf1OY0cE=;
+        b=JMHMlt7DSeuFoHJkZRU/5VdGNV/jn//Sg91XrMlmkkg8b4h+eEtwZBMc50VXXKz/VL
+         0Y2I4cIi4iwg70wqeyGhIa6wWal2qZ61Btc2jiSa6b+Yl5ZmiVjyNCuIvOCSE8kl8Rdy
+         qn/Ys7gUMh8VcgKKQJXCO3ERNEc0Zd5EEpxTQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=vaPrL5AVs+QSJPGBukt1u2S4cdrUJEqxE7lIf1OY0cE=;
+        b=W/Nt5SUqLdbEoVV+LS2W9TrweKQiNxzSglcUmzuDdsQEUEFcVC1uuxaP9L3rQ671RR
+         CR65jnGkpAilfRmwACerbAEvp2c60Mvg46tXA3W52/h2X44LTEPwE26GCOmgYd+AgL5T
+         RhJ1x2TspfwvlX8A79RgENujD9wxS3oabYbbn+mSoNU/ug2GMIEHdSWp7sag/Ch2CIg2
+         cj05ARwp5Tfd9yWY6FGVugzzulhjzJtrVGDpM2sFP6uHolyylRZ4eZW1/rhhemNtsZ2h
+         nq4G+uqd4gRbGjukpkM2QzZFUHVO0eWH/GD7CxcxwPLOESjrt2KWsW7L1orJB0f1qVGK
+         9seQ==
+X-Gm-Message-State: AGRZ1gKoVX7Ta5lqg7T65Jle1H8cBHNKca6K0tJELN4cc8wG0UIVAuLc
+        1d0OG0WswZoAFBJTObEgX7YSbA==
+X-Google-Smtp-Source: AJdET5ez3IrF06E+5fy+JSrcX4gco41KzioLzdsgd8C02DFCXvWlcIL+jD1BWVZxxtWuI5JCLD1MfQ==
+X-Received: by 2002:a63:c447:: with SMTP id m7mr6731822pgg.27.1542154639355;
+        Tue, 13 Nov 2018 16:17:19 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
+        by smtp.gmail.com with ESMTPSA id x63-v6sm28278005pfk.14.2018.11.13.16.17.18
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 13 Nov 2018 16:17:18 -0800 (PST)
+Date:   Tue, 13 Nov 2018 16:17:17 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v1 1/4] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+Message-ID: <20181114001717.GG22824@google.com>
+References: <20181106120528.30342-1-bgodavar@codeaurora.org>
+ <20181106120528.30342-2-bgodavar@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/j5HQM3BtDpk6Uv4sir_Rhdt"; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181106120528.30342-2-bgodavar@codeaurora.org>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---Sig_/j5HQM3BtDpk6Uv4sir_Rhdt
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Nov 06, 2018 at 05:35:25PM +0530, Balakrishna Godavarthi wrote:
+> wcn3990 requires a power pulse to turn ON/OFF along with
+> regulators. Sometimes we are observing the power pulses are sent
+> out with some time delay, due to queuing these commands. This is
+> causing synchronization issues with chip, which intern delay the
+> chip setup or may end up with communication issues.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 22 +++++++++-------------
+>  1 file changed, 9 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index f72ded4ec9ae..051f081d1835 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1016,8 +1016,7 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>  static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>  {
+>  	struct hci_uart *hu = hci_get_drvdata(hdev);
+> -	struct qca_data *qca = hu->priv;
+> -	struct sk_buff *skb;
+> +	int ret;
+>  
+>  	/* These power pulses are single byte command which are sent
+>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+> @@ -1030,18 +1029,14 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>  	 * sending power pulses to SoC.
+>  	 */
+>  	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+> -
+> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+> -	if (!skb)
+> -		return -ENOMEM;
+> -
+>  	hci_uart_set_flow_control(hu, true);
+> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
+> +	if (ret < 0) {
+> +		bt_dev_err(hdev, "failed to send power pulse %02x to SoC", cmd);
+> +		return ret;
+> +	}
+>  
+> -	skb_put_u8(skb, cmd);
+> -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+> -
+> -	skb_queue_tail(&qca->txq, skb);
+> -	hci_uart_tx_wakeup(hu);
+> +	serdev_device_wait_until_sent(hu->serdev, 0);
+>  
+>  	/* Wait for 100 uS for SoC to settle down */
+>  	usleep_range(100, 200);
 
-On Mon, 12 Nov 2018 18:17:38 -0600
-Rob Herring <robh@kernel.org> wrote:
+Is the delay still needed now that we wait for the pulse to be sent? I
+didn't observe any problems without it in a few dozens of iterations.
 
-> On Mon, Nov 12, 2018 at 4:27 PM Sebastian Reichel
-> <sebastian.reichel@collabora.com> wrote:
-> >
-> > Hi,
-> >
-> > On Mon, Nov 12, 2018 at 10:19:02PM +0100, H. Nikolaus Schaller wrote: =
-=20
-> > > > Am 12.11.2018 um 21:59 schrieb Andreas Kemnade <andreas@kemnade.inf=
-o>:
-> > > > On Sun, 11 Nov 2018 03:46:48 +0100
-> > > > Sebastian Reichel <sebastian.reichel@collabora.com> wrote: =20
-> > > >> On Sun, Nov 11, 2018 at 12:20:34AM +0100, Andreas Kemnade wrote: =
-=20
-> > > >>> This is a first try to be able to use h4 devices specified in
-> > > >>> the devicetree, so you do not need to call hciattach and
-> > > >>> it can be automatically probed.
-> > > >>>
-> > > >>> Of course, proper devicetree bindings documentation is
-> > > >>> missing. And also you would extend that by regulator/
-> > > >>> enable gpio settings.
-> > > >>>
-> > > >>> But before proceeding further it should be checked if the
-> > > >>> general way of doing things is right.
-> > > >>>
-> > > >>> Signed-off-by: Andreas Kemnade <andreas@kemnade.info>
-> > > >>> --- =20
-> > > >>
-> > > >> Patch looks good to me, just one note
-> > > >> =20
-> > > > I found one thing myself:
-> > > > Shouldn't we have a generic compatible string like "generic-h4".
-> > > > ehci-platform.c has for example:
-> > > >        { .compatible =3D "generic-ehci", }, =20
-> > >
-> > > There might be differences in h4 compatible devices (e.g. default
-> > > baud rate) so that I would not bet there a "generic-h4" suffices
-> > > in the long run. =20
->=20
-> It will not because that doesn't define clocks, resets, gpios,
-> supplies, etc. and the interactions of all those.
->=20
-well, we need a simple supply being on when the device is on.
-Nothing more.
+> @@ -1283,7 +1278,8 @@ static void qca_power_shutdown(struct hci_uart *hu)
+>  
+>  	host_set_baudrate(hu, 2400);
+>  	hci_uart_set_flow_control(hu, true);
+> -	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
+> +	serdev_device_write(serdev, &cmd, sizeof(cmd), 0);
+> +	serdev_device_wait_until_sent(serdev, 0);
+>  	hci_uart_set_flow_control(hu, false);
 
-> > My suggestion is to use this in DT:
-> >
-> > compatible =3D "wi2wi,w2cbw003-bluetooth", "<something generic>";
-> >
-That would be my slight preference here.
+You could call qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE)
+instead, as an earlier patch set did before skbs were used to send the
+power pulse.
 
-> > The driver can start with supporting just the generic compatible
-> > string. If somebody finds some incompatible differences, the driver
-> > can add a custom handler for the wi2wi chip without breaking DT
-> > ABI. =20
->=20
-> Any idea how many H4 devices there are? Somehow I doubt there are that
-> many to be unmanageable.
->=20
-Well, many devices are h4 devices with some more or less important
-vendor-specific commands. Well, "hciattach any" uses simple h4 protocol.
+You can also consider to set the baudrate in qca_send_power_pulse()
+depending on the power pulse. On the plus side this would reduce a bit
+of clutter in the callers of qca_send_power_pulse(), on the negative
+side it would be harder to follow when baudrate changes occur (not
+sure this is a problem). Up to you, just an idea.
 
-those firmware download commands and they have their own drivers.
-Most devices I had used bluetooth uart from the command line with, were
-simple enough. The other question is whether those devices will run a
-modern kernel.
+Thanks
 
-No strong opinion here.=20
-
-Regards,
-Andreas
-
---Sig_/j5HQM3BtDpk6Uv4sir_Rhdt
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE7sDbhY5mwNpwYgrAfb1qx03ikyQFAlvq9VgACgkQfb1qx03i
-kyS5nBAAxlvnsfTEFAxI0BcKanS38HpbBcXP8k1/aPlkYpgHeVPGgZeyd8Cj1aGn
-e8gdITUsT2IA3Jlph2V2+W+QuHynUaW+pZgsvVJ8EwgxHoUqhcw4EgghkerHHnLf
-/ykN/hNS9Pz+PeDJz4mmVl6bqjD0T494GVfR63Z1iQXmvaK3QgsbKC5N+q8kZqgx
-JMdbS2ZRrF7gvoyfNtzP390hmqcZ+UpN3p5Dx6Lm6pM/SzI9Gt+3z8qYwnw3Qg4r
-EWlg/Hmj6xDQnS1J8rPCBA2VCFOLP2EgEc+kr+HpND/mXrpfw5gClBXVKd+X9XWO
-I2ZubzUTy5mE7xHpAhJT0e8B66CfZ1Kb/hmnLY941N24nqoB5ynu1/JZiXsn304r
-6HHMwdsY5+Dsxrc7zvA4s8g322vIMR5Zx0FDD4n+1mryBRPJL/b4iiComnyTgBxQ
-rJA5nYKc8GRN8QsOGpFGL2r2YphSAGnwa8H/616jxvZhzqH0CO6D0OAY6wP6tF71
-C96bnoXS8XXbpID8jbFMbPjil4AEGiNX3plUNUe0viFqhz6x4kYqI0FYKuZW+8qA
-7jwYVkQy9QXVw91COg0KAUkGXfYhQAapeTKPhHtI75Xpq9xoAXTRKHw77+HreZjs
-zdafAAz9IhXG0cilaGbNxtEUU5iRAhAQkfe7rYrITcw0Nn/472c=
-=/9mK
------END PGP SIGNATURE-----
-
---Sig_/j5HQM3BtDpk6Uv4sir_Rhdt--
+Matthias
