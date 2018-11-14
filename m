@@ -2,167 +2,137 @@ Return-Path: <SRS0=ohN3=NZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D849DC43441
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 02:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB903C43441
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 03:15:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8403520896
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 02:14:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="oA6gsNKm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8403520896
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	by mail.kernel.org (Postfix) with ESMTP id AC3A020869
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 03:15:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC3A020869
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728391AbeKNMPK (ORCPT
+        id S1731325AbeKNNQq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Nov 2018 07:15:10 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:33243 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727005AbeKNMPK (ORCPT
+        Wed, 14 Nov 2018 08:16:46 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:45081 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727065AbeKNNQp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Nov 2018 07:15:10 -0500
-Received: by mail-pl1-f196.google.com with SMTP id w22-v6so6986898plk.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Nov 2018 18:14:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=lRWLFcidtSQVS0zg3RNQj2AoK+XfyU3o7oUoQYHTt6w=;
-        b=oA6gsNKmxYedmmD7L9E0PEZBWLInXI/ZeZaGAMGzg6OKmMV2DwX+XxF18uxVaHCvnu
-         +rnVuI7a9Wcdi+vfAH8MrdQWvleufPoqhS82BTcyL6/R63CKrqo3XDsY55NIPh2cRhuf
-         9k1uAZx8Gej+qFHQTiHVNkc5WeCdABxRcgfqc=
+        Wed, 14 Nov 2018 08:16:45 -0500
+Received: by mail-ed1-f65.google.com with SMTP id d39so9070996edb.12;
+        Tue, 13 Nov 2018 19:15:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=lRWLFcidtSQVS0zg3RNQj2AoK+XfyU3o7oUoQYHTt6w=;
-        b=Tab8ZFWGVWRyWBzUL+wgLFL9TjITCm0VYWfRrSKh83p0KmBhzLf38hV0ueJ6zQ10O3
-         dJFEF3Rk/2S2r6emDz0etDtyIxuCfsUTfcIbnsr69vgjN8IdICHQ5Q9c/A9H9bnktVio
-         t49dJmuxjb08S/DEhsmrjK71nBV+QswQOJ9JVRUNqN7yKuTgnJsBKPrQz+8f55kKCuPj
-         g2HOkdPWU1U8DKPJxaOfQqNL0AEQzGXDQA5pokRiBJWMXaHfaSPkOaeUGkKHdNMVTJ6o
-         NfKaL+DXqfHRFzLR5oJpBkD2odyrmGm7i78JcxOOgS0M71/S0q+1Hh8fOO2N3u4VhQmz
-         gktw==
-X-Gm-Message-State: AGRZ1gLshLbTGcID665Eg8BbVMubqA4BqNlLXoDJtkB7UBqtEnTpIrr4
-        c7xgAUZ7vllMD9Rp6nI/YLshYA==
-X-Google-Smtp-Source: AJdET5dTrDoxV57z1fK7SIx9nc3h0BuPTl5kaAQbpfL9uIAckp0FJRGCU4au0K9uy9OKdrGma4DoLg==
-X-Received: by 2002:a17:902:ab81:: with SMTP id f1-v6mr17866plr.103.1542161646105;
-        Tue, 13 Nov 2018 18:14:06 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
-        by smtp.gmail.com with ESMTPSA id 67-v6sm27881214pfk.134.2018.11.13.18.14.05
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 13 Nov 2018 18:14:05 -0800 (PST)
-Date:   Tue, 13 Nov 2018 18:14:04 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aLt5l5+tiU/xD6tpHDgJHsAhwGUVSEm/uoRzBY6PMzY=;
+        b=WgGz6g5ZpoBwVExTEH2ato/IaRqb+hDPsn100pFvf/fuSkix7ELCy+0lP4S4pumJ6L
+         xzbZ1SjLLnban23iGZyh46vWMGNsEw39OT6XeqrE/iKJ3vTsE9NhtJSZL7mx2vtlNKDJ
+         dZVt0uWR3avrY1KD3urk5yeBWWCyWx+upuL0g/E45Y6oh3hCPRlHsyZrVxrCaB3TPLxR
+         5SG6sfhljOBKqn/L28OWedTLImUdXT2nnZLY0BbBqRBKxPzYlwVz8wq7ms7zRLM2WG/T
+         E5Q//RvbCj3BI2eu78qAvFsn9eXndKEzGu+BYLXJsmJFVEkr3Qvr9pgTGaPdulWnXYu2
+         bCuA==
+X-Gm-Message-State: AGRZ1gLEJydc2oMcBMGBGVPi1+g0Ixj13jbWq+R6w6O0WmeJ1vmkB7wy
+        PnblU19mNXQ9Dy+37FaWk5jbfV+58G4=
+X-Google-Smtp-Source: AJdET5cIF8RpXSLRRJqlhC9+ptxZuevpQ2C4tg5KI7xQd+p0G0UePouJaNNt4Oozn6Wx4bUW8ZE7KQ==
+X-Received: by 2002:a17:906:6b99:: with SMTP id l25-v6mr399665ejr.154.1542165327096;
+        Tue, 13 Nov 2018 19:15:27 -0800 (PST)
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com. [209.85.128.47])
+        by smtp.gmail.com with ESMTPSA id q3-v6sm3336757ejz.30.2018.11.13.19.15.26
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 13 Nov 2018 19:15:26 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id i73-v6so8687124wmd.5;
+        Tue, 13 Nov 2018 19:15:26 -0800 (PST)
+X-Received: by 2002:a1c:9f01:: with SMTP id i1-v6mr367214wme.8.1542165325650;
+ Tue, 13 Nov 2018 19:15:25 -0800 (PST)
+MIME-Version: 1.0
+References: <20181107101308.7626-1-wens@csie.org> <20181107101308.7626-2-wens@csie.org>
+ <5bea0ebe.1c69fb81.e15d7.98e1@mx.google.com>
+In-Reply-To: <5bea0ebe.1c69fb81.e15d7.98e1@mx.google.com>
+From:   Chen-Yu Tsai <wens@csie.org>
+Date:   Wed, 14 Nov 2018 11:15:06 +0800
+X-Gmail-Original-Message-ID: <CAGb2v65PqwKrRdh2_Y48zYnmJa0=hv3Bd4UdvdWvBBMfT2BfSw@mail.gmail.com>
+Message-ID: <CAGb2v65PqwKrRdh2_Y48zYnmJa0=hv3Bd4UdvdWvBBMfT2BfSw@mail.gmail.com>
+Subject: Re: [PATCH 01/15] dt-bindings: net: broadcom-bluetooth: Fix external
+ clock names
+To:     Rob Herring <robh@kernel.org>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v1 3/4] Bluetooth: hci_qca: clear
- HCI_QUIRK_RESET_ON_CLOSE flag
-Message-ID: <20181114021404.GI22824@google.com>
-References: <20181106120528.30342-1-bgodavar@codeaurora.org>
- <20181106120528.30342-4-bgodavar@codeaurora.org>
- <462C4F58-E6E2-4B20-B074-72DDFA6D7364@holtmann.org>
- <170e0419929840109d349b5df5e38364@codeaurora.org>
- <0CE81F0B-B122-4793-817F-F0F4738C44E0@holtmann.org>
- <c4ced688b33ad82b61a705908393a0a6@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c4ced688b33ad82b61a705908393a0a6@codeaurora.org>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+        Mark Rutland <mark.rutland@arm.com>,
+        Maxime Ripard <maxime.ripard@bootlin.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org, linux-sunxi@googlegroups.com,
+        Loic Poulain <loic.poulain@gmail.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Nov 06, 2018 at 06:44:07PM +0530, Balakrishna Godavarthi wrote:
-> Hi Marcel,
-> 
-> On 2018-11-06 18:32, Marcel Holtmann wrote:
-> > Hi Balakrishna,
-> > 
-> > > > > During hci down we are sending reset command to chip, which
-> > > > > is not required for wcn3990, as hdev->shutdown() will turn off the
-> > > > > regulators.
-> > > > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> > > > > ---
-> > > > > drivers/bluetooth/hci_qca.c | 1 +
-> > > > > 1 file changed, 1 insertion(+)
-> > > > > diff --git a/drivers/bluetooth/hci_qca.c
-> > > > > b/drivers/bluetooth/hci_qca.c
-> > > > > index 8301663f0004..97b57e0f4725 100644
-> > > > > --- a/drivers/bluetooth/hci_qca.c
-> > > > > +++ b/drivers/bluetooth/hci_qca.c
-> > > > > @@ -1190,6 +1190,7 @@ static int qca_setup(struct hci_uart *hu)
-> > > > > 		 */
-> > > > > 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
-> > > > > 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-> > > > > +		clear_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+On Tue, Nov 13, 2018 at 7:37 AM Rob Herring <robh@kernel.org> wrote:
+>
+> On Wed, Nov 07, 2018 at 06:12:54PM +0800, Chen-Yu Tsai wrote:
+> > The Broadcom Bluetooth controllers can take up to two external clocks:
+> > an external frequency reference, substituting the main crystal, and a
+> > LPO clock at 32.768 kHz substituting the internal LPO clock.
+> >
+> > In particular, the external LPO clock must be used when the controller
+> > does not have NVRAM connected, and the main reference frequency is not
+> > the default 20 MHz. This is described in detail in the datasheet.
+> >
+> > The original "extclk" clock name is ambiguous as to which of these it
+> > refers to, and some designs might even require both.
+> >
+> > This patch deprecates the existing name, and adds "txco" and "lpo".
+> >
+> > Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+> > ---
+> >  Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> > index 4194ff7e6ee6..2535e54219af 100644
+> > --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> > +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> > @@ -18,7 +18,10 @@ Optional properties:
+> >   - shutdown-gpios: GPIO specifier, used to enable the BT module
+> >   - device-wakeup-gpios: GPIO specifier, used to wakeup the controller
+> >   - host-wakeup-gpios: GPIO specifier, used to wakeup the host processor
+> > - - clocks: clock specifier if external clock provided to the controller
+> > + - clocks and clock-names: clock specifier if external clocks are provided
+> > +   - "txco": external reference clock
+> > +   - "extclk": deprecated, replaced by "txco"
+> > +   - "lpo": external low power 32.768 kHz clock
+> >   - clock-names: should be "extclk"
+>
+> This line should change?
 
-This patch doesn't apply cleanly against bluetooth-next, looks like
-you have the unrelated "Bluetooth: hci_qca: Set
-HCI_QUIRK_USE_BDADDR_PROPERTY for wcn3990"
-(https://lore.kernel.org/patchwork/patch/1004372/) in your tree.
+Yes. Missed that.
 
-> > > > > 		hu->hdev->shutdown = qca_power_off;
-> > > > > 		ret = qca_wcn3990_init(hu);
-> > > > > 		if (ret)
-> > > > I am pretty certain that you didn’t want this quirk:
-> > > >        /* When this quirk is set, the HCI Reset command is send when
-> > > >         * closing the transport instead of when opening it.
-> > > > This quirk is for Bluetooth 1.0b devices where the HCI_Reset behavior
-> > > > was not clear or for devices that actually misbehave with the initial
-> > > > HCI_Reset.
-> > > > In addition, you commit message is totally misleading. That is not
-> > > > what is happening with this quirk.
-> > > > Regards
-> > > > Marcel
-> > > 
-> > > My intention was reset command is not required when we do an hci down.
-> > > this is because of hdev->shutdown will turn off the regulators.
-> > > It is like turning off the chip. sending reset command after turning
-> > > off the chip is not required.
-> > > 
-> > > I understand the usage of the quirk, will update the commit text.
-> > 
-> > you are papering over the issue. Actually
-> > hci_serdev.c:hci_uart_register_device() is the culprit with the legacy
-> > code copied over from hci_ldisc.c:hci_uart_register_dev(). I think
-> > there is no point doing all this legacy line discipline quirk handling
-> > until it is really needed. The serdev drivers are all for recent
-> > hardware.
-> > 
-> > That said, having moved over to a btuart.c approach and killed the
-> > whole hci_serdev.c thing would have been a lot better here. You will
-> > keep running in weird situations where 18 year old code keeps
-> > surprising you.
-> 
-> [Bala]: even i feel the same. they are lot such kind of HACK's we need to do
-> with current arch.
->         when can we expect btuart.c merged to bt-next. i think having btuart
-> will helps us to have the control of
->         vendor porto's call's like in btusb.c
+>
+> 'clocks' needs to describe how many clocks and the order of them.
+>
+> 'clock-names' needs to list the names. Keep them separate.
 
-btuart was initially part of the 'add support for Bluetooth on MT7622
-SoC' series (https://lore.kernel.org/patchwork/patch/960806/), but was
-dropped with v6
-(https://lore.kernel.org/patchwork/project/lkml/list/?series=360046)
-upon Marcel's request: 'Frankly I prefer to keep the btuart.c driver
-for drivers that really just use H:4 as transport protocol. If the
-protocol is only H:4 alike and has extra headers, then it should be a
-separate driver.' (https://lore.kernel.org/patchwork/patch/960806/#1148426).
+I was under the impression that when clock-names was used, the
+order of clocks shouldn't matter.
 
-Cheers
+Also, both clocks are optional. The controller can use a standalone
+crystal instead of an external TXCO, which would not get described in
+the device tree, and/or not use an LPO clock. How would one describe
+a device that has an LPO clock input but not a TXCO clock input?
 
-Matthias
+Last, IMHO listing them with name + description, one item per line
+is more readable then having the items on one line, then having the
+next line list all their respective names. If ordering and number of
+items is important, I could add the requirements to the description
+of "clocks and clock-names"?
+
+Thanks
+ChenYu
