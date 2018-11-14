@@ -2,186 +2,161 @@ Return-Path: <SRS0=ohN3=NZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C56C43441
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 13:37:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FA6C43441
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 15:27:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E71F4223DD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 13:37:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A37722360
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 15:27:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="MREqTpfD";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Z2itNEfm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E71F4223DD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sCEWcqXv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A37722360
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732604AbeKNXko (ORCPT
+        id S1733043AbeKOBbK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Nov 2018 18:40:44 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:60976 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728107AbeKNXko (ORCPT
+        Wed, 14 Nov 2018 20:31:10 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:39611 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732450AbeKOBbK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Nov 2018 18:40:44 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id E430A60452; Wed, 14 Nov 2018 13:37:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1542202646;
-        bh=PUwOWkpDQplNqhC4C6/JqUXs7AVHuJik6rmwSXexrMU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=MREqTpfDgt5v49Tw9CDtVrM6BO6rQUF7ADRcd4SIn2ABgr4/2HuZF0J6k0l6VOFhl
-         9j5id+tb7GEwx7uYCq+9M8Ub7KxkYKVAlDUbPtr7sF9ItXCdDxPp/ZJvXNcRf491lF
-         4Rd9qGFrsbklNzHlyO26i0BH3StlsYmdUeXlM948=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id EF4AD601D4;
-        Wed, 14 Nov 2018 13:37:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1542202645;
-        bh=PUwOWkpDQplNqhC4C6/JqUXs7AVHuJik6rmwSXexrMU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Z2itNEfm48lNNdVo/swrPfG38DboEelevSi00HJuSe6IMMjNsIPufRL2pKxBlyXYL
-         bq7wBERTwxSZOXQzgOkqWPOnT0aW+4epyNRC5xxBd46aPxZ+rUmY3eGKRmjJAlf4MI
-         5tAscqh2mA/X+xHN+2zd5YC/yC266+tpD283+fVU=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Wed, 14 Nov 2018 19:07:24 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v1 3/4] Bluetooth: hci_qca: clear HCI_QUIRK_RESET_ON_CLOSE
- flag
-In-Reply-To: <FD7AE55A-D7AF-4C90-9D01-2DC197A97550@holtmann.org>
+        Wed, 14 Nov 2018 20:31:10 -0500
+Received: by mail-lf1-f67.google.com with SMTP id n18so11803075lfh.6;
+        Wed, 14 Nov 2018 07:27:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=lxuyA6K3eFznfbr2HJR5peke0YfBJniX+SvMsHc8lJU=;
+        b=sCEWcqXvyQMq7WjKCExXW+cCb9Rv6DY/CJlcmInQ+jVqe+v32DYYNFL4/6bt66ZFNj
+         CjNefWx/GvtfM4yjl+EwjSS5RgnHt65SZw8Z4Qyzy2ZISvTgSAE3NFVjp3PECilXNfmx
+         OyI5K6fpbaewwBme7czFC0N+yhzAraBHWoZgLrVKCajXeDORJL5BZbOT4VFqHrUyw9Bh
+         KKlcI6R9Go5MBdqsnP98X9hjpj1HShluA4vboh2mlCN+M0CP12BTzA2VxtkzmMZi/Kzy
+         uA5+yTTQmPl6k/yYHj+o053P7MAvd8Qcr05uSUr36zdFh1NKOEmF6mF3c61GaM5ViUaA
+         dafA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=lxuyA6K3eFznfbr2HJR5peke0YfBJniX+SvMsHc8lJU=;
+        b=Al6+dmDlkj23VnWhCoUqmeMLwVC9bl3QZOCS9rFMAsYQF8VdwA5NLKeYBwulmiEnhh
+         Hh/nIoGuGCbuN9jjA3aXqmhzzbjcznZIoNU6VAaxfjiOUBC/ZGwHm0l43TidL09cwrYw
+         LiB+MEnavo+cb+sHO6/uyD/TprvYLEdR8r53Ngc/FUpVhf/tpubAoixipT4Vt7DCQI2H
+         H7L9f+A5gUwtZqjv+Al+sM+qHZGC5UTF2QgPeSufYIJnGkMCnGU7fY5RoH4QPiXKJ7EZ
+         kBlpwwxrHegH6UxbuZyrB7a0/5ZPnNeC7m9duMrp/p7WrYio7KdMqzU9FlyzsDLaIcQo
+         wvnw==
+X-Gm-Message-State: AGRZ1gK3AkIYsnDBMdSF/VfRuJRFJZWTzftIPj2SZ9Eoe9Gr3REiYi9n
+        VoKJ/c1p/vKAwBm0Ypq2EOE=
+X-Google-Smtp-Source: AJdET5fL8RlXSAVhJgY6Ojly6xH0/+zgBhgP4LVL9SwPb5V1McZHE48KGnY63ujexAGKH0IPO8eNSw==
+X-Received: by 2002:a19:c70a:: with SMTP id x10mr1254108lff.88.1542209246335;
+        Wed, 14 Nov 2018 07:27:26 -0800 (PST)
+Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
+        by smtp.gmail.com with ESMTPSA id i78sm3968314lfa.9.2018.11.14.07.27.25
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 14 Nov 2018 07:27:25 -0800 (PST)
+Received: from johan by xi.terra with local (Exim 4.91)
+        (envelope-from <johan@kernel.org>)
+        id 1gMx4c-0005H9-T4; Wed, 14 Nov 2018 16:27:22 +0100
+Date:   Wed, 14 Nov 2018 16:27:22 +0100
+From:   Johan Hovold <johan@kernel.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v1 1/4] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+Message-ID: <20181114152722.GA19900@localhost>
 References: <20181106120528.30342-1-bgodavar@codeaurora.org>
- <20181106120528.30342-4-bgodavar@codeaurora.org>
- <462C4F58-E6E2-4B20-B074-72DDFA6D7364@holtmann.org>
- <170e0419929840109d349b5df5e38364@codeaurora.org>
- <0CE81F0B-B122-4793-817F-F0F4738C44E0@holtmann.org>
- <c4ced688b33ad82b61a705908393a0a6@codeaurora.org>
- <3c9684ec5fcc9f5d99be7e9b2e705514@codeaurora.org>
- <FD7AE55A-D7AF-4C90-9D01-2DC197A97550@holtmann.org>
-Message-ID: <ef69b8768782d1fd14a583bb543858d0@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+ <20181106120528.30342-2-bgodavar@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181106120528.30342-2-bgodavar@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+On Tue, Nov 06, 2018 at 05:35:25PM +0530, Balakrishna Godavarthi wrote:
+> wcn3990 requires a power pulse to turn ON/OFF along with
+> regulators. Sometimes we are observing the power pulses are sent
+> out with some time delay, due to queuing these commands. This is
+> causing synchronization issues with chip, which intern delay the
+> chip setup or may end up with communication issues.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 22 +++++++++-------------
+>  1 file changed, 9 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index f72ded4ec9ae..051f081d1835 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1016,8 +1016,7 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>  static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>  {
+>  	struct hci_uart *hu = hci_get_drvdata(hdev);
+> -	struct qca_data *qca = hu->priv;
+> -	struct sk_buff *skb;
+> +	int ret;
+>  
+>  	/* These power pulses are single byte command which are sent
+>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+> @@ -1030,18 +1029,14 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>  	 * sending power pulses to SoC.
+>  	 */
+>  	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+> -
+> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+> -	if (!skb)
+> -		return -ENOMEM;
+> -
+>  	hci_uart_set_flow_control(hu, true);
+> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
 
-On 2018-11-14 13:18, Marcel Holtmann wrote:
-> Hi Balakrishna,
-> 
->>>>>>> During hci down we are sending reset command to chip, which
->>>>>>> is not required for wcn3990, as hdev->shutdown() will turn off 
->>>>>>> the
->>>>>>> regulators.
->>>>>>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->>>>>>> ---
->>>>>>> drivers/bluetooth/hci_qca.c | 1 +
->>>>>>> 1 file changed, 1 insertion(+)
->>>>>>> diff --git a/drivers/bluetooth/hci_qca.c 
->>>>>>> b/drivers/bluetooth/hci_qca.c
->>>>>>> index 8301663f0004..97b57e0f4725 100644
->>>>>>> --- a/drivers/bluetooth/hci_qca.c
->>>>>>> +++ b/drivers/bluetooth/hci_qca.c
->>>>>>> @@ -1190,6 +1190,7 @@ static int qca_setup(struct hci_uart *hu)
->>>>>>> 		 */
->>>>>>> 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
->>>>>>> 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
->>>>>>> +		clear_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
->>>>>>> 		hu->hdev->shutdown = qca_power_off;
->>>>>>> 		ret = qca_wcn3990_init(hu);
->>>>>>> 		if (ret)
->>>>>> I am pretty certain that you didn’t want this quirk:
->>>>>>       /* When this quirk is set, the HCI Reset command is send 
->>>>>> when
->>>>>>        * closing the transport instead of when opening it.
->>>>>> This quirk is for Bluetooth 1.0b devices where the HCI_Reset 
->>>>>> behavior
->>>>>> was not clear or for devices that actually misbehave with the 
->>>>>> initial
->>>>>> HCI_Reset.
->>>>>> In addition, you commit message is totally misleading. That is not
->>>>>> what is happening with this quirk.
->>>>>> Regards
->>>>>> Marcel
->>>>> My intention was reset command is not required when we do an hci 
->>>>> down.
->>>>> this is because of hdev->shutdown will turn off the regulators.
->>>>> It is like turning off the chip. sending reset command after 
->>>>> turning off the chip is not required.
->>>>> I understand the usage of the quirk, will update the commit text.
->>>> you are papering over the issue. Actually
->>>> hci_serdev.c:hci_uart_register_device() is the culprit with the 
->>>> legacy
->>>> code copied over from hci_ldisc.c:hci_uart_register_dev(). I think
->>>> there is no point doing all this legacy line discipline quirk 
->>>> handling
->>>> until it is really needed. The serdev drivers are all for recent
->>>> hardware.
->>>> That said, having moved over to a btuart.c approach and killed the
->>>> whole hci_serdev.c thing would have been a lot better here. You will
->>>> keep running in weird situations where 18 year old code keeps
->>>> surprising you.
->>> [Bala]: even i feel the same. they are lot such kind of HACK's we 
->>> need
->>> to do with current arch.
->>>        when can we expect btuart.c merged to bt-next. i think having
->>> btuart will helps us to have the control of
->>>        vendor porto's call's like in btusb.c
->>>> Regards
->>>> Marcel
->> 
->> I need some clarification, do you expect some thing like this 
->> https://github.com/torvalds/linux/blob/master/drivers/bluetooth/btmtkuart.c 
->> for Qualcomm BT chip too.
->> it looks it is completely avoided hci_serdev.c interface.
-> 
-> you tell me actually. Are you using the H:4 transport or do you have
-> an extra protocol layer / framing below it. If you do, then use your
-> own driver, but if the transport is H:4 with vendor packets and vendor
-> setup, then btuart.c (which is not yet upstream) should be your
-> target.
-> 
-> For the MTK hardware it was obvious that it was better served as a
-> separate driver. For QCA serial it really depends on how much extra
-> protocol you have to run. So this might be an exercise in trying QCA
-> serial as a separate driver and then go from there.
-> 
-> It is clear that the baggage from hci_ldisc.c etc is in the way for
-> serdev based systems.
-> 
-> Regards
-> 
-> Marcel
+Don't you want a non-zero timeout here? Otherwise you might as well call
+serdev_device_write() directly.
 
-[Bala]:
-     From my experience of serdev and ldisc, I prefer to go as MTK, here 
-are the reasons
-     1.If btuart maintains same generic way as hci_serdev, hardware 
-vendors will not have control on of
-       port opening and close. Because qca want to close port when we do 
-hci down where as hci_serdev it is not possible to do.
-       This is an important feature for power saving of the device.
-    2. I think btuart will have common recv_handle to handle all the 
-received data irrespective to the vendors.
-       but in our case,  we will receive debug logs as ACL packet which 
-is not possible to bypass as diagnostic packet.
+Also have you made sure that serdev_device_write_wakeup() is called in
+the drivers write-wakeup callback as serdev_device_write() requires?
 
-      The same with the susb system restart events too. So, I feel that 
-having an different driver as same as MTK will help us.
+See this series in case what you really wanted was to wait indefinitely
+(you can use MAX_SCHEDULE_TIMEOUT):
 
--- 
-Regards
-Balakrishna.
+	https://lkml.kernel.org/r/<20181114150904.19653-1-johan@kernel.org>
+
+> +	if (ret < 0) {
+> +		bt_dev_err(hdev, "failed to send power pulse %02x to SoC", cmd);
+> +		return ret;
+> +	}
+>  
+> -	skb_put_u8(skb, cmd);
+> -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+> -
+> -	skb_queue_tail(&qca->txq, skb);
+> -	hci_uart_tx_wakeup(hu);
+> +	serdev_device_wait_until_sent(hu->serdev, 0);
+>  
+>  	/* Wait for 100 uS for SoC to settle down */
+>  	usleep_range(100, 200);
+> @@ -1283,7 +1278,8 @@ static void qca_power_shutdown(struct hci_uart *hu)
+>  
+>  	host_set_baudrate(hu, 2400);
+>  	hci_uart_set_flow_control(hu, true);
+> -	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
+> +	serdev_device_write(serdev, &cmd, sizeof(cmd), 0);
+
+Same here.
+
+> +	serdev_device_wait_until_sent(serdev, 0);
+>  	hci_uart_set_flow_control(hu, false);
+>  	qca_power_setup(hu, false);
+>  }
+
+Johan
