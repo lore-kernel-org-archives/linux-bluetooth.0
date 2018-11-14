@@ -2,185 +2,129 @@ Return-Path: <SRS0=ohN3=NZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 985E8C43610
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 06:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6590C43441
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 06:32:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52B17223D0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 06:32:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="kW7MwNvn";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="ROoaTi+h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52B17223D0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	by mail.kernel.org (Postfix) with ESMTP id 9A2D720854
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Nov 2018 06:32:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A2D720854
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731424AbeKNQeJ (ORCPT
+        id S1730632AbeKNQee (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Nov 2018 11:34:09 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:46320 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727528AbeKNQeJ (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Nov 2018 11:34:09 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 35858607B9; Wed, 14 Nov 2018 06:32:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1542177138;
-        bh=VSeSrAA4QLB+KdBPvzpw3SiKtST4OOVMqtb4rGQNfbc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=kW7MwNvn/q5ve2PykoFaRF+IgSAS6eqF+Ld7BZV3TnFomDlEy45CcTKCbVHoGa/fW
-         CrnbT23HzC1RlvKeJcgiHaIfk34/MB5ezK5cGK6YxhkDsz6xjR1pCRgG9fj0/4u3K3
-         1RBcDBuYLJNbBw3S66g0R78qIIpfGQfk43Va95TQ=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 9A5296071B;
-        Wed, 14 Nov 2018 06:32:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1542177136;
-        bh=VSeSrAA4QLB+KdBPvzpw3SiKtST4OOVMqtb4rGQNfbc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ROoaTi+hTD64c3DXzdrjoUWQMICdMhvWGBeu6W1rLhfdbMsg9t3nLJw3Wr7v/3a1Z
-         W+cgJJBhFdUCBbwtPRc6JUKoIllCBajgSeW3xlA/ltmkKKt3hE4OCXyvH/FAsvoIjg
-         RVvHKvxzhYTWxqoq/S+YtUDsFza6knrkxWpduWXA=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 14 Nov 2018 12:02:16 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v1 2/4] Bluetooth: hci_qca: Pull RTS line high for
- baudrate change command
-In-Reply-To: <20181114015504.GH22824@google.com>
-References: <20181106120528.30342-1-bgodavar@codeaurora.org>
- <20181106120528.30342-3-bgodavar@codeaurora.org>
- <20181114015504.GH22824@google.com>
-Message-ID: <25c29e35b32ca71fe6d0b02f4d6ed559@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+        Wed, 14 Nov 2018 11:34:34 -0500
+Received: from mga17.intel.com ([192.55.52.151]:59166 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727841AbeKNQee (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 14 Nov 2018 11:34:34 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Nov 2018 22:32:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,231,1539673200"; 
+   d="scan'208";a="91909469"
+Received: from ubuntu16.iind.intel.com ([10.224.186.218])
+  by orsmga008.jf.intel.com with ESMTP; 13 Nov 2018 22:32:42 -0800
+From:   raghuram.hegde@intel.com
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Raghuram Hegde <raghuram.hegde@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>
+Subject: [PATCH] Bluetooth: btusb: Add support for Intel bluetooth device 8087:0029
+Date:   Wed, 14 Nov 2018 12:02:24 +0530
+Message-Id: <1542177144-16173-1-git-send-email-raghuram.hegde@intel.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+From: Raghuram Hegde <raghuram.hegde@intel.com>
 
-On 2018-11-14 07:25, Matthias Kaehlcke wrote:
-> On Tue, Nov 06, 2018 at 05:35:26PM +0530, Balakrishna Godavarthi wrote:
->> This patch will pull the RTS line high instead of turning off the
->> flow control, while changing baudrate of host and chip.
-> 
-> Please don't only describe what is changed, but also why this change
-> is necessary.
-> 
-> IIUC the BT chip honors flow control during baudrate changes, however
-> it sometimes sends 'garbage' which results in "Bluetooth: hci0: Frame
-> reassembly failed (-84)" messages.
-> 
+Include the new USB product ID for Intel Bluetooth device 22260
+family (CcPeak)
 
-[Bala]: will update the commit text.
+The /sys/kernel/debug/usb/devices portion for this device is:
 
->> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> ---
->>  drivers/bluetooth/hci_qca.c | 23 ++++++++++++-----------
->>  1 file changed, 12 insertions(+), 11 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index 051f081d1835..8301663f0004 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -963,7 +963,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
->> uint8_t baudrate)
->>  	struct hci_uart *hu = hci_get_drvdata(hdev);
->>  	struct qca_data *qca = hu->priv;
->>  	struct sk_buff *skb;
->> -	struct qca_serdev *qcadev;
->>  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
->> 
->>  	if (baudrate > QCA_BAUDRATE_3200000)
->> @@ -977,13 +976,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
->> uint8_t baudrate)
->>  		return -ENOMEM;
->>  	}
->> 
->> -	/* Disabling hardware flow control is mandatory while
->> -	 * sending change baudrate request to wcn3990 SoC.
->> -	 */
->> -	qcadev = serdev_device_get_drvdata(hu->serdev);
->> -	if (qcadev->btsoc_type == QCA_WCN3990)
->> -		hci_uart_set_flow_control(hu, true);
->> -
->>  	/* Assign commands to change baudrate and packet type. */
->>  	skb_put_data(skb, cmd, sizeof(cmd));
->>  	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
->> @@ -999,9 +991,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
->> uint8_t baudrate)
->>  	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
->>  	set_current_state(TASK_RUNNING);
->> 
->> -	if (qcadev->btsoc_type == QCA_WCN3990)
->> -		hci_uart_set_flow_control(hu, false);
->> -
->>  	return 0;
->>  }
->> 
->> @@ -1086,6 +1075,7 @@ static int qca_check_speeds(struct hci_uart *hu)
->>  static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type 
->> speed_type)
->>  {
->>  	unsigned int speed, qca_baudrate;
->> +	struct qca_serdev *qcadev;
->>  	int ret;
->> 
->>  	if (speed_type == QCA_INIT_SPEED) {
->> @@ -1097,6 +1087,14 @@ static int qca_set_speed(struct hci_uart *hu, 
->> enum qca_speed_type speed_type)
->>  		if (!speed)
->>  			return 0;
->> 
->> +		/* Pulling RTS line to high is mandatory while sending change
->> +		 * baudrate request to SoC and also while setting the host
->> +		 * baudrate.
->> +		 */
-> 
-> Instead of just stating that this is 'mandatory' explain why it is
-> needed. Also better say 'Deassert RTS' instead of the more lower level
-> 'Pulling RTS line to high'. It could be something like 'Deassert RTS
-> to prevent the BT controller from sending garbage during the baudrate
-> change.'
-> 
+T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=02 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=8087 ProdID=0029 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
 
-[Bala]: will update the comment.
+Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
+Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+---
+ drivers/bluetooth/btusb.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
->> +		qcadev = serdev_device_get_drvdata(hu->serdev);
->> +		if (qcadev->btsoc_type == QCA_WCN3990)
->> +			serdev_device_set_rts(hu->serdev, false);
->> +
->>  		qca_baudrate = qca_get_baudrate_value(speed);
->>  		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
->>  		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
->> @@ -1104,6 +1102,9 @@ static int qca_set_speed(struct hci_uart *hu, 
->> enum qca_speed_type speed_type)
->>  			return ret;
->> 
->>  		host_set_baudrate(hu, speed);
->> +
->> +		if (qcadev->btsoc_type == QCA_WCN3990)
->> +			serdev_device_set_rts(hu->serdev, true);
->>  	}
->> 
->>  	return 0;
-> 
-> Tested-by: Matthias Kaehlcke <mka@chromium.org>
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7439a7eb50ac..1cd54e9228d3 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -342,6 +342,7 @@ static const struct usb_device_id blacklist_table[] = {
+	{ USB_DEVICE(0x1286, 0x204e), .driver_info = BTUSB_MARVELL },
 
-Thanks for testing.
-
--- 
-Regards
-Balakrishna.
+	/* Intel Bluetooth devices */
++	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW },
+	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW },
+	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW },
+	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+@@ -2106,7 +2107,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+	case 0x11:	/* JfP */
+	case 0x12:	/* ThP */
+	case 0x13:	/* HrP */
+-	case 0x14:	/* QnJ, IcP */
++	case 0x14:	/* CcP */
+		break;
+	default:
+		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
+@@ -2200,7 +2201,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+	case 0x11:	/* JfP */
+	case 0x12:	/* ThP */
+	case 0x13:	/* HrP */
+-	case 0x14:	/* QnJ, IcP */
++	case 0x14:	/* CcP */
+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.sfi",
+			 le16_to_cpu(ver.hw_variant),
+			 le16_to_cpu(ver.hw_revision),
+@@ -2232,7 +2233,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+	case 0x11:	/* JfP */
+	case 0x12:	/* ThP */
+	case 0x13:	/* HrP */
+-	case 0x14:	/* QnJ, IcP */
++	case 0x14:	/* CcP */
+		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.ddc",
+			 le16_to_cpu(ver.hw_variant),
+			 le16_to_cpu(ver.hw_revision),
+--
+2.7.4
