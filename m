@@ -2,176 +2,105 @@ Return-Path: <SRS0=SE7D=N2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF1A3C43441
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 14:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 282A1C43441
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 15:43:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7698208A3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 14:34:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4D512146D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 15:43:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="ivwMDfEM";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="LAbmLrXL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7698208A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="GlWzlLGG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4D512146D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388410AbeKPAml (ORCPT
+        id S2388564AbeKPBwF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Nov 2018 19:42:41 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:51322 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387839AbeKPAml (ORCPT
+        Thu, 15 Nov 2018 20:52:05 -0500
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:41842 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726432AbeKPBwF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 15 Nov 2018 19:42:41 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 47A8461310; Thu, 15 Nov 2018 14:34:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1542292476;
-        bh=xaFaJuhxeA0F2SUUV8a2E1LPngaLvBnPIYiWLBbAG9o=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ivwMDfEMsKx35AGnS9yqPOS4bh12isGWNjJBSboOCUyZGZH9qLmZo2TYuSlVOLoKQ
-         m3GU+GKOONG/Vgb3n5ccvUM6981FnJ1nAhlrUf7ty63NSs5O5UV9dNHNT7CwqfwvFZ
-         F3ywwu67w654SPr2D8a4v+kysTxmfi2hn6/OHjyg=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 72C7161320;
-        Thu, 15 Nov 2018 14:34:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1542292469;
-        bh=xaFaJuhxeA0F2SUUV8a2E1LPngaLvBnPIYiWLBbAG9o=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=LAbmLrXL7JzMSXqQBwNVVRf/RKps9a7H7xyLxnGItcw0xnpW5/pa5G47ajMkv74OC
-         dQiqz7KslEPBRABLcqYLgNturzip0s01B0lEJCgZmp8SySDOReMSOYHAAEVcIXY7Vs
-         KUYjnqxOq0u4K3h9UAADXzue9X+FbQzduCcCEdP4=
+        Thu, 15 Nov 2018 20:52:05 -0500
+Received: by mail-vs1-f67.google.com with SMTP id t17so11908344vsc.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Nov 2018 07:43:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=augury.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vgRNrOsOPNB188sQ8k81AXfFaeSIBbP5rW3HbvhbZcM=;
+        b=GlWzlLGGuHpSgDBbZ9MHoAxmdmu/J2MuL5Bvf+EXkbMrzeaEqNmTEcutZ/asqtzePR
+         pd+HttdRV6Zo0ylivw9I5Bq4A0uix2+m0RvmmEsXRfNTgPqop3JnBz8VZSGPsDC2IjLd
+         FLGQYArGj5cMnKW8Rw84EbooqKoUPzfAFxVT8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vgRNrOsOPNB188sQ8k81AXfFaeSIBbP5rW3HbvhbZcM=;
+        b=HUTJ/0G8aOaxSJhLiw1bItvURExwbchBO1SXQnLqBP7lIE7Vp8+GKU8Znj+Kx/HXuX
+         J5lsdGC6n3ydvCufWNJTwF3SL5iXbiCkMv8MpeCT8kFdyNLd8pi/boPWnQXyrbDkaMM4
+         90xzUDbW7XX1aSMT9YM3m4bdvySdVw47LKf7Sfy/fIHzNXLBD3rZerUtVKke1NBSzSGD
+         MD7ZB1/dnpK1hP1Q/pqz6jT4Rta4oMYdXUQxUnUBjVAp6kxHzDPBLRopjH5p+M0dcZMB
+         7XJj0W35FWyxlfk8/GnGxnAN+S0L+UR9Lxewa2NGvXk2MV8kO0GaBaXHRI0aExGZ76P4
+         RBMg==
+X-Gm-Message-State: AGRZ1gKo8Pr0eiSo7h63EGlljDixqG6Yrv9LUS8d71WHczn3wWZTTtgL
+        z5BUfp6QBaK5neDiDXgb5d441i0yuphD7DxxekHk0g==
+X-Google-Smtp-Source: AJdET5crkd8qJMd50+Db7v8ijNM1EVyaguqxpJmeELTPsMjWnNGX+5H1lri7tsOjMlGjXqE5wVmfdstyT3pWwnQJfog=
+X-Received: by 2002:a67:105:: with SMTP id 5mr2815465vsb.183.1542296623980;
+ Thu, 15 Nov 2018 07:43:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 15 Nov 2018 20:04:29 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Johan Hovold <johan@kernel.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        Johan Hovold <jhovold@gmail.com>
-Subject: Re: [PATCH v1 1/4] Bluetooth: hci_qca: use wait_until_sent() for
- power pulses
-In-Reply-To: <20181114152722.GA19900@localhost>
-References: <20181106120528.30342-1-bgodavar@codeaurora.org>
- <20181106120528.30342-2-bgodavar@codeaurora.org>
- <20181114152722.GA19900@localhost>
-Message-ID: <e2362ad539463a3a139419b93ccca831@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+References: <20181115083817.20986-1-gbenhaim@augury.com> <CABBYNZJ_TEM18yfO6O4HFdyo7sm-cE8iL4Y8_DEa1e6xZ7a=Bg@mail.gmail.com>
+ <CAHotPr-jS457EKX=7dvcwA6eB12zr7d2dZG5Prjh6+fMdAT=+Q@mail.gmail.com>
+ <9007400A-D10D-4906-AB75-6D6395AF98FD@holtmann.org> <CAHotPr9Jb3Prqk_tkaeTRsJk0VgsGWbj8tsSdEp-Q9mb9Dt=-A@mail.gmail.com>
+ <CAHotPr-BO=RE6HZYWsC1+MT9oSZ58Xf-8XLz53BJq0Z6Em9Hsw@mail.gmail.com> <CAO1O6seRNsBvz_sdZHKZhSYc3wbeZPOf-_0qXEG6PAnom0qcvA@mail.gmail.com>
+In-Reply-To: <CAO1O6seRNsBvz_sdZHKZhSYc3wbeZPOf-_0qXEG6PAnom0qcvA@mail.gmail.com>
+From:   Gal Ben Haim <gbenhaim@augury.com>
+Date:   Thu, 15 Nov 2018 17:43:32 +0200
+Message-ID: <CAHotPr_3F-wCDyKryYa-K_=tmLP7cwRDqhbzWNDJ2P7EmYxRVg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatt: Ignore SIGPIPE
+To:     emil.lenngren@gmail.com
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Johan,
+should it be added to setup_signalfd in main.c ?
 
-On 2018-11-14 20:57, Johan Hovold wrote:
-> On Tue, Nov 06, 2018 at 05:35:25PM +0530, Balakrishna Godavarthi wrote:
->> wcn3990 requires a power pulse to turn ON/OFF along with
->> regulators. Sometimes we are observing the power pulses are sent
->> out with some time delay, due to queuing these commands. This is
->> causing synchronization issues with chip, which intern delay the
->> chip setup or may end up with communication issues.
->> 
->> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> ---
->>  drivers/bluetooth/hci_qca.c | 22 +++++++++-------------
->>  1 file changed, 9 insertions(+), 13 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index f72ded4ec9ae..051f081d1835 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -1016,8 +1016,7 @@ static inline void host_set_baudrate(struct 
->> hci_uart *hu, unsigned int speed)
->>  static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
->>  {
->>  	struct hci_uart *hu = hci_get_drvdata(hdev);
->> -	struct qca_data *qca = hu->priv;
->> -	struct sk_buff *skb;
->> +	int ret;
->> 
->>  	/* These power pulses are single byte command which are sent
->>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
->> @@ -1030,18 +1029,14 @@ static int qca_send_power_pulse(struct hci_dev 
->> *hdev, u8 cmd)
->>  	 * sending power pulses to SoC.
->>  	 */
->>  	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
->> -
->> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
->> -	if (!skb)
->> -		return -ENOMEM;
->> -
->>  	hci_uart_set_flow_control(hu, true);
->> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
-> 
-> Don't you want a non-zero timeout here? Otherwise you might as well 
-> call
-> serdev_device_write() directly.
-> 
-
-[Bala]: we need an in definite timeout for these commands. will use 
-HCI_UART_TX_WAKEUP.
-
-> Also have you made sure that serdev_device_write_wakeup() is called in
-> the drivers write-wakeup callback as serdev_device_write() requires?
-> 
-> See this series in case what you really wanted was to wait indefinitely
-> (you can use MAX_SCHEDULE_TIMEOUT):
-> 
-> 	https://lkml.kernel.org/r/<20181114150904.19653-1-johan@kernel.org>
-> 
-
-[Bala]: thanks for pointers. from 
-https://lore.kernel.org/patchwork/patch/1012358/
-         it was clear to me that i need call below functions in order to 
-wait until full data is sent.
-
-         serdev_device_write_wakeup()
-         serdev_device_write()
-         serdev_device_wait_until_sent()
-
-         correct me whether my understanding is correct.
-
->> +	if (ret < 0) {
->> +		bt_dev_err(hdev, "failed to send power pulse %02x to SoC", cmd);
->> +		return ret;
->> +	}
->> 
->> -	skb_put_u8(skb, cmd);
->> -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
->> -
->> -	skb_queue_tail(&qca->txq, skb);
->> -	hci_uart_tx_wakeup(hu);
->> +	serdev_device_wait_until_sent(hu->serdev, 0);
->> 
->>  	/* Wait for 100 uS for SoC to settle down */
->>  	usleep_range(100, 200);
->> @@ -1283,7 +1278,8 @@ static void qca_power_shutdown(struct hci_uart 
->> *hu)
->> 
->>  	host_set_baudrate(hu, 2400);
->>  	hci_uart_set_flow_control(hu, true);
->> -	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
->> +	serdev_device_write(serdev, &cmd, sizeof(cmd), 0);
-> 
-> Same here.
-> 
->> +	serdev_device_wait_until_sent(serdev, 0);
->>  	hci_uart_set_flow_control(hu, false);
->>  	qca_power_setup(hu, false);
->>  }
-> 
-> Johan
-
--- 
-Regards
-Balakrishna.
+On Thu, Nov 15, 2018 at 2:56 PM Emil Lenngren <emil.lenngren@gmail.com> wrote:
+>
+> Den tors 15 nov. 2018 kl 12:55 skrev Gal Ben Haim <gbenhaim@augury.com>:
+> >
+> > I submitted a different patch -
+> > https://marc.info/?l=linux-bluetooth&m=154228281730667&w=2
+> > On Thu, Nov 15, 2018 at 12:20 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
+> > >
+> > > I can try to create another patch for it
+> > >
+> > > On Thu, Nov 15, 2018 at 12:18 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+> > > >
+> > > > Hi Gal,
+> > > >
+> > > > > io_send can use poll and check for POLLOUT and POLLRDHUP before
+> > > > > writing to the pipe
+> > > >
+> > > > that should be done anyway since code that writes to a pipe descriptor (or socket for that matter) without checking that it is still valid is broken code.
+> > > >
+> > > > Regards
+> > > >
+> > > > Marcel
+> > > >
+>
+> Even if you first check for writability with poll, you still need to
+> also ignore the SIGPIPE signal, since the connection could be reset
+> after the check is made but before the write is executed, I guess. But
+> the "signal(SIGPIPE, SIG_IGN)" should usually be made once at
+> application initialization.
+>
+> /Emil
