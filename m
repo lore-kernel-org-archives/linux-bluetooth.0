@@ -3,27 +3,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A478C43441
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 09:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2844C43441
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 09:36:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F1F6D223CB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 09:36:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1F6D223CB
+	by mail.kernel.org (Postfix) with ESMTP id B3B76223CB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 09:36:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3B76223CB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729047AbeKOTnu (ORCPT
+        id S2388173AbeKOTnN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Nov 2018 14:43:50 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:46464 "EHLO
-        wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388055AbeKOTnN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 15 Nov 2018 14:43:13 -0500
+Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:46470 "EHLO
+        wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388019AbeKOTnM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 15 Nov 2018 14:43:12 -0500
 Received: by wens.csie.org (Postfix, from userid 1000)
-        id 1433B5FDD9; Thu, 15 Nov 2018 17:36:05 +0800 (CST)
+        id D58CA5FD95; Thu, 15 Nov 2018 17:36:04 +0800 (CST)
 From:   Chen-Yu Tsai <wens@csie.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -34,9 +34,9 @@ Cc:     Chen-Yu Tsai <wens@csie.org>,
         Loic Poulain <loic.poulain@gmail.com>,
         linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 15/15] arm64: dts: allwinner: a64: bananapi-m64: Add Bluetooth device node
-Date:   Thu, 15 Nov 2018 17:36:03 +0800
-Message-Id: <20181115093603.26729-16-wens@csie.org>
+Subject: [PATCH v2 08/15] Bluetooth: hci_bcm: Add support for LPO clock
+Date:   Thu, 15 Nov 2018 17:35:56 +0800
+Message-Id: <20181115093603.26729-9-wens@csie.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181115093603.26729-1-wens@csie.org>
 References: <20181115093603.26729-1-wens@csie.org>
@@ -47,57 +47,111 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The AP6212 is based on the Broadcom BCM43430 or BCM43438. The WiFi side
-identifies as BCM43430, while the Bluetooth side identifies as BCM43438.
+The Broadcom Bluetooth controllers support a secondary LPO clock at
+32.768 kHz. This external clock provides low power timing, and also
+a way to detect the frequency of the main reference clock. On many
+designs without NVRAM and a non-default reference clock, this must
+be used or the controller will not function correctly.
 
-The Bluetooth side is connected to UART1 in a 4 wire configuration. Same
-as the WiFi side, due to being the same chip and package, DLDO2 provides
-overall power via VBAT, and DLDO4 provides I/O power via VDDIO. The RTC
-clock output provides the LPO low power clock at 32.768 kHz.
-
-This patch enables Bluetooth on this board, and also adds the missing
-LPO clock on the WiFi side. There is also a PCM connection for Bluetooth,
-but this is not covered here.
-
-Acked-by: Maxime Ripard <maxime.ripard@bootlin.com>
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- .../boot/dts/allwinner/sun50i-a64-bananapi-m64.dts | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 41 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 36 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-bananapi-m64.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-bananapi-m64.dts
-index ef1c90401bb2..beca5c4979cf 100644
---- a/arch/arm64/boot/dts/allwinner/sun50i-a64-bananapi-m64.dts
-+++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-bananapi-m64.dts
-@@ -94,6 +94,8 @@
- 	wifi_pwrseq: wifi_pwrseq {
- 		compatible = "mmc-pwrseq-simple";
- 		reset-gpios = <&r_pio 0 2 GPIO_ACTIVE_LOW>; /* PL2 */
-+		clocks = <&rtc 1>;
-+		clock-names = "ext_clock";
- 	};
- };
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 1584c95c9c34..345d728a5434 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -72,7 +72,8 @@
+  * @btpu: Apple ACPI method to drive BT_REG_ON pin high ("Bluetooth Power Up")
+  * @btpd: Apple ACPI method to drive BT_REG_ON pin low ("Bluetooth Power Down")
+  * @txco_clk: external reference frequency clock used by Bluetooth device
+- * @clk_enabled: whether @txco_clk is prepared and enabled
++ * @lpo_clk: external LPO clock used by Bluetooth device
++ * @clk_enabled: whether clocks are prepared and enabled
+  * @init_speed: default baudrate of Bluetooth device;
+  *	the host UART is initially set to this baudrate so that
+  *	it can configure the Bluetooth device for @oper_speed
+@@ -103,6 +104,7 @@ struct bcm_device {
+ #endif
  
-@@ -335,7 +337,19 @@
- &uart1 {
- 	pinctrl-names = "default";
- 	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
-+	uart-has-rtscts;
- 	status = "okay";
+ 	struct clk		*txco_clk;
++	struct clk		*lpo_clk;
+ 	bool			clk_enabled;
+ 
+ 	u32			init_speed;
+@@ -215,21 +217,34 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+ 	int err;
+ 
+ 	if (powered && !dev->clk_enabled) {
+-		err = clk_prepare_enable(dev->txco_clk);
++		/* LPO clock needs to be 32.768 kHz */
++		err = clk_set_rate(dev->lpo_clk, 32768);
++		if (err) {
++			dev_err(dev->dev, "Could not set LPO clock rate\n");
++			return err;
++		}
 +
-+	bluetooth {
-+		compatible = "brcm,bcm43438-bt";
-+		clocks = <&rtc 1>;
-+		clock-names = "lpo";
-+		vbat-supply = <&reg_dldo2>;
-+		vddio-supply = <&reg_dldo4>;
-+		device-wakeup-gpios = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
-+		host-wakeup-gpios = <&r_pio 0 5 GPIO_ACTIVE_HIGH>; /* PL5 */
-+		shutdown-gpios = <&r_pio 0 4 GPIO_ACTIVE_HIGH>; /* PL4 */
-+	};
- };
++		err = clk_prepare_enable(dev->lpo_clk);
+ 		if (err)
+ 			return err;
++
++		err = clk_prepare_enable(dev->txco_clk);
++		if (err)
++			goto err_lpo_clk_disable;
+ 	}
  
- &usb_otg {
+ 	err = dev->set_shutdown(dev, powered);
+ 	if (err)
+-		goto err_clk_disable;
++		goto err_txco_clk_disable;
+ 
+ 	err = dev->set_device_wakeup(dev, powered);
+ 	if (err)
+ 		goto err_revert_shutdown;
+ 
+-	if (!powered && dev->clk_enabled)
++	if (!powered && dev->clk_enabled) {
+ 		clk_disable_unprepare(dev->txco_clk);
++		clk_disable_unprepare(dev->lpo_clk);
++	}
+ 
+ 	dev->clk_enabled = powered;
+ 
+@@ -237,9 +252,12 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+ 
+ err_revert_shutdown:
+ 	dev->set_shutdown(dev, !powered);
+-err_clk_disable:
++err_txco_clk_disable:
+ 	if (powered && !dev->clk_enabled)
+ 		clk_disable_unprepare(dev->txco_clk);
++err_lpo_clk_disable:
++	if (powered && !dev->clk_enabled)
++		clk_disable_unprepare(dev->lpo_clk);
+ 	return err;
+ }
+ 
+@@ -934,6 +952,19 @@ static int bcm_get_resources(struct bcm_device *dev)
+ 	if (IS_ERR(dev->txco_clk))
+ 		dev->txco_clk = NULL;
+ 
++	dev->lpo_clk = devm_clk_get(dev->dev, "lpo");
++	if (dev->lpo_clk == ERR_PTR(-EPROBE_DEFER))
++		return PTR_ERR(dev->lpo_clk);
++
++	if (IS_ERR(dev->lpo_clk))
++		dev->lpo_clk = NULL;
++
++	/* Check if we accidentally fetched the lpo clock twice */
++	if (dev->lpo_clk && clk_is_match(dev->lpo_clk, dev->txco_clk)) {
++		devm_clk_put(dev->dev, dev->txco_clk);
++		dev->txco_clk = NULL;
++	}
++
+ 	dev->device_wakeup = devm_gpiod_get_optional(dev->dev, "device-wakeup",
+ 						     GPIOD_OUT_LOW);
+ 	if (IS_ERR(dev->device_wakeup))
 -- 
 2.19.1
 
