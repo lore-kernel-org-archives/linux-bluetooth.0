@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 992E7C43441
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 09:37:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6982CC43441
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 09:37:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62CF92087A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 09:37:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62CF92087A
+	by mail.kernel.org (Postfix) with ESMTP id 3DA14223CB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 09:37:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DA14223CB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388058AbeKOTnM (ORCPT
+        id S2388012AbeKOToj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Nov 2018 14:43:12 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:46474 "EHLO
+        Thu, 15 Nov 2018 14:44:39 -0500
+Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:46324 "EHLO
         wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388024AbeKOTnM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 15 Nov 2018 14:43:12 -0500
+        id S1727265AbeKOTnK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 15 Nov 2018 14:43:10 -0500
 Received: by wens.csie.org (Postfix, from userid 1000)
-        id E69A85FDAF; Thu, 15 Nov 2018 17:36:04 +0800 (CST)
+        id 9C2D05F775; Thu, 15 Nov 2018 17:36:04 +0800 (CST)
 From:   Chen-Yu Tsai <wens@csie.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -34,9 +34,9 @@ Cc:     Chen-Yu Tsai <wens@csie.org>,
         Loic Poulain <loic.poulain@gmail.com>,
         linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 10/15] Bluetooth: hci_bcm: Wait for device to come out of reset after power on
-Date:   Thu, 15 Nov 2018 17:35:58 +0800
-Message-Id: <20181115093603.26729-11-wens@csie.org>
+Subject: [PATCH v2 01/15] dt-bindings: net: broadcom-bluetooth: Fix external clock names
+Date:   Thu, 15 Nov 2018 17:35:49 +0800
+Message-Id: <20181115093603.26729-2-wens@csie.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181115093603.26729-1-wens@csie.org>
 References: <20181115093603.26729-1-wens@csie.org>
@@ -47,42 +47,42 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The datasheets for BCM20702 and BCM43438 both have power up time
-sequence graphs, however they are slightly different. Both chips
-also have an internal power-on-reset, which holds the chip in reset
-for a short time after the regulators are enabled.
+The Broadcom Bluetooth controllers can take up to two external clocks:
+an external frequency reference, substituting the main crystal, and a
+LPO clock at 32.768 kHz substituting the internal LPO clock.
 
-For the BCM20702, the time period from when the regulators are enabled,
-until the chip settles and comes out of sleep state, is 6564 ~ 8171 us.
+In particular, the external LPO clock must be used when the controller
+does not have NVRAM connected, and the main reference frequency is not
+the default 20 MHz. This is described in detail in the datasheet.
 
-For the BCM43438, the graph only shows the time period from when the
-regulators are enabled until the chip responds by driving the host's
-CTS line low, assuming the host has already driven its RTS line low.
-This is shown to be 6.5 sleep cycles, with the sleep clock at 32.768
-kHz. This is around 2 ms.
+The original "extclk" clock name is ambiguous as to which of these it
+refers to, and some designs might even require both.
 
-Wait a full 10 ms after the regulators are enabled to account for signal
-rising times.
+This patch deprecates the existing name, and adds "txco" and "lpo".
 
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- drivers/bluetooth/hci_bcm.c | 3 +++
- 1 file changed, 3 insertions(+)
+ .../devicetree/bindings/net/broadcom-bluetooth.txt         | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index f2101038284e..538ce8059bff 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -256,6 +256,9 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
- 		regulator_bulk_disable(BCM_NUM_SUPPLIES, dev->supplies);
- 	}
+diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+index 4194ff7e6ee6..711c75ac2bb5 100644
+--- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
++++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+@@ -18,8 +18,11 @@ Optional properties:
+  - shutdown-gpios: GPIO specifier, used to enable the BT module
+  - device-wakeup-gpios: GPIO specifier, used to wakeup the controller
+  - host-wakeup-gpios: GPIO specifier, used to wakeup the host processor
+- - clocks: clock specifier if external clock provided to the controller
+- - clock-names: should be "extclk"
++ - clocks: 1 or 2 clocks as defined in clock-names below, in that order
++ - clock-names: names for clock inputs, matching the clocks given
++   - "extclk": deprecated, replaced by "txco"
++   - "txco": external reference clock (not a standalone crystal)
++   - "lpo": external low power 32.768 kHz clock
  
-+	/* wait for device to power on and come out of reset */
-+	usleep_range(10000, 20000);
-+
- 	dev->res_enabled = powered;
  
- 	return 0;
+ Example:
 -- 
 2.19.1
 
