@@ -2,88 +2,126 @@ Return-Path: <SRS0=SE7D=N2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5356C43441
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 11:55:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05FE1C43441
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 12:38:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85837223DD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 11:55:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B984B2083E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Nov 2018 12:38:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="dq6n9dqR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85837223DD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJkr4Jyd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B984B2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729010AbeKOWCy (ORCPT
+        id S2387647AbeKOWpm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Nov 2018 17:02:54 -0500
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:45279 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728859AbeKOWCy (ORCPT
+        Thu, 15 Nov 2018 17:45:42 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:46735 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728699AbeKOWpm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 15 Nov 2018 17:02:54 -0500
-Received: by mail-vs1-f66.google.com with SMTP id v10so4104663vsv.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Nov 2018 03:55:22 -0800 (PST)
+        Thu, 15 Nov 2018 17:45:42 -0500
+Received: by mail-ot1-f67.google.com with SMTP id w25so17141963otm.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Nov 2018 04:38:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=augury.com; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=3hluAns2WCpo6lbuW0LCHAZT+njLgi8WppR5QuKFd7s=;
-        b=dq6n9dqR3hF82zlG9UICV7mRWhmNps2QJmx1J8ckBZ424Gx0mtTX4JvKruLEXH16Hn
-         mEqWgFxnY5NXcrT6J68ufrfrLMVjvkBPBMpuP1tfCdH88I9Ux/N6q9yXvlTxlfPaXd8O
-         uAm1hMGnuSNJdzVQ9CgOEjRkUpaMRgLrarzrc=
+        bh=xztb9mBOfez/RVxdoNNvnlJjGEd8Y27UU6I5XZmFFM8=;
+        b=KJkr4JydgYHQDTPu0Wx3LWdUqlEG/ohvXKp4IUtV3l/l8YT1p1XttAQ9md7pXpp8UI
+         kP04dyMZLkDVqluzSarx8Ka6iirb92RkGzWCq1YevqHAKhFgXIcbHke/Hy4jf4hRhYxz
+         sEgCIFUrhGcVVeG3z5Qq1NIkuiaf0YJKB85J6crPeCeJiog1SSR9fOazpTYz0Y/ZiaKw
+         OgrCf1RUqd3eZ2YO9OxI+vPWEF0203TlhWXVpDfH3KOpaHEYjtr3vMwEODT6MX5tc5n/
+         nfF4c3uOSvnhjVnZVFbcHzlje4+8JP8phlcOj/tJkb8WiCPsqbxt59/xshEXEX2qDUvk
+         KCgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=3hluAns2WCpo6lbuW0LCHAZT+njLgi8WppR5QuKFd7s=;
-        b=XZO1uJU9o+0b50bsPwl62rPQFtTo6N5kAHuGccofdLujteaOENBHJRX28rKwIWL5+o
-         73qlK6gX/uaTIuDPm3gFuTsWT0Sc3j7PXER5uSLeM+IOSbUUXmthEkyvVbBMe5ypbH8Q
-         If96ZjNHtyjkCrjCt28dmfhUHJl/o4BBV/YfZ25ceY/1/bligxnR7MjfEHdKd3OGAFq8
-         KW2eYbFZa1nbREazBvepsYThY7LTFTW2XBUiEBKIWWEsyX3r+vrR/ufwXtd0OC5sgy6g
-         MA0fZwm4z9xk6Md1IarF2Lkpf2bH2stFE4yghI0RIMrKeWgIl4vtrfBl8ORphRc5V5jH
-         Dm/g==
-X-Gm-Message-State: AGRZ1gKcCZFEJorCCGGObfm5o/CksUA4KozKOyZzIoTVmiMMMpjwcjVY
-        RKgk2LEhiiaw1LiIve0sfSuGotfyIjAUFkG/QTNP++C0GGQ=
-X-Google-Smtp-Source: AJdET5f+ceoJj4ZdzDp9NYe2JCBd4wTDKQ0jRtyu650ZKN++8utg9H6c8hlhnnEtyUey6opBTzP4uwv46iOwNQ86ZNs=
-X-Received: by 2002:a67:3144:: with SMTP id x65mr2584674vsx.186.1542282921351;
- Thu, 15 Nov 2018 03:55:21 -0800 (PST)
+        bh=xztb9mBOfez/RVxdoNNvnlJjGEd8Y27UU6I5XZmFFM8=;
+        b=IXr5gChoy91c/RGOeAK+WKd8NpL+ASI7UqRU+3pfBxwocjy6e4o8DRxwKq5O0jEIxX
+         9qGm5WqsO7b/3y+EmRPN2iYjaguEWc+8InJKZP70yeAnsiVHaTxF46aSB1I3HwCX0Ic6
+         hFthbxDHEoisHwOsdZ1Cp+6Ex3/RriD4MfexonB3AHJ1obcuuXp820YimR0BE/TWQUEs
+         aNmGL3dGvOgYxyZrhb7gnq92lkfy31lKoyFeIrq7Elwu+y4oStPtpoC8gBRre7I5v9Ob
+         Xe8bZ07hz93Tq8vxJac5DYBLMfYtG+rE8ENmnVPCiGnxAgyGgEx1jEaQ0o00P8XCSmZw
+         +rWg==
+X-Gm-Message-State: AGRZ1gLWdP6j0Jvo96dOcb866OdXgho/T+EH8XamRDPDBbgJQJeto/tU
+        jp+eA0eeq3kkZqZkwYrgGO4KL0n7qqqMIsGYbIE=
+X-Google-Smtp-Source: AJdET5dI0/vm+T80UXncsNFAE2OFAwuRCs99E8b22mCn9JMhzLOw/Y92n9U3r4tqStdarvFMmsd/SxBND8rOpCvTquw=
+X-Received: by 2002:a9d:3213:: with SMTP id t19mr3885380otc.71.1542285480899;
+ Thu, 15 Nov 2018 04:38:00 -0800 (PST)
 MIME-Version: 1.0
-References: <20181115083817.20986-1-gbenhaim@augury.com> <CABBYNZJ_TEM18yfO6O4HFdyo7sm-cE8iL4Y8_DEa1e6xZ7a=Bg@mail.gmail.com>
- <CAHotPr-jS457EKX=7dvcwA6eB12zr7d2dZG5Prjh6+fMdAT=+Q@mail.gmail.com>
- <9007400A-D10D-4906-AB75-6D6395AF98FD@holtmann.org> <CAHotPr9Jb3Prqk_tkaeTRsJk0VgsGWbj8tsSdEp-Q9mb9Dt=-A@mail.gmail.com>
-In-Reply-To: <CAHotPr9Jb3Prqk_tkaeTRsJk0VgsGWbj8tsSdEp-Q9mb9Dt=-A@mail.gmail.com>
-From:   Gal Ben Haim <gbenhaim@augury.com>
-Date:   Thu, 15 Nov 2018 13:55:09 +0200
-Message-ID: <CAHotPr-BO=RE6HZYWsC1+MT9oSZ58Xf-8XLz53BJq0Z6Em9Hsw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gatt: Ignore SIGPIPE
-To:     marcel@holtmann.org
-Cc:     luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+References: <20181115115324.10215-1-gbenhaim@augury.com>
+In-Reply-To: <20181115115324.10215-1-gbenhaim@augury.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 15 Nov 2018 14:37:48 +0200
+Message-ID: <CABBYNZKkrddaFypEA0FGW8CHAH3bf-atNKh2+6scLKC3ZPSfQQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] shared/io-mainloop: Try to write to the pipe only
+ if there are readers
+To:     gbenhaim@augury.com
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I submitted a different patch -
-https://marc.info/?l=linux-bluetooth&m=154228281730667&w=2
-On Thu, Nov 15, 2018 at 12:20 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
+Hi Gal,
+On Thu, Nov 15, 2018 at 1:55 PM Gal Ben-Haim <gbenhaim@augury.com> wrote:
 >
-> I can try to create another patch for it
+> bluetoothd receives a SIGPIPE and terminates if writing to a pipe that
+> was acquired by AcquireNotify and there are no readers. it can be
+> reproduced by terminating the reader process without closing the reader
+> end of the pipe.
 >
-> On Thu, Nov 15, 2018 at 12:18 PM Marcel Holtmann <marcel@holtmann.org> wrote:
-> >
-> > Hi Gal,
-> >
-> > > io_send can use poll and check for POLLOUT and POLLRDHUP before
-> > > writing to the pipe
-> >
-> > that should be done anyway since code that writes to a pipe descriptor (or socket for that matter) without checking that it is still valid is broken code.
-> >
-> > Regards
-> >
-> > Marcel
-> >
+> poll is used to check for a POLLRDHUP event before write and an EPIPE
+> error is returned if the peer closed its end of the pipe.
+> ---
+>  src/shared/io-mainloop.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
+> index 2306c3479..4a70449fc 100644
+> --- a/src/shared/io-mainloop.c
+> +++ b/src/shared/io-mainloop.c
+> @@ -27,6 +27,7 @@
+>
+>  #include <unistd.h>
+>  #include <errno.h>
+> +#include <poll.h>
+>  #include <sys/socket.h>
+>
+>  #include "src/shared/mainloop.h"
+> @@ -305,7 +306,14 @@ ssize_t io_send(struct io *io, const struct iovec *iov, int iovcnt)
+>         if (!io || io->fd < 0)
+>                 return -ENOTCONN;
+>
+> +       struct pollfd fds[1];
+> +       fds[0].fd = io->fd;
+> +       fds[0].events = POLLRDHUP;
+>         do {
+> +               if (poll(fds, 1, 0) > 0 && fds[0].revents & POLLRDHUP > 0) {
+> +                       return -EPIPE;
+> +               }
+> +
+>                 ret = writev(io->fd, iov, iovcnt);
+>         } while (ret < 0 && errno == EINTR);
+>
+> --
+> 2.19.1
+
+We normally do it a bit differently, we setup a write handler using
+io_set_write_handler which informs when the fd is writable, otherwise
+we maybe polling twice here since the user of the io may already be
+using that mechanism. That said you are actually checking for HUP
+which is something done io_set_disconnect_handler, which is already in
+use. I suspect to really get this done cleanly we should perhaps use
+MSG_NOSIGNAL when trying to write.
+
+-- 
+Luiz Augusto von Dentz
