@@ -2,113 +2,139 @@ Return-Path: <SRS0=Z/iR=N3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BA13C43441
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:46:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29C55C43441
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:55:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C667F20869
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B48F42086C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:55:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="iaFJoj8w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C667F20869
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kemnade.info
+	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="ayrmFHm6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B48F42086C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725854AbeKQGAB (ORCPT
+        id S1725819AbeKQGIq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 17 Nov 2018 01:00:01 -0500
-Received: from mail.andi.de1.cc ([85.214.239.24]:46738 "EHLO
-        h2641619.stratoserver.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725819AbeKQGAB (ORCPT
+        Sat, 17 Nov 2018 01:08:46 -0500
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:43601 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725763AbeKQGIq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 17 Nov 2018 01:00:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=kemnade.info; s=20180802; h=Content-Type:MIME-Version:References:
-        In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=BFXFaEKcscgkScbVPZKLnvJdnbdJOocvRoWbJZ3kMgY=; b=iaFJoj8wDDaFgPUsN/PdvilPA
-        ZDBqP47E7DUO1rJfoWRNIVNR9XvQveWbwdqhAzN5tP6j4Q3obG6XdjzgRyKbiV+PeynYsVsLHR7NU
-        1GaZ6yuvsyQx6wZUUk2UYP1+TDjI8qZD5XJulHlk7j6Syu7nIvKeCUIBfL9rsT3UTXX/U=;
-Received: from x590fed94.dyn.telefonica.de ([89.15.237.148] helo=localhost)
-        by h2641619.stratoserver.net with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <andreas@kemnade.info>)
-        id 1gNk4C-0000V0-6U; Fri, 16 Nov 2018 20:46:12 +0100
-Received: from [::1] (helo=localhost)
-        by localhost with esmtp (Exim 4.89)
-        (envelope-from <andreas@kemnade.info>)
-        id 1gNk48-0007dE-LQ; Fri, 16 Nov 2018 20:46:08 +0100
-Date:   Fri, 16 Nov 2018 20:46:01 +0100
-From:   Andreas Kemnade <andreas@kemnade.info>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Rob Herring <robh@kernel.org>, sebastian.reichel@collabora.com,
-        hns@goldelico.com, devicetree@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, letux-kernel@openphoenux.org
-Subject: Re: [Letux-kernel] [PATCH RFC] bluetooth: add uart h4 devices via
- serdev/devicetree
-Message-ID: <20181116204601.4e1aa0de@kemnade.info>
-In-Reply-To: <86A3A2E6-FC89-42FE-8410-9C8273EC9CF7@holtmann.org>
-References: <20181110232034.17277-1-andreas@kemnade.info>
-        <20181111024648.7rt7rlhaqihtqecv@earth.universe>
-        <20181112215812.18ebca35@aktux>
-        <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com>
-        <20181112222726.73m2oca7hankvcjs@earth.universe>
-        <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com>
-        <20181113170128.0f59ef0e@kemnade.info>
-        <86A3A2E6-FC89-42FE-8410-9C8273EC9CF7@holtmann.org>
-X-Mailer: Claws Mail 3.14.1 (GTK+ 2.24.31; i686-pc-linux-gnu)
+        Sat, 17 Nov 2018 01:08:46 -0500
+Received: by mail-vs1-f68.google.com with SMTP id x1so14406232vsc.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 11:54:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=augury.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=g+IW+WWtiG4NSpqwG+28lC2DKSMR9lgHSQMOkOj6ZoA=;
+        b=ayrmFHm6YQhDJkqb22C5xKWwOlIR2yO/xhEdYQDk2RCtTUPl9vMrOJ26Uw0y9godPF
+         57F1BRMtLpTC9Urg3Wr2qqKKc5fZwt+Ug5Ngo8Im8H/yLq/OreRZjfYOPfMgkSY/Epg+
+         T3JD0WeKvx8r7AOBErSu2Yi0ktCMnrEEHqXpY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=g+IW+WWtiG4NSpqwG+28lC2DKSMR9lgHSQMOkOj6ZoA=;
+        b=sWDmXh8BDLrfsrp9ZXcSjiZYMZReOEJajaiDaiVtyZv2FJO+kLzyUYXiYgfAWKHHXY
+         ZD1CGPII2jZfgSYv/GYgZiyzD5sp5dKMKn1ZRmXO3lijzyGnZuOCWrtIJVofx2NrMv6B
+         t6r3b5Xum5eEFiXchSdF0IbVM7lQhZR69Hb8a6q+K4P1WjOy/akbCtwQiJ2jz+3ckKdc
+         FkRPUOQF+RfxHue4BCsITvvS/7qu2zQWMZVvVFqvP7yc+QfYqYL7M43Q/b3/7bpLWj0/
+         /ItDD9z8C1Ulci6scak8/YkPB2l7m0eT/hlP9rxgqtc0h6+CNt2mC0XU3GksbTBFPcQU
+         sXuA==
+X-Gm-Message-State: AGRZ1gLXLQGoWcwNCp1sNx5IqZqydgntOzdhchVA27hG/ZlaolI/xsGT
+        gIs/mxjFrqxgOuyHBD6jdDnvAA6e+bdnfcbZeoAMNQ==
+X-Google-Smtp-Source: AJdET5fN3+SgP62+VOe3utulkbnjRj9fmRsa+JNxZYwXo1V0wY2bpppUQntaIApR8kUkgi6BYx/PZXfQr/3p+0CwOQg=
+X-Received: by 2002:a67:dd11:: with SMTP id y17mr5287652vsj.111.1542398099290;
+ Fri, 16 Nov 2018 11:54:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/mDijiKpFyv=Lgc7SNi0J1bT"; protocol="application/pgp-signature"
+References: <20181116191452.17377-1-gbenhaim@augury.com> <CABBYNZJFTNMvXE5p0t4XrhF8KaJf3RKRdbD1Hv6Jwp+x+6shGQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJFTNMvXE5p0t4XrhF8KaJf3RKRdbD1Hv6Jwp+x+6shGQ@mail.gmail.com>
+From:   Gal Ben Haim <gbenhaim@augury.com>
+Date:   Fri, 16 Nov 2018 21:54:48 +0200
+Message-ID: <CAHotPr8prG8vfmOeFYD+5rq7U9MtnHDjkhET4M4dwMn4OE-Vug@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core: Ignore SIGPIPE
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---Sig_/mDijiKpFyv=Lgc7SNi0J1bT
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi Marcel,
-
-On Wed, 14 Nov 2018 08:51:17 +0100
-Marcel Holtmann <marcel@holtmann.org> wrote:
-[...[
-> Btw. I see nothing standing in the way of merging btuart.c driver and the=
-n go from there. Either I dig this out and submit or someone else does.
->=20
-Do you mean this?
-https://patchwork.kernel.org/patch/10490651/
-
-Regards,
-Andreas
-
---Sig_/mDijiKpFyv=Lgc7SNi0J1bT
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE7sDbhY5mwNpwYgrAfb1qx03ikyQFAlvvHnkACgkQfb1qx03i
-kyR9qQ/+K2Abq9GwLl4Jt232U9wItKWwkfDgv1TeqM4yNPupS994y4/CXOIz/58v
-SWitIU1xIL88pIc7OpZXVNF4SZagQWn4m3krfmb9mN9TD8XeeT6bQmsB4p2/CsaA
-PMzFZR6p3Lqa+ai81Emy6L/eaKYHmn1gOARrqamw8izO4ZL0LsOk8X3zf/tuv3/V
-S9Dcsfym88tvjPTqzCESk4A+AXhH5G04otd0546zaugxu+snH9H+21rxxT+WRcEQ
-0c5gok6G6ohwOlB+1i4SNO6qcgDH26OYoO5u/gn5TFQvbk1riXQunTwnfoaikLGk
-rH6yBtuov3ZlHD0d3zl8H6I/cONeQKnBCKL7n5Z+x/buuSLr9//z99vX7ezxkJqm
-nY3Ym2pZLZ1rOEgA+iRJ5f+IuOCmfGj0bhCtJrqPzwQ5SGIdIGcR57yuXbDBHHBM
-MpPMLaZPyyVbLhnCRe3biRPU6kTASc2ENMHdru6WgtmEI5S5/8JDeS+1EqImCdyc
-oYbuEqhC2RpypskKR2/bPcTlIILul1jF0Mt+kZ8GJbvKT8taUCUQ695W1zbzyyMz
-IANeudeJZ2AGKG/zcDoNC8ynm8n0LdR4DNqvqobJ9SRSSokZq9jooBlW5Gn78wDa
-fD60AggnsCuXdg38xlYt412IrzcCuZUoJcYMoDct/xKRB5d951o=
-=++Bb
------END PGP SIGNATURE-----
-
---Sig_/mDijiKpFyv=Lgc7SNi0J1bT--
+there's a suggestion in the thread about my other patch that uses poll
+that the signal should be ignored anyway,
+to prevent a scenario that the peer disconnects between poll or
+checking for MSG_NOSIGNAL and the write attempt.
+On Fri, Nov 16, 2018 at 9:30 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Gal,
+>
+> On Fri, Nov 16, 2018 at 9:17 PM Gal Ben-Haim <gbenhaim@augury.com> wrote:
+> >
+> > bluetoothd receives a SIGPIPE and terminates if writing to a pipe that
+> > was acquired by AcquireNotify and there are no readers. it can be
+> > reproduced by terminating the reader process without closing the reader
+> > end of the pipe.
+> >
+> > Ignoring the SIGPIPE will cause the write operation to return an
+> > error which will be logged as "io_send: Broken pipe".
+>
+> Ive been suggesting using MSG_NOSIGNAL, do you have anything against it?
+>
+> MSG_NOSIGNAL (since Linux 2.2)Requests not to send SIGPIPE on errors
+> on stream oriented sockets when the other end breaks the connection.
+> The EPIPE error is still returned.
+> (https://linux.die.net/man/2/send)
+>
+> > ---
+> >  src/main.c | 10 +++++++---
+> >  1 file changed, 7 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/src/main.c b/src/main.c
+> > index 4716f5388..c62886593 100644
+> > --- a/src/main.c
+> > +++ b/src/main.c
+> > @@ -691,7 +691,7 @@ int main(int argc, char *argv[])
+> >         uint16_t sdp_mtu = 0;
+> >         uint32_t sdp_flags = 0;
+> >         int gdbus_flags = 0;
+> > -       guint signal, watchdog;
+> > +       guint signal_source, watchdog;
+> >         const char *watchdog_usec;
+> >
+> >         init_defaults();
+> > @@ -721,7 +721,11 @@ int main(int argc, char *argv[])
+> >
+> >         event_loop = g_main_loop_new(NULL, FALSE);
+> >
+> > -       signal = setup_signalfd();
+> > +       signal_source = setup_signalfd();
+> > +
+> > +       /* Ignore SIGPIPE, a broken pipe error will be returned from write
+> > +        * attempts to a pipe with no readers */
+> > +       signal(SIGPIPE, SIG_IGN);
+> >
+> >         __btd_log_init(option_debug, option_detach);
+> >
+> > @@ -809,7 +813,7 @@ int main(int argc, char *argv[])
+> >
+> >         sd_notify(0, "STATUS=Quitting");
+> >
+> > -       g_source_remove(signal);
+> > +       g_source_remove(signal_source);
+> >
+> >         plugin_cleanup();
+> >
+> > --
+> > 2.19.1
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
