@@ -2,68 +2,121 @@ Return-Path: <SRS0=Z/iR=N3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6408C43441
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 16:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 680A9C43441
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:15:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A167420825
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 16:17:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16DC52087A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:15:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L+ZQJBjm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A167420825
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="qNWC2EK1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16DC52087A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728481AbeKQCaF (ORCPT
+        id S1725804AbeKQF2i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Nov 2018 21:30:05 -0500
-Received: from mail-qk1-f181.google.com ([209.85.222.181]:38767 "EHLO
-        mail-qk1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728175AbeKQCaF (ORCPT
+        Sat, 17 Nov 2018 00:28:38 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53819 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725729AbeKQF2h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Nov 2018 21:30:05 -0500
-Received: by mail-qk1-f181.google.com with SMTP id d19so38214656qkg.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 08:17:05 -0800 (PST)
+        Sat, 17 Nov 2018 00:28:37 -0500
+Received: by mail-wm1-f66.google.com with SMTP id f10-v6so23047828wme.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 11:14:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=wBuWWW230rzGpsdIHdGS/ov4oJpBNMLe/GjthBvZcnw=;
-        b=L+ZQJBjmL9cIN/atIpKwX6ddLNmquI7j9uy9DqwM6q/IAeAviMXdOdeLW2JWqV2PK0
-         m7oRZRt1Rw60FC9QkOMZknNjw7n+NbVdVIq34FZewHPVrpmEQdkbKY3vTzI5s8QN6xrA
-         F4328QH28OMHGgdA1jV+XcbH+L52bU7mGjiNVeO0zxeOA0Hb4+5xz6656xwBBdAgywSs
-         zzjnKyY1mP/daoZ2UnD8B2UCxz1gKyzJwKdabVM4kCQ2SJLyURV/clyHanYA7COnkosC
-         AkzJwhUnkfAdGw/s3y7h06C5aEAuIdUOjXnO3r8tZV+mQ+rlYJoYu9CzxLdSfF4wNvrb
-         XEkg==
+        d=augury.com; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5eO2sjIh+NTZFkj6UFvRs1KxnPlyQpZQtrRuOOyN6p0=;
+        b=qNWC2EK1t0rtBuB8yEPZsEmn9c1J7IzkvxGp1gzUFc5DhnsqlfyQphmkP4kcC7GFbn
+         lPL1zm/y40I/AbuJqlMV3S+BUdHWYwaSF9gUW8UkzmC0NEQYUN0ieGm72EGzsMcvaoz7
+         +cWPDyYiCRHxmMQjrSC5rIolR1B1W/gkCMPMo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=wBuWWW230rzGpsdIHdGS/ov4oJpBNMLe/GjthBvZcnw=;
-        b=Rq4sPXf+NBy3rWlh03hK6NWla/DYmHwGvZZRaNtiZlt3ksHWUYKUUIowDzY4l0Alvi
-         Jq8yuIrsk9ms6jBs7nHmKnCiYXy11Re1uqDrdQgQMe9VOjRR7ZPNabhEPUmTUzYL8Y9e
-         akyOkG/GMh2zIRLWducYcIfUAYLTXGtNzPIYdvoFwPVwxeEP/hnT8egEjKFpk/ECo1Pp
-         XMsTtjS3pvvJxNZBq0+LzKK8g3S3XnwQyUPpENbmCxi1L4Z/eGtPpOhbO5I8wYVr55Jp
-         /uBXyW/ifMVxFPXYbwArTgyPNJZ2PZ/lL15+fdY0H3ktkTaPaTrA7yKWw3uW3V7fP5GI
-         NbIA==
-X-Gm-Message-State: AGRZ1gKw30mlEmiuvgh77mRqpfGS/6X6UsHbauLjYgxzd9EjyQAHDnSD
-        4ralfYrmey3WFOApttjlqoCpa8ktFL/V+9Gw8zmcXnUQZpM=
-X-Google-Smtp-Source: AJdET5dXsprE8Zh9iDCFce1XnPtMpwz+fW7qjUpvKJc5uiU8EkbpfRHUv+FoxGgg8y4xk38GSVH1LTrrDXDzIcNzZmg=
-X-Received: by 2002:ac8:1243:: with SMTP id g3mr10810508qtj.139.1542385024468;
- Fri, 16 Nov 2018 08:17:04 -0800 (PST)
-MIME-Version: 1.0
-From:   sanjeev sharma <sanjeevsharmaengg@gmail.com>
-Date:   Fri, 16 Nov 2018 21:46:52 +0530
-Message-ID: <CAGUYZuQ8ue76z0Xj1E91=S+FyXrVYy32xW-zLEsLzxxZzU4m8w@mail.gmail.com>
-Subject: BlueZ for Android
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5eO2sjIh+NTZFkj6UFvRs1KxnPlyQpZQtrRuOOyN6p0=;
+        b=NxfbvASsGdopWa+VXYn6/cu5fwz0ZJrqAZL7H0EY2//lLCHLYG/jDL8Rrn6W5WW7E0
+         FHCyyZJeYj/OcSgYTXcAFncGe5xo+7bWcJodX4FuHd1AK6qCrlGMo6G4OlJbYgD4c+2q
+         H77DKs09Eu6VZnlW47vX63NnPw6RY0Pg8uKKa0Bmap0URrZTIHnS+kCL/ZhGCr7CgiS7
+         SAH9VLsWan9TumN1OKS6vT59fscbDuJRG46qjqNhsUjJDKwiKtg1n/vMnBb+XTzDcVDt
+         ZZcjI33X2CybD//7GtPzHI0HN3VbQykUe+F/E4tJRGeV63o7dK6u2fxJ7O6yJjaFHg/U
+         pGWQ==
+X-Gm-Message-State: AGRZ1gL7X4yeCWVyliTpB5wto0aLx6s5cDDCSTayTxtJ4IqzgrogV8ix
+        Aw6+uvlI1Vd4St0VhVhDDZimpRWQIqnukYfB+PXMFjRfIUpdjMHnqyZSqVVMaiqHcVrlU002w8o
+        6xD9F020yb8gR62hremGpQQRBDR2+Zaijhr1c2aWy1etqfyguR5MIaO/b7LKk/gIwsgSj4Msq83
+        T8HbA=
+X-Google-Smtp-Source: AJdET5f6PO0anwFLGD0lAeIPx2zucAIhBDYaJuAF9TMOZSOI3yBkKOx8razlz1Npxnl/6Zo8Rxx7Xg==
+X-Received: by 2002:a1c:9f01:: with SMTP id i1-v6mr9560077wme.8.1542395697729;
+        Fri, 16 Nov 2018 11:14:57 -0800 (PST)
+Received: from localhost.localdomain (bzq-79-182-246-1.red.bezeqint.net. [79.182.246.1])
+        by smtp.gmail.com with ESMTPSA id 64-v6sm26679102wml.22.2018.11.16.11.14.55
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 16 Nov 2018 11:14:56 -0800 (PST)
+From:   Gal Ben-Haim <gbenhaim@augury.com>
 To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Gal Ben-Haim <gbenhaim@augury.com>
+Subject: [PATCH BlueZ] core: Ignore SIGPIPE
+Date:   Fri, 16 Nov 2018 21:14:52 +0200
+Message-Id: <20181116191452.17377-1-gbenhaim@augury.com>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Do we support BlueZ for Android and if yes, may I know the latest
-commits and on which architecture we are supporting it.
+bluetoothd receives a SIGPIPE and terminates if writing to a pipe that
+was acquired by AcquireNotify and there are no readers. it can be
+reproduced by terminating the reader process without closing the reader
+end of the pipe.
+
+Ignoring the SIGPIPE will cause the write operation to return an
+error which will be logged as "io_send: Broken pipe".
+---
+ src/main.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index 4716f5388..c62886593 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -691,7 +691,7 @@ int main(int argc, char *argv[])
+ 	uint16_t sdp_mtu = 0;
+ 	uint32_t sdp_flags = 0;
+ 	int gdbus_flags = 0;
+-	guint signal, watchdog;
++	guint signal_source, watchdog;
+ 	const char *watchdog_usec;
+ 
+ 	init_defaults();
+@@ -721,7 +721,11 @@ int main(int argc, char *argv[])
+ 
+ 	event_loop = g_main_loop_new(NULL, FALSE);
+ 
+-	signal = setup_signalfd();
++	signal_source = setup_signalfd();
++
++	/* Ignore SIGPIPE, a broken pipe error will be returned from write 
++	 * attempts to a pipe with no readers */
++	signal(SIGPIPE, SIG_IGN);
+ 
+ 	__btd_log_init(option_debug, option_detach);
+ 
+@@ -809,7 +813,7 @@ int main(int argc, char *argv[])
+ 
+ 	sd_notify(0, "STATUS=Quitting");
+ 
+-	g_source_remove(signal);
++	g_source_remove(signal_source);
+ 
+ 	plugin_cleanup();
+ 
+-- 
+2.19.1
+
