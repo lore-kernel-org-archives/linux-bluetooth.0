@@ -2,169 +2,121 @@ Return-Path: <SRS0=Z/iR=N3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82152C43441
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 09:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5BB8C43441
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 10:37:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4008C2082A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 09:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6622820892
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 10:37:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEHVnW8A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4008C2082A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=pass (1024-bit key) header.d=TelevicGroupnv.onmicrosoft.com header.i=@TelevicGroupnv.onmicrosoft.com header.b="YQknggE1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6622820892
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=televic.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389452AbeKPT7A (ORCPT
+        id S1727544AbeKPUtm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Nov 2018 14:59:00 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:41634 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727567AbeKPT7A (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Nov 2018 14:59:00 -0500
-Received: by mail-lf1-f68.google.com with SMTP id c16so16164124lfj.8;
-        Fri, 16 Nov 2018 01:47:25 -0800 (PST)
+        Fri, 16 Nov 2018 15:49:42 -0500
+Received: from mail-eopbgr20125.outbound.protection.outlook.com ([40.107.2.125]:17050
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727543AbeKPUtm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 16 Nov 2018 15:49:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=LZRsKcSkngEhVVyFO5g2YoKSrORmYMIFROVS31LbGv8=;
-        b=VEHVnW8Aythv6hZt4DHyeasTHOnM66P5I6t9vgmtZVGW/dd9eIKmRq4WVXuZzzhUrN
-         IzjzD4JaiFm6A3I2e2lVhri7mXvKXfUGrQEyqpPya6x/qUo0d6649FFX45LPNzNEgGY6
-         flVkGLhdEMMyq0tOwLQ14u+1zsGWOT1Qs75UbKyPu+IwWF4nb+/NF+CM6NH8zdj7TxhG
-         PQs/4NmyVbdjDBa6G/2SmbtvQAhtJfEivcUcO4oBd2tBf6JjpfvXWf7Re6uXNAU9letF
-         2OTPk2XygK2KY9P754EVTVan0IDX9BAr+nJN7Z4sAqQcJbKsMBxGvmACSEAO2jnERFpK
-         3h6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=LZRsKcSkngEhVVyFO5g2YoKSrORmYMIFROVS31LbGv8=;
-        b=HZQq/8dpl41yQJ5ic1jidNQnNDwDxlFippl0+3C9SD8pwblFHAWQMwYxbEUFs7PK8P
-         m361et3pizFlxb7KrtBPRHY8wAj7XZw5gPGK8e4TZuShkngQbsqmvcdXJc7U7mJLqyDQ
-         ZC4qUJhRpSDcYY4JgisV/YUHS3hXubhxchHblD8Mpt+jOVvQJtnC2CHbidPtBTONDVIk
-         MEirlvAOOrAINPurc7ZQ6rvucIDCpH7McCmQy8XWftdvdlg5U9UjYGlQPKr6S8VqKOrO
-         xI4v5E0Emix3Q1+0kilISxgXitXYBDk7UrRa57E/1c3vAx5M39E/q0zIisoQf6UR9bZp
-         la+g==
-X-Gm-Message-State: AGRZ1gJ9kFFs+I790+gY431Xhnvk5iwnk8sKOW9cAXUQ2FcgAMvWreRs
-        e2ew1mo81BZoIQt2HgyLDek=
-X-Google-Smtp-Source: AJdET5d8hsFnaB4BqJDaiyqMEzGGrjumczP8mLApNCQWwx2ZGs7VU+ieOsD7PqsFir8lGxQnnaN92w==
-X-Received: by 2002:a19:d9d6:: with SMTP id s83mr5492190lfi.57.1542361644189;
-        Fri, 16 Nov 2018 01:47:24 -0800 (PST)
-Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id y14-v6sm2432772ljj.55.2018.11.16.01.47.22
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 16 Nov 2018 01:47:22 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.91)
-        (envelope-from <johan@kernel.org>)
-        id 1gNaii-0002XJ-3y; Fri, 16 Nov 2018 10:47:24 +0100
-Date:   Fri, 16 Nov 2018 10:47:24 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     Johan Hovold <johan@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        Johan Hovold <jhovold@gmail.com>
-Subject: Re: [PATCH v1 1/4] Bluetooth: hci_qca: use wait_until_sent() for
- power pulses
-Message-ID: <20181116094724.GO19900@localhost>
-References: <20181106120528.30342-1-bgodavar@codeaurora.org>
- <20181106120528.30342-2-bgodavar@codeaurora.org>
- <20181114152722.GA19900@localhost>
- <e2362ad539463a3a139419b93ccca831@codeaurora.org>
+ d=TelevicGroupnv.onmicrosoft.com; s=selector1-televic-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TUeuHmLfpNqFvTF9bJlMpfb2oI7/efaXiGZJxtxC11U=;
+ b=YQknggE1VyGnZwjLl1ikWav5x6A2rKftT7VjW7kTMAG3AXsqdVeH+pLuNgJ7VbnOiZg3TTMK1YJPF5NovsVoxjHJQ6ZYjSAfV7jNUakAOWcPjzUwoGBU9FQBPXJDbqd5L/WPP8djRu18RlNucvCSA7C5iy9J0BB8ZWuRwZkUIS0=
+Received: from DB7PR07MB5785.eurprd07.prod.outlook.com (20.178.105.90) by
+ DB7PR07MB4825.eurprd07.prod.outlook.com (20.178.40.26) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1294.15; Fri, 16 Nov 2018 10:37:51 +0000
+Received: from DB7PR07MB5785.eurprd07.prod.outlook.com
+ ([fe80::4c7f:aca9:7f62:23e0]) by DB7PR07MB5785.eurprd07.prod.outlook.com
+ ([fe80::4c7f:aca9:7f62:23e0%5]) with mapi id 15.20.1339.021; Fri, 16 Nov 2018
+ 10:37:51 +0000
+From:   Vieren Frank <F.Vieren@televic.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: BlueZ - HCI adapter address via ioctl(hciSocket, HCIGETDEVINFO,
+ &devInfo) doesn't match address via DBus for Adapter1.address
+Thread-Topic: BlueZ - HCI adapter address via ioctl(hciSocket, HCIGETDEVINFO,
+ &devInfo) doesn't match address via DBus for Adapter1.address
+Thread-Index: AdR9l4TJB3saVVIcT4a2M0KLQ+3sQA==
+Date:   Fri, 16 Nov 2018 10:37:51 +0000
+Message-ID: <DB7PR07MB57856A83E042E478FF972A1E9ADD0@DB7PR07MB5785.eurprd07.prod.outlook.com>
+Accept-Language: nl-BE, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=F.Vieren@televic.com; 
+x-originating-ip: [84.199.255.188]
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;DB7PR07MB4825;6:YQTX5rB0Ffez4dcRkKKBrjulPdN5+wWaLkbGJW/cg6PHKAq6mBHW//pFufdAGEo7WeREe777e4FatRBj0qx7EUQGXsMztyJw6dGyUtQOYLOiL19N8wzJpuQPikcIxCZ1mKmW2vzePGW3RLhpJx9wEWD/FlNyo5y2v2BEGzoTS+aUUlk6p8AU7aS3QQpE0HuI7sevATxrcKSMLr3ZfY9newknbO61iLIYyaXh/Z+YvgjF2eSEvxVc1fo510krZOLZ4tsxrVg39pslndNwfPsPZImQ87epxfWPeMFdyKFpsOjp/G3cQhP49nBlu3G8SxaaN9Lk8kuq6PD82Fkr5zcLc9TNSyFV1IsJM6cPJFhS16tsZqrlbfx+DfixBW09roUVwCirO1Oi3BePj9c2uy+L3B1fBtEC9WLjmFkSDS6kdv+l+K5ZBi+2LyCtKJlf2NODyrsZrrzvb/RuGXqmAWat9Q==;5:9K+dFiEDOIufFjnG4nnm32JjEtoqlAht70E5lGew6UW2qob6AIGqg+kIzYBy3UNMFjMg4uueMU326Sra9FQ3NcWsYUHytOTvA1i/kXUI9aB+sI6drnMBvLKYVZFLLnNhrq07j7VIdSD6fkgXncqYG/SlHHosLA8tGtX2Qj/onZE=;7:MqvQX7ijib/FEqBW+2IBpBaUUot3aXHoxw89YW5ZIvklBI3ZN47XvD8qCEjiY4w8Hd5HXNMRBAjMHevJsR/wBuzBE9IkUlh2012hUlSrtlqTtGmhM2gDWsoImljxcT7MywX9jWCQ9TujBaZFHiJBTA==
+x-ms-exchange-antispam-srfa-diagnostics: SOS;
+x-ms-office365-filtering-correlation-id: 2120f374-c1d2-4288-bc1f-08d64baf8f2e
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390098)(7020095)(4652040)(8989299)(5600074)(711020)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060)(7193020);SRVR:DB7PR07MB4825;
+x-ms-traffictypediagnostic: DB7PR07MB4825:
+x-microsoft-antispam-prvs: <DB7PR07MB4825EE5A7AA8296FE477F5109ADD0@DB7PR07MB4825.eurprd07.prod.outlook.com>
+x-exchange-antispam-report-test: UriScan:;
+x-ms-exchange-senderadcheck: 1
+x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(6040522)(2401047)(8121501046)(5005006)(93006095)(93001095)(10201501046)(3231415)(944501410)(52105112)(3002001)(148016)(149066)(150057)(6041310)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(20161123562045)(20161123558120)(20161123560045)(20161123564045)(201708071742011)(7699051)(76991095);SRVR:DB7PR07MB4825;BCL:0;PCL:0;RULEID:;SRVR:DB7PR07MB4825;
+x-forefront-prvs: 0858FF8026
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(39850400004)(136003)(346002)(366004)(376002)(51874003)(189003)(199004)(6506007)(8936002)(33656002)(8676002)(66066001)(105586002)(486006)(256004)(102836004)(81156014)(2351001)(6916009)(106356001)(81166006)(26005)(2906002)(7696005)(5660300001)(99286004)(476003)(9686003)(68736007)(71190400001)(6306002)(2900100001)(14454004)(25786009)(53936002)(305945005)(7736002)(74316002)(316002)(6436002)(478600001)(72206003)(86362001)(55016002)(97736004)(5640700003)(71200400001)(6116002)(966005)(3846002)(2501003)(186003);DIR:OUT;SFP:1102;SCL:1;SRVR:DB7PR07MB4825;H:DB7PR07MB5785.eurprd07.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: televic.com does not designate
+ permitted sender hosts)
+x-microsoft-antispam-message-info: DgZ9btB5UFwDxCuEJDYCkzvmPIHPFd804VBVaECBKgdeNgsFRspkHt84dFS4S7ywhJxkD0A5mRV8ZTUj6Gg4gLgFSqZ6ctkAERhrBf+TkLQN8iPoohKIYvBlTqETRke34mbwrOlv+jPQlu1KmM0y+zDZ/HWjOd5UQUja8DY58nmhN/5aVgjHtvNoDCmT96/7WMpcnxx2bXtQIOU5z9udknaaH2jALec9VWKN79c//XsxdEt7HT5PhGZInkylGc7QxL4Y6mtOL5lau1/UwjECPbzsi81rkDiUzPVxyA64z+bymNQtJPI95oBnnL0/ZHcVGK54vXr8UtfIWyEdXtGS0RUHrFIWFaPmRLBhZBArF6A=
+spamdiagnosticoutput: 1:99
+spamdiagnosticmetadata: NSPM
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e2362ad539463a3a139419b93ccca831@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: televic.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2120f374-c1d2-4288-bc1f-08d64baf8f2e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Nov 2018 10:37:51.1537
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 68a8593e-d1fc-4a6a-b782-1bdcb0633231
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR07MB4825
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 08:04:29PM +0530, Balakrishna Godavarthi wrote:
-> Hi Johan,
-> 
-> On 2018-11-14 20:57, Johan Hovold wrote:
-> > On Tue, Nov 06, 2018 at 05:35:25PM +0530, Balakrishna Godavarthi wrote:
-> >> wcn3990 requires a power pulse to turn ON/OFF along with
-> >> regulators. Sometimes we are observing the power pulses are sent
-> >> out with some time delay, due to queuing these commands. This is
-> >> causing synchronization issues with chip, which intern delay the
-> >> chip setup or may end up with communication issues.
-> >> 
-> >> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> >> ---
-> >>  drivers/bluetooth/hci_qca.c | 22 +++++++++-------------
-> >>  1 file changed, 9 insertions(+), 13 deletions(-)
-> >> 
-> >> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> >> index f72ded4ec9ae..051f081d1835 100644
-> >> --- a/drivers/bluetooth/hci_qca.c
-> >> +++ b/drivers/bluetooth/hci_qca.c
-> >> @@ -1016,8 +1016,7 @@ static inline void host_set_baudrate(struct 
-> >> hci_uart *hu, unsigned int speed)
-> >>  static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
-> >>  {
-> >>  	struct hci_uart *hu = hci_get_drvdata(hdev);
-> >> -	struct qca_data *qca = hu->priv;
-> >> -	struct sk_buff *skb;
-> >> +	int ret;
-> >> 
-> >>  	/* These power pulses are single byte command which are sent
-> >>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
-> >> @@ -1030,18 +1029,14 @@ static int qca_send_power_pulse(struct hci_dev 
-> >> *hdev, u8 cmd)
-> >>  	 * sending power pulses to SoC.
-> >>  	 */
-> >>  	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
-> >> -
-> >> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
-> >> -	if (!skb)
-> >> -		return -ENOMEM;
-> >> -
-> >>  	hci_uart_set_flow_control(hu, true);
-> >> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
-> > 
-> > Don't you want a non-zero timeout here? Otherwise you might as well
-> > call serdev_device_write() directly.
-> 
-> [Bala]: we need an in definite timeout for these commands. will use 
-> HCI_UART_TX_WAKEUP.
-> 
-> > Also have you made sure that serdev_device_write_wakeup() is called in
-> > the drivers write-wakeup callback as serdev_device_write() requires?
-> > 
-> > See this series in case what you really wanted was to wait indefinitely
-> > (you can use MAX_SCHEDULE_TIMEOUT):
-> > 
-> > 	https://lkml.kernel.org/r/<20181114150904.19653-1-johan@kernel.org>
-> 
-> [Bala]: thanks for pointers. from 
-> https://lore.kernel.org/patchwork/patch/1012358/
->          it was clear to me that i need call below functions in order to 
-> wait until full data is sent.
-> 
->          serdev_device_write_wakeup()
->          serdev_device_write()
->          serdev_device_wait_until_sent()
-> 
->          correct me whether my understanding is correct.
+Hallo,
 
-No, serdev_device_write_wakeup() needs to be called from the serdev
-driver's write_wakeup() callback (as defined in struct struct
-serdev_device_ops).
+Recently I have been started exploring the BLE world of hardware and softwa=
+re.
 
-Either use serdev_device_write_wakeup() as the callback, or call it from
-your driver's custom write_wakeup() callback.
+In my quest to find the best SW framework to address BLE hardware I have be=
+en confronted with this issue as described here : https://bugreports.qt.io/=
+browse/QTBUG-71727 when trying to use the QT BLE SW stack in use with Nordi=
+c BLE nRF52832 hardware.
 
-Hmm, I see now that the callbacks are set in hci_uart_register_device()
-to hci_serdev_client_ops, which is shared by all serdev BT drivers. You
-may be able to just add the call to the callback defined there so that
-all Bluetooth drivers can use serdev_device_write().
+To summarize my findings:
+- When the public device address of the Nordic HW is NOT set, meaning in Li=
+nux the hcitool dev or hciconfig tooling will show the ZERO device address =
+meaning 00:00:00:00:00:00 assigned to the HCI adapter/controller. The bluet=
+oothctl tool will show the "random" address different from zero's.
+- When running in this case(setup) the QT heartrate-server applic (QT v5.11=
+ on Linux Ubuntu 18), the QT application fails to find the proper HCI adapt=
+er as it compares the address found by reading out the HCIdevice address vi=
+a ioctl (resulting in 00:00:00:00:00:00) and the address retrieved from the=
+ BlueZ adapter (DBus) that corresponds to the random address created by Nor=
+dic (also the address shown via bluetoothctl).=20
 
-Johan
+So my question is after I have set the "public device address" via the hcit=
+ool cmd 0x3f 0x006 BD_ADDRESS, the random address is no longer the random a=
+ddress set by Nordic it has changed into the public address (although when =
+looking via DBUS at the address for the Adapter1, the address type is still=
+ set as random) I configured and the QT application will succeed as both ad=
+dresses will match.
+
+Any idea what is happening in this process.
+
+Thanks in advance,
+Best regards,
+Frank
