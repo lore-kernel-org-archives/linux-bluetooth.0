@@ -2,121 +2,110 @@ Return-Path: <SRS0=Z/iR=N3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 680A9C43441
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9195AC43441
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:18:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16DC52087A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:15:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FC4D2086C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 19:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="qNWC2EK1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16DC52087A
+	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="JBiUuLqM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FC4D2086C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725804AbeKQF2i (ORCPT
+        id S1725804AbeKQFcO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 17 Nov 2018 00:28:38 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53819 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725729AbeKQF2h (ORCPT
+        Sat, 17 Nov 2018 00:32:14 -0500
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:34861 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725729AbeKQFcN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 17 Nov 2018 00:28:37 -0500
-Received: by mail-wm1-f66.google.com with SMTP id f10-v6so23047828wme.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 11:14:59 -0800 (PST)
+        Sat, 17 Nov 2018 00:32:13 -0500
+Received: by mail-vs1-f67.google.com with SMTP id e7so14376112vsc.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 11:18:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=augury.com; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5eO2sjIh+NTZFkj6UFvRs1KxnPlyQpZQtrRuOOyN6p0=;
-        b=qNWC2EK1t0rtBuB8yEPZsEmn9c1J7IzkvxGp1gzUFc5DhnsqlfyQphmkP4kcC7GFbn
-         lPL1zm/y40I/AbuJqlMV3S+BUdHWYwaSF9gUW8UkzmC0NEQYUN0ieGm72EGzsMcvaoz7
-         +cWPDyYiCRHxmMQjrSC5rIolR1B1W/gkCMPMo=
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=y7FBZN72cICJGv/KWbFSo63/QIIWi45/uQgrOhU1+Ic=;
+        b=JBiUuLqMuWLw5Gcvf+Z6LUHuRxpKqhU9MyOr81nshrwNbuYMlPgD7ZjWcdOf3hWO9R
+         L1nHfFtPL7nfuwmAjAz2DRo/YFmb3vkN5BFTBFke8rDSB7fPpG6JpUXD6B9diYVvINoZ
+         xWDZcmjECmiWXJJkWDX3OxX8NTQ5BWNoi3VS4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5eO2sjIh+NTZFkj6UFvRs1KxnPlyQpZQtrRuOOyN6p0=;
-        b=NxfbvASsGdopWa+VXYn6/cu5fwz0ZJrqAZL7H0EY2//lLCHLYG/jDL8Rrn6W5WW7E0
-         FHCyyZJeYj/OcSgYTXcAFncGe5xo+7bWcJodX4FuHd1AK6qCrlGMo6G4OlJbYgD4c+2q
-         H77DKs09Eu6VZnlW47vX63NnPw6RY0Pg8uKKa0Bmap0URrZTIHnS+kCL/ZhGCr7CgiS7
-         SAH9VLsWan9TumN1OKS6vT59fscbDuJRG46qjqNhsUjJDKwiKtg1n/vMnBb+XTzDcVDt
-         ZZcjI33X2CybD//7GtPzHI0HN3VbQykUe+F/E4tJRGeV63o7dK6u2fxJ7O6yJjaFHg/U
-         pGWQ==
-X-Gm-Message-State: AGRZ1gL7X4yeCWVyliTpB5wto0aLx6s5cDDCSTayTxtJ4IqzgrogV8ix
-        Aw6+uvlI1Vd4St0VhVhDDZimpRWQIqnukYfB+PXMFjRfIUpdjMHnqyZSqVVMaiqHcVrlU002w8o
-        6xD9F020yb8gR62hremGpQQRBDR2+Zaijhr1c2aWy1etqfyguR5MIaO/b7LKk/gIwsgSj4Msq83
-        T8HbA=
-X-Google-Smtp-Source: AJdET5f6PO0anwFLGD0lAeIPx2zucAIhBDYaJuAF9TMOZSOI3yBkKOx8razlz1Npxnl/6Zo8Rxx7Xg==
-X-Received: by 2002:a1c:9f01:: with SMTP id i1-v6mr9560077wme.8.1542395697729;
-        Fri, 16 Nov 2018 11:14:57 -0800 (PST)
-Received: from localhost.localdomain (bzq-79-182-246-1.red.bezeqint.net. [79.182.246.1])
-        by smtp.gmail.com with ESMTPSA id 64-v6sm26679102wml.22.2018.11.16.11.14.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 16 Nov 2018 11:14:56 -0800 (PST)
-From:   Gal Ben-Haim <gbenhaim@augury.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Gal Ben-Haim <gbenhaim@augury.com>
-Subject: [PATCH BlueZ] core: Ignore SIGPIPE
-Date:   Fri, 16 Nov 2018 21:14:52 +0200
-Message-Id: <20181116191452.17377-1-gbenhaim@augury.com>
-X-Mailer: git-send-email 2.19.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=y7FBZN72cICJGv/KWbFSo63/QIIWi45/uQgrOhU1+Ic=;
+        b=Jy2lNAMHL/jbiLfA65fo7o+8CkZ7v1girhS1BRZMo8JX/mVHcv8AnWLwjq8nYoTYN0
+         KMQ3DERWgsQ/2pw1F+q4dkwQGhFYeB3lTp1o/aJQf4i5MjKK+FnzJtxUQk3TV656u/GV
+         VLkmZGGoZHjaEq9RjMWjds4yIKqqOAIY3g4BG/dRXSoPNnZP+dLwMJB5XH2BxJw8mWkn
+         ljFZOyZpxSHBLPhRRACXqf7jQvJTX48FWEpjc32pXv8p0ABFs+kv0bX5SN0CvtI8C3QU
+         bXsltoX2nbjuXjZhHVaak2Bi8v/CHgY81uO2R7Lf2uS3OYj8dgUqM2/qP4EtHX+RL4zN
+         0XxQ==
+X-Gm-Message-State: AGRZ1gLhw7pZKgB3bCvtPSW2fucSWFJmUL1wJiJCi8mMMS/awkm3pMnJ
+        fwEOoeW02Mp25Azi3PlbKQz3vudcSGq5hJKqe/qEQA==
+X-Google-Smtp-Source: AJdET5cCkkFbClAYa1sARrYyLjIjeU0eCohGGvw8weD32JusR1cQCSmxqihov8o6JqNSwyOqVagW8q1mtuATFSgPIsk=
+X-Received: by 2002:a67:10c3:: with SMTP id 186mr5140123vsq.209.1542395913589;
+ Fri, 16 Nov 2018 11:18:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20181115083817.20986-1-gbenhaim@augury.com> <CABBYNZJ_TEM18yfO6O4HFdyo7sm-cE8iL4Y8_DEa1e6xZ7a=Bg@mail.gmail.com>
+ <CAHotPr-jS457EKX=7dvcwA6eB12zr7d2dZG5Prjh6+fMdAT=+Q@mail.gmail.com>
+ <9007400A-D10D-4906-AB75-6D6395AF98FD@holtmann.org> <CAHotPr9Jb3Prqk_tkaeTRsJk0VgsGWbj8tsSdEp-Q9mb9Dt=-A@mail.gmail.com>
+ <CAHotPr-BO=RE6HZYWsC1+MT9oSZ58Xf-8XLz53BJq0Z6Em9Hsw@mail.gmail.com>
+ <CAO1O6seRNsBvz_sdZHKZhSYc3wbeZPOf-_0qXEG6PAnom0qcvA@mail.gmail.com> <CAHotPr_3F-wCDyKryYa-K_=tmLP7cwRDqhbzWNDJ2P7EmYxRVg@mail.gmail.com>
+In-Reply-To: <CAHotPr_3F-wCDyKryYa-K_=tmLP7cwRDqhbzWNDJ2P7EmYxRVg@mail.gmail.com>
+From:   Gal Ben Haim <gbenhaim@augury.com>
+Date:   Fri, 16 Nov 2018 21:18:22 +0200
+Message-ID: <CAHotPr9S0b_i9_Wj-swQoRHBe2qOQ_pZx7XmLLJ2sQTeABaycQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatt: Ignore SIGPIPE
+To:     Emil Lenngren <emil.lenngren@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-bluetoothd receives a SIGPIPE and terminates if writing to a pipe that
-was acquired by AcquireNotify and there are no readers. it can be
-reproduced by terminating the reader process without closing the reader
-end of the pipe.
-
-Ignoring the SIGPIPE will cause the write operation to return an
-error which will be logged as "io_send: Broken pipe".
----
- src/main.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/src/main.c b/src/main.c
-index 4716f5388..c62886593 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -691,7 +691,7 @@ int main(int argc, char *argv[])
- 	uint16_t sdp_mtu = 0;
- 	uint32_t sdp_flags = 0;
- 	int gdbus_flags = 0;
--	guint signal, watchdog;
-+	guint signal_source, watchdog;
- 	const char *watchdog_usec;
- 
- 	init_defaults();
-@@ -721,7 +721,11 @@ int main(int argc, char *argv[])
- 
- 	event_loop = g_main_loop_new(NULL, FALSE);
- 
--	signal = setup_signalfd();
-+	signal_source = setup_signalfd();
-+
-+	/* Ignore SIGPIPE, a broken pipe error will be returned from write 
-+	 * attempts to a pipe with no readers */
-+	signal(SIGPIPE, SIG_IGN);
- 
- 	__btd_log_init(option_debug, option_detach);
- 
-@@ -809,7 +813,7 @@ int main(int argc, char *argv[])
- 
- 	sd_notify(0, "STATUS=Quitting");
- 
--	g_source_remove(signal);
-+	g_source_remove(signal_source);
- 
- 	plugin_cleanup();
- 
--- 
-2.19.1
-
+I submitted another patch that does it in src/main.c -
+https://marc.info/?l=linux-bluetooth&m=154239570400752&w=2
+On Thu, Nov 15, 2018 at 5:43 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
+>
+> should it be added to setup_signalfd in main.c ?
+>
+> On Thu, Nov 15, 2018 at 2:56 PM Emil Lenngren <emil.lenngren@gmail.com> wrote:
+> >
+> > Den tors 15 nov. 2018 kl 12:55 skrev Gal Ben Haim <gbenhaim@augury.com>:
+> > >
+> > > I submitted a different patch -
+> > > https://marc.info/?l=linux-bluetooth&m=154228281730667&w=2
+> > > On Thu, Nov 15, 2018 at 12:20 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
+> > > >
+> > > > I can try to create another patch for it
+> > > >
+> > > > On Thu, Nov 15, 2018 at 12:18 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+> > > > >
+> > > > > Hi Gal,
+> > > > >
+> > > > > > io_send can use poll and check for POLLOUT and POLLRDHUP before
+> > > > > > writing to the pipe
+> > > > >
+> > > > > that should be done anyway since code that writes to a pipe descriptor (or socket for that matter) without checking that it is still valid is broken code.
+> > > > >
+> > > > > Regards
+> > > > >
+> > > > > Marcel
+> > > > >
+> >
+> > Even if you first check for writability with poll, you still need to
+> > also ignore the SIGPIPE signal, since the connection could be reset
+> > after the check is made but before the write is executed, I guess. But
+> > the "signal(SIGPIPE, SIG_IGN)" should usually be made once at
+> > application initialization.
+> >
+> > /Emil
