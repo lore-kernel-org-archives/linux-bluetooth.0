@@ -4,64 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-18.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCE9C43610
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82335C43441
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 67627206B2
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46464206B2
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VoTZcDlK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67627206B2
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KRJ9ktXt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46464206B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730845AbeKQLWn (ORCPT
+        id S1731028AbeKQLWv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 17 Nov 2018 06:22:43 -0500
-Received: from mail-pl1-f202.google.com ([209.85.214.202]:54479 "EHLO
+        Sat, 17 Nov 2018 06:22:51 -0500
+Received: from mail-pl1-f202.google.com ([209.85.214.202]:38964 "EHLO
         mail-pl1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730012AbeKQLWm (ORCPT
+        with ESMTP id S1730286AbeKQLWu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 17 Nov 2018 06:22:42 -0500
-Received: by mail-pl1-f202.google.com with SMTP id k14-v6so18426888pls.21
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 17:08:01 -0800 (PST)
+        Sat, 17 Nov 2018 06:22:50 -0500
+Received: by mail-pl1-f202.google.com with SMTP id 34-v6so18449907plf.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 17:08:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=s3V1He2Zj5wng/11t7K3HEWj/4wZGpXZr3vO1JV3B7s=;
-        b=VoTZcDlK+vJS5EdgLM8TokoaYkl1BgjquuNWLN560DpIJoU8cTccEOBZb0dyCqJwzN
-         39fteUJOWxdSIDetnAJYERMadSBBhZRFD3fSExO4UQrlWBf8YisCo1zT+5/xtA7GQHLW
-         JefAYZ9XiCf2CIa3Ypzngk4KgvISSKXfv2gtPkCDcIZp9Pumw4a/PziS47Tx5tP0jaiN
-         PPeLBOr0U6oFM6HqQwrdnRkqHFYC1xFqPVGGMZNf+xeKeWtP4JZryYmD2Ka9QR6EOJLL
-         HTyTWHh6QpqmQiO0TaqcKxYDSAWJV4hWgoPuN9YX8oSCjXG1lLCt3RaQD+vHGrYfOeP8
-         hvsQ==
+        bh=otj/32ePMtp8zjyI9T3AOMCzqrhYC3AtvdJgM2y5xMU=;
+        b=KRJ9ktXtxL92PTIPjGraoP+jZH+QxfyrW0XLo5P38qqRG5iXW4H0mbHVGrTJY01VVY
+         5IQkgkU8oE7auKOf1UjR0ex9sDUtY3z6klXTaGvBm6z7jZ31hwKDLIfkIsCIGqQLj3qJ
+         rRQYBIWTdtCd8UERr8EnmPR8+st0jufTbj853h8ul+nW3py4ooVTOUZYjzDRQH0jVfRn
+         p3g5E2BWinWrcvlh8ET0/PqZW6pjQIdslKm93VXTCiau0BoZ2VXfgsofdeAMYzID9YTD
+         07wb0FyHo6ZoJbIitMBhVaRKA0IfzjCQqu/ZtOzyLQPfcA35pHFgJXLSJcfCrIRIhz5r
+         9BVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=s3V1He2Zj5wng/11t7K3HEWj/4wZGpXZr3vO1JV3B7s=;
-        b=a6YDXVdhxqcG9v5uxTVc1dcWtxnvomJV+E9W4uPceEFbJr0XY+lya0/RVBl8l2Jkqn
-         j59nPCI0rbWMlwVQguSqqZZzLZG0isSMFIhK/BZ7QshnoxCJCa2gI5ZC4NdaP+ZD+XO0
-         qgU21s3oRfQRMfr5gISRBVdyosz719ds3oK7gcpdhb9CqfOaOU7+M8eCCPRAOMCCev57
-         rKVSx2D9Fvi/muS0qOVihHG8dWlfmNwEhK2mgMPUx4gihvtDzSSGV0MNVdMqjvvopCPd
-         jG71oq/1AfBIs1or6lipIT1E5zjDXOpPMyg0T4r/1DuQ9rVaG2tlxXu2Bh3VbkMsndVH
-         nASw==
-X-Gm-Message-State: AGRZ1gJfWvkE4gXSfypWuTqOznz9rbw9oPbjTAnXLGcZjT1b+VInc/xu
-        3Kk67SDaxRh+DRgigXrASwz+qUni94d7
-X-Google-Smtp-Source: AJdET5fT21G7Mst65AWLTtqZDKa2Kxm5bUKbPAIVj2Mk2Av80SRcUeA7bJ33k04/S8D3kGmbtP06CQBXFq36
-X-Received: by 2002:aa7:8157:: with SMTP id d23-v6mr186165pfn.136.1542416881178;
- Fri, 16 Nov 2018 17:08:01 -0800 (PST)
-Date:   Fri, 16 Nov 2018 17:07:45 -0800
+        bh=otj/32ePMtp8zjyI9T3AOMCzqrhYC3AtvdJgM2y5xMU=;
+        b=s15GvF2IZ2h6OSZzAXmB+27O0WM5I7THbOhzFI1VGFRpxNBitaAnw1BbDXcKDDUlNo
+         S16OGzS3028U1NvawvILwUjPTROUMX0TOX2K0Fo+edwO+ydPOTLt6aItJu796jYxy8P1
+         k87t7HAS35hAiOFoM1J2CaPDjR1bPbv1ret3XwHWKGu85/Mqr1SOm4qrBD9JewLplpu4
+         udCErSIRwK77B/rBvvcA07eLzJAloDT6IJlfdupD9KahTwWOeekGG/XL9cBq/TyX6ZZG
+         DD9bPedxHcMdRB7glCVoHxF4QHjLHF2cmDNppIaDqkvzNMDRtN6oP4QVRmcM3AcDX1AJ
+         IF+w==
+X-Gm-Message-State: AA+aEWZJp0r1zSpG4keCuOk5RJ03nm6AYhHiTteTUrYzgYPpkPLX0KlT
+        mED6J9iJY1LzHQUv17SI1XlgiA80Ez5/
+X-Google-Smtp-Source: AFSGD/XRJZoMm/pkhIcQK8n1ROMyqQENtXD0+5hcPxiq6+KXNTzOQ3LxFLcqSj/FLV/zvuQs2WbLKtVsxm0m
+X-Received: by 2002:a63:e210:: with SMTP id q16mr64085pgh.132.1542416889258;
+ Fri, 16 Nov 2018 17:08:09 -0800 (PST)
+Date:   Fri, 16 Nov 2018 17:07:47 -0800
 In-Reply-To: <20181117010748.24347-1-rajatja@google.com>
-Message-Id: <20181117010748.24347-3-rajatja@google.com>
+Message-Id: <20181117010748.24347-5-rajatja@google.com>
 Mime-Version: 1.0
 References: <20181117010748.24347-1-rajatja@google.com>
 X-Mailer: git-send-email 2.19.1.1215.g8438c0b245-goog
-Subject: [PATCH 2/5] usb: assign ACPI companions for embedded USB devices
+Subject: [PATCH 4/5] Bluetooth: btusb: Collect the common Intel assignments together
 From:   Rajat Jain <rajatja@google.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -80,93 +80,60 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Dmitry Torokhov <dtor@chromium.org>
+The BTUSB_INTEL and BTUSB_INTEL_NEW have common functions & quirks are
+assigned to hdev structure. Lets collect them together instead of
+repeating them in different code branches.
 
-USB devices permanently connected to USB ports may be described in ACPI
-tables and share ACPI devices with ports they are connected to. See [1]
-for details.
-
-This will allow us to describe sideband resources for devices, such as,
-for example, hard reset line for BT USB controllers.
-
-[1] https://docs.microsoft.com/en-us/windows-hardware/drivers/bringup/other-acpi-namespace-objects#acpi-namespace-hierarchy-and-adr-for-embedded-usb-devices
-
-Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
-Signed-off-by: Rajat Jain <rajatja@google.com> (changed how we get the usb_port)
+Signed-off-by: Rajat Jain <rajatja@google.com>
 ---
- drivers/usb/core/usb-acpi.c | 44 +++++++++++++++++++++++++++++--------
- 1 file changed, 35 insertions(+), 9 deletions(-)
+ drivers/bluetooth/btusb.c | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/usb/core/usb-acpi.c b/drivers/usb/core/usb-acpi.c
-index 8ff73c83e8e8..9043d7242d67 100644
---- a/drivers/usb/core/usb-acpi.c
-+++ b/drivers/usb/core/usb-acpi.c
-@@ -200,30 +200,56 @@ static struct acpi_device *
- usb_acpi_find_companion_for_device(struct usb_device *udev)
- {
- 	struct acpi_device *adev;
-+	struct usb_port *port_dev;
-+	struct usb_hub *hub;
-+
-+	if (!udev->parent) {
-+		/* root hub is only child (_ADR=0) under its parent, the HC */
-+		adev = ACPI_COMPANION(udev->dev.parent);
-+		return acpi_find_child_device(adev, 0, false);
-+	}
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7439a7eb50ac..e8e148480c91 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3077,28 +3077,25 @@ static int btusb_probe(struct usb_interface *intf,
+ 		data->diag = usb_ifnum_to_if(data->udev, ifnum_base + 2);
+ 	}
+ #endif
++	if (id->driver_info & BTUSB_INTEL ||
++	    id->driver_info & BTUSB_INTEL_NEW) {
  
--	if (!udev->parent)
-+	hub = usb_hub_to_struct_hub(udev->parent);
-+	if (!hub)
- 		return NULL;
+-	if (id->driver_info & BTUSB_INTEL) {
+ 		hdev->manufacturer = 2;
+-		hdev->setup = btusb_setup_intel;
+-		hdev->shutdown = btusb_shutdown_intel;
+-		hdev->set_diag = btintel_set_diag_mfg;
+ 		hdev->set_bdaddr = btintel_set_bdaddr;
+ 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+-	}
  
--	/* root hub is only child (_ADR=0) under its parent, the HC */
--	adev = ACPI_COMPANION(udev->dev.parent);
--	return acpi_find_child_device(adev, 0, false);
-+	/*
-+	 * This is an embedded USB device connected to a port and such
-+	 * devices share port's ACPI companion.
-+	 */
-+	port_dev = hub->ports[udev->portnum - 1];
-+	return usb_acpi_get_companion_for_port(port_dev);
- }
+-	if (id->driver_info & BTUSB_INTEL_NEW) {
+-		hdev->manufacturer = 2;
+-		hdev->send = btusb_send_frame_intel;
+-		hdev->setup = btusb_setup_intel_new;
+-		hdev->hw_error = btintel_hw_error;
+-		hdev->set_diag = btintel_set_diag;
+-		hdev->set_bdaddr = btintel_set_bdaddr;
+-		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+-		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+-		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
++		if (id->driver_info & BTUSB_INTEL) {
++			hdev->setup = btusb_setup_intel;
++			hdev->shutdown = btusb_shutdown_intel;
++			hdev->set_diag = btintel_set_diag_mfg;
++		} else {
++			hdev->send = btusb_send_frame_intel;
++			hdev->setup = btusb_setup_intel_new;
++			hdev->hw_error = btintel_hw_error;
++			hdev->set_diag = btintel_set_diag;
++		}
+ 	}
  
--
- static struct acpi_device *usb_acpi_find_companion(struct device *dev)
- {
- 	/*
--	 * In the ACPI DSDT table, only usb root hub and usb ports are
--	 * acpi device nodes. The hierarchy like following.
-+	 * The USB hierarchy like following:
-+	 *
- 	 * Device (EHC1)
- 	 *	Device (HUBN)
- 	 *		Device (PR01)
- 	 *			Device (PR11)
- 	 *			Device (PR12)
-+	 *				Device (FN12)
-+	 *				Device (FN13)
- 	 *			Device (PR13)
- 	 *			...
--	 * So all binding process is divided into two parts. binding
--	 * root hub and usb ports.
-+	 * where HUBN is root hub, and PRNN are USB ports and devices
-+	 * connected to them, and FNNN are individualk functions for
-+	 * connected composite USB devices. PRNN and FNNN may contain
-+	 * _CRS and other methods describing sideband resources for
-+	 * the connected device.
-+	 *
-+	 * On the kernel side both root hub and embedded USB devices are
-+	 * represented as instances of usb_device structure, and ports
-+	 * are represented as usb_port structures, so the whole process
-+	 * is split into 2 parts: finding companions for devices and
-+	 * finding companions for ports.
-+	 *
-+	 * Note that we do not handle individual functions of composite
-+	 * devices yet, for that we would need to assign companions to
-+	 * devices corresponding to USB interfaces.
- 	 */
- 	if (is_usb_device(dev))
- 		return usb_acpi_find_companion_for_device(to_usb_device(dev));
+ 	if (id->driver_info & BTUSB_MARVELL)
 -- 
 2.19.1.1215.g8438c0b245-goog
 
