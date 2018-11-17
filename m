@@ -1,123 +1,109 @@
-Return-Path: <SRS0=Z/iR=N3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=7u80=N4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C2EC43441
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 23:46:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA883C43441
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:07:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AE0D20883
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Nov 2018 23:46:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81D92206B2
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:07:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="Ldt3wVc3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AE0D20883
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VlcF3LQB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81D92206B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728077AbeKQKAc (ORCPT
+        id S1729977AbeKQLWe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 17 Nov 2018 05:00:32 -0500
-Received: from mail-ua1-f66.google.com ([209.85.222.66]:38510 "EHLO
-        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726214AbeKQKAc (ORCPT
+        Sat, 17 Nov 2018 06:22:34 -0500
+Received: from mail-qk1-f202.google.com ([209.85.222.202]:44115 "EHLO
+        mail-qk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727116AbeKQLWe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 17 Nov 2018 05:00:32 -0500
-Received: by mail-ua1-f66.google.com with SMTP id p9so8878719uaa.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 15:46:05 -0800 (PST)
+        Sat, 17 Nov 2018 06:22:34 -0500
+Received: by mail-qk1-f202.google.com with SMTP id f22so54537669qkm.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 17:07:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=augury.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6faokSPAGhS4yqRfNMcPaylbTt71jpMgejl9GWDOpP4=;
-        b=Ldt3wVc3WrsubCL0BOLbIKjdmE6vQCgkGWHqCLfvOR+sRqj6K4AvBuFzPyJRag1T+d
-         5UfxjX5l+mc708zXRZOCJU+bo3xwYkQglMaSvvfitOxS1E4tlTwXF8SvIX61R047Fzpn
-         qQhmpDTILGeHsdgF5Z7tqvi3tu6a07kcDTdLc=
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=//oLCiaulrU9R/KxJFqT9+N+Fsj9dA6lmJFRUXTRLEc=;
+        b=VlcF3LQB2Y42qfvTiU3KNZqAvi2pTcAVzWtEneJ5Tfb45i0I6Eq3mi0UMaVeVdkFWw
+         3rcgdseEFurHdFUfsA0ucpy0mt4vnvWfmRQbR+MnpvHwF0NDZJUAzj2pg0t/848UfImB
+         Km/3ffOGk9LyePxLH81bRKpVWoy0wlH4ndFKp5yWB9vx8vhJByUM6yRw4adzBRDzMfMy
+         oNZdaYnJ0wH+uXwemJCogKV7YcmQ2w4SD3qTdPF9etT5k53e8o0fguEmB951vCdYPhnz
+         IEzUdCvcBhNqGXW1Dq3Spo8otpBc5Ddt/o9QEHkpm6qISHryHGPS1Vs19tiRcoS3CGn7
+         uljQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6faokSPAGhS4yqRfNMcPaylbTt71jpMgejl9GWDOpP4=;
-        b=IgWXjzdCOs5bjwLwgPRZxIl57BluCdrHJFFM/g9FHhGXIXZzBla3JwRRgRqymAswLN
-         Vo2mbgi+ZC1TiJelXea3jRSogyuBC68vFfC5BxFoazfW+BhBkUdhlG5qpzbvy/FJ+Jac
-         0e2gPxMTOwouSz2RzX8zQIiuMieS6buYSIG+wF1qtgIJPQ1sfdILCjW/3Sbd0FTH1DfY
-         rh1JwuzGYFpRzfRi7m1aoeyfFhvkQ9G9zIxbx3c1Qyl6dRSl6wXRpESeA+SlO5WnZ1O2
-         4VsGbgtA/CLGxl/Vzv75dctEXYfAc7mecm9gKz9reHHYk4ROyLu2WZGlZ9fOOHqq3nq7
-         isbg==
-X-Gm-Message-State: AGRZ1gKrPDT4VvWlkjquc6QPWpdCAZza8zh1iYPnw5IZbPz/BJKaahAQ
-        6bmQi3oYjOC+QdjN9CoQmjd6aW2zR5nwwl/tYeuS/OzCj2k=
-X-Google-Smtp-Source: AJdET5dT8rtmfIm5ieD0VO9hRONDJMU08XCw847hsQxUXvtTldXHVx+wOl77XeHU9v3a2hV0f6AfAPhr+9b0qGELefU=
-X-Received: by 2002:ab0:4a16:: with SMTP id q22mr5658595uae.1.1542411965186;
- Fri, 16 Nov 2018 15:46:05 -0800 (PST)
-MIME-Version: 1.0
-References: <20181116191452.17377-1-gbenhaim@augury.com> <5F365876-5DA6-4916-B810-E2DF1ABD3772@holtmann.org>
- <CAHotPr-cE2gc9Gue9ekyqgb4fFCR+jPWuVYcQzNrpFc-BmW7-g@mail.gmail.com>
-In-Reply-To: <CAHotPr-cE2gc9Gue9ekyqgb4fFCR+jPWuVYcQzNrpFc-BmW7-g@mail.gmail.com>
-From:   Gal Ben Haim <gbenhaim@augury.com>
-Date:   Sat, 17 Nov 2018 01:45:54 +0200
-Message-ID: <CAHotPr_nF+ZLmRAVUKPFdbGJ2rt_+vBA9cv5-pgEf-DHhJueJQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core: Ignore SIGPIPE
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=//oLCiaulrU9R/KxJFqT9+N+Fsj9dA6lmJFRUXTRLEc=;
+        b=VJQzaaAQAqklIgrNL+Vt+67heWMoNtfj+l+wrp56O4PdezdkWGlifCQ4KihyJ86wPH
+         XO6JbFGlfufS7xNG87zyTtQhYjtGAZ0yLCPtT22WhNsUc+lgKNOEoYTJcCYP1ceBfBOj
+         C7UHqhzMiX/aWCQRsMv9zkTzIkuRwQrpnfBiSj841NGIwo9ZeClGS6a0VgpwkJUO2ycu
+         6xA1MYGsEkZ+wMlUmvi7n6uxupxdy3qZd+j8k/mNIKtjFe+tsH2sSMyA44i147od08xs
+         k5U2rO6pkBwQfhLrJnN6WedFjmpVnZw/WxW3fDK/SXi67l+amsjALXmlODbdxZA7G0NG
+         xb8A==
+X-Gm-Message-State: AGRZ1gLdrdapq64RGwz3Vb0EaKRWuWMH0LMu+EjFmuG0s2zDBnmPNQRK
+        YmwWgmjLl4eVlvOXE+4hS7Ab+Zh1EYUg
+X-Google-Smtp-Source: AJdET5dUOdhATft1VO59rYlUEY0vQ3/Nq4Y0lQVF7D5mT5h+c9/l+ZQwf5l3A3yEibeQhg1wa3RLEmZrj6ZV
+X-Received: by 2002:aed:22a7:: with SMTP id p36mr5010855qtc.53.1542416873139;
+ Fri, 16 Nov 2018 17:07:53 -0800 (PST)
+Date:   Fri, 16 Nov 2018 17:07:43 -0800
+Message-Id: <20181117010748.24347-1-rajatja@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.19.1.1215.g8438c0b245-goog
+Subject: [PATCH 0/5] Reset Intel BT controller if it gets stuck
+From:   Rajat Jain <rajatja@google.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Torokhov <dtor@chromium.org>,
+        Rajat Jain <rajatja@google.com>,
+        Alex Hung <alex.hung@canonical.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-usb@vger.kernel.org, netdev@vger.kernel.org
+Cc:     rajatxjain@gmail.com, dtor@google.com, raghuram.hegde@intel.com,
+        chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I tried MSG_NOSIGNAL, see my other patch. the error is io_send: Socket
-operation on non-socket.
+There can be error conditions within Intel BT firmware that can cause it
+to get stuck, with the only way out being toggle the reset pin to the
+device. (I do not have the details about the issues that lead to such
+conditions, Intel folks copied here can elaborate if needed). Thus, this
+is an effor to be able to toggle the reset line from the driver if it
+detects such a situation. It makes few enhancements to the common
+framework which I think may be useful for other unrelated problems.
 
-please suggest an acceptable solution for this issue
-On Fri, Nov 16, 2018 at 10:11 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
->
-> what should signal_handler do in case of SIGPIPE? will failed write
-> return EPIPE if the signal is catched?
->
-> On Fri, Nov 16, 2018 at 10:01 PM Marcel Holtmann <marcel@holtmann.org> wrote:
-> >
-> > Hi Gal,
-> >
-> > > bluetoothd receives a SIGPIPE and terminates if writing to a pipe that
-> > > was acquired by AcquireNotify and there are no readers. it can be
-> > > reproduced by terminating the reader process without closing the reader
-> > > end of the pipe.
-> > >
-> > > Ignoring the SIGPIPE will cause the write operation to return an
-> > > error which will be logged as "io_send: Broken pipe".
-> > > ---
-> > > src/main.c | 10 +++++++---
-> > > 1 file changed, 7 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/src/main.c b/src/main.c
-> > > index 4716f5388..c62886593 100644
-> > > --- a/src/main.c
-> > > +++ b/src/main.c
-> > > @@ -691,7 +691,7 @@ int main(int argc, char *argv[])
-> > >       uint16_t sdp_mtu = 0;
-> > >       uint32_t sdp_flags = 0;
-> > >       int gdbus_flags = 0;
-> > > -     guint signal, watchdog;
-> > > +     guint signal_source, watchdog;
-> > >       const char *watchdog_usec;
-> > >
-> > >       init_defaults();
-> > > @@ -721,7 +721,11 @@ int main(int argc, char *argv[])
-> > >
-> > >       event_loop = g_main_loop_new(NULL, FALSE);
-> > >
-> > > -     signal = setup_signalfd();
-> > > +     signal_source = setup_signalfd();
-> > > +
-> > > +     /* Ignore SIGPIPE, a broken pipe error will be returned from write
-> > > +      * attempts to a pipe with no readers */
-> > > +     signal(SIGPIPE, SIG_IGN);
-> >
-> > if we decide not to use MSG_NOSIGNAL, then everything has to go via signalfd and not just by hacking in signal(SIG_IGN).
-> >
-> > Regards
-> >
-> > Marcel
-> >
+Dmitry Torokhov (2):
+  usb: split code locating ACPI companion into port and device
+  usb: assign ACPI companions for embedded USB devices
+  (This basically allows ACPI nodes to be attached to the USB devices,
+   thus useful for any onboard / embedded USB devices that wants to get
+   some info from the ACPI).
+
+Rajat Jain (3):
+  Bluetooth: Reset Bluetooth chip after multiple command timeouts
+  Bluetooth: btusb: Collect the common Intel assignments together
+  Bluetooth: btusb: Use the hw_reset method to allow resetting the BT
+    chip
+
+ drivers/bluetooth/btusb.c        |  63 +++++++++---
+ drivers/usb/core/usb-acpi.c      | 163 +++++++++++++++++++------------
+ include/net/bluetooth/hci.h      |   8 ++
+ include/net/bluetooth/hci_core.h |   2 +
+ net/bluetooth/hci_core.c         |  15 ++-
+ 5 files changed, 171 insertions(+), 80 deletions(-)
+
+-- 
+2.19.1.1215.g8438c0b245-goog
+
