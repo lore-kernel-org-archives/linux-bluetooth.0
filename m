@@ -2,252 +2,107 @@ Return-Path: <SRS0=7u80=N4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92054C43441
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67FB6C43441
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 06:00:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D5552089D
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19D5E2081C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 06:00:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fBEXgzgl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5552089D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="D4SEkSeU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19D5E2081C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731183AbeKQLXY (ORCPT
+        id S1725810AbeKQQQG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 17 Nov 2018 06:23:24 -0500
-Received: from mail-pf1-f202.google.com ([209.85.210.202]:55884 "EHLO
-        mail-pf1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730014AbeKQLWj (ORCPT
+        Sat, 17 Nov 2018 11:16:06 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:33947 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725791AbeKQQQG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 17 Nov 2018 06:22:39 -0500
-Received: by mail-pf1-f202.google.com with SMTP id s71so8859878pfi.22
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 17:07:58 -0800 (PST)
+        Sat, 17 Nov 2018 11:16:06 -0500
+Received: by mail-wm1-f66.google.com with SMTP id f1-v6so2272384wmg.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 22:00:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=3+V0B5HfCmIbS1CGOR3HioePk534q44RYhZtw60V2so=;
-        b=fBEXgzgljW3FCHJH2l0voeT5o3hZ/ZaRfqNSYdcAW0B1SuDjvpNbkT5ZXAO+sIEik3
-         u71feX4aANzbI/T6FPerx8/tZ3nVYm1NSeGhNOVAUmiuf/D8foByvRyvyz9JDNjeMM74
-         loSg9aQRCrjTiyZQ6p1Af4D7T8pbu14tlaqnO/BY4UR7pb1jq3K74BqzuCanoZ1sHFIe
-         AVoPSpVDML1GKT2cK1m2txAI14asWc6bxZwSo2O1dCUg7208DUU0V89Bz8o2tV/AiqkI
-         4iSyTe/31Yy58qLUSnkjFJFU7H9swtknd4Bcv/no5I7npndfnm98j8GuFvys+M9SgGxH
-         F31Q==
+        d=augury.com; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lKjUBvp8cZYpTdNf6HyoRHBaIh49PY7FXb3aWN7UQRg=;
+        b=D4SEkSeUSiNCrMNaNv6uF6ipQCyAwAxQbcJjN4OMTI40Q3zbYgtl7u7DnqRkWMNWN6
+         cNaz+ZP3i/rLX+JNeE5+eMwhQCzrVtOhnbEV7x3pUg47s4kRfGKb/ZPF0RnsQqwoZwuw
+         1E9uhygZACIjzHNwflqNQM9zFkmCyOGIiUkTo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=3+V0B5HfCmIbS1CGOR3HioePk534q44RYhZtw60V2so=;
-        b=cNwVnA3C4E3n8UVC56uht5gBbwLwvUwkdScWDlAVv2nEHZOGqDBrZuDRBdmmMP0O+R
-         wIZYtY0PVqcct9swWg7kLxfZjtT7ReD7Ia+r5z0MH9jensu6ymbtaP61Ep+clgAy4Rng
-         NuLC89mGmiKKVCz9rvA+ImkHbP05r7rIqF09YaYxAPIRuIdrBxM0i4qK15CxRte2Z7/N
-         HGJkreqgaYeXE3GpI+W2+R5KeZakiDowagEkMC4L1l5ryavvw6iksmPfH01Jt6HZ4FNC
-         t8BBiXB3oNVSNJ0Lkp0X3r7Q/uCdyFV+ER86tz4ZdVaiZL4yzsDI7ZkbltdjR3IqIjCI
-         Mcng==
-X-Gm-Message-State: AGRZ1gKiyjzx4Ul4zfYlAQFhpQks7FVE9gnbgIeyRJEYG/WMYwsy4eAs
-        NjMD9NRknuP4j9xLUAyXWNR9rogdkmsh
-X-Google-Smtp-Source: AJdET5dYgDB3ETVvI2sBtTEt31uhe4FlVl2dDpgGlyHkdTKyPft8YWW3ui3Cyh+L3Wj076+23u9sP0mO6vxn
-X-Received: by 2002:a62:ac0b:: with SMTP id v11mr425852pfe.104.1542416877428;
- Fri, 16 Nov 2018 17:07:57 -0800 (PST)
-Date:   Fri, 16 Nov 2018 17:07:44 -0800
-In-Reply-To: <20181117010748.24347-1-rajatja@google.com>
-Message-Id: <20181117010748.24347-2-rajatja@google.com>
-Mime-Version: 1.0
-References: <20181117010748.24347-1-rajatja@google.com>
-X-Mailer: git-send-email 2.19.1.1215.g8438c0b245-goog
-Subject: [PATCH 1/5] usb: split code locating ACPI companion into port and device
-From:   Rajat Jain <rajatja@google.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Torokhov <dtor@chromium.org>,
-        Rajat Jain <rajatja@google.com>,
-        Alex Hung <alex.hung@canonical.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-usb@vger.kernel.org, netdev@vger.kernel.org
-Cc:     rajatxjain@gmail.com, dtor@google.com, raghuram.hegde@intel.com,
-        chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lKjUBvp8cZYpTdNf6HyoRHBaIh49PY7FXb3aWN7UQRg=;
+        b=HS6kVl1pGzxTdnewUv14aOWsxzKtQ2CQ3zIt7EMiVnnnULs+WqGny5SeVEbGuyGk7E
+         oO7fADRV1GZb0bFegfpzu25i9U5iqvfERVigcC+pIyUfXNevZ2n7CqnhxDLTkpFMxB9J
+         JPUwCcn5L49bJY/LRirTn/LAu4dEv0mT81OooyfshC2SJ6iah146g4Hf1SM3/+rZQhTi
+         5BhOns78rn4xEqzvwm200H//8BGRveI3Wc7uVx6yTlgwh23umctp3/K8vaZl5+0AipX5
+         FxIbmHhiH0Xuey+Snbx2yA1y/xoYL1HK2NSuvVZg6vwOeaAv7xSHa+eExBrHzrf1rr9z
+         Oh2g==
+X-Gm-Message-State: AA+aEWYFdnz2t+iAkdoxUjdY5aed0mME5oyq1+8l6CeDsQH7PYcOdvpu
+        0FohCSLGpIniAjRm9B489P0T1jUun/jW9VsO0Zh3G+6parJVjSrk0KcIaOZX6VnmDP0hp/yQZ5i
+        fCROlbbGlEmGwDTDimVd4GZjyoq8JqcnhE6bbOOdfkk4WfblijA+iNy7MInszafR2AApfEBATEc
+        9dcjg=
+X-Google-Smtp-Source: AFSGD/UpmwkF5Jyjs55KHJFosadL5/dmkRJeDA+9nFBtHMpKeZC0oTaNnNW0B04jyImRO8gesHjWlg==
+X-Received: by 2002:a1c:4843:: with SMTP id v64mr263335wma.79.1542434431754;
+        Fri, 16 Nov 2018 22:00:31 -0800 (PST)
+Received: from localhost.localdomain (bzq-79-182-246-1.red.bezeqint.net. [79.182.246.1])
+        by smtp.gmail.com with ESMTPSA id q11-v6sm26935130wrj.7.2018.11.16.22.00.29
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 16 Nov 2018 22:00:30 -0800 (PST)
+From:   Gal Ben-Haim <gbenhaim@augury.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Gal Ben-Haim <gbenhaim@augury.com>
+Subject: [PATCH BlueZ] core: Catch SIGPIPE
+Date:   Sat, 17 Nov 2018 08:00:24 +0200
+Message-Id: <20181117060024.10390-1-gbenhaim@augury.com>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Dmitry Torokhov <dtor@chromium.org>
+bluetoothd receives a SIGPIPE and terminates if writing to a pipe that
+was acquired by AcquireNotify and there are no readers. it can be
+reproduced by terminating the reader process without closing the reader
+end of the pipe.
 
-In preparation for handling embedded USB devices let's split
-usb_acpi_find_companion() into usb_acpi_find_companion_for_device() and
-usb_acpi_find_companion_for_port().
-
-Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
-Signed-off-by: Rajat Jain <rajatja@google.com>
+Catching SIGPIPE will cause the write call to return an EPIPE error
+which will be logged as "io_send: Broken pipe".
 ---
- drivers/usb/core/usb-acpi.c | 133 +++++++++++++++++++-----------------
- 1 file changed, 72 insertions(+), 61 deletions(-)
+ src/main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/usb/core/usb-acpi.c b/drivers/usb/core/usb-acpi.c
-index e221861b3187..8ff73c83e8e8 100644
---- a/drivers/usb/core/usb-acpi.c
-+++ b/drivers/usb/core/usb-acpi.c
-@@ -139,12 +139,79 @@ static struct acpi_device *usb_acpi_find_port(struct acpi_device *parent,
- 	return acpi_find_child_device(parent, raw, false);
- }
+diff --git a/src/main.c b/src/main.c
+index 4716f5388..54cdb8d3f 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -533,6 +533,8 @@ static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
+ 	case SIGUSR2:
+ 		__btd_toggle_debug();
+ 		break;
++	case SIGPIPE:
++		break;
+ 	}
  
--static struct acpi_device *usb_acpi_find_companion(struct device *dev)
-+static struct acpi_device *
-+usb_acpi_get_companion_for_port(struct usb_port *port_dev)
- {
- 	struct usb_device *udev;
- 	struct acpi_device *adev;
- 	acpi_handle *parent_handle;
-+	int port1;
-+
-+	/* Get the struct usb_device point of port's hub */
-+	udev = to_usb_device(port_dev->dev.parent->parent);
-+
-+	/*
-+	 * The root hub ports' parent is the root hub. The non-root-hub
-+	 * ports' parent is the parent hub port which the hub is
-+	 * connected to.
-+	 */
-+	if (!udev->parent) {
-+		adev = ACPI_COMPANION(&udev->dev);
-+		port1 = usb_hcd_find_raw_port_number(bus_to_hcd(udev->bus),
-+						     port_dev->portnum);
-+	} else {
-+		parent_handle = usb_get_hub_port_acpi_handle(udev->parent,
-+							     udev->portnum);
-+		if (!parent_handle)
-+			return NULL;
-+
-+		acpi_bus_get_device(parent_handle, &adev);
-+		port1 = port_dev->portnum;
-+	}
-+
-+	return usb_acpi_find_port(adev, port1);
-+}
-+
-+static struct acpi_device *
-+usb_acpi_find_companion_for_port(struct usb_port *port_dev)
-+{
-+	struct acpi_device *adev;
-+	struct acpi_pld_info *pld;
-+	acpi_handle *handle;
-+	acpi_status status;
-+
-+	adev = usb_acpi_get_companion_for_port(port_dev);
-+	if (!adev)
-+		return NULL;
-+
-+	handle = adev->handle;
-+	status = acpi_get_physical_device_location(handle, &pld);
-+	if (!ACPI_FAILURE(status) && pld) {
-+		port_dev->location = USB_ACPI_LOCATION_VALID
-+			| pld->group_token << 8 | pld->group_position;
-+		port_dev->connect_type = usb_acpi_get_connect_type(handle, pld);
-+		ACPI_FREE(pld);
-+	}
+ 	return TRUE;
+@@ -549,6 +551,7 @@ static guint setup_signalfd(void)
+ 	sigaddset(&mask, SIGINT);
+ 	sigaddset(&mask, SIGTERM);
+ 	sigaddset(&mask, SIGUSR2);
++	sigaddset(&mask, SIGPIPE);
  
-+	return adev;
-+}
-+
-+static struct acpi_device *
-+usb_acpi_find_companion_for_device(struct usb_device *udev)
-+{
-+	struct acpi_device *adev;
-+
-+	if (!udev->parent)
-+		return NULL;
-+
-+	/* root hub is only child (_ADR=0) under its parent, the HC */
-+	adev = ACPI_COMPANION(udev->dev.parent);
-+	return acpi_find_child_device(adev, 0, false);
-+}
-+
-+
-+static struct acpi_device *usb_acpi_find_companion(struct device *dev)
-+{
- 	/*
- 	 * In the ACPI DSDT table, only usb root hub and usb ports are
- 	 * acpi device nodes. The hierarchy like following.
-@@ -158,66 +225,10 @@ static struct acpi_device *usb_acpi_find_companion(struct device *dev)
- 	 * So all binding process is divided into two parts. binding
- 	 * root hub and usb ports.
- 	 */
--	if (is_usb_device(dev)) {
--		udev = to_usb_device(dev);
--		if (udev->parent)
--			return NULL;
--
--		/* root hub is only child (_ADR=0) under its parent, the HC */
--		adev = ACPI_COMPANION(dev->parent);
--		return acpi_find_child_device(adev, 0, false);
--	} else if (is_usb_port(dev)) {
--		struct usb_port *port_dev = to_usb_port(dev);
--		int port1 = port_dev->portnum;
--		struct acpi_pld_info *pld;
--		acpi_handle *handle;
--		acpi_status status;
--
--		/* Get the struct usb_device point of port's hub */
--		udev = to_usb_device(dev->parent->parent);
--
--		/*
--		 * The root hub ports' parent is the root hub. The non-root-hub
--		 * ports' parent is the parent hub port which the hub is
--		 * connected to.
--		 */
--		if (!udev->parent) {
--			struct usb_hcd *hcd = bus_to_hcd(udev->bus);
--			int raw;
--
--			raw = usb_hcd_find_raw_port_number(hcd, port1);
--
--			adev = usb_acpi_find_port(ACPI_COMPANION(&udev->dev),
--						  raw);
--
--			if (!adev)
--				return NULL;
--		} else {
--			parent_handle =
--				usb_get_hub_port_acpi_handle(udev->parent,
--				udev->portnum);
--			if (!parent_handle)
--				return NULL;
--
--			acpi_bus_get_device(parent_handle, &adev);
--
--			adev = usb_acpi_find_port(adev, port1);
--
--			if (!adev)
--				return NULL;
--		}
--		handle = adev->handle;
--		status = acpi_get_physical_device_location(handle, &pld);
--		if (ACPI_FAILURE(status) || !pld)
--			return adev;
--
--		port_dev->location = USB_ACPI_LOCATION_VALID
--			| pld->group_token << 8 | pld->group_position;
--		port_dev->connect_type = usb_acpi_get_connect_type(handle, pld);
--		ACPI_FREE(pld);
--
--		return adev;
--	}
-+	if (is_usb_device(dev))
-+		return usb_acpi_find_companion_for_device(to_usb_device(dev));
-+	else if (is_usb_port(dev))
-+		return usb_acpi_find_companion_for_port(to_usb_port(dev));
- 
- 	return NULL;
- }
+ 	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
+ 		perror("Failed to set signal mask");
 -- 
-2.19.1.1215.g8438c0b245-goog
+2.19.1
 
