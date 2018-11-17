@@ -5,64 +5,63 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D65C43441
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 940C8C43441
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D7B92086B
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5833C206B2
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Nov 2018 01:08:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nlgihIct"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D7B92086B
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bk0/2DMl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5833C206B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731115AbeKQLXB (ORCPT
+        id S1730899AbeKQLWr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 17 Nov 2018 06:23:01 -0500
-Received: from mail-qk1-f202.google.com ([209.85.222.202]:54209 "EHLO
-        mail-qk1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731092AbeKQLXA (ORCPT
+        Sat, 17 Nov 2018 06:22:47 -0500
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:32883 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730875AbeKQLWr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 17 Nov 2018 06:23:00 -0500
-Received: by mail-qk1-f202.google.com with SMTP id s19so55747716qke.20
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 17:08:19 -0800 (PST)
+        Sat, 17 Nov 2018 06:22:47 -0500
+Received: by mail-pl1-f201.google.com with SMTP id o23so7190161pll.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Nov 2018 17:08:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=9Bz/gCkqSI0CecCt2g4/WTM1AOdDeQtvlngMweYYdmw=;
-        b=nlgihIctGCne0mtlEThgsyUWNHtbhJpNh7Z49gDzmEhVdo/LQZm/OA/XsS3egMZ8FK
-         G4chD8RmD72ekB+dcMRvjugvKGX0znbKqtkm69Ne0nKmGG0+0cLvlLb+Enzkwktv78+r
-         +rqn5i+5tKs9Y5IvgtzuOQgqQQXY6NtRE96pr5NYtSMjsUhVH7giRhp+p/r0D/UgHkuI
-         vV96C+IVoEiXhIZBO4pMTLfRRduH1miJBg8vIgkNV1t3KiQ5JXBYEgz/5qYYs+hL1djj
-         eblAGBCjApClh1JtV7aC+fpNL04w0O72N+v3E9BigjIkCNoqPjyc/GFnZZY9imJxjIyi
-         gF8g==
+        bh=vGykdBl547WQNsa3hHIaJmF/PJ6TocftyqcyGK983ds=;
+        b=Bk0/2DMl06D/t/uR8JTQ4g1fx6IEQ5hmQQYf4mjM5WPed+7xOkh0asmfs5FCU7f+Ho
+         yOUaOt0n7bR5h0MAgFM2kvhwgDzED/W2rYgGU1cebcxSCZf/yz7o2nqXPQn22eB5g4Zh
+         uxMcpw2guzTs/xpn3Eu0fUbrWUURv9U/Xsa6DpV2rHA7POiEENo2FhRxicOozEtNRK/m
+         WejB9wgIeXQuUpDQe3Bv1GHZdrWszM0vvU9/mOR+emMLORcZlRjcfpMgbbGScBBFVgsD
+         tNCP4Y3lTnXDRj3Rxt3wFUH0gDPN+evLbRY3AW/OtjFKZ2DSgN1Sv8PWSF+W3K92i1WN
+         7VZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=9Bz/gCkqSI0CecCt2g4/WTM1AOdDeQtvlngMweYYdmw=;
-        b=lXBa9znhDt3oa+5Kk/kpRB+INMXUBMzy5XFLyh0Tba42a2ad2p8J3D7Lg6F249a0L2
-         bzGeTbY3nW8ygQwgR57mAr/ywaHAn83dV4BFzFXHGvT30a2DghmtdM6XDhQ+Rhqju0/7
-         Xwy0CK5dX54txANsHUsMVZEw9BLqvXsPDsBBlbvjr+k2ZvSBgtkHqxCYY58ArweA5QfX
-         yxC19bnpcwC5TdYJJfFM5zlOHY9aH+PqYOz9dNWWqfUU8caaPMVzzZqC8czIl+wNFF0M
-         TewNLnB7UzcZw+MBP2Zru77XsxCBfp2Rnk2qMEQyPhnonAn7u81X7+2xOjIBnho/+TF3
-         wUqQ==
-X-Gm-Message-State: AA+aEWaJhMl7MF53atteiKyUJL3IgDQUeih3AY1l0oLs7jkH+Ls7ojjE
-        QD06svi96JUh359PqQcf3+Lgpiaj53k4
-X-Google-Smtp-Source: AJdET5cv9bDoi1wGJAXcfLMtIHhqtws0JIoFPYKrXO1shBaaUzv1dsbUlXe3IOo1/i/vZTgPNyoTUETi1XLA
-X-Received: by 2002:a37:fcd:: with SMTP id 74mr5130365qkp.11.1542416899291;
- Fri, 16 Nov 2018 17:08:19 -0800 (PST)
-Date:   Fri, 16 Nov 2018 17:07:48 -0800
+        bh=vGykdBl547WQNsa3hHIaJmF/PJ6TocftyqcyGK983ds=;
+        b=pFKeDtdEqj6uSzfEqsKq6IVZk0q6aoummHIq1m75Z3R/XmSp7XNNFji5JxTXT3JoPv
+         gpxGM95gnkdJ6Zrojyv3t7gpMGlvDKsp3CzkfXmHDeI0HOby+sCGAStNQpbUPoF/2DS1
+         jT2HKbzHl9vrvg+NUcV0oW/5M8PlLsL0oVYNaLM20cjDER39NlcDuBouuBmZSC7Esu3U
+         b+SnAlP2JUtI2GwO3iK1Ej8N6t0T3+U6+6E8yaFUV9W340zvDnIszpVIZC7Jb9YSeTEi
+         ZhPxM3Bno4Gd587NP03JT/7uZILUhaQVYPd+I9krZWZ5nLCO4BlxeqQrJUoTlttPxmRE
+         tnUg==
+X-Gm-Message-State: AA+aEWannrC9eU7EqKoCD5xt3Oz1cVXMFj4M4lGqWzfwlhtcee64FzIt
+        WeJJBkaTVI81RUEACukploM0Kk9Vpqqw
+X-Google-Smtp-Source: AFSGD/XNrAd5Rq1HC2xEdE2LNbI4si4DUeI/pAMxIF3yhPUtPyeWue/gqDzlLPxo3Yac8uZgNPCcsmYY1qpJ
+X-Received: by 2002:a63:5fd6:: with SMTP id t205mr51086pgb.77.1542416885652;
+ Fri, 16 Nov 2018 17:08:05 -0800 (PST)
+Date:   Fri, 16 Nov 2018 17:07:46 -0800
 In-Reply-To: <20181117010748.24347-1-rajatja@google.com>
-Message-Id: <20181117010748.24347-6-rajatja@google.com>
+Message-Id: <20181117010748.24347-4-rajatja@google.com>
 Mime-Version: 1.0
 References: <20181117010748.24347-1-rajatja@google.com>
 X-Mailer: git-send-email 2.19.1.1215.g8438c0b245-goog
-Subject: [PATCH 5/5] Bluetooth: btusb: Use the hw_reset method to allow
- resetting the BT chip
+Subject: [PATCH 3/5] Bluetooth: Reset Bluetooth chip after multiple command timeouts
 From:   Rajat Jain <rajatja@google.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -81,105 +80,90 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If the platform provides it, use the reset gpio to reset the BT
-chip (requested by the HCI core if needed). This has been found helpful
-on some of Intel bluetooth controllers where the firmware gets stuck and
-the only way out is a hard reset pin provided by the platform.
+Add a quirk and a hook to allow the HCI core to reset the BT chip
+if needed (after a number of timed out commands). Use that new hook to
+initiate BT chip reset if the controller fails to respond to certain
+number of commands (currently 5) including the HCI reset commands.
+This is done based on a newly introduced quirk. This is done based
+on some initial work by Intel.
 
 Signed-off-by: Rajat Jain <rajatja@google.com>
 ---
- drivers/bluetooth/btusb.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ include/net/bluetooth/hci.h      |  8 ++++++++
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_core.c         | 15 +++++++++++++--
+ 3 files changed, 23 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e8e148480c91..8aad02d9e211 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -29,6 +29,7 @@
- #include <linux/of_device.h>
- #include <linux/of_irq.h>
- #include <linux/suspend.h>
-+#include <linux/gpio/consumer.h>
- #include <asm/unaligned.h>
- 
- #include <net/bluetooth/bluetooth.h>
-@@ -475,6 +476,8 @@ struct btusb_data {
- 	struct usb_endpoint_descriptor *diag_tx_ep;
- 	struct usb_endpoint_descriptor *diag_rx_ep;
- 
-+	struct gpio_desc *reset_gpio;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c36dc1e20556..af02fa5ffe54 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -192,6 +192,14 @@ enum {
+ 	 *
+ 	 */
+ 	HCI_QUIRK_NON_PERSISTENT_SETUP,
 +
- 	__u8 cmdreq_type;
- 	__u8 cmdreq;
- 
-@@ -490,6 +493,28 @@ struct btusb_data {
- 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
++	/* When this quirk is set, hw_reset() would be run to reset the
++	 * hardware, after a certain number of commands (currently 5)
++	 * time out because the device fails to respond.
++	 *
++	 * This quirk should be set before hci_register_dev is called.
++	 */
++	HCI_QUIRK_HW_RESET_ON_TIMEOUT,
  };
  
-+
-+static void btusb_hw_reset(struct hci_dev *hdev)
-+{
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+	struct gpio_desc *reset_gpio = data->reset_gpio;
-+
-+	/*
-+	 * Toggle the hard reset line if the platform provides one. The reset
-+	 * is going to yank the device off the USB and then replug. So doing
-+	 * once is enough. The cleanup is handled correctly on the way out
-+	 * (standard USB disconnect), and the new device is detected cleanly
-+	 * and bound to the driver again like it should be.
-+	 */
-+	if (reset_gpio) {
-+		bt_dev_dbg(hdev, "%s: Initiating HW reset via gpio", __func__);
-+		clear_bit(HCI_QUIRK_HW_RESET_ON_TIMEOUT, &hdev->quirks);
-+		gpiod_set_value(reset_gpio, 1);
-+		mdelay(100);
-+		gpiod_set_value(reset_gpio, 0);
+ /* HCI device flags */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e5ea633ea368..b86218304b80 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -313,6 +313,7 @@ struct hci_dev {
+ 	unsigned int	acl_cnt;
+ 	unsigned int	sco_cnt;
+ 	unsigned int	le_cnt;
++	unsigned int	timeout_cnt;
+ 
+ 	unsigned int	acl_mtu;
+ 	unsigned int	sco_mtu;
+@@ -437,6 +438,7 @@ struct hci_dev {
+ 	int (*post_init)(struct hci_dev *hdev);
+ 	int (*set_diag)(struct hci_dev *hdev, bool enable);
+ 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
++	void (*hw_reset)(struct hci_dev *hdev);
+ };
+ 
+ #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 7352fe85674b..ab3a6a8b7ba6 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2569,13 +2569,24 @@ static void hci_cmd_timeout(struct work_struct *work)
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+ 					    cmd_timer.work);
+ 
++	hdev->timeout_cnt++;
+ 	if (hdev->sent_cmd) {
+ 		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
+ 		u16 opcode = __le16_to_cpu(sent->opcode);
+ 
+-		bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
++		bt_dev_err(hdev, "command 0x%4.4x tx timeout (cnt = %u)",
++			   opcode, hdev->timeout_cnt);
+ 	} else {
+-		bt_dev_err(hdev, "command tx timeout");
++		bt_dev_err(hdev, "command tx timeout (cnt = %u)",
++			   hdev->timeout_cnt);
 +	}
-+}
 +
- static inline void btusb_free_frags(struct btusb_data *data)
- {
- 	unsigned long flags;
-@@ -3030,6 +3055,11 @@ static int btusb_probe(struct usb_interface *intf,
++	if (test_bit(HCI_QUIRK_HW_RESET_ON_TIMEOUT, &hdev->quirks) &&
++	    hdev->timeout_cnt >= 5) {
++		hdev->timeout_cnt = 0;
++		if (hdev->hw_reset)
++			hdev->hw_reset(hdev);
++		return;
+ 	}
  
- 	SET_HCIDEV_DEV(hdev, &intf->dev);
- 
-+	data->reset_gpio = gpiod_get_optional(&data->udev->dev, "reset",
-+					      GPIOD_OUT_LOW);
-+	if (data->reset_gpio)
-+		hdev->hw_reset = btusb_hw_reset;
-+
- 	hdev->open   = btusb_open;
- 	hdev->close  = btusb_close;
- 	hdev->flush  = btusb_flush;
-@@ -3085,6 +3115,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-+		set_bit(HCI_QUIRK_HW_RESET_ON_TIMEOUT, &hdev->quirks);
- 
- 		if (id->driver_info & BTUSB_INTEL) {
- 			hdev->setup = btusb_setup_intel;
-@@ -3225,6 +3256,8 @@ static int btusb_probe(struct usb_interface *intf,
- 	return 0;
- 
- out_free_dev:
-+	if (data->reset_gpio)
-+		gpiod_put(data->reset_gpio);
- 	hci_free_dev(hdev);
- 	return err;
- }
-@@ -3268,6 +3301,9 @@ static void btusb_disconnect(struct usb_interface *intf)
- 	if (data->oob_wake_irq)
- 		device_init_wakeup(&data->udev->dev, false);
- 
-+	if (data->reset_gpio)
-+		gpiod_put(data->reset_gpio);
-+
- 	hci_free_dev(hdev);
- }
- 
+ 	atomic_set(&hdev->cmd_cnt, 1);
 -- 
 2.19.1.1215.g8438c0b245-goog
 
