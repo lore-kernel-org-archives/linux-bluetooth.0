@@ -1,120 +1,81 @@
-Return-Path: <SRS0=E1HW=N5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=AiOn=N6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56120C43441
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Nov 2018 16:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C20F2C43441
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Nov 2018 02:32:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 230CD2080F
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Nov 2018 16:14:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 230CD2080F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
+	by mail.kernel.org (Postfix) with ESMTP id 6B2842080F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Nov 2018 02:32:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKxyf/eU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B2842080F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727333AbeKSCfB (ORCPT
+        id S1727453AbeKSMyN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 18 Nov 2018 21:35:01 -0500
-Received: from a3.inai.de ([88.198.85.195]:54162 "EHLO a3.inai.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726964AbeKSCfA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 18 Nov 2018 21:35:00 -0500
-Received: by a3.inai.de (Postfix, from userid 65534)
-        id 5233213023DE; Sun, 18 Nov 2018 17:08:09 +0100 (CET)
-Received: from a4.inai.de (a4.inai.de [IPv6:2a01:4f8:222:6c9::f8])
-        by a3.inai.de (Postfix) with ESMTP id 97CE4260D2B2;
-        Sun, 18 Nov 2018 17:08:07 +0100 (CET)
-From:   Jan Engelhardt <jengelh@inai.de>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     jengelh@inai.de
-Subject: [PATCH 1/8] build: rename libexecdir to pkglibexecdir
-Date:   Sun, 18 Nov 2018 17:07:55 +0100
-Message-Id: <20181118160802.11087-2-jengelh@inai.de>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20181118160802.11087-1-jengelh@inai.de>
-References: <20181118160802.11087-1-jengelh@inai.de>
+        Mon, 19 Nov 2018 07:54:13 -0500
+Received: from mail-ua1-f52.google.com ([209.85.222.52]:44989 "EHLO
+        mail-ua1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725955AbeKSMyN (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 19 Nov 2018 07:54:13 -0500
+Received: by mail-ua1-f52.google.com with SMTP id d19so10184517uaq.11
+        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Nov 2018 18:32:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=AD3m4ufIh4dacXU7/LTWeVFD1OwHizZw0qVlwsFCvGo=;
+        b=jKxyf/eUg7DNwVgY43iV0JPf74RcMSj2fep6NeAcj6E/EWCOYh4c+ZPk63nWfTomLR
+         etvYbUfMoiXtfUEYBdFxo+Vl4hC+5rZ04KuPIj0xL+rzEwTfSIEoAEOwFLDfGovfIlMR
+         iTKsh5mh8FlYiTveMAm68QM/gKW5HOEKhqEJE/QKwT9i3KQMJndowVzOU+W82fzu8haR
+         7ySwKRLptejr6v7S0R8aODDkkO4g66MZv1BBLDaOE9B8W/MOb4dr4jT/GcZu11KOwBcp
+         oEOwx79/Dp6eSMNMnTl05+jCA9HW3cCHFcbGYiEMbnmH0vbuh68khpe74+7/esiC7rBD
+         xV1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=AD3m4ufIh4dacXU7/LTWeVFD1OwHizZw0qVlwsFCvGo=;
+        b=X1rfY3ZirUIo6pjnT+TH0blkZjHLbpYWRUU7uZsDt3jJaolnCPKYE3x9+rcN9YThtB
+         OZwyFmbq6GHf0fIKhO/nBqs3YANbcDskL61VO61pAQQfHTZLCWUZeTGoltugUYx1/hcT
+         iXwFlOc98tgGLJiTQi3yqW8h2KfzWbUJtedGBuaKN/zq24Xc/zxjxpYivH3Vco0vXGGB
+         6PJukgCJUOSOZphqt77JYLbGaGGv18t/mVffh3L2jaMg6xc+OhmTYhpZEIMrSQa54JTY
+         lX8chAnVrJIOG55WwBlefFcxx9OAcPKFtPbbZyt4SF0MQwOgzUsnAqMf36MefO0P+v8Z
+         q0ig==
+X-Gm-Message-State: AGRZ1gJ419K8gWLMwvA+wqqNZecPqT3BX9QjLchUbHrSBMZXtkLdS2on
+        itXQIPn/YvofKlVhg2ebHLw9eMbqwTM7AzO+eD6OSKMg
+X-Google-Smtp-Source: AJdET5cVcRyzvbZYGfO2pRqRXtso6imtmq9R1D5XGj27iBf+ekq+FGD53vbDfRXsIRcTIvA7oOKG2+lOGyEvActJ5ao=
+X-Received: by 2002:ab0:7544:: with SMTP id k4mr8749908uaq.66.1542594726024;
+ Sun, 18 Nov 2018 18:32:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Calvin Yoo <choongbeom@gmail.com>
+Date:   Mon, 19 Nov 2018 11:31:54 +0900
+Message-ID: <CAO9gXyTw4P+poT_qDi3SoBHaBELWdPV7Fv4Q7Ce7vN7q_oDbDw@mail.gmail.com>
+Subject: How to test SDP(Service Discovery Protocol) on PTS ?
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When files are to be placed not in libexecdir but a subdirectory of
-it, automake has a variable name reserved for exactly that purpose
-(and a default value, which Makefile.am will override), called
-pkglibexecdir. Let's use it.
----
- Makefile.am                       | 4 ++--
- obexd/src/obex.service.in         | 2 +-
- src/bluetooth.service.in          | 2 +-
- tools/bluetooth-logger.service.in | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
+Hello,
 
-diff --git a/Makefile.am b/Makefile.am
-index 0ccf393c6..eee70b88b 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -19,7 +19,7 @@ CLEANFILES =
- 
- EXTRA_DIST =
- 
--libexecdir = @libexecdir@/bluetooth
-+pkglibexecdir = @libexecdir@/bluetooth
- 
- libexec_PROGRAMS =
- 
-@@ -489,7 +489,7 @@ MAINTAINERCLEANFILES = Makefile.in \
- 	ltmain.sh depcomp compile missing install-sh mkinstalldirs test-driver
- 
- SED_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
--		$(SED) -e 's,@libexecdir\@,$(libexecdir),g' \
-+		$(SED) -e 's,@pkglibexecdir\@,$(pkglibexecdir),g' \
- 		< $< > $@
- 
- %.service: %.service.in Makefile
-diff --git a/obexd/src/obex.service.in b/obexd/src/obex.service.in
-index bca3aef66..fc0dce993 100644
---- a/obexd/src/obex.service.in
-+++ b/obexd/src/obex.service.in
-@@ -4,7 +4,7 @@ Description=Bluetooth OBEX service
- [Service]
- Type=dbus
- BusName=org.bluez.obex
--ExecStart=@libexecdir@/obexd
-+ExecStart=@pkglibexecdir@/obexd
- 
- [Install]
- Alias=dbus-org.bluez.obex.service
-diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-index f799f65f0..f9faaa452 100644
---- a/src/bluetooth.service.in
-+++ b/src/bluetooth.service.in
-@@ -6,7 +6,7 @@ ConditionPathIsDirectory=/sys/class/bluetooth
- [Service]
- Type=dbus
- BusName=org.bluez
--ExecStart=@libexecdir@/bluetoothd
-+ExecStart=@pkglibexecdir@/bluetoothd
- NotifyAccess=main
- #WatchdogSec=10
- #Restart=on-failure
-diff --git a/tools/bluetooth-logger.service.in b/tools/bluetooth-logger.service.in
-index 026a2f130..009002731 100644
---- a/tools/bluetooth-logger.service.in
-+++ b/tools/bluetooth-logger.service.in
-@@ -4,7 +4,7 @@ ConditionPathIsDirectory=/sys/class/bluetooth
- 
- [Service]
- Type=simple
--ExecStart=@libexecdir@/btmon-logger -p -b /var/log/bluetooth/hci.log
-+ExecStart=@pkglibexecdir@/btmon-logger -p -b /var/log/bluetooth/hci.log
- NotifyAccess=main
- CapabilityBoundingSet=CAP_NET_RAW
- LimitNPROC=1
--- 
-2.19.1
+"LMP Error Transaction Collision" error occurs when I try to test
+SDP/SR/SA/BV-01-C.
+And finally displays "IUT failed to accept SDP channel".
+I checked server role and other mandatory items of SDP ICS and start
+the test and make my device discoverable(advertising).
 
+Is there any prior preparation for this test or need controls with sdptool?
+I mean do I need to do something more than advertising?
+
+
+Thanks,
+Choongbeom
