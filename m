@@ -2,230 +2,173 @@ Return-Path: <SRS0=AiOn=N6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-18.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B55C43441
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Nov 2018 21:44:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03348C43441
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Nov 2018 23:04:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99FD52086A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Nov 2018 21:44:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B214A20870
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Nov 2018 23:04:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="INq2Ntk3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99FD52086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kNN3V41Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B214A20870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731224AbeKTIJ4 (ORCPT
+        id S1732072AbeKTJaZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Nov 2018 03:09:56 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:43471 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731142AbeKTIJz (ORCPT
+        Tue, 20 Nov 2018 04:30:25 -0500
+Received: from mail-pf1-f201.google.com ([209.85.210.201]:45295 "EHLO
+        mail-pf1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732040AbeKTJaY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Nov 2018 03:09:55 -0500
-Received: by mail-pf1-f195.google.com with SMTP id w73so6149563pfk.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Nov 2018 13:44:17 -0800 (PST)
+        Tue, 20 Nov 2018 04:30:24 -0500
+Received: by mail-pf1-f201.google.com with SMTP id 74so2089900pfk.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Nov 2018 15:04:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=59SpcEBGDTbUjAhoGBNRiCVTfP9hvpXi6ZEQUqtN9nY=;
-        b=INq2Ntk3CQHQPQkFepGAlZvnyrBuSstFBnmaYDtVq3Aq02ZY8V/bXtKIvBheMz/SOe
-         wvthbhxD+N3oKo4wZnlRMS7LOvuloFEIcHcfa3e/5csf9NRCHNDYOWzzmxeRrXvfNgQj
-         eXd9ETe8bsn3j3RDc95VNAaZ2Ikx0jTr8NMxM=
+        d=google.com; s=20161025;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=hozA7Ab9Mbo9dP4gWzek1tXXv9KaEdb0RAgi2ZqAK7A=;
+        b=kNN3V41Qzl7VMMMjqPuUBqaprYPthA6N4Txzdkq/UT8nCXoc8FSn0r0uLsCroW+mm+
+         Up4i7WbNMfRfe2D6Kz2I8tbhi/4Crx41wITmLIbnjGzuT0PsKBEpcVDi4bMkKAclhfdg
+         2S7+C0PQGe6wR4BMipewGmJmR31hCPumKJTwOp77qmHcPUnaq+nSDQUvz5kxnhbkjtT9
+         K6UsWb87A0mfyc1cVUeciEolkJzx1y2pXeGphR/hfzabwoZCqiEJft0Gk4SUHGeTluVQ
+         tOiiirdzJe3yLIdxKebkMuOO+3qXTUF+XJLp/t87ENKhmt2qFZJ4Ow9IoPiJA9F07nbX
+         vfsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=59SpcEBGDTbUjAhoGBNRiCVTfP9hvpXi6ZEQUqtN9nY=;
-        b=Ckau6gjHgt2cZE9m+1NEPUlUyABc06lryHbl2IU3e+vgbbw5Ie6FZsb0qBvdInUZ6T
-         5RybOvgk1O7ABXeCWGfYu58vVgWzp3vlp2JG9/yUAPHs69ehkXl440QRTxV1/y6Yvwmh
-         Oj374WdXCN5g6dQSYt+ntZzBAuTk2EI3r76SB2WeGrMP6yRJF3dczzYMFqsVEE70wPdP
-         UmS9qsq7OvO4ciT2hnkOhUUNPm8RERqjgHG9VEvdgOU/7ulChzXBHu38m/VO4ktzRADT
-         JYn9rTFryegJCCHK9j6/6+B9KuW7FoWPyNT6UAe9spiqv3B44vQsEu5K1Jwc1kqcmpIt
-         AAog==
-X-Gm-Message-State: AGRZ1gKMh+3LMHcBAwgGCTfCc8X+wf1NRDOAcFDGvzYzsy3C4ks9b4Vz
-        iwm61bzwAlYx2CiJ9PtGDIV+Ug==
-X-Google-Smtp-Source: AJdET5ex+V19mmP/60+6bs0oyIH4ge5EMxTJRIiRbAppKSHzaE8n7FIcrIDLfspY9vtPwWhule6rog==
-X-Received: by 2002:a63:c503:: with SMTP id f3mr21104270pgd.431.1542663857331;
-        Mon, 19 Nov 2018 13:44:17 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
-        by smtp.gmail.com with ESMTPSA id u69sm35162091pfj.116.2018.11.19.13.44.16
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 19 Nov 2018 13:44:16 -0800 (PST)
-Date:   Mon, 19 Nov 2018 13:44:15 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=hozA7Ab9Mbo9dP4gWzek1tXXv9KaEdb0RAgi2ZqAK7A=;
+        b=sJxJqRyB44fanIGeeIreNX0fSASjM4RljaE+EM8Z1C5+yjNBcv7XslAtTVQ2bpSrEz
+         cUkK7603gBHF0Wr6j8ELmjJFcKFqn6/FBz7HLhELlKEONRAtPZ0KubrFA7SSgcWwSFCt
+         V9J8VqF9pc2MNHw6zuF0ePOOLNJFhsw2fwr8fiyTGhRfgmj63UNCRkQhYOo0ollgixol
+         10s2O6pStt74LzVExl2Enb6ANMegSgglzOCDyBdXLBcUjZRplw2784dmuCO4ZOBQJ6KN
+         cOGykQdBBGkWDwBpUjTsD6z75uJl1mgC65hHyPRQLYqhN80EpRldfIQ7sG66U8L2LLSq
+         EcbQ==
+X-Gm-Message-State: AGRZ1gJSDvoAGIY77rlOkbYxSbAEqXwNjGD1A1IXnTgvFmidlF2JlGae
+        JRFUWWvuva4jHoJaw9Ha7VpedGoa53rL
+X-Google-Smtp-Source: AJdET5ecBZzURnJmtWNOpDzYUP6gzTjRvxiu7VaSkfzZWHs94/8LDuHXzrAweriKyMCS4ZZr3ce5wPTctIw9
+X-Received: by 2002:a63:2c13:: with SMTP id s19mr7793541pgs.75.1542668667066;
+ Mon, 19 Nov 2018 15:04:27 -0800 (PST)
+Date:   Mon, 19 Nov 2018 15:04:06 -0800
+In-Reply-To: <20181119230409.258121-1-rajatja@google.com>
+Message-Id: <20181119230409.258121-2-rajatja@google.com>
+Mime-Version: 1.0
+References: <20181117010748.24347-1-rajatja@google.com> <20181119230409.258121-1-rajatja@google.com>
+X-Mailer: git-send-email 2.19.1.1215.g8438c0b245-goog
+Subject: [PATCH v2 2/5] usb: assign ACPI companions for embedded USB devices
+From:   Rajat Jain <rajatja@google.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Loic Poulain <loic.poulain@linaro.org>
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Brian Norris <briannorris@chromium.org>,
-        Dmitry Grinberg <dmitrygr@google.com>
-Subject: Re: [PATCH v2 1/3] Bluetooth: Add quirk for reading BD_ADDR from
- fwnode property
-Message-ID: <20181119214415.GQ22824@google.com>
-References: <20181030004415.237101-1-mka@chromium.org>
- <20181030004415.237101-2-mka@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181030004415.237101-2-mka@chromium.org>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Torokhov <dtor@chromium.org>,
+        Rajat Jain <rajatja@google.com>,
+        Alex Hung <alex.hung@canonical.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-usb@vger.kernel.org, netdev@vger.kernel.org
+Cc:     rajatxjain@gmail.com, dtor@google.com, raghuram.hegde@intel.com,
+        chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Dmitry Torokhov <dtor@chromium.org>
 
-is this in line with what you suggested at
-https://lore.kernel.org/patchwork/patch/992280/#1183789 ?
+USB devices permanently connected to USB ports may be described in ACPI
+tables and share ACPI devices with ports they are connected to. See [1]
+for details.
 
-Thanks
+This will allow us to describe sideband resources for devices, such as,
+for example, hard reset line for BT USB controllers.
 
-Matthias
+[1] https://docs.microsoft.com/en-us/windows-hardware/drivers/bringup/other-acpi-namespace-objects#acpi-namespace-hierarchy-and-adr-for-embedded-usb-devices
 
-On Mon, Oct 29, 2018 at 05:44:13PM -0700, Matthias Kaehlcke wrote:
-> Add HCI_QUIRK_USE_BDADDR_PROPERTY to allow controllers to retrieve
-> the public Bluetooth address from the firmware node property
-> 'local-bd-address'. If quirk is set and the property does not exist
-> or is invalid the controller is marked as unconfigured.
-> 
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> Changes in v2:
-> - added check for return value of ->setup()
-> - only read BD_ADDR from the property if it isn't assigned yet. This
->   is needed to support configuration from user space
-> - refactored the branch of the new quirk to get rid of 'bd_addr_set'
-> - added 'Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>' tag
-> ---
->  include/net/bluetooth/hci.h | 12 ++++++++++
->  net/bluetooth/hci_core.c    | 45 +++++++++++++++++++++++++++++++++++++
->  net/bluetooth/mgmt.c        |  6 +++--
->  3 files changed, 61 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index c36dc1e20556..fbba43e9bef5 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -158,6 +158,18 @@ enum {
->  	 */
->  	HCI_QUIRK_INVALID_BDADDR,
->  
-> +	/* When this quirk is set, the public Bluetooth address
-> +	 * initially reported by HCI Read BD Address command
-> +	 * is considered invalid. The public BD Address can be
-> +	 * specified in the fwnode property 'local-bd-address'.
-> +	 * If this property does not exist or is invalid controller
-> +	 * configuration is required before this device can be used.
-> +	 *
-> +	 * This quirk can be set before hci_register_dev is called or
-> +	 * during the hdev->setup vendor callback.
-> +	 */
-> +	HCI_QUIRK_USE_BDADDR_PROPERTY,
-> +
->  	/* When this quirk is set, the duplicate filtering during
->  	 * scanning is based on Bluetooth devices addresses. To allow
->  	 * RSSI based updates, restart scanning if needed.
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 7352fe85674b..d4149005a661 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -30,6 +30,7 @@
->  #include <linux/rfkill.h>
->  #include <linux/debugfs.h>
->  #include <linux/crypto.h>
-> +#include <linux/property.h>
->  #include <asm/unaligned.h>
->  
->  #include <net/bluetooth/bluetooth.h>
-> @@ -1355,6 +1356,36 @@ int hci_inquiry(void __user *arg)
->  	return err;
->  }
->  
-> +/**
-> + * hci_dev_get_bd_addr_from_property - Get the Bluetooth Device Address
-> + *				       (BD_ADDR) for a HCI device from
-> + *				       a firmware node property.
-> + * @hdev:	The HCI device
-> + *
-> + * Search the firmware node for 'local-bd-address'.
-> + *
-> + * All-zero BD addresses are rejected, because those could be properties
-> + * that exist in the firmware tables, but were not updated by the firmware. For
-> + * example, the DTS could define 'local-bd-address', with zero BD addresses.
-> + */
-> +static int hci_dev_get_bd_addr_from_property(struct hci_dev *hdev)
-> +{
-> +	struct fwnode_handle *fwnode = dev_fwnode(hdev->dev.parent);
-> +	bdaddr_t ba;
-> +	int ret;
-> +
-> +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
-> +					    (u8 *)&ba, sizeof(ba));
-> +	if (ret < 0)
-> +		return ret;
-> +	if (!bacmp(&ba, BDADDR_ANY))
-> +		return -ENODATA;
-> +
-> +	hdev->public_addr = ba;
-> +
-> +	return 0;
-> +}
-> +
->  static int hci_dev_do_open(struct hci_dev *hdev)
->  {
->  	int ret = 0;
-> @@ -1422,6 +1453,20 @@ static int hci_dev_do_open(struct hci_dev *hdev)
->  		if (hdev->setup)
->  			ret = hdev->setup(hdev);
->  
-> +		if (ret)
-> +			goto setup_failed;
-> +
-> +		if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
-> +			if (!bacmp(&hdev->public_addr, BDADDR_ANY))
-> +				hci_dev_get_bd_addr_from_property(hdev);
-> +
-> +			if (!bacmp(&hdev->public_addr, BDADDR_ANY) ||
-> +			    !hdev->set_bdaddr ||
-> +			    hdev->set_bdaddr(hdev, &hdev->public_addr))
-> +				hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
-> +		}
-> +
-> +setup_failed:
->  		/* The transport driver can set these quirks before
->  		 * creating the HCI device or in its setup callback.
->  		 *
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index ccce954f8146..fae84353d030 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -551,7 +551,8 @@ static bool is_configured(struct hci_dev *hdev)
->  	    !hci_dev_test_flag(hdev, HCI_EXT_CONFIGURED))
->  		return false;
->  
-> -	if (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
-> +	if ((test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) ||
-> +	     test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) &&
->  	    !bacmp(&hdev->public_addr, BDADDR_ANY))
->  		return false;
->  
-> @@ -566,7 +567,8 @@ static __le32 get_missing_options(struct hci_dev *hdev)
->  	    !hci_dev_test_flag(hdev, HCI_EXT_CONFIGURED))
->  		options |= MGMT_OPTION_EXTERNAL_CONFIG;
->  
-> -	if (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
-> +	if ((test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) ||
-> +	     test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) &&
->  	    !bacmp(&hdev->public_addr, BDADDR_ANY))
->  		options |= MGMT_OPTION_PUBLIC_ADDRESS;
->  
+Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
+Signed-off-by: Rajat Jain <rajatja@google.com> (changed how we get the usb_port)
+---
+v2: same as v1
+
+ drivers/usb/core/usb-acpi.c | 44 +++++++++++++++++++++++++++++--------
+ 1 file changed, 35 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/usb/core/usb-acpi.c b/drivers/usb/core/usb-acpi.c
+index 8ff73c83e8e8..9043d7242d67 100644
+--- a/drivers/usb/core/usb-acpi.c
++++ b/drivers/usb/core/usb-acpi.c
+@@ -200,30 +200,56 @@ static struct acpi_device *
+ usb_acpi_find_companion_for_device(struct usb_device *udev)
+ {
+ 	struct acpi_device *adev;
++	struct usb_port *port_dev;
++	struct usb_hub *hub;
++
++	if (!udev->parent) {
++		/* root hub is only child (_ADR=0) under its parent, the HC */
++		adev = ACPI_COMPANION(udev->dev.parent);
++		return acpi_find_child_device(adev, 0, false);
++	}
+ 
+-	if (!udev->parent)
++	hub = usb_hub_to_struct_hub(udev->parent);
++	if (!hub)
+ 		return NULL;
+ 
+-	/* root hub is only child (_ADR=0) under its parent, the HC */
+-	adev = ACPI_COMPANION(udev->dev.parent);
+-	return acpi_find_child_device(adev, 0, false);
++	/*
++	 * This is an embedded USB device connected to a port and such
++	 * devices share port's ACPI companion.
++	 */
++	port_dev = hub->ports[udev->portnum - 1];
++	return usb_acpi_get_companion_for_port(port_dev);
+ }
+ 
+-
+ static struct acpi_device *usb_acpi_find_companion(struct device *dev)
+ {
+ 	/*
+-	 * In the ACPI DSDT table, only usb root hub and usb ports are
+-	 * acpi device nodes. The hierarchy like following.
++	 * The USB hierarchy like following:
++	 *
+ 	 * Device (EHC1)
+ 	 *	Device (HUBN)
+ 	 *		Device (PR01)
+ 	 *			Device (PR11)
+ 	 *			Device (PR12)
++	 *				Device (FN12)
++	 *				Device (FN13)
+ 	 *			Device (PR13)
+ 	 *			...
+-	 * So all binding process is divided into two parts. binding
+-	 * root hub and usb ports.
++	 * where HUBN is root hub, and PRNN are USB ports and devices
++	 * connected to them, and FNNN are individualk functions for
++	 * connected composite USB devices. PRNN and FNNN may contain
++	 * _CRS and other methods describing sideband resources for
++	 * the connected device.
++	 *
++	 * On the kernel side both root hub and embedded USB devices are
++	 * represented as instances of usb_device structure, and ports
++	 * are represented as usb_port structures, so the whole process
++	 * is split into 2 parts: finding companions for devices and
++	 * finding companions for ports.
++	 *
++	 * Note that we do not handle individual functions of composite
++	 * devices yet, for that we would need to assign companions to
++	 * devices corresponding to USB interfaces.
+ 	 */
+ 	if (is_usb_device(dev))
+ 		return usb_acpi_find_companion_for_device(to_usb_device(dev));
+-- 
+2.19.1.1215.g8438c0b245-goog
+
