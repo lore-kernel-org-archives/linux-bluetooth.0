@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6119AC4161D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D629C41536
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 13:58:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 375622087E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 13:58:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B011206BB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 13:58:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OI8geiXw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375622087E
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FzzlqoEl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B011206BB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729069AbeKUA1r (ORCPT
+        id S1729070AbeKUA1t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Nov 2018 19:27:47 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:36211 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726219AbeKUA1r (ORCPT
+        Tue, 20 Nov 2018 19:27:49 -0500
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:35236 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726119AbeKUA1t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Nov 2018 19:27:47 -0500
-Received: by mail-ed1-f66.google.com with SMTP id f23so2011263edb.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Nov 2018 05:58:29 -0800 (PST)
+        Tue, 20 Nov 2018 19:27:49 -0500
+Received: by mail-ed1-f67.google.com with SMTP id x30so2014265edx.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Nov 2018 05:58:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=AjEe3KODygyeikufoUCepvtVQ8cKXdlhue2u8i2G8oc=;
-        b=OI8geiXwVxfkjhyi1Ku1U9x+z84NAi+UjOQ6HLCqBNjyrAaeIzdu/nwd8isLITNGC0
-         H7dXvvbK9LmbxtzBPRXPpzVms4u5k9HtVG2PalwsX1rAEWvmJdsCj9LozK8G6BlojGoS
-         GY0LLIeopAb0WY/2nYmQXI+Xw+jSFFyBTniWq0/Ox8rphw5EL4gyK7Fejl6dSJgNejTK
-         hGAjVrwPJdBuggJZtGRhr9uHn3jJUlVUa6u9qCiFyKnuT99aubg/knRUrHdVcwie1VUr
-         +XKHZIwQsqFhLPiYdEsiwrVA55vmEw/JvDdMZp3FfWyrmfvJxgHZiUa4k+AHf/rAwJCX
-         LHwg==
+        bh=zFMlPMPQF+xrGURWDxSoB24BvNe3hRE05sVQscDl7Cw=;
+        b=FzzlqoEl0f2HLuNxiyXizemnnyRM4r929n0qGxHcCMnmo/CfdHoew3g7nnb3exzsov
+         HEz8MV/eYmE598izhDa0QHYeYL9/FMBr4vHxyiBikKMEvvJvHlgfH/flKRuq4JljQArl
+         i1Wua90M2z3eoMAMGqoUmX7BqUIPWZYLeiH61SnXz5okV1uo8POHN9+6qxL/GO6eZxlN
+         duiHc3S6K0mDHe2wBwEnDnvDFEgX0PMidipGJgLowp+8OUczDVaDPr9m+vSzTo+eGZR5
+         bzOMq/mv9f1mZkBIp93ejGesUgpYfzzFIqdtbIQjOsm2yOvSoGvNUmwHsYwzgrabPBA3
+         cKmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=AjEe3KODygyeikufoUCepvtVQ8cKXdlhue2u8i2G8oc=;
-        b=iJJyu2Jct9Gqt5O2VnaTs3XDGQqEDfJcZAFTTri2wobvNkFU831mA5JhqdV4yzBapt
-         DVtaGafIju8kdU2voocMy1AibRN/OtSx3fIlfYC5STouMQ7SV4jh102r2DGZhHCurCPF
-         AZt+No3YLB743yCXj9/KRCdkg4YzMvmn6cUYGes150/7E3a9lXh2J0zPwGeCqIfcGEpd
-         lFDKKTDYZTo8X2dQJ6vOlY4vO45A8RD348371+OBsK4UqtdLMy2lKDLUy4TqUNMpgf7D
-         22FfXvd7CORYWZE0B1SJOoPc4+LS5rYEJZXS/Z6kmqkkPSRTniSm3rHaGb1GHj54rZRS
-         hDdA==
-X-Gm-Message-State: AGRZ1gLz31kvOZnX6Cg2hRNbt2TnJQGhIYttx0pEa/uBNCSxSeNrl/Yx
-        VfI//0w1YDFd8o1cZ4g3cocMF119
-X-Google-Smtp-Source: AJdET5e7L//AVUNN0Thn8I/2Hd6IyAehV442GvRNdLPBie/wth2VEv56IAT9qCOvh//PgZGF1eQPTg==
-X-Received: by 2002:a17:906:9154:: with SMTP id y20-v6mr2073325ejw.8.1542722308297;
-        Tue, 20 Nov 2018 05:58:28 -0800 (PST)
+        bh=zFMlPMPQF+xrGURWDxSoB24BvNe3hRE05sVQscDl7Cw=;
+        b=HfTKYEo3ZkAGWv01QHAlm45l9y9HC9MMkNW9L9tCAK4BYFmethRkITHkMUH6fEatkp
+         Nk8FuWSgLzlVJ7fu/+S2aFm09Rw3pvjhTMWbMwWZbxGHtS6CIhz6rDU4AK74kGibpAA7
+         jYzi/uiQe4LDBux8h7sh2JbPEy4uhCdLO60xprU8EDn3fRLK2c40/an0w+awI5cP5/1h
+         OL1qAZddUiNUhei7EorQ1m160L+bI8m50LCWicITYb4B5NYfARxBreGqor+XwaBwT7eP
+         qStJ2uUCUeX5QC1byqsPoubfvFr+cuqq4eJh3qd2znu8cMkxA5GN+Z8Px24xkn3Jm2CT
+         FZ/w==
+X-Gm-Message-State: AGRZ1gLJjUCFdoyzsQQzZXAid+3NoBC+/hNcYX3TwXNEr0p1oFJkuGFj
+        ggelc3ghbW4Pa4G96/Mbzq10LnuJ
+X-Google-Smtp-Source: AJdET5eEGin5prXqDIV3bkCryLtB27iU1pHdy6iBwZQuAVVl0c3Y6/ZvMJ9qFuw1vAMZe7dnaTAqZA==
+X-Received: by 2002:a17:906:a44:: with SMTP id x4-v6mr2033762ejf.177.1542722309555;
+        Tue, 20 Nov 2018 05:58:29 -0800 (PST)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id c29sm7200768eda.75.2018.11.20.05.58.26
+        by smtp.gmail.com with ESMTPSA id c29sm7200768eda.75.2018.11.20.05.58.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 20 Nov 2018 05:58:27 -0800 (PST)
+        Tue, 20 Nov 2018 05:58:28 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/4] shared/shell: Add option to print to monitor
-Date:   Tue, 20 Nov 2018 15:58:20 +0200
-Message-Id: <20181120135821.18082-3-luiz.dentz@gmail.com>
+Subject: [PATCH v2 4/4] log: Use shared log code
+Date:   Tue, 20 Nov 2018 15:58:21 +0200
+Message-Id: <20181120135821.18082-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20181120135821.18082-1-luiz.dentz@gmail.com>
 References: <20181120135821.18082-1-luiz.dentz@gmail.com>
@@ -74,120 +74,285 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds option -m/--monitor which send output to btmon using
-libshared bt_log:
-
-= bluetoothctl: power on
-= bluetoothctl: Changing power on succeeded
+Use bt_log_* to send messages to the logging channel.
 ---
- src/shared/shell.c | 30 +++++++++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 3 deletions(-)
+ Makefile.tools      |   6 +-
+ android/Android.mk  |   1 +
+ android/Makefile.am |   1 +
+ src/log.c           | 130 +++++---------------------------------------
+ 4 files changed, 19 insertions(+), 119 deletions(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 241046440..89a2e82bc 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -27,6 +27,7 @@
+diff --git a/Makefile.tools b/Makefile.tools
+index f81fd0a4c..231a4b09b 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -223,13 +223,15 @@ tools_mcaptest_SOURCES = tools/mcaptest.c \
+ 				btio/btio.h btio/btio.c \
+ 				src/log.c src/log.h \
+ 				profiles/health/mcap.h profiles/health/mcap.c
+-tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@ -lrt
++tools_mcaptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@ \
++				src/libshared-mainloop.la -lrt
  
- #include <stdio.h>
- #include <errno.h>
-+#include <syslog.h>
- #include <unistd.h>
- #include <stdlib.h>
- #include <stdarg.h>
-@@ -45,6 +46,7 @@
+ tools_bneptest_SOURCES = tools/bneptest.c \
+ 				btio/btio.h btio/btio.c \
+ 				src/log.h src/log.c \
+ 				profiles/network/bnep.h profiles/network/bnep.c
+-tools_bneptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
++tools_bneptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@ \
++				src/libshared-mainloop.la
+ 
+ tools_cltest_SOURCES = tools/cltest.c
+ tools_cltest_LDADD = lib/libbluetooth-internal.la src/libshared-mainloop.la
+diff --git a/android/Android.mk b/android/Android.mk
+index 76a826b47..8f842e775 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -228,6 +228,7 @@ include $(BUILD_EXECUTABLE)
+ include $(CLEAR_VARS)
+ 
+ LOCAL_SRC_FILES := \
++	bluez/src/shared/log.c \
+ 	bluez/src/log.c \
+ 	bluez/btio/btio.c \
+ 	bluez/lib/bluetooth.c \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 154f8db56..d665d1e14 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -107,6 +107,7 @@ android_avdtptest_SOURCES = android/avdtptest.c \
+ 				btio/btio.h btio/btio.c \
+ 				src/shared/util.h src/shared/util.c \
+ 				src/shared/queue.h src/shared/queue.c \
++				src/shared/log.h src/shared/log.c \
+ 				android/avdtp.h android/avdtp.c
+ android_avdtptest_CFLAGS = $(AM_CFLAGS)
+ android_avdtptest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+diff --git a/src/log.c b/src/log.c
+index d2a20de78..ea639cbd6 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -41,95 +41,15 @@
+ #include "lib/hci.h"
+ 
  #include "src/shared/util.h"
- #include "src/shared/queue.h"
- #include "src/shared/shell.h"
 +#include "src/shared/log.h"
+ #include "log.h"
  
- #define CMD_LENGTH	48
- #define print_text(color, fmt, args...) \
-@@ -70,6 +72,7 @@ static struct {
- 	int argc;
- 	char **argv;
- 	bool mode;
-+	bool monitor;
- 	int timeout;
- 	struct io *input;
+ #define LOG_IDENT "bluetoothd"
+-#define LOG_IDENT_LEN sizeof(LOG_IDENT)
  
-@@ -521,6 +524,12 @@ void bt_shell_printf(const char *fmt, ...)
- 	vprintf(fmt, args);
- 	va_end(args);
- 
-+	if (data.monitor) {
-+		va_start(args, fmt);
-+		bt_log_vprintf(0xffff, data.name, LOG_INFO, fmt, args);
-+		va_end(args);
-+	}
-+
- 	if (save_input) {
- 		if (!data.saved_prompt)
- 			rl_restore_prompt();
-@@ -613,6 +622,9 @@ static void rl_handler(char *input)
- 	if (history_search(input, -1))
- 		add_history(input);
- 
-+	if (data.monitor)
-+		bt_log_printf(0xffff, data.name, LOG_INFO, "%s", input);
-+
- 	if (wordexp(input, &w, WRDE_NOCMD))
- 		goto done;
- 
-@@ -988,6 +1000,7 @@ static const struct option main_options[] = {
- 	{ "version",	no_argument, 0, 'v' },
- 	{ "help",	no_argument, 0, 'h' },
- 	{ "timeout",	required_argument, 0, 't' },
-+	{ "monitor",	no_argument, 0, 'm' },
- };
- 
- static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
-@@ -1003,7 +1016,8 @@ static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
- 	for (i = 0; opt && opt->options[i].name; i++)
- 		printf("\t--%s \t%s\n", opt->options[i].name, opt->help[i]);
- 
--	printf("\t--timeout \tTimeout in seconds for non-interactive mode\n"
-+	printf("\t--monitor \tEnable monitor output\n"
-+		"\t--timeout \tTimeout in seconds for non-interactive mode\n"
- 		"\t--version \tDisplay version\n"
- 		"\t--help \t\tDisplay help\n");
+-struct log_hdr {
+-	uint16_t opcode;
+-	uint16_t index;
+-	uint16_t len;
+-	uint8_t  priority;
+-	uint8_t  ident_len;
+-} __attribute__((packed));
+-
+-static int logging_fd = -1;
+-
+-static void logging_open(void)
+-{
+-	struct sockaddr_hci addr;
+-	int fd;
+-
+-	if (logging_fd >= 0)
+-		return;
+-
+-	fd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+-	if (fd < 0)
+-		return;
+-
+-	memset(&addr, 0, sizeof(addr));
+-	addr.hci_family = AF_BLUETOOTH;
+-	addr.hci_dev = HCI_DEV_NONE;
+-	addr.hci_channel = HCI_CHANNEL_LOGGING;
+-
+-	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+-		close(fd);
+-		return;
+-	}
+-
+-	logging_fd = fd;
+-}
+-
+-static void logging_close(void)
+-{
+-	if (logging_fd >= 0) {
+-		close(logging_fd);
+-		logging_fd = -1;
+-	}
+-}
+-
+-static void logging_log(uint16_t index, int priority,
++static void monitor_log(uint16_t index, int priority,
+ 					const char *format, va_list ap)
+ {
+-	struct log_hdr hdr;
+-	struct msghdr msg;
+-	struct iovec iov[3];
+-	uint16_t len;
+-	char *str;
+-
+-	if (vasprintf(&str, format, ap) < 0)
+-		return;
+-
+-	len = strlen(str) + 1;
+-
+-	hdr.opcode = cpu_to_le16(0x0000);
+-	hdr.index = cpu_to_le16(index);
+-	hdr.len = cpu_to_le16(2 + LOG_IDENT_LEN + len);
+-	hdr.priority = priority;
+-	hdr.ident_len = LOG_IDENT_LEN;
+-
+-	iov[0].iov_base = &hdr;
+-	iov[0].iov_len = sizeof(hdr);
+-
+-	iov[1].iov_base = LOG_IDENT;
+-	iov[1].iov_len = LOG_IDENT_LEN;
+-
+-	iov[2].iov_base = str;
+-	iov[2].iov_len = len;
+-
+-	memset(&msg, 0, sizeof(msg));
+-	msg.msg_iov = iov;
+-	msg.msg_iovlen = 3;
+-
+-	if (sendmsg(logging_fd, &msg, 0) < 0) {
+-		if (errno != ENODEV) {
+-			close(logging_fd);
+-			logging_fd = -1;
+-		}
+-	}
+-
+-	free(str);
++	bt_log_vprintf(index, LOG_IDENT, priority, format, ap);
  }
-@@ -1022,9 +1036,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 	if (opt) {
- 		memcpy(options + offset, opt->options,
- 				sizeof(struct option) * opt->optno);
--		snprintf(optstr, sizeof(optstr), "+hvt:%s", opt->optstr);
-+		snprintf(optstr, sizeof(optstr), "+mhvt:%s", opt->optstr);
- 	} else
--		snprintf(optstr, sizeof(optstr), "+hvt:");
-+		snprintf(optstr, sizeof(optstr), "+mhvt:");
  
- 	data.name = strrchr(argv[0], '/');
- 	if (!data.name)
-@@ -1047,6 +1061,13 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 		case 't':
- 			data.timeout = atoi(optarg);
- 			break;
-+		case 'm':
-+			data.monitor = true;
-+			if (bt_log_open() < 0) {
-+				data.monitor = false;
-+				printf("Unable to open logging channel\n");
-+			}
-+			break;
- 		default:
- 			if (index < 0) {
- 				for (index = 0; options[index].val; index++) {
-@@ -1131,6 +1152,9 @@ void bt_shell_cleanup(void)
- 		data.envs = NULL;
- 	}
+ void error(const char *format, ...)
+@@ -140,11 +60,8 @@ void error(const char *format, ...)
+ 	vsyslog(LOG_ERR, format, ap);
+ 	va_end(ap);
  
-+	if (data.monitor)
-+		bt_log_close();
-+
- 	rl_cleanup();
+-	if (logging_fd < 0)
+-		return;
+-
+ 	va_start(ap, format);
+-	logging_log(HCI_DEV_NONE, LOG_ERR, format, ap);
++	monitor_log(HCI_DEV_NONE, LOG_ERR, format, ap);
+ 	va_end(ap);
+ }
  
- 	data.init = false;
+@@ -156,11 +73,8 @@ void warn(const char *format, ...)
+ 	vsyslog(LOG_WARNING, format, ap);
+ 	va_end(ap);
+ 
+-	if (logging_fd < 0)
+-		return;
+-
+ 	va_start(ap, format);
+-	logging_log(HCI_DEV_NONE, LOG_WARNING, format, ap);
++	monitor_log(HCI_DEV_NONE, LOG_WARNING, format, ap);
+ 	va_end(ap);
+ }
+ 
+@@ -172,11 +86,8 @@ void info(const char *format, ...)
+ 	vsyslog(LOG_INFO, format, ap);
+ 	va_end(ap);
+ 
+-	if (logging_fd < 0)
+-		return;
+-
+ 	va_start(ap, format);
+-	logging_log(HCI_DEV_NONE, LOG_INFO, format, ap);
++	monitor_log(HCI_DEV_NONE, LOG_INFO, format, ap);
+ 	va_end(ap);
+ }
+ 
+@@ -188,11 +99,8 @@ void btd_log(uint16_t index, int priority, const char *format, ...)
+ 	vsyslog(priority, format, ap);
+ 	va_end(ap);
+ 
+-	if (logging_fd < 0)
+-		return;
+-
+ 	va_start(ap, format);
+-	logging_log(index, priority, format, ap);
++	monitor_log(index, priority, format, ap);
+ 	va_end(ap);
+ }
+ 
+@@ -204,11 +112,8 @@ void btd_error(uint16_t index, const char *format, ...)
+ 	vsyslog(LOG_ERR, format, ap);
+ 	va_end(ap);
+ 
+-	if (logging_fd < 0)
+-		return;
+-
+ 	va_start(ap, format);
+-	logging_log(index, LOG_ERR, format, ap);
++	monitor_log(index, LOG_ERR, format, ap);
+ 	va_end(ap);
+ }
+ 
+@@ -220,11 +125,8 @@ void btd_warn(uint16_t index, const char *format, ...)
+ 	vsyslog(LOG_WARNING, format, ap);
+ 	va_end(ap);
+ 
+-	if (logging_fd < 0)
+-		return;
+-
+ 	va_start(ap, format);
+-	logging_log(index, LOG_WARNING, format, ap);
++	monitor_log(index, LOG_WARNING, format, ap);
+ 	va_end(ap);
+ }
+ 
+@@ -236,11 +138,8 @@ void btd_info(uint16_t index, const char *format, ...)
+ 	vsyslog(LOG_INFO, format, ap);
+ 	va_end(ap);
+ 
+-	if (logging_fd < 0)
+-		return;
+-
+ 	va_start(ap, format);
+-	logging_log(index, LOG_INFO, format, ap);
++	monitor_log(index, LOG_INFO, format, ap);
+ 	va_end(ap);
+ }
+ 
+@@ -252,11 +151,8 @@ void btd_debug(uint16_t index, const char *format, ...)
+ 	vsyslog(LOG_DEBUG, format, ap);
+ 	va_end(ap);
+ 
+-	if (logging_fd < 0)
+-		return;
+-
+ 	va_start(ap, format);
+-	logging_log(index, LOG_DEBUG, format, ap);
++	monitor_log(index, LOG_DEBUG, format, ap);
+ 	va_end(ap);
+ }
+ 
+@@ -311,7 +207,7 @@ void __btd_log_init(const char *debug, int detach)
+ 
+ 	__btd_enable_debug(__start___debug, __stop___debug);
+ 
+-	logging_open();
++	bt_log_open();
+ 
+ 	if (!detach)
+ 		option |= LOG_PERROR;
+@@ -325,7 +221,7 @@ void __btd_log_cleanup(void)
+ {
+ 	closelog();
+ 
+-	logging_close();
++	bt_log_close();
+ 
+ 	g_strfreev(enabled);
+ }
 -- 
 2.17.2
 
