@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDA2C18DF5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6119AC4161D
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 13:58:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B3CC2075B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 13:58:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 375622087E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 13:58:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LvxDLILl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B3CC2075B
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OI8geiXw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 375622087E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728865AbeKUA1q (ORCPT
+        id S1729069AbeKUA1r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Nov 2018 19:27:46 -0500
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:38150 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726119AbeKUA1q (ORCPT
+        Tue, 20 Nov 2018 19:27:47 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:36211 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726219AbeKUA1r (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Nov 2018 19:27:46 -0500
-Received: by mail-ed1-f67.google.com with SMTP id h50so2002879ede.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Nov 2018 05:58:27 -0800 (PST)
+        Tue, 20 Nov 2018 19:27:47 -0500
+Received: by mail-ed1-f66.google.com with SMTP id f23so2011263edb.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Nov 2018 05:58:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=6XV+fA4WdSqgGMOCcumxqGupDzn7LUIFSTl0WNGNKuY=;
-        b=LvxDLILlqTJHU83OkWcm2I9+evaJZK9RKkG4CGbkks74rIbYkj1WUgD4MOrg2/OS8g
-         2ILJ29iVcfRJndiqfZYOp0rhKF3df5xfyxMQBgPgAsufo6I/Osl0EapE31fXNB9ef+10
-         AZZ6A8jPA4EN1oIxbUYw1IcHVipLuT2D5R+xmyVH0vKYNoRAr7YVI+3jGFXUtD6WMxuL
-         cK1k4A7GedtuUd3p37xy9aHTivBTH9BsAWSFDn42sK3XfInybTWoUtCJt/G3ygpAoblV
-         BNhpHfzSfY5Cbs4rHo+OECK7o/GyWNRnPOkrkX5UXOJznJtqY3Ds/0icWsnks1M7mz6N
-         Z2dA==
+        bh=AjEe3KODygyeikufoUCepvtVQ8cKXdlhue2u8i2G8oc=;
+        b=OI8geiXwVxfkjhyi1Ku1U9x+z84NAi+UjOQ6HLCqBNjyrAaeIzdu/nwd8isLITNGC0
+         H7dXvvbK9LmbxtzBPRXPpzVms4u5k9HtVG2PalwsX1rAEWvmJdsCj9LozK8G6BlojGoS
+         GY0LLIeopAb0WY/2nYmQXI+Xw+jSFFyBTniWq0/Ox8rphw5EL4gyK7Fejl6dSJgNejTK
+         hGAjVrwPJdBuggJZtGRhr9uHn3jJUlVUa6u9qCiFyKnuT99aubg/knRUrHdVcwie1VUr
+         +XKHZIwQsqFhLPiYdEsiwrVA55vmEw/JvDdMZp3FfWyrmfvJxgHZiUa4k+AHf/rAwJCX
+         LHwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=6XV+fA4WdSqgGMOCcumxqGupDzn7LUIFSTl0WNGNKuY=;
-        b=is3kkjpMfY9LtVz2koQ4X4qIC+I0Hy/4kdqntRocURnBD87k3X62X7AC8dFrwUJMjY
-         7hN5k2GLOyiDtLkwWt2XWKr2egNezFGeGPy7zyyuAprv/J2sfdlNtzmH0cvG3SNQdBSQ
-         qBx/Hg8fHaWphELUzqJzgjFK73vjF3dszl8/4jima0lHXILUrUcxsFlCAGj/g5QfAZyx
-         U2ReOWvUHuH0+Bs3iiZYZkOPdG6ha6GhM4fNEP8OmptZ6RuP0SGC4tWsi48gc0F4X+Xo
-         JC3DEHOOj+FP0kNYQQoRFuu+dg9VQv51u1zCxEuoHsYgSkEJ2UtQFqWVQjn+zCEQwdS3
-         64AQ==
-X-Gm-Message-State: AGRZ1gLlemKT7tnbH8JwQtwKsdnC7v+XBWWZqL3szaKIhL6QyCqnjLai
-        Zb2N8+mmNGWNJZ8utoULkdPW+HHd
-X-Google-Smtp-Source: AJdET5cPwqYC4wwbHE41jWaOUPUirTNiPyPZEfl8St4hkGswbhhWwMwwHy+CQIiaysFgjwUMNMICSQ==
-X-Received: by 2002:a17:906:5a0a:: with SMTP id p10-v6mr2098064ejq.43.1542722306673;
-        Tue, 20 Nov 2018 05:58:26 -0800 (PST)
+        bh=AjEe3KODygyeikufoUCepvtVQ8cKXdlhue2u8i2G8oc=;
+        b=iJJyu2Jct9Gqt5O2VnaTs3XDGQqEDfJcZAFTTri2wobvNkFU831mA5JhqdV4yzBapt
+         DVtaGafIju8kdU2voocMy1AibRN/OtSx3fIlfYC5STouMQ7SV4jh102r2DGZhHCurCPF
+         AZt+No3YLB743yCXj9/KRCdkg4YzMvmn6cUYGes150/7E3a9lXh2J0zPwGeCqIfcGEpd
+         lFDKKTDYZTo8X2dQJ6vOlY4vO45A8RD348371+OBsK4UqtdLMy2lKDLUy4TqUNMpgf7D
+         22FfXvd7CORYWZE0B1SJOoPc4+LS5rYEJZXS/Z6kmqkkPSRTniSm3rHaGb1GHj54rZRS
+         hDdA==
+X-Gm-Message-State: AGRZ1gLz31kvOZnX6Cg2hRNbt2TnJQGhIYttx0pEa/uBNCSxSeNrl/Yx
+        VfI//0w1YDFd8o1cZ4g3cocMF119
+X-Google-Smtp-Source: AJdET5e7L//AVUNN0Thn8I/2Hd6IyAehV442GvRNdLPBie/wth2VEv56IAT9qCOvh//PgZGF1eQPTg==
+X-Received: by 2002:a17:906:9154:: with SMTP id y20-v6mr2073325ejw.8.1542722308297;
+        Tue, 20 Nov 2018 05:58:28 -0800 (PST)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id c29sm7200768eda.75.2018.11.20.05.58.25
+        by smtp.gmail.com with ESMTPSA id c29sm7200768eda.75.2018.11.20.05.58.26
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 20 Nov 2018 05:58:26 -0800 (PST)
+        Tue, 20 Nov 2018 05:58:27 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/4] shared/tester: Make use of shared log
-Date:   Tue, 20 Nov 2018 15:58:19 +0200
-Message-Id: <20181120135821.18082-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/4] shared/shell: Add option to print to monitor
+Date:   Tue, 20 Nov 2018 15:58:20 +0200
+Message-Id: <20181120135821.18082-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20181120135821.18082-1-luiz.dentz@gmail.com>
 References: <20181120135821.18082-1-luiz.dentz@gmail.com>
@@ -74,189 +74,120 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Use bt_monitor_* to send messages to the logging channel.
----
- src/shared/tester.c | 112 ++++----------------------------------------
- 1 file changed, 9 insertions(+), 103 deletions(-)
+This adds option -m/--monitor which send output to btmon using
+libshared bt_log:
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 05c81a66d..168d0de91 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -46,6 +46,7 @@
+= bluetoothctl: power on
+= bluetoothctl: Changing power on succeeded
+---
+ src/shared/shell.c | 30 +++++++++++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 241046440..89a2e82bc 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -27,6 +27,7 @@
  
+ #include <stdio.h>
+ #include <errno.h>
++#include <syslog.h>
+ #include <unistd.h>
+ #include <stdlib.h>
+ #include <stdarg.h>
+@@ -45,6 +46,7 @@
  #include "src/shared/util.h"
- #include "src/shared/tester.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/shell.h"
 +#include "src/shared/log.h"
  
- #define COLOR_OFF	"\x1B[0m"
- #define COLOR_BLACK	"\x1B[0;30m"
-@@ -131,8 +132,6 @@ struct monitor_l2cap_hdr {
- 	uint16_t psm;
- } __attribute__((packed));
+ #define CMD_LENGTH	48
+ #define print_text(color, fmt, args...) \
+@@ -70,6 +72,7 @@ static struct {
+ 	int argc;
+ 	char **argv;
+ 	bool mode;
++	bool monitor;
+ 	int timeout;
+ 	struct io *input;
  
--static int monitor_fd = -1;
--
- static void test_destroy(gpointer data)
- {
- 	struct test_case *test = data;
-@@ -150,102 +149,6 @@ static void test_destroy(gpointer data)
- 	free(test);
+@@ -521,6 +524,12 @@ void bt_shell_printf(const char *fmt, ...)
+ 	vprintf(fmt, args);
+ 	va_end(args);
+ 
++	if (data.monitor) {
++		va_start(args, fmt);
++		bt_log_vprintf(0xffff, data.name, LOG_INFO, fmt, args);
++		va_end(args);
++	}
++
+ 	if (save_input) {
+ 		if (!data.saved_prompt)
+ 			rl_restore_prompt();
+@@ -613,6 +622,9 @@ static void rl_handler(char *input)
+ 	if (history_search(input, -1))
+ 		add_history(input);
+ 
++	if (data.monitor)
++		bt_log_printf(0xffff, data.name, LOG_INFO, "%s", input);
++
+ 	if (wordexp(input, &w, WRDE_NOCMD))
+ 		goto done;
+ 
+@@ -988,6 +1000,7 @@ static const struct option main_options[] = {
+ 	{ "version",	no_argument, 0, 'v' },
+ 	{ "help",	no_argument, 0, 'h' },
+ 	{ "timeout",	required_argument, 0, 't' },
++	{ "monitor",	no_argument, 0, 'm' },
+ };
+ 
+ static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
+@@ -1003,7 +1016,8 @@ static void usage(int argc, char **argv, const struct bt_shell_opt *opt)
+ 	for (i = 0; opt && opt->options[i].name; i++)
+ 		printf("\t--%s \t%s\n", opt->options[i].name, opt->help[i]);
+ 
+-	printf("\t--timeout \tTimeout in seconds for non-interactive mode\n"
++	printf("\t--monitor \tEnable monitor output\n"
++		"\t--timeout \tTimeout in seconds for non-interactive mode\n"
+ 		"\t--version \tDisplay version\n"
+ 		"\t--help \t\tDisplay help\n");
  }
+@@ -1022,9 +1036,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 	if (opt) {
+ 		memcpy(options + offset, opt->options,
+ 				sizeof(struct option) * opt->optno);
+-		snprintf(optstr, sizeof(optstr), "+hvt:%s", opt->optstr);
++		snprintf(optstr, sizeof(optstr), "+mhvt:%s", opt->optstr);
+ 	} else
+-		snprintf(optstr, sizeof(optstr), "+hvt:");
++		snprintf(optstr, sizeof(optstr), "+mhvt:");
  
--static int monitor_open(void)
--{
--	struct sockaddr_hci addr;
--	int fd;
--
--	if (!option_monitor)
--		return -1;
--
--	if (monitor_fd >= 0)
--		return monitor_fd;
--
--	fd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
--	if (fd < 0)
--		return fd;
--
--	memset(&addr, 0, sizeof(addr));
--	addr.hci_family = AF_BLUETOOTH;
--	addr.hci_dev = HCI_DEV_NONE;
--	addr.hci_channel = HCI_CHANNEL_LOGGING;
--
--	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
--		option_monitor = FALSE;
--		tester_debug("Failed to open monitor socket: %s",
--			     strerror(errno));
--		close(fd);
--		return -1;
--	}
--
--	monitor_fd = fd;
--
--	return fd;
--}
--
--static void monitor_sendmsg(const char *label, int level, struct iovec *io,
--							size_t io_len)
--{
--	struct monitor_hdr hdr;
--	struct msghdr msg;
--	struct iovec iov[5];
--	size_t i;
--
--	monitor_fd = monitor_open();
--	if (monitor_fd < 0 || io_len > 3)
--		return;
--
--	hdr.opcode = cpu_to_le16(0x0000);
--	hdr.index = cpu_to_le16(0xffff);
--	hdr.ident_len = strlen(label) + 1;
--	hdr.len = cpu_to_le16(2 + hdr.ident_len);
--	hdr.priority = level;
--
--	iov[0].iov_base = &hdr;
--	iov[0].iov_len = sizeof(hdr);
--
--	iov[1].iov_base = (void *) label;
--	iov[1].iov_len = hdr.ident_len;
--
--	memset(&msg, 0, sizeof(msg));
--	msg.msg_iov = iov;
--	msg.msg_iovlen = 2;
--
--	for (i = 0; i < io_len; i++) {
--		iov[i + 2] = io[i];
--		hdr.len += io[i].iov_len;
--		msg.msg_iovlen++;
--	}
--
--	if (sendmsg(monitor_fd, &msg, 0) < 0) {
--		/* Disable monitor */
--		option_monitor = FALSE;
--		tester_debug("Failed to send to monitor: %s", strerror(errno));
--		close(monitor_fd);
--		monitor_fd = -1;
--	}
--}
--
--static void monitor_vprintf(const char *id, int level, const char *format,
--								va_list ap)
--{
--	struct iovec iov;
--	char *str;
--
--	if (!option_monitor)
--		return;
--
--	if (vasprintf(&str, format, ap) < 0)
--		return;
--
--	iov.iov_base = str;
--	iov.iov_len = strlen(str) + 1;
--
--	monitor_sendmsg(id, level, &iov, 1);
--
--	free(str);
--}
--
- static void tester_vprintf(const char *format, va_list ap)
- {
- 	if (tester_use_quiet())
-@@ -266,7 +169,7 @@ static void tester_log(const char *format, ...)
- 	va_end(ap);
+ 	data.name = strrchr(argv[0], '/');
+ 	if (!data.name)
+@@ -1047,6 +1061,13 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
+ 		case 't':
+ 			data.timeout = atoi(optarg);
+ 			break;
++		case 'm':
++			data.monitor = true;
++			if (bt_log_open() < 0) {
++				data.monitor = false;
++				printf("Unable to open logging channel\n");
++			}
++			break;
+ 		default:
+ 			if (index < 0) {
+ 				for (index = 0; options[index].val; index++) {
+@@ -1131,6 +1152,9 @@ void bt_shell_cleanup(void)
+ 		data.envs = NULL;
+ 	}
  
- 	va_start(ap, format);
--	monitor_vprintf(tester_name, LOG_INFO, format, ap);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_INFO, format, ap);
- 	va_end(ap);
- }
- 
-@@ -279,7 +182,7 @@ void tester_print(const char *format, ...)
- 	va_end(ap);
- 
- 	va_start(ap, format);
--	monitor_vprintf(tester_name, LOG_INFO, format, ap);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_INFO, format, ap);
- 	va_end(ap);
- }
- 
-@@ -292,7 +195,7 @@ void tester_debug(const char *format, ...)
- 	va_end(ap);
- 
- 	va_start(ap, format);
--	monitor_vprintf(tester_name, LOG_DEBUG, format, ap);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_DEBUG, format, ap);
- 	va_end(ap);
- }
- 
-@@ -305,7 +208,7 @@ void tester_warn(const char *format, ...)
- 	va_end(ap);
- 
- 	va_start(ap, format);
--	monitor_vprintf(tester_name, LOG_WARNING, format, ap);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_WARNING, format, ap);
- 	va_end(ap);
- }
- 
-@@ -340,7 +243,7 @@ static void monitor_log(char dir, uint16_t cid, uint16_t psm, const void *data,
- 	iov[2].iov_base = &term;
- 	iov[2].iov_len = sizeof(term);
- 
--	monitor_sendmsg(label, LOG_INFO, iov, 3);
-+	bt_log_sendmsg(HCI_DEV_NONE, label, LOG_INFO, iov, 3);
- }
- 
- void tester_monitor(char dir, uint16_t cid, uint16_t psm, const void *data,
-@@ -1032,5 +935,8 @@ int tester_run(void)
- 
- 	g_list_free_full(test_list, test_destroy);
- 
-+	if (option_monitor)
++	if (data.monitor)
 +		bt_log_close();
 +
- 	return ret == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
- }
+ 	rl_cleanup();
+ 
+ 	data.init = false;
 -- 
 2.17.2
 
