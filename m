@@ -2,274 +2,199 @@ Return-Path: <SRS0=OtUJ=N7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEAF6C4161D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 11:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9806BC18DF5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 12:36:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C95C420685
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 11:45:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0217C2087E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 12:35:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jF+iyPn4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C95C420685
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="CQu/A2SS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0217C2087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729209AbeKTWOM (ORCPT
+        id S1726172AbeKTXEV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Nov 2018 17:14:12 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:33472 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728997AbeKTWOM (ORCPT
+        Tue, 20 Nov 2018 18:04:21 -0500
+Received: from mail-vk1-f195.google.com ([209.85.221.195]:33191 "EHLO
+        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725876AbeKTXEV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Nov 2018 17:14:12 -0500
-Received: by mail-qk1-f195.google.com with SMTP id o89so2331733qko.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Nov 2018 03:45:26 -0800 (PST)
+        Tue, 20 Nov 2018 18:04:21 -0500
+Received: by mail-vk1-f195.google.com with SMTP id d201so364126vka.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Nov 2018 04:35:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=augury.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=C1PTrCxdEK4pa93TSNJmCKw1xwdme8dS/+6VGxlseTo=;
-        b=jF+iyPn4Ch0TXhOix8Skw3Ky+O9UGoNI5jHHkQMKsJee4D4r8e7EYvGUeyd8Hi+5sN
-         lLbKaJBFWqNotB97z45SQGGTjF20zg7rq43EM6bGZ/hu5xVOM1WQxz7qtxwhVQNjAnnD
-         D6PEDGTZjLgfgJ9HIteKX9CMVgUraRrR2EGf9cgksjIepyVkwXdu3NhemcM4OLORh/Vy
-         KW5XH1DSGm5+UzCr3NsC8G4Opy1z3HsuRfVFEwyALG7J9VeiRqVqGFASYJok3Nhm6pIf
-         EmCGLQs8AOrUqSbMLnZWfjquqmYaRk/8wgj3s/JDVKYewTCg3qODhWxWRY5kURPDAcGI
-         wutw==
+        bh=zu8ZuI303JrlSx/EnjNJJ7B/rYtk8B5q1bvTJWb5XME=;
+        b=CQu/A2SSU6P8cUJ/HGtJ+zkT7CyQh/LdHxIioWgDXzSGxr8Ctqwt2Is5fJjWtVPnKJ
+         1qivP19FlAc8GS77lH9rYbqa212sd9QdhQSKKGGteoj5Ezz2kXKeAv5l3yQL25oXw78m
+         bhiHoGvwMGGVLhSz8w+G2q0zIKOv90JX4VNWg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=C1PTrCxdEK4pa93TSNJmCKw1xwdme8dS/+6VGxlseTo=;
-        b=g0v61N5t8/i5hfI8wPZYbo6d0OeonE+hoJTx+RlGc4+XJrwYIpD3Z7HUeP/Y/mQdiE
-         hzumIbrMUOvdY+4DLMTaId0pWigFgzNUCZWuCYikP5aWii1X92D527qeyT8BiEF1Avry
-         gQhsd9FCd+405cqz78Z2eeEAgH5HG5WbSVXexw7oMokY3JCLf1p3Vi+te2bGihKEdAyg
-         H1vEsNZzRz7qvxTgNUSTl0IRnPgJbe/uCWekFPRZXIpemg+kdQyCZ+7n0GeefL9NnnyJ
-         Kz2E4Ov+PolZBJFEUDvtrJv1n2BKU49hkwHPaYvNG+JPs1j14Qo9VbPTAEzfJlAN/R/4
-         m2kg==
-X-Gm-Message-State: AGRZ1gLtd4F7gnF2roReKBtM3B/2/gagrAh75SPynoBKTzMowO8amfia
-        gYBxRfycXzDt85JRBJHLnBtVrXIvV7CtNLoSFcMMrQ==
-X-Google-Smtp-Source: AFSGD/XnaVTZKf8Mncr+dQOTyNbqV1mDwe7P8s1qWcpWrBWZIFrpZnEVahqtLFIhhWXYI7noITXD8Pllvik5aZgcS6U=
-X-Received: by 2002:aed:2a64:: with SMTP id k33mr1537592qtf.102.1542714326081;
- Tue, 20 Nov 2018 03:45:26 -0800 (PST)
+        bh=zu8ZuI303JrlSx/EnjNJJ7B/rYtk8B5q1bvTJWb5XME=;
+        b=WJ/yULYSC+8K6mipfS5P1irhQSfAr1uTRuqKI1C5PdW6xepHdZqIEUH4MqlcN4Uquk
+         swNkj8s8V+45GU36Q/gUeW35fKoz6CVha/A9V+qS/FsLfweViC4egFTcA5Rne8FrQeqA
+         UuOzDrRqX3HvKmJc3XrMGAHLDckJHWssFKcOuoV4pw107EagvD/WR0GNLhCtxWyRR+BL
+         HrAp3NOq3NX6PeKOw0Awwz1y3sOX7bBnfiX8z9sg724mjBj79kQy64G7oHtXBIcfszA+
+         WL6/LXqrhTdguCi/KSqyjpmqtdQCLwtCt/apTBGmelpvkgnk4ANLUJH4bBng/vMdyFvI
+         MZbw==
+X-Gm-Message-State: AA+aEWZs32SXFwua57xATlN1SlnmoB94PdbIOMSsOnq7xsgoV3w1asvx
+        rJQULIh6mfBpaA31fmTEMXtSNko9WmbkH6bn6f/kkg==
+X-Google-Smtp-Source: AFSGD/UKrJPGuvz+k+llK4UJN1B41bRdNTO8sYGSr4UHFxG2fdJf1mtOWOtBAilyAiXkzjTmp8VU1hki45dDlhkf++0=
+X-Received: by 2002:a1f:83ca:: with SMTP id f193mr698383vkd.75.1542717324627;
+ Tue, 20 Nov 2018 04:35:24 -0800 (PST)
 MIME-Version: 1.0
-References: <1541745429-13105-1-git-send-email-jaganath.kanakkassery@intel.com>
-In-Reply-To: <1541745429-13105-1-git-send-email-jaganath.kanakkassery@intel.com>
-From:   Jaganath K <jaganath.k.os@gmail.com>
-Date:   Tue, 20 Nov 2018 17:15:14 +0530
-Message-ID: <CAJzH+botVyUqym5menn+rC2VYOYQ_3Y5-HrrijToBZ0VP4EO0g@mail.gmail.com>
-Subject: Re: [PATCH v2 BlueZ] btmgmt: Add BREDR PHYs in PHY Configuration commands
-To:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>
-Cc:     Jaganath Kanakkassery <jaganath.kanakkassery@intel.com>
+References: <20181119154311.27826-1-luiz.dentz@gmail.com> <CABBYNZK90H=0e4GKo1g96jYkg3EM+5C2DhbCvi-Cgtd8W+E3YA@mail.gmail.com>
+ <CAHotPr_8M4H_6sLV+BK02QBKLwwAn0cEOFhyoMN5F0=_gY1dHQ@mail.gmail.com> <CABBYNZJNM2SpM2w3kwuLw1FfXcoSZfyO02xCJAgdx-BBPyw7-w@mail.gmail.com>
+In-Reply-To: <CABBYNZJNM2SpM2w3kwuLw1FfXcoSZfyO02xCJAgdx-BBPyw7-w@mail.gmail.com>
+From:   Gal Ben Haim <gbenhaim@augury.com>
+Date:   Tue, 20 Nov 2018 14:35:13 +0200
+Message-ID: <CAHotPr8nQYJkN30pTncQfx-SGgmUgTs582_q_MAiLi=bEFYO9w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/5] gatt: Fix invalid read when disconnecting
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+i tried with both git am and git apply
 
-On Fri, Nov 9, 2018 at 12:13 PM Jaganath Kanakkassery
-<jaganath.k.os@gmail.com> wrote:
+On Tue, Nov 20, 2018 at 12:35 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> This basically adds BREDR packet types also in the PHY confiuration
-> commands & events and makes the PHYs 32 bit so that it can be
-> extended in future. This also add configurable PHYs in the GetPhy
-> command wherein only those can be selected or deselected in SetPhy.
+> Hi Gal,
+> On Tue, Nov 20, 2018 at 11:31 AM Gal Ben Haim <gbenhaim@augury.com> wrote:
+> >
+> > I can't apply this patch, not to the revision in master and not to the 5.50 tag
 >
-> This also adds LE prefix for LE phys to make it more
-> descriptive
-> ---
->  lib/mgmt.h     | 32 ++++++++++++++++---------
->  tools/btmgmt.c | 75 ++++++++++++++++++++++++++++++++++------------------------
->  2 files changed, 65 insertions(+), 42 deletions(-)
+> They are on top o master, how are you trying to apply them, with git am?
 >
-> diff --git a/lib/mgmt.h b/lib/mgmt.h
-> index ec6a380..570dec9 100644
-> --- a/lib/mgmt.h
-> +++ b/lib/mgmt.h
-> @@ -552,16 +552,26 @@ struct mgmt_cp_set_appearance {
+> > On Tue, Nov 20, 2018 at 10:50 AM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > On Mon, Nov 19, 2018 at 5:43 PM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > >
+> > > > In case there is a client of AcquireNotify and a disconnect happens the
+> > > > code not only have to free the client object but also destroy the io
+> > > > associated with it, for this reason the client object cannot be freed
+> > > > until the io is destroyed otherwise it may lead to the following error:
+> > > >
+> > > > Invalid read of size 4
+> > > >    at 0x63920: notify_io_destroy (gatt-client.c:1461)
+> > > >    by 0x63EDB: pipe_io_destroy (gatt-client.c:1082)
+> > > >    by 0x6405B: characteristic_free (gatt-client.c:1663)
+> > > >    by 0x81F33: remove_interface (object.c:667)
+> > > >    by 0x826CB: g_dbus_unregister_interface (object.c:1391)
+> > > >    by 0x85D2B: queue_remove_all (queue.c:354)
+> > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
+> > > >    by 0x85CF7: queue_remove_all (queue.c:339)
+> > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
+> > > >    by 0x695CB: gatt_service_removed (device.c:3747)
+> > > >    by 0x85B17: queue_foreach (queue.c:220)
+> > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
+> > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
+> > > >  Address 0x515ed48 is 0 bytes inside a block of size 20 free'd
+> > > >    at 0x483EAD0: free (vg_replace_malloc.c:530)
+> > > >    by 0x85D2B: queue_remove_all (queue.c:354)
+> > > >    by 0x636D3: unregister_characteristic (gatt-client.c:1741)
+> > > >    by 0x85D2B: queue_remove_all (queue.c:354)
+> > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
+> > > >    by 0x85CF7: queue_remove_all (queue.c:339)
+> > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
+> > > >    by 0x695CB: gatt_service_removed (device.c:3747)
+> > > >    by 0x85B17: queue_foreach (queue.c:220)
+> > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
+> > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
+> > > >    by 0x85D2B: queue_remove_all (queue.c:354)
+> > > >    by 0x91387: gatt_db_clear_range (gatt-db.c:475)
+> > > > ---
+> > > >  src/gatt-client.c | 24 ++++++++++++------------
+> > > >  1 file changed, 12 insertions(+), 12 deletions(-)
+> > > >
+> > > > diff --git a/src/gatt-client.c b/src/gatt-client.c
+> > > > index 234f46ed7..55aa5e423 100644
+> > > > --- a/src/gatt-client.c
+> > > > +++ b/src/gatt-client.c
+> > > > @@ -1645,13 +1645,22 @@ static const GDBusMethodTable characteristic_methods[] = {
+> > > >         { }
+> > > >  };
+> > > >
+> > > > +static void remove_client(void *data)
+> > > > +{
+> > > > +       struct notify_client *ntfy_client = data;
+> > > > +       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
+> > > > +
+> > > > +       queue_remove(client->all_notify_clients, ntfy_client);
+> > > > +
+> > > > +       notify_client_unref(ntfy_client);
+> > > > +}
+> > > > +
+> > > >  static void characteristic_free(void *data)
+> > > >  {
+> > > >         struct characteristic *chrc = data;
+> > > >
+> > > >         /* List should be empty here */
+> > > >         queue_destroy(chrc->descs, NULL);
+> > > > -       queue_destroy(chrc->notify_clients, NULL);
+> > > >
+> > > >         if (chrc->write_io) {
+> > > >                 queue_remove(chrc->service->client->ios, chrc->write_io->io);
+> > > > @@ -1663,6 +1672,8 @@ static void characteristic_free(void *data)
+> > > >                 pipe_io_destroy(chrc->notify_io);
+> > > >         }
+> > > >
+> > > > +       queue_destroy(chrc->notify_clients, remove_client);
+> > > > +
+> > > >         g_free(chrc->path);
+> > > >         free(chrc);
+> > > >  }
+> > > > @@ -1715,16 +1726,6 @@ static struct characteristic *characteristic_create(
+> > > >         return chrc;
+> > > >  }
+> > > >
+> > > > -static void remove_client(void *data)
+> > > > -{
+> > > > -       struct notify_client *ntfy_client = data;
+> > > > -       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
+> > > > -
+> > > > -       queue_remove(client->all_notify_clients, ntfy_client);
+> > > > -
+> > > > -       notify_client_unref(ntfy_client);
+> > > > -}
+> > > > -
+> > > >  static void unregister_characteristic(void *data)
+> > > >  {
+> > > >         struct characteristic *chrc = data;
+> > > > @@ -1738,7 +1739,6 @@ static void unregister_characteristic(void *data)
+> > > >         if (chrc->write_op)
+> > > >                 bt_gatt_client_cancel(gatt, chrc->write_op->id);
+> > > >
+> > > > -       queue_remove_all(chrc->notify_clients, NULL, NULL, remove_client);
+> > > >         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
+> > > >
+> > > >         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
+> > > > --
+> > > > 2.17.2
+> > >
+> > > Can you try with this set to see it does work properly.
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
 >
->  #define MGMT_OP_GET_PHY_CONFIGURATION  0x0044
->  struct mgmt_rp_get_phy_confguration {
-> -       uint16_t        supported_phys;
-> -       uint16_t        selected_phys;
-> -} __packed;
-> -
-> -#define MGMT_PHY_LE_1M_TX              0x0001
-> -#define MGMT_PHY_LE_1M_RX              0x0002
-> -#define MGMT_PHY_LE_2M_TX              0x0004
-> -#define MGMT_PHY_LE_2M_RX              0x0008
-> -#define MGMT_PHY_LE_CODED_TX           0x0010
-> -#define MGMT_PHY_LE_CODED_RX           0x0020
-> +       uint32_t        supported_phys;
-> +       uint32_t        configurable_phys;
-> +       uint32_t        selected_phys;
-> +} __packed;
-> +
-> +#define MGMT_PHY_BR_1M_1SLOT   0x00000001
-> +#define MGMT_PHY_BR_1M_3SLOT   0x00000002
-> +#define MGMT_PHY_BR_1M_5SLOT   0x00000004
-> +#define MGMT_PHY_EDR_2M_1SLOT  0x00000008
-> +#define MGMT_PHY_EDR_2M_3SLOT  0x00000010
-> +#define MGMT_PHY_EDR_2M_5SLOT  0x00000020
-> +#define MGMT_PHY_EDR_3M_1SLOT  0x00000040
-> +#define MGMT_PHY_EDR_3M_3SLOT  0x00000080
-> +#define MGMT_PHY_EDR_3M_5SLOT  0x00000100
-> +#define MGMT_PHY_LE_1M_TX              0x00000200
-> +#define MGMT_PHY_LE_1M_RX              0x00000400
-> +#define MGMT_PHY_LE_2M_TX              0x00000800
-> +#define MGMT_PHY_LE_2M_RX              0x00001000
-> +#define MGMT_PHY_LE_CODED_TX   0x00002000
-> +#define MGMT_PHY_LE_CODED_RX   0x00004000
->
->  #define MGMT_PHY_LE_TX_MASK (MGMT_PHY_LE_1M_TX | MGMT_PHY_LE_2M_TX | \
->                              MGMT_PHY_LE_CODED_TX)
-> @@ -570,7 +580,7 @@ struct mgmt_rp_get_phy_confguration {
->
->  #define MGMT_OP_SET_PHY_CONFIGURATION  0x0045
->  struct mgmt_cp_set_phy_confguration {
-> -       uint16_t        default_phys;
-> +       uint32_t        selected_phys;
->  } __packed;
 >
 >
-> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-> index 9e3a3ca..6922f3d 100644
-> --- a/tools/btmgmt.c
-> +++ b/tools/btmgmt.c
-> @@ -4181,15 +4181,24 @@ static void cmd_appearance(int argc, char **argv)
->  }
->
->  static const char *phys_str[] = {
-> -       "1MTX",
-> -       "1MRX",
-> -       "2MTX",
-> -       "2MRX",
-> -       "CODEDTX",
-> -       "CODEDRX",
-> +       "BR1M1SLOT",
-> +       "BR1M3SLOT",
-> +       "BR1M5SLOT",
-> +       "EDR2M1SLOT",
-> +       "EDR2M3SLOT",
-> +       "EDR2M5SLOT",
-> +       "EDR3M1SLOT",
-> +       "EDR3M3SLOT",
-> +       "EDR3M5SLOT",
-> +       "LE1MTX",
-> +       "LE1MRX",
-> +       "LE2MTX",
-> +       "LE2MRX",
-> +       "LECODEDTX",
-> +       "LECODEDRX",
->  };
->
-> -static const char *phys2str(uint16_t phys)
-> +static const char *phys2str(uint32_t phys)
->  {
->         static char str[256];
->         unsigned int i;
-> @@ -4207,11 +4216,25 @@ static const char *phys2str(uint16_t phys)
->         return str;
->  }
->
-> +static bool str2phy(const char *phy_str, uint32_t *phy_val)
-> +{
-> +       unsigned int i;
-> +
-> +       for (i = 0; i < NELEM(phys_str); i++) {
-> +               if (strcasecmp(phys_str[i], phy_str) == 0) {
-> +                       *phy_val = (1 << i);
-> +                       return true;
-> +               }
-> +       }
-> +
-> +       return false;
-> +}
-> +
->  static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
->                                                         void *user_data)
->  {
->         const struct mgmt_rp_get_phy_confguration *rp = param;
-> -       uint16_t supported_flags, selected_phys;
-> +       uint32_t supported_phys, selected_phys, configurable_phys;
->
->         if (status != 0) {
->                 error("Get PHY Configuration failed with status 0x%02x (%s)",
-> @@ -4224,10 +4247,12 @@ static void get_phy_rsp(uint8_t status, uint16_t len, const void *param,
->                 return bt_shell_noninteractive_quit(EXIT_FAILURE);
->         }
->
-> -       supported_flags = get_le16(&rp->supported_phys);
-> -       selected_phys = get_le16(&rp->selected_phys);
-> +       supported_phys = get_le32(&rp->supported_phys);
-> +       configurable_phys = get_le32(&rp->configurable_phys);
-> +       selected_phys = get_le32(&rp->selected_phys);
->
-> -       print("Supported phys: %s", phys2str(supported_flags));
-> +       print("Supported phys: %s", phys2str(supported_phys));
-> +       print("Configurable phys: %s", phys2str(configurable_phys));
->         print("Selected phys: %s", phys2str(selected_phys));
->
->         bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> @@ -4266,33 +4291,20 @@ static void cmd_phy(int argc, char **argv)
->  {
->         struct mgmt_cp_set_phy_confguration cp;
->         int i;
-> -       uint16_t phys = 0;
-> +       uint32_t phys = 0;
->         uint16_t index;
->
->         if (argc < 2)
->                 return get_phy();
->
->         for (i = 1; i < argc; i++) {
-> -               if (strcasecmp(argv[i], "1MTX") == 0)
-> -                       phys |= MGMT_PHY_LE_1M_TX;
-> -
-> -               if (strcasecmp(argv[i], "1MRX") == 0)
-> -                       phys |= MGMT_PHY_LE_1M_RX;
-> -
-> -               if (strcasecmp(argv[i], "2MTX") == 0)
-> -                       phys |= MGMT_PHY_LE_2M_TX;
-> -
-> -               if (strcasecmp(argv[i], "2MRX") == 0)
-> -                       phys |= MGMT_PHY_LE_2M_RX;
-> -
-> -               if (strcasecmp(argv[i], "CODEDTX") == 0)
-> -                       phys |= MGMT_PHY_LE_CODED_TX;
-> +               uint32_t phy_val;
->
-> -               if (strcasecmp(argv[i], "CODEDRX") == 0)
-> -                       phys |= MGMT_PHY_LE_CODED_RX;
-> +               if (str2phy(argv[i], &phy_val))
-> +                       phys |= phy_val;
->         }
->
-> -       cp.default_phys = cpu_to_le16(phys);
-> +       cp.selected_phys = cpu_to_le32(phys);
->
->         index = mgmt_index;
->         if (index == MGMT_INDEX_NONE)
-> @@ -4501,8 +4513,9 @@ static const struct bt_shell_menu main_menu = {
->                 cmd_clr_adv,            "Clear advertising instances"   },
->         { "appearance",         "<appearance>",
->                 cmd_appearance,         "Set appearance"                },
-> -       { "phy",                "[1MTX] [1MRX] [2MTX] [2MRX] [CODEDTX] "
-> -                               "[CODEDRX] [BR1M1SLOT] [BR1M3SLOT] [BR1M5SLOT]"
-> +       { "phy",                "[LE1MTX] [LE1MRX] [LE2MTX] [LE2MRX] "
-> +                               "[LECODEDTX] [LECODEDRX] "
-> +                               "[BR1M1SLOT] [BR1M3SLOT] [BR1M5SLOT]"
->                                 "[EDR2M1SLOT] [EDR2M3SLOT] [EDR2M5SLOT]"
->                                 "[EDR3M1SLOT] [EDR3M3SLOT] [EDR3M5SLOT]",
->                 cmd_phy,                "Get/Set PHY Configuration"     },
 > --
-
-Ping.
-
-Thanks,
-Jaganath
+> Luiz Augusto von Dentz
