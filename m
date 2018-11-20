@@ -2,573 +2,182 @@ Return-Path: <SRS0=OtUJ=N7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 073F7C43610
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 07:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17E28C18E01
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 08:51:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85854208E4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 07:29:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85854208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id B7E6A2145D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 08:50:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZljsVCBb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7E6A2145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731822AbeKTR4y (ORCPT
+        id S1726944AbeKTTSh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Nov 2018 12:56:54 -0500
-Received: from mga11.intel.com ([192.55.52.93]:57174 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726840AbeKTR4y (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Nov 2018 12:56:54 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Nov 2018 23:29:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,256,1539673200"; 
-   d="scan'208";a="282598063"
-Received: from ingas-nuc1.sea.intel.com ([10.251.156.184])
-  by fmsmga006.fm.intel.com with ESMTP; 19 Nov 2018 23:29:13 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v4] doc: Initial Bluetooth Mesh API
-Date:   Mon, 19 Nov 2018 23:29:05 -0800
-Message-Id: <20181120072905.26306-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.17.2
+        Tue, 20 Nov 2018 14:18:37 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:37694 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725866AbeKTTSc (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 20 Nov 2018 14:18:32 -0500
+Received: by mail-ot1-f65.google.com with SMTP id 40so985834oth.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Nov 2018 00:50:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=E8ZIFDHr7ZftwhrBHcMZ1HNvBlaRD4+FZney/mWN3Hg=;
+        b=ZljsVCBb6jGZFfSkuD3Z8omycrNkZjn5zTPu3fEVVOnWaC6v2I1U7u9IthgCXy+hPB
+         nFrDuA5QYyemMXn+qtMFDRq1Oyb8ZbjedBFBuU7Nwd5xfKESJeKNQPXk9rfxTPrsVBQ2
+         8U2R6ODYMVv0c3on3mFVQGANq53PeUhb6F/+rAPBTSlw5Kfrx9FLZtyRO/0cbbtpobXu
+         6j4pfR5LQnlnrxuiajDUTL5GKVzO1/5to7gOWAlaF7xky3ihhhObGTwyFUfIMCQDsXHY
+         XSnbYEzbCMCHdIr39SWWOQlgPVVTGE5VjkjPpyr1A/IMPsa5/dkY6j09NgAYnP/gBE/Y
+         PpLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=E8ZIFDHr7ZftwhrBHcMZ1HNvBlaRD4+FZney/mWN3Hg=;
+        b=U4N5viOugLtnPikIwQwdXYtbYglV98FsqeCsbJWJMflnFYFzYrtbyu3ghmPeNfT/n8
+         MKBSncsp6N292/K3ZNN1KejbU7tg/gbKxtXs6nlXRCeBxGLvlpT0jc7dsZ1vNbtdAvgC
+         kn/YuncodW8sNBDjGZjhXkEqqrtf/RAe3J2J2/5pv0V/NsWVIOR/uTAab1w52HAe5KGO
+         CaoVyOU6Vco8wLVjPQJGFnpHjjW1tDivqxb4TFv0mnD7w1z1uzyd9eR8szg4ZDGNGIYA
+         39QFTK3tg/xjxtRsCKjeXTLot2+gW0jlT2OQrtrym3g/8gm9Ayu9i0q9tMv6M9t0ZMBJ
+         2VrA==
+X-Gm-Message-State: AA+aEWao3rCa3kr0O9ni5yi5bXLb9xMp9fKmK14+NLjLOI8RdbjNiUhr
+        R99zks8PghnbTWZ3axgd/Mqi9gZFI6MjKSWWyvg8KQ==
+X-Google-Smtp-Source: AFSGD/XsaBTWov1reY4LhDnsiAJ8iWuiZsWq4h7rAtCzE3f+q47hXCcQ4zuHoDNsF4RPiKk/qwiG0YYc1bkHVV08/ec=
+X-Received: by 2002:a05:6830:1004:: with SMTP id a4mr571541otp.254.1542703832200;
+ Tue, 20 Nov 2018 00:50:32 -0800 (PST)
+MIME-Version: 1.0
+References: <20181119154311.27826-1-luiz.dentz@gmail.com>
+In-Reply-To: <20181119154311.27826-1-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 20 Nov 2018 10:50:20 +0200
+Message-ID: <CABBYNZK90H=0e4GKo1g96jYkg3EM+5C2DhbCvi-Cgtd8W+E3YA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/5] gatt: Fix invalid read when disconnecting
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     gbenhaim@augury.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This decribes proposed D-Bus based API for Bluetooth Mesh
-implementation.
----
- doc/mesh-api.txt | 512 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 512 insertions(+)
- create mode 100644 doc/mesh-api.txt
+On Mon, Nov 19, 2018 at 5:43 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> In case there is a client of AcquireNotify and a disconnect happens the
+> code not only have to free the client object but also destroy the io
+> associated with it, for this reason the client object cannot be freed
+> until the io is destroyed otherwise it may lead to the following error:
+>
+> Invalid read of size 4
+>    at 0x63920: notify_io_destroy (gatt-client.c:1461)
+>    by 0x63EDB: pipe_io_destroy (gatt-client.c:1082)
+>    by 0x6405B: characteristic_free (gatt-client.c:1663)
+>    by 0x81F33: remove_interface (object.c:667)
+>    by 0x826CB: g_dbus_unregister_interface (object.c:1391)
+>    by 0x85D2B: queue_remove_all (queue.c:354)
+>    by 0x635F7: unregister_service (gatt-client.c:1893)
+>    by 0x85CF7: queue_remove_all (queue.c:339)
+>    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
+>    by 0x695CB: gatt_service_removed (device.c:3747)
+>    by 0x85B17: queue_foreach (queue.c:220)
+>    by 0x91283: notify_service_changed (gatt-db.c:280)
+>    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
+>  Address 0x515ed48 is 0 bytes inside a block of size 20 free'd
+>    at 0x483EAD0: free (vg_replace_malloc.c:530)
+>    by 0x85D2B: queue_remove_all (queue.c:354)
+>    by 0x636D3: unregister_characteristic (gatt-client.c:1741)
+>    by 0x85D2B: queue_remove_all (queue.c:354)
+>    by 0x635F7: unregister_service (gatt-client.c:1893)
+>    by 0x85CF7: queue_remove_all (queue.c:339)
+>    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
+>    by 0x695CB: gatt_service_removed (device.c:3747)
+>    by 0x85B17: queue_foreach (queue.c:220)
+>    by 0x91283: notify_service_changed (gatt-db.c:280)
+>    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
+>    by 0x85D2B: queue_remove_all (queue.c:354)
+>    by 0x91387: gatt_db_clear_range (gatt-db.c:475)
+> ---
+>  src/gatt-client.c | 24 ++++++++++++------------
+>  1 file changed, 12 insertions(+), 12 deletions(-)
+>
+> diff --git a/src/gatt-client.c b/src/gatt-client.c
+> index 234f46ed7..55aa5e423 100644
+> --- a/src/gatt-client.c
+> +++ b/src/gatt-client.c
+> @@ -1645,13 +1645,22 @@ static const GDBusMethodTable characteristic_methods[] = {
+>         { }
+>  };
+>
+> +static void remove_client(void *data)
+> +{
+> +       struct notify_client *ntfy_client = data;
+> +       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
+> +
+> +       queue_remove(client->all_notify_clients, ntfy_client);
+> +
+> +       notify_client_unref(ntfy_client);
+> +}
+> +
+>  static void characteristic_free(void *data)
+>  {
+>         struct characteristic *chrc = data;
+>
+>         /* List should be empty here */
+>         queue_destroy(chrc->descs, NULL);
+> -       queue_destroy(chrc->notify_clients, NULL);
+>
+>         if (chrc->write_io) {
+>                 queue_remove(chrc->service->client->ios, chrc->write_io->io);
+> @@ -1663,6 +1672,8 @@ static void characteristic_free(void *data)
+>                 pipe_io_destroy(chrc->notify_io);
+>         }
+>
+> +       queue_destroy(chrc->notify_clients, remove_client);
+> +
+>         g_free(chrc->path);
+>         free(chrc);
+>  }
+> @@ -1715,16 +1726,6 @@ static struct characteristic *characteristic_create(
+>         return chrc;
+>  }
+>
+> -static void remove_client(void *data)
+> -{
+> -       struct notify_client *ntfy_client = data;
+> -       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
+> -
+> -       queue_remove(client->all_notify_clients, ntfy_client);
+> -
+> -       notify_client_unref(ntfy_client);
+> -}
+> -
+>  static void unregister_characteristic(void *data)
+>  {
+>         struct characteristic *chrc = data;
+> @@ -1738,7 +1739,6 @@ static void unregister_characteristic(void *data)
+>         if (chrc->write_op)
+>                 bt_gatt_client_cancel(gatt, chrc->write_op->id);
+>
+> -       queue_remove_all(chrc->notify_clients, NULL, NULL, remove_client);
+>         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
+>
+>         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
+> --
+> 2.17.2
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-new file mode 100644
-index 000000000..eed7ba653
---- /dev/null
-+++ b/doc/mesh-api.txt
-@@ -0,0 +1,512 @@
-+BlueZ D-Bus Mesh API description
-+********************************
-+
-+Mesh Network Hierarchy
-+======================
-+Service		org.bluez.mesh
-+Interface	org.bluez.mesh.Network1
-+Object path	/org/bluez/mesh
-+
-+Methods:
-+		void Join(object app_defined_root, array{byte}[16] uuid)
-+
-+			This is the first method that an application has to call to become
-+			a provisioned node on a mesh network. The call will initiate
-+			broadcasting of Unprovisioned Device Beacon.
-+
-+			The app_defined_root parameter is a D-Bus object root path of the
-+			application that implements org.bluez.mesh.Application1 interface.
-+			The application represents a node where child mesh elements have
-+			their own objects that implement org.bluez.mesh.Element1 interface.
-+			The application hierarchy also contains a provision agent object
-+			that implements org.bluez.mesh.ProvisionAgent1 interface.
-+			The standard DBus.ObjectManager interface must be available on the
-+			app_defined_root path.
-+
-+			The uuid parameter is a 16-byte array that contains Device UUID.
-+
-+			PossibleErrors:
-+				org.bluez.mesh.Error.InvalidArguments
-+
-+		void Cancel(void)
-+			Cancels an outstanding provisioning request initiated by Join()
-+			method.
-+
-+		(object node, array{byte, array{(uint16, dict}} configuration)
-+				Attach(object app_defined_root, uint64 token)
-+
-+			This is the first method that an application must call to get access
-+			to mesh node functionalities.
-+
-+			The app_defined_root parameter is a D-Bus object root path of the
-+			application that implements org.bluez.mesh.Application1 interface.
-+			The application represents a node where child mesh elements have
-+			their own objects that implement org.bluez.mesh.Element1 interface.
-+			The standard DBus.ObjectManager interface must be available on the
-+			app_defined_root path.
-+
-+			The token parameter is a 64-bit number that has been assigned to the
-+			application when it first got provisioned/joined mesh network, i.e.
-+			upon receiving JoinComplete() method. The daemon uses the token to
-+			verify whether the application is authorized to assume the mesh
-+			node identity.
-+
-+			In case of success, the method call returns mesh node object (see
-+			Mesh Node Hierarchy section) and current configuration settings.
-+			The return value of configuration parameter is an array, where each
-+			entry is a structure that contains element configuration.
-+			The element configuration structure is organized as follows:
-+
-+				byte
-+
-+					Element index, identifies the element to which this
-+					configuration entry pertians.
-+
-+				array{struct}
-+
-+					Models array where each entry is a structure with the
-+					following members:
-+
-+						uint16
-+
-+							Either a SIG Model Identifier or, if Vendor key is
-+							present in model configuration dictionary, a 16-bit
-+							vendor-assigned Model Identifier
-+
-+						dict
-+
-+							A dictionary that contains model configuration with
-+							the following keys defined:
-+
-+								array{uint16} Bindings
-+
-+									Indices of application keys bound to
-+									the model
-+
-+								uint32 PublicationPeriod
-+
-+									Model publication period in milliseconds
-+
-+								uint16 Vendor
-+
-+									A 16-bit Bluetooth-assigned Company
-+									Identifier of the vendor as defined by
-+									Bluetooth SIG
-+
-+			PossibleErrors:
-+				org.bluez.mesh.Error.InvalidArguments
-+				org.bluez.mesh.Error.NotFound,
-+				org.bluez.mesh.Error.Failed
-+
-+		void Leave(uint64 token)
-+
-+			This removes the configuration information about the mesh node
-+			identified by the 64-bit token parameter. The token parameter
-+			has been obtained as a result of successful Join() method call.
-+
-+			PossibleErrors:
-+				org.bluez.mesh.Error.NotFound
-+
-+
-+Mesh Node Hierarchy
-+===================
-+Service		org.bluez.mesh
-+Interface	org.bluez.mesh.Node1
-+Object path	/org/bluez/mesh/node<xxxx>
-+		where xxxx is a 4-digit hexadecimal number generated by meshd daemon
-+
-+Methods:
-+		void Send(object element_path, uint16 destination, uint16 key_index,
-+								array{byte} data)
-+
-+			This method is used to send a message originated by a local model.
-+
-+			The element_path parameter is the object path of an element from
-+			a collection of the application elements (see Mesh Application
-+			Hierarchy section).
-+
-+			The destination parameter contains the destination address. This
-+			destination must be a uint16 to a unicast address, or a well known
-+			group address.
-+
-+			The key_index parameter determines which application key to use for
-+			encrypting the message. The key_index must be valid for that
-+			element, i.e., the application key must be bound to a model on this
-+			element. Otherwise, org.bluez.mesh.Error.NotAuthorized will be
-+			returned.
-+
-+			The data parameter is an outgoing message to be encypted by the
-+			meshd daemon and sent on.
-+
-+			Possible errors:
-+				org.bluez.mesh.Error.NotAuthorized
-+				org.bluez.mesh.Error.InvalidArguments
-+				org.bluez.mesh.Error.NotFound
-+
-+		void Publish(object element_path, uint16 model, array{byte} data)
-+
-+			This method is used to send a publication originated by a local
-+			model. If the model does not exist, or it has no publication record,
-+			the method returns org.bluez.mesh.Error.DoesNotExist error.
-+
-+			The element_path parameter is the object path of an element from
-+			a collection of the application elements (see Mesh Application
-+			Hierarchy section).
-+
-+			The model parameter contains a model ID, as defined by the
-+			Bluetooth SIG.
-+
-+			Since only one Publish record may exist per element-model, the
-+			destination and key_index are obtained from the Publication
-+			record cached by the daemon.
-+
-+			Possible errors:
-+				org.bluez.mesh.Error.DoesNotExist
-+				org.bluez.mesh.Error.InvalidArguments
-+
-+		void VendorPublish(object element_path, uint16 vendor, uint16 model_id,
-+								array{byte} data)
-+
-+			This method is used to send a publication originated by a local
-+			vendor model. If the model does not exist, or it has no publication
-+			record, the method returns org.bluez.mesh.Error.DoesNotExist error.
-+
-+			The element_path parameter is the object path of an element from
-+			a collection of the application elements (see Mesh Application
-+			Hierarchy section).
-+
-+			The vendor parameter is a 16-bit Bluetooth-assigned Company
-+			Identifier.
-+
-+			The model_id parameter is a 16-bit vendor-assigned Model Identifier.
-+
-+			Since only one Publish record may exist per element-model, the
-+			destination and key_index are obtained from the Publication
-+			record cached by the daemon.
-+
-+			Possible errors:
-+				org.bluez.mesh.Error.DoesNotExist
-+				org.bluez.mesh.Error.InvalidArguments
-+
-+Properties:
-+		dict Features [read-only]
-+
-+			The dictionary that contains information about feature support.
-+			The following keys are defined:
-+
-+				boolean Friend
-+
-+					Indicates the ability to establish a friendship with a
-+					Low Power node
-+
-+				boolean LowPower
-+
-+					Indicates support for operating in Low Power node mode
-+
-+				boolean Proxy
-+
-+					Indicates support for GATT proxy
-+
-+				boolean Relay - indicates support for relaying messages
-+
-+			If the key is absent from the dictionary, the feature is not
-+			supported. Otherwise, true means that the feature is enabled and
-+			false means that the feature is disabled.
-+
-+		boolean Beacon [read-only]
-+
-+			This property indicates whether the periodic beaconing is enabled
-+			(true) or disabled (false).
-+
-+		uint32 SecondsSinceLastHeard [read-only]
-+
-+			This property may be read at any time to determine the number of
-+			seconds since mesh network layer traffic was last detected on this
-+			node's network.
-+
-+
-+Mesh Application Hierarchy
-+==========================
-+Service		unique name
-+Interface		org.bluez.mesh.Application1
-+Object path	<app_defined_root>
-+
-+An application is a collection of elements that host SIG defined and vendor
-+specific models. It is expected that an application implements
-+org.freedesktop.DBus.ObjectManager interface.
-+
-+An example mesh application hierarchy may look like this:
-+
-+		-> /com/example
-+			|   - org.freedesktop.DBus.ObjectManager
-+			|   - org.bluez.mesh.Application1
-+			|   - org.bluez.mesh.Attention1 (optional)
-+			|
-+			-> /com/example/agent
-+			| |   - org.bluez.mesh.ProvisionAgent1
-+			|
-+			-> /com/example/ele00
-+			| |   - org.bluez.mesh.Element1
-+			-> /com/example/ele01
-+			| |   - org.bluez.mesh.Element1
-+			...
-+			-> /com/example/elexx
-+			| |   - org.bluez.mesh.Element1
-+
-+Methods:
-+		void JoinComplete(uint64 token)
-+
-+			This method is called when the node provisioning initiated
-+			by a Join() method call successfully completed.
-+
-+			The token parameter serves as a unique identifier of the particular
-+			node. The token must be preserved by the application in order to
-+			authenticate itself to the mesh daemon and attach to the network
-+			as a mesh node by calling Attach() method or permanently remove the
-+			identity of the mesh node by calling Leave() method.
-+
-+		void JoinFailed(string reason)
-+
-+			This method is called when the node provisioning initiated
-+			by Join() has failed.
-+
-+			The reason parameter identifies the reason for provisioning failure.
-+			The defined values are: "timeout", "bad-pdu", "confirmation-failed",
-+			"out-of-resources", "decryption-error", "unexpected-error",
-+			"cannot-assign-addresses".
-+
-+Properties:
-+		uint16 CompanyID [read-only]
-+
-+			A 16-bit Bluetooth-assigned Company Identifier of the vendor as
-+			defined by Bluetooth SIG
-+
-+		uint16 ProductID [read-only]
-+
-+			A 16-bit vendor-assigned product identifier
-+
-+		uint16 VersionID [read-only]
-+
-+			A 16-bit vendor-assigned product version identifier
-+
-+
-+Mesh Element Hierarchy
-+======================
-+Service		unique name
-+Interface	org.bluez.mesh.Element1
-+Object path	<app_defined_element_path>
-+
-+Methods:
-+		void MessageReceived(uint16 source, uint16 key_index,
-+								boolean subscription, array{byte} data)
-+
-+			This method is called by meshd daemon when a message arrives
-+			addressed to the application.
-+
-+			The source parameter is unicast address of the remote node-element
-+			that sent the message.
-+
-+			The key_index parameter indicates which application key has been
-+			used to decode the incoming message. The same key_index should be
-+			used by the application when sending a response to this message
-+			(in case a response is expected).
-+
-+			The subscription parameter is a boolean that is set to true if
-+			the message is received as a part of the subscription (i.e., the
-+			destination is either a well known group address or a virtual
-+			label.
-+
-+			The data parameter is the incoming message.
-+
-+		void UpdateModelConfiguration(uint16 model_id, dict config)
-+
-+			This method is called by meshd daemon when a model's configuration
-+			is updated.
-+
-+			The model_id parameter contains BT SIG Model Identifier or, if
-+			Vendor key is present in config dictionary, a 16-bit
-+			vendor-assigned Model Identifier.
-+
-+			The config parameter is a dictionary with the following keys
-+			defined:
-+
-+				array{uint16} Bindings
-+
-+					Indices of application keys bound to the model
-+
-+				uint32 PublicationPeriod
-+
-+					Model publication period in milliseconds
-+
-+				uint16 Vendor
-+
-+					A 16-bit Bluetooth-assigned Company Identifier of the
-+					vendor as defined by Bluetooth SIG
-+
-+Properties:
-+			uint8 Index [read-only]
-+
-+				Element index. It is required that the application follows
-+				sequential numbering scheme for the elements, starting with 0.
-+
-+			array{uint16} Models [read-only]
-+
-+				An array of SIG Model Identifiers. The array may be empty.
-+
-+			array{(uint16, uint16)} VendorModels [read-only]
-+
-+				An array of pairs (vendor, model ID):
-+
-+					vendor is a 16-bit Bluetooth-assigned Company Identifier
-+					of the vendor as defined by Bluetooth SIG
-+
-+					model ID is a 16-bit vendor-assigned Model Identifier
-+
-+				The array may be empty.
-+
-+			uint16 Location [read-only, optional]
-+
-+				Location descriptor as defined in the GATT Bluetooth Namespace
-+				Descriptors section of the Bluetooth SIG Assigned Numbers
-+
-+
-+Mesh Attention Hierarchy
-+========================
-+Service		unique name
-+Interface	org.bluez.mesh.Attention1
-+Object path	freely definable
-+
-+This is an optional interface that implements health attention timer.
-+
-+Methods:
-+		void SetTimer(uint8 element_index,  uint16 time)
-+
-+			The element_index parameter is the element's index within the node
-+			where the health server model is hosted.
-+
-+			The time parameter indicates how many seconds the attention state
-+			shall be on.
-+
-+			PossibleErrors:
-+				org.bluez.mesh.Error.NotSupported
-+
-+		uint16 GetTimer(uint16 element)
-+
-+			The element parameter is the unicast address within the node
-+			where the health server model is hosted.
-+
-+			Returns the number of seconds for how long the attention action
-+			remains staying on.
-+
-+			PossibleErrors:
-+				org.bluez.mesh.Error.NotSupported
-+
-+
-+Provisioning Agent Hierarchy
-+============================
-+Service		unique name
-+Interface	org.bluez.mesh.ProvisionAgent
-+Object path	freely definable
-+
-+Methods:
-+		array{byte} PrivateKey()
-+
-+			This method is called during provisioning if the Provisioner
-+			has requested Out-Of-Band ECC key exchange. The Private key
-+			is returned to the Daemon, and the Public Key is delivered to
-+			the remote Provisioner using a method that does not involve
-+			the Bluetooth Mesh system. The Private Key returned must be
-+			32 octets in size, or the Provisioning procedure will fail
-+			and be canceled.
-+
-+			This function will only be called if the Provisioner has
-+			requested pre-determined keys to be exchanged Out-of-Band,
-+			and the local role is Unprovisioned device.
-+
-+		array{byte} PublicKey()
-+
-+			This method is called during provisioning if the local device
-+			is the Provisioner, and is requestng Out-Of-Band ECC key
-+			exchange. The Public key is returned to the Daemon
-+			that is the matched pair of the Private key of the remote
-+			device. The Public Key returned must be 64 octets in
-+			size, or the Provisioning procedure will fail and be canceled.
-+
-+			This function will only be called if the Provisioner has
-+			requested pre-determined keys to be exchanged Out-of-Band,
-+			and the local role is Provisioner.
-+
-+		void DisplayString(string display)
-+			This method is called when the Daemon has something important
-+			for the Agent to Display, but does not require any additional
-+			input locally. For instance: "Enter "ABCDE" on remote device".
-+
-+		void DisplayNumeric(uint8 type, uint32 number)
-+
-+			This method is called when the Daemon has something important
-+			for the Agent to Display, but does not require any additional
-+			input locally. For instance: "Enter 149264 on remote device".
-+
-+			The type parameter indicates the display method. An enumeration
-+			of "Blink", "Beep", "Vibrate", or "OutNumeric".
-+
-+			The number parameter is the specific value represented by
-+			the Prompt.
-+
-+		uint32 PromptNumeric(uint8 type)
-+
-+			This method is called when the Daemon has requires the user to
-+			enter a 1-9 digit decimal value.
-+
-+			The type parameter indicates the input method. An enumeration
-+			of "Push", "Twist", or "InNumeric".
-+
-+			This agent should prompt the user for specific input. For instance:
-+			"Enter value being displayed by remote device".
-+
-+		array{byte} PromptStatic(uint8 type)
-+
-+			This method is called when the Daemon requires a 16 octet
-+			byte array, as an Out-of-Band authentication.
-+
-+			The type parameter indicates the input method. An enumeration
-+			of "Static", or "InAlpha".
-+
-+			The Static data returned must be 16 octets in size, or the
-+			Provisioning procedure will fail and be canceled. If input is
-+			an InAlpha String, the printable charactors should be left
-+			justified, with trailing 0x00 octets filling the remaining bytes.
-+
-+		void Cancel()
-+
-+			This method gets called by the daemon to cancel any existing
-+			Agent Requests. When called, any pending user input should be
-+			canceled.
-+
-+
-+Properties:
-+			array{string} Capabilities [read-only]
-+
-+				An array of strings with the following allowed values:
-+					"blink", "beep", "vibrate", "out-numeric", "out-alpha",
-+					"push", "twist", "in-numeric", "in-alpha", "public-oob",
-+					"static-oob".
-+
-+
-+			array{string} OutOfBandInfo [read-only, optional]
-+
-+				Indicates availability of OOB data.
-+				An array of strings with the following allowed values:
-+					"other", "uri", "machine-code-2d", "bar-code", "nfc",
-+					"number", "string", "on-box", "in-box", "on-paper",
-+					"in-manual", "on-device"
-+
-+			string URI [read-only, optional]
-+
-+				Uniform Resource Identifier points to out-of-band (OOB)
-+				information (e.g., a public key)
-+
-+
-+Mesh Provisioner Hierarchy
-+==========================
-+<TBD>
--- 
-2.17.2
+Can you try with this set to see it does work properly.
 
+--
+Luiz Augusto von Dentz
