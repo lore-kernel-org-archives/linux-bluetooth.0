@@ -1,255 +1,574 @@
-Return-Path: <SRS0=AiOn=N6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=OtUJ=N7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D35C43441
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Nov 2018 23:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 073F7C43610
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 07:29:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F1EF12086A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Nov 2018 23:05:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NTzqh7Xq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1EF12086A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTP id 85854208E4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 07:29:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85854208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732043AbeKTJaV (ORCPT
+        id S1731822AbeKTR4y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Nov 2018 04:30:21 -0500
-Received: from mail-it1-f202.google.com ([209.85.166.202]:58953 "EHLO
-        mail-it1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732032AbeKTJaV (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Nov 2018 04:30:21 -0500
-Received: by mail-it1-f202.google.com with SMTP id b137-v6so469091iti.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Nov 2018 15:04:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=ht0KyOh1qyTCyJTWR8FJ0kQ4r9NOG2ZYRU0qkbwdVxg=;
-        b=NTzqh7XqPizW3LKbTLltZA7fs5TZVy6YJa+uBgWCyXcCuDjwNOHnE90YECCJFl8FvE
-         uoXHXt67YbqemX5mGaAADP2IVDXGQSkq/IHOC734rhxeKtpB3211zgGt5coW7/2ot0I9
-         x8ByhgXEXPiRtYbSi2e8cc+vg2Sb/L2aYJbfYJp+NQYgqZ12i0hEs3ORn1nvzcQR0Ora
-         oCJFdJUTOZSVtGWZOSG7iMuoxmw76YL85sTE08wsAPfPvWIYorai0xvULf2Qcw5jtzMT
-         aFIZMsrXaY2SbiA2xoIAu2VF6QhKq1gCZ6RjYD+s7tFSq0oCmMB3INb7JXeCAmEr+VZg
-         kqRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=ht0KyOh1qyTCyJTWR8FJ0kQ4r9NOG2ZYRU0qkbwdVxg=;
-        b=sy6O0lRNZ76LyyCtUeJyDy0P9N5YRInpvvdOyAbKYe0vxtvUV8iqj1cyUK0n7TEe1b
-         i3k/J0nClWaXqsII1Obr4Sw3PWS8/cQeYdFBoraziWuHvWvHFKhyHiNmJktb+coD/0/I
-         iWeaV7y70Ovcr+PzI1V0y3tmyEEBEGZVGqd0YrcjJUGULxbtYgc9Jo7J7VPcBhcvh+3g
-         HKbtBrkZ+mCA4gV07lMuV3l2myL2T19C/r2bxnZhRpJsObtZ2wkNk93pgxsztsJlMLCX
-         4xsgtziInBBc7kJeu7+k3SCf5CD+R0/UKRkvFfWtJ3oHNv6r7gI+BXx+SF9gnV4TUSGu
-         9GjQ==
-X-Gm-Message-State: AA+aEWYCLa1aiKM4HZDq5LB5kqHtEQLxOwkofapmjiWgRX3kQ7Ccnxqo
-        OGCCaawHt/XO1RVRcNDP1p4ueuyQU16F
-X-Google-Smtp-Source: AJdET5epn00g1R5JWP1cMzk7X7UcKhiKt2pnk87nH5GZlOdyRhKGMBnmCcHOOT0PbwbEFr++W09Y8yN8z+bu
-X-Received: by 2002:a24:6cb:: with SMTP id 194-v6mr55049itv.18.1542668663035;
- Mon, 19 Nov 2018 15:04:23 -0800 (PST)
-Date:   Mon, 19 Nov 2018 15:04:05 -0800
-In-Reply-To: <20181117010748.24347-1-rajatja@google.com>
-Message-Id: <20181119230409.258121-1-rajatja@google.com>
-Mime-Version: 1.0
-References: <20181117010748.24347-1-rajatja@google.com>
-X-Mailer: git-send-email 2.19.1.1215.g8438c0b245-goog
-Subject: [PATCH v2 1/5] usb: split code locating ACPI companion into port and device
-From:   Rajat Jain <rajatja@google.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Torokhov <dtor@chromium.org>,
-        Rajat Jain <rajatja@google.com>,
-        Alex Hung <alex.hung@canonical.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-usb@vger.kernel.org, netdev@vger.kernel.org
-Cc:     rajatxjain@gmail.com, dtor@google.com, raghuram.hegde@intel.com,
-        chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 20 Nov 2018 12:56:54 -0500
+Received: from mga11.intel.com ([192.55.52.93]:57174 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726840AbeKTR4y (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 20 Nov 2018 12:56:54 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Nov 2018 23:29:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,256,1539673200"; 
+   d="scan'208";a="282598063"
+Received: from ingas-nuc1.sea.intel.com ([10.251.156.184])
+  by fmsmga006.fm.intel.com with ESMTP; 19 Nov 2018 23:29:13 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ v4] doc: Initial Bluetooth Mesh API
+Date:   Mon, 19 Nov 2018 23:29:05 -0800
+Message-Id: <20181120072905.26306-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.17.2
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Dmitry Torokhov <dtor@chromium.org>
-
-In preparation for handling embedded USB devices let's split
-usb_acpi_find_companion() into usb_acpi_find_companion_for_device() and
-usb_acpi_find_companion_for_port().
-
-Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
-Signed-off-by: Rajat Jain <rajatja@google.com>
+This decribes proposed D-Bus based API for Bluetooth Mesh
+implementation.
 ---
-v2: same as v1
+ doc/mesh-api.txt | 512 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 512 insertions(+)
+ create mode 100644 doc/mesh-api.txt
 
- drivers/usb/core/usb-acpi.c | 133 +++++++++++++++++++-----------------
- 1 file changed, 72 insertions(+), 61 deletions(-)
-
-diff --git a/drivers/usb/core/usb-acpi.c b/drivers/usb/core/usb-acpi.c
-index e221861b3187..8ff73c83e8e8 100644
---- a/drivers/usb/core/usb-acpi.c
-+++ b/drivers/usb/core/usb-acpi.c
-@@ -139,12 +139,79 @@ static struct acpi_device *usb_acpi_find_port(struct acpi_device *parent,
- 	return acpi_find_child_device(parent, raw, false);
- }
- 
--static struct acpi_device *usb_acpi_find_companion(struct device *dev)
-+static struct acpi_device *
-+usb_acpi_get_companion_for_port(struct usb_port *port_dev)
- {
- 	struct usb_device *udev;
- 	struct acpi_device *adev;
- 	acpi_handle *parent_handle;
-+	int port1;
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+new file mode 100644
+index 000000000..eed7ba653
+--- /dev/null
++++ b/doc/mesh-api.txt
+@@ -0,0 +1,512 @@
++BlueZ D-Bus Mesh API description
++********************************
 +
-+	/* Get the struct usb_device point of port's hub */
-+	udev = to_usb_device(port_dev->dev.parent->parent);
++Mesh Network Hierarchy
++======================
++Service		org.bluez.mesh
++Interface	org.bluez.mesh.Network1
++Object path	/org/bluez/mesh
 +
-+	/*
-+	 * The root hub ports' parent is the root hub. The non-root-hub
-+	 * ports' parent is the parent hub port which the hub is
-+	 * connected to.
-+	 */
-+	if (!udev->parent) {
-+		adev = ACPI_COMPANION(&udev->dev);
-+		port1 = usb_hcd_find_raw_port_number(bus_to_hcd(udev->bus),
-+						     port_dev->portnum);
-+	} else {
-+		parent_handle = usb_get_hub_port_acpi_handle(udev->parent,
-+							     udev->portnum);
-+		if (!parent_handle)
-+			return NULL;
++Methods:
++		void Join(object app_defined_root, array{byte}[16] uuid)
 +
-+		acpi_bus_get_device(parent_handle, &adev);
-+		port1 = port_dev->portnum;
-+	}
++			This is the first method that an application has to call to become
++			a provisioned node on a mesh network. The call will initiate
++			broadcasting of Unprovisioned Device Beacon.
 +
-+	return usb_acpi_find_port(adev, port1);
-+}
++			The app_defined_root parameter is a D-Bus object root path of the
++			application that implements org.bluez.mesh.Application1 interface.
++			The application represents a node where child mesh elements have
++			their own objects that implement org.bluez.mesh.Element1 interface.
++			The application hierarchy also contains a provision agent object
++			that implements org.bluez.mesh.ProvisionAgent1 interface.
++			The standard DBus.ObjectManager interface must be available on the
++			app_defined_root path.
 +
-+static struct acpi_device *
-+usb_acpi_find_companion_for_port(struct usb_port *port_dev)
-+{
-+	struct acpi_device *adev;
-+	struct acpi_pld_info *pld;
-+	acpi_handle *handle;
-+	acpi_status status;
++			The uuid parameter is a 16-byte array that contains Device UUID.
 +
-+	adev = usb_acpi_get_companion_for_port(port_dev);
-+	if (!adev)
-+		return NULL;
++			PossibleErrors:
++				org.bluez.mesh.Error.InvalidArguments
 +
-+	handle = adev->handle;
-+	status = acpi_get_physical_device_location(handle, &pld);
-+	if (!ACPI_FAILURE(status) && pld) {
-+		port_dev->location = USB_ACPI_LOCATION_VALID
-+			| pld->group_token << 8 | pld->group_position;
-+		port_dev->connect_type = usb_acpi_get_connect_type(handle, pld);
-+		ACPI_FREE(pld);
-+	}
- 
-+	return adev;
-+}
++		void Cancel(void)
++			Cancels an outstanding provisioning request initiated by Join()
++			method.
 +
-+static struct acpi_device *
-+usb_acpi_find_companion_for_device(struct usb_device *udev)
-+{
-+	struct acpi_device *adev;
++		(object node, array{byte, array{(uint16, dict}} configuration)
++				Attach(object app_defined_root, uint64 token)
 +
-+	if (!udev->parent)
-+		return NULL;
++			This is the first method that an application must call to get access
++			to mesh node functionalities.
 +
-+	/* root hub is only child (_ADR=0) under its parent, the HC */
-+	adev = ACPI_COMPANION(udev->dev.parent);
-+	return acpi_find_child_device(adev, 0, false);
-+}
++			The app_defined_root parameter is a D-Bus object root path of the
++			application that implements org.bluez.mesh.Application1 interface.
++			The application represents a node where child mesh elements have
++			their own objects that implement org.bluez.mesh.Element1 interface.
++			The standard DBus.ObjectManager interface must be available on the
++			app_defined_root path.
++
++			The token parameter is a 64-bit number that has been assigned to the
++			application when it first got provisioned/joined mesh network, i.e.
++			upon receiving JoinComplete() method. The daemon uses the token to
++			verify whether the application is authorized to assume the mesh
++			node identity.
++
++			In case of success, the method call returns mesh node object (see
++			Mesh Node Hierarchy section) and current configuration settings.
++			The return value of configuration parameter is an array, where each
++			entry is a structure that contains element configuration.
++			The element configuration structure is organized as follows:
++
++				byte
++
++					Element index, identifies the element to which this
++					configuration entry pertians.
++
++				array{struct}
++
++					Models array where each entry is a structure with the
++					following members:
++
++						uint16
++
++							Either a SIG Model Identifier or, if Vendor key is
++							present in model configuration dictionary, a 16-bit
++							vendor-assigned Model Identifier
++
++						dict
++
++							A dictionary that contains model configuration with
++							the following keys defined:
++
++								array{uint16} Bindings
++
++									Indices of application keys bound to
++									the model
++
++								uint32 PublicationPeriod
++
++									Model publication period in milliseconds
++
++								uint16 Vendor
++
++									A 16-bit Bluetooth-assigned Company
++									Identifier of the vendor as defined by
++									Bluetooth SIG
++
++			PossibleErrors:
++				org.bluez.mesh.Error.InvalidArguments
++				org.bluez.mesh.Error.NotFound,
++				org.bluez.mesh.Error.Failed
++
++		void Leave(uint64 token)
++
++			This removes the configuration information about the mesh node
++			identified by the 64-bit token parameter. The token parameter
++			has been obtained as a result of successful Join() method call.
++
++			PossibleErrors:
++				org.bluez.mesh.Error.NotFound
 +
 +
-+static struct acpi_device *usb_acpi_find_companion(struct device *dev)
-+{
- 	/*
- 	 * In the ACPI DSDT table, only usb root hub and usb ports are
- 	 * acpi device nodes. The hierarchy like following.
-@@ -158,66 +225,10 @@ static struct acpi_device *usb_acpi_find_companion(struct device *dev)
- 	 * So all binding process is divided into two parts. binding
- 	 * root hub and usb ports.
- 	 */
--	if (is_usb_device(dev)) {
--		udev = to_usb_device(dev);
--		if (udev->parent)
--			return NULL;
--
--		/* root hub is only child (_ADR=0) under its parent, the HC */
--		adev = ACPI_COMPANION(dev->parent);
--		return acpi_find_child_device(adev, 0, false);
--	} else if (is_usb_port(dev)) {
--		struct usb_port *port_dev = to_usb_port(dev);
--		int port1 = port_dev->portnum;
--		struct acpi_pld_info *pld;
--		acpi_handle *handle;
--		acpi_status status;
--
--		/* Get the struct usb_device point of port's hub */
--		udev = to_usb_device(dev->parent->parent);
--
--		/*
--		 * The root hub ports' parent is the root hub. The non-root-hub
--		 * ports' parent is the parent hub port which the hub is
--		 * connected to.
--		 */
--		if (!udev->parent) {
--			struct usb_hcd *hcd = bus_to_hcd(udev->bus);
--			int raw;
--
--			raw = usb_hcd_find_raw_port_number(hcd, port1);
--
--			adev = usb_acpi_find_port(ACPI_COMPANION(&udev->dev),
--						  raw);
--
--			if (!adev)
--				return NULL;
--		} else {
--			parent_handle =
--				usb_get_hub_port_acpi_handle(udev->parent,
--				udev->portnum);
--			if (!parent_handle)
--				return NULL;
--
--			acpi_bus_get_device(parent_handle, &adev);
--
--			adev = usb_acpi_find_port(adev, port1);
--
--			if (!adev)
--				return NULL;
--		}
--		handle = adev->handle;
--		status = acpi_get_physical_device_location(handle, &pld);
--		if (ACPI_FAILURE(status) || !pld)
--			return adev;
--
--		port_dev->location = USB_ACPI_LOCATION_VALID
--			| pld->group_token << 8 | pld->group_position;
--		port_dev->connect_type = usb_acpi_get_connect_type(handle, pld);
--		ACPI_FREE(pld);
--
--		return adev;
--	}
-+	if (is_usb_device(dev))
-+		return usb_acpi_find_companion_for_device(to_usb_device(dev));
-+	else if (is_usb_port(dev))
-+		return usb_acpi_find_companion_for_port(to_usb_port(dev));
- 
- 	return NULL;
- }
++Mesh Node Hierarchy
++===================
++Service		org.bluez.mesh
++Interface	org.bluez.mesh.Node1
++Object path	/org/bluez/mesh/node<xxxx>
++		where xxxx is a 4-digit hexadecimal number generated by meshd daemon
++
++Methods:
++		void Send(object element_path, uint16 destination, uint16 key_index,
++								array{byte} data)
++
++			This method is used to send a message originated by a local model.
++
++			The element_path parameter is the object path of an element from
++			a collection of the application elements (see Mesh Application
++			Hierarchy section).
++
++			The destination parameter contains the destination address. This
++			destination must be a uint16 to a unicast address, or a well known
++			group address.
++
++			The key_index parameter determines which application key to use for
++			encrypting the message. The key_index must be valid for that
++			element, i.e., the application key must be bound to a model on this
++			element. Otherwise, org.bluez.mesh.Error.NotAuthorized will be
++			returned.
++
++			The data parameter is an outgoing message to be encypted by the
++			meshd daemon and sent on.
++
++			Possible errors:
++				org.bluez.mesh.Error.NotAuthorized
++				org.bluez.mesh.Error.InvalidArguments
++				org.bluez.mesh.Error.NotFound
++
++		void Publish(object element_path, uint16 model, array{byte} data)
++
++			This method is used to send a publication originated by a local
++			model. If the model does not exist, or it has no publication record,
++			the method returns org.bluez.mesh.Error.DoesNotExist error.
++
++			The element_path parameter is the object path of an element from
++			a collection of the application elements (see Mesh Application
++			Hierarchy section).
++
++			The model parameter contains a model ID, as defined by the
++			Bluetooth SIG.
++
++			Since only one Publish record may exist per element-model, the
++			destination and key_index are obtained from the Publication
++			record cached by the daemon.
++
++			Possible errors:
++				org.bluez.mesh.Error.DoesNotExist
++				org.bluez.mesh.Error.InvalidArguments
++
++		void VendorPublish(object element_path, uint16 vendor, uint16 model_id,
++								array{byte} data)
++
++			This method is used to send a publication originated by a local
++			vendor model. If the model does not exist, or it has no publication
++			record, the method returns org.bluez.mesh.Error.DoesNotExist error.
++
++			The element_path parameter is the object path of an element from
++			a collection of the application elements (see Mesh Application
++			Hierarchy section).
++
++			The vendor parameter is a 16-bit Bluetooth-assigned Company
++			Identifier.
++
++			The model_id parameter is a 16-bit vendor-assigned Model Identifier.
++
++			Since only one Publish record may exist per element-model, the
++			destination and key_index are obtained from the Publication
++			record cached by the daemon.
++
++			Possible errors:
++				org.bluez.mesh.Error.DoesNotExist
++				org.bluez.mesh.Error.InvalidArguments
++
++Properties:
++		dict Features [read-only]
++
++			The dictionary that contains information about feature support.
++			The following keys are defined:
++
++				boolean Friend
++
++					Indicates the ability to establish a friendship with a
++					Low Power node
++
++				boolean LowPower
++
++					Indicates support for operating in Low Power node mode
++
++				boolean Proxy
++
++					Indicates support for GATT proxy
++
++				boolean Relay - indicates support for relaying messages
++
++			If the key is absent from the dictionary, the feature is not
++			supported. Otherwise, true means that the feature is enabled and
++			false means that the feature is disabled.
++
++		boolean Beacon [read-only]
++
++			This property indicates whether the periodic beaconing is enabled
++			(true) or disabled (false).
++
++		uint32 SecondsSinceLastHeard [read-only]
++
++			This property may be read at any time to determine the number of
++			seconds since mesh network layer traffic was last detected on this
++			node's network.
++
++
++Mesh Application Hierarchy
++==========================
++Service		unique name
++Interface		org.bluez.mesh.Application1
++Object path	<app_defined_root>
++
++An application is a collection of elements that host SIG defined and vendor
++specific models. It is expected that an application implements
++org.freedesktop.DBus.ObjectManager interface.
++
++An example mesh application hierarchy may look like this:
++
++		-> /com/example
++			|   - org.freedesktop.DBus.ObjectManager
++			|   - org.bluez.mesh.Application1
++			|   - org.bluez.mesh.Attention1 (optional)
++			|
++			-> /com/example/agent
++			| |   - org.bluez.mesh.ProvisionAgent1
++			|
++			-> /com/example/ele00
++			| |   - org.bluez.mesh.Element1
++			-> /com/example/ele01
++			| |   - org.bluez.mesh.Element1
++			...
++			-> /com/example/elexx
++			| |   - org.bluez.mesh.Element1
++
++Methods:
++		void JoinComplete(uint64 token)
++
++			This method is called when the node provisioning initiated
++			by a Join() method call successfully completed.
++
++			The token parameter serves as a unique identifier of the particular
++			node. The token must be preserved by the application in order to
++			authenticate itself to the mesh daemon and attach to the network
++			as a mesh node by calling Attach() method or permanently remove the
++			identity of the mesh node by calling Leave() method.
++
++		void JoinFailed(string reason)
++
++			This method is called when the node provisioning initiated
++			by Join() has failed.
++
++			The reason parameter identifies the reason for provisioning failure.
++			The defined values are: "timeout", "bad-pdu", "confirmation-failed",
++			"out-of-resources", "decryption-error", "unexpected-error",
++			"cannot-assign-addresses".
++
++Properties:
++		uint16 CompanyID [read-only]
++
++			A 16-bit Bluetooth-assigned Company Identifier of the vendor as
++			defined by Bluetooth SIG
++
++		uint16 ProductID [read-only]
++
++			A 16-bit vendor-assigned product identifier
++
++		uint16 VersionID [read-only]
++
++			A 16-bit vendor-assigned product version identifier
++
++
++Mesh Element Hierarchy
++======================
++Service		unique name
++Interface	org.bluez.mesh.Element1
++Object path	<app_defined_element_path>
++
++Methods:
++		void MessageReceived(uint16 source, uint16 key_index,
++								boolean subscription, array{byte} data)
++
++			This method is called by meshd daemon when a message arrives
++			addressed to the application.
++
++			The source parameter is unicast address of the remote node-element
++			that sent the message.
++
++			The key_index parameter indicates which application key has been
++			used to decode the incoming message. The same key_index should be
++			used by the application when sending a response to this message
++			(in case a response is expected).
++
++			The subscription parameter is a boolean that is set to true if
++			the message is received as a part of the subscription (i.e., the
++			destination is either a well known group address or a virtual
++			label.
++
++			The data parameter is the incoming message.
++
++		void UpdateModelConfiguration(uint16 model_id, dict config)
++
++			This method is called by meshd daemon when a model's configuration
++			is updated.
++
++			The model_id parameter contains BT SIG Model Identifier or, if
++			Vendor key is present in config dictionary, a 16-bit
++			vendor-assigned Model Identifier.
++
++			The config parameter is a dictionary with the following keys
++			defined:
++
++				array{uint16} Bindings
++
++					Indices of application keys bound to the model
++
++				uint32 PublicationPeriod
++
++					Model publication period in milliseconds
++
++				uint16 Vendor
++
++					A 16-bit Bluetooth-assigned Company Identifier of the
++					vendor as defined by Bluetooth SIG
++
++Properties:
++			uint8 Index [read-only]
++
++				Element index. It is required that the application follows
++				sequential numbering scheme for the elements, starting with 0.
++
++			array{uint16} Models [read-only]
++
++				An array of SIG Model Identifiers. The array may be empty.
++
++			array{(uint16, uint16)} VendorModels [read-only]
++
++				An array of pairs (vendor, model ID):
++
++					vendor is a 16-bit Bluetooth-assigned Company Identifier
++					of the vendor as defined by Bluetooth SIG
++
++					model ID is a 16-bit vendor-assigned Model Identifier
++
++				The array may be empty.
++
++			uint16 Location [read-only, optional]
++
++				Location descriptor as defined in the GATT Bluetooth Namespace
++				Descriptors section of the Bluetooth SIG Assigned Numbers
++
++
++Mesh Attention Hierarchy
++========================
++Service		unique name
++Interface	org.bluez.mesh.Attention1
++Object path	freely definable
++
++This is an optional interface that implements health attention timer.
++
++Methods:
++		void SetTimer(uint8 element_index,  uint16 time)
++
++			The element_index parameter is the element's index within the node
++			where the health server model is hosted.
++
++			The time parameter indicates how many seconds the attention state
++			shall be on.
++
++			PossibleErrors:
++				org.bluez.mesh.Error.NotSupported
++
++		uint16 GetTimer(uint16 element)
++
++			The element parameter is the unicast address within the node
++			where the health server model is hosted.
++
++			Returns the number of seconds for how long the attention action
++			remains staying on.
++
++			PossibleErrors:
++				org.bluez.mesh.Error.NotSupported
++
++
++Provisioning Agent Hierarchy
++============================
++Service		unique name
++Interface	org.bluez.mesh.ProvisionAgent
++Object path	freely definable
++
++Methods:
++		array{byte} PrivateKey()
++
++			This method is called during provisioning if the Provisioner
++			has requested Out-Of-Band ECC key exchange. The Private key
++			is returned to the Daemon, and the Public Key is delivered to
++			the remote Provisioner using a method that does not involve
++			the Bluetooth Mesh system. The Private Key returned must be
++			32 octets in size, or the Provisioning procedure will fail
++			and be canceled.
++
++			This function will only be called if the Provisioner has
++			requested pre-determined keys to be exchanged Out-of-Band,
++			and the local role is Unprovisioned device.
++
++		array{byte} PublicKey()
++
++			This method is called during provisioning if the local device
++			is the Provisioner, and is requestng Out-Of-Band ECC key
++			exchange. The Public key is returned to the Daemon
++			that is the matched pair of the Private key of the remote
++			device. The Public Key returned must be 64 octets in
++			size, or the Provisioning procedure will fail and be canceled.
++
++			This function will only be called if the Provisioner has
++			requested pre-determined keys to be exchanged Out-of-Band,
++			and the local role is Provisioner.
++
++		void DisplayString(string display)
++			This method is called when the Daemon has something important
++			for the Agent to Display, but does not require any additional
++			input locally. For instance: "Enter "ABCDE" on remote device".
++
++		void DisplayNumeric(uint8 type, uint32 number)
++
++			This method is called when the Daemon has something important
++			for the Agent to Display, but does not require any additional
++			input locally. For instance: "Enter 149264 on remote device".
++
++			The type parameter indicates the display method. An enumeration
++			of "Blink", "Beep", "Vibrate", or "OutNumeric".
++
++			The number parameter is the specific value represented by
++			the Prompt.
++
++		uint32 PromptNumeric(uint8 type)
++
++			This method is called when the Daemon has requires the user to
++			enter a 1-9 digit decimal value.
++
++			The type parameter indicates the input method. An enumeration
++			of "Push", "Twist", or "InNumeric".
++
++			This agent should prompt the user for specific input. For instance:
++			"Enter value being displayed by remote device".
++
++		array{byte} PromptStatic(uint8 type)
++
++			This method is called when the Daemon requires a 16 octet
++			byte array, as an Out-of-Band authentication.
++
++			The type parameter indicates the input method. An enumeration
++			of "Static", or "InAlpha".
++
++			The Static data returned must be 16 octets in size, or the
++			Provisioning procedure will fail and be canceled. If input is
++			an InAlpha String, the printable charactors should be left
++			justified, with trailing 0x00 octets filling the remaining bytes.
++
++		void Cancel()
++
++			This method gets called by the daemon to cancel any existing
++			Agent Requests. When called, any pending user input should be
++			canceled.
++
++
++Properties:
++			array{string} Capabilities [read-only]
++
++				An array of strings with the following allowed values:
++					"blink", "beep", "vibrate", "out-numeric", "out-alpha",
++					"push", "twist", "in-numeric", "in-alpha", "public-oob",
++					"static-oob".
++
++
++			array{string} OutOfBandInfo [read-only, optional]
++
++				Indicates availability of OOB data.
++				An array of strings with the following allowed values:
++					"other", "uri", "machine-code-2d", "bar-code", "nfc",
++					"number", "string", "on-box", "in-box", "on-paper",
++					"in-manual", "on-device"
++
++			string URI [read-only, optional]
++
++				Uniform Resource Identifier points to out-of-band (OOB)
++				information (e.g., a public key)
++
++
++Mesh Provisioner Hierarchy
++==========================
++<TBD>
 -- 
-2.19.1.1215.g8438c0b245-goog
+2.17.2
 
