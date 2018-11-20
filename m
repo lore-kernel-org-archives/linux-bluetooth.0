@@ -2,199 +2,331 @@ Return-Path: <SRS0=OtUJ=N7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9806BC18DF5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 12:36:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C731BC18DF5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 13:58:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0217C2087E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 12:35:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DAFA206BB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Nov 2018 13:58:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="CQu/A2SS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0217C2087E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="slIXWFEt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DAFA206BB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726172AbeKTXEV (ORCPT
+        id S1726479AbeKUA1p (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Nov 2018 18:04:21 -0500
-Received: from mail-vk1-f195.google.com ([209.85.221.195]:33191 "EHLO
-        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725876AbeKTXEV (ORCPT
+        Tue, 20 Nov 2018 19:27:45 -0500
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:44863 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726219AbeKUA1p (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Nov 2018 18:04:21 -0500
-Received: by mail-vk1-f195.google.com with SMTP id d201so364126vka.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Nov 2018 04:35:25 -0800 (PST)
+        Tue, 20 Nov 2018 19:27:45 -0500
+Received: by mail-ed1-f68.google.com with SMTP id y56so1969706edd.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Nov 2018 05:58:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=augury.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zu8ZuI303JrlSx/EnjNJJ7B/rYtk8B5q1bvTJWb5XME=;
-        b=CQu/A2SSU6P8cUJ/HGtJ+zkT7CyQh/LdHxIioWgDXzSGxr8Ctqwt2Is5fJjWtVPnKJ
-         1qivP19FlAc8GS77lH9rYbqa212sd9QdhQSKKGGteoj5Ezz2kXKeAv5l3yQL25oXw78m
-         bhiHoGvwMGGVLhSz8w+G2q0zIKOv90JX4VNWg=
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id;
+        bh=AxhPGKMLOfXQzGSiANP5TCUKP7aITrK2lrJvNAawjKs=;
+        b=slIXWFEtcjTokqiPT+jWL2ygXn+00JS1qq6a72BJFm8eD9VrbuXJssuefthOak7DZG
+         eKBNYzVTRdKcU+PbaOsRNlaw7zWXXNUMFIBarQj6R2FUwKwXUYzCJDFP29f0I/HMwJ7j
+         gh0nhNQ2DOlJIdpcwGe06PtYh7zvfko8Tp9I84LvTC2aMcJ5ELYx5y0JdHvj/jJqWEPW
+         S9HvJyziXQQM4IFETfboEjYuxpPKy3xAGkxEchFQtUC+1roiUb+KlLSTkib2ZlVBxx59
+         4NDBTLeF+NwYA3946v+tbUtGkjGSkEsihU50MocpNBjFWY1Wh78Z5ny05LVGO08cP7j9
+         S1PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zu8ZuI303JrlSx/EnjNJJ7B/rYtk8B5q1bvTJWb5XME=;
-        b=WJ/yULYSC+8K6mipfS5P1irhQSfAr1uTRuqKI1C5PdW6xepHdZqIEUH4MqlcN4Uquk
-         swNkj8s8V+45GU36Q/gUeW35fKoz6CVha/A9V+qS/FsLfweViC4egFTcA5Rne8FrQeqA
-         UuOzDrRqX3HvKmJc3XrMGAHLDckJHWssFKcOuoV4pw107EagvD/WR0GNLhCtxWyRR+BL
-         HrAp3NOq3NX6PeKOw0Awwz1y3sOX7bBnfiX8z9sg724mjBj79kQy64G7oHtXBIcfszA+
-         WL6/LXqrhTdguCi/KSqyjpmqtdQCLwtCt/apTBGmelpvkgnk4ANLUJH4bBng/vMdyFvI
-         MZbw==
-X-Gm-Message-State: AA+aEWZs32SXFwua57xATlN1SlnmoB94PdbIOMSsOnq7xsgoV3w1asvx
-        rJQULIh6mfBpaA31fmTEMXtSNko9WmbkH6bn6f/kkg==
-X-Google-Smtp-Source: AFSGD/UKrJPGuvz+k+llK4UJN1B41bRdNTO8sYGSr4UHFxG2fdJf1mtOWOtBAilyAiXkzjTmp8VU1hki45dDlhkf++0=
-X-Received: by 2002:a1f:83ca:: with SMTP id f193mr698383vkd.75.1542717324627;
- Tue, 20 Nov 2018 04:35:24 -0800 (PST)
-MIME-Version: 1.0
-References: <20181119154311.27826-1-luiz.dentz@gmail.com> <CABBYNZK90H=0e4GKo1g96jYkg3EM+5C2DhbCvi-Cgtd8W+E3YA@mail.gmail.com>
- <CAHotPr_8M4H_6sLV+BK02QBKLwwAn0cEOFhyoMN5F0=_gY1dHQ@mail.gmail.com> <CABBYNZJNM2SpM2w3kwuLw1FfXcoSZfyO02xCJAgdx-BBPyw7-w@mail.gmail.com>
-In-Reply-To: <CABBYNZJNM2SpM2w3kwuLw1FfXcoSZfyO02xCJAgdx-BBPyw7-w@mail.gmail.com>
-From:   Gal Ben Haim <gbenhaim@augury.com>
-Date:   Tue, 20 Nov 2018 14:35:13 +0200
-Message-ID: <CAHotPr8nQYJkN30pTncQfx-SGgmUgTs582_q_MAiLi=bEFYO9w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] gatt: Fix invalid read when disconnecting
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=AxhPGKMLOfXQzGSiANP5TCUKP7aITrK2lrJvNAawjKs=;
+        b=QkVCbyIMHahIEqho3NPVfo3JMYYF34L2z4b9RIvRlL71w63FkEJw7hvCsZF4BVfArJ
+         eDPdYrqGlFv0YvuyP4AvR5tid5ZBn+Ijh/HCHkntdIsakJNOdU56hbZmSy6vk4J3tWPa
+         U9XT42mMRp3QQxBKT/MYa1ICRU+1HvKixhx52SBerLz6jdCHhQvh2zel/Xmp3Dl2wU7e
+         9ixT/GnfLT24DLJU+DJzxDcaDjXnISfQiTkU9vWDy3Plm2WewPo/rMQ/j0N2iecLGSAY
+         fLv38SGyUZOuRowEt4NRTmGoi+kKGEH61BChe1kjLcRAIyfBxWl/W5Y0jWLFHmPgC2+i
+         K8vg==
+X-Gm-Message-State: AGRZ1gJUmPgXh7ssaTkuzwq4FyqlYjxeZiarZ8hVtZp/nNrqBYj8qajd
+        zO6be+f88xDtxBp9HwLnfpzqOqdx
+X-Google-Smtp-Source: AJdET5dMdNpvCdM79FO6zEPGR4D2lJfstURrTjOy1Q/pTjBga8qOwybNm/jTBjESXxEzFLtIB7nX4Q==
+X-Received: by 2002:a17:906:8488:: with SMTP id m8-v6mr2077625ejx.121.1542722305479;
+        Tue, 20 Nov 2018 05:58:25 -0800 (PST)
+Received: from localhost.localdomain ([192.198.151.62])
+        by smtp.gmail.com with ESMTPSA id c29sm7200768eda.75.2018.11.20.05.58.24
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 20 Nov 2018 05:58:24 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/4] shared/log: Add common code to interface with logging channel
+Date:   Tue, 20 Nov 2018 15:58:18 +0200
+Message-Id: <20181120135821.18082-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.17.2
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-i tried with both git am and git apply
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Nov 20, 2018 at 12:35 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Gal,
-> On Tue, Nov 20, 2018 at 11:31 AM Gal Ben Haim <gbenhaim@augury.com> wrote:
-> >
-> > I can't apply this patch, not to the revision in master and not to the 5.50 tag
->
-> They are on top o master, how are you trying to apply them, with git am?
->
-> > On Tue, Nov 20, 2018 at 10:50 AM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > On Mon, Nov 19, 2018 at 5:43 PM Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > >
-> > > > In case there is a client of AcquireNotify and a disconnect happens the
-> > > > code not only have to free the client object but also destroy the io
-> > > > associated with it, for this reason the client object cannot be freed
-> > > > until the io is destroyed otherwise it may lead to the following error:
-> > > >
-> > > > Invalid read of size 4
-> > > >    at 0x63920: notify_io_destroy (gatt-client.c:1461)
-> > > >    by 0x63EDB: pipe_io_destroy (gatt-client.c:1082)
-> > > >    by 0x6405B: characteristic_free (gatt-client.c:1663)
-> > > >    by 0x81F33: remove_interface (object.c:667)
-> > > >    by 0x826CB: g_dbus_unregister_interface (object.c:1391)
-> > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
-> > > >    by 0x85CF7: queue_remove_all (queue.c:339)
-> > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
-> > > >    by 0x695CB: gatt_service_removed (device.c:3747)
-> > > >    by 0x85B17: queue_foreach (queue.c:220)
-> > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
-> > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
-> > > >  Address 0x515ed48 is 0 bytes inside a block of size 20 free'd
-> > > >    at 0x483EAD0: free (vg_replace_malloc.c:530)
-> > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > >    by 0x636D3: unregister_characteristic (gatt-client.c:1741)
-> > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
-> > > >    by 0x85CF7: queue_remove_all (queue.c:339)
-> > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
-> > > >    by 0x695CB: gatt_service_removed (device.c:3747)
-> > > >    by 0x85B17: queue_foreach (queue.c:220)
-> > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
-> > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
-> > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > >    by 0x91387: gatt_db_clear_range (gatt-db.c:475)
-> > > > ---
-> > > >  src/gatt-client.c | 24 ++++++++++++------------
-> > > >  1 file changed, 12 insertions(+), 12 deletions(-)
-> > > >
-> > > > diff --git a/src/gatt-client.c b/src/gatt-client.c
-> > > > index 234f46ed7..55aa5e423 100644
-> > > > --- a/src/gatt-client.c
-> > > > +++ b/src/gatt-client.c
-> > > > @@ -1645,13 +1645,22 @@ static const GDBusMethodTable characteristic_methods[] = {
-> > > >         { }
-> > > >  };
-> > > >
-> > > > +static void remove_client(void *data)
-> > > > +{
-> > > > +       struct notify_client *ntfy_client = data;
-> > > > +       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
-> > > > +
-> > > > +       queue_remove(client->all_notify_clients, ntfy_client);
-> > > > +
-> > > > +       notify_client_unref(ntfy_client);
-> > > > +}
-> > > > +
-> > > >  static void characteristic_free(void *data)
-> > > >  {
-> > > >         struct characteristic *chrc = data;
-> > > >
-> > > >         /* List should be empty here */
-> > > >         queue_destroy(chrc->descs, NULL);
-> > > > -       queue_destroy(chrc->notify_clients, NULL);
-> > > >
-> > > >         if (chrc->write_io) {
-> > > >                 queue_remove(chrc->service->client->ios, chrc->write_io->io);
-> > > > @@ -1663,6 +1672,8 @@ static void characteristic_free(void *data)
-> > > >                 pipe_io_destroy(chrc->notify_io);
-> > > >         }
-> > > >
-> > > > +       queue_destroy(chrc->notify_clients, remove_client);
-> > > > +
-> > > >         g_free(chrc->path);
-> > > >         free(chrc);
-> > > >  }
-> > > > @@ -1715,16 +1726,6 @@ static struct characteristic *characteristic_create(
-> > > >         return chrc;
-> > > >  }
-> > > >
-> > > > -static void remove_client(void *data)
-> > > > -{
-> > > > -       struct notify_client *ntfy_client = data;
-> > > > -       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
-> > > > -
-> > > > -       queue_remove(client->all_notify_clients, ntfy_client);
-> > > > -
-> > > > -       notify_client_unref(ntfy_client);
-> > > > -}
-> > > > -
-> > > >  static void unregister_characteristic(void *data)
-> > > >  {
-> > > >         struct characteristic *chrc = data;
-> > > > @@ -1738,7 +1739,6 @@ static void unregister_characteristic(void *data)
-> > > >         if (chrc->write_op)
-> > > >                 bt_gatt_client_cancel(gatt, chrc->write_op->id);
-> > > >
-> > > > -       queue_remove_all(chrc->notify_clients, NULL, NULL, remove_client);
-> > > >         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
-> > > >
-> > > >         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
-> > > > --
-> > > > 2.17.2
-> > >
-> > > Can you try with this set to see it does work properly.
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+This enables any code using shared to log information using the logging
+channel which can then be decoded by the likes of btmon.
+---
+ Makefile.am      |   1 +
+ src/shared/log.c | 191 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/log.h |  31 ++++++++
+ 3 files changed, 223 insertions(+)
+ create mode 100644 src/shared/log.c
+ create mode 100644 src/shared/log.h
+
+diff --git a/Makefile.am b/Makefile.am
+index 0ccf393c6..3f613a617 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -119,6 +119,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+ 			src/shared/gatt-server.h src/shared/gatt-server.c \
+ 			src/shared/gatt-db.h src/shared/gatt-db.c \
+ 			src/shared/gap.h src/shared/gap.c \
++			src/shared/log.h src/shared/log.c \
+ 			src/shared/tty.h
+ 
+ if READLINE
+diff --git a/src/shared/log.c b/src/shared/log.c
+new file mode 100644
+index 000000000..d42bae713
+--- /dev/null
++++ b/src/shared/log.c
+@@ -0,0 +1,191 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <errno.h>
++#include <inttypes.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <stdarg.h>
++#include <string.h>
++#include <signal.h>
++#include <sys/socket.h>
++
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++
++#include "src/shared/util.h"
++#include "src/shared/log.h"
++
++struct log_hdr {
++	uint16_t opcode;
++	uint16_t index;
++	uint16_t len;
++	uint8_t  priority;
++	uint8_t  ident_len;
++} __attribute__((packed));
++
++struct log_l2cap_hdr {
++	uint16_t cid;
++	uint16_t psm;
++} __attribute__((packed));
++
++static int log_fd = -1;
++
++int bt_log_sendmsg(uint16_t index, const char *label, int level,
++					struct iovec *io, size_t io_len)
++{
++	struct log_hdr hdr;
++	struct msghdr msg;
++	struct iovec iov[5];
++	size_t i;
++	int err;
++
++	if (io_len > 3)
++		return -EMSGSIZE;
++
++	log_fd = bt_log_open();
++	if (log_fd < 0)
++		return log_fd;
++
++	hdr.opcode = cpu_to_le16(0x0000);
++	hdr.index = cpu_to_le16(index);
++	hdr.ident_len = strlen(label) + 1;
++	hdr.len = cpu_to_le16(2 + hdr.ident_len);
++	hdr.priority = level;
++
++	iov[0].iov_base = &hdr;
++	iov[0].iov_len = sizeof(hdr);
++
++	iov[1].iov_base = (void *) label;
++	iov[1].iov_len = hdr.ident_len;
++
++	memset(&msg, 0, sizeof(msg));
++	msg.msg_iov = iov;
++	msg.msg_iovlen = 2;
++
++	for (i = 0; i < io_len; i++) {
++		iov[i + 2] = io[i];
++		hdr.len += io[i].iov_len;
++		msg.msg_iovlen++;
++	}
++
++	err = sendmsg(log_fd, &msg, 0);
++	if (err < 0) {
++		err = -errno;
++		close(log_fd);
++		log_fd = -1;
++	}
++
++	return err;
++}
++
++int bt_log_open(void)
++{
++	struct sockaddr_hci addr;
++	int fd;
++	static int err;
++
++	if (err < 0)
++		return err;
++
++	if (log_fd >= 0)
++		return log_fd;
++
++	fd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
++	if (fd < 0) {
++		err = -errno;
++		return -errno;
++	}
++
++	memset(&addr, 0, sizeof(addr));
++	addr.hci_family = AF_BLUETOOTH;
++	addr.hci_dev = HCI_DEV_NONE;
++	addr.hci_channel = HCI_CHANNEL_LOGGING;
++
++	err = bind(fd, (struct sockaddr *) &addr, sizeof(addr));
++	if (err < 0) {
++		err = -errno;
++		close(fd);
++		return err;
++	}
++
++	log_fd = fd;
++
++	return fd;
++}
++
++int bt_log_vprintf(uint16_t index, const char *label, int level,
++					const char *format, va_list ap)
++{
++	struct iovec iov;
++	char *str;
++	int len;
++
++	len = vasprintf(&str, format, ap);
++	if (len < 0)
++		return errno;
++
++	len = strlen(str);
++
++	/* Replace new line since btmon already adds it */
++	if (len > 1 && str[len - 1] == '\n') {
++		str[len - 1] = '\0';
++		len--;
++	}
++
++	iov.iov_base = str;
++	iov.iov_len = len + 1;
++
++	len = bt_log_sendmsg(index, label, level, &iov, 1);
++
++	free(str);
++
++	return len;
++}
++
++int bt_log_printf(uint16_t index, const char *label, int level,
++						const char *format, ...)
++{
++	va_list ap;
++	int err;
++
++	va_start(ap, format);
++	err = bt_log_vprintf(index, label, level, format, ap);
++	va_end(ap);
++
++	return err;
++}
++
++void bt_log_close(void)
++{
++	if (log_fd < 0)
++		return;
++
++	close(log_fd);
++	log_fd = -1;
++}
+diff --git a/src/shared/log.h b/src/shared/log.h
+new file mode 100644
+index 000000000..c72ab735b
+--- /dev/null
++++ b/src/shared/log.h
+@@ -0,0 +1,31 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++int bt_log_open(void);
++int bt_log_sendmsg(uint16_t index, const char *label, int level,
++					struct iovec *io, size_t io_len);
++int bt_log_vprintf(uint16_t index, const char *label, int level,
++					const char *format, va_list ap);
++int bt_log_printf(uint16_t index, const char *label, int level,
++					const char *format, ...);
++void bt_log_close(void);
+-- 
+2.17.2
+
