@@ -7,68 +7,62 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61639C43441
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Nov 2018 09:15:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D4DC43441
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Nov 2018 09:16:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11AD82145D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Nov 2018 09:15:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0AAE2145D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Nov 2018 09:16:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oDz9UVC0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11AD82145D
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lgSLChOz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0AAE2145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729247AbeKUTtZ (ORCPT
+        id S1729324AbeKUTuD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Nov 2018 14:49:25 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:41076 "EHLO
+        Wed, 21 Nov 2018 14:50:03 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:36498 "EHLO
         mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726665AbeKUTtZ (ORCPT
+        with ESMTP id S1726665AbeKUTuD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Nov 2018 14:49:25 -0500
-Received: by mail-oi1-f193.google.com with SMTP id j21so3934733oii.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Nov 2018 01:15:43 -0800 (PST)
+        Wed, 21 Nov 2018 14:50:03 -0500
+Received: by mail-oi1-f193.google.com with SMTP id x23so3957987oix.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Nov 2018 01:16:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oU4dvncTPpxAdJusGHIRxhM/TbGN1l8qnzw8xRTvnOM=;
-        b=oDz9UVC0epQt1A6/wTSORIIchcbLsgIvfYF/Uuq4qEa69wIpP69vbsTBXn9CocH9bM
-         RVCkkX4b80Wk+/2yK6PJvgwn0siLYPCZxNma7yaX5JcdAUc9SsSfPOIs8omO5/JMKYyp
-         Ex4SjiccXqLNYE1yS1DAq0OhnUDAbayv2+s7fWWz2ul3RIJC0YRnuZSSvc6VivVJpHVK
-         jtFXfmokQQvM8kfPdf+IWpajt1lP08MbmOp8src+Dps90Vo3MPrDOGymIH6YAIHGb5sU
-         Ph12+FIeOsEdqvbg4o6HKMu+INzqYUcbcezZ/iueOcngPmgBnljEnHuXLhP+HFbvdNUz
-         xgmQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=9NonInrmMeQUZt9BxikKVXLOn61UaS8cGj6eIKTd3RQ=;
+        b=lgSLChOzoz+tZ/epWvAEEgjzgIk2do+4uJTvz8CAR01ByOSya5cGcEAbDH9TsQMQ4e
+         SZ7OiGe37AZtYNPoWhJvgm48apoctICYN5LbXCVoE+RUujE2MpuBhFHkw/aCALB63qjf
+         XN64wxHmaBHwfbxHtOp+BBjCsMYdE1LZKTcXpoSEmVdHZImnJMpFQOyupoDCpq9rb0Td
+         dYgujfFX1VX4vFnICIyH9DDcI2WyF/TvuNOldSWnOxdLNOiZbQz5qHJsebbkG2StoaGO
+         bVapuZ9J62PEFTF8FTJ6wd9ITSRUNBD5x4Yf8Qn9U2mq8Jvvcmjhb91ojh+V+p3TGYn6
+         +VIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oU4dvncTPpxAdJusGHIRxhM/TbGN1l8qnzw8xRTvnOM=;
-        b=E3fJtYrJ4/9PdoPIaIjlKArOBs+KJUhrKvf/va1RzCktHhoBBy911FsP+3/rmA0nop
-         JZU6H5bDM3rTotGNWGLKW1agfqU4Q+qTy3BuKiVQBZYgMXoqoWF2wyM/u/aYaJe58wMW
-         JRyfxeSX8/BwHYKGl4h7EKOczFUEvLXs1QWM1jwaR1zGwdU6Wlw+juD5mj/FjvLI0quj
-         mQWsO08OFNG75bgzsblMVz74me6mjCGE0llHjDHlkzCHCvUpX/JtCRNsbcciMB8RRYOL
-         NH3glOiauiSDfVJdUbSih8NbkO5hbbNsj0zb+cSXSCRx6Okos0lDmb58WZzTdord0eKq
-         oE6Q==
-X-Gm-Message-State: AGRZ1gKu8cZjweKynIDgX7L0C5nnK5W7EV1PC0NyEIHfBXRIDqwOzhpK
-        GrhfeneTM42F+tsewRxvQRfCOZv2Bce/SrmQLl03+A==
-X-Google-Smtp-Source: AJdET5fe0WhG8DR7SKvfQvXF9ns8laERREQ059qqUaK3PL/ZyI0g98eZtRb4Ikhf9yauWph/u0XfzN17rkS1xJikqXg=
-X-Received: by 2002:aca:d886:: with SMTP id p128-v6mr3211168oig.346.1542791742845;
- Wed, 21 Nov 2018 01:15:42 -0800 (PST)
+         :message-id:subject:to;
+        bh=9NonInrmMeQUZt9BxikKVXLOn61UaS8cGj6eIKTd3RQ=;
+        b=d/n2q7QxPQssuymI6vhQroupq3K8Qh2FnqvuDXlok8uSfGE/ztfKjUKsULiOmkXcUz
+         JKJXza4seOVgyl+Rtp71urBWz3MU8vanndnjVK7hQKNq2WzTu1ZSbVHoLhfS1Qf29a6H
+         XUWKIhBJxkb33sgpDP1DAbpPctznniuGCPPyBrftW91qhLe5wH3KdB86XHhU+O6KTQRc
+         iVFZfgh1KHcnw3RukHqwht0eafgbneFNHQuJv8O+baeAk0ruZOo57Extc3pnH6u0V5/f
+         c/MjMd8BqJrmqwJ5jN/8Sx4s7ZkoCQ5lzuvhEXYkfaeSlR4z9V18K8Ozf7cy6z2Ib8Rr
+         oXSw==
+X-Gm-Message-State: AGRZ1gKSdt2Tu9FxaRlRxN4414bHc36C3VhgPaB9GliRWu5rYpCCUKD0
+        qZSF1FgQOzS94DxgQA658b9idWdS3Oww0yCn2ymRAA==
+X-Google-Smtp-Source: AJdET5cTDWKoIzDpPGDYOb3xBSfltomiMBIBdbeEnPwyLg+NKxFBiZBEnQq61aLOMhW/rkcBM0vchwDXg7RQHxjbJtU=
+X-Received: by 2002:a05:6808:97:: with SMTP id s23mr2949824oic.251.1542791780816;
+ Wed, 21 Nov 2018 01:16:20 -0800 (PST)
 MIME-Version: 1.0
-References: <20181119154311.27826-1-luiz.dentz@gmail.com> <CABBYNZK90H=0e4GKo1g96jYkg3EM+5C2DhbCvi-Cgtd8W+E3YA@mail.gmail.com>
- <CAHotPr_8M4H_6sLV+BK02QBKLwwAn0cEOFhyoMN5F0=_gY1dHQ@mail.gmail.com>
- <CABBYNZJNM2SpM2w3kwuLw1FfXcoSZfyO02xCJAgdx-BBPyw7-w@mail.gmail.com>
- <CAHotPr8nQYJkN30pTncQfx-SGgmUgTs582_q_MAiLi=bEFYO9w@mail.gmail.com>
- <CABBYNZJzpPd+ZfJRTyCnicr8jApj_YW31qZhUDxSk_PgKiPZKg@mail.gmail.com>
- <CAHotPr8pvbCOoYHVz-k4NU-prmtkq2bZOFN5V_GjCebte5HBtg@mail.gmail.com> <CAHotPr8MyEwqATiL+4CHfTJ-40Df3cjm60CptT6wh-0GTpFgOg@mail.gmail.com>
-In-Reply-To: <CAHotPr8MyEwqATiL+4CHfTJ-40Df3cjm60CptT6wh-0GTpFgOg@mail.gmail.com>
+References: <20181120135821.18082-1-luiz.dentz@gmail.com>
+In-Reply-To: <20181120135821.18082-1-luiz.dentz@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 21 Nov 2018 11:15:30 +0200
-Message-ID: <CABBYNZKGjNYc7WBWrN9XHnLaYmOk0x981MB9XGqk8EQArMZeMg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] gatt: Fix invalid read when disconnecting
-To:     gbenhaim@augury.com
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Wed, 21 Nov 2018 11:16:09 +0200
+Message-ID: <CABBYNZ+WF_ea7TMqcd+gDO+x3EpWuRWVW3EwfgK-vDBL3Ygt8A@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] shared/log: Add common code to interface with
+ logging channel
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -76,146 +70,269 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
-On Wed, Nov 21, 2018 at 9:15 AM Gal Ben Haim <gbenhaim@augury.com> wrote:
+On Tue, Nov 20, 2018 at 3:58 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> it fixes the same case that cause the version from master to crash.
-> i haven't tested for anything else..
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> On Tue, Nov 20, 2018 at 8:31 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
-> >
-> > ok I patched it. i'll test it tomorrow in the office and let you know.
-> >
-> > On Tue, Nov 20, 2018 at 3:59 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Gal,
-> > >
-> > > On Tue, Nov 20, 2018 at 2:35 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
-> > > >
-> > > > i tried with both git am and git apply
-> > >
-> > > Does that applies to v2 as well? I just rebased it on top master, are
-> > > you sure you don't have your own changes conflicting with it?
-> > >
-> > > > On Tue, Nov 20, 2018 at 12:35 PM Luiz Augusto von Dentz
-> > > > <luiz.dentz@gmail.com> wrote:
-> > > > >
-> > > > > Hi Gal,
-> > > > > On Tue, Nov 20, 2018 at 11:31 AM Gal Ben Haim <gbenhaim@augury.com> wrote:
-> > > > > >
-> > > > > > I can't apply this patch, not to the revision in master and not to the 5.50 tag
-> > > > >
-> > > > > They are on top o master, how are you trying to apply them, with git am?
-> > > > >
-> > > > > > On Tue, Nov 20, 2018 at 10:50 AM Luiz Augusto von Dentz
-> > > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > > >
-> > > > > > > On Mon, Nov 19, 2018 at 5:43 PM Luiz Augusto von Dentz
-> > > > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > > > > > >
-> > > > > > > > In case there is a client of AcquireNotify and a disconnect happens the
-> > > > > > > > code not only have to free the client object but also destroy the io
-> > > > > > > > associated with it, for this reason the client object cannot be freed
-> > > > > > > > until the io is destroyed otherwise it may lead to the following error:
-> > > > > > > >
-> > > > > > > > Invalid read of size 4
-> > > > > > > >    at 0x63920: notify_io_destroy (gatt-client.c:1461)
-> > > > > > > >    by 0x63EDB: pipe_io_destroy (gatt-client.c:1082)
-> > > > > > > >    by 0x6405B: characteristic_free (gatt-client.c:1663)
-> > > > > > > >    by 0x81F33: remove_interface (object.c:667)
-> > > > > > > >    by 0x826CB: g_dbus_unregister_interface (object.c:1391)
-> > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > > > > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
-> > > > > > > >    by 0x85CF7: queue_remove_all (queue.c:339)
-> > > > > > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
-> > > > > > > >    by 0x695CB: gatt_service_removed (device.c:3747)
-> > > > > > > >    by 0x85B17: queue_foreach (queue.c:220)
-> > > > > > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
-> > > > > > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
-> > > > > > > >  Address 0x515ed48 is 0 bytes inside a block of size 20 free'd
-> > > > > > > >    at 0x483EAD0: free (vg_replace_malloc.c:530)
-> > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > > > > > >    by 0x636D3: unregister_characteristic (gatt-client.c:1741)
-> > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > > > > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
-> > > > > > > >    by 0x85CF7: queue_remove_all (queue.c:339)
-> > > > > > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
-> > > > > > > >    by 0x695CB: gatt_service_removed (device.c:3747)
-> > > > > > > >    by 0x85B17: queue_foreach (queue.c:220)
-> > > > > > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
-> > > > > > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
-> > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > > > > > >    by 0x91387: gatt_db_clear_range (gatt-db.c:475)
-> > > > > > > > ---
-> > > > > > > >  src/gatt-client.c | 24 ++++++++++++------------
-> > > > > > > >  1 file changed, 12 insertions(+), 12 deletions(-)
-> > > > > > > >
-> > > > > > > > diff --git a/src/gatt-client.c b/src/gatt-client.c
-> > > > > > > > index 234f46ed7..55aa5e423 100644
-> > > > > > > > --- a/src/gatt-client.c
-> > > > > > > > +++ b/src/gatt-client.c
-> > > > > > > > @@ -1645,13 +1645,22 @@ static const GDBusMethodTable characteristic_methods[] = {
-> > > > > > > >         { }
-> > > > > > > >  };
-> > > > > > > >
-> > > > > > > > +static void remove_client(void *data)
-> > > > > > > > +{
-> > > > > > > > +       struct notify_client *ntfy_client = data;
-> > > > > > > > +       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
-> > > > > > > > +
-> > > > > > > > +       queue_remove(client->all_notify_clients, ntfy_client);
-> > > > > > > > +
-> > > > > > > > +       notify_client_unref(ntfy_client);
-> > > > > > > > +}
-> > > > > > > > +
-> > > > > > > >  static void characteristic_free(void *data)
-> > > > > > > >  {
-> > > > > > > >         struct characteristic *chrc = data;
-> > > > > > > >
-> > > > > > > >         /* List should be empty here */
-> > > > > > > >         queue_destroy(chrc->descs, NULL);
-> > > > > > > > -       queue_destroy(chrc->notify_clients, NULL);
-> > > > > > > >
-> > > > > > > >         if (chrc->write_io) {
-> > > > > > > >                 queue_remove(chrc->service->client->ios, chrc->write_io->io);
-> > > > > > > > @@ -1663,6 +1672,8 @@ static void characteristic_free(void *data)
-> > > > > > > >                 pipe_io_destroy(chrc->notify_io);
-> > > > > > > >         }
-> > > > > > > >
-> > > > > > > > +       queue_destroy(chrc->notify_clients, remove_client);
-> > > > > > > > +
-> > > > > > > >         g_free(chrc->path);
-> > > > > > > >         free(chrc);
-> > > > > > > >  }
-> > > > > > > > @@ -1715,16 +1726,6 @@ static struct characteristic *characteristic_create(
-> > > > > > > >         return chrc;
-> > > > > > > >  }
-> > > > > > > >
-> > > > > > > > -static void remove_client(void *data)
-> > > > > > > > -{
-> > > > > > > > -       struct notify_client *ntfy_client = data;
-> > > > > > > > -       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
-> > > > > > > > -
-> > > > > > > > -       queue_remove(client->all_notify_clients, ntfy_client);
-> > > > > > > > -
-> > > > > > > > -       notify_client_unref(ntfy_client);
-> > > > > > > > -}
-> > > > > > > > -
-> > > > > > > >  static void unregister_characteristic(void *data)
-> > > > > > > >  {
-> > > > > > > >         struct characteristic *chrc = data;
-> > > > > > > > @@ -1738,7 +1739,6 @@ static void unregister_characteristic(void *data)
-> > > > > > > >         if (chrc->write_op)
-> > > > > > > >                 bt_gatt_client_cancel(gatt, chrc->write_op->id);
-> > > > > > > >
-> > > > > > > > -       queue_remove_all(chrc->notify_clients, NULL, NULL, remove_client);
-> > > > > > > >         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
-> > > > > > > >
-> > > > > > > >         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
-> > > > > > > > --
-> > > > > > > > 2.17.2
+> This enables any code using shared to log information using the logging
+> channel which can then be decoded by the likes of btmon.
+> ---
+>  Makefile.am      |   1 +
+>  src/shared/log.c | 191 +++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/log.h |  31 ++++++++
+>  3 files changed, 223 insertions(+)
+>  create mode 100644 src/shared/log.c
+>  create mode 100644 src/shared/log.h
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index 0ccf393c6..3f613a617 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -119,6 +119,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+>                         src/shared/gatt-server.h src/shared/gatt-server.c \
+>                         src/shared/gatt-db.h src/shared/gatt-db.c \
+>                         src/shared/gap.h src/shared/gap.c \
+> +                       src/shared/log.h src/shared/log.c \
+>                         src/shared/tty.h
+>
+>  if READLINE
+> diff --git a/src/shared/log.c b/src/shared/log.c
+> new file mode 100644
+> index 000000000..d42bae713
+> --- /dev/null
+> +++ b/src/shared/log.c
+> @@ -0,0 +1,191 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2018  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdio.h>
+> +#include <errno.h>
+> +#include <inttypes.h>
+> +#include <unistd.h>
+> +#include <stdlib.h>
+> +#include <stdarg.h>
+> +#include <string.h>
+> +#include <signal.h>
+> +#include <sys/socket.h>
+> +
+> +#include "lib/bluetooth.h"
+> +#include "lib/hci.h"
+> +
+> +#include "src/shared/util.h"
+> +#include "src/shared/log.h"
+> +
+> +struct log_hdr {
+> +       uint16_t opcode;
+> +       uint16_t index;
+> +       uint16_t len;
+> +       uint8_t  priority;
+> +       uint8_t  ident_len;
+> +} __attribute__((packed));
+> +
+> +struct log_l2cap_hdr {
+> +       uint16_t cid;
+> +       uint16_t psm;
+> +} __attribute__((packed));
+> +
+> +static int log_fd = -1;
+> +
+> +int bt_log_sendmsg(uint16_t index, const char *label, int level,
+> +                                       struct iovec *io, size_t io_len)
+> +{
+> +       struct log_hdr hdr;
+> +       struct msghdr msg;
+> +       struct iovec iov[5];
+> +       size_t i;
+> +       int err;
+> +
+> +       if (io_len > 3)
+> +               return -EMSGSIZE;
+> +
+> +       log_fd = bt_log_open();
+> +       if (log_fd < 0)
+> +               return log_fd;
+> +
+> +       hdr.opcode = cpu_to_le16(0x0000);
+> +       hdr.index = cpu_to_le16(index);
+> +       hdr.ident_len = strlen(label) + 1;
+> +       hdr.len = cpu_to_le16(2 + hdr.ident_len);
+> +       hdr.priority = level;
+> +
+> +       iov[0].iov_base = &hdr;
+> +       iov[0].iov_len = sizeof(hdr);
+> +
+> +       iov[1].iov_base = (void *) label;
+> +       iov[1].iov_len = hdr.ident_len;
+> +
+> +       memset(&msg, 0, sizeof(msg));
+> +       msg.msg_iov = iov;
+> +       msg.msg_iovlen = 2;
+> +
+> +       for (i = 0; i < io_len; i++) {
+> +               iov[i + 2] = io[i];
+> +               hdr.len += io[i].iov_len;
+> +               msg.msg_iovlen++;
+> +       }
+> +
+> +       err = sendmsg(log_fd, &msg, 0);
+> +       if (err < 0) {
+> +               err = -errno;
+> +               close(log_fd);
+> +               log_fd = -1;
+> +       }
+> +
+> +       return err;
+> +}
+> +
+> +int bt_log_open(void)
+> +{
+> +       struct sockaddr_hci addr;
+> +       int fd;
+> +       static int err;
+> +
+> +       if (err < 0)
+> +               return err;
+> +
+> +       if (log_fd >= 0)
+> +               return log_fd;
+> +
+> +       fd = socket(PF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+> +       if (fd < 0) {
+> +               err = -errno;
+> +               return -errno;
+> +       }
+> +
+> +       memset(&addr, 0, sizeof(addr));
+> +       addr.hci_family = AF_BLUETOOTH;
+> +       addr.hci_dev = HCI_DEV_NONE;
+> +       addr.hci_channel = HCI_CHANNEL_LOGGING;
+> +
+> +       err = bind(fd, (struct sockaddr *) &addr, sizeof(addr));
+> +       if (err < 0) {
+> +               err = -errno;
+> +               close(fd);
+> +               return err;
+> +       }
+> +
+> +       log_fd = fd;
+> +
+> +       return fd;
+> +}
+> +
+> +int bt_log_vprintf(uint16_t index, const char *label, int level,
+> +                                       const char *format, va_list ap)
+> +{
+> +       struct iovec iov;
+> +       char *str;
+> +       int len;
+> +
+> +       len = vasprintf(&str, format, ap);
+> +       if (len < 0)
+> +               return errno;
+> +
+> +       len = strlen(str);
+> +
+> +       /* Replace new line since btmon already adds it */
+> +       if (len > 1 && str[len - 1] == '\n') {
+> +               str[len - 1] = '\0';
+> +               len--;
+> +       }
+> +
+> +       iov.iov_base = str;
+> +       iov.iov_len = len + 1;
+> +
+> +       len = bt_log_sendmsg(index, label, level, &iov, 1);
+> +
+> +       free(str);
+> +
+> +       return len;
+> +}
+> +
+> +int bt_log_printf(uint16_t index, const char *label, int level,
+> +                                               const char *format, ...)
+> +{
+> +       va_list ap;
+> +       int err;
+> +
+> +       va_start(ap, format);
+> +       err = bt_log_vprintf(index, label, level, format, ap);
+> +       va_end(ap);
+> +
+> +       return err;
+> +}
+> +
+> +void bt_log_close(void)
+> +{
+> +       if (log_fd < 0)
+> +               return;
+> +
+> +       close(log_fd);
+> +       log_fd = -1;
+> +}
+> diff --git a/src/shared/log.h b/src/shared/log.h
+> new file mode 100644
+> index 000000000..c72ab735b
+> --- /dev/null
+> +++ b/src/shared/log.h
+> @@ -0,0 +1,31 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2018  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +int bt_log_open(void);
+> +int bt_log_sendmsg(uint16_t index, const char *label, int level,
+> +                                       struct iovec *io, size_t io_len);
+> +int bt_log_vprintf(uint16_t index, const char *label, int level,
+> +                                       const char *format, va_list ap);
+> +int bt_log_printf(uint16_t index, const char *label, int level,
+> +                                       const char *format, ...);
+> +void bt_log_close(void);
+> --
+> 2.17.2
 
 Applied.
 
