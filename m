@@ -2,62 +2,76 @@ Return-Path: <SRS0=tgYb=OD=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3717AC43441
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Nov 2018 13:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04704C43441
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Nov 2018 22:09:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F303F2086B
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Nov 2018 13:28:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F303F2086B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
+	by mail.kernel.org (Postfix) with ESMTP id BCAFB20868
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Nov 2018 22:09:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCAFB20868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726323AbeKYAQ0 (ORCPT
+        id S1726327AbeKYI7M convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 24 Nov 2018 19:16:26 -0500
-Received: from a3.inai.de ([88.198.85.195]:54552 "EHLO a3.inai.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726316AbeKYAQ0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 24 Nov 2018 19:16:26 -0500
-Received: by a3.inai.de (Postfix, from userid 25121)
-        id 3CD713BACCAB; Sat, 24 Nov 2018 14:27:59 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by a3.inai.de (Postfix) with ESMTP id 32B2D3BB6970;
-        Sat, 24 Nov 2018 14:27:59 +0100 (CET)
-Date:   Sat, 24 Nov 2018 14:27:59 +0100 (CET)
-From:   Jan Engelhardt <jengelh@inai.de>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 1/7] build: change @foo@ to $(foo) in automake
- makefiles
-In-Reply-To: <CABBYNZL0jgnZTYSQ+c+54_fHudK+0fg-GwS_-LUzw7gde_aMyA@mail.gmail.com>
-Message-ID: <nycvar.YFH.7.76.1811241421150.5864@n3.vanv.qr>
-References: <CABBYNZ+pLp5W0_sNC4ih_KuW2WmX5drBL2bPX4rG4fHQ4kyecg@mail.gmail.com> <20181121125753.15476-1-jengelh@inai.de> <20181121125753.15476-2-jengelh@inai.de> <CABBYNZL0jgnZTYSQ+c+54_fHudK+0fg-GwS_-LUzw7gde_aMyA@mail.gmail.com>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        Sun, 25 Nov 2018 03:59:12 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:37002 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726275AbeKYI7L (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 25 Nov 2018 03:59:11 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id EC17329EF8
+        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Nov 2018 22:09:46 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id DD30629EFA; Sat, 24 Nov 2018 22:09:46 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 201363] RTL8822BE Bluetooth not detected on Lenovo A485
+Date:   Sat, 24 Nov 2018 22:09:47 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: samantham@posteo.net
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: OBSOLETE
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-201363-62941-tOEKPJq2cT@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-201363-62941@https.bugzilla.kernel.org/>
+References: <bug-201363-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thursday 2018-11-22 10:47, Luiz Augusto von Dentz wrote:
+https://bugzilla.kernel.org/show_bug.cgi?id=201363
 
->Hi Jan,
->> When using automake, all AC_SUBSTed variables are made available as
->> make variables, so that they can also be set at make time. Therefore,
->> they need not use the @harcoded@ style.
->>
->> -pkglibexecdir = @libexecdir@/bluetooth
->> +pkglibexecdir = $(libexecdir)/bluetooth
->> -includedir = @includedir@/bluetooth
->> +includedir = $(includedir)/bluetooth
->
->Makefile:2392: *** Recursive variable 'includedir' references itself
->(eventually).  Stop.
+Samantha McVey (samantham@posteo.net) changed:
 
-Thank you. Not sure why my system does not give the recursive warning here (it
-*did* for libexecdir though, which is what brought commit 78bce48009 forth).
-I'll do the distcheck too (apparently that --enables-android, which I missed).
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |OBSOLETE
+
+--- Comment #2 from Samantha McVey (samantham@posteo.net) ---
+Closing this. It has been fixed as of BIOS version 1.06 from Lenovo.
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
