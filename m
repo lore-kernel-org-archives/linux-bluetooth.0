@@ -6,33 +6,33 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36AAFC04EBC
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Nov 2018 09:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E9E6C18E01
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Nov 2018 09:20:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0027F20865
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Nov 2018 09:20:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0027F20865
+	by mail.kernel.org (Postfix) with ESMTP id DA83E20989
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Nov 2018 09:20:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA83E20989
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727565AbeKYUK4 (ORCPT
+        id S1727576AbeKYUK5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 25 Nov 2018 15:10:56 -0500
-Received: from a3.inai.de ([88.198.85.195]:54016 "EHLO a3.inai.de"
+        Sun, 25 Nov 2018 15:10:57 -0500
+Received: from a3.inai.de ([88.198.85.195]:54034 "EHLO a3.inai.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727554AbeKYUK4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 25 Nov 2018 15:10:56 -0500
+        id S1727554AbeKYUK5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 25 Nov 2018 15:10:57 -0500
 Received: by a3.inai.de (Postfix, from userid 65534)
-        id B6CFCF8B1E; Sun, 25 Nov 2018 10:20:16 +0100 (CET)
+        id 34BFBF8B1B; Sun, 25 Nov 2018 10:20:18 +0100 (CET)
 Received: from a4.inai.de (a4.inai.de [IPv6:2a01:4f8:222:6c9::f8])
-        by a3.inai.de (Postfix) with ESMTP id F0B1BF8B18;
-        Sun, 25 Nov 2018 10:20:13 +0100 (CET)
+        by a3.inai.de (Postfix) with ESMTP id 3941BF8B1C;
+        Sun, 25 Nov 2018 10:20:14 +0100 (CET)
 From:   Jan Engelhardt <jengelh@inai.de>
 To:     luiz.dentz@gmail.com
 Cc:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/8] build: -l arguments to belong into LDADD/LIBADD not LDFLAGS
-Date:   Sun, 25 Nov 2018 10:20:07 +0100
-Message-Id: <20181125092012.8001-4-jengelh@inai.de>
+Subject: [PATCH 7/8] build: add missing ALSA_CFLAGS
+Date:   Sun, 25 Nov 2018 10:20:11 +0100
+Message-Id: <20181125092012.8001-8-jengelh@inai.de>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181125092012.8001-1-jengelh@inai.de>
 References: <CABBYNZL0jgnZTYSQ+c+54_fHudK+0fg-GwS_-LUzw7gde_aMyA@mail.gmail.com>
@@ -44,76 +44,46 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-It is an error to put -l arguments into LDFLAGS, because the linker
-command line is order-sensitive and libs must appear in certain
-places. For this, automake has the LDADD/LIBADD.
+Some targets use ALSA_LIBS, hence need ALSA_CFLAGS.
 ---
- Makefile.plugins    |  3 ++-
- android/Makefile.am | 15 ++++++++-------
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ Makefile.am      | 4 +++-
+ Makefile.plugins | 1 +
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/Makefile.am b/Makefile.am
+index 5d7bc06b9..26e03b46f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -160,6 +160,7 @@ gobex_sources = gobex/gobex.h gobex/gobex.c \
+ 
+ builtin_modules =
+ builtin_sources =
++builtin_cppflags =
+ builtin_nodist =
+ builtin_ldadd =
+ 
+@@ -217,7 +218,8 @@ src_bluetoothd_DEPENDENCIES = lib/libbluetooth-internal.la \
+ 				src/bluetooth.service
+ 
+ src_bluetoothd_CPPFLAGS = $(AM_CPPFLAGS) -DBLUETOOTH_PLUGIN_BUILTIN \
+-					-DPLUGINDIR=\""$(build_plugindir)"\"
++					-DPLUGINDIR=\""$(build_plugindir)"\" \
++					$(builtin_cppflags)
+ src_bluetoothd_SHORTNAME = bluetoothd
+ 
+ builtin_files = src/builtin.h $(builtin_nodist)
 diff --git a/Makefile.plugins b/Makefile.plugins
-index 1c9919d71..d3cf5cab8 100644
+index 2aaeb7450..47bf317cb 100644
 --- a/Makefile.plugins
 +++ b/Makefile.plugins
-@@ -107,6 +107,7 @@ if SIXAXIS
- plugin_LTLIBRARIES += plugins/sixaxis.la
- plugins_sixaxis_la_SOURCES = plugins/sixaxis.c
- plugins_sixaxis_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
--						-no-undefined $(UDEV_LIBS)
-+						-no-undefined
-+plugins_sixaxis_la_LIBADD = $(UDEV_LIBS)
- plugins_sixaxis_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden $(UDEV_CFLAGS)
+@@ -97,6 +97,7 @@ builtin_modules += midi
+ builtin_sources += profiles/midi/midi.c \
+ 			profiles/midi/libmidi.h \
+ 			profiles/midi/libmidi.c
++builtin_cppflags += $(ALSA_CFLAGS)
+ builtin_ldadd += $(ALSA_LIBS)
  endif
-diff --git a/android/Makefile.am b/android/Makefile.am
-index d09a52d69..0f04b6a05 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -142,7 +142,8 @@ android_haltest_SOURCES = android/client/haltest.c \
- 				android/hal-utils.h android/hal-utils.c
- android_haltest_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
- 				-DPLUGINDIR=\""$(android_plugindir)"\"
--android_haltest_LDFLAGS = -pthread -ldl -lm
-+android_haltest_LDFLAGS = -pthread
-+android_haltest_LDADD = -ldl -lm
  
- noinst_PROGRAMS += android/android-tester
- 
-@@ -165,8 +166,8 @@ android_android_tester_SOURCES = emulator/hciemu.h emulator/hciemu.c \
- android_android_tester_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
- 				-DPLUGINDIR=\""$(android_plugindir)"\"
- android_android_tester_LDADD = lib/libbluetooth-internal.la \
--				src/libshared-glib.la $(GLIB_LIBS)
--android_android_tester_LDFLAGS = -pthread -ldl
-+				src/libshared-glib.la $(GLIB_LIBS) -ldl
-+android_android_tester_LDFLAGS = -pthread
- 
- noinst_PROGRAMS += android/ipc-tester
- 
-@@ -194,9 +195,9 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
- 					android/system/audio.h
- android_audio_a2dp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
- 					$(SBC_CFLAGS)
--android_audio_a2dp_default_la_LIBADD = $(SBC_LIBS)
-+android_audio_a2dp_default_la_LIBADD = $(SBC_LIBS) -lrt
- android_audio_a2dp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
--					-no-undefined -pthread -lrt
-+					-no-undefined -pthread
- 
- plugin_LTLIBRARIES += android/audio.sco.default.la
- 
-@@ -210,9 +211,9 @@ android_audio_sco_default_la_SOURCES = android/hal-log.h \
- 					android/audio_utils/resampler.h \
- 					android/system/audio.h
- android_audio_sco_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
--android_audio_sco_default_la_LIBADD = $(SPEEXDSP_LIBS)
-+android_audio_sco_default_la_LIBADD = $(SPEEXDSP_LIBS) -lrt
- android_audio_sco_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
--					-no-undefined -lrt
-+					-no-undefined
- unit_tests += android/test-ipc
- 
- android_test_ipc_SOURCES = android/test-ipc.c \
 -- 
 2.19.1
 
