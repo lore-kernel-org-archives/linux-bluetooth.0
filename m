@@ -6,33 +6,33 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47FD6C43610
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Nov 2018 09:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDE4C43441
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Nov 2018 09:20:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 194B720865
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Nov 2018 09:20:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 194B720865
+	by mail.kernel.org (Postfix) with ESMTP id 900FD20868
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Nov 2018 09:20:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 900FD20868
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727551AbeKYUKy (ORCPT
+        id S1727573AbeKYUK4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 25 Nov 2018 15:10:54 -0500
-Received: from a3.inai.de ([88.198.85.195]:54008 "EHLO a3.inai.de"
+        Sun, 25 Nov 2018 15:10:56 -0500
+Received: from a3.inai.de ([88.198.85.195]:54028 "EHLO a3.inai.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727536AbeKYUKy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 25 Nov 2018 15:10:54 -0500
+        id S1727561AbeKYUK4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 25 Nov 2018 15:10:56 -0500
 Received: by a3.inai.de (Postfix, from userid 65534)
-        id EDE10F8B21; Sun, 25 Nov 2018 10:20:14 +0100 (CET)
+        id D2DA3F8B17; Sun, 25 Nov 2018 10:20:17 +0100 (CET)
 Received: from a4.inai.de (a4.inai.de [IPv6:2a01:4f8:222:6c9::f8])
-        by a3.inai.de (Postfix) with ESMTP id CDDDBF8B16;
-        Sun, 25 Nov 2018 10:20:13 +0100 (CET)
+        by a3.inai.de (Postfix) with ESMTP id 2A9F2F8B1B;
+        Sun, 25 Nov 2018 10:20:14 +0100 (CET)
 From:   Jan Engelhardt <jengelh@inai.de>
 To:     luiz.dentz@gmail.com
 Cc:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/8] build: rename includedir to pkgincludedir
-Date:   Sun, 25 Nov 2018 10:20:05 +0100
-Message-Id: <20181125092012.8001-2-jengelh@inai.de>
+Subject: [PATCH 6/8] build: add missing UDEV_CFLAGS
+Date:   Sun, 25 Nov 2018 10:20:10 +0100
+Message-Id: <20181125092012.8001-7-jengelh@inai.de>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181125092012.8001-1-jengelh@inai.de>
 References: <CABBYNZL0jgnZTYSQ+c+54_fHudK+0fg-GwS_-LUzw7gde_aMyA@mail.gmail.com>
@@ -44,37 +44,48 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change is similar to commit 5.50-130-g78bce4800 and does the
-same, but for includedir.
+Some targets link UDEV_LIBS, which means they also need UDEV_CFLAGS
+in their (or the global) CPPFLAGS.
 ---
- Makefile.am | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ Makefile.tools | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/Makefile.am b/Makefile.am
-index d4f4572d5..e63c72def 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -23,9 +23,9 @@ pkglibexecdir = @libexecdir@/bluetooth
+diff --git a/Makefile.tools b/Makefile.tools
+index 55e769d8c..35412ca61 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -38,6 +38,7 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+ 				monitor/intel.h monitor/intel.c \
+ 				monitor/broadcom.h monitor/broadcom.c \
+ 				monitor/tty.h
++monitor_btmon_CPPFLAGS = $(AM_CPPFLAGS) $(UDEV_CFLAGS)
+ monitor_btmon_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-mainloop.la $(UDEV_LIBS)
+ endif
+@@ -187,6 +188,7 @@ noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
+ 			tools/gatt-service profiles/iap/iapd
  
- libexec_PROGRAMS =
+ tools_bdaddr_SOURCES = tools/bdaddr.c src/oui.h src/oui.c
++tools_bdaddr_CPPFLAGS = $(AM_CPPFLAGS) $(UDEV_CFLAGS)
+ tools_bdaddr_LDADD = lib/libbluetooth-internal.la $(UDEV_LIBS)
  
--includedir = @includedir@/bluetooth
-+pkgincludedir = @includedir@/bluetooth
+ tools_avinfo_LDADD = lib/libbluetooth-internal.la
+@@ -336,6 +338,7 @@ tools_hciconfig_SOURCES = tools/hciconfig.c tools/csr.h tools/csr.c
+ tools_hciconfig_LDADD = lib/libbluetooth-internal.la
  
--include_HEADERS =
-+pkginclude_HEADERS =
+ tools_hcitool_SOURCES = tools/hcitool.c src/oui.h src/oui.c
++tools_hcitool_CPPFLAGS = $(AM_CPPFLAGS) $(UDEV_CFLAGS)
+ tools_hcitool_LDADD = lib/libbluetooth-internal.la $(UDEV_LIBS)
  
- AM_CFLAGS = $(WARNING_CFLAGS) $(MISC_CFLAGS)
- AM_LDFLAGS = $(MISC_LDFLAGS)
-@@ -75,7 +75,7 @@ local_headers = $(foreach file,$(lib_headers), lib/bluetooth/$(notdir $(file)))
- BUILT_SOURCES = $(local_headers) src/builtin.h
+ tools_hcidump_SOURCES = tools/hcidump.c \
+@@ -389,6 +392,7 @@ udevdir = $(UDEV_DIR)
  
- if LIBRARY
--include_HEADERS += $(lib_headers)
-+pkginclude_HEADERS += $(lib_headers)
+ udev_PROGRAMS = tools/hid2hci
  
- lib_LTLIBRARIES += lib/libbluetooth.la
++tools_hid2hci_CPPFLAGS = $(AM_CPPFLAGS) $(UDEV_CFLAGS)
+ tools_hid2hci_LDADD = $(UDEV_LIBS)
  
+ dist_man_MANS += tools/hid2hci.1
 -- 
 2.19.1
 
