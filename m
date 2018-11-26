@@ -2,124 +2,144 @@ Return-Path: <SRS0=1eqz=OF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D81C8C43441
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 17:55:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A99A9C43441
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 19:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA2B020663
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 17:55:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA2B020663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=holtmann.org
+	by mail.kernel.org (Postfix) with ESMTP id 6D95020817
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 19:05:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="K9qZWXLP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D95020817
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726414AbeK0Et6 convert rfc822-to-8bit (ORCPT
+        id S1726397AbeK0GAT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Nov 2018 23:49:58 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:37819 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726206AbeK0Et6 (ORCPT
+        Tue, 27 Nov 2018 01:00:19 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:35844 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725723AbeK0GAT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Nov 2018 23:49:58 -0500
-Received: from marcel-macbook.fritz.box (p4FEFC449.dip0.t-ipconnect.de [79.239.196.73])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C5F95CEEB1;
-        Mon, 26 Nov 2018 19:02:39 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
-Subject: Re: [PATCH BlueZ 1/6] share/mainloop: Add handling of NOTIFY_SOCKET
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20181126162438.27872-1-luiz.dentz@gmail.com>
-Date:   Mon, 26 Nov 2018 18:54:55 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <27978B59-0DF8-42D9-90F6-086FF3FFA386@holtmann.org>
-References: <20181126162438.27872-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3445.101.1)
+        Tue, 27 Nov 2018 01:00:19 -0500
+Received: by mail-pf1-f195.google.com with SMTP id b85so7044530pfc.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Nov 2018 11:05:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=OWNqEkqpKl4WT7B6IGt+53Wt8VkERsOTBdUuXdHPFSo=;
+        b=K9qZWXLPg0OuTE77bmwfiSOcVJgsB+oFhQK15uBcKKxF4452/c+EydbpMArkmKRH9T
+         eWQ0hvYykSfpfY8DWJ/us7bdzuaqFascj8/Nq9CP36Rg8V6YggOOFRKKsbiA2kkCWnp7
+         EJjbl/kBb4GsJgJ66NGS+ZV89wRSok9jf/BP8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=OWNqEkqpKl4WT7B6IGt+53Wt8VkERsOTBdUuXdHPFSo=;
+        b=q97xeOoJnOCypmuMwS0ZWdAAFJlDs8kpkDwE1kopFinvAFBNUlbsUfzK7tWBhq7EAL
+         MICPNjP6o2/7BPPe6i94TqdTrbb29UKditQD3KMH11FLO10f9euGmXm1p7ybUi7IQIOd
+         A03xb/Sg+Klw0JSA98sBLNiY6Dqvi9RlFA5dCP3SXSqDY6Qd1GxOzjDwPr++18MLjqhD
+         Oc31PSswbU/ETSfMahYjzHkv44CAhJoqlNdJfGHqBcoGsVIz7OwZIOUBjQnZnDm6KrBA
+         pQpIy2he4iU6VtRtKuoab8S+LGIMY73KEAxalnSdIROHfauHzeZV/DqbV/bX/YPztVub
+         gdjw==
+X-Gm-Message-State: AGRZ1gKwCYcFXRDwsffoFBs/dCANqjgppOA7t+BtHe4b/1NgktiY1/Xt
+        xQsnid3qFTTaorYBZ0+BqExJWA==
+X-Google-Smtp-Source: AFSGD/WF+2d59ctkZWeeTS9vL6D5mAZ4Prz/mqp3N25kkp8cSiSK00Bd+DUdNKfnbl3LjuFzeC3QmQ==
+X-Received: by 2002:a63:a112:: with SMTP id b18mr26230872pgf.440.1543259116954;
+        Mon, 26 Nov 2018 11:05:16 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
+        by smtp.gmail.com with ESMTPSA id b5sm1407338pfc.150.2018.11.26.11.05.15
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 26 Nov 2018 11:05:16 -0800 (PST)
+Date:   Mon, 26 Nov 2018 11:05:15 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+Message-ID: <20181126190515.GV22824@google.com>
+References: <20181122121512.13136-1-bgodavar@codeaurora.org>
+ <20181122121512.13136-2-bgodavar@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181122121512.13136-2-bgodavar@codeaurora.org>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
-
-> This adds handling of systemd NOTIFY_SOCKET so application using
-> mainloop instance do properly notify systemd what is their state.
+On Thu, Nov 22, 2018 at 05:45:10PM +0530, Balakrishna Godavarthi wrote:
+> wcn3990 requires a power pulse to turn ON/OFF along with
+> regulators. Sometimes we are observing the power pulses are sent
+> out with some time delay, due to queuing these commands. This is
+> causing synchronization issues with chip, which intern delay the
+> chip setup or may end up with communication issues.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > ---
-> Makefile.am                  |   8 ++-
-> src/shared/mainloop-glib.c   |   8 +++
-> src/shared/mainloop-notify.c | 104 +++++++++++++++++++++++++++++++++++
-> src/shared/mainloop-notify.h |  25 +++++++++
-> src/shared/mainloop.c        |  12 ++++
-> src/shared/mainloop.h        |   1 +
-> 6 files changed, 156 insertions(+), 2 deletions(-)
-> create mode 100644 src/shared/mainloop-notify.c
-> create mode 100644 src/shared/mainloop-notify.h
-> 
-> diff --git a/Makefile.am b/Makefile.am
-> index 0b26ccc3e..124c32482 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -130,12 +130,16 @@ endif
-> src_libshared_glib_la_SOURCES = $(shared_sources) \
-> 				src/shared/io-glib.c \
-> 				src/shared/timeout-glib.c \
-> -				src/shared/mainloop-glib.c
-> +				src/shared/mainloop-glib.c \
-> +				src/shared/mainloop-notify.h \
-> +				src/shared/mainloop-notify.c
-> 
-> src_libshared_mainloop_la_SOURCES = $(shared_sources) \
-> 				src/shared/io-mainloop.c \
-> 				src/shared/timeout-mainloop.c \
-> -				src/shared/mainloop.h src/shared/mainloop.c
-> +				src/shared/mainloop.h src/shared/mainloop.c \
-> +				src/shared/mainloop-notify.h \
-> +				src/shared/mainloop-notify.c
-> 
-> if ELL
-> src_libshared_ell_la_SOURCES = $(shared_sources) \
-> diff --git a/src/shared/mainloop-glib.c b/src/shared/mainloop-glib.c
-> index 8436969bb..9d588e8c5 100644
-> --- a/src/shared/mainloop-glib.c
-> +++ b/src/shared/mainloop-glib.c
-> @@ -36,6 +36,7 @@
-> #include <glib.h>
-> 
-> #include "mainloop.h"
-> +#include "mainloop-notify.h"
-> 
-> static GMainLoop *main_loop;
-> static int exit_status;
-> @@ -43,6 +44,7 @@ static int exit_status;
-> void mainloop_init(void)
-> {
-> 	main_loop = g_main_loop_new(NULL, FALSE);
-> +	mainloop_notify_init();
-> }
-> 
-> void mainloop_quit(void)
-> @@ -70,11 +72,17 @@ int mainloop_run(void)
-> 	if (!main_loop)
-> 		return -EINVAL;
-> 
-> +	mainloop_notify("READY=1");
-> +
-> 	g_main_loop_run(main_loop);
-> 
-> +	mainloop_notify("STOPPING=1");
-> +
+> v2: 
+>   * Updated function qca_send_power_pulse()
+>   * addressed reviewer comments.
 
-I actually think this is too simple. Frankly what we want is some generic code that runs the mainloops and handles the terminations signals and also brings you onto D-Bus. And only then signal READY=1.
+These unspecific descriptions require people to open v1, read through
+the comments and assume you addressed all of them. Better describe
+briefly what the actual changes are.
 
-If you look at iwd and wired/dbus.c then I have started something in that direction with dbus_app_run. That needs to be a bit more unified and turned into l_dbus_run or some similar name.
+> v1:
+>  * initial patch
+> 
+> ---
+>  drivers/bluetooth/hci_qca.c | 37 +++++++++++++------------------------
+>  1 file changed, 13 insertions(+), 24 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index f036c8f98ea3..f5dd323c1967 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1013,11 +1013,9 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>  		hci_uart_set_baudrate(hu, speed);
+>  }
+>  
+> -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+> +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
+>  {
+> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+> -	struct qca_data *qca = hu->priv;
+> -	struct sk_buff *skb;
+> +	int ret;
+>  
+>  	/* These power pulses are single byte command which are sent
+>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+> @@ -1029,19 +1027,16 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>  	 * save power. Disabling hardware flow control is mandatory while
+>  	 * sending power pulses to SoC.
+>  	 */
+> -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+> -
+> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+> -	if (!skb)
+> -		return -ENOMEM;
+> -
+> +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
+>  	hci_uart_set_flow_control(hu, true);
+> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
+> +	if (ret < 0) {
+> +		bt_dev_err(hu->hdev, "failed to send power pulse %02x to SoC",
+> +			   cmd);
 
-My thinking really is that the main() function should be just deal with argument parsing and then getting you on the system or session bus. It should not be bothered with all the signal setup or the duplicated code for handling the asynchronous shutdown. And if you have that, then you do a nice integration with NOTIFY_SOCKET.
+Re-enable flow control? The controller or serial port might be in a
+non-operational state anyway, but better not complicate matters
+further.
 
-Regards
+Cheers
 
-Marcel
-
+Matthias
