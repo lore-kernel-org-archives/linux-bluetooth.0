@@ -2,112 +2,126 @@ Return-Path: <SRS0=1eqz=OF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8515EC43441
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 10:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC48FC43441
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 11:23:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4AF0F2089F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 10:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4A8620862
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 11:23:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lAz7Y7Qt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AF0F2089F
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t0cSNRTb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4A8620862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726201AbeKZVjy (ORCPT
+        id S1728140AbeKZWRK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Nov 2018 16:39:54 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:37344 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726138AbeKZVjy (ORCPT
+        Mon, 26 Nov 2018 17:17:10 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:34444 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727007AbeKZWRJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Nov 2018 16:39:54 -0500
-Received: by mail-oi1-f195.google.com with SMTP id y23so15348121oia.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Nov 2018 02:46:11 -0800 (PST)
+        Mon, 26 Nov 2018 17:17:09 -0500
+Received: by mail-oi1-f193.google.com with SMTP id h25so15478609oig.1;
+        Mon, 26 Nov 2018 03:23:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=pGvCEPAgbpAv8Q/SdX73XLiuMctQqZwcuAAjn0T5F5w=;
-        b=lAz7Y7QtYpmInHaUrw51qOn50pmfWMj23FltuJqJ8jGpWwVy1DwguTkYn/TaWJURoK
-         C3QjNXPRlP6GHN4NWt1x4deALjlHJ0eu4vH3KDU12vvV2n3kkavOb8FEO7fntSc5ixMB
-         drXxqpn3N2H1xQL5sjyRbfRsQDHOOjHgZdBxcLxsiaAS2uhywISgScSVoyRoaPZEi5Su
-         COsLI/+KBWmMKMfrz+YovXpvFKBhlLYbektqUItmi4+pLItkhNn0VJxpN3Gnr3m1MN2T
-         /l2ZyLs9fT8AnKrvjqMBofx8adAxuaBFZ039gwD+6kKQSQ3fb3FVIRG67WVvDB+9Ytif
-         rbdg==
+        bh=wh72EPnqaGyYgk3Gl1t4ySpWdc0RnFKuyA6do15oDBU=;
+        b=t0cSNRTb9Qf1nGwX6gx4h4nrf71b3kRURxcYARpHFDvZ8bMQ3se5ScHTe8PVJCg3Sy
+         017OgVpp1G9B1nBsYUQijPo69XTA5R9ExlGG+xJQsnF5TCL1MTOS/MD303kzoSbS5ZwE
+         vlLtsnbxSYZ9a7G2ehtu1ezyw6Hpi2TYD3bm7G3HJnhm6Z2lpar4J1eSifv/UfZTO19p
+         DF85+mZRHCPX9d6jNgkGkli+iQBVaPD3VQdSLTEDtWfWmTs6xlLSlA+NVVdId9pWGsY1
+         zyDduYBVx2jMpRt0jIhvqhs/1is7NjloyCVmywWhgvg5ZCI0cB5hiwHTQ7kp98n97llu
+         jw6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=pGvCEPAgbpAv8Q/SdX73XLiuMctQqZwcuAAjn0T5F5w=;
-        b=poTDdEr5Isn2BNPjBitXVGBooPlo2qxYsy3m5XWn1MykaP3WzAcI9r8MJCZ7fBA6Yl
-         dG5wf1xfOLmiGoGdd3fci3nfnNXALwDylBoFNQ+wVg76n59cd1Vssk/Gul3c8FGxIHkh
-         L3/RjAmTqnp9rCvQr8sVZG3OefSNvajgGWJUUfeekysZcp5cE6vk6iKwF/r9+c/6/ToP
-         xTP/tfJvW3cYKS/zKGgm7JL0fmhOvT99QNjTQStuy8SO8/RqOHktpWihZ+vWUQPAGZLL
-         K+T1jxOJTRW8rvl0BoMbzz0KeqW6psPWYbvf7msOvjj5fhRO28BdTcmZf5zL/jovDOKF
-         YXjQ==
-X-Gm-Message-State: AGRZ1gKrvSp5jpq8mHWE1s7IfVXTNTSE8LeG2zBISc58erNobnti7TCb
-        VFCFmhjJlN3a8ZzIEP/3u58gJeCwIu4KUVde916HVQ==
-X-Google-Smtp-Source: AJdET5eQ9Gl4kpB6zRfbmh22v+Q51TNxL+tNUrqXhzqoa5v8bZK8Hp9LEDDWpEgCOz50O6WivQ74H/CH2qjbCfJdiSM=
-X-Received: by 2002:aca:47c6:: with SMTP id u189mr15357988oia.250.1543229171433;
- Mon, 26 Nov 2018 02:46:11 -0800 (PST)
+        bh=wh72EPnqaGyYgk3Gl1t4ySpWdc0RnFKuyA6do15oDBU=;
+        b=XHwpVtxod6X6pcom2RHsoL/HcuoEaqU3rrpdLAEo19Igl0+Op8N989oW42fds+l6c9
+         74nyliwc3s3kqFBI4O8OWQHEvjewvn8t1rzrhzPmA3cWqGyYm+zHTWiAY49A7V5tRKa/
+         l0KXLpiF81xehB47kB4J9PAUiVLA+0TpsxhEAZDWyaVmFWxqYQWh18gG9rpMbVomG6My
+         IxuwsjBMBHg0qfqSCoO/rfZpdzgJUpqNkPnrLa6Hx518lUG5PvFvpJobfFujvlAf1AJJ
+         gWiryFJUHNSbH6rGbl630EqwRBEULamHclJ14rFHRbdd5oDMZLnMA6C7+TAZdA8NMsrm
+         c2YA==
+X-Gm-Message-State: AGRZ1gKgsGXJxlKwAFLqdjyHwd/31BPoP+iYVB9hZb8fmRWb/3TC2xRJ
+        67w9fK7thDeqJ85M7L8KiPJQ8eJ81+4O1/7mHz3CCOgd
+X-Google-Smtp-Source: AJdET5fvpi4l0e4i0KMJ/CT50/KxQ8u2EFx2TrY7IgwGpp8mm9/HIi5LPeB7XRzZUibU+rJ5S7dRbrSDzHY0yHknrP0=
+X-Received: by 2002:aca:47c6:: with SMTP id u189mr15437722oia.250.1543231399015;
+ Mon, 26 Nov 2018 03:23:19 -0800 (PST)
 MIME-Version: 1.0
-References: <CABBYNZL0jgnZTYSQ+c+54_fHudK+0fg-GwS_-LUzw7gde_aMyA@mail.gmail.com>
- <20181125092012.8001-1-jengelh@inai.de>
-In-Reply-To: <20181125092012.8001-1-jengelh@inai.de>
+References: <5A23C871-B30F-44C4-898B-C138EFDB4893@holtmann.org> <1542245517-150977-1-git-send-email-zumeng.chen@gmail.com>
+In-Reply-To: <1542245517-150977-1-git-send-email-zumeng.chen@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 26 Nov 2018 12:45:58 +0200
-Message-ID: <CABBYNZ+AY6NPO68P5WJEtL_CKumTEywsuoGC4Roe4evm5mia1w@mail.gmail.com>
-Subject: Re: [PATCH bluez] build system refresh (take 3)
-To:     jengelh@inai.de
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Mon, 26 Nov 2018 13:23:07 +0200
+Message-ID: <CABBYNZL3Z0qL4F=uC1j5BYfARs2ByRMvc7uudTEPxs8GTuqoag@mail.gmail.com>
+Subject: Re: [PATCH 1/1 v2] Bluetooth: make the balance of judgement condition
+ to fix a false report
+To:     zumeng.chen@gmail.com
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jan,
-On Sun, Nov 25, 2018 at 11:20 AM Jan Engelhardt <jengelh@inai.de> wrote:
+Hi Marcel,
+On Thu, Nov 15, 2018 at 3:37 AM Zumeng Chen <zumeng.chen@gmail.com> wrote:
 >
+> This patch is to balance the condition scope between hci_get_cmd_complete and
+> hci_event_packet about orig_skb as follows:
 >
-> The following changes since commit 9568f4439efdf5daa2f941f544d8a84a2eee5cac:
+>         if (req_complete_skb || event == HCI_EV_CMD_STATUS ||
+>             event == HCI_EV_CMD_COMPLETE)
+>                 orig_skb = skb_clone(skb, GFP_KERNEL);
 >
->   doc: Initial Bluetooth Mesh API (2018-11-22 11:15:45 -0800)
+> And hci_get_cmd_complete will bt_dev_err out when HCI_EV_CMD_STATUS, so a lot
+> of asymmetric conditions are triggered. Since both of them are the entry into
+> hci_get_cmd_complete, we'd better get STATUS into judge the false out there.
 >
-> are available in the Git repository at:
+> Signed-off-by: Zumeng Chen <zumeng.chen@gmail.com>
+> ---
 >
->   git://github.com/jengelh/bluez
+> v2: remove redundant braces and adjust the indentation.
 >
-> for you to fetch changes up to 97561f245b7609e4c041b4083a7922817acc3ae7:
+> Cheers,
+> Zumeng
 >
->   build: add missing BACKTRACE_CFLAGS (2018-11-24 20:09:10 +0100)
+>  net/bluetooth/hci_event.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> ----------------------------------------------------------------
-> Jan Engelhardt (8):
->       build: rename includedir to pkgincludedir
->       build: change @foo@ to $(foo) in automake makefiles
->       build: -l arguments to belong into LDADD/LIBADD not LDFLAGS
->       build: -D/-I arguments go into CPPFLAGS
->       build: add missing ELL_CFLAGS
->       build: add missing UDEV_CFLAGS
->       build: add missing ALSA_CFLAGS
->       build: add missing BACKTRACE_CFLAGS
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 235b5aa..1d2a8fe 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -5217,7 +5217,8 @@ static bool hci_get_cmd_complete(struct hci_dev *hdev, u16 opcode,
+>                 return true;
+>         }
 >
->  Makefile.am         | 84 +++++++++++++++++++++++++++++++++++++++++++-----------------------------------------
->  Makefile.mesh       |  8 ++++++--
->  Makefile.obexd      | 15 ++++++++-------
->  Makefile.plugins    |  9 ++++++---
->  Makefile.tools      | 66 +++++++++++++++++++++++++++++++++++-------------------------------
->  android/Makefile.am | 41 +++++++++++++++++++++--------------------
->  6 files changed, 119 insertions(+), 104 deletions(-)
->
+> -       if (hdr->evt != HCI_EV_CMD_COMPLETE) {
+> +       if (!(hdr->evt == HCI_EV_CMD_COMPLETE ||
+> +             hdr->evt == HCI_EV_CMD_STATUS)) {
+>                 bt_dev_err(hdev, "last event is not cmd complete (0x%2.2x)",
+>                            hdr->evt);
+>                 return false;
+> --
+> 2.7.4
 
-Applied, thanks.
+It appears we need this also for enabling vendor_diag with intel controllers:
+
+[399314.236288] hci_cmd_status_evt:3138: hci0 opcode 0xfc43
+[399314.236291] Bluetooth: hci0: last event is not cmd complete (0x0f)
+[399314.236359] Bluetooth: hci0: Changing Intel diagnostic mode failed (-16)
+
 
 -- 
 Luiz Augusto von Dentz
