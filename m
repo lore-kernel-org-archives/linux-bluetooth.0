@@ -7,255 +7,205 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 042D7C04EB8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 16:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D114CC43441
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 16:49:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B16E420664
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 16:24:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96A6420659
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 16:49:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uZxm6Dlg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B16E420664
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khaF3Qy2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96A6420659
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726399AbeK0DTY (ORCPT
+        id S1726340AbeK0Dn5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Nov 2018 22:19:24 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:39099 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726253AbeK0DTY (ORCPT
+        Mon, 26 Nov 2018 22:43:57 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46949 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726313AbeK0Dn4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Nov 2018 22:19:24 -0500
-Received: by mail-lf1-f68.google.com with SMTP id n18so13998523lfh.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Nov 2018 08:24:47 -0800 (PST)
+        Mon, 26 Nov 2018 22:43:56 -0500
+Received: by mail-wr1-f65.google.com with SMTP id l9so19658594wrt.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Nov 2018 08:49:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=g6sefQQGqWf0sNzDHIx3/xmJOVDB4Nf8s92vAHKX6Go=;
-        b=uZxm6DlgNKndUsrFcFKYaRfGFKGL6i4RtEJpubicQ9Gg8dHePc89tS82hF/ceNXa0t
-         BTFnZu6c3cA06tTb1LJ+m05QVSKxp90pCppbeEl5GOtNvjQ426Pc6zKwVfOUx/juoCxb
-         6/4IL6TiusH6B9SVnR7lgXiyt6TBXzNzrFzbv2QM4fGnQMauhXU1p3guVke7AhSUhlav
-         WSohojjCDJgKISHaaPnlbYiZzTzswc9Zn3pL5Sot9wYi2+pGVbvGQI4gRNqkurNlQojc
-         zO9RuSBAo7J5YP278BEOQMTuqrltDf4qUdGIvEGkKIJerCZPuGIv7atUn6Ueqc+EPRu1
-         O2lg==
+        h=from:to:cc:subject:date:message-id;
+        bh=u4UQRApNL+/ofhIjOPfwQAV3Krh/P8s/9H0T86zXbcs=;
+        b=khaF3Qy2+q36Aws0Aff7/b44Lui39ckMpMUs9nhWqc718ij9fmpEUT/Ilo+94oV26Y
+         4H90CSkKBZHFsud0DABAzc3y5MmA1kgQsKo4ut4Kwng6bglIvEhmYOpX8K/GKWmiVr75
+         0/jp9RVifC0JNeXbKy9H9hl/xq6YoqLT9vtaApWgevXMhr5PkZVY3dVM4B702o7kPaa+
+         pGGvFT6we09yxS7/EP7byN6Jxiy9Tc8QIqPUx7Bd3Gjhg1uh7UA/YBaC85qrm9Rx1KqI
+         oBP850Tamt9ULHHH7iVYJ8ssoY7rZ7i5VPohMfaEgsTBn4sHlZX2bspGLe50Ogr5+699
+         YKvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references;
-        bh=g6sefQQGqWf0sNzDHIx3/xmJOVDB4Nf8s92vAHKX6Go=;
-        b=VCMWd31EVc8qXzL5KCOR/JNA4HFM5kbAEdBHhR1X+fuos5Ko40UW4cO7/QjoVCnmv2
-         y/3WRZElzRcmBRRlag84CkQ284qjfKyuWaPjD91mBGD1wECZcuvxPCU7NtWIr0ronJNi
-         YZ8Reso/ZvBTo9mvjN2VMtZAD+2ZM5J4Q6Od8qh3sv5/mOyfMYvonphUkqeNhvJ7lvbx
-         o07BKJAJ/+E2X4+DRceDKUzBXa7AWntB0WnhsVecADQ+W0RSUcpfFqqLLHr1FyWWq9NC
-         TJH/CjPSTVo9tC7+QooNS/MF9PGzZrS0MV2Gj2vIPSK8Q/obQK0iNAc1FmKqdwAoR6cE
-         CRWQ==
-X-Gm-Message-State: AGRZ1gIkPmZ3Segu+nFL042M1zHBfYt8LAkTpdP2t3lpdRrcKeydWTvg
-        51h9qgBOxBvczembvIYZFK6X0Cil
-X-Google-Smtp-Source: AJdET5c7km1aepAUZhP8bHYYjRitLNYKXJCekeHMr9zwtKvMb+N7sPMkDnLmbKXPQqE0CC2APP95Cw==
-X-Received: by 2002:a19:5a05:: with SMTP id o5mr17338236lfb.140.1543249486484;
-        Mon, 26 Nov 2018 08:24:46 -0800 (PST)
-Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
-        by smtp.gmail.com with ESMTPSA id g70-v6sm120787ljg.92.2018.11.26.08.24.45
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 26 Nov 2018 08:24:45 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=u4UQRApNL+/ofhIjOPfwQAV3Krh/P8s/9H0T86zXbcs=;
+        b=M3CMbW9dgpyZxLPVpkV+8cW3ebgHG/Lxma3CDwSHvJRtJzrU0Ghda9Ww1RjVPB17Fn
+         RircpJW0M0/BPde+9OfeF1CBtsr0jI01U0axNz4tlJXycYr9T4cy/eTHwPAktMFcBKTi
+         A6wvArfdDQes5IkjIMaJNbsIVl4obQ+d1khKq+us7D+2GDI4ThIGi/NK76MZYeqP2rtw
+         OWDXodujX36tZvBPp/KZRFDkcJD0OETLE3StXCSTy1yzWY0U8ettNsDDORnLkOQ3O6r1
+         Uasb6wM0bvAO8CFW2OIzwnZnbtm4OE+hwC3GqphPyXFEkoBulNX4zbHqyhlg5VZ1GDON
+         XqCA==
+X-Gm-Message-State: AA+aEWbONZGYy30jP87RIFbfOFTD07BQJ2+mvLs5WyrVL9cAIg8OY49F
+        zCxmR0Ot5KaXm5auvlB4WhC3l+PY
+X-Google-Smtp-Source: AFSGD/Xc1VdrQ0Jn3gXIb/gjbhZJeHloMvMGihdDsrP7C8z3qKQUYFb9zBfhVg3svpD1dDwJq+OOiQ==
+X-Received: by 2002:a5d:56d2:: with SMTP id m18mr26057124wrw.113.1543250955620;
+        Mon, 26 Nov 2018 08:49:15 -0800 (PST)
+Received: from Buero.fritz.box ([2001:a62:15c7:f600:d580:4377:eac4:b277])
+        by smtp.gmail.com with ESMTPSA id q9sm1245736wrp.0.2018.11.26.08.49.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 26 Nov 2018 08:49:15 -0800 (PST)
+From:   Christian Zimmermann <zimmermach@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/6] core: Remove old code related to sd_notify
-Date:   Mon, 26 Nov 2018 18:24:37 +0200
-Message-Id: <20181126162438.27872-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20181126162438.27872-1-luiz.dentz@gmail.com>
-References: <20181126162438.27872-1-luiz.dentz@gmail.com>
+Cc:     Christian Zimmermann <zimmermach@gmail.com>
+Subject: [PATCH BlueZ 1/2] Added config conversion for Bluez4 as shell script during install
+Date:   Mon, 26 Nov 2018 17:49:06 +0100
+Message-Id: <20181126164907.15659-1-zimmermach@gmail.com>
+X-Mailer: git-send-email 2.11.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This is no longer needed since mainloop instances can handle it now.
 ---
- Makefile.am    |   1 -
- Makefile.tools |   2 +-
- src/systemd.c  | 107 -------------------------------------------------
- src/systemd.h  |  28 -------------
- 4 files changed, 1 insertion(+), 137 deletions(-)
- delete mode 100644 src/systemd.c
- delete mode 100644 src/systemd.h
+ Makefile.am                                |  8 +++
+ tools/bluez4_conversion/convert_config.sh  | 89 ++++++++++++++++++++++++++++++
+ tools/bluez4_conversion/convert_devices.sh |  3 +
+ 3 files changed, 100 insertions(+)
+ create mode 100755 tools/bluez4_conversion/convert_config.sh
+ create mode 100644 tools/bluez4_conversion/convert_devices.sh
 
 diff --git a/Makefile.am b/Makefile.am
-index 124c32482..a69baea10 100644
+index 0b26ccc3e..6dc5711d9 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -185,7 +185,6 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/bluetooth.ver \
- 			src/main.c src/log.h src/log.c \
- 			src/backtrace.h src/backtrace.c \
--			src/systemd.h src/systemd.c \
- 			src/rfkill.c src/hcid.h src/sdpd.h \
- 			src/sdpd-server.c src/sdpd-request.c \
- 			src/sdpd-service.c src/sdpd-database.c \
-diff --git a/Makefile.tools b/Makefile.tools
-index 35412ca61..d3d901bc9 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -46,7 +46,7 @@ endif
- if LOGGER
- libexec_PROGRAMS += tools/btmon-logger
+@@ -477,6 +477,8 @@ endif
  
--tools_btmon_logger_SOURCES = tools/btmon-logger.c src/systemd.c src/systemd.h
-+tools_btmon_logger_SOURCES = tools/btmon-logger.c
- tools_btmon_logger_LDADD = src/libshared-mainloop.la
- tools_btmon_logger_DEPENDENCIES = src/libshared-mainloop.la \
- 					tools/bluetooth-logger.service
-diff --git a/src/systemd.c b/src/systemd.c
-deleted file mode 100644
-index 0a4b35d06..000000000
---- a/src/systemd.c
-+++ /dev/null
-@@ -1,107 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012  Intel Corporation. All rights reserved.
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stdio.h>
--#include <errno.h>
--#include <unistd.h>
--#include <stdlib.h>
--#include <stddef.h>
--#include <string.h>
--#include <sys/socket.h>
--#include <sys/un.h>
--
--#include "systemd.h"
--
--int sd_listen_fds(int unset_environment)
--{
--	return 0;
--}
--
--int sd_notify(int unset_environment, const char *state)
--{
--	const char *sock;
--	struct sockaddr_un addr;
--	struct msghdr msghdr;
--	struct iovec iovec;
--	int fd, err;
--
--	if (!state) {
--		err = -EINVAL;
--		goto done;
--	}
--
--	sock = getenv("NOTIFY_SOCKET");
--	if (!sock)
--		return 0;
--
--	/* check for abstract socket or absolute path */
--	if (sock[0] != '@' && sock[0] != '/') {
--		err = -EINVAL;
--		goto done;
--	}
--
--	fd = socket(AF_UNIX, SOCK_DGRAM | SOCK_CLOEXEC, 0);
--	if (fd < 0) {
--		err = -errno;
--		goto done;
--	}
--
--	memset(&addr, 0, sizeof(addr));
--	addr.sun_family = AF_UNIX;
--	strncpy(addr.sun_path, sock, sizeof(addr.sun_path) - 1);
--
--	if (addr.sun_path[0] == '@')
--		addr.sun_path[0] = '\0';
--
--	memset(&iovec, 0, sizeof(iovec));
--	iovec.iov_base = (char *) state;
--	iovec.iov_len = strlen(state);
--
--	memset(&msghdr, 0, sizeof(msghdr));
--	msghdr.msg_name = &addr;
--	msghdr.msg_namelen = offsetof(struct sockaddr_un, sun_path) +
--								strlen(sock);
--
--	if (msghdr.msg_namelen > sizeof(struct sockaddr_un))
--		msghdr.msg_namelen = sizeof(struct sockaddr_un);
--
--	msghdr.msg_iov = &iovec;
--	msghdr.msg_iovlen = 1;
--
--	if (sendmsg(fd, &msghdr, MSG_NOSIGNAL) < 0)
--		err = -errno;
--	else
--		err = 1;
--
--	close(fd);
--
--done:
--	if (unset_environment)
--		unsetenv("NOTIFY_SOCKET");
--
--	return err;
--}
-diff --git a/src/systemd.h b/src/systemd.h
-deleted file mode 100644
-index 0ef7c82a9..000000000
---- a/src/systemd.h
-+++ /dev/null
-@@ -1,28 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2012  Intel Corporation. All rights reserved.
-- *
-- *
-- *  This program is free software; you can redistribute it and/or modify
-- *  it under the terms of the GNU General Public License as published by
-- *  the Free Software Foundation; either version 2 of the License, or
-- *  (at your option) any later version.
-- *
-- *  This program is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- *  GNU General Public License for more details.
-- *
-- *  You should have received a copy of the GNU General Public License
-- *  along with this program; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#define SD_LISTEN_FDS_START 3
--
--int sd_listen_fds(int unset_environment);
--
--int sd_notify(int unset_environment, const char *state);
+ EXTRA_DIST += $(manual_pages:.1=.txt)
+ 
++EXTRA_DIST += tools/bluez4_conversion/convert_config.sh tools/bluez4_conversion/convert_devices.sh
++
+ DISTCHECK_CONFIGURE_FLAGS = --disable-datafiles --enable-library \
+ 						--enable-health \
+ 						--enable-midi \
+@@ -535,3 +537,9 @@ clean-local:
+ 	-find $(top_builddir) -name "*.gcda" -delete
+ 	$(RM) -r lib/bluetooth
+ endif
++
++BLUEZ4_CONFIG_CONVERSION = $(srcdir)/tools/bluez4_conversion/convert_config.sh
++BLUEZ4_DEVICE_CONVERSION = $(srcdir)/tools/bluez4_conversion/convert_devices.sh
++install-exec-hook:
++	$(BLUEZ4_CONFIG_CONVERSION)
++	$(BLUEZ4_DEVICE_CONVERION)
+\ No newline at end of file
+diff --git a/tools/bluez4_conversion/convert_config.sh b/tools/bluez4_conversion/convert_config.sh
+new file mode 100755
+index 000000000..477e18fae
+--- /dev/null
++++ b/tools/bluez4_conversion/convert_config.sh
+@@ -0,0 +1,89 @@
++!/bin/sh
++
++CONFIG_DIR="/var/lib/bluetooth"
++
++convert_on_mode()
++{
++    config_file=$1
++    #Read on_mode from config file
++    on_mode=$( cat $config_file | grep -Po 'mode \K(.*)')
++    if [ ! -z "$on_mode" ]
++    then
++        if [ $on_mode == "discoverable" ]
++        then
++            #Write on mode to new INI file
++            echo -e "Discoverable=true" >> settings
++        else
++            #Write on mode to new INI file
++            echo -e "Discoverable=false" >> settings
++        fi
++    else
++        echo "On mode not found"
++    fi
++}
++
++convert_discoverable_timeout()
++{
++    config_file=$1
++    #Read discoverable timeout from config file
++    discoverable_timeout=$( cat $config_file | grep -Po 'discovto \K([0-9]+)')
++    if [ ! -z "$discoverable_timeout" ]
++    then
++        #Write discoverable timeout to new INI file
++        echo -e "DiscoverableTimeout=$discoverable_timeout" >> settings
++    else
++        echo "Discoverable Timeout not found"
++    fi
++}
++
++convert_pairable_timeout()
++{
++    config_file=$1
++    #Read pairable timeout from config file
++    pairable_timeout=$( cat $config_file | grep -Po 'pairto \K([0-9]+)')
++    if [ ! -z "$pairable_timeout" ]
++    then
++        #Write discoverable timeout to new INI file
++        echo -e "PairableTimeout=$pairable_timeout" >> settings
++    else
++        echo "Pairable Timeout not found"
++    fi
++}
++
++convert_local_name()
++{
++    config_file=$1
++    #Read local name from config file
++    local_name=$( cat $config_file | grep -Po 'name \K(.*)')
++    if [ ! -z "$local_name" ]
++    then
++        #Write local_name to new INI file
++        echo -e "Alias=$local_name" >> settings
++    else
++        echo "Local name not found"
++    fi
++}
++
++###
++# Main script body
++###
++for entry in `ls $CONFIG_DIR`; do
++    cd $CONFIG_DIR
++    cd $entry
++    if [ -f "config" ]
++    then
++        if [ ! -f "settings" ]
++        then
++            #Create new settings INI file
++            touch settings
++            echo -e "[General]" >> settings
++            convert_pairable_timeout config
++            convert_discoverable_timeout config
++            convert_on_mode config
++            convert_local_name config
++            rm config
++        else
++            echo "Settings already available"
++        fi
++    fi
++done
+diff --git a/tools/bluez4_conversion/convert_devices.sh b/tools/bluez4_conversion/convert_devices.sh
+new file mode 100644
+index 000000000..a8a013b06
+--- /dev/null
++++ b/tools/bluez4_conversion/convert_devices.sh
+@@ -0,0 +1,3 @@
++# TODO
++# This file is intended for replacing the conversion of Bluez4 device datas when upgrading to Bluez5 INI format
++# This is currently checked at every bluetoothd startup in src/adapter.c
+\ No newline at end of file
 -- 
-2.17.2
+2.11.0
 
