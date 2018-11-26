@@ -7,63 +7,66 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF798C43441
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 16:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31EFAC04EB8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 16:24:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6180120664
+	by mail.kernel.org (Postfix) with ESMTP id DD6F120862
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Nov 2018 16:24:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XUgZizVO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6180120664
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWKQGUH5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD6F120862
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726266AbeK0DTT (ORCPT
+        id S1726282AbeK0DTT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Mon, 26 Nov 2018 22:19:19 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:37116 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726210AbeK0DTT (ORCPT
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:37121 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726253AbeK0DTT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Mon, 26 Nov 2018 22:19:19 -0500
-Received: by mail-lj1-f195.google.com with SMTP id e5-v6so17170915lja.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Nov 2018 08:24:42 -0800 (PST)
+Received: by mail-lj1-f196.google.com with SMTP id e5-v6so17170973lja.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Nov 2018 08:24:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=1XKC2571SGgez9YvIIAL2s5yGwgnhu1krcg6zPdPmyo=;
-        b=XUgZizVOOFbYnRIDs209Z/ibPyOSYO2Ycm2jPy0CmZspGFlwOtuOZE0Z88Wi5FGtkd
-         5uA63gDb1S1A23JQQ7zyIl/2qQ9Z7bY2H8zZgfJkh6yMax3rDbXqytQjBdEonHuE91IV
-         zxvDltIDkMNiBx+rAh6aVdnWTYSGvegQs9NCG2dnGrGWwwZa1AeWIYGywVQ4s9TxVzTe
-         Q8IQxG7zfSPoEYow3jKid0l4FCa0w0NTQeq1Urh70LMKwYO19sT0jbcTGWNYM6lv/N9+
-         FbgtGG4e3lg3FLckyUo9ikrp2x2qXhWbeMthfMR7xFoKvaOVBO9UMzY7KNd8HTsKKhpc
-         WC2w==
+        h=from:to:subject:date:message-id:in-reply-to:references;
+        bh=48OphCe2+oC+yDdWhZmjruXfXcENpYxibjnmew9VZ84=;
+        b=CWKQGUH5rjLIxFTIGC/JI3/vpudEJu9zoLZ9nqHklhwtX9kXqiG3mVj/CjyzsNHuMK
+         AvFi2vpgPXEaD8yQP5kX847ETCnE8N105i+v4eQ/CcXqINy8vsSbSpxxBGnHoM+4EHwV
+         VGDJULN4s5eKeB6GoKJHKaBNKxc6un7i8yl1Ge8m7sQ9/i0x+LdJ7HvszFWLEgDvRQfL
+         p4lsN2/XmR8qCjPrvMPXaEA1aJblUKy4ga/hP456DZrSgt5c4pxqrg3daB/0jEhpXBax
+         ooqLQURP47hlb3FFhIk2jTyPovFKiOUtEIGqYIsVvO++RRnzD5LJohsOgh/v7cdtRc4I
+         MHSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=1XKC2571SGgez9YvIIAL2s5yGwgnhu1krcg6zPdPmyo=;
-        b=cyfZoe7F2I125siGiBcK4dF0mSL/pwFb49+VBcz2lTHC1hrnHD6gqdX/AfJe5473VS
-         lUtCqMSJIJhRwRxYj0XFUoaT/WNHTyoQdeOc32Qd91FItPqQjiYnTLy269iIszWdt5/v
-         Gj/7U5umtXsRApiIoZXuFY8T11FOvsBT+kK96JKkBsC2gV5HxSdOO7sj8psRpsk4JmSM
-         Z4J6YPzq21/wgcxjaLzNGHICboi/87qWoLjho7v69URkOqiixU/pyuUXOHsyrEwpMDqY
-         0u+k/Kmj3BNZhJph0JWWs2OX7yI5PabosOWJ91Wj1jXcwnMqLM2ZDGAZgJYpXRLcDFXJ
-         gv7Q==
-X-Gm-Message-State: AA+aEWaUvjbFxBjpkDs3wu2W7GEuvo2Jbs28MI5tQ92bcMwZdHQuveFK
-        +eKkAeWm7YKLWQPzvVws4v40cdIJ
-X-Google-Smtp-Source: AFSGD/UltJ4Cqigcps5ALkdD458IM850GbsoGGSfxyPg61WsJ3IAcW4RDKiefEzIhTxRFb1j7TvtxA==
-X-Received: by 2002:a2e:4299:: with SMTP id h25-v6mr104589ljf.5.1543249480890;
-        Mon, 26 Nov 2018 08:24:40 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references;
+        bh=48OphCe2+oC+yDdWhZmjruXfXcENpYxibjnmew9VZ84=;
+        b=LWsPjtmWu9LWYYPT2zTK1jwBpS9+L3+HOFZdnT3GmsEKW/ciusLNc8l5+YmRvLGNha
+         Qec48gaXYNlgDDWtATmUl9EIsFoD7BAQq/hVwYV70SRIdDOxngduwVwfzCGpy6WkfhGq
+         6gB25p3agACOhThmVcx6IRtOY1t8drk8zvFB4oUjm95DGEG+q9VXZy3QtnR75RuPtXud
+         KhRdVuGDV6WDdAI/Js8dn+SYMJni9kg/aHLhD/wrLJBafYnJPeD3jdOJ0sIGqXex//tB
+         Ldx1STPkfPD/o889ZYaqn7TB6ygqUu05vlJkRtBinBnKBN+f1cV8hsa9oiuZrQfg0sjr
+         aAjQ==
+X-Gm-Message-State: AA+aEWa1shHqipDaqwg8kgFLSS0Mshr3fGB3KTD+v1Jods7CvA0WRq0m
+        XJKqMP70VM9Af2ehEvtvMaTImwzK
+X-Google-Smtp-Source: AFSGD/UUoSqA71HpACrr7WVfVGOkJ376s6WijOsYyi6zJAK7BbC/cFWoMlbLijEpCYf+ou3w56JWHw==
+X-Received: by 2002:a2e:88cf:: with SMTP id a15-v6mr17185368ljk.76.1543249482295;
+        Mon, 26 Nov 2018 08:24:42 -0800 (PST)
 Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
-        by smtp.gmail.com with ESMTPSA id g70-v6sm120787ljg.92.2018.11.26.08.24.39
+        by smtp.gmail.com with ESMTPSA id g70-v6sm120787ljg.92.2018.11.26.08.24.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 26 Nov 2018 08:24:40 -0800 (PST)
+        Mon, 26 Nov 2018 08:24:41 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/6] share/mainloop: Add handling of NOTIFY_SOCKET
-Date:   Mon, 26 Nov 2018 18:24:33 +0200
-Message-Id: <20181126162438.27872-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/6] share/mainloop: Add watchdog support
+Date:   Mon, 26 Nov 2018 18:24:34 +0200
+Message-Id: <20181126162438.27872-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
+In-Reply-To: <20181126162438.27872-1-luiz.dentz@gmail.com>
+References: <20181126162438.27872-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -71,284 +74,71 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds handling of systemd NOTIFY_SOCKET so application using
-mainloop instance do properly notify systemd what is their state.
+This adds watchdog notification support by sending "WATCHDOG=1" twice
+as frequent as required by WATCHDOG_USEC.
 ---
- Makefile.am                  |   8 ++-
- src/shared/mainloop-glib.c   |   8 +++
- src/shared/mainloop-notify.c | 104 +++++++++++++++++++++++++++++++++++
- src/shared/mainloop-notify.h |  25 +++++++++
- src/shared/mainloop.c        |  12 ++++
- src/shared/mainloop.h        |   1 +
- 6 files changed, 156 insertions(+), 2 deletions(-)
- create mode 100644 src/shared/mainloop-notify.c
- create mode 100644 src/shared/mainloop-notify.h
+ src/shared/mainloop-notify.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-diff --git a/Makefile.am b/Makefile.am
-index 0b26ccc3e..124c32482 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -130,12 +130,16 @@ endif
- src_libshared_glib_la_SOURCES = $(shared_sources) \
- 				src/shared/io-glib.c \
- 				src/shared/timeout-glib.c \
--				src/shared/mainloop-glib.c
-+				src/shared/mainloop-glib.c \
-+				src/shared/mainloop-notify.h \
-+				src/shared/mainloop-notify.c
- 
- src_libshared_mainloop_la_SOURCES = $(shared_sources) \
- 				src/shared/io-mainloop.c \
- 				src/shared/timeout-mainloop.c \
--				src/shared/mainloop.h src/shared/mainloop.c
-+				src/shared/mainloop.h src/shared/mainloop.c \
-+				src/shared/mainloop-notify.h \
-+				src/shared/mainloop-notify.c
- 
- if ELL
- src_libshared_ell_la_SOURCES = $(shared_sources) \
-diff --git a/src/shared/mainloop-glib.c b/src/shared/mainloop-glib.c
-index 8436969bb..9d588e8c5 100644
---- a/src/shared/mainloop-glib.c
-+++ b/src/shared/mainloop-glib.c
-@@ -36,6 +36,7 @@
- #include <glib.h>
- 
- #include "mainloop.h"
-+#include "mainloop-notify.h"
- 
- static GMainLoop *main_loop;
- static int exit_status;
-@@ -43,6 +44,7 @@ static int exit_status;
- void mainloop_init(void)
- {
- 	main_loop = g_main_loop_new(NULL, FALSE);
-+	mainloop_notify_init();
- }
- 
- void mainloop_quit(void)
-@@ -70,11 +72,17 @@ int mainloop_run(void)
- 	if (!main_loop)
- 		return -EINVAL;
- 
-+	mainloop_notify("READY=1");
-+
- 	g_main_loop_run(main_loop);
- 
-+	mainloop_notify("STOPPING=1");
-+
- 	g_main_loop_unref(main_loop);
- 	main_loop = NULL;
- 
-+	mainloop_notify_exit();
-+
- 	return exit_status;
- }
- 
 diff --git a/src/shared/mainloop-notify.c b/src/shared/mainloop-notify.c
-new file mode 100644
-index 000000000..fef333c24
---- /dev/null
+index fef333c24..cb895086f 100644
+--- a/src/shared/mainloop-notify.c
 +++ b/src/shared/mainloop-notify.c
-@@ -0,0 +1,104 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <stddef.h>
-+#include <string.h>
-+
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+
-+#include "mainloop.h"
-+#include "mainloop-notify.h"
-+
-+static char *notify_sock;
-+static int notify_fd = -1;
-+
-+void mainloop_notify_init(void)
-+{
-+	const char *sock;
-+
-+	sock = getenv("NOTIFY_SOCKET");
-+	if (!sock)
-+		return;
-+
-+	/* check for abstract socket or absolute path */
-+	if (sock[0] != '@' && sock[0] != '/')
-+		return;
-+
-+	notify_sock = strdup(sock);
-+
-+	notify_fd = socket(AF_UNIX, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-+}
-+
-+void mainloop_notify_exit(void)
-+{
-+	if (notify_fd > 0) {
-+		close(notify_fd);
-+		notify_fd = -1;
-+	}
-+
-+	free(notify_sock);
-+	notify_sock = NULL;
-+}
-+
-+int mainloop_notify(const char *state)
-+{
-+	struct sockaddr_un addr;
-+	struct msghdr msghdr;
-+	struct iovec iovec;
-+
-+	if (notify_fd <= 0)
-+		return -ENOTCONN;
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+	strncpy(addr.sun_path, notify_sock, sizeof(addr.sun_path) - 1);
-+
-+	if (addr.sun_path[0] == '@')
-+		addr.sun_path[0] = '\0';
-+
-+	memset(&iovec, 0, sizeof(iovec));
-+	iovec.iov_base = (char *) state;
-+	iovec.iov_len = strlen(state);
-+
-+	memset(&msghdr, 0, sizeof(msghdr));
-+	msghdr.msg_name = &addr;
-+	msghdr.msg_namelen = offsetof(struct sockaddr_un, sun_path) +
-+							strlen(notify_sock);
-+
-+	if (msghdr.msg_namelen > sizeof(struct sockaddr_un))
-+		msghdr.msg_namelen = sizeof(struct sockaddr_un);
-+
-+	msghdr.msg_iov = &iovec;
-+	msghdr.msg_iovlen = 1;
-+
-+	return sendmsg(notify_fd, &msghdr, MSG_NOSIGNAL);
-+}
-diff --git a/src/shared/mainloop-notify.h b/src/shared/mainloop-notify.h
-new file mode 100644
-index 000000000..721b5fbed
---- /dev/null
-+++ b/src/shared/mainloop-notify.h
-@@ -0,0 +1,25 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+void mainloop_notify_init(void);
-+void mainloop_notify_exit(void);
-diff --git a/src/shared/mainloop.c b/src/shared/mainloop.c
-index e6ab9c43d..9255e6e0e 100644
---- a/src/shared/mainloop.c
-+++ b/src/shared/mainloop.c
-@@ -30,13 +30,17 @@
- #include <errno.h>
- #include <unistd.h>
- #include <stdlib.h>
-+#include <stddef.h>
- #include <string.h>
- #include <signal.h>
- #include <sys/signalfd.h>
- #include <sys/timerfd.h>
- #include <sys/epoll.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
+@@ -37,13 +37,27 @@
  
  #include "mainloop.h"
-+#include "mainloop-notify.h"
- 
- #define MAX_EPOLL_EVENTS 10
- 
-@@ -83,6 +87,8 @@ void mainloop_init(void)
- 		mainloop_list[i] = NULL;
- 
- 	epoll_terminate = 0;
+ #include "mainloop-notify.h"
++#include "timeout.h"
 +
-+	mainloop_notify_init();
++#define WATCHDOG_THRESHOLD 2
+ 
+ static char *notify_sock;
+ static int notify_fd = -1;
+ 
++static unsigned int watchdog;
++
++static bool watchdog_callback(void *user_data)
++{
++	mainloop_notify("WATCHDOG=1");
++
++	return true;
++}
++
+ void mainloop_notify_init(void)
+ {
+ 	const char *sock;
++	const char *watchdog_usec;
++	int msec;
+ 
+ 	sock = getenv("NOTIFY_SOCKET");
+ 	if (!sock)
+@@ -56,6 +70,17 @@ void mainloop_notify_init(void)
+ 	notify_sock = strdup(sock);
+ 
+ 	notify_fd = socket(AF_UNIX, SOCK_DGRAM | SOCK_CLOEXEC, 0);
++
++	watchdog_usec = getenv("WATCHDOG_USEC");
++	if (!watchdog_usec)
++		return;
++
++	msec = atoi(watchdog_usec) / 1000;
++	if (msec < 0)
++		return;
++
++	watchdog = timeout_add(msec / WATCHDOG_THRESHOLD,
++				watchdog_callback, NULL, NULL);
  }
  
- void mainloop_quit(void)
-@@ -141,6 +147,8 @@ int mainloop_run(void)
- 		}
- 	}
+ void mainloop_notify_exit(void)
+@@ -67,6 +92,8 @@ void mainloop_notify_exit(void)
  
-+	mainloop_notify("READY=1");
+ 	free(notify_sock);
+ 	notify_sock = NULL;
 +
- 	while (!epoll_terminate) {
- 		struct epoll_event events[MAX_EPOLL_EVENTS];
- 		int n, nfds;
-@@ -180,9 +188,13 @@ int mainloop_run(void)
- 		}
- 	}
- 
-+	mainloop_notify("STOPPING=1");
-+
- 	close(epoll_fd);
- 	epoll_fd = 0;
- 
-+	mainloop_notify_exit();
-+
- 	return exit_status;
++	timeout_remove(watchdog);
  }
  
-diff --git a/src/shared/mainloop.h b/src/shared/mainloop.h
-index b83caabc8..7ae6b3c90 100644
---- a/src/shared/mainloop.h
-+++ b/src/shared/mainloop.h
-@@ -49,3 +49,4 @@ int mainloop_remove_timeout(int id);
- 
- int mainloop_set_signal(sigset_t *mask, mainloop_signal_func callback,
- 				void *user_data, mainloop_destroy_func destroy);
-+int mainloop_notify(const char *state);
+ int mainloop_notify(const char *state)
 -- 
 2.17.2
 
