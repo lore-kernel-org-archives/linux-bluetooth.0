@@ -2,172 +2,170 @@ Return-Path: <SRS0=erFC=OG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FD3C43441
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 00:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB00C43441
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 06:41:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D585220828
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 00:27:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3182F2086B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 06:41:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="amznbjpY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D585220828
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="ZPrjJQEG";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="KV5lSGtW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3182F2086B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728023AbeK0LXo (ORCPT
+        id S1728843AbeK0RiB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Nov 2018 06:23:44 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:45113 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727662AbeK0LXn (ORCPT
+        Tue, 27 Nov 2018 12:38:01 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:60454 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727684AbeK0RiB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Nov 2018 06:23:43 -0500
-Received: by mail-pl1-f195.google.com with SMTP id a14so14666667plm.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Nov 2018 16:27:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=/T57492GUH9ZY+82mh7i4CE9AsqTtkI3ZG3pO+ZjY+4=;
-        b=amznbjpYNr+SvajVa96b3wIXXjTFt8U4Gj+tTlY99W3HxDSPOJAlJmL5OUd3M3De6N
-         7jj9XsbJ1iSVRRpnQQ7H+kk1lK0MXltxllQxufO1n2dSxve8Os11shGA4rd1fbNJoddP
-         3/B/vdItFQmY8UQRA1NuPkhMH/iskBwNvpYHQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=/T57492GUH9ZY+82mh7i4CE9AsqTtkI3ZG3pO+ZjY+4=;
-        b=T9tqnYKUdHlcJ6zx26Ef7pkSFzNVwksR8U7WZvYD1BDPbwmkI5fVeEpAbUtAwR1LOv
-         MK+KmgDY68qWWhATuiIwMDTNYs6Bxn3S8eARJNFxqwswrXg4Js3sYgOXk5p9QRz5c4cx
-         /qfzzZOHPFQq+eYqluBgrum7TbRNEDJHv6j+nwPJQuCk/qKqJ7AaCtiLSNQGxGvEPT3M
-         MUY6YZaA9ECy5e351tUQlmofxgmcQA8AtoFlXvBHNW49AWixQL61G6+SgqjanjwKh2rP
-         e+cntSQKDWCcVQ4J1lzfPcKmfRrI/AN3pCAXUp0RgPMfE1Q7gX5MrQhgZDyxKacb7NlZ
-         BKoQ==
-X-Gm-Message-State: AA+aEWa9VQWSDnnt/lFWpn1tkiV8sNIDqEhwJjfRTCNmxjv5Umz+g2F9
-        ELB/OJW/sna44OjVx32JGFoX5A==
-X-Google-Smtp-Source: AFSGD/UeXzvxGdXrqPLKKDBSaGMQGE0SmYNLLOJu1ey8T2IQlCSw6i+JhdqRSXMl8xPeRaTBIUjOFw==
-X-Received: by 2002:a17:902:3064:: with SMTP id u91mr29602774plb.325.1543278466185;
-        Mon, 26 Nov 2018 16:27:46 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:b6af:f85:ed6c:ac6a])
-        by smtp.gmail.com with ESMTPSA id v2sm1861533pgs.0.2018.11.26.16.27.45
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 26 Nov 2018 16:27:45 -0800 (PST)
-Date:   Mon, 26 Nov 2018 16:27:44 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+        Tue, 27 Nov 2018 12:38:01 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id A04DB60246; Tue, 27 Nov 2018 06:41:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1543300869;
+        bh=LgaQmQG36N5dIAbDS8Pfcmp8KC9VrC5TKhqKRdPb9Yg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ZPrjJQEGmIRp8eFd6i3TS4SkIMP7yNlkwwKPRECOqzwSd1tgY3LGNMxLrlqnoSlJK
+         /MU7P3s8pYeqMY1RH4o6ixPyn5zkEyJFudE4UDtIJnidxhE9bfaXD3Qo5GzLGiQ8PP
+         inqZ6K43gcdNzCwEjWebeTgSDjRZ20z5mWbnSODE=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id BF2EB60246;
+        Tue, 27 Nov 2018 06:41:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1543300868;
+        bh=LgaQmQG36N5dIAbDS8Pfcmp8KC9VrC5TKhqKRdPb9Yg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KV5lSGtW2WEUh0+W+dGbWC5tWuaKB6WLhHhyEpS73dw7UD+slbcGneEnmM73mkuzo
+         yn+dZKYvesgjXiwm4fI5hJcIi3upHEC9+La918zqvls2d/dToKN12spEeBl7WQsCIC
+         3k1UsYwLNA/PS3fRFFnM8KHY/0s4s1eqK7P8pqt0=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 27 Nov 2018 12:11:08 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v2 3/3] Bluetooth: hci_qca: Fix frame reassembly errors
- for wcn3990
-Message-ID: <20181127002744.GZ22824@google.com>
+Subject: Re: [PATCH v2 2/3] Bluetooth: hci_qca: Deassert RTS while baudrate
+ change command
+In-Reply-To: <20181126194210.GW22824@google.com>
 References: <20181122121512.13136-1-bgodavar@codeaurora.org>
- <20181122121512.13136-4-bgodavar@codeaurora.org>
- <20181127000950.GY22824@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181127000950.GY22824@google.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+ <20181122121512.13136-3-bgodavar@codeaurora.org>
+ <20181126194210.GW22824@google.com>
+Message-ID: <ad8de20da986b530dd53d83c96da7b7b@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Nov 26, 2018 at 04:09:50PM -0800, Matthias Kaehlcke wrote:
-> On Thu, Nov 22, 2018 at 05:45:12PM +0530, Balakrishna Godavarthi wrote:
-> > During initalization of wcn3990, we observed UART is reading some
-> > stray bytes on the Rx line. This is logging Frame reassembly errors
-> > on the serial console. This could be because of tristate of Tx line
-> > of wcn3990 during boot up.
-> > 
-> > [  176.929612] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
-> > [  176.945734] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
-> > [  176.953298] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
-> > [  177.010660] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
-> > [  177.067633] Bluetooth: hci_qca.c:qca_recv() hci0: Frame reassembly failed (-84)
-> > 
-> > Now we enable a flag during bootup to stop executing proto receive
-> > function and clear it back once the initialization is done.
-> > 
-> > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> > Tested-by: Matthias Kaehlcke <mka@chromium.org>
-> > ---
-> > v2:
-> >  * Updated commit text & comments.
-> > v1: 
-> >  * initial patch
-> > ---
-> >  drivers/bluetooth/hci_qca.c | 18 ++++++++++++++++++
-> >  1 file changed, 18 insertions(+)
-> > 
-> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > index ed905ea1c58a..2f3d9e16ba5a 100644
-> > --- a/drivers/bluetooth/hci_qca.c
-> > +++ b/drivers/bluetooth/hci_qca.c
-> > @@ -56,6 +56,7 @@
-> >  
-> >  /* Controller states */
-> >  #define STATE_IN_BAND_SLEEP_ENABLED	1
-> > +#define STATE_DISCARD_RX		2
-> >  
-> >  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
-> >  #define IBS_TX_IDLE_TIMEOUT_MS		2000
-> > @@ -511,6 +512,7 @@ static int qca_open(struct hci_uart *hu)
-> >  		} else {
-> >  			hu->init_speed = qcadev->init_speed;
-> >  			hu->oper_speed = qcadev->oper_speed;
-> > +			set_bit(STATE_DISCARD_RX, &qca->flags);
-> >  			ret = qca_power_setup(hu, true);
-> >  			if (ret) {
-> >  				destroy_workqueue(qca->workqueue);
-> > @@ -903,6 +905,13 @@ static int qca_recv(struct hci_uart *hu, const void *data, int count)
-> >  	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
-> >  		return -EUNATCH;
-> >  
-> > +	/* We discard Rx data received while device is in booting
-> > +	 * stage, This is because of BT chip Tx line is in tristate.
-> > +	 * Due to this we read some garbage data on UART Rx.
-> > +	 */
-> > +	if (test_bit(STATE_DISCARD_RX, &qca->flags))
-> > +		return 0;
-> > +
-> >  	qca->rx_skb = h4_recv_buf(hu->hdev, qca->rx_skb, data, count,
-> >  				  qca_recv_pkts, ARRAY_SIZE(qca_recv_pkts));
-> >  	if (IS_ERR(qca->rx_skb)) {
-> > @@ -1193,6 +1202,7 @@ static int qca_setup(struct hci_uart *hu)
-> >  		if (ret)
-> >  			return ret;
-> >  
-> > +		clear_bit(STATE_DISCARD_RX, &qca->flags);
-> >  		ret = qca_read_soc_version(hdev, &soc_ver);
-> >  		if (ret)
-> >  			return ret;
-> > @@ -1269,6 +1279,14 @@ static const struct qca_vreg_data qca_soc_data = {
-> >  
-> >  static void qca_power_shutdown(struct hci_uart *hu)
-> >  {
-> > +	struct qca_data *qca = hu->priv;
-> > +
-> > +	/* From this point we go into power off state,
-> > +	 * disable IBS and discard all the queued data.
-> > +	 */
-> > +	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+Hi Matthias,
+
+On 2018-11-27 01:12, Matthias Kaehlcke wrote:
+> On Thu, Nov 22, 2018 at 05:45:11PM +0530, Balakrishna Godavarthi wrote:
+>> This patch will help to stop frame reassembly errors while changing
+>> the baudrate. This is because host send a change baudrate request
+>> command to the chip with 115200 bps, Whereas chip will change their
+>> UART clocks to the enable for new baudrate and sends the response
+>> for the change request command with newer baudrate, On host side
+>> we are still operating in 115200 bps which results of reading garbage
+>> data. Here we are pulling RTS line, so that chip we will wait to send 
+>> data
+>> to host until host change its baudrate.
 > 
-> Is IBS actually related to the frame reassembly errors or is this
-> addressing a different issue? In 100 iteratios of 'hciconfig up/down'
-> without clearing the flag I didn't observe any frame reassembly
-> errors.
+> Thanks for updating the commit message and provide more details!
+> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> Tested-by: Matthias Kaehlcke <mka@chromium.org>
+>> ---
+>> v2:
+>>  * updated commit text and comments.
+>> v1:
+>>  * initial patch
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 23 ++++++++++++-----------
+>>  1 file changed, 12 insertions(+), 11 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index f5dd323c1967..ed905ea1c58a 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -963,7 +963,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
+>> uint8_t baudrate)
+>>  	struct hci_uart *hu = hci_get_drvdata(hdev);
+>>  	struct qca_data *qca = hu->priv;
+>>  	struct sk_buff *skb;
+>> -	struct qca_serdev *qcadev;
+>>  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
+>> 
+>>  	if (baudrate > QCA_BAUDRATE_3200000)
+>> @@ -977,13 +976,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
+>> uint8_t baudrate)
+>>  		return -ENOMEM;
+>>  	}
+>> 
+>> -	/* Disabling hardware flow control is mandatory while
+>> -	 * sending change baudrate request to wcn3990 SoC.
+>> -	 */
+>> -	qcadev = serdev_device_get_drvdata(hu->serdev);
+>> -	if (qcadev->btsoc_type == QCA_WCN3990)
+>> -		hci_uart_set_flow_control(hu, true);
+>> -
+>>  	/* Assign commands to change baudrate and packet type. */
+>>  	skb_put_data(skb, cmd, sizeof(cmd));
+>>  	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+>> @@ -999,9 +991,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
+>> uint8_t baudrate)
+>>  	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
+>>  	set_current_state(TASK_RUNNING);
+>> 
+>> -	if (qcadev->btsoc_type == QCA_WCN3990)
+>> -		hci_uart_set_flow_control(hu, false);
+>> -
+>>  	return 0;
+>>  }
+>> 
+>> @@ -1086,6 +1075,7 @@ static int qca_check_speeds(struct hci_uart *hu)
+>>  static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type 
+>> speed_type)
+>>  {
+>>  	unsigned int speed, qca_baudrate;
+>> +	struct qca_serdev *qcadev;
+>>  	int ret;
+>> 
+>>  	if (speed_type == QCA_INIT_SPEED) {
+>> @@ -1097,6 +1087,14 @@ static int qca_set_speed(struct hci_uart *hu, 
+>> enum qca_speed_type speed_type)
+>>  		if (!speed)
+>>  			return 0;
+>> 
+>> +		/* Deassert RTS while changing the baudrate of chip and host.
+>> +		 * This will stop chip to transmit it response with an newer
+>> +		 * baudrate until we change the baudarte.
+> 
+> nit: baudrate
+> 
+> re-nit (to consider if you respin anyway): 'This prevents the chip
+> from transmitting its response with the new baudrate while the host
+> port is still operating at the old speed'?
+> (I'm not a native English speaker, probably there is still room for
+> improvement ;-)
 
-Looks like this addresses the "Bluetooth: Received HCI_IBS_SLEEP_IND
-in rx state 0" messages that are seen when the interface is brought up
-on a system with firmware binaries (with IBS support?). Please spin
-this out into a separate patch.
+[Bala]: will update.
 
-Thanks
+> 
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 
-Matthias
+-- 
+Regards
+Balakrishna.
