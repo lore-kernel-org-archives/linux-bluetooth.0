@@ -2,240 +2,114 @@ Return-Path: <SRS0=erFC=OG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E82C04EBA
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 15:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7133C43441
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 21:19:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12D0E208E4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 15:20:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7ECE3208E4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 21:19:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TYIqEb3U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12D0E208E4
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K8brNMUM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ECE3208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729511AbeK1CSP (ORCPT
+        id S1726288AbeK1ISd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Nov 2018 21:18:15 -0500
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:41926 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728834AbeK1CSP (ORCPT
+        Wed, 28 Nov 2018 03:18:33 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:44830 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726273AbeK1ISd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Nov 2018 21:18:15 -0500
-Received: by mail-ot1-f65.google.com with SMTP id u16so20419178otk.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Nov 2018 07:20:00 -0800 (PST)
+        Wed, 28 Nov 2018 03:18:33 -0500
+Received: by mail-lf1-f65.google.com with SMTP id z13so17684686lfe.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Nov 2018 13:19:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Pm6Z4U1oXx4kdkiBIYuvqQrWfEUi4qM69CamUz09rkM=;
-        b=TYIqEb3UWlB9bEV2xIMOK3j7i4rqWi9Qc79oKZ0ILskPRCAdNb/B1jvfV3Lh+IxE7p
-         y2ar4LFUap/YJt2Ng8c5+Ln0MwKS2D/R/zVAQuqBUq5Yf//9W5HXuxI0wJOamDVkt5AM
-         Yr4GgctZYxf7VapFEJKTayy2amYWE54MzGDbgdDyZu9VZtnMfyfAevvBZaTN5F6GxSp4
-         RU+3MlwfniPEzoEoHvG3BLtZu9pZhwGt8gnvBVdxGv7+ohTYOykRXqCOPC+xkQ2n3k6p
-         sgsslFtvyDKYEBqCorhGlC1fL6EzBtlFAfcp2GipigqkzN9erAFfE9r9HSfV/H4CGgXQ
-         Rg3g==
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=WzDCG80SAL/hczcxkWBHg+kV0y8RtZFNkQb7UBQicW0=;
+        b=K8brNMUMcjokTr9fuINVjicRrDU8w2VUaqY5Q8+23u1D/steaO6z7QqmthiD4Uphta
+         PUrCYpg+MYaIXDkFQUHbA2KhgucYQIBbE/EbtNWBvPPwlyYX3iPahknOBjbuwCJstfZ8
+         vqhDg0fUauoJBYKjPhFdAsJcMbwCEwJMTwvzBBc+Q9g3VVQ/NTIexQesMzOq4GRKPlq2
+         dvtkvAkw3KTRmd3B709fGK4vOesoDTwoRTdpBFpeGJ9wlQiIgRVYHq8yMQQIQV+IT9CR
+         9pGB9ujmgmUL3yniyl20Sg/lbTe62L3J59RyFSIP9dT2pDDLKHfxEUAp+KvyDN4H4mWF
+         9Zeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Pm6Z4U1oXx4kdkiBIYuvqQrWfEUi4qM69CamUz09rkM=;
-        b=LWxEUHEOwZwF2gTzY9sQweskmRrsuRnYD1Vq1Bd/bCi8daWPf5DhLZsPg6Iqg5xQg3
-         eJzqJ84YHZ9AEw/LumuLvbzzkXVY1GwsQr0EvJMMKmtAu6TdOBXDgC+VJNdI7n/DktJn
-         vft4lQr0ORZ8RYypCvSRrDV8FnF8/9gfobS8phfeiVTL9n1P4In2I8vLcN7OE15cbPj6
-         FbM05TkP++rmBKLSz/cDQ0C3YSKelQRdIuHw66h0mMuYby5kBsdfbFRN2uCqFipY5mbE
-         l/3KqBMXQRS5ykOakoQiMELJ/WWCkcJJgRgwj0yi7PnFNFO8cHY1X6dHrSOjvl0ubYVc
-         uCEg==
-X-Gm-Message-State: AA+aEWaGZdM7A1zvT8XWe5xgnwT2PLVdaJQ66nXVwQFTmeNIvha128Qo
-        ipu0HGxlBbbgC7yoUf+PFJsW93kmbFQbbZ1mg1tDICOn
-X-Google-Smtp-Source: AFSGD/UF8oibiJLbMQW70abNnKCjVdQEZNhqUUrhS/fWHxExlHx/pnSq8fn/EM7zevzNqX9w1Sza3JejnFnymDH8SNw=
-X-Received: by 2002:a9d:4c01:: with SMTP id l1mr18727396otf.242.1543331999708;
- Tue, 27 Nov 2018 07:19:59 -0800 (PST)
-MIME-Version: 1.0
-References: <20181126162438.27872-1-luiz.dentz@gmail.com> <27978B59-0DF8-42D9-90F6-086FF3FFA386@holtmann.org>
- <CABBYNZJ8zNu6Ub1Zo4ms0nX8CfgWjnXfR5d_My77VsC2q5Z1_g@mail.gmail.com> <1663DCEA-9B2E-4B2E-BE32-568A7D6CDA3E@holtmann.org>
-In-Reply-To: <1663DCEA-9B2E-4B2E-BE32-568A7D6CDA3E@holtmann.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 27 Nov 2018 17:19:47 +0200
-Message-ID: <CABBYNZLfh2T3rUmoXyHkoxn-M4nm3uvS78wcRQdjM8j0d-Tktg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/6] share/mainloop: Add handling of NOTIFY_SOCKET
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=WzDCG80SAL/hczcxkWBHg+kV0y8RtZFNkQb7UBQicW0=;
+        b=co9MnEuUBRAs6kAP+RJWTehKfZs55NBpz+aj12J1I9QuGZSD3FRvZUn67LR6BVQgQn
+         E6STFvLP5Jdy6EqDHdDaDC+G15rfKQWNHnEf9kLEz0rhK+D1jsIIM7yEiOs5aScqQEQr
+         jLipiesvZ+LO9Er2FnnSPqnQvvbniT182TZm1DdEJecVomzL4KDa7ds66D7l5Q6HHx6Q
+         cumdn+Fsv1oWijU+f+xDz8zhJjDwqLSDOg/XqV+zjO+HxugiqrZ9ICHsl2JgwzdaBrnI
+         0pf2y5H7nUcPQKk7z9sMLNv4570mY0mF0/RoH7VuzlRg/Mq1QgsorO6aQWj9X+wmOClJ
+         JbLw==
+X-Gm-Message-State: AA+aEWYk1/Pqdk0gwc32w4YKQZfzN11zl6CoTpwuQmaHwjowTJkVOtzi
+        qlzcccvpwtS56Wd6K30X3RA=
+X-Google-Smtp-Source: AFSGD/VXaTFsH1Pw/qO8uGkMDQvnODHJdAu8bqrRDzEk91t6XPqdFYmtnv1ipC5Pk3xHhEJ/bP84Rw==
+X-Received: by 2002:a19:6806:: with SMTP id d6mr4790114lfc.48.1543353559124;
+        Tue, 27 Nov 2018 13:19:19 -0800 (PST)
+Received: from jhedberg-mac01.home (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
+        by smtp.gmail.com with ESMTPSA id y23-v6sm775574ljk.95.2018.11.27.13.19.17
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 27 Nov 2018 13:19:18 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
+Subject: Re: [PATCH 1/1 v2] Bluetooth: make the balance of judgement condition
+ to fix a false report
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <1704c39f-c005-d0cc-9bab-c21e537a07be@gmail.com>
+Date:   Tue, 27 Nov 2018 23:19:14 +0200
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <566C2A3E-8924-455C-93B1-B514A4CB0511@gmail.com>
+References: <5A23C871-B30F-44C4-898B-C138EFDB4893@holtmann.org>
+ <1542245517-150977-1-git-send-email-zumeng.chen@gmail.com>
+ <00BD5234-6645-4E40-9B3C-859C147EEB7C@gmail.com>
+ <3D63F92F-1BA5-415D-AED4-A38FB2E29C00@gmail.com>
+ <1704c39f-c005-d0cc-9bab-c21e537a07be@gmail.com>
+To:     Zumeng Chen <zumeng.chen@gmail.com>
+X-Mailer: Apple Mail (2.3445.101.1)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
-
-On Tue, Nov 27, 2018 at 3:30 PM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
->
-> Hi Luiz,
->
-> >>> This adds handling of systemd NOTIFY_SOCKET so application using
-> >>> mainloop instance do properly notify systemd what is their state.
-> >>> ---
-> >>> Makefile.am                  |   8 ++-
-> >>> src/shared/mainloop-glib.c   |   8 +++
-> >>> src/shared/mainloop-notify.c | 104 ++++++++++++++++++++++++++++++++++=
-+
-> >>> src/shared/mainloop-notify.h |  25 +++++++++
-> >>> src/shared/mainloop.c        |  12 ++++
-> >>> src/shared/mainloop.h        |   1 +
-> >>> 6 files changed, 156 insertions(+), 2 deletions(-)
-> >>> create mode 100644 src/shared/mainloop-notify.c
-> >>> create mode 100644 src/shared/mainloop-notify.h
-> >>>
-> >>> diff --git a/Makefile.am b/Makefile.am
-> >>> index 0b26ccc3e..124c32482 100644
-> >>> --- a/Makefile.am
-> >>> +++ b/Makefile.am
-> >>> @@ -130,12 +130,16 @@ endif
-> >>> src_libshared_glib_la_SOURCES =3D $(shared_sources) \
-> >>>                              src/shared/io-glib.c \
-> >>>                              src/shared/timeout-glib.c \
-> >>> -                             src/shared/mainloop-glib.c
-> >>> +                             src/shared/mainloop-glib.c \
-> >>> +                             src/shared/mainloop-notify.h \
-> >>> +                             src/shared/mainloop-notify.c
-> >>>
-> >>> src_libshared_mainloop_la_SOURCES =3D $(shared_sources) \
-> >>>                              src/shared/io-mainloop.c \
-> >>>                              src/shared/timeout-mainloop.c \
-> >>> -                             src/shared/mainloop.h src/shared/mainlo=
-op.c
-> >>> +                             src/shared/mainloop.h src/shared/mainlo=
-op.c \
-> >>> +                             src/shared/mainloop-notify.h \
-> >>> +                             src/shared/mainloop-notify.c
-> >>>
-> >>> if ELL
-> >>> src_libshared_ell_la_SOURCES =3D $(shared_sources) \
-> >>> diff --git a/src/shared/mainloop-glib.c b/src/shared/mainloop-glib.c
-> >>> index 8436969bb..9d588e8c5 100644
-> >>> --- a/src/shared/mainloop-glib.c
-> >>> +++ b/src/shared/mainloop-glib.c
-> >>> @@ -36,6 +36,7 @@
-> >>> #include <glib.h>
-> >>>
-> >>> #include "mainloop.h"
-> >>> +#include "mainloop-notify.h"
-> >>>
-> >>> static GMainLoop *main_loop;
-> >>> static int exit_status;
-> >>> @@ -43,6 +44,7 @@ static int exit_status;
-> >>> void mainloop_init(void)
-> >>> {
-> >>>      main_loop =3D g_main_loop_new(NULL, FALSE);
-> >>> +     mainloop_notify_init();
-> >>> }
-> >>>
-> >>> void mainloop_quit(void)
-> >>> @@ -70,11 +72,17 @@ int mainloop_run(void)
-> >>>      if (!main_loop)
-> >>>              return -EINVAL;
-> >>>
-> >>> +     mainloop_notify("READY=3D1");
-> >>> +
-> >>>      g_main_loop_run(main_loop);
-> >>>
-> >>> +     mainloop_notify("STOPPING=3D1");
-> >>> +
-> >>
-> >> I actually think this is too simple. Frankly what we want is some gene=
-ric code that runs the mainloops and handles the terminations signals and a=
-lso brings you onto D-Bus. And only then signal READY=3D1.
-> >
-> > That was the intention, though things like btmon-logger does not need
-> > to be on D-Bus beside mainloop_run is normally called after D-Bus
-> > setup since we want to confirm we can claim the name.
->
-> I think it is fine to have a version that does not connect to D-Bus, but =
-the name claiming in case of D-Bus based application needs to be handled co=
-rrectly as well. The background is that we want to start other activities l=
-ike connecting to mgmt socket etc. only _after_ we successfully claimed the=
- name. Claiming the name is an asynchronous operation (at least in ELL D-Bu=
-s) so the mainloop needs to be running.
-
-As I said Im fine not triggering the READY=3D1 directly at mainloop_run,
-the name claim is done blocking in gdbus/libdbus but Id understand
-this may change once we switch over to ELL.
-
-> >> If you look at iwd and wired/dbus.c then I have started something in t=
-hat direction with dbus_app_run. That needs to be a bit more unified and tu=
-rned into l_dbus_run or some similar name.
-> >
-> > Right, Im not sure if that applies to our internal g_dbus though but
-> > for meshd it definitely makes sense.
->
-> Our internal gdbus is something that needs to move towards ELL D-Bus real=
-ly quickly. We have to remove the dependency on libdbus even if we keep gdb=
-us API in place for a while.
->
-> >> My thinking really is that the main() function should be just deal wit=
-h argument parsing and then getting you on the system or session bus. It sh=
-ould not be bothered with all the signal setup or the duplicated code for h=
-andling the asynchronous shutdown. And if you have that, then you do a nice=
- integration with NOTIFY_SOCKET.
-> >
-> > I just wanted to tackle READY=3D1 and STOPPING=3D1 when the mainloop st=
-art
-> > and stop respectively, those I think make sense regardless of what
-> > type of service (D-Bus daemon, btproxy, btattach, etc) but perhaps you
-> > are saying that those things may actually need to be notified in
-> > different places depending on the service.
-> >
-> > For READY=3D1 I can see the point if the service does require do to
-> > something asynchronous before it is considered ready, bluetoothd
-> > currently don't require that but maybe in ell we are doing something
-> > different, for STOPPING=3D1 that only indicates we are starting to
-> > shutdown so that doesn't rule out doing it asynchronously:
-> >
-> > https://www.freedesktop.org/software/systemd/man/sd_notify.html
-> >
-> > STATUS=3D is free format and given the example I was assuming if would
-> > notify things asynchronously if we have to, thus why I created
-> > mainloop_notify, perhaps we should rename it to
-> > mainloop_notify_status?
-> >
-> > Watchdog I guess it is pretty safe to do the handling along with the
-> > mainloop since timeout handling is already done there anyway, anyway
-> > notifying READY or STOPPING multiple times probably don't make any
-> > sense, they cannot be undone, we could perhaps have a flag indicating
-> > if the mainloop shall handle those, maybe via an option like
-> > -s/--service=3D[ready, stopping, watchdog] passed to mainloop_init(int
-> > argc, char *argv[]) that way the user can inform that he wants to run
-> > the tool as a service and optionally include what states it should
-> > control (by default it would be all).
->
-> The watchdog needs to be done within the mainloop since you have to have =
-timeout handling active.
->
-> We can argue about if certain things are useful as a short term quick sol=
-ution, but in the end we want a proper solution and not just hack it into t=
-he codebase. I rather have no systemd integration than a half-baked one.
-
-Well Im trying to agree here on the API so we can have it similar in
-ELL thus making the transition a bit simpler, I was already intending
-to switch everything to mainloop abstraction, since I suppose the
-problem with ELL is not exactly the API but the dependency which may
-not be available in many distros. Some people already experience this
-on the likes of rpi when attempting to use meshd, though we hope that
-makes distro guys attempt to create packages for it once we have the
-D-Bus APIs implemented.
-
-> Regards
->
-> Marcel
->
+Hi Zumeng,
 
 
---=20
-Luiz Augusto von Dentz
+> On 27 Nov 2018, at 14.22, Zumeng Chen <zumeng.chen@gmail.com> wrote:
+> There is a related kernel as shown in the below list
+>=20
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D198699
+>=20
+> I didn't think my patch is to fix this one because I think we need to =
+sort out
+> the whole logic of CMD_COMPLETE. But my patch is good to fix the issue
+> described by subject.
+
+I=E2=80=99m still failing to see any major problem with command complete =
+handling. This seems more related to sending HCI commands that do not =
+complete in Command Complete (such as Inquiry or connection creation) =
+through the hci_request framework together with hci_req_run_skb(). This =
+could either happen by directly using the hci_req_sync() API, such as in =
+the case of the legacy inquiry ioctl, or by some code using =
+hci_cmd_sync() to send a command that does not complete in Command =
+Complete. In these cases you end up with a Command Status with status =3D=3D=
+ 0, which the hci_request code interprets as completion of the request, =
+but is unable to fetch any return parameters from it (which for these =
+cases is fine).
+
+Since what I've describe above is normal usage of the hci_req_sync() and =
+hci_cmd_sync() APIs I still don=E2=80=99t see any other issue except =
+that an error log was thrown rather than than (at most) a debug log. So =
+I=E2=80=99d still go for the patch that I submitted earlier today.
+
+Johan=
