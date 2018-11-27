@@ -2,213 +2,158 @@ Return-Path: <SRS0=erFC=OG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D62AEC43441
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 11:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57745C04EBA
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 11:22:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C38C2082F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 11:10:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C38C2082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 12DD72147D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 11:22:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="LPvxfy+y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12DD72147D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amarulasolutions.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729020AbeK0WIK (ORCPT
+        id S1730877AbeK0WUN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Nov 2018 17:08:10 -0500
-Received: from mga04.intel.com ([192.55.52.120]:63589 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728976AbeK0WIK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Nov 2018 17:08:10 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Nov 2018 03:10:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,286,1539673200"; 
-   d="scan'208";a="94665128"
-Received: from ubuntu16.iind.intel.com ([10.224.186.218])
-  by orsmga006.jf.intel.com with ESMTP; 27 Nov 2018 03:10:34 -0800
-From:   raghuram.hegde@intel.com
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Raghuram Hegde <raghuram.hegde@intel.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>
-Subject: [Patch v1] Bluetooth: btusb: Add support for Intel bluetooth device 8087:0029
-Date:   Tue, 27 Nov 2018 16:39:24 +0530
-Message-Id: <1543316964-4596-1-git-send-email-raghuram.hegde@intel.com>
-X-Mailer: git-send-email 2.7.4
+        Tue, 27 Nov 2018 17:20:13 -0500
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:35496 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729501AbeK0WUM (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 27 Nov 2018 17:20:12 -0500
+Received: by mail-ed1-f68.google.com with SMTP id x30so18680222edx.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Nov 2018 03:22:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amarulasolutions.com; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=xhM4mxpl6FFZ/rThS7YpFSaPWQ7uwJbzqsu3JPtVKbQ=;
+        b=LPvxfy+y35jRGSNkF+j4PLckvO6VUIisTpP/6HtBQMvgv8nAp1JWXxM9cFsag02QYJ
+         5e3ISVcvYxhCXUyY2M6nq7SECfUP+BzVwJ4LmNXpffolj4BYYR9mar6AFGy8uP4A3qfS
+         Xbn8Ktgbr6QJWnGFLaNV628vX71IPen9d88FA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=xhM4mxpl6FFZ/rThS7YpFSaPWQ7uwJbzqsu3JPtVKbQ=;
+        b=EBBx4w6cMJduKPJ/jItE5YE9h+FQW+ZY52Io18uw8V9umRp0IEqWzH4H2LmHqz2aow
+         hUjN3qEzkbAVs8Abfc5+8JECfcvAQNVyiLRb32zpssC+1G3hJr797j5ZcdpU4ls7GsrD
+         1fhxewRFbhr+TgahnQVgkSJds2N8Sljss/b1qncbOQ0+ghX6DU9OM39FDjSSuPHZcZLA
+         +q9CoSn7ni9uyGEr3MrfkNQgyk3VgLSfPaxskkaaUDuUfUu0AT1HQ7Jgb9pAM7jn3T/d
+         ilEHa3qaGPJzTTVUOqDJEv6L0XfPqO6LEhQHhgOwdghrV5FJpHddij63COzhEMVSJcXM
+         ucCA==
+X-Gm-Message-State: AA+aEWaVz4H0qLcI2ONZ5XHoMEZC1ND5ydb0XgrVdl/6e83B0ssrYNT8
+        4UVpQJG7Any0HZbSpfdBs/vQGmN/pjx4PA==
+X-Google-Smtp-Source: AFSGD/Wntr1PiMVM4oxiRsSwz4IxSoz4FROnk54Ri/lhtmGiITa/iHtydqPgrgtBKAssfqxxqzRasQ==
+X-Received: by 2002:a50:a982:: with SMTP id n2mr10322240edc.236.1543317755637;
+        Tue, 27 Nov 2018 03:22:35 -0800 (PST)
+Received: from andrea.amarulasolutions.com (85.100.broadband17.iol.cz. [109.80.100.85])
+        by smtp.gmail.com with ESMTPSA id b2sm964538ede.30.2018.11.27.03.22.34
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 27 Nov 2018 03:22:34 -0800 (PST)
+From:   Andrea Parri <andrea.parri@amarulasolutions.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andrea Parri <andrea.parri@amarulasolutions.com>
+Subject: [PATCH] bluetooth: Remove unnecessary smp_mb__after_atomic() barriers
+Date:   Tue, 27 Nov 2018 12:22:25 +0100
+Message-Id: <20181127112225.6177-1-andrea.parri@amarulasolutions.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Raghuram Hegde <raghuram.hegde@intel.com>
+The barriers are redundant because atomic_test_and_clear_bit() already
+provides the required full ordering for the cases in question (that is,
+when the bit is cleared).
 
-Include the new USB product ID for Intel Bluetooth device 22260
-family(CcPeak)
-
-The /sys/kernel/debug/usb/devices portion for this device is:
-
-T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=02 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=8087 ProdID=0029 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-
-Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Signed-off-by: Andrea Parri <andrea.parri@amarulasolutions.com>
 ---
- drivers/bluetooth/btusb.c | 83 +++++++++++++++++++++++++++--------------------
- 1 file changed, 48 insertions(+), 35 deletions(-)
+ drivers/bluetooth/btusb.c     |  8 ++------
+ drivers/bluetooth/hci_intel.c | 16 ++++------------
+ 2 files changed, 6 insertions(+), 18 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7439a7eb50ac..14931cf7afd4 100644
+index 7439a7eb50acb..885e17a1a9a57 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -344,6 +344,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Intel Bluetooth devices */
- 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW },
- 	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW },
-+	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW },
- 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
- 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
- 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
-@@ -2055,6 +2056,46 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
- 	return -EILSEQ;
+@@ -1935,10 +1935,8 @@ static void btusb_intel_bootup(struct btusb_data *data, const void *ptr,
+ 	if (len != sizeof(*evt))
+ 		return;
+ 
+-	if (test_and_clear_bit(BTUSB_BOOTING, &data->flags)) {
+-		smp_mb__after_atomic();
++	if (test_and_clear_bit(BTUSB_BOOTING, &data->flags))
+ 		wake_up_bit(&data->flags, BTUSB_BOOTING);
+-	}
  }
  
-+static int btusb_setup_intel_new_get_fw_name(struct intel_version *ver,
-+					     struct intel_boot_params *params,
-+					     char *fw_name, size_t len,
-+					     bool is_sfi)
-+{
-+	switch (ver->hw_variant) {
-+	case 0x0b:	/* SfP */
-+	case 0x0c:	/* WsP */
-+		if (is_sfi) {
-+			snprintf(fw_name, len, "intel/ibt-%u-%u.sfi",
-+				le16_to_cpu(ver->hw_variant),
-+				le16_to_cpu(params->dev_revid));
-+		} else {
-+			snprintf(fw_name, len, "intel/ibt-%u-%u.ddc",
-+				le16_to_cpu(ver->hw_variant),
-+				le16_to_cpu(params->dev_revid));
-+		}
-+		break;
-+	case 0x11:	/* JfP */
-+	case 0x12:	/* ThP */
-+	case 0x13:	/* HrP */
-+	case 0x14:	/* CcP */
-+		if (is_sfi) {
-+			snprintf(fw_name, len, "intel/ibt-%u-%u-%u.sfi",
-+				le16_to_cpu(ver->hw_variant),
-+				le16_to_cpu(ver->hw_revision),
-+				le16_to_cpu(ver->fw_revision));
-+		} else {
-+			snprintf(fw_name, len, "intel/ibt-%u-%u-%u.ddc",
-+				le16_to_cpu(ver->hw_variant),
-+				le16_to_cpu(ver->hw_revision),
-+				le16_to_cpu(ver->fw_revision));
-+		}
-+		break;
-+	default:
-+		return -1;
-+	}
-+	return 0;
-+}
-+
- static int btusb_setup_intel_new(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
-@@ -2106,7 +2147,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	case 0x11:	/* JfP */
- 	case 0x12:	/* ThP */
- 	case 0x13:	/* HrP */
--	case 0x14:	/* QnJ, IcP */
-+	case 0x14:	/* CcP */
+ static void btusb_intel_secure_send_result(struct btusb_data *data,
+@@ -1953,10 +1951,8 @@ static void btusb_intel_secure_send_result(struct btusb_data *data,
+ 		set_bit(BTUSB_FIRMWARE_FAILED, &data->flags);
+ 
+ 	if (test_and_clear_bit(BTUSB_DOWNLOADING, &data->flags) &&
+-	    test_bit(BTUSB_FIRMWARE_LOADED, &data->flags)) {
+-		smp_mb__after_atomic();
++	    test_bit(BTUSB_FIRMWARE_LOADED, &data->flags))
+ 		wake_up_bit(&data->flags, BTUSB_DOWNLOADING);
+-	}
+ }
+ 
+ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index 46ace321bf60e..8caa1a6619cea 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -909,10 +909,8 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 			set_bit(STATE_FIRMWARE_FAILED, &intel->flags);
+ 
+ 		if (test_and_clear_bit(STATE_DOWNLOADING, &intel->flags) &&
+-		    test_bit(STATE_FIRMWARE_LOADED, &intel->flags)) {
+-			smp_mb__after_atomic();
++		    test_bit(STATE_FIRMWARE_LOADED, &intel->flags))
+ 			wake_up_bit(&intel->flags, STATE_DOWNLOADING);
+-		}
+ 
+ 	/* When switching to the operational firmware the device
+ 	 * sends a vendor specific event indicating that the bootup
+@@ -920,10 +918,8 @@ static int intel_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
+ 	 */
+ 	} else if (skb->len == 9 && hdr->evt == 0xff && hdr->plen == 0x07 &&
+ 		   skb->data[2] == 0x02) {
+-		if (test_and_clear_bit(STATE_BOOTING, &intel->flags)) {
+-			smp_mb__after_atomic();
++		if (test_and_clear_bit(STATE_BOOTING, &intel->flags))
+ 			wake_up_bit(&intel->flags, STATE_BOOTING);
+-		}
+ 	}
+ recv:
+ 	return hci_recv_frame(hdev, skb);
+@@ -960,17 +956,13 @@ static int intel_recv_lpm(struct hci_dev *hdev, struct sk_buff *skb)
+ 		break;
+ 	case LPM_OP_SUSPEND_ACK:
+ 		set_bit(STATE_SUSPENDED, &intel->flags);
+-		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
+-			smp_mb__after_atomic();
++		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags))
+ 			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
+-		}
+ 		break;
+ 	case LPM_OP_RESUME_ACK:
+ 		clear_bit(STATE_SUSPENDED, &intel->flags);
+-		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags)) {
+-			smp_mb__after_atomic();
++		if (test_and_clear_bit(STATE_LPM_TRANSACTION, &intel->flags))
+ 			wake_up_bit(&intel->flags, STATE_LPM_TRANSACTION);
+-		}
  		break;
  	default:
- 		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-@@ -2190,23 +2231,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	 * ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi.
- 	 *
- 	 */
--	switch (ver.hw_variant) {
--	case 0x0b:	/* SfP */
--	case 0x0c:	/* WsP */
--		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.sfi",
--			 le16_to_cpu(ver.hw_variant),
--			 le16_to_cpu(params.dev_revid));
--		break;
--	case 0x11:	/* JfP */
--	case 0x12:	/* ThP */
--	case 0x13:	/* HrP */
--	case 0x14:	/* QnJ, IcP */
--		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.sfi",
--			 le16_to_cpu(ver.hw_variant),
--			 le16_to_cpu(ver.hw_revision),
--			 le16_to_cpu(ver.fw_revision));
--		break;
--	default:
-+	err = btusb_setup_intel_new_get_fw_name(&ver, &params, fwname,
-+						sizeof(fwname), true);
-+	if (err < 0) {
- 		bt_dev_err(hdev, "Unsupported Intel firmware naming");
- 		return -EINVAL;
- 	}
-@@ -2222,23 +2249,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	/* Save the DDC file name for later use to apply once the firmware
- 	 * downloading is done.
- 	 */
--	switch (ver.hw_variant) {
--	case 0x0b:	/* SfP */
--	case 0x0c:	/* WsP */
--		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u.ddc",
--			 le16_to_cpu(ver.hw_variant),
--			 le16_to_cpu(params.dev_revid));
--		break;
--	case 0x11:	/* JfP */
--	case 0x12:	/* ThP */
--	case 0x13:	/* HrP */
--	case 0x14:	/* QnJ, IcP */
--		snprintf(fwname, sizeof(fwname), "intel/ibt-%u-%u-%u.ddc",
--			 le16_to_cpu(ver.hw_variant),
--			 le16_to_cpu(ver.hw_revision),
--			 le16_to_cpu(ver.fw_revision));
--		break;
--	default:
-+	err = btusb_setup_intel_new_get_fw_name(&ver, &params, fwname,
-+						sizeof(fwname), false);
-+	if (err < 0) {
- 		bt_dev_err(hdev, "Unsupported Intel firmware naming");
- 		return -EINVAL;
- 	}
+ 		bt_dev_err(hdev, "Unknown LPM opcode (%02x)", lpm->opcode);
 -- 
-2.7.4
+2.17.1
 
