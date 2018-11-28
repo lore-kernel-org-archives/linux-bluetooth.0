@@ -1,115 +1,202 @@
-Return-Path: <SRS0=erFC=OG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=9KbV=OH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7133C43441
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 21:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0195AC43441
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 04:26:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7ECE3208E4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Nov 2018 21:19:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K8brNMUM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ECE3208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id BCB722081B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 04:26:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCB722081B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726288AbeK1ISd (ORCPT
+        id S1727074AbeK1P0R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Nov 2018 03:18:33 -0500
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:44830 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726273AbeK1ISd (ORCPT
+        Wed, 28 Nov 2018 10:26:17 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:35678 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726894AbeK1P0R (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Nov 2018 03:18:33 -0500
-Received: by mail-lf1-f65.google.com with SMTP id z13so17684686lfe.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Nov 2018 13:19:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=WzDCG80SAL/hczcxkWBHg+kV0y8RtZFNkQb7UBQicW0=;
-        b=K8brNMUMcjokTr9fuINVjicRrDU8w2VUaqY5Q8+23u1D/steaO6z7QqmthiD4Uphta
-         PUrCYpg+MYaIXDkFQUHbA2KhgucYQIBbE/EbtNWBvPPwlyYX3iPahknOBjbuwCJstfZ8
-         vqhDg0fUauoJBYKjPhFdAsJcMbwCEwJMTwvzBBc+Q9g3VVQ/NTIexQesMzOq4GRKPlq2
-         dvtkvAkw3KTRmd3B709fGK4vOesoDTwoRTdpBFpeGJ9wlQiIgRVYHq8yMQQIQV+IT9CR
-         9pGB9ujmgmUL3yniyl20Sg/lbTe62L3J59RyFSIP9dT2pDDLKHfxEUAp+KvyDN4H4mWF
-         9Zeg==
+        Wed, 28 Nov 2018 10:26:17 -0500
+Received: by mail-ed1-f65.google.com with SMTP id x30so20949259edx.2;
+        Tue, 27 Nov 2018 20:26:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=WzDCG80SAL/hczcxkWBHg+kV0y8RtZFNkQb7UBQicW0=;
-        b=co9MnEuUBRAs6kAP+RJWTehKfZs55NBpz+aj12J1I9QuGZSD3FRvZUn67LR6BVQgQn
-         E6STFvLP5Jdy6EqDHdDaDC+G15rfKQWNHnEf9kLEz0rhK+D1jsIIM7yEiOs5aScqQEQr
-         jLipiesvZ+LO9Er2FnnSPqnQvvbniT182TZm1DdEJecVomzL4KDa7ds66D7l5Q6HHx6Q
-         cumdn+Fsv1oWijU+f+xDz8zhJjDwqLSDOg/XqV+zjO+HxugiqrZ9ICHsl2JgwzdaBrnI
-         0pf2y5H7nUcPQKk7z9sMLNv4570mY0mF0/RoH7VuzlRg/Mq1QgsorO6aQWj9X+wmOClJ
-         JbLw==
-X-Gm-Message-State: AA+aEWYk1/Pqdk0gwc32w4YKQZfzN11zl6CoTpwuQmaHwjowTJkVOtzi
-        qlzcccvpwtS56Wd6K30X3RA=
-X-Google-Smtp-Source: AFSGD/VXaTFsH1Pw/qO8uGkMDQvnODHJdAu8bqrRDzEk91t6XPqdFYmtnv1ipC5Pk3xHhEJ/bP84Rw==
-X-Received: by 2002:a19:6806:: with SMTP id d6mr4790114lfc.48.1543353559124;
-        Tue, 27 Nov 2018 13:19:19 -0800 (PST)
-Received: from jhedberg-mac01.home (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
-        by smtp.gmail.com with ESMTPSA id y23-v6sm775574ljk.95.2018.11.27.13.19.17
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lOkLZlsvADrnqKiPbHPJ6IpFB4pq1F+b1THmG8uyKgA=;
+        b=LO4KAkD4kJOIGX2wsGzEo3BR3yhDn1AShNQ7HQ1QVGNiOIKgl5ObsolQMuGIUx1zXx
+         RozTLeKkIdJp6RSzVTiEbBNUWKWtOH/b0dvjvxcDRyUBbRBvT+k74FH8NvQVK0HVnU+N
+         hyYFs6zVi5lEbFR0GdwwLjbcznh0OX7PkXJXllgx+z2Ax4Zr2Y1ZyQ/GP0eShWLnszlB
+         mi7oDsce498wUfVGDf62Yeu8YQ6pq1RHRyEHSfshw1m1CA/1B4R1237id/WmaUVLI2R3
+         tX/CssfS7nAEgQweh/gAUp2hQ2vWNz1fG2/IjQ53U65VzyjEUDA3QCzVOXR7SXYNB9If
+         0Cdg==
+X-Gm-Message-State: AA+aEWaBYR/TgN0rZ8OWRL7Mqr3U71P8Xmx+gkyo+JTczK+19paCjLus
+        az79KIy6kRjs7D+UzThTz7RepieECgg=
+X-Google-Smtp-Source: AFSGD/WIPLRoJHxcGRO16gni09fivxRuz7x7Bly1P6rIXgGOR1jG25S30aFnx0YEL8uw/+PiM3e7hA==
+X-Received: by 2002:a50:8799:: with SMTP id a25mr29244544eda.96.1543379161942;
+        Tue, 27 Nov 2018 20:26:01 -0800 (PST)
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com. [209.85.128.51])
+        by smtp.gmail.com with ESMTPSA id e18-v6sm839582ejm.26.2018.11.27.20.26.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Nov 2018 13:19:18 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
-Subject: Re: [PATCH 1/1 v2] Bluetooth: make the balance of judgement condition
- to fix a false report
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-In-Reply-To: <1704c39f-c005-d0cc-9bab-c21e537a07be@gmail.com>
-Date:   Tue, 27 Nov 2018 23:19:14 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <566C2A3E-8924-455C-93B1-B514A4CB0511@gmail.com>
-References: <5A23C871-B30F-44C4-898B-C138EFDB4893@holtmann.org>
- <1542245517-150977-1-git-send-email-zumeng.chen@gmail.com>
- <00BD5234-6645-4E40-9B3C-859C147EEB7C@gmail.com>
- <3D63F92F-1BA5-415D-AED4-A38FB2E29C00@gmail.com>
- <1704c39f-c005-d0cc-9bab-c21e537a07be@gmail.com>
-To:     Zumeng Chen <zumeng.chen@gmail.com>
-X-Mailer: Apple Mail (2.3445.101.1)
+        Tue, 27 Nov 2018 20:26:01 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id a18so456345wmj.1;
+        Tue, 27 Nov 2018 20:26:01 -0800 (PST)
+X-Received: by 2002:a1c:2304:: with SMTP id j4mr1183669wmj.14.1543379161075;
+ Tue, 27 Nov 2018 20:26:01 -0800 (PST)
+MIME-Version: 1.0
+References: <20181115093603.26729-1-wens@csie.org>
+In-Reply-To: <20181115093603.26729-1-wens@csie.org>
+From:   Chen-Yu Tsai <wens@csie.org>
+Date:   Wed, 28 Nov 2018 12:25:48 +0800
+X-Gmail-Original-Message-ID: <CAGb2v66YJ8tkd8wMsBBHETO3UfQDNdmDtgy6SrUXSYergsSUTA@mail.gmail.com>
+Message-ID: <CAGb2v66YJ8tkd8wMsBBHETO3UfQDNdmDtgy6SrUXSYergsSUTA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/15] ARM: sunxi: Enable Broadcom-based Bluetooth controllers
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Maxime Ripard <maxime.ripard@bootlin.com>
+Cc:     Loic Poulain <loic.poulain@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        devicetree <devicetree@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zumeng,
+Hi,
 
+On Thu, Nov 15, 2018 at 5:36 PM Chen-Yu Tsai <wens@csie.org> wrote:
+>
+> Hi everyone,
+>
+> This is v2 of my Broadcom-based Bluetooth controllers on Allwinner SoC-
+> based SBCs series.
+>
+> Changes since v1:
+>
+>   - Collected tags
+>   - Re-organize dt binding clocks and clock-names properties
+>   - Simplify check for deferred probe when getting clocks
+>   - Add explanation of Cubietruck's clk_out_a pinmux setting placement
+>     to commit message.
+>   - Add missing "uart-has-rtscts" property to Cubietruck device tree
+>
+> Original cover letter follows.
+>
+>
+> On many Allwinner SBCs / developer boards, there is a WiFi+BT combo
+> module from AMPAK. Inside is either one or two Broadcom chips, depending
+> on the model. This series enables the Bluetooth controllers for AMPAK
+> AP6210, AP6212, and AP6330 found on several boards. More will come later
+> as other SoCs require changes to some other parts. I did not cover the
+> SCO PCM connections from the controller to the SoC's I2S interface. It
+> seems no one is actually doing this, so I was not sure how to proceed.
+> Any suggestions?
+>
+> I deliberately left out the netdev mailing list and Dave Miller, as the
+> only thing that is under net is the binding document. Maybe we should
+> move that out of Documentation/devicetree/bindings/net/ ?
+>
+> Also, I'm not subscribed to the linux-bluetooth ML, so please CC me for
+> any discussions.
+>
+> Patches 1 through 4 are device tree binding changes:
+>
+> 1 - Make the external clock name unambiguous, and add a second entry for
+>     the LPO clock.
+>
+> 2 - Add regulator supply properties for the VBAT and VDDIO power pins.
+>
+> 3 - Add a compatible string for BCM20702A1.
+>
+> 4 - Add a compatible string for BCM4330.
+>
+> Patches 5 through 13 are changes to the driver, either improvements,
+> or updates to handle the updated device tree binding.
+>
+> 5 - Make the driver handle deferred probing for the external clock.
+>
+> 6 - Simplify clock error checking for subsequent clk API calls.
+>
+> 7 - Handle clock-names for the main external clock.
+>
+> 8 - Support a new external clock, the LPO.
+>
+> 9 - Support regulator supplies.
+>
+> 10 - Wait a small amount of time after toggling the GPIO for the device
+>      to settle.
+>
+> 11 - Add support for BCM20702A1, including its default address.
+>
+> 12 - Add BCM4330 compatible string to the driver.
+>
+> 13 - Handle default address for BCM43430A0.
+>
+> 14 - Enable Broadcom-based serdev Bluetooth for multiple Allwinner ARMv7
+>      boards.
+>
+> 15 - Enable Broadcom-based serdev Bluetooth for the Bananapi M64.
+>
+> checkpatch reports an error for both patch 11 and patch 13:
+>
+>     ERROR: space required after that close brace '}'
+>
+> I followed the existing code's style. If this is undesirable, I can send
+> a follow-up patch fixing the entire code block.
+>
+> The first 13 patches should go through the Bluetooth tree, while we, the
+> sunxi maintainers, will take the last 2.
 
-> On 27 Nov 2018, at 14.22, Zumeng Chen <zumeng.chen@gmail.com> wrote:
-> There is a related kernel as shown in the below list
->=20
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D198699
->=20
-> I didn't think my patch is to fix this one because I think we need to =
-sort out
-> the whole logic of CMD_COMPLETE. But my patch is good to fix the issue
-> described by subject.
+It's been close to two weeks. Any comments or concerns from the Bluetooth
+maintainers? I'd like to see this in 4.22 if possible.
 
-I=E2=80=99m still failing to see any major problem with command complete =
-handling. This seems more related to sending HCI commands that do not =
-complete in Command Complete (such as Inquiry or connection creation) =
-through the hci_request framework together with hci_req_run_skb(). This =
-could either happen by directly using the hci_req_sync() API, such as in =
-the case of the legacy inquiry ioctl, or by some code using =
-hci_cmd_sync() to send a command that does not complete in Command =
-Complete. In these cases you end up with a Command Status with status =3D=3D=
- 0, which the hci_request code interprets as completion of the request, =
-but is unable to fetch any return parameters from it (which for these =
-cases is fine).
+Thanks
+ChenYu
 
-Since what I've describe above is normal usage of the hci_req_sync() and =
-hci_cmd_sync() APIs I still don=E2=80=99t see any other issue except =
-that an error log was thrown rather than than (at most) a debug log. So =
-I=E2=80=99d still go for the patch that I submitted earlier today.
-
-Johan=
+> Thanks
+> ChenYu
+>
+> Chen-Yu Tsai (14):
+>   dt-bindings: net: broadcom-bluetooth: Fix external clock names
+>   dt-bindings: net: broadcom-bluetooth: Add VBAT and VDDIO supplies
+>   dt-bindings: net: broadcom-bluetooth: Add BCM20702A1 compatible string
+>   dt-bindings: net: broadcom-bluetooth: Add BCM4330 compatible string
+>   Bluetooth: hci_bcm: Handle deferred probing for the clock supply
+>   Bluetooth: hci_bcm: Simplify clk_get error handling
+>   Bluetooth: hci_bcm: Use "txco" and "extclk" to get clock reference
+>   Bluetooth: hci_bcm: Add support for LPO clock
+>   Bluetooth: hci_bcm: Add support for regulator supplies
+>   Bluetooth: hci_bcm: Wait for device to come out of reset after power
+>     on
+>   Bluetooth: hci_bcm: Add compatible string for BCM4330
+>   Bluetooth: btbcm: Add default address for BCM43430A0
+>   ARM: dts: sunxi: Enable Broadcom-based Bluetooth for multiple boards
+>   arm64: dts: allwinner: a64: bananapi-m64: Add Bluetooth device node
+>
+> Maxime Ripard (1):
+>   Bluetooth: hci_bcm: Add BCM20702A1 variant
+>
+>  .../bindings/net/broadcom-bluetooth.txt       |  11 +-
+>  arch/arm/boot/dts/sun7i-a20-cubietruck.dts    |  23 ++++
+>  arch/arm/boot/dts/sun8i-a83t-bananapi-m3.dts  |  18 +++
+>  .../boot/dts/sun8i-a83t-cubietruck-plus.dts   |  18 +++
+>  arch/arm/boot/dts/sun8i-r16-bananapi-m2m.dts  |  14 +++
+>  .../dts/allwinner/sun50i-a64-bananapi-m64.dts |  14 +++
+>  drivers/bluetooth/btbcm.c                     |  13 +-
+>  drivers/bluetooth/hci_bcm.c                   | 112 +++++++++++++++---
+>  8 files changed, 206 insertions(+), 17 deletions(-)
+>
+> --
+> 2.19.1
+>
