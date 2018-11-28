@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E09C04EB8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 15:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC92C43610
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 15:00:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 47FB620832
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 15:00:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 232E020832
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 15:00:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CNBTcC8a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47FB620832
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Am0JCL9a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 232E020832
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728001AbeK2CC1 (ORCPT
+        id S1728031AbeK2CC2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Nov 2018 21:02:27 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:36737 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727789AbeK2CC1 (ORCPT
+        Wed, 28 Nov 2018 21:02:28 -0500
+Received: from mail-ed1-f41.google.com ([209.85.208.41]:34671 "EHLO
+        mail-ed1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727726AbeK2CC1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 28 Nov 2018 21:02:27 -0500
-Received: by mail-ed1-f66.google.com with SMTP id f23so22369112edb.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Nov 2018 07:00:29 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id b3so22362274ede.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Nov 2018 07:00:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=ME10onneWLlhCofm5WP7Z5Gpdz9mEtMZSKNZM4kptVw=;
-        b=CNBTcC8aSDthJR+kXNM9j9rAKfoM9cg5ffVNcVe6+focStYf2Ej0TAPYuDacYRg/3R
-         DLFyZNEfEJEwd3VGbb5/K0hBcPWh/WHOPew2nH6nhQYu0nzK6DMIONgYNB601nRYjfjo
-         UGXFF3Ge9TQoatTOb1zacdrDEiTweHMUys7dwPlpzy8nBGG6H6q7fwhIiXosfAvOoNkf
-         xBCzTw5WgSJIuUGLAi74Jk4vvV4FgQ/wZeGuwR1N8vDTmRBxcRH3E0BxAfa7u6oB+Y8g
-         jf+POpEVpJCZvvKzmp8QFDs+H/KPDEHngqILQBq7EUMXF39OJnGxvwx15uAXALxL4/Jc
-         0idQ==
+        bh=0mWStA882Q3rupQZGd999wQpJB5prJ4Yn5kWqeL7y7U=;
+        b=Am0JCL9a1NXg4+RJpiq1UtufM/l0RL/iNwDNiR4g/1MnXLjwxQymzOSaBCAyKJ0NYJ
+         HkO23SLI4yJow9Wj9CMyje3NsxUqLfAN2lCfqyoR0jLFwwjHEMbX6XV0WQRPNtOZFTDr
+         RhEs6s+RIQ5S3apck1ns6ZnKiseofvZcAcIOQVSHmOXe0Kg/D/zb3h0fPcOg/1v8ohPf
+         olowgrG8NiM+KJhhDJ4WW8PbLlBukPWAxHvTx670qxKvf9KVwv3ySxQTLSYjj5n1A4qB
+         lUda1TyC2TzY5swGoewZCpLQnXcN3SXZ+qI0bH7DE36oTX1/RUwLKX6sM1k3t2V6Etc1
+         RAbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=ME10onneWLlhCofm5WP7Z5Gpdz9mEtMZSKNZM4kptVw=;
-        b=mzdkrucslRZYmXyEFB08l8b/KDRRvlMsLZN+hfLU+KKckJBQn5CQ99jkoJLSvzUBVx
-         zBIzdD7PhN9mdBYB+CJzD+1j8YOrL2Q1MkeSx65FXCHPsOJ1IHZXklzJV+EASPK5/bZk
-         vU49sutHvqVDXHC2bM5R7ezdajpmSijJglQ6FC5flh1VpwhCDb7saReitFUmcTnZuViz
-         2sbaDs4ttJAKUhlPxBBayvdmX6sLtvsBjD3aqJbngJ6AHAbTQcVuWiGxOUsqQsf+1gqd
-         kWn1ORmLNw++F4fbHpm3CijnVXTO4RH1acCfWz+hvXOzYi7iDUyXvIUb7MFRlug6k+CY
-         Yk/w==
-X-Gm-Message-State: AA+aEWaWQfbYjr6WYGV3vclb89jLtTX04EU9cYI7Ilq2OlmA/HKBve56
-        oAXfNh8cF33wsV8Cy7TBJkbWGFiM
-X-Google-Smtp-Source: AFSGD/VSY6DbrrTMXGyQnL8aawNJGDyuZ0oQPJ1PvME/qEej2VovObAKY75o5Gm3fIVaQ//Jke9Tpg==
-X-Received: by 2002:a50:f5af:: with SMTP id u44mr31880510edm.172.1543417227978;
-        Wed, 28 Nov 2018 07:00:27 -0800 (PST)
+        bh=0mWStA882Q3rupQZGd999wQpJB5prJ4Yn5kWqeL7y7U=;
+        b=ddINDBF6yB/x2jErlzSSWUL0hE8DiVs5UWD2wYDEr8SvJMG6714PYLN2OwYorkX1pt
+         lklnhNpFwPVnk4MfduQvBfmyW0Vc/a0TzWZYO+IUR7AplaSzOwBCFLbLdAjG3xOEOZ6o
+         hMuE/7zi6P9/yc3QzvEC3SGdJLQvI0YPg9Curzv2P0f+QwU7qSRBcl6qLTPf/xOfJvAb
+         NDnw8AxjAVFwUNozOjrI50bxAGKCKDkXNP1VxEfWAkFFMGmELBwdBVdLN+gpgfGA+WnG
+         0J24cbCdMISb/cGmn5PQpuM3RX0mDdqjIUqgFOhTk7hA2xI+UU842+i0j5QsD50CNX3d
+         NNLQ==
+X-Gm-Message-State: AA+aEWbsyOv7DQPpXm47nmQnr4pxG8wOtWQHpdzFGC9CeTcEP22TLsxB
+        S5QxDhilQVj/5SaYNWITD4lC6C0H
+X-Google-Smtp-Source: AFSGD/WPKI2OtdNUduOsP318xVCPBzYI91woRJOmv3/pjesnT0T/IsaddEakImMPyZYY3PMNa3EXRQ==
+X-Received: by 2002:a17:906:3ce9:: with SMTP id d9-v6mr20677916ejh.236.1543417229236;
+        Wed, 28 Nov 2018 07:00:29 -0800 (PST)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id z2sm1869327edd.4.2018.11.28.07.00.26
+        by smtp.gmail.com with ESMTPSA id z2sm1869327edd.4.2018.11.28.07.00.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 28 Nov 2018 07:00:27 -0800 (PST)
+        Wed, 28 Nov 2018 07:00:28 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 02/10] share/mainloop: Add watchdog support
-Date:   Wed, 28 Nov 2018 17:00:15 +0200
-Message-Id: <20181128150023.1576-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 03/10] tool/btmon-logger: Use mainloop_notify instead of sd_notify
+Date:   Wed, 28 Nov 2018 17:00:16 +0200
+Message-Id: <20181128150023.1576-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20181128150023.1576-1-luiz.dentz@gmail.com>
 References: <20181128150023.1576-1-luiz.dentz@gmail.com>
@@ -74,71 +74,50 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds watchdog notification support by sending "WATCHDOG=1" twice
-as frequent as required by WATCHDOG_USEC.
+mainloop_notify takes care of sending the messages to NOTIFY_SOCKET and
+includes the handling of WATCHDOG_USEC as well.
 ---
- src/shared/mainloop-notify.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ tools/btmon-logger.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/src/shared/mainloop-notify.c b/src/shared/mainloop-notify.c
-index 81b0e15ba..49ca4f6c9 100644
---- a/src/shared/mainloop-notify.c
-+++ b/src/shared/mainloop-notify.c
-@@ -37,13 +37,27 @@
+diff --git a/tools/btmon-logger.c b/tools/btmon-logger.c
+index c3ba17939..1a42824ee 100644
+--- a/tools/btmon-logger.c
++++ b/tools/btmon-logger.c
+@@ -48,8 +48,6 @@
+ #include "src/shared/mainloop.h"
+ #include "src/shared/btsnoop.h"
  
- #include "mainloop.h"
- #include "mainloop-notify.h"
-+#include "timeout.h"
-+
-+#define WATCHDOG_TRIGGER_FREQ 2
+-#include "src/systemd.h"
+-
+ #define MONITOR_INDEX_NONE 0xffff
  
- static char *notify_sock;
- static int notify_fd = -1;
+ struct monitor_hdr {
+@@ -283,7 +281,7 @@ int main(int argc, char *argv[])
  
-+static unsigned int watchdog;
-+
-+static bool watchdog_callback(void *user_data)
-+{
-+	mainloop_sd_notify("WATCHDOG=1");
-+
-+	return true;
-+}
-+
- void mainloop_notify_init(void)
- {
- 	const char *sock;
-+	const char *watchdog_usec;
-+	int msec;
+ 	mainloop_init();
  
- 	sock = getenv("NOTIFY_SOCKET");
- 	if (!sock)
-@@ -56,6 +70,17 @@ void mainloop_notify_init(void)
- 	notify_sock = strdup(sock);
+-	sd_notify(0, "STATUS=Starting up");
++	mainloop_sd_notify("STATUS=Starting up");
  
- 	notify_fd = socket(AF_UNIX, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-+
-+	watchdog_usec = getenv("WATCHDOG_USEC");
-+	if (!watchdog_usec)
-+		return;
-+
-+	msec = atoi(watchdog_usec) / 1000;
-+	if (msec < 0)
-+		return;
-+
-+	watchdog = timeout_add(msec / WATCHDOG_TRIGGER_FREQ,
-+				watchdog_callback, NULL, NULL);
- }
+ 	while (true) {
+ 		int opt;
+@@ -375,12 +373,12 @@ int main(int argc, char *argv[])
  
- void mainloop_notify_exit(void)
-@@ -67,6 +92,8 @@ void mainloop_notify_exit(void)
+ 	printf("Bluetooth monitor logger ver %s\n", VERSION);
  
- 	free(notify_sock);
- 	notify_sock = NULL;
-+
-+	timeout_remove(watchdog);
- }
+-	sd_notify(0, "STATUS=Running");
+-	sd_notify(0, "READY=1");
++	mainloop_sd_notify("STATUS=Running");
++	mainloop_sd_notify("READY=1");
  
- int mainloop_sd_notify(const char *state)
+ 	exit_status = mainloop_run();
+ 
+-	sd_notify(0, "STATUS=Quitting");
++	mainloop_sd_notify("STATUS=Quitting");
+ 
+ 	btsnoop_unref(btsnoop_file);
+ 
 -- 
 2.17.2
 
