@@ -2,92 +2,109 @@ Return-Path: <SRS0=9KbV=OH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AA3AC43441
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 15:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F210BC43441
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 15:45:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 254A3208E7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 15:06:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZko90TZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 254A3208E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id C0E622146D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Nov 2018 15:45:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E622146D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=inai.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727979AbeK2CIj (ORCPT
+        id S1728262AbeK2CrX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Nov 2018 21:08:39 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:37583 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727872AbeK2CIj (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Nov 2018 21:08:39 -0500
-Received: by mail-oi1-f193.google.com with SMTP id y23so22819946oia.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Nov 2018 07:06:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XQ38wtxBMoylRpeENOLFrsZuwWeHQH+0ev2i5TO6dUk=;
-        b=AZko90TZDu+hTnGhx/dYCi1yBA0fiEhIfQLn5nL7shj+xHb7X2SCSyN3mR+08jzdQd
-         h1Mao8pyyK0Vu+pmq6Uuymp8AuWh5qxVJOYY7IDgZToJimyLmzi/rdnwJuLEPBuZz7gH
-         gvMUd8YT/SE5N9zfhO89UnU5/ngm9o/sfTOwfkjIh1OXaD7phmIfZmrDNtDWpB7T/IkV
-         hgql68mJ/AhhHcOUdIltutTMMQuLYRNpvkk9LTkqH1bvNqoftF+2fRN9TAJEf00HjQHQ
-         l+8lbYGUnhq4vvjmb5/5ygzKW0D2r/a3nDJKLE4a4ryoegCWB+zw4B+pjlLrEcniGHnF
-         Ab5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XQ38wtxBMoylRpeENOLFrsZuwWeHQH+0ev2i5TO6dUk=;
-        b=s8c01o1RvX194NTyNnJxDRwmFVBNOCeIq1et6HDnb6y1sjWYNcLqAjQo7jolNPAG91
-         +joeA2LSfMiNxqh9KqGywTP+bS4/+R5DFhnPYGjve5WwEPAArIAofi7OrudqgjW+pJxI
-         csAVKf4Z9HyN1LJOxZNn1xOk2Mp1eWjR5PV3aP8R4lJyVtN9lQWr8hFdgq5UP5+80Wmm
-         lRMQS2mWuQMzIUlmHFS0QWqjUxs5dHB9aLL/gmgsqkC0s2Ey2G90X/G3u9VIkyAkUkNj
-         wPd0Dt+VwTwelxgax0doBBj7g80uVs0gxH4PDnIOLkOA992GAexsKvWKz6sGHbmR4SUl
-         H9uw==
-X-Gm-Message-State: AA+aEWb95Foj9/xZZpiwniXrSoPp/kxDdDyBDvz4nUcHQVrY55CUJiXd
-        FO40xfRE2VnQNhEYgxUp/CQtwuQmZNLcYsrIf+wjqQ==
-X-Google-Smtp-Source: AFSGD/WSzdlyLDLqudW8lDIBKNKEbQizx1B93SH4NH7vKWT232k6ywJVKkJFs7G2PMUDd6beh6k2lWjQF4YItvTVdFs=
-X-Received: by 2002:aca:e755:: with SMTP id e82mr3402815oih.153.1543417600739;
- Wed, 28 Nov 2018 07:06:40 -0800 (PST)
+        Wed, 28 Nov 2018 21:47:23 -0500
+Received: from a3.inai.de ([88.198.85.195]:37970 "EHLO a3.inai.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728102AbeK2CrX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 28 Nov 2018 21:47:23 -0500
+Received: by a3.inai.de (Postfix, from userid 65534)
+        id AB99FE0B084; Wed, 28 Nov 2018 16:45:16 +0100 (CET)
+Received: from a4.inai.de (a4.inai.de [IPv6:2a01:4f8:222:6c9::f8])
+        by a3.inai.de (Postfix) with ESMTP id 102AB3BACCB1;
+        Wed, 28 Nov 2018 16:45:15 +0100 (CET)
+From:   Jan Engelhardt <jengelh@inai.de>
+To:     luiz.dentz@gmail.com
+Cc:     jengelh@inai.de, linux-bluetooth@vger.kernel.org
+Subject: [PATCH] build: make building with --coverage work again
+Date:   Wed, 28 Nov 2018 16:45:14 +0100
+Message-Id: <20181128154514.17315-1-jengelh@inai.de>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <CABBYNZ+EmmyGU2_ktS237iCjrEa1d7=ODCy_nmNerXmCuX7tsg@mail.gmail.com>
+References: <CABBYNZ+EmmyGU2_ktS237iCjrEa1d7=ODCy_nmNerXmCuX7tsg@mail.gmail.com>
 MIME-Version: 1.0
-References: <CABBYNZL0jgnZTYSQ+c+54_fHudK+0fg-GwS_-LUzw7gde_aMyA@mail.gmail.com>
- <20181125092012.8001-1-jengelh@inai.de> <CABBYNZ+AY6NPO68P5WJEtL_CKumTEywsuoGC4Roe4evm5mia1w@mail.gmail.com>
- <CABBYNZKaBff5xU=9K=4D8id_dw+MNjmCRt8ugZ0k8g1x2Z=K9A@mail.gmail.com> <nycvar.YFH.7.76.1811281603540.16342@n3.vanv.qr>
-In-Reply-To: <nycvar.YFH.7.76.1811281603540.16342@n3.vanv.qr>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 28 Nov 2018 17:06:28 +0200
-Message-ID: <CABBYNZ+EmmyGU2_ktS237iCjrEa1d7=ODCy_nmNerXmCuX7tsg@mail.gmail.com>
-Subject: Re: [PATCH bluez] build system refresh (take 3)
-To:     jengelh@inai.de
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jan,
-On Wed, Nov 28, 2018 at 5:04 PM Jan Engelhardt <jengelh@inai.de> wrote:
->
-> On Wednesday 2018-11-28 15:38, Luiz Augusto von Dentz wrote:
->
-> >Hi Jan,
-> >
-> >> >  6 files changed, 119 insertions(+), 104 deletions(-)
-> >> Applied, thanks.
-> >
-> >Looks like this is breaking the build if coverage is enabled (set when
-> >lcov is available).
->
-> How are you specifically enabling coverage on your system?
+When `./configure --enable-coverage` is given and lcov is present,
+MISC_CFLAGS and MISC_LDFLAGS will be set to --coverage. However,
 
-Just install lcov and it will auto enable it.
+1. obexd uses per-target LDFLAGS and, in doing so, forget to re-mention
+$(AM_LDFLAGS). This problem existed for a long time.
 
+2. obexd uses per-target CFLAGS and, in doing so, forgot to re-mention
+$(AM_CFLAGS). This got broken in 06dbb223fbe50acc48b3ba1d33cb424275b4baaa.
+
+This led to no --coverage showing up in the linker line for obexd,
+causing a link failure indicating unresolved symbols like
+__gcov_exit.
+---
+ Makefile.obexd      | 6 +++---
+ android/Makefile.am | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 22a4977ef..1c1e500fe 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -81,15 +81,15 @@ obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
+ 			gdbus/libgdbus-internal.la \
+ 			$(ICAL_LIBS) $(DBUS_LIBS) $(GLIB_LIBS) -ldl
+ 
+-obexd_src_obexd_LDFLAGS = -Wl,--export-dynamic
++obexd_src_obexd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic
+ 
+-obexd_src_obexd_CPPFLAGS = $(AM_CFLAGS) $(GLIB_CFLAGS) $(DBUS_CFLAGS) \
++obexd_src_obexd_CPPFLAGS = $(AM_CPPFLAGS) $(GLIB_CFLAGS) $(DBUS_CFLAGS) \
+ 				$(ICAL_CFLAGS) -DOBEX_PLUGIN_BUILTIN \
+ 				-DPLUGINDIR=\""$(obex_plugindir)"\" \
+ 				-D_FILE_OFFSET_BITS=64 \
+ 				-I$(builddir)/lib -I$(builddir)/obexd/src
+ 
+-obexd_src_obexd_CFLAGS = -fPIC
++obexd_src_obexd_CFLAGS = $(AM_CFLAGS) -fPIC
+ 
+ endif
+ 
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 5dd1adf9d..a370598a2 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -142,7 +142,7 @@ android_haltest_SOURCES = android/client/haltest.c \
+ 				android/hal-utils.h android/hal-utils.c
+ android_haltest_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/android \
+ 				-DPLUGINDIR=\""$(android_plugindir)"\"
+-android_haltest_LDFLAGS = -pthread
++android_haltest_LDFLAGS = $(AM_LDFLAGS) -pthread
+ android_haltest_LDADD = -ldl -lm
+ 
+ noinst_PROGRAMS += android/android-tester
+@@ -167,7 +167,7 @@ android_android_tester_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/android \
+ 				-DPLUGINDIR=\""$(android_plugindir)"\"
+ android_android_tester_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS) -ldl
+-android_android_tester_LDFLAGS = -pthread
++android_android_tester_LDFLAGS = $(AM_LDFLAGS) -pthread
+ 
+ noinst_PROGRAMS += android/ipc-tester
+ 
 -- 
-Luiz Augusto von Dentz
+2.19.1
+
