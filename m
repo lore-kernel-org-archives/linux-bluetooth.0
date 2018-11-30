@@ -4,51 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E134C04EB8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Nov 2018 15:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC3FC04EB8
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Nov 2018 15:03:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A2AB20834
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Nov 2018 15:03:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1247020834
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Nov 2018 15:03:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="ecq0gep7";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="F2MbKOMp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A2AB20834
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="b2sqsLsi";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="KHoWpG/6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1247020834
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727203AbeLACMy (ORCPT
+        id S1727310AbeLACNB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Nov 2018 21:12:54 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:57900 "EHLO
+        Fri, 30 Nov 2018 21:13:01 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:58172 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726563AbeLACMy (ORCPT
+        with ESMTP id S1726843AbeLACNA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Nov 2018 21:12:54 -0500
+        Fri, 30 Nov 2018 21:13:00 -0500
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 37A6960B1E; Fri, 30 Nov 2018 15:03:17 +0000 (UTC)
+        id D20FF60913; Fri, 30 Nov 2018 15:03:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1543590197;
-        bh=9N2h9srDC69u+NilQXaiuhEEYEVcr69GPqiKe6jlgTA=;
+        s=default; t=1543590204;
+        bh=XnZaeQcx41V0uGtWNEsuJlg6Xt9prKh8PFBDs3ByIoc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ecq0gep75JMi33g5x+mdpgXQZKPg/Jz+AboS/K0H2YgnFLY4bLqMrVNuFVPLEg0Dh
-         ogONB7kyuNqflMVRGPuZ0OEtNyULZ8MUN0Mtzf40tJBYmyvVcW+Yfw6L97wE1BK07i
-         TRrogbga2C9kNP9B2+shCXH/DRIUJPZHRBiMHme8=
+        b=b2sqsLsiefV7n0nJ0VUT7UURuAbcZpoUhMaIxX+g87njeJ1mlUhrnk/1OkNckMipC
+         4Allgdhrmx+OhMUhfWssBiXbiaNeQRPfh+A7ucmvjobhtJzv/KeDHLBtHEUKi6I6Sb
+         iO+YKojn+QBjNhOXiYSABEDbfZgupTEMz2Xz4nBo=
 Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 5FE6C60351;
-        Fri, 30 Nov 2018 15:03:13 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 6177F60C64;
+        Fri, 30 Nov 2018 15:03:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1543590196;
-        bh=9N2h9srDC69u+NilQXaiuhEEYEVcr69GPqiKe6jlgTA=;
+        s=default; t=1543590203;
+        bh=XnZaeQcx41V0uGtWNEsuJlg6Xt9prKh8PFBDs3ByIoc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=F2MbKOMpKfjz/rX+7VasExh0T5RwumWdsVnIx2dQL8koC2C72NndE6EoEIxHscyCi
-         /HlM8/vOvFW889zbpNe9pj7/HWkE7Dq7RRy6cs29vcG7H5HLMMYbvuW+mXq8IgWFIB
-         ++VDUCbmmx9S2Ikfbm70BLcn+3F8L6I8VUDh/534=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 5FE6C60351
+        b=KHoWpG/6GrJKDH9J7z70cL8oq5uU1FQe1BQqESgsv1rS+R7MqiGIoV9mDRs42tb+/
+         3gIyGbzM3pgDfJENW6RR2/2gSDvxRzKB3qPCymvp6qcZVB7nYQv66FpdzC3Ss1kcHD
+         CiQ0jGEoq1JZDLPEPOYGZCHlfDeOBPxh3MHT3hqA=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 6177F60C64
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
 From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
@@ -57,9 +58,9 @@ Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
         linux-arm-msm@vger.kernel.org,
         Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v3 2/4] Bluetooth: hci_qca: Deassert RTS while baudrate change command
-Date:   Fri, 30 Nov 2018 20:32:45 +0530
-Message-Id: <20181130150247.26294-3-bgodavar@codeaurora.org>
+Subject: [PATCH v3 4/4] Bluetooth: hci_qca: Disable IBS state machine and flush Tx buffer
+Date:   Fri, 30 Nov 2018 20:32:47 +0530
+Message-Id: <20181130150247.26294-5-bgodavar@codeaurora.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181130150247.26294-1-bgodavar@codeaurora.org>
 References: <20181130150247.26294-1-bgodavar@codeaurora.org>
@@ -70,99 +71,32 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch will help to stop frame reassembly errors while changing
-the baudrate. This is because host send a change baudrate request
-command to the chip with 115200 bps, Whereas chip will change their
-UART clocks to the enable for new baudrate and sends the response
-for the change request command with newer baudrate, On host side
-we are still operating in 115200 bps which results of reading garbage
-data. Here we are pulling RTS line, so that chip we will wait to send data
-to host until host change its baudrate.
+During hci down we observed IBS sleep commands are queued in the Tx
+buffer and hci_uart_write_work is sending data to the chip which is
+not required as the chip is powered off. This patch will disable IBS
+and flush the Tx buffer before we turn off the chip.
 
 Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Tested-by: Matthias Kaehlcke <mka@chromium.org>
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 ---
-v3:
- * Updated comments in code to be more specific.
-v2:
- * updated commit text and comments.
-v1:
- * initial patch
+v3: 
+  * initial patch
 ---
- drivers/bluetooth/hci_qca.c | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ drivers/bluetooth/hci_qca.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f5dd323c1967..253b5bae30c2 100644
+index d595a82cb4b9..6f2a4bf7ba17 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -963,7 +963,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
- 	struct sk_buff *skb;
--	struct qca_serdev *qcadev;
- 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
- 
- 	if (baudrate > QCA_BAUDRATE_3200000)
-@@ -977,13 +976,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 		return -ENOMEM;
- 	}
- 
--	/* Disabling hardware flow control is mandatory while
--	 * sending change baudrate request to wcn3990 SoC.
--	 */
--	qcadev = serdev_device_get_drvdata(hu->serdev);
--	if (qcadev->btsoc_type == QCA_WCN3990)
--		hci_uart_set_flow_control(hu, true);
--
- 	/* Assign commands to change baudrate and packet type. */
- 	skb_put_data(skb, cmd, sizeof(cmd));
- 	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-@@ -999,9 +991,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
- 	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
- 	set_current_state(TASK_RUNNING);
- 
--	if (qcadev->btsoc_type == QCA_WCN3990)
--		hci_uart_set_flow_control(hu, false);
--
- 	return 0;
- }
- 
-@@ -1086,6 +1075,7 @@ static int qca_check_speeds(struct hci_uart *hu)
- static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- {
- 	unsigned int speed, qca_baudrate;
-+	struct qca_serdev *qcadev;
- 	int ret;
- 
- 	if (speed_type == QCA_INIT_SPEED) {
-@@ -1097,6 +1087,15 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 		if (!speed)
- 			return 0;
- 
-+		/* Deassert RTS while changing the baudrate of chip and host.
-+		 * This will prevent chip from transmitting its response with
-+		 * the new baudrate while the host port is still operating at
-+		 * the old speed.
-+		 */
-+		qcadev = serdev_device_get_drvdata(hu->serdev);
-+		if (qcadev->btsoc_type == QCA_WCN3990)
-+			serdev_device_set_rts(hu->serdev, false);
-+
- 		qca_baudrate = qca_get_baudrate_value(speed);
- 		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
- 		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
-@@ -1104,6 +1103,9 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 			return ret;
- 
- 		host_set_baudrate(hu, speed);
-+
-+		if (qcadev->btsoc_type == QCA_WCN3990)
-+			serdev_device_set_rts(hu->serdev, true);
- 	}
- 
- 	return 0;
+@@ -1286,6 +1286,8 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 	 * still open, discard all the garbage data received on the Rx line.
+ 	 */
+ 	set_bit(STATE_DISCARD_RX, &qca->flags);
++	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
++	qca_flush(hu);
+ 	host_set_baudrate(hu, 2400);
+ 	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
+ 	qca_power_setup(hu, false);
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
 a Linux Foundation Collaborative Project
