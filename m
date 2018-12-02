@@ -1,181 +1,157 @@
-Return-Path: <SRS0=rlJ7=OJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=kO+n=OL=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4788FC04EB8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Nov 2018 15:03:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23499C04EB8
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Dec 2018 04:19:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C55F2145D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Nov 2018 15:03:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC4BB20851
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 Dec 2018 04:19:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="hP9hV8vR";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="SeHZuLNe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C55F2145D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SeMQAHBd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC4BB20851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726966AbeLACMv (ORCPT
+        id S1725372AbeLBETN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Nov 2018 21:12:51 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:57834 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726563AbeLACMu (ORCPT
+        Sat, 1 Dec 2018 23:19:13 -0500
+Received: from mail-pf1-f181.google.com ([209.85.210.181]:39722 "EHLO
+        mail-pf1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725294AbeLBETN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Nov 2018 21:12:50 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 1700A60BDE; Fri, 30 Nov 2018 15:03:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1543590194;
-        bh=VrkinCBp/tHKYO2A1RLSjZrrp7j5olXCrtmMmTWXDIg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hP9hV8vRved0yMqoTMyGCElhvurPPQyQiQxYwLaqgGK/pbXU6pjUVCwcH97ItX/xr
-         sszFtzaBD2JohWE1MfZ0X63FFkN1rWvY/OPNqFoawUbnb3gVv/PY9uD9LyKQLHhq/8
-         pkl2VecHZy9aSJDfS9/Tv6dbwnxtXYylrdWLqavE=
-Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id E7C0B601D2;
-        Fri, 30 Nov 2018 15:03:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1543590192;
-        bh=VrkinCBp/tHKYO2A1RLSjZrrp7j5olXCrtmMmTWXDIg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SeHZuLNeKGiPknb55xP3bAT2UtnFOk+0oVQdzlCebAutHvXczfD/kvXQzAJDDhByw
-         XZDLX8lWXbIrFyCAmTsPgsc4rlRgKslFD5zYz18zU9LIbNKmWH70cP1LRTELwYk3bH
-         LNStbFzsclUElMpo8w4l4iDvPZ3VFgKbmIs7nQds=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org E7C0B601D2
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v3 1/4] Bluetooth: hci_qca: use wait_until_sent() for power pulses
-Date:   Fri, 30 Nov 2018 20:32:44 +0530
-Message-Id: <20181130150247.26294-2-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20181130150247.26294-1-bgodavar@codeaurora.org>
-References: <20181130150247.26294-1-bgodavar@codeaurora.org>
+        Sat, 1 Dec 2018 23:19:13 -0500
+Received: by mail-pf1-f181.google.com with SMTP id c72so4715867pfc.6
+        for <linux-bluetooth@vger.kernel.org>; Sat, 01 Dec 2018 20:19:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:openpgp:autocrypt:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=Wdz3n24ea4JoJehJj5iORFXphzUYXmPGkRqz0WnDlxo=;
+        b=SeMQAHBd5EvZp3nAgSA7qJARdF/0hMaPmty7isB1VeSJtFuBfBjnrjvlPD43Vnzsvn
+         2q/U5+jg64TRmfGgHcZXcBG5oRZY5byAmWfBihTCvhA80KTCqy+RLCVB8bfOI6d9J/s6
+         hhe5VjhnR3FLM4E53WfVXHdZ6B1qXOs8pYFI8j0nQas0uj8XA9gdAz61+nDlaZITrzsC
+         sdLfLjjRMmABUDMFKH95mf3JQaQqJieHxskgDKh0km5swxpcZcsyVAjncptd3X+yvJX4
+         DeCdP4BtBRx8tJqwOYcA0FfpENfIWYyNFil6XJvjCL3LBsFoe76pCn7AjxN4zeFuvcbM
+         eKjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:openpgp:autocrypt:message-id
+         :date:user-agent:mime-version:content-language
+         :content-transfer-encoding;
+        bh=Wdz3n24ea4JoJehJj5iORFXphzUYXmPGkRqz0WnDlxo=;
+        b=hMyiiM/1kVWu0H2ZJooZc6C0fsgvVt2nI5uVapUsYylWFUImb3nzzp2ugZmcnjdxja
+         4YaI/f2zGLjDnlqTI960DtrwfNWi1+KL/PNq511H1njWGckSk/Ba/vghBZUNnrul2lIU
+         TTboEub+yU7c+NeOb7v085jjizm7nSBQdPYbYHbDgNRZGtny63LIua7JWPYgX+YKB7H8
+         zu8DxwGySG5NdBVKTDDzmyjW8uXvIjEVMyQUbzWXgnWI8ROwNTWAfCSJRwP4nCf+DkeP
+         HlBAUhuAw9Pe4Ie/kK0aS1p7IZlYf5SRb4ekovSuFKmJpyzDMbdXq8RmcT8gypjuJJom
+         +83A==
+X-Gm-Message-State: AA+aEWZXJVqWHB/2jt08rA7XW2VlrpM2+XQPEGmGOjuKFOXGhrBb7avW
+        T6AfzN+FTk1JZrGsVJFI5mmNUUk=
+X-Google-Smtp-Source: AFSGD/WI8zdYi2/HbOT+xb2Hcy7qlmalJWzzwctc9MgfJTrAYYWTBIrDZe1gthnzkPa3C3/WZH1oVQ==
+X-Received: by 2002:a63:8c0d:: with SMTP id m13mr9585422pgd.422.1543724351253;
+        Sat, 01 Dec 2018 20:19:11 -0800 (PST)
+Received: from [10.0.0.16] (c-98-210-227-32.hsd1.ca.comcast.net. [98.210.227.32])
+        by smtp.gmail.com with ESMTPSA id n66sm23613359pfk.19.2018.12.01.20.19.10
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 01 Dec 2018 20:19:10 -0800 (PST)
+From:   Cinaed Simson <cinaed.simson@gmail.com>
+X-Google-Original-From: Cinaed Simson <Cinaed.Simson@GMail.COM>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: bug in the bluetooth.service file - or install
+Openpgp: preference=signencrypt
+Autocrypt: addr=Cinaed.Simson@GMail.COM; prefer-encrypt=mutual; keydata=
+ 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
+ FDV1prVcSN66lXaF
+Message-ID: <26be9e12-0405-28d3-0f56-86e27830af87@GMail.COM>
+Date:   Sat, 1 Dec 2018 20:19:09 -0800
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-wcn3990 requires a power pulse to turn ON/OFF along with
-regulators. Sometimes we are observing the power pulses are sent
-out with some time delay, due to queuing these commands. This is
-causing synchronization issues with chip, which intern delay the
-chip setup or may end up with communication issues.
+Hi - the latest git version of bluez is installing
 
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
----
-v3:
-  * no change.
-v2: 
-  * Updated function qca_send_power_pulse()
-  * addressed reviewer comments.
+  bluetoothd
 
-v1:
- * initial patch
----
- drivers/bluetooth/hci_qca.c | 37 +++++++++++++------------------------
- 1 file changed, 13 insertions(+), 24 deletions(-)
+in
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f036c8f98ea3..f5dd323c1967 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1013,11 +1013,9 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
- 		hci_uart_set_baudrate(hu, speed);
- }
- 
--static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
-+static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
- {
--	struct hci_uart *hu = hci_get_drvdata(hdev);
--	struct qca_data *qca = hu->priv;
--	struct sk_buff *skb;
-+	int ret;
- 
- 	/* These power pulses are single byte command which are sent
- 	 * at required baudrate to wcn3990. On wcn3990, we have an external
-@@ -1029,19 +1027,16 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
- 	 * save power. Disabling hardware flow control is mandatory while
- 	 * sending power pulses to SoC.
- 	 */
--	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
--
--	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
--	if (!skb)
--		return -ENOMEM;
--
-+	bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
- 	hci_uart_set_flow_control(hu, true);
-+	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
-+	if (ret < 0) {
-+		bt_dev_err(hu->hdev, "failed to send power pulse %02x to SoC",
-+			   cmd);
-+		return ret;
-+	}
- 
--	skb_put_u8(skb, cmd);
--	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
--
--	skb_queue_tail(&qca->txq, skb);
--	hci_uart_tx_wakeup(hu);
-+	serdev_device_wait_until_sent(hu->serdev, 0);
- 
- 	/* Wait for 100 uS for SoC to settle down */
- 	usleep_range(100, 200);
-@@ -1116,7 +1111,6 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 
- static int qca_wcn3990_init(struct hci_uart *hu)
- {
--	struct hci_dev *hdev = hu->hdev;
- 	struct qca_serdev *qcadev;
- 	int ret;
- 
-@@ -1139,12 +1133,12 @@ static int qca_wcn3990_init(struct hci_uart *hu)
- 
- 	/* Forcefully enable wcn3990 to enter in to boot mode. */
- 	host_set_baudrate(hu, 2400);
--	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
-+	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
- 	if (ret)
- 		return ret;
- 
- 	qca_set_speed(hu, QCA_INIT_SPEED);
--	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWERON_PULSE);
-+	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWERON_PULSE);
- 	if (ret)
- 		return ret;
- 
-@@ -1274,13 +1268,8 @@ static const struct qca_vreg_data qca_soc_data = {
- 
- static void qca_power_shutdown(struct hci_uart *hu)
- {
--	struct serdev_device *serdev = hu->serdev;
--	unsigned char cmd = QCA_WCN3990_POWEROFF_PULSE;
--
- 	host_set_baudrate(hu, 2400);
--	hci_uart_set_flow_control(hu, true);
--	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
--	hci_uart_set_flow_control(hu, false);
-+	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
- 	qca_power_setup(hu, false);
- }
- 
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+  ./libexec
+
+but the
+
+  ./bluez/src/bluetooth.service
+
+file is instructing systemd to start bluetoothd from the
+
+  ./libexec/bluetooth
+
+directory.
+
+I just noticed the problem after blowing everything away and re-installing.
+
+Evidently, the directory
+
+ ./libexec/bluetooth
+
+was from a previous install.
+
+Or maybe it's install issue.
+
+-- Cinaed
+
+
+
 
