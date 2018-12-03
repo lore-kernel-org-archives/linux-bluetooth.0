@@ -2,79 +2,107 @@ Return-Path: <SRS0=1Mik=OM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 157C6C04EB9
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Dec 2018 03:37:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E913C04EB9
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Dec 2018 13:56:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B87AE20892
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Dec 2018 03:37:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 232ED206B7
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Dec 2018 13:56:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zinnoinc-com.20150623.gappssmtp.com header.i=@zinnoinc-com.20150623.gappssmtp.com header.b="XYqMe07b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B87AE20892
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zinnoinc.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fcBie7r+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 232ED206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725925AbeLCDhz (ORCPT
+        id S1726569AbeLCN5f (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 Dec 2018 22:37:55 -0500
-Received: from mail-ed1-f52.google.com ([209.85.208.52]:33746 "EHLO
-        mail-ed1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725806AbeLCDhz (ORCPT
+        Mon, 3 Dec 2018 08:57:35 -0500
+Received: from mail-wm1-f45.google.com ([209.85.128.45]:51382 "EHLO
+        mail-wm1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725917AbeLCN5e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 Dec 2018 22:37:55 -0500
-Received: by mail-ed1-f52.google.com with SMTP id p6so1216984eds.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 02 Dec 2018 19:37:49 -0800 (PST)
+        Mon, 3 Dec 2018 08:57:34 -0500
+Received: by mail-wm1-f45.google.com with SMTP id s14so5943747wmh.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Dec 2018 05:56:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=zinnoinc-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=L+AE943PUJNpFpnEou1kw6xifwwAKxICB7PdJcWS4Sc=;
-        b=XYqMe07bGmZa7NBX32v9wt8YRope4Ym2gblEGcrBOzCyWLb4VFaBY9/vJDg8OW9dr8
-         axGJeEGKLHCEeXFKF6xATtXTnL5B3hlucya2OnEXWyc6cE69YAk4nR4A2eK254FkQ592
-         Hi6Pa8iXroU/Pwzw8KwuhG/rCsH47msxfbx1xceYtXqjsthH5DbAHFt6DR6m1qfCHoEs
-         YtHXVeZ/YZNhV/zE4Yxx//hBBkl3SB+GNcjHt9t7QTOutPavbcJ9T89/s4z4uJw169Am
-         2UWydjRX9LrFBpLNpDyDI/XaE895sZ2dDHDg/wh/xMNc3UYoPk4XOHIzj8d23lVUr8Zd
-         aw2w==
+        d=gmail.com; s=20161025;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-transfer-encoding:content-language;
+        bh=cMnpUBeldWanMuyvVwns3+W/TQAOEbo3HqriJiuxswE=;
+        b=fcBie7r+GpZaVqxZCXFGlQWPfxtMGiy9QwgIxX29ZBY+mWOd3BKeHst8kYmVM9T1y6
+         s5B0+WFvW7fBoEaWqQ2klUc4Pf0n0+sbW3faXYisCQepwnFa/bYwO1YpBp7oPLLwE+be
+         YLrCBNe41IHa0zZd0kcW3xjBAsseLOMy7uH2gDISq03DJZZSKqPU/ji+cI5tD5izx36x
+         l1co17G+P4fy89oL05SBskqxjO7xciooLH5++Zh1kItvw1GHjw6S8LLPjPbbNcVY81MT
+         qbCU6/ufFJWkD5lQbHkPWlS1FkxAA1/GTK4Q1O0X9uA/eUkL7kRBaOlfJfjvoMPuTES/
+         n6cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=L+AE943PUJNpFpnEou1kw6xifwwAKxICB7PdJcWS4Sc=;
-        b=ubL1dkAIFo7B4IuOKsHDrNzHOUl+eL9JJJE3VpOPGYeX3j0Gf8Dew0ctOyzBHd6/o8
-         NvFfu53mG12pIEPJtIUdBmPJRxzWlODvONMWQMYdCSHehWYatwOOpeJk34XDpojySPe2
-         iiezAp+nDF1ESSoQYZx1XcXqZB7kgYQp+ro6DKZEY0+WAXUkSSFdfN+yyRBkNcz7aPPs
-         E+IpksoiNXC5SDz9EAPjixDbxBxtQcxahztb3owCKzIm/hCqBFl0b0TUXLWSKzcdA1Ud
-         jf4Cl5Qmg/qpNXuEGm3/RKjVr/MAxAJ6stK/wwvMIr4dkiJwgKYyt6PixsEZ5kcIv5gJ
-         j+9Q==
-X-Gm-Message-State: AA+aEWYnopms1GPE9qIli6+FQ/OHFObOxWK8MvY4WKObypsR78usN6pN
-        zi2eJZjzYtkG45BK5JIkiOITbIEBi/Mh0Wg6cKWavUNPtk4xIw==
-X-Google-Smtp-Source: AFSGD/UAhUPGTY4mT0nizb72kQuLCxp8q3XG5AWYuJGMsESWnDFkPiNyRPt83emrHVg/3xVZigEqwnT3NCPGTZvztHE=
-X-Received: by 2002:a17:906:7087:: with SMTP id b7-v6mr11360666ejk.194.1543808267936;
- Sun, 02 Dec 2018 19:37:47 -0800 (PST)
-MIME-Version: 1.0
-From:   Tuan Nguyen <tuan.nguyen@zinnoinc.com>
-Date:   Mon, 3 Dec 2018 10:37:11 +0700
-Message-ID: <CA+z3N4hm3CQezC0DZjd=BY-e6EX9bB07N4jxxqYeEgzH-QiW3Q@mail.gmail.com>
-Subject: iOS auto disconnect after 30s
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-transfer-encoding:content-language;
+        bh=cMnpUBeldWanMuyvVwns3+W/TQAOEbo3HqriJiuxswE=;
+        b=P0NvQ+UYHSvZxOgudfabvdaPYq34ID2LOStWxnWeBpoUGkc7nuXUo4P/Td6NEOojJz
+         60Fo4gH1+Dl1+Qa2pfiqrNXShr2RraPeSCZ6Jf/qSW6mdJ2UW9v9Sc68o7ajXNtHTxmx
+         ZFstHjp/vTFmGxxuKWlssjosHM5dml6KIKv+FKDgjDGBTl8ITluI2LHRqF6g14JCUdEB
+         ksI5bQdBT8Wo+S9aPJVrPnI2B/Vm9KOoVb8GaO+NTYX7cvzaLSACb5Dp95aZ+rrAKX43
+         n8uEpo/7sU8TN953gai+M4JTQ7I3382H4Ggm8eg8KINeJrkrcp4G2Ynmpg4qUEsxm4P/
+         NRvw==
+X-Gm-Message-State: AA+aEWagzuDS41i0GXREoOz/hdjGtpG16GYqcmL7K74QBAXDu3O2rRgI
+        G/2zVXUhF35bTXaKx2v6ZeWFcKmv
+X-Google-Smtp-Source: AFSGD/U7HgOqmPTu7RvOTj+WoDg/LtkvHhhq5L4a+H3QcPcwd1DyTfWoEpxadziAJcDdJEX0R3sWTQ==
+X-Received: by 2002:a1c:8095:: with SMTP id b143mr8074184wmd.63.1543845385684;
+        Mon, 03 Dec 2018 05:56:25 -0800 (PST)
+Received: from [192.168.0.1] (cpc149624-rdng29-2-0-cust819.15-3.cable.virginm.net. [82.15.3.52])
+        by smtp.googlemail.com with ESMTPSA id j8sm10862829wrt.40.2018.12.03.05.56.24
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 03 Dec 2018 05:56:24 -0800 (PST)
 To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   Matt <mwtaylor@gmail.com>
+Subject: Error setting UUIDs discovery filter on big endian systems
+Message-ID: <150d16d9-9149-a463-e285-aaea10bed6e4@gmail.com>
+Date:   Mon, 3 Dec 2018 13:56:23 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-GB
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi there,
+Hi,
 
-I am using bluez 5.50 to write an application to communicate with iOS
-app via BLE.
-the python advertisement and gatt server work well but when I tried to
-change gatt security method from encrypt-read/write to read/write, my
-iOS app alway disconnect after 30s.
+When setting a UUIDs discovery filter I am receiving 
+"org.bluez.Error.InProgress" on starting a scan (which isn't in progress 
+and will not start unless the discovery filter is cleared).
 
-Using btmon, i found a error related to Insufficient Authentication.
-Also try to test with bluez 5.47, the issue does not happen.
+I am using bluez 5.50 (on openWRT). The problem seems to only appear on 
+big endian hardware (tested a couple of recent kernel and bluez 
+versions), the same software compiled for and tested on little endian 
+hardware works as expected. The issue can be reproduced in the following 
+way using bluetoothctl:
 
-Thanks
+# /etc/init.d/bluetoothd restart
+# bluetoothctl
+[bluetooth]# power on
+Changing power on succeeded
+[CHG] Controller 00:1A:7D:DA:71:13 Powered: yes
+[bluetooth]# menu scan
+[bluetooth]# uuids 0000180f-0000-1000-8000-00805f9b34fb
+[bluetooth]# back
+[bluetooth]# scan on
+SetDiscoveryFilter success
+Failed to start discovery: org.bluez.Error.InProgress
 
-Tuan Nguyen
+Setting an rssi filter does work as expected on my big endian hardware, 
+it is only the uuids filter that appears to show this problem. The issue 
+appears whether set using bluetoothctl or directly using DBus.
+
+Thank you for your help and attention,
+Matt
