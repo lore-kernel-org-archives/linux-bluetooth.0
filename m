@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2FAC04EB8
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Dec 2018 19:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0492C04EB8
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Dec 2018 19:53:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E4662082B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Dec 2018 19:52:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A32A2082B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Dec 2018 19:53:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BYGTsLPV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E4662082B
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpjeTUwC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A32A2082B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725897AbeLDTwE (ORCPT
+        id S1726276AbeLDTxf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Dec 2018 14:52:04 -0500
-Received: from mail-ot1-f47.google.com ([209.85.210.47]:34012 "EHLO
-        mail-ot1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725859AbeLDTwE (ORCPT
+        Tue, 4 Dec 2018 14:53:35 -0500
+Received: from mail-ot1-f41.google.com ([209.85.210.41]:38865 "EHLO
+        mail-ot1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725882AbeLDTxe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Dec 2018 14:52:04 -0500
-Received: by mail-ot1-f47.google.com with SMTP id t5so16413798otk.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Dec 2018 11:52:03 -0800 (PST)
+        Tue, 4 Dec 2018 14:53:34 -0500
+Received: by mail-ot1-f41.google.com with SMTP id e12so16388302otl.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Dec 2018 11:53:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=KIHG6BFvRmqx61ngPQw26JTUezuj178TfwAKVUUmRQY=;
-        b=BYGTsLPVKJIaYB0DCb75cL/MocqRi4uaK8r9Rs/z4Y9ftyjXd9J1xS1Rqy/BhCmL61
-         33qO1JmMxfjrx2Zr7HedpTCYzaTMC6kvi/yRj0rj0BNiQGAPnAF7i+71xJg3pVQ1Z6wW
-         s7IJTP5VqjmvBuo6gYDzXNU7ecI4ApLn8qwkpNiBDU0VtHd4P6WI9eUK18gM1vlJ4rRL
-         yfwMIUzmXkUZBV+5QpQDzgnwK/O1Zi70Oj/1IPFT+WM5+Hg2RBmEVPx5/xN5kvmEwh0U
-         XVqkNIZPz1ADxrMXrQxvA+VG08oX9ohroTXuhFceRo7WzdgVfwuRNP0nAHOpxK7oVaDQ
-         WdYA==
+        bh=mmmqXQv2a47QgU0160yr8itboqA/wqRp3qwj7kkYBc8=;
+        b=MpjeTUwClS14ibVj9UXoq07jpDLZmSqIvHimDKBxO+zbUiAiJFTuqUhbo2EVChzRkY
+         FolW6leAUL2Ik0TIk7ugxmCAuLa3DrbD7FnFpZuNpCuzHIBuL6ffy/QPqqyCFcnDqoQe
+         aOU+kA0shv4GI8z4/enS7wYuRLH+WT+KgZLbbcSrxC4sXbBsK6wzazBUYw04AHNlOiGv
+         PEFXkFwIz2h9fxoRsBOJ4fXHU04HKDvEuiGu6Pfbeqx8g2eXy5L4cINnRqjBwxtfOPbC
+         LyUwPhCbbwWYt/gWmSZQ6vqiMkkIyQq0VUseii8jTrTn3krHtat12ZbvXHhE8zD28ZdA
+         OF5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=KIHG6BFvRmqx61ngPQw26JTUezuj178TfwAKVUUmRQY=;
-        b=j2mC+IaecgylpWs0oiPUdm+yk+sO9YH7gmT9e8AJ7C4NqtqpY7LbroFyTU5TQhZDjY
-         r0+2SVdzkky/MW71NxtSw/LUNn1G47vWomuTXrdc9YwtruEgAqhaqcOU45EnFD6OrY3p
-         GgizJqSKbi/WV2pRe0zm5W62UDGdqE1+wojeSHhNFY94hRp4a3nbHea5DCFksGjr4YJu
-         TpPNpg1DFKIb5ZTMI26D6vuZhTsLBpTvmz9iXM0Ul/WRzTiis57z93JpQ/8YL0TTCV2w
-         rfI0QC1FUEbPNb2H188avEMR2jMfJ7zQNXzfhpPwlL9VvPr6SQenui0932wtkMAJ7xtt
-         TE8w==
-X-Gm-Message-State: AA+aEWYbpOBXmGkqWMDzx195UTgjrgvkYyJW1Yb/gQKB+eJWf+PPpiKL
-        K1gxveA93QdlgAGPxNxle0vSkN4q/VmO+ZH4WHG0mPF/
-X-Google-Smtp-Source: AFSGD/WwYE/6FKCkcacoXXxa8bjDKYWCBnaW8OrfPac4lz6G3mibfGf42jyN3bW7XlWtvSupVygXSxJHST5Xo/cH+8s=
-X-Received: by 2002:a9d:3213:: with SMTP id t19mr14732623otc.71.1543953123342;
- Tue, 04 Dec 2018 11:52:03 -0800 (PST)
+        bh=mmmqXQv2a47QgU0160yr8itboqA/wqRp3qwj7kkYBc8=;
+        b=mCA/t5ZRtx6mHV2sbPdaWXHHjoZs5b0eDfLs2PqYFtX9r4SjZ6hp9rvpqaJwCzi+Rg
+         +J2phT1wGAddVuVgFzBwQkO9dMsd+xVZPLhJ1UjHS6KUwy+pD9CrYKR7Q0U8D1Gz2y2d
+         YiLUYzH78i1mWZyKeMwnu7xcwtvuSuNJL2po4Me4WJRdWncEDcj3SbvMwvB+E7JLRFjV
+         ZoArpZ6iSkEmXL/fPKeyEmyvx2elwYYLKSlW8GNI7QO2diHWpnzIbKdWvKygJHms4Wb4
+         hW6dQUdhiQ701uJCu4q8pyYG6/Z9a72owPWqJs5BjJsTyFwNz2UTIeAkU70wXWWBFtit
+         UqGw==
+X-Gm-Message-State: AA+aEWYWEpMykXHtApQB+fmYeeiZ6Ju5vneuZEuCxHS8AlbqP7jlS63h
+        Snm38j2SrrPmv4IB1C4tW4W6Fp4Fvo+qHU+9CCA=
+X-Google-Smtp-Source: AFSGD/Vvjg+qqN9yX8r4XB4KvVyShEInFxScU/mTvDDQIDk6O8a5Bx7wCaFtleRHyinOOFhRLyObaJdIPSihz/PfYzs=
+X-Received: by 2002:a9d:3d0:: with SMTP id f74mr13037467otf.52.1543953213467;
+ Tue, 04 Dec 2018 11:53:33 -0800 (PST)
 MIME-Version: 1.0
-References: <BN6PR19MB0050F4179F4EF725CF779C3DD0AE0@BN6PR19MB0050.namprd19.prod.outlook.com>
-In-Reply-To: <BN6PR19MB0050F4179F4EF725CF779C3DD0AE0@BN6PR19MB0050.namprd19.prod.outlook.com>
+References: <150d16d9-9149-a463-e285-aaea10bed6e4@gmail.com>
+In-Reply-To: <150d16d9-9149-a463-e285-aaea10bed6e4@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 4 Dec 2018 21:51:50 +0200
-Message-ID: <CABBYNZKgUygfM=AjwrfWpJ2i_Nrot2QQbyzsvjQguRw5Ww6=1A@mail.gmail.com>
-Subject: Re: BlueZ 5.50 not including GATT and GAP UUIDs in SDP list
-To:     TSutter@efji.com
+Date:   Tue, 4 Dec 2018 21:53:21 +0200
+Message-ID: <CABBYNZJbT3fv8tq7JvBjiDuE2W+p__uceBSkduYtrChq0i8WFA@mail.gmail.com>
+Subject: Re: Error setting UUIDs discovery filter on big endian systems
+To:     mwtaylor@gmail.com
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -70,35 +70,40 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Trevor,
-On Mon, Dec 3, 2018 at 8:06 PM Trevor Sutter <TSutter@efji.com> wrote:
+Hi Matt,
+On Mon, Dec 3, 2018 at 3:59 PM Matt <mwtaylor@gmail.com> wrote:
 >
-> Hello,
+> Hi,
 >
-> I am using BlueZ 5.50 on Linux 4.12.0 running in dual mode (BR/EDR and BLE).
+> When setting a UUIDs discovery filter I am receiving
+> "org.bluez.Error.InProgress" on starting a scan (which isn't in progress
+> and will not start unless the discovery filter is cleared).
 >
-> I recently upgraded from Bluez 5.46 and after doing so, I noticed that the GATT (1801) and GAP (1800) UUIDs are no longer getting added to my SDP list.
-> I looked through the source file history and, as far as I can tell, changes made to /src/gatt-database.c for commit 109b9fa51bfcd8d15143003729cf4c730c39fe72 (gatt: Add all services as records) are responsible.
+> I am using bluez 5.50 (on openWRT). The problem seems to only appear on
+> big endian hardware (tested a couple of recent kernel and bluez
+> versions), the same software compiled for and tested on little endian
+> hardware works as expected. The issue can be reproduced in the following
+> way using bluetoothctl:
 >
-> On startup we call:
-> btd_gatt_database_new() , which calls register_core_services() and gatt_db_register(), respectively.
+> # /etc/init.d/bluetoothd restart
+> # bluetoothctl
+> [bluetooth]# power on
+> Changing power on succeeded
+> [CHG] Controller 00:1A:7D:DA:71:13 Powered: yes
+> [bluetooth]# menu scan
+> [bluetooth]# uuids 0000180f-0000-1000-8000-00805f9b34fb
+> [bluetooth]# back
+> [bluetooth]# scan on
+> SetDiscoveryFilter success
+> Failed to start discovery: org.bluez.Error.InProgress
 >
-> register_core_services() needs the gatt_db_service_added() callback to be registered by gatt_db_register() in order to add the GATT/GAP services to the SDP list, since it is called first, no callback is executed.
->
-> See the following call stack:
->
-> register_core_services
-> populate_gap_service/ populate_gatt_service
-> gatt_db_service_set_active
-> notify_service_changed -> gatt db will not be in the notify_list, no callback.
->
-> I am not very familiar with the gatt/db code in BlueZ, but as a quick test, I inverted the order of the register_core_services() and gatt_db_register() calls and I now have the GATT and GAP entries in my SDP list.
->
-> I would like confirmation that this is actually a bug, and that I do not have something else misconfigured.
-> And, if it is a bug, I would appreciate input on whether or not this is the correct fix.
+> Setting an rssi filter does work as expected on my big endian hardware,
+> it is only the uuids filter that appears to show this problem. The issue
+> appears whether set using bluetoothctl or directly using DBus.
 
-Thanks for the report, Ive sent a fix for it, let me know if you have
-any feedback about it.
+Do you have the bluetoothd logs when that happens? I wonder if it is
+something with our string to UUID conversion.
+
 
 -- 
 Luiz Augusto von Dentz
