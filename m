@@ -2,96 +2,103 @@ Return-Path: <SRS0=1GGh=OO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D66C04EBF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 15:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60109C04EBF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 17:19:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B48220878
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 15:40:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B48220878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 3047C2082B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 17:19:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3047C2082B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728069AbeLEPki (ORCPT
+        id S1727806AbeLERTS convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Dec 2018 10:40:38 -0500
-Received: from mga11.intel.com ([192.55.52.93]:16335 "EHLO mga11.intel.com"
+        Wed, 5 Dec 2018 12:19:18 -0500
+Received: from mga12.intel.com ([192.55.52.136]:35530 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727309AbeLEPkh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Dec 2018 10:40:37 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1727195AbeLERTS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 Dec 2018 12:19:18 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Dec 2018 07:40:37 -0800
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Dec 2018 09:19:17 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,318,1539673200"; 
-   d="scan'208";a="115880489"
-Received: from stinkbox.fi.intel.com (HELO stinkbox) ([10.237.72.174])
-  by orsmga002.jf.intel.com with SMTP; 05 Dec 2018 07:40:33 -0800
-Received: by stinkbox (sSMTP sendmail emulation); Wed, 05 Dec 2018 17:40:32 +0200
-Date:   Wed, 5 Dec 2018 17:40:32 +0200
-From:   Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Kay Sievers <kay.sievers@vrfy.org>,
-        Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 BlueZ] hid2hci: Fix udev rules for linux-4.14+
-Message-ID: <20181205154032.GT9144@intel.com>
-References: <20180620164240.6535-1-ville.syrjala@linux.intel.com>
- <20181204204117.14964-1-ville.syrjala@linux.intel.com>
- <20181205070621.GE16346@kroah.com>
+   d="scan'208";a="116290345"
+Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
+  by FMSMGA003.fm.intel.com with ESMTP; 05 Dec 2018 09:19:17 -0800
+Received: from orsmsx114.amr.corp.intel.com ([169.254.8.128]) by
+ ORSMSX103.amr.corp.intel.com ([169.254.5.166]) with mapi id 14.03.0415.000;
+ Wed, 5 Dec 2018 09:19:17 -0800
+From:   "Ghorai, Sukumar" <sukumar.ghorai@intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Rajat Jain <rajatja@google.com>
+CC:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Dmitry Torokhov" <dtor@chromium.org>,
+        Alex Hung <alex.hung@canonical.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "rajatxjain@gmail.com" <rajatxjain@gmail.com>,
+        "dtor@google.com" <dtor@google.com>,
+        "Hegde, Raghuram" <raghuram.hegde@intel.com>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
+Subject: RE: [PATCH v3 2/5] usb: assign ACPI companions for embedded USB
+ devices
+Thread-Topic: [PATCH v3 2/5] usb: assign ACPI companions for embedded USB
+ devices
+Thread-Index: AQHUgfT9bpVoLUXBzUeHmeL1LtVGbaVwfSmA///7x/A=
+Date:   Wed, 5 Dec 2018 17:19:16 +0000
+Message-ID: <D73ECEF0C711E34A8F972E4B87F540058FBCF1CB@ORSMSX114.amr.corp.intel.com>
+References: <20181117010748.24347-1-rajatja@google.com>
+ <20181121235020.29461-1-rajatja@google.com>
+ <20181121235020.29461-2-rajatja@google.com> <20181205093247.GB1817@kroah.com>
+In-Reply-To: <20181205093247.GB1817@kroah.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.0.400.15
+dlp-reaction: no-action
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNTAwY2E3ZjYtNzY4Ny00YmY3LTkwYWEtZTMyMDE5ODRiMzBjIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiMXRNbkxIS0ExUElYNmRPZEQrRVdJQk1pN1NXN3Y2ZlEwZWl3MzREY0U2QloyV0ZtS0ZpZGFKZ2EzWmpWcUl4RyJ9
+x-ctpclassification: CTP_NT
+x-originating-ip: [10.22.254.138]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181205070621.GE16346@kroah.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Dec 05, 2018 at 08:06:21AM +0100, Greg Kroah-Hartman wrote:
-> On Tue, Dec 04, 2018 at 10:41:17PM +0200, Ville Syrjala wrote:
-> > From: Ville Syrjälä <ville.syrjala@linux.intel.com>
-> > 
-> > Since commit 1455cf8dbfd0 ("driver core: emit uevents when
-> > device is bound to a driver") the kernel started emitting
-> > "bind" and "unbind" uevents which confuse the hid2hci
-> > udev rules.
-> > 
-> > The symptoms on an affected machine (Dell E5400 in my case)
-> > include bluetooth devices not appearing and udev hogging
-> > the cpu as it's busy processing a constant stream of these
-> > "bind"+"unbind" uevents.
-> 
-> What is causing a "stream" of bind and unbind events?  This only happens
-> when a device is attached to a driver or removed from a driver, which is
-> caused by something else happening.
+>On Wed, Nov 21, 2018 at 03:50:17PM -0800, Rajat Jain wrote:
+>> From: Dmitry Torokhov <dtor@chromium.org>
+>>
+>> USB devices permanently connected to USB ports may be described in
+>> ACPI tables and share ACPI devices with ports they are connected to.
+>> See [1] for details.
+>>
+>> This will allow us to describe sideband resources for devices, such
+>> as, for example, hard reset line for BT USB controllers.
+>>
+>> [1]
+>> https://docs.microsoft.com/en-us/windows-hardware/drivers/bringup/othe
+>> r-acpi-namespace-objects#acpi-namespace-hierarchy-and-adr-for-
+>embedded
+>> -usb-devices
+>>
+>> Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
+>> Signed-off-by: Rajat Jain <rajatja@google.com> (changed how we get the
+>> usb_port)
+>
+>Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-Not sure if it's just due to this thing causing devices to
-appear/disappear during bind/unbind events or what.
-
-> This should not be a normal
-> occurance, unless something odd is happening to your hardware?
-
-It's not specific to my hardware. Lot's of people are affected.
-See eg. 
-https://bugs.launchpad.net/ubuntu/+source/systemd/+bug/1759836
-
-Acutally looking through that bug it seems someone else noticed
-hid2hci failing lot in the logs. So maybe it's just that we already
-switched the mode during "add", and then we try to redo the same
-thing during "bind" which fails, and that then causes and unbind?
-Dunno, udev is beyond me.
-
--- 
-Ville Syrjälä
-Intel
+Tested-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
