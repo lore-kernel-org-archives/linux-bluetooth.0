@@ -2,77 +2,123 @@ Return-Path: <SRS0=1GGh=OO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46B0EC07E85
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81499C04EBF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:41:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0CBD520989
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:38:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CBD520989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=davemloft.net
+	by mail.kernel.org (Postfix) with ESMTP id 507F8208E7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:41:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 507F8208E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728482AbeLETit (ORCPT
+        id S1727783AbeLETk5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Dec 2018 14:38:49 -0500
-Received: from shards.monkeyblade.net ([23.128.96.9]:43068 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727297AbeLETir (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Dec 2018 14:38:47 -0500
-Received: from localhost (unknown [IPv6:2601:601:9f80:35cd::bf5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id E197814525CDA;
-        Wed,  5 Dec 2018 11:38:43 -0800 (PST)
-Date:   Wed, 05 Dec 2018 11:38:43 -0800 (PST)
-Message-Id: <20181205.113843.1342804787283427751.davem@davemloft.net>
-To:     petrm@mellanox.com
-Cc:     linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, devel@linuxdriverproject.org,
-        linux-wireless@vger.kernel.org, linux-s390@vger.kernel.org,
-        devel@driverdev.osuosl.org, sparmaintainer@unisys.com,
-        linux-bluetooth@vger.kernel.org, dev@openvswitch.org,
-        linux-kselftest@vger.kernel.org, dledford@redhat.com, jgg@ziepe.ca,
-        j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net,
-        benve@cisco.com, _govind@gmx.com, pkaustub@cisco.com,
-        yisen.zhuang@huawei.com, salil.mehta@huawei.com,
-        linux-net-drivers@solarflare.com, ecree@solarflare.com,
-        bkenward@solarflare.com, peppe.cavallaro@st.com,
-        alexandre.torgue@st.com, joabreu@synopsys.com,
-        mcoquelin.stm32@gmail.com, kys@microsoft.com,
-        haiyangz@microsoft.com, sthemmin@microsoft.com, jiri@resnulli.us,
-        dsa@cumulusnetworks.com, shrijeet@gmail.com, j@w1.fi,
-        kvalo@codeaurora.org, jwi@linux.ibm.com, ubraun@linux.ibm.com,
-        schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com,
-        ruxandra.radulescu@nxp.com, ioana.ciornei@nxp.com,
-        gregkh@linuxfoundation.org, david.kershner@unisys.com,
-        marcel@holtmann.org, johan.hedberg@gmail.com, kuznet@ms2.inr.ac.ru,
-        yoshfuji@linux-ipv6.org
-Subject: Re: [PATCH net-next 0/8] Pass extack to NETDEV_PRE_UP
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <cover.1544006963.git.petrm@mellanox.com>
-References: <cover.1544006963.git.petrm@mellanox.com>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Wed, 05 Dec 2018 11:38:45 -0800 (PST)
+        Wed, 5 Dec 2018 14:40:57 -0500
+Received: from mga18.intel.com ([134.134.136.126]:19844 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727523AbeLETk5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 Dec 2018 14:40:57 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Dec 2018 11:40:56 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,319,1539673200"; 
+   d="scan'208";a="98359884"
+Received: from stinkbox.fi.intel.com (HELO stinkbox) ([10.237.72.174])
+  by orsmga006.jf.intel.com with SMTP; 05 Dec 2018 11:40:52 -0800
+Received: by stinkbox (sSMTP sendmail emulation); Wed, 05 Dec 2018 21:40:51 +0200
+Date:   Wed, 5 Dec 2018 21:40:51 +0200
+From:   Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Kay Sievers <kay.sievers@vrfy.org>,
+        Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 BlueZ] hid2hci: Fix udev rules for linux-4.14+
+Message-ID: <20181205194051.GU9144@intel.com>
+References: <20180620164240.6535-1-ville.syrjala@linux.intel.com>
+ <20181204204117.14964-1-ville.syrjala@linux.intel.com>
+ <20181205070621.GE16346@kroah.com>
+ <20181205154032.GT9144@intel.com>
+ <20181205192036.GB434@kroah.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181205192036.GB434@kroah.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Wed, Dec 05, 2018 at 08:20:36PM +0100, Greg Kroah-Hartman wrote:
+> On Wed, Dec 05, 2018 at 05:40:32PM +0200, Ville Syrjälä wrote:
+> > On Wed, Dec 05, 2018 at 08:06:21AM +0100, Greg Kroah-Hartman wrote:
+> > > On Tue, Dec 04, 2018 at 10:41:17PM +0200, Ville Syrjala wrote:
+> > > > From: Ville Syrjälä <ville.syrjala@linux.intel.com>
+> > > > 
+> > > > Since commit 1455cf8dbfd0 ("driver core: emit uevents when
+> > > > device is bound to a driver") the kernel started emitting
+> > > > "bind" and "unbind" uevents which confuse the hid2hci
+> > > > udev rules.
+> > > > 
+> > > > The symptoms on an affected machine (Dell E5400 in my case)
+> > > > include bluetooth devices not appearing and udev hogging
+> > > > the cpu as it's busy processing a constant stream of these
+> > > > "bind"+"unbind" uevents.
+> > > 
+> > > What is causing a "stream" of bind and unbind events?  This only happens
+> > > when a device is attached to a driver or removed from a driver, which is
+> > > caused by something else happening.
+> > 
+> > Not sure if it's just due to this thing causing devices to
+> > appear/disappear during bind/unbind events or what.
+> 
+> Someone has to be telling the kernel to bind/unbind from a driver to
+> a device, it doesn't do it on its own.  Look at your other rules/scripts
+> for that.
+> 
+> Also note that the kernel has been doing this for over a year now (since
+> 4.l4), what just happened in 4.19 to cause this to be an issue?
 
-Your CC list is so huge that vger.kernel.org dropped all of your postings.
+It became an issue for me after I got a machine that suffers from
+this. The regression has been present ever since commit 1455cf8dbfd0
+("driver core: emit uevents when device is bound to a driver").
 
-That CC list is not reasonable at all, trim it down to the most minimum
-set.  Probably 2 or 3 mailing lists, primarily netdev, and maybe a small
-handful of specific developers.
+You need a Dell E5400 or something similar to see it since those
+have these magic bluetooth devices or whatever.
 
-Nothing more.
+> 
+> > > This should not be a normal
+> > > occurance, unless something odd is happening to your hardware?
+> > 
+> > It's not specific to my hardware. Lot's of people are affected.
+> > See eg. 
+> > https://bugs.launchpad.net/ubuntu/+source/systemd/+bug/1759836
+> > 
+> > Acutally looking through that bug it seems someone else noticed
+> > hid2hci failing lot in the logs. So maybe it's just that we already
+> > switched the mode during "add", and then we try to redo the same
+> > thing during "bind" which fails, and that then causes and unbind?
+> 
+> You have to manually unbind the device, the kernel does not do that.  So
+> perhaps you have a broken udev rule somewhere else that would do
+> something odd like unbind/bind?
+> 
+> I don't see this happening on my systems, but hey, I know better than to
+> run Ubuntu :)
+
+As do I. And you don't see it because you don't have the right
+hardware.
+
+-- 
+Ville Syrjälä
+Intel
