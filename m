@@ -2,152 +2,83 @@ Return-Path: <SRS0=1GGh=OO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9AB3C04EBF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 06:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5204C04EB9
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 07:06:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 968E320850
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 06:25:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C27620850
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 07:06:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="txIEH2uk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 968E320850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zsVR+TSL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C27620850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linuxfoundation.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727131AbeLEGZF (ORCPT
+        id S1726695AbeLEHGY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Dec 2018 01:25:05 -0500
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:37721 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726941AbeLEGZF (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Dec 2018 01:25:05 -0500
-Received: by mail-lj1-f194.google.com with SMTP id e5-v6so17242539lja.4;
-        Tue, 04 Dec 2018 22:25:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=5QY/1Ml4Uba9OMC9jYH1RXCMD6KPLn2BRWMhqIvwP7c=;
-        b=txIEH2ukOndvOgoKSZhp/DeUAu+mxzNmLHemDyKVpRZ2JtuYH+mxswhVn402cukVGH
-         YlYOdcq+PipTjH9weKcyYJ/MHBMowZdzUojWQcEn0cwoO5w/hFQ+n//YRYGhbh+V0Kul
-         J9/GbGF+19Qmre2/7R/wJNX9DxXnp3hn4i5JOCcg6WI2zh2mvJ54OzJzGr59vSiGoYs3
-         SjMuqYO2EXLBn5WFAOShTHbHZiNmwZYsdfyTZfx2QDTKPZY+5YBy5knABQEbqDhGt5iA
-         qFxKDCcrd7W8v6XMOhyJOvaWVS7lCvnHEQnrkTNPUlK6q1//PTps4aTSje589VbGsJrr
-         Sz7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=5QY/1Ml4Uba9OMC9jYH1RXCMD6KPLn2BRWMhqIvwP7c=;
-        b=LU+wFixNRn4Ic7TMgMZ5YPt9x0zY7i5HLhxkbCahtVkzbwzyFPjAZbB7ePCP6dK6zO
-         YA8ydSpz/HPkdrkG+Mw6QGehhrf87wXhyoR7yVi3vLOtCnty7kxL9l59knU3m8RYvmDT
-         Gtrgi8v+rSfw6EV5hKKFVYEfF43iC58UmcxE9UPSQWsdIHy5sktUP92tZb0Qkosk9akk
-         P6I6c1q/snh+VpunXnL90mKRrk+8QX4WRlgLBKrG9e5wp0n7pQZa4a6EL1ayQfEY1cDS
-         pthmeAxCsU8jR6NiDxPbNeGWS9t5eHLlgIJXawdVGBUqda3glRaBjJLbcAIMCYfO1VBQ
-         bM0Q==
-X-Gm-Message-State: AA+aEWa0hwWIhI2J8ZG23+XptbfPY+CkkylLQ/hr8qlwsHJMtSZ8EXwp
-        w15OfO5y5G9GMLG06UEf+Jk=
-X-Google-Smtp-Source: AFSGD/XCZ8UvG3pTdJfJI8e1cG8p6V31B5zTlKmgz6Rxbm0in+FzQ569RojS6OMoja/kVc2kjkljaQ==
-X-Received: by 2002:a2e:9694:: with SMTP id q20-v6mr14658588lji.173.1543991103049;
-        Tue, 04 Dec 2018 22:25:03 -0800 (PST)
-Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id c88-v6sm2377482ljf.60.2018.12.04.22.25.01
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 22:25:02 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.91)
-        (envelope-from <johan@kernel.org>)
-        id 1gUQcJ-00019l-Vq; Wed, 05 Dec 2018 07:25:04 +0100
-Date:   Wed, 5 Dec 2018 07:25:03 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v3 1/4] Bluetooth: hci_qca: use wait_until_sent() for
- power pulses
-Message-ID: <20181205062503.GG18087@localhost>
-References: <20181130150247.26294-1-bgodavar@codeaurora.org>
- <20181130150247.26294-2-bgodavar@codeaurora.org>
+        Wed, 5 Dec 2018 02:06:24 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53436 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726171AbeLEHGY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 Dec 2018 02:06:24 -0500
+Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 46D16206B7;
+        Wed,  5 Dec 2018 07:06:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1543993583;
+        bh=/cKE/U/SeujIjazvnCQW//Pd4Pi77WBrSOuKFuP72fE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=zsVR+TSL081M85lNrECrY18VKihCDCC7n8jBLbJG85EnTziiM/8Ge9HJlOkt9wFuA
+         cyEUlO7yZrXwTPcI0vGh/39z0GSBh85piImPk/Rw+/BGqQCRXqZ3YHpo4vCeb8Fpk8
+         xBfEdQYH2kx2L/0V80kLfAEHOnSie9zCZgTV+45c=
+Date:   Wed, 5 Dec 2018 08:06:21 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Ville Syrjala <ville.syrjala@linux.intel.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Kay Sievers <kay.sievers@vrfy.org>,
+        Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 BlueZ] hid2hci: Fix udev rules for linux-4.14+
+Message-ID: <20181205070621.GE16346@kroah.com>
+References: <20180620164240.6535-1-ville.syrjala@linux.intel.com>
+ <20181204204117.14964-1-ville.syrjala@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20181130150247.26294-2-bgodavar@codeaurora.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181204204117.14964-1-ville.syrjala@linux.intel.com>
 User-Agent: Mutt/1.11.0 (2018-11-25)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Nov 30, 2018 at 08:32:44PM +0530, Balakrishna Godavarthi wrote:
-> wcn3990 requires a power pulse to turn ON/OFF along with
-> regulators. Sometimes we are observing the power pulses are sent
-> out with some time delay, due to queuing these commands. This is
-> causing synchronization issues with chip, which intern delay the
-> chip setup or may end up with communication issues.
+On Tue, Dec 04, 2018 at 10:41:17PM +0200, Ville Syrjala wrote:
+> From: Ville Syrjälä <ville.syrjala@linux.intel.com>
 > 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> v3:
->   * no change.
-> v2: 
->   * Updated function qca_send_power_pulse()
->   * addressed reviewer comments.
-
-Please make sure to include reviewers on CC when resending, and as
-someone else already mentioned, be a bit more specific about what
-changes you actually made in response to the review feedback you
-received.
-
-> v1:
->  * initial patch
-> ---
->  drivers/bluetooth/hci_qca.c | 37 +++++++++++++------------------------
->  1 file changed, 13 insertions(+), 24 deletions(-)
+> Since commit 1455cf8dbfd0 ("driver core: emit uevents when
+> device is bound to a driver") the kernel started emitting
+> "bind" and "unbind" uevents which confuse the hid2hci
+> udev rules.
 > 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index f036c8f98ea3..f5dd323c1967 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1013,11 +1013,9 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
->  		hci_uart_set_baudrate(hu, speed);
->  }
->  
-> -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
-> +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
->  {
-> -	struct hci_uart *hu = hci_get_drvdata(hdev);
-> -	struct qca_data *qca = hu->priv;
-> -	struct sk_buff *skb;
-> +	int ret;
->  
->  	/* These power pulses are single byte command which are sent
->  	 * at required baudrate to wcn3990. On wcn3990, we have an external
-> @@ -1029,19 +1027,16 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
->  	 * save power. Disabling hardware flow control is mandatory while
->  	 * sending power pulses to SoC.
->  	 */
-> -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
-> -
-> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
-> -	if (!skb)
-> -		return -ENOMEM;
-> -
-> +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
->  	hci_uart_set_flow_control(hu, true);
-> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
+> The symptoms on an affected machine (Dell E5400 in my case)
+> include bluetooth devices not appearing and udev hogging
+> the cpu as it's busy processing a constant stream of these
+> "bind"+"unbind" uevents.
 
-You're still using 0 as a timeout here which is broken, as I already
-told you.
+What is causing a "stream" of bind and unbind events?  This only happens
+when a device is attached to a driver or removed from a driver, which is
+caused by something else happening.  This should not be a normal
+occurance, unless something odd is happening to your hardware?
 
-From 4.21 this will result in an indefinite timeout, but currently
-implies not to wait for a full write buffer to drain at all.
+thanks,
 
-As I also mentioned, you need to to make sure to call
-serdev_device_write_wakeup() in the write_wakup() path if you are going
-to use serdev_device_write() at all.
-
-Johan
+greg k-h
