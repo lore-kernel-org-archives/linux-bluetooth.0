@@ -2,154 +2,140 @@ Return-Path: <SRS0=1GGh=OO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68105C04EBF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 887B1C04EBF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:49:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F58D20892
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:46:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WtCItKIZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F58D20892
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 4CD73208E7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:49:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1544039366;
+	bh=S75QfcoRBleggQyU1suN9Y4s8+dMub0dnVnPHlFzMPc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=NJ0fHtZrYwWTk2tETKTU0FZkK1VC3ZyFnkYZ/cuo1dEK52dtBnULrmeCMEK8z3zjP
+	 ncWejmq9uqISSxvnIZA6vg/9+IDfRzbX+08Ohmo9RE6hSK0Fgj00DU0W+Q/thZS5kB
+	 aInTP+LaaHI6818OrSEUTxIKQY4ZlsORxzzgaMuY=
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CD73208E7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linuxfoundation.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727832AbeLETqo (ORCPT
+        id S1727943AbeLETtU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Dec 2018 14:46:44 -0500
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:35788 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727257AbeLETqn (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Dec 2018 14:46:43 -0500
-Received: by mail-lj1-f194.google.com with SMTP id x85-v6so19482131ljb.2;
-        Wed, 05 Dec 2018 11:46:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pECtvteeo7795cmfljqIf27awj6Ab3REDnb3qaExur0=;
-        b=WtCItKIZNRA9n2qD05ZW0dQe18cfOtSQjZaRIqeYsV2+nRkEj8KvBeMlwP9Mdmr6FC
-         Pgi73L/qgQcmrfJQy4u/8853siqol4I8p3m7XM+g/U1hNoYklcFAvpaTtroaBEAqOUjp
-         aEqzdL/mkzH0Rqprj3Hr1FIWI0ySgHbS789aTiMNgwAtl0VJVQODQAx3SNWrPlrrVVOT
-         20yv42aY1IqaOAWhx0hnQrRf8v836feJzR3DWyAPvrYfWyjubLi/c8ByuJBUorSMnND6
-         YHPoYrpyIBA+buBwSe7SVZNOQuWv9Ulw4h+dJ9vXcwzl9cCR/oMBqZKyvzm2RWD+5D3E
-         PvlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pECtvteeo7795cmfljqIf27awj6Ab3REDnb3qaExur0=;
-        b=SlQEgaR+lq0Paorhg41ypFk6uIR3SIOOTKdOBW/EXVcBC/YhIZb+OTDMiEK1rF3V/f
-         dWvehCDgaofg5M7IeDZVLvRJoLE2doUlulvzcEql+bw2O4Q09K77VYj1SYk8TlVL76Mu
-         R4UMuwRdixZDl8ZDeCsz6nBrufqyjT7jwzc3RUI3Rg+hq7BZwtcWqPQr30uE+BlCCwEq
-         DIJH8jiBz84sSoOjMVWDZh9ShQV9Bbejreua03+xXVXWPY9I/mEMU0pOZbdRcOe8AFpf
-         vv7njv4ZOBOYgNHBa+sCwydQQZlh7qLMLjgOSqyZMHlDmYfdgceYAzRvidDpjeKh3Gsh
-         VIWQ==
-X-Gm-Message-State: AA+aEWbZ+5FTwDwUyd2rA2tyzjlL1l8bBe+eKPya9vjDDMIVPdLnpUxN
-        g1adoUysHAlimYa+co5spokjuJNLq6E1fw==
-X-Google-Smtp-Source: AFSGD/VkAQERmgoJ5BFgUKqcvZh0RhI2QzDOrMXI7lJCrjz2wMs1Pk2cGY4TvO12AYsdAP6DhK8Hfg==
-X-Received: by 2002:a2e:5654:: with SMTP id k81-v6mr16131640ljb.48.1544039201494;
-        Wed, 05 Dec 2018 11:46:41 -0800 (PST)
-Received: from localhost.localdomain ([2a02:a315:5445:5300:41e8:260c:942a:b736])
-        by smtp.googlemail.com with ESMTPSA id u15-v6sm4284096lja.63.2018.12.05.11.46.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 05 Dec 2018 11:46:40 -0800 (PST)
-From:   =?UTF-8?q?Pawe=C5=82=20Chmiel?= <pawel.mikolaj.chmiel@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonathan Bakker <xc-racer2@live.ca>,
-        =?UTF-8?q?Pawe=C5=82=20Chmiel?= <pawel.mikolaj.chmiel@gmail.com>
-Subject: [PATCH] Bluetooth: hci_bcm: Handle specific unknown packets after firmware loading
-Date:   Wed,  5 Dec 2018 20:45:38 +0100
-Message-Id: <20181205194538.8074-1-pawel.mikolaj.chmiel@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Wed, 5 Dec 2018 14:49:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57006 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727523AbeLETtT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 Dec 2018 14:49:19 -0500
+Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2A37620892;
+        Wed,  5 Dec 2018 19:49:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1544039358;
+        bh=S75QfcoRBleggQyU1suN9Y4s8+dMub0dnVnPHlFzMPc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HRMEK2bcwTnlg/mBuwysmfwu9+mDenVDogynr3x49mPVRwVUORlNltf0XgCXcbQju
+         mF+fBJaHbr0B3+ip5wzPSNGwoOsODW89/7WzKAvCSR1f8+HYcf8NE12GaiJHpLJJ6y
+         J/hKcyi1me30lsrEZHwJfvm3ratGyoilsysE8zoQ=
+Date:   Wed, 5 Dec 2018 20:49:16 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Kay Sievers <kay.sievers@vrfy.org>,
+        Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 BlueZ] hid2hci: Fix udev rules for linux-4.14+
+Message-ID: <20181205194916.GA20809@kroah.com>
+References: <20180620164240.6535-1-ville.syrjala@linux.intel.com>
+ <20181204204117.14964-1-ville.syrjala@linux.intel.com>
+ <20181205070621.GE16346@kroah.com>
+ <20181205154032.GT9144@intel.com>
+ <20181205192036.GB434@kroah.com>
+ <20181205194051.GU9144@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181205194051.GU9144@intel.com>
+User-Agent: Mutt/1.11.0 (2018-11-25)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Jonathan Bakker <xc-racer2@live.ca>
+On Wed, Dec 05, 2018 at 09:40:51PM +0200, Ville Syrj‰l‰ wrote:
+> On Wed, Dec 05, 2018 at 08:20:36PM +0100, Greg Kroah-Hartman wrote:
+> > On Wed, Dec 05, 2018 at 05:40:32PM +0200, Ville Syrj‰l‰ wrote:
+> > > On Wed, Dec 05, 2018 at 08:06:21AM +0100, Greg Kroah-Hartman wrote:
+> > > > On Tue, Dec 04, 2018 at 10:41:17PM +0200, Ville Syrjala wrote:
+> > > > > From: Ville Syrj‰l‰ <ville.syrjala@linux.intel.com>
+> > > > > 
+> > > > > Since commit 1455cf8dbfd0 ("driver core: emit uevents when
+> > > > > device is bound to a driver") the kernel started emitting
+> > > > > "bind" and "unbind" uevents which confuse the hid2hci
+> > > > > udev rules.
+> > > > > 
+> > > > > The symptoms on an affected machine (Dell E5400 in my case)
+> > > > > include bluetooth devices not appearing and udev hogging
+> > > > > the cpu as it's busy processing a constant stream of these
+> > > > > "bind"+"unbind" uevents.
+> > > > 
+> > > > What is causing a "stream" of bind and unbind events?  This only happens
+> > > > when a device is attached to a driver or removed from a driver, which is
+> > > > caused by something else happening.
+> > > 
+> > > Not sure if it's just due to this thing causing devices to
+> > > appear/disappear during bind/unbind events or what.
+> > 
+> > Someone has to be telling the kernel to bind/unbind from a driver to
+> > a device, it doesn't do it on its own.  Look at your other rules/scripts
+> > for that.
+> > 
+> > Also note that the kernel has been doing this for over a year now (since
+> > 4.l4), what just happened in 4.19 to cause this to be an issue?
+> 
+> It became an issue for me after I got a machine that suffers from
+> this. The regression has been present ever since commit 1455cf8dbfd0
+> ("driver core: emit uevents when device is bound to a driver").
+> 
+> You need a Dell E5400 or something similar to see it since those
+> have these magic bluetooth devices or whatever.
 
-The Broadcom controller on aries S5PV210 boards sends out a couple of
-unknown packets after the firmware is loaded.  This will cause
-logging of errors such as:
-	Bluetooth: hci0: Frame reassembly failed (-84)
+What does the kernel log say is going on?  Is the device "bouncing" from
+being added/removed from the system all the time?
 
-This is probably also the case with other boards, as there are related
-Android userspace patches for custom ROMs such as
-https://review.lineageos.org/#/c/LineageOS/android_system_bt/+/142721/
-Since this appears to be intended behaviour, treated them as diagnostic
-packets.
+What makes this system "magic"?
 
-Note that this is another variant of commit 01d5e44ace8a 
-("Bluetooth: hci_bcm: Handle empty packet after firmware loading")
+> > > > This should not be a normal
+> > > > occurance, unless something odd is happening to your hardware?
+> > > 
+> > > It's not specific to my hardware. Lot's of people are affected.
+> > > See eg. 
+> > > https://bugs.launchpad.net/ubuntu/+source/systemd/+bug/1759836
+> > > 
+> > > Acutally looking through that bug it seems someone else noticed
+> > > hid2hci failing lot in the logs. So maybe it's just that we already
+> > > switched the mode during "add", and then we try to redo the same
+> > > thing during "bind" which fails, and that then causes and unbind?
+> > 
+> > You have to manually unbind the device, the kernel does not do that.  So
+> > perhaps you have a broken udev rule somewhere else that would do
+> > something odd like unbind/bind?
+> > 
+> > I don't see this happening on my systems, but hey, I know better than to
+> > run Ubuntu :)
+> 
+> As do I. And you don't see it because you don't have the right
+> hardware.
 
-Signed-off-by: Jonathan Bakker <xc-racer2@live.ca>
-Signed-off-by: Pawe≈Ç Chmiel <pawel.mikolaj.chmiel@gmail.com>
----
- drivers/bluetooth/hci_bcm.c | 32 +++++++++++++++++++++++++++-----
- 1 file changed, 27 insertions(+), 5 deletions(-)
+Fair enough, what makes my hardware different from yours?
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index ddbd8c6a0ceb..ae271836dc26 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -51,6 +51,12 @@
- #define BCM_LM_DIAG_PKT 0x07
- #define BCM_LM_DIAG_SIZE 63
- 
-+#define BCM_UNKNOWN_PKT 0x31
-+#define BCM_UNKNOWN_SIZE 0
-+
-+#define BCM_UNKNOWN2_PKT 0x34
-+#define BCM_UNKNOWN2_SIZE 0
-+
- #define BCM_AUTOSUSPEND_DELAY	5000 /* default autosleep delay */
- 
- /**
-@@ -561,12 +567,28 @@ static int bcm_setup(struct hci_uart *hu)
- 	.lsize = 0, \
- 	.maxlen = BCM_NULL_SIZE
- 
-+#define BCM_RECV_UNKNOWN \
-+	.type = BCM_UNKNOWN_PKT, \
-+	.hlen = BCM_UNKNOWN_SIZE, \
-+	.loff = 0, \
-+	.lsize = 0, \
-+	.maxlen = BCM_UNKNOWN_SIZE
-+
-+#define BCM_RECV_UNKNOWN2 \
-+	.type = BCM_UNKNOWN2_PKT, \
-+	.hlen = BCM_UNKNOWN2_SIZE, \
-+	.loff = 0, \
-+	.lsize = 0, \
-+	.maxlen = BCM_UNKNOWN2_SIZE
-+
- static const struct h4_recv_pkt bcm_recv_pkts[] = {
--	{ H4_RECV_ACL,      .recv = hci_recv_frame },
--	{ H4_RECV_SCO,      .recv = hci_recv_frame },
--	{ H4_RECV_EVENT,    .recv = hci_recv_frame },
--	{ BCM_RECV_LM_DIAG, .recv = hci_recv_diag  },
--	{ BCM_RECV_NULL,    .recv = hci_recv_diag  },
-+	{ H4_RECV_ACL,       .recv = hci_recv_frame },
-+	{ H4_RECV_SCO,       .recv = hci_recv_frame },
-+	{ H4_RECV_EVENT,     .recv = hci_recv_frame },
-+	{ BCM_RECV_LM_DIAG,  .recv = hci_recv_diag  },
-+	{ BCM_RECV_NULL,     .recv = hci_recv_diag  },
-+	{ BCM_RECV_UNKNOWN,  .recv = hci_recv_diag  },
-+	{ BCM_RECV_UNKNOWN2, .recv = hci_recv_diag  },
- };
- 
- static int bcm_recv(struct hci_uart *hu, const void *data, int count)
--- 
-2.17.1
+thanks,
 
+greg k-h
