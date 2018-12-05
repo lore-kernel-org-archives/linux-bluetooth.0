@@ -2,112 +2,96 @@ Return-Path: <SRS0=1GGh=OO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9342CC04EBF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 12:10:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D66C04EBF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 15:40:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E89720850
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 12:10:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OeExl23O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E89720850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 3B48220878
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 15:40:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B48220878
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727484AbeLEMKM (ORCPT
+        id S1728069AbeLEPki (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Dec 2018 07:10:12 -0500
-Received: from mail-ot1-f50.google.com ([209.85.210.50]:37987 "EHLO
-        mail-ot1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727339AbeLEMKM (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Dec 2018 07:10:12 -0500
-Received: by mail-ot1-f50.google.com with SMTP id e12so18406657otl.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Dec 2018 04:10:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=ueBQlxcrbASqUOhcHRsoRzvg2pOyMlOEtu5cbqND82E=;
-        b=OeExl23OVyQZdWOmD/css9B4ja+H7KTWg+BEOGrQRqrF234XJ7dWlcbbUfz1pkTwKF
-         HxNL9N5boY32gL4lwpgp61HzqSc541hgwsDtO8tWetuk5O7Kio1LY6QeqPx43pAoLYiX
-         0zpucNTdZ85+4rVgV1G5HgifqyxGN4H4MTY1PmILDxf252PZFpkwoNigv3/d74dUWK1o
-         MD7FZCBPOUd0yYO+RcBzJEbBcx7Bg3E7q0bIvP7JTtHFnngbBaJyvB6OB7uqJe3ClnkO
-         D3gioI3X+OZO92sp4a2QpxlXNpyxdHlCL/1Y911OOn+gYZIEBqDr2iPNkCzHWojx8Ph6
-         MB7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=ueBQlxcrbASqUOhcHRsoRzvg2pOyMlOEtu5cbqND82E=;
-        b=mtR7TbNa7bxlewyrrmXgsyuuGAO3gtDO1sDqkiShQQgvWFKV6IRHZk6+YnTlBzPv+y
-         fa14qBTGSLtHOgUH+0CIYTdrkej2JjZvBKJmN24cWhr5UMmkdYvpRm45S4Lvp66+B3Nr
-         n2Rgdl+OIDy4w/zDFHl5fo6aCg9EuCy1ui++rVRHCvFxX/x9J7BdBHwHJ9+lmD0Eqhlp
-         Tg9hRrBZFqUQvIn+zxHaihsCwQszZnY8BJkHHbWPG5vjSZD8NVWyw8QB5roqVHkdQK36
-         kuEdpw14P6xJqtK8M+AkQbNoKsOrcwIBhW1+HbViWN/ZcFrD0fq2G0NGKfXv5IEC3/50
-         N1Zw==
-X-Gm-Message-State: AA+aEWZUfj2ij3sAEETrwhnZ+vCJMfVjp6jsk/OpixnsL83AmAk0uX0m
-        LYnIxQPW/arjx1t2B88jdvzbC33oXIQ74XVjAE3G2x60
-X-Google-Smtp-Source: AFSGD/VubMX4FmYR+e7d+FBCcKLfxop6hH2tW7eKO48glAb8coNQQIt3lHNmUm9Ks5zAE1d6WHbHj/uCzT80UHQYT8c=
-X-Received: by 2002:a9d:7749:: with SMTP id t9mr16060032otl.342.1544011811726;
- Wed, 05 Dec 2018 04:10:11 -0800 (PST)
+        Wed, 5 Dec 2018 10:40:38 -0500
+Received: from mga11.intel.com ([192.55.52.93]:16335 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727309AbeLEPkh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 Dec 2018 10:40:37 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Dec 2018 07:40:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,318,1539673200"; 
+   d="scan'208";a="115880489"
+Received: from stinkbox.fi.intel.com (HELO stinkbox) ([10.237.72.174])
+  by orsmga002.jf.intel.com with SMTP; 05 Dec 2018 07:40:33 -0800
+Received: by stinkbox (sSMTP sendmail emulation); Wed, 05 Dec 2018 17:40:32 +0200
+Date:   Wed, 5 Dec 2018 17:40:32 +0200
+From:   Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Kay Sievers <kay.sievers@vrfy.org>,
+        Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 BlueZ] hid2hci: Fix udev rules for linux-4.14+
+Message-ID: <20181205154032.GT9144@intel.com>
+References: <20180620164240.6535-1-ville.syrjala@linux.intel.com>
+ <20181204204117.14964-1-ville.syrjala@linux.intel.com>
+ <20181205070621.GE16346@kroah.com>
 MIME-Version: 1.0
-References: <20181204194429.13829-1-luiz.dentz@gmail.com>
-In-Reply-To: <20181204194429.13829-1-luiz.dentz@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 5 Dec 2018 14:09:59 +0200
-Message-ID: <CABBYNZ+3PmJv98iY7UHLZJTS5rquaJeh71DsdtAFuyyqDkoOwQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] gatt: Register GATT and GAP services as SDP records
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181205070621.GE16346@kroah.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+On Wed, Dec 05, 2018 at 08:06:21AM +0100, Greg Kroah-Hartman wrote:
+> On Tue, Dec 04, 2018 at 10:41:17PM +0200, Ville Syrjala wrote:
+> > From: Ville Syrjälä <ville.syrjala@linux.intel.com>
+> > 
+> > Since commit 1455cf8dbfd0 ("driver core: emit uevents when
+> > device is bound to a driver") the kernel started emitting
+> > "bind" and "unbind" uevents which confuse the hid2hci
+> > udev rules.
+> > 
+> > The symptoms on an affected machine (Dell E5400 in my case)
+> > include bluetooth devices not appearing and udev hogging
+> > the cpu as it's busy processing a constant stream of these
+> > "bind"+"unbind" uevents.
+> 
+> What is causing a "stream" of bind and unbind events?  This only happens
+> when a device is attached to a driver or removed from a driver, which is
+> caused by something else happening.
 
-On Tue, Dec 4, 2018 at 9:44 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This ensures that GATT and GAP services can be discover over SDP as well
-> as over GATT.
-> ---
->  src/gatt-database.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index c31afa0e9..2c2f035b1 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -847,6 +847,8 @@ static void populate_gap_service(struct btd_gatt_database *database)
->                                                         NULL, database);
->
->         gatt_db_service_set_active(service, true);
-> +
-> +       database_add_record(database, service);
->  }
->
->  static void gatt_ccc_read_cb(struct gatt_db_attribute *attrib,
-> @@ -1071,6 +1073,8 @@ static void populate_gatt_service(struct btd_gatt_database *database)
->                                                                         NULL);
->
->         gatt_db_service_set_active(service, true);
-> +
-> +       database_add_record(database, service);
->  }
->
->  static void register_core_services(struct btd_gatt_database *database)
-> --
-> 2.17.2
+Not sure if it's just due to this thing causing devices to
+appear/disappear during bind/unbind events or what.
 
-Applied.
+> This should not be a normal
+> occurance, unless something odd is happening to your hardware?
+
+It's not specific to my hardware. Lot's of people are affected.
+See eg. 
+https://bugs.launchpad.net/ubuntu/+source/systemd/+bug/1759836
+
+Acutally looking through that bug it seems someone else noticed
+hid2hci failing lot in the logs. So maybe it's just that we already
+switched the mode during "add", and then we try to redo the same
+thing during "bind" which fails, and that then causes and unbind?
+Dunno, udev is beyond me.
 
 -- 
-Luiz Augusto von Dentz
+Ville Syrjälä
+Intel
