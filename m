@@ -2,95 +2,121 @@ Return-Path: <SRS0=1GGh=OO=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA03C04EB9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 17:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDFE4C04EB9
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:14:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E53B82084C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 17:41:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E53B82084C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id A75AA20850
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Dec 2018 19:14:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A75AA20850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bakke.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727996AbeLERld convert rfc822-to-8bit (ORCPT
+        id S1727763AbeLETN6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Dec 2018 12:41:33 -0500
-Received: from mga06.intel.com ([134.134.136.31]:48097 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727592AbeLERld (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Dec 2018 12:41:33 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Dec 2018 09:41:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,318,1539673200"; 
-   d="scan'208";a="116253101"
-Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
-  by orsmga001.jf.intel.com with ESMTP; 05 Dec 2018 09:41:32 -0800
-Received: from orsmsx153.amr.corp.intel.com (10.22.226.247) by
- ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Wed, 5 Dec 2018 09:41:32 -0800
-Received: from orsmsx114.amr.corp.intel.com ([169.254.8.128]) by
- ORSMSX153.amr.corp.intel.com ([169.254.12.54]) with mapi id 14.03.0415.000;
- Wed, 5 Dec 2018 09:41:31 -0800
-From:   "Ghorai, Sukumar" <sukumar.ghorai@intel.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Rajat Jain <rajatja@google.com>
-CC:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Dmitry Torokhov" <dtor@chromium.org>,
-        Alex Hung <alex.hung@canonical.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "rajatxjain@gmail.com" <rajatxjain@gmail.com>,
-        "dtor@google.com" <dtor@google.com>,
-        "Hegde, Raghuram" <raghuram.hegde@intel.com>,
-        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
-Subject: RE: [PATCH v3 1/5] usb: split code locating ACPI companion into
- port and device
-Thread-Topic: [PATCH v3 1/5] usb: split code locating ACPI companion into
- port and device
-Thread-Index: AQHUgfT7UkY6xWQeNEOR6zSp3GNaBKVwfRIA///8W1A=
-Date:   Wed, 5 Dec 2018 17:41:30 +0000
-Message-ID: <D73ECEF0C711E34A8F972E4B87F540058FBCF24A@ORSMSX114.amr.corp.intel.com>
-References: <20181117010748.24347-1-rajatja@google.com>
- <20181121235020.29461-1-rajatja@google.com> <20181205093228.GA1817@kroah.com>
-In-Reply-To: <20181205093228.GA1817@kroah.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiYmVlNGU4OGItYmQ5OC00MTMyLTg0NGQtZWFlYWE2ZjBmN2IzIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoibHEwMUI3RzlEc0dDUHhPTkFlQ0xBNjl0K3pYbTNMVlJ4VWNDdzk3bVB1bXpqY1NtZWtNZWRqSFJZNTdOOFNHMyJ9
-x-ctpclassification: CTP_NT
-x-originating-ip: [10.22.254.140]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Wed, 5 Dec 2018 14:13:58 -0500
+Received: from smtprelay0067.hostedemail.com ([216.40.44.67]:40210 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727606AbeLETN6 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 Dec 2018 14:13:58 -0500
+X-Greylist: delayed 529 seconds by postgrey-1.27 at vger.kernel.org; Wed, 05 Dec 2018 14:13:57 EST
+Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
+        by smtpgrave02.hostedemail.com (Postfix) with ESMTP id 3FB6A18020DB3;
+        Wed,  5 Dec 2018 19:05:09 +0000 (UTC)
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay08.hostedemail.com (Postfix) with ESMTP id 26B75182CF66B;
+        Wed,  5 Dec 2018 19:05:08 +0000 (UTC)
+X-Session-Marker: 6461674062616B6B652E636F6D
+X-HE-Tag: coil62_663d10cb1d15b
+X-Filterd-Recvd-Size: 3591
+Received: from [192.168.6.106] (219.92-221-209.customer.lyse.net [92.221.209.219])
+        (Authenticated sender: dag@bakke.com)
+        by omf15.hostedemail.com (Postfix) with ESMTPA;
+        Wed,  5 Dec 2018 19:05:01 +0000 (UTC)
+Subject: Re: [PATCH v2 BlueZ] hid2hci: Fix udev rules for linux-4.14+
+To:     =?UTF-8?B?VmlsbGUgU3lyasOkbMOk?= <ville.syrjala@linux.intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Kay Sievers <kay.sievers@vrfy.org>,
+        =?UTF-8?Q?Zbigniew_J=c4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
+        systemd-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org
+References: <20180620164240.6535-1-ville.syrjala@linux.intel.com>
+ <20181204204117.14964-1-ville.syrjala@linux.intel.com>
+ <20181205070621.GE16346@kroah.com> <20181205154032.GT9144@intel.com>
+From:   Dag B <dag@bakke.com>
+Message-ID: <c2f9f862-0bf1-be6b-ad9f-8c375d4b8ff0@bakke.com>
+Date:   Wed, 5 Dec 2018 20:09:35 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
 MIME-Version: 1.0
+In-Reply-To: <20181205154032.GT9144@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
->On Wed, Nov 21, 2018 at 03:50:16PM -0800, Rajat Jain wrote:
->> From: Dmitry Torokhov <dtor@chromium.org>
->>
->> In preparation for handling embedded USB devices let's split
->> usb_acpi_find_companion() into usb_acpi_find_companion_for_device()
->> and usb_acpi_find_companion_for_port().
->>
->> Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
->> Signed-off-by: Rajat Jain <rajatja@google.com>
->
->Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-Tested-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
+
+On 05.12.2018 16:40, Ville Syrjälä wrote:
+> On Wed, Dec 05, 2018 at 08:06:21AM +0100, Greg Kroah-Hartman wrote:
+>> On Tue, Dec 04, 2018 at 10:41:17PM +0200, Ville Syrjala wrote:
+>>> From: Ville Syrjälä <ville.syrjala@linux.intel.com>
+>>>
+>>> Since commit 1455cf8dbfd0 ("driver core: emit uevents when
+>>> device is bound to a driver") the kernel started emitting
+>>> "bind" and "unbind" uevents which confuse the hid2hci
+>>> udev rules.
+>>>
+>>> The symptoms on an affected machine (Dell E5400 in my case)
+>>> include bluetooth devices not appearing and udev hogging
+>>> the cpu as it's busy processing a constant stream of these
+>>> "bind"+"unbind" uevents.
+>> What is causing a "stream" of bind and unbind events?  This only happens
+>> when a device is attached to a driver or removed from a driver, which is
+>> caused by something else happening.
+> Not sure if it's just due to this thing causing devices to
+> appear/disappear during bind/unbind events or what.
+>
+>> This should not be a normal
+>> occurance, unless something odd is happening to your hardware?
+> It's not specific to my hardware. Lot's of people are affected.
+> See eg.
+> https://bugs.launchpad.net/ubuntu/+source/systemd/+bug/1759836
+>
+> Acutally looking through that bug it seems someone else noticed
+> hid2hci failing lot in the logs. So maybe it's just that we already
+> switched the mode during "add", and then we try to redo the same
+> thing during "bind" which fails, and that then causes and unbind?
+> Dunno, udev is beyond me.
+>
+>
+There is another bluetooth scenario where a cpu core peaks at 100%.
+This is when a bluetooth keyboard goes out to lunch/suspends/disappears.
+No idea if this is related to the original issue, asking forgiveness if 
+it is not.
+I have found it challenging to attract any attention to the problem, 
+despite it not being an entirely new or uncommon occurence.
+
+Google the following terms: bluetooth keyboard bluetoothd linux 100% cpu
+
+
+
+By chance, I discovered a supposed fix for this on github today. I have 
+not had the chance to test it (or if it even applies) yet:
+
+https://github.com/peak3d/bluez/commit/9cc3c1afd793e40b1a0cdc4a13e08b5e2575759e
+
+Could someone please shine a light on the sanity of this patch?
+
+
+
+Dag B
