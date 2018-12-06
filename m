@@ -5,65 +5,68 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE29C07E85
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 00:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 568ACC04EB9
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 00:00:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C28B2082B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 00:00:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19CCC2082B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 00:00:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ko2gOJn6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C28B2082B
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h4bZU3Gr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19CCC2082B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728851AbeLFAAj (ORCPT
+        id S1728865AbeLFAAm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Dec 2018 19:00:39 -0500
-Received: from mail-qk1-f176.google.com ([209.85.222.176]:43670 "EHLO
-        mail-qk1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728156AbeLFAAj (ORCPT
+        Wed, 5 Dec 2018 19:00:42 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:34481 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728156AbeLFAAl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Dec 2018 19:00:39 -0500
-Received: by mail-qk1-f176.google.com with SMTP id r71so13005855qkr.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Dec 2018 16:00:38 -0800 (PST)
+        Wed, 5 Dec 2018 19:00:41 -0500
+Received: by mail-qk1-f196.google.com with SMTP id a132so13045198qkg.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Dec 2018 16:00:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=ISI1T9x4C7DYp5le1zxUDJcWtskratwQokhhbruJrk8=;
-        b=ko2gOJn6XqIhm64DOAx9l13UOyB6e4sYVtWTLq5CfQNEc20H9kB7zdEDBymyURunJL
-         Nie//48tgy4Mr8dc8Uuoogs5oExPVFRkZQRtt+xF6Y72P+c92AD9ARfxwVSd66AozelA
-         RAcE1at7lIs3UQzUeIbBCC/X5wkZJV7KDlLYoZFfPNCPflRnjdbCAwtWnc+PD+zhZ8DE
-         0jKC7o3PjuoLyW2dnrjLvRP5gBBcRTfbfPmIu3hv/C9Fo4KceVH114Xp3kazOs7azuID
-         77LEwZ/GUPb2Y+njsecTCwN+GmIK5/CWyeNbCvR7bdrXnJHXXOClZUriusv9iCkRbBje
-         tH8w==
+        h=from:to:subject:date:message-id:in-reply-to:references;
+        bh=kN8SBxgTy5rkHxbhW0wEvipo+9NWA23vHviilRvmCus=;
+        b=h4bZU3Grm14HFKTPhkcvzrBI9c2Zidg6tRA11wnGXCfvpbmz0jkCf6i1m4qsDdW1mf
+         4VUaA00BPn2E256HB+mWWjAOePiX7W2u+F4s88OHJMhl1UIKYkLebMrxn2YkzufADmmb
+         0P0Awy/TjoltNQ/0nrnjkWeqJG/DqspwyjMJ6IpQt2popgttLtYZgdvrMzZWf3w3eTh1
+         sbB1jfmUlcrhB6B7NA0stxDiRO3NjToNclafWGbA61vb7XGiJbYC4vLUYSo26rE5Hzmm
+         p/p7jDN254wNRNTWN6B+l0geG/RJSrdJEYjlc4roBVMPKVnbyJ51AxWNXMFghiaVTQCx
+         jExA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=ISI1T9x4C7DYp5le1zxUDJcWtskratwQokhhbruJrk8=;
-        b=jWqC2YE0Z1JTygATBVeWwbfTHgtFCy1On/tWAJI/WbxStA2zSyhnnPpuZ4rjqJktQV
-         90ZooyaybLn9Tnn/iyapLnEhpxOxjh5YnofpDW8BvVsOd38S7XOuoRqol+5e20K4cOIg
-         a2uQP6KPgSDUbRhKeApIe/xatXhf8RNOD3EEzogdf82o0YUbgwMTYXRPx2lVJL5KpQRl
-         6vwFVt2AKSlK93YB5CeiFHp9QPsYRyW8IbSoKgSADyySAYMCWu4pmhyNy/VsrZgGLpSm
-         xOX7Mnp6XWf8u7142+NAYbGhwvhbve/GMob4SiTUBOCeuFAixHXojIo+7PfRnJUrgfEr
-         /qMg==
-X-Gm-Message-State: AA+aEWZxwExoKYETSYjfYWgE1P6GAqFOe0l/Ezi2egYQdf5UbuK+qDnk
-        +jyfH3RtBJ4sxmyJr4OaxBhbOpRzgk0=
-X-Google-Smtp-Source: AFSGD/V6SNlBsqUavSMNPH/UZaOljKXtIHBN1krSU0Gf03zfpE6CLjc+g3N07u1MK3n8bE3fdNbcQA==
-X-Received: by 2002:a37:744:: with SMTP id 65mr24305836qkh.260.1544054437956;
-        Wed, 05 Dec 2018 16:00:37 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references;
+        bh=kN8SBxgTy5rkHxbhW0wEvipo+9NWA23vHviilRvmCus=;
+        b=t+LkfDfWnE+S28HYJdw+1bO0Ej+RULlK89MWptRuNNUTjd/dwfvLqf2jh0sFGGaIN1
+         VOx19BpMbWBvtZpN7XUwlBzS3Qk0iMCeSwEXf+j503n8Q49Bp7zfYtKHHa0JJ8SroRxT
+         5Lum5ED0TsO8ffwPIIzXZYlcOZVPznV9rMZw1/8dkfX0J+MBCZF1cs+GoL0QeBjrcfLL
+         a3oVL+XQoiFlzi7LiJrSWXFXmSVtVjbzRLII9iNQSZdhB//ejzyXjZx+VI8eAjESYzy4
+         M/TOhW5AMe56RQEeWtFf5WFlQ/MfIW+enkEeatLyuMsQv7/tgsWKyLsjHPdcgQg6iglH
+         /XGg==
+X-Gm-Message-State: AA+aEWbZm4WlccItYlyh4KWG56mXMMzxAOfefDKRaxa1fMRimgC7xjWA
+        cPGL6MPAsZa6GYe0eBbxwYxZZYwIVpU=
+X-Google-Smtp-Source: AFSGD/X8/gATVQWpP+UkRhw3DLC7gHM1Ob8Ks/+y4jQ0gyVHSwKegdtKt9pfATPIJTZwVOI5ERqZTw==
+X-Received: by 2002:a37:2ec4:: with SMTP id u187mr24383416qkh.304.1544054439579;
+        Wed, 05 Dec 2018 16:00:39 -0800 (PST)
 Received: from localhost.localdomain ([189.23.210.178])
-        by smtp.gmail.com with ESMTPSA id f189sm12317109qkb.4.2018.12.05.16.00.36
+        by smtp.gmail.com with ESMTPSA id f189sm12317109qkb.4.2018.12.05.16.00.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 05 Dec 2018 16:00:37 -0800 (PST)
+        Wed, 05 Dec 2018 16:00:39 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] avrcp: Fix error creating media items
-Date:   Wed,  5 Dec 2018 21:00:32 -0300
-Message-Id: <20181206000033.14963-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] gdbus: Make sure the object path and interface are valid
+Date:   Wed,  5 Dec 2018 21:00:33 -0300
+Message-Id: <20181206000033.14963-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
+In-Reply-To: <20181206000033.14963-1-luiz.dentz@gmail.com>
+References: <20181206000033.14963-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -71,39 +74,38 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Don't use item name in the object since it would need to be properly
-escaped if the remote stack uses UID 0, instead just create the path
-using the object pointer even  though it is invalid to have 0 as UID:
+D-Bus object path and interface must be validate otherwise it can cause
+errors as follow:
 
-AVRCP 1.6.1, page 84:
-
-  'The value of UID=0x0 is a special value used only to request
-   the metadata for the currently playing media using the
-   GetElementAttributes command and shall not be used for any item
-   in a folder.'
+0  0xb7f67ab1 in __kernel_vsyscall ()
+1  0xb7ca1cc1 in raise (sig=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:64
+2  0xb7ca50ee in abort () at abort.c:92
+3  0xb7e30ba5 in _dbus_abort () at dbus-sysdeps.c:94
+4  0xb7e267a6 in _dbus_warn_check_failed (
+    format=0xb7e36cd4 "arguments to %s() were incorrect, assertion \"%s\" failed in file %s line %d.\nThis is normally a bug in some application using the D-Bus library.\n") at dbus-internals.c:290
+5  0xb7e16d9f in dbus_message_iter_append_basic (iter=0xbf864400, type=111,
+    value=0xd70940) at dbus-message.c:2586
+6  0x004fcdec in emit_interfaces_added (user_data=0xd70938)
+    at gdbus/object.c:574
 ---
- profiles/audio/player.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ gdbus/object.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 048f98f96..ac23f720b 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -1800,11 +1800,11 @@ static struct media_item *media_folder_create_item(struct media_player *mp,
- 	item->player = mp;
- 	item->uid = uid;
+diff --git a/gdbus/object.c b/gdbus/object.c
+index 617ab5eda..830175385 100644
+--- a/gdbus/object.c
++++ b/gdbus/object.c
+@@ -1346,6 +1346,10 @@ gboolean g_dbus_register_interface(DBusConnection *connection,
+ {
+ 	struct generic_data *data;
  
--	if (uid > 0)
-+	if (!uid && name[0] == '/')
-+		item->path = g_strdup_printf("%s%s", mp->path, name);
-+	else
- 		item->path = g_strdup_printf("%s/item%" PRIu64 "",
- 						folder->item->path, uid);
--	else
--		item->path = g_strdup_printf("%s%s", mp->path, name);
- 
- 	item->name = g_strdup(name);
- 	item->type = type;
++	if (!dbus_validate_path(path, NULL) ||
++				!dbus_validate_interface(name, NULL))
++		return FALSE;
++
+ 	data = object_path_ref(connection, path);
+ 	if (data == NULL)
+ 		return FALSE;
 -- 
 2.17.2
 
