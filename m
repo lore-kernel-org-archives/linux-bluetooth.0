@@ -2,112 +2,179 @@ Return-Path: <SRS0=vk22=OP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,URIBL_RHS_DOB autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 499A7C04EB8
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 09:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2530C04EB9
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 10:40:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 09E5E20892
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 09:18:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FBAB20989
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 10:40:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TtqAt8Sz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09E5E20892
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="brQgcnZr";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="V7i27NWm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FBAB20989
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727783AbeLFJST (ORCPT
+        id S1728482AbeLFKkJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Dec 2018 04:18:19 -0500
-Received: from mail-lj1-f172.google.com ([209.85.208.172]:44089 "EHLO
-        mail-lj1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727763AbeLFJST (ORCPT
+        Thu, 6 Dec 2018 05:40:09 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:58134 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727575AbeLFKkJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Dec 2018 04:18:19 -0500
-Received: by mail-lj1-f172.google.com with SMTP id k19-v6so20973395lji.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Dec 2018 01:18:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=OQ3t84dKnQ6B/RyERUTE1tKi0/46k3d4I8jDBoO572U=;
-        b=TtqAt8Sz5DX/njQbu9yqrFUbAO8WCvH/LikKREYpOurgQ7li0u2aDPKVuR4AmEh9JS
-         oIbAp7jouJcWJk0+YTUvX9pt+IpNkAjK3xDxYKM6p2thSpfP8rnvhOJkbRbH1ySGbGfK
-         BZmT4QPM3dOBTPkzFhWYOtgxrshOcv26d4mzkwkHttar6z57EY34tUd1NKhQfh4/LHCG
-         M7HVcaX3J0PvqujIG5vflLgyIFyDcru84iF3875Kymk8WoHr+VizcxStEoEsYi9Fvq3P
-         NW/qBHo6H9VSEm/LXZTd9ljhyc08xIaLLIQzXhlMNvoMOoelQac1QMvyohM8SonQBJcl
-         p/RQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=OQ3t84dKnQ6B/RyERUTE1tKi0/46k3d4I8jDBoO572U=;
-        b=FRxSLDKQWQlKX6Mp2W1KaFBAy6CWVP0naLcaXu9pfI+u5n2+w+tpGBSV9qe4M1mde4
-         3WD6vZuf18+fYZ1zh/OcOTTrMqFZIxb1qEVUHUFDOmUm4nMkSD+2okFMPUWA8eBoQZsM
-         YD0lg0vuNwPq6oeacToIjsKRvHMmrtyEKSq77Jg9mqUAvNlklWorpg400MPLAU6P+9VQ
-         fpdPduMyr4a9nNun/22C3YoSwD6XVmz4UiDSUGuueQrQsb+ldjaDx2FDnpC6SF51aZSn
-         6emI4Zw9EgLmOTkagay4n7/NdAVVJELGK4pCavh9I74DlagKfLMTJW0IWTQjBNp+uut+
-         OTcg==
-X-Gm-Message-State: AA+aEWapsaR6c+qZayoB4FQIemtuS6XAfuGVGo6Iaq/W5a0FjFjDkBzw
-        TWDpQUOj8DyFQZtXtu6M/7Q=
-X-Google-Smtp-Source: AFSGD/UZrXJwa+Pr02Qwj/M1gC1GH5yunJ2K0jKVSAgJOoVM85ITZjrrSE6HdTDzRC5AeUw4Y3SOpg==
-X-Received: by 2002:a2e:630a:: with SMTP id x10-v6mr17335697ljb.11.1544087896909;
-        Thu, 06 Dec 2018 01:18:16 -0800 (PST)
-Received: from jhedberg-mac01.home (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
-        by smtp.gmail.com with ESMTPSA id p77-v6sm4654092lja.0.2018.12.06.01.18.15
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Dec 2018 01:18:15 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: ELL changes breaking BlueZ tip?
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-In-Reply-To: <E2B14DEE-C3A1-435F-AEAF-ACBE239B76B8@holtmann.org>
-Date:   Thu, 6 Dec 2018 11:18:14 +0200
-Cc:     Brian Gix <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Von Dentz <luiz.dentz@gmail.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <2A17A357-6C9F-4632-B9D2-3132EC379EF6@gmail.com>
-References: <DEBB0CAA2616974FAE35E4B560B9A4375C13D7A5@ORSMSX103.amr.corp.intel.com>
- <E2B14DEE-C3A1-435F-AEAF-ACBE239B76B8@holtmann.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Thu, 6 Dec 2018 05:40:09 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 716ED607B5; Thu,  6 Dec 2018 10:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1544092808;
+        bh=fUivZL1s5upLZ6o4BY6b7ICJk+NquYmE+NS6SkUqvb0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=brQgcnZrc39UBOq3uo71BZ6Em/BpdDcNbzGA6x9z5dtn6zSZSYfHhOyCwtGPxoNLz
+         G/xb9qSuudDUSS+0TvGoKjx+wi8F171+/qL2u32dhfFB4QiR1AEM8WVkKmakqw5sQX
+         rn8Vo2XXcYJqyEm6W/6XMJLkDCTer5a/236GEKj4=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id E071460792;
+        Thu,  6 Dec 2018 10:40:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1544092807;
+        bh=fUivZL1s5upLZ6o4BY6b7ICJk+NquYmE+NS6SkUqvb0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=V7i27NWmde+SYh9gGSpWeqnVq3H4/HRcwjSy4AraCRD9fKuz5nQBLvrnJzHx1JMN0
+         b88B+LGnCyM7SBD/ET/D9QBWP3Q0NibBKLvFaYC41D9LeczkXYcK+H7dqH1WukB7t9
+         cdO7bKoRJxst3ldCmXpDVCdWSQ4N3oL63MxwRbCk=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 06 Dec 2018 16:10:07 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Johan Hovold <johan@kernel.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        Johan Hovold <jhovold@gmail.com>
+Subject: Re: [PATCH v3 1/4] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+In-Reply-To: <20181205062503.GG18087@localhost>
+References: <20181130150247.26294-1-bgodavar@codeaurora.org>
+ <20181130150247.26294-2-bgodavar@codeaurora.org>
+ <20181205062503.GG18087@localhost>
+Message-ID: <c9bcbaed89a18499fe42463b20367499@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Johan,
 
-> On 6 Dec 2018, at 10.19, Marcel Holtmann <marcel@holtmann.org> wrote:
->> I am getting significant compile errors trying to build bluez on the =
-master tip today, that seem to be related to new ELL external v internal =
-changes?
->>=20
->> Build environment: vanilla Fedora 28 with ELL version 0.15 installed
->>=20
->>=20
->> It starts out by complaining that there is no rule to build:
->> ell/util.c
->=20
-> please re-run ./bootstrap-configure and I would urge to use the =
-internal ELL following the description in README. Mind you that only =
-internal ELL related files are linked and build when either =
---enable-mesh or --enable-btpclient is selected.
+On 2018-12-05 11:55, Johan Hovold wrote:
+> On Fri, Nov 30, 2018 at 08:32:44PM +0530, Balakrishna Godavarthi wrote:
+>> wcn3990 requires a power pulse to turn ON/OFF along with
+>> regulators. Sometimes we are observing the power pulses are sent
+>> out with some time delay, due to queuing these commands. This is
+>> causing synchronization issues with chip, which intern delay the
+>> chip setup or may end up with communication issues.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>> v3:
+>>   * no change.
+>> v2:
+>>   * Updated function qca_send_power_pulse()
+>>   * addressed reviewer comments.
+> 
+> Please make sure to include reviewers on CC when resending, and as
+> someone else already mentioned, be a bit more specific about what
+> changes you actually made in response to the review feedback you
+> received.
+> 
 
-./bootstrap-configure && make does=E2=80=99t work for me either:
+[Bala]: sure will add and provide more info in version change history.
 
-  CC       ell/util.lo
-ell/util.c:27: error: "_GNU_SOURCE" redefined [-Werror]
- #define _GNU_SOURCE
-=20
-In file included from ell/util.c:24:
-./config.h:97: note: this is the location of the previous definition
- # define _GNU_SOURCE 1
+>> v1:
+>>  * initial patch
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 37 
+>> +++++++++++++------------------------
+>>  1 file changed, 13 insertions(+), 24 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index f036c8f98ea3..f5dd323c1967 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -1013,11 +1013,9 @@ static inline void host_set_baudrate(struct 
+>> hci_uart *hu, unsigned int speed)
+>>  		hci_uart_set_baudrate(hu, speed);
+>>  }
+>> 
+>> -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>> +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
+>>  {
+>> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+>> -	struct qca_data *qca = hu->priv;
+>> -	struct sk_buff *skb;
+>> +	int ret;
+>> 
+>>  	/* These power pulses are single byte command which are sent
+>>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+>> @@ -1029,19 +1027,16 @@ static int qca_send_power_pulse(struct hci_dev 
+>> *hdev, u8 cmd)
+>>  	 * save power. Disabling hardware flow control is mandatory while
+>>  	 * sending power pulses to SoC.
+>>  	 */
+>> -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+>> -
+>> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+>> -	if (!skb)
+>> -		return -ENOMEM;
+>> -
+>> +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
+>>  	hci_uart_set_flow_control(hu, true);
+>> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
+> 
+> You're still using 0 as a timeout here which is broken, as I already
+> told you.
+> 
 
+[Bala]: got the change now will update to timeout to non zero value.
 
-Johan=
+> From 4.21 this will result in an indefinite timeout, but currently
+> implies not to wait for a full write buffer to drain at all.
+> 
+> As I also mentioned, you need to to make sure to call
+> serdev_device_write_wakeup() in the write_wakup() path if you are going
+> to use serdev_device_write() at all.
+> 
+
+[Bala]: this where i am confused.
+         calling serdev_device_write is calling an wakeup internally. 
+below is the flow
+
+         ttyport_write_buf:
+               * calling serdev_device_write() will call write_buf() in 
+this call we are enabling bit "TTY_DO_WRITE_WAKEUP" and calling write()
+                 i.e. uart_write() where we call in start_tx. this will 
+go to the vendor specific write where in isr we call uart_write_wakeup()
+                 
+https://elixir.bootlin.com/linux/latest/source/drivers/tty/serial/qcom_geni_serial.c#L756
+
+         
+uart_write_wakeup()->ttyport_write_wakeup()->serdev_controller_write_wakeup()->hci_uart_write_wakeup()->hci_uart_tx_wakeup()
+
+         the above is flow when serdev_device_write() is called, it is 
+indirectly calling serdev_write_wakeup().
+
+         Why actual we need to call an serdev_write_wakeup() is this 
+wakeup related to the UART port or for the BT chip.
+
+> Johan
+
+-- 
+Regards
+Balakrishna.
