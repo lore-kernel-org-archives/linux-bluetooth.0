@@ -2,110 +2,83 @@ Return-Path: <SRS0=vk22=OP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 568ACC04EB9
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 00:00:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE38C04EB9
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 02:55:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 19CCC2082B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 00:00:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8A51214C1
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Dec 2018 02:55:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h4bZU3Gr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19CCC2082B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=nestlabs.com header.i=@nestlabs.com header.b="mizsaczL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8A51214C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nestlabs.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728865AbeLFAAm (ORCPT
+        id S1727804AbeLFCzG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Dec 2018 19:00:42 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:34481 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728156AbeLFAAl (ORCPT
+        Wed, 5 Dec 2018 21:55:06 -0500
+Received: from mail-it1-f179.google.com ([209.85.166.179]:55749 "EHLO
+        mail-it1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727514AbeLFCzF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Dec 2018 19:00:41 -0500
-Received: by mail-qk1-f196.google.com with SMTP id a132so13045198qkg.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Dec 2018 16:00:40 -0800 (PST)
+        Wed, 5 Dec 2018 21:55:05 -0500
+Received: by mail-it1-f179.google.com with SMTP id o19so24898663itg.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Dec 2018 18:55:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=kN8SBxgTy5rkHxbhW0wEvipo+9NWA23vHviilRvmCus=;
-        b=h4bZU3Grm14HFKTPhkcvzrBI9c2Zidg6tRA11wnGXCfvpbmz0jkCf6i1m4qsDdW1mf
-         4VUaA00BPn2E256HB+mWWjAOePiX7W2u+F4s88OHJMhl1UIKYkLebMrxn2YkzufADmmb
-         0P0Awy/TjoltNQ/0nrnjkWeqJG/DqspwyjMJ6IpQt2popgttLtYZgdvrMzZWf3w3eTh1
-         sbB1jfmUlcrhB6B7NA0stxDiRO3NjToNclafWGbA61vb7XGiJbYC4vLUYSo26rE5Hzmm
-         p/p7jDN254wNRNTWN6B+l0geG/RJSrdJEYjlc4roBVMPKVnbyJ51AxWNXMFghiaVTQCx
-         jExA==
+        d=nestlabs.com; s=google;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=pYmJeaALV1j5SXS1SQvjiq2rcRiEVrY0kLI4guT/2gU=;
+        b=mizsaczLN8FVIZuEvgHeAgDvEUrK506Bxe0SAXAKk82+tacWQV28Hema590XHGwRHD
+         zVfKGlSbdj1YeNzvYXPdlXV1PcPu6NX2hxtNs9sXo9nzjnaXXOI/sFtF8dLFT0cRwxqa
+         2n2cV+yMLDTOK/ht92wccgzuo8K5o6hrAQoqA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references;
-        bh=kN8SBxgTy5rkHxbhW0wEvipo+9NWA23vHviilRvmCus=;
-        b=t+LkfDfWnE+S28HYJdw+1bO0Ej+RULlK89MWptRuNNUTjd/dwfvLqf2jh0sFGGaIN1
-         VOx19BpMbWBvtZpN7XUwlBzS3Qk0iMCeSwEXf+j503n8Q49Bp7zfYtKHHa0JJ8SroRxT
-         5Lum5ED0TsO8ffwPIIzXZYlcOZVPznV9rMZw1/8dkfX0J+MBCZF1cs+GoL0QeBjrcfLL
-         a3oVL+XQoiFlzi7LiJrSWXFXmSVtVjbzRLII9iNQSZdhB//ejzyXjZx+VI8eAjESYzy4
-         M/TOhW5AMe56RQEeWtFf5WFlQ/MfIW+enkEeatLyuMsQv7/tgsWKyLsjHPdcgQg6iglH
-         /XGg==
-X-Gm-Message-State: AA+aEWbZm4WlccItYlyh4KWG56mXMMzxAOfefDKRaxa1fMRimgC7xjWA
-        cPGL6MPAsZa6GYe0eBbxwYxZZYwIVpU=
-X-Google-Smtp-Source: AFSGD/X8/gATVQWpP+UkRhw3DLC7gHM1Ob8Ks/+y4jQ0gyVHSwKegdtKt9pfATPIJTZwVOI5ERqZTw==
-X-Received: by 2002:a37:2ec4:: with SMTP id u187mr24383416qkh.304.1544054439579;
-        Wed, 05 Dec 2018 16:00:39 -0800 (PST)
-Received: from localhost.localdomain ([189.23.210.178])
-        by smtp.gmail.com with ESMTPSA id f189sm12317109qkb.4.2018.12.05.16.00.38
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 05 Dec 2018 16:00:39 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] gdbus: Make sure the object path and interface are valid
-Date:   Wed,  5 Dec 2018 21:00:33 -0300
-Message-Id: <20181206000033.14963-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20181206000033.14963-1-luiz.dentz@gmail.com>
-References: <20181206000033.14963-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=pYmJeaALV1j5SXS1SQvjiq2rcRiEVrY0kLI4guT/2gU=;
+        b=JyOxX5n3EjauU/NJqVhejDTWVUDnQBIwZo8fysWejeU753dzuFJagu08UrEAepP0PV
+         EIYwONPVaQisA9B8QSPFVgmrSBBBGHpUNVQcDdnXYOjAPI+WG1omI+4MvijS64gU6Ogt
+         na6WbXvO1TDs4aMMoJtVpLyvBFAhN1hFGuc28Z2qROxBAUnRcUFRt/92I+jgBsO2+pLj
+         p2CRTa0jNkUfsfPoYZMIWvUJPzSDcII8JYW/S2HjfKtRQXdRoMkiXux6SnWmEmePoIOq
+         8BwZysnteypG3rJ1SHiawVDD0T6/duCJkLoGqUHLjcV8t3TB7xKyHvmlQPpbqgYKZG/b
+         EbGg==
+X-Gm-Message-State: AA+aEWbOHu5MVy9WNISGk5ufytR18Ch008p8FOIdQyJRib9HNgoGd7OS
+        G6UAjddPM0nh/lWPfG3Q7JcCo0qN5588xNmEoPyLAAJwwSG8HA==
+X-Google-Smtp-Source: AFSGD/Xuhi46TKoyUXO+WsCdoHvsf3fO1UxaNmeQpikRSzStGoqudBKmUmVyl2gWstJZAFn/XaLfIBM6/y/hvzfOVsQ=
+X-Received: by 2002:a24:7954:: with SMTP id z81mr16120832itc.94.1544064904854;
+ Wed, 05 Dec 2018 18:55:04 -0800 (PST)
+MIME-Version: 1.0
+Reply-To: yunhanw@nestlabs.com
+From:   Yunhan Wang <yunhanw@nestlabs.com>
+Date:   Wed, 5 Dec 2018 18:54:53 -0800
+Message-ID: <CALvjcs9zQ3v9pW6_Sy-VJD4hiX2FDrnqV7xYUNkNGg6mVaoHKQ@mail.gmail.com>
+Subject: BLE advertisement re-enabling after ble connection goes away
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi, Luiz and Marcel
 
-D-Bus object path and interface must be validate otherwise it can cause
-errors as follow:
+May I have a question on ble behavior on BLE re-advertisement?
 
-0  0xb7f67ab1 in __kernel_vsyscall ()
-1  0xb7ca1cc1 in raise (sig=6) at ../nptl/sysdeps/unix/sysv/linux/raise.c:64
-2  0xb7ca50ee in abort () at abort.c:92
-3  0xb7e30ba5 in _dbus_abort () at dbus-sysdeps.c:94
-4  0xb7e267a6 in _dbus_warn_check_failed (
-    format=0xb7e36cd4 "arguments to %s() were incorrect, assertion \"%s\" failed in file %s line %d.\nThis is normally a bug in some application using the D-Bus library.\n") at dbus-internals.c:290
-5  0xb7e16d9f in dbus_message_iter_append_basic (iter=0xbf864400, type=111,
-    value=0xd70940) at dbus-message.c:2586
-6  0x004fcdec in emit_interfaces_added (user_data=0xd70938)
-    at gdbus/object.c:574
----
- gdbus/object.c | 4 ++++
- 1 file changed, 4 insertions(+)
+According to Bluetooth spec Vol. 3 (the host volume), 9.2.4.2, "The
+device shall remain in general discoverable mode until a connection is
+established or the Host terminates the mode."
 
-diff --git a/gdbus/object.c b/gdbus/object.c
-index 617ab5eda..830175385 100644
---- a/gdbus/object.c
-+++ b/gdbus/object.c
-@@ -1346,6 +1346,10 @@ gboolean g_dbus_register_interface(DBusConnection *connection,
- {
- 	struct generic_data *data;
- 
-+	if (!dbus_validate_path(path, NULL) ||
-+				!dbus_validate_interface(name, NULL))
-+		return FALSE;
-+
- 	data = object_path_ref(connection, path);
- 	if (data == NULL)
- 		return FALSE;
--- 
-2.17.2
+There is no description on re-enabling the advertising "after"
+disconnection, so the responsibility for re-enabling the advertising
+is bluez or kernel or application code? In other words, does kernel or
+bluez or application would re-enable the ble advertisement after ble
+disconnection happens?
 
+Thanks
+Best wishes
+Yunhan.
