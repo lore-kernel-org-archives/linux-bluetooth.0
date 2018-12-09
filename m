@@ -2,37 +2,37 @@ Return-Path: <SRS0=uF1k=OS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FA8DC07E85
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Dec 2018 18:44:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCA5C07E85
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Dec 2018 18:45:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C15CE20672
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Dec 2018 18:44:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15CE20672
+	by mail.kernel.org (Postfix) with ESMTP id 04CCA2054F
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Dec 2018 18:45:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04CCA2054F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726219AbeLISoI convert rfc822-to-8bit (ORCPT
+        id S1726194AbeLISp1 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Dec 2018 13:44:08 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:40230 "EHLO
+        Sun, 9 Dec 2018 13:45:27 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:40268 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726097AbeLISoI (ORCPT
+        by vger.kernel.org with ESMTP id S1726097AbeLISp1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Dec 2018 13:44:08 -0500
+        Sun, 9 Dec 2018 13:45:27 -0500
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 1D5EE2A171
-        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Dec 2018 18:44:08 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id C12EC2A187
+        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Dec 2018 18:45:26 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 108362A189; Sun,  9 Dec 2018 18:44:08 +0000 (UTC)
+        id B5D832A18B; Sun,  9 Dec 2018 18:45:26 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 201945] New: Not work bluetooth
-Date:   Sun, 09 Dec 2018 18:44:08 +0000
+Subject: [Bug 201945] Not work Bluetooth
+Date:   Sun, 09 Dec 2018 18:45:27 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
@@ -45,10 +45,10 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-201945-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: short_desc
+Message-ID: <bug-201945-62941-wXU3xPU5Gt@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-201945-62941@https.bugzilla.kernel.org/>
+References: <bug-201945-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -62,33 +62,11 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=201945
 
-            Bug ID: 201945
-           Summary: Not work bluetooth
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: Ubuntu 4.19.0-8.9-generic 4.19.6
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: caravena@gmail.com
-        Regression: No
+Cristian Aravena Romero (caravena@gmail.com) changed:
 
-Hello,
-
-Open bug in launchpad.net
-https://bugs.launchpad.net/bugs/1807608
-
-"I'm working with linux 4.19, and not work bluetooth. Not problem with linux
-4.18.20."
-
-Best regards,
---
-Cristian Aravena Romero (caravena)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+            Summary|Not work bluetooth          |Not work Bluetooth
 
 -- 
 You are receiving this mail because:
