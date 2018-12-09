@@ -1,83 +1,95 @@
-Return-Path: <SRS0=E4Bp=OR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=uF1k=OS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A6CEC04EB8
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Dec 2018 07:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FA8DC07E85
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Dec 2018 18:44:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FB7F20868
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Dec 2018 07:17:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="Qh6Ca4hB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB7F20868
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=augury.com
+	by mail.kernel.org (Postfix) with ESMTP id C15CE20672
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Dec 2018 18:44:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15CE20672
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bugzilla.kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726226AbeLHHRj (ORCPT
+        id S1726219AbeLISoI convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 8 Dec 2018 02:17:39 -0500
-Received: from mail-ua1-f54.google.com ([209.85.222.54]:39453 "EHLO
-        mail-ua1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726121AbeLHHRi (ORCPT
+        Sun, 9 Dec 2018 13:44:08 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:40230 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726097AbeLISoI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 8 Dec 2018 02:17:38 -0500
-Received: by mail-ua1-f54.google.com with SMTP id k10so2198409ual.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Dec 2018 23:17:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=augury.com; s=google;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=tjfP4zvCF0qwaLJdcZUbVnE2NSELYUVwl/poj5ItwfQ=;
-        b=Qh6Ca4hBys8E3rIEZmCUQqOJtGK6pD5sOLpNXXC7F7yV28WtZ7XR1QxpBqjx/UB2b0
-         kzQYTOqGKMRtpnN3vwkOrvblrFT+KprIxFLB5PCnAMt5fsDv/+Aa6fHD3ph65gIhZn48
-         WNbHG4hqD7QQajILqb9CskiQDRltlZao2dvFM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=tjfP4zvCF0qwaLJdcZUbVnE2NSELYUVwl/poj5ItwfQ=;
-        b=KxyvlyQwcKTr2mE/oJVj/0RHnSaBNDSyI6WuZyC1RbJK8CRyLoBcAtFAJEzDZigHe/
-         BDy19Vm98WkePUQgef9HosLDm5eP589PDN0pR7f9mONi3VIitKf+vKAhtmXziHK36aQo
-         hd4wnUZuGVfu9s3slTRvtJZaBfrZxrIkDJi/SfX1EK6x6nk69k9XbMItE5XOxEy8+ZkA
-         YC2o188UubFXd+YFT15xottEC+NYoyWvR2IuJV9Ppl6NfIPkt3Be6V/rnAjlDN3eo/8I
-         z0vKmCkrXhxfaZKvrl8E4wj2UJwin5ru+5uZYwiuSNLCPH6vTBKEZpnrBRkKkEtuD4qN
-         vaag==
-X-Gm-Message-State: AA+aEWYnZg9MKHEO7P2WWkmf/i3/pH8xNrUXkd7GjCOzLaCLNWCfPdNw
-        RXpZNjHmgfL9y2rO5/mHxWrj3hCjoyIM0mqz6M1Yv03n
-X-Google-Smtp-Source: AFSGD/XQHj98sIoS0NlWE6ZtvIv/0D7hk4KYDYwg/lRlIeGHIA7mANLJHusvGsdESzZ/qrx8FQMGLpPUW87/zisD2CY=
-X-Received: by 2002:ab0:3259:: with SMTP id r25mr2138330uan.108.1544253457532;
- Fri, 07 Dec 2018 23:17:37 -0800 (PST)
-MIME-Version: 1.0
-From:   Gal Ben Haim <gbenhaim@augury.com>
-Date:   Sat, 8 Dec 2018 09:17:26 +0200
-Message-ID: <CAHotPr9MSwoiFCFL8=8_L8V0t-6VU3LMk3KuPmt8tvX_nz5uEg@mail.gmail.com>
-Subject: Some ACL packets are missed
+        Sun, 9 Dec 2018 13:44:08 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 1D5EE2A171
+        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Dec 2018 18:44:08 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 108362A189; Sun,  9 Dec 2018 18:44:08 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 201945] New: Not work bluetooth
+Date:   Sun, 09 Dec 2018 18:44:08 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: caravena@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-201945-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-we send a relatively large stream of data (~160 kb) from peripherals
-via GATT notifications, multiple times per hour. occasionally (about
-once an hour per peripheral) we loose sync of our protocol between the
-central and peripheral.
-this seems to happen only in a system with lower performance (iMX7d).
+https://bugzilla.kernel.org/show_bug.cgi?id=201945
 
-we traced this to some GATT notifications that don't reach the
-application level, these are visible in `btmon`. we're using BlueZ
-5.50 (also tried to apply patches since the release due to required
-bug fixes). it happens both with with start_notitfy and
-acquire_notify.
+            Bug ID: 201945
+           Summary: Not work bluetooth
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: Ubuntu 4.19.0-8.9-generic 4.19.6
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: caravena@gmail.com
+        Regression: No
 
-we have another implementation of this transfer that is less stressful
-and streams 256 kb chunks with a pause for sending a command in the
-other direction for the next chunk and it has no issues. we also have
-an older implementation of the central application that uses HCI
-sockets and not bluetoothd/d-bus, which also has no issues.
+Hello,
 
-is it possible that in some occasions bluetoothd will skip
-notifications? how do I even start to debug/fix it ?
+Open bug in launchpad.net
+https://bugs.launchpad.net/bugs/1807608
+
+"I'm working with linux 4.19, and not work bluetooth. Not problem with linux
+4.18.20."
+
+Best regards,
+--
+Cristian Aravena Romero (caravena)
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
