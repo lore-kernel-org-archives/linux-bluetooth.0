@@ -1,73 +1,77 @@
-Return-Path: <SRS0=uF1k=OS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=6tYv=OT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.5 required=3.0 tests=BODY_SINGLE_WORD,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCA5C07E85
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Dec 2018 18:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2BB0C04EB8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Dec 2018 16:35:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 04CCA2054F
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Dec 2018 18:45:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04CCA2054F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bugzilla.kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 6524C204FD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Dec 2018 16:35:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kxkvChGu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6524C204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726194AbeLISp1 convert rfc822-to-8bit (ORCPT
+        id S1726912AbeLJQfh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Dec 2018 13:45:27 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:40268 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726097AbeLISp1 (ORCPT
+        Mon, 10 Dec 2018 11:35:37 -0500
+Received: from mail-it1-f173.google.com ([209.85.166.173]:52401 "EHLO
+        mail-it1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726261AbeLJQfh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Dec 2018 13:45:27 -0500
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id C12EC2A187
-        for <linux-bluetooth@vger.kernel.org>; Sun,  9 Dec 2018 18:45:26 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id B5D832A18B; Sun,  9 Dec 2018 18:45:26 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 201945] Not work Bluetooth
-Date:   Sun, 09 Dec 2018 18:45:27 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: caravena@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: short_desc
-Message-ID: <bug-201945-62941-wXU3xPU5Gt@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-201945-62941@https.bugzilla.kernel.org/>
-References: <bug-201945-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 10 Dec 2018 11:35:37 -0500
+Received: by mail-it1-f173.google.com with SMTP id g76so18257711itg.2;
+        Mon, 10 Dec 2018 08:35:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WASiI+LGr+j54QgtHqz/Mb0c0vmWaC6GIOI+FQCQgEU=;
+        b=kxkvChGu2Aa6vfGw4HJvvp6zTyflCwAqjvhF6wwpOw6/JW8yY6WlK5oFE9bGm9U1A+
+         fI7vl4jWTnqAB/QqRaQnq/bKOsZCEZ29cokg9LV+FjIEIiEkfBbbVsQRRfHbMyOSWzPX
+         +cRU8c3nVaMKvHgA5FhmUHiw4UGGnT78XBKmOMqKpt2AwvPymF0kJDKr1GkBobYcilW4
+         8Tdjli9JlznjftkaZpda8fz5CAwTcCb/+el/xwPKQVMbMvopjboU29o4BcyaiYujNMm/
+         OKkIPdDFX74TYehAMwPuAzV/yCQ0JjNQth2+8tlEXSmnv9kzrcfqxEtrD2yZnyYToDBj
+         Mzsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WASiI+LGr+j54QgtHqz/Mb0c0vmWaC6GIOI+FQCQgEU=;
+        b=gjcYWohWYOJp7ppDiLwyqo/jV1HegNTeItOaynNGn0v88Qoz3r9loVEVWQYIQYHK3+
+         vvGwPmiX255lLKa9LfZyiKbcgqrnZsDrOTstP04mq0lK5jhYE+tZW5QfJakzSjhVcDIy
+         H7oqhxBekdXz7m/LuO1QXxqyy4p5j2/uFaWFOHQ1BEEJ3TSSOTtdmH7TDZsf5TvVMFQG
+         0mnBF8FKmE61aNYf4E3vUKSgp+fP6CmkY+GFS3GFHAb7ORTGE4tQ9MoKFufUUzU7Usbo
+         xEwVxWEOJgMbgrDtdYmhm/dG4KsLuCBY1LBqlURKs2CXhWpWil8e+GG7ADfZU9wMeJ45
+         RfjA==
+X-Gm-Message-State: AA+aEWbW3x0MZVys31StE6eCAanFQTfRmCM0v6u0si9tJ51lITihrAgN
+        RVFTpL9BkaOBqLhL9uvCggJZvNSkfbaiQt9Mst4=
+X-Google-Smtp-Source: AFSGD/X7bZD0Qh6SURlHuPH2ln+cCafGj7e468wEoHMRMUGHYM9sPPPgOQET6IiEpN+5IioDR/fdWqLUC/YDWE5ySlY=
+X-Received: by 2002:a24:648f:: with SMTP id t137mr11220288itc.95.1544459736033;
+ Mon, 10 Dec 2018 08:35:36 -0800 (PST)
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+References: <20181105145619.6395-1-tiny.windzz@gmail.com>
+In-Reply-To: <20181105145619.6395-1-tiny.windzz@gmail.com>
+From:   Frank Lee <tiny.windzz@gmail.com>
+Date:   Tue, 11 Dec 2018 00:35:26 +0800
+Message-ID: <CAEExFWs0h_fxgJsJCDJdY7uCo3gWvNFSvuozMA0M617+=mULOw@mail.gmail.com>
+Subject: Re: [PATCH] net/bluetooth: Change to use DEFINE_SHOW_ATTRIBUTE macro
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>, davem@davemloft.net,
+        Kees Cook <keescook@chromium.org>, gustavo@embeddedor.com,
+        dvlasenk@redhat.com
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=201945
-
-Cristian Aravena Romero (caravena@gmail.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-            Summary|Not work bluetooth          |Not work Bluetooth
-
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+ping......
