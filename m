@@ -2,163 +2,190 @@ Return-Path: <SRS0=Lkqy=OU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8B1C5CFFE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Dec 2018 15:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4745C5CFFE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Dec 2018 16:24:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E75B420672
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Dec 2018 15:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7EE3820870
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Dec 2018 16:24:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="bta/SaWy";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="gRTW5zh2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E75B420672
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="cFQUEbuV";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="apM5iSjq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EE3820870
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727144AbeLKPf0 (ORCPT
+        id S1727703AbeLKQYk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Dec 2018 10:35:26 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:39106 "EHLO
+        Tue, 11 Dec 2018 11:24:40 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:44406 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726499AbeLKPfZ (ORCPT
+        with ESMTP id S1727273AbeLKPmh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Dec 2018 10:35:25 -0500
+        Tue, 11 Dec 2018 10:42:37 -0500
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 0511F60C64; Tue, 11 Dec 2018 15:35:09 +0000 (UTC)
+        id F226660913; Tue, 11 Dec 2018 15:42:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1544542524;
-        bh=UTejcDY/XE3AHidaahIJmn23UpUx87hv2SPQ3EFob4c=;
-        h=From:To:Cc:Subject:Date:From;
-        b=bta/SaWyoo+Kn/0HX2gfB1BH6IeyOMaqdM/Q8R1mUgdFaiSUtQjRYdggcazhgszjI
-         RP3LWU+0ArVQrT5dWIhK4pJjxWOnWEZvGDKCQWkEv71jZVpyM6CPHOo69lChPtqqei
-         kIMGdoOpWf69ya9jH67zjK4EoYVLG1TzaPjxtV1I=
-Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id D570C60B19;
-        Tue, 11 Dec 2018 15:35:04 +0000 (UTC)
+        s=default; t=1544542957;
+        bh=6ggL3c3Hm2Qsp/HijtdSknvW4aClXsInkiPhUrDPlB8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=cFQUEbuVRHeEnnXhh5H7rPcAJIzxwLJ7vCuZ5lY++q0y1z5HbwaEcY9VYThaMGjfD
+         UDHgQxqYwdBUjFhLmmjGw5SW26iO80Y6I7z5FVRMXQzKZaTFh+8RSinH8rA1vb7QJd
+         PlPLBAn9RH2kxW4fcS3TJg8ICMt28dAT9LPnBkB8=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id A423A6029D;
+        Tue, 11 Dec 2018 15:42:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1544542507;
-        bh=UTejcDY/XE3AHidaahIJmn23UpUx87hv2SPQ3EFob4c=;
-        h=From:To:Cc:Subject:Date:From;
-        b=gRTW5zh29QVQDnP182zT+0MoAldt7GIsuGkEQsB854qV5CMcWYoOKFF5pDnqnNvgq
-         A4fFThDQwbMzHe/fPVrTfYL28hX4hans8Jsrh7SWn4MA33MB+4YnNHa4+cME2bmzBV
-         uLYZlFGo+iKF3Mk04QfkZpv7TmgIlL3eV39+ueQ0=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org D570C60B19
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [RESEND v2] Bluetooth: hci_qca: Add helper to set device address
-Date:   Tue, 11 Dec 2018 21:04:50 +0530
-Message-Id: <20181211153450.9764-1-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.19.1
+        s=default; t=1544542954;
+        bh=6ggL3c3Hm2Qsp/HijtdSknvW4aClXsInkiPhUrDPlB8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=apM5iSjqEF/jsht4JPWKj87KMONWckUjtWKwwS0NIoolnf+UwtiYouZ3WHc/ZMHnV
+         QVdhdBvwE7MkrXWKmhgKLeEqinUrefPfAoqG6SRnC9yj4PryfgkOn2g5WcY9xxZe23
+         tlMWMZDSI/Q4OFSia8Q+csujUjFnmK6FVMHjsNFY=
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 11 Dec 2018 21:12:34 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Johan Hovold <johan@kernel.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        Johan Hovold <jhovold@gmail.com>
+Subject: Re: [PATCH v3 1/4] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+In-Reply-To: <c9bcbaed89a18499fe42463b20367499@codeaurora.org>
+References: <20181130150247.26294-1-bgodavar@codeaurora.org>
+ <20181130150247.26294-2-bgodavar@codeaurora.org>
+ <20181205062503.GG18087@localhost>
+ <c9bcbaed89a18499fe42463b20367499@codeaurora.org>
+Message-ID: <0a8cc07b08ee10812a99b46c78e616ce@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch add qca_set_bdaddr() to set the device
-address for latest Qualcomm Bluetooth chipset wcn3990 and above.
+Hi Johan,
 
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
-Tested-by: Matthias Kaehlcke <mka@chromium.org>
----
- drivers/bluetooth/btqca.c   | 19 +++++++++++++++++++
- drivers/bluetooth/btqca.h   |  8 +++++++-
- drivers/bluetooth/hci_qca.c |  5 ++++-
- 3 files changed, 30 insertions(+), 2 deletions(-)
+On 2018-12-06 16:10, Balakrishna Godavarthi wrote:
+> Hi Johan,
+> 
+> On 2018-12-05 11:55, Johan Hovold wrote:
+>> On Fri, Nov 30, 2018 at 08:32:44PM +0530, Balakrishna Godavarthi 
+>> wrote:
+>>> wcn3990 requires a power pulse to turn ON/OFF along with
+>>> regulators. Sometimes we are observing the power pulses are sent
+>>> out with some time delay, due to queuing these commands. This is
+>>> causing synchronization issues with chip, which intern delay the
+>>> chip setup or may end up with communication issues.
+>>> 
+>>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>>> ---
+>>> v3:
+>>>   * no change.
+>>> v2:
+>>>   * Updated function qca_send_power_pulse()
+>>>   * addressed reviewer comments.
+>> 
+>> Please make sure to include reviewers on CC when resending, and as
+>> someone else already mentioned, be a bit more specific about what
+>> changes you actually made in response to the review feedback you
+>> received.
+>> 
+> 
+> [Bala]: sure will add and provide more info in version change history.
+> 
+>>> v1:
+>>>  * initial patch
+>>> ---
+>>>  drivers/bluetooth/hci_qca.c | 37 
+>>> +++++++++++++------------------------
+>>>  1 file changed, 13 insertions(+), 24 deletions(-)
+>>> 
+>>> diff --git a/drivers/bluetooth/hci_qca.c 
+>>> b/drivers/bluetooth/hci_qca.c
+>>> index f036c8f98ea3..f5dd323c1967 100644
+>>> --- a/drivers/bluetooth/hci_qca.c
+>>> +++ b/drivers/bluetooth/hci_qca.c
+>>> @@ -1013,11 +1013,9 @@ static inline void host_set_baudrate(struct 
+>>> hci_uart *hu, unsigned int speed)
+>>>  		hci_uart_set_baudrate(hu, speed);
+>>>  }
+>>> 
+>>> -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>>> +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
+>>>  {
+>>> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+>>> -	struct qca_data *qca = hu->priv;
+>>> -	struct sk_buff *skb;
+>>> +	int ret;
+>>> 
+>>>  	/* These power pulses are single byte command which are sent
+>>>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+>>> @@ -1029,19 +1027,16 @@ static int qca_send_power_pulse(struct 
+>>> hci_dev *hdev, u8 cmd)
+>>>  	 * save power. Disabling hardware flow control is mandatory while
+>>>  	 * sending power pulses to SoC.
+>>>  	 */
+>>> -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+>>> -
+>>> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+>>> -	if (!skb)
+>>> -		return -ENOMEM;
+>>> -
+>>> +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
+>>>  	hci_uart_set_flow_control(hu, true);
+>>> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
+>> 
+>> You're still using 0 as a timeout here which is broken, as I already
+>> told you.
+>> 
+> 
+> [Bala]: got the change now will update to timeout to non zero value.
+> 
+>> From 4.21 this will result in an indefinite timeout, but currently
+>> implies not to wait for a full write buffer to drain at all.
+>> 
+>> As I also mentioned, you need to to make sure to call
+>> serdev_device_write_wakeup() in the write_wakup() path if you are 
+>> going
+>> to use serdev_device_write() at all.
+>> 
+> 
+> [Bala]: this where i am confused.
+>         calling serdev_device_write is calling an wakeup internally.
+> below is the flow
+> 
+>         ttyport_write_buf:
+>               * calling serdev_device_write() will call write_buf() in
+> this call we are enabling bit "TTY_DO_WRITE_WAKEUP" and calling
+> write()
+>                 i.e. uart_write() where we call in start_tx. this will
+> go to the vendor specific write where in isr we call
+> uart_write_wakeup()
+> 
+> https://elixir.bootlin.com/linux/latest/source/drivers/tty/serial/qcom_geni_serial.c#L756
+> 
+> 
+> uart_write_wakeup()->ttyport_write_wakeup()->serdev_controller_write_wakeup()->hci_uart_write_wakeup()->hci_uart_tx_wakeup()
+> 
+>         the above is flow when serdev_device_write() is called, it is
+> indirectly calling serdev_write_wakeup().
+> 
+>         Why actual we need to call an serdev_write_wakeup() is this
+> wakeup related to the UART port or for the BT chip.
+> 
+>> Johan
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index ec9e03a6b778..612268574fc7 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -391,6 +391,25 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- }
- EXPORT_SYMBOL_GPL(qca_uart_setup);
- 
-+int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-+{
-+	struct sk_buff *skb;
-+	int err;
-+
-+	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6, bdaddr,
-+				HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
-+		return err;
-+	}
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(qca_set_bdaddr);
-+
- MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
- MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index 0c01f375fe83..c72c56ea7480 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -20,6 +20,7 @@
- 
- #define EDL_PATCH_CMD_OPCODE		(0xFC00)
- #define EDL_NVM_ACCESS_OPCODE		(0xFC0B)
-+#define EDL_WRITE_BD_ADDR_OPCODE	(0xFC14)
- #define EDL_PATCH_CMD_LEN		(1)
- #define EDL_PATCH_VER_REQ_CMD		(0x19)
- #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
-@@ -140,7 +141,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 		   enum qca_btsoc_type soc_type, u32 soc_ver);
- int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
--
-+int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- #else
- 
- static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-@@ -159,4 +160,9 @@ static inline int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- #endif
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f036c8f98ea3..53ac5ade532b 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1241,7 +1241,10 @@ static int qca_setup(struct hci_uart *hu)
- 	}
- 
- 	/* Setup bdaddr */
--	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
-+	if (qcadev->btsoc_type == QCA_WCN3990)
-+		hu->hdev->set_bdaddr = qca_set_bdaddr;
-+	else
-+		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
- 
- 	return ret;
- }
+Can you help me to understand, whether my understating is correct wrt 
+serdev_wakeup().
+
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
-
+Regards
+Balakrishna.
