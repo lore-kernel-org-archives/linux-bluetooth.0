@@ -2,149 +2,163 @@ Return-Path: <SRS0=Lkqy=OU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D2DC07E85
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Dec 2018 12:49:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8B1C5CFFE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Dec 2018 15:35:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 28B912084A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Dec 2018 12:49:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28B912084A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id E75B420672
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Dec 2018 15:35:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="bta/SaWy";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="gRTW5zh2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E75B420672
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726299AbeLKMtq (ORCPT
+        id S1727144AbeLKPf0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Dec 2018 07:49:46 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:51534 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726230AbeLKMtq (ORCPT
+        Tue, 11 Dec 2018 10:35:26 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:39106 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726499AbeLKPfZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Dec 2018 07:49:46 -0500
-Received: by mail-wm1-f65.google.com with SMTP id s14so2100102wmh.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Dec 2018 04:49:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rrMBaLzH5r0cuQEw0g7bLsnIqu8YhS2a6FaDqAVdlrQ=;
-        b=JVxo/c3jrxTdWQftaWwvkI5c4am0kzGrtyIuuQhET5TV6vl3TYzwV3Gd3StGiiWCMf
-         fAQM62Q9vYsJ1QXs4IAPKYvTkr4kd9TXeGr43Yc359apY5FJ8tGlWocQCtPkRJ8szo4h
-         zD5Eqx2UzsGwFqovTkw5TLnMr6CH4B1Y0ZNOUiRB0Ek2iGCY+l0eujRbBjCePIcaFbKE
-         SYXF/kkWEOTEYs6xBN8ak7M4DMaanYzHH1yTRacIy2LJ/LR3O3HUmgtHE2pblyM/u4B5
-         NuMEX0xuAfU7Dh/c19H23inuafcoEzcW0uGvIH2rkWqhtW5bIHtfdM0kkIyEKExUYHj1
-         VRHw==
-X-Gm-Message-State: AA+aEWYI6ydUtDA114Q0hV9QCTLYBwaSuYaszMATLPmiG4dy8ni0KxP1
-        BaXfCnAbty15tSSHC0GFVBwZiQ==
-X-Google-Smtp-Source: AFSGD/UtkycDInu66Jm3dH8hpMSe/fiu+INJIXatuCEJqvjSvGxfE4l0yTkQZ/ypAf04Fm+DrD9KIQ==
-X-Received: by 2002:a1c:1f81:: with SMTP id f123mr2004108wmf.64.1544532583658;
-        Tue, 11 Dec 2018 04:49:43 -0800 (PST)
-Received: from shalem.localdomain (546A5441.cm-12-3b.dynamic.ziggo.nl. [84.106.84.65])
-        by smtp.gmail.com with ESMTPSA id p6sm20068142wrx.50.2018.12.11.04.49.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Dec 2018 04:49:42 -0800 (PST)
-Subject: Re: [PATCH v2 1/2] Bluetooth: hci_h5: Add suspend / resume ops
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     Jeremy Cline <jeremy@jcline.org>, linux-bluetooth@vger.kernel.org,
-        linux-serial@vger.kernel.org, linux-acpi@vger.kernel.org
-References: <20181030131723.4589-1-hdegoede@redhat.com>
-From:   Hans de Goede <hdegoede@redhat.com>
-Message-ID: <57436796-dbed-2744-612d-8043eff4e0e3@redhat.com>
-Date:   Tue, 11 Dec 2018 13:49:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.1
+        Tue, 11 Dec 2018 10:35:25 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 0511F60C64; Tue, 11 Dec 2018 15:35:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1544542524;
+        bh=UTejcDY/XE3AHidaahIJmn23UpUx87hv2SPQ3EFob4c=;
+        h=From:To:Cc:Subject:Date:From;
+        b=bta/SaWyoo+Kn/0HX2gfB1BH6IeyOMaqdM/Q8R1mUgdFaiSUtQjRYdggcazhgszjI
+         RP3LWU+0ArVQrT5dWIhK4pJjxWOnWEZvGDKCQWkEv71jZVpyM6CPHOo69lChPtqqei
+         kIMGdoOpWf69ya9jH67zjK4EoYVLG1TzaPjxtV1I=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id D570C60B19;
+        Tue, 11 Dec 2018 15:35:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1544542507;
+        bh=UTejcDY/XE3AHidaahIJmn23UpUx87hv2SPQ3EFob4c=;
+        h=From:To:Cc:Subject:Date:From;
+        b=gRTW5zh29QVQDnP182zT+0MoAldt7GIsuGkEQsB854qV5CMcWYoOKFF5pDnqnNvgq
+         A4fFThDQwbMzHe/fPVrTfYL28hX4hans8Jsrh7SWn4MA33MB+4YnNHa4+cME2bmzBV
+         uLYZlFGo+iKF3Mk04QfkZpv7TmgIlL3eV39+ueQ0=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org D570C60B19
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [RESEND v2] Bluetooth: hci_qca: Add helper to set device address
+Date:   Tue, 11 Dec 2018 21:04:50 +0530
+Message-Id: <20181211153450.9764-1-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-In-Reply-To: <20181030131723.4589-1-hdegoede@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+This patch add qca_set_bdaddr() to set the device
+address for latest Qualcomm Bluetooth chipset wcn3990 and above.
 
-On 30-10-18 14:17, Hans de Goede wrote:
-> Add support for vendor specific suspend / resume callbacks.
-> 
-> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+Tested-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ drivers/bluetooth/btqca.c   | 19 +++++++++++++++++++
+ drivers/bluetooth/btqca.h   |  8 +++++++-
+ drivers/bluetooth/hci_qca.c |  5 ++++-
+ 3 files changed, 30 insertions(+), 2 deletions(-)
 
-Ping? What is the status of this series ?
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index ec9e03a6b778..612268574fc7 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -391,6 +391,25 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ }
+ EXPORT_SYMBOL_GPL(qca_uart_setup);
+ 
++int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	struct sk_buff *skb;
++	int err;
++
++	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6, bdaddr,
++				HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
++		return err;
++	}
++
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(qca_set_bdaddr);
++
+ MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
+ MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 0c01f375fe83..c72c56ea7480 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -20,6 +20,7 @@
+ 
+ #define EDL_PATCH_CMD_OPCODE		(0xFC00)
+ #define EDL_NVM_ACCESS_OPCODE		(0xFC0B)
++#define EDL_WRITE_BD_ADDR_OPCODE	(0xFC14)
+ #define EDL_PATCH_CMD_LEN		(1)
+ #define EDL_PATCH_VER_REQ_CMD		(0x19)
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+@@ -140,7 +141,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		   enum qca_btsoc_type soc_type, u32 soc_ver);
+ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+-
++int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ #else
+ 
+ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+@@ -159,4 +160,9 @@ static inline int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	return -EOPNOTSUPP;
++}
++
+ #endif
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index f036c8f98ea3..53ac5ade532b 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1241,7 +1241,10 @@ static int qca_setup(struct hci_uart *hu)
+ 	}
+ 
+ 	/* Setup bdaddr */
+-	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
++	if (qcadev->btsoc_type == QCA_WCN3990)
++		hu->hdev->set_bdaddr = qca_set_bdaddr;
++	else
++		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+ 
+ 	return ret;
+ }
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
 
-Regards,
-
-Hans
-
-
-
-
-> ---
->   drivers/bluetooth/hci_h5.c | 29 +++++++++++++++++++++++++++++
->   1 file changed, 29 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> index 8eede1197cd2..beddb89a00f2 100644
-> --- a/drivers/bluetooth/hci_h5.c
-> +++ b/drivers/bluetooth/hci_h5.c
-> @@ -115,6 +115,8 @@ struct h5_vnd {
->   	int (*setup)(struct h5 *h5);
->   	void (*open)(struct h5 *h5);
->   	void (*close)(struct h5 *h5);
-> +	int (*suspend)(struct h5 *h5);
-> +	int (*resume)(struct h5 *h5);
->   	const struct acpi_gpio_mapping *acpi_gpio_map;
->   };
->   
-> @@ -841,6 +843,28 @@ static void h5_serdev_remove(struct serdev_device *serdev)
->   	hci_uart_unregister_device(&h5->serdev_hu);
->   }
->   
-> +static int __maybe_unused h5_serdev_suspend(struct device *dev)
-> +{
-> +	struct h5 *h5 = dev_get_drvdata(dev);
-> +	int ret = 0;
-> +
-> +	if (h5->vnd && h5->vnd->suspend)
-> +		ret = h5->vnd->suspend(h5);
-> +
-> +	return ret;
-> +}
-> +
-> +static int __maybe_unused h5_serdev_resume(struct device *dev)
-> +{
-> +	struct h5 *h5 = dev_get_drvdata(dev);
-> +	int ret = 0;
-> +
-> +	if (h5->vnd && h5->vnd->resume)
-> +		ret = h5->vnd->resume(h5);
-> +
-> +	return ret;
-> +}
-> +
->   #ifdef CONFIG_BT_HCIUART_RTL
->   static int h5_btrtl_setup(struct h5 *h5)
->   {
-> @@ -935,12 +959,17 @@ static const struct acpi_device_id h5_acpi_match[] = {
->   MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
->   #endif
->   
-> +static const struct dev_pm_ops h5_serdev_pm_ops = {
-> +	SET_SYSTEM_SLEEP_PM_OPS(h5_serdev_suspend, h5_serdev_resume)
-> +};
-> +
->   static struct serdev_device_driver h5_serdev_driver = {
->   	.probe = h5_serdev_probe,
->   	.remove = h5_serdev_remove,
->   	.driver = {
->   		.name = "hci_uart_h5",
->   		.acpi_match_table = ACPI_PTR(h5_acpi_match),
-> +		.pm = &h5_serdev_pm_ops,
->   	},
->   };
->   
-> 
