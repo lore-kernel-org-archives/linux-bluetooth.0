@@ -2,140 +2,92 @@ Return-Path: <SRS0=UWae=OV=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FAKE_REPLY_C,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90953C67839
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Dec 2018 16:42:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0476FC65BAF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Dec 2018 20:48:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 510D52084E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Dec 2018 16:42:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1544632979;
-	bh=CEfOnDUl2orlVP/IkFeOrJck/rMIS2yqKxZdBlq5o/M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Rb1teD55mH/fYzhLayGxUQ0Pd2WJWr22I2SKRyTlLmx9vw8MmIt9FAFYFH+Dpbm0H
-	 R96ffJP5r5CxqanOkz5iMCpKUHwArpsM/JIXHVFz/C8KL4Syb/0QuLuaVg4QuU+HhL
-	 hbVL2f05eRPym4xwl7OtwnzaxiF3j4gw6zTzApJ0=
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 510D52084E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id B397F2086D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Dec 2018 20:48:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C1WJ507A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B397F2086D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-bluetooth-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727691AbeLLQmx (ORCPT
+        id S1726440AbeLLUsP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Dec 2018 11:42:53 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:40312 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726358AbeLLQmx (ORCPT
+        Wed, 12 Dec 2018 15:48:15 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:33919 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726294AbeLLUsO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Dec 2018 11:42:53 -0500
-Received: by mail-lf1-f66.google.com with SMTP id v5so14045964lfe.7;
-        Wed, 12 Dec 2018 08:42:50 -0800 (PST)
+        Wed, 12 Dec 2018 15:48:14 -0500
+Received: by mail-it1-f196.google.com with SMTP id x124so14592260itd.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Dec 2018 12:48:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=5e7CLPwCiJ18XlUvTFdDOWzUy5MIjQbuB+kR/LpYlcA=;
-        b=OJ9Z/uW6lxcw5vcYbB95L6WgB7GNoOhPLjMFJh2WRHTVuhvpJOXnDmu8RagnAlR6Wu
-         bug7zF792vcvYdgxjjBabzI9LjwCO/LUfdYMolf0LXN/8RoYP20TK5O3WEHvY+mXc8D/
-         ajLHiWYALYUJpdEtVPQoFgpgqlJSg61A8G/s/qZMCjif4v4YwIMdthKrnQc9YLinwvhT
-         zgP9qA9KQCnpQ3fA7RsfrDPyuA1mkK8v6BEWlswXM3VsIB2IBC2Hut4MLa+WQhKp1SjU
-         jcxrnv7Ol62KKepG6QrE9h2hr1zABA+AX0SXR6aRLq7HygCnS1I8HuNFx4UBAk1X+GvG
-         cHEw==
+        h=date:from:to:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=Pc1llJ1vGFWBFC2fFu0AdtVxos97Joz2K3y69+o9b2M=;
+        b=C1WJ507A6r4w+V/vkr228vGuXGxQxkj8spGKaahm98gwmVP6hJDwY9FTBn5vRDg2Cb
+         j182pClixNTI9ITD/VQMkKlXixsThXeC6KSFy27iquyMgwFyneKXZCH/6Cdtmbijdkd0
+         eUPCyMkuAZhfjIm5BT8H57vaV5QpPkv9ThD1PpSBf1IGoXt235i9jsaSLH488XbXJ02d
+         psmWMWuynaQQXiqKu6IE0W1+plmS9FhC09ZcShPxTaFIL3Ns/gZB+0MLJ4/oUUYhHmuT
+         AQOjDK/tzc8dT1gdbA/hat7I7OxcO78Y/XDfqpIZ+/A/AiGtXk7rXeoM1mbSRlK87e40
+         7gOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=5e7CLPwCiJ18XlUvTFdDOWzUy5MIjQbuB+kR/LpYlcA=;
-        b=LvT3XBArc7behYccp9f/1OI2llfnvGay1QfiPO8QTaWmSSDP7fz0w8oU6dM/w5Vszn
-         eX6vymEdCP2oi4K2Y1k3Q3b6zjg+QtOf9TRW8mnEKVf3jBjYrrIUapwKrlh1SR3h339q
-         1YWKL9dpl7vNq+LtKYGRvbNd7ACM4zTLGpfm7gWWKLYB0/xGNrFNPE/lXpQ0uwJPbybo
-         azflImrXB11ieTg4ai57mPvZg3WT3WLHTzji5Zep/X/EqS98szljfWfv+aBUN4ydxLjS
-         qaRKCD3RdJvhYOA7IghCkTtYEIRjEieNGQuPl1JMrsFsmmv8zMOYxBHGsyr+1LYwd7y9
-         KI6A==
-X-Gm-Message-State: AA+aEWb+Fb7NApsFPZrqXCdl/MZpa128S7jWZRT6xraIt9bxHvmjf32x
-        k5ugKiflFJlbAPGNo7dWOFQ=
-X-Google-Smtp-Source: AFSGD/WNZ6o5AKfXfIH6WpFLs5LIkjWt6ayLQuNbt1IiS46qW9t2PaeUBMlHfjPqSNUHAB2EFJkpsQ==
-X-Received: by 2002:a19:a086:: with SMTP id j128mr11534328lfe.93.1544632969951;
-        Wed, 12 Dec 2018 08:42:49 -0800 (PST)
-Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id v11-v6sm3329313ljc.57.2018.12.12.08.42.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Dec 2018 08:42:48 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.91)
-        (envelope-from <johan@kernel.org>)
-        id 1gX7b1-0005Y6-C7; Wed, 12 Dec 2018 17:42:51 +0100
-Date:   Wed, 12 Dec 2018 17:42:51 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     Johan Hovold <johan@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        Johan Hovold <jhovold@gmail.com>
-Subject: Re: [PATCH v3 1/4] Bluetooth: hci_qca: use wait_until_sent() for
- power pulses
-Message-ID: <20181212164251.GI3500@localhost>
-References: <20181130150247.26294-1-bgodavar@codeaurora.org>
- <20181130150247.26294-2-bgodavar@codeaurora.org>
- <20181205062503.GG18087@localhost>
- <c9bcbaed89a18499fe42463b20367499@codeaurora.org>
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=Pc1llJ1vGFWBFC2fFu0AdtVxos97Joz2K3y69+o9b2M=;
+        b=Mi2X9oQ7lStA1P/xn9fduFqVYdRaKXaTofkhxn+uU0EmKwAsERd1wLzTrb767JxPvS
+         1FfAxTxT2ykdk0r+1y8WIXFD1mNFS4BuKBnNcc1kpdyoyNQov/x++hs0HG2BfzyoEy9i
+         8ohW+WRJtFN3VwNPHa29Cxhbt3H3YXMHvsLZpLSIJu6QeEXdX45AcsaTR3obXvEbYUJz
+         nTNC6v+/CzN7z/RAyxlRkylNdFoYwnHvz8XpH9hJGEl8gGe2doWxMMB6ORymHg7i6QT4
+         I1acj7BtpMRBsPFctW+0PUNNBVHICPaeltL/K4TQRNhWkNograGkHLwpk1+lLnAIiqZN
+         uBGA==
+X-Gm-Message-State: AA+aEWblFB9paMAPcf7y9Y9TVoOQzN0v3yKEMRRXBtf+vyAndpeII7Xw
+        VAmeV0gd83Skdb2dM1IuvVTMXwA=
+X-Google-Smtp-Source: AFSGD/U5HD1lD+VMSvZC+r8S4N5lJ9oRbTOttZXPAPSAlHlLfeRPL+UFndh8Rds+fXv0004brTIyww==
+X-Received: by 2002:a24:e04a:: with SMTP id c71mr7243474ith.127.1544647693669;
+        Wed, 12 Dec 2018 12:48:13 -0800 (PST)
+Received: from r (CPE1cabc0918a93-CM1cabc0918a90.cpe.net.cable.rogers.com. [99.229.26.117])
+        by smtp.gmail.com with ESMTPSA id k64sm211563itb.7.2018.12.12.12.48.12
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 12 Dec 2018 12:48:12 -0800 (PST)
+Date:   Wed, 12 Dec 2018 15:48:10 -0500
+From:   r yang <decatf@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/1] sbc: Use extended inline assembly for armv6
+ primitives
+Message-ID: <20181212204810.GA30878@r>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c9bcbaed89a18499fe42463b20367499@codeaurora.org>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Dec 06, 2018 at 04:10:07PM +0530, Balakrishna Godavarthi wrote:
-> Hi Johan,
-> 
-> On 2018-12-05 11:55, Johan Hovold wrote:
-> > On Fri, Nov 30, 2018 at 08:32:44PM +0530, Balakrishna Godavarthi wrote:
+What happened to this[1] patch? Did it fall by the wayside?
 
-> >> +	ret = serdev_device_write(hu->serdev, &cmd, sizeof(cmd), 0);
-> > 
-> > You're still using 0 as a timeout here which is broken, as I already
-> > told you.
-> 
-> [Bala]: got the change now will update to timeout to non zero value.
-> 
-> > From 4.21 this will result in an indefinite timeout, but currently
-> > implies not to wait for a full write buffer to drain at all.
-> > 
-> > As I also mentioned, you need to to make sure to call
-> > serdev_device_write_wakeup() in the write_wakup() path if you are going
-> > to use serdev_device_write() at all.
-> 
-> [Bala]: this where i am confused.
->          calling serdev_device_write is calling an wakeup internally. 
-> below is the flow
-> 
->          ttyport_write_buf:
->                * calling serdev_device_write() will call write_buf() in 
-> this call we are enabling bit "TTY_DO_WRITE_WAKEUP" and calling write()
->                  i.e. uart_write() where we call in start_tx. this will 
-> go to the vendor specific write where in isr we call uart_write_wakeup()
->                  
-> https://elixir.bootlin.com/linux/latest/source/drivers/tty/serial/qcom_geni_serial.c#L756
-> 
->          
-> uart_write_wakeup()->ttyport_write_wakeup()->serdev_controller_write_wakeup()->hci_uart_write_wakeup()->hci_uart_tx_wakeup()
-> 
->          the above is flow when serdev_device_write() is called, it is 
-> indirectly calling serdev_write_wakeup().
+I can reproduce the issue this patch addresses. It was also reported
+here[2] with gdb traces.
 
-No, serdev_device_write_wakeup() is currently not called in this path,
-which means you cannot use serdev_device_write().
+I've tested this patch with Alpine Linux on the current edge release.
+Alpine currently uses sbc 1.4 and gcc 8. Before this patch bluetooth
+a2dp audio will segmentation fault in sbc_analyze_eight_armv6.
+After this patch the armv6 assembly code does not crash and a2dp audio
+streaming works.
 
->          Why actual we need to call an serdev_write_wakeup() is this 
-> wakeup related to the UART port or for the BT chip.
+PS: I'm not certain how to properly send this as reply to the original
+patch mail so I've referenced the original this way.
 
-serdev_device_write_wakeup() is where a writer blocked on a full write
-buffer in serdev_device_write() is woken up. 
-
-Johan
+[1] https://marc.info/?l=linux-bluetooth&m=152535913710490
+[2] https://bugzilla.redhat.com/show_bug.cgi?format=multiple&id=1350490
