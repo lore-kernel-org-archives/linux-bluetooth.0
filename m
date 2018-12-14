@@ -2,39 +2,39 @@ Return-Path: <SRS0=8d51=OX=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF438C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Dec 2018 22:48:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0130C43444
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Dec 2018 22:48:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 425312080F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Dec 2018 22:48:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19EFB208C1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Dec 2018 22:48:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730681AbeLNWsT (ORCPT
+        id S1730700AbeLNWsV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Dec 2018 17:48:19 -0500
-Received: from mga18.intel.com ([134.134.136.126]:9390 "EHLO mga18.intel.com"
+        Fri, 14 Dec 2018 17:48:21 -0500
+Received: from mga18.intel.com ([134.134.136.126]:9397 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729691AbeLNWsT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Dec 2018 17:48:19 -0500
+        id S1730682AbeLNWsU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Dec 2018 17:48:20 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 14:48:17 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 14:48:19 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,354,1539673200"; 
-   d="scan'208";a="100809990"
+   d="scan'208";a="100810006"
 Received: from bgix-dell-lap.sea.intel.com ([10.251.138.67])
-  by orsmga006.jf.intel.com with ESMTP; 14 Dec 2018 14:48:16 -0800
+  by orsmga006.jf.intel.com with ESMTP; 14 Dec 2018 14:48:18 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ 11/30] mesh: Rewrite Controler interface for full init
-Date:   Fri, 14 Dec 2018 14:47:34 -0800
-Message-Id: <20181214224753.2892-12-brian.gix@intel.com>
+Subject: [PATCH BlueZ 13/30] mesh: centralize generic utilities
+Date:   Fri, 14 Dec 2018 14:47:36 -0800
+Message-Id: <20181214224753.2892-14-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181214224753.2892-1-brian.gix@intel.com>
 References: <20181214224753.2892-1-brian.gix@intel.com>
@@ -43,219 +43,63 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- mesh/mesh-io-generic.c | 148 +++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 137 insertions(+), 11 deletions(-)
+From: Inga Stotland <inga.stotland@intel.com>
 
-diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
-index 52514e280..59e694f00 100644
---- a/mesh/mesh-io-generic.c
-+++ b/mesh/mesh-io-generic.c
-@@ -30,7 +30,6 @@
- #include "monitor/bt.h"
- #include "src/shared/hci.h"
+---
+ mesh/util.c | 26 ++++++++++++++++++++++++++
+ mesh/util.h |  1 +
+ 2 files changed, 27 insertions(+)
+
+diff --git a/mesh/util.c b/mesh/util.c
+index 2cdcdf37d..ac0294742 100644
+--- a/mesh/util.c
++++ b/mesh/util.c
+@@ -26,10 +26,36 @@
+ #include <stdbool.h>
+ #include <stdint.h>
+ #include <stdio.h>
++#include <unistd.h>
++#include <termios.h>
+ #include <time.h>
++#include <sys/ioctl.h>
++#include <sys/time.h>
++
++#include <ell/ell.h>
  
--#include "mesh/display.h"
- #include "mesh/mesh-io.h"
- #include "mesh/mesh-io-api.h"
+ #include "mesh/util.h"
  
-@@ -177,6 +176,115 @@ static void event_callback(const void *buf, uint8_t size, void *user_data)
- 	}
- }
- 
-+static void local_commands_callback(const void *data, uint8_t size,
-+							void *user_data)
++void print_packet(const char *label, const void *data, uint16_t size)
 +{
-+	const struct bt_hci_rsp_read_local_commands *rsp = data;
++	struct timeval pkt_time;
 +
-+	if (rsp->status)
-+		l_error("Failed to read local commands");
++	gettimeofday(&pkt_time, NULL);
++
++	if (size > 0) {
++		char *str;
++
++		str = l_util_hexstring(data, size);
++		l_debug("%05d.%03d %s: %s",
++				(uint32_t) pkt_time.tv_sec % 100000,
++				(uint32_t) pkt_time.tv_usec/1000, label, str);
++		l_free(str);
++	} else
++		l_debug("%05d.%03d %s: empty",
++				(uint32_t) pkt_time.tv_sec % 100000,
++				(uint32_t) pkt_time.tv_usec/1000, label);
 +}
 +
-+static void local_features_callback(const void *data, uint8_t size,
-+							void *user_data)
-+{
-+	const struct bt_hci_rsp_read_local_features *rsp = data;
-+
-+	if (rsp->status)
-+		l_error("Failed to read local features");
-+}
-+
-+static void hci_generic_callback(const void *data, uint8_t size,
-+								void *user_data)
-+{
-+	uint8_t status = l_get_u8(data);
-+
-+	if (status)
-+		l_error("Failed to initialize HCI");
-+}
-+
-+static void configure_hci(struct mesh_io_private *io)
-+{
-+	struct bt_hci_cmd_le_set_scan_parameters cmd;
-+	struct bt_hci_cmd_set_event_mask cmd_sem;
-+	struct bt_hci_cmd_le_set_event_mask cmd_slem;
-+
-+	/* Set scan parameters */
-+	cmd.type = 0x00; /* Passive Scanning. No scanning PDUs shall be sent */
-+	cmd.interval = 0x0030; /* Scan Interval = N * 0.625ms */
-+	cmd.window = 0x0030; /* Scan Window = N * 0.625ms */
-+	cmd.own_addr_type = 0x00; /* Public Device Address */
-+	/* Accept all advertising packets except directed advertising packets
-+	 * not addressed to this device (default). */
-+	cmd.filter_policy = 0x00;
-+
-+	/* Set event mask
-+	 *
-+	 * Mask: 0x2000800002008890
-+	 *   Disconnection Complete
-+	 *   Encryption Change
-+	 *   Read Remote Version Information Complete
-+	 *   Hardware Error
-+	 *   Data Buffer Overflow
-+	 *   Encryption Key Refresh Complete
-+	 *   LE Meta
-+	 */
-+	cmd_sem.mask[0] = 0x90;
-+	cmd_sem.mask[1] = 0x88;
-+	cmd_sem.mask[2] = 0x00;
-+	cmd_sem.mask[3] = 0x02;
-+	cmd_sem.mask[4] = 0x00;
-+	cmd_sem.mask[5] = 0x80;
-+	cmd_sem.mask[6] = 0x00;
-+	cmd_sem.mask[7] = 0x20;
-+
-+	/* Set LE event mask
-+	 *
-+	 * Mask: 0x000000000000087f
-+	 *   LE Connection Complete
-+	 *   LE Advertising Report
-+	 *   LE Connection Update Complete
-+	 *   LE Read Remote Used Features Complete
-+	 *   LE Long Term Key Request
-+	 *   LE Remote Connection Parameter Request
-+	 *   LE Data Length Change
-+	 *   LE PHY Update Complete
-+	 */
-+	cmd_slem.mask[0] = 0x7f;
-+	cmd_slem.mask[1] = 0x08;
-+	cmd_slem.mask[2] = 0x00;
-+	cmd_slem.mask[3] = 0x00;
-+	cmd_slem.mask[4] = 0x00;
-+	cmd_slem.mask[5] = 0x00;
-+	cmd_slem.mask[6] = 0x00;
-+	cmd_slem.mask[7] = 0x00;
-+
-+	/* TODO: Move to suitable place. Set suitable masks */
-+	/* Reset Command */
-+	bt_hci_send(io->hci, BT_HCI_CMD_RESET, NULL, 0, hci_generic_callback,
-+								NULL, NULL);
-+
-+	/* Read local supported commands */
-+	bt_hci_send(io->hci, BT_HCI_CMD_READ_LOCAL_COMMANDS, NULL, 0,
-+					local_commands_callback, NULL, NULL);
-+
-+	/* Read local supported features */
-+	bt_hci_send(io->hci, BT_HCI_CMD_READ_LOCAL_FEATURES, NULL, 0,
-+					local_features_callback, NULL, NULL);
-+
-+	/* Set event mask */
-+	bt_hci_send(io->hci, BT_HCI_CMD_SET_EVENT_MASK, &cmd_sem,
-+			sizeof(cmd_sem), hci_generic_callback, NULL, NULL);
-+
-+	/* Set LE event mask */
-+	bt_hci_send(io->hci, BT_HCI_CMD_LE_SET_EVENT_MASK, &cmd_slem,
-+			sizeof(cmd_slem), hci_generic_callback, NULL, NULL);
-+
-+	/* Scan Params */
-+	bt_hci_send(io->hci, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS, &cmd,
-+				sizeof(cmd), hci_generic_callback, NULL, NULL);
-+}
-+
- static bool dev_init(uint16_t index, struct mesh_io *io)
+ uint32_t get_timestamp_secs(void)
  {
- 	struct mesh_io_private *tmp;
-@@ -198,6 +306,8 @@ static bool dev_init(uint16_t index, struct mesh_io *io)
- 	if (!tmp->hci)
- 		goto fail;
- 
-+	configure_hci(tmp);
-+
- 	bt_hci_register(tmp->hci, BT_HCI_EVT_LE_META_EVENT,
- 						event_callback, io, NULL);
- 
-@@ -480,7 +590,6 @@ static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
- 	if (!info || !data || !len || len > sizeof(tx->pkt))
- 		return false;
- 
--
- 	tx = l_new(struct tx_pkt, 1);
- 	if (!tx)
- 		return false;
-@@ -524,7 +633,7 @@ static bool find_by_pattern(const void *a, const void *b)
- 	return (!memcmp(tx->pkt, pattern->data, pattern->len));
- }
- 
--static bool tx_cancel(struct mesh_io *io, uint8_t *data, uint8_t len)
-+static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
- {
- 	struct mesh_io_private *pvt = io->pvt;
- 	struct tx_pkt *tx;
-@@ -568,13 +677,25 @@ static bool find_by_filter_id(const void *a, const void *b)
- 	return rx_reg->filter_id == filter_id;
- }
- 
-+static void set_recv_scan_enable(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct bt_hci_cmd_le_set_scan_enable cmd;
-+
-+	cmd.enable = 0x01;	/* Enable scanning */
-+	cmd.filter_dup = 0x00;	/* Report duplicates */
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+			&cmd, sizeof(cmd), NULL, NULL, NULL);
-+}
-+
- static bool recv_register(struct mesh_io *io, uint8_t filter_id,
- 				mesh_io_recv_func_t cb, void *user_data)
- {
--	struct bt_hci_cmd_le_set_scan_enable cmd;
-+	struct bt_hci_cmd_le_set_scan_parameters cmd;
- 	struct mesh_io_private *pvt = io->pvt;
- 	struct pvt_rx_reg *rx_reg;
--	bool scanning;
-+	bool already_scanning;
- 
- 	l_info("%s %d", __func__, filter_id);
- 	if (!cb || !filter_id || filter_id > sizeof(pvt->filters))
-@@ -593,15 +714,20 @@ static bool recv_register(struct mesh_io *io, uint8_t filter_id,
- 	rx_reg->cb = cb;
- 	rx_reg->user_data = user_data;
- 
--	scanning = !l_queue_isempty(pvt->rx_regs);
-+	already_scanning = !l_queue_isempty(pvt->rx_regs);
- 
- 	l_queue_push_head(pvt->rx_regs, rx_reg);
- 
--	if (!scanning) {
--		cmd.enable = 0x01;	/* Enable scanning */
--		cmd.filter_dup = 0x00;	/* Report duplicates */
--		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
--				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+	if (!already_scanning) {
-+		cmd.type = 0x00;				/* Passive scanning */
-+		cmd.interval = L_CPU_TO_LE16(0x0010);		/* 10 ms */
-+		cmd.window = L_CPU_TO_LE16(0x0010);		/* 10 ms */
-+		cmd.own_addr_type = 0x01; 			/* ADDR_TYPE_RANDOM */
-+		cmd.filter_policy = 0x00;			/* Accept all */
-+
-+		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-+				&cmd, sizeof(cmd),
-+				set_recv_scan_enable, pvt, NULL);
- 	}
- 
- 	return true;
+ 	struct timespec ts;
+diff --git a/mesh/util.h b/mesh/util.h
+index 61110104a..b8efb6521 100644
+--- a/mesh/util.h
++++ b/mesh/util.h
+@@ -22,3 +22,4 @@ uint32_t get_timestamp_secs(void);
+ bool str2hex(const char *str, uint16_t in_len, uint8_t *out,
+ 							uint16_t out_len);
+ size_t hex2str(uint8_t *in, size_t in_len, char *out, size_t out_len);
++void print_packet(const char *label, const void *data, uint16_t size);
 -- 
 2.14.5
 
