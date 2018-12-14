@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB3DC43612
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Dec 2018 22:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E642AC43613
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Dec 2018 22:48:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E04412080F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Dec 2018 22:48:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A55F2080F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Dec 2018 22:48:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730551AbeLNWsO (ORCPT
+        id S1730629AbeLNWsR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Dec 2018 17:48:14 -0500
-Received: from mga18.intel.com ([134.134.136.126]:9382 "EHLO mga18.intel.com"
+        Fri, 14 Dec 2018 17:48:17 -0500
+Received: from mga18.intel.com ([134.134.136.126]:9390 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730264AbeLNWsO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Dec 2018 17:48:14 -0500
+        id S1729691AbeLNWsQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Dec 2018 17:48:16 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 14:48:13 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 14:48:15 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,354,1539673200"; 
-   d="scan'208";a="100809957"
+   d="scan'208";a="100809966"
 Received: from bgix-dell-lap.sea.intel.com ([10.251.138.67])
-  by orsmga006.jf.intel.com with ESMTP; 14 Dec 2018 14:48:13 -0800
+  by orsmga006.jf.intel.com with ESMTP; 14 Dec 2018 14:48:14 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ 05/30] mesh: Re-write storage for Multiple Nodes
-Date:   Fri, 14 Dec 2018 14:47:28 -0800
-Message-Id: <20181214224753.2892-6-brian.gix@intel.com>
+Subject: [PATCH BlueZ 07/30] mesh: Rewite Network layer for multiple nodes
+Date:   Fri, 14 Dec 2018 14:47:30 -0800
+Message-Id: <20181214224753.2892-8-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181214224753.2892-1-brian.gix@intel.com>
 References: <20181214224753.2892-1-brian.gix@intel.com>
@@ -43,881 +43,613 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Inga Stotland <inga.stotland@intel.com>
-
 ---
- mesh/storage.c | 574 +++++++++++++++++++++++++--------------------------------
- mesh/storage.h |  39 ++--
- 2 files changed, 273 insertions(+), 340 deletions(-)
+ mesh/net.c | 293 ++++++++++++++++---------------------------------------------
+ mesh/net.h |  31 ++-----
+ 2 files changed, 83 insertions(+), 241 deletions(-)
 
-diff --git a/mesh/storage.c b/mesh/storage.c
-index 1f3b25886..fa96af05c 100644
---- a/mesh/storage.c
-+++ b/mesh/storage.c
-@@ -27,6 +27,8 @@
- #include <fcntl.h>
- #include <stdio.h>
- #include <unistd.h>
-+#include <dirent.h>
-+#include <libgen.h>
+diff --git a/mesh/net.c b/mesh/net.c
+index 97b6f5b16..b47df7c04 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -30,7 +30,6 @@
+ #include "mesh/mesh-defs.h"
+ #include "mesh/util.h"
  
- #include <sys/types.h>
- #include <sys/stat.h>
-@@ -42,39 +44,43 @@
- #include "mesh/net.h"
- #include "mesh/appkey.h"
- #include "mesh/model.h"
-+#include "mesh/mesh-db.h"
- #include "mesh/storage.h"
+-#include "mesh/display.h"
+ #include "mesh/crypto.h"
+ #include "mesh/net_keys.h"
+ #include "mesh/mesh.h"
+@@ -112,12 +111,9 @@ struct mesh_subnet {
+ };
  
--/*
-- * TODO: figure out naming convention to store alternative nodes
-- * Mesh storage dir wil be in configure.ac
-- */
--#define DEVICE_COMPOSITION_FILE "../config/composition.json"
--#define NODE_CONGIGURATION_FILE "../config/configuration.json"
-+struct write_info {
-+	json_object *jnode;
-+	const char *config_name;
-+	void *user_data;
-+	mesh_status_func_t cb;
-+};
- 
--static bool read_local_node_cb(struct mesh_db_node *db_node, void *user_data)
-+static const char *storage_dir;
-+static struct l_queue *node_ids;
-+
-+static bool simple_match(const void *a, const void *b)
- {
--	struct mesh_net *net = user_data;
--	struct mesh_node *node;
-+	return a == b;
-+}
-+
-+static bool read_node_cb(struct mesh_db_node *db_node, void *user_data)
-+{
-+	struct mesh_node *node = user_data;
-+	struct mesh_net *net;
- 	uint32_t seq_number;
+ struct mesh_net {
+-	int ref_count;
+ 	struct mesh_io *io;
+-	struct mesh_node *local_node;
++	struct mesh_node *node;
+ 	struct mesh_prov *prov;
+-	void *jconfig_local;
+-	const char *cfg_file;
+ 	struct l_queue *app_keys;
+ 	unsigned int pkt_id;
+ 	unsigned int bea_id;
+@@ -129,7 +125,6 @@ struct mesh_net {
+ 	bool beacon_enable;
+ 	bool proxy_enable;
+ 	bool provisioner;
+-	bool provisioned;
+ 	bool friend_seq;
+ 	struct l_timeout *iv_update_timeout;
+ 	enum _iv_upd_state iv_upd_state;
+@@ -139,7 +134,6 @@ struct mesh_net {
+ 	uint32_t iv_index;
+ 	uint32_t seq_num;
+ 	uint32_t cached_seq_num;
 -	uint16_t crpl;
- 	uint8_t ttl, mode, cnt, num_ele;
- 	uint16_t unicast, interval;
- 	uint8_t *uuid;
+ 	uint16_t src_addr;
+ 	uint16_t last_addr;
+ 	uint16_t friend_addr;
+@@ -253,6 +247,8 @@ struct net_decode {
+ 	bool proxy;
+ };
+ 
++static struct l_queue *nets;
++
+ static inline struct mesh_subnet *get_primary_subnet(struct mesh_net *net)
+ {
+ 	return l_queue_peek_head(net->subnets);
+@@ -499,8 +495,8 @@ uint32_t mesh_net_next_seq_num(struct mesh_net *net)
+ 	/* Periodically store advanced sequence number */
+ 	if (net->seq_num + MIN_SEQ_TRIGGER >= net->cached_seq_num) {
+ 		net->cached_seq_num = net->seq_num +
+-					node_seq_cache(net->local_node);
+-		node_set_sequence_number(net->local_node, net->cached_seq_num);
++					node_seq_cache(net->node);
++		node_set_sequence_number(net->node, net->cached_seq_num);
+ 	}
+ 
+ 	return seq;
+@@ -647,15 +643,13 @@ static void start_network_beacon(void *a, void *b)
+ 				network_beacon_timeout, subnet, NULL);
+ }
+ 
+-struct mesh_net *mesh_net_new(uint16_t index)
++struct mesh_net *mesh_net_new(struct mesh_node *node)
+ {
+ 	struct mesh_net *net;
+ 
+ 	net = l_new(struct mesh_net, 1);
  
 -	if (!net)
--		return false;
+-		return NULL;
 -
--	node = node_create_from_storage(net, db_node, true);
--	if (!node)
-+	if (!node_init_from_storage(node, db_node)) {
-+		node_free(node);
++	net->node = node;
+ 	net->pkt_id = 0;
+ 	net->bea_id = 0;
+ 	net->key_id_next = 0;
+@@ -689,27 +683,17 @@ struct mesh_net *mesh_net_new(uint16_t index)
+ 
+ 	memset(&net->heartbeat, 0, sizeof(net->heartbeat));
+ 
+-	return mesh_net_ref(net);
+-}
+-
+-struct mesh_net *mesh_net_ref(struct mesh_net *net)
+-{
+-	if (!net)
+-		return NULL;
+-
+-	__sync_fetch_and_add(&net->ref_count, 1);
++	if (!nets)
++		nets = l_queue_new();
+ 
+ 	return net;
+ }
+ 
+-void mesh_net_unref(struct mesh_net *net)
++void mesh_net_free(struct mesh_net *net)
+ {
+ 	if (!net)
+ 		return;
+ 
+-	if (__sync_sub_and_fetch(&net->ref_count, 1))
+-		return;
+-
+ 	l_queue_destroy(net->subnets, subnet_free);
+ 	l_queue_destroy(net->fast_cache, mesh_msg_free);
+ 	l_queue_destroy(net->msg_cache, mesh_msg_free);
+@@ -773,7 +757,6 @@ bool mesh_net_register_unicast(struct mesh_net *net,
+ 	if (!net || !IS_UNICAST(address) || !num_ele)
  		return false;
-+	}
  
--	mesh_net_local_node_set(net, node, db_node->provisioner);
-+	net = node_get_net(node);
- 	seq_number = node_get_sequence_number(node);
- 	mesh_net_set_seq_num(net, seq_number);
- 	ttl = node_default_ttl_get(node);
- 	mesh_net_set_default_ttl(net, ttl);
--	crpl = node_get_crpl(node);
--	mesh_net_set_crpl(net, crpl);
+-	l_info("mesh_net_set_address: 0x%x", address);
+ 	net->src_addr = address;
+ 	net->last_addr = address + num_ele - 1;
+ 	if (net->last_addr < net->src_addr)
+@@ -971,7 +954,7 @@ int mesh_net_del_key(struct mesh_net *net, uint16_t idx)
+ 	l_queue_remove(net->subnets, subnet);
+ 	subnet_free(subnet);
  
- 	mode = node_proxy_mode_get(node);
- 	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
-@@ -103,6 +109,7 @@ static bool read_local_node_cb(struct mesh_db_node *db_node, void *user_data)
- 	uuid = node_uuid_get(node);
- 	if (uuid)
- 		mesh_net_id_uuid_set(net, uuid);
+-	if (!storage_local_net_key_del(net, idx))
++	if (!storage_net_key_del(net, idx))
+ 		return MESH_STATUS_STORAGE_FAIL;
+ 
+ 	return MESH_STATUS_SUCCESS;
+@@ -991,7 +974,7 @@ int mesh_net_add_key(struct mesh_net *net, bool update, uint16_t idx,
+ 			l_info("Start key refresh");
+ 			status = mesh_net_kr_phase_one(net, idx, value);
+ 			if (status == MESH_STATUS_SUCCESS &&
+-				!storage_local_net_key_add(net, idx,
++				!storage_net_key_add(net, idx,
+ 						value, KEY_REFRESH_PHASE_ONE))
+ 				return MESH_STATUS_STORAGE_FAIL;
+ 		} else
+@@ -1021,7 +1004,7 @@ int mesh_net_add_key(struct mesh_net *net, bool update, uint16_t idx,
+ 		return MESH_STATUS_INSUFF_RESOURCES;
+ 	}
+ 
+-	if (!storage_local_net_key_add(net, idx, value,
++	if (!storage_net_key_add(net, idx, value,
+ 					KEY_REFRESH_PHASE_NONE)) {
+ 		l_queue_remove(net->subnets, subnet);
+ 		subnet_free(subnet);
+@@ -1204,14 +1187,6 @@ static bool match_msg_timeout(const void *a, const void *b)
+ 	return sar->msg_timeout == msg_timeout;
+ }
+ 
+-static bool match_sar_id(const void *a, const void *b)
+-{
+-	const struct mesh_sar *sar = a;
+-	unsigned int id = L_PTR_TO_UINT(b);
+-
+-	return sar->id == id;
+-}
+-
+ static bool match_seg_timeout(const void *a, const void *b)
+ {
+ 	const struct mesh_sar *sar = a;
+@@ -1813,7 +1788,7 @@ static bool msg_rxed(struct mesh_net *net, bool frnd,
+ 	}
+ 
+ not_for_friend:
+-	return mesh_model_rx(net, szmic, seqAuth, seq, iv_index,
++	return mesh_model_rx(net->node, szmic, seqAuth, seq, iv_index,
+ 					ttl, src, dst, key_id, data, size);
+ }
+ 
+@@ -2511,22 +2486,40 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
+ 		send_relay_pkt(net, packet, size + 1);
+ }
+ 
++struct net_queue_data {
++	struct mesh_io_recv_info *info;
++	const uint8_t *data;
++	uint16_t len;
++};
 +
++static void net_rx(void *net_ptr, void *user_data)
++{
++	struct net_queue_data *data = user_data;
++	struct mesh_net *net = net_ptr;
++	int8_t rssi = 0;
++
++	if (data->info) {
++		net->instant = data->info->instant;
++		net->chan = data->info->chan;
++		rssi = data->info->rssi;
++	}
++
++	packet_received(net, data->data, data->len, rssi);
++}
++
+ static void net_msg_recv(void *user_data, struct mesh_io_recv_info *info,
+ 					const uint8_t *data, uint16_t len)
+ {
+-	struct mesh_net *net = user_data;
+-	int8_t rssi = 0;
++	struct net_queue_data net_data = {
++		.info = info,
++		.data = data + 1,
++		.len = len - 1,
++	};
+ 
+-	if (len <= 2 || !net)
++	if (len <= 2)
+ 		return;
+ 
+-	if (info) {
+-		net->instant = info->instant;
+-		net->chan = info->chan;
+-		rssi = info->rssi;
+-	}
+-
+-	packet_received(user_data, data + 1, len - 1, rssi);
++	l_queue_foreach(nets, net_rx, &net_data);
+ }
+ 
+ static void set_network_beacon(void *a, void *b)
+@@ -2653,7 +2646,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
+ 			net->iv_upd_state = IV_UPD_NORMAL;
+ 		}
+ 
+-		storage_local_set_iv_index(net, iv_index, net->iv_upd_state);
++		storage_set_iv_index(net, iv_index, net->iv_upd_state);
+ 
+ 		/* Figure out the key refresh phase */
+ 		if (kr_transition) {
+@@ -2675,7 +2668,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
+ 		net->iv_upd_state = IV_UPD_UPDATING;
+ 		net->iv_update_timeout = l_timeout_create(IV_IDX_UPD_MIN,
+ 							iv_upd_to, net, NULL);
+-		storage_local_set_iv_index(net, iv_index, net->iv_upd_state);
++		storage_set_iv_index(net, iv_index, net->iv_upd_state);
+ 	} else if (iv_update && iv_index != net->iv_index) {
+ 		l_error("Update attempted too soon (iv idx already updated)");
+ 		return;
+@@ -2688,7 +2681,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
+ 	if (iv_index > net->iv_index) {
+ 		l_queue_clear(net->msg_cache, mesh_msg_free);
+ 		net->iv_index = iv_index;
+-		storage_local_set_iv_index(net, iv_index, net->iv_upd_state);
++		storage_set_iv_index(net, iv_index, net->iv_upd_state);
+ 	}
+ 
+ 	/* Figure out the key refresh phase */
+@@ -2915,34 +2908,37 @@ bool mesh_net_set_beacon_mode(struct mesh_net *net, bool enable)
  	return true;
  }
  
-@@ -132,13 +139,14 @@ static bool read_app_keys_cb(uint16_t net_idx, uint16_t app_idx, uint8_t *key,
- 	return appkey_key_init(net, net_idx, app_idx, key, new_key);
++static bool is_this_net(const void *a, const void *b)
++{
++	return a == b;
++}
++
+ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+ {
++	bool first;
++
+ 	if (!net)
+ 		return false;
+ 
+-	net->io = io;
+-	if (net->provisioned) {
++	first = l_queue_isempty(nets);
++	if (first) {
++		if (!nets)
++			nets = l_queue_new();
+ 
++		l_info("Register io cb");
+ 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_BEACON,
+ 							beacon_recv, net);
+ 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_NET,
+-							net_msg_recv, net);
++							net_msg_recv, NULL);
+ 		l_queue_foreach(net->subnets, start_network_beacon, net);
++	}
+ 
+-	} else {
+-		uint8_t *uuid = node_uuid_get(net->local_node);
+-
+-		if (!uuid)
+-			return false;
++	if (l_queue_find(nets, is_this_net, net))
++		return false;
+ 
+-		mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_BEACON);
+-		mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_NET);
++	l_queue_push_head(nets, net);
+ 
+-		mesh_prov_listen(net, uuid, (uint8_t *) &net->prov_caps,
+-					acceptor_prov_open,
+-					acceptor_prov_close,
+-					acceptor_prov_receive, net);
+-	}
++	net->io = io;
+ 
+ 	return true;
+ }
+@@ -2952,10 +2948,10 @@ struct mesh_io *mesh_net_detach(struct mesh_net *net)
+ 	struct mesh_io *io;
+ 	uint8_t type = 0;
+ 
+-	if (!net)
++	if (!net || !net->io)
+ 		return NULL;
+ 
+-	io  = net->io;
++	io = net->io;
+ 
+ 	mesh_io_send_cancel(net->io, &type, 1);
+ 	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_BEACON);
+@@ -2975,7 +2971,7 @@ bool mesh_net_iv_index_update(struct mesh_net *net)
+ 	mesh_net_flush_msg_queues(net);
+ 	net->iv_upd_state = IV_UPD_UPDATING;
+ 	net->iv_index++;
+-	if (!storage_local_set_iv_index(net, net->iv_index, IV_UPD_UPDATING))
++	if (!storage_set_iv_index(net, net->iv_index, IV_UPD_UPDATING))
+ 		return false;
+ 
+ 	l_queue_foreach(net->subnets, set_network_beacon, net);
+@@ -3241,28 +3237,25 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
+ 	l_free(str);
  }
  
--static bool parse_local_node(struct mesh_net *net, json_object *jnode)
-+static bool parse_node(struct mesh_node *node, json_object *jnode)
+-unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
+-				uint16_t src, uint16_t dst,
+-				uint8_t key_id, uint8_t ttl,
+-				uint32_t seq, uint32_t iv_index,
+-				bool szmic,
++bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
++				uint16_t dst, uint8_t key_id, uint8_t ttl,
++				uint32_t seq, uint32_t iv_index, bool szmic,
+ 				const void *msg, uint16_t msg_len,
+ 				mesh_net_status_func_t status_func,
+ 				void *user_data)
  {
- 	bool bvalue;
- 	uint32_t iv_index;
- 	uint8_t key_buf[16];
- 	uint8_t cnt;
- 	uint16_t interval;
-+	struct mesh_net *net = node_get_net(node);
+ 	struct mesh_sar *payload = NULL;
+ 	uint8_t seg, seg_max;
+-	unsigned int ret = 0;
+ 	bool result;
  
- 	if (mesh_db_read_iv_index(jnode, &iv_index, &bvalue))
- 		mesh_net_set_iv_index(net, iv_index, bvalue);
-@@ -147,97 +155,35 @@ static bool parse_local_node(struct mesh_net *net, json_object *jnode)
- 		mesh_net_transmit_params_set(net, cnt, interval);
+ 	if (!net || msg_len > 384)
+-		return 0;
++		return false;
  
- 	/* Node composition/configuration info */
--	if (!mesh_db_read_node(jnode, read_local_node_cb, net))
-+	if (!mesh_db_read_node(jnode, read_node_cb, node))
- 		return false;
+ 	if (!src)
+ 		src = net->src_addr;
  
- 	if (!mesh_db_read_net_keys(jnode, read_net_keys_cb, net))
- 		return false;
+ 	if (!src || !dst)
+-		return 0;
++		return false;
  
--	/* TODO: use the actual "primary" network index for this node */
--	if (mesh_db_read_device_key(jnode, key_buf) &&
--		!node_set_device_key(mesh_net_local_node_get(net), key_buf))
-+	if (!mesh_db_read_device_key(jnode, key_buf))
- 		return false;
+ 	if (ttl == 0xff)
+ 		ttl = net->default_ttl;
+@@ -3287,7 +3280,7 @@ unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
+ 		/* Adjust our seq_num for "virtual" delivery */
+ 		net->seq_num += seg_max;
+ 		mesh_net_next_seq_num(net);
+-		return 0;
++		return true;
+ 	}
  
--	mesh_db_read_app_keys(jnode, read_app_keys_cb, net);
+ 	/* If Segmented, Cancel any OB segmented message to same DST */
+@@ -3337,29 +3330,13 @@ unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
+ 			l_timeout_create(MSG_TO, outmsg_to, net, NULL);
+ 		payload->status_func = status_func;
+ 		payload->user_data = user_data;
+-		ret = payload->id = ++net->sar_id_next;
++		payload->id = ++net->sar_id_next;
+ 	} else
+ 		mesh_sar_free(payload);
+ 
+-	return ret;
+-}
+-
+-void mesh_net_app_send_cancel(struct mesh_net *net, unsigned int id)
+-{
+-	struct mesh_sar *sar = l_queue_remove_if(net->sar_out, match_sar_id,
+-						L_UINT_TO_PTR(id));
+-
+-	if (sar) {
+-		l_info("Canceling OB %d", id);
+-		if (sar->status_func)
+-			sar->status_func(sar->remote, 2,
+-				sar->buf, sar->len - 4,
+-				sar->user_data);
+-	}
+-	mesh_sar_free(sar);
++	return result;
+ }
+ 
+-/* TODO: add net key index */
+ void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
+ 				uint32_t iv_index,
+ 				uint8_t ttl,
+@@ -3768,40 +3745,9 @@ uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr)
+ 		return frnd->poll_timeout;
+ }
+ 
+-bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
+-							bool provisioner)
++struct mesh_node *mesh_net_node_get(struct mesh_net *net)
+ {
+-	if (net->local_node) {
+-		l_info("Local node already registered");
+-		return false;
+-	}
+-
+-	net->local_node = node;
+-	net->provisioner = provisioner;
 -
 -	return true;
 -}
 -
--static bool read_unprov_device_cb(struct mesh_db_node *db_node, void *user_data)
+-struct mesh_node *mesh_net_local_node_get(struct mesh_net *net)
 -{
--	struct mesh_net *net = user_data;
--	struct mesh_node *node;
--	uint16_t crpl;
--	uint8_t *uuid;
--
--	if (!net)
--		return false;
-+	node_set_device_key(node, key_buf);
- 
--	node = node_create_from_storage(net, db_node, true);
--
--	if (!node)
--		return false;
--
--	mesh_net_local_node_set(net, node, db_node->provisioner);
--	crpl = node_get_crpl(node);
--	mesh_net_set_crpl(net, crpl);
--
--	uuid = node_uuid_get(node);
--	if (uuid)
--		mesh_net_id_uuid_set(net, uuid);
-+	mesh_db_read_app_keys(jnode, read_app_keys_cb, net);
- 
- 	return true;
- }
- 
--static bool parse_unprovisioned_device(struct mesh_net *net, json_object *jnode)
--{
--	struct mesh_db_prov prov;
--	struct mesh_net_prov_caps *caps;
--	struct mesh_node *node;
--
--	/* Node composition/configuration info */
--	if (!mesh_db_read_unprovisioned_device(jnode,
--					read_unprov_device_cb, net))
--		return false;
--
--	if (!mesh_db_read_prov_info(jnode, &prov))
--		return false;
--
--	caps = mesh_net_prov_caps_get(net);
--	if (!caps)
--		return false;
--
--	node = mesh_net_local_node_get(net);
--	if (!node)
--		return false;
--
--	caps->num_ele = node_get_num_elements(node);
--	l_put_le16(prov.algorithm, &caps->algorithms);
--	caps->pub_type = prov.pub_type;
--	caps->static_type = prov.static_type;
--	caps->output_size = prov.output_oob.size;
--	l_put_le16(prov.output_oob.actions, &caps->output_action);
--	caps->input_size = prov.input_oob.size;
--	l_put_le16(prov.input_oob.actions, &caps->input_action);
--
--	return mesh_net_priv_key_set(net, prov.priv_key);
+-	return  net->local_node;
 -}
 -
--static bool parse_config(struct mesh_net *net, const char *config_name,
--							bool unprovisioned)
-+static bool parse_config(char *in_file, char *out_file, uint16_t node_id)
- {
- 	int fd;
- 	char *str;
--	const char *out;
- 	struct stat st;
- 	ssize_t sz;
- 	json_object *jnode = NULL;
- 	bool result = false;
-+	struct mesh_node *node;
- 
--	if (!config_name)
--		return false;
-+	l_info("Loading configuration from %s", in_file);
- 
--	fd = open(config_name, O_RDONLY);
-+	fd = open(in_file, O_RDONLY);
- 	if (!fd)
- 		return false;
- 
-@@ -254,7 +200,7 @@ static bool parse_config(struct mesh_net *net, const char *config_name,
- 
- 	sz = read(fd, str, st.st_size);
- 	if (sz != st.st_size) {
--		l_error("Failed to read configuration file");
-+		l_error("Failed to read configuration file %s", in_file);
- 		goto done;
- 	}
- 
-@@ -262,22 +208,19 @@ static bool parse_config(struct mesh_net *net, const char *config_name,
- 	if (!jnode)
- 		goto done;
- 
--	mesh_net_jconfig_set(net, jnode);
-+	node = node_new();
- 
--	if (!unprovisioned)
--		result = parse_local_node(net, jnode);
--	else
--		result = parse_unprovisioned_device(net, jnode);
-+	node_jconfig_set(node, jnode);
-+	node_cfg_file_set(node, out_file);
-+	node_id_set(node, node_id);
-+
-+	result = parse_node(node, jnode);
- 
- 	if (!result) {
--		storage_release(net);
--		goto done;
-+		json_object_put(jnode);
-+		node_free(node);
- 	}
- 
--	mesh_net_cfg_file_get(net, &out);
--	if (!out)
--		mesh_net_cfg_file_set(net, !unprovisioned ?
--					config_name : NODE_CONGIGURATION_FILE);
- done:
- 	close(fd);
- 	if (str)
-@@ -286,166 +229,70 @@ done:
- 	return result;
- }
- 
--bool storage_parse_config(struct mesh_net *net, const char *config_name)
+-bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl)
 -{
--	bool result = false;
--	bool unprovisioned = !config_name;
+-	if (!net)
+-		return false;
 -
--	if (unprovisioned) {
--		result = parse_config(net, DEVICE_COMPOSITION_FILE, true);
--		goto done;
--	}
--
--	result = parse_config(net, config_name, false);
--
--	if (!result) {
--		size_t len = strlen(config_name) + 5;
--		char *bak = l_malloc(len);
--
--		/* Fall-back to Backup version */
--		strncpy(bak, config_name, len);
--		bak = strncat(bak, ".bak", 5);
--
--		remove(config_name);
--		rename(bak, config_name);
--
--		result = parse_config(net, config_name, false);
--
--		l_free(bak);
--	}
--
--	/* If configuration read fails, try as unprovisioned device */
--	if (!result) {
--		l_info("Parse configuration failed, trying unprovisioned");
--		unprovisioned = true;
--		result = parse_config(net, DEVICE_COMPOSITION_FILE, true);
--	}
--
--done:
--	if (result)
--		mesh_net_provisioned_set(net, !unprovisioned);
--
--	return result;
+-	net->crpl = crpl;
+-	return true;
 -}
 -
--bool storage_local_set_ttl(struct mesh_net *net, uint8_t ttl)
-+bool storage_set_ttl(json_object *jnode, uint8_t ttl)
- {
--	json_object *jnode;
+-uint16_t mesh_net_get_crpl(struct mesh_net *net)
+-{
+-	if (!net)
+-		return 0;
 -
+-	return net->crpl;
++	return  net->node;
+ }
+ 
+ struct l_queue *mesh_net_get_app_keys(struct mesh_net *net)
+@@ -3824,41 +3770,6 @@ bool mesh_net_have_key(struct mesh_net *net, uint16_t idx)
+ 						L_UINT_TO_PTR(idx)) != NULL);
+ }
+ 
+-bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig)
+-{
 -	if (!net)
 -		return false;
 -
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
+-	net->jconfig_local = jconfig;
+-	return true;
+-}
 -
- 	return mesh_db_write_int(jnode, "defaultTTL", ttl);
- }
- 
--bool storage_local_set_relay(struct mesh_net *net, bool enable,
-+bool storage_set_relay(json_object *jnode, bool enable,
- 				uint8_t count, uint8_t interval)
- {
--	json_object *jnode;
+-void *mesh_net_jconfig_get(struct mesh_net *net)
+-{
+-	if (!net)
+-		return NULL;
 -
+-	return  net->jconfig_local;
+-}
+-
+-bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg)
+-{
 -	if (!net)
 -		return false;
 -
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
+-	net->cfg_file = cfg;
+-	return true;
+-}
 -
- 	return mesh_db_write_relay_mode(jnode, enable, count, interval);
- }
- 
--bool storage_local_set_transmit_params(struct mesh_net *net, uint8_t count,
-+bool storage_set_transmit_params(json_object *jnode, uint8_t count,
- 							uint8_t interval)
- {
--	json_object *jnode;
--
+-bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg)
+-{
 -	if (!net)
 -		return false;
 -
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
+-	*cfg = net->cfg_file;
+-	return true;
+-}
 -
- 	return mesh_db_write_net_transmit(jnode, count, interval);
+ bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr)
+ {
+ 	if (!net)
+@@ -3919,55 +3830,3 @@ void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov)
+ 	net->prov = prov;
  }
  
--bool storage_local_set_mode(struct mesh_net *net, uint8_t mode,
-+bool storage_set_mode(json_object *jnode, uint8_t mode,
- 						const char *mode_name)
- {
--	json_object *jnode;
--
--	if (!net || !mode_name)
+-bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
+-				uint16_t net_idx,  uint8_t net_key[16],
+-				uint16_t unicast, uint16_t snb_flags,
+-				uint32_t iv_index, mesh_status_func_t cb,
+-				void *user_data)
+-{
+-	if (net->provisioned || !net->local_node)
 -		return false;
 -
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
+-	if (!node_set_primary(net->local_node, unicast) ||
+-				!(mesh_net_register_unicast(net, unicast,
+-						mesh_net_get_num_ele(net))))
 -		return false;
 -
- 	return mesh_db_write_mode(jnode, mode_name, mode);
- }
- 
--bool storage_model_bind(struct mesh_net *net, uint16_t addr, uint32_t mod_id,
-+bool storage_model_bind(struct mesh_node *node, uint16_t addr, uint32_t mod_id,
- 				uint16_t app_idx, bool unbind)
- {
- 	json_object *jnode;
--	bool is_local;
-+	int ele_idx;
-+	bool is_vendor = (mod_id > 0xffff);
- 
--	if (!net)
-+	ele_idx = node_get_element_idx(node, addr);
-+	if (ele_idx < 0)
- 		return false;
- 
--	is_local = mesh_net_is_local_address(net, addr);
--	if (is_local) {
--		int ele_idx;
--		bool is_vendor = (mod_id > 0xffff);
+-	if (!node_set_device_key(net->local_node, device_key))
+-		return false;
 -
--		ele_idx = node_get_element_idx(mesh_net_local_node_get(net),
--									addr);
--		if (ele_idx < 0)
--			return false;
+-	net->iv_index = iv_index;
+-	net->iv_update = ((snb_flags & 0x02) != 0);
+-	if (!storage_local_set_iv_index(net, iv_index, net->iv_update))
+-		return false;
 -
--		jnode = mesh_net_jconfig_get(net);
--		if (!jnode)
--			return false;
+-	if (mesh_net_add_key(net, false, net_idx, net_key) !=
+-							MESH_STATUS_SUCCESS)
+-		return false;
 -
--		if (unbind)
--			return mesh_db_model_binding_del(jnode, ele_idx,
--						is_vendor, mod_id, app_idx);
--		else
--			return mesh_db_model_binding_add(jnode, ele_idx,
--						is_vendor, mod_id, app_idx);
+-	if ((snb_flags & 0x01) &&
+-			(mesh_net_add_key(net, true, net_idx, net_key) !=
+-							MESH_STATUS_SUCCESS)) {
+-		l_queue_clear(net->subnets, l_free);
+-		return false;
 -	}
-+	jnode = node_jconfig_get(node);
- 
--	/* TODO: write remote node bindings to provisioner DB */
--	return false;
-+	if (unbind)
-+		return mesh_db_model_binding_del(jnode, ele_idx, is_vendor,
-+							mod_id, app_idx);
-+	else
-+		return mesh_db_model_binding_add(jnode, ele_idx, is_vendor,
-+							mod_id, app_idx);
- }
- 
--bool storage_local_app_key_add(struct mesh_net *net, uint16_t net_idx,
-+bool storage_app_key_add(struct mesh_net *net, uint16_t net_idx,
- 			uint16_t app_idx, const uint8_t key[16], bool update)
- {
- 	json_object *jnode;
-+	struct mesh_node *node = mesh_net_node_get(net);
- 
--	if (!net)
--		return false;
 -
--	jnode = mesh_net_jconfig_get(net);
-+	jnode = node_jconfig_get(node);
- 	if (!jnode)
- 		return false;
- 
- 	return mesh_db_app_key_add(jnode, net_idx, app_idx, key, update);
- }
- 
--bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
-+bool storage_app_key_del(struct mesh_net *net, uint16_t net_idx,
- 					uint16_t app_idx)
- {
- 	json_object *jnode;
-+	struct mesh_node *node = mesh_net_node_get(net);
- 
--	if (!net)
--		return false;
+-	return storage_save_new_config(net, net->cfg_file, cb, user_data);
 -
--	jnode = mesh_net_jconfig_get(net);
-+	jnode = node_jconfig_get(node);
- 	if (!jnode)
- 		return false;
- 
-@@ -453,116 +300,53 @@ bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
- 
- }
- 
--bool storage_local_net_key_add(struct mesh_net *net, uint16_t net_idx,
-+bool storage_net_key_add(struct mesh_net *net, uint16_t net_idx,
- 					const uint8_t key[16], int phase)
- {
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
-+	struct mesh_node *node = mesh_net_node_get(net);
-+	json_object *jnode = node_jconfig_get(node);
- 
- 	return mesh_db_net_key_add(jnode, net_idx, key, phase);
- }
- 
--bool storage_local_net_key_del(struct mesh_net *net, uint16_t net_idx)
-+bool storage_net_key_del(struct mesh_net *net, uint16_t net_idx)
- {
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
-+	struct mesh_node *node = mesh_net_node_get(net);
-+	json_object *jnode = node_jconfig_get(node);
- 
- 	return mesh_db_net_key_del(jnode, net_idx);
- }
- 
--bool storage_local_set_iv_index(struct mesh_net *net, uint32_t iv_index,
-+bool storage_set_iv_index(struct mesh_net *net, uint32_t iv_index,
- 								bool update)
- {
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
-+	struct mesh_node *node = mesh_net_node_get(net);
-+	json_object *jnode = node_jconfig_get(node);
- 
- 	return mesh_db_write_iv_index(jnode, iv_index, update);
- }
- 
--bool storage_local_set_device_key(struct mesh_net *net, uint8_t dev_key[16])
--{
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
--	return mesh_db_write_device_key(jnode, dev_key);
 -}
 -
--bool storage_local_set_unicast(struct mesh_net *net, uint16_t unicast)
-+bool storage_write_sequence_number(struct mesh_net *net, uint32_t seq)
- {
--	json_object *jnode;
--
+-void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned)
+-{
 -	if (!net)
--		return false;
+-		return;
 -
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
--	return mesh_db_write_uint16_hex(jnode, "unicastAddress", unicast);
+-	net->provisioned = provisioned;
 -}
 -
--bool storage_local_write_sequence_number(struct mesh_net *net, uint32_t seq)
+-bool mesh_net_provisioned_get(struct mesh_net *net)
 -{
--	json_object *jnode;
--	const char *cfg_file;
-+	struct mesh_node *node = mesh_net_node_get(net);
-+	json_object *jnode = node_jconfig_get(node);
- 	bool result;
--
 -	if (!net)
 -		return false;
 -
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
-+	l_debug("");
- 	result = mesh_db_write_int(jnode, "sequenceNumber", seq);
- 	if (!result)
- 		return false;
+-	return net->provisioned;
+-}
+diff --git a/mesh/net.h b/mesh/net.h
+index b8eb0699d..c63ea59ee 100644
+--- a/mesh/net.h
++++ b/mesh/net.h
+@@ -259,9 +259,8 @@ typedef void (*mesh_net_status_func_t)(uint16_t remote, uint8_t status,
+ 					void *data, uint16_t size,
+ 					void *user_data);
  
--	result = mesh_net_cfg_file_get(net, &cfg_file);
--	if (result && cfg_file)
--		result = storage_save_config(net, cfg_file, false, NULL, NULL);
-+	result = storage_save_config(node, false, NULL, NULL);
+-struct mesh_net *mesh_net_new(uint16_t index);
+-struct mesh_net *mesh_net_ref(struct mesh_net *net);
+-void mesh_net_unref(struct mesh_net *net);
++struct mesh_net *mesh_net_new(struct mesh_node *node);
++void mesh_net_free(struct mesh_net *net);
+ void mesh_net_flush_msg_queues(struct mesh_net *net);
+ void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update);
+ bool mesh_net_iv_index_update(struct mesh_net *net);
+@@ -301,13 +300,12 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
+ 				uint32_t seq, uint16_t src, uint16_t dst,
+ 				const uint8_t *msg, uint16_t msg_len);
  
- 	return result;
- }
- 
--static bool save_config(struct mesh_net *net, const char *config_name)
-+static bool save_config(json_object *jnode, const char *config_name)
- {
- 	FILE *outfile;
- 	const char *str;
--	json_object *jnode;
- 	bool result = false;
- 
--	if (!net || !config_name)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
- 	outfile = fopen(config_name, "w");
- 	if (!outfile) {
- 		l_error("Failed to save configuration to %s", config_name);
-@@ -581,13 +365,6 @@ static bool save_config(struct mesh_net *net, const char *config_name)
- 	return result;
- }
- 
--struct write_info {
--	const char *config_name;
--	struct mesh_net *net;
--	void *user_data;
--	mesh_status_func_t cb;
--};
--
- static void idle_save_config(void *user_data)
- {
- 	struct write_info *info = user_data;
-@@ -603,7 +380,7 @@ static void idle_save_config(void *user_data)
- 	remove(tmp);
- 
- 	l_debug("Storage-Wrote");
--	result = save_config(info->net, tmp);
-+	result = save_config(info->jnode, tmp);
- 
- 	if (result) {
- 		remove(bak);
-@@ -621,48 +398,203 @@ static void idle_save_config(void *user_data)
- 	l_free(info);
- }
- 
--bool storage_save_config(struct mesh_net *net, const char *config_name,
--			bool no_wait, mesh_status_func_t cb, void *user_data)
-+bool storage_save_config(struct mesh_node *node, bool no_wait,
-+					mesh_status_func_t cb, void *user_data)
- {
- 	struct write_info *info;
- 
- 	info = l_new(struct write_info, 1);
- 	if (!info)
- 		return false;
--
--	info->net = net;
--	info->config_name = config_name;
-+	l_debug("");
-+	info->jnode = node_jconfig_get(node);
-+	info->config_name = node_cfg_file_get(node);
- 	info->cb = cb;
- 	info->user_data = user_data;
- 
- 	if (no_wait)
- 		idle_save_config(info);
--	l_idle_oneshot(idle_save_config, info, NULL);
-+	else
-+		l_idle_oneshot(idle_save_config, info, NULL);
- 
- 	return true;
- }
- 
--bool storage_save_new_config(struct mesh_net *net, const char *config_name,
--					mesh_status_func_t cb, void *user_data)
-+static int create_dir(const char *dirname)
- {
--	json_object *jnode;
-+	struct stat st;
-+	char dir[PATH_MAX + 1], *prev, *next;
-+	int err;
- 
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
-+	err = stat(dirname, &st);
-+	if (!err && S_ISREG(st.st_mode))
-+		return 0;
-+
-+	memset(dir, 0, PATH_MAX + 1);
-+	strcat(dir, "/");
-+
-+	prev = strchr(dirname, '/');
-+
-+	while (prev) {
-+		next = strchr(prev + 1, '/');
-+		if (!next)
-+			break;
-+
-+		if (next - prev == 1) {
-+			prev = next;
-+			continue;
-+		}
-+
-+		strncat(dir, prev + 1, next - prev);
-+		mkdir(dir, 0755);
-+
-+		prev = next;
-+	}
-+
-+	mkdir(dirname, 0755);
-+
-+	return 0;
-+}
-+
-+bool storage_load_nodes(const char *dir_name)
-+{
-+	DIR *dir;
-+	struct dirent *entry;
-+
-+	create_dir(dir_name);
-+	dir = opendir(dir_name);
-+	if (!dir) {
-+		l_error("Failed to open mesh node storage directory: %s",
-+								dir_name);
- 		return false;
-+	}
-+
-+	storage_dir = dir_name;
-+	node_ids = l_queue_new();
-+
-+	while ((entry = readdir(dir)) != NULL) {
-+		char name_buf[PATH_MAX];
-+		char *filename;
-+		uint32_t node_id;
-+		size_t len;
-+
-+		if (entry->d_type != DT_DIR)
-+			continue;
-+
-+		if (sscanf(entry->d_name, "%04x", &node_id) != 1)
-+			continue;
-+
-+		snprintf(name_buf, PATH_MAX, "%s/%s/node.json", dir_name,
-+								entry->d_name);
-+
-+		l_queue_push_tail(node_ids, L_UINT_TO_PTR(node_id));
-+
-+		len = strlen(name_buf);
-+		filename = l_malloc(len + 1);
-+
-+		strncpy(filename, name_buf, len + 1);
-+
-+		if (parse_config(name_buf, filename, node_id))
-+			continue;
-+
-+		/* Fall-back to Backup version */
-+		snprintf(name_buf, PATH_MAX, "%s/%s/node.json.bak", dir_name,
-+								entry->d_name);
- 
--	mesh_db_remove_property(jnode, "provision");
-+		if (parse_config(name_buf, filename, node_id)) {
-+			remove(filename);
-+			rename(name_buf, filename);
-+			continue;
-+		}
- 
--	return storage_save_config(net, config_name, false, cb, user_data);
-+		l_free(filename);
-+	}
-+
-+	return true;
- }
- 
--void storage_release(struct mesh_net *net)
-+bool storage_create_node_config(struct mesh_node *node, void *data)
- {
-+	struct mesh_db_node *db_node = data;
-+	uint16_t node_id;
-+	uint8_t num_tries = 0;
-+	char name_buf[PATH_MAX];
-+	char *filename;
- 	json_object *jnode;
-+	size_t len;
-+
-+	if (!storage_dir)
-+		return false;
-+
-+	jnode = json_object_new_object();
-+
-+	if (!mesh_db_add_node(jnode, db_node))
-+		return false;
-+
-+
-+
-+	do {
-+		l_getrandom(&node_id, 2);
-+		if (!l_queue_find(node_ids, simple_match,
-+						L_UINT_TO_PTR(node_id)))
-+			break;
-+	} while (++num_tries < 10);
-+
-+	if (num_tries == 10) {
-+		l_error("Failed to generate unique node ID");
-+
-+	}
-+
-+	snprintf(name_buf, PATH_MAX, "%s/%04x", storage_dir, node_id);
-+
-+	/* Create a new directory and node.json file */
-+	if (mkdir(name_buf, 0755) != 0)
-+		goto fail;
- 
--	jnode = mesh_net_jconfig_get(net);
-+	len = strlen(name_buf) + strlen("/node.json") + 1;
-+	filename = l_malloc(len);
-+
-+	snprintf(filename, len, "%s/node.json", name_buf);
-+	l_debug("New node config %s", filename);
-+
-+	if (!save_config(jnode, filename)) {
-+		l_free(filename);
-+		goto fail;
-+	}
-+
-+	node_jconfig_set(node, jnode);
-+	node_cfg_file_set(node, filename);
-+
-+	return true;
-+fail:
-+	json_object_put(jnode);
-+	return false;
-+}
-+
-+/* Permanently remove node configuration */
-+void storage_remove_node_config(struct mesh_node *node)
-+{
-+	char *cfgname;
-+	struct json_object *jnode;
-+	const char *dir_name;
-+
-+	jnode = node_jconfig_get(node);
- 	if (jnode)
- 		json_object_put(jnode);
-+	node_jconfig_set(node, NULL);
-+
-+	cfgname = (char *) node_cfg_file_get(node);
-+	if (!cfgname)
-+		return;
-+
-+	l_debug("Delete node config file %s", cfgname);
-+	remove(cfgname);
-+
-+	dir_name = dirname(cfgname);
-+
-+	l_debug("Delete directory %s", dir_name);
-+	rmdir(dir_name);
- 
--	mesh_net_jconfig_set(net, NULL);
-+	l_free(cfgname);
-+	node_cfg_file_set(node, NULL);
- }
-diff --git a/mesh/storage.h b/mesh/storage.h
-index 341932dba..9583669f0 100644
---- a/mesh/storage.h
-+++ b/mesh/storage.h
-@@ -18,34 +18,35 @@
-  *
-  */
- 
-+#include <json-c/json.h>
-+
- struct mesh_net;
-+struct mesh_node;
- 
--bool storage_parse_config(struct mesh_net *net, const char *config_name);
--bool storage_save_config(struct mesh_net *net, const char *config_name,
--			bool no_wait, mesh_status_func_t cb, void *user_data);
--bool storage_save_new_config(struct mesh_net *net, const char *config_name,
-+bool storage_load_nodes(const char *dir);
-+bool storage_create_node_config(struct mesh_node *node, void *db_node);
-+void storage_remove_node_config(struct mesh_node *node);
-+bool storage_save_config(struct mesh_node *node, bool no_wait,
- 					mesh_status_func_t cb, void *user_data);
--void storage_release(struct mesh_net *net);
--
--bool storage_model_bind(struct mesh_net *net, uint16_t addr, uint32_t id,
-+bool storage_model_bind(struct mesh_node *node, uint16_t addr, uint32_t id,
- 						uint16_t app_idx, bool unbind);
- 
--bool storage_local_set_ttl(struct mesh_net *net, uint8_t ttl);
--bool storage_local_set_relay(struct mesh_net *net, bool enable, uint8_t count,
-+bool storage_set_ttl(json_object *jnode, uint8_t ttl);
-+bool storage_set_relay(json_object *jnode, bool enable, uint8_t count,
- 							uint8_t interval);
--bool storage_local_set_transmit_params(struct mesh_net *net, uint8_t count,
-+bool storage_set_transmit_params(json_object *jnode, uint8_t count,
- 							uint8_t interval);
--bool storage_local_set_mode(struct mesh_net *net, uint8_t mode,
-+bool storage_set_mode(json_object *jnode, uint8_t mode,
- 							const char *mode_name);
--bool storage_local_net_key_add(struct mesh_net *net, uint16_t net_idx,
-+bool storage_net_key_add(struct mesh_net *net, uint16_t net_idx,
- 					const uint8_t key[16], int phase);
--bool storage_local_net_key_del(struct mesh_net *net, uint16_t net_idx);
--bool storage_local_app_key_add(struct mesh_net *net, uint16_t net_idx,
-+bool storage_net_key_del(struct mesh_net *net, uint16_t net_idx);
-+bool storage_app_key_add(struct mesh_net *net, uint16_t net_idx,
- 			uint16_t app_idx, const uint8_t key[16], bool update);
--bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
-+bool storage_app_key_del(struct mesh_net *net, uint16_t net_idx,
- 							uint16_t app_idx);
--bool storage_local_write_sequence_number(struct mesh_net *net, uint32_t seq);
--bool storage_local_set_iv_index(struct mesh_net *net, uint32_t iv_index,
-+bool storage_write_sequence_number(struct mesh_net *net, uint32_t seq);
-+bool storage_set_iv_index(struct mesh_net *net, uint32_t iv_index,
- 								bool update);
--bool storage_local_set_device_key(struct mesh_net *net, uint8_t dev_key[16]);
--bool storage_local_set_unicast(struct mesh_net *net, uint16_t unicast);
-+bool storage_set_device_key(struct mesh_node *node, uint8_t dev_key[16]);
-+bool storage_set_unicast(struct mesh_node *node, uint16_t unicast);
+-unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
+-				uint16_t src, uint16_t dst, uint8_t key_id,
+-				uint8_t ttl, uint32_t seq, uint32_t iv_index,
+-				bool szmic, const void *msg, uint16_t msg_len,
++bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
++				uint16_t dst, uint8_t key_id, uint8_t ttl,
++				uint32_t seq, uint32_t iv_index, bool szmic,
++				const void *msg, uint16_t msg_len,
+ 				mesh_net_status_func_t status_func,
+ 				void *user_data);
+-void mesh_net_app_send_cancel(struct mesh_net *net, unsigned int id);
+ void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
+ 				uint32_t iv_index, uint8_t ttl, uint32_t seq,
+ 				uint16_t src, uint16_t dst, bool rly,
+@@ -363,16 +361,8 @@ void mesh_net_sub_list_add(struct mesh_net *net, uint16_t addr);
+ void mesh_net_sub_list_del(struct mesh_net *net, uint16_t addr);
+ uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr);
+ struct mesh_io *mesh_net_get_io(struct mesh_net *net);
+-bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
+-							bool provisioner);
+-struct mesh_node *mesh_net_local_node_get(struct mesh_net *net);
+-bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl);
+-uint16_t mesh_net_get_crpl(struct mesh_net *net);
++struct mesh_node *mesh_net_node_get(struct mesh_net *net);
+ bool mesh_net_have_key(struct mesh_net *net, uint16_t net_idx);
+-bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig);
+-void *mesh_net_jconfig_get(struct mesh_net *net);
+-bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg);
+-bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg);
+ bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr);
+ void mesh_net_set_window_accuracy(struct mesh_net *net, uint8_t accuracy);
+ void mesh_net_transmit_params_set(struct mesh_net *net, uint8_t count,
+@@ -381,10 +371,3 @@ void mesh_net_transmit_params_get(struct mesh_net *net, uint8_t *count,
+ 							uint16_t *interval);
+ struct mesh_prov *mesh_net_get_prov(struct mesh_net *net);
+ void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov);
+-void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned);
+-bool mesh_net_provisioned_get(struct mesh_net *net);
+-bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
+-				uint16_t net_idx,  uint8_t net_key[16],
+-				uint16_t unicast, uint16_t snb_flags,
+-				uint32_t iv_index, mesh_status_func_t cb,
+-				void *user_data);
 -- 
 2.14.5
 
