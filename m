@@ -2,104 +2,134 @@ Return-Path: <SRS0=1Za/=OY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BBEC43387
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 07:22:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F8CC43387
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 20:29:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A97F20672
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 07:22:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C4D32084D
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 20:29:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i3CeH+hZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JJPxMoy8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729671AbeLOHWV (ORCPT
+        id S1727265AbeLOU3V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 15 Dec 2018 02:22:21 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:34753 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728675AbeLOHWV (ORCPT
+        Sat, 15 Dec 2018 15:29:21 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46221 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727229AbeLOU3U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 15 Dec 2018 02:22:21 -0500
-Received: by mail-pl1-f193.google.com with SMTP id w4so3768202plz.1;
-        Fri, 14 Dec 2018 23:22:19 -0800 (PST)
+        Sat, 15 Dec 2018 15:29:20 -0500
+Received: by mail-wr1-f67.google.com with SMTP id l9so8551535wrt.13
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Dec 2018 12:29:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=xNSQnLp2ea1UJjtMX5kv0ypQi79onHL2a/igC8HRsrE=;
-        b=i3CeH+hZC8i4s3hA3MTygU6Qa9RqRpWIp43U734ZciNoSVfaw0u9IW3BrFuruEsFP/
-         jbPUgqRQAYq1gNA7Up/xWzvSaow47L4G+wC2SVl5FiER+oT5pmj24rggAQq0NtgPWD35
-         gJbxAr4R1gp56ib5i3BlRaMNUSByOUjdegle8QxVcVULJXmPgVbLFoG/yLYf2FXB0+Cb
-         0IOie6umI3z9JzO3DVg9OMrnwxud0QCkLM6GU6zD7vdp6KGDfmpWs5vfjnpSNFBPHBP1
-         MT8l/LVzi36b60H+NnDcynooR8n+XMtWilWH1fyCRwWRByMUbDRvNT2IlPJb638Cts70
-         CxQg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=0zooompeLkv4cocIRzLKYrz/1U8/mu6s8z0oVz8VZwE=;
+        b=JJPxMoy8tTx0o2DzdUSZVwyiora8tNXOg76isU/cMIUlxIBhZ5xVb2TkE5uApMfOdx
+         ZSLvWT4UJSiTlWNcIYGlrYFoUvZHADNljTltHcUvEQGvM3YkhDEkiJiL+VS26n4QqROb
+         cUkmhBuT9MTA7LXZpD3dvyaE6EGPHP7ZObJBTPHPiazyaXADokG8OdkUUMNHbg0ZxEze
+         j5ofCBI5ISqOHEJyAjKj1tKkB7Q4ohLhkitLckI67RSD+LTSnINnPX2OYeFwODtGEGFf
+         mgfqE70tZfYI9YrHoF6pg0lQFg8BkG9iLvLM8fcKWEaLDpR2iLiLkxXmvTNatAKbLu6N
+         Uj2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=xNSQnLp2ea1UJjtMX5kv0ypQi79onHL2a/igC8HRsrE=;
-        b=KVV1MBK8S/Bl1IuP2jfAiAvZFHKARRhH475Ra5CEh7An0a257IBN6j+WZ0uuta2JsC
-         oeTvrrNDOMYNIKhm8GFozqxlPcsBUOhM5RHZ/nLHmxE4SGLO/4SUcW0ZBZNGHgVl9x+G
-         Ek0dlD+Hcy6d56HQV6gpyhCq0V71VPhEmI3tM1Ewj1GW9EFQRyaYfVNb2gg23EERuM/o
-         m+nq23bc9qUP79K5/PcG56vRoME4OmQ0Av6x42/uirOR/khQSeu+W5ekwftemEXppO08
-         Ckk9/nBNBeEkro67ZNI1QYu6jpxm1UMm5U5B5gV84Jlaz2RM5khPKhbJvXmzWVzmpdJ/
-         1g0g==
-X-Gm-Message-State: AA+aEWZ0NswU9IEQ3HcUawGe2d0nAzfWvG37uidBgEXG5CFNJmJC94Sk
-        PtvNlkKJV8YGcOT3MIN7pIBYkAPPIKE=
-X-Google-Smtp-Source: AFSGD/Xr3NiL/VDa9o5FushEkh3TT9+3wB5GheOwgyGbADGkLi48cu06bO80VnawtUOeQHxba6Xyvw==
-X-Received: by 2002:a17:902:47aa:: with SMTP id r39mr5542068pld.219.1544858539576;
-        Fri, 14 Dec 2018 23:22:19 -0800 (PST)
-Received: from localhost (68.168.130.77.16clouds.com. [68.168.130.77])
-        by smtp.gmail.com with ESMTPSA id r83sm12121143pfc.115.2018.12.14.23.22.18
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=0zooompeLkv4cocIRzLKYrz/1U8/mu6s8z0oVz8VZwE=;
+        b=kqBWqCK+Rt9k/SZnKzsZ5UgnUPsetlLlCDJk1U0yAOgph1URXBF0MhBv1rJxG57xJJ
+         m/zFAsZSSgWEjc+vBbTfQ4P4g/rdKRdv75JeJ8S2hhqdVlr17exW6LOX3VP3j0JpZV50
+         03M295wue/joJFmrd5pYAeT+mzPiw4RtPs0D9C1hVK+ga9jWILv6l3C34vTczvn9fb32
+         Z19FxhA2pQoyz/4DTTT+IZoj5L5FBUr297GsYGBU9JxWUrmsR/Oz0xh3Etebapk5qBYo
+         iBj1bK7JzWz7w6u6g6CAHB/EkO/Mt5hX27PqADw/QZzLyNOQpsUc+0Zz8Dbt2p1VS4X/
+         cQ9g==
+X-Gm-Message-State: AA+aEWaxK0uxLGN/2hjaLEtJ6NuREKNryRMtRR0tcXckkPJ8d48gIP4x
+        t+2ZCvAf+A+geInfYLyEUgo=
+X-Google-Smtp-Source: AFSGD/XE1rllTS5ACmfrsH+AMH0TDchIEaBAdDqhB5w+lVFkIJNRL2Zd+ACCKLndDBLzb4AZFYT+Bg==
+X-Received: by 2002:adf:f350:: with SMTP id e16mr5912705wrp.125.1544905758789;
+        Sat, 15 Dec 2018 12:29:18 -0800 (PST)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id x20sm13516900wme.6.2018.12.15.12.29.16
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 14 Dec 2018 23:22:18 -0800 (PST)
-From:   Yangtao Li <tiny.windzz@gmail.com>
-To:     alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
-        davem@davemloft.net
-Cc:     linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yangtao Li <tiny.windzz@gmail.com>
-Subject: [PATCH] 6lowpan: convert to DEFINE_SHOW_ATTRIBUTE
-Date:   Sat, 15 Dec 2018 02:22:17 -0500
-Message-Id: <20181215072217.26085-1-tiny.windzz@gmail.com>
-X-Mailer: git-send-email 2.17.0
+        Sat, 15 Dec 2018 12:29:17 -0800 (PST)
+Date:   Sat, 15 Dec 2018 21:29:10 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: bluez: dbus method call for switching endpoint
+Message-ID: <20181215202910.j24amjshrvjqprll@pali>
+References: <20180711082352.oo6srapfnol5nkxq@pali>
+ <CABBYNZJuGT5_zhg-BkAc4XjtVu5His92cHTujrin=SMOVbaodQ@mail.gmail.com>
+ <20180711144501.ovdxc2expa4bg6sc@pali>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="imkmxtjc22yaldve"
+Content-Disposition: inline
+In-Reply-To: <20180711144501.ovdxc2expa4bg6sc@pali>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
 
-Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
----
- net/6lowpan/debugfs.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+--imkmxtjc22yaldve
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
-index 24915e0bb9ea..6c152f9ea26e 100644
---- a/net/6lowpan/debugfs.c
-+++ b/net/6lowpan/debugfs.c
-@@ -232,18 +232,7 @@ static int lowpan_context_show(struct seq_file *file, void *offset)
- 
- 	return 0;
- }
--
--static int lowpan_context_open(struct inode *inode, struct file *file)
--{
--	return single_open(file, lowpan_context_show, inode->i_private);
--}
--
--static const struct file_operations lowpan_context_fops = {
--	.open		= lowpan_context_open,
--	.read		= seq_read,
--	.llseek		= seq_lseek,
--	.release	= single_release,
--};
-+DEFINE_SHOW_ATTRIBUTE(lowpan_context);
- 
- static int lowpan_short_addr_get(void *data, u64 *val)
- {
--- 
-2.17.0
+On Wednesday 11 July 2018 16:45:01 Pali Roh=C3=A1r wrote:
+> On Wednesday 11 July 2018 16:27:07 Luiz Augusto von Dentz wrote:
+> > One way to solve all of these is that we would expose the remote
+> > endpoints using MediaEndpoint1
+>=20
+> So client application (like pulseadio) would see list of remote
+> endpoints (one for each codec) and choose one for connection?
+>=20
+> Looks like this should solve this problem.
 
+Are there any progress on such API in bluez?
+
+On pulseaudio mailing list other people proposed patches for other A2DP
+codecs and basically bluez API for choosing A2DP codec is still missing
+part...
+
+> > though only SelectConfiguration would
+> > be really useful here and that doesn't contain the remote capabilities
+> > that probably should be made into properties, along with codec type
+> > and uuid.
+>=20
+> Remote capabilities are needed. And for codec type =3D=3D vendor it is ne=
+eded
+> to know also vendor id and codec id.
+>=20
+> > Besides a good headset would probably
+> > remember what codec you selected the last time and just connect with
+> > it, this btw is what I would do when operating as a sink.
+>=20
+> I hope that Linux would support also not-so-good headsets.
+>=20
+> Anyway, dual booting between systems which support different set of
+> codecs makes those "good headset" with remember support just
+> "no-so-good" one.
+>=20
+
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
+
+--imkmxtjc22yaldve
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXBVkFAAKCRCL8Mk9A+RD
+Uu5qAKCA/PFlL1hYBtnvOtjCQl9wp+LlcACeJdpgni+tfqM0Noma6zC8CnlT44w=
+=gUEQ
+-----END PGP SIGNATURE-----
+
+--imkmxtjc22yaldve--
