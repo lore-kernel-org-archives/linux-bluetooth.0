@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DEAEC43387
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC7CC43444
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 57BBB20896
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66AD4208C1
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730068AbeLOABm (ORCPT
+        id S1730074AbeLOABm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Fri, 14 Dec 2018 19:01:42 -0500
-Received: from mga17.intel.com ([192.55.52.151]:20314 "EHLO mga17.intel.com"
+Received: from mga17.intel.com ([192.55.52.151]:20315 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729995AbeLOABk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Dec 2018 19:01:40 -0500
+        id S1730061AbeLOABm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Dec 2018 19:01:42 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 16:01:38 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 16:01:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,354,1539673200"; 
-   d="scan'208";a="98882848"
+   d="scan'208";a="98882873"
 Received: from bgix-dell-lap.sea.intel.com ([10.251.138.67])
-  by orsmga007.jf.intel.com with ESMTP; 14 Dec 2018 16:01:37 -0800
+  by orsmga007.jf.intel.com with ESMTP; 14 Dec 2018 16:01:40 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v2 15/30] mesh: Re-architect for DBus API
-Date:   Fri, 14 Dec 2018 16:01:13 -0800
-Message-Id: <20181215000128.928-16-brian.gix@intel.com>
+Subject: [PATCH BlueZ v2 21/30] mesh: DBUS interface for Provisioning Agent
+Date:   Fri, 14 Dec 2018 16:01:19 -0800
+Message-Id: <20181215000128.928-22-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181215000128.928-1-brian.gix@intel.com>
 References: <20181215000128.928-1-brian.gix@intel.com>
@@ -46,796 +46,854 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Inga Stotland <inga.stotland@intel.com>
 
 ---
- mesh/mesh.c | 625 ++++++++++++++++++++++++++++++++++++++++++++++--------------
- mesh/mesh.h |  27 ++-
- 2 files changed, 505 insertions(+), 147 deletions(-)
+ mesh/agent.c | 665 ++++++++++++++++++++++++++++++++++++++++++++++++-----------
+ mesh/agent.h |  71 +++++--
+ 2 files changed, 593 insertions(+), 143 deletions(-)
 
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index d1d409672..05232b225 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -36,9 +36,24 @@
- #include "mesh/node.h"
- #include "mesh/net.h"
- #include "mesh/storage.h"
--#include "mesh/cfgmod.h"
-+#include "mesh/prov.h"
+diff --git a/mesh/agent.c b/mesh/agent.c
+index 1da10b7bd..db61e27ab 100644
+--- a/mesh/agent.c
++++ b/mesh/agent.c
+@@ -22,208 +22,627 @@
+ #include <config.h>
+ #endif
+ 
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <stdbool.h>
+-#include <string.h>
+-#include <inttypes.h>
+-
+ #include <ell/ell.h>
+ 
+-#include "src/shared/shell.h"
+-
+-#include "mesh/util.h"
++#include "mesh/mesh.h"
 +#include "mesh/provision.h"
- #include "mesh/model.h"
-+#include "mesh/dbus.h"
 +#include "mesh/error.h"
- #include "mesh/mesh.h"
-+#include "mesh/agent.h"
-+
-+#define MESH_COMP_MAX_LEN 378
-+
-+/*
-+ * The default values for mesh configuration. Can be
-+ * overwritten by values from mesh.conf
-+ */
-+#define DEFAULT_PROV_TIMEOUT 60
-+#define DEFAULT_ALGORITHMS 0x0001
-+
-+/* TODO: add more default values */
++#include "mesh/dbus.h"
+ #include "mesh/agent.h"
  
- struct scan_filter {
- 	uint8_t id;
-@@ -46,42 +61,49 @@ struct scan_filter {
+-struct input_request {
+-	enum oob_type type;
+-	uint16_t len;
+-	agent_input_cb cb;
++typedef enum {
++	MESH_AGENT_REQUEST_BLINK,
++	MESH_AGENT_REQUEST_BEEP,
++	MESH_AGENT_REQUEST_VIBRATE,
++	MESH_AGENT_REQUEST_OUT_NUMERIC,
++	MESH_AGENT_REQUEST_OUT_ALPHA,
++	MESH_AGENT_REQUEST_PUSH,
++	MESH_AGENT_REQUEST_TWIST,
++	MESH_AGENT_REQUEST_IN_NUMERIC,
++	MESH_AGENT_REQUEST_IN_ALPHA,
++	MESH_AGENT_REQUEST_STATIC_OOB,
++	MESH_AGENT_REQUEST_PRIVATE_KEY,
++	MESH_AGENT_REQUEST_PUBLIC_KEY
++} agent_request_type_t;
++
++struct agent_request {
++	agent_request_type_t type;
++	struct l_dbus_message *msg;
++	void *cb;
+ 	void *user_data;
  };
  
- struct bt_mesh {
--	struct mesh_net *net;
- 	struct mesh_io *io;
- 	struct l_queue *filters;
--	int ref_count;
--	uint16_t index;
-+	prov_rx_cb_t prov_rx;
-+	void *prov_data;
-+	uint32_t prov_timeout;
-+	uint16_t algorithms;
- 	uint16_t req_index;
- 	uint8_t max_filters;
- };
- 
-+struct join_data{
-+	struct l_dbus_message *msg;
-+	struct mesh_agent *agent;
-+	const char *sender;
-+	const char *app_path;
-+	struct mesh_node *node;
-+	uint32_t disc_watch;
-+	uint8_t uuid[16];
+-static struct input_request pending_request = {NONE, 0, NULL, NULL};
++struct mesh_agent {
++	char *path;
++	char *owner;
++	struct mesh_agent_prov_caps caps;
++	struct agent_request *req;
 +};
-+
-+struct attach_data {
-+	uint64_t token;
-+	struct l_dbus_message *msg;
-+	const char *app;
-+};
-+
-+static struct bt_mesh mesh;
- static struct l_queue *controllers;
--static struct l_queue *mesh_list;
- static struct mgmt *mgmt_mesh;
- static bool initialized;
--static struct bt_mesh *current;
-+
-+/* We allow only one outstanding Join request */
-+static struct join_data *join_pending;
-+
-+/* Pending Attach requests */
-+static struct l_queue *attach_queue;
  
- static bool simple_match(const void *a, const void *b)
- {
- 	return a == b;
- }
- 
--static void save_exit_config(struct bt_mesh *mesh)
+-bool agent_completion(void)
 -{
--	const char *cfg_filename;
--
--	if (!mesh_net_cfg_file_get(mesh->net, &cfg_filename) || !cfg_filename)
--		return;
--
--	/* Preserve the last sequence number before saving configuration */
--	storage_local_write_sequence_number(mesh->net,
--					mesh_net_get_seq_num(mesh->net));
--
--	if (storage_save_config(mesh->net, cfg_filename, true, NULL, NULL))
--		l_info("Saved final configuration to %s", cfg_filename);
--}
--
--static void start_io(struct bt_mesh *mesh, uint16_t index)
-+static void start_io(uint16_t index)
- {
- 	struct mesh_io *io;
- 	struct mesh_io_caps caps;
-@@ -91,21 +113,70 @@ static void start_io(struct bt_mesh *mesh, uint16_t index)
- 	io = mesh_io_new(index, MESH_IO_TYPE_GENERIC);
- 	if (!io) {
- 		l_error("Failed to start mesh io (hci %u)", index);
--		current = NULL;
- 		return;
- 	}
- 
- 	mesh_io_get_caps(io, &caps);
--	mesh->max_filters = caps.max_num_filters;
-+	mesh.max_filters = caps.max_num_filters;
-+
-+	mesh.io = io;
-+
-+	l_debug("Started mesh (io %p) on hci %u", mesh.io, index);
-+
-+	node_attach_io(io);
-+}
-+
-+/* Used for any outbound traffic that doesn't have Friendship Constraints */
-+/* This includes Beacons, Provisioning and unrestricted Network Traffic */
-+bool mesh_send_pkt(uint8_t count, uint16_t interval,
-+					uint8_t *data, uint16_t len)
-+{
-+	struct mesh_io_send_info info = {
-+		.type = MESH_IO_TIMING_TYPE_GENERAL,
-+		.u.gen.cnt = count,
-+		.u.gen.interval = interval,
-+		.u.gen.max_delay = 0,
-+		.u.gen.min_delay = 0,
-+	};
-+
-+	return mesh_io_send(mesh.io, &info, data, len);
-+}
-+
-+bool mesh_send_cancel(const uint8_t *filter, uint8_t len)
-+{
-+	return mesh_io_send_cancel(mesh.io, filter, len);
-+}
- 
--	mesh_net_attach(mesh->net, io);
--	mesh_net_set_window_accuracy(mesh->net, caps.window_accuracy);
--	mesh->io = io;
--	mesh->index = index;
-+static void prov_rx(void *user_data, struct mesh_io_recv_info *info,
-+					const uint8_t *data, uint16_t len)
-+{
-+	if (user_data != &mesh)
-+		return;
-+
-+	if (mesh.prov_rx)
-+		mesh.prov_rx(mesh.prov_data, data, len);
-+}
-+
-+bool mesh_reg_prov_rx(prov_rx_cb_t cb, void *user_data)
-+{
-+	if (mesh.prov_rx && mesh.prov_rx != cb)
-+		return false;
- 
--	current = NULL;
-+	mesh.prov_rx = cb;
-+	mesh.prov_data = user_data;
- 
--	l_debug("Started mesh (io %p) on hci %u", mesh->io, index);
-+	return mesh_io_register_recv_cb(mesh.io, MESH_IO_FILTER_PROV,
-+							prov_rx, &mesh);
-+}
-+
-+void mesh_unreg_prov_rx(prov_rx_cb_t cb)
-+{
-+	if (mesh.prov_rx != cb)
-+		return;
-+
-+	mesh.prov_rx = NULL;
-+	mesh.prov_data = NULL;
-+	mesh_io_deregister_recv_cb(mesh.io, MESH_IO_FILTER_PROV);
- }
- 
- static void read_info_cb(uint8_t status, uint16_t length,
-@@ -115,7 +186,7 @@ static void read_info_cb(uint8_t status, uint16_t length,
- 	const struct mgmt_rp_read_info *rp = param;
- 	uint32_t current_settings, supported_settings;
- 
--	if (!current)
-+	if (mesh.io)
- 		/* Already initialized */
- 		return;
- 
-@@ -148,7 +219,7 @@ static void read_info_cb(uint8_t status, uint16_t length,
- 		return;
- 	}
- 
--	start_io(current, index);
-+	start_io(index);
- }
- 
- static void index_added(uint16_t index, uint16_t length, const void *param,
-@@ -156,11 +227,8 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
- {
- 	l_debug("hci device %u", index);
- 
--	if (!current)
--		return;
--
--	if (current->req_index != MGMT_INDEX_NONE &&
--					index != current->req_index) {
-+	if (mesh.req_index != MGMT_INDEX_NONE &&
-+					index != mesh.req_index) {
- 		l_debug("Ignore index %d", index);
- 		return;
- 	}
-@@ -219,145 +287,100 @@ static void read_index_list_cb(uint8_t status, uint16_t length,
- 	}
- }
- 
--static bool load_config(struct bt_mesh *mesh, const char *in_config_name)
-+static bool init_mgmt(void)
- {
--	if (!mesh->net)
+-	if (pending_request.type == NONE)
 -		return false;
--
--	if (!storage_parse_config(mesh->net, in_config_name))
-+	mgmt_mesh = mgmt_new_default();
-+	if (!mgmt_mesh)
- 		return false;
++struct prov_action {
++	const char *action;
++	uint16_t output;
++	uint16_t input;
++	uint8_t size;
++};
++
++struct oob_info {
++	const char *oob;
++	uint16_t mask;
++};
++
++static struct prov_action cap_table[] = {
++	{"blink", 0x0001, 0x0000, 1},
++	{"beep", 0x0002, 0x0000, 1},
++	{"vibrate", 0x0004, 0x0000, 1},
++	{"out-numeric", 0x0008, 0x0000, 8},
++	{"out-alpha", 0x0010, 0x0000, 8},
++	{"push", 0x0000, 0x0001, 1},
++	{"twist", 0x0000, 0x0002, 1},
++	{"in-numeric", 0x0000, 0x0004, 8},
++	{"in-alpha", 0x0000, 0x0008, 8}
++};
  
--	/* Register foundational models */
--	mesh_config_srv_init(mesh->net, PRIMARY_ELE_IDX);
--
 -	return true;
--}
--
--static bool init_mesh(void)
--{
--	if (initialized)
--		return true;
--
- 	controllers = l_queue_new();
- 	if (!controllers)
- 		return false;
- 
--	mesh_list = l_queue_new();
--	if (!mesh_list)
--		return false;
--
--	mgmt_mesh = mgmt_new_default();
--	if (!mgmt_mesh)
--		goto fail;
--
- 	mgmt_register(mgmt_mesh, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
- 						index_added, NULL, NULL);
- 	mgmt_register(mgmt_mesh, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
- 						index_removed, NULL, NULL);
--
--	initialized = true;
- 	return true;
--
--fail:
--	l_error("Failed to initialize mesh management");
--
--	l_queue_destroy(controllers, NULL);
--
--	return false;
- }
- 
--struct bt_mesh *mesh_new(uint16_t index, const char *config_file)
-+bool mesh_init(uint16_t index, const char *config_dir)
- {
--	struct bt_mesh *mesh;
-+	if (initialized)
-+		return true;
++static struct oob_info oob_table[] = {
++	{"other", 0x0001},
++	{"uri", 0x0002},
++	{"machine-code-2d", 0x0004},
++	{"barcode", 0x0008},
++	{"nfc", 0x0010},
++	{"number", 0x0020},
++	{"string", 0x0040},
++	{"on-box", 0x0800},
++	{"in-box", 0x1000},
++	{"on-paper", 0x2000},
++	{"in-manual", 0x4000},
++	{"on-device", 0x8000}
++};
 +
-+	if (!init_mgmt()) {
-+		l_error("Failed to initialize mesh management");
-+		return false;
-+	}
- 
--	if (!init_mesh())
--		return NULL;
-+	mesh.req_index = index;
- 
--	mesh = l_new(struct bt_mesh, 1);
--	if (!mesh)
--		return NULL;
-+	mesh_model_init();
-+	mesh_agent_init();
- 
--	mesh->req_index = index;
--	mesh->index = MGMT_INDEX_NONE;
-+	/* TODO: read mesh.conf */
-+	mesh.prov_timeout = DEFAULT_PROV_TIMEOUT;
-+	mesh.algorithms = DEFAULT_ALGORITHMS;
- 
--	mesh->net = mesh_net_new(index);
--	if (!mesh->net) {
--		l_free(mesh);
--		return NULL;
--	}
-+	if (!config_dir)
-+		config_dir = MESH_STORAGEDIR;
- 
--	if (!load_config(mesh, config_file)) {
--		l_error("Failed to load mesh configuration: %s", config_file);
--		l_free(mesh);
--		return NULL;
--	}
-+	l_info("Loading node configuration from %s", config_dir);
++static struct l_queue *agents;
 +
-+	if (!storage_load_nodes(config_dir))
-+		return false;
- 
--	/*
--	 * TODO: Check if another mesh is searching for io.
--	 * If so, add to pending list and return.
--	 */
- 	l_debug("send read index_list");
- 	if (mgmt_send(mgmt_mesh, MGMT_OP_READ_INDEX_LIST,
- 				MGMT_INDEX_NONE, 0, NULL,
--				read_index_list_cb, mesh, NULL) > 0) {
--		current = mesh;
--		l_queue_push_tail(mesh_list, mesh);
--		return mesh_ref(mesh);
--	}
--
--	l_free(mesh);
-+				read_index_list_cb, NULL, NULL) <= 0)
-+		return false;
- 
--	return NULL;
-+	return true;
++static bool simple_match(const void *a, const void *b)
++{
++	return a == b;
  }
  
--struct bt_mesh *mesh_ref(struct bt_mesh *mesh)
-+static void attach_exit(void *data)
+-static void reset_input_request(void)
++static void parse_prov_caps(struct mesh_agent_prov_caps *caps,
++				struct l_dbus_message_iter *property)
  {
--	if (!mesh)
--		return NULL;
--
--	__sync_fetch_and_add(&mesh->ref_count, 1);
-+	struct l_dbus_message *reply;
-+	struct attach_data *pending = data;
- 
--	return mesh;
-+	reply = dbus_error(pending->msg, MESH_ERROR_FAILED, "Failed. Exiting");
-+	l_dbus_send(dbus_get_bus(), reply);
-+	l_free(pending);
- }
- 
--void mesh_unref(struct bt_mesh *mesh)
-+void mesh_cleanup(void)
- {
--	struct mesh_io *io;
-+	struct l_dbus_message *reply;
- 
--	if (!mesh)
--		return;
-+	mesh_io_destroy(mesh.io);
-+	mgmt_unref(mgmt_mesh);
- 
--	if (__sync_sub_and_fetch(&mesh->ref_count, 1))
--		return;
-+	if (join_pending) {
-+		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED,
-+							"Failed. Exiting");
-+		l_dbus_send(dbus_get_bus(), reply);
- 
--	if (mesh_net_provisioned_get(mesh->net))
--		save_exit_config(mesh);
-+		if (join_pending->disc_watch)
-+			dbus_disconnect_watch_remove(dbus_get_bus(),
-+						join_pending->disc_watch);
- 
--	node_cleanup(mesh->net);
-+		if (join_pending->node)
-+			node_free(join_pending->node);
- 
--	storage_release(mesh->net);
--	io = mesh_net_detach(mesh->net);
--	if (io)
--		mesh_io_destroy(io);
-+		l_free(join_pending);
-+		join_pending = NULL;
+-	pending_request.type = NONE;
+-	pending_request.len = 0;
+-	pending_request.cb = NULL;
+-	pending_request.user_data = NULL;
++	struct l_dbus_message_iter iter_caps;
++	const char *str;
++	uint32_t i;
++
++	if (!l_dbus_message_iter_get_variant(property, "as", &iter_caps))
++		return;
++
++	while (l_dbus_message_iter_next_entry(&iter_caps, &str)) {
++		for (i = 0; i < L_ARRAY_SIZE(cap_table); i++) {
++			if (strcmp(str, cap_table[i].action))
++				continue;
++
++			caps->output_action |= cap_table[i].output;
++			if (cap_table[i].output &&
++					caps->output_size < cap_table[i].size)
++				caps->output_size = cap_table[i].size;
++
++			caps->input_action |= cap_table[i].input;
++			if (cap_table[i].input &&
++					caps->input_size < cap_table[i].size)
++				caps->input_size = cap_table[i].size;
++
++			break;
++		}
++
++		if (!strcmp(str, "PublicOOB"))
++			caps->pub_type = 1;
++		else if (!strcmp(str, "StaticOOB"))
++			caps->static_type = 1;
 +	}
- 
--	mesh_net_unref(mesh->net);
--	l_queue_remove(mesh_list, mesh);
--	l_free(mesh);
--}
-+	l_queue_destroy(attach_queue, attach_exit);
-+	node_cleanup_all();
-+	mesh_model_cleanup();
- 
--void mesh_cleanup(void)
--{
- 	l_queue_destroy(controllers, NULL);
--	l_queue_destroy(mesh_list, NULL);
--	mgmt_unref(mgmt_mesh);
--}
--
--bool mesh_set_output(struct bt_mesh *mesh, const char *config_name)
--{
--	if (!config_name)
--		return false;
--
--	return mesh_net_cfg_file_set(mesh->net, config_name);
-+	l_dbus_object_remove_interface(dbus_get_bus(), BLUEZ_MESH_PATH,
-+							MESH_NETWORK_INTERFACE);
-+	l_dbus_unregister_interface(dbus_get_bus(), MESH_NETWORK_INTERFACE);
++
  }
  
- const char *mesh_status_str(uint8_t err)
-@@ -386,7 +409,333 @@ const char *mesh_status_str(uint8_t err)
+-static void try_again(void)
++static void parse_oob_info(struct mesh_agent_prov_caps *caps,
++				struct l_dbus_message_iter *property)
+ {
+-	static int try_count;
+-	enum oob_type type = pending_request.type;
++	struct l_dbus_message_iter iter_oob;
++	uint32_t i;
++	const char *str;
+ 
+-	if (try_count == 2) {
+-		reset_input_request();
+-		try_count = 0;
++	if (!l_dbus_message_iter_get_variant(property, "as", &iter_oob))
+ 		return;
++
++	while (l_dbus_message_iter_next_entry(&iter_oob, &str)) {
++		for (i = 0; i < L_ARRAY_SIZE(oob_table); i++) {
++			if (strcmp(str, oob_table[i].oob))
++				continue;
++			caps->oob_info |= oob_table[i].mask;
++		}
  	}
++}
+ 
+-	pending_request.type = NONE;
+-	agent_input_request(type, pending_request.len, pending_request.cb,
+-						pending_request.user_data);
++static void agent_free(void *agent_data)
++{
++	struct mesh_agent *agent = agent_data;
++	mesh_error_t err;
++	mesh_agent_cb_t simple_cb;
++	mesh_agent_key_cb_t key_cb;
++	mesh_agent_number_cb_t number_cb;
+ 
+-	try_count++;
++	if (!l_queue_find(agents, simple_match, agent))
++		return;
++
++	err = MESH_ERROR_DOES_NOT_EXIST;
++
++	if (agent->req && agent->req->cb) {
++		struct agent_request *req = agent->req;
++
++		switch (req->type) {
++		case MESH_AGENT_REQUEST_PUSH:
++		case MESH_AGENT_REQUEST_TWIST:
++		case MESH_AGENT_REQUEST_IN_NUMERIC:
++			number_cb = req->cb;
++			number_cb(req->user_data, err, 0);
++			break;
++		case MESH_AGENT_REQUEST_IN_ALPHA:
++		case MESH_AGENT_REQUEST_STATIC_OOB:
++		case MESH_AGENT_REQUEST_PRIVATE_KEY:
++		case MESH_AGENT_REQUEST_PUBLIC_KEY:
++			key_cb = req->cb;
++			key_cb(req->user_data, err, NULL, 0);
++			break;
++		case MESH_AGENT_REQUEST_BLINK:
++		case MESH_AGENT_REQUEST_BEEP:
++		case MESH_AGENT_REQUEST_VIBRATE:
++		case MESH_AGENT_REQUEST_OUT_NUMERIC:
++		case MESH_AGENT_REQUEST_OUT_ALPHA:
++			simple_cb = agent->req->cb;
++			simple_cb(req->user_data, err);
++		default:
++			break;
++		}
++
++		l_dbus_message_unref(req->msg);
++		l_free(req);
++	}
++
++	l_free(agent->path);
++	l_free(agent->owner);
  }
  
--struct mesh_net *mesh_get_net(struct bt_mesh *mesh)
-+static void free_pending_join_call(bool failed)
+-static void response_hexadecimal(const char *input, void *user_data)
++void mesh_agent_remove(struct mesh_agent *agent)
+ {
+-	uint8_t buf[MAX_HEXADECIMAL_OOB_LEN];
++	if (!l_queue_find(agents, simple_match, agent))
++		return;
+ 
+-	if (!str2hex(input, strlen(input), buf, pending_request.len)) {
+-		bt_shell_printf("Incorrect input: expecting %d hex octets\n",
+-							pending_request.len);
+-		try_again();
++	agent_free(agent);
++	l_queue_remove(agents, agent);
++}
++
++void mesh_agent_cleanup(void)
 +{
-+	if (!join_pending)
++	if (!agents)
+ 		return;
++
++	l_queue_destroy(agents, agent_free);
++
++}
++
++void mesh_agent_init(void)
++{
++	if (!agents)
++		agents = l_queue_new();
++}
++
++struct mesh_agent *mesh_agent_create(const char *path, const char *owner,
++					struct l_dbus_message_iter *properties)
++{
++	struct mesh_agent *agent;
++	const char *key, *uri_string;
++	struct l_dbus_message_iter variant;
++
++	agent = l_new(struct mesh_agent, 1);
++
++	while (l_dbus_message_iter_next_entry(properties, &key, &variant)) {
++		if (!strcmp(key, "Capabilities")) {
++			parse_prov_caps(&agent->caps, &variant);
++		} else if (!strcmp(key, "URI")) {
++			l_dbus_message_iter_get_variant(&variant, "s",
++								&uri_string);
++			/* TODO: compute hash */
++		} else if (!strcmp(key, "OutOfBandInfo")) {
++			parse_oob_info(&agent->caps, &variant);
++		}
+ 	}
+ 
+-	if (pending_request.cb)
+-		pending_request.cb(HEXADECIMAL, buf, pending_request.len,
+-					pending_request.user_data);
++	agent->owner = l_strdup(owner);
++	agent->path = l_strdup(path);
++
++	l_queue_push_tail(agents, agent);
++
++	return agent;
++}
++
++struct mesh_agent_prov_caps *mesh_agent_get_caps(struct mesh_agent *agent)
++{
++	if (!agent || !l_queue_find(agents, simple_match, agent))
++		return NULL;
++
++	return &agent->caps;
++}
++
++static struct agent_request *create_request(agent_request_type_t type,
++						void *cb, void *data)
++{
++	struct agent_request *req;
++
++	req = l_new(struct agent_request, 1);
+ 
+-	reset_input_request();
++	req->type = type;
++	req->cb = cb;
++	req->user_data = data;
++
++	return req;
+ }
+ 
+-static void response_decimal(const char *input, void *user_data)
++static mesh_error_t get_reply_error(struct l_dbus_message *reply)
+ {
+-	uint8_t buf[DECIMAL_OOB_LEN];
++	const char *name, *desc;
++
++	if (l_dbus_message_is_error(reply)) {
+ 
+-	if (strlen(input) > pending_request.len) {
+-		bt_shell_printf("Bad input: expected no more than %d digits\n",
+-						pending_request.len);
+-		try_again();
++		l_dbus_message_get_error(reply, &name, &desc);
++		l_error("Agent failed output action (%s), %s", name, desc);
++		return MESH_ERROR_FAILED;
++	}
++
++	return MESH_ERROR_NONE;
++}
++
++static void simple_reply(struct l_dbus_message *reply, void *user_data)
++{
++	struct mesh_agent *agent = user_data;
++	struct agent_request *req;
++	mesh_agent_cb_t cb;
++	mesh_error_t err;
++
++	if (!l_queue_find(agents, simple_match, agent) || !agent->req)
+ 		return;
++
++	req = agent->req;
++
++	err = get_reply_error(reply);
++
++	l_dbus_message_unref(req->msg);
++
++	if (req->cb) {
++		cb = req->cb;
++		cb(req->user_data, err);
+ 	}
+ 
+-	l_put_be32(atoi(input), buf);
++	l_free(req);
++	agent->req = NULL;
++}
++
++static void numeric_reply(struct l_dbus_message *reply, void *user_data)
++{
++	struct mesh_agent *agent = user_data;
++	struct agent_request *req;
++	mesh_agent_number_cb_t cb;
++	uint32_t count;
++	mesh_error_t err;
++
++	if (!l_queue_find(agents, simple_match, agent) || !agent->req)
++		return;
+ 
+-	if (pending_request.cb)
+-		pending_request.cb(DECIMAL, buf, DECIMAL_OOB_LEN,
+-					pending_request.user_data);
++	req = agent->req;
+ 
+-	reset_input_request();
++	err = get_reply_error(reply);
++
++	count = 0;
++
++	if (err == MESH_ERROR_NONE) {
++		if (!l_dbus_message_get_arguments(reply, "u", &count)) {
++			l_error("Failed to retrieve numeric input");
++			err = MESH_ERROR_FAILED;
++		}
++	}
++
++	l_dbus_message_unref(req->msg);
++
++	if (req->cb) {
++		cb = req->cb;
++		cb(req->user_data, err, count);
++	}
++
++	l_free(req);
++	agent->req = NULL;
+ }
+ 
+-static void response_ascii(const char *input, void *user_data)
++static void key_reply(struct l_dbus_message *reply, void *user_data)
+ {
+-	if (pending_request.cb)
+-		pending_request.cb(ASCII, (uint8_t *) input, strlen(input),
+-					pending_request.user_data);
++	struct mesh_agent *agent = user_data;
++	struct agent_request *req;
++	mesh_agent_key_cb_t cb;
++	struct l_dbus_message_iter iter_array;
++	uint32_t n = 0, expected_len = 0;
++	uint8_t buf[64];
++	mesh_error_t err;
++
++	if (!l_queue_find(agents, simple_match, agent) || !agent->req)
 +		return;
 +
-+	if (join_pending->disc_watch)
-+		dbus_disconnect_watch_remove(dbus_get_bus(),
-+						join_pending->disc_watch);
++	req = agent->req;
 +
-+	mesh_agent_remove(join_pending->agent);
++	err = get_reply_error(reply);
 +
-+	if (failed) {
-+		storage_remove_node_config(join_pending->node);
-+		mesh_agent_remove(join_pending->agent);
++	if (err != MESH_ERROR_NONE)
++		goto done;
++
++	if (!l_dbus_message_get_arguments(reply, "au", &iter_array)) {
++		l_error("Failed to retrieve key input");
++		err = MESH_ERROR_FAILED;
++		goto done;
 +	}
 +
-+	l_free(join_pending);
-+	join_pending = NULL;
-+}
-+
-+/* This is being called if the app exits unexpectedly */
-+static void prov_disc_cb(struct l_dbus *bus, void *user_data)
-+{
-+	if (!join_pending)
-+		return;
-+
-+	if (join_pending->msg)
-+		l_dbus_message_unref(join_pending->msg);
-+
-+	acceptor_cancel(&mesh);
-+
-+	join_pending->disc_watch = 0;
-+
-+	free_pending_join_call(true);
-+}
-+
-+static const char *prov_status_str(uint8_t status)
-+{
-+	switch (status) {
-+	case PROV_ERR_SUCCESS:
-+		return "success";
-+	case PROV_ERR_INVALID_PDU:
-+	case PROV_ERR_INVALID_FORMAT:
-+	case PROV_ERR_UNEXPECTED_PDU:
-+		return "bad-pdu";
-+	case PROV_ERR_CONFIRM_FAILED:
-+		return "confirmation-failed";
-+	case PROV_ERR_INSUF_RESOURCE:
-+		return "out-of-resources";
-+	case PROV_ERR_DECRYPT_FAILED:
-+		return "decryption-error";
-+	case PROV_ERR_CANT_ASSIGN_ADDR:
-+		return "cannot-assign-addresses";
-+	case PROV_ERR_TIMEOUT:
-+		return "timeout";
-+	case PROV_ERR_UNEXPECTED_ERR:
-+	default:
-+		return "unexpected-error";
++	if (!l_dbus_message_iter_get_fixed_array(&iter_array, buf, &n)) {
++		l_error("Failed to retrieve key input");
++		err = MESH_ERROR_FAILED;
++		goto done;
 +	}
-+}
 +
-+static void send_join_failed(const char *owner, const char *path,
-+							uint8_t status)
-+{
-+	struct l_dbus_message *msg;
-+	struct l_dbus *dbus = dbus_get_bus();
++	if (req->type == MESH_AGENT_REQUEST_PRIVATE_KEY)
++		expected_len = 32;
++	else if (MESH_AGENT_REQUEST_PUBLIC_KEY)
++		expected_len = 64;
++	else
++		expected_len = 16;
 +
-+	msg = l_dbus_message_new_method_call(dbus, owner, path,
-+						MESH_APPLICATION_INTERFACE,
-+						"JoinFailed");
++	if (n != expected_len) {
++		l_error("Bad response length: %u (need %u)", n, expected_len);
++		err = MESH_ERROR_FAILED;
++		n = 0;
++	}
+ 
+-	reset_input_request();
++done:
++	l_dbus_message_unref(req->msg);
 +
-+	l_dbus_message_set_arguments(msg, "s", prov_status_str(status));
-+	l_dbus_send(dbus_get_bus(), msg);
++	if (req->cb) {
++		cb = req->cb;
++		cb(req->user_data, err, buf, n);
++	}
 +
-+	free_pending_join_call(true);
-+}
-+
-+static bool prov_complete_cb(void *user_data, uint8_t status,
-+					struct mesh_prov_node_info *info)
-+{
++	l_free(req);
++	agent->req = NULL;
+ }
+ 
+-static bool request_hexadecimal(uint16_t len)
++static mesh_error_t output_request(struct mesh_agent *agent, const char *action,
++					agent_request_type_t type, uint32_t cnt,
++					void *cb, void *user_data)
+ {
+-	if (len > MAX_HEXADECIMAL_OOB_LEN)
+-		return false;
 +	struct l_dbus *dbus = dbus_get_bus();
 +	struct l_dbus_message *msg;
-+	const char *owner;
-+	const char *path;
-+	const uint8_t *dev_key;
++	struct l_dbus_message_builder *builder;
 +
-+	l_debug("Provisioning complete %s", prov_status_str(status));
++	if (!l_queue_find(agents, simple_match, agent))
++		return MESH_ERROR_DOES_NOT_EXIST;
 +
-+	if (!join_pending)
-+		return false;
++	if (agent->req)
++		return MESH_ERROR_BUSY;
+ 
+-	bt_shell_printf("Request hexadecimal key (hex %d octets)\n", len);
+-	bt_shell_prompt_input("mesh", "Enter key (hex number):",
+-						response_hexadecimal, NULL);
++	agent->req = create_request(type, cb, user_data);
++	msg = l_dbus_message_new_method_call(dbus, agent->owner, agent->path,
++						MESH_PROVISION_AGENT_INTERFACE,
++						"DisplayNumeric");
 +
-+	owner = join_pending->sender;
-+	path = join_pending->app_path;
++	builder = l_dbus_message_builder_new(msg);
++	l_dbus_message_builder_append_basic(builder, 's', action);
++	l_dbus_message_builder_append_basic(builder, 'u', &cnt);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
 +
-+	if (status == PROV_ERR_SUCCESS &&
-+	    !node_add_pending_local(join_pending->node, info, mesh.io))
-+		status = PROV_ERR_UNEXPECTED_ERR;
++	l_debug("Send DisplayNumeric request to %s %s",
++						agent->owner, agent->path);
 +
-+	if (status != PROV_ERR_SUCCESS) {
-+		send_join_failed(owner, path, status);
-+		return false;
-+	}
++	l_dbus_send_with_reply(dbus_get_bus(), msg, simple_reply, agent,
++									NULL);
+ 
+-	return true;
++	agent->req->msg = l_dbus_message_ref(msg);
 +
-+	dev_key = node_get_device_key(join_pending->node);
++	return MESH_ERROR_NONE;
+ }
+ 
+-static uint32_t power_ten(uint8_t power)
++static mesh_error_t prompt_input(struct mesh_agent *agent, const char *action,
++					agent_request_type_t type, bool numeric,
++					void *cb, void *user_data)
+ {
+-	uint32_t ret = 1;
++	struct l_dbus *dbus = dbus_get_bus();
++	struct l_dbus_message *msg;
++	struct l_dbus_message_builder *builder;
++	const char *method_name;
++	l_dbus_message_func_t reply_cb;
 +
-+	msg = l_dbus_message_new_method_call(dbus, owner, path,
-+						MESH_APPLICATION_INTERFACE,
-+						"JoinComplete");
++	if (!l_queue_find(agents, simple_match, agent))
++		return MESH_ERROR_DOES_NOT_EXIST;
 +
-+	l_dbus_message_set_arguments(msg, "t", l_get_u64(dev_key));
++	if (agent->req)
++		return MESH_ERROR_BUSY;
 +
-+	l_dbus_send(dbus_get_bus(), msg);
++	agent->req = create_request(type, cb, user_data);
 +
-+	free_pending_join_call(false);
++	method_name = numeric ? "PromptNumeric" : "PromptStatic";
 +
-+	return true;
++	msg = l_dbus_message_new_method_call(dbus, agent->owner,
++						agent->path,
++						MESH_PROVISION_AGENT_INTERFACE,
++						method_name);
++
++	builder = l_dbus_message_builder_new(msg);
++	l_dbus_message_builder_append_basic(builder, 's', action);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++
++	l_debug("Send \"%s\" input request to %s %s", action,
++						agent->owner, agent->path);
+ 
+-	while (power--)
+-		ret *= 10;
++	reply_cb = numeric ? numeric_reply : key_reply;
+ 
+-	return ret;
++	l_dbus_send_with_reply(dbus_get_bus(), msg, reply_cb, agent, NULL);
++
++	agent->req->msg = l_dbus_message_ref(msg);
++
++	return MESH_ERROR_NONE;
+ }
+ 
+-static bool request_decimal(uint16_t len)
++static mesh_error_t request_key(struct mesh_agent *agent,
++					agent_request_type_t type,
++					void *cb, void *user_data)
+ {
+-	bt_shell_printf("Request decimal key (0 - %d)\n", power_ten(len) - 1);
+-	bt_shell_prompt_input("mesh", "Enter Numeric key:", response_decimal,
++	struct l_dbus *dbus = dbus_get_bus();
++	struct l_dbus_message *msg;
++	const char *method_name;
++
++	if (!l_queue_find(agents, simple_match, agent))
++		return MESH_ERROR_DOES_NOT_EXIST;
++
++	if (agent->req)
++		return MESH_ERROR_BUSY;
++
++	agent->req = create_request(type, cb, user_data);
++
++	method_name = (type == MESH_AGENT_REQUEST_PRIVATE_KEY) ?
++						"PrivateKey" : "PublicKey";
++
++	msg = l_dbus_message_new_method_call(dbus, agent->owner,
++						agent->path,
++						MESH_PROVISION_AGENT_INTERFACE,
++						method_name);
++
++	l_debug("Send key request to %s %s", agent->owner, agent->path);
++
++	l_dbus_send_with_reply(dbus_get_bus(), msg, key_reply, agent, NULL);
++
++	agent->req->msg = l_dbus_message_ref(msg);
++
++	return MESH_ERROR_NONE;
 +}
 +
-+static void node_init_cb(struct mesh_node *node, struct mesh_agent *agent)
++mesh_error_t mesh_agent_display_string(struct mesh_agent *agent,
++					const char *str, mesh_agent_cb_t cb,
++					void *user_data)
 +{
-+	struct l_dbus_message *reply;
-+	uint8_t num_ele;
++	struct l_dbus *dbus = dbus_get_bus();
++	struct l_dbus_message *msg;
++	struct l_dbus_message_builder *builder;
 +
-+	if (!node) {
-+		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED,
-+				"Failed to create node from application");
-+		goto fail;
-+	}
++	if (!l_queue_find(agents, simple_match, agent))
++		return MESH_ERROR_DOES_NOT_EXIST;
 +
-+	join_pending->node = node;
-+	num_ele = node_get_num_elements(node);
++	if (agent->req)
++		return MESH_ERROR_BUSY;
 +
-+	if (!acceptor_start(num_ele, join_pending->uuid, mesh.algorithms,
-+				mesh.prov_timeout, agent, prov_complete_cb,
-+				&mesh))
-+	{
-+		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED,
-+				"Failed to start provisioning acceptor");
-+		goto fail;
-+	}
++	agent->req = create_request(MESH_AGENT_REQUEST_OUT_ALPHA,
++								cb, user_data);
++	msg = l_dbus_message_new_method_call(dbus, agent->owner, agent->path,
++						MESH_PROVISION_AGENT_INTERFACE,
++						"DisplayString");
 +
-+	reply = l_dbus_message_new_method_return(join_pending->msg);
-+	l_dbus_send(dbus_get_bus(), reply);
-+	join_pending->msg = NULL;
++	builder = l_dbus_message_builder_new(msg);
++	l_dbus_message_builder_append_basic(builder, 's', str);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
 +
-+	return;
++	l_debug("Send DisplayString request to %s %s",
++						agent->owner, agent->path);
 +
-+fail:
-+	l_dbus_send(dbus_get_bus(), reply);
-+	mesh_agent_remove(join_pending->agent);
-+	l_free(join_pending);
-+	join_pending = NULL;
-+}
++	l_dbus_send_with_reply(dbus_get_bus(), msg, simple_reply, agent,
+ 									NULL);
+ 
+-	return true;
++	agent->req->msg = l_dbus_message_ref(msg);
 +
-+static struct l_dbus_message *join_network_call(struct l_dbus *dbus,
-+						struct l_dbus_message *msg,
++	return MESH_ERROR_NONE;
++
+ }
+ 
+-static bool request_ascii(uint16_t len)
++mesh_error_t mesh_agent_display_number(struct mesh_agent *agent, bool initiator,
++					uint8_t action, uint32_t count,
++					mesh_agent_cb_t cb, void *user_data)
+ {
+-	if (len > MAX_ASCII_OOB_LEN)
+-		return false;
++	const char *str_type;
++	agent_request_type_t type;
++
++	type = action;
++
++	if (initiator)
++		type = action + MESH_AGENT_REQUEST_PUSH;
++
++	if (type >= L_ARRAY_SIZE(cap_table))
++		return MESH_ERROR_INVALID_ARGS;
+ 
+-	bt_shell_printf("Request ASCII key (max characters %d)\n", len);
+-	bt_shell_prompt_input("mesh", "Enter key (ascii string):",
+-							response_ascii, NULL);
++	str_type = cap_table[type].action;
+ 
+-	return true;
++	return output_request(agent, str_type, type, count, cb, user_data);
+ }
+ 
+-bool agent_input_request(enum oob_type type, uint16_t max_len,
+-					agent_input_cb cb, void *user_data)
++mesh_error_t mesh_agent_prompt_number(struct mesh_agent *agent, bool initiator,
++						uint8_t action,
++						mesh_agent_number_cb_t cb,
 +						void *user_data)
  {
--	return mesh->net;
-+	const char *app_path, *sender;
-+	struct l_dbus_message_iter iter_uuid;
-+	uint32_t n;
+-	bool result;
++	const char *str_type;
++	agent_request_type_t type;
+ 
+-	if (pending_request.type != NONE)
+-		return false;
++	type = action;
+ 
+-	switch (type) {
+-	case HEXADECIMAL:
+-		result = request_hexadecimal(max_len);
+-		break;
+-	case DECIMAL:
+-		result = request_decimal(max_len);
+-		break;
+-	case ASCII:
+-		result = request_ascii(max_len);
+-		break;
+-	case NONE:
+-	case OUTPUT:
+-	default:
+-		return false;
+-	};
++	if (!initiator)
++		type = action + MESH_AGENT_REQUEST_PUSH;
+ 
+-	if (result) {
+-		pending_request.type = type;
+-		pending_request.len = max_len;
+-		pending_request.cb = cb;
+-		pending_request.user_data = user_data;
++	if (type >= L_ARRAY_SIZE(cap_table))
++		return MESH_ERROR_INVALID_ARGS;
+ 
+-		return true;
+-	}
++	str_type = cap_table[type].action;
 +
-+	l_debug("Join network request");
-+
-+	if (join_pending)
-+		return dbus_error(msg, MESH_ERROR_BUSY,
-+						"Provisioning in progress");
-+
-+	if (!l_dbus_message_get_arguments(msg, "oay", &app_path,
-+								&iter_uuid))
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	join_pending = l_new(struct join_data, 1);
-+
-+	n = dbus_get_byte_array(&iter_uuid, join_pending->uuid,16);
-+
-+	if (n != 16) {
-+		l_free(join_pending);
-+		join_pending = NULL;
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
-+							"Bad device UUID");
-+	}
-+
-+	sender = l_dbus_message_get_sender(msg);
-+
-+	join_pending->sender = l_strdup(sender);
-+	join_pending->disc_watch = dbus_disconnect_watch_add(dbus, sender,
-+							prov_disc_cb, NULL);
-+	join_pending->msg = l_dbus_message_ref(msg);
-+	join_pending->app_path = app_path;
-+
-+	/* Try to create a temporary node */
-+	node_join(app_path, sender, join_pending->uuid, node_init_cb);
-+
-+	return NULL;
++	return prompt_input(agent, str_type, type, true, cb, user_data);
 +}
-+
-+static struct l_dbus_message *cancel_join_call(struct l_dbus *dbus,
-+						struct l_dbus_message *msg,
-+						void *user_data)
+ 
+-	return false;
++mesh_error_t mesh_agent_prompt_alpha(struct mesh_agent *agent,
++				mesh_agent_key_cb_t cb, void *user_data)
 +{
-+	struct l_dbus_message *reply;
-+
-+	l_debug("Cancel Join");
-+
-+	if (!join_pending) {
-+		reply = dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST,
-+							"No join in progress");
-+		goto done;
-+	}
-+
-+	acceptor_cancel(&mesh);
-+
-+	/* Return error to the original Join call */
-+	if (join_pending->msg) {
-+		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED, NULL);
-+		l_dbus_send(dbus_get_bus(), reply);
-+	}
-+
-+	reply = l_dbus_message_new_method_return(msg);
-+	l_dbus_message_set_arguments(reply, "");
-+
-+	free_pending_join_call(true);
-+done:
-+	return reply;
-+}
-+
-+static bool match_attach_request(const void *a, const void *b)
-+{
-+	const struct attach_data *pending = a;
-+	const uint64_t *token = b;
-+
-+	return *token == pending->token;
-+}
-+
-+static void attach_ready_cb(int status, char *node_path, uint64_t token)
-+{
-+	struct l_dbus_message *reply;
-+	struct attach_data *pending;
-+
-+	pending = l_queue_find(attach_queue, match_attach_request, &token);
-+	if (!pending)
-+		return;
-+
-+	if (status != MESH_ERROR_NONE) {
-+		const char *desc = (status == MESH_ERROR_NOT_FOUND) ?
-+				"Node match not found" : "Attach failed";
-+		reply = dbus_error(pending->msg, status, desc);
-+		goto done;
-+	}
-+
-+	reply = l_dbus_message_new_method_return(pending->msg);
-+
-+	node_build_attach_reply(reply, token);
-+
-+done:
-+	l_dbus_send(dbus_get_bus(), reply);
-+	l_queue_remove(attach_queue, pending);
-+	l_free(pending);
-+}
-+
-+static struct l_dbus_message *attach_call(struct l_dbus *dbus,
-+						struct l_dbus_message *msg,
-+						void *user_data)
-+{
-+	uint64_t token = 1;
-+	const char *app_path, *sender;
-+	struct attach_data *pending;
-+
-+	l_debug("Attach");
-+
-+	if (!l_dbus_message_get_arguments(msg, "ot", &app_path, &token))
-+		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
-+
-+	sender = l_dbus_message_get_sender(msg);
-+
-+	if (node_attach(app_path, sender, token, attach_ready_cb) !=
-+								MESH_ERROR_NONE)
-+		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
-+						"Matching node not found");
-+
-+	pending = l_new(struct attach_data, 1);
-+
-+	pending->token = token;
-+	pending->msg = l_dbus_message_ref(msg);
-+
-+	if (!attach_queue)
-+		attach_queue = l_queue_new();
-+
-+	l_queue_push_tail(attach_queue, pending);
-+
-+	return NULL;
-+}
-+
-+static void setup_network_interface(struct l_dbus_interface *iface)
-+{
-+	l_dbus_interface_method(iface, "Join", 0, join_network_call, "",
-+				"oay", "app", "uuid");
-+
-+	l_dbus_interface_method(iface, "Cancel", 0, cancel_join_call, "", "");
-+
-+	l_dbus_interface_method(iface, "Attach", 0, attach_call,
-+				"oa(ya(qa{sv}))", "ot", "node", "configuration",
-+				"app", "token");
-+
-+	/* TODO: Implement Leave method */
-+}
-+
-+bool mesh_dbus_init(struct l_dbus *dbus)
-+{
-+	if (!l_dbus_register_interface(dbus, MESH_NETWORK_INTERFACE,
-+						setup_network_interface,
-+						NULL, false)) {
-+		l_info("Unable to register %s interface",
-+			       MESH_NETWORK_INTERFACE);
-+		return false;
-+	}
-+
-+	if (!l_dbus_object_add_interface(dbus, BLUEZ_MESH_PATH,
-+						MESH_NETWORK_INTERFACE, NULL)) {
-+		l_info("Unable to register the mesh object on '%s'",
-+							MESH_NETWORK_INTERFACE);
-+		l_dbus_unregister_interface(dbus, MESH_NETWORK_INTERFACE);
-+		return false;
-+	}
-+
-+	l_info("Added Network Interface on %s", BLUEZ_MESH_PATH);
-+
-+	return true;
++	return prompt_input(agent, "in-alpha", MESH_AGENT_REQUEST_IN_ALPHA,
++							false, cb, user_data);
  }
-diff --git a/mesh/mesh.h b/mesh/mesh.h
-index 8d389883b..1189f8276 100644
---- a/mesh/mesh.h
-+++ b/mesh/mesh.h
-@@ -18,15 +18,24 @@
+ 
+-static void response_output(const char *input, void *user_data)
++mesh_error_t mesh_agent_request_static(struct mesh_agent *agent,
++				mesh_agent_key_cb_t cb, void *user_data)
+ {
+-	reset_input_request();
++	return prompt_input(agent, "static-oob", MESH_AGENT_REQUEST_STATIC_OOB,
++							false, cb, user_data);
+ }
+ 
+-bool agent_output_request(const char *str)
++mesh_error_t mesh_agent_request_private_key(struct mesh_agent *agent,
++				mesh_agent_key_cb_t cb, void *user_data)
+ {
+-	if (pending_request.type != NONE)
+-		return false;
++	return request_key(agent, MESH_AGENT_REQUEST_PRIVATE_KEY, cb,
++								user_data);
+ 
+-	pending_request.type = OUTPUT;
+-	bt_shell_prompt_input("mesh", str, response_output, NULL);
+-	return true;
+ }
+ 
+-void agent_output_request_cancel(void)
++mesh_error_t mesh_agent_request_public_key(struct mesh_agent *agent,
++				mesh_agent_key_cb_t cb, void *user_data)
+ {
+-	if (pending_request.type != OUTPUT)
++	return request_key(agent, MESH_AGENT_REQUEST_PUBLIC_KEY, cb,
++								user_data);
++}
++
++void mesh_agent_cancel(struct mesh_agent *agent)
++{
++	struct l_dbus *dbus = dbus_get_bus();
++	struct l_dbus_message *msg;
++
++	if (!l_queue_find(agents, simple_match, agent))
+ 		return;
+ 
+-	pending_request.type = NONE;
+-	bt_shell_release_prompt("");
++	msg = l_dbus_message_new_method_call(dbus, agent->owner, agent->path,
++						MESH_PROVISION_AGENT_INTERFACE,
++						"Cancel");
++	l_dbus_send(dbus, msg);
+ }
+diff --git a/mesh/agent.h b/mesh/agent.h
+index 6fb475691..d90e1c17d 100644
+--- a/mesh/agent.h
++++ b/mesh/agent.h
+@@ -2,7 +2,7 @@
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+- *  Copyright (C) 2017  Intel Corporation. All rights reserved.
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
+  *
+  *
+  *  This library is free software; you can redistribute it and/or
+@@ -18,25 +18,56 @@
   *
   */
  
--struct bt_mesh;
--struct mesh_net;
-+#define BLUEZ_MESH_NAME "org.bluez.mesh"
+-#define MAX_HEXADECIMAL_OOB_LEN	128
+-#define DECIMAL_OOB_LEN		4
+-#define MAX_ASCII_OOB_LEN		16
++struct mesh_agent;
  
--struct bt_mesh *mesh_new(uint16_t index, const char *in_config_name);
--struct bt_mesh *mesh_ref(struct bt_mesh *mesh);
--void mesh_unref(struct bt_mesh *mesh);
--bool mesh_set_output(struct bt_mesh *mesh, const char *out_config_name);
-+#define MESH_NETWORK_INTERFACE "org.bluez.mesh.Network1"
-+#define MESH_NODE_INTERFACE "org.bluez.mesh.Node1"
-+#define MESH_ELEMENT_INTERFACE "org.bluez.mesh.Element1"
-+#define MESH_APPLICATION_INTERFACE "org.bluez.mesh.Application1"
-+#define MESH_PROVISION_AGENT_INTERFACE "org.bluez.mesh.ProvisionAgent1"
-+#define ERROR_INTERFACE "org.bluez.mesh.Error"
+-enum oob_type {
+-	NONE,
+-	HEXADECIMAL,
+-	DECIMAL,
+-	ASCII,
+-	OUTPUT,
+-} oob_type_t;
++struct mesh_agent_prov_caps {
++	uint32_t uri_hash;
++	uint16_t oob_info;
++	uint16_t output_action;
++	uint16_t input_action;
++	uint8_t pub_type;
++	uint8_t static_type;
++	uint8_t output_size;
++	uint8_t input_size;
++};
+ 
+-typedef void (*agent_input_cb)(enum oob_type type, void *input, uint16_t len,
++typedef void (*mesh_agent_cb_t) (void *user_data, mesh_error_t err);
 +
-+typedef void (*prov_rx_cb_t)(void *user_data, const uint8_t *data,
-+								uint16_t len);
-+bool mesh_init(uint16_t index, const char *in_config_name);
- void mesh_cleanup(void);
--const char *mesh_status_str(uint8_t err);
-+bool mesh_dbus_init(struct l_dbus *dbus);
- 
--/* Command line testing */
--struct mesh_net *mesh_get_net(struct bt_mesh *mesh);
-+const char *mesh_status_str(uint8_t err);
-+bool mesh_send_pkt(uint8_t count, uint16_t interval, uint8_t *data,
-+								uint16_t len);
-+bool mesh_send_cancel(const uint8_t *filter, uint8_t len);
-+bool mesh_reg_prov_rx(prov_rx_cb_t cb, void *user_data);
-+void mesh_unreg_prov_rx(prov_rx_cb_t cb);
++typedef void (*mesh_agent_key_cb_t) (void *user_data, mesh_error_t err,
++						uint8_t *key, uint32_t len);
++
++typedef void (*mesh_agent_number_cb_t) (void *user_data,
++					mesh_error_t err, uint32_t number);
++
++void mesh_agent_init(void);
++void mesh_agent_cleanup(void);
++struct mesh_agent *mesh_agent_create(const char *path, const char *owner,
++					struct l_dbus_message_iter *properties);
++
++void mesh_agent_remove(struct mesh_agent *agent);
++void mesh_agent_cancel(struct mesh_agent *agent);
++
++struct mesh_agent_prov_caps *mesh_agent_get_caps(struct mesh_agent *agent);
++
++mesh_error_t mesh_agent_display_number(struct mesh_agent *agent, bool initiator,
++					uint8_t action, uint32_t count,
++					mesh_agent_cb_t cb, void *user_data);
++mesh_error_t mesh_agent_prompt_number(struct mesh_agent *agent, bool initiator,
++						uint8_t action,
++						mesh_agent_number_cb_t cb,
++						void *user_data);
++mesh_error_t mesh_agent_prompt_alpha(struct mesh_agent *agent,
++							mesh_agent_key_cb_t cb,
++							void *user_data);
++mesh_error_t mesh_agent_request_static(struct mesh_agent *agent,
++							mesh_agent_key_cb_t cb,
++							void *user_data);
++mesh_error_t mesh_agent_request_private_key(struct mesh_agent *agent,
++							mesh_agent_key_cb_t cb,
++							void *user_data);
++mesh_error_t mesh_agent_request_public_key(struct mesh_agent *agent,
++							mesh_agent_key_cb_t cb,
+ 							void *user_data);
+-bool agent_input_request(enum oob_type type, uint16_t max_len,
+-					agent_input_cb cb, void *user_data);
+-
+-bool agent_output_request(const char *str);
+-void agent_output_request_cancel(void);
+-bool agent_completion(void);
+-bool agent_input(const char *input);
+-void agent_release(void);
++mesh_error_t mesh_agent_display_string(struct mesh_agent *agent,
++					const char *str, mesh_agent_cb_t cb,
++					void *user_data);
 -- 
 2.14.5
 
