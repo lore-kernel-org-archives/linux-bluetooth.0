@@ -2,267 +2,104 @@ Return-Path: <SRS0=1Za/=OY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72975C43387
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 06:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BBEC43387
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 07:22:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 138E7206C0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 06:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A97F20672
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 07:22:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=augury.com header.i=@augury.com header.b="V+Z5BUJz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i3CeH+hZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729671AbeLOGpR (ORCPT
+        id S1729671AbeLOHWV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 15 Dec 2018 01:45:17 -0500
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:41096 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727757AbeLOGpR (ORCPT
+        Sat, 15 Dec 2018 02:22:21 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:34753 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728675AbeLOHWV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 15 Dec 2018 01:45:17 -0500
-Received: by mail-vs1-f66.google.com with SMTP id t17so4738311vsc.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Dec 2018 22:45:15 -0800 (PST)
+        Sat, 15 Dec 2018 02:22:21 -0500
+Received: by mail-pl1-f193.google.com with SMTP id w4so3768202plz.1;
+        Fri, 14 Dec 2018 23:22:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=augury.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tIwgeB/hlMSfRsyE/JUCTg0JBtgZg+9tUWpb5G2xVm0=;
-        b=V+Z5BUJzsDMEaNw+Siu/1nje+uTv/yxe8O3MLNRvqfc+VFkIqs84etvkfXMLaxhAAO
-         rIbsBW7DmJz3ZdoogsYTd2hvO43NttpjljnPwngtTmE0IqI8X1tGK4K8QMzlrVn6j3lN
-         XDkR0o7ODeaK6873lQB7OhxzL7UflRKTqbvZs=
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=xNSQnLp2ea1UJjtMX5kv0ypQi79onHL2a/igC8HRsrE=;
+        b=i3CeH+hZC8i4s3hA3MTygU6Qa9RqRpWIp43U734ZciNoSVfaw0u9IW3BrFuruEsFP/
+         jbPUgqRQAYq1gNA7Up/xWzvSaow47L4G+wC2SVl5FiER+oT5pmj24rggAQq0NtgPWD35
+         gJbxAr4R1gp56ib5i3BlRaMNUSByOUjdegle8QxVcVULJXmPgVbLFoG/yLYf2FXB0+Cb
+         0IOie6umI3z9JzO3DVg9OMrnwxud0QCkLM6GU6zD7vdp6KGDfmpWs5vfjnpSNFBPHBP1
+         MT8l/LVzi36b60H+NnDcynooR8n+XMtWilWH1fyCRwWRByMUbDRvNT2IlPJb638Cts70
+         CxQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tIwgeB/hlMSfRsyE/JUCTg0JBtgZg+9tUWpb5G2xVm0=;
-        b=Q8C52QoX6xqnjVT5tPgaBPGIwNFiHw9SgKJOdrk9cYnPuedgfFrdmG3BOLSIhMEEXB
-         dm4LC9wZBVGoabrC/Rtowupa14GagpASpmOMNCXO5+3FoNsCJ3PseL7iEVlEhcAMgmN6
-         93pouZAkvrvja75ExUMIHtTDcKAO8IHHoYPLZJIDDRDT8PPFXjmg5J/U8MmkdmjvRixA
-         gYflZVuZ5hzmKjfprBUZvVbFkgzHbSA2K0l7TgpETI78eXtUvzvMxByJ0hB32x3eCpqY
-         s3F93kW4rUP1EBnb8m3wjv46gr+9UuixU4MP7blwDcIK1o+5VEz6PnpVYX33GB5Yuj6v
-         U9jg==
-X-Gm-Message-State: AA+aEWZuaI3M8i1Xsb8cRYIe/P2aPhBo7ctTxxM8FnzBCDEeRwnQvyDY
-        pO9ZQSEj0q6oxjNSTHE5QcYtX6crcA3yEipktvuHMVS1SkM=
-X-Google-Smtp-Source: AFSGD/XRLFCJAuij3p86X51032x8waUXKu9ZWT6Aa6KKV2II16mBnYWon5ZfNrFFRQzMopQ5Q0ILFRYsRTzWWw1wrmg=
-X-Received: by 2002:a67:dd11:: with SMTP id y17mr2771408vsj.111.1544856315309;
- Fri, 14 Dec 2018 22:45:15 -0800 (PST)
-MIME-Version: 1.0
-References: <20181119154311.27826-1-luiz.dentz@gmail.com> <CABBYNZK90H=0e4GKo1g96jYkg3EM+5C2DhbCvi-Cgtd8W+E3YA@mail.gmail.com>
- <CAHotPr_8M4H_6sLV+BK02QBKLwwAn0cEOFhyoMN5F0=_gY1dHQ@mail.gmail.com>
- <CABBYNZJNM2SpM2w3kwuLw1FfXcoSZfyO02xCJAgdx-BBPyw7-w@mail.gmail.com>
- <CAHotPr8nQYJkN30pTncQfx-SGgmUgTs582_q_MAiLi=bEFYO9w@mail.gmail.com>
- <CABBYNZJzpPd+ZfJRTyCnicr8jApj_YW31qZhUDxSk_PgKiPZKg@mail.gmail.com>
- <CAHotPr8pvbCOoYHVz-k4NU-prmtkq2bZOFN5V_GjCebte5HBtg@mail.gmail.com>
- <CAHotPr8MyEwqATiL+4CHfTJ-40Df3cjm60CptT6wh-0GTpFgOg@mail.gmail.com> <CABBYNZKGjNYc7WBWrN9XHnLaYmOk0x981MB9XGqk8EQArMZeMg@mail.gmail.com>
-In-Reply-To: <CABBYNZKGjNYc7WBWrN9XHnLaYmOk0x981MB9XGqk8EQArMZeMg@mail.gmail.com>
-From:   Gal Ben Haim <gbenhaim@augury.com>
-Date:   Sat, 15 Dec 2018 08:45:04 +0200
-Message-ID: <CAHotPr89aB+bsuMxF3S+jQk-oJp=6XM=AeTqGC78aQ7Xg38NQQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] gatt: Fix invalid read when disconnecting
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=xNSQnLp2ea1UJjtMX5kv0ypQi79onHL2a/igC8HRsrE=;
+        b=KVV1MBK8S/Bl1IuP2jfAiAvZFHKARRhH475Ra5CEh7An0a257IBN6j+WZ0uuta2JsC
+         oeTvrrNDOMYNIKhm8GFozqxlPcsBUOhM5RHZ/nLHmxE4SGLO/4SUcW0ZBZNGHgVl9x+G
+         Ek0dlD+Hcy6d56HQV6gpyhCq0V71VPhEmI3tM1Ewj1GW9EFQRyaYfVNb2gg23EERuM/o
+         m+nq23bc9qUP79K5/PcG56vRoME4OmQ0Av6x42/uirOR/khQSeu+W5ekwftemEXppO08
+         Ckk9/nBNBeEkro67ZNI1QYu6jpxm1UMm5U5B5gV84Jlaz2RM5khPKhbJvXmzWVzmpdJ/
+         1g0g==
+X-Gm-Message-State: AA+aEWZ0NswU9IEQ3HcUawGe2d0nAzfWvG37uidBgEXG5CFNJmJC94Sk
+        PtvNlkKJV8YGcOT3MIN7pIBYkAPPIKE=
+X-Google-Smtp-Source: AFSGD/Xr3NiL/VDa9o5FushEkh3TT9+3wB5GheOwgyGbADGkLi48cu06bO80VnawtUOeQHxba6Xyvw==
+X-Received: by 2002:a17:902:47aa:: with SMTP id r39mr5542068pld.219.1544858539576;
+        Fri, 14 Dec 2018 23:22:19 -0800 (PST)
+Received: from localhost (68.168.130.77.16clouds.com. [68.168.130.77])
+        by smtp.gmail.com with ESMTPSA id r83sm12121143pfc.115.2018.12.14.23.22.18
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 14 Dec 2018 23:22:18 -0800 (PST)
+From:   Yangtao Li <tiny.windzz@gmail.com>
+To:     alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
+        davem@davemloft.net
+Cc:     linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yangtao Li <tiny.windzz@gmail.com>
+Subject: [PATCH] 6lowpan: convert to DEFINE_SHOW_ATTRIBUTE
+Date:   Sat, 15 Dec 2018 02:22:17 -0500
+Message-Id: <20181215072217.26085-1-tiny.windzz@gmail.com>
+X-Mailer: git-send-email 2.17.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-I still get segmentation faults occasionally after applying this patch,
-i'm not 100% sure that it's related but it happens in the same area...
-its not something that I can reproduce immediately like with the
-previous segfault. I think that it doesn't happen if I use my original
-patch https://marc.info/?l=linux-bluetooth&m=154250398526173&w=2
+Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
 
-bluetoothd[2599]: src/device.c:att_disconnected_cb()
-bluetoothd[2599]: src/device.c:att_disconnected_cb() Connection reset
-by peer (104)
-bluetoothd[2599]: src/service.c:change_state() 0x4edae0: device
-DA:51:61:24:3C:36 profile gap-profile state changed: connected ->
-disconnecting (0)
-bluetoothd[2599]: src/service.c:change_state() 0x4edae0: device
-DA:51:61:24:3C:36 profile gap-profile state changed: disconnecting ->
-disconnected (0)
-bluetoothd[2599]: src/gatt-client.c:btd_gatt_client_disconnected()
-Device disconnected. Cleaning up.
-bluetoothd[2599]: src/device.c:att_disconnected_cb() Automatic
-connection disabled
-bluetoothd[2599]: src/gatt-database.c:btd_gatt_database_att_disconnected()
-bluetoothd[2599]: attrib/gattrib.c:g_attrib_unref() 0x4ee410: g_attrib_unref=0
-bluetoothd[2599]: src/device.c:btd_device_set_temporary() temporary 1
-bluetoothd[2599]: src/device.c:device_remove() Removing device
-/org/bluez/hci0/dev_DA_51_61_24_3C_36
-bluetoothd[2599]: src/service.c:change_state() 0x4edae0: device
-DA:51:61:24:3C:36 profile gap-profile state changed: disconnected ->
-unavailable (0)
-bluetoothd[2599]: profiles/gap/gas.c:gap_remove() GAP profile remove
-(DA:51:61:24:3C:36)
-bluetoothd[2599]: src/service.c:btd_service_unref() 0x4edae0: ref=0
-bluetoothd[2599]: src/device.c:btd_device_unref() Freeing device
-/org/bluez/hci0/dev_DA_51_61_24_3C_36
-bluetoothd[2599]: src/gatt-client.c:unregister_service() Removing GATT
-service: /org/bluez/hci0/dev_DA_51_61_24_3C_36/service0008
-bluetoothd[2599]: src/gatt-client.c:unregister_service() Removing GATT
-service: /org/bluez/hci0/dev_DA_51_61_24_3C_36/service0009
-bluetoothd[2599]: src/gatt-client.c:unregister_characteristic()
-Removing GATT characteristic:
-/org/bluez/hci0/dev_DA_51_61_24_3C_36/service0009/char000a
-bluetoothd[2599]: src/gatt-client.c:unregister_characteristic()
-Removing GATT characteristic:
-/org/bluez/hci0/dev_DA_51_61_24_3C_36/service0009/char000c
-bluetoothd[2599]: src/gatt-client.c:unregister_descriptor() Removing
-GATT descriptor:
-/org/bluez/hci0/dev_DA_51_61_24_3C_36/service0009/char000c/desc000e
-Segmentation fault
+Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+---
+ net/6lowpan/debugfs.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
+diff --git a/net/6lowpan/debugfs.c b/net/6lowpan/debugfs.c
+index 24915e0bb9ea..6c152f9ea26e 100644
+--- a/net/6lowpan/debugfs.c
++++ b/net/6lowpan/debugfs.c
+@@ -232,18 +232,7 @@ static int lowpan_context_show(struct seq_file *file, void *offset)
+ 
+ 	return 0;
+ }
+-
+-static int lowpan_context_open(struct inode *inode, struct file *file)
+-{
+-	return single_open(file, lowpan_context_show, inode->i_private);
+-}
+-
+-static const struct file_operations lowpan_context_fops = {
+-	.open		= lowpan_context_open,
+-	.read		= seq_read,
+-	.llseek		= seq_lseek,
+-	.release	= single_release,
+-};
++DEFINE_SHOW_ATTRIBUTE(lowpan_context);
+ 
+ static int lowpan_short_addr_get(void *data, u64 *val)
+ {
+-- 
+2.17.0
 
-On Wed, Nov 21, 2018 at 11:15 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi,
-> On Wed, Nov 21, 2018 at 9:15 AM Gal Ben Haim <gbenhaim@augury.com> wrote:
-> >
-> > it fixes the same case that cause the version from master to crash.
-> > i haven't tested for anything else..
-> >
-> > On Tue, Nov 20, 2018 at 8:31 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
-> > >
-> > > ok I patched it. i'll test it tomorrow in the office and let you know.
-> > >
-> > > On Tue, Nov 20, 2018 at 3:59 PM Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > Hi Gal,
-> > > >
-> > > > On Tue, Nov 20, 2018 at 2:35 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
-> > > > >
-> > > > > i tried with both git am and git apply
-> > > >
-> > > > Does that applies to v2 as well? I just rebased it on top master, are
-> > > > you sure you don't have your own changes conflicting with it?
-> > > >
-> > > > > On Tue, Nov 20, 2018 at 12:35 PM Luiz Augusto von Dentz
-> > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Gal,
-> > > > > > On Tue, Nov 20, 2018 at 11:31 AM Gal Ben Haim <gbenhaim@augury.com> wrote:
-> > > > > > >
-> > > > > > > I can't apply this patch, not to the revision in master and not to the 5.50 tag
-> > > > > >
-> > > > > > They are on top o master, how are you trying to apply them, with git am?
-> > > > > >
-> > > > > > > On Tue, Nov 20, 2018 at 10:50 AM Luiz Augusto von Dentz
-> > > > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > > > >
-> > > > > > > > On Mon, Nov 19, 2018 at 5:43 PM Luiz Augusto von Dentz
-> > > > > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > > > > >
-> > > > > > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > > > > > > >
-> > > > > > > > > In case there is a client of AcquireNotify and a disconnect happens the
-> > > > > > > > > code not only have to free the client object but also destroy the io
-> > > > > > > > > associated with it, for this reason the client object cannot be freed
-> > > > > > > > > until the io is destroyed otherwise it may lead to the following error:
-> > > > > > > > >
-> > > > > > > > > Invalid read of size 4
-> > > > > > > > >    at 0x63920: notify_io_destroy (gatt-client.c:1461)
-> > > > > > > > >    by 0x63EDB: pipe_io_destroy (gatt-client.c:1082)
-> > > > > > > > >    by 0x6405B: characteristic_free (gatt-client.c:1663)
-> > > > > > > > >    by 0x81F33: remove_interface (object.c:667)
-> > > > > > > > >    by 0x826CB: g_dbus_unregister_interface (object.c:1391)
-> > > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > > > > > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
-> > > > > > > > >    by 0x85CF7: queue_remove_all (queue.c:339)
-> > > > > > > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
-> > > > > > > > >    by 0x695CB: gatt_service_removed (device.c:3747)
-> > > > > > > > >    by 0x85B17: queue_foreach (queue.c:220)
-> > > > > > > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
-> > > > > > > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
-> > > > > > > > >  Address 0x515ed48 is 0 bytes inside a block of size 20 free'd
-> > > > > > > > >    at 0x483EAD0: free (vg_replace_malloc.c:530)
-> > > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > > > > > > >    by 0x636D3: unregister_characteristic (gatt-client.c:1741)
-> > > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > > > > > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
-> > > > > > > > >    by 0x85CF7: queue_remove_all (queue.c:339)
-> > > > > > > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
-> > > > > > > > >    by 0x695CB: gatt_service_removed (device.c:3747)
-> > > > > > > > >    by 0x85B17: queue_foreach (queue.c:220)
-> > > > > > > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
-> > > > > > > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
-> > > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
-> > > > > > > > >    by 0x91387: gatt_db_clear_range (gatt-db.c:475)
-> > > > > > > > > ---
-> > > > > > > > >  src/gatt-client.c | 24 ++++++++++++------------
-> > > > > > > > >  1 file changed, 12 insertions(+), 12 deletions(-)
-> > > > > > > > >
-> > > > > > > > > diff --git a/src/gatt-client.c b/src/gatt-client.c
-> > > > > > > > > index 234f46ed7..55aa5e423 100644
-> > > > > > > > > --- a/src/gatt-client.c
-> > > > > > > > > +++ b/src/gatt-client.c
-> > > > > > > > > @@ -1645,13 +1645,22 @@ static const GDBusMethodTable characteristic_methods[] = {
-> > > > > > > > >         { }
-> > > > > > > > >  };
-> > > > > > > > >
-> > > > > > > > > +static void remove_client(void *data)
-> > > > > > > > > +{
-> > > > > > > > > +       struct notify_client *ntfy_client = data;
-> > > > > > > > > +       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
-> > > > > > > > > +
-> > > > > > > > > +       queue_remove(client->all_notify_clients, ntfy_client);
-> > > > > > > > > +
-> > > > > > > > > +       notify_client_unref(ntfy_client);
-> > > > > > > > > +}
-> > > > > > > > > +
-> > > > > > > > >  static void characteristic_free(void *data)
-> > > > > > > > >  {
-> > > > > > > > >         struct characteristic *chrc = data;
-> > > > > > > > >
-> > > > > > > > >         /* List should be empty here */
-> > > > > > > > >         queue_destroy(chrc->descs, NULL);
-> > > > > > > > > -       queue_destroy(chrc->notify_clients, NULL);
-> > > > > > > > >
-> > > > > > > > >         if (chrc->write_io) {
-> > > > > > > > >                 queue_remove(chrc->service->client->ios, chrc->write_io->io);
-> > > > > > > > > @@ -1663,6 +1672,8 @@ static void characteristic_free(void *data)
-> > > > > > > > >                 pipe_io_destroy(chrc->notify_io);
-> > > > > > > > >         }
-> > > > > > > > >
-> > > > > > > > > +       queue_destroy(chrc->notify_clients, remove_client);
-> > > > > > > > > +
-> > > > > > > > >         g_free(chrc->path);
-> > > > > > > > >         free(chrc);
-> > > > > > > > >  }
-> > > > > > > > > @@ -1715,16 +1726,6 @@ static struct characteristic *characteristic_create(
-> > > > > > > > >         return chrc;
-> > > > > > > > >  }
-> > > > > > > > >
-> > > > > > > > > -static void remove_client(void *data)
-> > > > > > > > > -{
-> > > > > > > > > -       struct notify_client *ntfy_client = data;
-> > > > > > > > > -       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
-> > > > > > > > > -
-> > > > > > > > > -       queue_remove(client->all_notify_clients, ntfy_client);
-> > > > > > > > > -
-> > > > > > > > > -       notify_client_unref(ntfy_client);
-> > > > > > > > > -}
-> > > > > > > > > -
-> > > > > > > > >  static void unregister_characteristic(void *data)
-> > > > > > > > >  {
-> > > > > > > > >         struct characteristic *chrc = data;
-> > > > > > > > > @@ -1738,7 +1739,6 @@ static void unregister_characteristic(void *data)
-> > > > > > > > >         if (chrc->write_op)
-> > > > > > > > >                 bt_gatt_client_cancel(gatt, chrc->write_op->id);
-> > > > > > > > >
-> > > > > > > > > -       queue_remove_all(chrc->notify_clients, NULL, NULL, remove_client);
-> > > > > > > > >         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
-> > > > > > > > >
-> > > > > > > > >         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
-> > > > > > > > > --
-> > > > > > > > > 2.17.2
->
-> Applied.
->
-> --
-> Luiz Augusto von Dentz
