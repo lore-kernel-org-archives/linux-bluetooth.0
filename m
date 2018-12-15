@@ -6,18 +6,18 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 304FBC43444
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:26:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AA0C43613
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:26:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48146206C0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:26:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C13B206C0
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:26:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729029AbeLOA03 (ORCPT
+        id S1729412AbeLOA0a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Dec 2018 19:26:29 -0500
+        Fri, 14 Dec 2018 19:26:30 -0500
 Received: from mga17.intel.com ([192.55.52.151]:22249 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728620AbeLOA03 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1728962AbeLOA03 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 14 Dec 2018 19:26:29 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
@@ -25,16 +25,16 @@ Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 16:26:28 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,355,1539673200"; 
-   d="scan'208";a="109640280"
+   d="scan'208";a="109640285"
 Received: from bgix-dell-lap.sea.intel.com ([10.251.138.67])
   by fmsmga008.fm.intel.com with ESMTP; 14 Dec 2018 16:26:28 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v3 03/30] mesh: Utilities for DBus support
-Date:   Fri, 14 Dec 2018 16:25:57 -0800
-Message-Id: <20181215002624.9313-4-brian.gix@intel.com>
+Subject: [PATCH BlueZ v3 04/30] mesh: Internal errors
+Date:   Fri, 14 Dec 2018 16:25:58 -0800
+Message-Id: <20181215002624.9313-5-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181215002624.9313-1-brian.gix@intel.com>
 References: <20181215002624.9313-1-brian.gix@intel.com>
@@ -46,18 +46,16 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Inga Stotland <inga.stotland@intel.com>
 
 ---
- mesh/dbus.c | 181 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- mesh/dbus.h |  40 ++++++++++++++
- 2 files changed, 221 insertions(+)
- create mode 100644 mesh/dbus.c
- create mode 100644 mesh/dbus.h
+ mesh/error.h | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+ create mode 100644 mesh/error.h
 
-diff --git a/mesh/dbus.c b/mesh/dbus.c
+diff --git a/mesh/error.h b/mesh/error.h
 new file mode 100644
-index 000000000..a8b398f9e
+index 000000000..e7bac445b
 --- /dev/null
-+++ b/mesh/dbus.c
-@@ -0,0 +1,181 @@
++++ b/mesh/error.h
+@@ -0,0 +1,35 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -78,213 +76,21 @@ index 000000000..a8b398f9e
 + *
 + */
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <time.h>
-+#include <ell/ell.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/mgmt.h"
-+
-+#include "src/shared/mgmt.h"
-+
-+#include "mesh/mesh-defs.h"
-+#include "mesh/mesh-io.h"
-+#include "mesh/node.h"
-+#include "mesh/net.h"
-+#include "mesh/storage.h"
-+#include "mesh/cfgmod.h"
-+#include "mesh/model.h"
-+#include "mesh/mesh.h"
-+#include "mesh/error.h"
-+#include "mesh/dbus.h"
-+
-+struct l_dbus *dbus;
-+
-+struct error_entry {
-+	const char *dbus_err;
-+	const char *default_desc;
-+};
-+
 +/*
-+ * Important: The entries in this table are ordered to enum
-+ * values in mesh_error_t (error.h)
++ * Important: Changes in this table must be reflected in the
++ * the entries of error_table[] in dbus.c
 + */
-+static struct error_entry error_table[] =
-+{
-+	{ NULL, NULL },
-+	{ ERROR_INTERFACE ".Failed", "Operation failed" },
-+	{ ERROR_INTERFACE ".NotAuthorized", "Permission denied"},
-+	{ ERROR_INTERFACE ".NotFound", "Object not found"},
-+	{ ERROR_INTERFACE ".InvalidArgs", "Invalid arguments"},
-+	{ ERROR_INTERFACE ".InProgress", "Already in progress"},
-+	{ ERROR_INTERFACE ".AlreadyExists", "Already exists"},
-+	{ ERROR_INTERFACE ".DoesNotExist", "Does not exist"},
-+	{ ERROR_INTERFACE ".Canceled", "Operation canceled"}
-+};
-+
-+struct l_dbus_message *dbus_error(struct l_dbus_message *msg, int err,
-+							const char *description)
-+{
-+	int array_len = L_ARRAY_SIZE(error_table);
-+
-+	/* Default to ".Failed" */
-+	if (!err || err >= array_len)
-+		err = MESH_ERROR_FAILED;
-+
-+	if (description)
-+		return l_dbus_message_new_error(msg,
-+				error_table[err].dbus_err,
-+				"%s", description);
-+	else
-+		return l_dbus_message_new_error(msg,
-+				error_table[err].dbus_err,
-+				"%s", error_table[err].default_desc);
-+}
-+
-+struct l_dbus *dbus_get_bus(void)
-+{
-+	return dbus;
-+}
-+
-+uint32_t dbus_get_byte_array(struct l_dbus_message_iter *array, uint8_t *buf,
-+							uint32_t max_len)
-+{
-+	uint32_t i;
-+
-+	for (i = 0; i < max_len; i++) {
-+		if (!l_dbus_message_iter_next_entry(array, buf + i))
-+			break;
-+	}
-+
-+	return i;
-+}
-+
-+uint32_t dbus_disconnect_watch_add(struct l_dbus *dbus, const char *name,
-+					l_dbus_watch_func_t callback,
-+					void *user_data)
-+{
-+	return l_dbus_add_signal_watch(dbus, "org.freedesktop.DBus",
-+				"/org/freedesktop/DBus",
-+				L_DBUS_INTERFACE_DBUS, "NameOwnerChanged",
-+				L_DBUS_MATCH_ARGUMENT(0), name,
-+				L_DBUS_MATCH_NONE,
-+				callback, user_data);
-+}
-+
-+bool dbus_disconnect_watch_remove(struct l_dbus *dbus, uint32_t id)
-+{
-+	return l_dbus_remove_signal_watch(dbus, id);
-+}
-+
-+bool dbus_init(struct l_dbus *bus)
-+{
-+	/* Network interface */
-+	if (!mesh_dbus_init(bus))
-+		return false;
-+
-+	/* Node interface */
-+	if (!node_dbus_init(bus))
-+		return false;
-+
-+	dbus = bus;
-+
-+	return true;
-+}
-+
-+bool dbus_match_interface(struct l_dbus_message_iter *interfaces,
-+							const char *match)
-+{
-+	const char *interface;
-+	struct l_dbus_message_iter properties;
-+
-+	while (l_dbus_message_iter_next_entry(interfaces, &interface,
-+								&properties)) {
-+		if (!strcmp(match, interface))
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
-+bool dbus_append_byte_array(struct l_dbus_message_builder *builder,
-+						const uint8_t *data, int len)
-+{
-+	int i;
-+
-+	if (!l_dbus_message_builder_enter_array(builder, "y"))
-+		return false;
-+
-+	for (i = 0; i < len; i++)
-+		if (!l_dbus_message_builder_append_basic(builder, 'y',
-+				data + i))
-+			return false;
-+
-+	if (!l_dbus_message_builder_leave_array(builder))
-+		return false;
-+
-+	return true;
-+}
-+
-+void dbus_append_dict_entry_basic(struct l_dbus_message_builder *builder,
-+					const char *key, const char *signature,
-+					const void *data)
-+{
-+	l_dbus_message_builder_enter_dict(builder, "sv");
-+	l_dbus_message_builder_append_basic(builder, 's', key);
-+	l_dbus_message_builder_enter_variant(builder, signature);
-+	l_dbus_message_builder_append_basic(builder, signature[0], data);
-+	l_dbus_message_builder_leave_variant(builder);
-+	l_dbus_message_builder_leave_dict(builder);
-+}
-diff --git a/mesh/dbus.h b/mesh/dbus.h
-new file mode 100644
-index 000000000..90cbe9e5c
---- /dev/null
-+++ b/mesh/dbus.h
-@@ -0,0 +1,40 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *
-+ */
-+
-+#define BLUEZ_MESH_PATH "/org/bluez/mesh"
-+#define BLUEZ_MESH_SERVICE "org.bluez.mesh"
-+
-+bool dbus_init(struct l_dbus *dbus);
-+struct l_dbus *dbus_get_bus(void);
-+uint32_t dbus_disconnect_watch_add(struct l_dbus *dbus, const char *name,
-+					l_dbus_watch_func_t callback,
-+					void *user_data);
-+bool dbus_disconnect_watch_remove(struct l_dbus *dbus, uint32_t id);
-+uint32_t dbus_get_byte_array(struct l_dbus_message_iter *array, uint8_t *buf,
-+							uint32_t max_len);
-+bool dbus_append_byte_array(struct l_dbus_message_builder *builder,
-+						const uint8_t *data, int len);
-+void dbus_append_dict_entry_basic(struct l_dbus_message_builder *builder,
-+					const char *key, const char *signature,
-+					const void *data);
-+bool dbus_match_interface(struct l_dbus_message_iter *interfaces,
-+							const char *match);
-+struct l_dbus_message *dbus_error(struct l_dbus_message *msg, int err,
-+						const char *description);
++typedef enum {
++	MESH_ERROR_NONE,
++	MESH_ERROR_FAILED,
++	MESH_ERROR_NOT_AUTHORIZED,
++	MESH_ERROR_NOT_FOUND,
++	MESH_ERROR_INVALID_ARGS,
++	MESH_ERROR_BUSY,
++	MESH_ERROR_ALREADY_EXISTS,
++	MESH_ERROR_DOES_NOT_EXIST,
++	MESH_ERROR_CANCELED,
++} mesh_error_t;
 -- 
 2.14.5
 
