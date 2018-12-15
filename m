@@ -3,38 +3,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4107C43387
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B35DC43612
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3211520896
+	by mail.kernel.org (Postfix) with ESMTP id 77DE020896
 	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730084AbeLOABo (ORCPT
+        id S1730107AbeLOABp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Dec 2018 19:01:44 -0500
+        Fri, 14 Dec 2018 19:01:45 -0500
 Received: from mga17.intel.com ([192.55.52.151]:20315 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729667AbeLOABn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Dec 2018 19:01:43 -0500
+        id S1730078AbeLOABo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Dec 2018 19:01:44 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 16:01:41 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 16:01:42 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,354,1539673200"; 
-   d="scan'208";a="98882883"
+   d="scan'208";a="98882886"
 Received: from bgix-dell-lap.sea.intel.com ([10.251.138.67])
   by orsmga007.jf.intel.com with ESMTP; 14 Dec 2018 16:01:41 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v2 23/30] mesh: Clean-up Comment style
-Date:   Fri, 14 Dec 2018 16:01:21 -0800
-Message-Id: <20181215000128.928-24-brian.gix@intel.com>
+Subject: [PATCH BlueZ v2 24/30] mesh: Update for DBus API and multi-node support
+Date:   Fri, 14 Dec 2018 16:01:22 -0800
+Message-Id: <20181215000128.928-25-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181215000128.928-1-brian.gix@intel.com>
 References: <20181215000128.928-1-brian.gix@intel.com>
@@ -43,262 +43,156 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- mesh/friend.c | 76 +++++++++++++++++++++++++++++------------------------------
- 1 file changed, 38 insertions(+), 38 deletions(-)
+From: Inga Stotland <inga.stotland@intel.com>
 
-diff --git a/mesh/friend.c b/mesh/friend.c
-index 9ce499463..d17fde084 100644
---- a/mesh/friend.c
-+++ b/mesh/friend.c
-@@ -34,7 +34,7 @@
+---
+ mesh/main.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 66 insertions(+), 7 deletions(-)
+
+diff --git a/mesh/main.c b/mesh/main.c
+index 173f57a8f..95a66cc9d 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -33,11 +33,14 @@
+ #include <sys/stat.h>
+ #include <ell/ell.h>
+ 
++#include <dbus/dbus.h>
++
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+ 
+ #include "mesh/mesh.h"
  #include "mesh/net.h"
- #include "mesh/crypto.h"
- #include "mesh/model.h"
--#include "mesh/display.h"
-+#include "mesh/util.h"
++#include "mesh/dbus.h"
+ #include "mesh/storage.h"
  
- #include "mesh/friend.h"
- 
-@@ -78,7 +78,7 @@ static void response_timeout(struct l_timeout *timeout, void *user_data)
- 	struct frnd_negotiation *neg = user_data;
- 
- 	/* LPN did not choose us */
--	l_info("Did not win negotiation for %4.4x", neg->low_power_node);
-+	l_debug("Did not win negotiation for %4.4x", neg->low_power_node);
- 
- 	net_key_unref(neg->key_id);
- 	l_queue_remove(frnd_negotiations, neg);
-@@ -177,13 +177,13 @@ void friend_request(struct mesh_net *net, uint16_t src,
- 	uint8_t minCache = (minReq >> 0) & 7;
- 	int32_t rsp_delay;
- 
--	l_info("RSSI of Request: %d dbm", rssi);
--	l_info("Delay: %d ms", delay);
--	l_info("Poll Timeout of Request: %d ms", timeout * 100);
--	l_info("Previous Friend: %4.4x", prev);
--	l_info("Num Elem: %2.2x", num_ele);
--	l_info("Cache Requested: %d", cache_size(minCache));
--	l_info("Cache to offer: %d", frnd_cache_size);
-+	l_debug("RSSI of Request: %d dbm", rssi);
-+	l_debug("Delay: %d ms", delay);
-+	l_debug("Poll Timeout of Request: %d ms", timeout * 100);
-+	l_debug("Previous Friend: %4.4x", prev);
-+	l_debug("Num Elem: %2.2x", num_ele);
-+	l_debug("Cache Requested: %d", cache_size(minCache));
-+	l_debug("Cache to offer: %d", frnd_cache_size);
- 
- 	/* Determine our own suitability before
- 	 * deciding to participate in negotiation
-@@ -224,7 +224,7 @@ void friend_request(struct mesh_net *net, uint16_t src,
- 	 * of 1, bit zero and additional 0.5
- 	 */
- 	rsp_delay = -(rssi * scaling[rssiScale]);
--	l_info("RSSI Factor: %d ms", rsp_delay / 10);
-+	l_debug("RSSI Factor: %d ms", rsp_delay / 10);
- 
- 	/* Relay Window (Positive Factor, larger values == more time)
- 	 * Scaling factor 0-3 == multiplier of 1.0 - 2.5
-@@ -232,7 +232,7 @@ void friend_request(struct mesh_net *net, uint16_t src,
- 	 * of 1, bit zero and additional 0.5
- 	 */
- 	rsp_delay += frnd_relay_window * scaling[winScale];
--	l_info("Win Size Factor: %d ms",
-+	l_debug("Win Size Factor: %d ms",
- 			(frnd_relay_window * scaling[winScale]) / 10);
- 
- 	/* Normalize to ms */
-@@ -244,7 +244,7 @@ void friend_request(struct mesh_net *net, uint16_t src,
- 	else if (rsp_delay > MAX_RESP_DELAY)
- 		rsp_delay = MAX_RESP_DELAY;
- 
--	l_info("Total Response Delay: %d ms", rsp_delay);
-+	l_debug("Total Response Delay: %d ms", rsp_delay);
- 
- 	/* Add in 100ms delay before start of "Offer Period" */
- 	rsp_delay += RESPONSE_DELAY;
-@@ -261,7 +261,7 @@ void friend_clear_confirm(struct mesh_net *net, uint16_t src,
- 	struct frnd_negotiation *neg = l_queue_remove_if(frnd_negotiations,
- 					match_by_lpn, L_UINT_TO_PTR(lpn));
- 
--	l_info("Friend Clear confirmed %4.4x (cnt %4.4x)", lpn, lpnCounter);
-+	l_debug("Friend Clear confirmed %4.4x (cnt %4.4x)", lpn, lpnCounter);
- 
- 	if (!neg)
- 		return;
-@@ -276,7 +276,7 @@ static void friend_poll_timeout(struct l_timeout *timeout, void *user_data)
- 	struct mesh_friend *frnd = user_data;
- 
- 	if (mesh_friend_clear(frnd->net, frnd))
--		l_info("Friend Poll Timeout %4.4x", frnd->dst);
-+		l_debug("Friend Poll Timeout %4.4x", frnd->dst);
- 
- 	l_timeout_remove(frnd->timeout);
- 	frnd->timeout = NULL;
-@@ -343,7 +343,7 @@ void friend_clear(struct mesh_net *net, uint16_t src, uint16_t lpn,
- 			return;
- 	}
- 
--	l_info("Friend Cleared %4.4x (%4.4x)", lpn, lpnCounter);
-+	l_debug("Friend Cleared %4.4x (%4.4x)", lpn, lpnCounter);
- 
- 	l_put_be16(lpn, msg + 1);
- 	l_put_be16(lpnCounter, msg + 3);
-@@ -369,11 +369,11 @@ static void clear_retry(struct l_timeout *timeout, void *user_data)
- 
- 	if (secs && ((secs << 1) < neg->poll_timeout/10)) {
- 		neg->receive_delay++;
--		l_info("Try FRND_CLR again in %d seconds (total timeout %d)",
-+		l_debug("Try FRND_CLR again in %d seconds (total timeout %d)",
- 						secs, neg->poll_timeout/10);
- 		l_timeout_modify(neg->timeout, secs);
- 	} else {
--		l_info("FRND_CLR timed out %d", secs);
-+		l_debug("FRND_CLR timed out %d", secs);
- 		l_timeout_remove(timeout);
- 		l_queue_remove(frnd_negotiations, neg);
- 		l_free(neg);
-@@ -407,7 +407,7 @@ static void friend_delay_rsp(struct l_timeout *timeout, void *user_data)
- 
- 			seqZero &= SEQ_ZERO_MASK;
- 
--			l_info("Fwd ACK pkt %6.6x-%8.8x",
-+			l_debug("Fwd ACK pkt %6.6x-%8.8x",
- 					pkt->u.one[0].seq,
- 					pkt->iv_index);
- 
-@@ -420,7 +420,7 @@ static void friend_delay_rsp(struct l_timeout *timeout, void *user_data)
- 
- 
- 		} else {
--			l_info("Fwd CTL pkt %6.6x-%8.8x",
-+			l_debug("Fwd CTL pkt %6.6x-%8.8x",
- 					pkt->u.one[0].seq,
- 					pkt->iv_index);
- 
-@@ -442,7 +442,7 @@ static void friend_delay_rsp(struct l_timeout *timeout, void *user_data)
- 		else
- 			len = pkt->last_len;
- 
--		l_info("Fwd FRND pkt %6.6x",
-+		l_debug("Fwd FRND pkt %6.6x",
- 				pkt->u.s12[pkt->cnt_out].seq);
- 
- 		print_packet("Frnd-Msg", pkt->u.s12[pkt->cnt_out].data, len);
-@@ -462,7 +462,7 @@ static void friend_delay_rsp(struct l_timeout *timeout, void *user_data)
- update:
- 	/* No More Data -- send Update message with md = false */
- 	net_seq = mesh_net_get_seq_num(net);
--	l_info("Fwd FRND UPDATE %6.6x with MD == 0", net_seq);
-+	l_debug("Fwd FRND UPDATE %6.6x with MD == 0", net_seq);
- 
- 	frnd->last = frnd->seq;
- 	mesh_net_get_snb_state(net, upd + 1, &iv_index);
-@@ -488,7 +488,7 @@ void friend_poll(struct mesh_net *net, uint16_t src, bool seq,
- 	if (neg && !neg->clearing) {
- 		uint8_t msg[5] = { NET_OP_FRND_CLEAR };
- 
--		l_info("Won negotiation for %4.4x", neg->low_power_node);
-+		l_debug("Won negotiation for %4.4x", neg->low_power_node);
- 
- 		/* This call will clean-up and replace if already friends */
- 		frnd = mesh_friend_new(net, src, neg->num_ele,
-@@ -695,7 +695,7 @@ void frnd_offer(struct mesh_net *net, uint16_t src, uint8_t window,
- {
- 	struct frnd_offers *offer;
- 
--	l_info("RSSI of Offer: %d dbm", l_rssi);
-+	l_debug("RSSI of Offer: %d dbm", l_rssi);
- 
- 	/* Ignore RFU window value 0 */
- 	if (window == 0)
-@@ -735,7 +735,7 @@ static void frnd_negotiated_to(struct l_timeout *timeout, void *user_data)
- {
- 	struct mesh_net *net = user_data;
- 
--	l_info("frnd_negotiated_to");
-+	l_debug("frnd_negotiated_to");
- 	if (!mesh_net_get_friend(net)) {
- 		l_timeout_remove(poll_period_to);
- 		poll_period_to = NULL;
-@@ -776,7 +776,7 @@ void frnd_poll(struct mesh_net *net, bool retry)
- 		seq = !seq;
- 		mesh_net_set_frnd_seq(net, seq);
- 	} else if (!(poll_cnt--)) {
--		l_info("Lost Friendship with %4.4x", old_friend);
-+		l_debug("Lost Friendship with %4.4x", old_friend);
- 		l_timeout_remove(poll_period_to);
- 		poll_period_to = NULL;
- 		frnd_poll_cancel(net);
-@@ -790,7 +790,7 @@ void frnd_poll(struct mesh_net *net, bool retry)
- 	if (poll_retry_to)
- 		l_timeout_remove(poll_retry_to);
- 
--	l_info("TX-FRIEND POLL %d", seq);
-+	l_debug("TX-FRIEND POLL %d", seq);
- 	msg[1] = seq;
- 	net_seq = mesh_net_get_seq_num(net);
- 	mesh_net_transport_send(net, key_id, true,
-@@ -858,7 +858,7 @@ static void req_timeout(struct l_timeout *timeout, void *user_data)
- 		l_free(best);
- 		return;
- 	} else if (!best) {
--		l_info("No Offers Received");
-+		l_debug("No Offers Received");
- 		return;
- 	}
- 
-@@ -884,7 +884,7 @@ static void req_timeout(struct l_timeout *timeout, void *user_data)
- 
- old_keys_only:
- 
--	l_info("Winning offer %4.4x RSSI: %ddb Window: %dms Cache sz: %d",
-+	l_debug("Winning offer %4.4x RSSI: %ddb Window: %dms Cache sz: %d",
- 			best->src, best->local_rssi,
- 			best->window, best->cache);
- 
-@@ -930,23 +930,23 @@ void frnd_request_friend(struct mesh_net *net, uint8_t cache,
- 		offers = l_queue_new();
- 
- 	msg[n++] = NET_OP_FRND_REQUEST;
--	msg[n] = cache & 0x07;		// MinRequirements - Cache
--	msg[n++] |= (offer_delay & 0x0f) << 3;	// Offer Delay
--	poll_period_ms = (timeout * 300) / 4; // 3/4 of the time in ms
--	l_put_be32(timeout, msg + n);	// PollTimeout
--	msg[n++] = delay;		// ReceiveDelay
-+	msg[n] = cache & 0x07;		/* MinRequirements - Cache */
-+	msg[n++] |= (offer_delay & 0x0f) << 3;	/* Offer Delay */
-+	poll_period_ms = (timeout * 300) / 4; /* 3/4 of the time in ms */
-+	l_put_be32(timeout, msg + n);	/* PollTimeout */
-+	msg[n++] = delay;		/* ReceiveDelay */
- 	n += 3;
--	l_put_be16(old_friend, msg + n);	// PreviousAddress
-+	l_put_be16(old_friend, msg + n);	/* PreviousAddress */
- 	n += 2;
--	msg[n++] = mesh_net_get_num_ele(net);	// NumElements
--	l_put_be16(cnt + 1, msg + n);	// Next counter
-+	msg[n++] = mesh_net_get_num_ele(net);	/* NumElements */
-+	l_put_be16(cnt + 1, msg + n);	/* Next counter */
- 	n += 2;
- 	print_packet("Tx-NET_OP_FRND_REQUEST", msg, n);
- 	mesh_net_transport_send(net, 0, false,
- 			mesh_net_get_iv_index(net), 0,
- 			0, 0, FRIENDS_ADDRESS,
- 			msg, n);
--	l_timeout_create_ms(1000, req_timeout, net, NULL); // 1000 ms
-+	l_timeout_create_ms(1000, req_timeout, net, NULL); /* 1000 ms */
- 	mesh_net_set_friend(net, 0);
- 	cnt++;
+ static const struct option main_options[] = {
+@@ -56,12 +59,46 @@ static void usage(void)
+ 	       "\tmeshd [options]\n");
+ 	l_info("Options:\n"
+ 	       "\t--index <hcinum>  Use specified controller\n"
+-	       "\t--config          Configuration file\n"
++	       "\t--config          Configuration directory\n"
+ 	       "\t--nodetach        Run in foreground\n"
+ 	       "\t--debug           Enable debug output\n"
+ 	       "\t--help            Show %s information\n", __func__);
  }
-@@ -1036,7 +1036,7 @@ void frnd_key_refresh(struct mesh_net *net, uint8_t phase)
- 	case 0:
- 	case 3:
- 		if (new_lpn_id) {
--			l_info("LPN Retiring KeySet %d", lpn_key_id);
-+			l_debug("LPN Retiring KeySet %d", lpn_key_id);
- 			net_key_unref(lpn_key_id);
- 			lpn_key_id = new_lpn_id;
+ 
++static void do_debug(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
++
++	l_info("%s%s", prefix, str);
++}
++
++static void request_name_callback(struct l_dbus *dbus, bool success,
++					bool queued, void *user_data)
++{
++	l_info("Request name %s",
++		success ? "success": "failed");
++
++	if (success)
++		dbus_init(dbus);
++	else
++		l_main_quit();
++}
++
++static void ready_callback(void *user_data)
++{
++	struct l_dbus *dbus = user_data;
++
++	l_info("D-Bus ready");
++	l_dbus_name_acquire(dbus, BLUEZ_MESH_NAME, false, false, false,
++						request_name_callback, NULL);
++
++}
++
++static void disconnect_callback(void *user_data)
++{
++	l_main_quit();
++}
++
+ static void signal_handler(uint32_t signo, void *user_data)
+ {
+ 	static bool terminated;
+@@ -78,8 +115,9 @@ int main(int argc, char *argv[])
+ {
+ 	int status;
+ 	bool detached = true;
+-	struct bt_mesh *mesh = NULL;
+-	const char *config_file = NULL;
++	bool dbus_debug = false;
++	struct l_dbus *dbus = NULL;
++	const char *config_dir = NULL;
+ 	int index = MGMT_INDEX_NONE;
+ 
+ 	if (!l_main_init())
+@@ -91,7 +129,7 @@ int main(int argc, char *argv[])
+ 		int opt;
+ 		const char *str;
+ 
+-		opt = getopt_long(argc, argv, "i:c:ndh", main_options, NULL);
++		opt = getopt_long(argc, argv, "i:c:ndbh", main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+ 
+@@ -117,7 +155,10 @@ int main(int argc, char *argv[])
+ 			l_debug_enable("*");
+ 			break;
+ 		case 'c':
+-			config_file = optarg;
++			config_dir = optarg;
++			break;
++		case 'b':
++			dbus_debug = true;
+ 			break;
+ 		case 'h':
+ 			usage();
+@@ -130,7 +171,7 @@ int main(int argc, char *argv[])
  		}
+ 	}
+ 
+-	if (!mesh_new(index, config_file)) {
++	if (!mesh_init(index, config_dir)) {
+ 		l_error("Failed to initialize mesh");
+ 		status = EXIT_FAILURE;
+ 		goto done;
+@@ -138,6 +179,24 @@ int main(int argc, char *argv[])
+ 
+ 	umask(0077);
+ 
++	dbus = l_dbus_new_default(L_DBUS_SYSTEM_BUS);
++	if (!dbus) {
++		l_error("unable to connect to D-Bus");
++		status = EXIT_FAILURE;
++		goto done;
++	}
++
++	if (dbus_debug)
++		l_dbus_set_debug(dbus, do_debug, "[DBUS] ", NULL);
++	l_dbus_set_ready_handler(dbus, ready_callback, dbus, NULL);
++	l_dbus_set_disconnect_handler(dbus, disconnect_callback, NULL, NULL);
++
++	if (!l_dbus_object_manager_enable(dbus)) {
++		l_error("Failed to enable Object Manager");
++		status = EXIT_FAILURE;
++		goto done;
++	}
++
+ 	if (detached) {
+ 		if (daemon(0, 0)) {
+ 			perror("Failed to start meshd daemon");
+@@ -149,8 +208,8 @@ int main(int argc, char *argv[])
+ 	status = l_main_run_with_signal(signal_handler, NULL);
+ 
+ done:
+-	mesh_unref(mesh);
+ 	mesh_cleanup();
++	l_dbus_destroy(dbus);
+ 	l_main_exit();
+ 
+ 	return status;
 -- 
 2.14.5
 
