@@ -3,38 +3,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66612C43387
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3E0C43614
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9EFD520896
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3473E20896
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:01:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730050AbeLOABk (ORCPT
+        id S1730129AbeLOABs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Dec 2018 19:01:40 -0500
-Received: from mga17.intel.com ([192.55.52.151]:20309 "EHLO mga17.intel.com"
+        Fri, 14 Dec 2018 19:01:48 -0500
+Received: from mga17.intel.com ([192.55.52.151]:20315 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729985AbeLOABh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Dec 2018 19:01:37 -0500
+        id S1730072AbeLOABo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Dec 2018 19:01:44 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 16:01:36 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 16:01:42 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,354,1539673200"; 
-   d="scan'208";a="98882837"
+   d="scan'208";a="98882889"
 Received: from bgix-dell-lap.sea.intel.com ([10.251.138.67])
-  by orsmga007.jf.intel.com with ESMTP; 14 Dec 2018 16:01:36 -0800
+  by orsmga007.jf.intel.com with ESMTP; 14 Dec 2018 16:01:42 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v2 12/30] mesh: Unchanged variables set to const
-Date:   Fri, 14 Dec 2018 16:01:10 -0800
-Message-Id: <20181215000128.928-13-brian.gix@intel.com>
+Subject: [PATCH BlueZ v2 25/30] mesh: Add default location for Mesh Node storage
+Date:   Fri, 14 Dec 2018 16:01:23 -0800
+Message-Id: <20181215000128.928-26-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181215000128.928-1-brian.gix@intel.com>
 References: <20181215000128.928-1-brian.gix@intel.com>
@@ -43,23 +43,28 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- mesh/mesh-io-api.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Inga Stotland <inga.stotland@intel.com>
 
-diff --git a/mesh/mesh-io-api.h b/mesh/mesh-io-api.h
-index f69fceeb2..acf12445d 100644
---- a/mesh/mesh-io-api.h
-+++ b/mesh/mesh-io-api.h
-@@ -31,7 +31,7 @@ typedef bool (*mesh_io_deregister_t)(struct mesh_io *io, uint8_t filter_id);
- typedef bool (*mesh_io_filter_set_t)(struct mesh_io *io,
- 			uint8_t filter_id, const uint8_t *data, uint8_t len,
- 			mesh_io_status_func_t callback, void *user_data);
--typedef bool (*mesh_io_tx_cancel_t)(struct mesh_io *io, uint8_t *pattern,
-+typedef bool (*mesh_io_tx_cancel_t)(struct mesh_io *io, const uint8_t *pattern,
- 								uint8_t len);
+---
+ configure.ac | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index 1a095a352..901d51e0f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -364,6 +364,11 @@ AC_DEFINE_UNQUOTED(CONFIGDIR, "${configdir}",
+ 			[Directory for the configuration files])
+ AC_SUBST(CONFIGDIR, "${configdir}")
  
- struct mesh_io_api {
++if (test "${enable_mesh}" = "yes"); then
++	AC_DEFINE_UNQUOTED(MESH_STORAGEDIR, "${storagedir}/mesh",
++			[Directory for the storage files])
++fi
++
+ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+ 			[enable BlueZ for Android]),
+ 					[enable_android=${enableval}])
 -- 
 2.14.5
 
