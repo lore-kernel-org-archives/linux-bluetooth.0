@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A17E1C43387
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA305C43444
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:26:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A518B206C0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:26:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0213F206C0
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Dec 2018 00:26:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729519AbeLOA0a (ORCPT
+        id S1728928AbeLOA0b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Dec 2018 19:26:30 -0500
+        Fri, 14 Dec 2018 19:26:31 -0500
 Received: from mga17.intel.com ([192.55.52.151]:22249 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726448AbeLOA0a (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Dec 2018 19:26:30 -0500
+        id S1726448AbeLOA0b (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 14 Dec 2018 19:26:31 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 16:26:29 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Dec 2018 16:26:30 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,355,1539673200"; 
-   d="scan'208";a="109640288"
+   d="scan'208";a="109640307"
 Received: from bgix-dell-lap.sea.intel.com ([10.251.138.67])
-  by fmsmga008.fm.intel.com with ESMTP; 14 Dec 2018 16:26:29 -0800
+  by fmsmga008.fm.intel.com with ESMTP; 14 Dec 2018 16:26:30 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v3 05/30] mesh: Re-write storage for Multiple Nodes
-Date:   Fri, 14 Dec 2018 16:25:59 -0800
-Message-Id: <20181215002624.9313-6-brian.gix@intel.com>
+Subject: [PATCH BlueZ v3 09/30] mesh: Acceptor side provisioning implimentation
+Date:   Fri, 14 Dec 2018 16:26:03 -0800
+Message-Id: <20181215002624.9313-10-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181215002624.9313-1-brian.gix@intel.com>
 References: <20181215002624.9313-1-brian.gix@intel.com>
@@ -43,877 +43,728 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Inga Stotland <inga.stotland@intel.com>
-
 ---
- mesh/storage.c | 570 +++++++++++++++++++++++++--------------------------------
- mesh/storage.h |  39 ++--
- 2 files changed, 269 insertions(+), 340 deletions(-)
+ mesh/prov-acceptor.c | 711 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 711 insertions(+)
+ create mode 100644 mesh/prov-acceptor.c
 
-diff --git a/mesh/storage.c b/mesh/storage.c
-index 1f3b25886..459c9f4fa 100644
---- a/mesh/storage.c
-+++ b/mesh/storage.c
-@@ -27,6 +27,8 @@
- #include <fcntl.h>
- #include <stdio.h>
- #include <unistd.h>
-+#include <dirent.h>
-+#include <libgen.h>
- 
- #include <sys/types.h>
- #include <sys/stat.h>
-@@ -42,39 +44,43 @@
- #include "mesh/net.h"
- #include "mesh/appkey.h"
- #include "mesh/model.h"
-+#include "mesh/mesh-db.h"
- #include "mesh/storage.h"
- 
--/*
-- * TODO: figure out naming convention to store alternative nodes
-- * Mesh storage dir wil be in configure.ac
-- */
--#define DEVICE_COMPOSITION_FILE "../config/composition.json"
--#define NODE_CONGIGURATION_FILE "../config/configuration.json"
-+struct write_info {
-+	json_object *jnode;
-+	const char *config_name;
-+	void *user_data;
-+	mesh_status_func_t cb;
+diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
+new file mode 100644
+index 000000000..ac42e1e2c
+--- /dev/null
++++ b/mesh/prov-acceptor.c
+@@ -0,0 +1,711 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <sys/select.h>
++#include <sys/time.h>
++#include <sys/types.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <termios.h>
++
++#include <ctype.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <getopt.h>
++#include <time.h>
++#include <ell/ell.h>
++
++#include "mesh/mesh-defs.h"
++#include "src/shared/ecc.h"
++
++#include "mesh/util.h"
++#include "mesh/net_keys.h"
++#include "mesh/crypto.h"
++#include "mesh/net.h"
++#include "mesh/error.h"
++#include "mesh/prov.h"
++#include "mesh/provision.h"
++#include "mesh/pb-adv.h"
++#include "mesh/mesh.h"
++#include "mesh/agent.h"
++
++/* Quick size sanity check */
++static const uint16_t expected_pdu_size[] = {
++	2,	/* PROV_INVITE */
++	12,	/* PROV_CAPS */
++	6,	/* PROV_START */
++	65,	/* PROV_PUB_KEY */
++	1,	/* PROV_INP_CMPLT */
++	17,	/* PROV_CONFIRM */
++	17,	/* PROV_RANDOM */
++	34,	/* PROV_DATA */
++	1,	/* PROV_COMPLETE */
++	2,	/* PROV_FAILED */
 +};
- 
--static bool read_local_node_cb(struct mesh_db_node *db_node, void *user_data)
-+static const char *storage_dir;
-+static struct l_queue *node_ids;
 +
-+static bool simple_match(const void *a, const void *b)
- {
--	struct mesh_net *net = user_data;
--	struct mesh_node *node;
-+	return a == b;
++#define BEACON_TYPE_UNPROVISIONED		0x00
++
++static const uint8_t pkt_filter = MESH_AD_TYPE_PROVISION;
++static const uint8_t bec_filter[] = {MESH_AD_TYPE_BEACON,
++						BEACON_TYPE_UNPROVISIONED};
++
++enum acp_state {
++	ACP_PROV_IDLE = 0,
++	ACP_PROV_CAPS_SENT,
++	ACP_PROV_CAPS_ACKED,
++	ACP_PROV_KEY_SENT,
++	ACP_PROV_KEY_ACKED,
++	ACP_PROV_INP_CMPLT_SENT,
++	ACP_PROV_INP_CMPLT_ACKED,
++	ACP_PROV_CONF_SENT,
++	ACP_PROV_CONF_ACKED,
++	ACP_PROV_RAND_SENT,
++	ACP_PROV_RAND_ACKED,
++	ACP_PROV_CMPLT_SENT,
++	ACP_PROV_FAIL_SENT,
++};
++
++#define MAT_REMOTE_PUBLIC	0x01
++#define MAT_LOCAL_PRIVATE	0x02
++#define MAT_RAND_AUTH		0x04
++#define MAT_SECRET	(MAT_REMOTE_PUBLIC | MAT_LOCAL_PRIVATE)
++
++struct mesh_prov_acceptor {
++	mesh_prov_acceptor_complete_func_t cmplt;
++	prov_trans_tx_t trans_tx;
++	void *agent;
++	void *caller_data;
++	void *trans_data;
++	struct l_timeout *timeout;
++	uint32_t to_secs;
++	enum acp_state	state;
++	uint8_t transport;
++	uint8_t material;
++	uint8_t expected;
++	int8_t previous;
++	struct conf_input conf_inputs;
++	uint8_t calc_key[16];
++	uint8_t salt[16];
++	uint8_t confirm[16];
++	uint8_t s_key[16];
++	uint8_t s_nonce[13];
++	uint8_t private_key[32];
++	uint8_t secret[32];
++	uint8_t rand_auth_workspace[48];
++};
++
++static struct mesh_prov_acceptor *prov = NULL;
++
++static void acceptor_free(void)
++{
++
++	if (prov)
++		l_timeout_remove(prov->timeout);
++
++	mesh_send_cancel(bec_filter, sizeof(bec_filter));
++	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
++
++	if (prov->trans_tx) {
++		if (prov->transport == PB_ADV)
++			pb_adv_unreg(prov->trans_data);
++#if defined(GATT_ENABLED)
++		/* TODO: Cleanup GATT bearer if exists */
++		else if (prov->transport == PB_GATT)
++			pb_gatt_unreg(prov->trans_data);
++#endif
++	}
++
++	l_free(prov);
++	prov = NULL;
 +}
 +
-+static bool read_node_cb(struct mesh_db_node *db_node, void *user_data)
++static void acp_prov_close(void *user_data, uint8_t reason)
 +{
-+	struct mesh_node *node = user_data;
-+	struct mesh_net *net;
- 	uint32_t seq_number;
--	uint16_t crpl;
- 	uint8_t ttl, mode, cnt, num_ele;
- 	uint16_t unicast, interval;
- 	uint8_t *uuid;
- 
--	if (!net)
--		return false;
--
--	node = node_create_from_storage(net, db_node, true);
--	if (!node)
-+	if (!node_init_from_storage(node, db_node)) {
-+		node_free(node);
- 		return false;
-+	}
- 
--	mesh_net_local_node_set(net, node, db_node->provisioner);
-+	net = node_get_net(node);
- 	seq_number = node_get_sequence_number(node);
- 	mesh_net_set_seq_num(net, seq_number);
- 	ttl = node_default_ttl_get(node);
- 	mesh_net_set_default_ttl(net, ttl);
--	crpl = node_get_crpl(node);
--	mesh_net_set_crpl(net, crpl);
- 
- 	mode = node_proxy_mode_get(node);
- 	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
-@@ -103,6 +109,7 @@ static bool read_local_node_cb(struct mesh_db_node *db_node, void *user_data)
- 	uuid = node_uuid_get(node);
- 	if (uuid)
- 		mesh_net_id_uuid_set(net, uuid);
-+
- 	return true;
- }
- 
-@@ -132,13 +139,14 @@ static bool read_app_keys_cb(uint16_t net_idx, uint16_t app_idx, uint8_t *key,
- 	return appkey_key_init(net, net_idx, app_idx, key, new_key);
- }
- 
--static bool parse_local_node(struct mesh_net *net, json_object *jnode)
-+static bool parse_node(struct mesh_node *node, json_object *jnode)
- {
- 	bool bvalue;
- 	uint32_t iv_index;
- 	uint8_t key_buf[16];
- 	uint8_t cnt;
- 	uint16_t interval;
-+	struct mesh_net *net = node_get_net(node);
- 
- 	if (mesh_db_read_iv_index(jnode, &iv_index, &bvalue))
- 		mesh_net_set_iv_index(net, iv_index, bvalue);
-@@ -147,97 +155,35 @@ static bool parse_local_node(struct mesh_net *net, json_object *jnode)
- 		mesh_net_transmit_params_set(net, cnt, interval);
- 
- 	/* Node composition/configuration info */
--	if (!mesh_db_read_node(jnode, read_local_node_cb, net))
-+	if (!mesh_db_read_node(jnode, read_node_cb, node))
- 		return false;
- 
- 	if (!mesh_db_read_net_keys(jnode, read_net_keys_cb, net))
- 		return false;
- 
--	/* TODO: use the actual "primary" network index for this node */
--	if (mesh_db_read_device_key(jnode, key_buf) &&
--		!node_set_device_key(mesh_net_local_node_get(net), key_buf))
--		return false;
--
--	mesh_db_read_app_keys(jnode, read_app_keys_cb, net);
--
--	return true;
--}
--
--static bool read_unprov_device_cb(struct mesh_db_node *db_node, void *user_data)
--{
--	struct mesh_net *net = user_data;
--	struct mesh_node *node;
--	uint16_t crpl;
--	uint8_t *uuid;
--
--	if (!net)
--		return false;
--
--	node = node_create_from_storage(net, db_node, true);
--
--	if (!node)
-+	if (!mesh_db_read_device_key(jnode, key_buf))
- 		return false;
- 
--	mesh_net_local_node_set(net, node, db_node->provisioner);
--	crpl = node_get_crpl(node);
--	mesh_net_set_crpl(net, crpl);
-+	node_set_device_key(node, key_buf);
- 
--	uuid = node_uuid_get(node);
--	if (uuid)
--		mesh_net_id_uuid_set(net, uuid);
-+	mesh_db_read_app_keys(jnode, read_app_keys_cb, net);
- 
- 	return true;
- }
- 
--static bool parse_unprovisioned_device(struct mesh_net *net, json_object *jnode)
--{
--	struct mesh_db_prov prov;
--	struct mesh_net_prov_caps *caps;
--	struct mesh_node *node;
--
--	/* Node composition/configuration info */
--	if (!mesh_db_read_unprovisioned_device(jnode,
--					read_unprov_device_cb, net))
--		return false;
--
--	if (!mesh_db_read_prov_info(jnode, &prov))
--		return false;
--
--	caps = mesh_net_prov_caps_get(net);
--	if (!caps)
--		return false;
--
--	node = mesh_net_local_node_get(net);
--	if (!node)
--		return false;
--
--	caps->num_ele = node_get_num_elements(node);
--	l_put_le16(prov.algorithm, &caps->algorithms);
--	caps->pub_type = prov.pub_type;
--	caps->static_type = prov.static_type;
--	caps->output_size = prov.output_oob.size;
--	l_put_le16(prov.output_oob.actions, &caps->output_action);
--	caps->input_size = prov.input_oob.size;
--	l_put_le16(prov.input_oob.actions, &caps->input_action);
--
--	return mesh_net_priv_key_set(net, prov.priv_key);
--}
--
--static bool parse_config(struct mesh_net *net, const char *config_name,
--							bool unprovisioned)
-+static bool parse_config(char *in_file, char *out_file, uint16_t node_id)
- {
- 	int fd;
- 	char *str;
--	const char *out;
- 	struct stat st;
- 	ssize_t sz;
- 	json_object *jnode = NULL;
- 	bool result = false;
-+	struct mesh_node *node;
- 
--	if (!config_name)
--		return false;
-+	l_info("Loading configuration from %s", in_file);
- 
--	fd = open(config_name, O_RDONLY);
-+	fd = open(in_file, O_RDONLY);
- 	if (!fd)
- 		return false;
- 
-@@ -254,7 +200,7 @@ static bool parse_config(struct mesh_net *net, const char *config_name,
- 
- 	sz = read(fd, str, st.st_size);
- 	if (sz != st.st_size) {
--		l_error("Failed to read configuration file");
-+		l_error("Failed to read configuration file %s", in_file);
- 		goto done;
- 	}
- 
-@@ -262,22 +208,19 @@ static bool parse_config(struct mesh_net *net, const char *config_name,
- 	if (!jnode)
- 		goto done;
- 
--	mesh_net_jconfig_set(net, jnode);
-+	node = node_new();
- 
--	if (!unprovisioned)
--		result = parse_local_node(net, jnode);
--	else
--		result = parse_unprovisioned_device(net, jnode);
-+	node_jconfig_set(node, jnode);
-+	node_cfg_file_set(node, out_file);
-+	node_id_set(node, node_id);
-+
-+	result = parse_node(node, jnode);
- 
- 	if (!result) {
--		storage_release(net);
--		goto done;
-+		json_object_put(jnode);
-+		node_free(node);
- 	}
- 
--	mesh_net_cfg_file_get(net, &out);
--	if (!out)
--		mesh_net_cfg_file_set(net, !unprovisioned ?
--					config_name : NODE_CONGIGURATION_FILE);
- done:
- 	close(fd);
- 	if (str)
-@@ -286,166 +229,70 @@ done:
- 	return result;
- }
- 
--bool storage_parse_config(struct mesh_net *net, const char *config_name)
--{
--	bool result = false;
--	bool unprovisioned = !config_name;
--
--	if (unprovisioned) {
--		result = parse_config(net, DEVICE_COMPOSITION_FILE, true);
--		goto done;
--	}
--
--	result = parse_config(net, config_name, false);
--
--	if (!result) {
--		size_t len = strlen(config_name) + 5;
--		char *bak = l_malloc(len);
--
--		/* Fall-back to Backup version */
--		strncpy(bak, config_name, len);
--		bak = strncat(bak, ".bak", 5);
--
--		remove(config_name);
--		rename(bak, config_name);
--
--		result = parse_config(net, config_name, false);
--
--		l_free(bak);
--	}
--
--	/* If configuration read fails, try as unprovisioned device */
--	if (!result) {
--		l_info("Parse configuration failed, trying unprovisioned");
--		unprovisioned = true;
--		result = parse_config(net, DEVICE_COMPOSITION_FILE, true);
--	}
--
--done:
--	if (result)
--		mesh_net_provisioned_set(net, !unprovisioned);
--
--	return result;
--}
--
--bool storage_local_set_ttl(struct mesh_net *net, uint8_t ttl)
-+bool storage_set_ttl(json_object *jnode, uint8_t ttl)
- {
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
- 	return mesh_db_write_int(jnode, "defaultTTL", ttl);
- }
- 
--bool storage_local_set_relay(struct mesh_net *net, bool enable,
-+bool storage_set_relay(json_object *jnode, bool enable,
- 				uint8_t count, uint8_t interval)
- {
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
- 	return mesh_db_write_relay_mode(jnode, enable, count, interval);
- }
- 
--bool storage_local_set_transmit_params(struct mesh_net *net, uint8_t count,
-+bool storage_set_transmit_params(json_object *jnode, uint8_t count,
- 							uint8_t interval)
- {
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
- 	return mesh_db_write_net_transmit(jnode, count, interval);
- }
- 
--bool storage_local_set_mode(struct mesh_net *net, uint8_t mode,
-+bool storage_set_mode(json_object *jnode, uint8_t mode,
- 						const char *mode_name)
- {
--	json_object *jnode;
--
--	if (!net || !mode_name)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
- 	return mesh_db_write_mode(jnode, mode_name, mode);
- }
- 
--bool storage_model_bind(struct mesh_net *net, uint16_t addr, uint32_t mod_id,
-+bool storage_model_bind(struct mesh_node *node, uint16_t addr, uint32_t mod_id,
- 				uint16_t app_idx, bool unbind)
- {
- 	json_object *jnode;
--	bool is_local;
-+	int ele_idx;
-+	bool is_vendor = (mod_id > 0xffff);
- 
--	if (!net)
-+	ele_idx = node_get_element_idx(node, addr);
-+	if (ele_idx < 0)
- 		return false;
- 
--	is_local = mesh_net_is_local_address(net, addr);
--	if (is_local) {
--		int ele_idx;
--		bool is_vendor = (mod_id > 0xffff);
--
--		ele_idx = node_get_element_idx(mesh_net_local_node_get(net),
--									addr);
--		if (ele_idx < 0)
--			return false;
--
--		jnode = mesh_net_jconfig_get(net);
--		if (!jnode)
--			return false;
--
--		if (unbind)
--			return mesh_db_model_binding_del(jnode, ele_idx,
--						is_vendor, mod_id, app_idx);
--		else
--			return mesh_db_model_binding_add(jnode, ele_idx,
--						is_vendor, mod_id, app_idx);
--	}
-+	jnode = node_jconfig_get(node);
- 
--	/* TODO: write remote node bindings to provisioner DB */
--	return false;
-+	if (unbind)
-+		return mesh_db_model_binding_del(jnode, ele_idx, is_vendor,
-+							mod_id, app_idx);
-+	else
-+		return mesh_db_model_binding_add(jnode, ele_idx, is_vendor,
-+							mod_id, app_idx);
- }
- 
--bool storage_local_app_key_add(struct mesh_net *net, uint16_t net_idx,
-+bool storage_app_key_add(struct mesh_net *net, uint16_t net_idx,
- 			uint16_t app_idx, const uint8_t key[16], bool update)
- {
- 	json_object *jnode;
-+	struct mesh_node *node = mesh_net_node_get(net);
- 
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
-+	jnode = node_jconfig_get(node);
- 	if (!jnode)
- 		return false;
- 
- 	return mesh_db_app_key_add(jnode, net_idx, app_idx, key, update);
- }
- 
--bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
-+bool storage_app_key_del(struct mesh_net *net, uint16_t net_idx,
- 					uint16_t app_idx)
- {
- 	json_object *jnode;
-+	struct mesh_node *node = mesh_net_node_get(net);
- 
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
-+	jnode = node_jconfig_get(node);
- 	if (!jnode)
- 		return false;
- 
-@@ -453,116 +300,53 @@ bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
- 
- }
- 
--bool storage_local_net_key_add(struct mesh_net *net, uint16_t net_idx,
-+bool storage_net_key_add(struct mesh_net *net, uint16_t net_idx,
- 					const uint8_t key[16], int phase)
- {
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
-+	struct mesh_node *node = mesh_net_node_get(net);
-+	json_object *jnode = node_jconfig_get(node);
- 
- 	return mesh_db_net_key_add(jnode, net_idx, key, phase);
- }
- 
--bool storage_local_net_key_del(struct mesh_net *net, uint16_t net_idx)
-+bool storage_net_key_del(struct mesh_net *net, uint16_t net_idx)
- {
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
-+	struct mesh_node *node = mesh_net_node_get(net);
-+	json_object *jnode = node_jconfig_get(node);
- 
- 	return mesh_db_net_key_del(jnode, net_idx);
- }
- 
--bool storage_local_set_iv_index(struct mesh_net *net, uint32_t iv_index,
-+bool storage_set_iv_index(struct mesh_net *net, uint32_t iv_index,
- 								bool update)
- {
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
-+	struct mesh_node *node = mesh_net_node_get(net);
-+	json_object *jnode = node_jconfig_get(node);
- 
- 	return mesh_db_write_iv_index(jnode, iv_index, update);
- }
- 
--bool storage_local_set_device_key(struct mesh_net *net, uint8_t dev_key[16])
--{
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
--	return mesh_db_write_device_key(jnode, dev_key);
--}
--
--bool storage_local_set_unicast(struct mesh_net *net, uint16_t unicast)
--{
--	json_object *jnode;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
--	return mesh_db_write_uint16_hex(jnode, "unicastAddress", unicast);
--}
--
--bool storage_local_write_sequence_number(struct mesh_net *net, uint32_t seq)
-+bool storage_write_sequence_number(struct mesh_net *net, uint32_t seq)
- {
--	json_object *jnode;
--	const char *cfg_file;
-+	struct mesh_node *node = mesh_net_node_get(net);
-+	json_object *jnode = node_jconfig_get(node);
- 	bool result;
--
--	if (!net)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
-+	l_debug("");
- 	result = mesh_db_write_int(jnode, "sequenceNumber", seq);
- 	if (!result)
- 		return false;
- 
--	result = mesh_net_cfg_file_get(net, &cfg_file);
--	if (result && cfg_file)
--		result = storage_save_config(net, cfg_file, false, NULL, NULL);
-+	result = storage_save_config(node, false, NULL, NULL);
- 
- 	return result;
- }
- 
--static bool save_config(struct mesh_net *net, const char *config_name)
-+static bool save_config(json_object *jnode, const char *config_name)
- {
- 	FILE *outfile;
- 	const char *str;
--	json_object *jnode;
- 	bool result = false;
- 
--	if (!net || !config_name)
--		return false;
--
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
--		return false;
--
- 	outfile = fopen(config_name, "w");
- 	if (!outfile) {
- 		l_error("Failed to save configuration to %s", config_name);
-@@ -581,13 +365,6 @@ static bool save_config(struct mesh_net *net, const char *config_name)
- 	return result;
- }
- 
--struct write_info {
--	const char *config_name;
--	struct mesh_net *net;
--	void *user_data;
--	mesh_status_func_t cb;
--};
--
- static void idle_save_config(void *user_data)
- {
- 	struct write_info *info = user_data;
-@@ -603,7 +380,7 @@ static void idle_save_config(void *user_data)
- 	remove(tmp);
- 
- 	l_debug("Storage-Wrote");
--	result = save_config(info->net, tmp);
-+	result = save_config(info->jnode, tmp);
- 
- 	if (result) {
- 		remove(bak);
-@@ -621,48 +398,199 @@ static void idle_save_config(void *user_data)
- 	l_free(info);
- }
- 
--bool storage_save_config(struct mesh_net *net, const char *config_name,
--			bool no_wait, mesh_status_func_t cb, void *user_data)
-+bool storage_save_config(struct mesh_node *node, bool no_wait,
-+					mesh_status_func_t cb, void *user_data)
- {
- 	struct write_info *info;
- 
- 	info = l_new(struct write_info, 1);
- 	if (!info)
- 		return false;
--
--	info->net = net;
--	info->config_name = config_name;
-+	l_debug("");
-+	info->jnode = node_jconfig_get(node);
-+	info->config_name = node_cfg_file_get(node);
- 	info->cb = cb;
- 	info->user_data = user_data;
- 
- 	if (no_wait)
- 		idle_save_config(info);
--	l_idle_oneshot(idle_save_config, info, NULL);
-+	else
-+		l_idle_oneshot(idle_save_config, info, NULL);
- 
- 	return true;
- }
- 
--bool storage_save_new_config(struct mesh_net *net, const char *config_name,
--					mesh_status_func_t cb, void *user_data)
-+static int create_dir(const char *dirname)
- {
--	json_object *jnode;
-+	struct stat st;
-+	char dir[PATH_MAX + 1], *prev, *next;
-+	int err;
- 
--	jnode = mesh_net_jconfig_get(net);
--	if (!jnode)
-+	err = stat(dirname, &st);
-+	if (!err && S_ISREG(st.st_mode))
-+		return 0;
-+
-+	memset(dir, 0, PATH_MAX + 1);
-+	strcat(dir, "/");
-+
-+	prev = strchr(dirname, '/');
-+
-+	while (prev) {
-+		next = strchr(prev + 1, '/');
-+		if (!next)
-+			break;
-+
-+		if (next - prev == 1) {
-+			prev = next;
-+			continue;
-+		}
-+
-+		strncat(dir, prev + 1, next - prev);
-+		mkdir(dir, 0755);
-+
-+		prev = next;
-+	}
-+
-+	mkdir(dirname, 0755);
-+
-+	return 0;
++	/* TODO: Handle Close */
 +}
 +
-+bool storage_load_nodes(const char *dir_name)
++static void prov_to(struct l_timeout *timeout, void *user_data)
 +{
-+	DIR *dir;
-+	struct dirent *entry;
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	uint8_t fail_code[2] = {PROV_FAILED, PROV_ERR_UNEXPECTED_ERR};
 +
-+	create_dir(dir_name);
-+	dir = opendir(dir_name);
-+	if (!dir) {
-+		l_error("Failed to open mesh node storage directory: %s",
-+								dir_name);
- 		return false;
++	if (rx_prov != prov)
++		return;
++
++	prov->timeout = NULL;
++
++	if (prov->cmplt && prov->trans_tx) {
++		prov->cmplt(prov->caller_data, PROV_ERR_TIMEOUT, NULL);
++		prov->cmplt = NULL;
++		prov->trans_tx(prov->trans_data, fail_code, 2);
++		prov->timeout = l_timeout_create(1, prov_to, prov, NULL);
++		return;
 +	}
 +
-+	storage_dir = dir_name;
-+	node_ids = l_queue_new();
++	acceptor_free();
++}
 +
-+	while ((entry = readdir(dir)) != NULL) {
-+		char name_buf[PATH_MAX];
-+		char *filename;
-+		uint32_t node_id;
-+		size_t len;
++static void acp_prov_open(void *user_data, prov_trans_tx_t trans_tx,
++				void *trans_data, uint8_t transport)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
 +
-+		if (entry->d_type != DT_DIR)
-+			continue;
++	/* Only one provisioning session may be open at a time */
++	if (rx_prov != prov)
++		return;
 +
-+		if (sscanf(entry->d_name, "%04x", &node_id) != 1)
-+			continue;
++	/* Only one provisioning session may be open at a time */
++	if (prov->trans_tx && prov->trans_tx != trans_tx &&
++					prov->transport != transport)
++		return;
 +
-+		snprintf(name_buf, PATH_MAX, "%s/%s/node.json", dir_name,
-+								entry->d_name);
++	if (transport == PB_ADV) {
++#if defined(GATT_ENABLED)
++		/* TODO: Disable PB-GATT */
++#endif
++	}
 +
-+		l_queue_push_tail(node_ids, L_UINT_TO_PTR(node_id));
++#if defined(GATT_ENABLED)
++	else if (transport == PB_GATT) {
++		/* TODO: Disable PB-ADV */
++		pb_adv_unreg(prov);
++	}
++#endif
 +
-+		len = strlen(name_buf);
-+		filename = l_malloc(len + 1);
- 
--	mesh_db_remove_property(jnode, "provision");
-+		strncpy(filename, name_buf, len + 1);
- 
--	return storage_save_config(net, config_name, false, cb, user_data);
-+		if (parse_config(name_buf, filename, node_id))
-+			continue;
++	else
++		return;
 +
-+		/* Fall-back to Backup version */
-+		snprintf(name_buf, PATH_MAX, "%s/%s/node.json.bak", dir_name,
-+								entry->d_name);
++	prov->trans_tx = trans_tx;
++	prov->transport = transport;
++	prov->trans_data = trans_data;
++	prov->timeout = l_timeout_create(prov->to_secs, prov_to, prov, NULL);
++}
 +
-+		if (parse_config(name_buf, filename, node_id)) {
-+			remove(filename);
-+			rename(name_buf, filename);
-+			continue;
++static void swap_u256_bytes(uint8_t *u256)
++{
++	int i;
++
++	/* End-to-End byte reflection of 32 octet buffer */
++	for (i = 0; i < 16; i++) {
++		u256[i] ^= u256[31 - i];
++		u256[31 - i] ^= u256[i];
++		u256[i] ^= u256[31 - i];
++	}
++}
++
++static void prov_calc_secret(const uint8_t *pub, const uint8_t *priv,
++							uint8_t *secret)
++{
++	uint8_t tmp[64];
++
++	/* Convert to ECC byte order */
++	memcpy(tmp, pub, 64);
++	swap_u256_bytes(tmp);
++	swap_u256_bytes(tmp + 32);
++
++	ecdh_shared_secret(tmp, priv, secret);
++
++	/* Convert to Mesh byte order */
++	swap_u256_bytes(secret);
++}
++
++static void acp_credentials(struct mesh_prov_acceptor *prov)
++{
++	prov_calc_secret(prov->conf_inputs.prv_pub_key,
++			prov->private_key, prov->secret);
++
++	mesh_crypto_s1(&prov->conf_inputs,
++			sizeof(prov->conf_inputs), prov->salt);
++
++	mesh_crypto_prov_conf_key(prov->secret, prov->salt,
++			prov->calc_key);
++
++	l_getrandom(prov->rand_auth_workspace, 16);
++
++	print_packet("PublicKeyProv", prov->conf_inputs.prv_pub_key, 64);
++	print_packet("PublicKeyDev", prov->conf_inputs.dev_pub_key, 64);
++	print_packet("PrivateKeyLocal", prov->private_key, 32);
++	print_packet("ConfirmationInputs", &prov->conf_inputs,
++						sizeof(prov->conf_inputs));
++	print_packet("ECDHSecret", prov->secret, 32);
++	print_packet("LocalRandom", prov->rand_auth_workspace, 16);
++	print_packet("ConfirmationSalt", prov->salt, 16);
++	print_packet("ConfirmationKey", prov->calc_key, 16);
++}
++
++static uint32_t digit_mod(uint8_t power)
++{
++	uint32_t ret = 1;
++
++	while (power--)
++		ret *= 10;
++
++	return ret;
++}
++
++static void number_cb(void *user_data, mesh_error_t err, uint32_t number)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	uint8_t out[2];
++
++	if (prov != rx_prov)
++		return;
++
++	if (err) {
++		out[0] = PROV_FAILED;
++		out[1] = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, out, 2);
++		return;
++	}
++
++	/* Save two copies, to generate two confirmation values */
++	l_put_be32(number, prov->rand_auth_workspace + 28);
++	l_put_be32(number, prov->rand_auth_workspace + 44);
++	prov->material |= MAT_RAND_AUTH;
++	out[0] = PROV_INP_CMPLT;
++	prov->trans_tx(prov->trans_data, out, 1);
++}
++
++static void static_cb(void *user_data, mesh_error_t err,
++						uint8_t *key, uint32_t len)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	uint8_t out[2];
++
++	if (prov != rx_prov)
++		return;
++
++	if (err || !key || len != 16) {
++		out[0] = PROV_FAILED;
++		out[1] = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, out, 2);
++		return;
++	}
++
++	/* Save two copies, to generate two confirmation values */
++	memcpy(prov->rand_auth_workspace + 16, key, 16);
++	memcpy(prov->rand_auth_workspace + 32, key, 16);
++	prov->material |= MAT_RAND_AUTH;
++}
++
++static void priv_key_cb(void *user_data, mesh_error_t err,
++						uint8_t *key, uint32_t len)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	uint8_t out[2];
++
++	if (prov != rx_prov)
++		return;
++
++	if (err || !key || len != 32) {
++		out[0] = PROV_FAILED;
++		out[1] = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, out, 2);
++		return;
++	}
++
++	memcpy(prov->private_key, key, 32);
++	ecc_make_public_key(prov->private_key,
++			prov->conf_inputs.dev_pub_key);
++
++	/* Convert to Mesh byte order */
++	swap_u256_bytes(prov->conf_inputs.dev_pub_key);
++	swap_u256_bytes(prov->conf_inputs.dev_pub_key + 32);
++
++	prov->material |= MAT_LOCAL_PRIVATE;
++	if ((prov->material & MAT_SECRET) == MAT_SECRET)
++		acp_credentials(prov);
++}
++
++static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	struct mesh_prov_node_info *info;
++	uint8_t *out;
++	uint8_t type = *data++;
++	uint8_t fail_code[2];
++	uint32_t oob_key;
++	uint64_t decode_mic;
++	bool result;
++
++	if (rx_prov != prov || !prov->trans_tx)
++		return;
++
++	l_debug("Provisioning packet received type: %2.2x (%u octets)",
++								type, len);
++
++	if (type == prov->previous) {
++		l_error("Ignore repeated %2.2x packet", type);
++		return;
++	} else if (type > prov->expected || type < prov->previous) {
++		l_error("Expected %2.2x, Got:%2.2x", prov->expected, type);
++		fail_code[1] = PROV_ERR_UNEXPECTED_PDU;
++		goto failure;
++	}
++
++	if (type >= L_ARRAY_SIZE(expected_pdu_size) ||
++					len != expected_pdu_size[type]) {
++		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
++			len, expected_pdu_size[type], type);
++		fail_code[1] = PROV_ERR_INVALID_FORMAT;
++		goto failure;
++	}
++
++	switch (type){
++	case PROV_INVITE: /* Prov Invite */
++		/* Prov Capabilities */
++		out = l_malloc(1 + sizeof(struct mesh_net_prov_caps));
++		out[0] = PROV_CAPS;
++		memcpy(out + 1, &prov->conf_inputs.caps,
++					sizeof(prov->conf_inputs.caps));
++
++		prov->conf_inputs.invite.attention = data[0];
++
++		prov->state = ACP_PROV_CAPS_SENT;
++		prov->expected = PROV_START;
++		prov->trans_tx(prov->trans_data,
++				out, sizeof(prov->conf_inputs.caps) + 1);
++		l_free(out);
++		break;
++
++	case PROV_START: /* Prov Start */
++		memcpy(&prov->conf_inputs.start, data,
++				sizeof(prov->conf_inputs.start));
++
++		if (prov->conf_inputs.start.algorithm ||
++				prov->conf_inputs.start.pub_key > 1 ||
++				prov->conf_inputs.start.auth_method > 3) {
++			fail_code[1] = PROV_ERR_INVALID_FORMAT;
++			goto failure;
 +		}
 +
-+		l_free(filename);
-+	}
++		if (prov->conf_inputs.start.pub_key) {
++			if (prov->conf_inputs.caps.pub_type) {
++				/* Prompt Agent for Private Key of OOB */
++				mesh_agent_request_private_key(prov->agent,
++							priv_key_cb, prov);
++			} else {
++				fail_code[1] = PROV_ERR_INVALID_PDU;
++				goto failure;
++			}
++		} else {
++			/* Ephemeral Public Key requested */
++			ecc_make_key(prov->conf_inputs.dev_pub_key,
++					prov->private_key);
++			swap_u256_bytes(prov->conf_inputs.dev_pub_key);
++			swap_u256_bytes(prov->conf_inputs.dev_pub_key + 32);
++			prov->material |= MAT_LOCAL_PRIVATE;
++		}
 +
-+	return true;
- }
- 
--void storage_release(struct mesh_net *net)
-+bool storage_create_node_config(struct mesh_node *node, void *data)
- {
-+	struct mesh_db_node *db_node = data;
-+	uint16_t node_id;
-+	uint8_t num_tries = 0;
-+	char name_buf[PATH_MAX];
-+	char *filename;
- 	json_object *jnode;
-+	size_t len;
++		prov->expected = PROV_PUB_KEY;
++		break;
 +
-+	if (!storage_dir)
-+		return false;
++	case PROV_PUB_KEY: /* Public Key */
++		/* Save Key */
++		memcpy(prov->conf_inputs.prv_pub_key, data, 64);
++		prov->material |= MAT_REMOTE_PUBLIC;
++		prov->expected = PROV_CONFIRM;
 +
-+	jnode = json_object_new_object();
++		if ((prov->material & MAT_SECRET) != MAT_SECRET)
++			return;
 +
-+	if (!mesh_db_add_node(jnode, db_node))
-+		return false;
++		acp_credentials(prov);
 +
-+	do {
-+		l_getrandom(&node_id, 2);
-+		if (!l_queue_find(node_ids, simple_match,
-+						L_UINT_TO_PTR(node_id)))
++		if (!prov->conf_inputs.start.pub_key) {
++			out = l_malloc(65);
++			out[0] = PROV_PUB_KEY;
++			memcpy(out + 1, prov->conf_inputs.dev_pub_key, 64);
++			prov->trans_tx(prov->trans_data, out, 65);
++			l_free(out);
++		}
++
++		/* Start Step 3 */
++		switch (prov->conf_inputs.start.auth_method) {
++		default:
++		case 0:
++			/* Auth Type 3c - No OOB */
 +			break;
-+	} while (++num_tries < 10);
 +
-+	if (num_tries == 10)
-+		l_error("Failed to generate unique node ID");
++		case 1:
++			/* Auth Type 3c - Static OOB */
++			/* Prompt Agent for Static OOB */
++			fail_code[1] = mesh_agent_request_static(prov->agent,
++					static_cb, prov);
 +
-+	snprintf(name_buf, PATH_MAX, "%s/%04x", storage_dir, node_id);
++			if (fail_code[1])
++				goto failure;
 +
-+	/* Create a new directory and node.json file */
-+	if (mkdir(name_buf, 0755) != 0)
-+		goto fail;
- 
--	jnode = mesh_net_jconfig_get(net);
-+	len = strlen(name_buf) + strlen("/node.json") + 1;
-+	filename = l_malloc(len);
++			break;
 +
-+	snprintf(filename, len, "%s/node.json", name_buf);
-+	l_debug("New node config %s", filename);
++		case 2:
++			/* Auth Type 3a - Output OOB */
++			l_getrandom(&oob_key, sizeof(oob_key));
++			oob_key %= digit_mod(prov->conf_inputs.start.auth_size);
 +
-+	if (!save_config(jnode, filename)) {
-+		l_free(filename);
-+		goto fail;
++			/* Save two copies, for two confirmation values */
++			l_put_be32(oob_key, prov->rand_auth_workspace + 28);
++			l_put_be32(oob_key, prov->rand_auth_workspace + 44);
++			prov->material |= MAT_RAND_AUTH;
++
++			if (prov->conf_inputs.start.auth_action ==
++							PROV_ACTION_OUT_ALPHA) {
++				/* TODO: Construst NUL-term string to pass */
++				fail_code[1] = mesh_agent_display_string(
++					prov->agent, NULL, NULL, prov);
++			} else {
++				/* Ask Agent to Display U32 */
++				fail_code[1] = mesh_agent_display_number(
++					prov->agent, false,
++					prov->conf_inputs.start.auth_action,
++					oob_key, NULL, prov);
++			}
++
++			if (fail_code[1])
++				goto failure;
++
++			break;
++
++		case 3:
++			/* Auth Type 3b - input OOB */
++			/* Prompt Agent for Input OOB */
++			if (prov->conf_inputs.start.auth_action ==
++							PROV_ACTION_IN_ALPHA) {
++				fail_code[1] = mesh_agent_prompt_alpha(
++					prov->agent,
++					static_cb, prov);
++			} else {
++				fail_code[1] = mesh_agent_prompt_number(
++					prov->agent, false,
++					prov->conf_inputs.start.auth_action,
++					number_cb, prov);
++			}
++
++			if (fail_code[1])
++				goto failure;
++
++			break;
++		}
++
++		prov->expected = PROV_CONFIRM;
++		break;
++
++	case PROV_CONFIRM: /* Confirmation */
++		out = l_malloc(17);
++		out[0] = PROV_CONFIRM;
++
++		/* Calculate and Send our Confirmation */
++		mesh_crypto_aes_cmac(prov->calc_key, prov->rand_auth_workspace,
++								32, out + 1);
++		prov->trans_tx(prov->trans_data, out, 17);
++		l_free(out);
++
++		/* Save Provisioners confirmation for later compare */
++		memcpy(prov->confirm, data, 16);
++		prov->expected = PROV_RANDOM;
++		break;
++
++	case PROV_RANDOM: /* Random Value */
++		out = l_malloc(17);
++		/* Calculate Session key (needed later) while data is fresh */
++		mesh_crypto_prov_prov_salt(prov->salt, data,
++						prov->rand_auth_workspace,
++						prov->salt);
++		mesh_crypto_session_key(prov->secret, prov->salt, prov->s_key);
++		mesh_crypto_nonce(prov->secret, prov->salt, prov->s_nonce);
++
++		/* Calculate expected Provisioner Confirm */
++		memcpy(prov->rand_auth_workspace + 16, data, 16);
++		mesh_crypto_aes_cmac(prov->calc_key,
++				prov->rand_auth_workspace + 16, 32, out);
++
++		/* Compare our calculation with Provisioners */
++		if (memcmp(out, prov->confirm, 16)) {
++			fail_code[1] = PROV_ERR_CONFIRM_FAILED;
++			l_free(out);
++			goto failure;
++		}
++
++		/* Send Random value we used */
++		out[0] = PROV_RANDOM;
++		memcpy(out + 1, prov->rand_auth_workspace, 16);
++		prov->trans_tx(prov->trans_data, out, 17);
++		l_free(out);
++		prov->expected = PROV_DATA;
++		break;
++
++	case PROV_DATA: /* Provisioning Data */
++
++		/* Calculate our device key */
++		mesh_crypto_device_key(prov->secret,
++				prov->salt,
++				prov->calc_key);
++
++		/* Decrypt new node data into workspace */
++		mesh_crypto_aes_ccm_decrypt(prov->s_nonce, prov->s_key,
++				NULL, 0,
++				data, len - 1, prov->rand_auth_workspace,
++				&decode_mic, sizeof(decode_mic));
++
++		/* Validate that the data hasn't been messed with in transit */
++		if (l_get_be64(data + 25) != decode_mic) {
++			l_error("Provisioning Failed-MIC compare");
++			fail_code[1] = PROV_ERR_DECRYPT_FAILED;
++			goto failure;
++		}
++
++		info = l_malloc(sizeof(struct mesh_prov_node_info));
++
++		memcpy(info->device_key, prov->calc_key, 16);
++		memcpy(info->net_key, prov->rand_auth_workspace, 16);
++		info->net_index = l_get_be16(prov->rand_auth_workspace + 16);
++		info->flags = prov->rand_auth_workspace[18];
++		info->iv_index = l_get_be32(prov->rand_auth_workspace + 19);
++		info->unicast = l_get_be16(prov->rand_auth_workspace + 23);
++
++		result = prov->cmplt(prov->caller_data, PROV_ERR_SUCCESS, info);
++		prov->cmplt = NULL;
++		l_free(info);
++
++		if (result) {
++			prov->rand_auth_workspace[0] = PROV_COMPLETE;
++			prov->trans_tx(prov->trans_data,
++					prov->rand_auth_workspace, 1);
++			goto cleanup;
++		} else {
++			fail_code[1] = PROV_ERR_UNEXPECTED_ERR;
++			goto failure;
++		}
++		break;
++
++	case PROV_FAILED: /* Provisioning Error -- abort */
++		/* TODO: Call Complete Callback (Fail)*/
++		prov->cmplt(prov->caller_data,
++				data[0] ? data[0] : PROV_ERR_UNEXPECTED_ERR,
++				NULL);
++		prov->cmplt = NULL;
++		goto cleanup;
 +	}
 +
-+	node_jconfig_set(node, jnode);
-+	node_cfg_file_set(node, filename);
++	prov->previous = type;
++	return;
 +
-+	return true;
-+fail:
-+	json_object_put(jnode);
++failure:
++	fail_code[0] = PROV_FAILED;
++	prov->trans_tx(prov->trans_data, fail_code, 2);
++	if (prov->cmplt)
++		prov->cmplt(prov->caller_data, fail_code[1], NULL);
++	prov->cmplt = NULL;
++
++cleanup:
++	l_timeout_remove(prov->timeout);
++
++	/* Give PB Link 5 seconds to end session */
++	prov->timeout = l_timeout_create(5, prov_to, prov, NULL);
++}
++
++static void acp_prov_ack(void *user_data, uint8_t msg_num)
++{
++	/* TODO: Handle PB-ADV Ack */
++}
++
++
++/* This starts unprovisioned device beacon */
++bool acceptor_start(uint8_t num_ele, uint8_t uuid[16],
++		uint16_t algorithms, uint32_t timeout,
++		struct mesh_agent *agent,
++		mesh_prov_acceptor_complete_func_t complete_cb,
++		void *caller_data)
++{
++	struct mesh_agent_prov_caps *caps;
++	uint8_t beacon[24] = {MESH_AD_TYPE_BEACON,
++						BEACON_TYPE_UNPROVISIONED};
++	uint8_t len = sizeof(beacon) - sizeof(uint32_t);
++	bool result;
++
++	/* Invoked from Join() method in mesh-api.txt, to join a
++	 * remote mesh network.
++	 */
++
++#if defined(GATT_ENABLED)
++	/* If we support PB-GATT, that means we need to set up a GATT
++	 * service, and need the existence of bluetoothd, with it's
++	 * own LE capable controller. That is a battle for another day.
++	 * We will *always* support PB-ADV.
++	 */
++#endif
++	if (prov)
++		return false;
++
++	prov = l_new(struct mesh_prov_acceptor, 1);
++	prov->to_secs = timeout;
++	prov->agent = agent;
++	prov->cmplt = complete_cb;
++	prov->previous = -1;
++	prov->caller_data = caller_data;
++
++	caps = mesh_agent_get_caps(agent);
++
++	/* TODO: Should we sanity check values here or elsewhere? */
++	prov->conf_inputs.caps.num_ele = num_ele;
++	prov->conf_inputs.caps.pub_type = caps->pub_type;
++	prov->conf_inputs.caps.static_type = caps->static_type;
++	prov->conf_inputs.caps.output_size = caps->output_size;
++	prov->conf_inputs.caps.input_size = caps->input_size;
++
++	/* Store UINT16 values in Over-the-Air order, in packed structure
++	 * for crypto inputs
++	 */
++	l_put_be16(algorithms, &prov->conf_inputs.caps.algorithms);
++	l_put_be16(caps->output_action, &prov->conf_inputs.caps.output_action);
++	l_put_be16(caps->input_action, &prov->conf_inputs.caps.input_action);
++
++	/* Compose Unprovisioned Beacon */
++	memcpy(beacon + 2, uuid, 16);
++	l_put_be16(caps->oob_info, beacon + 18);
++	if (caps->oob_info & OOB_INFO_URI_HASH){
++		l_put_be32(caps->uri_hash, beacon + 20);
++		len += sizeof(uint32_t);
++	}
++
++	/* Infinitely Beacon until Canceled, or Provisioning Starts */
++	result = mesh_send_pkt(0, 500, beacon, len);
++
++	if (!result)
++		goto error_fail;
++
++	/* Always register for PB-ADV */
++	result = pb_adv_reg(acp_prov_open, acp_prov_close, acp_prov_rx,
++						acp_prov_ack, uuid, prov);
++
++	if (result)
++		return true;
++
++error_fail:
++	acceptor_free();
 +	return false;
 +}
 +
-+/* Permanently remove node configuration */
-+void storage_remove_node_config(struct mesh_node *node)
++void acceptor_cancel(void *user_data)
 +{
-+	char *cfgname;
-+	struct json_object *jnode;
-+	const char *dir_name;
-+
-+	jnode = node_jconfig_get(node);
- 	if (jnode)
- 		json_object_put(jnode);
-+	node_jconfig_set(node, NULL);
-+
-+	cfgname = (char *) node_cfg_file_get(node);
-+	if (!cfgname)
-+		return;
-+
-+	l_debug("Delete node config file %s", cfgname);
-+	remove(cfgname);
-+
-+	dir_name = dirname(cfgname);
-+
-+	l_debug("Delete directory %s", dir_name);
-+	rmdir(dir_name);
- 
--	mesh_net_jconfig_set(net, NULL);
-+	l_free(cfgname);
-+	node_cfg_file_set(node, NULL);
- }
-diff --git a/mesh/storage.h b/mesh/storage.h
-index 341932dba..9583669f0 100644
---- a/mesh/storage.h
-+++ b/mesh/storage.h
-@@ -18,34 +18,35 @@
-  *
-  */
- 
-+#include <json-c/json.h>
-+
- struct mesh_net;
-+struct mesh_node;
- 
--bool storage_parse_config(struct mesh_net *net, const char *config_name);
--bool storage_save_config(struct mesh_net *net, const char *config_name,
--			bool no_wait, mesh_status_func_t cb, void *user_data);
--bool storage_save_new_config(struct mesh_net *net, const char *config_name,
-+bool storage_load_nodes(const char *dir);
-+bool storage_create_node_config(struct mesh_node *node, void *db_node);
-+void storage_remove_node_config(struct mesh_node *node);
-+bool storage_save_config(struct mesh_node *node, bool no_wait,
- 					mesh_status_func_t cb, void *user_data);
--void storage_release(struct mesh_net *net);
--
--bool storage_model_bind(struct mesh_net *net, uint16_t addr, uint32_t id,
-+bool storage_model_bind(struct mesh_node *node, uint16_t addr, uint32_t id,
- 						uint16_t app_idx, bool unbind);
- 
--bool storage_local_set_ttl(struct mesh_net *net, uint8_t ttl);
--bool storage_local_set_relay(struct mesh_net *net, bool enable, uint8_t count,
-+bool storage_set_ttl(json_object *jnode, uint8_t ttl);
-+bool storage_set_relay(json_object *jnode, bool enable, uint8_t count,
- 							uint8_t interval);
--bool storage_local_set_transmit_params(struct mesh_net *net, uint8_t count,
-+bool storage_set_transmit_params(json_object *jnode, uint8_t count,
- 							uint8_t interval);
--bool storage_local_set_mode(struct mesh_net *net, uint8_t mode,
-+bool storage_set_mode(json_object *jnode, uint8_t mode,
- 							const char *mode_name);
--bool storage_local_net_key_add(struct mesh_net *net, uint16_t net_idx,
-+bool storage_net_key_add(struct mesh_net *net, uint16_t net_idx,
- 					const uint8_t key[16], int phase);
--bool storage_local_net_key_del(struct mesh_net *net, uint16_t net_idx);
--bool storage_local_app_key_add(struct mesh_net *net, uint16_t net_idx,
-+bool storage_net_key_del(struct mesh_net *net, uint16_t net_idx);
-+bool storage_app_key_add(struct mesh_net *net, uint16_t net_idx,
- 			uint16_t app_idx, const uint8_t key[16], bool update);
--bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
-+bool storage_app_key_del(struct mesh_net *net, uint16_t net_idx,
- 							uint16_t app_idx);
--bool storage_local_write_sequence_number(struct mesh_net *net, uint32_t seq);
--bool storage_local_set_iv_index(struct mesh_net *net, uint32_t iv_index,
-+bool storage_write_sequence_number(struct mesh_net *net, uint32_t seq);
-+bool storage_set_iv_index(struct mesh_net *net, uint32_t iv_index,
- 								bool update);
--bool storage_local_set_device_key(struct mesh_net *net, uint8_t dev_key[16]);
--bool storage_local_set_unicast(struct mesh_net *net, uint16_t unicast);
-+bool storage_set_device_key(struct mesh_node *node, uint8_t dev_key[16]);
-+bool storage_set_unicast(struct mesh_node *node, uint16_t unicast);
++	acceptor_free();
++}
 -- 
 2.14.5
 
