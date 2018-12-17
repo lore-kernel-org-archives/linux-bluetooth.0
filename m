@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA9FC43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 14:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8657AC43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 14:14:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6042E20874
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 14:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A8BF20874
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 14:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="jB5HVnru";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="XbDspo2H"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="LvDiZ3bp";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="OftJ/QUn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387470AbeLQOOL (ORCPT
+        id S2387418AbeLQON4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Dec 2018 09:14:11 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:48104 "EHLO
+        Mon, 17 Dec 2018 09:13:56 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:46942 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387469AbeLQOOK (ORCPT
+        with ESMTP id S2387409AbeLQON4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Dec 2018 09:14:10 -0500
+        Mon, 17 Dec 2018 09:13:56 -0500
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id A76A160985; Mon, 17 Dec 2018 14:14:05 +0000 (UTC)
+        id DB7A66071C; Mon, 17 Dec 2018 14:13:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1545056049;
-        bh=TkMRL+TDThM6lIVxkus75WMUfrvshcOf3gkyZU5Z2II=;
+        s=default; t=1545056035;
+        bh=cha9YkKT0Mg0ydqFDNy/tLlbHyKKx+h32VQdZDbm6zc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jB5HVnruutCtKhJJa9R8LNGTz6yS0LFw3xOQLlMOrNIe/0HfpZH/jQor8kxGLz13N
-         UKALgtBiTmSLgDIFjHwysmS5qvOUef/kRwviSeWrzV+6aA9ofCKnpKsW7tVzDwtELs
-         T4GQbk5MK62g2xhxBl52W5ym/tDbzd8dbohkElfk=
+        b=LvDiZ3bpWLNs1NjKUJkEQEnbF3T3cSbLq6fx4qrJAXc7mzSivUeyBwAP7a7gi/kFt
+         PxAkg4jdvrmBUh3d83jaY9/lx7WlJIJrnHwQjsSW52ToPV5saOLiXwS5PU+Rh4qe93
+         3mvsFSsPw4YMmpy7yGcNSw3FllDHqC5GyyTThbfw=
 Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 3290F6098B;
-        Mon, 17 Dec 2018 14:13:59 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 19232608CF;
+        Mon, 17 Dec 2018 14:13:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1545056043;
-        bh=TkMRL+TDThM6lIVxkus75WMUfrvshcOf3gkyZU5Z2II=;
+        s=default; t=1545056032;
+        bh=cha9YkKT0Mg0ydqFDNy/tLlbHyKKx+h32VQdZDbm6zc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XbDspo2HybpaUZ/ulvlsTtQJfYtCUyCwqQOtpfwtcFLSC+J1658BW72xUh+RE+pL3
-         /yKzjYyObpySJDiNootw+iSG1spu8+bZlWzznyi4UsJQLd9Mbn4JEqeZ4cBpC/7wIi
-         AllIJLfKvyzq3BOVYO3ocHZbq2Aw9PDZ3AZ58Lo4=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 3290F6098B
+        b=OftJ/QUn5us5DkALaLkzPKCEuMJonHg85cS4cympCNeBdC+WUuvdP/z9YnWrbzXHo
+         iAxRasv/DzldX/zBuDiz+ghOjvdf04OviNcBhqXEwJLBTMafxiG9pPZkrHccPCfM10
+         crLOgi0Wey1Bn8OybcUhkr00lnmIE5/QsZrgQqIs=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 19232608CF
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
 From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
@@ -55,9 +55,9 @@ Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
         linux-arm-msm@vger.kernel.org,
         Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v4 5/5] Bluetooth: btqca: inject command complete event during fw download
-Date:   Mon, 17 Dec 2018 19:43:30 +0530
-Message-Id: <20181217141330.6294-6-bgodavar@codeaurora.org>
+Subject: [PATCH v4 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate change command
+Date:   Mon, 17 Dec 2018 19:43:27 +0530
+Message-Id: <20181217141330.6294-3-bgodavar@codeaurora.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181217141330.6294-1-bgodavar@codeaurora.org>
 References: <20181217141330.6294-1-bgodavar@codeaurora.org>
@@ -68,113 +68,101 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Latest qualcomm chips are not sending an command complete event for
-every firmware packet sent to chip. They only respond with a vendor
-specific event for the last firmware packet. This optimization will
-decrease the BT ON time. Due to this we are seeing a timeout error
-message logs on the console during firmware download. Now we are
-injecting a command complete event once we receive an vendor specific
-event for the last RAM firmware packet.
+This patch will help to stop frame reassembly errors while changing
+the baudrate. This is because host send a change baudrate request
+command to the chip with 115200 bps, Whereas chip will change their
+UART clocks to the enable for new baudrate and sends the response
+for the change request command with newer baudrate, On host side
+we are still operating in 115200 bps which results of reading garbage
+data. Here we are pulling RTS line, so that chip we will wait to send data
+to host until host change its baudrate.
 
 Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Tested-by: Matthias Kaehlcke <mka@chromium.org>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 ---
-v4:
-  * intial patch.
-
+v4: 
+ * no change
+v3:
+ * Updated comments in code to be more specific.
+v2:
+ * updated commit text and comments.
+v1:
+ * initial patch
 ---
- drivers/bluetooth/btqca.c | 39 ++++++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btqca.h |  3 +++
- 2 files changed, 41 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_qca.c | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index ec9e03a6b778..0b533f65f652 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -144,6 +144,7 @@ static void qca_tlv_check_data(struct rome_config *config,
- 		 * In case VSE is skipped, only the last segment is acked.
- 		 */
- 		config->dnld_mode = tlv_patch->download_mode;
-+		config->dnld_type = config->dnld_mode;
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index d8bc77c8c9b9..204fef3846e4 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -963,7 +963,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	struct qca_data *qca = hu->priv;
+ 	struct sk_buff *skb;
+-	struct qca_serdev *qcadev;
+ 	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
  
- 		BT_DBG("Total Length           : %d bytes",
- 		       le32_to_cpu(tlv_patch->total_size));
-@@ -264,6 +265,31 @@ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
- 	return err;
- }
- 
-+static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
-+{
-+	struct hci_event_hdr *hdr;
-+	struct hci_ev_cmd_complete *evt;
-+	struct sk_buff *skb;
-+
-+	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	hdr = skb_put(skb, sizeof(*hdr));
-+	hdr->evt = HCI_EV_CMD_COMPLETE;
-+	hdr->plen = sizeof(*evt) + 1;
-+
-+	evt = skb_put(skb, sizeof(*evt));
-+	evt->ncmd = 1;
-+	evt->opcode = HCI_OP_NOP;
-+
-+	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
-+
-+	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
-+
-+	return hci_recv_frame(hdev, skb);
-+}
-+
- static int qca_download_firmware(struct hci_dev *hdev,
- 				  struct rome_config *config)
- {
-@@ -297,11 +323,22 @@ static int qca_download_firmware(struct hci_dev *hdev,
- 		ret = qca_tlv_send_segment(hdev, segsize, segment,
- 					    config->dnld_mode);
- 		if (ret)
--			break;
-+			goto out;
- 
- 		segment += segsize;
+ 	if (baudrate > QCA_BAUDRATE_3200000)
+@@ -977,13 +976,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 		return -ENOMEM;
  	}
  
-+	/* Latest qualcomm chipsets are not sending a command complete event
-+	 * for every fw packet sent. They only respond with a vendor specific
-+	 * event for the last packet. This optimization in the chip will
-+	 * decrease the BT in initialization time. Here we will inject a command
-+	 * complete event to avoid a command timeout error message.
-+	 */
-+	if ((config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
-+	    config->dnld_type == ROME_SKIP_EVT_VSE))
-+		return qca_inject_cmd_complete_event(hdev);
+-	/* Disabling hardware flow control is mandatory while
+-	 * sending change baudrate request to wcn3990 SoC.
+-	 */
+-	qcadev = serdev_device_get_drvdata(hu->serdev);
+-	if (qcadev->btsoc_type == QCA_WCN3990)
+-		hci_uart_set_flow_control(hu, true);
+-
+ 	/* Assign commands to change baudrate and packet type. */
+ 	skb_put_data(skb, cmd, sizeof(cmd));
+ 	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+@@ -999,9 +991,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
+ 	set_current_state(TASK_RUNNING);
+ 
+-	if (qcadev->btsoc_type == QCA_WCN3990)
+-		hci_uart_set_flow_control(hu, false);
+-
+ 	return 0;
+ }
+ 
+@@ -1086,6 +1075,7 @@ static int qca_check_speeds(struct hci_uart *hu)
+ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ {
+ 	unsigned int speed, qca_baudrate;
++	struct qca_serdev *qcadev;
+ 	int ret;
+ 
+ 	if (speed_type == QCA_INIT_SPEED) {
+@@ -1097,6 +1087,15 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		if (!speed)
+ 			return 0;
+ 
++		/* Deassert RTS while changing the baudrate of chip and host.
++		 * This will prevent chip from transmitting its response with
++		 * the new baudrate while the host port is still operating at
++		 * the old speed.
++		 */
++		qcadev = serdev_device_get_drvdata(hu->serdev);
++		if (qcadev->btsoc_type == QCA_WCN3990)
++			serdev_device_set_rts(hu->serdev, false);
 +
-+out:
- 	release_firmware(fw);
+ 		qca_baudrate = qca_get_baudrate_value(speed);
+ 		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
+ 		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
+@@ -1104,6 +1103,9 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 			return ret;
  
- 	return ret;
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index 0c01f375fe83..5c8fc54133e3 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -40,6 +40,8 @@
- #define QCA_WCN3990_POWERON_PULSE	0xFC
- #define QCA_WCN3990_POWEROFF_PULSE	0xC0
- 
-+#define QCA_HCI_CC_SUCCESS		0x00
+ 		host_set_baudrate(hu, speed);
 +
- enum qca_bardrate {
- 	QCA_BAUDRATE_115200 	= 0,
- 	QCA_BAUDRATE_57600,
-@@ -81,6 +83,7 @@ struct rome_config {
- 	char fwname[64];
- 	uint8_t user_baud_rate;
- 	enum rome_tlv_dnld_mode dnld_mode;
-+	enum rome_tlv_dnld_mode dnld_type;
- };
++		if (qcadev->btsoc_type == QCA_WCN3990)
++			serdev_device_set_rts(hu->serdev, true);
+ 	}
  
- struct edl_event_hdr {
+ 	return 0;
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
 a Linux Foundation Collaborative Project
