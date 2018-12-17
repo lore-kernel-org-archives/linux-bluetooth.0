@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2974EC43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F14C43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02BD6217F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D435217F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731449AbeLQEFN (ORCPT
+        id S1731444AbeLQEFN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Sun, 16 Dec 2018 23:05:13 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:53250 "EHLO
+Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:53264 "EHLO
         wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731375AbeLQEFM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1726430AbeLQEFM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Sun, 16 Dec 2018 23:05:12 -0500
 Received: by wens.csie.org (Postfix, from userid 1000)
-        id 5F2015FD13; Mon, 17 Dec 2018 12:05:03 +0800 (CST)
+        id 96D1F5FDD5; Mon, 17 Dec 2018 12:05:03 +0800 (CST)
 From:   Chen-Yu Tsai <wens@csie.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -30,11 +30,10 @@ To:     Marcel Holtmann <marcel@holtmann.org>,
 Cc:     Chen-Yu Tsai <wens@csie.org>,
         Loic Poulain <loic.poulain@gmail.com>,
         linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Ondrej Jirman <megous@megous.com>
-Subject: [PATCH v3 05/15] Bluetooth: hci_bcm: Handle deferred probing for the clock supply
-Date:   Mon, 17 Dec 2018 12:04:39 +0800
-Message-Id: <20181217040449.31437-6-wens@csie.org>
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 12/15] Bluetooth: hci_bcm: Add compatible string for BCM4330
+Date:   Mon, 17 Dec 2018 12:04:46 +0800
+Message-Id: <20181217040449.31437-13-wens@csie.org>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20181217040449.31437-1-wens@csie.org>
 References: <20181217040449.31437-1-wens@csie.org>
@@ -45,34 +44,27 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On some systems that actually have the bluetooth controller wired up
-with an extra clock signal, it's possible the bluetooth controller
-probes before the clock provider. clk_get would return a defer probe
-error, which was not handled by this driver.
+The BCM4330 chip is a 802.11 a/b/g/n + Bluetooth 4.0 + HS controller.
+This patch adds a compatible string match to the serdev driver for the
+Bluetooth part of the chip.
 
-Handle this properly, so that these systems can work reliably.
-
-Tested-by: Ondrej Jirman <megous@megous.com>
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- drivers/bluetooth/hci_bcm.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index ddbd8c6a0ceb..800132369134 100644
+index 8c75e7a67379..a5cb580a07de 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -907,6 +907,10 @@ static int bcm_get_resources(struct bcm_device *dev)
- 
- 	dev->clk = devm_clk_get(dev->dev, NULL);
- 
-+	/* Handle deferred probing */
-+	if (dev->clk == ERR_PTR(-EPROBE_DEFER))
-+		return PTR_ERR(dev->clk);
-+
- 	dev->device_wakeup = devm_gpiod_get_optional(dev->dev, "device-wakeup",
- 						     GPIOD_OUT_LOW);
- 	if (IS_ERR(dev->device_wakeup))
+@@ -1397,6 +1397,7 @@ static void bcm_serdev_remove(struct serdev_device *serdev)
+ #ifdef CONFIG_OF
+ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ 	{ .compatible = "brcm,bcm20702a1" },
++	{ .compatible = "brcm,bcm4330-bt" },
+ 	{ .compatible = "brcm,bcm43438-bt" },
+ 	{ },
+ };
 -- 
 2.20.0
 
