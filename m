@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2268C43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93AF7C43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F2C3217F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C896217FB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731435AbeLQEFM (ORCPT
+        id S1731425AbeLQEFM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Sun, 16 Dec 2018 23:05:12 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:53258 "EHLO
+Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:53254 "EHLO
         wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731378AbeLQEFM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1731373AbeLQEFM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Sun, 16 Dec 2018 23:05:12 -0500
 Received: by wens.csie.org (Postfix, from userid 1000)
-        id 693E15FD90; Mon, 17 Dec 2018 12:05:03 +0800 (CST)
+        id 7619C5FDA6; Mon, 17 Dec 2018 12:05:03 +0800 (CST)
 From:   Chen-Yu Tsai <wens@csie.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -32,9 +32,9 @@ Cc:     Chen-Yu Tsai <wens@csie.org>,
         linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         Ondrej Jirman <megous@megous.com>
-Subject: [PATCH v3 06/15] Bluetooth: hci_bcm: Simplify clk_get error handling
-Date:   Mon, 17 Dec 2018 12:04:40 +0800
-Message-Id: <20181217040449.31437-7-wens@csie.org>
+Subject: [PATCH v3 08/15] Bluetooth: hci_bcm: Add support for LPO clock
+Date:   Mon, 17 Dec 2018 12:04:42 +0800
+Message-Id: <20181217040449.31437-9-wens@csie.org>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20181217040449.31437-1-wens@csie.org>
 References: <20181217040449.31437-1-wens@csie.org>
@@ -45,60 +45,108 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The driver currently checks the clk pointer for an error condition, as
-returned by clk_get, before every invocation of the clk consumer API.
-This is redundant if the goal is simply to ignore the errors, thereby
-making the clk optional. The clk consumer API already checks if the
-pointer is NULL or not.
-
-Simplify the code a bit by assigning NULL to the clk pointer if the
-error condition is one we want to ignore, which is every error except
-deferred probing.
+The Broadcom Bluetooth controllers support a secondary LPO clock at
+32.768 kHz. This external clock provides low power timing, and also
+a way to detect the frequency of the main reference clock. On many
+designs without NVRAM and a non-default reference clock, this must
+be used or the controller will not function correctly.
 
 Tested-by: Ondrej Jirman <megous@megous.com>
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- drivers/bluetooth/hci_bcm.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ drivers/bluetooth/hci_bcm.c | 41 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 36 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 800132369134..ff73ecb8215f 100644
+index 1584c95c9c34..345d728a5434 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -214,7 +214,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
- {
+@@ -72,7 +72,8 @@
+  * @btpu: Apple ACPI method to drive BT_REG_ON pin high ("Bluetooth Power Up")
+  * @btpd: Apple ACPI method to drive BT_REG_ON pin low ("Bluetooth Power Down")
+  * @txco_clk: external reference frequency clock used by Bluetooth device
+- * @clk_enabled: whether @txco_clk is prepared and enabled
++ * @lpo_clk: external LPO clock used by Bluetooth device
++ * @clk_enabled: whether clocks are prepared and enabled
+  * @init_speed: default baudrate of Bluetooth device;
+  *	the host UART is initially set to this baudrate so that
+  *	it can configure the Bluetooth device for @oper_speed
+@@ -103,6 +104,7 @@ struct bcm_device {
+ #endif
+ 
+ 	struct clk		*txco_clk;
++	struct clk		*lpo_clk;
+ 	bool			clk_enabled;
+ 
+ 	u32			init_speed;
+@@ -215,21 +217,34 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
  	int err;
  
--	if (powered && !IS_ERR(dev->clk) && !dev->clk_enabled) {
-+	if (powered && !dev->clk_enabled) {
- 		err = clk_prepare_enable(dev->clk);
+ 	if (powered && !dev->clk_enabled) {
+-		err = clk_prepare_enable(dev->txco_clk);
++		/* LPO clock needs to be 32.768 kHz */
++		err = clk_set_rate(dev->lpo_clk, 32768);
++		if (err) {
++			dev_err(dev->dev, "Could not set LPO clock rate\n");
++			return err;
++		}
++
++		err = clk_prepare_enable(dev->lpo_clk);
  		if (err)
  			return err;
-@@ -228,7 +228,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
++
++		err = clk_prepare_enable(dev->txco_clk);
++		if (err)
++			goto err_lpo_clk_disable;
+ 	}
+ 
+ 	err = dev->set_shutdown(dev, powered);
+ 	if (err)
+-		goto err_clk_disable;
++		goto err_txco_clk_disable;
+ 
+ 	err = dev->set_device_wakeup(dev, powered);
  	if (err)
  		goto err_revert_shutdown;
  
--	if (!powered && !IS_ERR(dev->clk) && dev->clk_enabled)
-+	if (!powered && dev->clk_enabled)
- 		clk_disable_unprepare(dev->clk);
+-	if (!powered && dev->clk_enabled)
++	if (!powered && dev->clk_enabled) {
+ 		clk_disable_unprepare(dev->txco_clk);
++		clk_disable_unprepare(dev->lpo_clk);
++	}
  
  	dev->clk_enabled = powered;
-@@ -238,7 +238,7 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+ 
+@@ -237,9 +252,12 @@ static int bcm_gpio_set_power(struct bcm_device *dev, bool powered)
+ 
  err_revert_shutdown:
  	dev->set_shutdown(dev, !powered);
- err_clk_disable:
--	if (powered && !IS_ERR(dev->clk) && !dev->clk_enabled)
+-err_clk_disable:
++err_txco_clk_disable:
+ 	if (powered && !dev->clk_enabled)
+ 		clk_disable_unprepare(dev->txco_clk);
++err_lpo_clk_disable:
 +	if (powered && !dev->clk_enabled)
- 		clk_disable_unprepare(dev->clk);
++		clk_disable_unprepare(dev->lpo_clk);
  	return err;
  }
-@@ -911,6 +911,10 @@ static int bcm_get_resources(struct bcm_device *dev)
- 	if (dev->clk == ERR_PTR(-EPROBE_DEFER))
- 		return PTR_ERR(dev->clk);
  
-+	/* Ignore all other errors as before */
-+	if (IS_ERR(dev->clk))
-+		dev->clk = NULL;
+@@ -934,6 +952,19 @@ static int bcm_get_resources(struct bcm_device *dev)
+ 	if (IS_ERR(dev->txco_clk))
+ 		dev->txco_clk = NULL;
+ 
++	dev->lpo_clk = devm_clk_get(dev->dev, "lpo");
++	if (dev->lpo_clk == ERR_PTR(-EPROBE_DEFER))
++		return PTR_ERR(dev->lpo_clk);
++
++	if (IS_ERR(dev->lpo_clk))
++		dev->lpo_clk = NULL;
++
++	/* Check if we accidentally fetched the lpo clock twice */
++	if (dev->lpo_clk && clk_is_match(dev->lpo_clk, dev->txco_clk)) {
++		devm_clk_put(dev->dev, dev->txco_clk);
++		dev->txco_clk = NULL;
++	}
 +
  	dev->device_wakeup = devm_gpiod_get_optional(dev->dev, "device-wakeup",
  						     GPIOD_OUT_LOW);
