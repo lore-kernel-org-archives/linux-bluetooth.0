@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A900C43612
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACE36C43444
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0529A217FB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A6E42183F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731343AbeLQEFJ (ORCPT
+        id S1731307AbeLQEFJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Sun, 16 Dec 2018 23:05:09 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:53080 "EHLO
+Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:53112 "EHLO
         wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726395AbeLQEFJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1726430AbeLQEFJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Sun, 16 Dec 2018 23:05:09 -0500
 Received: by wens.csie.org (Postfix, from userid 1000)
-        id 497FA5FCFC; Mon, 17 Dec 2018 12:05:03 +0800 (CST)
+        id 5D3875FD0F; Mon, 17 Dec 2018 12:05:03 +0800 (CST)
 From:   Chen-Yu Tsai <wens@csie.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -31,11 +31,10 @@ Cc:     Chen-Yu Tsai <wens@csie.org>,
         Loic Poulain <loic.poulain@gmail.com>,
         linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Rob Herring <robh@kernel.org>,
-        Ondrej Jirman <megous@megous.com>
-Subject: [PATCH v3 02/15] dt-bindings: net: broadcom-bluetooth: Add VBAT and VDDIO supplies
-Date:   Mon, 17 Dec 2018 12:04:36 +0800
-Message-Id: <20181217040449.31437-3-wens@csie.org>
+        Rob Herring <robh@kernel.org>
+Subject: [PATCH v3 04/15] dt-bindings: net: broadcom-bluetooth: Add BCM4330 compatible string
+Date:   Mon, 17 Dec 2018 12:04:38 +0800
+Message-Id: <20181217040449.31437-5-wens@csie.org>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20181217040449.31437-1-wens@csie.org>
 References: <20181217040449.31437-1-wens@csie.org>
@@ -46,33 +45,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The Broadcom Bluetooth chips have two power inputs, VBAT and VDDIO.
-The former provides overall power for the chip, while the latter powers
-the I/O pins and buffers.
+The BCM4330 is a 802.11 a/b/g/n WiFi + Bluetooth 4.0 chip from Broadcom.
+It is found in the Ampak AP6330 WiFi+BT module. The partiular one I have
+identifies as BCM4330B1 for Bluetooth and BCM4330/4 for WiFi.
 
-This patch adds properties for the two so we can describe the power
-supply relationships.
+It is unclear if the AP6330 module uses this revision of the BCM4330, or
+if there are multiple revisions. The module does not have revision
+markings. This patch elects to use just BCM4330 for the compatible
+string.
 
 Reviewed-by: Rob Herring <robh@kernel.org>
-Tested-by: Ondrej Jirman <megous@megous.com>
 Signed-off-by: Chen-Yu Tsai <wens@csie.org>
 ---
- Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 2 ++
- 1 file changed, 2 insertions(+)
+ Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-index 711c75ac2bb5..78cfa0fbece9 100644
+index d9d734a07faf..c26f4e11037c 100644
 --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
 +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-@@ -23,6 +23,8 @@ Optional properties:
-    - "extclk": deprecated, replaced by "txco"
-    - "txco": external reference clock (not a standalone crystal)
-    - "lpo": external low power 32.768 kHz clock
-+ - vbat-supply: phandle to regulator supply for VBAT
-+ - vddio-supply: phandle to regulator supply for VDDIO
+@@ -11,6 +11,7 @@ Required properties:
  
+  - compatible: should contain one of the following:
+    * "brcm,bcm20702a1"
++   * "brcm,bcm4330-bt"
+    * "brcm,bcm43438-bt"
  
- Example:
+ Optional properties:
 -- 
 2.20.0
 
