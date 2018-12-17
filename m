@@ -2,75 +2,85 @@ Return-Path: <SRS0=yw44=O2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C93F0C43444
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BADC43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 09:29:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5895217F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 04:06:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1FFA217F4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 09:29:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731227AbeLQEFJ (ORCPT
+        id S1731591AbeLQJ3d convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 16 Dec 2018 23:05:09 -0500
-Received: from mirror2.csie.ntu.edu.tw ([140.112.30.76]:53096 "EHLO
-        wens.csie.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731113AbeLQEFJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 16 Dec 2018 23:05:09 -0500
-Received: by wens.csie.org (Postfix, from userid 1000)
-        id 535B95FCB4; Mon, 17 Dec 2018 12:05:03 +0800 (CST)
-From:   Chen-Yu Tsai <wens@csie.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Maxime Ripard <maxime.ripard@bootlin.com>
-Cc:     Chen-Yu Tsai <wens@csie.org>,
-        Loic Poulain <loic.poulain@gmail.com>,
-        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Rob Herring <robh@kernel.org>,
-        Ondrej Jirman <megous@megous.com>
-Subject: [PATCH v3 03/15] dt-bindings: net: broadcom-bluetooth: Add BCM20702A1 compatible string
-Date:   Mon, 17 Dec 2018 12:04:37 +0800
-Message-Id: <20181217040449.31437-4-wens@csie.org>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20181217040449.31437-1-wens@csie.org>
-References: <20181217040449.31437-1-wens@csie.org>
+        Mon, 17 Dec 2018 04:29:33 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:47706 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726505AbeLQJ3d (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 17 Dec 2018 04:29:33 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 72FD129BD1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Dec 2018 09:29:32 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 6758629BD8; Mon, 17 Dec 2018 09:29:32 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 198303] Bluetooth dies after a while.
+Date:   Mon, 17 Dec 2018 09:29:32 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: mika.noren@gmail.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: PATCH_ALREADY_AVAILABLE
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-198303-62941-DAFXLDTKhj@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-198303-62941@https.bugzilla.kernel.org/>
+References: <bug-198303-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The BCM20702A1 is a Bluetooth 4.0 chip from Broadcom. It is found in the
-Ampak AP6210 WiFi+BT module, identified from the read verbose config info
-command response. However the Bluetooth firmware provided by vendors uses
-the name BCM20710. This patch elects to use the chip ID returned by the
-chip for the compatible string.
+https://bugzilla.kernel.org/show_bug.cgi?id=198303
 
-Reviewed-by: Rob Herring <robh@kernel.org>
-Tested-by: Ondrej Jirman <megous@megous.com>
-Signed-off-by: Chen-Yu Tsai <wens@csie.org>
----
- Documentation/devicetree/bindings/net/broadcom-bluetooth.txt | 1 +
- 1 file changed, 1 insertion(+)
+Mika Norén (mika.noren@gmail.com) changed:
 
-diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-index 78cfa0fbece9..d9d734a07faf 100644
---- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-+++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
-@@ -10,6 +10,7 @@ device the slave device is attached to.
- Required properties:
- 
-  - compatible: should contain one of the following:
-+   * "brcm,bcm20702a1"
-    * "brcm,bcm43438-bt"
- 
- Optional properties:
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |PATCH_ALREADY_AVAILABLE
+
+--- Comment #7 from Mika Norén (mika.noren@gmail.com) ---
+(In reply to Grzegorz from comment #4)
+> It would be helpfull if you attach logs from btmon (example: sudo btmon -i 0
+> -w btmon.log) and from bluetoothd (sudo valgrind ./bluetoothd -n -d) -
+> bluetoothd from bluez sources (you can checkout to 5.47-4 tag).
+> 
+> Regards,
+> Grzegorz
+
+As this issue has been solved in later kernel versions, I see no reason to keep
+this open. Can be marked as solved. 
+
+I'm not sure when it was solved though. Everything started to work as intended
+after an update some time ago.
+
 -- 
-2.20.0
-
+You are receiving this mail because:
+You are the assignee for the bug.
