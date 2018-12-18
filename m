@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 862C0C43387
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:32:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56751C43613
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:32:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A0C32184C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:32:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31F012184C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:32:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727565AbeLRWcB (ORCPT
+        id S1727586AbeLRWcE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 17:32:01 -0500
-Received: from mga03.intel.com ([134.134.136.65]:60670 "EHLO mga03.intel.com"
+        Tue, 18 Dec 2018 17:32:04 -0500
+Received: from mga03.intel.com ([134.134.136.65]:60672 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727548AbeLRWb6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 17:31:58 -0500
+        id S1727522AbeLRWb4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 17:31:56 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
   by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 14:31:52 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,370,1539673200"; 
-   d="scan'208";a="101704222"
+   d="scan'208";a="101704209"
 Received: from bgix-dell-lap.sea.intel.com ([10.241.111.161])
   by orsmga006.jf.intel.com with ESMTP; 18 Dec 2018 14:31:52 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org
-Subject: [PATCH BlueZ v4 28/30] mesh: Sample On/Off Client and Server
-Date:   Tue, 18 Dec 2018 14:31:37 -0800
-Message-Id: <20181218223139.8041-29-brian.gix@intel.com>
+Subject: [PATCH BlueZ v4 24/30] mesh: Update for DBus API and multi-node support
+Date:   Tue, 18 Dec 2018 14:31:33 -0800
+Message-Id: <20181218223139.8041-25-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181218223139.8041-1-brian.gix@intel.com>
 References: <20181218223139.8041-1-brian.gix@intel.com>
@@ -46,677 +46,153 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Inga Stotland <inga.stotland@intel.com>
 
 ---
- mesh/test/example-onoff-client | 288 ++++++++++++++++++++++++++++++++
- mesh/test/example-onoff-server | 365 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 653 insertions(+)
- create mode 100644 mesh/test/example-onoff-client
- create mode 100644 mesh/test/example-onoff-server
+ mesh/main.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 66 insertions(+), 7 deletions(-)
 
-diff --git a/mesh/test/example-onoff-client b/mesh/test/example-onoff-client
-new file mode 100644
-index 000000000..e4a87eb12
---- /dev/null
-+++ b/mesh/test/example-onoff-client
-@@ -0,0 +1,288 @@
-+#!/usr/bin/env python3
-+
-+import sys
-+import struct
-+import numpy
-+import dbus
-+import dbus.service
-+import dbus.exceptions
-+
-+try:
-+  from gi.repository import GObject
-+except ImportError:
-+  import gobject as GObject
-+from dbus.mainloop.glib import DBusGMainLoop
-+
-+MESH_SERVICE_NAME = 'org.bluez.mesh'
-+DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
-+DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
-+
-+MESH_NETWORK_IFACE = 'org.bluez.mesh.Network1'
-+MESH_NODE_IFACE = 'org.bluez.mesh.Node1'
-+MESH_ELEMENT_IFACE = 'org.bluez.mesh.Element1'
-+
-+VENDOR_ID_NONE = 0xffff
-+
-+app = None
-+bus = None
-+mainloop = None
-+node = None
-+token = numpy.uint64(0x76bd4f2372477600)
-+
-+def unwrap(item):
-+	if isinstance(item, dbus.Boolean):
-+		return bool(item)
-+	if isinstance(item, (dbus.UInt16, dbus.Int16, dbus.UInt32, dbus.Int32,
-+						dbus.UInt64, dbus.Int64)):
-+		return int(item)
-+	if isinstance(item, dbus.Byte):
-+		return bytes([int(item)])
-+	if isinstance(item, dbus.String):
-+			return item
-+	if isinstance(item, (dbus.Array, list, tuple)):
-+		return [unwrap(x) for x in item]
-+	if isinstance(item, (dbus.Dictionary, dict)):
-+		return dict([(unwrap(x), unwrap(y)) for x, y in item.items()])
-+
-+	print('Dictionary item not handled')
-+	print(type(item))
-+	return item
-+
-+def attach_app_cb(node_path, dict_array):
-+	print('Mesh application registered ', node_path)
-+	print(type(node_path))
-+	print(type(dict_array))
-+	print(dict_array)
-+
-+	els = unwrap(dict_array)
-+	print("Get Elements")
-+	for el in els:
-+		print(el)
-+		idx = struct.unpack('b', el[0])[0]
-+		print('Configuration for Element ', end='')
-+		print(idx)
-+		models = el[1]
-+
-+		element = app.get_element(idx)
-+		element.set_model_config(models)
-+
-+	obj = bus.get_object(MESH_SERVICE_NAME, node_path)
-+	global node
-+	node = dbus.Interface(obj, MESH_NODE_IFACE)
-+
-+def error_cb(error):
-+	print('D-Bus call failed: ' + str(error))
-+
-+def generic_reply_cb():
-+	print('D-Bus call done')
-+
-+def interfaces_removed_cb(object_path, interfaces):
-+	if not mesh_net:
-+		return
-+
-+	if object_path == mesh_net[2]:
-+		print('Service was removed')
-+		mainloop.quit()
-+
-+class Application(dbus.service.Object):
-+
-+	def __init__(self, bus):
-+		self.path = '/example'
-+		self.elements = []
-+		dbus.service.Object.__init__(self, bus, self.path)
-+
-+	def get_path(self):
-+		return dbus.ObjectPath(self.path)
-+
-+	def add_element(self, element):
-+		self.elements.append(element)
-+
-+	def get_element(self, idx):
-+		for ele in self.elements:
-+			if ele.get_index() == idx:
-+				return ele
-+
-+	@dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
-+	def GetManagedObjects(self):
-+		response = {}
-+		print('GetManagedObjects')
-+		for element in self.elements:
-+			response[element.get_path()] = element.get_properties()
-+		return response
-+
-+class Element(dbus.service.Object):
-+	PATH_BASE = '/example/ele'
-+
-+	def __init__(self, bus, index):
-+		self.path = self.PATH_BASE + format(index, '02x')
-+		print(self.path)
-+		self.models = []
-+		self.bus = bus
-+		self.index = index
-+		dbus.service.Object.__init__(self, bus, self.path)
-+
-+	def _get_sig_models(self):
-+		ids = []
-+		for model in self.models:
-+			id = model.get_id()
-+			vendor = model.get_vendor()
-+			if vendor == VENDOR_ID_NONE:
-+				ids.append(id)
-+		return ids
-+
-+	def get_properties(self):
-+		return {
-+				MESH_ELEMENT_IFACE: {
-+				'Index': dbus.Byte(self.index),
-+				'Models': dbus.Array(
-+					self._get_sig_models(), signature='q')
-+				}
-+		}
-+
-+	def add_model(self, model):
-+		model.set_path(self.path)
-+		self.models.append(model)
-+
-+	def get_index(self):
-+		return self.index
-+
-+	def set_model_config(self, config):
-+		print('Set element models config')
-+
-+	@dbus.service.method(MESH_ELEMENT_IFACE,
-+					in_signature="qqbay", out_signature="")
-+	def MessageReceived(self, source, key, is_sub, data):
-+		print('Message Received on Element ', end='')
-+		print(self.index)
-+		for model in self.models:
-+			model.process_message(source, key, data)
-+
-+	@dbus.service.method(MESH_ELEMENT_IFACE,
-+					in_signature="qa{sv}", out_signature="")
-+
-+	def UpdateModelConfiguration(self, model_id, config):
-+		print('UpdateModelConfig ', end='')
-+		print(hex(model_id))
-+		for model in self.models:
-+			if model_id == model.get_id():
-+				model.set_config(config)
-+				return
-+
-+	@dbus.service.method(MESH_ELEMENT_IFACE,
-+					in_signature="", out_signature="")
-+	def get_path(self):
-+		return dbus.ObjectPath(self.path)
-+
-+class Model():
-+	def __init__(self, model_id):
-+		self.cmd_ops = []
-+		self.model_id = model_id
-+		self.vendor = VENDOR_ID_NONE
-+		self.path = None
-+
-+	def set_path(self, path):
-+		self.path = path
-+
-+	def get_id(self):
-+		return self.model_id
-+
-+	def get_vendor(self):
-+		return self.vendor
-+
-+	def process_message(self, source, key, data):
-+		print('Model process message')
-+
-+	def set_publication(self, period):
-+		self.period = period
-+
-+	def set_bindings(self, bindings):
-+		self.bindings = bindings
-+
-+	def set_config(self, config):
-+		if 'Bindings' in config:
-+			self.bindings = config.get('Bindings')
-+			print('Bindings: ', end='')
-+			print(self.bindings)
-+		if 'PublicationPeriod' in config:
-+			self.set_publication(config.get('PublicationPeriod'))
-+			print('Model publication period ', end='')
-+			print(self.pub_period, end='')
-+			print(' ms')
-+
-+class OnOffClient(Model):
-+	def __init__(self, model_id):
-+		Model.__init__(self, model_id)
-+		self.cmd_ops = { 0x8201, # get
-+						 0x8202, # set
-+						 0x8203 } # set unacknowledged
-+		print('OnOff Client')
-+
-+	def _reply_cb(state):
-+		print('State ', end='');
-+		print(state)
-+
-+	def _send_message(self, dest, key, data, reply_cb):
-+		print('OnOffClient send data')
-+		node.Send(self.path, dest, key, data, reply_handler=reply_cb,
-+				  error_handler=error_cb)
-+
-+	def get_state(self, dest, key):
-+		opcode = 0x8201
-+		data = struct.pack('<H', opcode)
-+		self._send_message(dest, key, data, self._reply_cb)
-+
-+	def set_state(self, dest, key, state):
-+		opcode = 0x8202
-+		data = struct.pack('<HB', opcode, state)
-+		self._send_message(dest, key, data, self._reply_cb)
-+
-+	def process_message(self, source, key, data):
-+		print('OnOffClient process message len ', end = '')
-+		datalen = len(data)
-+		print(datalen)
-+
-+		if datalen!=3:
-+			return
-+
-+		opcode, state=struct.unpack('<HB',bytes(data))
-+		if opcode != 0x8202 :
-+			print('Bad opcode ', end='')
-+			print(hex(opcode))
-+			return
-+
-+		print('Got state ', end = '')
-+		print(hex(state))
-+
-+def attach_app_error_cb(error):
-+	print('Failed to register application: ' + str(error))
-+	mainloop.quit()
-+
-+def main():
-+
-+	DBusGMainLoop(set_as_default=True)
-+
-+	global bus
-+	bus = dbus.SystemBus()
-+	global mainloop
-+	global app
-+
-+	mesh_net = dbus.Interface(bus.get_object(MESH_SERVICE_NAME,
-+							"/org/bluez/mesh"),
-+							MESH_NETWORK_IFACE)
-+	mesh_net.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
-+
-+	app = Application(bus)
-+	first_ele = Element(bus, 0x00)
-+	first_ele.add_model(OnOffClient(0x1001))
-+	app.add_element(first_ele)
-+
-+	mainloop = GObject.MainLoop()
-+
-+	print('Attach')
-+	mesh_net.Attach(app.get_path(), token,
-+					reply_handler=attach_app_cb,
-+					error_handler=attach_app_error_cb)
-+	mainloop.run()
-+
-+if __name__ == '__main__':
-+	main()
-diff --git a/mesh/test/example-onoff-server b/mesh/test/example-onoff-server
-new file mode 100644
-index 000000000..131b6415c
---- /dev/null
-+++ b/mesh/test/example-onoff-server
-@@ -0,0 +1,365 @@
-+#!/usr/bin/env python3
-+
-+import sys
-+import struct
-+import numpy
-+import dbus
-+import dbus.service
-+import dbus.exceptions
-+
-+from threading import Timer
-+import time
-+
-+
-+try:
-+  from gi.repository import GObject
-+except ImportError:
-+  import gobject as GObject
-+from dbus.mainloop.glib import DBusGMainLoop
-+
-+MESH_SERVICE_NAME = 'org.bluez.mesh'
-+DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
-+DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
-+
-+MESH_NETWORK_IFACE = 'org.bluez.mesh.Network1'
-+MESH_NODE_IFACE = 'org.bluez.mesh.Node1'
-+MESH_APPLICATION_IFACE = 'org.bluez.mesh.Application1'
-+MESH_ELEMENT_IFACE = 'org.bluez.mesh.Element1'
-+
-+APP_COMPANY_ID = 0x05f1
-+APP_PRODUCT_ID = 0x0001
-+APP_VERSION_ID = 0x0001
-+
-+VENDOR_ID_NONE = 0xffff
-+
-+app = None
-+bus = None
-+mainloop = None
-+node = None
-+
-+token = numpy.uint64(0x76bd4f2372476578)
-+
-+def generic_error_cb(error):
-+	print('D-Bus call failed: ' + str(error))
-+
-+def generic_reply_cb():
-+	print('D-Bus call done')
-+
-+def unwrap(item):
-+	if isinstance(item, dbus.Boolean):
-+		return bool(item)
-+	if isinstance(item, (dbus.UInt16, dbus.Int16, dbus.UInt32, dbus.Int32,
-+						dbus.UInt64, dbus.Int64)):
-+		return int(item)
-+	if isinstance(item, dbus.Byte):
-+		return bytes([int(item)])
-+	if isinstance(item, dbus.String):
-+			return item
-+	if isinstance(item, (dbus.Array, list, tuple)):
-+		return [unwrap(x) for x in item]
-+	if isinstance(item, (dbus.Dictionary, dict)):
-+		return dict([(unwrap(x), unwrap(y)) for x, y in item.items()])
-+
-+	print('Dictionary item not handled')
-+	print(type(item))
-+	return item
-+
-+def attach_app_cb(node_path, dict_array):
-+	print('Mesh application registered ', node_path)
-+
-+	obj = bus.get_object(MESH_SERVICE_NAME, node_path)
-+
-+	global node
-+	node = dbus.Interface(obj, MESH_NODE_IFACE)
-+
-+	els = unwrap(dict_array)
-+	print("Get Elements")
-+
-+	for el in els:
-+		idx = struct.unpack('b', el[0])[0]
-+		print('Configuration for Element ', end='')
-+		print(idx)
-+
-+		models = el[1]
-+		element = app.get_element(idx)
-+		element.set_model_config(models)
-+
-+def interfaces_removed_cb(object_path, interfaces):
-+	if not mesh_net:
-+		return
-+
-+	if object_path == mesh_net[2]:
-+		print('Service was removed')
-+		mainloop.quit()
-+
-+def send_response(path, dest, key, data):
-+		print('send response ', end='')
-+		print(data)
-+		node.Send(path, dest, key, data, reply_handler=generic_reply_cb,
-+						error_handler=generic_error_cb)
-+
-+def send_publication(path, model_id, data):
-+		print('send publication ', end='')
-+		print(data)
-+		node.Publish(path, model_id, data,
-+						reply_handler=generic_reply_cb,
-+						error_handler=generic_error_cb)
-+
-+class PubTimer():
-+	def __init__(self):
-+		self.seconds = None
-+		self.func = None
-+		self.thread = None
-+		self.busy = False
-+
-+	def _timeout_cb(self):
-+		self.func()
-+		self.busy = True
-+		self._schedule_timer()
-+		self.busy =False
-+
-+	def _schedule_timer(self):
-+		self.thread = Timer(self.seconds, self._timeout_cb)
-+		self.thread.start()
-+
-+	def start(self, seconds, func):
-+		self.func = func
-+		self.seconds = seconds
-+		if not self.busy:
-+			self._schedule_timer()
-+
-+	def cancel(self):
-+		print('Cancel timer')
-+		if self.thread is not None:
-+			print('Cancel thread')
-+			self.thread.cancel()
-+			self.thread = None
-+
-+class Application(dbus.service.Object):
-+
-+	def __init__(self, bus):
-+		self.path = '/example'
-+		self.elements = []
-+		dbus.service.Object.__init__(self, bus, self.path)
-+
-+	def get_path(self):
-+		return dbus.ObjectPath(self.path)
-+
-+	def add_element(self, element):
-+		self.elements.append(element)
-+
-+	def get_element(self, idx):
-+		for ele in self.elements:
-+			if ele.get_index() == idx:
-+				return ele
-+
-+	def get_properties(self):
-+		return {
-+			MESH_APPLICATION_IFACE: {
-+				'CompanyID': dbus.UInt16(APP_COMPANY_ID),
-+				'ProductID': dbus.UInt16(APP_PRODUCT_ID),
-+				'VersionID': dbus.UInt16(APP_VERSION_ID)
-+			}
-+		}
-+
-+	@dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
-+	def GetManagedObjects(self):
-+		response = {}
-+		print('GetManagedObjects')
-+		response[self.path] = self.get_properties()
-+		for element in self.elements:
-+			response[element.get_path()] = element.get_properties()
-+		return response
-+
-+class Element(dbus.service.Object):
-+	PATH_BASE = '/example/ele'
-+
-+	def __init__(self, bus, index):
-+		self.path = self.PATH_BASE + format(index, '02x')
-+		print(self.path)
-+		self.models = []
-+		self.bus = bus
-+		self.index = index
-+		dbus.service.Object.__init__(self, bus, self.path)
-+
-+	def _get_sig_models(self):
-+		ids = []
-+		for model in self.models:
-+			id = model.get_id()
-+			vendor = model.get_vendor()
-+			if vendor == VENDOR_ID_NONE:
-+				ids.append(id)
-+		return ids
-+
-+	def get_properties(self):
-+		return {
-+			MESH_ELEMENT_IFACE: {
-+				'Index': dbus.Byte(self.index),
-+				'Models': dbus.Array(
-+					self._get_sig_models(), signature='q')
-+			}
-+		}
-+
-+	def add_model(self, model):
-+		model.set_path(self.path)
-+		self.models.append(model)
-+
-+	def get_index(self):
-+		return self.index
-+
-+	def set_model_config(self, configs):
-+		print('Set element models config')
-+		for config in configs:
-+			mod_id = config[0]
-+			self.UpdateModelConfiguration(mod_id, config[1])
-+
-+	@dbus.service.method(MESH_ELEMENT_IFACE,
-+					in_signature="qqbay", out_signature="")
-+	def MessageReceived(self, source, key, is_sub, data):
-+		print('Message Received on Element ', end='')
-+		print(self.index)
-+		for model in self.models:
-+			model.process_message(source, key, data)
-+
-+	@dbus.service.method(MESH_ELEMENT_IFACE,
-+					in_signature="qa{sv}", out_signature="")
-+
-+	def UpdateModelConfiguration(self, model_id, config):
-+		print('UpdateModelConfig ', end='')
-+		print(hex(model_id))
-+		for model in self.models:
-+			if model_id == model.get_id():
-+				model.set_config(config)
-+				return
-+
-+	@dbus.service.method(MESH_ELEMENT_IFACE,
-+					in_signature="", out_signature="")
-+
-+	def get_path(self):
-+		return dbus.ObjectPath(self.path)
-+
-+class Model():
-+	def __init__(self, model_id):
-+		self.cmd_ops = []
-+		self.model_id = model_id
-+		self.vendor = VENDOR_ID_NONE
-+		self.bindings = []
-+		self.pub_period = 0
-+		self.pub_id = 0
-+		self.path = None
-+
-+	def set_path(self, path):
-+		self.path = path
-+
-+	def get_id(self):
-+		return self.model_id
-+
-+	def get_vendor(self):
-+		return self.vendor
-+
-+	def process_message(self, source, key, data):
-+		print('Model process message')
-+
-+	def set_publication(self, period):
-+		self.pub_period = period
-+
-+	def set_config(self, config):
-+		if 'Bindings' in config:
-+			self.bindings = config.get('Bindings')
-+			print('Bindings: ', end='')
-+			print(self.bindings)
-+		if 'PublicationPeriod' in config:
-+			self.set_publication(config.get('PublicationPeriod'))
-+			print('Model publication period ', end='')
-+			print(self.pub_period, end='')
-+			print(' ms')
-+
-+class OnOffServer(Model):
-+	def __init__(self, model_id):
-+		Model.__init__(self, model_id)
-+		self.cmd_ops = { 0x8201, # get
-+						 0x8202, # set
-+						 0x8203 } # set unacknowledged
-+
-+		print("OnOff Server ", end="")
-+		self.state = 0
-+		print('State ', end='')
-+		self.timer = PubTimer()
-+
-+	def process_message(self, source, key, data):
-+		datalen = len(data)
-+		print('OnOff Server process message len ', datalen)
-+
-+		if datalen!=2 and datalen!=3:
-+			return
-+
-+		if datalen==2:
-+			op_tuple=struct.unpack('<H',bytes(data))
-+			opcode = op_tuple[0]
-+			if opcode != 0x8201:
-+				print(hex(opcode))
-+				return
-+			print('Get state')
-+		elif datalen==3:
-+			opcode,self.state=struct.unpack('<HB',bytes(data))
-+			if opcode != 0x8202 and opcode != 0x8203:
-+				print(hex(opcode))
-+				return
-+			print('Set state: ', end='')
-+			print(self.state)
-+
-+		rsp_data = struct.pack('<HB', 0x8204, self.state)
-+		send_response(self.path, source, key, rsp_data)
-+
-+	def publish(self):
-+		print('Publish')
-+		data = struct.pack('B', self.state)
-+		send_publication(self.path, self.model_id, data)
-+
-+	def set_publication(self, period):
-+		if period == 0:
-+			self.pub_period = 0
-+			self.timer.cancel()
-+			return
-+
-+		# We do not handle ms in this example
-+		if period < 1000:
-+			return
-+
-+		self.pub_period = period
-+		self.timer.start(period/1000, self.publish)
-+
-+def attach_app_error_cb(error):
-+	print('Failed to register application: ' + str(error))
-+	mainloop.quit()
-+
-+def main():
-+
-+	DBusGMainLoop(set_as_default=True)
-+
-+	global bus
-+	bus = dbus.SystemBus()
-+	global mainloop
-+	global app
-+
-+	mesh_net = dbus.Interface(bus.get_object(MESH_SERVICE_NAME,
-+						"/org/bluez/mesh"),
-+						MESH_NETWORK_IFACE)
-+	mesh_net.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
-+
-+	app = Application(bus)
-+	first_ele = Element(bus, 0x00)
-+	first_ele.add_model(OnOffServer(0x1000))
-+	app.add_element(first_ele)
-+
-+	mainloop = GObject.MainLoop()
-+
-+	print('Attach')
-+	mesh_net.Attach(app.get_path(), token,
-+					reply_handler=attach_app_cb,
-+					error_handler=attach_app_error_cb)
-+
-+	mainloop.run()
-+
-+if __name__ == '__main__':
-+	main()
+diff --git a/mesh/main.c b/mesh/main.c
+index 173f57a8f..95a66cc9d 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -33,11 +33,14 @@
+ #include <sys/stat.h>
+ #include <ell/ell.h>
+ 
++#include <dbus/dbus.h>
++
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+ 
+ #include "mesh/mesh.h"
+ #include "mesh/net.h"
++#include "mesh/dbus.h"
+ #include "mesh/storage.h"
+ 
+ static const struct option main_options[] = {
+@@ -56,12 +59,46 @@ static void usage(void)
+ 	       "\tmeshd [options]\n");
+ 	l_info("Options:\n"
+ 	       "\t--index <hcinum>  Use specified controller\n"
+-	       "\t--config          Configuration file\n"
++	       "\t--config          Configuration directory\n"
+ 	       "\t--nodetach        Run in foreground\n"
+ 	       "\t--debug           Enable debug output\n"
+ 	       "\t--help            Show %s information\n", __func__);
+ }
+ 
++static void do_debug(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
++
++	l_info("%s%s", prefix, str);
++}
++
++static void request_name_callback(struct l_dbus *dbus, bool success,
++					bool queued, void *user_data)
++{
++	l_info("Request name %s",
++		success ? "success": "failed");
++
++	if (success)
++		dbus_init(dbus);
++	else
++		l_main_quit();
++}
++
++static void ready_callback(void *user_data)
++{
++	struct l_dbus *dbus = user_data;
++
++	l_info("D-Bus ready");
++	l_dbus_name_acquire(dbus, BLUEZ_MESH_NAME, false, false, false,
++						request_name_callback, NULL);
++
++}
++
++static void disconnect_callback(void *user_data)
++{
++	l_main_quit();
++}
++
+ static void signal_handler(uint32_t signo, void *user_data)
+ {
+ 	static bool terminated;
+@@ -78,8 +115,9 @@ int main(int argc, char *argv[])
+ {
+ 	int status;
+ 	bool detached = true;
+-	struct bt_mesh *mesh = NULL;
+-	const char *config_file = NULL;
++	bool dbus_debug = false;
++	struct l_dbus *dbus = NULL;
++	const char *config_dir = NULL;
+ 	int index = MGMT_INDEX_NONE;
+ 
+ 	if (!l_main_init())
+@@ -91,7 +129,7 @@ int main(int argc, char *argv[])
+ 		int opt;
+ 		const char *str;
+ 
+-		opt = getopt_long(argc, argv, "i:c:ndh", main_options, NULL);
++		opt = getopt_long(argc, argv, "i:c:ndbh", main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+ 
+@@ -117,7 +155,10 @@ int main(int argc, char *argv[])
+ 			l_debug_enable("*");
+ 			break;
+ 		case 'c':
+-			config_file = optarg;
++			config_dir = optarg;
++			break;
++		case 'b':
++			dbus_debug = true;
+ 			break;
+ 		case 'h':
+ 			usage();
+@@ -130,7 +171,7 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
+-	if (!mesh_new(index, config_file)) {
++	if (!mesh_init(index, config_dir)) {
+ 		l_error("Failed to initialize mesh");
+ 		status = EXIT_FAILURE;
+ 		goto done;
+@@ -138,6 +179,24 @@ int main(int argc, char *argv[])
+ 
+ 	umask(0077);
+ 
++	dbus = l_dbus_new_default(L_DBUS_SYSTEM_BUS);
++	if (!dbus) {
++		l_error("unable to connect to D-Bus");
++		status = EXIT_FAILURE;
++		goto done;
++	}
++
++	if (dbus_debug)
++		l_dbus_set_debug(dbus, do_debug, "[DBUS] ", NULL);
++	l_dbus_set_ready_handler(dbus, ready_callback, dbus, NULL);
++	l_dbus_set_disconnect_handler(dbus, disconnect_callback, NULL, NULL);
++
++	if (!l_dbus_object_manager_enable(dbus)) {
++		l_error("Failed to enable Object Manager");
++		status = EXIT_FAILURE;
++		goto done;
++	}
++
+ 	if (detached) {
+ 		if (daemon(0, 0)) {
+ 			perror("Failed to start meshd daemon");
+@@ -149,8 +208,8 @@ int main(int argc, char *argv[])
+ 	status = l_main_run_with_signal(signal_handler, NULL);
+ 
+ done:
+-	mesh_unref(mesh);
+ 	mesh_cleanup();
++	l_dbus_destroy(dbus);
+ 	l_main_exit();
+ 
+ 	return status;
 -- 
 2.14.5
 
