@@ -2,109 +2,158 @@ Return-Path: <SRS0=Q26+=O3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EB8C43387
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 13:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5929EC43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 14:50:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9431421871
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 13:47:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2528121850
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 14:50:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qqCq2i9Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726631AbeLRNri convert rfc822-to-8bit (ORCPT
+        id S1726588AbeLROui (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 08:47:38 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:51963 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726426AbeLRNri (ORCPT
+        Tue, 18 Dec 2018 09:50:38 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40554 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726426AbeLROui (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 08:47:38 -0500
-Received: from marcel-macpro.fritz.box (p4FF9F1DE.dip0.t-ipconnect.de [79.249.241.222])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 4D69ECF35C;
-        Tue, 18 Dec 2018 14:55:16 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH BlueZ v3 00/30] Major rewrite for Multi-Node and DBus
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <110368016.VWXbCARz0c@ix>
-Date:   Tue, 18 Dec 2018 14:47:36 +0100
-Cc:     Brian Gix <brian.gix@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <73E0C5F2-1162-4857-976A-EDE376D55747@holtmann.org>
-References: <20181215002624.9313-1-brian.gix@intel.com>
- <DEBB0CAA2616974FAE35E4B560B9A4375D8E01AF@ORSMSX101.amr.corp.intel.com>
- <17761993.WvVeqkb5i9@ix> <110368016.VWXbCARz0c@ix>
-To:     Szymon Janc <szymon.janc@codecoup.pl>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Tue, 18 Dec 2018 09:50:38 -0500
+Received: by mail-wr1-f66.google.com with SMTP id p4so16194081wrt.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Dec 2018 06:50:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=hZWmzV34HLvL3UIv8VW+OCuSuWZohMPYZe2FaBUoZFg=;
+        b=qqCq2i9ZjcYwXrmGMFPeGyE6ozfiO32/xOp+Z+oo51m28MFk6LDX/39IVTpqyYSlCo
+         HufdODWiYKIAd/2vjPyss/6tEXsg/vaKI3l7LJgliFky9DvO/1UhgRddqu6SOIP74t7F
+         g4U0BkR1S/kO9Q2W2uE+4ahC3q7zG/y15HsPijCJE32bmU/RzuOAuMyEyxvjYW7pUmWh
+         xycHUW1ki/my23Uc9aYGKdVY3Cy4WRSMvimvO+S6BLuLJ87a9cCl/qCY3igFh9YH/u7D
+         VN8dBVVuibiTrrKrMZiCGbHwlBHwABBvuqvn4FuQMcRbUxibAVuL6tvS9M8kfmqAOVZN
+         ORzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=hZWmzV34HLvL3UIv8VW+OCuSuWZohMPYZe2FaBUoZFg=;
+        b=HyUV46Pzl5xBQO0FqFMZDwaYMvVBTxxue0W3+VzFnZyUF7lN2VbRcFh3/Mv9lqI2vI
+         56ox6rLmo1xOL6ESKU64UX4WpSXd+WO7krci3a8qugeV3SzPiKRPsM2ptRUne0TLvaLX
+         PiOrB2EhoF4wsITSFcwRbXJE4C33TwnM94g+3FsfD+V0ai+X8m2XUMY4n5PCY1GQG/O8
+         x8Yt0ZgDGBBvZfbQLk0gfO2JHu5+BVZv8BdaZkVpgE+rvhbNL1u/ooa0p1VhsMF42On1
+         W9iA0u8/mug6lrUpLyXKlZVXfEvYMooOQrD403gLMgoUFQ0s1Udn0OeiBeEyFh5gDscc
+         DSpQ==
+X-Gm-Message-State: AA+aEWZdjYvqhBSEgoeiRAox/5KQ4kMqriJfeav1zGptqPyvUH4G/Meu
+        jVo4b+ohAllY9NPspznQnkY9LW5WPQY=
+X-Google-Smtp-Source: AFSGD/W637FC58A/PgEfKb7Y2ZD3vYjpUjft4dctZWKMBezpv0UsIyK3v8E44oxpzbzpvXYHyvQLmQ==
+X-Received: by 2002:adf:9205:: with SMTP id 5mr5488327wrj.189.1545144635948;
+        Tue, 18 Dec 2018 06:50:35 -0800 (PST)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id n15sm3214134wrt.21.2018.12.18.06.50.34
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 18 Dec 2018 06:50:34 -0800 (PST)
+Date:   Tue, 18 Dec 2018 15:50:33 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: Bluez has fully broken profiles/audio/a2dp-codecs.h file for big
+ endian
+Message-ID: <20181218145033.itlwcfraxsusafb3@pali>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="y7ncv4bwoypndujv"
+Content-Disposition: inline
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
 
->>> This patch-set has been applied upstream.
->> 
->> There is something wrong with Makefile.mesh
->> 
->> Makefile.am: installing './depcomp'
->> parallel-tests: installing './test-driver'
->> Makefile.mesh:31: warning: variable 'mesh_btmesh_LDADD' is defined but no
->> program or
->> Makefile.mesh:31: library has 'mesh_btmesh' as canonical name (possible
->> typo) Makefile.am:306:   'Makefile.mesh' included from here
->> Makefile.mesh:32: warning: variable 'mesh_btmesh_DEPENDENCIES' is defined
->> but no program or
->> Makefile.mesh:32: library has 'mesh_btmesh' as canonical name (possible
->> typo) Makefile.am:306:   'Makefile.mesh' included from here
->> 
->> 
->> Enabling commented out code (why is it commented out btw?) in Makefile.mesh
->> stil results in:
->> 
->> Makefile.mesh:39: warning: mesh_btmesh_LDADD multiply defined in condition
->> MESH ...
->> Makefile.am:306:   'Makefile.mesh' included from here
->> Makefile.mesh:31: ... 'mesh_btmesh_LDADD' previously defined here
->> Makefile.am:306:   'Makefile.mesh' included from here
->> 
-> 
-> 
-> This seems to fix warnign for me. Was ot on purpose that btmesh wasn't added 
-> to noinst ?
-> 
-> 
-> diff --git a/Makefile.mesh b/Makefile.mesh
-> index 5344fbb21..1b8adea7e 100644
-> --- a/Makefile.mesh
-> +++ b/Makefile.mesh
-> @@ -31,8 +31,8 @@ mesh_meshd_DEPENDENCIES = $(ell_dependencies)
-> mesh_btmesh_LDADD = src/libshared-mainloop.la $(ell_ldadd) -lreadline -ljson-
-> c
-> mesh_btmesh_DEPENDENCIES = $(ell_dependencies)
-> 
-> -#
-> -# noinst_PROGRAMS += mesh/btmesh
-> +noinst_PROGRAMS += mesh/btmesh
-> +
-> #
-> # mesh_btmesh_SOURCES = $(mesh_sources) \
-> #                                              mesh/btmesh.c
-> 
+--y7ncv4bwoypndujv
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+Hello,
 
-so this stuff is _not_ acceptable at all. Please stop treating bluez.git as your playground. It is your responsibility that such patches are not applied.
+I spotted that bluez has file profiles/audio/a2dp-codecs.h in its git
+repository with some #if __BYTE_ORDER =3D=3D checks, including #ifdef for
+big endian systems.
 
-We have git and so everything can be reversed and history can be restored. Commenting anything out in a Makefile is never needed and a total no-go. Same applies to *.c files. I do not want staging or untested stuff in the main tree. I also do not want any dead files in the tree that are not build. Clone your tree on github or somewhere else if you want to experiment.
+But this file is fully broken for big endian systems. For example, there
+is following structure which is same for both little and big endian
+systems:
 
-I am reverting the whole set of patches and doing a push —force. You need to start over.
+  typedef struct {
+  	uint32_t vendor_id;
+  	uint16_t codec_id;
+  } __attribute__ ((packed)) a2dp_vendor_codec_t;
 
-Regards
+Which is valid only for little endian systems, as those definitions are
+bound to little endian ordering -- not to host ordering.
 
-Marcel
+Next there is a2dp_mpeg_t. It has different definition for little endian
+and big endian systems.
 
+little endian:
+
+  typedef struct {
+  	uint8_t channel_mode:4;
+  	uint8_t crc:1;
+  	uint8_t layer:3;
+  	uint8_t frequency:6;
+  	uint8_t mpf:1;
+  	uint8_t rfa:1;
+  	uint16_t bitrate;
+  } __attribute__ ((packed)) a2dp_mpeg_t;
+
+big endian:
+
+  typedef struct {
+  	uint8_t layer:3;
+  	uint8_t crc:1;
+  	uint8_t channel_mode:4;
+  	uint8_t rfa:1;
+  	uint8_t mpf:1;
+  	uint8_t frequency:6;
+  	uint16_t bitrate;
+  } __attribute__ ((packed)) a2dp_mpeg_t;
+
+But as you can see, bitrate on big endian definition is incorrect. It
+is still in little endian. Proper way would be to define bitrate as
+"uint8_t bitrate[2];" or as "uint8_t bitrate_lo; uint8_t bitrate_hi".
+
+So basically this file a2dp-codecs.h is not compatible with big endian
+systems, even there are "#elif __BYTE_ORDER =3D=3D __BIG_ENDIAN" branches.
+
+If you are not going to support big endian systems, I suggest you to
+drop all those "#elif __BYTE_ORDER =3D=3D __BIG_ENDIAN" parts as people
+think that existence of these macros means that code is supported on big
+endian systems.
+
+It is better throw an error that big endian is broken as trying to
+produce non-working binaries.
+
+Moreover, some people started copying this a2dp-codecs.h file to other
+projects which just leads to copy+paste of broken code.
+
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
+
+--y7ncv4bwoypndujv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXBkJNgAKCRCL8Mk9A+RD
+UsdbAKCse9ktTz3le8ey5o2byPoGvJ6YvACZARJSfKggTjzyzARoWgrGN+8Ej7k=
+=x5GM
+-----END PGP SIGNATURE-----
+
+--y7ncv4bwoypndujv--
