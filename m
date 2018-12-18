@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34877C43444
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B837C43612
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:31:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ECDA6218A2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:31:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EEBB2184C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:31:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727426AbeLRWb6 (ORCPT
+        id S1727451AbeLRWbz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 17:31:58 -0500
+        Tue, 18 Dec 2018 17:31:55 -0500
 Received: from mga03.intel.com ([134.134.136.65]:60668 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727468AbeLRWb5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 17:31:57 -0500
+        id S1727063AbeLRWbw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 17:31:52 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 14:31:52 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 14:31:50 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,370,1539673200"; 
-   d="scan'208";a="101704192"
+   d="scan'208";a="101704146"
 Received: from bgix-dell-lap.sea.intel.com ([10.241.111.161])
-  by orsmga006.jf.intel.com with ESMTP; 18 Dec 2018 14:31:52 -0800
+  by orsmga006.jf.intel.com with ESMTP; 18 Dec 2018 14:31:50 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org
-Subject: [PATCH BlueZ v4 19/30] mesh: Restrusture DB to support multiple nodes
-Date:   Tue, 18 Dec 2018 14:31:28 -0800
-Message-Id: <20181218223139.8041-20-brian.gix@intel.com>
+Subject: [PATCH BlueZ v4 05/30] mesh: Re-write storage for Multiple Nodes
+Date:   Tue, 18 Dec 2018 14:31:14 -0800
+Message-Id: <20181218223139.8041-6-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181218223139.8041-1-brian.gix@intel.com>
 References: <20181218223139.8041-1-brian.gix@intel.com>
@@ -46,615 +46,874 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Inga Stotland <inga.stotland@intel.com>
 
 ---
- mesh/mesh-db.c | 454 +++++++++++++++++++++++++++++++++++++--------------------
- mesh/mesh-db.h |   6 +-
- 2 files changed, 296 insertions(+), 164 deletions(-)
+ mesh/storage.c | 570 +++++++++++++++++++++++++--------------------------------
+ mesh/storage.h |  39 ++--
+ 2 files changed, 269 insertions(+), 340 deletions(-)
 
-diff --git a/mesh/mesh-db.c b/mesh/mesh-db.c
-index 86e17ed9a..e6aa51340 100644
---- a/mesh/mesh-db.c
-+++ b/mesh/mesh-db.c
-@@ -162,6 +162,7 @@ static json_object *jarray_string_del(json_object *jarray, char *str,
- 		if (str_entry && !strncmp(str, str_entry, len))
- 			continue;
+diff --git a/mesh/storage.c b/mesh/storage.c
+index 1f3b25886..459c9f4fa 100644
+--- a/mesh/storage.c
++++ b/mesh/storage.c
+@@ -27,6 +27,8 @@
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <unistd.h>
++#include <dirent.h>
++#include <libgen.h>
  
-+		json_object_get(jentry);
- 		json_object_array_add(jarray_new, jentry);
- 	}
+ #include <sys/types.h>
+ #include <sys/stat.h>
+@@ -42,39 +44,43 @@
+ #include "mesh/net.h"
+ #include "mesh/appkey.h"
+ #include "mesh/model.h"
++#include "mesh/mesh-db.h"
+ #include "mesh/storage.h"
  
-@@ -193,9 +194,6 @@ static json_object *jarray_key_del(json_object *jarray, int16_t idx)
+-/*
+- * TODO: figure out naming convention to store alternative nodes
+- * Mesh storage dir wil be in configure.ac
+- */
+-#define DEVICE_COMPOSITION_FILE "../config/composition.json"
+-#define NODE_CONGIGURATION_FILE "../config/configuration.json"
++struct write_info {
++	json_object *jnode;
++	const char *config_name;
++	void *user_data;
++	mesh_status_func_t cb;
++};
+ 
+-static bool read_local_node_cb(struct mesh_db_node *db_node, void *user_data)
++static const char *storage_dir;
++static struct l_queue *node_ids;
++
++static bool simple_match(const void *a, const void *b)
  {
- 	json_object *jarray_new;
- 	int i, sz = json_object_array_length(jarray);
--	char idx_str[5];
--
--	snprintf(idx_str, 5, "%4.4x", idx);
- 
- 	jarray_new = json_object_new_array();
- 	if (!jarray_new)
-@@ -203,16 +201,17 @@ static json_object *jarray_key_del(json_object *jarray, int16_t idx)
- 
- 	for (i = 0; i < sz; ++i) {
- 		json_object *jentry, *jvalue;
--		char *str;
- 
- 		jentry = json_object_array_get_idx(jarray, i);
- 
- 		if (json_object_object_get_ex(jentry, "index", &jvalue)) {
--			str = (char *)json_object_get_string(jvalue);
--			if (str && !strncmp(str, idx_str, 4))
-+			int tmp = json_object_get_int(jvalue);
+-	struct mesh_net *net = user_data;
+-	struct mesh_node *node;
++	return a == b;
++}
 +
-+			if (tmp == idx)
- 				continue;
- 		}
++static bool read_node_cb(struct mesh_db_node *db_node, void *user_data)
++{
++	struct mesh_node *node = user_data;
++	struct mesh_net *net;
+ 	uint32_t seq_number;
+-	uint16_t crpl;
+ 	uint8_t ttl, mode, cnt, num_ele;
+ 	uint16_t unicast, interval;
+ 	uint8_t *uuid;
  
-+		json_object_get(jentry);
- 		json_object_array_add(jarray_new, jentry);
- 	}
- 
-@@ -389,19 +388,10 @@ bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
- 	char buf[5];
- 
- 	json_object_object_get_ex(jobj, "netKeys", &jarray);
--	if (!jarray && (phase != KEY_REFRESH_PHASE_NONE))
--		return false;
- 
- 	if (jarray)
- 		jentry = get_key_object(jarray, idx);
- 
--	/*
--	 * The key entry should exist if the key is updated
--	 * (i.e., Key Refresh is underway)
--	 */
--	if (!jentry && (phase != KEY_REFRESH_PHASE_NONE))
+-	if (!net)
 -		return false;
 -
- 	if (jentry) {
- 		uint8_t buf[16];
- 		json_object *jvalue;
-@@ -422,7 +412,7 @@ bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
+-	node = node_create_from_storage(net, db_node, true);
+-	if (!node)
++	if (!node_init_from_storage(node, db_node)) {
++		node_free(node);
  		return false;
- 	}
++	}
  
--	if (phase == KEY_REFRESH_PHASE_NONE) {
-+	if (!jentry) {
- 		jentry = json_object_new_object();
- 		if (!jentry)
- 			goto fail;
-@@ -442,6 +432,19 @@ bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
- 		if (!add_key(jentry, "key", key))
- 			goto fail;
+-	mesh_net_local_node_set(net, node, db_node->provisioner);
++	net = node_get_net(node);
+ 	seq_number = node_get_sequence_number(node);
+ 	mesh_net_set_seq_num(net, seq_number);
+ 	ttl = node_default_ttl_get(node);
+ 	mesh_net_set_default_ttl(net, ttl);
+-	crpl = node_get_crpl(node);
+-	mesh_net_set_crpl(net, crpl);
  
-+		/* If Key Refresh underway, add placeholder for "Old Key" */
-+		if (phase != KEY_REFRESH_PHASE_NONE) {
-+			uint8_t buf[16];
-+			uint8_t i;
+ 	mode = node_proxy_mode_get(node);
+ 	if (mode == MESH_MODE_ENABLED || mode == MESH_MODE_DISABLED)
+@@ -103,6 +109,7 @@ static bool read_local_node_cb(struct mesh_db_node *db_node, void *user_data)
+ 	uuid = node_uuid_get(node);
+ 	if (uuid)
+ 		mesh_net_id_uuid_set(net, uuid);
 +
-+			/* Flip Bits to differentiate */
-+			for (i = 0; i < sizeof(buf); i++)
-+				buf[i] = key[i] ^ 0xff;
-+
-+			if (!add_key(jentry, "oldKey", buf))
-+				goto fail;
-+		}
-+
- 		if (!jarray) {
- 			jarray = json_object_new_array();
- 			if (!jarray)
-@@ -733,7 +736,7 @@ static bool parse_bindings(json_object *jbindings, struct mesh_db_model *mod)
- 	if (cnt > 0xffff)
- 		return false;
- 
--	mod->num_subs = cnt;
-+	mod->num_bindings = cnt;
- 
- 	/* Allow empty bindings list */
- 	if (!cnt)
-@@ -761,6 +764,130 @@ static bool parse_bindings(json_object *jbindings, struct mesh_db_model *mod)
  	return true;
  }
  
-+static bool get_key_index(json_object *jobj, const char *keyword,
-+								uint16_t *index)
-+{
-+	int idx;
-+
-+	if (!get_int(jobj, keyword, &idx))
-+		return false;
-+
-+	if (!CHECK_KEY_IDX_RANGE(idx))
-+		return false;
-+
-+	*index = (uint16_t) idx;
-+	return true;
-+}
-+
-+static struct mesh_db_pub *parse_model_publication(json_object *jpub)
-+{
-+	json_object *jvalue;
-+	struct mesh_db_pub *pub;
-+	int len, value;
-+	char *str;
-+
-+	pub = l_new(struct mesh_db_pub, 1);
-+	if (!pub)
-+		return NULL;
-+
-+	json_object_object_get_ex(jpub, "address", &jvalue);
-+	str = (char *)json_object_get_string(jvalue);
-+	len = strlen(str);
-+
-+	switch (len) {
-+	case 4:
-+		if (sscanf(str, "%04hx", &pub->addr) != 1)
-+			goto fail;
-+		break;
-+	case 32:
-+		if (!str2hex(str, len, pub->virt_addr, 16))
-+			goto fail;
-+		pub->virt = true;
-+		break;
-+	default:
-+		goto fail;
-+	}
-+
-+	if (!get_key_index(jpub, "index", &pub->idx))
-+		goto fail;
-+
-+	if (!get_int(jpub, "ttl", &value))
-+		goto fail;
-+	pub->ttl = (uint8_t) value;
-+
-+	if (!get_int(jpub, "period", &value))
-+		goto fail;
-+	pub->period = (uint8_t) value;
-+
-+	if (!get_int(jpub, "credentials", &value))
-+		goto fail;
-+	pub->credential = (uint8_t) value;
-+
-+	if (!get_int(jpub, "retransmit", &value))
-+		goto fail;
-+
-+	pub->retransmit = (uint8_t) value;
-+	return pub;
-+
-+fail:
-+	l_free(pub);
-+	return NULL;
-+}
-+
-+static bool parse_model_subscriptions(json_object *jsubs,
-+						struct mesh_db_model *mod)
-+{
-+	struct mesh_db_sub *subs;
-+	int i, cnt;
-+
-+	if (json_object_get_type(jsubs) != json_type_array)
-+		return NULL;
-+
-+	cnt = json_object_array_length(jsubs);
-+	/* Allow empty array */
-+	if (!cnt)
-+		return true;
-+
-+	subs = l_new(struct mesh_db_sub, cnt);
-+	if (!subs)
-+		return false;
-+
-+	for (i = 0; i < cnt; ++i) {
-+		char *str;
-+		int len;
-+		json_object *jvalue;
-+
-+		jvalue = json_object_array_get_idx(jsubs, i);
-+		if (!jvalue)
-+			return false;
-+
-+		str = (char *)json_object_get_string(jvalue);
-+		len = strlen(str);
-+
-+		switch (len) {
-+		case 4:
-+			if (sscanf(str, "%04hx", &subs[i].src.addr) != 1)
-+				goto fail;
-+		break;
-+		case 32:
-+			if (!str2hex(str, len, subs[i].src.virt_addr, 16))
-+				goto fail;
-+			subs[i].virt = true;
-+			break;
-+		default:
-+			goto fail;
-+		}
-+	}
-+
-+	mod->num_subs = cnt;
-+	mod->subs = subs;
-+
-+	return true;
-+fail:
-+	l_free(subs);
-+	return false;
-+}
-+
- static bool parse_models(json_object *jmodels, struct mesh_db_element *ele)
- {
- 	int i, num_models;
-@@ -810,11 +937,22 @@ static bool parse_models(json_object *jmodels, struct mesh_db_element *ele)
- 
- 		json_object_object_get_ex(jmodel, "bind", &jarray);
- 
--		if (jarray && (json_object_get_type(jmodels) != json_type_array
-+		if (jarray && (json_object_get_type(jarray) != json_type_array
- 					|| !parse_bindings(jarray, mod)))
- 			goto fail;
- 
--		/* TODO add pub/sub */
-+		json_object_object_get_ex(jmodel, "publish", &jvalue);
-+		if (jvalue) {
-+			mod->pub = parse_model_publication(jvalue);
-+			if (!mod->pub)
-+				goto fail;
-+		}
-+
-+		json_object_object_get_ex(jmodel, "subscribe", &jarray);
-+
-+		if (jarray && !parse_model_subscriptions(jarray, mod))
-+			goto fail;
-+
- 		l_queue_push_tail(ele->models, mod);
- 	}
- 
-@@ -1012,33 +1150,6 @@ static bool parse_composition(json_object *jcomp, struct mesh_db_node *node)
- 	return true;
+@@ -132,13 +139,14 @@ static bool read_app_keys_cb(uint16_t net_idx, uint16_t app_idx, uint8_t *key,
+ 	return appkey_key_init(net, net_idx, app_idx, key, new_key);
  }
  
--static uint16_t get_prov_flags(json_object *jarray, uint16_t max_value)
+-static bool parse_local_node(struct mesh_net *net, json_object *jnode)
++static bool parse_node(struct mesh_node *node, json_object *jnode)
+ {
+ 	bool bvalue;
+ 	uint32_t iv_index;
+ 	uint8_t key_buf[16];
+ 	uint8_t cnt;
+ 	uint16_t interval;
++	struct mesh_net *net = node_get_net(node);
+ 
+ 	if (mesh_db_read_iv_index(jnode, &iv_index, &bvalue))
+ 		mesh_net_set_iv_index(net, iv_index, bvalue);
+@@ -147,97 +155,35 @@ static bool parse_local_node(struct mesh_net *net, json_object *jnode)
+ 		mesh_net_transmit_params_set(net, cnt, interval);
+ 
+ 	/* Node composition/configuration info */
+-	if (!mesh_db_read_node(jnode, read_local_node_cb, net))
++	if (!mesh_db_read_node(jnode, read_node_cb, node))
+ 		return false;
+ 
+ 	if (!mesh_db_read_net_keys(jnode, read_net_keys_cb, net))
+ 		return false;
+ 
+-	/* TODO: use the actual "primary" network index for this node */
+-	if (mesh_db_read_device_key(jnode, key_buf) &&
+-		!node_set_device_key(mesh_net_local_node_get(net), key_buf))
+-		return false;
+-
+-	mesh_db_read_app_keys(jnode, read_app_keys_cb, net);
+-
+-	return true;
+-}
+-
+-static bool read_unprov_device_cb(struct mesh_db_node *db_node, void *user_data)
 -{
--	int i, cnt;
--	uint16_t result = 0;
+-	struct mesh_net *net = user_data;
+-	struct mesh_node *node;
+-	uint16_t crpl;
+-	uint8_t *uuid;
 -
--	cnt = json_object_array_length(jarray);
--	if (!cnt)
--		return 0;
+-	if (!net)
+-		return false;
 -
--	for (i = 0; i < cnt; ++i) {
--		json_object *jvalue;
--		int value;
+-	node = node_create_from_storage(net, db_node, true);
 -
--		jvalue = json_object_array_get_idx(jarray, i);
--		value = json_object_get_int(jvalue);
--		if (value > 16)
--			continue;
+-	if (!node)
++	if (!mesh_db_read_device_key(jnode, key_buf))
+ 		return false;
+ 
+-	mesh_net_local_node_set(net, node, db_node->provisioner);
+-	crpl = node_get_crpl(node);
+-	mesh_net_set_crpl(net, crpl);
++	node_set_device_key(node, key_buf);
+ 
+-	uuid = node_uuid_get(node);
+-	if (uuid)
+-		mesh_net_id_uuid_set(net, uuid);
++	mesh_db_read_app_keys(jnode, read_app_keys_cb, net);
+ 
+ 	return true;
+ }
+ 
+-static bool parse_unprovisioned_device(struct mesh_net *net, json_object *jnode)
+-{
+-	struct mesh_db_prov prov;
+-	struct mesh_net_prov_caps *caps;
+-	struct mesh_node *node;
 -
--		if ((1 << value) > max_value)
--			continue;
+-	/* Node composition/configuration info */
+-	if (!mesh_db_read_unprovisioned_device(jnode,
+-					read_unprov_device_cb, net))
+-		return false;
 -
--		result |= (1 << value);
+-	if (!mesh_db_read_prov_info(jnode, &prov))
+-		return false;
+-
+-	caps = mesh_net_prov_caps_get(net);
+-	if (!caps)
+-		return false;
+-
+-	node = mesh_net_local_node_get(net);
+-	if (!node)
+-		return false;
+-
+-	caps->num_ele = node_get_num_elements(node);
+-	l_put_le16(prov.algorithm, &caps->algorithms);
+-	caps->pub_type = prov.pub_type;
+-	caps->static_type = prov.static_type;
+-	caps->output_size = prov.output_oob.size;
+-	l_put_le16(prov.output_oob.actions, &caps->output_action);
+-	caps->input_size = prov.input_oob.size;
+-	l_put_le16(prov.input_oob.actions, &caps->input_action);
+-
+-	return mesh_net_priv_key_set(net, prov.priv_key);
+-}
+-
+-static bool parse_config(struct mesh_net *net, const char *config_name,
+-							bool unprovisioned)
++static bool parse_config(char *in_file, char *out_file, uint16_t node_id)
+ {
+ 	int fd;
+ 	char *str;
+-	const char *out;
+ 	struct stat st;
+ 	ssize_t sz;
+ 	json_object *jnode = NULL;
+ 	bool result = false;
++	struct mesh_node *node;
+ 
+-	if (!config_name)
+-		return false;
++	l_info("Loading configuration from %s", in_file);
+ 
+-	fd = open(config_name, O_RDONLY);
++	fd = open(in_file, O_RDONLY);
+ 	if (!fd)
+ 		return false;
+ 
+@@ -254,7 +200,7 @@ static bool parse_config(struct mesh_net *net, const char *config_name,
+ 
+ 	sz = read(fd, str, st.st_size);
+ 	if (sz != st.st_size) {
+-		l_error("Failed to read configuration file");
++		l_error("Failed to read configuration file %s", in_file);
+ 		goto done;
+ 	}
+ 
+@@ -262,22 +208,19 @@ static bool parse_config(struct mesh_net *net, const char *config_name,
+ 	if (!jnode)
+ 		goto done;
+ 
+-	mesh_net_jconfig_set(net, jnode);
++	node = node_new();
+ 
+-	if (!unprovisioned)
+-		result = parse_local_node(net, jnode);
+-	else
+-		result = parse_unprovisioned_device(net, jnode);
++	node_jconfig_set(node, jnode);
++	node_cfg_file_set(node, out_file);
++	node_id_set(node, node_id);
++
++	result = parse_node(node, jnode);
+ 
+ 	if (!result) {
+-		storage_release(net);
+-		goto done;
++		json_object_put(jnode);
++		node_free(node);
+ 	}
+ 
+-	mesh_net_cfg_file_get(net, &out);
+-	if (!out)
+-		mesh_net_cfg_file_set(net, !unprovisioned ?
+-					config_name : NODE_CONGIGURATION_FILE);
+ done:
+ 	close(fd);
+ 	if (str)
+@@ -286,166 +229,70 @@ done:
+ 	return result;
+ }
+ 
+-bool storage_parse_config(struct mesh_net *net, const char *config_name)
+-{
+-	bool result = false;
+-	bool unprovisioned = !config_name;
+-
+-	if (unprovisioned) {
+-		result = parse_config(net, DEVICE_COMPOSITION_FILE, true);
+-		goto done;
 -	}
+-
+-	result = parse_config(net, config_name, false);
+-
+-	if (!result) {
+-		size_t len = strlen(config_name) + 5;
+-		char *bak = l_malloc(len);
+-
+-		/* Fall-back to Backup version */
+-		strncpy(bak, config_name, len);
+-		bak = strncat(bak, ".bak", 5);
+-
+-		remove(config_name);
+-		rename(bak, config_name);
+-
+-		result = parse_config(net, config_name, false);
+-
+-		l_free(bak);
+-	}
+-
+-	/* If configuration read fails, try as unprovisioned device */
+-	if (!result) {
+-		l_info("Parse configuration failed, trying unprovisioned");
+-		unprovisioned = true;
+-		result = parse_config(net, DEVICE_COMPOSITION_FILE, true);
+-	}
+-
+-done:
+-	if (result)
+-		mesh_net_provisioned_set(net, !unprovisioned);
 -
 -	return result;
 -}
 -
- bool mesh_db_read_node(json_object *jnode, mesh_db_node_cb cb, void *user_data)
+-bool storage_local_set_ttl(struct mesh_net *net, uint8_t ttl)
++bool storage_set_ttl(json_object *jnode, uint8_t ttl)
  {
- 	struct mesh_db_node node;
-@@ -1091,117 +1202,28 @@ bool mesh_db_read_node(json_object *jnode, mesh_db_node_cb cb, void *user_data)
- 	return cb(&node, user_data);
+-	json_object *jnode;
+-
+-	if (!net)
+-		return false;
+-
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
+-		return false;
+-
+ 	return mesh_db_write_int(jnode, "defaultTTL", ttl);
  }
  
--bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
--								void *user_data)
--{
--	struct mesh_db_node node;
--	json_object *jvalue;
--	char *str;
+-bool storage_local_set_relay(struct mesh_net *net, bool enable,
++bool storage_set_relay(json_object *jnode, bool enable,
+ 				uint8_t count, uint8_t interval)
+ {
+-	json_object *jnode;
 -
--	if (!cb) {
--		l_info("Device read callback is required");
+-	if (!net)
 -		return false;
--	}
 -
--	memset(&node, 0, sizeof(node));
--
--	if (!parse_composition(jnode, &node)) {
--		l_info("Failed to parse local device composition");
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
 -		return false;
--	}
 -
--	parse_features(jnode, &node);
+ 	return mesh_db_write_relay_mode(jnode, enable, count, interval);
+ }
+ 
+-bool storage_local_set_transmit_params(struct mesh_net *net, uint8_t count,
++bool storage_set_transmit_params(json_object *jnode, uint8_t count,
+ 							uint8_t interval)
+ {
+-	json_object *jnode;
 -
--	json_object_object_get_ex(jnode, "elements", &jvalue);
--	if (jvalue && json_object_get_type(jvalue) == json_type_array) {
--		if (!parse_elements(jvalue, &node))
+-	if (!net)
+-		return false;
+-
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
+-		return false;
+-
+ 	return mesh_db_write_net_transmit(jnode, count, interval);
+ }
+ 
+-bool storage_local_set_mode(struct mesh_net *net, uint8_t mode,
++bool storage_set_mode(json_object *jnode, uint8_t mode,
+ 						const char *mode_name)
+ {
+-	json_object *jnode;
+-
+-	if (!net || !mode_name)
+-		return false;
+-
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
+-		return false;
+-
+ 	return mesh_db_write_mode(jnode, mode_name, mode);
+ }
+ 
+-bool storage_model_bind(struct mesh_net *net, uint16_t addr, uint32_t mod_id,
++bool storage_model_bind(struct mesh_node *node, uint16_t addr, uint32_t mod_id,
+ 				uint16_t app_idx, bool unbind)
+ {
+ 	json_object *jnode;
+-	bool is_local;
++	int ele_idx;
++	bool is_vendor = (mod_id > 0xffff);
+ 
+-	if (!net)
++	ele_idx = node_get_element_idx(node, addr);
++	if (ele_idx < 0)
+ 		return false;
+ 
+-	is_local = mesh_net_is_local_address(net, addr);
+-	if (is_local) {
+-		int ele_idx;
+-		bool is_vendor = (mod_id > 0xffff);
+-
+-		ele_idx = node_get_element_idx(mesh_net_local_node_get(net),
+-									addr);
+-		if (ele_idx < 0)
 -			return false;
+-
+-		jnode = mesh_net_jconfig_get(net);
+-		if (!jnode)
+-			return false;
+-
+-		if (unbind)
+-			return mesh_db_model_binding_del(jnode, ele_idx,
+-						is_vendor, mod_id, app_idx);
+-		else
+-			return mesh_db_model_binding_add(jnode, ele_idx,
+-						is_vendor, mod_id, app_idx);
 -	}
--
--	json_object_object_get_ex(jnode, "UUID", &jvalue);
--	if (!jvalue)
++	jnode = node_jconfig_get(node);
+ 
+-	/* TODO: write remote node bindings to provisioner DB */
+-	return false;
++	if (unbind)
++		return mesh_db_model_binding_del(jnode, ele_idx, is_vendor,
++							mod_id, app_idx);
++	else
++		return mesh_db_model_binding_add(jnode, ele_idx, is_vendor,
++							mod_id, app_idx);
+ }
+ 
+-bool storage_local_app_key_add(struct mesh_net *net, uint16_t net_idx,
++bool storage_app_key_add(struct mesh_net *net, uint16_t net_idx,
+ 			uint16_t app_idx, const uint8_t key[16], bool update)
+ {
+ 	json_object *jnode;
++	struct mesh_node *node = mesh_net_node_get(net);
+ 
+-	if (!net)
 -		return false;
 -
--	str = (char *)json_object_get_string(jvalue);
--	if (!str2hex(str, strlen(str), node.uuid, 16))
+-	jnode = mesh_net_jconfig_get(net);
++	jnode = node_jconfig_get(node);
+ 	if (!jnode)
+ 		return false;
+ 
+ 	return mesh_db_app_key_add(jnode, net_idx, app_idx, key, update);
+ }
+ 
+-bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
++bool storage_app_key_del(struct mesh_net *net, uint16_t net_idx,
+ 					uint16_t app_idx)
+ {
+ 	json_object *jnode;
++	struct mesh_node *node = mesh_net_node_get(net);
+ 
+-	if (!net)
 -		return false;
 -
--	return cb(&node, user_data);
+-	jnode = mesh_net_jconfig_get(net);
++	jnode = node_jconfig_get(node);
+ 	if (!jnode)
+ 		return false;
+ 
+@@ -453,116 +300,53 @@ bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
+ 
+ }
+ 
+-bool storage_local_net_key_add(struct mesh_net *net, uint16_t net_idx,
++bool storage_net_key_add(struct mesh_net *net, uint16_t net_idx,
+ 					const uint8_t key[16], int phase)
+ {
+-	json_object *jnode;
+-
+-	if (!net)
+-		return false;
+-
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
+-		return false;
++	struct mesh_node *node = mesh_net_node_get(net);
++	json_object *jnode = node_jconfig_get(node);
+ 
+ 	return mesh_db_net_key_add(jnode, net_idx, key, phase);
+ }
+ 
+-bool storage_local_net_key_del(struct mesh_net *net, uint16_t net_idx)
++bool storage_net_key_del(struct mesh_net *net, uint16_t net_idx)
+ {
+-	json_object *jnode;
+-
+-	if (!net)
+-		return false;
+-
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
+-		return false;
++	struct mesh_node *node = mesh_net_node_get(net);
++	json_object *jnode = node_jconfig_get(node);
+ 
+ 	return mesh_db_net_key_del(jnode, net_idx);
+ }
+ 
+-bool storage_local_set_iv_index(struct mesh_net *net, uint32_t iv_index,
++bool storage_set_iv_index(struct mesh_net *net, uint32_t iv_index,
+ 								bool update)
+ {
+-	json_object *jnode;
+-
+-	if (!net)
+-		return false;
+-
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
+-		return false;
++	struct mesh_node *node = mesh_net_node_get(net);
++	json_object *jnode = node_jconfig_get(node);
+ 
+ 	return mesh_db_write_iv_index(jnode, iv_index, update);
+ }
+ 
+-bool storage_local_set_device_key(struct mesh_net *net, uint8_t dev_key[16])
+-{
+-	json_object *jnode;
+-
+-	if (!net)
+-		return false;
+-
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
+-		return false;
+-
+-	return mesh_db_write_device_key(jnode, dev_key);
 -}
 -
--bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov)
-+bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
-+								uint16_t value)
+-bool storage_local_set_unicast(struct mesh_net *net, uint16_t unicast)
+-{
+-	json_object *jnode;
+-
+-	if (!net)
+-		return false;
+-
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
+-		return false;
+-
+-	return mesh_db_write_uint16_hex(jnode, "unicastAddress", unicast);
+-}
+-
+-bool storage_local_write_sequence_number(struct mesh_net *net, uint32_t seq)
++bool storage_write_sequence_number(struct mesh_net *net, uint32_t seq)
  {
--	json_object *jprov, *jarray, *jvalue, *jobj;
--	int value;
--	char *str;
+-	json_object *jnode;
+-	const char *cfg_file;
++	struct mesh_node *node = mesh_net_node_get(net);
++	json_object *jnode = node_jconfig_get(node);
+ 	bool result;
 -
--	if (!prov)
+-	if (!net)
 -		return false;
 -
--	json_object_object_get_ex(jnode, "provision", &jprov);
--	if (!jprov)
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
 -		return false;
 -
--	json_object_object_get_ex(jprov, "algorithms", &jarray);
--	if (!jarray || json_object_get_type(jarray) != json_type_array)
--		return false;
--
--	prov->algorithm = get_prov_flags(jarray, ALG_FIPS_256_ECC);
--	if (!prov->algorithm) {
--		l_info("At least one algorithm must be indicated");
--		return false;
--	}
--
--	json_object_object_get_ex(jprov, "outputOOB", &jobj);
--	json_object_object_get_ex(jobj, "size", &jvalue);
--	value = json_object_get_int(jvalue);
--	if (value > 8)
--		return false;
--
--	prov->output_oob.size = (uint8_t) value;
--	json_object_object_get_ex(jobj, "actions", &jarray);
--	if (!jarray || json_object_get_type(jarray) != json_type_array)
--		return false;
--
--	prov->output_oob.actions = get_prov_flags(jarray, OOB_OUT_ALPHA);
--
--	json_object_object_get_ex(jprov, "inputOOB", &jobj);
--	json_object_object_get_ex(jobj, "size", &jvalue);
--	value = json_object_get_int(jvalue);
--	if (value > 8)
--		return false;
--
--	prov->input_oob.size = (uint8_t) value;
--	json_object_object_get_ex(jobj, "actions", &jarray);
--	if (!jarray || json_object_get_type(jarray) != json_type_array)
--		return false;
--
--	prov->input_oob.actions = get_prov_flags(jarray, OOB_IN_ALPHA);
--
--	json_object_object_get_ex(jprov, "publicType", &jvalue);
--	prov->pub_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
--
--	json_object_object_get_ex(jprov, "staticType", &jvalue);
--	prov->static_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
--
--	json_object_object_get_ex(jprov, "privateKey", &jvalue);
--	if (!jvalue)
--		return false;
-+	json_object *jstring;
-+	char buf[5];
- 
--	str = (char *)json_object_get_string(jvalue);
--	if (!str2hex(str, strlen(str), prov->priv_key, 32))
-+	snprintf(buf, 5, "%4.4x", value);
-+	jstring = json_object_new_string(buf);
-+	if (!jstring)
++	l_debug("");
+ 	result = mesh_db_write_int(jnode, "sequenceNumber", seq);
+ 	if (!result)
  		return false;
  
-+	json_object_object_add(jobj, desc, jstring);
- 	return true;
+-	result = mesh_net_cfg_file_get(net, &cfg_file);
+-	if (result && cfg_file)
+-		result = storage_save_config(net, cfg_file, false, NULL, NULL);
++	result = storage_save_config(node, false, NULL, NULL);
+ 
+ 	return result;
  }
  
--bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
--								uint16_t value)
-+bool mesh_db_write_uint32_hex(json_object *jobj, const char *desc,
-+								uint32_t value)
+-static bool save_config(struct mesh_net *net, const char *config_name)
++static bool save_config(json_object *jnode, const char *config_name)
  {
- 	json_object *jstring;
--	char buf[5];
-+	char buf[9];
+ 	FILE *outfile;
+ 	const char *str;
+-	json_object *jnode;
+ 	bool result = false;
  
--	snprintf(buf, 5, "%4.4x", value);
-+	snprintf(buf, 9, "%8.8x", value);
- 	jstring = json_object_new_string(buf);
- 	if (!jstring)
- 		return false;
-@@ -1238,23 +1260,23 @@ bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value)
- 	return true;
- }
- 
--bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value)
-+static const char *mode_to_string(int mode)
- {
--	json_object *jstring;
--
--	switch (value) {
-+	switch (mode) {
- 	case MESH_MODE_DISABLED:
--		jstring = json_object_new_string("disabled");
--		break;
-+		return "disabled";
- 	case MESH_MODE_ENABLED:
--		jstring = json_object_new_string("enabled");
--		break;
--	case MESH_MODE_UNSUPPORTED:
--		jstring = json_object_new_string("unsupported");
--		break;
-+		return "enabled";
- 	default:
+-	if (!net || !config_name)
 -		return false;
--	};
-+		return "unsupported";
-+	}
-+}
-+
-+bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value)
-+{
-+	json_object *jstring;
-+
-+	jstring = json_object_new_string(mode_to_string(value));
- 
- 	if (!jstring)
- 		return false;
-@@ -1272,7 +1294,7 @@ bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
- 	json_object_object_del(jnode, "relay");
- 
- 	jrelay = json_object_new_object();
--	if (jrelay)
-+	if (!jrelay)
- 		return false;
- 
- 	if (!mesh_db_write_mode(jrelay, "mode", mode))
-@@ -1359,3 +1381,113 @@ void mesh_db_remove_property(json_object *jobj, const char *desc)
- {
- 	json_object_object_del(jobj, desc);
+-
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
+-		return false;
+-
+ 	outfile = fopen(config_name, "w");
+ 	if (!outfile) {
+ 		l_error("Failed to save configuration to %s", config_name);
+@@ -581,13 +365,6 @@ static bool save_config(struct mesh_net *net, const char *config_name)
+ 	return result;
  }
-+
-+static void add_model(void *a, void *b)
-+{
-+	struct mesh_db_model *mod = a;
-+	json_object *jmodels = b, *jmodel;
-+
-+	jmodel = json_object_new_object();
-+	if (!jmodel)
-+		return;
-+
-+	if (!mod->vendor)
-+		mesh_db_write_uint16_hex(jmodel, "modelId",
-+						(uint16_t) mod->id);
+ 
+-struct write_info {
+-	const char *config_name;
+-	struct mesh_net *net;
+-	void *user_data;
+-	mesh_status_func_t cb;
+-};
+-
+ static void idle_save_config(void *user_data)
+ {
+ 	struct write_info *info = user_data;
+@@ -603,7 +380,7 @@ static void idle_save_config(void *user_data)
+ 	remove(tmp);
+ 
+ 	l_debug("Storage-Wrote");
+-	result = save_config(info->net, tmp);
++	result = save_config(info->jnode, tmp);
+ 
+ 	if (result) {
+ 		remove(bak);
+@@ -621,48 +398,199 @@ static void idle_save_config(void *user_data)
+ 	l_free(info);
+ }
+ 
+-bool storage_save_config(struct mesh_net *net, const char *config_name,
+-			bool no_wait, mesh_status_func_t cb, void *user_data)
++bool storage_save_config(struct mesh_node *node, bool no_wait,
++					mesh_status_func_t cb, void *user_data)
+ {
+ 	struct write_info *info;
+ 
+ 	info = l_new(struct write_info, 1);
+ 	if (!info)
+ 		return false;
+-
+-	info->net = net;
+-	info->config_name = config_name;
++	l_debug("");
++	info->jnode = node_jconfig_get(node);
++	info->config_name = node_cfg_file_get(node);
+ 	info->cb = cb;
+ 	info->user_data = user_data;
+ 
+ 	if (no_wait)
+ 		idle_save_config(info);
+-	l_idle_oneshot(idle_save_config, info, NULL);
 +	else
-+		mesh_db_write_uint32_hex(jmodel, "modelId", mod->id);
++		l_idle_oneshot(idle_save_config, info, NULL);
+ 
+ 	return true;
+ }
+ 
+-bool storage_save_new_config(struct mesh_net *net, const char *config_name,
+-					mesh_status_func_t cb, void *user_data)
++static int create_dir(const char *dirname)
+ {
+-	json_object *jnode;
++	struct stat st;
++	char dir[PATH_MAX + 1], *prev, *next;
++	int err;
+ 
+-	jnode = mesh_net_jconfig_get(net);
+-	if (!jnode)
++	err = stat(dirname, &st);
++	if (!err && S_ISREG(st.st_mode))
++		return 0;
 +
-+	json_object_array_add(jmodels, jmodel);
-+}
++	memset(dir, 0, PATH_MAX + 1);
++	strcat(dir, "/");
 +
-+/* Add unprovisioned node (local) */
-+bool mesh_db_add_node(json_object *jnode, struct mesh_db_node *node) {
++	prev = strchr(dirname, '/');
 +
-+	struct mesh_db_modes *modes = &node->modes;
-+	const struct l_queue_entry *entry;
-+	json_object *jelements;
++	while (prev) {
++		next = strchr(prev + 1, '/');
++		if (!next)
++			break;
 +
-+	/* CID, PID, VID, crpl */
-+	if (!mesh_db_write_uint16_hex(jnode, "cid", node->cid))
-+		return false;
-+
-+	if (!mesh_db_write_uint16_hex(jnode, "pid", node->pid))
-+		return false;
-+
-+	if (!mesh_db_write_uint16_hex(jnode, "vid", node->vid))
-+		return false;
-+
-+	if (!mesh_db_write_uint16_hex(jnode, "crpl", node->crpl))
-+		return false;
-+
-+	/* Device UUID */
-+	if (!add_key(jnode, "UUID", node->uuid))
-+		return false;
-+
-+	/* Features: relay, LPN, friend, proxy*/
-+	if (!mesh_db_write_relay_mode(jnode, modes->relay.state,
-+						modes->relay.cnt,
-+						modes->relay.interval))
-+		return false;
-+
-+	if (!mesh_db_write_mode(jnode, "lowPower", modes->lpn))
-+		return false;
-+
-+	if (!mesh_db_write_mode(jnode, "friend", modes->friend))
-+		return false;
-+
-+	if (!mesh_db_write_mode(jnode, "proxy", modes->proxy))
-+		return false;
-+
-+	/* Beaconing state */
-+	if (!mesh_db_write_mode(jnode, "beacon", modes->beacon))
-+		return false;
-+
-+	/* Sequence number */
-+	json_object_object_add(jnode, "sequenceNumber",
-+					json_object_new_int(node->seq_number));
-+
-+	/* Default TTL */
-+	json_object_object_add(jnode, "defaultTTL",
-+						json_object_new_int(node->ttl));
-+
-+	/* Elements */
-+	jelements = json_object_new_array();
-+	if (!jelements)
-+		return false;
-+
-+	entry = l_queue_get_entries(node->elements);
-+
-+	for (; entry; entry = entry->next) {
-+		struct mesh_db_element *ele = entry->data;
-+		json_object *jelement, *jmodels;
-+
-+		jelement = json_object_new_object();
-+
-+		if (!jelement) {
-+			json_object_put(jelements);
-+			return false;
++		if (next - prev == 1) {
++			prev = next;
++			continue;
 +		}
 +
-+		mesh_db_write_int(jelement, "elementIndex", ele->index);
-+		mesh_db_write_uint16_hex(jelement, "location", ele->location);
-+		json_object_array_add(jelements, jelement);
++		strncat(dir, prev + 1, next - prev);
++		mkdir(dir, 0755);
 +
-+		/* Models */
-+		if (l_queue_isempty(ele->models))
++		prev = next;
++	}
++
++	mkdir(dirname, 0755);
++
++	return 0;
++}
++
++bool storage_load_nodes(const char *dir_name)
++{
++	DIR *dir;
++	struct dirent *entry;
++
++	create_dir(dir_name);
++	dir = opendir(dir_name);
++	if (!dir) {
++		l_error("Failed to open mesh node storage directory: %s",
++								dir_name);
+ 		return false;
++	}
++
++	storage_dir = dir_name;
++	node_ids = l_queue_new();
++
++	while ((entry = readdir(dir)) != NULL) {
++		char name_buf[PATH_MAX];
++		char *filename;
++		uint32_t node_id;
++		size_t len;
++
++		if (entry->d_type != DT_DIR)
 +			continue;
 +
-+		jmodels = json_object_new_array();
-+		if (!jmodels) {
-+			json_object_put(jelements);
-+			return false;
++		if (sscanf(entry->d_name, "%04x", &node_id) != 1)
++			continue;
++
++		snprintf(name_buf, PATH_MAX, "%s/%s/node.json", dir_name,
++								entry->d_name);
++
++		l_queue_push_tail(node_ids, L_UINT_TO_PTR(node_id));
++
++		len = strlen(name_buf);
++		filename = l_malloc(len + 1);
+ 
+-	mesh_db_remove_property(jnode, "provision");
++		strncpy(filename, name_buf, len + 1);
+ 
+-	return storage_save_config(net, config_name, false, cb, user_data);
++		if (parse_config(name_buf, filename, node_id))
++			continue;
++
++		/* Fall-back to Backup version */
++		snprintf(name_buf, PATH_MAX, "%s/%s/node.json.bak", dir_name,
++								entry->d_name);
++
++		if (parse_config(name_buf, filename, node_id)) {
++			remove(filename);
++			rename(name_buf, filename);
++			continue;
 +		}
 +
-+		json_object_object_add(jelement, "models", jmodels);
-+		l_queue_foreach(ele->models, add_model, jmodels);
++		l_free(filename);
 +	}
 +
-+	json_object_object_add(jnode, "elements", jelements);
++	return true;
+ }
+ 
+-void storage_release(struct mesh_net *net)
++bool storage_create_node_config(struct mesh_node *node, void *data)
+ {
++	struct mesh_db_node *db_node = data;
++	uint16_t node_id;
++	uint8_t num_tries = 0;
++	char name_buf[PATH_MAX];
++	char *filename;
+ 	json_object *jnode;
++	size_t len;
++
++	if (!storage_dir)
++		return false;
++
++	jnode = json_object_new_object();
++
++	if (!mesh_db_add_node(jnode, db_node))
++		return false;
++
++	do {
++		l_getrandom(&node_id, 2);
++		if (!l_queue_find(node_ids, simple_match,
++						L_UINT_TO_PTR(node_id)))
++			break;
++	} while (++num_tries < 10);
++
++	if (num_tries == 10)
++		l_error("Failed to generate unique node ID");
++
++	snprintf(name_buf, PATH_MAX, "%s/%04x", storage_dir, node_id);
++
++	/* Create a new directory and node.json file */
++	if (mkdir(name_buf, 0755) != 0)
++		goto fail;
+ 
+-	jnode = mesh_net_jconfig_get(net);
++	len = strlen(name_buf) + strlen("/node.json") + 1;
++	filename = l_malloc(len);
++
++	snprintf(filename, len, "%s/node.json", name_buf);
++	l_debug("New node config %s", filename);
++
++	if (!save_config(jnode, filename)) {
++		l_free(filename);
++		goto fail;
++	}
++
++	node_jconfig_set(node, jnode);
++	node_cfg_file_set(node, filename);
 +
 +	return true;
++fail:
++	json_object_put(jnode);
++	return false;
 +}
-diff --git a/mesh/mesh-db.h b/mesh/mesh-db.h
-index 336302f28..9a32e6c76 100644
---- a/mesh/mesh-db.h
-+++ b/mesh/mesh-db.h
-@@ -103,9 +103,7 @@ typedef bool (*mesh_db_app_key_cb)(uint16_t idx, uint16_t net_idx,
- typedef bool (*mesh_db_node_cb)(struct mesh_db_node *node, void *user_data);
++
++/* Permanently remove node configuration */
++void storage_remove_node_config(struct mesh_node *node)
++{
++	char *cfgname;
++	struct json_object *jnode;
++	const char *dir_name;
++
++	jnode = node_jconfig_get(node);
+ 	if (jnode)
+ 		json_object_put(jnode);
++	node_jconfig_set(node, NULL);
++
++	cfgname = (char *) node_cfg_file_get(node);
++	if (!cfgname)
++		return;
++
++	l_debug("Delete node config file %s", cfgname);
++	remove(cfgname);
++
++	dir_name = dirname(cfgname);
++
++	l_debug("Delete directory %s", dir_name);
++	rmdir(dir_name);
  
- bool mesh_db_read_node(json_object *jobj, mesh_db_node_cb cb, void *user_data);
--bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
--							void *user_data);
--bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov);
-+bool mesh_db_add_node(json_object *jnode, struct mesh_db_node *node);
- bool mesh_db_read_iv_index(json_object *jobj, uint32_t *idx, bool *update);
- bool mesh_db_read_device_key(json_object *jobj, uint8_t key_buf[16]);
- bool mesh_db_read_net_transmit(json_object *jobj, uint8_t *cnt,
-@@ -124,6 +122,8 @@ bool mesh_db_write_app_key(json_object *jobj, uint16_t net_idx,
- bool mesh_db_write_int(json_object *jobj, const char *keyword, int value);
- bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
- 								uint16_t value);
-+bool mesh_db_write_uint32_hex(json_object *jobj, const char *desc,
-+								uint32_t value);
- bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value);
- bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
- 							uint16_t interval);
+-	mesh_net_jconfig_set(net, NULL);
++	l_free(cfgname);
++	node_cfg_file_set(node, NULL);
+ }
+diff --git a/mesh/storage.h b/mesh/storage.h
+index 341932dba..9583669f0 100644
+--- a/mesh/storage.h
++++ b/mesh/storage.h
+@@ -18,34 +18,35 @@
+  *
+  */
+ 
++#include <json-c/json.h>
++
+ struct mesh_net;
++struct mesh_node;
+ 
+-bool storage_parse_config(struct mesh_net *net, const char *config_name);
+-bool storage_save_config(struct mesh_net *net, const char *config_name,
+-			bool no_wait, mesh_status_func_t cb, void *user_data);
+-bool storage_save_new_config(struct mesh_net *net, const char *config_name,
++bool storage_load_nodes(const char *dir);
++bool storage_create_node_config(struct mesh_node *node, void *db_node);
++void storage_remove_node_config(struct mesh_node *node);
++bool storage_save_config(struct mesh_node *node, bool no_wait,
+ 					mesh_status_func_t cb, void *user_data);
+-void storage_release(struct mesh_net *net);
+-
+-bool storage_model_bind(struct mesh_net *net, uint16_t addr, uint32_t id,
++bool storage_model_bind(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 						uint16_t app_idx, bool unbind);
+ 
+-bool storage_local_set_ttl(struct mesh_net *net, uint8_t ttl);
+-bool storage_local_set_relay(struct mesh_net *net, bool enable, uint8_t count,
++bool storage_set_ttl(json_object *jnode, uint8_t ttl);
++bool storage_set_relay(json_object *jnode, bool enable, uint8_t count,
+ 							uint8_t interval);
+-bool storage_local_set_transmit_params(struct mesh_net *net, uint8_t count,
++bool storage_set_transmit_params(json_object *jnode, uint8_t count,
+ 							uint8_t interval);
+-bool storage_local_set_mode(struct mesh_net *net, uint8_t mode,
++bool storage_set_mode(json_object *jnode, uint8_t mode,
+ 							const char *mode_name);
+-bool storage_local_net_key_add(struct mesh_net *net, uint16_t net_idx,
++bool storage_net_key_add(struct mesh_net *net, uint16_t net_idx,
+ 					const uint8_t key[16], int phase);
+-bool storage_local_net_key_del(struct mesh_net *net, uint16_t net_idx);
+-bool storage_local_app_key_add(struct mesh_net *net, uint16_t net_idx,
++bool storage_net_key_del(struct mesh_net *net, uint16_t net_idx);
++bool storage_app_key_add(struct mesh_net *net, uint16_t net_idx,
+ 			uint16_t app_idx, const uint8_t key[16], bool update);
+-bool storage_local_app_key_del(struct mesh_net *net, uint16_t net_idx,
++bool storage_app_key_del(struct mesh_net *net, uint16_t net_idx,
+ 							uint16_t app_idx);
+-bool storage_local_write_sequence_number(struct mesh_net *net, uint32_t seq);
+-bool storage_local_set_iv_index(struct mesh_net *net, uint32_t iv_index,
++bool storage_write_sequence_number(struct mesh_net *net, uint32_t seq);
++bool storage_set_iv_index(struct mesh_net *net, uint32_t iv_index,
+ 								bool update);
+-bool storage_local_set_device_key(struct mesh_net *net, uint8_t dev_key[16]);
+-bool storage_local_set_unicast(struct mesh_net *net, uint16_t unicast);
++bool storage_set_device_key(struct mesh_node *node, uint8_t dev_key[16]);
++bool storage_set_unicast(struct mesh_node *node, uint16_t unicast);
 -- 
 2.14.5
 
