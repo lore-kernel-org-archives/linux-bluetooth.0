@@ -2,166 +2,152 @@ Return-Path: <SRS0=Q26+=O3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBB9C43387
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 17:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE14BC43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 19:29:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52FF0218A3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 17:24:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B052021841
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 19:29:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="KNkGh4YA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727052AbeLRRYm (ORCPT
+        id S1727196AbeLRT3Q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 12:24:42 -0500
-Received: from mga17.intel.com ([192.55.52.151]:54342 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726555AbeLRRYl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 12:24:41 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 09:24:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,368,1539673200"; 
-   d="scan'208";a="303210342"
-Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
-  by fmsmga006.fm.intel.com with ESMTP; 18 Dec 2018 09:24:40 -0800
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.175]) by
- ORSMSX110.amr.corp.intel.com ([169.254.10.212]) with mapi id 14.03.0415.000;
- Tue, 18 Dec 2018 09:24:40 -0800
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     Danielle Costantino <danielle.costantino@gmail.com>
-CC:     "michal.lowas-rzechonek@silvair.com" 
-        <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Plans for meshd
-Thread-Topic: Plans for meshd
-Thread-Index: AQHUlkzs4eI9Vs+iikShZ/67E4V4MqWDbuDAgAFurwD//8yAMIAAl9GA//96wTA=
-Date:   Tue, 18 Dec 2018 17:24:38 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4375D8E0CBD@ORSMSX101.amr.corp.intel.com>
+        Tue, 18 Dec 2018 14:29:16 -0500
+Received: from mail-lf1-f41.google.com ([209.85.167.41]:34410 "EHLO
+        mail-lf1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726721AbeLRT3O (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 14:29:14 -0500
+Received: by mail-lf1-f41.google.com with SMTP id p6so13186150lfc.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Dec 2018 11:29:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=silvair-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=dcbZPmUTjug2h4VpXi0EMFE+baMTG+anA7SdYDqanOQ=;
+        b=KNkGh4YAueT2dB7oXGwDtDx6Ml2oAVNdNFSgo0Vsk5rdzlj0c/ceN4cYoK3ELLk5C8
+         emEGLv3gdYPeS/hiZBZ5MpTewZimzC64jTetjeYeNhIyZM+XhKc7HGUcDjkrdI0omksy
+         TVF5tMiarUgDVvb/RfZFV98v7cnSX0hLCcyenzn0bkM8XQTH41ftZLT32BEUph74YEzQ
+         gpmXGtMeQV+8kES6BCzVUx5BdPF6mqTl6ni0MxGUQkwO9aulhJfyFvTXD0OrKhfBHT10
+         25+UuEO6TqwAMJopI6jtXHg2hc+j24zgicrlFfcaDGV+3ugDTxf5x3aBAd828eJTYK8t
+         W1Zg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:mail-followup-to
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=dcbZPmUTjug2h4VpXi0EMFE+baMTG+anA7SdYDqanOQ=;
+        b=L6VwPbtrmIKRN9PNJ/xJCEy0/KKEUzjoosvcB+W2XU6MTU1ELv1vC7DjCjOBnyJQkC
+         ogS4YCrgCbQDPPbRwcgwQgDgHRzMAW8blAdlwpWcWVeZDMDASvrORX30nGJ6725ZVXH5
+         QPqllAHTbUksNFGPRhj8yN3369Sy9i84QOnkapNLMenbel2smnZjBbF7LnVIaB+I/GPU
+         SDKhLEBxVWsWonmYbpOQKgbGm3bU+ppCv9yc9f7FDaakfTk74OrX84u6FlDxAdNfTsEL
+         WDV8cv2lGGRw9mhM2TXLZrkOTBH9xC9gVdBwZGbBOad7dqQhNMG42MRcUTU6bxFTxHoj
+         TFTw==
+X-Gm-Message-State: AA+aEWZL1Od7J7elV69w+1nwWGV4DNKmMdcP4r0BaJ1+jxGK1fqU+BWa
+        OKIBOyLFcxl27rmYKWA/fZK8BtERqaE=
+X-Google-Smtp-Source: AFSGD/VFJhaid4UXvT7qwkRcivtF1JgJd/ShgV9WZlYcOiG0zrsnH2Onbb9sRU7uGe+hI50KqMcg6A==
+X-Received: by 2002:a19:d857:: with SMTP id p84mr10498178lfg.44.1545161351379;
+        Tue, 18 Dec 2018 11:29:11 -0800 (PST)
+Received: from kynes (apn-31-2-85-140.dynamic.gprs.plus.pl. [31.2.85.140])
+        by smtp.gmail.com with ESMTPSA id m13-v6sm3150538ljg.56.2018.12.18.11.29.10
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 18 Dec 2018 11:29:10 -0800 (PST)
+Date:   Tue, 18 Dec 2018 20:29:09 +0100
+From:   Michal Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Plans for meshd
+Message-ID: <20181218192909.27htxh3glfgjmial@kynes>
+Mail-Followup-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <CACXRGxyMGt1zecvRmgoa5uuSwy4H9UpSECM0tOuC+uXGmQoGNg@mail.gmail.com>
  <DEBB0CAA2616974FAE35E4B560B9A4375D8E02FE@ORSMSX101.amr.corp.intel.com>
  <20181218110838.ollsqils5ci7cq4v@scytale>
  <DEBB0CAA2616974FAE35E4B560B9A4375D8E0B35@ORSMSX101.amr.corp.intel.com>
- <CAAVjN7f2bW5pB-1zB1wZPq-usnHeyoie5M5izQa1-Eqj+9Q2Cg@mail.gmail.com>
-In-Reply-To: <CAAVjN7f2bW5pB-1zB1wZPq-usnHeyoie5M5izQa1-Eqj+9Q2Cg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzQ4MzM0MTktZGZjNi00MzUyLTk2OGUtMzNjODQwNTk3YWQ1IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiT1wvWmtHd2tsTnBcL2FmYjdzZXV5aUtQMFRUUFNUS3RXWUgzU2NxQW8xZVRROHlYYmFYQXB0RTB3WlhPakFHWWUwIn0=
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.22.254.138]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4375D8E0B35@ORSMSX101.amr.corp.intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgRGFuaWVsbGUsDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogbGlu
-dXgtYmx1ZXRvb3RoLW93bmVyQHZnZXIua2VybmVsLm9yZyBbbWFpbHRvOmxpbnV4LWJsdWV0b290
-aC0NCj4gb3duZXJAdmdlci5rZXJuZWwub3JnXSBPbiBCZWhhbGYgT2YgRGFuaWVsbGUgQ29zdGFu
-dGlubw0KPiBTZW50OiBUdWVzZGF5LCBEZWNlbWJlciAxOCwgMjAxOCA5OjA4IEFNDQo+IFRvOiBH
-aXgsIEJyaWFuIDxicmlhbi5naXhAaW50ZWwuY29tPg0KPiBDYzogbWljaGFsLmxvd2FzLXJ6ZWNo
-b25la0BzaWx2YWlyLmNvbTsgbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KPiBTdWJq
-ZWN0OiBSZTogUGxhbnMgZm9yIG1lc2hkDQo+IA0KPiBUaGFua3MgZm9yIHRoZSB3b3JrIGRvbmUg
-b24gQkxFIE1lc2ggYnV0IEkgaGF2ZSB0byBhZ3JlZSB3aXRoIHRoZSByZXF1ZXN0DQo+IHRvIHN1
-cHBvcnQgR0FUVCBhbmQgQkxFIE1lc2ggc2ltdWx0YW5lb3VzbHkgb24gYSBzaW5nbGUgY29udHJv
-bGxlci4gVGhlcmUNCj4gYXJlIG1hbnkgYXBwbGljYXRpb25zIHRoYXQgdXNlIEdBVFQgZm9yIGhp
-Z2hlciBiYW5kd2lkdGggcG9pbnQgdG8gcG9pbnQNCj4gY29ubmVjdGlvbnMgdXNlZCBpbiBPVEEg
-dXBkYXRlIHdoZXJlIHRoZSBvdmVyaGVhZCBhbmQgZnVuY3Rpb25hbGl0eSBvZg0KPiBtZXNoIGFy
-ZSBub3QgbmVlZGVkIG9yIHdhbnRlZC4gVW50aWwgTWVzaCBzdXBwb3J0cyByb3V0ZWQgcGFja2V0
-cyBsYXJnZQ0KPiBTQVIgdXBsb2FkcyBmbG9vZCB0aGUgbWVzaCBuZXR3b3JrIGFuZCBtYWtlIE9U
-QSBvdmVyIG1lc2ggbmVhcmx5DQo+IGltcG9zc2libGUgd2hlbiB0aGUgbm9kZSBjb3VudCBnb2Vz
-IGFib3ZlIDQgcmVsYXkgbm9kZXMuIExpbWl0aW5nIHRoZQ0KPiBudW1iZXIgb2YgR0FUVCBub2Rl
-cyB0byAxIGF0IGEgdGltZSBpcyBub3QgYSBwcm9ibGVtIGZvciBvdXIgYXBwbGljYXRpb24NCj4g
-bmVlZHMuDQo+IA0KPiBXaGF0IEkgYW0gdW5jbGVhciBvbiBpcyB3aHkgaXQgaXMgbm90IHBvc3Np
-YmxlIHRvIHN1cHBvcnQgZ2VuZXJpYyBHQVRUIGFuZA0KPiBQQi1HQVRUICsgUHJveHkgQ2xpZW50
-L1NlcnZlciBvbiB0aGUgc2FtZSBjb250cm9sbGVyLiBJZiBQQi1BRFYgaXMgb25seSB1c2VkDQo+
-IGZvciBwcm92aXNpb25pbmcgdGhlbiB0aGUgdGltZSBzcGVudCBpbiBBRFYgd2lsbCBub3QgYWZm
-ZWN0IHN0ZWFkeSBzdGF0ZQ0KPiBvcGVyYXRpb25zLg0KDQpJIGFtIG5vdCBlbnRpcmVseSBzdXJl
-IEkgdW5kZXJzdGFuZCB5b3VyIHF1ZXN0aW9uLCBzbyBJIHdpbGwgYW5zd2VyIHRoZSBxdWVzdGlv
-biBJICp0aGluayogeW91IGFyZSBhc2tpbmcuDQoNCk1lc2ggaXMgYW4gQWR2ZXJ0aXNpbmcgYmFz
-ZWQgc3lzdGVtLCB0aGF0IHdvcmtzIGJlc3QgaW4gYSBzdGVhZHkgc3RhdGUgd2hlbiBldmVyeW9u
-ZSBpcyBqdXN0DQpwYXNzaXZlbHkgc2Nhbm5pbmcgZm9yIGNvbm5lY3Rpb25sZXNzIGFkdmVydGlz
-aW5nIHBhY2tldHMsIGFuZCBzZW5kaW5nIHRoZW0gd2hlbiByZXF1aXJlZC4NCg0KR0FUVCBydW5z
-IG92ZXIgYW4gQUNMIGNvbm5lY3Rpb24gd2hpY2ggcmVzZXJ2ZXMgYSBjZXJ0YWluIGFtb3VudCBv
-ZiB0aGUgYXZhaWxhYmxlICJ0aW1lIiBiYW5kd2lkdGgsIGV2ZW4gd2hlbiB0aGUgQUNMIGxpbmsg
-aXMgaWRsZS4gIFRoaXMgcmVkdWNlcyB0aGUgb3Bwb3J0dW5pdGllcyBmb3IgdGhlIGNvbnRyb2xs
-ZXIgdG8gaGVhciBhZHZlcnRpc2luZyBwYWNrZXRzLCBhbmQgdGhlcmUgYXJlIG1vcmUgbWlzc2Vk
-ICBtZXNoIChBRFYpIHBhY2tldHMgYXMgYSByZXN1bHQuDQoNCkFsc28gKHdpdGggdGhlIHBvc3Np
-YmxlIGV4Y2VwdGlvbiBvZiBhIGhpZ2hlciBzcGVlZCBGaXJtd2FyZSB1cGRhdGUgcGF0aCkgdGhl
-ICBHQVRUIFByb3h5IFNlcnZpY2UgaXMgaW50ZW5kZWQgYXMgYSBsZWdhY3kgbWV0aG9kIGZvciBh
-IEdBVFQgT25seSBkZXZpY2UgdG8gam9pbiBhIG1lc2gsIGFuZCB0YWxrIHRvIG5vZGUgdGhyb3Vn
-aCB0aGUgbWVzaC4gIEl0IGlzICpub3QqIGludGVuZGVkIHRvIGJlIHRoZSBtYWluIGJlYXJlciBv
-ZiB0aGUgbWVzaCAoaS5lLiBhbGwgdGhlIG5vZGVzIGFyZSAqbm90KiBpbnRlcmNvbm5lY3RlZCBi
-eSBHQVRULi4uICAgb25seSB0aGUgbm9kZXMgdGhhdCBkbyBub3Qgc3VwcG9ydCBkaXNjcmV0ZSBh
-ZHZlcnRpc2luZyBjb250cm9sLi4uICBsaWtlIHBlcmhhcHMgb2xkZXIgc21hcnRwaG9uZXMpLg0K
-DQpUaGUgIkJhY2tib25lIiBvZiBhbnkgTWVzaCBOZXR3b3JrIHdpbGwgYmUgQURWIGJlYXJlciBv
-bmx5Lg0KDQoNCj4gVGhhbmtzLA0KPiBEYW5pZWxsZQ0KPiANCj4gT24gVHVlLCBEZWMgMTgsIDIw
-MTggYXQgODoyOCBBTSBHaXgsIEJyaWFuIDxicmlhbi5naXhAaW50ZWwuY29tPiB3cm90ZToNCj4g
-Pg0KPiA+IEhpIE1pY2hhbCwNCj4gPg0KPiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0N
-Cj4gPiA+IEZyb206IGxpbnV4LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0
-bzpsaW51eC1ibHVldG9vdGgtDQo+ID4gPiBvd25lckB2Z2VyLmtlcm5lbC5vcmddIE9uIEJlaGFs
-ZiBPZiBNaWNoYWwgTG93YXMtUnplY2hvbmVrDQo+ID4gPiBTZW50OiBUdWVzZGF5LCBEZWNlbWJl
-ciAxOCwgMjAxOCAzOjA5IEFNDQo+ID4gPiBUbzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2VybmVs
-Lm9yZw0KPiA+ID4gU3ViamVjdDogUmU6IFBsYW5zIGZvciBtZXNoZA0KPiA+ID4NCj4gPiBbLi4u
-XQ0KPiA+ID4gV2hhdCBJJ20gdGhpbmtpbmcgYWJvdXQgaXMgaGF2aW5nIGJvdGggbW9kZXMgb2Yg
-Y29tbXVuaWNhdGlvbg0KPiA+ID4gYXZhaWxhYmxlLCBldmVuIGlmIHRoZSBlbWJlZGRlZCBkZXZp
-Y2UgaGFzIGp1c3Qgb25lIENvbnRyb2xsZXIsIGFzDQo+ID4gPiBpcyB0aGUgY2FzZSB3aXRoIHRo
-ZSBtYWpvcml0eSBvZiBvZmYtdGhlLXNoZWxmIHBsYXRmb3Jtcy4NCj4gPiA+DQo+ID4gPiBUaGUg
-cmVhc29uIHdlIHdhbnQvbmVlZCBib3RoIEJMRS9HQVRUIGFuZCBNZXNoIG9uIHRoZSBzYW1lIG5v
-ZGUNCj4gaGFzDQo+ID4gPiBhIGxvdCB0byBkbyB3aXRoIHByb3Zpc2lvbmluZyAtIGF0IHRoZSBt
-b21lbnQgd2UgY29uZmlndXJlIG91cg0KPiA+ID4gbmV0d29ya3MgdXNpbmcgYSBtb2JpbGUgYXBw
-LCBtZWFuaW5nIHdlIG5lZWQgZGV2aWNlcyB0byBzdXBwb3J0DQo+ID4gPiBQQi1HQVRULiBUaGlz
-IGlzIGJlY2F1c2UgQ29udHJvbGxlcnMgcHJlc2VudCBpbiBtb2JpbGUgZGV2aWNlcyBkbw0KPiA+
-ID4gbm90IHN1cHBvcnQgTWVzaCBuYXRpdmVseSwgYW5kIHdlIGNhbid0IGFzc3VtZSB0aGVyZSBp
-cyBhIEdBVFQgUHJveHkNCj4gPiA+IG5lYXJieSwgZXNwZWNpYWxseSB3aGVuIGNvbmZpZ3VyaW5n
-IGEgbmV3IG5ldHdvcmsuDQo+ID4gPg0KPiA+ID4gPiBBbmQgSSBhbSBub3Qgb3Bwb3NlZCB0byBz
-b21lb25lIHN0YXJ0aW5nIGEgcHJvamVjdCB0aGF0IHdpbGwgYWxsb3cNCj4gPiA+ID4gdGhlIGJs
-dWV0b290aGQgYW5kIG1lc2hkIHNoYXJlIGEgc2luZ2xlIGNvbnRyb2xsZXIgYW5kIHRha2luZw0K
-PiA+ID4gPiByZXNwb25zaWJpbGl0eSB0aGUgcmVkdWNlZCBwZXJmb3JtYW5jZSBvZiBlYWNoLCBi
-dXQgdGhhdCBpcyBub3QNCj4gPiA+ID4gd29yayB3ZSBoYXZlIHBsYW5uZWQuDQo+ID4gPiBBY2su
-DQo+ID4gPg0KPiA+ID4gRllJLCBpdCBzZWVtcyB3ZSBtaWdodCBiZSBpbnRlcmVzdGVkIGluIG1h
-a2luZyB0aGF0IGhhcHBlbi4NCj4gPg0KPiA+IE1heWJlIHdlIHNob3VsZCBzdGFydCB3aXRoIHdo
-YXQgeW91IGFjdHVhbGx5IG5lZWQuDQo+ID4gKiBEbyB5b3UgbmVlZCBHQVRUIHN1cHBvcnQgb25s
-eSBmb3IgdGhlIFByb3Zpc2lvbmluZyBwcm9jZWR1cmU/DQo+ID4gKiBvciBhbHNvIGFzIGEgR0FU
-VCBwcm94eSBTZXJ2ZXI/DQo+ID4NCj4gPiBUaGVyZSBpcyBhIHBvc3NpYmlsaXR5Li4uICAgV2Ug
-aGFkIGFuIGludGVybmFsIHByb2plY3Qgd2hlcmUgd2Ugc3VwcG9ydGVkIGENCj4gR0FUVCBQcm94
-eSBzZXJ2ZXIgd2l0aG91dCB1c2luZyB0aGUgYmx1ZXRvb290aGQgc2VydmljZXMgYXQgYWxsLiAg
-Rm9yDQo+IGJsdWV0b290aGQsIHRoZSByZXN1bHQgaXMgdGhlIHNhbWU6ICBUaGUgY29udHJvbGxl
-ciB3YXMgZW50aXJlbHkgdW5kZXIgdGhlDQo+IGNvbnRyb2wgb2YgdGhlIG1lc2ggZXhlY3V0YWJs
-ZSAoaXQgd2FzIG5vdCBhIGRhZW1vbiwgYnV0IGEgcHJvb2Ytb2YtY29uY2VwdA0KPiBjb21tYW5k
-IGxpbmUgdG9vbCkuICBCdXQgdGhlcmUgYXJlIHByb2JsZW1zIHdpdGggdGhhdCBwYXJ0aWN1bGFy
-IGlkZWEgZ2l2ZW4NCj4gdGhlIGFyY2hpdGVjdHVyZSBvZiB0aGUgbWVzaGQgZGFlbW9uOg0KPiA+
-DQo+ID4gKiBJIGRvIG5vdCB0aGluayB3ZSBzaG91bGQgdHJ5IHRvIHN1cHBvcnQgUHJveHkgQ2xp
-ZW50ICphdCBhbGwqLiBUaGUgUHJveHkNCj4gQ2xpZW50IGFzc3VtZXMgYSBzaW5nbGUgTm9kZSwg
-d2hpY2ggZGVmZWF0cyB0aGUgcHVycG9zZSBvZiBoYXZpbmcgYSBkYWVtb24NCj4gYXQgYWxsLg0K
-PiA+DQo+ID4gKiBPbmx5IGEgc2luZ2xlIG5vZGUgKG9yIHVucHJvdmlzaW9uZWQgR0FUVCBzZXJ2
-ZXIpIGNhbiB1c2UgR0FUVCBhdCBhDQo+IHRpbWUuICBUaGUgcHJvdG9jb2wgZG9lcyBub3QgYWxs
-b3cgZm9yIHRoZSBtdWx0aS1ub2RlIGFyY2hpdGVjdHVyZSBvZiB0aGUNCj4gZGFlbW9uLg0KPiA+
-DQo+ID4gKiAgSWYgd2UgZG8gdHJ5IHRvIHB1dCBhIEdBVFQgUHJveHkgU2VydmVyIG9uIGEgc2lu
-Z2xlIGNvbnRyb2xsZXINCj4gaW1wbGVtZW50YXRpb24sIHdlIG1heSBuZWVkIGEgc3BlY2lhbCBu
-b2RlIHRoYXQgbG9vcHMgYmFjayBkYXRhIHJlY2VpdmVkDQo+IGZyb20gdGhlIE1lc2ggdG8gdGhl
-IEdhdHQgQ2xpZW50Lg0KPiA+DQo+ID4gKiBXZSB3aWxsIHByb2JhYmx5IG5lZWQgdG8gbGltaXQg
-dGhpcyBzcGVjaWFsIEdBVFQgc3VwcG9ydGluZyBub2RlIHRvIGENCj4gc2luZ2xlIG5vZGUgb24g
-dGhlIGRhZW1vbi4NCj4gPg0KPiA+ICogV2UgbWF5IHdhbnQgdG8gbWFrZSB0aGlzIGEgYnVpbGQt
-dGltZSBvcHRpb24sIGJlY2F1c2UgQURWIGhhbmRsaW5nIHdpbGwNCj4gcHJvYmFibHkgYmUgYWZm
-ZWN0ZWQgd2hldGhlciBhbiBleGlzdGluZyBHQVRUIGNvbm5lY3Rpb24gaXMgZXN0YWJsaXNoZWQg
-b3INCj4gbm90LCBpZiBpdCBpcyBwb3NzaWJsZSB0aGF0IGEgR0FUVCBjb25uZWN0aW9uIGNvdWxk
-IGJlIHJlcXVlc3RlZC4NCj4gPg0KPiA+ICogVGhpcyBhZmZlY3RzIHRoZSB0aW1lcyB3aGVuIHdl
-IGNhbiB1c2UgUmFuZG9taXplZCwgZXZlciBjaGFuZ2luZyBCRA0KPiBBRERScywgYW5kIHJlcXVp
-cmVzIHVzIHRvIGludGVybGVhdmUgY29ubmVjdGFibGUgYWR2ZXJ0aXNlbWVudHMgYW5kICJiZQ0K
-PiBjb25uZWN0YWJsZSIsIHdoaWNoIGlzIG5vdCB0ZWNobmljYWxseSBhbGxvd2VkIHdpdGggbWVz
-aCBuZXR3b3JrIEFEVg0KPiBwYWNrZXRzLg0KPiA+DQo+ID4NCj4gPg0KPiA+DQo+ID4gPg0KPiA+
-ID4gcmVnYXJkcw0KPiA+ID4gLS0NCj4gPiA+IE1pY2hhxYIgTG93YXMtUnplY2hvbmVrIDxtaWNo
-YWwubG93YXMtcnplY2hvbmVrQHNpbHZhaXIuY29tPg0KPiA+ID4gU2lsdmFpciBodHRwOi8vc2ls
-dmFpci5jb20NCj4gPiA+IEphc25vZ8OzcnNrYSA0NCwgMzEtMzU4IEtyYWtvdywgUE9MQU5EDQo+
-IA0KPiANCj4gDQo+IC0tDQo+IC0gRGFuaWVsbGUgQ29zdGFudGlubw0K
+Hi Brian,
+
+On 12/18, Gix, Brian wrote:
+> Maybe we should start with what you actually need.
+> * Do you need GATT support only for the Provisioning procedure?
+Primarily, but not only this. As Danielle mentioned, there are cases
+where we would like to "fall back" to GATT in order to exchange large
+amounts of data with a selected node. This is going to happen only
+occassionally, so it won't affect the "steady state" performance of a
+mesh network. Spec even mentions that particular use case, via Node
+Identity procedure.
+
+> * or also as a GATT proxy Server?
+No, at the moment we don't need GATT Proxy Server support in Linux,
+althouth long-term I think it would be beneficial for bluez to have
+this.
+
+> * I do not think we should try to support Proxy Client *at all*.
+Agreed.
+
+> The Proxy Client assumes a single Node, which defeats the purpose of
+> having a daemon at all.
+>
+> * Only a single node (or unprovisioned GATT server) can use GATT at a
+> time.  The protocol does not allow for the multi-node architecture of
+> the daemon.
+I do not think this is true. The spec doesn't seem to put any
+limitations on the Network PDUs you can exchange with the GATT Proxy
+Server, so I think it is entirely possible to have multiple Mesh nodes
+share a single GATT connection to a proxy.
+
+Noone does that, though, because performance of such a setup would
+probably be abysmal :) In the end, I don't consider this a "real" use
+case.
+
+> *  If we do try to put a GATT Proxy Server on a single controller
+> implementation, we may need a special node that loops back data
+> received from the Mesh to the Gatt Client.
+Well, I was wondering if it would be feasible to implement another
+flavour of mesh-io layer, that would talk to Bluetooth Daemon (possibly
+via API extensions) instead of opening the hci user channel on its own.
+
+For that to work, the main Bluetooth Daemon would need to expose D-Bus
+signals to retrieve "raw" advertising indications, and a method to send
+a single advertising packet.
+
+Alternatively (and this is just me thinking out loud), maybe it would be
+possible to dup() the HCI socket and pass it to the Mesh Daemon,
+assuming it gets spawneby by fork()ing Bluetooth Daemon? Not sure if the
+kernel interface allows such sheganigans.
+
+> * We may want to make this a build-time option, because ADV handling
+> will probably be affected whether an existing GATT connection is
+> established or not, if it is possible that a GATT connection could be
+> requested.
+> 
+> * This affects the times when we can use Randomized, ever changing BD
+> ADDRs, and requires us to interleave connectable advertisements and
+> "be connectable", which is not technically allowed with mesh network
+> ADV packets.
+In our experience, /just enabling/ Proxy Server on a node (thus making
+it advertise with connectables) does not seem affect delivery rate of
+mesh packets, at least not meaningfully (0.1%, maybe). The performance
+drop is observable only after an actual connection is established, and
+is in 10-20% range, if I recall correctly.
+
+regards
+-- 
+Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+Silvair http://silvair.com
+Jasnogórska 44, 31-358 Krakow, POLAND
