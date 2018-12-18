@@ -1,108 +1,234 @@
-Return-Path: <SRS0=yw44=O2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=Q26+=O3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D3DC43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 21:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB12C43444
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 08:16:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BF8E21783
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Dec 2018 21:48:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 367A7214C6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 08:16:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=codecoup-pl.20150623.gappssmtp.com header.i=@codecoup-pl.20150623.gappssmtp.com header.b="wl0deA39"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727096AbeLQVsi (ORCPT
+        id S1726528AbeLRIQT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Dec 2018 16:48:38 -0500
-Received: from mga03.intel.com ([134.134.136.65]:52243 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726361AbeLQVsh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Dec 2018 16:48:37 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Dec 2018 13:48:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,366,1539673200"; 
-   d="scan'208";a="130747824"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
-  by fmsmga001.fm.intel.com with ESMTP; 17 Dec 2018 13:48:36 -0800
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.175]) by
- ORSMSX105.amr.corp.intel.com ([169.254.2.191]) with mapi id 14.03.0415.000;
- Mon, 17 Dec 2018 13:48:35 -0800
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     Michal Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Plans for meshd
-Thread-Topic: Plans for meshd
-Thread-Index: AQHUlkzs4eI9Vs+iikShZ/67E4V4MqWDbuDA
-Date:   Mon, 17 Dec 2018 21:48:34 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4375D8E02FE@ORSMSX101.amr.corp.intel.com>
-References: <CACXRGxyMGt1zecvRmgoa5uuSwy4H9UpSECM0tOuC+uXGmQoGNg@mail.gmail.com>
-In-Reply-To: <CACXRGxyMGt1zecvRmgoa5uuSwy4H9UpSECM0tOuC+uXGmQoGNg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjFlZWNmZWQtMjc2Ni00NDZjLWEyOTYtMjlhMTk2MTI3ODQ0IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiWG9VUHdhYXI4aG5EckptdW1EUUtKeDViNW9aOEwxYytCMndxTDY1RmdFdUdtTTNyZUJ5ZUZQSVpiVkNOckJETSJ9
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.22.254.138]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Tue, 18 Dec 2018 03:16:19 -0500
+Received: from mail-lj1-f181.google.com ([209.85.208.181]:34802 "EHLO
+        mail-lj1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726367AbeLRIQT (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 03:16:19 -0500
+Received: by mail-lj1-f181.google.com with SMTP id u89-v6so2699506lje.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Dec 2018 00:16:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:organization:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=uCTy3accaNtm8mC5d/4W82yxigV3vBUyjf/mAsVE9LI=;
+        b=wl0deA3928MsVD2XDZfvtR0YqQGozSvaoMTj6ebL7OkWQqvXToNLDWJN0puLtxfD5/
+         1Vx9jRP30xC1Rjx63X1yh+cxEZfNIEA6+GpIHSl8Uxf+nOIdT9/juuh0NmkAX1nMuL3n
+         c8vnYJFa+ad4KR7qCW0V9AXyGCkcwo8FIsUHpRoSHfyqwKUk48b2jpD4TtO2itzvAaaZ
+         VRVJpTpuIGrye3YL1E5xMPB5fpaluwIdsEpEfLX7O2YQRJfoSTanRvE+HRw8H6CikCB4
+         congHmz3or3Dzi0GJuw1BXh6KCWJTVde/mTxOp/Kh5g07S6j/fFI4TxvBvsGC6qfwt+b
+         vgRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=uCTy3accaNtm8mC5d/4W82yxigV3vBUyjf/mAsVE9LI=;
+        b=Tf20Hg4VylJt4hbcP4uUlvaQwx6Nlphl4/rJKSJo7Hod1T2PIwqVPSvfsbnpewKAuB
+         uYCHxLnZxkBozjLWOLp192+cMDyNG1N7uEb14fNY5bHqeBM0DlmAZOj+KR58Aa7IgLY0
+         ncfeHuWEdU5Uvh/b4pOumbCQ2Ih/3qimjc7o6vqhy2ayUXDG5lVlquBUxT4zZijcj5t0
+         Llhqp/Gcgp17DZWpu1X2DYDe1VnFYxudFisLRE4Vl77AIM61nlRX8MGNE+dVsiSW8i/Z
+         TKJ/blyKPvWLzpppwja4lqVQigOnZDZoiuWa3dhy4T55gAqd5HeVbM2XYi43yFghmZE1
+         LnrA==
+X-Gm-Message-State: AA+aEWblRWZpExgDe1bePemGo+EewsUXOmf+CpC0g8+D/i+YEM5+QvUl
+        SsG0Yro1JzWmIngDiqCnHYmC3XG6IDjr4w==
+X-Google-Smtp-Source: AFSGD/U8b5GKfZhdcCN9dwZljrBDOgkoGR5QAIqMOoxtZT7y0XZnhlPfXBjd4z4MlKKeMOOGjal6zw==
+X-Received: by 2002:a2e:5152:: with SMTP id b18-v6mr8035658lje.88.1545120976284;
+        Tue, 18 Dec 2018 00:16:16 -0800 (PST)
+Received: from ix.localnet ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id b17sm3131208lfc.21.2018.12.18.00.16.14
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 18 Dec 2018 00:16:15 -0800 (PST)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+To:     "Gix, Brian" <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "Stotland, Inga" <inga.stotland@intel.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>
+Subject: Re: [PATCH BlueZ v3 00/30] Major rewrite for Multi-Node and DBus
+Date:   Tue, 18 Dec 2018 09:16:13 +0100
+Message-ID: <17761993.WvVeqkb5i9@ix>
+Organization: CODECOUP
+In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4375D8E01AF@ORSMSX101.amr.corp.intel.com>
+References: <20181215002624.9313-1-brian.gix@intel.com> <DEBB0CAA2616974FAE35E4B560B9A4375D8E01AF@ORSMSX101.amr.corp.intel.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWljaGFsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4
-LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgt
-DQo+IG93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIE1pY2hhbCBMb3dhcy1SemVj
-aG9uZWsNCj4gU2VudDogTW9uZGF5LCBEZWNlbWJlciAxNywgMjAxOCAxOjEwIFBNDQo+IFRvOiBs
-aW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQo+IFN1YmplY3Q6IFBsYW5zIGZvciBtZXNo
-ZA0KPiANCj4gSGksDQo+IA0KPiBHaXZlbiByZWNlbnQgcGF0Y2hlcyB0byBtZXNoLCB3aGF0IGFy
-ZSB5b3VyIG1pZCB0byBsb25nLXRlcm0gcGxhbnMgdG8NCj4gZW5hYmxlIGNvLWV4aXN0ZW5jZSBv
-ZiBibHVldG9vdGhkIGFuZCBtZXNoZCBvbiBhIHNpbmdsZSBzeXN0ZW0/DQoNCllvdSBhcmUgZXNz
-ZW50aWFsbHkgY29ycmVjdCwgdGhhdCB0aGUgY3VycmVudCBpbXBsZW1lbnRhdGlvbiBhc3N1bWVz
-IG1lc2ggb3duZXJzaGlwIG9mIHRoZSBDb250cm9sbGVyLCBhbmQgdGhlcmUgaXMgbm8gY28tZXhp
-c3RlbmNlIG9mICJDbGFzc2ljIEJsdWV0b290aCIgYXMgaW1wbGVtZW50ZWQgaW4gdGhlIEJsdWV0
-b290aCBEYWVtb24sIG9uIHRoZSBzYW1lIGNvbnRyb2xsZXIuICBTbyBjdXJyZW50bHksIGlmIHlv
-dSB3YW50IHRvIHNpbXVsdGFuZW91c2x5IHJ1biBhbiBBQ0wgY29ubmVjdGlvbiBiYXNlZCBhcHBs
-aWNhdGlvbiB3aXRoIE1lc2gsIHlvdSB3b3VsZCBkbyBzbyB3aXRoIG1vcmUgdGhhbiBvbmUgY29u
-dHJvbGxlci4gIChUaGlzIHNob3VsZCBhbHJlYWR5IHdvcmspDQoNCkkgY29uc2lkZXIgdGhpcyB0
-byBiZSBhIHByYWN0aWNhbCBhcHByb2FjaCwgYmVjYXVzZSB0aGUgb3ZlcmhlYWQgY29uc3VtZWQg
-YnkgQUNMIGNvbm5lY3Rpb25zIG5lZ2F0aXZlbHkgYWZmZWN0cyBBZHZlcnRpc2luZyBiYXNlZCBj
-b21tdW5pY2F0aW9ucywgYW5kIGxpbnV4IGluIHBhcnRpY3VsYXIgaGFuZGxlcyBhIHByYWN0aWNh
-bGx5IHVubGltaXRlZCBudW1iZXIgb2YgY29udHJvbGxlcnMuICBTdXBwb3J0IGZvciBkZXZpY2Vz
-IHdpdGggY29udHJvbGxlcnMgdGhhdCBoYXZlIGFjdGl2ZSBBQ0wgY29ubmVjdGlvbnMgcmVxdWly
-ZXMgb3RoZXIgbWVzaCBkZXZpY2VzIHRvIHNlbmQgbW9yZSByZWR1bmRhbnQgcGFja2V0cyB0byBl
-bnN1cmUgZGVsaXZlcnkuDQoNClRoZSBwcmltYXJ5IHVzZSBjYXNlcyB0YXJnZXRlZCBieSB0aGlz
-IGltcGxlbWVudGF0aW9uIGFzc3VtZXMgdGhlIGNvbnRyb2xsZXIgaXMgYmVpbmcgdXNlZCBmb3Ig
-b25lIG9yIHRoZSBvdGhlci4gIEFuZCB3ZSB3YW50IHRvIGdpdmUgZW1iZWRkZWQgcGxhdGZvcm1z
-IHRoZSBvcHRpb24gb2Ygbm90IGluc3RhbGxpbmcgbWVzaGQgaWYgdGhleSBkb24ndCBuZWVkIE1l
-c2gsIG9yIG5vdCBpbnN0YWxsaW5nIGJsdWV0b290aGQgaWYgdGhleSBkb24ndCBuZWVkIENsYXNz
-aWMgQmx1ZXRvb3RoLiANCg0KVGhhdCBzYWlkIHdlICpkbyogcGxhbiBvbiBzdXBwb3J0aW5nIEdB
-VFQgUHJveHkgU2VydmVyLCBidXQgb2ZmZXJpbmcgdGhpcyBzdXBwb3J0IHRocm91Z2ggdGhlIEJs
-dWV0b290aCBkYWVtb24gKGJsdWV0b290aGQpIG9uIGEgc2VwYXJhdGUgY29udHJvbGxlci4gIElz
-IHRoaXMgeW91ciBvcmlnaW5hbCBxdWVzdGlvbj8gIFNhbWUgc3lzdGVtLCBidXQgbXVsdGlwbGUg
-Y29udHJvbGxlcnMsIGFuZCBib3RoIGRhZW1vbnMgcnVubmluZy4gIEFsc28gZm9yd2FyZCBsb29r
-aW5nLCBhIHN5c3RlbSBtaWdodCBoYXZlIGFzIG1hbnkgYXMgNSBjb250cm9sbGVyczogIDEgZm9y
-IENsYXNzaWMgQmx1ZXRvb3RoLCAxIGZvciBPdXRib3VuZCBNZXNoIHRyYWZmaWMsIGFuZCAzIChv
-bmUgb24gZWFjaCBMRSBhZHYgY2hhbm5lbCkgZm9yIGluY29taW5nIE1lc2ggdHJhZmZpYy4NCg0K
-QW5kIEkgYW0gbm90IG9wcG9zZWQgdG8gc29tZW9uZSBzdGFydGluZyBhIHByb2plY3QgdGhhdCB3
-aWxsIGFsbG93IHRoZSBibHVldG9vdGhkIGFuZCBtZXNoZCBzaGFyZSBhIHNpbmdsZSBjb250cm9s
-bGVyIGFuZCB0YWtpbmcgcmVzcG9uc2liaWxpdHkgdGhlIHJlZHVjZWQgcGVyZm9ybWFuY2Ugb2Yg
-ZWFjaCwgYnV0IHRoYXQgaXMgbm90IHdvcmsgd2UgaGF2ZSBwbGFubmVkLg0KDQo+IEZyb20gd2hh
-dCBJIGdhdGhlciAocGxlYXNlLCBjb3JyZWN0IG1lIGlmIEknbSB3cm9uZyksIGN1cnJlbnQgaW1w
-bGVtZW50YXRpb24NCj4gb2YgbWVzaC1pby1nZW5lcmljIGFzc3VtZXMgdGhhdCBtZXNoZCBpcyB0
-aGUgc29sZSBvd25lciBvZiB0aGUgQkxFDQo+IGFkYXB0ZXIsIGJlY2F1c2UgdGhlIEhDSSBzb2Nr
-ZXQgaXMgYm91bmQgdXNpbmcgYXMgSENJX0NIQU5ORUxfVVNFUiwgc28gYXQNCj4gdGhlIG1vbWVu
-dCB0aGUgZGFlbW9ucyBhcmUgdW5hYmxlIHRvIHNoYXJlIHRoZSBzYW1lIEhDSSBkZXZpY2UuIElz
-IG15DQo+IHVuZGVyc3RhbmRpbmcgY29ycmVjdD8NCj4gDQo+IHJlZ2FyZHMNCj4gLS0NCj4gTWlj
-aGHFgiBMb3dhcy1SemVjaG9uZWsNCj4gTGFtYmRhIFRlYW0gTGVhZGVyDQo+IA0KPiBTaWx2YWly
-DQo+IEphc25vZ8OzcnNrYSA0NA0KPiAzMS0zNTggS3Jha293DQo+IFBPTEFORA0KPiANCj4gaHR0
-cDovL3d3dy5zaWx2YWlyLmNvbQ0KDQpSZWdhcmRzLA0KQnJpYW4NCg==
+Hi Brian,
+
+On Monday, 17 December 2018 19:42:01 CET Gix, Brian wrote:
+> This patch-set has been applied upstream.
+
+There is something wrong with Makefile.mesh
+
+Makefile.am: installing './depcomp'
+parallel-tests: installing './test-driver'
+Makefile.mesh:31: warning: variable 'mesh_btmesh_LDADD' is defined but no 
+program or
+Makefile.mesh:31: library has 'mesh_btmesh' as canonical name (possible typo)
+Makefile.am:306:   'Makefile.mesh' included from here
+Makefile.mesh:32: warning: variable 'mesh_btmesh_DEPENDENCIES' is defined but 
+no program or
+Makefile.mesh:32: library has 'mesh_btmesh' as canonical name (possible typo)
+Makefile.am:306:   'Makefile.mesh' included from here
+
+
+Enabling commented out code (why is it commented out btw?) in Makefile.mesh 
+stil results in:
+
+Makefile.mesh:39: warning: mesh_btmesh_LDADD multiply defined in condition 
+MESH ...
+Makefile.am:306:   'Makefile.mesh' included from here
+Makefile.mesh:31: ... 'mesh_btmesh_LDADD' previously defined here
+Makefile.am:306:   'Makefile.mesh' included from here
+
+
+
+
+> > -----Original Message-----
+> > From: Gix, Brian
+> > Sent: Friday, December 14, 2018 4:26 PM
+> > To: linux-bluetooth@vger.kernel.org
+> > Cc: johan.hedberg@gmail.com; Stotland, Inga <inga.stotland@intel.com>;
+> > marcel@holtmann.org; Gix, Brian <brian.gix@intel.com>
+> > Subject: [PATCH BlueZ v3 00/30] Major rewrite for Multi-Node and DBus
+> > 
+> > The Mesh Daemon has been largely rewritten.
+> > 
+> > It matches the API in doc/mesh-api.txt, and is now accessible from non-
+> > privledged DBus clients.  The commandline version has been temporarily
+> > removed, although it will probably be re-added in the future. The dBus
+> > privledges need to be adjusted to allow for non-privledged access to
+> > Daemon interfaces.  We will shortly also be adding a Mesh Specific README
+> > and TODO file, but in the meantime, contact Brian and/or Inga with any
+> > questions.
+> > 
+> > v3 -- distcheck and pedantic styleguide fixes
+> > 
+> > Brian Gix (12):
+> >   mesh: Staging for Mesh DBus API rewrite
+> >   mesh: Delete obsolete files
+> >   mesh: Rewite Network layer for multiple nodes
+> >   mesh: Direction agnostic PB-Adv implimentation
+> >   mesh: Acceptor side provisioning implimentation
+> >   mesh: Initiator side provisioning implimentation
+> >   mesh: Rewrite Controler interface for full init
+> >   mesh: Unchanged variables set to const
+> >   mesh: re-arrange provisioning for DBus API
+> >   mesh: restructure I/O for multiple nodes
+> >   mesh: Clean-up Comment style
+> >   mesh: Enable building Mesh Daemon
+> > 
+> > Inga Stotland (18):
+> >   mesh: Utilities for DBus support
+> >   mesh: Internal errors
+> >   mesh: Re-write storage for Multiple Nodes
+> >   mesh: Rewrite Node handling for multiple nodes
+> >   mesh: centralize generic utilities
+> >   mesh: Re-architect for DBus API
+> >   mesh: Make config model handle multiple nodes
+> >   mesh: Multi node Config Server model
+> >   mesh: Restrusture DB to support multiple nodes
+> >   mesh: restructure model services for multiple nodes
+> >   mesh: DBUS interface for Provisioning Agent
+> >   mesh: restructure App Key storage
+> >   mesh: Update for DBus API and multi-node support
+> >   mesh: Add default location for Mesh Node storage
+> >   mesh: Add structural changes for mesh
+> >   mesh: Sample Provisioning Agent
+> >   mesh: Sample On/Off Client and Server
+> >   mesh: Sample Mesh Joiner (provision acceptor)
+> >  
+> >  Makefile.mesh                  |   26 +-
+> >  configure.ac                   |    5 +
+> >  mesh/agent.c                   |  665 ++++++++++++++++----
+> >  mesh/agent.h                   |   71 ++-
+> >  mesh/appkey.c                  |   17 +-
+> >  mesh/cfgmod-server.c           |  173 +++---
+> >  mesh/cfgmod.h                  |    2 +-
+> >  mesh/config/composition.json   |   44 --
+> >  mesh/dbus.c                    |  181 ++++++
+> >  mesh/dbus.h                    |   40 ++
+> >  mesh/display.c                 |   64 --
+> >  mesh/error.h                   |   35 ++
+> >  mesh/friend.c                  |   76 +--
+> >  mesh/main.c                    |   73 ++-
+> >  mesh/mesh-db.c                 |  454 +++++++++-----
+> >  mesh/mesh-db.h                 |    6 +-
+> >  mesh/mesh-io-api.h             |    2 +-
+> >  mesh/mesh-io-generic.c         |  149 ++++-
+> >  mesh/mesh-io.c                 |    3 +-
+> >  mesh/mesh-io.h                 |    3 +-
+> >  mesh/mesh.c                    |  625 ++++++++++++++-----
+> >  mesh/mesh.h                    |   27 +-
+> >  mesh/model.c                   |  811 +++++++++++++++++-------
+> >  mesh/model.h                   |   66 +-
+> >  mesh/net.c                     |  293 +++------
+> >  mesh/net.h                     |   31 +-
+> >  mesh/node.c                    | 1338
+> >  +++++++++++++++++++++++++++++++++----
+> > 
+> > ---
+> > 
+> >  mesh/node.h                    |   42 +-
+> >  mesh/pb-adv.c                  |  444 +++++++++++++
+> >  mesh/{display.h => pb-adv.h}   |   13 +-
+> >  mesh/prov-acceptor.c           |  711 +++++++++++++++++++++
+> >  mesh/prov-initiator.c          |  650 +++++++++++++++++++
+> >  mesh/prov.c                    |  722 ----------------------
+> >  mesh/prov.h                    |   14 +-
+> >  mesh/provision.c               | 1162 ----------------------------------
+> >  mesh/provision.h               |  112 +++-
+> >  mesh/storage.c                 |  570 ++++++++---------
+> >  mesh/storage.h                 |   39 +-
+> >  mesh/test/agent.py             |   40 ++
+> >  mesh/test/example-onoff-client |  288 +++++++++  mesh/test/example-
+> > 
+> > onoff-server |  365 +++++++++++
+> > 
+> >  mesh/test/test-join            |  408 ++++++++++++
+> >  mesh/util.c                    |   26 +
+> >  mesh/util.h                    |    1 +
+> >  44 files changed, 7188 insertions(+), 3699 deletions(-)  delete mode
+> >  100644
+> > 
+> > mesh/config/composition.json  create mode 100644 mesh/dbus.c  create
+> > mode 100644 mesh/dbus.h  delete mode 100644 mesh/display.c  create
+> > mode 100644 mesh/error.h  create mode 100644 mesh/pb-adv.c  rename
+> > mesh/{display.h => pb-adv.h} (71%)  create mode 100644 mesh/prov-
+> > acceptor.c  create mode 100644 mesh/prov-initiator.c  delete mode 100644
+> > mesh/prov.c  delete mode 100644 mesh/provision.c  create mode 100755
+> > mesh/test/agent.py  create mode 100644 mesh/test/example-onoff-client
+> > create mode 100644 mesh/test/example-onoff-server  create mode 100644
+> > mesh/test/test-join
+> > 
+> > --
+> > 2.14.5
+
+
+-- 
+pozdrawiam
+Szymon Janc
+
+
