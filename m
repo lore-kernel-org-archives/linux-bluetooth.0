@@ -2,173 +2,201 @@ Return-Path: <SRS0=Q26+=O3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9F9C43387
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:05:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25DDBC43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:09:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C90D1218A2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:05:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F02B9218A2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:09:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726956AbeLRXFX (ORCPT
+        id S1727393AbeLRXJV convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 18:05:23 -0500
-Received: from mga06.intel.com ([134.134.136.31]:25475 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727544AbeLRXFX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 18:05:23 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 15:05:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,370,1539673200"; 
-   d="scan'208";a="260559239"
-Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
-  by orsmga004.jf.intel.com with ESMTP; 18 Dec 2018 15:05:22 -0800
-Received: from orsmsx156.amr.corp.intel.com (10.22.240.22) by
- ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Tue, 18 Dec 2018 15:05:21 -0800
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.175]) by
- ORSMSX156.amr.corp.intel.com ([169.254.8.155]) with mapi id 14.03.0415.000;
- Tue, 18 Dec 2018 15:05:21 -0800
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Tue, 18 Dec 2018 18:09:21 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:56959 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727304AbeLRXJV (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 18:09:21 -0500
+Received: from marcel-macpro.fritz.box (p4FF9F1DE.dip0.t-ipconnect.de [79.249.241.222])
+        by mail.holtmann.org (Postfix) with ESMTPSA id E1179CEE81;
+        Wed, 19 Dec 2018 00:16:58 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH BlueZ v4 09/30] mesh: Acceptor side provisioning
+ implimentation
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20181218223139.8041-10-brian.gix@intel.com>
+Date:   Wed, 19 Dec 2018 00:09:19 +0100
+Cc:     linux-bluetooth@vger.kernel.org,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: RE: [PATCH BlueZ v4 00/30] Major rewrite for Multi-Node and DBus
-Thread-Topic: [PATCH BlueZ v4 00/30] Major rewrite for Multi-Node and DBus
-Thread-Index: AQHUlyF4wCdQreuwjkGr57mcbSVIt6WFosgA//96PuA=
-Date:   Tue, 18 Dec 2018 23:05:20 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4375D8E1140@ORSMSX101.amr.corp.intel.com>
+        inga.stotland@intel.com
+Content-Transfer-Encoding: 8BIT
+Message-Id: <1A6BD1B4-7CCB-466E-9390-B36C690CB70C@holtmann.org>
 References: <20181218223139.8041-1-brian.gix@intel.com>
- <9BBB0DA5-534C-4A9C-BFAF-31F5F0AD3EE6@holtmann.org>
-In-Reply-To: <9BBB0DA5-534C-4A9C-BFAF-31F5F0AD3EE6@holtmann.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiN2ExNWFhZTQtNzI4NC00ZGNiLThhZjYtODBkYzI1YzM2NGNmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiQWFyV2plRU0xKzg3WUxcL0loNE0zUEp2VGs2aW90MTZmUlwvbExcL3BUNWRJXC84NUNaa01UMVhmMHhhWVJrWjdjQnYifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.22.254.139]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+ <20181218223139.8041-10-brian.gix@intel.com>
+To:     Brian Gix <brian.gix@intel.com>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWFyY2VsLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4
-LWJsdWV0b290aC1vd25lckB2Z2VyLmtlcm5lbC5vcmcgW21haWx0bzpsaW51eC1ibHVldG9vdGgt
-DQo+IG93bmVyQHZnZXIua2VybmVsLm9yZ10gT24gQmVoYWxmIE9mIE1hcmNlbCBIb2x0bWFubg0K
-PiBTZW50OiBUdWVzZGF5LCBEZWNlbWJlciAxOCwgMjAxOCAzOjAwIFBNDQo+IFRvOiBHaXgsIEJy
-aWFuIDxicmlhbi5naXhAaW50ZWwuY29tPg0KPiBDYzogbGludXgtYmx1ZXRvb3RoQHZnZXIua2Vy
-bmVsLm9yZzsgSm9oYW4gSGVkYmVyZw0KPiA8am9oYW4uaGVkYmVyZ0BnbWFpbC5jb20+OyBTdG90
-bGFuZCwgSW5nYSA8aW5nYS5zdG90bGFuZEBpbnRlbC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFU
-Q0ggQmx1ZVogdjQgMDAvMzBdIE1ham9yIHJld3JpdGUgZm9yIE11bHRpLU5vZGUgYW5kIERCdXMN
-Cj4gDQo+IEhpIEJyaWFuLA0KPiANCj4gPiBUaGUgTWVzaCBEYWVtb24gaGFzIGJlZW4gbGFyZ2Vs
-eSByZXdyaXR0ZW4uDQo+ID4NCj4gPiBJdCBtYXRjaGVzIHRoZSBBUEkgaW4gZG9jL21lc2gtYXBp
-LnR4dCwgYW5kIGlzIG5vdyBhY2Nlc3NpYmxlIGZyb20NCj4gPiBub24tcHJpdmxlZGdlZCBEQnVz
-IGNsaWVudHMuICBUaGUgY29tbWFuZGxpbmUgdmVyc2lvbiBoYXMgYmVlbg0KPiA+IHRlbXBvcmFy
-aWx5IHJlbW92ZWQsIGFsdGhvdWdoIGl0IHdpbGwgcHJvYmFibHkgYmUgcmUtYWRkZWQgaW4gdGhl
-DQo+ID4gZnV0dXJlLiBUaGUgZEJ1cyBwcml2bGVkZ2VzIG5lZWQgdG8gYmUgYWRqdXN0ZWQgdG8g
-YWxsb3cgZm9yDQo+ID4gbm9uLXByaXZsZWRnZWQgYWNjZXNzIHRvIERhZW1vbiBpbnRlcmZhY2Vz
-LiAgV2Ugd2lsbCBzaG9ydGx5IGFsc28gYmUNCj4gPiBhZGRpbmcgYSBNZXNoIFNwZWNpZmljIFJF
-QURNRSBhbmQgVE9ETyBmaWxlLCBidXQgaW4gdGhlIG1lYW50aW1lLA0KPiA+IGNvbnRhY3QgQnJp
-YW4gYW5kL29yIEluZ2Egd2l0aCBhbnkgcXVlc3Rpb25zLg0KPiA+DQo+ID4gdjQgLS0gUmVtb3Zl
-IGFsbCB0cmFjZSBvZiBmb3JlZ3JvdW5kIGJ0bWVzaCBhcHAuIEl0IGlzIG9ic29sZXRlLCBhbmQN
-Cj4gPiBhZGRzIG5vIGZ1bmN0aW9uYWxpdHkgbm90IGFsc28gcHJlc2VudCBpbiB0aGUgbWVzaGQg
-ZXhlY3V0YWJsZS4NCj4gPg0KPiA+IEJyaWFuIEdpeCAoMTIpOg0KPiA+ICBtZXNoOiBTdGFnaW5n
-IGZvciBNZXNoIERCdXMgQVBJIHJld3JpdGUNCj4gPiAgbWVzaDogRGVsZXRlIG9ic29sZXRlIGZp
-bGVzDQo+ID4gIG1lc2g6IFJld2l0ZSBOZXR3b3JrIGxheWVyIGZvciBtdWx0aXBsZSBub2Rlcw0K
-PiA+ICBtZXNoOiBEaXJlY3Rpb24gYWdub3N0aWMgUEItQWR2IGltcGxpbWVudGF0aW9uDQo+ID4g
-IG1lc2g6IEFjY2VwdG9yIHNpZGUgcHJvdmlzaW9uaW5nIGltcGxpbWVudGF0aW9uDQo+ID4gIG1l
-c2g6IEluaXRpYXRvciBzaWRlIHByb3Zpc2lvbmluZyBpbXBsaW1lbnRhdGlvbg0KPiA+ICBtZXNo
-OiBSZXdyaXRlIENvbnRyb2xlciBpbnRlcmZhY2UgZm9yIGZ1bGwgaW5pdA0KPiA+ICBtZXNoOiBV
-bmNoYW5nZWQgdmFyaWFibGVzIHNldCB0byBjb25zdA0KPiA+ICBtZXNoOiByZS1hcnJhbmdlIHBy
-b3Zpc2lvbmluZyBmb3IgREJ1cyBBUEkNCj4gPiAgbWVzaDogcmVzdHJ1Y3R1cmUgSS9PIGZvciBt
-dWx0aXBsZSBub2Rlcw0KPiA+ICBtZXNoOiBDbGVhbi11cCBDb21tZW50IHN0eWxlDQo+ID4gIG1l
-c2g6IEVuYWJsZSBidWlsZGluZyBNZXNoIERhZW1vbg0KPiA+DQo+ID4gSW5nYSBTdG90bGFuZCAo
-MTgpOg0KPiA+ICBtZXNoOiBVdGlsaXRpZXMgZm9yIERCdXMgc3VwcG9ydA0KPiA+ICBtZXNoOiBJ
-bnRlcm5hbCBlcnJvcnMNCj4gPiAgbWVzaDogUmUtd3JpdGUgc3RvcmFnZSBmb3IgTXVsdGlwbGUg
-Tm9kZXMNCj4gPiAgbWVzaDogUmV3cml0ZSBOb2RlIGhhbmRsaW5nIGZvciBtdWx0aXBsZSBub2Rl
-cw0KPiA+ICBtZXNoOiBjZW50cmFsaXplIGdlbmVyaWMgdXRpbGl0aWVzDQo+ID4gIG1lc2g6IFJl
-LWFyY2hpdGVjdCBmb3IgREJ1cyBBUEkNCj4gPiAgbWVzaDogTWFrZSBjb25maWcgbW9kZWwgaGFu
-ZGxlIG11bHRpcGxlIG5vZGVzDQo+ID4gIG1lc2g6IE11bHRpIG5vZGUgQ29uZmlnIFNlcnZlciBt
-b2RlbA0KPiA+ICBtZXNoOiBSZXN0cnVzdHVyZSBEQiB0byBzdXBwb3J0IG11bHRpcGxlIG5vZGVz
-DQo+ID4gIG1lc2g6IHJlc3RydWN0dXJlIG1vZGVsIHNlcnZpY2VzIGZvciBtdWx0aXBsZSBub2Rl
-cw0KPiA+ICBtZXNoOiBEQlVTIGludGVyZmFjZSBmb3IgUHJvdmlzaW9uaW5nIEFnZW50DQo+ID4g
-IG1lc2g6IHJlc3RydWN0dXJlIEFwcCBLZXkgc3RvcmFnZQ0KPiA+ICBtZXNoOiBVcGRhdGUgZm9y
-IERCdXMgQVBJIGFuZCBtdWx0aS1ub2RlIHN1cHBvcnQNCj4gPiAgbWVzaDogQWRkIGRlZmF1bHQg
-bG9jYXRpb24gZm9yIE1lc2ggTm9kZSBzdG9yYWdlDQo+ID4gIG1lc2g6IEFkZCBzdHJ1Y3R1cmFs
-IGNoYW5nZXMgZm9yIG1lc2gNCj4gPiAgbWVzaDogU2FtcGxlIFByb3Zpc2lvbmluZyBBZ2VudA0K
-PiA+ICBtZXNoOiBTYW1wbGUgT24vT2ZmIENsaWVudCBhbmQgU2VydmVyDQo+ID4gIG1lc2g6IFNh
-bXBsZSBNZXNoIEpvaW5lciAocHJvdmlzaW9uIGFjY2VwdG9yKQ0KPiA+DQo+ID4gTWFrZWZpbGUu
-bWVzaCAgICAgICAgICAgICAgICAgIHwgICAxOSArLQ0KPiA+IGNvbmZpZ3VyZS5hYyAgICAgICAg
-ICAgICAgICAgICB8ICAgIDUgKw0KPiA+IG1lc2gvYWdlbnQuYyAgICAgICAgICAgICAgICAgICB8
-ICA2NjUgKysrKysrKysrKysrKysrKy0tLS0NCj4gPiBtZXNoL2FnZW50LmggICAgICAgICAgICAg
-ICAgICAgfCAgIDcxICsrLQ0KPiA+IG1lc2gvYXBwa2V5LmMgICAgICAgICAgICAgICAgICB8ICAg
-MTcgKy0NCj4gPiBtZXNoL2J0bWVzaC5jICAgICAgICAgICAgICAgICAgfCAgMTgxIC0tLS0tLQ0K
-PiA+IG1lc2gvY2ZnbW9kLXNlcnZlci5jICAgICAgICAgICB8ICAxNzMgKysrLS0tDQo+ID4gbWVz
-aC9jZmdtb2QuaCAgICAgICAgICAgICAgICAgIHwgICAgMiArLQ0KPiA+IG1lc2gvY29uZmlnL2Nv
-bXBvc2l0aW9uLmpzb24gICB8ICAgNDQg4oCUDQo+IA0KPiBJIGhhdmUgbm8gaWRlYSB3aHkgd2Ug
-d291bGQgY3JlYXRlIGEgZGlyZWN0b3J5IGNvbmZpZyBoZXJlLiBQdXQgdGhlIGpzb24gZmlsZXMN
-Cj4gaW4gJCh0b3Bfc3JjZGlyKSBhbmQgYmUgZG9uZSB3aXRoIGl0Lg0KDQpUaGlzIGlzIGEgZmls
-ZSBkZWxldGlvbiwgc28gaXQgd2lsbCBubyBsb25nZXIgYmUgdGhlcmUuDQoNCj4gDQo+ID4gbWVz
-aC9kYnVzLmMgICAgICAgICAgICAgICAgICAgIHwgIDE4MSArKysrKysNCj4gPiBtZXNoL2RidXMu
-aCAgICAgICAgICAgICAgICAgICAgfCAgIDQwICsrDQo+ID4gbWVzaC9kaXNwbGF5LmMgICAgICAg
-ICAgICAgICAgIHwgICA2NCAtLQ0KPiA+IG1lc2gvZXJyb3IuaCAgICAgICAgICAgICAgICAgICB8
-ICAgMzUgKysNCj4gPiBtZXNoL2ZyaWVuZC5jICAgICAgICAgICAgICAgICAgfCAgIDc2ICstLQ0K
-PiA+IG1lc2gvbWFpbi5jICAgICAgICAgICAgICAgICAgICB8ICAgNzMgKystDQo+ID4gbWVzaC9t
-ZXNoLWRiLmMgICAgICAgICAgICAgICAgIHwgIDQ1NCArKysrKysrKystLS0tLQ0KPiA+IG1lc2gv
-bWVzaC1kYi5oICAgICAgICAgICAgICAgICB8ICAgIDYgKy0NCj4gPiBtZXNoL21lc2gtaW8tYXBp
-LmggICAgICAgICAgICAgfCAgICAyICstDQo+ID4gbWVzaC9tZXNoLWlvLWdlbmVyaWMuYyAgICAg
-ICAgIHwgIDE0OSArKysrLQ0KPiA+IG1lc2gvbWVzaC1pby5jICAgICAgICAgICAgICAgICB8ICAg
-IDMgKy0NCj4gPiBtZXNoL21lc2gtaW8uaCAgICAgICAgICAgICAgICAgfCAgICAzICstDQo+ID4g
-bWVzaC9tZXNoLmMgICAgICAgICAgICAgICAgICAgIHwgIDYyNSArKysrKysrKysrKysrKy0tLS0t
-DQo+ID4gbWVzaC9tZXNoLmggICAgICAgICAgICAgICAgICAgIHwgICAyNyArLQ0KPiA+IG1lc2gv
-bW9kZWwuYyAgICAgICAgICAgICAgICAgICB8ICA4MTEgKysrKysrKysrKysrKysrKystLS0tLS0t
-DQo+ID4gbWVzaC9tb2RlbC5oICAgICAgICAgICAgICAgICAgIHwgICA2NiArLQ0KPiA+IG1lc2gv
-bmV0LmMgICAgICAgICAgICAgICAgICAgICB8ICAyOTMgKysrLS0tLS0tDQo+ID4gbWVzaC9uZXQu
-aCAgICAgICAgICAgICAgICAgICAgIHwgICAzMSArLQ0KPiA+IG1lc2gvbm9kZS5jICAgICAgICAg
-ICAgICAgICAgICB8IDEzMzggKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0NCj4g
-LS0tLS0NCj4gPiBtZXNoL25vZGUuaCAgICAgICAgICAgICAgICAgICAgfCAgIDQyICstDQo+ID4g
-bWVzaC9wYi1hZHYuYyAgICAgICAgICAgICAgICAgIHwgIDQ0NCArKysrKysrKysrKysrDQo+ID4g
-bWVzaC97ZGlzcGxheS5oID0+IHBiLWFkdi5ofSAgIHwgICAxMyArLQ0KPiA+IG1lc2gvcHJvdi1h
-Y2NlcHRvci5jICAgICAgICAgICB8ICA3MTEgKysrKysrKysrKysrKysrKysrKysrDQo+ID4gbWVz
-aC9wcm92LWluaXRpYXRvci5jICAgICAgICAgIHwgIDY1MCArKysrKysrKysrKysrKysrKysrDQo+
-ID4gbWVzaC9wcm92LmMgICAgICAgICAgICAgICAgICAgIHwgIDcyMiAtLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tDQo+ID4gbWVzaC9wcm92LmggICAgICAgICAgICAgICAgICAgIHwgICAxNCArLQ0KPiA+
-IG1lc2gvcHJvdmlzaW9uLmMgICAgICAgICAgICAgICB8IDExNjIgLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLQ0KPiA+IG1lc2gvcHJvdmlzaW9uLmggICAgICAgICAgICAgICB8ICAx
-MTIgKysrLQ0KPiA+IG1lc2gvc3RvcmFnZS5jICAgICAgICAgICAgICAgICB8ICA1NzAgKysrKysr
-KystLS0tLS0tLS0NCj4gPiBtZXNoL3N0b3JhZ2UuaCAgICAgICAgICAgICAgICAgfCAgIDM5ICst
-DQo+ID4gbWVzaC90ZXN0L2FnZW50LnB5ICAgICAgICAgICAgIHwgICA0MCArKw0KPiA+IG1lc2gv
-dGVzdC9leGFtcGxlLW9ub2ZmLWNsaWVudCB8ICAyODggKysrKysrKysrDQo+ID4gbWVzaC90ZXN0
-L2V4YW1wbGUtb25vZmYtc2VydmVyIHwgIDM2NSArKysrKysrKysrKw0KPiA+IG1lc2gvdGVzdC90
-ZXN0LWpvaW4gICAgICAgICAgICB8ICA0MDggKysrKysrKysrKysrDQo+IA0KPiBDYW4gd2UgcGxl
-YXNlIG5vdCBkb2luZyB0aGlzIGtpbmQgb2YgbmVzdGluZyBvZiBkaXJlY3Rvcmllcy4gVXNlIHRo
-ZQ0KPiAkKHRvcF9zcmNkaXIpL3Rlc3QgZm9yIHRoaXMuDQoNCldlIHdpbGwgbW92ZSB0aGVzZSB0
-byBhIGRpZmZlcmVudCBkaXJlY3RvcnkNCg0KDQo+ID4gbWVzaC91dGlsLmMgICAgICAgICAgICAg
-ICAgICAgIHwgICAyNiArDQo+ID4gbWVzaC91dGlsLmggICAgICAgICAgICAgICAgICAgIHwgICAg
-MSArDQo+ID4gNDUgZmlsZXMgY2hhbmdlZCwgNzE3NyBpbnNlcnRpb25zKCspLCAzODg0IGRlbGV0
-aW9ucygtKSBkZWxldGUgbW9kZQ0KPiA+IDEwMDY0NCBtZXNoL2J0bWVzaC5jIGRlbGV0ZSBtb2Rl
-IDEwMDY0NA0KPiBtZXNoL2NvbmZpZy9jb21wb3NpdGlvbi5qc29uDQo+ID4gY3JlYXRlIG1vZGUg
-MTAwNjQ0IG1lc2gvZGJ1cy5jIGNyZWF0ZSBtb2RlIDEwMDY0NCBtZXNoL2RidXMuaA0KPiBkZWxl
-dGUNCj4gPiBtb2RlIDEwMDY0NCBtZXNoL2Rpc3BsYXkuYyBjcmVhdGUgbW9kZSAxMDA2NDQgbWVz
-aC9lcnJvci5oIGNyZWF0ZQ0KPiBtb2RlDQo+ID4gMTAwNjQ0IG1lc2gvcGItYWR2LmMgcmVuYW1l
-IG1lc2gve2Rpc3BsYXkuaCA9PiBwYi1hZHYuaH0gKDcxJSkgY3JlYXRlDQo+ID4gbW9kZSAxMDA2
-NDQgbWVzaC9wcm92LWFjY2VwdG9yLmMgY3JlYXRlIG1vZGUgMTAwNjQ0DQo+ID4gbWVzaC9wcm92
-LWluaXRpYXRvci5jIGRlbGV0ZSBtb2RlIDEwMDY0NCBtZXNoL3Byb3YuYyBkZWxldGUgbW9kZQ0K
-PiA+IDEwMDY0NCBtZXNoL3Byb3Zpc2lvbi5jIGNyZWF0ZSBtb2RlIDEwMDc1NSBtZXNoL3Rlc3Qv
-YWdlbnQucHkgY3JlYXRlDQo+ID4gbW9kZSAxMDA2NDQgbWVzaC90ZXN0L2V4YW1wbGUtb25vZmYt
-Y2xpZW50IGNyZWF0ZSBtb2RlIDEwMDY0NA0KPiA+IG1lc2gvdGVzdC9leGFtcGxlLW9ub2ZmLXNl
-cnZlciBjcmVhdGUgbW9kZSAxMDA2NDQgbWVzaC90ZXN0L3Rlc3Qtam9pbg0KPiANCj4gUmVnYXJk
-cw0KPiANCj4gTWFyY2VsDQoNCg==
+Hi Brian,
+
+> ---
+> mesh/prov-acceptor.c | 711 +++++++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 711 insertions(+)
+> create mode 100644 mesh/prov-acceptor.c
+> 
+> diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
+> new file mode 100644
+> index 000000000..ac42e1e2c
+> --- /dev/null
+> +++ b/mesh/prov-acceptor.c
+> @@ -0,0 +1,711 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2018  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <sys/select.h>
+> +#include <sys/time.h>
+> +#include <sys/types.h>
+> +#include <unistd.h>
+> +#include <fcntl.h>
+> +#include <termios.h>
+> +
+> +#include <ctype.h>
+> +#include <stdlib.h>
+> +#include <stdio.h>
+> +#include <getopt.h>
+> +#include <time.h>
+> +#include <ell/ell.h>
+> +
+> +#include "mesh/mesh-defs.h"
+> +#include "src/shared/ecc.h"
+> +
+> +#include "mesh/util.h"
+> +#include "mesh/net_keys.h"
+> +#include "mesh/crypto.h"
+> +#include "mesh/net.h"
+> +#include "mesh/error.h"
+> +#include "mesh/prov.h"
+> +#include "mesh/provision.h"
+> +#include "mesh/pb-adv.h"
+> +#include "mesh/mesh.h"
+> +#include "mesh/agent.h"
+> +
+> +/* Quick size sanity check */
+> +static const uint16_t expected_pdu_size[] = {
+> +	2,	/* PROV_INVITE */
+> +	12,	/* PROV_CAPS */
+> +	6,	/* PROV_START */
+> +	65,	/* PROV_PUB_KEY */
+> +	1,	/* PROV_INP_CMPLT */
+> +	17,	/* PROV_CONFIRM */
+> +	17,	/* PROV_RANDOM */
+> +	34,	/* PROV_DATA */
+> +	1,	/* PROV_COMPLETE */
+> +	2,	/* PROV_FAILED */
+> +};
+> +
+> +#define BEACON_TYPE_UNPROVISIONED		0x00
+> +
+> +static const uint8_t pkt_filter = MESH_AD_TYPE_PROVISION;
+> +static const uint8_t bec_filter[] = {MESH_AD_TYPE_BEACON,
+> +						BEACON_TYPE_UNPROVISIONED};
+> +
+> +enum acp_state {
+> +	ACP_PROV_IDLE = 0,
+> +	ACP_PROV_CAPS_SENT,
+> +	ACP_PROV_CAPS_ACKED,
+> +	ACP_PROV_KEY_SENT,
+> +	ACP_PROV_KEY_ACKED,
+> +	ACP_PROV_INP_CMPLT_SENT,
+> +	ACP_PROV_INP_CMPLT_ACKED,
+> +	ACP_PROV_CONF_SENT,
+> +	ACP_PROV_CONF_ACKED,
+> +	ACP_PROV_RAND_SENT,
+> +	ACP_PROV_RAND_ACKED,
+> +	ACP_PROV_CMPLT_SENT,
+> +	ACP_PROV_FAIL_SENT,
+> +};
+> +
+> +#define MAT_REMOTE_PUBLIC	0x01
+> +#define MAT_LOCAL_PRIVATE	0x02
+> +#define MAT_RAND_AUTH		0x04
+> +#define MAT_SECRET	(MAT_REMOTE_PUBLIC | MAT_LOCAL_PRIVATE)
+> +
+> +struct mesh_prov_acceptor {
+> +	mesh_prov_acceptor_complete_func_t cmplt;
+> +	prov_trans_tx_t trans_tx;
+> +	void *agent;
+> +	void *caller_data;
+> +	void *trans_data;
+> +	struct l_timeout *timeout;
+> +	uint32_t to_secs;
+> +	enum acp_state	state;
+> +	uint8_t transport;
+> +	uint8_t material;
+> +	uint8_t expected;
+> +	int8_t previous;
+> +	struct conf_input conf_inputs;
+> +	uint8_t calc_key[16];
+> +	uint8_t salt[16];
+> +	uint8_t confirm[16];
+> +	uint8_t s_key[16];
+> +	uint8_t s_nonce[13];
+> +	uint8_t private_key[32];
+> +	uint8_t secret[32];
+> +	uint8_t rand_auth_workspace[48];
+> +};
+> +
+> +static struct mesh_prov_acceptor *prov = NULL;
+> +
+> +static void acceptor_free(void)
+> +{
+> +
+> +	if (prov)
+> +		l_timeout_remove(prov->timeout);
+> +
+> +	mesh_send_cancel(bec_filter, sizeof(bec_filter));
+> +	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
+> +
+> +	if (prov->trans_tx) {
+> +		if (prov->transport == PB_ADV)
+> +			pb_adv_unreg(prov->trans_data);
+> +#if defined(GATT_ENABLED)
+> +		/* TODO: Cleanup GATT bearer if exists */
+> +		else if (prov->transport == PB_GATT)
+> +			pb_gatt_unreg(prov->trans_data);
+> +#endif
+
+this is a simple no. Please stop hacking the code like yes. And yes, adding ifdef is hacking it. Either you abstract different bearer cleanly or they will be all always available. I am not doing two test runs to check your idea of build options.
+
+Regards
+
+Marcel
+
