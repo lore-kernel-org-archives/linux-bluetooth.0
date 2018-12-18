@@ -2,71 +2,117 @@ Return-Path: <SRS0=Q26+=O3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC7CC43387
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FA2C43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:30:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EFBD12184C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:15:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D81862184C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:30:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727057AbeLRXPm convert rfc822-to-8bit (ORCPT
+        id S1727562AbeLRXaX convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 18:15:42 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:40800 "EHLO
+        Tue, 18 Dec 2018 18:30:23 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:43784 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727033AbeLRXPm (ORCPT
+        with ESMTP id S1726817AbeLRXaX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 18:15:42 -0500
+        Tue, 18 Dec 2018 18:30:23 -0500
 Received: from marcel-macpro.fritz.box (p4FF9F1DE.dip0.t-ipconnect.de [79.249.241.222])
-        by mail.holtmann.org (Postfix) with ESMTPSA id AE648CEE81;
-        Wed, 19 Dec 2018 00:23:19 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id BE30BCEE81;
+        Wed, 19 Dec 2018 00:38:00 +0100 (CET)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH BlueZ v4 25/30] mesh: Add default location for Mesh Node
- storage
+Subject: Re: [PATCH v2] Bluetooth: Support fast advertising interval
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20181218223139.8041-26-brian.gix@intel.com>
-Date:   Wed, 19 Dec 2018 00:15:40 +0100
-Cc:     linux-bluetooth@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        inga.stotland@intel.com
+In-Reply-To: <1540895076-6046-1-git-send-email-bharat.b.panda@intel.com>
+Date:   Wed, 19 Dec 2018 00:30:21 +0100
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <29B57DE0-38C2-4EAE-8851-0598E97BDA8E@holtmann.org>
-References: <20181218223139.8041-1-brian.gix@intel.com>
- <20181218223139.8041-26-brian.gix@intel.com>
-To:     Brian Gix <brian.gix@intel.com>
+Message-Id: <E8D865FD-B17C-4F46-8CC7-6EC6F010D757@holtmann.org>
+References: <marcel@holtmann.org>
+ <1540895076-6046-1-git-send-email-bharat.b.panda@intel.com>
+To:     Bharat Bhusan Panda <bharat.b.panda@intel.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+Hi Bharat,
 
+> Changes made to add support for fast advertising interval as per
+> core 4.1 specification, section 9.3.11.2.
 > 
+> A peripheral device entering any of the following GAP modes and
+> sending either non-connectable advertising events or scannable undirected
+> advertising events should use adv_fast_interval2(100ms - 150ms)
+> for adv_fast_period(30s).
+>         - Non-Discoverable Mode
+>         - Non-Connectable Mode
+>         - Limited Discoverable Mode
+>         - General Discoverable Mode
+> 
+> Signed-off-by: Bharat Bhusan Panda <bharat.b.panda@intel.com>
 > ---
-> configure.ac | 5 +++++
-> 1 file changed, 5 insertions(+)
+> include/net/bluetooth/hci_core.h |  2 ++
+> net/bluetooth/hci_request.c      | 27 +++++++++++++++++++++++++++
+> 2 files changed, 29 insertions(+)
 > 
-> diff --git a/configure.ac b/configure.ac
-> index 1a095a352..901d51e0f 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -364,6 +364,11 @@ AC_DEFINE_UNQUOTED(CONFIGDIR, "${configdir}",
-> 			[Directory for the configuration files])
-> AC_SUBST(CONFIGDIR, "${configdir}")
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 0db1b9b..868c2fb 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1491,6 +1491,8 @@ struct hci_mgmt_chan {
+> #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+> #define DISCOV_BREDR_INQUIRY_LEN	0x08
+> #define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/* msec */
+> +#define DISCOV_LE_FAST_ADV_INT_MIN	100	/* msec */
+> +#define DISCOV_LE_FAST_ADV_INT_MAX	150	/* msec */
 > 
-> +if (test "${enable_mesh}" = "yes"); then
-> +	AC_DEFINE_UNQUOTED(MESH_STORAGEDIR, "${storagedir}/mesh",
-> +			[Directory for the storage files])
-> +fi
-> +
+> void mgmt_fill_version_info(void *ver);
+> int mgmt_new_settings(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+> index e8c9ef1..fe43498 100644
+> --- a/net/bluetooth/hci_request.c
+> +++ b/net/bluetooth/hci_request.c
+> @@ -1092,6 +1092,33 @@ void __hci_req_enable_advertising(struct hci_request *req)
+> 	else
+> 		cp.type = LE_ADV_NONCONN_IND;
+> 
+> +	/* As per core 4.1 spec, section 9.3.11.2: A peripheral device
+> +	 * entering any of the following GAP modes and sending either
+> +	 * non-connectable advertising events or scannable undirected
+> +	 * advertising events should use adv_fast_interval2(100ms - 150ms)
+> +	 * for adv_fast_period(30s).
+> +	 *
+> +	 * 	- Non-Discoverable Mode
+> +	 *	- Non-Connectable Mode
+> +	 * 	- Limited Discoverable Mode
+> +	 * 	- General Discoverable Mode
+> +	 */
+> +	if (cp.type == LE_ADV_NONCONN_IND || cp.type == LE_ADV_SCAN_IND) {
+> +		/* Set the suggested min and max fast advertising interval,
+> +		 * only if the peripheral device has entered any of the modes
+> +		 * such as non-discoverable, non-connectable or limited-
+> +		 * discoverable.
+> +		 */
+> +		if (!hci_dev_test_flag(hdev, HCI_DISCOVERABLE) ||
+> +			!hci_dev_test_flag(hdev, HCI_CONNECTABLE) ||
+> +			hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE)) {
 
-why are we bothering with the check around it. We don’t do that for ANDROID_STORAGEDIR either. If there is a reason for it, then that one needs to be fixed first. Also can we please have proper text: "Directory for the mesh daemon storage files"
+this is still wrongly indented.
+
+> +			cp.min_interval =
+> +				cpu_to_le16(DISCOV_LE_FAST_ADV_INT_MIN);
+> +			cp.max_interval =
+> +				cpu_to_le16(DISCOV_LE_FAST_ADV_INT_MAX);
+> +		}
+> +	}
+> +
 
 Regards
 
