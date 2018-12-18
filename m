@@ -2,77 +2,109 @@ Return-Path: <SRS0=Q26+=O3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA59C43387
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 12:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9EB8C43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 13:47:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24129217D9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 12:51:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9431421871
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 13:47:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbeLRMvI convert rfc822-to-8bit (ORCPT
+        id S1726631AbeLRNri convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 07:51:08 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:58520 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726421AbeLRMvI (ORCPT
+        Tue, 18 Dec 2018 08:47:38 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:51963 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726426AbeLRNri (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 07:51:08 -0500
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 7C6D52A3FF
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Dec 2018 12:51:07 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 70B342A446; Tue, 18 Dec 2018 12:51:07 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 198303] Bluetooth dies after a while.
-Date:   Tue, 18 Dec 2018 12:51:07 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mika.noren@gmail.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: PATCH_ALREADY_AVAILABLE
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-198303-62941-EYmBoUrDjz@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-198303-62941@https.bugzilla.kernel.org/>
-References: <bug-198303-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 18 Dec 2018 08:47:38 -0500
+Received: from marcel-macpro.fritz.box (p4FF9F1DE.dip0.t-ipconnect.de [79.249.241.222])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4D69ECF35C;
+        Tue, 18 Dec 2018 14:55:16 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH BlueZ v3 00/30] Major rewrite for Multi-Node and DBus
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <110368016.VWXbCARz0c@ix>
+Date:   Tue, 18 Dec 2018 14:47:36 +0100
+Cc:     Brian Gix <brian.gix@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Stotland, Inga" <inga.stotland@intel.com>
 Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Message-Id: <73E0C5F2-1162-4857-976A-EDE376D55747@holtmann.org>
+References: <20181215002624.9313-1-brian.gix@intel.com>
+ <DEBB0CAA2616974FAE35E4B560B9A4375D8E01AF@ORSMSX101.amr.corp.intel.com>
+ <17761993.WvVeqkb5i9@ix> <110368016.VWXbCARz0c@ix>
+To:     Szymon Janc <szymon.janc@codecoup.pl>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=198303
+Hi Brian,
 
---- Comment #10 from Mika Norén (mika.noren@gmail.com) ---
-Yes, please do. :-)
+>>> This patch-set has been applied upstream.
+>> 
+>> There is something wrong with Makefile.mesh
+>> 
+>> Makefile.am: installing './depcomp'
+>> parallel-tests: installing './test-driver'
+>> Makefile.mesh:31: warning: variable 'mesh_btmesh_LDADD' is defined but no
+>> program or
+>> Makefile.mesh:31: library has 'mesh_btmesh' as canonical name (possible
+>> typo) Makefile.am:306:   'Makefile.mesh' included from here
+>> Makefile.mesh:32: warning: variable 'mesh_btmesh_DEPENDENCIES' is defined
+>> but no program or
+>> Makefile.mesh:32: library has 'mesh_btmesh' as canonical name (possible
+>> typo) Makefile.am:306:   'Makefile.mesh' included from here
+>> 
+>> 
+>> Enabling commented out code (why is it commented out btw?) in Makefile.mesh
+>> stil results in:
+>> 
+>> Makefile.mesh:39: warning: mesh_btmesh_LDADD multiply defined in condition
+>> MESH ...
+>> Makefile.am:306:   'Makefile.mesh' included from here
+>> Makefile.mesh:31: ... 'mesh_btmesh_LDADD' previously defined here
+>> Makefile.am:306:   'Makefile.mesh' included from here
+>> 
+> 
+> 
+> This seems to fix warnign for me. Was ot on purpose that btmesh wasn't added 
+> to noinst ?
+> 
+> 
+> diff --git a/Makefile.mesh b/Makefile.mesh
+> index 5344fbb21..1b8adea7e 100644
+> --- a/Makefile.mesh
+> +++ b/Makefile.mesh
+> @@ -31,8 +31,8 @@ mesh_meshd_DEPENDENCIES = $(ell_dependencies)
+> mesh_btmesh_LDADD = src/libshared-mainloop.la $(ell_ldadd) -lreadline -ljson-
+> c
+> mesh_btmesh_DEPENDENCIES = $(ell_dependencies)
+> 
+> -#
+> -# noinst_PROGRAMS += mesh/btmesh
+> +noinst_PROGRAMS += mesh/btmesh
+> +
+> #
+> # mesh_btmesh_SOURCES = $(mesh_sources) \
+> #                                              mesh/btmesh.c
+> 
 
-On Mon, 17 Dec 2018, 21:07 <bugzilla-daemon@bugzilla.kernel.org wrote:
 
-> https://bugzilla.kernel.org/show_bug.cgi?id=198303
->
-> --- Comment #9 from Nick (rishel.nick@gmail.com) ---
-> Just updated to 4.18.20, issue not resolved. Should I open a new issue?
->
-> --
-> You are receiving this mail because:
-> You reported the bug.
+so this stuff is _not_ acceptable at all. Please stop treating bluez.git as your playground. It is your responsibility that such patches are not applied.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+We have git and so everything can be reversed and history can be restored. Commenting anything out in a Makefile is never needed and a total no-go. Same applies to *.c files. I do not want staging or untested stuff in the main tree. I also do not want any dead files in the tree that are not build. Clone your tree on github or somewhere else if you want to experiment.
+
+I am reverting the whole set of patches and doing a push —force. You need to start over.
+
+Regards
+
+Marcel
+
