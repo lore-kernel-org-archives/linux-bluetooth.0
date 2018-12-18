@@ -3,38 +3,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA49C43444
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9313CC43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:31:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BE92A218A2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:31:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BF39218A2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 22:31:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727489AbeLRWbz (ORCPT
+        id S1727520AbeLRWb4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 17:31:55 -0500
-Received: from mga03.intel.com ([134.134.136.65]:60668 "EHLO mga03.intel.com"
+        Tue, 18 Dec 2018 17:31:56 -0500
+Received: from mga03.intel.com ([134.134.136.65]:60673 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727189AbeLRWbx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 17:31:53 -0500
+        id S1727426AbeLRWbz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 17:31:55 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
   by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 14:31:51 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,370,1539673200"; 
-   d="scan'208";a="101704160"
+   d="scan'208";a="101704186"
 Received: from bgix-dell-lap.sea.intel.com ([10.241.111.161])
   by orsmga006.jf.intel.com with ESMTP; 18 Dec 2018 14:31:51 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
-        marcel@holtmann.org, Brian Gix <brian.gix@intel.com>
-Subject: [PATCH BlueZ v4 09/30] mesh: Acceptor side provisioning implimentation
-Date:   Tue, 18 Dec 2018 14:31:18 -0800
-Message-Id: <20181218223139.8041-10-brian.gix@intel.com>
+        marcel@holtmann.org
+Subject: [PATCH BlueZ v4 17/30] mesh: Multi node Config Server model
+Date:   Tue, 18 Dec 2018 14:31:26 -0800
+Message-Id: <20181218223139.8041-18-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181218223139.8041-1-brian.gix@intel.com>
 References: <20181218223139.8041-1-brian.gix@intel.com>
@@ -43,728 +43,653 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- mesh/prov-acceptor.c | 711 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 711 insertions(+)
- create mode 100644 mesh/prov-acceptor.c
+From: Inga Stotland <inga.stotland@intel.com>
 
-diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
-new file mode 100644
-index 000000000..ac42e1e2c
---- /dev/null
-+++ b/mesh/prov-acceptor.c
-@@ -0,0 +1,711 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <sys/select.h>
-+#include <sys/time.h>
-+#include <sys/types.h>
-+#include <unistd.h>
-+#include <fcntl.h>
-+#include <termios.h>
-+
-+#include <ctype.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <getopt.h>
-+#include <time.h>
-+#include <ell/ell.h>
-+
-+#include "mesh/mesh-defs.h"
-+#include "src/shared/ecc.h"
-+
-+#include "mesh/util.h"
-+#include "mesh/net_keys.h"
-+#include "mesh/crypto.h"
-+#include "mesh/net.h"
-+#include "mesh/error.h"
-+#include "mesh/prov.h"
-+#include "mesh/provision.h"
-+#include "mesh/pb-adv.h"
-+#include "mesh/mesh.h"
-+#include "mesh/agent.h"
-+
-+/* Quick size sanity check */
-+static const uint16_t expected_pdu_size[] = {
-+	2,	/* PROV_INVITE */
-+	12,	/* PROV_CAPS */
-+	6,	/* PROV_START */
-+	65,	/* PROV_PUB_KEY */
-+	1,	/* PROV_INP_CMPLT */
-+	17,	/* PROV_CONFIRM */
-+	17,	/* PROV_RANDOM */
-+	34,	/* PROV_DATA */
-+	1,	/* PROV_COMPLETE */
-+	2,	/* PROV_FAILED */
-+};
-+
-+#define BEACON_TYPE_UNPROVISIONED		0x00
-+
-+static const uint8_t pkt_filter = MESH_AD_TYPE_PROVISION;
-+static const uint8_t bec_filter[] = {MESH_AD_TYPE_BEACON,
-+						BEACON_TYPE_UNPROVISIONED};
-+
-+enum acp_state {
-+	ACP_PROV_IDLE = 0,
-+	ACP_PROV_CAPS_SENT,
-+	ACP_PROV_CAPS_ACKED,
-+	ACP_PROV_KEY_SENT,
-+	ACP_PROV_KEY_ACKED,
-+	ACP_PROV_INP_CMPLT_SENT,
-+	ACP_PROV_INP_CMPLT_ACKED,
-+	ACP_PROV_CONF_SENT,
-+	ACP_PROV_CONF_ACKED,
-+	ACP_PROV_RAND_SENT,
-+	ACP_PROV_RAND_ACKED,
-+	ACP_PROV_CMPLT_SENT,
-+	ACP_PROV_FAIL_SENT,
-+};
-+
-+#define MAT_REMOTE_PUBLIC	0x01
-+#define MAT_LOCAL_PRIVATE	0x02
-+#define MAT_RAND_AUTH		0x04
-+#define MAT_SECRET	(MAT_REMOTE_PUBLIC | MAT_LOCAL_PRIVATE)
-+
-+struct mesh_prov_acceptor {
-+	mesh_prov_acceptor_complete_func_t cmplt;
-+	prov_trans_tx_t trans_tx;
-+	void *agent;
-+	void *caller_data;
-+	void *trans_data;
-+	struct l_timeout *timeout;
-+	uint32_t to_secs;
-+	enum acp_state	state;
-+	uint8_t transport;
-+	uint8_t material;
-+	uint8_t expected;
-+	int8_t previous;
-+	struct conf_input conf_inputs;
-+	uint8_t calc_key[16];
-+	uint8_t salt[16];
-+	uint8_t confirm[16];
-+	uint8_t s_key[16];
-+	uint8_t s_nonce[13];
-+	uint8_t private_key[32];
-+	uint8_t secret[32];
-+	uint8_t rand_auth_workspace[48];
-+};
-+
-+static struct mesh_prov_acceptor *prov = NULL;
-+
-+static void acceptor_free(void)
-+{
-+
-+	if (prov)
-+		l_timeout_remove(prov->timeout);
-+
-+	mesh_send_cancel(bec_filter, sizeof(bec_filter));
-+	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
-+
-+	if (prov->trans_tx) {
-+		if (prov->transport == PB_ADV)
-+			pb_adv_unreg(prov->trans_data);
-+#if defined(GATT_ENABLED)
-+		/* TODO: Cleanup GATT bearer if exists */
-+		else if (prov->transport == PB_GATT)
-+			pb_gatt_unreg(prov->trans_data);
-+#endif
-+	}
-+
-+	l_free(prov);
-+	prov = NULL;
-+}
-+
-+static void acp_prov_close(void *user_data, uint8_t reason)
-+{
-+	/* TODO: Handle Close */
-+}
-+
-+static void prov_to(struct l_timeout *timeout, void *user_data)
-+{
-+	struct mesh_prov_acceptor *rx_prov = user_data;
-+	uint8_t fail_code[2] = {PROV_FAILED, PROV_ERR_UNEXPECTED_ERR};
-+
-+	if (rx_prov != prov)
-+		return;
-+
-+	prov->timeout = NULL;
-+
-+	if (prov->cmplt && prov->trans_tx) {
-+		prov->cmplt(prov->caller_data, PROV_ERR_TIMEOUT, NULL);
-+		prov->cmplt = NULL;
-+		prov->trans_tx(prov->trans_data, fail_code, 2);
-+		prov->timeout = l_timeout_create(1, prov_to, prov, NULL);
-+		return;
-+	}
-+
-+	acceptor_free();
-+}
-+
-+static void acp_prov_open(void *user_data, prov_trans_tx_t trans_tx,
-+				void *trans_data, uint8_t transport)
-+{
-+	struct mesh_prov_acceptor *rx_prov = user_data;
-+
-+	/* Only one provisioning session may be open at a time */
-+	if (rx_prov != prov)
-+		return;
-+
-+	/* Only one provisioning session may be open at a time */
-+	if (prov->trans_tx && prov->trans_tx != trans_tx &&
-+					prov->transport != transport)
-+		return;
-+
-+	if (transport == PB_ADV) {
-+#if defined(GATT_ENABLED)
-+		/* TODO: Disable PB-GATT */
-+#endif
-+	}
-+
-+#if defined(GATT_ENABLED)
-+	else if (transport == PB_GATT) {
-+		/* TODO: Disable PB-ADV */
-+		pb_adv_unreg(prov);
-+	}
-+#endif
-+
-+	else
-+		return;
-+
-+	prov->trans_tx = trans_tx;
-+	prov->transport = transport;
-+	prov->trans_data = trans_data;
-+	prov->timeout = l_timeout_create(prov->to_secs, prov_to, prov, NULL);
-+}
-+
-+static void swap_u256_bytes(uint8_t *u256)
-+{
-+	int i;
-+
-+	/* End-to-End byte reflection of 32 octet buffer */
-+	for (i = 0; i < 16; i++) {
-+		u256[i] ^= u256[31 - i];
-+		u256[31 - i] ^= u256[i];
-+		u256[i] ^= u256[31 - i];
-+	}
-+}
-+
-+static void prov_calc_secret(const uint8_t *pub, const uint8_t *priv,
-+							uint8_t *secret)
-+{
-+	uint8_t tmp[64];
-+
-+	/* Convert to ECC byte order */
-+	memcpy(tmp, pub, 64);
-+	swap_u256_bytes(tmp);
-+	swap_u256_bytes(tmp + 32);
-+
-+	ecdh_shared_secret(tmp, priv, secret);
-+
-+	/* Convert to Mesh byte order */
-+	swap_u256_bytes(secret);
-+}
-+
-+static void acp_credentials(struct mesh_prov_acceptor *prov)
-+{
-+	prov_calc_secret(prov->conf_inputs.prv_pub_key,
-+			prov->private_key, prov->secret);
-+
-+	mesh_crypto_s1(&prov->conf_inputs,
-+			sizeof(prov->conf_inputs), prov->salt);
-+
-+	mesh_crypto_prov_conf_key(prov->secret, prov->salt,
-+			prov->calc_key);
-+
-+	l_getrandom(prov->rand_auth_workspace, 16);
-+
-+	print_packet("PublicKeyProv", prov->conf_inputs.prv_pub_key, 64);
-+	print_packet("PublicKeyDev", prov->conf_inputs.dev_pub_key, 64);
-+	print_packet("PrivateKeyLocal", prov->private_key, 32);
-+	print_packet("ConfirmationInputs", &prov->conf_inputs,
-+						sizeof(prov->conf_inputs));
-+	print_packet("ECDHSecret", prov->secret, 32);
-+	print_packet("LocalRandom", prov->rand_auth_workspace, 16);
-+	print_packet("ConfirmationSalt", prov->salt, 16);
-+	print_packet("ConfirmationKey", prov->calc_key, 16);
-+}
-+
-+static uint32_t digit_mod(uint8_t power)
-+{
-+	uint32_t ret = 1;
-+
-+	while (power--)
-+		ret *= 10;
-+
-+	return ret;
-+}
-+
-+static void number_cb(void *user_data, mesh_error_t err, uint32_t number)
-+{
-+	struct mesh_prov_acceptor *rx_prov = user_data;
-+	uint8_t out[2];
-+
-+	if (prov != rx_prov)
-+		return;
-+
-+	if (err) {
-+		out[0] = PROV_FAILED;
-+		out[1] = PROV_ERR_UNEXPECTED_ERR;
-+		prov->trans_tx(prov->trans_data, out, 2);
-+		return;
-+	}
-+
-+	/* Save two copies, to generate two confirmation values */
-+	l_put_be32(number, prov->rand_auth_workspace + 28);
-+	l_put_be32(number, prov->rand_auth_workspace + 44);
-+	prov->material |= MAT_RAND_AUTH;
-+	out[0] = PROV_INP_CMPLT;
-+	prov->trans_tx(prov->trans_data, out, 1);
-+}
-+
-+static void static_cb(void *user_data, mesh_error_t err,
-+						uint8_t *key, uint32_t len)
-+{
-+	struct mesh_prov_acceptor *rx_prov = user_data;
-+	uint8_t out[2];
-+
-+	if (prov != rx_prov)
-+		return;
-+
-+	if (err || !key || len != 16) {
-+		out[0] = PROV_FAILED;
-+		out[1] = PROV_ERR_UNEXPECTED_ERR;
-+		prov->trans_tx(prov->trans_data, out, 2);
-+		return;
-+	}
-+
-+	/* Save two copies, to generate two confirmation values */
-+	memcpy(prov->rand_auth_workspace + 16, key, 16);
-+	memcpy(prov->rand_auth_workspace + 32, key, 16);
-+	prov->material |= MAT_RAND_AUTH;
-+}
-+
-+static void priv_key_cb(void *user_data, mesh_error_t err,
-+						uint8_t *key, uint32_t len)
-+{
-+	struct mesh_prov_acceptor *rx_prov = user_data;
-+	uint8_t out[2];
-+
-+	if (prov != rx_prov)
-+		return;
-+
-+	if (err || !key || len != 32) {
-+		out[0] = PROV_FAILED;
-+		out[1] = PROV_ERR_UNEXPECTED_ERR;
-+		prov->trans_tx(prov->trans_data, out, 2);
-+		return;
-+	}
-+
-+	memcpy(prov->private_key, key, 32);
-+	ecc_make_public_key(prov->private_key,
-+			prov->conf_inputs.dev_pub_key);
-+
-+	/* Convert to Mesh byte order */
-+	swap_u256_bytes(prov->conf_inputs.dev_pub_key);
-+	swap_u256_bytes(prov->conf_inputs.dev_pub_key + 32);
-+
-+	prov->material |= MAT_LOCAL_PRIVATE;
-+	if ((prov->material & MAT_SECRET) == MAT_SECRET)
-+		acp_credentials(prov);
-+}
-+
-+static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
-+{
-+	struct mesh_prov_acceptor *rx_prov = user_data;
-+	struct mesh_prov_node_info *info;
-+	uint8_t *out;
-+	uint8_t type = *data++;
-+	uint8_t fail_code[2];
-+	uint32_t oob_key;
-+	uint64_t decode_mic;
-+	bool result;
-+
-+	if (rx_prov != prov || !prov->trans_tx)
-+		return;
-+
-+	l_debug("Provisioning packet received type: %2.2x (%u octets)",
-+								type, len);
-+
-+	if (type == prov->previous) {
-+		l_error("Ignore repeated %2.2x packet", type);
-+		return;
-+	} else if (type > prov->expected || type < prov->previous) {
-+		l_error("Expected %2.2x, Got:%2.2x", prov->expected, type);
-+		fail_code[1] = PROV_ERR_UNEXPECTED_PDU;
-+		goto failure;
-+	}
-+
-+	if (type >= L_ARRAY_SIZE(expected_pdu_size) ||
-+					len != expected_pdu_size[type]) {
-+		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
-+			len, expected_pdu_size[type], type);
-+		fail_code[1] = PROV_ERR_INVALID_FORMAT;
-+		goto failure;
-+	}
-+
-+	switch (type){
-+	case PROV_INVITE: /* Prov Invite */
-+		/* Prov Capabilities */
-+		out = l_malloc(1 + sizeof(struct mesh_net_prov_caps));
-+		out[0] = PROV_CAPS;
-+		memcpy(out + 1, &prov->conf_inputs.caps,
-+					sizeof(prov->conf_inputs.caps));
-+
-+		prov->conf_inputs.invite.attention = data[0];
-+
-+		prov->state = ACP_PROV_CAPS_SENT;
-+		prov->expected = PROV_START;
-+		prov->trans_tx(prov->trans_data,
-+				out, sizeof(prov->conf_inputs.caps) + 1);
-+		l_free(out);
-+		break;
-+
-+	case PROV_START: /* Prov Start */
-+		memcpy(&prov->conf_inputs.start, data,
-+				sizeof(prov->conf_inputs.start));
-+
-+		if (prov->conf_inputs.start.algorithm ||
-+				prov->conf_inputs.start.pub_key > 1 ||
-+				prov->conf_inputs.start.auth_method > 3) {
-+			fail_code[1] = PROV_ERR_INVALID_FORMAT;
-+			goto failure;
-+		}
-+
-+		if (prov->conf_inputs.start.pub_key) {
-+			if (prov->conf_inputs.caps.pub_type) {
-+				/* Prompt Agent for Private Key of OOB */
-+				mesh_agent_request_private_key(prov->agent,
-+							priv_key_cb, prov);
-+			} else {
-+				fail_code[1] = PROV_ERR_INVALID_PDU;
-+				goto failure;
-+			}
+---
+ mesh/cfgmod-server.c | 173 ++++++++++++++++++++++++++-------------------------
+ 1 file changed, 88 insertions(+), 85 deletions(-)
+
+diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
+index 2c4a02912..6cddb8eac 100644
+--- a/mesh/cfgmod-server.c
++++ b/mesh/cfgmod-server.c
+@@ -40,7 +40,7 @@
+ 
+ #define CFG_MAX_MSG_LEN 380
+ 
+-static void send_pub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
++static void send_pub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 			uint8_t status, uint16_t ele_addr, uint16_t pub_addr,
+ 			uint32_t mod_id, uint16_t idx, bool cred_flag,
+ 			uint8_t ttl, uint8_t period, uint8_t retransmit)
+@@ -60,7 +60,7 @@ static void send_pub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 	msg[n++] = ttl;
+ 	msg[n++] = period;
+ 	msg[n++] = retransmit;
+-	if (mod_id < 0x10000) {
++	if (mod_id < 0x10000 || mod_id > VENDOR_ID_MASK) {
+ 		l_put_le16(mod_id, msg + n);
+ 		n += 2;
+ 	} else {
+@@ -70,12 +70,11 @@ static void send_pub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		n += 2;
+ 	}
+ 
+-	mesh_model_send(net, CONFIG_SRV_MODEL,
+-			dst, src,
++	mesh_model_send(node, dst, src,
+ 			APP_IDX_DEV, DEFAULT_TTL, msg, n);
+ }
+ 
+-static bool config_pub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
++static bool config_pub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 					const uint8_t *pkt, uint16_t size)
+ {
+ 	uint32_t mod_id;
+@@ -84,33 +83,34 @@ static bool config_pub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 	struct mesh_model_pub *pub = NULL;
+ 	int status;
+ 
+-	if (size == 4)
++	if (size == 4) {
+ 		mod_id = l_get_le16(pkt + 2);
+-	else if (size == 6) {
++		mod_id |= VENDOR_ID_MASK;
++	} else if (size == 6) {
+ 		mod_id = l_get_le16(pkt + 2) << 16;
+ 		mod_id |= l_get_le16(pkt + 4);
+ 	} else
+ 		return false;
+ 
+ 	ele_addr = l_get_le16(pkt);
+-	ele_idx = node_get_element_idx(mesh_net_local_node_get(net), ele_addr);
++	ele_idx = node_get_element_idx(node, ele_addr);
+ 
+ 	if (ele_idx >= 0)
+-		pub = mesh_model_pub_get(net, ele_idx, mod_id, &status);
++		pub = mesh_model_pub_get(node, ele_idx, mod_id, &status);
+ 	else
+ 		status = MESH_STATUS_INVALID_ADDRESS;
+ 
+ 	if (pub && status == MESH_STATUS_SUCCESS)
+-		send_pub_status(net, src, dst, status, ele_addr, pub->addr,
++		send_pub_status(node, src, dst, status, ele_addr, pub->addr,
+ 				mod_id, pub->idx, pub->credential, pub->ttl,
+ 						pub->period, pub->retransmit);
+ 	else
+-		send_pub_status(net, src, dst, status, ele_addr, 0, mod_id,
++		send_pub_status(node, src, dst, status, ele_addr, 0, mod_id,
+ 								0, 0, 0, 0, 0);
+ 	return true;
+ }
+ 
+-static bool config_pub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
++static bool config_pub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 					const uint8_t *pkt, uint16_t size,
+ 					bool unreliable)
+ {
+@@ -133,6 +133,7 @@ static bool config_pub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		period = pkt[7];
+ 		retransmit = pkt[8];
+ 		mod_id = l_get_le16(pkt + 9);
++		mod_id |= VENDOR_ID_MASK;
+ 		break;
+ 
+ 	case 13:
+@@ -151,6 +152,7 @@ static bool config_pub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		period = pkt[21];
+ 		retransmit = pkt[22];
+ 		mod_id = l_get_le16(pkt + 23);
++		mod_id |= VENDOR_ID_MASK;
+ 		break;
+ 
+ 	case 27:
+@@ -181,24 +183,24 @@ static bool config_pub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 	if (!b_virt && test_addr > 0x7fff && test_addr < 0xc000)
+ 		return false;
+ 
+-	status = mesh_model_pub_set(net, ele_addr, mod_id, pub_addr, idx,
++	status = mesh_model_pub_set(node, ele_addr, mod_id, pub_addr, idx,
+ 					cred_flag, ttl, period, retransmit,
+ 					b_virt, &ota);
+ 
+-	l_info("pub_set: status %d, ea %4.4x, ota: %4.4x, mod: %x, idx: %3.3x",
++	l_debug("pub_set: status %d, ea %4.4x, ota: %4.4x, mod: %x, idx: %3.3x",
+ 					status, ele_addr, ota, mod_id, idx);
+ 
+ 	if (IS_UNASSIGNED(ota) && !b_virt)
+ 		ttl = period = idx = 0;
+ 
+ 	if (status >= 0 && !unreliable)
+-		send_pub_status(net, src, dst, status, ele_addr, ota,
++		send_pub_status(node, src, dst, status, ele_addr, ota,
+ 				mod_id, idx, cred_flag, ttl, period,
+ 				retransmit);
+ 	return true;
+ }
+ 
+-static void send_sub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
++static void send_sub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 					uint8_t status, uint16_t ele_addr,
+ 					uint16_t addr, uint32_t mod)
+ {
+@@ -210,7 +212,7 @@ static void send_sub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 	n += 2;
+ 	l_put_le16(addr, msg + n);
+ 	n += 2;
+-	if (mod >= 0x10000) {
++	if (mod >= 0x10000 && mod < VENDOR_ID_MASK) {
+ 		l_put_le16(mod >> 16, msg + n);
+ 		l_put_le16(mod, msg + n + 2);
+ 		n += 4;
+@@ -219,11 +221,10 @@ static void send_sub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		n += 2;
+ 	}
+ 
+-	mesh_model_send(net, CONFIG_SRV_MODEL, dst, src, APP_IDX_DEV,
+-							DEFAULT_TTL, msg, n);
++	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
+ }
+ 
+-static bool config_sub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
++static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 					const uint8_t *pkt, uint16_t size)
+ {
+ 	uint16_t ele_addr;
+@@ -251,6 +252,7 @@ static bool config_sub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		n += 2;
+ 		l_put_le16(mod_id, msg + n);
+ 		n += 2;
++		mod_id |= VENDOR_ID_MASK;
+ 		break;
+ 
+ 	case 6:
+@@ -269,7 +271,7 @@ static bool config_sub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 	}
+ 
+ 	buf_size = sizeof(uint16_t) * MAX_GRP_PER_MOD;
+-	ret = mesh_model_sub_get(net, ele_addr, mod_id, msg + n, buf_size,
++	ret = mesh_model_sub_get(node, ele_addr, mod_id, msg + n, buf_size,
+ 									&size);
+ 
+ 	if (!ret)
+@@ -277,13 +279,11 @@ static bool config_sub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 	else if (ret > 0)
+ 		*status = ret;
+ 
+-	mesh_model_send(net, CONFIG_SRV_MODEL,
+-			dst, src, APP_IDX_DEV,
+-			DEFAULT_TTL, msg, n);
++	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
+ 	return true;
+ }
+ 
+-static void config_sub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
++static void config_sub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 					const uint8_t *pkt, uint16_t size,
+ 					bool virt, uint32_t opcode)
+ {
+@@ -301,13 +301,15 @@ static void config_sub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL)
+ 			return;
+ 		mod_id = l_get_le16(pkt + 2);
++		mod_id |= VENDOR_ID_MASK;
+ 		break;
+ 	case 6:
+ 		if (virt)
+ 			return;
+-		if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL)
++		if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL) {
+ 			mod_id = l_get_le16(pkt + 4);
+-		else {
++			mod_id |= VENDOR_ID_MASK;
 +		} else {
-+			/* Ephemeral Public Key requested */
-+			ecc_make_key(prov->conf_inputs.dev_pub_key,
-+					prov->private_key);
-+			swap_u256_bytes(prov->conf_inputs.dev_pub_key);
-+			swap_u256_bytes(prov->conf_inputs.dev_pub_key + 32);
-+			prov->material |= MAT_LOCAL_PRIVATE;
-+		}
-+
-+		prov->expected = PROV_PUB_KEY;
-+		break;
-+
-+	case PROV_PUB_KEY: /* Public Key */
-+		/* Save Key */
-+		memcpy(prov->conf_inputs.prv_pub_key, data, 64);
-+		prov->material |= MAT_REMOTE_PUBLIC;
-+		prov->expected = PROV_CONFIRM;
-+
-+		if ((prov->material & MAT_SECRET) != MAT_SECRET)
-+			return;
-+
-+		acp_credentials(prov);
-+
-+		if (!prov->conf_inputs.start.pub_key) {
-+			out = l_malloc(65);
-+			out[0] = PROV_PUB_KEY;
-+			memcpy(out + 1, prov->conf_inputs.dev_pub_key, 64);
-+			prov->trans_tx(prov->trans_data, out, 65);
-+			l_free(out);
-+		}
-+
-+		/* Start Step 3 */
-+		switch (prov->conf_inputs.start.auth_method) {
-+		default:
-+		case 0:
-+			/* Auth Type 3c - No OOB */
-+			break;
-+
-+		case 1:
-+			/* Auth Type 3c - Static OOB */
-+			/* Prompt Agent for Static OOB */
-+			fail_code[1] = mesh_agent_request_static(prov->agent,
-+					static_cb, prov);
-+
-+			if (fail_code[1])
-+				goto failure;
-+
-+			break;
-+
-+		case 2:
-+			/* Auth Type 3a - Output OOB */
-+			l_getrandom(&oob_key, sizeof(oob_key));
-+			oob_key %= digit_mod(prov->conf_inputs.start.auth_size);
-+
-+			/* Save two copies, for two confirmation values */
-+			l_put_be32(oob_key, prov->rand_auth_workspace + 28);
-+			l_put_be32(oob_key, prov->rand_auth_workspace + 44);
-+			prov->material |= MAT_RAND_AUTH;
-+
-+			if (prov->conf_inputs.start.auth_action ==
-+							PROV_ACTION_OUT_ALPHA) {
-+				/* TODO: Construst NUL-term string to pass */
-+				fail_code[1] = mesh_agent_display_string(
-+					prov->agent, NULL, NULL, prov);
-+			} else {
-+				/* Ask Agent to Display U32 */
-+				fail_code[1] = mesh_agent_display_number(
-+					prov->agent, false,
-+					prov->conf_inputs.start.auth_action,
-+					oob_key, NULL, prov);
-+			}
-+
-+			if (fail_code[1])
-+				goto failure;
-+
-+			break;
-+
-+		case 3:
-+			/* Auth Type 3b - input OOB */
-+			/* Prompt Agent for Input OOB */
-+			if (prov->conf_inputs.start.auth_action ==
-+							PROV_ACTION_IN_ALPHA) {
-+				fail_code[1] = mesh_agent_prompt_alpha(
-+					prov->agent,
-+					static_cb, prov);
-+			} else {
-+				fail_code[1] = mesh_agent_prompt_number(
-+					prov->agent, false,
-+					prov->conf_inputs.start.auth_action,
-+					number_cb, prov);
-+			}
-+
-+			if (fail_code[1])
-+				goto failure;
-+
-+			break;
-+		}
-+
-+		prov->expected = PROV_CONFIRM;
-+		break;
-+
-+	case PROV_CONFIRM: /* Confirmation */
-+		out = l_malloc(17);
-+		out[0] = PROV_CONFIRM;
-+
-+		/* Calculate and Send our Confirmation */
-+		mesh_crypto_aes_cmac(prov->calc_key, prov->rand_auth_workspace,
-+								32, out + 1);
-+		prov->trans_tx(prov->trans_data, out, 17);
-+		l_free(out);
-+
-+		/* Save Provisioners confirmation for later compare */
-+		memcpy(prov->confirm, data, 16);
-+		prov->expected = PROV_RANDOM;
-+		break;
-+
-+	case PROV_RANDOM: /* Random Value */
-+		out = l_malloc(17);
-+		/* Calculate Session key (needed later) while data is fresh */
-+		mesh_crypto_prov_prov_salt(prov->salt, data,
-+						prov->rand_auth_workspace,
-+						prov->salt);
-+		mesh_crypto_session_key(prov->secret, prov->salt, prov->s_key);
-+		mesh_crypto_nonce(prov->secret, prov->salt, prov->s_nonce);
-+
-+		/* Calculate expected Provisioner Confirm */
-+		memcpy(prov->rand_auth_workspace + 16, data, 16);
-+		mesh_crypto_aes_cmac(prov->calc_key,
-+				prov->rand_auth_workspace + 16, 32, out);
-+
-+		/* Compare our calculation with Provisioners */
-+		if (memcmp(out, prov->confirm, 16)) {
-+			fail_code[1] = PROV_ERR_CONFIRM_FAILED;
-+			l_free(out);
-+			goto failure;
-+		}
-+
-+		/* Send Random value we used */
-+		out[0] = PROV_RANDOM;
-+		memcpy(out + 1, prov->rand_auth_workspace, 16);
-+		prov->trans_tx(prov->trans_data, out, 17);
-+		l_free(out);
-+		prov->expected = PROV_DATA;
-+		break;
-+
-+	case PROV_DATA: /* Provisioning Data */
-+
-+		/* Calculate our device key */
-+		mesh_crypto_device_key(prov->secret,
-+				prov->salt,
-+				prov->calc_key);
-+
-+		/* Decrypt new node data into workspace */
-+		mesh_crypto_aes_ccm_decrypt(prov->s_nonce, prov->s_key,
-+				NULL, 0,
-+				data, len - 1, prov->rand_auth_workspace,
-+				&decode_mic, sizeof(decode_mic));
-+
-+		/* Validate that the data hasn't been messed with in transit */
-+		if (l_get_be64(data + 25) != decode_mic) {
-+			l_error("Provisioning Failed-MIC compare");
-+			fail_code[1] = PROV_ERR_DECRYPT_FAILED;
-+			goto failure;
-+		}
-+
-+		info = l_malloc(sizeof(struct mesh_prov_node_info));
-+
-+		memcpy(info->device_key, prov->calc_key, 16);
-+		memcpy(info->net_key, prov->rand_auth_workspace, 16);
-+		info->net_index = l_get_be16(prov->rand_auth_workspace + 16);
-+		info->flags = prov->rand_auth_workspace[18];
-+		info->iv_index = l_get_be32(prov->rand_auth_workspace + 19);
-+		info->unicast = l_get_be16(prov->rand_auth_workspace + 23);
-+
-+		result = prov->cmplt(prov->caller_data, PROV_ERR_SUCCESS, info);
-+		prov->cmplt = NULL;
-+		l_free(info);
-+
-+		if (result) {
-+			prov->rand_auth_workspace[0] = PROV_COMPLETE;
-+			prov->trans_tx(prov->trans_data,
-+					prov->rand_auth_workspace, 1);
-+			goto cleanup;
-+		} else {
-+			fail_code[1] = PROV_ERR_UNEXPECTED_ERR;
-+			goto failure;
-+		}
-+		break;
-+
-+	case PROV_FAILED: /* Provisioning Error -- abort */
-+		/* TODO: Call Complete Callback (Fail)*/
-+		prov->cmplt(prov->caller_data,
-+				data[0] ? data[0] : PROV_ERR_UNEXPECTED_ERR,
-+				NULL);
-+		prov->cmplt = NULL;
-+		goto cleanup;
-+	}
-+
-+	prov->previous = type;
-+	return;
-+
-+failure:
-+	fail_code[0] = PROV_FAILED;
-+	prov->trans_tx(prov->trans_data, fail_code, 2);
-+	if (prov->cmplt)
-+		prov->cmplt(prov->caller_data, fail_code[1], NULL);
-+	prov->cmplt = NULL;
-+
-+cleanup:
-+	l_timeout_remove(prov->timeout);
-+
-+	/* Give PB Link 5 seconds to end session */
-+	prov->timeout = l_timeout_create(5, prov_to, prov, NULL);
-+}
-+
-+static void acp_prov_ack(void *user_data, uint8_t msg_num)
-+{
-+	/* TODO: Handle PB-ADV Ack */
-+}
-+
-+
-+/* This starts unprovisioned device beacon */
-+bool acceptor_start(uint8_t num_ele, uint8_t uuid[16],
-+		uint16_t algorithms, uint32_t timeout,
-+		struct mesh_agent *agent,
-+		mesh_prov_acceptor_complete_func_t complete_cb,
-+		void *caller_data)
-+{
-+	struct mesh_agent_prov_caps *caps;
-+	uint8_t beacon[24] = {MESH_AD_TYPE_BEACON,
-+						BEACON_TYPE_UNPROVISIONED};
-+	uint8_t len = sizeof(beacon) - sizeof(uint32_t);
-+	bool result;
-+
-+	/* Invoked from Join() method in mesh-api.txt, to join a
-+	 * remote mesh network.
-+	 */
-+
-+#if defined(GATT_ENABLED)
-+	/* If we support PB-GATT, that means we need to set up a GATT
-+	 * service, and need the existence of bluetoothd, with it's
-+	 * own LE capable controller. That is a battle for another day.
-+	 * We will *always* support PB-ADV.
-+	 */
-+#endif
-+	if (prov)
-+		return false;
-+
-+	prov = l_new(struct mesh_prov_acceptor, 1);
-+	prov->to_secs = timeout;
-+	prov->agent = agent;
-+	prov->cmplt = complete_cb;
-+	prov->previous = -1;
-+	prov->caller_data = caller_data;
-+
-+	caps = mesh_agent_get_caps(agent);
-+
-+	/* TODO: Should we sanity check values here or elsewhere? */
-+	prov->conf_inputs.caps.num_ele = num_ele;
-+	prov->conf_inputs.caps.pub_type = caps->pub_type;
-+	prov->conf_inputs.caps.static_type = caps->static_type;
-+	prov->conf_inputs.caps.output_size = caps->output_size;
-+	prov->conf_inputs.caps.input_size = caps->input_size;
-+
-+	/* Store UINT16 values in Over-the-Air order, in packed structure
-+	 * for crypto inputs
-+	 */
-+	l_put_be16(algorithms, &prov->conf_inputs.caps.algorithms);
-+	l_put_be16(caps->output_action, &prov->conf_inputs.caps.output_action);
-+	l_put_be16(caps->input_action, &prov->conf_inputs.caps.input_action);
-+
-+	/* Compose Unprovisioned Beacon */
-+	memcpy(beacon + 2, uuid, 16);
-+	l_put_be16(caps->oob_info, beacon + 18);
-+	if (caps->oob_info & OOB_INFO_URI_HASH){
-+		l_put_be32(caps->uri_hash, beacon + 20);
-+		len += sizeof(uint32_t);
-+	}
-+
-+	/* Infinitely Beacon until Canceled, or Provisioning Starts */
-+	result = mesh_send_pkt(0, 500, beacon, len);
-+
-+	if (!result)
-+		goto error_fail;
-+
-+	/* Always register for PB-ADV */
-+	result = pb_adv_reg(acp_prov_open, acp_prov_close, acp_prov_rx,
-+						acp_prov_ack, uuid, prov);
-+
-+	if (result)
-+		return true;
-+
-+error_fail:
-+	acceptor_free();
-+	return false;
-+}
-+
-+void acceptor_cancel(void *user_data)
-+{
-+	acceptor_free();
-+}
+ 			mod_id = l_get_le16(pkt + 2) << 16;
+ 			mod_id |= l_get_le16(pkt + 4);
+ 		}
+@@ -322,6 +324,7 @@ static void config_sub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		if (!virt)
+ 			return;
+ 		mod_id = l_get_le16(pkt + 18);
++		mod_id |= VENDOR_ID_MASK;
+ 		break;
+ 	case 22:
+ 		if (!virt)
+@@ -341,42 +344,42 @@ static void config_sub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 	func = opcode & ~OP_UNRELIABLE;
+ 	switch (func) {
+ 	default:
+-		l_info("Bad opcode: %x", func);
++		l_debug("Bad opcode: %x", func);
+ 		return;
+ 
+ 	case OP_CONFIG_MODEL_SUB_DELETE_ALL:
+-		status = mesh_model_sub_del_all(net, ele_addr, mod_id);
++		status = mesh_model_sub_del_all(node, ele_addr, mod_id);
+ 		break;
+ 
+ 	case OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE:
+ 		grp = UNASSIGNED_ADDRESS;
+ 		/* Fall Through */
+ 	case OP_CONFIG_MODEL_SUB_OVERWRITE:
+-		status = mesh_model_sub_ovr(net, ele_addr, mod_id,
++		status = mesh_model_sub_ovr(node, ele_addr, mod_id,
+ 							addr, virt, &grp);
+ 		break;
+ 	case OP_CONFIG_MODEL_SUB_VIRT_ADD:
+ 		grp = UNASSIGNED_ADDRESS;
+ 		/* Fall Through */
+ 	case OP_CONFIG_MODEL_SUB_ADD:
+-		status = mesh_model_sub_add(net, ele_addr, mod_id,
++		status = mesh_model_sub_add(node, ele_addr, mod_id,
+ 							addr, virt, &grp);
+ 		break;
+ 	case OP_CONFIG_MODEL_SUB_VIRT_DELETE:
+ 		grp = UNASSIGNED_ADDRESS;
+ 		/* Fall Through */
+ 	case OP_CONFIG_MODEL_SUB_DELETE:
+-		status = mesh_model_sub_del(net, ele_addr, mod_id,
++		status = mesh_model_sub_del(node, ele_addr, mod_id,
+ 							addr, virt, &grp);
+ 		break;
+ 	}
+ 
+ 	if (!unreliable && status >= 0)
+-		send_sub_status(net, src, dst, status, ele_addr, grp, mod_id);
++		send_sub_status(node, src, dst, status, ele_addr, grp, mod_id);
+ 
+ }
+ 
+-static void send_model_app_status(struct mesh_net *net, uint16_t src,
++static void send_model_app_status(struct mesh_node *node, uint16_t src,
+ 					uint16_t dst, uint8_t status,
+ 					uint16_t addr, uint32_t id,
+ 					uint16_t idx)
+@@ -389,18 +392,17 @@ static void send_model_app_status(struct mesh_net *net, uint16_t src,
+ 	n += 2;
+ 	l_put_le16(idx, msg + n);
+ 	n += 2;
+-	if (id > 0xffff) {
++	if (id >= 0x10000 && id < VENDOR_ID_MASK) {
+ 		l_put_le16(id >> 16, msg + n);
+ 		n += 2;
+ 	}
+ 	l_put_le16(id, msg + n);
+ 	n += 2;
+ 
+-	mesh_model_send(net, CONFIG_SRV_MODEL, dst, src, APP_IDX_DEV,
+-				DEFAULT_TTL, msg, n);
++	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
+ }
+ 
+-static void model_app_list(struct mesh_net *net, uint16_t src, uint16_t dst,
++static void model_app_list(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 					const uint8_t *pkt, uint16_t size)
+ {
+ 	uint16_t ele_addr;
+@@ -427,6 +429,7 @@ static void model_app_list(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		mod_id = l_get_le16(pkt + 2);
+ 		l_put_le16(ele_addr, msg + 1 + n);
+ 		l_put_le16(mod_id, msg + 3 + n);
++		mod_id |= VENDOR_ID_MASK;
+ 		n += 5;
+ 		break;
+ 	case 6:
+@@ -443,20 +446,20 @@ static void model_app_list(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 	}
+ 
+ 
+-	result = mesh_model_get_bindings(net, ele_addr, mod_id, msg + n,
++	result = mesh_model_get_bindings(node, ele_addr, mod_id, msg + n,
+ 							buf_size, &size);
+ 	n += size;
+ 
+ 	if (result >= 0) {
+ 		*status = result;
+-		mesh_model_send(net, CONFIG_SRV_MODEL, dst, src, APP_IDX_DEV,
+-					DEFAULT_TTL, msg, n);
++		mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL,
++								msg, n);
+ 	}
+ 
+ 	l_free(msg);
+ }
+ 
+-static bool model_app_bind(struct mesh_net *net, uint16_t src, uint16_t dst,
++static bool model_app_bind(struct mesh_node *node, uint16_t src, uint16_t dst,
+ 					const uint8_t *pkt, uint16_t size,
+ 					bool unbind)
+ {
+@@ -471,6 +474,7 @@ static bool model_app_bind(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 
+ 	case 6:
+ 		mod_id = l_get_le16(pkt + 4);
++		mod_id |= VENDOR_ID_MASK;
+ 		break;
+ 	case 8:
+ 		mod_id = l_get_le16(pkt + 4) << 16;
+@@ -485,11 +489,11 @@ static bool model_app_bind(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 		return false;
+ 
+ 	if (unbind)
+-		result = mesh_model_binding_del(net, ele_addr, mod_id, idx);
++		result = mesh_model_binding_del(node, ele_addr, mod_id, idx);
+ 	else
+-		result = mesh_model_binding_add(net, ele_addr, mod_id, idx);
++		result = mesh_model_binding_add(node, ele_addr, mod_id, idx);
+ 
+-	send_model_app_status(net, src, dst, result, ele_addr, mod_id, idx);
++	send_model_app_status(node, src, dst, result, ele_addr, mod_id, idx);
+ 
+ 	return true;
+ }
+@@ -533,7 +537,7 @@ static void hb_sub_timeout_func(struct l_timeout *timeout, void *user_data)
+ 	struct mesh_net *net = user_data;
+ 	struct mesh_net_heartbeat *hb = mesh_net_heartbeat_get(net);
+ 
+-	l_info("HB Subscription Ended");
++	l_debug("HB Subscription Ended");
+ 	l_timeout_remove(hb->sub_timer);
+ 	hb->sub_timer = NULL;
+ 	hb->sub_enabled = false;
+@@ -639,7 +643,7 @@ static int hb_subscription_set(struct mesh_net *net, uint16_t src,
+ 
+ static void node_reset(struct l_timeout *timeout, void *user_data)
+ {
+-	l_info("Node Reset");
++	l_debug("Node Reset");
+ 	l_timeout_remove(timeout);
+ 	l_main_quit();
+ }
+@@ -649,7 +653,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 				const uint8_t *data, uint16_t size,
+ 				uint8_t ttl, const void *user_data)
+ {
+-	struct mesh_net *net = (struct mesh_net *) user_data;
++	struct mesh_node *node = (struct mesh_node *) user_data;
++	struct mesh_net *net = node_get_net(node);
+ 	const uint8_t *pkt = data;
+ 	struct timeval time_now;
+ 	uint32_t opcode, tmp32;
+@@ -663,7 +668,6 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 	bool virt = false;
+ 	uint8_t count;
+ 	uint16_t interval;
+-	struct mesh_node *node;
+ 	uint16_t n;
+ 
+ 	if (idx != APP_IDX_DEV)
+@@ -675,10 +679,10 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 	} else
+ 		return false;
+ 
++	net = node_get_net(node);
+ 	hb = mesh_net_heartbeat_get(net);
+ 	l_debug("CONFIG-SRV-opcode 0x%x size %u idx %3.3x", opcode, size, idx);
+ 
+-	node = mesh_net_local_node_get(net);
+ 	n = 0;
+ 
+ 	switch (opcode) {
+@@ -691,8 +695,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 
+ 		/* Only page 0 is currently supported */
+ 		if (pkt[0] != 0) {
+-			l_info("Unsupported page number %d", pkt[0]);
+-			l_info("Returning page number 0");
++			l_debug("Unsupported page number %d", pkt[0]);
++			l_debug("Returning page number 0");
+ 		}
+ 		long_msg = l_malloc(CFG_MAX_MSG_LEN);
+ 		n = mesh_model_opcode_set(OP_DEV_COMP_STATUS, long_msg);
+@@ -711,7 +715,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		/* Fall Through */
+ 
+ 	case OP_CONFIG_DEFAULT_TTL_GET:
+-		l_info("Get/Set Default TTL");
++		l_debug("Get/Set Default TTL");
+ 
+ 		n = mesh_model_opcode_set(OP_CONFIG_DEFAULT_TTL_STATUS, msg);
+ 		msg[n++] = node_default_ttl_get(node);
+@@ -721,7 +725,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		if (size != 25 && size != 27)
+ 			return true;
+ 
+-		config_pub_set(net, src, unicast, pkt, size,
++		config_pub_set(node, src, unicast, pkt, size,
+ 				!!(opcode & OP_UNRELIABLE));
+ 		break;
+ 
+@@ -729,24 +733,24 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		if (size != 11 && size != 13)
+ 			return true;
+ 
+-		config_pub_set(net, src, unicast, pkt, size,
++		config_pub_set(node, src, unicast, pkt, size,
+ 				!!(opcode & OP_UNRELIABLE));
+ 		break;
+ 
+ 	case OP_CONFIG_MODEL_PUB_GET:
+-		config_pub_get(net, src, unicast, pkt, size);
++		config_pub_get(node, src, unicast, pkt, size);
+ 		break;
+ 
+ 	case OP_CONFIG_VEND_MODEL_SUB_GET:
+ 		if (size != 6)
+ 			return true;
+-		config_sub_get(net, src, unicast, pkt, size);
++		config_sub_get(node, src, unicast, pkt, size);
+ 		break;
+ 
+ 	case OP_CONFIG_MODEL_SUB_GET:
+ 		if (size != 4)
+ 			return true;
+-		config_sub_get(net, src, unicast, pkt, size);
++		config_sub_get(node, src, unicast, pkt, size);
+ 		break;
+ 
+ 	case OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE:
+@@ -758,7 +762,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 	case OP_CONFIG_MODEL_SUB_DELETE:
+ 	case OP_CONFIG_MODEL_SUB_ADD:
+ 	case OP_CONFIG_MODEL_SUB_DELETE_ALL:
+-		config_sub_set(net, src, unicast, pkt, size, virt, opcode);
++		config_sub_set(node, src, unicast, pkt, size, virt, opcode);
+ 		break;
+ 
+ 	case OP_CONFIG_RELAY_SET:
+@@ -777,7 +781,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		msg[n++] = node_relay_mode_get(node, &count, &interval);
+ 		msg[n++] = ((count - 1) << 5) + ((interval/10 - 1) & 0x1f);
+ 
+-		l_info("Get/Set Relay Config (%d)", msg[n-1]);
++		l_debug("Get/Set Relay Config (%d)", msg[n-1]);
+ 		break;
+ 
+ 	case OP_CONFIG_NETWORK_TRANSMIT_SET:
+@@ -786,7 +790,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 
+ 		count = (pkt[0] >> 5) + 1;
+ 		interval = ((pkt[0] & 0x1f) + 1) * 10;
+-		if (storage_local_set_transmit_params(net, count, interval))
++		if (storage_set_transmit_params(node_jconfig_get(node), count,
++								interval))
+ 			mesh_net_transmit_params_set(net, count, interval);
+ 		/* Fall Through */
+ 
+@@ -796,7 +801,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		mesh_net_transmit_params_get(net, &count, &interval);
+ 		msg[n++] = ((count - 1) << 5) + ((interval/10 - 1) & 0x1f);
+ 
+-		l_info("Get/Set Network Transmit Config");
++		l_debug("Get/Set Network Transmit Config");
+ 		break;
+ 
+ 	case OP_CONFIG_PROXY_SET:
+@@ -810,7 +815,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		n = mesh_model_opcode_set(OP_CONFIG_PROXY_STATUS, msg);
+ 
+ 		msg[n++] = node_proxy_mode_get(node);
+-		l_info("Get/Set Config Proxy (%d)", msg[n-1]);
++		l_debug("Get/Set Config Proxy (%d)", msg[n-1]);
+ 		break;
+ 
+ 	case OP_NODE_IDENTITY_SET:
+@@ -845,7 +850,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		n += 2;
+ 
+ 		msg[n++] = state;
+-		l_info("Get/Set Config Identity (%d)", state);
++		l_debug("Get/Set Config Identity (%d)", state);
+ 		break;
+ 
+ 	case OP_CONFIG_BEACON_SET:
+@@ -859,7 +864,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		n = mesh_model_opcode_set(OP_CONFIG_BEACON_STATUS, msg);
+ 
+ 		msg[n++] = node_beacon_mode_get(node);
+-		l_info("Get/Set Config Beacon (%d)", msg[n-1]);
++		l_debug("Get/Set Config Beacon (%d)", msg[n-1]);
+ 		break;
+ 
+ 	case OP_CONFIG_FRIEND_SET:
+@@ -874,7 +879,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		n = mesh_model_opcode_set(OP_CONFIG_FRIEND_STATUS, msg);
+ 
+ 		msg[n++] = node_friend_mode_get(node);
+-		l_info("Get/Set Friend (%d)", msg[n-1]);
++		l_debug("Get/Set Friend (%d)", msg[n-1]);
+ 		break;
+ 
+ 	case OP_CONFIG_KEY_REFRESH_PHASE_SET:
+@@ -908,7 +913,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		n += 2;
+ 		msg[n++] = phase;
+ 
+-		l_info("Get/Set Key Refresh State (%d)", msg[n-1]);
++		l_debug("Get/Set Key Refresh State (%d)", msg[n-1]);
+ 		break;
+ 
+ 	case OP_APPKEY_ADD:
+@@ -921,7 +926,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		b_res = appkey_key_add(net, net_idx, app_idx, pkt + 3,
+ 						opcode == OP_APPKEY_UPDATE);
+ 
+-		l_info("Add/Update AppKey %s: Net_Idx %3.3x, App_Idx %3.3x",
++		l_debug("Add/Update AppKey %s: Net_Idx %3.3x, App_Idx %3.3x",
+ 			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail",
+ 							net_idx, app_idx);
+ 
+@@ -942,9 +947,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		net_idx = l_get_le16(pkt) & 0xfff;
+ 		app_idx = l_get_le16(pkt + 1) >> 4;
+ 		b_res = appkey_key_delete(net, net_idx, app_idx);
+-		if (b_res == MESH_STATUS_SUCCESS)
+-			node_app_key_delete(net, dst, net_idx, app_idx);
+-		l_info("Delete AppKey %s Net_Idx %3.3x to App_Idx %3.3x",
++		l_debug("Delete AppKey %s Net_Idx %3.3x to App_Idx %3.3x",
+ 			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail",
+ 							net_idx, app_idx);
+ 
+@@ -979,7 +982,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		b_res = mesh_net_add_key(net, opcode == OP_NETKEY_UPDATE,
+ 						l_get_le16(pkt), pkt + 2);
+ 
+-		l_info("NetKey Add/Update %s",
++		l_debug("NetKey Add/Update %s",
+ 			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail");
+ 
+ 		n = mesh_model_opcode_set(OP_NETKEY_STATUS, msg);
+@@ -994,7 +997,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 
+ 		b_res = mesh_net_del_key(net, l_get_le16(pkt));
+ 
+-		l_info("NetKey delete %s",
++		l_debug("NetKey delete %s",
+ 			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail");
+ 
+ 		n = mesh_model_opcode_set(OP_NETKEY_STATUS, msg);
+@@ -1016,26 +1019,26 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 
+ 	case OP_MODEL_APP_BIND:
+ 	case OP_MODEL_APP_UNBIND:
+-		model_app_bind(net, src, unicast, pkt, size,
++		model_app_bind(node, src, unicast, pkt, size,
+ 				opcode != OP_MODEL_APP_BIND);
+ 		break;
+ 
+ 	case OP_VEND_MODEL_APP_GET:
+ 		if (size != 6)
+ 			return true;
+-		model_app_list(net, src, unicast, pkt, size);
++		model_app_list(node, src, unicast, pkt, size);
+ 		break;
+ 
+ 	case OP_MODEL_APP_GET:
+ 		if (size != 4)
+ 			return true;
+-		model_app_list(net, src, unicast, pkt, size);
++		model_app_list(node, src, unicast, pkt, size);
+ 		break;
+ 
+ 	case OP_CONFIG_HEARTBEAT_PUB_SET:
+-		l_info("OP_CONFIG_HEARTBEAT_PUB_SET");
++		l_debug("OP_CONFIG_HEARTBEAT_PUB_SET");
+ 		if (size != 9) {
+-			l_info("bad size %d", size);
++			l_debug("bad size %d", size);
+ 			return true;
+ 		}
+ 		if (pkt[2] > 0x11 || pkt[3] > 0x10 || pkt[4] > 0x7f)
+@@ -1101,7 +1104,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		if (size != 5)
+ 			return true;
+ 
+-		l_info("Set Sub Period (Log %2.2x) %d sec",
++		l_debug("Set Sub Period (Log %2.2x) %d sec",
+ 				pkt[4], log_to_uint32(pkt[4], 1));
+ 
+ 		b_res = hb_subscription_set(net, l_get_le16(pkt),
+@@ -1121,7 +1124,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 		else
+ 			time_now.tv_sec = hb->sub_period - time_now.tv_sec;
+ 
+-		l_info("Sub Period (Log %2.2x) %d sec",
++		l_debug("Sub Period (Log %2.2x) %d sec",
+ 				uint32_to_log(time_now.tv_sec),
+ 				(int) time_now.tv_sec);
+ 
+@@ -1159,8 +1162,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 
+ 	if (n) {
+ 		/* print_packet("App Tx", long_msg ? long_msg : msg, n); */
+-		mesh_model_send(net, CONFIG_SRV_MODEL,
+-				unicast, src,
++		mesh_model_send(node, unicast, src,
+ 				APP_IDX_DEV, DEFAULT_TTL,
+ 				long_msg ? long_msg : msg, n);
+ 	}
+@@ -1171,7 +1173,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
+ 
+ static void cfgmod_srv_unregister(void *user_data)
+ {
+-	struct mesh_net *net = user_data;
++	struct mesh_node *node = user_data;
++	struct mesh_net *net = node_get_net(node);
+ 	struct mesh_net_heartbeat *hb = mesh_net_heartbeat_get(net);
+ 
+ 	l_timeout_remove(hb->pub_timer);
+@@ -1187,8 +1190,8 @@ static const struct mesh_model_ops ops = {
+ 	.pub = NULL
+ };
+ 
+-void mesh_config_srv_init(struct mesh_net *net, uint8_t ele_idx)
++void mesh_config_srv_init(struct mesh_node *node, uint8_t ele_idx)
+ {
+ 	l_debug("%2.2x", ele_idx);
+-	mesh_model_register(net, ele_idx, CONFIG_SRV_MODEL, &ops, net);
++	mesh_model_register(node, ele_idx, CONFIG_SRV_MODEL, &ops, node);
+ }
 -- 
 2.14.5
 
