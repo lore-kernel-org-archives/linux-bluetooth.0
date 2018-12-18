@@ -6,72 +6,55 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E755EC43387
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:51:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21950C43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:51:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BE902218AC
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:51:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECE5F218A2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 23:51:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727876AbeLRXtv convert rfc822-to-8bit (ORCPT
+        id S1727802AbeLRXts (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 18:49:51 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:40615 "EHLO
+        Tue, 18 Dec 2018 18:49:48 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:55302 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727854AbeLRXtv (ORCPT
+        with ESMTP id S1726719AbeLRXtr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 18:49:51 -0500
+        Tue, 18 Dec 2018 18:49:47 -0500
 Received: from marcel-macpro.fritz.box (p4FF9F1DE.dip0.t-ipconnect.de [79.249.241.222])
-        by mail.holtmann.org (Postfix) with ESMTPSA id F376DCEE94;
-        Wed, 19 Dec 2018 00:57:28 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 71D00CEE92;
+        Wed, 19 Dec 2018 00:57:24 +0100 (CET)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v2] Bluetooth: hci_bcm: Handle specific unknown packets
- after firmware loading
+Subject: Re: [PATCH] 6lowpan: convert to DEFINE_SHOW_ATTRIBUTE
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20181205212232.3947-1-pawel.mikolaj.chmiel@gmail.com>
-Date:   Wed, 19 Dec 2018 00:49:49 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonathan Bakker <xc-racer2@live.ca>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6E62E2F9-5754-40AA-BA19-CDDABF338A1B@holtmann.org>
-References: <20181205212232.3947-1-pawel.mikolaj.chmiel@gmail.com>
-To:     =?utf-8?Q?Pawe=C5=82_Chmiel?= <pawel.mikolaj.chmiel@gmail.com>
+In-Reply-To: <20181215072217.26085-1-tiny.windzz@gmail.com>
+Date:   Wed, 19 Dec 2018 00:49:45 +0100
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <62A2F405-FC91-4A6C-85B4-A5D28E306F01@holtmann.org>
+References: <20181215072217.26085-1-tiny.windzz@gmail.com>
+To:     Yangtao Li <tiny.windzz@gmail.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pawel,
+Hi Yangtao,
 
-> The Broadcom controller on aries S5PV210 boards sends out a couple of
-> unknown packets after the firmware is loaded.  This will cause
-> logging of errors such as:
-> 	Bluetooth: hci0: Frame reassembly failed (-84)
+> Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
 > 
-> This is probably also the case with other boards, as there are related
-> Android userspace patches for custom ROMs such as
-> https://review.lineageos.org/#/c/LineageOS/android_system_bt/+/142721/
-> Since this appears to be intended behaviour, treated them as diagnostic
-> packets.
-> 
-> Note that this is another variant of commit 01d5e44ace8a
-> ("Bluetooth: hci_bcm: Handle empty packet after firmware loading")
-> 
-> Signed-off-by: Jonathan Bakker <xc-racer2@live.ca>
-> Signed-off-by: Paweł Chmiel <pawel.mikolaj.chmiel@gmail.com>
-> 
+> Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
 > ---
-> Changes from v1:
-> 	- Rename UNKNOWN to TYPE49
-> 	- Rename UNKNOWN2 to TYPE52
-> ---
-> drivers/bluetooth/hci_bcm.c | 22 ++++++++++++++++++++++
-> 1 file changed, 22 insertions(+)
+> net/6lowpan/debugfs.c | 13 +------------
+> 1 file changed, 1 insertion(+), 12 deletions(-)
 
-can you update this patch against latest bluetooth-next tree since it no longer applies cleanly.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
