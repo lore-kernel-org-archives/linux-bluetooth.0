@@ -2,92 +2,175 @@ Return-Path: <SRS0=Q26+=O3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24C21C43387
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 16:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F06C43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 17:07:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DFDC0218A2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 16:50:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E1C521873
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Dec 2018 17:07:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uJlhcz9a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726738AbeLRQuN convert rfc822-to-8bit (ORCPT
+        id S1726910AbeLRRH4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 11:50:13 -0500
-Received: from mga02.intel.com ([134.134.136.20]:19173 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726721AbeLRQuN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 11:50:13 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 08:50:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,368,1539673200"; 
-   d="scan'208";a="108345962"
-Received: from orsmsx102.amr.corp.intel.com ([10.22.225.129])
-  by fmsmga007.fm.intel.com with ESMTP; 18 Dec 2018 08:50:12 -0800
-Received: from orsmsx111.amr.corp.intel.com (10.22.240.12) by
- ORSMSX102.amr.corp.intel.com (10.22.225.129) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Tue, 18 Dec 2018 08:50:11 -0800
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.175]) by
- ORSMSX111.amr.corp.intel.com ([169.254.12.234]) with mapi id 14.03.0415.000;
- Tue, 18 Dec 2018 08:50:11 -0800
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     Szymon Janc <szymon.janc@codecoup.pl>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>
-Subject: Re: [PATCH BlueZ v3 00/30] Major rewrite for Multi-Node and DBus
-Thread-Topic: [PATCH BlueZ v3 00/30] Major rewrite for Multi-Node and DBus
-Thread-Index: AQHUlAzY/IpZ6d81qkWrt6HYgcLcF6WDSB4AgAFpxYD//+z/X4AAm/0A//+Agkk=
-Date:   Tue, 18 Dec 2018 16:50:11 +0000
-Message-ID: <370824AD-3981-4FE9-9D3B-B010EC4B3EBC@intel.com>
-References: <20181215002624.9313-1-brian.gix@intel.com>
- <DEBB0CAA2616974FAE35E4B560B9A4375D8E01AF@ORSMSX101.amr.corp.intel.com>
- <17761993.WvVeqkb5i9@ix>
- <398288BA-8B31-4D3F-97CE-62E4CD683923@intel.com>,<5F351471-7372-4486-B8A9-5D146AB60160@holtmann.org>
-In-Reply-To: <5F351471-7372-4486-B8A9-5D146AB60160@holtmann.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: 8BIT
+        Tue, 18 Dec 2018 12:07:56 -0500
+Received: from mail-wm1-f49.google.com ([209.85.128.49]:40082 "EHLO
+        mail-wm1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726599AbeLRRHz (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 12:07:55 -0500
+Received: by mail-wm1-f49.google.com with SMTP id f188so2887459wmf.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Dec 2018 09:07:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=MA8SyUOEcyuroS9hSjaU10Y3UPOUtpH5BVzkt5YN53M=;
+        b=uJlhcz9aHrNFZ24DsqawSRdSscuxuKEMIzbJ+m1mRbUl8jjoHZ1F2q9QqPeGgJgNY/
+         mN1f2AlOBukTYVkJcce7s8jUcU6/GMYC+2WaXh0p8s8dxyEg+paRn4Uxt+kuceJXo2uF
+         7xSeCjAGRQhGuvvtzd22WPpvlqjRTY/v3V6aMd8Ot/sCC2IfZ292e9tV8mUXcuRrvpfL
+         mYU3dLILl8Wb0Km0yzb8mqaKJ67zQ6czs7ad2gygEpOAqTLNWr1hEragtUeIPoxf7jMN
+         jFzB45HRVVHs7LRIo3MmV3EEOU9+v1sWZgHeLBmANlOnZZ3O34JwVMklDqD+u5S3BwUR
+         h+DA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=MA8SyUOEcyuroS9hSjaU10Y3UPOUtpH5BVzkt5YN53M=;
+        b=K+Aq2+TcgVskAVloQ4zP6egJILJCUVIuVu1b685iVZ/RHYcy5HXtQ7R+sMbbCMtQdB
+         eudHcwB8AtVSo82hL78k0gSBkbH19pzkHzzy/SzcAH/kXwi/m7j9uefQHO6G9qQthaJx
+         vX9XCoXS3Jql/dfLK5KkQI1liUBJWuC7vTQdt4ALCIL6q0UlHh01CyYOYFgPX59EN7mK
+         OtPdNnxSF/t1IkKMv8o2UGRZuPkJoXY+8MkuN5jO1lq5FwRnMpnT+Lnj0aj7ShTmb4Db
+         ubv8QPcJjeVuNAgRQlfLvIYXgBJDkJcBcyf+400TNseqBrTndyNruflYKfAVCmdQYsRF
+         Vefg==
+X-Gm-Message-State: AA+aEWYQhUQRhg2CQtgSRrquWNYiJQKOS25kAv1JJi1xScfZA9OwN5s4
+        am9vc1K/wweWowNBzmTQVwp3M6nws5OdC55lrYY=
+X-Google-Smtp-Source: AFSGD/XPXKEPdckkI9nxkmD9GDB/cqb3rAnxCL596tAqHNRCb8gDQy/Q16BG93RKz2S1i0SWrWtmPsxwf+TkH/DXF3Q=
+X-Received: by 2002:a7b:c315:: with SMTP id k21mr3828104wmj.145.1545152872996;
+ Tue, 18 Dec 2018 09:07:52 -0800 (PST)
 MIME-Version: 1.0
+References: <CACXRGxyMGt1zecvRmgoa5uuSwy4H9UpSECM0tOuC+uXGmQoGNg@mail.gmail.com>
+ <DEBB0CAA2616974FAE35E4B560B9A4375D8E02FE@ORSMSX101.amr.corp.intel.com>
+ <20181218110838.ollsqils5ci7cq4v@scytale> <DEBB0CAA2616974FAE35E4B560B9A4375D8E0B35@ORSMSX101.amr.corp.intel.com>
+In-Reply-To: <DEBB0CAA2616974FAE35E4B560B9A4375D8E0B35@ORSMSX101.amr.corp.intel.com>
+From:   Danielle Costantino <danielle.costantino@gmail.com>
+Date:   Tue, 18 Dec 2018 09:07:41 -0800
+Message-ID: <CAAVjN7f2bW5pB-1zB1wZPq-usnHeyoie5M5izQa1-Eqj+9Q2Cg@mail.gmail.com>
+Subject: Re: Plans for meshd
+To:     brian.gix@intel.com
+Cc:     michal.lowas-rzechonek@silvair.com, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Thanks for the work done on BLE Mesh but I have to agree with the
+request to support GATT and BLE Mesh simultaneously on a single
+controller. There are many applications that use GATT for higher
+bandwidth point to point connections used in OTA update where the
+overhead and functionality of mesh are not needed or wanted. Until
+Mesh supports routed packets large SAR uploads flood the mesh network
+and make OTA over mesh nearly impossible when the node count goes
+above 4 relay nodes. Limiting the number of GATT nodes to 1 at a time
+is not a problem for our application needs.
 
-> On Dec 18, 2018, at 8:26 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> 
-> Hi Brian,
-> 
->>>> This patch-set has been applied upstream.
->>> 
->>> There is something wrong with Makefile.mesh
->> 
->> This was tested by us on Fedora 27 and 28, without issues.
->> 
->> What build platform produced these errors?
-> 
-> start adding Fedora 29 to your test platform. However this has nothing to do with Fedora 29, the whole idea of just commenting something out and committing it is just not something we do. Actually it is something that should never be done if you are operating with git. Use your personal trees for testing.
-> 
->> Since Marcel is backing out the entire patchset, we will create a v4 patchset that removes btmesh (the non-daemon executable) entirely.  It probably won’t actually be needed in the future anyway... The DBus APIs should be sufficient.
-> 
-> Be careful to not take tools away from people that might depend on it right now.
+What I am unclear on is why it is not possible to support generic GATT
+and PB-GATT + Proxy Client/Server on the same controller. If PB-ADV is
+only used for provisioning then the time spent in ADV will not affect
+steady state operations.
 
-The only functionality that was available in btmesh that was not in the meshd daemon, was the ability to request a beacon be sent.  This is done automatically by the daemon.
+Thanks,
+Danielle
 
-The balance of btmesh functionality was to be a foreground app so that all the debug output is on the console. This can be done with the meshd executable with the -nd argument (no detach).
+On Tue, Dec 18, 2018 at 8:28 AM Gix, Brian <brian.gix@intel.com> wrote:
+>
+> Hi Michal,
+>
+> > -----Original Message-----
+> > From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-
+> > owner@vger.kernel.org] On Behalf Of Michal Lowas-Rzechonek
+> > Sent: Tuesday, December 18, 2018 3:09 AM
+> > To: linux-bluetooth@vger.kernel.org
+> > Subject: Re: Plans for meshd
+> >
+> [...]
+> > What I'm thinking about is having both modes of communication available=
+,
+> > even if the embedded device has just one Controller, as is the case wit=
+h the
+> > majority of off-the-shelf platforms.
+> >
+> > The reason we want/need both BLE/GATT and Mesh on the same node has a
+> > lot to do with provisioning - at the moment we configure our networks u=
+sing
+> > a mobile app, meaning we need devices to support PB-GATT. This is becau=
+se
+> > Controllers present in mobile devices do not support Mesh natively, and=
+ we
+> > can't assume there is a GATT Proxy nearby, especially when configuring =
+a
+> > new network.
+> >
+> > > And I am not opposed to someone starting a project that will allow th=
+e
+> > > bluetoothd and meshd share a single controller and taking
+> > > responsibility the reduced performance of each, but that is not work
+> > > we have planned.
+> > Ack.
+> >
+> > FYI, it seems we might be interested in making that happen.
+>
+> Maybe we should start with what you actually need.
+> * Do you need GATT support only for the Provisioning procedure?
+> * or also as a GATT proxy Server?
+>
+> There is a possibility...   We had an internal project where we supported=
+ a GATT Proxy server without using the bluetooothd services at all.  For bl=
+uetoothd, the result is the same:  The controller was entirely under the co=
+ntrol of the mesh executable (it was not a daemon, but a proof-of-concept c=
+ommand line tool).  But there are problems with that particular idea given =
+the architecture of the meshd daemon:
+>
+> * I do not think we should try to support Proxy Client *at all*. The Prox=
+y Client assumes a single Node, which defeats the purpose of having a daemo=
+n at all.
+>
+> * Only a single node (or unprovisioned GATT server) can use GATT at a tim=
+e.  The protocol does not allow for the multi-node architecture of the daem=
+on.
+>
+> *  If we do try to put a GATT Proxy Server on a single controller impleme=
+ntation, we may need a special node that loops back data received from the =
+Mesh to the Gatt Client.
+>
+> * We will probably need to limit this special GATT supporting node to a s=
+ingle node on the daemon.
+>
+> * We may want to make this a build-time option, because ADV handling will=
+ probably be affected whether an existing GATT connection is established or=
+ not, if it is possible that a GATT connection could be requested.
+>
+> * This affects the times when we can use Randomized, ever changing BD ADD=
+Rs, and requires us to interleave connectable advertisements and "be connec=
+table", which is not technically allowed with mesh network ADV packets.
+>
+>
+>
+>
+> >
+> > regards
+> > --
+> > Micha=C5=82 Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
+> > Silvair http://silvair.com
+> > Jasnog=C3=B3rska 44, 31-358 Krakow, POLAND
 
-After consulting with Inga, we think btmesh should be removed entirely.
 
-> Regards
-> 
-> Marcel
-> 
+
+--=20
+- Danielle Costantino
