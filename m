@@ -2,39 +2,39 @@ Return-Path: <SRS0=/IWC=O4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F67CC43612
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 558EFC43387
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 774C621871
+	by mail.kernel.org (Postfix) with ESMTP id 1643921871
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727694AbeLSEVX (ORCPT
+        id S1727690AbeLSEVX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 18 Dec 2018 23:21:23 -0500
-Received: from mga04.intel.com ([192.55.52.120]:4125 "EHLO mga04.intel.com"
+Received: from mga04.intel.com ([192.55.52.120]:4168 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727189AbeLSEVX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1727682AbeLSEVX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 18 Dec 2018 23:21:23 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:21:08 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:21:22 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,371,1539673200"; 
-   d="scan'208";a="99820177"
+   d="scan'208";a="99820210"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.192.41])
-  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:21:07 -0800
+  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:21:22 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v5 11/30] mesh: Rewrite Controler interface for full init
-Date:   Tue, 18 Dec 2018 20:19:57 -0800
-Message-Id: <20181219042016.25538-12-brian.gix@intel.com>
+Subject: [PATCH BlueZ v5 15/30] mesh: Re-architect for DBus API
+Date:   Tue, 18 Dec 2018 20:20:01 -0800
+Message-Id: <20181219042016.25538-16-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181219042016.25538-1-brian.gix@intel.com>
 References: <20181219042016.25538-1-brian.gix@intel.com>
@@ -43,220 +43,809 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- mesh/mesh-io-generic.c | 149 +++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 138 insertions(+), 11 deletions(-)
+From: Inga Stotland <inga.stotland@intel.com>
 
-diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
-index 52514e280..48e47e7a4 100644
---- a/mesh/mesh-io-generic.c
-+++ b/mesh/mesh-io-generic.c
-@@ -30,7 +30,6 @@
- #include "monitor/bt.h"
- #include "src/shared/hci.h"
+---
+ mesh/mesh.c | 624 ++++++++++++++++++++++++++++++++++++++++++++++--------------
+ mesh/mesh.h |  27 ++-
+ 2 files changed, 502 insertions(+), 149 deletions(-)
+
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index d1d409672..9ab8d3bf1 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -23,7 +23,6 @@
+ #endif
  
--#include "mesh/display.h"
+ #define _GNU_SOURCE
+-#include <time.h>
+ #include <ell/ell.h>
+ 
+ #include "lib/bluetooth.h"
+@@ -31,14 +30,25 @@
+ 
+ #include "src/shared/mgmt.h"
+ 
+-#include "mesh/mesh-defs.h"
  #include "mesh/mesh-io.h"
- #include "mesh/mesh-io-api.h"
+ #include "mesh/node.h"
+ #include "mesh/net.h"
+ #include "mesh/storage.h"
+-#include "mesh/cfgmod.h"
++#include "mesh/provision.h"
+ #include "mesh/model.h"
++#include "mesh/dbus.h"
++#include "mesh/error.h"
+ #include "mesh/mesh.h"
++#include "mesh/agent.h"
++
++/*
++ * The default values for mesh configuration. Can be
++ * overwritten by values from mesh.conf
++ */
++#define DEFAULT_PROV_TIMEOUT 60
++#define DEFAULT_ALGORITHMS 0x0001
++
++/* TODO: add more default values */
  
-@@ -177,6 +176,116 @@ static void event_callback(const void *buf, uint8_t size, void *user_data)
- 	}
+ struct scan_filter {
+ 	uint8_t id;
+@@ -46,42 +56,49 @@ struct scan_filter {
+ };
+ 
+ struct bt_mesh {
+-	struct mesh_net *net;
+ 	struct mesh_io *io;
+ 	struct l_queue *filters;
+-	int ref_count;
+-	uint16_t index;
++	prov_rx_cb_t prov_rx;
++	void *prov_data;
++	uint32_t prov_timeout;
++	uint16_t algorithms;
+ 	uint16_t req_index;
+ 	uint8_t max_filters;
+ };
+ 
++struct join_data{
++	struct l_dbus_message *msg;
++	struct mesh_agent *agent;
++	const char *sender;
++	const char *app_path;
++	struct mesh_node *node;
++	uint32_t disc_watch;
++	uint8_t uuid[16];
++};
++
++struct attach_data {
++	uint64_t token;
++	struct l_dbus_message *msg;
++	const char *app;
++};
++
++static struct bt_mesh mesh;
+ static struct l_queue *controllers;
+-static struct l_queue *mesh_list;
+ static struct mgmt *mgmt_mesh;
+ static bool initialized;
+-static struct bt_mesh *current;
++
++/* We allow only one outstanding Join request */
++static struct join_data *join_pending;
++
++/* Pending Attach requests */
++static struct l_queue *attach_queue;
+ 
+ static bool simple_match(const void *a, const void *b)
+ {
+ 	return a == b;
  }
  
-+static void local_commands_callback(const void *data, uint8_t size,
-+							void *user_data)
-+{
-+	const struct bt_hci_rsp_read_local_commands *rsp = data;
-+
-+	if (rsp->status)
-+		l_error("Failed to read local commands");
-+}
-+
-+static void local_features_callback(const void *data, uint8_t size,
-+							void *user_data)
-+{
-+	const struct bt_hci_rsp_read_local_features *rsp = data;
-+
-+	if (rsp->status)
-+		l_error("Failed to read local features");
-+}
-+
-+static void hci_generic_callback(const void *data, uint8_t size,
-+								void *user_data)
-+{
-+	uint8_t status = l_get_u8(data);
-+
-+	if (status)
-+		l_error("Failed to initialize HCI");
-+}
-+
-+static void configure_hci(struct mesh_io_private *io)
-+{
-+	struct bt_hci_cmd_le_set_scan_parameters cmd;
-+	struct bt_hci_cmd_set_event_mask cmd_sem;
-+	struct bt_hci_cmd_le_set_event_mask cmd_slem;
-+
-+	/* Set scan parameters */
-+	cmd.type = 0x00; /* Passive Scanning. No scanning PDUs shall be sent */
-+	cmd.interval = 0x0030; /* Scan Interval = N * 0.625ms */
-+	cmd.window = 0x0030; /* Scan Window = N * 0.625ms */
-+	cmd.own_addr_type = 0x00; /* Public Device Address */
-+	/* Accept all advertising packets except directed advertising packets
-+	 * not addressed to this device (default).
-+	 */
-+	cmd.filter_policy = 0x00;
-+
-+	/* Set event mask
-+	 *
-+	 * Mask: 0x2000800002008890
-+	 *   Disconnection Complete
-+	 *   Encryption Change
-+	 *   Read Remote Version Information Complete
-+	 *   Hardware Error
-+	 *   Data Buffer Overflow
-+	 *   Encryption Key Refresh Complete
-+	 *   LE Meta
-+	 */
-+	cmd_sem.mask[0] = 0x90;
-+	cmd_sem.mask[1] = 0x88;
-+	cmd_sem.mask[2] = 0x00;
-+	cmd_sem.mask[3] = 0x02;
-+	cmd_sem.mask[4] = 0x00;
-+	cmd_sem.mask[5] = 0x80;
-+	cmd_sem.mask[6] = 0x00;
-+	cmd_sem.mask[7] = 0x20;
-+
-+	/* Set LE event mask
-+	 *
-+	 * Mask: 0x000000000000087f
-+	 *   LE Connection Complete
-+	 *   LE Advertising Report
-+	 *   LE Connection Update Complete
-+	 *   LE Read Remote Used Features Complete
-+	 *   LE Long Term Key Request
-+	 *   LE Remote Connection Parameter Request
-+	 *   LE Data Length Change
-+	 *   LE PHY Update Complete
-+	 */
-+	cmd_slem.mask[0] = 0x7f;
-+	cmd_slem.mask[1] = 0x08;
-+	cmd_slem.mask[2] = 0x00;
-+	cmd_slem.mask[3] = 0x00;
-+	cmd_slem.mask[4] = 0x00;
-+	cmd_slem.mask[5] = 0x00;
-+	cmd_slem.mask[6] = 0x00;
-+	cmd_slem.mask[7] = 0x00;
-+
-+	/* TODO: Move to suitable place. Set suitable masks */
-+	/* Reset Command */
-+	bt_hci_send(io->hci, BT_HCI_CMD_RESET, NULL, 0, hci_generic_callback,
-+								NULL, NULL);
-+
-+	/* Read local supported commands */
-+	bt_hci_send(io->hci, BT_HCI_CMD_READ_LOCAL_COMMANDS, NULL, 0,
-+					local_commands_callback, NULL, NULL);
-+
-+	/* Read local supported features */
-+	bt_hci_send(io->hci, BT_HCI_CMD_READ_LOCAL_FEATURES, NULL, 0,
-+					local_features_callback, NULL, NULL);
-+
-+	/* Set event mask */
-+	bt_hci_send(io->hci, BT_HCI_CMD_SET_EVENT_MASK, &cmd_sem,
-+			sizeof(cmd_sem), hci_generic_callback, NULL, NULL);
-+
-+	/* Set LE event mask */
-+	bt_hci_send(io->hci, BT_HCI_CMD_LE_SET_EVENT_MASK, &cmd_slem,
-+			sizeof(cmd_slem), hci_generic_callback, NULL, NULL);
-+
-+	/* Scan Params */
-+	bt_hci_send(io->hci, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS, &cmd,
-+				sizeof(cmd), hci_generic_callback, NULL, NULL);
-+}
-+
- static bool dev_init(uint16_t index, struct mesh_io *io)
- {
- 	struct mesh_io_private *tmp;
-@@ -198,6 +307,8 @@ static bool dev_init(uint16_t index, struct mesh_io *io)
- 	if (!tmp->hci)
- 		goto fail;
- 
-+	configure_hci(tmp);
-+
- 	bt_hci_register(tmp->hci, BT_HCI_EVT_LE_META_EVENT,
- 						event_callback, io, NULL);
- 
-@@ -480,7 +591,6 @@ static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
- 	if (!info || !data || !len || len > sizeof(tx->pkt))
- 		return false;
- 
+-static void save_exit_config(struct bt_mesh *mesh)
+-{
+-	const char *cfg_filename;
 -
- 	tx = l_new(struct tx_pkt, 1);
- 	if (!tx)
- 		return false;
-@@ -524,7 +634,7 @@ static bool find_by_pattern(const void *a, const void *b)
- 	return (!memcmp(tx->pkt, pattern->data, pattern->len));
- }
- 
--static bool tx_cancel(struct mesh_io *io, uint8_t *data, uint8_t len)
-+static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
+-	if (!mesh_net_cfg_file_get(mesh->net, &cfg_filename) || !cfg_filename)
+-		return;
+-
+-	/* Preserve the last sequence number before saving configuration */
+-	storage_local_write_sequence_number(mesh->net,
+-					mesh_net_get_seq_num(mesh->net));
+-
+-	if (storage_save_config(mesh->net, cfg_filename, true, NULL, NULL))
+-		l_info("Saved final configuration to %s", cfg_filename);
+-}
+-
+-static void start_io(struct bt_mesh *mesh, uint16_t index)
++static void start_io(uint16_t index)
  {
- 	struct mesh_io_private *pvt = io->pvt;
- 	struct tx_pkt *tx;
-@@ -568,13 +678,25 @@ static bool find_by_filter_id(const void *a, const void *b)
- 	return rx_reg->filter_id == filter_id;
- }
- 
-+static void set_recv_scan_enable(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct bt_hci_cmd_le_set_scan_enable cmd;
-+
-+	cmd.enable = 0x01;	/* Enable scanning */
-+	cmd.filter_dup = 0x00;	/* Report duplicates */
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+			&cmd, sizeof(cmd), NULL, NULL, NULL);
-+}
-+
- static bool recv_register(struct mesh_io *io, uint8_t filter_id,
- 				mesh_io_recv_func_t cb, void *user_data)
- {
--	struct bt_hci_cmd_le_set_scan_enable cmd;
-+	struct bt_hci_cmd_le_set_scan_parameters cmd;
- 	struct mesh_io_private *pvt = io->pvt;
- 	struct pvt_rx_reg *rx_reg;
--	bool scanning;
-+	bool already_scanning;
- 
- 	l_info("%s %d", __func__, filter_id);
- 	if (!cb || !filter_id || filter_id > sizeof(pvt->filters))
-@@ -593,15 +715,20 @@ static bool recv_register(struct mesh_io *io, uint8_t filter_id,
- 	rx_reg->cb = cb;
- 	rx_reg->user_data = user_data;
- 
--	scanning = !l_queue_isempty(pvt->rx_regs);
-+	already_scanning = !l_queue_isempty(pvt->rx_regs);
- 
- 	l_queue_push_head(pvt->rx_regs, rx_reg);
- 
--	if (!scanning) {
--		cmd.enable = 0x01;	/* Enable scanning */
--		cmd.filter_dup = 0x00;	/* Report duplicates */
--		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
--				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+	if (!already_scanning) {
-+		cmd.type = 0x00;			/* Passive scanning */
-+		cmd.interval = L_CPU_TO_LE16(0x0010);	/* 10 ms */
-+		cmd.window = L_CPU_TO_LE16(0x0010);	/* 10 ms */
-+		cmd.own_addr_type = 0x01;		/* ADDR_TYPE_RANDOM */
-+		cmd.filter_policy = 0x00;		/* Accept all */
-+
-+		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-+				&cmd, sizeof(cmd),
-+				set_recv_scan_enable, pvt, NULL);
+ 	struct mesh_io *io;
+ 	struct mesh_io_caps caps;
+@@ -91,21 +108,70 @@ static void start_io(struct bt_mesh *mesh, uint16_t index)
+ 	io = mesh_io_new(index, MESH_IO_TYPE_GENERIC);
+ 	if (!io) {
+ 		l_error("Failed to start mesh io (hci %u)", index);
+-		current = NULL;
+ 		return;
  	}
  
+ 	mesh_io_get_caps(io, &caps);
+-	mesh->max_filters = caps.max_num_filters;
++	mesh.max_filters = caps.max_num_filters;
++
++	mesh.io = io;
++
++	l_debug("Started mesh (io %p) on hci %u", mesh.io, index);
++
++	node_attach_io(io);
++}
++
++/* Used for any outbound traffic that doesn't have Friendship Constraints */
++/* This includes Beacons, Provisioning and unrestricted Network Traffic */
++bool mesh_send_pkt(uint8_t count, uint16_t interval,
++					uint8_t *data, uint16_t len)
++{
++	struct mesh_io_send_info info = {
++		.type = MESH_IO_TIMING_TYPE_GENERAL,
++		.u.gen.cnt = count,
++		.u.gen.interval = interval,
++		.u.gen.max_delay = 0,
++		.u.gen.min_delay = 0,
++	};
++
++	return mesh_io_send(mesh.io, &info, data, len);
++}
++
++bool mesh_send_cancel(const uint8_t *filter, uint8_t len)
++{
++	return mesh_io_send_cancel(mesh.io, filter, len);
++}
++
++static void prov_rx(void *user_data, struct mesh_io_recv_info *info,
++					const uint8_t *data, uint16_t len)
++{
++	if (user_data != &mesh)
++		return;
++
++	if (mesh.prov_rx)
++		mesh.prov_rx(mesh.prov_data, data, len);
++}
++
++bool mesh_reg_prov_rx(prov_rx_cb_t cb, void *user_data)
++{
++	if (mesh.prov_rx && mesh.prov_rx != cb)
++		return false;
+ 
+-	mesh_net_attach(mesh->net, io);
+-	mesh_net_set_window_accuracy(mesh->net, caps.window_accuracy);
+-	mesh->io = io;
+-	mesh->index = index;
++	mesh.prov_rx = cb;
++	mesh.prov_data = user_data;
+ 
+-	current = NULL;
++	return mesh_io_register_recv_cb(mesh.io, MESH_IO_FILTER_PROV,
++							prov_rx, &mesh);
++}
++
++void mesh_unreg_prov_rx(prov_rx_cb_t cb)
++{
++	if (mesh.prov_rx != cb)
++		return;
+ 
+-	l_debug("Started mesh (io %p) on hci %u", mesh->io, index);
++	mesh.prov_rx = NULL;
++	mesh.prov_data = NULL;
++	mesh_io_deregister_recv_cb(mesh.io, MESH_IO_FILTER_PROV);
+ }
+ 
+ static void read_info_cb(uint8_t status, uint16_t length,
+@@ -115,7 +181,7 @@ static void read_info_cb(uint8_t status, uint16_t length,
+ 	const struct mgmt_rp_read_info *rp = param;
+ 	uint32_t current_settings, supported_settings;
+ 
+-	if (!current)
++	if (mesh.io)
+ 		/* Already initialized */
+ 		return;
+ 
+@@ -148,7 +214,7 @@ static void read_info_cb(uint8_t status, uint16_t length,
+ 		return;
+ 	}
+ 
+-	start_io(current, index);
++	start_io(index);
+ }
+ 
+ static void index_added(uint16_t index, uint16_t length, const void *param,
+@@ -156,11 +222,8 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
+ {
+ 	l_debug("hci device %u", index);
+ 
+-	if (!current)
+-		return;
+-
+-	if (current->req_index != MGMT_INDEX_NONE &&
+-					index != current->req_index) {
++	if (mesh.req_index != MGMT_INDEX_NONE &&
++					index != mesh.req_index) {
+ 		l_debug("Ignore index %d", index);
+ 		return;
+ 	}
+@@ -219,145 +282,100 @@ static void read_index_list_cb(uint8_t status, uint16_t length,
+ 	}
+ }
+ 
+-static bool load_config(struct bt_mesh *mesh, const char *in_config_name)
++static bool init_mgmt(void)
+ {
+-	if (!mesh->net)
+-		return false;
+-
+-	if (!storage_parse_config(mesh->net, in_config_name))
++	mgmt_mesh = mgmt_new_default();
++	if (!mgmt_mesh)
+ 		return false;
+ 
+-	/* Register foundational models */
+-	mesh_config_srv_init(mesh->net, PRIMARY_ELE_IDX);
+-
+-	return true;
+-}
+-
+-static bool init_mesh(void)
+-{
+-	if (initialized)
+-		return true;
+-
+ 	controllers = l_queue_new();
+ 	if (!controllers)
+ 		return false;
+ 
+-	mesh_list = l_queue_new();
+-	if (!mesh_list)
+-		return false;
+-
+-	mgmt_mesh = mgmt_new_default();
+-	if (!mgmt_mesh)
+-		goto fail;
+-
+ 	mgmt_register(mgmt_mesh, MGMT_EV_INDEX_ADDED, MGMT_INDEX_NONE,
+ 						index_added, NULL, NULL);
+ 	mgmt_register(mgmt_mesh, MGMT_EV_INDEX_REMOVED, MGMT_INDEX_NONE,
+ 						index_removed, NULL, NULL);
+-
+-	initialized = true;
  	return true;
+-
+-fail:
+-	l_error("Failed to initialize mesh management");
+-
+-	l_queue_destroy(controllers, NULL);
+-
+-	return false;
+ }
+ 
+-struct bt_mesh *mesh_new(uint16_t index, const char *config_file)
++bool mesh_init(uint16_t index, const char *config_dir)
+ {
+-	struct bt_mesh *mesh;
++	if (initialized)
++		return true;
+ 
+-	if (!init_mesh())
+-		return NULL;
++	if (!init_mgmt()) {
++		l_error("Failed to initialize mesh management");
++		return false;
++	}
+ 
+-	mesh = l_new(struct bt_mesh, 1);
+-	if (!mesh)
+-		return NULL;
++	mesh.req_index = index;
+ 
+-	mesh->req_index = index;
+-	mesh->index = MGMT_INDEX_NONE;
++	mesh_model_init();
++	mesh_agent_init();
+ 
+-	mesh->net = mesh_net_new(index);
+-	if (!mesh->net) {
+-		l_free(mesh);
+-		return NULL;
+-	}
++	/* TODO: read mesh.conf */
++	mesh.prov_timeout = DEFAULT_PROV_TIMEOUT;
++	mesh.algorithms = DEFAULT_ALGORITHMS;
+ 
+-	if (!load_config(mesh, config_file)) {
+-		l_error("Failed to load mesh configuration: %s", config_file);
+-		l_free(mesh);
+-		return NULL;
+-	}
++	if (!config_dir)
++		config_dir = MESH_STORAGEDIR;
++
++	l_info("Loading node configuration from %s", config_dir);
++
++	if (!storage_load_nodes(config_dir))
++		return false;
+ 
+-	/*
+-	 * TODO: Check if another mesh is searching for io.
+-	 * If so, add to pending list and return.
+-	 */
+ 	l_debug("send read index_list");
+ 	if (mgmt_send(mgmt_mesh, MGMT_OP_READ_INDEX_LIST,
+ 				MGMT_INDEX_NONE, 0, NULL,
+-				read_index_list_cb, mesh, NULL) > 0) {
+-		current = mesh;
+-		l_queue_push_tail(mesh_list, mesh);
+-		return mesh_ref(mesh);
+-	}
+-
+-	l_free(mesh);
++				read_index_list_cb, NULL, NULL) <= 0)
++		return false;
+ 
+-	return NULL;
++	return true;
+ }
+ 
+-struct bt_mesh *mesh_ref(struct bt_mesh *mesh)
++static void attach_exit(void *data)
+ {
+-	if (!mesh)
+-		return NULL;
++	struct l_dbus_message *reply;
++	struct attach_data *pending = data;
+ 
+-	__sync_fetch_and_add(&mesh->ref_count, 1);
+-
+-	return mesh;
++	reply = dbus_error(pending->msg, MESH_ERROR_FAILED, "Failed. Exiting");
++	l_dbus_send(dbus_get_bus(), reply);
++	l_free(pending);
+ }
+ 
+-void mesh_unref(struct bt_mesh *mesh)
++void mesh_cleanup(void)
+ {
+-	struct mesh_io *io;
++	struct l_dbus_message *reply;
+ 
+-	if (!mesh)
+-		return;
++	mesh_io_destroy(mesh.io);
++	mgmt_unref(mgmt_mesh);
+ 
+-	if (__sync_sub_and_fetch(&mesh->ref_count, 1))
+-		return;
++	if (join_pending) {
++		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED,
++							"Failed. Exiting");
++		l_dbus_send(dbus_get_bus(), reply);
+ 
+-	if (mesh_net_provisioned_get(mesh->net))
+-		save_exit_config(mesh);
++		if (join_pending->disc_watch)
++			l_dbus_remove_watch(dbus_get_bus(),
++						join_pending->disc_watch);
+ 
+-	node_cleanup(mesh->net);
++		if (join_pending->node)
++			node_free(join_pending->node);
+ 
+-	storage_release(mesh->net);
+-	io = mesh_net_detach(mesh->net);
+-	if (io)
+-		mesh_io_destroy(io);
++		l_free(join_pending);
++		join_pending = NULL;
++	}
+ 
+-	mesh_net_unref(mesh->net);
+-	l_queue_remove(mesh_list, mesh);
+-	l_free(mesh);
+-}
++	l_queue_destroy(attach_queue, attach_exit);
++	node_cleanup_all();
++	mesh_model_cleanup();
+ 
+-void mesh_cleanup(void)
+-{
+ 	l_queue_destroy(controllers, NULL);
+-	l_queue_destroy(mesh_list, NULL);
+-	mgmt_unref(mgmt_mesh);
+-}
+-
+-bool mesh_set_output(struct bt_mesh *mesh, const char *config_name)
+-{
+-	if (!config_name)
+-		return false;
+-
+-	return mesh_net_cfg_file_set(mesh->net, config_name);
++	l_dbus_object_remove_interface(dbus_get_bus(), BLUEZ_MESH_PATH,
++							MESH_NETWORK_INTERFACE);
++	l_dbus_unregister_interface(dbus_get_bus(), MESH_NETWORK_INTERFACE);
+ }
+ 
+ const char *mesh_status_str(uint8_t err)
+@@ -386,7 +404,333 @@ const char *mesh_status_str(uint8_t err)
+ 	}
+ }
+ 
+-struct mesh_net *mesh_get_net(struct bt_mesh *mesh)
++static void free_pending_join_call(bool failed)
+ {
+-	return mesh->net;
++	if (!join_pending)
++		return;
++
++	if (join_pending->disc_watch)
++		l_dbus_remove_watch(dbus_get_bus(),
++						join_pending->disc_watch);
++
++	mesh_agent_remove(join_pending->agent);
++
++	if (failed) {
++		storage_remove_node_config(join_pending->node);
++		mesh_agent_remove(join_pending->agent);
++	}
++
++	l_free(join_pending);
++	join_pending = NULL;
++}
++
++/* This is being called if the app exits unexpectedly */
++static void prov_disc_cb(struct l_dbus *bus, void *user_data)
++{
++	if (!join_pending)
++		return;
++
++	if (join_pending->msg)
++		l_dbus_message_unref(join_pending->msg);
++
++	acceptor_cancel(&mesh);
++
++	join_pending->disc_watch = 0;
++
++	free_pending_join_call(true);
++}
++
++static const char *prov_status_str(uint8_t status)
++{
++	switch (status) {
++	case PROV_ERR_SUCCESS:
++		return "success";
++	case PROV_ERR_INVALID_PDU:
++	case PROV_ERR_INVALID_FORMAT:
++	case PROV_ERR_UNEXPECTED_PDU:
++		return "bad-pdu";
++	case PROV_ERR_CONFIRM_FAILED:
++		return "confirmation-failed";
++	case PROV_ERR_INSUF_RESOURCE:
++		return "out-of-resources";
++	case PROV_ERR_DECRYPT_FAILED:
++		return "decryption-error";
++	case PROV_ERR_CANT_ASSIGN_ADDR:
++		return "cannot-assign-addresses";
++	case PROV_ERR_TIMEOUT:
++		return "timeout";
++	case PROV_ERR_UNEXPECTED_ERR:
++	default:
++		return "unexpected-error";
++	}
++}
++
++static void send_join_failed(const char *owner, const char *path,
++							uint8_t status)
++{
++	struct l_dbus_message *msg;
++	struct l_dbus *dbus = dbus_get_bus();
++
++	msg = l_dbus_message_new_method_call(dbus, owner, path,
++						MESH_APPLICATION_INTERFACE,
++						"JoinFailed");
++
++	l_dbus_message_set_arguments(msg, "s", prov_status_str(status));
++	l_dbus_send(dbus_get_bus(), msg);
++
++	free_pending_join_call(true);
++}
++
++static bool prov_complete_cb(void *user_data, uint8_t status,
++					struct mesh_prov_node_info *info)
++{
++	struct l_dbus *dbus = dbus_get_bus();
++	struct l_dbus_message *msg;
++	const char *owner;
++	const char *path;
++	const uint8_t *dev_key;
++
++	l_debug("Provisioning complete %s", prov_status_str(status));
++
++	if (!join_pending)
++		return false;
++
++	owner = join_pending->sender;
++	path = join_pending->app_path;
++
++	if (status == PROV_ERR_SUCCESS &&
++	    !node_add_pending_local(join_pending->node, info, mesh.io))
++		status = PROV_ERR_UNEXPECTED_ERR;
++
++	if (status != PROV_ERR_SUCCESS) {
++		send_join_failed(owner, path, status);
++		return false;
++	}
++
++	dev_key = node_get_device_key(join_pending->node);
++
++	msg = l_dbus_message_new_method_call(dbus, owner, path,
++						MESH_APPLICATION_INTERFACE,
++						"JoinComplete");
++
++	l_dbus_message_set_arguments(msg, "t", l_get_u64(dev_key));
++
++	l_dbus_send(dbus_get_bus(), msg);
++
++	free_pending_join_call(false);
++
++	return true;
++}
++
++static void node_init_cb(struct mesh_node *node, struct mesh_agent *agent)
++{
++	struct l_dbus_message *reply;
++	uint8_t num_ele;
++
++	if (!node) {
++		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED,
++				"Failed to create node from application");
++		goto fail;
++	}
++
++	join_pending->node = node;
++	num_ele = node_get_num_elements(node);
++
++	if (!acceptor_start(num_ele, join_pending->uuid, mesh.algorithms,
++				mesh.prov_timeout, agent, prov_complete_cb,
++				&mesh))
++	{
++		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED,
++				"Failed to start provisioning acceptor");
++		goto fail;
++	}
++
++	reply = l_dbus_message_new_method_return(join_pending->msg);
++	l_dbus_send(dbus_get_bus(), reply);
++	join_pending->msg = NULL;
++
++	return;
++
++fail:
++	l_dbus_send(dbus_get_bus(), reply);
++	mesh_agent_remove(join_pending->agent);
++	l_free(join_pending);
++	join_pending = NULL;
++}
++
++static struct l_dbus_message *join_network_call(struct l_dbus *dbus,
++						struct l_dbus_message *msg,
++						void *user_data)
++{
++	const char *app_path, *sender;
++	struct l_dbus_message_iter iter_uuid;
++	uint32_t n;
++
++	l_debug("Join network request");
++
++	if (join_pending)
++		return dbus_error(msg, MESH_ERROR_BUSY,
++						"Provisioning in progress");
++
++	if (!l_dbus_message_get_arguments(msg, "oay", &app_path,
++								&iter_uuid))
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
++
++	join_pending = l_new(struct join_data, 1);
++
++	l_dbus_message_iter_get_fixed_array(&iter_uuid, join_pending->uuid, &n);
++
++	if (n != 16) {
++		l_free(join_pending);
++		join_pending = NULL;
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
++							"Bad device UUID");
++	}
++
++	sender = l_dbus_message_get_sender(msg);
++
++	join_pending->sender = l_strdup(sender);
++	join_pending->disc_watch = l_dbus_add_disconnect_watch(dbus, sender,
++						prov_disc_cb, NULL, NULL);
++	join_pending->msg = l_dbus_message_ref(msg);
++	join_pending->app_path = app_path;
++
++	/* Try to create a temporary node */
++	node_join(app_path, sender, join_pending->uuid, node_init_cb);
++
++	return NULL;
++}
++
++static struct l_dbus_message *cancel_join_call(struct l_dbus *dbus,
++						struct l_dbus_message *msg,
++						void *user_data)
++{
++	struct l_dbus_message *reply;
++
++	l_debug("Cancel Join");
++
++	if (!join_pending) {
++		reply = dbus_error(msg, MESH_ERROR_DOES_NOT_EXIST,
++							"No join in progress");
++		goto done;
++	}
++
++	acceptor_cancel(&mesh);
++
++	/* Return error to the original Join call */
++	if (join_pending->msg) {
++		reply = dbus_error(join_pending->msg, MESH_ERROR_FAILED, NULL);
++		l_dbus_send(dbus_get_bus(), reply);
++	}
++
++	reply = l_dbus_message_new_method_return(msg);
++	l_dbus_message_set_arguments(reply, "");
++
++	free_pending_join_call(true);
++done:
++	return reply;
++}
++
++static bool match_attach_request(const void *a, const void *b)
++{
++	const struct attach_data *pending = a;
++	const uint64_t *token = b;
++
++	return *token == pending->token;
++}
++
++static void attach_ready_cb(int status, char *node_path, uint64_t token)
++{
++	struct l_dbus_message *reply;
++	struct attach_data *pending;
++
++	pending = l_queue_find(attach_queue, match_attach_request, &token);
++	if (!pending)
++		return;
++
++	if (status != MESH_ERROR_NONE) {
++		const char *desc = (status == MESH_ERROR_NOT_FOUND) ?
++				"Node match not found" : "Attach failed";
++		reply = dbus_error(pending->msg, status, desc);
++		goto done;
++	}
++
++	reply = l_dbus_message_new_method_return(pending->msg);
++
++	node_build_attach_reply(reply, token);
++
++done:
++	l_dbus_send(dbus_get_bus(), reply);
++	l_queue_remove(attach_queue, pending);
++	l_free(pending);
++}
++
++static struct l_dbus_message *attach_call(struct l_dbus *dbus,
++						struct l_dbus_message *msg,
++						void *user_data)
++{
++	uint64_t token = 1;
++	const char *app_path, *sender;
++	struct attach_data *pending;
++
++	l_debug("Attach");
++
++	if (!l_dbus_message_get_arguments(msg, "ot", &app_path, &token))
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
++
++	sender = l_dbus_message_get_sender(msg);
++
++	if (node_attach(app_path, sender, token, attach_ready_cb) !=
++								MESH_ERROR_NONE)
++		return dbus_error(msg, MESH_ERROR_NOT_FOUND,
++						"Matching node not found");
++
++	pending = l_new(struct attach_data, 1);
++
++	pending->token = token;
++	pending->msg = l_dbus_message_ref(msg);
++
++	if (!attach_queue)
++		attach_queue = l_queue_new();
++
++	l_queue_push_tail(attach_queue, pending);
++
++	return NULL;
++}
++
++static void setup_network_interface(struct l_dbus_interface *iface)
++{
++	l_dbus_interface_method(iface, "Join", 0, join_network_call, "",
++				"oay", "app", "uuid");
++
++	l_dbus_interface_method(iface, "Cancel", 0, cancel_join_call, "", "");
++
++	l_dbus_interface_method(iface, "Attach", 0, attach_call,
++				"oa(ya(qa{sv}))", "ot", "node", "configuration",
++				"app", "token");
++
++	/* TODO: Implement Leave method */
++}
++
++bool mesh_dbus_init(struct l_dbus *dbus)
++{
++	if (!l_dbus_register_interface(dbus, MESH_NETWORK_INTERFACE,
++						setup_network_interface,
++						NULL, false)) {
++		l_info("Unable to register %s interface",
++			       MESH_NETWORK_INTERFACE);
++		return false;
++	}
++
++	if (!l_dbus_object_add_interface(dbus, BLUEZ_MESH_PATH,
++						MESH_NETWORK_INTERFACE, NULL)) {
++		l_info("Unable to register the mesh object on '%s'",
++							MESH_NETWORK_INTERFACE);
++		l_dbus_unregister_interface(dbus, MESH_NETWORK_INTERFACE);
++		return false;
++	}
++
++	l_info("Added Network Interface on %s", BLUEZ_MESH_PATH);
++
++	return true;
+ }
+diff --git a/mesh/mesh.h b/mesh/mesh.h
+index 8d389883b..1189f8276 100644
+--- a/mesh/mesh.h
++++ b/mesh/mesh.h
+@@ -18,15 +18,24 @@
+  *
+  */
+ 
+-struct bt_mesh;
+-struct mesh_net;
++#define BLUEZ_MESH_NAME "org.bluez.mesh"
+ 
+-struct bt_mesh *mesh_new(uint16_t index, const char *in_config_name);
+-struct bt_mesh *mesh_ref(struct bt_mesh *mesh);
+-void mesh_unref(struct bt_mesh *mesh);
+-bool mesh_set_output(struct bt_mesh *mesh, const char *out_config_name);
++#define MESH_NETWORK_INTERFACE "org.bluez.mesh.Network1"
++#define MESH_NODE_INTERFACE "org.bluez.mesh.Node1"
++#define MESH_ELEMENT_INTERFACE "org.bluez.mesh.Element1"
++#define MESH_APPLICATION_INTERFACE "org.bluez.mesh.Application1"
++#define MESH_PROVISION_AGENT_INTERFACE "org.bluez.mesh.ProvisionAgent1"
++#define ERROR_INTERFACE "org.bluez.mesh.Error"
++
++typedef void (*prov_rx_cb_t)(void *user_data, const uint8_t *data,
++								uint16_t len);
++bool mesh_init(uint16_t index, const char *in_config_name);
+ void mesh_cleanup(void);
+-const char *mesh_status_str(uint8_t err);
++bool mesh_dbus_init(struct l_dbus *dbus);
+ 
+-/* Command line testing */
+-struct mesh_net *mesh_get_net(struct bt_mesh *mesh);
++const char *mesh_status_str(uint8_t err);
++bool mesh_send_pkt(uint8_t count, uint16_t interval, uint8_t *data,
++								uint16_t len);
++bool mesh_send_cancel(const uint8_t *filter, uint8_t len);
++bool mesh_reg_prov_rx(prov_rx_cb_t cb, void *user_data);
++void mesh_unreg_prov_rx(prov_rx_cb_t cb);
 -- 
 2.14.5
 
