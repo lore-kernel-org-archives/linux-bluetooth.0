@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC764C43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB79C43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C85D421871
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66E5D21871
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727718AbeLSEWB (ORCPT
+        id S1727721AbeLSEWF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 23:22:01 -0500
+        Tue, 18 Dec 2018 23:22:05 -0500
 Received: from mga04.intel.com ([192.55.52.120]:4230 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727144AbeLSEWB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 23:22:01 -0500
+        id S1727144AbeLSEWF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 23:22:05 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:22:01 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:22:04 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,371,1539673200"; 
-   d="scan'208";a="99820297"
+   d="scan'208";a="99820315"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.192.41])
-  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:22:00 -0800
+  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:22:04 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v5 24/30] mesh: Update for DBus API and multi-node support
-Date:   Tue, 18 Dec 2018 20:20:10 -0800
-Message-Id: <20181219042016.25538-25-brian.gix@intel.com>
+Subject: [PATCH BlueZ v5 25/30] mesh: Add default location for Mesh Node storage
+Date:   Tue, 18 Dec 2018 20:20:11 -0800
+Message-Id: <20181219042016.25538-26-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181219042016.25538-1-brian.gix@intel.com>
 References: <20181219042016.25538-1-brian.gix@intel.com>
@@ -46,153 +46,23 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Inga Stotland <inga.stotland@intel.com>
 
 ---
- mesh/main.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 66 insertions(+), 7 deletions(-)
+ configure.ac | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/mesh/main.c b/mesh/main.c
-index 173f57a8f..95a66cc9d 100644
---- a/mesh/main.c
-+++ b/mesh/main.c
-@@ -33,11 +33,14 @@
- #include <sys/stat.h>
- #include <ell/ell.h>
+diff --git a/configure.ac b/configure.ac
+index 1a095a352..ae64ddc0f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -364,6 +364,9 @@ AC_DEFINE_UNQUOTED(CONFIGDIR, "${configdir}",
+ 			[Directory for the configuration files])
+ AC_SUBST(CONFIGDIR, "${configdir}")
  
-+#include <dbus/dbus.h>
++AC_DEFINE_UNQUOTED(MESH_STORAGEDIR, "${storagedir}/mesh",
++			[Directory for the mesh daemon storage files])
 +
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
- 
- #include "mesh/mesh.h"
- #include "mesh/net.h"
-+#include "mesh/dbus.h"
- #include "mesh/storage.h"
- 
- static const struct option main_options[] = {
-@@ -56,12 +59,46 @@ static void usage(void)
- 	       "\tmeshd [options]\n");
- 	l_info("Options:\n"
- 	       "\t--index <hcinum>  Use specified controller\n"
--	       "\t--config          Configuration file\n"
-+	       "\t--config          Configuration directory\n"
- 	       "\t--nodetach        Run in foreground\n"
- 	       "\t--debug           Enable debug output\n"
- 	       "\t--help            Show %s information\n", __func__);
- }
- 
-+static void do_debug(const char *str, void *user_data)
-+{
-+	const char *prefix = user_data;
-+
-+	l_info("%s%s", prefix, str);
-+}
-+
-+static void request_name_callback(struct l_dbus *dbus, bool success,
-+					bool queued, void *user_data)
-+{
-+	l_info("Request name %s",
-+		success ? "success": "failed");
-+
-+	if (success)
-+		dbus_init(dbus);
-+	else
-+		l_main_quit();
-+}
-+
-+static void ready_callback(void *user_data)
-+{
-+	struct l_dbus *dbus = user_data;
-+
-+	l_info("D-Bus ready");
-+	l_dbus_name_acquire(dbus, BLUEZ_MESH_NAME, false, false, false,
-+						request_name_callback, NULL);
-+
-+}
-+
-+static void disconnect_callback(void *user_data)
-+{
-+	l_main_quit();
-+}
-+
- static void signal_handler(uint32_t signo, void *user_data)
- {
- 	static bool terminated;
-@@ -78,8 +115,9 @@ int main(int argc, char *argv[])
- {
- 	int status;
- 	bool detached = true;
--	struct bt_mesh *mesh = NULL;
--	const char *config_file = NULL;
-+	bool dbus_debug = false;
-+	struct l_dbus *dbus = NULL;
-+	const char *config_dir = NULL;
- 	int index = MGMT_INDEX_NONE;
- 
- 	if (!l_main_init())
-@@ -91,7 +129,7 @@ int main(int argc, char *argv[])
- 		int opt;
- 		const char *str;
- 
--		opt = getopt_long(argc, argv, "i:c:ndh", main_options, NULL);
-+		opt = getopt_long(argc, argv, "i:c:ndbh", main_options, NULL);
- 		if (opt < 0)
- 			break;
- 
-@@ -117,7 +155,10 @@ int main(int argc, char *argv[])
- 			l_debug_enable("*");
- 			break;
- 		case 'c':
--			config_file = optarg;
-+			config_dir = optarg;
-+			break;
-+		case 'b':
-+			dbus_debug = true;
- 			break;
- 		case 'h':
- 			usage();
-@@ -130,7 +171,7 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
--	if (!mesh_new(index, config_file)) {
-+	if (!mesh_init(index, config_dir)) {
- 		l_error("Failed to initialize mesh");
- 		status = EXIT_FAILURE;
- 		goto done;
-@@ -138,6 +179,24 @@ int main(int argc, char *argv[])
- 
- 	umask(0077);
- 
-+	dbus = l_dbus_new_default(L_DBUS_SYSTEM_BUS);
-+	if (!dbus) {
-+		l_error("unable to connect to D-Bus");
-+		status = EXIT_FAILURE;
-+		goto done;
-+	}
-+
-+	if (dbus_debug)
-+		l_dbus_set_debug(dbus, do_debug, "[DBUS] ", NULL);
-+	l_dbus_set_ready_handler(dbus, ready_callback, dbus, NULL);
-+	l_dbus_set_disconnect_handler(dbus, disconnect_callback, NULL, NULL);
-+
-+	if (!l_dbus_object_manager_enable(dbus)) {
-+		l_error("Failed to enable Object Manager");
-+		status = EXIT_FAILURE;
-+		goto done;
-+	}
-+
- 	if (detached) {
- 		if (daemon(0, 0)) {
- 			perror("Failed to start meshd daemon");
-@@ -149,8 +208,8 @@ int main(int argc, char *argv[])
- 	status = l_main_run_with_signal(signal_handler, NULL);
- 
- done:
--	mesh_unref(mesh);
- 	mesh_cleanup();
-+	l_dbus_destroy(dbus);
- 	l_main_exit();
- 
- 	return status;
+ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+ 			[enable BlueZ for Android]),
+ 					[enable_android=${enableval}])
 -- 
 2.14.5
 
