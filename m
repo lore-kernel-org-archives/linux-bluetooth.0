@@ -3,38 +3,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E87DC43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30513C43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3023621873
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BBD521873
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727675AbeLSEVQ (ORCPT
+        id S1727678AbeLSEVT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 23:21:16 -0500
+        Tue, 18 Dec 2018 23:21:19 -0500
 Received: from mga04.intel.com ([192.55.52.120]:4168 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727663AbeLSEVQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 23:21:16 -0500
+        id S1727321AbeLSEVT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 23:21:19 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:21:15 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:21:19 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,371,1539673200"; 
-   d="scan'208";a="99820193"
+   d="scan'208";a="99820205"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.192.41])
-  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:21:15 -0800
+  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:21:18 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v5 13/30] mesh: centralize generic utilities
-Date:   Tue, 18 Dec 2018 20:19:59 -0800
-Message-Id: <20181219042016.25538-14-brian.gix@intel.com>
+Subject: [PATCH BlueZ v5 14/30] mesh: re-arrange provisioning for DBus API
+Date:   Tue, 18 Dec 2018 20:20:00 -0800
+Message-Id: <20181219042016.25538-15-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181219042016.25538-1-brian.gix@intel.com>
 References: <20181219042016.25538-1-brian.gix@intel.com>
@@ -43,63 +43,158 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Inga Stotland <inga.stotland@intel.com>
-
 ---
- mesh/util.c | 26 ++++++++++++++++++++++++++
- mesh/util.h |  1 +
- 2 files changed, 27 insertions(+)
+ mesh/prov.h      |  14 +++++--
+ mesh/provision.h | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 2 files changed, 112 insertions(+), 14 deletions(-)
 
-diff --git a/mesh/util.c b/mesh/util.c
-index 2cdcdf37d..ac0294742 100644
---- a/mesh/util.c
-+++ b/mesh/util.c
-@@ -26,10 +26,36 @@
- #include <stdbool.h>
- #include <stdint.h>
- #include <stdio.h>
-+#include <unistd.h>
-+#include <termios.h>
- #include <time.h>
-+#include <sys/ioctl.h>
-+#include <sys/time.h>
-+
-+#include <ell/ell.h>
+diff --git a/mesh/prov.h b/mesh/prov.h
+index 09fe6c3cd..61ec08e10 100644
+--- a/mesh/prov.h
++++ b/mesh/prov.h
+@@ -47,11 +47,17 @@ enum mesh_prov_mode {
+ };
  
- #include "mesh/util.h"
+ struct mesh_prov;
+-typedef void (*mesh_prov_open_func_t)(struct mesh_prov *prov);
+-typedef void (*mesh_prov_close_func_t)(struct mesh_prov *prov, uint8_t reason);
++
++typedef void (*prov_trans_tx_t)(void *trans_data, uint8_t *data, uint16_t len);
++typedef void (*mesh_prov_open_func_t)(void *user_data, prov_trans_tx_t trans_tx,
++					void *trans_data, uint8_t trans_type);
++
++typedef void (*mesh_prov_close_func_t)(void *user_data, uint8_t reason);
+ typedef void (*mesh_prov_send_func_t)(bool success, struct mesh_prov *prov);
+-typedef void (*mesh_prov_receive_func_t)(const void *data, uint16_t size,
+-							struct mesh_prov *prov);
++typedef void (*mesh_prov_ack_func_t)(void *user_data, uint8_t msg_num);
++typedef void (*mesh_prov_receive_func_t)(void *user_data, const uint8_t *data,
++								uint16_t size);
++
  
-+void print_packet(const char *label, const void *data, uint16_t size)
-+{
-+	struct timeval pkt_time;
+ struct prov_invite {
+ 	uint8_t attention;
+diff --git a/mesh/provision.h b/mesh/provision.h
+index 0c59bf037..6b61a45be 100644
+--- a/mesh/provision.h
++++ b/mesh/provision.h
+@@ -17,14 +17,106 @@
+  *
+  */
+ 
 +
-+	gettimeofday(&pkt_time, NULL);
++/*
++ * size: hard define (mesh.conf - OOB_NUMBEROOB_NUMBER)
++ *      oob size - 8 if alpha or numeric
++ *	else 1 if mask is non zero
++ *	else 0
++ */
++struct bt_mesh;
+ struct mesh_prov;
+-struct l_queue;
+-
+-void initiator_prov_open(struct mesh_prov *prov);
+-void initiator_prov_close(struct mesh_prov *prov, uint8_t reason);
+-void initiator_prov_receive(const void *pkt, uint16_t size,
+-							struct mesh_prov *prov);
+-void acceptor_prov_open(struct mesh_prov *prov);
+-void acceptor_prov_close(struct mesh_prov *prov, uint8_t reason);
+-void acceptor_prov_receive(const void *pkt, uint16_t size,
+-							struct mesh_prov *prov);
++struct mesh_agent;
 +
-+	if (size > 0) {
-+		char *str;
++/* Provisioner Agent Response Types */
++#define OOB_CANCEL		0x00
++#define OOB_PRIV_KEY		0x01
++#define OOB_PUB_KEY		0x02
++#define OOB_NUMBER		0x03
++#define OOB_STATIC		0x04
++#define OOB_NUMBER_DISPLAY	0x05
 +
-+		str = l_util_hexstring(data, size);
-+		l_debug("%05d.%03d %s: %s",
-+				(uint32_t) pkt_time.tv_sec % 100000,
-+				(uint32_t) pkt_time.tv_usec/1000, label, str);
-+		l_free(str);
-+	} else
-+		l_debug("%05d.%03d %s: empty",
-+				(uint32_t) pkt_time.tv_sec % 100000,
-+				(uint32_t) pkt_time.tv_usec/1000, label);
-+}
++/* Spec defined Provisioning message types */
++#define PROV_INVITE	0x00
++#define PROV_CAPS	0x01
++#define PROV_START	0x02
++#define PROV_PUB_KEY	0x03
++#define PROV_INP_CMPLT	0x04
++#define PROV_CONFIRM	0x05
++#define PROV_RANDOM	0x06
++#define PROV_DATA	0x07
++#define PROV_COMPLETE	0x08
++#define PROV_FAILED	0x09
 +
- uint32_t get_timestamp_secs(void)
- {
- 	struct timespec ts;
-diff --git a/mesh/util.h b/mesh/util.h
-index 61110104a..b8efb6521 100644
---- a/mesh/util.h
-+++ b/mesh/util.h
-@@ -22,3 +22,4 @@ uint32_t get_timestamp_secs(void);
- bool str2hex(const char *str, uint16_t in_len, uint8_t *out,
- 							uint16_t out_len);
- size_t hex2str(uint8_t *in, size_t in_len, char *out, size_t out_len);
-+void print_packet(const char *label, const void *data, uint16_t size);
++/* Spec defined Error Codes */
++#define PROV_ERR_SUCCESS		0x00
++#define PROV_ERR_INVALID_PDU		0x01
++#define PROV_ERR_INVALID_FORMAT		0x02
++#define PROV_ERR_UNEXPECTED_PDU		0x03
++#define PROV_ERR_CONFIRM_FAILED		0x04
++#define PROV_ERR_INSUF_RESOURCE		0x05
++#define PROV_ERR_DECRYPT_FAILED		0x06
++#define PROV_ERR_UNEXPECTED_ERR		0x07
++#define PROV_ERR_CANT_ASSIGN_ADDR	0x08
++/* Internally generated Error Codes */
++#define PROV_ERR_TIMEOUT		0xFF
++
++/* Provisioner Action values */
++/* IN */
++#define PROV_ACTION_PUSH		0x00
++#define PROV_ACTION_TWIST		0x01
++#define PROV_ACTION_IN_NUMERIC		0x02
++#define PROV_ACTION_IN_ALPHA		0x03
++/* OUT */
++#define PROV_ACTION_BLINK		0x00
++#define PROV_ACTION_BEEP		0x01
++#define PROV_ACTION_VIBRATE		0x02
++#define PROV_ACTION_OUT_NUMERIC		0x03
++#define PROV_ACTION_OUT_ALPHA		0x04
++
++/* OOB_Info defines from Table 3.54 of Mesh profile Specification v1.0 */
++#define OOB_INFO_URI_HASH	0x0002
++
++/* PB_REMOTE not supported from unprovisioned state */
++enum trans_type {
++	PB_ADV = 0,
++	PB_GATT,
++};
++
++#define PROV_FLAG_KR	0x01
++#define PROV_FLAG_IVU	0x02
++
++struct mesh_prov_node_info {
++	uint32_t iv_index;
++	uint16_t unicast;
++	uint16_t net_index;
++	uint8_t net_key[16];
++	uint8_t device_key[16];
++	uint8_t flags; /* IVU and KR bits */
++};
++
++typedef bool (*mesh_prov_acceptor_complete_func_t)(void *user_data,
++					uint8_t status,
++					struct mesh_prov_node_info *info);
++
++typedef bool (*mesh_prov_initiator_complete_func_t)(void *user_data,
++					uint8_t status,
++					struct mesh_prov_node_info *info);
++
++/* This starts unprovisioned device beacon */
++bool acceptor_start(uint8_t num_ele, uint8_t uuid[16],
++			uint16_t algorithms, uint32_t timeout,
++			struct mesh_agent *agent,
++			mesh_prov_acceptor_complete_func_t complete_cb,
++			void *caller_data);
++void acceptor_cancel(void *user_data);
++
++bool initiator_start(enum trans_type transport,
++		uint8_t uuid[16],
++		uint16_t max_ele,
++		uint16_t server, /* Only valid for PB-Remote */
++		uint32_t timeout, /* in seconds from mesh.conf */
++		struct mesh_agent *agent,
++		mesh_prov_initiator_complete_func_t complete_cb,
++		void *caller_data);
++void initiator_cancel(void *user_data);
 -- 
 2.14.5
 
