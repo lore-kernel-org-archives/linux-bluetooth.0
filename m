@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD408C43444
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A63C43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B50AD21871
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC852204FD
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727723AbeLSEWJ (ORCPT
+        id S1727727AbeLSEWN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 23:22:09 -0500
+        Tue, 18 Dec 2018 23:22:13 -0500
 Received: from mga04.intel.com ([192.55.52.120]:4230 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727144AbeLSEWJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 23:22:09 -0500
+        id S1727144AbeLSEWN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 23:22:13 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:22:09 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:22:13 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,371,1539673200"; 
-   d="scan'208";a="99820325"
+   d="scan'208";a="99820336"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.192.41])
-  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:22:08 -0800
+  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:22:12 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v5 26/30] mesh: Add structural changes for mesh
-Date:   Tue, 18 Dec 2018 20:20:12 -0800
-Message-Id: <20181219042016.25538-27-brian.gix@intel.com>
+Subject: [PATCH BlueZ v5 27/30] mesh: Sample Provisioning Agent
+Date:   Tue, 18 Dec 2018 20:20:13 -0800
+Message-Id: <20181219042016.25538-28-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181219042016.25538-1-brian.gix@intel.com>
 References: <20181219042016.25538-1-brian.gix@intel.com>
@@ -46,55 +46,56 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Inga Stotland <inga.stotland@intel.com>
 
 ---
- Makefile.mesh | 19 ++++++-------------
- 1 file changed, 6 insertions(+), 13 deletions(-)
+ mesh/agent.py | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
+ create mode 100755 mesh/agent.py
 
-diff --git a/Makefile.mesh b/Makefile.mesh
-index 8b5af4cf6..ea6c5e939 100644
---- a/Makefile.mesh
-+++ b/Makefile.mesh
-@@ -3,35 +3,28 @@ if MESH
- mesh_sources = mesh/mesh.h mesh/mesh.c \
- 				mesh/net_keys.h mesh/net_keys.c \
- 				mesh/mesh-io.h mesh/mesh-io.c \
--				mesh/mesh-io-api.h \
-+				mesh/error.h mesh/mesh-io-api.h \
- 				mesh/mesh-io-generic.h \
- 				mesh/mesh-io-generic.c \
- 				mesh/storage.h mesh/storage.c \
- 				mesh/net.h mesh/net.c \
--				mesh/display.h mesh/display.c \
- 				mesh/crypto.h mesh/crypto.c \
- 				mesh/friend.h mesh/friend.c \
- 				mesh/appkey.h mesh/appkey.c \
- 				mesh/node.h mesh/node.c \
--				mesh/prov.h mesh/prov.c \
--				mesh/provision.h mesh/provision.c \
-+				mesh/provision.h mesh/prov.h \
- 				mesh/model.h mesh/model.c \
- 				mesh/cfgmod.h mesh/cfgmod-server.c \
- 				mesh/mesh-db.h mesh/mesh-db.c \
- 				mesh/util.h mesh/util.c \
-+				mesh/dbus.h mesh/dbus.c \
-+				mesh/agent.h mesh/agent.c \
-+				mesh/prov-acceptor.c mesh/prov-initiator.c \
-+				mesh/pb-adv.h mesh/pb-adv.c \
- 				mesh/mesh-defs.h
- libexec_PROGRAMS += mesh/meshd
- 
- mesh_meshd_SOURCES = $(mesh_sources) mesh/main.c
- mesh_meshd_LDADD = src/libshared-ell.la $(ell_ldadd) -ljson-c
- mesh_meshd_DEPENDENCIES = $(ell_dependencies) src/libshared-ell.la
--
--noinst_PROGRAMS += mesh/btmesh
--
--mesh_btmesh_SOURCES = $(mesh_sources) mesh/agent.h \
--						mesh/agent.c \
--						mesh/btmesh.c
--mesh_btmesh_LDADD = src/libshared-mainloop.la $(ell_ldadd) -lreadline -ljson-c
--mesh_btmesh_DEPENDENCIES = $(ell_dependencies)
--
- endif
+diff --git a/mesh/agent.py b/mesh/agent.py
+new file mode 100755
+index 000000000..22c92f952
+--- /dev/null
++++ b/mesh/agent.py
+@@ -0,0 +1,40 @@
++#!/usr/bin/python
++
++import sys
++import dbus
++import dbus.service
++import dbus.mainloop.glib
++
++AGENT_IFACE = 'org.bluez.mesh.ProvisionAgent1'
++AGENT_PATH = "/mesh/test/agent"
++
++bus = None
++
++class Agent(dbus.service.Object):
++	def __init__(self, bus):
++		self.path = AGENT_PATH
++		self.bus = bus
++		dbus.service.Object.__init__(self, bus, self.path)
++
++	def get_properties(self):
++		caps = []
++		oob = []
++		caps.append('out-numeric')
++		oob.append('other')
++		return {
++			AGENT_IFACE: {
++				'Capabilities': dbus.Array(caps, 's'),
++				'OutOfBandInfo': dbus.Array(oob, 's')
++			}
++		}
++
++	def get_path(self):
++		return dbus.ObjectPath(self.path)
++
++	@dbus.service.method(AGENT_IFACE, in_signature="", out_signature="")
++	def Cancel(self):
++		print("Cancel")
++
++	@dbus.service.method(AGENT_IFACE, in_signature="su", out_signature="")
++	def DisplayNumeric(self, type, value):
++		print("DisplayNumeric type=", type, " number=", value)
 -- 
 2.14.5
 
