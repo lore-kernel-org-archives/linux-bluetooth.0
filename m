@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4E15C43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F85C43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 893EC21871
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:20:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 951D521873
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727370AbeLSEU4 (ORCPT
+        id S1727393AbeLSEVB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 23:20:56 -0500
+        Tue, 18 Dec 2018 23:21:01 -0500
 Received: from mga04.intel.com ([192.55.52.120]:4125 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727189AbeLSEU4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 23:20:56 -0500
+        id S1727189AbeLSEVB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 23:21:01 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:20:55 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:20:58 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,371,1539673200"; 
-   d="scan'208";a="99820122"
+   d="scan'208";a="99820132"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.192.41])
-  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:20:55 -0800
+  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:20:58 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v5 07/30] mesh: Rewrite Network layer for multiple nodes
-Date:   Tue, 18 Dec 2018 20:19:53 -0800
-Message-Id: <20181219042016.25538-8-brian.gix@intel.com>
+Subject: [PATCH BlueZ v5 08/30] mesh: Direction agnostic PB-Adv implementation
+Date:   Tue, 18 Dec 2018 20:19:54 -0800
+Message-Id: <20181219042016.25538-9-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181219042016.25538-1-brian.gix@intel.com>
 References: <20181219042016.25538-1-brian.gix@intel.com>
@@ -44,612 +44,491 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 ---
- mesh/net.c | 293 ++++++++++++++++---------------------------------------------
- mesh/net.h |  31 ++-----
- 2 files changed, 83 insertions(+), 241 deletions(-)
+ mesh/pb-adv.c | 444 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/pb-adv.h |  23 +++
+ 2 files changed, 467 insertions(+)
+ create mode 100644 mesh/pb-adv.c
+ create mode 100644 mesh/pb-adv.h
 
-diff --git a/mesh/net.c b/mesh/net.c
-index 97b6f5b16..b47df7c04 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -30,7 +30,6 @@
- #include "mesh/mesh-defs.h"
- #include "mesh/util.h"
- 
--#include "mesh/display.h"
- #include "mesh/crypto.h"
- #include "mesh/net_keys.h"
- #include "mesh/mesh.h"
-@@ -112,12 +111,9 @@ struct mesh_subnet {
- };
- 
- struct mesh_net {
--	int ref_count;
- 	struct mesh_io *io;
--	struct mesh_node *local_node;
-+	struct mesh_node *node;
- 	struct mesh_prov *prov;
--	void *jconfig_local;
--	const char *cfg_file;
- 	struct l_queue *app_keys;
- 	unsigned int pkt_id;
- 	unsigned int bea_id;
-@@ -129,7 +125,6 @@ struct mesh_net {
- 	bool beacon_enable;
- 	bool proxy_enable;
- 	bool provisioner;
--	bool provisioned;
- 	bool friend_seq;
- 	struct l_timeout *iv_update_timeout;
- 	enum _iv_upd_state iv_upd_state;
-@@ -139,7 +134,6 @@ struct mesh_net {
- 	uint32_t iv_index;
- 	uint32_t seq_num;
- 	uint32_t cached_seq_num;
--	uint16_t crpl;
- 	uint16_t src_addr;
- 	uint16_t last_addr;
- 	uint16_t friend_addr;
-@@ -253,6 +247,8 @@ struct net_decode {
- 	bool proxy;
- };
- 
-+static struct l_queue *nets;
+diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
+new file mode 100644
+index 000000000..57647e184
+--- /dev/null
++++ b/mesh/pb-adv.c
+@@ -0,0 +1,444 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
- static inline struct mesh_subnet *get_primary_subnet(struct mesh_net *net)
- {
- 	return l_queue_peek_head(net->subnets);
-@@ -499,8 +495,8 @@ uint32_t mesh_net_next_seq_num(struct mesh_net *net)
- 	/* Periodically store advanced sequence number */
- 	if (net->seq_num + MIN_SEQ_TRIGGER >= net->cached_seq_num) {
- 		net->cached_seq_num = net->seq_num +
--					node_seq_cache(net->local_node);
--		node_set_sequence_number(net->local_node, net->cached_seq_num);
-+					node_seq_cache(net->node);
-+		node_set_sequence_number(net->node, net->cached_seq_num);
- 	}
- 
- 	return seq;
-@@ -647,15 +643,13 @@ static void start_network_beacon(void *a, void *b)
- 				network_beacon_timeout, subnet, NULL);
- }
- 
--struct mesh_net *mesh_net_new(uint16_t index)
-+struct mesh_net *mesh_net_new(struct mesh_node *node)
- {
- 	struct mesh_net *net;
- 
- 	net = l_new(struct mesh_net, 1);
- 
--	if (!net)
--		return NULL;
--
-+	net->node = node;
- 	net->pkt_id = 0;
- 	net->bea_id = 0;
- 	net->key_id_next = 0;
-@@ -689,27 +683,17 @@ struct mesh_net *mesh_net_new(uint16_t index)
- 
- 	memset(&net->heartbeat, 0, sizeof(net->heartbeat));
- 
--	return mesh_net_ref(net);
--}
--
--struct mesh_net *mesh_net_ref(struct mesh_net *net)
--{
--	if (!net)
--		return NULL;
--
--	__sync_fetch_and_add(&net->ref_count, 1);
-+	if (!nets)
-+		nets = l_queue_new();
- 
- 	return net;
- }
- 
--void mesh_net_unref(struct mesh_net *net)
-+void mesh_net_free(struct mesh_net *net)
- {
- 	if (!net)
- 		return;
- 
--	if (__sync_sub_and_fetch(&net->ref_count, 1))
--		return;
--
- 	l_queue_destroy(net->subnets, subnet_free);
- 	l_queue_destroy(net->fast_cache, mesh_msg_free);
- 	l_queue_destroy(net->msg_cache, mesh_msg_free);
-@@ -773,7 +757,6 @@ bool mesh_net_register_unicast(struct mesh_net *net,
- 	if (!net || !IS_UNICAST(address) || !num_ele)
- 		return false;
- 
--	l_info("mesh_net_set_address: 0x%x", address);
- 	net->src_addr = address;
- 	net->last_addr = address + num_ele - 1;
- 	if (net->last_addr < net->src_addr)
-@@ -971,7 +954,7 @@ int mesh_net_del_key(struct mesh_net *net, uint16_t idx)
- 	l_queue_remove(net->subnets, subnet);
- 	subnet_free(subnet);
- 
--	if (!storage_local_net_key_del(net, idx))
-+	if (!storage_net_key_del(net, idx))
- 		return MESH_STATUS_STORAGE_FAIL;
- 
- 	return MESH_STATUS_SUCCESS;
-@@ -991,7 +974,7 @@ int mesh_net_add_key(struct mesh_net *net, bool update, uint16_t idx,
- 			l_info("Start key refresh");
- 			status = mesh_net_kr_phase_one(net, idx, value);
- 			if (status == MESH_STATUS_SUCCESS &&
--				!storage_local_net_key_add(net, idx,
-+				!storage_net_key_add(net, idx,
- 						value, KEY_REFRESH_PHASE_ONE))
- 				return MESH_STATUS_STORAGE_FAIL;
- 		} else
-@@ -1021,7 +1004,7 @@ int mesh_net_add_key(struct mesh_net *net, bool update, uint16_t idx,
- 		return MESH_STATUS_INSUFF_RESOURCES;
- 	}
- 
--	if (!storage_local_net_key_add(net, idx, value,
-+	if (!storage_net_key_add(net, idx, value,
- 					KEY_REFRESH_PHASE_NONE)) {
- 		l_queue_remove(net->subnets, subnet);
- 		subnet_free(subnet);
-@@ -1204,14 +1187,6 @@ static bool match_msg_timeout(const void *a, const void *b)
- 	return sar->msg_timeout == msg_timeout;
- }
- 
--static bool match_sar_id(const void *a, const void *b)
--{
--	const struct mesh_sar *sar = a;
--	unsigned int id = L_PTR_TO_UINT(b);
--
--	return sar->id == id;
--}
--
- static bool match_seg_timeout(const void *a, const void *b)
- {
- 	const struct mesh_sar *sar = a;
-@@ -1813,7 +1788,7 @@ static bool msg_rxed(struct mesh_net *net, bool frnd,
- 	}
- 
- not_for_friend:
--	return mesh_model_rx(net, szmic, seqAuth, seq, iv_index,
-+	return mesh_model_rx(net->node, szmic, seqAuth, seq, iv_index,
- 					ttl, src, dst, key_id, data, size);
- }
- 
-@@ -2511,22 +2486,40 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
- 		send_relay_pkt(net, packet, size + 1);
- }
- 
-+struct net_queue_data {
-+	struct mesh_io_recv_info *info;
-+	const uint8_t *data;
-+	uint16_t len;
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <sys/select.h>
++#include <sys/time.h>
++#include <sys/types.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <termios.h>
++
++#include <ctype.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <getopt.h>
++#include <time.h>
++#include <ell/ell.h>
++
++#include "mesh/mesh-defs.h"
++#include "src/shared/ecc.h"
++
++#include "mesh/util.h"
++#include "mesh/net_keys.h"
++#include "mesh/crypto.h"
++#include "mesh/net.h"
++#include "mesh/mesh-io.h"
++#include "mesh/mesh.h"
++#include "mesh/prov.h"
++#include "mesh/provision.h"
++#include "mesh/pb-adv.h"
++
++
++struct pb_adv_session {
++	mesh_prov_open_func_t open_cb;
++	mesh_prov_close_func_t close_cb;
++	mesh_prov_receive_func_t rx_cb;
++	mesh_prov_ack_func_t ack_cb;
++	struct l_timeout *tx_timeout;
++	uint32_t conn_id;
++	uint16_t exp_len;
++	uint8_t exp_fcs;
++	uint8_t exp_segs;
++	uint8_t got_segs;
++	uint8_t msg_num;
++	uint8_t local_acked;
++	uint8_t local_msg_num;
++	uint8_t peer_msg_num;
++	uint8_t last_peer_msg_num;
++	uint8_t sar[80];
++	uint8_t uuid[16];
++	bool initiator;
++	bool opened;
++	void *user_data;
 +};
 +
-+static void net_rx(void *net_ptr, void *user_data)
-+{
-+	struct net_queue_data *data = user_data;
-+	struct mesh_net *net = net_ptr;
-+	int8_t rssi = 0;
++#define PB_ADV_ACK 0x01
++#define PB_ADV_OPEN_REQ 0x03
++#define PB_ADV_OPEN_CFM 0x07
++#define PB_ADV_CLOSE 0x0B
 +
-+	if (data->info) {
-+		net->instant = data->info->instant;
-+		net->chan = data->info->chan;
-+		rssi = data->info->rssi;
++#define PB_ADV_MTU	24
++
++static struct pb_adv_session *pb_session = NULL;
++
++static void send_adv_segs(struct pb_adv_session *session, const uint8_t *data,
++							uint16_t size)
++{
++	uint16_t init_size;
++	uint8_t buf[PB_ADV_MTU + 6] = { MESH_AD_TYPE_PROVISION };
++	uint8_t max_seg;
++	uint8_t consumed;
++	int i;
++
++	if (!size)
++		return;
++
++	mesh_send_cancel(buf, 1);
++
++	l_put_be32(session->conn_id, buf + 1);
++	buf[1 + 4] = ++session->local_msg_num;
++
++	if (size > PB_ADV_MTU - 4) {
++		max_seg = 1 +
++			(((size - (PB_ADV_MTU - 4)) - 1) / (PB_ADV_MTU - 1));
++		init_size = PB_ADV_MTU - 4;
++	} else {
++		max_seg = 0;
++		init_size = size;
 +	}
 +
-+	packet_received(net, data->data, data->len, rssi);
++	/* print_packet("FULL-TX", data, size); */
++
++	l_debug("Sending %u fragments for %u octets", max_seg + 1, size);
++
++	buf[6] = max_seg << 2;
++	l_put_be16(size, buf + 7);
++	buf[9] = mesh_crypto_compute_fcs(data, size);
++	memcpy(buf + 10, data, init_size);
++
++	l_debug("max_seg: %2.2x", max_seg);
++	l_debug("size: %2.2x, CRC: %2.2x", size, buf[9]);
++	/* print_packet("PB-TX", buf + 1, init_size + 9); */
++	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 50, buf, init_size + 10);
++
++	consumed = init_size;
++
++	for (i = 1; i <= max_seg; i++) {
++		uint8_t seg_size; /* Amount of payload data being sent */
++
++		if (size - consumed > PB_ADV_MTU - 1)
++			seg_size = PB_ADV_MTU - 1;
++		else
++			seg_size = size - consumed;
++
++		buf[6] = (i << 2) | 0x02;
++		memcpy(buf + 7, data + consumed, seg_size);
++
++		/* print_packet("PB-TX", buf + 1, seg_size + 6); */
++
++		mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 50,
++							buf, seg_size + 7);
++
++		consumed += seg_size;
++	}
 +}
 +
- static void net_msg_recv(void *user_data, struct mesh_io_recv_info *info,
- 					const uint8_t *data, uint16_t len)
- {
--	struct mesh_net *net = user_data;
--	int8_t rssi = 0;
-+	struct net_queue_data net_data = {
-+		.info = info,
-+		.data = data + 1,
-+		.len = len - 1,
-+	};
- 
--	if (len <= 2 || !net)
-+	if (len <= 2)
- 		return;
- 
--	if (info) {
--		net->instant = info->instant;
--		net->chan = info->chan;
--		rssi = info->rssi;
--	}
--
--	packet_received(user_data, data + 1, len - 1, rssi);
-+	l_queue_foreach(nets, net_rx, &net_data);
- }
- 
- static void set_network_beacon(void *a, void *b)
-@@ -2653,7 +2646,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 			net->iv_upd_state = IV_UPD_NORMAL;
- 		}
- 
--		storage_local_set_iv_index(net, iv_index, net->iv_upd_state);
-+		storage_set_iv_index(net, iv_index, net->iv_upd_state);
- 
- 		/* Figure out the key refresh phase */
- 		if (kr_transition) {
-@@ -2675,7 +2668,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 		net->iv_upd_state = IV_UPD_UPDATING;
- 		net->iv_update_timeout = l_timeout_create(IV_IDX_UPD_MIN,
- 							iv_upd_to, net, NULL);
--		storage_local_set_iv_index(net, iv_index, net->iv_upd_state);
-+		storage_set_iv_index(net, iv_index, net->iv_upd_state);
- 	} else if (iv_update && iv_index != net->iv_index) {
- 		l_error("Update attempted too soon (iv idx already updated)");
- 		return;
-@@ -2688,7 +2681,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 	if (iv_index > net->iv_index) {
- 		l_queue_clear(net->msg_cache, mesh_msg_free);
- 		net->iv_index = iv_index;
--		storage_local_set_iv_index(net, iv_index, net->iv_upd_state);
-+		storage_set_iv_index(net, iv_index, net->iv_upd_state);
- 	}
- 
- 	/* Figure out the key refresh phase */
-@@ -2915,34 +2908,37 @@ bool mesh_net_set_beacon_mode(struct mesh_net *net, bool enable)
- 	return true;
- }
- 
-+static bool is_this_net(const void *a, const void *b)
++static void tx_timeout(struct l_timeout *timeout, void *user_data)
 +{
-+	return a == b;
++	struct pb_adv_session *session = user_data;
++	uint8_t cancel[] = { MESH_AD_TYPE_PROVISION };
++	mesh_prov_close_func_t cb;
++
++	if (!session || pb_session != session)
++		return;
++
++	l_timeout_remove(session->tx_timeout);
++	session->tx_timeout = NULL;
++
++	mesh_send_cancel(cancel, sizeof(cancel));
++
++	l_info("TX timeout");
++	cb = pb_session->close_cb;
++	user_data = pb_session->user_data;
++	l_free(pb_session);
++	pb_session = NULL;
++	cb(user_data, 1);
 +}
 +
- bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
- {
++static void pb_adv_tx(void *user_data, uint8_t *data, uint16_t len)
++{
++	struct pb_adv_session *session = user_data;
++
++	if (!session || pb_session != session)
++		return;
++
++	l_timeout_remove(session->tx_timeout);
++	session->tx_timeout = l_timeout_create(30, tx_timeout, session, NULL);
++
++	send_adv_segs(session, data, len);
++}
++
++static void send_open_cfm(struct pb_adv_session *session)
++{
++	uint8_t open_cfm[7] = { MESH_AD_TYPE_PROVISION };
++
++	l_put_be32(session->conn_id, open_cfm + 1);
++	open_cfm[1 + 4] = 0;
++	open_cfm[1 + 4 + 1] = 0x07; /* OPEN_CFM */
++
++	/* print_packet("PB-TX", open_cfm + 1, sizeof(open_cfm) - 1); */
++
++	mesh_send_cancel(open_cfm, 1);
++	mesh_send_pkt(5, 100, open_cfm, sizeof(open_cfm));
++}
++
++static void send_ack(struct pb_adv_session *session, uint8_t msg_num)
++{
++	uint8_t ack[7] = { MESH_AD_TYPE_PROVISION };
++
++	l_put_be32(session->conn_id, ack + 1);
++	ack[1 + 4] = msg_num;
++	ack[1 + 4 + 1] = 0x01; /* ACK */
++
++	/* print_packet("ADV-ACK", ack + 1, sizeof(ack) - 1); */
++	mesh_send_pkt(1, 100, ack, sizeof(ack));
++}
++
++static void send_close_ind(struct pb_adv_session *session, uint8_t reason)
++{
++	uint8_t close_ind[8] = { MESH_AD_TYPE_PROVISION };
++
++	if (!pb_session || pb_session->user_data != session)
++		return;
++
++	l_put_be32(session->conn_id, close_ind + 1);
++	close_ind[5] = 0;
++	close_ind[6] = PB_ADV_CLOSE;		/* CLOSE_IND */
++	close_ind[7] = reason;
++
++	mesh_send_cancel(close_ind, 1);
++	mesh_send_pkt(5, 100, close_ind, sizeof(close_ind));
++}
++
++static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
++{
++	struct pb_adv_session *session = user_data;
++	uint32_t conn_id;
++	size_t offset;
++	uint8_t msg_num;
++	uint8_t type;
 +	bool first;
 +
- 	if (!net)
- 		return false;
- 
--	net->io = io;
--	if (net->provisioned) {
-+	first = l_queue_isempty(nets);
-+	if (first) {
-+		if (!nets)
-+			nets = l_queue_new();
- 
-+		l_info("Register io cb");
- 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_BEACON,
- 							beacon_recv, net);
- 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_NET,
--							net_msg_recv, net);
-+							net_msg_recv, NULL);
- 		l_queue_foreach(net->subnets, start_network_beacon, net);
++	if (!session || pb_session != session)
++		return;
++
++	conn_id = l_get_be32(pkt + 1);
++	type = l_get_u8(pkt + 6);
++
++	/* Validate new or existing Connection ID */
++	if (session->conn_id) {
++		if (session->conn_id != conn_id)
++			return;
++	} else if (type != 0x03)
++		return;
++	else if (!conn_id)
++		return;
++
++	msg_num = l_get_u8(pkt + 5);
++	pkt += 7;
++	len -= 7;
++
++	switch (type) {
++	case PB_ADV_OPEN_CFM:
++		/*
++		 * Ignore if:
++		 * 1. We are acceptor
++		 * 2. We are already provisioning on different conn_id
++		 */
++
++		if (!session->initiator)
++			return;
++
++		first = !session->opened;
++		session->opened = true;
++
++		/* Only call Open callback once */
++		if (first) {
++			l_debug("PB-ADV open confirmed");
++			session->open_cb(session->user_data, pb_adv_tx,
++							session, PB_ADV);
++		}
++		return;
++
++	case PB_ADV_OPEN_REQ:
++		/*
++		 * Ignore if:
++		 * 1. We are initiator
++		 * 2. Open request not addressed to us
++		 * 3. We are already provisioning on different conn_id
++		 */
++
++		if (session->initiator)
++			return;
++
++		if (memcmp(pkt, session->uuid, 16))
++			return;
++
++		first = !session->conn_id;
++		session->conn_id = conn_id;
++		session->last_peer_msg_num = 0xFF;
++		session->local_acked = 0xFF;
++		session->peer_msg_num = 0x00;
++		session->local_msg_num = 0x7F;
++		session->opened = true;
++
++		/* Only call Open callback once */
++		if (first) {
++			l_debug("PB-ADV open requested");
++			session->open_cb(session->user_data, pb_adv_tx,
++							session, PB_ADV);
++		}
++
++		/* Send CFM once per received request */
++		send_open_cfm(session);
++		break;
++
++	case PB_ADV_CLOSE:
++		l_timeout_remove(session->tx_timeout);
++		l_debug("Link closed notification: %2.2x", pkt[0]);
++		/* Wrap callback for pre-cleaning */
++		if (true) {
++			mesh_prov_close_func_t cb = session->close_cb;
++			void *user_data = session->user_data;
++
++			l_free(session);
++			pb_session = NULL;
++			cb(user_data, pkt[0]);
++		}
++		break;
++
++	case PB_ADV_ACK:
++		if (!session->opened)
++			return;
++
++		if (msg_num != session->local_msg_num)
++			return;
++
++		if (session->local_acked > msg_num)
++			return;
++
++		l_debug("Got ACK %d", msg_num);
++		session->local_acked = msg_num;
++		session->ack_cb(session->user_data, msg_num);
++		break;
++
++	default: /* DATA SEGMENT */
++		if (!session->opened)
++			return;
++
++		if (msg_num == session->last_peer_msg_num) {
++			send_ack(session, msg_num);
++			return;
++		}
++
++		switch(type & 0x03) {
++		case 0x00:
++			session->peer_msg_num = msg_num;
++			session->exp_len = l_get_be16(pkt);
++
++			l_debug("PB-ADV start with %u fragments, %d octets",
++						type >> 2, session->exp_len);
++
++			if (session->exp_len > sizeof(session->sar)) {
++				l_debug("Incoming length exceeded: %d",
++							session->exp_len);
++				return;
++			}
++
++			session->exp_fcs = l_get_u8(pkt + 2);
++			session->exp_segs = 0xff >> (7 - (type >> 2));
++
++			/* Save first segment */
++			memcpy(session->sar, pkt + 3, len - 3);
++			session->got_segs |= 1;
++			break;
++
++		case 0x02:
++			session->peer_msg_num = msg_num;
++			offset = 20 + (((type >> 2) - 1) * 23);
++
++			if (offset + len - 3 > sizeof(session->sar)) {
++				l_debug("Length exceeded: %d",
++							session->exp_len);
++				return;
++			}
++
++			l_debug("Processing fragment %u", type >> 2);
++			memcpy(session->sar + offset, pkt, len);
++			session->got_segs |= 1 << (type >> 2);
++			break;
++
++		default:
++			/* Malformed or unrecognized */
++			return;
++		}
++
++		if (session->got_segs != session->exp_segs)
++			return;
++
++		/* Validate RXed packet and pass up to Provisioning */
++		if (!mesh_crypto_check_fcs(session->sar,
++					session->exp_len,
++					session->exp_fcs)) {
++
++			/* This can be a false negative if first
++			 * segment missed, and can almost always
++			 * be ignored.
++			 */
++
++			l_debug("Invalid FCS");
++			return;
++		}
++
++		if (session->last_peer_msg_num != session->peer_msg_num) {
++			session->got_segs = 0;
++			session->rx_cb(session->user_data, session->sar,
++							session->exp_len);
++		}
++
++		session->last_peer_msg_num = session->peer_msg_num;
++		send_ack(session, session->last_peer_msg_num);
 +	}
- 
--	} else {
--		uint8_t *uuid = node_uuid_get(net->local_node);
--
--		if (!uuid)
--			return false;
-+	if (l_queue_find(nets, is_this_net, net))
++}
++
++bool pb_adv_reg(mesh_prov_open_func_t open_cb, mesh_prov_close_func_t close_cb,
++		mesh_prov_receive_func_t rx_cb, mesh_prov_ack_func_t ack_cb,
++		uint8_t uuid[16], void *user_data)
++{
++	if (pb_session)
 +		return false;
- 
--		mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_BEACON);
--		mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_NET);
-+	l_queue_push_head(nets, net);
- 
--		mesh_prov_listen(net, uuid, (uint8_t *) &net->prov_caps,
--					acceptor_prov_open,
--					acceptor_prov_close,
--					acceptor_prov_receive, net);
--	}
-+	net->io = io;
- 
- 	return true;
- }
-@@ -2952,10 +2948,10 @@ struct mesh_io *mesh_net_detach(struct mesh_net *net)
- 	struct mesh_io *io;
- 	uint8_t type = 0;
- 
--	if (!net)
-+	if (!net || !net->io)
- 		return NULL;
- 
--	io  = net->io;
-+	io = net->io;
- 
- 	mesh_io_send_cancel(net->io, &type, 1);
- 	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_BEACON);
-@@ -2975,7 +2971,7 @@ bool mesh_net_iv_index_update(struct mesh_net *net)
- 	mesh_net_flush_msg_queues(net);
- 	net->iv_upd_state = IV_UPD_UPDATING;
- 	net->iv_index++;
--	if (!storage_local_set_iv_index(net, net->iv_index, IV_UPD_UPDATING))
-+	if (!storage_set_iv_index(net, net->iv_index, IV_UPD_UPDATING))
- 		return false;
- 
- 	l_queue_foreach(net->subnets, set_network_beacon, net);
-@@ -3241,28 +3237,25 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
- 	l_free(str);
- }
- 
--unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
--				uint16_t src, uint16_t dst,
--				uint8_t key_id, uint8_t ttl,
--				uint32_t seq, uint32_t iv_index,
--				bool szmic,
-+bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
-+				uint16_t dst, uint8_t key_id, uint8_t ttl,
-+				uint32_t seq, uint32_t iv_index, bool szmic,
- 				const void *msg, uint16_t msg_len,
- 				mesh_net_status_func_t status_func,
- 				void *user_data)
- {
- 	struct mesh_sar *payload = NULL;
- 	uint8_t seg, seg_max;
--	unsigned int ret = 0;
- 	bool result;
- 
- 	if (!net || msg_len > 384)
--		return 0;
-+		return false;
- 
- 	if (!src)
- 		src = net->src_addr;
- 
- 	if (!src || !dst)
--		return 0;
-+		return false;
- 
- 	if (ttl == 0xff)
- 		ttl = net->default_ttl;
-@@ -3287,7 +3280,7 @@ unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
- 		/* Adjust our seq_num for "virtual" delivery */
- 		net->seq_num += seg_max;
- 		mesh_net_next_seq_num(net);
--		return 0;
-+		return true;
- 	}
- 
- 	/* If Segmented, Cancel any OB segmented message to same DST */
-@@ -3337,29 +3330,13 @@ unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
- 			l_timeout_create(MSG_TO, outmsg_to, net, NULL);
- 		payload->status_func = status_func;
- 		payload->user_data = user_data;
--		ret = payload->id = ++net->sar_id_next;
-+		payload->id = ++net->sar_id_next;
- 	} else
- 		mesh_sar_free(payload);
- 
--	return ret;
--}
--
--void mesh_net_app_send_cancel(struct mesh_net *net, unsigned int id)
--{
--	struct mesh_sar *sar = l_queue_remove_if(net->sar_out, match_sar_id,
--						L_UINT_TO_PTR(id));
--
--	if (sar) {
--		l_info("Canceling OB %d", id);
--		if (sar->status_func)
--			sar->status_func(sar->remote, 2,
--				sar->buf, sar->len - 4,
--				sar->user_data);
--	}
--	mesh_sar_free(sar);
-+	return result;
- }
- 
--/* TODO: add net key index */
- void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
- 				uint32_t iv_index,
- 				uint8_t ttl,
-@@ -3768,40 +3745,9 @@ uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr)
- 		return frnd->poll_timeout;
- }
- 
--bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
--							bool provisioner)
-+struct mesh_node *mesh_net_node_get(struct mesh_net *net)
- {
--	if (net->local_node) {
--		l_info("Local node already registered");
--		return false;
--	}
--
--	net->local_node = node;
--	net->provisioner = provisioner;
--
--	return true;
--}
--
--struct mesh_node *mesh_net_local_node_get(struct mesh_net *net)
--{
--	return  net->local_node;
--}
--
--bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl)
--{
--	if (!net)
--		return false;
--
--	net->crpl = crpl;
--	return true;
--}
--
--uint16_t mesh_net_get_crpl(struct mesh_net *net)
--{
--	if (!net)
--		return 0;
--
--	return net->crpl;
-+	return  net->node;
- }
- 
- struct l_queue *mesh_net_get_app_keys(struct mesh_net *net)
-@@ -3824,41 +3770,6 @@ bool mesh_net_have_key(struct mesh_net *net, uint16_t idx)
- 						L_UINT_TO_PTR(idx)) != NULL);
- }
- 
--bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig)
--{
--	if (!net)
--		return false;
--
--	net->jconfig_local = jconfig;
--	return true;
--}
--
--void *mesh_net_jconfig_get(struct mesh_net *net)
--{
--	if (!net)
--		return NULL;
--
--	return  net->jconfig_local;
--}
--
--bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg)
--{
--	if (!net)
--		return false;
--
--	net->cfg_file = cfg;
--	return true;
--}
--
--bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg)
--{
--	if (!net)
--		return false;
--
--	*cfg = net->cfg_file;
--	return true;
--}
--
- bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr)
- {
- 	if (!net)
-@@ -3919,55 +3830,3 @@ void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov)
- 	net->prov = prov;
- }
- 
--bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
--				uint16_t net_idx,  uint8_t net_key[16],
--				uint16_t unicast, uint16_t snb_flags,
--				uint32_t iv_index, mesh_status_func_t cb,
--				void *user_data)
--{
--	if (net->provisioned || !net->local_node)
--		return false;
--
--	if (!node_set_primary(net->local_node, unicast) ||
--				!(mesh_net_register_unicast(net, unicast,
--						mesh_net_get_num_ele(net))))
--		return false;
--
--	if (!node_set_device_key(net->local_node, device_key))
--		return false;
--
--	net->iv_index = iv_index;
--	net->iv_update = ((snb_flags & 0x02) != 0);
--	if (!storage_local_set_iv_index(net, iv_index, net->iv_update))
--		return false;
--
--	if (mesh_net_add_key(net, false, net_idx, net_key) !=
--							MESH_STATUS_SUCCESS)
--		return false;
--
--	if ((snb_flags & 0x01) &&
--			(mesh_net_add_key(net, true, net_idx, net_key) !=
--							MESH_STATUS_SUCCESS)) {
--		l_queue_clear(net->subnets, l_free);
--		return false;
--	}
--
--	return storage_save_new_config(net, net->cfg_file, cb, user_data);
--
--}
--
--void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned)
--{
--	if (!net)
--		return;
--
--	net->provisioned = provisioned;
--}
--
--bool mesh_net_provisioned_get(struct mesh_net *net)
--{
--	if (!net)
--		return false;
--
--	return net->provisioned;
--}
-diff --git a/mesh/net.h b/mesh/net.h
-index b8eb0699d..c63ea59ee 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -259,9 +259,8 @@ typedef void (*mesh_net_status_func_t)(uint16_t remote, uint8_t status,
- 					void *data, uint16_t size,
- 					void *user_data);
- 
--struct mesh_net *mesh_net_new(uint16_t index);
--struct mesh_net *mesh_net_ref(struct mesh_net *net);
--void mesh_net_unref(struct mesh_net *net);
-+struct mesh_net *mesh_net_new(struct mesh_node *node);
-+void mesh_net_free(struct mesh_net *net);
- void mesh_net_flush_msg_queues(struct mesh_net *net);
- void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update);
- bool mesh_net_iv_index_update(struct mesh_net *net);
-@@ -301,13 +300,12 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
- 				uint32_t seq, uint16_t src, uint16_t dst,
- 				const uint8_t *msg, uint16_t msg_len);
- 
--unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
--				uint16_t src, uint16_t dst, uint8_t key_id,
--				uint8_t ttl, uint32_t seq, uint32_t iv_index,
--				bool szmic, const void *msg, uint16_t msg_len,
-+bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
-+				uint16_t dst, uint8_t key_id, uint8_t ttl,
-+				uint32_t seq, uint32_t iv_index, bool szmic,
-+				const void *msg, uint16_t msg_len,
- 				mesh_net_status_func_t status_func,
- 				void *user_data);
--void mesh_net_app_send_cancel(struct mesh_net *net, unsigned int id);
- void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
- 				uint32_t iv_index, uint8_t ttl, uint32_t seq,
- 				uint16_t src, uint16_t dst, bool rly,
-@@ -363,16 +361,8 @@ void mesh_net_sub_list_add(struct mesh_net *net, uint16_t addr);
- void mesh_net_sub_list_del(struct mesh_net *net, uint16_t addr);
- uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr);
- struct mesh_io *mesh_net_get_io(struct mesh_net *net);
--bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
--							bool provisioner);
--struct mesh_node *mesh_net_local_node_get(struct mesh_net *net);
--bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl);
--uint16_t mesh_net_get_crpl(struct mesh_net *net);
-+struct mesh_node *mesh_net_node_get(struct mesh_net *net);
- bool mesh_net_have_key(struct mesh_net *net, uint16_t net_idx);
--bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig);
--void *mesh_net_jconfig_get(struct mesh_net *net);
--bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg);
--bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg);
- bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr);
- void mesh_net_set_window_accuracy(struct mesh_net *net, uint8_t accuracy);
- void mesh_net_transmit_params_set(struct mesh_net *net, uint8_t count,
-@@ -381,10 +371,3 @@ void mesh_net_transmit_params_get(struct mesh_net *net, uint8_t *count,
- 							uint16_t *interval);
- struct mesh_prov *mesh_net_get_prov(struct mesh_net *net);
- void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov);
--void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned);
--bool mesh_net_provisioned_get(struct mesh_net *net);
--bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
--				uint16_t net_idx,  uint8_t net_key[16],
--				uint16_t unicast, uint16_t snb_flags,
--				uint32_t iv_index, mesh_status_func_t cb,
--				void *user_data);
++
++	pb_session = l_new(struct pb_adv_session, 1);
++	pb_session->open_cb = open_cb;
++	pb_session->close_cb = close_cb;
++	pb_session->rx_cb = rx_cb;
++	pb_session->ack_cb = ack_cb;
++	pb_session->user_data = user_data;
++	memcpy(pb_session->uuid, uuid, 16);
++
++	/* TODO: register PB AD type and Start Beaconing ? */
++	mesh_reg_prov_rx(pb_adv_packet, pb_session);
++
++	return true;
++}
++
++void pb_adv_unreg(void *user_data)
++{
++	if (!pb_session || pb_session->user_data != user_data)
++		return;
++
++	l_timeout_remove(pb_session->tx_timeout);
++	send_close_ind(pb_session, 0);
++	l_free(pb_session);
++	pb_session = NULL;
++}
+diff --git a/mesh/pb-adv.h b/mesh/pb-adv.h
+new file mode 100644
+index 000000000..a5870d5a2
+--- /dev/null
++++ b/mesh/pb-adv.h
+@@ -0,0 +1,23 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++bool pb_adv_reg(mesh_prov_open_func_t open_cb, mesh_prov_close_func_t close_cb,
++		mesh_prov_receive_func_t rx_cb, mesh_prov_ack_func_t ack_cb,
++		uint8_t uuid[16], void *user_data);
++void pb_adv_unreg(void *user_data);
 -- 
 2.14.5
 
