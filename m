@@ -2,243 +2,239 @@ Return-Path: <SRS0=/IWC=O4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5715FC43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 16:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE04C43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 19:20:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24B27217D9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 16:52:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1ECD221841
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 19:20:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EOxKp6Gg"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="asSYRWwR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728994AbeLSQwG (ORCPT
+        id S1729870AbeLSTTx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Dec 2018 11:52:06 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34009 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728802AbeLSQwG (ORCPT
+        Wed, 19 Dec 2018 14:19:53 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:36236 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729703AbeLSTTw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Dec 2018 11:52:06 -0500
-Received: by mail-wr1-f65.google.com with SMTP id j2so20258640wrw.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Dec 2018 08:52:04 -0800 (PST)
+        Wed, 19 Dec 2018 14:19:52 -0500
+Received: by mail-pf1-f193.google.com with SMTP id b85so10277911pfc.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Dec 2018 11:19:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=XhsF65BQSRfMTAEMjbqKS6Uhtnu02UkSTdfBc/tR3i4=;
-        b=EOxKp6Ggf7UPAUlhBXrxhi8iuuaJthMcXMH+RQ4KC0RlhUBMcQh3SEdcnV9EEkfYO9
-         NJWFSGNY6s6vln1zvmCNMI+LAD2/0v/xun7XFfbhKY3+vMdyvbFp8xgSjDmYV2z8O14q
-         67RWuYm5+3UL+AFav5Tmz2z6KWlA0a1M9j6P7K8wpbDqEt3RgQQwbzc4uM45G7Hd6mEr
-         5lFc3Cv65fVNk9NNsy/Bl8eZQXW+TnHaGwQDSo6B6QlTFaxNeHkwVMRXYSsQC77nbyCv
-         Kobv/j1fDj3/E/sc55rzNOdCwO8ZS86id3YMcYlLsiEZmgh1xNj8yaepC1lAP2D9++en
-         7g3g==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=t7rCqin0A4JcGVKgWQDkIVq9x7vm8QhesykNL37gXsw=;
+        b=asSYRWwRMJSHnXfKT72DSTqNaDIkEgbjz3da0Xg1tNVNc8ghEro6v6NHd8gbaT2Chg
+         RM83lyaT3ccxI3J2nQr6M5hTQ4hOi2lkXeO/Hr0fHlpTjQ6YcGXDibYl28FGEcBeysG5
+         zNvRCitSocFZA2q3UWjm0nIxpBHt8P+Ksa+WA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=XhsF65BQSRfMTAEMjbqKS6Uhtnu02UkSTdfBc/tR3i4=;
-        b=HOsXTs4usjiWsp10/EequTvn4FRebIgq2lhNo5LxMopLE1LzE9vJgYbSAZ3nnSf9Hd
-         I9FWpSNBYCNNlW5iLZx/Bn1/e7TpA/IdPnnwk/5nSih3DIxKeYKUg7QLH0so27yU2YJd
-         XI5DEpGXw3L+AmPSkwmt/srDnHOXvTMmKuJo6w+7inr3phgg0CkRdE+Ldj7R0gLq8pyC
-         K/Dfoyq2gAEhdxwg3SoPd61zNs3DtTGB2DQ1xrjL9r7TZXuJohptqnexwEA36cv9zxXO
-         4995tceRXjg6NhjSySr9DRb4akwGfjQWRM9acTL9TvmLJl+mTSQeC+zgk+zBnONjdjkx
-         Wn8g==
-X-Gm-Message-State: AA+aEWYGBedwgAgtxMcV+Oygg1X2ndqivMFoxYgRHGMUbSVAOLXI6XaO
-        Ev7k/vFf8fhwvwllHY348tw+ISu/iY4=
-X-Google-Smtp-Source: AFSGD/WVP7b1eHGcJGwHDOfu/tP+PUNZ1cQNX5qY3UTnMQ7P9tP4u+uxxmUaFP1iR80CoUmYHTmEgg==
-X-Received: by 2002:a5d:628a:: with SMTP id k10mr18791142wru.254.1545238323444;
-        Wed, 19 Dec 2018 08:52:03 -0800 (PST)
-Received: from localhost.localdomain ([2a02:130:501:7::102])
-        by smtp.gmail.com with ESMTPSA id w125sm5613853wmb.45.2018.12.19.08.52.02
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 19 Dec 2018 08:52:02 -0800 (PST)
-From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 10/10] avinfo: Parse information about A2DP codecs: FastStream, aptX Low Latency, aptX HD and LDAC
-Date:   Wed, 19 Dec 2018 17:51:09 +0100
-Message-Id: <20181219165109.29088-11-pali.rohar@gmail.com>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20181219165109.29088-1-pali.rohar@gmail.com>
-References: <20181219165109.29088-1-pali.rohar@gmail.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=t7rCqin0A4JcGVKgWQDkIVq9x7vm8QhesykNL37gXsw=;
+        b=kVzQ6EfD1c3Nn4me4DdABPpGFwSavZ2sr06HI5/edk9EE77jncF8PkYO74CjzBazvn
+         uFvQvlRvEPB2SxSVCbOJibAOWXBbsu50kJ6uSlryT3c7jN+MhXFp9dYPcnQSefc0PLks
+         BATIDWqc1Xe/TLtxFKpj+H0luDiZReWquvO9AtrOQe27mcFunefzvCkefaFJDTV8PI06
+         r287BQHR5woUGGlxGM3cbBk1wNHO/TQvdz+JYOs/1GStYnXD290zRKjRqEHoqLY8HCTR
+         cGWQLQSZ+wQkXaSlAqYTGIWaxB84gZXC6bbT5LU5dckHK4jcKKi8uPTGpMsAggsYkiVc
+         ZIDg==
+X-Gm-Message-State: AA+aEWYRSUgJpP2XE2H2Nw4U+tQwZIJs3gO1dOb+wDNFTn+jI0izGUhG
+        C/HSssW4AVCKijwPNgo7ptBUiG5MNtk=
+X-Google-Smtp-Source: AFSGD/USmI+1+Ht1i8i8cx4RDtjXCfMZrrcwmmIGmgy9vzf6JVMHAgmRDIfYeYuEHH9KkAiCJTXCWg==
+X-Received: by 2002:a62:b9a:: with SMTP id 26mr21860699pfl.196.1545247191201;
+        Wed, 19 Dec 2018 11:19:51 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id 184sm25685654pfe.106.2018.12.19.11.19.50
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 19 Dec 2018 11:19:50 -0800 (PST)
+Date:   Wed, 19 Dec 2018 11:19:49 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Loic Poulain <loic.poulain@linaro.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Brian Norris <briannorris@chromium.org>,
+        Dmitry Grinberg <dmitrygr@google.com>
+Subject: Re: [PATCH RESEND v2 1/3] Bluetooth: Add quirk for reading BD_ADDR
+ from fwnode property
+Message-ID: <20181219191949.GD109358@google.com>
+References: <20181204201615.245574-1-mka@chromium.org>
+ <20181204201615.245574-2-mka@chromium.org>
+ <5F86A55E-2893-4D16-BA5C-36A60CB46DBC@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <5F86A55E-2893-4D16-BA5C-36A60CB46DBC@holtmann.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- tools/avinfo.c | 130 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 129 insertions(+), 1 deletion(-)
+Hi Marcel,
 
-diff --git a/tools/avinfo.c b/tools/avinfo.c
-index 78da0d5d2..9c05eb889 100644
---- a/tools/avinfo.c
-+++ b/tools/avinfo.c
-@@ -4,6 +4,7 @@
-  *
-  *  Copyright (C) 2006-2010  Nokia Corporation
-  *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2018       Pali Rohár <pali.rohar@gmail.com>
-  *
-  *
-  *  This program is free software; you can redistribute it and/or modify
-@@ -195,6 +196,107 @@ static void print_aptx(a2dp_aptx_t *aptx, uint8_t size)
- 	printf("\n");
- }
- 
-+static void print_faststream(a2dp_faststream_t *faststream, uint8_t size)
-+{
-+	printf("\t\tVendor Specific Value (FastStream)");
-+
-+	if (size < sizeof(*faststream)) {
-+		printf(" (broken)\n");
-+		return;
-+	}
-+
-+	printf("\n\t\t\tDirections: ");
-+	if (faststream->direction & FASTSTREAM_DIRECTION_SINK)
-+		printf("sink ");
-+	if (faststream->direction & FASTSTREAM_DIRECTION_SOURCE)
-+		printf("source ");
-+
-+	if (faststream->direction & FASTSTREAM_DIRECTION_SINK) {
-+		printf("\n\t\t\tSink Frequencies: ");
-+		if (faststream->sink_frequency & FASTSTREAM_SINK_SAMPLING_FREQ_44100)
-+			printf("44.1kHz ");
-+		if (faststream->sink_frequency & FASTSTREAM_SINK_SAMPLING_FREQ_48000)
-+			printf("48kHz ");
-+	}
-+
-+	if (faststream->direction & FASTSTREAM_DIRECTION_SOURCE) {
-+		printf("\n\t\t\tSource Frequencies: ");
-+		if (faststream->source_frequency & FASTSTREAM_SOURCE_SAMPLING_FREQ_16000)
-+			printf("16kHz ");
-+	}
-+
-+	printf("\n");
-+}
-+
-+static void print_aptx_ll(a2dp_aptx_ll_t *aptx_ll, uint8_t size)
-+{
-+	a2dp_aptx_ll_new_caps_t *aptx_ll_new;
-+
-+	printf("\t\tVendor Specific Value (aptX Low Latency)");
-+
-+	if (size < sizeof(*aptx_ll)) {
-+		printf(" (broken)\n");
-+		return;
-+	}
-+
-+	printf("\n\t\t\tFrequencies: ");
-+	if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_16000)
-+		printf("16kHz ");
-+	if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_32000)
-+		printf("32kHz ");
-+	if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_44100)
-+		printf("44.1kHz ");
-+	if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_48000)
-+		printf("48kHz ");
-+
-+	printf("\n\t\t\tChannel modes: ");
-+	if (aptx_ll->channel_mode & APTX_LL_CHANNEL_MODE_MONO)
-+		printf("Mono ");
-+	if (aptx_ll->channel_mode & APTX_LL_CHANNEL_MODE_STEREO)
-+		printf("Stereo ");
-+
-+	printf("\n\t\tBidirectional link: %s", aptx_ll->bidirect_link ? "Yes" : "No");
-+
-+	aptx_ll_new = &aptx_ll->new_caps[0];
-+	if (aptx_ll->has_new_caps && size >= sizeof(*aptx_ll) + sizeof(*aptx_ll_new)) {
-+		printf("\n\t\tTarget codec buffer level: %u", (unsigned)aptx_ll_new->target_level2 | ((unsigned)(aptx_ll_new->target_level1) << 8));
-+		printf("\n\t\tInitial codec buffer level: %u", (unsigned)aptx_ll_new->initial_level2 | ((unsigned)(aptx_ll_new->initial_level1) << 8));
-+		printf("\n\t\tSRA max rate: %g", aptx_ll_new->sra_max_rate / 10000.0);
-+		printf("\n\t\tSRA averaging time: %us", (unsigned)aptx_ll_new->sra_avg_time);
-+		printf("\n\t\tGood working codec buffer level: %u", (unsigned)aptx_ll_new->good_working_level2 | ((unsigned)(aptx_ll_new->good_working_level1) << 8));
-+	}
-+
-+	printf("\n");
-+}
-+
-+static void print_aptx_hd(a2dp_aptx_hd_t *aptx_hd, uint8_t size)
-+{
-+	printf("\t\tVendor Specific Value (aptX HD)");
-+
-+	if (size < sizeof(*aptx_hd)) {
-+		printf(" (broken)\n");
-+		return;
-+	}
-+
-+	printf("\n\t\t\tFrequencies: ");
-+	if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_16000)
-+		printf("16kHz ");
-+	if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_32000)
-+		printf("32kHz ");
-+	if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_44100)
-+		printf("44.1kHz ");
-+	if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_48000)
-+		printf("48kHz ");
-+
-+	printf("\n\t\t\tChannel modes: ");
-+	if (aptx_hd->channel_mode & APTX_HD_CHANNEL_MODE_MONO)
-+		printf("Mono ");
-+	if (aptx_hd->channel_mode & APTX_HD_CHANNEL_MODE_STEREO)
-+		printf("Stereo ");
-+
-+	printf("\n");
-+}
-+
- static void print_ldac(a2dp_ldac_t *ldac, uint8_t size)
- {
- 	printf("\t\tVendor Specific Value (LDAC)");
-@@ -204,7 +306,27 @@ static void print_ldac(a2dp_ldac_t *ldac, uint8_t size)
- 		return;
- 	}
- 
--	printf("\n\t\t\tUnknown: %02x %02x", ldac->frequency, ldac->channel_mode);
-+	printf("\n\t\t\tFrequencies: ");
-+	if (ldac->frequency & LDAC_SAMPLING_FREQ_44100)
-+		printf("44.1kHz ");
-+	if (ldac->frequency & LDAC_SAMPLING_FREQ_48000)
-+		printf("48kHz ");
-+	if (ldac->frequency & LDAC_SAMPLING_FREQ_88200)
-+		printf("88.2kHz ");
-+	if (ldac->frequency & LDAC_SAMPLING_FREQ_96000)
-+		printf("96kHz ");
-+	if (ldac->frequency & LDAC_SAMPLING_FREQ_176400)
-+		printf("176.4kHz ");
-+	if (ldac->frequency & LDAC_SAMPLING_FREQ_192000)
-+		printf("192kHz ");
-+
-+	printf("\n\t\t\tChannel modes: ");
-+	if (ldac->channel_mode & LDAC_CHANNEL_MODE_MONO)
-+		printf("Mono ");
-+	if (ldac->channel_mode & LDAC_CHANNEL_MODE_DUAL)
-+		printf("Dual ");
-+	if (ldac->channel_mode & LDAC_CHANNEL_MODE_STEREO)
-+		printf("Stereo ");
- 
- 	printf("\n");
- }
-@@ -236,6 +358,12 @@ static void print_vendor(a2dp_vendor_codec_t *vendor, uint8_t size)
- 
- 	if (vendor_id == APTX_VENDOR_ID && codec_id == APTX_CODEC_ID)
- 		print_aptx((void *) vendor, size);
-+	else if (vendor_id == FASTSTREAM_VENDOR_ID && codec_id == FASTSTREAM_CODEC_ID)
-+		print_faststream((void *) vendor, size);
-+	else if (vendor_id == APTX_LL_VENDOR_ID && codec_id == APTX_LL_CODEC_ID)
-+		print_aptx_ll((void *) vendor, size);
-+	else if (vendor_id == APTX_HD_VENDOR_ID && codec_id == APTX_HD_CODEC_ID)
-+		print_aptx_hd((void *) vendor, size);
- 	else if (vendor_id == LDAC_VENDOR_ID && codec_id == LDAC_CODEC_ID)
- 		print_ldac((void *) vendor, size);
- }
--- 
-2.11.0
+thanks for the review!
 
+On Wed, Dec 19, 2018 at 03:22:12PM +0100, Marcel Holtmann wrote:
+
+> > Add HCI_QUIRK_USE_BDADDR_PROPERTY to allow controllers to retrieve
+> > the public Bluetooth address from the firmware node property
+> > 'local-bd-address'. If quirk is set and the property does not exist
+> > or is invalid the controller is marked as unconfigured.
+> > 
+> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> > Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> > Tested-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> > ---
+> > Changes in v2:
+> > - added check for return value of ->setup()
+> > - only read BD_ADDR from the property if it isn't assigned yet. This
+> >  is needed to support configuration from user space
+> > - refactored the branch of the new quirk to get rid of 'bd_addr_set'
+> > - added 'Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>' tag
+> > ---
+> > include/net/bluetooth/hci.h | 12 ++++++++++
+> > net/bluetooth/hci_core.c    | 45 +++++++++++++++++++++++++++++++++++++
+> > net/bluetooth/mgmt.c        |  6 +++--
+> > 3 files changed, 61 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index c36dc1e20556a..fbba43e9bef5b 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -158,6 +158,18 @@ enum {
+> > 	 */
+> > 	HCI_QUIRK_INVALID_BDADDR,
+> > 
+> > +	/* When this quirk is set, the public Bluetooth address
+> > +	 * initially reported by HCI Read BD Address command
+> > +	 * is considered invalid. The public BD Address can be
+> > +	 * specified in the fwnode property 'local-bd-address'.
+> > +	 * If this property does not exist or is invalid controller
+> > +	 * configuration is required before this device can be used.
+> > +	 *
+> > +	 * This quirk can be set before hci_register_dev is called or
+> > +	 * during the hdev->setup vendor callback.
+> > +	 */
+> > +	HCI_QUIRK_USE_BDADDR_PROPERTY,
+> > +
+> > 	/* When this quirk is set, the duplicate filtering during
+> > 	 * scanning is based on Bluetooth devices addresses. To allow
+> > 	 * RSSI based updates, restart scanning if needed.
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 7352fe85674be..d4149005a661e 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -30,6 +30,7 @@
+> > #include <linux/rfkill.h>
+> > #include <linux/debugfs.h>
+> > #include <linux/crypto.h>
+> > +#include <linux/property.h>
+> > #include <asm/unaligned.h>
+> > 
+> > #include <net/bluetooth/bluetooth.h>
+> > @@ -1355,6 +1356,36 @@ int hci_inquiry(void __user *arg)
+> > 	return err;
+> > }
+> > 
+> > +/**
+> > + * hci_dev_get_bd_addr_from_property - Get the Bluetooth Device Address
+> > + *				       (BD_ADDR) for a HCI device from
+> > + *				       a firmware node property.
+> > + * @hdev:	The HCI device
+> > + *
+> > + * Search the firmware node for 'local-bd-address'.
+> > + *
+> > + * All-zero BD addresses are rejected, because those could be properties
+> > + * that exist in the firmware tables, but were not updated by the firmware. For
+> > + * example, the DTS could define 'local-bd-address', with zero BD addresses.
+> > + */
+> > +static int hci_dev_get_bd_addr_from_property(struct hci_dev *hdev)
+> > +{
+> > +	struct fwnode_handle *fwnode = dev_fwnode(hdev->dev.parent);
+> > +	bdaddr_t ba;
+> > +	int ret;
+> > +
+> > +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
+> > +					    (u8 *)&ba, sizeof(ba));
+> > +	if (ret < 0)
+> > +		return ret;
+> > +	if (!bacmp(&ba, BDADDR_ANY))
+> > +		return -ENODATA;
+> > +
+> > +	hdev->public_addr = ba;
+> 
+> this needs to use bacpy btw.
+
+will change
+
+> > +
+> > +	return 0;
+> > +}
+> 
+> Make this void since the return value is actually not used right now.
+
+ok
+
+> > +
+> > static int hci_dev_do_open(struct hci_dev *hdev)
+> > {
+> > 	int ret = 0;
+> > @@ -1422,6 +1453,20 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+> > 		if (hdev->setup)
+> > 			ret = hdev->setup(hdev);
+> > 
+> > +		if (ret)
+> > +			goto setup_failed;
+> > +
+> > +		if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
+> > +			if (!bacmp(&hdev->public_addr, BDADDR_ANY))
+> > +				hci_dev_get_bd_addr_from_property(hdev);
+> 
+> So I would move the bacmp() into
+> hci_dev_get_bd_addr_from_property. Mainly since you also write the
+> field there.
+
+Personally I'm not a fan of functions that pretend to do something and
+then do it conditionally, IMO it obscures the actual code flow.
+
+I'm open to change it though if you have a strong preference for not
+having the check in hci_dev_do_open().
+
+> > +			if (!bacmp(&hdev->public_addr, BDADDR_ANY) ||
+> > +			    !hdev->set_bdaddr ||
+> > +			    hdev->set_bdaddr(hdev, &hdev->public_addr))
+> > +				hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
+> > +		}
+> 
+> So this one I don’t like since it makes my brain hurt when I have to read it and understand it.
+
+I agree, it's an ugly construct.
+
+> I think this needs to be like this:
+> 
+> 	if (bacmp(&hdev->public_addr, BDADDR_ANY) &&
+> 	    hdev->set_bdaddr)
+> 		ret = hdev->set_bdaddr(hdev, &hdev->public_addr);
+> 	else
+> 		err = -EADDRNOTAVAIL;
+> 
+> That will fail the power on procedure which is the right thing to do if the local-bd-address is not present. The driver decided that it should be in DT and so enforce that.
+
+Ok, will change as suggested.
+
+Thanks
+
+Matthias
