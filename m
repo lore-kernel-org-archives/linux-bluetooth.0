@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB01C43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC764C43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A751A21873
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:21:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C85D421871
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Dec 2018 04:22:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727717AbeLSEVx (ORCPT
+        id S1727718AbeLSEWB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Dec 2018 23:21:53 -0500
-Received: from mga04.intel.com ([192.55.52.120]:4189 "EHLO mga04.intel.com"
+        Tue, 18 Dec 2018 23:22:01 -0500
+Received: from mga04.intel.com ([192.55.52.120]:4230 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727144AbeLSEVx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Dec 2018 23:21:53 -0500
+        id S1727144AbeLSEWB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 Dec 2018 23:22:01 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:21:52 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Dec 2018 20:22:01 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,371,1539673200"; 
-   d="scan'208";a="99820275"
+   d="scan'208";a="99820297"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.192.41])
-  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:21:52 -0800
+  by orsmga007.jf.intel.com with ESMTP; 18 Dec 2018 20:22:00 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v5 22/30] mesh: restructure App Key storage
-Date:   Tue, 18 Dec 2018 20:20:08 -0800
-Message-Id: <20181219042016.25538-23-brian.gix@intel.com>
+Subject: [PATCH BlueZ v5 24/30] mesh: Update for DBus API and multi-node support
+Date:   Tue, 18 Dec 2018 20:20:10 -0800
+Message-Id: <20181219042016.25538-25-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181219042016.25538-1-brian.gix@intel.com>
 References: <20181219042016.25538-1-brian.gix@intel.com>
@@ -46,89 +46,153 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Inga Stotland <inga.stotland@intel.com>
 
 ---
- mesh/appkey.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ mesh/main.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 66 insertions(+), 7 deletions(-)
 
-diff --git a/mesh/appkey.c b/mesh/appkey.c
-index 3d445d217..c4ebf16b6 100644
---- a/mesh/appkey.c
-+++ b/mesh/appkey.c
-@@ -31,7 +31,7 @@
- #include "mesh/node.h"
+diff --git a/mesh/main.c b/mesh/main.c
+index 173f57a8f..95a66cc9d 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -33,11 +33,14 @@
+ #include <sys/stat.h>
+ #include <ell/ell.h>
+ 
++#include <dbus/dbus.h>
++
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+ 
+ #include "mesh/mesh.h"
  #include "mesh/net.h"
- #include "mesh/crypto.h"
--#include "mesh/display.h"
-+#include "mesh/util.h"
- #include "mesh/model.h"
++#include "mesh/dbus.h"
  #include "mesh/storage.h"
- #include "mesh/appkey.h"
-@@ -206,12 +206,12 @@ bool appkey_msg_in_replay_cache(struct mesh_net *net, uint16_t idx,
- 		}
  
- 		if (seq < msg->seq) {
--			l_info("Ignoring packet with lower sequence number");
-+			l_debug("Ignoring packet with lower sequence number");
- 			return true;
- 		}
+ static const struct option main_options[] = {
+@@ -56,12 +59,46 @@ static void usage(void)
+ 	       "\tmeshd [options]\n");
+ 	l_info("Options:\n"
+ 	       "\t--index <hcinum>  Use specified controller\n"
+-	       "\t--config          Configuration file\n"
++	       "\t--config          Configuration directory\n"
+ 	       "\t--nodetach        Run in foreground\n"
+ 	       "\t--debug           Enable debug output\n"
+ 	       "\t--help            Show %s information\n", __func__);
+ }
  
- 		if (seq == msg->seq) {
--			l_info("Message already processed (duplicate)");
-+			l_debug("Message already processed (duplicate)");
- 			return true;
- 		}
++static void do_debug(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
++
++	l_info("%s%s", prefix, str);
++}
++
++static void request_name_callback(struct l_dbus *dbus, bool success,
++					bool queued, void *user_data)
++{
++	l_info("Request name %s",
++		success ? "success": "failed");
++
++	if (success)
++		dbus_init(dbus);
++	else
++		l_main_quit();
++}
++
++static void ready_callback(void *user_data)
++{
++	struct l_dbus *dbus = user_data;
++
++	l_info("D-Bus ready");
++	l_dbus_name_acquire(dbus, BLUEZ_MESH_NAME, false, false, false,
++						request_name_callback, NULL);
++
++}
++
++static void disconnect_callback(void *user_data)
++{
++	l_main_quit();
++}
++
+ static void signal_handler(uint32_t signo, void *user_data)
+ {
+ 	static bool terminated;
+@@ -78,8 +115,9 @@ int main(int argc, char *argv[])
+ {
+ 	int status;
+ 	bool detached = true;
+-	struct bt_mesh *mesh = NULL;
+-	const char *config_file = NULL;
++	bool dbus_debug = false;
++	struct l_dbus *dbus = NULL;
++	const char *config_dir = NULL;
+ 	int index = MGMT_INDEX_NONE;
  
-@@ -302,6 +302,7 @@ bool appkey_key_init(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
- 		return false;
+ 	if (!l_main_init())
+@@ -91,7 +129,7 @@ int main(int argc, char *argv[])
+ 		int opt;
+ 		const char *str;
  
- 	key->net_idx = net_idx;
-+	key->app_idx = app_idx;
+-		opt = getopt_long(argc, argv, "i:c:ndh", main_options, NULL);
++		opt = getopt_long(argc, argv, "i:c:ndbh", main_options, NULL);
+ 		if (opt < 0)
+ 			break;
  
- 	if (key_value && !set_key(key, app_idx, key_value, false))
- 		return false;
-@@ -392,14 +393,14 @@ int appkey_key_add(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
- 			return MESH_STATUS_SUCCESS;
- 
- 		if (!update) {
--			l_info("Failed to add key: index already stored %x",
-+			l_debug("Failed to add key: index already stored %x",
- 				(net_idx << 16) | app_idx);
- 			return MESH_STATUS_IDX_ALREADY_STORED;
+@@ -117,7 +155,10 @@ int main(int argc, char *argv[])
+ 			l_debug_enable("*");
+ 			break;
+ 		case 'c':
+-			config_file = optarg;
++			config_dir = optarg;
++			break;
++		case 'b':
++			dbus_debug = true;
+ 			break;
+ 		case 'h':
+ 			usage();
+@@ -130,7 +171,7 @@ int main(int argc, char *argv[])
  		}
  	}
  
- 	if (!key) {
--		if (l_queue_length(app_keys) <= MAX_APP_KEYS)
-+		if (!(l_queue_length(app_keys) < MAX_APP_KEYS))
- 			return MESH_STATUS_INSUFF_RESOURCES;
+-	if (!mesh_new(index, config_file)) {
++	if (!mesh_init(index, config_dir)) {
+ 		l_error("Failed to initialize mesh");
+ 		status = EXIT_FAILURE;
+ 		goto done;
+@@ -138,6 +179,24 @@ int main(int argc, char *argv[])
  
- 		key = app_key_new();
-@@ -411,7 +412,7 @@ int appkey_key_add(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
- 			return MESH_STATUS_INSUFF_RESOURCES;
- 		}
+ 	umask(0077);
  
--		if (!storage_local_app_key_add(net, net_idx, app_idx, new_key,
-+		if (!storage_app_key_add(net, net_idx, app_idx, new_key,
- 								false)) {
- 			appkey_key_free(key);
- 			return MESH_STATUS_STORAGE_FAIL;
-@@ -424,7 +425,7 @@ int appkey_key_add(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
- 		if (!set_key(key, app_idx, new_key, true))
- 			return MESH_STATUS_INSUFF_RESOURCES;
++	dbus = l_dbus_new_default(L_DBUS_SYSTEM_BUS);
++	if (!dbus) {
++		l_error("unable to connect to D-Bus");
++		status = EXIT_FAILURE;
++		goto done;
++	}
++
++	if (dbus_debug)
++		l_dbus_set_debug(dbus, do_debug, "[DBUS] ", NULL);
++	l_dbus_set_ready_handler(dbus, ready_callback, dbus, NULL);
++	l_dbus_set_disconnect_handler(dbus, disconnect_callback, NULL, NULL);
++
++	if (!l_dbus_object_manager_enable(dbus)) {
++		l_error("Failed to enable Object Manager");
++		status = EXIT_FAILURE;
++		goto done;
++	}
++
+ 	if (detached) {
+ 		if (daemon(0, 0)) {
+ 			perror("Failed to start meshd daemon");
+@@ -149,8 +208,8 @@ int main(int argc, char *argv[])
+ 	status = l_main_run_with_signal(signal_handler, NULL);
  
--		if (!storage_local_app_key_add(net, net_idx, app_idx, new_key,
-+		if (!storage_app_key_add(net, net_idx, app_idx, new_key,
- 								true))
- 			return MESH_STATUS_STORAGE_FAIL;
- 	}
-@@ -457,7 +458,7 @@ int appkey_key_delete(struct mesh_net *net, uint16_t net_idx,
- 	l_queue_remove(app_keys, key);
- 	appkey_key_free(key);
+ done:
+-	mesh_unref(mesh);
+ 	mesh_cleanup();
++	l_dbus_destroy(dbus);
+ 	l_main_exit();
  
--	if (!storage_local_app_key_del(net, net_idx, app_idx))
-+	if (!storage_app_key_del(net, net_idx, app_idx))
- 		return MESH_STATUS_STORAGE_FAIL;
- 
- 	return MESH_STATUS_SUCCESS;
+ 	return status;
 -- 
 2.14.5
 
