@@ -2,112 +2,209 @@ Return-Path: <SRS0=5zPD=O5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FROM,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49BFCC43387
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Dec 2018 07:54:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C5D9C43387
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Dec 2018 08:46:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 046BA21720
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Dec 2018 07:54:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6E8B21741
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Dec 2018 08:46:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=targetsg.onmicrosoft.com header.i=@targetsg.onmicrosoft.com header.b="kB5v9PNk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KLockwgg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730467AbeLTHyD (ORCPT
+        id S1728830AbeLTIqW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Dec 2018 02:54:03 -0500
-Received: from mail-eopbgr60108.outbound.protection.outlook.com ([40.107.6.108]:61536
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729907AbeLTHyC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Dec 2018 02:54:02 -0500
+        Thu, 20 Dec 2018 03:46:22 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:37001 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725771AbeLTIqV (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 20 Dec 2018 03:46:21 -0500
+Received: by mail-qk1-f196.google.com with SMTP id g125so506125qke.4;
+        Thu, 20 Dec 2018 00:46:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=targetsg.onmicrosoft.com; s=selector1-targetsg-com01e;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C5TQxKMiwxUUqBzzUzvk+y30dU8D8Mp44dfT7NXgIQs=;
- b=kB5v9PNkXTm/C5OKA2sAD6fJjIFYl0dwmV0INF57c7X3p7yMmkA8TQqZ51sAU/i2naJftbHp8nAxXwHTuCZLdp/il9Us9xHbaQo6ZMFmdYNtMxWPcfFHCjBS/exVMR2uh0WFkdugupyjQGt0o9DxwnlgLGjOti3SV1BrH0qV/i0=
-Received: from AM0PR02MB3841.eurprd02.prod.outlook.com (52.134.80.26) by
- AM0PR02MB3665.eurprd02.prod.outlook.com (52.133.63.30) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1425.20; Thu, 20 Dec 2018 07:53:59 +0000
-Received: from AM0PR02MB3841.eurprd02.prod.outlook.com
- ([fe80::c54:ab59:4e66:9f94]) by AM0PR02MB3841.eurprd02.prod.outlook.com
- ([fe80::c54:ab59:4e66:9f94%2]) with mapi id 15.20.1425.024; Thu, 20 Dec 2018
- 07:53:59 +0000
-From:   Kai Ruhnau <kai.ruhnau@target-sg.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: AW: Broken "device" privacy for my TI chip
-Thread-Topic: Broken "device" privacy for my TI chip
-Thread-Index: AdSNifJ+UYE5GaWEQKeA1pt1wcpcBgJn8pwAAEOme0A=
-Date:   Thu, 20 Dec 2018 07:53:59 +0000
-Message-ID: <AM0PR02MB384105110097E23AB03EDB85C5BF0@AM0PR02MB3841.eurprd02.prod.outlook.com>
-References: <AM0PR02MB38415BE5FF10D0A6D1469E8AC5A90@AM0PR02MB3841.eurprd02.prod.outlook.com>
- <32DDD430-DD53-4C30-B288-1AE2F58D2EC9@holtmann.org>
-In-Reply-To: <32DDD430-DD53-4C30-B288-1AE2F58D2EC9@holtmann.org>
-Accept-Language: en-US
-Content-Language: de-DE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [217.250.113.163]
-x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;AM0PR02MB3665;6:38T7rMuR18JMVw8qfAjjvvAdYl0SIJQR6qgyFkUOlNKSlPg1RG7ys1VBFZzSEzkA4DYlmgZksq9B3bHFfpj+TDCFrstjuphTXFOJk0SWlnh4/C5SfdsgZVbqnWZZPkirSeXu/djZ5bC1wnf0fmcjTcM1Zrc23jqwjspFiNg4mRnKaov9Bh0a5F8Izd55fUmx1x1rnaE1mueIJJ9HXtuYKeQAMSRLcGPJVpe+04efcD/riOhgvwlLbv+1lHIqT57ZLUapfUVjH9dt/PAtNBBxxIy07JArpvJ9lUMQISidkJdjLtqtBDJ8gyO6ixWOTG8SXoUoHFAxhKzGBsUZix8HUCh21I8tQ6Z9I++ww/z/kctSK9l+PfWZdEwV3WkmEiXuQAqg+IFL3/NoutPVJI1v+UOWKXcg3gLxzTuk5Yp/BaJlnaYyu7DWuCAY3WFCzUy8+OZiFy8nNtNUfSADC13qGQ==;5:6zXZz18oD/5b+Iyb6ybJsfIXhFocZg4mJuulF9HPcORiS//sQ2DQ3Frj4lIUZpeR0b0N/ysPUNcAYlVeEoCi6/V8y4X5ApieiaoGwdzFIVMi7EG9tUoMYoXcW0fBoRTYgD/1lQJ1nMOmaB+Uzrh8nd30uM87khn9v0mTn6LNlTw=;7:dKPc6JXpoxNzE8vuogHhkR2LpGARG4y7uTQMocy74r3r/AXClx2FUt9hIrbEmhqV5uf1dJclFPIIkg/mCf6WSxo+Zoh7jJEO44Bvv7a7NJLCs77UTSfYmcFB23QBDM47ojenah6U/iKnleW/D5/n6Q==
-x-ms-exchange-antispam-srfa-diagnostics: SOS;
-x-ms-office365-filtering-correlation-id: 46e0a6db-37de-47af-650c-08d666504cea
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(7021145)(8989299)(4534185)(7022145)(4603075)(4627221)(201702281549075)(8990200)(7048125)(7024125)(7027125)(7023125)(5600074)(711020)(2017052603328)(7153060)(7193020);SRVR:AM0PR02MB3665;
-x-ms-traffictypediagnostic: AM0PR02MB3665:
-x-microsoft-antispam-prvs: <AM0PR02MB3665315A82648E21774165E4C5BF0@AM0PR02MB3665.eurprd02.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(3230021)(999002)(5005026)(6040522)(2401047)(8121501046)(3231475)(944501520)(52105112)(93006095)(93001095)(3002001)(10201501046)(149066)(150057)(6041310)(20161123560045)(20161123562045)(20161123564045)(2016111802025)(20161123558120)(6043046)(201708071742011)(7699051)(76991095);SRVR:AM0PR02MB3665;BCL:0;PCL:0;RULEID:;SRVR:AM0PR02MB3665;
-x-forefront-prvs: 0892FA9A88
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39830400003)(366004)(376002)(396003)(136003)(346002)(51914003)(189003)(199004)(446003)(11346002)(76176011)(71200400001)(71190400001)(68736007)(186003)(2906002)(6506007)(476003)(7736002)(55016002)(7696005)(26005)(305945005)(6346003)(102836004)(66574012)(105586002)(8936002)(25786009)(106356001)(508600001)(66066001)(74316002)(81166006)(81156014)(8676002)(99286004)(5660300001)(4326008)(14454004)(97736004)(86362001)(316002)(6436002)(486006)(44832011)(14444005)(256004)(6916009)(6116002)(3846002)(53936002)(33656002)(9686003);DIR:OUT;SFP:1102;SCL:1;SRVR:AM0PR02MB3665;H:AM0PR02MB3841.eurprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: target-sg.com does not designate
- permitted sender hosts)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=kai.ruhnau@target-sg.com; 
-x-microsoft-antispam-message-info: VCfCdmHKYt+bf/rHUjZCH1iPjf11CLJBhavHImTpp/qpmnQm8WodIz61aDH6Y4x0fJbX0YHWROO+yPHzBEmMsRcigyGaTOIZkHGee9IQ9oMUuPmKnSjDJWtimAhE20kGb1vFlV6Mxcx+295m/iEg97ePcx9BM+d+SGlbwBhzqg3NM+G/953NsxPN79g/yMBMVyE6/moThtzRZeIVN4J0zjQJTNSNyzdWw0dvyuTzctW0YVnyaKEv2DTqELfF5kQONSd1Ft5hEwlphzlHKYQXwr9RxPAR4hk5Mx/ZudAnNaK1PXr0HX1PzgBb3ibcuXwr
-spamdiagnosticoutput: 1:99
-spamdiagnosticmetadata: NSPM
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=EOwgCUvZ74kmHVV7W4HoF6+v84HqgH+3RyqhHyrdvcg=;
+        b=KLockwgg0k11EZ++bTLxYEUkSjGe3ossmToCnGYIVGz+jFAjgeSZwrh4HkIkBrEnMS
+         cIQQwd8J9XC8OJpd7mdBZv3uqB/tJMrCjEB2AV5O2UwpbtFTtMc4PzdVDjNQnITztAEW
+         FC9NjJWUpP/FS4Nhmy9Xdundv9YRCv6Y8CrTqzF3HVJcg8d98AeCYp74k3RYOW1CspfO
+         0P2YtfpoNx1kzcDOoZmPnNRSAp3OiQTvwB0pJn+lVorTDxCMJHtyALqoqS2zKe6+bSU6
+         kmNp1K33gSiFA8es0O3CAgciUeaQCga8y3J0SDXO6yYxOHt2kCLD84QsYhbBhHpNK2s5
+         /Fgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=EOwgCUvZ74kmHVV7W4HoF6+v84HqgH+3RyqhHyrdvcg=;
+        b=fLBRqHmxRGQkjZTYd/fiQErOyESQ/zNnRk0wufDw8eAi7EQoPniMqNkefBEBcmuSpQ
+         BKjM0VRWSNdkYY89kNW00TmVnhcCUivu7qGeqDB4asvDliMHiK5ldDfukycbPDnmVop7
+         Xf9QSXwAkylxq1YSmZi3ovuZiPBnwywXUnfuOb89y77pLl3x7a5RmokoRANJ7Mp6NO1t
+         HQPZyNCYnYNI6x4Zq93DUCrGkuV5eWdzFxoaRS3HdTLQlVv4TDxpE3Dc/2kiRw7nBcsg
+         RKhLNEbz9MIbUP7qVeSZTKv4Xrek0Ek32rxytzThXA18wS7YHjUMao5F4cURBro6ltB3
+         cudw==
+X-Gm-Message-State: AA+aEWbw6zeIM/v3QRQEad5UxAQG7sLOqZWkiVaBKZyblgqlZ7DCdTCu
+        NvxjjY/YLnAfI21YGeo+ISGKBW+B+3EGhK7hMAA=
+X-Google-Smtp-Source: AFSGD/UdTKm/b7AXjKKoW0pwH6lR1CZD2/dc9enzIpw8qrvY5Nloaq7Tf4zisxqlQAwB75VOoqG+HepV4O8mURh35U4=
+X-Received: by 2002:a37:bd5:: with SMTP id 204mr22232345qkl.242.1545295579755;
+ Thu, 20 Dec 2018 00:46:19 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: target-sg.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46e0a6db-37de-47af-650c-08d666504cea
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Dec 2018 07:53:59.2412
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 52a4fe2f-f30a-452d-90b1-03ecc8ab0c0d
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR02MB3665
+References: <20181117010748.24347-1-rajatja@google.com> <20181121235020.29461-1-rajatja@google.com>
+ <20181121235020.29461-5-rajatja@google.com>
+In-Reply-To: <20181121235020.29461-5-rajatja@google.com>
+Reply-To: rajatxjain@gmail.com
+From:   Rajat Jain <rajatxjain@gmail.com>
+Date:   Thu, 20 Dec 2018 00:46:08 -0800
+Message-ID: <CAA93t1qvPeDDnQ4294kZpfwEbvDMJdx30=aY1SBdx2vVyvzW0g@mail.gmail.com>
+Subject: Re: [PATCH v3 5/5] Bluetooth: btusb: Use the hw_reset method to allow
+ resetting the BT chip
+To:     Rajat Jain <rajatja@google.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Torokhov <dtor@chromium.org>,
+        Alex Hung <alex.hung@canonical.com>,
+        linux-bluetooth@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-usb@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        Dmitry Torokhov <dtor@google.com>, raghuram.hegde@intel.com,
+        chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWFyY2VsLA0KDQo+PiBJ4oCZbSBydW5uaW5nIEJsdWVaIDUuNTAgb24gbXkgZW1iZWRkZWQg
-cGxhdGZvcm0gY29udGFpbmluZyBhbiBPRElOLVcxNjAgV2lGaS9CbHVldG9vdGgtY29tYm8tY2hp
-cCB3aXRoIGEgVEkgQmx1ZXRvb3RoIGNvcmUuIEFmdGVyIHVuLXJlc2V0dGluZyB0aGUgQmx1ZXRv
-b3RoIHBvd2VyIEdQSU8sIEkgcnVuIGBoY2lhdHRhY2gg4oCmIHRleGFzIDExNTIwMCBmbG93YCBh
-bmQgdGhlbiBzdGFydCBibHVldG9vdGhkLiBJbiBgbWFpbi5jb25mYCwgSSBoYXZlIHNldCBgUHJp
-dmFjeT1kZXZpY2VgLg0KPj4NCj4+IFdpdGggdGhpcyBzZXR1cCwgdGhlIGBzZXRfcHJpdmFjeV9j
-b21wbGV0ZWAgKGFkYXB0ZXIuYykgY2FsbGJhY2sgaW4gYmx1ZXRvb3RoZCBpcyBjYWxsZWQgd2l0
-aCBgc3RhdHVzID09IE1HTVRfU1RBVFVTX1JFSkVDVEVEYCBhbmQgYWNjb3JkaW5nIHRvIG15IDQu
-OSBrZXJuZWwsIHRoaXMgaXMgdGhlIGNhc2Ugd2hlbiBgaGRldl9pc19wb3dlcmVkYDogQWZ0ZXIg
-Ym9vdGluZyBhbmQgcnVubmluZyBgaGNpYXR0YWNoYCwgbXkgY2hpcCBpcyBhbHJlYWR5ICJ1cCIg
-YW5kIHRodXMgSSBjYW5ub3Qgc2V0IHRoZSBJUksuDQo+Pg0KPj4gSSBmb3VuZCBpbiBgdGV4YXNf
-cG9zdGAgKGhjaWF0dGFjaF90aS5jKSwgdGhhdCB0aGVyZSdzIGFuIGV4cGxpY2l0IGlvY3RsIHRv
-IEhDSURFVlVQIHRoZSBjaGlwIGF0IHRoZSBlbmQsIHNvIHRoaXMgY29tYmluYXRpb24gY2Fubm90
-IHdvcmsgY29ycmVjdGx5IGF0IHRoZSBtb21lbnQuDQo+Pg0KPj4gRm9yIHRoZSB0aW1lIGJlaW5n
-LCBJIGhhdmUgZXh0ZW5kZWQgbXkgaGNpYXR0YWNoIHN5c3RlbWQgdW5pdCB3aXRoIGBFeGVjU3Rh
-cnRQb3N0PS91c3IvYmluL2hjaWNvbmZpZyBoY2kwIGRvd25gIGFuZCB0aGF0IGZpeGVzIHRoZSBg
-c2V0X3ByaXZhY3lgIGNhbGwgY2hhaW4gd2hlbiBzdGFydGluZyBibHVldG9vdGhkLg0KPg0KPiBz
-dG9wIHVzaW5nIGhjaWF0dGFjaCBhbmQgc3RhcnQgdXNpbmcgc2VyZGV2Lg0KDQpJJ20gc3RpbGwg
-b24gbGludXgtc3RhYmxlIDQuOSwgc28gSSBoYXZlIHRvIHB1dCB0aGF0IG9uIHRoZSBsaXN0IG9m
-IHRoaW5ncyB0aGF0IHdpbGwgYmUgYmV0dGVyIHdoZW4gSSBmaW5kIHRpbWUgdG8gdXBkYXRlLiBU
-aGFua3MgZm9yIHRoZSBwb2ludGVyIQ0KDQpDaGVlcnMsDQpLYWkNCi0tDQpLYWkgUnVobmF1DQpT
-b2Z0d2FyZSBNYW5hZ2VyDQpUOis0OSAyMDIgNzY5MzAyIDE5DQoNClRhcmdldCBTeXN0ZW1lbGVr
-dHJvbmlrIEdtYkggJiBDby4gS0cNCkhlaW56LUZhbmdtYW4tU3RyYcOfZSA0DQo0MjI4NyBXdXBw
-ZXJ0YWwNCg0KQW10c2dlcmljaHQgV3VwcGVydGFsIEhSQSAyMzg5OA0KUGVyc8O2bmxpY2ggaGFm
-dGVuZGUgR2VzZWxsc2NoYWZ0ZXJpbg0KVGFyZ2V0IFN5c3RlbWVsZWt0cm9uaWsgQmV0ZWlsaWd1
-bmdzIEdtYkgNCkhlaW56LUZhbmdtYW4tU3RyYcOfZSA0LCA0MjI4NyBXdXBwZXJ0YWwNCkFtdHNn
-ZXJpY2h0IFd1cHBlcnRhbCBIUkIgMjUzNDYNCkdlc2Now6RmdHNmw7xocmVyOiBKw7xyZ2VuIFN0
-ZWluDQotLQ0K
+On Wed, Nov 21, 2018 at 3:50 PM Rajat Jain <rajatja@google.com> wrote:
+>
+> If the platform provides it, use the reset gpio to reset the BT
+> chip (requested by the HCI core if needed). This has been found helpful
+> on some of Intel bluetooth controllers where the firmware gets stuck and
+> the only way out is a hard reset pin provided by the platform.
+
+Hi Folks,
+
+I was wondering if you got a change to look at this patchset, and if
+there is any feedback.
+
+Thanks,
+
+Rajat
+
+
+>
+> Signed-off-by: Rajat Jain <rajatja@google.com>
+> ---
+> v3: Better error handling for gpiod_get_optional()
+> v2: Handle the EPROBE_DEFER case.
+>
+>  drivers/bluetooth/btusb.c | 40 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+>
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index e8e148480c91..e7631f770fae 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -29,6 +29,7 @@
+>  #include <linux/of_device.h>
+>  #include <linux/of_irq.h>
+>  #include <linux/suspend.h>
+> +#include <linux/gpio/consumer.h>
+>  #include <asm/unaligned.h>
+>
+>  #include <net/bluetooth/bluetooth.h>
+> @@ -475,6 +476,8 @@ struct btusb_data {
+>         struct usb_endpoint_descriptor *diag_tx_ep;
+>         struct usb_endpoint_descriptor *diag_rx_ep;
+>
+> +       struct gpio_desc *reset_gpio;
+> +
+>         __u8 cmdreq_type;
+>         __u8 cmdreq;
+>
+> @@ -490,6 +493,26 @@ struct btusb_data {
+>         int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+>  };
+>
+> +
+> +static void btusb_hw_reset(struct hci_dev *hdev)
+> +{
+> +       struct btusb_data *data = hci_get_drvdata(hdev);
+> +       struct gpio_desc *reset_gpio = data->reset_gpio;
+> +
+> +       /*
+> +        * Toggle the hard reset line if the platform provides one. The reset
+> +        * is going to yank the device off the USB and then replug. So doing
+> +        * once is enough. The cleanup is handled correctly on the way out
+> +        * (standard USB disconnect), and the new device is detected cleanly
+> +        * and bound to the driver again like it should be.
+> +        */
+> +       bt_dev_dbg(hdev, "%s: Initiating HW reset via gpio", __func__);
+> +       clear_bit(HCI_QUIRK_HW_RESET_ON_TIMEOUT, &hdev->quirks);
+> +       gpiod_set_value(reset_gpio, 1);
+> +       mdelay(100);
+> +       gpiod_set_value(reset_gpio, 0);
+> +}
+> +
+>  static inline void btusb_free_frags(struct btusb_data *data)
+>  {
+>         unsigned long flags;
+> @@ -2917,6 +2940,7 @@ static int btusb_probe(struct usb_interface *intf,
+>                        const struct usb_device_id *id)
+>  {
+>         struct usb_endpoint_descriptor *ep_desc;
+> +       struct gpio_desc *reset_gpio;
+>         struct btusb_data *data;
+>         struct hci_dev *hdev;
+>         unsigned ifnum_base;
+> @@ -3030,6 +3054,16 @@ static int btusb_probe(struct usb_interface *intf,
+>
+>         SET_HCIDEV_DEV(hdev, &intf->dev);
+>
+> +       reset_gpio = gpiod_get_optional(&data->udev->dev, "reset",
+> +                                       GPIOD_OUT_LOW);
+> +       if (IS_ERR(reset_gpio)) {
+> +               err = PTR_ERR(reset_gpio);
+> +               goto out_free_dev;
+> +       } else if (reset_gpio) {
+> +               data->reset_gpio = reset_gpio;
+> +               hdev->hw_reset = btusb_hw_reset;
+> +       }
+> +
+>         hdev->open   = btusb_open;
+>         hdev->close  = btusb_close;
+>         hdev->flush  = btusb_flush;
+> @@ -3085,6 +3119,7 @@ static int btusb_probe(struct usb_interface *intf,
+>                 set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+>                 set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+>                 set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+> +               set_bit(HCI_QUIRK_HW_RESET_ON_TIMEOUT, &hdev->quirks);
+>
+>                 if (id->driver_info & BTUSB_INTEL) {
+>                         hdev->setup = btusb_setup_intel;
+> @@ -3225,6 +3260,8 @@ static int btusb_probe(struct usb_interface *intf,
+>         return 0;
+>
+>  out_free_dev:
+> +       if (data->reset_gpio)
+> +               gpiod_put(data->reset_gpio);
+>         hci_free_dev(hdev);
+>         return err;
+>  }
+> @@ -3268,6 +3305,9 @@ static void btusb_disconnect(struct usb_interface *intf)
+>         if (data->oob_wake_irq)
+>                 device_init_wakeup(&data->udev->dev, false);
+>
+> +       if (data->reset_gpio)
+> +               gpiod_put(data->reset_gpio);
+> +
+>         hci_free_dev(hdev);
+>  }
+>
+> --
+> 2.19.1.1215.g8438c0b245-goog
+>
