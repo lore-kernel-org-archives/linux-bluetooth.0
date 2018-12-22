@@ -4,232 +4,148 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA909C43387
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Dec 2018 00:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7271C43387
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Dec 2018 01:59:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE46E2190A
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Dec 2018 00:31:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A96C02192C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Dec 2018 01:59:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="mfOVyahx"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KLujoqmz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403821AbeLVAbS (ORCPT
+        id S1725891AbeLVB7t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Dec 2018 19:31:18 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:46242 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390865AbeLVAbS (ORCPT
+        Fri, 21 Dec 2018 20:59:49 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:36071 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725812AbeLVB7t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Dec 2018 19:31:18 -0500
-Received: by mail-pg1-f193.google.com with SMTP id w7so3175109pgp.13
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Dec 2018 16:31:17 -0800 (PST)
+        Fri, 21 Dec 2018 20:59:49 -0500
+Received: by mail-pl1-f194.google.com with SMTP id g9so3258632plo.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Dec 2018 17:59:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=p+1BizQ1dU0KK9WderA0aAUU6w8Amm/sQxiieLd0kDU=;
-        b=mfOVyahx1bQ48yACVmHVxy8RqHH4vHpi8VrXsmsFY70yRT0DBHkVy68hc+v7+LdLQc
-         YQxHiFqDk4J0jcQ2TmRafG6vzzueT0wNmzBn3ab07Df9xXjwaXRTFP2ZBtMs5AhRGnpT
-         CprNPDWDyzKl8ykA56x9+HMd3dl4YvqrT9zcM=
+        bh=y9j/0ZCEHfNjripmRqToTQAHB6Hfe0JOyVyQTlDXgmY=;
+        b=KLujoqmzLUIixdu3As/inbuiaG4jgO8QEa7/AHAz2tUr6Svc+5DGlwdxqvNhynd3iS
+         5Ens+u1DlUEuIGssUz54DRYJxKuaQ4sHFPTE8J1MxsCAC/m6k/I+VDJ7LSTeTJmy8Fhc
+         8oDLwiyXgh8aHgx8W9qLEjucLpmR9Aa73r4/I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=p+1BizQ1dU0KK9WderA0aAUU6w8Amm/sQxiieLd0kDU=;
-        b=VqIavBQtZi/ge4HLl4SpoUL7tJo5BkDUPlr2wbIgWiKrbMzPCtmTngN9LZXpPaVNsd
-         jvNYiIbcPVGGHx3NEclGZaYFRGBKa+r8f+NUZijjILsQ8dpblN+/nlWmCjGZrJWT5B1H
-         y0y1nmmE3e6U0dW6ZC9L9jlIaJLhz8KxbpWZA+uDlC5uJLx7cZmt+SACuJ1jluk93TnR
-         k1cfyfRuua7AgaY7BkqwAWOWPMzWa8AM7gD2rZBE2tiz0d1Nh3ir03Odl5+XPbQsSosf
-         wgCHQC2/CLZMwxxXjmUpzpPcvJir1kRotQ+Nsd9PQTaTrLydNdHmrUAulcoiKDVSa8xB
-         C80Q==
-X-Gm-Message-State: AJcUuke1C0jAgYuNo5Jtyr9Aws//gPxNA/usGkCmpv3BLimqYPMWLEC2
-        gziIhhvjb1ikTD/uoutOjk/CJg==
-X-Google-Smtp-Source: ALg8bN7jxNw2GkQh8FWeHh+29SIOu7Q13ngpszvssklwhNs7ulCc1uqkq3bjRzSlIGjgkp1SOC8gpA==
-X-Received: by 2002:a63:184a:: with SMTP id 10mr4346194pgy.81.1545438677396;
-        Fri, 21 Dec 2018 16:31:17 -0800 (PST)
+        bh=y9j/0ZCEHfNjripmRqToTQAHB6Hfe0JOyVyQTlDXgmY=;
+        b=sqBTnUgw/fZF5a/W2S3mC0srEU1FOd1mOR7O7DcFP486ab9iJ7TznJkcARfPhoDoUV
+         X/8ZnGqlZY6YMk6XZpXn7EcR06ypQ3G3DdA3PJHGpE9unUT7WFfXJKG4me2HPR6r67Fx
+         BZh9Pw814jGzOCTUj3e9hp+jVZ8YsIh4nka1e9aornRAcYtpP4G3oL9bh9O/DeKijB7I
+         ZBsBsGLB5ZjD5XWQFGxZrUCiBHfXRK23QNu/LLiaHcEUZrFqh393szqNP3wVrCk9Iggq
+         +NIt/2vQ2xqDkb/Cs53VPUikqvtDUNCRvgmgLRkeFsZx5+TWq8jh33yw/u8eSxbJE9Bb
+         SPNg==
+X-Gm-Message-State: AJcUuke7ZT9JqazZ6sLeWxd3iqpK80GTHKX8rq00si5TPScU+ds+KmAB
+        3NSKYBPsZYjEPrpwfR0Ln3sOrg==
+X-Google-Smtp-Source: ALg8bN6DhafH1HbNSg/7NZoyce0De0wNXprA1421sC2oCMDU2/a+iTCZkVFW1LNvHi9Cj+fkSM5lfA==
+X-Received: by 2002:a17:902:7b88:: with SMTP id w8mr4794527pll.320.1545443988779;
+        Fri, 21 Dec 2018 17:59:48 -0800 (PST)
 Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id g11sm34089874pfo.139.2018.12.21.16.31.16
+        by smtp.gmail.com with ESMTPSA id o13sm35780703pfk.57.2018.12.21.17.59.47
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 21 Dec 2018 16:31:16 -0800 (PST)
-Date:   Fri, 21 Dec 2018 16:31:16 -0800
+        Fri, 21 Dec 2018 17:59:47 -0800 (PST)
+Date:   Fri, 21 Dec 2018 17:59:47 -0800
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v5 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate
- change command
-Message-ID: <20181222003116.GE261387@google.com>
+Subject: Re: [PATCH v5 1/5] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+Message-ID: <20181222015947.GF261387@google.com>
 References: <20181220144639.15928-1-bgodavar@codeaurora.org>
- <20181220144639.15928-3-bgodavar@codeaurora.org>
+ <20181220144639.15928-2-bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20181220144639.15928-3-bgodavar@codeaurora.org>
+In-Reply-To: <20181220144639.15928-2-bgodavar@codeaurora.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Dec 20, 2018 at 08:16:36PM +0530, Balakrishna Godavarthi wrote:
-> This patch will help to stop frame reassembly errors while changing
-> the baudrate. This is because host send a change baudrate request
-> command to the chip with 115200 bps, Whereas chip will change their
-> UART clocks to the enable for new baudrate and sends the response
-> for the change request command with newer baudrate, On host side
-> we are still operating in 115200 bps which results of reading garbage
-> data. Here we are pulling RTS line, so that chip we will wait to send data
-> to host until host change its baudrate.
+On Thu, Dec 20, 2018 at 08:16:35PM +0530, Balakrishna Godavarthi wrote:
+> wcn3990 requires a power pulse to turn ON/OFF along with
+> regulators. Sometimes we are observing the power pulses are sent
+> out with some time delay, due to queuing these commands. This is
+> causing synchronization issues with chip, which intern delay the
+> chip setup or may end up with communication issues.
 > 
 > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> Tested-by: Matthias Kaehlcke <mka@chromium.org>
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 > ---
->  drivers/bluetooth/hci_qca.c | 24 +++++++++++++-----------
->  1 file changed, 13 insertions(+), 11 deletions(-)
+>  drivers/bluetooth/hci_qca.c | 38 ++++++++++++++-----------------------
+>  1 file changed, 14 insertions(+), 24 deletions(-)
 > 
 > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 5a07c2370289..1680ead6cc3d 100644
+> index f036c8f98ea3..5a07c2370289 100644
 > --- a/drivers/bluetooth/hci_qca.c
 > +++ b/drivers/bluetooth/hci_qca.c
-> @@ -963,7 +963,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  	struct hci_uart *hu = hci_get_drvdata(hdev);
->  	struct qca_data *qca = hu->priv;
->  	struct sk_buff *skb;
-> -	struct qca_serdev *qcadev;
->  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
->  
->  	if (baudrate > QCA_BAUDRATE_3200000)
-> @@ -977,13 +976,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  		return -ENOMEM;
->  	}
->  
-> -	/* Disabling hardware flow control is mandatory while
-> -	 * sending change baudrate request to wcn3990 SoC.
-> -	 */
-> -	qcadev = serdev_device_get_drvdata(hu->serdev);
-> -	if (qcadev->btsoc_type == QCA_WCN3990)
-> -		hci_uart_set_flow_control(hu, true);
-> -
->  	/* Assign commands to change baudrate and packet type. */
->  	skb_put_data(skb, cmd, sizeof(cmd));
->  	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-> @@ -999,9 +991,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
->  	set_current_state(TASK_RUNNING);
->  
-> -	if (qcadev->btsoc_type == QCA_WCN3990)
-> -		hci_uart_set_flow_control(hu, false);
-> -
->  	return 0;
+> @@ -1013,11 +1013,9 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>  		hci_uart_set_baudrate(hu, speed);
 >  }
 >  
-> @@ -1086,6 +1075,7 @@ static int qca_check_speeds(struct hci_uart *hu)
->  static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+> -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+> +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
 >  {
->  	unsigned int speed, qca_baudrate;
-> +	struct qca_serdev *qcadev;
->  	int ret;
+> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+> -	struct qca_data *qca = hu->priv;
+> -	struct sk_buff *skb;
+> +	int ret;
 >  
->  	if (speed_type == QCA_INIT_SPEED) {
-> @@ -1097,6 +1087,15 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  		if (!speed)
->  			return 0;
+>  	/* These power pulses are single byte command which are sent
+>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+> @@ -1029,19 +1027,16 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>  	 * save power. Disabling hardware flow control is mandatory while
+>  	 * sending power pulses to SoC.
+>  	 */
+> -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+> -
+> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+> -	if (!skb)
+> -		return -ENOMEM;
+> -
+> +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
+>  	hci_uart_set_flow_control(hu, true);
+> +	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
+> +	if (ret < 0) {
+> +		bt_dev_err(hu->hdev, "failed to send power pulse %02x to SoC",
+> +			   cmd);
+> +		return ret;
+> +	}
 >  
-> +		/* Deassert RTS while changing the baudrate of chip and host.
-> +		 * This will prevent chip from transmitting its response with
-> +		 * the new baudrate while the host port is still operating at
-> +		 * the old speed.
-> +		 */
-> +		qcadev = serdev_device_get_drvdata(hu->serdev);
-> +		if (qcadev->btsoc_type == QCA_WCN3990)
-> +			serdev_device_set_rts(hu->serdev, false);
-> +
->  		qca_baudrate = qca_get_baudrate_value(speed);
->  		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
->  		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
-> @@ -1104,6 +1103,9 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  			return ret;
->  
->  		host_set_baudrate(hu, speed);
-> +
-> +		if (qcadev->btsoc_type == QCA_WCN3990)
-> +			serdev_device_set_rts(hu->serdev, true);
->  	}
->  
->  	return 0;
+> -	skb_put_u8(skb, cmd);
+> -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+> -
+> -	skb_queue_tail(&qca->txq, skb);
+> -	hci_uart_tx_wakeup(hu);
+> +	serdev_device_wait_until_sent(hu->serdev, 0);
 
-I looked for ways to do without this change, but didn't find a good
-solution. There are several possible problems with baudrate changes:
+serdev_device_wait_until_sent() might only guarantee that the UART
+circular buffer is empty (see
+https://elixir.bootlin.com/linux/v4.19/source/drivers/tty/tty_ioctl.c#L225),
+not that the data has actually sent (e.g. it might be sitting in
+the UART FIFO). However with this:
 
-1) send request to BT controller to change the baudrate
+>  	/* Wait for 100 uS for SoC to settle down */
+>  	usleep_range(100, 200);
 
-  this is an asynchronous operation, the actual baudrate change can
-  be delayed for multiple reasons, e.g.:
+we should probably be fine, unless there's tons of data in the
+FIFO.
 
-  - request sits in the BT driver's TX queue
-
-    this could be worked around by checking skb_queue_empty()
-
-  - request sits in the UART buffer
-
-    a workaround for this could be calling
-    serdev_device_wait_until_sent() (only available with serdev though)
-
-  - the request sits in the UART FIFO
-
-    will be sent out 'immediately'. no neat solution available AFAIK,
-    a short sleep could be an effective workaround
-
-  - the controller may have a short delay to apply the change
-
-    Also no neat solution here. A/the same short sleep could work
-    around this
-
-2) change baudrate of the host UART
-  - this must not happen before the baudrate change request has been
-    sent to the BT controller, otherwise things are messed up
-    seriously
-
-    Ideally set_termios would make sure all pending data is sent
-    before the change is applied, some UART drivers do this, others
-    don't, so we can't rely on this.
-
-3) BT controller sends data after baudrate change
-
-  a few ms after a baudrate change the BT controller sends data
-  (4, 255, 2, 146, 1, 4, 14, 4, 1, 0, 0, 0) with the new baudrate
-
-  - dunno what the data stands for, but the BT stack/driver appears to
-    be fine with it, as long as the host UART operates at the new
-    baudrate when the data is received.
-
-  - if the data is received before the baudrate of the host UART is
-    changes we see 'frame reassembly' errors
-
-
-In summary, I think it should be feasible to guarantee that the
-baudrate change of the host UART is always done after the controller
-changed it's baudrate, however we can't guarantee at the same time
-that the baudrate change of the host controller is completed before
-the BT controller sends its 'response'.
-
-Using the RTS signal seems a reasonable way to delay the controller
-data until the host is ready, the only thing I don't like too much
-is that in this patch set we currently have two mechanisms to
-suppress/delay unwanted data. Unfortunately the RTS method isn't
-effective at initialization time.
-
-Not the scope of this patch set, but I really dislike the 300 ms delay
-(BAUDRATE_SETTLE_TIMEOUT_MS) in qca_set_baudrate(), and wonder if it
-is actually needed (I seriously doubt that it takes the BT controller
-300 ms to change its baudrate). I guess it's more a combination of what I
-described above in 1), once we are done with this series I might try
-to improve this, unless somebody is really, really convinced that such
-a gigantic delay is actually needed.
+You currently call serdev_device_write_flush() in
+qca_power_shutdown(), I wonder if it would make sense to call it in
+qca_send_power_pulse(), regardless of whether it's an on or off
+pulse. In any case we don't care if the chip receives any 'pending'
+data when we switch it on or off, right?
 
 Cheers
 
