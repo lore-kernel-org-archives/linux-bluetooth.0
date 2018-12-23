@@ -1,456 +1,168 @@
-Return-Path: <SRS0=1nTO=O7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=7VLe=PA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C550C43387
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Dec 2018 23:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83948C43387
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Dec 2018 09:30:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3CC39218E0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Dec 2018 23:04:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4843A218FD
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Dec 2018 09:30:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKrA/ZuJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="koVOb0Dd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730558AbeLVXEe (ORCPT
+        id S1727147AbeLWJac (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 22 Dec 2018 18:04:34 -0500
-Received: from mail-ot1-f45.google.com ([209.85.210.45]:37426 "EHLO
-        mail-ot1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725937AbeLVXEe (ORCPT
+        Sun, 23 Dec 2018 04:30:32 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:50458 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727117AbeLWJab (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 22 Dec 2018 18:04:34 -0500
-Received: by mail-ot1-f45.google.com with SMTP id 40so8331176oth.4
-        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Dec 2018 15:04:33 -0800 (PST)
+        Sun, 23 Dec 2018 04:30:31 -0500
+Received: by mail-wm1-f66.google.com with SMTP id n190so9021597wmd.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Dec 2018 01:30:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=l17be5uc9Xrk0ALe+IieWWmNQlQupzPwdOdQApZF9ig=;
-        b=XKrA/ZuJe/nL1yYZ4zyHKwZoi911TOHYGe0kAeOigOyJn7nBH69qcSivYImJF0vY+1
-         2Yyp/Ium6XG8/viFpF/VY8PRigeusqvkjOGi9PUlFAGMl8lD/vkUYWsDKKa6LiUDkdb3
-         UZnYh2Szlw0oai79L9znmdRMQMihlxeFrXnmQ6vRkaeMz63ZzxedqjbA5QK+tsDBe0SM
-         /1dHTWKd+kVRXHCK73gc3GA46WnlOpqG79BC0VG2B7wCn3byIEuIB9gX/eWSg7ac/Ktz
-         8vJTmoTLw00TosK7dCLbDYMjgFHlAC0EKTBYKoHvGzVtg3K2aZTTbb/ULoAQVqCzHtjz
-         S++Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=mgejcjmr1AqK2ft35RLWN3ZW1MAUM9YRSmQpmiQ1/A4=;
+        b=koVOb0DdAUDtqNCQEMpS9GHfQKnN333GE+0e53wdWQIU50M102e4sbY5jRaehMZoKD
+         z0A324ynfdt4qsxZZRj7wetvIG/TxrTWaIlx1FMjJ5tVbogiFyqHSLjx5lO2lnSpL1El
+         nNaMR54nRcXR/LVTK0Q/D1Jd8o5wEhAkq1DirqGdeA8JKoyXszZg1xfy+4TpNwZQSgeH
+         7T9rqrtoJGDV2gPIM6xTzD0rjcQUQMIAQ+KQyuAiVv2KKFr6TxvkOsn2LT28oMRSnx2S
+         CD8woBN5IgVEbjL98RC7hAPKrAfIPXMvduRPw6APGhyrCi/OfGC0RnkRUB2895yMU3HN
+         81XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=l17be5uc9Xrk0ALe+IieWWmNQlQupzPwdOdQApZF9ig=;
-        b=Z0ai04LxLmjCvzzHiyxcEOwHVjXkdUyOPQE2oBjSG4aHFgMns0H/ZGNT3668vKL8Pj
-         pFzAVO1qBS6XrnLkCdPz4jcrB+VqfI9Taso3VoEPUAaoInvFX2ecGr6kmgnSV+j/yLmQ
-         fgxSDynOBtarCjPFP8TueGZzpIWetSEsrQ2LE4Mh/Mj433RWCGnlD+3XWR1GkJrd+uX+
-         HWQoOk8lAymGXMIW4Fgv23DVGz9EuocmPRxZ0A/BG1nMqkVgy9s/EbRpz51KV895RfSv
-         +LlGiO4BHH7+Thgg/hzVbXaQvnADpdK+xO7sfS9eR5nTLt8foLoHJ97OTiv4MlXd9b14
-         e4Ew==
-X-Gm-Message-State: AJcUukclqFU9PV3n1rq2xXFaZEImzcAdAM54YIe31OUx5AG3oMOM0oNl
-        rifsUaZhDAM/b0zbONWbux+jdX8ThYu45/94Fc4=
-X-Google-Smtp-Source: ALg8bN4EnIaut2B1fU01QYoIEvI6BLDdnIA8dueXHt0R2W2TV8xXMTmoRlB5XLLCNII6gFlv1qNBrJ3WnegJBLQ60RU=
-X-Received: by 2002:a9d:4c01:: with SMTP id l1mr5369010otf.242.1545519873029;
- Sat, 22 Dec 2018 15:04:33 -0800 (PST)
-MIME-Version: 1.0
-References: <20181219211735.17563-1-pali.rohar@gmail.com>
-In-Reply-To: <20181219211735.17563-1-pali.rohar@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sat, 22 Dec 2018 20:04:21 -0300
-Message-ID: <CABBYNZ+ntTPASbv4434zJf7q_KRtiGbduSORbhNoC__ihZW-cA@mail.gmail.com>
-Subject: Re: [PATCH] btmon: Parse information about A2DP codecs: FastStream,
- aptX Low Latency and aptX HD
-To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=mgejcjmr1AqK2ft35RLWN3ZW1MAUM9YRSmQpmiQ1/A4=;
+        b=SjVsHtp4+WL/OefacjkAhklypxLG1b9YMJgcF1VtlzduolKwSws6gOS9n22akPdgRc
+         GWK+Fze5DW3C9FLaSJvbGEfK7bKQgnXTT6XOvwqiNGmjRLHn3siC6Ipci8MJKAOtDcmx
+         6g9E/+a5AgaIGAXd/Im/eOM39l8gkXipGpiAXeKegIcKMTwtX8p0KaCypJdOnAY9bdhA
+         Wx1GRTCqDLoEt/1wiJFJx0IHN2OQ4QHeOnaKw8px1J9vM7fQHwrHphOBiBLIcGn5f3WY
+         y/nFXylPyBs7ucCZHDb+dri9/7S0B30SOOUHvVam+nxVBJNJWp+fFSYt45Z9WSqUSO0e
+         tJXg==
+X-Gm-Message-State: AJcUuke847DhqtSHo1/SK/4arQ3yioTGd9ZyP08vuInB3sQ3qilUfMJv
+        zZEeH7FHys0u5Rd2VYcmde4=
+X-Google-Smtp-Source: AFSGD/XOQmrL5WWDeYYCp0ds1Qn8k6Q3+PnAVqkA2eFJsBFcqrCIVI7kxsqtK0aJngk3Pu6R7RiP+g==
+X-Received: by 2002:a1c:2d42:: with SMTP id t63mr9211910wmt.9.1545557428793;
+        Sun, 23 Dec 2018 01:30:28 -0800 (PST)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id t76sm24614249wme.33.2018.12.23.01.30.27
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 23 Dec 2018 01:30:28 -0800 (PST)
+Date:   Sun, 23 Dec 2018 10:30:27 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 00/10] A2DP: Fix endianity and define new A2DP codecs
+Message-ID: <20181223093027.usl6jemzla3kmo7y@pali>
+References: <20181219165109.29088-1-pali.rohar@gmail.com>
+ <CABBYNZ+ryN3zywdsFQTguJWZ8jSYSOTT7OghxGVZ6wpoYh_QTQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="p722ahk4crmizpkz"
+Content-Disposition: inline
+In-Reply-To: <CABBYNZ+ryN3zywdsFQTguJWZ8jSYSOTT7OghxGVZ6wpoYh_QTQ@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pali,
 
-On Wed, Dec 19, 2018 at 7:17 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrot=
-e:
->
-> ---
+--p722ahk4crmizpkz
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The commit message should be formated to fit in 80 columns including
-the spaces/tabs added by the likes of git shortlog, you can probably
-move part of the subject like to the actual description.
+On Saturday 22 December 2018 19:54:48 Luiz Augusto von Dentz wrote:
+> Hi Pali,
+>=20
+> On Wed, Dec 19, 2018 at 5:17 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wr=
+ote:
+> >
+> > This patch series try to fix endianity problems in a2dp-codecs.h file,
+> > then fixes parsing MPEG bit rate values, extend a2dp-codecs.h file for
+> > new A2DP codecs FastStream, aptX Low Latency, aptX HD and finally adds
+> > support for parsing information about FastStream, aptX Low Latency,
+> > aptX HD and LDAC codecs in avinfo utility.
+> >
+> > Pali Roh=C3=A1r (10):
+> >   avinfo: Fix buffer overflow when parsing broken/malicious data
+> >   avinfo: Show Vendor Specific Data
+> >   a2dp-codecs: Add SBC prefix for MIN/MAX_BITPOOL constants
+> >   a2dp-codecs: Fix codec id for ATRAC
+> >   a2dp-codecs & avinfo: Fix parsing MPEG bit rate values
+> >   a2dp-codecs: Define a2dp_vendor_codec_t struct in endian neutral way
+> >   a2dp-codecs: Add needed includes and properly check for endian macros
+> >   a2dp-codecs: Properly define macros and struct for LDAC codec
+> >   a2dp-codecs: Add macros and structures for FastStream, aptX Low
+> >     Latency and aptX HD codecs
+> >   avinfo: Parse information about A2DP codecs: FastStream, aptX Low
+> >     Latency, aptX HD and LDAC
+> >
+> >  android/a2dp.c               |   8 +-
+> >  android/avdtp.c              |   4 +-
+> >  android/hal-audio-aptx.c     |  15 +-
+> >  android/hal-audio-sbc.c      |  12 +-
+> >  profiles/audio/a2dp-codecs.h | 256 ++++++++++++++++++++++++++----
+> >  profiles/audio/a2dp.c        |   8 +-
+> >  tools/avinfo.c               | 362 +++++++++++++++++++++++++++++++++++=
++-------
+> >  7 files changed, 551 insertions(+), 114 deletions(-)
+> >
+> > --
+> > 2.11.0
+>=20
+> gitlint: checking commit message...
+> 3: B6 Body message is missing
+> -----------------------------------------------
+> gitlint: \033[31mYour commit message contains the above violations.\033[0m
+>=20
+> Please add description to the commit messages.
 
->  monitor/a2dp.c | 230 +++++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->  1 file changed, 230 insertions(+)
->
-> diff --git a/monitor/a2dp.c b/monitor/a2dp.c
-> index 6a271217b..6e82500d4 100644
-> --- a/monitor/a2dp.c
-> +++ b/monitor/a2dp.c
-> @@ -3,6 +3,7 @@
->   *  BlueZ - Bluetooth protocol stack for Linux
->   *
->   *  Copyright (C) 2015  Andrzej Kaczmarek <andrzej.kaczmarek@codecoup.pl=
->
-> + *  Copyright (C) 2018  Pali Roh=C3=A1r <pali.rohar@gmail.com>
->   *
->   *
->   *  This library is free software; you can redistribute it and/or
-> @@ -51,6 +52,12 @@
->  /* Vendor Specific A2DP Codecs */
->  #define APTX_VENDOR_ID         0x0000004f
->  #define APTX_CODEC_ID          0x0001
-> +#define FASTSTREAM_VENDOR_ID   0x0000000a
-> +#define FASTSTREAM_CODEC_ID    0x0001
-> +#define APTX_LL_VENDOR_ID      0x0000000a
-> +#define APTX_LL_CODEC_ID       0x0002
-> +#define APTX_HD_VENDOR_ID      0x000000D7
-> +#define APTX_HD_CODEC_ID       0x0024
->  #define LDAC_VENDOR_ID         0x0000012d
->  #define LDAC_CODEC_ID          0x00aa
->
-> @@ -187,6 +194,23 @@ static const struct bit_desc aptx_channel_mode_table=
-[] =3D {
->         { }
->  };
->
-> +static const struct bit_desc faststream_direction_table[] =3D {
-> +       {  0, "Sink" },
-> +       {  1, "Source" },
-> +       { }
-> +};
-> +
-> +static const struct bit_desc faststream_sink_frequency_table[] =3D {
-> +       {  1, "44100" },
-> +       {  0, "48000" },
-> +       { }
-> +};
-> +
-> +static const struct bit_desc faststream_source_frequency_table[] =3D {
-> +       {  5, "16000" },
-> +       { }
-> +};
-> +
->  static void print_value_bits(uint8_t indent, uint32_t value,
->                                                 const struct bit_desc *ta=
-ble)
->  {
-> @@ -215,6 +239,12 @@ static const char *vndcodec2str(uint32_t vendor_id, =
-uint16_t codec_id)
->  {
->         if (vendor_id =3D=3D APTX_VENDOR_ID && codec_id =3D=3D APTX_CODEC=
-_ID)
->                 return "aptX";
-> +       else if (vendor_id =3D=3D FASTSTREAM_VENDOR_ID && codec_id =3D=3D=
- FASTSTREAM_CODEC_ID)
-> +               return "FastStream";
-> +       else if (vendor_id =3D=3D APTX_LL_VENDOR_ID && codec_id =3D=3D AP=
-TX_LL_CODEC_ID)
-> +               return "aptX Low Latency";
-> +       else if (vendor_id =3D=3D APTX_HD_VENDOR_ID && codec_id =3D=3D AP=
-TX_HD_CODEC_ID)
-> +               return "aptX HD";
->         else if (vendor_id =3D=3D LDAC_VENDOR_ID && codec_id =3D=3D LDAC_=
-CODEC_ID)
->                 return "LDAC";
+What should I put into those commit messages? I think that those changes
+without commit body are such small, that commit title describes them.+
 
-I wonder if it wouldn't be better to have a table with these as well,
-so we define a struct with vendor id, codec id and string name.
+> Also there seems to be
+> several problems with codying style like the following:
+>=20
+> Applying: avinfo: Fix buffer overflow when parsing broken/malicious data
+> WARNING:UNSPECIFIED_INT: Prefer 'unsigned int' to bare use of 'unsigned'
+> #77: FILE: tools/avinfo.c:241:
+> +    unsigned freq, bitrate;
+>=20
+> WARNING:LONG_LINE: line over 80 characters
+> #124: FILE: tools/avinfo.c:433:
+> +static void print_media_codec(struct avdtp_media_codec_capability
+> *cap, uint8_t size)
+>=20
+> WARNING:LONG_LINE: line over 80 characters
+> #182: FILE: tools/avinfo.c:510:
+> +            print_content_protection((void *) cap->data, cap->length);
+>=20
+> total: 0 errors, 3 warnings, 173 lines checked
 
-> @@ -508,6 +538,98 @@ static bool codec_vendor_aptx_cap(uint8_t losc, stru=
-ct l2cap_frame *frame)
->         return true;
->  }
->
-> +static bool codec_vendor_faststream_cap(uint8_t losc, struct l2cap_frame=
- *frame)
-> +{
-> +       uint8_t cap =3D 0;
-> +
-> +       if (losc !=3D 2)
-> +               return false;
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cDirection: 0x%02x", BASE_INDENT + 2, ' ', cap);
-> +       print_value_bits(BASE_INDENT + 2, cap, faststream_direction_table=
-);
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cSink Frequency: 0x%02x", BASE_INDENT + 2, ' ', ca=
-p & 0x0f);
-> +       print_value_bits(BASE_INDENT + 2, cap & 0x0f, faststream_sink_fre=
-quency_table);
-> +
-> +       print_field("%*cSource Frequency: 0x%02x", BASE_INDENT + 2, ' ', =
-cap & 0xf0);
-> +       print_value_bits(BASE_INDENT + 2, cap & 0xf0, faststream_source_f=
-requency_table);
-> +
-> +       return true;
-> +}
-> +
-> +static bool codec_vendor_aptx_ll_cap(uint8_t losc, struct l2cap_frame *f=
-rame)
-> +{
-> +       uint8_t cap =3D 0;
-> +       uint16_t level =3D 0;
-> +
-> +       if (losc !=3D 2 && losc !=3D 11)
-> +               return false;
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cFrequency: 0x%02x", BASE_INDENT + 2, ' ', cap & 0=
-xf0);
-> +       print_value_bits(BASE_INDENT + 2, cap & 0xf0, aptx_frequency_tabl=
-e);
-> +
-> +       print_field("%*cChannel Mode: 0x%02x", BASE_INDENT + 2, ' ',
-> +                                                               cap & 0x0=
-f);
-> +       print_value_bits(BASE_INDENT + 2, cap & 0x0f, aptx_channel_mode_t=
-able);
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cBidirectional link: %s", BASE_INDENT, ' ', (cap &=
- 1) ? "Yes" : "No");
-> +
-> +       if ((cap & 2) && losc =3D=3D 11) {
-> +               /* reserved */
-> +               l2cap_frame_get_u8(frame, &cap);
-> +
-> +               l2cap_frame_get_le16(frame, &level);
-> +               print_field("%*cTarget codec buffer level: %u (0x%02x)", =
-BASE_INDENT + 2, ' ', level, level);
-> +
-> +               l2cap_frame_get_le16(frame, &level);
-> +               print_field("%*cInitial codec buffer level: %u (0x%02x)",=
- BASE_INDENT + 2, ' ', level, level);
-> +
-> +               l2cap_frame_get_u8(frame, &cap);
-> +               print_field("%*cSRA max rate: %g (0x%02x)", BASE_INDENT +=
- 2, ' ', cap / 10000.0, cap);
-> +
-> +               l2cap_frame_get_u8(frame, &cap);
-> +               print_field("%*cSRA averaging time: %us (0x%02x)", BASE_I=
-NDENT + 2, ' ', cap, cap);
-> +
-> +               l2cap_frame_get_le16(frame, &level);
-> +               print_field("%*cGood working codec buffer level: %u (0x%0=
-2x)", BASE_INDENT + 2, ' ', level, level);
-
-I suspect many of these lines are above 80 columns, please fix them.
-
-> +       }
-> +
-> +       return true;
-> +}
-> +
-> +static bool codec_vendor_aptx_hd_cap(uint8_t losc, struct l2cap_frame *f=
-rame)
-> +{
-> +       uint8_t cap =3D 0;
-> +
-> +       if (losc !=3D 5)
-> +               return false;
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cFrequency: 0x%02x", BASE_INDENT + 2, ' ', cap & 0=
-xf0);
-> +       print_value_bits(BASE_INDENT + 2, cap & 0xf0, aptx_frequency_tabl=
-e);
-> +
-> +       print_field("%*cChannel Mode: 0x%02x", BASE_INDENT + 2, ' ',
-> +                                                               cap & 0x0=
-f);
-> +       print_value_bits(BASE_INDENT + 2, cap & 0x0f, aptx_channel_mode_t=
-able);
-> +
-> +       /* reserved */
-> +       l2cap_frame_get_u8(frame, &cap);
-> +       l2cap_frame_get_u8(frame, &cap);
-> +       l2cap_frame_get_u8(frame, &cap);
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       return true;
-> +}
-> +
->  static bool codec_vendor_ldac(uint8_t losc, struct l2cap_frame *frame)
->  {
->         uint16_t cap =3D 0;
-> @@ -543,6 +665,12 @@ static bool codec_vendor_cap(uint8_t losc, struct l2=
-cap_frame *frame)
->
->         if (vendor_id =3D=3D APTX_VENDOR_ID && codec_id =3D=3D APTX_CODEC=
-_ID)
->                 return codec_vendor_aptx_cap(losc, frame);
-> +       else if (vendor_id =3D=3D FASTSTREAM_VENDOR_ID && codec_id =3D=3D=
- FASTSTREAM_CODEC_ID)
-> +               return codec_vendor_faststream_cap(losc, frame);
-> +       else if (vendor_id =3D=3D APTX_LL_VENDOR_ID && codec_id =3D=3D AP=
-TX_LL_CODEC_ID)
-> +               return codec_vendor_aptx_ll_cap(losc, frame);
-> +       else if (vendor_id =3D=3D APTX_HD_VENDOR_ID && codec_id =3D=3D AP=
-TX_HD_CODEC_ID)
-> +               return codec_vendor_aptx_hd_cap(losc, frame);
->         else if (vendor_id =3D=3D LDAC_VENDOR_ID && codec_id =3D=3D LDAC_=
-CODEC_ID)
->                 return codec_vendor_ldac(losc, frame);
-
-If we go ahead with the idea of defining a table of vendor codecs the
-struct could also define a function callback which parses these so one
-just have to include new entries to table.
-
-> @@ -572,6 +700,102 @@ static bool codec_vendor_aptx_cfg(uint8_t losc, str=
-uct l2cap_frame *frame)
->         return true;
->  }
->
-> +static bool codec_vendor_faststream_cfg(uint8_t losc, struct l2cap_frame=
- *frame)
-> +{
-> +       uint8_t cap =3D 0;
-> +
-> +       if (losc !=3D 2)
-> +               return false;
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cDirection: %s (0x%02x)", BASE_INDENT + 2, ' ',
-> +                       find_value_bit(cap, faststream_direction_table),
-> +                       cap);
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cSink Frequency: %s (0x%02x)", BASE_INDENT + 2, ' =
-',
-> +                       find_value_bit(cap & 0x0f, faststream_sink_freque=
-ncy_table),
-> +                       cap & 0x0f);
-> +
-> +       print_field("%*cSource Frequency: %s (0x%02x)", BASE_INDENT + 2, =
-' ',
-> +                       find_value_bit(cap & 0xf0, faststream_source_freq=
-uency_table),
-> +                       cap & 0xf0);
-> +
-> +       return true;
-> +}
-> +
-> +static bool codec_vendor_aptx_ll_cfg(uint8_t losc, struct l2cap_frame *f=
-rame)
-> +{
-> +       uint8_t cap =3D 0;
-> +       uint16_t level =3D 0;
-> +
-> +       if (losc !=3D 2 && losc !=3D 11)
-> +               return false;
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cFrequency: %s (0x%02x)", BASE_INDENT + 2, ' ',
-> +                       find_value_bit(cap & 0xf0, aptx_frequency_table),
-> +                       cap & 0xf0);
-> +
-> +       print_field("%*cChannel Mode: %s (0x%02x)", BASE_INDENT + 2, ' ',
-> +                       find_value_bit(cap & 0x0f, aptx_channel_mode_tabl=
-e),
-> +                       cap & 0x0f);
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cBidirectional link: %s", BASE_INDENT, ' ', (cap &=
- 1) ? "Yes" : "No");
-> +
-> +       if ((cap & 2) && losc =3D=3D 11) {
-> +               l2cap_frame_get_u8(frame, &cap);
-> +
-> +               l2cap_frame_get_le16(frame, &level);
-> +               print_field("%*cTarget codec buffer level: %u (0x%02x)", =
-BASE_INDENT + 2, ' ', level, level);
-> +
-> +               l2cap_frame_get_le16(frame, &level);
-> +               print_field("%*cInitial codec buffer level: %u (0x%02x)",=
- BASE_INDENT + 2, ' ', level, level);
-> +
-> +               l2cap_frame_get_u8(frame, &cap);
-> +               print_field("%*cSRA max rate: %g (0x%02x)", BASE_INDENT +=
- 2, ' ', cap / 10000.0, cap);
-> +
-> +               l2cap_frame_get_u8(frame, &cap);
-> +               print_field("%*cSRA averaging time: %us (0x%02x)", BASE_I=
-NDENT + 2, ' ', cap, cap);
-> +
-> +               l2cap_frame_get_le16(frame, &level);
-> +               print_field("%*cGood working codec buffer level: %u (0x%0=
-2x)", BASE_INDENT + 2, ' ', level, level);
-> +       }
-> +
-> +       return true;
-> +}
-> +
-> +static bool codec_vendor_aptx_hd_cfg(uint8_t losc, struct l2cap_frame *f=
-rame)
-> +{
-> +       uint8_t cap =3D 0;
-> +
-> +       if (losc !=3D 5)
-> +               return false;
-> +
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       print_field("%*cFrequency: %s (0x%02x)", BASE_INDENT + 2, ' ',
-> +                       find_value_bit(cap & 0xf0, aptx_frequency_table),
-> +                       cap & 0xf0);
-> +
-> +       print_field("%*cChannel Mode: %s (0x%02x)", BASE_INDENT + 2, ' ',
-> +                       find_value_bit(cap & 0x0f, aptx_channel_mode_tabl=
-e),
-> +                       cap & 0x0f);
-> +
-> +       /* reserved */
-> +       l2cap_frame_get_u8(frame, &cap);
-> +       l2cap_frame_get_u8(frame, &cap);
-> +       l2cap_frame_get_u8(frame, &cap);
-> +       l2cap_frame_get_u8(frame, &cap);
-> +
-> +       return true;
-> +}
-> +
->  static bool codec_vendor_cfg(uint8_t losc, struct l2cap_frame *frame)
->  {
->         uint32_t vendor_id =3D 0;
-> @@ -593,6 +817,12 @@ static bool codec_vendor_cfg(uint8_t losc, struct l2=
-cap_frame *frame)
->
->         if (vendor_id =3D=3D APTX_VENDOR_ID && codec_id =3D=3D APTX_CODEC=
-_ID)
->                 return codec_vendor_aptx_cfg(losc, frame);
-> +       else if (vendor_id =3D=3D FASTSTREAM_VENDOR_ID && codec_id =3D=3D=
- FASTSTREAM_CODEC_ID)
-> +               return codec_vendor_faststream_cfg(losc, frame);
-> +       else if (vendor_id =3D=3D APTX_LL_VENDOR_ID && codec_id =3D=3D AP=
-TX_LL_CODEC_ID)
-> +               return codec_vendor_aptx_ll_cfg(losc, frame);
-> +       else if (vendor_id =3D=3D APTX_HD_VENDOR_ID && codec_id =3D=3D AP=
-TX_HD_CODEC_ID)
-> +               return codec_vendor_aptx_hd_cfg(losc, frame);
->         else if (vendor_id =3D=3D LDAC_VENDOR_ID && codec_id =3D=3D LDAC_=
-CODEC_ID)
->                 return codec_vendor_ldac(losc, frame);
-
-Ditto.
-
->
-> --
-> 2.11.0
->
-
+Ok, I will fix them.
 
 --=20
-Luiz Augusto von Dentz
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
+
+--p722ahk4crmizpkz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXB9VsQAKCRCL8Mk9A+RD
+UvfrAJ9GVi7vZnZCWDTGgHV6k6eMxoPzJgCeO1BT8qTvPGlFOGj/YVDn1fs1LuI=
+=6A5t
+-----END PGP SIGNATURE-----
+
+--p722ahk4crmizpkz--
