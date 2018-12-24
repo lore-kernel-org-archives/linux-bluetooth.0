@@ -2,102 +2,70 @@ Return-Path: <SRS0=i2N+=PB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02A40C64E75
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Dec 2018 16:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD2EC64E79
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Dec 2018 20:56:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C1C5821736
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Dec 2018 16:13:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20150623.gappssmtp.com header.i=@mojatatu-com.20150623.gappssmtp.com header.b="poadVC2G"
+	by mail.kernel.org (Postfix) with ESMTP id 1A08D2184A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Dec 2018 20:56:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725823AbeLXQNE (ORCPT
+        id S1725813AbeLXU4J convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Dec 2018 11:13:04 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:53931 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbeLXQNE (ORCPT
+        Mon, 24 Dec 2018 15:56:09 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:41228 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725788AbeLXU4J (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Dec 2018 11:13:04 -0500
-Received: by mail-it1-f196.google.com with SMTP id g85so16298331ita.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Dec 2018 08:13:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=afQclJ5woybxePflmI4x3735O0DVaZv3YIHUJ2dD08A=;
-        b=poadVC2GwNm+0pWT6rTlCs8jUnE4Ud1OJWQC61reWOWppqCetWouH6VMjL7S7pHmz7
-         8Pozx1Gs0P58M87TBzZgIi/AgGgMLeKpcq/+2OdybKDEUKaGysJsRYem6MjXuyXfo8H4
-         /NE+PIjCL2DwiOSSPl7phfRVu9VP9sjsdsKWlcIlzPTYHPGAVk8N3gjpCRQhZkaiQPQ1
-         HY4F7l+EBRuZ1l4TgSfXSgPedpwuyBVqmlvro4hDF39Xr5X9aei8bOUjvt1CriYf9lmz
-         m+dHA0zcuvKNWcAH5wKwZOAWwHbuzilKlufZJv6uYJ6k2axwRugJWhIiCjrRmEnX4ywZ
-         bvbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=afQclJ5woybxePflmI4x3735O0DVaZv3YIHUJ2dD08A=;
-        b=rSadfwVUUEurYFgyZP8q9qlwNLnwFdjdfwEXtC5RMtkn7M9CQX//6LYfzHxaq990G6
-         wDa1AmkKqLmYQrtjwgabzd0vDEN657VL94VOXZuzAndo8KBNv8SntK6XyBZjlzzfA+4Q
-         z3z0UMw+g81hDyTUqwcE7Ebgvs3KIgNXQ6rgnyXY6WR8Q5DP9LmOgRGF/W0O+2C3WVrZ
-         rBvZN4I97/FC5zMGIXfHAbL/zxGXa/sgo5z2xSCLck1zMPaLs8zZqp6i92gd0klobo4Z
-         bfF0AVBayjHbql1XV35zNg0MyaYAN90jgC9g6Ql/GB4aHYDMobsRkbZm/Ciz0gcW9wcD
-         ExUA==
-X-Gm-Message-State: AA+aEWZ+/If61b3VClw1Wj0UgKPDCEZsvhDBmjdT2ZOaX+edNr4OOYQJ
-        qrU4LzyaufkAYLdtwTABOshcuw==
-X-Google-Smtp-Source: AFSGD/Vb8P5y+FMl4A8ScX3fby9/Kd0l2tEgInnOCyfSkesZocTXW9GM0LOdVetNvdGfUc00BiIrbA==
-X-Received: by 2002:a24:2f08:: with SMTP id j8mr9792117itj.42.1545667983730;
-        Mon, 24 Dec 2018 08:13:03 -0800 (PST)
-Received: from x220t ([64.26.149.125])
-        by smtp.gmail.com with ESMTPSA id 125sm12613163itk.28.2018.12.24.08.13.02
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 24 Dec 2018 08:13:03 -0800 (PST)
-Date:   Mon, 24 Dec 2018 11:12:58 -0500
-From:   Alexander Aring <aring@mojatatu.com>
-To:     YueHaibing <yuehaibing@huawei.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next] 6lowpan: fix debugfs_simple_attr.cocci warnings
-Message-ID: <20181224161258.gvvq25k3ufuyt3ej@x220t>
-References: <1545274433-146957-1-git-send-email-yuehaibing@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1545274433-146957-1-git-send-email-yuehaibing@huawei.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Mon, 24 Dec 2018 15:56:09 -0500
+Received: from [192.168.0.117] (188.146.78.210.nat.umts.dynamic.t-mobile.pl [188.146.78.210])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 0395ACF2A7;
+        Mon, 24 Dec 2018 22:03:47 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH BlueZ v5 01/30] mesh: Staging for Mesh DBus API rewrite
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20181219042016.25538-2-brian.gix@intel.com>
+Date:   Mon, 24 Dec 2018 21:56:05 +0100
+Cc:     linux-bluetooth@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        inga.stotland@intel.com
+Content-Transfer-Encoding: 8BIT
+Message-Id: <7E58E152-A3BD-465F-9DFF-C2EFBEA2D88E@holtmann.org>
+References: <20181219042016.25538-1-brian.gix@intel.com>
+ <20181219042016.25538-2-brian.gix@intel.com>
+To:     Brian Gix <brian.gix@intel.com>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Brian,
 
-On Thu, Dec 20, 2018 at 02:53:53AM +0000, YueHaibing wrote:
-> Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
-> for debugfs files.
+totally unclear commit subject and missing commit message explaining what this does.
+
 > 
-> Semantic patch information:
-> Rationale: DEFINE_SIMPLE_ATTRIBUTE + debugfs_create_file()
-> imposes some significant overhead as compared to
-> DEFINE_DEBUGFS_ATTRIBUTE + debugfs_create_file_unsafe().
+> ---
+> Makefile.am | 1 -
+> 1 file changed, 1 deletion(-)
 > 
+> diff --git a/Makefile.am b/Makefile.am
+> index f84a1faba..7e92977b7 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -303,7 +303,6 @@ unit_tests =
+> include Makefile.tools
+> include Makefile.obexd
+> include android/Makefile.am
+> -include Makefile.mesh
 
-Ok.
+Please re-read this patch and think about if you want to start a 30 patch series like this.
 
-> Generated by: scripts/coccinelle/api/debugfs/debugfs_simple_attr.cocci
-> 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Regards
 
-Acked-by: Alexander Aring <aring@mojatatu.com>
+Marcel
 
-Reminder to myself: We should finally move this crap away which is even
-not net namespace aware and introduce a stable uapi. I would love to see
-it that it can be controlled by iproute2. :-)
-
-- Alex
