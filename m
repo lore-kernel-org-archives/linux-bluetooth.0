@@ -2,194 +2,152 @@ Return-Path: <SRS0=UKt+=PE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E2FC43444
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Dec 2018 03:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF37EC43444
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Dec 2018 07:31:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EAB59218E2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Dec 2018 03:24:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E6BD218E2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Dec 2018 07:31:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="pMXB/bUp";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="PLjPPkk5"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="YQUzfxie";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="YQUzfxie"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728409AbeL0DYM (ORCPT
+        id S1729499AbeL0Hbs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Dec 2018 22:24:12 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:33976 "EHLO
+        Thu, 27 Dec 2018 02:31:48 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:49492 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727234AbeL0DYL (ORCPT
+        with ESMTP id S1727007AbeL0Hbs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Dec 2018 22:24:11 -0500
+        Thu, 27 Dec 2018 02:31:48 -0500
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id CCA1C607F4; Thu, 27 Dec 2018 03:24:10 +0000 (UTC)
+        id AB46460541; Thu, 27 Dec 2018 07:31:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1545881050;
-        bh=Q7PDw9ZDvEmIOC1MPCXNl2zdmgOOLQvl7m3RYcVLv+c=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=pMXB/bUpqQ20VDTOSCVLABrMaKEIEqv5Hgidoa2l30skwXP/xG8bOYqMXq+cyaJ5p
-         7E4d7hMt1COtTBWugkL+5KyCRrKFXPx8zyLP1ZLJ2BGjX/xDQ+28UVUgbV0TfHuYsp
-         6N9G5/IRrPV7DMLjBUHrfZZTwhDvBLkX+x+MPIo0=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 7DBAE60559;
-        Thu, 27 Dec 2018 03:23:56 +0000 (UTC)
+        s=default; t=1545895906;
+        bh=3Rr7rYzk1tor6Xioj6gl0H2Bf6DAVuIM67ZBsWSL45Q=;
+        h=From:To:Cc:Subject:Date:From;
+        b=YQUzfxie2QAK1d6ARRT7StHJspPF1KW1LUXH0PT+EWC0NPjpAl7wQOU0WGUp1c/fd
+         Hs1AD9MnRfRsITbOxY1BSXj81dhKtCJjVutR46kRfbeR4f1/zkIZOV4gNJv7xEpb+V
+         GqSNkikI3nTsCcLMyRRuIlOfQsr9ir3SPFeLBmsQ=
+Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 44305602CB;
+        Thu, 27 Dec 2018 07:31:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1545881036;
-        bh=Q7PDw9ZDvEmIOC1MPCXNl2zdmgOOLQvl7m3RYcVLv+c=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=PLjPPkk5nuYds6SF8dKQBzViOjEyoo/u2S0hbMYQYW9ozZZ77mS7s4DYKlJwkbnDp
-         dkPmIliB2QtebaA/sx2k/08xDT3fcpsPlfAWyp2nWYH86WTLStMoZVTaneB8PZVv4m
-         sRiaXe0K+wpLHZ5e82b6wf0f4tA6h6F1AOX88M3o=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 27 Dec 2018 08:53:56 +0530
+        s=default; t=1545895906;
+        bh=3Rr7rYzk1tor6Xioj6gl0H2Bf6DAVuIM67ZBsWSL45Q=;
+        h=From:To:Cc:Subject:Date:From;
+        b=YQUzfxie2QAK1d6ARRT7StHJspPF1KW1LUXH0PT+EWC0NPjpAl7wQOU0WGUp1c/fd
+         Hs1AD9MnRfRsITbOxY1BSXj81dhKtCJjVutR46kRfbeR4f1/zkIZOV4gNJv7xEpb+V
+         GqSNkikI3nTsCcLMyRRuIlOfQsr9ir3SPFeLBmsQ=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 44305602CB
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
 From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v5 1/5] Bluetooth: hci_qca: use wait_until_sent() for
- power pulses
-In-Reply-To: <20181226222148.GI261387@google.com>
-References: <20181220144639.15928-1-bgodavar@codeaurora.org>
- <20181220144639.15928-2-bgodavar@codeaurora.org>
- <20181222015947.GF261387@google.com>
- <379c7c10d70ad86e03122d051ce0cf6f@codeaurora.org>
- <20181226222148.GI261387@google.com>
-Message-ID: <75a8b12023f38a8af5e281ea1902cb73@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [PATCH v6 0/6] Bug fixes for Qualcomm BT chip wcn3990 
+Date:   Thu, 27 Dec 2018 13:01:30 +0530
+Message-Id: <20181227073136.8431-1-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+The below issues are found in the recent testing.
 
-On 2018-12-27 03:51, Matthias Kaehlcke wrote:
-> On Wed, Dec 26, 2018 at 12:01:51PM +0530, Balakrishna Godavarthi wrote:
->> Hi Matthias,
->> 
->> On 2018-12-22 07:29, Matthias Kaehlcke wrote:
->> > On Thu, Dec 20, 2018 at 08:16:35PM +0530, Balakrishna Godavarthi wrote:
->> > > wcn3990 requires a power pulse to turn ON/OFF along with
->> > > regulators. Sometimes we are observing the power pulses are sent
->> > > out with some time delay, due to queuing these commands. This is
->> > > causing synchronization issues with chip, which intern delay the
->> > > chip setup or may end up with communication issues.
->> > >
->> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> > > ---
->> > >  drivers/bluetooth/hci_qca.c | 38
->> > > ++++++++++++++-----------------------
->> > >  1 file changed, 14 insertions(+), 24 deletions(-)
->> > >
->> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> > > index f036c8f98ea3..5a07c2370289 100644
->> > > --- a/drivers/bluetooth/hci_qca.c
->> > > +++ b/drivers/bluetooth/hci_qca.c
->> > > @@ -1013,11 +1013,9 @@ static inline void host_set_baudrate(struct
->> > > hci_uart *hu, unsigned int speed)
->> > >  		hci_uart_set_baudrate(hu, speed);
->> > >  }
->> > >
->> > > -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
->> > > +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
->> > >  {
->> > > -	struct hci_uart *hu = hci_get_drvdata(hdev);
->> > > -	struct qca_data *qca = hu->priv;
->> > > -	struct sk_buff *skb;
->> > > +	int ret;
->> > >
->> > >  	/* These power pulses are single byte command which are sent
->> > >  	 * at required baudrate to wcn3990. On wcn3990, we have an external
->> > > @@ -1029,19 +1027,16 @@ static int qca_send_power_pulse(struct
->> > > hci_dev *hdev, u8 cmd)
->> > >  	 * save power. Disabling hardware flow control is mandatory while
->> > >  	 * sending power pulses to SoC.
->> > >  	 */
->> > > -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
->> > > -
->> > > -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
->> > > -	if (!skb)
->> > > -		return -ENOMEM;
->> > > -
->> > > +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
->> > >  	hci_uart_set_flow_control(hu, true);
->> > > +	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
->> > > +	if (ret < 0) {
->> > > +		bt_dev_err(hu->hdev, "failed to send power pulse %02x to SoC",
->> > > +			   cmd);
->> > > +		return ret;
->> > > +	}
->> > >
->> > > -	skb_put_u8(skb, cmd);
->> > > -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
->> > > -
->> > > -	skb_queue_tail(&qca->txq, skb);
->> > > -	hci_uart_tx_wakeup(hu);
->> > > +	serdev_device_wait_until_sent(hu->serdev, 0);
->> >
->> > serdev_device_wait_until_sent() might only guarantee that the UART
->> > circular buffer is empty (see
->> > https://elixir.bootlin.com/linux/v4.19/source/drivers/tty/tty_ioctl.c#L225),
->> > not that the data has actually sent (e.g. it might be sitting in
->> > the UART FIFO). However with this:
->> >
->> > >  	/* Wait for 100 uS for SoC to settle down */
->> > >  	usleep_range(100, 200);
->> >
->> > we should probably be fine, unless there's tons of data in the
->> > FIFO.
->> >
->> > You currently call serdev_device_write_flush() in
->> > qca_power_shutdown(), I wonder if it would make sense to call it in
->> > qca_send_power_pulse(), regardless of whether it's an on or off
->> 
->> [Bala]: during sending the ON pulse we will not have any data in the
->>         UART circular buffer as this is the first command to send and 
->> we are
->> sending it as soon as we open the port.
->>         so i taught why should be flush the circular as it is already 
->> empty.
-> 
->> > pulse. In any case we don't care if the chip receives any 'pending'
->> > data when we switch it on or off, right?
->> >
->> 
->> [Bala]: during on we freshly open port and i see that flush() called 
->> while
->> port opening.
->> 
->> https://elixir.bootlin.com/linux/latest/source/drivers/tty/serial/serial_core.c#L207
-> 
-> I would argue that the serdev_device_write_flush() call in
-> qca_power_shutdown() is related with/needed for sending the power off
-> pulse, hence it should be part of qca_send_power_pulse(), unless it
-> adds a significant overhead and we really want to call it only in the
-> shutdown case.
-> 
-> Flushing the buffer should be fairly lightweight and power pulses are
-> only sent when the device is switched on or off, so the overhead
-> should be negligible. You *could* restrict the flush to the power off
-> pulse, assuming that the driver always re-opens the port in
-> qca_wcn3990_init() (tests with this patch set suggest this might not
-> be needed) and that serdev_device_open() flushes the buffer (which
-> seems a sane assumption). Yet given the minimal overhead I'd suggest
-> to not make assumptions about what happened previously in other code
-> and avoid the clutter of a condition that doesn't add much value.
-> 
-[Bala]: will call the flush() while sending the power pulses 
-irrespective of the pulse type.
+1. Observed device is not going into off state or not responding.
+    As wcn3990 require a power pulses to turn on the irrespctive of
+    igniting regulators, it was observed that power on or power off
+    pulses are not in sync with respective to chip.
+    The below patch will help us to wait until byte is pushed on to wires.          
 
-> Cheers
-> 
-> Matthias
+    * Bluetooth: hci_qca: use wait_until_sent() for power pulses
+
+2. Observed Chip responding when we are in sleep.
+   This is due to turn on flow control during change baudrate request.
+   The below patch will only pull the RTS line high instead of turning off
+   the flow.
+
+   * Bluetooth: hci_qca: Pull RTS line high for baudrate change command.
+
+3. Frame reassembly errors splashing on console.
+   wcn3990 requires will use multiple baudrates during booting stage.
+   i.e. 2400 bps while sending power off pulse
+    115200 bps while sending power on pulse
+    port close
+    port open
+    set baudrate to 115200 request the chip version.
+
+  during above process, we are seeing some stray bytes coming up
+  on the UART Rx FIFO it could be due to frequent baudrate change.
+
+  This patch will stop the frame reassembly errors.
+
+  * Bluetooth: hci_qca: Fix frame reassembly errors for wcn3990
+
+4. Disable IBS state machine and flush Tx buffer
+   We are disabling IBS and flushing the Tx buffer before turning off the chip.
+  
+   This is due to IBS state machine is active when we turn off the chip.
+   This will stop queuing IBS protocol bytes.
+
+   * Bluetooth: hci_qca: Disable IBS state machine and flush Tx buffer
+
+5. hci_qca: Update baudrate change wait time for wcn3990
+   
+   This patch will help to decrease the BT on time by 200ms.
+   we updated the baudrate change wait time to 100ms instead of 300ms.
+   
+6. btqca: inject command complete event during fw download
+   
+   Qualcomm latest chip will not send an command complete event
+   for last packet of the fw dump sent, so here we are inject an command 
+   complete event.
+
+   * Bluetooth: btqca: inject command complete event during fw download
+
+Changes in v6:
+ * added serdev_device_write_flush in qca_send_power_pulse().
+ * added new patch to update the baudrate change wait time.
+
+Changes in V5:
+ * added serdev_device_write_flush before sending the power off pulse
+   during shutdown.
+
+Changes in v4:
+ * used serdev_device_write_buf() instead of serdev_device_write().
+ * added new patch to stop logging of 0xfc00 timeout on console.
+
+Changes in v3:
+ * moved IBS & qca_flush to different patch
+ * updated comments in code fo Deassert RTS patch
+
+Balakrishna Godavarthi (6):
+  Bluetooth: hci_qca: use wait_until_sent() for power pulses
+  Bluetooth: hci_qca: Deassert RTS while baudrate change command
+  Bluetooth: hci_qca: Fix frame reassembly errors for wcn3990
+  Bluetooth: hci_qca: Disable IBS state machine and flush Tx buffer
+  Bluetooth: hci_qca: Update baudrate change wait time for wcn3990
+  Bluetooth: btqca: inject command complete event during fw download
+
+ drivers/bluetooth/btqca.c   | 39 +++++++++++++++-
+ drivers/bluetooth/btqca.h   |  3 ++
+ drivers/bluetooth/hci_qca.c | 88 ++++++++++++++++++++++---------------
+ 3 files changed, 94 insertions(+), 36 deletions(-)
 
 -- 
-Regards
-Balakrishna.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
