@@ -2,109 +2,178 @@ Return-Path: <SRS0=UKt+=PE=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53338C43387
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Dec 2018 19:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E28EC43387
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Dec 2018 20:19:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BB48208E4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Dec 2018 19:22:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E6802148D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Dec 2018 20:19:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="JT6LCeJz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728809AbeL0TWH convert rfc822-to-8bit (ORCPT
+        id S1729586AbeL0US7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Dec 2018 14:22:07 -0500
-Received: from mga02.intel.com ([134.134.136.20]:10546 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726466AbeL0TWH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Dec 2018 14:22:07 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Dec 2018 11:22:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,406,1539673200"; 
-   d="scan'208";a="121475225"
-Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
-  by orsmga002.jf.intel.com with ESMTP; 27 Dec 2018 11:22:06 -0800
-Received: from orsmsx154.amr.corp.intel.com (10.22.226.12) by
- ORSMSX109.amr.corp.intel.com (10.22.240.7) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Thu, 27 Dec 2018 11:22:06 -0800
-Received: from orsmsx101.amr.corp.intel.com ([169.254.8.175]) by
- ORSMSX154.amr.corp.intel.com ([169.254.11.172]) with mapi id 14.03.0415.000;
- Thu, 27 Dec 2018 11:22:06 -0800
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "Stotland, Inga" <inga.stotland@intel.com>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
-Subject: RE: [PATCH BlueZ v5 27/30] mesh: Sample Provisioning Agent
-Thread-Topic: [PATCH BlueZ v5 27/30] mesh: Sample Provisioning Agent
-Thread-Index: AQHUl1Jx9q/MplaTdU6F0rPBT2MNiaWO8XCAgAQP93A=
-Date:   Thu, 27 Dec 2018 19:22:05 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4375D8E5F84@ORSMSX101.amr.corp.intel.com>
-References: <20181219042016.25538-1-brian.gix@intel.com>
- <20181219042016.25538-28-brian.gix@intel.com>
- <3DB952F2-C235-4921-A4E9-4FADF5C10F31@holtmann.org>
-In-Reply-To: <3DB952F2-C235-4921-A4E9-4FADF5C10F31@holtmann.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZWExOTAzMjYtMmE1Ny00MmVhLTlhMjMtZGFiZmYzNTUzYjVhIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiSVJZODJlaUs4ZUdKMGF3WXpZNGJqeXY1enJmd1JUOElpVitRdG41QUJSMnNMTFNyUElTRlVEeDZEelRmVzVTeCJ9
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.22.254.139]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Thu, 27 Dec 2018 15:18:59 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:41671 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729416AbeL0US7 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 27 Dec 2018 15:18:59 -0500
+Received: by mail-pg1-f196.google.com with SMTP id m1so9166712pgq.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Dec 2018 12:18:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=GYI91X033NSGnZvBjCnNcYSVYclCXDlVA3GrVYN52WE=;
+        b=JT6LCeJzsDqjYqwqIusUOw+5OclRiNrmeisQkl4DNHqadMhxqaBCtvFhiItR2qL5c1
+         ZNcm9y8UxeU5CQ4iptj32xuvbOeYdW+4kq/IV6Ilusr1IjBnqL13Lkn4ia8+77cQXZHd
+         VIQTU6Lv1wHxCXl+cd0AVnzB6syz8JVdYSThA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=GYI91X033NSGnZvBjCnNcYSVYclCXDlVA3GrVYN52WE=;
+        b=W4Xhax2ANfnHV+DHI8mvsHctPZlnlYYMAM0p7fmT/rbGRB8cdRv75pEa3ozL02Gunu
+         Q/IfbCKwqeZJS1/yxPjccdPVyLWP8e3rIMzEEWNHZ1d6WwkG8ij7M83GHIk16WcYC4YQ
+         cfHiJJAFlhAyY+uT4BTHGhOIsc+EEFlAccDCOr/suLOnk6XuagAhQWuscM3wL6lMdznb
+         2I78G7oaRQyrddPE4hFqbJgoomJkYI12pJ0IRbLUTPZBgQho352nPbb6qsl19rEVWhYR
+         sSyiWgNFiRctmpUfxMt8WCQTptullQo2VtIEyWAXz0gX/M/SCxTLiwuKLnaHq6LHI6z1
+         wm9A==
+X-Gm-Message-State: AA+aEWYQ2SE+w/0kwX/SJpjwQ6buZuqL3F2gL5apHA12eRd/ZH/xjD4z
+        RA3WnIFKZj4Kefq8mR0SMF6XTw==
+X-Google-Smtp-Source: AFSGD/XiGGfmU/3etUsizltHcSqH7L6d8qJ68T43Duk8gi9QGDRQdb9Hj4L6izSHEIY5/iAu4ixG6A==
+X-Received: by 2002:aa7:810c:: with SMTP id b12mr25299607pfi.44.1545941938146;
+        Thu, 27 Dec 2018 12:18:58 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id v62sm62071727pfd.163.2018.12.27.12.18.57
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 27 Dec 2018 12:18:57 -0800 (PST)
+Date:   Thu, 27 Dec 2018 12:18:56 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v6 1/6] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+Message-ID: <20181227201856.GJ261387@google.com>
+References: <20181227073136.8431-1-bgodavar@codeaurora.org>
+ <20181227073136.8431-2-bgodavar@codeaurora.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181227073136.8431-2-bgodavar@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
-
-> -----Original Message-----
-> From: Marcel Holtmann [mailto:marcel@holtmann.org]
-> Sent: Monday, December 24, 2018 1:10 PM
-> To: Gix, Brian <brian.gix@intel.com>
-> Cc: linux-bluetooth@vger.kernel.org; Johan Hedberg
-> <johan.hedberg@gmail.com>; Stotland, Inga <inga.stotland@intel.com>
-> Subject: Re: [PATCH BlueZ v5 27/30] mesh: Sample Provisioning Agent
+On Thu, Dec 27, 2018 at 01:01:31PM +0530, Balakrishna Godavarthi wrote:
+> wcn3990 requires a power pulse to turn ON/OFF along with
+> regulators. Sometimes we are observing the power pulses are sent
+> out with some time delay, due to queuing these commands. This is
+> causing synchronization issues with chip, which intern delay the
+> chip setup or may end up with communication issues.
 > 
-> Hi Brian,
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+> Changes in v6:
+>  * added serdev_device_write_flush() in qca_send_power_pulse
+>    instead during the power off pulse.
 > 
-> > ---
-> > mesh/agent.py | 40 ++++++++++++++++++++++++++++++++++++++++
-> > 1 file changed, 40 insertions(+)
-> > create mode 100755 mesh/agent.py
+> Changes in v5:
+>  * added serdev_device_write_flush() in qca_power_off().
 > 
-> no, these all belong in the test directory. And we never used the .py suffix
-> either.
-
-The python scripts are all being moved to the test directory, but one point of clarification here:
-
-agent.py is not stand-alone. It is imported into other files, much like the existing files:
-
-./test/bluezutils.py
-./test/dbusdef.py
-./test/sap_client.py
-
-This is the standard naming convention for included/imported python modules, and while it
-*is* possible to include modules that do not follow that naming convention, it is ugly,
-and will not seem "Natural" to anyone from the python world coming in and trying to use
-these modules in BlueZ.  It would be like not using the ".h" extension on C header files.
-
-Are you absolutely *certain* that you want to break with python precedence in order to avoid using
-the .py file name extension?
-
+> ---
+>  drivers/bluetooth/hci_qca.c | 38 ++++++++++++++-----------------------
+>  1 file changed, 14 insertions(+), 24 deletions(-)
 > 
-> Regards
-> 
-> Marcel
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index f036c8f98ea3..507a2355c758 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1013,11 +1013,9 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>  		hci_uart_set_baudrate(hu, speed);
+>  }
+>  
+> -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+> +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
+>  {
+> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+> -	struct qca_data *qca = hu->priv;
+> -	struct sk_buff *skb;
+> +	int ret;
+>  
+>  	/* These power pulses are single byte command which are sent
+>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+> @@ -1029,19 +1027,17 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>  	 * save power. Disabling hardware flow control is mandatory while
+>  	 * sending power pulses to SoC.
+>  	 */
+> -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+> -
+> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+> -	if (!skb)
+> -		return -ENOMEM;
+> -
+> +	serdev_device_write_flush(hu->serdev);
+> +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
 
+nit: why clutter the code flow by putting the log statement in the
+middle of code that is actually doing something with the serial
+interface?
+
+In case you respin anyway I suggest to structure it like this:
+
+  bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
+
+  hci_uart_set_flow_control(hu, true);
+  serdev_device_write_flush(hu->serdev);
+  ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
+
+
+>  	hci_uart_set_flow_control(hu, true);
+> +	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
+> +	if (ret < 0) {
+> +		bt_dev_err(hu->hdev, "failed to send power pulse %02x to SoC",
+
+nit: especially on 'embedded' devices 'SoC' is typically associated
+with the CPU running Linux, you might want to change it to
+'controller'.
+
+> +			   cmd);
+> +		return ret;
+> +	}
+>  
+> -	skb_put_u8(skb, cmd);
+> -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+> -
+> -	skb_queue_tail(&qca->txq, skb);
+> -	hci_uart_tx_wakeup(hu);
+> +	serdev_device_wait_until_sent(hu->serdev, 0);
+>  
+>  	/* Wait for 100 uS for SoC to settle down */
+>  	usleep_range(100, 200);
+
+I said earlier the delay here should be enough to ensure that the byte
+gets transferred from a hardware buffer/FIFO to the controller,
+however that didn't take into account that the power pulses are sent
+with a baudrate of 2400. That translates to ~240 bytes/s, hence a
+delay of 5 ms is needed to be on the safe side.
+
+In case you change the delay please also update the comment to make
+clear this is not only time for the BT controller to settle, but also
+to guarantee that the command was actually sent to the controller.
+
+So far it seems no problems have been observed, though this could be
+thanks to the 100 ms delay in qca_wcn3990_init().
+
+Cheers
+
+Matthias
