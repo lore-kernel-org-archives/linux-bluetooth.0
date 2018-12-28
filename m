@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18061C43612
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D80EC43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CEADA217F9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C7C9217F9
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727012AbeL1WH5 (ORCPT
+        id S1727073AbeL1WIL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Dec 2018 17:07:57 -0500
-Received: from mga17.intel.com ([192.55.52.151]:19951 "EHLO mga17.intel.com"
+        Fri, 28 Dec 2018 17:08:11 -0500
+Received: from mga17.intel.com ([192.55.52.151]:19960 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727004AbeL1WHz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Dec 2018 17:07:55 -0500
+        id S1726999AbeL1WIK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 28 Dec 2018 17:08:10 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
   by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Dec 2018 14:07:54 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,411,1539673200"; 
-   d="scan'208";a="113968707"
+   d="scan'208";a="113968700"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.140.14])
-  by orsmga003.jf.intel.com with ESMTP; 28 Dec 2018 14:07:54 -0800
+  by orsmga003.jf.intel.com with ESMTP; 28 Dec 2018 14:07:53 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v6 09/26] mesh: Initiator side provisioning implementation
-Date:   Fri, 28 Dec 2018 14:07:28 -0800
-Message-Id: <20181228220745.25147-10-brian.gix@intel.com>
+Subject: [PATCH BlueZ v6 07/26] mesh: Direction agnostic PB-ADV implementation
+Date:   Fri, 28 Dec 2018 14:07:26 -0800
+Message-Id: <20181228220745.25147-8-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181228220745.25147-1-brian.gix@intel.com>
 References: <20181228220745.25147-1-brian.gix@intel.com>
@@ -43,22 +43,23 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This functionaility (originally found in provision.c) was rewritten
-as the Initiator side only of the provisioning procedure.  If the
-local device owns and controls access to a mesh network, this is the
-side of the provisioning procedure that it must use to bring new
-unprovisioned devices into the network as Nodes.
+Originally found in prov.c, this file implements the PB-ADV
+provisioning transport.  It may be used by either the
+Acceptor or the Initiator side of the Provisioning procedure,
+but only one session may be active at once.
 ---
- mesh/prov-initiator.c | 641 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 641 insertions(+)
- create mode 100644 mesh/prov-initiator.c
+ mesh/pb-adv.c | 444 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ mesh/pb-adv.h |  23 +++
+ 2 files changed, 467 insertions(+)
+ create mode 100644 mesh/pb-adv.c
+ create mode 100644 mesh/pb-adv.h
 
-diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c
+diff --git a/mesh/pb-adv.c b/mesh/pb-adv.c
 new file mode 100644
-index 000000000..669cf340d
+index 000000000..57647e184
 --- /dev/null
-+++ b/mesh/prov-initiator.c
-@@ -0,0 +1,641 @@
++++ b/mesh/pb-adv.c
+@@ -0,0 +1,444 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -103,603 +104,435 @@ index 000000000..669cf340d
 +#include "mesh/net_keys.h"
 +#include "mesh/crypto.h"
 +#include "mesh/net.h"
-+#include "mesh/error.h"
++#include "mesh/mesh-io.h"
++#include "mesh/mesh.h"
 +#include "mesh/prov.h"
 +#include "mesh/provision.h"
 +#include "mesh/pb-adv.h"
-+#include "mesh/mesh.h"
-+#include "mesh/agent.h"
 +
-+/* Quick size sanity check */
-+static const uint16_t expected_pdu_size[] = {
-+	2,	/* PROV_INVITE */
-+	12,	/* PROV_CAPS */
-+	6,	/* PROV_START */
-+	65,	/* PROV_PUB_KEY */
-+	1,	/* PROV_INP_CMPLT */
-+	17,	/* PROV_CONFIRM */
-+	17,	/* PROV_RANDOM */
-+	34,	/* PROV_DATA */
-+	1,	/* PROV_COMPLETE */
-+	2,	/* PROV_FAILED */
++
++struct pb_adv_session {
++	mesh_prov_open_func_t open_cb;
++	mesh_prov_close_func_t close_cb;
++	mesh_prov_receive_func_t rx_cb;
++	mesh_prov_ack_func_t ack_cb;
++	struct l_timeout *tx_timeout;
++	uint32_t conn_id;
++	uint16_t exp_len;
++	uint8_t exp_fcs;
++	uint8_t exp_segs;
++	uint8_t got_segs;
++	uint8_t msg_num;
++	uint8_t local_acked;
++	uint8_t local_msg_num;
++	uint8_t peer_msg_num;
++	uint8_t last_peer_msg_num;
++	uint8_t sar[80];
++	uint8_t uuid[16];
++	bool initiator;
++	bool opened;
++	void *user_data;
 +};
 +
-+#define BEACON_TYPE_UNPROVISIONED		0x00
++#define PB_ADV_ACK 0x01
++#define PB_ADV_OPEN_REQ 0x03
++#define PB_ADV_OPEN_CFM 0x07
++#define PB_ADV_CLOSE 0x0B
 +
-+static const uint8_t pkt_filter = MESH_AD_TYPE_PROVISION;
++#define PB_ADV_MTU	24
 +
-+enum int_state {
-+	INT_PROV_IDLE = 0,
-+	INT_PROV_INVITE_SENT,
-+	INT_PROV_INVITE_ACKED,
-+	INT_PROV_START_SENT,
-+	INT_PROV_START_ACKED,
-+	INT_PROV_KEY_SENT,
-+	INT_PROV_KEY_ACKED,
-+	INT_PROV_CONF_SENT,
-+	INT_PROV_CONF_ACKED,
-+	INT_PROV_RAND_SENT,
-+	INT_PROV_RAND_ACKED,
-+	INT_PROV_DATA_SENT,
-+	INT_PROV_DATA_ACKED,
-+};
++static struct pb_adv_session *pb_session = NULL;
 +
-+#define MAT_REMOTE_PUBLIC	0x01
-+#define MAT_LOCAL_PRIVATE	0x02
-+#define MAT_RAND_AUTH		0x04
-+#define MAT_SECRET	(MAT_REMOTE_PUBLIC | MAT_LOCAL_PRIVATE)
-+
-+struct mesh_prov_initiator {
-+	mesh_prov_initiator_complete_func_t cmplt;
-+	prov_trans_tx_t trans_tx;
-+	void *agent;
-+	void *caller_data;
-+	void *trans_data;
-+	struct l_timeout *timeout;
-+	uint32_t to_secs;
-+	enum int_state	state;
-+	enum trans_type transport;
-+	uint8_t material;
-+	uint8_t expected;
-+	int8_t previous;
-+	struct conf_input conf_inputs;
-+	uint8_t calc_key[16];
-+	uint8_t salt[16];
-+	uint8_t confirm[16];
-+	uint8_t s_key[16];
-+	uint8_t s_nonce[13];
-+	uint8_t private_key[32];
-+	uint8_t secret[32];
-+	uint8_t rand_auth_workspace[48];
-+};
-+
-+static struct mesh_prov_initiator *prov = NULL;
-+
-+static void initiator_free(void)
++static void send_adv_segs(struct pb_adv_session *session, const uint8_t *data,
++							uint16_t size)
 +{
-+
-+	if (prov)
-+		l_timeout_remove(prov->timeout);
-+
-+	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
-+
-+	l_free(prov);
-+	prov = NULL;
-+}
-+
-+static void int_prov_close(void *user_data, uint8_t reason)
-+{
-+	/* TODO: Handle Close */
-+}
-+
-+static void int_prov_open(void *user_data, prov_trans_tx_t trans_tx,
-+				void *trans_data, uint8_t transport)
-+{
-+	struct mesh_prov_initiator *rx_prov = user_data;
-+	uint8_t invite[] = { PROV_INVITE, 30 };
-+
-+	/* Only one provisioning session may be open at a time */
-+	if (rx_prov != prov)
-+		return;
-+
-+	/* Only one provisioning session may be open at a time */
-+	if (prov->trans_tx && prov->trans_tx != trans_tx &&
-+					prov->transport != transport)
-+		return;
-+
-+	/* We only care here if transport does *not* match */
-+	if (transport != prov->transport)
-+		return;
-+
-+	/* Always use an ephemeral key when Initiator */
-+	ecc_make_key(prov->conf_inputs.prv_pub_key, prov->private_key);
-+	prov->material |= MAT_LOCAL_PRIVATE;
-+
-+	prov->trans_tx = trans_tx;
-+	prov->trans_data = trans_data;
-+	prov->state = INT_PROV_INVITE_SENT;
-+	prov->expected = PROV_CAPS;
-+
-+	prov->conf_inputs.invite.attention = invite[1];
-+	prov->trans_tx(prov->trans_data, invite, sizeof(invite));
-+	return;
-+}
-+
-+static void swap_u256_bytes(uint8_t *u256)
-+{
++	uint16_t init_size;
++	uint8_t buf[PB_ADV_MTU + 6] = { MESH_AD_TYPE_PROVISION };
++	uint8_t max_seg;
++	uint8_t consumed;
 +	int i;
 +
-+	/* End-to-End byte reflection of 32 octet buffer */
-+	for (i = 0; i < 16; i++) {
-+		u256[i] ^= u256[31 - i];
-+		u256[31 - i] ^= u256[i];
-+		u256[i] ^= u256[31 - i];
++	if (!size)
++		return;
++
++	mesh_send_cancel(buf, 1);
++
++	l_put_be32(session->conn_id, buf + 1);
++	buf[1 + 4] = ++session->local_msg_num;
++
++	if (size > PB_ADV_MTU - 4) {
++		max_seg = 1 +
++			(((size - (PB_ADV_MTU - 4)) - 1) / (PB_ADV_MTU - 1));
++		init_size = PB_ADV_MTU - 4;
++	} else {
++		max_seg = 0;
++		init_size = size;
++	}
++
++	/* print_packet("FULL-TX", data, size); */
++
++	l_debug("Sending %u fragments for %u octets", max_seg + 1, size);
++
++	buf[6] = max_seg << 2;
++	l_put_be16(size, buf + 7);
++	buf[9] = mesh_crypto_compute_fcs(data, size);
++	memcpy(buf + 10, data, init_size);
++
++	l_debug("max_seg: %2.2x", max_seg);
++	l_debug("size: %2.2x, CRC: %2.2x", size, buf[9]);
++	/* print_packet("PB-TX", buf + 1, init_size + 9); */
++	mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 50, buf, init_size + 10);
++
++	consumed = init_size;
++
++	for (i = 1; i <= max_seg; i++) {
++		uint8_t seg_size; /* Amount of payload data being sent */
++
++		if (size - consumed > PB_ADV_MTU - 1)
++			seg_size = PB_ADV_MTU - 1;
++		else
++			seg_size = size - consumed;
++
++		buf[6] = (i << 2) | 0x02;
++		memcpy(buf + 7, data + consumed, seg_size);
++
++		/* print_packet("PB-TX", buf + 1, seg_size + 6); */
++
++		mesh_send_pkt(MESH_IO_TX_COUNT_UNLIMITED, 50,
++							buf, seg_size + 7);
++
++		consumed += seg_size;
 +	}
 +}
 +
-+static void prov_calc_secret(const uint8_t *pub, const uint8_t *priv,
-+							uint8_t *secret)
++static void tx_timeout(struct l_timeout *timeout, void *user_data)
 +{
-+	uint8_t tmp[64];
++	struct pb_adv_session *session = user_data;
++	uint8_t cancel[] = { MESH_AD_TYPE_PROVISION };
++	mesh_prov_close_func_t cb;
 +
-+	/* Convert to ECC byte order */
-+	memcpy(tmp, pub, 64);
-+	swap_u256_bytes(tmp);
-+	swap_u256_bytes(tmp + 32);
-+
-+	ecdh_shared_secret(tmp, priv, secret);
-+
-+	/* Convert to Mesh byte order */
-+	swap_u256_bytes(secret);
-+}
-+
-+static void int_credentials(struct mesh_prov_initiator *prov)
-+{
-+	prov_calc_secret(prov->conf_inputs.dev_pub_key,
-+			prov->private_key, prov->secret);
-+
-+	mesh_crypto_s1(&prov->conf_inputs,
-+			sizeof(prov->conf_inputs), prov->salt);
-+
-+	mesh_crypto_prov_conf_key(prov->secret, prov->salt,
-+			prov->calc_key);
-+
-+	l_getrandom(prov->rand_auth_workspace, 16);
-+
-+	print_packet("PublicKeyProv", prov->conf_inputs.prv_pub_key, 64);
-+	print_packet("PublicKeyDev", prov->conf_inputs.dev_pub_key, 64);
-+	print_packet("PrivateKeyLocal", prov->private_key, 32);
-+	print_packet("ConfirmationInputs", &prov->conf_inputs,
-+						sizeof(prov->conf_inputs));
-+	print_packet("ECDHSecret", prov->secret, 32);
-+	print_packet("LocalRandom", prov->rand_auth_workspace, 16);
-+	print_packet("ConfirmationSalt", prov->salt, 16);
-+	print_packet("ConfirmationKey", prov->calc_key, 16);
-+}
-+
-+static uint8_t u16_high_bit(uint16_t mask)
-+{
-+	uint8_t cnt = 0;
-+
-+	if (!mask)
-+		return 0xff;
-+
-+	while (mask & 0xfffe) {
-+		cnt++;
-+		mask >>= 1;
-+	}
-+
-+	return cnt;
-+}
-+
-+static uint32_t digit_mod(uint8_t power)
-+{
-+	uint32_t ret = 1;
-+
-+	while (power--)
-+		ret *= 10;
-+
-+	return ret;
-+}
-+
-+static void calc_local_material(const uint8_t *random)
-+{
-+	/* Calculate SessionKey while the data is fresh */
-+	mesh_crypto_prov_prov_salt(prov->salt,
-+			prov->rand_auth_workspace, random,
-+			prov->salt);
-+	mesh_crypto_session_key(prov->secret, prov->salt,
-+			prov->s_key);
-+	mesh_crypto_nonce(prov->secret, prov->salt, prov->s_nonce);
-+
-+	print_packet("SessionKey", prov->s_key, sizeof(prov->s_key));
-+	print_packet("Nonce", prov->s_nonce, sizeof(prov->s_nonce));
-+	print_packet("RandomDevice", prov->rand_auth_workspace, 16);
-+}
-+
-+static void number_cb(void *user_data, int err, uint32_t number)
-+{
-+	struct mesh_prov_initiator *rx_prov = user_data;
-+	uint8_t out[2];
-+
-+	if (prov != rx_prov)
++	if (!session || pb_session != session)
 +		return;
 +
-+	if (err) {
-+		out[0] = PROV_FAILED;
-+		out[1] = PROV_ERR_UNEXPECTED_ERR;
-+		prov->trans_tx(prov->trans_data, out, 2);
-+		return;
-+	}
++	l_timeout_remove(session->tx_timeout);
++	session->tx_timeout = NULL;
 +
-+	/* Save two copies, to generate two confirmation values */
-+	l_put_be32(number, prov->rand_auth_workspace + 28);
-+	l_put_be32(number, prov->rand_auth_workspace + 44);
-+	prov->material |= MAT_RAND_AUTH;
++	mesh_send_cancel(cancel, sizeof(cancel));
++
++	l_info("TX timeout");
++	cb = pb_session->close_cb;
++	user_data = pb_session->user_data;
++	l_free(pb_session);
++	pb_session = NULL;
++	cb(user_data, 1);
 +}
 +
-+static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
++static void pb_adv_tx(void *user_data, uint8_t *data, uint16_t len)
 +{
-+	struct mesh_prov_initiator *rx_prov = user_data;
-+	uint8_t out[2];
++	struct pb_adv_session *session = user_data;
 +
-+	if (prov != rx_prov)
++	if (!session || pb_session != session)
 +		return;
 +
-+	if (err || !key || len != 16) {
-+		out[0] = PROV_FAILED;
-+		out[1] = PROV_ERR_UNEXPECTED_ERR;
-+		prov->trans_tx(prov->trans_data, out, 2);
-+		return;
-+	}
++	l_timeout_remove(session->tx_timeout);
++	session->tx_timeout = l_timeout_create(30, tx_timeout, session, NULL);
 +
-+	memcpy(prov->rand_auth_workspace + 16, key, 16);
-+	memcpy(prov->rand_auth_workspace + 32, key, 16);
-+	prov->material |= MAT_RAND_AUTH;
++	send_adv_segs(session, data, len);
 +}
 +
-+static void pub_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
++static void send_open_cfm(struct pb_adv_session *session)
 +{
-+	struct mesh_prov_initiator *rx_prov = user_data;
-+	uint8_t out[2];
++	uint8_t open_cfm[7] = { MESH_AD_TYPE_PROVISION };
 +
-+	if (prov != rx_prov)
-+		return;
++	l_put_be32(session->conn_id, open_cfm + 1);
++	open_cfm[1 + 4] = 0;
++	open_cfm[1 + 4 + 1] = 0x07; /* OPEN_CFM */
 +
-+	if (err || !key || len != 64) {
-+		out[0] = PROV_FAILED;
-+		out[1] = PROV_ERR_UNEXPECTED_ERR;
-+		prov->trans_tx(prov->trans_data, out, 2);
-+		return;
-+	}
++	/* print_packet("PB-TX", open_cfm + 1, sizeof(open_cfm) - 1); */
 +
-+		memcpy(prov->conf_inputs.dev_pub_key, key, 64);
-+		prov->material |= MAT_REMOTE_PUBLIC;
-+
-+		if ((prov->material & MAT_SECRET) == MAT_SECRET)
-+			int_credentials(prov);
++	mesh_send_cancel(open_cfm, 1);
++	mesh_send_pkt(5, 100, open_cfm, sizeof(open_cfm));
 +}
 +
-+static void int_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
++static void send_ack(struct pb_adv_session *session, uint8_t msg_num)
 +{
-+	struct mesh_prov_initiator *rx_prov = user_data;
-+	uint8_t *out;
-+	uint8_t type = *data++;
-+	uint8_t fail_code[2];
-+	uint32_t oob_key;
-+	uint64_t mic;
++	uint8_t ack[7] = { MESH_AD_TYPE_PROVISION };
 +
-+	if (rx_prov != prov || !prov->trans_tx)
++	l_put_be32(session->conn_id, ack + 1);
++	ack[1 + 4] = msg_num;
++	ack[1 + 4 + 1] = 0x01; /* ACK */
++
++	/* print_packet("ADV-ACK", ack + 1, sizeof(ack) - 1); */
++	mesh_send_pkt(1, 100, ack, sizeof(ack));
++}
++
++static void send_close_ind(struct pb_adv_session *session, uint8_t reason)
++{
++	uint8_t close_ind[8] = { MESH_AD_TYPE_PROVISION };
++
++	if (!pb_session || pb_session->user_data != session)
 +		return;
 +
-+	l_debug("Provisioning packet received type: %2.2x (%u octets)",
-+								type, len);
++	l_put_be32(session->conn_id, close_ind + 1);
++	close_ind[5] = 0;
++	close_ind[6] = PB_ADV_CLOSE;		/* CLOSE_IND */
++	close_ind[7] = reason;
 +
-+	if (type == prov->previous) {
-+		l_error("Ignore repeated %2.2x packet", type);
++	mesh_send_cancel(close_ind, 1);
++	mesh_send_pkt(5, 100, close_ind, sizeof(close_ind));
++}
++
++static void pb_adv_packet(void *user_data, const uint8_t *pkt, uint16_t len)
++{
++	struct pb_adv_session *session = user_data;
++	uint32_t conn_id;
++	size_t offset;
++	uint8_t msg_num;
++	uint8_t type;
++	bool first;
++
++	if (!session || pb_session != session)
 +		return;
-+	} else if (type > prov->expected || type < prov->previous) {
-+		l_error("Expected %2.2x, Got:%2.2x", prov->expected, type);
-+		fail_code[1] = PROV_ERR_UNEXPECTED_PDU;
-+		goto failure;
-+	}
 +
-+	if (type >= L_ARRAY_SIZE(expected_pdu_size) ||
-+					len != expected_pdu_size[type]) {
-+		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
-+			len, expected_pdu_size[type], type);
-+		fail_code[1] = PROV_ERR_INVALID_FORMAT;
-+		goto failure;
-+	}
++	conn_id = l_get_be32(pkt + 1);
++	type = l_get_u8(pkt + 6);
++
++	/* Validate new or existing Connection ID */
++	if (session->conn_id) {
++		if (session->conn_id != conn_id)
++			return;
++	} else if (type != 0x03)
++		return;
++	else if (!conn_id)
++		return;
++
++	msg_num = l_get_u8(pkt + 5);
++	pkt += 7;
++	len -= 7;
 +
 +	switch (type) {
-+	case PROV_CAPS: /* Capabilities */
-+		prov->state = INT_PROV_INVITE_ACKED;
-+		memcpy(&prov->conf_inputs.caps, data,
-+					sizeof(prov->conf_inputs.caps));
++	case PB_ADV_OPEN_CFM:
++		/*
++		 * Ignore if:
++		 * 1. We are acceptor
++		 * 2. We are already provisioning on different conn_id
++		 */
 +
-+		l_debug("Got Num Ele %d", data[0]);
-+		l_debug("Got alg %4.4x", l_get_be16(data + 1));
-+		l_debug("Got pub_type %d", data[3]);
-+		l_debug("Got static_type %d", data[4]);
-+		l_debug("Got output_size %d", data[5]);
-+		l_debug("Got output_action %d", l_get_be16(data + 6));
-+		l_debug("Got input_size %d", data[8]);
-+		l_debug("Got input_action %d", l_get_be16(data + 9));
-+
-+		if (!(l_get_be16(data + 1) & 0x0001)) {
-+			l_error("Unsupported Algorithm");
-+			fail_code[1] = PROV_ERR_INVALID_FORMAT;
-+			goto failure;
-+		}
-+
-+		/* If Public Key available Out of Band, use it */
-+		if (prov->conf_inputs.caps.pub_type) {
-+			prov->conf_inputs.start.pub_key = 0x01;
-+			prov->expected = PROV_CONFIRM;
-+			/* Prompt Agent for remote Public Key */
-+			mesh_agent_request_public_key(prov->agent,
-+							pub_key_cb, prov);
-+
-+			/* Nothing else for us to do now */
-+		} else
-+			prov->expected = PROV_PUB_KEY;
-+
-+		/* Parse OOB Options, prefer static, then out, then in */
-+		if (prov->conf_inputs.caps.static_type) {
-+
-+			prov->conf_inputs.start.auth_method = 0x01;
-+
-+		} else if (prov->conf_inputs.caps.output_size &&
-+				prov->conf_inputs.caps.output_action) {
-+
-+			prov->conf_inputs.start.auth_method = 0x02;
-+			prov->conf_inputs.start.auth_action =
-+					u16_high_bit(l_get_be16(data + 6));
-+			prov->conf_inputs.start.auth_size =
-+						(data[5] > 8 ? 8 : data[5]);
-+
-+		} else if (prov->conf_inputs.caps.input_size &&
-+				prov->conf_inputs.caps.input_action) {
-+
-+			prov->conf_inputs.start.auth_method = 0x03;
-+			prov->conf_inputs.start.auth_action =
-+					u16_high_bit(l_get_be16(data + 9));
-+			prov->conf_inputs.start.auth_size =
-+						(data[8] > 8 ? 8 : data[8]);
-+
-+		}
-+
-+		out = l_malloc(1 + sizeof(prov->conf_inputs.start));
-+		out[0] = PROV_START;
-+		memcpy(out + 1, &prov->conf_inputs.start,
-+					sizeof(prov->conf_inputs.start));
-+
-+		prov->state = INT_PROV_START_SENT;
-+		prov->trans_tx(prov->trans_data, out,
-+					sizeof(prov->conf_inputs.start) + 1);
-+		l_free(out);
-+		break;
-+
-+	case PROV_PUB_KEY: /* Public Key */
-+		/* If we expected Pub Key Out-Of-Band, then fail */
-+		if (prov->conf_inputs.start.pub_key) {
-+			fail_code[1] = PROV_ERR_INVALID_PDU;
-+			goto failure;
-+		}
-+
-+		memcpy(prov->conf_inputs.dev_pub_key, data, 64);
-+		prov->material |= MAT_REMOTE_PUBLIC;
-+		prov->expected = PROV_CONFIRM;
-+
-+		if ((prov->material & MAT_SECRET) != MAT_SECRET)
++		if (!session->initiator)
 +			return;
 +
-+		int_credentials(prov);
-+		prov->state = INT_PROV_KEY_ACKED;
++		first = !session->opened;
++		session->opened = true;
 +
-+		prov->expected = PROV_CONFIRM;
++		/* Only call Open callback once */
++		if (first) {
++			l_debug("PB-ADV open confirmed");
++			session->open_cb(session->user_data, pb_adv_tx,
++							session, PB_ADV);
++		}
++		return;
 +
-+		memset(prov->rand_auth_workspace + 16, 0, 32);
-+		switch (prov->conf_inputs.start.auth_method) {
++	case PB_ADV_OPEN_REQ:
++		/*
++		 * Ignore if:
++		 * 1. We are initiator
++		 * 2. Open request not addressed to us
++		 * 3. We are already provisioning on different conn_id
++		 */
++
++		if (session->initiator)
++			return;
++
++		if (memcmp(pkt, session->uuid, 16))
++			return;
++
++		first = !session->conn_id;
++		session->conn_id = conn_id;
++		session->last_peer_msg_num = 0xFF;
++		session->local_acked = 0xFF;
++		session->peer_msg_num = 0x00;
++		session->local_msg_num = 0x7F;
++		session->opened = true;
++
++		/* Only call Open callback once */
++		if (first) {
++			l_debug("PB-ADV open requested");
++			session->open_cb(session->user_data, pb_adv_tx,
++							session, PB_ADV);
++		}
++
++		/* Send CFM once per received request */
++		send_open_cfm(session);
++		break;
++
++	case PB_ADV_CLOSE:
++		l_timeout_remove(session->tx_timeout);
++		l_debug("Link closed notification: %2.2x", pkt[0]);
++		/* Wrap callback for pre-cleaning */
++		if (true) {
++			mesh_prov_close_func_t cb = session->close_cb;
++			void *user_data = session->user_data;
++
++			l_free(session);
++			pb_session = NULL;
++			cb(user_data, pkt[0]);
++		}
++		break;
++
++	case PB_ADV_ACK:
++		if (!session->opened)
++			return;
++
++		if (msg_num != session->local_msg_num)
++			return;
++
++		if (session->local_acked > msg_num)
++			return;
++
++		l_debug("Got ACK %d", msg_num);
++		session->local_acked = msg_num;
++		session->ack_cb(session->user_data, msg_num);
++		break;
++
++	default: /* DATA SEGMENT */
++		if (!session->opened)
++			return;
++
++		if (msg_num == session->last_peer_msg_num) {
++			send_ack(session, msg_num);
++			return;
++		}
++
++		switch(type & 0x03) {
++		case 0x00:
++			session->peer_msg_num = msg_num;
++			session->exp_len = l_get_be16(pkt);
++
++			l_debug("PB-ADV start with %u fragments, %d octets",
++						type >> 2, session->exp_len);
++
++			if (session->exp_len > sizeof(session->sar)) {
++				l_debug("Incoming length exceeded: %d",
++							session->exp_len);
++				return;
++			}
++
++			session->exp_fcs = l_get_u8(pkt + 2);
++			session->exp_segs = 0xff >> (7 - (type >> 2));
++
++			/* Save first segment */
++			memcpy(session->sar, pkt + 3, len - 3);
++			session->got_segs |= 1;
++			break;
++
++		case 0x02:
++			session->peer_msg_num = msg_num;
++			offset = 20 + (((type >> 2) - 1) * 23);
++
++			if (offset + len - 3 > sizeof(session->sar)) {
++				l_debug("Length exceeded: %d",
++							session->exp_len);
++				return;
++			}
++
++			l_debug("Processing fragment %u", type >> 2);
++			memcpy(session->sar + offset, pkt, len);
++			session->got_segs |= 1 << (type >> 2);
++			break;
++
 +		default:
-+		case 0:
-+			/* Auth Type 3c - No OOB */
-+			prov->material |= MAT_RAND_AUTH;
-+			break;
-+		case 1:
-+			/* Auth Type 3c - Static OOB */
-+			/* Prompt Agent for Static OOB */
-+			fail_code[1] = mesh_agent_request_static(prov->agent,
-+					static_cb, prov);
-+
-+			if (fail_code[1])
-+				goto failure;
-+
-+			break;
-+		case 2:
-+			/* Auth Type 3a - Output OOB */
-+			/* Prompt Agent for Output OOB */
-+			if (prov->conf_inputs.start.auth_action ==
-+							PROV_ACTION_OUT_ALPHA) {
-+				fail_code[1] = mesh_agent_prompt_alpha(
-+					prov->agent,
-+					static_cb, prov);
-+			} else {
-+				fail_code[1] = mesh_agent_prompt_number(
-+					prov->agent, true,
-+					prov->conf_inputs.start.auth_action,
-+					number_cb, prov);
-+			}
-+
-+			if (fail_code[1])
-+				goto failure;
-+
-+			break;
-+
-+
-+		case 3:
-+			/* Auth Type 3b - input OOB */
-+			l_getrandom(&oob_key, sizeof(oob_key));
-+			oob_key %= digit_mod(prov->conf_inputs.start.auth_size);
-+
-+			/* Save two copies, for two confirmation values */
-+			l_put_be32(oob_key, prov->rand_auth_workspace + 28);
-+			l_put_be32(oob_key, prov->rand_auth_workspace + 44);
-+			prov->material |= MAT_RAND_AUTH;
-+			/* Ask Agent to Display U32 */
-+			if (prov->conf_inputs.start.auth_action ==
-+							PROV_ACTION_IN_ALPHA) {
-+				/* TODO: Construst NUL-term string to pass */
-+				fail_code[1] = mesh_agent_display_string(
-+					prov->agent, NULL, NULL, prov);
-+			} else {
-+				fail_code[1] = mesh_agent_display_number(
-+					prov->agent, false,
-+					prov->conf_inputs.start.auth_action,
-+					oob_key, NULL, prov);
-+			}
-+
-+			if (fail_code[1])
-+				goto failure;
-+
-+			break;
-+
-+
-+		}
-+		break;
-+
-+	case PROV_INP_CMPLT: /* Provisioning Input Complete */
-+		/* TODO: Cancel Agent prompt */
-+		prov->expected = PROV_CONFIRM;
-+		out = l_malloc(17);
-+		out[0] = PROV_CONFIRM;
-+		mesh_crypto_aes_cmac(prov->calc_key, prov->rand_auth_workspace,
-+								32, out + 1);
-+		prov->trans_tx(prov->trans_data, out, 17);
-+		l_free(out);
-+		break;
-+
-+	case PROV_CONFIRM: /* Confirmation */
-+		prov->state = INT_PROV_CONF_ACKED;
-+		/* RXed Device Confirmation */
-+		memcpy(prov->confirm, data, 16);
-+		print_packet("ConfirmationDevice", prov->confirm, 16);
-+		prov->expected = PROV_RANDOM;
-+		out = l_malloc(17);
-+		out[0] = PROV_RANDOM;
-+		memcpy(out + 1, prov->rand_auth_workspace, 16);
-+		prov->trans_tx(prov->trans_data, out, 17);
-+		l_free(out);
-+		break;
-+
-+	case PROV_RANDOM: /* Random */
-+		prov->state = INT_PROV_RAND_ACKED;
-+
-+		/* RXed Device Confirmation */
-+		memcpy(prov->rand_auth_workspace + 16, data, 16);
-+		print_packet("RandomDevice", data, 16);
-+		calc_local_material(data);
-+
-+		mesh_crypto_aes_cmac(prov->calc_key,
-+						prov->rand_auth_workspace + 16,
-+						32, prov->rand_auth_workspace);
-+
-+		if (memcmp(prov->rand_auth_workspace, prov->confirm, 16)) {
-+			l_error("Provisioning Failed-Confirm compare)");
-+			fail_code[1] = PROV_ERR_CONFIRM_FAILED;
-+			goto failure;
++			/* Malformed or unrecognized */
++			return;
 +		}
 +
-+		if (prov->state == INT_PROV_RAND_ACKED) {
-+			prov->expected = PROV_COMPLETE;
-+			out = l_malloc(34);
-+			out[0] = PROV_DATA;
-+			/* TODO: Fill Prov Data Structure */
-+			/* Encrypt Prov Data */
-+			mesh_crypto_aes_ccm_encrypt(prov->s_nonce, prov->s_key,
-+					NULL, 0,
-+					out + 1,
-+					25,
-+					out + 1,
-+					&mic, sizeof(mic));
-+			prov->trans_tx(prov->trans_data, out, 34);
-+			l_free(out);
++		if (session->got_segs != session->exp_segs)
++			return;
++
++		/* Validate RXed packet and pass up to Provisioning */
++		if (!mesh_crypto_check_fcs(session->sar,
++					session->exp_len,
++					session->exp_fcs)) {
++
++			/* This can be a false negative if first
++			 * segment missed, and can almost always
++			 * be ignored.
++			 */
++
++			l_debug("Invalid FCS");
++			return;
 +		}
-+		break;
 +
-+	case PROV_COMPLETE: /* Complete */
-+		l_info("Provisioning Complete");
-+		prov->state = INT_PROV_IDLE;
-+		//mesh_prov_close(prov, 0);
-+		break;
++		if (session->last_peer_msg_num != session->peer_msg_num) {
++			session->got_segs = 0;
++			session->rx_cb(session->user_data, session->sar,
++							session->exp_len);
++		}
 +
-+	case PROV_FAILED: /* Failed */
-+		l_error("Provisioning Failed (reason: %d)", data[0]);
-+		//mesh_prov_close(prov, data[0]);
-+		break;
-+
-+	default:
-+		l_error("Unknown Pkt %2.2x", type);
-+		fail_code[1] = PROV_ERR_UNEXPECTED_PDU;
-+		goto failure;
++		session->last_peer_msg_num = session->peer_msg_num;
++		send_ack(session, session->last_peer_msg_num);
 +	}
-+
-+	prov->previous = type;
-+	return;
-+
-+failure:
-+	fail_code[0] = PROV_FAILED;
-+	prov->trans_tx(prov->trans_data, fail_code, 2);
-+	/* TODO: Call Complete Callback (Fail)*/
 +}
 +
-+static void int_prov_ack(void *user_data, uint8_t msg_num)
++bool pb_adv_reg(mesh_prov_open_func_t open_cb, mesh_prov_close_func_t close_cb,
++		mesh_prov_receive_func_t rx_cb, mesh_prov_ack_func_t ack_cb,
++		uint8_t uuid[16], void *user_data)
 +{
-+	/* TODO: Handle PB-ADV Ack */
-+}
-+
-+
-+bool initiator_start(enum trans_type transport,
-+		uint8_t uuid[16],
-+		uint16_t max_ele,
-+		uint16_t server, /* Only valid for PB-Remote */
-+		uint32_t timeout, /* in seconds from mesh.conf */
-+		struct mesh_agent *agent,
-+		mesh_prov_initiator_complete_func_t complete_cb,
-+		void *caller_data)
-+{
-+	bool result;
-+
-+	/* Invoked from Add() method in mesh-api.txt, to add a
-+	 * remote unprovisioned device network.
-+	 */
-+
-+	if (prov)
++	if (pb_session)
 +		return false;
 +
-+	prov = l_new(struct mesh_prov_initiator, 1);
-+	prov->to_secs = timeout;
-+	prov->agent = agent;
-+	prov->cmplt = complete_cb;
-+	prov->caller_data = caller_data;
-+	prov->previous = -1;
++	pb_session = l_new(struct pb_adv_session, 1);
++	pb_session->open_cb = open_cb;
++	pb_session->close_cb = close_cb;
++	pb_session->rx_cb = rx_cb;
++	pb_session->ack_cb = ack_cb;
++	pb_session->user_data = user_data;
++	memcpy(pb_session->uuid, uuid, 16);
 +
-+	/* Always register for PB-ADV */
-+	result = pb_adv_reg(int_prov_open, int_prov_close, int_prov_rx,
-+						int_prov_ack, uuid, prov);
++	/* TODO: register PB AD type and Start Beaconing ? */
++	mesh_reg_prov_rx(pb_adv_packet, pb_session);
 +
-+	if (result)
-+		return true;
-+
-+	initiator_free();
-+	return false;
++	return true;
 +}
 +
-+void initiator_cancel(void *user_data)
++void pb_adv_unreg(void *user_data)
 +{
-+	initiator_free();
++	if (!pb_session || pb_session->user_data != user_data)
++		return;
++
++	l_timeout_remove(pb_session->tx_timeout);
++	send_close_ind(pb_session, 0);
++	l_free(pb_session);
++	pb_session = NULL;
 +}
+diff --git a/mesh/pb-adv.h b/mesh/pb-adv.h
+new file mode 100644
+index 000000000..a5870d5a2
+--- /dev/null
++++ b/mesh/pb-adv.h
+@@ -0,0 +1,23 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++bool pb_adv_reg(mesh_prov_open_func_t open_cb, mesh_prov_close_func_t close_cb,
++		mesh_prov_receive_func_t rx_cb, mesh_prov_ack_func_t ack_cb,
++		uint8_t uuid[16], void *user_data);
++void pb_adv_unreg(void *user_data);
 -- 
 2.14.5
 
