@@ -2,63 +2,63 @@ Return-Path: <SRS0=+lf3=PF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7619C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 07:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2DD5C43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 11:25:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75C2F2087F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 07:49:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CFD92087F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 11:25:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="S7aUHADL";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="S7aUHADL"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Dy+kgERA";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Xo3ghD6B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729561AbeL1HtE (ORCPT
+        id S1732072AbeL1LZj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Dec 2018 02:49:04 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:57816 "EHLO
+        Fri, 28 Dec 2018 06:25:39 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:40074 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729270AbeL1HtE (ORCPT
+        with ESMTP id S1729450AbeL1LZj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Dec 2018 02:49:04 -0500
+        Fri, 28 Dec 2018 06:25:39 -0500
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 8565F607F1; Fri, 28 Dec 2018 07:49:03 +0000 (UTC)
+        id 822FA6053B; Fri, 28 Dec 2018 11:25:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1545983343;
-        bh=1F/Yn44DPECdXMHddk3/h6tLbhV1GEAPKLXSN3qQwNM=;
+        s=default; t=1545996338;
+        bh=wjrL2rEhZUVUpTPdWN6/twFVaY62HNxrxxejuWi7Omk=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=S7aUHADLd4FxPVpsq/ZBLAefCk1Rw1cSMQ/N2h8Glym7rJ4E/+PCc7KzqkkTM6khy
-         /X0XPmPVLfbp3Y3s0Ob7Oum3oa9JKiAOhsuW1XyUiMuwUHe5aVInAKUUWWMpTxmYOn
-         T5ubwBfhbbGDN3v0O2QXg3Ls56GxR44EVeiabuw8=
+        b=Dy+kgERA99gIXaz81t2HSwYyl4KNRPJzeEzl6TV/MP9g2ZljvXQl6n9Q3KtBeKQHl
+         +kpRRtJg8/7O4b8ZrIwWGHbJjJKBw2msnjQoZjY6AMWinxoZgO7EvVtYpo7NZfurNM
+         MYpDZONvEx5/c/8JH3oZC7VG4Jb/+bmXOw0B24qY=
 Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id EA45660364;
-        Fri, 28 Dec 2018 07:49:02 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTP id BCB8560364;
+        Fri, 28 Dec 2018 11:25:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1545983343;
-        bh=1F/Yn44DPECdXMHddk3/h6tLbhV1GEAPKLXSN3qQwNM=;
+        s=default; t=1545996337;
+        bh=wjrL2rEhZUVUpTPdWN6/twFVaY62HNxrxxejuWi7Omk=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=S7aUHADLd4FxPVpsq/ZBLAefCk1Rw1cSMQ/N2h8Glym7rJ4E/+PCc7KzqkkTM6khy
-         /X0XPmPVLfbp3Y3s0Ob7Oum3oa9JKiAOhsuW1XyUiMuwUHe5aVInAKUUWWMpTxmYOn
-         T5ubwBfhbbGDN3v0O2QXg3Ls56GxR44EVeiabuw8=
+        b=Xo3ghD6BNBiGWVa7f/m/5iM5Ncxo59j8MzoTbsFIbocnix9C+XK5Gtm7EdeZ2LG9x
+         OOVFT1cAtevbcNVa5f6Q4M6gFRG+o0Kv6uXEvolR7oEReqCBJKyRgglMHyRHh10H54
+         +abECGLfCzRKf4OmMunQb6tIov3sFmJgtDb/plL4=
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Fri, 28 Dec 2018 13:19:02 +0530
+Date:   Fri, 28 Dec 2018 16:55:37 +0530
 From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
 To:     Matthias Kaehlcke <mka@chromium.org>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v6 3/6] Bluetooth: hci_qca: Fix frame reassembly errors
- for wcn3990
-In-Reply-To: <20181227202514.GK261387@google.com>
+Subject: Re: [PATCH v6 5/6] Bluetooth: hci_qca: Update baudrate change wait
+ time for wcn3990
+In-Reply-To: <20181227210023.GL261387@google.com>
 References: <20181227073136.8431-1-bgodavar@codeaurora.org>
- <20181227073136.8431-4-bgodavar@codeaurora.org>
- <20181227202514.GK261387@google.com>
-Message-ID: <3ff6a55912a5b4f9462484d90bab3084@codeaurora.org>
+ <20181227073136.8431-6-bgodavar@codeaurora.org>
+ <20181227210023.GL261387@google.com>
+Message-ID: <b527c36b08400bf8737814a7dc9bd736@codeaurora.org>
 X-Sender: bgodavar@codeaurora.org
 User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -68,24 +68,67 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Matthias,
 
-On 2018-12-28 01:55, Matthias Kaehlcke wrote:
-> On Thu, Dec 27, 2018 at 01:01:33PM +0530, Balakrishna Godavarthi wrote:
->> During initalization of wcn3990, we observed UART is reading some
->> stray bytes on the Rx line. This is logging Frame reassembly errors
->> on the serial console. This could be because of tristate of Tx line
->> of wcn3990 during boot up.
+On 2018-12-28 02:30, Matthias Kaehlcke wrote:
+> On Thu, Dec 27, 2018 at 01:01:35PM +0530, Balakrishna Godavarthi wrote:
+>> This patch will update the baudrate change request wait time from
+>> 300 ms to 100 ms. When host sends the change baudrate request to
+>> the controller, controller sets its clock and wait until the
+>> clocks settle down. Here the Wait time is required for both
+>> host and controller to be on sync.
 > 
-> My testing suggests that this change is not needed if the Rx line of
-> the SoC/AP is configured with a pull-up. We'd probably all prefer not
-> to have this change if there's a neater way to address the garbage
-> data. Could you test with adding the pull-up and dropping this patch
-> on your side?
+> Ultimately up to you, but I would advise against adding 'improvement'
+> changes to this series. The scope of the series is already fairly
+> vague ("Bug fixes for Qualcomm BT chip wcn3990"), with at least some
+> patches that could be sent individually, which would reduce churn when
+> respinning.
+
+[Bala]: yes your correct will send this as improvement patch once the 
+series is merged.
+
 > 
-> Thanks
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>> 
+>> Changes in v6:
+>>  * intial patch.
+>> 
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 12 ++++++++++--
+>>  1 file changed, 10 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 4677a6a2716a..61b0fb1ff32f 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -60,7 +60,8 @@
+>> 
+>>  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+>>  #define IBS_TX_IDLE_TIMEOUT_MS		2000
+>> -#define BAUDRATE_SETTLE_TIMEOUT_MS	300
+>> +#define ROME_BD_SETTLE_TIMEOUT_MS	300
+>> +#define WCN3990_BD_SETTLE_TIMEOUT_MS	100
+> 
+> My testing suggests that even the lower 100 ms delay isn't needed, if
+> different parts that require a delay are addressed more specifically,
+> instead of using a single long 'settle' delay
+> (https://lore.kernel.org/patchwork/patch/1026795/#1212816 has some
+> details).
+> 
+[Bala]: i to agree with you. but from the point 1, we have many chances 
+of getting
+         baudrate change delay. after lot of stress test and experiments 
+we found 100 ms is reasonable to handle all
+         of them together.
+
+> My idea was to sent a patch after this series has landed to avoid
+> interfering with it.
+> 
+
+[Bala]: sure will drop this change from the series.
+
+> Cheers
 > 
 > Matthias
-
-Thanks a lot it worked to me. will drop this patch.
 
 -- 
 Regards
