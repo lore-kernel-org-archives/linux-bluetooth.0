@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EBCDC43614
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E7BFC43612
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:07:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5ED96217F9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:07:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4316F217F9
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:07:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727002AbeL1WHz (ORCPT
+        id S1727017AbeL1WH5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Dec 2018 17:07:55 -0500
+        Fri, 28 Dec 2018 17:07:57 -0500
 Received: from mga17.intel.com ([192.55.52.151]:19949 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726749AbeL1WHz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S1726827AbeL1WHz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 28 Dec 2018 17:07:55 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Dec 2018 14:07:53 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Dec 2018 14:07:54 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,411,1539673200"; 
-   d="scan'208";a="113968696"
+   d="scan'208";a="113968704"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.140.14])
-  by orsmga003.jf.intel.com with ESMTP; 28 Dec 2018 14:07:53 -0800
+  by orsmga003.jf.intel.com with ESMTP; 28 Dec 2018 14:07:54 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v6 06/26] mesh: Rewrite Network layer for multiple nodes
-Date:   Fri, 28 Dec 2018 14:07:25 -0800
-Message-Id: <20181228220745.25147-7-brian.gix@intel.com>
+Subject: [PATCH BlueZ v6 08/26] mesh: Acceptor side provisioning implementation
+Date:   Fri, 28 Dec 2018 14:07:27 -0800
+Message-Id: <20181228220745.25147-9-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181228220745.25147-1-brian.gix@intel.com>
 References: <20181228220745.25147-1-brian.gix@intel.com>
@@ -43,636 +43,705 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The Network layer of the Mesh Daemon has access to all
-network keys that have been entrusted to Nodes on the local
-device, and acts as a MUX by forwarding incoming messages
-to some, all or none of the local Nodes, based on addressing
-and keys.
-
-It also is reponsible for for applying Network layer encryption
-to outgoing messages, and for relaying messages based on TTL.
+This functionaility (originally found in provision.c) was rewritten
+as the Acceptor side only of the provisioning procedure. This
+is the more common procedure of the unprovisioned device that is
+brought into an existing mesh network by a remote (master) Provisioner.
 ---
- mesh/net.c | 294 ++++++++++++++++---------------------------------------------
- mesh/net.h |  34 ++-----
- 2 files changed, 84 insertions(+), 244 deletions(-)
+ mesh/prov-acceptor.c | 684 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 684 insertions(+)
+ create mode 100644 mesh/prov-acceptor.c
 
-diff --git a/mesh/net.c b/mesh/net.c
-index 97b6f5b16..842d899d7 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -26,11 +26,11 @@
- #include <stdio.h>
- #include <sys/time.h>
- #include <ell/ell.h>
-+#include <json-c/json.h>
- 
- #include "mesh/mesh-defs.h"
- #include "mesh/util.h"
- 
--#include "mesh/display.h"
- #include "mesh/crypto.h"
- #include "mesh/net_keys.h"
- #include "mesh/mesh.h"
-@@ -112,12 +112,9 @@ struct mesh_subnet {
- };
- 
- struct mesh_net {
--	int ref_count;
- 	struct mesh_io *io;
--	struct mesh_node *local_node;
-+	struct mesh_node *node;
- 	struct mesh_prov *prov;
--	void *jconfig_local;
--	const char *cfg_file;
- 	struct l_queue *app_keys;
- 	unsigned int pkt_id;
- 	unsigned int bea_id;
-@@ -129,7 +126,6 @@ struct mesh_net {
- 	bool beacon_enable;
- 	bool proxy_enable;
- 	bool provisioner;
--	bool provisioned;
- 	bool friend_seq;
- 	struct l_timeout *iv_update_timeout;
- 	enum _iv_upd_state iv_upd_state;
-@@ -139,7 +135,6 @@ struct mesh_net {
- 	uint32_t iv_index;
- 	uint32_t seq_num;
- 	uint32_t cached_seq_num;
--	uint16_t crpl;
- 	uint16_t src_addr;
- 	uint16_t last_addr;
- 	uint16_t friend_addr;
-@@ -253,6 +248,8 @@ struct net_decode {
- 	bool proxy;
- };
- 
-+static struct l_queue *nets;
+diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
+new file mode 100644
+index 000000000..baa3c4d30
+--- /dev/null
++++ b/mesh/prov-acceptor.c
+@@ -0,0 +1,684 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
- static inline struct mesh_subnet *get_primary_subnet(struct mesh_net *net)
- {
- 	return l_queue_peek_head(net->subnets);
-@@ -499,8 +496,8 @@ uint32_t mesh_net_next_seq_num(struct mesh_net *net)
- 	/* Periodically store advanced sequence number */
- 	if (net->seq_num + MIN_SEQ_TRIGGER >= net->cached_seq_num) {
- 		net->cached_seq_num = net->seq_num +
--					node_seq_cache(net->local_node);
--		node_set_sequence_number(net->local_node, net->cached_seq_num);
-+					node_seq_cache(net->node);
-+		node_set_sequence_number(net->node, net->cached_seq_num);
- 	}
- 
- 	return seq;
-@@ -647,15 +644,13 @@ static void start_network_beacon(void *a, void *b)
- 				network_beacon_timeout, subnet, NULL);
- }
- 
--struct mesh_net *mesh_net_new(uint16_t index)
-+struct mesh_net *mesh_net_new(struct mesh_node *node)
- {
- 	struct mesh_net *net;
- 
- 	net = l_new(struct mesh_net, 1);
- 
--	if (!net)
--		return NULL;
--
-+	net->node = node;
- 	net->pkt_id = 0;
- 	net->bea_id = 0;
- 	net->key_id_next = 0;
-@@ -689,27 +684,17 @@ struct mesh_net *mesh_net_new(uint16_t index)
- 
- 	memset(&net->heartbeat, 0, sizeof(net->heartbeat));
- 
--	return mesh_net_ref(net);
--}
--
--struct mesh_net *mesh_net_ref(struct mesh_net *net)
--{
--	if (!net)
--		return NULL;
--
--	__sync_fetch_and_add(&net->ref_count, 1);
-+	if (!nets)
-+		nets = l_queue_new();
- 
- 	return net;
- }
- 
--void mesh_net_unref(struct mesh_net *net)
-+void mesh_net_free(struct mesh_net *net)
- {
- 	if (!net)
- 		return;
- 
--	if (__sync_sub_and_fetch(&net->ref_count, 1))
--		return;
--
- 	l_queue_destroy(net->subnets, subnet_free);
- 	l_queue_destroy(net->fast_cache, mesh_msg_free);
- 	l_queue_destroy(net->msg_cache, mesh_msg_free);
-@@ -773,7 +758,6 @@ bool mesh_net_register_unicast(struct mesh_net *net,
- 	if (!net || !IS_UNICAST(address) || !num_ele)
- 		return false;
- 
--	l_info("mesh_net_set_address: 0x%x", address);
- 	net->src_addr = address;
- 	net->last_addr = address + num_ele - 1;
- 	if (net->last_addr < net->src_addr)
-@@ -971,7 +955,7 @@ int mesh_net_del_key(struct mesh_net *net, uint16_t idx)
- 	l_queue_remove(net->subnets, subnet);
- 	subnet_free(subnet);
- 
--	if (!storage_local_net_key_del(net, idx))
-+	if (!storage_net_key_del(net, idx))
- 		return MESH_STATUS_STORAGE_FAIL;
- 
- 	return MESH_STATUS_SUCCESS;
-@@ -991,7 +975,7 @@ int mesh_net_add_key(struct mesh_net *net, bool update, uint16_t idx,
- 			l_info("Start key refresh");
- 			status = mesh_net_kr_phase_one(net, idx, value);
- 			if (status == MESH_STATUS_SUCCESS &&
--				!storage_local_net_key_add(net, idx,
-+				!storage_net_key_add(net, idx,
- 						value, KEY_REFRESH_PHASE_ONE))
- 				return MESH_STATUS_STORAGE_FAIL;
- 		} else
-@@ -1021,7 +1005,7 @@ int mesh_net_add_key(struct mesh_net *net, bool update, uint16_t idx,
- 		return MESH_STATUS_INSUFF_RESOURCES;
- 	}
- 
--	if (!storage_local_net_key_add(net, idx, value,
-+	if (!storage_net_key_add(net, idx, value,
- 					KEY_REFRESH_PHASE_NONE)) {
- 		l_queue_remove(net->subnets, subnet);
- 		subnet_free(subnet);
-@@ -1204,14 +1188,6 @@ static bool match_msg_timeout(const void *a, const void *b)
- 	return sar->msg_timeout == msg_timeout;
- }
- 
--static bool match_sar_id(const void *a, const void *b)
--{
--	const struct mesh_sar *sar = a;
--	unsigned int id = L_PTR_TO_UINT(b);
--
--	return sar->id == id;
--}
--
- static bool match_seg_timeout(const void *a, const void *b)
- {
- 	const struct mesh_sar *sar = a;
-@@ -1813,7 +1789,7 @@ static bool msg_rxed(struct mesh_net *net, bool frnd,
- 	}
- 
- not_for_friend:
--	return mesh_model_rx(net, szmic, seqAuth, seq, iv_index,
-+	return mesh_model_rx(net->node, szmic, seqAuth, seq, iv_index,
- 					ttl, src, dst, key_id, data, size);
- }
- 
-@@ -2511,22 +2487,40 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
- 		send_relay_pkt(net, packet, size + 1);
- }
- 
-+struct net_queue_data {
-+	struct mesh_io_recv_info *info;
-+	const uint8_t *data;
-+	uint16_t len;
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <sys/select.h>
++#include <sys/time.h>
++#include <sys/types.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <termios.h>
++
++#include <ctype.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <getopt.h>
++#include <time.h>
++#include <ell/ell.h>
++
++#include "mesh/mesh-defs.h"
++#include "src/shared/ecc.h"
++
++#include "mesh/util.h"
++#include "mesh/net_keys.h"
++#include "mesh/crypto.h"
++#include "mesh/net.h"
++#include "mesh/error.h"
++#include "mesh/prov.h"
++#include "mesh/provision.h"
++#include "mesh/pb-adv.h"
++#include "mesh/mesh.h"
++#include "mesh/agent.h"
++
++/* Quick size sanity check */
++static const uint16_t expected_pdu_size[] = {
++	2,	/* PROV_INVITE */
++	12,	/* PROV_CAPS */
++	6,	/* PROV_START */
++	65,	/* PROV_PUB_KEY */
++	1,	/* PROV_INP_CMPLT */
++	17,	/* PROV_CONFIRM */
++	17,	/* PROV_RANDOM */
++	34,	/* PROV_DATA */
++	1,	/* PROV_COMPLETE */
++	2,	/* PROV_FAILED */
 +};
 +
-+static void net_rx(void *net_ptr, void *user_data)
-+{
-+	struct net_queue_data *data = user_data;
-+	struct mesh_net *net = net_ptr;
-+	int8_t rssi = 0;
++#define BEACON_TYPE_UNPROVISIONED		0x00
 +
-+	if (data->info) {
-+		net->instant = data->info->instant;
-+		net->chan = data->info->chan;
-+		rssi = data->info->rssi;
++static const uint8_t pkt_filter = MESH_AD_TYPE_PROVISION;
++static const uint8_t bec_filter[] = {MESH_AD_TYPE_BEACON,
++						BEACON_TYPE_UNPROVISIONED};
++
++enum acp_state {
++	ACP_PROV_IDLE = 0,
++	ACP_PROV_CAPS_SENT,
++	ACP_PROV_CAPS_ACKED,
++	ACP_PROV_KEY_SENT,
++	ACP_PROV_KEY_ACKED,
++	ACP_PROV_INP_CMPLT_SENT,
++	ACP_PROV_INP_CMPLT_ACKED,
++	ACP_PROV_CONF_SENT,
++	ACP_PROV_CONF_ACKED,
++	ACP_PROV_RAND_SENT,
++	ACP_PROV_RAND_ACKED,
++	ACP_PROV_CMPLT_SENT,
++	ACP_PROV_FAIL_SENT,
++};
++
++#define MAT_REMOTE_PUBLIC	0x01
++#define MAT_LOCAL_PRIVATE	0x02
++#define MAT_RAND_AUTH		0x04
++#define MAT_SECRET	(MAT_REMOTE_PUBLIC | MAT_LOCAL_PRIVATE)
++
++struct mesh_prov_acceptor {
++	mesh_prov_acceptor_complete_func_t cmplt;
++	prov_trans_tx_t trans_tx;
++	void *agent;
++	void *caller_data;
++	void *trans_data;
++	struct l_timeout *timeout;
++	uint32_t to_secs;
++	enum acp_state	state;
++	uint8_t transport;
++	uint8_t material;
++	uint8_t expected;
++	int8_t previous;
++	struct conf_input conf_inputs;
++	uint8_t calc_key[16];
++	uint8_t salt[16];
++	uint8_t confirm[16];
++	uint8_t s_key[16];
++	uint8_t s_nonce[13];
++	uint8_t private_key[32];
++	uint8_t secret[32];
++	uint8_t rand_auth_workspace[48];
++};
++
++static struct mesh_prov_acceptor *prov = NULL;
++
++static void acceptor_free(void)
++{
++
++	if (prov)
++		l_timeout_remove(prov->timeout);
++
++	mesh_send_cancel(bec_filter, sizeof(bec_filter));
++	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
++
++	if (prov->trans_tx) {
++		if (prov->transport == PB_ADV)
++			pb_adv_unreg(prov->trans_data);
 +	}
 +
-+	packet_received(net, data->data, data->len, rssi);
++	l_free(prov);
++	prov = NULL;
 +}
 +
- static void net_msg_recv(void *user_data, struct mesh_io_recv_info *info,
- 					const uint8_t *data, uint16_t len)
- {
--	struct mesh_net *net = user_data;
--	int8_t rssi = 0;
-+	struct net_queue_data net_data = {
-+		.info = info,
-+		.data = data + 1,
-+		.len = len - 1,
-+	};
- 
--	if (len <= 2 || !net)
-+	if (len <= 2)
- 		return;
- 
--	if (info) {
--		net->instant = info->instant;
--		net->chan = info->chan;
--		rssi = info->rssi;
--	}
--
--	packet_received(user_data, data + 1, len - 1, rssi);
-+	l_queue_foreach(nets, net_rx, &net_data);
- }
- 
- static void set_network_beacon(void *a, void *b)
-@@ -2653,7 +2647,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 			net->iv_upd_state = IV_UPD_NORMAL;
- 		}
- 
--		storage_local_set_iv_index(net, iv_index, net->iv_upd_state);
-+		storage_set_iv_index(net, iv_index, net->iv_upd_state);
- 
- 		/* Figure out the key refresh phase */
- 		if (kr_transition) {
-@@ -2675,7 +2669,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 		net->iv_upd_state = IV_UPD_UPDATING;
- 		net->iv_update_timeout = l_timeout_create(IV_IDX_UPD_MIN,
- 							iv_upd_to, net, NULL);
--		storage_local_set_iv_index(net, iv_index, net->iv_upd_state);
-+		storage_set_iv_index(net, iv_index, net->iv_upd_state);
- 	} else if (iv_update && iv_index != net->iv_index) {
- 		l_error("Update attempted too soon (iv idx already updated)");
- 		return;
-@@ -2688,7 +2682,7 @@ static void update_iv_kr_state(struct mesh_subnet *subnet, uint32_t iv_index,
- 	if (iv_index > net->iv_index) {
- 		l_queue_clear(net->msg_cache, mesh_msg_free);
- 		net->iv_index = iv_index;
--		storage_local_set_iv_index(net, iv_index, net->iv_upd_state);
-+		storage_set_iv_index(net, iv_index, net->iv_upd_state);
- 	}
- 
- 	/* Figure out the key refresh phase */
-@@ -2915,34 +2909,37 @@ bool mesh_net_set_beacon_mode(struct mesh_net *net, bool enable)
- 	return true;
- }
- 
-+static bool is_this_net(const void *a, const void *b)
++static void acp_prov_close(void *user_data, uint8_t reason)
 +{
-+	return a == b;
++	/* TODO: Handle Close */
 +}
 +
- bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
- {
-+	bool first;
++static void prov_to(struct l_timeout *timeout, void *user_data)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	uint8_t fail_code[2] = {PROV_FAILED, PROV_ERR_UNEXPECTED_ERR};
 +
- 	if (!net)
- 		return false;
- 
--	net->io = io;
--	if (net->provisioned) {
-+	first = l_queue_isempty(nets);
-+	if (first) {
-+		if (!nets)
-+			nets = l_queue_new();
- 
-+		l_info("Register io cb");
- 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_BEACON,
- 							beacon_recv, net);
- 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_NET,
--							net_msg_recv, net);
-+							net_msg_recv, NULL);
- 		l_queue_foreach(net->subnets, start_network_beacon, net);
++	if (rx_prov != prov)
++		return;
++
++	prov->timeout = NULL;
++
++	if (prov->cmplt && prov->trans_tx) {
++		prov->cmplt(prov->caller_data, PROV_ERR_TIMEOUT, NULL);
++		prov->cmplt = NULL;
++		prov->trans_tx(prov->trans_data, fail_code, 2);
++		prov->timeout = l_timeout_create(1, prov_to, prov, NULL);
++		return;
 +	}
- 
--	} else {
--		uint8_t *uuid = node_uuid_get(net->local_node);
--
--		if (!uuid)
--			return false;
-+	if (l_queue_find(nets, is_this_net, net))
++
++	acceptor_free();
++}
++
++static void acp_prov_open(void *user_data, prov_trans_tx_t trans_tx,
++				void *trans_data, uint8_t transport)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++
++	/* Only one provisioning session may be open at a time */
++	if (rx_prov != prov)
++		return;
++
++	/* Only one provisioning session may be open at a time */
++	if (prov->trans_tx && prov->trans_tx != trans_tx &&
++					prov->transport != transport)
++		return;
++
++	if (transport != PB_ADV)
++		return;
++
++	prov->trans_tx = trans_tx;
++	prov->transport = transport;
++	prov->trans_data = trans_data;
++	prov->timeout = l_timeout_create(prov->to_secs, prov_to, prov, NULL);
++}
++
++static void swap_u256_bytes(uint8_t *u256)
++{
++	int i;
++
++	/* End-to-End byte reflection of 32 octet buffer */
++	for (i = 0; i < 16; i++) {
++		u256[i] ^= u256[31 - i];
++		u256[31 - i] ^= u256[i];
++		u256[i] ^= u256[31 - i];
++	}
++}
++
++static void prov_calc_secret(const uint8_t *pub, const uint8_t *priv,
++							uint8_t *secret)
++{
++	uint8_t tmp[64];
++
++	/* Convert to ECC byte order */
++	memcpy(tmp, pub, 64);
++	swap_u256_bytes(tmp);
++	swap_u256_bytes(tmp + 32);
++
++	ecdh_shared_secret(tmp, priv, secret);
++
++	/* Convert to Mesh byte order */
++	swap_u256_bytes(secret);
++}
++
++static void acp_credentials(struct mesh_prov_acceptor *prov)
++{
++	prov_calc_secret(prov->conf_inputs.prv_pub_key,
++			prov->private_key, prov->secret);
++
++	mesh_crypto_s1(&prov->conf_inputs,
++			sizeof(prov->conf_inputs), prov->salt);
++
++	mesh_crypto_prov_conf_key(prov->secret, prov->salt,
++			prov->calc_key);
++
++	l_getrandom(prov->rand_auth_workspace, 16);
++
++	print_packet("PublicKeyProv", prov->conf_inputs.prv_pub_key, 64);
++	print_packet("PublicKeyDev", prov->conf_inputs.dev_pub_key, 64);
++	print_packet("PrivateKeyLocal", prov->private_key, 32);
++	print_packet("ConfirmationInputs", &prov->conf_inputs,
++						sizeof(prov->conf_inputs));
++	print_packet("ECDHSecret", prov->secret, 32);
++	print_packet("LocalRandom", prov->rand_auth_workspace, 16);
++	print_packet("ConfirmationSalt", prov->salt, 16);
++	print_packet("ConfirmationKey", prov->calc_key, 16);
++}
++
++static uint32_t digit_mod(uint8_t power)
++{
++	uint32_t ret = 1;
++
++	while (power--)
++		ret *= 10;
++
++	return ret;
++}
++
++static void number_cb(void *user_data, int err, uint32_t number)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	uint8_t out[2];
++
++	if (prov != rx_prov)
++		return;
++
++	if (err) {
++		out[0] = PROV_FAILED;
++		out[1] = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, out, 2);
++		return;
++	}
++
++	/* Save two copies, to generate two confirmation values */
++	l_put_be32(number, prov->rand_auth_workspace + 28);
++	l_put_be32(number, prov->rand_auth_workspace + 44);
++	prov->material |= MAT_RAND_AUTH;
++	out[0] = PROV_INP_CMPLT;
++	prov->trans_tx(prov->trans_data, out, 1);
++}
++
++static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	uint8_t out[2];
++
++	if (prov != rx_prov)
++		return;
++
++	if (err || !key || len != 16) {
++		out[0] = PROV_FAILED;
++		out[1] = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, out, 2);
++		return;
++	}
++
++	/* Save two copies, to generate two confirmation values */
++	memcpy(prov->rand_auth_workspace + 16, key, 16);
++	memcpy(prov->rand_auth_workspace + 32, key, 16);
++	prov->material |= MAT_RAND_AUTH;
++}
++
++static void priv_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	uint8_t out[2];
++
++	if (prov != rx_prov)
++		return;
++
++	if (err || !key || len != 32) {
++		out[0] = PROV_FAILED;
++		out[1] = PROV_ERR_UNEXPECTED_ERR;
++		prov->trans_tx(prov->trans_data, out, 2);
++		return;
++	}
++
++	memcpy(prov->private_key, key, 32);
++	ecc_make_public_key(prov->private_key,
++			prov->conf_inputs.dev_pub_key);
++
++	/* Convert to Mesh byte order */
++	swap_u256_bytes(prov->conf_inputs.dev_pub_key);
++	swap_u256_bytes(prov->conf_inputs.dev_pub_key + 32);
++
++	prov->material |= MAT_LOCAL_PRIVATE;
++	if ((prov->material & MAT_SECRET) == MAT_SECRET)
++		acp_credentials(prov);
++}
++
++static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
++{
++	struct mesh_prov_acceptor *rx_prov = user_data;
++	struct mesh_prov_node_info *info;
++	uint8_t *out;
++	uint8_t type = *data++;
++	uint8_t fail_code[2];
++	uint32_t oob_key;
++	uint64_t decode_mic;
++	bool result;
++
++	if (rx_prov != prov || !prov->trans_tx)
++		return;
++
++	l_debug("Provisioning packet received type: %2.2x (%u octets)",
++								type, len);
++
++	if (type == prov->previous) {
++		l_error("Ignore repeated %2.2x packet", type);
++		return;
++	} else if (type > prov->expected || type < prov->previous) {
++		l_error("Expected %2.2x, Got:%2.2x", prov->expected, type);
++		fail_code[1] = PROV_ERR_UNEXPECTED_PDU;
++		goto failure;
++	}
++
++	if (type >= L_ARRAY_SIZE(expected_pdu_size) ||
++					len != expected_pdu_size[type]) {
++		l_error("Expected PDU size %d, Got %d (type: %2.2x)",
++			len, expected_pdu_size[type], type);
++		fail_code[1] = PROV_ERR_INVALID_FORMAT;
++		goto failure;
++	}
++
++	switch (type){
++	case PROV_INVITE: /* Prov Invite */
++		/* Prov Capabilities */
++		out = l_malloc(1 + sizeof(struct mesh_net_prov_caps));
++		out[0] = PROV_CAPS;
++		memcpy(out + 1, &prov->conf_inputs.caps,
++					sizeof(prov->conf_inputs.caps));
++
++		prov->conf_inputs.invite.attention = data[0];
++
++		prov->state = ACP_PROV_CAPS_SENT;
++		prov->expected = PROV_START;
++		prov->trans_tx(prov->trans_data,
++				out, sizeof(prov->conf_inputs.caps) + 1);
++		l_free(out);
++		break;
++
++	case PROV_START: /* Prov Start */
++		memcpy(&prov->conf_inputs.start, data,
++				sizeof(prov->conf_inputs.start));
++
++		if (prov->conf_inputs.start.algorithm ||
++				prov->conf_inputs.start.pub_key > 1 ||
++				prov->conf_inputs.start.auth_method > 3) {
++			fail_code[1] = PROV_ERR_INVALID_FORMAT;
++			goto failure;
++		}
++
++		if (prov->conf_inputs.start.pub_key) {
++			if (prov->conf_inputs.caps.pub_type) {
++				/* Prompt Agent for Private Key of OOB */
++				mesh_agent_request_private_key(prov->agent,
++							priv_key_cb, prov);
++			} else {
++				fail_code[1] = PROV_ERR_INVALID_PDU;
++				goto failure;
++			}
++		} else {
++			/* Ephemeral Public Key requested */
++			ecc_make_key(prov->conf_inputs.dev_pub_key,
++					prov->private_key);
++			swap_u256_bytes(prov->conf_inputs.dev_pub_key);
++			swap_u256_bytes(prov->conf_inputs.dev_pub_key + 32);
++			prov->material |= MAT_LOCAL_PRIVATE;
++		}
++
++		prov->expected = PROV_PUB_KEY;
++		break;
++
++	case PROV_PUB_KEY: /* Public Key */
++		/* Save Key */
++		memcpy(prov->conf_inputs.prv_pub_key, data, 64);
++		prov->material |= MAT_REMOTE_PUBLIC;
++		prov->expected = PROV_CONFIRM;
++
++		if ((prov->material & MAT_SECRET) != MAT_SECRET)
++			return;
++
++		acp_credentials(prov);
++
++		if (!prov->conf_inputs.start.pub_key) {
++			out = l_malloc(65);
++			out[0] = PROV_PUB_KEY;
++			memcpy(out + 1, prov->conf_inputs.dev_pub_key, 64);
++			prov->trans_tx(prov->trans_data, out, 65);
++			l_free(out);
++		}
++
++		/* Start Step 3 */
++		switch (prov->conf_inputs.start.auth_method) {
++		default:
++		case 0:
++			/* Auth Type 3c - No OOB */
++			break;
++
++		case 1:
++			/* Auth Type 3c - Static OOB */
++			/* Prompt Agent for Static OOB */
++			fail_code[1] = mesh_agent_request_static(prov->agent,
++					static_cb, prov);
++
++			if (fail_code[1])
++				goto failure;
++
++			break;
++
++		case 2:
++			/* Auth Type 3a - Output OOB */
++			l_getrandom(&oob_key, sizeof(oob_key));
++			oob_key %= digit_mod(prov->conf_inputs.start.auth_size);
++
++			/* Save two copies, for two confirmation values */
++			l_put_be32(oob_key, prov->rand_auth_workspace + 28);
++			l_put_be32(oob_key, prov->rand_auth_workspace + 44);
++			prov->material |= MAT_RAND_AUTH;
++
++			if (prov->conf_inputs.start.auth_action ==
++							PROV_ACTION_OUT_ALPHA) {
++				/* TODO: Construst NUL-term string to pass */
++				fail_code[1] = mesh_agent_display_string(
++					prov->agent, NULL, NULL, prov);
++			} else {
++				/* Ask Agent to Display U32 */
++				fail_code[1] = mesh_agent_display_number(
++					prov->agent, false,
++					prov->conf_inputs.start.auth_action,
++					oob_key, NULL, prov);
++			}
++
++			if (fail_code[1])
++				goto failure;
++
++			break;
++
++		case 3:
++			/* Auth Type 3b - input OOB */
++			/* Prompt Agent for Input OOB */
++			if (prov->conf_inputs.start.auth_action ==
++							PROV_ACTION_IN_ALPHA) {
++				fail_code[1] = mesh_agent_prompt_alpha(
++					prov->agent,
++					static_cb, prov);
++			} else {
++				fail_code[1] = mesh_agent_prompt_number(
++					prov->agent, false,
++					prov->conf_inputs.start.auth_action,
++					number_cb, prov);
++			}
++
++			if (fail_code[1])
++				goto failure;
++
++			break;
++		}
++
++		prov->expected = PROV_CONFIRM;
++		break;
++
++	case PROV_CONFIRM: /* Confirmation */
++		out = l_malloc(17);
++		out[0] = PROV_CONFIRM;
++
++		/* Calculate and Send our Confirmation */
++		mesh_crypto_aes_cmac(prov->calc_key, prov->rand_auth_workspace,
++								32, out + 1);
++		prov->trans_tx(prov->trans_data, out, 17);
++		l_free(out);
++
++		/* Save Provisioners confirmation for later compare */
++		memcpy(prov->confirm, data, 16);
++		prov->expected = PROV_RANDOM;
++		break;
++
++	case PROV_RANDOM: /* Random Value */
++		out = l_malloc(17);
++		/* Calculate Session key (needed later) while data is fresh */
++		mesh_crypto_prov_prov_salt(prov->salt, data,
++						prov->rand_auth_workspace,
++						prov->salt);
++		mesh_crypto_session_key(prov->secret, prov->salt, prov->s_key);
++		mesh_crypto_nonce(prov->secret, prov->salt, prov->s_nonce);
++
++		/* Calculate expected Provisioner Confirm */
++		memcpy(prov->rand_auth_workspace + 16, data, 16);
++		mesh_crypto_aes_cmac(prov->calc_key,
++				prov->rand_auth_workspace + 16, 32, out);
++
++		/* Compare our calculation with Provisioners */
++		if (memcmp(out, prov->confirm, 16)) {
++			fail_code[1] = PROV_ERR_CONFIRM_FAILED;
++			l_free(out);
++			goto failure;
++		}
++
++		/* Send Random value we used */
++		out[0] = PROV_RANDOM;
++		memcpy(out + 1, prov->rand_auth_workspace, 16);
++		prov->trans_tx(prov->trans_data, out, 17);
++		l_free(out);
++		prov->expected = PROV_DATA;
++		break;
++
++	case PROV_DATA: /* Provisioning Data */
++
++		/* Calculate our device key */
++		mesh_crypto_device_key(prov->secret,
++				prov->salt,
++				prov->calc_key);
++
++		/* Decrypt new node data into workspace */
++		mesh_crypto_aes_ccm_decrypt(prov->s_nonce, prov->s_key,
++				NULL, 0,
++				data, len - 1, prov->rand_auth_workspace,
++				&decode_mic, sizeof(decode_mic));
++
++		/* Validate that the data hasn't been messed with in transit */
++		if (l_get_be64(data + 25) != decode_mic) {
++			l_error("Provisioning Failed-MIC compare");
++			fail_code[1] = PROV_ERR_DECRYPT_FAILED;
++			goto failure;
++		}
++
++		info = l_malloc(sizeof(struct mesh_prov_node_info));
++
++		memcpy(info->device_key, prov->calc_key, 16);
++		memcpy(info->net_key, prov->rand_auth_workspace, 16);
++		info->net_index = l_get_be16(prov->rand_auth_workspace + 16);
++		info->flags = prov->rand_auth_workspace[18];
++		info->iv_index = l_get_be32(prov->rand_auth_workspace + 19);
++		info->unicast = l_get_be16(prov->rand_auth_workspace + 23);
++
++		result = prov->cmplt(prov->caller_data, PROV_ERR_SUCCESS, info);
++		prov->cmplt = NULL;
++		l_free(info);
++
++		if (result) {
++			prov->rand_auth_workspace[0] = PROV_COMPLETE;
++			prov->trans_tx(prov->trans_data,
++					prov->rand_auth_workspace, 1);
++			goto cleanup;
++		} else {
++			fail_code[1] = PROV_ERR_UNEXPECTED_ERR;
++			goto failure;
++		}
++		break;
++
++	case PROV_FAILED: /* Provisioning Error -- abort */
++		/* TODO: Call Complete Callback (Fail)*/
++		prov->cmplt(prov->caller_data,
++				data[0] ? data[0] : PROV_ERR_UNEXPECTED_ERR,
++				NULL);
++		prov->cmplt = NULL;
++		goto cleanup;
++	}
++
++	prov->previous = type;
++	return;
++
++failure:
++	fail_code[0] = PROV_FAILED;
++	prov->trans_tx(prov->trans_data, fail_code, 2);
++	if (prov->cmplt)
++		prov->cmplt(prov->caller_data, fail_code[1], NULL);
++	prov->cmplt = NULL;
++
++cleanup:
++	l_timeout_remove(prov->timeout);
++
++	/* Give PB Link 5 seconds to end session */
++	prov->timeout = l_timeout_create(5, prov_to, prov, NULL);
++}
++
++static void acp_prov_ack(void *user_data, uint8_t msg_num)
++{
++	/* TODO: Handle PB-ADV Ack */
++}
++
++
++/* This starts unprovisioned device beacon */
++bool acceptor_start(uint8_t num_ele, uint8_t uuid[16],
++		uint16_t algorithms, uint32_t timeout,
++		struct mesh_agent *agent,
++		mesh_prov_acceptor_complete_func_t complete_cb,
++		void *caller_data)
++{
++	struct mesh_agent_prov_caps *caps;
++	uint8_t beacon[24] = {MESH_AD_TYPE_BEACON,
++						BEACON_TYPE_UNPROVISIONED};
++	uint8_t len = sizeof(beacon) - sizeof(uint32_t);
++	bool result;
++
++	/* Invoked from Join() method in mesh-api.txt, to join a
++	 * remote mesh network.
++	 */
++
++	if (prov)
 +		return false;
- 
--		mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_BEACON);
--		mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_NET);
-+	l_queue_push_head(nets, net);
- 
--		mesh_prov_listen(net, uuid, (uint8_t *) &net->prov_caps,
--					acceptor_prov_open,
--					acceptor_prov_close,
--					acceptor_prov_receive, net);
--	}
-+	net->io = io;
- 
- 	return true;
- }
-@@ -2952,10 +2949,10 @@ struct mesh_io *mesh_net_detach(struct mesh_net *net)
- 	struct mesh_io *io;
- 	uint8_t type = 0;
- 
--	if (!net)
-+	if (!net || !net->io)
- 		return NULL;
- 
--	io  = net->io;
-+	io = net->io;
- 
- 	mesh_io_send_cancel(net->io, &type, 1);
- 	mesh_io_deregister_recv_cb(io, MESH_IO_FILTER_BEACON);
-@@ -2975,7 +2972,7 @@ bool mesh_net_iv_index_update(struct mesh_net *net)
- 	mesh_net_flush_msg_queues(net);
- 	net->iv_upd_state = IV_UPD_UPDATING;
- 	net->iv_index++;
--	if (!storage_local_set_iv_index(net, net->iv_index, IV_UPD_UPDATING))
-+	if (!storage_set_iv_index(net, net->iv_index, IV_UPD_UPDATING))
- 		return false;
- 
- 	l_queue_foreach(net->subnets, set_network_beacon, net);
-@@ -3241,28 +3238,25 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
- 	l_free(str);
- }
- 
--unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
--				uint16_t src, uint16_t dst,
--				uint8_t key_id, uint8_t ttl,
--				uint32_t seq, uint32_t iv_index,
--				bool szmic,
-+bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
-+				uint16_t dst, uint8_t key_id, uint8_t ttl,
-+				uint32_t seq, uint32_t iv_index, bool szmic,
- 				const void *msg, uint16_t msg_len,
- 				mesh_net_status_func_t status_func,
- 				void *user_data)
- {
- 	struct mesh_sar *payload = NULL;
- 	uint8_t seg, seg_max;
--	unsigned int ret = 0;
- 	bool result;
- 
- 	if (!net || msg_len > 384)
--		return 0;
-+		return false;
- 
- 	if (!src)
- 		src = net->src_addr;
- 
- 	if (!src || !dst)
--		return 0;
-+		return false;
- 
- 	if (ttl == 0xff)
- 		ttl = net->default_ttl;
-@@ -3287,7 +3281,7 @@ unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
- 		/* Adjust our seq_num for "virtual" delivery */
- 		net->seq_num += seg_max;
- 		mesh_net_next_seq_num(net);
--		return 0;
++
++	prov = l_new(struct mesh_prov_acceptor, 1);
++	prov->to_secs = timeout;
++	prov->agent = agent;
++	prov->cmplt = complete_cb;
++	prov->previous = -1;
++	prov->caller_data = caller_data;
++
++	caps = mesh_agent_get_caps(agent);
++
++	/* TODO: Should we sanity check values here or elsewhere? */
++	prov->conf_inputs.caps.num_ele = num_ele;
++	prov->conf_inputs.caps.pub_type = caps->pub_type;
++	prov->conf_inputs.caps.static_type = caps->static_type;
++	prov->conf_inputs.caps.output_size = caps->output_size;
++	prov->conf_inputs.caps.input_size = caps->input_size;
++
++	/* Store UINT16 values in Over-the-Air order, in packed structure
++	 * for crypto inputs
++	 */
++	l_put_be16(algorithms, &prov->conf_inputs.caps.algorithms);
++	l_put_be16(caps->output_action, &prov->conf_inputs.caps.output_action);
++	l_put_be16(caps->input_action, &prov->conf_inputs.caps.input_action);
++
++	/* Compose Unprovisioned Beacon */
++	memcpy(beacon + 2, uuid, 16);
++	l_put_be16(caps->oob_info, beacon + 18);
++	if (caps->oob_info & OOB_INFO_URI_HASH){
++		l_put_be32(caps->uri_hash, beacon + 20);
++		len += sizeof(uint32_t);
++	}
++
++	/* Infinitely Beacon until Canceled, or Provisioning Starts */
++	result = mesh_send_pkt(0, 500, beacon, len);
++
++	if (!result)
++		goto error_fail;
++
++	/* Always register for PB-ADV */
++	result = pb_adv_reg(acp_prov_open, acp_prov_close, acp_prov_rx,
++						acp_prov_ack, uuid, prov);
++
++	if (result)
 +		return true;
- 	}
- 
- 	/* If Segmented, Cancel any OB segmented message to same DST */
-@@ -3337,29 +3331,13 @@ unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
- 			l_timeout_create(MSG_TO, outmsg_to, net, NULL);
- 		payload->status_func = status_func;
- 		payload->user_data = user_data;
--		ret = payload->id = ++net->sar_id_next;
-+		payload->id = ++net->sar_id_next;
- 	} else
- 		mesh_sar_free(payload);
- 
--	return ret;
--}
--
--void mesh_net_app_send_cancel(struct mesh_net *net, unsigned int id)
--{
--	struct mesh_sar *sar = l_queue_remove_if(net->sar_out, match_sar_id,
--						L_UINT_TO_PTR(id));
--
--	if (sar) {
--		l_info("Canceling OB %d", id);
--		if (sar->status_func)
--			sar->status_func(sar->remote, 2,
--				sar->buf, sar->len - 4,
--				sar->user_data);
--	}
--	mesh_sar_free(sar);
-+	return result;
- }
- 
--/* TODO: add net key index */
- void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
- 				uint32_t iv_index,
- 				uint8_t ttl,
-@@ -3768,40 +3746,9 @@ uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr)
- 		return frnd->poll_timeout;
- }
- 
--bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
--							bool provisioner)
-+struct mesh_node *mesh_net_node_get(struct mesh_net *net)
- {
--	if (net->local_node) {
--		l_info("Local node already registered");
--		return false;
--	}
--
--	net->local_node = node;
--	net->provisioner = provisioner;
--
--	return true;
--}
--
--struct mesh_node *mesh_net_local_node_get(struct mesh_net *net)
--{
--	return  net->local_node;
--}
--
--bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl)
--{
--	if (!net)
--		return false;
--
--	net->crpl = crpl;
--	return true;
--}
--
--uint16_t mesh_net_get_crpl(struct mesh_net *net)
--{
--	if (!net)
--		return 0;
--
--	return net->crpl;
-+	return  net->node;
- }
- 
- struct l_queue *mesh_net_get_app_keys(struct mesh_net *net)
-@@ -3824,41 +3771,6 @@ bool mesh_net_have_key(struct mesh_net *net, uint16_t idx)
- 						L_UINT_TO_PTR(idx)) != NULL);
- }
- 
--bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig)
--{
--	if (!net)
--		return false;
--
--	net->jconfig_local = jconfig;
--	return true;
--}
--
--void *mesh_net_jconfig_get(struct mesh_net *net)
--{
--	if (!net)
--		return NULL;
--
--	return  net->jconfig_local;
--}
--
--bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg)
--{
--	if (!net)
--		return false;
--
--	net->cfg_file = cfg;
--	return true;
--}
--
--bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg)
--{
--	if (!net)
--		return false;
--
--	*cfg = net->cfg_file;
--	return true;
--}
--
- bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr)
- {
- 	if (!net)
-@@ -3919,55 +3831,3 @@ void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov)
- 	net->prov = prov;
- }
- 
--bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
--				uint16_t net_idx,  uint8_t net_key[16],
--				uint16_t unicast, uint16_t snb_flags,
--				uint32_t iv_index, mesh_status_func_t cb,
--				void *user_data)
--{
--	if (net->provisioned || !net->local_node)
--		return false;
--
--	if (!node_set_primary(net->local_node, unicast) ||
--				!(mesh_net_register_unicast(net, unicast,
--						mesh_net_get_num_ele(net))))
--		return false;
--
--	if (!node_set_device_key(net->local_node, device_key))
--		return false;
--
--	net->iv_index = iv_index;
--	net->iv_update = ((snb_flags & 0x02) != 0);
--	if (!storage_local_set_iv_index(net, iv_index, net->iv_update))
--		return false;
--
--	if (mesh_net_add_key(net, false, net_idx, net_key) !=
--							MESH_STATUS_SUCCESS)
--		return false;
--
--	if ((snb_flags & 0x01) &&
--			(mesh_net_add_key(net, true, net_idx, net_key) !=
--							MESH_STATUS_SUCCESS)) {
--		l_queue_clear(net->subnets, l_free);
--		return false;
--	}
--
--	return storage_save_new_config(net, net->cfg_file, cb, user_data);
--
--}
--
--void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned)
--{
--	if (!net)
--		return;
--
--	net->provisioned = provisioned;
--}
--
--bool mesh_net_provisioned_get(struct mesh_net *net)
--{
--	if (!net)
--		return false;
--
--	return net->provisioned;
--}
-diff --git a/mesh/net.h b/mesh/net.h
-index b8eb0699d..0ef01b63e 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -17,9 +17,6 @@
-  *
-  */
- 
--#include <stdbool.h>
--#include <stdint.h>
--
- #ifndef __packed
- #define __packed __attribute__((packed))
- #endif
-@@ -259,9 +256,8 @@ typedef void (*mesh_net_status_func_t)(uint16_t remote, uint8_t status,
- 					void *data, uint16_t size,
- 					void *user_data);
- 
--struct mesh_net *mesh_net_new(uint16_t index);
--struct mesh_net *mesh_net_ref(struct mesh_net *net);
--void mesh_net_unref(struct mesh_net *net);
-+struct mesh_net *mesh_net_new(struct mesh_node *node);
-+void mesh_net_free(struct mesh_net *net);
- void mesh_net_flush_msg_queues(struct mesh_net *net);
- void mesh_net_set_iv_index(struct mesh_net *net, uint32_t index, bool update);
- bool mesh_net_iv_index_update(struct mesh_net *net);
-@@ -301,13 +297,12 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t key_id,
- 				uint32_t seq, uint16_t src, uint16_t dst,
- 				const uint8_t *msg, uint16_t msg_len);
- 
--unsigned int mesh_net_app_send(struct mesh_net *net, bool frnd_cred,
--				uint16_t src, uint16_t dst, uint8_t key_id,
--				uint8_t ttl, uint32_t seq, uint32_t iv_index,
--				bool szmic, const void *msg, uint16_t msg_len,
-+bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
-+				uint16_t dst, uint8_t key_id, uint8_t ttl,
-+				uint32_t seq, uint32_t iv_index, bool szmic,
-+				const void *msg, uint16_t msg_len,
- 				mesh_net_status_func_t status_func,
- 				void *user_data);
--void mesh_net_app_send_cancel(struct mesh_net *net, unsigned int id);
- void mesh_net_ack_send(struct mesh_net *net, uint32_t key_id,
- 				uint32_t iv_index, uint8_t ttl, uint32_t seq,
- 				uint16_t src, uint16_t dst, bool rly,
-@@ -363,16 +358,8 @@ void mesh_net_sub_list_add(struct mesh_net *net, uint16_t addr);
- void mesh_net_sub_list_del(struct mesh_net *net, uint16_t addr);
- uint32_t mesh_net_friend_timeout(struct mesh_net *net, uint16_t addr);
- struct mesh_io *mesh_net_get_io(struct mesh_net *net);
--bool mesh_net_local_node_set(struct mesh_net *net, struct mesh_node *node,
--							bool provisioner);
--struct mesh_node *mesh_net_local_node_get(struct mesh_net *net);
--bool mesh_net_set_crpl(struct mesh_net *net, uint16_t crpl);
--uint16_t mesh_net_get_crpl(struct mesh_net *net);
-+struct mesh_node *mesh_net_node_get(struct mesh_net *net);
- bool mesh_net_have_key(struct mesh_net *net, uint16_t net_idx);
--bool mesh_net_jconfig_set(struct mesh_net *net, void *jconfig);
--void *mesh_net_jconfig_get(struct mesh_net *net);
--bool mesh_net_cfg_file_set(struct mesh_net *net, const char *cfg);
--bool mesh_net_cfg_file_get(struct mesh_net *net, const char **cfg);
- bool mesh_net_is_local_address(struct mesh_net *net, uint16_t addr);
- void mesh_net_set_window_accuracy(struct mesh_net *net, uint8_t accuracy);
- void mesh_net_transmit_params_set(struct mesh_net *net, uint8_t count,
-@@ -381,10 +368,3 @@ void mesh_net_transmit_params_get(struct mesh_net *net, uint8_t *count,
- 							uint16_t *interval);
- struct mesh_prov *mesh_net_get_prov(struct mesh_net *net);
- void mesh_net_set_prov(struct mesh_net *net, struct mesh_prov *prov);
--void mesh_net_provisioned_set(struct mesh_net *net, bool provisioned);
--bool mesh_net_provisioned_get(struct mesh_net *net);
--bool mesh_net_provisioned_new(struct mesh_net *net, uint8_t device_key[16],
--				uint16_t net_idx,  uint8_t net_key[16],
--				uint16_t unicast, uint16_t snb_flags,
--				uint32_t iv_index, mesh_status_func_t cb,
--				void *user_data);
++
++error_fail:
++	acceptor_free();
++	return false;
++}
++
++void acceptor_cancel(void *user_data)
++{
++	acceptor_free();
++}
 -- 
 2.14.5
 
