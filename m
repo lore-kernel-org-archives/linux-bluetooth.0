@@ -2,39 +2,39 @@ Return-Path: <SRS0=+lf3=PF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19409C43444
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8095CC43613
 	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7234217F9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59FE9218E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727040AbeL1WIA (ORCPT
+        id S1727048AbeL1WIG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Dec 2018 17:08:00 -0500
+        Fri, 28 Dec 2018 17:08:06 -0500
 Received: from mga17.intel.com ([192.55.52.151]:19949 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727005AbeL1WH7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Dec 2018 17:07:59 -0500
+        id S1727032AbeL1WIB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 28 Dec 2018 17:08:01 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Dec 2018 14:07:54 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Dec 2018 14:07:57 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,411,1539673200"; 
-   d="scan'208";a="113968710"
+   d="scan'208";a="113968761"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.140.14])
-  by orsmga003.jf.intel.com with ESMTP; 28 Dec 2018 14:07:54 -0800
+  by orsmga003.jf.intel.com with ESMTP; 28 Dec 2018 14:07:57 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v6 10/26] mesh: Rewrite Controler interface for full init
-Date:   Fri, 28 Dec 2018 14:07:29 -0800
-Message-Id: <20181228220745.25147-11-brian.gix@intel.com>
+Subject: [PATCH BlueZ v6 26/26] mesh: Sample Mesh Joiner (provision acceptor)
+Date:   Fri, 28 Dec 2018 14:07:45 -0800
+Message-Id: <20181228220745.25147-27-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181228220745.25147-1-brian.gix@intel.com>
 References: <20181228220745.25147-1-brian.gix@intel.com>
@@ -43,223 +43,427 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Functionaility has been added to allow a BT 4.0 or later controller
-to be used for Advertising based Mesh usage, regardless of how it
-was previously initialized.
----
- mesh/mesh-io-generic.c | 149 +++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 138 insertions(+), 11 deletions(-)
+From: Inga Stotland <inga.stotland@intel.com>
 
-diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
-index 52514e280..48e47e7a4 100644
---- a/mesh/mesh-io-generic.c
-+++ b/mesh/mesh-io-generic.c
-@@ -30,7 +30,6 @@
- #include "monitor/bt.h"
- #include "src/shared/hci.h"
- 
--#include "mesh/display.h"
- #include "mesh/mesh-io.h"
- #include "mesh/mesh-io-api.h"
- 
-@@ -177,6 +176,116 @@ static void event_callback(const void *buf, uint8_t size, void *user_data)
- 	}
- }
- 
-+static void local_commands_callback(const void *data, uint8_t size,
-+							void *user_data)
-+{
-+	const struct bt_hci_rsp_read_local_commands *rsp = data;
+---
+ test/test-join | 408 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 408 insertions(+)
+ create mode 100644 test/test-join
+
+diff --git a/test/test-join b/test/test-join
+new file mode 100644
+index 000000000..cdf92a2f1
+--- /dev/null
++++ b/test/test-join
+@@ -0,0 +1,408 @@
++#!/usr/bin/env python3
 +
-+	if (rsp->status)
-+		l_error("Failed to read local commands");
-+}
++import sys
++import struct
++import numpy
++import dbus
++import dbus.service
++import dbus.exceptions
 +
-+static void local_features_callback(const void *data, uint8_t size,
-+							void *user_data)
-+{
-+	const struct bt_hci_rsp_read_local_features *rsp = data;
++from threading import Timer
++import time
 +
-+	if (rsp->status)
-+		l_error("Failed to read local features");
-+}
++try:
++  from gi.repository import GObject
++except ImportError:
++  import gobject as GObject
++from dbus.mainloop.glib import DBusGMainLoop
 +
-+static void hci_generic_callback(const void *data, uint8_t size,
-+								void *user_data)
-+{
-+	uint8_t status = l_get_u8(data);
++import agent
 +
-+	if (status)
-+		l_error("Failed to initialize HCI");
-+}
++MESH_SERVICE_NAME = 'org.bluez.mesh'
++DBUS_PROP_IFACE = 'org.freedesktop.DBus.Properties'
++DBUS_OM_IFACE = 'org.freedesktop.DBus.ObjectManager'
 +
-+static void configure_hci(struct mesh_io_private *io)
-+{
-+	struct bt_hci_cmd_le_set_scan_parameters cmd;
-+	struct bt_hci_cmd_set_event_mask cmd_sem;
-+	struct bt_hci_cmd_le_set_event_mask cmd_slem;
++MESH_NETWORK_IFACE = 'org.bluez.mesh.Network1'
++MESH_NODE_IFACE = 'org.bluez.mesh.Node1'
++MESH_APPLICATION_IFACE = 'org.bluez.mesh.Application1'
++MESH_ELEMENT_IFACE = 'org.bluez.mesh.Element1'
 +
-+	/* Set scan parameters */
-+	cmd.type = 0x00; /* Passive Scanning. No scanning PDUs shall be sent */
-+	cmd.interval = 0x0030; /* Scan Interval = N * 0.625ms */
-+	cmd.window = 0x0030; /* Scan Window = N * 0.625ms */
-+	cmd.own_addr_type = 0x00; /* Public Device Address */
-+	/* Accept all advertising packets except directed advertising packets
-+	 * not addressed to this device (default).
-+	 */
-+	cmd.filter_policy = 0x00;
++APP_COMPANY_ID = 0x05f1
++APP_PRODUCT_ID = 0x0001
++APP_VERSION_ID = 0x0001
 +
-+	/* Set event mask
-+	 *
-+	 * Mask: 0x2000800002008890
-+	 *   Disconnection Complete
-+	 *   Encryption Change
-+	 *   Read Remote Version Information Complete
-+	 *   Hardware Error
-+	 *   Data Buffer Overflow
-+	 *   Encryption Key Refresh Complete
-+	 *   LE Meta
-+	 */
-+	cmd_sem.mask[0] = 0x90;
-+	cmd_sem.mask[1] = 0x88;
-+	cmd_sem.mask[2] = 0x00;
-+	cmd_sem.mask[3] = 0x02;
-+	cmd_sem.mask[4] = 0x00;
-+	cmd_sem.mask[5] = 0x80;
-+	cmd_sem.mask[6] = 0x00;
-+	cmd_sem.mask[7] = 0x20;
++VENDOR_ID_NONE = 0xffff
 +
-+	/* Set LE event mask
-+	 *
-+	 * Mask: 0x000000000000087f
-+	 *   LE Connection Complete
-+	 *   LE Advertising Report
-+	 *   LE Connection Update Complete
-+	 *   LE Read Remote Used Features Complete
-+	 *   LE Long Term Key Request
-+	 *   LE Remote Connection Parameter Request
-+	 *   LE Data Length Change
-+	 *   LE PHY Update Complete
-+	 */
-+	cmd_slem.mask[0] = 0x7f;
-+	cmd_slem.mask[1] = 0x08;
-+	cmd_slem.mask[2] = 0x00;
-+	cmd_slem.mask[3] = 0x00;
-+	cmd_slem.mask[4] = 0x00;
-+	cmd_slem.mask[5] = 0x00;
-+	cmd_slem.mask[6] = 0x00;
-+	cmd_slem.mask[7] = 0x00;
++mesh_net = None
++app = None
++bus = None
++mainloop = None
++node = None
 +
-+	/* TODO: Move to suitable place. Set suitable masks */
-+	/* Reset Command */
-+	bt_hci_send(io->hci, BT_HCI_CMD_RESET, NULL, 0, hci_generic_callback,
-+								NULL, NULL);
++token = None
 +
-+	/* Read local supported commands */
-+	bt_hci_send(io->hci, BT_HCI_CMD_READ_LOCAL_COMMANDS, NULL, 0,
-+					local_commands_callback, NULL, NULL);
++def generic_error_cb(error):
++	print('D-Bus call failed: ' + str(error))
 +
-+	/* Read local supported features */
-+	bt_hci_send(io->hci, BT_HCI_CMD_READ_LOCAL_FEATURES, NULL, 0,
-+					local_features_callback, NULL, NULL);
++def generic_reply_cb():
++	print('D-Bus call done')
 +
-+	/* Set event mask */
-+	bt_hci_send(io->hci, BT_HCI_CMD_SET_EVENT_MASK, &cmd_sem,
-+			sizeof(cmd_sem), hci_generic_callback, NULL, NULL);
++def unwrap(item):
++	if isinstance(item, dbus.Boolean):
++		return bool(item)
++	if isinstance(item, (dbus.UInt16, dbus.Int16,
++			 dbus.UInt32, dbus.Int32,
++			 dbus.UInt64, dbus.Int64)):
++		return int(item)
++	if isinstance(item, dbus.Byte):
++		return bytes([int(item)])
++	if isinstance(item, dbus.String):
++		return item
++	if isinstance(item, (dbus.Array, list, tuple)):
++		return [unwrap(x) for x in item]
++	if isinstance(item, (dbus.Dictionary, dict)):
++		return dict([(unwrap(x), unwrap(y)) for x, y in item.items()])
 +
-+	/* Set LE event mask */
-+	bt_hci_send(io->hci, BT_HCI_CMD_LE_SET_EVENT_MASK, &cmd_slem,
-+			sizeof(cmd_slem), hci_generic_callback, NULL, NULL);
++	print('Dictionary item not handled')
++	print(type(item))
++	return item
 +
-+	/* Scan Params */
-+	bt_hci_send(io->hci, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS, &cmd,
-+				sizeof(cmd), hci_generic_callback, NULL, NULL);
-+}
++def join_cb():
++	print('Join procedure started')
 +
- static bool dev_init(uint16_t index, struct mesh_io *io)
- {
- 	struct mesh_io_private *tmp;
-@@ -198,6 +307,8 @@ static bool dev_init(uint16_t index, struct mesh_io *io)
- 	if (!tmp->hci)
- 		goto fail;
- 
-+	configure_hci(tmp);
++def join_error_cb(reason):
++	print('Join procedure failed: ', reason)
 +
- 	bt_hci_register(tmp->hci, BT_HCI_EVT_LE_META_EVENT,
- 						event_callback, io, NULL);
- 
-@@ -480,7 +591,6 @@ static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
- 	if (!info || !data || !len || len > sizeof(tx->pkt))
- 		return false;
- 
--
- 	tx = l_new(struct tx_pkt, 1);
- 	if (!tx)
- 		return false;
-@@ -524,7 +634,7 @@ static bool find_by_pattern(const void *a, const void *b)
- 	return (!memcmp(tx->pkt, pattern->data, pattern->len));
- }
- 
--static bool tx_cancel(struct mesh_io *io, uint8_t *data, uint8_t len)
-+static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
- {
- 	struct mesh_io_private *pvt = io->pvt;
- 	struct tx_pkt *tx;
-@@ -568,13 +678,25 @@ static bool find_by_filter_id(const void *a, const void *b)
- 	return rx_reg->filter_id == filter_id;
- }
- 
-+static void set_recv_scan_enable(const void *buf, uint8_t size,
-+							void *user_data)
-+{
-+	struct mesh_io_private *pvt = user_data;
-+	struct bt_hci_cmd_le_set_scan_enable cmd;
++def attach_app_cb(node_path, dict_array):
++	print('Mesh application registered ', node_path)
 +
-+	cmd.enable = 0x01;	/* Enable scanning */
-+	cmd.filter_dup = 0x00;	/* Report duplicates */
-+	bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
-+			&cmd, sizeof(cmd), NULL, NULL, NULL);
-+}
++	obj = bus.get_object(MESH_SERVICE_NAME, node_path)
 +
- static bool recv_register(struct mesh_io *io, uint8_t filter_id,
- 				mesh_io_recv_func_t cb, void *user_data)
- {
--	struct bt_hci_cmd_le_set_scan_enable cmd;
-+	struct bt_hci_cmd_le_set_scan_parameters cmd;
- 	struct mesh_io_private *pvt = io->pvt;
- 	struct pvt_rx_reg *rx_reg;
--	bool scanning;
-+	bool already_scanning;
- 
- 	l_info("%s %d", __func__, filter_id);
- 	if (!cb || !filter_id || filter_id > sizeof(pvt->filters))
-@@ -593,15 +715,20 @@ static bool recv_register(struct mesh_io *io, uint8_t filter_id,
- 	rx_reg->cb = cb;
- 	rx_reg->user_data = user_data;
- 
--	scanning = !l_queue_isempty(pvt->rx_regs);
-+	already_scanning = !l_queue_isempty(pvt->rx_regs);
- 
- 	l_queue_push_head(pvt->rx_regs, rx_reg);
- 
--	if (!scanning) {
--		cmd.enable = 0x01;	/* Enable scanning */
--		cmd.filter_dup = 0x00;	/* Report duplicates */
--		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
--				&cmd, sizeof(cmd), NULL, NULL, NULL);
-+	if (!already_scanning) {
-+		cmd.type = 0x00;			/* Passive scanning */
-+		cmd.interval = L_CPU_TO_LE16(0x0010);	/* 10 ms */
-+		cmd.window = L_CPU_TO_LE16(0x0010);	/* 10 ms */
-+		cmd.own_addr_type = 0x01;		/* ADDR_TYPE_RANDOM */
-+		cmd.filter_policy = 0x00;		/* Accept all */
++	global node
++	node = dbus.Interface(obj, MESH_NODE_IFACE)
 +
-+		bt_hci_send(pvt->hci, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
-+				&cmd, sizeof(cmd),
-+				set_recv_scan_enable, pvt, NULL);
- 	}
- 
- 	return true;
++	els = unwrap(dict_array)
++	print("Get Elements")
++
++	for el in els:
++		idx = struct.unpack('b', el[0])[0]
++		print('Configuration for Element ', end='')
++		print(idx)
++
++		models = el[1]
++		element = app.get_element(idx)
++		element.set_model_config(models)
++
++def attach_app_error_cb(error):
++	print('Failed to register application: ' + str(error))
++	mainloop.quit()
++
++def attach(token):
++	print('Attach')
++	mesh_net.Attach(app.get_path(), token,
++					reply_handler=attach_app_cb,
++					error_handler=attach_app_error_cb)
++
++def interfaces_removed_cb(object_path, interfaces):
++	if not mesh_net:
++		return
++
++	if object_path == mesh_net[2]:
++		print('Service was removed')
++	mainloop.quit()
++
++def send_response(path, dest, key, data):
++	print('send response ', end='')
++	print(data)
++	node.Send(path, dest, key, data, reply_handler=generic_reply_cb,
++					error_handler=generic_error_cb)
++
++def send_publication(path, model_id, data):
++	print('send publication ', end='')
++	print(data)
++	node.Publish(path, model_id, data, reply_handler=generic_reply_cb,
++			error_handler=generic_error_cb)
++
++class PubTimer():
++	def __init__(self):
++		self.seconds = None
++		self.func = None
++		self.thread = None
++		self.busy = False
++
++	def _timeout_cb(self):
++		self.func()
++		self.busy = True
++		self._schedule_timer()
++		self.busy =False
++
++	def _schedule_timer(self):
++		self.thread = Timer(self.seconds, self._timeout_cb)
++		self.thread.start()
++
++	def start(self, seconds, func):
++		self.func = func
++		self.seconds = seconds
++		if not self.busy:
++			self._schedule_timer()
++
++	def cancel(self):
++		print('Cancel timer')
++		if self.thread is not None:
++			print('Cancel thread')
++			self.thread.cancel()
++			self.thread = None
++
++class Application(dbus.service.Object):
++
++	def __init__(self, bus):
++		self.path = '/example'
++		self.agent = None
++		self.elements = []
++		dbus.service.Object.__init__(self, bus, self.path)
++
++	def set_agent(self, agent):
++		self.agent = agent
++
++	def get_path(self):
++		return dbus.ObjectPath(self.path)
++
++	def add_element(self, element):
++		self.elements.append(element)
++
++	def get_element(self, idx):
++		for ele in self.elements:
++			if ele.get_index() == idx:
++				return ele
++
++	def get_properties(self):
++		return {
++			MESH_APPLICATION_IFACE: {
++			'CompanyID': dbus.UInt16(APP_COMPANY_ID),
++			'ProductID': dbus.UInt16(APP_PRODUCT_ID),
++			'VersionID': dbus.UInt16(APP_VERSION_ID)
++			}
++		}
++
++	@dbus.service.method(DBUS_OM_IFACE, out_signature='a{oa{sa{sv}}}')
++
++	def GetManagedObjects(self):
++		response = {}
++		print('GetManagedObjects')
++		response[self.path] = self.get_properties()
++		response[self.agent.get_path()] = self.agent.get_properties()
++		for element in self.elements:
++			response[element.get_path()] = element.get_properties()
++		return response
++
++	@dbus.service.method(MESH_APPLICATION_IFACE,
++					in_signature="t", out_signature="")
++
++	def JoinComplete(self, value):
++		global token
++		print('JoinComplete ', value)
++
++		token = value
++		attach(token)
++
++	@dbus.service.method(MESH_APPLICATION_IFACE,
++					in_signature="s", out_signature="")
++
++	def JoinFailed(self, value):
++		print('JoinFailed ', value)
++		token = value
++
++class Element(dbus.service.Object):
++	PATH_BASE = '/example/ele'
++
++	def __init__(self, bus, index):
++		self.path = self.PATH_BASE + format(index, '02x')
++		print(self.path)
++		self.models = []
++		self.bus = bus
++		self.index = index
++		dbus.service.Object.__init__(self, bus, self.path)
++
++	def _get_sig_models(self):
++		ids = []
++		for model in self.models:
++			id = model.get_id()
++			vendor = model.get_vendor()
++			if vendor == VENDOR_ID_NONE:
++				ids.append(id)
++		return ids
++
++	def get_properties(self):
++		return {
++			MESH_ELEMENT_IFACE: {
++			'Index': dbus.Byte(self.index),
++			'Models': dbus.Array(self._get_sig_models(), 'q')
++			}
++		}
++
++	def add_model(self, model):
++		model.set_path(self.path)
++		self.models.append(model)
++
++	def get_index(self):
++		return self.index
++
++	def set_model_config(self, configs):
++		print('Set element models config')
++		for config in configs:
++			mod_id = config[0]
++			self.UpdateModelConfiguration(mod_id, config[1])
++
++	@dbus.service.method(MESH_ELEMENT_IFACE,
++					in_signature="qqbay", out_signature="")
++	def MessageReceived(self, source, key, is_sub, data):
++		print('Message Received on Element ', end='')
++		print(self.index)
++		for model in self.models:
++			model.process_message(source, key, data)
++
++	@dbus.service.method(MESH_ELEMENT_IFACE,
++					in_signature="qa{sv}", out_signature="")
++
++	def UpdateModelConfiguration(self, model_id, config):
++		print('UpdateModelConfig ', end='')
++		print(hex(model_id))
++		for model in self.models:
++			if model_id == model.get_id():
++				model.set_config(config)
++				return
++
++	@dbus.service.method(MESH_ELEMENT_IFACE,
++					in_signature="", out_signature="")
++
++	def get_path(self):
++		return dbus.ObjectPath(self.path)
++
++class Model():
++	def __init__(self, model_id):
++		self.cmd_ops = []
++		self.model_id = model_id
++		self.vendor = VENDOR_ID_NONE
++		self.bindings = []
++		self.pub_period = 0
++		self.pub_id = 0
++		self.path = None
++
++	def set_path(self, path):
++		self.path = path
++
++	def get_id(self):
++		return self.model_id
++
++	def get_vendor(self):
++		return self.vendor
++
++	def process_message(self, source, key, data):
++		print('Model process message')
++
++	def set_publication(self, period):
++		self.pub_period = period
++
++	def set_config(self, config):
++		if 'Bindings' in config:
++			self.bindings = config.get('Bindings')
++			print('Bindings: ', end='')
++			print(self.bindings)
++		if 'PublicationPeriod' in config:
++			self.set_publication(config.get('PublicationPeriod'))
++			print('Model publication period ', end='')
++			print(self.pub_period, end='')
++			print(' ms')
++
++class OnOffServer(Model):
++	def __init__(self, model_id):
++		Model.__init__(self, model_id)
++		self.cmd_ops = { 0x8201, # get
++				 0x8202, # set
++				 0x8203 } # set unacknowledged
++
++		print("OnOff Server ", end="")
++		self.state = 0
++		print('State ', end='')
++		self.timer = PubTimer()
++
++	def process_message(self, source, key, data):
++		datalen = len(data)
++		print('OnOff Server process message len ', datalen)
++
++		if datalen!=2 and datalen!=3:
++			return
++
++		if datalen==2:
++			op_tuple=struct.unpack('<H',bytes(data))
++			opcode = op_tuple[0]
++			if opcode != 0x8201:
++				print(hex(opcode))
++				return
++			print('Get state')
++		elif datalen==3:
++			opcode,self.state=struct.unpack('<HB',bytes(data))
++			if opcode != 0x8202 and opcode != 0x8203:
++				print(hex(opcode))
++				return
++			print('Set state: ', end='')
++			print(self.state)
++
++		rsp_data = struct.pack('<HB', 0x8204, self.state)
++		send_response(self.path, source, key, rsp_data)
++
++	def publish(self):
++		print('Publish')
++		data = struct.pack('B', self.state)
++		send_publication(self.path, self.model_id, data)
++
++	def set_publication(self, period):
++		if period == 0:
++			self.pub_period = 0
++			self.timer.cancel()
++			return
++
++		# We do not handle ms in this example
++		if period < 1000:
++			return
++
++		self.pub_period = period
++		self.timer.start(period/1000, self.publish)
++
++def main():
++
++	DBusGMainLoop(set_as_default=True)
++
++	global bus
++	bus = dbus.SystemBus()
++	global mainloop
++	global app
++	global mesh_net
++
++	mesh_net = dbus.Interface(bus.get_object(MESH_SERVICE_NAME,
++						 "/org/bluez/mesh"),
++						 MESH_NETWORK_IFACE)
++	mesh_net.connect_to_signal('InterfacesRemoved', interfaces_removed_cb)
++
++	app = Application(bus)
++	prov_agent = agent.Agent(bus)
++	app.set_agent(prov_agent)
++	first_ele = Element(bus, 0x00)
++	first_ele.add_model(OnOffServer(0x1000))
++	app.add_element(first_ele)
++
++	mainloop = GObject.MainLoop()
++
++	print('Join')
++	caps = ["out-numeric"]
++	oob = ["other"]
++	uuid = bytearray.fromhex("0a0102030405060708090A0B0C0D0E0F")
++	print(uuid)
++	mesh_net.Join(app.get_path(), uuid,
++			reply_handler=join_cb,
++			error_handler=join_error_cb)
++
++	mainloop.run()
++
++if __name__ == '__main__':
++	main()
 -- 
 2.14.5
 
