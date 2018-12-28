@@ -2,114 +2,112 @@ Return-Path: <SRS0=+lf3=PF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A97CC43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 19:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B76FC43444
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 20:25:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4370520869
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 19:54:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CCE1B2148E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 20:25:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=umn.edu header.i=@umn.edu header.b="aW45K2PI"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kVioIQcm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732153AbeL1TyC (ORCPT
+        id S2388069AbeL1UZY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Dec 2018 14:54:02 -0500
-Received: from mta-p5.oit.umn.edu ([134.84.196.205]:51834 "EHLO
-        mta-p5.oit.umn.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731742AbeL1TyC (ORCPT
+        Fri, 28 Dec 2018 15:25:24 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:34163 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387992AbeL1UZX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Dec 2018 14:54:02 -0500
-Received: from localhost (unknown [127.0.0.1])
-        by mta-p5.oit.umn.edu (Postfix) with ESMTP id 0583091D
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Dec 2018 19:54:01 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at umn.edu
-Received: from mta-p5.oit.umn.edu ([127.0.0.1])
-        by localhost (mta-p5.oit.umn.edu [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id iox_j0wZqXm5 for <linux-bluetooth@vger.kernel.org>;
-        Fri, 28 Dec 2018 13:54:00 -0600 (CST)
-Received: from mail-it1-f197.google.com (mail-it1-f197.google.com [209.85.166.197])
-        (using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mta-p5.oit.umn.edu (Postfix) with ESMTPS id C7FA37A9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Dec 2018 13:54:00 -0600 (CST)
-Received: by mail-it1-f197.google.com with SMTP id g7so26255809itg.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Dec 2018 11:54:00 -0800 (PST)
+        Fri, 28 Dec 2018 15:25:23 -0500
+Received: by mail-pg1-f194.google.com with SMTP id j10so10456154pga.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Dec 2018 12:25:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umn.edu; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=OOQZ2gUP/hFWYwmXJPBuARknrljj37IHB2B7Qlx9Ggk=;
-        b=aW45K2PIL7dj0eKXhxVNkgW8T8gjZ45Y5kbXS47Tl+6mJsOETOmTzjsj1AbXXpIh5y
-         7ImbiF8NiAZlA1lLiC7IDOIx3oOQ/g2Kcb/PPiYrScEfkRHex72ZrOYJqWduP6XPO90B
-         JHLrJjKTLIMEZCy0FSkQGwMrKElhfO4cHCou27brTxRgMOV0NWIQKo4tzu9E0julkCof
-         7RX/lzhLaKiO3z+XlGlL1dPQAydxN6NIcY9PY3/0Ns6MTUGH3GF4cMNA2JlwK5NwpAtI
-         uXUAhNN/00Xk1Q2+tPDHo4cVvusayoXjE4vv3x4FBTWg7W1L7kxq3yKnakVyx7YLtKUp
-         soOQ==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=wyGQY6Le7A84DqOos4Q8wHdbM4IltgYGr4EVT2t3KYw=;
+        b=kVioIQcmqyUuv+aXvDr4CubClJv64cCdpF59MC+du18V7/yB0aPPqD8nVJa7XNzRjv
+         9Wf0QuorxDRTpFHbrdZJ99LRjKHOY8OaOoDnsWG6rSp9/kAPZl88CjAUXvKB/R9K8Zot
+         J+fw8m41f1BHJk905vCJiiMf70njjI9USUAEc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=OOQZ2gUP/hFWYwmXJPBuARknrljj37IHB2B7Qlx9Ggk=;
-        b=o1L84Mpc6wxajxXPn2jtNyFgozJz/R5nP3xOV9EvTEQV7Hj67m0olDdp6wkUK+FwD6
-         uS23lHVzjFVlyvmCTCok0ZbP2nBKKrPhXJ+4EhP+uWjjd4GlvycMSMWjmz3sBK1Ys3CI
-         MVNloMoDeonFMq6uNLEZ0KV6+pI+MvJdfY/ennazxA0a4CMFvqN6vFVe+tdMbIe9h0Pj
-         d0TOB0deX8kcOuME9YUEs0iubAz19gUfCN2Wx/roD/05F7H2XWmfysOGJnawKVRM11nJ
-         FgK/kbhWUJLCurK9Wy1H5Q8qWYhWGEcEla3zzX4FdfmiynBabAQIx2oxeOwX7jtoIp6b
-         MqFw==
-X-Gm-Message-State: AA+aEWZ/8mALx2+X+I33imAyMx1amagUsOsmagPY9+q7GW44uWqqelZG
-        JgFdzksrjT0H8mL5tuHsB+3leCLs+Jj4eFvsOZYowNOaCqCwlCxBFBiLx5YtfGhaBTz9PfRUPs1
-        uiboorkSE90V/xdoralCpFvDTs+9UHTd5
-X-Received: by 2002:a24:d12:: with SMTP id 18mr17112162itx.31.1546026840233;
-        Fri, 28 Dec 2018 11:54:00 -0800 (PST)
-X-Google-Smtp-Source: AFSGD/UVectugpd+Z8lQKCDdq7nqOfv32VdKWC2PxjK9Puw4KDUWVeZSDw/OzU8OS+tbwsrVCXpj7Q==
-X-Received: by 2002:a24:d12:: with SMTP id 18mr17112148itx.31.1546026839974;
-        Fri, 28 Dec 2018 11:53:59 -0800 (PST)
-Received: from cs-u-syssec1.cs.umn.edu (cs-u-syssec1.cs.umn.edu. [134.84.121.78])
-        by smtp.gmail.com with ESMTPSA id v3sm1992206ioj.79.2018.12.28.11.53.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 28 Dec 2018 11:53:59 -0800 (PST)
-From:   Aditya Pakki <pakki001@umn.edu>
-To:     pakki001@umn.edu
-Cc:     kjlu@umn.edu, Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] bluetooth: hci_intel: Check for driver register failure
-Date:   Fri, 28 Dec 2018 13:53:51 -0600
-Message-Id: <20181228195351.11009-1-pakki001@umn.edu>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=wyGQY6Le7A84DqOos4Q8wHdbM4IltgYGr4EVT2t3KYw=;
+        b=BnZO8nHZ1Bbg4PIgyMqMj/SmSUrdTBVvm3KjAtU+noCzVsBKuI7hsCBzIkW/6dnOOv
+         1cbZwu6LNlzPCEY/LapEHk/XMTBqQ7Sz0iY/xL00trO/nW9QPd6VpLsIQekXPhZP3OND
+         VZpy31SXH/mbW/X43sxF2V3lR2xpUv1mOSCiiUnUK6/p08hyc9TkJgKa/DN3hFsdsH3F
+         a8/AEbpq1Pi+aWJd4CsjBH0PeAJhkvHrQwOvhPPVVs4D8APiElXd7MpI9VXSsh3qXZps
+         +R4fP1axAPCnIiu4CsecEAUoJ+Or0F+JZhX/R3Ev7JU3l+VQVYcxgir4DtzAXJWXm9jY
+         z5ng==
+X-Gm-Message-State: AJcUukcCKONVs+cnoXmAzHMe0I/2XIFnodI3yTeo2UJSSqi5lGaBIs2P
+        c6Svl3AT56uHbQDeZ54NlF3BWA==
+X-Google-Smtp-Source: ALg8bN7UOBl81/FosTTVYKkklg9K6acQDfxZ1qq4JYeqqv0obFxrK9GaO8TZ12F/55Dv22tYMhvcdA==
+X-Received: by 2002:a63:dc54:: with SMTP id f20mr27877596pgj.410.1546028721657;
+        Fri, 28 Dec 2018 12:25:21 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id f6sm60453390pfg.188.2018.12.28.12.25.20
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 28 Dec 2018 12:25:20 -0800 (PST)
+Date:   Fri, 28 Dec 2018 12:25:20 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v7 3/4] Bluetooth: hci_qca: Disable IBS state machine and
+ flush Tx buffer
+Message-ID: <20181228202520.GO261387@google.com>
+References: <20181228114819.17479-1-bgodavar@codeaurora.org>
+ <20181228114819.17479-4-bgodavar@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181228114819.17479-4-bgodavar@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-While initializing the driver, the function platform_driver_register can
-fail and return an error. Consistent with other invocations, this patch
-returns the error upstream.
+On Fri, Dec 28, 2018 at 05:18:18PM +0530, Balakrishna Godavarthi wrote:
+> During hci down we observed IBS sleep commands are queued in the Tx
+> buffer and hci_uart_write_work is sending data to the chip which is
+> not required as the chip is powered off. This patch will disable IBS
+> and flush the Tx buffer before we turn off the chip.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index b79ef901ab8b..9d5e41f159c7 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1274,6 +1274,14 @@ static const struct qca_vreg_data qca_soc_data = {
+>  
+>  static void qca_power_shutdown(struct hci_uart *hu)
+>  {
+> +	struct qca_data *qca = hu->priv;
+> +
+> +	/* From this point we go into power off state. But serial port is
+> +	 * still open, stop queueing the IBS data and flush all the buffered
+> +	 * data in skb's.
+> +	 */
+> +	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
 
-Signed-off-by: Aditya Pakki <pakki001@umn.edu>
----
- drivers/bluetooth/hci_intel.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+With that you ensure that no IBS wakeup command is sent for the power
+pulse, however there could still be a wakeup work in the workqueue
+(added before clearing the above bit). If you want to make sure no
+IBS wakeup command is pending I think you need to add:
 
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index f31410526c57..8450389a2017 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -1242,7 +1242,11 @@ static struct platform_driver intel_driver = {
- 
- int __init intel_init(void)
- {
--	platform_driver_register(&intel_driver);
-+	int rc;
-+
-+	rc = platform_driver_register(&intel_driver);
-+	if (rc)
-+		return rc;
- 
- 	return hci_uart_register_proto(&intel_proto);
- }
--- 
-2.17.1
+if (work_pending(&qca->ws_awake_device))
+	cancel_work_sync(&qca->ws_awake_device);
 
+it's not exactly the case you intend to address with this patch, but a
+related (probably less frequent) scenario.
