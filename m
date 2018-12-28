@@ -2,190 +2,114 @@ Return-Path: <SRS0=+lf3=PF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C23C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 19:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A97CC43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 19:54:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75E2821479
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 19:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4370520869
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 19:54:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Wj/fYxwf"
+	dkim=pass (2048-bit key) header.d=umn.edu header.i=@umn.edu header.b="aW45K2PI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730885AbeL1TuX (ORCPT
+        id S1732153AbeL1TyC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Dec 2018 14:50:23 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:32971 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728358AbeL1TuX (ORCPT
+        Fri, 28 Dec 2018 14:54:02 -0500
+Received: from mta-p5.oit.umn.edu ([134.84.196.205]:51834 "EHLO
+        mta-p5.oit.umn.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731742AbeL1TyC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Dec 2018 14:50:23 -0500
-Received: by mail-pl1-f193.google.com with SMTP id z23so10395872plo.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Dec 2018 11:50:22 -0800 (PST)
+        Fri, 28 Dec 2018 14:54:02 -0500
+Received: from localhost (unknown [127.0.0.1])
+        by mta-p5.oit.umn.edu (Postfix) with ESMTP id 0583091D
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Dec 2018 19:54:01 +0000 (UTC)
+X-Virus-Scanned: amavisd-new at umn.edu
+Received: from mta-p5.oit.umn.edu ([127.0.0.1])
+        by localhost (mta-p5.oit.umn.edu [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id iox_j0wZqXm5 for <linux-bluetooth@vger.kernel.org>;
+        Fri, 28 Dec 2018 13:54:00 -0600 (CST)
+Received: from mail-it1-f197.google.com (mail-it1-f197.google.com [209.85.166.197])
+        (using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mta-p5.oit.umn.edu (Postfix) with ESMTPS id C7FA37A9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Dec 2018 13:54:00 -0600 (CST)
+Received: by mail-it1-f197.google.com with SMTP id g7so26255809itg.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Dec 2018 11:54:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=96/pjSXhAMjwkHr3rbMEv/489k9NFNRoowfW2wnsCNA=;
-        b=Wj/fYxwfXVyU2RA9Ip6FPglDMMCEpiKzEuo+TvDxrLeEO6JS9aeJVstE3zAuM3330F
-         0gUFgNR+60Yqdsa2JtwJCnuEAHTrupH7EOpdpGN0iqvTCfIgG9EIPTU6TSlKfozPb1A5
-         WwAgp+k6599Y5eyiOemry5+MDTCuNigUrR+dE=
+        d=umn.edu; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=OOQZ2gUP/hFWYwmXJPBuARknrljj37IHB2B7Qlx9Ggk=;
+        b=aW45K2PIL7dj0eKXhxVNkgW8T8gjZ45Y5kbXS47Tl+6mJsOETOmTzjsj1AbXXpIh5y
+         7ImbiF8NiAZlA1lLiC7IDOIx3oOQ/g2Kcb/PPiYrScEfkRHex72ZrOYJqWduP6XPO90B
+         JHLrJjKTLIMEZCy0FSkQGwMrKElhfO4cHCou27brTxRgMOV0NWIQKo4tzu9E0julkCof
+         7RX/lzhLaKiO3z+XlGlL1dPQAydxN6NIcY9PY3/0Ns6MTUGH3GF4cMNA2JlwK5NwpAtI
+         uXUAhNN/00Xk1Q2+tPDHo4cVvusayoXjE4vv3x4FBTWg7W1L7kxq3yKnakVyx7YLtKUp
+         soOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=96/pjSXhAMjwkHr3rbMEv/489k9NFNRoowfW2wnsCNA=;
-        b=OPdte27Gd6FphQMc54EMnUiOD48wwUkL3XAAmJTewSwojipK6WoM6DylC+tTiSXstU
-         pQdZwyT3nByalUXlEhWFNabIVFn2+pgHg5TruaC3Elp0GlC7WugyZEkPL/t4A07WjZOH
-         BkHJqpNv/b4nRlSHVFco37tjFBiea4pS3EKIo65jlguumBnAvhXU24F87L3sG8ZRZ3+h
-         wLi9n1KYDpRCLsujdHHm1ifpW4PFgWuKCDNZA6xd2giaseFYSFyRczAX0SCs8vTSWY5z
-         6BrQg23mxCOoywGFqY+WeeyvSmiWGPbKsR4Ltk3N1WiToQSeCyZ+jIvxKpmJ48xF1/3r
-         g99w==
-X-Gm-Message-State: AJcUukf+AEjxLiSJJ9D4YdgR2xyAvTEcM5chrysEBpcoUTYBRGtJQ0fL
-        nYu4F9fU/J/6BfnpQkHpNDk/VA==
-X-Google-Smtp-Source: ALg8bN6iZseIOZSPsjqMMPvYJ0ZOQlpCmyrxkwqmQ/OSwlJwb4fMlTo5ORq3VJD0tRdMwwTftl6oOQ==
-X-Received: by 2002:a17:902:1127:: with SMTP id d36mr28000603pla.299.1546026622187;
-        Fri, 28 Dec 2018 11:50:22 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id v89sm22789366pfj.164.2018.12.28.11.50.21
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 28 Dec 2018 11:50:21 -0800 (PST)
-Date:   Fri, 28 Dec 2018 11:50:20 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 4/4] Bluetooth: btqca: inject command complete event
- during fw download
-Message-ID: <20181228195020.GN261387@google.com>
-References: <20181228114819.17479-1-bgodavar@codeaurora.org>
- <20181228114819.17479-5-bgodavar@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181228114819.17479-5-bgodavar@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=OOQZ2gUP/hFWYwmXJPBuARknrljj37IHB2B7Qlx9Ggk=;
+        b=o1L84Mpc6wxajxXPn2jtNyFgozJz/R5nP3xOV9EvTEQV7Hj67m0olDdp6wkUK+FwD6
+         uS23lHVzjFVlyvmCTCok0ZbP2nBKKrPhXJ+4EhP+uWjjd4GlvycMSMWjmz3sBK1Ys3CI
+         MVNloMoDeonFMq6uNLEZ0KV6+pI+MvJdfY/ennazxA0a4CMFvqN6vFVe+tdMbIe9h0Pj
+         d0TOB0deX8kcOuME9YUEs0iubAz19gUfCN2Wx/roD/05F7H2XWmfysOGJnawKVRM11nJ
+         FgK/kbhWUJLCurK9Wy1H5Q8qWYhWGEcEla3zzX4FdfmiynBabAQIx2oxeOwX7jtoIp6b
+         MqFw==
+X-Gm-Message-State: AA+aEWZ/8mALx2+X+I33imAyMx1amagUsOsmagPY9+q7GW44uWqqelZG
+        JgFdzksrjT0H8mL5tuHsB+3leCLs+Jj4eFvsOZYowNOaCqCwlCxBFBiLx5YtfGhaBTz9PfRUPs1
+        uiboorkSE90V/xdoralCpFvDTs+9UHTd5
+X-Received: by 2002:a24:d12:: with SMTP id 18mr17112162itx.31.1546026840233;
+        Fri, 28 Dec 2018 11:54:00 -0800 (PST)
+X-Google-Smtp-Source: AFSGD/UVectugpd+Z8lQKCDdq7nqOfv32VdKWC2PxjK9Puw4KDUWVeZSDw/OzU8OS+tbwsrVCXpj7Q==
+X-Received: by 2002:a24:d12:: with SMTP id 18mr17112148itx.31.1546026839974;
+        Fri, 28 Dec 2018 11:53:59 -0800 (PST)
+Received: from cs-u-syssec1.cs.umn.edu (cs-u-syssec1.cs.umn.edu. [134.84.121.78])
+        by smtp.gmail.com with ESMTPSA id v3sm1992206ioj.79.2018.12.28.11.53.59
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 28 Dec 2018 11:53:59 -0800 (PST)
+From:   Aditya Pakki <pakki001@umn.edu>
+To:     pakki001@umn.edu
+Cc:     kjlu@umn.edu, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] bluetooth: hci_intel: Check for driver register failure
+Date:   Fri, 28 Dec 2018 13:53:51 -0600
+Message-Id: <20181228195351.11009-1-pakki001@umn.edu>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Dec 28, 2018 at 05:18:19PM +0530, Balakrishna Godavarthi wrote:
-> Latest qualcomm chips are not sending an command complete event for
-> every firmware packet sent to chip. They only respond with a vendor
-> specific event for the last firmware packet. This optimization will
-> decrease the BT ON time. Due to this we are seeing a timeout error
-> message logs on the console during firmware download. Now we are
-> injecting a command complete event once we receive an vendor specific
-> event for the last RAM firmware packet.
-> 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
->  drivers/bluetooth/btqca.c | 39 ++++++++++++++++++++++++++++++++++++++-
->  drivers/bluetooth/btqca.h |  3 +++
->  2 files changed, 41 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index ec9e03a6b778..0b533f65f652 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -144,6 +144,7 @@ static void qca_tlv_check_data(struct rome_config *config,
->  		 * In case VSE is skipped, only the last segment is acked.
->  		 */
->  		config->dnld_mode = tlv_patch->download_mode;
-> +		config->dnld_type = config->dnld_mode;
->  
->  		BT_DBG("Total Length           : %d bytes",
->  		       le32_to_cpu(tlv_patch->total_size));
-> @@ -264,6 +265,31 @@ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
->  	return err;
->  }
->  
-> +static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
-> +{
-> +	struct hci_event_hdr *hdr;
-> +	struct hci_ev_cmd_complete *evt;
-> +	struct sk_buff *skb;
-> +
-> +	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
-> +	if (!skb)
-> +		return -ENOMEM;
-> +
-> +	hdr = skb_put(skb, sizeof(*hdr));
-> +	hdr->evt = HCI_EV_CMD_COMPLETE;
-> +	hdr->plen = sizeof(*evt) + 1;
-> +
-> +	evt = skb_put(skb, sizeof(*evt));
-> +	evt->ncmd = 1;
-> +	evt->opcode = HCI_OP_NOP;
-> +
-> +	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
-> +
-> +	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
-> +
-> +	return hci_recv_frame(hdev, skb);
-> +}
-> +
->  static int qca_download_firmware(struct hci_dev *hdev,
->  				  struct rome_config *config)
->  {
-> @@ -297,11 +323,22 @@ static int qca_download_firmware(struct hci_dev *hdev,
->  		ret = qca_tlv_send_segment(hdev, segsize, segment,
->  					    config->dnld_mode);
->  		if (ret)
-> -			break;
-> +			goto out;
->  
->  		segment += segsize;
->  	}
->  
-> +	/* Latest qualcomm chipsets are not sending a command complete event
-> +	 * for every fw packet sent. They only respond with a vendor specific
-> +	 * event for the last packet. This optimization in the chip will
-> +	 * decrease the BT in initialization time. Here we will inject a command
-> +	 * complete event to avoid a command timeout error message.
-> +	 */
-> +	if ((config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
-> +	    config->dnld_type == ROME_SKIP_EVT_VSE))
-> +		return qca_inject_cmd_complete_event(hdev);
-> +
-> +out:
->  	release_firmware(fw);
->  
->  	return ret;
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index 0c01f375fe83..5c8fc54133e3 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -40,6 +40,8 @@
->  #define QCA_WCN3990_POWERON_PULSE	0xFC
->  #define QCA_WCN3990_POWEROFF_PULSE	0xC0
->  
-> +#define QCA_HCI_CC_SUCCESS		0x00
-> +
->  enum qca_bardrate {
->  	QCA_BAUDRATE_115200 	= 0,
->  	QCA_BAUDRATE_57600,
-> @@ -81,6 +83,7 @@ struct rome_config {
->  	char fwname[64];
->  	uint8_t user_baud_rate;
->  	enum rome_tlv_dnld_mode dnld_mode;
-> +	enum rome_tlv_dnld_mode dnld_type;
+While initializing the driver, the function platform_driver_register can
+fail and return an error. Consistent with other invocations, this patch
+returns the error upstream.
 
-The ->dnld_type vs ->dnld_mode is a bit confusing, I don't have a
-better suggestion though.
+Signed-off-by: Aditya Pakki <pakki001@umn.edu>
+---
+ drivers/bluetooth/hci_intel.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
->  };
->  
->  struct edl_event_hdr {
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index f31410526c57..8450389a2017 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -1242,7 +1242,11 @@ static struct platform_driver intel_driver = {
+ 
+ int __init intel_init(void)
+ {
+-	platform_driver_register(&intel_driver);
++	int rc;
++
++	rc = platform_driver_register(&intel_driver);
++	if (rc)
++		return rc;
+ 
+ 	return hci_uart_register_proto(&intel_proto);
+ }
+-- 
+2.17.1
 
-I'm not an expert in dealing with HCI SKBs, as far as I can tell the
-above looks sane to me and I confirmed that it fixes the timeout when
-downloading firmware.
-
-Tested-by: Matthias Kaehlcke <mka@chromium.org>
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
