@@ -2,39 +2,39 @@ Return-Path: <SRS0=+lf3=PF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1696AC43613
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7653FC43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF0F5217F9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:07:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38AA3217F9
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:08:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727029AbeL1WH7 (ORCPT
+        id S1727034AbeL1WIA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Dec 2018 17:07:59 -0500
+        Fri, 28 Dec 2018 17:08:00 -0500
 Received: from mga17.intel.com ([192.55.52.151]:19951 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726827AbeL1WH6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Dec 2018 17:07:58 -0500
+        id S1727031AbeL1WH7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 28 Dec 2018 17:07:59 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Dec 2018 14:07:55 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Dec 2018 14:07:56 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,411,1539673200"; 
-   d="scan'208";a="113968726"
+   d="scan'208";a="113968732"
 Received: from bgix-dell-lap.sea.intel.com ([10.252.140.14])
   by orsmga003.jf.intel.com with ESMTP; 28 Dec 2018 14:07:55 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     johan.hedberg@gmail.com, inga.stotland@intel.com,
         marcel@holtmann.org, brian.gix@intel.com
-Subject: [PATCH BlueZ v6 15/26] mesh: Multi node Config Server model
-Date:   Fri, 28 Dec 2018 14:07:34 -0800
-Message-Id: <20181228220745.25147-16-brian.gix@intel.com>
+Subject: [PATCH BlueZ v6 17/26] mesh: Restructure DB to support multiple nodes
+Date:   Fri, 28 Dec 2018 14:07:36 -0800
+Message-Id: <20181228220745.25147-18-brian.gix@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181228220745.25147-1-brian.gix@intel.com>
 References: <20181228220745.25147-1-brian.gix@intel.com>
@@ -45,20 +45,17 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Inga Stotland <inga.stotland@intel.com>
 
-The Config Server model is an internal service that allows
-priviledged remote Config Client nodes to manipulate and
-configure local keys, subscription lists, and publications of
-models on specific local nodes. It has been rewritten to allow
-control of multiple nodes on the local device.
+Added needed functionality to support the storage of multiple
+subnets, subscription lists, and publications per node.
 ---
- mesh/cfgmod-server.c | 179 ++++++++++++++++++++++++++-------------------------
- mesh/cfgmod.h        |   3 +-
- 2 files changed, 93 insertions(+), 89 deletions(-)
+ mesh/mesh-db.c | 456 +++++++++++++++++++++++++++++++++++++--------------------
+ mesh/mesh-db.h |   9 +-
+ 2 files changed, 297 insertions(+), 168 deletions(-)
 
-diff --git a/mesh/cfgmod-server.c b/mesh/cfgmod-server.c
-index 2c4a02912..062bdaaf2 100644
---- a/mesh/cfgmod-server.c
-+++ b/mesh/cfgmod-server.c
+diff --git a/mesh/mesh-db.c b/mesh/mesh-db.c
+index 86e17ed9a..5c0b72551 100644
+--- a/mesh/mesh-db.c
++++ b/mesh/mesh-db.c
 @@ -15,7 +15,6 @@
   *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   *  Lesser General Public License for more details.
@@ -67,677 +64,627 @@ index 2c4a02912..062bdaaf2 100644
   */
  
  #ifdef HAVE_CONFIG_H
-@@ -24,11 +23,14 @@
+@@ -29,6 +28,7 @@
+ #include <string.h>
  
- #include <unistd.h>
- #include <stdio.h>
-+#include <stdint.h>
- #include <sys/time.h>
  #include <ell/ell.h>
-+#include <ell/ell.h>
++#include <json-c/json.h>
  
--#include "mesh/mesh-defs.h"
-+#include "json-c/json.h"
+ #include "mesh/mesh-defs.h"
+ #include "mesh/util.h"
+@@ -162,6 +162,7 @@ static json_object *jarray_string_del(json_object *jarray, char *str,
+ 		if (str_entry && !strncmp(str, str_entry, len))
+ 			continue;
  
-+#include "mesh/mesh-defs.h"
- #include "mesh/mesh.h"
- #include "mesh/node.h"
- #include "mesh/net.h"
-@@ -40,7 +42,7 @@
- 
- #define CFG_MAX_MSG_LEN 380
- 
--static void send_pub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
-+static void send_pub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
- 			uint8_t status, uint16_t ele_addr, uint16_t pub_addr,
- 			uint32_t mod_id, uint16_t idx, bool cred_flag,
- 			uint8_t ttl, uint8_t period, uint8_t retransmit)
-@@ -60,7 +62,7 @@ static void send_pub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
- 	msg[n++] = ttl;
- 	msg[n++] = period;
- 	msg[n++] = retransmit;
--	if (mod_id < 0x10000) {
-+	if (mod_id < 0x10000 || mod_id > VENDOR_ID_MASK) {
- 		l_put_le16(mod_id, msg + n);
- 		n += 2;
- 	} else {
-@@ -70,12 +72,11 @@ static void send_pub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
- 		n += 2;
++		json_object_get(jentry);
+ 		json_object_array_add(jarray_new, jentry);
  	}
  
--	mesh_model_send(net, CONFIG_SRV_MODEL,
--			dst, src,
-+	mesh_model_send(node, dst, src,
- 			APP_IDX_DEV, DEFAULT_TTL, msg, n);
- }
- 
--static bool config_pub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
-+static bool config_pub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					const uint8_t *pkt, uint16_t size)
+@@ -193,9 +194,6 @@ static json_object *jarray_key_del(json_object *jarray, int16_t idx)
  {
- 	uint32_t mod_id;
-@@ -84,33 +85,34 @@ static bool config_pub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
- 	struct mesh_model_pub *pub = NULL;
- 	int status;
+ 	json_object *jarray_new;
+ 	int i, sz = json_object_array_length(jarray);
+-	char idx_str[5];
+-
+-	snprintf(idx_str, 5, "%4.4x", idx);
  
--	if (size == 4)
-+	if (size == 4) {
- 		mod_id = l_get_le16(pkt + 2);
--	else if (size == 6) {
-+		mod_id |= VENDOR_ID_MASK;
-+	} else if (size == 6) {
- 		mod_id = l_get_le16(pkt + 2) << 16;
- 		mod_id |= l_get_le16(pkt + 4);
- 	} else
- 		return false;
+ 	jarray_new = json_object_new_array();
+ 	if (!jarray_new)
+@@ -203,16 +201,17 @@ static json_object *jarray_key_del(json_object *jarray, int16_t idx)
  
- 	ele_addr = l_get_le16(pkt);
--	ele_idx = node_get_element_idx(mesh_net_local_node_get(net), ele_addr);
-+	ele_idx = node_get_element_idx(node, ele_addr);
+ 	for (i = 0; i < sz; ++i) {
+ 		json_object *jentry, *jvalue;
+-		char *str;
  
- 	if (ele_idx >= 0)
--		pub = mesh_model_pub_get(net, ele_idx, mod_id, &status);
-+		pub = mesh_model_pub_get(node, ele_idx, mod_id, &status);
- 	else
- 		status = MESH_STATUS_INVALID_ADDRESS;
+ 		jentry = json_object_array_get_idx(jarray, i);
  
- 	if (pub && status == MESH_STATUS_SUCCESS)
--		send_pub_status(net, src, dst, status, ele_addr, pub->addr,
-+		send_pub_status(node, src, dst, status, ele_addr, pub->addr,
- 				mod_id, pub->idx, pub->credential, pub->ttl,
- 						pub->period, pub->retransmit);
- 	else
--		send_pub_status(net, src, dst, status, ele_addr, 0, mod_id,
-+		send_pub_status(node, src, dst, status, ele_addr, 0, mod_id,
- 								0, 0, 0, 0, 0);
- 	return true;
- }
- 
--static bool config_pub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
-+static bool config_pub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					const uint8_t *pkt, uint16_t size,
- 					bool unreliable)
- {
-@@ -133,6 +135,7 @@ static bool config_pub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
- 		period = pkt[7];
- 		retransmit = pkt[8];
- 		mod_id = l_get_le16(pkt + 9);
-+		mod_id |= VENDOR_ID_MASK;
- 		break;
- 
- 	case 13:
-@@ -151,6 +154,7 @@ static bool config_pub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
- 		period = pkt[21];
- 		retransmit = pkt[22];
- 		mod_id = l_get_le16(pkt + 23);
-+		mod_id |= VENDOR_ID_MASK;
- 		break;
- 
- 	case 27:
-@@ -181,24 +185,24 @@ static bool config_pub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
- 	if (!b_virt && test_addr > 0x7fff && test_addr < 0xc000)
- 		return false;
- 
--	status = mesh_model_pub_set(net, ele_addr, mod_id, pub_addr, idx,
-+	status = mesh_model_pub_set(node, ele_addr, mod_id, pub_addr, idx,
- 					cred_flag, ttl, period, retransmit,
- 					b_virt, &ota);
- 
--	l_info("pub_set: status %d, ea %4.4x, ota: %4.4x, mod: %x, idx: %3.3x",
-+	l_debug("pub_set: status %d, ea %4.4x, ota: %4.4x, mod: %x, idx: %3.3x",
- 					status, ele_addr, ota, mod_id, idx);
- 
- 	if (IS_UNASSIGNED(ota) && !b_virt)
- 		ttl = period = idx = 0;
- 
- 	if (status >= 0 && !unreliable)
--		send_pub_status(net, src, dst, status, ele_addr, ota,
-+		send_pub_status(node, src, dst, status, ele_addr, ota,
- 				mod_id, idx, cred_flag, ttl, period,
- 				retransmit);
- 	return true;
- }
- 
--static void send_sub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
-+static void send_sub_status(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					uint8_t status, uint16_t ele_addr,
- 					uint16_t addr, uint32_t mod)
- {
-@@ -210,7 +214,7 @@ static void send_sub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
- 	n += 2;
- 	l_put_le16(addr, msg + n);
- 	n += 2;
--	if (mod >= 0x10000) {
-+	if (mod >= 0x10000 && mod < VENDOR_ID_MASK) {
- 		l_put_le16(mod >> 16, msg + n);
- 		l_put_le16(mod, msg + n + 2);
- 		n += 4;
-@@ -219,11 +223,10 @@ static void send_sub_status(struct mesh_net *net, uint16_t src, uint16_t dst,
- 		n += 2;
- 	}
- 
--	mesh_model_send(net, CONFIG_SRV_MODEL, dst, src, APP_IDX_DEV,
--							DEFAULT_TTL, msg, n);
-+	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
- }
- 
--static bool config_sub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
-+static bool config_sub_get(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					const uint8_t *pkt, uint16_t size)
- {
- 	uint16_t ele_addr;
-@@ -251,6 +254,7 @@ static bool config_sub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
- 		n += 2;
- 		l_put_le16(mod_id, msg + n);
- 		n += 2;
-+		mod_id |= VENDOR_ID_MASK;
- 		break;
- 
- 	case 6:
-@@ -269,7 +273,7 @@ static bool config_sub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
- 	}
- 
- 	buf_size = sizeof(uint16_t) * MAX_GRP_PER_MOD;
--	ret = mesh_model_sub_get(net, ele_addr, mod_id, msg + n, buf_size,
-+	ret = mesh_model_sub_get(node, ele_addr, mod_id, msg + n, buf_size,
- 									&size);
- 
- 	if (!ret)
-@@ -277,13 +281,11 @@ static bool config_sub_get(struct mesh_net *net, uint16_t src, uint16_t dst,
- 	else if (ret > 0)
- 		*status = ret;
- 
--	mesh_model_send(net, CONFIG_SRV_MODEL,
--			dst, src, APP_IDX_DEV,
--			DEFAULT_TTL, msg, n);
-+	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
- 	return true;
- }
- 
--static void config_sub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
-+static void config_sub_set(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					const uint8_t *pkt, uint16_t size,
- 					bool virt, uint32_t opcode)
- {
-@@ -301,13 +303,15 @@ static void config_sub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
- 		if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL)
- 			return;
- 		mod_id = l_get_le16(pkt + 2);
-+		mod_id |= VENDOR_ID_MASK;
- 		break;
- 	case 6:
- 		if (virt)
- 			return;
--		if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL)
-+		if (opcode != OP_CONFIG_MODEL_SUB_DELETE_ALL) {
- 			mod_id = l_get_le16(pkt + 4);
--		else {
-+			mod_id |= VENDOR_ID_MASK;
-+		} else {
- 			mod_id = l_get_le16(pkt + 2) << 16;
- 			mod_id |= l_get_le16(pkt + 4);
+ 		if (json_object_object_get_ex(jentry, "index", &jvalue)) {
+-			str = (char *)json_object_get_string(jvalue);
+-			if (str && !strncmp(str, idx_str, 4))
++			int tmp = json_object_get_int(jvalue);
++
++			if (tmp == idx)
+ 				continue;
  		}
-@@ -322,6 +326,7 @@ static void config_sub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
- 		if (!virt)
- 			return;
- 		mod_id = l_get_le16(pkt + 18);
-+		mod_id |= VENDOR_ID_MASK;
- 		break;
- 	case 22:
- 		if (!virt)
-@@ -341,42 +346,42 @@ static void config_sub_set(struct mesh_net *net, uint16_t src, uint16_t dst,
- 	func = opcode & ~OP_UNRELIABLE;
- 	switch (func) {
+ 
++		json_object_get(jentry);
+ 		json_object_array_add(jarray_new, jentry);
+ 	}
+ 
+@@ -389,19 +388,10 @@ bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
+ 	char buf[5];
+ 
+ 	json_object_object_get_ex(jobj, "netKeys", &jarray);
+-	if (!jarray && (phase != KEY_REFRESH_PHASE_NONE))
+-		return false;
+ 
+ 	if (jarray)
+ 		jentry = get_key_object(jarray, idx);
+ 
+-	/*
+-	 * The key entry should exist if the key is updated
+-	 * (i.e., Key Refresh is underway)
+-	 */
+-	if (!jentry && (phase != KEY_REFRESH_PHASE_NONE))
+-		return false;
+-
+ 	if (jentry) {
+ 		uint8_t buf[16];
+ 		json_object *jvalue;
+@@ -422,7 +412,7 @@ bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
+ 		return false;
+ 	}
+ 
+-	if (phase == KEY_REFRESH_PHASE_NONE) {
++	if (!jentry) {
+ 		jentry = json_object_new_object();
+ 		if (!jentry)
+ 			goto fail;
+@@ -442,6 +432,19 @@ bool mesh_db_net_key_add(json_object *jobj, uint16_t idx,
+ 		if (!add_key(jentry, "key", key))
+ 			goto fail;
+ 
++		/* If Key Refresh underway, add placeholder for "Old Key" */
++		if (phase != KEY_REFRESH_PHASE_NONE) {
++			uint8_t buf[16];
++			uint8_t i;
++
++			/* Flip Bits to differentiate */
++			for (i = 0; i < sizeof(buf); i++)
++				buf[i] = key[i] ^ 0xff;
++
++			if (!add_key(jentry, "oldKey", buf))
++				goto fail;
++		}
++
+ 		if (!jarray) {
+ 			jarray = json_object_new_array();
+ 			if (!jarray)
+@@ -733,7 +736,7 @@ static bool parse_bindings(json_object *jbindings, struct mesh_db_model *mod)
+ 	if (cnt > 0xffff)
+ 		return false;
+ 
+-	mod->num_subs = cnt;
++	mod->num_bindings = cnt;
+ 
+ 	/* Allow empty bindings list */
+ 	if (!cnt)
+@@ -761,6 +764,130 @@ static bool parse_bindings(json_object *jbindings, struct mesh_db_model *mod)
+ 	return true;
+ }
+ 
++static bool get_key_index(json_object *jobj, const char *keyword,
++								uint16_t *index)
++{
++	int idx;
++
++	if (!get_int(jobj, keyword, &idx))
++		return false;
++
++	if (!CHECK_KEY_IDX_RANGE(idx))
++		return false;
++
++	*index = (uint16_t) idx;
++	return true;
++}
++
++static struct mesh_db_pub *parse_model_publication(json_object *jpub)
++{
++	json_object *jvalue;
++	struct mesh_db_pub *pub;
++	int len, value;
++	char *str;
++
++	pub = l_new(struct mesh_db_pub, 1);
++	if (!pub)
++		return NULL;
++
++	json_object_object_get_ex(jpub, "address", &jvalue);
++	str = (char *)json_object_get_string(jvalue);
++	len = strlen(str);
++
++	switch (len) {
++	case 4:
++		if (sscanf(str, "%04hx", &pub->addr) != 1)
++			goto fail;
++		break;
++	case 32:
++		if (!str2hex(str, len, pub->virt_addr, 16))
++			goto fail;
++		pub->virt = true;
++		break;
++	default:
++		goto fail;
++	}
++
++	if (!get_key_index(jpub, "index", &pub->idx))
++		goto fail;
++
++	if (!get_int(jpub, "ttl", &value))
++		goto fail;
++	pub->ttl = (uint8_t) value;
++
++	if (!get_int(jpub, "period", &value))
++		goto fail;
++	pub->period = (uint8_t) value;
++
++	if (!get_int(jpub, "credentials", &value))
++		goto fail;
++	pub->credential = (uint8_t) value;
++
++	if (!get_int(jpub, "retransmit", &value))
++		goto fail;
++
++	pub->retransmit = (uint8_t) value;
++	return pub;
++
++fail:
++	l_free(pub);
++	return NULL;
++}
++
++static bool parse_model_subscriptions(json_object *jsubs,
++						struct mesh_db_model *mod)
++{
++	struct mesh_db_sub *subs;
++	int i, cnt;
++
++	if (json_object_get_type(jsubs) != json_type_array)
++		return NULL;
++
++	cnt = json_object_array_length(jsubs);
++	/* Allow empty array */
++	if (!cnt)
++		return true;
++
++	subs = l_new(struct mesh_db_sub, cnt);
++	if (!subs)
++		return false;
++
++	for (i = 0; i < cnt; ++i) {
++		char *str;
++		int len;
++		json_object *jvalue;
++
++		jvalue = json_object_array_get_idx(jsubs, i);
++		if (!jvalue)
++			return false;
++
++		str = (char *)json_object_get_string(jvalue);
++		len = strlen(str);
++
++		switch (len) {
++		case 4:
++			if (sscanf(str, "%04hx", &subs[i].src.addr) != 1)
++				goto fail;
++		break;
++		case 32:
++			if (!str2hex(str, len, subs[i].src.virt_addr, 16))
++				goto fail;
++			subs[i].virt = true;
++			break;
++		default:
++			goto fail;
++		}
++	}
++
++	mod->num_subs = cnt;
++	mod->subs = subs;
++
++	return true;
++fail:
++	l_free(subs);
++	return false;
++}
++
+ static bool parse_models(json_object *jmodels, struct mesh_db_element *ele)
+ {
+ 	int i, num_models;
+@@ -810,11 +937,22 @@ static bool parse_models(json_object *jmodels, struct mesh_db_element *ele)
+ 
+ 		json_object_object_get_ex(jmodel, "bind", &jarray);
+ 
+-		if (jarray && (json_object_get_type(jmodels) != json_type_array
++		if (jarray && (json_object_get_type(jarray) != json_type_array
+ 					|| !parse_bindings(jarray, mod)))
+ 			goto fail;
+ 
+-		/* TODO add pub/sub */
++		json_object_object_get_ex(jmodel, "publish", &jvalue);
++		if (jvalue) {
++			mod->pub = parse_model_publication(jvalue);
++			if (!mod->pub)
++				goto fail;
++		}
++
++		json_object_object_get_ex(jmodel, "subscribe", &jarray);
++
++		if (jarray && !parse_model_subscriptions(jarray, mod))
++			goto fail;
++
+ 		l_queue_push_tail(ele->models, mod);
+ 	}
+ 
+@@ -1012,33 +1150,6 @@ static bool parse_composition(json_object *jcomp, struct mesh_db_node *node)
+ 	return true;
+ }
+ 
+-static uint16_t get_prov_flags(json_object *jarray, uint16_t max_value)
+-{
+-	int i, cnt;
+-	uint16_t result = 0;
+-
+-	cnt = json_object_array_length(jarray);
+-	if (!cnt)
+-		return 0;
+-
+-	for (i = 0; i < cnt; ++i) {
+-		json_object *jvalue;
+-		int value;
+-
+-		jvalue = json_object_array_get_idx(jarray, i);
+-		value = json_object_get_int(jvalue);
+-		if (value > 16)
+-			continue;
+-
+-		if ((1 << value) > max_value)
+-			continue;
+-
+-		result |= (1 << value);
+-	}
+-
+-	return result;
+-}
+-
+ bool mesh_db_read_node(json_object *jnode, mesh_db_node_cb cb, void *user_data)
+ {
+ 	struct mesh_db_node node;
+@@ -1091,117 +1202,28 @@ bool mesh_db_read_node(json_object *jnode, mesh_db_node_cb cb, void *user_data)
+ 	return cb(&node, user_data);
+ }
+ 
+-bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
+-								void *user_data)
+-{
+-	struct mesh_db_node node;
+-	json_object *jvalue;
+-	char *str;
+-
+-	if (!cb) {
+-		l_info("Device read callback is required");
+-		return false;
+-	}
+-
+-	memset(&node, 0, sizeof(node));
+-
+-	if (!parse_composition(jnode, &node)) {
+-		l_info("Failed to parse local device composition");
+-		return false;
+-	}
+-
+-	parse_features(jnode, &node);
+-
+-	json_object_object_get_ex(jnode, "elements", &jvalue);
+-	if (jvalue && json_object_get_type(jvalue) == json_type_array) {
+-		if (!parse_elements(jvalue, &node))
+-			return false;
+-	}
+-
+-	json_object_object_get_ex(jnode, "UUID", &jvalue);
+-	if (!jvalue)
+-		return false;
+-
+-	str = (char *)json_object_get_string(jvalue);
+-	if (!str2hex(str, strlen(str), node.uuid, 16))
+-		return false;
+-
+-	return cb(&node, user_data);
+-}
+-
+-bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov)
++bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
++								uint16_t value)
+ {
+-	json_object *jprov, *jarray, *jvalue, *jobj;
+-	int value;
+-	char *str;
+-
+-	if (!prov)
+-		return false;
+-
+-	json_object_object_get_ex(jnode, "provision", &jprov);
+-	if (!jprov)
+-		return false;
+-
+-	json_object_object_get_ex(jprov, "algorithms", &jarray);
+-	if (!jarray || json_object_get_type(jarray) != json_type_array)
+-		return false;
+-
+-	prov->algorithm = get_prov_flags(jarray, ALG_FIPS_256_ECC);
+-	if (!prov->algorithm) {
+-		l_info("At least one algorithm must be indicated");
+-		return false;
+-	}
+-
+-	json_object_object_get_ex(jprov, "outputOOB", &jobj);
+-	json_object_object_get_ex(jobj, "size", &jvalue);
+-	value = json_object_get_int(jvalue);
+-	if (value > 8)
+-		return false;
+-
+-	prov->output_oob.size = (uint8_t) value;
+-	json_object_object_get_ex(jobj, "actions", &jarray);
+-	if (!jarray || json_object_get_type(jarray) != json_type_array)
+-		return false;
+-
+-	prov->output_oob.actions = get_prov_flags(jarray, OOB_OUT_ALPHA);
+-
+-	json_object_object_get_ex(jprov, "inputOOB", &jobj);
+-	json_object_object_get_ex(jobj, "size", &jvalue);
+-	value = json_object_get_int(jvalue);
+-	if (value > 8)
+-		return false;
+-
+-	prov->input_oob.size = (uint8_t) value;
+-	json_object_object_get_ex(jobj, "actions", &jarray);
+-	if (!jarray || json_object_get_type(jarray) != json_type_array)
+-		return false;
+-
+-	prov->input_oob.actions = get_prov_flags(jarray, OOB_IN_ALPHA);
+-
+-	json_object_object_get_ex(jprov, "publicType", &jvalue);
+-	prov->pub_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
+-
+-	json_object_object_get_ex(jprov, "staticType", &jvalue);
+-	prov->static_type = (json_object_get_boolean(jvalue)) ? 1 : 0;
+-
+-	json_object_object_get_ex(jprov, "privateKey", &jvalue);
+-	if (!jvalue)
+-		return false;
++	json_object *jstring;
++	char buf[5];
+ 
+-	str = (char *)json_object_get_string(jvalue);
+-	if (!str2hex(str, strlen(str), prov->priv_key, 32))
++	snprintf(buf, 5, "%4.4x", value);
++	jstring = json_object_new_string(buf);
++	if (!jstring)
+ 		return false;
+ 
++	json_object_object_add(jobj, desc, jstring);
+ 	return true;
+ }
+ 
+-bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
+-								uint16_t value)
++bool mesh_db_write_uint32_hex(json_object *jobj, const char *desc,
++								uint32_t value)
+ {
+ 	json_object *jstring;
+-	char buf[5];
++	char buf[9];
+ 
+-	snprintf(buf, 5, "%4.4x", value);
++	snprintf(buf, 9, "%8.8x", value);
+ 	jstring = json_object_new_string(buf);
+ 	if (!jstring)
+ 		return false;
+@@ -1238,23 +1260,23 @@ bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value)
+ 	return true;
+ }
+ 
+-bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value)
++static const char *mode_to_string(int mode)
+ {
+-	json_object *jstring;
+-
+-	switch (value) {
++	switch (mode) {
+ 	case MESH_MODE_DISABLED:
+-		jstring = json_object_new_string("disabled");
+-		break;
++		return "disabled";
+ 	case MESH_MODE_ENABLED:
+-		jstring = json_object_new_string("enabled");
+-		break;
+-	case MESH_MODE_UNSUPPORTED:
+-		jstring = json_object_new_string("unsupported");
+-		break;
++		return "enabled";
  	default:
--		l_info("Bad opcode: %x", func);
-+		l_debug("Bad opcode: %x", func);
- 		return;
+-		return false;
+-	};
++		return "unsupported";
++	}
++}
++
++bool mesh_db_write_mode(json_object *jobj, const char *keyword, int value)
++{
++	json_object *jstring;
++
++	jstring = json_object_new_string(mode_to_string(value));
  
- 	case OP_CONFIG_MODEL_SUB_DELETE_ALL:
--		status = mesh_model_sub_del_all(net, ele_addr, mod_id);
-+		status = mesh_model_sub_del_all(node, ele_addr, mod_id);
- 		break;
+ 	if (!jstring)
+ 		return false;
+@@ -1272,7 +1294,7 @@ bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
+ 	json_object_object_del(jnode, "relay");
  
- 	case OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE:
- 		grp = UNASSIGNED_ADDRESS;
- 		/* Fall Through */
- 	case OP_CONFIG_MODEL_SUB_OVERWRITE:
--		status = mesh_model_sub_ovr(net, ele_addr, mod_id,
-+		status = mesh_model_sub_ovr(node, ele_addr, mod_id,
- 							addr, virt, &grp);
- 		break;
- 	case OP_CONFIG_MODEL_SUB_VIRT_ADD:
- 		grp = UNASSIGNED_ADDRESS;
- 		/* Fall Through */
- 	case OP_CONFIG_MODEL_SUB_ADD:
--		status = mesh_model_sub_add(net, ele_addr, mod_id,
-+		status = mesh_model_sub_add(node, ele_addr, mod_id,
- 							addr, virt, &grp);
- 		break;
- 	case OP_CONFIG_MODEL_SUB_VIRT_DELETE:
- 		grp = UNASSIGNED_ADDRESS;
- 		/* Fall Through */
- 	case OP_CONFIG_MODEL_SUB_DELETE:
--		status = mesh_model_sub_del(net, ele_addr, mod_id,
-+		status = mesh_model_sub_del(node, ele_addr, mod_id,
- 							addr, virt, &grp);
- 		break;
- 	}
- 
- 	if (!unreliable && status >= 0)
--		send_sub_status(net, src, dst, status, ele_addr, grp, mod_id);
-+		send_sub_status(node, src, dst, status, ele_addr, grp, mod_id);
- 
- }
- 
--static void send_model_app_status(struct mesh_net *net, uint16_t src,
-+static void send_model_app_status(struct mesh_node *node, uint16_t src,
- 					uint16_t dst, uint8_t status,
- 					uint16_t addr, uint32_t id,
- 					uint16_t idx)
-@@ -389,18 +394,17 @@ static void send_model_app_status(struct mesh_net *net, uint16_t src,
- 	n += 2;
- 	l_put_le16(idx, msg + n);
- 	n += 2;
--	if (id > 0xffff) {
-+	if (id >= 0x10000 && id < VENDOR_ID_MASK) {
- 		l_put_le16(id >> 16, msg + n);
- 		n += 2;
- 	}
- 	l_put_le16(id, msg + n);
- 	n += 2;
- 
--	mesh_model_send(net, CONFIG_SRV_MODEL, dst, src, APP_IDX_DEV,
--				DEFAULT_TTL, msg, n);
-+	mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL, msg, n);
- }
- 
--static void model_app_list(struct mesh_net *net, uint16_t src, uint16_t dst,
-+static void model_app_list(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					const uint8_t *pkt, uint16_t size)
- {
- 	uint16_t ele_addr;
-@@ -427,6 +431,7 @@ static void model_app_list(struct mesh_net *net, uint16_t src, uint16_t dst,
- 		mod_id = l_get_le16(pkt + 2);
- 		l_put_le16(ele_addr, msg + 1 + n);
- 		l_put_le16(mod_id, msg + 3 + n);
-+		mod_id |= VENDOR_ID_MASK;
- 		n += 5;
- 		break;
- 	case 6:
-@@ -443,20 +448,20 @@ static void model_app_list(struct mesh_net *net, uint16_t src, uint16_t dst,
- 	}
- 
- 
--	result = mesh_model_get_bindings(net, ele_addr, mod_id, msg + n,
-+	result = mesh_model_get_bindings(node, ele_addr, mod_id, msg + n,
- 							buf_size, &size);
- 	n += size;
- 
- 	if (result >= 0) {
- 		*status = result;
--		mesh_model_send(net, CONFIG_SRV_MODEL, dst, src, APP_IDX_DEV,
--					DEFAULT_TTL, msg, n);
-+		mesh_model_send(node, dst, src, APP_IDX_DEV, DEFAULT_TTL,
-+								msg, n);
- 	}
- 
- 	l_free(msg);
- }
- 
--static bool model_app_bind(struct mesh_net *net, uint16_t src, uint16_t dst,
-+static bool model_app_bind(struct mesh_node *node, uint16_t src, uint16_t dst,
- 					const uint8_t *pkt, uint16_t size,
- 					bool unbind)
- {
-@@ -471,6 +476,7 @@ static bool model_app_bind(struct mesh_net *net, uint16_t src, uint16_t dst,
- 
- 	case 6:
- 		mod_id = l_get_le16(pkt + 4);
-+		mod_id |= VENDOR_ID_MASK;
- 		break;
- 	case 8:
- 		mod_id = l_get_le16(pkt + 4) << 16;
-@@ -485,11 +491,11 @@ static bool model_app_bind(struct mesh_net *net, uint16_t src, uint16_t dst,
+ 	jrelay = json_object_new_object();
+-	if (jrelay)
++	if (!jrelay)
  		return false;
  
- 	if (unbind)
--		result = mesh_model_binding_del(net, ele_addr, mod_id, idx);
-+		result = mesh_model_binding_del(node, ele_addr, mod_id, idx);
- 	else
--		result = mesh_model_binding_add(net, ele_addr, mod_id, idx);
-+		result = mesh_model_binding_add(node, ele_addr, mod_id, idx);
- 
--	send_model_app_status(net, src, dst, result, ele_addr, mod_id, idx);
-+	send_model_app_status(node, src, dst, result, ele_addr, mod_id, idx);
- 
- 	return true;
+ 	if (!mesh_db_write_mode(jrelay, "mode", mode))
+@@ -1359,3 +1381,113 @@ void mesh_db_remove_property(json_object *jobj, const char *desc)
+ {
+ 	json_object_object_del(jobj, desc);
  }
-@@ -533,7 +539,7 @@ static void hb_sub_timeout_func(struct l_timeout *timeout, void *user_data)
- 	struct mesh_net *net = user_data;
- 	struct mesh_net_heartbeat *hb = mesh_net_heartbeat_get(net);
- 
--	l_info("HB Subscription Ended");
-+	l_debug("HB Subscription Ended");
- 	l_timeout_remove(hb->sub_timer);
- 	hb->sub_timer = NULL;
- 	hb->sub_enabled = false;
-@@ -639,7 +645,7 @@ static int hb_subscription_set(struct mesh_net *net, uint16_t src,
- 
- static void node_reset(struct l_timeout *timeout, void *user_data)
- {
--	l_info("Node Reset");
-+	l_debug("Node Reset");
- 	l_timeout_remove(timeout);
- 	l_main_quit();
- }
-@@ -649,7 +655,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 				const uint8_t *data, uint16_t size,
- 				uint8_t ttl, const void *user_data)
- {
--	struct mesh_net *net = (struct mesh_net *) user_data;
-+	struct mesh_node *node = (struct mesh_node *) user_data;
-+	struct mesh_net *net = node_get_net(node);
- 	const uint8_t *pkt = data;
- 	struct timeval time_now;
- 	uint32_t opcode, tmp32;
-@@ -663,7 +670,6 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 	bool virt = false;
- 	uint8_t count;
- 	uint16_t interval;
--	struct mesh_node *node;
- 	uint16_t n;
- 
- 	if (idx != APP_IDX_DEV)
-@@ -675,10 +681,10 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 	} else
- 		return false;
- 
-+	net = node_get_net(node);
- 	hb = mesh_net_heartbeat_get(net);
- 	l_debug("CONFIG-SRV-opcode 0x%x size %u idx %3.3x", opcode, size, idx);
- 
--	node = mesh_net_local_node_get(net);
- 	n = 0;
- 
- 	switch (opcode) {
-@@ -691,8 +697,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 
- 		/* Only page 0 is currently supported */
- 		if (pkt[0] != 0) {
--			l_info("Unsupported page number %d", pkt[0]);
--			l_info("Returning page number 0");
-+			l_debug("Unsupported page number %d", pkt[0]);
-+			l_debug("Returning page number 0");
- 		}
- 		long_msg = l_malloc(CFG_MAX_MSG_LEN);
- 		n = mesh_model_opcode_set(OP_DEV_COMP_STATUS, long_msg);
-@@ -711,7 +717,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		/* Fall Through */
- 
- 	case OP_CONFIG_DEFAULT_TTL_GET:
--		l_info("Get/Set Default TTL");
-+		l_debug("Get/Set Default TTL");
- 
- 		n = mesh_model_opcode_set(OP_CONFIG_DEFAULT_TTL_STATUS, msg);
- 		msg[n++] = node_default_ttl_get(node);
-@@ -721,7 +727,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		if (size != 25 && size != 27)
- 			return true;
- 
--		config_pub_set(net, src, unicast, pkt, size,
-+		config_pub_set(node, src, unicast, pkt, size,
- 				!!(opcode & OP_UNRELIABLE));
- 		break;
- 
-@@ -729,24 +735,24 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		if (size != 11 && size != 13)
- 			return true;
- 
--		config_pub_set(net, src, unicast, pkt, size,
-+		config_pub_set(node, src, unicast, pkt, size,
- 				!!(opcode & OP_UNRELIABLE));
- 		break;
- 
- 	case OP_CONFIG_MODEL_PUB_GET:
--		config_pub_get(net, src, unicast, pkt, size);
-+		config_pub_get(node, src, unicast, pkt, size);
- 		break;
- 
- 	case OP_CONFIG_VEND_MODEL_SUB_GET:
- 		if (size != 6)
- 			return true;
--		config_sub_get(net, src, unicast, pkt, size);
-+		config_sub_get(node, src, unicast, pkt, size);
- 		break;
- 
- 	case OP_CONFIG_MODEL_SUB_GET:
- 		if (size != 4)
- 			return true;
--		config_sub_get(net, src, unicast, pkt, size);
-+		config_sub_get(node, src, unicast, pkt, size);
- 		break;
- 
- 	case OP_CONFIG_MODEL_SUB_VIRT_OVERWRITE:
-@@ -758,7 +764,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 	case OP_CONFIG_MODEL_SUB_DELETE:
- 	case OP_CONFIG_MODEL_SUB_ADD:
- 	case OP_CONFIG_MODEL_SUB_DELETE_ALL:
--		config_sub_set(net, src, unicast, pkt, size, virt, opcode);
-+		config_sub_set(node, src, unicast, pkt, size, virt, opcode);
- 		break;
- 
- 	case OP_CONFIG_RELAY_SET:
-@@ -777,7 +783,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		msg[n++] = node_relay_mode_get(node, &count, &interval);
- 		msg[n++] = ((count - 1) << 5) + ((interval/10 - 1) & 0x1f);
- 
--		l_info("Get/Set Relay Config (%d)", msg[n-1]);
-+		l_debug("Get/Set Relay Config (%d)", msg[n-1]);
- 		break;
- 
- 	case OP_CONFIG_NETWORK_TRANSMIT_SET:
-@@ -786,7 +792,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 
- 		count = (pkt[0] >> 5) + 1;
- 		interval = ((pkt[0] & 0x1f) + 1) * 10;
--		if (storage_local_set_transmit_params(net, count, interval))
-+		if (storage_set_transmit_params(node_jconfig_get(node), count,
-+								interval))
- 			mesh_net_transmit_params_set(net, count, interval);
- 		/* Fall Through */
- 
-@@ -796,7 +803,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		mesh_net_transmit_params_get(net, &count, &interval);
- 		msg[n++] = ((count - 1) << 5) + ((interval/10 - 1) & 0x1f);
- 
--		l_info("Get/Set Network Transmit Config");
-+		l_debug("Get/Set Network Transmit Config");
- 		break;
- 
- 	case OP_CONFIG_PROXY_SET:
-@@ -810,7 +817,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		n = mesh_model_opcode_set(OP_CONFIG_PROXY_STATUS, msg);
- 
- 		msg[n++] = node_proxy_mode_get(node);
--		l_info("Get/Set Config Proxy (%d)", msg[n-1]);
-+		l_debug("Get/Set Config Proxy (%d)", msg[n-1]);
- 		break;
- 
- 	case OP_NODE_IDENTITY_SET:
-@@ -845,7 +852,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		n += 2;
- 
- 		msg[n++] = state;
--		l_info("Get/Set Config Identity (%d)", state);
-+		l_debug("Get/Set Config Identity (%d)", state);
- 		break;
- 
- 	case OP_CONFIG_BEACON_SET:
-@@ -859,7 +866,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		n = mesh_model_opcode_set(OP_CONFIG_BEACON_STATUS, msg);
- 
- 		msg[n++] = node_beacon_mode_get(node);
--		l_info("Get/Set Config Beacon (%d)", msg[n-1]);
-+		l_debug("Get/Set Config Beacon (%d)", msg[n-1]);
- 		break;
- 
- 	case OP_CONFIG_FRIEND_SET:
-@@ -874,7 +881,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		n = mesh_model_opcode_set(OP_CONFIG_FRIEND_STATUS, msg);
- 
- 		msg[n++] = node_friend_mode_get(node);
--		l_info("Get/Set Friend (%d)", msg[n-1]);
-+		l_debug("Get/Set Friend (%d)", msg[n-1]);
- 		break;
- 
- 	case OP_CONFIG_KEY_REFRESH_PHASE_SET:
-@@ -908,7 +915,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		n += 2;
- 		msg[n++] = phase;
- 
--		l_info("Get/Set Key Refresh State (%d)", msg[n-1]);
-+		l_debug("Get/Set Key Refresh State (%d)", msg[n-1]);
- 		break;
- 
- 	case OP_APPKEY_ADD:
-@@ -921,7 +928,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		b_res = appkey_key_add(net, net_idx, app_idx, pkt + 3,
- 						opcode == OP_APPKEY_UPDATE);
- 
--		l_info("Add/Update AppKey %s: Net_Idx %3.3x, App_Idx %3.3x",
-+		l_debug("Add/Update AppKey %s: Net_Idx %3.3x, App_Idx %3.3x",
- 			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail",
- 							net_idx, app_idx);
- 
-@@ -942,9 +949,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		net_idx = l_get_le16(pkt) & 0xfff;
- 		app_idx = l_get_le16(pkt + 1) >> 4;
- 		b_res = appkey_key_delete(net, net_idx, app_idx);
--		if (b_res == MESH_STATUS_SUCCESS)
--			node_app_key_delete(net, dst, net_idx, app_idx);
--		l_info("Delete AppKey %s Net_Idx %3.3x to App_Idx %3.3x",
-+		l_debug("Delete AppKey %s Net_Idx %3.3x to App_Idx %3.3x",
- 			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail",
- 							net_idx, app_idx);
- 
-@@ -979,7 +984,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		b_res = mesh_net_add_key(net, opcode == OP_NETKEY_UPDATE,
- 						l_get_le16(pkt), pkt + 2);
- 
--		l_info("NetKey Add/Update %s",
-+		l_debug("NetKey Add/Update %s",
- 			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail");
- 
- 		n = mesh_model_opcode_set(OP_NETKEY_STATUS, msg);
-@@ -994,7 +999,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 
- 		b_res = mesh_net_del_key(net, l_get_le16(pkt));
- 
--		l_info("NetKey delete %s",
-+		l_debug("NetKey delete %s",
- 			(b_res == MESH_STATUS_SUCCESS) ? "success" : "fail");
- 
- 		n = mesh_model_opcode_set(OP_NETKEY_STATUS, msg);
-@@ -1016,26 +1021,26 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 
- 	case OP_MODEL_APP_BIND:
- 	case OP_MODEL_APP_UNBIND:
--		model_app_bind(net, src, unicast, pkt, size,
-+		model_app_bind(node, src, unicast, pkt, size,
- 				opcode != OP_MODEL_APP_BIND);
- 		break;
- 
- 	case OP_VEND_MODEL_APP_GET:
- 		if (size != 6)
- 			return true;
--		model_app_list(net, src, unicast, pkt, size);
-+		model_app_list(node, src, unicast, pkt, size);
- 		break;
- 
- 	case OP_MODEL_APP_GET:
- 		if (size != 4)
- 			return true;
--		model_app_list(net, src, unicast, pkt, size);
-+		model_app_list(node, src, unicast, pkt, size);
- 		break;
- 
- 	case OP_CONFIG_HEARTBEAT_PUB_SET:
--		l_info("OP_CONFIG_HEARTBEAT_PUB_SET");
-+		l_debug("OP_CONFIG_HEARTBEAT_PUB_SET");
- 		if (size != 9) {
--			l_info("bad size %d", size);
-+			l_debug("bad size %d", size);
- 			return true;
- 		}
- 		if (pkt[2] > 0x11 || pkt[3] > 0x10 || pkt[4] > 0x7f)
-@@ -1101,7 +1106,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		if (size != 5)
- 			return true;
- 
--		l_info("Set Sub Period (Log %2.2x) %d sec",
-+		l_debug("Set Sub Period (Log %2.2x) %d sec",
- 				pkt[4], log_to_uint32(pkt[4], 1));
- 
- 		b_res = hb_subscription_set(net, l_get_le16(pkt),
-@@ -1121,7 +1126,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 		else
- 			time_now.tv_sec = hb->sub_period - time_now.tv_sec;
- 
--		l_info("Sub Period (Log %2.2x) %d sec",
-+		l_debug("Sub Period (Log %2.2x) %d sec",
- 				uint32_to_log(time_now.tv_sec),
- 				(int) time_now.tv_sec);
- 
-@@ -1159,8 +1164,7 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 
- 	if (n) {
- 		/* print_packet("App Tx", long_msg ? long_msg : msg, n); */
--		mesh_model_send(net, CONFIG_SRV_MODEL,
--				unicast, src,
-+		mesh_model_send(node, unicast, src,
- 				APP_IDX_DEV, DEFAULT_TTL,
- 				long_msg ? long_msg : msg, n);
- 	}
-@@ -1171,7 +1175,8 @@ static bool cfg_srv_pkt(uint16_t src, uint32_t dst,
- 
- static void cfgmod_srv_unregister(void *user_data)
- {
--	struct mesh_net *net = user_data;
-+	struct mesh_node *node = user_data;
-+	struct mesh_net *net = node_get_net(node);
- 	struct mesh_net_heartbeat *hb = mesh_net_heartbeat_get(net);
- 
- 	l_timeout_remove(hb->pub_timer);
-@@ -1187,8 +1192,8 @@ static const struct mesh_model_ops ops = {
- 	.pub = NULL
- };
- 
--void mesh_config_srv_init(struct mesh_net *net, uint8_t ele_idx)
-+void mesh_config_srv_init(struct mesh_node *node, uint8_t ele_idx)
- {
- 	l_debug("%2.2x", ele_idx);
--	mesh_model_register(net, ele_idx, CONFIG_SRV_MODEL, &ops, net);
-+	mesh_model_register(node, ele_idx, CONFIG_SRV_MODEL, &ops, node);
- }
-diff --git a/mesh/cfgmod.h b/mesh/cfgmod.h
-index bedb0c6f6..84fa184e5 100644
---- a/mesh/cfgmod.h
-+++ b/mesh/cfgmod.h
-@@ -15,7 +15,6 @@
++
++static void add_model(void *a, void *b)
++{
++	struct mesh_db_model *mod = a;
++	json_object *jmodels = b, *jmodel;
++
++	jmodel = json_object_new_object();
++	if (!jmodel)
++		return;
++
++	if (!mod->vendor)
++		mesh_db_write_uint16_hex(jmodel, "modelId",
++						(uint16_t) mod->id);
++	else
++		mesh_db_write_uint32_hex(jmodel, "modelId", mod->id);
++
++	json_object_array_add(jmodels, jmodel);
++}
++
++/* Add unprovisioned node (local) */
++bool mesh_db_add_node(json_object *jnode, struct mesh_db_node *node) {
++
++	struct mesh_db_modes *modes = &node->modes;
++	const struct l_queue_entry *entry;
++	json_object *jelements;
++
++	/* CID, PID, VID, crpl */
++	if (!mesh_db_write_uint16_hex(jnode, "cid", node->cid))
++		return false;
++
++	if (!mesh_db_write_uint16_hex(jnode, "pid", node->pid))
++		return false;
++
++	if (!mesh_db_write_uint16_hex(jnode, "vid", node->vid))
++		return false;
++
++	if (!mesh_db_write_uint16_hex(jnode, "crpl", node->crpl))
++		return false;
++
++	/* Device UUID */
++	if (!add_key(jnode, "UUID", node->uuid))
++		return false;
++
++	/* Features: relay, LPN, friend, proxy*/
++	if (!mesh_db_write_relay_mode(jnode, modes->relay.state,
++						modes->relay.cnt,
++						modes->relay.interval))
++		return false;
++
++	if (!mesh_db_write_mode(jnode, "lowPower", modes->lpn))
++		return false;
++
++	if (!mesh_db_write_mode(jnode, "friend", modes->friend))
++		return false;
++
++	if (!mesh_db_write_mode(jnode, "proxy", modes->proxy))
++		return false;
++
++	/* Beaconing state */
++	if (!mesh_db_write_mode(jnode, "beacon", modes->beacon))
++		return false;
++
++	/* Sequence number */
++	json_object_object_add(jnode, "sequenceNumber",
++					json_object_new_int(node->seq_number));
++
++	/* Default TTL */
++	json_object_object_add(jnode, "defaultTTL",
++						json_object_new_int(node->ttl));
++
++	/* Elements */
++	jelements = json_object_new_array();
++	if (!jelements)
++		return false;
++
++	entry = l_queue_get_entries(node->elements);
++
++	for (; entry; entry = entry->next) {
++		struct mesh_db_element *ele = entry->data;
++		json_object *jelement, *jmodels;
++
++		jelement = json_object_new_object();
++
++		if (!jelement) {
++			json_object_put(jelements);
++			return false;
++		}
++
++		mesh_db_write_int(jelement, "elementIndex", ele->index);
++		mesh_db_write_uint16_hex(jelement, "location", ele->location);
++		json_object_array_add(jelements, jelement);
++
++		/* Models */
++		if (l_queue_isempty(ele->models))
++			continue;
++
++		jmodels = json_object_new_array();
++		if (!jmodels) {
++			json_object_put(jelements);
++			return false;
++		}
++
++		json_object_object_add(jelement, "models", jmodels);
++		l_queue_foreach(ele->models, add_model, jmodels);
++	}
++
++	json_object_object_add(jnode, "elements", jelements);
++
++	return true;
++}
+diff --git a/mesh/mesh-db.h b/mesh/mesh-db.h
+index 336302f28..40e60f72d 100644
+--- a/mesh/mesh-db.h
++++ b/mesh/mesh-db.h
+@@ -15,11 +15,8 @@
   *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
   *  Lesser General Public License for more details.
   *
 - *
   */
  
- #define CONFIG_SRV_MODEL	(VENDOR_ID_MASK | 0x0000)
-@@ -95,4 +94,4 @@
- #define OP_VEND_MODEL_APP_GET			0x804C
- #define OP_VEND_MODEL_APP_LIST			0x804E
+-#include <json-c/json.h>
+-
+ struct mesh_db_sub {
+ 	bool virt;
+ 	union {
+@@ -103,9 +100,7 @@ typedef bool (*mesh_db_app_key_cb)(uint16_t idx, uint16_t net_idx,
+ typedef bool (*mesh_db_node_cb)(struct mesh_db_node *node, void *user_data);
  
--void mesh_config_srv_init(struct mesh_net *net, uint8_t ele_idx);
-+void mesh_config_srv_init(struct mesh_node *node, uint8_t ele_idx);
+ bool mesh_db_read_node(json_object *jobj, mesh_db_node_cb cb, void *user_data);
+-bool mesh_db_read_unprovisioned_device(json_object *jnode, mesh_db_node_cb cb,
+-							void *user_data);
+-bool mesh_db_read_prov_info(json_object *jnode, struct mesh_db_prov *prov);
++bool mesh_db_add_node(json_object *jnode, struct mesh_db_node *node);
+ bool mesh_db_read_iv_index(json_object *jobj, uint32_t *idx, bool *update);
+ bool mesh_db_read_device_key(json_object *jobj, uint8_t key_buf[16]);
+ bool mesh_db_read_net_transmit(json_object *jobj, uint8_t *cnt,
+@@ -124,6 +119,8 @@ bool mesh_db_write_app_key(json_object *jobj, uint16_t net_idx,
+ bool mesh_db_write_int(json_object *jobj, const char *keyword, int value);
+ bool mesh_db_write_uint16_hex(json_object *jobj, const char *desc,
+ 								uint16_t value);
++bool mesh_db_write_uint32_hex(json_object *jobj, const char *desc,
++								uint32_t value);
+ bool mesh_db_write_bool(json_object *jobj, const char *keyword, bool value);
+ bool mesh_db_write_relay_mode(json_object *jnode, uint8_t mode, uint8_t count,
+ 							uint16_t interval);
 -- 
 2.14.5
 
