@@ -1,127 +1,134 @@
-Return-Path: <SRS0=+lf3=PF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=rkTY=PG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B57A1C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 642DBC43387
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Dec 2018 07:19:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76351217F9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Dec 2018 22:10:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V7WEeU3W"
+	by mail.kernel.org (Postfix) with ESMTP id 3D15A20866
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Dec 2018 07:19:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726903AbeL1WKZ (ORCPT
+        id S1728904AbeL2HS4 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Dec 2018 17:10:25 -0500
-Received: from mail-ot1-f45.google.com ([209.85.210.45]:43240 "EHLO
-        mail-ot1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726874AbeL1WKZ (ORCPT
+        Sat, 29 Dec 2018 02:18:56 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:59696 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727245AbeL2HS4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Dec 2018 17:10:25 -0500
-Received: by mail-ot1-f45.google.com with SMTP id a11so19628316otr.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Dec 2018 14:10:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=3nqRhVsf+aiP/4j5aCIgTmryRoa455rAYuX9YWyNASw=;
-        b=V7WEeU3WK4Df1IDdWWI6vKJDhT7fVTUawHEfk/d+a4Kcg58lDyb4vFlTs5HucqHkYS
-         FFG3u+TTJ1JFy9yxgRI08v0AXiPpeC7+vuxD7J6nps11ftvVI/AOc7m/97sPu9KhguQ4
-         /aK9mMLz51514jodlGcQhyR5qZVkMPfPCpK7iLuoqrP8QLsTsaenpvgtkjK2lq/sShOW
-         NeNrKCa97jdqbBStaxFiFTY0V9BceCfx4GfbnscZffx+VcseRd5QY3dxVjccwQ+Xf7ri
-         LpteeeZYOFwGbp9PNAx/t1+w1NehFBEU6Id0ny/x++TJyo6MxSTW4wrcjiNfQjzHnRox
-         Co6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=3nqRhVsf+aiP/4j5aCIgTmryRoa455rAYuX9YWyNASw=;
-        b=c/QBx2o4ZNFjlaRqLOFWGqzSvgOD5ecTvb0ZLJAJiLl2m5Kfs+6pv9z+tR8C/Z8PeS
-         POs/VjKdjosI5kFbvLqetYqmgcy2fS+VBpRckgFfhhW7qUYIsS7wHx0uT2y2YqS8++89
-         Yxfn2Z+gEAWdywG3VgJsFGNF0wuRhYsImIXKBmVl3b7uFNq7enWA0LLq1SVUVxZErxit
-         NeCFkin96mJVCw1wd+D3rDm/uKNf8KK1hiJ/TpPYgj1dxtasDtHIHpUgR5WKwgXiDN04
-         NOuJwH7pjwjbJIzJoFc/XJVkcO3t9HrtjcaQbLDgVEoNJ/ZbqucdMCyuwPOnXpB9voNm
-         VUrw==
-X-Gm-Message-State: AJcUukf2CWpoVIjq8s/VwQjAJEf7hZZZZkn0zT+Y/xiDoY1wC7InGagA
-        /AzPfl552+ZUh/aRy/sl/TNlZV3+S5stFc0gGueITWWM
-X-Google-Smtp-Source: ALg8bN7hV0wG7ftbNEexVWWI9YNklHEPX8z28UFACeT9Z1o/4BIsqRAT0K6msZgwQs4Qb/HIdu1/p6GFN7vN6ZQB760=
-X-Received: by 2002:a9d:3426:: with SMTP id v35mr2160258otb.71.1546035023317;
- Fri, 28 Dec 2018 14:10:23 -0800 (PST)
-MIME-Version: 1.0
-References: <20180711082352.oo6srapfnol5nkxq@pali> <CABBYNZJuGT5_zhg-BkAc4XjtVu5His92cHTujrin=SMOVbaodQ@mail.gmail.com>
- <20180711144501.ovdxc2expa4bg6sc@pali> <20181215202910.j24amjshrvjqprll@pali>
- <CABBYNZLK4tyL8nvWbXxr6VctyEyJkMdwNiWMy4gUge9h9Vb4SQ@mail.gmail.com> <20181228191102.GA31975@reaktio.net>
-In-Reply-To: <20181228191102.GA31975@reaktio.net>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 28 Dec 2018 19:10:11 -0300
-Message-ID: <CABBYNZ+bwbSkH4qtkuzhE=JY6KAGwJ_E4ABGT_LE6E277eTNDQ@mail.gmail.com>
-Subject: Re: bluez: dbus method call for switching endpoint
-To:     =?UTF-8?B?UGFzaSBLw6Rya2vDpGluZW4=?= <pasik@iki.fi>
-Cc:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Sat, 29 Dec 2018 02:18:56 -0500
+Received: from [172.20.12.43] (unknown [213.61.67.157])
+        by mail.holtmann.org (Postfix) with ESMTPSA id C2247CF358;
+        Sat, 29 Dec 2018 08:26:35 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH v7 4/4] Bluetooth: btqca: inject command complete event
+ during fw download
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20181228114819.17479-5-bgodavar@codeaurora.org>
+Date:   Sat, 29 Dec 2018 08:18:53 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <2C799DB5-8033-45B5-A790-A16F73641645@holtmann.org>
+References: <20181228114819.17479-1-bgodavar@codeaurora.org>
+ <20181228114819.17479-5-bgodavar@codeaurora.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pasi,
+Hi Balakrishna,
 
-On Fri, Dec 28, 2018 at 4:46 PM Pasi K=C3=A4rkk=C3=A4inen <pasik@iki.fi> wr=
-ote:
->
-> Hi Luiz,
->
-> On Tue, Dec 18, 2018 at 01:02:39PM -0300, Luiz Augusto von Dentz wrote:
-> > Hi Pali,
-> >
-> > On Sat, Dec 15, 2018 at 5:29 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> =
-wrote:
-> > >
-> > > On Wednesday 11 July 2018 16:45:01 Pali Roh=C3=A1r wrote:
-> > > > On Wednesday 11 July 2018 16:27:07 Luiz Augusto von Dentz wrote:
-> > > > > One way to solve all of these is that we would expose the remote
-> > > > > endpoints using MediaEndpoint1
-> > > >
-> > > > So client application (like pulseadio) would see list of remote
-> > > > endpoints (one for each codec) and choose one for connection?
-> > > >
-> > > > Looks like this should solve this problem.
-> > >
-> > > Are there any progress on such API in bluez?
-> > >
-> > > On pulseaudio mailing list other people proposed patches for other A2=
-DP
-> > > codecs and basically bluez API for choosing A2DP codec is still missi=
-ng
-> > > part...
-> >
-> > Im currenlty on vacation but will try to find time for that, that said
-> > that shouldn't stop us to include support for other codecs, the last
-> > set seems to have some sort of priority for ordering the registration
-> > of the codecs.
-> >
->
-> Let us know when you have something to see/try!
-> I'm happy to do testing of the patches.
->
-> People are currently eager to get support for multiple BT audio codecs wo=
-rking and merged upstream :)
+> Latest qualcomm chips are not sending an command complete event for
+> every firmware packet sent to chip. They only respond with a vendor
+> specific event for the last firmware packet. This optimization will
+> decrease the BT ON time. Due to this we are seeing a timeout error
+> message logs on the console during firmware download. Now we are
+> injecting a command complete event once we receive an vendor specific
+> event for the last RAM firmware packet.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> ---
+> drivers/bluetooth/btqca.c | 39 ++++++++++++++++++++++++++++++++++++++-
+> drivers/bluetooth/btqca.h |  3 +++
+> 2 files changed, 41 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index ec9e03a6b778..0b533f65f652 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -144,6 +144,7 @@ static void qca_tlv_check_data(struct rome_config *config,
+> 		 * In case VSE is skipped, only the last segment is acked.
+> 		 */
+> 		config->dnld_mode = tlv_patch->download_mode;
+> +		config->dnld_type = config->dnld_mode;
+> 
+> 		BT_DBG("Total Length           : %d bytes",
+> 		       le32_to_cpu(tlv_patch->total_size));
+> @@ -264,6 +265,31 @@ static int qca_tlv_send_segment(struct hci_dev *hdev, int seg_size,
+> 	return err;
+> }
+> 
+> +static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
+> +{
+> +	struct hci_event_hdr *hdr;
+> +	struct hci_ev_cmd_complete *evt;
+> +	struct sk_buff *skb;
+> +
+> +	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
+> +	if (!skb)
+> +		return -ENOMEM;
+> +
+> +	hdr = skb_put(skb, sizeof(*hdr));
+> +	hdr->evt = HCI_EV_CMD_COMPLETE;
+> +	hdr->plen = sizeof(*evt) + 1;
+> +
+> +	evt = skb_put(skb, sizeof(*evt));
+> +	evt->ncmd = 1;
+> +	evt->opcode = HCI_OP_NOP;
+> +
+> +	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
+> +
+> +	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
+> +
+> +	return hci_recv_frame(hdev, skb);
+> +}
+> +
+> static int qca_download_firmware(struct hci_dev *hdev,
+> 				  struct rome_config *config)
+> {
+> @@ -297,11 +323,22 @@ static int qca_download_firmware(struct hci_dev *hdev,
+> 		ret = qca_tlv_send_segment(hdev, segsize, segment,
+> 					    config->dnld_mode);
+> 		if (ret)
+> -			break;
+> +			goto out;
+> 
+> 		segment += segsize;
+> 	}
+> 
+> +	/* Latest qualcomm chipsets are not sending a command complete event
+> +	 * for every fw packet sent. They only respond with a vendor specific
+> +	 * event for the last packet. This optimization in the chip will
+> +	 * decrease the BT in initialization time. Here we will inject a command
+> +	 * complete event to avoid a command timeout error message.
+> +	 */
+> +	if ((config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
+> +	    config->dnld_type == ROME_SKIP_EVT_VSE))
+> +		return qca_inject_cmd_complete_event(hdev);
+> +
 
-Note that it is very unlikely that this API would allow multiple
-codecs at the same time, headsets normally only allow one
-configuration at time. Making it possible to switch codecs is more of
-a workaround for headsets that don't honor the codec priority since
-they normally codec back, although some model no longer configure a
-stream just wait the source.
+have you actually considered using __hci_cmd_send in that case. It is allowed for vendor OGF to use that command. I see you actually do use it and now I am failing to understand what this is for.
 
-Regarding the API I still didn't have time to start it, so it will
-take a little longer than I antecipated.
---=20
-Luiz Augusto von Dentz
+Regards
+
+Marcel
+
