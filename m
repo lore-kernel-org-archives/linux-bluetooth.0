@@ -1,67 +1,68 @@
-Return-Path: <SRS0=iDKf=PH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=lDVm=PI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E11C43387
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Dec 2018 14:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DECD5C43444
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Dec 2018 06:04:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D4CE02075D
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Dec 2018 14:02:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A68EB20828
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Dec 2018 06:04:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XYdBlZ5L"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="PwiVeYBL";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Aa7FO7mX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726058AbeL3OCD (ORCPT
+        id S1726944AbeLaGEs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Dec 2018 09:02:03 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:46679 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725925AbeL3OCD (ORCPT
+        Mon, 31 Dec 2018 01:04:48 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:53991 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726782AbeLaGEs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Dec 2018 09:02:03 -0500
-Received: by mail-pf1-f196.google.com with SMTP id c73so12323249pfe.13
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Dec 2018 06:02:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=yxG7m/436Tbtkr3w6GYV0MQgrbWL2UZyGeZ/5qQBnZU=;
-        b=XYdBlZ5LNoHbsQ/csSm4opsAAl/UZKv/7PMqG8jce9/7MjKiPkFQ6QG5djFnFC+bYj
-         276VCDZMgh5ujmQg+IE3q4YtUEiiGO3JfrAD1cXa2lBQSO2PrG6ZuhXS90ZdNgWe0LX/
-         1VQrRerGOJnH40sXO7BD+YeUaQDRfN19NHTxMkU2NVpaEP4MDUhT1PvsQQxXhmr4pTwm
-         w/FiQah0LBbAqb3b6Wr1vxFfgWX9/yrwypSBmbb8fWyB7KamooVy2LIoZB1tgOu+FbmH
-         zJoBfBRg+7pTc5WH1em4Woqs4Hlkr3yLtFMXiA8reSCQ3PNUGz3jeqCO0uViRCmyxUkz
-         4BXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:content-transfer-encoding;
-        bh=yxG7m/436Tbtkr3w6GYV0MQgrbWL2UZyGeZ/5qQBnZU=;
-        b=eYxp5zaloo897tzY1bBgA3TURHGPcae4E5ro1vy0EAckedEGDwDgEWeF0QMjgMymAW
-         aGGi+Rqq7UEWG6UICIzGs3F5aniQQsOUGGIJM4KCTF+q9xfdP0SECGYb6erbW7+2rrPX
-         1jjkkyej4POGs9xJdccnko+fFIaPfsRsQx2FwybpR0YKSGjcliu/thX13LMDv4CNPX3V
-         cmjb52FhQsQ8RPvKVu8pKgeC6/k0Mu81Wib8S4YWSUBzPH6bmrhVMm12Ys8yr/EVA3ib
-         ZVY+vKpiD5Y+xsHuYT1EGS+lxsIWKAupEwOCJXMgBm7O3g+8ciEIfh5vO+2qRnJ9Hcc1
-         coMQ==
-X-Gm-Message-State: AA+aEWYqu7gdifU77P/EQHssL5yOSWynJwmfwm96rkVv48KrYvcFJHIc
-        yOxGDvbwrNezZH8YJb7+XjDrWiU/is5oG8fDwBr0SEYz
-X-Google-Smtp-Source: AFSGD/VtgN+7//thwQZtAh2Z7jzzo65SCTWZFrZ2egWbRxh0broySyP3LoeXKsB+iLjFFWuG9fzf688Vehylc8tci1M=
-X-Received: by 2002:a62:938f:: with SMTP id r15mr34684979pfk.27.1546178522081;
- Sun, 30 Dec 2018 06:02:02 -0800 (PST)
+        Mon, 31 Dec 2018 01:04:48 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 1964F60452; Mon, 31 Dec 2018 06:04:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1546236287;
+        bh=zKIJeKlQjf3ssAa3hPI03SLi9ZeSYnVl3wsCPSVy0GQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=PwiVeYBLVOFj5CFSiy56mHHjRzkDkHkWiPs9coa24GnWAmOqV4AwijrFOErcs7VKO
+         7zNwxLfv1+BL7wDJO0wLob+EzOJl2HjrUIr7jKWM5WoBRL7x/uLTboieT48q50MUgG
+         ieeAiuUsK96u8qpsaE4mMpCRP39wOQiE3shq/NwU=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id 0AD1160351;
+        Mon, 31 Dec 2018 06:04:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1546236286;
+        bh=zKIJeKlQjf3ssAa3hPI03SLi9ZeSYnVl3wsCPSVy0GQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Aa7FO7mX6oouA726enCV1OhpRmvEIvXiB6empaZnR65V2/nWOJkNJwJleXhLUpS1S
+         6AvLvUbTXlRYWM8jCKi5QNSptQtyRhFUYLZKuSWv8yndEYKH85R/zrZ2B85L5EY0bF
+         zH4Cxoe0Lw3l4riUJ9QIwRCmVoVgzfz5O1Z4xR88=
 MIME-Version: 1.0
-References: <1527256763-13474-1-git-send-email-emil.lenngren@gmail.com> <A73D99C8-7E66-49CF-8B85-E8879308A5F8@holtmann.org>
-In-Reply-To: <A73D99C8-7E66-49CF-8B85-E8879308A5F8@holtmann.org>
-From:   Emil Lenngren <emil.lenngren@gmail.com>
-Date:   Sun, 30 Dec 2018 15:01:51 +0100
-Message-ID: <CAO1O6sf8G8VPJLoctB4mNC842NUE4FA0KKi8Hb-cVQq+rfuTag@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix flow bugs in H5 so the protocol doesn't stall
-To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Mon, 31 Dec 2018 11:34:46 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v7 4/4] Bluetooth: btqca: inject command complete event
+ during fw download
+In-Reply-To: <1FC4CC11-B070-4ACF-9107-857A4D392876@holtmann.org>
+References: <20181228114819.17479-1-bgodavar@codeaurora.org>
+ <20181228114819.17479-5-bgodavar@codeaurora.org>
+ <2C799DB5-8033-45B5-A790-A16F73641645@holtmann.org>
+ <de93a7b7169a0cfb8f28f5d8e5138dc7@codeaurora.org>
+ <1FC4CC11-B070-4ACF-9107-857A4D392876@holtmann.org>
+Message-ID: <1ec946b46301124c90aa12abffeca176@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -69,171 +70,139 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Marcel,
 
-S=C3=B6n den 30 dec. 2018 11:29 skrev Marcel Holtmann <marcel@holtmann.org>=
-:
->
-> Hi Emil,
->
-> > 1. If more than tx_win packets are enqueued, so that the unack queue
-> > gets full, then when packets are later acked, uart tx is not woken up,
-> > meaning that the flow will be stalled unless uart tx is not later
-> > woken up for some other reason (e.g. packet is received so an ack
-> > needs to be sent).
-> >
-> > 2. If remote peer sends tx_win packets to us and our ack(s) are
-> > incorrectly received by the remote device, it will first resend the
-> > tx_win packets and wait for their ack before it can send the next
-> > packets. However, we only send ack if a NEW packet (not a resent packet=
-)
-> > is arrived. Therefore, we will never send ack and the remote device
-> > will keep resend the packets (and wait for the acks) forever, until
-> > we send a new tx packet.
->
-> do you have interest in working on the bt3wire.c driver that is a pure se=
-rdev driver and make it fully H:5 compliant. I think it would be good to mo=
-ve away from hci_h5.c since it is too much entangled with the line discipli=
-ne.
-
-I can take a look at it but can't promise anything. I found the email
-from 2018-03-18. Is that the latest version? Are there any known
-issues with it expect that it misses important features?
-
-Anyway, the current hci_h5.c driver should still be fixed since it's
-still in use and probably will for some time...
-Yeah the protocol gets pretty complicated in practice and there are
-quite many "edge" cases that can be a bit tricky to cover. I'm not
-sure if a few comments spread out at different places would make
-someone follow the code. I would rather see them as a compliment to a
-bigger description at the top of the file or so, discussing various
-flows and cases. What do you think?
-
-> > }
-> >
-> > static void h5_handle_internal_rx(struct hci_uart *hu)
-> > @@ -354,7 +359,7 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
-> >
-> >       h5->rx_ack =3D H5_HDR_ACK(hdr);
-> >
-> > -     h5_pkt_cull(h5);
-> > +     h5_pkt_cull(hu);
-> >
-> >       switch (H5_HDR_PKT_TYPE(hdr)) {
-> >       case HCI_EVENT_PKT:
-> > @@ -419,6 +424,8 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, uns=
-igned char c)
-> >       if (H5_HDR_RELIABLE(hdr) && H5_HDR_SEQ(hdr) !=3D h5->tx_ack) {
-> >               BT_ERR("Out-of-order packet arrived (%u !=3D %u)",
-> >                      H5_HDR_SEQ(hdr), h5->tx_ack);
-> > +             set_bit(H5_TX_ACK_REQ, &h5->flags);
-> > +             hci_uart_tx_wakeup(hu);
-> >               h5_reset_rx(h5);
->
-> I really wonder if these are actually two independent patches fixing two =
-independent things.
-
-You're right, they could be separated.
-
->
+On 2018-12-30 13:40, Marcel Holtmann wrote:
+> Hi Balakrishna,
+> 
+>>>> Latest qualcomm chips are not sending an command complete event for
+>>>> every firmware packet sent to chip. They only respond with a vendor
+>>>> specific event for the last firmware packet. This optimization will
+>>>> decrease the BT ON time. Due to this we are seeing a timeout error
+>>>> message logs on the console during firmware download. Now we are
+>>>> injecting a command complete event once we receive an vendor 
+>>>> specific
+>>>> event for the last RAM firmware packet.
+>>>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>>>> ---
+>>>> drivers/bluetooth/btqca.c | 39 
+>>>> ++++++++++++++++++++++++++++++++++++++-
+>>>> drivers/bluetooth/btqca.h |  3 +++
+>>>> 2 files changed, 41 insertions(+), 1 deletion(-)
+>>>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>>>> index ec9e03a6b778..0b533f65f652 100644
+>>>> --- a/drivers/bluetooth/btqca.c
+>>>> +++ b/drivers/bluetooth/btqca.c
+>>>> @@ -144,6 +144,7 @@ static void qca_tlv_check_data(struct 
+>>>> rome_config *config,
+>>>> 		 * In case VSE is skipped, only the last segment is acked.
+>>>> 		 */
+>>>> 		config->dnld_mode = tlv_patch->download_mode;
+>>>> +		config->dnld_type = config->dnld_mode;
+>>>> 		BT_DBG("Total Length           : %d bytes",
+>>>> 		       le32_to_cpu(tlv_patch->total_size));
+>>>> @@ -264,6 +265,31 @@ static int qca_tlv_send_segment(struct hci_dev 
+>>>> *hdev, int seg_size,
+>>>> 	return err;
+>>>> }
+>>>> +static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
+>>>> +{
+>>>> +	struct hci_event_hdr *hdr;
+>>>> +	struct hci_ev_cmd_complete *evt;
+>>>> +	struct sk_buff *skb;
+>>>> +
+>>>> +	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
+>>>> +	if (!skb)
+>>>> +		return -ENOMEM;
+>>>> +
+>>>> +	hdr = skb_put(skb, sizeof(*hdr));
+>>>> +	hdr->evt = HCI_EV_CMD_COMPLETE;
+>>>> +	hdr->plen = sizeof(*evt) + 1;
+>>>> +
+>>>> +	evt = skb_put(skb, sizeof(*evt));
+>>>> +	evt->ncmd = 1;
+>>>> +	evt->opcode = HCI_OP_NOP;
+>>>> +
+>>>> +	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
+>>>> +
+>>>> +	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
+>>>> +
+>>>> +	return hci_recv_frame(hdev, skb);
+>>>> +}
+>>>> +
+>>>> static int qca_download_firmware(struct hci_dev *hdev,
+>>>> 				  struct rome_config *config)
+>>>> {
+>>>> @@ -297,11 +323,22 @@ static int qca_download_firmware(struct 
+>>>> hci_dev *hdev,
+>>>> 		ret = qca_tlv_send_segment(hdev, segsize, segment,
+>>>> 					    config->dnld_mode);
+>>>> 		if (ret)
+>>>> -			break;
+>>>> +			goto out;
+>>>> 		segment += segsize;
+>>>> 	}
+>>>> +	/* Latest qualcomm chipsets are not sending a command complete 
+>>>> event
+>>>> +	 * for every fw packet sent. They only respond with a vendor 
+>>>> specific
+>>>> +	 * event for the last packet. This optimization in the chip will
+>>>> +	 * decrease the BT in initialization time. Here we will inject a 
+>>>> command
+>>>> +	 * complete event to avoid a command timeout error message.
+>>>> +	 */
+>>>> +	if ((config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
+>>>> +	    config->dnld_type == ROME_SKIP_EVT_VSE))
+>>>> +		return qca_inject_cmd_complete_event(hdev);
+>>>> +
+>>> have you actually considered using __hci_cmd_send in that case. It is
+>>> allowed for vendor OGF to use that command. I see you actually do use
+>>> it and now I am failing to understand what this is for.
+>> [Bala]: thanks for reviewing the change.
+>> 
+>> __hci_cmd_send() can be used only to send the command to the chip. it 
+>> will not wait for the response for the command sent.
+>> 
+>> as you know that every vendor command sent to chip will respond with 
+>> vendor specific event and command complete event.
+>> but in our case chip will only respond with vendor specific event 
+>> only. so we are injecting command complete event.
+> 
+> and __hci_cmd_sync_ev is also not working for you? However since you
+> are not waiting for the vendor event anyway and just injecting
+> cmd_complete, I wonder what’s the difference in just using
+> __hci_cmd_send and not bothering to wait or inject at all. I am
+> failing to see where this injection makes a difference.
+> 
+> For me it is a big difference if we are injecting one event like in
+> the case of Intel compared to injecting one for every command. It will
+> show a wrong picture in btmon and that is a bad idea.
+> 
 > Regards
->
+> 
 > Marcel
 
+[Bala]: here is the use case, when ever we download the fw packets i.e. 
+RAM image, for every command sent(i.e. fw packet) from
+the host chip will respond with an vendor specific event and command 
+complete event.
 
-/Emil
+the above is taking more time to setup the BT device. then we came up 
+with solution where we enable flags in fw file (i.e. RAM image header)
+whether to wait for event to be received or sent the total packets and 
+wait for the events for the last packet.
 
-Den s=C3=B6n 30 dec. 2018 kl 11:29 skrev Marcel Holtmann <marcel@holtmann.o=
-rg>:
->
-> Hi Emil,
->
-> > 1. If more than tx_win packets are enqueued, so that the unack queue
-> > gets full, then when packets are later acked, uart tx is not woken up,
-> > meaning that the flow will be stalled unless uart tx is not later
-> > woken up for some other reason (e.g. packet is received so an ack
-> > needs to be sent).
-> >
-> > 2. If remote peer sends tx_win packets to us and our ack(s) are
-> > incorrectly received by the remote device, it will first resend the
-> > tx_win packets and wait for their ack before it can send the next
-> > packets. However, we only send ack if a NEW packet (not a resent packet=
-)
-> > is arrived. Therefore, we will never send ack and the remote device
-> > will keep resend the packets (and wait for the acks) forever, until
-> > we send a new tx packet.
->
-> do you have interest in working on the bt3wire.c driver that is a pure se=
-rdev driver and make it fully H:5 compliant. I think it would be good to mo=
-ve away from hci_h5.c since it is too much entangled with the line discipli=
-ne.
->
-> > ---
-> > drivers/bluetooth/hci_h5.c | 11 +++++++++--
-> > 1 file changed, 9 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> > index abee221..6fca22c 100644
-> > --- a/drivers/bluetooth/hci_h5.c
-> > +++ b/drivers/bluetooth/hci_h5.c
-> > @@ -238,16 +238,19 @@ static int h5_close(struct hci_uart *hu)
-> >       return 0;
-> > }
-> >
-> > -static void h5_pkt_cull(struct h5 *h5)
-> > +static void h5_pkt_cull(struct hci_uart *hu)
-> > {
-> > +     struct h5 *h5 =3D hu->priv;
-> >       struct sk_buff *skb, *tmp;
-> >       unsigned long flags;
-> >       int i, to_remove;
-> > +     bool was_full;
-> >       u8 seq;
-> >
-> >       spin_lock_irqsave(&h5->unack.lock, flags);
-> >
-> >       to_remove =3D skb_queue_len(&h5->unack);
-> > +     was_full =3D to_remove =3D=3D h5->tx_win;
->
-> I would really add a comment here.
->
-> >       if (to_remove =3D=3D 0)
-> >               goto unlock;
-> >
-> > @@ -278,6 +281,8 @@ static void h5_pkt_cull(struct h5 *h5)
-> >
-> > unlock:
-> >       spin_unlock_irqrestore(&h5->unack.lock, flags);
-> > +     if (was_full && to_remove > 0 && !skb_queue_empty(&h5->rel))
-> > +             hci_uart_tx_wakeup(hu);
->
-> And here as well. it should be commented on why this is the right express=
-ion. Especially since it is rather complex. Can we not check all the condit=
-ions up-front?
->
-> > }
-> >
-> > static void h5_handle_internal_rx(struct hci_uart *hu)
-> > @@ -354,7 +359,7 @@ static void h5_complete_rx_pkt(struct hci_uart *hu)
-> >
-> >       h5->rx_ack =3D H5_HDR_ACK(hdr);
-> >
-> > -     h5_pkt_cull(h5);
-> > +     h5_pkt_cull(hu);
-> >
-> >       switch (H5_HDR_PKT_TYPE(hdr)) {
-> >       case HCI_EVENT_PKT:
-> > @@ -419,6 +424,8 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, uns=
-igned char c)
-> >       if (H5_HDR_RELIABLE(hdr) && H5_HDR_SEQ(hdr) !=3D h5->tx_ack) {
-> >               BT_ERR("Out-of-order packet arrived (%u !=3D %u)",
-> >                      H5_HDR_SEQ(hdr), h5->tx_ack);
-> > +             set_bit(H5_TX_ACK_REQ, &h5->flags);
-> > +             hci_uart_tx_wakeup(hu);
-> >               h5_reset_rx(h5);
->
-> I really wonder if these are actually two independent patches fixing two =
-independent things.
->
-> Regards
->
-> Marcel
->
+So currently we are handling both the cases in the code. i.e wait for 
+event for all packet or wait for an event for the last packet.
+
+but in the second case i.e. wait for event for the last packet sent, we 
+are only receiving an vendor specific event from chip which holds the 
+status of fw download.
+
+so as __hci_cmd_sync_ev() requires an command complete event. so we are 
+injecting it after the vendor specific event received for the last 
+packet.
+
+This helps to overcome 0xfc00 timeout error logging on console.
+
+-- 
+Regards
+Balakrishna.
