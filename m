@@ -1,220 +1,290 @@
-Return-Path: <SRS0=lDVm=PI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=uf0v=PJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26BE5C43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Dec 2018 08:03:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC753C43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jan 2019 19:27:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E184C21019
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Dec 2018 08:03:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A98B0208E3
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jan 2019 19:27:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="cpdlLNF6";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="S0Iyxrs9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BExvHwvV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727129AbeLaIDP (ORCPT
+        id S1726899AbfAAT11 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Dec 2018 03:03:15 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:56054 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725972AbeLaIDP (ORCPT
+        Tue, 1 Jan 2019 14:27:27 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:36286 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726792AbfAAT11 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Dec 2018 03:03:15 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id B05F360452; Mon, 31 Dec 2018 08:03:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1546243393;
-        bh=ByjGONaO6K6ABXTAtM2Sps/tbArwR/B4XbijFXapALo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=cpdlLNF6Xby5OHB86fEE+e/V9oKm4d414AFaIaEDv+nPo/scRKDr4z5sZTNLa/X29
-         PkMpwl0Mo+bG6flZqkjkYiaSC4t+5LADvqugijbl/8rtVUTxA9hK0MwJbOJ4YWB/OE
-         GR7PVm1ouFqoM1A10aeL57ux2SKYNrydaM3UHHZo=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 94D1960452;
-        Mon, 31 Dec 2018 08:03:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1546243392;
-        bh=ByjGONaO6K6ABXTAtM2Sps/tbArwR/B4XbijFXapALo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=S0Iyxrs9UEw2/pstVhx4CiIBEwYzXG4xzHa+eKBzBee9TFCJXBSlEUooIwM466FYr
-         SorfNx0Pq4vfv2q5xKzZGb3oWyWnpQjabHLqnyvSF1B0vS5k5pVXYY/k5xeBO9qoz9
-         q2pGhZ2/JgUxsHcfxWZwD0fgHmddT5Uah7yTGduQ=
+        Tue, 1 Jan 2019 14:27:27 -0500
+Received: by mail-ot1-f66.google.com with SMTP id k98so25362863otk.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jan 2019 11:27:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CJJJsHLnDidVHXTq3/DbNsbODjQwXvFw4okmZMT54Ss=;
+        b=BExvHwvV2AnJV5boaKZyfzAKfzGDGwdRC7nRc9GbkSpyOTUGYQ9aLDWM3S1Eohez4+
+         hTDA3752Z+jKVluvtg1M/St4TRN38PpuG6nfOMZDx0WApoJ5Q13vL742frzyT5OX8tOF
+         i49YQbBL5jXJgty6v/ImU5iuSfPI1Bp9tOjbp1juKFxzrvTKk3hY3NzQzKgT7oRpMoyU
+         WPI4X1biiGCujSiAWKDyxg0bjvlG+BxYpHje+EnWGG/SRHTmsZqttifKRJKDaEKRPfEA
+         C+YFPF9eT6GStmZztfEhCOjlkwNvF4cKAry6g/sZnL6oJ2rrJ4wmySkhJ9lc7UwmXXPw
+         7WeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CJJJsHLnDidVHXTq3/DbNsbODjQwXvFw4okmZMT54Ss=;
+        b=FBm/dgtwloZonaq7VJ65CGUARmUFPy+rtieMmusCfNI62eY7OGNK7/wZqhmzBK0kOg
+         j3CNE765owyJi1A27hp1xB8izTRdS5ap1L+uYOaDnkBazmcyexiNvOVe/fbOaSV7aNzq
+         LVFzLwORJozQ4WlnW8qZlXV5HsNNDTfiNlt2MyNjKJ1kMEvEp1gheNj++hQPcJdj2ZfJ
+         4VPOKACsfpkfQFLRMsCBwhibR0QyHft5z3yPP9lG9Igdl2I+qRWIScEP+ocTEO4R4BNC
+         8YT6hTAdasj0F5uMKSy72yV1JEKVyQNUWyUragXvyCmcdwOeiNjp3HM99J5cs+EaKMPG
+         Z7tQ==
+X-Gm-Message-State: AJcUukdUsUnBuZBYvLVvmr+WyZy7FZdQN/LQUS4M+bEy0BU5O9s6evmB
+        aRjvEN6MP43swWTUbIzYHtXg1ujoNeLvvfmQcsgWJXra
+X-Google-Smtp-Source: ALg8bN4EFsplu1yEcLW6Fr4EOZsWe2kVo6nRg284CZjm7RRQRirEvh6yZek3TrmLOLPt94n5rw9cE/Q/Gg5U8b623pA=
+X-Received: by 2002:a9d:7749:: with SMTP id t9mr30292091otl.342.1546370845086;
+ Tue, 01 Jan 2019 11:27:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date:   Mon, 31 Dec 2018 13:33:12 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v7 4/4] Bluetooth: btqca: inject command complete event
- during fw download
-In-Reply-To: <1ec946b46301124c90aa12abffeca176@codeaurora.org>
-References: <20181228114819.17479-1-bgodavar@codeaurora.org>
- <20181228114819.17479-5-bgodavar@codeaurora.org>
- <2C799DB5-8033-45B5-A790-A16F73641645@holtmann.org>
- <de93a7b7169a0cfb8f28f5d8e5138dc7@codeaurora.org>
- <1FC4CC11-B070-4ACF-9107-857A4D392876@holtmann.org>
- <1ec946b46301124c90aa12abffeca176@codeaurora.org>
-Message-ID: <a1c7cbde6dd7cfdf1386d2ac6177bb49@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+References: <20181119154311.27826-1-luiz.dentz@gmail.com> <CABBYNZK90H=0e4GKo1g96jYkg3EM+5C2DhbCvi-Cgtd8W+E3YA@mail.gmail.com>
+ <CAHotPr_8M4H_6sLV+BK02QBKLwwAn0cEOFhyoMN5F0=_gY1dHQ@mail.gmail.com>
+ <CABBYNZJNM2SpM2w3kwuLw1FfXcoSZfyO02xCJAgdx-BBPyw7-w@mail.gmail.com>
+ <CAHotPr8nQYJkN30pTncQfx-SGgmUgTs582_q_MAiLi=bEFYO9w@mail.gmail.com>
+ <CABBYNZJzpPd+ZfJRTyCnicr8jApj_YW31qZhUDxSk_PgKiPZKg@mail.gmail.com>
+ <CAHotPr8pvbCOoYHVz-k4NU-prmtkq2bZOFN5V_GjCebte5HBtg@mail.gmail.com>
+ <CAHotPr8MyEwqATiL+4CHfTJ-40Df3cjm60CptT6wh-0GTpFgOg@mail.gmail.com>
+ <CABBYNZKGjNYc7WBWrN9XHnLaYmOk0x981MB9XGqk8EQArMZeMg@mail.gmail.com>
+ <CAHotPr89aB+bsuMxF3S+jQk-oJp=6XM=AeTqGC78aQ7Xg38NQQ@mail.gmail.com> <CAHotPr9tdmnFhZLX2utqFxeXUx_0G0AYsfwKrmktV4USbfBcyw@mail.gmail.com>
+In-Reply-To: <CAHotPr9tdmnFhZLX2utqFxeXUx_0G0AYsfwKrmktV4USbfBcyw@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 1 Jan 2019 16:27:13 -0300
+Message-ID: <CABBYNZ+sPBv8QdMNp7-fTD_d9g2atNWka1whhD1iUas4g1JWKA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/5] gatt: Fix invalid read when disconnecting
+To:     Gal Ben Haim <gbenhaim@augury.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Gal,
 
-On 2018-12-31 11:34, Balakrishna Godavarthi wrote:
-> Hi Marcel,
-> 
-> On 2018-12-30 13:40, Marcel Holtmann wrote:
->> Hi Balakrishna,
->> 
->>>>> Latest qualcomm chips are not sending an command complete event for
->>>>> every firmware packet sent to chip. They only respond with a vendor
->>>>> specific event for the last firmware packet. This optimization will
->>>>> decrease the BT ON time. Due to this we are seeing a timeout error
->>>>> message logs on the console during firmware download. Now we are
->>>>> injecting a command complete event once we receive an vendor 
->>>>> specific
->>>>> event for the last RAM firmware packet.
->>>>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->>>>> ---
->>>>> drivers/bluetooth/btqca.c | 39 
->>>>> ++++++++++++++++++++++++++++++++++++++-
->>>>> drivers/bluetooth/btqca.h |  3 +++
->>>>> 2 files changed, 41 insertions(+), 1 deletion(-)
->>>>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
->>>>> index ec9e03a6b778..0b533f65f652 100644
->>>>> --- a/drivers/bluetooth/btqca.c
->>>>> +++ b/drivers/bluetooth/btqca.c
->>>>> @@ -144,6 +144,7 @@ static void qca_tlv_check_data(struct 
->>>>> rome_config *config,
->>>>> 		 * In case VSE is skipped, only the last segment is acked.
->>>>> 		 */
->>>>> 		config->dnld_mode = tlv_patch->download_mode;
->>>>> +		config->dnld_type = config->dnld_mode;
->>>>> 		BT_DBG("Total Length           : %d bytes",
->>>>> 		       le32_to_cpu(tlv_patch->total_size));
->>>>> @@ -264,6 +265,31 @@ static int qca_tlv_send_segment(struct hci_dev 
->>>>> *hdev, int seg_size,
->>>>> 	return err;
->>>>> }
->>>>> +static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
->>>>> +{
->>>>> +	struct hci_event_hdr *hdr;
->>>>> +	struct hci_ev_cmd_complete *evt;
->>>>> +	struct sk_buff *skb;
->>>>> +
->>>>> +	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
->>>>> +	if (!skb)
->>>>> +		return -ENOMEM;
->>>>> +
->>>>> +	hdr = skb_put(skb, sizeof(*hdr));
->>>>> +	hdr->evt = HCI_EV_CMD_COMPLETE;
->>>>> +	hdr->plen = sizeof(*evt) + 1;
->>>>> +
->>>>> +	evt = skb_put(skb, sizeof(*evt));
->>>>> +	evt->ncmd = 1;
->>>>> +	evt->opcode = HCI_OP_NOP;
->>>>> +
->>>>> +	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
->>>>> +
->>>>> +	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
->>>>> +
->>>>> +	return hci_recv_frame(hdev, skb);
->>>>> +}
->>>>> +
->>>>> static int qca_download_firmware(struct hci_dev *hdev,
->>>>> 				  struct rome_config *config)
->>>>> {
->>>>> @@ -297,11 +323,22 @@ static int qca_download_firmware(struct 
->>>>> hci_dev *hdev,
->>>>> 		ret = qca_tlv_send_segment(hdev, segsize, segment,
->>>>> 					    config->dnld_mode);
->>>>> 		if (ret)
->>>>> -			break;
->>>>> +			goto out;
->>>>> 		segment += segsize;
->>>>> 	}
->>>>> +	/* Latest qualcomm chipsets are not sending a command complete 
->>>>> event
->>>>> +	 * for every fw packet sent. They only respond with a vendor 
->>>>> specific
->>>>> +	 * event for the last packet. This optimization in the chip will
->>>>> +	 * decrease the BT in initialization time. Here we will inject a 
->>>>> command
->>>>> +	 * complete event to avoid a command timeout error message.
->>>>> +	 */
->>>>> +	if ((config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
->>>>> +	    config->dnld_type == ROME_SKIP_EVT_VSE))
->>>>> +		return qca_inject_cmd_complete_event(hdev);
->>>>> +
->>>> have you actually considered using __hci_cmd_send in that case. It 
->>>> is
->>>> allowed for vendor OGF to use that command. I see you actually do 
->>>> use
->>>> it and now I am failing to understand what this is for.
->>> [Bala]: thanks for reviewing the change.
->>> 
->>> __hci_cmd_send() can be used only to send the command to the chip. it 
->>> will not wait for the response for the command sent.
->>> 
->>> as you know that every vendor command sent to chip will respond with 
->>> vendor specific event and command complete event.
->>> but in our case chip will only respond with vendor specific event 
->>> only. so we are injecting command complete event.
->> 
->> and __hci_cmd_sync_ev is also not working for you? However since you
->> are not waiting for the vendor event anyway and just injecting
->> cmd_complete, I wonder what’s the difference in just using
->> __hci_cmd_send and not bothering to wait or inject at all. I am
->> failing to see where this injection makes a difference.
->> 
->> For me it is a big difference if we are injecting one event like in
->> the case of Intel compared to injecting one for every command. It will
->> show a wrong picture in btmon and that is a bad idea.
->> 
->> Regards
->> 
->> Marcel
-> 
-> [Bala]: here is the use case, when ever we download the fw packets
-> i.e. RAM image, for every command sent(i.e. fw packet) from
-> the host chip will respond with an vendor specific event and command
-> complete event.
-> 
-> the above is taking more time to setup the BT device. then we came up
-> with solution where we enable flags in fw file (i.e. RAM image header)
-> whether to wait for event to be received or sent the total packets and
-> wait for the events for the last packet.
-> 
-> So currently we are handling both the cases in the code. i.e wait for
-> event for all packet or wait for an event for the last packet.
-> 
-> but in the second case i.e. wait for event for the last packet sent,
-> we are only receiving an vendor specific event from chip which holds
-> the status of fw download.
-> 
-> so as __hci_cmd_sync_ev() requires an command complete event. so we
-> are injecting it after the vendor specific event received for the last
-> packet.
-> 
-> This helps to overcome 0xfc00 timeout error logging on console.
+On Sat, Dec 22, 2018 at 3:51 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
+>
+> it definitely happens with this patch and not with mine
 
-[Bala]: one more point to add
-command complete injection is done for only 1 Vendor Specific command 
-which is used repeatedly only during firmware download phase
-to download firmware chunks. It is not used generically for all Vendor 
-Specific commands.
+Can you try with valgrind so we got to see if the backtrace is really
+the same, also is that using GATT caching or is that disabled?
+
+> On Sat, Dec 15, 2018 at 8:45 AM Gal Ben Haim <gbenhaim@augury.com> wrote:
+> >
+> > I still get segmentation faults occasionally after applying this patch,
+> > i'm not 100% sure that it's related but it happens in the same area...
+> > its not something that I can reproduce immediately like with the
+> > previous segfault. I think that it doesn't happen if I use my original
+> > patch https://marc.info/?l=linux-bluetooth&m=154250398526173&w=2
+> >
+> > bluetoothd[2599]: src/device.c:att_disconnected_cb()
+> > bluetoothd[2599]: src/device.c:att_disconnected_cb() Connection reset
+> > by peer (104)
+> > bluetoothd[2599]: src/service.c:change_state() 0x4edae0: device
+> > DA:51:61:24:3C:36 profile gap-profile state changed: connected ->
+> > disconnecting (0)
+> > bluetoothd[2599]: src/service.c:change_state() 0x4edae0: device
+> > DA:51:61:24:3C:36 profile gap-profile state changed: disconnecting ->
+> > disconnected (0)
+> > bluetoothd[2599]: src/gatt-client.c:btd_gatt_client_disconnected()
+> > Device disconnected. Cleaning up.
+> > bluetoothd[2599]: src/device.c:att_disconnected_cb() Automatic
+> > connection disabled
+> > bluetoothd[2599]: src/gatt-database.c:btd_gatt_database_att_disconnected()
+> > bluetoothd[2599]: attrib/gattrib.c:g_attrib_unref() 0x4ee410: g_attrib_unref=0
+> > bluetoothd[2599]: src/device.c:btd_device_set_temporary() temporary 1
+> > bluetoothd[2599]: src/device.c:device_remove() Removing device
+> > /org/bluez/hci0/dev_DA_51_61_24_3C_36
+> > bluetoothd[2599]: src/service.c:change_state() 0x4edae0: device
+> > DA:51:61:24:3C:36 profile gap-profile state changed: disconnected ->
+> > unavailable (0)
+> > bluetoothd[2599]: profiles/gap/gas.c:gap_remove() GAP profile remove
+> > (DA:51:61:24:3C:36)
+> > bluetoothd[2599]: src/service.c:btd_service_unref() 0x4edae0: ref=0
+> > bluetoothd[2599]: src/device.c:btd_device_unref() Freeing device
+> > /org/bluez/hci0/dev_DA_51_61_24_3C_36
+> > bluetoothd[2599]: src/gatt-client.c:unregister_service() Removing GATT
+> > service: /org/bluez/hci0/dev_DA_51_61_24_3C_36/service0008
+> > bluetoothd[2599]: src/gatt-client.c:unregister_service() Removing GATT
+> > service: /org/bluez/hci0/dev_DA_51_61_24_3C_36/service0009
+> > bluetoothd[2599]: src/gatt-client.c:unregister_characteristic()
+> > Removing GATT characteristic:
+> > /org/bluez/hci0/dev_DA_51_61_24_3C_36/service0009/char000a
+> > bluetoothd[2599]: src/gatt-client.c:unregister_characteristic()
+> > Removing GATT characteristic:
+> > /org/bluez/hci0/dev_DA_51_61_24_3C_36/service0009/char000c
+> > bluetoothd[2599]: src/gatt-client.c:unregister_descriptor() Removing
+> > GATT descriptor:
+> > /org/bluez/hci0/dev_DA_51_61_24_3C_36/service0009/char000c/desc000e
+> > Segmentation fault
+> >
+> >
+> > On Wed, Nov 21, 2018 at 11:15 AM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi,
+> > > On Wed, Nov 21, 2018 at 9:15 AM Gal Ben Haim <gbenhaim@augury.com> wrote:
+> > > >
+> > > > it fixes the same case that cause the version from master to crash.
+> > > > i haven't tested for anything else..
+> > > >
+> > > > On Tue, Nov 20, 2018 at 8:31 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
+> > > > >
+> > > > > ok I patched it. i'll test it tomorrow in the office and let you know.
+> > > > >
+> > > > > On Tue, Nov 20, 2018 at 3:59 PM Luiz Augusto von Dentz
+> > > > > <luiz.dentz@gmail.com> wrote:
+> > > > > >
+> > > > > > Hi Gal,
+> > > > > >
+> > > > > > On Tue, Nov 20, 2018 at 2:35 PM Gal Ben Haim <gbenhaim@augury.com> wrote:
+> > > > > > >
+> > > > > > > i tried with both git am and git apply
+> > > > > >
+> > > > > > Does that applies to v2 as well? I just rebased it on top master, are
+> > > > > > you sure you don't have your own changes conflicting with it?
+> > > > > >
+> > > > > > > On Tue, Nov 20, 2018 at 12:35 PM Luiz Augusto von Dentz
+> > > > > > > <luiz.dentz@gmail.com> wrote:
+> > > > > > > >
+> > > > > > > > Hi Gal,
+> > > > > > > > On Tue, Nov 20, 2018 at 11:31 AM Gal Ben Haim <gbenhaim@augury.com> wrote:
+> > > > > > > > >
+> > > > > > > > > I can't apply this patch, not to the revision in master and not to the 5.50 tag
+> > > > > > > >
+> > > > > > > > They are on top o master, how are you trying to apply them, with git am?
+> > > > > > > >
+> > > > > > > > > On Tue, Nov 20, 2018 at 10:50 AM Luiz Augusto von Dentz
+> > > > > > > > > <luiz.dentz@gmail.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > On Mon, Nov 19, 2018 at 5:43 PM Luiz Augusto von Dentz
+> > > > > > > > > > <luiz.dentz@gmail.com> wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > > > > > > > > > >
+> > > > > > > > > > > In case there is a client of AcquireNotify and a disconnect happens the
+> > > > > > > > > > > code not only have to free the client object but also destroy the io
+> > > > > > > > > > > associated with it, for this reason the client object cannot be freed
+> > > > > > > > > > > until the io is destroyed otherwise it may lead to the following error:
+> > > > > > > > > > >
+> > > > > > > > > > > Invalid read of size 4
+> > > > > > > > > > >    at 0x63920: notify_io_destroy (gatt-client.c:1461)
+> > > > > > > > > > >    by 0x63EDB: pipe_io_destroy (gatt-client.c:1082)
+> > > > > > > > > > >    by 0x6405B: characteristic_free (gatt-client.c:1663)
+> > > > > > > > > > >    by 0x81F33: remove_interface (object.c:667)
+> > > > > > > > > > >    by 0x826CB: g_dbus_unregister_interface (object.c:1391)
+> > > > > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
+> > > > > > > > > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
+> > > > > > > > > > >    by 0x85CF7: queue_remove_all (queue.c:339)
+> > > > > > > > > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
+> > > > > > > > > > >    by 0x695CB: gatt_service_removed (device.c:3747)
+> > > > > > > > > > >    by 0x85B17: queue_foreach (queue.c:220)
+> > > > > > > > > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
+> > > > > > > > > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
+> > > > > > > > > > >  Address 0x515ed48 is 0 bytes inside a block of size 20 free'd
+> > > > > > > > > > >    at 0x483EAD0: free (vg_replace_malloc.c:530)
+> > > > > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
+> > > > > > > > > > >    by 0x636D3: unregister_characteristic (gatt-client.c:1741)
+> > > > > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
+> > > > > > > > > > >    by 0x635F7: unregister_service (gatt-client.c:1893)
+> > > > > > > > > > >    by 0x85CF7: queue_remove_all (queue.c:339)
+> > > > > > > > > > >    by 0x661DF: btd_gatt_client_service_removed (gatt-client.c:2199)
+> > > > > > > > > > >    by 0x695CB: gatt_service_removed (device.c:3747)
+> > > > > > > > > > >    by 0x85B17: queue_foreach (queue.c:220)
+> > > > > > > > > > >    by 0x91283: notify_service_changed (gatt-db.c:280)
+> > > > > > > > > > >    by 0x91283: gatt_db_service_destroy (gatt-db.c:291)
+> > > > > > > > > > >    by 0x85D2B: queue_remove_all (queue.c:354)
+> > > > > > > > > > >    by 0x91387: gatt_db_clear_range (gatt-db.c:475)
+> > > > > > > > > > > ---
+> > > > > > > > > > >  src/gatt-client.c | 24 ++++++++++++------------
+> > > > > > > > > > >  1 file changed, 12 insertions(+), 12 deletions(-)
+> > > > > > > > > > >
+> > > > > > > > > > > diff --git a/src/gatt-client.c b/src/gatt-client.c
+> > > > > > > > > > > index 234f46ed7..55aa5e423 100644
+> > > > > > > > > > > --- a/src/gatt-client.c
+> > > > > > > > > > > +++ b/src/gatt-client.c
+> > > > > > > > > > > @@ -1645,13 +1645,22 @@ static const GDBusMethodTable characteristic_methods[] = {
+> > > > > > > > > > >         { }
+> > > > > > > > > > >  };
+> > > > > > > > > > >
+> > > > > > > > > > > +static void remove_client(void *data)
+> > > > > > > > > > > +{
+> > > > > > > > > > > +       struct notify_client *ntfy_client = data;
+> > > > > > > > > > > +       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
+> > > > > > > > > > > +
+> > > > > > > > > > > +       queue_remove(client->all_notify_clients, ntfy_client);
+> > > > > > > > > > > +
+> > > > > > > > > > > +       notify_client_unref(ntfy_client);
+> > > > > > > > > > > +}
+> > > > > > > > > > > +
+> > > > > > > > > > >  static void characteristic_free(void *data)
+> > > > > > > > > > >  {
+> > > > > > > > > > >         struct characteristic *chrc = data;
+> > > > > > > > > > >
+> > > > > > > > > > >         /* List should be empty here */
+> > > > > > > > > > >         queue_destroy(chrc->descs, NULL);
+> > > > > > > > > > > -       queue_destroy(chrc->notify_clients, NULL);
+> > > > > > > > > > >
+> > > > > > > > > > >         if (chrc->write_io) {
+> > > > > > > > > > >                 queue_remove(chrc->service->client->ios, chrc->write_io->io);
+> > > > > > > > > > > @@ -1663,6 +1672,8 @@ static void characteristic_free(void *data)
+> > > > > > > > > > >                 pipe_io_destroy(chrc->notify_io);
+> > > > > > > > > > >         }
+> > > > > > > > > > >
+> > > > > > > > > > > +       queue_destroy(chrc->notify_clients, remove_client);
+> > > > > > > > > > > +
+> > > > > > > > > > >         g_free(chrc->path);
+> > > > > > > > > > >         free(chrc);
+> > > > > > > > > > >  }
+> > > > > > > > > > > @@ -1715,16 +1726,6 @@ static struct characteristic *characteristic_create(
+> > > > > > > > > > >         return chrc;
+> > > > > > > > > > >  }
+> > > > > > > > > > >
+> > > > > > > > > > > -static void remove_client(void *data)
+> > > > > > > > > > > -{
+> > > > > > > > > > > -       struct notify_client *ntfy_client = data;
+> > > > > > > > > > > -       struct btd_gatt_client *client = ntfy_client->chrc->service->client;
+> > > > > > > > > > > -
+> > > > > > > > > > > -       queue_remove(client->all_notify_clients, ntfy_client);
+> > > > > > > > > > > -
+> > > > > > > > > > > -       notify_client_unref(ntfy_client);
+> > > > > > > > > > > -}
+> > > > > > > > > > > -
+> > > > > > > > > > >  static void unregister_characteristic(void *data)
+> > > > > > > > > > >  {
+> > > > > > > > > > >         struct characteristic *chrc = data;
+> > > > > > > > > > > @@ -1738,7 +1739,6 @@ static void unregister_characteristic(void *data)
+> > > > > > > > > > >         if (chrc->write_op)
+> > > > > > > > > > >                 bt_gatt_client_cancel(gatt, chrc->write_op->id);
+> > > > > > > > > > >
+> > > > > > > > > > > -       queue_remove_all(chrc->notify_clients, NULL, NULL, remove_client);
+> > > > > > > > > > >         queue_remove_all(chrc->descs, NULL, NULL, unregister_descriptor);
+> > > > > > > > > > >
+> > > > > > > > > > >         g_dbus_unregister_interface(btd_get_dbus_connection(), chrc->path,
+> > > > > > > > > > > --
+> > > > > > > > > > > 2.17.2
+> > >
+> > > Applied.
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
+
+
 
 -- 
-Regards
-Balakrishna.
+Luiz Augusto von Dentz
