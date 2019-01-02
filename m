@@ -2,139 +2,257 @@ Return-Path: <SRS0=LS+A=PK=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B210AC43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jan 2019 09:01:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D481DC43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jan 2019 22:15:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89A27218A4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jan 2019 09:01:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 973F4214C6
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jan 2019 22:15:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="lInczR7f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729097AbfABJBG (ORCPT
+        id S1729550AbfABWPP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Jan 2019 04:01:06 -0500
-Received: from mail-it1-f197.google.com ([209.85.166.197]:60338 "EHLO
-        mail-it1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729048AbfABJBG (ORCPT
+        Wed, 2 Jan 2019 17:15:15 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:33884 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729528AbfABWPN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Jan 2019 04:01:06 -0500
-Received: by mail-it1-f197.google.com with SMTP id t143so32665404itc.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jan 2019 01:01:05 -0800 (PST)
+        Wed, 2 Jan 2019 17:15:13 -0500
+Received: by mail-pg1-f196.google.com with SMTP id j10so15139767pga.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jan 2019 14:15:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=sL/L4QggFD/VjZGwokBedWAykxKnibxrFhA7xFl8ByA=;
+        b=lInczR7f3OnOTdvtxDjUPwbjTzhMxbldE6Sm9bjouAM8YU2YSdTR3ZLFlpqIOGMMzt
+         WbC5RKc1c9NB+j/ihCPPX7WJjY9OewJpG2hV6xggl+sS4Lu75A0OWLm8B2Q5FsCDdvvu
+         +IRF5+a18O19Q0Qld4yS94SWHhLPipY4dj1K8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=vnSvBHnDvnjKy1V5T3iMSuAgOZki3ThpZ2UVSaPKn4g=;
-        b=syMBxUvUwpr4sCwTGAeC1wr7PZbIzi8eP8kLZ5ruMJ5cg/TW34BctBHjCEjHe+Mf9Q
-         hddogY9tEFU95PYBhIrTSVuBU6yxbdHPwhFvqU6pnzRc/Bde8WikbK3LRHLdMRz6L/tc
-         cw4yBrFYSO/wQaXR6s21CAFgRdEZsy75W3r1CsUyLeudVeUAxX2KGmPA1rcVYdw7BIuO
-         DqOTTGn8guiaZpObc4Bt0L9SbixrMITunyBoqP3Y2gcMEWSOtkMeT/3wejjNqHPWm5BM
-         7xHEcw5YqPJxWR6rEsmZ6WcvHCS/ssKoEmtI4gcnwz2wTFtKv44k8UtIMFxzEI+02m6n
-         vyJA==
-X-Gm-Message-State: AJcUukc11KFjvUrWBElIZQBhP9Wo7c6TEjtYHRhJUbuhQXTlWZIt1cqp
-        BFBH20/a+kt77Ve1TDPN7ZSkC/bk9m9ruwOgLl5jnWdc21Zn
-X-Google-Smtp-Source: ALg8bN6phlXwCbeMHe/h9+IXiv7YOD7jO8OwRYDw/X5diXbbHaOLm0nw6tgNzxB2eZ84ikwip3LYJoPk2QVk14FQdr79JTWvr2o6
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=sL/L4QggFD/VjZGwokBedWAykxKnibxrFhA7xFl8ByA=;
+        b=QqUbtzrKcTawjVKtTbnzAqcktAud3YVi+Qudc7RPR3MNDfmaXjlxsM1Njfh9xYT48H
+         DZtX5w0GJa+Eyz3SGffXVbthLTfbGjmsjDRV+4a/GLC/tFerKuSO7LE71uZzhKNS1ITe
+         rEtie921mJRoHibecjLZqBb5YypAAn6+pp90NEq++wHQLEFZ/6/SQ3xRba0CejdXdKY5
+         hqC4A5emhg4Yg4UpYDbL9HExv0s6ffdYg0Jqu9uOGfMK7h3vkH1U7AdCPK4L2lTdn/4G
+         J4bfIdk3Tk/5dmXl9w4OeTg0Zgb8B39sR6Yp5DOnH2E+065xYkNOa/Im5/4jKkjVtvSY
+         C06w==
+X-Gm-Message-State: AJcUukeNv13/u0wOHAwgEQoHKQarESc5OHR9XN3q+qKj9G5ibyxMofyC
+        7lIclq0CJwN/KvEOvVThiwuMrw==
+X-Google-Smtp-Source: ALg8bN6qxbmHknk1z2ofI5SmX05XOHuuCgY9E14yDIpXUutUUs/SvtBOxoZnC1Pe3MrHHM/2QISrLg==
+X-Received: by 2002:a63:2e88:: with SMTP id u130mr15243486pgu.9.1546467312171;
+        Wed, 02 Jan 2019 14:15:12 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id z9sm152320614pfd.99.2019.01.02.14.15.10
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 02 Jan 2019 14:15:11 -0800 (PST)
+Date:   Wed, 2 Jan 2019 14:15:10 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v7 4/4] Bluetooth: btqca: inject command complete event
+ during fw download
+Message-ID: <20190102221510.GQ261387@google.com>
+References: <20181228114819.17479-1-bgodavar@codeaurora.org>
+ <20181228114819.17479-5-bgodavar@codeaurora.org>
+ <2C799DB5-8033-45B5-A790-A16F73641645@holtmann.org>
+ <de93a7b7169a0cfb8f28f5d8e5138dc7@codeaurora.org>
+ <1FC4CC11-B070-4ACF-9107-857A4D392876@holtmann.org>
+ <1ec946b46301124c90aa12abffeca176@codeaurora.org>
 MIME-Version: 1.0
-X-Received: by 2002:a24:2543:: with SMTP id g64mr13547504itg.20.1546419664981;
- Wed, 02 Jan 2019 01:01:04 -0800 (PST)
-Date:   Wed, 02 Jan 2019 01:01:04 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ce1573057e75e2bf@google.com>
-Subject: BUG: unable to handle kernel paging request in h4_recv_buf
-From:   syzbot <syzbot+017a32f149406df32703@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1ec946b46301124c90aa12abffeca176@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Mon, Dec 31, 2018 at 11:34:46AM +0530, Balakrishna Godavarthi wrote:
+> Hi Marcel,
+> 
+> On 2018-12-30 13:40, Marcel Holtmann wrote:
+> > Hi Balakrishna,
+> > 
+> > > > > Latest qualcomm chips are not sending an command complete event for
+> > > > > every firmware packet sent to chip. They only respond with a vendor
+> > > > > specific event for the last firmware packet. This optimization will
+> > > > > decrease the BT ON time. Due to this we are seeing a timeout error
+> > > > > message logs on the console during firmware download. Now we are
+> > > > > injecting a command complete event once we receive an vendor
+> > > > > specific
+> > > > > event for the last RAM firmware packet.
+> > > > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> > > > > ---
+> > > > > drivers/bluetooth/btqca.c | 39
+> > > > > ++++++++++++++++++++++++++++++++++++++-
+> > > > > drivers/bluetooth/btqca.h |  3 +++
+> > > > > 2 files changed, 41 insertions(+), 1 deletion(-)
+> > > > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> > > > > index ec9e03a6b778..0b533f65f652 100644
+> > > > > --- a/drivers/bluetooth/btqca.c
+> > > > > +++ b/drivers/bluetooth/btqca.c
+> > > > > @@ -144,6 +144,7 @@ static void qca_tlv_check_data(struct
+> > > > > rome_config *config,
+> > > > > 		 * In case VSE is skipped, only the last segment is acked.
+> > > > > 		 */
+> > > > > 		config->dnld_mode = tlv_patch->download_mode;
+> > > > > +		config->dnld_type = config->dnld_mode;
+> > > > > 		BT_DBG("Total Length           : %d bytes",
+> > > > > 		       le32_to_cpu(tlv_patch->total_size));
+> > > > > @@ -264,6 +265,31 @@ static int qca_tlv_send_segment(struct
+> > > > > hci_dev *hdev, int seg_size,
+> > > > > 	return err;
+> > > > > }
+> > > > > +static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
+> > > > > +{
+> > > > > +	struct hci_event_hdr *hdr;
+> > > > > +	struct hci_ev_cmd_complete *evt;
+> > > > > +	struct sk_buff *skb;
+> > > > > +
+> > > > > +	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
+> > > > > +	if (!skb)
+> > > > > +		return -ENOMEM;
+> > > > > +
+> > > > > +	hdr = skb_put(skb, sizeof(*hdr));
+> > > > > +	hdr->evt = HCI_EV_CMD_COMPLETE;
+> > > > > +	hdr->plen = sizeof(*evt) + 1;
+> > > > > +
+> > > > > +	evt = skb_put(skb, sizeof(*evt));
+> > > > > +	evt->ncmd = 1;
+> > > > > +	evt->opcode = HCI_OP_NOP;
 
-syzbot found the following crash on:
+After looking a bit more at it I realize HCI_OP_NOP is not a good
+value in this case:
 
-HEAD commit:    28e8c4bc8eb4 Merge tag 'rtc-4.21' of git://git.kernel.org/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14a063fd400000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c2ab9708c613a224
-dashboard link: https://syzkaller.appspot.com/bug?extid=017a32f149406df32703
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13d654d7400000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=174483fd400000
+static void hci_cmd_complete_evt(...)
+{
+  ...
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+017a32f149406df32703@syzkaller.appspotmail.com
+  if (*opcode != HCI_OP_NOP)
+    cancel_delayed_work(&hdev->cmd_timer);
 
-Bluetooth: hci0: sending frame failed (-49)
-Bluetooth: hci0: command 0x1001 tx timeout
-Bluetooth: hci0: sending frame failed (-49)
-Bluetooth: hci0: command 0x1009 tx timeout
-Bluetooth: hci0: Frame reassembly failed (-84)
-BUG: unable to handle kernel paging request at ffffffffffffffd6
-#PF error: [normal kernel read fault]
-PGD 9871067 P4D 9871067 PUD 9873067 PMD 0
-Oops: 0000 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 7 Comm: kworker/u4:0 Not tainted 4.20.0+ #4
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: events_unbound flush_to_ldisc
-RIP: 0010:h4_recv_buf+0x1ea/0xda0 drivers/bluetooth/hci_h4.c:211
-Code: b6 14 10 48 89 c8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 d7 0a 00  
-00 48 ba 00 00 00 00 00 fc ff df 48 8b 45 d0 4c 8d 60 70 <0f> b7 58 2a 4c  
-89 e0 48 c1 e8 03 0f b6 04 10 84 c0 74 08 3c 03 0f
-RSP: 0018:ffff8880a945f6c0 EFLAGS: 00010246
-RAX: ffffffffffffffac RBX: 0000000000000000 RCX: ffffffffffffffd6
-RDX: dffffc0000000000 RSI: ffffffff85883972 RDI: 0000000000000005
-RBP: ffff8880a945f748 R08: ffff8880a944e1c0 R09: 0000000000000003
-R10: ffffed1015ce5b8f R11: ffff8880ae72dc7b R12: 000000000000001c
-R13: ffff88808c9fea40 R14: ffff8880829e76e0 R15: 0000000000000006
-FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffffffffd6 CR3: 0000000098164000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-  h4_recv+0xe4/0x200 drivers/bluetooth/hci_h4.c:131
-  hci_uart_tty_receive+0x22b/0x530 drivers/bluetooth/hci_ldisc.c:607
-  tty_ldisc_receive_buf+0x164/0x1c0 drivers/tty/tty_buffer.c:465
-  tty_port_default_receive_buf+0x114/0x190 drivers/tty/tty_port.c:38
-  receive_buf drivers/tty/tty_buffer.c:481 [inline]
-  flush_to_ldisc+0x3b2/0x590 drivers/tty/tty_buffer.c:533
-  process_one_work+0xd0c/0x1ce0 kernel/workqueue.c:2153
-  worker_thread+0x143/0x14a0 kernel/workqueue.c:2296
-  kthread+0x357/0x430 kernel/kthread.c:246
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
-Modules linked in:
-CR2: ffffffffffffffd6
----[ end trace 6acbbb9f58ccf0f7 ]---
-RIP: 0010:h4_recv_buf+0x1ea/0xda0 drivers/bluetooth/hci_h4.c:211
-Code: b6 14 10 48 89 c8 83 e0 07 83 c0 01 38 d0 7c 08 84 d2 0f 85 d7 0a 00  
-00 48 ba 00 00 00 00 00 fc ff df 48 8b 45 d0 4c 8d 60 70 <0f> b7 58 2a 4c  
-89 e0 48 c1 e8 03 0f b6 04 10 84 c0 74 08 3c 03 0f
-RSP: 0018:ffff8880a945f6c0 EFLAGS: 00010246
-RAX: ffffffffffffffac RBX: 0000000000000000 RCX: ffffffffffffffd6
-RDX: dffffc0000000000 RSI: ffffffff85883972 RDI: 0000000000000005
-RBP: ffff8880a945f748 R08: ffff8880a944e1c0 R09: 0000000000000003
-R10: ffffed1015ce5b8f R11: ffff8880ae72dc7b R12: 000000000000001c
-R13: ffff88808c9fea40 R14: ffff8880829e76e0 R15: 0000000000000006
-FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffffffffd6 CR3: 0000000098164000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+  ...
+}
 
+https://elixir.bootlin.com/linux/v4.19/source/net/bluetooth/hci_event.c#L3351
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Cancelling the command timeout is precisely what we want. Not sure why
+the patch with HCI_OP_NOP makes the timeouts go away in most cases
+(but not e.g. when inserting an msleep(1000) after downloading the
+NVM.
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+I suggest to pass the opcode of the command to be completed.
+
+> > > > > +
+> > > > > +	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
+> > > > > +
+> > > > > +	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
+> > > > > +
+> > > > > +	return hci_recv_frame(hdev, skb);
+> > > > > +}
+> > > > > +
+> > > > > static int qca_download_firmware(struct hci_dev *hdev,
+> > > > > 				  struct rome_config *config)
+> > > > > {
+> > > > > @@ -297,11 +323,22 @@ static int
+> > > > > qca_download_firmware(struct hci_dev *hdev,
+> > > > > 		ret = qca_tlv_send_segment(hdev, segsize, segment,
+> > > > > 					    config->dnld_mode);
+> > > > > 		if (ret)
+> > > > > -			break;
+> > > > > +			goto out;
+> > > > > 		segment += segsize;
+> > > > > 	}
+> > > > > +	/* Latest qualcomm chipsets are not sending a command
+> > > > > complete event
+> > > > > +	 * for every fw packet sent. They only respond with a
+> > > > > vendor specific
+> > > > > +	 * event for the last packet. This optimization in the chip will
+> > > > > +	 * decrease the BT in initialization time. Here we will
+> > > > > inject a command
+> > > > > +	 * complete event to avoid a command timeout error message.
+> > > > > +	 */
+> > > > > +	if ((config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
+> > > > > +	    config->dnld_type == ROME_SKIP_EVT_VSE))
+> > > > > +		return qca_inject_cmd_complete_event(hdev);
+> > > > > +
+> > > > have you actually considered using __hci_cmd_send in that case. It is
+> > > > allowed for vendor OGF to use that command. I see you actually do use
+> > > > it and now I am failing to understand what this is for.
+> > > [Bala]: thanks for reviewing the change.
+> > > 
+> > > __hci_cmd_send() can be used only to send the command to the chip.
+> > > it will not wait for the response for the command sent.
+> > > 
+> > > as you know that every vendor command sent to chip will respond with
+> > > vendor specific event and command complete event.
+> > > but in our case chip will only respond with vendor specific event
+> > > only. so we are injecting command complete event.
+> > 
+> > and __hci_cmd_sync_ev is also not working for you? However since you
+> > are not waiting for the vendor event anyway and just injecting
+> > cmd_complete, I wonder what’s the difference in just using
+> > __hci_cmd_send and not bothering to wait or inject at all. I am
+> > failing to see where this injection makes a difference.
+> > 
+> > For me it is a big difference if we are injecting one event like in
+> > the case of Intel compared to injecting one for every command. It will
+> > show a wrong picture in btmon and that is a bad idea.
+> > 
+> > Regards
+> > 
+> > Marcel
+> 
+> [Bala]: here is the use case, when ever we download the fw packets i.e. RAM
+> image, for every command sent(i.e. fw packet) from
+> the host chip will respond with an vendor specific event and command
+> complete event.
+> 
+> the above is taking more time to setup the BT device. then we came up with
+> solution where we enable flags in fw file (i.e. RAM image header)
+> whether to wait for event to be received or sent the total packets and wait
+> for the events for the last packet.
+> 
+> So currently we are handling both the cases in the code. i.e wait for event
+> for all packet or wait for an event for the last packet.
+> 
+> but in the second case i.e. wait for event for the last packet sent, we are
+> only receiving an vendor specific event from chip which holds the status of
+> fw download.
+> 
+> so as __hci_cmd_sync_ev() requires an command complete event. so we are
+> injecting it after the vendor specific event received for the last packet.
+> 
+> This helps to overcome 0xfc00 timeout error logging on console.
+
+Some more details:
+
+The timeout error is actually from reading the 'SoC version', which
+uses the same command code as the firmware download
+(EDL_PATCH_CMD_OPCODE). Without reading the 'SoC version' it would be
+from the command to write the first firmware segment.
+
+If the download of a firmware binary takes >= 2s (HCI_CMD_TIMEOUT) the
+timeout would still occur. If necessary this could be mitigated by
+injecting some command complete events during the firmware download,
+though I expect Marcel wouldn't be overly happy with that, since it
+would affect btmon even more.
+
+Regards
+
+Matthias
