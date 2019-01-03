@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61AEFC43387
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jan 2019 16:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 805D8C43387
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jan 2019 16:43:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33FD62070D
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jan 2019 16:43:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 519D72070D
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jan 2019 16:43:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730097AbfACQnl (ORCPT
+        id S1732360AbfACQno (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Jan 2019 11:43:41 -0500
-Received: from avasout03.plus.net ([84.93.230.244]:41584 "EHLO
+        Thu, 3 Jan 2019 11:43:44 -0500
+Received: from avasout03.plus.net ([84.93.230.244]:41583 "EHLO
         avasout03.plus.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732354AbfACQnk (ORCPT
+        with ESMTP id S1732359AbfACQno (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Jan 2019 11:43:40 -0500
+        Thu, 3 Jan 2019 11:43:44 -0500
+X-Greylist: delayed 450 seconds by postgrey-1.27 at vger.kernel.org; Thu, 03 Jan 2019 11:43:40 EST
 Received: from localhost.localdomain ([87.112.196.180])
         by smtp with ESMTPA
-        id f5yHgSh7KimnMf5yRgALVK; Thu, 03 Jan 2019 16:36:09 +0000
+        id f5yHgSh7KimnMf5yfgALWW; Thu, 03 Jan 2019 16:36:14 +0000
 X-CM-Score: 0.00
 X-CNFS-Analysis: v=2.3 cv=CoqRjEwD c=1 sm=1 tr=0
- a=Y1wGFK3FhPvFCcGACwKsaA==:117 a=Y1wGFK3FhPvFCcGACwKsaA==:17 a=ag1SF4gXAAAA:8
- a=OE3fWgKIv0mTuvs3W8IA:9 a=QAsrkg2CaESh2Yvt:21 a=3fakuoe7C_Kcefeu:21
- a=Yupwre4RP9_Eg_Bd0iYG:22
+ a=Y1wGFK3FhPvFCcGACwKsaA==:117 a=Y1wGFK3FhPvFCcGACwKsaA==:17
+ a=08VI1bL2Rn6wF1MGSkkA:9 a=HBl-pWRkaHKTX-Y4:21 a=MtzrMieHWah2KP3q:21
 X-AUTH: davidjohnsummers@:2500
 From:   David Summers <beagleboard@davidjohnsummers.uk>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com, robh+dt@kernel.org,
@@ -35,65 +35,66 @@ To:     marcel@holtmann.org, johan.hedberg@gmail.com, robh+dt@kernel.org,
 Cc:     David Summers <beagleboard@davidjohnsummers.uk>,
         linux-bluetooth@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
-Subject: [PATCHv2] Description of the realtek bluetooth device tree hooks
-Date:   Thu,  3 Jan 2019 16:35:37 +0000
-Message-Id: <20190103163538.6575-1-beagleboard@davidjohnsummers.uk>
+Subject: [PATCHv2] Patch to add the realtek bluetooth device tree refs to the code
+Date:   Thu,  3 Jan 2019 16:35:38 +0000
+Message-Id: <20190103163538.6575-2-beagleboard@davidjohnsummers.uk>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20181229115513.31153-1-beagleboard@davidjohnsummers.uk>
+In-Reply-To: <20190103163538.6575-1-beagleboard@davidjohnsummers.uk>
 References: <20181229115513.31153-1-beagleboard@davidjohnsummers.uk>
+ <20190103163538.6575-1-beagleboard@davidjohnsummers.uk>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4wfAkm9zAlECxWQLhXo7Q589QNcGDC2gfu6hoaG3VtoQya9njWI7TwaPZ7gMS45vJ8LWahhiJtSS9C/4N1Z57zqWiuMnbD0z+XByQzMHq0g+jLCDrXC4Wz
- cN5Tdz43ktAXMpaNhSZsJq9Kbsx+QRWhNBCt4yDR9Fk6GxuDEN7LCP8MlODrMGsTUQB/p3ISWtBQ6isUhwotBb5TZuAuJ98cZUQ=
+X-CMAE-Envelope: MS4wfJ3ZsIL67fs0G4mFxi9UnwIVyOgUyC3xEhXTIXUqi3aziO5QnJ1YVWFKFj2nBViO9mFbuIuW4HbHjEvF1KbwNgUMXfRvraHH9Hl0ueXD4d8ieyhZRlC9
+ kgUmE/IBQ/YrdIFnyGR9JrFplcq3EyjzlT1YBTrgnTGyShwy3JXCL0ASk0Ku3bEYl/R+AhFhdBXXC9yyjQEXz5P+hSXbhJdLl2k=
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds the desrciption file that describes the hooks for the
-realtek bluetooth serial devices, as needed to refer to the interface
-in the device tree.
+This patch adds the necessary device tree hooks to the realtek
+bluetooth driver for serial connections.
+
+The realtek devices that are listed btrtl.c are searched on the
+realtek web site for the version that have serial connections.
+
+Most of these devices also have wi-fi connected via sdio, that is not
+covered by the bluetooth driver - but as that interface will also be
+needed in the device tree, the hocks here have "-bluetooth" added. The
+exception to this is the rtl8761atv, which only has a serial
+bluetooth.
 
 Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
 ---
- .../bindings/net/realtek-bluetooth-serial.txt | 28 +++++++++++++++++++
- 1 file changed, 28 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
+ drivers/bluetooth/hci_h5.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
-new file mode 100644
-index 000000000000..0aabca1fc002
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
-@@ -0,0 +1,28 @@
-+Realtek bluetooth devices connected via a UART
-+
-+- compatible: should be "realtek,<name>-bluetooth"
-+  except for "realtek,trl8761atv" - which only has a serial bluetooth connection
-+       "realtek,rtl8723as-bluetooth"
-+       "realtek,rtl8723bs-bluetooth"
-+       "realtek,rtl8723ds-bluetooth"
-+       "realtek,rtl8761atv"
-+       "realtek,rtl8821as-bluetooth"
-+       "realtek,rtl8821cs-bluetooth"
-+       "realtek,rtl8822bs-bluetooth"
-+- These device are bluetooth devices, that connect via a uart
-+- all devices (except for rtl8761atv) are also wifi devices, this is connected
-+  seperatly via sdio - and is not covered by this compatible node
-+- ideally these will be referenced in a device tree serial node via serdev
-+ http://events17.linuxfoundation.org/sites/events/files/slides/serdev-elce-2017-2.pdf
-+
-+Example:
-+
-+&uart0 {
-+	status = "okay";
-+       	pinctrl-0 = <&uart0_xfer>, <&uart0_cts>;
-+       	bluetooth {
-+               	  compatible = "realtek,rtl8723bs-bluetooth";
-+       	};
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 8eede1197cd2..2fec7ff2ce7c 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -925,6 +925,22 @@ static struct h5_vnd rtl_vnd = {
+ };
+ #endif
+ 
++#ifdef CONFIG_OF
++static const struct of_device_id h5_of_match[] = {
++#ifdef CONFIG_BT_HCIUART_RTL
++       { .compatible = "realtek,rtl8723as-bluetooth"},
++       { .compatible = "realtek,rtl8723bs-bluetooth"},
++       { .compatible = "realtek,rtl8723ds-bluetooth"},
++       { .compatible = "realtek,rtl8761atv"},
++       { .compatible = "realtek,rtl8821as-bluetooth"},
++       { .compatible = "realtek,rtl8821cs-bluetooth"},
++       { .compatible = "realtek,rtl8822bs-bluetooth"},
++#endif
++       { }
 +};
++MODULE_DEVICE_TABLE(of, h5_of_match);
++#endif
 +
-+this ensures that the bluetooth device is tied to the correct uart
+ #ifdef CONFIG_ACPI
+ static const struct acpi_device_id h5_acpi_match[] = {
+ #ifdef CONFIG_BT_HCIUART_RTL
 -- 
 beagleboard@davidjohnsummers.uk
 
