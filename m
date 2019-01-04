@@ -2,224 +2,143 @@ Return-Path: <SRS0=et4D=PM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28935C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 10:24:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8244C43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 19:57:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA31220874
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 10:24:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76575218DE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 19:57:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tWynInKv"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="ZCF+pIvT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726472AbfADKYl (ORCPT
+        id S1726102AbfADT5X (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Jan 2019 05:24:41 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43495 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725958AbfADKYk (ORCPT
+        Fri, 4 Jan 2019 14:57:23 -0500
+Received: from mail.andi.de1.cc ([85.214.239.24]:50324 "EHLO
+        h2641619.stratoserver.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725930AbfADT5W (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Jan 2019 05:24:40 -0500
-Received: by mail-pg1-f195.google.com with SMTP id v28so17321175pgk.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Jan 2019 02:24:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=e+ntR3Ku+rEIjTKLI8nz2mlgePoIr/xEO8bg5Zhtf70=;
-        b=tWynInKvFm8shcNmW0PbqI8IoiAE0yu/E9EdjX994Pe5HI4WVikVHS6bKzS2Giw1ME
-         IfKoPT8/HSFsJbsb1aD6X68HcEAsZf4JBFAxXn1n/68g5MkuuqeItV+n1sdml9brm4fX
-         aWkASNRfPEb71hD1Jfj9+ljKDY0cgGHmUoBCo/uZbOUcSQp6jB2xbsviBVi4tfM80UHB
-         X5BqQKi9LoO/uO2Xmknvzv/k+KtF6vCJv9kkEirgQZBmlk8duusKMMVnRb5Ot7YS/4R/
-         SCDfKAuLZvqM0nmai7i3lWjgC/ViP2HB9b7CswyzqWkfecy4ChxMiezgcZqJ7l+IVHSM
-         Y9Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=e+ntR3Ku+rEIjTKLI8nz2mlgePoIr/xEO8bg5Zhtf70=;
-        b=htINFrq6nAQhznUocX74npf8/oOhlIN3WpPvnM5FPcoHHhHMvm1eDGOynW6ZAyk3Kg
-         fUaJX9Z6TFhG/T+jgdLH0bPlR4syihigQa9WOxJv2URKYdAjmSWSQ8B4ysyt2EkDiY2Q
-         7uzZ3IRtMWvjU6Tvz8eXx4sG65jTh4XKjwNf+1AlqE/acafiK/x2MXsbuO76T6KTX6SM
-         YBQ0PBye6NtjdoLH0D1srvKCr9tzGPX0hS7wW5UGf26toyWpjhBTnPZr11EW+BmJLX/D
-         OT2k8y3+DBqNvQOOGWE6+zEXr6z2HWvaUuVVwEMrWIobDnU1+WzwLPNA4JFzMXv1mwhN
-         vUrw==
-X-Gm-Message-State: AA+aEWYnFJMZINXig1NxwcgcfNNnZQgUJN0JqRQOhCkiGWYJJ1GKdkNC
-        0DZ5LwRKLCZBsYMYBQI1sjXMawvhOZEvKkhfIlwEAek1
-X-Google-Smtp-Source: ALg8bN622UdIs2Vm56S5cP3Oh6J/+zC5yrEY/iq8IScZw4HK0lNw6Pk18FeIrrSOk8rGENCfjLL+CL4QdoOX43esuak=
-X-Received: by 2002:a62:5444:: with SMTP id i65mr53471747pfb.193.1546597479821;
- Fri, 04 Jan 2019 02:24:39 -0800 (PST)
-MIME-Version: 1.0
-References: <20180316221221.130478-1-marcel@holtmann.org>
-In-Reply-To: <20180316221221.130478-1-marcel@holtmann.org>
-From:   Emil Lenngren <emil.lenngren@gmail.com>
-Date:   Fri, 4 Jan 2019 11:24:29 +0100
-Message-ID: <CAO1O6scQR_3t28DPUQsY-yONc1JMVaFHZejgGAK2kv-vHY=Qtw@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: Add new serdev based driver for 3-Wire attached controllers
+        Fri, 4 Jan 2019 14:57:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=kemnade.info; s=20180802; h=Content-Type:MIME-Version:References:
+        In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=iA6N/AtSYaHhvS+C0cYvEnbPRyBjDBCnf7Dl1B5pYkk=; b=ZCF+pIvTcNvk5rC7jMjovU+k+
+        q8a3b3YjTA1XP9opptKJ/1sk/XaSh4RzAMB0lY7JdZjjkmJNZY40Md4ceSZ/A9aYG9lnq4vN56KFt
+        id6WR79Zd/fKSaCwRIZoFZcVpYfbChTHG+kaD7DTtMZjm6OLlto8wZE8btg5RebzaIO/E=;
+Received: from pd9e2f2c8.dip0.t-ipconnect.de ([217.226.242.200] helo=aktux)
+        by h2641619.stratoserver.net with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <andreas@kemnade.info>)
+        id 1gfVan-00050j-Es; Fri, 04 Jan 2019 20:57:17 +0100
+Date:   Fri, 4 Jan 2019 20:57:10 +0100
+From:   Andreas Kemnade <andreas@kemnade.info>
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Rob Herring <robh@kernel.org>,
+        Sebastian Reichel <sebastian.reichel@collabora.com>,
+        "H . Nikolaus Schaller" <hns@goldelico.com>,
+        devicetree <devicetree@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org, letux-kernel@openphoenux.org
+Subject: Re: [Letux-kernel] [PATCH RFC] bluetooth: add uart h4 devices via
+ serdev/devicetree
+Message-ID: <20190104205600.3e6b31c9@aktux>
+In-Reply-To: <B5CEA49A-0F54-40C5-BCEA-7875BE1358E3@holtmann.org>
+References: <20181110232034.17277-1-andreas@kemnade.info>
+        <20181111024648.7rt7rlhaqihtqecv@earth.universe>
+        <20181112215812.18ebca35@aktux>
+        <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com>
+        <20181112222726.73m2oca7hankvcjs@earth.universe>
+        <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com>
+        <20181113170128.0f59ef0e@kemnade.info>
+        <86A3A2E6-FC89-42FE-8410-9C8273EC9CF7@holtmann.org>
+        <20181116204601.4e1aa0de@kemnade.info>
+        <09AFE47C-D188-4397-A2CD-C70FFAC3B677@holtmann.org>
+        <20190104064403.325771fd@kemnade.info>
+        <B5CEA49A-0F54-40C5-BCEA-7875BE1358E3@holtmann.org>
+X-Mailer: Claws Mail 3.14.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/k.3xD97g07g2Scmu0iHJy5M"; protocol="application/pgp-signature"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+--Sig_/k.3xD97g07g2Scmu0iHJy5M
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
 Hi Marcel,
-a few questions below
 
-Den fre 16 mars 2018 kl 23:13 skrev Marcel Holtmann <marcel@holtmann.org>:
->
-> This is a from scratch written driver to run H:5 aka 3-Wire on serdev based
-> system with a Bluetooth controller attached via an UART. It is currently
-> tested on RPi3. It works only without Broadcom integration and that means
-> firmware loading is not supported. It is easy to add, but in that case
-> some packet errors happen that are not yet debugged.
->
-> It does support data integrity check, but it does not actually support
-> the sliding window. It is currently limit to 1 packet and on the
-> receiver side there is no packet loss detection.
->
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
-> +static void bt3wire_tx_work(struct work_struct *work)
-> +{
-> +       struct bt3wire_dev *bdev = container_of(work, struct bt3wire_dev,
-> +                                              tx_work);
-> +       struct serdev_device *serdev = bdev->serdev;
-> +       struct hci_dev *hdev = bdev->hdev;
-> +
-> +       while (1) {
-> +               clear_bit(BT3WIRE_TX_STATE_WAKEUP, &bdev->tx_state);
-> +
-> +               while (1) {
-> +                       struct sk_buff *skb = skb_dequeue(&bdev->tx_queue);
-> +                       int len;
-> +
-> +                       if (!skb)
-> +                               break;
-> +
-> +                       len = serdev_device_write_buf(serdev, skb->data,
-> +                                                     skb->len);
-> +                       hdev->stat.byte_tx += len;
-> +
-> +                       skb_pull(skb, len);
-> +                       if (skb->len > 0) {
-> +                               skb_queue_head(&bdev->tx_queue, skb);
-> +                               break;
-> +                       }
-> +
-> +                       kfree_skb(skb);
-> +               }
-> +
-> +               if (!test_bit(BT3WIRE_TX_STATE_WAKEUP, &bdev->tx_state))
-> +                       break;
-> +       }
-> +
-> +       clear_bit(BT3WIRE_TX_STATE_ACTIVE, &bdev->tx_state);
-> +}
-> +
-> +static int bt3wire_tx_wakeup(struct bt3wire_dev *bdev)
-> +{
-> +       if (test_and_set_bit(BT3WIRE_TX_STATE_ACTIVE, &bdev->tx_state)) {
-> +               set_bit(BT3WIRE_TX_STATE_WAKEUP, &bdev->tx_state);
-> +               return 0;
-> +       }
-> +
-> +       schedule_work(&bdev->tx_work);
-> +       return 0;
-> +}
-> +
-> +static int bt3wire_open(struct hci_dev *hdev)
-> +{
-> +       struct bt3wire_dev *bdev = hci_get_drvdata(hdev);
-> +       int err;
-> +
-> +       bdev->tx_seq = 0;
-> +       bdev->tx_ack = 0;
-> +
-> +       bdev->rx_slip_state = SLIP_WAIT_DELIM;
-> +       bdev->rx_skb = NULL;
-> +
-> +       err = serdev_device_open(bdev->serdev);
-> +       if (err) {
-> +               bt_dev_err(hdev, "Unable to open UART device %s",
-> +                          dev_name(&bdev->serdev->dev));
-> +               return err;
-> +       }
-> +
-> +       serdev_device_set_baudrate(bdev->serdev, 115200);
-> +
-> +       bdev->link_state = LINK_UNINITIALIZED;
-> +       schedule_delayed_work(&bdev->link_timer, 0);
-> +
-> +       if (!wait_event_interruptible_timeout(bdev->link_wait,
-> +                                             bdev->link_state == LINK_ACTIVE,
-> +                                             LINK_ACTIVATION_TIMEOUT)) {
-> +               bt_dev_err(hdev, "Link activation timeout");
-> +               err = -ETIMEDOUT;
-> +
-> +               cancel_delayed_work_sync(&bdev->link_timer);
-> +               serdev_device_close(bdev->serdev);
-> +       } else {
-> +               bt_dev_info(hdev, "Link activation successful");
-> +               err = 0;
-> +       }
-> +
-> +       return err;
-> +}
-> +
-> +static int bt3wire_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
-> +{
-> +       struct bt3wire_dev *bdev = hci_get_drvdata(hdev);
-> +
-> +       switch (hci_skb_pkt_type(skb)) {
-> +       case HCI_COMMAND_PKT:
-> +               hdev->stat.cmd_tx++;
-> +               break;
-> +       case HCI_ACLDATA_PKT:
-> +               hdev->stat.acl_tx++;
-> +               break;
-> +       case HCI_SCODATA_PKT:
-> +               hdev->stat.sco_tx++;
-> +               break;
-> +       }
-> +
-> +       bt3wire_queue_pkt(bdev, hci_skb_pkt_type(skb), skb->data, skb->len);
-> +       kfree_skb(skb);
-> +
-> +       bt3wire_tx_wakeup(bdev);
-> +       return 0;
-> +}
-> +
-> +static void bt3wire_write_wakeup(struct serdev_device *serdev)
-> +{
-> +       struct bt3wire_dev *bdev = serdev_device_get_drvdata(serdev);
-> +
-> +       bt3wire_tx_wakeup(bdev);
-> +}
-> +
+On Fri, 4 Jan 2019 10:07:34 +0100
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-Any specific reason this draft as well as
-https://patchwork.kernel.org/patch/10490651/ uses its own code above
-for tx work, send frame, set baud rate etc. when there seems to be a
-common lib for such things in hci_serdev.c?
+> Hi Andreas,
+>=20
+> >>>> Btw. I see nothing standing in the way of merging btuart.c driver an=
+d then go from there. Either I dig this out and submit or someone else does.
+> >>>>  =20
+> >>> Do you mean this?
+> >>> https://patchwork.kernel.org/patch/10490651/   =20
+> >>=20
+> >> yes, that one.
+> >>  =20
+> > Hmm, there seemed to be nothing in the pull requests regarding btuart.
+> > Did you change plans? =20
+>=20
+> because I only submitted it as RFC. We can easily merge that one upstream=
+ since it is rather trivial. The main problem is how you want to do the dev=
+ice matching. Do you have a DT entry for your really simple devices?
+>=20
+Hmm, in that link it is non-rfc. So someone picked you rfc patch up and
+submitted it?
 
-I'm also wondering about having the tx work in a separate
-workqueue/thread. Wouldn't it be better (fewer context switches) if
-the serdev_device_write_buf call was done from the same threads that
-1. put the message in the queue and 2. the serdev wake-up callback
-(protected by some lock)? It seems serdev_device_write_buf is async
-and shouldn't block if I'm correct.
-In the current code (whose logic seems to be used by many drivers) I
-see a potential race condition if there is a context switch just
-before the line "clear_bit(BT3WIRE_TX_STATE_ACTIVE,
-&bdev->tx_state);", then another thread calls bt3wire_tx_wakeup, then
-the tx work will never run (unless a new packet is enqueued).
+You might see what we are already doing here:
+http://git.goldelico.com/?p=3Dletux-kernel.git;a=3Dblobdiff;f=3Darch/arm/bo=
+ot/dts/omap3-gta04.dtsi;h=3D4d2bac4293938de4a15a59979616909cf8842524;hp=3Db=
+fced960d63ec40cf9db4901374b331737a9a168;hb=3Df78bf51754e35010de40518b9a8a14=
+8d0269bbc8;hpb=3Db6805813a9ab5b0d66b44cc54a0059eca4dd0a98
 
-About the baud rate, would it be a good idea to control that via a
-device tree parameter?
+We are using compatible=C2=A0=3D=C2=A0"wi2wi,w2cbw003-bluetooth"
 
-/Emil
+But I think we should also add a generic device string like
+bluetooth,h4
+So if people dig out older hardware, they can just add that to their
+device trees and have bluetooth
+
+The full patchset we are currently using is here:
+http://git.goldelico.com/?p=3Dletux-kernel.git;a=3Dshortlog;h=3Drefs/heads/=
+letux/bluetooth-h4-serdev
+
+Regards,
+Andreas
+
+--Sig_/k.3xD97g07g2Scmu0iHJy5M
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE7sDbhY5mwNpwYgrAfb1qx03ikyQFAlwvupYACgkQfb1qx03i
+kyQCMA//UcuhECwYbxbjrGLdMxqjvgo452MgX/hSy9bN/NTFmq2g09u1g5nv5MkV
+b76cfWGRkMw+Zn6Sui2dE7gJUgHNHpyrt7IfmLiHYGHGOnG3S9q89lStD7+XQyrR
+ox8sE4N/vpIfc2OFwu3QLDeTH33ZxsA1ICpDsnuCiikl7gAkRGh5FzFaOvAKprCC
+htWcq2BvpMp8HkoFcWAUi/ucjswO2qk7s66zVJW7ssfw4yhnrRJDrlLUnv1EF+K0
+J8/MT/TydjHRklISPA5gXG1HhMZa3m+gyMt9Kx85W7aLnbY/bEp44gtR+IKteKNO
+FnOR23XwwBK+/nG+GJ7R55R0Gg5vbR0JpF/caglux2gpEQM2tS4HM8kaW0Hvhuwd
+O8FBOQiVg1z0bNwd111H6/R2j0+REE1gYW80iLJjHVKqRzMYF5J7ayO/OT0sKYKD
+LVBlUcDsDTumjuwcyFWbJ/Zk6Z8F3u9RMOv+1GCL3JNJKthYDj3JN6MAMcEINA0n
+Y1JuGj++4jK1R5z2H0dd1a3TTuy/lVGoySxrVU6U5CgobwRuMxhN3YBdWHDMC9qo
+t9/RnAkI/xj8ScNeAsZEYJe9ZDwWgWZ3lygols7QvqApSMtQjB8h6Ci/yD5Vbzss
+KXKyrPayXyPO2HRrsFxBoLX/CRAscvGlwvKeN2uyNUWCG/Tt4Uo=
+=N5bk
+-----END PGP SIGNATURE-----
+
+--Sig_/k.3xD97g07g2Scmu0iHJy5M--
