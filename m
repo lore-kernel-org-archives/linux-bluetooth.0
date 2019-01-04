@@ -2,193 +2,252 @@ Return-Path: <SRS0=et4D=PM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED17C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 09:27:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FF8C43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 09:52:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E6B421872
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 09:27:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00C232184B
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 09:52:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DoIq5wGM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbfADJ1D (ORCPT
+        id S1727914AbfADJwB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Jan 2019 04:27:03 -0500
-Received: from mail-io1-f70.google.com ([209.85.166.70]:50563 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726097AbfADJ1D (ORCPT
+        Fri, 4 Jan 2019 04:52:01 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:33284 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727897AbfADJwB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Jan 2019 04:27:03 -0500
-Received: by mail-io1-f70.google.com with SMTP id p4so40596928iod.17
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Jan 2019 01:27:02 -0800 (PST)
+        Fri, 4 Jan 2019 04:52:01 -0500
+Received: by mail-it1-f194.google.com with SMTP id m8so947945itk.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Jan 2019 01:52:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PxI7OgqkHvzZrSlRXshJHucgZ9qIFdibRiWWgaoh7w0=;
+        b=DoIq5wGMhxGgdj62h5XZdcrV8VRp/MZT0LIH4M7gOoD/c00nqhgDdWopk2OJW+zggH
+         TFlM7RIx5UE55WWfP9JgHgXDT6hTOkXzFE1yWyv+vLMSQnBK7SAXe3hJbfI/oAr+KBXl
+         81fjMjPaR5RkPIdK1kiHE+8XFJB2mafBr/vpBxIc+WtWR3ApGDvJyrTfwasusBtGwpIf
+         YYplyk7jD8DozDFKpUAROkCrDnxD1zTOJgF9GkBoaee8orl/KAEuk2+u7qCtNdSaeYlD
+         ZzU79ZvXR9L6Z80QjiQEcLNsQdwViPFY4LiRj+f4QPSpzrMkXoIRdpgPdggir13Yd2Ns
+         N7MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=x/pjvUGS+Z1h8jZWINExGUPei1FYW0Ls1tAPGI3H9es=;
-        b=gGjOFnpYgngeyAaB2S6ZQBGZxki0oGX9M4hZa+x1nP2Go5+kMnyYuchCZxumwbUVVN
-         okPUgO54DMwaXXO6MrmC9xynBWtckWIMRuI40a7/Y/GErENWrD0Iu252eAqRtIz9QOIz
-         D1PhLCmsIFT+rM97u4mFQowBa4LbOjbwKE9/sjvTcbugUCxo8y5yiOku2hJ3NZ33o9xf
-         WCR9cNWft81otgoY0Vjk8e/TeDqIbnMeVy1SYdxQe2Rh9eC9DHDHpEeOLLb32wTB8ook
-         9cy/tILX2LNsjlwv9IJPOebj9rxz5Q+UhmrVm4sEDGQkAYVWJlinMv5l65yvb5ZAXU8Z
-         nnvg==
-X-Gm-Message-State: AJcUukfqmmz/eSCxwGgKmFQNfUzIYXZv1ARvXgv2HmgSOL3dc8+qHmoF
-        RLOrqbo0bRF06FJNKvcdW5+RlSRV3yYJLRb83k90Ll72JO/m
-X-Google-Smtp-Source: ALg8bN5BE58ryNHUaIdMWphqbx076XMjfyIl5pWqmWiESo4haaWyyX4CFzuFYxbApcIY1IGHcjAahSesOsBV4zn28qfhHA5yITbw
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PxI7OgqkHvzZrSlRXshJHucgZ9qIFdibRiWWgaoh7w0=;
+        b=lai9Ph/LsuEDrg9cF4HL9MEtlyEFmY7WrtbaLZLYm+RJ302oeSLuXIwv8Cpuq9Db78
+         OsO+WTPwi9KHt4dN6h5MMuOiGbDz9c46P/wZiI38q0K4ExdSGGh2MFeiJQsVtKE+Kk3i
+         fL+HPmYKrU5BZJQILjWvk8egF2qZ3HVeSBgNA5aAr7yV1q1nQjhYD+r2XC2gHyQl0BFU
+         k8pX5osITjdF1nRd9uEC1vJOVYEcPYNdRycnDF50A6wCMzHPkvN4F4m0XcWHohfoZDEE
+         fuIzwLboYpT5JmIpk2bEDmqPXETTtvDBKRkbWSdK6uuZJ0mBcV6t2+iPK308RuMoTcTx
+         4IZw==
+X-Gm-Message-State: AJcUukd21jf9jnL3UxX9zara/SQaISffeuNYcZGQa+bW83HlWAljvXbD
+        Dw522qktkamI4z4W8mEBmOaWfqYVC2yl3SpL0W6zrw==
+X-Google-Smtp-Source: ALg8bN7La7vssdsBjy8X6DuAQ7tQADfpMs5ro+jvOMTE5h155joV60F/uGERgW5PIQhYhNxnTYfXIkp3UscWIuUCgwY=
+X-Received: by 2002:a02:97a2:: with SMTP id s31mr20779145jaj.82.1546595519897;
+ Fri, 04 Jan 2019 01:51:59 -0800 (PST)
 MIME-Version: 1.0
-X-Received: by 2002:a6b:e519:: with SMTP id y25mr27940927ioc.36.1546594022271;
- Fri, 04 Jan 2019 01:27:02 -0800 (PST)
-Date:   Fri, 04 Jan 2019 01:27:02 -0800
-In-Reply-To: <0000000000003692760578e651dd@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004f34dd057e9e7b2a@google.com>
-Subject: Re: KASAN: use-after-free Write in hci_sock_release
-From:   syzbot <syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+References: <000000000000a980e3057896e9df@google.com> <000000000000491298057e9ebf6e@google.com>
+In-Reply-To: <000000000000491298057e9ebf6e@google.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Fri, 4 Jan 2019 10:51:49 +0100
+Message-ID: <CACT4Y+Z=ufffBE+bs5Le4STyvdT_fJsNx6g4exw6Si2bCM165A@mail.gmail.com>
+Subject: Re: KASAN: use-after-free Read in kobject_put
+To:     syzbot <syzbot+fdc00003f4efff43bc5b@syzkaller.appspotmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        David Miller <davem@davemloft.net>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        LKML <linux-kernel@vger.kernel.org>, rafael@kernel.org,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+On Fri, Jan 4, 2019 at 10:46 AM syzbot
+<syzbot+fdc00003f4efff43bc5b@syzkaller.appspotmail.com> wrote:
+>
+> syzbot has found a reproducer for the following crash on:
+>
+> HEAD commit:    645ff1e8e704 Merge branch 'for-linus' of git://git.kernel...
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=172cee4b400000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=7308e68273924137
+> dashboard link: https://syzkaller.appspot.com/bug?extid=fdc00003f4efff43bc5b
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15d603e7400000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10786f77400000
+>
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+fdc00003f4efff43bc5b@syzkaller.appspotmail.com
 
-HEAD commit:    645ff1e8e704 Merge branch 'for-linus' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1303e2bb400000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7308e68273924137
-dashboard link: https://syzkaller.appspot.com/bug?extid=b364ed862aa07c74bc62
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=152532bb400000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f73320c00000
++bluetooth maintainers
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+b364ed862aa07c74bc62@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: use-after-free in atomic_dec  
-include/asm-generic/atomic-instrumented.h:127 [inline]
-BUG: KASAN: use-after-free in hci_sock_release+0x154/0x3c0  
-net/bluetooth/hci_sock.c:873
-Write of size 4 at addr ffff888098651620 by task syz-executor472/8899
-
-CPU: 1 PID: 8899 Comm: syz-executor472 Not tainted 4.20.0+ #8
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x1db/0x2d0 lib/dump_stack.c:113
-  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
-  kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
-  check_memory_region_inline mm/kasan/generic.c:185 [inline]
-  check_memory_region+0x123/0x190 mm/kasan/generic.c:191
-  kasan_check_write+0x14/0x20 mm/kasan/common.c:106
-  atomic_dec include/asm-generic/atomic-instrumented.h:127 [inline]
-  hci_sock_release+0x154/0x3c0 net/bluetooth/hci_sock.c:873
-  __sock_release+0xd3/0x250 net/socket.c:579
-  sock_close+0x1b/0x30 net/socket.c:1141
-  __fput+0x3c5/0xb10 fs/file_table.c:278
-  ____fput+0x16/0x20 fs/file_table.c:309
-  task_work_run+0x1f4/0x2b0 kernel/task_work.c:113
-  tracehook_notify_resume include/linux/tracehook.h:188 [inline]
-  exit_to_usermode_loop+0x32a/0x3b0 arch/x86/entry/common.c:166
-  prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
-  syscall_return_slowpath arch/x86/entry/common.c:268 [inline]
-  do_syscall_64+0x696/0x800 arch/x86/entry/common.c:293
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-RIP: 0033:0x446419
-Code: e8 0c e8 ff ff 48 83 c4 18 c3 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 7b 08 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00007ff91cfd4da8 EFLAGS: 00000246 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 00000000006dbc28 RCX: 0000000000446419
-RDX: 0000000000446419 RSI: 0000000000446419 RDI: 0000000000000004
-RBP: 00000000006dbc20 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000006dbc2c
-R13: 6368762f7665642f R14: 00007ff91cfd59c0 R15: 00000000006dbd2c
-
-Allocated by task 8889:
-  save_stack+0x45/0xd0 mm/kasan/common.c:73
-  set_track mm/kasan/common.c:85 [inline]
-  kasan_kmalloc mm/kasan/common.c:482 [inline]
-  kasan_kmalloc+0xcf/0xe0 mm/kasan/common.c:455
-  kmem_cache_alloc_trace+0x151/0x760 mm/slab.c:3607
-  kmalloc include/linux/slab.h:545 [inline]
-  kzalloc include/linux/slab.h:740 [inline]
-  hci_alloc_dev+0x148/0x21a0 net/bluetooth/hci_core.c:3116
-  __vhci_create_device+0x101/0x5a0 drivers/bluetooth/hci_vhci.c:114
-  vhci_create_device drivers/bluetooth/hci_vhci.c:163 [inline]
-  vhci_get_user drivers/bluetooth/hci_vhci.c:219 [inline]
-  vhci_write+0x2d0/0x470 drivers/bluetooth/hci_vhci.c:299
-  call_write_iter include/linux/fs.h:1862 [inline]
-  new_sync_write fs/read_write.c:474 [inline]
-  __vfs_write+0x764/0xb40 fs/read_write.c:487
-  vfs_write+0x20c/0x580 fs/read_write.c:549
-  ksys_write+0x105/0x260 fs/read_write.c:598
-  __do_sys_write fs/read_write.c:610 [inline]
-  __se_sys_write fs/read_write.c:607 [inline]
-  __x64_sys_write+0x73/0xb0 fs/read_write.c:607
-  do_syscall_64+0x1a3/0x800 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 8888:
-  save_stack+0x45/0xd0 mm/kasan/common.c:73
-kobject: 'rfkill320' (00000000e0cb8fff): fill_kobj_path: path  
-= '/devices/virtual/bluetooth/hci4/rfkill320'
-  set_track mm/kasan/common.c:85 [inline]
-  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:444
-  kasan_slab_free+0xe/0x10 mm/kasan/common.c:452
-  __cache_free mm/slab.c:3485 [inline]
-  kfree+0xcf/0x230 mm/slab.c:3804
-  bt_host_release+0x19/0x30 net/bluetooth/hci_sysfs.c:86
-  device_release+0x7d/0x210 drivers/base/core.c:919
-  kobject_cleanup lib/kobject.c:662 [inline]
-  kobject_release lib/kobject.c:691 [inline]
-  kref_put include/linux/kref.h:67 [inline]
-  kobject_put.cold+0x28f/0x2ec lib/kobject.c:708
-  put_device+0x20/0x30 drivers/base/core.c:2060
-  hci_free_dev+0x19/0x20 net/bluetooth/hci_core.c:3208
-  vhci_release+0x7e/0xf0 drivers/bluetooth/hci_vhci.c:355
-kobject: 'rfkill313' (00000000d3ffb8c5): kobject_uevent_env
-  __fput+0x3c5/0xb10 fs/file_table.c:278
-  ____fput+0x16/0x20 fs/file_table.c:309
-  task_work_run+0x1f4/0x2b0 kernel/task_work.c:113
-  tracehook_notify_resume include/linux/tracehook.h:188 [inline]
-  exit_to_usermode_loop+0x32a/0x3b0 arch/x86/entry/common.c:166
-kobject: 'rfkill313' (00000000d3ffb8c5): fill_kobj_path: path  
-= '/devices/virtual/bluetooth/hci2/rfkill313'
-  prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
-  syscall_return_slowpath arch/x86/entry/common.c:268 [inline]
-  do_syscall_64+0x696/0x800 arch/x86/entry/common.c:293
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-The buggy address belongs to the object at ffff8880986505c0
-  which belongs to the cache kmalloc-8k of size 8192
-The buggy address is located 4192 bytes inside of
-  8192-byte region [ffff8880986505c0, ffff8880986525c0)
-The buggy address belongs to the page:
-kobject: 'rfkill313' (00000000d3ffb8c5): kobject_cleanup, parent            
-(null)
-page:ffffea0002619400 count:1 mapcount:0 mapping:ffff88812c3f2080 index:0x0  
-compound_mapcount: 0
-flags: 0x1fffc0000010200(slab|head)
-raw: 01fffc0000010200 ffffea0002616508 ffffea0002302f08 ffff88812c3f2080
-raw: 0000000000000000 ffff8880986505c0 0000000100000001 0000000000000000
-kobject: 'rfkill313' (00000000d3ffb8c5): calling ktype release
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff888098651500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff888098651580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-kobject: 'rfkill313': free name
-> ffff888098651600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                ^
-  ffff888098651680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff888098651700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
+> ==================================================================
+> BUG: KASAN: use-after-free in kobject_put+0xca/0xe0 lib/kobject.c:704
+> Read of size 1 at addr ffff88808f9e9ecc by task syz-executor111/8699
+>
+> CPU: 1 PID: 8699 Comm: syz-executor111 Not tainted 4.20.0+ #8
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> Google 01/01/2011
+> Call Trace:
+>   __dump_stack lib/dump_stack.c:77 [inline]
+>   dump_stack+0x1db/0x2d0 lib/dump_stack.c:113
+>   print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
+>   kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
+>   __asan_report_load1_noabort+0x14/0x20 mm/kasan/generic_report.c:132
+>   kobject_put+0xca/0xe0 lib/kobject.c:704
+>   put_device+0x20/0x30 drivers/base/core.c:2060
+>   hci_free_dev+0x19/0x20 net/bluetooth/hci_core.c:3208
+>   vhci_release+0x7e/0xf0 drivers/bluetooth/hci_vhci.c:355
+>   __fput+0x3c5/0xb10 fs/file_table.c:278
+>   ____fput+0x16/0x20 fs/file_table.c:309
+>   task_work_run+0x1f4/0x2b0 kernel/task_work.c:113
+>   tracehook_notify_resume include/linux/tracehook.h:188 [inline]
+>   exit_to_usermode_loop+0x32a/0x3b0 arch/x86/entry/common.c:166
+>   prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
+>   syscall_return_slowpath arch/x86/entry/common.c:268 [inline]
+>   do_syscall_64+0x696/0x800 arch/x86/entry/common.c:293
+>   entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> RIP: 0033:0x4054f1
+> Code: 75 14 b8 03 00 00 00 0f 05 48 3d 01 f0 ff ff 0f 83 94 17 00 00 c3 48
+> 83 ec 08 e8 6a fc ff ff 48 89 04 24 b8 03 00 00 00 0f 05 <48> 8b 3c 24 48
+> 89 c2 e8 b3 fc ff ff 48 89 d0 48 83 c4 08 48 3d 01
+> RSP: 002b:00007ffeb26e56e0 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+> RAX: 0000000000000000 RBX: 0000000000000004 RCX: 00000000004054f1
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+> RBP: 0000000000000000 R08: 000000037ffffa00 R09: 0000000000000001
+> R10: 0000000000000001 R11: 0000000000000293 R12: 00000000006dbc2c
+> R13: 20c49ba5e353f7cf R14: 000000000000002d R15: 0000000000000005
+>
+> Allocated by task 8707:
+>   save_stack+0x45/0xd0 mm/kasan/common.c:73
+>   set_track mm/kasan/common.c:85 [inline]
+>   kasan_kmalloc mm/kasan/common.c:482 [inline]
+>   kasan_kmalloc+0xcf/0xe0 mm/kasan/common.c:455
+>   kmem_cache_alloc_trace+0x151/0x760 mm/slab.c:3607
+>   kmalloc include/linux/slab.h:545 [inline]
+>   kzalloc include/linux/slab.h:740 [inline]
+>   hci_alloc_dev+0x148/0x21a0 net/bluetooth/hci_core.c:3116
+>   __vhci_create_device+0x101/0x5a0 drivers/bluetooth/hci_vhci.c:114
+>   vhci_create_device drivers/bluetooth/hci_vhci.c:163 [inline]
+>   vhci_get_user drivers/bluetooth/hci_vhci.c:219 [inline]
+>   vhci_write+0x2d0/0x470 drivers/bluetooth/hci_vhci.c:299
+>   call_write_iter include/linux/fs.h:1862 [inline]
+>   new_sync_write fs/read_write.c:474 [inline]
+>   __vfs_write+0x764/0xb40 fs/read_write.c:487
+>   vfs_write+0x20c/0x580 fs/read_write.c:549
+>   ksys_write+0x105/0x260 fs/read_write.c:598
+>   __do_sys_write fs/read_write.c:610 [inline]
+>   __se_sys_write fs/read_write.c:607 [inline]
+>   __x64_sys_write+0x73/0xb0 fs/read_write.c:607
+>   do_syscall_64+0x1a3/0x800 arch/x86/entry/common.c:290
+>   entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>
+> Freed by task 8699:
+>   save_stack+0x45/0xd0 mm/kasan/common.c:73
+>   set_track mm/kasan/common.c:85 [inline]
+>   __kasan_slab_free+0x102/0x150 mm/kasan/common.c:444
+>   kasan_slab_free+0xe/0x10 mm/kasan/common.c:452
+>   __cache_free mm/slab.c:3485 [inline]
+>   kfree+0xcf/0x230 mm/slab.c:3804
+>   bt_host_release+0x19/0x30 net/bluetooth/hci_sysfs.c:86
+>   device_release+0x7d/0x210 drivers/base/core.c:919
+>   kobject_cleanup lib/kobject.c:662 [inline]
+>   kobject_release lib/kobject.c:691 [inline]
+>   kref_put include/linux/kref.h:67 [inline]
+>   kobject_put.cold+0x28f/0x2ec lib/kobject.c:708
+>   put_device+0x20/0x30 drivers/base/core.c:2060
+>   hci_dev_put include/net/bluetooth/hci_core.h:1014 [inline]
+>   hci_unregister_dev+0x716/0x980 net/bluetooth/hci_core.c:3379
+>   vhci_release+0x76/0xf0 drivers/bluetooth/hci_vhci.c:354
+>   __fput+0x3c5/0xb10 fs/file_table.c:278
+>   ____fput+0x16/0x20 fs/file_table.c:309
+>   task_work_run+0x1f4/0x2b0 kernel/task_work.c:113
+>   tracehook_notify_resume include/linux/tracehook.h:188 [inline]
+>   exit_to_usermode_loop+0x32a/0x3b0 arch/x86/entry/common.c:166
+>   prepare_exit_to_usermode arch/x86/entry/common.c:197 [inline]
+>   syscall_return_slowpath arch/x86/entry/common.c:268 [inline]
+>   do_syscall_64+0x696/0x800 arch/x86/entry/common.c:293
+>   entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>
+> The buggy address belongs to the object at ffff88808f9e8e00
+>   which belongs to the cache kmalloc-8k of size 8192
+> The buggy address is located 4300 bytes inside of
+>   8192-byte region [ffff88808f9e8e00, ffff88808f9eae00)
+> The buggy address belongs to the page:
+> page:ffffea00023e7a00 count:1 mapcount:0 mapping:ffff88812c3f2080 index:0x0
+> compound_mapcount: 0
+> flags: 0x1fffc0000010200(slab|head)
+> raw: 01fffc0000010200 ffffea00023e6808 ffffea00023e8408 ffff88812c3f2080
+> raw: 0000000000000000 ffff88808f9e8e00 0000000100000001 0000000000000000
+> page dumped because: kasan: bad access detected
+> kobject: 'rfkill468' (000000007192bbb6): kobject_cleanup, parent
+> (null)
+>
+> Memory state around the buggy address:
+>   ffff88808f9e9d80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>   ffff88808f9e9e00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> > ffff88808f9e9e80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                                                ^
+>   ffff88808f9e9f00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>   ffff88808f9e9f80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ==================================================================
+> kobject: 'rfkill471' (00000000171c66a4): kobject_add_internal:
+> parent: 'hci2', set: 'devices'
+> kobject: 'rfkill471' (00000000171c66a4): kobject_uevent_env
+> kobject: 'hci6' (00000000cea6c5b0): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci6'
+> kobject: 'hci5' (00000000d9130f82): kobject_uevent_env
+> kobject: 'rfkill468' (000000007192bbb6): calling ktype release
+> kobject: 'hci5' (00000000d9130f82): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci5'
+> kobject: 'rfkill468': free name
+> kobject: 'rfkill471' (00000000171c66a4): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci2/rfkill471'
+> kobject: 'hci1' (000000006eef9329): kobject_uevent_env
+> kobject: 'rfkill472' (000000003d2f7a84): kobject_add_internal:
+> parent: 'hci0', set: 'devices'
+> kobject: 'hci1' (000000006eef9329): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci1'
+> kobject: 'rfkill469' (0000000043e5b34a): kobject_uevent_env
+> kobject: 'hci1' (000000006eef9329): kobject_cleanup, parent           (null)
+> kobject: 'rfkill469' (0000000043e5b34a): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci3/rfkill469'
+> kobject: 'hci1' (000000006eef9329): calling ktype release
+> kobject: 'rfkill472' (000000003d2f7a84): kobject_uevent_env
+> kobject: 'rfkill470' (00000000155e553b): kobject_uevent_env
+> kobject: 'rfkill472' (000000003d2f7a84): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci0/rfkill472'
+> kobject: 'rfkill470' (00000000155e553b): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci4/rfkill470'
+> kobject: 'rfkill473' (0000000082665f74): kobject_add_internal:
+> parent: 'hci6', set: 'devices'
+> kobject: 'hci1': free name
+> kobject: 'rfkill473' (0000000082665f74): kobject_uevent_env
+> kobject: 'hci1' (00000000a68c12d6): kobject_add_internal:
+> parent: 'bluetooth', set: 'devices'
+> kobject: 'rfkill472' (000000003d2f7a84): kobject_uevent_env
+> kobject: 'hci1' (00000000a68c12d6): kobject_uevent_env
+> kobject: 'rfkill472' (000000003d2f7a84): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci0/rfkill472'
+> kobject: 'hci1' (00000000a68c12d6): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci1'
+> kobject: 'rfkill473' (0000000082665f74): fill_kobj_path: path
+> = '/devices/virtual/bluetooth/hci6/rfkill473'
+>
+> --
+> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/000000000000491298057e9ebf6e%40google.com.
+> For more options, visit https://groups.google.com/d/optout.
