@@ -2,160 +2,139 @@ Return-Path: <SRS0=SaLm=PP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 926D3C43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 18:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C44C43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 18:51:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D9DC2070B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 18:31:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 087B8206BB
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 18:51:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="HSY7EReK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727031AbfAGSbF (ORCPT
+        id S1727535AbfAGSvL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Jan 2019 13:31:05 -0500
-Received: from mail-it1-f200.google.com ([209.85.166.200]:60372 "EHLO
-        mail-it1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726854AbfAGSbE (ORCPT
+        Mon, 7 Jan 2019 13:51:11 -0500
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:41810 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728065AbfAGSuw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Jan 2019 13:31:04 -0500
-Received: by mail-it1-f200.google.com with SMTP id t143so1204798itc.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jan 2019 10:31:04 -0800 (PST)
+        Mon, 7 Jan 2019 13:50:52 -0500
+Received: by mail-vs1-f67.google.com with SMTP id t17so888083vsc.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jan 2019 10:50:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GZHDCGPs4z3y7ituqpfrLyMWFnn+906H7KD1VFwaE18=;
+        b=HSY7EReKFJ3rs89PzbLD5kgnqLvq/YhfkvltohmFyZ+PFoOnCwzWQVwZV+sLvQqD3k
+         J+UlTwiNC8tMvwGaw4j/4T3oeoatGqYjQSbS+N0hXs/rss8+ah7fWcOQLLsm+EJfvt+T
+         0616M31tj+4Rz6pE3ZWRUJ/50qyind8yDu0EM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=0jYZIyCrrX6/GR8efrwhudP/H6iO9n0VT1CfmVttA0M=;
-        b=UJvrh+Q4lLcJbrjJuJ+tPazDXFGhqu1BT6UUuo51lv0sIhexTE6y7ogYgJ4jUTXwnN
-         T8o8Pe/uv5ITofOh9TTFKYIGTeoO4uJhxs7QIYPdsb9jBTwFYSlncYpISPYIcDjmpAVN
-         STFrdS0ad3ER4ky1Vvk9MICEfS0GOhDt4/9pIRzrxi724FUoNCNtpxlrklggJxQU9PQ5
-         zVdbF5thvenfJgY+BEoGQCtczTJfjbjDKOGy6T1iwjBnX8E7QWM1inyas+nT2lmb+m/w
-         5L7Tn4iOakfbJWOt57qdzDKxKQXEpNowF5Qeli/TZn+S96XvLgyI8VDpV2V+6W47m2El
-         EVNg==
-X-Gm-Message-State: AA+aEWaHCQtFL2kqLreShFHpqD8PgCfZgHERY4MTNKADl/00a9b6Mi0e
-        jFah1Y7eEYmxQ5tC3eFDnNfUvCKacwr/gqIJk5uWWeSNN4tj
-X-Google-Smtp-Source: AFSGD/UJZr/pFTUWFCQvtlUr7LqYjvNnBvAtApnKipTOFkXc0ZcUI7KmTocgPlVIIJsxpbqBIInkfkilMkWxsw7/pUchkOPIsOB/
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GZHDCGPs4z3y7ituqpfrLyMWFnn+906H7KD1VFwaE18=;
+        b=rFhY5CcqFk/S0YQsnXQz0DHrgl7AIgA558WuPApdjg0sO8TDj+qRSnTYsXZti0PgQH
+         QNUYO/N7EuKT20k26Hzwa/Ej1DGSahjvRF08zMKht1tZ7dww8JQvywvRuMDnVeSFFlC3
+         xWFdvKWahE6iY47mGWbJ3wqi+4fLxpCN9GNMNTn01mDw1IWLznFK+nHOwKXwgfVWqoqr
+         Pvwkn3mYF927sxLitCROoLzLO90kX9t71Bh9fOxolOpjc+8vyhCvYsfR9w17M8+5y1ho
+         MdfJiLMA9mgV4S4tiuKSOSIlg5eqfwQHZk+D15p/e8+sl6CTBnM5Xz9J8+ByrrnoeGgk
+         8Rjw==
+X-Gm-Message-State: AA+aEWa+DSOn7c0/l1yzUjmrJCIUHFxacgvzpJ22ojwJYxaTsdWwY5hu
+        zxRZV0uhXaVPyK9RxJD4ygJAB4yDF1E=
+X-Google-Smtp-Source: AFSGD/UXYG8tM7rYkicRHQcBllzmiingvyj2Smi/iGolgv8ZufDuxDv6bTIxv5k9PhhbIjLaGsBp/w==
+X-Received: by 2002:a67:f60e:: with SMTP id k14mr26135194vso.71.1546887051995;
+        Mon, 07 Jan 2019 10:50:51 -0800 (PST)
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com. [209.85.222.46])
+        by smtp.gmail.com with ESMTPSA id a187sm37501623vkf.26.2019.01.07.10.50.50
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 07 Jan 2019 10:50:50 -0800 (PST)
+Received: by mail-ua1-f46.google.com with SMTP id z11so462492uaa.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jan 2019 10:50:50 -0800 (PST)
+X-Received: by 2002:ab0:45d4:: with SMTP id u78mr22969857uau.52.1546887050200;
+ Mon, 07 Jan 2019 10:50:50 -0800 (PST)
 MIME-Version: 1.0
-X-Received: by 2002:a02:5c8:: with SMTP id 69mr48679298jal.20.1546885863660;
- Mon, 07 Jan 2019 10:31:03 -0800 (PST)
-Date:   Mon, 07 Jan 2019 10:31:03 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000696949057ee26e44@google.com>
-Subject: KASAN: slab-out-of-bounds Read in hci_event_packet
-From:   syzbot <syzbot+cec7a50c412a2c03f8f5@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+References: <20190103001120.177784-1-mka@chromium.org>
+In-Reply-To: <20190103001120.177784-1-mka@chromium.org>
+From:   Doug Anderson <dianders@chromium.org>
+Date:   Mon, 7 Jan 2019 10:50:39 -0800
+X-Gmail-Original-Message-ID: <CAD=FV=Wdgyh6pW2mZiq6qHR=mxisf4ygSS6yf23P_qw4tAGCwg@mail.gmail.com>
+Message-ID: <CAD=FV=Wdgyh6pW2mZiq6qHR=mxisf4ygSS6yf23P_qw4tAGCwg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Fix locking in bt_accept_enqueue() for BH context
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Dean Jenkins <Dean_Jenkins@mentor.com>,
+        linux-bluetooth@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Dmitry Grinberg <dmitrygr@google.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi,
 
-syzbot found the following crash on:
+On Wed, Jan 2, 2019 at 4:11 PM Matthias Kaehlcke <mka@chromium.org> wrote:
+>
+> With commit e16337622016 ("Bluetooth: Handle bt_accept_enqueue() socket
+> atomically") lock_sock[_nested]() is used to acquire the socket lock
+> before manipulating the socket. lock_sock[_nested]() may block, which
+> is problematic since bt_accept_enqueue() can be called in bottom half
+> context (e.g. from rfcomm_connect_ind()):
+>
+> [<ffffff80080d81ec>] __might_sleep+0x4c/0x80
+> [<ffffff800876c7b0>] lock_sock_nested+0x24/0x58
+> [<ffffff8000d7c27c>] bt_accept_enqueue+0x48/0xd4 [bluetooth]
+> [<ffffff8000e67d8c>] rfcomm_connect_ind+0x190/0x218 [rfcomm]
+>
+> Add a parameter to bt_accept_enqueue() to indicate whether the
+> function is called from BH context, and acquire the socket lock
+> with bh_lock_sock_nested() if that's the case.
+>
+> Also adapt all callers of bt_accept_enqueue() to pass the new
+> parameter:
+>
+> - l2cap_sock_new_connection_cb()
+>   - uses lock_sock() to lock the parent socket => process context
+>
+> - rfcomm_connect_ind()
+>   - acquires the parent socket lock with bh_lock_sock() => BH
+>     context
+>
+> - __sco_chan_add()
+>   - called from sco_chan_add(), which is called from sco_connect().
+>     parent is NULL, hence bt_accept_enqueue() isn't called in this
+>     code path and we can ignore it
+>   - also called from sco_conn_ready(). uses bh_lock_sock() to acquire
+>     the parent lock => BH context
+>
+> Fixes: e16337622016 ("Bluetooth: Handle bt_accept_enqueue() socket atomically")
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+> Changes in v2:
+> - use parameter in bt_accept_enqueue() to decide which lock to
+>   acquire and adapt all callers
+> - updated commit message
+> ---
+>  include/net/bluetooth/bluetooth.h |  2 +-
+>  net/bluetooth/af_bluetooth.c      | 16 +++++++++++++---
+>  net/bluetooth/l2cap_sock.c        |  2 +-
+>  net/bluetooth/rfcomm/sock.c       |  2 +-
+>  net/bluetooth/sco.c               |  2 +-
+>  5 files changed, 17 insertions(+), 7 deletions(-)
 
-HEAD commit:    574823bfab82 Change mincore() to count "mapped" pages rath..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=145e8207400000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d55557b516c45456
-dashboard link: https://syzkaller.appspot.com/bug?extid=cec7a50c412a2c03f8f5
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1643bfbf400000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12d6c8f7400000
+This looks nice to me, thanks!
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+cec7a50c412a2c03f8f5@syzkaller.appspotmail.com
-
-kauditd_printk_skb: 5 callbacks suppressed
-audit: type=1400 audit(1546856008.711:36): avc:  denied  { map } for   
-pid=8365 comm="syz-executor431" path="/root/syz-executor431611296"  
-dev="sda1" ino=16484 scontext=unconfined_u:system_r:insmod_t:s0-s0:c0.c1023  
-tcontext=unconfined_u:object_r:user_home_t:s0 tclass=file permissive=1
-==================================================================
-BUG: KASAN: slab-out-of-bounds in hci_inquiry_result_with_rssi_evt  
-net/bluetooth/hci_event.c:3988 [inline]
-BUG: KASAN: slab-out-of-bounds in hci_event_packet+0xb33e/0xc22e  
-net/bluetooth/hci_event.c:5863
-Read of size 1 at addr ffff88809fcab1c0 by task kworker/u5:0/1171
-
-CPU: 1 PID: 1171 Comm: kworker/u5:0 Not tainted 4.20.0+ #13
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: hci0 hci_rx_work
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x1db/0x2d0 lib/dump_stack.c:113
-  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
-  kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
-  __asan_report_load1_noabort+0x14/0x20 mm/kasan/generic_report.c:132
-  hci_inquiry_result_with_rssi_evt net/bluetooth/hci_event.c:3988 [inline]
-  hci_event_packet+0xb33e/0xc22e net/bluetooth/hci_event.c:5863
-  hci_rx_work+0x578/0xcd0 net/bluetooth/hci_core.c:4412
-  process_one_work+0xd0c/0x1ce0 kernel/workqueue.c:2153
-  worker_thread+0x143/0x14a0 kernel/workqueue.c:2296
-  kthread+0x357/0x430 kernel/kthread.c:246
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
-
-Allocated by task 8369:
-  save_stack+0x45/0xd0 mm/kasan/common.c:73
-  set_track mm/kasan/common.c:85 [inline]
-  kasan_kmalloc mm/kasan/common.c:482 [inline]
-  kasan_kmalloc+0xcf/0xe0 mm/kasan/common.c:455
-  __do_kmalloc_node mm/slab.c:3671 [inline]
-  __kmalloc_node_track_caller+0x4e/0x70 mm/slab.c:3685
-  __kmalloc_reserve.isra.0+0x40/0xe0 net/core/skbuff.c:140
-  __alloc_skb+0x12d/0x730 net/core/skbuff.c:208
-  alloc_skb include/linux/skbuff.h:1011 [inline]
-  bt_skb_alloc include/net/bluetooth/bluetooth.h:339 [inline]
-  vhci_get_user drivers/bluetooth/hci_vhci.c:180 [inline]
-  vhci_write+0xc4/0x470 drivers/bluetooth/hci_vhci.c:299
-  call_write_iter include/linux/fs.h:1862 [inline]
-  new_sync_write fs/read_write.c:474 [inline]
-  __vfs_write+0x764/0xb40 fs/read_write.c:487
-  vfs_write+0x20c/0x580 fs/read_write.c:549
-  ksys_write+0x105/0x260 fs/read_write.c:598
-  __do_sys_write fs/read_write.c:610 [inline]
-  __se_sys_write fs/read_write.c:607 [inline]
-  __x64_sys_write+0x73/0xb0 fs/read_write.c:607
-  do_syscall_64+0x1a3/0x800 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 0:
-(stack is not available)
-
-The buggy address belongs to the object at ffff88809fcaadc0
-  which belongs to the cache kmalloc-1k of size 1024
-The buggy address is located 0 bytes to the right of
-  1024-byte region [ffff88809fcaadc0, ffff88809fcab1c0)
-The buggy address belongs to the page:
-page:ffffea00027f2a80 count:1 mapcount:0 mapping:ffff88812c3f0ac0 index:0x0  
-compound_mapcount: 0
-flags: 0x1fffc0000010200(slab|head)
-raw: 01fffc0000010200 ffffea0001d08488 ffffea0002812908 ffff88812c3f0ac0
-raw: 0000000000000000 ffff88809fcaa040 0000000100000007 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff88809fcab080: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  ffff88809fcab100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> ffff88809fcab180: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
-                                            ^
-  ffff88809fcab200: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-  ffff88809fcab280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
-
-
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Cc: stable@vger.kernel.org
+Reviewed-by: Douglas Anderson <dianders@chromium.org>
