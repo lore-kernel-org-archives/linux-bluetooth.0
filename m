@@ -2,91 +2,81 @@ Return-Path: <SRS0=SaLm=PP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47FE6C43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 22:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED61CC43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 23:13:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0712D2147C
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 22:38:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA265206C0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 23:13:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gKU92Sen"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lLSXaT1j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726932AbfAGWiJ (ORCPT
+        id S1727031AbfAGXNV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Jan 2019 17:38:09 -0500
-Received: from mail-pg1-f173.google.com ([209.85.215.173]:35314 "EHLO
-        mail-pg1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726668AbfAGWiJ (ORCPT
+        Mon, 7 Jan 2019 18:13:21 -0500
+Received: from mail-pl1-f181.google.com ([209.85.214.181]:41325 "EHLO
+        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726638AbfAGXNV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Jan 2019 17:38:09 -0500
-Received: by mail-pg1-f173.google.com with SMTP id s198so787556pgs.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jan 2019 14:38:09 -0800 (PST)
+        Mon, 7 Jan 2019 18:13:21 -0500
+Received: by mail-pl1-f181.google.com with SMTP id u6so868015plm.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jan 2019 15:13:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=oFdzsb0RAt6lK2wWiUtbwjjXv+Kn0B0Ns2lDnvJbndw=;
-        b=gKU92Senz6fNV0LLjxRXyZdhHOez60xvP1/e/U3jfIpUsJn7WsHYqLGB4I7IRf80+V
-         j5B1qa378ZQVNoKXHBLgdPIIGPU+t7T31DXxn8//8/aXD/wnYTO2WrF37rS9rozOPWAK
-         sFAVzDjZTVvAj77T5WErgDIKApCrhHovohm9OdIwy5vTTgNHpz+NAyKQ/cttmFXv70fY
-         /m/pEpoMF8DrUeByepqVZC9cKlbyncMSN+l2izq6bOCPGhBqxLrbm7blevLur07txoks
-         Wu9uXCTSNUd2smz5xX1+B8JiAXrGnVq4+M0b30CiR/YaVyD8kHWwabCT2Pc9LkWCyoaV
-         dDLQ==
+        d=google.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=Ls+/EkkeeeabzFt4bmmnRO7q3pw+esmbTOanxMqmU5E=;
+        b=lLSXaT1jIUC8SQz7TC/mwp7aVpWbugg8aA+3qcmWWoBGyVmPCI2kcqN1Mt3lMYqzIf
+         bisKCtnj8lSFN5tYN4fIW32ZV/PbnB3vHLhjgNehQ9eTU0fjoq5RiYY38D+g9IJ06bzz
+         /dWezX6goQvilJvCPcQ7XJP8xuhQGga5JGGLOwAOm9T2Nx9cxTcIP1ghyfl+f89LDyKW
+         i2AtjPHTAoo+9kKIKlhHUvSRTNt/5YxWmn0QtLFlwGozBnW32Cuvbnn9u/sY6poDi/VL
+         4H/EkZD8hEOpy/tQ3ovJoYSMlgmF6j+dicx7TX40kMHEQFnJGaPLXtXgh8wVwuTQC4CL
+         HP1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=oFdzsb0RAt6lK2wWiUtbwjjXv+Kn0B0Ns2lDnvJbndw=;
-        b=cblT6bleks6gvniZ5s3Y+qMqQ8kWMjonlBW84qYhyEob0TJE2/Wv6aTVzuEA2QPOWn
-         cjLtQYwQwuys9yiXdxis15iC0bkwgrsEA7ay9z/R6SRr3ffaTPBX9DXE3w6bNi3JwHR6
-         xbME6ct+GK2udzEo5xlZfMW+Zv+SffSPvfmb6g3ShrNBh96ZRLn6GlKX02hLsdW86Yfm
-         k36uhCgYTlg4cOh11W8cpIePhqGh2PHdLkXsekhJz5uE8g3n8SrkFRB89nAsmg8iMXNr
-         Oh2CiehbNjtieluruNaiwnv0ttWv52vI7cZJwIslUP4JypUJ5vvC9AnRIfaD6kW/BWIz
-         Ennw==
-X-Gm-Message-State: AJcUukdlez3wZA7QpEswcLVMCA3Q9YctvIDDA+2UiRWpos1SQioTYkKW
-        tnM4HThpDf2PMmq6bRgxPe5X7u5x7giFgMT3E00mWWHa
-X-Google-Smtp-Source: AFSGD/X/Yuj2eo6wnY9iNuSn0NehlGA3fyFIc6ingU3xQvE3M76N1v3eHOoV0JDPRtvBSkJHmlKTJUWcYU/f63nUp2I=
-X-Received: by 2002:a62:f247:: with SMTP id y7mr64839118pfl.25.1546900688742;
- Mon, 07 Jan 2019 14:38:08 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=Ls+/EkkeeeabzFt4bmmnRO7q3pw+esmbTOanxMqmU5E=;
+        b=StVO5vtHs5myD1ztqouNhjnufeKgvzXqknlshnOUnYMugL2bPtsRPYRYLF/hZoBc6j
+         RRNOhFMLEbuma77eqIpwI6chd9CVHpnqbhDker7opKiJZQ9l8IlcIV3DBZd9fVmO695k
+         UBVkj84+YiGIXVmn6FBm6LiUGl6hUP2bGG4ktY34b8Lfpn0CQM21eCtnbcwhTk0Vjwzt
+         cfx9yeirUV85V1soTEmA4UEzmmMufRWfe9Po95cOTk4kRtfKKMHX3yZRd2rS1a6DHPHW
+         +jnyVp94ozXBjyaGwxYEhKxvHPD/r+SI30nVwqnT+i1kZOcqKISumQVi+zIY6dgq8QJS
+         BMTQ==
+X-Gm-Message-State: AJcUukeJRKjtMkFgpEgOl/U2Djl2dYD9MLB8bEC1wQh9R9tS7jOG7MiY
+        WFDAf/Bv5jhD0YEmLT//9ejoFZNt0IVdXVcdbrYJhyR4cHOXAQ==
+X-Google-Smtp-Source: ALg8bN7TDNXVhJA+kO04xQM4u87mkD865LHZUpV6Oj8lD+4KxzxdBgwAfFN6+y5Zvd5M60ucqXWf8lVapQ0UYimow2M=
+X-Received: by 2002:a17:902:925:: with SMTP id 34mr60849569plm.14.1546902800088;
+ Mon, 07 Jan 2019 15:13:20 -0800 (PST)
 MIME-Version: 1.0
-References: <CAEQQxWzdBy9JOC7+oQTBJ35Gov1CDk17fy+XH=jha8MuT9fy9Q@mail.gmail.com>
- <49999069-238D-4FBE-8F38-3762788A67C1@holtmann.org> <CAEQQxWxAvZBX8simb7gNu6ob_0gGXzTEQuOybiP5MTV8dq5sEg@mail.gmail.com>
-In-Reply-To: <CAEQQxWxAvZBX8simb7gNu6ob_0gGXzTEQuOybiP5MTV8dq5sEg@mail.gmail.com>
-From:   Andrey Batyiev <batyiev@gmail.com>
-Date:   Tue, 8 Jan 2019 00:37:57 +0200
-Message-ID: <CAEQQxWxpi7FR=RDT1cLMDBUUGzHSfSrgngHL7dCK5V1eJOOu3Q@mail.gmail.com>
-Subject: Re: Bluetooth ECDH selftest failed (endianness issue?)
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
+From:   Eric Cooper <coopereric@google.com>
+Date:   Mon, 7 Jan 2019 15:13:09 -0800
+Message-ID: <CAGp4ueerLhg2Ek=NhEGP6MS8_x48G2gF4EA3m7MWGq=jg44UfQ@mail.gmail.com>
+Subject: Is exchange mtu request supported when bluez is central?
+To:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Marcel,
+Hello, I am running bluez as a central and the peripheral sends an
+Exchange MTU Request:
+  ACL Data RX: Handle 0 flags 0x02 dlen 7
+      ATT: Exchange MTU Request (0x02) len 2
+        Client RX MTU: 247
 
-> On Sat, Dec 29, 2018 at 9:35 AM Marcel Holtmann <marcel@holtmann.org> wrote:
-> I think that our ECDH code was endian safe, but then it got changed at some point to use standard crypto and maybe something went wrong there. Can just provide the btmon -w trace.log for the SMP pairing so that I can have a look at the binary trace.
+And bluez responds with not supported:
+  ACL Data TX: Handle 0 flags 0x00 dlen 9
+      ATT: Error Response (0x01) len 4
+        Exchange MTU Request (0x02)
+        Handle: 0x0000
+        Error: Request Not Supported (0x06)
 
-I found out that if I change "swap_digits" method in
-"net/bluetooth/ecdh_helper.c" to
 
-static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
-{
-int i;
+Is there a configuration change or otherwise I can use to enable this?
 
-for (i = 0; i < ndigits; i++)
-        out[i] = in[ndigits - 1 - i];
-}
-
-then BLE pairing on big-endian become operational. I'm not sure what
-proper fix should be: is it a problem with crypto API usage or a
-problem with crypto itself?
-
-Thanks,
-   Andrey
+Thanks in advance and please let me know if there is more information
+I can provide,
+Eric
