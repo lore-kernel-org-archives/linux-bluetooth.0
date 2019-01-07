@@ -2,174 +2,169 @@ Return-Path: <SRS0=SaLm=PP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6D2C43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 13:31:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6344EC43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 14:47:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0307206B6
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 13:31:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F1982087F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 14:47:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="fGEUzvPW";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Qoq9E9hy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727066AbfAGNbF (ORCPT
+        id S1728156AbfAGOqx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Jan 2019 08:31:05 -0500
-Received: from mail-io1-f70.google.com ([209.85.166.70]:37737 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726963AbfAGNbF (ORCPT
+        Mon, 7 Jan 2019 09:46:53 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:41982 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727242AbfAGOqw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Jan 2019 08:31:05 -0500
-Received: by mail-io1-f70.google.com with SMTP id d63so272465iog.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jan 2019 05:31:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=vm6ItJyYSta4/ymiPfVMaGeSQpw+CMG54sFJCA/cdoQ=;
-        b=GINJuwmjY93WsSYIanPgC4bJdU2VztvNDpgIu7Usb8VZF9ndT2kq4/zSso26WVzIwR
-         rjKHp1ObHGmJaWcNlW0fXG93OCvzDrn775raEtgViX9FybDsIkWdguWL4oIaksYVbbS4
-         Cl56QDWf7Jv4oYvpQPbEEm7CskApeE3FbT9iRNRVOVYgq8gsz3wuzMq8qfZeQf283bBy
-         fLeQVGoGhh/NZngYxymfuZcRzGaSOVvoeQut/hsKX2jIRzkibN+SiOfmQFDXfa0EShB9
-         R9ySkLl1YRIoB8OiaZau/jb1woJbn7NAnWdJREtgEyvKjYD94ZtOJc9dlAyHzlr97LZT
-         JsuA==
-X-Gm-Message-State: AA+aEWZQqdbSzFUssimhmYbgGjXCvr/0VX+vFeD9kJXxhLI11XicCUl/
-        tEq2++W8dvXZs0lYRTqceU5Eg+VnmDZBDeBVEEIm1U9danIN
-X-Google-Smtp-Source: AFSGD/VPn3AAcFnwwWXbqm6aWR6GnmgjkASB+lH4ek0+JIfMy1agZe7gKVIxNLgWmVWb8whbbLCoYG2h6jvDNGCxCKvWzVII7vAQ
+        Mon, 7 Jan 2019 09:46:52 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 66C8160740; Mon,  7 Jan 2019 14:46:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1546872411;
+        bh=16fNLFKqqjRvHsFBLfso/8HBLbShOY3uqTRNcD3M5r4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=fGEUzvPW0C1/WV7X25wKTSvPtRbQ8MFkRGvXaCnYCDeTuhE3g8Qy01KHxo3SvwKWF
+         NB0UT/T5G6LOE8UxQoYJkQvuw/YQRZd6xgTDpAlxWOt7JTlcS3chdAkQTO/DEodNxF
+         1bvDlz12v0+sMRWJpXNF5dT1fDuwXsj0DFtQu+/I=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id A7E5760300;
+        Mon,  7 Jan 2019 14:46:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1546872410;
+        bh=16fNLFKqqjRvHsFBLfso/8HBLbShOY3uqTRNcD3M5r4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Qoq9E9hyzci3v19KCA35Ekut0DAOkALhtlE5dpTYaRCWmyAPe/JMCHQXhdJvw4p5J
+         G5+cW94BhwDcjkBZub3cspPoTljml1ph70m6YCfoYcG20vVbhNYyB7PnrP1tbMkmND
+         sMKIr0ZAfTcXnE0jgsa/Ll9TeaPUeQ/DHhLI1Yew=
 MIME-Version: 1.0
-X-Received: by 2002:a02:c55:: with SMTP id g82mr47932757jad.17.1546867863851;
- Mon, 07 Jan 2019 05:31:03 -0800 (PST)
-Date:   Mon, 07 Jan 2019 05:31:03 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008a1bce057ede3d13@google.com>
-Subject: KASAN: slab-out-of-bounds Read in bacpy
-From:   syzbot <syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 07 Jan 2019 20:16:49 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org
+Subject: Re: [RESEND, v2] Bluetooth: hci_qca: Add helper to set device address
+In-Reply-To: <20181228120719.20571-1-bgodavar@codeaurora.org>
+References: <20181228120719.20571-1-bgodavar@codeaurora.org>
+Message-ID: <b30b273b4e1554afe2a20febaeda1411@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi Marcel,
 
-syzbot found the following crash on:
-
-HEAD commit:    574823bfab82 Change mincore() to count "mapped" pages rath..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15145dab400000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d55557b516c45456
-dashboard link: https://syzkaller.appspot.com/bug?extid=660883c56e2fa65d4497
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1756666f400000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1397354b400000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-out-of-bounds in memcpy include/linux/string.h:352 [inline]
-BUG: KASAN: slab-out-of-bounds in bacpy+0x23/0x30  
-include/net/bluetooth/bluetooth.h:236
-Read of size 6 at addr ffff888094f0bc3b by task kworker/u5:0/1171
-
-CPU: 0 PID: 1171 Comm: kworker/u5:0 Not tainted 4.20.0+ #13
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: hci0 hci_rx_work
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x1db/0x2d0 lib/dump_stack.c:113
-  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
-  kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
-  check_memory_region_inline mm/kasan/generic.c:185 [inline]
-  check_memory_region+0x123/0x190 mm/kasan/generic.c:191
-  memcpy+0x24/0x50 mm/kasan/common.c:130
-  memcpy include/linux/string.h:352 [inline]
-  bacpy+0x23/0x30 include/net/bluetooth/bluetooth.h:236
-  hci_inquiry_result_with_rssi_evt net/bluetooth/hci_event.c:3986 [inline]
-  hci_event_packet+0x3afc/0xc22e net/bluetooth/hci_event.c:5863
-  hci_rx_work+0x578/0xcd0 net/bluetooth/hci_core.c:4412
-  process_one_work+0xd0c/0x1ce0 kernel/workqueue.c:2153
-  worker_thread+0x143/0x14a0 kernel/workqueue.c:2296
-  kthread+0x357/0x430 kernel/kthread.c:246
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
-
-Allocated by task 7831:
-  save_stack+0x45/0xd0 mm/kasan/common.c:73
-  set_track mm/kasan/common.c:85 [inline]
-  kasan_kmalloc mm/kasan/common.c:482 [inline]
-  kasan_kmalloc+0xcf/0xe0 mm/kasan/common.c:455
-  __do_kmalloc_node mm/slab.c:3671 [inline]
-  __kmalloc_node_track_caller+0x4e/0x70 mm/slab.c:3685
-  __kmalloc_reserve.isra.0+0x40/0xe0 net/core/skbuff.c:140
-  __alloc_skb+0x12d/0x730 net/core/skbuff.c:208
-  alloc_skb include/linux/skbuff.h:1011 [inline]
-  bt_skb_alloc include/net/bluetooth/bluetooth.h:339 [inline]
-  vhci_get_user drivers/bluetooth/hci_vhci.c:180 [inline]
-  vhci_write+0xc4/0x470 drivers/bluetooth/hci_vhci.c:299
-  call_write_iter include/linux/fs.h:1862 [inline]
-  new_sync_write fs/read_write.c:474 [inline]
-  __vfs_write+0x764/0xb40 fs/read_write.c:487
-  vfs_write+0x20c/0x580 fs/read_write.c:549
-  ksys_write+0x105/0x260 fs/read_write.c:598
-  __do_sys_write fs/read_write.c:610 [inline]
-  __se_sys_write fs/read_write.c:607 [inline]
-  __x64_sys_write+0x73/0xb0 fs/read_write.c:607
-  do_syscall_64+0x1a3/0x800 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 5970:
-  save_stack+0x45/0xd0 mm/kasan/common.c:73
-  set_track mm/kasan/common.c:85 [inline]
-  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:444
-  kasan_slab_free+0xe/0x10 mm/kasan/common.c:452
-  __cache_free mm/slab.c:3485 [inline]
-  kfree+0xcf/0x230 mm/slab.c:3804
-  load_elf_binary+0x25dd/0x5580 fs/binfmt_elf.c:1118
-  search_binary_handler fs/exec.c:1656 [inline]
-  search_binary_handler+0x17f/0x570 fs/exec.c:1634
-  exec_binprm fs/exec.c:1698 [inline]
-  __do_execve_file.isra.0+0x14f3/0x2700 fs/exec.c:1818
-  do_execveat_common fs/exec.c:1865 [inline]
-  do_execve fs/exec.c:1882 [inline]
-  __do_sys_execve fs/exec.c:1963 [inline]
-  __se_sys_execve fs/exec.c:1958 [inline]
-  __x64_sys_execve+0x8f/0xc0 fs/exec.c:1958
-  do_syscall_64+0x1a3/0x800 arch/x86/entry/common.c:290
-  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-The buggy address belongs to the object at ffff888094f0ba40
-  which belongs to the cache kmalloc-512 of size 512
-The buggy address is located 507 bytes inside of
-  512-byte region [ffff888094f0ba40, ffff888094f0bc40)
-The buggy address belongs to the page:
-page:ffffea000253c2c0 count:1 mapcount:0 mapping:ffff88812c3f0940 index:0x0
-flags: 0x1fffc0000000200(slab)
-raw: 01fffc0000000200 ffffea00025dbf08 ffffea000253ca88 ffff88812c3f0940
-raw: 0000000000000000 ffff888094f0b040 0000000100000006 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
-  ffff888094f0bb00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-  ffff888094f0bb80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-> ffff888094f0bc00: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
-                                            ^
-  ffff888094f0bc80: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
-  ffff888094f0bd00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+On 2018-12-28 17:37, Balakrishna Godavarthi wrote:
+> This patch add qca_set_bdaddr() to set the device
+> address for latest Qualcomm Bluetooth chipset wcn3990 and above.
+> 
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+> Tested-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+>  drivers/bluetooth/btqca.c   | 19 +++++++++++++++++++
+>  drivers/bluetooth/btqca.h   |  8 +++++++-
+>  drivers/bluetooth/hci_qca.c |  5 ++++-
+>  3 files changed, 30 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index ec9e03a6b778..612268574fc7 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -391,6 +391,25 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t 
+> baudrate,
+>  }
+>  EXPORT_SYMBOL_GPL(qca_uart_setup);
+> 
+> +int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> +{
+> +	struct sk_buff *skb;
+> +	int err;
+> +
+> +	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6, bdaddr,
+> +				HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		err = PTR_ERR(skb);
+> +		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
+> +		return err;
+> +	}
+> +
+> +	kfree_skb(skb);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(qca_set_bdaddr);
+> +
+>  MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
+>  MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver
+> " VERSION);
+>  MODULE_VERSION(VERSION);
+> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+> index 0c01f375fe83..c72c56ea7480 100644
+> --- a/drivers/bluetooth/btqca.h
+> +++ b/drivers/bluetooth/btqca.h
+> @@ -20,6 +20,7 @@
+> 
+>  #define EDL_PATCH_CMD_OPCODE		(0xFC00)
+>  #define EDL_NVM_ACCESS_OPCODE		(0xFC0B)
+> +#define EDL_WRITE_BD_ADDR_OPCODE	(0xFC14)
+>  #define EDL_PATCH_CMD_LEN		(1)
+>  #define EDL_PATCH_VER_REQ_CMD		(0x19)
+>  #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+> @@ -140,7 +141,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev,
+> const bdaddr_t *bdaddr);
+>  int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>  		   enum qca_btsoc_type soc_type, u32 soc_ver);
+>  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+> -
+> +int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+>  #else
+> 
+>  static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const
+> bdaddr_t *bdaddr)
+> @@ -159,4 +160,9 @@ static inline int qca_read_soc_version(struct
+> hci_dev *hdev, u32 *soc_version)
+>  	return -EOPNOTSUPP;
+>  }
+> 
+> +static inline int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t 
+> *bdaddr)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>  #endif
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index f036c8f98ea3..53ac5ade532b 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -1241,7 +1241,10 @@ static int qca_setup(struct hci_uart *hu)
+>  	}
+> 
+>  	/* Setup bdaddr */
+> -	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+> +	if (qcadev->btsoc_type == QCA_WCN3990)
+> +		hu->hdev->set_bdaddr = qca_set_bdaddr;
+> +	else
+> +		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+> 
+>  	return ret;
+>  }
 
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Can you pls review this change.
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
-syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+-- 
+Regards
+Balakrishna.
