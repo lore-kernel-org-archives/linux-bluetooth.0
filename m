@@ -1,144 +1,175 @@
-Return-Path: <SRS0=et4D=PM=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=SaLm=PP=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.7 required=3.0 tests=FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8244C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 19:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB6D2C43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 13:31:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 76575218DE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jan 2019 19:57:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kemnade.info header.i=@kemnade.info header.b="ZCF+pIvT"
+	by mail.kernel.org (Postfix) with ESMTP id A0307206B6
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jan 2019 13:31:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726102AbfADT5X (ORCPT
+        id S1727066AbfAGNbF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Jan 2019 14:57:23 -0500
-Received: from mail.andi.de1.cc ([85.214.239.24]:50324 "EHLO
-        h2641619.stratoserver.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725930AbfADT5W (ORCPT
+        Mon, 7 Jan 2019 08:31:05 -0500
+Received: from mail-io1-f70.google.com ([209.85.166.70]:37737 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726963AbfAGNbF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Jan 2019 14:57:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=kemnade.info; s=20180802; h=Content-Type:MIME-Version:References:
-        In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=iA6N/AtSYaHhvS+C0cYvEnbPRyBjDBCnf7Dl1B5pYkk=; b=ZCF+pIvTcNvk5rC7jMjovU+k+
-        q8a3b3YjTA1XP9opptKJ/1sk/XaSh4RzAMB0lY7JdZjjkmJNZY40Md4ceSZ/A9aYG9lnq4vN56KFt
-        id6WR79Zd/fKSaCwRIZoFZcVpYfbChTHG+kaD7DTtMZjm6OLlto8wZE8btg5RebzaIO/E=;
-Received: from pd9e2f2c8.dip0.t-ipconnect.de ([217.226.242.200] helo=aktux)
-        by h2641619.stratoserver.net with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <andreas@kemnade.info>)
-        id 1gfVan-00050j-Es; Fri, 04 Jan 2019 20:57:17 +0100
-Date:   Fri, 4 Jan 2019 20:57:10 +0100
-From:   Andreas Kemnade <andreas@kemnade.info>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Rob Herring <robh@kernel.org>,
-        Sebastian Reichel <sebastian.reichel@collabora.com>,
-        "H . Nikolaus Schaller" <hns@goldelico.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, letux-kernel@openphoenux.org
-Subject: Re: [Letux-kernel] [PATCH RFC] bluetooth: add uart h4 devices via
- serdev/devicetree
-Message-ID: <20190104205600.3e6b31c9@aktux>
-In-Reply-To: <B5CEA49A-0F54-40C5-BCEA-7875BE1358E3@holtmann.org>
-References: <20181110232034.17277-1-andreas@kemnade.info>
-        <20181111024648.7rt7rlhaqihtqecv@earth.universe>
-        <20181112215812.18ebca35@aktux>
-        <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com>
-        <20181112222726.73m2oca7hankvcjs@earth.universe>
-        <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com>
-        <20181113170128.0f59ef0e@kemnade.info>
-        <86A3A2E6-FC89-42FE-8410-9C8273EC9CF7@holtmann.org>
-        <20181116204601.4e1aa0de@kemnade.info>
-        <09AFE47C-D188-4397-A2CD-C70FFAC3B677@holtmann.org>
-        <20190104064403.325771fd@kemnade.info>
-        <B5CEA49A-0F54-40C5-BCEA-7875BE1358E3@holtmann.org>
-X-Mailer: Claws Mail 3.14.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+        Mon, 7 Jan 2019 08:31:05 -0500
+Received: by mail-io1-f70.google.com with SMTP id d63so272465iog.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jan 2019 05:31:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=vm6ItJyYSta4/ymiPfVMaGeSQpw+CMG54sFJCA/cdoQ=;
+        b=GINJuwmjY93WsSYIanPgC4bJdU2VztvNDpgIu7Usb8VZF9ndT2kq4/zSso26WVzIwR
+         rjKHp1ObHGmJaWcNlW0fXG93OCvzDrn775raEtgViX9FybDsIkWdguWL4oIaksYVbbS4
+         Cl56QDWf7Jv4oYvpQPbEEm7CskApeE3FbT9iRNRVOVYgq8gsz3wuzMq8qfZeQf283bBy
+         fLeQVGoGhh/NZngYxymfuZcRzGaSOVvoeQut/hsKX2jIRzkibN+SiOfmQFDXfa0EShB9
+         R9ySkLl1YRIoB8OiaZau/jb1woJbn7NAnWdJREtgEyvKjYD94ZtOJc9dlAyHzlr97LZT
+         JsuA==
+X-Gm-Message-State: AA+aEWZQqdbSzFUssimhmYbgGjXCvr/0VX+vFeD9kJXxhLI11XicCUl/
+        tEq2++W8dvXZs0lYRTqceU5Eg+VnmDZBDeBVEEIm1U9danIN
+X-Google-Smtp-Source: AFSGD/VPn3AAcFnwwWXbqm6aWR6GnmgjkASB+lH4ek0+JIfMy1agZe7gKVIxNLgWmVWb8whbbLCoYG2h6jvDNGCxCKvWzVII7vAQ
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/k.3xD97g07g2Scmu0iHJy5M"; protocol="application/pgp-signature"
+X-Received: by 2002:a02:c55:: with SMTP id g82mr47932757jad.17.1546867863851;
+ Mon, 07 Jan 2019 05:31:03 -0800 (PST)
+Date:   Mon, 07 Jan 2019 05:31:03 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008a1bce057ede3d13@google.com>
+Subject: KASAN: slab-out-of-bounds Read in bacpy
+From:   syzbot <syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---Sig_/k.3xD97g07g2Scmu0iHJy5M
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hello,
 
-Hi Marcel,
+syzbot found the following crash on:
 
-On Fri, 4 Jan 2019 10:07:34 +0100
-Marcel Holtmann <marcel@holtmann.org> wrote:
+HEAD commit:    574823bfab82 Change mincore() to count "mapped" pages rath..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15145dab400000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d55557b516c45456
+dashboard link: https://syzkaller.appspot.com/bug?extid=660883c56e2fa65d4497
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1756666f400000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1397354b400000
 
-> Hi Andreas,
->=20
-> >>>> Btw. I see nothing standing in the way of merging btuart.c driver an=
-d then go from there. Either I dig this out and submit or someone else does.
-> >>>>  =20
-> >>> Do you mean this?
-> >>> https://patchwork.kernel.org/patch/10490651/   =20
-> >>=20
-> >> yes, that one.
-> >>  =20
-> > Hmm, there seemed to be nothing in the pull requests regarding btuart.
-> > Did you change plans? =20
->=20
-> because I only submitted it as RFC. We can easily merge that one upstream=
- since it is rather trivial. The main problem is how you want to do the dev=
-ice matching. Do you have a DT entry for your really simple devices?
->=20
-Hmm, in that link it is non-rfc. So someone picked you rfc patch up and
-submitted it?
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+660883c56e2fa65d4497@syzkaller.appspotmail.com
 
-You might see what we are already doing here:
-http://git.goldelico.com/?p=3Dletux-kernel.git;a=3Dblobdiff;f=3Darch/arm/bo=
-ot/dts/omap3-gta04.dtsi;h=3D4d2bac4293938de4a15a59979616909cf8842524;hp=3Db=
-fced960d63ec40cf9db4901374b331737a9a168;hb=3Df78bf51754e35010de40518b9a8a14=
-8d0269bbc8;hpb=3Db6805813a9ab5b0d66b44cc54a0059eca4dd0a98
+==================================================================
+BUG: KASAN: slab-out-of-bounds in memcpy include/linux/string.h:352 [inline]
+BUG: KASAN: slab-out-of-bounds in bacpy+0x23/0x30  
+include/net/bluetooth/bluetooth.h:236
+Read of size 6 at addr ffff888094f0bc3b by task kworker/u5:0/1171
 
-We are using compatible=C2=A0=3D=C2=A0"wi2wi,w2cbw003-bluetooth"
+CPU: 0 PID: 1171 Comm: kworker/u5:0 Not tainted 4.20.0+ #13
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: hci0 hci_rx_work
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x1db/0x2d0 lib/dump_stack.c:113
+  print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
+  kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
+  check_memory_region_inline mm/kasan/generic.c:185 [inline]
+  check_memory_region+0x123/0x190 mm/kasan/generic.c:191
+  memcpy+0x24/0x50 mm/kasan/common.c:130
+  memcpy include/linux/string.h:352 [inline]
+  bacpy+0x23/0x30 include/net/bluetooth/bluetooth.h:236
+  hci_inquiry_result_with_rssi_evt net/bluetooth/hci_event.c:3986 [inline]
+  hci_event_packet+0x3afc/0xc22e net/bluetooth/hci_event.c:5863
+  hci_rx_work+0x578/0xcd0 net/bluetooth/hci_core.c:4412
+  process_one_work+0xd0c/0x1ce0 kernel/workqueue.c:2153
+  worker_thread+0x143/0x14a0 kernel/workqueue.c:2296
+  kthread+0x357/0x430 kernel/kthread.c:246
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
 
-But I think we should also add a generic device string like
-bluetooth,h4
-So if people dig out older hardware, they can just add that to their
-device trees and have bluetooth
+Allocated by task 7831:
+  save_stack+0x45/0xd0 mm/kasan/common.c:73
+  set_track mm/kasan/common.c:85 [inline]
+  kasan_kmalloc mm/kasan/common.c:482 [inline]
+  kasan_kmalloc+0xcf/0xe0 mm/kasan/common.c:455
+  __do_kmalloc_node mm/slab.c:3671 [inline]
+  __kmalloc_node_track_caller+0x4e/0x70 mm/slab.c:3685
+  __kmalloc_reserve.isra.0+0x40/0xe0 net/core/skbuff.c:140
+  __alloc_skb+0x12d/0x730 net/core/skbuff.c:208
+  alloc_skb include/linux/skbuff.h:1011 [inline]
+  bt_skb_alloc include/net/bluetooth/bluetooth.h:339 [inline]
+  vhci_get_user drivers/bluetooth/hci_vhci.c:180 [inline]
+  vhci_write+0xc4/0x470 drivers/bluetooth/hci_vhci.c:299
+  call_write_iter include/linux/fs.h:1862 [inline]
+  new_sync_write fs/read_write.c:474 [inline]
+  __vfs_write+0x764/0xb40 fs/read_write.c:487
+  vfs_write+0x20c/0x580 fs/read_write.c:549
+  ksys_write+0x105/0x260 fs/read_write.c:598
+  __do_sys_write fs/read_write.c:610 [inline]
+  __se_sys_write fs/read_write.c:607 [inline]
+  __x64_sys_write+0x73/0xb0 fs/read_write.c:607
+  do_syscall_64+0x1a3/0x800 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-The full patchset we are currently using is here:
-http://git.goldelico.com/?p=3Dletux-kernel.git;a=3Dshortlog;h=3Drefs/heads/=
-letux/bluetooth-h4-serdev
+Freed by task 5970:
+  save_stack+0x45/0xd0 mm/kasan/common.c:73
+  set_track mm/kasan/common.c:85 [inline]
+  __kasan_slab_free+0x102/0x150 mm/kasan/common.c:444
+  kasan_slab_free+0xe/0x10 mm/kasan/common.c:452
+  __cache_free mm/slab.c:3485 [inline]
+  kfree+0xcf/0x230 mm/slab.c:3804
+  load_elf_binary+0x25dd/0x5580 fs/binfmt_elf.c:1118
+  search_binary_handler fs/exec.c:1656 [inline]
+  search_binary_handler+0x17f/0x570 fs/exec.c:1634
+  exec_binprm fs/exec.c:1698 [inline]
+  __do_execve_file.isra.0+0x14f3/0x2700 fs/exec.c:1818
+  do_execveat_common fs/exec.c:1865 [inline]
+  do_execve fs/exec.c:1882 [inline]
+  __do_sys_execve fs/exec.c:1963 [inline]
+  __se_sys_execve fs/exec.c:1958 [inline]
+  __x64_sys_execve+0x8f/0xc0 fs/exec.c:1958
+  do_syscall_64+0x1a3/0x800 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-Regards,
-Andreas
+The buggy address belongs to the object at ffff888094f0ba40
+  which belongs to the cache kmalloc-512 of size 512
+The buggy address is located 507 bytes inside of
+  512-byte region [ffff888094f0ba40, ffff888094f0bc40)
+The buggy address belongs to the page:
+page:ffffea000253c2c0 count:1 mapcount:0 mapping:ffff88812c3f0940 index:0x0
+flags: 0x1fffc0000000200(slab)
+raw: 01fffc0000000200 ffffea00025dbf08 ffffea000253ca88 ffff88812c3f0940
+raw: 0000000000000000 ffff888094f0b040 0000000100000006 0000000000000000
+page dumped because: kasan: bad access detected
 
---Sig_/k.3xD97g07g2Scmu0iHJy5M
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Memory state around the buggy address:
+  ffff888094f0bb00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  ffff888094f0bb80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+> ffff888094f0bc00: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
+                                            ^
+  ffff888094f0bc80: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
+  ffff888094f0bd00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
------BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEE7sDbhY5mwNpwYgrAfb1qx03ikyQFAlwvupYACgkQfb1qx03i
-kyQCMA//UcuhECwYbxbjrGLdMxqjvgo452MgX/hSy9bN/NTFmq2g09u1g5nv5MkV
-b76cfWGRkMw+Zn6Sui2dE7gJUgHNHpyrt7IfmLiHYGHGOnG3S9q89lStD7+XQyrR
-ox8sE4N/vpIfc2OFwu3QLDeTH33ZxsA1ICpDsnuCiikl7gAkRGh5FzFaOvAKprCC
-htWcq2BvpMp8HkoFcWAUi/ucjswO2qk7s66zVJW7ssfw4yhnrRJDrlLUnv1EF+K0
-J8/MT/TydjHRklISPA5gXG1HhMZa3m+gyMt9Kx85W7aLnbY/bEp44gtR+IKteKNO
-FnOR23XwwBK+/nG+GJ7R55R0Gg5vbR0JpF/caglux2gpEQM2tS4HM8kaW0Hvhuwd
-O8FBOQiVg1z0bNwd111H6/R2j0+REE1gYW80iLJjHVKqRzMYF5J7ayO/OT0sKYKD
-LVBlUcDsDTumjuwcyFWbJ/Zk6Z8F3u9RMOv+1GCL3JNJKthYDj3JN6MAMcEINA0n
-Y1JuGj++4jK1R5z2H0dd1a3TTuy/lVGoySxrVU6U5CgobwRuMxhN3YBdWHDMC9qo
-t9/RnAkI/xj8ScNeAsZEYJe9ZDwWgWZ3lygols7QvqApSMtQjB8h6Ci/yD5Vbzss
-KXKyrPayXyPO2HRrsFxBoLX/CRAscvGlwvKeN2uyNUWCG/Tt4Uo=
-=N5bk
------END PGP SIGNATURE-----
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
---Sig_/k.3xD97g07g2Scmu0iHJy5M--
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
