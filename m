@@ -2,126 +2,106 @@ Return-Path: <SRS0=sr2f=PQ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C5BCC43612
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jan 2019 16:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 066ADC43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jan 2019 18:42:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCED020883
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jan 2019 16:56:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BlCE4f6x"
+	by mail.kernel.org (Postfix) with ESMTP id D5A462070B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jan 2019 18:42:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728944AbfAHQ4R (ORCPT
+        id S1729344AbfAHSmh convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jan 2019 11:56:17 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35258 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728788AbfAHQ4Q (ORCPT
+        Tue, 8 Jan 2019 13:42:37 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:52870 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727484AbfAHSmg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jan 2019 11:56:16 -0500
-Received: by mail-wm1-f66.google.com with SMTP id t200so5183081wmt.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jan 2019 08:56:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=a+bAqw0B2EGsv0BQQ1xbxpfNNqA4lKqTb3ZfNdzj4wQ=;
-        b=BlCE4f6xZuGXPQ8iTIxm/yuWI3GZVxo4r5eUWgiKTkJhv3KKMmsz8KIUpncLAqdmiI
-         NNz6h2PbWFeflSGFhn++AFm5f+e4kCguYjRyZEkvtMcfodqx70h6smB6RZ85lUEzuxZw
-         6DOZ+gkxjnALV3SXFtBDDUbNVkvuJFd7Ul6xfkksf4Qlb1O4otTSDmozQ2WJWUOa7L48
-         aOAAT8Fgz8el00cT4iguXKMbWIRWAfjAQH/D7whDvo+MMKhMPKbFZrKeeFa+kHJyLRvg
-         4iDy58I0ZqRw6wfwUpszeGm3GLW7SvnLMDmT8hrf8hZFz60ooTIzfSd5QNIVvzQHOKVd
-         gIcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=a+bAqw0B2EGsv0BQQ1xbxpfNNqA4lKqTb3ZfNdzj4wQ=;
-        b=oFAjnLIEiGpd6bQplK4tnAAbestJzmgioy06ZJma+Vqn4OIZSq1UT/ilf19lEfRMEq
-         WYithq/APDq45alPivG1aXZAUT/PLs+7EYzsxFm93AGnJldzgcY04EbrSRgGXYiRkZLr
-         V/0pfO+EZKDCqEfglDfNMfSEzIBGUR81mumiEmbIeDJu3I2+v/q9EmG+EBzHsCeKnfXD
-         3RnXxTGi9Bdu6BaQAj53xPSYdpOb1kmOF1LR7RU1h+uBhVnA5d6tXjURo7w7FKDDqwjo
-         b0ONdXZvzk1JUbzTgERYAQhlYMtjJhmdX+gtMpYb3maLu1Vuscu1HD/cTdWLHxxJvHUL
-         RCBw==
-X-Gm-Message-State: AJcUukd28089YM0wT1KJ7vBLx3zBBtfBEcqKYUyDSU6QPdiZMbIK5tKW
-        F8K7+Lb6AuyXLM0C4oQ+80w=
-X-Google-Smtp-Source: ALg8bN5IgopfUVcSEuFe3OvZU2YZRVn1ap9Nlfrh6VvZGYDdZbhOcS9FAQukjZz6q7OJjgblsvFzbQ==
-X-Received: by 2002:a1c:90cb:: with SMTP id s194mr2297364wmd.57.1546966574653;
-        Tue, 08 Jan 2019 08:56:14 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id p139sm20266428wmd.31.2019.01.08.08.56.13
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 08 Jan 2019 08:56:13 -0800 (PST)
-Date:   Tue, 8 Jan 2019 17:56:12 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluez: dbus method call for switching endpoint
-Message-ID: <20190108165612.5krhgtmce336xjx3@pali>
-References: <20180711082352.oo6srapfnol5nkxq@pali>
- <CABBYNZJuGT5_zhg-BkAc4XjtVu5His92cHTujrin=SMOVbaodQ@mail.gmail.com>
- <20180711144501.ovdxc2expa4bg6sc@pali>
- <20181215202910.j24amjshrvjqprll@pali>
- <CABBYNZLK4tyL8nvWbXxr6VctyEyJkMdwNiWMy4gUge9h9Vb4SQ@mail.gmail.com>
- <20181228191102.GA31975@reaktio.net>
- <CABBYNZ+bwbSkH4qtkuzhE=JY6KAGwJ_E4ABGT_LE6E277eTNDQ@mail.gmail.com>
- <20181229130818.jdcpwlpyoyhdqlf3@pali>
- <CABBYNZK4+K5vRF0JCHFcUjbfzWanp_ju6XfQQJWBtiLqKi=e7Q@mail.gmail.com>
+        Tue, 8 Jan 2019 13:42:36 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id D224828DA2
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jan 2019 18:42:35 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id C649F28DD5; Tue,  8 Jan 2019 18:42:35 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 199035] BCM2046B1 and hid2hci generates highcpu usage due to
+ udev since 4.14 kernel
+Date:   Tue, 08 Jan 2019 18:42:34 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: jgwphd@yahoo.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-199035-62941-xKgTsiTXNT@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-199035-62941@https.bugzilla.kernel.org/>
+References: <bug-199035-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="66g63gj2jo2avyud"
-Content-Disposition: inline
-In-Reply-To: <CABBYNZK4+K5vRF0JCHFcUjbfzWanp_ju6XfQQJWBtiLqKi=e7Q@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=199035
 
---66g63gj2jo2avyud
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+John (jgwphd@yahoo.com) changed:
 
-On Tuesday 08 January 2019 13:44:24 Luiz Augusto von Dentz wrote:
-> > > Regarding the API I still didn't have time to start it, so it will
-> > > take a little longer than I antecipated.
->=20
-> Ive just sent the patches adding support to switch the endpoints, Ive
-> only tested with a couple of sony headsets so I would appreciate if
-> you guys could try it as well. Note that the SetConfiguration must
-> come from the same D-Bus connection as the endpoint that would be
-> used, also if there is already an stream in place it must also be from
-> the same client since it would be terminated in the process, this is
-> to prevent entities fighting to configure with its own priority though
-> usually we only PA endpoints, if you want to bypass this just for now
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jgwphd@yahoo.com
 
-Great! Once patches would be ready I would look at my last A2DP
-pulseaudio patches [1] and would try to implement switching, including
-support for bi-directional FastStream codec -- which can benefit from
-it.
+--- Comment #11 from John (jgwphd@yahoo.com) ---
+When I boot up every day without exception, my machine starts up with one of
+the CPU cores running at 100%. I see lots of posts on other forums (Unbuntu 
+etc) going back over a year or more blaming touchpads or nvidia or WiFi. Some
+even say they can't use their thumb drive if it isn't plugged in when they
+boot. The problem also mimics a defective thumb drive where you plug it in and
+Ubuntu doesn't see it (because systemd-udevd doesn't have the cycles to process
+the newly plugged in USB device). Losing one core makes my machine slower but
+not too noticeably so. I do see much longer boot times and sometime it will
+hang entirely during boot. I assume a single core or dual core machine will be
+drastically slowed down or even unusable. When I search I find other non-ubuntu
+os's complaining about similar problems.
 
-[1] - https://lists.freedesktop.org/archives/pulseaudio-discuss/2018-July/0=
-30344.html
+I have 18.10 running on my Dell studio XPS with an AMD® Phenom(tm) ii x4 945
+processor × 4 and AMD® Juniper graphics. It's a quad-core 64 bit machine. I
+have wireless mouse and keyboard for Logitech. I have a pretty vanilla set-up.
+I DO NOT have a touchpad or nvidia or WiFi!
 
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
+I can verify that the problem can be managed by stopping and starting
+systemd-udevd. I used the following commands, suggested in this bug report, in
+sequence in the terminal which corrects the problem until I boot again. 
 
---66g63gj2jo2avyud
-Content-Type: application/pgp-signature; name="signature.asc"
+sudo systemctl stop systemd-udevd systemd-udevd-kernel.socket
+systemd-udevd-control.socket
 
------BEGIN PGP SIGNATURE-----
+sudo systemctl start systemd-udevd systemd-udevd-kernel.socket
+systemd-udevd-control.socket
 
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXDTWKgAKCRCL8Mk9A+RD
-UlE2AKCkdAxU0ReRC4EnH9F6a3ZTYp2D3gCeJWVBjIIuKjZYF1xrBq2fuE3ffI0=
-=HXqO
------END PGP SIGNATURE-----
+Also the problem will "sometimes" re-appear by plugging in a thumb drive! 
 
---66g63gj2jo2avyud--
+This is a serious kernel problem and can manifest its presence in a number of
+ways depending on your hardware configuration. 
+
+This is a very very very annoying problem will someone PLEASE fix it soon!
+...did I mention that this is a serious problem impacting many people!
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
