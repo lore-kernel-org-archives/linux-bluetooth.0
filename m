@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DC1C43387
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jan 2019 19:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B113EC43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jan 2019 20:01:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 01C22206BB
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jan 2019 19:49:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81DFE20660
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jan 2019 20:01:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1546976988;
-	bh=d3ERtPeQBuYf05umVBU/ZzTe4eKjbdLsdfPJgnKuOEk=;
+	s=default; t=1546977698;
+	bh=six3iyUY145Sh6nLkNfMcPSzAnUFATLQInMCjSFuxH8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ZUkcvL+BSzRAALwJ8HevyO/BhrYMnhsVe9PRsl06CA0HgmqEHBudDHErUm1EbbtB7
-	 kqJF6k3HCyF/bvH//YFOYYhCKSvACCKy2rd9gOF2/rdPzui0Ke5yZ3hoZVA/34GzU0
-	 PZlFg8xgmHBbmaEJcsw4ezS8ALsixn8DTPAssUvY=
+	b=WVsciImdBF7e6IhosoaPCjDWOdoY8w9pHa122A2DBbjj6RAjKwXX44OftDZCkDilb
+	 X7zV7Mgiif07ia4PWhS0PV+UqpMkpHDznJC36PBDvW92x30Cws5hgcHf7HDCcx/yl8
+	 KyiCkx8vyMZLhXxDhShpFjemeS79tWY5H2awFagU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731448AbfAHTtm (ORCPT
+        id S1730375AbfAHUBc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jan 2019 14:49:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40296 "EHLO mail.kernel.org"
+        Tue, 8 Jan 2019 15:01:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36590 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731240AbfAHTb7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jan 2019 14:31:59 -0500
+        id S1730343AbfAHT3Q (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 8 Jan 2019 14:29:16 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ADF8B217D9;
-        Tue,  8 Jan 2019 19:31:57 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8665D2070B;
+        Tue,  8 Jan 2019 19:29:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1546975918;
-        bh=d3ERtPeQBuYf05umVBU/ZzTe4eKjbdLsdfPJgnKuOEk=;
+        s=default; t=1546975755;
+        bh=six3iyUY145Sh6nLkNfMcPSzAnUFATLQInMCjSFuxH8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ww3VAx/70WeeuMLJ6rePWCxO6HIXWOpTtZwLg8X/VAyYeV5d90MAcWK0kAB43jZ/o
-         5Bv91dq78bQXWuw+BHWewE8VH+tY8uFvl/ttjH/1qgO7us1V9czumBUWH+rigNkgLd
-         JvLF6ayzQSwNc7571zb2toH8clNucxFnDbbT+oKg=
+        b=TGtJasnUb02eXrMHujYTlj98V7+6pE2LZXux3LhaJ8tKKO2F2hsrUzt+19DJ/BtCb
+         gHPf35q4N/dqAsIxfRv5UySZsbaUR4JpgkAYnA4s2CloOQHMIC6LQ8uNUWNgNgHsE7
+         SEYXbdREEN8MKA6/BJB1vKEG6531DOWUIwxLOMFE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Raghuram Hegde <raghuram.hegde@intel.com>,
@@ -46,12 +46,12 @@ Cc:     Raghuram Hegde <raghuram.hegde@intel.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 83/97] Bluetooth: btusb: Add support for Intel bluetooth device 8087:0029
-Date:   Tue,  8 Jan 2019 14:29:32 -0500
-Message-Id: <20190108192949.122407-83-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 099/117] Bluetooth: btusb: Add support for Intel bluetooth device 8087:0029
+Date:   Tue,  8 Jan 2019 14:26:07 -0500
+Message-Id: <20190108192628.121270-99-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190108192949.122407-1-sashal@kernel.org>
-References: <20190108192949.122407-1-sashal@kernel.org>
+In-Reply-To: <20190108192628.121270-1-sashal@kernel.org>
+References: <20190108192628.121270-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -108,10 +108,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 37 insertions(+), 35 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index cd2e5cf14ea5..77b67a5f21ee 100644
+index 7439a7eb50ac..05c8a7ed859c 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -343,6 +343,7 @@ static const struct usb_device_id blacklist_table[] = {
+@@ -344,6 +344,7 @@ static const struct usb_device_id blacklist_table[] = {
  	/* Intel Bluetooth devices */
  	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_NEW },
  	{ USB_DEVICE(0x8087, 0x0026), .driver_info = BTUSB_INTEL_NEW },
@@ -119,7 +119,7 @@ index cd2e5cf14ea5..77b67a5f21ee 100644
  	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
  	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
  	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
-@@ -2054,6 +2055,35 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -2055,6 +2056,35 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
  	return -EILSEQ;
  }
  
@@ -155,7 +155,7 @@ index cd2e5cf14ea5..77b67a5f21ee 100644
  static int btusb_setup_intel_new(struct hci_dev *hdev)
  {
  	struct btusb_data *data = hci_get_drvdata(hdev);
-@@ -2105,7 +2135,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+@@ -2106,7 +2136,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
  	case 0x11:	/* JfP */
  	case 0x12:	/* ThP */
  	case 0x13:	/* HrP */
@@ -164,7 +164,7 @@ index cd2e5cf14ea5..77b67a5f21ee 100644
  		break;
  	default:
  		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-@@ -2189,23 +2219,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+@@ -2190,23 +2220,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
  	 * ibt-<hw_variant>-<hw_revision>-<fw_revision>.sfi.
  	 *
  	 */
@@ -191,7 +191,7 @@ index cd2e5cf14ea5..77b67a5f21ee 100644
  		bt_dev_err(hdev, "Unsupported Intel firmware naming");
  		return -EINVAL;
  	}
-@@ -2221,23 +2237,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+@@ -2222,23 +2238,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
  	/* Save the DDC file name for later use to apply once the firmware
  	 * downloading is done.
  	 */
