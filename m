@@ -2,158 +2,145 @@ Return-Path: <SRS0=eb2H=PR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C95C6C43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 18:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28515C43444
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 18:17:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8CD2B20859
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 18:14:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E/FKrCll"
+	by mail.kernel.org (Postfix) with ESMTP id EA2ED20859
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 18:17:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1547057876;
+	bh=313J75pRSdWBx+s0b8l0AI9icPNGOqqYuBfcA0aYkkE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=XSOQ7dlHuSvzMr9KbIOPfiTbu8OAT95Tz4dOOf12OnQ4+sFAGf2Xe1j770nLoJbxr
+	 XhkJ+FnaedHYm2r+RlHLdy3Zl3wHzSfH7jpX+oGhy7ypMZKWSFmkFwCBWPcDqFRn8X
+	 IFxeEGelYTg/o5vDQALDtnMiP28dw1RK6o58v+r4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727481AbfAISOk (ORCPT
+        id S1726657AbfAISRz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Jan 2019 13:14:40 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:36379 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727478AbfAISOk (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Jan 2019 13:14:40 -0500
-Received: by mail-wm1-f67.google.com with SMTP id p6so9309080wmc.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Jan 2019 10:14:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=SlP3VweZ6FHsDUICqkIz5Ya3bOmfUACHavuvi+4r0mM=;
-        b=E/FKrCllkLUMH0FnreM3axQkWWcrEte+E4nXrv+PDC6vl98HX6YqNoI9KN/drVUNCx
-         uyQB95xVaSlV2ATYAnZj2Tim7LvsI0qhkZBTtaUIJByvxycEl5rxdjE3CnCF7eljq83n
-         xwAmkduaLf80dyynIRBKrNNf5+snvLvCd5Jih0SfZk6ikzrP/MTrEGz3yBea9C3VenFu
-         sWe6W4yLT8kc/PPGjf94EFJJQ5v38fZ+TQ7e7pLgbp9uXOObkQJWt/aSDbTaujsARFYv
-         WqPhdb7pa0HmraYg7f9mWDrQJD5b9d2RTuOr8cEovntCOuV0kihuCy1iXM5jtX7jL9Th
-         izag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=SlP3VweZ6FHsDUICqkIz5Ya3bOmfUACHavuvi+4r0mM=;
-        b=BS8xU4JxwLcMPQuuDQrANtKjvvFriBsVphDVVQw2tAhpoqLprcM0FuR3Q+VAQIGXN8
-         u0bf1ZToRKMZmT6GeZT5fRiJucwF4ymT/iBWhJ8CPhk1HfUrtYIpqNqHS0egkZL2AZBo
-         +cigvnRgYPZ3kReG6KVohHcr4D8/6WUTxEONFzF16LK3mVeV2avrr0oS2Z6QYHdXkHp/
-         1+4o1VXYt2x8KGI8Ae95xMKMH2RB2Uk6qebPHqyRFAJJOgg4B4c4xP5vl7MvseT4SH00
-         goMB1/2naX4bzPnXvMqVO5tAdvhzeE/ZVuFBBYx0Ll5XwwjsqFe7PBTaY55zmK5sI7sX
-         eepQ==
-X-Gm-Message-State: AJcUukcn/EZUX8PRKH+O7iqDikxDfnHkvJZQklnD2K744DqQ0XmIyGhe
-        uBg9I4DvnI7UDq1hXP3YdIU=
-X-Google-Smtp-Source: ALg8bN4pfYOti2YICob7BLJwP4Du8HPcfotV+sgTtMaaAEsDybAS6ulvPJ/5bseq5NxmmXEXN19qEg==
-X-Received: by 2002:a1c:1d8e:: with SMTP id d136mr6524268wmd.98.1547057678781;
-        Wed, 09 Jan 2019 10:14:38 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id b18sm50266967wrr.43.2019.01.09.10.14.37
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 09 Jan 2019 10:14:37 -0800 (PST)
-Date:   Wed, 9 Jan 2019 19:14:36 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluez: dbus method call for switching endpoint
-Message-ID: <20190109181436.atlbhkqclpq3kcta@pali>
-References: <CABBYNZJuGT5_zhg-BkAc4XjtVu5His92cHTujrin=SMOVbaodQ@mail.gmail.com>
- <20180711144501.ovdxc2expa4bg6sc@pali>
- <20181215202910.j24amjshrvjqprll@pali>
- <CABBYNZLK4tyL8nvWbXxr6VctyEyJkMdwNiWMy4gUge9h9Vb4SQ@mail.gmail.com>
- <20181228191102.GA31975@reaktio.net>
- <CABBYNZ+bwbSkH4qtkuzhE=JY6KAGwJ_E4ABGT_LE6E277eTNDQ@mail.gmail.com>
- <20181229130818.jdcpwlpyoyhdqlf3@pali>
- <CABBYNZK4+K5vRF0JCHFcUjbfzWanp_ju6XfQQJWBtiLqKi=e7Q@mail.gmail.com>
- <20190108165612.5krhgtmce336xjx3@pali>
- <20190109180340.5fh7adag6buij4px@pali>
+        Wed, 9 Jan 2019 13:17:55 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53828 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726282AbfAISRy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 9 Jan 2019 13:17:54 -0500
+Received: from earth.universe (dyndsl-095-033-009-186.ewe-ip-backbone.de [95.33.9.186])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C50FD20859;
+        Wed,  9 Jan 2019 18:17:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1547057872;
+        bh=313J75pRSdWBx+s0b8l0AI9icPNGOqqYuBfcA0aYkkE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=IxD1sY1xWGN1Xj1uhaGkjogiFUVrTr+rTdaZlCkVb+QmL2oWJW9xMEbAn2WBmxQKh
+         JXjKYCvdoQ102NFbso0wQl/MRQFbMF0dqaMNCNXLSq+1lsLDDcsai50afnehBrRtUS
+         TcMwM8XaxxBuEDGjFWyrYtXmGtODKfb4jxYnc95o=
+Received: by earth.universe (Postfix, from userid 1000)
+        id F18763C08E2; Wed,  9 Jan 2019 19:17:50 +0100 (CET)
+Date:   Wed, 9 Jan 2019 19:17:50 +0100
+From:   Sebastian Reichel <sre@kernel.org>
+To:     Pavel Machek <pavel@ucw.cz>
+Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Tony Lindgren <tony@atomide.com>,
+        Rob Herring <robh@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-bluetooth@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 10/14] media: wl128x-radio: simplify
+ fmc_prepare/fmc_release
+Message-ID: <20190109181750.lqcm2bhg4wubuavu@earth.universe>
+References: <20181221011752.25627-1-sre@kernel.org>
+ <20181221011752.25627-11-sre@kernel.org>
+ <20181222192934.GA15237@amd>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="k7es2c5p7bwz2jbl"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="a7a3feumpr3jovsz"
 Content-Disposition: inline
-In-Reply-To: <20190109180340.5fh7adag6buij4px@pali>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20181222192934.GA15237@amd>
+User-Agent: NeoMutt/20180716
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 
---k7es2c5p7bwz2jbl
-Content-Type: text/plain; charset=utf-8
+--a7a3feumpr3jovsz
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wednesday 09 January 2019 19:03:40 Pali Roh=C3=A1r wrote:
-> On Tuesday 08 January 2019 17:56:12 Pali Roh=C3=A1r wrote:
-> > On Tuesday 08 January 2019 13:44:24 Luiz Augusto von Dentz wrote:
-> > > > > Regarding the API I still didn't have time to start it, so it will
-> > > > > take a little longer than I antecipated.
-> > >=20
-> > > Ive just sent the patches adding support to switch the endpoints, Ive
-> > > only tested with a couple of sony headsets so I would appreciate if
-> > > you guys could try it as well. Note that the SetConfiguration must
-> > > come from the same D-Bus connection as the endpoint that would be
-> > > used, also if there is already an stream in place it must also be from
-> > > the same client since it would be terminated in the process, this is
-> > > to prevent entities fighting to configure with its own priority though
-> > > usually we only PA endpoints, if you want to bypass this just for now
+Hi Pavel,
+
+On Sat, Dec 22, 2018 at 08:29:34PM +0100, Pavel Machek wrote:
+> On Fri 2018-12-21 02:17:48, Sebastian Reichel wrote:
+> > From: Sebastian Reichel <sebastian.reichel@collabora.com>
 > >=20
-> > Great! Once patches would be ready I would look at my last A2DP
-> > pulseaudio patches [1] and would try to implement switching, including
-> > support for bi-directional FastStream codec -- which can benefit from
-> > it.
-> >=20
-> > [1] - https://lists.freedesktop.org/archives/pulseaudio-discuss/2018-Ju=
-ly/030344.html
+> > Remove unused return code from fmc_prepare() and fmc_release() to
+> > simplify the code a bit.
 >=20
-> Hi! I applied your 6 patches from https://marc.info/?l=3Dlinux-bluetooth&=
-r=3D1&b=3D201901&w=3D2
-> but whatever I did I was not able to locate in dbus hierarchy list of
-> A2DP codecs supported by device.
 >=20
-> I thought that somewhere in
+> >  /*
+> >   * This function will be called from FM V4L2 release function.
+> >   * Unregister from ST driver.
+> >   */
+> > -int fmc_release(struct fmdev *fmdev)
+> > +void fmc_release(struct fmdev *fmdev)
+> >  {
+> >  	static struct st_proto_s fm_st_proto;
+> >  	int ret;
+> > =20
+> >  	if (!test_bit(FM_CORE_READY, &fmdev->flag)) {
+> >  		fmdbg("FM Core is already down\n");
+> > -		return 0;
+> > +		return;
+> >  	}
+> >  	/* Service pending read */
+> >  	wake_up_interruptible(&fmdev->rx.rds.read_queue);
+> > @@ -1611,7 +1606,6 @@ int fmc_release(struct fmdev *fmdev)
+> >  		fmdbg("Successfully unregistered from ST\n");
+> > =20
+> >  	clear_bit(FM_CORE_READY, &fmdev->flag);
+> > -	return ret;
+> >  }
 >=20
-> qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
 >=20
-> I found A2DP codec capabilities...
->=20
-> So how to get list of all supported A2DP codecs for particular device?
+> You probably leave unused variable (ret) here. I guess that's okay as
+> you remove it later in the series...?
 
-Ah, I forgot to start bluetoothd with --experimental option. After that
-I see sep*
+It's still being used after this patch (but indeed removed in a
+later patch).
 
-/
-/org
-/org/bluez
-/org/bluez/hci0
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep1
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep3
-/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep5
+> Also... I'd kind of expect _prepare routine to return int. Even if it
+> currently does not do anything that could return error, I'd kind of
+> expect allocations being done there...
 
-and qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep1 org=
-=2Efreedesktop.DBus.Properties.GetAll org.bluez.MediaEndpoint1
-list them correctly.
+well the driver is basically feature complete and all allocations
+happen in probe :)
 
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
+-- Sebastian
 
---k7es2c5p7bwz2jbl
+--a7a3feumpr3jovsz
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXDY6CwAKCRCL8Mk9A+RD
-UouEAJ9G5bJHms0ysrVCmXyRnytUythZgwCgp1Xem/SpDmYmBs2+1TzOBDslTw8=
-=V+rp
+iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlw2Os4ACgkQ2O7X88g7
++pqZzg//bTzS3nZUi6Vb7quyzAZCP2Af55tTDRC/h7KzMPLcFFYdQi6m6lg3rUir
+gKRmQ7u+2a6CjclVTLAHfYUZ5au2MzUkhkoxcUPqVp6WJJDxCvnFHfyHBGoCVUXf
+5TGCOOF89GtohkSGoONEIYQZXIy+MAOTGpvmCIHkbIKWQ37BT1mxqsoAYGEQ51wb
+8qgQ0/hfhudtEqiP5qFQyxHJT3G3IXPuBQoBL/T/MZzkGP+XdL0KusXE4FNKUkgS
+Ex8cvUsu88t1VKxQyLmi8UDPpLS4kG8dybC2lX9NZUcvupZgD8/YXK7XtrmKAQbB
+NLFpAuIqvU5vsYRAuEGqMY5UxoLvdfVpNX4WhXk775bwuDJgwCWjusEyG7eBOx3A
+1+Pv/K0ABOHe9bvc9uGpVjXQM5mmlLrBDxYfSGr14MW6ydc7MKqsY+M7aQl1yz2H
+dYWAXVOaQY/vcFib8x6Ef2rPEbGTh1y8AaOm2rOTYP5NtWW/Z2b7UY8Egwbg/c7p
+rcmlYTgEW1M+suekjnJlHk9LErLmN2mv/GnI9tdp1r0LTe09SuYRFh1wPVNrdX//
+eVH7T900J2XHgvZDpDapwiuE0/rWgCeeWcIe4QIgIotWiygq8g1MLqbtkaL5SXyX
+WzLSTuoTxhA70QnT7C2LS57UADMDhXjjDqryLhnZSmdxhu0g+LQ=
+=/dmx
 -----END PGP SIGNATURE-----
 
---k7es2c5p7bwz2jbl--
+--a7a3feumpr3jovsz--
