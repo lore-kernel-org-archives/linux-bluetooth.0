@@ -2,145 +2,214 @@ Return-Path: <SRS0=eb2H=PR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28515C43444
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 18:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D505CC43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 19:24:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA2ED20859
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 18:17:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1547057876;
-	bh=313J75pRSdWBx+s0b8l0AI9icPNGOqqYuBfcA0aYkkE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=XSOQ7dlHuSvzMr9KbIOPfiTbu8OAT95Tz4dOOf12OnQ4+sFAGf2Xe1j770nLoJbxr
-	 XhkJ+FnaedHYm2r+RlHLdy3Zl3wHzSfH7jpX+oGhy7ypMZKWSFmkFwCBWPcDqFRn8X
-	 IFxeEGelYTg/o5vDQALDtnMiP28dw1RK6o58v+r4=
+	by mail.kernel.org (Postfix) with ESMTP id A431020663
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 19:24:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726657AbfAISRz (ORCPT
+        id S1728244AbfAITYt convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Jan 2019 13:17:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53828 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726282AbfAISRy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Jan 2019 13:17:54 -0500
-Received: from earth.universe (dyndsl-095-033-009-186.ewe-ip-backbone.de [95.33.9.186])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C50FD20859;
-        Wed,  9 Jan 2019 18:17:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1547057872;
-        bh=313J75pRSdWBx+s0b8l0AI9icPNGOqqYuBfcA0aYkkE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=IxD1sY1xWGN1Xj1uhaGkjogiFUVrTr+rTdaZlCkVb+QmL2oWJW9xMEbAn2WBmxQKh
-         JXjKYCvdoQ102NFbso0wQl/MRQFbMF0dqaMNCNXLSq+1lsLDDcsai50afnehBrRtUS
-         TcMwM8XaxxBuEDGjFWyrYtXmGtODKfb4jxYnc95o=
-Received: by earth.universe (Postfix, from userid 1000)
-        id F18763C08E2; Wed,  9 Jan 2019 19:17:50 +0100 (CET)
-Date:   Wed, 9 Jan 2019 19:17:50 +0100
-From:   Sebastian Reichel <sre@kernel.org>
-To:     Pavel Machek <pavel@ucw.cz>
+        Wed, 9 Jan 2019 14:24:49 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:35076 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728182AbfAITYt (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 9 Jan 2019 14:24:49 -0500
+Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 78C94CF357;
+        Wed,  9 Jan 2019 20:32:31 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH 12/14] media: wl128x-radio: move from TI_ST to hci_ll
+ driver
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190109181156.yamhult6bpwkhx74@earth.universe>
+Date:   Wed, 9 Jan 2019 20:24:46 +0100
 Cc:     Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
         Tony Lindgren <tony@atomide.com>,
         Rob Herring <robh@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-bluetooth@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-omap@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 10/14] media: wl128x-radio: simplify
- fmc_prepare/fmc_release
-Message-ID: <20190109181750.lqcm2bhg4wubuavu@earth.universe>
+        Pavel Machek <pavel@ucw.cz>, linux-bluetooth@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <0C9AD246-B511-4E59-888F-47EAB034D4BF@holtmann.org>
 References: <20181221011752.25627-1-sre@kernel.org>
- <20181221011752.25627-11-sre@kernel.org>
- <20181222192934.GA15237@amd>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="a7a3feumpr3jovsz"
-Content-Disposition: inline
-In-Reply-To: <20181222192934.GA15237@amd>
-User-Agent: NeoMutt/20180716
+ <20181221011752.25627-13-sre@kernel.org>
+ <C85D80C9-2B00-4161-B934-9D70E2B173D0@holtmann.org>
+ <20190109181156.yamhult6bpwkhx74@earth.universe>
+To:     Sebastian Reichel <sre@kernel.org>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Sebastian,
 
---a7a3feumpr3jovsz
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>>> +static int ll_register_fm(struct ll_device *lldev)
+>>> +{
+>>> +	struct device *dev = &lldev->serdev->dev;
+>>> +	int err;
+>>> +
+>>> +	if (!of_device_is_compatible(dev->of_node, "ti,wl1281-st") &&
+>>> +	    !of_device_is_compatible(dev->of_node, "ti,wl1283-st") &&
+>>> +	    !of_device_is_compatible(dev->of_node, "ti,wl1285-st"))
+>>> +		return -ENODEV;
+>> 
+>> do we really want to hardcode this here? Isn't there some HCI
+>> vendor command or some better DT description that we can use to
+>> decide when to register this platform device.
+> 
+> I don't know if there is some way to identify the availability
+> based on some HCI vendor command. The public documentation from
+> the WiLink chips is pretty bad.
 
-Hi Pavel,
+can we have some boolean property in the DT file then instead of hardcoding this in the driver.
 
-On Sat, Dec 22, 2018 at 08:29:34PM +0100, Pavel Machek wrote:
-> On Fri 2018-12-21 02:17:48, Sebastian Reichel wrote:
-> > From: Sebastian Reichel <sebastian.reichel@collabora.com>
-> >=20
-> > Remove unused return code from fmc_prepare() and fmc_release() to
-> > simplify the code a bit.
->=20
->=20
-> >  /*
-> >   * This function will be called from FM V4L2 release function.
-> >   * Unregister from ST driver.
-> >   */
-> > -int fmc_release(struct fmdev *fmdev)
-> > +void fmc_release(struct fmdev *fmdev)
-> >  {
-> >  	static struct st_proto_s fm_st_proto;
-> >  	int ret;
-> > =20
-> >  	if (!test_bit(FM_CORE_READY, &fmdev->flag)) {
-> >  		fmdbg("FM Core is already down\n");
-> > -		return 0;
-> > +		return;
-> >  	}
-> >  	/* Service pending read */
-> >  	wake_up_interruptible(&fmdev->rx.rds.read_queue);
-> > @@ -1611,7 +1606,6 @@ int fmc_release(struct fmdev *fmdev)
-> >  		fmdbg("Successfully unregistered from ST\n");
-> > =20
-> >  	clear_bit(FM_CORE_READY, &fmdev->flag);
-> > -	return ret;
-> >  }
->=20
->=20
-> You probably leave unused variable (ret) here. I guess that's okay as
-> you remove it later in the series...?
+> 
+>>> +	lldev->fmdev = platform_device_register_data(dev, "wl128x-fm",
+>>> +		PLATFORM_DEVID_AUTO, NULL, 0);
+>> 
+>> Fix the indentation please to following networking coding style.
+> 
+> Ok.
+> 
+> [...]
+> 
+>>> +static int ll_recv_radio(struct hci_dev *hdev, struct sk_buff *skb)
+>>> +{
+>>> +	struct hci_uart *hu = hci_get_drvdata(hdev);
+>>> +	struct serdev_device *serdev = hu->serdev;
+>>> +	struct ll_device *lldev = serdev_device_get_drvdata(serdev);
+>>> +
+>>> +	if (!lldev->fm_handler) {
+>>> +		kfree_skb(skb);
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	/* Prepend skb with frame type */
+>>> +	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+>>> +
+>>> +	lldev->fm_handler(lldev->fm_drvdata, skb);
+>> 
+>> So I have no idea why we bother adding the frame type here. What
+>> is the purpose. I think this is useless and we better fix the
+>> radio driver if that is what is expected.
+> 
+> That should be possible. I will change this before sending another
+> revision.
+> 
+>>> +	return 0;
+>>> +}
+> 
+> [...]
+> 
+>>> +int hci_ti_fm_send(struct device *dev, struct sk_buff *skb)
+>>> +{
+>>> +	struct serdev_device *serdev = to_serdev_device(dev);
+>>> +	struct ll_device *lldev = serdev_device_get_drvdata(serdev);
+>>> +	struct hci_uart *hu = &lldev->hu;
+>>> +	int ret;
+>>> +
+>>> +	hci_skb_pkt_type(skb) = HCILL_FM_RADIO;
+>>> +	ret = ll_enqueue_prefixed(hu, skb);
+>> 
+>> This is the same as above, lets have the radio driver not add this
+>> H:4 protocol type in the first place. It is really pointless that
+>> this driver tries to hack around it.
+> 
+> Yes, obviously both paths should follow the same logic.
+> 
+> [...]
+> 
+>>> diff --git a/include/linux/ti_wilink_st.h b/include/linux/ti_wilink_st.h
+>>> index f2293028ab9d..a9de5654b0cd 100644
+>>> --- a/include/linux/ti_wilink_st.h
+>>> +++ b/include/linux/ti_wilink_st.h
+>>> @@ -86,6 +86,8 @@ struct st_proto_s {
+>>> extern long st_register(struct st_proto_s *);
+>>> extern long st_unregister(struct st_proto_s *);
+>>> 
+>>> +void hci_ti_set_fm_handler(struct device *dev, void (*recv_handler) (void *, struct sk_buff *), void *drvdata);
+>>> +int hci_ti_fm_send(struct device *dev, struct sk_buff *skb);
+>> 
+>> This really needs to be put somewhere else if we are removing the
+>> TI Wilink driver. This header file has to be removed as well.
+> 
+> That header is already being used by the hci_ll driver (before this
+> patch) for some packet structures. I removed all WiLink specific
+> things in the patch removing the TI WiLink driver and kept it
+> otherwise.
 
-It's still being used after this patch (but indeed removed in a
-later patch).
+We need to move everything from ti_wilink_st.h that is used in hci_ll.c into that file.
 
-> Also... I'd kind of expect _prepare routine to return int. Even if it
-> currently does not do anything that could return error, I'd kind of
-> expect allocations being done there...
+> 
+>> I wonder really if we are not better having the Bluetooth HCI core
+>> provide an abstraction for a vendor channel. So that the HCI
+>> packets actually can flow through HCI monitor and be recorded via
+>> btmon. This would also mean that the driver could do something
+>> like hci_vnd_chan_add() and hci_vnd_chan_del() and use a struct
+>> hci_vnd_chan for callback handler hci_vnd_chan_send() functions.
+> 
+> Was this question directed to me? I trust your decision how this
+> should be implemented. I'm missing the big picture from other BT
+> devices ;)
+> 
+> If I understood you correctly the suggestion is, that the TI BT
+> driver uses hci_recv_frame() for packet type 0x08 (LL_RECV_FM_RADIO).
+> Then the FM driver can call hci_vnd_chan_add() in its probe function
+> and hci_vnd_chan_del() in its remove function to register the receive
+> hook? Also the dump_tx_skb_data()/dump_rx_skb_data() could be
+> removed, since btmon can be used to see the packets? Sounds very
+> nice to me.
+> 
+>> On a side note, what is the protocol the TI FM radio is using
+>> anyway? Is that anywhere documented except the driver itself? Are
+>> they using HCI commands as well?
+> 
+> AFAIK there is no public documentation for the TI WiLink chips. At
+> least my only information source are the existing drivers. The
+> driver protocol can be seen in drivers/media/radio/wl128x/fmdrv_common.h:
+> 
+> struct fm_cmd_msg_hdr {
+> 	__u8 hdr;		/* Logical Channel-8 */
+> 	__u8 len;		/* Number of bytes follows */
+> 	__u8 op;		/* FM Opcode */
+> 	__u8 rd_wr;		/* Read/Write command */
+> 	__u8 dlen;		/* Length of payload */
+> } __attribute__ ((packed));
+> 
+> struct fm_event_msg_hdr {
+> 	__u8 header;		/* Logical Channel-8 */
+> 	__u8 len;		/* Number of bytes follows */
+> 	__u8 status;		/* Event status */
+> 	__u8 num_fm_hci_cmds;	/* Number of pkts the host allowed to send */
+> 	__u8 op;		/* FM Opcode */
+> 	__u8 rd_wr;		/* Read/Write command */
+> 	__u8 dlen;		/* Length of payload */
+> } __attribute__ ((packed));
 
-well the driver is basically feature complete and all allocations
-happen in probe :)
+This is really a custom protocol (even if it kinda modeled after HCI commands/events) and it be really better the core allows to register skb_pkt_type() vendor channels so it just feeds this back into the driver. We need a bit of btmon mapping for this, but that shouldn’t be that hard.
 
--- Sebastian
+> Apart from the Bluetooth and FM part, the chips also support GPS
+> (packet type 0x9). The GPS feature is not used on Droid 4 stock
+> rom and seems to carry some TI specific protocol instead of NMEA.
+> Here is an old submission for this driver:
+> http://lkml.iu.edu/hypermail/linux/kernel/1005.0/00918.html
+> 
+> (I don't plan to work on the GPS part, but it provides some more
+> details about the WiLink chips protocol)
 
---a7a3feumpr3jovsz
-Content-Type: application/pgp-signature; name="signature.asc"
+We do have a GNSS subsystem now and could just as easily hook this up.
 
------BEGIN PGP SIGNATURE-----
+Regards
 
-iQIzBAEBCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAlw2Os4ACgkQ2O7X88g7
-+pqZzg//bTzS3nZUi6Vb7quyzAZCP2Af55tTDRC/h7KzMPLcFFYdQi6m6lg3rUir
-gKRmQ7u+2a6CjclVTLAHfYUZ5au2MzUkhkoxcUPqVp6WJJDxCvnFHfyHBGoCVUXf
-5TGCOOF89GtohkSGoONEIYQZXIy+MAOTGpvmCIHkbIKWQ37BT1mxqsoAYGEQ51wb
-8qgQ0/hfhudtEqiP5qFQyxHJT3G3IXPuBQoBL/T/MZzkGP+XdL0KusXE4FNKUkgS
-Ex8cvUsu88t1VKxQyLmi8UDPpLS4kG8dybC2lX9NZUcvupZgD8/YXK7XtrmKAQbB
-NLFpAuIqvU5vsYRAuEGqMY5UxoLvdfVpNX4WhXk775bwuDJgwCWjusEyG7eBOx3A
-1+Pv/K0ABOHe9bvc9uGpVjXQM5mmlLrBDxYfSGr14MW6ydc7MKqsY+M7aQl1yz2H
-dYWAXVOaQY/vcFib8x6Ef2rPEbGTh1y8AaOm2rOTYP5NtWW/Z2b7UY8Egwbg/c7p
-rcmlYTgEW1M+suekjnJlHk9LErLmN2mv/GnI9tdp1r0LTe09SuYRFh1wPVNrdX//
-eVH7T900J2XHgvZDpDapwiuE0/rWgCeeWcIe4QIgIotWiygq8g1MLqbtkaL5SXyX
-WzLSTuoTxhA70QnT7C2LS57UADMDhXjjDqryLhnZSmdxhu0g+LQ=
-=/dmx
------END PGP SIGNATURE-----
+Marcel
 
---a7a3feumpr3jovsz--
