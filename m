@@ -2,166 +2,222 @@ Return-Path: <SRS0=eb2H=PR=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A368C43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 14:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E073DC43612
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 15:04:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00CEF206BB
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 14:52:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1547045551;
-	bh=A+VzfcjrHJEwoNmY7LN6qVm0Y6NW79eDYnwIh5MM3U8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=qeJZZLZRPyMHbzZ7+MZftv4SvQPdVK2Lzouc4IGHpWIelnfswCD7VGYyngVlTGSUA
-	 3ZK+76FTMqVz5zKqvg39Wgp/khlgivykFJuIM3rhs04/GH8DslKUTqc/fCGExaGymU
-	 R9ngCdgYLmS5A31ssgbVwosFudKP2g9HfG1Vuy3A=
+	by mail.kernel.org (Postfix) with ESMTP id 9BE302070B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jan 2019 15:04:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="cPP3OnnP";
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="Q5wXqVKy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731895AbfAIOwZ (ORCPT
+        id S1732256AbfAIPEC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Jan 2019 09:52:25 -0500
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:37237 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731894AbfAIOwY (ORCPT
+        Wed, 9 Jan 2019 10:04:02 -0500
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:54766 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731751AbfAIPEB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Jan 2019 09:52:24 -0500
-Received: by mail-lf1-f65.google.com with SMTP id y11so5850871lfj.4;
-        Wed, 09 Jan 2019 06:52:22 -0800 (PST)
+        Wed, 9 Jan 2019 10:04:01 -0500
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x09EkNCF025646
+        for <linux-bluetooth@vger.kernel.org>; Wed, 9 Jan 2019 07:04:01 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=pfpt0818; bh=C166CZFA7mRQpsWEVuPMFieJPliLj6377Y/zM0KADbc=;
+ b=cPP3OnnPTCMU+ljdNT8ClvTwDDT74h467LrxTDQhL90VaKY0H6lriFv5bkFHrfXbiv9g
+ OwfI4nyV2R2QFhgf6CYITCXxUo+Zd9ioLco3ppUO1eXNfcW2A1JQL0IZWopd1t2xZ5qv
+ +PXf0SHAwXW/2WhZAuSbvC8sXEg6NcVM86WeGyciSTGMRPdeWxkWPUPygEiZnq2bNmxJ
+ zqenXffAgmtUG0+Tk/8YV4m45btP44RT1aaRd3tcf7eZSrf9VhlVGQKtbzfiDdb4eyQc
+ 0gligW5pkbxzpIItFifbhtTE+kPLzs6YHK2Axr2RKvu70CCRrrhdunJ0Nw+jgNxxJA13 Xw== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+        by mx0a-0016f401.pphosted.com with ESMTP id 2pvwjq5m7c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT)
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Jan 2019 07:04:00 -0800
+Received: from SC-EXCH02.marvell.com (10.93.176.82) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Wed, 9 Jan
+ 2019 07:03:59 -0800
+Received: from NAM05-BY2-obe.outbound.protection.outlook.com (104.47.50.57) by
+ SC-EXCH02.marvell.com (10.93.176.82) with Microsoft SMTP Server (TLS) id
+ 15.0.1367.3 via Frontend Transport; Wed, 9 Jan 2019 07:03:59 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=CTOH2U9RnpHUdI/YfiBNuwRGlHn4ti/2BLzinWpx71A=;
-        b=gimAuo9EG2tEFGet8cxftE3/of/TsHB3hlbvNuU4JTKX80EoMYFS1jMz6riWn79vho
-         /PMeIKn0ARMYQRk23Jm3xabZH4P9JWjNPK3bknoICz9Y4/Mu3diE9Ov1ha3wMGUr8h9A
-         OnbxYimrW+l8kZqhDmbknII1/Am/jPJignnO51Lf0k83RuBqQgVjrbOeexGr3fsNCcgN
-         1xniGpPAzD7Gf0PvkBejgZbbDlJzf70iBrY7CzKQeNme4nbkgxzyGMg2M46ubM9WL9Eo
-         Zr8Fnbxx+r1YmYrj7dPefRrArwYmzL7GXqur24tQM9n+D90+KiVqeufZs/bs4fQ8IqrR
-         FClQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=CTOH2U9RnpHUdI/YfiBNuwRGlHn4ti/2BLzinWpx71A=;
-        b=OFzQ4xyGJiX5SVfReUHG1bVps03KWW58Qo7kpK+zh6lzuGV/docaeFK6oi2kovJytX
-         MnBWxx7aAo5oQbD9fjGUK3c38Qwos6zYzt5tN37mjn1e6HK4h447OLD4n1rghO/J1+MS
-         K6PRn5qYfBkj4Tl+2R0LgNok3EMK6MQOVR9bf3ynTUqIOvLWFTwNQ74Pa8G0h4HtPFvo
-         tE6xlVSYFz9w281FIgXBZbZXuJUSXAVkPSymjW605cD2b/2WE9rc0mCT0efawRPKNYev
-         jeqN8r6oaZhfEAXkXyP8ezFaDcy0b7ZQuePvg8pe5HSEWgwSZjd6j6X5gCZzCJiYLnbc
-         6i3w==
-X-Gm-Message-State: AJcUukfPXQSNpsF+g3WfoxOAOYtO4/+xXUXtTXV84n/Fpu0Q+Jm55lz4
-        zim80+q2X0Gkk954bcAtG4U=
-X-Google-Smtp-Source: ALg8bN4vl6auDLxa5fEhpTZFGpIGQ+MDO+/LNsKr0lHwoubLl5stD9bo5hiAEknLS9NtiIbN7zoVUA==
-X-Received: by 2002:a19:8fce:: with SMTP id s75mr3537633lfk.151.1547045541898;
-        Wed, 09 Jan 2019 06:52:21 -0800 (PST)
-Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id k21-v6sm14646036ljc.15.2019.01.09.06.52.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Jan 2019 06:52:20 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.91)
-        (envelope-from <johan@kernel.org>)
-        id 1ghFDU-0000fN-QQ; Wed, 09 Jan 2019 15:52:24 +0100
-Date:   Wed, 9 Jan 2019 15:52:24 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
-        mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v5 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate
- change command
-Message-ID: <20190109145224.GN14782@localhost>
-References: <20181220144639.15928-1-bgodavar@codeaurora.org>
- <20181220144639.15928-3-bgodavar@codeaurora.org>
+ d=marvell.onmicrosoft.com; s=selector1-marvell-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C166CZFA7mRQpsWEVuPMFieJPliLj6377Y/zM0KADbc=;
+ b=Q5wXqVKy7NUBZcMyQgHUmf+gXYvCFlbJ0Q59oylzXs60VFsifjhRJvZhmu30NtGlwBn/QRdP2IgzKaevezkec7uBBST0Gmtcy3e5lPfOi7yKPeL4ncJI5G1MjtrR73cpwoBQOYD3jdWaH8BzLOBgjMumEJwQ6WQCpJDdrFdEShQ=
+Received: from CY4PR18MB1237.namprd18.prod.outlook.com (10.172.176.7) by
+ CY4PR18MB1061.namprd18.prod.outlook.com (10.173.183.140) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1495.6; Wed, 9 Jan 2019 15:03:58 +0000
+Received: from CY4PR18MB1237.namprd18.prod.outlook.com
+ ([fe80::95d4:8a68:81d7:87c5]) by CY4PR18MB1237.namprd18.prod.outlook.com
+ ([fe80::95d4:8a68:81d7:87c5%8]) with mapi id 15.20.1495.011; Wed, 9 Jan 2019
+ 15:03:57 +0000
+From:   Ganapathi Bhat <gbhat@marvell.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     Cathy Luo <cluo@marvell.com>, Zhiyuan Yang <yangzy@marvell.com>,
+        James Cao <jcao@marvell.com>,
+        Rakesh Parmar <rakeshp@marvell.com>,
+        Rahul Tank <rahult@marvell.com>
+Subject: [PATCH] bluetooth: btmrvl_sdio: add support for sd8977 chipset
+Thread-Topic: [PATCH] bluetooth: btmrvl_sdio: add support for sd8977 chipset
+Thread-Index: AdSoLIisF52s4F6bS8yE2vNp34CzNA==
+Date:   Wed, 9 Jan 2019 15:03:57 +0000
+Message-ID: <CY4PR18MB1237FAFE56DFCADE0DB09FC1A08B0@CY4PR18MB1237.namprd18.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [182.72.17.59]
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;CY4PR18MB1061;20:zm25rBN9UbGDUQY2gbSWmXnfU5tlD/6qKrDfVqyJr8/xoHOjYnkAxMO03UXXVFMW911G/JPc3VAWVq+cb7kbBFl8AhtpgGOUj+07FXo1SSztV6G0Uqr04MsBGJTcjmEnVARc4cj+D9dmu+KSkQixPjFHvukBQP1huLoGgr/E3Z8=
+x-ms-exchange-antispam-srfa-diagnostics: SOS;SOR;
+x-forefront-antispam-report: SFV:SKI;SCL:-1;SFV:NSPM;SFS:(10009020)(396003)(366004)(376002)(346002)(39860400002)(136003)(189003)(199004)(7736002)(78486014)(7696005)(305945005)(26005)(71190400001)(71200400001)(6916009)(316002)(54906003)(99286004)(8676002)(81156014)(81166006)(8936002)(476003)(86362001)(575784001)(2501003)(74316002)(6116002)(5660300001)(33656002)(3846002)(106356001)(5640700003)(14454004)(2906002)(102836004)(186003)(25786009)(68736007)(105586002)(486006)(2351001)(55016002)(478600001)(66066001)(55236004)(6506007)(4326008)(256004)(53936002)(107886003)(97736004)(6436002)(9686003)(16843485002);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR18MB1061;H:CY4PR18MB1237.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-office365-filtering-correlation-id: f2cf3ceb-b579-4c5f-5165-08d67643ae08
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600109)(711020)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060)(7193020);SRVR:CY4PR18MB1061;
+x-ms-traffictypediagnostic: CY4PR18MB1061:
+x-microsoft-antispam-prvs: <CY4PR18MB1061B6CD26F121FF00386589A08B0@CY4PR18MB1061.namprd18.prod.outlook.com>
+x-forefront-prvs: 0912297777
+received-spf: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: JXqmM3B+3XCIdC2Ct3zjOo3C+0oqY0LGj/W/kc3ME2RiNPmNjjM4c6GAHhPv3LuAtWea6plehgXrwxYDdufJlCLMwRnzPz1+YIaphUZE6KnB0YYMuuvRyODGOcaHjysmDIEQKxSPcJlqpA3k/R/E7E7BA+4VMxhpEj58Jbw3Ea9+YTYWtwRBW1FSxQPLfphMLh4ch1a1wJFoINr08Vc7VDbCBK7u8UEBmfGvZenUFOI/YAtB1sF/QwbQitgwc/9HlNQx3V2H3KlerdEpTGEOjITzhGkzSySb8HkQNyEPfr/c/BkEEpX1+iUAAokwWOTc
+spamdiagnosticoutput: 1:99
+spamdiagnosticmetadata: NSPM
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181220144639.15928-3-bgodavar@codeaurora.org>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2cf3ceb-b579-4c5f-5165-08d67643ae08
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jan 2019 15:03:57.3233
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR18MB1061
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-01-09_07:,,
+ signatures=0
+X-Proofpoint-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1901090125
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Dec 20, 2018 at 08:16:36PM +0530, Balakrishna Godavarthi wrote:
-> This patch will help to stop frame reassembly errors while changing
-> the baudrate. This is because host send a change baudrate request
-> command to the chip with 115200 bps, Whereas chip will change their
-> UART clocks to the enable for new baudrate and sends the response
-> for the change request command with newer baudrate, On host side
-> we are still operating in 115200 bps which results of reading garbage
-> data. Here we are pulling RTS line, so that chip we will wait to send data
-> to host until host change its baudrate.
-> 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> Tested-by: Matthias Kaehlcke <mka@chromium.org>
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
-> ---
->  drivers/bluetooth/hci_qca.c | 24 +++++++++++++-----------
->  1 file changed, 13 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 5a07c2370289..1680ead6cc3d 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -963,7 +963,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  	struct hci_uart *hu = hci_get_drvdata(hdev);
->  	struct qca_data *qca = hu->priv;
->  	struct sk_buff *skb;
-> -	struct qca_serdev *qcadev;
->  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
->  
->  	if (baudrate > QCA_BAUDRATE_3200000)
-> @@ -977,13 +976,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  		return -ENOMEM;
->  	}
->  
-> -	/* Disabling hardware flow control is mandatory while
-> -	 * sending change baudrate request to wcn3990 SoC.
-> -	 */
-> -	qcadev = serdev_device_get_drvdata(hu->serdev);
-> -	if (qcadev->btsoc_type == QCA_WCN3990)
-> -		hci_uart_set_flow_control(hu, true);
-> -
->  	/* Assign commands to change baudrate and packet type. */
->  	skb_put_data(skb, cmd, sizeof(cmd));
->  	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-> @@ -999,9 +991,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
->  	set_current_state(TASK_RUNNING);
->  
-> -	if (qcadev->btsoc_type == QCA_WCN3990)
-> -		hci_uart_set_flow_control(hu, false);
-> -
->  	return 0;
->  }
->  
-> @@ -1086,6 +1075,7 @@ static int qca_check_speeds(struct hci_uart *hu)
->  static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  {
->  	unsigned int speed, qca_baudrate;
-> +	struct qca_serdev *qcadev;
->  	int ret;
->  
->  	if (speed_type == QCA_INIT_SPEED) {
-> @@ -1097,6 +1087,15 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  		if (!speed)
->  			return 0;
->  
-> +		/* Deassert RTS while changing the baudrate of chip and host.
-> +		 * This will prevent chip from transmitting its response with
-> +		 * the new baudrate while the host port is still operating at
-> +		 * the old speed.
-> +		 */
-> +		qcadev = serdev_device_get_drvdata(hu->serdev);
-> +		if (qcadev->btsoc_type == QCA_WCN3990)
-> +			serdev_device_set_rts(hu->serdev, false);
-> +
+From 6591fb4e6bbac53a9b3b852a2a4160c8de315d97 Mon Sep 17 00:00:00 2001
+From: Hemantkumar Suthar <shemant@marvell.com>
 
-This may not do what you want unless you also disable hardware flow
-control.
+This patch adds support for 8977 chipset to mwifiex with SDIO
+interface. Register offsets and supported feature flags are
+updated. Firmware image used will be mrvl/sd8977_uapsta.bin.
 
-Johan
+Signed-off-by: Hemantkumar Suthar <shemant@marvell.com>
+Signed-off-by: Rakesh Parmar <rakeshp@marvell.com>
+Signed-off-by: Cathy Luo <cluo@marvell.com>
+Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
+---
+ drivers/bluetooth/Kconfig       |  4 ++--
+ drivers/bluetooth/btmrvl_sdio.c | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 845b031..7b2e76e 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -336,7 +336,7 @@ config BT_MRVL
+ 	  The core driver to support Marvell Bluetooth devices.
+=20
+ 	  This driver is required if you want to support
+-	  Marvell Bluetooth devices, such as 8688/8787/8797/8887/8897/8997.
++	  Marvell Bluetooth devices, such as 8688/8787/8797/8887/8897/8977/8997.
+=20
+ 	  Say Y here to compile Marvell Bluetooth driver
+ 	  into the kernel or say M to compile it as module.
+@@ -350,7 +350,7 @@ config BT_MRVL_SDIO
+ 	  The driver for Marvell Bluetooth chipsets with SDIO interface.
+=20
+ 	  This driver is required if you want to use Marvell Bluetooth
+-	  devices with SDIO interface. Currently SD8688/SD8787/SD8797/SD8887/SD88=
+97/SD8997
++	  devices with SDIO interface. Currently SD8688/SD8787/SD8797/SD8887/SD88=
+97/SD8977/SD8997
+ 	  chipsets are supported.
+=20
+ 	  Say Y here to compile support for Marvell BT-over-SDIO driver
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdi=
+o.c
+index fb3d039..b2712a5 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -211,6 +211,29 @@ static int btmrvl_sdio_probe_of(struct device *dev,
+ 	.fw_dump_end =3D 0xea,
+ };
+=20
++static const struct btmrvl_sdio_card_reg btmrvl_reg_8977 =3D {
++	.cfg =3D 0x00,
++	.host_int_mask =3D 0x08,
++	.host_intstatus =3D 0x0c,
++	.card_status =3D 0x5c,
++	.sq_read_base_addr_a0 =3D 0xf8,
++	.sq_read_base_addr_a1 =3D 0xf9,
++	.card_revision =3D 0xc8,
++	.card_fw_status0 =3D 0xe8,
++	.card_fw_status1 =3D 0xe9,
++	.card_rx_len =3D 0xea,
++	.card_rx_unit =3D 0xeb,
++	.io_port_0 =3D 0xe4,
++	.io_port_1 =3D 0xe5,
++	.io_port_2 =3D 0xe6,
++	.int_read_to_clear =3D true,
++	.host_int_rsr =3D 0x04,
++	.card_misc_cfg =3D 0xD8,
++	.fw_dump_ctrl =3D 0xf0,
++	.fw_dump_start =3D 0xf1,
++	.fw_dump_end =3D 0xf8,
++};
++
+ static const struct btmrvl_sdio_card_reg btmrvl_reg_8997 =3D {
+ 	.cfg =3D 0x00,
+ 	.host_int_mask =3D 0x08,
+@@ -279,6 +302,15 @@ static int btmrvl_sdio_probe_of(struct device *dev,
+ 	.supports_fw_dump =3D true,
+ };
+=20
++static const struct btmrvl_sdio_device btmrvl_sdio_sd8977 =3D {
++	.helper         =3D NULL,
++	.firmware       =3D "mrvl/sd8977_uapsta.bin",
++	.reg            =3D &btmrvl_reg_8977,
++	.support_pscan_win_report =3D true,
++	.sd_blksz_fw_dl =3D 256,
++	.supports_fw_dump =3D true,
++};
++
+ static const struct btmrvl_sdio_device btmrvl_sdio_sd8997 =3D {
+ 	.helper         =3D NULL,
+ 	.firmware       =3D "mrvl/sd8997_uapsta.bin",
+@@ -307,6 +339,9 @@ static int btmrvl_sdio_probe_of(struct device *dev,
+ 	/* Marvell SD8897 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x912E),
+ 			.driver_data =3D (unsigned long)&btmrvl_sdio_sd8897 },
++	/* Marvell SD8977 Bluetooth device */
++	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x9146),
++			.driver_data =3D (unsigned long)&btmrvl_sdio_sd8977 },
+ 	/* Marvell SD8997 Bluetooth device */
+ 	{ SDIO_DEVICE(SDIO_VENDOR_ID_MARVELL, 0x9142),
+ 			.driver_data =3D (unsigned long)&btmrvl_sdio_sd8997 },
+@@ -1760,4 +1795,5 @@ static void __exit btmrvl_sdio_exit_module(void)
+ MODULE_FIRMWARE("mrvl/sd8797_uapsta.bin");
+ MODULE_FIRMWARE("mrvl/sd8887_uapsta.bin");
+ MODULE_FIRMWARE("mrvl/sd8897_uapsta.bin");
++MODULE_FIRMWARE("mrvl/sd8977_uapsta.bin");
+ MODULE_FIRMWARE("mrvl/sd8997_uapsta.bin");
+--=20
+1.9.1
+
