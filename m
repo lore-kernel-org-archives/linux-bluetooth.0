@@ -2,73 +2,147 @@ Return-Path: <SRS0=Rbfz=PS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCCBC43387
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 09:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36629C43387
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 11:29:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 09AAD214DA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 09:42:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 048D4206B6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 11:29:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uD2/Qzd6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728034AbfAJJmJ convert rfc822-to-8bit (ORCPT
+        id S1728315AbfAJL3P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Jan 2019 04:42:09 -0500
-Received: from mx-relay45-hz1.antispameurope.com ([94.100.133.221]:46800 "EHLO
-        mx-relay45-hz1.antispameurope.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727968AbfAJJmJ (ORCPT
+        Thu, 10 Jan 2019 06:29:15 -0500
+Received: from mail-oi1-f174.google.com ([209.85.167.174]:42840 "EHLO
+        mail-oi1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727455AbfAJL3P (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Jan 2019 04:42:09 -0500
-X-Greylist: delayed 401 seconds by postgrey-1.27 at vger.kernel.org; Thu, 10 Jan 2019 04:42:08 EST
-Received: from unknown ([193.201.169.249]) by mx-relay45-hz1.antispameurope.com;
- Thu, 10 Jan 2019 10:35:25 +0100
-Received: from KMLEXC66.kme.intern (10.120.237.251) by KMLEXC65.kme.intern
- (10.120.236.251) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Thu, 10 Jan
- 2019 10:35:19 +0100
-Received: from KMLEXC66.kme.intern ([fe80::4193:55fc:3d0a:1908]) by
- KMLEXC66.kme.intern ([fe80::4193:55fc:3d0a:1908%14]) with mapi id
- 15.00.1367.000; Thu, 10 Jan 2019 10:35:19 +0100
-From:   "Kazda, Petr" <Petr.Kazda@konicaminolta.cz>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Bluez4 HSP problems -> backporting of Bluez5 to Ubuntu 12.04
-Thread-Topic: Bluez4 HSP problems -> backporting of Bluez5 to Ubuntu 12.04
-Thread-Index: AdSow7Xpa/A3NgioSxqdDhtpMSmNNQ==
-Date:   Thu, 10 Jan 2019 09:35:19 +0000
-Message-ID: <909a3877987d4e1d917e365f7d1eb603@KMLEXC66.kme.intern>
-Accept-Language: cs-CZ, de-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.120.236.1]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Thu, 10 Jan 2019 06:29:15 -0500
+Received: by mail-oi1-f174.google.com with SMTP id w13so8959812oiw.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jan 2019 03:29:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=R4AHf9uQ3NLy23xBTJJXEkpepLEmWncTH1KK3FvIhK4=;
+        b=uD2/Qzd6iFGlCXSzB9APiqQYKHqUy1fzfyMRl4OKMWADmL09//+5Gexr36ix0guUTQ
+         3wDxkN2b44ob/Doy8sWSS/+488jfI26Do5lnNmYhPNQ6OOslKUdLlTb7jz2bK+Lp87lL
+         6zkrgzs+VpQgfS4JwZaNlZTYPjLIqaHKBf5FHtN5hV5mmqhmFv59kCI519OCEcTHWGx0
+         Qzmna2VdXMgffh//JrvrtekII725rfY0X7B8xrqEEUypYRyIC7NdF7aUs+CXv/pnzL/z
+         UNxJD1KXDhy1a1/MVoaGaDAnvAAMCNh9A5GF+niTzBJmPN7MvIdOAFM3FcrbG97OhtNo
+         09Ow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=R4AHf9uQ3NLy23xBTJJXEkpepLEmWncTH1KK3FvIhK4=;
+        b=KmbCxrtPBiOPmEpyRZNnT5/oLsNTUD0/pCqP9tb4wITav9+yPJnkKHJGUrIWNwffPF
+         k4spZi5vhTkSNbobcU6Pwb82jfyZxp1A+a0vxT7QCf5PkcK/NWy/T/mM6r+l8rwu5KVt
+         aCbNDi6Lk7DSi+NelwC4JC3U4lUB+bFyvGUE6iGux2iSx/s7zn8eLFyvG+9bQvMOfGEk
+         OeBqXB7Y/+aX6duwkhRtiQ5jyUT3c+V595ZyH22nH2GKijLV5Cpgp2MKMh6kThi+mV86
+         88fKwoIRvqbXs1mIIQv/feOd5n9B/I4z9VgJvNqOp2WcFrV1lgl+MTRyPzrI8NQ5VdEn
+         8cdg==
+X-Gm-Message-State: AJcUukfQ4nr6cD1aGbJHrgyliMEG5Zkl6wkOqYi8p7/5qtXLzCeeWbCG
+        A/wUz4qyBLU3Dl4QE+UgPChozF+bQBqyhC37boYxFaci
+X-Google-Smtp-Source: ALg8bN47EIoBQdkaCD+lyLvmpgoy6ZL5XAQ8sc+JBfLCEjLYA43e6h1fpJK6NAjYMRzuKb0KN/1KI2d3DFsmB+7Xb5Q=
+X-Received: by 2002:aca:aa0d:: with SMTP id t13mr6537007oie.273.1547119754639;
+ Thu, 10 Jan 2019 03:29:14 -0800 (PST)
 MIME-Version: 1.0
-X-cloud-security-sender: petr.kazda@konicaminolta.cz
-X-cloud-security-recipient: linux-bluetooth@vger.kernel.org
-X-cloud-security-crypt: load encryption module
-X-cloud-security-Virusscan: CLEAN
-X-cloud-security-disclaimer: This E-Mail was scanned by E-Mailservice on mx-relay45-hz1.antispameurope.com with D2B7318096A
-X-cloud-security-connect: unknown[193.201.169.249], TLS=1, IP=193.201.169.249
-X-cloud-security: scantime:.3027
+References: <CABBYNZJuGT5_zhg-BkAc4XjtVu5His92cHTujrin=SMOVbaodQ@mail.gmail.com>
+ <20180711144501.ovdxc2expa4bg6sc@pali> <20181215202910.j24amjshrvjqprll@pali>
+ <CABBYNZLK4tyL8nvWbXxr6VctyEyJkMdwNiWMy4gUge9h9Vb4SQ@mail.gmail.com>
+ <20181228191102.GA31975@reaktio.net> <CABBYNZ+bwbSkH4qtkuzhE=JY6KAGwJ_E4ABGT_LE6E277eTNDQ@mail.gmail.com>
+ <20181229130818.jdcpwlpyoyhdqlf3@pali> <CABBYNZK4+K5vRF0JCHFcUjbfzWanp_ju6XfQQJWBtiLqKi=e7Q@mail.gmail.com>
+ <20190108165612.5krhgtmce336xjx3@pali> <20190109180340.5fh7adag6buij4px@pali> <20190109181436.atlbhkqclpq3kcta@pali>
+In-Reply-To: <20190109181436.atlbhkqclpq3kcta@pali>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 10 Jan 2019 08:29:02 -0300
+Message-ID: <CABBYNZJk=wycGzic5+DqFHg=30KX9NNwnZMpsVdgkLjzseMA2g@mail.gmail.com>
+Subject: Re: bluez: dbus method call for switching endpoint
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Cc:     =?UTF-8?B?UGFzaSBLw6Rya2vDpGluZW4=?= <pasik@iki.fi>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Bluez developers,
-we have a product that is currently build using OMAP4 platform with Ubuntu 12.04 (armhf build) running on it. Due to various reasons the upgrade to more recent version of Linux is not possible (mainly because TI does not provide updated OS image and sources for proprietary drivers).
+Hi Pali,
 
-So we are stuck with Bluez 4.101 (latest available version built from sources).
+On Wed, Jan 9, 2019 at 3:14 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrote=
+:
+>
+> On Wednesday 09 January 2019 19:03:40 Pali Roh=C3=A1r wrote:
+> > On Tuesday 08 January 2019 17:56:12 Pali Roh=C3=A1r wrote:
+> > > On Tuesday 08 January 2019 13:44:24 Luiz Augusto von Dentz wrote:
+> > > > > > Regarding the API I still didn't have time to start it, so it w=
+ill
+> > > > > > take a little longer than I antecipated.
+> > > >
+> > > > Ive just sent the patches adding support to switch the endpoints, I=
+ve
+> > > > only tested with a couple of sony headsets so I would appreciate if
+> > > > you guys could try it as well. Note that the SetConfiguration must
+> > > > come from the same D-Bus connection as the endpoint that would be
+> > > > used, also if there is already an stream in place it must also be f=
+rom
+> > > > the same client since it would be terminated in the process, this i=
+s
+> > > > to prevent entities fighting to configure with its own priority tho=
+ugh
+> > > > usually we only PA endpoints, if you want to bypass this just for n=
+ow
+> > >
+> > > Great! Once patches would be ready I would look at my last A2DP
+> > > pulseaudio patches [1] and would try to implement switching, includin=
+g
+> > > support for bi-directional FastStream codec -- which can benefit from
+> > > it.
+> > >
+> > > [1] - https://lists.freedesktop.org/archives/pulseaudio-discuss/2018-=
+July/030344.html
+> >
+> > Hi! I applied your 6 patches from https://marc.info/?l=3Dlinux-bluetoot=
+h&r=3D1&b=3D201901&w=3D2
+> > but whatever I did I was not able to locate in dbus hierarchy list of
+> > A2DP codecs supported by device.
+> >
+> > I thought that somewhere in
+> >
+> > qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
+> >
+> > I found A2DP codec capabilities...
+> >
+> > So how to get list of all supported A2DP codecs for particular device?
+>
+> Ah, I forgot to start bluetoothd with --experimental option. After that
+> I see sep*
+>
+> /
+> /org
+> /org/bluez
+> /org/bluez/hci0
+> /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
+> /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep1
+> /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep3
+> /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep5
+>
+> and qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep1 o=
+rg.freedesktop.DBus.Properties.GetAll org.bluez.MediaEndpoint1
+> list them correctly.
 
-We have been testing compatibility with two Bluetooth headsets - Jabra Steel and Plantronics Explorer 55. Neither of these works in HSP mode, Plantronics does not work even in A2DP. We are using Edimax EW-7611ULB dongle.
+You can use d-feet as well, btw did you forget to paste sep2 and sep4
+or the device just skip them? Ive made sure not to filter any
+endpoints even if they would not have any matching local endpoints so
+we allow new endpoints to be registered later, anyway SetConfiguration
+actually checks that endpoints matches.
 
-More specifically Jabra works in A2DP, in HSP it does not show any errors anywhere, but it simply does not transfer any sound in or out. Plantronics does not work in A2DP (there is message like failed to acquire transport bluez_XXXXXXXX from pulseaudio), in HSP it throws error in btusb module. I tried every possible workaround found on the internet, tweaked the settings back and forth, tried different combinations, but no luck. I came to the conclusion that it might be somehow connected with SCO packets routing, but at this point I do not see any way how to move further by myself.
-
-I tested both devices with more recent Ubuntu 18.04 with the same Edimax dongle, same drivers and both headsets work without issues, so it seems that the culprit outdated Bluez. 
-
-Now to the main question. Is it possible to backport Bluez5 to Ubuntu 12.04? We do not need the GUI elements, just the basic modules (BLE, HID, audio). If it is theoretically possible, is there anyone willing to do it (even as a paid job)?
-
-Thank you.
-
-Petr
+--=20
+Luiz Augusto von Dentz
