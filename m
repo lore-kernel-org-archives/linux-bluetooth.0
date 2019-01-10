@@ -2,64 +2,66 @@ Return-Path: <SRS0=Rbfz=PS=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 569A3C43387
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 16:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C94C43387
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 16:48:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 192D4214C6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 16:48:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E67E206B7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 16:48:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c927x+pu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mdHjFmRl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728594AbfAJQsA (ORCPT
+        id S1728610AbfAJQsF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Jan 2019 11:48:00 -0500
-Received: from mail-wm1-f48.google.com ([209.85.128.48]:40630 "EHLO
-        mail-wm1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728458AbfAJQsA (ORCPT
+        Thu, 10 Jan 2019 11:48:05 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46683 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728599AbfAJQsE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Jan 2019 11:48:00 -0500
-Received: by mail-wm1-f48.google.com with SMTP id f188so12699401wmf.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jan 2019 08:47:57 -0800 (PST)
+        Thu, 10 Jan 2019 11:48:04 -0500
+Received: by mail-wr1-f68.google.com with SMTP id l9so12122930wrt.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jan 2019 08:48:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=to:from:subject:openpgp:autocrypt:message-id:date:mime-version
-         :content-language:content-transfer-encoding;
-        bh=b4s2cEyKd5Lbbhrm3838tItWK1bLYUNgstHLzvAAS4g=;
-        b=c927x+pu3KDMIJB6+o539u7HcH7YLi3REU8GsHKOQ8mpe4gypJKOOsBeX+zC5gHIha
-         D6bFvWFed2cDl6f9A1dmNB3lq5aGpRPPS5m9Om+YdtJuNgkwyScTLnxgXtXY1yfP7i3+
-         l7VINPYHiWr/ZebKFv2pSj6kxVzeJmWQiqJ7KXDutXP/MCP6CLjVTaGkq/EsptLeToz+
-         J2M5wRkDLXn8O8d4vMTLYK6JTn58/E76+l0S0ctwgeWVoaev88kaR8vxva26NmvOucd+
-         3HxfybVjf+azgtiINpujhHUqstOvUqr0Uj4AnzAf117sDjRqA/YSuEI2tr4Rp2kXGlj7
-         48Ew==
+        h=subject:references:to:from:openpgp:autocrypt:message-id:date
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=pbYepxF85BmhMFRdCpMczn8lfgb5k2x1NOD6HAWWBlo=;
+        b=mdHjFmRl2b56tMq2MleMh0POq2wA1vXuPHYxRQlmfvXrQ1JW4tJ0MbVSLXsHNX9gM2
+         Ecfp1LBm6TQ34CknYaUL/JWGSlfjCEZ+WwzhUmZhASB/A5HszzcPgOeKH9hfzt5q2cNH
+         dNPx3++LuouBlicYrqOYVEfluHYLBnAn4Xsf+I2eRQ4sVIIKavzoEYEA2VRVnBaB1IO4
+         yHrD4yZM/pvLn5aVl2MDOLqWQPu1x7nM+v/x1lQtz03X+xSyp7fbdeZ2ZADkX1lk8MbX
+         NCnKVlnFfRca+i77ZBaz+2il2INP3w+PHBD+hNfBlQahLB4SQoxR1yZyyOUBg0kOxtsH
+         CsUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:openpgp:autocrypt:message-id
-         :date:mime-version:content-language:content-transfer-encoding;
-        bh=b4s2cEyKd5Lbbhrm3838tItWK1bLYUNgstHLzvAAS4g=;
-        b=AU35KHy9e1CDvf7y7ckveYhiXVh2hux1PAF4UY4OOxtcVuvGBcvhZ8qLvjpw1iQwcd
-         Mr8qjjVHWlwUYxpcVUrs0M5VnVrJM/ur3fMkaBDE4CqEq7gsItBH0YWEUun7qCCeLSMh
-         UyCNxjOjVVpv9mjk8KoPdL83m1mpiDASqnAvu4xT360pVpIASin+uKcwR3iukkhEGJn7
-         cY8imFA8Qcd/RpmWzWfiN103m24i6aoWadzKk+RWBYPs/1I9wWC3RRq4H1FRx8JF0uBS
-         m/r5isNFqhnNf7G0TlU+pkK0Au43TzL3J79x/p3BdJ1gc54lLiWvATtuQ/+AeJKDsQM8
-         Rieg==
-X-Gm-Message-State: AJcUukeDeL6PYt4dyqxvhqR+M86unDY8igy7eIrYQlm48+uYbqlD4zLe
-        qRAi0VWLApBCsnzebHgm/LMvwocc
-X-Google-Smtp-Source: ALg8bN4P9YiNOY3cXus1LSe986Klw3KqgFjnH0Pjc+kygaopZ4aTzaZzYXFrvUIycmdv3ClvfbDB/g==
-X-Received: by 2002:a7b:c852:: with SMTP id c18mr10105013wml.49.1547138876365;
-        Thu, 10 Jan 2019 08:47:56 -0800 (PST)
+        h=x-gm-message-state:subject:references:to:from:openpgp:autocrypt
+         :message-id:date:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pbYepxF85BmhMFRdCpMczn8lfgb5k2x1NOD6HAWWBlo=;
+        b=cXO3BddEpAn+NdsXXkr9siI7SNyzhpGMCKzv8MnxnOu/w2g2DzXF6aFozmg6WtrGAh
+         V/897WlZbcADzT33agzyWWI4D7oFcq02629o22qlN7gk6zn0+R1SYagNK8Ea0OCgHliO
+         QqBloXEJ2LSSVxjgh041bovgn3+G4gOm9UTaSItxkC4upYczcebaYRd9tCuNhJ8bQ17+
+         Fv/nAOVWQCqyShi+yWvowwECRw65Q5mXZrs28yr6A7E5Ecb9f00wwvO4JlVLc73gKGP2
+         XbwJHCyVrtaWs/eoiHNGNlivDf8nO68XAAZoqY9J+CJZql3tFU57wYK8q1oln4o4eQtX
+         B+0A==
+X-Gm-Message-State: AJcUukcoOQ9k/WIzAXXTu+nKJ/rWSoEzCbazdq43j7IZ+nDbR+uAK5IH
+        OAt8k4MR1swnuHi9PcqA4n347BEV
+X-Google-Smtp-Source: ALg8bN7aPGCtcexVouXatJZ4SSK57hWw1BHZ0OErA3xOQ1R0mVsAE7raz2ggiSKSABsVjhnMfXeZ8g==
+X-Received: by 2002:a5d:454f:: with SMTP id p15mr10616411wrr.39.1547138881309;
+        Thu, 10 Jan 2019 08:48:01 -0800 (PST)
 Received: from [192.168.2.164] (p5B08A983.dip0.t-ipconnect.de. [91.8.169.131])
-        by smtp.gmail.com with ESMTPSA id a12sm66257687wro.18.2019.01.10.08.47.55
+        by smtp.gmail.com with ESMTPSA id 3sm19176456wmw.46.2019.01.10.08.48.00
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Jan 2019 08:47:55 -0800 (PST)
-To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+        Thu, 10 Jan 2019 08:48:00 -0800 (PST)
+Subject: Re: Multiple peers with bluetooth_6lowpan
+References: <b0665aa8-4bfb-4ec8-3f7f-deb2bf5ea61a@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
 From:   Josua Mayer <josua.mayer97@gmail.com>
-Subject: [RFC] bluetooth_6lowpan: search for destination address in all peers
 Openpgp: preference=signencrypt
 Autocrypt: addr=josua.mayer97@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFtbYt4BEACysNSF+vmzzBvR+YgJDK6X34V+WUStfjN3YqbcClZxUWe2rOt3BfxsuG+a
@@ -135,9 +137,10 @@ Autocrypt: addr=josua.mayer97@gmail.com; prefer-encrypt=mutual; keydata=
  baaDWy6Yx9bIat1koYXY0TD9hhIRdQ1Z3T0qBqm2b9oMT8XzhIhlBzwkrku5XmVfHILh6m/D
  Atc5XoeNksMaV6XsdxSAsBT6Vy5Ancd9LQ6hx2F4N/EY2K+X/j63RQwyJSrHXWHyY1if/TY3
  CKEuEwlKLbUIs14huWIjQI1HmQ9RjWe3DUkI6Y6MpmY=
-Message-ID: <edcbc506-c247-e5b7-ea78-942d7832d9ef@gmail.com>
-Date:   Thu, 10 Jan 2019 17:47:55 +0100
+Message-ID: <d36c145a-02a2-a9b2-a4b0-68e275d74958@gmail.com>
+Date:   Thu, 10 Jan 2019 17:48:00 +0100
 MIME-Version: 1.0
+In-Reply-To: <b0665aa8-4bfb-4ec8-3f7f-deb2bf5ea61a@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -146,33 +149,63 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Josua Mayer <josua.mayer97@gmail.com>
+Good day once more,
 
-Handle overlooked case where the target address is assigned to a peer
-and neither route nor gateway exist.
+I have now identified a chain of calls leading up to the described
+issue, along with a work-around:
 
-For one peer, no checks are performed to see if it is meant to receive
-packets for a given address.
+The first step was discovering fishy debug messages in dmesg:
+[  235.505517] Connecting to first module while both are powered
+[  237.394085] ifindex 5 peer bdaddr 00:b1:fc:8c:6e:47 type 1 my addr
+a4:d5:78:11:cf:6f type 1
+[  241.872089] dest IP fe80::b1:fcff:fe8c:6e47
+[  241.872104] peers 1 addr fe80::b1:fcff:fe8c:6e47 rt   (null)
+[  241.872124] xmit bt0 to 00:b1:fc:8c:6e:47 type 1 IP 6800::600 chan
+(ptrval)
+[  242.356387] Connecting to second module
+[  244.073592] dest IP fe80::b1:fcff:fe8c:6e47
+[  244.073603] peers 2 addr fe80::b1:fcff:fe8c:6e47 rt   (null)
+[  244.073607] no such peer
 
-As soon as there is a second peer however, checks are performed
-to deal with routes and gatways for handling complex setups with
-multiple hops to a target address.
-This logic assumed that no route and no gatway imply that the
-destination address can not be reached, which is false in case of a
-direct peer.
----
- net/bluetooth/6lowpan.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+We can see here how the first module is connected, and packets to its
+link-local address are being transmitted.
+Then the second module is connected and the number of peers updates to 2.
+Now we have another packet for the first modules link-local address. We
+know there are 2 peers, but for some reason we get a message saying "no
+such peer"!
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 828e87fe8027..f706b8a13fad 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -187,10 +187,16 @@ static inline struct lowpan_peer
-*peer_lookup_dst(struct lowpan_btle_dev *dev,
- 	}
+Luckily this message was easy to trace:
+See net/bluetooth/6lowpan.c:setup_header
+This message is a direct result of a previous call to peer_lookup_dst
+returning null.
+Now while reviewing peer_lookup_dst, keep in mind that we are looking
+for a difference in behaviour when there is one, and when tehre are at
+least two peers.
+Let me just quote here:
+if (count == 1) {
+peer = list_first_or_null_rcu(&dev->peers, struct lowpan_peer, list);
+return peer;
+}
 
- 	if (!rt) {
+If there is only one peer, no checks are performed at all, it is simply
+assumed that this peer mist be the one to receive packets for the given
+address.
+So this is the one peers, or one module connected case - which works
+just fine.
+
+Then follows a curious case that I do not fully understand:
+if no route is known, and no gateway was specified in packet data, do
+not even search for the right peer, simply return 0:
+if (!rt) {
+nexthop = &lowpan_cb(skb)->gw;
+
+if (ipv6_addr_any(nexthop))
+return NULL;
+}
+^^ I believe this decision is wrong.
+There might be neither route nor gateway, if the destination is a peer.
+
+I have come up with the following work-around:
 -		nexthop = &lowpan_cb(skb)->gw;
 -
 -		if (ipv6_addr_any(nexthop))
@@ -187,9 +220,112 @@ index 828e87fe8027..f706b8a13fad 100644
 +			 */
 +			nexthop = &lowpan_cb(skb)->gw;
 +		}
- 	} else {
- 		nexthop = rt6_nexthop(rt, daddr);
+I am submitting this patch as separately as:
+[RFC] bluetooth_6lowpan: search for destination address in all peers
+It is by no means finished and meant to illustrate the core issue, and
+allow for a discussion around the control logic, and purpose of
+Please comment if I have understood the purpose of the peer_lookup_dst
+function.
+I might even suggest removing the special handling of one peer ... .
 
--- 
-2.20.1
+Yours sincerely
+Josua Mayer
 
+
+Am 08.01.19 um 19:57 schrieb Josua Mayer:
+> Greetings everybody,
+> 
+> I want to present to you an issue I am having the 6LoWPAN over BLE
+> facility in the kernel.
+> I have reached the point where I don't know where, what and how to debug
+> the situation and am hoping for some advice here:
+> 
+> First an overview of the setup:
+> 1. an SBC with BLE capable Bluetooth chip
+> 2. multiple Nordic nRF52840 modules
+> 
+> This is the problem I have observed:
+> 1. One Nordic module is powered - SBC connects to it
+> --> ping6 works flawlessly till the module restarts
+> --> communication with the remote server works as expected
+> 
+> 2. Two Nordic modules are powered - SBC connects only to one at a time
+> --> ping6 works flawlessly till the module restarts
+> --> communication with the remote server works as expected
+> 
+> 3. Two Nordic modules are powered - SBC connects to both
+> --> ping6 receives no more replies as soon as the second module is connected
+> --> communication to the remote server stops as soon as the second
+> module is connected
+> 
+> Test Case:
+> rfkill unblock 0
+> modprobe bluetooth_6lowpan
+> echo -n 'module bluetooth_6lowpan +p' >
+> /sys/kernel/debug/dynamic_debug/control
+> 
+> while true; do ping6 -c 1 -I bt0 fe80::b1:fcff:fe8c:6e47 || true; sleep
+> 1; done
+> 
+> echo "Connecting to first module while both are powered" > /dev/kmsg
+> echo "connect 00:B1:FC:8C:6E:47 1" >
+> /sys/kernel/debug/bluetooth/6lowpan_control
+> # sit back and watch pings till module restarts
+> echo "Connecting to first module while both are powered" > /dev/kmsg
+> echo "connect 00:B1:FC:8C:6E:47 1" >
+> /sys/kernel/debug/bluetooth/6lowpan_control
+> # wait till first ping goes through
+> echo "Connecting to second module" > /dev/kmsg
+> echo "connect 00:39:D3:29:92:1C 1" >
+> /sys/kernel/debug/bluetooth/6lowpan_control
+> # Expected: ping6 continues to receive replies
+> # Actual result: ping6 times out
+> 
+> Please see attached dmesg.log from this test case, with dynamic
+> debugging enabled for module bluetooth_6lowpan.
+> 
+> The Nordic modules are programmed to advertise themselves for
+> establishing a connection; Then they start communication with a server
+> on the internet over ipv6. Finally they are rebooted by a watchdog.
+> While a module is connected, it can be pinged by its link-local address
+> which is derived from its MAC address and thereby known.
+> 
+> As you may have noticed I just wrote "SBC" above.
+> That is because I have done this experiment with 3 different SBCs:
+> 1. SolidRun HummingBoard with i.MX6 uSOM Revision 1.5
+> features Ti WL18MODGB combined WiFi and Bluetooth module
+> - linux-image-4.20.0-trunk-armmp_4.20-1~exp2_armhf.deb
+> (+BT_HCIUART=m, +BT_HCIUART_LL=y, +DYNAMIC_DEBUG=y)
+> ^^ This system was used to produce the attached dmesg.log
+> 
+> 2. RaspberryPi 3B
+> 3. RaspberryPi 3B+
+> - rpi-4.15.y (from their github)
+> - rpi-4.16.y (from their github)
+> - rpi-4.17.y (from their github)
+> - rpi-4.18.y (from their github)
+> - rpi-4.19.y (from their github)
+> - rpi-4.20.y (from their github)
+> bcm2709_defconfig
+> zImage modules dtbs -j12
+> gcc-linaro-7.3.1-2018.05-x86_64_arm-linux-gnueabihf
+> 
+> rpi-4.14.y suffers from a busy kworker (Workqueue: hci0 hci_rx_work
+> [bluetooth]) making tests difficult.
+> 
+> Supposedly back in 4.4.8-v7 on raspberrypi this issue with multiple
+> peers did not exist, while the busy kworker did pop up after time
+> requring a reboot.
+> I did not verify or test with that rather old version yet.
+> Would it be a good idea to start from that 4.4.8 rpi fork working up to
+> 4.15 to find the place where it broke? I feel like this kind of work is
+> difficult
+> when forks are involved.
+> 
+> Are there any components of the kernel in particular that could be verified
+> in order to figure out what is going wrong?
+> 
+> 
+> Yours sincerely
+> Josua Mayer
+> 
