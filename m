@@ -7,146 +7,114 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 353D6C43387
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 06:28:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CFD9C43387
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 06:29:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 066262173B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 06:28:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1ADE821738
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Jan 2019 06:29:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1547101720;
-	bh=IbBAP5tQr/AKDsuD+OPBlhsO0wVsjH1xEzAmmbFRLRE=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=0yeJvX5IwvZ1ktrPnzziEwHr9R0ZrZ6Q+hQtzVoZh7C0JVxWXUONICrrO6k0x+RwQ
-	 O8o76dpwmFz+gI0pUyqymBAyi1+93ZvP44ZBZFlrBGRVZb6YrOsvMoZmIbT95o7mji
-	 gMIUtQwSOkHQ11qVNRaH3XpkoT6M7/EdUraLClIY=
+	s=default; t=1547101763;
+	bh=lYWmmcoXXeN1EcA6kRer3NaCPJLc9vJUzQ2qWlTrUNs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=JXsJmPu/+2k5/44NNKnmUpkiMEVFs0Hp+hua+Aar4nlUsCHczH//iR06ZpIotTxx9
+	 PvpYNSmth+ZVjjVuiwS4xHduCQwRrbwqfJYF+JS+Negr14gKGP9Hjcf+G1PFbjSC6E
+	 Q+CAoVYPAOSI/Ae+yyAqyFeBfsEuOPAblWP8gf1o=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726968AbfAJG2h (ORCPT
+        id S1727330AbfAJG3U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Jan 2019 01:28:37 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37640 "EHLO mail.kernel.org"
+        Thu, 10 Jan 2019 01:29:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37866 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726338AbfAJG2h (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Jan 2019 01:28:37 -0500
+        id S1726968AbfAJG3U (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 10 Jan 2019 01:29:20 -0500
 Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 088CA206B7;
-        Thu, 10 Jan 2019 06:28:34 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 922C1206B7;
+        Thu, 10 Jan 2019 06:29:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1547101715;
-        bh=IbBAP5tQr/AKDsuD+OPBlhsO0wVsjH1xEzAmmbFRLRE=;
-        h=Date:From:To:Cc:Subject:From;
-        b=s/yNM6nTtDaF0EAfi4cN8E410WWe6mf3MQJXTAUh2RppmJ4qF512GFdd+s8NuNEzT
-         GiuqP+BhyZm7+m9YKXZZn9B/bMTiiGx9XJ4YKW4XGdMnzt1rbHcl2xJqVwr3LpvjRi
-         2k2h8g1gBUFOtXq2aNni0dsTcmIV/eueBvM3RiFw=
-Date:   Thu, 10 Jan 2019 07:28:33 +0100
+        s=default; t=1547101760;
+        bh=lYWmmcoXXeN1EcA6kRer3NaCPJLc9vJUzQ2qWlTrUNs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=bDcz399e5lZdcBFZgMor1qdei2nWBzFu0b4Da2b381H88DmvZd7UkOTk1YeJBssDC
+         exef7bwMji2LFTeHzg91VirbxKTWap9E9nwkeaqpF3JI0r0ZuycNtc9A5MkKlLgYo/
+         0TI/AjNOc6gAve2y20jSFY0Q+PbRaLxSkkWaGMXU=
+Date:   Thu, 10 Jan 2019 07:29:17 +0100
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: check message types in l2cap_get_conf_opt
-Message-ID: <20190110062833.GA15047@kroah.com>
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        Ran Menscher <ran.menscher@karambasecurity.com>
+Subject: [PATCH 2/2] Bluetooth: check the buffer size for some messages
+ before parsing
+Message-ID: <20190110062917.GB15047@kroah.com>
+References: <20190110062833.GA15047@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20190110062833.GA15047@kroah.com>
 User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-l2cap_get_conf_opt can handle a "default" message type, but it needs to
-be verified that it really is the correct type (CONF_EFS or CONF_RFC)
-before passing it back to the caller.  To do this we need to check the
-return value of this call now and handle the error correctly up the
-stack.
+The L2CAP_CONF_EFS and L2CAP_CONF_RFC messages can be sent from
+userspace so their structure sizes need to be checked before parsing
+them.
 
 Based on a patch from Ran Menscher.
 
 Reported-by: Ran Menscher <ran.menscher@karambasecurity.com>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- net/bluetooth/l2cap_core.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ net/bluetooth/l2cap_core.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2a7fb517d460..93daf94565cf 100644
+index 93daf94565cf..55e48e6efc2b 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -2980,6 +2980,10 @@ static inline int l2cap_get_conf_opt(void **ptr, int *type, int *olen,
- 		break;
+@@ -3361,7 +3361,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 			break;
  
- 	default:
-+		/* Only CONF_EFS and CONF_RFC are allowed here */
-+		if ((opt->type != L2CAP_CONF_EFS) &&
-+		    (opt->type != L2CAP_CONF_RFC))
-+			return -EPROTO;
- 		*val = (unsigned long) opt->val;
- 		break;
- 	}
-@@ -3324,7 +3328,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 	void *endptr = data + data_size;
- 	void *req = chan->conf_req;
- 	int len = chan->conf_len;
--	int type, hint, olen;
-+	int type, hint, olen, err;
- 	unsigned long val;
- 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
- 	struct l2cap_conf_efs efs;
-@@ -3336,7 +3340,10 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 	BT_DBG("chan %p", chan);
- 
- 	while (len >= L2CAP_CONF_OPT_SIZE) {
--		len -= l2cap_get_conf_opt(&req, &type, &olen, &val);
-+		err = l2cap_get_conf_opt(&req, &type, &olen, &val);
-+		if (err < 0)
-+			return err;
-+		len -= err;
- 
- 		hint  = type & L2CAP_CONF_HINT;
- 		type &= L2CAP_CONF_MASK;
-@@ -3539,7 +3546,7 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
- 	struct l2cap_conf_req *req = data;
- 	void *ptr = req->data;
- 	void *endptr = data + size;
--	int type, olen;
-+	int type, olen, err;
- 	unsigned long val;
- 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
- 	struct l2cap_conf_efs efs;
-@@ -3547,7 +3554,10 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
- 	BT_DBG("chan %p, rsp %p, len %d, req %p", chan, rsp, len, data);
- 
- 	while (len >= L2CAP_CONF_OPT_SIZE) {
--		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
-+		err = l2cap_get_conf_opt(&rsp, &type, &olen, &val);
-+		if (err < 0)
-+			return err;
-+		len -= err;
- 
- 		switch (type) {
- 		case L2CAP_CONF_MTU:
-@@ -3707,7 +3717,7 @@ void __l2cap_connect_rsp_defer(struct l2cap_chan *chan)
- 
- static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- {
--	int type, olen;
-+	int type, olen, err;
- 	unsigned long val;
- 	/* Use sane default values in case a misbehaving remote device
- 	 * did not send an RFC or extended window size option.
-@@ -3727,7 +3737,10 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- 		return;
- 
- 	while (len >= L2CAP_CONF_OPT_SIZE) {
--		len -= l2cap_get_conf_opt(&rsp, &type, &olen, &val);
-+		err = l2cap_get_conf_opt(&rsp, &type, &olen, &val);
-+		if (err < 0)
-+			return;
-+		len -= err;
- 
- 		switch (type) {
  		case L2CAP_CONF_RFC:
+-			if (olen == sizeof(rfc))
++			if ((olen == sizeof(rfc)) &&
++			    (endptr - ptr >= L2CAP_CONF_OPT_SIZE + sizeof(rfc)))
+ 				memcpy(&rfc, (void *) val, olen);
+ 			break;
+ 
+@@ -3371,7 +3372,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+ 			break;
+ 
+ 		case L2CAP_CONF_EFS:
+-			if (olen == sizeof(efs)) {
++			if ((olen == sizeof(efs)) &&
++			    (endptr - ptr >= L2CAP_CONF_OPT_SIZE + sizeof(efs))) {
+ 				remote_efs = 1;
+ 				memcpy(&efs, (void *) val, olen);
+ 			}
+@@ -3576,7 +3578,8 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
+ 			break;
+ 
+ 		case L2CAP_CONF_RFC:
+-			if (olen == sizeof(rfc))
++			if ((olen == sizeof(rfc)) &&
++			    (endptr - ptr >= L2CAP_CONF_OPT_SIZE + sizeof(rfc)))
+ 				memcpy(&rfc, (void *)val, olen);
+ 
+ 			if (test_bit(CONF_STATE2_DEVICE, &chan->conf_state) &&
+@@ -3596,7 +3599,8 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
+ 			break;
+ 
+ 		case L2CAP_CONF_EFS:
+-			if (olen == sizeof(efs)) {
++			if ((olen == sizeof(efs)) &&
++			    (endptr - ptr >= L2CAP_CONF_OPT_SIZE + sizeof(efs))) {
+ 				memcpy(&efs, (void *)val, olen);
+ 
+ 				if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
 -- 
 2.20.1
 
