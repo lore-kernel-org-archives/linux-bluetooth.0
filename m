@@ -2,107 +2,120 @@ Return-Path: <SRS0=CXZ/=PT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C870AC43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 05:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6E5C43612
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 06:55:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 90D7820870
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 05:32:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1547184750;
-	bh=R1EsEh842il6A8FDQcPwpUpbpasEfVxm5rxXur9h5C4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=X0I1xc4HTB1SvIWdYUE4XJbR7EyhMlRlx7xpjcMWu1r0Ht+VHWFOoR5hC3nNYwojF
-	 fZBv8CKbDchMz+6RcUoO0Du0Z6xwF+tBGXnKQKVWUVapJaLVdqagumOVcn9f4BvfdF
-	 +1WoMmX98tXp3qijJzommfZn7PFrjE5pct6qrQm0=
+	by mail.kernel.org (Postfix) with ESMTP id 8BDFA20874
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 06:55:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uHDoT1IP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729070AbfAKFc2 (ORCPT
+        id S1725790AbfAKGzW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Jan 2019 00:32:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50900 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725769AbfAKFc2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Jan 2019 00:32:28 -0500
-Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1AC0220870;
-        Fri, 11 Jan 2019 05:32:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1547184747;
-        bh=R1EsEh842il6A8FDQcPwpUpbpasEfVxm5rxXur9h5C4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZhCnhVg4fzB69N1GVnFese/1fDYSghIyERYe1UZOo6MNuEWUa7qmD4On5VA22lJGG
-         91kjVTXbJ1Wa1ct4MlvL31ry9BSP9BkQLc1aEpU5OAVYWr5/AlG40KKj0iNHWhix7E
-         jTK+zIk3oHLRvimbmLI+IIx9R3f3mfn6h9VCbhYA=
-Date:   Fri, 11 Jan 2019 06:32:23 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Joe Perches <joe@perches.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: check message types in l2cap_get_conf_opt
-Message-ID: <20190111053223.GA24338@kroah.com>
-References: <20190110062833.GA15047@kroah.com>
- <8616937378cec9330c27a3b08c24ab15ebb42ecf.camel@perches.com>
+        Fri, 11 Jan 2019 01:55:22 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:44455 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725267AbfAKGzW (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 11 Jan 2019 01:55:22 -0500
+Received: by mail-pf1-f195.google.com with SMTP id u6so6499877pfh.11;
+        Thu, 10 Jan 2019 22:55:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=ND9+7PXVzbCVGLg9x59ZbN8q0pF2DmYmFt3qYX2lP5g=;
+        b=uHDoT1IP1XyfHKt6Pyj0gYCAyO7jux99PBGQLGKGjEbsMNfdb79UI4FA09OxnLpQWg
+         wD3TUdh/GMve2xiLh8Pz6mME9790SVBbyiH77RFSuSuzPNUWb0ZEtyp+Z7/uXQzQfYwp
+         IWgTyTOO6biVPKL/oBrnca21MZLjLDI3qzGGCtP7EP9qK5pnbu7rtdlqy0yTCm+q8tAE
+         u8wxMYTE6UYMEKoIAiDsaVgzo7CBZ0h1o7hhDwv6xfKWkWtKA8cOQ1OJMVNxdxNdvTui
+         dKaRbzBC9ipINF+htOIwDCxKDAHgsPQJXW4bk4FW1wM5aTqRZqmobEAzxJRSywUsWdnF
+         P0BQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=ND9+7PXVzbCVGLg9x59ZbN8q0pF2DmYmFt3qYX2lP5g=;
+        b=eboh8HQTQFYLPB0m6PU3wBMbjMFuXB6T7yXB755brxjzi5qwdJc4ndheVf0jBw+asY
+         YrPrX9d4I99yGzxnE5VzdmB7igJDLmgfH5BWSsLFRdOZipIr5buUAnrGib9H2uEkOgFu
+         F/hf1OqhXWjLb/7/YQYB+T5mnRdnozm8ZHT5+rWnLDd3/7MLyomjF2ygESxIbZE5KkMZ
+         /4o69MAaOZX9HLIR5lQvGFf+5wfEr9ySwIroaiTGMo43fY5qVczpkPpPxv/X7+WIlsSC
+         yznP+VUabSPqtNClLI6C3mCIG1fktoA6qoiEZvMeBCYR/YKsqPN288z9XRKL1Blx60hJ
+         hmcQ==
+X-Gm-Message-State: AJcUukdWmDgSUlbkCKaYHybVNrC2HAYtz/qDc17Yg0teEzT3SECbo3mX
+        5UnmOJOOsGhlP6vpZiDUYTk=
+X-Google-Smtp-Source: ALg8bN5/XgE3khJkstBqxYLL/ieDdUD7kC66zRon1vnNIIa8IjqIj1Z1EO8lt/JDtiLi/OMlQsuFPA==
+X-Received: by 2002:a63:6984:: with SMTP id e126mr12458307pgc.143.1547189720752;
+        Thu, 10 Jan 2019 22:55:20 -0800 (PST)
+Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
+        by smtp.gmail.com with ESMTPSA id j9sm99456381pfi.86.2019.01.10.22.55.19
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 10 Jan 2019 22:55:20 -0800 (PST)
+Date:   Thu, 10 Jan 2019 22:55:17 -0800
+From:   Myungho Jung <mhjungk@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_uart: Add a local variable to store the
+ result of h4_recv_buf()
+Message-ID: <20190111065514.GA26542@myunghoj-Precision-5530>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8616937378cec9330c27a3b08c24ab15ebb42ecf.camel@perches.com>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jan 10, 2019 at 01:02:09PM -0800, Joe Perches wrote:
-> On Thu, 2019-01-10 at 07:28 +0100, Greg Kroah-Hartman wrote:
-> > l2cap_get_conf_opt can handle a "default" message type, but it needs to
-> > be verified that it really is the correct type (CONF_EFS or CONF_RFC)
-> > before passing it back to the caller.  To do this we need to check the
-> > return value of this call now and handle the error correctly up the
-> > stack.
-> []
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> []
-> > @@ -3324,7 +3328,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
-> >  	void *endptr = data + data_size;
-> >  	void *req = chan->conf_req;
-> >  	int len = chan->conf_len;
-> > -	int type, hint, olen;
-> > +	int type, hint, olen, err;
-> 
-> err doesn't seem the right name for any of these as the
-> return is now negative only when there is an error.
-> 
-> Maybe opt_len instead.
+In h4_recv(), if h4_recv_buf() returns error and h4_recv() is
+asynchronously called again before setting rx_skb to NULL, ERR_PTR will
+be dereferenced in h4_recv_buf(). Check return value in a local variable
+before writing to rx_skb.
 
-I was copying the style that was used in the rest of the file.  If the
-maintainers want me to use a different name, I'll be glad to do so.  My
-personal preference is just 'ret'.
+Reported-by: syzbot+017a32f149406df32703@syzkaller.appspotmail.com
+Signed-off-by: Myungho Jung <mhjungk@gmail.com>
+---
+ drivers/bluetooth/hci_h4.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-> >  	unsigned long val;
-> >  	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
-> >  	struct l2cap_conf_efs efs;
-> > @@ -3336,7 +3340,10 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
-> >  	BT_DBG("chan %p", chan);
-> >  
-> >  	while (len >= L2CAP_CONF_OPT_SIZE) {
-> > -		len -= l2cap_get_conf_opt(&req, &type, &olen, &val);
-> > +		err = l2cap_get_conf_opt(&req, &type, &olen, &val);
-> > +		if (err < 0)
-> > +			return err;
-> > +		len -= err;
-> 
-> especially as you subtract the positive return not
-> an error value.
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index fb97a3bf069b..fa30ec9cebd4 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -124,19 +124,22 @@ static const struct h4_recv_pkt h4_recv_pkts[] = {
+ static int h4_recv(struct hci_uart *hu, const void *data, int count)
+ {
+ 	struct h4_struct *h4 = hu->priv;
++	struct sk_buff *skb;
+ 
+ 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
+ 		return -EUNATCH;
+ 
+-	h4->rx_skb = h4_recv_buf(hu->hdev, h4->rx_skb, data, count,
+-				 h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
+-	if (IS_ERR(h4->rx_skb)) {
+-		int err = PTR_ERR(h4->rx_skb);
++	skb = h4_recv_buf(hu->hdev, h4->rx_skb, data, count,
++			  h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
++	if (IS_ERR(skb)) {
++		int err = PTR_ERR(skb);
+ 		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
+ 		h4->rx_skb = NULL;
+ 		return err;
+ 	}
+ 
++	h4->rx_skb = skb;
++
+ 	return count;
+ }
+ 
+-- 
+2.17.1
 
-True, 'ret' would be nicer, but again, I was trying to follow the file's
-style.
-
-thanks,
-
-greg k-h
