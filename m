@@ -2,120 +2,215 @@ Return-Path: <SRS0=CXZ/=PT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6E5C43612
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 06:55:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2491C43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 09:49:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BDFA20874
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 06:55:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uHDoT1IP"
+	by mail.kernel.org (Postfix) with ESMTP id 9304220874
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 09:49:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725790AbfAKGzW (ORCPT
+        id S1731426AbfAKJto convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Jan 2019 01:55:22 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44455 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725267AbfAKGzW (ORCPT
+        Fri, 11 Jan 2019 04:49:44 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:40122 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727653AbfAKJtn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Jan 2019 01:55:22 -0500
-Received: by mail-pf1-f195.google.com with SMTP id u6so6499877pfh.11;
-        Thu, 10 Jan 2019 22:55:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=ND9+7PXVzbCVGLg9x59ZbN8q0pF2DmYmFt3qYX2lP5g=;
-        b=uHDoT1IP1XyfHKt6Pyj0gYCAyO7jux99PBGQLGKGjEbsMNfdb79UI4FA09OxnLpQWg
-         wD3TUdh/GMve2xiLh8Pz6mME9790SVBbyiH77RFSuSuzPNUWb0ZEtyp+Z7/uXQzQfYwp
-         IWgTyTOO6biVPKL/oBrnca21MZLjLDI3qzGGCtP7EP9qK5pnbu7rtdlqy0yTCm+q8tAE
-         u8wxMYTE6UYMEKoIAiDsaVgzo7CBZ0h1o7hhDwv6xfKWkWtKA8cOQ1OJMVNxdxNdvTui
-         dKaRbzBC9ipINF+htOIwDCxKDAHgsPQJXW4bk4FW1wM5aTqRZqmobEAzxJRSywUsWdnF
-         P0BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=ND9+7PXVzbCVGLg9x59ZbN8q0pF2DmYmFt3qYX2lP5g=;
-        b=eboh8HQTQFYLPB0m6PU3wBMbjMFuXB6T7yXB755brxjzi5qwdJc4ndheVf0jBw+asY
-         YrPrX9d4I99yGzxnE5VzdmB7igJDLmgfH5BWSsLFRdOZipIr5buUAnrGib9H2uEkOgFu
-         F/hf1OqhXWjLb/7/YQYB+T5mnRdnozm8ZHT5+rWnLDd3/7MLyomjF2ygESxIbZE5KkMZ
-         /4o69MAaOZX9HLIR5lQvGFf+5wfEr9ySwIroaiTGMo43fY5qVczpkPpPxv/X7+WIlsSC
-         yznP+VUabSPqtNClLI6C3mCIG1fktoA6qoiEZvMeBCYR/YKsqPN288z9XRKL1Blx60hJ
-         hmcQ==
-X-Gm-Message-State: AJcUukdWmDgSUlbkCKaYHybVNrC2HAYtz/qDc17Yg0teEzT3SECbo3mX
-        5UnmOJOOsGhlP6vpZiDUYTk=
-X-Google-Smtp-Source: ALg8bN5/XgE3khJkstBqxYLL/ieDdUD7kC66zRon1vnNIIa8IjqIj1Z1EO8lt/JDtiLi/OMlQsuFPA==
-X-Received: by 2002:a63:6984:: with SMTP id e126mr12458307pgc.143.1547189720752;
-        Thu, 10 Jan 2019 22:55:20 -0800 (PST)
-Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
-        by smtp.gmail.com with ESMTPSA id j9sm99456381pfi.86.2019.01.10.22.55.19
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 10 Jan 2019 22:55:20 -0800 (PST)
-Date:   Thu, 10 Jan 2019 22:55:17 -0800
-From:   Myungho Jung <mhjungk@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_uart: Add a local variable to store the
- result of h4_recv_buf()
-Message-ID: <20190111065514.GA26542@myunghoj-Precision-5530>
+        Fri, 11 Jan 2019 04:49:43 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 5E8EB29993
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jan 2019 09:49:42 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 52EF4299A5; Fri, 11 Jan 2019 09:49:42 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 202213] bluez trunk tests fail with GCC 9 (or with
+ -fsanitize=address with GCC 9)
+Date:   Fri, 11 Jan 2019 09:49:41 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: mliska@suse.cz
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-202213-62941-cPX9nAEond@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-202213-62941@https.bugzilla.kernel.org/>
+References: <bug-202213-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In h4_recv(), if h4_recv_buf() returns error and h4_recv() is
-asynchronously called again before setting rx_skb to NULL, ERR_PTR will
-be dereferenced in h4_recv_buf(). Check return value in a local variable
-before writing to rx_skb.
+https://bugzilla.kernel.org/show_bug.cgi?id=202213
 
-Reported-by: syzbot+017a32f149406df32703@syzkaller.appspotmail.com
-Signed-off-by: Myungho Jung <mhjungk@gmail.com>
----
- drivers/bluetooth/hci_h4.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+--- Comment #5 from Martin Liška (mliska@suse.cz) ---
+(In reply to Stefan Seyfried from comment #4)
+> With gcc9 (finally found a way to use it in OBS :-), it asserts:
+> 
+> abuild@strolchi:~/rpmbuild/BUILD/bluez-5.50> cat unit/test-sdp.log
+> bluetoothd[3066]: Bluetooth daemon 5.50
+> len: 7 raw_size: 14 cont_len: 0
+> **
+> ERROR:unit/test-sdp.c:258:client_handler: assertion failed: ((size_t) len ==
+> rsp_pdu->raw_size + rsp_pdu->cont_len)
+> FAIL unit/test-sdp (exit status: 134)
+> 
+> I added a printf before the assert (and shifted it down one line)
 
-diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
-index fb97a3bf069b..fa30ec9cebd4 100644
---- a/drivers/bluetooth/hci_h4.c
-+++ b/drivers/bluetooth/hci_h4.c
-@@ -124,19 +124,22 @@ static const struct h4_recv_pkt h4_recv_pkts[] = {
- static int h4_recv(struct hci_uart *hu, const void *data, int count)
- {
- 	struct h4_struct *h4 = hu->priv;
-+	struct sk_buff *skb;
- 
- 	if (!test_bit(HCI_UART_REGISTERED, &hu->flags))
- 		return -EUNATCH;
- 
--	h4->rx_skb = h4_recv_buf(hu->hdev, h4->rx_skb, data, count,
--				 h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
--	if (IS_ERR(h4->rx_skb)) {
--		int err = PTR_ERR(h4->rx_skb);
-+	skb = h4_recv_buf(hu->hdev, h4->rx_skb, data, count,
-+			  h4_recv_pkts, ARRAY_SIZE(h4_recv_pkts));
-+	if (IS_ERR(skb)) {
-+		int err = PTR_ERR(skb);
- 		bt_dev_err(hu->hdev, "Frame reassembly failed (%d)", err);
- 		h4->rx_skb = NULL;
- 		return err;
- 	}
- 
-+	h4->rx_skb = skb;
-+
- 	return count;
- }
- 
+The patch does not fix the root problem.
+#define define_test(name, _mtu, args...) \
+        do {                                                            \
+                const struct sdp_pdu pdus[] = {                         \
+                        args, { }                                       \
+                };                                                      \
+                static struct test_data data;                           \
+                data.mtu = _mtu;                                        \
+                data.pdu_list = g_memdup(pdus, sizeof(pdus));           \
+                tester_add(name, &data, NULL, test_sdp, NULL);          \
+        } while (0)
+
+here you copy pdus, but you should also memdup .raw_data, otherwise
+it will reach it's end of scope.
+
+Slightly reduced test-case that illustrates that:
+
+$ cat test-sdp.i
+struct a {
+  void *b;
+  long c
+};
+enum { d = 5 } typedef *e;
+e g_malloc0_n();
+typedef enum { f, g } h;
+*g_io_channel_unix_new();
+e g_memdup();
+struct i {
+  _Bool j;
+  void *k;
+  long l
+};
+struct m {
+  struct i *n
+};
+struct context {
+  int o;
+  int fd;
+  struct m *data
+};
+int q;
+struct i r;
+struct a s[];
+t(e u) {
+  struct context *context = u;
+  r = context->data->n[q];
+  s[0].b = r.k;
+  s[0].c = r.l;
+  writev(context->fd, s, 2);
+  return 0;
+}
+v(int channel, h cond, e u) {
+  struct context *context = u;
+  g_source_remove(context->o);
+  g_free(u);
+  tester_test_passed();
+}
+int *w;
+int aa[];
+*x(data) {
+  struct context *context = g_malloc0_n(1, sizeof(struct context));
+  socketpair(1, d, 0, aa);
+  w = g_io_channel_unix_new(aa[0]);
+  context->o = g_io_add_watch(w, g, v, context);
+  context->fd = aa[1];
+  context->data = data;
+}
+y() {
+  struct context *context = x();
+  g_idle_add(t, context);
+}
+z;
+main() {
+  tester_init(z);
+  {
+    struct i ab[] = {.1, (char[]){4, 11, 0, 1}, sizeof(0)};
+    static struct m data;
+    data.n = g_memdup(ab, sizeof(ab));
+    tester_add("", &data, 0, y);
+  }
+  tester_run();
+}
+
+$ ./test
+
+ - init
+ - setup
+ - setup complete
+ - run
+=================================================================
+==29724==ERROR: AddressSanitizer: stack-use-after-scope on address
+0x7fffffffdc00 at pc 0x7ffff744c678 bp 0x7fffffffd9e0 sp 0x7fffffffd190
+READ of size 4 at 0x7fffffffdc00 thread T0
+    #0 0x7ffff744c677 in read_iovec
+/home/marxin/Programming/gcc/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:956
+    #1 0x7ffff744cded in __interceptor_writev
+/home/marxin/Programming/gcc/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:1150
+    #2 0x408160 in t
+/home/marxin/BIG/osc/Base:System/bluez/bluez-5.50/xxx/test-sdp.i:31
+    #3 0x7ffff7ed8626  (/usr/lib64/libglib-2.0.so.0+0x4d626)
+    #4 0x7ffff7edbc14 in g_main_context_dispatch
+(/usr/lib64/libglib-2.0.so.0+0x50c14)
+    #5 0x7ffff7edbfd7  (/usr/lib64/libglib-2.0.so.0+0x50fd7)
+    #6 0x7ffff7edc2d1 in g_main_loop_run (/usr/lib64/libglib-2.0.so.0+0x512d1)
+    #7 0x41ad10 in tester_run src/shared/tester.c:830
+    #8 0x408603 in main
+/home/marxin/BIG/osc/Base:System/bluez/bluez-5.50/xxx/test-sdp.i:63
+    #9 0x7ffff7018fea in __libc_start_main ../csu/libc-start.c:308
+    #10 0x403789 in _start
+(/home/marxin/BIG/osc/Base:System/bluez/bluez-5.50/xxx/test+0x403789)
+
+Address 0x7fffffffdc00 is located in stack of thread T0 at offset 48 in frame
+    #0 0x408394 in main
+/home/marxin/BIG/osc/Base:System/bluez/bluez-5.50/xxx/test-sdp.i:55
+
+  This frame has 2 object(s):
+    [48, 52) '<unknown>' <== Memory access at offset 48 is inside this variable
+    [64, 88) 'ab' (line 58)
+HINT: this may be a false positive if your program uses some custom stack
+unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-use-after-scope
+/home/marxin/Programming/gcc/libsanitizer/sanitizer_common/sanitizer_common_interceptors.inc:956
+in read_iovec
+Shadow bytes around the buggy address:
+  0x10007fff7b30: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10007fff7b40: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10007fff7b50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10007fff7b60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10007fff7b70: 00 00 00 00 00 00 00 00 00 00 f1 f1 f1 f1 f1 f1
+=>0x10007fff7b80:[f8]f2 f8 f8 f8 f3 f3 f3 f3 f3 00 00 00 00 00 00
+  0x10007fff7b90: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10007fff7ba0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10007fff7bb0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10007fff7bc0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x10007fff7bd0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
 -- 
-2.17.1
-
+You are receiving this mail because:
+You are the assignee for the bug.
