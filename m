@@ -2,169 +2,164 @@ Return-Path: <SRS0=CXZ/=PT=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F62C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 00:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B113C43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 01:37:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF5F22133F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 00:55:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CBBF2133F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jan 2019 01:37:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="RsMMbSiC"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aVLWml4X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728376AbfAKAzg (ORCPT
+        id S1729373AbfAKBhJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Jan 2019 19:55:36 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:45189 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727933AbfAKAzg (ORCPT
+        Thu, 10 Jan 2019 20:37:09 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33357 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728988AbfAKBhJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Jan 2019 19:55:36 -0500
-Received: by mail-pl1-f193.google.com with SMTP id a14so5938386plm.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jan 2019 16:55:35 -0800 (PST)
+        Thu, 10 Jan 2019 20:37:09 -0500
+Received: by mail-pl1-f194.google.com with SMTP id z23so6019743plo.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jan 2019 17:37:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=YjCyW2GH67YMCpgdeXCFurOp9JBWuqWYPvAFzLefnC0=;
-        b=RsMMbSiCTIRrlCcMpHkBgeytNsaijEdpO6bwVs6/eaJBb8CNAtTKpGU42GTaM6E9HD
-         3gyuumzejiDbRjd0QuM4BcsV8oiCnY40wubFJ8nRANgD5D9+doZ1RVFWswpyD9hK9eUZ
-         guTcKBO8QZyYcVOecWU9AJ+LyiYyc+gqP94kU=
+        bh=6q/xuJNr3sBokRPwM7RLrMqV7Gur7gMpsOwsUuBthOg=;
+        b=aVLWml4XKnApFgE2Q8PtpPD/DlQNKQrKrNsHisKzt8pYhhhOTzn81GWo1lzA7h+A78
+         KiEMjzMxh2ENr5rHRRPM0ZD0scmKSA9mX27lBst0k54bw9P54NmKNpl/BHxMWUyW7Ra2
+         27pFF0tAgTgNs1fMrnbUpGUM/YcfgI6omo228=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=YjCyW2GH67YMCpgdeXCFurOp9JBWuqWYPvAFzLefnC0=;
-        b=KZzeLFmQsQvRmAhhRANGWWizk2CuaBFJb+1e/r5ocJTKxchPf4SC4IU31ME7iqlpop
-         PJx1o7OCoNjPLDzwJjtx7kin7P1RLfh1fY1SvYcnmzJNi+ueb3t5R4NSJfhQvrHIt9b1
-         8qU/BXJseQTNsqZUf8ku/86wXVM6ntxXZIdUxg7YWniEQd/gOUXfJZx1t3d540+C/KGV
-         zecWeCP80u+PaIGM7Vk6+gw5uNzjN0oefXo5692zMxhWVzOkTGhD8lpzIhF+Kgjue4PO
-         blnJ2bp4ZHqe2TorChrSSR/RToTTEjDkl+YVWUhafvFGc2Kul7VmPyc0BUS6RmChNv+Q
-         sHoQ==
-X-Gm-Message-State: AJcUukcaMBy5FtgCmiILAr7qJkDAD+JJaMESUtzt3RA68ff9TPQbeNM3
-        hFUSzNzv9v08IhLQgQyWjAdz3Q==
-X-Google-Smtp-Source: ALg8bN5swk/zauv3ghMFWlLsv9y9oVTr+DmGRDMp0DYm2UZiYQ3UuDIPaI/QNJR20sbT4PpJbHBRDw==
-X-Received: by 2002:a17:902:7044:: with SMTP id h4mr12378360plt.35.1547168135238;
-        Thu, 10 Jan 2019 16:55:35 -0800 (PST)
+        bh=6q/xuJNr3sBokRPwM7RLrMqV7Gur7gMpsOwsUuBthOg=;
+        b=QOHG5VDshEcmfUuGb4OXjqVs0FhWuRmOy4yE66x3jhbGs7TdNfFBLN7aWAnyWFr2dJ
+         ImPrEDN7vd+2PryjQR1RXhCXA3/VaAjTGO4QchzX0573f81TDb8eLjWXhrlkW8a2WG8D
+         bn3CAERiuifO7aKqU735ZRxCn73Gzxmbzn/gfKx/Y43OCXK6oTRlC7tKVxo2GzYyKTVO
+         8iFXn8ylalDd4VsnhyqlD/MGrVKOYL6nirN/AIjOSNMlk5qA5mMf9jtb9asincHVcUz+
+         LeKy1lzkz+qcqURTxYiTXOEWXbJzCL/MTJWkN+Yfv6o5Q2oGWMXDxqkQogF+VeQ9uOtM
+         xRMQ==
+X-Gm-Message-State: AJcUukdGUNjVUjetdC4Q/SBu4qEyFzyI1c+jwQdBGgFydClS082MwklC
+        PsG2p5aDN8SC9URyQK3w7+g9Sw==
+X-Google-Smtp-Source: ALg8bN4tw0O29N8dG2GqX8fmXJOiKGYbbzqFIdaODZZGVrvW3VYOb1baZENAWKIxOn3FxZhlopy5tQ==
+X-Received: by 2002:a17:902:e290:: with SMTP id cf16mr12947722plb.81.1547170628474;
+        Thu, 10 Jan 2019 17:37:08 -0800 (PST)
 Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id y191sm27642057pfg.56.2019.01.10.16.55.33
+        by smtp.gmail.com with ESMTPSA id d80sm216447471pfm.146.2019.01.10.17.37.07
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 10 Jan 2019 16:55:33 -0800 (PST)
-Date:   Thu, 10 Jan 2019 16:55:32 -0800
+        Thu, 10 Jan 2019 17:37:07 -0800 (PST)
+Date:   Thu, 10 Jan 2019 17:37:07 -0800
 From:   Matthias Kaehlcke <mka@chromium.org>
 To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
 Cc:     Johan Hovold <johan@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
         linux-arm-msm@vger.kernel.org, Johan Hovold <jhovold@gmail.com>
-Subject: Re: [PATCH v5 1/5] Bluetooth: hci_qca: use wait_until_sent() for
- power pulses
-Message-ID: <20190111005532.GC261387@google.com>
+Subject: Re: [PATCH v5 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate
+ change command
+Message-ID: <20190111013707.GD261387@google.com>
 References: <20181220144639.15928-1-bgodavar@codeaurora.org>
- <20181220144639.15928-2-bgodavar@codeaurora.org>
- <20181222015947.GF261387@google.com>
- <20190109143822.GM14782@localhost>
- <2d4ee183e3c2fa964c14a5ac702043c0@codeaurora.org>
+ <20181220144639.15928-3-bgodavar@codeaurora.org>
+ <20190109145224.GN14782@localhost>
+ <b5160d8862b49f0369fa58610516d354@codeaurora.org>
+ <20190110143928.GE3430@localhost>
+ <61301df80bd6a8ee0265b31b7f6a3aa1@codeaurora.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2d4ee183e3c2fa964c14a5ac702043c0@codeaurora.org>
+In-Reply-To: <61301df80bd6a8ee0265b31b7f6a3aa1@codeaurora.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jan 10, 2019 at 08:18:37PM +0530, Balakrishna Godavarthi wrote:
+On Thu, Jan 10, 2019 at 08:22:12PM +0530, Balakrishna Godavarthi wrote:
 > Hi Johan,
 > 
-> On 2019-01-09 20:08, Johan Hovold wrote:
-> > On Fri, Dec 21, 2018 at 05:59:47PM -0800, Matthias Kaehlcke wrote:
-> > > On Thu, Dec 20, 2018 at 08:16:35PM +0530, Balakrishna Godavarthi
-> > > wrote:
-> > > > wcn3990 requires a power pulse to turn ON/OFF along with
-> > > > regulators. Sometimes we are observing the power pulses are sent
-> > > > out with some time delay, due to queuing these commands. This is
-> > > > causing synchronization issues with chip, which intern delay the
-> > > > chip setup or may end up with communication issues.
-> > > >
-> > > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> > > > ---
-> > > >  drivers/bluetooth/hci_qca.c | 38 ++++++++++++++-----------------------
-> > > >  1 file changed, 14 insertions(+), 24 deletions(-)
-> > > >
-> > > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > > > index f036c8f98ea3..5a07c2370289 100644
-> > > > --- a/drivers/bluetooth/hci_qca.c
-> > > > +++ b/drivers/bluetooth/hci_qca.c
-> > > > @@ -1013,11 +1013,9 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
-> > > >  		hci_uart_set_baudrate(hu, speed);
-> > > >  }
-> > > >
-> > > > -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
-> > > > +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
-> > > >  {
-> > > > -	struct hci_uart *hu = hci_get_drvdata(hdev);
-> > > > -	struct qca_data *qca = hu->priv;
-> > > > -	struct sk_buff *skb;
-> > > > +	int ret;
-> > > >
-> > > >  	/* These power pulses are single byte command which are sent
-> > > >  	 * at required baudrate to wcn3990. On wcn3990, we have an external
-> > > > @@ -1029,19 +1027,16 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
-> > > >  	 * save power. Disabling hardware flow control is mandatory while
-> > > >  	 * sending power pulses to SoC.
-> > > >  	 */
-> > > > -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
-> > > > -
-> > > > -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
-> > > > -	if (!skb)
-> > > > -		return -ENOMEM;
-> > > > -
-> > > > +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to SoC", cmd);
-> > > >  	hci_uart_set_flow_control(hu, true);
-> > > > +	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
-> > > > +	if (ret < 0) {
-> > > > +		bt_dev_err(hu->hdev, "failed to send power pulse %02x to SoC",
-> > > > +			   cmd);
-> > > > +		return ret;
-> > > > +	}
-> > > >
-> > > > -	skb_put_u8(skb, cmd);
-> > > > -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-> > > > -
-> > > > -	skb_queue_tail(&qca->txq, skb);
-> > > > -	hci_uart_tx_wakeup(hu);
-> > > > +	serdev_device_wait_until_sent(hu->serdev, 0);
+> On 2019-01-10 20:09, Johan Hovold wrote:
+> > On Thu, Jan 10, 2019 at 08:04:12PM +0530, Balakrishna Godavarthi wrote:
+> > > Hi Johan,
+> > > 
+> > > On 2019-01-09 20:22, Johan Hovold wrote:
+> > > > On Thu, Dec 20, 2018 at 08:16:36PM +0530, Balakrishna Godavarthi wrote:
+> > > >> This patch will help to stop frame reassembly errors while changing
+> > > >> the baudrate. This is because host send a change baudrate request
+> > > >> command to the chip with 115200 bps, Whereas chip will change their
+> > > >> UART clocks to the enable for new baudrate and sends the response
+> > > >> for the change request command with newer baudrate, On host side
+> > > >> we are still operating in 115200 bps which results of reading garbage
+> > > >> data. Here we are pulling RTS line, so that chip we will wait to send
+> > > >> data
+> > > >> to host until host change its baudrate.
 > > 
-> > Again, do you really want to wait indefinitely here?
+> > > >> +		/* Deassert RTS while changing the baudrate of chip and host.
+> > > >> +		 * This will prevent chip from transmitting its response with
+> > > >> +		 * the new baudrate while the host port is still operating at
+> > > >> +		 * the old speed.
+> > > >> +		 */
+> > > >> +		qcadev = serdev_device_get_drvdata(hu->serdev);
+> > > >> +		if (qcadev->btsoc_type == QCA_WCN3990)
+> > > >> +			serdev_device_set_rts(hu->serdev, false);
+> > > >> +
+> > > >
+> > > > This may not do what you want unless you also disable hardware flow
+> > > > control.
 > > 
-> [Bala]: these commands are mandatory to turn ON or OFF the chip.
->         so blocking to the max time is required.
->         these commands are sent during the BT chip ON & OFF.
->         in the latest series, i have flushed the uart before sending this
-> commands
->         so the uart FIFO(as just opened the port before calling this
-> function) or the circular
->         buffer will be empty and also i am disabling the flow control too.
->        https://patchwork.kernel.org/patch/10744435/
+> > > Here my requirement here is to block the chip to send its data before
+> > > HOST changes it is baudrate. So if i disable flow control lines of
+> > > HOST which will be in low state.  so that the chip will send it data
+> > > before HOST change the baudrate of HOST. which results in frame
+> > > reassembly error.
+> > 
+> > Not sure I understand what you're trying to say above. My point is that
+> > you cannot reliable control RTS when you have automatic flow control
+> > enabled (i.e. it is managed by hardware and it's state reflects whether
+> > there's room in the UART receive FIFO).
+> > 
+> > Johan
+> 
+> [Bala]: Yes i got your point, but our driver
 
-The commands may be mandatory for switching the chip on or off, but
-what is better if there is a problem with sending them (e.g. a buggy
-UART driver):
+I suppose with "our driver" you refer to a Qualcomm UART driver like
+qcom_geni_serial.c. Unless the Bluetooth controller is really tied to
+some specific SoC (e.g. because it is on-chip) you shouldn't make
+assumptions about the UART driver or hardware beyond standard
+behavior.
 
-1. wait a reasonable time, report an error
-2. wait forever
+But even if we assume that the driver you mention is used, I think you
+are rather confirming Johan's concern than dispersing it:
 
-?
+> will not support automatic flow control (based on the FIFO status)
+> unless we explicitly enabled via software. i.e. if we enable the
+> flow, hardware will look for it else it will not looks for CTS or
+> RTS Line.
 
-If the single byte command couldn't be sent after a few milliseconds,
-it likely never will, waiting forever doesn't fix that. An error
-report at least provides some information about the problem and the
-driver is in a not-hanging state.
+So we agree that the UART hardware may change RTS if hardware flow
+control is enabled?
+
+static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
+{
+  ...
+  hci_uart_set_flow_control(hu, false);
+  ...
+}
+
+I still find it utterly confusing that set_flow_control(false) enables
+flow control, but that's what it does, hence after
+qca_send_power_pulse() flow control is (re-)enabled.
+
+So far I haven't seen problems with qcom_geni_serial.c overriding the
+level set with serdev_device_set_rts(), but I tend to agree with Johan
+that this could be a problem (if not with this UART (driver) then with
+another). I'm not keen about adding more flow control on/off clutter,
+but if that is needed for the driver to operate reliably across
+platforms so be it.
 
 Cheers
 
