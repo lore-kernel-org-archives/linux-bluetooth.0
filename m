@@ -2,153 +2,203 @@ Return-Path: <SRS0=/mwE=PU=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6790FC43387
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Jan 2019 12:18:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EACE1C43387
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Jan 2019 15:00:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9590220854
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Jan 2019 12:18:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 839412084E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Jan 2019 15:00:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=goldelico.com header.i=@goldelico.com header.b="NNkODpjM"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=davidjohnsummers.uk header.i=@davidjohnsummers.uk header.b="D08lw16d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725831AbfALMSt (ORCPT
+        id S1725836AbfALPA0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 12 Jan 2019 07:18:49 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:15175 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725824AbfALMSt (ORCPT
+        Sat, 12 Jan 2019 10:00:26 -0500
+Received: from mail-gw.unlimitedwebhosting.co.uk ([149.255.60.86]:55496 "EHLO
+        mail-gw.unlimitedwebhosting.co.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725834AbfALPAZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 12 Jan 2019 07:18:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1547295526;
-        s=strato-dkim-0002; d=goldelico.com;
-        h=To:References:Message-Id:Cc:Date:In-Reply-To:From:Subject:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=CxSOw4BgpsEPtywcCm9QpO7XiE3I6drZc0oPoSe07Ic=;
-        b=NNkODpjM2lGMrPBjqmnGCBmlxCuwHSPFFlus1apGQstQ8u4SZdCgRYWVRRmVwKej3j
-        yFxA54RUDRWoTdoJx8rX1DMTJ1MLyO5nAN8NsbhfK7LRmC3SU74V+Kzrc3AGW3YIO8ZI
-        t52BozR4rjPZejlYZv/qaAwYL+8+CJubXKmL0cFFB6yTr3vG+5qsQ3VKqgAVD5x1P8Db
-        s2faoBXaNOfXpSUvmyKScfSuy64i4KOYaQZRI8HmFYPXOvvN7i9m4ufSTiXBie40WEnL
-        a1nhctA1V8mXyHDRuT93FEVYRCz9iZfpef5XHE9sidnhKEA9iBIb+HOW2zQ2ANys1inR
-        GKCQ==
-X-RZG-AUTH: ":JGIXVUS7cutRB/49FwqZ7WcJeFKiMgPgp8VKxflSZ1P34KBp5hRw/qOxWRk4dCz2bu0M03KjNDR7J5QXDJRMIEU1BODrFBRYTjk="
-X-RZG-CLASS-ID: mo00
-Received: from [IPv6:2001:16b8:26cb:ce00:cff:a27b:eae1:f1ea]
-        by smtp.strato.de (RZmta 44.9 AUTH)
-        with ESMTPSA id 608499v0CCFSg9t
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Sat, 12 Jan 2019 13:15:28 +0100 (CET)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
-Subject: Re: [Letux-kernel] [PATCH RFC] bluetooth: add uart h4 devices via serdev/devicetree
-From:   "H. Nikolaus Schaller" <hns@goldelico.com>
-In-Reply-To: <CABdtJHuHrp6iPEWaCJ1_dMg0reED8ScKTjnW9aRa2JvMnHtH_A@mail.gmail.com>
-Date:   Sat, 12 Jan 2019 13:15:28 +0100
-Cc:     Andreas Kemnade <andreas@kemnade.info>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Rob Herring <robh@kernel.org>,
-        Sebastian Reichel <sebastian.reichel@collabora.com>,
-        devicetree <devicetree@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, letux-kernel@openphoenux.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <A88AE17C-28B7-4CD9-9F3B-AD436A64460B@goldelico.com>
-References: <20181110232034.17277-1-andreas@kemnade.info> <20181111024648.7rt7rlhaqihtqecv@earth.universe> <20181112215812.18ebca35@aktux> <2C74C837-A6D3-47C9-BE59-CCA594289B94@goldelico.com> <20181112222726.73m2oca7hankvcjs@earth.universe> <CABGGisxsdv+BTd5-HMzF8asEcWtL5F4CMzmkrBCwK=NibvqjLQ@mail.gmail.com> <20181113170128.0f59ef0e@kemnade.info> <86A3A2E6-FC89-42FE-8410-9C8273EC9CF7@holtmann.org> <20181116204601.4e1aa0de@kemnade.info> <09AFE47C-D188-4397-A2CD-C70FFAC3B677@holtmann.org> <20190104064403.325771fd@kemnade.info> <B5CEA49A-0F54-40C5-BCEA-7875BE1358E3@holtmann.org> <20190104205600.3e6b31c9@aktux> <CABdtJHuHrp6iPEWaCJ1_dMg0reED8ScKTjnW9aRa2JvMnHtH_A@mail.gmail.com>
-To:     Jon Nettleton <jon@solid-run.com>,
-        Andreas Kemnade <andreas@kemnade.info>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sean Wang <sean.wang@mediatek.com>
-X-Mailer: Apple Mail (2.3124)
+        Sat, 12 Jan 2019 10:00:25 -0500
+Received: from uwhbsf01.unlimitedwebhosting.co.uk (mail-gw.unlimitedwebhosting.co.uk [149.255.60.72])
+        by mail-gw.unlimitedwebhosting.co.uk (Postfix) with ESMTPS id 9F4DE6060EBE
+        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Jan 2019 15:00:20 +0000 (GMT)
+X-ASG-Debug-ID: 1547305219-0554135c625afbc70001-Y6scnF
+Received: from cloud706.unlimitedwebhosting.co.uk (no-dns-yet.unlimited.uk.net [149.255.62.7]) by uwhbsf01.unlimitedwebhosting.co.uk with ESMTP id LsN1chPtGtZg0VPq (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Sat, 12 Jan 2019 15:00:19 +0000 (GMT)
+X-Barracuda-Envelope-From: beagleboard@davidjohnsummers.uk
+X-Barracuda-Effective-Source-IP: no-dns-yet.unlimited.uk.net[149.255.62.7]
+X-Barracuda-Apparent-Source-IP: 149.255.62.7
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=davidjohnsummers.uk; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=1x9jj1+9r+Zx7FMCJbxgCN6yyhxwioQL7qECsRH30lQ=; b=D08lw16dDjq45WvT3lhq4FvjWP
+        hTvXP8E2CwG7WBImsLgvBsxRsMxwb2SljZpEaqfvm6vdDD5aUUBFEcRzKD+Ruq/itGYpL0ZOWDF6D
+        JoSLUloZVbHwgjeK3lAfLvWKeRdqjCH89wps0IOKqVnxe+rAtB/wX1stF7wOiXDb7bsxhfPlcxLDj
+        mUGCCUJIL0orUdL3IwOzFzXaru1cXjxXX1hTV2bHYl4RqdMQhHncIalVxCn3t8PBsdGAi1Ufi81FX
+        D4h1eO5R2eta3QN0saEhvG8mhheWil80hn4I/IB+AoEzn52jiV9fEQTHqIoNlxtyRGDrxtG69cBgL
+        QjEDCd1w==;
+Received: from [87.112.42.200] (port=41384 helo=[192.168.2.187])
+        by cloud706.unlimitedwebhosting.co.uk with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.91)
+        (envelope-from <beagleboard@davidjohnsummers.uk>)
+        id 1giKln-002ddh-0M; Sat, 12 Jan 2019 15:00:19 +0000
+Subject: Re: [PATCHv2] Description of the realtek bluetooth device tree hooks
+To:     Rob Herring <robh@kernel.org>
+X-ASG-Orig-Subj: Re: [PATCHv2] Description of the realtek bluetooth device tree hooks
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mark.rutland@arm.com,
+        linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
+References: <20181229115513.31153-1-beagleboard@davidjohnsummers.uk>
+ <20190103163538.6575-1-beagleboard@davidjohnsummers.uk>
+ <20190111163420.GA20311@bogus>
+From:   David Summers <beagleboard@davidjohnsummers.uk>
+Message-ID: <1308b7df-9f09-c46e-e740-131bd1c42fef@davidjohnsummers.uk>
+Date:   Sat, 12 Jan 2019 15:00:17 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.3
+MIME-Version: 1.0
+In-Reply-To: <20190111163420.GA20311@bogus>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cloud706.unlimitedwebhosting.co.uk
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - davidjohnsummers.uk
+X-Get-Message-Sender-Via: cloud706.unlimitedwebhosting.co.uk: authenticated_id: davidjoh/from_h
+X-Authenticated-Sender: cloud706.unlimitedwebhosting.co.uk: beagleboard@davidjohnsummers.uk
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Barracuda-Connect: no-dns-yet.unlimited.uk.net[149.255.62.7]
+X-Barracuda-Start-Time: 1547305219
+X-Barracuda-Encrypted: ECDHE-RSA-AES256-GCM-SHA384
+X-Barracuda-URL: https://149.255.60.72:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at unlimitedwebhosting.co.uk
+X-Barracuda-Scan-Msg-Size: 4490
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Spam-Score: 0.00
+X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=2.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.65539
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi all,
+Thanks Rob,
 
-> Am 12.01.2019 um 12:16 schrieb Jon Nettleton <jon@solid-run.com>:
->=20
-> On Fri, Jan 4, 2019 at 8:57 PM Andreas Kemnade <andreas@kemnade.info> =
-wrote:
->>=20
->> Hi Marcel,
->>=20
->> On Fri, 4 Jan 2019 10:07:34 +0100
->> Marcel Holtmann <marcel@holtmann.org> wrote:
->>=20
->>> Hi Andreas,
->>>=20
->>>>>>> Btw. I see nothing standing in the way of merging btuart.c =
-driver and then go from there. Either I dig this out and submit or =
-someone else does.
->>>>>>>=20
->>>>>> Do you mean this?
->>>>>> https://patchwork.kernel.org/patch/10490651/
->>>>>=20
->>>>> yes, that one.
->>>>>=20
->>>> Hmm, there seemed to be nothing in the pull requests regarding =
-btuart.
->>>> Did you change plans?
->>>=20
->>> because I only submitted it as RFC. We can easily merge that one =
-upstream since it is rather trivial. The main problem is how you want to =
-do the device matching. Do you have a DT entry for your really simple =
-devices?
->>>=20
->> Hmm, in that link it is non-rfc. So someone picked you rfc patch up =
-and
->> submitted it?
+I'll hopefully make those changes this weekend, and resubmit - just so 
+next weekend can move onto the device tree.
 
-I have researched a little the patchwork entry and it makes me think =
-that Sean did post it as part of a series for MediaTek Bluetooth drivers =
-to the mediatek mailing list (which is why we can find it in patchwork):
+Oh yes, on the "-bluetooth" or "-bt"; as these devices have both and 
+sdio input for wifi, and uart for bluetooth; I guess they will need to 
+be listed twice in a device tree, both under uart and sdio. Now as both 
+these parts of the device tree will want to specify the driver used, and 
+the driver is different for bluetooth and for wifi - doesn't that mean 
+we should specify compatible differently? Otherwise how will the kernel 
+know which driver to load for wifi and which for bluetooth?
 
-	=
-https://patchwork.kernel.org/project/linux-mediatek/list/?series=3D&submit=
-ter=3D169671&state=3D&q=3D%5Bv5&archive=3D&delegate=3D
+So question is am I missing something here, and this could be simplified?
 
-It wasn't discussed there and some other patches of the series have been =
-merged to other trees (e.g. for serdev core).
+On the interrupts, GPIO control lines, power supplies, etc, on the ASUS 
+code that I'm basing the patches on (for Tinker Board S) - these bits 
+are freestanding in the device tree, and mainly go in with the wifi 
+patch (and not bluetooth). I'll put some though into how this is best 
+arranged when going mainline. I think if I'm honest, if I wait to get 
+all these extras in the documentation, this will only get settled when I 
+get the wifi into the device tree - as problem is more natural there. 
+This though would delay the bluetooth patch probably a month. I'd prefer 
+to get something out there - even if I have to return later to tidy the 
+documentation.
 
-So I assume Sean is also waiting to get this patch upstream.
+Regards, and thanks for the helpful comments.
 
->> You might see what we are already doing here:
->> =
-http://git.goldelico.com/?p=3Dletux-kernel.git;a=3Dblobdiff;f=3Darch/arm/b=
-oot/dts/omap3-gta04.dtsi;h=3D4d2bac4293938de4a15a59979616909cf8842524;hp=3D=
-bfced960d63ec40cf9db4901374b331737a9a168;hb=3Df78bf51754e35010de40518b9a8a=
-148d0269bbc8;hpb=3Db6805813a9ab5b0d66b44cc54a0059eca4dd0a98
->>=20
->> We are using compatible =3D "wi2wi,w2cbw003-bluetooth"
->>=20
->> But I think we should also add a generic device string like
->> bluetooth,h4
->> So if people dig out older hardware, they can just add that to their
->> device trees and have bluetooth
->>=20
->> The full patchset we are currently using is here:
->> =
-http://git.goldelico.com/?p=3Dletux-kernel.git;a=3Dshortlog;h=3Drefs/heads=
-/letux/bluetooth-h4-serdev
->>=20
->> Regards,
->> Andreas
->=20
-> Good timing for this thread.  I have just integrated the mynewt blehci
-> firmware for the nina-b1 chip integrated onto our SOM.  This is
-> exactly the functionality I need in the kernel to make the
-> initialization seamless.  A generic device string is exactly what
-> would be needed for most devices that are running in this
-> configuration.  We may also want to have a generic reset_gpio handler.
->=20
-> -Jon
+David.
 
-BR,
-Nikolaus
 
+On 11/01/2019 16:34, Rob Herring wrote:
+> On Thu, Jan 03, 2019 at 04:35:37PM +0000, David Summers wrote:
+>> This adds the desrciption file that describes the hooks for the
+>> realtek bluetooth serial devices, as needed to refer to the interface
+>> in the device tree.
+> Please follow conventions for patch subjects. 'git log --oneline
+> --no-merges -- path/to/file' usually gives a good clue. In this case,
+> something like:
+>
+> dt-bindings: net: Add Realtek serial bluetooth binding
+>
+>> Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
+>> ---
+>>   .../bindings/net/realtek-bluetooth-serial.txt | 28 +++++++++++++++++++
+>>   1 file changed, 28 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
+>> new file mode 100644
+>> index 000000000000..0aabca1fc002
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
+>> @@ -0,0 +1,28 @@
+>> +Realtek bluetooth devices connected via a UART
+>> +
+>> +- compatible: should be "realtek,<name>-bluetooth"
+>> +  except for "realtek,trl8761atv" - which only has a serial bluetooth connection
+>> +       "realtek,rtl8723as-bluetooth"
+>> +       "realtek,rtl8723bs-bluetooth"
+>> +       "realtek,rtl8723ds-bluetooth"
+>> +       "realtek,rtl8761atv"
+>> +       "realtek,rtl8821as-bluetooth"
+>> +       "realtek,rtl8821cs-bluetooth"
+>> +       "realtek,rtl8822bs-bluetooth"
+> Arguably, '-bluetooth' is not necessary as nothing else is attached to
+> the serial port. At least shorten it to '-bt'.
+>
+>> +- These device are bluetooth devices, that connect via a uart
+> s/device/devices/
+>
+>> +- all devices (except for rtl8761atv) are also wifi devices, this is connected
+>> +  seperatly via sdio - and is not covered by this compatible node
+> Really, this should be up above the property list in a description of
+> the device(s).
+>
+>> +- ideally these will be referenced in a device tree serial node via serdev
+> Not ideally, but it is only valid for this to be a child of a UART.
+>
+> serdev is a kernel thing, and shouldn't be part of the binding doc.
+>
+>> + http://events17.linuxfoundation.org/sites/events/files/slides/serdev-elce-2017-2.pdf
+> Useful, but again, not part of this binding.
+>
+> There's no interrupts, GPIO control lines, power supplies, etc. for
+> these chips? The binding should be complete even if your platform
+> doesn't need these.
+>
+>> +
+>> +Example:
+>> +
+>> +&uart0 {
+>> +	status = "okay";
+> Don't show status in examples.
+>
+>> +       	pinctrl-0 = <&uart0_xfer>, <&uart0_cts>;
+>> +       	bluetooth {
+>> +               	  compatible = "realtek,rtl8723bs-bluetooth";
+>> +       	};
+> Mixed tabs and spaces. Use tabs.
+>
+>> +};
+>> +
+>> +this ensures that the bluetooth device is tied to the correct uart
+>> -- 
+>> beagleboard@davidjohnsummers.uk
+>>
 
