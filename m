@@ -2,89 +2,130 @@ Return-Path: <SRS0=wTsk=PW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4334C43444
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 16:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2737EC43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 17:03:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B4002087E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 16:10:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I6Vckd7s"
+	by mail.kernel.org (Postfix) with ESMTP id 02C7920659
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 17:03:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726841AbfANQKP (ORCPT
+        id S1726674AbfANRDF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Jan 2019 11:10:15 -0500
-Received: from mail-oi1-f180.google.com ([209.85.167.180]:42081 "EHLO
-        mail-oi1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726640AbfANQKO (ORCPT
+        Mon, 14 Jan 2019 12:03:05 -0500
+Received: from mail-it1-f199.google.com ([209.85.166.199]:56065 "EHLO
+        mail-it1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726588AbfANRDF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Jan 2019 11:10:14 -0500
-Received: by mail-oi1-f180.google.com with SMTP id w13so18259190oiw.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jan 2019 08:10:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=7TSGbnUbnf7Nf7OqAIT1iyRsUQMOPOfIJB+Z0EhLKv0=;
-        b=I6Vckd7sWuoOLhAjzFF8Rl+nbDzcYK6ysBPixy6oe5GtMmq5u6kWhuIxP299k3JKCZ
-         VkByINElKeTo8HRwxerJdC1+A4p2wMxIFUIUpu5FrEfzU2b0FpCMH7gOwGSIG79PbHAj
-         0sI6KzymYecOpK5wpE1h/gOdJn9B4j9tJLmsfv5fQRQzSdU1CWnHB6bpI1wi5QItOjGa
-         BDBpROZi2Ve5l+4U+u6oliQ92CBzyrIY06lz/1KDYY7QOMztTXEWatBdzDrwvh7uHbKE
-         yStn5ajV9kYHWKtl7MjTPIAa6j9yftL4M1BWb2vgXOgLvKb6G/YRiT7VFSjZfQ+wY31a
-         8ZTA==
+        Mon, 14 Jan 2019 12:03:05 -0500
+Received: by mail-it1-f199.google.com with SMTP id j3so167392itf.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jan 2019 09:03:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7TSGbnUbnf7Nf7OqAIT1iyRsUQMOPOfIJB+Z0EhLKv0=;
-        b=cJomkw20aPdeyLxo90OVfB1g7F2Vqxwq1P1R89Gub2iBWvjk432FODqJH0ITqGCQIF
-         KRatPT9gl1qYw7xtoNrOS2BctHBGOE2yGiD2ufMNyOjlj6nNep7joS8xADj2EM+fFzMX
-         HEHQyBRsLVaX14qsgU0Fggz+Vr+EbBJiekmDhn8Se8yq+faKmsUTc7QC30Jx7CJs2fGb
-         M3pcH/OshNeGr0LiPKKsXn4TEZ0oNwKCFyIQohZu0zH7WxBkUDrhfpEhqPdPAnewflbs
-         5aPdAbql8XxUd/C6iSDqA6cvOrH9saHReKbajLNmPDdHi790P0ionGFp6KeqabuRfIqA
-         G60g==
-X-Gm-Message-State: AJcUukcOREb0E0GOSDoqNK61u0CIxNKPITq7FuauZDIr49GRT69myjSK
-        2UF1zl4OVCpkhJIbh4mKk47Oi3eDnPNmC8YMqLVMXWzL
-X-Google-Smtp-Source: ALg8bN4awog98vohkHcbKGhciI4el6D+jsIGChRyRVYUgsA2NIDK1qHii3+NQELYtYorkOnPIcYsByfeiYBvmm5rQuE=
-X-Received: by 2002:a05:6808:97:: with SMTP id s23mr15499626oic.251.1547482213275;
- Mon, 14 Jan 2019 08:10:13 -0800 (PST)
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=6055W/Z0ZYAVes941wKhELyr0ynZLpeKL56q4keySdE=;
+        b=QekndD26viEyMu8jK1qHSovvjY9Bdc0XfnteQ/XE6XozRXBhxWLfthuZsq51ZG5bIw
+         fKFRQiB38r5FpypyEkhS6fqJhSH2Yu4Xox/d0WeT0EtEIrrrO38lxT0KyKS/8A4N5yGm
+         hSuoSm1RTkZMW71ClI3Yxh8pauvA6ty2UKlzrlpGv5C7ILdNATtF8mMoPyUXXU7UH4Dv
+         3+3m4NdpNV2IhCk8N6gcFwoYyFbbrJ8xzWEc+IQfI8iCow0M7VSMGiN/Fq8GPr55yr6e
+         ANDoSrlEHYGqeKQP9i7RJ1s/PaSHdRCXvT7uwUCOQkwaH4zJ1TJRdI5k5QhHX9hc7I5B
+         Yy5A==
+X-Gm-Message-State: AJcUukd+VTfYjp3vqS2VNEhDv//9j+b4wgzZdmiC2rMoeJTXKAbZ0ohf
+        6D50F/ojFI0PXYZPACKzaab/DIGMy6bXnHHS4tsvgBR3BI5R
+X-Google-Smtp-Source: ALg8bN4qH+eRhafGIpM42fJ+lex/5qpT/7u67LEyw2D+KAEENKsmTm90HieeM5MYM7oFAMvNSTXcVPABsAaixW6AGIX98kbh1W3b
 MIME-Version: 1.0
-References: <756897232.3954.1547478487424.JavaMail.zimbra@gangsto.cz> <1512791786.3988.1547479324453.JavaMail.zimbra@gangsto.cz>
-In-Reply-To: <1512791786.3988.1547479324453.JavaMail.zimbra@gangsto.cz>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 14 Jan 2019 13:10:00 -0300
-Message-ID: <CABBYNZ+fYv1LundPmLqgdtn8fYLpxWnD9O2PJXe7=mOnO_c2TA@mail.gmail.com>
-Subject: Re: Bash-completion for bluetoothctl
-To:     =?UTF-8?Q?Audun_M=2E_Gangst=C3=B8?= <audun@gangsto.org>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Received: by 2002:a02:2b18:: with SMTP id h24mr9677344jaa.7.1547485383850;
+ Mon, 14 Jan 2019 09:03:03 -0800 (PST)
+Date:   Mon, 14 Jan 2019 09:03:03 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000998547057f6e046f@google.com>
+Subject: general protection fault in hci_uart_write_work
+From:   syzbot <syzbot+257790c15bcdef6fe00c@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Audun,
+Hello,
 
-On Mon, Jan 14, 2019 at 12:24 PM Audun M. Gangst=C3=B8 <audun@gangsto.org> =
-wrote:
->
-> Hello,
->
-> I've made a simple bash-completion script for bluetoothctl.
->
-> I don't know what to do with it now, but I thought I'd share it in case s=
-omeone were interested.
->
-> Use it (or not) as you wish with no restrictions.
+syzbot found the following crash on:
 
-Id like that bt_shell learn a command to generate it like bluetoothctl
---tab-complete/-c [...], that way we don't have to keep updating the
-script instead it shall just call using that option.
+HEAD commit:    6b529fb0a3ea Merge tag 'for-5.0-rc1-tag' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1366fa30c00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b05cfdb4ee8ab9b2
+dashboard link: https://syzkaller.appspot.com/bug?extid=257790c15bcdef6fe00c
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=134d5107400000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15760b4f400000
 
---=20
-Luiz Augusto von Dentz
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+257790c15bcdef6fe00c@syzkaller.appspotmail.com
+
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
+R13: ffffffffffffffff R14: 0000000000000000 R15: 0000000000000000
+kasan: CONFIG_KASAN_INLINE enabled
+Bluetooth: Invalid header checksum
+kasan: GPF could be caused by NULL-ptr deref or user memory access
+general protection fault: 0000 [#1] PREEMPT SMP KASAN
+Bluetooth: Can't allocate HCI device
+CPU: 1 PID: 22 Comm: kworker/1:1 Not tainted 5.0.0-rc1+ #24
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: events hci_uart_write_work
+RIP: 0010:hci_uart_write_work+0x1b6/0x710 drivers/bluetooth/hci_ldisc.c:180
+Code: 0f 85 6a 04 00 00 49 8b b4 24 c8 00 00 00 4c 89 ef e8 3e a8 96 02 89  
+c6 48 8b 45 d0 48 8d b8 5c 10 00 00 48 89 f8 48 c1 e8 03 <0f> b6 14 18 48  
+89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 1d
+RSP: 0018:ffff8880a95c7960 EFLAGS: 00010203
+RAX: 000000000000020b RBX: dffffc0000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: 000000000000105c
+RBP: ffff8880a95c79e0 R08: 0000000000000006 R09: ffff8880a95b8e88
+R10: ffff8880a95b85c0 R11: 0000000000000000 R12: ffff888087c2b5c0
+R13: ffff88808e0775c0 R14: ffff888096c7b868 R15: ffff888087c2b630
+FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000100 CR3: 00000000978b1000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+  process_one_work+0xd0c/0x1ce0 kernel/workqueue.c:2153
+  worker_thread+0x143/0x14a0 kernel/workqueue.c:2296
+  kthread+0x357/0x430 kernel/kthread.c:246
+  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
+Modules linked in:
+---[ end trace 5bffc9ea5ce29536 ]---
+RIP: 0010:hci_uart_write_work+0x1b6/0x710 drivers/bluetooth/hci_ldisc.c:180
+Code: 0f 85 6a 04 00 00 49 8b b4 24 c8 00 00 00 4c 89 ef e8 3e a8 96 02 89  
+c6 48 8b 45 d0 48 8d b8 5c 10 00 00 48 89 f8 48 c1 e8 03 <0f> b6 14 18 48  
+89 f8 83 e0 07 83 c0 03 38 d0 7c 08 84 d2 0f 85 1d
+RSP: 0018:ffff8880a95c7960 EFLAGS: 00010203
+RAX: 000000000000020b RBX: dffffc0000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: 000000000000105c
+RBP: ffff8880a95c79e0 R08: 0000000000000006 R09: ffff8880a95b8e88
+R10: ffff8880a95b85c0 R11: 0000000000000000 R12: ffff888087c2b5c0
+R13: ffff88808e0775c0 R14: ffff888096c7b868 R15: ffff888087c2b630
+FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000100 CR3: 0000000009871000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with  
+syzbot.
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
