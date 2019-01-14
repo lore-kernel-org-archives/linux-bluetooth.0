@@ -3,79 +3,73 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F634C43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 18:52:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EE5BC43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 22:10:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E20322064C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 18:52:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E330720656
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 22:10:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726806AbfANSw3 (ORCPT
+        id S1727139AbfANWKH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Jan 2019 13:52:29 -0500
-Received: from proxima.lasnet.de ([78.47.171.185]:43489 "EHLO
-        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726734AbfANSw2 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Jan 2019 13:52:28 -0500
-Received: from localhost.localdomain (p200300E9D70DB1A9F35C53A5883DC5AE.dip0.t-ipconnect.de [IPv6:2003:e9:d70d:b1a9:f35c:53a5:883d:c5ae])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 38434C8C28;
-        Mon, 14 Jan 2019 19:52:25 +0100 (CET)
-Subject: Re: [PATCH net-next] 6lowpan: fix debugfs_simple_attr.cocci warnings
-To:     Alexander Aring <aring@mojatatu.com>,
-        YueHaibing <yuehaibing@huawei.com>
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-References: <1545274433-146957-1-git-send-email-yuehaibing@huawei.com>
- <20181224161258.gvvq25k3ufuyt3ej@x220t>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-Message-ID: <9acdfea8-caf7-6349-4963-5c638425a8ab@datenfreihafen.org>
-Date:   Mon, 14 Jan 2019 19:52:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.1
-MIME-Version: 1.0
-In-Reply-To: <20181224161258.gvvq25k3ufuyt3ej@x220t>
-Content-Type: text/plain; charset=utf-8
+        Mon, 14 Jan 2019 17:10:07 -0500
+Received: from mga11.intel.com ([192.55.52.93]:44887 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727130AbfANWKG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 14 Jan 2019 17:10:06 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Jan 2019 14:10:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,479,1539673200"; 
+   d="scan'208";a="138258799"
+Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Jan 2019 14:10:05 -0800
+Received: from orsmsx153.amr.corp.intel.com (10.22.226.247) by
+ ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Mon, 14 Jan 2019 14:10:04 -0800
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.210]) by
+ ORSMSX153.amr.corp.intel.com ([169.254.12.21]) with mapi id 14.03.0415.000;
+ Mon, 14 Jan 2019 14:10:04 -0800
+From:   "Gix, Brian" <brian.gix@intel.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     "michal.lowas-rzechonek@silvair.com" 
+        <michal.lowas-rzechonek@silvair.com>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Subject: Re: [PATCH BlueZ] mesh: remove uneeded BDADDR type check
+Thread-Topic: [PATCH BlueZ] mesh: remove uneeded BDADDR type check
+Thread-Index: AQHUqTtenZKwMh/QX0+rTSeSA+/0ZaWv33AA
+Date:   Mon, 14 Jan 2019 22:10:04 +0000
+Message-ID: <1547503802.32139.0.camel@intel.com>
+References: <20190110232229.22630-1-brian.gix@intel.com>
+In-Reply-To: <20190110232229.22630-1-brian.gix@intel.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.251.134.233]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F7C385AD8FCEEF4ABCE23C54480876A8@intel.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello.
-
-On 24.12.18 17:12, Alexander Aring wrote:
-> Hi,
-> 
-> On Thu, Dec 20, 2018 at 02:53:53AM +0000, YueHaibing wrote:
->> Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
->> for debugfs files.
->>
->> Semantic patch information:
->> Rationale: DEFINE_SIMPLE_ATTRIBUTE + debugfs_create_file()
->> imposes some significant overhead as compared to
->> DEFINE_DEBUGFS_ATTRIBUTE + debugfs_create_file_unsafe().
->>
-> 
-> Ok.
-> 
->> Generated by: scripts/coccinelle/api/debugfs/debugfs_simple_attr.cocci
->>
->> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> 
-> Acked-by: Alexander Aring <aring@mojatatu.com>
-
-Marcel, Johan, can one of you apply this? My rule is still that 6lowpan
-patches are going through the bluetooth tree. If you want me to pick the
-sporadic patch here and there for 6lowpan let me know.
-
-regards
-Stefan Schmidt
+UGF0Y2ggQXBwbGllZA0KDQpPbiBUaHUsIDIwMTktMDEtMTAgYXQgMTU6MjIgLTA4MDAsIEJyaWFu
+IEdpeCB3cm90ZToNCj4gQlRfSENJX0VWVF9MRV9BRFZfUkVQT1JUIG9ubHkgY29tZXMgZnJvbSBs
+ZWdhbCBMRSBldmVudHMNCj4gLS0tDQo+ICBtZXNoL21lc2gtaW8tZ2VuZXJpYy5jIHwgNCAtLS0t
+DQo+ICAxIGZpbGUgY2hhbmdlZCwgNCBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9t
+ZXNoL21lc2gtaW8tZ2VuZXJpYy5jIGIvbWVzaC9tZXNoLWlvLWdlbmVyaWMuYw0KPiBpbmRleCA0
+OGU0N2U3YTQuLjY3MGM3YWI5NyAxMDA2NDQNCj4gLS0tIGEvbWVzaC9tZXNoLWlvLWdlbmVyaWMu
+Yw0KPiArKysgYi9tZXNoL21lc2gtaW8tZ2VuZXJpYy5jDQo+IEBAIC0xMzAsMTAgKzEzMCw2IEBA
+IHN0YXRpYyB2b2lkIGV2ZW50X2Fkdl9yZXBvcnQoc3RydWN0IG1lc2hfaW8gKmlvLCBjb25zdCB2
+b2lkICpidWYsIHVpbnQ4X3Qgc2l6ZSkNCj4gIAlpZiAoZXZ0LT5ldmVudF90eXBlICE9IDB4MDMp
+DQo+ICAJCXJldHVybjsNCj4gIA0KPiAtCWlmIChldnQtPmFkZHJfdHlwZSAhPSBCREFERFJfTEVf
+UFVCTElDICYmDQo+IC0JCQlldnQtPmFkZHJfdHlwZSAhPSBCREFERFJfTEVfUkFORE9NKQ0KPiAt
+CQlyZXR1cm47DQo+IC0NCj4gIAlpbnN0YW50ID0gZ2V0X2luc3RhbnQoKTsNCj4gIAlhZHYgPSBl
+dnQtPmRhdGE7DQo+ICAJYWR2X2xlbiA9IGV2dC0+ZGF0YV9sZW47
