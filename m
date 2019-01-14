@@ -2,83 +2,80 @@ Return-Path: <SRS0=wTsk=PW=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7667DC43387
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 17:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F634C43387
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 18:52:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C5B52086D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 17:23:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1547486604;
-	bh=/R5P5JI5LxOZr++VFkk+FPiBVO/kGLCBeHT1D5s7gao=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=F4KNOL7tCR/nP7sakMBamOKf3AjNPIHs3dLuaElMGmPuLIxOdnAhftkbNYdyMBhOF
-	 oMItkWS8UG6mYvzcyBeOKF6h4ZLCzh5LkUx8qIE5anq82ESBzuThPz/+j8CjvaegsK
-	 S6mFOknTtF/1oeMfMeAMffhcNksgyyPzA8r0NQMM=
+	by mail.kernel.org (Postfix) with ESMTP id E20322064C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jan 2019 18:52:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726755AbfANRXX (ORCPT
+        id S1726806AbfANSw3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Jan 2019 12:23:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50356 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726646AbfANRXX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Jan 2019 12:23:23 -0500
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        Mon, 14 Jan 2019 13:52:29 -0500
+Received: from proxima.lasnet.de ([78.47.171.185]:43489 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726734AbfANSw2 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 14 Jan 2019 13:52:28 -0500
+Received: from localhost.localdomain (p200300E9D70DB1A9F35C53A5883DC5AE.dip0.t-ipconnect.de [IPv6:2003:e9:d70d:b1a9:f35c:53a5:883d:c5ae])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 106E720873
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jan 2019 17:23:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1547486603;
-        bh=/R5P5JI5LxOZr++VFkk+FPiBVO/kGLCBeHT1D5s7gao=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=bswwTkh38YKAc0rdeDuZWM6B11PtnjSV23zIBKeTAyqjC4VX23wnHxDmMJeeLZgi7
-         Z/ZmpNFzyEGA4TQyqJt6ACC/E0s4cvfD6VFNIpgcUD/AbQteYOpB9Q3pWh0/zkSZKv
-         PR71vAVmxRGQE+70s3D/Ggm/d47nJhm4qDj8N0mg=
-Received: by mail-qk1-f176.google.com with SMTP id q8so11015428qke.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jan 2019 09:23:23 -0800 (PST)
-X-Gm-Message-State: AJcUukfpO1e8enKU3tUuWuTXhO8kbM7kx6iVHoOEouBCno2u8K0FTaBc
-        6OvNmhAPm2mnH2j+I6POPn+tkRXsX7+6lHBeaDU=
-X-Google-Smtp-Source: ALg8bN7gZ4r8ZH/ir3qedfyWGbYAebnVbCdSheS62ygIdaewMTDWhhaHrGtK80cwkhFSNREuzhuyHTEQDLvxu99xc9Q=
-X-Received: by 2002:a05:620a:151a:: with SMTP id i26mr23067335qkk.281.1547486602282;
- Mon, 14 Jan 2019 09:23:22 -0800 (PST)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 38434C8C28;
+        Mon, 14 Jan 2019 19:52:25 +0100 (CET)
+Subject: Re: [PATCH net-next] 6lowpan: fix debugfs_simple_attr.cocci warnings
+To:     Alexander Aring <aring@mojatatu.com>,
+        YueHaibing <yuehaibing@huawei.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+References: <1545274433-146957-1-git-send-email-yuehaibing@huawei.com>
+ <20181224161258.gvvq25k3ufuyt3ej@x220t>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+Message-ID: <9acdfea8-caf7-6349-4963-5c638425a8ab@datenfreihafen.org>
+Date:   Mon, 14 Jan 2019 19:52:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.1
 MIME-Version: 1.0
-References: <1545389940-9170-1-git-send-email-amit.k.bag@intel.com>
-In-Reply-To: <1545389940-9170-1-git-send-email-amit.k.bag@intel.com>
-From:   Josh Boyer <jwboyer@kernel.org>
-Date:   Mon, 14 Jan 2019 12:23:07 -0500
-X-Gmail-Original-Message-ID: <CA+5PVA7YcEhEdPj6DOYR=kHOxzMZkbeP6-QHq62Jx9qk3=j4hg@mail.gmail.com>
-Message-ID: <CA+5PVA7YcEhEdPj6DOYR=kHOxzMZkbeP6-QHq62Jx9qk3=j4hg@mail.gmail.com>
-Subject: Re: [PATCH 1/4] linux-firmware: Update firmware file for Intel Bluetooth,9560
-To:     Amit K Bag <amit.k.bag@intel.com>
-Cc:     Linux Firmware <linux-firmware@kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        chethan.tumkur.narayan@intel.com, ravishankar.srivatsa@intel.com
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20181224161258.gvvq25k3ufuyt3ej@x220t>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Dec 21, 2018 at 6:02 AM Amit K Bag <amit.k.bag@intel.com> wrote:
->
-> This patch updates the firmware file for Intel Bluetooth 9560
-> Also it is known as Intel JeffersonPeak (JfP).
->
-> FW Build: REL0386
->
-> Release Version: 20.100.0.3
->
-> Signed-off-by: Amit K Bag <amit.k.bag@intel.com>
-> ---
->  WHENCE                |   8 ++++----
->  intel/ibt-17-16-1.sfi | Bin 640328 -> 641280 bytes
->  intel/ibt-17-2.sfi    | Bin 640328 -> 641280 bytes
->  3 files changed, 4 insertions(+), 4 deletions(-)
+Hello.
 
-All 4 patches applied and pushed out.
+On 24.12.18 17:12, Alexander Aring wrote:
+> Hi,
+> 
+> On Thu, Dec 20, 2018 at 02:53:53AM +0000, YueHaibing wrote:
+>> Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
+>> for debugfs files.
+>>
+>> Semantic patch information:
+>> Rationale: DEFINE_SIMPLE_ATTRIBUTE + debugfs_create_file()
+>> imposes some significant overhead as compared to
+>> DEFINE_DEBUGFS_ATTRIBUTE + debugfs_create_file_unsafe().
+>>
+> 
+> Ok.
+> 
+>> Generated by: scripts/coccinelle/api/debugfs/debugfs_simple_attr.cocci
+>>
+>> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> 
+> Acked-by: Alexander Aring <aring@mojatatu.com>
 
-josh
+Marcel, Johan, can one of you apply this? My rule is still that 6lowpan
+patches are going through the bluetooth tree. If you want me to pick the
+sporadic patch here and there for 6lowpan let me know.
+
+regards
+Stefan Schmidt
