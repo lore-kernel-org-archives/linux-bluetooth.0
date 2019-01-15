@@ -5,62 +5,62 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC96C43612
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jan 2019 14:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A28CEC43387
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jan 2019 14:12:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8B5A20656
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jan 2019 14:12:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 598F820656
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jan 2019 14:12:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dT+JvBR0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pc2WY20U"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730006AbfAOOMe (ORCPT
+        id S1730022AbfAOOMh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Jan 2019 09:12:34 -0500
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:42429 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730000AbfAOOMe (ORCPT
+        Tue, 15 Jan 2019 09:12:37 -0500
+Received: from mail-qt1-f179.google.com ([209.85.160.179]:46650 "EHLO
+        mail-qt1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730000AbfAOOMg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Jan 2019 09:12:34 -0500
-Received: by mail-qk1-f193.google.com with SMTP id 68so1584671qke.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jan 2019 06:12:33 -0800 (PST)
+        Tue, 15 Jan 2019 09:12:36 -0500
+Received: by mail-qt1-f179.google.com with SMTP id y20so2996602qtm.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jan 2019 06:12:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=Ei+i5HTcP0MZ6Q36/H2rA5K0H0HbOdEJMvGxu12BRUo=;
-        b=dT+JvBR0hgQEhXjWJzl57zIG/8oVjXOVT/wu+5EpjdKqCcIVrYMRd928gpESzxMPfn
-         EWeFsUA3vjvM2zTKRvNYFRkeTZnnjQ4MYLSMV/2LS+DP27M4t9Xx0Ml0gF/8ndKr0swy
-         i/hFb+nrZCswMOHxyk4XCFGjcvvKz5/E6SAjkjUtLJ3lKtLTYtrpzWem/qYTvNdh2IkQ
-         XstdMGq5VYQVwfHjEAtk21n2i3Gr8cE9qz48o4ciDeGwrYVru+EV4R0YoK1LB5XlCxJP
-         T9TN+FQyra+5MRCNnrB4kFe2ri9zr4NRqSrGkJqqi3wGo3m1Mm4Gkcku4lWxp9d6Xr5t
-         mydg==
+        bh=VSywhEJApHKQ9O7U3e9+Du0VEo3rScGKci9LP54NXo8=;
+        b=pc2WY20UJ3dmMCBzC0a+ZfF4jRazTBLBXsT0SLo5MuLzqTnwyHx3K1XLJp1Kn3sHcQ
+         bMJMA8NK7cB0feCwMB15LQubxPwOweKYqCEYQvttrLCrGYQcl2AJV4LjwDdE8mULq793
+         2Wq99t/rzRiCiL676MxsTgoSenkbIxh3fDGKVHH43MgR/9ZkJwJKHTvarF/CbA8LJnZ/
+         w4OxDgLKsISNVACITv+bKMnI43wedjX2rP/WfuB32Ih5jSqhkD5cmeXFYFNGtJZFICjA
+         nd2hvCbfZoQ5G625PUSViQeQKD+93z+0xiDNpkRWkSFE1rkBq4EymiGidwLsjkZHwnyy
+         B6wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=Ei+i5HTcP0MZ6Q36/H2rA5K0H0HbOdEJMvGxu12BRUo=;
-        b=SiU6qkdKz4uYOlPagKxuFp2/JMG5AFCCmLmFe2GbJMJJ4eWLaIzjp2ArjQuga1fFP0
-         WFn894BJ0tk2TEYEGPGpsBfjK7BnNw4hJOdDSg8eFwsDgHIuoWzTXu/dvOz/0SbYdr5k
-         SJN2LhgFJjdpgiPkgX7Hr4f2sQZCgcwEn+F8kkwZLBu2ddPP5iReKu6hEMmTOXxVVOL4
-         l1D+NbG4BrD61nVd2EbPiomYKrkHOyx809c5A5TvYWwgK9iQHjNvYrn287bTqQP07R1x
-         Xr3n7RwTLdWSsbj684Q64jtXZj9pwhtT9Y7rB8+dXw993FTNf5HUwKia8FpXms9ZyhFD
-         073A==
-X-Gm-Message-State: AJcUukdMdyv0oQrwGwvghrV72RIcfmJSR1Z6LYNwNQ9XzvUwrQB0aYh+
-        zyfO/gwobLrX5hOUoju0CcmxrA3rKkI=
-X-Google-Smtp-Source: ALg8bN5sSckGZdwGe3GIO9xtjR/3Y9OD9FHWoXlLrNU0NMs+duaoSk+iUDcE3/oXb7es4305rzVPoA==
-X-Received: by 2002:a37:6517:: with SMTP id z23mr2840750qkb.161.1547561552836;
-        Tue, 15 Jan 2019 06:12:32 -0800 (PST)
+        bh=VSywhEJApHKQ9O7U3e9+Du0VEo3rScGKci9LP54NXo8=;
+        b=AokNdJ8yZGA3j5i9PLWP+Gdc7+5ZQcdjR2OYGiTgPsk2X+HzUVHpopGNjtkLNiyHEK
+         k1+tVpSF4e3F7vcchzSqd8zq+b+7gttuIz2IHPtEmiqDbXjgcWHeQwcd03nTn9TP3yv4
+         vAb/jk4eM/eOgo90gjSyFGF43ezsTTykPMcqxixSIKH60y155X5PriprWyB7u3NibASw
+         ziwak3PJipuaIw5wJhqqjEc5Z25b7sHnYU39xshr1MqToaimoGrXVt3HkhlTXWVYvv4v
+         lYOU/b8Xm5yTyOq4pnzQkC43nhJLT4Y+vlLY9zcM7QAf9c39wOeMrilZxD5NEexczT0+
+         3cEQ==
+X-Gm-Message-State: AJcUukdfzMvipjWmEjiReCbz1eN2KusPbomdlbbnjy0522sg4LmFy5dl
+        mcUZkG/4/OWVenTHP1Pj0ueEQFby/Rg=
+X-Google-Smtp-Source: ALg8bN7ywAcIJ2FAnn5qQPqJdDkb1Gq736RC8CGUMFUKEt5U9HeUhV2L5XHPmGsZeaG7rs9mAgPKtw==
+X-Received: by 2002:a0c:f053:: with SMTP id b19mr3029369qvl.29.1547561554403;
+        Tue, 15 Jan 2019 06:12:34 -0800 (PST)
 Received: from localhost.localdomain ([186.206.5.228])
-        by smtp.gmail.com with ESMTPSA id l95sm10572580qkh.37.2019.01.15.06.12.31
+        by smtp.gmail.com with ESMTPSA id l95sm10572580qkh.37.2019.01.15.06.12.33
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 15 Jan 2019 06:12:32 -0800 (PST)
+        Tue, 15 Jan 2019 06:12:33 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 5/8] doc/settings-storage: Add Endpoint group to cache
-Date:   Tue, 15 Jan 2019 11:10:20 -0300
-Message-Id: <20190115141023.353-5-luiz.dentz@gmail.com>
+Subject: [PATCH v2 6/8] a2dp: Cache remote endpoints
+Date:   Tue, 15 Jan 2019 11:10:21 -0300
+Message-Id: <20190115141023.353-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20190115141023.353-1-luiz.dentz@gmail.com>
 References: <20190115141023.353-1-luiz.dentz@gmail.com>
@@ -71,47 +71,883 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This documents how A2DP endpoints should be stored in the cache.
+In order to always have the Endpoint interface available the remote
+endpoints needs to be cached since the remote stack may config a stream
+on its own there may not be a chance to discover the endpoits available
+which would make it impossible to switch endpoints.
 ---
- doc/settings-storage.txt | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ profiles/audio/a2dp.c  | 724 +++++++++++++++++++++++++----------------
+ profiles/audio/avdtp.c |  46 ++-
+ profiles/audio/avdtp.h |   5 +
+ 3 files changed, 492 insertions(+), 283 deletions(-)
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index 90357f735..44b0b4961 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -159,7 +159,7 @@ Cache directory file format
- ============================
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 4fa01894a..6975682c9 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -1441,6 +1441,410 @@ static gboolean disconnect_cb(GIOChannel *io, GIOCondition cond, gpointer data)
+ 	return FALSE;
+ }
  
- Each file, named by remote device address, may includes multiple groups
--(General, ServiceRecords, Attributes).
-+(General, ServiceRecords, Attributes, Endpoints).
- 
- In ServiceRecords, SDP records are stored using their handle as key
- (hexadecimal format).
-@@ -168,6 +168,9 @@ In "Attributes" group GATT database is stored using attribute handle as key
- (hexadecimal format). Value associated with this handle is serialized form of
- all data required to re-create given attribute. ":" is used to separate fields.
- 
-+In "Endpoints" group A2DP remote endpoints are stored using the seid as key
-+(hexadecimal format) and ":" is used to separate fields.
++static void caps_add_codec(GSList **l, uint8_t codec, uint8_t *caps,
++							size_t size)
++{
++	struct avdtp_service_capability *media_transport, *media_codec;
++	struct avdtp_media_codec_capability *cap;
 +
- [General] group contains:
- 
-   Name		String		Remote device friendly name
-@@ -211,6 +214,12 @@ Sample Attributes section:
-   002b=2803:002c:02:00002a38-0000-1000-8000-00805f9b34fb
-   002d=2803:002e:08:00002a39-0000-1000-8000-00805f9b34fb
- 
-+[Endpoints] group contains:
++	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
++						NULL, 0);
 +
-+	<xx>:<xx>:<xxxxxxxx...>	String	First field is the endpoint type,
-+					followed by codec type and its
-+					capabilies as hexadecimal encoded
-+					string.
++	*l = g_slist_append(*l, media_transport);
++
++	cap = g_malloc0(sizeof(*cap) + size);
++	cap->media_type = AVDTP_MEDIA_TYPE_AUDIO;
++	cap->media_codec_type = codec;
++	memcpy(cap->data, caps, size);
++
++	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, cap,
++						sizeof(*cap) + size);
++
++	*l = g_slist_append(*l, media_codec);
++	g_free(cap);
++}
++
++struct client {
++	const char *sender;
++	const char *path;
++};
++
++static int match_client(const void *data, const void *user_data)
++{
++	struct a2dp_sep *sep = (void *) data;
++	const struct a2dp_endpoint *endpoint = sep->endpoint;
++	const struct client *client = user_data;
++
++	if (strcmp(client->sender, endpoint->get_name(sep, sep->user_data)))
++		return -1;
++
++	return strcmp(client->path, endpoint->get_path(sep, sep->user_data));
++}
++
++static struct a2dp_sep *find_sep(struct a2dp_server *server, uint8_t type,
++					const char *sender, const char *path)
++{
++	GSList *l;
++	struct client client = { sender, path };
++
++	l = type == AVDTP_SEP_TYPE_SINK ? server->sources : server->sinks;
++
++	l = g_slist_find_custom(l, &client, match_client);
++	if (l)
++		return l->data;
++
++	return NULL;
++}
++
++static int parse_properties(DBusMessageIter *props, uint8_t **caps, int *size)
++{
++	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
++		const char *key;
++		DBusMessageIter value, entry;
++		int var;
++
++		dbus_message_iter_recurse(props, &entry);
++		dbus_message_iter_get_basic(&entry, &key);
++
++		dbus_message_iter_next(&entry);
++		dbus_message_iter_recurse(&entry, &value);
++
++		var = dbus_message_iter_get_arg_type(&value);
++		if (strcasecmp(key, "Capabilities") == 0) {
++			DBusMessageIter array;
++
++			if (var != DBUS_TYPE_ARRAY)
++				return -EINVAL;
++
++			dbus_message_iter_recurse(&value, &array);
++			dbus_message_iter_get_fixed_array(&array, caps, size);
++			return 0;
++		}
++
++		dbus_message_iter_next(props);
++	}
++
++	return -EINVAL;
++}
++
++static void reconfig_cb(struct avdtp *session, struct a2dp_sep *sep,
++			struct avdtp_stream *stream, int err, void *user_data)
++{
++	DBusMessage *msg = user_data;
++
++	if (err)
++		g_dbus_send_message(btd_get_dbus_connection(),
++					btd_error_failed(msg, strerror(-err)));
++	else
++		g_dbus_send_reply(btd_get_dbus_connection(), msg,
++					DBUS_TYPE_INVALID);
++
++	dbus_message_unref(msg);
++}
++
++static int a2dp_reconfig(struct a2dp_channel *chan, const char *sender,
++			struct a2dp_sep *lsep, struct a2dp_remote_sep *rsep,
++			uint8_t *caps, int size, void *user_data)
++{
++	struct a2dp_setup *setup;
++	struct a2dp_setup_cb *cb_data;
++	GSList *l;
++	int err;
++
++	setup = a2dp_setup_get(chan->session);
++	if (!setup)
++		return -ENOMEM;
++
++	cb_data = setup_cb_new(setup);
++	cb_data->config_cb = reconfig_cb;
++	cb_data->user_data = user_data;
++
++	setup->sep = lsep;
++	setup->rsep = rsep;
++
++	caps_add_codec(&setup->caps, setup->sep->codec, caps, size);
++
++	l = avdtp_get_type(rsep->sep) == AVDTP_SEP_TYPE_SINK ?
++					chan->server->sources :
++					chan->server->sinks;
++
++	/* Check for existing stream and close it */
++	for (; l; l = g_slist_next(l)) {
++		struct a2dp_sep *tmp = l->data;
++
++		/* Attempt to reconfigure if a stream already exists */
++		if (tmp->stream) {
++			/* Only allow switching sep from the same sender */
++			if (strcmp(sender, tmp->endpoint->get_name(tmp,
++							tmp->user_data)))
++				return -EPERM;
++
++			err = avdtp_close(chan->session, tmp->stream, FALSE);
++			if (err < 0) {
++				error("avdtp_close: %s", strerror(-err));
++				goto fail;
++			}
++
++			setup->reconfigure = TRUE;
++
++			return 0;
++		}
++	}
++
++	err = avdtp_set_configuration(setup->session, setup->rsep->sep,
++						lsep->lsep,
++						setup->caps,
++						&setup->stream);
++	if (err < 0) {
++		error("avdtp_set_configuration: %s", strerror(-err));
++		goto fail;
++	}
++
++	return 0;
++
++fail:
++	setup_unref(setup);
++	return err;
++}
++
++static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
++								void *data)
++{
++	struct a2dp_remote_sep *rsep = data;
++	struct a2dp_channel *chan = rsep->chan;
++	struct a2dp_sep *lsep = NULL;
++	struct avdtp_service_capability *service;
++	struct avdtp_media_codec_capability *codec;
++	DBusMessageIter args, props;
++	const char *sender, *path;
++	uint8_t *caps;
++	int err, size = 0;
++
++	sender = dbus_message_get_sender(msg);
++
++	dbus_message_iter_init(msg, &args);
++
++	dbus_message_iter_get_basic(&args, &path);
++	dbus_message_iter_next(&args);
++
++	lsep = find_sep(chan->server, avdtp_get_type(rsep->sep), sender, path);
++	if (!lsep)
++		return btd_error_invalid_args(msg);
++
++	service = avdtp_get_codec(rsep->sep);
++	codec = (struct avdtp_media_codec_capability *) service->data;
++
++	/* Check if codec really matches */
++	if (!endpoint_match_codec_ind(chan->session, codec, lsep))
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_recurse(&args, &props);
++	if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_DICT_ENTRY)
++		return btd_error_invalid_args(msg);
++
++	if (parse_properties(&props, &caps, &size) < 0)
++		return btd_error_invalid_args(msg);
++
++	err = a2dp_reconfig(chan, sender, lsep, rsep, caps, size,
++					dbus_message_ref(msg));
++	if (err < 0) {
++		dbus_message_unref(msg);
++		return btd_error_failed(msg, strerror(-err));
++	}
++
++	return NULL;
++}
++
++static const GDBusMethodTable sep_methods[] = {
++	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("SetConfiguration",
++					GDBUS_ARGS({ "endpoint", "o" },
++						{ "properties", "a{sv}" } ),
++					NULL, set_configuration) },
++	{ },
++};
++
++static gboolean get_uuid(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct a2dp_remote_sep *sep = data;
++	const char *uuid;
++
++	switch (avdtp_get_type(sep->sep)) {
++	case AVDTP_SEP_TYPE_SOURCE:
++		uuid = A2DP_SOURCE_UUID;
++		break;
++	case AVDTP_SEP_TYPE_SINK:
++		uuid = A2DP_SOURCE_UUID;
++		break;
++	default:
++		uuid = "";
++	}
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++
++	return TRUE;
++}
++
++static gboolean get_codec(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct a2dp_remote_sep *sep = data;
++	struct avdtp_service_capability *cap = avdtp_get_codec(sep->sep);
++	struct avdtp_media_codec_capability *codec = (void *) cap->data;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
++						&codec->media_codec_type);
++
++	return TRUE;
++}
++
++static gboolean get_capabilities(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct a2dp_remote_sep *sep = data;
++	struct avdtp_service_capability *service = avdtp_get_codec(sep->sep);
++	struct avdtp_media_codec_capability *codec = (void *) service->data;
++	uint8_t *caps = codec->data;
++	DBusMessageIter array;
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_TYPE_BYTE_AS_STRING, &array);
++
++	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE, &caps,
++					service->length - sizeof(*codec));
++
++	dbus_message_iter_close_container(iter, &array);
++
++	return TRUE;
++}
++
++static const GDBusPropertyTable sep_properties[] = {
++	{ "UUID", "s", get_uuid, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Codec", "y", get_codec, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ "Capabilities", "ay", get_capabilities, NULL, NULL,
++					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
++	{ }
++};
++
++static void register_remote_sep(void *data, void *user_data)
++{
++	struct avdtp_remote_sep *rsep = data;
++	struct a2dp_channel *chan = user_data;
++	struct a2dp_remote_sep *sep;
++
++	sep = queue_find(chan->seps, match_remote_sep, rsep);
++	if (sep)
++		return;
++
++	sep = new0(struct a2dp_remote_sep, 1);
++	sep->chan = chan;
++	sep->sep = rsep;
++
++	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
++		goto done;
++
++	asprintf(&sep->path, "%s/sep%d", device_get_path(chan->device),
++							avdtp_get_seid(rsep));
++
++	if (g_dbus_register_interface(btd_get_dbus_connection(),
++				sep->path, MEDIA_ENDPOINT_INTERFACE,
++				sep_methods, NULL, sep_properties,
++				sep, remote_sep_free) == FALSE) {
++		error("Could not register remote sep %s", sep->path);
++		free(sep->path);
++		sep->path = NULL;
++		goto done;
++	}
++
++	DBG("Found remote SEP: %s", sep->path);
++
++done:
++	queue_push_tail(chan->seps, sep);
++}
++
++static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
++								char **seids)
++{
++	struct avdtp_remote_sep *sep;
++
++	if (!seids)
++		return;
++
++	for (; *seids; seids++) {
++		uint8_t seid;
++		uint8_t type;
++		uint8_t codec;
++		char *value, caps[256];
++		uint8_t data[128];
++		int i, size;
++		GSList *l = NULL;
++
++		if (sscanf(*seids, "%02hhx", &seid) != 1)
++			continue;
++
++		value = g_key_file_get_string(key_file, "Endpoints", *seids,
++								NULL);
++		if (!value)
++			continue;
++
++		if (sscanf(value, "%02hhx:%02hhx:%s", &type, &codec,
++								caps) != 3) {
++			warn("Unable to load Endpoint: seid %u", seid);
++			g_free(value);
++			continue;
++		}
++
++		for (i = 0, size = strlen(caps); i < size; i += 2) {
++			uint8_t *tmp = data + i / 2;
++
++			if (sscanf(caps + i, "%02hhx", tmp) != 1) {
++				warn("Unable to load Endpoint: seid %u", seid);
++				break;
++			}
++		}
++
++		g_free(value);
++
++		if (i != size)
++			continue;
++
++		caps_add_codec(&l, codec, data, size / 2);
++
++		sep = avdtp_register_remote_sep(chan->session, seid, type, l);
++		if (!sep) {
++			warn("Unable to register Endpoint: seid %u", seid);
++			continue;
++		}
++
++		register_remote_sep(sep, chan);
++	}
++}
++
++static void load_remote_seps(struct a2dp_channel *chan)
++{
++	struct btd_device *device = chan->device;
++	char filename[PATH_MAX];
++	char dst_addr[18];
++	char **keys;
++	GKeyFile *key_file;
++
++	ba2str(device_get_address(device), dst_addr);
++
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
++			btd_adapter_get_storage_dir(device_get_adapter(device)),
++			dst_addr);
++	key_file = g_key_file_new();
++	g_key_file_load_from_file(key_file, filename, 0, NULL);
++	keys = g_key_file_get_keys(key_file, "Endpoints", NULL, NULL);
++
++	load_remote_sep(chan, key_file, keys);
++
++	g_strfreev(keys);
++	g_key_file_free(key_file);
++}
++
+ static void avdtp_state_cb(struct btd_device *dev, struct avdtp *session,
+ 					avdtp_session_state_t old_state,
+ 					avdtp_session_state_t new_state,
+@@ -1456,6 +1860,9 @@ static void avdtp_state_cb(struct btd_device *dev, struct avdtp *session,
+ 	case AVDTP_SESSION_STATE_CONNECTING:
+ 		break;
+ 	case AVDTP_SESSION_STATE_CONNECTED:
++		if (!chan->session)
++			chan->session = session;
++		load_remote_seps(chan);
+ 		break;
+ 	}
+ }
+@@ -1904,28 +2311,6 @@ void a2dp_remove_sep(struct a2dp_sep *sep)
+ 	a2dp_unregister_sep(sep);
+ }
  
- Info file format
- ================
+-static void setup_add_caps(struct a2dp_setup *setup, uint8_t *caps, size_t size)
+-{
+-	struct avdtp_service_capability *media_transport, *media_codec;
+-	struct avdtp_media_codec_capability *cap;
+-
+-	media_transport = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT,
+-						NULL, 0);
+-
+-	setup->caps = g_slist_append(setup->caps, media_transport);
+-
+-	cap = g_malloc0(sizeof(*cap) + size);
+-	cap->media_type = AVDTP_MEDIA_TYPE_AUDIO;
+-	cap->media_codec_type = setup->sep->codec;
+-	memcpy(cap->data, caps, size);
+-
+-	media_codec = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, cap,
+-						sizeof(*cap) + size);
+-
+-	setup->caps = g_slist_append(setup->caps, media_codec);
+-	g_free(cap);
+-}
+-
+ static void select_cb(struct a2dp_setup *setup, void *ret, int size)
+ {
+ 	if (size < 0) {
+@@ -1933,7 +2318,7 @@ static void select_cb(struct a2dp_setup *setup, void *ret, int size)
+ 		goto done;
+ 	}
+ 
+-	setup_add_caps(setup, ret, size);
++	caps_add_codec(&setup->caps, setup->sep->codec, ret, size);
+ 
+ done:
+ 	finalize_select(setup);
+@@ -1989,275 +2374,58 @@ static struct a2dp_sep *a2dp_select_sep(struct avdtp *session, uint8_t type,
+ 	return a2dp_find_sep(session, l, NULL);
+ }
+ 
+-struct client {
+-	const char *sender;
+-	const char *path;
+-};
+-
+-static int match_client(const void *data, const void *user_data)
+-{
+-	struct a2dp_sep *sep = (void *) data;
+-	const struct a2dp_endpoint *endpoint = sep->endpoint;
+-	const struct client *client = user_data;
+-
+-	if (strcmp(client->sender, endpoint->get_name(sep, sep->user_data)))
+-		return -1;
+-
+-	return strcmp(client->path, endpoint->get_path(sep, sep->user_data));
+-}
+-
+-static struct a2dp_sep *find_sep(struct a2dp_server *server, const char *sender,
+-							const char *path)
+-{
+-	GSList *l;
+-	struct client client = { sender, path };
+-
+-	l = g_slist_find_custom(server->sources, &client, match_client);
+-	if (l)
+-		return l->data;
+-
+-	l = g_slist_find_custom(server->sinks, &client, match_client);
+-	if (l)
+-		return l->data;
+-
+-	return NULL;
+-}
+-
+-static int parse_properties(DBusMessageIter *props, uint8_t **caps, int *size)
+-{
+-	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
+-		const char *key;
+-		DBusMessageIter value, entry;
+-		int var;
+-
+-		dbus_message_iter_recurse(props, &entry);
+-		dbus_message_iter_get_basic(&entry, &key);
+-
+-		dbus_message_iter_next(&entry);
+-		dbus_message_iter_recurse(&entry, &value);
+-
+-		var = dbus_message_iter_get_arg_type(&value);
+-		if (strcasecmp(key, "Capabilities") == 0) {
+-			DBusMessageIter array;
+-
+-			if (var != DBUS_TYPE_ARRAY)
+-				return -EINVAL;
+-
+-			dbus_message_iter_recurse(&value, &array);
+-			dbus_message_iter_get_fixed_array(&array, caps, size);
+-			return 0;
+-		}
+-
+-		dbus_message_iter_next(props);
+-	}
+-
+-	return -EINVAL;
+-}
+-
+-static int a2dp_reconfig(struct a2dp_channel *chan, const char *sender,
+-			struct a2dp_sep *lsep, struct a2dp_remote_sep *rsep,
+-			uint8_t *caps, int size)
+-{
+-	struct a2dp_setup *setup;
+-	const struct queue_entry *entry;
+-	int err;
+-
+-	setup = a2dp_setup_get(chan->session);
+-	if (!setup)
+-		return -ENOMEM;
+-
+-	setup->sep = lsep;
+-	setup->rsep = rsep;
+-
+-	setup_add_caps(setup, caps, size);
+-
+-	/* Check for existing stream and close it */
+-	for (entry = queue_get_entries(chan->server->seps); entry;
+-						entry = entry->next) {
+-		struct a2dp_sep *tmp = entry->data;
+-
+-		/* Attempt to reconfigure if a stream already exists */
+-		if (tmp->stream) {
+-			/* Only allow switching sep from the same sender */
+-			if (strcmp(sender, tmp->endpoint->get_name(tmp,
+-							tmp->user_data)))
+-				return -EPERM;
+-
+-			err = avdtp_close(chan->session, tmp->stream, FALSE);
+-			if (err < 0) {
+-				error("avdtp_close: %s", strerror(-err));
+-				return err;
+-			}
+-
+-			setup->reconfigure = TRUE;
+-
+-			return 0;
+-		}
+-	}
+-
+-	err = avdtp_set_configuration(setup->session, setup->rsep->sep,
+-						lsep->lsep,
+-						setup->caps,
+-						&setup->stream);
+-	if (err < 0) {
+-		error("avdtp_set_configuration: %s", strerror(-err));
+-		return err;
+-	}
+-
+-	return 0;
+-}
+-
+-static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
+-								void *data)
+-{
+-	struct a2dp_remote_sep *rsep = data;
+-	struct a2dp_channel *chan = rsep->chan;
+-	struct a2dp_sep *lsep;
+-	struct avdtp_service_capability *service;
+-	struct avdtp_media_codec_capability *codec;
+-	DBusMessageIter args, props;
+-	const char *sender, *path;
+-	uint8_t *caps;
+-	int err, size = 0;
+-
+-	sender = dbus_message_get_sender(msg);
+-
+-	dbus_message_iter_init(msg, &args);
+-
+-	dbus_message_iter_get_basic(&args, &path);
+-	dbus_message_iter_next(&args);
+-
+-	lsep = find_sep(chan->server, sender, path);
+-	if (!lsep)
+-		return btd_error_invalid_args(msg);
+-
+-	/* Check if SEPs are no the same role */
+-	if (avdtp_get_type(rsep->sep) == lsep->type)
+-		return btd_error_invalid_args(msg);
+-
+-	service = avdtp_get_codec(rsep->sep);
+-	codec = (struct avdtp_media_codec_capability *) service->data;
+-
+-	/* Check if codec match */
+-	if (!endpoint_match_codec_ind(chan->session, codec, lsep))
+-		return btd_error_invalid_args(msg);
+-
+-	dbus_message_iter_recurse(&args, &props);
+-	if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_DICT_ENTRY)
+-		return btd_error_invalid_args(msg);
+-
+-	if (parse_properties(&props, &caps, &size) < 0)
+-		return btd_error_invalid_args(msg);
+-
+-	err = a2dp_reconfig(chan, sender, lsep, rsep, caps, size);
+-	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
+-
+-	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+-}
+-
+-static const GDBusMethodTable sep_methods[] = {
+-	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("SetConfiguration",
+-					GDBUS_ARGS({ "endpoint", "o" },
+-						{ "properties", "a{sv}" } ),
+-					NULL, set_configuration) },
+-	{ },
+-};
+-
+-static gboolean get_uuid(const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct a2dp_remote_sep *sep = data;
+-	const char *uuid;
+-
+-	switch (avdtp_get_type(sep->sep)) {
+-	case AVDTP_SEP_TYPE_SOURCE:
+-		uuid = A2DP_SOURCE_UUID;
+-		break;
+-	case AVDTP_SEP_TYPE_SINK:
+-		uuid = A2DP_SOURCE_UUID;
+-		break;
+-	default:
+-		uuid = "";
+-	}
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
+-
+-	return TRUE;
+-}
+-
+-static gboolean get_codec(const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
+-{
+-	struct a2dp_remote_sep *sep = data;
+-	struct avdtp_service_capability *cap = avdtp_get_codec(sep->sep);
+-	struct avdtp_media_codec_capability *codec = (void *) cap->data;
+-
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+-						&codec->media_codec_type);
+-
+-	return TRUE;
+-}
+-
+-static gboolean get_capabilities(const GDBusPropertyTable *property,
+-					DBusMessageIter *iter, void *data)
++static void store_remote_sep(void *data, void *user_data)
+ {
+ 	struct a2dp_remote_sep *sep = data;
++	GKeyFile *key_file = (void *) user_data;
++	char seid[4], value[256];
+ 	struct avdtp_service_capability *service = avdtp_get_codec(sep->sep);
+ 	struct avdtp_media_codec_capability *codec = (void *) service->data;
+-	uint8_t *caps = codec->data;
+-	DBusMessageIter array;
++	unsigned int i;
++	ssize_t offset;
+ 
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+-					DBUS_TYPE_BYTE_AS_STRING, &array);
++	sprintf(seid, "%02hhx", avdtp_get_seid(sep->sep));
+ 
+-	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE, &caps,
+-					service->length - sizeof(*codec));
++	offset = sprintf(value, "%02hhx:%02hhx:", avdtp_get_type(sep->sep),
++						codec->media_codec_type);
+ 
+-	dbus_message_iter_close_container(iter, &array);
++	for (i = 0; i < service->length - sizeof(*codec); i++)
++		offset += sprintf(value + offset, "%02hhx", codec->data[i]);
+ 
+-	return TRUE;
+-}
+ 
+-static const GDBusPropertyTable sep_properties[] = {
+-	{ "UUID", "s", get_uuid, NULL, NULL,
+-					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+-	{ "Codec", "y", get_codec, NULL, NULL,
+-					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+-	{ "Capabilities", "ay", get_capabilities, NULL, NULL,
+-					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
+-	{ }
+-};
++	g_key_file_set_string(key_file, "Endpoints", seid, value);
++}
+ 
+-static void register_remote_sep(void *data, void *user_data)
++static void store_remote_seps(struct a2dp_channel *chan)
+ {
+-	struct avdtp_remote_sep *rsep = data;
+-	struct a2dp_setup *setup = user_data;
+-	struct a2dp_remote_sep *sep;
++	struct btd_device *device = chan->device;
++	char filename[PATH_MAX];
++	char dst_addr[18];
++	GKeyFile *key_file;
++	char *data;
++	gsize length = 0;
+ 
+-	sep = new0(struct a2dp_remote_sep, 1);
+-	sep->chan = setup->chan;
+-	sep->sep = rsep;
++	if (queue_isempty(chan->seps))
++		return;
+ 
+-	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL))
+-		goto done;
++	ba2str(device_get_address(device), dst_addr);
+ 
+-	asprintf(&sep->path, "%s/sep%d", device_get_path(setup->chan->device),
+-							avdtp_get_seid(rsep));
++	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
++			btd_adapter_get_storage_dir(device_get_adapter(device)),
++			dst_addr);
++	key_file = g_key_file_new();
++	g_key_file_load_from_file(key_file, filename, 0, NULL);
+ 
+-	if (g_dbus_register_interface(btd_get_dbus_connection(),
+-				sep->path, MEDIA_ENDPOINT_INTERFACE,
+-				sep_methods, NULL, sep_properties,
+-				sep, remote_sep_free) == FALSE) {
+-		error("Could not register remote sep %s", sep->path);
+-		free(sep->path);
+-		sep->path = NULL;
+-	}
++	/* Remove current endpoints since it might have changed */
++	g_key_file_remove_group(key_file, "Endpoints", NULL);
+ 
+-	DBG("Found remote SEP: %s", sep->path);
++	queue_foreach(chan->seps, store_remote_sep, key_file);
+ 
+-done:
+-	queue_push_tail(setup->chan->seps, sep);
++	data = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(filename, data, length, NULL);
++
++	g_free(data);
++	g_key_file_free(key_file);
+ }
+ 
+ static void discover_cb(struct avdtp *session, GSList *seps,
+@@ -2270,8 +2438,10 @@ static void discover_cb(struct avdtp *session, GSList *seps,
+ 	setup->seps = seps;
+ 	setup->err = err;
+ 
+-	if (!err && queue_isempty(setup->chan->seps))
+-		g_slist_foreach(seps, register_remote_sep, setup);
++	if (!err) {
++		g_slist_foreach(seps, register_remote_sep, setup->chan);
++		store_remote_seps(setup->chan);
++	}
+ 
+ 	finalize_discover(setup);
+ }
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index cc4322d10..4f964feb5 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -2638,12 +2638,15 @@ static gboolean avdtp_discover_resp(struct avdtp *session,
+ 		stream = find_stream_by_rseid(session, resp->seps[i].seid);
+ 
+ 		sep = find_remote_sep(session->seps, resp->seps[i].seid);
+-		if (!sep) {
+-			if (resp->seps[i].inuse && !stream)
+-				continue;
+-			sep = g_new0(struct avdtp_remote_sep, 1);
+-			session->seps = g_slist_append(session->seps, sep);
+-		}
++		if (sep && sep->type == resp->seps[i].type &&
++				sep->media_type == resp->seps[i].media_type)
++			continue;
++
++		if (resp->seps[i].inuse && !stream)
++			continue;
++
++		sep = g_new0(struct avdtp_remote_sep, 1);
++		session->seps = g_slist_append(session->seps, sep);
+ 
+ 		sep->stream = stream;
+ 		sep->seid = resp->seps[i].seid;
+@@ -3192,6 +3195,37 @@ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
+ 	return cap;
+ }
+ 
++struct avdtp_remote_sep *avdtp_register_remote_sep(struct avdtp *session,
++							uint8_t seid,
++							uint8_t type,
++							GSList *caps)
++{
++	struct avdtp_remote_sep *sep;
++	GSList *l;
++
++	sep = find_remote_sep(session->seps, seid);
++	if (sep)
++		return sep;
++
++	sep = g_new0(struct avdtp_remote_sep, 1);
++	session->seps = g_slist_append(session->seps, sep);
++	sep->seid = seid;
++	sep->type = type;
++	sep->media_type = AVDTP_MEDIA_TYPE_AUDIO;
++	sep->caps = caps;
++
++	for (l = caps; l; l = g_slist_next(l)) {
++		struct avdtp_service_capability *cap = l->data;
++
++		if (cap->category == AVDTP_MEDIA_CODEC)
++			sep->codec = cap;
++	}
++
++	DBG("seid %d type %d media %d", sep->seid, sep->type, sep->media_type);
++
++	return sep;
++}
++
+ static gboolean process_discover(gpointer data)
+ {
+ 	struct avdtp *session = data;
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index e5fc40c89..b03ca9030 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -223,6 +223,11 @@ struct avdtp *avdtp_ref(struct avdtp *session);
+ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
+ 							void *data, int size);
+ 
++struct avdtp_remote_sep *avdtp_register_remote_sep(struct avdtp *session,
++							uint8_t seid,
++							uint8_t type,
++							GSList *caps);
++
+ uint8_t avdtp_get_seid(struct avdtp_remote_sep *sep);
+ 
+ uint8_t avdtp_get_type(struct avdtp_remote_sep *sep);
 -- 
 2.17.2
 
