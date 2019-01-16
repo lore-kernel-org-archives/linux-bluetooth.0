@@ -4,49 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 620F3C43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 11:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AFEFC43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 12:31:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 344E120859
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 11:46:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DEC220578
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 12:31:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="XFffsftc";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="XFffsftc"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="gfBUbdaS";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Y4mXWpHP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392518AbfAPLqm (ORCPT
+        id S2392773AbfAPMbc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Jan 2019 06:46:42 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:43548 "EHLO
+        Wed, 16 Jan 2019 07:31:32 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:59068 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389613AbfAPLqc (ORCPT
+        with ESMTP id S2392579AbfAPMbc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Jan 2019 06:46:32 -0500
+        Wed, 16 Jan 2019 07:31:32 -0500
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 94A39608FB; Wed, 16 Jan 2019 11:46:31 +0000 (UTC)
+        id 9721D60208; Wed, 16 Jan 2019 12:31:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1547639191;
-        bh=ymB409/EObpTpVe+aPgVCCFfMgzXP9PAx6hVzoDTkiQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XFffsftcqXFYAHVpWi3jut3vDDiYSTCuKn9BeQcHL7S0IzWz2eOMLsGNA4JZm44n7
-         TnisocOyk8/q6vVwzKw1Cd5jPhPHBE6Gb7HaYz5WwfNH34Wd8lq9UnpxOCw8YszUA6
-         lFZrgzUPHp0JWuVtFL2t9DKBChzyJW2Wdagz8lJQ=
+        s=default; t=1547641890;
+        bh=UTejcDY/XE3AHidaahIJmn23UpUx87hv2SPQ3EFob4c=;
+        h=From:To:Cc:Subject:Date:From;
+        b=gfBUbdaSHd+yWk7RvPwfPvwmI+Wt+nddfwuU9PEgokXWRvcJQj5UWIhPGxPgrCivQ
+         FDYSjjMaqW4Btqd+1TEtGkom18vIJYNR0zRa3GSqOcQQDqZ8VaNqqb6Z4J43zqoLOt
+         jEVKdvMOm5XspoUM0IlGjxiJA+7PpsKKY5rpXlWY=
 Received: from bgodavar-linux.qualcomm.com (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: bgodavar@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 46D2F6087D;
-        Wed, 16 Jan 2019 11:46:28 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id B453C60208;
+        Wed, 16 Jan 2019 12:31:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1547639191;
-        bh=ymB409/EObpTpVe+aPgVCCFfMgzXP9PAx6hVzoDTkiQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=XFffsftcqXFYAHVpWi3jut3vDDiYSTCuKn9BeQcHL7S0IzWz2eOMLsGNA4JZm44n7
-         TnisocOyk8/q6vVwzKw1Cd5jPhPHBE6Gb7HaYz5WwfNH34Wd8lq9UnpxOCw8YszUA6
-         lFZrgzUPHp0JWuVtFL2t9DKBChzyJW2Wdagz8lJQ=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 46D2F6087D
+        s=default; t=1547641889;
+        bh=UTejcDY/XE3AHidaahIJmn23UpUx87hv2SPQ3EFob4c=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Y4mXWpHPL8XSnDiPyCXroOGR6FiQNMjKZ2U/aTB7jNKjL23fVPybj94SGgabQh4Z9
+         lprkpra79QZUK+Vc12jHp2Gq1U3MfgRqyQQRYIAqQ0ySqQoBp24RmCQXOPhLJqC1H9
+         8QUgf1snbS3EdRNS5PCAISVeDFeO7GP4/m2Y43aU=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org B453C60208
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
 Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=bgodavar@codeaurora.org
 From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
@@ -55,12 +55,10 @@ Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
         linux-arm-msm@vger.kernel.org,
         Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v8 3/3] Bluetooth: hci_qca: Disable IBS state machine and flush Tx buffer
-Date:   Wed, 16 Jan 2019 17:16:03 +0530
-Message-Id: <20190116114603.500-4-bgodavar@codeaurora.org>
+Subject: [RESEND v2] Bluetooth: hci_qca: Add helper to set device address
+Date:   Wed, 16 Jan 2019 18:01:15 +0530
+Message-Id: <20190116123115.24973-1-bgodavar@codeaurora.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190116114603.500-1-bgodavar@codeaurora.org>
-References: <20190116114603.500-1-bgodavar@codeaurora.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -68,35 +66,95 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-During hci down we observed IBS sleep commands are queued in the Tx
-buffer and hci_uart_write_work is sending data to the chip which is
-not required as the chip is powered off. This patch will disable IBS
-and flush the Tx buffer before we turn off the chip.
+This patch add qca_set_bdaddr() to set the device
+address for latest Qualcomm Bluetooth chipset wcn3990 and above.
 
 Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+Tested-by: Matthias Kaehlcke <mka@chromium.org>
 ---
- drivers/bluetooth/hci_qca.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/bluetooth/btqca.c   | 19 +++++++++++++++++++
+ drivers/bluetooth/btqca.h   |  8 +++++++-
+ drivers/bluetooth/hci_qca.c |  5 ++++-
+ 3 files changed, 30 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index ec9e03a6b778..612268574fc7 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -391,6 +391,25 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ }
+ EXPORT_SYMBOL_GPL(qca_uart_setup);
+ 
++int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	struct sk_buff *skb;
++	int err;
++
++	skb = __hci_cmd_sync_ev(hdev, EDL_WRITE_BD_ADDR_OPCODE, 6, bdaddr,
++				HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "QCA Change address cmd failed (%d)", err);
++		return err;
++	}
++
++	kfree_skb(skb);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(qca_set_bdaddr);
++
+ MODULE_AUTHOR("Ben Young Tae Kim <ytkim@qca.qualcomm.com>");
+ MODULE_DESCRIPTION("Bluetooth support for Qualcomm Atheros family ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 0c01f375fe83..c72c56ea7480 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -20,6 +20,7 @@
+ 
+ #define EDL_PATCH_CMD_OPCODE		(0xFC00)
+ #define EDL_NVM_ACCESS_OPCODE		(0xFC0B)
++#define EDL_WRITE_BD_ADDR_OPCODE	(0xFC14)
+ #define EDL_PATCH_CMD_LEN		(1)
+ #define EDL_PATCH_VER_REQ_CMD		(0x19)
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+@@ -140,7 +141,7 @@ int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		   enum qca_btsoc_type soc_type, u32 soc_ver);
+ int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version);
+-
++int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ #else
+ 
+ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+@@ -159,4 +160,9 @@ static inline int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline int qca_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	return -EOPNOTSUPP;
++}
++
+ #endif
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 7e4afcf40da2..7330ba71ada4 100644
+index f036c8f98ea3..53ac5ade532b 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -1275,6 +1275,14 @@ static const struct qca_vreg_data qca_soc_data = {
+@@ -1241,7 +1241,10 @@ static int qca_setup(struct hci_uart *hu)
+ 	}
  
- static void qca_power_shutdown(struct hci_uart *hu)
- {
-+	struct qca_data *qca = hu->priv;
-+
-+	/* From this point we go into power off state. But serial port is
-+	 * still open, stop queueing the IBS data and flush all the buffered
-+	 * data in skb's.
-+	 */
-+	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
-+	qca_flush(hu);
- 	host_set_baudrate(hu, 2400);
- 	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
- 	qca_power_setup(hu, false);
+ 	/* Setup bdaddr */
+-	hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
++	if (qcadev->btsoc_type == QCA_WCN3990)
++		hu->hdev->set_bdaddr = qca_set_bdaddr;
++	else
++		hu->hdev->set_bdaddr = qca_set_bdaddr_rome;
+ 
+ 	return ret;
+ }
 -- 
 The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
 a Linux Foundation Collaborative Project
