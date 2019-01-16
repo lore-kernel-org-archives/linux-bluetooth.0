@@ -2,111 +2,175 @@ Return-Path: <SRS0=3VKx=PY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C5F1C43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 20:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A0D2C43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 20:23:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39C2E20868
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 20:06:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E232020840
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 20:23:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Ys6yE7gB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727641AbfAPUGO convert rfc822-to-8bit (ORCPT
+        id S1731741AbfAPUW4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Jan 2019 15:06:14 -0500
-Received: from mga01.intel.com ([192.55.52.88]:26344 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727511AbfAPUGO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Jan 2019 15:06:14 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Jan 2019 12:06:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,487,1539673200"; 
-   d="scan'208";a="267666402"
-Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
-  by orsmga004.jf.intel.com with ESMTP; 16 Jan 2019 12:06:14 -0800
-Received: from orsmsx156.amr.corp.intel.com (10.22.240.22) by
- ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Wed, 16 Jan 2019 12:06:13 -0800
-Received: from orsmsx103.amr.corp.intel.com ([169.254.5.210]) by
- ORSMSX156.amr.corp.intel.com ([169.254.8.107]) with mapi id 14.03.0415.000;
- Wed, 16 Jan 2019 12:06:13 -0800
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "Stotland, Inga" <inga.stotland@intel.com>
-Subject: RE: [PATCH BlueZ] mesh: Cleanup PB-ADV transport on Prov Close
-Thread-Topic: [PATCH BlueZ] mesh: Cleanup PB-ADV transport on Prov Close
-Thread-Index: AQHUrF2pSSjeX1js+k6webuQckGSR6WyVPkg
-Date:   Wed, 16 Jan 2019 20:06:12 +0000
-Message-ID: <DEBB0CAA2616974FAE35E4B560B9A4375D90B8F2@ORSMSX103.amr.corp.intel.com>
-References: <20190114230524.22506-1-brian.gix@intel.com>
-In-Reply-To: <20190114230524.22506-1-brian.gix@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ctpclassification: CTP_NT
-x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiNjE5N2IwMjUtODQxZi00MjBmLWE5OGEtZWFlNjkyOWIwNmE3IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiS0QzTzZEY3hnXC9wZXV3eGp5MlZwTUV6OVNJdlI0ZmljMWZNcmUrY3pRYzNBVEs3OERRQkRRS3VkbFRwRDdnWGEifQ==
-dlp-product: dlpe-windows
-dlp-version: 11.0.400.15
-dlp-reaction: no-action
-x-originating-ip: [10.22.254.139]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Wed, 16 Jan 2019 15:22:56 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:43119 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730050AbfAPUW4 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 16 Jan 2019 15:22:56 -0500
+Received: by mail-pl1-f194.google.com with SMTP id gn14so3533878plb.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jan 2019 12:22:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ATF5Lt37lZd4XR74weI4YdFP5xD4fmjGIe3UjfXgJs0=;
+        b=Ys6yE7gBUdham7sCbDYYl11kLIa783zCix6NZY6wSopEKMswotxOPX72RIau9tLorw
+         DgXo9dA18KrdLiTuLCrCzThRVMww1nd7ysfTAsrLJ3tXtBAr/J6uIcr9KElWzXcQX7ga
+         M+et3ytePBaFUe9nNwLd7/EeOUuZoWsWvTPs0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ATF5Lt37lZd4XR74weI4YdFP5xD4fmjGIe3UjfXgJs0=;
+        b=fsCdXcoEc+zlGCI3RbRi3UskK5p9w4HfWAoaG6SWVPUXiU/eibhA8Oi2VO2q0bVFmt
+         j/ZvuVXsJ5IdMLDlI+q+jG2/j4DDZgcQSFxFxD1ZVf9XJbbHHghP/3T0Drr7i07E6h8y
+         fh0z2Z7BlUilaJGgbsATVfmXuR32YdeyOp8KVkvh4CPCQG1xkqNYfsum/fDSoCPWJNI+
+         kNpn5b+VJLvfeGwUNxJAljDIsfx6CoJKhI2XeSenJz1lJFpC4rV2tySdm3WTc37r6Wng
+         b8ugrWo59unBifMnx1rbeUpAybL+CZMUxWqrz3zshj4Ieq1/cMqANncbtHzrzMXOCKsd
+         2vvw==
+X-Gm-Message-State: AJcUukdE2gBuAn47fUE1A4zT4O8dTmNcraQinJn4Ac2PFo1TbYyY409z
+        LAgjW9CQNY+J+4RXWlwUTv9b9g==
+X-Google-Smtp-Source: ALg8bN4pJ040ecnF/7FzaQXtnqodtpti32I7WuYPl7fiovVlgvXoKdQZPcjhefmCzNbqbTt7h/CBNQ==
+X-Received: by 2002:a17:902:b03:: with SMTP id 3mr11614360plq.91.1547670175228;
+        Wed, 16 Jan 2019 12:22:55 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id i184sm9684698pfc.41.2019.01.16.12.22.53
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 16 Jan 2019 12:22:54 -0800 (PST)
+Date:   Wed, 16 Jan 2019 12:22:53 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v8 1/3] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+Message-ID: <20190116202253.GS261387@google.com>
+References: <20190116114603.500-1-bgodavar@codeaurora.org>
+ <20190116114603.500-2-bgodavar@codeaurora.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20190116114603.500-2-bgodavar@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Applied upstream
-
-> -----Original Message-----
-> From: Gix, Brian
-> Sent: Monday, January 14, 2019 3:05 PM
-> To: linux-bluetooth@vger.kernel.org
-> Cc: Stotland, Inga <inga.stotland@intel.com>; Gix, Brian
-> <brian.gix@intel.com>
-> Subject: [PATCH BlueZ] mesh: Cleanup PB-ADV transport on Prov Close
+On Wed, Jan 16, 2019 at 05:16:01PM +0530, Balakrishna Godavarthi wrote:
+> wcn3990 requires a power pulse to turn ON/OFF along with
+> regulators. Sometimes we are observing the power pulses are sent
+> out with some time delay, due to queuing these commands. This is
+> causing synchronization issues with chip, which intern delay the
+> chip setup or may end up with communication issues.
 > 
-> PB-ADV always used for provisioning, so must always  be cleaned up.
+> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 > ---
->  mesh/prov-acceptor.c  | 5 +----
->  mesh/prov-initiator.c | 2 ++
->  2 files changed, 3 insertions(+), 4 deletions(-)
+> Changes in v8:
+>  * Updated 1 second timeout instead of indefinite wait.
 > 
-> diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c index
-> d983991d4..3d4d93ba4 100644
-> --- a/mesh/prov-acceptor.c
-> +++ b/mesh/prov-acceptor.c
-> @@ -126,10 +126,7 @@ static void acceptor_free(void)
->  	mesh_send_cancel(bec_filter, sizeof(bec_filter));
->  	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
+> Changes in v7:
+>  *  updated the wait time to 5 ms after sending power pulses.
 > 
-> -	if (prov->trans_tx) {
-> -		if (prov->transport == PB_ADV)
-> -			pb_adv_unreg(prov->trans_data);
-> -	}
-> +	pb_adv_unreg(prov);
+> Changes in v6:
+>  * added serdev_device_write_flush() in qca_send_power_pulse
+>    instead during the power off pulse.
 > 
->  	l_free(prov);
->  	prov = NULL;
-> diff --git a/mesh/prov-initiator.c b/mesh/prov-initiator.c index
-> 669cf340d..d915f2aaf 100644
-> --- a/mesh/prov-initiator.c
-> +++ b/mesh/prov-initiator.c
-> @@ -122,6 +122,8 @@ static void initiator_free(void)
+> Changes in v5:
+>  * added serdev_device_write_flush() in qca_power_off().
+> ---
+>  drivers/bluetooth/hci_qca.c | 46 ++++++++++++++++---------------------
+>  1 file changed, 20 insertions(+), 26 deletions(-)
 > 
->  	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
-> 
-> +	pb_adv_unreg(prov);
-> +
->  	l_free(prov);
->  	prov = NULL;
->  }
-> --
-> 2.20.1
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index f036c8f98ea3..681bfa30467e 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -60,6 +60,7 @@
+>  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+>  #define IBS_TX_IDLE_TIMEOUT_MS		2000
+>  #define BAUDRATE_SETTLE_TIMEOUT_MS	300
+> +#define POWER_PULSE_TRANS_TIMEOUT_MS	1000
 
+nit: Not that it should make a different in normal operation, but 1s
+seems extreme. Is there really any chance that the byte hasn't been
+sent after say 100ms (which is still an eternity for a single byte)?
+
+>  /* susclk rate */
+>  #define SUSCLK_RATE_32KHZ	32768
+> @@ -1013,11 +1014,10 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>  		hci_uart_set_baudrate(hu, speed);
+>  }
+>  
+> -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+> +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
+>  {
+> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+> -	struct qca_data *qca = hu->priv;
+> -	struct sk_buff *skb;
+> +	int ret;
+> +	int timeout = __msecs_to_jiffies(POWER_PULSE_TRANS_TIMEOUT_MS);
+
+use msecs_to_jiffies()
+
+>  	/* These power pulses are single byte command which are sent
+>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+> @@ -1029,22 +1029,22 @@ static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>  	 * save power. Disabling hardware flow control is mandatory while
+>  	 * sending power pulses to SoC.
+>  	 */
+> -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+> -
+> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+> -	if (!skb)
+> -		return -ENOMEM;
+> +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to controller", cmd);
+>  
+> +	serdev_device_write_flush(hu->serdev);
+>  	hci_uart_set_flow_control(hu, true);
+> +	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
+> +	if (ret < 0) {
+> +		bt_dev_err(hu->hdev, "failed to send power pulse %02x", cmd);
+> +		return ret;
+> +	}
+>  
+> -	skb_put_u8(skb, cmd);
+> -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+> -
+> -	skb_queue_tail(&qca->txq, skb);
+> -	hci_uart_tx_wakeup(hu);
+> -
+> -	/* Wait for 100 uS for SoC to settle down */
+> -	usleep_range(100, 200);
+> +	serdev_device_wait_until_sent(hu->serdev, timeout);
+> +	/* Wait of 5ms is required for assuring to send the byte on the Tx
+> +	 * line and also for the controller to settle down for the received
+> +	 * byte.
+> +	 */
+> +	usleep_range(5000, 6000);
+
+I incorrectly claimed that there might be still bytes sitting in the
+UART FIFO when serdev_device_wait_until_sent() returns, Johan
+corrected me on that (thanks!). So if it takes the SoC 100us to settle
+down we should be good with the original code.
+
+Cheers
+
+Matthias
