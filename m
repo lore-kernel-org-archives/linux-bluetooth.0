@@ -2,131 +2,534 @@ Return-Path: <SRS0=3VKx=PY=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28841C43387
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 16:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E803C43387
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 19:57:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E988120657
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 16:35:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DABF820868
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jan 2019 19:57:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="U2WpP8vL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393722AbfAPQf1 (ORCPT
+        id S1731846AbfAPT5U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Jan 2019 11:35:27 -0500
-Received: from mx-relay20-hz1.antispameurope.com ([94.100.132.220]:59376 "EHLO
-        mx-relay20-hz1.antispameurope.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387444AbfAPQfZ (ORCPT
+        Wed, 16 Jan 2019 14:57:20 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:40160 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731602AbfAPT5U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Jan 2019 11:35:25 -0500
-Received: from unknown ([193.201.169.249]) by mx-relay20-hz1.antispameurope.com;
- Wed, 16 Jan 2019 17:35:21 +0100
-Received: from KMLEXC66.kme.intern (10.120.237.251) by KMLEXC68.kme.intern
- (10.120.236.246) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Wed, 16 Jan
- 2019 17:35:19 +0100
-Received: from KMLEXC66.kme.intern ([fe80::4193:55fc:3d0a:1908]) by
- KMLEXC66.kme.intern ([fe80::4193:55fc:3d0a:1908%14]) with mapi id
- 15.00.1367.000; Wed, 16 Jan 2019 17:35:19 +0100
-From:   "Kazda, Petr" <Petr.Kazda@konicaminolta.cz>
-To:     Ramya BM <m.ramya@globaledgesoft.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Bluez4 HSP problems -> backporting of Bluez5 to Ubuntu 12.04
-Thread-Topic: Bluez4 HSP problems -> backporting of Bluez5 to Ubuntu 12.04
-Thread-Index: AdSow7Xpa/A3NgioSxqdDhtpMSmNNc01zvIxzSvmo3A=
-Date:   Wed, 16 Jan 2019 16:35:19 +0000
-Message-ID: <cfae3f93348b4893ab89c9f5a941d1a7@KMLEXC66.kme.intern>
-References: <909a3877987d4e1d917e365f7d1eb603@KMLEXC66.kme.intern>
- <73493293.9326732.1547620188512.JavaMail.zimbra@globaledgesoft.com>
-In-Reply-To: <73493293.9326732.1547620188512.JavaMail.zimbra@globaledgesoft.com>
-Accept-Language: cs-CZ, de-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.120.236.1]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 16 Jan 2019 14:57:20 -0500
+Received: by mail-pf1-f194.google.com with SMTP id i12so3568170pfo.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Jan 2019 11:57:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=K1btvc7DG/yJ2fTyirMW8ZHX6XXqhPt0vjavq/XgrdY=;
+        b=U2WpP8vLTd2ESAKo/T5fb1pntago9xqx/MFyTzUmo3t31+eVdJejsdUIjA0JKQ1+wi
+         tWoRm747zoQM538lZQ8v541S5lKC8DLCr7J4e1fd2ncFWpS1oworC4WRwEKY+9Yjkj0m
+         HF8lYAul/9L/UkUbngXOWHvaPO6IbxhufnGlQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=K1btvc7DG/yJ2fTyirMW8ZHX6XXqhPt0vjavq/XgrdY=;
+        b=DvjZTcbukAkp9+foUt7uFtXBcQK+0FSRrZDE7qEtCo3xSJQk+beTxo5yDuO+StJtu7
+         k5xKHLrZpPc+KRYUULUdWuLal+ZXlsS7JKCg72tXofbx0h/OpwpoSGUMcTHtxcl0Mr/E
+         D8cChhkkjzRiH+sgWjQiuNZvG4zRJ9ZGb7IJPvHIlqxG4bPfcscbOAxQK9L61dJGqO0c
+         2sEaByxz2f/J3t/usWMNp80NDJKqztp8WriOpLeV7s4crsnPBIDg55sKTrJmJFn1pgny
+         9faupzkdYFF6dVWdAW2r5e/d9yylyz1bT4W0fBKB3lUHFeSjgXP/DuhUf8JWwersGmpo
+         faiA==
+X-Gm-Message-State: AJcUukd59mNazQ1FH4ctuIveNjD6GgBpBHrM8her8V1Iu6XNV4JKagBb
+        wzkAdl9/cceK91HNLAFMjkDc/nZVZZZ3DQ==
+X-Google-Smtp-Source: ALg8bN7A6fyqMm9I4eaIIMqpPw2LK4Zj2sllhTsPZZ7ZBrymWJo4POn9+wlxTtkNlGKxJP3T9Zt02w==
+X-Received: by 2002:a65:6148:: with SMTP id o8mr10413614pgv.451.1547668638434;
+        Wed, 16 Jan 2019 11:57:18 -0800 (PST)
+Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
+        by smtp.gmail.com with ESMTPSA id g136sm10627595pfb.154.2019.01.16.11.57.17
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 16 Jan 2019 11:57:17 -0800 (PST)
+Date:   Wed, 16 Jan 2019 11:57:16 -0800
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v7 4/4] Bluetooth: btqca: inject command complete event
+ during fw download
+Message-ID: <20190116195716.GR261387@google.com>
+References: <1FC4CC11-B070-4ACF-9107-857A4D392876@holtmann.org>
+ <1ec946b46301124c90aa12abffeca176@codeaurora.org>
+ <20190102221510.GQ261387@google.com>
+ <c34d44c656cf38a25dbfc9c6a1dd8106@codeaurora.org>
+ <20190110204328.GA261387@google.com>
+ <fc3430d2ba5e049883f91ff56aac0dbd@codeaurora.org>
+ <20190111231229.GI261387@google.com>
+ <5ef0fa1eca4a278ce31c88ef34c7c649@codeaurora.org>
+ <20190115012002.GP261387@google.com>
+ <6889ee31f9700659109c7b772bef76d9@codeaurora.org>
 MIME-Version: 1.0
-X-cloud-security-sender: petr.kazda@konicaminolta.cz
-X-cloud-security-recipient: linux-bluetooth@vger.kernel.org
-X-cloud-security-crypt: load encryption module
-X-cloud-security-Virusscan: CLEAN
-X-cloud-security-disclaimer: This E-Mail was scanned by E-Mailservice on mx-relay20-hz1.antispameurope.com with 1B3AB12BD4474
-X-cloud-security-connect: unknown[193.201.169.249], TLS=1, IP=193.201.169.249
-X-cloud-security: scantime:.1631
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6889ee31f9700659109c7b772bef76d9@codeaurora.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGVsbG8sDQp0aGFuayB5b3UgZm9yIHRoZSByZXBseS4NCg0KSW4gdGhlIG1lYW50aW1lIEkgaGF2
-ZSBkb25lIHNvbWUgdGVzdHMgYW5kIEkgbWFuYWdlZCB0byBidWlsZCBCbHVleiA1LjQ5IG9uIDEy
-LjA0IHdpdGggMy40LjAga2VybmVsIHdpdGhvdXQgbXVjaCBpc3N1ZXMgKGV4Y2VwdCBEYnVzIDEu
-NiBkZXBlbmRlbmN5LCBidXQgdGhhdCBpcyBlYXN5IHRvIHNvbHZlIGJ5IGJ1aWxkaW5nIGl0IGZy
-b20gc291cmNlKS4gSSBhbHNvIHN1Y2Nlc3NmdWxseSBtYW5hZ2VkIHRvIGJ1aWxkIFB1bHNlIDcu
-MSBhbmQgdmVuZG9yIGRyaXZlcnMgZm9yIHRoZSBCVCBEb25nbGUuIA0KDQpBZnRlciBsb3Qgb2Yg
-dHJpYWwgYW5kIGVycm9yIGl0IGNhbWUgb3V0IHRoYXQgcmVtb3Zpbmcgb2YgdGhlIHJ0bDg3MjNi
-dV9jb25maWcgZnJvbSAvbGliLy4uLi9maXJtd2FyZSBkaXJlY3Rvcnkgc29sdmVzIHRoZSBpc3N1
-ZSB3aXRoIEhTUC4gSXQgaXMgcHJvYmFibHkgc29tZSBrZXJuZWwgc3BlY2lmaWMgaXNzdWUgYXMg
-b24gYW5vdGhlciBtYWNoaW5lIHdpdGggbmV3ZXIga2VybmVsIGl0IHdvcmtzIGFsbCB0b2dldGhl
-ci4NCg0KTm93IHdlIGNhbiB1c2UgdGhlIEJUIGhlYWRzZXRzIGluIEhTUCBtb2RlLCBuZXcgQmx1
-ZXogaW1wcm92ZWQgdGhlIGNvbXBhdGliaWxpdHkgd2l0aCBtYW55IGhlYWRzZXRzIGFuZCBuZXcg
-UHVsc2Ugd2l0aCBORU9OIHN1cHBvcnQgY29uc3VtZXMgY29uc2lkZXJhYmx5IGxlc3MgQ1BVLg0K
-DQpTbyB3ZSBhcmUgaGFwcHkgd2l0aCB0aGUgc2V0dXAgbm93IDopDQoNCkJlc3QgcmVnYXJkcywN
-ClBldHIgDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQpGcm9tOiBSYW15YSBCTSA8bS5y
-YW15YUBnbG9iYWxlZGdlc29mdC5jb20+IA0KU2VudDogV2VkbmVzZGF5LCBKYW51YXJ5IDE2LCAy
-MDE5IDc6MzAgQU0NClRvOiBLYXpkYSwgUGV0ciA8UGV0ci5LYXpkYUBrb25pY2FtaW5vbHRhLmN6
-Pg0KQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBCbHVl
-ejQgSFNQIHByb2JsZW1zIC0+IGJhY2twb3J0aW5nIG9mIEJsdWV6NSB0byBVYnVudHUgMTIuMDQN
-Cg0KSGkgUGV0ciwNCg0KDQo+PiBOb3cgdG8gdGhlIG1haW4gcXVlc3Rpb24uIElzIGl0IHBvc3Np
-YmxlIHRvIGJhY2twb3J0IEJsdWV6NSB0byBVYnVudHUgMTIuMDQ/IFdlIGRvIG5vdCBuZWVkIHRo
-ZSBHVUkgZWxlbWVudHMsIGp1c3QgdGhlIGJhc2ljIG1vZHVsZXMgKEJMRSwgSElELCBhdWRpbyku
-DQoNCg0KWWVzIGl0IGlzIHBvc3NpYmxlIHRvIGNvbmZpZ3VyZSBibHVlejUgb24gdWJ1bnR1IDEy
-LjA0Lg0KDQoNCiANClJlZ2FyZHMsIA0KUmFteWENCg0KDQotLS0tLSBPcmlnaW5hbCBNZXNzYWdl
-IC0tLS0tDQpGcm9tOiAiUGV0ciBLYXpkYSIgPFBldHIuS2F6ZGFAa29uaWNhbWlub2x0YS5jej4N
-ClRvOiBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnDQpTZW50OiBUaHVyc2RheSwgMTAg
-SmFudWFyeSwgMjAxOSAxNTowNToxOQ0KU3ViamVjdDogQmx1ZXo0IEhTUCBwcm9ibGVtcyAtPiBi
-YWNrcG9ydGluZyBvZiBCbHVlejUgdG8gVWJ1bnR1IDEyLjA0DQoNCkRlYXIgQmx1ZXogZGV2ZWxv
-cGVycywNCndlIGhhdmUgYSBwcm9kdWN0IHRoYXQgaXMgY3VycmVudGx5IGJ1aWxkIHVzaW5nIE9N
-QVA0IHBsYXRmb3JtIHdpdGggVWJ1bnR1IDEyLjA0IChhcm1oZiBidWlsZCkgcnVubmluZyBvbiBp
-dC4gRHVlIHRvIHZhcmlvdXMgcmVhc29ucyB0aGUgdXBncmFkZSB0byBtb3JlIHJlY2VudCB2ZXJz
-aW9uIG9mIExpbnV4IGlzIG5vdCBwb3NzaWJsZSAobWFpbmx5IGJlY2F1c2UgVEkgZG9lcyBub3Qg
-cHJvdmlkZSB1cGRhdGVkIE9TIGltYWdlIGFuZCBzb3VyY2VzIGZvciBwcm9wcmlldGFyeSBkcml2
-ZXJzKS4NCg0KU28gd2UgYXJlIHN0dWNrIHdpdGggQmx1ZXogNC4xMDEgKGxhdGVzdCBhdmFpbGFi
-bGUgdmVyc2lvbiBidWlsdCBmcm9tIHNvdXJjZXMpLg0KDQpXZSBoYXZlIGJlZW4gdGVzdGluZyBj
-b21wYXRpYmlsaXR5IHdpdGggdHdvIEJsdWV0b290aCBoZWFkc2V0cyAtIEphYnJhIFN0ZWVsIGFu
-ZCBQbGFudHJvbmljcyBFeHBsb3JlciA1NS4gTmVpdGhlciBvZiB0aGVzZSB3b3JrcyBpbiBIU1Ag
-bW9kZSwgUGxhbnRyb25pY3MgZG9lcyBub3Qgd29yayBldmVuIGluIEEyRFAuIFdlIGFyZSB1c2lu
-ZyBFZGltYXggRVctNzYxMVVMQiBkb25nbGUuDQoNCk1vcmUgc3BlY2lmaWNhbGx5IEphYnJhIHdv
-cmtzIGluIEEyRFAsIGluIEhTUCBpdCBkb2VzIG5vdCBzaG93IGFueSBlcnJvcnMgYW55d2hlcmUs
-IGJ1dCBpdCBzaW1wbHkgZG9lcyBub3QgdHJhbnNmZXIgYW55IHNvdW5kIGluIG9yIG91dC4gUGxh
-bnRyb25pY3MgZG9lcyBub3Qgd29yayBpbiBBMkRQICh0aGVyZSBpcyBtZXNzYWdlIGxpa2UgZmFp
-bGVkIHRvIGFjcXVpcmUgdHJhbnNwb3J0IGJsdWV6X1hYWFhYWFhYIGZyb20gcHVsc2VhdWRpbyks
-IGluIEhTUCBpdCB0aHJvd3MgZXJyb3IgaW4gYnR1c2IgbW9kdWxlLiBJIHRyaWVkIGV2ZXJ5IHBv
-c3NpYmxlIHdvcmthcm91bmQgZm91bmQgb24gdGhlIGludGVybmV0LCB0d2Vha2VkIHRoZSBzZXR0
-aW5ncyBiYWNrIGFuZCBmb3J0aCwgdHJpZWQgZGlmZmVyZW50IGNvbWJpbmF0aW9ucywgYnV0IG5v
-IGx1Y2suIEkgY2FtZSB0byB0aGUgY29uY2x1c2lvbiB0aGF0IGl0IG1pZ2h0IGJlIHNvbWVob3cg
-Y29ubmVjdGVkIHdpdGggU0NPIHBhY2tldHMgcm91dGluZywgYnV0IGF0IHRoaXMgcG9pbnQgSSBk
-byBub3Qgc2VlIGFueSB3YXkgaG93IHRvIG1vdmUgZnVydGhlciBieSBteXNlbGYuDQoNCkkgdGVz
-dGVkIGJvdGggZGV2aWNlcyB3aXRoIG1vcmUgcmVjZW50IFVidW50dSAxOC4wNCB3aXRoIHRoZSBz
-YW1lIEVkaW1heCBkb25nbGUsIHNhbWUgZHJpdmVycyBhbmQgYm90aCBoZWFkc2V0cyB3b3JrIHdp
-dGhvdXQgaXNzdWVzLCBzbyBpdCBzZWVtcyB0aGF0IHRoZSBjdWxwcml0IG91dGRhdGVkIEJsdWV6
-LiANCg0KTm93IHRvIHRoZSBtYWluIHF1ZXN0aW9uLiBJcyBpdCBwb3NzaWJsZSB0byBiYWNrcG9y
-dCBCbHVlejUgdG8gVWJ1bnR1IDEyLjA0PyBXZSBkbyBub3QgbmVlZCB0aGUgR1VJIGVsZW1lbnRz
-LCBqdXN0IHRoZSBiYXNpYyBtb2R1bGVzIChCTEUsIEhJRCwgYXVkaW8pLiBJZiBpdCBpcyB0aGVv
-cmV0aWNhbGx5IHBvc3NpYmxlLCBpcyB0aGVyZSBhbnlvbmUgd2lsbGluZyB0byBkbyBpdCAoZXZl
-biBhcyBhIHBhaWQgam9iKT8NCg0KVGhhbmsgeW91Lg0KDQpQZXRyDQpEaXNjbGFpbWVyOi0gVGhl
-IGluZm9ybWF0aW9uIGNvbnRhaW5lZCBpbiB0aGlzIGVsZWN0cm9uaWMgbWVzc2FnZSBhbmQgYW55
-IGF0dGFjaG1lbnRzIHRvIHRoaXMgbWVzc2FnZSBhcmUgaW50ZW5kZWQgZm9yIHRoZSBleGNsdXNp
-dmUgdXNlIG9mIHRoZSBhZGRyZXNzZWUocykgYW5kIG1heSBjb250YWluIHByb3ByaWV0YXJ5LCBj
-b25maWRlbnRpYWwgb3IgcHJpdmlsZWdlZCBpbmZvcm1hdGlvbi4gSWYgeW91IGFyZSBub3QgdGhl
-IGludGVuZGVkIHJlY2lwaWVudCwgeW91IHNob3VsZCBub3QgZGlzc2VtaW5hdGUsIGRpc3RyaWJ1
-dGUgb3IgY29weSB0aGlzIGUtbWFpbC4gUGxlYXNlIG5vdGlmeSB0aGUgc2VuZGVyIGltbWVkaWF0
-ZWx5IGFuZCBkZXN0cm95IGFsbCBjb3BpZXMgb2YgdGhpcyBtZXNzYWdlIGFuZCBhbnkgYXR0YWNo
-bWVudHMuIFRoZSB2aWV3cyBleHByZXNzZWQgaW4gdGhpcyBFLW1haWwgbWVzc2FnZSAoaW5jbHVk
-aW5nIHRoZSBlbmNsb3N1cmUvKHMpIG9yIGF0dGFjaG1lbnQvKHMpIGlmIGFueSkgYXJlIHRob3Nl
-IG9mIHRoZSBpbmRpdmlkdWFsIHNlbmRlciwgZXhjZXB0IHdoZXJlIHRoZSBzZW5kZXIgZXhwcmVz
-c2x5LCBhbmQgd2l0aCBhdXRob3JpdHksIHN0YXRlcyB0aGVtIHRvIGJlIHRoZSB2aWV3cyBvZiBH
-bG9iYWxFZGdlLiBCZWZvcmUgb3BlbmluZyBhbnkgbWFpbCBhbmQgYXR0YWNobWVudHMgcGxlYXNl
-IGNoZWNrIHRoZW0gZm9yIHZpcnVzZXMgLkdsb2JhbEVkZ2UgZG9lcyBub3QgYWNjZXB0IGFueSBs
-aWFiaWxpdHkgZm9yIHZpcnVzIGluZmVjdGVkIG1haWxzLg0KDQo=
+On Wed, Jan 16, 2019 at 03:06:29PM +0530, Balakrishna Godavarthi wrote:
+> On 2019-01-15 06:50, Matthias Kaehlcke wrote:
+> > On Mon, Jan 14, 2019 at 09:21:25PM +0530, Balakrishna Godavarthi wrote:
+> > > On 2019-01-12 04:42, Matthias Kaehlcke wrote:
+> > > > On Fri, Jan 11, 2019 at 07:53:43PM +0530, Balakrishna Godavarthi wrote:
+> > > > > Hi Matthias,
+> > > > >
+> > > > > On 2019-01-11 02:13, Matthias Kaehlcke wrote:
+> > > > > > Hi Balakrishna,
+> > > > > >
+> > > > > > On Thu, Jan 10, 2019 at 08:30:43PM +0530, Balakrishna Godavarthi wrote:
+> > > > > > > Hi Matthias,
+> > > > > > >
+> > > > > > > On 2019-01-03 03:45, Matthias Kaehlcke wrote:
+> > > > > > > > On Mon, Dec 31, 2018 at 11:34:46AM +0530, Balakrishna Godavarthi wrote:
+> > > > > > > > > Hi Marcel,
+> > > > > > > > >
+> > > > > > > > > On 2018-12-30 13:40, Marcel Holtmann wrote:
+> > > > > > > > > > Hi Balakrishna,
+> > > > > > > > > >
+> > > > > > > > > > > > > Latest qualcomm chips are not sending an command complete event for
+> > > > > > > > > > > > > every firmware packet sent to chip. They only respond with a vendor
+> > > > > > > > > > > > > specific event for the last firmware packet. This optimization will
+> > > > > > > > > > > > > decrease the BT ON time. Due to this we are seeing a timeout error
+> > > > > > > > > > > > > message logs on the console during firmware download. Now we are
+> > > > > > > > > > > > > injecting a command complete event once we receive an vendor
+> > > > > > > > > > > > > specific
+> > > > > > > > > > > > > event for the last RAM firmware packet.
+> > > > > > > > > > > > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> > > > > > > > > > > > > ---
+> > > > > > > > > > > > > drivers/bluetooth/btqca.c | 39
+> > > > > > > > > > > > > ++++++++++++++++++++++++++++++++++++++-
+> > > > > > > > > > > > > drivers/bluetooth/btqca.h |  3 +++
+> > > > > > > > > > > > > 2 files changed, 41 insertions(+), 1 deletion(-)
+> > > > > > > > > > > > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> > > > > > > > > > > > > index ec9e03a6b778..0b533f65f652 100644
+> > > > > > > > > > > > > --- a/drivers/bluetooth/btqca.c
+> > > > > > > > > > > > > +++ b/drivers/bluetooth/btqca.c
+> > > > > > > > > > > > > @@ -144,6 +144,7 @@ static void qca_tlv_check_data(struct
+> > > > > > > > > > > > > rome_config *config,
+> > > > > > > > > > > > > 		 * In case VSE is skipped, only the last segment is acked.
+> > > > > > > > > > > > > 		 */
+> > > > > > > > > > > > > 		config->dnld_mode = tlv_patch->download_mode;
+> > > > > > > > > > > > > +		config->dnld_type = config->dnld_mode;
+> > > > > > > > > > > > > 		BT_DBG("Total Length           : %d bytes",
+> > > > > > > > > > > > > 		       le32_to_cpu(tlv_patch->total_size));
+> > > > > > > > > > > > > @@ -264,6 +265,31 @@ static int qca_tlv_send_segment(struct
+> > > > > > > > > > > > > hci_dev *hdev, int seg_size,
+> > > > > > > > > > > > > 	return err;
+> > > > > > > > > > > > > }
+> > > > > > > > > > > > > +static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
+> > > > > > > > > > > > > +{
+> > > > > > > > > > > > > +	struct hci_event_hdr *hdr;
+> > > > > > > > > > > > > +	struct hci_ev_cmd_complete *evt;
+> > > > > > > > > > > > > +	struct sk_buff *skb;
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
+> > > > > > > > > > > > > +	if (!skb)
+> > > > > > > > > > > > > +		return -ENOMEM;
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +	hdr = skb_put(skb, sizeof(*hdr));
+> > > > > > > > > > > > > +	hdr->evt = HCI_EV_CMD_COMPLETE;
+> > > > > > > > > > > > > +	hdr->plen = sizeof(*evt) + 1;
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +	evt = skb_put(skb, sizeof(*evt));
+> > > > > > > > > > > > > +	evt->ncmd = 1;
+> > > > > > > > > > > > > +	evt->opcode = HCI_OP_NOP;
+> > > > > > > >
+> > > > > > > > After looking a bit more at it I realize HCI_OP_NOP is not a good
+> > > > > > > > value in this case:
+> > > > > > > >
+> > > > > > > > static void hci_cmd_complete_evt(...)
+> > > > > > > > {
+> > > > > > > >   ...
+> > > > > > > >
+> > > > > > > >   if (*opcode != HCI_OP_NOP)
+> > > > > > > >     cancel_delayed_work(&hdev->cmd_timer);
+> > > > > > > >
+> > > > > > > >   ...
+> > > > > > > > }
+> > > > > > > >
+> > > > > > > > https://elixir.bootlin.com/linux/v4.19/source/net/bluetooth/hci_event.c#L3351
+> > > > > > > >
+> > > > > > > > Cancelling the command timeout is precisely what we want. Not sure why
+> > > > > > > > the patch with HCI_OP_NOP makes the timeouts go away in most cases
+> > > > > > > > (but not e.g. when inserting an msleep(1000) after downloading the
+> > > > > > > > NVM.
+> > > > > > > >
+> > > > > > > > I suggest to pass the opcode of the command to be completed.
+> > > > > > > >
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > +	return hci_recv_frame(hdev, skb);
+> > > > > > > > > > > > > +}
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > > static int qca_download_firmware(struct hci_dev *hdev,
+> > > > > > > > > > > > > 				  struct rome_config *config)
+> > > > > > > > > > > > > {
+> > > > > > > > > > > > > @@ -297,11 +323,22 @@ static int
+> > > > > > > > > > > > > qca_download_firmware(struct hci_dev *hdev,
+> > > > > > > > > > > > > 		ret = qca_tlv_send_segment(hdev, segsize, segment,
+> > > > > > > > > > > > > 					    config->dnld_mode);
+> > > > > > > > > > > > > 		if (ret)
+> > > > > > > > > > > > > -			break;
+> > > > > > > > > > > > > +			goto out;
+> > > > > > > > > > > > > 		segment += segsize;
+> > > > > > > > > > > > > 	}
+> > > > > > > > > > > > > +	/* Latest qualcomm chipsets are not sending a command
+> > > > > > > > > > > > > complete event
+> > > > > > > > > > > > > +	 * for every fw packet sent. They only respond with a
+> > > > > > > > > > > > > vendor specific
+> > > > > > > > > > > > > +	 * event for the last packet. This optimization in the chip will
+> > > > > > > > > > > > > +	 * decrease the BT in initialization time. Here we will
+> > > > > > > > > > > > > inject a command
+> > > > > > > > > > > > > +	 * complete event to avoid a command timeout error message.
+> > > > > > > > > > > > > +	 */
+> > > > > > > > > > > > > +	if ((config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
+> > > > > > > > > > > > > +	    config->dnld_type == ROME_SKIP_EVT_VSE))
+> > > > > > > > > > > > > +		return qca_inject_cmd_complete_event(hdev);
+> > > > > > > > > > > > > +
+> > > > > > > > > > > > have you actually considered using __hci_cmd_send in that case. It is
+> > > > > > > > > > > > allowed for vendor OGF to use that command. I see you actually do use
+> > > > > > > > > > > > it and now I am failing to understand what this is for.
+> > > > > > > > > > > [Bala]: thanks for reviewing the change.
+> > > > > > > > > > >
+> > > > > > > > > > > __hci_cmd_send() can be used only to send the command to the chip.
+> > > > > > > > > > > it will not wait for the response for the command sent.
+> > > > > > > > > > >
+> > > > > > > > > > > as you know that every vendor command sent to chip will respond with
+> > > > > > > > > > > vendor specific event and command complete event.
+> > > > > > > > > > > but in our case chip will only respond with vendor specific event
+> > > > > > > > > > > only. so we are injecting command complete event.
+> > > > > > > > > >
+> > > > > > > > > > and __hci_cmd_sync_ev is also not working for you? However since you
+> > > > > > > > > > are not waiting for the vendor event anyway and just injecting
+> > > > > > > > > > cmd_complete, I wonder what’s the difference in just using
+> > > > > > > > > > __hci_cmd_send and not bothering to wait or inject at all. I am
+> > > > > > > > > > failing to see where this injection makes a difference.
+> > > > > > > > > >
+> > > > > > > > > > For me it is a big difference if we are injecting one event like in
+> > > > > > > > > > the case of Intel compared to injecting one for every command. It will
+> > > > > > > > > > show a wrong picture in btmon and that is a bad idea.
+> > > > > > > > > >
+> > > > > > > > > > Regards
+> > > > > > > > > >
+> > > > > > > > > > Marcel
+> > > > > > > > >
+> > > > > > > > > [Bala]: here is the use case, when ever we download the fw packets
+> > > > > > > > > i.e. RAM
+> > > > > > > > > image, for every command sent(i.e. fw packet) from
+> > > > > > > > > the host chip will respond with an vendor specific event and command
+> > > > > > > > > complete event.
+> > > > > > > > >
+> > > > > > > > > the above is taking more time to setup the BT device. then we came
+> > > > > > > > > up with
+> > > > > > > > > solution where we enable flags in fw file (i.e. RAM image header)
+> > > > > > > > > whether to wait for event to be received or sent the total packets
+> > > > > > > > > and wait
+> > > > > > > > > for the events for the last packet.
+> > > > > > > > >
+> > > > > > > > > So currently we are handling both the cases in the code. i.e wait
+> > > > > > > > > for event
+> > > > > > > > > for all packet or wait for an event for the last packet.
+> > > > > > > > >
+> > > > > > > > > but in the second case i.e. wait for event for the last packet sent,
+> > > > > > > > > we are
+> > > > > > > > > only receiving an vendor specific event from chip which holds the
+> > > > > > > > > status of
+> > > > > > > > > fw download.
+> > > > > > > > >
+> > > > > > > > > so as __hci_cmd_sync_ev() requires an command complete event. so we
+> > > > > > > > > are
+> > > > > > > > > injecting it after the vendor specific event received for the last
+> > > > > > > > > packet.
+> > > > > > > > >
+> > > > > > > > > This helps to overcome 0xfc00 timeout error logging on console.
+> > > > > > > >
+> > > > > > > > Some more details:
+> > > > > > > >
+> > > > > > > > The timeout error is actually from reading the 'SoC version', which
+> > > > > > > > uses the same command code as the firmware download
+> > > > > > > > (EDL_PATCH_CMD_OPCODE). Without reading the 'SoC version' it would be
+> > > > > > > > from the command to write the first firmware segment.
+> > > > > > > >
+> > > > > > > > If the download of a firmware binary takes >= 2s (HCI_CMD_TIMEOUT) the
+> > > > > > > > timeout would still occur. If necessary this could be mitigated by
+> > > > > > > > injecting some command complete events during the firmware download,
+> > > > > > > > though I expect Marcel wouldn't be overly happy with that, since it
+> > > > > > > > would affect btmon even more.
+> > > > > > > >
+> > > > > > > > Regards
+> > > > > > > >
+> > > > > > > > Matthias
+> > > > > > >
+> > > > > > > [Bala]: Basically every vendor specific command we sent to chip,
+> > > > > > > chip should respond with an vendor specific event followed by an
+> > > > > > > command
+> > > > > > > complete event
+> > > > > > > or some times it will only respond with an command complete event.
+> > > > > > > but in any case command complete event is mandatory to all the
+> > > > > > > command we
+> > > > > > > sent to the chip.
+> > > > > >
+> > > > > > Is this ("command complete event is mandatory to all the command we
+> > > > > > sent to the chip") a description of what the chip actually does, or
+> > > > > > what it should be doing according to the spec?
+> > > > > >
+> > > > > > As mentioned earlier, the timeout we see originates from reading the
+> > > > > > SoC version:
+> > > > > >
+> > > > > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> > > > > > index 0b533f65f652fc..1e484e61799571 100644
+> > > > > > --- a/drivers/bluetooth/btqca.c
+> > > > > > +++ b/drivers/bluetooth/btqca.c
+> > > > > > @@ -400,6 +400,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t
+> > > > > > baudrate,
+> > > > > >                 return err;
+> > > > > >         }
+> > > > > >
+> > > > > > +       printk("DBG: ZZZzzzzzzz\n");
+> > > > > > +       msleep(2500);
+> > > > > > +       printk("DBG: good morning!\n");
+> > > > > > +
+> > > > > >         /* Download NVM configuration */
+> > > > > >         config.type = TLV_TYPE_NVM;
+> > > > > >         if (soc_type == QCA_WCN3990)
+> > > > > >
+> > > > > > When you boot with this patch you'll see something like this:
+> > > > > >
+> > > > > > [   15.531365] DBG: reading SoC version
+> > > > > > [   15.544963] DBG: ZZZzzzzzzz
+> > > > > > [   17.590282] Bluetooth: hci0: command 0xfc00 tx timeout
+> > > > > > [   18.099110] DBG: good morning!
+> > > > > >
+> > > > >
+> > > > > [Bala]: my previous analysis were wrong. thanks for pointing me to the
+> > > > > correct issue.
+> > > > >         i am able to see timeout after version command.(used some
+> > > > > sleep)
+> > > > >         here is the reason for it.
+> > > > >
+> > > > >         01 00 fc 01 19 (we send the command to chip to request
+> > > > > version)
+> > > > >         04 ff 0e 00 02 0a 00 00 00 01 00 01 02 14 02 01 40(chip will
+> > > > > respond
+> > > > > with the vendor specific event payload will be chip version)
+> > > > >         04 0e 04 01 00 00 00(command complete event)
+> > > > >
+> > > > >        issue is with command complete event. ideally command
+> > > > > complete event
+> > > > > payload holds the command for which chip sends command complete event.
+> > > > >
+> > > > >        breaking the command
+> > > > >
+> > > > >        04 : event packet (fixed)
+> > > > >        0e : command complete event(fixed)
+> > > > >        04 : size of the payload,
+> > > > >
+> > > > >        01 : no of commands in the payload
+> > > > >        00 : OCF (opocde lsb)
+> > > > >        00 : OGF (opcode msb)
+> > > > >        00 : status of command executed,
+> > > > >
+> > > > >       payload is form byte 4 to byte 7. which hold the command i.e
+> > > > > opcode
+> > > > >       form the above response opcode is 0x0000. ideally this should be
+> > > > > 0xfc00
+> > > > >       because the command complete response from the chip is for the
+> > > > > command
+> > > > > 0xfc00.
+> > > > >
+> > > > >       Checked with Chip firmware dev team for the reason, it was an
+> > > > > limitation or an bug in the chip ROM firmware
+> > > > >       in the current chipset, which is fixed in the coming chipset.
+> > > > >
+> > > > >       so we expect the command 0xfc00 but recevuies 0x00. so that is
+> > > > > the
+> > > > > reason we see an timeouts.
+> > > > >       for all the vendor commands we receive 0x0000 in the command
+> > > > > complete
+> > > > > event.
+> > > >
+> > > > Thanks for your analysis.
+> > > >
+> > > > It is unfortunate (though not unexpected) that this is a problem in
+> > > > the ROM were we can't fix it, but at least the FW team is aware of it
+> > > > and fixed it for future hardware.
+> > > >
+> > > > >       if comes a new question how are we not seeing an 0xfc00 when
+> > > > > we inject
+> > > > > an command complete event.
+> > > > >       i experimented this patch, when i inject the command complete
+> > > > > event
+> > > > > from the soc version still i can see the command timeouts.
+> > > >
+> > > > I don't see command timeouts when injecting a command complete event
+> > > > after reading the SoC version. I suspect you still use patch which
+> > > > injects a command complete event with HCI_OP_NOP, which is precisely
+> > > > what the chip does ...
+> > > >
+> > > [Bala]: i am seeing command timeout after injecting cc event after
+> > > read
+> > > version request.
+> > > 
+> > > > >       The reason for no timeouts error, we are injecting an command
+> > > > > complete
+> > > > > after last packet sent out, so this injection helps
+> > > > >       .bin file to speed out it download part, so as the bin is dumped
+> > > > > fastly we send an HCI RESET Comamnd where we recevie an command
+> > > > > complete
+> > > > > event
+> > > > >       with non zero opcode which is cancelling the command timeout
+> > > > > timer.
+> > > > >
+> > > > >       when we inject command complete event, in short we are
+> > > > > completing
+> > > > > setup process in less than 2 seconds(command timeout timer value),
+> > > > >       so before 2 seconds we are sending an HCI RESET command whose
+> > > > > command
+> > > > > complete event opcode value is an non zero (which cancels the command
+> > > > > timeout timer)
+> > > >
+> > > > I agree that HCI_RESET cancels the command timeout timer if it is sent
+> > > > before the 2s timout expires, but I have doubts on the part about
+> > > > command complete events.
+> > > >
+> > > > In my observations there are no command timeouts if a command complete
+> > > > (with opcode != HCI_OP_NOP) is injected after the firmware download,
+> > > > even if a 3s sleep is added before sending the HCI_RESET.
+> > > >
+> > > 
+> > > [Bala]: add sleep before sending HCI reset, oxfc00 timeout observed.
+> > 
+> > Please double check your setup. Are you 100% sure you are not still
+> > sending HCI_OP_NOP as opcode?
+> > 
+> 
+> [Bala]: sorry i am injecting the HCI_OP_NOP, so that is the reason we have
+> an timeouts.
+>         yes if the opcode 0x42 injected, no timeouts are observed.
+
+Please don't use 0x42 (at least not as literal) when you respin, I
+only chose this value to illustrate that it's really the injected
+command which cancels the timer. You might want to add a
+QCA_HCI_OP_DUMMY or similar, to make clear that the value doesn't
+matter (as long as it isn't an actual opcode). With a define I don't
+really care if you use 0x01, 0x42 or any other non-opcode value.
+
+> > This is the diff I use for debugging on top of your patchset:
+> > 
+> > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> > index 0b533f65f652fc..5bb9e0ca7c348b 100644
+> > --- a/drivers/bluetooth/btqca.c
+> > +++ b/drivers/bluetooth/btqca.c
+> > @@ -27,6 +27,8 @@
+> > 
+> >  #define VERSION "0.1"
+> > 
+> > +static int qca_inject_cmd_complete_event(struct hci_dev *hdev);
+> > +
+> >  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
+> >  {
+> >  	struct sk_buff *skb;
+> > @@ -84,6 +86,11 @@ int qca_read_soc_version(struct hci_dev *hdev, u32
+> > *soc_version)
+> >  	if (*soc_version == 0)
+> >  		err = -EILSEQ;
+> > 
+> > +	qca_inject_cmd_complete_event(hdev);
+> > +	printk("DBG: ZZZzzzzzzz\n");
+> > +	msleep(2500);
+> > +	printk("DBG: good morning!\n");
+> > +
+> >  out:
+> >  	kfree_skb(skb);
+> >  	if (err)
+> > @@ -281,7 +288,7 @@ static int qca_inject_cmd_complete_event(struct
+> > hci_dev *hdev)
+> > 
+> >  	evt = skb_put(skb, sizeof(*evt));
+> >  	evt->ncmd = 1;
+> > -	evt->opcode = HCI_OP_NOP;
+> > +	evt->opcode = 0x42;
+> > 
+> >  	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
+> > 
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index f12555f23a49a0..c87ac1823439ab 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -3348,8 +3348,11 @@ static void hci_cmd_complete_evt(struct hci_dev
+> > *hdev, struct sk_buff *skb,
+> >  		break;
+> >  	}
+> > 
+> > -	if (*opcode != HCI_OP_NOP)
+> > +	if (*opcode != HCI_OP_NOP) {
+> > +		printk("DBG: cancelling command timer (opcode = 0x%02x)\n",
+> > +		       *opcode);
+> >  		cancel_delayed_work(&hdev->cmd_timer);
+> > +	}
+> > 
+> >  	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags))
+> >  		atomic_set(&hdev->cmd_cnt, 1);
+> > 
+> > 
+> > With that I see:
+> > 
+> > [   18.725417] Bluetooth: hci0: setting up wcn3990
+> > [   18.860381] DBG: ZZZzzzzzzz
+> > [   18.863332] DBG: cancelling command timer (opcode = 0x42)
+> > [   21.427085] DBG: good morning!
+> > 
+> > 
+> > The timer is clearly cancelled by the injected command (opcode 0x42)
+> > and no timeout occurs. I wouldn't expect you to see anything vastly
+> > different.
+> > 
+> > Cheers
+> > 
+> > Matthias
+> 
+> [Bala]: I think it would be better if we inject a command complete event
+> after we
+>         receive the version data.  instead of injecting in between firmware
+> download.
+>         this change will be only for wcn3990.
+
+At first sight that doesn't sound like a bad idea if we want to inject
+a single command complete event. However the NVM download times out
+unless the command(s) of the TLV download is completed:
+
+[   21.789452] Bluetooth: hci0: QCA Downloading qca/crnv21.bin
+[   21.797675] Bluetooth: hci0: Send segment 0, size 243
+[   23.605597] Bluetooth: hci0: command 0xfc00 tx timeout
+
+So we should inject one command complete event after reading the SoC
+version and another after downloading the TLV file. An event after
+downloading the NVM file seems optional, since the HCI reset
+immediately after will cancel the timer anyway.
+
+Cheers
+
+Matthias
