@@ -2,184 +2,136 @@ Return-Path: <SRS0=DBgY=PZ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB193C43387
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Jan 2019 10:28:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F11C43387
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Jan 2019 12:14:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86AF42054F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Jan 2019 10:28:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A232C2054F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Jan 2019 12:14:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="WLlFwYtX";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="gBkjD5R6"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="Dtsfnree"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727988AbfAQK1z (ORCPT
+        id S1727457AbfAQMOe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Jan 2019 05:27:55 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:39288 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727929AbfAQK1y (ORCPT
+        Thu, 17 Jan 2019 07:14:34 -0500
+Received: from aer-iport-2.cisco.com ([173.38.203.52]:18597 "EHLO
+        aer-iport-2.cisco.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726171AbfAQMOe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Jan 2019 05:27:54 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 6E63460A0A; Thu, 17 Jan 2019 10:27:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1547720873;
-        bh=NOsk1mAdMP9C98CozzoBaA3CYvF+HcfMMSA7Tf0HRMY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=WLlFwYtXWMuJW042vYCGtfcTeQD5PgxPXs6GjPsJrwbZrn6iKNqTSXNxa6t6b5hUT
-         TylTSNt2KqaYnzsjFVp5dCNXGrSAZ/2WGpnuUCMv0Bu1sjZbaNMoyzF438MN3lWCTw
-         K1RCilKFoWrpNyqSMcvhJMluLkkUU9Nwo0xdFrHc=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 2EBB460A08;
-        Thu, 17 Jan 2019 10:27:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1547720869;
-        bh=NOsk1mAdMP9C98CozzoBaA3CYvF+HcfMMSA7Tf0HRMY=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=gBkjD5R6AHPCWR7OlblBly/tJY6Vr3jjzsJkos6UICNvyKMT6+mB/op78pbVa6kjS
-         snlDAHhpNoZkSXKTTQxwcfqiTWjU4D3XDZRup/590Q7Sn1SZV7qoMiQxHaa7KvgHBq
-         fLn9YMsMTaOhBK2bUC0mAXA6+knZj6b1JlssqhGs=
+        Thu, 17 Jan 2019 07:14:34 -0500
+X-Greylist: delayed 586 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Jan 2019 07:14:33 EST
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=cisco.com; i=@cisco.com; l=2937; q=dns/txt; s=iport;
+  t=1547727274; x=1548936874;
+  h=to:from:subject:message-id:date:mime-version:
+   content-transfer-encoding;
+  bh=y+Non+sKIL0Ry9W79/7/svPvKHE/ONWQ3rh5ZOC1NhU=;
+  b=DtsfnreeRsNB6zhedgpVVJz+dqOAMatc/jwQJd2NZNZpPLR+aLJhrQTy
+   yng+upqMQYLJDzykLQ88TAcWt3wsFC0bBw1wfSOPhKwK43yVq+qqF422D
+   mG4sakC1VSaDKITKCzlScG7oxyYdwtPGSSRQDHXNWNNG/bvS3rbNuGC2x
+   8=;
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-Anti-Spam-Result: =?us-ascii?q?A0ClAABDbkBc/xbLJq1jHAEBAQQBAQc?=
+ =?us-ascii?q?EAQGBVAQBAQsBgVqBXjOEKIh5pSKBZw2HZDcGDQEDAQECAQECbSiFdA8BBXY?=
+ =?us-ascii?q?CJgJfDQgBAYJTS4ICqnCBL4VDg2SBDYELi0uBf4E4gj2EfAESAQODJYJXAol?=
+ =?us-ascii?q?cmDQJkg0GGIogh2uHIJNugVwiZXFwFYMogiYXgQABAo0cPgOJJYI+AQE?=
+X-IronPort-AV: E=Sophos;i="5.56,488,1539648000"; 
+   d="scan'208";a="9499733"
+Received: from aer-iport-nat.cisco.com (HELO aer-core-1.cisco.com) ([173.38.203.22])
+  by aer-iport-2.cisco.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 17 Jan 2019 12:04:46 +0000
+Received: from [10.47.79.134] ([10.47.79.134])
+        by aer-core-1.cisco.com (8.15.2/8.15.2) with ESMTP id x0HC4k9g029713
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Jan 2019 12:04:46 GMT
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+From:   =?UTF-8?Q?Per_Waag=c3=b8?= <pwaago@cisco.com>
+Subject: Disconnection of signaling channel after AVDTP close
+Message-ID: <e66fded8-91ee-6cb9-11be-162dd5c436aa@cisco.com>
+Date:   Thu, 17 Jan 2019 13:04:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 17 Jan 2019 15:57:48 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v8 3/3] Bluetooth: hci_qca: Disable IBS state machine and
- flush Tx buffer
-In-Reply-To: <20190116230801.GT261387@google.com>
-References: <20190116114603.500-1-bgodavar@codeaurora.org>
- <20190116114603.500-4-bgodavar@codeaurora.org>
- <20190116230801.GT261387@google.com>
-Message-ID: <5b507ee20e9e4ba022334433aa2f3691@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.47.79.134, [10.47.79.134]
+X-Outbound-Node: aer-core-1.cisco.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2019-01-17 04:38, Matthias Kaehlcke wrote:
-> On Wed, Jan 16, 2019 at 05:16:03PM +0530, Balakrishna Godavarthi wrote:
->> During hci down we observed IBS sleep commands are queued in the Tx
->> buffer and hci_uart_write_work is sending data to the chip which is
->> not required as the chip is powered off. This patch will disable IBS
->> and flush the Tx buffer before we turn off the chip.
->> 
->> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> ---
->>  drivers/bluetooth/hci_qca.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->> 
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index 7e4afcf40da2..7330ba71ada4 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -1275,6 +1275,14 @@ static const struct qca_vreg_data qca_soc_data 
->> = {
->> 
->>  static void qca_power_shutdown(struct hci_uart *hu)
->>  {
->> +	struct qca_data *qca = hu->priv;
->> +
->> +	/* From this point we go into power off state. But serial port is
->> +	 * still open, stop queueing the IBS data and flush all the buffered
->> +	 * data in skb's.
->> +	 */
->> +	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->> +	qca_flush(hu);
->>  	host_set_baudrate(hu, 2400);
->>  	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
->>  	qca_power_setup(hu, false);
-> 
-> Due to a race-condition there could be an IBS sleep command queued
-> even after clearing the bit and flushing the queue.
-> 
-> In qca_enqueue() we have this:
-> 
-> static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-> {
->         ...
-> 
->         /* Don't go to sleep in middle of patch download or
->          * Out-Of-Band(GPIOs control) sleep is selected.
->          */
->         if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
->                 skb_queue_tail(&qca->txq, skb);
->                 return 0;
->         }
-> 
->         spin_lock_irqsave(&qca->hci_ibs_lock, flags);
-> }
-> 
-> With process X executing qca_power_shutdown() and process Y running
-> qca_enqueue() this could happen:
-> 
-> [X] test_bit(STATE_IN_BAND_SLEEP_ENABLED)  => set
-> [Y] clear_bit(STATE_IN_BAND_SLEEP_ENABLED)
-> [Y] qca_flush(hu);
-> [X] skb_queue_tail(&qca->txq, skb);
-> 
-> The following should fix this race:
-> 
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -770,16 +770,17 @@ static int qca_enqueue(struct hci_uart *hu,
-> struct sk_buff *skb)
->  	/* Prepend skb with frame type */
->  	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
-> 
-> +	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
-> +
->  	/* Don't go to sleep in middle of patch download or
->  	 * Out-Of-Band(GPIOs control) sleep is selected.
->  	 */
->  	if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
->  		skb_queue_tail(&qca->txq, skb);
-> +		spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
->  		return 0;
->  	}
-> 
-> -	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
-> -
->  	/* Act according to current state */
->  	switch (qca->tx_ibs_state) {
->  	case HCI_IBS_TX_AWAKE:
-> @@ -1275,13 +1276,17 @@ static const struct qca_vreg_data qca_soc_data 
-> = {
->  static void qca_power_shutdown(struct hci_uart *hu)
->  {
->  	struct qca_data *qca = hu->priv;
-> +	unsigned long flags;
-> 
->  	/* From this point we go into power off state. But serial port is
->  	 * still open, stop queueing the IBS data and flush all the buffered
->  	 * data in skb's.
->  	 */
-> +	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
->  	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->  	qca_flush(hu);
-> +	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
-> +
-[Bala]: Thanks for catch this. yes you are rite, we will have an byte 
-queued in the skb.
-         will update with the lock.
+We have a product that implements an A2DP sink running bluez 5.50. I'm 
+try to qualify this product with the Bluetooth SIG using the Profile 
+Tuning Suite (PTS), but I am having trouble passing a test that verifies 
+reported delay value (A2DP/SNK/SYN/BV-01-C).
 
->  	host_set_baudrate(hu, 2400);
->  	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
->  	qca_power_setup(hu, false);
-> 
-> Cheers
-> 
-> Matthias
+In that test, PTS configures an AVDTP stream and verifies the delay 
+report, then opens the stream, streams some data and closes the stream. 
+This is repeated. The problem seems to be that after the stream is 
+closed, bluez immediately also closes the L2CAP signaling channel.
 
--- 
-Regards
-Balakrishna.
+I have pasted the problematic sequence from btmon at the bottom of this 
+email, the problem is the last L2CAP Disconnection request.
+
+This was introduced with commit 7ece89b0b6 between version 5.47 and 
+5.48. Before that, there was always a one second delay before the 
+signaling channel was disconnected,
+which was enough for PTS to configure a new stream.
+
+What was the rationale for always disconnecting immediately? Could there 
+be circumstances where it would make sense to keep the signaling channel 
+open a bit longer? Is there any other way we can force the channel to 
+stay open?
+
+Best regards,
+Per Waagø
+
+--
+ > ACL Data RX: Handle 12 flags 0x02 dlen 7                #329 [hci0] 
+48.732441
+       Channel: 64 len 3 [PSM 25 mode 0] {chan 0}
+       AVDTP: Close (0x08) Command (0x00) type 0x00 label 2 nosp 0
+         ACP SEID: 1
+< ACL Data TX: Handle 12 flags 0x00 dlen 6                #330 [hci0] 
+48.732775
+       Channel: 64 len 2 [PSM 25 mode 0] {chan 0}
+       AVDTP: Close (0x08) Response Accept (0x02) type 0x00 label 2 nosp 0
+ > ACL Data RX: Handle 12 flags 0x02 dlen 310              #331 [hci0] 
+48.736692
+ > ACL Data RX: Handle 12 flags 0x01 dlen 337              #332 [hci0] 
+48.771536
+       Channel: 65 len 643 [PSM 25 mode 0] {chan 1}
+ > ACL Data RX: Handle 12 flags 0x02 dlen 12               #333 [hci0] 
+48.771963
+       L2CAP: Disconnection Request (0x06) ident 30 len 4
+         Destination CID: 65
+         Source CID: 65
+< ACL Data TX: Handle 12 flags 0x00 dlen 12               #334 [hci0] 
+48.772019
+       L2CAP: Disconnection Response (0x07) ident 30 len 4
+         Destination CID: 65
+         Source CID: 65
+< ACL Data TX: Handle 12 flags 0x00 dlen 12               #335 [hci0] 
+48.772960
+       L2CAP: Disconnection Request (0x06) ident 4 len 4
+         Destination CID: 64
+         Source CID: 64
+ > HCI Event: Number of Completed Packets (0x13) plen 5    #336 [hci0] 
+48.778131
+         Num handles: 1
+         Handle: 12
+         Count: 2
+ > HCI Event: Number of Completed Packets (0x13) plen 5    #337 [hci0] 
+48.953264
+         Num handles: 1
+         Handle: 12
+         Count: 1
+ > HCI Event: Disconnect Complete (0x05) plen 4            #338 [hci0] 
+50.167143
+         Status: Success (0x00)
+         Handle: 12
+         Reason: Remote Device Terminated due to Power Off (0x15)
+
