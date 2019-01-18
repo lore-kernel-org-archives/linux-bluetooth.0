@@ -3,59 +3,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEDF6C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA4F4C43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:14:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B97EE2086D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:10:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD3ED2086D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:14:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726874AbfARJKt (ORCPT
+        id S1726197AbfARJOm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 04:10:49 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:33173 "EHLO
+        Fri, 18 Jan 2019 04:14:42 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:57063 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726033AbfARJKs (ORCPT
+        with ESMTP id S1725938AbfARJOm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 04:10:48 -0500
+        Fri, 18 Jan 2019 04:14:42 -0500
 Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 561B6CF2C6;
-        Fri, 18 Jan 2019 10:18:33 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 0BE82CF2C3;
+        Fri, 18 Jan 2019 10:22:27 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [RESEND v2] Bluetooth: hci_qca: Add helper to set device address
+Subject: Re: [PATCH 1/2] bluetooth: btmrvl_sdio: improve printk messages
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190116123115.24973-1-bgodavar@codeaurora.org>
-Date:   Fri, 18 Jan 2019 10:10:46 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+In-Reply-To: <20190111205657.2792-1-stefan@agner.ch>
+Date:   Fri, 18 Jan 2019 10:14:40 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, huxm@marvell.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <21D2F8A6-2968-4434-9BAA-890E0B165EE8@holtmann.org>
-References: <20190116123115.24973-1-bgodavar@codeaurora.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Message-Id: <24BB9B9D-5516-4511-8A7E-AB342AE6131C@holtmann.org>
+References: <20190111205657.2792-1-stefan@agner.ch>
+To:     Stefan Agner <stefan@agner.ch>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+Hi Stefan,
 
-> This patch add qca_set_bdaddr() to set the device
-> address for latest Qualcomm Bluetooth chipset wcn3990 and above.
+> Use dev_* variants to print messages in drivers.
 > 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
-> Tested-by: Matthias Kaehlcke <mka@chromium.org>
+> Signed-off-by: Stefan Agner <stefan@agner.ch>
 > ---
-> drivers/bluetooth/btqca.c   | 19 +++++++++++++++++++
-> drivers/bluetooth/btqca.h   |  8 +++++++-
-> drivers/bluetooth/hci_qca.c |  5 ++++-
-> 3 files changed, 30 insertions(+), 2 deletions(-)
+> drivers/bluetooth/btmrvl_sdio.c | 7 ++++---
+> 1 file changed, 4 insertions(+), 3 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
