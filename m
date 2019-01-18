@@ -4,61 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6949C1B0FD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 22:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA510C1B0FD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 22:34:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F54F2054F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 22:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99A6520823
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 22:34:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SKBLVT+t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jzPixTH7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730097AbfARWe0 (ORCPT
+        id S1730071AbfARWeV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 17:34:26 -0500
-Received: from mail-vs1-f74.google.com ([209.85.217.74]:34503 "EHLO
-        mail-vs1-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730017AbfARWeZ (ORCPT
+        Fri, 18 Jan 2019 17:34:21 -0500
+Received: from mail-pl1-f201.google.com ([209.85.214.201]:37589 "EHLO
+        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730070AbfARWeV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 17:34:25 -0500
-Received: by mail-vs1-f74.google.com with SMTP id u29so6485207vsj.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jan 2019 14:34:24 -0800 (PST)
+        Fri, 18 Jan 2019 17:34:21 -0500
+Received: by mail-pl1-f201.google.com with SMTP id v11so9025610ply.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jan 2019 14:34:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=8MIi8gu7z+i/YfVXWgocUhpPLp3jAxogC5eMTHVicfw=;
-        b=SKBLVT+tM+i4aFJrnO5hJGrV8iIRjBdcLFpH1h+nF74lBeSkijVZ7a/CY4b1XLBc2P
-         M8InEFFF3r6BI7YFemEag2pyBoY2jNd6jRVgoS9iBYbU1R6t6IhJg1SjZMleyiHtLg60
-         mlDk9aILfGb/hLVc0k34bGsE2I8NuGnSaSt4ib2Z99Rl2u90hSbwWkL88QZxr0H1xZYH
-         miVTsvzVSVI9WcxbS611j1Bz+QiaAkhf/k6IJLFZEgU9WCOJ+EMpSRSrIPCFntLhBqzI
-         tmhEgInUooYMrARGPWQLdBvZ/YHzLr9TwmJC6GhUSkWI5LMRhxz7T5CAqIjy6/XNFosd
-         kDqg==
+        bh=5Vf/zxYwOeYnNWL3N0nFW9n1v8wnzmKf0NaeVZgXiaM=;
+        b=jzPixTH7zJ1yIIX5bZzrUQThN590v6DWlfCKamohvLlKx5xj3PTGaNlXRFdk3O6anO
+         mzvDL3vYXDynePF8uuET9rXYuf00lUdxjkTA7vdbPjEMTOo38mP+zEMUe6bMK7qVNww2
+         vapy/RgoUXYRI/Qi2zpUXc27WocMAQtoJxAwksTDgm7enmKfcwB0ciKFiY7lilL6doaT
+         +29l3cZ4rfjw6YpRQz+TA6AVwOdXWOPY8LgScYw4iEp5qJHilmJ3ZwE+7ei5/GGjKz0c
+         PBBRloe/D57GSfFJz22Ui/IYngZoDhuVRQjwwsGny6F3ZaPeJ2ItTxPzZ55XpXjse6sI
+         TedA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=8MIi8gu7z+i/YfVXWgocUhpPLp3jAxogC5eMTHVicfw=;
-        b=VbZaVxvghc2CQdTC4b/BUoH0Q1o8zwZSNpnjYMLySygfB8/5/yP8LUG5lUEa6DVMYF
-         v8G2jH4tROQO3WvC2+Jh1IYhdbDJZiZzPt0sOU32RHE5ynff2v+ifSGQ1Q0GB2Nbj51a
-         Qyu2/opq3zDh6VrPQ7aaDg5H1e2ey/7l3pITCmbZIRTgKLtg91CyKLM37n1sppVNHhFC
-         IkznnCFQb7catXtXAJZHaohizbYeXs0xuHp4Oft6UAEw7ohl0Qd8NXO0cVZmI8iYz3UC
-         7enPTKqHHRl4oEMP8npAbG0oRmoUKavvyiLCtvZvm/ACW9A2kIc/VWx5gmuquvVtgMyG
-         hlOg==
-X-Gm-Message-State: AJcUukd4K4DEslw6UQAHRzA1sGIpmXc5lRfoAmkB+zN+ap4U5RVXnujL
-        VyQFHCjl3KjIS3v1PLsRmuf2YqB4uw1r
-X-Google-Smtp-Source: ALg8bN41kTDqj7CBYC9jZrqyjwjFxAeP3fgMWQ/r20O74dWceCGbjiVpwhZuU45MatlNuNxOpe1z6B9oEsEl
-X-Received: by 2002:a67:7ac5:: with SMTP id v188mr15143415vsc.31.1547850864359;
- Fri, 18 Jan 2019 14:34:24 -0800 (PST)
-Date:   Fri, 18 Jan 2019 14:34:05 -0800
+        bh=5Vf/zxYwOeYnNWL3N0nFW9n1v8wnzmKf0NaeVZgXiaM=;
+        b=UIIJ9k41r/XIx0P1BswbrW8fp4XUViTkOizTCQ2J9JyvYs4YbALB/xiTQ47hoVx5ge
+         NdCtYnLr+mEXtoY4QonpW0hAjoo5zkph4SkB0z5a1kmx+JDlSRdRYMu0HMvj07mZINrs
+         HY9PSr5UNyPCrekM1F/IZKY+P3paCWkgX3S78B5DK+Q6SW4SetLCVqQ5YP2Km+qGVqMt
+         BDaKuGnmCjY2hJ923ySfVszgj9akPCgC8EX7lnto7QqVHKJv1eP+1XSqe0nihJsS+Pj1
+         uJWtWkYCbZRMKsbp6oKkvLHs2ekv0IM8LPSf6QGpd9eEJoMBHCD1u5KmhFuIbdRTzYa7
+         Dg3A==
+X-Gm-Message-State: AJcUukeunQcD17YmZDPixt37aqP+3+vFj4rqKM7nRO5uBiJrkoGZBXoP
+        MVN3VZWWCYTbVg7wB5PhafeUO0JPVWbg
+X-Google-Smtp-Source: ALg8bN6thYeoMCSIyboFDVOgiChvDQtw39+2XeK8itXMoEr8A7Hmc4UB4lWL/ifImlNAu5t+wmuXpmEVFPNz
+X-Received: by 2002:a62:679d:: with SMTP id t29mr8166391pfj.90.1547850860134;
+ Fri, 18 Jan 2019 14:34:20 -0800 (PST)
+Date:   Fri, 18 Jan 2019 14:34:04 -0800
 In-Reply-To: <20190118223407.64818-1-rajatja@google.com>
-Message-Id: <20190118223407.64818-3-rajatja@google.com>
+Message-Id: <20190118223407.64818-2-rajatja@google.com>
 Mime-Version: 1.0
 References: <20181117010748.24347-1-rajatja@google.com> <20190118223407.64818-1-rajatja@google.com>
 X-Mailer: git-send-email 2.20.1.321.g9e740568ce-goog
-Subject: [PATCH v4 3/5] Bluetooth: Reset Bluetooth chip after multiple command timeouts
+Subject: [PATCH v4 2/5] usb: assign ACPI companions for embedded USB devices
 From:   Rajat Jain <rajatja@google.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -77,94 +77,99 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add a quirk and a hook to allow the HCI core to reset the BT chip
-if needed (after a number of timed out commands). Use that new hook to
-initiate BT chip reset if the controller fails to respond to certain
-number of commands (currently 5) including the HCI reset commands.
-This is done based on a newly introduced quirk. This is done based
-on some initial work by Intel.
+From: Dmitry Torokhov <dtor@chromium.org>
 
-Signed-off-by: Rajat Jain <rajatja@google.com>
+USB devices permanently connected to USB ports may be described in ACPI
+tables and share ACPI devices with ports they are connected to. See [1]
+for details.
+
+This will allow us to describe sideband resources for devices, such as,
+for example, hard reset line for BT USB controllers.
+
+[1] https://docs.microsoft.com/en-us/windows-hardware/drivers/bringup/other-acpi-namespace-objects#acpi-namespace-hierarchy-and-adr-for-embedded-usb-devices
+
+Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
+Signed-off-by: Rajat Jain <rajatja@google.com> (changed how we get the usb_port)
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Tested-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
 ---
-v4: same as v1
+v4: Add Acked-by and Tested-by in signatures.
 v3: same as v1
 v2: same as v1
 
- include/net/bluetooth/hci.h      |  8 ++++++++
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_core.c         | 15 +++++++++++++--
- 3 files changed, 23 insertions(+), 2 deletions(-)
+ drivers/usb/core/usb-acpi.c | 44 +++++++++++++++++++++++++++++--------
+ 1 file changed, 35 insertions(+), 9 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index c36dc1e20556..af02fa5ffe54 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -192,6 +192,14 @@ enum {
- 	 *
- 	 */
- 	HCI_QUIRK_NON_PERSISTENT_SETUP,
+diff --git a/drivers/usb/core/usb-acpi.c b/drivers/usb/core/usb-acpi.c
+index 8ff73c83e8e8..9043d7242d67 100644
+--- a/drivers/usb/core/usb-acpi.c
++++ b/drivers/usb/core/usb-acpi.c
+@@ -200,30 +200,56 @@ static struct acpi_device *
+ usb_acpi_find_companion_for_device(struct usb_device *udev)
+ {
+ 	struct acpi_device *adev;
++	struct usb_port *port_dev;
++	struct usb_hub *hub;
 +
-+	/* When this quirk is set, hw_reset() would be run to reset the
-+	 * hardware, after a certain number of commands (currently 5)
-+	 * time out because the device fails to respond.
-+	 *
-+	 * This quirk should be set before hci_register_dev is called.
-+	 */
-+	HCI_QUIRK_HW_RESET_ON_TIMEOUT,
- };
- 
- /* HCI device flags */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e5ea633ea368..b86218304b80 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -313,6 +313,7 @@ struct hci_dev {
- 	unsigned int	acl_cnt;
- 	unsigned int	sco_cnt;
- 	unsigned int	le_cnt;
-+	unsigned int	timeout_cnt;
- 
- 	unsigned int	acl_mtu;
- 	unsigned int	sco_mtu;
-@@ -437,6 +438,7 @@ struct hci_dev {
- 	int (*post_init)(struct hci_dev *hdev);
- 	int (*set_diag)(struct hci_dev *hdev, bool enable);
- 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-+	void (*hw_reset)(struct hci_dev *hdev);
- };
- 
- #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 7352fe85674b..ab3a6a8b7ba6 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2569,13 +2569,24 @@ static void hci_cmd_timeout(struct work_struct *work)
- 	struct hci_dev *hdev = container_of(work, struct hci_dev,
- 					    cmd_timer.work);
- 
-+	hdev->timeout_cnt++;
- 	if (hdev->sent_cmd) {
- 		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
- 		u16 opcode = __le16_to_cpu(sent->opcode);
- 
--		bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
-+		bt_dev_err(hdev, "command 0x%4.4x tx timeout (cnt = %u)",
-+			   opcode, hdev->timeout_cnt);
- 	} else {
--		bt_dev_err(hdev, "command tx timeout");
-+		bt_dev_err(hdev, "command tx timeout (cnt = %u)",
-+			   hdev->timeout_cnt);
++	if (!udev->parent) {
++		/* root hub is only child (_ADR=0) under its parent, the HC */
++		adev = ACPI_COMPANION(udev->dev.parent);
++		return acpi_find_child_device(adev, 0, false);
 +	}
-+
-+	if (test_bit(HCI_QUIRK_HW_RESET_ON_TIMEOUT, &hdev->quirks) &&
-+	    hdev->timeout_cnt >= 5) {
-+		hdev->timeout_cnt = 0;
-+		if (hdev->hw_reset)
-+			hdev->hw_reset(hdev);
-+		return;
- 	}
  
- 	atomic_set(&hdev->cmd_cnt, 1);
+-	if (!udev->parent)
++	hub = usb_hub_to_struct_hub(udev->parent);
++	if (!hub)
+ 		return NULL;
+ 
+-	/* root hub is only child (_ADR=0) under its parent, the HC */
+-	adev = ACPI_COMPANION(udev->dev.parent);
+-	return acpi_find_child_device(adev, 0, false);
++	/*
++	 * This is an embedded USB device connected to a port and such
++	 * devices share port's ACPI companion.
++	 */
++	port_dev = hub->ports[udev->portnum - 1];
++	return usb_acpi_get_companion_for_port(port_dev);
+ }
+ 
+-
+ static struct acpi_device *usb_acpi_find_companion(struct device *dev)
+ {
+ 	/*
+-	 * In the ACPI DSDT table, only usb root hub and usb ports are
+-	 * acpi device nodes. The hierarchy like following.
++	 * The USB hierarchy like following:
++	 *
+ 	 * Device (EHC1)
+ 	 *	Device (HUBN)
+ 	 *		Device (PR01)
+ 	 *			Device (PR11)
+ 	 *			Device (PR12)
++	 *				Device (FN12)
++	 *				Device (FN13)
+ 	 *			Device (PR13)
+ 	 *			...
+-	 * So all binding process is divided into two parts. binding
+-	 * root hub and usb ports.
++	 * where HUBN is root hub, and PRNN are USB ports and devices
++	 * connected to them, and FNNN are individualk functions for
++	 * connected composite USB devices. PRNN and FNNN may contain
++	 * _CRS and other methods describing sideband resources for
++	 * the connected device.
++	 *
++	 * On the kernel side both root hub and embedded USB devices are
++	 * represented as instances of usb_device structure, and ports
++	 * are represented as usb_port structures, so the whole process
++	 * is split into 2 parts: finding companions for devices and
++	 * finding companions for ports.
++	 *
++	 * Note that we do not handle individual functions of composite
++	 * devices yet, for that we would need to assign companions to
++	 * devices corresponding to USB interfaces.
+ 	 */
+ 	if (is_usb_device(dev))
+ 		return usb_acpi_find_companion_for_device(to_usb_device(dev));
 -- 
 2.20.1.321.g9e740568ce-goog
 
