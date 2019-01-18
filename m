@@ -2,133 +2,132 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79998C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 08:04:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04E82C43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 08:06:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38ADA20855
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 08:04:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA28720855
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 08:06:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="IIbDQfTR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="olhrbWMf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727226AbfARIEg (ORCPT
+        id S1727377AbfARIGE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 03:04:36 -0500
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:38450 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727148AbfARIEg (ORCPT
+        Fri, 18 Jan 2019 03:06:04 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:34435 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727178AbfARIGE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 03:04:36 -0500
-Received: by mail-lj1-f193.google.com with SMTP id c19-v6so10869781lja.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jan 2019 00:04:35 -0800 (PST)
+        Fri, 18 Jan 2019 03:06:04 -0500
+Received: by mail-ot1-f68.google.com with SMTP id t5so8601712otk.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jan 2019 00:06:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3NhT2eWhr5S5rkCErIdiQfluflXMoVDjp27+mkZozEo=;
-        b=IIbDQfTRvvkn/vL97q3tKPaKDWGAvwWeBCn0/HFOvAXa5QGfKITAB7HuqR/eGKkMh4
-         L2apHKsxOW2Nw3T5Ot3LdFmZIm8hjBllsghGNhdG+yzYnWLbKDBxb6QEW9qH8NUPsMAQ
-         rHXih1sbOr9sF8dTnuQH15SXOavJgCdnMD4VGBSlLIeRnoV5iWjwBTvg8dy0I/7ZozQj
-         7dYwTw0rNcP75NzwaArYgGGwqpOP3RaCYggIPmjaUfJiPw3RPtFO4qEjf7brAAMLuojH
-         oUZJ1QUouZxfKB2WdIj/zjhvffrWO28OhxdjqgAimGGE5RTr6TxAq72iFLRiQ/76QDnZ
-         Ue2w==
+         :cc:content-transfer-encoding;
+        bh=tlEpNku48dSVYhPKkB6rvKrTudELtTUNbGEV4kVhoxg=;
+        b=olhrbWMfL07HTohj8M3xFbg0eLC38I0Ecid60Ly7I5/gzjkw9dhNXWkeLzUIoyt1/Y
+         HZgbkyGSS83chHTAsZDgz80YQy8XeyupSTBmPDKVfhjaoPphEUQzEkJLuJ/qHMNarp/k
+         v51VHWDGMlc7eFgzsOIkJs7XIZBSWBHbhb4IFxTvMDsYpIZXaQqfBrnCrUvEk+uHjfR9
+         SfFEgIECrG8U3RNWSHvKB02anI3t1+KERlux1efdC77osWup3kqZGFPf9iVNulZiofqW
+         HuvueVFZYd6PoM9VdAhIy68BL8UHkmXVUdYh2vO9G4qlXzwXD54KrEPofKC2RbKDnvEJ
+         dtLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3NhT2eWhr5S5rkCErIdiQfluflXMoVDjp27+mkZozEo=;
-        b=kH9GxqlcXO3x5KAcsAmoBjTFiGwjQoYjgDbOQdSCDOu0dDu4HHA8ID4VPhDSk4sa5Z
-         zcLz/LAqGXwo+tH3sqWMGlEDONrJFmzlg5AlM2Rquto3tpfoBuP5Vsh/THPdyTKcpsbJ
-         ZVb9ZIkidL2nu2wTuoposgZ7xPy1JJ/VGx8NjMa8CysZ6d6nU+uSl/bute7mBcPhYwhq
-         Izb9+APb/MwCMN9T6DMks5Smqnk0yS56EuvjdZhRRT2M7yiGiR+sh46tXA/T77+ur48u
-         jnR/WxkrsKOYHwhfClOiHGjxXrUlE9W4YkEUWRXwK/GpIr4OypF7fkGKg+OXFeIwLcze
-         ZbNA==
-X-Gm-Message-State: AJcUukfFPcWYjfECQ6vIl8tIfLEHJ9QqktlUqzznpe3OE83ymZAH9Ar2
-        KLD4xgo9zitYN3eIsdIy/VNOa0cSr0A0xs9PtihDMA==
-X-Google-Smtp-Source: ALg8bN5FfzZGQIw/vaJdrOUfEL+LL33zljUNnbHdj/rE8jjz+nUNJ7D0BsxpWO8A5p41AG3TK3+iEur4i8PoxaEh0i4=
-X-Received: by 2002:a2e:5356:: with SMTP id t22-v6mr11168097ljd.26.1547798674458;
- Fri, 18 Jan 2019 00:04:34 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=tlEpNku48dSVYhPKkB6rvKrTudELtTUNbGEV4kVhoxg=;
+        b=kz3wbn+V+Z5WJDc8/ftUcqD9HFd8HsMdn0durmliTN9kz75ixEUwwo7MFKFa6xF0RM
+         u+XXo+wsjxZU2W4PN6kXYX+chSGWu+5oouuAco5Ir65fcL/MC9CTjaZcz+XPWbIZ4+Pv
+         xfeF5n+1vrpZSIJ4uCDJuuBO8pQ4jT1AxsRHJbVG4713UpDGZCqmUUNAGUvsJVzxUMCk
+         4D8DCqSc6juSUzj0J952rSSO06ND45P749l5V75za6WBgmP4RyoB6EvgFtdfrLDKy8G7
+         i541j+tPbvM0WNobFf0pvYt7jgTnhnDbwb7p7ER1oY0PDvjQNJZaGDUQw5kCr5jnDaEG
+         Y3gg==
+X-Gm-Message-State: AJcUukdZhrwFfTjGw+/kCPUCg+a7HDwmC9jeJXMroi6VC2VdDOUYSL7a
+        kuRFBalvu402/cvDFO70F+doCGzFE6xneYd7/u8=
+X-Google-Smtp-Source: ALg8bN5r1B/2cULa4uzpcGlW0nIXXGfJzYv4RQ9QPt5GEysfI32gi2TgUGRiZvMynwOorzDYywXMnFcTuyVqzCHzOis=
+X-Received: by 2002:a9d:18f:: with SMTP id e15mr11590015ote.84.1547798763470;
+ Fri, 18 Jan 2019 00:06:03 -0800 (PST)
 MIME-Version: 1.0
-References: <20190118034652.4018-1-inga.stotland@intel.com>
-In-Reply-To: <20190118034652.4018-1-inga.stotland@intel.com>
-From:   "Von Dentz, Luiz" <luiz.von.dentz@intel.com>
-Date:   Fri, 18 Jan 2019 05:04:23 -0300
-Message-ID: <CACumGOLC+b1WsfSqgXLRBQbeZ0vFOx6bpLAFjrpYBXvrQ5oxig@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] mesh: Add D-Bus policy for Bluetooth mesh daemon
-To:     Inga Stotland <inga.stotland@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, "Gix, Brian" <brian.gix@intel.com>
+References: <20190113172320.17586-1-pali.rohar@gmail.com> <20190117230452.hsxwmoz4oks3snrs@pali>
+In-Reply-To: <20190117230452.hsxwmoz4oks3snrs@pali>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 18 Jan 2019 05:05:52 -0300
+Message-ID: <CABBYNZKdCfbNE1P_gW7CB826KJaSPxo0OERARP==70J35UvU0w@mail.gmail.com>
+Subject: Re: [PATCH] btmon: Fix parsing A2DP FastStream codec configuration
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Inga,
+Hi Pali,
 
-On Fri, Jan 18, 2019 at 12:47 AM Inga Stotland <inga.stotland@intel.com> wrote:
+On Thu, Jan 17, 2019 at 8:07 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrot=
+e:
 >
-> This adds new D-Bus policy file btmesh.conf
-> ---
->  Makefile.mesh    |  6 ++++++
->  mesh/btmesh.conf | 24 ++++++++++++++++++++++++
->  2 files changed, 30 insertions(+)
->  create mode 100644 mesh/btmesh.conf
+> On Sunday 13 January 2019 18:23:20 Pali Roh=C3=A1r wrote:
+> > This codec is bi-directional, therefore both sink and source directions=
+ may
+> > be present in configuration at same time.
+> >
+> > Some Creative headsets send more frequency bits in configuration and wh=
+en
+> > both 41kHz and 48kHz are present then headset expects 48kHz. So adjust
+> > FastStream frequency table as find_value_bit() takes first matched bit.
+> > ---
+> >  monitor/a2dp.c | 10 ++++++----
+> >  1 file changed, 6 insertions(+), 4 deletions(-)
 >
-> diff --git a/Makefile.mesh b/Makefile.mesh
-> index ea6c5e939..e15718116 100644
-> --- a/Makefile.mesh
-> +++ b/Makefile.mesh
-> @@ -1,5 +1,9 @@
->  if MESH
+> Hello, can somebody review this bluez patch?
+
+Will do it today.
+
+> > diff --git a/monitor/a2dp.c b/monitor/a2dp.c
+> > index ffdcbb962..42fe395a1 100644
+> > --- a/monitor/a2dp.c
+> > +++ b/monitor/a2dp.c
+> > @@ -201,8 +201,10 @@ static const struct bit_desc faststream_direction_=
+table[] =3D {
+> >  };
+> >
+> >  static const struct bit_desc faststream_sink_frequency_table[] =3D {
+> > -     {  1, "44100" },
+> > +     /* in config buffer, there may be more frequency bits
+> > +      * and 48kHz takes precedence over 41kHz */
+> >       {  0, "48000" },
+> > +     {  1, "44100" },
+> >       { }
+> >  };
+> >
+> > @@ -746,9 +748,9 @@ static bool codec_vendor_faststream_cfg(uint8_t los=
+c, struct l2cap_frame *frame)
+> >
+> >       l2cap_frame_get_u8(frame, &cap);
+> >
+> > -     print_field("%*cDirection: %s (0x%02x)", BASE_INDENT + 2, ' ',
+> > -                     find_value_bit(cap, faststream_direction_table),
+> > -                     cap);
+> > +     /* FastStream codec is bi-directional */
+> > +     print_field("%*cDirection: 0x%02x", BASE_INDENT + 2, ' ', cap);
+> > +     print_value_bits(BASE_INDENT + 2, cap, faststream_direction_table=
+);
+> >
+> >       l2cap_frame_get_u8(frame, &cap);
+> >
 >
-> +if DATAFILES
-> +dbus_DATA += mesh/btmesh.conf
-> +endif
-> +
->  mesh_sources = mesh/mesh.h mesh/mesh.c \
->                                 mesh/net_keys.h mesh/net_keys.c \
->                                 mesh/mesh-io.h mesh/mesh-io.c \
-> @@ -27,4 +31,6 @@ libexec_PROGRAMS += mesh/meshd
->  mesh_meshd_SOURCES = $(mesh_sources) mesh/main.c
->  mesh_meshd_LDADD = src/libshared-ell.la $(ell_ldadd) -ljson-c
->  mesh_meshd_DEPENDENCIES = $(ell_dependencies) src/libshared-ell.la
-> +
-> +EXTRA_DIST += mesh/btmesh.conf
->  endif
-> diff --git a/mesh/btmesh.conf b/mesh/btmesh.conf
-> new file mode 100644
-> index 000000000..f05545065
-> --- /dev/null
-> +++ b/mesh/btmesh.conf
-> @@ -0,0 +1,24 @@
-> +<!-- This configuration file specifies the required security policies
-> +     for Bluetooth Mesh daemon to work. -->
-> +
-> +<!DOCTYPE busconfig PUBLIC "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
-> + "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd">
-> +<busconfig>
-> +
-> +  <!-- ../system.conf have denied everything, so we just punch some holes -->
-> +
-> +  <policy user="root">
-> +    <allow own="org.bluez.mesh"/>
-> +    <allow send_destination="org.bluez.mesh"/>
-> +    <allow send_interface="org.bluez.mesh.Application1"/>
-> +    <allow send_interface="org.bluez.mesh.Element1"/>
-> +    <allow send_interface="org.bluez.mesh.ProvisionAgent1"/>
-> +    <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
-> +    <allow send_interface="org.freedesktop.DBus.Properties"/>
-> +  </policy>
-> +
-> +  <policy context="default">
-> +    <allow send_destination="org.bluez.mesh"/>
-> +  </policy>
-> +
-> +</busconfig>
 > --
-> 2.17.2
+> Pali Roh=C3=A1r
+> pali.rohar@gmail.com
 
-Any plans to put together a btmesh.service file for systemd as well?
+
+
+--=20
+Luiz Augusto von Dentz
