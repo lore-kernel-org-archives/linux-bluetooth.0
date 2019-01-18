@@ -2,518 +2,249 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72969C07EBF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:53:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA3D2C1B0FD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 20:52:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A2D82087E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:53:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE19D20896
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 20:52:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mT7wLWq+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728896AbfARRxq (ORCPT
+        id S1729565AbfARUwJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 12:53:46 -0500
-Received: from mga12.intel.com ([192.55.52.136]:9295 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728074AbfARRxo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 12:53:44 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jan 2019 09:53:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,491,1539673200"; 
-   d="scan'208";a="127135533"
-Received: from bgix-dell-lap.sea.intel.com ([10.254.20.125])
-  by orsmga002.jf.intel.com with ESMTP; 18 Jan 2019 09:53:42 -0800
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com
-Subject: [PATCH BlueZ] mesh: Fix Relaying for multiple nodes
-Date:   Fri, 18 Jan 2019 09:53:41 -0800
-Message-Id: <20190118175341.8089-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.14.5
+        Fri, 18 Jan 2019 15:52:09 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:35638 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729500AbfARUwJ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 18 Jan 2019 15:52:09 -0500
+Received: by mail-lf1-f68.google.com with SMTP id e26so11467532lfc.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jan 2019 12:52:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=d55kv1Odtp4wUVXwmNpwnomEyVkO6+qn4xgL1ctrvlE=;
+        b=mT7wLWq+OspjuepeD9b5H8I/yhIMHHSjXy16IdNJYxfURPj67q7P61Iv8gILMgjo7u
+         IhnfcsusSO46GMzdjxdvx69W1Q2qDZJ9Am58wqkWBbUSZcygFvaXoLMFKbpFDANMyqXl
+         zTYKjTdhv0Fp/rJ3Wmfr/WQakT3wDkQlE3vXZnF89PQ0gEbsENt9iOzGBCw0DU7tCNFw
+         3hw6RSiqyi0c0xIwJoQWmNgYh1ya+ewfrBahKUkLDBTfKVKy/FWWSvdSsheXM2P87TVy
+         K118ebZW5hpNonFaQAr8W8GIU7ipNZxSpDP9O5U8VahOumzpPMHW47i+Rer5oHk6BY/R
+         lquQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=d55kv1Odtp4wUVXwmNpwnomEyVkO6+qn4xgL1ctrvlE=;
+        b=WxNjyaOKj6rqe1Xd9+aczWpwx0OW84RFwdFQ79yySa6lgjkbusxL+n+Xo1EcquaoqB
+         9+oO92BWtFZboXBMzQxbfcgcC3pIk/qZA3odK/976K0eMMP/qVkdzpDQGPW1Dc0+VYFb
+         JN0I9bQc+AN/3LArLpqyByQA1AGiaEQkhJ/3pDwxWnvlN4cv9oI+8eLVTqM26wCnuLGI
+         Oig614oFAF8AAytG3XcY645HiI2bscuYYh26CTXGFAWglgxAbPeGnNvdAQVqWf+Paode
+         nJQfrw4471Q5/GaKcZBAXW0GzA/2Sy7S9UasFmnAlKS4WDKnABfaiPlebau9LmxP0GhD
+         UZ3A==
+X-Gm-Message-State: AJcUukcGm5AwVJbsFW0V2VqKKrC3cu8obCpGQWBOjDxOpnh1F7CYruJ4
+        jg69RcF7tvryQV9mapDD7drBieYDuZUsGmUkSlrEJQ==
+X-Google-Smtp-Source: ALg8bN4OrTiIvnstWDLlTKb2DnhvR+1yikkcy+nUey94Ld7W1AG/noZkT94PZ1f7pQ8sVNLJ53r/exzoSBKNrluH9dY=
+X-Received: by 2002:a19:c995:: with SMTP id z143mr12162960lff.79.1547844726265;
+ Fri, 18 Jan 2019 12:52:06 -0800 (PST)
+MIME-Version: 1.0
+References: <20181117010748.24347-1-rajatja@google.com> <20181121235020.29461-1-rajatja@google.com>
+ <20181121235020.29461-5-rajatja@google.com> <BE2BC4DD-B10C-4ED8-8770-DE042478A152@holtmann.org>
+In-Reply-To: <BE2BC4DD-B10C-4ED8-8770-DE042478A152@holtmann.org>
+From:   Rajat Jain <rajatja@google.com>
+Date:   Fri, 18 Jan 2019 12:51:29 -0800
+Message-ID: <CACK8Z6GnpbpsL9J28-qd4fmjnro5yWoAZe9U7YDM1LGxhFn9Bg@mail.gmail.com>
+Subject: Re: [PATCH v3 5/5] Bluetooth: btusb: Use the hw_reset method to allow
+ resetting the BT chip
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Torokhov <dtor@chromium.org>,
+        Alex Hung <alex.hung@canonical.com>,
+        linux-bluetooth@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+        Rajat Jain <rajatxjain@gmail.com>,
+        Dmitry Torokhov <dtor@google.com>, raghuram.hegde@intel.com,
+        chethan.tumkur.narayan@intel.com,
+        "Ghorai, Sukumar" <sukumar.ghorai@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Relay is now a cooperation between all the nodes on the daemon.
-If any one or more nodes have relay enabled and a received packet
-is addressed to a Group, or a non-present Unicast address, then the
-packet's TTL is decremented and it is resent.
----
- mesh/crypto.c    |   8 +--
- mesh/mesh-defs.h |   9 ++-
- mesh/net.c       | 187 ++++++++++++++++++++++++++++++++-----------------------
- 3 files changed, 118 insertions(+), 86 deletions(-)
+Hi Marcel,
 
-diff --git a/mesh/crypto.c b/mesh/crypto.c
-index e68cc2d5f..451e2da71 100644
---- a/mesh/crypto.c
-+++ b/mesh/crypto.c
-@@ -1169,13 +1169,13 @@ bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
- 				*payload = packet + 9;
- 
- 			if (payload_len)
--				*payload_len = packet_len - 9 - 8;
-+				*payload_len = packet_len - 9;
- 		} else {
- 			if (payload)
- 				*payload = packet + 10;
- 
- 			if (payload_len)
--				*payload_len = packet_len - 10 - 8;
-+				*payload_len = packet_len - 10;
- 		}
- 	} else {
- 		if (cookie)
-@@ -1202,13 +1202,13 @@ bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
- 				*payload = packet + 13;
- 
- 			if (payload_len)
--				*payload_len = packet_len - 13 - 4;
-+				*payload_len = packet_len - 13;
- 		} else {
- 			if (payload)
- 				*payload = packet + 10;
- 
- 			if (payload_len)
--				*payload_len = packet_len - 10 - 4;
-+				*payload_len = packet_len - 10;
- 		}
- 	}
- 
-diff --git a/mesh/mesh-defs.h b/mesh/mesh-defs.h
-index d40fc43e8..c30041e4a 100644
---- a/mesh/mesh-defs.h
-+++ b/mesh/mesh-defs.h
-@@ -62,7 +62,9 @@
- #define VIRTUAL_ADDRESS_LOW	0x8000
- #define VIRTUAL_ADDRESS_HIGH	0xbfff
- #define GROUP_ADDRESS_LOW	0xc000
--#define GROUP_ADDRESS_HIGH	0xff00
-+#define GROUP_ADDRESS_HIGH	0xfeff
-+#define FIXED_GROUP_LOW		0xff00
-+#define FIXED_GROUP_HIGH	0xffff
- 
- #define NODE_IDENTITY_STOPPED		0x00
- #define NODE_IDENTITY_RUNNING		0x01
-@@ -79,6 +81,7 @@
- 					((x) < VIRTUAL_ADDRESS_LOW))
- #define IS_VIRTUAL(x)		(((x) >= VIRTUAL_ADDRESS_LOW) && \
- 					((x) <= VIRTUAL_ADDRESS_HIGH))
--#define IS_GROUP(x)		(((x) >= GROUP_ADDRESS_LOW) && \
--					((x) <= GROUP_ADDRESS_HIGH))
-+#define IS_GROUP(x)		((((x) >= GROUP_ADDRESS_LOW) && \
-+					((x) < FIXED_GROUP_HIGH)) || \
-+					((x) == ALL_NODES_ADDRESS))
- #define IS_ALL_NODES(x)	((x) == ALL_NODES_ADDRESS)
-diff --git a/mesh/net.c b/mesh/net.c
-index 6ef056b56..4961c11c7 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -71,6 +71,13 @@
- 
- #define SAR_KEY(src, seq0)	((((uint32_t)(seq0)) << 16) | (src))
- 
-+enum _relay_advice {
-+	RELAY_NONE,		/* Relay not enabled in node */
-+	RELAY_ALLOWED,		/* Relay enabled, msg not to node's unicast */
-+	RELAY_DISALLOWED,	/* Msg was unicast handled by this node */
-+	RELAY_ALWAYS		/* Relay enabled, msg to a group */
-+};
-+
- enum _iv_upd_state {
- 	/* Allows acceptance of any iv_index secure net beacon */
- 	IV_UPD_INIT,
-@@ -160,7 +167,6 @@ struct mesh_net {
- 	struct l_queue *frnd_msgs;
- 	struct l_queue *friends;
- 	struct l_queue *destinations;
--	struct l_queue *fast_cache;
- 
- 	uint8_t prov_priv_key[32];
- 
-@@ -248,6 +254,8 @@ struct net_decode {
- 	bool proxy;
- };
- 
-+#define FAST_CACHE_SIZE 8
-+static struct l_queue *fast_cache;
- static struct l_queue *nets;
- 
- static inline struct mesh_subnet *get_primary_subnet(struct mesh_net *net)
-@@ -673,7 +681,6 @@ struct mesh_net *mesh_net_new(struct mesh_node *node)
- 	net->tx_interval = DEFAULT_TRANSMIT_INTERVAL;
- 
- 	net->subnets = l_queue_new();
--	net->fast_cache = l_queue_new();
- 	net->msg_cache = l_queue_new();
- 	net->sar_in = l_queue_new();
- 	net->sar_out = l_queue_new();
-@@ -687,6 +694,9 @@ struct mesh_net *mesh_net_new(struct mesh_node *node)
- 	if (!nets)
- 		nets = l_queue_new();
- 
-+	if (!fast_cache)
-+		fast_cache = l_queue_new();
-+
- 	return net;
- }
- 
-@@ -696,7 +706,6 @@ void mesh_net_free(struct mesh_net *net)
- 		return;
- 
- 	l_queue_destroy(net->subnets, subnet_free);
--	l_queue_destroy(net->fast_cache, mesh_msg_free);
- 	l_queue_destroy(net->msg_cache, mesh_msg_free);
- 	l_queue_destroy(net->sar_in, mesh_sar_free);
- 	l_queue_destroy(net->sar_out, mesh_sar_free);
-@@ -1021,7 +1030,6 @@ int mesh_net_add_key(struct mesh_net *net, bool update, uint16_t idx,
- void mesh_net_flush_msg_queues(struct mesh_net *net)
- {
- 	l_queue_clear(net->msg_cache, mesh_msg_free);
--	l_queue_clear(net->fast_cache, mesh_msg_free);
- }
- 
- uint32_t mesh_net_get_iv_index(struct mesh_net *net)
-@@ -2210,23 +2218,23 @@ static bool find_fast_hash(const void *a, const void *b)
- 	return *entry == *test;
- }
- 
--static void *check_fast_cache(struct mesh_net *net, uint64_t hash)
-+static bool check_fast_cache(uint64_t hash)
- {
--	void *found = l_queue_find(net->fast_cache, find_fast_hash, &hash);
-+	void *found = l_queue_find(fast_cache, find_fast_hash, &hash);
- 	uint64_t *new_hash;
- 
- 	if (found)
--		return NULL;
-+		return false;
- 
--	if (l_queue_length(net->fast_cache) >= 8)
--		new_hash = l_queue_pop_head(net->fast_cache);
-+	if (l_queue_length(fast_cache) >= FAST_CACHE_SIZE)
-+		new_hash = l_queue_pop_head(fast_cache);
- 	else
- 		new_hash = l_malloc(sizeof(hash));
- 
- 	*new_hash = hash;
--	l_queue_push_tail(net->fast_cache, new_hash);
-+	l_queue_push_tail(fast_cache, new_hash);
- 
--	return new_hash;
-+	return true;
- }
- 
- static bool match_by_dst(const void *a, const void *b)
-@@ -2237,8 +2245,9 @@ static bool match_by_dst(const void *a, const void *b)
- 	return dest->dst == dst;
- }
- 
--static void send_relay_pkt(struct mesh_net *net, uint8_t *packet, uint8_t size)
-+static void send_relay_pkt(struct mesh_net *net, uint8_t *data, uint8_t size)
- {
-+	uint8_t packet[30];
- 	struct mesh_io *io = net->io;
- 	struct mesh_io_send_info info = {
- 		.type = MESH_IO_TIMING_TYPE_GENERAL,
-@@ -2249,8 +2258,9 @@ static void send_relay_pkt(struct mesh_net *net, uint8_t *packet, uint8_t size)
- 	};
- 
- 	packet[0] = MESH_AD_TYPE_NETWORK;
-+	memcpy(packet + 1, data, size);
- 
--	mesh_io_send(io, &info, packet, size);
-+	mesh_io_send(io, &info, packet, size + 1);
- }
- 
- static void send_msg_pkt(struct mesh_net *net, uint8_t *packet, uint8_t size)
-@@ -2270,15 +2280,12 @@ static void send_msg_pkt(struct mesh_net *net, uint8_t *packet, uint8_t size)
- 	mesh_io_send(io, &info, packet, size);
- }
- 
--static void packet_received(void *user_data, const void *data, uint8_t size,
--								int8_t rssi)
-+static enum _relay_advice packet_received(void *user_data,
-+				uint32_t key_id, uint32_t iv_index,
-+				const void *data, uint8_t size, int8_t rssi)
- {
- 	struct mesh_net *net = user_data;
--	uint32_t iv_index;
--	uint8_t iv_flag;
- 	const uint8_t *msg = data;
--	uint8_t *out;
--	size_t out_size;
- 	uint8_t app_msg_len;
- 	uint8_t net_ttl, net_key_id, net_segO, net_segN, net_opcode;
- 	uint32_t net_seq, cache_cookie;
-@@ -2287,50 +2294,13 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
- 	bool net_ctl, net_segmented, net_szmic, net_relay;
- 	struct mesh_friend *net_frnd = NULL;
- 	bool drop = false;
--	uint64_t hash, *isNew = NULL;
--	uint32_t key_id;
--
--	iv_flag = msg[0] >> 7;
--	iv_index = net->iv_index;
--	l_debug("%s iv_index %d NID: %2.2x", __func__, iv_index, msg[0] & 0x7f);
--
--	if (sizeof(uint16_t) <= sizeof(void *)) {
--		/* Add in additional cache to allow us to
--		 * avoid decrypting duplicatesr
--		 * Fast 64 bit Hash, Network MIC doesn't matter
--		 * With 64 bit hash, false pos chance is 1 in 1.8 * 10^19
--		 */
--		hash = l_get_le64(msg + 1) ^ l_get_le64(msg + 9);
--		isNew = check_fast_cache(net, hash);
--		if (!isNew)
--			return;
--
--		l_debug("New");
--	}
--
--	memcpy(packet + 2, data, size);
--
--	if (iv_index && (iv_index & 0x01) != iv_flag)
--		iv_index--;
- 
- 	/* Tester--Drop 90% of packets */
- 	/* l_getrandom(&iv_flag, 1); */
- 	/* if (iv_flag%10<9) drop = true; */
- 
--	if (!drop)
--		print_packet("RX: Network [enc] :", data, size);
--
--	key_id = net_key_decrypt(iv_index, packet + 2, size, &out, &out_size);
- 
--	if (!key_id) {
--		l_debug("Failed to decode packet");
--		/* Remove fast-cache-hash */
--		l_queue_remove(net->fast_cache, isNew);
--		l_free(isNew);
--		return;
--	}
--
--	memcpy(packet + 2, out, out_size);
-+	memcpy(packet + 2, data, size);
- 
- 	if (!drop)
- 		print_packet("RX: Network [clr] :", packet + 2, size);
-@@ -2347,7 +2317,7 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
- 					&net_segO, &net_segN,
- 					&msg, &app_msg_len)) {
- 		l_error("Failed to parse packet content");
--		return;
-+		return RELAY_NONE;
- 	}
- 
- 	/* Ignore incoming packets if we are LPN and frnd bit not set */
-@@ -2357,7 +2327,7 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
- 		subnet = l_queue_find(net->subnets, match_key_id,
- 							L_UINT_TO_PTR(key_id));
- 		if (subnet)
--			return;
-+			return RELAY_NONE;
- 
- 		/* If the queue is empty, stop polling */
- 		if (net_ctl && net_opcode == NET_OP_FRND_UPDATE && !msg[5])
-@@ -2368,16 +2338,16 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
- 	} else if (net_dst == 0) {
- 		l_error("illegal parms: DST: %4.4x Ctl: %d TTL: %2.2x",
- 						net_dst, net_ctl, net_ttl);
--		return;
-+		return RELAY_NONE;
- 	}
- 
- 	/* Ignore if we originally sent this */
- 	if (is_us(net, net_src, true))
--		return;
-+		return RELAY_NONE;
- 
- 	if (drop) {
- 		l_info("Dropping SEQ 0x%06x", net_seq);
--		return;
-+		return RELAY_NONE;
- 	}
- 
- 	l_debug("check %08x", cache_cookie);
-@@ -2385,7 +2355,7 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
- 	/* As a Relay, suppress repeats of last N packets that pass through */
- 	/* The "cache_cookie" should be unique part of App message */
- 	if (msg_in_cache(net, net_src, net_seq, cache_cookie))
--		return;
-+		return RELAY_NONE;
- 
- 	l_debug("RX: Network %04x -> %04x : TTL 0x%02x : IV : %8.8x SEQ 0x%06x",
- 			net_src, net_dst, net_ttl, iv_index, net_seq);
-@@ -2403,12 +2373,12 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
- 			if (net_opcode == NET_OP_SEG_ACKNOWLEDGE) {
- 				/* Illegal to send ACK to non-Unicast Addr */
- 				if (net_dst & 0x8000)
--					return;
-+					return RELAY_NONE;
- 
- 				/* print_packet("Got ACK", msg, app_msg_len); */
- 				/* Pedantic check for correct size */
- 				if (app_msg_len != 7)
--					return;
-+					return RELAY_NONE;
- 
- 				/* If this is an ACK to our friend queue-only */
- 				if (is_lpn_friend(net, net_dst, true))
-@@ -2468,28 +2438,37 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
- 		if (!!(net_frnd))
- 			l_info("Ask for more data!");
- 
--		/* If this is one of our Unicast addresses, don't relay */
--		if (net_dst <= 0x7fff)
--			return;
-+		/* If this is one of our Unicast addresses, disallow relay */
-+		if (IS_UNICAST(net_dst))
-+			return RELAY_DISALLOWED;
- 	}
- 
-+	/* If relay not enable, or no more hops allowed */
- 	if (!net->relay.enable || net_ttl < 0x02 || net_frnd)
--		return;
-+		return RELAY_NONE;
- 
--	packet[2 + 1] = (packet[2 + 1] & ~TTL_MASK) | (net_ttl - 1);
-+	/* Group or Virtual destinations should *always* be relayed */
-+	if (IS_GROUP(net_dst) || IS_VIRTUAL(net_dst))
-+		return RELAY_ALWAYS;
- 
--	if (!net_key_encrypt(key_id, iv_index, packet + 2, size)) {
--		l_error("Failed to encode relay packet");
--		return;
--	}
-+	/* Unicast destinations for other nodes *may* be relayed */
-+	else if (IS_UNICAST(net_dst))
-+		return RELAY_ALLOWED;
- 
--	if (net->relay.enable)
--		send_relay_pkt(net, packet, size + 1);
-+	/* Otherwise, do not make a relay decision */
-+	else
-+		return RELAY_NONE;
- }
- 
- struct net_queue_data {
- 	struct mesh_io_recv_info *info;
-+	struct mesh_net *net;
- 	const uint8_t *data;
-+	uint8_t *out;
-+	size_t out_size;
-+	enum _relay_advice relay_advice;
-+	uint32_t key_id;
-+	uint32_t iv_index;
- 	uint16_t len;
- };
- 
-@@ -2497,30 +2476,78 @@ static void net_rx(void *net_ptr, void *user_data)
- {
- 	struct net_queue_data *data = user_data;
- 	struct mesh_net *net = net_ptr;
-+	enum _relay_advice relay_advice;
-+	uint8_t *out;
-+	size_t out_size;
-+	uint32_t key_id;
- 	int8_t rssi = 0;
- 
-+	key_id = net_key_decrypt(net->iv_index, data->data, data->len,
-+								&out, &out_size);
-+
-+	if (!key_id)
-+		return;
-+
-+	print_packet("RX: Network [enc] :", data->data, data->len);
-+
- 	if (data->info) {
- 		net->instant = data->info->instant;
- 		net->chan = data->info->chan;
- 		rssi = data->info->rssi;
- 	}
- 
--	packet_received(net, data->data, data->len, rssi);
-+	relay_advice = packet_received(net, key_id, net->iv_index,
-+							out, out_size, rssi);
-+	if (relay_advice > data->relay_advice) {
-+		bool iv_flag = !!(net->iv_index & 1);
-+		bool iv_pkt = !!(data->data[0] & 0x80);
-+
-+		data->iv_index = net->iv_index;
-+		if (iv_pkt != iv_flag)
-+			data->iv_index--;
-+
-+		data->relay_advice = relay_advice;
-+		data->key_id = key_id;
-+		data->net = net;
-+		data->out = out;
-+		data->out_size = out_size;
-+	}
- }
- 
- static void net_msg_recv(void *user_data, struct mesh_io_recv_info *info,
- 					const uint8_t *data, uint16_t len)
- {
-+	uint64_t hash;
-+	bool isNew;
- 	struct net_queue_data net_data = {
- 		.info = info,
- 		.data = data + 1,
- 		.len = len - 1,
-+		.relay_advice = RELAY_NONE,
- 	};
- 
--	if (len <= 2)
-+	if (len < 9)
-+		return;
-+
-+	hash = l_get_le64(data + 1);
-+
-+	/* Only process packet once per reception */
-+	isNew = check_fast_cache(hash);
-+	if (!isNew)
- 		return;
- 
- 	l_queue_foreach(nets, net_rx, &net_data);
-+
-+	if (net_data.relay_advice == RELAY_ALWAYS ||
-+			net_data.relay_advice == RELAY_ALLOWED) {
-+		uint8_t ttl = net_data.out[1] & TTL_MASK;
-+
-+		net_data.out[1] &=  ~TTL_MASK;
-+		net_data.out[1] |= ttl - 1;
-+		net_key_encrypt(net_data.key_id, net_data.iv_index,
-+					net_data.out, net_data.out_size);
-+		send_relay_pkt(net_data.net, net_data.out, net_data.out_size);
-+	}
- }
- 
- static void set_network_beacon(void *a, void *b)
-@@ -2815,7 +2842,6 @@ static void lpn_process_beacon(void *user_data, const void *data,
- 
- 	/* print_packet("lpn: Secure Net Beacon RXed", data, size); */
- 	rxed_key_refresh = (buf[0] & 0x01) == 0x01;
--	iv_update = (buf[0] & 0x02) == 0x02;
- 	iv_index = l_get_be32(buf + 1);
- 
- 	/* Inhibit recognizing iv_update true-->false if we have outbound
-@@ -2927,6 +2953,9 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
- 		if (!nets)
- 			nets = l_queue_new();
- 
-+		if (!fast_cache)
-+			fast_cache = l_queue_new();
-+
- 		l_info("Register io cb");
- 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_BEACON,
- 							beacon_recv, net);
--- 
-2.14.5
+Thanks for your review.
 
+On Fri, Jan 18, 2019 at 3:04 AM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+>
+> Hi Rajat,
+>
+> > If the platform provides it, use the reset gpio to reset the BT
+> > chip (requested by the HCI core if needed). This has been found helpful
+> > on some of Intel bluetooth controllers where the firmware gets stuck an=
+d
+> > the only way out is a hard reset pin provided by the platform.
+> >
+> > Signed-off-by: Rajat Jain <rajatja@google.com>
+> > ---
+> > v3: Better error handling for gpiod_get_optional()
+> > v2: Handle the EPROBE_DEFER case.
+> >
+> > drivers/bluetooth/btusb.c | 40 +++++++++++++++++++++++++++++++++++++++
+> > 1 file changed, 40 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index e8e148480c91..e7631f770fae 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -29,6 +29,7 @@
+> > #include <linux/of_device.h>
+> > #include <linux/of_irq.h>
+> > #include <linux/suspend.h>
+> > +#include <linux/gpio/consumer.h>
+> > #include <asm/unaligned.h>
+> >
+> > #include <net/bluetooth/bluetooth.h>
+> > @@ -475,6 +476,8 @@ struct btusb_data {
+> >       struct usb_endpoint_descriptor *diag_tx_ep;
+> >       struct usb_endpoint_descriptor *diag_rx_ep;
+> >
+> > +     struct gpio_desc *reset_gpio;
+> > +
+> >       __u8 cmdreq_type;
+> >       __u8 cmdreq;
+> >
+> > @@ -490,6 +493,26 @@ struct btusb_data {
+> >       int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+> > };
+> >
+> > +
+> > +static void btusb_hw_reset(struct hci_dev *hdev)
+> > +{
+> > +     struct btusb_data *data =3D hci_get_drvdata(hdev);
+> > +     struct gpio_desc *reset_gpio =3D data->reset_gpio;
+> > +
+> > +     /*
+> > +      * Toggle the hard reset line if the platform provides one. The r=
+eset
+> > +      * is going to yank the device off the USB and then replug. So do=
+ing
+> > +      * once is enough. The cleanup is handled correctly on the way ou=
+t
+> > +      * (standard USB disconnect), and the new device is detected clea=
+nly
+> > +      * and bound to the driver again like it should be.
+> > +      */
+> > +     bt_dev_dbg(hdev, "%s: Initiating HW reset via gpio", __func__);
+>
+> No __func__ here. That bt_dev_dbg does all of that via dynamic debug alre=
+ady.
+
+Will fix.
+
+>
+> > +     clear_bit(HCI_QUIRK_HW_RESET_ON_TIMEOUT, &hdev->quirks);
+> > +     gpiod_set_value(reset_gpio, 1);
+> > +     mdelay(100);
+> > +     gpiod_set_value(reset_gpio, 0);
+> > +}
+> > +
+> > static inline void btusb_free_frags(struct btusb_data *data)
+> > {
+> >       unsigned long flags;
+> > @@ -2917,6 +2940,7 @@ static int btusb_probe(struct usb_interface *intf=
+,
+> >                      const struct usb_device_id *id)
+> > {
+> >       struct usb_endpoint_descriptor *ep_desc;
+> > +     struct gpio_desc *reset_gpio;
+> >       struct btusb_data *data;
+> >       struct hci_dev *hdev;
+> >       unsigned ifnum_base;
+> > @@ -3030,6 +3054,16 @@ static int btusb_probe(struct usb_interface *int=
+f,
+> >
+> >       SET_HCIDEV_DEV(hdev, &intf->dev);
+> >
+> > +     reset_gpio =3D gpiod_get_optional(&data->udev->dev, "reset",
+> > +                                     GPIOD_OUT_LOW);
+> > +     if (IS_ERR(reset_gpio)) {
+> > +             err =3D PTR_ERR(reset_gpio);
+> > +             goto out_free_dev;
+> > +     } else if (reset_gpio) {
+> > +             data->reset_gpio =3D reset_gpio;
+> > +             hdev->hw_reset =3D btusb_hw_reset;
+> > +     }
+> > +
+>
+> How do we ensure that this is the right =E2=80=9Creset=E2=80=9D line. And=
+ it also needs to be bound to some hardware unless
+> we can guarantee that this is always the same.
+
+The BIOS / ACPI ensures that. The kernel driver just uses the ACPI
+provided reset line.
+
+>
+> >       hdev->open   =3D btusb_open;
+> >       hdev->close  =3D btusb_close;
+> >       hdev->flush  =3D btusb_flush;
+> > @@ -3085,6 +3119,7 @@ static int btusb_probe(struct usb_interface *intf=
+,
+> >               set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)=
+;
+> >               set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> >               set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+> > +             set_bit(HCI_QUIRK_HW_RESET_ON_TIMEOUT, &hdev->quirks);
+>
+> You are not messing with the quirks here please. Clearing quirks is crazy=
+. Use the data->flags since this should be all btusb.c specific.
+
+Do I understand it right that you do not want me to clear the quirks
+in btusb_hw_reset() and use data->flags instead? Sure, I will do that.
+But I'm not sure if that's all you meant, because you commented on
+btusb_probe() code where I'm setting the quirk (not clearing it) so
+that the hci core can call the hw_reset() callback on timeout.
+
+Thanks,
+
+Rajat
+>
+> >
+> >               if (id->driver_info & BTUSB_INTEL) {
+> >                       hdev->setup =3D btusb_setup_intel;
+> > @@ -3225,6 +3260,8 @@ static int btusb_probe(struct usb_interface *intf=
+,
+> >       return 0;
+> >
+> > out_free_dev:
+> > +     if (data->reset_gpio)
+> > +             gpiod_put(data->reset_gpio);
+> >       hci_free_dev(hdev);
+> >       return err;
+> > }
+> > @@ -3268,6 +3305,9 @@ static void btusb_disconnect(struct usb_interface=
+ *intf)
+> >       if (data->oob_wake_irq)
+> >               device_init_wakeup(&data->udev->dev, false);
+> >
+> > +     if (data->reset_gpio)
+> > +             gpiod_put(data->reset_gpio);
+> > +
+> >       hci_free_dev(hdev);
+> > }
+>
+> Regards
+>
+> Marcel
+>
