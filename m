@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A12C43612
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05809C43444
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6752F2086D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C079A2086D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8VQohhR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mE2s9Fi4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728345AbfARRCx (ORCPT
+        id S1728370AbfARRCz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 12:02:53 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:44918 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728305AbfARRCt (ORCPT
+        Fri, 18 Jan 2019 12:02:55 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38008 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728058AbfARRCy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 12:02:49 -0500
-Received: by mail-pg1-f193.google.com with SMTP id t13so6318151pgr.11;
-        Fri, 18 Jan 2019 09:02:48 -0800 (PST)
+        Fri, 18 Jan 2019 12:02:54 -0500
+Received: by mail-pl1-f194.google.com with SMTP id e5so6606731plb.5;
+        Fri, 18 Jan 2019 09:02:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=4xR1KYQugEMkmMq57G98vJgznMGv5+b9o//ihdpDFFk=;
-        b=W8VQohhRHylK8qIeIMPsCgeUBkdi246JIFWArzeRK06r73GzduMz7oIZ78WICDUblz
-         e45HrHe+vYK3sW75OWoVPmedz3/n6+Vpn8v4nZqU/sFVuI9JL55JT8KKHjzFcrV7blzz
-         YmbjdI80sMz7GdsWqSWFtE+FtZvRuFkoXVJQuWqsdq21KX7zRMEi0Jlkdfi5KSbiAdZ5
-         nhSrAzga7K/HUkudnngpKnnNIBDANg9hpGGlO/r1GVzvFyG22T0RcaEjjwgr3xLrU9U0
-         J8YwgwoqIc8UnCSrfo86OKT6jg1XujU6BZrDQxu3AbIVQ4yw2KHUcRqOokW3vlXJfwnJ
-         LJxg==
+        bh=ZcE0++5u/bnDO9bvoYpUsbiaOU0sb4V9OQ0+PXHgS5E=;
+        b=mE2s9Fi4sTMYiU1QXLckdLLFVjTB+qtcWoGKiDN2/mjUnPrMyJ4k64vtBj2rKcUU6O
+         In4qg1yIauYZ3u/2jaER+vstVOdaR64r2TQz63tV4b9xq4+0kR1mbsuAHrYt1PpZpXzq
+         oga9PX/ZfZSxZJA+a5kXvZmzoIS8wZ3RJv9taxrP8MD0s2iWRIUEHq51q2Lz//kxELtb
+         1A6IRRJSJ+rXxq/G1ZsW2VuYUudyvnOJNrs63P6uxAX7xGWcpfk8hBvVoqsSJ4e2LlDX
+         1WOem+WVtD1FxWVs4KMe3xsMv6DNVP/T7H/lZ+xu73yMTOvd1rT1S2/qkYcVSK506eFE
+         JABg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=4xR1KYQugEMkmMq57G98vJgznMGv5+b9o//ihdpDFFk=;
-        b=CsUef19+jotDCYBSYZLH5SAOYw1ICYTwy5Hnq+IYyfjxSeDxCmDXOoCQ2D3ahLx+ze
-         5updL6g2XtArW6WSI+GC7TgGGnQw+PB8gtH7R076vM+7qVFQnkDWik+cAEb6U71xZvPZ
-         qgVGGrR+R2J0yLcHJwBAq9/YNoU4mQ2z9DE1FqdBPCDztx+tbC9E4uurtaX06+ZD3z+Q
-         febM4X6SDvZNomlPKk0fxS+0yugmtHNzY/904RvwahAWBbYVjoeXCDI9f1B2K7j5v/xP
-         EAsQyu+/3pbTL/fXUpVknj586xyJiZCiUm9NanRL3hTe5RSRE3klGe8PfV9srYyfJYE4
-         dQlg==
-X-Gm-Message-State: AJcUukfx8S2UIZAKdKoIhMeboQRhuwoxYmve9QoLzlE0kUNr4zA9TN+x
-        5BtfrLNvZga0NmFcUyvxoDs=
-X-Google-Smtp-Source: ALg8bN7eKG9Zfd/C08iT/TSsDGBMH2LRelSemvSqKMOphpjky6CTf4WpERgIJdacBkOyODA2ZJbrBQ==
-X-Received: by 2002:a62:3888:: with SMTP id f130mr19784070pfa.132.1547830968387;
-        Fri, 18 Jan 2019 09:02:48 -0800 (PST)
+        bh=ZcE0++5u/bnDO9bvoYpUsbiaOU0sb4V9OQ0+PXHgS5E=;
+        b=T7XIA8b4PaXFAKTglFL13+jqGMQ/X6abCyHd7nyVcXI03CXNM+3h4v9PNQUZPFOuCe
+         SS687Pdj0HvqBCkPPAz1dXhZZ/np2DcQg5bglmdCEfxR6wh0icj55ceX+I9lasQP01j+
+         txE82I7JAA2j0bhSIAIVjBTh+dNbXBL3bObp9uqHIlq3SXwlMiSsyVJM3dBIs9tn+kze
+         zuQZ7NvLfm+p+jBSEKQbVoTCLFvYEY+GgfjW/V3QaXMhNece9bB3HGdoz9E/CCdVTi9G
+         7OjbiNfF6JIyTiAAAP1AwsIyxsjJPMAwOk89ybXD+C54rT2rJFg12Qodtb/5QtykklQV
+         7JHg==
+X-Gm-Message-State: AJcUukf6qHRcjzy4wj5UT14l4Iya+w+PrQKw5AuwzQTUrTRKTo9khzr2
+        4wVrd8UpUgA0mmiyrxwYZSg=
+X-Google-Smtp-Source: ALg8bN67v456utGVLWiqi+aDYttYUprlBywzYI0OUggA5xoUZQRpdBWeIlXY8gcLLbH3xV9LWXo1SA==
+X-Received: by 2002:a17:902:27a8:: with SMTP id d37mr20153695plb.182.1547830973155;
+        Fri, 18 Jan 2019 09:02:53 -0800 (PST)
 Received: from anarsoul-thinkpad.lan (216-71-193-140.dyn.novuscom.net. [216.71.193.140])
-        by smtp.gmail.com with ESMTPSA id b4sm5672222pgq.65.2019.01.18.09.02.47
+        by smtp.gmail.com with ESMTPSA id b4sm5672222pgq.65.2019.01.18.09.02.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 09:02:47 -0800 (PST)
+        Fri, 18 Jan 2019 09:02:52 -0800 (PST)
 From:   Vasily Khoruzhick <anarsoul@gmail.com>
 To:     "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
@@ -67,9 +67,9 @@ To:     "David S. Miller" <davem@davemloft.net>,
         Vasily Khoruzhick <anarsoul@gmail.com>, netdev@vger.kernel.org,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/8] Bluetooth: hci_h5: Add support for binding RTL8723BS with device tree
-Date:   Fri, 18 Jan 2019 09:02:28 -0800
-Message-Id: <20190118170232.16142-5-anarsoul@gmail.com>
+Subject: [PATCH 8/8] DO-NOT-MERGE: arm64: allwinner: a64: enable Bluetooth On SoPine baseboard
+Date:   Fri, 18 Jan 2019 09:02:32 -0800
+Message-Id: <20190118170232.16142-9-anarsoul@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190118170232.16142-1-anarsoul@gmail.com>
 References: <20190118170232.16142-1-anarsoul@gmail.com>
@@ -80,65 +80,42 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-RTL8723BS is often used in ARM boards, so add ability to bind it
-using device tree.
+SoPine has optional RTL8723BS WiFi + BT module, BT is connected to UART1
+and uses PL4 as BT reset, PL5 as device wake GPIO, PL6 as host wake GPIO
+the I2C controlling signals are connected to R_I2C bus.
+
+Enable it in the device tree.
 
 Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
 ---
- drivers/bluetooth/hci_h5.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ .../dts/allwinner/sun50i-a64-sopine-baseboard.dts  | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 7ead8c3d8657..44f848c02c63 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -26,6 +26,7 @@
- #include <linux/gpio/consumer.h>
- #include <linux/kernel.h>
- #include <linux/mod_devicetable.h>
-+#include <linux/of_device.h>
- #include <linux/serdev.h>
- #include <linux/skbuff.h>
- 
-@@ -823,6 +824,11 @@ static int h5_serdev_probe(struct serdev_device *serdev)
- 		if (h5->vnd->acpi_gpio_map)
- 			devm_acpi_dev_add_driver_gpios(dev,
- 						       h5->vnd->acpi_gpio_map);
-+	} else {
-+		h5->vnd = (const struct h5_vnd *)
-+				of_device_get_match_data(&serdev->dev);
-+		of_property_read_string(serdev->dev.of_node,
-+					"firmware-postfix", &h5->id);
- 	}
- 
- 	h5->enable_gpio = devm_gpiod_get_optional(dev, "enable", GPIOD_OUT_LOW);
-@@ -1024,12 +1030,26 @@ static const struct dev_pm_ops h5_serdev_pm_ops = {
- 	SET_SYSTEM_SLEEP_PM_OPS(h5_serdev_suspend, h5_serdev_resume)
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+index e6fb9683f213..691ffad390c6 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-sopine-baseboard.dts
+@@ -204,6 +204,20 @@
+ 	status = "okay";
  };
  
-+static struct h5_vnd rtl8723_of_vnd = {
-+	.setup		= h5_btrtl_setup,
-+	.open		= h5_btrtl_open,
-+	.close		= h5_btrtl_close,
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
++	status = "okay";
++
++	bluetooth {
++		compatible = "realtek,rtl8723bs-bt";
++		reset-gpios = <&r_pio 0 4 GPIO_ACTIVE_LOW>; /* PL4 */
++		device-wake-gpios = <&r_pio 0 5 GPIO_ACTIVE_HIGH>; /* PL5 */
++		host-wake-gpios = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
++		firmware-postfix = "pine64";
++	};
 +};
 +
-+static const struct of_device_id h5_of_match[] = {
-+	{ .compatible = "realtek,rtl8723bs-bt", .data = &rtl8723_of_vnd },
-+	{ .compatible = "realtek,rtl8723cs-bt", .data = &rtl8723_of_vnd },
-+	{ /* sentinel */ },
-+};
-+MODULE_DEVICE_TABLE(of, h5_of_match);
-+
- static struct serdev_device_driver h5_serdev_driver = {
- 	.probe = h5_serdev_probe,
- 	.remove = h5_serdev_remove,
- 	.driver = {
- 		.name = "hci_uart_h5",
- 		.acpi_match_table = ACPI_PTR(h5_acpi_match),
-+		.of_match_table = of_match_ptr(h5_of_match),
- 		.pm = &h5_serdev_pm_ops,
- 	},
- };
+ &usb_otg {
+ 	dr_mode = "host";
+ 	status = "okay";
 -- 
 2.20.1
 
