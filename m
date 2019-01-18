@@ -3,46 +3,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07EBBC43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 08:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB6BC43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 08:57:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C02AC20855
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 08:54:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BECA82087E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 08:57:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727399AbfARIyg convert rfc822-to-8bit (ORCPT
+        id S1726732AbfARI5R convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 03:54:36 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:33439 "EHLO
+        Fri, 18 Jan 2019 03:57:17 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:36634 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726302AbfARIyg (ORCPT
+        with ESMTP id S1725784AbfARI5R (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 03:54:36 -0500
+        Fri, 18 Jan 2019 03:57:17 -0500
 Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D271ECF2C3;
-        Fri, 18 Jan 2019 10:02:20 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7C8C4CF2C3;
+        Fri, 18 Jan 2019 10:05:01 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [RFC,v2] Bluetooth: hci_qca: Collect controller memory dump
- during SSR
+Subject: Re: [PATCH v7 4/4] Bluetooth: btqca: inject command complete event
+ during fw download
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <95e5932be1a189ac2dae78c7b690dd03@codeaurora.org>
-Date:   Fri, 18 Jan 2019 09:54:34 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+In-Reply-To: <4641fce775b6d38b58ae8b70dd622d53@codeaurora.org>
+Date:   Fri, 18 Jan 2019 09:57:14 +0100
+Cc:     Matthias Kaehlcke <mka@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <E763DD7D-CC97-4594-87A8-86480616F08C@holtmann.org>
-References: <20181228130411.23007-1-bgodavar@codeaurora.org>
- <8B1A4B0A-BFC3-44EC-A75F-D87DBA64625B@holtmann.org>
- <25b5db1596c46f41e883bd9fd971392b@codeaurora.org>
- <7FE05B13-885C-4454-8168-75411AF8F5C2@holtmann.org>
- <95e5932be1a189ac2dae78c7b690dd03@codeaurora.org>
+Message-Id: <7B2D2E74-925A-4C70-9641-2B7EA5721B4B@holtmann.org>
+References: <1FC4CC11-B070-4ACF-9107-857A4D392876@holtmann.org>
+ <1ec946b46301124c90aa12abffeca176@codeaurora.org>
+ <20190102221510.GQ261387@google.com>
+ <c34d44c656cf38a25dbfc9c6a1dd8106@codeaurora.org>
+ <20190110204328.GA261387@google.com>
+ <fc3430d2ba5e049883f91ff56aac0dbd@codeaurora.org>
+ <20190111231229.GI261387@google.com>
+ <5ef0fa1eca4a278ce31c88ef34c7c649@codeaurora.org>
+ <20190115012002.GP261387@google.com>
+ <6889ee31f9700659109c7b772bef76d9@codeaurora.org>
+ <20190116195716.GR261387@google.com>
+ <4641fce775b6d38b58ae8b70dd622d53@codeaurora.org>
 To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -52,447 +58,450 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Balakrishna,
 
->>>>> We will collect the ramdump of BT controller when hardware error event
->>>>> received before rebooting the HCI layer. Before restarting a subsystem
->>>>> or a process running on a subsystem, it is often required to request
->>>>> either a subsystem or a process to perform proper cache dump and
->>>>> software failure reason into a memory buffer which application
->>>>> processor can retrieve afterwards. SW developers can often provide
->>>>> initial investigation by looking into that debugging information.
->>>>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->>>>> ---
->>>>> changes v2:
->>>>> * entirely an newer approach handling with an work queue.
->>>>> ---
->>>>> drivers/bluetooth/hci_qca.c | 289 ++++++++++++++++++++++++++++++++++--
->>>>> 1 file changed, 278 insertions(+), 11 deletions(-)
->>>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->>>>> index f036c8f98ea3..62b768bc32ec 100644
->>>>> --- a/drivers/bluetooth/hci_qca.c
->>>>> +++ b/drivers/bluetooth/hci_qca.c
->>>>> @@ -32,6 +32,7 @@
->>>>> #include <linux/clk.h>
->>>>> #include <linux/debugfs.h>
->>>>> #include <linux/delay.h>
->>>>> +#include <linux/devcoredump.h>
->>>>> #include <linux/device.h>
->>>>> #include <linux/gpio/consumer.h>
->>>>> #include <linux/mod_devicetable.h>
->>>> don't we have some crashdump core facility that could be utilized here?
->>> [Bala]: no i don't think so. that is reason calling devcoredump.h
->> what is wrong with using devcoredump.h?
+>>> On 2019-01-15 06:50, Matthias Kaehlcke wrote:
+>>> > On Mon, Jan 14, 2019 at 09:21:25PM +0530, Balakrishna Godavarthi wrote:
+>>> > > On 2019-01-12 04:42, Matthias Kaehlcke wrote:
+>>> > > > On Fri, Jan 11, 2019 at 07:53:43PM +0530, Balakrishna Godavarthi wrote:
+>>> > > > > Hi Matthias,
+>>> > > > >
+>>> > > > > On 2019-01-11 02:13, Matthias Kaehlcke wrote:
+>>> > > > > > Hi Balakrishna,
+>>> > > > > >
+>>> > > > > > On Thu, Jan 10, 2019 at 08:30:43PM +0530, Balakrishna Godavarthi wrote:
+>>> > > > > > > Hi Matthias,
+>>> > > > > > >
+>>> > > > > > > On 2019-01-03 03:45, Matthias Kaehlcke wrote:
+>>> > > > > > > > On Mon, Dec 31, 2018 at 11:34:46AM +0530, Balakrishna Godavarthi wrote:
+>>> > > > > > > > > Hi Marcel,
+>>> > > > > > > > >
+>>> > > > > > > > > On 2018-12-30 13:40, Marcel Holtmann wrote:
+>>> > > > > > > > > > Hi Balakrishna,
+>>> > > > > > > > > >
+>>> > > > > > > > > > > > > Latest qualcomm chips are not sending an command complete event for
+>>> > > > > > > > > > > > > every firmware packet sent to chip. They only respond with a vendor
+>>> > > > > > > > > > > > > specific event for the last firmware packet. This optimization will
+>>> > > > > > > > > > > > > decrease the BT ON time. Due to this we are seeing a timeout error
+>>> > > > > > > > > > > > > message logs on the console during firmware download. Now we are
+>>> > > > > > > > > > > > > injecting a command complete event once we receive an vendor
+>>> > > > > > > > > > > > > specific
+>>> > > > > > > > > > > > > event for the last RAM firmware packet.
+>>> > > > > > > > > > > > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>>> > > > > > > > > > > > > ---
+>>> > > > > > > > > > > > > drivers/bluetooth/btqca.c | 39
+>>> > > > > > > > > > > > > ++++++++++++++++++++++++++++++++++++++-
+>>> > > > > > > > > > > > > drivers/bluetooth/btqca.h |  3 +++
+>>> > > > > > > > > > > > > 2 files changed, 41 insertions(+), 1 deletion(-)
+>>> > > > > > > > > > > > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>>> > > > > > > > > > > > > index ec9e03a6b778..0b533f65f652 100644
+>>> > > > > > > > > > > > > --- a/drivers/bluetooth/btqca.c
+>>> > > > > > > > > > > > > +++ b/drivers/bluetooth/btqca.c
+>>> > > > > > > > > > > > > @@ -144,6 +144,7 @@ static void qca_tlv_check_data(struct
+>>> > > > > > > > > > > > > rome_config *config,
+>>> > > > > > > > > > > > > 		 * In case VSE is skipped, only the last segment is acked.
+>>> > > > > > > > > > > > > 		 */
+>>> > > > > > > > > > > > > 		config->dnld_mode = tlv_patch->download_mode;
+>>> > > > > > > > > > > > > +		config->dnld_type = config->dnld_mode;
+>>> > > > > > > > > > > > > 		BT_DBG("Total Length           : %d bytes",
+>>> > > > > > > > > > > > > 		       le32_to_cpu(tlv_patch->total_size));
+>>> > > > > > > > > > > > > @@ -264,6 +265,31 @@ static int qca_tlv_send_segment(struct
+>>> > > > > > > > > > > > > hci_dev *hdev, int seg_size,
+>>> > > > > > > > > > > > > 	return err;
+>>> > > > > > > > > > > > > }
+>>> > > > > > > > > > > > > +static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
+>>> > > > > > > > > > > > > +{
+>>> > > > > > > > > > > > > +	struct hci_event_hdr *hdr;
+>>> > > > > > > > > > > > > +	struct hci_ev_cmd_complete *evt;
+>>> > > > > > > > > > > > > +	struct sk_buff *skb;
+>>> > > > > > > > > > > > > +
+>>> > > > > > > > > > > > > +	skb = bt_skb_alloc(sizeof(*hdr) + sizeof(*evt) + 1, GFP_KERNEL);
+>>> > > > > > > > > > > > > +	if (!skb)
+>>> > > > > > > > > > > > > +		return -ENOMEM;
+>>> > > > > > > > > > > > > +
+>>> > > > > > > > > > > > > +	hdr = skb_put(skb, sizeof(*hdr));
+>>> > > > > > > > > > > > > +	hdr->evt = HCI_EV_CMD_COMPLETE;
+>>> > > > > > > > > > > > > +	hdr->plen = sizeof(*evt) + 1;
+>>> > > > > > > > > > > > > +
+>>> > > > > > > > > > > > > +	evt = skb_put(skb, sizeof(*evt));
+>>> > > > > > > > > > > > > +	evt->ncmd = 1;
+>>> > > > > > > > > > > > > +	evt->opcode = HCI_OP_NOP;
+>>> > > > > > > >
+>>> > > > > > > > After looking a bit more at it I realize HCI_OP_NOP is not a good
+>>> > > > > > > > value in this case:
+>>> > > > > > > >
+>>> > > > > > > > static void hci_cmd_complete_evt(...)
+>>> > > > > > > > {
+>>> > > > > > > >   ...
+>>> > > > > > > >
+>>> > > > > > > >   if (*opcode != HCI_OP_NOP)
+>>> > > > > > > >     cancel_delayed_work(&hdev->cmd_timer);
+>>> > > > > > > >
+>>> > > > > > > >   ...
+>>> > > > > > > > }
+>>> > > > > > > >
+>>> > > > > > > > https://elixir.bootlin.com/linux/v4.19/source/net/bluetooth/hci_event.c#L3351
+>>> > > > > > > >
+>>> > > > > > > > Cancelling the command timeout is precisely what we want. Not sure why
+>>> > > > > > > > the patch with HCI_OP_NOP makes the timeouts go away in most cases
+>>> > > > > > > > (but not e.g. when inserting an msleep(1000) after downloading the
+>>> > > > > > > > NVM.
+>>> > > > > > > >
+>>> > > > > > > > I suggest to pass the opcode of the command to be completed.
+>>> > > > > > > >
+>>> > > > > > > > > > > > > +
+>>> > > > > > > > > > > > > +	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
+>>> > > > > > > > > > > > > +
+>>> > > > > > > > > > > > > +	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
+>>> > > > > > > > > > > > > +
+>>> > > > > > > > > > > > > +	return hci_recv_frame(hdev, skb);
+>>> > > > > > > > > > > > > +}
+>>> > > > > > > > > > > > > +
+>>> > > > > > > > > > > > > static int qca_download_firmware(struct hci_dev *hdev,
+>>> > > > > > > > > > > > > 				  struct rome_config *config)
+>>> > > > > > > > > > > > > {
+>>> > > > > > > > > > > > > @@ -297,11 +323,22 @@ static int
+>>> > > > > > > > > > > > > qca_download_firmware(struct hci_dev *hdev,
+>>> > > > > > > > > > > > > 		ret = qca_tlv_send_segment(hdev, segsize, segment,
+>>> > > > > > > > > > > > > 					    config->dnld_mode);
+>>> > > > > > > > > > > > > 		if (ret)
+>>> > > > > > > > > > > > > -			break;
+>>> > > > > > > > > > > > > +			goto out;
+>>> > > > > > > > > > > > > 		segment += segsize;
+>>> > > > > > > > > > > > > 	}
+>>> > > > > > > > > > > > > +	/* Latest qualcomm chipsets are not sending a command
+>>> > > > > > > > > > > > > complete event
+>>> > > > > > > > > > > > > +	 * for every fw packet sent. They only respond with a
+>>> > > > > > > > > > > > > vendor specific
+>>> > > > > > > > > > > > > +	 * event for the last packet. This optimization in the chip will
+>>> > > > > > > > > > > > > +	 * decrease the BT in initialization time. Here we will
+>>> > > > > > > > > > > > > inject a command
+>>> > > > > > > > > > > > > +	 * complete event to avoid a command timeout error message.
+>>> > > > > > > > > > > > > +	 */
+>>> > > > > > > > > > > > > +	if ((config->dnld_type == ROME_SKIP_EVT_VSE_CC ||
+>>> > > > > > > > > > > > > +	    config->dnld_type == ROME_SKIP_EVT_VSE))
+>>> > > > > > > > > > > > > +		return qca_inject_cmd_complete_event(hdev);
+>>> > > > > > > > > > > > > +
+>>> > > > > > > > > > > > have you actually considered using __hci_cmd_send in that case. It is
+>>> > > > > > > > > > > > allowed for vendor OGF to use that command. I see you actually do use
+>>> > > > > > > > > > > > it and now I am failing to understand what this is for.
+>>> > > > > > > > > > > [Bala]: thanks for reviewing the change.
+>>> > > > > > > > > > >
+>>> > > > > > > > > > > __hci_cmd_send() can be used only to send the command to the chip.
+>>> > > > > > > > > > > it will not wait for the response for the command sent.
+>>> > > > > > > > > > >
+>>> > > > > > > > > > > as you know that every vendor command sent to chip will respond with
+>>> > > > > > > > > > > vendor specific event and command complete event.
+>>> > > > > > > > > > > but in our case chip will only respond with vendor specific event
+>>> > > > > > > > > > > only. so we are injecting command complete event.
+>>> > > > > > > > > >
+>>> > > > > > > > > > and __hci_cmd_sync_ev is also not working for you? However since you
+>>> > > > > > > > > > are not waiting for the vendor event anyway and just injecting
+>>> > > > > > > > > > cmd_complete, I wonder what’s the difference in just using
+>>> > > > > > > > > > __hci_cmd_send and not bothering to wait or inject at all. I am
+>>> > > > > > > > > > failing to see where this injection makes a difference.
+>>> > > > > > > > > >
+>>> > > > > > > > > > For me it is a big difference if we are injecting one event like in
+>>> > > > > > > > > > the case of Intel compared to injecting one for every command. It will
+>>> > > > > > > > > > show a wrong picture in btmon and that is a bad idea.
+>>> > > > > > > > > >
+>>> > > > > > > > > > Regards
+>>> > > > > > > > > >
+>>> > > > > > > > > > Marcel
+>>> > > > > > > > >
+>>> > > > > > > > > [Bala]: here is the use case, when ever we download the fw packets
+>>> > > > > > > > > i.e. RAM
+>>> > > > > > > > > image, for every command sent(i.e. fw packet) from
+>>> > > > > > > > > the host chip will respond with an vendor specific event and command
+>>> > > > > > > > > complete event.
+>>> > > > > > > > >
+>>> > > > > > > > > the above is taking more time to setup the BT device. then we came
+>>> > > > > > > > > up with
+>>> > > > > > > > > solution where we enable flags in fw file (i.e. RAM image header)
+>>> > > > > > > > > whether to wait for event to be received or sent the total packets
+>>> > > > > > > > > and wait
+>>> > > > > > > > > for the events for the last packet.
+>>> > > > > > > > >
+>>> > > > > > > > > So currently we are handling both the cases in the code. i.e wait
+>>> > > > > > > > > for event
+>>> > > > > > > > > for all packet or wait for an event for the last packet.
+>>> > > > > > > > >
+>>> > > > > > > > > but in the second case i.e. wait for event for the last packet sent,
+>>> > > > > > > > > we are
+>>> > > > > > > > > only receiving an vendor specific event from chip which holds the
+>>> > > > > > > > > status of
+>>> > > > > > > > > fw download.
+>>> > > > > > > > >
+>>> > > > > > > > > so as __hci_cmd_sync_ev() requires an command complete event. so we
+>>> > > > > > > > > are
+>>> > > > > > > > > injecting it after the vendor specific event received for the last
+>>> > > > > > > > > packet.
+>>> > > > > > > > >
+>>> > > > > > > > > This helps to overcome 0xfc00 timeout error logging on console.
+>>> > > > > > > >
+>>> > > > > > > > Some more details:
+>>> > > > > > > >
+>>> > > > > > > > The timeout error is actually from reading the 'SoC version', which
+>>> > > > > > > > uses the same command code as the firmware download
+>>> > > > > > > > (EDL_PATCH_CMD_OPCODE). Without reading the 'SoC version' it would be
+>>> > > > > > > > from the command to write the first firmware segment.
+>>> > > > > > > >
+>>> > > > > > > > If the download of a firmware binary takes >= 2s (HCI_CMD_TIMEOUT) the
+>>> > > > > > > > timeout would still occur. If necessary this could be mitigated by
+>>> > > > > > > > injecting some command complete events during the firmware download,
+>>> > > > > > > > though I expect Marcel wouldn't be overly happy with that, since it
+>>> > > > > > > > would affect btmon even more.
+>>> > > > > > > >
+>>> > > > > > > > Regards
+>>> > > > > > > >
+>>> > > > > > > > Matthias
+>>> > > > > > >
+>>> > > > > > > [Bala]: Basically every vendor specific command we sent to chip,
+>>> > > > > > > chip should respond with an vendor specific event followed by an
+>>> > > > > > > command
+>>> > > > > > > complete event
+>>> > > > > > > or some times it will only respond with an command complete event.
+>>> > > > > > > but in any case command complete event is mandatory to all the
+>>> > > > > > > command we
+>>> > > > > > > sent to the chip.
+>>> > > > > >
+>>> > > > > > Is this ("command complete event is mandatory to all the command we
+>>> > > > > > sent to the chip") a description of what the chip actually does, or
+>>> > > > > > what it should be doing according to the spec?
+>>> > > > > >
+>>> > > > > > As mentioned earlier, the timeout we see originates from reading the
+>>> > > > > > SoC version:
+>>> > > > > >
+>>> > > > > > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>>> > > > > > index 0b533f65f652fc..1e484e61799571 100644
+>>> > > > > > --- a/drivers/bluetooth/btqca.c
+>>> > > > > > +++ b/drivers/bluetooth/btqca.c
+>>> > > > > > @@ -400,6 +400,10 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t
+>>> > > > > > baudrate,
+>>> > > > > >                 return err;
+>>> > > > > >         }
+>>> > > > > >
+>>> > > > > > +       printk("DBG: ZZZzzzzzzz\n");
+>>> > > > > > +       msleep(2500);
+>>> > > > > > +       printk("DBG: good morning!\n");
+>>> > > > > > +
+>>> > > > > >         /* Download NVM configuration */
+>>> > > > > >         config.type = TLV_TYPE_NVM;
+>>> > > > > >         if (soc_type == QCA_WCN3990)
+>>> > > > > >
+>>> > > > > > When you boot with this patch you'll see something like this:
+>>> > > > > >
+>>> > > > > > [   15.531365] DBG: reading SoC version
+>>> > > > > > [   15.544963] DBG: ZZZzzzzzzz
+>>> > > > > > [   17.590282] Bluetooth: hci0: command 0xfc00 tx timeout
+>>> > > > > > [   18.099110] DBG: good morning!
+>>> > > > > >
+>>> > > > >
+>>> > > > > [Bala]: my previous analysis were wrong. thanks for pointing me to the
+>>> > > > > correct issue.
+>>> > > > >         i am able to see timeout after version command.(used some
+>>> > > > > sleep)
+>>> > > > >         here is the reason for it.
+>>> > > > >
+>>> > > > >         01 00 fc 01 19 (we send the command to chip to request
+>>> > > > > version)
+>>> > > > >         04 ff 0e 00 02 0a 00 00 00 01 00 01 02 14 02 01 40(chip will
+>>> > > > > respond
+>>> > > > > with the vendor specific event payload will be chip version)
+>>> > > > >         04 0e 04 01 00 00 00(command complete event)
+>>> > > > >
+>>> > > > >        issue is with command complete event. ideally command
+>>> > > > > complete event
+>>> > > > > payload holds the command for which chip sends command complete event.
+>>> > > > >
+>>> > > > >        breaking the command
+>>> > > > >
+>>> > > > >        04 : event packet (fixed)
+>>> > > > >        0e : command complete event(fixed)
+>>> > > > >        04 : size of the payload,
+>>> > > > >
+>>> > > > >        01 : no of commands in the payload
+>>> > > > >        00 : OCF (opocde lsb)
+>>> > > > >        00 : OGF (opcode msb)
+>>> > > > >        00 : status of command executed,
+>>> > > > >
+>>> > > > >       payload is form byte 4 to byte 7. which hold the command i.e
+>>> > > > > opcode
+>>> > > > >       form the above response opcode is 0x0000. ideally this should be
+>>> > > > > 0xfc00
+>>> > > > >       because the command complete response from the chip is for the
+>>> > > > > command
+>>> > > > > 0xfc00.
+>>> > > > >
+>>> > > > >       Checked with Chip firmware dev team for the reason, it was an
+>>> > > > > limitation or an bug in the chip ROM firmware
+>>> > > > >       in the current chipset, which is fixed in the coming chipset.
+>>> > > > >
+>>> > > > >       so we expect the command 0xfc00 but recevuies 0x00. so that is
+>>> > > > > the
+>>> > > > > reason we see an timeouts.
+>>> > > > >       for all the vendor commands we receive 0x0000 in the command
+>>> > > > > complete
+>>> > > > > event.
+>>> > > >
+>>> > > > Thanks for your analysis.
+>>> > > >
+>>> > > > It is unfortunate (though not unexpected) that this is a problem in
+>>> > > > the ROM were we can't fix it, but at least the FW team is aware of it
+>>> > > > and fixed it for future hardware.
+>>> > > >
+>>> > > > >       if comes a new question how are we not seeing an 0xfc00 when
+>>> > > > > we inject
+>>> > > > > an command complete event.
+>>> > > > >       i experimented this patch, when i inject the command complete
+>>> > > > > event
+>>> > > > > from the soc version still i can see the command timeouts.
+>>> > > >
+>>> > > > I don't see command timeouts when injecting a command complete event
+>>> > > > after reading the SoC version. I suspect you still use patch which
+>>> > > > injects a command complete event with HCI_OP_NOP, which is precisely
+>>> > > > what the chip does ...
+>>> > > >
+>>> > > [Bala]: i am seeing command timeout after injecting cc event after
+>>> > > read
+>>> > > version request.
+>>> > >
+>>> > > > >       The reason for no timeouts error, we are injecting an command
+>>> > > > > complete
+>>> > > > > after last packet sent out, so this injection helps
+>>> > > > >       .bin file to speed out it download part, so as the bin is dumped
+>>> > > > > fastly we send an HCI RESET Comamnd where we recevie an command
+>>> > > > > complete
+>>> > > > > event
+>>> > > > >       with non zero opcode which is cancelling the command timeout
+>>> > > > > timer.
+>>> > > > >
+>>> > > > >       when we inject command complete event, in short we are
+>>> > > > > completing
+>>> > > > > setup process in less than 2 seconds(command timeout timer value),
+>>> > > > >       so before 2 seconds we are sending an HCI RESET command whose
+>>> > > > > command
+>>> > > > > complete event opcode value is an non zero (which cancels the command
+>>> > > > > timeout timer)
+>>> > > >
+>>> > > > I agree that HCI_RESET cancels the command timeout timer if it is sent
+>>> > > > before the 2s timout expires, but I have doubts on the part about
+>>> > > > command complete events.
+>>> > > >
+>>> > > > In my observations there are no command timeouts if a command complete
+>>> > > > (with opcode != HCI_OP_NOP) is injected after the firmware download,
+>>> > > > even if a 3s sleep is added before sending the HCI_RESET.
+>>> > > >
+>>> > >
+>>> > > [Bala]: add sleep before sending HCI reset, oxfc00 timeout observed.
+>>> >
+>>> > Please double check your setup. Are you 100% sure you are not still
+>>> > sending HCI_OP_NOP as opcode?
+>>> >
+>>> [Bala]: sorry i am injecting the HCI_OP_NOP, so that is the reason we have
+>>> an timeouts.
+>>>        yes if the opcode 0x42 injected, no timeouts are observed.
+>> Please don't use 0x42 (at least not as literal) when you respin, I
+>> only chose this value to illustrate that it's really the injected
+>> command which cancels the timer. You might want to add a
+>> QCA_HCI_OP_DUMMY or similar, to make clear that the value doesn't
+>> matter (as long as it isn't an actual opcode). With a define I don't
+>> really care if you use 0x01, 0x42 or any other non-opcode value.
 > 
-> [Bala]: using the  devcoredump.h
+> [Bala]: will not use 0x42, will use an opcode 0xfc00.
 > 
->>>>> @@ -57,9 +58,10 @@
->>>>> /* Controller states */
->>>>> #define STATE_IN_BAND_SLEEP_ENABLED	1
->>>>> -#define IBS_WAKE_RETRANS_TIMEOUT_MS	100
->>>>> +#define	IBS_WAKE_RETRANS_TIMEOUT_MS	100
->>>>> #define IBS_TX_IDLE_TIMEOUT_MS		2000
->>>>> -#define BAUDRATE_SETTLE_TIMEOUT_MS	300
->>>>> +#define	BAUDRATE_SETTLE_TIMEOUT_MS	300
->>>>> +#define MEMDUMP_COLLECTION_TIMEOUT_MS	8000
->>>>> /* susclk rate */
->>>>> #define SUSCLK_RATE_32KHZ	32768
->>>>> @@ -67,6 +69,13 @@
->>>>> /* Controller debug log header */
->>>>> #define QCA_DEBUG_HANDLE	0x2EDC
->>>>> +/* Controller dump header */
->>>>> +#define QCA_SSR_DUMP_HANDLE		0x0108
->>>>> +#define QCA_DUMP_PACKET_SIZE		255
->>>>> +#define QCA_LAST_SEQUENCE_NUM		0xFFFF
->>>>> +#define QCA_CRASHBYTE_PACKET_LEN	1100
->>>>> +#define QCA_MEMDUMP_BYTE		0xFB
->>>>> +
->>>>> /* HCI_IBS transmit side sleep protocol states */
->>>>> enum tx_ibs_states {
->>>>> 	HCI_IBS_TX_ASLEEP,
->>>>> @@ -89,12 +98,41 @@ enum hci_ibs_clock_state_vote {
->>>>> 	HCI_IBS_RX_VOTE_CLOCK_OFF,
->>>>> };
->>>>> +/* Controller memory dump states */
->>>>> +enum qca_memdump_states {
->>>>> +	QCA_MEMDUMP_IDLE,
->>>>> +	QCA_MEMDUMP_COLLECTING,
->>>>> +	QCA_MEMDUMP_COLLECTED,
->>>>> +	QCA_MEMDUMP_TIMEOUT,
->>>>> +};
->>>>> +
->>>>> +struct qca_memdump_data {
->>>>> +	char *memdump_buf_head;
->>>>> +	char *memdump_buf_tail;
->>>>> +	u32 current_seq_no;
->>>>> +	u32 received_dump;
->>>>> +};
->>>>> +
->>>>> +struct qca_memdump_event_hdr {
->>>>> +	__u8    evt;
->>>>> +	__u8    plen;
->>>>> +	__u16   opcode;
->>>>> +	__u16   seq_no;
->>>>> +	__u8    reserved;
->>>>> +} __packed;
->>>>> +
->>>>> +
->>>>> +struct qca_dump_size {
->>>>> +	u32 dump_size;
->>>>> +} __packed;
->>>>> +
->>>>> struct qca_data {
->>>>> 	struct hci_uart *hu;
->>>>> 	struct sk_buff *rx_skb;
->>>>> 	struct sk_buff_head txq;
->>>>> -	struct sk_buff_head tx_wait_q;	/* HCI_IBS wait queue	*/
->>>>> -	spinlock_t hci_ibs_lock;	/* HCI_IBS state lock	*/
->>>>> +	struct sk_buff_head tx_wait_q;		/* HCI_IBS wait queue	*/
->>>>> +	struct sk_buff_head rx_memdump_q;	/* Memdump wait queue	*/
->>>>> +	spinlock_t hci_ibs_lock;		/* HCI_IBS state lock	*/
->>>>> 	u8 tx_ibs_state;	/* HCI_IBS transmit side power state*/
->>>>> 	u8 rx_ibs_state;	/* HCI_IBS receive side power state */
->>>>> 	bool tx_vote;		/* Clock must be on for TX */
->>>>> @@ -103,12 +141,17 @@ struct qca_data {
->>>>> 	u32 tx_idle_delay;
->>>>> 	struct timer_list wake_retrans_timer;
->>>>> 	u32 wake_retrans;
->>>>> +	struct timer_list memdump_timer;
->>>>> +	u32 memdump_delay;
->>>>> 	struct workqueue_struct *workqueue;
->>>>> 	struct work_struct ws_awake_rx;
->>>>> 	struct work_struct ws_awake_device;
->>>>> 	struct work_struct ws_rx_vote_off;
->>>>> 	struct work_struct ws_tx_vote_off;
->>>>> +	struct work_struct ctrl_memdump_evt;
->>>>> +	struct qca_memdump_data *qca_memdump;
->>>>> 	unsigned long flags;
->>>>> +	enum qca_memdump_states memdump_state;
->>>>> 	/* For debugging purpose */
->>>>> 	u64 ibs_sent_wacks;
->>>>> @@ -173,6 +216,7 @@ struct qca_serdev {
->>>>> static int qca_power_setup(struct hci_uart *hu, bool on);
->>>>> static void qca_power_shutdown(struct hci_uart *hu);
->>>>> static int qca_power_off(struct hci_dev *hdev);
->>>>> +static void qca_controller_memdump(struct work_struct *work);
->>>>> static void __serial_clock_on(struct tty_struct *tty)
->>>>> {
->>>>> @@ -446,6 +490,21 @@ static void hci_ibs_wake_retrans_timeout(struct timer_list *t)
->>>>> 		hci_uart_tx_wakeup(hu);
->>>>> }
->>>>> +static void hci_memdump_timeout(struct timer_list *t)
->>>>> +{
->>>>> +	struct qca_data *qca = from_timer(qca, t, tx_idle_timer);
->>>>> +	struct hci_uart *hu = qca->hu;
->>>>> +	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
->>>>> +	char *memdump_buf = qca_memdump->memdump_buf_tail;
->>>>> +
->>>>> +	bt_dev_err(hu->hdev, "clearing allocated memory due to memdump timeout");
->>>>> +	kfree(memdump_buf);
->>>>> +	kfree(qca_memdump);
->>>>> +	qca->memdump_state = QCA_MEMDUMP_TIMEOUT;
->>>>> +	del_timer(&qca->memdump_timer);
->>>>> +	cancel_work_sync(&qca->ctrl_memdump_evt);
->>>>> +}
->>>>> +
->>>>> /* Initialize protocol */
->>>>> static int qca_open(struct hci_uart *hu)
->>>>> {
->>>>> @@ -461,6 +520,7 @@ static int qca_open(struct hci_uart *hu)
->>>>> 	skb_queue_head_init(&qca->txq);
->>>>> 	skb_queue_head_init(&qca->tx_wait_q);
->>>>> +	skb_queue_head_init(&qca->rx_memdump_q);
->>>>> 	spin_lock_init(&qca->hci_ibs_lock);
->>>>> 	qca->workqueue = alloc_ordered_workqueue("qca_wq", 0);
->>>>> 	if (!qca->workqueue) {
->>>>> @@ -473,6 +533,7 @@ static int qca_open(struct hci_uart *hu)
->>>>> 	INIT_WORK(&qca->ws_awake_device, qca_wq_awake_device);
->>>>> 	INIT_WORK(&qca->ws_rx_vote_off, qca_wq_serial_rx_clock_vote_off);
->>>>> 	INIT_WORK(&qca->ws_tx_vote_off, qca_wq_serial_tx_clock_vote_off);
->>>>> +	INIT_WORK(&qca->ctrl_memdump_evt, qca_controller_memdump);
->>>>> 	qca->hu = hu;
->>>>> @@ -500,7 +561,7 @@ static int qca_open(struct hci_uart *hu)
->>>>> 	qca->tx_votes_off = 0;
->>>>> 	qca->rx_votes_on = 0;
->>>>> 	qca->rx_votes_off = 0;
->>>>> -
->>>>> +	qca->memdump_state = QCA_MEMDUMP_IDLE;
->>>>> 	hu->priv = qca;
->>>>> 	if (hu->serdev) {
->>>>> @@ -528,6 +589,9 @@ static int qca_open(struct hci_uart *hu)
->>>>> 	timer_setup(&qca->tx_idle_timer, hci_ibs_tx_idle_timeout, 0);
->>>>> 	qca->tx_idle_delay = IBS_TX_IDLE_TIMEOUT_MS;
->>>>> +	timer_setup(&qca->memdump_timer, hci_memdump_timeout, 0);
->>>>> +	qca->memdump_delay = MEMDUMP_COLLECTION_TIMEOUT_MS;
->>>>> +
->>>>> 	BT_DBG("HCI_UART_QCA open, tx_idle_delay=%u, wake_retrans=%u",
->>>>> 	       qca->tx_idle_delay, qca->wake_retrans);
->>>>> @@ -605,8 +669,10 @@ static int qca_close(struct hci_uart *hu)
->>>>> 	skb_queue_purge(&qca->tx_wait_q);
->>>>> 	skb_queue_purge(&qca->txq);
->>>>> +	skb_queue_purge(&qca->rx_memdump_q);
->>>>> 	del_timer(&qca->tx_idle_timer);
->>>>> 	del_timer(&qca->wake_retrans_timer);
->>>>> +	del_timer(&qca->memdump_timer);
->>>>> 	destroy_workqueue(qca->workqueue);
->>>>> 	qca->hu = NULL;
->>>>> @@ -866,6 +932,141 @@ static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
->>>>> 	return hci_recv_frame(hdev, skb);
->>>>> }
->>>>> +static void qca_controller_memdump(struct work_struct *work)
->>>>> +{
->>>>> +	struct qca_data *qca = container_of(work, struct qca_data,
->>>>> +					    ctrl_memdump_evt);
->>>>> +	struct hci_uart *hu = qca->hu;
->>>>> +	struct sk_buff *skb;
->>>>> +	struct qca_memdump_event_hdr *cmd_hdr;
->>>>> +	struct qca_memdump_data *qca_memdump = qca->qca_memdump;
->>>>> +	struct qca_dump_size *dump;
->>>>> +	char *memdump_buf;
->>>>> +	char nullBuff[QCA_DUMP_PACKET_SIZE] = { 0 };
->>>>> +	u16 opcode, seq_no;
->>>>> +	u32 dump_size;
->>>>> +
->>>>> +	while ((skb = skb_dequeue(&qca->rx_memdump_q))) {
->>>>> +
->>>>> +		if (!qca_memdump) {
->>>>> +			qca_memdump = kzalloc(sizeof(struct qca_memdump_data),
->>>>> +					      GFP_ATOMIC);
->>>>> +			if (!qca_memdump)
->>>>> +				return;
->>>>> +
->>>>> +			qca->qca_memdump = qca_memdump;
->>>>> +		}
->>>>> +
->>>>> +		qca->memdump_state = QCA_MEMDUMP_COLLECTING;
->>>>> +		cmd_hdr = (void *) skb->data;
->>>>> +		opcode = __le16_to_cpu(cmd_hdr->opcode);
->>>>> +		seq_no = __le16_to_cpu(cmd_hdr->seq_no);
->>>>> +		skb_pull(skb, sizeof(struct qca_memdump_event_hdr));
->>>>> +
->>>>> +		if (!seq_no) {
->>>>> +
->>>>> +			/* This is the first frame of memdump packet from
->>>>> +			 * the controller, Disable IBS to recevie dump
->>>>> +			 * with out any interruption, ideally time required for
->>>>> +			 * the controller to send the dump is 8 seconds. let us
->>>>> +			 * start timer to handle this asynchronous activity.
->>>>> +			 */
->>>>> +			clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
->>>>> +
->>>>> +			dump = (void *) skb->data;
->>>>> +			dump_size = __le32_to_cpu(dump->dump_size);
->>>>> +			if (!(dump_size)) {
->>>>> +				bt_dev_err(hu->hdev, "QCA invalid memdump size");
->>>>> +				kfree_skb(skb);
->>>>> +				return;
->>>>> +			}
->>>>> +
->>>>> +			bt_dev_info(hu->hdev, "QCA: collecting memdump started"
->>>>> +				     "of size:%u", dump_size);
->>>>> +			mod_timer(&qca->memdump_timer, (jiffies +
->>>>> +				  msecs_to_jiffies(qca->memdump_delay)));
->>>>> +
->>>>> +			skb_pull(skb, sizeof(dump_size));
->>>>> +			memdump_buf = vmalloc(dump_size);
->>>>> +			qca_memdump->memdump_buf_head = memdump_buf;
->>>>> +			qca_memdump->memdump_buf_tail = memdump_buf;
->>>>> +		}
->>>>> +
->>>>> +		memdump_buf = qca_memdump->memdump_buf_tail;
->>>>> +
->>>>> +		/* If sequence no 0 is missed then there is no point in
->>>>> +		 * accepting the other sequences.
->>>>> +		 */
->>>>> +		if (!memdump_buf) {
->>>>> +			bt_dev_err(hu->hdev, "QCA: Discarding other packets");
->>>>> +			kfree(qca_memdump);
->>>>> +			kfree_skb(skb);
->>>>> +			qca->qca_memdump = NULL;
->>>>> +			return;
->>>>> +		}
->>>>> +
->>>>> +		/* There could be chance of missing some packets from
->>>>> +		 * the controller. In such cases let us store the dummy
->>>>> +		 * packets in the buffer.
->>>>> +		 */
->>>>> +		while ((seq_no > qca_memdump->current_seq_no + 1) &&
->>>>> +			seq_no != QCA_LAST_SEQUENCE_NUM) {
->>>>> +			bt_dev_err(hu->hdev, "QCA controller missed packet:%d",
->>>>> +				   qca_memdump->current_seq_no);
->>>>> +			memcpy(memdump_buf, nullBuff, QCA_DUMP_PACKET_SIZE);
->>>>> +			memdump_buf = memdump_buf + QCA_DUMP_PACKET_SIZE;
->>>>> +			qca_memdump->received_dump += QCA_DUMP_PACKET_SIZE;
->>>>> +			qca_memdump->current_seq_no++;
->>>>> +		}
->>>>> +
->>>>> +		memcpy(memdump_buf, (unsigned char *) skb->data, skb->len);
->>>>> +		memdump_buf = memdump_buf + skb->len;
->>>>> +		qca_memdump->memdump_buf_tail = memdump_buf;
->>>>> +		qca_memdump->current_seq_no = seq_no + 1;
->>>>> +		qca_memdump->received_dump += skb->len;
->>>>> +		qca->qca_memdump = qca_memdump;
->>>>> +		kfree_skb(skb);
->>>>> +		if (seq_no == QCA_LAST_SEQUENCE_NUM) {
->>>>> +			bt_dev_info(hu->hdev, "QCA writing crash dump of size %d bytes",
->>>>> +				   qca_memdump->received_dump);
->>>>> +			memdump_buf = qca_memdump->memdump_buf_head;
->>>>> +			dev_coredumpv(&hu->serdev->dev, memdump_buf,
->>>>> +				      qca_memdump->received_dump, GFP_KERNEL);
->>>>> +			// Revisit for free(memdump) if needed.
->>>>> +			del_timer(&qca->memdump_timer);
->>>>> +			kfree(qca->qca_memdump);
->>>>> +			qca->qca_memdump = NULL;
->>>>> +			qca->memdump_state = QCA_MEMDUMP_COLLECTED;
->>>>> +		}
->>>>> +	}
->>>>> +
->>>>> +}
->>>>> +
->>>>> +int qca_controller_memdump_event(struct hci_dev *hdev, struct sk_buff *skb)
->>>>> +{
->>>>> +	struct hci_uart *hu = hci_get_drvdata(hdev);
->>>>> +	struct qca_data *qca = hu->priv;
->>>>> +
->>>>> +	skb_queue_tail(&qca->rx_memdump_q, skb);
->>>>> +	queue_work(qca->workqueue, &qca->ctrl_memdump_evt);
->>>>> +
->>>>> +	return 0;
->>>>> +}
->>>>> +
->>>>> +static int qca_recv_event_data(struct hci_dev *hdev, struct sk_buff *skb)
->>>>> +{
->>>>> +	/* We receive chip memory dump as an event packet, With a dedicated
->>>>> +	 * handler followed by a hardware error event. When this event is
->>>>> +	 * received we store dump into a file before closing hci. This
->>>>> +	 * dump will help in triaging the issues.
->>>>> +	 */
->>>>> +	if ((skb->data[0] == HCI_VENDOR_PKT) &&
->>>>> +	    (get_unaligned_be16((skb->data) + 2) == QCA_SSR_DUMP_HANDLE))
->>>> The (skb->data) is pointless, just do skb->data.
->>> [Bala]: will update.
->>>>> +		return qca_controller_memdump_event(hdev, skb);
->>>>> +
->>>>> +	return hci_recv_frame(hdev, skb);
->>>>> +}
->>>>> +
->>>>> #define QCA_IBS_SLEEP_IND_EVENT \
->>>>> 	.type = HCI_IBS_SLEEP_IND, \
->>>>> 	.hlen = 0, \
->>>>> @@ -888,12 +1089,12 @@ static int qca_recv_acl_data(struct hci_dev *hdev, struct sk_buff *skb)
->>>>> 	.maxlen = HCI_MAX_IBS_SIZE
->>>>> static const struct h4_recv_pkt qca_recv_pkts[] = {
->>>>> -	{ H4_RECV_ACL,             .recv = qca_recv_acl_data },
->>>>> -	{ H4_RECV_SCO,             .recv = hci_recv_frame    },
->>>>> -	{ H4_RECV_EVENT,           .recv = hci_recv_frame    },
->>>>> -	{ QCA_IBS_WAKE_IND_EVENT,  .recv = qca_ibs_wake_ind  },
->>>>> -	{ QCA_IBS_WAKE_ACK_EVENT,  .recv = qca_ibs_wake_ack  },
->>>>> -	{ QCA_IBS_SLEEP_IND_EVENT, .recv = qca_ibs_sleep_ind },
->>>>> +	{ H4_RECV_ACL,             .recv = qca_recv_acl_data	},
->>>>> +	{ H4_RECV_SCO,             .recv = hci_recv_frame	},
->>>>> +	{ H4_RECV_EVENT,           .recv = qca_recv_event_data	},
->>>> call it qca_recv_event and don't realign the whole table.
->>> [Bala]: will update.
->>>>> +	{ QCA_IBS_WAKE_IND_EVENT,  .recv = qca_ibs_wake_ind	},
->>>>> +	{ QCA_IBS_WAKE_ACK_EVENT,  .recv = qca_ibs_wake_ack	},
->>>>> +	{ QCA_IBS_SLEEP_IND_EVENT, .recv = qca_ibs_sleep_ind	},
->>>>> };
->>>>> static int qca_recv(struct hci_uart *hu, const void *data, int count)
->>>>> @@ -1114,6 +1315,68 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->>>>> 	return 0;
->>>>> }
->>>>> +static int qca_send_crashbuffer(struct hci_uart *hu)
->>>>> +{
->>>>> +	struct qca_data *qca = hu->priv;
->>>>> +	struct sk_buff *skb;
->>>>> +	unsigned char buf[QCA_CRASHBYTE_PACKET_LEN];
->>>>> +
->>>>> +	bt_dev_dbg(hu->hdev, "sending soc crash buffer to controller");
->>>>> +
->>>>> +	/* We forcefully crash the controller, by sending 0xfb byte for
->>>>> +	 * 1024 times. We also might have chance of losing data, To be
->>>>> +	 * on safer side we send 1100 bytes to the SoC.
->>>>> +	 */
->>>>> +	memset(buf, QCA_MEMDUMP_BYTE, QCA_CRASHBYTE_PACKET_LEN);
->>>>> +
->>>>> +	skb = bt_skb_alloc(QCA_CRASHBYTE_PACKET_LEN, GFP_KERNEL);
->>>>> +	if (!skb) {
->>>>> +		bt_dev_err(hu->hdev, "Failed to allocate memory for skb packet");
->>>>> +		return -ENOMEM;
->>>>> +	}
->>>>> +
->>>>> +	skb_put_data(skb, buf, QCA_CRASHBYTE_PACKET_LEN);
->>>>> +	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
->>>>> +
->>>>> +	skb_queue_tail(&qca->txq, skb);
->>>>> +	hci_uart_tx_wakeup(hu);
->>>>> +
->>>>> +	return 0;
->>>>> +}
->>>>> +
->>>>> +static void qca_hw_error(struct hci_dev *hdev, u8 code)
->>>>> +{
->>>>> +	struct hci_uart *hu = hci_get_drvdata(hdev);
->>>>> +	struct qca_data *qca = hu->priv;
->>>>> +
->>>>> +	bt_dev_info(hdev, "mem_dump_status: %d", qca->memdump_state);
->>>>> +
->>>>> +	if (qca->memdump_state == QCA_MEMDUMP_IDLE) {
->>>>> +		/* If hardware error event received for other than QCA
->>>>> +		 * soc memory dump event, then we need to crash the SOC
->>>>> +		 * and wait here for 8 seconds to get the dump packets.
->>>>> +		 * This will block main thread to be on hold until we
->>>>> +		 * collect dump.
->>>>> +		 */
->>>>> +		mod_timer(&qca->memdump_timer,
->>>>> +			  (jiffies + msecs_to_jiffies(qca->memdump_delay)));
->>>> Why a timer that then ends up in interrupt context?
->>> [Bala]: some times we only receive hardware error from the chip, so we are sending an special buffer to request the
->>>       chip for memory dump. we are using an timer to check whether the data memdump is collected. if the timer
->>>       over flows we are cleaning up all the assigned memory and unblock the main thread,
->>>       in short this timer is a watch dog timer for the memory dump collection.
->> I saw that you used a bunch of timers actually. My question is why are
->> these not delayed_wq instead? I wonder if we really want to keep using
->> timers and handling interrupt context locking if we could move
->> everything to wq instead.
+>>> > This is the diff I use for debugging on top of your patchset:
+>>> >
+>>> > diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>>> > index 0b533f65f652fc..5bb9e0ca7c348b 100644
+>>> > --- a/drivers/bluetooth/btqca.c
+>>> > +++ b/drivers/bluetooth/btqca.c
+>>> > @@ -27,6 +27,8 @@
+>>> >
+>>> >  #define VERSION "0.1"
+>>> >
+>>> > +static int qca_inject_cmd_complete_event(struct hci_dev *hdev);
+>>> > +
+>>> >  int qca_read_soc_version(struct hci_dev *hdev, u32 *soc_version)
+>>> >  {
+>>> >  	struct sk_buff *skb;
+>>> > @@ -84,6 +86,11 @@ int qca_read_soc_version(struct hci_dev *hdev, u32
+>>> > *soc_version)
+>>> >  	if (*soc_version == 0)
+>>> >  		err = -EILSEQ;
+>>> >
+>>> > +	qca_inject_cmd_complete_event(hdev);
+>>> > +	printk("DBG: ZZZzzzzzzz\n");
+>>> > +	msleep(2500);
+>>> > +	printk("DBG: good morning!\n");
+>>> > +
+>>> >  out:
+>>> >  	kfree_skb(skb);
+>>> >  	if (err)
+>>> > @@ -281,7 +288,7 @@ static int qca_inject_cmd_complete_event(struct
+>>> > hci_dev *hdev)
+>>> >
+>>> >  	evt = skb_put(skb, sizeof(*evt));
+>>> >  	evt->ncmd = 1;
+>>> > -	evt->opcode = HCI_OP_NOP;
+>>> > +	evt->opcode = 0x42;
+>>> >
+>>> >  	skb_put_u8(skb, QCA_HCI_CC_SUCCESS);
+>>> >
+>>> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>> > index f12555f23a49a0..c87ac1823439ab 100644
+>>> > --- a/net/bluetooth/hci_event.c
+>>> > +++ b/net/bluetooth/hci_event.c
+>>> > @@ -3348,8 +3348,11 @@ static void hci_cmd_complete_evt(struct hci_dev
+>>> > *hdev, struct sk_buff *skb,
+>>> >  		break;
+>>> >  	}
+>>> >
+>>> > -	if (*opcode != HCI_OP_NOP)
+>>> > +	if (*opcode != HCI_OP_NOP) {
+>>> > +		printk("DBG: cancelling command timer (opcode = 0x%02x)\n",
+>>> > +		       *opcode);
+>>> >  		cancel_delayed_work(&hdev->cmd_timer);
+>>> > +	}
+>>> >
+>>> >  	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags))
+>>> >  		atomic_set(&hdev->cmd_cnt, 1);
+>>> >
+>>> >
+>>> > With that I see:
+>>> >
+>>> > [   18.725417] Bluetooth: hci0: setting up wcn3990
+>>> > [   18.860381] DBG: ZZZzzzzzzz
+>>> > [   18.863332] DBG: cancelling command timer (opcode = 0x42)
+>>> > [   21.427085] DBG: good morning!
+>>> >
+>>> >
+>>> > The timer is clearly cancelled by the injected command (opcode 0x42)
+>>> > and no timeout occurs. I wouldn't expect you to see anything vastly
+>>> > different.
+>>> >
+>>> > Cheers
+>>> >
+>>> > Matthias
+>>> [Bala]: I think it would be better if we inject a command complete event
+>>> after we
+>>>        receive the version data.  instead of injecting in between firmware
+>>> download.
+>>>        this change will be only for wcn3990.
+>> At first sight that doesn't sound like a bad idea if we want to inject
+>> a single command complete event. However the NVM download times out
+>> unless the command(s) of the TLV download is completed:
+>> [   21.789452] Bluetooth: hci0: QCA Downloading qca/crnv21.bin
+>> [   21.797675] Bluetooth: hci0: Send segment 0, size 243
+>> [   23.605597] Bluetooth: hci0: command 0xfc00 tx timeout
+>> So we should inject one command complete event after reading the SoC
+>> version and another after downloading the TLV file. An event after
+>> downloading the NVM file seems optional, since the HCI reset
+>> immediately after will cancel the timer anyway.
+>> Cheers
+>> Matthias
 > 
-> [Bala]: Let me brief you the requirement.
->       This patch is used to collect the memory dump received from the chip and store it into a file.
->       We receive chip memory dump in two cases
->        1. When chip goes into the bad state it sends the dump followed by and hardware error event.
->        2. Some time when we send some garbage or un recognized command to chip.
->           it will respond with a hardware error event. So we send an 0xfb bytes to the chip requesting it to send the memory dump.
-> 
-> In both cases, chip will go into the bad state once it sends the dump. so we need to turn OFF and ON chip and perform the init procedure.
-> So keeping the above cases in the view, we register an handle for hardware error event. So that in both the cases hw error routine will execute.
-> 
-> As the dump as some specific headers we will queue the received data into work queue.
-> We are blocking the main thread until the total dump is stored into the file.
-> Here is the answer for the question, yes we check the status of the work queue but for handling case 2 we require timers.
-> But let us assume the wq is taking more time than expected. Then we also need a timer.
-> we are using timer so that we will not block the main thread indefinitely.
-> They are some cases where when we request a memory dump, after some packet sent by the chip.
-> it may go into a bad state where it will not pump the remaining dump, so we are using a timer to unblock the main thread.
-> so during timeout, we are restarting the flags to unblock the main thread.
-> 
-> 
->>>>> +		qca_send_crashbuffer(hu);
->>>>> +
->>>>> +		while (qca->memdump_state != QCA_MEMDUMP_COLLECTED &&
->>>>> +			qca->memdump_state != QCA_MEMDUMP_TIMEOUT)
->>>>> +			;
->>>> What is this? Busy loop? I rather not do that.
->>> [Bala]: this busy required to collected the dump from the chip before we close an reopen the hci.
->>>       >> +	} else if (qca->memdump_state == QCA_MEMDUMP_COLLECTING) {
->> Why not use some wakeup handling here. I am really against any kind of
->> busy loops in a driver.
-> [Bala]: this busy loop is require. pls refer my comments to the above query.
->        this will help in mainly in case 2, where we will block the main thread until we have dump collected.
-> 
->        let us assume that we received an hardware error event, hw error routine we execute which sends an
->        special byte to the chip requesting for memory dump. it starts sending the dump, but we move forward and turn off the
->        chip so we will miss the dump. so here the busy loop is to wait until we have dump.
->        but the we are not waiting indefinitely we have timer to unblock them.
+> [Bala]: sure will inject at cc event after the version command and also after the downloading TLV.
 
-I do not see how any of this is correct. Can you not use some wakeup helper like everybody else does. I also do not see how these two threads are correctly protected. It looks really hackish to me.
+I am still not convinced that this is all needed. Can not just wake up by waiting for the correct event. On the Intel side we actually wait for the firmware download event to come in before continuing.
 
 Regards
 
