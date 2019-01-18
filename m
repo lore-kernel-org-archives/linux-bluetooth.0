@@ -2,226 +2,126 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB2DC43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 11:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65FE8C43444
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 12:08:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A26AC2087E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 11:56:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FF882133D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 12:08:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726810AbfARL4d (ORCPT
+        id S1727488AbfARMIf convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 06:56:33 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:42311 "EHLO
+        Fri, 18 Jan 2019 07:08:35 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:48449 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726593AbfARL4d (ORCPT
+        with ESMTP id S1727115AbfARMIf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 06:56:33 -0500
-Received: from localhost.localdomain (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id DF3B8CEE14;
-        Fri, 18 Jan 2019 13:04:17 +0100 (CET)
+        Fri, 18 Jan 2019 07:08:35 -0500
+Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 352A8CEE14;
+        Fri, 18 Jan 2019 13:16:20 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH 1/2] Bluetooth: check message types in l2cap_get_conf_opt
 From:   Marcel Holtmann <marcel@holtmann.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     gregkh@linuxfoundation.org
-Subject: [PATCH] Bluetooth: Check L2CAP option sizes returned from l2cap_get_conf_opt
-Date:   Fri, 18 Jan 2019 12:56:20 +0100
-Message-Id: <20190118115620.7562-1-marcel@holtmann.org>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CFEFF965-E86B-4BDF-A72F-C1EE3E1D97BF@holtmann.org>
+Date:   Fri, 18 Jan 2019 13:08:33 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <055645D1-A6AC-4ED6-8A44-37F787A9EC5A@holtmann.org>
+References: <20190110062833.GA15047@kroah.com>
+ <E3A13BCC-C138-4E76-A379-A32CBB9AFF26@holtmann.org>
+ <20190118101947.GA20179@kroah.com>
+ <CFEFF965-E86B-4BDF-A72F-C1EE3E1D97BF@holtmann.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When doing option parsing for standard type values of 1, 2 or 4 octets,
-the value is converted directly into a variable instead of a pointer. To
-avoid being tricked into being a pointer, check that for these option
-types that sizes actually match. In L2CAP every option is fixed size and
-thus it is prudent anyway to ensure that the remote side sends us the
-right option size along with option paramters.
+Hi Greg,
 
-If the option size is not matching the option type, then that option is
-silently ignored. It is a protocol violation and instead of trying to
-give the remote attacker any further hints just pretend that option is
-not present and proceed with the default values. Implementation
-following the specification and its qualification procedures will always
-use the correct size and thus not being impacted here.
+>>>> l2cap_get_conf_opt can handle a "default" message type, but it needs to
+>>>> be verified that it really is the correct type (CONF_EFS or CONF_RFC)
+>>>> before passing it back to the caller.  To do this we need to check the
+>>>> return value of this call now and handle the error correctly up the
+>>>> stack.
+>>>> 
+>>>> Based on a patch from Ran Menscher.
+>>>> 
+>>>> Reported-by: Ran Menscher <ran.menscher@karambasecurity.com>
+>>>> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>>>> ---
+>>>> net/bluetooth/l2cap_core.c | 25 +++++++++++++++++++------
+>>>> 1 file changed, 19 insertions(+), 6 deletions(-)
+>>>> 
+>>>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>>>> index 2a7fb517d460..93daf94565cf 100644
+>>>> --- a/net/bluetooth/l2cap_core.c
+>>>> +++ b/net/bluetooth/l2cap_core.c
+>>>> @@ -2980,6 +2980,10 @@ static inline int l2cap_get_conf_opt(void **ptr, int *type, int *olen,
+>>>> 		break;
+>>>> 
+>>>> 	default:
+>>>> +		/* Only CONF_EFS and CONF_RFC are allowed here */
+>>>> +		if ((opt->type != L2CAP_CONF_EFS) &&
+>>>> +		    (opt->type != L2CAP_CONF_RFC))
+>>>> +			return -EPROTO;
+>>> 
+>>> after re-reading that specification, this also includes CONF_QOS since that is a multi-field variable as well. Even if we currently don’t act on that field, we need to accept it being send.
+>> 
+>> /me hands you some \n characters...
+>> 
+>> Ok, will fix up.
+>> 
+>>>> 		*val = (unsigned long) opt->val;
+>>>> 		break;
+>>>> 	}
+>>>> @@ -3324,7 +3328,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+>>>> 	void *endptr = data + data_size;
+>>>> 	void *req = chan->conf_req;
+>>>> 	int len = chan->conf_len;
+>>>> -	int type, hint, olen;
+>>>> +	int type, hint, olen, err;
+>>>> 	unsigned long val;
+>>>> 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
+>>>> 	struct l2cap_conf_efs efs;
+>>>> @@ -3336,7 +3340,10 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+>>>> 	BT_DBG("chan %p", chan);
+>>>> 
+>>>> 	while (len >= L2CAP_CONF_OPT_SIZE) {
+>>>> -		len -= l2cap_get_conf_opt(&req, &type, &olen, &val);
+>>>> +		err = l2cap_get_conf_opt(&req, &type, &olen, &val);
+>>>> +		if (err < 0)
+>>>> +			return err;
+>>>> +		len -= err;
+>>> 
+>>> We need to handle not yet known options correctly since otherwise we are breaking forwards compatibility if newer specifications introduce new parameters. So just returning with an error here is not acceptable. It will fail qualification test cases.
+>> 
+>> So what should we do here?  We can't keep going as the size is
+>> incorrect.
+>> 
+>>> Don’t we rather have proper length checks in l2cap_parse_conf_{req,rsp} instead of doing this. I think your second patch is enough.
+>> 
+>> It is?  Ok, if that's all that is needed, that's fine with me.  I was
+>> just taking the patch from the original submitter, I don't understand
+>> the bluetooth protocol at all :)
+> 
+> I need to get my brain back into the nasty details of that protocol. I know for sure that just aborting is violating the handling of unknown options and that will fail qualification.
+> 
+> Let me look at how they managed to trick us.
 
-To keep the code readable and consistent accross all options, a few
-cosmetic changes were also required.
+actually this one was easy to understand. Just fixing was overly complicated by focusing on the default case and then punching in exceptions.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/l2cap_core.c | 77 +++++++++++++++++++++++---------------
- 1 file changed, 46 insertions(+), 31 deletions(-)
+Since all option types are fixed size, I now added length checks to these. Patch has been posted.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2a7fb517d460..77799e7d5a34 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -3343,10 +3343,14 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 
- 		switch (type) {
- 		case L2CAP_CONF_MTU:
-+			if (olen != 2)
-+				break;
- 			mtu = val;
- 			break;
- 
- 		case L2CAP_CONF_FLUSH_TO:
-+			if (olen != 2)
-+				break;
- 			chan->flush_to = val;
- 			break;
- 
-@@ -3354,26 +3358,30 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 			break;
- 
- 		case L2CAP_CONF_RFC:
--			if (olen == sizeof(rfc))
--				memcpy(&rfc, (void *) val, olen);
-+			if (olen != sizeof(rfc))
-+				break;
-+			memcpy(&rfc, (void *) val, olen);
- 			break;
- 
- 		case L2CAP_CONF_FCS:
-+			if (olen != 1)
-+				break;
- 			if (val == L2CAP_FCS_NONE)
- 				set_bit(CONF_RECV_NO_FCS, &chan->conf_state);
- 			break;
- 
- 		case L2CAP_CONF_EFS:
--			if (olen == sizeof(efs)) {
--				remote_efs = 1;
--				memcpy(&efs, (void *) val, olen);
--			}
-+			if (olen != sizeof(efs))
-+				break;
-+			remote_efs = 1;
-+			memcpy(&efs, (void *) val, olen);
- 			break;
- 
- 		case L2CAP_CONF_EWS:
-+			if (olen != 2)
-+				break;
- 			if (!(chan->conn->local_fixed_chan & L2CAP_FC_A2MP))
- 				return -ECONNREFUSED;
--
- 			set_bit(FLAG_EXT_CTRL, &chan->flags);
- 			set_bit(CONF_EWS_RECV, &chan->conf_state);
- 			chan->tx_win_max = L2CAP_DEFAULT_EXT_WINDOW;
-@@ -3383,7 +3391,6 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
- 		default:
- 			if (hint)
- 				break;
--
- 			result = L2CAP_CONF_UNKNOWN;
- 			*((u8 *) ptr++) = type;
- 			break;
-@@ -3551,55 +3558,60 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
- 
- 		switch (type) {
- 		case L2CAP_CONF_MTU:
-+			if (olen != 2)
-+				break;
- 			if (val < L2CAP_DEFAULT_MIN_MTU) {
- 				*result = L2CAP_CONF_UNACCEPT;
- 				chan->imtu = L2CAP_DEFAULT_MIN_MTU;
- 			} else
- 				chan->imtu = val;
--			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, chan->imtu, endptr - ptr);
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_MTU, 2, chan->imtu,
-+					   endptr - ptr);
- 			break;
- 
- 		case L2CAP_CONF_FLUSH_TO:
-+			if (olen != 2)
-+				break;
- 			chan->flush_to = val;
--			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FLUSH_TO,
--					   2, chan->flush_to, endptr - ptr);
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_FLUSH_TO, 2,
-+					   chan->flush_to, endptr - ptr);
- 			break;
- 
- 		case L2CAP_CONF_RFC:
--			if (olen == sizeof(rfc))
--				memcpy(&rfc, (void *)val, olen);
--
-+			if (olen != sizeof(rfc))
-+				break;
-+			memcpy(&rfc, (void *)val, olen);
- 			if (test_bit(CONF_STATE2_DEVICE, &chan->conf_state) &&
- 			    rfc.mode != chan->mode)
- 				return -ECONNREFUSED;
--
- 			chan->fcs = 0;
--
--			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC,
--					   sizeof(rfc), (unsigned long) &rfc, endptr - ptr);
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_RFC, sizeof(rfc),
-+					   (unsigned long) &rfc, endptr - ptr);
- 			break;
- 
- 		case L2CAP_CONF_EWS:
-+			if (olen != 2)
-+				break;
- 			chan->ack_win = min_t(u16, val, chan->ack_win);
- 			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EWS, 2,
- 					   chan->tx_win, endptr - ptr);
- 			break;
- 
- 		case L2CAP_CONF_EFS:
--			if (olen == sizeof(efs)) {
--				memcpy(&efs, (void *)val, olen);
--
--				if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
--				    efs.stype != L2CAP_SERV_NOTRAFIC &&
--				    efs.stype != chan->local_stype)
--					return -ECONNREFUSED;
--
--				l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS, sizeof(efs),
--						   (unsigned long) &efs, endptr - ptr);
--			}
-+			if (olen != sizeof(efs))
-+				break;
-+			memcpy(&efs, (void *)val, olen);
-+			if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
-+			    efs.stype != L2CAP_SERV_NOTRAFIC &&
-+			    efs.stype != chan->local_stype)
-+				return -ECONNREFUSED;
-+			l2cap_add_conf_opt(&ptr, L2CAP_CONF_EFS, sizeof(efs),
-+					   (unsigned long) &efs, endptr - ptr);
- 			break;
- 
- 		case L2CAP_CONF_FCS:
-+			if (olen != 1)
-+				break;
- 			if (*result == L2CAP_CONF_PENDING)
- 				if (val == L2CAP_FCS_NONE)
- 					set_bit(CONF_RECV_NO_FCS,
-@@ -3731,10 +3743,13 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
- 
- 		switch (type) {
- 		case L2CAP_CONF_RFC:
--			if (olen == sizeof(rfc))
--				memcpy(&rfc, (void *)val, olen);
-+			if (olen != sizeof(rfc))
-+				break;
-+			memcpy(&rfc, (void *)val, olen);
- 			break;
- 		case L2CAP_CONF_EWS:
-+			if (olen != 2)
-+				break;
- 			txwin_ext = val;
- 			break;
- 		}
--- 
-2.20.1
+Regards
+
+Marcel
 
