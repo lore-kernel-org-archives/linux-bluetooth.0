@@ -2,108 +2,107 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A84FC43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 10:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D1E4C43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 10:49:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C56320823
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 10:21:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1547806890;
-	bh=5jhxpjRb0OpBqQv0JLCh4dbunGip/g1WdfQmydA+Pe4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=MU/JDvzaMgU5+m6CKN9ptnioM9ZKh+h2xMH96WCceeF/PaZeWwkAv1U41h60LH1NP
-	 5JnJLuh7GqUoSAxv9tbydjUmF+cCaxj8McQ0FzTqeNU24g+YWj+C9uYOfe+JWReKbU
-	 wuuR2O9fkrl6dVu/8tRHsx8Hrbc9Th4yUQQAkKOQ=
+	by mail.kernel.org (Postfix) with ESMTP id 2EDDE204EC
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 10:49:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726448AbfARKV1 (ORCPT
+        id S1726873AbfARKtJ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 05:21:27 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49872 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726031AbfARKV1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 05:21:27 -0500
-Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0DB8220823;
-        Fri, 18 Jan 2019 10:21:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1547806886;
-        bh=5jhxpjRb0OpBqQv0JLCh4dbunGip/g1WdfQmydA+Pe4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=vwzOWF6JoX8vNQr532Py9nAzRTHHMadOvRHNp7Gl/K7KT5K1UxRUK1rBKcslF7yPO
-         RwhBlu/7K/Sy9r8fAf/KZDwACuF+m9ASnLcUJfHu4o6/mzXEt01s+i+o2ltFEdSwqk
-         YbvELA4VWIEbO0W0XcJubO2l3HH76cv53tU1B9yE=
-Date:   Fri, 18 Jan 2019 11:21:23 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
+        Fri, 18 Jan 2019 05:49:09 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:49007 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726416AbfARKtJ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 18 Jan 2019 05:49:09 -0500
+Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1BD80CEE14;
+        Fri, 18 Jan 2019 11:56:54 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH v2] Bluetooth: Fix locking in bt_accept_enqueue() for BH
+ context
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190103001120.177784-1-mka@chromium.org>
+Date:   Fri, 18 Jan 2019 11:49:07 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Ran Menscher <ran.menscher@karambasecurity.com>
-Subject: Re: [PATCH 2/2] Bluetooth: check the buffer size for some messages
- before parsing
-Message-ID: <20190118102123.GB20179@kroah.com>
-References: <20190110062833.GA15047@kroah.com>
- <20190110062917.GB15047@kroah.com>
- <39E6B251-4ED3-4C0F-B8A2-0FAAF6E905A6@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <39E6B251-4ED3-4C0F-B8A2-0FAAF6E905A6@holtmann.org>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+        "David S. Miller" <davem@davemloft.net>,
+        Dean Jenkins <Dean_Jenkins@mentor.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        Konstantin Khlebnikov <khlebnikov@yandex-team.ru>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Dmitry Grinberg <dmitrygr@google.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <49E47F95-44F6-4A1E-8595-924EE40AF1A8@holtmann.org>
+References: <20190103001120.177784-1-mka@chromium.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 10:37:25AM +0100, Marcel Holtmann wrote:
-> Hi Greg,
+Hi Matthias,
+
+> With commit e16337622016 ("Bluetooth: Handle bt_accept_enqueue() socket
+> atomically") lock_sock[_nested]() is used to acquire the socket lock
+> before manipulating the socket. lock_sock[_nested]() may block, which
+> is problematic since bt_accept_enqueue() can be called in bottom half
+> context (e.g. from rfcomm_connect_ind()):
 > 
-> > The L2CAP_CONF_EFS and L2CAP_CONF_RFC messages can be sent from
-> > userspace so their structure sizes need to be checked before parsing
-> > them.
+> [<ffffff80080d81ec>] __might_sleep+0x4c/0x80
+> [<ffffff800876c7b0>] lock_sock_nested+0x24/0x58
+> [<ffffff8000d7c27c>] bt_accept_enqueue+0x48/0xd4 [bluetooth]
+> [<ffffff8000e67d8c>] rfcomm_connect_ind+0x190/0x218 [rfcomm]
 > 
-> this message is confusing me. How can these be send from userspace?
-
-So claimed the original reporter.  You have the information in your
-inbox, is it incorrect?
-
-> > 
-> > Based on a patch from Ran Menscher.
-> > 
-> > Reported-by: Ran Menscher <ran.menscher@karambasecurity.com>
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > ---
-> > net/bluetooth/l2cap_core.c | 12 ++++++++----
-> > 1 file changed, 8 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index 93daf94565cf..55e48e6efc2b 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -3361,7 +3361,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
-> > 			break;
-> > 
-> > 		case L2CAP_CONF_RFC:
-> > -			if (olen == sizeof(rfc))
-> > +			if ((olen == sizeof(rfc)) &&
-> > +			    (endptr - ptr >= L2CAP_CONF_OPT_SIZE + sizeof(rfc)))
-> > 				memcpy(&rfc, (void *) val, olen);
+> Add a parameter to bt_accept_enqueue() to indicate whether the
+> function is called from BH context, and acquire the socket lock
+> with bh_lock_sock_nested() if that's the case.
 > 
-> We don’t do ((x == y) && (..)) actually. Using (x == y && ..) is plenty.
+> Also adapt all callers of bt_accept_enqueue() to pass the new
+> parameter:
+> 
+> - l2cap_sock_new_connection_cb()
+>  - uses lock_sock() to lock the parent socket => process context
+> 
+> - rfcomm_connect_ind()
+>  - acquires the parent socket lock with bh_lock_sock() => BH
+>    context
+> 
+> - __sco_chan_add()
+>  - called from sco_chan_add(), which is called from sco_connect().
+>    parent is NULL, hence bt_accept_enqueue() isn't called in this
+>    code path and we can ignore it
+>  - also called from sco_conn_ready(). uses bh_lock_sock() to acquire
+>    the parent lock => BH context
+> 
+> Fixes: e16337622016 ("Bluetooth: Handle bt_accept_enqueue() socket atomically")
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+> Changes in v2:
+> - use parameter in bt_accept_enqueue() to decide which lock to
+>  acquire and adapt all callers
+> - updated commit message
+> ---
+> include/net/bluetooth/bluetooth.h |  2 +-
+> net/bluetooth/af_bluetooth.c      | 16 +++++++++++++---
+> net/bluetooth/l2cap_sock.c        |  2 +-
+> net/bluetooth/rfcomm/sock.c       |  2 +-
+> net/bluetooth/sco.c               |  2 +-
+> 5 files changed, 17 insertions(+), 7 deletions(-)
 
-Ick, ok, whatever, you all trust that your brains can remember C
-priority levels, me, I trust ()...
+patch has been applied to bluetooth-next tree.
 
-I can fix this up to remove the extra (), but I would like _SOMEONE_ to
-at least validate that this resolves the reported issues...
+Regards
 
-thanks,
+Marcel
 
-greg k-h
