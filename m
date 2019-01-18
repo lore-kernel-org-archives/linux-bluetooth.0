@@ -2,104 +2,132 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B401AC43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:44:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA7DBC43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 10:19:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84B9D2086D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:44:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A96B20823
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 10:19:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1547804664;
-	bh=plVoBg5/nSGmBbaNdNHKt9EilBsqNWFEdPAHVHIN6mM=;
+	s=default; t=1547806794;
+	bh=1K2oPG0BNUyuwiLD3OSyY20dNzbqxmELiFdn8hmkQUc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=0rgJ/Yizq5lLWp29CW2sintL8g3YoX3P0mucZh3Z4jnUfpjAaEjYYcBs8qvhbpg1C
-	 nlzgpkARL7LXywBBQeK+GNWalMT0/+sOjC9JlBTvmqeRPBUp+u35QuXqT6IuOhu7ey
-	 GhU99Rt0zhFLhgL8Zzshy/mje35xFqoub6/kq7oM=
+	b=F711FR0J2fAgAMyKmxjs5vlQtjQWDfVTwniChJYVprV9uKvPOJY7Ze0etFRd3FYV1
+	 InxkQXnm1QiTDJTtBBGR6a02XmmyX9QtTc5Gy+ba7Nny64+SW8mIWp1Ztxyypw0bb1
+	 nIF52aymL/SeaaZswMaJQ9scRocAWcuSPc0779/o=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726741AbfARJoT (ORCPT
+        id S1726302AbfARKTv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 04:44:19 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:45628 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726288AbfARJoT (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 04:44:19 -0500
-Received: by mail-lf1-f66.google.com with SMTP id b20so9986402lfa.12;
-        Fri, 18 Jan 2019 01:44:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=DbNcV5FxgSD+yvWgMWS7YwD0GBsATUSU5Aw9ZdWgggE=;
-        b=hdItBB9+EfQ5NEnXuztEWnUwENTHXYats8ctgH3RtU6X2uguFpOLTvnNiut38tko9e
-         5BdYsXoEMSUM5WsIp38nUOQeGR8/Khnl0ItijExfeyFK6snvWAxXlrZJQn2McdDAqgGF
-         e07WtRwxB3H7X1ozCtQwETMGwRPubRoJfMN0C8dtLFxqJzdJeXJ8EAhj70zV+9BYUvDM
-         SAmMSgNJZJtfuzYvMpWBMOybCYQQ1UFCjA/ueFZNx/xlTHybV3F6aS2DLwOCt5zUlIIv
-         2m+CdCRfDb/CS00g/t619caRUhuNglbTpa4fCAD3yp5JK5R5fqLJvkwQSnbazP6gxthV
-         1Cew==
-X-Gm-Message-State: AJcUukf1+LY7q4baubxugcPM5/eD75Ai5MgsNCN9A86WqjOdpz2g4LRO
-        BY2KMGs3SpIFvMAuCPvJRuU=
-X-Google-Smtp-Source: ALg8bN6u0hKWS5qNTcg1WWHpL34BIDtX0OHA1pfnwfN6P2Zw7cV1ZyzGs6KvBh3H4NBpahDoumsTyQ==
-X-Received: by 2002:a19:5059:: with SMTP id z25mr7866757lfj.120.1547804656864;
-        Fri, 18 Jan 2019 01:44:16 -0800 (PST)
-Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id i75sm723308lfb.58.2019.01.18.01.44.15
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 01:44:15 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.91)
-        (envelope-from <johan@kernel.org>)
-        id 1gkQhE-0000ui-SJ; Fri, 18 Jan 2019 10:44:16 +0100
-Date:   Fri, 18 Jan 2019 10:44:16 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Johan Hovold <johan@kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        Johan Hovold <jhovold@gmail.com>
-Subject: Re: [PATCH v5 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate
- change command
-Message-ID: <20190118094416.GB3691@localhost>
-References: <b5160d8862b49f0369fa58610516d354@codeaurora.org>
- <20190110143928.GE3430@localhost>
- <61301df80bd6a8ee0265b31b7f6a3aa1@codeaurora.org>
- <20190111013707.GD261387@google.com>
- <194b5d18ea86830b6a24939d483a964c@codeaurora.org>
- <20190111235633.GK261387@google.com>
- <a6e083d245baebc019b6e7163fd6f133@codeaurora.org>
- <20190115234628.GQ261387@google.com>
- <20190117160944.GV3691@localhost>
- <20190117172109.GU261387@google.com>
+        Fri, 18 Jan 2019 05:19:51 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48346 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726120AbfARKTv (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 18 Jan 2019 05:19:51 -0500
+Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9985B20823;
+        Fri, 18 Jan 2019 10:19:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1547806790;
+        bh=1K2oPG0BNUyuwiLD3OSyY20dNzbqxmELiFdn8hmkQUc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=A7fR34IagHLYTk9rGIQoyjfz2+RhjMbZ4KW5LTbD4M5yfJctoZsIuwNmBuzkwgX3u
+         V7E84KV7qDdKGoJ+Q10w47NPc4/GcY4WKJG+w7QrXDpMH9vHxXRt0EnJv1UuoIJEds
+         6WjOQItyi+HIzUKxDZjmuTUVNHnUraq+B3MIjg3s=
+Date:   Fri, 18 Jan 2019 11:19:47 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: check message types in l2cap_get_conf_opt
+Message-ID: <20190118101947.GA20179@kroah.com>
+References: <20190110062833.GA15047@kroah.com>
+ <E3A13BCC-C138-4E76-A379-A32CBB9AFF26@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190117172109.GU261387@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <E3A13BCC-C138-4E76-A379-A32CBB9AFF26@holtmann.org>
 User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jan 17, 2019 at 09:21:09AM -0800, Matthias Kaehlcke wrote:
+On Fri, Jan 18, 2019 at 10:35:30AM +0100, Marcel Holtmann wrote:
+> Hi Greg,
+> 
+> > l2cap_get_conf_opt can handle a "default" message type, but it needs to
+> > be verified that it really is the correct type (CONF_EFS or CONF_RFC)
+> > before passing it back to the caller.  To do this we need to check the
+> > return value of this call now and handle the error correctly up the
+> > stack.
+> > 
+> > Based on a patch from Ran Menscher.
+> > 
+> > Reported-by: Ran Menscher <ran.menscher@karambasecurity.com>
+> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > ---
+> > net/bluetooth/l2cap_core.c | 25 +++++++++++++++++++------
+> > 1 file changed, 19 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index 2a7fb517d460..93daf94565cf 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -2980,6 +2980,10 @@ static inline int l2cap_get_conf_opt(void **ptr, int *type, int *olen,
+> > 		break;
+> > 
+> > 	default:
+> > +		/* Only CONF_EFS and CONF_RFC are allowed here */
+> > +		if ((opt->type != L2CAP_CONF_EFS) &&
+> > +		    (opt->type != L2CAP_CONF_RFC))
+> > +			return -EPROTO;
+> 
+> after re-reading that specification, this also includes CONF_QOS since that is a multi-field variable as well. Even if we currently don’t act on that field, we need to accept it being send.
 
-> I observed that the qcom_geni_serial driver doesn't raise RTS with
-> flow control disabled. It seems we have to investigate why that's the
-> case. I agree that the driver should be platform agnostic.
+/me hands you some \n characters...
 
-Sounds like a driver bug, unless the hardware is just "odd". The
-driver implementation of this looks very non-standard judging from a
-quick peek.
+Ok, will fix up.
 
-In fact, qcom_geni_serial_get_mctrl() is currently a no-op if hardware
-flow control is not enabled:
+> > 		*val = (unsigned long) opt->val;
+> > 		break;
+> > 	}
+> > @@ -3324,7 +3328,7 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+> > 	void *endptr = data + data_size;
+> > 	void *req = chan->conf_req;
+> > 	int len = chan->conf_len;
+> > -	int type, hint, olen;
+> > +	int type, hint, olen, err;
+> > 	unsigned long val;
+> > 	struct l2cap_conf_rfc rfc = { .mode = L2CAP_MODE_BASIC };
+> > 	struct l2cap_conf_efs efs;
+> > @@ -3336,7 +3340,10 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
+> > 	BT_DBG("chan %p", chan);
+> > 
+> > 	while (len >= L2CAP_CONF_OPT_SIZE) {
+> > -		len -= l2cap_get_conf_opt(&req, &type, &olen, &val);
+> > +		err = l2cap_get_conf_opt(&req, &type, &olen, &val);
+> > +		if (err < 0)
+> > +			return err;
+> > +		len -= err;
+> 
+> We need to handle not yet known options correctly since otherwise we are breaking forwards compatibility if newer specifications introduce new parameters. So just returning with an error here is not acceptable. It will fail qualification test cases.
 
-	if (uart_console(uport) || !uart_cts_enabled(uport))
-		return;
+So what should we do here?  We can't keep going as the size is
+incorrect.
 
-Perhaps dropping the !uart_cts_enabled() test is sufficient.
+> Don’t we rather have proper length checks in l2cap_parse_conf_{req,rsp} instead of doing this. I think your second patch is enough.
 
-Johan
+It is?  Ok, if that's all that is needed, that's fine with me.  I was
+just taking the patch from the original submitter, I don't understand
+the bluetooth protocol at all :)
+
+thanks,
+
+greg k-h
