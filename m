@@ -5,57 +5,57 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6674FC43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A12C43612
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3606120896
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6752F2086D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A5QwWQtk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8VQohhR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728321AbfARRCt (ORCPT
+        id S1728345AbfARRCx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 12:02:49 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:40377 "EHLO
+        Fri, 18 Jan 2019 12:02:53 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:44918 "EHLO
         mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727491AbfARRCs (ORCPT
+        with ESMTP id S1728305AbfARRCt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 12:02:48 -0500
-Received: by mail-pg1-f193.google.com with SMTP id z10so6330843pgp.7;
-        Fri, 18 Jan 2019 09:02:47 -0800 (PST)
+        Fri, 18 Jan 2019 12:02:49 -0500
+Received: by mail-pg1-f193.google.com with SMTP id t13so6318151pgr.11;
+        Fri, 18 Jan 2019 09:02:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=d2rQCukECTJQilTnrmqyIouQcxujlVs0VqTurP7Vfgw=;
-        b=A5QwWQtkeb+gp7/yUDs3PgOjwdsSvVocZkMnIO6pMCwJ5rIogQA2WynHjNSJybVTpv
-         fGaNbgySGaTW9HkRagV5mvKiUc/us/gswoj0v3zFk4ck/dfgA+gPKH9HR8oPewgohIVw
-         sXhMOVgKNLmNLYBd5aoC1exj1/60VA0sVzRrgBeKi3I9mJZyar7u1PxiRrNF38BB5aXz
-         s9H250UhEBbnO7vq5O/91k5wbMwYdp836OntanmubH3y8xaQ9z1+qRdIPG6TwK2SD3m8
-         bxoVb8Ssqt8IlA8NBxcI2C6bP2kC167TgSk6tbvYj65dFeH1pK0nLPXtp/DFFVDI4h+7
-         ppRg==
+        bh=4xR1KYQugEMkmMq57G98vJgznMGv5+b9o//ihdpDFFk=;
+        b=W8VQohhRHylK8qIeIMPsCgeUBkdi246JIFWArzeRK06r73GzduMz7oIZ78WICDUblz
+         e45HrHe+vYK3sW75OWoVPmedz3/n6+Vpn8v4nZqU/sFVuI9JL55JT8KKHjzFcrV7blzz
+         YmbjdI80sMz7GdsWqSWFtE+FtZvRuFkoXVJQuWqsdq21KX7zRMEi0Jlkdfi5KSbiAdZ5
+         nhSrAzga7K/HUkudnngpKnnNIBDANg9hpGGlO/r1GVzvFyG22T0RcaEjjwgr3xLrU9U0
+         J8YwgwoqIc8UnCSrfo86OKT6jg1XujU6BZrDQxu3AbIVQ4yw2KHUcRqOokW3vlXJfwnJ
+         LJxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=d2rQCukECTJQilTnrmqyIouQcxujlVs0VqTurP7Vfgw=;
-        b=ES5N9M8TQc6vIJDGHtNeW/tGtriq42lDWgOB7LzkSzGrdyatDhUu84FEw0SpnF8mUc
-         gTvefKSV6eHtYIx6+Of+0/barQa5FREOVzjQ6U+yqU79/86H2MpK8mdbBKvVWHd31yRO
-         JHgA+vG2BFQmh0pN9tp14Gmht4GpPgkSeKANzUCfBT7arGrjeWvyy1Ijh60vntS+Knvd
-         FuWsfMdLmcHlMgeJBwPL0mqIBxu2jPs8vE90QyD+3nFpx3OP2jqgydjxolCFpt1mdAwp
-         Nj3iz0WuL4Mft2d7ksL9wfunA0G6p4/iOpwB3NcoIlz5e0m2H0y12oe5P1Gu3xjInm/u
-         cv5A==
-X-Gm-Message-State: AJcUukdzgYHFADSDktgXftnz28rPDpvqZxgf1exSFYJl5ee8D9d/Osfa
-        q1e/BZoCBv0sE8ERBaQTmrQ=
-X-Google-Smtp-Source: ALg8bN6nIPP2MNX0kxfvTje18iThnYwjws4PFr2ea4/zP2x8dsfJDv2hBo/BuhJSO8QS/crgw7j5kg==
-X-Received: by 2002:a62:1212:: with SMTP id a18mr20702116pfj.217.1547830967166;
-        Fri, 18 Jan 2019 09:02:47 -0800 (PST)
+        bh=4xR1KYQugEMkmMq57G98vJgznMGv5+b9o//ihdpDFFk=;
+        b=CsUef19+jotDCYBSYZLH5SAOYw1ICYTwy5Hnq+IYyfjxSeDxCmDXOoCQ2D3ahLx+ze
+         5updL6g2XtArW6WSI+GC7TgGGnQw+PB8gtH7R076vM+7qVFQnkDWik+cAEb6U71xZvPZ
+         qgVGGrR+R2J0yLcHJwBAq9/YNoU4mQ2z9DE1FqdBPCDztx+tbC9E4uurtaX06+ZD3z+Q
+         febM4X6SDvZNomlPKk0fxS+0yugmtHNzY/904RvwahAWBbYVjoeXCDI9f1B2K7j5v/xP
+         EAsQyu+/3pbTL/fXUpVknj586xyJiZCiUm9NanRL3hTe5RSRE3klGe8PfV9srYyfJYE4
+         dQlg==
+X-Gm-Message-State: AJcUukfx8S2UIZAKdKoIhMeboQRhuwoxYmve9QoLzlE0kUNr4zA9TN+x
+        5BtfrLNvZga0NmFcUyvxoDs=
+X-Google-Smtp-Source: ALg8bN7eKG9Zfd/C08iT/TSsDGBMH2LRelSemvSqKMOphpjky6CTf4WpERgIJdacBkOyODA2ZJbrBQ==
+X-Received: by 2002:a62:3888:: with SMTP id f130mr19784070pfa.132.1547830968387;
+        Fri, 18 Jan 2019 09:02:48 -0800 (PST)
 Received: from anarsoul-thinkpad.lan (216-71-193-140.dyn.novuscom.net. [216.71.193.140])
-        by smtp.gmail.com with ESMTPSA id b4sm5672222pgq.65.2019.01.18.09.02.46
+        by smtp.gmail.com with ESMTPSA id b4sm5672222pgq.65.2019.01.18.09.02.47
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 09:02:46 -0800 (PST)
+        Fri, 18 Jan 2019 09:02:47 -0800 (PST)
 From:   Vasily Khoruzhick <anarsoul@gmail.com>
 To:     "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
@@ -67,9 +67,9 @@ To:     "David S. Miller" <davem@davemloft.net>,
         Vasily Khoruzhick <anarsoul@gmail.com>, netdev@vger.kernel.org,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/8] dt-bindings: net: bluetooth: Add rtl8723bs-bluetooth
-Date:   Fri, 18 Jan 2019 09:02:27 -0800
-Message-Id: <20190118170232.16142-4-anarsoul@gmail.com>
+Subject: [PATCH 4/8] Bluetooth: hci_h5: Add support for binding RTL8723BS with device tree
+Date:   Fri, 18 Jan 2019 09:02:28 -0800
+Message-Id: <20190118170232.16142-5-anarsoul@gmail.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190118170232.16142-1-anarsoul@gmail.com>
 References: <20190118170232.16142-1-anarsoul@gmail.com>
@@ -80,55 +80,65 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add binding document for bluetooth part of RTL8723BS/RTL8723CS
+RTL8723BS is often used in ARM boards, so add ability to bind it
+using device tree.
 
 Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
 ---
- .../bindings/net/rtl8723bs-bluetooth.txt      | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
+ drivers/bluetooth/hci_h5.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt b/Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
-new file mode 100644
-index 000000000000..8357f242ae4c
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
-@@ -0,0 +1,35 @@
-+RTL8723BS/RTL8723CS Bluetooth
-+---------------------
-+
-+RTL8723CS/RTL8723CS is WiFi + BT chip. WiFi part is connected over SDIO, while
-+BT is connected over serial. It speaks H5 protocol with few extra commands
-+to upload firmware and change module speed.
-+
-+Required properties:
-+
-+ - compatible: should be one of the following:
-+   * "realtek,rtl8723bs-bt"
-+   * "realtek,rtl8723cs-bt"
-+Optional properties:
-+
-+ - device-wake-gpios: GPIO specifier, used to wakeup the BT module (active high)
-+ - enable-gpios: GPIO specifier, used to enable the BT module (active high)
-+ - host-wake-gpios: GPIO specifier, used to wakeup the host processor (active high)
-+ - firmware-postfix: firmware postfix to be used for firmware config
-+ - reset-gpios: GPIO specifier, used to reset the BT module (active high)
-+
-+Example:
-+
-+&uart1 {
-+       pinctrl-names = "default";
-+       pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
-+       status = "okay";
-+
-+       bluetooth {
-+               compatible = "realtek,rtl8723bs-bt";
-+               reset-gpios = <&r_pio 0 4 GPIO_ACTIVE_LOW>; /* PL4 */
-+               device-wake-gpios = <&r_pio 0 5 GPIO_ACTIVE_HIGH>; /* PL5 */
-+               host-wakeup-gpios = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
-+               firmware-postfix="pine64";
-+       };
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 7ead8c3d8657..44f848c02c63 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -26,6 +26,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/kernel.h>
+ #include <linux/mod_devicetable.h>
++#include <linux/of_device.h>
+ #include <linux/serdev.h>
+ #include <linux/skbuff.h>
+ 
+@@ -823,6 +824,11 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+ 		if (h5->vnd->acpi_gpio_map)
+ 			devm_acpi_dev_add_driver_gpios(dev,
+ 						       h5->vnd->acpi_gpio_map);
++	} else {
++		h5->vnd = (const struct h5_vnd *)
++				of_device_get_match_data(&serdev->dev);
++		of_property_read_string(serdev->dev.of_node,
++					"firmware-postfix", &h5->id);
+ 	}
+ 
+ 	h5->enable_gpio = devm_gpiod_get_optional(dev, "enable", GPIOD_OUT_LOW);
+@@ -1024,12 +1030,26 @@ static const struct dev_pm_ops h5_serdev_pm_ops = {
+ 	SET_SYSTEM_SLEEP_PM_OPS(h5_serdev_suspend, h5_serdev_resume)
+ };
+ 
++static struct h5_vnd rtl8723_of_vnd = {
++	.setup		= h5_btrtl_setup,
++	.open		= h5_btrtl_open,
++	.close		= h5_btrtl_close,
 +};
++
++static const struct of_device_id h5_of_match[] = {
++	{ .compatible = "realtek,rtl8723bs-bt", .data = &rtl8723_of_vnd },
++	{ .compatible = "realtek,rtl8723cs-bt", .data = &rtl8723_of_vnd },
++	{ /* sentinel */ },
++};
++MODULE_DEVICE_TABLE(of, h5_of_match);
++
+ static struct serdev_device_driver h5_serdev_driver = {
+ 	.probe = h5_serdev_probe,
+ 	.remove = h5_serdev_remove,
+ 	.driver = {
+ 		.name = "hci_uart_h5",
+ 		.acpi_match_table = ACPI_PTR(h5_acpi_match),
++		.of_match_table = of_match_ptr(h5_of_match),
+ 		.pm = &h5_serdev_pm_ops,
+ 	},
+ };
 -- 
 2.20.1
 
