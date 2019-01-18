@@ -2,113 +2,69 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C498C43444
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7079EC43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:40:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F28562086D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:37:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4976920823
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:40:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726593AbfARJh2 convert rfc822-to-8bit (ORCPT
+        id S1725982AbfARJkA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 04:37:28 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:43151 "EHLO
+        Fri, 18 Jan 2019 04:40:00 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:52308 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725856AbfARJh1 (ORCPT
+        with ESMTP id S1725856AbfARJkA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 04:37:27 -0500
+        Fri, 18 Jan 2019 04:40:00 -0500
 Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 732B2CF2C3;
-        Fri, 18 Jan 2019 10:45:12 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id BDCDBCF2C3;
+        Fri, 18 Jan 2019 10:47:45 +0100 (CET)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 2/2] Bluetooth: check the buffer size for some messages
- before parsing
+Subject: Re: [PATCH] bluetooth: btmrvl_sdio: add support for sd8977 chipset
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190110062917.GB15047@kroah.com>
-Date:   Fri, 18 Jan 2019 10:37:25 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Ran Menscher <ran.menscher@karambasecurity.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <39E6B251-4ED3-4C0F-B8A2-0FAAF6E905A6@holtmann.org>
-References: <20190110062833.GA15047@kroah.com>
- <20190110062917.GB15047@kroah.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+In-Reply-To: <CY4PR18MB1237FAFE56DFCADE0DB09FC1A08B0@CY4PR18MB1237.namprd18.prod.outlook.com>
+Date:   Fri, 18 Jan 2019 10:39:59 +0100
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Cathy Luo <cluo@marvell.com>,
+        Zhiyuan Yang <yangzy@marvell.com>,
+        James Cao <jcao@marvell.com>,
+        Rakesh Parmar <rakeshp@marvell.com>,
+        Rahul Tank <rahult@marvell.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <A8B9C782-BCA2-4BE4-85C6-D0DFE65DEE1E@holtmann.org>
+References: <CY4PR18MB1237FAFE56DFCADE0DB09FC1A08B0@CY4PR18MB1237.namprd18.prod.outlook.com>
+To:     Ganapathi Bhat <gbhat@marvell.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Greg,
+Hi Ganapathi,
 
-> The L2CAP_CONF_EFS and L2CAP_CONF_RFC messages can be sent from
-> userspace so their structure sizes need to be checked before parsing
-> them.
-
-this message is confusing me. How can these be send from userspace?
-
+> From 6591fb4e6bbac53a9b3b852a2a4160c8de315d97 Mon Sep 17 00:00:00 2001
+> From: Hemantkumar Suthar <shemant@marvell.com>
 > 
-> Based on a patch from Ran Menscher.
+> This patch adds support for 8977 chipset to mwifiex with SDIO
+> interface. Register offsets and supported feature flags are
+> updated. Firmware image used will be mrvl/sd8977_uapsta.bin.
 > 
-> Reported-by: Ran Menscher <ran.menscher@karambasecurity.com>
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Hemantkumar Suthar <shemant@marvell.com>
+> Signed-off-by: Rakesh Parmar <rakeshp@marvell.com>
+> Signed-off-by: Cathy Luo <cluo@marvell.com>
+> Signed-off-by: Ganapathi Bhat <gbhat@marvell.com>
 > ---
-> net/bluetooth/l2cap_core.c | 12 ++++++++----
-> 1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 93daf94565cf..55e48e6efc2b 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -3361,7 +3361,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
-> 			break;
-> 
-> 		case L2CAP_CONF_RFC:
-> -			if (olen == sizeof(rfc))
-> +			if ((olen == sizeof(rfc)) &&
-> +			    (endptr - ptr >= L2CAP_CONF_OPT_SIZE + sizeof(rfc)))
-> 				memcpy(&rfc, (void *) val, olen);
+> drivers/bluetooth/Kconfig       |  4 ++--
+> drivers/bluetooth/btmrvl_sdio.c | 36 ++++++++++++++++++++++++++++++++++++
+> 2 files changed, 38 insertions(+), 2 deletions(-)
 
-We don’t do ((x == y) && (..)) actually. Using (x == y && ..) is plenty.
-
-> 			break;
-> 
-> @@ -3371,7 +3372,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
-> 			break;
-> 
-> 		case L2CAP_CONF_EFS:
-> -			if (olen == sizeof(efs)) {
-> +			if ((olen == sizeof(efs)) &&
-> +			    (endptr - ptr >= L2CAP_CONF_OPT_SIZE + sizeof(efs))) {
-> 				remote_efs = 1;
-> 				memcpy(&efs, (void *) val, olen);
-> 			}
-> @@ -3576,7 +3578,8 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
-> 			break;
-> 
-> 		case L2CAP_CONF_RFC:
-> -			if (olen == sizeof(rfc))
-> +			if ((olen == sizeof(rfc)) &&
-> +			    (endptr - ptr >= L2CAP_CONF_OPT_SIZE + sizeof(rfc)))
-> 				memcpy(&rfc, (void *)val, olen);
-> 
-> 			if (test_bit(CONF_STATE2_DEVICE, &chan->conf_state) &&
-> @@ -3596,7 +3599,8 @@ static int l2cap_parse_conf_rsp(struct l2cap_chan *chan, void *rsp, int len,
-> 			break;
-> 
-> 		case L2CAP_CONF_EFS:
-> -			if (olen == sizeof(efs)) {
-> +			if ((olen == sizeof(efs)) &&
-> +			    (endptr - ptr >= L2CAP_CONF_OPT_SIZE + sizeof(efs))) {
-> 				memcpy(&efs, (void *)val, olen);
-> 
-> 				if (chan->local_stype != L2CAP_SERV_NOTRAFIC &&
+patch has been applied to bluetooth-next tree.
 
 Regards
 
