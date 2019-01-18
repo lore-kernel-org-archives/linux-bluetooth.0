@@ -2,231 +2,133 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 545B3C1B0F7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 21:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBE1C1B0FD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 22:24:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16BA62086D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 21:38:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="lOWNJGgC"
+	by mail.kernel.org (Postfix) with ESMTP id E225320449
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 22:24:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729782AbfARVir (ORCPT
+        id S1729963AbfARWYn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 16:38:47 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:38732 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729646AbfARVir (ORCPT
+        Fri, 18 Jan 2019 17:24:43 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:15108 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729955AbfARWYn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 16:38:47 -0500
-Received: by mail-pl1-f194.google.com with SMTP id e5so6890214plb.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jan 2019 13:38:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=nD9AXsHMsReXlxJOvTkuVVtJE+NgYYtgeRF+rQSNkvo=;
-        b=lOWNJGgC8uz2Ol5EzJe/0VcyIGrQKPY/5ddax80v9wJboF1z9kN2u7pj8giXrpHunv
-         m27sEYqxlT4YAnaXZD6lRUrCsZ1peXsfZ7ekJHnf576AcN7PzDiyCPf0FnvrQnp79Rnc
-         O+7lIxyiY08127XtmK6pcTIKVGACVuVyjyQFo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=nD9AXsHMsReXlxJOvTkuVVtJE+NgYYtgeRF+rQSNkvo=;
-        b=Ksys6vfOd5+88xLf2zGXZxsrJmnc5qwLYTKceowwsHVlGPXdGbjUdfsj2Cu0xLtkGS
-         fIgH11locRy/33C9al++Zf9JmC1jZKwYIAoHbjg4dQ95p8ToHqNfY3gSmAxGcy+0HV/R
-         7wHuMs1Ti2KlxzueV7sWffuJA424tNxLsLhwsXETnSe4RGgGlEEzy5Gd+yCojmWoPbwM
-         EQJtZ0yqNW+27DF9/x5sBR7gs33TWcfyE9Q0kMp+A8MeoWKqv1mo5V1T5zvdKzlWrr2F
-         aqCl0HokwvnyFxS6zkhk0EE6lqRsvOn92EWvxcUo4PJKTJ+F/7Hp+sUCae9WsSiNBCvZ
-         kkWQ==
-X-Gm-Message-State: AJcUukenE7xkchqeST2+q01/m+0k9x2chE/LEwnF8NM3I4aDlMRY8+oT
-        f3N5W4NhV1DAOMkP9m6AWm1k+w==
-X-Google-Smtp-Source: ALg8bN7LG49XgcxmIN5rTb6vB/LobJcLC3MDdoxuBXQaw7vVBLcuW34Q++xNMB0/ptvBMXd5h9JJBw==
-X-Received: by 2002:a17:902:d891:: with SMTP id b17mr21011555plz.80.1547847526289;
-        Fri, 18 Jan 2019 13:38:46 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id 64sm10662033pff.101.2019.01.18.13.38.45
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 18 Jan 2019 13:38:45 -0800 (PST)
-Date:   Fri, 18 Jan 2019 13:38:44 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Loic Poulain <loic.poulain@linaro.org>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Brian Norris <briannorris@chromium.org>,
-        Dmitry Grinberg <dmitrygr@google.com>
-Subject: Re: [PATCH v3 1/3] Bluetooth: Add quirk for reading BD_ADDR from
- fwnode property
-Message-ID: <20190118213844.GB261387@google.com>
-References: <20181228220546.367-1-mka@chromium.org>
- <20181228220546.367-2-mka@chromium.org>
+        Fri, 18 Jan 2019 17:24:43 -0500
+X-UUID: 75af8fc2950940c59f3633b75f091b51-20190119
+X-UUID: 75af8fc2950940c59f3633b75f091b51-20190119
+Received: from mtkmrs01.mediatek.inc [(172.21.131.159)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (mhqrelay.mediatek.com ESMTP with TLS)
+        with ESMTP id 586277262; Sat, 19 Jan 2019 06:24:38 +0800
+Received: from mtkcas09.mediatek.inc (172.21.101.178) by
+ mtkmbs01n2.mediatek.inc (172.21.101.79) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Sat, 19 Jan 2019 06:24:36 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas09.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Sat, 19 Jan 2019 06:24:36 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Sean Wang <sean.wang@mediatek.com>
+Subject: [PATCH v5 2/2] Bluetooth: btusb: Add protocol support for MediaTek MT7663U USB devices
+Date:   Sat, 19 Jan 2019 06:24:31 +0800
+Message-ID: <11f545dcf82eb2e097354f2cb5df8e128b80786d.1547849398.git.sean.wang@mediatek.com>
+X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <cover.1547849398.git.sean.wang@mediatek.com>
+References: <cover.1547849398.git.sean.wang@mediatek.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20181228220546.367-2-mka@chromium.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-TM-SNTS-SMTP: 667F7A411AFB7690537A268DA5AB71D13432DE3399A547740DAC6A6841A76A442000:8
+X-MTK:  N
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Dec 28, 2018 at 02:05:44PM -0800, Matthias Kaehlcke wrote:
-> Add HCI_QUIRK_USE_BDADDR_PROPERTY to allow controllers to retrieve
-> the public Bluetooth address from the firmware node property
-> 'local-bd-address'. If quirk is set and the property does not exist
-> or is invalid the controller is marked as unconfigured.
-> 
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> Tested-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> ---
-> Changes in v3:
-> - return no value from hci_dev_get_bd_addr_from_property() since
->   currently nobody uses it anyway
-> - use bacpy() in hci_dev_get_bd_addr_from_property()
-> - return -EADDRNOTAVAIL if no BD_ADDR is configured or if the driver
->   has no ->set_bdaddr
-> 
-> Changes in v2:
-> - added check for return value of ->setup()
-> - only read BD_ADDR from the property if it isn't assigned yet. This
->   is needed to support configuration from user space
-> - refactored the branch of the new quirk to get rid of 'bd_addr_set'
-> - added 'Reviewed-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>' tag
-> ---
->  include/net/bluetooth/hci.h | 12 +++++++++++
->  net/bluetooth/hci_core.c    | 43 +++++++++++++++++++++++++++++++++++++
->  net/bluetooth/mgmt.c        |  6 ++++--
->  3 files changed, 59 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index c36dc1e20556a..fbba43e9bef5b 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -158,6 +158,18 @@ enum {
->  	 */
->  	HCI_QUIRK_INVALID_BDADDR,
->  
-> +	/* When this quirk is set, the public Bluetooth address
-> +	 * initially reported by HCI Read BD Address command
-> +	 * is considered invalid. The public BD Address can be
-> +	 * specified in the fwnode property 'local-bd-address'.
-> +	 * If this property does not exist or is invalid controller
-> +	 * configuration is required before this device can be used.
-> +	 *
-> +	 * This quirk can be set before hci_register_dev is called or
-> +	 * during the hdev->setup vendor callback.
-> +	 */
-> +	HCI_QUIRK_USE_BDADDR_PROPERTY,
-> +
->  	/* When this quirk is set, the duplicate filtering during
->  	 * scanning is based on Bluetooth devices addresses. To allow
->  	 * RSSI based updates, restart scanning if needed.
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 7352fe85674be..3ccfa351b87bb 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -30,6 +30,7 @@
->  #include <linux/rfkill.h>
->  #include <linux/debugfs.h>
->  #include <linux/crypto.h>
-> +#include <linux/property.h>
->  #include <asm/unaligned.h>
->  
->  #include <net/bluetooth/bluetooth.h>
-> @@ -1355,6 +1356,32 @@ int hci_inquiry(void __user *arg)
->  	return err;
->  }
->  
-> +/**
-> + * hci_dev_get_bd_addr_from_property - Get the Bluetooth Device Address
-> + *				       (BD_ADDR) for a HCI device from
-> + *				       a firmware node property.
-> + * @hdev:	The HCI device
-> + *
-> + * Search the firmware node for 'local-bd-address'.
-> + *
-> + * All-zero BD addresses are rejected, because those could be properties
-> + * that exist in the firmware tables, but were not updated by the firmware. For
-> + * example, the DTS could define 'local-bd-address', with zero BD addresses.
-> + */
-> +static void hci_dev_get_bd_addr_from_property(struct hci_dev *hdev)
-> +{
-> +	struct fwnode_handle *fwnode = dev_fwnode(hdev->dev.parent);
-> +	bdaddr_t ba;
-> +	int ret;
-> +
-> +	ret = fwnode_property_read_u8_array(fwnode, "local-bd-address",
-> +					    (u8 *)&ba, sizeof(ba));
-> +	if (ret < 0 || !bacmp(&ba, BDADDR_ANY))
-> +		return;
-> +
-> +	bacpy(&hdev->public_addr, &ba);
-> +}
-> +
->  static int hci_dev_do_open(struct hci_dev *hdev)
->  {
->  	int ret = 0;
-> @@ -1422,6 +1449,22 @@ static int hci_dev_do_open(struct hci_dev *hdev)
->  		if (hdev->setup)
->  			ret = hdev->setup(hdev);
->  
-> +		if (ret)
-> +			goto setup_failed;
-> +
-> +		if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
-> +			if (!bacmp(&hdev->public_addr, BDADDR_ANY))
-> +				hci_dev_get_bd_addr_from_property(hdev);
-> +
-> +			if (bacmp(&hdev->public_addr, BDADDR_ANY) &&
-> +			    hdev->set_bdaddr)
-> +				ret = hdev->set_bdaddr(hdev,
-> +						       &hdev->public_addr);
-> +			else
-> +				ret = -EADDRNOTAVAIL;
-> +		}
-> +
-> +setup_failed:
->  		/* The transport driver can set these quirks before
->  		 * creating the HCI device or in its setup callback.
->  		 *
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index ccce954f81468..fae84353d030f 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -551,7 +551,8 @@ static bool is_configured(struct hci_dev *hdev)
->  	    !hci_dev_test_flag(hdev, HCI_EXT_CONFIGURED))
->  		return false;
->  
-> -	if (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
-> +	if ((test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) ||
-> +	     test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) &&
->  	    !bacmp(&hdev->public_addr, BDADDR_ANY))
->  		return false;
->  
-> @@ -566,7 +567,8 @@ static __le32 get_missing_options(struct hci_dev *hdev)
->  	    !hci_dev_test_flag(hdev, HCI_EXT_CONFIGURED))
->  		options |= MGMT_OPTION_EXTERNAL_CONFIG;
->  
-> -	if (test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) &&
-> +	if ((test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks) ||
-> +	     test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) &&
->  	    !bacmp(&hdev->public_addr, BDADDR_ANY))
->  		options |= MGMT_OPTION_PUBLIC_ADDRESS;
->  
+From: Sean Wang <sean.wang@mediatek.com>
 
-Marcel (et al), do you have any more comments on this series or
-is it ready to land?
+This adds the support of enabling MT7663U Bluetooth function running
+on the top of btusb driver.
 
-Thanks
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-Matthias
+T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  5 Spd=5000 MxCh= 0
+D:  Ver= 3.00 Cls=ef(misc ) Sub=02 Prot=01 MxPS= 9 #Cfgs=  1
+P:  Vendor=0e8d ProdID=7663 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=160mA
+A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+ drivers/bluetooth/btusb.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index d2ac1912f968..d21bfcf2f95a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2408,6 +2408,7 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
+ 
+ #ifdef CONFIG_BT_HCIBTUSB_MTK
+ 
++#define FIRMWARE_MT7663		"mediatek/mt7663pr2h.bin"
+ #define FIRMWARE_MT7668		"mediatek/mt7668pr2h.bin"
+ 
+ #define HCI_WMT_MAX_EVENT_SIZE		64
+@@ -2836,6 +2837,9 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 	}
+ 
+ 	switch (dev_id) {
++	case 0x7663:
++		fwname = FIRMWARE_MT7663;
++		break;
+ 	case 0x7668:
+ 		fwname = FIRMWARE_MT7668;
+ 		break;
+@@ -2931,6 +2935,7 @@ static int btusb_mtk_shutdown(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++MODULE_FIRMWARE(FIRMWARE_MT7663);
+ MODULE_FIRMWARE(FIRMWARE_MT7668);
+ #endif
+ 
+-- 
+2.18.0
+
