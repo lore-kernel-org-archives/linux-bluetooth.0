@@ -2,113 +2,133 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C51C3C43444
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 15:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21959C43612
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98C0320896
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 15:00:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1547823648;
-	bh=a/+McF0cITMP6pxFXNLPV1FPG7/8cCqbAniN7ouA5+U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=D7ZpfuAV44Wm83jQEnyjjGrE+AKCMKd3pljKEi+GnUtIPrXkkOpxe2GP++8hpVAIz
-	 n/7LQTBGTZ9PoJ0FExOXH7dyA9szAn/3iwERiRgOU5pewDHJchvetsShMqoxXcURpH
-	 YWMrGpCUUaVnIUyQDDe0A/DuL2DxixJ4jv7v7OeE=
+	by mail.kernel.org (Postfix) with ESMTP id D1CFD20883
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:02:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pywTVcO+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727822AbfARPAs (ORCPT
+        id S1728277AbfARRCs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 10:00:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35406 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727415AbfARPAr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 10:00:47 -0500
-Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 66B792087E;
-        Fri, 18 Jan 2019 15:00:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1547823646;
-        bh=a/+McF0cITMP6pxFXNLPV1FPG7/8cCqbAniN7ouA5+U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gG9eSKJcLZhpmZwuxj6vhvSQtLx3q74k8xfEiB2iuw+4z4tQoVWVeKQ2nydVxawlC
-         EgTz1kgLWfhkfeqjFwhDVcNls1Hhfi2PZ2dfm7h3ePmXU8VbH4yFW4U+p0o0It6/ei
-         E3SbSE+9OXxGpMK2d+tU0CAy7iCWIRJCfE9FfV7g=
-Date:   Fri, 18 Jan 2019 16:00:44 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Verify that l2cap_get_conf_opt provides large
- enough buffer
-Message-ID: <20190118150044.GA31656@kroah.com>
-References: <20190118124319.12187-1-marcel@holtmann.org>
- <20190118125342.GA31025@kroah.com>
- <93BDB9CB-55F3-415A-8EED-DD532C36BC8A@holtmann.org>
+        Fri, 18 Jan 2019 12:02:48 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:34732 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726601AbfARRCr (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 18 Jan 2019 12:02:47 -0500
+Received: by mail-pl1-f195.google.com with SMTP id w4so6620166plz.1;
+        Fri, 18 Jan 2019 09:02:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=jFEUu0iFvQYztS9g4BUdYLNIZwJ1NonHLyGxopxGJbE=;
+        b=pywTVcO+DpWWCNXOmqzrHFpvyS521dw4vRXXY+31xsUMVGpIEiHHodTkbjeGeAkH0G
+         ijzes2TXZ3uLqONaDqtQ5NJDGqfMmRtiOsAPToCvWtjn4XWMMm4gQID00FhBd3zgCAup
+         dBXoawZQUh0QXLLLQ4yn2f92WW5WCswHPHT57RE56vkU4vCAaHfVS+8x5c/poaiaNANF
+         7CBhFFyUyrgL7uHK6Gb80GCVPLdMAj641DlRCfd7i3t5mZ8rLXlWt3nnd/M8n2dNdpIP
+         g60WsdqC10hB4b2Eog/1WMf6/GMRYeJz6yEX5dt+jqIavBDelbv+9wvf7e+Mwky9ShKo
+         kUiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=jFEUu0iFvQYztS9g4BUdYLNIZwJ1NonHLyGxopxGJbE=;
+        b=KSCW4CiGiNlvIYMuEN4xVWjgob0MXSwY8RoveVQt1stVP/D6p2EUoAuPGVvnZb4wS/
+         RhKqQH3cs0OkAVM0EAMh56BSsKgCAw4loeO1FIHcnwVggMmibri5fudIxsGNTN7IPW08
+         QlmJEVQG4KtautW7CBfZsM8fooXVIt2Rw4OoBReZTg/vzhKGkVJTMJP4uNQFRBEqb4jv
+         7wCBIP9e8adefrDZpQubPNqQqxA/BjtPaIm4U4tgXnT/fXlU+vPK9lb9DhnDCiq/WSUN
+         bfps4OaEjJaKqBopNyOXlX1zDfTLnqBgdtFiFJJ8+znlDw7v9tp7+HvSYQw4HiXrwC5H
+         53Sg==
+X-Gm-Message-State: AJcUukeU5HBrpdynkAWI8zf9Bv/pv4JVnloxR62pSa71I3oT6idFQ1l9
+        yb0U8LnoHelF1TzCxZuQm3f/3a7JUI0=
+X-Google-Smtp-Source: ALg8bN4RkK6wHVXxv15RcaeOc3A+ypBDn75Lj3dSW/DHGg4PYPYfnEC+ZoHcA89/Fdvj6Pa8xVbxfA==
+X-Received: by 2002:a17:902:145:: with SMTP id 63mr19834028plb.256.1547830966075;
+        Fri, 18 Jan 2019 09:02:46 -0800 (PST)
+Received: from anarsoul-thinkpad.lan (216-71-193-140.dyn.novuscom.net. [216.71.193.140])
+        by smtp.gmail.com with ESMTPSA id b4sm5672222pgq.65.2019.01.18.09.02.44
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 18 Jan 2019 09:02:45 -0800 (PST)
+From:   Vasily Khoruzhick <anarsoul@gmail.com>
+To:     "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Maxime Ripard <maxime.ripard@bootlin.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Vasily Khoruzhick <anarsoul@gmail.com>, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/8] Bluetooth: hci_h5: Add support for reset GPIO
+Date:   Fri, 18 Jan 2019 09:02:26 -0800
+Message-Id: <20190118170232.16142-3-anarsoul@gmail.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190118170232.16142-1-anarsoul@gmail.com>
+References: <20190118170232.16142-1-anarsoul@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <93BDB9CB-55F3-415A-8EED-DD532C36BC8A@holtmann.org>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 02:12:23PM +0100, Marcel Holtmann wrote:
-> Hi Greg,
-> 
-> >> The function l2cap_get_conf_opt will return L2CAP_CONF_OPT_SIZE + opt->len
-> >> as length value. The opt->len however is in control over the remote user
-> >> and can be used by an attacker to gain access beyond the bounds of the
-> >> actual packet.
-> >> 
-> >> To prevent any potential leak of heap memory, it is enough to check that
-> >> the resulting len calculation after calling l2cap_get_conf_opt is not
-> >> below zero. A well formed packet will always return >= 0 here and will
-> >> end with the length value being zero after the last option has been
-> >> parsed. In case of malformed packets messing with the opt->len field the
-> >> length value will become negative. If that is the case, then just abort
-> >> and ignore the option.
-> >> 
-> >> In case an attacker uses a too short opt->len value, then garbage will
-> >> be parsed, but that is protected by the unknown option handling and also
-> >> the option parameter size checks.
-> >> 
-> >> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> >> ---
-> >> net/bluetooth/l2cap_core.c | 6 ++++++
-> >> 1 file changed, 6 insertions(+)
-> >> 
-> >> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> >> index 77799e7d5a34..ccdc5c67d22a 100644
-> >> --- a/net/bluetooth/l2cap_core.c
-> >> +++ b/net/bluetooth/l2cap_core.c
-> >> @@ -3337,6 +3337,8 @@ static int l2cap_parse_conf_req(struct l2cap_chan *chan, void *data, size_t data
-> >> 
-> >> 	while (len >= L2CAP_CONF_OPT_SIZE) {
-> >> 		len -= l2cap_get_conf_opt(&req, &type, &olen, &val);
-> >> +		if (len < 0)
-> >> +			break;
-> > 
-> > <snip>
-> > 
-> > Patch looks good to me, thanks for fixing this all up:
-> 
-> it would be still good if we can get this verified by the reporter.
+Some boards (e.g. Pine64 and Pinebook) wire a GPIO to reset pin of
+RTL8723BS
 
-The "reporter" seems to have disappeared once they reported this stuff,
-so I would not count on them doing anything here, we asked numerous
-times :(
+Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+---
+ drivers/bluetooth/hci_h5.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-If the patches look correct, I recommend just merging it and I can
-backport it to the stable releases and the distros can pick it up from
-there.
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 069d1c8fde73..7ead8c3d8657 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -107,6 +107,7 @@ struct h5 {
+ 	const struct h5_vnd *vnd;
+ 	const char *id;
+ 
++	struct gpio_desc *reset_gpio;
+ 	struct gpio_desc *enable_gpio;
+ 	struct gpio_desc *device_wake_gpio;
+ };
+@@ -833,6 +834,10 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+ 	if (IS_ERR(h5->device_wake_gpio))
+ 		return PTR_ERR(h5->device_wake_gpio);
+ 
++	h5->reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
++	if (IS_ERR(h5->reset_gpio))
++		return PTR_ERR(h5->reset_gpio);
++
+ 	return hci_uart_register_device(&h5->serdev_hu, &h5p);
+ }
+ 
+@@ -921,6 +926,9 @@ static void h5_btrtl_open(struct h5 *h5)
+ 
+ 	/* The controller needs up to 500ms to wakeup */
+ 	gpiod_set_value_cansleep(h5->enable_gpio, 1);
++	/* Take it out of reset */
++	gpiod_set_value_cansleep(h5->reset_gpio, 0);
++	msleep(100);
+ 	gpiod_set_value_cansleep(h5->device_wake_gpio, 1);
+ 	msleep(500);
+ }
+@@ -928,6 +936,7 @@ static void h5_btrtl_open(struct h5 *h5)
+ static void h5_btrtl_close(struct h5 *h5)
+ {
+ 	gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
++	gpiod_set_value_cansleep(h5->reset_gpio, 1);
+ 	gpiod_set_value_cansleep(h5->enable_gpio, 0);
+ }
+ 
+-- 
+2.20.1
 
-thanks,
-
-greg k-h
