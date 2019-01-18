@@ -2,174 +2,510 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA510C1B0FD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 22:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C667EC5AE5E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 23:14:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99A6520823
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 22:34:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jzPixTH7"
+	by mail.kernel.org (Postfix) with ESMTP id 874342054F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 23:14:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730071AbfARWeV (ORCPT
+        id S1729980AbfARXOB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 17:34:21 -0500
-Received: from mail-pl1-f201.google.com ([209.85.214.201]:37589 "EHLO
-        mail-pl1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730070AbfARWeV (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 17:34:21 -0500
-Received: by mail-pl1-f201.google.com with SMTP id v11so9025610ply.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jan 2019 14:34:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=5Vf/zxYwOeYnNWL3N0nFW9n1v8wnzmKf0NaeVZgXiaM=;
-        b=jzPixTH7zJ1yIIX5bZzrUQThN590v6DWlfCKamohvLlKx5xj3PTGaNlXRFdk3O6anO
-         mzvDL3vYXDynePF8uuET9rXYuf00lUdxjkTA7vdbPjEMTOo38mP+zEMUe6bMK7qVNww2
-         vapy/RgoUXYRI/Qi2zpUXc27WocMAQtoJxAwksTDgm7enmKfcwB0ciKFiY7lilL6doaT
-         +29l3cZ4rfjw6YpRQz+TA6AVwOdXWOPY8LgScYw4iEp5qJHilmJ3ZwE+7ei5/GGjKz0c
-         PBBRloe/D57GSfFJz22Ui/IYngZoDhuVRQjwwsGny6F3ZaPeJ2ItTxPzZ55XpXjse6sI
-         TedA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=5Vf/zxYwOeYnNWL3N0nFW9n1v8wnzmKf0NaeVZgXiaM=;
-        b=UIIJ9k41r/XIx0P1BswbrW8fp4XUViTkOizTCQ2J9JyvYs4YbALB/xiTQ47hoVx5ge
-         NdCtYnLr+mEXtoY4QonpW0hAjoo5zkph4SkB0z5a1kmx+JDlSRdRYMu0HMvj07mZINrs
-         HY9PSr5UNyPCrekM1F/IZKY+P3paCWkgX3S78B5DK+Q6SW4SetLCVqQ5YP2Km+qGVqMt
-         BDaKuGnmCjY2hJ923ySfVszgj9akPCgC8EX7lnto7QqVHKJv1eP+1XSqe0nihJsS+Pj1
-         uJWtWkYCbZRMKsbp6oKkvLHs2ekv0IM8LPSf6QGpd9eEJoMBHCD1u5KmhFuIbdRTzYa7
-         Dg3A==
-X-Gm-Message-State: AJcUukeunQcD17YmZDPixt37aqP+3+vFj4rqKM7nRO5uBiJrkoGZBXoP
-        MVN3VZWWCYTbVg7wB5PhafeUO0JPVWbg
-X-Google-Smtp-Source: ALg8bN6thYeoMCSIyboFDVOgiChvDQtw39+2XeK8itXMoEr8A7Hmc4UB4lWL/ifImlNAu5t+wmuXpmEVFPNz
-X-Received: by 2002:a62:679d:: with SMTP id t29mr8166391pfj.90.1547850860134;
- Fri, 18 Jan 2019 14:34:20 -0800 (PST)
-Date:   Fri, 18 Jan 2019 14:34:04 -0800
-In-Reply-To: <20190118223407.64818-1-rajatja@google.com>
-Message-Id: <20190118223407.64818-2-rajatja@google.com>
-Mime-Version: 1.0
-References: <20181117010748.24347-1-rajatja@google.com> <20190118223407.64818-1-rajatja@google.com>
-X-Mailer: git-send-email 2.20.1.321.g9e740568ce-goog
-Subject: [PATCH v4 2/5] usb: assign ACPI companions for embedded USB devices
-From:   Rajat Jain <rajatja@google.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Torokhov <dtor@chromium.org>,
-        Rajat Jain <rajatja@google.com>,
-        Alex Hung <alex.hung@canonical.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-usb@vger.kernel.org, netdev@vger.kernel.org
-Cc:     rajatxjain@gmail.com, dtor@google.com, raghuram.hegde@intel.com,
-        chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 18 Jan 2019 18:14:01 -0500
+Received: from mga03.intel.com ([134.134.136.65]:16432 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729780AbfARXOB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 18 Jan 2019 18:14:01 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jan 2019 15:14:00 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,492,1539673200"; 
+   d="scan'208";a="107745018"
+Received: from bgix-dell-lap.sea.intel.com ([10.255.77.179])
+  by orsmga007.jf.intel.com with ESMTP; 18 Jan 2019 15:13:59 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@intel.com, brian.gix@intel.com
+Subject: [PATCH BlueZ v2] mesh: Fix Relaying for multiple nodes
+Date:   Fri, 18 Jan 2019 15:13:58 -0800
+Message-Id: <20190118231358.1206-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Dmitry Torokhov <dtor@chromium.org>
-
-USB devices permanently connected to USB ports may be described in ACPI
-tables and share ACPI devices with ports they are connected to. See [1]
-for details.
-
-This will allow us to describe sideband resources for devices, such as,
-for example, hard reset line for BT USB controllers.
-
-[1] https://docs.microsoft.com/en-us/windows-hardware/drivers/bringup/other-acpi-namespace-objects#acpi-namespace-hierarchy-and-adr-for-embedded-usb-devices
-
-Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
-Signed-off-by: Rajat Jain <rajatja@google.com> (changed how we get the usb_port)
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Tested-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
+Relay is now a cooperation between all the nodes on the daemon.
+If any one or more nodes have relay enabled and a received packet
+is addressed to a Group, or a non-present Unicast address, then the
+packet's TTL is decremented and it is resent.
 ---
-v4: Add Acked-by and Tested-by in signatures.
-v3: same as v1
-v2: same as v1
+ mesh/crypto.c    |   8 +--
+ mesh/mesh-defs.h |   9 ++-
+ mesh/net.c       | 186 ++++++++++++++++++++++++++++++++-----------------------
+ 3 files changed, 118 insertions(+), 85 deletions(-)
 
- drivers/usb/core/usb-acpi.c | 44 +++++++++++++++++++++++++++++--------
- 1 file changed, 35 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/usb/core/usb-acpi.c b/drivers/usb/core/usb-acpi.c
-index 8ff73c83e8e8..9043d7242d67 100644
---- a/drivers/usb/core/usb-acpi.c
-+++ b/drivers/usb/core/usb-acpi.c
-@@ -200,30 +200,56 @@ static struct acpi_device *
- usb_acpi_find_companion_for_device(struct usb_device *udev)
- {
- 	struct acpi_device *adev;
-+	struct usb_port *port_dev;
-+	struct usb_hub *hub;
+diff --git a/mesh/crypto.c b/mesh/crypto.c
+index e68cc2d5f..451e2da71 100644
+--- a/mesh/crypto.c
++++ b/mesh/crypto.c
+@@ -1169,13 +1169,13 @@ bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
+ 				*payload = packet + 9;
+ 
+ 			if (payload_len)
+-				*payload_len = packet_len - 9 - 8;
++				*payload_len = packet_len - 9;
+ 		} else {
+ 			if (payload)
+ 				*payload = packet + 10;
+ 
+ 			if (payload_len)
+-				*payload_len = packet_len - 10 - 8;
++				*payload_len = packet_len - 10;
+ 		}
+ 	} else {
+ 		if (cookie)
+@@ -1202,13 +1202,13 @@ bool mesh_crypto_packet_parse(const uint8_t *packet, uint8_t packet_len,
+ 				*payload = packet + 13;
+ 
+ 			if (payload_len)
+-				*payload_len = packet_len - 13 - 4;
++				*payload_len = packet_len - 13;
+ 		} else {
+ 			if (payload)
+ 				*payload = packet + 10;
+ 
+ 			if (payload_len)
+-				*payload_len = packet_len - 10 - 4;
++				*payload_len = packet_len - 10;
+ 		}
+ 	}
+ 
+diff --git a/mesh/mesh-defs.h b/mesh/mesh-defs.h
+index d40fc43e8..c30041e4a 100644
+--- a/mesh/mesh-defs.h
++++ b/mesh/mesh-defs.h
+@@ -62,7 +62,9 @@
+ #define VIRTUAL_ADDRESS_LOW	0x8000
+ #define VIRTUAL_ADDRESS_HIGH	0xbfff
+ #define GROUP_ADDRESS_LOW	0xc000
+-#define GROUP_ADDRESS_HIGH	0xff00
++#define GROUP_ADDRESS_HIGH	0xfeff
++#define FIXED_GROUP_LOW		0xff00
++#define FIXED_GROUP_HIGH	0xffff
+ 
+ #define NODE_IDENTITY_STOPPED		0x00
+ #define NODE_IDENTITY_RUNNING		0x01
+@@ -79,6 +81,7 @@
+ 					((x) < VIRTUAL_ADDRESS_LOW))
+ #define IS_VIRTUAL(x)		(((x) >= VIRTUAL_ADDRESS_LOW) && \
+ 					((x) <= VIRTUAL_ADDRESS_HIGH))
+-#define IS_GROUP(x)		(((x) >= GROUP_ADDRESS_LOW) && \
+-					((x) <= GROUP_ADDRESS_HIGH))
++#define IS_GROUP(x)		((((x) >= GROUP_ADDRESS_LOW) && \
++					((x) < FIXED_GROUP_HIGH)) || \
++					((x) == ALL_NODES_ADDRESS))
+ #define IS_ALL_NODES(x)	((x) == ALL_NODES_ADDRESS)
+diff --git a/mesh/net.c b/mesh/net.c
+index 6ef056b56..9e509a8ea 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -71,6 +71,13 @@
+ 
+ #define SAR_KEY(src, seq0)	((((uint32_t)(seq0)) << 16) | (src))
+ 
++enum _relay_advice {
++	RELAY_NONE,		/* Relay not enabled in node */
++	RELAY_ALLOWED,		/* Relay enabled, msg not to node's unicast */
++	RELAY_DISALLOWED,	/* Msg was unicast handled by this node */
++	RELAY_ALWAYS		/* Relay enabled, msg to a group */
++};
 +
-+	if (!udev->parent) {
-+		/* root hub is only child (_ADR=0) under its parent, the HC */
-+		adev = ACPI_COMPANION(udev->dev.parent);
-+		return acpi_find_child_device(adev, 0, false);
-+	}
+ enum _iv_upd_state {
+ 	/* Allows acceptance of any iv_index secure net beacon */
+ 	IV_UPD_INIT,
+@@ -160,7 +167,6 @@ struct mesh_net {
+ 	struct l_queue *frnd_msgs;
+ 	struct l_queue *friends;
+ 	struct l_queue *destinations;
+-	struct l_queue *fast_cache;
  
--	if (!udev->parent)
-+	hub = usb_hub_to_struct_hub(udev->parent);
-+	if (!hub)
- 		return NULL;
+ 	uint8_t prov_priv_key[32];
  
--	/* root hub is only child (_ADR=0) under its parent, the HC */
--	adev = ACPI_COMPANION(udev->dev.parent);
--	return acpi_find_child_device(adev, 0, false);
-+	/*
-+	 * This is an embedded USB device connected to a port and such
-+	 * devices share port's ACPI companion.
-+	 */
-+	port_dev = hub->ports[udev->portnum - 1];
-+	return usb_acpi_get_companion_for_port(port_dev);
+@@ -248,6 +254,8 @@ struct net_decode {
+ 	bool proxy;
+ };
+ 
++#define FAST_CACHE_SIZE 8
++static struct l_queue *fast_cache;
+ static struct l_queue *nets;
+ 
+ static inline struct mesh_subnet *get_primary_subnet(struct mesh_net *net)
+@@ -673,7 +681,6 @@ struct mesh_net *mesh_net_new(struct mesh_node *node)
+ 	net->tx_interval = DEFAULT_TRANSMIT_INTERVAL;
+ 
+ 	net->subnets = l_queue_new();
+-	net->fast_cache = l_queue_new();
+ 	net->msg_cache = l_queue_new();
+ 	net->sar_in = l_queue_new();
+ 	net->sar_out = l_queue_new();
+@@ -687,6 +694,9 @@ struct mesh_net *mesh_net_new(struct mesh_node *node)
+ 	if (!nets)
+ 		nets = l_queue_new();
+ 
++	if (!fast_cache)
++		fast_cache = l_queue_new();
++
+ 	return net;
  }
  
--
- static struct acpi_device *usb_acpi_find_companion(struct device *dev)
+@@ -696,7 +706,6 @@ void mesh_net_free(struct mesh_net *net)
+ 		return;
+ 
+ 	l_queue_destroy(net->subnets, subnet_free);
+-	l_queue_destroy(net->fast_cache, mesh_msg_free);
+ 	l_queue_destroy(net->msg_cache, mesh_msg_free);
+ 	l_queue_destroy(net->sar_in, mesh_sar_free);
+ 	l_queue_destroy(net->sar_out, mesh_sar_free);
+@@ -1021,7 +1030,6 @@ int mesh_net_add_key(struct mesh_net *net, bool update, uint16_t idx,
+ void mesh_net_flush_msg_queues(struct mesh_net *net)
  {
- 	/*
--	 * In the ACPI DSDT table, only usb root hub and usb ports are
--	 * acpi device nodes. The hierarchy like following.
-+	 * The USB hierarchy like following:
-+	 *
- 	 * Device (EHC1)
- 	 *	Device (HUBN)
- 	 *		Device (PR01)
- 	 *			Device (PR11)
- 	 *			Device (PR12)
-+	 *				Device (FN12)
-+	 *				Device (FN13)
- 	 *			Device (PR13)
- 	 *			...
--	 * So all binding process is divided into two parts. binding
--	 * root hub and usb ports.
-+	 * where HUBN is root hub, and PRNN are USB ports and devices
-+	 * connected to them, and FNNN are individualk functions for
-+	 * connected composite USB devices. PRNN and FNNN may contain
-+	 * _CRS and other methods describing sideband resources for
-+	 * the connected device.
-+	 *
-+	 * On the kernel side both root hub and embedded USB devices are
-+	 * represented as instances of usb_device structure, and ports
-+	 * are represented as usb_port structures, so the whole process
-+	 * is split into 2 parts: finding companions for devices and
-+	 * finding companions for ports.
-+	 *
-+	 * Note that we do not handle individual functions of composite
-+	 * devices yet, for that we would need to assign companions to
-+	 * devices corresponding to USB interfaces.
- 	 */
- 	if (is_usb_device(dev))
- 		return usb_acpi_find_companion_for_device(to_usb_device(dev));
+ 	l_queue_clear(net->msg_cache, mesh_msg_free);
+-	l_queue_clear(net->fast_cache, mesh_msg_free);
+ }
+ 
+ uint32_t mesh_net_get_iv_index(struct mesh_net *net)
+@@ -2210,23 +2218,23 @@ static bool find_fast_hash(const void *a, const void *b)
+ 	return *entry == *test;
+ }
+ 
+-static void *check_fast_cache(struct mesh_net *net, uint64_t hash)
++static bool check_fast_cache(uint64_t hash)
+ {
+-	void *found = l_queue_find(net->fast_cache, find_fast_hash, &hash);
++	void *found = l_queue_find(fast_cache, find_fast_hash, &hash);
+ 	uint64_t *new_hash;
+ 
+ 	if (found)
+-		return NULL;
++		return false;
+ 
+-	if (l_queue_length(net->fast_cache) >= 8)
+-		new_hash = l_queue_pop_head(net->fast_cache);
++	if (l_queue_length(fast_cache) >= FAST_CACHE_SIZE)
++		new_hash = l_queue_pop_head(fast_cache);
+ 	else
+ 		new_hash = l_malloc(sizeof(hash));
+ 
+ 	*new_hash = hash;
+-	l_queue_push_tail(net->fast_cache, new_hash);
++	l_queue_push_tail(fast_cache, new_hash);
+ 
+-	return new_hash;
++	return true;
+ }
+ 
+ static bool match_by_dst(const void *a, const void *b)
+@@ -2237,8 +2245,9 @@ static bool match_by_dst(const void *a, const void *b)
+ 	return dest->dst == dst;
+ }
+ 
+-static void send_relay_pkt(struct mesh_net *net, uint8_t *packet, uint8_t size)
++static void send_relay_pkt(struct mesh_net *net, uint8_t *data, uint8_t size)
+ {
++	uint8_t packet[30];
+ 	struct mesh_io *io = net->io;
+ 	struct mesh_io_send_info info = {
+ 		.type = MESH_IO_TIMING_TYPE_GENERAL,
+@@ -2249,8 +2258,9 @@ static void send_relay_pkt(struct mesh_net *net, uint8_t *packet, uint8_t size)
+ 	};
+ 
+ 	packet[0] = MESH_AD_TYPE_NETWORK;
++	memcpy(packet + 1, data, size);
+ 
+-	mesh_io_send(io, &info, packet, size);
++	mesh_io_send(io, &info, packet, size + 1);
+ }
+ 
+ static void send_msg_pkt(struct mesh_net *net, uint8_t *packet, uint8_t size)
+@@ -2270,15 +2280,12 @@ static void send_msg_pkt(struct mesh_net *net, uint8_t *packet, uint8_t size)
+ 	mesh_io_send(io, &info, packet, size);
+ }
+ 
+-static void packet_received(void *user_data, const void *data, uint8_t size,
+-								int8_t rssi)
++static enum _relay_advice packet_received(void *user_data,
++				uint32_t key_id, uint32_t iv_index,
++				const void *data, uint8_t size, int8_t rssi)
+ {
+ 	struct mesh_net *net = user_data;
+-	uint32_t iv_index;
+-	uint8_t iv_flag;
+ 	const uint8_t *msg = data;
+-	uint8_t *out;
+-	size_t out_size;
+ 	uint8_t app_msg_len;
+ 	uint8_t net_ttl, net_key_id, net_segO, net_segN, net_opcode;
+ 	uint32_t net_seq, cache_cookie;
+@@ -2287,50 +2294,13 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
+ 	bool net_ctl, net_segmented, net_szmic, net_relay;
+ 	struct mesh_friend *net_frnd = NULL;
+ 	bool drop = false;
+-	uint64_t hash, *isNew = NULL;
+-	uint32_t key_id;
+-
+-	iv_flag = msg[0] >> 7;
+-	iv_index = net->iv_index;
+-	l_debug("%s iv_index %d NID: %2.2x", __func__, iv_index, msg[0] & 0x7f);
+-
+-	if (sizeof(uint16_t) <= sizeof(void *)) {
+-		/* Add in additional cache to allow us to
+-		 * avoid decrypting duplicatesr
+-		 * Fast 64 bit Hash, Network MIC doesn't matter
+-		 * With 64 bit hash, false pos chance is 1 in 1.8 * 10^19
+-		 */
+-		hash = l_get_le64(msg + 1) ^ l_get_le64(msg + 9);
+-		isNew = check_fast_cache(net, hash);
+-		if (!isNew)
+-			return;
+-
+-		l_debug("New");
+-	}
+-
+-	memcpy(packet + 2, data, size);
+-
+-	if (iv_index && (iv_index & 0x01) != iv_flag)
+-		iv_index--;
+ 
+ 	/* Tester--Drop 90% of packets */
+ 	/* l_getrandom(&iv_flag, 1); */
+ 	/* if (iv_flag%10<9) drop = true; */
+ 
+-	if (!drop)
+-		print_packet("RX: Network [enc] :", data, size);
+-
+-	key_id = net_key_decrypt(iv_index, packet + 2, size, &out, &out_size);
+ 
+-	if (!key_id) {
+-		l_debug("Failed to decode packet");
+-		/* Remove fast-cache-hash */
+-		l_queue_remove(net->fast_cache, isNew);
+-		l_free(isNew);
+-		return;
+-	}
+-
+-	memcpy(packet + 2, out, out_size);
++	memcpy(packet + 2, data, size);
+ 
+ 	if (!drop)
+ 		print_packet("RX: Network [clr] :", packet + 2, size);
+@@ -2347,7 +2317,7 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
+ 					&net_segO, &net_segN,
+ 					&msg, &app_msg_len)) {
+ 		l_error("Failed to parse packet content");
+-		return;
++		return RELAY_NONE;
+ 	}
+ 
+ 	/* Ignore incoming packets if we are LPN and frnd bit not set */
+@@ -2357,7 +2327,7 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
+ 		subnet = l_queue_find(net->subnets, match_key_id,
+ 							L_UINT_TO_PTR(key_id));
+ 		if (subnet)
+-			return;
++			return RELAY_NONE;
+ 
+ 		/* If the queue is empty, stop polling */
+ 		if (net_ctl && net_opcode == NET_OP_FRND_UPDATE && !msg[5])
+@@ -2368,16 +2338,16 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
+ 	} else if (net_dst == 0) {
+ 		l_error("illegal parms: DST: %4.4x Ctl: %d TTL: %2.2x",
+ 						net_dst, net_ctl, net_ttl);
+-		return;
++		return RELAY_NONE;
+ 	}
+ 
+ 	/* Ignore if we originally sent this */
+ 	if (is_us(net, net_src, true))
+-		return;
++		return RELAY_NONE;
+ 
+ 	if (drop) {
+ 		l_info("Dropping SEQ 0x%06x", net_seq);
+-		return;
++		return RELAY_NONE;
+ 	}
+ 
+ 	l_debug("check %08x", cache_cookie);
+@@ -2385,7 +2355,7 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
+ 	/* As a Relay, suppress repeats of last N packets that pass through */
+ 	/* The "cache_cookie" should be unique part of App message */
+ 	if (msg_in_cache(net, net_src, net_seq, cache_cookie))
+-		return;
++		return RELAY_NONE;
+ 
+ 	l_debug("RX: Network %04x -> %04x : TTL 0x%02x : IV : %8.8x SEQ 0x%06x",
+ 			net_src, net_dst, net_ttl, iv_index, net_seq);
+@@ -2403,12 +2373,12 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
+ 			if (net_opcode == NET_OP_SEG_ACKNOWLEDGE) {
+ 				/* Illegal to send ACK to non-Unicast Addr */
+ 				if (net_dst & 0x8000)
+-					return;
++					return RELAY_NONE;
+ 
+ 				/* print_packet("Got ACK", msg, app_msg_len); */
+ 				/* Pedantic check for correct size */
+ 				if (app_msg_len != 7)
+-					return;
++					return RELAY_NONE;
+ 
+ 				/* If this is an ACK to our friend queue-only */
+ 				if (is_lpn_friend(net, net_dst, true))
+@@ -2468,28 +2438,37 @@ static void packet_received(void *user_data, const void *data, uint8_t size,
+ 		if (!!(net_frnd))
+ 			l_info("Ask for more data!");
+ 
+-		/* If this is one of our Unicast addresses, don't relay */
+-		if (net_dst <= 0x7fff)
+-			return;
++		/* If this is one of our Unicast addresses, disallow relay */
++		if (IS_UNICAST(net_dst))
++			return RELAY_DISALLOWED;
+ 	}
+ 
++	/* If relay not enable, or no more hops allowed */
+ 	if (!net->relay.enable || net_ttl < 0x02 || net_frnd)
+-		return;
++		return RELAY_NONE;
+ 
+-	packet[2 + 1] = (packet[2 + 1] & ~TTL_MASK) | (net_ttl - 1);
++	/* Group or Virtual destinations should *always* be relayed */
++	if (IS_GROUP(net_dst) || IS_VIRTUAL(net_dst))
++		return RELAY_ALWAYS;
+ 
+-	if (!net_key_encrypt(key_id, iv_index, packet + 2, size)) {
+-		l_error("Failed to encode relay packet");
+-		return;
+-	}
++	/* Unicast destinations for other nodes *may* be relayed */
++	else if (IS_UNICAST(net_dst))
++		return RELAY_ALLOWED;
+ 
+-	if (net->relay.enable)
+-		send_relay_pkt(net, packet, size + 1);
++	/* Otherwise, do not make a relay decision */
++	else
++		return RELAY_NONE;
+ }
+ 
+ struct net_queue_data {
+ 	struct mesh_io_recv_info *info;
++	struct mesh_net *net;
+ 	const uint8_t *data;
++	uint8_t *out;
++	size_t out_size;
++	enum _relay_advice relay_advice;
++	uint32_t key_id;
++	uint32_t iv_index;
+ 	uint16_t len;
+ };
+ 
+@@ -2497,30 +2476,78 @@ static void net_rx(void *net_ptr, void *user_data)
+ {
+ 	struct net_queue_data *data = user_data;
+ 	struct mesh_net *net = net_ptr;
++	enum _relay_advice relay_advice;
++	uint8_t *out;
++	size_t out_size;
++	uint32_t key_id;
+ 	int8_t rssi = 0;
+ 
++	key_id = net_key_decrypt(net->iv_index, data->data, data->len,
++								&out, &out_size);
++
++	if (!key_id)
++		return;
++
++	print_packet("RX: Network [enc] :", data->data, data->len);
++
+ 	if (data->info) {
+ 		net->instant = data->info->instant;
+ 		net->chan = data->info->chan;
+ 		rssi = data->info->rssi;
+ 	}
+ 
+-	packet_received(net, data->data, data->len, rssi);
++	relay_advice = packet_received(net, key_id, net->iv_index,
++							out, out_size, rssi);
++	if (relay_advice > data->relay_advice) {
++		bool iv_flag = !!(net->iv_index & 1);
++		bool iv_pkt = !!(data->data[0] & 0x80);
++
++		data->iv_index = net->iv_index;
++		if (iv_pkt != iv_flag)
++			data->iv_index--;
++
++		data->relay_advice = relay_advice;
++		data->key_id = key_id;
++		data->net = net;
++		data->out = out;
++		data->out_size = out_size;
++	}
+ }
+ 
+ static void net_msg_recv(void *user_data, struct mesh_io_recv_info *info,
+ 					const uint8_t *data, uint16_t len)
+ {
++	uint64_t hash;
++	bool isNew;
+ 	struct net_queue_data net_data = {
+ 		.info = info,
+ 		.data = data + 1,
+ 		.len = len - 1,
++		.relay_advice = RELAY_NONE,
+ 	};
+ 
+-	if (len <= 2)
++	if (len < 9)
++		return;
++
++	hash = l_get_le64(data + 1);
++
++	/* Only process packet once per reception */
++	isNew = check_fast_cache(hash);
++	if (!isNew)
+ 		return;
+ 
+ 	l_queue_foreach(nets, net_rx, &net_data);
++
++	if (net_data.relay_advice == RELAY_ALWAYS ||
++			net_data.relay_advice == RELAY_ALLOWED) {
++		uint8_t ttl = net_data.out[1] & TTL_MASK;
++
++		net_data.out[1] &=  ~TTL_MASK;
++		net_data.out[1] |= ttl - 1;
++		net_key_encrypt(net_data.key_id, net_data.iv_index,
++					net_data.out, net_data.out_size);
++		send_relay_pkt(net_data.net, net_data.out, net_data.out_size);
++	}
+ }
+ 
+ static void set_network_beacon(void *a, void *b)
+@@ -2927,6 +2954,9 @@ bool mesh_net_attach(struct mesh_net *net, struct mesh_io *io)
+ 		if (!nets)
+ 			nets = l_queue_new();
+ 
++		if (!fast_cache)
++			fast_cache = l_queue_new();
++
+ 		l_info("Register io cb");
+ 		mesh_io_register_recv_cb(io, MESH_IO_FILTER_BEACON,
+ 							beacon_recv, net);
 -- 
-2.20.1.321.g9e740568ce-goog
+2.14.5
 
