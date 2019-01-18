@@ -6,37 +6,36 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54B3FC43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:10:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2745C43444
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:10:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2E2C22086D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCAA62086D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:10:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726801AbfARJKq (ORCPT
+        id S1726838AbfARJKr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 04:10:46 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:48544 "EHLO
+        Fri, 18 Jan 2019 04:10:47 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:55655 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725938AbfARJKp (ORCPT
+        with ESMTP id S1726033AbfARJKr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 04:10:45 -0500
+        Fri, 18 Jan 2019 04:10:47 -0500
 Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0C7A6CF2C3;
-        Fri, 18 Jan 2019 10:18:30 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 9D809CF2C4;
+        Fri, 18 Jan 2019 10:18:31 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH net-next] 6lowpan: fix debugfs_simple_attr.cocci warnings
+Subject: Re: [PATCH] Bluetooth: 6lowpan: Fix debugfs_simple_attr.cocci
+ warnings
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1545274433-146957-1-git-send-email-yuehaibing@huawei.com>
-Date:   Fri, 18 Jan 2019 10:10:43 +0100
-Cc:     Alexander Aring <alex.aring@gmail.com>,
-        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
+In-Reply-To: <1547603646-138771-1-git-send-email-yuehaibing@huawei.com>
+Date:   Fri, 18 Jan 2019 10:10:45 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <27123639-4327-4EB0-8832-7AC22ACFB386@holtmann.org>
-References: <1545274433-146957-1-git-send-email-yuehaibing@huawei.com>
+Message-Id: <F98F6BF6-1B20-4B33-B20B-7FCE7756AED5@holtmann.org>
+References: <1547603646-138771-1-git-send-email-yuehaibing@huawei.com>
 To:     YueHaibing <yuehaibing@huawei.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -58,8 +57,8 @@ Hi Yue,
 > 
 > Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 > ---
-> net/6lowpan/debugfs.c | 42 +++++++++++++++++++++---------------------
-> 1 file changed, 21 insertions(+), 21 deletions(-)
+> net/bluetooth/6lowpan.c | 11 ++++++-----
+> 1 file changed, 6 insertions(+), 5 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
