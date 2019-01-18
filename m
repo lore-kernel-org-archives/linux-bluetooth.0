@@ -2,118 +2,131 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EBF0C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A57C5ACD3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:14:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E98AE2086D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:03:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M2HHbcWz"
+	by mail.kernel.org (Postfix) with ESMTP id 5A0742086D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 17:14:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728081AbfARRCp (ORCPT
+        id S1728385AbfARROJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 12:02:45 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:32904 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726601AbfARRCp (ORCPT
+        Fri, 18 Jan 2019 12:14:09 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:40666 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727986AbfARROJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 12:02:45 -0500
-Received: by mail-pg1-f196.google.com with SMTP id z11so6343864pgu.0;
-        Fri, 18 Jan 2019 09:02:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fTwTJ6DcxG+KFm9dgnIsmZ7TQbsxD7TvxVrP3lKUQbE=;
-        b=M2HHbcWzq/zZQrN8K8KEDRWT2AAz+ERJaSb0g2jUKl2A0QXdNrTPAhRH2tbjFGSAqZ
-         n0njzd3M/B/9B9tvZxaAxIJjZXYWlvMrvlSsP3p8f3m1P9OtrzSvKSFWr7/vQ7sKFfk+
-         aALZaVErmlKhfH0EF3mwFO0wnL52lmIvWjHSlPKU1dRsXbbArWunIuyY21hp3PcYJ50g
-         MEo20yOFxGV/2e6Z2miQGFgjMDjYlMTEvLtoR/OyGah8v6Z6zUiPrO43bdUnyCfeZKZq
-         kGSmlkaT5VIgS1hs0Kr3Gq5PM+X/78cNv8E0tSzMIZC7VkZG/81zccor+4xMZZCmuLT3
-         RttA==
+        Fri, 18 Jan 2019 12:14:09 -0500
+Received: by mail-ed1-f65.google.com with SMTP id g22so11701461edr.7;
+        Fri, 18 Jan 2019 09:14:07 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fTwTJ6DcxG+KFm9dgnIsmZ7TQbsxD7TvxVrP3lKUQbE=;
-        b=VMxWzOS3Sn/OCpv4tj7oEDxor6HWwH5COxh1IQRbyj6biz3zD43JLTbqLQESZlVBbu
-         KOLecsCEVa69EevTUgaTGGWOUH1PUXExFudQhdmr3eiEAcTayrlHQ3OCx2jkXZFeTjgX
-         mMabHpa0bLk5KHdA3koeqVE04xELAqRSvC5s07hDt4U6KiJuagPiHbL7AoB3HqdOeE8i
-         E+lqRZXeTImVjNhT1TnlonT6tTHJbRmL64Xh6JdWUbpdjtgiP3WIgXCluAo8WDj+fmXL
-         nlx6qJU4eTlYzw74r6sWhcLlmzkNmNUu1SLACGPAisOvyFXwglFrh5rz4xFiGz6519g5
-         2hvA==
-X-Gm-Message-State: AJcUukcHvyy6HGgEchpYY0kb1JMUF1iOywBYmUQGhgw0wlcLbHufcUkX
-        cbt9N3diceRDm9KC6WUp0RGZejRo7kA=
-X-Google-Smtp-Source: ALg8bN7HAgdYJ+NDkn3J1J5MtD2MNJnml/Mm6sagtlXyOBk1679E809p1lTbiMhY196fm6at322PBQ==
-X-Received: by 2002:a63:9712:: with SMTP id n18mr18138607pge.295.1547830963881;
-        Fri, 18 Jan 2019 09:02:43 -0800 (PST)
-Received: from anarsoul-thinkpad.lan (216-71-193-140.dyn.novuscom.net. [216.71.193.140])
-        by smtp.gmail.com with ESMTPSA id b4sm5672222pgq.65.2019.01.18.09.02.42
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ktKsigAQx+weGoNj6gtSnvxHTDmILfP/OH8CmOk6WZQ=;
+        b=IxZer6iTdMpVoaSeIKLuizSg5gJU/ql2VwTTOqQA8mvLhLawQ+TjniwZdwHVC+COAj
+         Tlo6kORD+N/ntS5tnK7+dAO0IKB+bu6m782/zzi78z4Q9BDevQPe+xkMtmv8PutW91iE
+         YgMaZLeFacuz2Bm03+gTCUSLyTHD0IeqmTnG8WUpH52BWToZXEb3kqEP3S5Ve90Yqgki
+         DO//G8E+KGpVfcfiGUsjD2gnUkf2AVKnSNXyzhpI1Pcko/GQsHeHKgOyHM8Dmd9ppaGt
+         oGdpC6qzGXpE/lIAp26dmXCuP513022OvK8TU3gP8v8EPYszTzVsL8d+dswjteHS0spI
+         4sSQ==
+X-Gm-Message-State: AJcUukfWVifdXTQKAp8+ZG2Oda5K7n2mSM5YFZM5kB87NW65j3erbYEs
+        3BR2UwMEA/FxG8uYdG8AuptjSf34cFk=
+X-Google-Smtp-Source: ALg8bN5qFhu7RKcLzksjq1SOLr1G8jsKX7WOiHtS7t+FxvWYV+jz8OqQRB+5Nci0qj+iWwggwbelmQ==
+X-Received: by 2002:a50:cd5c:: with SMTP id d28mr15917198edj.176.1547831646602;
+        Fri, 18 Jan 2019 09:14:06 -0800 (PST)
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com. [209.85.128.54])
+        by smtp.gmail.com with ESMTPSA id e26-v6sm4013243ejb.29.2019.01.18.09.14.05
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 09:02:43 -0800 (PST)
-From:   Vasily Khoruzhick <anarsoul@gmail.com>
-To:     "David S. Miller" <davem@davemloft.net>,
+        Fri, 18 Jan 2019 09:14:06 -0800 (PST)
+Received: by mail-wm1-f54.google.com with SMTP id t200so5232499wmt.0;
+        Fri, 18 Jan 2019 09:14:05 -0800 (PST)
+X-Received: by 2002:a1c:f605:: with SMTP id w5mr16981898wmc.116.1547831645652;
+ Fri, 18 Jan 2019 09:14:05 -0800 (PST)
+MIME-Version: 1.0
+References: <20190118170232.16142-1-anarsoul@gmail.com> <20190118170232.16142-3-anarsoul@gmail.com>
+In-Reply-To: <20190118170232.16142-3-anarsoul@gmail.com>
+From:   Chen-Yu Tsai <wens@csie.org>
+Date:   Sat, 19 Jan 2019 01:13:55 +0800
+X-Gmail-Original-Message-ID: <CAGb2v665Wsu5dhNi1=-bMmPYP-5nfTamtu0uXVYym+RxzNeN=A@mail.gmail.com>
+Message-ID: <CAGb2v665Wsu5dhNi1=-bMmPYP-5nfTamtu0uXVYym+RxzNeN=A@mail.gmail.com>
+Subject: Re: [PATCH 2/8] Bluetooth: hci_h5: Add support for reset GPIO
+To:     Vasily Khoruzhick <anarsoul@gmail.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
         Maxime Ripard <maxime.ripard@bootlin.com>,
-        Chen-Yu Tsai <wens@csie.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Vasily Khoruzhick <anarsoul@gmail.com>, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        netdev <netdev@vger.kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/8] Add support for rtl8723bs/rtl8723cs bluetooth
-Date:   Fri, 18 Jan 2019 09:02:24 -0800
-Message-Id: <20190118170232.16142-1-anarsoul@gmail.com>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-rtl8723{bc}s is WiFi/Bluetooth module, WiFi part is connected over SDIO
-while bluetooth is connected over UART.
+On Sat, Jan 19, 2019 at 1:02 AM Vasily Khoruzhick <anarsoul@gmail.com> wrote:
+>
+> Some boards (e.g. Pine64 and Pinebook) wire a GPIO to reset pin of
+> RTL8723BS
 
-This series adds support for rtl8723bs/rtl8723cs bluetooth.
+Pine64 / Pinebook don't have the enable pin. One could say that the
+enable pin and the reset pin you add here are actually the same thing.
 
-Bluetooth module in rtl8723cs is buggy - it advertises some features that
-it doesn't support and responds either with garbage or with errors on
-corresponding commands. Unfortunately that confuses bluetooth stack,
-so we need to introduce another quirk.
+ChenYu
 
-Patches for Pine64 and Sopine are provided as examples since WiFi/BT module
-is optional on these boards.
-
-Vasily Khoruzhick (8):
-  Bluetooth: Add new quirk for broken local ext features max_page
-  Bluetooth: hci_h5: Add support for reset GPIO
-  dt-bindings: net: bluetooth: Add rtl8723bs-bluetooth
-  Bluetooth: hci_h5: Add support for binding RTL8723BS with device tree
-  Bluetooth: btrtl: add support for the RTL8723CS
-  arm64: allwinner: a64: enable Bluetooth On Pinebook
-  DO-NOT-MERGE: arm64: allwinner: a64: enable Bluetooth On Pine64
-  DO-NOT-MERGE: arm64: allwinner: a64: enable Bluetooth On SoPine
-    baseboard
-
- .../bindings/net/rtl8723bs-bluetooth.txt      |  35 +++++
- .../boot/dts/allwinner/sun50i-a64-pine64.dts  |  10 +-
- .../dts/allwinner/sun50i-a64-pinebook.dts     |  14 ++
- .../allwinner/sun50i-a64-sopine-baseboard.dts |  14 ++
- drivers/bluetooth/btrtl.c                     | 128 +++++++++++++++++-
- drivers/bluetooth/btrtl.h                     |  12 ++
- drivers/bluetooth/hci_h5.c                    |  33 +++++
- include/net/bluetooth/hci.h                   |   7 +
- net/bluetooth/hci_event.c                     |   4 +-
- 9 files changed, 252 insertions(+), 5 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/rtl8723bs-bluetooth.txt
-
--- 
-2.20.1
-
+> Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+> ---
+>  drivers/bluetooth/hci_h5.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index 069d1c8fde73..7ead8c3d8657 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -107,6 +107,7 @@ struct h5 {
+>         const struct h5_vnd *vnd;
+>         const char *id;
+>
+> +       struct gpio_desc *reset_gpio;
+>         struct gpio_desc *enable_gpio;
+>         struct gpio_desc *device_wake_gpio;
+>  };
+> @@ -833,6 +834,10 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+>         if (IS_ERR(h5->device_wake_gpio))
+>                 return PTR_ERR(h5->device_wake_gpio);
+>
+> +       h5->reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
+> +       if (IS_ERR(h5->reset_gpio))
+> +               return PTR_ERR(h5->reset_gpio);
+> +
+>         return hci_uart_register_device(&h5->serdev_hu, &h5p);
+>  }
+>
+> @@ -921,6 +926,9 @@ static void h5_btrtl_open(struct h5 *h5)
+>
+>         /* The controller needs up to 500ms to wakeup */
+>         gpiod_set_value_cansleep(h5->enable_gpio, 1);
+> +       /* Take it out of reset */
+> +       gpiod_set_value_cansleep(h5->reset_gpio, 0);
+> +       msleep(100);
+>         gpiod_set_value_cansleep(h5->device_wake_gpio, 1);
+>         msleep(500);
+>  }
+> @@ -928,6 +936,7 @@ static void h5_btrtl_open(struct h5 *h5)
+>  static void h5_btrtl_close(struct h5 *h5)
+>  {
+>         gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
+> +       gpiod_set_value_cansleep(h5->reset_gpio, 1);
+>         gpiod_set_value_cansleep(h5->enable_gpio, 0);
+>  }
+>
+> --
+> 2.20.1
+>
