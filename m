@@ -2,72 +2,104 @@ Return-Path: <SRS0=s7/i=P2=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44104C43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B401AC43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:44:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12C1E2086D
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:43:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84B9D2086D
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:44:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1547804664;
+	bh=plVoBg5/nSGmBbaNdNHKt9EilBsqNWFEdPAHVHIN6mM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=0rgJ/Yizq5lLWp29CW2sintL8g3YoX3P0mucZh3Z4jnUfpjAaEjYYcBs8qvhbpg1C
+	 nlzgpkARL7LXywBBQeK+GNWalMT0/+sOjC9JlBTvmqeRPBUp+u35QuXqT6IuOhu7ey
+	 GhU99Rt0zhFLhgL8Zzshy/mje35xFqoub6/kq7oM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725983AbfARJn5 convert rfc822-to-8bit (ORCPT
+        id S1726741AbfARJoT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 04:43:57 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:44336 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725784AbfARJn5 (ORCPT
+        Fri, 18 Jan 2019 04:44:19 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:45628 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726288AbfARJoT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 04:43:57 -0500
-Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 85143CF2C3;
-        Fri, 18 Jan 2019 10:51:42 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: Bluetooth ECDH selftest failed (endianness issue?)
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAEQQxWxpi7FR=RDT1cLMDBUUGzHSfSrgngHL7dCK5V1eJOOu3Q@mail.gmail.com>
-Date:   Fri, 18 Jan 2019 10:43:55 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <82ABD3A9-290C-4291-A84D-C4C2DE62CD17@holtmann.org>
-References: <CAEQQxWzdBy9JOC7+oQTBJ35Gov1CDk17fy+XH=jha8MuT9fy9Q@mail.gmail.com>
- <49999069-238D-4FBE-8F38-3762788A67C1@holtmann.org>
- <CAEQQxWxAvZBX8simb7gNu6ob_0gGXzTEQuOybiP5MTV8dq5sEg@mail.gmail.com>
- <CAEQQxWxpi7FR=RDT1cLMDBUUGzHSfSrgngHL7dCK5V1eJOOu3Q@mail.gmail.com>
-To:     Andrey Batyiev <batyiev@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Fri, 18 Jan 2019 04:44:19 -0500
+Received: by mail-lf1-f66.google.com with SMTP id b20so9986402lfa.12;
+        Fri, 18 Jan 2019 01:44:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=DbNcV5FxgSD+yvWgMWS7YwD0GBsATUSU5Aw9ZdWgggE=;
+        b=hdItBB9+EfQ5NEnXuztEWnUwENTHXYats8ctgH3RtU6X2uguFpOLTvnNiut38tko9e
+         5BdYsXoEMSUM5WsIp38nUOQeGR8/Khnl0ItijExfeyFK6snvWAxXlrZJQn2McdDAqgGF
+         e07WtRwxB3H7X1ozCtQwETMGwRPubRoJfMN0C8dtLFxqJzdJeXJ8EAhj70zV+9BYUvDM
+         SAmMSgNJZJtfuzYvMpWBMOybCYQQ1UFCjA/ueFZNx/xlTHybV3F6aS2DLwOCt5zUlIIv
+         2m+CdCRfDb/CS00g/t619caRUhuNglbTpa4fCAD3yp5JK5R5fqLJvkwQSnbazP6gxthV
+         1Cew==
+X-Gm-Message-State: AJcUukf1+LY7q4baubxugcPM5/eD75Ai5MgsNCN9A86WqjOdpz2g4LRO
+        BY2KMGs3SpIFvMAuCPvJRuU=
+X-Google-Smtp-Source: ALg8bN6u0hKWS5qNTcg1WWHpL34BIDtX0OHA1pfnwfN6P2Zw7cV1ZyzGs6KvBh3H4NBpahDoumsTyQ==
+X-Received: by 2002:a19:5059:: with SMTP id z25mr7866757lfj.120.1547804656864;
+        Fri, 18 Jan 2019 01:44:16 -0800 (PST)
+Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
+        by smtp.gmail.com with ESMTPSA id i75sm723308lfb.58.2019.01.18.01.44.15
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 18 Jan 2019 01:44:15 -0800 (PST)
+Received: from johan by xi.terra with local (Exim 4.91)
+        (envelope-from <johan@kernel.org>)
+        id 1gkQhE-0000ui-SJ; Fri, 18 Jan 2019 10:44:16 +0100
+Date:   Fri, 18 Jan 2019 10:44:16 +0100
+From:   Johan Hovold <johan@kernel.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     Johan Hovold <johan@kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        Johan Hovold <jhovold@gmail.com>
+Subject: Re: [PATCH v5 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate
+ change command
+Message-ID: <20190118094416.GB3691@localhost>
+References: <b5160d8862b49f0369fa58610516d354@codeaurora.org>
+ <20190110143928.GE3430@localhost>
+ <61301df80bd6a8ee0265b31b7f6a3aa1@codeaurora.org>
+ <20190111013707.GD261387@google.com>
+ <194b5d18ea86830b6a24939d483a964c@codeaurora.org>
+ <20190111235633.GK261387@google.com>
+ <a6e083d245baebc019b6e7163fd6f133@codeaurora.org>
+ <20190115234628.GQ261387@google.com>
+ <20190117160944.GV3691@localhost>
+ <20190117172109.GU261387@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190117172109.GU261387@google.com>
+User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Andrey,
+On Thu, Jan 17, 2019 at 09:21:09AM -0800, Matthias Kaehlcke wrote:
 
->> On Sat, Dec 29, 2018 at 9:35 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->> I think that our ECDH code was endian safe, but then it got changed at some point to use standard crypto and maybe something went wrong there. Can just provide the btmon -w trace.log for the SMP pairing so that I can have a look at the binary trace.
-> 
-> I found out that if I change "swap_digits" method in
-> "net/bluetooth/ecdh_helper.c" to
-> 
-> static inline void swap_digits(u64 *in, u64 *out, unsigned int ndigits)
-> {
-> int i;
-> 
-> for (i = 0; i < ndigits; i++)
->        out[i] = in[ndigits - 1 - i];
-> }
-> 
-> then BLE pairing on big-endian become operational. I'm not sure what
-> proper fix should be: is it a problem with crypto API usage or a
-> problem with crypto itself?
+> I observed that the qcom_geni_serial driver doesn't raise RTS with
+> flow control disabled. It seems we have to investigate why that's the
+> case. I agree that the driver should be platform agnostic.
 
-if the kernel ECC and ECDH crypto already swaps for us, then we don’t need to do it again. So all the swap_digits most likely can be removed from net/bluetooth/.
+Sounds like a driver bug, unless the hardware is just "odd". The
+driver implementation of this looks very non-standard judging from a
+quick peek.
 
-Regards
+In fact, qcom_geni_serial_get_mctrl() is currently a no-op if hardware
+flow control is not enabled:
 
-Marcel
+	if (uart_console(uport) || !uart_cts_enabled(uport))
+		return;
 
+Perhaps dropping the !uart_cts_enabled() test is sufficient.
+
+Johan
