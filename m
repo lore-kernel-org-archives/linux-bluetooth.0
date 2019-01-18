@@ -3,59 +3,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8561EC43387
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B25C43387
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:19:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A3C920823
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:15:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75EB620823
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Jan 2019 09:19:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbfARJPD (ORCPT
+        id S1726342AbfARJTo convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 04:15:03 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:51196 "EHLO
+        Fri, 18 Jan 2019 04:19:44 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:50823 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725856AbfARJPC (ORCPT
+        with ESMTP id S1726550AbfARJTn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 04:15:02 -0500
+        Fri, 18 Jan 2019 04:19:43 -0500
 Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 4DF8CCF2C3;
-        Fri, 18 Jan 2019 10:22:47 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3AAC7CF2C3;
+        Fri, 18 Jan 2019 10:27:28 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 2/2] bluetooth: btmrvl_sdio: lower log level of
- informational message
+Subject: Re: [PATCH] Bluetooth: hci_uart: Add a local variable to store the
+ result of h4_recv_buf()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190111205657.2792-2-stefan@agner.ch>
-Date:   Fri, 18 Jan 2019 10:15:00 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, huxm@marvell.com,
+In-Reply-To: <20190111065514.GA26542@myunghoj-Precision-5530>
+Date:   Fri, 18 Jan 2019 10:19:41 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <8610ACAD-F828-441E-87F3-EE8B93EE7801@holtmann.org>
-References: <20190111205657.2792-1-stefan@agner.ch>
- <20190111205657.2792-2-stefan@agner.ch>
-To:     Stefan Agner <stefan@agner.ch>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <09FCB21A-2184-4CDB-8BF0-75C403DF39F9@holtmann.org>
+References: <20190111065514.GA26542@myunghoj-Precision-5530>
+To:     Myungho Jung <mhjungk@gmail.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Stefan,
+Hi Myungho,
 
-> The platform specific wake-up interrupt is optional. Don't print
-> an error message in case it is missing, merely inform the user in
-> this case.
+> In h4_recv(), if h4_recv_buf() returns error and h4_recv() is
+> asynchronously called again before setting rx_skb to NULL, ERR_PTR will
+> be dereferenced in h4_recv_buf(). Check return value in a local variable
+> before writing to rx_skb.
 > 
-> Signed-off-by: Stefan Agner <stefan@agner.ch>
+> Reported-by: syzbot+017a32f149406df32703@syzkaller.appspotmail.com
+> Signed-off-by: Myungho Jung <mhjungk@gmail.com>
 > ---
-> drivers/bluetooth/btmrvl_sdio.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> drivers/bluetooth/hci_h4.c | 11 +++++++----
+> 1 file changed, 7 insertions(+), 4 deletions(-)
 
 patch has been applied to bluetooth-next tree.
+
+Can you actually fix all callers of h4_recv_buf since they all suffer from the same issue.
 
 Regards
 
