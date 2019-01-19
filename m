@@ -2,107 +2,116 @@ Return-Path: <SRS0=MOIW=P3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D123AC61CE8
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 08:19:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC6CC61CE4
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 12:33:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98B8A2087E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 08:19:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQ4YNOd4"
+	by mail.kernel.org (Postfix) with ESMTP id 989E12084C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 12:33:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727622AbfASITY (ORCPT
+        id S1727995AbfASMdU convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Jan 2019 03:19:24 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:42530 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725910AbfASITY (ORCPT
+        Sat, 19 Jan 2019 07:33:20 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:45196 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727982AbfASMdT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Jan 2019 03:19:24 -0500
-Received: by mail-pl1-f195.google.com with SMTP id y1so7377431plp.9;
-        Sat, 19 Jan 2019 00:19:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=1EcKwu0GULlC0nUFpv4OivQZC0RXDycgG3OU8afRkfQ=;
-        b=UQ4YNOd4MeTNchhYMFv4RmhnbNMhJ0yWIsQUl+7y3m6YN8YYQDkgWx9BJnuBCh6Qcg
-         jpWn6auLM3jBy1lM4WHvImLdGRoLJDqqlkR+XJXxVDetLswG2WUHkKnqhfmQxaxGhj7Q
-         /FBTzRsGV+u2c0ZzmS35nwcFX3qc/07PDJRLDKC/oBBynD9KhnQxRNCw4ZexttkjQ8nu
-         g01kKkQN5XQd1k6M03amDZrdZQIhmc2IerhQzfyeDm5PoP5InDJga8cJfAwCMEMOKVqV
-         v3BSj4i264w+Ck0sMLTwZc6jBgw9wFtHeC4cFv1ZVEp2ki9EdFMXuF7I0i3l8A+ABrPN
-         LsAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1EcKwu0GULlC0nUFpv4OivQZC0RXDycgG3OU8afRkfQ=;
-        b=YTSnRHg4OA9i/lhwvovJAwoSJeidg8ee4EDWRvmqjLHN6QFO9cxukIB1i3iaXgQp+g
-         RDKjXKmpYsjmXs5FI3G9ZnUQSS+09rbRHkJysC7NCwfaaGovuwPXa6cjc0dw/ksv5CdY
-         h+vBxD2W7Iy97HJPz3zj+I7zAiRL7Mo57WdhmSdjyMT308wmn1gk8gJedjNIeHrmMdJ2
-         RPSGFTG+xhCDm752ZP2FmF5HNmNC406xIx3VEWph9WgR7Dod14gGGkrefHPGv2HhFseA
-         nKEmH7lBT69hd+hExjMxPdxRO8sLtMWmEnQBm7fw+9bJIbMUTZ+lF9w+5h5nOWr1Duoq
-         js1Q==
-X-Gm-Message-State: AJcUukcnFt+vKlDCAsI4YX3f/9xP6Tx0jMJS/nUduLas2MadF4IQWFGz
-        yS/4Zj55Nt33gcKh8392Pdk=
-X-Google-Smtp-Source: ALg8bN48sWygmxBXFC3SEZbp2GffqxNi6D7mSafaPDnXbEhoA72gq5Z4JJXjDqdv/qgAY3Pwe7d4sw==
-X-Received: by 2002:a17:902:8a95:: with SMTP id p21mr22592166plo.183.1547885963812;
-        Sat, 19 Jan 2019 00:19:23 -0800 (PST)
-Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
-        by smtp.gmail.com with ESMTPSA id w10sm8253029pgi.81.2019.01.19.00.19.22
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 19 Jan 2019 00:19:23 -0800 (PST)
-Date:   Sat, 19 Jan 2019 00:19:20 -0800
-From:   Myungho Jung <mhjungk@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_uart: Add a local variable to store the
- result of h4_recv_buf()
-Message-ID: <20190119081919.GA10681@myunghoj-Precision-5530>
-References: <20190111065514.GA26542@myunghoj-Precision-5530>
- <09FCB21A-2184-4CDB-8BF0-75C403DF39F9@holtmann.org>
+        Sat, 19 Jan 2019 07:33:19 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id B6AB92E134
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Jan 2019 12:33:18 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id AAFB92E15C; Sat, 19 Jan 2019 12:33:18 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 202345] New: bluetoothd can end up with a corrupted DBus object
+ path
+Date:   Sat, 19 Jan 2019 12:33:18 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kai.ruhnau@live.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-202345-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <09FCB21A-2184-4CDB-8BF0-75C403DF39F9@holtmann.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 10:19:41AM +0100, Marcel Holtmann wrote:
-> Hi Myungho,
-> 
-> > In h4_recv(), if h4_recv_buf() returns error and h4_recv() is
-> > asynchronously called again before setting rx_skb to NULL, ERR_PTR will
-> > be dereferenced in h4_recv_buf(). Check return value in a local variable
-> > before writing to rx_skb.
-> > 
-> > Reported-by: syzbot+017a32f149406df32703@syzkaller.appspotmail.com
-> > Signed-off-by: Myungho Jung <mhjungk@gmail.com>
-> > ---
-> > drivers/bluetooth/hci_h4.c | 11 +++++++----
-> > 1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> patch has been applied to bluetooth-next tree.
-> 
-> Can you actually fix all callers of h4_recv_buf since they all suffer from the same issue.
-> 
-> Regards
-> 
-> Marcel
-> 
+https://bugzilla.kernel.org/show_bug.cgi?id=202345
 
-Hi Marcel,
+            Bug ID: 202345
+           Summary: bluetoothd can end up with a corrupted DBus object
+                    path
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.9.130
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: kai.ruhnau@live.com
+        Regression: No
 
-Sure, let me check other callers and fix them if applicable.
+Three times during the past few days, I was able to end up with a bluetoothd
+daemon that reported a corrupted DBus object path (note the ']' character where
+'_' should be)
 
-Thanks,
-Myungho
+# busctl tree org.bluez
+Failed to introspect object /org/bluez/hci0/dev_4F_D1_9D_30]B7_8D of service
+org.bluez: Invalid argument
+└─/org
+  └─/org/bluez
+    └─/org/bluez/hci0
+[…]
 
+
+GetManagedObjects works fine and reports the correct path:
+# busctl call org.bluez / org.freedesktop.DBus.ObjectManager GetManagedObjects
+[…] "/org/bluez/hci0/dev_4F_D1_9D_30_B7_8D" 3
+"org.freedesktop.DBus.Introspectable" 0 "org.bluez.Device1" 11 "Address" s
+"4F:D1:9D:30:B7:8D" "AddressType" s "random" "Alias" s "4F-D1-9D-30-B7-8D"
+"Paired" b false "Trusted" b false "Blocked" b false "LegacyPairing" b false
+"Connected" b false "UUIDs" as 0 "Adapter" o "/org/bluez/hci0"
+"ServicesResolved" b false "org.freedesktop.DBus.Properties" 0 […]
+
+Querying a property doesn't work, though:
+# busctl get-property org.bluez /org/bluez/hci0/dev_4F_D1_9D_30_B7_8D
+org.bluez.Device1 Address
+Method "Get" with signature "ss" on interface "org.freedesktop.DBus.Properties"
+doesn't exist
+
+And that last behavior then crashes my application.
+
+The most weird thing is that the object path corruption has been consistently
+at the fifth underscore (between the fourth and fifth address byte), but with
+different characters: a 'Y' (resulting in
+'/org/bluez/hci0/dev_xx_xx_xx_xxYxx_xx') , a '^', and today the above ']'.
+
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
