@@ -2,155 +2,106 @@ Return-Path: <SRS0=MOIW=P3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BF56C5AE5E
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 00:31:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5A8C0031C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 03:49:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3DFFF20823
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 00:31:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="oA3VNzX3"
+	by mail.kernel.org (Postfix) with ESMTP id DE20C2086D
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 03:49:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730235AbfASAbM (ORCPT
+        id S1730416AbfASDtp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Jan 2019 19:31:12 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:45459 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730168AbfASAbM (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Jan 2019 19:31:12 -0500
-Received: by mail-pg1-f194.google.com with SMTP id y4so6792852pgc.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Jan 2019 16:31:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Sd+gwOo5E4dkuf4Q6i8JvdMw7Stn3ZJ/xuY+z66pxp8=;
-        b=oA3VNzX3bnQsIF+UkffAZ2wgMaE+zvZWqNg94TTjaV6spVo1EZmId5LhAR9U3kg3Rf
-         bo87YaFm4ExZiqEeI8JNFjoH0xhhIpIiq9zqOhFk8XadY45FUxnibwkrSqtkZkNBK8Lr
-         kYUaocAI89Ep6MQo0Yv1crVQFF94Mth6jL/sI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Sd+gwOo5E4dkuf4Q6i8JvdMw7Stn3ZJ/xuY+z66pxp8=;
-        b=n2PNbNEcqd9/Cxh4OKYb001GTgmoYl/3RwVjJEeK3AlIgvCdziYdOHpSK2CdOR/4Ki
-         IA/LoF2VoSzxYuTVARTNxqBxdQ2O5hFoenjLRU0P8clZCP+9o3XkDx/DG2tuh4xHwDqN
-         JYppt8pcDfIt7ZxoFQpyXSOypjJ7OEBfl0rtTavOOA5q59pP2UKBzcl/mwvtNVzekWau
-         XrtK4DcPfc18Ba6BGHFUJnx5HfgcUAKpC/fa5CbIFmA5VuxgppVTyahpDQ7kNqUKOJqJ
-         w2JUem2rf695kcPfGFDgqj3Obzty3hb38XMvbZGvFq/OGGcqYNbLagui3sw430e3nhf+
-         rIgw==
-X-Gm-Message-State: AJcUukdHZ6R69vvjkfaaKmK9Skz4wnZ57ZY9zEAwfea8ne98StEub0PH
-        eINrU8AKrcIqyEmUDvtsImjLbA==
-X-Google-Smtp-Source: ALg8bN5oODdLlAZyklgwdzaHEQrU0y01J2dK24MCqQvbNSaRWzmMpr17C9P/2k541Da/gT6P/ZXpqw==
-X-Received: by 2002:a63:c051:: with SMTP id z17mr19393530pgi.20.1547857871519;
-        Fri, 18 Jan 2019 16:31:11 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id q195sm6681095pgq.7.2019.01.18.16.31.10
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 18 Jan 2019 16:31:10 -0800 (PST)
-Date:   Fri, 18 Jan 2019 16:31:09 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Johan Hovold <johan@kernel.org>
-Cc:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        Johan Hovold <jhovold@gmail.com>
-Subject: Re: [PATCH v5 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate
- change command
-Message-ID: <20190119003109.GD261387@google.com>
-References: <20190110143928.GE3430@localhost>
- <61301df80bd6a8ee0265b31b7f6a3aa1@codeaurora.org>
- <20190111013707.GD261387@google.com>
- <194b5d18ea86830b6a24939d483a964c@codeaurora.org>
- <20190111235633.GK261387@google.com>
- <a6e083d245baebc019b6e7163fd6f133@codeaurora.org>
- <20190115234628.GQ261387@google.com>
- <20190117160944.GV3691@localhost>
- <20190117172109.GU261387@google.com>
- <20190118094416.GB3691@localhost>
+        Fri, 18 Jan 2019 22:49:45 -0500
+Received: from mga04.intel.com ([192.55.52.120]:18133 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730410AbfASDtp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 18 Jan 2019 22:49:45 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Jan 2019 19:49:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,493,1539673200"; 
+   d="scan'208,217";a="109429613"
+Received: from orsmsx102.amr.corp.intel.com ([10.22.225.129])
+  by orsmga006.jf.intel.com with ESMTP; 18 Jan 2019 19:49:44 -0800
+Received: from orsmsx114.amr.corp.intel.com (10.22.240.10) by
+ ORSMSX102.amr.corp.intel.com (10.22.225.129) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Fri, 18 Jan 2019 19:49:43 -0800
+Received: from orsmsx103.amr.corp.intel.com ([169.254.5.210]) by
+ ORSMSX114.amr.corp.intel.com ([169.254.8.248]) with mapi id 14.03.0415.000;
+ Fri, 18 Jan 2019 19:49:43 -0800
+From:   "Stotland, Inga" <inga.stotland@intel.com>
+To:     "marcel@holtmann.org" <marcel@holtmann.org>
+CC:     "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Gix, Brian" <brian.gix@intel.com>
+Subject: Re: [PATCH BlueZ] mesh: Add D-Bus policy for Bluetooth mesh daemon
+Thread-Topic: [PATCH BlueZ] mesh: Add D-Bus policy for Bluetooth mesh daemon
+Thread-Index: AQHUruB907mn2RpEQk+Pv0BGzoZ1LKW1PjOAgAE+K4A=
+Date:   Sat, 19 Jan 2019 03:49:43 +0000
+Message-ID: <2700dbe29b92b23991c881dbf46ec55d8f326486.camel@intel.com>
+References: <20190118034652.4018-1-inga.stotland@intel.com>
+         <437FB2B8-80F7-4DE1-86E8-880AA307B618@holtmann.org>
+In-Reply-To: <437FB2B8-80F7-4DE1-86E8-880AA307B618@holtmann.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.254.106.117]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0472B80C3BC19F409A0B2006121C1CAC@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190118094416.GB3691@localhost>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 10:44:16AM +0100, Johan Hovold wrote:
-> On Thu, Jan 17, 2019 at 09:21:09AM -0800, Matthias Kaehlcke wrote:
-> 
-> > I observed that the qcom_geni_serial driver doesn't raise RTS with
-> > flow control disabled. It seems we have to investigate why that's the
-> > case. I agree that the driver should be platform agnostic.
-> 
-> Sounds like a driver bug, unless the hardware is just "odd". The
-> driver implementation of this looks very non-standard judging from a
-> quick peek.
-> 
-> In fact, qcom_geni_serial_get_mctrl() is currently a no-op if hardware
-> flow control is not enabled:
-> 
-> 	if (uart_console(uport) || !uart_cts_enabled(uport))
-> 		return;
-> 
-> Perhaps dropping the !uart_cts_enabled() test is sufficient.
-
-Thanks for taking a look Johan, that was indeed the problem (also
-in set_mctrl()). I posted a fix: https://lore.kernel.org/patchwork/patch/1033611/
-
-Balakrishna, the following (applied on top of your patch) works for me
-with the UART patch above:
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 9d5e41f159c78f..60bfdf01f72841 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1080,7 +1080,7 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- {
- 	unsigned int speed, qca_baudrate;
- 	struct qca_serdev *qcadev;
--	int ret;
-+	int ret = 0;
- 
- 	if (speed_type == QCA_INIT_SPEED) {
- 		speed = qca_get_speed(hu, QCA_INIT_SPEED);
-@@ -1097,22 +1097,27 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
- 		 * the old speed.
- 		 */
- 		qcadev = serdev_device_get_drvdata(hu->serdev);
--		if (qcadev->btsoc_type == QCA_WCN3990)
-+		if (qcadev->btsoc_type == QCA_WCN3990) {
-+			hci_uart_set_flow_control(hu, true);
- 			serdev_device_set_rts(hu->serdev, false);
-+		}
- 
- 		qca_baudrate = qca_get_baudrate_value(speed);
- 		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
- 		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
- 		if (ret)
--			return ret;
-+			goto out;
- 
- 		host_set_baudrate(hu, speed);
- 
--		if (qcadev->btsoc_type == QCA_WCN3990)
-+out:
-+		if (qcadev->btsoc_type == QCA_WCN3990) {
-+			hci_uart_set_flow_control(hu, false);
- 			serdev_device_set_rts(hu->serdev, true);
-+		}
- 	}
- 
--	return 0;
-+	return ret;
- }
- 
- static int qca_wcn3990_init(struct hci_uart *hu)
+SGkgTWFyY2VsLA0KDQpPbiBGcmksIDIwMTktMDEtMTggYXQgMDk6NTAgKzAxMDAsIE1hcmNlbCBI
+b2x0bWFubiB3cm90ZToNCj4gSGkgSW5nYSwNCj4gDQo+IFRoaXMgYWRkcyBuZXcgRC1CdXMgcG9s
+aWN5IGZpbGUgYnRtZXNoLmNvbmYNCj4gLS0tDQo+IE1ha2VmaWxlLm1lc2ggICAgfCAgNiArKysr
+KysNCj4gbWVzaC9idG1lc2guY29uZiB8IDI0ICsrKysrKysrKysrKysrKysrKysrKysrKw0KPiAy
+IGZpbGVzIGNoYW5nZWQsIDMwIGluc2VydGlvbnMoKykNCj4gY3JlYXRlIG1vZGUgMTAwNjQ0IG1l
+c2gvYnRtZXNoLmNvbmYNCj4gDQo+IGRpZmYgLS1naXQgYS9NYWtlZmlsZS5tZXNoIGIvTWFrZWZp
+bGUubWVzaA0KPiBpbmRleCBlYTZjNWU5MzkuLmUxNTcxODExNiAxMDA2NDQNCj4gLS0tIGEvTWFr
+ZWZpbGUubWVzaA0KPiArKysgYi9NYWtlZmlsZS5tZXNoDQo+IEBAIC0xLDUgKzEsOSBAQA0KPiBp
+ZiBNRVNIDQo+IA0KPiAraWYgREFUQUZJTEVTDQo+ICtkYnVzX0RBVEEgKz0gbWVzaC9idG1lc2gu
+Y29uZg0KPiArZW5kaWYNCj4gKw0KPiANCj4gSSBwcmVmZXIgdGhpcyBpcyBuYW1lZCBibHVldG9v
+dGgtbWVzaC5jb25mLg0KPiANCj4gQW5kIGZvciB0aGUgZGFlbW9uIGJpbmFyeSBuYW1lIHRoaXMg
+bWlnaHQgYmUgYmV0dGVyIGFzIGJsdWV0b290aGQtbWVzaCBpbnN0ZWFkIG9mIGp1c3QgbWVzaGQu
+DQoNCkFncmVlZDogbWFrZXMgaXQgZWFzaWVyIGZpbmRpbmcgdGhlIHByb2Nlc3MgYnkgbmFtZQ0K
+DQo+IA0KPiBtZXNoX3NvdXJjZXMgPSBtZXNoL21lc2guaCBtZXNoL21lc2guYyBcDQo+IAkJCQlt
+ZXNoL25ldF9rZXlzLmggbWVzaC9uZXRfa2V5cy5jIFwNCj4gCQkJCW1lc2gvbWVzaC1pby5oIG1l
+c2gvbWVzaC1pby5jIFwNCj4gQEAgLTI3LDQgKzMxLDYgQEAgbGliZXhlY19QUk9HUkFNUyArPSBt
+ZXNoL21lc2hkDQo+IG1lc2hfbWVzaGRfU09VUkNFUyA9ICQobWVzaF9zb3VyY2VzKSBtZXNoL21h
+aW4uYw0KPiBtZXNoX21lc2hkX0xEQUREID0gc3JjL2xpYnNoYXJlZC1lbGwubGEgJChlbGxfbGRh
+ZGQpIC1sanNvbi1jDQo+IG1lc2hfbWVzaGRfREVQRU5ERU5DSUVTID0gJChlbGxfZGVwZW5kZW5j
+aWVzKSBzcmMvbGlic2hhcmVkLWVsbC5sYQ0KPiArDQo+ICtFWFRSQV9ESVNUICs9IG1lc2gvYnRt
+ZXNoLmNvbmYNCj4gZW5kaWYNCj4gZGlmZiAtLWdpdCBhL21lc2gvYnRtZXNoLmNvbmYgYi9tZXNo
+L2J0bWVzaC5jb25mDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4IDAwMDAwMDAwMC4u
+ZjA1NTQ1MDY1DQo+IC0tLSAvZGV2L251bGwNCj4gKysrIGIvbWVzaC9idG1lc2guY29uZg0KPiBA
+QCAtMCwwICsxLDI0IEBADQo+ICs8IS0tIFRoaXMgY29uZmlndXJhdGlvbiBmaWxlIHNwZWNpZmll
+cyB0aGUgcmVxdWlyZWQgc2VjdXJpdHkgcG9saWNpZXMNCj4gKyAgICAgZm9yIEJsdWV0b290aCBN
+ZXNoIGRhZW1vbiB0byB3b3JrLiDigJQ+DQo+IA0KPiBMb3dlciBjYXNlIOKAnG1lc2jigJ0gaGVy
+ZS4NCj4gDQo+ICsNCj4gKzwhRE9DVFlQRSBidXNjb25maWcgUFVCTElDICItLy9mcmVlZGVza3Rv
+cC8vRFREIEQtQlVTIEJ1cyBDb25maWd1cmF0aW9uIDEuMC8vRU4iDQo+ICsgImh0dHA6Ly93d3cu
+ZnJlZWRlc2t0b3Aub3JnL3N0YW5kYXJkcy9kYnVzLzEuMC9idXNjb25maWcuZHRkIj4NCj4gKzxi
+dXNjb25maWc+DQo+ICsNCj4gKyAgPCEtLSAuLi9zeXN0ZW0uY29uZiBoYXZlIGRlbmllZCBldmVy
+eXRoaW5nLCBzbyB3ZSBqdXN0IHB1bmNoIHNvbWUgaG9sZXMgLS0+DQo+ICsNCj4gKyAgPHBvbGlj
+eSB1c2VyPSJyb290Ij4NCj4gKyAgICA8YWxsb3cgb3duPSJvcmcuYmx1ZXoubWVzaCIvPg0KPiAr
+ICAgIDxhbGxvdyBzZW5kX2Rlc3RpbmF0aW9uPSJvcmcuYmx1ZXoubWVzaCIvPg0KPiArICAgIDxh
+bGxvdyBzZW5kX2ludGVyZmFjZT0ib3JnLmJsdWV6Lm1lc2guQXBwbGljYXRpb24xIi8+DQo+ICsg
+ICAgPGFsbG93IHNlbmRfaW50ZXJmYWNlPSJvcmcuYmx1ZXoubWVzaC5FbGVtZW50MSIvPg0KPiAr
+ICAgIDxhbGxvdyBzZW5kX2ludGVyZmFjZT0ib3JnLmJsdWV6Lm1lc2guUHJvdmlzaW9uQWdlbnQx
+Ii8+DQo+ICsgICAgPGFsbG93IHNlbmRfaW50ZXJmYWNlPSJvcmcuZnJlZWRlc2t0b3AuREJ1cy5P
+YmplY3RNYW5hZ2VyIi8+DQo+ICsgICAgPGFsbG93IHNlbmRfaW50ZXJmYWNlPSJvcmcuZnJlZWRl
+c2t0b3AuREJ1cy5Qcm9wZXJ0aWVz4oCdLz4NCj4gDQo+IERvIHlvdSBuZWVkIHRoZSBsYXN0IHR3
+bz8NCg0KTm90IHJlYWxseS4gV2lsbCByZW1vdmUuDQoNCj4gDQo+ICsgIDwvcG9saWN5Pg0KPiAr
+DQo+ICsgIDxwb2xpY3kgY29udGV4dD0iZGVmYXVsdCI+DQo+ICsgICAgPGFsbG93IHNlbmRfZGVz
+dGluYXRpb249Im9yZy5ibHVlei5tZXNoIi8+DQo+ICsgIDwvcG9saWN5Pg0KPiArDQo+ICs8L2J1
+c2NvbmZpZz4NCj4gDQo+IFJlZ2FyZHMNCj4gDQo+IE1hcmNlbA0KPiANCg0KVGhhbmtzLA0KSW5n
+YQ0K
