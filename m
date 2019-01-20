@@ -1,79 +1,138 @@
-Return-Path: <SRS0=MOIW=P3=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=FRXr=P4=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4964FC61CE8
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 19:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A50C61CE4
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Jan 2019 09:45:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 13D582086D
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Jan 2019 19:51:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3703D2087B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Jan 2019 09:45:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+ETn9eF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729124AbfASTvD (ORCPT
+        id S1730469AbfATJpG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Jan 2019 14:51:03 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:46834 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728988AbfASTvD (ORCPT
+        Sun, 20 Jan 2019 04:45:06 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:44623 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730461AbfATJpF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Jan 2019 14:51:03 -0500
-Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5E5CDCF340;
-        Sat, 19 Jan 2019 20:58:47 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v4 1/5] usb: split code locating ACPI companion into port
- and device
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190118223407.64818-1-rajatja@google.com>
-Date:   Sat, 19 Jan 2019 20:51:00 +0100
+        Sun, 20 Jan 2019 04:45:05 -0500
+Received: by mail-pl1-f195.google.com with SMTP id e11so8338389plt.11;
+        Sun, 20 Jan 2019 01:45:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=Uuj5qeyPQRNMgSOvskIjreOxX4tQJ5q841j1HWFRaJs=;
+        b=B+ETn9eFnkyGXbFKkShNkgobCVLVyCEk0x5FgM3WdrFeu3QsQGg9Xzd2rJrZuKZ874
+         MOujsPAfYoLda8eenq7wGYdvxB0jGJ9GDkJ0Zt6sqMIfk1OfG6+C9++OcDPmS6/d9UVY
+         xHTdfxgHvssX2Gg5rtEVveNOjwmH2EfXZ4VPnz6kbcNmCbwnSQJ991vYPedvUIz93BEm
+         wDGN9xHXFqUmIJPBtLBpI8a1xUHlytXDtTIvdkJGYMO8BGjRNmvk3mKZjh9v2af4Ujbl
+         HQGWaBbYrvQXnlgwTwjTQa9QX7wC7/OIN3gy5OBlVfuyNfQDFBixqmRuD0Gqs/FzIZf+
+         kwOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Uuj5qeyPQRNMgSOvskIjreOxX4tQJ5q841j1HWFRaJs=;
+        b=JtuxPsFxfT8v4g2VVbeP6TA5v8mBC1JXsfb0NEdY8vzaqpO0YqC+yj06xvsPK6MIFO
+         g/to/qpl3QntuLdNvUjbBxbXuPz4+DSASo3n24EVm241GCaW2K1rM5yPxBexh8o21flJ
+         gEazSDx5TAWTjsdyr0izphG07MKBoWveCugU2tYh+N/AMVdOw6A2tnR+RrxPAW6Pkv/k
+         h28zDa+aT63I3TlIRGz0QGS6cd6qfmdi71bd/05BB5FDr0HRVZZNfGg+9dV3He2BZyzk
+         U6I0CL0q8x/oRDNR44eg94HvRxFBAn/RSUz8GZyqeHd9P2HrDxRGVR17o5Xj6a7OAhHa
+         ZEeA==
+X-Gm-Message-State: AJcUukf75O2MVXu/cEVVsDggAQGip0XyEsK/FwgDIeWeql1Eole8i1Od
+        svbjS/4YUPvl7KTBGcqIdmw3Nxs6
+X-Google-Smtp-Source: ALg8bN78uIMhjBG7tPJtnVKpUrefmGaJ9o+gTHomnL0ak7v1Ercl08Bm44CMSQmYQ4GIVuiccGarqA==
+X-Received: by 2002:a17:902:128c:: with SMTP id g12mr24656538pla.146.1547977503984;
+        Sun, 20 Jan 2019 01:45:03 -0800 (PST)
+Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
+        by smtp.gmail.com with ESMTPSA id m3sm19444921pff.173.2019.01.20.01.45.02
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 20 Jan 2019 01:45:03 -0800 (PST)
+Date:   Sun, 20 Jan 2019 01:45:00 -0800
+From:   Myungho Jung <mhjungk@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Torokhov <dtor@chromium.org>,
-        Alex Hung <alex.hung@canonical.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-usb@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        rajatxjain@gmail.com, dtor@google.com,
-        Raghuram Hegde <raghuram.hegde@intel.com>,
-        chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
-Content-Transfer-Encoding: 7bit
-Message-Id: <C103ADA0-68A0-4571-AE47-1744E64E0D7E@holtmann.org>
-References: <20181117010748.24347-1-rajatja@google.com>
- <20190118223407.64818-1-rajatja@google.com>
-To:     Rajat Jain <rajatja@google.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: hci_uart: Add a local variable to store the
+ result of h4_recv_buf()
+Message-ID: <20190120094459.GA22129@myunghoj-Precision-5530>
+References: <20190111065514.GA26542@myunghoj-Precision-5530>
+ <09FCB21A-2184-4CDB-8BF0-75C403DF39F9@holtmann.org>
+ <20190119081919.GA10681@myunghoj-Precision-5530>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190119081919.GA10681@myunghoj-Precision-5530>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rajat,
-
-> In preparation for handling embedded USB devices let's split
-> usb_acpi_find_companion() into usb_acpi_find_companion_for_device() and
-> usb_acpi_find_companion_for_port().
+On Sat, Jan 19, 2019 at 12:19:20AM -0800, Myungho Jung wrote:
+> On Fri, Jan 18, 2019 at 10:19:41AM +0100, Marcel Holtmann wrote:
+> > Hi Myungho,
+> > 
+> > > In h4_recv(), if h4_recv_buf() returns error and h4_recv() is
+> > > asynchronously called again before setting rx_skb to NULL, ERR_PTR will
+> > > be dereferenced in h4_recv_buf(). Check return value in a local variable
+> > > before writing to rx_skb.
+> > > 
+> > > Reported-by: syzbot+017a32f149406df32703@syzkaller.appspotmail.com
+> > > Signed-off-by: Myungho Jung <mhjungk@gmail.com>
+> > > ---
+> > > drivers/bluetooth/hci_h4.c | 11 +++++++----
+> > > 1 file changed, 7 insertions(+), 4 deletions(-)
+> > 
+> > patch has been applied to bluetooth-next tree.
+> > 
+> > Can you actually fix all callers of h4_recv_buf since they all suffer from the same issue.
+> > 
+> > Regards
+> > 
+> > Marcel
+> > 
 > 
-> Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
-> Signed-off-by: Rajat Jain <rajatja@google.com>
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Tested-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
-> ---
-> v4: Add Acked-by and Tested-by in signatures.
-> v3: same as v1
-> v2: same as v1
+> Hi Marcel,
 > 
-> drivers/usb/core/usb-acpi.c | 133 +++++++++++++++++++-----------------
-> 1 file changed, 72 insertions(+), 61 deletions(-)
+> Sure, let me check other callers and fix them if applicable.
+> 
+> Thanks,
+> Myungho
+> 
 
-what is the plan here? I take this via bluetooth-next tree?
+Hi Marcel,
 
-Regards
+I found there are many callers that need to be fixed. So, how about checking
+error code in h4_recv_buf() instead?
 
-Marcel
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index fb97a3bf069b..dea48090d2dc 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -174,6 +174,10 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	u8 alignment = hu->alignment ? hu->alignment : 1;
+ 
++	/* Check if socket buffer is not reset yet from previous error */
++	if (IS_ERR(skb))
++		skb = NULL;
++
+ 	while (count) {
+ 		int i, len;
 
+
+It is tested and verified by syzbot. The previous commit is no more needed if
+this looks better. 
+
+Thanks,
+Myungho
