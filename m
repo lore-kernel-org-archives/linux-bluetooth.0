@@ -2,166 +2,101 @@ Return-Path: <SRS0=Rr1U=P5=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59036C282F6
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Jan 2019 08:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51623C67875
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Jan 2019 11:02:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2AF2D20989
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Jan 2019 08:56:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548061005;
-	bh=ljoqcITDvkcqTfkTIOdLmre0eIJ7TDdk3SpkC0S0AGo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=HeAktRWJv3+/ci31fdL1q/kbBpy4P6UZIY1e7mvxBOp/ypu14R4xybV9+XOjK+b7o
-	 DtAtgUD/Qt2m06lmBbsfLojlMkY3fJ1KA9U5M6RDFcnnO6DVQHtiD1PKNbRDqcOpbp
-	 l+beN5bfWsWhixkfZAhENp0KwtyPwvNRBdLRBB9E=
+	by mail.kernel.org (Postfix) with ESMTP id 1E0B12085A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Jan 2019 11:02:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kx4jKEb+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729957AbfAUI4Y (ORCPT
+        id S1727980AbfAULC3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Jan 2019 03:56:24 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:39038 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729906AbfAUI4X (ORCPT
+        Mon, 21 Jan 2019 06:02:29 -0500
+Received: from mail-pg1-f171.google.com ([209.85.215.171]:42157 "EHLO
+        mail-pg1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727566AbfAULC2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Jan 2019 03:56:23 -0500
-Received: by mail-lj1-f196.google.com with SMTP id t9-v6so16810872ljh.6;
-        Mon, 21 Jan 2019 00:56:21 -0800 (PST)
+        Mon, 21 Jan 2019 06:02:28 -0500
+Received: by mail-pg1-f171.google.com with SMTP id d72so9327051pga.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jan 2019 03:02:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=HKFgLv/j3Z0mWZdAgD7A+A06DttgOLiIrXfeps43Wao=;
+        b=Kx4jKEb+B68BML3ETwLVCgVGbZUTUWMqkI7tQZGjIz/WoDeBqRItWDonXwEHoMbvcg
+         YlnjdFtRc9WQqll9CBJZWD4H+ndmgZt5clXcvW3nbmc7y/zNsEMBd8HgmqGEXXovuKqf
+         id8noefqubpff4CH2sDbu7iiiKfLKsPm4ru0XP+q4NaBisNWqBU9EWm2g6LooB5YUEkZ
+         U5SDtR8acOr8tE7JllNAmAEjfurDkiHrNbIwACWbBwfDqtO4cdKIQUzjl7qEmx3eapia
+         lQAktTR5++sGjGd9tUhFkv0AmcT78Sv+AjCbp2EKX20CPiHiETWz3UuMybH6vk+nC+3O
+         zCyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=71c5hyAY1EO0S0MOpM0Em5vA0o1Gvicjzd3MBEoNQCA=;
-        b=YSjUJuA3k/wPEQzhAm5g9oTNo9Bl+8XeOO/Fywk+2447YnrmRNLPv1axuiWOIHAejE
-         YlWy8DZdoh9I4HlLGQ3/GIbRC7WKsyn2sLy5kGWlzjVyx585Cvr9McP6yEP83HkWY5dX
-         F7YUrsDRBS8TrJoNGFqVWo0hBxxrob+m4lNrJEU+uxiQPQFprfEo+1Unia434/BFCBKY
-         G43uyMYHcA6bZGK7xKbeOLd4tFb8vBQLJ4AaqB8tj32yrxwaMCQp+cMIOb2ojswe9JJ0
-         rG+3z2bZAl9FIynS57jV+OyoN63omlWfAJgidsCwpmsXO3QwoL3pT2lZ9/wu6C7IBbtY
-         9taw==
-X-Gm-Message-State: AJcUukf6xAlmcodI5xv4Emo5ia2biMAfnmtkZxNpgy/aWU+pCwkskJ2P
-        zJfLkztVvPmXwbHMqmH3FdgM22rZ
-X-Google-Smtp-Source: ALg8bN5V5F7mb0JqjYWPXZkemIKmk0W2dwrw8GFZ1oJPMXrJUKMnH9xI044Gfv2KhSpp+0encx/5Xw==
-X-Received: by 2002:a2e:3218:: with SMTP id y24-v6mr1782139ljy.157.1548060980222;
-        Mon, 21 Jan 2019 00:56:20 -0800 (PST)
-Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id f1sm2172504lfm.22.2019.01.21.00.56.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 21 Jan 2019 00:56:19 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.91)
-        (envelope-from <johan@kernel.org>)
-        id 1glVNN-0000QF-T7; Mon, 21 Jan 2019 09:56:14 +0100
-Date:   Mon, 21 Jan 2019 09:56:13 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Johan Hovold <johan@kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        Johan Hovold <jhovold@gmail.com>
-Subject: Re: [PATCH v5 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate
- change command
-Message-ID: <20190121085613.GG3691@localhost>
-References: <61301df80bd6a8ee0265b31b7f6a3aa1@codeaurora.org>
- <20190111013707.GD261387@google.com>
- <194b5d18ea86830b6a24939d483a964c@codeaurora.org>
- <20190111235633.GK261387@google.com>
- <a6e083d245baebc019b6e7163fd6f133@codeaurora.org>
- <20190115234628.GQ261387@google.com>
- <20190117160944.GV3691@localhost>
- <20190117172109.GU261387@google.com>
- <20190118094416.GB3691@localhost>
- <20190119003109.GD261387@google.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=HKFgLv/j3Z0mWZdAgD7A+A06DttgOLiIrXfeps43Wao=;
+        b=HUSQA0w+9rgztlzJBaOJ4UcK3Y0cfaDTf6YBkxE4U2See0uKVYMguRXWTmvpkoelRl
+         0lZkRsBYChpkz5EAWd8fLu1el/ut2Bp0rYv8IUb53R88DaowUVV28RWvI/6p+qslp/gX
+         6e1glGBSh9tTgjS/kiVqHf79OlMkTGQ+oNKB/WO5maCnJe4V/MKeWO90dMFeRX8bnGnl
+         38kos1nbCmyVglFd8J0n3cCZBarK4umkyv2eOsbs1Ojk0eB6TjKXpD7nHIgGiuipvxiq
+         pBgAcDaNuIUoauY1FVmWJeEhYxV8Th9+BrKOmQrn8IqgAW+9dP0A3k9BIn2HqwWgc9MJ
+         e/DA==
+X-Gm-Message-State: AJcUukc5oUEYfkF/Oav7xGDX18+IwfoJ6M3+RuQSqosi2iHGn6Y7B8Oo
+        LGW4FmbbCAkVf7RmTnjG/4JEAxphN94l6uWmrfIW6ugd
+X-Google-Smtp-Source: ALg8bN7LZkaDPcHGxIu3sATduugk+Z8Aehj9Ll4yUb7BENoulQMoWqTdPEv/JapTVBtkIVD8edmYVbHBrhiWyNF9NIw=
+X-Received: by 2002:a62:b15:: with SMTP id t21mr30273522pfi.136.1548068547749;
+ Mon, 21 Jan 2019 03:02:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190119003109.GD261387@google.com>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+From:   Youssif Saeed <youssif.am.saeed@gmail.com>
+Date:   Mon, 21 Jan 2019 11:02:16 +0000
+Message-ID: <CA+T8qpa+qHK7O6zr+a7CUysPzzR4jce7peCCcuOVN4J9TP6teQ@mail.gmail.com>
+Subject: BlueZ 5.50: Browsing local GATT table
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 04:31:09PM -0800, Matthias Kaehlcke wrote:
-> On Fri, Jan 18, 2019 at 10:44:16AM +0100, Johan Hovold wrote:
-> > On Thu, Jan 17, 2019 at 09:21:09AM -0800, Matthias Kaehlcke wrote:
-> > 
-> > > I observed that the qcom_geni_serial driver doesn't raise RTS with
-> > > flow control disabled. It seems we have to investigate why that's the
-> > > case. I agree that the driver should be platform agnostic.
-> > 
-> > Sounds like a driver bug, unless the hardware is just "odd". The
-> > driver implementation of this looks very non-standard judging from a
-> > quick peek.
-> > 
-> > In fact, qcom_geni_serial_get_mctrl() is currently a no-op if hardware
-> > flow control is not enabled:
-> > 
-> > 	if (uart_console(uport) || !uart_cts_enabled(uport))
-> > 		return;
-> > 
-> > Perhaps dropping the !uart_cts_enabled() test is sufficient.
-> 
-> Thanks for taking a look Johan, that was indeed the problem (also
-> in set_mctrl()). I posted a fix: https://lore.kernel.org/patchwork/patch/1033611/
+Hi
 
-Nice (I did mean set_mctrl() above, as I think you noticed).
+Is there a tool/utility for browsing the local GATT table. I have so
+far used "bluetoothctl info" as follows:-
 
-> Balakrishna, the following (applied on top of your patch) works for me
-> with the UART patch above:
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 9d5e41f159c78f..60bfdf01f72841 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -1080,7 +1080,7 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  {
->  	unsigned int speed, qca_baudrate;
->  	struct qca_serdev *qcadev;
-> -	int ret;
-> +	int ret = 0;
->  
->  	if (speed_type == QCA_INIT_SPEED) {
->  		speed = qca_get_speed(hu, QCA_INIT_SPEED);
-> @@ -1097,22 +1097,27 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  		 * the old speed.
->  		 */
->  		qcadev = serdev_device_get_drvdata(hu->serdev);
-> -		if (qcadev->btsoc_type == QCA_WCN3990)
-> +		if (qcadev->btsoc_type == QCA_WCN3990) {
-> +			hci_uart_set_flow_control(hu, true);
+[bluetooth]menu gatt
+[bluetooth]register-service 0xFFFF
+[bluetooth]register-characteristic 0xAAAA read,write
+[bluetooth]register-application
+[bluetooth]back
+[bluetooth]info
+Controller 00:16:A4:09:31:11 (public)
+Name: linuxvm
+Alias: linuxvm
+Class: 0x000c0000
+Powered: yes
+Discoverable: no
+Pairable: yes
+UUID: Headset AG                (00001112-0000-1000-8000-00805f9b34fb)
+UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
+UUID: Audio Sink                (0000110b-0000-1000-8000-00805f9b34fb)
+UUID: Unknown                   (0000ffff-0000-1000-8000-00805f9b34fb)
+UUID: Headset                   (00001108-0000-1000-8000-00805f9b34fb)
+Modalias: usb:v1D6Bp0246d0532
+Discovering: no
 
-Wow, yeah, this parameter inversion is indeed confusing...
+However, this does not show the list of characteristics/descriptors
+and their handles which is what I am after.
 
->  			serdev_device_set_rts(hu->serdev, false);
-> +		}
+I am using BlueZ 5.50 on an Ubuntu machine running Linux 4.15.0-43-generic.
 
-But looking at hci_uart_set_flow_control() now, it actually also
-deasserts RTS. So all you need here is the hci_uart_set_flow_control()
-call.  
-
-And that makes the inversion make a bit more sense too, even if the
-naming is a bit unfortunate with respect to
-serdev_device_set_flow_control() at least.
-
->  		qca_baudrate = qca_get_baudrate_value(speed);
->  		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
->  		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
->  		if (ret)
-> -			return ret;
-> +			goto out;
->  
->  		host_set_baudrate(hu, speed);
->  
-> -		if (qcadev->btsoc_type == QCA_WCN3990)
-> +out:
-> +		if (qcadev->btsoc_type == QCA_WCN3990) {
-> +			hci_uart_set_flow_control(hu, false);
->  			serdev_device_set_rts(hu->serdev, true);
-> +		}
-
-And same here.
-
-Johan
+Thanks
+Youssif
