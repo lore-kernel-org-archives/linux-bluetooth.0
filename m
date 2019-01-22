@@ -2,134 +2,114 @@ Return-Path: <SRS0=wtFT=P6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89FC5C282C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 21:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C36C282C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 22:29:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 594B720866
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 21:53:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D591C20866
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 22:29:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Y5YGS+Xf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WGLK5XSB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726942AbfAVVxc (ORCPT
+        id S1726867AbfAVW3G (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Jan 2019 16:53:32 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:34087 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726832AbfAVVxc (ORCPT
+        Tue, 22 Jan 2019 17:29:06 -0500
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:41331 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726804AbfAVW3G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Jan 2019 16:53:32 -0500
-Received: by mail-pg1-f196.google.com with SMTP id j10so46211pga.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jan 2019 13:53:31 -0800 (PST)
+        Tue, 22 Jan 2019 17:29:06 -0500
+Received: by mail-lj1-f194.google.com with SMTP id k15-v6so134448ljc.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jan 2019 14:29:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=0xmELSHataISH5vThijiY1zNydt2sRYeLj/tC2a6MpI=;
-        b=Y5YGS+XfApbE/H9ALND+YmmlNPp7JXcRo9oaKgN0aXlulYRCcSFLaq3UQdJNJtpFcq
-         jj72LBn9McVB7BwKl6eTUTAcZpSbVS4ZFJDGtfxvZGXF4DKe5UDtKxzkCSqVetkMFbrP
-         MDCvUT7LX3k+7l3HmTbRbH3zFjx7ds7rfXXrI=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ATJb8Y1QK0+DWFS5C9575PNIZ/kg7x8HH9FfSrgkB1I=;
+        b=WGLK5XSB1+8mmb5g65v/2ltx2RQwKTpbRuDeKxSaDMZUzLtEDIHnwvd88+dzibti7f
+         m/qpQ99vKGMgbWm2I80mSjhnoWuCKuZXGZZALyNHKkf31RX9jmp4thBWNhantnnsm0t9
+         wGeEnMa2a11fndE2wmWDA7/x1iSOTaiMtRxgo5K53s5FPlBfyfHKHb+JLIcIdeC+XLoM
+         L9P2V81DZV89sPdLB2oYHkBs6HIIreq8CotEz4ptAZ1y4BQppnztVNZMdUlTr3eCTFpO
+         bv1g6BcNXY59Y3LH/Dnx0MImDonudTiN8IbxzWDW/KGdaCemwyk/CL7Cpz0XaGWYRPvJ
+         M24g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=0xmELSHataISH5vThijiY1zNydt2sRYeLj/tC2a6MpI=;
-        b=oXJmxt3bOuyplzaO37VhNgqUry7z0UY9758EnIxN7LhbPVFSlD12vfxH84o4cVwkIK
-         QnDyxWMNP50+6DAC+rb8jkb0r0kka77z3DOQb2gRQwKw7jMQtqJ3DJDsOkoJVsudS8IT
-         PmU2DA+HZMxIsk+xenkzcPGniijqtPYa6bYpLLzfE17xLW4GluY0fLgHW2Y6Vamk6itz
-         d4bq5cnhFa/vD9ouzX1JJEHA7tUvnWukU2BbXFAlmB3wX2HjlRf9ODgZYCkiphqPTMS7
-         BT5psxZyuRtrRNfJsGP9Nb3Y/Yfqo6HCD5isLL7Tm4oDqJJ28sFRybppcVbz8HmGmP/4
-         AD0Q==
-X-Gm-Message-State: AJcUukfC7UqxVjSw3ZOYFGcdk1+A0kTxeXkYTtxIsz/EHOdb4EN0B65p
-        djs9ZQ3WmW4mpM+G2LrC0fwbbg==
-X-Google-Smtp-Source: ALg8bN43Fv6i7dp4x6fZQrpJTgaAAkSBgEvBMEKO5bp+aaHrZYNntySuODgk1VLu7hQn7HThysoN1w==
-X-Received: by 2002:a62:f907:: with SMTP id o7mr34695979pfh.244.1548194011474;
-        Tue, 22 Jan 2019 13:53:31 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id s9sm23467463pgl.88.2019.01.22.13.53.30
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 22 Jan 2019 13:53:31 -0800 (PST)
-Date:   Tue, 22 Jan 2019 13:53:30 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     Johan Hovold <johan@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, Johan Hovold <jhovold@gmail.com>
-Subject: Re: [PATCH v5 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate
- change command
-Message-ID: <20190122215330.GI261387@google.com>
-References: <20190111013707.GD261387@google.com>
- <194b5d18ea86830b6a24939d483a964c@codeaurora.org>
- <20190111235633.GK261387@google.com>
- <a6e083d245baebc019b6e7163fd6f133@codeaurora.org>
- <20190115234628.GQ261387@google.com>
- <20190117160944.GV3691@localhost>
- <20190117172109.GU261387@google.com>
- <20190118094416.GB3691@localhost>
- <20190119003109.GD261387@google.com>
- <24831204bab89250099ca56e7562bd16@codeaurora.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ATJb8Y1QK0+DWFS5C9575PNIZ/kg7x8HH9FfSrgkB1I=;
+        b=bKEVceo5caoe0qW0koyjcksxvm7ogac73ufVL4GfJWcS3dE/0Iq7jcZJBDUIQ99hYq
+         zq648Aqev9iNUKwQ7k5iySDCPO4+2QOefOgvGQi+yRJJK8IUvhXC3ODzRyAPeCc5qJwY
+         vMgfpiWRpWSQdnr5iVTPsuYjj/bbaI41GQFISPrUF7WlkJvZim1FLHPLBdvS64jCPsZC
+         5zBM/VSU0aRRrOt9+PjYhEDC8ixxDSvDmvjcO9F3xFPnXyNNvYWseB6RDr23HR69KyYX
+         1RHiVBlOeeT+32G0AJitWSk93jf15rWrU+fRISAAoOo3wRFyiFhJZWc+ySplCOa6fwNY
+         exsg==
+X-Gm-Message-State: AJcUukcxyFszoIwFcsiW7iAwtS//YG29qmgW9bNf+0j8U5k6Ds3DscHf
+        Cvog/3LCUv11RjvcLBSWmmq0xid9EpQBdxLAI+xwTQ==
+X-Google-Smtp-Source: ALg8bN4oiPniTUo1bcuJEkQ8dvHztC/NIPTgsxSsGDXUI+KpR8FA1FBQioCBOlZ9LPKHMSTM0EcN2sIjGM59Ztefs1I=
+X-Received: by 2002:a2e:9395:: with SMTP id g21-v6mr2157913ljh.78.1548196144151;
+ Tue, 22 Jan 2019 14:29:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <24831204bab89250099ca56e7562bd16@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20181117010748.24347-1-rajatja@google.com> <20190118223407.64818-1-rajatja@google.com>
+ <C103ADA0-68A0-4571-AE47-1744E64E0D7E@holtmann.org>
+In-Reply-To: <C103ADA0-68A0-4571-AE47-1744E64E0D7E@holtmann.org>
+From:   Rajat Jain <rajatja@google.com>
+Date:   Tue, 22 Jan 2019 14:28:27 -0800
+Message-ID: <CACK8Z6FzWTZ_SYCBqGsOcf2xzSp3+W9HD-1inyRtJ=Wqsww8Pw@mail.gmail.com>
+Subject: Re: [PATCH v4 1/5] usb: split code locating ACPI companion into port
+ and device
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dmitry Torokhov <dtor@chromium.org>,
+        Alex Hung <alex.hung@canonical.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-usb@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        Rajat Jain <rajatxjain@gmail.com>,
+        Dmitry Torokhov <dtor@google.com>,
+        Raghuram Hegde <raghuram.hegde@intel.com>,
+        chethan.tumkur.narayan@intel.com,
+        "Ghorai, Sukumar" <sukumar.ghorai@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jan 21, 2019 at 08:11:39PM +0530, Balakrishna Godavarthi wrote:
-> Hi Matthias,
-> 
-> On 2019-01-19 06:01, Matthias Kaehlcke wrote:
-> > On Fri, Jan 18, 2019 at 10:44:16AM +0100, Johan Hovold wrote:
-> > > On Thu, Jan 17, 2019 at 09:21:09AM -0800, Matthias Kaehlcke wrote:
-> > > 
-> > > > I observed that the qcom_geni_serial driver doesn't raise RTS with
-> > > > flow control disabled. It seems we have to investigate why that's the
-> > > > case. I agree that the driver should be platform agnostic.
-> > > 
-> > > Sounds like a driver bug, unless the hardware is just "odd". The
-> > > driver implementation of this looks very non-standard judging from a
-> > > quick peek.
-> > > 
-> > > In fact, qcom_geni_serial_get_mctrl() is currently a no-op if hardware
-> > > flow control is not enabled:
-> > > 
-> > > 	if (uart_console(uport) || !uart_cts_enabled(uport))
-> > > 		return;
-> > > 
-> > > Perhaps dropping the !uart_cts_enabled() test is sufficient.
-> > 
-> > Thanks for taking a look Johan, that was indeed the problem (also
-> > in set_mctrl()). I posted a fix:
-> > https://lore.kernel.org/patchwork/patch/1033611/
-> > 
-> > Balakrishna, the following (applied on top of your patch) works for me
-> > with the UART patch above:
-> > 
-> 
-> [Bala]: will test and update BT patch accordingly.
+Hi Marcel,
 
-Note that Johan pointed out that hci_uart_set_flow_control() deasserts
-RTS when flow control is disabled, so the _set_rts() calls can be
-removed. With that only a single action needs to be undone in case of
-an error, you can consider to keep the return instead of using the
-goto introduced by my patch.
+On Sat, Jan 19, 2019 at 11:51 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Rajat,
+>
+> > In preparation for handling embedded USB devices let's split
+> > usb_acpi_find_companion() into usb_acpi_find_companion_for_device() and
+> > usb_acpi_find_companion_for_port().
+> >
+> > Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
+> > Signed-off-by: Rajat Jain <rajatja@google.com>
+> > Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > Tested-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
+> > ---
+> > v4: Add Acked-by and Tested-by in signatures.
+> > v3: same as v1
+> > v2: same as v1
+> >
+> > drivers/usb/core/usb-acpi.c | 133 +++++++++++++++++++-----------------
+> > 1 file changed, 72 insertions(+), 61 deletions(-)
+>
+> what is the plan here? I take this via bluetooth-next tree?
 
-Please keep/adapt the "Deassert RTS while changing the baudrate ..."
-comment to leave it clear to posterity why flow control is disabled
-during baudrate changes. It's fairly obvious once you understand the
-problem and that disabling flow control deasserts RTS, but it took us
-a while to get there, initially we only had a comment saying
-"disabling flow control is mandatory" (I recall I inquired about this
-multiple times during the initial review of the wcn3990 patches ;-)
+Yes, I'd think that would be the best plan. Dmitry / Greg - do you
+have any objections / suggestions?
 
-Thanks
-
-Matthias
+>
+> Regards
+>
+> Marcel
+>
