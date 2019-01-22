@@ -2,120 +2,129 @@ Return-Path: <SRS0=wtFT=P6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA89AC282C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 12:59:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B9EC282C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 13:45:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B70ED21721
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 12:59:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E8C4F21721
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 13:45:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F8W1IgZ+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tDjzuRXy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728327AbfAVM7R (ORCPT
+        id S1728577AbfAVNpa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Jan 2019 07:59:17 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:39015 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727936AbfAVM7R (ORCPT
+        Tue, 22 Jan 2019 08:45:30 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:36513 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728439AbfAVNpa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Jan 2019 07:59:17 -0500
-Received: by mail-wm1-f66.google.com with SMTP id y8so14069516wmi.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jan 2019 04:59:16 -0800 (PST)
+        Tue, 22 Jan 2019 08:45:30 -0500
+Received: by mail-ed1-f65.google.com with SMTP id f23so19348446edb.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jan 2019 05:45:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=H9JtaknP1fT5QmX63bb5xCqMGbzzVUZ2EJQ41u87s2I=;
-        b=F8W1IgZ+FgDODSbYyYSeopIRtW6gNJIFthgvqdQeUHKSGjkLY0BP0a3TUMIjLhfdOk
-         X1ks/DyaXCHLy6xKdewCrf1KzeszPVy090A3ZwfwHyB+YCSTkJUflold/uIs9RfQBLoF
-         hLSzuhWYTnpvNC2yoKy2Juln+aKbyFwo9diWMsOukzMEmG81oX1/x7Y+6KALpY6fQjj/
-         cHSfVeCZQfkeMdJ+VfiawmGOWyY0AxjT3r7HlqOOgJii3xM4yUWIJVcP4Ri4MHKo6F9I
-         4oOc2ygXuAWW+Uldv/jEy0vR46/vyuANZ3XuaQiLrSf4HmvqWbTd7Iuc8nrRxRfy6lcB
-         H5zg==
+        h=from:to:subject:date:message-id;
+        bh=dQXMfrKK633k51y9hnl350MLkTxRXwrZW+Ivg+uxDgI=;
+        b=tDjzuRXyMd3ZjT0Asd6G7EI9nDt4QVNfJIYKq6HAOg190EjFAuXJkV1sLjNOhV4TVJ
+         n+4Em05cvGeQnE51mUOj22O8FWEnyqKyEHQOgCfpOgI55gQMgp+0bXURZAMF/NVm1xvL
+         zjFxzoRSd4MhwM5AIbzXw3RBbQfoR4TBrMyEYT1z7IIdjya9u6N60TDabbhJ1C/AXP3m
+         BY2M/yVD6oK+HKq7M99saDHRqGAKvGk8hHrfSkGpnG+1Iohb56h+yqPILX8OV75cg2YV
+         5cIqXoIiJ4Ss5DThefr8NTYLMYMnQJzgA9h5bubJ1vIXz7xpI/QDcw601zYDB1wCY4Nm
+         0vWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=H9JtaknP1fT5QmX63bb5xCqMGbzzVUZ2EJQ41u87s2I=;
-        b=YGATRZ8PdREdzuWIshoJp00jZKzdOjMaUjFQfADs66gEsVE6n+7T96zcy741oeISdy
-         pl9xLPS9QUrtS5JDhsYmpZIg3CpJLBcXkCGsHYKwcdgn3T9stlY1hj0bvUjwSr/sf1HJ
-         FF79NV+WXgiCyrJ33qm66RnVfPMO8wU/FVdn+CD9C7O3+GfkvVOnQtYf8AyHjgMLfWlI
-         IWJAJxr/zvefpKqjbDx8fJqi1VUmB5a+si9CPcdEkNw/k7BrE2KhHztL2jhpSOiWIYG6
-         SnWFxPfINv7zHDSYTMosmjxEmGmCx5eOtKQ1uO5eJ4tuv4F6EFFTsfCUOzHGIVvP++fZ
-         4K4Q==
-X-Gm-Message-State: AJcUukdhrJHpe0PiOQOVRXvw9y6dx820l1mmLFszqVQuV+24ZIPDp/Ch
-        Z4n/ZY46iFyiqpS+KJ88iOs=
-X-Google-Smtp-Source: ALg8bN4DHIAKQSFh8AeMnWYdMrjKhKPZIMkiqErkOXVtX2ZLiVTCAsCaf4gbqeIZ4olm9lOSnTh7mg==
-X-Received: by 2002:a1c:2314:: with SMTP id j20mr3622454wmj.142.1548161955657;
-        Tue, 22 Jan 2019 04:59:15 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id q9sm73287360wrv.26.2019.01.22.04.59.14
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=dQXMfrKK633k51y9hnl350MLkTxRXwrZW+Ivg+uxDgI=;
+        b=EMYwL4bWLuAEelyBcIWnc4p0MRZ+MGBaFIefcH4dVE5wyckJxCKWmrUpwYNMyNR/0d
+         HKCNN3Wp/2gaz0xSTQ0nyM5CToTe6BSdT5FgS9nefiPtgBAqhsxCTJByyY+Yd36Q5HkD
+         ykZOcuB5ERVXNSTuoCeRcpWp/w0VZgXBZv8TD1hPe/+uc7bORfcpklvUDm80MneZY1sA
+         1rt6uILOYRFapL42mILaSyzPAHvm0Or91XEAwKQkNOO0s1VP8OXxfRnMvxI+Af7UmNC9
+         T/ZNjp73jLhZc7gZhiOYdbikkrJcrLe9JafOHQ1PdzZY/YaiFaasK3tHDa7SNlnBHkqE
+         UYrA==
+X-Gm-Message-State: AJcUukfM7d7wDw7rhlaA4M7VaGd5tRfh701ZAmpgYJXVXlLy2UsiLfOQ
+        klyJnuBTdyoQk2+535NqvnrytBOq
+X-Google-Smtp-Source: ALg8bN7ErXs7+d5Fga31V55x10WX5RL73R1oEQE4mxhfm4fQ0MeSYfCSk+BdfNoVV+/M9MV0stJ2gw==
+X-Received: by 2002:a17:906:f2c6:: with SMTP id gz6-v6mr28415063ejb.211.1548164727827;
+        Tue, 22 Jan 2019 05:45:27 -0800 (PST)
+Received: from localhost.localdomain ([192.198.151.62])
+        by smtp.gmail.com with ESMTPSA id dc5-v6sm5319153ejb.53.2019.01.22.05.45.26
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 22 Jan 2019 04:59:15 -0800 (PST)
-Date:   Tue, 22 Jan 2019 13:59:14 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>
-Subject: Re: [PATCH v2 1/8] doc/media-api: Enable MediaEndpoint to expose
- remote SEP
-Message-ID: <20190122125914.uotyzna5aasa4vw3@pali>
-References: <20190115141023.353-1-luiz.dentz@gmail.com>
- <CABBYNZLL7Usr=bS2rcJCCV6STVwi9ywq3Om6jkF8cfB8GC6mcA@mail.gmail.com>
- <20190121183016.jiqrtw3csllmqhif@pali>
- <CABBYNZKMPfkSvHqryeR7P8QitQVAv+-WVudSV=hpVaPjTOUu3A@mail.gmail.com>
- <20190122123812.hypezv5oypabeb27@pali>
- <CABBYNZK-qBX8cQmAmb4w1H21_W_PGKvvDPnQaTJ0RBK1TPJwJA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZK-qBX8cQmAmb4w1H21_W_PGKvvDPnQaTJ0RBK1TPJwJA@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Tue, 22 Jan 2019 05:45:26 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 1/9] doc/media-api: Enable MediaEndpoint to expose remote SEP
+Date:   Tue, 22 Jan 2019 15:45:16 +0200
+Message-Id: <20190122134524.20509-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.17.2
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tuesday 22 January 2019 14:54:30 Luiz Augusto von Dentz wrote:
-> Hi Pali,
-> On Tue, Jan 22, 2019 at 2:38 PM Pali Rohár <pali.rohar@gmail.com> wrote:
-> >
-> > On Tuesday 22 January 2019 14:35:42 Luiz Augusto von Dentz wrote:
-> > > I will send a v3 which does the reverse discovery, that should make it
-> > > work with existing paired devices that reconnect and configure since
-> > > otherwise there would not be any endpoints to associate with.
-> >
-> > Ok.
-> >
-> > > Note
-> > > though that in case of PA the endpoint object should be considered
-> > > optional no matter what since otherwise it won't be backward
-> > > compatible.
-> >
-> > Yes, patches are already backward compatible. When endpoints do not
-> > exist, pulseaudio just refuse to switch codec.
-> 
-> It refuses or there just no other profile/port to switch to?
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-It refuses just to switch from one A2DP profile to another A2DP profile
-of same type (sink --> sink OR source --> source) with different codecs.
-Switching between HFP and A2DP or between A2DP sink and A2DP source works.
+This adds the possibility to expose remote SEP using MediaEndpoint
+interface to allow setting a configuration.
+---
+ doc/media-api.txt | 27 +++++++++++++++++++++++++--
+ 1 file changed, 25 insertions(+), 2 deletions(-)
 
-> Btw, are
-> there anything special I need to do in order to test your patches? I
-> guess for apt-x I will need your lib right?
-
-Yes, for aptX you need that libopenaptx library and remote device with
-aptX codec support. See also profile switch limitation in patch
-description (tl;dr you need to issue profile switch command two times).
-
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index b5ad2db12..af9485342 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -500,14 +500,23 @@ Properties	object Player [readonly]
+ MediaEndpoint1 hierarchy
+ ========================
+ 
+-Service		unique name
++Service		unique name (Server role)
++		org.bluez (Client role)
+ Interface	org.bluez.MediaEndpoint1
+-Object path	freely definable
++Object path	freely definable (Server role)
++		[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/sepX
++		(Client role)
+ 
+ Methods		void SetConfiguration(object transport, dict properties)
+ 
+ 			Set configuration for the transport.
+ 
++			For client role transport must be set with a server
++			endpoint oject which will be configured and the
++			properties must contain the following properties:
++
++				array{byte} Capabilities
++
+ 		array{byte} SelectConfiguration(array{byte} capabilities)
+ 
+ 			Select preferable configuration from the supported
+@@ -532,6 +541,20 @@ Methods		void SetConfiguration(object transport, dict properties)
+ 			endpoint, because when this method gets called it has
+ 			already been unregistered.
+ 
++Properties	string UUID [readonly, optional]:
++
++			UUID of the profile which the endpoint is for.
++
++		byte Codec [readonly, optional]:
++
++			Assigned number of codec that the endpoint implements.
++			The values should match the profile specification which
++			is indicated by the UUID.
++
++		array{byte} Capabilities [readonly, optional]:
++
++			Capabilities blob, it is used as it is so the size and
++			byte order must match.
+ 
+ MediaTransport1 hierarchy
+ =========================
 -- 
-Pali Rohár
-pali.rohar@gmail.com
+2.17.2
+
