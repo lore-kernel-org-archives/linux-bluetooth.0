@@ -2,155 +2,121 @@ Return-Path: <SRS0=wtFT=P6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF86C282C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 07:33:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2FFC282C4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 08:33:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFBB620861
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 07:33:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A8A420879
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 08:33:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y8pa0uy7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rm0rKjQK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727268AbfAVHd0 (ORCPT
+        id S1727364AbfAVIdb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Jan 2019 02:33:26 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:40904 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726423AbfAVHd0 (ORCPT
+        Tue, 22 Jan 2019 03:33:31 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:40598 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727062AbfAVIda (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Jan 2019 02:33:26 -0500
-Received: by mail-it1-f196.google.com with SMTP id h193so18804593ita.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jan 2019 23:33:25 -0800 (PST)
+        Tue, 22 Jan 2019 03:33:30 -0500
+Received: by mail-pg1-f194.google.com with SMTP id z10so10723619pgp.7;
+        Tue, 22 Jan 2019 00:33:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=JymwwGqI9+O9tsHzNv9CCxv8BfDehjcmsopRCVDmYKg=;
-        b=Y8pa0uy7ws3Pvm6dm3Hwc9eNK2qFRQyZcD1tLDI9bsauE/Z7xhQoD5BNLYrs7iw7g9
-         fCK/1WQViiVd0jsfcZbo/00DkC220rYfb+lfssSnPoYnbhXdwXvXRxJMSIwkyadhUO6V
-         +brEvLvJc6/WYgModEZu/m/0m6KW0K7VxB4R2Vzjnn3iZOcKjRyWcffSxaf4PJw3sHLJ
-         RhT0HXmW91POOurT13c3sSUCWHC3u5aOd6ukYX+hKTlrBimP2YlwYcG/yIXv9SwyhLuy
-         CEJBcrOps0CJ+hERxhuVA2zLByJqJJHO/L/l8Sb5hcE1LZbEcBtaXwA1uKUkLn9Gl2lD
-         pKmQ==
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=56Ajni3E8oZE+o/bfMQDpPDoogGlR13oEATbHo2Cu/A=;
+        b=rm0rKjQK9GUvfcDjEXiVDMLEdrgt5o9JpBVcvm6/3/4uBbT2OFpoY4kCu3buz2WZaf
+         TE+PTo2JcZfISf12bVCsQQZ1g/t78GICw+q/GQd4JmEiSUVvnRWR0dIYYZrQIC+l7Q3u
+         u6zi/sgMuMMUezVtWKJHgRyJ0RHc/NRRUnX/g7mzAkyed0xdKrfn+F3bYPKquVyukdvw
+         4vcEBrY1rKyj6a7ViWsASljvhFRpB660snQbpAtEfaDQygjaZMJlddRVY3PHivwlKILH
+         yIm+AkcDudO63Y6dUM2tdiMKjpIoB+Tz7mIkbeM5AnDHB/qC3A80VlXwkcr4uhl9BVxa
+         iAuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:content-transfer-encoding;
-        bh=JymwwGqI9+O9tsHzNv9CCxv8BfDehjcmsopRCVDmYKg=;
-        b=h6ys7Ey0WCZ17Wl94+5sIuSAquxeoLVp4PVqA4N6aV8ahvKi5iCzYw9ijumGOi6LJT
-         887hJ8DEpSVRONvHIfOI6i+JX5sOpwPDhQgMFqOK4gPlebdig3ZuZBvLhdCXC6XNmiLq
-         amAjgOzxi3gnAuQkd+4Ps3g8OpTLgjSZ0RuC54LKdVFruIrQcUSpxV9rPVO+BMmOXY+a
-         zVkKOF0LCEwXenZCibuHouI+HHyxiAvz+9DSpAduyeX6aovILaI9KtciwEMkEe7PwMT/
-         OXm/EODoY4P+UX5QSjc/GbWx//kuybRviwNba7zHtbzqkjyue2L2L2AVaTx0xD7BHIO5
-         D5Gw==
-X-Gm-Message-State: AJcUuke9DNxUKM5ZydXhMyxqlSCdJ7wAmqgatXIs/y1X+6KcmU3UFbiI
-        iXK0HXqm4C188GJAjts+g1ovsP7j31gbRNabEqnAuQ==
-X-Google-Smtp-Source: ALg8bN6ZQ+dWoNXykBQTWfBisl4MGATtxQZkaDPjo0DJnvgwzo9YsUABh3LYGR1TgPWHMJ5+NAOXP4TppRZH1jQXPM0=
-X-Received: by 2002:a02:8904:: with SMTP id o4mr19065444jaj.35.1548142404937;
- Mon, 21 Jan 2019 23:33:24 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=56Ajni3E8oZE+o/bfMQDpPDoogGlR13oEATbHo2Cu/A=;
+        b=Sk3I8LMm3hY4+HMjua3IvgTaP3v3Ci2dscD0HKqzRjSDeSbkhzevOj5O5X7WDtmqaY
+         3Fdmlv3Atp0bberwVDNdvcaPWPnir0n2VC2k10JhKXskSh4+b2FIhIoG8nAS09nSL+Ko
+         9yCiKkLORF4EJAbP+Ny7tBcpb9yYVv0Gx01y4seQ8idjH+iDY+Q640AnxPf5hxz2PUyd
+         N2GVxUjEQfiuBs17IdbOXGwRMAiUq0a2W+B5TjxiK901NVnUblOvsLtUgKEn8GepXnwH
+         rhxTM85no3xOIZ7qRIg+3bDZ5LUm1op4mUdq5jBv+mOosRtJtCKYVeNTOY/zd+0dEV+m
+         mwYA==
+X-Gm-Message-State: AJcUukfOZRy4DXUVgsgHjlbght/hX6n1C9dUPS8PxhCFJ0tMKd/sTjYQ
+        lUEIB3+Q4iWdRi2VRk5rLtxe9R2p
+X-Google-Smtp-Source: ALg8bN7XC3FuX9Jb2JkPCXHQm3qRM4DFi0DHCcUtFxBel/U59HqJwSLH6rGNyeCtbfbKGV+4C8mTog==
+X-Received: by 2002:a63:5026:: with SMTP id e38mr31220384pgb.123.1548146009345;
+        Tue, 22 Jan 2019 00:33:29 -0800 (PST)
+Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
+        by smtp.gmail.com with ESMTPSA id a65sm12860844pge.65.2019.01.22.00.33.28
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 22 Jan 2019 00:33:28 -0800 (PST)
+Date:   Tue, 22 Jan 2019 00:33:26 -0800
+From:   Myungho Jung <mhjungk@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_uart: Check if socket buffer is ERR_PTR in
+ h4_recv_buf()
+Message-ID: <20190122083323.GA22508@myunghoj-Precision-5530>
 MIME-Version: 1.0
-References: <CAAOqupzadB0Nmo=WMRwD1AetRtuqGwA2OYryeVzyGgZT90KNYQ@mail.gmail.com>
-In-Reply-To: <CAAOqupzadB0Nmo=WMRwD1AetRtuqGwA2OYryeVzyGgZT90KNYQ@mail.gmail.com>
-From:   Grigory Fateyev <gfborn@gmail.com>
-Date:   Tue, 22 Jan 2019 10:33:14 +0300
-Message-ID: <CAAOqupwd9MRt8e9MA3FryCPx5obieqaWJt-ng8TBum4nqSgB3g@mail.gmail.com>
-Subject: Re: Cannot pair and connect headset
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Maybe I need to provide more information, which one? Or it's a wrong
-place to ask help?
+h4_recv_buf() callers store the return value to socket buffer and
+recursively pass the buffer to h4_recv_buf() without protection. So,
+ERR_PTR returned from h4_recv_buf() can be dereferenced, if called again
+before setting the socket buffer to NULL from previous error. Check if
+skb is ERR_PTR in h4_recv_buf().
 
-=D0=B2=D1=81, 20 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 17:09, Grigory Fat=
-eyev <gfborn@gmail.com>:
->
-> Hello!
->
-> I have a bluetooth headset SONY MDR-XB650BT and I cannot pair and connect=
- it.
->
-> I got it several months ago and it worked well, I configured it using
-> blueman-manager but now I cannot.
->
-> Hardware:
-> 02:00.0 Network controller: Intel Corporation Wireless 7265 (rev 59)
-> Subsystem: Intel Corporation Dual Band Wireless-AC 7265
-> Kernel driver in use: iwlwifi
-> Kernel modules: iwlwifi
->
-> Software:
-> Debian Stretch 9.6
-> Linux gregf 4.18.0-0.bpo.1-amd64 #1 SMP Debian 4.18.6-1~bpo9+1
-> (2018-09-13) x86_64 GNU/Linux
-> ii  blueman                               2.0.4-1
->      amd64        Graphical bluetooth manager
-> ii  bluetooth                             5.43-2+deb9u1
->      all          Bluetooth support
-> ii  bluez                                 5.43-2+deb9u1
->      amd64        Bluetooth tools and daemons
-> ii  bluez-firmware                        1.2-3
->      all          Firmware for Bluetooth devices
-> ii  bluez-hcidump                         5.43-2+deb9u1
->      amd64        Analyses Bluetooth HCI packets
-> ii  bluez-obexd                           5.43-2+deb9u1
->      amd64        bluez obex daemon
-> ii  bluez-tools                           0.2.0~20140808-5+b2
->      amd64        Set of tools to manage Bluetooth devices for linux
-> ii  libbluetooth3:amd64                   5.43-2+deb9u1
->      amd64        Library to use the BlueZ Linux Bluetooth stack
-> ii  pulseaudio-module-bluetooth           10.0-1+deb9u1
->      amd64        Bluetooth module for PulseAudio sound server
-> ii  python-bluez                          0.22-1
->      amd64        Python wrappers around BlueZ for rapid bluetooth
-> development
->
-> This is part of my logs: https://pastebin.com/xPnm6SgW
->
-> I'm trying to do it via `bluetoothctl` but get something like:
-> [bluetooth]# info 00:18:09:C5:44:1E
-> Device 00:18:09:C5:44:1E
-> Name: MDR-XB650BT
-> Alias: MDR-XB650BT
-> Class: 0x240404
-> Icon: audio-card
-> Paired: no
-> Trusted: no
-> Blocked: no
-> Connected: no
-> LegacyPairing: no
-> UUID: Headset                   (00001108-0000-1000-8000-00805f9b34fb)
-> UUID: Audio Sink                (0000110b-0000-1000-8000-00805f9b34fb)
-> UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
-> UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
-> UUID: Handsfree                 (0000111e-0000-1000-8000-00805f9b34fb)
-> [bluetooth]# agent on
-> Agent registered
-> [bluetooth]# trust 00:18:09:C5:44:1E
-> [CHG] Device 00:18:09:C5:44:1E Trusted: yes
-> Changing 00:18:09:C5:44:1E trust succeeded
-> [bluetooth]# pair 00:18:09:C5:44:1E
-> Attempting to pair with 00:18:09:C5:44:1E
-> [CHG] Device 00:18:09:C5:44:1E Connected: yes
-> Failed to pair: org.bluez.Error.AuthenticationFailed
-> [CHG] Device 00:18:09:C5:44:1E Connected: no
-> [CHG] Device 00:18:09:C5:44:1E Connected: yes
-> [CHG] Device 00:18:09:C5:44:1E Connected: no
-> [bluetooth]# pair 00:18:09:C5:44:1E
-> Attempting to pair with 00:18:09:C5:44:1E
-> [CHG] Device 00:18:09:C5:44:1E Connected: yes
-> Failed to pair: org.bluez.Error.AuthenticationFailed
-> [CHG] Device 00:18:09:C5:44:1E Connected: no
->
-> I'm sure it works but how to detect the reason why it cannot now, I
-> got out of my hairs. Could you help me, please?
->
-> Thank you!
+Reported-by: syzbot+017a32f149406df32703@syzkaller.appspotmail.com
+Signed-off-by: Myungho Jung <mhjungk@gmail.com>
+---
+ drivers/bluetooth/h4_recv.h | 4 ++++
+ drivers/bluetooth/hci_h4.c  | 4 ++++
+ 2 files changed, 8 insertions(+)
+
+diff --git a/drivers/bluetooth/h4_recv.h b/drivers/bluetooth/h4_recv.h
+index b432651f8236..285cf72190b7 100644
+--- a/drivers/bluetooth/h4_recv.h
++++ b/drivers/bluetooth/h4_recv.h
+@@ -60,6 +60,10 @@ static inline struct sk_buff *h4_recv_buf(struct hci_dev *hdev,
+ 					  const struct h4_recv_pkt *pkts,
+ 					  int pkts_count)
+ {
++	/* Check if socket buffer is not reset yet from previous error */
++	if (IS_ERR(skb))
++		skb = NULL;
++
+ 	while (count) {
+ 		int i, len;
+ 
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index fb97a3bf069b..dea48090d2dc 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -174,6 +174,10 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+ 	struct hci_uart *hu = hci_get_drvdata(hdev);
+ 	u8 alignment = hu->alignment ? hu->alignment : 1;
+ 
++	/* Check if socket buffer is not reset yet from previous error */
++	if (IS_ERR(skb))
++		skb = NULL;
++
+ 	while (count) {
+ 		int i, len;
+ 
+-- 
+2.17.1
+
