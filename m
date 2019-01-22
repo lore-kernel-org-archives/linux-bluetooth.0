@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD50C282C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 22:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C0B9C282C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 22:36:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3BCC720866
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 22:35:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB19A20866
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 22:36:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tNRdemVe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bLJtpU71"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726825AbfAVWfc (ORCPT
+        id S1726999AbfAVWfx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Jan 2019 17:35:32 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:38930 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726719AbfAVWfc (ORCPT
+        Tue, 22 Jan 2019 17:35:53 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:35018 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726976AbfAVWfx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Jan 2019 17:35:32 -0500
-Received: by mail-lf1-f68.google.com with SMTP id n18so130030lfh.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jan 2019 14:35:30 -0800 (PST)
+        Tue, 22 Jan 2019 17:35:53 -0500
+Received: by mail-lf1-f66.google.com with SMTP id e26so148130lfc.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jan 2019 14:35:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=QCFQ3/LFXyB79F8POK8jmGSXV3ke7RikEsl2ThYyROI=;
-        b=tNRdemVe11eGyQYmbwSwlv4x+G3+rX24JksmHOU3/qAONuaKJnrVdsAcSOl8g391wi
-         2uhVScAriP4gC2l7bPI6neqT8Oo8a5KDsK2l/VWO15c2DIAy6VUvc50MZyZEEZgOYSgB
-         5wybwRfyolTwawB0RlAswL60VQaWxU9c8OhBsGAR6zuE0Q0PF3gb/bZmiTWu3ZrKVLFl
-         lSalDQ+23N20sx26SDl1BHGeUzwonPgf2l4/o0MSzdU6ZAnJvWwXbYswbxPdgwX7cF7Q
-         VL0fKemCDfcprSkxMjIkWYYXJt4srUssuVVfvlvH53oho15KBnhDADrgD9Zh1vFMy0+H
-         WHUg==
+        bh=V9deSiVGRtf7KOnz/GlOSFbMEK4BRjaxktbduYIKVnY=;
+        b=bLJtpU71FMFxg38hzIqCSyVkh3i+x6LofTwhqnw900O5vvBbCCJrFvYB1PKOoYSJQg
+         KzGI4/9AAO2rGvpMv9qJhrJKhCo18WreWlVBvOy+TuskE/F6hG3xLH2rqDk1XnNin12P
+         87qC4o9JkJSEJXIWBf14CEnseK8gN2QcxSaM3Hxf80KNcUXL2j3QfENcgDfKj1JvquII
+         6/HkN+gReEXUGOWrDK0Hsd8/BCPbmJVjrsOQ3E1by5sN1cN9WcxhXotGpccYw6ZP6BBZ
+         hcspsGaKSZTVRxBYb5LHBppWqGKZooYG8Qf/JGHgQabW++B8ftGH7tG4UaqssENlQb41
+         3igg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QCFQ3/LFXyB79F8POK8jmGSXV3ke7RikEsl2ThYyROI=;
-        b=reQALLwyFxPBht3xXIdnD6wJjQDhx3plVsfrjV3bo+DgUKCjgk+ys+8Srwu/MLVrbL
-         wRQpVzkh3ncfb8BOb8K+/B3lEdk1BOoVmaJ6GBTQuNYy/kLW7PmO66UjqNfIh3NmcqMp
-         jG5/QNpOdFO76EIgKgAilHJLILxnuyrOKL3rleJ4I3AAsycBq1OaBfkb72pNQNqy5OSj
-         hZWAUhAqIhGXv0w+ixjoK14RZ3Ma6tIFrE4+lHJKBjqvhisbWagKLUTu/Tz9L/GrkhTx
-         qHbP9uspD916cZ6NAPFrIcSjYtbsiAryRImm8mfex2JOU/QWxxrxZttPwyUuzFE8FLKr
-         wcGQ==
-X-Gm-Message-State: AJcUukdL9XF1HuyONp9Q84xYiGYhpjZkAsid3fhA5TjN7JWlI2h9xPZ/
-        MI9nwO09Lm5yhUmtAEj+dSugz1Hi7PwfUsI2124zPA==
-X-Google-Smtp-Source: ALg8bN6//9MPig48NtGEAeFaPuk8Y78gGdXHbuCvU2euV9KADpbRVltAgq+HhrzyQU/6JU+mYxc2XIoFYUq0Ivgpmjs=
-X-Received: by 2002:a19:2906:: with SMTP id p6mr21485955lfp.17.1548196528984;
- Tue, 22 Jan 2019 14:35:28 -0800 (PST)
+        bh=V9deSiVGRtf7KOnz/GlOSFbMEK4BRjaxktbduYIKVnY=;
+        b=BIwym/sc57zxR+/CBnECDc0bxLGlNWz0uJePiIy9ZLd0RYE8FYNDthq+iW2zkjcELE
+         0SJd0krVhKIJiLQMfA+MMckQDssGRq2UwXSpqtE4bsb2qqD48UsZOnnhcJo2W7SbGOgW
+         ZRbxRPODcShkmzgKH9AkgrUf1UNBFy5qU6wymUlx/MFx2d1sR8xO3wJisoviblyM3lqQ
+         ND+La6qzQC7W/FMp0HprtV9mkcZT/JTMyY7uVLu75DKqu898sJgKs1oPS4FnkaL8dPfX
+         9EKiJ03JAS02vESUz/R88HTs+neFnMfkXsPjaAocxuxQkQtjEuthoZTlCyTgofulbEoP
+         TFew==
+X-Gm-Message-State: AJcUukd7sAYaaYIUEfh1E5EbK9OjnC7tnngpr6zi9+sIdeSVxdBxY6Vv
+        fWdq2xpcQQX8xA4QJHSs4O84uygQkyYcZIb0uZYxLw==
+X-Google-Smtp-Source: ALg8bN7P/BeHol1mQj+NCdReRKq5Fwg5E2xrUHUo/LsMsXcwGXxqebbLyM6AvCqOmgRyHbiIOlmiW62lKYL+kQ700jk=
+X-Received: by 2002:a19:9e11:: with SMTP id h17mr22648197lfe.73.1548196551023;
+ Tue, 22 Jan 2019 14:35:51 -0800 (PST)
 MIME-Version: 1.0
 References: <20181117010748.24347-1-rajatja@google.com> <20190118223407.64818-1-rajatja@google.com>
- <20190118223407.64818-3-rajatja@google.com> <D1490A23-9076-4BAA-A932-CDE1C073475B@holtmann.org>
-In-Reply-To: <D1490A23-9076-4BAA-A932-CDE1C073475B@holtmann.org>
+ <20190118223407.64818-4-rajatja@google.com> <46DE7349-6B10-4B2F-92C2-74D6EEFFF301@holtmann.org>
+In-Reply-To: <46DE7349-6B10-4B2F-92C2-74D6EEFFF301@holtmann.org>
 From:   Rajat Jain <rajatja@google.com>
-Date:   Tue, 22 Jan 2019 14:34:52 -0800
-Message-ID: <CACK8Z6FyBxibu-oeAnhZgcSxx_uzGcHsOqJ1S=RGeEZJj3K_og@mail.gmail.com>
-Subject: Re: [PATCH v4 3/5] Bluetooth: Reset Bluetooth chip after multiple
- command timeouts
+Date:   Tue, 22 Jan 2019 14:35:14 -0800
+Message-ID: <CACK8Z6G5d836tHb999+jgkRPmcN4sPW=t5dL=Z-UbJkziGSAXg@mail.gmail.com>
+Subject: Re: [PATCH v4 4/5] Bluetooth: btusb: Collect the common Intel
+ assignments together
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -87,12 +87,9 @@ e:
 >
 > Hi Rajat,
 >
-> > Add a quirk and a hook to allow the HCI core to reset the BT chip
-> > if needed (after a number of timed out commands). Use that new hook to
-> > initiate BT chip reset if the controller fails to respond to certain
-> > number of commands (currently 5) including the HCI reset commands.
-> > This is done based on a newly introduced quirk. This is done based
-> > on some initial work by Intel.
+> > The BTUSB_INTEL and BTUSB_INTEL_NEW have common functions & quirks are
+> > assigned to hdev structure. Lets collect them together instead of
+> > repeating them in different code branches.
 > >
 > > Signed-off-by: Rajat Jain <rajatja@google.com>
 > > ---
@@ -100,99 +97,61 @@ e:
 > > v3: same as v1
 > > v2: same as v1
 > >
-> > include/net/bluetooth/hci.h      |  8 ++++++++
-> > include/net/bluetooth/hci_core.h |  2 ++
-> > net/bluetooth/hci_core.c         | 15 +++++++++++++--
-> > 3 files changed, 23 insertions(+), 2 deletions(-)
+> > drivers/bluetooth/btusb.c | 27 ++++++++++++---------------
+> > 1 file changed, 12 insertions(+), 15 deletions(-)
 > >
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index c36dc1e20556..af02fa5ffe54 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -192,6 +192,14 @@ enum {
-> >        *
-> >        */
-> >       HCI_QUIRK_NON_PERSISTENT_SETUP,
-> > +
-> > +     /* When this quirk is set, hw_reset() would be run to reset the
-> > +      * hardware, after a certain number of commands (currently 5)
-> > +      * time out because the device fails to respond.
-> > +      *
-> > +      * This quirk should be set before hci_register_dev is called.
-> > +      */
-> > +     HCI_QUIRK_HW_RESET_ON_TIMEOUT,
-> > };
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 4761499db9ee..59869643cc29 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -3075,28 +3075,25 @@ static int btusb_probe(struct usb_interface *in=
+tf,
+> >               data->diag =3D usb_ifnum_to_if(data->udev, ifnum_base + 2=
+);
+> >       }
+> > #endif
+> > +     if (id->driver_info & BTUSB_INTEL ||
+> > +         id->driver_info & BTUSB_INTEL_NEW) {
 > >
-> > /* HCI device flags */
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
-ci_core.h
-> > index e5ea633ea368..b86218304b80 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -313,6 +313,7 @@ struct hci_dev {
-> >       unsigned int    acl_cnt;
-> >       unsigned int    sco_cnt;
-> >       unsigned int    le_cnt;
-> > +     unsigned int    timeout_cnt;
+> > -     if (id->driver_info & BTUSB_INTEL) {
+> >               hdev->manufacturer =3D 2;
+> > -             hdev->setup =3D btusb_setup_intel;
+> > -             hdev->shutdown =3D btusb_shutdown_intel;
+> > -             hdev->set_diag =3D btintel_set_diag_mfg;
+> >               hdev->set_bdaddr =3D btintel_set_bdaddr;
+> >               set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)=
+;
+> >               set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> >               set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+> > -     }
 > >
-> >       unsigned int    acl_mtu;
-> >       unsigned int    sco_mtu;
-> > @@ -437,6 +438,7 @@ struct hci_dev {
-> >       int (*post_init)(struct hci_dev *hdev);
-> >       int (*set_diag)(struct hci_dev *hdev, bool enable);
-> >       int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-> > +     void (*hw_reset)(struct hci_dev *hdev);
-> > };
-> >
-> > #define HCI_PHY_HANDLE(handle)        (handle & 0xff)
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 7352fe85674b..ab3a6a8b7ba6 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -2569,13 +2569,24 @@ static void hci_cmd_timeout(struct work_struct =
-*work)
-> >       struct hci_dev *hdev =3D container_of(work, struct hci_dev,
-> >                                           cmd_timer.work);
-> >
-> > +     hdev->timeout_cnt++;
-> >       if (hdev->sent_cmd) {
-> >               struct hci_command_hdr *sent =3D (void *) hdev->sent_cmd-=
->data;
-> >               u16 opcode =3D __le16_to_cpu(sent->opcode);
-> >
-> > -             bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
-> > +             bt_dev_err(hdev, "command 0x%4.4x tx timeout (cnt =3D %u)=
-",
-> > +                        opcode, hdev->timeout_cnt);
-> >       } else {
-> > -             bt_dev_err(hdev, "command tx timeout");
-> > +             bt_dev_err(hdev, "command tx timeout (cnt =3D %u)",
-> > +                        hdev->timeout_cnt);
-> > +     }
-> > +
-> > +     if (test_bit(HCI_QUIRK_HW_RESET_ON_TIMEOUT, &hdev->quirks) &&
-> > +         hdev->timeout_cnt >=3D 5) {
-> > +             hdev->timeout_cnt =3D 0;
-> > +             if (hdev->hw_reset)
-> > +                     hdev->hw_reset(hdev);
-> > +             return;
+> > -     if (id->driver_info & BTUSB_INTEL_NEW) {
+> > -             hdev->manufacturer =3D 2;
+> > -             hdev->send =3D btusb_send_frame_intel;
+> > -             hdev->setup =3D btusb_setup_intel_new;
+> > -             hdev->hw_error =3D btintel_hw_error;
+> > -             hdev->set_diag =3D btintel_set_diag;
+> > -             hdev->set_bdaddr =3D btintel_set_bdaddr;
+> > -             set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)=
+;
+> > -             set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> > -             set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+> > +             if (id->driver_info & BTUSB_INTEL) {
+> > +                     hdev->setup =3D btusb_setup_intel;
+> > +                     hdev->shutdown =3D btusb_shutdown_intel;
+> > +                     hdev->set_diag =3D btintel_set_diag_mfg;
+> > +             } else {
+> > +                     hdev->send =3D btusb_send_frame_intel;
+> > +                     hdev->setup =3D btusb_setup_intel_new;
+> > +                     hdev->hw_error =3D btintel_hw_error;
+> > +                     hdev->set_diag =3D btintel_set_diag;
+> > +             }
 > >       }
 >
-> so I really do not see the need for the quirk here. Either hdev->hw_reset=
- is provided, then execute it, if it is not provided then don=E2=80=99t. Th=
-e quirk is just duplicate information.
+> please scrap this patch since it is not making anything easier or simpler=
+. You think it does, but it really doesn=E2=80=99t.
 
-Sure, will do.
-
->
-> I also don=E2=80=99t like hdev->hw_reset since that implies that the only=
- way of handling a command timeout is a hardware reset. I prefer you call t=
-his hdev->cmd_timeout and also scrap the timeout_cnt. Let the driver decide=
- what number of timeouts it wants to react on. The number 5 is just an arbi=
-trary number you picked based on one hardware manufacturer.
-
-Sure, I can move the timeout_cnt from hdev to btusb_data so that the
-btusb can track the number of the timeouts..
+OK, will do.
 
 Thanks,
 
