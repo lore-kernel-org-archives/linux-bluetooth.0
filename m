@@ -2,118 +2,139 @@ Return-Path: <SRS0=wtFT=P6=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2545FC282C5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 13:45:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F4CC282C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 14:20:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA4DB20879
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 13:45:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B076020870
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 14:20:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UIYiv7c3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DDn1iZmn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728678AbfAVNpl (ORCPT
+        id S1728700AbfAVOUZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Jan 2019 08:45:41 -0500
-Received: from mail-ed1-f44.google.com ([209.85.208.44]:36143 "EHLO
-        mail-ed1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728630AbfAVNpl (ORCPT
+        Tue, 22 Jan 2019 09:20:25 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:36217 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728416AbfAVOUZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Jan 2019 08:45:41 -0500
-Received: by mail-ed1-f44.google.com with SMTP id f23so19348919edb.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jan 2019 05:45:40 -0800 (PST)
+        Tue, 22 Jan 2019 09:20:25 -0500
+Received: by mail-ot1-f68.google.com with SMTP id k98so23762244otk.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Jan 2019 06:20:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=AVWaushRs7nkXjvfzNqW87RGHM12FcgrQewKIb+0Oco=;
-        b=UIYiv7c3ZxBgBsjeF+JwYX3BILDxR9A27wH6Qg+TauHediDqp7F8Me61gDZgaXVVot
-         dovLe1OV010IX5FD/tSUdPE+tU5kvAnwzgpEToxgxQhqh8fb2PdWQ3ESl2foLRKxk3rU
-         bsCWOmj7yxeOPDGGi1jgcLtxrcH81T0/f0vAHCYFIaFXnwE6MQCFdiVV9tfY45TClpyz
-         MNY5tg2YEaAFW4NXSH5NE27t8bCXj1adzaxpJHi/XeY0uTVcTQogLUaJ7VO6KxHkYjYN
-         Br+aJre5DZo3HubME8YcRXyUdjGX3pO16uhhpR/AE15RjXeTDW4Y4RqAg4+OrXr7O2p2
-         3wgA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JRQyo+9FLUZ7G+IfWmTvQNFrcySN6caixA1hfZzdCn0=;
+        b=DDn1iZmnVr/O5mHyE3lMZRJ4wjOgWHfk9UsyCP1YBJS9sAdVdwkV8j9B20Ro3ftJb9
+         eVPgFcR8oGiAcMPfSwb/MarGlwgPb5rkftbJ2OC5P00x68Ag3TZCEQa9gZw+SdxyznYZ
+         SvAw/CMVUCUoBdG8YDBcLTsZqqBc/YPcNXbD+Ih61NrWuzOY9wOKUYc2/Ah7X3FpuEr7
+         /3JIxr9Gdihxj/0BhNSoFf9+ul4woYTZKjM4uXOoUevPuPJ9ZDaSaC7yySt9sTMWS76U
+         7oDPjzl5ZHb7Ymo8yZykE3787GRGweDshsmWSKNZNIMMw8MF+iTrmMqkkF4fGNESX9W5
+         VW/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references;
-        bh=AVWaushRs7nkXjvfzNqW87RGHM12FcgrQewKIb+0Oco=;
-        b=NEqeC3ay3j0PGYw+9h3x72I+talGkwa+hfo+ilNh+lG8UE10KDLsAgDlDwoDumivXq
-         /22lws1ZmStAWlcdo+SOnDujIUbQvHRh8BYObQVSvO+bgyXFsFzfHtX+abWShgH2wqkl
-         Gv3zTpQRBAQNN5vV6ie/UiYx1MuHhp3mQgE0pwPALjRLFHliMsbeK9+sLchLSCOGhA3g
-         XkXufnRVhK3rbQHL3KLNgCFJxurKko2suY13/wyO7NnMLC4VJnPMxprbTOo14ZVBs5CR
-         dWTyg7djZ0I/oTmTqLJtzbz3PSjkq25UjqR1LSp+wB/ERjrVZx4b1eI0q19teLXJD/JM
-         x7ig==
-X-Gm-Message-State: AJcUukft8pudwJNb12GmyueRYHXzXD1fblw+rB2ipFj2xP8n1s1lgSWY
-        Ztn45AwMrY/p5CIrAmz0l3Af+MKN
-X-Google-Smtp-Source: ALg8bN7T1qfzqLa+PN2pCd4qxx1ufw+p3Q1cJh74i+PFegz39zB7DwiKX/445gvPc266xriSzgWttg==
-X-Received: by 2002:a17:906:2e4f:: with SMTP id r15-v6mr28241171eji.198.1548164738801;
-        Tue, 22 Jan 2019 05:45:38 -0800 (PST)
-Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id dc5-v6sm5319153ejb.53.2019.01.22.05.45.37
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 22 Jan 2019 05:45:38 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 9/9] a2dp: Add reverse discovery
-Date:   Tue, 22 Jan 2019 15:45:24 +0200
-Message-Id: <20190122134524.20509-9-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.17.2
-In-Reply-To: <20190122134524.20509-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JRQyo+9FLUZ7G+IfWmTvQNFrcySN6caixA1hfZzdCn0=;
+        b=psGzwO31nMkdgqBghhugoUL4qrx3ys/KisqNRo5WODFND2ThgC4KrtCaLIMbhy8biO
+         IpKcbUlj5/riV8wEHHfH+9EjuoxMxogV4hoA6MxUuU0cj3sZ5fa93JPe4qlF+LSqUTfs
+         g54nci6w4k0p/QxTYMCuFTgB2Flvl9C7bDLiRgaRg/70pKrbkAH81xULbO+CpI2KI6m/
+         Kq9+r6qw0i1psECn5XMB4jsqFAyxj/wDntcai9ekQT0faVPWLKeXpMsPxaH+c6ZtdJ9r
+         ios/x5oRZbGXKaXwvADEjIhsWBZN1C+43Lb3KbqCuVU/dvSWJnMNLnJjElHLtPZ9TtoY
+         pQpg==
+X-Gm-Message-State: AJcUukdEz1gIxb5ZWXDFIz3SmH+pMgnb04Jax2D7aGSE3tq210tP5Cy0
+        d8CaRR4TfpdPSc6vrdPTeu4fWpOV3Q9jzX3Uqpuu4Q==
+X-Google-Smtp-Source: ALg8bN4XAtNWLrM6JU9sOV/fQABLEIz6K426QpOglwJP26m/VaOBPcYrlRHC06uJ5W6RCTgZPSuIUAYVTURPGUn2nl0=
+X-Received: by 2002:a9d:3d0:: with SMTP id f74mr13645657otf.52.1548166824095;
+ Tue, 22 Jan 2019 06:20:24 -0800 (PST)
+MIME-Version: 1.0
 References: <20190122134524.20509-1-luiz.dentz@gmail.com>
+In-Reply-To: <20190122134524.20509-1-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 22 Jan 2019 16:20:12 +0200
+Message-ID: <CABBYNZLCFpXhbAnVYaA-nVNOY8QRvpR1UZhMHfy-awZxtpSocQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/9] doc/media-api: Enable MediaEndpoint to expose
+ remote SEP
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Pali,
+On Tue, Jan 22, 2019 at 3:45 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds the possibility to expose remote SEP using MediaEndpoint
+> interface to allow setting a configuration.
+> ---
+>  doc/media-api.txt | 27 +++++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
+>
+> diff --git a/doc/media-api.txt b/doc/media-api.txt
+> index b5ad2db12..af9485342 100644
+> --- a/doc/media-api.txt
+> +++ b/doc/media-api.txt
+> @@ -500,14 +500,23 @@ Properties        object Player [readonly]
+>  MediaEndpoint1 hierarchy
+>  ========================
+>
+> -Service                unique name
+> +Service                unique name (Server role)
+> +               org.bluez (Client role)
+>  Interface      org.bluez.MediaEndpoint1
+> -Object path    freely definable
+> +Object path    freely definable (Server role)
+> +               [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/sepX
+> +               (Client role)
+>
+>  Methods                void SetConfiguration(object transport, dict properties)
+>
+>                         Set configuration for the transport.
+>
+> +                       For client role transport must be set with a server
+> +                       endpoint oject which will be configured and the
+> +                       properties must contain the following properties:
+> +
+> +                               array{byte} Capabilities
+> +
+>                 array{byte} SelectConfiguration(array{byte} capabilities)
+>
+>                         Select preferable configuration from the supported
+> @@ -532,6 +541,20 @@ Methods            void SetConfiguration(object transport, dict properties)
+>                         endpoint, because when this method gets called it has
+>                         already been unregistered.
+>
+> +Properties     string UUID [readonly, optional]:
+> +
+> +                       UUID of the profile which the endpoint is for.
+> +
+> +               byte Codec [readonly, optional]:
+> +
+> +                       Assigned number of codec that the endpoint implements.
+> +                       The values should match the profile specification which
+> +                       is indicated by the UUID.
+> +
+> +               array{byte} Capabilities [readonly, optional]:
+> +
+> +                       Capabilities blob, it is used as it is so the size and
+> +                       byte order must match.
+>
+>  MediaTransport1 hierarchy
+>  =========================
+> --
+> 2.17.2
 
-Now that remote endpoints are exposed there is a chance that a
-configured device will reconnect and initiate SetConfiguration skipping
-the discovery phase which is now required in order to be able to switch
-endpoints, so this introduces the reverse discovery logic in order to
-find out about remote endpoints capabilities if they have not been
-found yet.
----
- profiles/audio/a2dp.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+Can you try this set?
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index ff384cd23..4001ea0ea 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -583,6 +583,12 @@ static gboolean endpoint_match_codec_ind(struct avdtp *session,
- 	return TRUE;
- }
- 
-+static void reverse_discover(struct avdtp *session, GSList *seps, int err,
-+							void *user_data)
-+{
-+	DBG("err %d", err);
-+}
-+
- static gboolean endpoint_setconf_ind(struct avdtp *session,
- 						struct avdtp_local_sep *sep,
- 						struct avdtp_stream *stream,
-@@ -638,8 +644,14 @@ static gboolean endpoint_setconf_ind(struct avdtp *session,
- 						setup_ref(setup),
- 						endpoint_setconf_cb,
- 						a2dp_sep->user_data);
--		if (ret == 0)
-+		if (ret == 0) {
-+			/* Attempt to reverve discover if there are no remote
-+			 * SEPs.
-+			 */
-+			if (queue_isempty(setup->chan->seps))
-+				a2dp_discover(session, reverse_discover, NULL);
- 			return TRUE;
-+		}
- 
- 		setup_unref(setup);
- 		setup->err = g_new(struct avdtp_error, 1);
 -- 
-2.17.2
-
+Luiz Augusto von Dentz
