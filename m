@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D4BC282C0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 02:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EDFDC282C0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 02:42:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B73920870
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 02:40:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08C4820861
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jan 2019 02:42:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726804AbfAVCk1 (ORCPT
+        id S1726864AbfAVCmh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Jan 2019 21:40:27 -0500
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:42121 "EHLO
+        Mon, 21 Jan 2019 21:42:37 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:41695 "EHLO
         mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725901AbfAVCk1 (ORCPT
+        with ESMTP id S1726827AbfAVCmg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Jan 2019 21:40:27 -0500
-Received: by mail-ed1-f65.google.com with SMTP id y20so18052052edw.9;
-        Mon, 21 Jan 2019 18:40:25 -0800 (PST)
+        Mon, 21 Jan 2019 21:42:36 -0500
+Received: by mail-ed1-f65.google.com with SMTP id a20so18072776edc.8;
+        Mon, 21 Jan 2019 18:42:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=3cz/lFKQSSJLlHf1bGr3Q5xkouLJJKTAy2cjlq2O2Fw=;
-        b=FA6VjsFupHuivuIZWwnfext5/p3/N+LM/DBflcWk6xO83COwpS2qImZoHZ92zAZ7QA
-         zZ+FUDWNSEqvQMVz3UGQPcfd9zVrTrZncOXTXa7B4UqsZcguut20nek9EcFAYQ53H9GL
-         Jl7cEsH3kkufwMiZrGKV06mko6PxD3H96Zbj6npeXgTchLisXtxa09CKw53WU4zb6GEY
-         jUeOIZbkeTZafOvpvNXlVHNR72EzixjDrGo2OiO1l4KrHeo8mWrWcMuoB/1AOD02HyxX
-         FBMvz5LOeR7BNWoQZW8Jl2DDwOVEF3unHkxPDu4vqJV4FnTTMQe97Vl3RtlD+e9gOSkr
-         QV6Q==
-X-Gm-Message-State: AJcUuke675uOcL/9LwSII1xXRX3s05LnyH5940l1C2or//9zrbXY57LC
-        To3/H+NwjEHPuMzomO+R/C0GCzDbBr0=
-X-Google-Smtp-Source: ALg8bN4rX4hKaXfvukDWI4Ewjs9dTD+FmahuQ0Z4ZMZhidBvE6lG1d+TsbswnhRTMvq97xWHZ3IXmQ==
-X-Received: by 2002:a17:906:938e:: with SMTP id l14-v6mr26267311ejx.246.1548124824496;
-        Mon, 21 Jan 2019 18:40:24 -0800 (PST)
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com. [209.85.128.54])
-        by smtp.gmail.com with ESMTPSA id l41sm9840390eda.83.2019.01.21.18.40.23
+        bh=YXhQDQAi1e18Uu7imO5KBtXmSh8nOiaaK0PbWDcyVXk=;
+        b=GxVrt8lkN7BcN4cEENrQ+PIOl3eeVkEbGZH2h6HqNi5yIicgyzVVQlWPlFblN9JfMM
+         ucrq5NENHMNZd27pmIkB/qBJ4LuotevuNYRAxsmALWuJdc0WIt8fUIZULYBsTVGUd8Pg
+         stDfjhJJbblO9phpSNqf9O+iNXGq6m5EA3gzwwnZtQlWNfkikC6Ee4JUJzbCKodl5vo7
+         Cb7rXbjt++T5/t1vKoJmNB5UOtrIrOTDBbGO/6eN1mmy9a30AClut2S1quXWIvSzAQYO
+         27buw5SlRomZ8g6XTBQhqEFeED57orPm0A1T66veuYKp3t+FyA2Ltlqgw7hiNoA0kTaW
+         6hbw==
+X-Gm-Message-State: AJcUukfw3544AKSpBKdyMsMkrO3UresXqT7FCnTxmPaOMxdq+Yk8zXIs
+        TRQ3fiECWbfnXZIm+l15Jm7xY4yiG+0=
+X-Google-Smtp-Source: ALg8bN6ug7bFyCqgYpF5aB93JQy8tzxPg7PJ20dUkBaXs+be058sVyTNUTzFzZmD1F03tUI9fgWq1w==
+X-Received: by 2002:a17:906:6085:: with SMTP id t5-v6mr26849899ejj.47.1548124954689;
+        Mon, 21 Jan 2019 18:42:34 -0800 (PST)
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com. [209.85.221.42])
+        by smtp.gmail.com with ESMTPSA id v9sm9404283edl.3.2019.01.21.18.42.34
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 21 Jan 2019 18:40:23 -0800 (PST)
-Received: by mail-wm1-f54.google.com with SMTP id y185so7472183wmd.1;
-        Mon, 21 Jan 2019 18:40:23 -0800 (PST)
-X-Received: by 2002:a1c:578e:: with SMTP id l136mr1543215wmb.124.1548124823178;
- Mon, 21 Jan 2019 18:40:23 -0800 (PST)
+        Mon, 21 Jan 2019 18:42:34 -0800 (PST)
+Received: by mail-wr1-f42.google.com with SMTP id s12so25599989wrt.4;
+        Mon, 21 Jan 2019 18:42:34 -0800 (PST)
+X-Received: by 2002:a5d:5208:: with SMTP id j8mr31802531wrv.188.1548124953877;
+ Mon, 21 Jan 2019 18:42:33 -0800 (PST)
 MIME-Version: 1.0
-References: <20190121203928.32723-1-beagleboard@davidjohnsummers.uk> <20190121203928.32723-2-beagleboard@davidjohnsummers.uk>
-In-Reply-To: <20190121203928.32723-2-beagleboard@davidjohnsummers.uk>
+References: <20190121203928.32723-1-beagleboard@davidjohnsummers.uk>
+In-Reply-To: <20190121203928.32723-1-beagleboard@davidjohnsummers.uk>
 From:   Chen-Yu Tsai <wens@csie.org>
-Date:   Tue, 22 Jan 2019 10:40:10 +0800
-X-Gmail-Original-Message-ID: <CAGb2v64j=hGFhb3GVocRo9B1uY+tFBjbrm6F71L4ejA+cruUvA@mail.gmail.com>
-Message-ID: <CAGb2v64j=hGFhb3GVocRo9B1uY+tFBjbrm6F71L4ejA+cruUvA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] dt-bindings: Create the file for Realtek Bluetooth
- serial devices
+Date:   Tue, 22 Jan 2019 10:42:20 +0800
+X-Gmail-Original-Message-ID: <CAGb2v64pnz=uHBUCYESM-gM=c7pRc22MCP12pvNvT2wYgxx87Q@mail.gmail.com>
+Message-ID: <CAGb2v64pnz=uHBUCYESM-gM=c7pRc22MCP12pvNvT2wYgxx87Q@mail.gmail.com>
+Subject: Re: [PATCH v4 1/2] Bluetooth: hci_h5: Add the Realtek compatible
+ flags for the device tree
 To:     David Summers <beagleboard@davidjohnsummers.uk>
 Cc:     Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
@@ -68,85 +68,54 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-
-Interested party here. I'd like to get this working on the Pine64 which has
-an RTL8723BS module. I had made some changes and had it working but didn't
-get around to doing the patches yet.
-
 On Tue, Jan 22, 2019 at 4:39 AM David Summers
 <beagleboard@davidjohnsummers.uk> wrote:
 >
 > With the changes requested by Marcel Holtmann and Rob Herring.
 >
-> Capitalisation as requested.
->
+> The patch is unchanged, but subject changed to the norm.
+
+Same stuff with the commit log.
+
 > Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
-
-The commit log is a bit lacking, as it doesn't provide any context or details
-relevant to the changes in this patch, but also has details that should be
-in the changelog, and not the commit log.
-
 > ---
->  .../bindings/net/realtek-bluetooth-serial.txt | 32 +++++++++++++++++++
->  1 file changed, 32 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
+>  drivers/bluetooth/hci_h5.c | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
 >
-> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
-> new file mode 100644
-> index 000000000000..2eddde1a0cf1
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
-> @@ -0,0 +1,32 @@
-> +Realtek Bluetooth devices connected via a UART.
-> +These devices typically also have a WI-FI connected via SDIO - the
-> +compatible described here is used just for referencing the Bluetooth.
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index 8eede1197cd2..056ab2decccc 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -925,6 +925,22 @@ static struct h5_vnd rtl_vnd = {
+>  };
+>  #endif
+>
+> +#ifdef CONFIG_OF
+> +static const struct of_device_id h5_of_match[] = {
+> +#ifdef CONFIG_BT_HCIUART_RTL
+> +       { .compatible = "realtek,rtl8723as-bt"},
+> +       { .compatible = "realtek,rtl8723bs-bt"},
+> +       { .compatible = "realtek,rtl8723ds-bt"},
+> +       { .compatible = "realtek,rtl8761atv"},
+> +       { .compatible = "realtek,rtl8821as-bt"},
+> +       { .compatible = "realtek,rtl8821cs-bt"},
+> +       { .compatible = "realtek,rtl8822bs-bt"},
+> +#endif
+> +       { }
+> +};
+> +MODULE_DEVICE_TABLE(of, h5_of_match);
+> +#endif
 > +
-> +- compatible: should be "realtek,<name>-bt"
-> +  except for "realtek,trl8761atv" - which only has a serial Bluetooth connection
-> +       "realtek,rtl8723as-bt"
-> +       "realtek,rtl8723bs-bt"
-> +       "realtek,rtl8723ds-bt"
-> +       "realtek,rtl8761atv"
-> +       "realtek,rtl8821as-bt"
-> +       "realtek,rtl8821cs-bt"
-> +       "realtek,rtl8822bs-bt"
-> +
-> +Example:
-> +
-> +&uart0 {
-> +       status = "okay";
-> +       pinctrl-0 = <&uart0_xfer>, <&uart0_cts>;
-> +       bluetooth {
-> +               compatible = "realtek,rtl8723bs-bt";
-> +               uart_rts_gpios = <&gpio4 19 GPIO_ACTIVE_LOW>;
-> +               pinctrl-names = "default","rts_gpio";
-> +               pinctrl-0 = <&uart0_rts>;
-> +               pinctrl-1 = <&uart0_gpios>;
-> +               BT,reset_gpio    = <&gpio4 29 GPIO_ACTIVE_HIGH>;
-> +               BT,wake_gpio     = <&gpio4 26 GPIO_ACTIVE_HIGH>;
-> +               BT,wake_host_irq = <&gpio4 31 GPIO_ACTIVE_HIGH>;
 
-You haven't listed these three properties in the bindings.
+You added the list of compatibles, but you aren't actually
+referencing the list in the driver. Which means this patch
+actually does nothing in terms of functionality.
 
-Second, for the last one, the property name says irq, but it takes
-a GPIO phandle. This is slightly misleading.
-
-Furthermore, ACPI already uses the names "device-wake-gpios",
-"enable-gpios", and "host-wake-gpios". Would it be possible to
-stick to those?
-
-Last, you don't actually add support for them in the driver.
-
-So why are they there?
-
-Regards
 ChenYu
 
-> +       };
-> +};
-> +
-> +this ensures that the Bluetooth device is tied to the correct uart.
+>  #ifdef CONFIG_ACPI
+>  static const struct acpi_device_id h5_acpi_match[] = {
+>  #ifdef CONFIG_BT_HCIUART_RTL
 > --
 > beagleboard@davidjohnsummers.uk
 >
