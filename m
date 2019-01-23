@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D690C282C0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33A7EC282C0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:37:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2888E20870
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:34:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 006EA20870
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:37:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WFzRBb/q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jsL90nk7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727425AbfAWLea (ORCPT
+        id S1727308AbfAWLhK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Jan 2019 06:34:30 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:46023 "EHLO
+        Wed, 23 Jan 2019 06:37:10 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:39591 "EHLO
         mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726317AbfAWLea (ORCPT
+        with ESMTP id S1726359AbfAWLhK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Jan 2019 06:34:30 -0500
-Received: by mail-pg1-f193.google.com with SMTP id y4so940550pgc.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jan 2019 03:34:29 -0800 (PST)
+        Wed, 23 Jan 2019 06:37:10 -0500
+Received: by mail-pg1-f193.google.com with SMTP id w6so959374pgl.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jan 2019 03:37:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:mail-followup-to:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=9axYZ7/8onrf5sAiiOI5QbsAjGDVxhi2CqQ563fvilQ=;
-        b=WFzRBb/q1k4rwt1+5oxhJQqVxLk1sOjschVoY8Voq/NF8zFp0Kp8m7IqB8SGHPSac/
-         Sonoh63Vgt2FMbsu1rOyviA3npiC4TS4hN5Rx0toF/Pd04sFeWCKW5pknNz4s5IF8nwB
-         ivMhNKEmU7MZ0yILIDe2Am8eWTkuRv+hkEcy6f2ZWovGV9TrpwDncWKpVzgbs2AZk8sI
-         N2qhTBVntfSYoZumLCc3O2gGjWUBYKOwYuRWSnJ2OqjSwEBuxG802w2QfMfATmyYis1g
-         l3PRZIp0+Ik7boLySkNOUpHyLGXuvXB7Co9Cb/fUVmq1vNuL1OjLt8GEno6+NhRSoEDh
-         Uw2g==
+        bh=3mtg4APi49JWQK0YyPgM2MNw0kiZMYGnXlU08tJjwMY=;
+        b=jsL90nk7iMi2D6EmpXcypwivheV1Da00n8mjJUejQ0BFae3TG+d7TaUX02abQreZz3
+         o3VOj0nZ7qLJiI+693ya5J5zJKavTVQ7t0HkEq2dw30ZCFlbc/JVhMcbapKlixC4dfxb
+         AGz1mIiyavFQXP6qHtxTTQO6iU6UU0vU3lwt2+1e+0NpbmRsOvw7F6xWKA5MtSiNlzFA
+         tmffBgy8Z9Tbx+ycJMrJUBvSNMyQgwofxSv6Mb1gw9lvSqpp8mzf7uVSVi1lAuUk62Wg
+         gZYOwzBTqC0VT6YeZleYJD6rw07vlC7hcXXGBO0helXGXz6OSSstAKdjSCqSF7wtnxSo
+         M2Uw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id
          :mail-followup-to:references:mime-version:content-disposition
          :in-reply-to:user-agent;
-        bh=9axYZ7/8onrf5sAiiOI5QbsAjGDVxhi2CqQ563fvilQ=;
-        b=M/bXeyBWY8KQlDIO+a82mRQN/jq6P3JIH0i13U9SfPBHrl2rU6kIkBQiZRNffgBu63
-         tKmgcsxd6SDhZV195arT89V8IQDLtuP+pCSUIONkq7marObs18sUp8DUvtfMdJqSgKI4
-         DZvxOF6w+RbAKAbVmwUEU3jsFDp58tujAnw9tVgLr+3rAare4tyNUjbdDuU5SYmd7XFz
-         HJgLvIleIfxmAmnEvfty106B+iM354V5v5r0PVj43pPLNcFOQMUbxA1PwDsMkALpYgjJ
-         ZCtw0mkJ0LASzuFrEDaguG/JLBT03mq6Fl8jaGNUCAAhFYW+rDubktptubXO9EhzpL4G
-         taxg==
-X-Gm-Message-State: AJcUukdBUaaUpGTgtwn5/3De1k11JcFmdpXc2QJ29Mvg8gtjcJe4fi/P
-        bA6QWeOw1FruOL+Rn5mKrrQ=
-X-Google-Smtp-Source: ALg8bN5u5TBYfSBZKJ1vGqBo90/lO2OeELD0H7XSMvgOP96q9FjbjnD4++OOz9FrhzX326l0zprUCg==
-X-Received: by 2002:a62:da5a:: with SMTP id w26mr1724973pfl.106.1548243269397;
-        Wed, 23 Jan 2019 03:34:29 -0800 (PST)
+        bh=3mtg4APi49JWQK0YyPgM2MNw0kiZMYGnXlU08tJjwMY=;
+        b=gErOYbMzsjh6wWJLB0vbj0r9qdF+Owef9Af3ZCKV+BjUGoGpZNndu1eRFOcRuBAWKi
+         fRdA0mvCpEGhn4JctqhLwpe/nHnRsWv2GE7yaCEIPay/mmc5Tu+t7yUUzqvDpIEV8Bjp
+         BU3t4ISIq8raUTaOyWlf+yty49ufRfd9p/18z7b+Q8EqetdibgQ7JL6XKn6pa9Plc2NC
+         65p2C3uewRMMPOD/JhZXrcXU3nVVuHaAwf73zzUwb+9rIPwv93bV2utkgYosxFy6Dzow
+         QDp7bfzL9PMMSa2KTlQmOmow45wcmvZwDud67nAoRnRIw0RXVfDbyngiy9DDkyS+dXjG
+         WfiQ==
+X-Gm-Message-State: AJcUukewW2nmg/dmbE2B8qa2oD5WbF4v6EcG6tSmUV/tNcX6mBOx6yEK
+        +GHNqTAJI2wnf0CLtuXLs0o=
+X-Google-Smtp-Source: ALg8bN7DPcGWdDrVIdLF7szXEN8erO+Yx4evE2jUm664p07+T/F510xVUVdXXN7tTjNbj95a9AZcYA==
+X-Received: by 2002:a63:4a4d:: with SMTP id j13mr1686387pgl.127.1548243429384;
+        Wed, 23 Jan 2019 03:37:09 -0800 (PST)
 Received: from localhost ([192.55.54.45])
-        by smtp.gmail.com with ESMTPSA id l64sm26256922pge.73.2019.01.23.03.34.27
+        by smtp.gmail.com with ESMTPSA id a90sm33009488pfj.109.2019.01.23.03.37.07
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Jan 2019 03:34:28 -0800 (PST)
-Date:   Wed, 23 Jan 2019 13:34:24 +0200
+        Wed, 23 Jan 2019 03:37:08 -0800 (PST)
+Date:   Wed, 23 Jan 2019 13:37:04 +0200
 From:   Johan Hedberg <johan.hedberg@gmail.com>
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org
-Subject: Re: [PATCH] Bluetooth: Check L2CAP option sizes returned from
- l2cap_get_conf_opt
-Message-ID: <20190123113424.GA11718@fcahill-mobl1.ger.corp.intel.com>
+Subject: Re: [PATCH] Bluetooth: Verify that l2cap_get_conf_opt provides large
+ enough buffer
+Message-ID: <20190123113704.GB11718@fcahill-mobl1.ger.corp.intel.com>
 Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
         linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org
-References: <20190118115620.7562-1-marcel@holtmann.org>
+References: <20190118124319.12187-1-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190118115620.7562-1-marcel@holtmann.org>
+In-Reply-To: <20190118124319.12187-1-marcel@holtmann.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
@@ -80,27 +80,27 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 Hi Marcel,
 
 On Fri, Jan 18, 2019, Marcel Holtmann wrote:
-> When doing option parsing for standard type values of 1, 2 or 4 octets,
-> the value is converted directly into a variable instead of a pointer. To
-> avoid being tricked into being a pointer, check that for these option
-> types that sizes actually match. In L2CAP every option is fixed size and
-> thus it is prudent anyway to ensure that the remote side sends us the
-> right option size along with option paramters.
+> The function l2cap_get_conf_opt will return L2CAP_CONF_OPT_SIZE + opt->len
+> as length value. The opt->len however is in control over the remote user
+> and can be used by an attacker to gain access beyond the bounds of the
+> actual packet.
 > 
-> If the option size is not matching the option type, then that option is
-> silently ignored. It is a protocol violation and instead of trying to
-> give the remote attacker any further hints just pretend that option is
-> not present and proceed with the default values. Implementation
-> following the specification and its qualification procedures will always
-> use the correct size and thus not being impacted here.
+> To prevent any potential leak of heap memory, it is enough to check that
+> the resulting len calculation after calling l2cap_get_conf_opt is not
+> below zero. A well formed packet will always return >= 0 here and will
+> end with the length value being zero after the last option has been
+> parsed. In case of malformed packets messing with the opt->len field the
+> length value will become negative. If that is the case, then just abort
+> and ignore the option.
 > 
-> To keep the code readable and consistent accross all options, a few
-> cosmetic changes were also required.
+> In case an attacker uses a too short opt->len value, then garbage will
+> be parsed, but that is protected by the unknown option handling and also
+> the option parameter size checks.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/l2cap_core.c | 77 +++++++++++++++++++++++---------------
->  1 file changed, 46 insertions(+), 31 deletions(-)
+>  net/bluetooth/l2cap_core.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
 Applied to bluetooth-next. Thanks.
 
