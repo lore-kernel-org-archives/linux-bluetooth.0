@@ -2,134 +2,262 @@ Return-Path: <SRS0=X26K=P7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB2EC282C0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 12:57:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D020C282C0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 13:35:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A86F2184C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 12:57:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25BE520870
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 13:35:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="H5zBqLdq";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Ddozk3S+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HUnnNLhE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726104AbfAWM5p (ORCPT
+        id S1726167AbfAWNff (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Jan 2019 07:57:45 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:41756 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726029AbfAWM5p (ORCPT
+        Wed, 23 Jan 2019 08:35:35 -0500
+Received: from mail-io1-f49.google.com ([209.85.166.49]:46591 "EHLO
+        mail-io1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726029AbfAWNff (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Jan 2019 07:57:45 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 9769260736; Wed, 23 Jan 2019 12:57:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1548248263;
-        bh=Mz+DueOzCHqjZ4WaYFUaDzBjJPzVrxhpr9P0YTWphvU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=H5zBqLdql9Dr5PmUYZy7+f552lAhtjCw+B7wCKmhvWXmqZOaVYqUZw+t3918bgVhn
-         UtjG4Ywj8GuM+6J0AmYax95LAAx8WFpAFkKxw4qrhHIWlRHM8zZ8ayLixyVxhg5o8g
-         YqbfnDj1FAUej60O6ZRo9wON36O7UnTr9m2ejnyE=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id D0A0C6024C;
-        Wed, 23 Jan 2019 12:57:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1548248262;
-        bh=Mz+DueOzCHqjZ4WaYFUaDzBjJPzVrxhpr9P0YTWphvU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=Ddozk3S+mXaTq+cf+U0u96VsBktf4zD8r6mxOun444IjsvpB+zplBbd88UXrqEgtb
-         zvYkAdMoEeCYE3izRvlAiC+dAjoR2eU5M3ikGvLKS3kfvSfi6e5VChZ0njs5DLVcsL
-         eOSrgqrG+6o5+jyuD/ybWmBeUd8ho9CC146JBe+Y=
+        Wed, 23 Jan 2019 08:35:35 -0500
+Received: by mail-io1-f49.google.com with SMTP id s8so1626903iob.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jan 2019 05:35:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=3a0QUeN0G/N8ZvIwRTKf+J6Ex9PPoPdvyMYfytUc7Fo=;
+        b=HUnnNLhEuVZ+iYMFJX9jKDDb/dju+eIJ+/JA+8BUBIgQj1S7ILJdvomEJGodU+P2qQ
+         WUJ7d2/V7Pb5eUglA1GUuxsXEzuvQgkJx+rq6G1rbkSdscjC2+sktTBrlQ5a1ebymAfj
+         KDLLiWiPVJA4w+1N7xDr/AKyOmfyaNcjkufNYUjpFo39XVQFVdHLMOWajfVv4+lbH9gl
+         +9+gL4FEETbrY1Y1KhRhbBFqyw5J70Vrg7JKcF5MaPbSB/TmBpStWPHtulE3aox4LLWu
+         944k2Mx/Zm0DaVzJAhPGC/0mnrrllbO02IQ0RSmPnbGpv0aNCb3F5XDqSTMKDYVNXnJA
+         Hz/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:content-transfer-encoding;
+        bh=3a0QUeN0G/N8ZvIwRTKf+J6Ex9PPoPdvyMYfytUc7Fo=;
+        b=OoTt4juwGWxKqt32AUmfUHSLBYMsb5QnLJNc3KONLQjkZecS5m6WqwtNgRBoknUTdQ
+         2Og2dIG2nb7CAgIoxCsxD96L6Wt5p9uzqgQwL4DepO21m77nXFuAdq+8SJ8ruwNA/cpZ
+         G98zmWqXkQxwPGPdsTcwDiAQteHHofhaoj4T2HAmOQw2Bu6vcy1S+4gSx3Dxn+iS+VVg
+         dVNiMydUqnGIFUjkAD9DoPmDJ1IVQ43vmCb9uZb/G/Y1Z9AV77Dd5WxyPfyH0w5gmV0Z
+         ddGeTpldnjOxICSSb+abYxVcWcvSl/ox5PzZprWxrzAp2VYSapMpyBzdI7Vqi2+iC2mX
+         RwEw==
+X-Gm-Message-State: AJcUukccKrcky2xzA+GY24FjOZ19jUsk6CA73J6f+faOlobw0Q5AsQ/g
+        iOwZjtoM/zUxz8K6ZYHAowKeevnj993pSMz4Tx78zvWf
+X-Google-Smtp-Source: AHgI3IaWnGxYK0nE6nL5oqVmZ3SwQWfI9gOI9Fayy/eSykhhy6Hy+PP77oh7Skgwe3v19QlSSeJ1JsQJzfth3EE9Gy8=
+X-Received: by 2002:a6b:b589:: with SMTP id e131mr1094995iof.41.1548250533493;
+ Wed, 23 Jan 2019 05:35:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 23 Jan 2019 18:27:42 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Johan Hovold <johan@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, Johan Hovold <jhovold@gmail.com>
-Subject: Re: [PATCH v5 2/5] Bluetooth: hci_qca: Deassert RTS while baudrate
- change command
-In-Reply-To: <20190122215330.GI261387@google.com>
-References: <20190111013707.GD261387@google.com>
- <194b5d18ea86830b6a24939d483a964c@codeaurora.org>
- <20190111235633.GK261387@google.com>
- <a6e083d245baebc019b6e7163fd6f133@codeaurora.org>
- <20190115234628.GQ261387@google.com> <20190117160944.GV3691@localhost>
- <20190117172109.GU261387@google.com> <20190118094416.GB3691@localhost>
- <20190119003109.GD261387@google.com>
- <24831204bab89250099ca56e7562bd16@codeaurora.org>
- <20190122215330.GI261387@google.com>
-Message-ID: <f5e3080235572c44fe1e8c0d4b2e5a97@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+References: <CAAOqupzadB0Nmo=WMRwD1AetRtuqGwA2OYryeVzyGgZT90KNYQ@mail.gmail.com>
+ <CAAOqupwd9MRt8e9MA3FryCPx5obieqaWJt-ng8TBum4nqSgB3g@mail.gmail.com>
+ <CAAOqupx4hqhbYKyDyirgHWScrNSeFw-4z4OC7oRKDx9-yNbtAQ@mail.gmail.com> <CABBYNZJ-7j_F5w-fso=V--w-G4kN+5Mc-MufHUfeP_jUT0bM+g@mail.gmail.com>
+In-Reply-To: <CABBYNZJ-7j_F5w-fso=V--w-G4kN+5Mc-MufHUfeP_jUT0bM+g@mail.gmail.com>
+From:   Grigory Fateyev <gfborn@gmail.com>
+Date:   Wed, 23 Jan 2019 16:35:22 +0300
+Message-ID: <CAAOqupyE9i8qFpRfvDkHQ4TbJky+04v1k-387+ALRJ6RA+U5dg@mail.gmail.com>
+Subject: Re: Cannot pair and connect headset
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+Luiz, thank you very much!
 
-On 2019-01-23 03:23, Matthias Kaehlcke wrote:
-> On Mon, Jan 21, 2019 at 08:11:39PM +0530, Balakrishna Godavarthi wrote:
->> Hi Matthias,
->> 
->> On 2019-01-19 06:01, Matthias Kaehlcke wrote:
->> > On Fri, Jan 18, 2019 at 10:44:16AM +0100, Johan Hovold wrote:
->> > > On Thu, Jan 17, 2019 at 09:21:09AM -0800, Matthias Kaehlcke wrote:
->> > >
->> > > > I observed that the qcom_geni_serial driver doesn't raise RTS with
->> > > > flow control disabled. It seems we have to investigate why that's the
->> > > > case. I agree that the driver should be platform agnostic.
->> > >
->> > > Sounds like a driver bug, unless the hardware is just "odd". The
->> > > driver implementation of this looks very non-standard judging from a
->> > > quick peek.
->> > >
->> > > In fact, qcom_geni_serial_get_mctrl() is currently a no-op if hardware
->> > > flow control is not enabled:
->> > >
->> > > 	if (uart_console(uport) || !uart_cts_enabled(uport))
->> > > 		return;
->> > >
->> > > Perhaps dropping the !uart_cts_enabled() test is sufficient.
->> >
->> > Thanks for taking a look Johan, that was indeed the problem (also
->> > in set_mctrl()). I posted a fix:
->> > https://lore.kernel.org/patchwork/patch/1033611/
->> >
->> > Balakrishna, the following (applied on top of your patch) works for me
->> > with the UART patch above:
->> >
->> 
->> [Bala]: will test and update BT patch accordingly.
-> 
-> Note that Johan pointed out that hci_uart_set_flow_control() deasserts
-> RTS when flow control is disabled, so the _set_rts() calls can be
-> removed. With that only a single action needs to be undone in case of
-> an error, you can consider to keep the return instead of using the
-> goto introduced by my patch.
-> 
+Yes, I did a lot of time, but without luck.
 
-[Bala]: ok sure. will note this.
+[bluetooth]# info 00:18:09:C5:44:1E
+Device 00:18:09:C5:44:1E
+Name: MDR-XB650BT
+Alias: MDR-XB650BT
+Class: 0x240404
+Icon: audio-card
+Paired: no
+Trusted: yes
+Blocked: no
+Connected: no
+LegacyPairing: no
+UUID: Headset                   (00001108-0000-1000-8000-00805f9b34fb)
+UUID: Audio Sink                (0000110b-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+UUID: Handsfree                 (0000111e-0000-1000-8000-00805f9b34fb)
 
-> Please keep/adapt the "Deassert RTS while changing the baudrate ..."
-> comment to leave it clear to posterity why flow control is disabled
-> during baudrate changes. It's fairly obvious once you understand the
-> problem and that disabling flow control deasserts RTS, but it took us
-> a while to get there, initially we only had a comment saying
-> "disabling flow control is mandatory" (I recall I inquired about this
-> multiple times during the initial review of the wcn3990 patches ;-)
-> 
-> Thanks
-> 
-> Matthias
+[...]
+> ACL Data RX: Handle 256 flags 0x02 dlen 12                               =
+ [hci0] 439.668085
+      L2CAP: Disconnection Response (0x07) ident 5 len 4
+        Destination CID: 576
+        Source CID: 64
+> HCI Event: Simple Pairing Complete (0x36) plen 7                         =
+ [hci0] 439.672100
+        Status: Authentication Failure (0x05)
+        Address: 00:18:09:C5:44:1E (CRESYN)
+> HCI Event: Auth Complete (0x06) plen 3                                   =
+ [hci0] 439.673066
+        Status: Authentication Failure (0x05)
+        Handle: 256
+@ MGMT Event: Authentication Failed (0x0011) plen 8
+{0x0002} [hci0] 439.673127
+        BR/EDR Address: 00:18:09:C5:44:1E (CRESYN)
+        Status: Authentication Failed (0x05)
+@ MGMT Event: Authentication Failed (0x0011) plen 8
+{0x0001} [hci0] 439.673127
+        BR/EDR Address: 00:18:09:C5:44:1E (CRESYN)
+        Status: Authentication Failed (0x05)
+=3D bluetoothd: connect error: Connection refused (111)
+            439.774156
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+     [hci0] 441.809823
+        Handle: 256
+        Reason: Remote User Terminated Connection (0x13)
+> HCI Event: Command Status (0x0f) plen 4                                  =
+ [hci0] 441.812119
+      Disconnect (0x01|0x0006) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Disconnect Complete (0x05) plen 4                             =
+ [hci0] 441.829130
+        Status: Success (0x00)
+        Handle: 256
+        Reason: Connection Terminated By Local Host (0x16)
+@ MGMT Event: Device Disconnected (0x000c) plen 8
 
--- 
-Regards
-Balakrishna.
+=D1=81=D1=80, 23 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 15:56, Luiz August=
+o von Dentz <luiz.dentz@gmail.com>:
+>
+> Hi Grigory,
+>
+> Looks like the headset is refusing to pair, perhaps because it
+> believes it has already been paired, did you remove the device
+> locally? Perhaps you will need to enter into pairing mode or something
+> to clear the previous pairing, or you already tried that?
+>
+> On Wed, Jan 23, 2019 at 8:53 AM Grigory Fateyev <gfborn@gmail.com> wrote:
+> >
+> > There are some `btmon` logs, when I try to pair https://pastebin.com/4j=
+7LzD2N
+> >
+> > PS. Sorry for top quoting!
+> >
+> > =D0=B2=D1=82, 22 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 10:33, Grigory=
+ Fateyev <gfborn@gmail.com>:
+> > >
+> > > Maybe I need to provide more information, which one? Or it's a wrong
+> > > place to ask help?
+> > >
+> > > =D0=B2=D1=81, 20 =D1=8F=D0=BD=D0=B2. 2019 =D0=B3. =D0=B2 17:09, Grigo=
+ry Fateyev <gfborn@gmail.com>:
+> > > >
+> > > > Hello!
+> > > >
+> > > > I have a bluetooth headset SONY MDR-XB650BT and I cannot pair and c=
+onnect it.
+> > > >
+> > > > I got it several months ago and it worked well, I configured it usi=
+ng
+> > > > blueman-manager but now I cannot.
+> > > >
+> > > > Hardware:
+> > > > 02:00.0 Network controller: Intel Corporation Wireless 7265 (rev 59=
+)
+> > > > Subsystem: Intel Corporation Dual Band Wireless-AC 7265
+> > > > Kernel driver in use: iwlwifi
+> > > > Kernel modules: iwlwifi
+> > > >
+> > > > Software:
+> > > > Debian Stretch 9.6
+> > > > Linux gregf 4.18.0-0.bpo.1-amd64 #1 SMP Debian 4.18.6-1~bpo9+1
+> > > > (2018-09-13) x86_64 GNU/Linux
+> > > > ii  blueman                               2.0.4-1
+> > > >      amd64        Graphical bluetooth manager
+> > > > ii  bluetooth                             5.43-2+deb9u1
+> > > >      all          Bluetooth support
+> > > > ii  bluez                                 5.43-2+deb9u1
+> > > >      amd64        Bluetooth tools and daemons
+> > > > ii  bluez-firmware                        1.2-3
+> > > >      all          Firmware for Bluetooth devices
+> > > > ii  bluez-hcidump                         5.43-2+deb9u1
+> > > >      amd64        Analyses Bluetooth HCI packets
+> > > > ii  bluez-obexd                           5.43-2+deb9u1
+> > > >      amd64        bluez obex daemon
+> > > > ii  bluez-tools                           0.2.0~20140808-5+b2
+> > > >      amd64        Set of tools to manage Bluetooth devices for linu=
+x
+> > > > ii  libbluetooth3:amd64                   5.43-2+deb9u1
+> > > >      amd64        Library to use the BlueZ Linux Bluetooth stack
+> > > > ii  pulseaudio-module-bluetooth           10.0-1+deb9u1
+> > > >      amd64        Bluetooth module for PulseAudio sound server
+> > > > ii  python-bluez                          0.22-1
+> > > >      amd64        Python wrappers around BlueZ for rapid bluetooth
+> > > > development
+> > > >
+> > > > This is part of my logs: https://pastebin.com/xPnm6SgW
+> > > >
+> > > > I'm trying to do it via `bluetoothctl` but get something like:
+> > > > [bluetooth]# info 00:18:09:C5:44:1E
+> > > > Device 00:18:09:C5:44:1E
+> > > > Name: MDR-XB650BT
+> > > > Alias: MDR-XB650BT
+> > > > Class: 0x240404
+> > > > Icon: audio-card
+> > > > Paired: no
+> > > > Trusted: no
+> > > > Blocked: no
+> > > > Connected: no
+> > > > LegacyPairing: no
+> > > > UUID: Headset                   (00001108-0000-1000-8000-00805f9b34=
+fb)
+> > > > UUID: Audio Sink                (0000110b-0000-1000-8000-00805f9b34=
+fb)
+> > > > UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34=
+fb)
+> > > > UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34=
+fb)
+> > > > UUID: Handsfree                 (0000111e-0000-1000-8000-00805f9b34=
+fb)
+> > > > [bluetooth]# agent on
+> > > > Agent registered
+> > > > [bluetooth]# trust 00:18:09:C5:44:1E
+> > > > [CHG] Device 00:18:09:C5:44:1E Trusted: yes
+> > > > Changing 00:18:09:C5:44:1E trust succeeded
+> > > > [bluetooth]# pair 00:18:09:C5:44:1E
+> > > > Attempting to pair with 00:18:09:C5:44:1E
+> > > > [CHG] Device 00:18:09:C5:44:1E Connected: yes
+> > > > Failed to pair: org.bluez.Error.AuthenticationFailed
+> > > > [CHG] Device 00:18:09:C5:44:1E Connected: no
+> > > > [CHG] Device 00:18:09:C5:44:1E Connected: yes
+> > > > [CHG] Device 00:18:09:C5:44:1E Connected: no
+> > > > [bluetooth]# pair 00:18:09:C5:44:1E
+> > > > Attempting to pair with 00:18:09:C5:44:1E
+> > > > [CHG] Device 00:18:09:C5:44:1E Connected: yes
+> > > > Failed to pair: org.bluez.Error.AuthenticationFailed
+> > > > [CHG] Device 00:18:09:C5:44:1E Connected: no
+> > > >
+> > > > I'm sure it works but how to detect the reason why it cannot now, I
+> > > > got out of my hairs. Could you help me, please?
+> > > >
+> > > > Thank you!
+> >
+> >
+> >
+> > --
+> > --
+> > Grigory
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+
+
+--=20
+--=20
+Grigory
