@@ -2,115 +2,46 @@ Return-Path: <SRS0=X26K=P7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD435C282C0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 07:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2485DC282C2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 09:24:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9893F20870
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 07:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6B8620870
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 09:24:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726207AbfAWHqN (ORCPT
+        id S1727264AbfAWJY5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Jan 2019 02:46:13 -0500
-Received: from gateway34.websitewelcome.com ([192.185.148.164]:33429 "EHLO
-        gateway34.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725991AbfAWHqN (ORCPT
+        Wed, 23 Jan 2019 04:24:57 -0500
+Received: from unassigned.psychz.net ([104.216.19.210]:47474 "EHLO
+        thespruceeats.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727291AbfAWJY5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Jan 2019 02:46:13 -0500
-X-Greylist: delayed 1393 seconds by postgrey-1.27 at vger.kernel.org; Wed, 23 Jan 2019 02:46:12 EST
-Received: from cm16.websitewelcome.com (cm16.websitewelcome.com [100.42.49.19])
-        by gateway34.websitewelcome.com (Postfix) with ESMTP id 026D417A7D1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jan 2019 01:22:59 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id mCsEgjwfq4FKpmCsFg8eYi; Wed, 23 Jan 2019 01:22:59 -0600
-X-Authority-Reason: nr=8
-Received: from [189.250.130.205] (port=46276 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.91)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1gmCps-0038sJ-9x; Wed, 23 Jan 2019 01:22:58 -0600
-Date:   Wed, 23 Jan 2019 01:20:31 -0600
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH net-next] Bluetooth: Mark expected switch fall-throughs
-Message-ID: <20190123072031.GA9678@embeddedor>
+        Wed, 23 Jan 2019 04:24:57 -0500
+X-Greylist: delayed 3841 seconds by postgrey-1.27 at vger.kernel.org; Wed, 23 Jan 2019 04:24:56 EST
+To:     linux-bluetooth@vger.kernel.org
+Subject: Want to edit your photos
+Message-ID: <dd65c9389dd88b10f1eb1a55b86049b9@pamperedchef.com>
+Date:   Wed, 23 Jan 2019 08:46:02 +0100
+From:   "Judy" <pinrainteserpasnlop@theboatguyinc.com>
+Reply-To: hantekapan@sina.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.250.130.205
-X-Source-L: No
-X-Exim-ID: 1gmCps-0038sJ-9x
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [189.250.130.205]:46276
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 22
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Type: text/plain; format=flowed; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-where we are expecting to fall through.
+We want to work for you to edit your photos.
 
-This patch fixes the following warnings:
+We can do your photos with white background, sharpen, retouching is
+included  for all your photos.
 
-net/bluetooth/rfcomm/core.c:479:6: warning: this statement may fall through [-Wimplicit-fallthrough=]
-net/bluetooth/l2cap_core.c:4223:6: warning: this statement may fall through [-Wimplicit-fallthrough=]
+Waiting for the test photos to start with.
 
-Warning level 3 was used: -Wimplicit-fallthrough=3
-
-This patch is part of the ongoing efforts to enabling
--Wimplicit-fallthrough.
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- net/bluetooth/l2cap_core.c  | 1 +
- net/bluetooth/rfcomm/core.c | 1 +
- 2 files changed, 2 insertions(+)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2a7fb517d460..a5b76e24940a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4244,6 +4244,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
- 				goto done;
- 			break;
- 		}
-+		/* fall through */
- 
- 	default:
- 		l2cap_chan_set_err(chan, ECONNRESET);
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 1a635df80643..3a9e9d9670be 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -483,6 +483,7 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
- 		/* if closing a dlc in a session that hasn't been started,
- 		 * just close and unlink the dlc
- 		 */
-+		/* fall through */
- 
- 	default:
- 		rfcomm_dlc_clear_timer(d);
--- 
-2.20.1
+Thanks,
+Judy
 
