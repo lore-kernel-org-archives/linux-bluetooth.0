@@ -2,115 +2,166 @@ Return-Path: <SRS0=X26K=P7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D10C282C2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 10:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE6CC282C0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:24:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7BD92183F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 10:48:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5971820870
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:24:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=silvair-com.20150623.gappssmtp.com header.i=@silvair-com.20150623.gappssmtp.com header.b="G0Eu3hJb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qtJuonBC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726872AbfAWKsA (ORCPT
+        id S1726938AbfAWLYC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Jan 2019 05:48:00 -0500
-Received: from mail-lj1-f176.google.com ([209.85.208.176]:44118 "EHLO
-        mail-lj1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726359AbfAWKsA (ORCPT
+        Wed, 23 Jan 2019 06:24:02 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:44842 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726804AbfAWLYB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Jan 2019 05:48:00 -0500
-Received: by mail-lj1-f176.google.com with SMTP id k19-v6so1466569lji.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jan 2019 02:47:59 -0800 (PST)
+        Wed, 23 Jan 2019 06:24:01 -0500
+Received: by mail-oi1-f196.google.com with SMTP id m6so1460586oig.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jan 2019 03:24:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=silvair-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=X883s8YXVZU+v7t+zQF0PoJLYpxBC3xKotUZaJCQDaA=;
-        b=G0Eu3hJbl8fJNdW3WFyrpL7FRxVJ9CIpJT3as3x2cX+bQBDb7gTudvBuxcPKFzn+CC
-         gPxwTyc9C+TpHuln4IyWmTAbdh30jqhGZnfAkESAjoycEsIwoygdxiowUR/cr6o24p35
-         20lCwEmF6YdK5WOAEHr6W2ALHZCLkJxCMxxAXb4S6qXiX1QtyNUeYCPWRmPbY4CHt1Vx
-         RnBFvJH8FMfGyGQuzQzw/J+kravgl9aTELy7+sy88tvbsC4kuGyVjwfeKPPAmJN1yYWj
-         SQbWvg1EuEVlnMzCbHnLKug0+wr3N/0Oy7TTJprqOGE/qQdSEi9c7HOkIUHH1vAjuJ1s
-         hpBA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=8CmZTpoO7WzlV8VipA8BQzD5kWg0/6j/W5scHpA7UOk=;
+        b=qtJuonBCaj1Rve07xOY5SzB8yvXaCn9umbUpMbMENrWU4ux+g5aAjhnshENX81o/T0
+         U6VxS0HAkXR0A8tep5Zd50qhrSSY8FaTmP5NaAxCzF12tKCBgWrwIz2EevtgYNPP9/4e
+         MrNKyNIjTPLYdbpRbLfu5+4mFWncd4Z+ciPP2kdHnn4d7wz3n+8Oep+E/Iqzw8Ug8AFd
+         4lNcmKA/7cQ70jW7nzrI8AJ6ZGi1aQ24F583tbMpKSTr5VjA5rAp2f4YeOlBF900duKn
+         2qrB5MKvFEzLlJ4Rc4pqfhgsOB2N041AcO5FYc+puIhXgdZ8wlkPKxzzWVGecXvxdmJQ
+         LJyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to:user-agent;
-        bh=X883s8YXVZU+v7t+zQF0PoJLYpxBC3xKotUZaJCQDaA=;
-        b=J8P/VYW1wKcgCwsGxwtRVvStbFyt9vOC6606JiTngSuSlkNMxBEs4i7HKAPq6XAmRr
-         6kl+4xs5lD8iqQAYG30XDw89SdMrq9if/sy4+SlHfmXSVl+MAH4youJqxSgKH2lV6a+W
-         sYdt3Zs0G2hOT8/toRgL7cD4c7z35jJb4kY0wo/EcOpFLLgy9GlGWCh9rrg1hyYZxbyP
-         YUqq6xCDNG1jYGXH/lEKI41tdRLVXjzQgpICJpUC4GP+mAvjw5ucJ2LcE57YRcRdjPWd
-         rcZULaWeRcEHdz2Ol6yvi6c3uY22JrZHR/MWPfUQZ34d5rs8djnLy6prr5K1+RlpBnpB
-         7riw==
-X-Gm-Message-State: AJcUukeHxUv+puaS+1cqkMXsOV4sCrXkcv8hyv3iFlOcW5XZq9MKW2Qa
-        bZRcxgsd6PxK9eLybOOoql5mNQ==
-X-Google-Smtp-Source: ALg8bN5BqUHw/vMozy7RikY3x4DNWofBiNTEUPxCSBD0z3hwzBFH0R+KwwEjFzH4apJTJVJbJghSKw==
-X-Received: by 2002:a2e:3a04:: with SMTP id h4-v6mr1604809lja.81.1548240478201;
-        Wed, 23 Jan 2019 02:47:58 -0800 (PST)
-Received: from scytale ([217.153.94.18])
-        by smtp.gmail.com with ESMTPSA id 6sm459769lfa.27.2019.01.23.02.47.57
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 23 Jan 2019 02:47:57 -0800 (PST)
-Date:   Wed, 23 Jan 2019 11:47:55 +0100
-From:   =?utf-8?Q?Micha=C5=82?= Lowas-Rzechonek 
-        <michal.lowas-rzechonek@silvair.com>
-To:     Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Re: Format of HCI LE Advertising Report Event
-Message-ID: <20190123104755.vfripl2xo46hjums@scytale>
-Mail-Followup-To: Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-References: <20190123102452.o5xvunjcsx57pdwl@scytale>
- <282271E8-D3D1-4AEC-8B57-BA03F3FF7D36@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=8CmZTpoO7WzlV8VipA8BQzD5kWg0/6j/W5scHpA7UOk=;
+        b=Z2/EFc604mgVxsMyS++YRoPZSvKERKSG6r/b8D6dnKdoeEU2JNMG5KglCU1+q5GwQb
+         vZIG2bs8b2vp5+msB3NRjt/vV6j/oa+hRkOxNvI8eeGNdWjAXrWHVVJ12PRRUIdbJPiT
+         sRn1QysyIgAny49AsIi9nnz0TgRv8s27voqwviaJ1EqrUuXLnoojFJvGr1fXsrGU7XVb
+         eDId9OsStH9EXvGlLojCkcpBwMYrBOGsqwQtk0+TFUllzkHmr4hlMgunk7Hh3TPheDYS
+         CD0XcB9ZFyilJuC+/EnU0G3idJ4gzBsECDlNHErcCjQcQQH6cpQh88n00ZFHu8JIHK+O
+         aNnQ==
+X-Gm-Message-State: AJcUukfZpkZub0tsW1doI/HFvD6RyATH3SJYeGEpk08pwgMMSwBJc7xU
+        qKtgS0yTRqySuX6N9Xdfxaq0eZ+zmQqIWIQHz5/b1iLA
+X-Google-Smtp-Source: ALg8bN6nzGHm1jZa954kSyjHk03C9DFbwMx6M0yGvLM5vqG7IP7dO2fYy+uHFVwC+sbn1ZJymSJaZWCE85b6vu8jScA=
+X-Received: by 2002:aca:5e09:: with SMTP id s9mr1053725oib.153.1548242640311;
+ Wed, 23 Jan 2019 03:24:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <282271E8-D3D1-4AEC-8B57-BA03F3FF7D36@gmail.com>
-User-Agent: NeoMutt/20180716
+References: <20190121115745.5353-1-luiz.dentz@gmail.com>
+In-Reply-To: <20190121115745.5353-1-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 23 Jan 2019 13:23:48 +0200
+Message-ID: <CABBYNZJA-seDm0hT49uWda0fsRr4w6BWji_giDnHGzPBrtZdEA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] avdtp: Fix always destroying session immediatelly
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Johan,
+Hi,
+On Mon, Jan 21, 2019 at 1:57 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> In case the remote device sent a close/abort the session shall not be
+> free immediatelly as the remote may want to reconfigure the stream.
+> ---
+>  profiles/audio/avdtp.c | 23 ++++++++++++++++++-----
+>  1 file changed, 18 insertions(+), 5 deletions(-)
+>
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index 4f964feb5..f4c9a2ed8 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -412,6 +412,7 @@ struct avdtp {
+>         struct pending_req *req;
+>
+>         guint dc_timer;
+> +       int dc_timeout;
+>
+>         /* Attempt stream setup instead of disconnecting */
+>         gboolean stream_setup;
+> @@ -1152,10 +1153,12 @@ static void set_disconnect_timer(struct avdtp *session)
+>         if (session->dc_timer)
+>                 remove_disconnect_timer(session);
+>
+> -       if (!session->stream_setup && !session->streams)
+> +       DBG("timeout %d", session->dc_timeout);
+> +
+> +       if (!session->dc_timeout)
+>                 session->dc_timer = g_idle_add(disconnect_timeout, session);
+>         else
+> -               session->dc_timer = g_timeout_add_seconds(DISCONNECT_TIMEOUT,
+> +               session->dc_timer = g_timeout_add_seconds(session->dc_timeout,
+>                                                         disconnect_timeout,
+>                                                         session);
+>  }
+> @@ -1797,6 +1800,8 @@ static gboolean avdtp_close_cmd(struct avdtp *session, uint8_t transaction,
+>
+>         avdtp_sep_set_state(session, sep, AVDTP_STATE_CLOSING);
+>
+> +       session->dc_timeout = DISCONNECT_TIMEOUT;
+> +
+>         if (!avdtp_send(session, transaction, AVDTP_MSG_TYPE_ACCEPT,
+>                                                 AVDTP_CLOSE, NULL, 0))
+>                 return FALSE;
+> @@ -1893,8 +1898,10 @@ static gboolean avdtp_abort_cmd(struct avdtp *session, uint8_t transaction,
+>
+>         ret = avdtp_send(session, transaction, AVDTP_MSG_TYPE_ACCEPT,
+>                                                 AVDTP_ABORT, NULL, 0);
+> -       if (ret)
+> +       if (ret) {
+>                 avdtp_sep_set_state(session, sep, AVDTP_STATE_ABORTING);
+> +               session->dc_timeout = DISCONNECT_TIMEOUT;
+> +       }
+>
+>         return ret;
+>  }
+> @@ -2377,6 +2384,8 @@ struct avdtp *avdtp_new(GIOChannel *chan, struct btd_device *device,
+>          * with respect to the disconnect timer */
+>         session->stream_setup = TRUE;
+>
+> +       session->dc_timeout = DISCONNECT_TIMEOUT;
+> +
+>         avdtp_connect_cb(chan, NULL, session);
+>
+>         return session;
+> @@ -3512,8 +3521,10 @@ int avdtp_close(struct avdtp *session, struct avdtp_stream *stream,
+>
+>         ret = send_request(session, FALSE, stream, AVDTP_CLOSE,
+>                                                         &req, sizeof(req));
+> -       if (ret == 0)
+> +       if (ret == 0) {
+>                 stream->close_int = TRUE;
+> +               session->dc_timeout = 0;
+> +       }
+>
+>         return ret;
+>  }
+> @@ -3561,8 +3572,10 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream)
+>
+>         ret = send_request(session, TRUE, stream, AVDTP_ABORT,
+>                                                         &req, sizeof(req));
+> -       if (ret == 0)
+> +       if (ret == 0) {
+>                 stream->abort_int = TRUE;
+> +               session->dc_timeout = 0;
+> +       }
+>
+>         return ret;
+>  }
+> --
+> 2.17.2
 
-On 01/23, Johan Hedberg wrote:
-> > event_type[0]
-> > event_type[1]
-> > address_type[0]
-> > address_type[1]
-> > address[0]
-> > address[1]
-> > length[0]
-> > length[1]
-> > data[0]
-> > data[1]
-> > rssi[0]
-> > rssi[1]
-> 
-> See Vol 2, Part E, section 5.2 (page 728 in the pdf):
-> “
-> • Arrayed parameters are specified using the following notation:
-> ParameterA[i]. If more than one set of arrayed parameters are
-> specified (e.g. ParameterA[i], ParameterB[i]), then, unless noted
-> otherwise, the order of the parameters are as follows: ParameterA[0],
-> ParameterB[0], ParameterA[1], ParameterB[1], ParameterA[2],
-> ParameterB[2], ... ParameterA[n], ParameterB[n]
-> “
-
-Oh boy. Thanks a lot, I missed this.
-
-Not the clearest wording in the world :|
+Applied.
 
 -- 
-Michał Lowas-Rzechonek <michal.lowas-rzechonek@silvair.com>
-Silvair http://silvair.com
-Jasnogórska 44, 31-358 Krakow, POLAND
+Luiz Augusto von Dentz
