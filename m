@@ -2,169 +2,106 @@ Return-Path: <SRS0=X26K=P7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D63C282C0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:24:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D690C282C0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:34:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C2F7F20870
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:24:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2888E20870
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 11:34:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cB6Y5UTE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WFzRBb/q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727358AbfAWLYf (ORCPT
+        id S1727425AbfAWLea (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Jan 2019 06:24:35 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:41220 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727095AbfAWLYf (ORCPT
+        Wed, 23 Jan 2019 06:34:30 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:46023 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726317AbfAWLea (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Jan 2019 06:24:35 -0500
-Received: by mail-ot1-f66.google.com with SMTP id u16so1568143otk.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jan 2019 03:24:34 -0800 (PST)
+        Wed, 23 Jan 2019 06:34:30 -0500
+Received: by mail-pg1-f193.google.com with SMTP id y4so940550pgc.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jan 2019 03:34:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=QJi0V99Em77Tr6KqF6iJRTleogjvN80kXKMBlQ5nkqo=;
-        b=cB6Y5UTEDSLMjK7bomCI2DS/gZZdfFC8/MW3RvMhjc8Wz9WsnDU3QFyvGJPGt7kO36
-         q4XdTpy9eHhInqZ3B08UDI5S/gfnW99JvIxjfFCbQ5SH5+o3/e7s9AecIf2uHr/+fLnI
-         U5hURErNYxh3+SNpNWg/tR+b08pfVuzCMepDaQAk/rIta1ZMTqMM4aTn66a+2EclkvVA
-         SVh6Gq/+taRor1QJHYB60N//ueOuVl6DYUaBRHvX85fxRgUWduMsD3kQJupBQ5RUb5Rh
-         U7p09CvoWoqwnyey9/v2mtW2k3Db7AxzyBDzmmF1VL0nb2QuPgircYznm7eS114B5gMf
-         qBgw==
+        h=date:from:to:cc:subject:message-id:mail-followup-to:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=9axYZ7/8onrf5sAiiOI5QbsAjGDVxhi2CqQ563fvilQ=;
+        b=WFzRBb/q1k4rwt1+5oxhJQqVxLk1sOjschVoY8Voq/NF8zFp0Kp8m7IqB8SGHPSac/
+         Sonoh63Vgt2FMbsu1rOyviA3npiC4TS4hN5Rx0toF/Pd04sFeWCKW5pknNz4s5IF8nwB
+         ivMhNKEmU7MZ0yILIDe2Am8eWTkuRv+hkEcy6f2ZWovGV9TrpwDncWKpVzgbs2AZk8sI
+         N2qhTBVntfSYoZumLCc3O2gGjWUBYKOwYuRWSnJ2OqjSwEBuxG802w2QfMfATmyYis1g
+         l3PRZIp0+Ik7boLySkNOUpHyLGXuvXB7Co9Cb/fUVmq1vNuL1OjLt8GEno6+NhRSoEDh
+         Uw2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=QJi0V99Em77Tr6KqF6iJRTleogjvN80kXKMBlQ5nkqo=;
-        b=X+t1LD5PuaFVsF8mTlg+z/OmXSpqCENjoCdMoXS5HLJEuRgYcqaNSrCxK/GG2iC+cD
-         IQOj/ualaWuyj9GfZGPAcLx55ffRlLokqKdb9qbJXGBsMCDSRb4NtzvCZEyT6GL+aRtI
-         DZF91LYJA7IJV4t2+Op7IxqZthfF+brSjDn7ZW7yqh71tDjJYhiJaWPWpJvHdZqxtm83
-         cFRxAmJdKnGmxyZxKTVReN9i+2DcQCOQEsib3LkkwwQeqpYomlpRshGcdUlTlAoRV9Ds
-         cuDD3C1bILYBCz6C2dRKocGcIhFPgQ+i0LGJVzATbGyTfPmV5zLVbtksE+2UKexia4YK
-         yBAw==
-X-Gm-Message-State: AJcUukeKMRXk5cUJE7zgo5T+fZQOam82kjBH9WKhBL7cXyrF0jP+XDHM
-        b4qkPWgrl0vS3hoPkdm8JyX71WT2WZOAhDKVWmQ=
-X-Google-Smtp-Source: ALg8bN4Y95pX26SpO85C0TdaRRbtdG04/x+YgRlE+IzL1heqN/DoLR/QHt2d6xn7U0m4Ky+R1Khz0EXUKRJeLBX5RUw=
-X-Received: by 2002:a9d:7749:: with SMTP id t9mr1251212otl.342.1548242674118;
- Wed, 23 Jan 2019 03:24:34 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id
+         :mail-followup-to:references:mime-version:content-disposition
+         :in-reply-to:user-agent;
+        bh=9axYZ7/8onrf5sAiiOI5QbsAjGDVxhi2CqQ563fvilQ=;
+        b=M/bXeyBWY8KQlDIO+a82mRQN/jq6P3JIH0i13U9SfPBHrl2rU6kIkBQiZRNffgBu63
+         tKmgcsxd6SDhZV195arT89V8IQDLtuP+pCSUIONkq7marObs18sUp8DUvtfMdJqSgKI4
+         DZvxOF6w+RbAKAbVmwUEU3jsFDp58tujAnw9tVgLr+3rAare4tyNUjbdDuU5SYmd7XFz
+         HJgLvIleIfxmAmnEvfty106B+iM354V5v5r0PVj43pPLNcFOQMUbxA1PwDsMkALpYgjJ
+         ZCtw0mkJ0LASzuFrEDaguG/JLBT03mq6Fl8jaGNUCAAhFYW+rDubktptubXO9EhzpL4G
+         taxg==
+X-Gm-Message-State: AJcUukdBUaaUpGTgtwn5/3De1k11JcFmdpXc2QJ29Mvg8gtjcJe4fi/P
+        bA6QWeOw1FruOL+Rn5mKrrQ=
+X-Google-Smtp-Source: ALg8bN5u5TBYfSBZKJ1vGqBo90/lO2OeELD0H7XSMvgOP96q9FjbjnD4++OOz9FrhzX326l0zprUCg==
+X-Received: by 2002:a62:da5a:: with SMTP id w26mr1724973pfl.106.1548243269397;
+        Wed, 23 Jan 2019 03:34:29 -0800 (PST)
+Received: from localhost ([192.55.54.45])
+        by smtp.gmail.com with ESMTPSA id l64sm26256922pge.73.2019.01.23.03.34.27
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 23 Jan 2019 03:34:28 -0800 (PST)
+Date:   Wed, 23 Jan 2019 13:34:24 +0200
+From:   Johan Hedberg <johan.hedberg@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org
+Subject: Re: [PATCH] Bluetooth: Check L2CAP option sizes returned from
+ l2cap_get_conf_opt
+Message-ID: <20190123113424.GA11718@fcahill-mobl1.ger.corp.intel.com>
+Mail-Followup-To: Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org, gregkh@linuxfoundation.org
+References: <20190118115620.7562-1-marcel@holtmann.org>
 MIME-Version: 1.0
-References: <20190122134524.20509-1-luiz.dentz@gmail.com> <CABBYNZLCFpXhbAnVYaA-nVNOY8QRvpR1UZhMHfy-awZxtpSocQ@mail.gmail.com>
- <20190122175622.dj6riiim6zukpetw@pali>
-In-Reply-To: <20190122175622.dj6riiim6zukpetw@pali>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 23 Jan 2019 13:24:22 +0200
-Message-ID: <CABBYNZJGLGnNzXC_Q+Visk1XPwP9FX+BvJ65UQMj4tMJfL92+Q@mail.gmail.com>
-Subject: Re: [PATCH v3 1/9] doc/media-api: Enable MediaEndpoint to expose
- remote SEP
-To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190118115620.7562-1-marcel@holtmann.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pali,
-On Tue, Jan 22, 2019 at 7:56 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrot=
-e:
->
-> On Tuesday 22 January 2019 16:20:12 Luiz Augusto von Dentz wrote:
-> > Hi Pali,
-> > On Tue, Jan 22, 2019 at 3:45 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > >
-> > > This adds the possibility to expose remote SEP using MediaEndpoint
-> > > interface to allow setting a configuration.
-> > > ---
-> > >  doc/media-api.txt | 27 +++++++++++++++++++++++++--
-> > >  1 file changed, 25 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/doc/media-api.txt b/doc/media-api.txt
-> > > index b5ad2db12..af9485342 100644
-> > > --- a/doc/media-api.txt
-> > > +++ b/doc/media-api.txt
-> > > @@ -500,14 +500,23 @@ Properties        object Player [readonly]
-> > >  MediaEndpoint1 hierarchy
-> > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-> > >
-> > > -Service                unique name
-> > > +Service                unique name (Server role)
-> > > +               org.bluez (Client role)
-> > >  Interface      org.bluez.MediaEndpoint1
-> > > -Object path    freely definable
-> > > +Object path    freely definable (Server role)
-> > > +               [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_=
-XX/sepX
-> > > +               (Client role)
-> > >
-> > >  Methods                void SetConfiguration(object transport, dict =
-properties)
-> > >
-> > >                         Set configuration for the transport.
-> > >
-> > > +                       For client role transport must be set with a =
-server
-> > > +                       endpoint oject which will be configured and t=
-he
-> > > +                       properties must contain the following propert=
-ies:
-> > > +
-> > > +                               array{byte} Capabilities
-> > > +
-> > >                 array{byte} SelectConfiguration(array{byte} capabilit=
-ies)
-> > >
-> > >                         Select preferable configuration from the supp=
-orted
-> > > @@ -532,6 +541,20 @@ Methods            void SetConfiguration(object =
-transport, dict properties)
-> > >                         endpoint, because when this method gets calle=
-d it has
-> > >                         already been unregistered.
-> > >
-> > > +Properties     string UUID [readonly, optional]:
-> > > +
-> > > +                       UUID of the profile which the endpoint is for=
-.
-> > > +
-> > > +               byte Codec [readonly, optional]:
-> > > +
-> > > +                       Assigned number of codec that the endpoint im=
-plements.
-> > > +                       The values should match the profile specifica=
-tion which
-> > > +                       is indicated by the UUID.
-> > > +
-> > > +               array{byte} Capabilities [readonly, optional]:
-> > > +
-> > > +                       Capabilities blob, it is used as it is so the=
- size and
-> > > +                       byte order must match.
-> > >
-> > >  MediaTransport1 hierarchy
-> > >  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> > > --
-> > > 2.17.2
-> >
-> > Can you try this set?
->
-> Hi! In V3 you added only "a2dp: Add reverse discovery" patch right?
-> I tested my setup also with this patch and there is no difference,
-> pulseaudio is working fine :-)
->
+Hi Marcel,
 
-Applied.
+On Fri, Jan 18, 2019, Marcel Holtmann wrote:
+> When doing option parsing for standard type values of 1, 2 or 4 octets,
+> the value is converted directly into a variable instead of a pointer. To
+> avoid being tricked into being a pointer, check that for these option
+> types that sizes actually match. In L2CAP every option is fixed size and
+> thus it is prudent anyway to ensure that the remote side sends us the
+> right option size along with option paramters.
+> 
+> If the option size is not matching the option type, then that option is
+> silently ignored. It is a protocol violation and instead of trying to
+> give the remote attacker any further hints just pretend that option is
+> not present and proceed with the default values. Implementation
+> following the specification and its qualification procedures will always
+> use the correct size and thus not being impacted here.
+> 
+> To keep the code readable and consistent accross all options, a few
+> cosmetic changes were also required.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/l2cap_core.c | 77 +++++++++++++++++++++++---------------
+>  1 file changed, 46 insertions(+), 31 deletions(-)
 
+Applied to bluetooth-next. Thanks.
 
---=20
-Luiz Augusto von Dentz
+Johan
