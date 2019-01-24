@@ -6,108 +6,76 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C6F5C282C5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 15:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79DB3C282C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 17:23:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6B4F2184C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 15:23:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 44E91218AF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 17:23:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728377AbfAXPXR (ORCPT
+        id S1728989AbfAXRW6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Jan 2019 10:23:17 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:57110 "EHLO
+        Thu, 24 Jan 2019 12:22:58 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:59317 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728305AbfAXPXR (ORCPT
+        with ESMTP id S1728428AbfAXRW5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Jan 2019 10:23:17 -0500
-Received: from 61-220-137-37.hinet-ip.hinet.net ([61.220.137.37] helo=localhost)
+        Thu, 24 Jan 2019 12:22:57 -0500
+Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
         by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
         (Exim 4.76)
-        (envelope-from <kai.heng.feng@canonical.com>)
-        id 1gmgqY-0000jG-DC; Thu, 24 Jan 2019 15:23:14 +0000
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     drake@endlessm.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Kai-Heng Feng <kai.heng.feng@canonical.com>
-Subject: [PATCH 1/3] Bluetooth: btrtl: Let rtl_load_file() always return error code
-Date:   Thu, 24 Jan 2019 23:23:08 +0800
-Message-Id: <20190124152310.29717-1-kai.heng.feng@canonical.com>
-X-Mailer: git-send-email 2.17.1
+        (envelope-from <colin.king@canonical.com>)
+        id 1gmiiN-00057f-9Y; Thu, 24 Jan 2019 17:22:55 +0000
+From:   Colin King <colin.king@canonical.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: make hw_err static, reduces object code size
+Date:   Thu, 24 Jan 2019 17:22:54 +0000
+Message-Id: <20190124172254.13186-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.19.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The return value of rtl_load_file() can be either firmware length or
-error code.
+From: Colin Ian King <colin.king@canonical.com>
 
-For consistency, always return error code and pass firmware length via
-another pointer.
+Don't populate the const array hw_err on the stack but instead make
+it static. Makes the object code smaller by 45 bytes:
 
-Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Before:
+   text	   data	    bss	    dec	    hex	filename
+ 100880	  21090	   1088	 123058	  1e0b2	linux/net/bluetooth/hci_core.o
+
+After:
+   text	   data	    bss	    dec	    hex	filename
+ 100739	  21186	   1088	 123013	  1e085	linux/net/bluetooth/hci_core.o
+
+(gcc version 8.2.0 x86_64)
+
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
 ---
- drivers/bluetooth/btrtl.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ net/bluetooth/hci_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 41405de27d66..a134a79bf0ef 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -413,7 +413,8 @@ static int rtl_download_firmware(struct hci_dev *hdev,
- 	return ret;
- }
- 
--static int rtl_load_file(struct hci_dev *hdev, const char *name, u8 **buff)
-+static int rtl_load_file(struct hci_dev *hdev, const char *name,
-+			 u8 **buff, int *fw_size)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 7352fe85674b..40cd6b48473a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3401,7 +3401,7 @@ EXPORT_SYMBOL(hci_resume_dev);
+ /* Reset HCI device */
+ int hci_reset_dev(struct hci_dev *hdev)
  {
- 	const struct firmware *fw;
- 	int ret;
-@@ -422,8 +423,8 @@ static int rtl_load_file(struct hci_dev *hdev, const char *name, u8 **buff)
- 	ret = request_firmware(&fw, name, &hdev->dev);
- 	if (ret < 0)
- 		return ret;
--	ret = fw->size;
--	*buff = kmemdup(fw->data, ret, GFP_KERNEL);
-+	*fw_size = fw->size;
-+	*buff = kmemdup(fw->data, fw->size, GFP_KERNEL);
- 	if (!*buff)
- 		ret = -ENOMEM;
+-	const u8 hw_err[] = { HCI_EV_HARDWARE_ERROR, 0x01, 0x00 };
++	static const u8 hw_err[] = { HCI_EV_HARDWARE_ERROR, 0x01, 0x00 };
+ 	struct sk_buff *skb;
  
-@@ -564,12 +565,11 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 			goto err_free;
- 	}
- 
--	btrtl_dev->fw_len = rtl_load_file(hdev, btrtl_dev->ic_info->fw_name,
--					  &btrtl_dev->fw_data);
--	if (btrtl_dev->fw_len < 0) {
-+	ret = rtl_load_file(hdev, btrtl_dev->ic_info->fw_name,
-+			    &btrtl_dev->fw_data, &btrtl_dev->fw_len);
-+	if (ret || !btrtl_dev->fw_len) {
- 		rtl_dev_err(hdev, "firmware file %s not found\n",
- 			    btrtl_dev->ic_info->fw_name);
--		ret = btrtl_dev->fw_len;
- 		goto err_free;
- 	}
- 
-@@ -581,13 +581,12 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 			snprintf(cfg_name, sizeof(cfg_name), "%s.bin",
- 				 btrtl_dev->ic_info->cfg_name);
- 		}
--		btrtl_dev->cfg_len = rtl_load_file(hdev, cfg_name,
--						   &btrtl_dev->cfg_data);
-+		ret = rtl_load_file(hdev, cfg_name, &btrtl_dev->cfg_data,
-+				    &btrtl_dev->cfg_len);
- 		if (btrtl_dev->ic_info->config_needed &&
--		    btrtl_dev->cfg_len <= 0) {
-+		    (ret || !btrtl_dev->cfg_len)) {
- 			rtl_dev_err(hdev, "mandatory config file %s not found\n",
- 				    btrtl_dev->ic_info->cfg_name);
--			ret = btrtl_dev->cfg_len;
- 			goto err_free;
- 		}
- 	}
+ 	skb = bt_skb_alloc(3, GFP_ATOMIC);
 -- 
-2.17.1
+2.19.1
 
