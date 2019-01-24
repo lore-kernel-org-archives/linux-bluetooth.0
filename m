@@ -1,257 +1,120 @@
-Return-Path: <SRS0=X26K=P7=vger.kernel.org=linux-bluetooth-owner@kernel.org>
+Return-Path: <SRS0=7kT9=QA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26FDDC282C0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 20:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 206BAC282C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 09:36:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E30F821855
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jan 2019 20:58:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tlzkQDI8"
+	by mail.kernel.org (Postfix) with ESMTP id EBAD3218A2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 09:36:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726366AbfAWU5d (ORCPT
+        id S1726074AbfAXJgY convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Jan 2019 15:57:33 -0500
-Received: from mail-vk1-f201.google.com ([209.85.221.201]:44069 "EHLO
-        mail-vk1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726324AbfAWU5c (ORCPT
+        Thu, 24 Jan 2019 04:36:24 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:56158 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726025AbfAXJgY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Jan 2019 15:57:32 -0500
-Received: by mail-vk1-f201.google.com with SMTP id 101so1047663vkd.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jan 2019 12:57:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=66N0nnVy7ZeFP1SFsZPBRguoq/ldZpv35aMOmW31chg=;
-        b=tlzkQDI8+8AB5azQXeDGuNm6veoYP9zWn2BhPDZnxYjaWrlBFQppyVEWx1QkYS85k6
-         IygNYRfuhGdYy5aap5OlpxJz1UmT23SidjQlRDlcbBItKcr7ZkJv0KvCT++pz2uWMVIo
-         5o167QWlZ/oU16oOVSmeZei+aCu9U5eG7kvCm6YZ+N8Oq6Xp5kdi/lJIVp9DKeRxpt9A
-         L7o51ufTgWdq0H5XX7ss6pAR3uK+T6pV+Xj9mKPYNjDWln5LMwSO5p1lUe0yw+ylv0kt
-         7seMiDbNukqzGDuEcMVnj+fp62QF4b+VOUhFNyuUNBSY6/AhB2Jv3zTXBEb4SaljkwMY
-         TSwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=66N0nnVy7ZeFP1SFsZPBRguoq/ldZpv35aMOmW31chg=;
-        b=UjR0ibIaf9Kov3Q4t/uEi58eHMEq8MVG5VjKQcA8Loib2KIVIa0KJKm4+GtosJHE5D
-         Ur+Pz6E4o/tydKKtI69BNZg97CZC5cKZ42ba21AZ7gUi3fEl7hm3/ZoO/7JV6T481tI7
-         YYiHXrLDplJk7SnflqlWl5hCBrMU3pyhNqgBOLyRorE/qCoOp9pjITNBfaqlL8j1Tsqp
-         r3BxInQO3ptxdGT8OA0bsHxURBImfgwZUrhe0seFDfLhAtvuuk5IaxCIC2qTnVziUWBJ
-         P2XjR7kiO90tRHQCK0MMdWsaHqGkv3GdGGnZiPh1qIc3ggBiZX2TM++rprBDZMfQrp50
-         UoDA==
-X-Gm-Message-State: AJcUukeun+2rPY4Wr8dJvcc8joFkGjAi55RDrYzwKiuL+MvsGdVod+8O
-        MzlzT7Ipy3SLlm1+dQKMS/lOK7ijlW4e
-X-Google-Smtp-Source: ALg8bN5xc2h05A/VYfCqaHxF8KwkVT3SaJ7TWLCck9Rjba8cSJhAzC4zTTtPfx0XsOwng+tJDM+puWr9vRhT
-X-Received: by 2002:a1f:91d4:: with SMTP id t203mr2948783vkd.2.1548277051177;
- Wed, 23 Jan 2019 12:57:31 -0800 (PST)
-Date:   Wed, 23 Jan 2019 12:57:22 -0800
-In-Reply-To: <20181117010748.24347-1-rajatja@google.com>
-Message-Id: <20190123205725.239661-1-rajatja@google.com>
-Mime-Version: 1.0
-References: <20181117010748.24347-1-rajatja@google.com>
-X-Mailer: git-send-email 2.20.1.321.g9e740568ce-goog
-Subject: [PATCH v5 1/4] usb: split code locating ACPI companion into port and device
-From:   Rajat Jain <rajatja@google.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+        Thu, 24 Jan 2019 04:36:24 -0500
+Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4CC34CF166;
+        Thu, 24 Jan 2019 10:44:09 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH v5 3/4] Bluetooth: Allow driver specific cmd timeout
+ handling
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190123205725.239661-3-rajatja@google.com>
+Date:   Thu, 24 Jan 2019 10:36:21 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "David S. Miller" <davem@davemloft.net>,
         Dmitry Torokhov <dtor@chromium.org>,
-        Rajat Jain <rajatja@google.com>,
         Alex Hung <alex.hung@canonical.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-usb@vger.kernel.org, netdev@vger.kernel.org
-Cc:     rajatxjain@gmail.com, dtor@google.com, raghuram.hegde@intel.com,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-usb@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        rajatxjain@gmail.com, dtor@google.com,
+        Raghuram Hegde <raghuram.hegde@intel.com>,
         chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Message-Id: <D868735A-05A4-405A-9101-8D59F4208B9E@holtmann.org>
+References: <20181117010748.24347-1-rajatja@google.com>
+ <20190123205725.239661-1-rajatja@google.com>
+ <20190123205725.239661-3-rajatja@google.com>
+To:     Rajat Jain <rajatja@google.com>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Dmitry Torokhov <dtor@chromium.org>
+Hi Rajat,
 
-In preparation for handling embedded USB devices let's split
-usb_acpi_find_companion() into usb_acpi_find_companion_for_device() and
-usb_acpi_find_companion_for_port().
+> Add a hook to allow the BT driver to do device or command specific
+> handling in case of timeouts. This is to be used by Intel driver to
+> reset the device after certain number of timeouts.
+> 
+> Signed-off-by: Rajat Jain <rajatja@google.com>
+> ---
+> v5: Drop the quirk, and rename the hook function to cmd_timeout()
+> v4: same as v1
+> v3: same as v1
+> v2: same as v1
+> 
+> include/net/bluetooth/hci_core.h |  1 +
+> net/bluetooth/hci_core.c         | 10 ++++++++--
+> 2 files changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index e5ea633ea368..624d5f2b1f36 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -437,6 +437,7 @@ struct hci_dev {
+> 	int (*post_init)(struct hci_dev *hdev);
+> 	int (*set_diag)(struct hci_dev *hdev, bool enable);
+> 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+> +	void (*cmd_timeout)(struct hci_dev *hdev, struct hci_command_hdr *cmd);
+> };
+> 
+> #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 7352fe85674b..c6917f57581a 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2568,16 +2568,22 @@ static void hci_cmd_timeout(struct work_struct *work)
+> {
+> 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+> 					    cmd_timer.work);
+> +	struct hci_command_hdr *sent = NULL;
+> 
+> 	if (hdev->sent_cmd) {
+> -		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
+> -		u16 opcode = __le16_to_cpu(sent->opcode);
+> +		u16 opcode;
+> +
+> +		sent = (void *) hdev->sent_cmd->data;
+> +		opcode = __le16_to_cpu(sent->opcode);
+> 
+> 		bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
+> 	} else {
+> 		bt_dev_err(hdev, "command tx timeout");
+> 	}
+> 
+> +	if (hdev->cmd_timeout)
+> +		hdev->cmd_timeout(hdev, sent);
+> +
 
-Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
-Signed-off-by: Rajat Jain <rajatja@google.com>
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Tested-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
----
-v5: same as v4
-v4: Add Acked-by and Tested-by in signatures.
-v3: same as v1
-v2: same as v1
+drop the sent parameter. You are not using it and if at some point in the future you might want to use it, then we add it and fix up all users.
 
- drivers/usb/core/usb-acpi.c | 133 +++++++++++++++++++-----------------
- 1 file changed, 72 insertions(+), 61 deletions(-)
+And frankly, I would move the hdev->cmd_timeout call into the hdev->sent_cmd block since I do not even know if it makes sense to deal with the fallback case where hdev->sent_cmd is not available. Unless you have that kind of error case, but that is only possible if you have external injection of HCI commands.
 
-diff --git a/drivers/usb/core/usb-acpi.c b/drivers/usb/core/usb-acpi.c
-index e221861b3187..8ff73c83e8e8 100644
---- a/drivers/usb/core/usb-acpi.c
-+++ b/drivers/usb/core/usb-acpi.c
-@@ -139,12 +139,79 @@ static struct acpi_device *usb_acpi_find_port(struct acpi_device *parent,
- 	return acpi_find_child_device(parent, raw, false);
- }
- 
--static struct acpi_device *usb_acpi_find_companion(struct device *dev)
-+static struct acpi_device *
-+usb_acpi_get_companion_for_port(struct usb_port *port_dev)
- {
- 	struct usb_device *udev;
- 	struct acpi_device *adev;
- 	acpi_handle *parent_handle;
-+	int port1;
-+
-+	/* Get the struct usb_device point of port's hub */
-+	udev = to_usb_device(port_dev->dev.parent->parent);
-+
-+	/*
-+	 * The root hub ports' parent is the root hub. The non-root-hub
-+	 * ports' parent is the parent hub port which the hub is
-+	 * connected to.
-+	 */
-+	if (!udev->parent) {
-+		adev = ACPI_COMPANION(&udev->dev);
-+		port1 = usb_hcd_find_raw_port_number(bus_to_hcd(udev->bus),
-+						     port_dev->portnum);
-+	} else {
-+		parent_handle = usb_get_hub_port_acpi_handle(udev->parent,
-+							     udev->portnum);
-+		if (!parent_handle)
-+			return NULL;
-+
-+		acpi_bus_get_device(parent_handle, &adev);
-+		port1 = port_dev->portnum;
-+	}
-+
-+	return usb_acpi_find_port(adev, port1);
-+}
-+
-+static struct acpi_device *
-+usb_acpi_find_companion_for_port(struct usb_port *port_dev)
-+{
-+	struct acpi_device *adev;
-+	struct acpi_pld_info *pld;
-+	acpi_handle *handle;
-+	acpi_status status;
-+
-+	adev = usb_acpi_get_companion_for_port(port_dev);
-+	if (!adev)
-+		return NULL;
-+
-+	handle = adev->handle;
-+	status = acpi_get_physical_device_location(handle, &pld);
-+	if (!ACPI_FAILURE(status) && pld) {
-+		port_dev->location = USB_ACPI_LOCATION_VALID
-+			| pld->group_token << 8 | pld->group_position;
-+		port_dev->connect_type = usb_acpi_get_connect_type(handle, pld);
-+		ACPI_FREE(pld);
-+	}
- 
-+	return adev;
-+}
-+
-+static struct acpi_device *
-+usb_acpi_find_companion_for_device(struct usb_device *udev)
-+{
-+	struct acpi_device *adev;
-+
-+	if (!udev->parent)
-+		return NULL;
-+
-+	/* root hub is only child (_ADR=0) under its parent, the HC */
-+	adev = ACPI_COMPANION(udev->dev.parent);
-+	return acpi_find_child_device(adev, 0, false);
-+}
-+
-+
-+static struct acpi_device *usb_acpi_find_companion(struct device *dev)
-+{
- 	/*
- 	 * In the ACPI DSDT table, only usb root hub and usb ports are
- 	 * acpi device nodes. The hierarchy like following.
-@@ -158,66 +225,10 @@ static struct acpi_device *usb_acpi_find_companion(struct device *dev)
- 	 * So all binding process is divided into two parts. binding
- 	 * root hub and usb ports.
- 	 */
--	if (is_usb_device(dev)) {
--		udev = to_usb_device(dev);
--		if (udev->parent)
--			return NULL;
--
--		/* root hub is only child (_ADR=0) under its parent, the HC */
--		adev = ACPI_COMPANION(dev->parent);
--		return acpi_find_child_device(adev, 0, false);
--	} else if (is_usb_port(dev)) {
--		struct usb_port *port_dev = to_usb_port(dev);
--		int port1 = port_dev->portnum;
--		struct acpi_pld_info *pld;
--		acpi_handle *handle;
--		acpi_status status;
--
--		/* Get the struct usb_device point of port's hub */
--		udev = to_usb_device(dev->parent->parent);
--
--		/*
--		 * The root hub ports' parent is the root hub. The non-root-hub
--		 * ports' parent is the parent hub port which the hub is
--		 * connected to.
--		 */
--		if (!udev->parent) {
--			struct usb_hcd *hcd = bus_to_hcd(udev->bus);
--			int raw;
--
--			raw = usb_hcd_find_raw_port_number(hcd, port1);
--
--			adev = usb_acpi_find_port(ACPI_COMPANION(&udev->dev),
--						  raw);
--
--			if (!adev)
--				return NULL;
--		} else {
--			parent_handle =
--				usb_get_hub_port_acpi_handle(udev->parent,
--				udev->portnum);
--			if (!parent_handle)
--				return NULL;
--
--			acpi_bus_get_device(parent_handle, &adev);
--
--			adev = usb_acpi_find_port(adev, port1);
--
--			if (!adev)
--				return NULL;
--		}
--		handle = adev->handle;
--		status = acpi_get_physical_device_location(handle, &pld);
--		if (ACPI_FAILURE(status) || !pld)
--			return adev;
--
--		port_dev->location = USB_ACPI_LOCATION_VALID
--			| pld->group_token << 8 | pld->group_position;
--		port_dev->connect_type = usb_acpi_get_connect_type(handle, pld);
--		ACPI_FREE(pld);
--
--		return adev;
--	}
-+	if (is_usb_device(dev))
-+		return usb_acpi_find_companion_for_device(to_usb_device(dev));
-+	else if (is_usb_port(dev))
-+		return usb_acpi_find_companion_for_port(to_usb_port(dev));
- 
- 	return NULL;
- }
--- 
-2.20.1.321.g9e740568ce-goog
+Regards
+
+Marcel
 
