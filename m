@@ -2,225 +2,181 @@ Return-Path: <SRS0=7kT9=QA=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B96C282C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 09:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3199AC282C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 11:20:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 09F4220855
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 09:46:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3AFD218AF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 11:20:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="edCTcMBO";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="HpJpr0+6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727208AbfAXJqd convert rfc822-to-8bit (ORCPT
+        id S1727618AbfAXLUc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Jan 2019 04:46:33 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:53020 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725986AbfAXJqd (ORCPT
+        Thu, 24 Jan 2019 06:20:32 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:50320 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727462AbfAXLUc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Jan 2019 04:46:33 -0500
-Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7D6A3CF166;
-        Thu, 24 Jan 2019 10:54:18 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v5 4/4] Bluetooth: btusb: Use the cmd_timeout method to
- reset the Intel BT chip
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190123205725.239661-4-rajatja@google.com>
-Date:   Thu, 24 Jan 2019 10:46:30 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dmitry Torokhov <dtor@chromium.org>,
-        Alex Hung <alex.hung@canonical.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-        rajatxjain@gmail.com, dtor@google.com, raghuram.hegde@intel.com,
-        chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <7A112914-5B41-4D26-807B-021B7AC907C6@holtmann.org>
-References: <20181117010748.24347-1-rajatja@google.com>
- <20190123205725.239661-1-rajatja@google.com>
- <20190123205725.239661-4-rajatja@google.com>
-To:     Rajat Jain <rajatja@google.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Thu, 24 Jan 2019 06:20:32 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id E51CF608CF; Thu, 24 Jan 2019 11:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1548328830;
+        bh=xQsHcD94ruVN1aWvmE53eloRfSfs2tMdtMgRqy30cvU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=edCTcMBOXiRKs5FhTq1tnd29OV00skTN4kjFylf+YH/D7+qCWWE4gjOxLiYaEQWQs
+         pEKcCRCty7IhTVMfpcN6FM5wCYfzbCmcgbNB/OmXl0J3l18h+XVBDz5ZgKxulFUxXT
+         T8zRWI7U1f9uoDG0nkQ3DLL4I/O3xGk1Z7sPY7z0=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id 922A8608CD;
+        Thu, 24 Jan 2019 11:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1548328829;
+        bh=xQsHcD94ruVN1aWvmE53eloRfSfs2tMdtMgRqy30cvU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=HpJpr0+6P4YOlPS1n63fe1VO5NtfKREWQEwJkgyeCKl1yxF96KoeO9IejgIXG3z86
+         XOcTL+ZZmy+PTx/CFx/0kVLEUfEKpuVFISdL5/rWjRqYu2ijlgYdmVXmvmJG9ELhyb
+         ClWWK89uWemqmcsWXlASlWOR8rp/BmzXnIQSHEsI=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 24 Jan 2019 16:50:29 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v8 1/3] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+In-Reply-To: <20190116202253.GS261387@google.com>
+References: <20190116114603.500-1-bgodavar@codeaurora.org>
+ <20190116114603.500-2-bgodavar@codeaurora.org>
+ <20190116202253.GS261387@google.com>
+Message-ID: <988be02c105b2d0719eb2bdf875d9587@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rajat,
+Hi Matthias,
 
-> If the platform provides it, use the reset gpio to reset the Intel BT
-> chip, as part of cmd_timeout handling. This has been found helpful on
-> Intel bluetooth controllers where the firmware gets stuck and the only
-> way out is a hard reset pin provided by the platform.
+On 2019-01-17 01:52, Matthias Kaehlcke wrote:
+> On Wed, Jan 16, 2019 at 05:16:01PM +0530, Balakrishna Godavarthi wrote:
+>> wcn3990 requires a power pulse to turn ON/OFF along with
+>> regulators. Sometimes we are observing the power pulses are sent
+>> out with some time delay, due to queuing these commands. This is
+>> causing synchronization issues with chip, which intern delay the
+>> chip setup or may end up with communication issues.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>> Changes in v8:
+>>  * Updated 1 second timeout instead of indefinite wait.
+>> 
+>> Changes in v7:
+>>  *  updated the wait time to 5 ms after sending power pulses.
+>> 
+>> Changes in v6:
+>>  * added serdev_device_write_flush() in qca_send_power_pulse
+>>    instead during the power off pulse.
+>> 
+>> Changes in v5:
+>>  * added serdev_device_write_flush() in qca_power_off().
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 46 
+>> ++++++++++++++++---------------------
+>>  1 file changed, 20 insertions(+), 26 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index f036c8f98ea3..681bfa30467e 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -60,6 +60,7 @@
+>>  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+>>  #define IBS_TX_IDLE_TIMEOUT_MS		2000
+>>  #define BAUDRATE_SETTLE_TIMEOUT_MS	300
+>> +#define POWER_PULSE_TRANS_TIMEOUT_MS	1000
 > 
-> Signed-off-by: Rajat Jain <rajatja@google.com>
-> ---
-> v5: Rename the hook to cmd_timeout, and wait for 5 timeouts before
->    resetting the device.
-> v4: Use data->flags instead of clearing the quirk in btusb_hw_reset()
-> v3: Better error handling for gpiod_get_optional()
-> v2: Handle the EPROBE_DEFER case.
+> nit: Not that it should make a different in normal operation, but 1s
+> seems extreme. Is there really any chance that the byte hasn't been
+> sent after say 100ms (which is still an eternity for a single byte)?
 > 
-> drivers/bluetooth/btusb.c | 54 +++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 54 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 4761499db9ee..8949ea30a1bc 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -29,6 +29,7 @@
-> #include <linux/of_device.h>
-> #include <linux/of_irq.h>
-> #include <linux/suspend.h>
-> +#include <linux/gpio/consumer.h>
-> #include <asm/unaligned.h>
-> 
-> #include <net/bluetooth/bluetooth.h>
-> @@ -439,6 +440,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
-> #define BTUSB_BOOTING		9
-> #define BTUSB_DIAG_RUNNING	10
-> #define BTUSB_OOB_WAKE_ENABLED	11
-> +#define BTUSB_HW_RESET_ACTIVE	12
-> 
-> struct btusb_data {
-> 	struct hci_dev       *hdev;
-> @@ -476,6 +478,8 @@ struct btusb_data {
-> 	struct usb_endpoint_descriptor *diag_tx_ep;
-> 	struct usb_endpoint_descriptor *diag_rx_ep;
-> 
-> +	struct gpio_desc *reset_gpio;
-> +
-> 	__u8 cmdreq_type;
-> 	__u8 cmdreq;
-> 
-> @@ -489,8 +493,39 @@ struct btusb_data {
-> 	int (*setup_on_usb)(struct hci_dev *hdev);
-> 
-> 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
-> +	unsigned num_cmd_timeout;
+[Bala]: i missed to address this. for now let us have 1 second delay.
+         based on stress test or further enchantments we can reduce this 
+delay.
 
-Make this cmd_timeout_count or cmd_timeout_cnt.
-
-> };
+>>  /* susclk rate */
+>>  #define SUSCLK_RATE_32KHZ	32768
+>> @@ -1013,11 +1014,10 @@ static inline void host_set_baudrate(struct 
+>> hci_uart *hu, unsigned int speed)
+>>  		hci_uart_set_baudrate(hu, speed);
+>>  }
+>> 
+>> -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>> +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
+>>  {
+>> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+>> -	struct qca_data *qca = hu->priv;
+>> -	struct sk_buff *skb;
+>> +	int ret;
+>> +	int timeout = __msecs_to_jiffies(POWER_PULSE_TRANS_TIMEOUT_MS);
 > 
-> +
-> +static void btusb_intel_cmd_timeout(struct hci_dev *hdev,
-> +				    struct hci_command_hdr *cmd)
-> +{
-> +	struct btusb_data *data = hci_get_drvdata(hdev);
-> +	struct gpio_desc *reset_gpio = data->reset_gpio;
-> +
-> +	bt_dev_err(hdev, "btusb num_cmd_timeout = %u", ++data->num_cmd_timeout);
-
-I would prefer if you don’t do the increase in the bt_dev_err(). And you can also scrap the “btusb “ prefix here since that is all present via bt_dev_err if really needed at some point. Actually I question the whole bt_dev_err here in the first place since the core will put our the error. You are just repeating it here.
-
-> +
-> +	if (data->num_cmd_timeout < 5)
-> +		return;
-
-So I would propose to do just this:
-
-	if (++data->cmd_timeout_count < 5)
-		return;
-
-> +
-> +	/*
-> +	 * Toggle the hard reset line if the platform provides one. The reset
-> +	 * is going to yank the device off the USB and then replug. So doing
-> +	 * once is enough. The cleanup is handled correctly on the way out
-> +	 * (standard USB disconnect), and the new device is detected cleanly
-> +	 * and bound to the driver again like it should be.
-> +	 */
-> +	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
-> +		bt_dev_err(hdev, "last reset failed? Not resetting again");
-> +		return;
-> +	}
-> +
-> +	bt_dev_err(hdev, "Initiating HW reset via gpio");
-> +	gpiod_set_value(reset_gpio, 1);
-> +	mdelay(100);
-> +	gpiod_set_value(reset_gpio, 0);
-> +}
-> +
-> static inline void btusb_free_frags(struct btusb_data *data)
-> {
-> 	unsigned long flags;
-> @@ -2915,6 +2950,7 @@ static int btusb_probe(struct usb_interface *intf,
-> 		       const struct usb_device_id *id)
-> {
-> 	struct usb_endpoint_descriptor *ep_desc;
-> +	struct gpio_desc *reset_gpio;
-> 	struct btusb_data *data;
-> 	struct hci_dev *hdev;
-> 	unsigned ifnum_base;
-> @@ -3028,6 +3064,15 @@ static int btusb_probe(struct usb_interface *intf,
+> use msecs_to_jiffies()
 > 
-> 	SET_HCIDEV_DEV(hdev, &intf->dev);
+>>  	/* These power pulses are single byte command which are sent
+>>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+>> @@ -1029,22 +1029,22 @@ static int qca_send_power_pulse(struct hci_dev 
+>> *hdev, u8 cmd)
+>>  	 * save power. Disabling hardware flow control is mandatory while
+>>  	 * sending power pulses to SoC.
+>>  	 */
+>> -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+>> -
+>> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+>> -	if (!skb)
+>> -		return -ENOMEM;
+>> +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to controller", cmd);
+>> 
+>> +	serdev_device_write_flush(hu->serdev);
+>>  	hci_uart_set_flow_control(hu, true);
+>> +	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
+>> +	if (ret < 0) {
+>> +		bt_dev_err(hu->hdev, "failed to send power pulse %02x", cmd);
+>> +		return ret;
+>> +	}
+>> 
+>> -	skb_put_u8(skb, cmd);
+>> -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+>> -
+>> -	skb_queue_tail(&qca->txq, skb);
+>> -	hci_uart_tx_wakeup(hu);
+>> -
+>> -	/* Wait for 100 uS for SoC to settle down */
+>> -	usleep_range(100, 200);
+>> +	serdev_device_wait_until_sent(hu->serdev, timeout);
+>> +	/* Wait of 5ms is required for assuring to send the byte on the Tx
+>> +	 * line and also for the controller to settle down for the received
+>> +	 * byte.
+>> +	 */
+>> +	usleep_range(5000, 6000);
 > 
-> +	reset_gpio = gpiod_get_optional(&data->udev->dev, "reset",
-> +					GPIOD_OUT_LOW);
-
-Any reason to not use the devm_gpiod_get_optional() version here?
-
-> +	if (IS_ERR(reset_gpio)) {
-> +		err = PTR_ERR(reset_gpio);
-> +		goto out_free_dev;
-> +	} else if (reset_gpio) {
-> +		data->reset_gpio = reset_gpio;
-> +	}
-> +
-> 	hdev->open   = btusb_open;
-> 	hdev->close  = btusb_close;
-> 	hdev->flush  = btusb_flush;
-> @@ -3085,6 +3130,8 @@ static int btusb_probe(struct usb_interface *intf,
-> 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
-> 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-> +		if (data->reset_gpio)
-> +			hdev->cmd_timeout = btusb_intel_cmd_timeout;
-> 	}
-
-Always assign hdev->cmd_timeout = btusb_intel_cmd_timeout and put it after btintel_set_bdaddr and before the quirks.
-
-Move the if (data->reset_gpio) check into btusb_intel_cmd_timeout() function and print a warning that no reset GPIO is present.
-
+> I incorrectly claimed that there might be still bytes sitting in the
+> UART FIFO when serdev_device_wait_until_sent() returns, Johan
+> corrected me on that (thanks!). So if it takes the SoC 100us to settle
+> down we should be good with the original code.
 > 
-> 	if (id->driver_info & BTUSB_INTEL_NEW) {
-> @@ -3097,6 +3144,8 @@ static int btusb_probe(struct usb_interface *intf,
-> 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
-> 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-> +		if (data->reset_gpio)
-> +			hdev->cmd_timeout = btusb_intel_cmd_timeout;
-> 	}
+> Cheers
 > 
-> 	if (id->driver_info & BTUSB_MARVELL)
-> @@ -3226,6 +3275,8 @@ static int btusb_probe(struct usb_interface *intf,
-> 	return 0;
-> 
-> out_free_dev:
-> +	if (data->reset_gpio)
-> +		gpiod_put(data->reset_gpio);
-> 	hci_free_dev(hdev);
-> 	return err;
-> }
-> @@ -3269,6 +3320,9 @@ static void btusb_disconnect(struct usb_interface *intf)
-> 	if (data->oob_wake_irq)
-> 		device_init_wakeup(&data->udev->dev, false);
-> 
-> +	if (data->reset_gpio)
-> +		gpiod_put(data->reset_gpio);
-> +
-> 	hci_free_dev(hdev);
-> }
+> Matthias
 
+-- 
 Regards
-
-Marcel
-
+Balakrishna.
