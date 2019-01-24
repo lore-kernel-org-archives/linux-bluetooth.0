@@ -4,63 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4C5C282C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 20:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D384C282C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 20:11:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 310B421855
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 20:06:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1ACD5218A6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 20:11:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qm9Oxp+Y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WouYq4kx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730849AbfAXUGQ (ORCPT
+        id S1730188AbfAXULW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Jan 2019 15:06:16 -0500
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:34152 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728590AbfAXUGP (ORCPT
+        Thu, 24 Jan 2019 15:11:22 -0500
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:40503 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729790AbfAXULV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Jan 2019 15:06:15 -0500
-Received: by mail-lf1-f65.google.com with SMTP id p6so5294977lfc.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jan 2019 12:06:13 -0800 (PST)
+        Thu, 24 Jan 2019 15:11:21 -0500
+Received: by mail-lj1-f194.google.com with SMTP id n18-v6so6390422lji.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jan 2019 12:11:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=I44R5by7utG/5Cuuk2f4UjloCvOrI5Cx4uHif7F31LM=;
-        b=qm9Oxp+YgeCHc1SPFddkkVXbLPcQA58VtGcIQX69gDDtCze6TffAljuOoLBpIWn39m
-         L+vDe15nPgYpyUBDmzofGFpEfHWmhIfjvi/N+qzmFEbcwWkXPtOC2AKKrviBu6TIRxhs
-         8kikYHtFba+h+efHg1qZHwQR1qEOYEDxnI1QrqEoLv4Fyx7wgi9ENX9QcoY1+XXPAoNc
-         fakQo59z59q6hNznEDPQvlFSn7iB7KIhQlYEezhQ9LV4m7ozdXXe27w6WhHq7tpi3KJK
-         zU9Wwrt7jWH+v1q9uvH3pT7XGqVMSpzh4uor0Aqp43z7PYFGIJ2SWxF2pYC18dgaciCi
-         c+wQ==
+        bh=HG5FNm/40qWdHQsWrUQRMWT/agpt5B2Q6/gk2f7JfZE=;
+        b=WouYq4kx3ch3DRkgzhCmjF4AiZ+q05wfeAxbg9N/kksxRerTzVHL3tson1EUF0cfd2
+         Het0ejVSUjEIFk5p4kdG9qx4UIdhV+IC+uRnfavg89BDbOC3ok21PFqXyRFYOo5+fOZM
+         0LVImucOuepsNtdqEy25Qo28R1SkvAG7GbjS3J3ZFj/0/3EPyZvR+oSxPv+2yizNKhjj
+         CxTQTDUqwCY/kT+9e4A+oAdCeJ4IOTzO67vpXN4oy3YCPVBngLvfS82dBjMKLiEET4AP
+         0BYY+0oEc0EMiVuBZQgjNnWbmc5PrGzkJP5DKRf7/fnDT1BPzAp+MH5BbH4SWDCx2rxm
+         b/3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=I44R5by7utG/5Cuuk2f4UjloCvOrI5Cx4uHif7F31LM=;
-        b=udAaxhGfzT6RkQta8MYXXMC1YJ/WUFOC6YVqOkQuKkRMZcaFsPaVPJr6VxqOXnd9Fg
-         ZXS8vIUeU68j4XDPBP6u+VcaUFWPF3fzhWUMAkhXkQxM4WXE0zrgjfzOsh0wiEyLhBEv
-         7eoOMull+NWu0bx0NBiq/aysAB2sbiuVRdfNED3rgbKrAB5PpsVhTDW3lsmvPl9a65gH
-         mSvmSiC+CDqI9HH/hj73rbswLdMaqnHwFV90OJWh4Gk9XVNtCJWV7vyaRmGt0NIrG+KO
-         lhT/LR+zQh9LxGmllV49aiUgJi8dSPk3EJaZ9Q+KR3H/8BjwumxHLedA/8z7DOd2Wq4D
-         MbtA==
-X-Gm-Message-State: AJcUukfOsp6jD+Im16FiUbFZbr7M54imnP66U5lwki1zd+jBpCxUrpjN
-        UbSZV/DYXt4tdW94IM+qzfogMz1zMxoL4I0LcB2cs9Js8Lbmtw==
-X-Google-Smtp-Source: ALg8bN79xzF84mpqT9PowT9KxU6sSIHpBORgXfYF2wq0WumkJp46k8uDupCVefo8QOvu1yfsK2Ca0BciK0uEtWYLY3Q=
-X-Received: by 2002:a19:2906:: with SMTP id p6mr6259390lfp.17.1548360372533;
- Thu, 24 Jan 2019 12:06:12 -0800 (PST)
+        bh=HG5FNm/40qWdHQsWrUQRMWT/agpt5B2Q6/gk2f7JfZE=;
+        b=ECLxn5GlHdIuB8LgZbkyWH96LPwAbQxeFDs8/NbNSwa0cqWQV21jqXJYJb8PKkDTpA
+         7OWRXsvEbNexf1LIL3WnofFvwsUIqoxgl4me/msZuG4lzHN22BVoZNYxMKB5ynBFxpt1
+         iAa/xFca/kEUtztCpqpopReVWiw4J2pOhsTlt4b3Jvx9PXW5pulTEyFGi0aIwi/r5Vh7
+         aXb3asj0w5bNwck0wDkys5rwA71rPdjMdP1Gu5sFnqAycXk8iQ1RNus9AkFKjomNk6FW
+         mKwJ7GO3mXyUzpRc+ofxMxEsdqzv+Ge8BUKXyI7j/GTjjDBC1fwEZFH2j97GadFmXYvs
+         3Ndw==
+X-Gm-Message-State: AJcUukfS+6n2/OrweFMvugc2GSL31dc0aMtbZyMEwUdptGny5i5bRAZ3
+        hu3uItqFn4VBAyEz/GhhtzabW126HfdSfkdJplit1g==
+X-Google-Smtp-Source: ALg8bN5iyDfUFaULY+MEuCxsUhn6+b26/wDUddQ77zFqokyiY6uRCisCg5+1tQkI0s8DnTvQqNTyEV7IsD9pKp0xnUI=
+X-Received: by 2002:a2e:9395:: with SMTP id g21-v6mr6401932ljh.78.1548360679132;
+ Thu, 24 Jan 2019 12:11:19 -0800 (PST)
 MIME-Version: 1.0
 References: <20181117010748.24347-1-rajatja@google.com> <20190123205725.239661-1-rajatja@google.com>
- <20190123205725.239661-4-rajatja@google.com> <7A112914-5B41-4D26-807B-021B7AC907C6@holtmann.org>
-In-Reply-To: <7A112914-5B41-4D26-807B-021B7AC907C6@holtmann.org>
+ <20190123205725.239661-3-rajatja@google.com> <D868735A-05A4-405A-9101-8D59F4208B9E@holtmann.org>
+In-Reply-To: <D868735A-05A4-405A-9101-8D59F4208B9E@holtmann.org>
 From:   Rajat Jain <rajatja@google.com>
-Date:   Thu, 24 Jan 2019 12:05:35 -0800
-Message-ID: <CACK8Z6ENnMzD48CZwg7LyiTGRMJ9Eu6_bFDbEyxfrvDO5_AY2g@mail.gmail.com>
-Subject: Re: [PATCH v5 4/4] Bluetooth: btusb: Use the cmd_timeout method to
- reset the Intel BT chip
+Date:   Thu, 24 Jan 2019 12:10:42 -0800
+Message-ID: <CACK8Z6HSEXJSSFryusJVS632d1WwAUt1rW0Q2QTBO-375mMS+Q@mail.gmail.com>
+Subject: Re: [PATCH v5 3/4] Bluetooth: Allow driver specific cmd timeout handling
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -82,228 +81,93 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jan 24, 2019 at 1:46 AM Marcel Holtmann <marcel@holtmann.org> wrote=
+Hi Marcel,
+
+On Thu, Jan 24, 2019 at 1:36 AM Marcel Holtmann <marcel@holtmann.org> wrote=
 :
 >
 > Hi Rajat,
 >
-> > If the platform provides it, use the reset gpio to reset the Intel BT
-> > chip, as part of cmd_timeout handling. This has been found helpful on
-> > Intel bluetooth controllers where the firmware gets stuck and the only
-> > way out is a hard reset pin provided by the platform.
+> > Add a hook to allow the BT driver to do device or command specific
+> > handling in case of timeouts. This is to be used by Intel driver to
+> > reset the device after certain number of timeouts.
 > >
 > > Signed-off-by: Rajat Jain <rajatja@google.com>
 > > ---
-> > v5: Rename the hook to cmd_timeout, and wait for 5 timeouts before
-> >    resetting the device.
-> > v4: Use data->flags instead of clearing the quirk in btusb_hw_reset()
-> > v3: Better error handling for gpiod_get_optional()
-> > v2: Handle the EPROBE_DEFER case.
+> > v5: Drop the quirk, and rename the hook function to cmd_timeout()
+> > v4: same as v1
+> > v3: same as v1
+> > v2: same as v1
 > >
-> > drivers/bluetooth/btusb.c | 54 +++++++++++++++++++++++++++++++++++++++
-> > 1 file changed, 54 insertions(+)
+> > include/net/bluetooth/hci_core.h |  1 +
+> > net/bluetooth/hci_core.c         | 10 ++++++++--
+> > 2 files changed, 9 insertions(+), 2 deletions(-)
 > >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 4761499db9ee..8949ea30a1bc 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -29,6 +29,7 @@
-> > #include <linux/of_device.h>
-> > #include <linux/of_irq.h>
-> > #include <linux/suspend.h>
-> > +#include <linux/gpio/consumer.h>
-> > #include <asm/unaligned.h>
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
+ci_core.h
+> > index e5ea633ea368..624d5f2b1f36 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -437,6 +437,7 @@ struct hci_dev {
+> >       int (*post_init)(struct hci_dev *hdev);
+> >       int (*set_diag)(struct hci_dev *hdev, bool enable);
+> >       int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+> > +     void (*cmd_timeout)(struct hci_dev *hdev, struct hci_command_hdr =
+*cmd);
+> > };
 > >
-> > #include <net/bluetooth/bluetooth.h>
-> > @@ -439,6 +440,7 @@ static const struct dmi_system_id btusb_needs_reset=
-_resume_table[] =3D {
-> > #define BTUSB_BOOTING         9
-> > #define BTUSB_DIAG_RUNNING    10
-> > #define BTUSB_OOB_WAKE_ENABLED        11
-> > +#define BTUSB_HW_RESET_ACTIVE        12
+> > #define HCI_PHY_HANDLE(handle)        (handle & 0xff)
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index 7352fe85674b..c6917f57581a 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -2568,16 +2568,22 @@ static void hci_cmd_timeout(struct work_struct =
+*work)
+> > {
+> >       struct hci_dev *hdev =3D container_of(work, struct hci_dev,
+> >                                           cmd_timer.work);
+> > +     struct hci_command_hdr *sent =3D NULL;
 > >
-> > struct btusb_data {
-> >       struct hci_dev       *hdev;
-> > @@ -476,6 +478,8 @@ struct btusb_data {
-> >       struct usb_endpoint_descriptor *diag_tx_ep;
-> >       struct usb_endpoint_descriptor *diag_rx_ep;
-> >
-> > +     struct gpio_desc *reset_gpio;
+> >       if (hdev->sent_cmd) {
+> > -             struct hci_command_hdr *sent =3D (void *) hdev->sent_cmd-=
+>data;
+> > -             u16 opcode =3D __le16_to_cpu(sent->opcode);
+> > +             u16 opcode;
 > > +
-> >       __u8 cmdreq_type;
-> >       __u8 cmdreq;
+> > +             sent =3D (void *) hdev->sent_cmd->data;
+> > +             opcode =3D __le16_to_cpu(sent->opcode);
 > >
-> > @@ -489,8 +493,39 @@ struct btusb_data {
-> >       int (*setup_on_usb)(struct hci_dev *hdev);
+> >               bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
+> >       } else {
+> >               bt_dev_err(hdev, "command tx timeout");
+> >       }
 > >
-> >       int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
-> > +     unsigned num_cmd_timeout;
+> > +     if (hdev->cmd_timeout)
+> > +             hdev->cmd_timeout(hdev, sent);
+> > +
 >
-> Make this cmd_timeout_count or cmd_timeout_cnt.
+> drop the sent parameter. You are not using it and if at some point in the=
+ future you might want to use it, then we add it and fix up all users.
 
 Sure, will do.
 
 >
-> > };
-> >
-> > +
-> > +static void btusb_intel_cmd_timeout(struct hci_dev *hdev,
-> > +                                 struct hci_command_hdr *cmd)
-> > +{
-> > +     struct btusb_data *data =3D hci_get_drvdata(hdev);
-> > +     struct gpio_desc *reset_gpio =3D data->reset_gpio;
-> > +
-> > +     bt_dev_err(hdev, "btusb num_cmd_timeout =3D %u", ++data->num_cmd_=
-timeout);
->
-> I would prefer if you don=E2=80=99t do the increase in the bt_dev_err(). =
-And you can also scrap the =E2=80=9Cbtusb =E2=80=9C prefix here since that =
-is all present via bt_dev_err if really needed at some point. Actually I qu=
-estion the whole bt_dev_err here in the first place since the core will put=
- our the error. You are just repeating it here.
+> And frankly, I would move the hdev->cmd_timeout call into the hdev->sent_=
+cmd block since I do not even know if it makes sense to deal with the fallb=
+ack case where hdev->sent_cmd is not available. Unless you have that kind o=
+f error case, but that is only possible if you have external injection of H=
+CI commands.
 
-will do.
-
->
-> > +
-> > +     if (data->num_cmd_timeout < 5)
-> > +             return;
->
-> So I would propose to do just this:
->
->         if (++data->cmd_timeout_count < 5)
->                 return;
-
-will do.
-
-
->
-> > +
-> > +     /*
-> > +      * Toggle the hard reset line if the platform provides one. The r=
-eset
-> > +      * is going to yank the device off the USB and then replug. So do=
-ing
-> > +      * once is enough. The cleanup is handled correctly on the way ou=
-t
-> > +      * (standard USB disconnect), and the new device is detected clea=
-nly
-> > +      * and bound to the driver again like it should be.
-> > +      */
-> > +     if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
-> > +             bt_dev_err(hdev, "last reset failed? Not resetting again"=
-);
-> > +             return;
-> > +     }
-> > +
-> > +     bt_dev_err(hdev, "Initiating HW reset via gpio");
-> > +     gpiod_set_value(reset_gpio, 1);
-> > +     mdelay(100);
-> > +     gpiod_set_value(reset_gpio, 0);
-> > +}
-> > +
-> > static inline void btusb_free_frags(struct btusb_data *data)
-> > {
-> >       unsigned long flags;
-> > @@ -2915,6 +2950,7 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >                      const struct usb_device_id *id)
-> > {
-> >       struct usb_endpoint_descriptor *ep_desc;
-> > +     struct gpio_desc *reset_gpio;
-> >       struct btusb_data *data;
-> >       struct hci_dev *hdev;
-> >       unsigned ifnum_base;
-> > @@ -3028,6 +3064,15 @@ static int btusb_probe(struct usb_interface *int=
-f,
-> >
-> >       SET_HCIDEV_DEV(hdev, &intf->dev);
-> >
-> > +     reset_gpio =3D gpiod_get_optional(&data->udev->dev, "reset",
-> > +                                     GPIOD_OUT_LOW);
->
-> Any reason to not use the devm_gpiod_get_optional() version here?
-
-Yes, we're using the &data->udev->dev device (parent of the USB
-interface) to fetch the gpio, so if we use the devm_* variant, the
-gpio resource will not be freed immediately if the btusb_probe fails.
-I'll add a comment in the code to make this more clear.
-
->
-> > +     if (IS_ERR(reset_gpio)) {
-> > +             err =3D PTR_ERR(reset_gpio);
-> > +             goto out_free_dev;
-> > +     } else if (reset_gpio) {
-> > +             data->reset_gpio =3D reset_gpio;
-> > +     }
-> > +
-> >       hdev->open   =3D btusb_open;
-> >       hdev->close  =3D btusb_close;
-> >       hdev->flush  =3D btusb_flush;
-> > @@ -3085,6 +3130,8 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >               set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)=
-;
-> >               set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> >               set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-> > +             if (data->reset_gpio)
-> > +                     hdev->cmd_timeout =3D btusb_intel_cmd_timeout;
-> >       }
->
-> Always assign hdev->cmd_timeout =3D btusb_intel_cmd_timeout and put it af=
-ter btintel_set_bdaddr and before the quirks.
-
-will do.
-
->
-> Move the if (data->reset_gpio) check into btusb_intel_cmd_timeout() funct=
-ion and print a warning that no reset GPIO is present.
-
-There'll be Intel platforms already out there which will obviously not
-have the reset pin described in the ACPI as of today. So I'm not sure
-if it is right for all of them to start complaining about a missing
-"reset gpio" in case of timeout post this change. Thus I would prefer
-to assign hdev->cmd_timeout only if ACPI does provide a gpio i.e.
-newer platforms that want to support this feature. Thoughts?
+Ummm ... my preference would be to keep it outside the block so that
+the hook is always invoked in any timeout, to be consistent (whether
+externally injected or not). Let me know if that is OK. I plan to send
+out an iteration keeping it outside, but I'll be happy to move it in
+if you feel strongly about it.
 
 Thanks,
 
 Rajat
 
->
-> >
-> >       if (id->driver_info & BTUSB_INTEL_NEW) {
-> > @@ -3097,6 +3144,8 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >               set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks)=
-;
-> >               set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
-> >               set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-> > +             if (data->reset_gpio)
-> > +                     hdev->cmd_timeout =3D btusb_intel_cmd_timeout;
-> >       }
-> >
-> >       if (id->driver_info & BTUSB_MARVELL)
-> > @@ -3226,6 +3275,8 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >       return 0;
-> >
-> > out_free_dev:
-> > +     if (data->reset_gpio)
-> > +             gpiod_put(data->reset_gpio);
-> >       hci_free_dev(hdev);
-> >       return err;
-> > }
-> > @@ -3269,6 +3320,9 @@ static void btusb_disconnect(struct usb_interface=
- *intf)
-> >       if (data->oob_wake_irq)
-> >               device_init_wakeup(&data->udev->dev, false);
-> >
-> > +     if (data->reset_gpio)
-> > +             gpiod_put(data->reset_gpio);
-> > +
-> >       hci_free_dev(hdev);
-> > }
 >
 > Regards
 >
