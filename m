@@ -6,47 +6,45 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 206BAC282C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 09:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B96C282C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 09:46:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EBAD3218A2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 09:36:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09F4220855
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 09:46:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726074AbfAXJgY convert rfc822-to-8bit (ORCPT
+        id S1727208AbfAXJqd convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Jan 2019 04:36:24 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:56158 "EHLO
+        Thu, 24 Jan 2019 04:46:33 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:53020 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726025AbfAXJgY (ORCPT
+        with ESMTP id S1725986AbfAXJqd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Jan 2019 04:36:24 -0500
+        Thu, 24 Jan 2019 04:46:33 -0500
 Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 4CC34CF166;
-        Thu, 24 Jan 2019 10:44:09 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7D6A3CF166;
+        Thu, 24 Jan 2019 10:54:18 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v5 3/4] Bluetooth: Allow driver specific cmd timeout
- handling
+Subject: Re: [PATCH v5 4/4] Bluetooth: btusb: Use the cmd_timeout method to
+ reset the Intel BT chip
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190123205725.239661-3-rajatja@google.com>
-Date:   Thu, 24 Jan 2019 10:36:21 +0100
+In-Reply-To: <20190123205725.239661-4-rajatja@google.com>
+Date:   Thu, 24 Jan 2019 10:46:30 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "David S. Miller" <davem@davemloft.net>,
         Dmitry Torokhov <dtor@chromium.org>,
         Alex Hung <alex.hung@canonical.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-usb@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        rajatxjain@gmail.com, dtor@google.com,
-        Raghuram Hegde <raghuram.hegde@intel.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+        rajatxjain@gmail.com, dtor@google.com, raghuram.hegde@intel.com,
         chethan.tumkur.narayan@intel.com, sukumar.ghorai@intel.com
 Content-Transfer-Encoding: 8BIT
-Message-Id: <D868735A-05A4-405A-9101-8D59F4208B9E@holtmann.org>
+Message-Id: <7A112914-5B41-4D26-807B-021B7AC907C6@holtmann.org>
 References: <20181117010748.24347-1-rajatja@google.com>
  <20190123205725.239661-1-rajatja@google.com>
- <20190123205725.239661-3-rajatja@google.com>
+ <20190123205725.239661-4-rajatja@google.com>
 To:     Rajat Jain <rajatja@google.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -56,63 +54,171 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Rajat,
 
-> Add a hook to allow the BT driver to do device or command specific
-> handling in case of timeouts. This is to be used by Intel driver to
-> reset the device after certain number of timeouts.
+> If the platform provides it, use the reset gpio to reset the Intel BT
+> chip, as part of cmd_timeout handling. This has been found helpful on
+> Intel bluetooth controllers where the firmware gets stuck and the only
+> way out is a hard reset pin provided by the platform.
 > 
 > Signed-off-by: Rajat Jain <rajatja@google.com>
 > ---
-> v5: Drop the quirk, and rename the hook function to cmd_timeout()
-> v4: same as v1
-> v3: same as v1
-> v2: same as v1
+> v5: Rename the hook to cmd_timeout, and wait for 5 timeouts before
+>    resetting the device.
+> v4: Use data->flags instead of clearing the quirk in btusb_hw_reset()
+> v3: Better error handling for gpiod_get_optional()
+> v2: Handle the EPROBE_DEFER case.
 > 
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_core.c         | 10 ++++++++--
-> 2 files changed, 9 insertions(+), 2 deletions(-)
+> drivers/bluetooth/btusb.c | 54 +++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 54 insertions(+)
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index e5ea633ea368..624d5f2b1f36 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -437,6 +437,7 @@ struct hci_dev {
-> 	int (*post_init)(struct hci_dev *hdev);
-> 	int (*set_diag)(struct hci_dev *hdev, bool enable);
-> 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-> +	void (*cmd_timeout)(struct hci_dev *hdev, struct hci_command_hdr *cmd);
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 4761499db9ee..8949ea30a1bc 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -29,6 +29,7 @@
+> #include <linux/of_device.h>
+> #include <linux/of_irq.h>
+> #include <linux/suspend.h>
+> +#include <linux/gpio/consumer.h>
+> #include <asm/unaligned.h>
+> 
+> #include <net/bluetooth/bluetooth.h>
+> @@ -439,6 +440,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
+> #define BTUSB_BOOTING		9
+> #define BTUSB_DIAG_RUNNING	10
+> #define BTUSB_OOB_WAKE_ENABLED	11
+> +#define BTUSB_HW_RESET_ACTIVE	12
+> 
+> struct btusb_data {
+> 	struct hci_dev       *hdev;
+> @@ -476,6 +478,8 @@ struct btusb_data {
+> 	struct usb_endpoint_descriptor *diag_tx_ep;
+> 	struct usb_endpoint_descriptor *diag_rx_ep;
+> 
+> +	struct gpio_desc *reset_gpio;
+> +
+> 	__u8 cmdreq_type;
+> 	__u8 cmdreq;
+> 
+> @@ -489,8 +493,39 @@ struct btusb_data {
+> 	int (*setup_on_usb)(struct hci_dev *hdev);
+> 
+> 	int oob_wake_irq;   /* irq for out-of-band wake-on-bt */
+> +	unsigned num_cmd_timeout;
+
+Make this cmd_timeout_count or cmd_timeout_cnt.
+
 > };
 > 
-> #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 7352fe85674b..c6917f57581a 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2568,16 +2568,22 @@ static void hci_cmd_timeout(struct work_struct *work)
-> {
-> 	struct hci_dev *hdev = container_of(work, struct hci_dev,
-> 					    cmd_timer.work);
-> +	struct hci_command_hdr *sent = NULL;
-> 
-> 	if (hdev->sent_cmd) {
-> -		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
-> -		u16 opcode = __le16_to_cpu(sent->opcode);
-> +		u16 opcode;
 > +
-> +		sent = (void *) hdev->sent_cmd->data;
-> +		opcode = __le16_to_cpu(sent->opcode);
+> +static void btusb_intel_cmd_timeout(struct hci_dev *hdev,
+> +				    struct hci_command_hdr *cmd)
+> +{
+> +	struct btusb_data *data = hci_get_drvdata(hdev);
+> +	struct gpio_desc *reset_gpio = data->reset_gpio;
+> +
+> +	bt_dev_err(hdev, "btusb num_cmd_timeout = %u", ++data->num_cmd_timeout);
+
+I would prefer if you don’t do the increase in the bt_dev_err(). And you can also scrap the “btusb “ prefix here since that is all present via bt_dev_err if really needed at some point. Actually I question the whole bt_dev_err here in the first place since the core will put our the error. You are just repeating it here.
+
+> +
+> +	if (data->num_cmd_timeout < 5)
+> +		return;
+
+So I would propose to do just this:
+
+	if (++data->cmd_timeout_count < 5)
+		return;
+
+> +
+> +	/*
+> +	 * Toggle the hard reset line if the platform provides one. The reset
+> +	 * is going to yank the device off the USB and then replug. So doing
+> +	 * once is enough. The cleanup is handled correctly on the way out
+> +	 * (standard USB disconnect), and the new device is detected cleanly
+> +	 * and bound to the driver again like it should be.
+> +	 */
+> +	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
+> +		bt_dev_err(hdev, "last reset failed? Not resetting again");
+> +		return;
+> +	}
+> +
+> +	bt_dev_err(hdev, "Initiating HW reset via gpio");
+> +	gpiod_set_value(reset_gpio, 1);
+> +	mdelay(100);
+> +	gpiod_set_value(reset_gpio, 0);
+> +}
+> +
+> static inline void btusb_free_frags(struct btusb_data *data)
+> {
+> 	unsigned long flags;
+> @@ -2915,6 +2950,7 @@ static int btusb_probe(struct usb_interface *intf,
+> 		       const struct usb_device_id *id)
+> {
+> 	struct usb_endpoint_descriptor *ep_desc;
+> +	struct gpio_desc *reset_gpio;
+> 	struct btusb_data *data;
+> 	struct hci_dev *hdev;
+> 	unsigned ifnum_base;
+> @@ -3028,6 +3064,15 @@ static int btusb_probe(struct usb_interface *intf,
 > 
-> 		bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
-> 	} else {
-> 		bt_dev_err(hdev, "command tx timeout");
+> 	SET_HCIDEV_DEV(hdev, &intf->dev);
+> 
+> +	reset_gpio = gpiod_get_optional(&data->udev->dev, "reset",
+> +					GPIOD_OUT_LOW);
+
+Any reason to not use the devm_gpiod_get_optional() version here?
+
+> +	if (IS_ERR(reset_gpio)) {
+> +		err = PTR_ERR(reset_gpio);
+> +		goto out_free_dev;
+> +	} else if (reset_gpio) {
+> +		data->reset_gpio = reset_gpio;
+> +	}
+> +
+> 	hdev->open   = btusb_open;
+> 	hdev->close  = btusb_close;
+> 	hdev->flush  = btusb_flush;
+> @@ -3085,6 +3130,8 @@ static int btusb_probe(struct usb_interface *intf,
+> 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+> 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+> +		if (data->reset_gpio)
+> +			hdev->cmd_timeout = btusb_intel_cmd_timeout;
+> 	}
+
+Always assign hdev->cmd_timeout = btusb_intel_cmd_timeout and put it after btintel_set_bdaddr and before the quirks.
+
+Move the if (data->reset_gpio) check into btusb_intel_cmd_timeout() function and print a warning that no reset GPIO is present.
+
+> 
+> 	if (id->driver_info & BTUSB_INTEL_NEW) {
+> @@ -3097,6 +3144,8 @@ static int btusb_probe(struct usb_interface *intf,
+> 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+> 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+> +		if (data->reset_gpio)
+> +			hdev->cmd_timeout = btusb_intel_cmd_timeout;
 > 	}
 > 
-> +	if (hdev->cmd_timeout)
-> +		hdev->cmd_timeout(hdev, sent);
+> 	if (id->driver_info & BTUSB_MARVELL)
+> @@ -3226,6 +3275,8 @@ static int btusb_probe(struct usb_interface *intf,
+> 	return 0;
+> 
+> out_free_dev:
+> +	if (data->reset_gpio)
+> +		gpiod_put(data->reset_gpio);
+> 	hci_free_dev(hdev);
+> 	return err;
+> }
+> @@ -3269,6 +3320,9 @@ static void btusb_disconnect(struct usb_interface *intf)
+> 	if (data->oob_wake_irq)
+> 		device_init_wakeup(&data->udev->dev, false);
+> 
+> +	if (data->reset_gpio)
+> +		gpiod_put(data->reset_gpio);
 > +
-
-drop the sent parameter. You are not using it and if at some point in the future you might want to use it, then we add it and fix up all users.
-
-And frankly, I would move the hdev->cmd_timeout call into the hdev->sent_cmd block since I do not even know if it makes sense to deal with the fallback case where hdev->sent_cmd is not available. Unless you have that kind of error case, but that is only possible if you have external injection of HCI commands.
+> 	hci_free_dev(hdev);
+> }
 
 Regards
 
