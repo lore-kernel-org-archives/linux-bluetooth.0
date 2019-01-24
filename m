@@ -7,71 +7,69 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6411C282C5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 18:07:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBADDC282C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 18:08:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C7552082C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 18:07:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 993BF218AF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 18:08:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q2PXFZrO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GMsPnP0N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729289AbfAXSHp (ORCPT
+        id S1729174AbfAXSHl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Jan 2019 13:07:45 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40125 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729287AbfAXSHo (ORCPT
+        Thu, 24 Jan 2019 13:07:41 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34674 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727919AbfAXSHl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Jan 2019 13:07:44 -0500
-Received: by mail-wm1-f67.google.com with SMTP id f188so4033358wmf.5;
-        Thu, 24 Jan 2019 10:07:42 -0800 (PST)
+        Thu, 24 Jan 2019 13:07:41 -0500
+Received: by mail-wr1-f67.google.com with SMTP id f7so7557947wrp.1;
+        Thu, 24 Jan 2019 10:07:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=BeYJT0Z/72s44LJc0KKufww5He7xJOSI991sA39Lbhc=;
-        b=q2PXFZrOM/z/diJ3NnNBKWMlk1VoribLeZ7TW4zBpAuGa6RGQga/gFJhWTByadXhfc
-         cjDHdXDkrvU7skdSqL3syKu7aAyixMVtwHkJhpMgCJBLgGmLWEo/9EV5/M/Emkkj28xi
-         yJ4bZz1rwhtW+KmVNvnkM9j5DajZXpILqNuPR9OZ4MdN8jwZlDpIl9HOks6v5RuCCbuA
-         16xLPwNBiCVxNeDc8JjE4hNvNdpDvIddnK++M3iWG9gW76AIs5g3M8H8iSKUAIWx3Kln
-         U2v/lgfDgf0SRM329AY/T9wrLPKi+DcG4woIeLxK6jIFEWB1sOsw4H8DjlfaFkow7t/d
-         xbiA==
+        h=sender:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9+mli0xSXk2ghiIeou+iQu6b7dIljMmGB5zDKNfOwTc=;
+        b=GMsPnP0NzZ+lEOLSnpeCpJbZ2wXAdhj4dZnr76MkTGwbYTStG9jdYcWYe+UhJT7x07
+         HbesboogtJS4h3K3qUOMVlNJyNwPye8XRhIrCxsMqBu6dMP3ZqKtGSBj+rvfnSrxGg20
+         IZxwHAGtmgrdDIlGBlCe/tD80o/cRX4+UPJ/2MyQvTycDau38crvHpbmqZ1U3kxd9Kn3
+         voHhOebTN89DvC+2Czb/fMmLZ275uuU2X9PShXBaHaTyVez5Q/ghwB/3MftaL2gcEdVy
+         za+LKnSgtVLjF8rS3frBmIrgS33c7QsF1cJTYI048F1CvGX1F35V4F56Kcj9UuwdAJsi
+         LxXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references:mime-version:content-transfer-encoding;
-        bh=BeYJT0Z/72s44LJc0KKufww5He7xJOSI991sA39Lbhc=;
-        b=AN1Ks4XQpnABqz1xaPZcCibyaJcHRsafiekvbemlONGozxPGU4bUlRRmFNQ7Ux5884
-         LYU7HUSjPmNPhnqeZgTiabfoHxQuXnAdwPN2+y3g5Rgk1N1RqFWkDLuppSplA1WhjWdE
-         hlgiw5Ee7STBCFZ3UOcB3yTkpEFn17nlQeePCaH8z4mvTlyaZOe/D69CdirHrWXGIQAS
-         +6NoQjuvYlYsURKkeuyu3Ct5BuaBc2tsy+dpbI8rYNIBpIOmLFPjFhIOfvTkC4BGc224
-         nnVWNhVl/b9j+tKwSC8BgFvEcaFWfh2LTnrcgC81ZSLU4tw6yRQAA7trlJx1yAlqP3/R
-         Ekig==
-X-Gm-Message-State: AJcUukd9NejAG3mu0SBDhO9pcWUx0fC93Qxl3T9QL+ankek13xUyFrPd
-        dIkkAoH26O4FYmyE83QOjso=
-X-Google-Smtp-Source: ALg8bN4AR9FkpiEi8UgqYmeyXS7F3KaRT/apSMnXHNDsY25y80ula8XtkhVhBYcLKGMhFJI89E9A8Q==
-X-Received: by 2002:a1c:85d2:: with SMTP id h201mr3502164wmd.151.1548353261479;
-        Thu, 24 Jan 2019 10:07:41 -0800 (PST)
-Received: from macbookpro.malat.net (bru31-1-78-225-224-134.fbx.proxad.net. [78.225.224.134])
-        by smtp.gmail.com with ESMTPSA id v132sm61758566wme.20.2019.01.24.10.07.40
+         :mime-version:content-transfer-encoding;
+        bh=9+mli0xSXk2ghiIeou+iQu6b7dIljMmGB5zDKNfOwTc=;
+        b=HvpqIJxfIWvRQ4ZBqLwK+oE+mVUXG7h+P7qzUiWQ32GfVvo6Jao0v9obyvnhmET3DB
+         MiD6HemvwVBRe9CDGloXT5zYr6KbqXhS6atvo9bH9P/s0mWxK6VdLCHP74PRzvG/TQIu
+         TzFyUZO5EYsowQc/6YKOycRCROuf9PnEXQloaenYyUh0VbUEGyUeAmdd68fuGgcvfG2a
+         C3OL4/MV+Q6m6EfCBebpQP+n2ssS/t/JKuQ4SVutssywcmjuap5Dm2b0Z64Q5h6FrpNR
+         35Cz/rNusBKUAFKfjSt6yGtI12TkHx2No/4kS/7+6s3YXD6zBdPSvN9hOa/VEgGm81F3
+         U8rA==
+X-Gm-Message-State: AJcUukcggs2yNXdgq8x2QaFdKmJ8CK/1JBPbFV+kL861Q0AJIiFEtcAb
+        tWTptf2SaVfap8pVCYfR2fY=
+X-Google-Smtp-Source: ALg8bN63lOvR0OgHzifOReN3O18SzENY1+lEzguq01mwJvGoXnOo99qLdc70oT7hGNUL/9RouglpCg==
+X-Received: by 2002:adf:ce86:: with SMTP id r6mr8531754wrn.257.1548353259561;
+        Thu, 24 Jan 2019 10:07:39 -0800 (PST)
+Received: from macbookpro.malat.net ([2a01:e34:ee1e:860:6f23:82e6:aa2d:bbd1])
+        by smtp.gmail.com with ESMTPSA id x3sm99402358wrd.19.2019.01.24.10.07.38
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 24 Jan 2019 10:07:40 -0800 (PST)
+        Thu, 24 Jan 2019 10:07:38 -0800 (PST)
 Received: by macbookpro.malat.net (Postfix, from userid 1000)
-        id 922D71143574; Thu, 24 Jan 2019 19:07:39 +0100 (CET)
+        id DEEB01143573; Thu, 24 Jan 2019 19:07:37 +0100 (CET)
 From:   Mathieu Malaterre <malat@debian.org>
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Mathieu Malaterre <malat@debian.org>,
-        Peter Hurley <peter@hurleysoftware.com>,
+        Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Correctly annotate implicit fall through in __rfcomm_dlc_close
-Date:   Thu, 24 Jan 2019 19:07:24 +0100
-Message-Id: <20190124180724.20910-2-malat@debian.org>
+Subject: [PATCH 1/2] Bluetooth: Annotate implicit fall through in l2cap_config_rsp
+Date:   Thu, 24 Jan 2019 19:07:23 +0100
+Message-Id: <20190124180724.20910-1-malat@debian.org>
 X-Mailer: git-send-email 2.19.2
-In-Reply-To: <20190124180724.20910-1-malat@debian.org>
-References: <20190124180724.20910-1-malat@debian.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -82,35 +80,28 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 There is a plan to build the kernel with -Wimplicit-fallthrough and
 this place in the code produced a warning (W=1).
 
-In this particular case put the fall through comment on a separate line so
-as to match the regular expression expected by GCC.
-
 This commit removes the following warning:
 
-  net/bluetooth/rfcomm/core.c:479:6: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  net/bluetooth/l2cap_core.c:4223:6: warning: this statement may fall through [-Wimplicit-fallthrough=]
 
-Cc: Peter Hurley <peter@hurleysoftware.com>
+Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
 Signed-off-by: Mathieu Malaterre <malat@debian.org>
 ---
- net/bluetooth/rfcomm/core.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ net/bluetooth/l2cap_core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 1a635df80643..caaae6accafa 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -480,9 +480,8 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
- 			__rfcomm_dlc_disconn(d);
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2a7fb517d460..a5b76e24940a 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4244,6 +4244,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
+ 				goto done;
  			break;
  		}
--		/* if closing a dlc in a session that hasn't been started,
--		 * just close and unlink the dlc
--		 */
-+		/* fall through - if closing a dlc in a session that hasn't */
-+		/* been started, just close and unlink the dlc */
++		/* fall through */
  
  	default:
- 		rfcomm_dlc_clear_timer(d);
+ 		l2cap_chan_set_err(chan, ECONNRESET);
 -- 
 2.19.2
 
