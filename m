@@ -5,30 +5,30 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86226C282C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 14:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24594C282C3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 14:23:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58A0021872
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 14:22:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F24A521872
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jan 2019 14:23:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728238AbfAXOWa convert rfc822-to-8bit (ORCPT
+        id S1727694AbfAXOXV convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Jan 2019 09:22:30 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:40254 "EHLO
+        Thu, 24 Jan 2019 09:23:21 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:42472 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727694AbfAXOW3 (ORCPT
+        by vger.kernel.org with ESMTP id S1727665AbfAXOXV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Jan 2019 09:22:29 -0500
+        Thu, 24 Jan 2019 09:23:21 -0500
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 24091306C0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jan 2019 14:22:29 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id C720630718
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jan 2019 14:23:20 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 17D88306B4; Thu, 24 Jan 2019 14:22:29 +0000 (UTC)
+        id C550E3072E; Thu, 24 Jan 2019 14:23:20 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 201921] Bluetooth: hci0: RTL: rtl: unknown IC info, lmp subver
  a99e, hci rev 826c, hci ver 0008
-Date:   Thu, 24 Jan 2019 14:22:25 +0000
+Date:   Thu, 24 Jan 2019 14:23:17 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -43,8 +43,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-201921-62941-sZVPHJFyDR@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-201921-62941-km8FusNKDG@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-201921-62941@https.bugzilla.kernel.org/>
 References: <bug-201921-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -60,10 +60,8 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=201921
 
---- Comment #8 from Kai-Heng Feng (kai.heng.feng@canonical.com) ---
-Created attachment 280717
-  --> https://bugzilla.kernel.org/attachment.cgi?id=280717&action=edit
-0003-Bluetooth-btrtl-Skip-initialization-if-firmware-is-a.patch
+--- Comment #9 from Kai-Heng Feng (kai.heng.feng@canonical.com) ---
+Please try these patches. It should the issue.
 
 -- 
 You are receiving this mail because:
