@@ -3,68 +3,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B56C282C2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 07:54:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C7AC282C0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 07:56:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39D54218DE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 07:54:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D6B621904
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 07:56:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728529AbfAYHyl (ORCPT
+        id S1728534AbfAYH4u convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Jan 2019 02:54:41 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:33071 "EHLO
+        Fri, 25 Jan 2019 02:56:50 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:46165 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726761AbfAYHyl (ORCPT
+        with ESMTP id S1726735AbfAYH4u (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Jan 2019 02:54:41 -0500
+        Fri, 25 Jan 2019 02:56:50 -0500
 Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7F087CF172;
-        Fri, 25 Jan 2019 09:02:27 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1C218CF172;
+        Fri, 25 Jan 2019 09:04:35 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH] Bluetooth: make hw_err static, reduces object code size
+Subject: Re: [PATCH 1/2] Bluetooth: Annotate implicit fall through in
+ l2cap_config_rsp
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190124172254.13186-1-colin.king@canonical.com>
-Date:   Fri, 25 Jan 2019 08:54:39 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20190124180724.20910-1-malat@debian.org>
+Date:   Fri, 25 Jan 2019 08:56:46 +0100
+Cc:     Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <6F6742C3-1D20-44F9-9EF6-DF6085069DA0@holtmann.org>
-References: <20190124172254.13186-1-colin.king@canonical.com>
-To:     Colin King <colin.king@canonical.com>
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <3DC0DB52-E3B0-42F3-BD4D-913FD77EDFBB@holtmann.org>
+References: <20190124180724.20910-1-malat@debian.org>
+To:     Mathieu Malaterre <malat@debian.org>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Colin,
+Hi Mathieu,
 
-> Don't populate the const array hw_err on the stack but instead make
-> it static. Makes the object code smaller by 45 bytes:
+> There is a plan to build the kernel with -Wimplicit-fallthrough and
+> this place in the code produced a warning (W=1).
 > 
-> Before:
->   text	   data	    bss	    dec	    hex	filename
-> 100880	  21090	   1088	 123058	  1e0b2	linux/net/bluetooth/hci_core.o
+> This commit removes the following warning:
 > 
-> After:
->   text	   data	    bss	    dec	    hex	filename
-> 100739	  21186	   1088	 123013	  1e085	linux/net/bluetooth/hci_core.o
+>  net/bluetooth/l2cap_core.c:4223:6: warning: this statement may fall through [-Wimplicit-fallthrough=]
 > 
-> (gcc version 8.2.0 x86_64)
-> 
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Cc: Gustavo Padovan <gustavo.padovan@collabora.co.uk>
+> Signed-off-by: Mathieu Malaterre <malat@debian.org>
 > ---
-> net/bluetooth/hci_core.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> net/bluetooth/l2cap_core.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-patch has been applied to bluetooth-next tree.
+the patches don’t apply cleanly against bluetooth-next tree. Please fix it up and resend.
 
 Regards
 
