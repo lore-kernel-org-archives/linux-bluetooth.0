@@ -6,73 +6,63 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE23EC282C0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 07:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B56C282C2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 07:54:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF8F2217D7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 07:51:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39D54218DE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 07:54:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726589AbfAYHvM (ORCPT
+        id S1728529AbfAYHyl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Jan 2019 02:51:12 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:55016 "EHLO
+        Fri, 25 Jan 2019 02:54:41 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:33071 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726273AbfAYHvL (ORCPT
+        with ESMTP id S1726761AbfAYHyl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Jan 2019 02:51:11 -0500
+        Fri, 25 Jan 2019 02:54:41 -0500
 Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 103E4CF172;
-        Fri, 25 Jan 2019 08:58:57 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7F087CF172;
+        Fri, 25 Jan 2019 09:02:27 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v6 1/4] usb: split code locating ACPI companion into port
- and device
+Subject: Re: [PATCH] Bluetooth: make hw_err static, reduces object code size
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190124232814.252661-1-rajatja@google.com>
-Date:   Fri, 25 Jan 2019 08:51:08 +0100
+In-Reply-To: <20190124172254.13186-1-colin.king@canonical.com>
+Date:   Fri, 25 Jan 2019 08:54:39 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Dmitry Torokhov <dtor@chromium.org>,
-        Alex Hung <alex.hung@canonical.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-usb@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        rajatxjain@gmail.com, dtor@google.com,
-        Raghuram Hegde <raghuram.hegde@intel.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        sukumar.ghorai@intel.com
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <7A631FFF-3C46-48B9-AAC6-F60F7B06D17D@holtmann.org>
-References: <20181117010748.24347-1-rajatja@google.com>
- <20190124232814.252661-1-rajatja@google.com>
-To:     Rajat Jain <rajatja@google.com>
+Message-Id: <6F6742C3-1D20-44F9-9EF6-DF6085069DA0@holtmann.org>
+References: <20190124172254.13186-1-colin.king@canonical.com>
+To:     Colin King <colin.king@canonical.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Rajat,
+Hi Colin,
 
-> In preparation for handling embedded USB devices let's split
-> usb_acpi_find_companion() into usb_acpi_find_companion_for_device() and
-> usb_acpi_find_companion_for_port().
+> Don't populate the const array hw_err on the stack but instead make
+> it static. Makes the object code smaller by 45 bytes:
 > 
-> Signed-off-by: Dmitry Torokhov <dtor@chromium.org>
-> Signed-off-by: Rajat Jain <rajatja@google.com>
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Tested-by: Sukumar Ghorai <sukumar.ghorai@intel.com>
+> Before:
+>   text	   data	    bss	    dec	    hex	filename
+> 100880	  21090	   1088	 123058	  1e0b2	linux/net/bluetooth/hci_core.o
+> 
+> After:
+>   text	   data	    bss	    dec	    hex	filename
+> 100739	  21186	   1088	 123013	  1e085	linux/net/bluetooth/hci_core.o
+> 
+> (gcc version 8.2.0 x86_64)
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 > ---
-> v6: same as v4
-> v5: same as v4
-> v4: Add Acked-by and Tested-by in signatures.
-> v3: same as v1
-> v2: same as v1
-> 
-> drivers/usb/core/usb-acpi.c | 133 +++++++++++++++++++-----------------
-> 1 file changed, 72 insertions(+), 61 deletions(-)
+> net/bluetooth/hci_core.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
 
