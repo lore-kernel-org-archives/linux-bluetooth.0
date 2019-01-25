@@ -2,100 +2,134 @@ Return-Path: <SRS0=pNHN=QB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACEF4C282C0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 08:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C06C282C0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 14:38:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 874032192C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 08:09:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0189218D0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 14:38:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m809RbmC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728017AbfAYIJu (ORCPT
+        id S1726238AbfAYOi6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Jan 2019 03:09:50 -0500
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:45013 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726219AbfAYIJu (ORCPT
+        Fri, 25 Jan 2019 09:38:58 -0500
+Received: from mail-lj1-f182.google.com ([209.85.208.182]:39689 "EHLO
+        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726111AbfAYOi5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Jan 2019 03:09:50 -0500
-Received: by mail-ot1-f65.google.com with SMTP id g16so3762388otg.11;
-        Fri, 25 Jan 2019 00:09:49 -0800 (PST)
+        Fri, 25 Jan 2019 09:38:57 -0500
+Received: by mail-lj1-f182.google.com with SMTP id t9-v6so8551540ljh.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Jan 2019 06:38:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id;
+        bh=2SeDtgkij5RzAn5Ydahnc+0UdTyRPe4w8M4KMznAQ8g=;
+        b=m809RbmCH3NWWWgF8cZxgy99DewLOIqFXMVq6mOyiZGBse9XL7DCAjVeUSTeakDcpD
+         PZXGCavACYdGOM3D7bm9c3ekUvkeFq7raKkOCO98LBGTKwNg8A2Xm0Qh49KpyJ2WmsM3
+         jPHMkS6k2ZgvwmVQTUxH9+ff+YDhm7jHFbL10LW5ToTT+rcYKEHXXGR8S15AZC5NucnU
+         TDyxMKCeglsZNptTbBxthyE4vxfEVwOSvWCqIq26AbAfOjFG7AiefHp2VAvXfZcRg2NK
+         PZDs2+W2KV/4z0n88Kjen1XvaUiA6tXX+V8F/Nvq79P9nSN5fQH6cKhkEDiTG4KYmzlj
+         ekZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=djPbkyd1+SDPYk6mxzOjNnM2qu3TJB1XOhWLX2r26UY=;
-        b=lCU6NQaIA8SuIm9EqDBlh2kX1j6AhBAh238qY7kmJxDGJuwAegkCvfuc7gIsFpAJO1
-         T9dpZTZHal98cO3wXTGUO451YZnQ7nUtX3Disv7kPh+Bz6pgCDTGsT9hJq0rcn+fyD1D
-         Oy1e44lAMvas0Rg/OTPbe+ELRjGDD//ZOwhp07MUEDKiCwxo8XKlWeODYHvqpNzSfia+
-         QNDdaWDq2Y+DyPZh3FjEYxaUAtKZPGBQ0xZdPi//Qm/HXr/Hr+sFhIDKTPo6Zx4yv3Lk
-         jW5kzg8Iyx83x1WRRFxgMWMh7+DeCiQaGTd1MzmK5qpmg006+PUSi75ZwDHHK6Ug4hUw
-         v1yA==
-X-Gm-Message-State: AJcUukeKxGM/PhQobcXld03NBAFFh1wihP6iDg9mBuIVQfwAdCI+ex1/
-        yBKI7FIP+2lzy/44Ai0P7Pyg825byq4/MBehJmg=
-X-Google-Smtp-Source: ALg8bN7qcPzB4rpapIl9bmuXZJ56NoyU3NH3MkcQD7LOJr7UNBzc3HjyajJjtO5+FDeLAQrv4FoTQKXvFFXn6LYVPaU=
-X-Received: by 2002:a9d:3d24:: with SMTP id a33mr7164512otc.365.1548403788902;
- Fri, 25 Jan 2019 00:09:48 -0800 (PST)
-MIME-Version: 1.0
-References: <20190124180724.20910-1-malat@debian.org> <20190124180724.20910-2-malat@debian.org>
-In-Reply-To: <20190124180724.20910-2-malat@debian.org>
-From:   Mathieu Malaterre <malat@debian.org>
-Date:   Fri, 25 Jan 2019 09:09:38 +0100
-Message-ID: <CA+7wUswNMgZZYpLokyv0DXqf7jemw2rhJ5uB1mGrccjmPgzAjg@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Bluetooth: Correctly annotate implicit fall through
- in __rfcomm_dlc_close
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Peter Hurley <peter@hurleysoftware.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=2SeDtgkij5RzAn5Ydahnc+0UdTyRPe4w8M4KMznAQ8g=;
+        b=SjdkmY0Rx+FtpDd2MBJwHAaL0T59u4xNOznd1+oslxAHZu6S4cOzW8NC+o1QXd0AJM
+         r0Pff90orEiQ62/273Fvs8q3zQzzRX/Jn70oerWiaCm9+S9LpUyEakVqvQWjBcn0BMjE
+         clWIBFvkBHNIB+dZoOyYz/HbFlHAZts0JuHrLoirVtEDXBzvzIDBqMhGazocnbY+XZRQ
+         VgKb9g0bgnATl9RHIz7qnLHpLaHwYaAC6GGZu33smiJ/Fa5i/GxfIchiUmPgQKBiC9YL
+         dVtm9yZwYD44uD5ofgy/XAem8dVWfPvO8p/yf16L3XAEfjWGTGvgQRXGndufErkXmRXu
+         xX0Q==
+X-Gm-Message-State: AJcUukfbY4zj3EP7B0XDnc+cIe98UUCj4D08B0Apyo/3YVDFdv65bBig
+        7U05skx+CP697VVGUMPRsetU61KpKus=
+X-Google-Smtp-Source: ALg8bN4cm5KQ3sMo6L14NdEq5y/M9oWpfQci/cmdVMyBxBB4mig1v7Jy4UyC/tfGvqMEIYDV/6pOVQ==
+X-Received: by 2002:a2e:449b:: with SMTP id b27-v6mr9228371ljf.47.1548427135042;
+        Fri, 25 Jan 2019 06:38:55 -0800 (PST)
+Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
+        by smtp.gmail.com with ESMTPSA id 65sm1510637lfp.55.2019.01.25.06.38.53
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 25 Jan 2019 06:38:53 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC BlueZ] doc/gatt-api: Add Handle property
+Date:   Fri, 25 Jan 2019 16:38:52 +0200
+Message-Id: <20190125143852.17424-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.17.2
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jan 24, 2019 at 7:07 PM Mathieu Malaterre <malat@debian.org> wrote:
->
-> There is a plan to build the kernel with -Wimplicit-fallthrough and
-> this place in the code produced a warning (W=1).
->
-> In this particular case put the fall through comment on a separate line so
-> as to match the regular expression expected by GCC.
->
-> This commit removes the following warning:
->
->   net/bluetooth/rfcomm/core.c:479:6: warning: this statement may fall through [-Wimplicit-fallthrough=]
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Please discard, already fixed by :
+When acting as server it is useful to select where to allocate the
+handle for an attribute so it can be restored in the same position when
+restarting the daemon or rebooting the system.
 
-6317950c1b9c Bluetooth: Mark expected switch fall-throughs
+In order to do that the application also needs to know in which handle
+the attribute is allocated the very first time it is registered, this
+also allows for a better integration with PTS and tools like auto-pts
+which needs to know the handles where the attributes have been
+allocated.
+---
+ doc/gatt-api.txt | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-> Cc: Peter Hurley <peter@hurleysoftware.com>
-> Signed-off-by: Mathieu Malaterre <malat@debian.org>
-> ---
->  net/bluetooth/rfcomm/core.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
->
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index 1a635df80643..caaae6accafa 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -480,9 +480,8 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
->                         __rfcomm_dlc_disconn(d);
->                         break;
->                 }
-> -               /* if closing a dlc in a session that hasn't been started,
-> -                * just close and unlink the dlc
-> -                */
-> +               /* fall through - if closing a dlc in a session that hasn't */
-> +               /* been started, just close and unlink the dlc */
->
->         default:
->                 rfcomm_dlc_clear_timer(d);
-> --
-> 2.19.2
->
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 8dda60b8a..491eb026a 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -50,6 +50,14 @@ Properties	string UUID [read-only]
+ 			Array of object paths representing the included
+ 			services of this service.
+ 
++		uint16 Handle [read-write, optional] (Server Only)
++
++			Service handle. When available in the server it
++			would attempt to use to allocate into the database
++			which may fail, to auto allocate the value 0x0000
++			shall be used which will cause the allocated handle to
++			be set once registered.
++
+ 
+ Characteristic hierarchy
+ ========================
+@@ -257,6 +265,14 @@ Properties	string UUID [read-only]
+ 				"secure-write" (Server only)
+ 				"authorize"
+ 
++		uint16 Handle [read-write, optional] (Server Only)
++
++			Characteristic handle. When available in the server it
++			would attempt to use to allocate into the database
++			which may fail, to auto allocate the value 0x0000
++			shall be used which will cause the allocated handle to
++			be set once registered.
++
+ Characteristic Descriptors hierarchy
+ ====================================
+ 
+@@ -332,6 +348,14 @@ Properties	string UUID [read-only]
+ 				"secure-write" (Server Only)
+ 				"authorize"
+ 
++		uint16 Handle [read-write, optional] (Server Only)
++
++			Characteristic handle. When available in the server it
++			would attempt to use to allocate into the database
++			which may fail, to auto allocate the value 0x0000
++			shall be used which will cause the allocated handle to
++			be set once registered.
++
+ GATT Profile hierarchy
+ =====================
+ 
+-- 
+2.17.2
+
