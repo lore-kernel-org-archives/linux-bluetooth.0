@@ -4,132 +4,194 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C06C282C0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 14:38:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 314B8C282C0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 14:41:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F0189218D0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 14:38:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5EE0218D0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 14:41:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m809RbmC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hm+efKeJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726238AbfAYOi6 (ORCPT
+        id S1726451AbfAYOlW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Jan 2019 09:38:58 -0500
-Received: from mail-lj1-f182.google.com ([209.85.208.182]:39689 "EHLO
-        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726111AbfAYOi5 (ORCPT
+        Fri, 25 Jan 2019 09:41:22 -0500
+Received: from mail-oi1-f174.google.com ([209.85.167.174]:37799 "EHLO
+        mail-oi1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726111AbfAYOlW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Jan 2019 09:38:57 -0500
-Received: by mail-lj1-f182.google.com with SMTP id t9-v6so8551540ljh.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Jan 2019 06:38:56 -0800 (PST)
+        Fri, 25 Jan 2019 09:41:22 -0500
+Received: by mail-oi1-f174.google.com with SMTP id y23so7817060oia.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Jan 2019 06:41:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=2SeDtgkij5RzAn5Ydahnc+0UdTyRPe4w8M4KMznAQ8g=;
-        b=m809RbmCH3NWWWgF8cZxgy99DewLOIqFXMVq6mOyiZGBse9XL7DCAjVeUSTeakDcpD
-         PZXGCavACYdGOM3D7bm9c3ekUvkeFq7raKkOCO98LBGTKwNg8A2Xm0Qh49KpyJ2WmsM3
-         jPHMkS6k2ZgvwmVQTUxH9+ff+YDhm7jHFbL10LW5ToTT+rcYKEHXXGR8S15AZC5NucnU
-         TDyxMKCeglsZNptTbBxthyE4vxfEVwOSvWCqIq26AbAfOjFG7AiefHp2VAvXfZcRg2NK
-         PZDs2+W2KV/4z0n88Kjen1XvaUiA6tXX+V8F/Nvq79P9nSN5fQH6cKhkEDiTG4KYmzlj
-         ekZA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zkwjuzu/UEKpmkjFauairkz2xJGPfJcFw7WQ01oT7fM=;
+        b=hm+efKeJx76zpncufMIDoS7XbQ/pH6APfSa4+uwdfozG2x1ps5u32dhGrx2XLCmo68
+         azTMJHcziVpOtMoibvaz7k48lORBsRDz1HzIiQjmNf0E47pRnqW/ILSAMby1cHvciQeo
+         hvjzQS+HYr19JPFrKABPeXCX2lX3kRXnvS+FwnC8sjp5LX2hkoPglFNXKuc8KSM8IjVB
+         NBiQ49LQduBsiLoJURFLCIRh/cMdrmPKKdxYet4IAuMZQF0SX+4ACkvS/XRJOfocxU9D
+         HwVdLtjYWCscK44qjQ/vuWHoxzDbfqcDtMnJ8N9ZZBnsLxNV3EIcquLjCfuVqXOV9j88
+         rK/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=2SeDtgkij5RzAn5Ydahnc+0UdTyRPe4w8M4KMznAQ8g=;
-        b=SjdkmY0Rx+FtpDd2MBJwHAaL0T59u4xNOznd1+oslxAHZu6S4cOzW8NC+o1QXd0AJM
-         r0Pff90orEiQ62/273Fvs8q3zQzzRX/Jn70oerWiaCm9+S9LpUyEakVqvQWjBcn0BMjE
-         clWIBFvkBHNIB+dZoOyYz/HbFlHAZts0JuHrLoirVtEDXBzvzIDBqMhGazocnbY+XZRQ
-         VgKb9g0bgnATl9RHIz7qnLHpLaHwYaAC6GGZu33smiJ/Fa5i/GxfIchiUmPgQKBiC9YL
-         dVtm9yZwYD44uD5ofgy/XAem8dVWfPvO8p/yf16L3XAEfjWGTGvgQRXGndufErkXmRXu
-         xX0Q==
-X-Gm-Message-State: AJcUukfbY4zj3EP7B0XDnc+cIe98UUCj4D08B0Apyo/3YVDFdv65bBig
-        7U05skx+CP697VVGUMPRsetU61KpKus=
-X-Google-Smtp-Source: ALg8bN4cm5KQ3sMo6L14NdEq5y/M9oWpfQci/cmdVMyBxBB4mig1v7Jy4UyC/tfGvqMEIYDV/6pOVQ==
-X-Received: by 2002:a2e:449b:: with SMTP id b27-v6mr9228371ljf.47.1548427135042;
-        Fri, 25 Jan 2019 06:38:55 -0800 (PST)
-Received: from localhost.localdomain (89-27-7-11.bb.dnainternet.fi. [89.27.7.11])
-        by smtp.gmail.com with ESMTPSA id 65sm1510637lfp.55.2019.01.25.06.38.53
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 25 Jan 2019 06:38:53 -0800 (PST)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zkwjuzu/UEKpmkjFauairkz2xJGPfJcFw7WQ01oT7fM=;
+        b=RdHaulB7YSt37x7wRQKZ5KOQluORz75tYUhAPnVEJx+YZQ2T6/+5nJ4nDXA7mwWE0g
+         aPrXQqsdwfFzJz77V59jDMb8VD44e/Ql5RFNQVNURijGJNKI2Mkau+gOLzj3vMsJJy4A
+         0iwkoWgAKK+o2ykcMI+nT7tgiKMwOVcPTM93zQjp7+oSAgm9TP4zt+sgJLZsuzw8I3/V
+         EdtapqO2cCYmiG7p1bOU4l05fQ79cezFcevAxsvaIuxdP1Bng2Wr1D62FeXd/bdI0RJk
+         sKNZJCvOFeTpOOrD0J23df+ODngxmnVH4TsDM7c9DTMpIa6bcCICj+oA3b5lJhSfFWGM
+         WlZQ==
+X-Gm-Message-State: AHQUAubBmCKGhvGZS4pnGq7fYXDaiL0r91T+jv64mIKV6Y7pN93LtYRf
+        WxcQ76YNOOJgibaE/FpS+p9kPcKBqYeFd03nLcA=
+X-Google-Smtp-Source: AHgI3IYtwVo4arF6M6SkpIWl9UDSgwB5+0wcQImCFDZhJW4Nus31EUuDtOXAHlmHCA+xkpp7kzddIlMv4RiiCB8J5ac=
+X-Received: by 2002:aca:d509:: with SMTP id m9mr1485462oig.82.1548427280131;
+ Fri, 25 Jan 2019 06:41:20 -0800 (PST)
+MIME-Version: 1.0
+References: <CA+T8qpa+qHK7O6zr+a7CUysPzzR4jce7peCCcuOVN4J9TP6teQ@mail.gmail.com>
+ <CABBYNZKGS=AcqtgfFffLBWZX6pxOHmkpnXgW4ddr4hO58a_pHQ@mail.gmail.com>
+ <CA+T8qpb=w5gnYMWh2fv6Q61ssHs1hrvJ=0gh0murxQZsvbt5vA@mail.gmail.com>
+ <CABBYNZ+p_BLtLvWYm3A1gzYY8uo8F2S1evuYTfkg8SST8zfD=Q@mail.gmail.com> <CA+T8qpbbi+7=8bNdiJFstFTWHAUXmUYtcL6x4=PVLKsppb9GrQ@mail.gmail.com>
+In-Reply-To: <CA+T8qpbbi+7=8bNdiJFstFTWHAUXmUYtcL6x4=PVLKsppb9GrQ@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] doc/gatt-api: Add Handle property
-Date:   Fri, 25 Jan 2019 16:38:52 +0200
-Message-Id: <20190125143852.17424-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.17.2
+Date:   Fri, 25 Jan 2019 16:41:07 +0200
+Message-ID: <CABBYNZK3X6NM38qG20dGMJAjpUdD-nqyzLf+T1RYtsOxW=XLUQ@mail.gmail.com>
+Subject: Re: BlueZ 5.50: Browsing local GATT table
+To:     Youssif Saeed <youssif.am.saeed@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Youssif,
 
-When acting as server it is useful to select where to allocate the
-handle for an attribute so it can be restored in the same position when
-restarting the daemon or rebooting the system.
+On Thu, 24 Jan 2019, 17:07 Youssif Saeed <youssif.am.saeed@gmail.com wrote:
+>
+> On Mon, Jan 21, 2019 at 3:02 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Youssif,
+> > On Mon, Jan 21, 2019 at 3:57 PM Youssif Saeed
+> > <youssif.am.saeed@gmail.com> wrote:
+> > >
+> > > Hi Luiz
+> > >
+> > > On Mon, Jan 21, 2019 at 12:12 PM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > Hi Youssif,
+> > > >
+> > > > On Mon, Jan 21, 2019 at 1:05 PM Youssif Saeed
+> > > > <youssif.am.saeed@gmail.com> wrote:
+> > > > >
+> > > > > Hi
+> > > > >
+> > > > > Is there a tool/utility for browsing the local GATT table. I have so
+> > > > > far used "bluetoothctl info" as follows:-
+> > > > >
+> > > > > [bluetooth]menu gatt
+> > > > > [bluetooth]register-service 0xFFFF
+> > > > > [bluetooth]register-characteristic 0xAAAA read,write
+> > > > > [bluetooth]register-application
+> > > > > [bluetooth]back
+> > > > > [bluetooth]info
+> > > > > Controller 00:16:A4:09:31:11 (public)
+> > > > > Name: linuxvm
+> > > > > Alias: linuxvm
+> > > > > Class: 0x000c0000
+> > > > > Powered: yes
+> > > > > Discoverable: no
+> > > > > Pairable: yes
+> > > > > UUID: Headset AG                (00001112-0000-1000-8000-00805f9b34fb)
+> > > > > UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+> > > > > UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+> > > > > UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+> > > > > UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+> > > > > UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+> > > > > UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
+> > > > > UUID: Audio Sink                (0000110b-0000-1000-8000-00805f9b34fb)
+> > > > > UUID: Unknown                   (0000ffff-0000-1000-8000-00805f9b34fb)
+> > > > > UUID: Headset                   (00001108-0000-1000-8000-00805f9b34fb)
+> > > > > Modalias: usb:v1D6Bp0246d0532
+> > > > > Discovering: no
+> > > > >
+> > > > > However, this does not show the list of characteristics/descriptors
+> > > > > and their handles which is what I am after.
+> > > > >
+> > > > > I am using BlueZ 5.50 on an Ubuntu machine running Linux 4.15.0-43-generic.
+> > > >
+> > > > I guess you would be after the registered local attributes, command
+> > > > info doesn't print that only the UUID of the services, we could have
+> > > > then as part of list-attributes perhaps but it would only show the
+> > > > attributes register by that instance of bluetoothctl nothing else. As
+> > > > for the handles that is currently not exposed to the application, do
+> > > > you require them perhaps to restore them in the same location?
+> > > >
+> > > > --
+> > > > Luiz Augusto von Dentz
+> > >
+> > > Thanks for getting back to me. Yes I am after the registered local
+> > > attributes. We're working on PTS testing the BlueZ stack and a few
+> > > tests require you to submit handles for the local GATT
+> > > services/characteristics, which is why having this would be very
+> > > useful. In my personal opinion the output to the deprecated "gatttool
+> > > primary/characteristics/descriptors" is ideal for displaying all the
+> > > necessary information. Something similar to this but for the local
+> > > GATT table can be very beneficial for future users even outside the
+> > > scope of PTS testing.
+> >
+> > I will need to look into that, we actually intend to have this all
+> > automated with auto-pts:
+> >
+> > https://github.com/intel/auto-pts
+> >
+> > Though that is not complete for BlueZ, only Zephyr, and even in case
+> > of Zephyr we hardcoded the handles, but I agree it is better to
+> > somehow notify the handle back to the application. Also another thing
+> > that we might have to improve in the future is a way to pin services
+> > so even if one reboot the system, or just restart bluetoothd, the
+> > application can have its services in the same region once again.
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+> Thanks for the link. I've seen the auto-pts project and it's quite
+> impressive. It's definitely helpful when doing PTS tests but as you
+> said it is missing a big portion for the BlueZ stack.
+>
+> Is there a place where we can post feature requests and unconfirmed
+> bugs, or is this mailing list the best location for that?
+>
 
-In order to do that the application also needs to know in which handle
-the attribute is allocated the very first time it is registered, this
-also allows for a better integration with PTS and tools like auto-pts
-which needs to know the handles where the attributes have been
-allocated.
----
- doc/gatt-api.txt | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+You can file issues in github direcly.
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index 8dda60b8a..491eb026a 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -50,6 +50,14 @@ Properties	string UUID [read-only]
- 			Array of object paths representing the included
- 			services of this service.
- 
-+		uint16 Handle [read-write, optional] (Server Only)
-+
-+			Service handle. When available in the server it
-+			would attempt to use to allocate into the database
-+			which may fail, to auto allocate the value 0x0000
-+			shall be used which will cause the allocated handle to
-+			be set once registered.
-+
- 
- Characteristic hierarchy
- ========================
-@@ -257,6 +265,14 @@ Properties	string UUID [read-only]
- 				"secure-write" (Server only)
- 				"authorize"
- 
-+		uint16 Handle [read-write, optional] (Server Only)
-+
-+			Characteristic handle. When available in the server it
-+			would attempt to use to allocate into the database
-+			which may fail, to auto allocate the value 0x0000
-+			shall be used which will cause the allocated handle to
-+			be set once registered.
-+
- Characteristic Descriptors hierarchy
- ====================================
- 
-@@ -332,6 +348,14 @@ Properties	string UUID [read-only]
- 				"secure-write" (Server Only)
- 				"authorize"
- 
-+		uint16 Handle [read-write, optional] (Server Only)
-+
-+			Characteristic handle. When available in the server it
-+			would attempt to use to allocate into the database
-+			which may fail, to auto allocate the value 0x0000
-+			shall be used which will cause the allocated handle to
-+			be set once registered.
-+
- GATT Profile hierarchy
- =====================
- 
--- 
-2.17.2
+>
+> I think it will be handy as well to report the handle back for remote
+> services/characteristics. As an example, this is the response for
+> "list-attributes":-
+>
+> Primary Service
+>         /org/bluez/hci0/dev_00_1B_DC_08_0A_D4/service0014
+>         00001801-0000-1000-8000-00805f9b34fb
+>         Generic Attribute Profile
+> Characteristic
+>         /org/bluez/hci0/dev_00_1B_DC_08_0A_D4/service0014/char0015
+>         00002a05-0000-1000-8000-00805f9b34fb
+>         Service Changed
+>
+> Unfortunately there are many PTS tests that list multiple attributes
+> with the same UUID but different handles. This is rare for everyday
+> application but it is not impossible. Again, the output of the
+> deprecated "gatttool primary/characteristics/descriptors" showed all
+> the necessary information including the properties and permissions,
+> and it would be extremely useful if something similar was implemented
+> to bluetoothctl.
 
+Ive send an RFC regarding that, please have a look if that makes sense.
