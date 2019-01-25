@@ -2,169 +2,151 @@ Return-Path: <SRS0=pNHN=QB=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E637C282C3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 00:13:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A12C282C3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 00:55:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3FF19218D3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 00:13:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA018218B0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jan 2019 00:55:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nX48F4Nk"
+	dkim=pass (2048-bit key) header.d=endlessm-com.20150623.gappssmtp.com header.i=@endlessm-com.20150623.gappssmtp.com header.b="qdOLVVlr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728031AbfAYANC (ORCPT
+        id S1728220AbfAYAzf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Jan 2019 19:13:02 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:42224 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726517AbfAYANB (ORCPT
+        Thu, 24 Jan 2019 19:55:35 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:43903 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726815AbfAYAzc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Jan 2019 19:13:01 -0500
-Received: by mail-pl1-f193.google.com with SMTP id y1so3656136plp.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jan 2019 16:13:01 -0800 (PST)
+        Thu, 24 Jan 2019 19:55:32 -0500
+Received: by mail-qt1-f196.google.com with SMTP id i7so8956939qtj.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jan 2019 16:55:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=B2qbOwfaABSqBpeERv2H4hCD0lY4pVpTYgc+0fjiL7s=;
-        b=nX48F4NkkfAdPI+Jh1GDRQ/ZLXRwonHLYlRA6rT+ZqK50TIcoKhNL1d84LG5smC4Au
-         2WRLewodvMWdCw6U9fuO+EHtXB9brR6+dYfvrc7lSTI2qVd/JMaRXfHYBFIXPyV1nFtU
-         m5xP/C0K7vT4qoQEJG4/KwAnPzt+ycQscRevQ=
+        d=endlessm-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5enGz62sQmbz9edqo02aKojbyGTmWpcSj4kNFI14c48=;
+        b=qdOLVVlrnzw6XPC6XFds6iZJclnlBXpv90zitECXT7HYjfoD+GdoUMol4c4AV+wte3
+         GBORMDcRC5KRETFVwwxY3HSgoGo9jYIsk1utyeLVzA8y7KF+fBd5bw6gu6MGIgZLgxIN
+         5h/lKtAhK/oVdxKNUrKvQLiCK2PI7zJFSf2B/H9N51XGxaJQy/1AA2zXr8G+fBBsguHP
+         SVbIRi3B/tsv4UHywiw5fujxpTIROVbNDREig+mORzdGMk6M/Nt7bDsbMEOEgg/kMItN
+         zBigBYnegOHfNzl1Mf2x10tX82fFU5UNcpZ99PqLqmYr1gcIdbxZOXCeRDF8u5yJpioW
+         lp0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=B2qbOwfaABSqBpeERv2H4hCD0lY4pVpTYgc+0fjiL7s=;
-        b=NJFime3RbnkTYw6+4k/4ji4/jtlrcMgeDEVZjDKcbalbeyWlocmS2S78up0fVb+IEj
-         Sbb3RBffRHR/cnqNptVDQm5eWUQ2RfpdhRLDPZCskR8bPhI3JCC7HqTXdfHrsDB6qeqv
-         ZA338CyB+f+mAk4nudOdP7GRo9QpQsJg/k+HGDVnyO1kA8NdvK6IsgNYxKVu+tWz0QCD
-         495c5VdOk5K/gT6HPRMasN/105GMIBjE7JZGAOYDVmyTmtE9F3dRuIiUN/5dKEDV57xk
-         UcbvfXfbIas+p/pK98b6ROREUFMH4ufXpVCif7yu8rx8RqreEc0KpDRA3kvqUCuYdlZz
-         v1Zw==
-X-Gm-Message-State: AJcUukcGEtUbOzLqAzFVF5ffBPJxt4w9qYojSu6PY3y2Sl6MfOxnwgS1
-        /7GarF2yOhTXhqIbGeV2JKhrHA==
-X-Google-Smtp-Source: ALg8bN7d3d+1eD3qzuGZ+x5YCQncngun3uHDkFjWHaIRMdyKU/t8VsGIXFsRqI97RnxvBd7V5GklbA==
-X-Received: by 2002:a17:902:780c:: with SMTP id p12mr8452972pll.197.1548375181020;
-        Thu, 24 Jan 2019 16:13:01 -0800 (PST)
-Received: from localhost ([2620:15c:202:1:75a:3f6e:21d:9374])
-        by smtp.gmail.com with ESMTPSA id a4sm24702452pgv.70.2019.01.24.16.13.00
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 24 Jan 2019 16:13:00 -0800 (PST)
-Date:   Thu, 24 Jan 2019 16:12:59 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v9 2/3] Bluetooth: hci_qca: Deassert RTS while baudrate
- change command
-Message-ID: <20190125001259.GB81583@google.com>
-References: <20190124120808.8275-1-bgodavar@codeaurora.org>
- <20190124120808.8275-3-bgodavar@codeaurora.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5enGz62sQmbz9edqo02aKojbyGTmWpcSj4kNFI14c48=;
+        b=hosf4x/M0juXw6DVXzBM0UN/eJD+XLmTfpBvg7GlNbmRDvR6nmjrSFMMijYkSJu0Sl
+         OucZl+F0jUQlJmk/cqMO6oSz2cEpXbF/GHVS7szcyA7ju+OzO8edN3EsqNNBxDExhIBt
+         2Fid0EIK3q+T846iXvcUmCbVfzVPxOXy4lBubYZz90P168eFkftcyYCJuUXwWF5sVQwo
+         pgzaW2/by+avoY9wJWScsQlLBcXw7PAmdhYE32lu2EmK8lSGc4ewPtKZdtNjz83I5shm
+         qDLpgRJycXQbJLCkR5ca6ba5kSIXGON7pFnIZT7Mr3+bzz1rcapJ/CJQzssFmXf4JgOO
+         fDNg==
+X-Gm-Message-State: AJcUukewvhCxiTpEYmdaq531BZI0N0EHpJTQBhl1YsffGam9AztVVb8R
+        EsN6QLn3GFpuQG6tY0HSvQiCbJSOOuwOqtS+MvggRg==
+X-Google-Smtp-Source: ALg8bN5yG71aFuADBWTiDdDT9OAJ3H1mZTMjwO3DOjNroiVwub2H+Vq9MVZMIpYRZPYFNlZLfI9/gIARzbmlpRfqikA=
+X-Received: by 2002:a0c:e40a:: with SMTP id o10mr8045903qvl.197.1548377731083;
+ Thu, 24 Jan 2019 16:55:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20190124120808.8275-3-bgodavar@codeaurora.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190124152310.29717-1-kai.heng.feng@canonical.com> <20190124152310.29717-3-kai.heng.feng@canonical.com>
+In-Reply-To: <20190124152310.29717-3-kai.heng.feng@canonical.com>
+From:   Daniel Drake <drake@endlessm.com>
+Date:   Fri, 25 Jan 2019 08:55:20 +0800
+Message-ID: <CAD8Lp47YpoVeDheK3pi0CcSJTdh2jSVcM8V9T_zmu=7deXszOw@mail.gmail.com>
+Subject: Re: [PATCH 3/3] Bluetooth: btrtl: Skip initialization if firmware is
+ already loaded
+To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Bluetooth mailing list 
+        <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+On Thu, Jan 24, 2019 at 11:23 PM Kai-Heng Feng
+<kai.heng.feng@canonical.com> wrote:
+> Realtek bluetooth may not work after reboot:
+> [   12.446130] Bluetooth: hci0: RTL: rtl: unknown IC info, lmp subver a99e, hci rev 826c, hci ver 0008
+>
+> The power is not cut during system reboot, so the firmware is kept in
+> Bluetooth controller.
+>
+> Realtek bluetooth doesn't have the ability to check firmware loading
+> status. but the version queried by HCI_OP_READ_LOCAL_VERSION will be
+> different if firmware is already loaded. Realtek's own fork, rtk_btusb
+> also use this method to detect the loading status.
+>
+> So let's assume the firmware is already loaded when we can't find
+> matching IC info.
 
-On Thu, Jan 24, 2019 at 05:38:07PM +0530, Balakrishna Godavarthi wrote:
-> This patch will help to stop frame reassembly errors while changing
-> the baudrate. This is because host send a change baudrate request
-> command to the chip with 115200 bps, Whereas chip will change their
-> UART clocks to the enable for new baudrate and sends the response
-> for the change request command with newer baudrate, On host side
-> we are still operating in 115200 bps which results of reading garbage
-> data. Here we are pulling RTS line, so that chip we will wait to send data
-> to host until host change its baudrate.
-> 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> Tested-by: Matthias Kaehlcke <mka@chromium.org>
-> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+This logic was already present in the driver - but it looks like this
+regressed at this point:
+
+commit 26503ad25de8c7c93a2037f919c2e49a62cf65f1
+Author: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date:   Thu Aug 2 16:57:13 2018 +0200
+
+    Bluetooth: btrtl: split the device initialization into smaller parts
+
+After your patch it is effectively there in two places now, since it
+is also in btrtl_download_firmware() (although not really effective
+after the above commit). I wonder if that can be cleaned up to avoid
+duplication.
+
+Regarding the other patches that move away from the style of returning
+either a useful value or an error, is this purely a stylistic thing or
+is it needed for your 3rd patch? I don't have strong feelings either
+way but I have the impression that the currently implemented approach
+is a common style within kernel code and I don't see benefit in
+splitting off a separate out parameter.
+
+Daniel
+
+
+> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=201921
+> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
 > ---
-> Changes in v9:
->  * disabled flow control while setting the baudrate of HOST and chip.
-> ---
->  drivers/bluetooth/hci_qca.c | 24 +++++++++++++-----------
->  1 file changed, 13 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index c08f4d105e73..6b5bcd44e24c 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -964,7 +964,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  	struct hci_uart *hu = hci_get_drvdata(hdev);
->  	struct qca_data *qca = hu->priv;
->  	struct sk_buff *skb;
-> -	struct qca_serdev *qcadev;
->  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
->  
->  	if (baudrate > QCA_BAUDRATE_3200000)
-> @@ -978,13 +977,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  		return -ENOMEM;
->  	}
->  
-> -	/* Disabling hardware flow control is mandatory while
-> -	 * sending change baudrate request to wcn3990 SoC.
-> -	 */
-> -	qcadev = serdev_device_get_drvdata(hu->serdev);
-> -	if (qcadev->btsoc_type == QCA_WCN3990)
-> -		hci_uart_set_flow_control(hu, true);
-> -
->  	/* Assign commands to change baudrate and packet type. */
->  	skb_put_data(skb, cmd, sizeof(cmd));
->  	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-> @@ -1000,9 +992,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
->  	set_current_state(TASK_RUNNING);
->  
-> -	if (qcadev->btsoc_type == QCA_WCN3990)
-> -		hci_uart_set_flow_control(hu, false);
-> -
->  	return 0;
+>  drivers/bluetooth/btrtl.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> index c36f500d8313..e2f89d57dd14 100644
+> --- a/drivers/bluetooth/btrtl.c
+> +++ b/drivers/bluetooth/btrtl.c
+> @@ -546,9 +546,10 @@ int btrtl_initialize(struct hci_dev *hdev,
+>                                             hdev->bus);
+>
+>         if (!btrtl_dev->ic_info) {
+> -               rtl_dev_err(hdev, "rtl: unknown IC info, lmp subver %04x, hci rev %04x, hci ver %04x",
+> -                           lmp_subver, hci_rev, hci_ver);
+> -               return -EINVAL;
+> +               rtl_dev_info(hdev, "rtl: unknown IC info, lmp subver %04x, hci rev %04x, hci ver %04x",
+> +                            lmp_subver, hci_rev, hci_ver);
+> +               rtl_dev_info(hdev, "rtl: firmware may be already loaded, or it's an unsupported IC.");
+> +               return 0;
+>         }
+>
+>         if (btrtl_dev->ic_info->has_rom_version) {
+> @@ -621,7 +622,8 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+>         if (ret)
+>                 return ret;
+>
+> -       ret = btrtl_download_firmware(hdev, &btrtl_dev);
+> +       if (btrtl_dev.ic_info)
+> +               ret = btrtl_download_firmware(hdev, &btrtl_dev);
+>
+>         return ret;
 >  }
->  
-> @@ -1089,6 +1078,7 @@ static int qca_check_speeds(struct hci_uart *hu)
->  static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  {
->  	unsigned int speed, qca_baudrate;
-> +	struct qca_serdev *qcadev;
->  	int ret;
->  
->  	if (speed_type == QCA_INIT_SPEED) {
-> @@ -1100,6 +1090,15 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  		if (!speed)
->  			return 0;
->  
-> +		/* Deassert RTS while changing the baudrate of chip and host.
-> +		 * This will prevent chip from transmitting its response with
-> +		 * the new baudrate while the host port is still operating at
-> +		 * the old speed.
-> +		 */
-
-It is not necessarily evident which action deasserts RTS, I suggest to
-rephrase it to something like:
-
-"Disable flow control for wcn3990 to deassert RTS while ... "
-
-> +		qcadev = serdev_device_get_drvdata(hu->serdev);
-> +		if (qcadev->btsoc_type == QCA_WCN3990)
-> +			hci_uart_set_flow_control(hu, true);
-> +
->  		qca_baudrate = qca_get_baudrate_value(speed);
->  		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
->  		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
-
-flow control should be re-enabled in the error path.
-
-Cheers
-
-Matthias
+> --
+> 2.17.1
+>
