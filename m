@@ -2,32 +2,31 @@ Return-Path: <SRS0=qwpb=QC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F3CC282C7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 14:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CABFDC282C7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 14:29:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84DD521908
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 14:26:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 958FD218B0
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 14:29:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=davidjohnsummers.uk header.i=@davidjohnsummers.uk header.b="oeerU8RW"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=davidjohnsummers.uk header.i=@davidjohnsummers.uk header.b="2cl4ygWU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726070AbfAZO0r (ORCPT
+        id S1726106AbfAZO3C (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Jan 2019 09:26:47 -0500
-Received: from mail-gw.unlimitedwebhosting.co.uk ([149.255.60.84]:47840 "EHLO
+        Sat, 26 Jan 2019 09:29:02 -0500
+Received: from mail-gw.unlimitedwebhosting.co.uk ([149.255.60.88]:38108 "EHLO
         mail-gw.unlimitedwebhosting.co.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726052AbfAZO0q (ORCPT
+        by vger.kernel.org with ESMTP id S1726084AbfAZO3C (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Jan 2019 09:26:46 -0500
+        Sat, 26 Jan 2019 09:29:02 -0500
 Received: from uwhbsf01.unlimitedwebhosting.co.uk (mail-gw.unlimitedwebhosting.co.uk [149.255.60.72])
-        by mail-gw.unlimitedwebhosting.co.uk (Postfix) with ESMTPS id A5067602D3F0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Jan 2019 14:26:44 +0000 (GMT)
-X-ASG-Debug-ID: 1548512803-05541359746d5330001-Y6scnF
-Received: from cloud706.unlimitedwebhosting.co.uk (no-dns-yet.unlimited.uk.net [149.255.62.7]) by uwhbsf01.unlimitedwebhosting.co.uk with ESMTP id bpHdA2UVU1B2Yryg (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Sat, 26 Jan 2019 14:26:43 +0000 (GMT)
+        by mail-gw.unlimitedwebhosting.co.uk (Postfix) with ESMTPS id B1F6A602D3DF
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Jan 2019 14:29:00 +0000 (GMT)
+X-ASG-Debug-ID: 1548512940-055413120a7707fa0001-Y6scnF
+Received: from cloud706.unlimitedwebhosting.co.uk (no-dns-yet.unlimited.uk.net [149.255.62.7]) by uwhbsf01.unlimitedwebhosting.co.uk with ESMTP id 5GyKw09K3j3GPGjL (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Sat, 26 Jan 2019 14:29:00 +0000 (GMT)
 X-Barracuda-Envelope-From: beagleboard@davidjohnsummers.uk
 X-Barracuda-Effective-Source-IP: no-dns-yet.unlimited.uk.net[149.255.62.7]
 X-Barracuda-Apparent-Source-IP: 149.255.62.7
@@ -37,37 +36,33 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=MKZIkyDMt8D9hlQ5bTlP9xPzKYmuaNxJDJgJ8EsS4Ps=; b=oeerU8RWDm1K+8mMY//8Yqw4nc
-        caD5aRf3CanjDlnO3hKcwD5d/exfqahb1PSp7d070HbvBpcM10hg+ioLKOU+jQcjD7UvdXwHzqSHJ
-        7ERMvsWG5/wGCa8odjIrygTbvj8oO4LlHaahtU4qAfUk/kTgClHL5h0r7jLzKqnzGaDn1+q/NkX+H
-        QWYsVUNjTB7aX2nBQy2/p06E7ZK14wl9XAJfotqnK40B5VWS14QwfmOD6s+uT8JlzDL7HZ1wBgD9x
-        CWV/7VfuUGVVt6zGdiYlSMjDjPseWQ1Tz/YbCCSpDEgeQa7UB4fibzR5zwi/yg05C4mVwS+9aIf6o
-        x9QRwUFg==;
-Received: from [87.113.131.230] (port=39480 helo=[192.168.2.187])
+        bh=1scTvgr80A23xIvV/8ok55Ux9jO4CmLVyK/zv9BSDCs=; b=2cl4ygWUBoO2cps3vwKu+hOSyy
+        /6iELXTqoq/vtEbGg6MLwot0B2bz4p/9pWWE1XEQkK/VdNR2qjOaBLq1O7wAzTr37xiKPFyAhRcUS
+        jfrBeysGr+9pDCmaiFj2wx1DOGnrA+eg4z+i4IS1HG0Fhyw8pnR05vxh92CglfGqFqxslacp9A4Ug
+        9hh8fdWSH0unuknQ4nzGh48wt136iWCSyuICPFTOYKbR42Zc4VHOCFSmu3p1G+p32r2lytsH2Rayk
+        yfrP55OPcPVxZU5KxldCgL7gdDW8HmVcjzMKV86RY0bUnf6zEUOmzLX0Rh0Oa6oTRvFjFa5f6EfSu
+        xasESMaw==;
+Received: from [87.113.131.230] (port=39488 helo=[192.168.2.187])
         by cloud706.unlimitedwebhosting.co.uk with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
         (Exim 4.91)
         (envelope-from <beagleboard@davidjohnsummers.uk>)
-        id 1gnOuw-000CJ7-K6; Sat, 26 Jan 2019 14:26:42 +0000
-Subject: Re: [PATCH v4 2/2] dt-bindings: Create the file for Realtek Bluetooth
- serial devices
-To:     Rob Herring <robh+dt@kernel.org>
-X-ASG-Orig-Subj: Re: [PATCH v4 2/2] dt-bindings: Create the file for Realtek Bluetooth
- serial devices
-Cc:     Mark Rutland <mark.rutland@arm.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        devicetree@vger.kernel.org
+        id 1gnOx9-000Clr-1X; Sat, 26 Jan 2019 14:28:59 +0000
+Subject: Re: [PATCH v4 1/2] Bluetooth: hci_h5: Add the Realtek compatible
+ flags for the device tree
+To:     David Summers <beagleboard@davidjohnsummers.uk>,
+        robh+dt@kernel.org, mark.rutland@arm.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com
+X-ASG-Orig-Subj: Re: [PATCH v4 1/2] Bluetooth: hci_h5: Add the Realtek compatible
+ flags for the device tree
+Cc:     linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org
 References: <20190121203928.32723-1-beagleboard@davidjohnsummers.uk>
- <20190121203928.32723-2-beagleboard@davidjohnsummers.uk>
- <CAL_Jsq+9zjPaDiJ0Uynp9p7WpH-NK-sT91vUm-+R7D_me8a9Mw@mail.gmail.com>
 From:   David Summers <beagleboard@davidjohnsummers.uk>
-Message-ID: <712d0ad2-0003-881c-b066-9462d3d8fa11@davidjohnsummers.uk>
-Date:   Sat, 26 Jan 2019 14:26:39 +0000
+Message-ID: <5a99337a-c33b-7dd6-dbdb-6945ec976ea4@davidjohnsummers.uk>
+Date:   Sat, 26 Jan 2019 14:28:58 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.3
 MIME-Version: 1.0
-In-Reply-To: <CAL_Jsq+9zjPaDiJ0Uynp9p7WpH-NK-sT91vUm-+R7D_me8a9Mw@mail.gmail.com>
+In-Reply-To: <20190121203928.32723-1-beagleboard@davidjohnsummers.uk>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-PH
@@ -82,143 +77,63 @@ X-Source:
 X-Source-Args: 
 X-Source-Dir: 
 X-Barracuda-Connect: no-dns-yet.unlimited.uk.net[149.255.62.7]
-X-Barracuda-Start-Time: 1548512803
+X-Barracuda-Start-Time: 1548512940
 X-Barracuda-Encrypted: ECDHE-RSA-AES256-GCM-SHA384
 X-Barracuda-URL: https://149.255.60.72:443/cgi-mod/mark.cgi
 X-Virus-Scanned: by bsmtpd at unlimitedwebhosting.co.uk
-X-Barracuda-Scan-Msg-Size: 5549
+X-Barracuda-Scan-Msg-Size: 1331
 X-Barracuda-BRTS-Status: 1
-X-Barracuda-Spam-Score: 0.00
-X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=2.0 tests=
+X-Barracuda-Spam-Score: 0.50
+X-Barracuda-Spam-Status: No, SCORE=0.50 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=2.0 tests=BSF_SC0_SA_TO_FROM_ADDR_MATCH
 X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.66440
         Rule breakdown below
          pts rule name              description
         ---- ---------------------- --------------------------------------------------
+        0.50 BSF_SC0_SA_TO_FROM_ADDR_MATCH Sender Address Matches Recipient
+                                   Address
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear All,
+This patch has been withdrawn.
 
-OK - spent some time last night and today reading 
-/Documentation/devicetree/bindings/pinctrl/pinctrl-bindings.txt and 
-/Documentation/devicetree/bindings/serial/serial.txt; reviewing the Asus 
-Tinker Board device tree, and the comments. What is clear:
-
- 1. I do not have the time available to learn in detail the preferred
-    linux style of device tree
- 2. The example I gave was for the ASUS Tinker Board, taken from the
-    rk3288-miniarm.dts
- 3. The current ASUS Tinker Board device tree is a patch done by ASUS
-    for debian:
-    https://github.com/TinkerBoard/debian_kernel/blob/develop/arch/arm/boot/dts/rk3288-miniarm.dts
- 4. This device tree is non standard, and not suitable for inclusion in
-    mainline
- 5. This device tree is the only really device tree available for the
-    ASUS Tinker Board (S)
- 6. The schematic for the ASUS Tinker Board is available on:
-    https://www.asus.com/uk/Single-Board-Computer/Tinker-Board/
- 7. The schematic is not detailed, it for example does not show how
-    Bluetooth and Wi-Fi are wired
- 8. The only hints on wiring are in the ASUS developed patches to the
-    debian device tree
- 9. The documentation for realtek Bluetooth will only be accepted with
-    an example that is complete:
-    https://www.spinics.net/lists/linux-bluetooth/msg78545.html
-10. Marcel has only had major problem with the first version of the
-    patch. Since changes made to hci_h5.c his only problem has the
-    naming of the compatible names, where he needs an Ack from Rob:
-    https://www.spinics.net/lists/linux-bluetooth/msg78637.html
-11. Marcel needs the device tree compatible hooks documented:
-    https://www.spinics.net/lists/linux-bluetooth/msg78445.html
-12. Now it is clear that I don't have time to do documentation, of the
-    required standard, that is applicable to the ASUS Tinker Board (S)
-13. So it is with regret that on reflection I have decided to withdraw
-    this patchset
-
-This to my mind is a pity, ASUS Tinker Board (S) uses currently don't 
-have good mainline support, most use the debian/ASUS rk3288-miniarm.dts 
-device tree. Without mainlining, it is very hard to support this board 
-in distributions like Arm Arch. But its also clear that I am not the 
-person to mainline the support. I neither have the knowledge of the 
-device tree. Access to proper schematics for the device. Nor the time 
-available to do this.
-
-Hopefully someone else will take up mainlining these boards. I hope the 
-bits I've done will at least give someone else ideas on how to proceed, 
-and that they will be more successful than I. I'll probably keep 
-learning the preferred device tree vocabulary and grammar - but at a 
-slow pace as time allows.
-
-Thank you all for your time and help,
-
-David Summers
-
-On 25/01/2019 19:46, Rob Herring wrote:
-> On Mon, Jan 21, 2019 at 2:39 PM David Summers
-> <beagleboard@davidjohnsummers.uk> wrote:
->> With the changes requested by Marcel Holtmann and Rob Herring.
->>
->> Capitalisation as requested.
-> Write something that makes sense for the git history. The above 2
-> lines are not useful information.
+On 21/01/2019 20:39, David Summers wrote:
+> With the changes requested by Marcel Holtmann and Rob Herring.
 >
->> Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
->> ---
->>   .../bindings/net/realtek-bluetooth-serial.txt | 32 +++++++++++++++++++
->>   1 file changed, 32 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
->>
->> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
->> new file mode 100644
->> index 000000000000..2eddde1a0cf1
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
->> @@ -0,0 +1,32 @@
->> +Realtek Bluetooth devices connected via a UART.
->> +These devices typically also have a WI-FI connected via SDIO - the
->> +compatible described here is used just for referencing the Bluetooth.
->> +
->> +- compatible: should be "realtek,<name>-bt"
->> +  except for "realtek,trl8761atv" - which only has a serial Bluetooth connection
->> +       "realtek,rtl8723as-bt"
->> +       "realtek,rtl8723bs-bt"
->> +       "realtek,rtl8723ds-bt"
->> +       "realtek,rtl8761atv"
->> +       "realtek,rtl8821as-bt"
->> +       "realtek,rtl8821cs-bt"
->> +       "realtek,rtl8822bs-bt"
->> +
->> +Example:
->> +
->> +&uart0 {
->> +       status = "okay";
-> Don't show 'status' in examples.
+> The patch is unchanged, but subject changed to the norm.
 >
->> +       pinctrl-0 = <&uart0_xfer>, <&uart0_cts>;
->> +       bluetooth {
->> +               compatible = "realtek,rtl8723bs-bt";
->> +               uart_rts_gpios = <&gpio4 19 GPIO_ACTIVE_LOW>;
-> We already have a standard property name and location for handling RTS
-> on a GPIO and this is not it.
+> Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
+> ---
+>   drivers/bluetooth/hci_h5.c | 16 ++++++++++++++++
+>   1 file changed, 16 insertions(+)
 >
->> +               pinctrl-names = "default","rts_gpio";
->> +               pinctrl-0 = <&uart0_rts>;
-> This belongs in the parent node.
->
->> +               pinctrl-1 = <&uart0_gpios>;
->> +               BT,reset_gpio    = <&gpio4 29 GPIO_ACTIVE_HIGH>;
->> +               BT,wake_gpio     = <&gpio4 26 GPIO_ACTIVE_HIGH>;
->> +               BT,wake_host_irq = <&gpio4 31 GPIO_ACTIVE_HIGH>;
-> All the above need to be documented. Putting in an example is not documented.
->
-> Drop the 'BT,' as the part preceding the comma should be a vendor name
-> if present and use '-' rather than '_' in property names.
->
-> 'reset-gpios' is the standard name for a reset gpio. An irq should use
-> the 'interrupts' binding even if connected to a GPIO on the host.
->
-> Rob
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index 8eede1197cd2..056ab2decccc 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -925,6 +925,22 @@ static struct h5_vnd rtl_vnd = {
+>   };
+>   #endif
+>   
+> +#ifdef CONFIG_OF
+> +static const struct of_device_id h5_of_match[] = {
+> +#ifdef CONFIG_BT_HCIUART_RTL
+> +       { .compatible = "realtek,rtl8723as-bt"},
+> +       { .compatible = "realtek,rtl8723bs-bt"},
+> +       { .compatible = "realtek,rtl8723ds-bt"},
+> +       { .compatible = "realtek,rtl8761atv"},
+> +       { .compatible = "realtek,rtl8821as-bt"},
+> +       { .compatible = "realtek,rtl8821cs-bt"},
+> +       { .compatible = "realtek,rtl8822bs-bt"},
+> +#endif
+> +       { }
+> +};
+> +MODULE_DEVICE_TABLE(of, h5_of_match);
+> +#endif
+> +
+>   #ifdef CONFIG_ACPI
+>   static const struct acpi_device_id h5_acpi_match[] = {
+>   #ifdef CONFIG_BT_HCIUART_RTL
 
 
