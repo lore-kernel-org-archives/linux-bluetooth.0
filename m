@@ -2,256 +2,223 @@ Return-Path: <SRS0=qwpb=QC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDDC4C282C7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 10:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F3CC282C7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 14:26:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A4B2921872
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 10:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84DD521908
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 14:26:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q6ZKevoK"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=davidjohnsummers.uk header.i=@davidjohnsummers.uk header.b="oeerU8RW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726326AbfAZKqW (ORCPT
+        id S1726070AbfAZO0r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Jan 2019 05:46:22 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:51020 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726165AbfAZKqW (ORCPT
+        Sat, 26 Jan 2019 09:26:47 -0500
+Received: from mail-gw.unlimitedwebhosting.co.uk ([149.255.60.84]:47840 "EHLO
+        mail-gw.unlimitedwebhosting.co.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726052AbfAZO0q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Jan 2019 05:46:22 -0500
-Received: by mail-wm1-f66.google.com with SMTP id n190so9087106wmd.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Jan 2019 02:46:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=V07GtudTSRg41GHhmCBFEJfgRNeLIqmecUDTxWTOp90=;
-        b=q6ZKevoKVWy19XQGIur8eXjdhz/XqZwCni6IIvS0dcMo9etlNViyac5j8WHE6CPkC3
-         WU6bciAWsNkzn7aXa1vy/+jODU+Xo9PjAXUC/G1olPsVpW65HHOpIFYwIgcXMiTOD93f
-         h+IuSQoIC2FpGMB+gaSAY1Rby0pWMWN1WkE26pU6aV0GGj8z4t9uUGtTqmMaR696Nbwc
-         4JTbwhKkJFb8Vq2gSQG3l+tmG6n3QJ0zVCHJiEQ+Q0oBmgVIQJhkXsKGtTzKdPlSx9OB
-         tlChNU/hBEROk++7Fq077ExP9oL0Mghu1S+1DOV07mnAOEotgLZC3gxSuExSqGCdQPOZ
-         qzhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=V07GtudTSRg41GHhmCBFEJfgRNeLIqmecUDTxWTOp90=;
-        b=tHjcXiq00/QnSuGpKEDAI8x8kGxtD8TQDn07B3UIFvgBylyk6nWQ95Xrz3diRivuL2
-         On25UFRAGmW7yq0PN1DnpTTqnhBD3wHAxXcmckPiPGYcqd3j07+qQz3AkeiRYF1qy9IR
-         pj0Tj7hJc/4y6NWLXsnO8s+oat15Ce+RvzTvQ2TOYHF9BKgifnk40PP1bVcJzteHTCBm
-         +Kc4pmvS1Wm8ST8XM0k6ufAOTjfnJG4Psm+p059ys5cIq/QAUgQYp+xvwVDRNWXZgI3m
-         1OMuRfv0tRkPgvkLsDMctoP7fRW44xEjNt7MqQJVYKDUmnATMUiVUZG9jQXmROkJYTkS
-         caoQ==
-X-Gm-Message-State: AJcUukdkrgxuA030o/PC/L2B78eUNzutWtWybZzmfLRpZV+WN/p8UQ7b
-        KPwWMwRrzuTGImiFy9J87BnP/5JA
-X-Google-Smtp-Source: ALg8bN6S64BJd4zxEldiH0wygHYltt4Vu4qHFKVOv7aOdL9oWaK+EZHoaM0KKU93EnXbrqP8Z+Jbyg==
-X-Received: by 2002:a1c:9692:: with SMTP id y140mr10396133wmd.67.1548499578775;
-        Sat, 26 Jan 2019 02:46:18 -0800 (PST)
-Received: from Pali-Latitude.lan ([2001:718:1e03:a01::1ca])
-        by smtp.gmail.com with ESMTPSA id t66sm34596305wme.15.2019.01.26.02.46.17
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 26 Jan 2019 02:46:18 -0800 (PST)
-From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] a2dp-codecs & avinfo: Simplify defintions and parsing of aptX family
-Date:   Sat, 26 Jan 2019 11:46:06 +0100
-Message-Id: <20190126104606.26486-1-pali.rohar@gmail.com>
-X-Mailer: git-send-email 2.11.0
+        Sat, 26 Jan 2019 09:26:46 -0500
+Received: from uwhbsf01.unlimitedwebhosting.co.uk (mail-gw.unlimitedwebhosting.co.uk [149.255.60.72])
+        by mail-gw.unlimitedwebhosting.co.uk (Postfix) with ESMTPS id A5067602D3F0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Jan 2019 14:26:44 +0000 (GMT)
+X-ASG-Debug-ID: 1548512803-05541359746d5330001-Y6scnF
+Received: from cloud706.unlimitedwebhosting.co.uk (no-dns-yet.unlimited.uk.net [149.255.62.7]) by uwhbsf01.unlimitedwebhosting.co.uk with ESMTP id bpHdA2UVU1B2Yryg (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Sat, 26 Jan 2019 14:26:43 +0000 (GMT)
+X-Barracuda-Envelope-From: beagleboard@davidjohnsummers.uk
+X-Barracuda-Effective-Source-IP: no-dns-yet.unlimited.uk.net[149.255.62.7]
+X-Barracuda-Apparent-Source-IP: 149.255.62.7
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=davidjohnsummers.uk; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=MKZIkyDMt8D9hlQ5bTlP9xPzKYmuaNxJDJgJ8EsS4Ps=; b=oeerU8RWDm1K+8mMY//8Yqw4nc
+        caD5aRf3CanjDlnO3hKcwD5d/exfqahb1PSp7d070HbvBpcM10hg+ioLKOU+jQcjD7UvdXwHzqSHJ
+        7ERMvsWG5/wGCa8odjIrygTbvj8oO4LlHaahtU4qAfUk/kTgClHL5h0r7jLzKqnzGaDn1+q/NkX+H
+        QWYsVUNjTB7aX2nBQy2/p06E7ZK14wl9XAJfotqnK40B5VWS14QwfmOD6s+uT8JlzDL7HZ1wBgD9x
+        CWV/7VfuUGVVt6zGdiYlSMjDjPseWQ1Tz/YbCCSpDEgeQa7UB4fibzR5zwi/yg05C4mVwS+9aIf6o
+        x9QRwUFg==;
+Received: from [87.113.131.230] (port=39480 helo=[192.168.2.187])
+        by cloud706.unlimitedwebhosting.co.uk with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.91)
+        (envelope-from <beagleboard@davidjohnsummers.uk>)
+        id 1gnOuw-000CJ7-K6; Sat, 26 Jan 2019 14:26:42 +0000
+Subject: Re: [PATCH v4 2/2] dt-bindings: Create the file for Realtek Bluetooth
+ serial devices
+To:     Rob Herring <robh+dt@kernel.org>
+X-ASG-Orig-Subj: Re: [PATCH v4 2/2] dt-bindings: Create the file for Realtek Bluetooth
+ serial devices
+Cc:     Mark Rutland <mark.rutland@arm.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        devicetree@vger.kernel.org
+References: <20190121203928.32723-1-beagleboard@davidjohnsummers.uk>
+ <20190121203928.32723-2-beagleboard@davidjohnsummers.uk>
+ <CAL_Jsq+9zjPaDiJ0Uynp9p7WpH-NK-sT91vUm-+R7D_me8a9Mw@mail.gmail.com>
+From:   David Summers <beagleboard@davidjohnsummers.uk>
+Message-ID: <712d0ad2-0003-881c-b066-9462d3d8fa11@davidjohnsummers.uk>
+Date:   Sat, 26 Jan 2019 14:26:39 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.3
+MIME-Version: 1.0
+In-Reply-To: <CAL_Jsq+9zjPaDiJ0Uynp9p7WpH-NK-sT91vUm-+R7D_me8a9Mw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-PH
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cloud706.unlimitedwebhosting.co.uk
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - davidjohnsummers.uk
+X-Get-Message-Sender-Via: cloud706.unlimitedwebhosting.co.uk: authenticated_id: davidjoh/from_h
+X-Authenticated-Sender: cloud706.unlimitedwebhosting.co.uk: beagleboard@davidjohnsummers.uk
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Barracuda-Connect: no-dns-yet.unlimited.uk.net[149.255.62.7]
+X-Barracuda-Start-Time: 1548512803
+X-Barracuda-Encrypted: ECDHE-RSA-AES256-GCM-SHA384
+X-Barracuda-URL: https://149.255.60.72:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at unlimitedwebhosting.co.uk
+X-Barracuda-Scan-Msg-Size: 5549
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Spam-Score: 0.00
+X-Barracuda-Spam-Status: No, SCORE=0.00 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=2.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.66440
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Reuse whole a2dp_aptx_t structure and defines as they are same for aptX Low
-Latency and aptX HD.
----
- profiles/audio/a2dp-codecs.h | 46 ++++++--------------------------------
- tools/avinfo.c               | 53 +++++++++++++-------------------------------
- 2 files changed, 22 insertions(+), 77 deletions(-)
+Dear All,
 
-diff --git a/profiles/audio/a2dp-codecs.h b/profiles/audio/a2dp-codecs.h
-index f31f3a311..4789e27ed 100644
---- a/profiles/audio/a2dp-codecs.h
-+++ b/profiles/audio/a2dp-codecs.h
-@@ -213,14 +213,6 @@
- #define APTX_LL_VENDOR_ID		0x0000000a
- #define APTX_LL_CODEC_ID		0x0002
- 
--#define APTX_LL_CHANNEL_MODE_MONO	0x01
--#define APTX_LL_CHANNEL_MODE_STEREO	0x02
--
--#define APTX_LL_SAMPLING_FREQ_16000	0x08
--#define APTX_LL_SAMPLING_FREQ_32000	0x04
--#define APTX_LL_SAMPLING_FREQ_44100	0x02
--#define APTX_LL_SAMPLING_FREQ_48000	0x01
--
- /* Default parameters for aptX Low Latency encoder */
- 
- /* Target codec buffer level = 180 */
-@@ -244,14 +236,6 @@
- #define APTX_HD_VENDOR_ID		0x000000D7
- #define APTX_HD_CODEC_ID		0x0024
- 
--#define APTX_HD_CHANNEL_MODE_MONO	0x1
--#define APTX_HD_CHANNEL_MODE_STEREO	0x2
--
--#define APTX_HD_SAMPLING_FREQ_16000	0x8
--#define APTX_HD_SAMPLING_FREQ_32000	0x4
--#define APTX_HD_SAMPLING_FREQ_44100	0x2
--#define APTX_HD_SAMPLING_FREQ_48000	0x1
--
- #define LDAC_VENDOR_ID			0x0000012d
- #define LDAC_CODEC_ID			0x00aa
- 
-@@ -360,25 +344,13 @@ typedef struct {
- } __attribute__ ((packed)) a2dp_faststream_t;
- 
- typedef struct {
--	a2dp_vendor_codec_t info;
--	uint8_t channel_mode:4;
--	uint8_t frequency:4;
-+	a2dp_aptx_t aptx;
- 	uint8_t bidirect_link:1;
- 	uint8_t has_new_caps:1;
- 	uint8_t reserved:6;
- 	a2dp_aptx_ll_new_caps_t new_caps[0];
- } __attribute__ ((packed)) a2dp_aptx_ll_t;
- 
--typedef struct {
--	a2dp_vendor_codec_t info;
--	uint8_t channel_mode:4;
--	uint8_t frequency:4;
--	uint8_t reserved0;
--	uint8_t reserved1;
--	uint8_t reserved2;
--	uint8_t reserved3;
--} __attribute__ ((packed)) a2dp_aptx_hd_t;
--
- #elif defined(__BYTE_ORDER) && defined(__BIG_ENDIAN) && \
- 	__BYTE_ORDER == __BIG_ENDIAN
- 
-@@ -430,25 +402,21 @@ typedef struct {
- } __attribute__ ((packed)) a2dp_faststream_t;
- 
- typedef struct {
--	a2dp_vendor_codec_t info;
--	uint8_t frequency:4;
--	uint8_t channel_mode:4;
-+	a2dp_aptx_t aptx;
- 	uint8_t reserved:6;
- 	uint8_t has_new_caps:1;
- 	uint8_t bidirect_link:1;
- 	a2dp_aptx_ll_new_caps_t new_caps[0];
- } __attribute__ ((packed)) a2dp_aptx_ll_t;
- 
-+#else
-+#error "Unknown byte order"
-+#endif
-+
- typedef struct {
--	a2dp_vendor_codec_t info;
--	uint8_t frequency:4;
--	uint8_t channel_mode:4;
-+	a2dp_aptx_t aptx;
- 	uint8_t reserved0;
- 	uint8_t reserved1;
- 	uint8_t reserved2;
- 	uint8_t reserved3;
- } __attribute__ ((packed)) a2dp_aptx_hd_t;
--
--#else
--#error "Unknown byte order"
--#endif
-diff --git a/tools/avinfo.c b/tools/avinfo.c
-index 42f539f43..852d7b67e 100644
---- a/tools/avinfo.c
-+++ b/tools/avinfo.c
-@@ -168,15 +168,8 @@ struct avdtp_content_protection_capability {
- 	uint8_t data[0];
- } __attribute__ ((packed));
- 
--static void print_aptx(a2dp_aptx_t *aptx, uint8_t size)
-+static void print_aptx_common(a2dp_aptx_t *aptx)
- {
--	printf("\t\tVendor Specific Value (aptX)");
--
--	if (size < sizeof(*aptx)) {
--		printf(" (broken)\n");
--		return;
--	}
--
- 	printf("\n\t\t\tFrequencies: ");
- 	if (aptx->frequency & APTX_SAMPLING_FREQ_16000)
- 		printf("16kHz ");
-@@ -192,6 +185,18 @@ static void print_aptx(a2dp_aptx_t *aptx, uint8_t size)
- 		printf("Mono ");
- 	if (aptx->channel_mode & APTX_CHANNEL_MODE_STEREO)
- 		printf("Stereo ");
-+}
-+
-+static void print_aptx(a2dp_aptx_t *aptx, uint8_t size)
-+{
-+	printf("\t\tVendor Specific Value (aptX)");
-+
-+	if (size < sizeof(*aptx)) {
-+		printf(" (broken)\n");
-+		return;
-+	}
-+
-+	print_aptx_common(aptx);
- 
- 	printf("\n");
- }
-@@ -242,21 +247,7 @@ static void print_aptx_ll(a2dp_aptx_ll_t *aptx_ll, uint8_t size)
- 		return;
- 	}
- 
--	printf("\n\t\t\tFrequencies: ");
--	if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_16000)
--		printf("16kHz ");
--	if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_32000)
--		printf("32kHz ");
--	if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_44100)
--		printf("44.1kHz ");
--	if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_48000)
--		printf("48kHz ");
--
--	printf("\n\t\t\tChannel modes: ");
--	if (aptx_ll->channel_mode & APTX_LL_CHANNEL_MODE_MONO)
--		printf("Mono ");
--	if (aptx_ll->channel_mode & APTX_LL_CHANNEL_MODE_STEREO)
--		printf("Stereo ");
-+	print_aptx_common(&aptx_ll->aptx);
- 
- 	printf("\n\t\tBidirectional link: %s",
- 			aptx_ll->bidirect_link ? "Yes" : "No");
-@@ -292,21 +283,7 @@ static void print_aptx_hd(a2dp_aptx_hd_t *aptx_hd, uint8_t size)
- 		return;
- 	}
- 
--	printf("\n\t\t\tFrequencies: ");
--	if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_16000)
--		printf("16kHz ");
--	if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_32000)
--		printf("32kHz ");
--	if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_44100)
--		printf("44.1kHz ");
--	if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_48000)
--		printf("48kHz ");
--
--	printf("\n\t\t\tChannel modes: ");
--	if (aptx_hd->channel_mode & APTX_HD_CHANNEL_MODE_MONO)
--		printf("Mono ");
--	if (aptx_hd->channel_mode & APTX_HD_CHANNEL_MODE_STEREO)
--		printf("Stereo ");
-+	print_aptx_common(&aptx_hd->aptx);
- 
- 	printf("\n");
- }
--- 
-2.11.0
+OK - spent some time last night and today reading 
+/Documentation/devicetree/bindings/pinctrl/pinctrl-bindings.txt and 
+/Documentation/devicetree/bindings/serial/serial.txt; reviewing the Asus 
+Tinker Board device tree, and the comments. What is clear:
+
+ 1. I do not have the time available to learn in detail the preferred
+    linux style of device tree
+ 2. The example I gave was for the ASUS Tinker Board, taken from the
+    rk3288-miniarm.dts
+ 3. The current ASUS Tinker Board device tree is a patch done by ASUS
+    for debian:
+    https://github.com/TinkerBoard/debian_kernel/blob/develop/arch/arm/boot/dts/rk3288-miniarm.dts
+ 4. This device tree is non standard, and not suitable for inclusion in
+    mainline
+ 5. This device tree is the only really device tree available for the
+    ASUS Tinker Board (S)
+ 6. The schematic for the ASUS Tinker Board is available on:
+    https://www.asus.com/uk/Single-Board-Computer/Tinker-Board/
+ 7. The schematic is not detailed, it for example does not show how
+    Bluetooth and Wi-Fi are wired
+ 8. The only hints on wiring are in the ASUS developed patches to the
+    debian device tree
+ 9. The documentation for realtek Bluetooth will only be accepted with
+    an example that is complete:
+    https://www.spinics.net/lists/linux-bluetooth/msg78545.html
+10. Marcel has only had major problem with the first version of the
+    patch. Since changes made to hci_h5.c his only problem has the
+    naming of the compatible names, where he needs an Ack from Rob:
+    https://www.spinics.net/lists/linux-bluetooth/msg78637.html
+11. Marcel needs the device tree compatible hooks documented:
+    https://www.spinics.net/lists/linux-bluetooth/msg78445.html
+12. Now it is clear that I don't have time to do documentation, of the
+    required standard, that is applicable to the ASUS Tinker Board (S)
+13. So it is with regret that on reflection I have decided to withdraw
+    this patchset
+
+This to my mind is a pity, ASUS Tinker Board (S) uses currently don't 
+have good mainline support, most use the debian/ASUS rk3288-miniarm.dts 
+device tree. Without mainlining, it is very hard to support this board 
+in distributions like Arm Arch. But its also clear that I am not the 
+person to mainline the support. I neither have the knowledge of the 
+device tree. Access to proper schematics for the device. Nor the time 
+available to do this.
+
+Hopefully someone else will take up mainlining these boards. I hope the 
+bits I've done will at least give someone else ideas on how to proceed, 
+and that they will be more successful than I. I'll probably keep 
+learning the preferred device tree vocabulary and grammar - but at a 
+slow pace as time allows.
+
+Thank you all for your time and help,
+
+David Summers
+
+On 25/01/2019 19:46, Rob Herring wrote:
+> On Mon, Jan 21, 2019 at 2:39 PM David Summers
+> <beagleboard@davidjohnsummers.uk> wrote:
+>> With the changes requested by Marcel Holtmann and Rob Herring.
+>>
+>> Capitalisation as requested.
+> Write something that makes sense for the git history. The above 2
+> lines are not useful information.
+>
+>> Signed-off-by: David Summers <beagleboard@davidjohnsummers.uk>
+>> ---
+>>   .../bindings/net/realtek-bluetooth-serial.txt | 32 +++++++++++++++++++
+>>   1 file changed, 32 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
+>> new file mode 100644
+>> index 000000000000..2eddde1a0cf1
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/realtek-bluetooth-serial.txt
+>> @@ -0,0 +1,32 @@
+>> +Realtek Bluetooth devices connected via a UART.
+>> +These devices typically also have a WI-FI connected via SDIO - the
+>> +compatible described here is used just for referencing the Bluetooth.
+>> +
+>> +- compatible: should be "realtek,<name>-bt"
+>> +  except for "realtek,trl8761atv" - which only has a serial Bluetooth connection
+>> +       "realtek,rtl8723as-bt"
+>> +       "realtek,rtl8723bs-bt"
+>> +       "realtek,rtl8723ds-bt"
+>> +       "realtek,rtl8761atv"
+>> +       "realtek,rtl8821as-bt"
+>> +       "realtek,rtl8821cs-bt"
+>> +       "realtek,rtl8822bs-bt"
+>> +
+>> +Example:
+>> +
+>> +&uart0 {
+>> +       status = "okay";
+> Don't show 'status' in examples.
+>
+>> +       pinctrl-0 = <&uart0_xfer>, <&uart0_cts>;
+>> +       bluetooth {
+>> +               compatible = "realtek,rtl8723bs-bt";
+>> +               uart_rts_gpios = <&gpio4 19 GPIO_ACTIVE_LOW>;
+> We already have a standard property name and location for handling RTS
+> on a GPIO and this is not it.
+>
+>> +               pinctrl-names = "default","rts_gpio";
+>> +               pinctrl-0 = <&uart0_rts>;
+> This belongs in the parent node.
+>
+>> +               pinctrl-1 = <&uart0_gpios>;
+>> +               BT,reset_gpio    = <&gpio4 29 GPIO_ACTIVE_HIGH>;
+>> +               BT,wake_gpio     = <&gpio4 26 GPIO_ACTIVE_HIGH>;
+>> +               BT,wake_host_irq = <&gpio4 31 GPIO_ACTIVE_HIGH>;
+> All the above need to be documented. Putting in an example is not documented.
+>
+> Drop the 'BT,' as the part preceding the comma should be a vendor name
+> if present and use '-' rather than '_' in property names.
+>
+> 'reset-gpios' is the standard name for a reset gpio. An irq should use
+> the 'interrupts' binding even if connected to a GPIO on the host.
+>
+> Rob
+
 
