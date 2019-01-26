@@ -2,229 +2,90 @@ Return-Path: <SRS0=qwpb=QC=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E03C282C7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 10:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 396A3C282C7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 10:24:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 01217217D7
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 10:15:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5B52217D7
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jan 2019 10:24:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CeFgyTLw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VdhbhoNB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726234AbfAZKPv (ORCPT
+        id S1726262AbfAZKY0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Jan 2019 05:15:51 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34171 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726143AbfAZKPv (ORCPT
+        Sat, 26 Jan 2019 05:24:26 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:40951 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726174AbfAZKY0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Jan 2019 05:15:51 -0500
-Received: by mail-wr1-f67.google.com with SMTP id f7so12813923wrp.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Jan 2019 02:15:49 -0800 (PST)
+        Sat, 26 Jan 2019 05:24:26 -0500
+Received: by mail-wm1-f68.google.com with SMTP id f188so8836278wmf.5
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Jan 2019 02:24:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=rfHb2DEIGpI+8Vk07/ubySXfh40QuvrW6cCf2FQNqoU=;
-        b=CeFgyTLwkHd8JRocS4hBazyyRnbsDCA63qMUBMMxFL3y9QqkIKjPUKsERyAyCR+ZmL
-         ZHpAEzZawVGpfDjicQ7A7IoNGKZZjUJXkYjrx0LGdCioBc4PRBpEfZ+pxQfPI9CrEsMt
-         5Ww75fuda4eafID/ssjnnefOSSKH+6Avg2GavNfKqd7a5Q6/retsJaF//WOpk1AFRpNU
-         yVSBGfyvXDDaMEVVZlYwWiECpAN9RaTIz8mGRaVdex6c0bClKcEA/dhLEGpQmZps6B6C
-         UtyRTjJLGWLaa2gV4ClzPXgXDaJ8pfXOrQ4dPCwQlfKeVF+uAjmItPTTxjfGP22vO0yO
-         shWw==
+        h=from:to:subject:date:message-id;
+        bh=IvalRoPZTdyATx+MNsD3J/jQB9ZbptG5LiuC3iQ4D+k=;
+        b=VdhbhoNBR7DvXKlaETqxth9iKF4OzxlAbUcC4c7GOMTzzy0sYi6iCZkd4svLdn/5DJ
+         MTJfIV7azj78PGRydbiE4lTcSHOU3DqC8Vc32MOp/MSeRQdEZ9iySyOjuD72VmytXqeS
+         CaW5QmOk/BlxWtDWmkZKSziN9HhQn8UHX86MWZWpdbvCteZonNACzy3mB/O++AgMQKI9
+         4NcFw8zznnCaf02io9uV6MxJihksBAvU6VAXtIDGO3affPVLJr1/bzPNfrhRvQny1k7A
+         sgHoiwKYVopP++8Pi5NlS07jHGIBu7g+VCj6dyYaEznS4aElolm2omQloSyULHdar4SL
+         mzLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=rfHb2DEIGpI+8Vk07/ubySXfh40QuvrW6cCf2FQNqoU=;
-        b=i9HYAH65Ybi8H0E5BYyeKOVb4VSzEukv0a5/cu4VjHi7oMFoc3s5mzKxLrCgkhqLs4
-         4fabFs385YloXI5RgCMMgkCkjKaywVHTtJfzfCqZ/X2N11CvkQyXSL2HO4CbLkG+hqtF
-         2xyrPJutBKWSD3MVQjNQGsEK9Ku6fUkovfye0/970srqdNKZnFtLwQxhK9X/eE1ZYINP
-         Uv6S5H8EzM3lBohgdFjTcefmrlFVQolwu5K1yqX6RI1YPN09vojiJrEeTusMu2iLta59
-         73pVvlTucTxSgayWk6YaFWz3L3ZdSCfodFNg+S0h+kzp8HXuwNR+7TuXthNyqx9QiarF
-         pyVw==
-X-Gm-Message-State: AJcUukef3vWOGV7NETu/27PRkyPqLeWvQsfiiH2jyxadLJNwCEce3xgI
-        oFEJQWdXQYUI/x47qfnNjLQ=
-X-Google-Smtp-Source: ALg8bN7qvbuGkybzDGUAKkl5HPMdnCDQpxnIHbKyvR9qpgakC34rwwOncJeCgoi64u5qe/DLf6Mmcw==
-X-Received: by 2002:adf:e3c8:: with SMTP id k8mr14650347wrm.83.1548497748915;
-        Sat, 26 Jan 2019 02:15:48 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id y138sm76581112wmc.16.2019.01.26.02.15.47
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 26 Jan 2019 02:15:47 -0800 (PST)
-Date:   Sat, 26 Jan 2019 11:15:46 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: bluez: dbus method call for switching endpoint
-Message-ID: <20190126101546.dwingybq7ee4w6lx@pali>
-References: <CABBYNZLK4tyL8nvWbXxr6VctyEyJkMdwNiWMy4gUge9h9Vb4SQ@mail.gmail.com>
- <20181228191102.GA31975@reaktio.net>
- <CABBYNZ+bwbSkH4qtkuzhE=JY6KAGwJ_E4ABGT_LE6E277eTNDQ@mail.gmail.com>
- <20181229130818.jdcpwlpyoyhdqlf3@pali>
- <CABBYNZK4+K5vRF0JCHFcUjbfzWanp_ju6XfQQJWBtiLqKi=e7Q@mail.gmail.com>
- <20190108165612.5krhgtmce336xjx3@pali>
- <20190109180340.5fh7adag6buij4px@pali>
- <20190109181436.atlbhkqclpq3kcta@pali>
- <CABBYNZJk=wycGzic5+DqFHg=30KX9NNwnZMpsVdgkLjzseMA2g@mail.gmail.com>
- <20190110115910.jldtfzzrhvta44pa@pali>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="xzosdn77cznlnmzu"
-Content-Disposition: inline
-In-Reply-To: <20190110115910.jldtfzzrhvta44pa@pali>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=IvalRoPZTdyATx+MNsD3J/jQB9ZbptG5LiuC3iQ4D+k=;
+        b=JU2PDro7bGGbYQvwmaQVq/PDR88QeV1E4gkJ7JdS7lt1aNKtgY5zJFgCF8C5DU3/AM
+         jUJ9AvDzcEJRZB2azJCZcTC9HrnFXM+i0PBiBqXPUfbCHNIyYtDzThUhzxPfsGkPiAfv
+         Hx+s+Akql/IrZggHAbBh8A5Yjhioevm0CmuyLHMP2MYf1UTP1toQgV37jBCO33rPgIN5
+         twd/SyJVUWLTXTsRDdoNPO0fXiVwk04ZZV0iGVrNyBUCOo9ItB8QmzOYEaDVS0CDeqOD
+         /qu//WHD4EDMskPxSNK7HEYn3xsyOIVGF0wigPdFSXdOx6dXOr/MSmQK+b3juy6ZiiXn
+         QnRQ==
+X-Gm-Message-State: AJcUukdThixb4LNkGiJQb0eXRUF5FqRP5MFwMBCqzPjS8pQeL2yoOXCJ
+        PJFDoHP9rB1pTRtrq3OzUlrIpFLP
+X-Google-Smtp-Source: ALg8bN5bxd4eg2rzZGotGwzxY68VyJhWPpBWBcCg0kydyWwcNQjLBPhAjSwwFuwPcw9x94y/7lN8xg==
+X-Received: by 2002:a1c:b14:: with SMTP id 20mr10358415wml.103.1548498264220;
+        Sat, 26 Jan 2019 02:24:24 -0800 (PST)
+Received: from Pali-Latitude.lan ([2001:718:1e03:a01::1ca])
+        by smtp.gmail.com with ESMTPSA id l19sm64930390wme.21.2019.01.26.02.24.23
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 26 Jan 2019 02:24:23 -0800 (PST)
+From:   =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] avinfo: Fix parsing capabilities
+Date:   Sat, 26 Jan 2019 11:24:15 +0100
+Message-Id: <20190126102415.23786-1-pali.rohar@gmail.com>
+X-Mailer: git-send-email 2.11.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Function print_caps() expects capabilities buffer without AVDTP header.
+Previously avinfo somehow worked, because AVDTP header looks like
+capability header with unknown category which was skipped.
+---
+ tools/avinfo.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---xzosdn77cznlnmzu
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+diff --git a/tools/avinfo.c b/tools/avinfo.c
+index 02fc1f233..a3298e8c8 100644
+--- a/tools/avinfo.c
++++ b/tools/avinfo.c
+@@ -809,7 +809,7 @@ static ssize_t avdtp_get_caps(int sk, int seid)
+ 		return -1;
+ 	}
+ 
+-	print_caps(caps, ret);
++	print_caps(caps->caps, ret - sizeof(struct getcap_resp));
+ 
+ 	return 0;
+ }
+-- 
+2.11.0
 
-On Thursday 10 January 2019 12:59:10 Pali Roh=C3=A1r wrote:
-> On Thursday 10 January 2019 08:29:02 Luiz Augusto von Dentz wrote:
-> > Hi Pali,
-> >=20
-> > On Wed, Jan 9, 2019 at 3:14 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> w=
-rote:
-> > >
-> > > On Wednesday 09 January 2019 19:03:40 Pali Roh=C3=A1r wrote:
-> > > > On Tuesday 08 January 2019 17:56:12 Pali Roh=C3=A1r wrote:
-> > > > > On Tuesday 08 January 2019 13:44:24 Luiz Augusto von Dentz wrote:
-> > > > > > > > Regarding the API I still didn't have time to start it, so =
-it will
-> > > > > > > > take a little longer than I antecipated.
-> > > > > >
-> > > > > > Ive just sent the patches adding support to switch the endpoint=
-s, Ive
-> > > > > > only tested with a couple of sony headsets so I would appreciat=
-e if
-> > > > > > you guys could try it as well. Note that the SetConfiguration m=
-ust
-> > > > > > come from the same D-Bus connection as the endpoint that would =
-be
-> > > > > > used, also if there is already an stream in place it must also =
-be from
-> > > > > > the same client since it would be terminated in the process, th=
-is is
-> > > > > > to prevent entities fighting to configure with its own priority=
- though
-> > > > > > usually we only PA endpoints, if you want to bypass this just f=
-or now
-> > > > >
-> > > > > Great! Once patches would be ready I would look at my last A2DP
-> > > > > pulseaudio patches [1] and would try to implement switching, incl=
-uding
-> > > > > support for bi-directional FastStream codec -- which can benefit =
-=66rom
-> > > > > it.
-> > > > >
-> > > > > [1] - https://lists.freedesktop.org/archives/pulseaudio-discuss/2=
-018-July/030344.html
-> > > >
-> > > > Hi! I applied your 6 patches from https://marc.info/?l=3Dlinux-blue=
-tooth&r=3D1&b=3D201901&w=3D2
-> > > > but whatever I did I was not able to locate in dbus hierarchy list =
-of
-> > > > A2DP codecs supported by device.
-> > > >
-> > > > I thought that somewhere in
-> > > >
-> > > > qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
-> > > >
-> > > > I found A2DP codec capabilities...
-> > > >
-> > > > So how to get list of all supported A2DP codecs for particular devi=
-ce?
-> > >
-> > > Ah, I forgot to start bluetoothd with --experimental option. After th=
-at
-> > > I see sep*
-> > >
-> > > /
-> > > /org
-> > > /org/bluez
-> > > /org/bluez/hci0
-> > > /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX
-> > > /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep1
-> > > /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep3
-> > > /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/sep5
-> > >
-> > > and qdbus --system org.bluez /org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/se=
-p1 org.freedesktop.DBus.Properties.GetAll org.bluez.MediaEndpoint1
-> > > list them correctly.
-> >=20
-> > You can use d-feet as well, btw did you forget to paste sep2 and sep4
-> > or the device just skip them?
->=20
-> No. This headset exports only sep1, sep3 and sep5. And supports SBC,
-> aptX and FastStream codecs. So count is correct, just numbering is not
-> canonical.
-
-Still, I have a question. Why there is only sep1, sep3 and sep5? Where
-are numbers 2 and 4? Why numbering is not canonical: 1, 2, 3?
-
-If it could help, here is output from avinfo:
-
-Connecting ...=20
-Stream End-Point #1: Audio Sink=20
-	Media Codec: SBC
-		Channel Modes: Mono DualChannel Stereo JointStereo
-		Frequencies: 16Khz 32Khz 44.1Khz 48Khz=20
-		Subbands: 4 8
-		Blocks: 4 8 12 16=20
-		Bitpool Range: 2-53
-	Content Protection: SCMS-T
-Stream End-Point #5: Audio Sink=20
-	Media Codec: Vendor Specific A2DP Codec
-		Vendor ID 0x0000004f
-		Vendor Specific Codec ID 0x0001
-		Vendor Specific Data: 0xf2
-		Vendor Specific Value (aptX)
-			Frequencies: 16kHz 32kHz 44.1kHz 48kHz=20
-			Channel modes: Stereo=20
-Stream End-Point #3: Audio Sink=20
-	Media Codec: Vendor Specific A2DP Codec
-		Vendor ID 0x0000000a
-		Vendor Specific Codec ID 0x0001
-		Vendor Specific Data: 0x03 0x23
-		Vendor Specific Value (FastStream)
-			Directions: sink source=20
-			Sink Frequencies: 44.1kHz 48kHz=20
-			Source Frequencies: 16kHz=20
-
-You can see that there is endpoint 1, 5 and 3.
-
-Who choose numbers for endpoints?
-
-> > Ive made sure not to filter any
-> > endpoints even if they would not have any matching local endpoints so
-> > we allow new endpoints to be registered later, anyway SetConfiguration
-> > actually checks that endpoints matches.
-> >=20
->=20
-
---=20
-Pali Roh=C3=A1r
-pali.rohar@gmail.com
-
---xzosdn77cznlnmzu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iF0EABECAB0WIQS4VrIQdKium2krgIWL8Mk9A+RDUgUCXEwzUAAKCRCL8Mk9A+RD
-UsG2AKCxeLwHSKxocUa9/Xqpo+5z9nzRMgCgoTTsWvsOSiD7LqiSXbAIR4YJ7oc=
-=QmcS
------END PGP SIGNATURE-----
-
---xzosdn77cznlnmzu--
