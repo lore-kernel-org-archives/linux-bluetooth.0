@@ -8,63 +8,62 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2B80C282C8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 06:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAFB8C282CB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 06:59:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA2762148E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 06:53:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA9D321736
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 06:59:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RS8Z7Yvb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L9zGyJh9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726627AbfA1GxF (ORCPT
+        id S1726719AbfA1G7Q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Jan 2019 01:53:05 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:39413 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726620AbfA1GxF (ORCPT
+        Mon, 28 Jan 2019 01:59:16 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:35784 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726612AbfA1G7Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Jan 2019 01:53:05 -0500
-Received: by mail-pl1-f194.google.com with SMTP id 101so7325635pld.6;
-        Sun, 27 Jan 2019 22:53:05 -0800 (PST)
+        Mon, 28 Jan 2019 01:59:16 -0500
+Received: by mail-pf1-f195.google.com with SMTP id z9so7591529pfi.2;
+        Sun, 27 Jan 2019 22:59:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=date:from:to:cc:subject:message-id:mime-version:content-disposition
          :user-agent;
-        bh=06xdCdtRR06KTVY+pLjNmKSVjH30nkMmIgzGgULRezI=;
-        b=RS8Z7YvbSvn3vYxVewo647h665538qs07iLt4dGFFckhXAxmSgQ/4ntHEwew7bwc6O
-         b992er5IxFzxqGffeBJJscp4y6Z3LMjqmdmOUYGPm0E2vc8ZBOf0bBaC+zf0jJ+URN6H
-         JUjs/QmJ3eqybmcvqXR+PBJtbYY/tDH9jDF7AAyFUg1o5bKHiCNh6copFdGr68BqjmfR
-         50DsgfHOuwjZSg15V/s+m4C20TxVLmr1IL8f0J1zIRIZw+/yHdMGWvsTtan0Aa/25xkU
-         kaJvOPcxN3vRXZ02h93dOv0ENZ8NHC2kok2djG0RStrshUkbJGOmCi9S2hwfatyuXffH
-         t5Bw==
+        bh=PPMteN8p8+yuCViHNNM49LqdtRO2VGHUxenNraKRdGo=;
+        b=L9zGyJh9Y/e3HFRUllXUMPl1KLB83+oaZLPctuxJbbLP62ZUBeoUcdCw00vZDzSt7o
+         IUBxOw+uP/qUcBoyFNsg25949GMQZP9Qe3oSVnWP3NUnY9fzhOlpHdNNQG+Csh5ygskw
+         455UK8pddgzYHwPoo+rsf961yQdcCa3jTlvHDwLEj6Jzt/M1PwpTP6R9LBEO29pSss78
+         2Ke+yKTseBHwA/zrwiHTsCmILjahbTnoMQq7CbueS9+fvvv/T6Z9zaetvqnz711UFW6d
+         ZwHXeq1IENod6Sf1uB5nAY4gwTLUfw2wqwju5xp2AmOG1DTzNvJ/aGObRjFi/cfGilHP
+         zzmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
          :content-disposition:user-agent;
-        bh=06xdCdtRR06KTVY+pLjNmKSVjH30nkMmIgzGgULRezI=;
-        b=biHM/8iqgIT/k5coNW7iDGInk6I/1cm7njw6IxdIRxz9ehZkp2ftwWrSpS/MorHDXC
-         x4NA4bJfYNijcJoOzAU44/H7X0pji6RctIaaTIVV2/uiWYBjWgC1E0h6EEdZQos5vS7E
-         XEBaY2hUW3dOnEK0p+f8YhmjQufjKMR7Ia9essfQDNmd30TYv7vk26LVCJkdLxXEHWr6
-         KMxJ/7IMVFoIlwvDg82cm4+pUr/sydbXyT4bACSLJSynu0bp2ORBZ9Owv9/OTTOKiZx0
-         46h4B4NCaD4DNFxXufj7j3X+PanSYWTXC/cSKthRyp0eeTjCgS/cF/mpLEOBbnIR6ywB
-         Jb6g==
-X-Gm-Message-State: AJcUukd13MIkQE/Uc+TjtJwYslPJ13h8L2MT1562fvXQWmxMIXO3CXmG
-        LAUodIU/3GKv085pkF426iQ=
-X-Google-Smtp-Source: ALg8bN4B7Q+Ycax2hd9srlD84igfxH4MYv/Lwz2fJLXrf0dt63AXNjdE0s6Zw/1j1Y7tBoS5tfHy/A==
-X-Received: by 2002:a17:902:9687:: with SMTP id n7mr20012110plp.94.1548658384789;
-        Sun, 27 Jan 2019 22:53:04 -0800 (PST)
+        bh=PPMteN8p8+yuCViHNNM49LqdtRO2VGHUxenNraKRdGo=;
+        b=aRmJt8/DwPs2RE/BgPXt8sXt4JnU+C+8nJeCzpG5AljRgoAJwwCu5+QGKsR+ChI7EW
+         8LpdOfUTxA4/b+r7s/tTkUKD6A7Vx3yBT3bSyvltTrUv09jflw8E6PYOHI3lw0alTS1X
+         mQ2Zz6cByV755ohTsYnrJ0oS3T91V8WglDBYbcB5wvoXsTST+xk4R5QiQmmUYqbgeZK4
+         1lIAC503IoBRghH3Mnt2eng8jnrqZFx64MPSoOkT6IyhE58vRlxqWOgwv4Q/J3MS+MRF
+         jeRyVH4YNxtpiesV76YM/i45eGf1hGsbWoib8CR68TKGKtPjv+me7XZWSTKvWk2nwP+A
+         jzGw==
+X-Gm-Message-State: AJcUukenurRycqMJtjyKJLYKRMKzOzocivOz3zSUS92KXdtWLkMXY00v
+        iF0AxXD2TTOItttPoWPGo/M=
+X-Google-Smtp-Source: ALg8bN7PoREnNrhgCSB5zZWTAwI3mkjj9oUmxSTAFbhqJ2NrxtYHmhy+VBGoaoK8+cDwx6IfbZx4AA==
+X-Received: by 2002:a63:165e:: with SMTP id 30mr18830259pgw.103.1548658755709;
+        Sun, 27 Jan 2019 22:59:15 -0800 (PST)
 Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
-        by smtp.gmail.com with ESMTPSA id e16sm39769853pfn.46.2019.01.27.22.53.03
+        by smtp.gmail.com with ESMTPSA id r66sm50393263pfk.157.2019.01.27.22.59.15
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sun, 27 Jan 2019 22:53:04 -0800 (PST)
-Date:   Sun, 27 Jan 2019 22:53:02 -0800
+        Sun, 27 Jan 2019 22:59:15 -0800 (PST)
+Date:   Sun, 27 Jan 2019 22:59:13 -0800
 From:   Myungho Jung <mhjungk@gmail.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_uart: Switch pty driver to slave side in
- tty_set_termios()
-Message-ID: <20190128065259.GA2976@myunghoj-Precision-5530>
+Subject: [PATCH] Bluetooth: Add NULL check for tiocmget() and tiocmset()
+Message-ID: <20190128065910.GA14959@myunghoj-Precision-5530>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -74,77 +73,57 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tty_set_termios() should be called with slave side of pty driver. So, If
-tty driver is pty master, it needs to be switched to ->link.
+tiocmget() and tiocmset() operations are optional and some tty drivers
+like pty miss the operations. We need NULL check before referencing
+them.
 
 Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
 Signed-off-by: Myungho Jung <mhjungk@gmail.com>
 ---
- drivers/bluetooth/hci_ldisc.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ drivers/bluetooth/hci_ath.c   | 13 ++++++++-----
+ drivers/bluetooth/hci_ldisc.c |  5 +++++
+ 2 files changed, 13 insertions(+), 5 deletions(-)
 
+diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+index d568fbd94d6c..076700a1e9a8 100644
+--- a/drivers/bluetooth/hci_ath.c
++++ b/drivers/bluetooth/hci_ath.c
+@@ -94,11 +94,14 @@ static void ath_hci_uart_work(struct work_struct *work)
+ 	hu = ath->hu;
+ 	tty = hu->tty;
+ 
+-	/* verify and wake up controller */
+-	if (ath->cur_sleep) {
+-		status = ath_wakeup_ar3k(tty);
+-		if (!(status & TIOCM_CTS))
+-			return;
++	/* tiocmget() and tiocmset() operations are optional */
++	if (tty->driver->ops->tiocmget && tty->driver->ops->tiocmset) {
++		/* verify and wake up controller */
++		if (ath->cur_sleep) {
++			status = ath_wakeup_ar3k(tty);
++			if (!(status & TIOCM_CTS))
++				return;
++		}
+ 	}
+ 
+ 	/* Ready to send Data */
 diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index fbf7b4df23ab..90c5ea8c399b 100644
+index fbf7b4df23ab..9f88a8563cf6 100644
 --- a/drivers/bluetooth/hci_ldisc.c
 +++ b/drivers/bluetooth/hci_ldisc.c
-@@ -299,10 +299,18 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
- }
- 
-+/* If driver is pty master, return slave side */
-+static struct tty_struct *hci_uart_get_real_tty(struct tty_struct *tty)
-+{
-+	return  (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
-+		 tty->driver->subtype == PTY_TYPE_MASTER) ? tty->link : tty;
-+}
-+
- /* Flow control or un-flow control the device */
- void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
- {
- 	struct tty_struct *tty = hu->tty;
-+	struct tty_struct *real_tty;
- 	struct ktermios ktermios;
- 	int status;
- 	unsigned int set = 0;
-@@ -314,11 +322,12 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+@@ -314,6 +314,11 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
  		return;
  	}
  
-+	real_tty = hci_uart_get_real_tty(tty);
++	/* tiocmget() and tiocmset() operations are optional */
++	if (!tty->driver->ops->tiocmget || !tty->driver->ops->tiocmset) {
++		return;
++	}
++
  	if (enable) {
  		/* Disable hardware flow control */
--		ktermios = tty->termios;
-+		ktermios = real_tty->termios;
- 		ktermios.c_cflag &= ~CRTSCTS;
--		status = tty_set_termios(tty, &ktermios);
-+		status = tty_set_termios(real_tty, &ktermios);
- 		BT_DBG("Disabling hardware flow control: %s",
- 		       status ? "failed" : "success");
- 
-@@ -350,9 +359,9 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
- 		BT_DBG("Setting RTS: %s", status ? "failed" : "success");
- 
- 		/* Re-enable hardware flow control */
--		ktermios = tty->termios;
-+		ktermios = real_tty->termios;
- 		ktermios.c_cflag |= CRTSCTS;
--		status = tty_set_termios(tty, &ktermios);
-+		status = tty_set_termios(real_tty, &ktermios);
- 		BT_DBG("Enabling hardware flow control: %s",
- 		       status ? "failed" : "success");
- 	}
-@@ -367,9 +376,10 @@ void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
- 
- void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
- {
--	struct tty_struct *tty = hu->tty;
-+	struct tty_struct *tty;
- 	struct ktermios ktermios;
- 
-+	tty = hci_uart_get_real_tty(hu->tty);
- 	ktermios = tty->termios;
- 	ktermios.c_cflag &= ~CBAUD;
- 	tty_termios_encode_baud_rate(&ktermios, speed, speed);
+ 		ktermios = tty->termios;
 -- 
 2.17.1
 
