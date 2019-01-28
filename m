@@ -6,59 +6,59 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACEE2C282CD
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 13:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2EDAC282C8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 13:50:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AD792087F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 13:45:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8482C2087F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 13:50:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="m6xPf4Ep";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="SY2LvpQc"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="HCIilymf";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="I0tC10OC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726694AbfA1Npx (ORCPT
+        id S1726798AbfA1Nt6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Jan 2019 08:45:53 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:38104 "EHLO
+        Mon, 28 Jan 2019 08:49:58 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:40244 "EHLO
         smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726647AbfA1Npx (ORCPT
+        with ESMTP id S1726668AbfA1Nt6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Jan 2019 08:45:53 -0500
+        Mon, 28 Jan 2019 08:49:58 -0500
 Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id BBD7360851; Mon, 28 Jan 2019 13:45:49 +0000 (UTC)
+        id 779DE6072E; Mon, 28 Jan 2019 13:49:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1548683149;
-        bh=NijZksKMHZ/9rah5scXmUB3OrJFZczGzQ6VzUkGep8o=;
+        s=default; t=1548683397;
+        bh=jLekNMlt29VoliIvsUGbMcPHooW3QQi1ouQ1GtV1alY=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=m6xPf4EpSsBG9lfUo/rNmpRLrzq7a1i+5xyL10Pkfzvnp4dX0vI2tCMuBVVoWCmgr
-         NDLHlYiltB0nV/vZB5zWDHorZjZPZJDBpZ33jaQah+AE+WP1A4wD45V7P/fjpnrHc9
-         EOAfZfRpxmGJCeReD5VBP0dIm/b3GqnQYeU0Aw8k=
+        b=HCIilymfWuAGrgON5CFiF+lQ4KUfNgpzKIKr6S5nV2LxIoH4zCgmj67QQ/7j3tSR1
+         uadbeziK0/AIK6Xsf6UsEcKymmZMGhpHdfGoQqg1FgNr029I4qP/LFyA3a5PPMDfp4
+         W7RwkMaWSn5N7GyjuSoZEbwGpCSvaudcBL9X5ShU=
 Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 96F37602F8;
-        Mon, 28 Jan 2019 13:45:48 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTP id 3DB74605A5;
+        Mon, 28 Jan 2019 13:49:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1548683148;
-        bh=NijZksKMHZ/9rah5scXmUB3OrJFZczGzQ6VzUkGep8o=;
+        s=default; t=1548683396;
+        bh=jLekNMlt29VoliIvsUGbMcPHooW3QQi1ouQ1GtV1alY=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=SY2LvpQcnWz1AbmI4sSoLc/4vfe8818ZqErzQZO3GzmuJbs3Sg68Ri7TO2u+1bIAZ
-         TRXmtpIE8uJlIaCTGqRa7E+j2yRMPbaLZ29y9/ntjYC2VwUHcGQIdG+R84UQ6pDbrh
-         CD2K+dO3DgZ8HLZ+aVK5E1oFxc2bi+t2SylTP8rA=
+        b=I0tC10OCo0hnM7GiDbwpTWjqb/BEcyZ8h/jy6bSPJWSslb5qijnazy11iUCouhh+C
+         w73G4dJGskK+V6+YFafpIKrboxtNiTqAb+1aSyz8tHfYU/9GSxnxppUBMqmBp2wpmO
+         fnSl+GiuKnmt7lXqDRwPmMSxpKq68hNlMDjR/Lxw=
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Mon, 28 Jan 2019 19:15:48 +0530
+Date:   Mon, 28 Jan 2019 19:19:56 +0530
 From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
 To:     Matthias Kaehlcke <mka@chromium.org>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v9 2/3] Bluetooth: hci_qca: Deassert RTS while baudrate
- change command
-In-Reply-To: <20190125001259.GB81583@google.com>
+Subject: Re: [PATCH v9 1/3] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+In-Reply-To: <20190125011412.GE81583@google.com>
 References: <20190124120808.8275-1-bgodavar@codeaurora.org>
- <20190124120808.8275-3-bgodavar@codeaurora.org>
- <20190125001259.GB81583@google.com>
-Message-ID: <6b18e30fb1b747d674a75cb265b5821b@codeaurora.org>
+ <20190124120808.8275-2-bgodavar@codeaurora.org>
+ <20190125011412.GE81583@google.com>
+Message-ID: <0fac93a13ee445569659075cf467ad4d@codeaurora.org>
 X-Sender: bgodavar@codeaurora.org
 User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -68,112 +68,157 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Matthias,
 
-On 2019-01-25 05:42, Matthias Kaehlcke wrote:
-> Hi Balakrishna,
-> 
-> On Thu, Jan 24, 2019 at 05:38:07PM +0530, Balakrishna Godavarthi wrote:
->> This patch will help to stop frame reassembly errors while changing
->> the baudrate. This is because host send a change baudrate request
->> command to the chip with 115200 bps, Whereas chip will change their
->> UART clocks to the enable for new baudrate and sends the response
->> for the change request command with newer baudrate, On host side
->> we are still operating in 115200 bps which results of reading garbage
->> data. Here we are pulling RTS line, so that chip we will wait to send 
->> data
->> to host until host change its baudrate.
+On 2019-01-25 06:44, Matthias Kaehlcke wrote:
+> On Thu, Jan 24, 2019 at 05:38:06PM +0530, Balakrishna Godavarthi wrote:
+>> wcn3990 requires a power pulse to turn ON/OFF along with
+>> regulators. Sometimes we are observing the power pulses are sent
+>> out with some time delay, due to queuing these commands. This is
+>> causing synchronization issues with chip, which intern delay the
+>> chip setup or may end up with communication issues.
 >> 
 >> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> Tested-by: Matthias Kaehlcke <mka@chromium.org>
->> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 >> ---
 >> Changes in v9:
->>  * disabled flow control while setting the baudrate of HOST and chip.
+>>  * Reverted to 100us sleep.
+>>  * used inline call msecs_to_jiffies()
+>> 
+>> Changes in v8:
+>>  * Updated 1 second timeout instead of indefinite wait.
+>> 
+>> Changes in v7:
+>>  *  updated the wait time to 5 ms after sending power pulses.
+>> 
+>> Changes in v6:
+>>  * added serdev_device_write_flush() in qca_send_power_pulse
+>>    instead during the power off pulse.
+>> 
+>> Changes in v5:
+>>  * added serdev_device_write_flush() in qca_power_off().
 >> ---
->>  drivers/bluetooth/hci_qca.c | 24 +++++++++++++-----------
->>  1 file changed, 13 insertions(+), 11 deletions(-)
+>>  drivers/bluetooth/hci_qca.c | 40 
+>> +++++++++++++++----------------------
+>>  1 file changed, 16 insertions(+), 24 deletions(-)
 >> 
 >> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index c08f4d105e73..6b5bcd44e24c 100644
+>> index f036c8f98ea3..c08f4d105e73 100644
 >> --- a/drivers/bluetooth/hci_qca.c
 >> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -964,7 +964,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
->> uint8_t baudrate)
->>  	struct hci_uart *hu = hci_get_drvdata(hdev);
->>  	struct qca_data *qca = hu->priv;
->>  	struct sk_buff *skb;
->> -	struct qca_serdev *qcadev;
->>  	u8 cmd[] = { 0x01, 0x48, 0xFC, 0x01, 0x00 };
->> 
->>  	if (baudrate > QCA_BAUDRATE_3200000)
->> @@ -978,13 +977,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
->> uint8_t baudrate)
->>  		return -ENOMEM;
->>  	}
->> 
->> -	/* Disabling hardware flow control is mandatory while
->> -	 * sending change baudrate request to wcn3990 SoC.
->> -	 */
->> -	qcadev = serdev_device_get_drvdata(hu->serdev);
->> -	if (qcadev->btsoc_type == QCA_WCN3990)
->> -		hci_uart_set_flow_control(hu, true);
->> -
->>  	/* Assign commands to change baudrate and packet type. */
->>  	skb_put_data(skb, cmd, sizeof(cmd));
->>  	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
->> @@ -1000,9 +992,6 @@ static int qca_set_baudrate(struct hci_dev *hdev, 
->> uint8_t baudrate)
->>  	schedule_timeout(msecs_to_jiffies(BAUDRATE_SETTLE_TIMEOUT_MS));
->>  	set_current_state(TASK_RUNNING);
->> 
->> -	if (qcadev->btsoc_type == QCA_WCN3990)
->> -		hci_uart_set_flow_control(hu, false);
->> -
->>  	return 0;
+>> @@ -60,6 +60,7 @@
+>>  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+>>  #define IBS_TX_IDLE_TIMEOUT_MS		2000
+>>  #define BAUDRATE_SETTLE_TIMEOUT_MS	300
+>> +#define POWER_PULSE_TRANS_TIMEOUT_MS	1000
+> 
+> I still doubt that this mega-timeout of 1s is needed, but it shouldn't
+> do any harm either, so whatever ...
+> 
+
+[Bala]: for now let us have it. we can improve it in the improvement 
+patch
+         based on the results.
+
+>>  /* susclk rate */
+>>  #define SUSCLK_RATE_32KHZ	32768
+>> @@ -1013,11 +1014,10 @@ static inline void host_set_baudrate(struct 
+>> hci_uart *hu, unsigned int speed)
+>>  		hci_uart_set_baudrate(hu, speed);
 >>  }
 >> 
->> @@ -1089,6 +1078,7 @@ static int qca_check_speeds(struct hci_uart *hu)
->>  static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type 
->> speed_type)
+>> -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>> +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
 >>  {
->>  	unsigned int speed, qca_baudrate;
->> +	struct qca_serdev *qcadev;
->>  	int ret;
+>> -	struct hci_uart *hu = hci_get_drvdata(hdev);
+>> -	struct qca_data *qca = hu->priv;
+>> -	struct sk_buff *skb;
+>> +	int ret;
+>> +	int timeout = msecs_to_jiffies(POWER_PULSE_TRANS_TIMEOUT_MS);
 >> 
->>  	if (speed_type == QCA_INIT_SPEED) {
->> @@ -1100,6 +1090,15 @@ static int qca_set_speed(struct hci_uart *hu, 
->> enum qca_speed_type speed_type)
->>  		if (!speed)
->>  			return 0;
+>>  	/* These power pulses are single byte command which are sent
+>>  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+>> @@ -1029,21 +1029,19 @@ static int qca_send_power_pulse(struct hci_dev 
+>> *hdev, u8 cmd)
+>>  	 * save power. Disabling hardware flow control is mandatory while
+>>  	 * sending power pulses to SoC.
+>>  	 */
+>> -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+>> -
+>> -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+>> -	if (!skb)
+>> -		return -ENOMEM;
+>> +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to controller", cmd);
 >> 
->> +		/* Deassert RTS while changing the baudrate of chip and host.
->> +		 * This will prevent chip from transmitting its response with
->> +		 * the new baudrate while the host port is still operating at
->> +		 * the old speed.
->> +		 */
+>> +	serdev_device_write_flush(hu->serdev);
+>>  	hci_uart_set_flow_control(hu, true);
+>> +	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
+>> +	if (ret < 0) {
+>> +		bt_dev_err(hu->hdev, "failed to send power pulse %02x", cmd);
+>> +		return ret;
+>> +	}
+>> 
+>> -	skb_put_u8(skb, cmd);
+>> -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+>> -
+>> -	skb_queue_tail(&qca->txq, skb);
+>> -	hci_uart_tx_wakeup(hu);
+>> +	serdev_device_wait_until_sent(hu->serdev, timeout);
+>> 
+>> -	/* Wait for 100 uS for SoC to settle down */
+>> +	/* Wait for 100 uS for SoC to settle down for the received byte. */
 > 
-> It is not necessarily evident which action deasserts RTS, I suggest to
-> rephrase it to something like:
-> 
-> "Disable flow control for wcn3990 to deassert RTS while ... "
+> I don't think 'for the received byte' adds much value here. If you
+> respin anyway I'd suggest to leave the comment as is.
 > 
 
 [Bala]: will update.
 
->> +		qcadev = serdev_device_get_drvdata(hu->serdev);
->> +		if (qcadev->btsoc_type == QCA_WCN3990)
->> +			hci_uart_set_flow_control(hu, true);
->> +
->>  		qca_baudrate = qca_get_baudrate_value(speed);
->>  		bt_dev_dbg(hu->hdev, "Set UART speed to %d", speed);
->>  		ret = qca_set_baudrate(hu->hdev, qca_baudrate);
+>>  	usleep_range(100, 200);
+>>  	hci_uart_set_flow_control(hu, false);
+>> 
+>> @@ -1116,7 +1114,6 @@ static int qca_set_speed(struct hci_uart *hu, 
+>> enum qca_speed_type speed_type)
+>> 
+>>  static int qca_wcn3990_init(struct hci_uart *hu)
+>>  {
+>> -	struct hci_dev *hdev = hu->hdev;
+>>  	struct qca_serdev *qcadev;
+>>  	int ret;
+>> 
+>> @@ -1139,12 +1136,12 @@ static int qca_wcn3990_init(struct hci_uart 
+>> *hu)
+>> 
+>>  	/* Forcefully enable wcn3990 to enter in to boot mode. */
+>>  	host_set_baudrate(hu, 2400);
+>> -	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
+>> +	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
+>>  	if (ret)
+>>  		return ret;
+>> 
+>>  	qca_set_speed(hu, QCA_INIT_SPEED);
+>> -	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWERON_PULSE);
+>> +	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWERON_PULSE);
+>>  	if (ret)
+>>  		return ret;
+>> 
+>> @@ -1274,13 +1271,8 @@ static const struct qca_vreg_data qca_soc_data 
+>> = {
+>> 
+>>  static void qca_power_shutdown(struct hci_uart *hu)
+>>  {
+>> -	struct serdev_device *serdev = hu->serdev;
+>> -	unsigned char cmd = QCA_WCN3990_POWEROFF_PULSE;
+>> -
+>>  	host_set_baudrate(hu, 2400);
+>> -	hci_uart_set_flow_control(hu, true);
+>> -	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
+>> -	hci_uart_set_flow_control(hu, false);
+>> +	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
+>>  	qca_power_setup(hu, false);
+>>  }
+>> 
 > 
-> flow control should be re-enabled in the error path.
+> Looks good to me besides possible minor improvements:
 > 
-> Cheers
-> 
-> Matthias
-
-[Bala; will update.
+> Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
 
 -- 
 Regards
