@@ -3,73 +3,103 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0898CC282C8
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 12:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB668C282CD
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 12:16:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBD2D214DA
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 12:05:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B65A2148E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jan 2019 12:16:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726689AbfA1MFD convert rfc822-to-8bit (ORCPT
+        id S1726843AbfA1MQp convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Jan 2019 07:05:03 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:39627 "EHLO
+        Mon, 28 Jan 2019 07:16:45 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:57437 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726672AbfA1MFD (ORCPT
+        with ESMTP id S1726802AbfA1MQo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Jan 2019 07:05:03 -0500
+        Mon, 28 Jan 2019 07:16:44 -0500
 Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 75D2ACF2B4;
-        Mon, 28 Jan 2019 13:12:50 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id EB9C2CF2B6;
+        Mon, 28 Jan 2019 13:24:30 +0100 (CET)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH] btusb: Add shutdown routine for BTUSB_INTEL_NEW devices
+Subject: Re: [PATCH] Bluetooth: Add NULL check for tiocmget() and tiocmset()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1548665625-23742-1-git-send-email-raghuram.hegde@intel.com>
-Date:   Mon, 28 Jan 2019 13:05:01 +0100
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>
+In-Reply-To: <20190128065910.GA14959@myunghoj-Precision-5530>
+Date:   Mon, 28 Jan 2019 13:16:42 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <91F174CE-3CBE-4D3B-B0C9-E350C01F3DDF@holtmann.org>
-References: <1548665625-23742-1-git-send-email-raghuram.hegde@intel.com>
-To:     Raghuram Hegde <raghuram.hegde@intel.com>
+Message-Id: <0D7C928B-8E3E-4986-A6D2-AFCFF4F0E274@holtmann.org>
+References: <20190128065910.GA14959@myunghoj-Precision-5530>
+To:     Myungho Jung <mhjungk@gmail.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Raghuram,
+Hi Myungho,
 
-> btusb_shutdown_intel routine shall reset the controller
-> and stop all BT operation.
-> Advantages:
-> 	1. Power save on the platform
-> 	2. Host and controller will be in Sync.
+> tiocmget() and tiocmset() operations are optional and some tty drivers
+> like pty miss the operations. We need NULL check before referencing
+> them.
 > 
-> Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
-> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
+> Signed-off-by: Myungho Jung <mhjungk@gmail.com>
 > ---
-> drivers/bluetooth/btusb.c | 1 +
-> 1 file changed, 1 insertion(+)
+> drivers/bluetooth/hci_ath.c   | 13 ++++++++-----
+> drivers/bluetooth/hci_ldisc.c |  5 +++++
+> 2 files changed, 13 insertions(+), 5 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 5de0c2e59b97..66483ca3d870 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3139,6 +3139,7 @@ static int btusb_probe(struct usb_interface *intf,
-> 		hdev->manufacturer = 2;
-> 		hdev->send = btusb_send_frame_intel;
-> 		hdev->setup = btusb_setup_intel_new;
-> +		hdev->shutdown = btusb_shutdown_intel;
-> 		hdev->hw_error = btintel_hw_error;
-> 		hdev->set_diag = btintel_set_diag;
-> 		hdev->set_bdaddr = btintel_set_bdaddr;
+> diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
+> index d568fbd94d6c..076700a1e9a8 100644
+> --- a/drivers/bluetooth/hci_ath.c
+> +++ b/drivers/bluetooth/hci_ath.c
+> @@ -94,11 +94,14 @@ static void ath_hci_uart_work(struct work_struct *work)
+> 	hu = ath->hu;
+> 	tty = hu->tty;
+> 
+> -	/* verify and wake up controller */
+> -	if (ath->cur_sleep) {
+> -		status = ath_wakeup_ar3k(tty);
+> -		if (!(status & TIOCM_CTS))
+> -			return;
+> +	/* tiocmget() and tiocmset() operations are optional */
+> +	if (tty->driver->ops->tiocmget && tty->driver->ops->tiocmset) {
+> +		/* verify and wake up controller */
+> +		if (ath->cur_sleep) {
+> +			status = ath_wakeup_ar3k(tty);
+> +			if (!(status & TIOCM_CTS))
+> +				return;
+> +		}
+> 	}
 
-I assumed that this was only needed for the older ROM versions of the Intel controllers and not the newer RAM versions. I have been told they don’t inherit the LED issue that we tried to fix with this. Please read the comments in btusb_shutdown_intel and amend comments if needed and provide a detailed commit message.
+actually in case of hci_ath.c I would prefer that the setup actually fails. There is no point in continuing here. These are vendor specific hardware routines and you will not run them over TTYs that don’t support it. So instead of ignoring the operating, fail hard and cleanly during setup.
+
+> 	/* Ready to send Data */
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index fbf7b4df23ab..9f88a8563cf6 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -314,6 +314,11 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+> 		return;
+> 	}
+> 
+> +	/* tiocmget() and tiocmset() operations are optional */
+> +	if (!tty->driver->ops->tiocmget || !tty->driver->ops->tiocmset) {
+> +		return;
+> +	}
+> +
+
+No { } here please.
+
+> 	if (enable) {
+> 		/* Disable hardware flow control */
+> 		ktermios = tty->termios;
 
 Regards
 
