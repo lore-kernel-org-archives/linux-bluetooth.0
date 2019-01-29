@@ -2,66 +2,65 @@ Return-Path: <SRS0=G1v0=QF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36B14C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B405C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07A4F2147A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FE432147A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2CmiM/I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WbzKq9oe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727668AbfA2N0l (ORCPT
+        id S1727676AbfA2N0m (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Jan 2019 08:26:41 -0500
-Received: from mail-ed1-f51.google.com ([209.85.208.51]:43302 "EHLO
-        mail-ed1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726060AbfA2N0l (ORCPT
+        Tue, 29 Jan 2019 08:26:42 -0500
+Received: from mail-ed1-f41.google.com ([209.85.208.41]:45797 "EHLO
+        mail-ed1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727661AbfA2N0m (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Jan 2019 08:26:41 -0500
-Received: by mail-ed1-f51.google.com with SMTP id f9so15922852eds.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jan 2019 05:26:40 -0800 (PST)
+        Tue, 29 Jan 2019 08:26:42 -0500
+Received: by mail-ed1-f41.google.com with SMTP id d39so15919608edb.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jan 2019 05:26:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=mX4rlndXGHoskbbnDBD9XOOEU72dH9VtPCmZr/s+T0E=;
-        b=J2CmiM/ImM15dejl0XI+UI2WKob33dgNAlenpeb+ee+VNTOH73SGDIRHtv0P6DjAm9
-         L47PnDHBHtezGdCZX9gi/vGRQ/4eNRctdVY+OSaysGDwgtlOvO0b5I+0ItFzuBZM0hYB
-         EQQBuvOAcHekDk25g9wEkZ1+5fy2Q2/RRzkSMX0f0J43rUQKwpbidwLi5bUJ54+OibO1
-         AXIPrKqyKAVEq15JRGdNEH7RmeHBI0+0AMgnkUeRn9TJZwRZOSOtSHXFEiDX4ZQN1nY6
-         a2UoIKRjczd+JaK6PWARNbMmiF5BboFcikQJdbEbgmBNKCam1Cxnpp9/8hSaDY3nPHJm
-         tiVg==
+        bh=/7G+6AaPjBNNYsahqqqpTw5dwK7692a4bGPdpJ35QkM=;
+        b=WbzKq9oesIJ0+Bga4vvJmNn3o6z3cq0t7rUqe1UnMajfxtjWRCEIhD+qZoGHwGxPDm
+         RfDnu3NJ/8BtRtvI9zZPoVw/wT9IuVCeZyZseuJFn+SLeQKncZh1YC4ZJ+/5MQfxWXfg
+         EsoBd6E+pRYn4Thvx5KS4v0VU7u6VTO0C9kR1Gslb6HrpMO+cZV7/eUHO/E736gs7w0O
+         ytrdd0xT06SverIxCJkAHO3yDwo1UaPYlcMq7pfJunz5yIDB7aXlsxlWcpA4MofvC2IC
+         qe5dBJvcjx7AbdAXZs6DJVahQ8SF7bUEEbL2kWPTia1P8J/7qZw27l/miEmSgbSjMS0K
+         x3xg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=mX4rlndXGHoskbbnDBD9XOOEU72dH9VtPCmZr/s+T0E=;
-        b=LXqdWONtYYHoNA4z+UBWTDQVdOhItOOrT6q5SNW5h8XGbB6hxcUKcI9tKzsH2oxHYD
-         HtgerzJeBJ7Z9ZsvuOxwumThRwlK4QDkkVlgheNNdyTW5Adxgn+Q9cVs13FVkWJbaXR2
-         uWfJxvtQmw1Mp3rvRQ4GR2tHk4d2BYawoaC0Oy890qOwQ2uhgpmpSaq1Q55WBovVKcGV
-         +nehnd+CzUdhfKT2fDfMROPqNe4COwJdmlZHsUYdxwIlo8wtzuKsEpXlHgv+vO321QX7
-         iT/iXkmzHSXAVS3TpLHIYrRChMg0gLbPjYltIoozkNa3awMz+wBAespWXR9fGP7TriHz
-         Zz4A==
-X-Gm-Message-State: AJcUukf+PcQsAAF7b7FG4pqgVF3xn7hoz4Dga6t5eS+bsxUDLaAeeW6U
-        Si1spUEYgpf3Ts1UC9G2WfFpzJKP
-X-Google-Smtp-Source: ALg8bN68AQErNz0lsJs++B/W0utyWcogftWojmMhiSvmBGWztBBdcGlKtBZ/oz3emKJenfcQz0A+6A==
-X-Received: by 2002:a50:f5af:: with SMTP id u44mr26266657edm.172.1548768398864;
-        Tue, 29 Jan 2019 05:26:38 -0800 (PST)
+        bh=/7G+6AaPjBNNYsahqqqpTw5dwK7692a4bGPdpJ35QkM=;
+        b=M0HL1ypX4NRvLVw7BOsSpCZGLn8FlAvAQWv0OygU44JLChoNEQvz991Zdb4inO5gfW
+         3K69cu0meGuDBOsAJfU5oyu3DAPTBIDyqiF5+iRvBp5sv+9RBO1GJT9DwWG6oMbXAAG3
+         AgwS0ZG8Ohve4EfkwvWU2qcmzG0UvdvC2GajkaFyl5yfPgDSpIRBnJNzV19IeBsvCGuf
+         h3OrTInHOn/fH7/13njrcfLqYi5aAduw/WR+lwtKMUJl2J9epvf0vnYtXiIuvge/KZ9Y
+         e+jcR1Dz3JUVqT1aI0u3hsmeBjFIuBwgu/J0fZhiMb/tTIZOYz2OQXWijcyBPzpuUKWj
+         4npw==
+X-Gm-Message-State: AJcUukeJhPkBapy/6tPR0EY+i80kVHQuI3EANzD1LQBXbVzfpmsFM1gY
+        TdEyKwDhYQCuj1xvavsaZqBz8vJV
+X-Google-Smtp-Source: ALg8bN4E4YGTQ6IrxdptzxDbrc236hB0JV3Nmghsg0gkjJE2zwT74g8gK000WwE67CqTE8kl/LlJXA==
+X-Received: by 2002:a17:906:2f88:: with SMTP id w8-v6mr22230229eji.114.1548768400449;
+        Tue, 29 Jan 2019 05:26:40 -0800 (PST)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id i14-v6sm8179964ejy.40.2019.01.29.05.26.37
+        by smtp.gmail.com with ESMTPSA id i14-v6sm8179964ejy.40.2019.01.29.05.26.38
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 29 Jan 2019 05:26:38 -0800 (PST)
+        Tue, 29 Jan 2019 05:26:39 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/15] unit/test-crypto: Add test for bt_crypto_gatt_hash
-Date:   Tue, 29 Jan 2019 15:26:21 +0200
-Message-Id: <20190129132634.28786-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 03/15] lib/uuid: Introduce definition for GATT caching attributes
+Date:   Tue, 29 Jan 2019 15:26:22 +0200
+Message-Id: <20190129132634.28786-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20190129132634.28786-1-luiz.dentz@gmail.com>
 References: <20190129132634.28786-1-luiz.dentz@gmail.com>
@@ -72,79 +71,27 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds test case base on the example given in the spec.
+This introduces UUIDs for Client Features and Database Hash
+characteristics.
 ---
- unit/test-crypto.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ lib/uuid.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/unit/test-crypto.c b/unit/test-crypto.c
-index bc37abb51..5a938c09e 100644
---- a/unit/test-crypto.c
-+++ b/unit/test-crypto.c
-@@ -208,6 +208,54 @@ static void test_sign(gconstpointer data)
- 	tester_test_passed();
- }
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 7e13e0fda..fbc08f51e 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -150,6 +150,10 @@ extern "C" {
+ #define MESH_PROXY_DATA_IN				0x2ADD
+ #define MESH_PROXY_DATA_OUT				0x2ADE
  
-+static void test_gatt_hash(gconstpointer data)
-+{
-+	struct iovec iov;
-+	const uint8_t m[] = {
-+			0x01, 0x00, 0x00, 0x28, 0x00, 0x18, 0x02, 0x00,
-+			0x03, 0x28, 0x0A, 0x03, 0x00, 0x00, 0x2A, 0x04,
-+			0x00, 0x03, 0x28, 0x02, 0x05, 0x00, 0x01, 0x2A,
-+			0x06, 0x00, 0x00, 0x28, 0x01, 0x18, 0x07, 0x00,
-+			0x03, 0x28, 0x20, 0x08, 0x00, 0x05, 0x2A, 0x09,
-+			0x00, 0x02, 0x29, 0x0A, 0x00, 0x03, 0x28, 0x02,
-+			0x0B, 0x00, 0xFF, 0xFF, 0x0C, 0x00, 0x03, 0x28,
-+			0x02, 0x0D, 0x00, 0xFF, 0xFF, 0x0E, 0x00, 0x00,
-+			0x28, 0x08, 0x18, 0x0F, 0x00, 0x02, 0x28, 0x14,
-+			0x00, 0x16, 0x00, 0x0F, 0x18, 0x10, 0x00, 0x03,
-+			0x28, 0xA2, 0x11, 0x00, 0x18, 0x2A, 0x12, 0x00,
-+			0x02, 0x29, 0x13, 0x00, 0x00, 0x29, 0x00, 0x00,
-+			0x14, 0x00, 0x01, 0x28, 0x0F, 0x18, 0x15, 0x00,
-+			0x03, 0x28, 0x02, 0x16, 0x00, 0x19, 0x2A };
-+	const uint8_t exp[16] = {
-+			0x22, 0x7C, 0xE3, 0x34, 0x22, 0xBA, 0xA5, 0xDD,
-+			0x6F, 0xA0, 0x82, 0x2A, 0xC1, 0xAD, 0x94, 0x19 };
-+	uint8_t res[16];
++/* GATT Caching attributes */
++#define GATT_CHARAC_CLI_FEAT				0x2B29
++#define GATT_CHARAC_DB_HASH				0x2B2A
 +
-+	tester_debug("M:");
-+	util_hexdump(' ', m, sizeof(m), print_debug, NULL);
-+
-+	iov.iov_base = (void *) m;
-+	iov.iov_len = sizeof(m);
-+
-+	if (!bt_crypto_gatt_hash(crypto, &iov, 1, res)) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	tester_debug("Expected:");
-+	util_hexdump(' ', exp, 16, print_debug, NULL);
-+
-+	tester_debug("Result:");
-+	util_hexdump(' ', res, 16, print_debug, NULL);
-+
-+	if (memcmp(res, exp, 16)) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	tester_test_passed();
-+}
-+
- int main(int argc, char *argv[])
- {
- 	int exit_status;
-@@ -226,6 +274,8 @@ int main(int argc, char *argv[])
- 	tester_add("/crypto/sign_att_4", &test_data_4, NULL, test_sign, NULL);
- 	tester_add("/crypto/sign_att_5", &test_data_5, NULL, test_sign, NULL);
- 
-+	tester_add("/crypto/gatt_hash", NULL, NULL, test_gatt_hash, NULL);
-+
- 	exit_status = tester_run();
- 
- 	bt_crypto_unref(crypto);
+ typedef struct {
+ 	enum {
+ 		BT_UUID_UNSPEC = 0,
 -- 
 2.17.2
 
