@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B405C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C5D2C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FE432147A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5A412148E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WbzKq9oe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iGpOo5c3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727676AbfA2N0m (ORCPT
+        id S1727694AbfA2N0o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Jan 2019 08:26:42 -0500
-Received: from mail-ed1-f41.google.com ([209.85.208.41]:45797 "EHLO
-        mail-ed1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727661AbfA2N0m (ORCPT
+        Tue, 29 Jan 2019 08:26:44 -0500
+Received: from mail-ed1-f44.google.com ([209.85.208.44]:38629 "EHLO
+        mail-ed1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727661AbfA2N0o (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Jan 2019 08:26:42 -0500
-Received: by mail-ed1-f41.google.com with SMTP id d39so15919608edb.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jan 2019 05:26:41 -0800 (PST)
+        Tue, 29 Jan 2019 08:26:44 -0500
+Received: by mail-ed1-f44.google.com with SMTP id h50so15944617ede.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jan 2019 05:26:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=/7G+6AaPjBNNYsahqqqpTw5dwK7692a4bGPdpJ35QkM=;
-        b=WbzKq9oesIJ0+Bga4vvJmNn3o6z3cq0t7rUqe1UnMajfxtjWRCEIhD+qZoGHwGxPDm
-         RfDnu3NJ/8BtRtvI9zZPoVw/wT9IuVCeZyZseuJFn+SLeQKncZh1YC4ZJ+/5MQfxWXfg
-         EsoBd6E+pRYn4Thvx5KS4v0VU7u6VTO0C9kR1Gslb6HrpMO+cZV7/eUHO/E736gs7w0O
-         ytrdd0xT06SverIxCJkAHO3yDwo1UaPYlcMq7pfJunz5yIDB7aXlsxlWcpA4MofvC2IC
-         qe5dBJvcjx7AbdAXZs6DJVahQ8SF7bUEEbL2kWPTia1P8J/7qZw27l/miEmSgbSjMS0K
-         x3xg==
+        bh=G/Ftm0pFdkGx6X26PFfS1xnyy0ImZwYR2rXTjOYdkWA=;
+        b=iGpOo5c3/qGzQeAso6la93O90lNByRBrESEmmRL/EfAEo4JrjvLqUc2YtGtDFOG3qe
+         n94djxn9zhM6kPkOGJiWsEz2tjeYWqtiRr7lzLOgTngAIZOZCY5GkuzvqfmgNnpO0nRu
+         FDkLheriH7dVMePOWhryiDowlpoaM5uMorU9kfmRAWFWDOFOLpAJidbSjz8sRMxba5n9
+         51gNq6I5hsJZMJfTFkniGngnoZMx3sUpxzyXReU1enuYNtniALH83JsQEhmFk02uwmyI
+         kvm7jnoOiutD4WmLTY7eoY3o0JQ/NXE+LAlFsjiz6VKfZlK67zPof7LXQdJHmqd8JAbi
+         Vb4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=/7G+6AaPjBNNYsahqqqpTw5dwK7692a4bGPdpJ35QkM=;
-        b=M0HL1ypX4NRvLVw7BOsSpCZGLn8FlAvAQWv0OygU44JLChoNEQvz991Zdb4inO5gfW
-         3K69cu0meGuDBOsAJfU5oyu3DAPTBIDyqiF5+iRvBp5sv+9RBO1GJT9DwWG6oMbXAAG3
-         AgwS0ZG8Ohve4EfkwvWU2qcmzG0UvdvC2GajkaFyl5yfPgDSpIRBnJNzV19IeBsvCGuf
-         h3OrTInHOn/fH7/13njrcfLqYi5aAduw/WR+lwtKMUJl2J9epvf0vnYtXiIuvge/KZ9Y
-         e+jcR1Dz3JUVqT1aI0u3hsmeBjFIuBwgu/J0fZhiMb/tTIZOYz2OQXWijcyBPzpuUKWj
-         4npw==
-X-Gm-Message-State: AJcUukeJhPkBapy/6tPR0EY+i80kVHQuI3EANzD1LQBXbVzfpmsFM1gY
-        TdEyKwDhYQCuj1xvavsaZqBz8vJV
-X-Google-Smtp-Source: ALg8bN4E4YGTQ6IrxdptzxDbrc236hB0JV3Nmghsg0gkjJE2zwT74g8gK000WwE67CqTE8kl/LlJXA==
-X-Received: by 2002:a17:906:2f88:: with SMTP id w8-v6mr22230229eji.114.1548768400449;
-        Tue, 29 Jan 2019 05:26:40 -0800 (PST)
+        bh=G/Ftm0pFdkGx6X26PFfS1xnyy0ImZwYR2rXTjOYdkWA=;
+        b=GRb2FAYewMGi4TXjuKqyXlxuSp6eFSTQs9fNfQb57bGJP0NQfU+DDevT0kRIkv4m+z
+         0ttSzSIloYLhTDP4X8fACl92rPYWgxuIwrJulOwH88iBDMzfSsWdFqwnc/EaeQeQD5QJ
+         1NQE5JaObOprXuJQaHCIzs1ZPuc69HoQHXC4dG4roEiCLtFkzO6VwEPXhLH3d6jYrRVX
+         AbrfIK95gns/qv7lBbNsHdJxUpW2YXLq+WsDKJz4a+zEtVa1vLkZEYksJsSmkwIHON4C
+         h+38k3AI5YOHL7ML+Qwo3rg6ONR2Fn3Xlqj9FVOLnpseI7kDaOQ5RPCZRmwPFMUQ/C/M
+         qjnw==
+X-Gm-Message-State: AJcUukdU+tshiI/OLe6hgFw2o8+yhMb4lHegCPSTioITLmYjj15i3NHE
+        Etob6v8pF6AqxrCUa7r1iOk8IWJG
+X-Google-Smtp-Source: ALg8bN4kaBAesCFBpB2SjwS3w4OUC7z8+SSEWu2qbCeh2rH9OSSXrAe8FKXuNG+jO4EUHvyJZL272A==
+X-Received: by 2002:a50:f61e:: with SMTP id c30mr24793994edn.197.1548768401761;
+        Tue, 29 Jan 2019 05:26:41 -0800 (PST)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id i14-v6sm8179964ejy.40.2019.01.29.05.26.38
+        by smtp.gmail.com with ESMTPSA id i14-v6sm8179964ejy.40.2019.01.29.05.26.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 29 Jan 2019 05:26:39 -0800 (PST)
+        Tue, 29 Jan 2019 05:26:41 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 03/15] lib/uuid: Introduce definition for GATT caching attributes
-Date:   Tue, 29 Jan 2019 15:26:22 +0200
-Message-Id: <20190129132634.28786-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 04/15] shared/util: Add decoding support for GATT caching attributes
+Date:   Tue, 29 Jan 2019 15:26:23 +0200
+Message-Id: <20190129132634.28786-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20190129132634.28786-1-luiz.dentz@gmail.com>
 References: <20190129132634.28786-1-luiz.dentz@gmail.com>
@@ -71,27 +71,25 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces UUIDs for Client Features and Database Hash
-characteristics.
+This adds support to decode Client Supported Features and Database
+Hash.
 ---
- lib/uuid.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/shared/util.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 7e13e0fda..fbc08f51e 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -150,6 +150,10 @@ extern "C" {
- #define MESH_PROXY_DATA_IN				0x2ADD
- #define MESH_PROXY_DATA_OUT				0x2ADE
- 
-+/* GATT Caching attributes */
-+#define GATT_CHARAC_CLI_FEAT				0x2B29
-+#define GATT_CHARAC_DB_HASH				0x2B2A
-+
- typedef struct {
- 	enum {
- 		BT_UUID_UNSPEC = 0,
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 145bb2a3a..330a0722a 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -526,6 +526,8 @@ static const struct {
+ 	{ 0x2adc, "Mesh Provisioning Data Out"			},
+ 	{ 0x2add, "Mesh Proxy Data In"				},
+ 	{ 0x2ade, "Mesh Proxy Data Out"				},
++	{ 0x2b29, "Client Supported Features"			},
++	{ 0x2b2A, "Database Hash"				},
+ 	/* vendor defined */
+ 	{ 0xfeff, "GN Netcom"					},
+ 	{ 0xfefe, "GN ReSound A/S"				},
 -- 
 2.17.2
 
