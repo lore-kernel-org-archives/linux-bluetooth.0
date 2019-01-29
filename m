@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A46A0C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B9F3C282D0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C1D82148E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 230102147A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2MoV6GH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bZLDarwp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727772AbfA2N05 (ORCPT
+        id S1727776AbfA2N05 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 29 Jan 2019 08:26:57 -0500
-Received: from mail-ed1-f45.google.com ([209.85.208.45]:41851 "EHLO
-        mail-ed1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727387AbfA2N04 (ORCPT
+Received: from mail-ed1-f42.google.com ([209.85.208.42]:36515 "EHLO
+        mail-ed1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727394AbfA2N05 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Jan 2019 08:26:56 -0500
-Received: by mail-ed1-f45.google.com with SMTP id a20so15941147edc.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jan 2019 05:26:55 -0800 (PST)
+        Tue, 29 Jan 2019 08:26:57 -0500
+Received: by mail-ed1-f42.google.com with SMTP id f23so15963660edb.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jan 2019 05:26:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=mJlk2bTrvkMsvMMMkMsXtWQzlaBuMZwWwK9Wt22pCec=;
-        b=e2MoV6GHJ5NcTEqZAeTiXxz/teWQawXjqdRw6/+tsUb6glEbwXQFb/ocgVOCUQVJIe
-         z4MdvYGxjVNQJOX10XXpHzqch0sBIsz8cTBix90VkwOVCUOF5nenlsVEFiPAsG1SiJCL
-         +3KYcbLRM0NfU3AXwGWqOrZrCyYJCCf8xpm0GvBm96SUyNpbj8uUsgHgUWoY6HQtHS82
-         kp7IE5cW2NkEhn1Y/2IQzPtua7ML3re0En5amyETh7IriLoGAFpH3FaWmb58Q9f1UqB/
-         IRyuMob6SPqXARjlpIgLfZD/ngv3GMphw3UEiCdfN2l7C6ifoyTHqYItGCS9VGsszutj
-         prJQ==
+        bh=UAtv7TOrkQDAbkzDsD/saBzd9wZrhlBrAa1rNJHZvwE=;
+        b=bZLDarwpx/EOOYXPx6QJzcsKzr0sqN+P0nc/ynF/0VdTvBAORCJrKzYyK4DykZbGhr
+         QJaAQpqBdZMhCne0K8xOJsBN/Q/lv1YV2PT9eo7wY+m7doVB6Iuo4oJ9lg/eqPy7nD1I
+         LYEhL7KjVuwbDdaz3X7InmHn6DzB1/XDWMKgAOHR7e48ItI87Z6wRfFfxcPgbTibIXxl
+         0cS7ELEFrKPtrgq8SBSRm8Sz2ijEamkOwiBu2Ubf1nl33f1cAPPHTFAZxyxZvfm/Akzj
+         TnWGo/wwQIhpXsKsvgqVRp6G5LSuo66i3vSrCycidSD+y30cp1JOlcq07rM6ej8L1Mj+
+         Wlfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=mJlk2bTrvkMsvMMMkMsXtWQzlaBuMZwWwK9Wt22pCec=;
-        b=rWAA8+qUmn99DEFUMxLuUJMBUcuAXYzvrxpNUpNhsIe9YbTuWJTuSMdyOjQgIeHRe2
-         +nfuEqEGkJe6vdjAqDhDu4BzitT8f6grbK4qIgvFwaseD7mWArw/t9E/pLyzGFZYyfs5
-         cCLL8DFlUy2EXWk1y9v+cvCF9V6QCV1dU3msIuIrOzcJjqzfz0lkHABlWPA3+SeZ0ULx
-         SIJVoZa2ulLV/2UYGTG0H83CgYLEzDu1RwGM+ABxUYxL4/rfU4cL6iSgj/RQG7FYt3xb
-         s5zP+8IctjOH2dEx7gnKh2POkik26cLz/5Xmj1YmQJs2xE4IsURINbIDlWXgVmktigTI
-         3KXA==
-X-Gm-Message-State: AJcUukf2tWcBSpct0XK6jcUcd3yeruhtdc1ZfAzqw8RMGiJPc8OTIoL/
-        3SaNwzsL00s05pb4NSX7oOwwlPuK
-X-Google-Smtp-Source: ALg8bN46wNOdGMNudWaTi4171aGw8NS+PVoP0amGBrb8E07dpnHs3i2gR22rMMzGSd395mvbQWgt/g==
-X-Received: by 2002:a50:9849:: with SMTP id h9mr24375101edb.36.1548768412607;
-        Tue, 29 Jan 2019 05:26:52 -0800 (PST)
+        bh=UAtv7TOrkQDAbkzDsD/saBzd9wZrhlBrAa1rNJHZvwE=;
+        b=WaHBQsHSxsO+UYFQC6Y+VMN81stfjJc87zkW4aEE59GAeaHr/CSc7YTCOHKWkZxfLQ
+         yQOv9LgOIMymuwPH4iEFlMsbKmd6lfXCsIlskXXt9uM9rlkekyWzyykzUSSAD2XP2CBg
+         H+bcTjQQAlhWlWox7JjjC5Dm7UmXnkvQsZtH0Qn7t+2eogx8pJnB3tV2erL+sExB+y6q
+         4rxPemPhksjXOedGwUwhIkfRYEEHtv4zAEvSL6AyQKiV4fse2FU5NqlWH8SVdwx+D12x
+         scH91a7bOVbTgXyPFm0nsCAhvzM9X4reSmjvKfynVonCkNi6bC0CZDwmAdAayytuQgoY
+         4Gbg==
+X-Gm-Message-State: AJcUukfcL9Z6gp2RBeUYKkrS1KPbOkr3KUfTneJjnx2kkb1gsmVJl5hb
+        36CPAqpJZU4p6TTZhkVvgRqbPoFq
+X-Google-Smtp-Source: ALg8bN7B0nml+oL7GWRYz1C3ceNju+2ePZLWUH7igksxyl2yqb8/kQEV587E8fw0uZyqhfvoFgSw4A==
+X-Received: by 2002:a50:b172:: with SMTP id l47mr25020355edd.225.1548768415297;
+        Tue, 29 Jan 2019 05:26:55 -0800 (PST)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id i14-v6sm8179964ejy.40.2019.01.29.05.26.51
+        by smtp.gmail.com with ESMTPSA id i14-v6sm8179964ejy.40.2019.01.29.05.26.53
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 29 Jan 2019 05:26:51 -0800 (PST)
+        Tue, 29 Jan 2019 05:26:54 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 12/15] gatt: Implement Robust Caching handling for server
-Date:   Tue, 29 Jan 2019 15:26:31 +0200
-Message-Id: <20190129132634.28786-12-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 13/15] shared/gatt-client: Read database hash if available
+Date:   Tue, 29 Jan 2019 15:26:32 +0200
+Message-Id: <20190129132634.28786-13-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20190129132634.28786-1-luiz.dentz@gmail.com>
 References: <20190129132634.28786-1-luiz.dentz@gmail.com>
@@ -71,203 +71,256 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This detects when a client becomes change-unware returning
-DB Out of Sync error when that happens.
+This reads the database hash if available and compares to the existing
+value, if it matches consider the discovery is completed.
 ---
- src/device.c        |  2 +-
- src/gatt-database.c | 75 ++++++++++++++++++++++++++++++++++++++++++---
- src/gatt-database.h |  4 +--
- 3 files changed, 74 insertions(+), 7 deletions(-)
+ src/shared/gatt-client.c | 177 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 152 insertions(+), 25 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 79ede3729..060251f66 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4922,7 +4922,7 @@ static void gatt_server_init(struct btd_device *device,
- 	bt_att_set_enc_key_size(device->att, device->ltk_enc_size);
- 	bt_gatt_server_set_debug(device->server, gatt_debug, NULL, NULL);
- 
--	btd_gatt_database_att_connected(database, device->att);
-+	btd_gatt_database_server_connected(database, device->server);
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 3c2aa293b..d5f9b1294 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -325,6 +325,7 @@ struct discovery_op {
+ 	struct queue *pending_chrcs;
+ 	struct queue *ext_prop_desc;
+ 	struct gatt_db_attribute *cur_svc;
++	struct gatt_db_attribute *hash;
+ 	bool success;
+ 	uint16_t start;
+ 	uint16_t end;
+@@ -349,11 +350,19 @@ static void discovery_op_free(struct discovery_op *op)
+ 	free(op);
  }
  
- static bool local_counter(uint32_t *sign_cnt, void *user_data)
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index d72f2c781..aecfa0e43 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -180,6 +180,8 @@ struct device_state {
- 	uint8_t bdaddr_type;
- 	unsigned int disc_id;
- 	uint8_t cli_feat[1];
-+	bool change_aware;
-+	bool out_of_sync;
- 	struct queue *ccc_states;
- 	struct notify *pending;
- };
-@@ -328,6 +330,7 @@ static void att_disconnected(int err, void *user_data)
- 	DBG("");
- 
- 	state->disc_id = 0;
-+	state->out_of_sync = false;
- 
- 	device = btd_adapter_find_device(state->db->adapter, &state->bdaddr,
- 							state->bdaddr_type);
-@@ -1119,10 +1122,13 @@ static void cli_feat_write_cb(struct gatt_db_attribute *attrib,
- 	/* Shall we reallocate the feat array if bigger? */
- 	len = MIN(sizeof(state->cli_feat), len);
- 	while (len) {
--		state->cli_feat[len - 1] |= value[len -1];
-+		state->cli_feat[len - 1] |= value[len - 1];
- 		len--;
- 	}
- 
-+	state->cli_feat[0] &= BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING;
-+	state->change_aware = true;
++static bool read_db_hash(struct discovery_op *op);
 +
- done:
- 	gatt_db_attribute_write_result(attrib, id, ecode);
- }
-@@ -1134,12 +1140,22 @@ static void db_hash_read_cb(struct gatt_db_attribute *attrib,
+ static void discovery_op_complete(struct discovery_op *op, bool success,
+ 								uint8_t err)
  {
- 	struct btd_gatt_database *database = user_data;
- 	const uint8_t *hash;
-+	struct device_state *state;
-+	bdaddr_t bdaddr;
-+	uint8_t bdaddr_type;
+ 	const struct queue_entry *svc;
  
- 	DBG("Database Hash read");
- 
- 	hash = gatt_db_get_hash(database->db);
- 
- 	gatt_db_attribute_read_result(attrib, id, 0, hash, 16);
++	op->success = success;
 +
-+	if (!get_dst_info(att, &bdaddr, &bdaddr_type))
++	/* Read database hash if discovery has been successful */
++	if (success && read_db_hash(op))
 +		return;
 +
-+	state = find_device_state(database, &bdaddr, bdaddr_type);
-+	if (state)
-+		state->change_aware = true;
+ 	/*
+ 	 * Unregister remove callback so it is not called when clearing unused
+ 	 * range.
+@@ -380,7 +389,6 @@ static void discovery_op_complete(struct discovery_op *op, bool success,
+ 	if (op->last != UINT16_MAX)
+ 		gatt_db_clear_range(op->client->db, op->last + 1, UINT16_MAX);
+ 
+-	op->success = success;
+ 	op->complete_func(op, success, err);
  }
  
- static void populate_gatt_service(struct btd_gatt_database *database)
-@@ -1197,7 +1213,14 @@ static void conf_cb(void *user_data)
- 
- static void service_changed_conf(void *user_data)
- {
-+	struct device_state *state = user_data;
-+
- 	DBG("");
-+
-+	if (!state)
-+		return;
-+
-+	state->change_aware = true;
+@@ -1249,6 +1257,139 @@ static void notify_client_ready(struct bt_gatt_client *client, bool success,
+ 	bt_gatt_client_unref(client);
  }
  
- static void state_set_pending(struct device_state *state, struct notify *notify)
-@@ -1239,6 +1262,14 @@ static void send_notification_to_device(void *data, void *user_data)
- 	struct btd_device *device;
- 	struct bt_gatt_server *server;
- 
-+	if (notify->conf == service_changed_conf) {
-+		if (device_state->cli_feat[0] &
-+				BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING) {
-+			device_state->change_aware = false;
-+			notify->user_data = device_state;
-+		}
-+	}
-+
- 	ccc = find_ccc_state(device_state, notify->ccc_handle);
- 	if (!ccc)
- 		return;
-@@ -3352,6 +3383,40 @@ static const GDBusMethodTable manager_methods[] = {
- 	{ }
- };
- 
-+static uint8_t server_authorize(struct bt_att *att, uint8_t opcode,
-+					uint16_t handle, void *user_data)
++static void discover_all(struct discovery_op *op)
 +{
-+	struct btd_gatt_database *database = user_data;
-+	struct device_state *state;
-+	bdaddr_t bdaddr;
-+	uint8_t bdaddr_type;
++	struct bt_gatt_client *client = op->client;
 +
-+	if (!get_dst_info(att, &bdaddr, &bdaddr_type))
-+		return 0;
++	client->discovery_req = bt_gatt_discover_all_primary_services(
++							client->att, NULL,
++							discover_primary_cb,
++							discovery_op_ref(op),
++							discovery_op_unref);
++	if (client->discovery_req)
++		return;
 +
-+	/* Skip if there is no device state */
-+	state = find_device_state(database, &bdaddr, bdaddr_type);
-+	if (!state)
-+		return 0;
++	util_debug(client->debug_callback, client->debug_data,
++			"Failed to initiate primary service discovery");
 +
-+	/* Skip if client doesn't support Robust Caching */
-+	if (!(state->cli_feat[0] & BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING))
-+		return 0;
++	client->in_init = false;
++	notify_client_ready(client, false, BT_ATT_ERROR_UNLIKELY);
 +
-+	if (state->change_aware)
-+		return 0;
-+
-+	if (state->out_of_sync) {
-+		state->out_of_sync = false;
-+		state->change_aware = true;
-+		return 0;
-+	}
-+
-+	state->out_of_sync = true;
-+
-+	return BT_ATT_ERROR_DB_OUT_OF_SYNC;
++	discovery_op_unref(op);
 +}
 +
- struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
++static void db_hash_write_value_cb(struct gatt_db_attribute *attrib,
++						int err, void *user_data)
++{
++	struct bt_gatt_client *client = user_data;
++
++	util_debug(client->debug_callback, client->debug_data,
++						"Value set status: %d", err);
++}
++
++static void db_hash_read_value_cb(struct gatt_db_attribute *attrib,
++						int err, const uint8_t *value,
++						size_t length, void *user_data)
++{
++	const uint8_t **hash = user_data;
++
++	if (err || (length != 16))
++		return;
++
++	*hash = value;
++}
++
++static void db_hash_read_cb(bool success, uint8_t att_ecode,
++						struct bt_gatt_result *result,
++						void *user_data)
++{
++	struct discovery_op *op = user_data;
++	struct bt_gatt_client *client = op->client;
++	const uint8_t *hash = NULL, *value;
++	uint16_t len, handle;
++	struct bt_gatt_iter iter;
++
++	if (!success)
++		goto discover;
++
++	bt_gatt_iter_init(&iter, result);
++	bt_gatt_iter_next_read_by_type(&iter, &handle, &len, &value);
++
++	util_debug(client->debug_callback, client->debug_data,
++				"DB Hash found: handle 0x%04x length 0x%04x",
++				handle, len);
++
++	if (len != 16)
++		goto discover;
++
++	/* Read stored value in the db */
++	gatt_db_attribute_read(op->hash, 0, BT_ATT_OP_READ_REQ, NULL,
++					db_hash_read_value_cb, &hash);
++
++	/* Check if the has has changed since last time */
++	if (hash && !memcmp(hash, value, len)) {
++		util_debug(client->debug_callback, client->debug_data,
++				"DB Hash match: skipping discovery");
++		queue_remove_all(op->pending_svcs, NULL, NULL, NULL);
++		discovery_op_complete(op, true, 0);
++		return;
++	}
++
++	util_debug(client->debug_callback, client->debug_data,
++						"DB Hash value:");
++	util_hexdump(' ', value, len, client->debug_callback,
++						client->debug_data);
++
++	/* Store the new hash in the db */
++	gatt_db_attribute_write(op->hash, 0, value, len, 0, NULL,
++					db_hash_write_value_cb, client);
++
++discover:
++	if (!op->success) {
++		discover_all(op);
++		return;
++	}
++
++	discovery_op_complete(op, true, 0);
++}
++
++static void get_first_attribute(struct gatt_db_attribute *attrib,
++								void *user_data)
++{
++	struct gatt_db_attribute **stored = user_data;
++
++	if (*stored)
++		return;
++
++	*stored = attrib;
++}
++
++static bool read_db_hash(struct discovery_op *op)
++{
++	struct bt_gatt_client *client = op->client;
++	bt_uuid_t uuid;
++
++	/* Check if hash was already read */
++	if (op->hash)
++		return false;
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_DB_HASH);
++	gatt_db_find_by_type(client->db, 0x0001, 0xffff, &uuid,
++						get_first_attribute, &op->hash);
++	if (!op->hash)
++		return false;
++
++	if (!bt_gatt_read_by_type(client->att, 0x0001, 0xffff, &uuid,
++							db_hash_read_cb,
++							discovery_op_ref(op),
++							discovery_op_unref)) {
++		discovery_op_unref(op);
++		return false;
++	}
++
++	return true;
++}
++
+ static void exchange_mtu_cb(bool success, uint8_t att_ecode, void *user_data)
  {
- 	struct btd_gatt_database *database;
-@@ -3413,7 +3478,6 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter)
- 	if (!database->db_id)
- 		goto fail;
+ 	struct discovery_op *op = user_data;
+@@ -1282,21 +1423,12 @@ static void exchange_mtu_cb(bool success, uint8_t att_ecode, void *user_data)
+ 					bt_att_get_mtu(client->att));
  
+ discover:
+-	client->discovery_req = bt_gatt_discover_all_primary_services(
+-							client->att, NULL,
+-							discover_primary_cb,
+-							discovery_op_ref(op),
+-							discovery_op_unref);
+-	if (client->discovery_req)
++	if (read_db_hash(op)) {
++		op->success = false;
+ 		return;
++	}
+ 
+-	util_debug(client->debug_callback, client->debug_data,
+-			"Failed to initiate primary service discovery");
 -
- 	return database;
- 
- fail:
-@@ -3442,9 +3506,10 @@ struct gatt_db *btd_gatt_database_get_db(struct btd_gatt_database *database)
- 	return database->db;
+-	client->in_init = false;
+-	notify_client_ready(client, false, att_ecode);
+-
+-	discovery_op_unref(op);
++	discover_all(op);
  }
  
--void btd_gatt_database_att_connected(struct btd_gatt_database *database,
--						struct bt_att *att)
-+void btd_gatt_database_server_connected(struct btd_gatt_database *database,
-+						struct bt_gatt_server *server)
+ struct service_changed_op {
+@@ -1491,17 +1623,6 @@ static unsigned int register_notify(struct bt_gatt_client *client,
+ 	return notify_data->id;
+ }
+ 
+-static void get_first_attribute(struct gatt_db_attribute *attrib,
+-								void *user_data)
+-{
+-	struct gatt_db_attribute **stored = user_data;
+-
+-	if (*stored)
+-		return;
+-
+-	*stored = attrib;
+-}
+-
+ static void service_changed_register_cb(uint16_t att_ecode, void *user_data)
  {
-+	struct bt_att *att = bt_gatt_server_get_att(server);
- 	struct device_state *state;
- 	bdaddr_t bdaddr;
- 	uint8_t bdaddr_type;
-@@ -3452,6 +3517,8 @@ void btd_gatt_database_att_connected(struct btd_gatt_database *database,
- 	if (!get_dst_info(att, &bdaddr, &bdaddr_type))
- 		return;
+ 	bool success;
+@@ -1747,6 +1868,11 @@ static bool gatt_client_init(struct bt_gatt_client *client, uint16_t mtu)
+ 	return true;
  
-+	bt_gatt_server_set_authorize(server, server_authorize, database);
+ discover:
++	if (read_db_hash(op)) {
++		op->success = false;
++		goto done;
++	}
 +
- 	state = find_device_state(database, &bdaddr, bdaddr_type);
- 	if (!state || !state->pending)
- 		return;
-diff --git a/src/gatt-database.h b/src/gatt-database.h
-index a77a0fb20..154d3243f 100644
---- a/src/gatt-database.h
-+++ b/src/gatt-database.h
-@@ -23,9 +23,9 @@ struct btd_gatt_database *btd_gatt_database_new(struct btd_adapter *adapter);
- void btd_gatt_database_destroy(struct btd_gatt_database *database);
+ 	client->discovery_req = bt_gatt_discover_all_primary_services(
+ 							client->att, NULL,
+ 							discover_primary_cb,
+@@ -1757,6 +1883,7 @@ discover:
+ 		return false;
+ 	}
  
- struct gatt_db *btd_gatt_database_get_db(struct btd_gatt_database *database);
--void btd_gatt_database_att_connected(struct btd_gatt_database *database,
--						struct bt_att *att);
- void btd_gatt_database_att_disconnected(struct btd_gatt_database *database,
- 						struct btd_device *device);
-+void btd_gatt_database_server_connected(struct btd_gatt_database *database,
-+						struct bt_gatt_server *server);
- 
- void btd_gatt_database_restore_svc_chng_ccc(struct btd_gatt_database *database);
++done:
+ 	client->in_init = true;
+ 	return true;
+ }
 -- 
 2.17.2
 
