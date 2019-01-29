@@ -2,107 +2,242 @@ Return-Path: <SRS0=G1v0=QF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C5EC169C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 12:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D47C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:08:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F6A9214DA
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 12:25:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F016E20870
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:08:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="VDHkewhT";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="a3TQ1ary"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728553AbfA2MZx (ORCPT
+        id S1726298AbfA2NIP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Jan 2019 07:25:53 -0500
-Received: from mga11.intel.com ([192.55.52.93]:20101 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728060AbfA2MZx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Jan 2019 07:25:53 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Jan 2019 04:25:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,537,1539673200"; 
-   d="scan'208";a="134076046"
-Received: from ubuntu16.iind.intel.com ([10.224.186.218])
-  by orsmga001.jf.intel.com with ESMTP; 29 Jan 2019 04:25:51 -0800
-From:   raghuram.hegde@intel.com
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Raghuram Hegde <raghuram.hegde@intel.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>
-Subject: [Patch v1] btusb: Add shutdown routine for BTUSB_INTEL_NEW devices
-Date:   Tue, 29 Jan 2019 17:54:48 +0530
-Message-Id: <1548764688-5429-1-git-send-email-raghuram.hegde@intel.com>
-X-Mailer: git-send-email 2.7.4
+        Tue, 29 Jan 2019 08:08:15 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:45782 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725601AbfA2NIO (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 29 Jan 2019 08:08:14 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 41D8B607C6; Tue, 29 Jan 2019 13:08:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1548767293;
+        bh=Q12TnkwkVVITYlDvppoUDUNceEPtstIaTK+pdb3rrNg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=VDHkewhTyTWWLtq+mLmhUOWq7+v+HHOtq3xAxDF7oMSpYjZWmh4Rvp9ggExDQe7fz
+         OBvdBKc2We1FWWA+pDkNvQ0An1RbqPrY299F09WcFvDjJiRSrkrFXopm/6gNRtILK6
+         6nJoDvJ7jBI0b4PVrTDWvAyfq5MHeoJ6KqCmlN3o=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id 0CB8260112;
+        Tue, 29 Jan 2019 13:08:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1548767292;
+        bh=Q12TnkwkVVITYlDvppoUDUNceEPtstIaTK+pdb3rrNg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=a3TQ1aryKma/5Y7XmxUlLdCxm5CVgKsXzP7V2hKtAuGDcjsp0oUITDkBS9Q9wWGqh
+         qNsa1yEXV6RHkaRjYWIfp73PffqpNi6QCi/7rNe4E0AFTi5WNOfdC0XGoaD/7FBeC7
+         c2RbQYZfgnZS95DovzSxT8Dl1FqgDebwPHgJsJvo=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 29 Jan 2019 18:38:12 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v9 1/3] Bluetooth: hci_qca: use wait_until_sent() for
+ power pulses
+In-Reply-To: <20190128174750.GG81583@google.com>
+References: <20190124120808.8275-1-bgodavar@codeaurora.org>
+ <20190124120808.8275-2-bgodavar@codeaurora.org>
+ <20190125011412.GE81583@google.com>
+ <0fac93a13ee445569659075cf467ad4d@codeaurora.org>
+ <20190128174750.GG81583@google.com>
+Message-ID: <911775a5d93dc066ab4b96f56b74e341@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Raghuram Hegde <raghuram.hegde@intel.com>
+Hi Matthias,
 
-Observation:
-If BT operations (Eg:BREDR inquiry/LE scan) were triggered
-through the stack, followed by BT turn off through
-'hciconfig hci0 down', the controller would still be active
-and consume power.
-Also, there is a possibility that a race condition/
-synchronization issue might arise on the subsequent BT turn
-on, as the controller might try to push the
-events that were queued up before processing the HCI Reset
-command.
+On 2019-01-28 23:17, Matthias Kaehlcke wrote:
+> On Mon, Jan 28, 2019 at 07:19:56PM +0530, Balakrishna Godavarthi wrote:
+>> Hi Matthias,
+>> 
+>> On 2019-01-25 06:44, Matthias Kaehlcke wrote:
+>> > On Thu, Jan 24, 2019 at 05:38:06PM +0530, Balakrishna Godavarthi wrote:
+>> > > wcn3990 requires a power pulse to turn ON/OFF along with
+>> > > regulators. Sometimes we are observing the power pulses are sent
+>> > > out with some time delay, due to queuing these commands. This is
+>> > > causing synchronization issues with chip, which intern delay the
+>> > > chip setup or may end up with communication issues.
+>> > >
+>> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> > > ---
+>> > > Changes in v9:
+>> > >  * Reverted to 100us sleep.
+>> > >  * used inline call msecs_to_jiffies()
+>> > >
+>> > > Changes in v8:
+>> > >  * Updated 1 second timeout instead of indefinite wait.
+>> > >
+>> > > Changes in v7:
+>> > >  *  updated the wait time to 5 ms after sending power pulses.
+>> > >
+>> > > Changes in v6:
+>> > >  * added serdev_device_write_flush() in qca_send_power_pulse
+>> > >    instead during the power off pulse.
+>> > >
+>> > > Changes in v5:
+>> > >  * added serdev_device_write_flush() in qca_power_off().
+>> > > ---
+>> > >  drivers/bluetooth/hci_qca.c | 40
+>> > > +++++++++++++++----------------------
+>> > >  1 file changed, 16 insertions(+), 24 deletions(-)
+>> > >
+>> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> > > index f036c8f98ea3..c08f4d105e73 100644
+>> > > --- a/drivers/bluetooth/hci_qca.c
+>> > > +++ b/drivers/bluetooth/hci_qca.c
+>> > > @@ -60,6 +60,7 @@
+>> > >  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
+>> > >  #define IBS_TX_IDLE_TIMEOUT_MS		2000
+>> > >  #define BAUDRATE_SETTLE_TIMEOUT_MS	300
+>> > > +#define POWER_PULSE_TRANS_TIMEOUT_MS	1000
+>> >
+>> > I still doubt that this mega-timeout of 1s is needed, but it shouldn't
+>> > do any harm either, so whatever ...
+>> >
+>> 
+>> [Bala]: for now let us have it. we can improve it in the improvement 
+>> patch
+>>         based on the results.
+> 
+> Fine.
+> 
+> With the UART buffer flushed and flow control disabled I wonder though
+> what makes you think that it could take longer than a few milliseconds
+> for the byte being put on the wire, short of a bug in the UART driver
+> or hardware, which (if it existed) shouldn't be worked around here.
+> 
 
-btusb_shutdown_intel_new routine shall reset the controller
-and stop all BT operation.
-Advantages:
-	1. Power save on the platform
-	2. Host and controller will be in Sync.
+[Bala]: i don't see any issue decreasing to milliseconds. will update it 
+to 100ms.
 
-Signed-off-by: Raghuram Hegde <raghuram.hegde@intel.com>
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
----
- drivers/bluetooth/btusb.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+>> > >  /* susclk rate */
+>> > >  #define SUSCLK_RATE_32KHZ	32768
+>> > > @@ -1013,11 +1014,10 @@ static inline void host_set_baudrate(struct
+>> > > hci_uart *hu, unsigned int speed)
+>> > >  		hci_uart_set_baudrate(hu, speed);
+>> > >  }
+>> > >
+>> > > -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
+>> > > +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
+>> > >  {
+>> > > -	struct hci_uart *hu = hci_get_drvdata(hdev);
+>> > > -	struct qca_data *qca = hu->priv;
+>> > > -	struct sk_buff *skb;
+>> > > +	int ret;
+>> > > +	int timeout = msecs_to_jiffies(POWER_PULSE_TRANS_TIMEOUT_MS);
+>> > >
+>> > >  	/* These power pulses are single byte command which are sent
+>> > >  	 * at required baudrate to wcn3990. On wcn3990, we have an external
+>> > > @@ -1029,21 +1029,19 @@ static int qca_send_power_pulse(struct
+>> > > hci_dev *hdev, u8 cmd)
+>> > >  	 * save power. Disabling hardware flow control is mandatory while
+>> > >  	 * sending power pulses to SoC.
+>> > >  	 */
+>> > > -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
+>> > > -
+>> > > -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
+>> > > -	if (!skb)
+>> > > -		return -ENOMEM;
+>> > > +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to controller", cmd);
+>> > >
+>> > > +	serdev_device_write_flush(hu->serdev);
+>> > >  	hci_uart_set_flow_control(hu, true);
+>> > > +	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
+>> > > +	if (ret < 0) {
+>> > > +		bt_dev_err(hu->hdev, "failed to send power pulse %02x", cmd);
+>> > > +		return ret;
+>> > > +	}
+>> > >
+>> > > -	skb_put_u8(skb, cmd);
+>> > > -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
+>> > > -
+>> > > -	skb_queue_tail(&qca->txq, skb);
+>> > > -	hci_uart_tx_wakeup(hu);
+>> > > +	serdev_device_wait_until_sent(hu->serdev, timeout);
+>> > >
+>> > > -	/* Wait for 100 uS for SoC to settle down */
+>> > > +	/* Wait for 100 uS for SoC to settle down for the received byte. */
+>> >
+>> > I don't think 'for the received byte' adds much value here. If you
+>> > respin anyway I'd suggest to leave the comment as is.
+>> >
+>> 
+>> [Bala]: will update.
+>> 
+>> > >  	usleep_range(100, 200);
+>> > >  	hci_uart_set_flow_control(hu, false);
+>> > >
+>> > > @@ -1116,7 +1114,6 @@ static int qca_set_speed(struct hci_uart *hu,
+>> > > enum qca_speed_type speed_type)
+>> > >
+>> > >  static int qca_wcn3990_init(struct hci_uart *hu)
+>> > >  {
+>> > > -	struct hci_dev *hdev = hu->hdev;
+>> > >  	struct qca_serdev *qcadev;
+>> > >  	int ret;
+>> > >
+>> > > @@ -1139,12 +1136,12 @@ static int qca_wcn3990_init(struct hci_uart
+>> > > *hu)
+>> > >
+>> > >  	/* Forcefully enable wcn3990 to enter in to boot mode. */
+>> > >  	host_set_baudrate(hu, 2400);
+>> > > -	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
+>> > > +	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
+>> > >  	if (ret)
+>> > >  		return ret;
+>> > >
+>> > >  	qca_set_speed(hu, QCA_INIT_SPEED);
+>> > > -	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWERON_PULSE);
+>> > > +	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWERON_PULSE);
+>> > >  	if (ret)
+>> > >  		return ret;
+>> > >
+>> > > @@ -1274,13 +1271,8 @@ static const struct qca_vreg_data
+>> > > qca_soc_data = {
+>> > >
+>> > >  static void qca_power_shutdown(struct hci_uart *hu)
+>> > >  {
+>> > > -	struct serdev_device *serdev = hu->serdev;
+>> > > -	unsigned char cmd = QCA_WCN3990_POWEROFF_PULSE;
+>> > > -
+>> > >  	host_set_baudrate(hu, 2400);
+>> > > -	hci_uart_set_flow_control(hu, true);
+>> > > -	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
+>> > > -	hci_uart_set_flow_control(hu, false);
+>> > > +	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
+>> > >  	qca_power_setup(hu, false);
+>> > >  }
+>> > >
+>> >
+>> > Looks good to me besides possible minor improvements:
+>> >
+>> > Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+>> 
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5de0c2e59b97..3aac92be0f87 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2434,6 +2434,24 @@ static int btusb_shutdown_intel(struct hci_dev *hdev)
- 	return 0;
- }
- 
-+static int btusb_shutdown_intel_new(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+	
-+	/* Send HCI Reset to the controller to stop any BT activity which
-+	 * were triggered. This will help to save power and maintain the
-+	 * sync b/w Host and controller
-+	 */
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "HCI reset during shutdown failed");
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
- #ifdef CONFIG_PM
- /* Configure an out-of-band gpio as wake-up pin, if specified in device tree */
- static int marvell_config_oob_wake(struct hci_dev *hdev)
-@@ -3139,6 +3157,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->manufacturer = 2;
- 		hdev->send = btusb_send_frame_intel;
- 		hdev->setup = btusb_setup_intel_new;
-+		hdev->shutdown = btusb_shutdown_intel_new;
- 		hdev->hw_error = btintel_hw_error;
- 		hdev->set_diag = btintel_set_diag;
- 		hdev->set_bdaddr = btintel_set_bdaddr;
 -- 
-2.7.4
-
+Regards
+Balakrishna.
