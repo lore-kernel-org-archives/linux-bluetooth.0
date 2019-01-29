@@ -2,72 +2,69 @@ Return-Path: <SRS0=G1v0=QF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F4164C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E4FEC169C4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C51332147A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 213F92147A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9xxTDGB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuHxFuxZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727747AbfA2N0u (ORCPT
+        id S1727789AbfA2N0v (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Jan 2019 08:26:50 -0500
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:35669 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727387AbfA2N0u (ORCPT
+        Tue, 29 Jan 2019 08:26:51 -0500
+Received: from mail-ed1-f49.google.com ([209.85.208.49]:33263 "EHLO
+        mail-ed1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727743AbfA2N0v (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Jan 2019 08:26:50 -0500
-Received: by mail-ed1-f65.google.com with SMTP id x30so15998899edx.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jan 2019 05:26:48 -0800 (PST)
+        Tue, 29 Jan 2019 08:26:51 -0500
+Received: by mail-ed1-f49.google.com with SMTP id p6so16017141eds.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jan 2019 05:26:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=vLwe/+rJ4RKQgBAYmxmK0w9wIE1xNanRiQE30O4s8AE=;
-        b=W9xxTDGBioamOmCWozYyJHls/iaeChqGABOI4IDyC4lrkd+059o/hHWYncDuD4ZQwk
-         BHxiizUO3gng1tJNsIrH/8TEZPjgBaU/uxu9z+OVrj7U5UpAXBvGBmGI7roQ72qjH4uR
-         OEZiTOmfydanG4H2gD8XRwD1nS1xuPvFZ5fC3gB0pbyJG2PdCtBT9vx8w3RFrGsjnFCF
-         /rLnuraHGANAAYmEHA8EgO4L1ZwdwwCnSp9mKYGDCiE34TTRNgc1ui7qoaX37VfCObgp
-         vVYTmX60DjbS8wit/JmmUcFnwj532EDJDO+A3WP9Rbb96cRUXRfXeDWMOidhjH4w76PM
-         1G9Q==
+        h=from:to:subject:date:message-id:in-reply-to:references;
+        bh=J7uhUtEootXzSWc/VHDajLB7MO18Ec7bTzsGtorW4Zc=;
+        b=AuHxFuxZNSqJTCvQQ4BOfrZ223uVxYiXzsxUANl/eaWzwQUqL6Iw26Fjq+WO3tRK1H
+         Khz8fmLLjkd+H4MzxrqcXM7g6rcIhdVYt8AU77WgnbNujwuIa5gEsxVPFii9U8tTGlcA
+         8cYT/c9U7jB9dqve8H3rH9sFVsPgs2Z4zGMBZ7FgyWM3uvxPrGcI8zKi0ealkf6eFl56
+         B+t+sKYn6QY2xnCdnxzxcMTpnItUOC5ucbZMAR1IbJiQyG+MkUg02dC/Nxg4Af66JfN6
+         egVs4arlQhyYGcHRg5InBMLBctxYi43oKSGJTzFDa5SP5dfx7ARIStc3rwreCfKOI/HU
+         MK2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=vLwe/+rJ4RKQgBAYmxmK0w9wIE1xNanRiQE30O4s8AE=;
-        b=n2LLubEzrZk58j7/y30loZSQsI9/4W90XH2l4c1WOdUMqdEH5PG3HVdFuwpxISu2XV
-         1rEJLTMGNA10dezoRERZolWBmZ8RbO0YehQdiNtJZeWcMfITLlcNTAR0eHTPY7vHM9r5
-         pwn49G0bdNNZOq5DW04sv+1zOoDwKxb7OzAOjS1gZ8WF1IOwVGZD3v0PUqfU+2xWiZ5p
-         ePQP3dbVT+wipxAt5+vIam8tUGdo9Kf36KW6p2icO9DzsdxrLWinOxa4rpMpf59yjGJ3
-         DADZ5fSdxpE5/ILMXuvLuXhJ7Dgb3KSK0Y9WHa2ubmzy/I840bMnBzKyXTLNTGTY6DQ7
-         ZrPw==
-X-Gm-Message-State: AJcUukdscFP5A5tM8I711yic+YFYA18gbE7sJAW8i/mOy7DSfTybXntN
-        5NX3lIJAadMf9cehB8sJSCCUUK3h
-X-Google-Smtp-Source: ALg8bN5e8S47W3BGTd8en+zD+omD8HbqgdTgeER7NDsB4jdfs0qpFMYRwbZEMDsojfOt5gVcsH7NKg==
-X-Received: by 2002:a50:a741:: with SMTP id h59mr24240167edc.106.1548768407092;
-        Tue, 29 Jan 2019 05:26:47 -0800 (PST)
+         :references;
+        bh=J7uhUtEootXzSWc/VHDajLB7MO18Ec7bTzsGtorW4Zc=;
+        b=PlykxphRCgpE9EarNs9pTPRjrRboD6DI4BTy2QX5vvpxDPmivEa0UxGRpOtgbt+uWT
+         jCJF41A/BHnh1QCCkfabDZqoGm8BKxqn613phmTGQlKj2hTU3hSTXOU1/t/f0fsSMdog
+         7mgMyLf/Ddtm+hiSplsF1MxX3QU6LGvzXMCEsDkIWXK7W3uB9izVSy1C/Hgwmfg5xo0y
+         5qQ4gOCLO1hqNOpy8Hn/+cbIPhN0AAQrlX+CJULV5Gi5FlNjLEmnc1d+ZsjbW20ZAHj1
+         4rUSe3SEXI8LDLRdEUTY7EWLWRTfxNmzpNYs/JMllJdeHUdkOmBoyvZ/CqvsenrGH/dF
+         oAAQ==
+X-Gm-Message-State: AJcUukfJVfDp5m6c8sMnQUix3kSWFF8zrZ0VKTijqyJXjs2gFCovupcw
+        YE6lBknuz1c0012MUYM6sUr0RGJD
+X-Google-Smtp-Source: ALg8bN6DdrQlyFBjgkUAzCd5gy9Js+KyaKQulXHF9797PeqEB3WWieesPAATkAjKtQl3A0kyEutn3g==
+X-Received: by 2002:a50:d797:: with SMTP id w23mr26250983edi.19.1548768408501;
+        Tue, 29 Jan 2019 05:26:48 -0800 (PST)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id i14-v6sm8179964ejy.40.2019.01.29.05.26.45
+        by smtp.gmail.com with ESMTPSA id i14-v6sm8179964ejy.40.2019.01.29.05.26.47
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 29 Jan 2019 05:26:46 -0800 (PST)
+        Tue, 29 Jan 2019 05:26:47 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 08/15] shared/gatt-db: Generate database hash
-Date:   Tue, 29 Jan 2019 15:26:27 +0200
-Message-Id: <20190129132634.28786-8-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 09/15] gatt: Add caching support for server
+Date:   Tue, 29 Jan 2019 15:26:28 +0200
+Message-Id: <20190129132634.28786-9-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20190129132634.28786-1-luiz.dentz@gmail.com>
 References: <20190129132634.28786-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -75,151 +72,159 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This use bt_crypto_hash (AES-CMAC) to generate a database hash
-using the content of the attribute:
-
-In ascending order of attribute handles, starting with the first handle,
-concatenate the fields Attribute Handle, Attribute Type, and Attribute
-Value if the attribute has one of the following types:
-«Primary Service», «Secondary Service», «Included Service»,
-«Characteristic», or «Characteristic Extended Properties», concatenate
-the fields Attribute Handle and Attribute Type if the attribute has one
-of the following types: «Characteristic User Description»,
-«Client Characteristic Configuration»,
-«Server Characteristic Configuration», «Characteristic Format», or
-«Characteristic Aggregate Format», and ignore the attribute if it has
-any other type (such attributes are not part of the concatenation).
+This registers both Client Features and Database Hash Characteristics
+which are mandatory for the server.
 ---
- src/shared/gatt-db.c | 68 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 66 insertions(+), 2 deletions(-)
+ src/gatt-database.c | 103 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 102 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index d97dca124..7dc93268b 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -35,6 +35,7 @@
- #include "src/shared/timeout.h"
- #include "src/shared/att.h"
- #include "src/shared/gatt-db.h"
-+#include "src/shared/crypto.h"
- 
- #ifndef MAX
- #define MAX(a, b) ((a) > (b) ? (a) : (b))
-@@ -58,6 +59,7 @@ static const bt_uuid_t ext_desc_uuid = { .type = BT_UUID16,
- 
- struct gatt_db {
- 	int ref_count;
-+	struct bt_crypto *crypto;
- 	uint8_t hash[16];
- 	unsigned int hash_id;
- 	uint16_t next_handle;
-@@ -225,6 +227,7 @@ struct gatt_db *gatt_db_new(void)
- 	struct gatt_db *db;
- 
- 	db = new0(struct gatt_db, 1);
-+	db->crypto = bt_crypto_new();
- 	db->services = queue_new();
- 	db->notify_list = queue_new();
- 	db->next_handle = 0x0001;
-@@ -266,12 +269,71 @@ static void handle_notify(void *data, void *user_data)
- 		notify->service_removed(notify_data->attr, notify->user_data);
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 2c2f035b1..d72f2c781 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -86,6 +86,8 @@ struct btd_gatt_database {
+ 	struct queue *ccc_callbacks;
+ 	struct gatt_db_attribute *svc_chngd;
+ 	struct gatt_db_attribute *svc_chngd_ccc;
++	struct gatt_db_attribute *cli_feat;
++	struct gatt_db_attribute *db_hash;
+ 	struct queue *apps;
+ 	struct queue *profiles;
+ };
+@@ -177,6 +179,7 @@ struct device_state {
+ 	bdaddr_t bdaddr;
+ 	uint8_t bdaddr_type;
+ 	unsigned int disc_id;
++	uint8_t cli_feat[1];
+ 	struct queue *ccc_states;
+ 	struct notify *pending;
+ };
+@@ -1055,6 +1058,90 @@ service_add_ccc(struct gatt_db_attribute *service,
+ 	return ccc;
  }
  
-+static void gen_hash_m(struct gatt_db_attribute *attr, void *user_data)
++static void cli_feat_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
 +{
-+	struct iovec *iov = user_data;
-+	uint8_t *data;
-+	size_t len;
++	struct btd_gatt_database *database = user_data;
++	struct device_state *state;
++	uint8_t ecode = 0;
++	const uint8_t *value = NULL;
++	size_t len = 0;
 +
-+	if (bt_uuid_len(&attr->uuid) != 2)
-+		return;
++	DBG("Client Features read");
 +
-+	switch (attr->uuid.value.u16) {
-+	case GATT_PRIM_SVC_UUID:
-+	case GATT_SND_SVC_UUID:
-+	case GATT_INCLUDE_UUID:
-+	case GATT_CHARAC_UUID:
-+		/* Allocate space for handle + type + value */
-+		len = 2 + 2 + attr->value_len;
-+		data = malloc(2 + 2 + attr->value_len);
-+		put_le16(attr->handle, data);
-+		bt_uuid_to_le(&attr->uuid, data + 2);
-+		memcpy(data + 4, attr->value, attr->value_len);
-+		break;
-+	case GATT_CHARAC_USER_DESC_UUID:
-+	case GATT_CLIENT_CHARAC_CFG_UUID:
-+	case GATT_SERVER_CHARAC_CFG_UUID:
-+	case GATT_CHARAC_FMT_UUID:
-+	case GATT_CHARAC_AGREG_FMT_UUID:
-+		/* Allocate space for handle + type  */
-+		len = 2 + 2;
-+		data = malloc(2 + 2 + attr->value_len);
-+		put_le16(attr->handle, data);
-+		bt_uuid_to_le(&attr->uuid, data + 2);
-+		break;
-+	default:
-+		return;
++	state = get_device_state(database, att);
++	if (!state) {
++		ecode = BT_ATT_ERROR_UNLIKELY;
++		goto done;
 +	}
 +
-+	iov[attr->handle].iov_base = data;
-+	iov[attr->handle].iov_len = len;
++	len = sizeof(state->cli_feat) - offset;
++	value = len ? &state->cli_feat[offset] : NULL;
 +
-+	return;
++done:
++	gatt_db_attribute_read_result(attrib, id, ecode, value, len);
 +}
 +
-+static void service_gen_hash_m(struct gatt_db_attribute *attr, void *user_data)
++static void cli_feat_write_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					const uint8_t *value, size_t len,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
 +{
-+	gatt_db_service_foreach(attr, NULL, gen_hash_m, user_data);
++	struct btd_gatt_database *database = user_data;
++	struct device_state *state;
++	uint8_t ecode = 0;
++
++	DBG("Client Features write");
++
++	state = get_device_state(database, att);
++	if (!state) {
++		ecode = BT_ATT_ERROR_UNLIKELY;
++		goto done;
++	}
++
++	if (!value || !len) {
++		ecode = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
++		goto done;
++	}
++
++	/* A client shall never clear a bit it has set.
++	 * TODO: make it generic to any bits.
++	 */
++	if (state->cli_feat[0] & BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING &&
++			!(value[0] & BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING)) {
++		ecode = BT_ATT_ERROR_VALUE_NOT_ALLOWED;
++		goto done;
++	}
++
++	/* Shall we reallocate the feat array if bigger? */
++	len = MIN(sizeof(state->cli_feat), len);
++	while (len) {
++		state->cli_feat[len - 1] |= value[len -1];
++		len--;
++	}
++
++done:
++	gatt_db_attribute_write_result(attrib, id, ecode);
 +}
 +
- static bool db_hash_update(void *user_data)
++static void db_hash_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
++{
++	struct btd_gatt_database *database = user_data;
++	const uint8_t *hash;
++
++	DBG("Database Hash read");
++
++	hash = gatt_db_get_hash(database->db);
++
++	gatt_db_attribute_read_result(attrib, id, 0, hash, 16);
++}
++
+ static void populate_gatt_service(struct btd_gatt_database *database)
  {
- 	struct gatt_db *db = user_data;
-+	struct iovec *iov;
-+	uint16_t i;
+ 	bt_uuid_t uuid;
+@@ -1062,7 +1149,7 @@ static void populate_gatt_service(struct btd_gatt_database *database)
  
- 	db->hash_id = 0;
+ 	/* Add the GATT service */
+ 	bt_uuid16_create(&uuid, UUID_GATT);
+-	service = gatt_db_add_service(database->db, &uuid, true, 4);
++	service = gatt_db_add_service(database->db, &uuid, true, 8);
  
-+	iov = new0(struct iovec, db->next_handle);
+ 	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
+ 	database->svc_chngd = gatt_db_service_add_characteristic(service, &uuid,
+@@ -1072,11 +1159,25 @@ static void populate_gatt_service(struct btd_gatt_database *database)
+ 	database->svc_chngd_ccc = service_add_ccc(service, database, NULL, NULL,
+ 									NULL);
+ 
++	bt_uuid16_create(&uuid, GATT_CHARAC_CLI_FEAT);
++	database->cli_feat = gatt_db_service_add_characteristic(service,
++				&uuid, BT_ATT_PERM_READ | BT_ATT_PERM_WRITE,
++				BT_GATT_CHRC_PROP_READ |
++				BT_GATT_CHRC_PROP_WRITE,
++				cli_feat_read_cb, cli_feat_write_cb,
++				database);
 +
-+	gatt_db_foreach_service(db, NULL, service_gen_hash_m, iov);
-+	bt_crypto_gatt_hash(db->crypto, iov, db->next_handle, db->hash);
++	bt_uuid16_create(&uuid, GATT_CHARAC_DB_HASH);
++	database->db_hash = gatt_db_service_add_characteristic(service,
++				&uuid, BT_ATT_PERM_READ, BT_GATT_CHRC_PROP_READ,
++				db_hash_read_cb, NULL, database);
 +
-+	for (i = 0; i < db->next_handle; i++)
-+		free(iov[i].iov_base);
-+
-+	free(iov);
-+
- 	return false;
+ 	gatt_db_service_set_active(service, true);
+ 
+ 	database_add_record(database, service);
  }
  
-@@ -292,7 +354,7 @@ static void notify_service_changed(struct gatt_db *db,
- 	queue_foreach(db->notify_list, handle_notify, &data);
- 
- 	/* Tigger hash update */
--	if (!db->hash_id)
-+	if (!db->hash_id && db->crypto)
- 		db->hash_id = timeout_add(HASH_UPDATE_TIMEOUT, db_hash_update,
- 								db, NULL);
- 
-@@ -319,6 +381,8 @@ static void gatt_db_destroy(struct gatt_db *db)
- 	if (!db)
- 		return;
- 
-+	bt_crypto_unref(db->crypto);
 +
- 	/*
- 	 * Clear the notify list before clearing the services to prevent the
- 	 * latter from sending service_removed events.
-@@ -506,7 +570,7 @@ uint8_t *gatt_db_get_hash(struct gatt_db *db)
+ static void register_core_services(struct btd_gatt_database *database)
  {
- 	uint8_t hash[16] = {};
- 
--	if (!db)
-+	if (!db || !db->crypto)
- 		return NULL;
- 
- 	/* Generate hash if if has not been generated yet */
+ 	populate_gap_service(database);
 -- 
 2.17.2
 
