@@ -2,242 +2,139 @@ Return-Path: <SRS0=G1v0=QF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D47C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F43C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F016E20870
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:08:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60CF82147A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jan 2019 13:26:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="VDHkewhT";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="a3TQ1ary"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XsJK42ei"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726298AbfA2NIP (ORCPT
+        id S1726390AbfA2N0k (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Jan 2019 08:08:15 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:45782 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725601AbfA2NIO (ORCPT
+        Tue, 29 Jan 2019 08:26:40 -0500
+Received: from mail-ed1-f44.google.com ([209.85.208.44]:42925 "EHLO
+        mail-ed1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726060AbfA2N0j (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Jan 2019 08:08:14 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id 41D8B607C6; Tue, 29 Jan 2019 13:08:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1548767293;
-        bh=Q12TnkwkVVITYlDvppoUDUNceEPtstIaTK+pdb3rrNg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=VDHkewhTyTWWLtq+mLmhUOWq7+v+HHOtq3xAxDF7oMSpYjZWmh4Rvp9ggExDQe7fz
-         OBvdBKc2We1FWWA+pDkNvQ0An1RbqPrY299F09WcFvDjJiRSrkrFXopm/6gNRtILK6
-         6nJoDvJ7jBI0b4PVrTDWvAyfq5MHeoJ6KqCmlN3o=
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by smtp.codeaurora.org (Postfix) with ESMTP id 0CB8260112;
-        Tue, 29 Jan 2019 13:08:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1548767292;
-        bh=Q12TnkwkVVITYlDvppoUDUNceEPtstIaTK+pdb3rrNg=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=a3TQ1aryKma/5Y7XmxUlLdCxm5CVgKsXzP7V2hKtAuGDcjsp0oUITDkBS9Q9wWGqh
-         qNsa1yEXV6RHkaRjYWIfp73PffqpNi6QCi/7rNe4E0AFTi5WNOfdC0XGoaD/7FBeC7
-         c2RbQYZfgnZS95DovzSxT8Dl1FqgDebwPHgJsJvo=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 29 Jan 2019 18:38:12 +0530
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v9 1/3] Bluetooth: hci_qca: use wait_until_sent() for
- power pulses
-In-Reply-To: <20190128174750.GG81583@google.com>
-References: <20190124120808.8275-1-bgodavar@codeaurora.org>
- <20190124120808.8275-2-bgodavar@codeaurora.org>
- <20190125011412.GE81583@google.com>
- <0fac93a13ee445569659075cf467ad4d@codeaurora.org>
- <20190128174750.GG81583@google.com>
-Message-ID: <911775a5d93dc066ab4b96f56b74e341@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.2.5
+        Tue, 29 Jan 2019 08:26:39 -0500
+Received: by mail-ed1-f44.google.com with SMTP id y20so15940736edw.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jan 2019 05:26:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id;
+        bh=lkAak8YkVJhMqmBbCroxFOGLIBlfK/xui5S8VQTp+Bw=;
+        b=XsJK42eiwbirM4N2BMpweZZjVOJzWH2IQxkGm9GS0bjEGf9OKNHGyuZyBN7wc3+hmM
+         CaQH8sQc823b6z8IodAIo4LGuGhDy/umotQwO7Vl/N8apovf196jPy+cNvFIqLR3Ar3I
+         c2CUI3WD6EBEFdi13GM1vM5s1uoqnMaFCaWllKNM7GZ98N6qkRUmLuEBnm4+kfiCx11Q
+         D2kAQNYBmimX5p3l5OVpF+MBVkbrd3zNezwM5/jd7fRRqrsiqyOkUsJmoxElxFuOq8WQ
+         Bx0wikBoCGBLbEE7zzM4Wv8K1Ah3H1hs39HXQtHCWbQiykms3ls4pLIHoI7Kb3t6GVNl
+         3IzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=lkAak8YkVJhMqmBbCroxFOGLIBlfK/xui5S8VQTp+Bw=;
+        b=PxqvqGfByFoin8Hz1BohgL9rXb9Tj8Os9BroaTyM47YDNCvFAECyD8fKXIves3NPB2
+         iGWyHfQvMcU6qmyabbxPZ0b2TWTMWU5WLqnoDx15ZEykUMKs9giQ9iEbeFHVoOAmFUzt
+         RwSOP6HlmM4e51Kr8LrytL9b9MhThYEOYZ/29pgqU6EmcSSuloHTr4HgyNMp0coS0ckj
+         RkF+BmJfEblO5ez7xlkyMfNTw5WNOtXaxa2dKpiMmqUu6VactECLxIl5IAWxKCV37wpg
+         SDnoh15PxGDpHzS1Z41XzdAX34SNQMo1lQxSSknE9YM5vhZF9mVa7SqFkJDtVHGIjtV1
+         S04w==
+X-Gm-Message-State: AJcUukeW95Qf0iWqQ3pr9JZLD1DuK3bvhyUwpTwtMvg5sjk+A+YTOmpE
+        c5kfZFzBNApOu1eZMw5kV0+ARxx2
+X-Google-Smtp-Source: ALg8bN4oSbuClcGiDx9mxgXUpAf/8eQNHNLdGQuvAI3WL92fiUUGR7fIgAb1zn7KQU/dyaJNWjuMVw==
+X-Received: by 2002:a17:906:78c6:: with SMTP id r6mr22818417ejn.123.1548768397454;
+        Tue, 29 Jan 2019 05:26:37 -0800 (PST)
+Received: from localhost.localdomain ([192.198.151.62])
+        by smtp.gmail.com with ESMTPSA id i14-v6sm8179964ejy.40.2019.01.29.05.26.35
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 29 Jan 2019 05:26:36 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 01/15] shared/crypto: Add bt_crypto_gatt_hash
+Date:   Tue, 29 Jan 2019 15:26:20 +0200
+Message-Id: <20190129132634.28786-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.17.2
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 2019-01-28 23:17, Matthias Kaehlcke wrote:
-> On Mon, Jan 28, 2019 at 07:19:56PM +0530, Balakrishna Godavarthi wrote:
->> Hi Matthias,
->> 
->> On 2019-01-25 06:44, Matthias Kaehlcke wrote:
->> > On Thu, Jan 24, 2019 at 05:38:06PM +0530, Balakrishna Godavarthi wrote:
->> > > wcn3990 requires a power pulse to turn ON/OFF along with
->> > > regulators. Sometimes we are observing the power pulses are sent
->> > > out with some time delay, due to queuing these commands. This is
->> > > causing synchronization issues with chip, which intern delay the
->> > > chip setup or may end up with communication issues.
->> > >
->> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> > > ---
->> > > Changes in v9:
->> > >  * Reverted to 100us sleep.
->> > >  * used inline call msecs_to_jiffies()
->> > >
->> > > Changes in v8:
->> > >  * Updated 1 second timeout instead of indefinite wait.
->> > >
->> > > Changes in v7:
->> > >  *  updated the wait time to 5 ms after sending power pulses.
->> > >
->> > > Changes in v6:
->> > >  * added serdev_device_write_flush() in qca_send_power_pulse
->> > >    instead during the power off pulse.
->> > >
->> > > Changes in v5:
->> > >  * added serdev_device_write_flush() in qca_power_off().
->> > > ---
->> > >  drivers/bluetooth/hci_qca.c | 40
->> > > +++++++++++++++----------------------
->> > >  1 file changed, 16 insertions(+), 24 deletions(-)
->> > >
->> > > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> > > index f036c8f98ea3..c08f4d105e73 100644
->> > > --- a/drivers/bluetooth/hci_qca.c
->> > > +++ b/drivers/bluetooth/hci_qca.c
->> > > @@ -60,6 +60,7 @@
->> > >  #define IBS_WAKE_RETRANS_TIMEOUT_MS	100
->> > >  #define IBS_TX_IDLE_TIMEOUT_MS		2000
->> > >  #define BAUDRATE_SETTLE_TIMEOUT_MS	300
->> > > +#define POWER_PULSE_TRANS_TIMEOUT_MS	1000
->> >
->> > I still doubt that this mega-timeout of 1s is needed, but it shouldn't
->> > do any harm either, so whatever ...
->> >
->> 
->> [Bala]: for now let us have it. we can improve it in the improvement 
->> patch
->>         based on the results.
-> 
-> Fine.
-> 
-> With the UART buffer flushed and flow control disabled I wonder though
-> what makes you think that it could take longer than a few milliseconds
-> for the byte being put on the wire, short of a bug in the UART driver
-> or hardware, which (if it existed) shouldn't be worked around here.
-> 
+The bt_crypto_gatt_hash uses AES-CCM to create a hash with the contents
+stored in the iovec.
 
-[Bala]: i don't see any issue decreasing to milliseconds. will update it 
-to 100ms.
+Note: The spec disregards the byte order so both the key, msg and res
+are not swapped.
+---
+ src/shared/crypto.c | 31 +++++++++++++++++++++++++++++++
+ src/shared/crypto.h |  3 +++
+ 2 files changed, 34 insertions(+)
 
->> > >  /* susclk rate */
->> > >  #define SUSCLK_RATE_32KHZ	32768
->> > > @@ -1013,11 +1014,10 @@ static inline void host_set_baudrate(struct
->> > > hci_uart *hu, unsigned int speed)
->> > >  		hci_uart_set_baudrate(hu, speed);
->> > >  }
->> > >
->> > > -static int qca_send_power_pulse(struct hci_dev *hdev, u8 cmd)
->> > > +static int qca_send_power_pulse(struct hci_uart *hu, u8 cmd)
->> > >  {
->> > > -	struct hci_uart *hu = hci_get_drvdata(hdev);
->> > > -	struct qca_data *qca = hu->priv;
->> > > -	struct sk_buff *skb;
->> > > +	int ret;
->> > > +	int timeout = msecs_to_jiffies(POWER_PULSE_TRANS_TIMEOUT_MS);
->> > >
->> > >  	/* These power pulses are single byte command which are sent
->> > >  	 * at required baudrate to wcn3990. On wcn3990, we have an external
->> > > @@ -1029,21 +1029,19 @@ static int qca_send_power_pulse(struct
->> > > hci_dev *hdev, u8 cmd)
->> > >  	 * save power. Disabling hardware flow control is mandatory while
->> > >  	 * sending power pulses to SoC.
->> > >  	 */
->> > > -	bt_dev_dbg(hdev, "sending power pulse %02x to SoC", cmd);
->> > > -
->> > > -	skb = bt_skb_alloc(sizeof(cmd), GFP_KERNEL);
->> > > -	if (!skb)
->> > > -		return -ENOMEM;
->> > > +	bt_dev_dbg(hu->hdev, "sending power pulse %02x to controller", cmd);
->> > >
->> > > +	serdev_device_write_flush(hu->serdev);
->> > >  	hci_uart_set_flow_control(hu, true);
->> > > +	ret = serdev_device_write_buf(hu->serdev, &cmd, sizeof(cmd));
->> > > +	if (ret < 0) {
->> > > +		bt_dev_err(hu->hdev, "failed to send power pulse %02x", cmd);
->> > > +		return ret;
->> > > +	}
->> > >
->> > > -	skb_put_u8(skb, cmd);
->> > > -	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
->> > > -
->> > > -	skb_queue_tail(&qca->txq, skb);
->> > > -	hci_uart_tx_wakeup(hu);
->> > > +	serdev_device_wait_until_sent(hu->serdev, timeout);
->> > >
->> > > -	/* Wait for 100 uS for SoC to settle down */
->> > > +	/* Wait for 100 uS for SoC to settle down for the received byte. */
->> >
->> > I don't think 'for the received byte' adds much value here. If you
->> > respin anyway I'd suggest to leave the comment as is.
->> >
->> 
->> [Bala]: will update.
->> 
->> > >  	usleep_range(100, 200);
->> > >  	hci_uart_set_flow_control(hu, false);
->> > >
->> > > @@ -1116,7 +1114,6 @@ static int qca_set_speed(struct hci_uart *hu,
->> > > enum qca_speed_type speed_type)
->> > >
->> > >  static int qca_wcn3990_init(struct hci_uart *hu)
->> > >  {
->> > > -	struct hci_dev *hdev = hu->hdev;
->> > >  	struct qca_serdev *qcadev;
->> > >  	int ret;
->> > >
->> > > @@ -1139,12 +1136,12 @@ static int qca_wcn3990_init(struct hci_uart
->> > > *hu)
->> > >
->> > >  	/* Forcefully enable wcn3990 to enter in to boot mode. */
->> > >  	host_set_baudrate(hu, 2400);
->> > > -	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWEROFF_PULSE);
->> > > +	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
->> > >  	if (ret)
->> > >  		return ret;
->> > >
->> > >  	qca_set_speed(hu, QCA_INIT_SPEED);
->> > > -	ret = qca_send_power_pulse(hdev, QCA_WCN3990_POWERON_PULSE);
->> > > +	ret = qca_send_power_pulse(hu, QCA_WCN3990_POWERON_PULSE);
->> > >  	if (ret)
->> > >  		return ret;
->> > >
->> > > @@ -1274,13 +1271,8 @@ static const struct qca_vreg_data
->> > > qca_soc_data = {
->> > >
->> > >  static void qca_power_shutdown(struct hci_uart *hu)
->> > >  {
->> > > -	struct serdev_device *serdev = hu->serdev;
->> > > -	unsigned char cmd = QCA_WCN3990_POWEROFF_PULSE;
->> > > -
->> > >  	host_set_baudrate(hu, 2400);
->> > > -	hci_uart_set_flow_control(hu, true);
->> > > -	serdev_device_write_buf(serdev, &cmd, sizeof(cmd));
->> > > -	hci_uart_set_flow_control(hu, false);
->> > > +	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
->> > >  	qca_power_setup(hu, false);
->> > >  }
->> > >
->> >
->> > Looks good to me besides possible minor improvements:
->> >
->> > Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
->> 
-
+diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+index ce0dcd638..5c5e1217d 100644
+--- a/src/shared/crypto.c
++++ b/src/shared/crypto.c
+@@ -688,3 +688,34 @@ bool bt_crypto_h6(struct bt_crypto *crypto, const uint8_t w[16],
+ 
+ 	return true;
+ }
++
++bool bt_crypto_gatt_hash(struct bt_crypto *crypto, struct iovec *iov,
++				size_t iov_len, uint8_t res[16])
++{
++	const uint8_t key[16] = {};
++	ssize_t len;
++	int fd;
++
++	if (!crypto)
++		return false;
++
++	fd = alg_new(crypto->cmac_aes, key, 16);
++	if (fd < 0)
++		return false;
++
++	len = writev(fd, iov, iov_len);
++	if (len < 0) {
++		close(fd);
++		return false;
++	}
++
++	len = read(fd, res, 16);
++	if (len < 0) {
++		close(fd);
++		return false;
++	}
++
++	close(fd);
++
++	return true;
++}
+diff --git a/src/shared/crypto.h b/src/shared/crypto.h
+index 1e1b4836d..c58d2e104 100644
+--- a/src/shared/crypto.h
++++ b/src/shared/crypto.h
+@@ -23,6 +23,7 @@
+ 
+ #include <stdbool.h>
+ #include <stdint.h>
++#include <sys/uio.h>
+ 
+ struct bt_crypto;
+ 
+@@ -61,3 +62,5 @@ bool bt_crypto_h6(struct bt_crypto *crypto, const uint8_t w[16],
+ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 				const uint8_t *m, uint16_t m_len,
+ 				uint32_t sign_cnt, uint8_t signature[12]);
++bool bt_crypto_gatt_hash(struct bt_crypto *crypto, struct iovec *iov,
++				size_t iov_len, uint8_t res[16]);
 -- 
-Regards
-Balakrishna.
+2.17.2
+
