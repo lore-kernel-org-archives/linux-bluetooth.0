@@ -2,95 +2,135 @@ Return-Path: <SRS0=Btsr=QG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 018DEC282D7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 09:59:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62BA3C282D7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 10:07:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C9116218A3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 09:59:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 338A32184D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 10:07:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548842385;
-	bh=caLKrCLKxUmzNb1bdoAzfpXGhwc0u4/lOLTNF1bFlqc=;
+	s=default; t=1548842872;
+	bh=9d6rHs/SDFt8xKj8KZeuROPhEAeOAgVLz3LnRSYQQ2g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=BRGkk8UPI1d7q7DNvuSJxBsmwzV8ohkXl1Njf4NDfn+CfwktUdqRRT9n9PuOAAUJ5
-	 0y2V6l675fpAofaF0D/dN3VHEIuwVCp9YpRHWLDcj6vK6iQgJ0VGNRwtgvBozKcYWb
-	 OELkTIYcLoeQMExkLgUjDXgCM8PRlORC3fHiJt8s=
+	b=cSCABNkchsw4Ly7KhSNLFX66/H7xyv2du6YGuFxJSvAOC6J6f6AQyY3jvudLt/+K4
+	 IZyFKjxwX97+VyDyhAqVytYrH+D068X+49jft/fZE0j+lyIBtAc3mxkHEjVDpLpm5Q
+	 go/vwgvby/zEQMSxKkMp/OQgylrWRvvLUkWkYXoE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730621AbfA3J7p (ORCPT
+        id S1727974AbfA3KHq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Jan 2019 04:59:45 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:46124 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726713AbfA3J7p (ORCPT
+        Wed, 30 Jan 2019 05:07:46 -0500
+Received: from mail-lj1-f194.google.com ([209.85.208.194]:41203 "EHLO
+        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726406AbfA3KHp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Jan 2019 04:59:45 -0500
-Received: by mail-lf1-f66.google.com with SMTP id f5so16880226lfc.13;
-        Wed, 30 Jan 2019 01:59:43 -0800 (PST)
+        Wed, 30 Jan 2019 05:07:45 -0500
+Received: by mail-lj1-f194.google.com with SMTP id k15-v6so20164053ljc.8;
+        Wed, 30 Jan 2019 02:07:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=a5XBY6xj9+zxrACI0GDVmm78XUqLrekfPbtv6zRYzPY=;
-        b=MWygwd0NH3PNfcE0+qmFED6CHe7R/VUwj1+dhgC9zwDutuIur4eWOK/4hahpo+5uRK
-         yxl4fvxop7IydoQEzjIfmmTKZKVqmweTmIP7ooGXCAKU9Me+uvwhZqlka07jTP2/8K+u
-         6UjaJUF8Ltj4cL2CD3ae3bq+flej1V/gJTbwKHm4p9vyd/RHzFfy0HQF4Hgcf8pYGiqH
-         BUAcAfMeBAU8jEZIFp6/LyJxmnNiZBKQxz15+yP3A1ZKZreS6okUp7WRO4e479hN+mPo
-         H7QZSAiPpRYtt6HBfoxBOhrNkGrvIjhGAXJ8OnKyec112cbH/OijnWNId+fokJSB0JRR
-         zCew==
-X-Gm-Message-State: AJcUukdh//h/2BifGz/bdGWlJW3q82XEChk3IRaSVXJV5Y5kncW5yv9Y
-        eSlMlzJ/YLQFxkrsui3Eb9M=
-X-Google-Smtp-Source: ALg8bN7vcQB1PPKPTEqZYHEnl6iyubsH8P/M6bSZq/xHlRPUN6P3oe5qrJfBIyKYcZeEyyyxR+04zQ==
-X-Received: by 2002:a19:5d42:: with SMTP id p2mr22616773lfj.83.1548842382909;
-        Wed, 30 Jan 2019 01:59:42 -0800 (PST)
+        bh=kN/2wSUiHLI2WtXBOwgOk4c/eaZ2luQazEMp69syOrg=;
+        b=M7SmFJscLqKuyXAU7FbaI1uEiA5WWYQthvE/tijrbzjX6SID9ynPvSt6lvklYjotpR
+         kLeFEt1lulru0Di7Sz7kl/e4t/Kc0/qS9XWygOfTZKkVmJW6vm0BxL22XO4w0xWKx/cn
+         fB8/DY7JOWzw1S91pskcet02C8AhvEJaTVwkNHbeXL2OiIWUTQ5bYQTTXwfV/Vanr0Dr
+         l4iQnXUzaMZn5/RtBxtgZXLCFze3Gigb7GA6iN0DWduWNwhZtJS4dvk8Igxja1m0+DlZ
+         zeJjlzEck0CvREyG6u0s6jHbLAyzmQmjNaIH+MP6WO0BQ2MP5Z3Q8XFX9fLSbhw2KCHq
+         8NRQ==
+X-Gm-Message-State: AJcUukdP9BkCID7ZEhwLOlMlObAMMi4a/fQSNPPOQFBi47NBzDu+/8cz
+        74ApZdlUjYki9KzKJR4xwXw=
+X-Google-Smtp-Source: ALg8bN5wrFpThY3Q3Vv5g8H9yZ3uXDIuTZakbGOAiFji+khVX19qPlZOaBt3PhHCkYNFxY06MMKcYA==
+X-Received: by 2002:a2e:86ca:: with SMTP id n10-v6mr21308598ljj.49.1548842862949;
+        Wed, 30 Jan 2019 02:07:42 -0800 (PST)
 Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id f20-v6sm193942ljk.33.2019.01.30.01.59.41
+        by smtp.gmail.com with ESMTPSA id a18-v6sm195865ljk.86.2019.01.30.02.07.41
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Jan 2019 01:59:42 -0800 (PST)
+        Wed, 30 Jan 2019 02:07:42 -0800 (PST)
 Received: from johan by xi.terra with local (Exim 4.91)
         (envelope-from <johan@kernel.org>)
-        id 1gomeg-0001Bf-CS; Wed, 30 Jan 2019 10:59:38 +0100
-Date:   Wed, 30 Jan 2019 10:59:38 +0100
+        id 1gommQ-0001EZ-8l; Wed, 30 Jan 2019 11:07:38 +0100
+Date:   Wed, 30 Jan 2019 11:07:38 +0100
 From:   Johan Hovold <johan@kernel.org>
 To:     Myungho Jung <mhjungk@gmail.com>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add NULL check for tiocmget() and tiocmset()
-Message-ID: <20190130095938.GP3691@localhost>
-References: <20190128065910.GA14959@myunghoj-Precision-5530>
+Subject: Re: [PATCH] Bluetooth: hci_uart: Switch pty driver to slave side in
+ tty_set_termios()
+Message-ID: <20190130100738.GQ3691@localhost>
+References: <20190128065259.GA2976@myunghoj-Precision-5530>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190128065910.GA14959@myunghoj-Precision-5530>
+In-Reply-To: <20190128065259.GA2976@myunghoj-Precision-5530>
 User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Jan 27, 2019 at 10:59:13PM -0800, Myungho Jung wrote:
-> tiocmget() and tiocmset() operations are optional and some tty drivers
-> like pty miss the operations. We need NULL check before referencing
-> them.
+On Sun, Jan 27, 2019 at 10:53:02PM -0800, Myungho Jung wrote:
+> tty_set_termios() should be called with slave side of pty driver. So, If
+> tty driver is pty master, it needs to be switched to ->link.
 
-Good catch. I suggest splitting these fixes in two separate patches
-(after addressing Marcel's comments).
-
-Don't forget to CC stable and add a Fixes-tag for each, as we we want to
-have this backported to stable.
+I'm not sure that's the right solution. PTYs are virtual devices used
+for IPC and neither end (master or slave) have support for modem
+control or baud rates.
 
 > Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
-
-Actually, these two bugs were never reported by sysbot AFAIKT so no need
-to give credit to anyone else here.
-
 > Signed-off-by: Myungho Jung <mhjungk@gmail.com>
 > ---
->  drivers/bluetooth/hci_ath.c   | 13 ++++++++-----
->  drivers/bluetooth/hci_ldisc.c |  5 +++++
->  2 files changed, 13 insertions(+), 5 deletions(-)
+>  drivers/bluetooth/hci_ldisc.c | 20 +++++++++++++++-----
+>  1 file changed, 15 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index fbf7b4df23ab..90c5ea8c399b 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -299,10 +299,18 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>  	return 0;
+>  }
+>  
+> +/* If driver is pty master, return slave side */
+> +static struct tty_struct *hci_uart_get_real_tty(struct tty_struct *tty)
+> +{
+> +	return  (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+> +		 tty->driver->subtype == PTY_TYPE_MASTER) ? tty->link : tty;
+> +}
+> +
+>  /* Flow control or un-flow control the device */
+>  void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+>  {
+>  	struct tty_struct *tty = hu->tty;
+> +	struct tty_struct *real_tty;
+>  	struct ktermios ktermios;
+>  	int status;
+>  	unsigned int set = 0;
+> @@ -314,11 +322,12 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+>  		return;
+>  	}
+>  
+> +	real_tty = hci_uart_get_real_tty(tty);
+>  	if (enable) {
+>  		/* Disable hardware flow control */
+> -		ktermios = tty->termios;
+> +		ktermios = real_tty->termios;
+>  		ktermios.c_cflag &= ~CRTSCTS;
+> -		status = tty_set_termios(tty, &ktermios);
+> +		status = tty_set_termios(real_tty, &ktermios);
+>  		BT_DBG("Disabling hardware flow control: %s",
+>  		       status ? "failed" : "success");
+
+So instead of these pointless calls to set the slave termios and
+modem-control state, you might as well bail out early above (and
+similarly in set_baudrate()).
+
+Using n_hci for a master pty really makes no sense at all, so we could
+even bail out at ldisc open, but perhaps that can be discussed and
+addressed later.
 
 Johan
