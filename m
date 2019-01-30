@@ -7,60 +7,63 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E91CC282D7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 13:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3556C282D8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 13:54:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1AA5220833
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 13:54:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A3ABF20833
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 13:54:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Job1Fwzb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XP3vpZgQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730966AbfA3Nya (ORCPT
+        id S1731171AbfA3Nyc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Jan 2019 08:54:30 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:40139 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726233AbfA3Nya (ORCPT
+        Wed, 30 Jan 2019 08:54:32 -0500
+Received: from mail-ed1-f45.google.com ([209.85.208.45]:34682 "EHLO
+        mail-ed1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726233AbfA3Nyc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Jan 2019 08:54:30 -0500
-Received: by mail-ed1-f66.google.com with SMTP id g22so19038110edr.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Jan 2019 05:54:29 -0800 (PST)
+        Wed, 30 Jan 2019 08:54:32 -0500
+Received: by mail-ed1-f45.google.com with SMTP id b3so19122835ede.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Jan 2019 05:54:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=oaRyVDA/eovjNcMCRjZe6dtyv9PtDgAS5pv0eCkcD0I=;
-        b=Job1FwzbrepL8R/oUgPKjA6J7yg2sFGhPhmpkkSyH5z4CMsoXNp2FMEisUq0uzSBlF
-         CsyyzzXjkubpzUAB6OH9/oVqubOT8aEA7TNd1MRQ+zGarWjPPSAohIadLWeyzEtUgisp
-         FzR356v3Jub0iP4B2quNwBx9rq+ebpwqLy0JtfAT0N2jWshjrbSkSMtVK2foJz57D1hx
-         wA45dNotO7rN3MmbqsZ+Rw6vY+efaKYK+4xq1yQuh9mMNXMGZUa5+iVE+SbpyCX3zbPE
-         7Tx7w7zRUUxOO/U6ow7d/0B6VB10GX5JYSndTz3vjJ+9IvGyW40WYQyOrFY8ATkCHfMQ
-         cGUQ==
+        h=from:to:subject:date:message-id:in-reply-to:references;
+        bh=/NkFctSFhKp6VYGrFVhRVXmbjQfu3lrETokz0GrwKew=;
+        b=XP3vpZgQBEMF5n0RdwB8FY6I1BFKpCd3SXEJST3+X0n7UGGPTT/nbr03vLDXRCnrMi
+         5dkDUmc00PC4jW3YWCoyNaLn/ha0woC8amaHur7cZ7s6Fp3RCgea94v6YVMyQS1XEIUb
+         MB+dJgsf57nGJxKL9jMa7mbgLFahRRGWPfTB5oJt9/stDUaExuLbQuJNS6SE4gZHgv0t
+         4EU1DHnXLra+p5AoiejXD47aKV2TFq5KevPIdv2jsa/jvF8iBk9bQIFdl3VRvI+Iojy1
+         elvPR//17bMOLVsgO43aI7DmDYtoIL1Q8swJmhkyB7kRY7x43HCc3Q4YSxSAzjnpHbJ8
+         u5Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=oaRyVDA/eovjNcMCRjZe6dtyv9PtDgAS5pv0eCkcD0I=;
-        b=kU7+XIwGRuo3rbIk45IPwKPaw03KO1rmHqm7j9zYVfflMzPeFZurQNYB9WWM3/VVCO
-         u9/Vb16NSzuqp+YsBuaf1VBTUBRtLGQX0LtR7xOcUMbuMi8BewUiLjC4CsCpRX6nrAUR
-         GN4/VbiclKYDhYmVYoYkZzN2onWjyiwpXOV+kfQgiSL+WHg0OSC4/NhYmr+fjV1z60f3
-         2IQgbNMh7Q1ujDTKF57DADO8w7uIxZdWYRqFxd05XDamUOOpd9luOs+a5AtoIDVZHlVx
-         qZZ3EeK1A/YHaLKXirsMb0w01EwbFILXhGH9R+8RUgVRUz2BePxKLgKDoHPpsNQTMr/3
-         AGrw==
-X-Gm-Message-State: AJcUukeDa9gXdaNh7zHJR0ICmstbMiDdT4XhyIyjcigfrQJVaqy3ufOr
-        Ec92n2WkH0fPA6KWEOn4dByInOt+
-X-Google-Smtp-Source: ALg8bN5JefKasCu6BVu6+vLjsYC73xwrb3KsqunrDb2JA1V6VQVW6vHQ8vuYedeUgLVAbsmacRNzKQ==
-X-Received: by 2002:a17:906:6d46:: with SMTP id a6mr25480743ejt.203.1548856468247;
-        Wed, 30 Jan 2019 05:54:28 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references;
+        bh=/NkFctSFhKp6VYGrFVhRVXmbjQfu3lrETokz0GrwKew=;
+        b=CP0RJlQfstOHGEMs2Hs7PIp3JhIC1Y3S5qc9Ga9+LP3jkdcoEm5cA8dvL0Q9bq5uUb
+         oZPRYvuFuIxs0/HkKOP+5XM3qOUGCm3g451hBwha8jE59B4vngyrrGaz0qxXvvitqFb+
+         yivlKteWNDvbAhPl7QNGhupetWSdv/ekWKlUwv7Jb0yFeBgr8Z19vpZWmp6zxw4NaUEj
+         81K6uMfps7zeWc+VX/rMh63z6Kub5el6bpyUTY4J/temT2LRGMMnYaQf5yAEI+wns0bm
+         GGLPWKH4C2epBXKv1AQutfK1JrmyiijoIBq0BF0tELw3Z4TuKmzp6VAMan3D87aGnDrU
+         vgcg==
+X-Gm-Message-State: AJcUukcA2uGVyngbCMxohwrlI2yuPZzi2HvbOJwWsl1wmiUG60JOiZWV
+        gt4ytp4sHGCsf4qnynROIO2ETlQf
+X-Google-Smtp-Source: ALg8bN4ICV39zzY43NW0CPph9cz4OvHnTuf951zlGOPhb0DCzIopqJPw/M59UmIB6areq3tt5typfg==
+X-Received: by 2002:a17:906:a40a:: with SMTP id l10mr26195494ejz.248.1548856469590;
+        Wed, 30 Jan 2019 05:54:29 -0800 (PST)
 Received: from localhost.localdomain ([192.198.151.62])
-        by smtp.gmail.com with ESMTPSA id s19sm325045eja.52.2019.01.30.05.54.26
+        by smtp.gmail.com with ESMTPSA id s19sm325045eja.52.2019.01.30.05.54.28
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 30 Jan 2019 05:54:26 -0800 (PST)
+        Wed, 30 Jan 2019 05:54:28 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/8] doc/gatt-api: Add Handle property
-Date:   Wed, 30 Jan 2019 15:54:17 +0200
-Message-Id: <20190130135424.2091-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/8] shared/gatt-db: Allow passing 0 as handle to gatt_db_insert_*
+Date:   Wed, 30 Jan 2019 15:54:18 +0200
+Message-Id: <20190130135424.2091-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.17.2
+In-Reply-To: <20190130135424.2091-1-luiz.dentz@gmail.com>
+References: <20190130135424.2091-1-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -68,72 +71,58 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When acting as server it is useful to select where to allocate the
-handle for an attribute so it can be restored in the same position when
-restarting the daemon or rebooting the system.
-
-In order to do that the application also needs to know in which handle
-the attribute is allocated the very first time it is registered, this
-also allows for a better integration with PTS and tools like auto-pts
-which needs to know the handles where the attributes have been
-allocated.
+Handle 0 should be allocate on the next handle just as any of
+gatt_db_add_* functions.
 ---
- v2: Fixes inserting characteristics and descriptors with handle 0x0000,
- add a patch to enable list-attribute to list with local attributes and
- print changes to attribute Handle property.
+ src/shared/gatt-db.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
- doc/gatt-api.txt | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
-
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index 8dda60b8a..491eb026a 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -50,6 +50,14 @@ Properties	string UUID [read-only]
- 			Array of object paths representing the included
- 			services of this service.
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index d28301ac4..c62255fee 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -525,9 +525,12 @@ struct gatt_db_attribute *gatt_db_insert_service(struct gatt_db *db,
  
-+		uint16 Handle [read-write, optional] (Server Only)
-+
-+			Service handle. When available in the server it
-+			would attempt to use to allocate into the database
-+			which may fail, to auto allocate the value 0x0000
-+			shall be used which will cause the allocated handle to
-+			be set once registered.
-+
+ 	after = NULL;
  
- Characteristic hierarchy
- ========================
-@@ -257,6 +265,14 @@ Properties	string UUID [read-only]
- 				"secure-write" (Server only)
- 				"authorize"
+-	if (!db || handle < 1)
++	if (!db)
+ 		return NULL;
  
-+		uint16 Handle [read-write, optional] (Server Only)
++	if (!handle)
++		handle = db->next_handle;
 +
-+			Characteristic handle. When available in the server it
-+			would attempt to use to allocate into the database
-+			which may fail, to auto allocate the value 0x0000
-+			shall be used which will cause the allocated handle to
-+			be set once registered.
-+
- Characteristic Descriptors hierarchy
- ====================================
+ 	if (num_handles < 1 || (handle + num_handles - 1) > UINT16_MAX)
+ 		return NULL;
  
-@@ -332,6 +348,14 @@ Properties	string UUID [read-only]
- 				"secure-write" (Server Only)
- 				"authorize"
+@@ -585,8 +588,7 @@ struct gatt_db_attribute *gatt_db_add_service(struct gatt_db *db,
+ 						bool primary,
+ 						uint16_t num_handles)
+ {
+-	return gatt_db_insert_service(db, db->next_handle, uuid, primary,
+-								num_handles);
++	return gatt_db_insert_service(db, 0, uuid, primary, num_handles);
+ }
  
-+		uint16 Handle [read-write, optional] (Server Only)
-+
-+			Characteristic handle. When available in the server it
-+			would attempt to use to allocate into the database
-+			which may fail, to auto allocate the value 0x0000
-+			shall be used which will cause the allocated handle to
-+			be set once registered.
-+
- GATT Profile hierarchy
- =====================
+ unsigned int gatt_db_register(struct gatt_db *db,
+@@ -768,7 +770,7 @@ gatt_db_service_insert_characteristic(struct gatt_db_attribute *attrib,
+ 					gatt_db_write_t write_func,
+ 					void *user_data)
+ {
+-	if (!attrib || !handle)
++	if (!attrib)
+ 		return NULL;
  
+ 	return service_insert_characteristic(attrib->service, handle, uuid,
+@@ -856,7 +858,7 @@ gatt_db_service_insert_descriptor(struct gatt_db_attribute *attrib,
+ 					gatt_db_write_t write_func,
+ 					void *user_data)
+ {
+-	if (!attrib || !handle)
++	if (!attrib)
+ 		return NULL;
+ 
+ 	return service_insert_descriptor(attrib->service, handle, uuid,
 -- 
 2.17.2
 
