@@ -2,156 +2,138 @@ Return-Path: <SRS0=Btsr=QG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC568C282D7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 12:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E91CC282D7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 13:54:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99E5B20882
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 12:24:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AA5220833
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 13:54:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dKOJ7/yP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Job1Fwzb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726915AbfA3MYZ (ORCPT
+        id S1730966AbfA3Nya (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Jan 2019 07:24:25 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:45080 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725768AbfA3MYZ (ORCPT
+        Wed, 30 Jan 2019 08:54:30 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:40139 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726233AbfA3Nya (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Jan 2019 07:24:25 -0500
-Received: by mail-ot1-f66.google.com with SMTP id 32so20882844ota.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Jan 2019 04:24:24 -0800 (PST)
+        Wed, 30 Jan 2019 08:54:30 -0500
+Received: by mail-ed1-f66.google.com with SMTP id g22so19038110edr.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Jan 2019 05:54:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=4ZyFPhpjAUdxP9q7eq+5sfzAFfU/Sem54xvGYNVqWpU=;
-        b=dKOJ7/yPnvoqVEBgbV4NcOfpGrJ0f5z+Q5FhwcXN8VzgSwKuZPsH6NNLQTYRSdnmz0
-         OZeWDxf+jYNUS3mpHF8wDmnOEuTov/fvCeHiWX3Iw39JZY3j17QLCvrZI/EL8NJMDMu7
-         Dd9Jnv0f9cyfHJ1zaYUwimKlA2Z/wapMALRrPkbb817iX3iL+z6LJvusXlkZRR6l60W9
-         1t0VWsUZCIuqPW5KjM8WF3jwSw3pHfcZrMdBAgfQA47xuxtY+SByZ4fKp602AF3EPW+D
-         MQwIG5l6Gl8gjIokGfXG44vk6yDpa0EA8Rt43a7ZcacnZWOBcqxcY323ZtEXejDW8ngu
-         oeLg==
+        h=from:to:subject:date:message-id;
+        bh=oaRyVDA/eovjNcMCRjZe6dtyv9PtDgAS5pv0eCkcD0I=;
+        b=Job1FwzbrepL8R/oUgPKjA6J7yg2sFGhPhmpkkSyH5z4CMsoXNp2FMEisUq0uzSBlF
+         CsyyzzXjkubpzUAB6OH9/oVqubOT8aEA7TNd1MRQ+zGarWjPPSAohIadLWeyzEtUgisp
+         FzR356v3Jub0iP4B2quNwBx9rq+ebpwqLy0JtfAT0N2jWshjrbSkSMtVK2foJz57D1hx
+         wA45dNotO7rN3MmbqsZ+Rw6vY+efaKYK+4xq1yQuh9mMNXMGZUa5+iVE+SbpyCX3zbPE
+         7Tx7w7zRUUxOO/U6ow7d/0B6VB10GX5JYSndTz3vjJ+9IvGyW40WYQyOrFY8ATkCHfMQ
+         cGUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=4ZyFPhpjAUdxP9q7eq+5sfzAFfU/Sem54xvGYNVqWpU=;
-        b=HH/vf+HGKt+CZN74rTFbJG72zypfPH7o8ghrxVyvvwzZD3bcWSNxZJtis13okTe0xU
-         EqZ9SufhipIJPp3bVQEBY/HRFYrlIl6wPCgmv0XPjVmoiFcHAABVHsffBV3q92YvUB9l
-         rd4UrEc/CuwAusSa+CTsMgOk35ilBYwWhxcN8fDCsAmQbQOpaLTu2ifLDUt9bfxkvpBa
-         oTcrAJ/N9OdE6Epl4R/wC42ffmKN4yIXhVClNmJB3YG2lY+pK2Phk+POIp+Ltvqi/RXT
-         kqa3lvVYrvhW1TmZCQ3gIqZAwMUbaCHySOE8fum7iwipd2km1IrlvL1MVxqnc5SqdkIb
-         5QGA==
-X-Gm-Message-State: AJcUukd9ezwJr7WX1hp3iW/Pizo2QzaIsZYUI/K1ZphtR8jS4xoRTHne
-        WKY61+Trku3crBAJ/0QX2Mt7YUtPxJ4dUQ3hhLc=
-X-Google-Smtp-Source: ALg8bN7mDNkA6THsZKA2xDoxwT/H0LYmaoOSyROusjbG3RRtQBmih+ER0fs8lxhqW0EO3WQWm0kdxtPm3wpxbgPvOQc=
-X-Received: by 2002:a9d:3d0:: with SMTP id f74mr21969369otf.52.1548851063503;
- Wed, 30 Jan 2019 04:24:23 -0800 (PST)
-MIME-Version: 1.0
-References: <20190123174504.12350-1-pali.rohar@gmail.com> <8D9BABBE-2BBC-4BFE-BF7C-3BE24AF4DD10@holtmann.org>
- <20190123175448.cdkdpnk6i5r4rzjs@pali> <20190130081517.GI32745@reaktio.net> <20190130120631.usx67zjk4kmbhcla@pali>
-In-Reply-To: <20190130120631.usx67zjk4kmbhcla@pali>
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=oaRyVDA/eovjNcMCRjZe6dtyv9PtDgAS5pv0eCkcD0I=;
+        b=kU7+XIwGRuo3rbIk45IPwKPaw03KO1rmHqm7j9zYVfflMzPeFZurQNYB9WWM3/VVCO
+         u9/Vb16NSzuqp+YsBuaf1VBTUBRtLGQX0LtR7xOcUMbuMi8BewUiLjC4CsCpRX6nrAUR
+         GN4/VbiclKYDhYmVYoYkZzN2onWjyiwpXOV+kfQgiSL+WHg0OSC4/NhYmr+fjV1z60f3
+         2IQgbNMh7Q1ujDTKF57DADO8w7uIxZdWYRqFxd05XDamUOOpd9luOs+a5AtoIDVZHlVx
+         qZZ3EeK1A/YHaLKXirsMb0w01EwbFILXhGH9R+8RUgVRUz2BePxKLgKDoHPpsNQTMr/3
+         AGrw==
+X-Gm-Message-State: AJcUukeDa9gXdaNh7zHJR0ICmstbMiDdT4XhyIyjcigfrQJVaqy3ufOr
+        Ec92n2WkH0fPA6KWEOn4dByInOt+
+X-Google-Smtp-Source: ALg8bN5JefKasCu6BVu6+vLjsYC73xwrb3KsqunrDb2JA1V6VQVW6vHQ8vuYedeUgLVAbsmacRNzKQ==
+X-Received: by 2002:a17:906:6d46:: with SMTP id a6mr25480743ejt.203.1548856468247;
+        Wed, 30 Jan 2019 05:54:28 -0800 (PST)
+Received: from localhost.localdomain ([192.198.151.62])
+        by smtp.gmail.com with ESMTPSA id s19sm325045eja.52.2019.01.30.05.54.26
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 30 Jan 2019 05:54:26 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 30 Jan 2019 14:24:11 +0200
-Message-ID: <CABBYNZJ5z_-8KiotL=9fkvq-gLPoqU1LJpaOBv1z4QfZiA3zaA@mail.gmail.com>
-Subject: Re: [PATCH] tools/hcidump: Decode FastStream, aptX Low Latency, aptX
- HD and LDAC
-To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
-Cc:     =?UTF-8?B?UGFzaSBLw6Rya2vDpGluZW4=?= <pasik@iki.fi>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/8] doc/gatt-api: Add Handle property
+Date:   Wed, 30 Jan 2019 15:54:17 +0200
+Message-Id: <20190130135424.2091-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.17.2
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pali, Pasi,
-On Wed, Jan 30, 2019 at 2:09 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrot=
-e:
->
-> On Wednesday 30 January 2019 10:15:17 Pasi K=C3=A4rkk=C3=A4inen wrote:
-> > On Wed, Jan 23, 2019 at 06:54:48PM +0100, Pali Roh=C3=A1r wrote:
-> > > On Wednesday 23 January 2019 18:46:18 Marcel Holtmann wrote:
-> > > > Hi Pali,
-> > > >
-> > > > > ---
-> > > > > tools/parser/avdtp.c | 58 +++++++++++++++++++++++++++++++++++++++=
-++++++++++---
-> > > > > 1 file changed, 55 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
-> > > > > index 18569c895..a21410f5a 100644
-> > > > > --- a/tools/parser/avdtp.c
-> > > > > +++ b/tools/parser/avdtp.c
-> > > > > @@ -155,6 +155,12 @@ static char *vndcodec2str(uint32_t vendor, u=
-int16_t vndcodec)
-> > > > > {
-> > > > >         if (vendor =3D=3D 0x0000004f && vndcodec =3D=3D 0x0001)
-> > > > >                 return "aptX";
-> > > > > +       else if (vendor =3D=3D 0x0000000a && vndcodec =3D=3D 0x00=
-01)
-> > > > > +               return "FastStream";
-> > > > > +       else if (vendor =3D=3D 0x0000000a && vndcodec =3D=3D 0x00=
-02)
-> > > > > +               return "aptX Low Latency";
-> > > > > +       else if (vendor =3D=3D 0x000000d7 && vndcodec =3D=3D 0x00=
-24)
-> > > > > +               return "aptX HD";
-> > > > >         else if (vendor =3D=3D 0x0000012d && vndcodec =3D=3D 0x00=
-aa)
-> > > > >                 return "LDAC";
-> > > > >         return "Unknown???;
-> > > >
-> > > > lets keep the focus on btmon support since nobody should be using h=
-cidump anymore.
-> > >
-> > > In btmon I already implemented it and patches are now merged. I just
-> > > found another place where this capability parsing is implemented and
-> > > based on fact that users still use hcidump I quickly looked at it and
-> > > implemented this parsing.
-> > >
-> >
-> > I agree, hcidump still comes up on many places (guides, blogs, mailingl=
-ist posts, etc),
-> > so it makes sense to add these patches to hcidump aswell. Especially wh=
-en the patch is quite small.
->
-> Exactly, people still use hcidump...
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Well it is a deprecated tool which we might remove starting on BlueZ
-6.x which we would like to do in the very next release, if that
-doesn't happen than perhaps Id take these patches in for a very last
-BlueZ 5.x release.
+When acting as server it is useful to select where to allocate the
+handle for an attribute so it can be restored in the same position when
+restarting the daemon or rebooting the system.
 
-@Marcel: Or you have a better plan? We could do one last 5.x and then
-start working on removing the deprecated tools/etc.
+In order to do that the application also needs to know in which handle
+the attribute is allocated the very first time it is registered, this
+also allows for a better integration with PTS and tools like auto-pts
+which needs to know the handles where the attributes have been
+allocated.
+---
+ v2: Fixes inserting characteristics and descriptors with handle 0x0000,
+ add a patch to enable list-attribute to list with local attributes and
+ print changes to attribute Handle property.
 
-> >
-> > > > Regards
-> > > >
-> > > > Marcel
-> > > >
-> > >
-> > > --
-> > > Pali Roh=C3=A1r
-> > > pali.rohar@gmail.com
-> >
-> >
-> > -- Pasi
-> >
->
-> --
-> Pali Roh=C3=A1r
-> pali.rohar@gmail.com
+ doc/gatt-api.txt | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 8dda60b8a..491eb026a 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -50,6 +50,14 @@ Properties	string UUID [read-only]
+ 			Array of object paths representing the included
+ 			services of this service.
+ 
++		uint16 Handle [read-write, optional] (Server Only)
++
++			Service handle. When available in the server it
++			would attempt to use to allocate into the database
++			which may fail, to auto allocate the value 0x0000
++			shall be used which will cause the allocated handle to
++			be set once registered.
++
+ 
+ Characteristic hierarchy
+ ========================
+@@ -257,6 +265,14 @@ Properties	string UUID [read-only]
+ 				"secure-write" (Server only)
+ 				"authorize"
+ 
++		uint16 Handle [read-write, optional] (Server Only)
++
++			Characteristic handle. When available in the server it
++			would attempt to use to allocate into the database
++			which may fail, to auto allocate the value 0x0000
++			shall be used which will cause the allocated handle to
++			be set once registered.
++
+ Characteristic Descriptors hierarchy
+ ====================================
+ 
+@@ -332,6 +348,14 @@ Properties	string UUID [read-only]
+ 				"secure-write" (Server Only)
+ 				"authorize"
+ 
++		uint16 Handle [read-write, optional] (Server Only)
++
++			Characteristic handle. When available in the server it
++			would attempt to use to allocate into the database
++			which may fail, to auto allocate the value 0x0000
++			shall be used which will cause the allocated handle to
++			be set once registered.
++
+ GATT Profile hierarchy
+ =====================
+ 
+-- 
+2.17.2
 
-
---=20
-Luiz Augusto von Dentz
