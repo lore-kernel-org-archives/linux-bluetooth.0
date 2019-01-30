@@ -2,181 +2,139 @@ Return-Path: <SRS0=Btsr=QG=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8199C282D9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 10:32:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E631C282D7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 12:06:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99AEB218A3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 10:32:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548844361;
-	bh=C4DU94GWt4qEhbe+dI81RNYkCk5pHp9kQdM+Hm7pDQk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=P/uCk1IkmyMF1DzvFf1/aQRrLe2sX2ju/aIVmVXQewgsIThljT6FmxL69Mp5f5v7h
-	 z6lf4tfaxoQAztqZaM0KHuuv3LAJKDtaNqpSBIFdBY2xmfN9LpEuwfHL3Qb7FPuhVx
-	 7b1oh3zV+eR7T8o4Ouxy6vDkBaa6u9DmMbH9GB40=
+	by mail.kernel.org (Postfix) with ESMTP id 0E4F420869
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Jan 2019 12:06:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q0tfyljK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730736AbfA3Kcg (ORCPT
+        id S1727878AbfA3MGp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Jan 2019 05:32:36 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:45483 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730703AbfA3Kcg (ORCPT
+        Wed, 30 Jan 2019 07:06:45 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:39550 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726713AbfA3MGp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Jan 2019 05:32:36 -0500
-Received: by mail-lj1-f195.google.com with SMTP id s5-v6so20203114ljd.12;
-        Wed, 30 Jan 2019 02:32:33 -0800 (PST)
+        Wed, 30 Jan 2019 07:06:45 -0500
+Received: by mail-wm1-f67.google.com with SMTP id y8so21270815wmi.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Jan 2019 04:06:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=9vkdzCQ269b/E3q0G0dD2elkVVJVrXir6Y62H4jdSEc=;
+        b=Q0tfyljKMBha5uvOHdCTvqE7lg6ky0pLeCrDJK/gZpc64npB+vj1ndXyGCKs5dRYG0
+         Hy9qaCIDAW+BrRLe6ChO+L+3Xv3Vd/sTxTPgYYPUqWw2A9N0/lm5EFTpbE795fP+G2ub
+         9NGk2o+fcGS6UlxFPzgiJNnOMBAEJqTnlUTKjjtAjL/e7rTkNS3x6g8V/OQkXJG5rEPa
+         tgcfbvG6LHu9AcIJ/Gs600HYvroDAFR9gnYzJaKuvI2oZKDN1hi3IVEL5A47uPH0FxDx
+         KdK3pUdJyW1T9hprOjHISQ4IYY+6F/kc9Jrcrfuu/YX/FX0boin+a+z6RgYDXSnta0yv
+         +MyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ft9BkvLH1Y/FBfGV+97dpueZ4pwzh0GlQFpeeqI/6cs=;
-        b=tEfZikx/f2ZG4Ro7T5jfbVh8BNlZbq8MZjyMWwg2FqZFWgJZoff/dwRaEOpoQWk7cC
-         HcnL4iCcnrPDmNsPr7+s6Lb8mLATx7YM4CVajli0gPmh/88k0n9mLsnvTsD6fFfd7KG+
-         KZq2FIwVrTN9ke2RqjAncDKhCnmyKZ+AKfVaCiMdu1lPO0eEmZJuDcp8fYu6tcTSic9N
-         wFWSz4ePMqts5iXOnMb+rgGg/d4zGgXgJOjH95TfA4EYLI5Gdi1pkC/Rdev7GNU77JC3
-         WUN6C2XMpIUIsptKlovCRF/A5L3yXtN7AsQiTSnMpcLm617E271aDjaRu8NfzYE9vxUb
-         EGnw==
-X-Gm-Message-State: AJcUukdCe+mAYqMd05vdgSL+9yScY3Pbrh0oDk4Tp17wUMLmi5QRLa6f
-        BB5fK2I1jNbkYV5fhZIH14w=
-X-Google-Smtp-Source: ALg8bN7wNvDaTi8sjUHn4unj76Gvm/ZOfle9NRPXrm315adA+A4WewjMXI6JvmBlEpaSh/6KzAbVmQ==
-X-Received: by 2002:a2e:8554:: with SMTP id u20-v6mr23528683ljj.193.1548844352727;
-        Wed, 30 Jan 2019 02:32:32 -0800 (PST)
-Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id 4-v6sm200271ljw.84.2019.01.30.02.32.31
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Jan 2019 02:32:31 -0800 (PST)
-Received: from johan by xi.terra with local (Exim 4.91)
-        (envelope-from <johan@kernel.org>)
-        id 1gonAR-0001O3-Ry; Wed, 30 Jan 2019 11:32:27 +0100
-Date:   Wed, 30 Jan 2019 11:32:27 +0100
-From:   Johan Hovold <johan@kernel.org>
-To:     shuah <shuah@kernel.org>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, linux-wireless@vger.kernel.org,
-        chris@the-brannons.com, devel@driverdev.osuosl.org,
-        robh@kernel.org, sameo@linux.intel.com,
-        linux-serial@vger.kernel.org, jslaby@suse.com,
-        santhameena13@gmail.com, kirk@reisers.ca, johan.hedberg@gmail.com,
-        arnd@arndb.de, marcel@holtmann.org, samuel.thibault@ens-lyon.org,
-        m.maya.nakamura@gmail.com, zhongjiang@huawei.com,
-        gregkh@linuxfoundation.org, speakup@linux-speakup.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, nishka.dasgupta_ug18@ashoka.edu.in,
-        davem@davemloft.net
-Subject: Re: [PATCH] tty: Fix WARNING in tty_set_termios
-Message-ID: <20190130103227.GR3691@localhost>
-References: <20190125232905.21727-1-shuah@kernel.org>
- <20190126041416.GF2217@ZenIV.linux.org.uk>
- <fe4018a7-19e4-cdd1-3095-bbe88a82788e@kernel.org>
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=9vkdzCQ269b/E3q0G0dD2elkVVJVrXir6Y62H4jdSEc=;
+        b=S55+KGcqF8lpXhnOIXooI1KfKzFSFpc0U1h8aln0c+LchNWI1LNvBVgqblgTPCpROr
+         vZz9HeUEzHLQwjWE6HqmwthTNuV1wUMQnK6QuobIHolWTsSDBQsG8cvkxTy30rNDuwNR
+         UX4RS2rxLjobpIBf1vhwVZm/KA9OqHVeqf2y7wrgo75V+4Roj6z66sfjt3plHJiHiuhK
+         vM8yjLwHJOUTwOfUpGiVYKF5srtnbpMEaPYhm/JDlD+8SmwG+WnMk5G1ysXETc+E99zZ
+         9mJDzbTN341bHIODbC3OSd1L3HI93Rm/8z27xQAgw3+yVCqw70LIl0YdImS435ZvNNd1
+         nkQA==
+X-Gm-Message-State: AJcUukeyJPF6XndiH8fN/lUYB+nYD6YDHLASMk3RksTUkMqSGhEFuaL3
+        cILgLAY3j6jDZ8E6/bzfMmQ=
+X-Google-Smtp-Source: ALg8bN7P/hiR93kuL1X6xAbBWww8SVulzr2Guo47SPByGLRH9pax/4gYkOB5/nyjefk5ZFDIE3Avjg==
+X-Received: by 2002:a7b:c142:: with SMTP id z2mr26412263wmi.102.1548850003469;
+        Wed, 30 Jan 2019 04:06:43 -0800 (PST)
+Received: from pali ([2a02:2b88:2:1::5cc6:2f])
+        by smtp.gmail.com with ESMTPSA id n9sm1014408wrx.80.2019.01.30.04.06.41
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 30 Jan 2019 04:06:42 -0800 (PST)
+Date:   Wed, 30 Jan 2019 13:06:31 +0100
+From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
+To:     Pasi =?utf-8?B?S8Okcmtrw6RpbmVu?= <pasik@iki.fi>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] tools/hcidump: Decode FastStream, aptX Low Latency, aptX
+ HD and LDAC
+Message-ID: <20190130120631.usx67zjk4kmbhcla@pali>
+References: <20190123174504.12350-1-pali.rohar@gmail.com>
+ <8D9BABBE-2BBC-4BFE-BF7C-3BE24AF4DD10@holtmann.org>
+ <20190123175448.cdkdpnk6i5r4rzjs@pali>
+ <20190130081517.GI32745@reaktio.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <fe4018a7-19e4-cdd1-3095-bbe88a82788e@kernel.org>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190130081517.GI32745@reaktio.net>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jan 28, 2019 at 02:29:22PM -0700, shuah wrote:
-> On 1/25/19 9:14 PM, Al Viro wrote:
-> > On Fri, Jan 25, 2019 at 04:29:05PM -0700, Shuah Khan wrote:
-> >> tty_set_termios() has the following WARMN_ON which can be triggered with a
-> >> syscall to invoke TIOCGETD __NR_ioctl.
-
-You meant TIOCSETD here, and in fact its the call which sets the uart
-protocol that triggers the warning.
-
-> >> WARN_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY &&
-> >>                  tty->driver->subtype == PTY_TYPE_MASTER);
-> >> Reference: https://syzkaller.appspot.com/bug?id=2410d22f1d8e5984217329dd0884b01d99e3e48d
-> >>
-> >> A simple change would have been to print error message instead of WARN_ON.
-> >> However, the callers assume that tty_set_termios() always returns 0 and
-> >> don't check return value. The complete solution is fixing all the callers
-> >> to check error and bail out to fix the WARN_ON.
-> >>
-> >> This fix changes tty_set_termios() to return error and all the callers
-> >> to check error and bail out. The reproducer is used to reproduce the
-> >> problem and verify the fix.
+On Wednesday 30 January 2019 10:15:17 Pasi Kärkkäinen wrote:
+> On Wed, Jan 23, 2019 at 06:54:48PM +0100, Pali Rohár wrote:
+> > On Wednesday 23 January 2019 18:46:18 Marcel Holtmann wrote:
+> > > Hi Pali,
+> > > 
+> > > > ---
+> > > > tools/parser/avdtp.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++++---
+> > > > 1 file changed, 55 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
+> > > > index 18569c895..a21410f5a 100644
+> > > > --- a/tools/parser/avdtp.c
+> > > > +++ b/tools/parser/avdtp.c
+> > > > @@ -155,6 +155,12 @@ static char *vndcodec2str(uint32_t vendor, uint16_t vndcodec)
+> > > > {
+> > > > 	if (vendor == 0x0000004f && vndcodec == 0x0001)
+> > > > 		return "aptX";
+> > > > +	else if (vendor == 0x0000000a && vndcodec == 0x0001)
+> > > > +		return "FastStream";
+> > > > +	else if (vendor == 0x0000000a && vndcodec == 0x0002)
+> > > > +		return "aptX Low Latency";
+> > > > +	else if (vendor == 0x000000d7 && vndcodec == 0x0024)
+> > > > +		return "aptX HD";
+> > > > 	else if (vendor == 0x0000012d && vndcodec == 0x00aa)
+> > > > 		return "LDAC";
+> > > > 	return "Unknown???;
+> > > 
+> > > lets keep the focus on btmon support since nobody should be using hcidump anymore.
 > > 
-> >> --- a/drivers/bluetooth/hci_ldisc.c
-> >> +++ b/drivers/bluetooth/hci_ldisc.c
-> >> @@ -321,6 +321,8 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
-> >>   		status = tty_set_termios(tty, &ktermios);
-> >>   		BT_DBG("Disabling hardware flow control: %s",
-> >>   		       status ? "failed" : "success");
-> >> +		if (status)
-> >> +			return;
+> > In btmon I already implemented it and patches are now merged. I just
+> > found another place where this capability parsing is implemented and
+> > based on fact that users still use hcidump I quickly looked at it and
+> > implemented this parsing.
 > > 
-> > Can that ldisc end up set on pty master?  And does it make any sense there?
 > 
-> The initial objective of the patch is to prevent the WARN_ON by making
-> the change to return error instead of WARN_ON. However, without changes
-> to places that don't check the return and keep making progress, there
-> will be secondary problems.
-> 
-> Without this change to return here, instead of WARN_ON, it will fail
-> with the following NULL pointer dereference at the next thing 
-> hci_uart_set_flow_control() attempts.
-> 
-> status = tty->driver->ops->tiocmget(tty);
-> 
-> kernel: [10140.649783] BUG: unable to handle kernel NULL pointer 
+> I agree, hcidump still comes up on many places (guides, blogs, mailinglist posts, etc),
+> so it makes sense to add these patches to hcidump aswell. Especially when the patch is quite small.
 
-That's a separate issue, which is being fixed:
+Exactly, people still use hcidump...
 
-	https://lkml.kernel.org/r/20190130095938.GP3691@localhost
-
-> > IOW, I don't believe that this patch makes any sense.  If anything,
-> > we need to prevent unconditional tty_set_termios() on the path
-> > that *does* lead to calling it for pty.
 > 
-> I don't think preventing unconditional tty_set_termios() is enough to
-> prevent secondary problems such as the one above.
+> > > Regards
+> > > 
+> > > Marcel
+> > > 
+> > 
+> > -- 
+> > Pali Rohár
+> > pali.rohar@gmail.com
 > 
-> For example, the following call chain leads to the WARN_ON that was
-> reported. Even if void hci_uart_set_baudrate() prevents the very first
-> tty_set_termios() call, its caller hci_uart_setup() continues with
-> more tty setup. It goes ahead to call driver setup callback. The
-> driver callback goes on to do more setup calling tty_set_termios().
 > 
-> WARN_ON call path:
->   hci_uart_set_baudrate+0x1cc/0x250 drivers/bluetooth/hci_ldisc.c:378
->   hci_uart_setup+0xa2/0x490 drivers/bluetooth/hci_ldisc.c:401
->   hci_dev_do_open+0x6b1/0x1920 net/bluetooth/hci_core.c:1423
+> -- Pasi
 > 
-> Once this WARN_ON is changed to return error, the following
-> happens, when hci_uart_setup() does driver setup callback.
-> 
-> kernel: [10140.649836]  mrvl_setup+0x17/0x80 [hci_uart]
-> kernel: [10140.649840]  hci_uart_setup+0x56/0x160 [hci_uart]
-> kernel: [10140.649850]  hci_dev_do_open+0xe6/0x630 [bluetooth]
-> kernel: [10140.649860]  hci_power_on+0x52/0x220 [bluetooth]
-> 
-> I think continuing to catch the invalid condition in tty_set_termios()
-> and preventing progress by checking return value is a straight forward
-> change to avoid secondary problems, and it might be difficult to catch
-> all the cases where it could fail.
 
-I agree with Al that this change doesn't make much sense. The WARN_ON
-is there to catch any bugs leading to the termios being changed for a
-master side pty. Those should bugs should be fixed, and not worked
-around in order to silence a WARN_ON.
-
-The problem started with 7721383f4199 ("Bluetooth: hci_uart: Support
-operational speed during setup") which introduced a new way for how
-tty_set_termios() could end up being called for a master pty.
-
-As Al hinted at, setting these ldiscs for a master pty really makes no
-sense and perhaps that is what we should prevent unless simply making
-sure they do not call tty_set_termios() is sufficient for the time
-being.
-
-Finally, note that serdev never operates on a pty, and that this is only
-an issue for (the three) line disciplines.
-
-Johan
+-- 
+Pali Rohár
+pali.rohar@gmail.com
