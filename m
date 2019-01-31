@@ -4,111 +4,148 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 051A5C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 15:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C9B2C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 15:43:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB7F7218D3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 15:40:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43C15218D3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 15:43:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548949210;
-	bh=5bmqbO0/nVI5m0s4mwUYnmLo7aQ1g72ZJhipFCOH2fg=;
+	s=default; t=1548949410;
+	bh=C/UsaAM7EPdEmLTJUhTLIw28ifq7A4V/KFCIx5IiqTQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Q4NdlV1+M7F8EYF1o2oEYmJEMqOA51uy+QHlmYEB0PitXim/UPsWJPZgb3DNC6yny
-	 n8EhyuV8gmKhQIathhBo0IFP7PGJdsmQzwo41gAoylijqIZNdWtp/4jvcteGHbtzwD
-	 BGJ8/nvs7TBcCOtP0Qs7DS796f9uHxBerCCH55uQ=
+	b=S6hBcFj+H4PHFr26y+G9hUl4tNtIVIxO1CzcWXFrKRuiuY44WIl3nO0EPXszRrMSM
+	 i4rjZWDAi3FoXnK0Xd2cr3jmMtrnoczWwZ1u6ExjBPlQnO8NvvA8qvHLQUV+03Eynz
+	 rhVT/xNqktJ4RXBmJ47ZDuYRt0kCuE9M/PTB55hw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733105AbfAaPkG (ORCPT
+        id S1731284AbfAaPn3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Jan 2019 10:40:06 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:41474 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731033AbfAaPkG (ORCPT
+        Thu, 31 Jan 2019 10:43:29 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:33854 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732719AbfAaPn3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Jan 2019 10:40:06 -0500
-Received: by mail-lj1-f195.google.com with SMTP id k15-v6so3053813ljc.8;
-        Thu, 31 Jan 2019 07:40:04 -0800 (PST)
+        Thu, 31 Jan 2019 10:43:29 -0500
+Received: by mail-lf1-f67.google.com with SMTP id p6so2701700lfc.1;
+        Thu, 31 Jan 2019 07:43:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=zEbsfq3Dl6n0U1jU7HiNj0/b8bjtRUy0PQ+fgxvrvJg=;
-        b=gbRZqBxp2daVDWk3KW2tV3mzgAuHomLa3KAyO60gpkS+wDzLv7IxEdt+prP0oOpAnU
-         i+TogHzfDawOQ2HnVBl/IyzY/2xL8rUbR2TFRayZJOlbs+bpliDqSmvRIWSfXKJXlbPC
-         nHvCReYxMbtNq90iBV35o3DrkSuOeCKpOfLf7e8KZFThZQB1qVQakTXSdXWXZTCDVUMO
-         ROOy6MS/FgfgUSP9UXC1Tl4zkvOttMA4vU4Iy+LfnWNyHMtSmad9V6EwM//49MbYYLZK
-         esdMwBPMnc7j5eEIqSwzqZ5yIPwcAT4qpKjVOAKUPJ+gr5kwMV2E5xr52bI+f90Du5Sx
-         Nwsg==
-X-Gm-Message-State: AJcUukfxcnkVqLKUEwSVbis9dov9sQQOQAWxioK+RR7cn+wgpmFoDYpT
-        9uPQxdZhNjjNzGqKaOH4gBY=
-X-Google-Smtp-Source: ALg8bN5lHiXt3UsKOO1GNuwnL9vDkLCyqQEJbIgpxWVaNU6OjL4yj838vQDNbRwrd4XAMoETzwE7Rg==
-X-Received: by 2002:a2e:5109:: with SMTP id f9-v6mr28574237ljb.52.1548949204055;
-        Thu, 31 Jan 2019 07:40:04 -0800 (PST)
+        bh=KCKruneN1VkYRblWDqLxAh0NhNskDittb059H3QEwZk=;
+        b=pTuI3iluPeuhunlZoCsmUp2OttZOay4p9NYoIscezR7LIaHQgb3ENQvG5Ov7hhSRCT
+         BKeCZOZeMC7te7d9arVQbaWrP/THQGrPu3GLVMgSeAjtR2FkySjqS8l5+BvAy3kAWtyu
+         2dSlv1M1Ge69BKaUlQAeSbmlPX7Wb2zNSwIEA46dmSpyXeWstWqpt9uYPHRtYdUzIGnp
+         9NJwPZTp7n3Y2hA4VVa/wE19+SekgscTBVFD+FTd7KArbBWUqHZ3aS/M3HumXydn9KWz
+         cP1vE+yZMJ3Md4ykJWEnI5w2gIPHAbm4Q8ePJW0CY81kr2brGE7Z3WmNCJhHxsL8dNIB
+         CGRg==
+X-Gm-Message-State: AJcUukcMbavNCCaLn2TlPk/rsWtKeb0AHlIMrIbqjOY/eWLEVI+efAig
+        cUCsveb5Ofj/2MS2nYDB7Wk=
+X-Google-Smtp-Source: ALg8bN6ZVnrArr+wIHcm1EarmxyboeqFZNgO1/KAHO2LFgB5/m6jIK8paR1OJDxDTlVQviw+lRUzUA==
+X-Received: by 2002:a19:9508:: with SMTP id x8mr27268001lfd.112.1548949407563;
+        Thu, 31 Jan 2019 07:43:27 -0800 (PST)
 Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
-        by smtp.gmail.com with ESMTPSA id t19-v6sm838425lje.23.2019.01.31.07.40.02
+        by smtp.gmail.com with ESMTPSA id x18-v6sm925807lji.27.2019.01.31.07.43.26
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 31 Jan 2019 07:40:03 -0800 (PST)
+        Thu, 31 Jan 2019 07:43:26 -0800 (PST)
 Received: from johan by xi.terra with local (Exim 4.91)
         (envelope-from <johan@kernel.org>)
-        id 1gpERc-0007SY-MF; Thu, 31 Jan 2019 16:40:00 +0100
-Date:   Thu, 31 Jan 2019 16:40:00 +0100
+        id 1gpEUu-0007Tq-8D; Thu, 31 Jan 2019 16:43:24 +0100
+Date:   Thu, 31 Jan 2019 16:43:24 +0100
 From:   Johan Hovold <johan@kernel.org>
 To:     Myungho Jung <mhjungk@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
+Cc:     Johan Hovold <johan@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Add NULL check for tiocmget() and
- tiocmset()
-Message-ID: <20190131154000.GU3691@localhost>
-References: <20190130053925.GA26699@myunghoj-Precision-5530>
+Subject: Re: [PATCH] Bluetooth: hci_uart: Switch pty driver to slave side in
+ tty_set_termios()
+Message-ID: <20190131154324.GV3691@localhost>
+References: <20190128065259.GA2976@myunghoj-Precision-5530>
+ <20190130100738.GQ3691@localhost>
+ <20190131051352.GB31677@myunghoj-Precision-5530>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190130053925.GA26699@myunghoj-Precision-5530>
+In-Reply-To: <20190131051352.GB31677@myunghoj-Precision-5530>
 User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Jan 29, 2019 at 09:39:28PM -0800, Myungho Jung wrote:
-> tiocmget() and tiocmset() operations are optional and some tty drivers
-> like pty miss the operations. We need NULL check to prevent from
-> dereference.
-> 
-> Signed-off-by: Myungho Jung <mhjungk@gmail.com>
-> ---
->  drivers/bluetooth/hci_ath.c   | 6 ++++++
->  drivers/bluetooth/hci_ldisc.c | 4 ++++
->  2 files changed, 10 insertions(+)
+On Wed, Jan 30, 2019 at 09:13:53PM -0800, Myungho Jung wrote:
+> On Wed, Jan 30, 2019 at 11:07:38AM +0100, Johan Hovold wrote:
+> > On Sun, Jan 27, 2019 at 10:53:02PM -0800, Myungho Jung wrote:
+> > > tty_set_termios() should be called with slave side of pty driver. So, If
+> > > tty driver is pty master, it needs to be switched to ->link.
+> > 
+> > I'm not sure that's the right solution. PTYs are virtual devices used
+> > for IPC and neither end (master or slave) have support for modem
+> > control or baud rates.
+> > 
+> > > Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
+> > > Signed-off-by: Myungho Jung <mhjungk@gmail.com>
+> > > ---
+> > >  drivers/bluetooth/hci_ldisc.c | 20 +++++++++++++++-----
+> > >  1 file changed, 15 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> > > index fbf7b4df23ab..90c5ea8c399b 100644
+> > > --- a/drivers/bluetooth/hci_ldisc.c
+> > > +++ b/drivers/bluetooth/hci_ldisc.c
+> > > @@ -299,10 +299,18 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+> > >  	return 0;
+> > >  }
+> > >  
+> > > +/* If driver is pty master, return slave side */
+> > > +static struct tty_struct *hci_uart_get_real_tty(struct tty_struct *tty)
+> > > +{
+> > > +	return  (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+> > > +		 tty->driver->subtype == PTY_TYPE_MASTER) ? tty->link : tty;
+> > > +}
+> > > +
+> > >  /* Flow control or un-flow control the device */
+> > >  void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+> > >  {
+> > >  	struct tty_struct *tty = hu->tty;
+> > > +	struct tty_struct *real_tty;
+> > >  	struct ktermios ktermios;
+> > >  	int status;
+> > >  	unsigned int set = 0;
+> > > @@ -314,11 +322,12 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+> > >  		return;
+> > >  	}
+> > >  
+> > > +	real_tty = hci_uart_get_real_tty(tty);
+> > >  	if (enable) {
+> > >  		/* Disable hardware flow control */
+> > > -		ktermios = tty->termios;
+> > > +		ktermios = real_tty->termios;
+> > >  		ktermios.c_cflag &= ~CRTSCTS;
+> > > -		status = tty_set_termios(tty, &ktermios);
+> > > +		status = tty_set_termios(real_tty, &ktermios);
+> > >  		BT_DBG("Disabling hardware flow control: %s",
+> > >  		       status ? "failed" : "success");
+> > 
+> > So instead of these pointless calls to set the slave termios and
+> > modem-control state, you might as well bail out early above (and
+> > similarly in set_baudrate()).
+> > 
+> > Using n_hci for a master pty really makes no sense at all, so we could
+> > even bail out at ldisc open, but perhaps that can be discussed and
+> > addressed later.
 
-Ah, you had already submitted a v2.
+> I fixed it to just return -EOPNOTSUPP if NULL in ath_setup().
 
-I still suggest splitting this one in two patches and that you add a
-Fixes and stable tag to each so that they both get backported to stable.
+That was the other fix. For this one you need to bail out if the tty is
+a pty master so that tty_set_termios never gets called here or in
+set_baudrate(). Possibly you can do that already at open().
 
-Also, when resubmitting, make sure to include a short changelog here
-below the cut-off line (---).
+This is also being discussed here:
 
-> 
-> diff --git a/drivers/bluetooth/hci_ath.c b/drivers/bluetooth/hci_ath.c
-> index d568fbd94d6c..fb9f6323a911 100644
-> --- a/drivers/bluetooth/hci_ath.c
-> +++ b/drivers/bluetooth/hci_ath.c
-> @@ -185,8 +185,14 @@ static int ath_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
->  
->  static int ath_setup(struct hci_uart *hu)
->  {
-> +	struct tty_struct *tty = hu->tty;
-> +
->  	BT_DBG("hu %p", hu);
->  
-> +	/* tty driver should support operations to set RTS */
-> +	if (!tty->driver->ops->tiocmget || !tty->driver->ops->tiocmset)
-> +		return -EOPNOTSUPP;
-
--ENODEV might be more appropriate.
+	https://lkml.kernel.org/r/20190130103227.GR3691@localhost
 
 Johan
