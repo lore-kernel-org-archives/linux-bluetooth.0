@@ -2,89 +2,145 @@ Return-Path: <SRS0=4ALD=QH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88066C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 11:13:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A85BAC282D9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 12:18:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EF0B218D3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 11:13:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D096218AC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 12:18:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ovCz5GTy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cx7LAO2I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726852AbfAaLNZ (ORCPT
+        id S1727259AbfAaMSN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Jan 2019 06:13:25 -0500
-Received: from mail-wr1-f48.google.com ([209.85.221.48]:44569 "EHLO
-        mail-wr1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726221AbfAaLNZ (ORCPT
+        Thu, 31 Jan 2019 07:18:13 -0500
+Received: from mail-oi1-f194.google.com ([209.85.167.194]:46806 "EHLO
+        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726266AbfAaMSM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Jan 2019 06:13:25 -0500
-Received: by mail-wr1-f48.google.com with SMTP id z5so2774507wrt.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Jan 2019 03:13:24 -0800 (PST)
+        Thu, 31 Jan 2019 07:18:12 -0500
+Received: by mail-oi1-f194.google.com with SMTP id x202so2485498oif.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Jan 2019 04:18:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=mXWQQxfwxqQ09ppegXOxGqcYq7eYiJbZ1dWb4tLdO5s=;
-        b=ovCz5GTyQAMzAzRct9Uh9+F0VVL+afnDckzI77YPRHrOEHuItCTf7jdwV9RoqpS+L2
-         PTcIUbSM7b8gbt/hZuK4WySg7sDWUIcWMIwwxinOiUdEwWVJG5CEfXEGwzarLi7BOZM0
-         Hz7VLmO44vBQi2hOGhDWmlxyTxXzRNxk/VlpJxlluq7A5vNtcFvmhLwH+KRVVaWYcV6j
-         ITo1dHXqB2sjdjIDlpSFD5vpe2kMCCmvnsNb/R1pCA5rgMVKUoUhBPjSfD9F3GieTX3H
-         4H2G3uuPKIvEW/VHug6DjMOBdu7LleGPtkSxEWJQ28Z4snzT1Pjr+/6XZZWnLHP2GihX
-         hSvg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=Ldoec4TbMWNZR7MsZcJzpGMCUDqtlmEAUQY0sOuTLec=;
+        b=Cx7LAO2I3fVthqmfonDs7dsbny8mg6ukXu4hE2jYWMISs2yd2BRwtXIzhiN1/OD4qk
+         59aRbUHvL4aJwJiIoh/fLn4XYi9MhsLlIMv+ZhX4TsczPrttBFndntvoleOJsMC2KiVH
+         eSpX4aTFjRkzdq58QlKavqZ376X+liEALSZmi9PATRfJ/RbWhqWPsEmCLgD8ZYQAwVOu
+         NDFFxAzqYDd39Y/w3w5QORdkGG4tDfBuNGi3PKGd/GxXUjH0lSZdkvuS6PdBtmgxZPrQ
+         G8WD5nMc7kpHPk1VEl0mffb+lw7s3EIIxVmxMAlQV3O80YF9hL7IfIESKDuTDVUJe7fE
+         Rjkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=mXWQQxfwxqQ09ppegXOxGqcYq7eYiJbZ1dWb4tLdO5s=;
-        b=BDy3tTUPBck5clR3hee+epLmPuQN1+ZX/KF2mqXX3ho34fcByFjsDYg1idStHMlEGd
-         qFAORdZ5l1JSUjZ6jvtH23Jb+1Qn8p8feSVd7ewaKW2V6TZH6C8yxoetLG8J/A7Nic8v
-         O1DKXlTnB+IfLqE7PKE49NakvWRNqpUIqcxlxRY3VriM3wWlQnSaGMJRb9Kbdb5GrvAr
-         5M77huH7Dpy2MYscxQ/zdk3VMT2VPxfegDPX7VA+j2C5bM5EROBVcezmAmsUhjqrnD9A
-         1b7OKSTll+fKujszcMwvDzQOm6ZJjXfQPOz86oXR1XVpRSBFB5zCUHcqCwCtdocuQVZn
-         8vDA==
-X-Gm-Message-State: AJcUukd3wsWoqbiC+yW5uEF6B2yM4nsAvlqtSRkZT8ABq2EtzsbBpmzq
-        NtcLF7fjKBV4xyBa9FvAnGY=
-X-Google-Smtp-Source: ALg8bN56bGMaS8esVBjV4rf5Sfqzykni0ZlwOxUqykRFPZDPCzy2nIutygDxDObPyRkQQefDCoRbVA==
-X-Received: by 2002:adf:b502:: with SMTP id a2mr36034225wrd.54.1548933203708;
-        Thu, 31 Jan 2019 03:13:23 -0800 (PST)
-Received: from pali ([2a02:2b88:2:1::5cc6:2f])
-        by smtp.gmail.com with ESMTPSA id b13sm3161688wrn.28.2019.01.31.03.13.22
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 31 Jan 2019 03:13:22 -0800 (PST)
-Date:   Thu, 31 Jan 2019 12:13:21 +0100
-From:   Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v3] a2dp-codecs: Fix SBC_MAX_BITPOOL and add SBC quality
- modes
-Message-ID: <20190131111321.h5yjt4xd2wab4awc@pali>
-References: <CABBYNZJCKhfX8jdYPqQvXDrtGQvMVT-htqE8WoyGYPLh1E78zA@mail.gmail.com>
- <20190129171207.8976-1-pali.rohar@gmail.com>
- <CABBYNZ+dY0pKjie9TxFPQN6TC7Kp4YYQNRii5=m66WKpi8VHNQ@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=Ldoec4TbMWNZR7MsZcJzpGMCUDqtlmEAUQY0sOuTLec=;
+        b=LrYZw4kipHRuuNobpBuwl065jDiIxS6eX3ESWWwwYoT37K0sQeRt/jn3o3+TQ38TPp
+         p3KqfhUczzsbIhYiA5bBRVaKhv7Ol74S++S97JHa8TDOw9EFAnc7CXbvgZjsyqOaR97n
+         cU51x1ZrgXpIJI8v/1iGsM0V1oSfUTRs8JzeGqMj6J9DW3UCk8iCnaiE32p53UPzIsWW
+         5A0u+P1Fop2NfmScsVincqrsDeYPxnhYzXybwGQd2lQrE7mKhvljbkTQPrY5trC2tBu0
+         OAMpUv8b7FX1CiJC/xfMuFnTuSlTfENsBEXgxDMzv8QT6XGBZ7nljKMBRpl1oSBqICu9
+         NY1w==
+X-Gm-Message-State: AJcUukdgflHqJd8dnBDkC8viR5bscyJtES2rQlCQb+/ecbim5bXJsG+8
+        7C4Qps2zm/resY3gRe1r0n2yViFG3U+nWbc+SZ5k6Q==
+X-Google-Smtp-Source: AHgI3IZk7zkS/IH+NLKQzwlRwtsuP273eTV2KYm4fFvTMiHOyT8brX0QxNhPsn5XhyjMSm1qmUaDRAYry+FMaGFh2d0=
+X-Received: by 2002:aca:47c6:: with SMTP id u189mr15544827oia.250.1548937091142;
+ Thu, 31 Jan 2019 04:18:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZ+dY0pKjie9TxFPQN6TC7Kp4YYQNRii5=m66WKpi8VHNQ@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20190130135424.2091-1-luiz.dentz@gmail.com>
+In-Reply-To: <20190130135424.2091-1-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 31 Jan 2019 14:17:58 +0200
+Message-ID: <CABBYNZ+ygRJJmc+4ckU32xQzxwKxRXy2PoVds6LbczuwK3mZjQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/8] doc/gatt-api: Add Handle property
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thursday 31 January 2019 12:52:09 Luiz Augusto von Dentz wrote:
-> Applied, thanks. Note that I did have to change some comments which
-> had line going over 80 columns.
+Hi,
+On Wed, Jan 30, 2019 at 3:54 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> When acting as server it is useful to select where to allocate the
+> handle for an attribute so it can be restored in the same position when
+> restarting the daemon or rebooting the system.
+>
+> In order to do that the application also needs to know in which handle
+> the attribute is allocated the very first time it is registered, this
+> also allows for a better integration with PTS and tools like auto-pts
+> which needs to know the handles where the attributes have been
+> allocated.
+> ---
+>  v2: Fixes inserting characteristics and descriptors with handle 0x0000,
+>  add a patch to enable list-attribute to list with local attributes and
+>  print changes to attribute Handle property.
+>
+>  doc/gatt-api.txt | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+>
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> index 8dda60b8a..491eb026a 100644
+> --- a/doc/gatt-api.txt
+> +++ b/doc/gatt-api.txt
+> @@ -50,6 +50,14 @@ Properties   string UUID [read-only]
+>                         Array of object paths representing the included
+>                         services of this service.
+>
+> +               uint16 Handle [read-write, optional] (Server Only)
+> +
+> +                       Service handle. When available in the server it
+> +                       would attempt to use to allocate into the database
+> +                       which may fail, to auto allocate the value 0x0000
+> +                       shall be used which will cause the allocated handle to
+> +                       be set once registered.
+> +
+>
+>  Characteristic hierarchy
+>  ========================
+> @@ -257,6 +265,14 @@ Properties string UUID [read-only]
+>                                 "secure-write" (Server only)
+>                                 "authorize"
+>
+> +               uint16 Handle [read-write, optional] (Server Only)
+> +
+> +                       Characteristic handle. When available in the server it
+> +                       would attempt to use to allocate into the database
+> +                       which may fail, to auto allocate the value 0x0000
+> +                       shall be used which will cause the allocated handle to
+> +                       be set once registered.
+> +
+>  Characteristic Descriptors hierarchy
+>  ====================================
+>
+> @@ -332,6 +348,14 @@ Properties string UUID [read-only]
+>                                 "secure-write" (Server Only)
+>                                 "authorize"
+>
+> +               uint16 Handle [read-write, optional] (Server Only)
+> +
+> +                       Characteristic handle. When available in the server it
+> +                       would attempt to use to allocate into the database
+> +                       which may fail, to auto allocate the value 0x0000
+> +                       shall be used which will cause the allocated handle to
+> +                       be set once registered.
+> +
+>  GATT Profile hierarchy
+>  =====================
+>
+> --
+> 2.17.2
 
-Ok, no problem.
+Applied.
 
 -- 
-Pali Rohár
-pali.rohar@gmail.com
+Luiz Augusto von Dentz
