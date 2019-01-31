@@ -2,148 +2,100 @@ Return-Path: <SRS0=4ALD=QH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5485C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 05:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C5BC169C4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 10:49:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BBB132085B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 05:13:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07B6F218AC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 10:49:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PxKKrtON"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bhYlEwWu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725961AbfAaFN5 (ORCPT
+        id S1727505AbfAaKty (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Jan 2019 00:13:57 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:37572 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725857AbfAaFN5 (ORCPT
+        Thu, 31 Jan 2019 05:49:54 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:38686 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726221AbfAaKty (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Jan 2019 00:13:57 -0500
-Received: by mail-pl1-f196.google.com with SMTP id b5so952948plr.4;
-        Wed, 30 Jan 2019 21:13:56 -0800 (PST)
+        Thu, 31 Jan 2019 05:49:54 -0500
+Received: by mail-ot1-f67.google.com with SMTP id e12so2408145otl.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Jan 2019 02:49:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=uGCyb3jEk8HZWIH52FnaNnYunQZQ/C84AsHyCYpT0Yo=;
-        b=PxKKrtON4an60EfsUF4wXv5hX3l23d6iqObZTc9DvAoZCSECI+PUHObSXY97fLFaN/
-         7aNCZ5hh1A7EwHWMHYWZc8NRjAPx68MKvSsiVeCKyynjR+IfwK2joKTR7Nt3MhCQe/uv
-         rERJzPXH5erWYo+s1uFSYkFh1XD8Yek+go1WnlijTDlE034fHsZhhpotufzR+ptNYevj
-         NdgGZd7xF4WSC/Es8nH63VVw22ufgtiY3dvZ8C76c8TyZEiBXV6ScTDpo6LzOQZZ6OQM
-         qt5dSXq6PRFkfw71fw+vf0Z0Nwa+M42+fpxaox2eAsMv/mm/Re1ipoF7KyOHppH059gp
-         f3Xg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=h8YkwEL8ui8ZwNo6oetV5MSn6VXaMzzOrvAnEMbyTcQ=;
+        b=bhYlEwWugrj6/09Ltqgr6g3suAjzAP35XWDAdJ6Ac3luw3UBfatsFNBOj2UPz3ZbC5
+         AsGrNfAbeIroPslYVK0b4VqM9Iijn3r8Jf0UDSLYty1AInpqpWxzzMXrW1CoynI6MTa8
+         Y/TVUz8NYl4ZSdYoVQb/4Ow1Kb4qlst/X4+rZJPYYKhXLrvMpKREuH4VwmldjuZgPxWZ
+         k34bwBywBh+p8qIR1Fotq7YuL+wvdT2adtXD51u0EAPqXB+5+MpkKCJDdxVhI+hjRFLW
+         1v2lVDXMrO8jbtHWem4vU/C6owBJlndTEmNVqsFT6OHRN9izeupEcL/2UibzBLVgTYIz
+         MWnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=uGCyb3jEk8HZWIH52FnaNnYunQZQ/C84AsHyCYpT0Yo=;
-        b=TNxMG9XCDoUujyhWGKE4aeLT2Z7t5/o6pzCmAEOMyERWXejrzr8RmElNEeOa2vPmqy
-         HyKsEOkf7kfnUmR/sqAOUxcDB3FSPdVNBBdBaSIlhbLleKxGXYXGGmiTRF8qxzysamyh
-         Vq8DwYFO46m4/nEPyvWlbT3vIo8697+oEL1gz4qyqpn/uFvCtb8JHwO4EMfSIUixmBGQ
-         jBDYGJ3sIWEBn9SsLPQeQAYvo2m6BxpAoqcf4H20M9SKwIaxyLB4uvNJbsX+eluXEy2H
-         BhyDQnI93W7yElqHUskESXY9Uh2KreOgOKAoyFckGa6nS9Nts+7zI/KQO99QIscBtrvU
-         HOsA==
-X-Gm-Message-State: AJcUukdixOdGSzwuqM9Ry/Ukts59bvHa10f94o1wjwkPTCSdcp4nYIaA
-        KjPvnCW2g9hCs21t2XJQtXg=
-X-Google-Smtp-Source: ALg8bN6SlZ2Owiz72SD7MhDGVMabXR+z6s8A9SjJ7YFOKJMogMCyJKC4AKwrAltaWwnjbkA8Ac6ziQ==
-X-Received: by 2002:a17:902:8607:: with SMTP id f7mr32503360plo.123.1548911636414;
-        Wed, 30 Jan 2019 21:13:56 -0800 (PST)
-Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
-        by smtp.gmail.com with ESMTPSA id x27sm8859067pfe.178.2019.01.30.21.13.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 30 Jan 2019 21:13:56 -0800 (PST)
-Date:   Wed, 30 Jan 2019 21:13:53 -0800
-From:   Myungho Jung <mhjungk@gmail.com>
-To:     Johan Hovold <johan@kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_uart: Switch pty driver to slave side in
- tty_set_termios()
-Message-ID: <20190131051352.GB31677@myunghoj-Precision-5530>
-References: <20190128065259.GA2976@myunghoj-Precision-5530>
- <20190130100738.GQ3691@localhost>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=h8YkwEL8ui8ZwNo6oetV5MSn6VXaMzzOrvAnEMbyTcQ=;
+        b=SI/Mcor9eJPVpPEXHFLDDAs5nXPKNMZYo0agwk8O7YCtHSQM35+9nmJZbuWDW9AX+K
+         wLc23fCxg1FZxKIE+OlbCC4jAoCgU0vIqWRid7Tz7Yq3jzGBUmiVCDJ/dgRiRkLbXGt4
+         A66rYbPY/6y4YYQdGgGNXPgvgMnE5FH4o5+isjS/wEC8kqFtiQht4vAdhFaiRpi04eVz
+         6/zAvsQHpRvL9nLONjvIXdl7WT79SWkDtFaLk/EJQHMptvZ6NgvlwylvyZgonzCLbLiA
+         2afm2qSH8xDH8TTFhvqFMgThQ2Mb2pMlLb4UYTGuxnUa8xNZBzi3uVplvMfSYtoDY9LD
+         suMg==
+X-Gm-Message-State: AJcUukf/0khLc8C2whcqC2Pm+HPEFyARnf6OCuPhq8yU/NeeY6AYC9rF
+        NAGUzb+6coLYSx0yxy8BJqDxNWU5ld7LpfgRHds=
+X-Google-Smtp-Source: ALg8bN66rlvBAZ2fCXGt980HM2dMNvVKKj9b0WVbxj2cS0eOHcZkDscbyVTAPzYt1n9JyT1JWEFoZVSXk8/AEwOqgJs=
+X-Received: by 2002:a9d:18f:: with SMTP id e15mr26367044ote.84.1548931793216;
+ Thu, 31 Jan 2019 02:49:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190130100738.GQ3691@localhost>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20190126102415.23786-1-pali.rohar@gmail.com>
+In-Reply-To: <20190126102415.23786-1-pali.rohar@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 31 Jan 2019 12:49:40 +0200
+Message-ID: <CABBYNZK2WzHXvmBZXyLqB_xHR13XRxUCnT38ZPY3sDOs=utdFg@mail.gmail.com>
+Subject: Re: [PATCH] avinfo: Fix parsing capabilities
+To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jan 30, 2019 at 11:07:38AM +0100, Johan Hovold wrote:
-> On Sun, Jan 27, 2019 at 10:53:02PM -0800, Myungho Jung wrote:
-> > tty_set_termios() should be called with slave side of pty driver. So, If
-> > tty driver is pty master, it needs to be switched to ->link.
-> 
-> I'm not sure that's the right solution. PTYs are virtual devices used
-> for IPC and neither end (master or slave) have support for modem
-> control or baud rates.
-> 
-> > Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
-> > Signed-off-by: Myungho Jung <mhjungk@gmail.com>
-> > ---
-> >  drivers/bluetooth/hci_ldisc.c | 20 +++++++++++++++-----
-> >  1 file changed, 15 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> > index fbf7b4df23ab..90c5ea8c399b 100644
-> > --- a/drivers/bluetooth/hci_ldisc.c
-> > +++ b/drivers/bluetooth/hci_ldisc.c
-> > @@ -299,10 +299,18 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
-> >  	return 0;
-> >  }
-> >  
-> > +/* If driver is pty master, return slave side */
-> > +static struct tty_struct *hci_uart_get_real_tty(struct tty_struct *tty)
-> > +{
-> > +	return  (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
-> > +		 tty->driver->subtype == PTY_TYPE_MASTER) ? tty->link : tty;
-> > +}
-> > +
-> >  /* Flow control or un-flow control the device */
-> >  void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
-> >  {
-> >  	struct tty_struct *tty = hu->tty;
-> > +	struct tty_struct *real_tty;
-> >  	struct ktermios ktermios;
-> >  	int status;
-> >  	unsigned int set = 0;
-> > @@ -314,11 +322,12 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
-> >  		return;
-> >  	}
-> >  
-> > +	real_tty = hci_uart_get_real_tty(tty);
-> >  	if (enable) {
-> >  		/* Disable hardware flow control */
-> > -		ktermios = tty->termios;
-> > +		ktermios = real_tty->termios;
-> >  		ktermios.c_cflag &= ~CRTSCTS;
-> > -		status = tty_set_termios(tty, &ktermios);
-> > +		status = tty_set_termios(real_tty, &ktermios);
-> >  		BT_DBG("Disabling hardware flow control: %s",
-> >  		       status ? "failed" : "success");
-> 
-> So instead of these pointless calls to set the slave termios and
-> modem-control state, you might as well bail out early above (and
-> similarly in set_baudrate()).
-> 
-> Using n_hci for a master pty really makes no sense at all, so we could
-> even bail out at ldisc open, but perhaps that can be discussed and
-> addressed later.
-> 
-> Johan
+Hi Pali,
+On Sat, Jan 26, 2019 at 12:25 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wro=
+te:
+>
+> Function print_caps() expects capabilities buffer without AVDTP header.
+> Previously avinfo somehow worked, because AVDTP header looks like
+> capability header with unknown category which was skipped.
+> ---
+>  tools/avinfo.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/tools/avinfo.c b/tools/avinfo.c
+> index 02fc1f233..a3298e8c8 100644
+> --- a/tools/avinfo.c
+> +++ b/tools/avinfo.c
+> @@ -809,7 +809,7 @@ static ssize_t avdtp_get_caps(int sk, int seid)
+>                 return -1;
+>         }
+>
+> -       print_caps(caps, ret);
+> +       print_caps(caps->caps, ret - sizeof(struct getcap_resp));
+>
+>         return 0;
+>  }
+> --
+> 2.11.0
 
-Hi Johan,
+Applied, thanks.
 
-I fixed it to just return -EOPNOTSUPP if NULL in ath_setup().
-
-Thanks,
-Myungho
+--=20
+Luiz Augusto von Dentz
