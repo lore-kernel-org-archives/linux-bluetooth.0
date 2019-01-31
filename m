@@ -2,68 +2,90 @@ Return-Path: <SRS0=4ALD=QH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.1 required=3.0 tests=DATE_IN_PAST_06_12,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 413F0C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 20:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 858E9C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 20:50:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 107CC20881
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 20:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5390F20881
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 20:50:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728651AbfAaUhh (ORCPT
+        id S1726840AbfAaUu1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Jan 2019 15:37:37 -0500
-Received: from williampainter.com ([185.53.170.252]:44537 "EHLO
-        plantstandinc.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728629AbfAaUhh (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Jan 2019 15:37:37 -0500
-X-Greylist: delayed 3652 seconds by postgrey-1.27 at vger.kernel.org; Thu, 31 Jan 2019 15:37:36 EST
+        Thu, 31 Jan 2019 15:50:27 -0500
+Received: from mga03.intel.com ([134.134.136.65]:26402 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725822AbfAaUu0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 31 Jan 2019 15:50:26 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 31 Jan 2019 12:50:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,545,1539673200"; 
+   d="scan'208";a="271562085"
+Received: from qbxie-mobl3.amr.corp.intel.com (HELO bgix-dell-lap.sea.intel.com) ([10.252.139.137])
+  by orsmga004.jf.intel.com with ESMTP; 31 Jan 2019 12:50:25 -0800
+From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: Start working
-Message-ID: <550474d8ea54338eea130fe44af6352e@chutingstar.com>
-Date:   Thu, 31 Jan 2019 14:07:36 +0100
-From:   "Julie" <kanasamtin@verizon.net>
-Reply-To: kuaident@sina.com
-MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Cc:     inga.stotland@intel.com, johan.hedberg@intel.com,
+        Brian Gix <brian.gix@intel.com>
+Subject: [PATCH BlueZ] mesh: Add MGMT bypass when specifying controller
+Date:   Thu, 31 Jan 2019 12:50:22 -0800
+Message-Id: <20190131205022.6689-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.14.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Want to make white background for your images?
+If Daemon is started with an explicit controller specified, the
+MGMT search for an unused shared controller is bypassed, and
+the controller is opened directly.
+---
+ mesh/mesh.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
 
-We can add clipping path, or give retouching for your photos if needed.
-
-Let's start testing for your photos.
-
-Thanks,
-Julie
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Neuwied
-
-
-Seevetal
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index 881b6ed73..e49653ef8 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -304,7 +304,7 @@ bool mesh_init(uint16_t index, const char *config_dir)
+ 	if (initialized)
+ 		return true;
+ 
+-	if (!init_mgmt()) {
++	if (index == MGMT_INDEX_NONE && !init_mgmt()) {
+ 		l_error("Failed to initialize mesh management");
+ 		return false;
+ 	}
+@@ -326,12 +326,18 @@ bool mesh_init(uint16_t index, const char *config_dir)
+ 	if (!storage_load_nodes(config_dir))
+ 		return false;
+ 
+-	l_debug("send read index_list");
+-	if (mgmt_send(mgmt_mesh, MGMT_OP_READ_INDEX_LIST,
+-				MGMT_INDEX_NONE, 0, NULL,
+-				read_index_list_cb, NULL, NULL) <= 0)
+-		return false;
+-
++	if (index == MGMT_INDEX_NONE) {
++		/* Use MGMT to find a candidate controller */
++		l_debug("send read index_list");
++		if (mgmt_send(mgmt_mesh, MGMT_OP_READ_INDEX_LIST,
++					MGMT_INDEX_NONE, 0, NULL,
++					read_index_list_cb, NULL, NULL) <= 0)
++			return false;
++	} else {
++		/* Open specified controller without searching */
++		start_io(mesh.req_index);
++		return mesh.io != NULL;
++	}
+ 	return true;
+ }
+ 
+-- 
+2.14.5
 
