@@ -2,63 +2,64 @@ Return-Path: <SRS0=4ALD=QH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC826C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 10:50:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE08DC169C4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 10:51:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C0EFA218DA
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 10:50:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4CB6218AC
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 10:51:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxYcEyct"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUzK3dpx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726434AbfAaKud (ORCPT
+        id S1727724AbfAaKvG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Jan 2019 05:50:33 -0500
-Received: from mail-oi1-f180.google.com ([209.85.167.180]:39815 "EHLO
-        mail-oi1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728454AbfAaKuc (ORCPT
+        Thu, 31 Jan 2019 05:51:06 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:36622 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726863AbfAaKvG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Jan 2019 05:50:32 -0500
-Received: by mail-oi1-f180.google.com with SMTP id i6so2331297oia.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Jan 2019 02:50:31 -0800 (PST)
+        Thu, 31 Jan 2019 05:51:06 -0500
+Received: by mail-oi1-f195.google.com with SMTP id x23so2353146oix.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Jan 2019 02:51:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=an3n9uPYIbdMY8UEd4I2+NS6usCUM1fsKjauvRsI0Sg=;
-        b=hxYcEyctguFEC97W1mBhMdHGo4ffEYsd3PZQxXSyXzKZADzeTbolDmahemr0LSCMPQ
-         LMUqrMjbq6z520ZfWkGIuBwEtvG8Dm5T7/WesLm7jiRUranStg9O7c8+pH99KROli0MU
-         pDFE1wfNdNINguq3y0EKyhVnOkT1+fNYA6LcGssRKWmlEcWdj3r6pr8kXA/bNeqD2Xsi
-         1PWcclRgy7/sPfV4UPfWJLt0V1YwH0bcA7ZrMAQA9gL4iXaV0Tq68UNOLhXu1m3CWZBX
-         KfEVlI1jrOojUh8MMUUGydqFBHWgicKLRlSMsH4O1g8hBT+4s/qMuhaavM8pp2UP7wsY
-         R23Q==
+        bh=l1KZ14nWHdwrhvul2mSEXynmf9y8Ds47wIZuCeMlcS0=;
+        b=QUzK3dpxoFXbjqFPcSJrl0MLJW7rOeumle2Xu0sRDGG3WKPQYP12kY6UvgPOoR6r8f
+         s8qhDSYP8b6mlgsnOEd/8rGVYFirc0iYTtfDbcWRcnOi97kTgOpbHVhy4JIVNoJomojT
+         N211Sqpn6KlHAq7W5xoRkRCshzH5y+qZQRdk4xJ/r2xMRRs2Elp22kOYIq8vQD5QHwha
+         ghksgZb/5Tw+XFp1pudEQ2QWk9sZNSkc9EohiMAD64rxs6sVxgItjLEawUtwMEz4uKBh
+         GgJrMigvqu2Eb4fmeJlqmhDB1/gkhi4ropPvF47ZAPMUl80uRKb6Fe9mbS0ePuEx/1EM
+         SpEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=an3n9uPYIbdMY8UEd4I2+NS6usCUM1fsKjauvRsI0Sg=;
-        b=bhYrNC6hKMb0Ss/3KQ2o7cze1vVtj96Qe7tThVqahh5KjR4yhpFiJNgwvnGny4HU7G
-         87jG3bESaiIMIv6TxERzRCRIpa7rMvnOGdTxAPTVnQEEvnDF1uPv6S6yqikDXvYnA4od
-         Q1KgU3PwGrFRat7oOnsEz22ddVhomI2Ysi8JZyf2qj1om2Y6OlTfoKvnzde0ZGemcweN
-         I8j4Kju2bwCdJizc9J6VVK/VfTTwAtsvRyuLrKCAQm7GfDUcFQ1F+17VQroKgDSuc40x
-         HWa9XMGM+ewaTac8xkpKJ/QPVc20Nn8NfKRHVHmnqrTqkWEEpX3KjVQliJ0HrJnk4RKp
-         dhjQ==
-X-Gm-Message-State: AJcUukfmCRhtwQ4cIgFMhVOTLV5Klr3oTOZRmRvGvMGPUrzR5ooqjmL9
-        eP3ntq47daCJathp0xt5ZBajdc0vvaZqxN354bDQMA==
-X-Google-Smtp-Source: AHgI3IZOpAU+6eA0uZS+fAe+H2aiJ07032RFQJqYvTb+ufc4CaAlOPhrQh4oZToywX0QNiIdqguISAYcS/ZaSK/hIfg=
-X-Received: by 2002:aca:47c6:: with SMTP id u189mr15348597oia.250.1548931830674;
- Thu, 31 Jan 2019 02:50:30 -0800 (PST)
+        bh=l1KZ14nWHdwrhvul2mSEXynmf9y8Ds47wIZuCeMlcS0=;
+        b=Q3VI/LFUiJEIy6eq4Bxz1S9z7Odf+oJP7Nc7QaGyoIAA+I3RxREOolHDmGB6RGQpz9
+         qRWGIAgh1RcktmouehZrsq71rFDpMpq9gVXhtOpBc1voPx1YK9u9JIjumf6un1GbyWqe
+         4RLxXOtsFxEKJWhjzEGlTTi1udLxOE1LGAGSCLtWAMW8MRCsw1dMd4HKGV1UapVEJkwz
+         JwfEI9rSfnmMRIMrMRi1YfkMBPnVYmJLvJpzhBUknSt646FIY3ck5wobHlSUMBaVCWU2
+         Y31cTAoN+oeH9x6ze61yoWiQtvzN1c7mj25jj2m1SQy3lFn5t2Qcoc2kb/P2ArFkrGEs
+         Y73w==
+X-Gm-Message-State: AJcUukecoFcRDWEQ4B6CiWir6/e1IZ3Nk7+LdBqFZok6ujZJFjXoV7qr
+        h1rQhGuSoNEs0aTAMgTQcC+/V0UJIqIyHKKawFGyQA==
+X-Google-Smtp-Source: AHgI3IZJeuQK2SOVEVmBxfpzrcHVxQybeZckEZyBNKfTYBE4+CcbpIYVnHIcGoEgoJGjy4t9STTkMrpblZkD070/5nk=
+X-Received: by 2002:aca:3dc5:: with SMTP id k188mr15341602oia.108.1548931864771;
+ Thu, 31 Jan 2019 02:51:04 -0800 (PST)
 MIME-Version: 1.0
-References: <20190126102450.23851-1-pali.rohar@gmail.com>
-In-Reply-To: <20190126102450.23851-1-pali.rohar@gmail.com>
+References: <20190126104606.26486-1-pali.rohar@gmail.com>
+In-Reply-To: <20190126104606.26486-1-pali.rohar@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 31 Jan 2019 12:50:18 +0200
-Message-ID: <CABBYNZ+1B89KQxCUX59=kD1QMzE8iyM8vX_T9ps9ESuNfZBQ0A@mail.gmail.com>
-Subject: Re: [PATCH] avinfo: Dump unknown codecs and unknown categories
+Date:   Thu, 31 Jan 2019 12:50:52 +0200
+Message-ID: <CABBYNZKqVmFGEXKRfo=w=NCn_fqc-Dc2WsAD8vQdkcRZsGL8yw@mail.gmail.com>
+Subject: Re: [PATCH] a2dp-codecs & avinfo: Simplify defintions and parsing of
+ aptX family
 To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,65 +70,200 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Pali,
-On Sat, Jan 26, 2019 at 12:26 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wro=
+On Sat, Jan 26, 2019 at 12:48 PM Pali Roh=C3=A1r <pali.rohar@gmail.com> wro=
 te:
 >
+> Reuse whole a2dp_aptx_t structure and defines as they are same for aptX L=
+ow
+> Latency and aptX HD.
 > ---
->  tools/avinfo.c | 14 +++++++++++++-
->  1 file changed, 13 insertions(+), 1 deletion(-)
+>  profiles/audio/a2dp-codecs.h | 46 ++++++--------------------------------
+>  tools/avinfo.c               | 53 +++++++++++++-------------------------=
+------
+>  2 files changed, 22 insertions(+), 77 deletions(-)
 >
+> diff --git a/profiles/audio/a2dp-codecs.h b/profiles/audio/a2dp-codecs.h
+> index f31f3a311..4789e27ed 100644
+> --- a/profiles/audio/a2dp-codecs.h
+> +++ b/profiles/audio/a2dp-codecs.h
+> @@ -213,14 +213,6 @@
+>  #define APTX_LL_VENDOR_ID              0x0000000a
+>  #define APTX_LL_CODEC_ID               0x0002
+>
+> -#define APTX_LL_CHANNEL_MODE_MONO      0x01
+> -#define APTX_LL_CHANNEL_MODE_STEREO    0x02
+> -
+> -#define APTX_LL_SAMPLING_FREQ_16000    0x08
+> -#define APTX_LL_SAMPLING_FREQ_32000    0x04
+> -#define APTX_LL_SAMPLING_FREQ_44100    0x02
+> -#define APTX_LL_SAMPLING_FREQ_48000    0x01
+> -
+>  /* Default parameters for aptX Low Latency encoder */
+>
+>  /* Target codec buffer level =3D 180 */
+> @@ -244,14 +236,6 @@
+>  #define APTX_HD_VENDOR_ID              0x000000D7
+>  #define APTX_HD_CODEC_ID               0x0024
+>
+> -#define APTX_HD_CHANNEL_MODE_MONO      0x1
+> -#define APTX_HD_CHANNEL_MODE_STEREO    0x2
+> -
+> -#define APTX_HD_SAMPLING_FREQ_16000    0x8
+> -#define APTX_HD_SAMPLING_FREQ_32000    0x4
+> -#define APTX_HD_SAMPLING_FREQ_44100    0x2
+> -#define APTX_HD_SAMPLING_FREQ_48000    0x1
+> -
+>  #define LDAC_VENDOR_ID                 0x0000012d
+>  #define LDAC_CODEC_ID                  0x00aa
+>
+> @@ -360,25 +344,13 @@ typedef struct {
+>  } __attribute__ ((packed)) a2dp_faststream_t;
+>
+>  typedef struct {
+> -       a2dp_vendor_codec_t info;
+> -       uint8_t channel_mode:4;
+> -       uint8_t frequency:4;
+> +       a2dp_aptx_t aptx;
+>         uint8_t bidirect_link:1;
+>         uint8_t has_new_caps:1;
+>         uint8_t reserved:6;
+>         a2dp_aptx_ll_new_caps_t new_caps[0];
+>  } __attribute__ ((packed)) a2dp_aptx_ll_t;
+>
+> -typedef struct {
+> -       a2dp_vendor_codec_t info;
+> -       uint8_t channel_mode:4;
+> -       uint8_t frequency:4;
+> -       uint8_t reserved0;
+> -       uint8_t reserved1;
+> -       uint8_t reserved2;
+> -       uint8_t reserved3;
+> -} __attribute__ ((packed)) a2dp_aptx_hd_t;
+> -
+>  #elif defined(__BYTE_ORDER) && defined(__BIG_ENDIAN) && \
+>         __BYTE_ORDER =3D=3D __BIG_ENDIAN
+>
+> @@ -430,25 +402,21 @@ typedef struct {
+>  } __attribute__ ((packed)) a2dp_faststream_t;
+>
+>  typedef struct {
+> -       a2dp_vendor_codec_t info;
+> -       uint8_t frequency:4;
+> -       uint8_t channel_mode:4;
+> +       a2dp_aptx_t aptx;
+>         uint8_t reserved:6;
+>         uint8_t has_new_caps:1;
+>         uint8_t bidirect_link:1;
+>         a2dp_aptx_ll_new_caps_t new_caps[0];
+>  } __attribute__ ((packed)) a2dp_aptx_ll_t;
+>
+> +#else
+> +#error "Unknown byte order"
+> +#endif
+> +
+>  typedef struct {
+> -       a2dp_vendor_codec_t info;
+> -       uint8_t frequency:4;
+> -       uint8_t channel_mode:4;
+> +       a2dp_aptx_t aptx;
+>         uint8_t reserved0;
+>         uint8_t reserved1;
+>         uint8_t reserved2;
+>         uint8_t reserved3;
+>  } __attribute__ ((packed)) a2dp_aptx_hd_t;
+> -
+> -#else
+> -#error "Unknown byte order"
+> -#endif
 > diff --git a/tools/avinfo.c b/tools/avinfo.c
-> index a3298e8c8..42f539f43 100644
+> index 42f539f43..852d7b67e 100644
 > --- a/tools/avinfo.c
 > +++ b/tools/avinfo.c
-> @@ -648,6 +648,8 @@ static void print_media_codec(
->                         struct avdtp_media_codec_capability *cap,
->                         uint8_t size)
+> @@ -168,15 +168,8 @@ struct avdtp_content_protection_capability {
+>         uint8_t data[0];
+>  } __attribute__ ((packed));
+>
+> -static void print_aptx(a2dp_aptx_t *aptx, uint8_t size)
+> +static void print_aptx_common(a2dp_aptx_t *aptx)
 >  {
-> +       int i;
+> -       printf("\t\tVendor Specific Value (aptX)");
+> -
+> -       if (size < sizeof(*aptx)) {
+> -               printf(" (broken)\n");
+> -               return;
+> -       }
+> -
+>         printf("\n\t\t\tFrequencies: ");
+>         if (aptx->frequency & APTX_SAMPLING_FREQ_16000)
+>                 printf("16kHz ");
+> @@ -192,6 +185,18 @@ static void print_aptx(a2dp_aptx_t *aptx, uint8_t si=
+ze)
+>                 printf("Mono ");
+>         if (aptx->channel_mode & APTX_CHANNEL_MODE_STEREO)
+>                 printf("Stereo ");
+> +}
 > +
->         if (size < sizeof(*cap)) {
->                 printf("\tMedia Codec: Unknown (broken)\n");
->                 return;
-> @@ -668,6 +670,10 @@ static void print_media_codec(
->                 break;
->         default:
->                 printf("\tMedia Codec: Unknown\n");
-> +               printf("\t\tCodec Data:");
-> +               for (i =3D 0; i < size - 2; ++i)
-> +                       printf(" 0x%.02x", ((unsigned char *)cap->data)[i=
-]);
-> +               printf("\n");
->         }
+> +static void print_aptx(a2dp_aptx_t *aptx, uint8_t size)
+> +{
+> +       printf("\t\tVendor Specific Value (aptX)");
+> +
+> +       if (size < sizeof(*aptx)) {
+> +               printf(" (broken)\n");
+> +               return;
+> +       }
+> +
+> +       print_aptx_common(aptx);
+>
+>         printf("\n");
 >  }
+> @@ -242,21 +247,7 @@ static void print_aptx_ll(a2dp_aptx_ll_t *aptx_ll, u=
+int8_t size)
+>                 return;
+>         }
 >
-> @@ -699,6 +705,7 @@ static void print_content_protection(
->  static void print_caps(void *data, int size)
->  {
->         int processed;
-> +       int i;
+> -       printf("\n\t\t\tFrequencies: ");
+> -       if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_16000)
+> -               printf("16kHz ");
+> -       if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_32000)
+> -               printf("32kHz ");
+> -       if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_44100)
+> -               printf("44.1kHz ");
+> -       if (aptx_ll->frequency & APTX_LL_SAMPLING_FREQ_48000)
+> -               printf("48kHz ");
+> -
+> -       printf("\n\t\t\tChannel modes: ");
+> -       if (aptx_ll->channel_mode & APTX_LL_CHANNEL_MODE_MONO)
+> -               printf("Mono ");
+> -       if (aptx_ll->channel_mode & APTX_LL_CHANNEL_MODE_STEREO)
+> -               printf("Stereo ");
+> +       print_aptx_common(&aptx_ll->aptx);
 >
->         for (processed =3D 0; processed + 2 < size;) {
->                 struct avdtp_service_capability *cap;
-> @@ -715,9 +722,14 @@ static void print_caps(void *data, int size)
->                 case AVDTP_REPORTING:
->                 case AVDTP_RECOVERY:
->                 case AVDTP_MULTIPLEXING:
-> -               default:
->                         /* FIXME: Add proper functions */
-> +                       break;
-> +               default:
->                         printf("\tUnknown category: %d\n", cap->category)=
-;
-> +                       printf("\t\tData:");
-> +                       for (i =3D 0; i < cap->length; ++i)
-> +                               printf(" 0x%.02x", ((unsigned char *)cap-=
->data)[i]);
-> +                       printf("\n");
->                         break;
->                 case AVDTP_MEDIA_CODEC:
->                         print_media_codec((void *) cap->data, cap->length=
-);
+>         printf("\n\t\tBidirectional link: %s",
+>                         aptx_ll->bidirect_link ? "Yes" : "No");
+> @@ -292,21 +283,7 @@ static void print_aptx_hd(a2dp_aptx_hd_t *aptx_hd, u=
+int8_t size)
+>                 return;
+>         }
+>
+> -       printf("\n\t\t\tFrequencies: ");
+> -       if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_16000)
+> -               printf("16kHz ");
+> -       if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_32000)
+> -               printf("32kHz ");
+> -       if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_44100)
+> -               printf("44.1kHz ");
+> -       if (aptx_hd->frequency & APTX_HD_SAMPLING_FREQ_48000)
+> -               printf("48kHz ");
+> -
+> -       printf("\n\t\t\tChannel modes: ");
+> -       if (aptx_hd->channel_mode & APTX_HD_CHANNEL_MODE_MONO)
+> -               printf("Mono ");
+> -       if (aptx_hd->channel_mode & APTX_HD_CHANNEL_MODE_STEREO)
+> -               printf("Stereo ");
+> +       print_aptx_common(&aptx_hd->aptx);
+>
+>         printf("\n");
+>  }
 > --
 > 2.11.0
 
