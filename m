@@ -2,145 +2,165 @@ Return-Path: <SRS0=4ALD=QH=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A85BAC282D9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 12:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE008C282DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 15:18:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D096218AC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 12:18:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cx7LAO2I"
+	by mail.kernel.org (Postfix) with ESMTP id AB21B20863
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Jan 2019 15:18:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727259AbfAaMSN (ORCPT
+        id S1731265AbfAaPSg convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Jan 2019 07:18:13 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:46806 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726266AbfAaMSM (ORCPT
+        Thu, 31 Jan 2019 10:18:36 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:37725 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726239AbfAaPSg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Jan 2019 07:18:12 -0500
-Received: by mail-oi1-f194.google.com with SMTP id x202so2485498oif.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Jan 2019 04:18:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=Ldoec4TbMWNZR7MsZcJzpGMCUDqtlmEAUQY0sOuTLec=;
-        b=Cx7LAO2I3fVthqmfonDs7dsbny8mg6ukXu4hE2jYWMISs2yd2BRwtXIzhiN1/OD4qk
-         59aRbUHvL4aJwJiIoh/fLn4XYi9MhsLlIMv+ZhX4TsczPrttBFndntvoleOJsMC2KiVH
-         eSpX4aTFjRkzdq58QlKavqZ376X+liEALSZmi9PATRfJ/RbWhqWPsEmCLgD8ZYQAwVOu
-         NDFFxAzqYDd39Y/w3w5QORdkGG4tDfBuNGi3PKGd/GxXUjH0lSZdkvuS6PdBtmgxZPrQ
-         G8WD5nMc7kpHPk1VEl0mffb+lw7s3EIIxVmxMAlQV3O80YF9hL7IfIESKDuTDVUJe7fE
-         Rjkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=Ldoec4TbMWNZR7MsZcJzpGMCUDqtlmEAUQY0sOuTLec=;
-        b=LrYZw4kipHRuuNobpBuwl065jDiIxS6eX3ESWWwwYoT37K0sQeRt/jn3o3+TQ38TPp
-         p3KqfhUczzsbIhYiA5bBRVaKhv7Ol74S++S97JHa8TDOw9EFAnc7CXbvgZjsyqOaR97n
-         cU51x1ZrgXpIJI8v/1iGsM0V1oSfUTRs8JzeGqMj6J9DW3UCk8iCnaiE32p53UPzIsWW
-         5A0u+P1Fop2NfmScsVincqrsDeYPxnhYzXybwGQd2lQrE7mKhvljbkTQPrY5trC2tBu0
-         OAMpUv8b7FX1CiJC/xfMuFnTuSlTfENsBEXgxDMzv8QT6XGBZ7nljKMBRpl1oSBqICu9
-         NY1w==
-X-Gm-Message-State: AJcUukdgflHqJd8dnBDkC8viR5bscyJtES2rQlCQb+/ecbim5bXJsG+8
-        7C4Qps2zm/resY3gRe1r0n2yViFG3U+nWbc+SZ5k6Q==
-X-Google-Smtp-Source: AHgI3IZk7zkS/IH+NLKQzwlRwtsuP273eTV2KYm4fFvTMiHOyT8brX0QxNhPsn5XhyjMSm1qmUaDRAYry+FMaGFh2d0=
-X-Received: by 2002:aca:47c6:: with SMTP id u189mr15544827oia.250.1548937091142;
- Thu, 31 Jan 2019 04:18:11 -0800 (PST)
-MIME-Version: 1.0
-References: <20190130135424.2091-1-luiz.dentz@gmail.com>
-In-Reply-To: <20190130135424.2091-1-luiz.dentz@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 31 Jan 2019 14:17:58 +0200
-Message-ID: <CABBYNZ+ygRJJmc+4ckU32xQzxwKxRXy2PoVds6LbczuwK3mZjQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/8] doc/gatt-api: Add Handle property
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 31 Jan 2019 10:18:36 -0500
+Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
+        by mail.holtmann.org (Postfix) with ESMTPSA id A490ECEE02;
+        Thu, 31 Jan 2019 16:26:22 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH] tty: Fix WARNING in tty_set_termios
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20190130103227.GR3691@localhost>
+Date:   Thu, 31 Jan 2019 16:18:33 +0100
+Cc:     shuah <shuah@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>,
+        "open list:NFC SUBSYSTEM" <linux-wireless@vger.kernel.org>,
+        chris@the-brannons.com, devel@driverdev.osuosl.org,
+        Rob Herring <robh@kernel.org>,
+        Samuel Ortiz <sameo@linux.intel.com>,
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        Jiri Slaby <jslaby@suse.com>, santhameena13@gmail.com,
+        kirk@reisers.ca, Johan Hedberg <johan.hedberg@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, samuel.thibault@ens-lyon.org,
+        m.maya.nakamura@gmail.com, zhongjiang@huawei.com,
+        Greg KH <gregkh@linuxfoundation.org>,
+        speakup@linux-speakup.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        nishka.dasgupta_ug18@ashoka.edu.in,
+        "David S. Miller" <davem@davemloft.net>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <D0EE5C33-2930-4286-998C-822DD7898B76@holtmann.org>
+References: <20190125232905.21727-1-shuah@kernel.org>
+ <20190126041416.GF2217@ZenIV.linux.org.uk>
+ <fe4018a7-19e4-cdd1-3095-bbe88a82788e@kernel.org>
+ <20190130103227.GR3691@localhost>
+To:     Johan Hovold <johan@kernel.org>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
-On Wed, Jan 30, 2019 at 3:54 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> When acting as server it is useful to select where to allocate the
-> handle for an attribute so it can be restored in the same position when
-> restarting the daemon or rebooting the system.
->
-> In order to do that the application also needs to know in which handle
-> the attribute is allocated the very first time it is registered, this
-> also allows for a better integration with PTS and tools like auto-pts
-> which needs to know the handles where the attributes have been
-> allocated.
-> ---
->  v2: Fixes inserting characteristics and descriptors with handle 0x0000,
->  add a patch to enable list-attribute to list with local attributes and
->  print changes to attribute Handle property.
->
->  doc/gatt-api.txt | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
->
-> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-> index 8dda60b8a..491eb026a 100644
-> --- a/doc/gatt-api.txt
-> +++ b/doc/gatt-api.txt
-> @@ -50,6 +50,14 @@ Properties   string UUID [read-only]
->                         Array of object paths representing the included
->                         services of this service.
->
-> +               uint16 Handle [read-write, optional] (Server Only)
-> +
-> +                       Service handle. When available in the server it
-> +                       would attempt to use to allocate into the database
-> +                       which may fail, to auto allocate the value 0x0000
-> +                       shall be used which will cause the allocated handle to
-> +                       be set once registered.
-> +
->
->  Characteristic hierarchy
->  ========================
-> @@ -257,6 +265,14 @@ Properties string UUID [read-only]
->                                 "secure-write" (Server only)
->                                 "authorize"
->
-> +               uint16 Handle [read-write, optional] (Server Only)
-> +
-> +                       Characteristic handle. When available in the server it
-> +                       would attempt to use to allocate into the database
-> +                       which may fail, to auto allocate the value 0x0000
-> +                       shall be used which will cause the allocated handle to
-> +                       be set once registered.
-> +
->  Characteristic Descriptors hierarchy
->  ====================================
->
-> @@ -332,6 +348,14 @@ Properties string UUID [read-only]
->                                 "secure-write" (Server Only)
->                                 "authorize"
->
-> +               uint16 Handle [read-write, optional] (Server Only)
-> +
-> +                       Characteristic handle. When available in the server it
-> +                       would attempt to use to allocate into the database
-> +                       which may fail, to auto allocate the value 0x0000
-> +                       shall be used which will cause the allocated handle to
-> +                       be set once registered.
-> +
->  GATT Profile hierarchy
->  =====================
->
-> --
-> 2.17.2
+Hi Johan,
 
-Applied.
+>>> On Fri, Jan 25, 2019 at 04:29:05PM -0700, Shuah Khan wrote:
+>>>> tty_set_termios() has the following WARMN_ON which can be triggered with a
+>>>> syscall to invoke TIOCGETD __NR_ioctl.
+> 
+> You meant TIOCSETD here, and in fact its the call which sets the uart
+> protocol that triggers the warning.
+> 
+>>>> WARN_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+>>>>                 tty->driver->subtype == PTY_TYPE_MASTER);
+>>>> Reference: https://syzkaller.appspot.com/bug?id=2410d22f1d8e5984217329dd0884b01d99e3e48d
+>>>> 
+>>>> A simple change would have been to print error message instead of WARN_ON.
+>>>> However, the callers assume that tty_set_termios() always returns 0 and
+>>>> don't check return value. The complete solution is fixing all the callers
+>>>> to check error and bail out to fix the WARN_ON.
+>>>> 
+>>>> This fix changes tty_set_termios() to return error and all the callers
+>>>> to check error and bail out. The reproducer is used to reproduce the
+>>>> problem and verify the fix.
+>>> 
+>>>> --- a/drivers/bluetooth/hci_ldisc.c
+>>>> +++ b/drivers/bluetooth/hci_ldisc.c
+>>>> @@ -321,6 +321,8 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+>>>>  		status = tty_set_termios(tty, &ktermios);
+>>>>  		BT_DBG("Disabling hardware flow control: %s",
+>>>>  		       status ? "failed" : "success");
+>>>> +		if (status)
+>>>> +			return;
+>>> 
+>>> Can that ldisc end up set on pty master?  And does it make any sense there?
+>> 
+>> The initial objective of the patch is to prevent the WARN_ON by making
+>> the change to return error instead of WARN_ON. However, without changes
+>> to places that don't check the return and keep making progress, there
+>> will be secondary problems.
+>> 
+>> Without this change to return here, instead of WARN_ON, it will fail
+>> with the following NULL pointer dereference at the next thing 
+>> hci_uart_set_flow_control() attempts.
+>> 
+>> status = tty->driver->ops->tiocmget(tty);
+>> 
+>> kernel: [10140.649783] BUG: unable to handle kernel NULL pointer 
+> 
+> That's a separate issue, which is being fixed:
+> 
+> 	https://lkml.kernel.org/r/20190130095938.GP3691@localhost
+> 
+>>> IOW, I don't believe that this patch makes any sense.  If anything,
+>>> we need to prevent unconditional tty_set_termios() on the path
+>>> that *does* lead to calling it for pty.
+>> 
+>> I don't think preventing unconditional tty_set_termios() is enough to
+>> prevent secondary problems such as the one above.
+>> 
+>> For example, the following call chain leads to the WARN_ON that was
+>> reported. Even if void hci_uart_set_baudrate() prevents the very first
+>> tty_set_termios() call, its caller hci_uart_setup() continues with
+>> more tty setup. It goes ahead to call driver setup callback. The
+>> driver callback goes on to do more setup calling tty_set_termios().
+>> 
+>> WARN_ON call path:
+>>  hci_uart_set_baudrate+0x1cc/0x250 drivers/bluetooth/hci_ldisc.c:378
+>>  hci_uart_setup+0xa2/0x490 drivers/bluetooth/hci_ldisc.c:401
+>>  hci_dev_do_open+0x6b1/0x1920 net/bluetooth/hci_core.c:1423
+>> 
+>> Once this WARN_ON is changed to return error, the following
+>> happens, when hci_uart_setup() does driver setup callback.
+>> 
+>> kernel: [10140.649836]  mrvl_setup+0x17/0x80 [hci_uart]
+>> kernel: [10140.649840]  hci_uart_setup+0x56/0x160 [hci_uart]
+>> kernel: [10140.649850]  hci_dev_do_open+0xe6/0x630 [bluetooth]
+>> kernel: [10140.649860]  hci_power_on+0x52/0x220 [bluetooth]
+>> 
+>> I think continuing to catch the invalid condition in tty_set_termios()
+>> and preventing progress by checking return value is a straight forward
+>> change to avoid secondary problems, and it might be difficult to catch
+>> all the cases where it could fail.
+> 
+> I agree with Al that this change doesn't make much sense. The WARN_ON
+> is there to catch any bugs leading to the termios being changed for a
+> master side pty. Those should bugs should be fixed, and not worked
+> around in order to silence a WARN_ON.
+> 
+> The problem started with 7721383f4199 ("Bluetooth: hci_uart: Support
+> operational speed during setup") which introduced a new way for how
+> tty_set_termios() could end up being called for a master pty.
+> 
+> As Al hinted at, setting these ldiscs for a master pty really makes no
+> sense and perhaps that is what we should prevent unless simply making
+> sure they do not call tty_set_termios() is sufficient for the time
+> being.
+> 
+> Finally, note that serdev never operates on a pty, and that this is only
+> an issue for (the three) line disciplines.
 
--- 
-Luiz Augusto von Dentz
+I think for PTYs we should just fail setting the HCI line discipline. Fail early and just move on with life.
+
+Regards
+
+Marcel
+
