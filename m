@@ -2,71 +2,152 @@ Return-Path: <SRS0=OdH+=QI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC5AAC169C4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:59:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59555C282D8
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 09:28:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B49B92184A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:59:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25DF22086C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 09:28:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1549013335;
+	bh=ZWSrzGqGcDkzsCbxMSKqo+i1CxyzmnGBYGBHhGUQSIY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=HAZ78oV/R6cL4cWUfPdvo7RSnI4MMg78TDgQeOR5JsFsFePpl1MvzIGMEUmYgh5La
+	 jGN1fOTDDR2bCNOj/aVREEu/5PQ6CTKsLTww1FZvQG/j3eYWCNGgg9VOKq5zgfX2sR
+	 /kFrkpWBIEgdp126LbQ+PfVonSIZSatXuQFWeNOY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727552AbfBAC7y convert rfc822-to-8bit (ORCPT
+        id S1726710AbfBAJ2t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Jan 2019 21:59:54 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:45468 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725831AbfBAC7y (ORCPT
+        Fri, 1 Feb 2019 04:28:49 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:44692 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725765AbfBAJ2t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Jan 2019 21:59:54 -0500
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 75B2F319B5
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Feb 2019 02:59:53 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 67CD2319C1; Fri,  1 Feb 2019 02:59:53 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 202481] lost first keystroke of BT-keyboards after idle
-Date:   Fri, 01 Feb 2019 02:59:53 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mybigspam@mail.ru
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-202481-62941-tvIO6pjOeM@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-202481-62941@https.bugzilla.kernel.org/>
-References: <bug-202481-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Fri, 1 Feb 2019 04:28:49 -0500
+Received: by mail-lf1-f65.google.com with SMTP id z13so4505613lfe.11;
+        Fri, 01 Feb 2019 01:28:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Orb4/Yh0tNK7GyrHjtzMrneVREVx94xbAQgC4293Qrw=;
+        b=Mj127OWb2OhFkEywJBKQl3vb1ybPv9MA9r+a1ApJi/9R58PEFsrDmwcluSX6FO0ofl
+         1paj53N8GQckxtDEuQnQNZ1Ewr6AeYlsyNIgl5mLyTITLX55lZl+mdNwPD+EmebL/VRH
+         YX1hRXdVMpnIKvWvfXQZKVxwsCCgvANTnpp7T598SJITQux9QkX3nI/ZnovfbPtkq4mg
+         KF2gLwX1iRLi9ofk9ViAdRpfkmX6f9Z+cWcXtStTWfwBsB+1EQztLXeQUQjsMti1cUK5
+         aKOa5R5Wl+ppNhKUvizIDyE6fxeC2ncHDhjsts4c0At8QyB8vbNZtnQtT0qOkGXBeM3c
+         Dg6Q==
+X-Gm-Message-State: AHQUAuaZDipTV1LUjDqYmpMFHs30GqrHeG5HhD0KmRp/gAtgggiUEYh3
+        5BZqUN4pggtTM88V9I1fKIk=
+X-Google-Smtp-Source: AHgI3IYYU66OXqs7dxrjf/0bmMmPTTxWRMMvM6yRoP7vZ4OYTk3HZzZty0Wyw2p+5YY6NjOFIGCkKQ==
+X-Received: by 2002:a19:760a:: with SMTP id c10mr383123lff.53.1549013326855;
+        Fri, 01 Feb 2019 01:28:46 -0800 (PST)
+Received: from xi.terra (c-74bee655.07-184-6d6c6d4.bbcust.telenor.se. [85.230.190.116])
+        by smtp.gmail.com with ESMTPSA id f1sm1268806lfm.22.2019.02.01.01.28.45
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 01 Feb 2019 01:28:46 -0800 (PST)
+Received: from johan by xi.terra with local (Exim 4.91)
+        (envelope-from <johan@kernel.org>)
+        id 1gpV7r-0003R8-1l; Fri, 01 Feb 2019 10:28:43 +0100
+Date:   Fri, 1 Feb 2019 10:28:43 +0100
+From:   Johan Hovold <johan@kernel.org>
+To:     Shuah Khan <shuah@kernel.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] tty: Fix WARNING in tty_set_termios()
+Message-ID: <20190201092843.GA3691@localhost>
+References: <20190131232359.27948-1-shuah@kernel.org>
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190131232359.27948-1-shuah@kernel.org>
+User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=202481
+On Thu, Jan 31, 2019 at 04:23:59PM -0700, Shuah Khan wrote:
+> tty_set_termios() has the following WARN_ON which can be triggered with a
+> syscall to invoke TIOCSETD __NR_ioctl.
 
---- Comment #1 from mybigspam@mail.ru ---
-Also tested on kernels v3.2 (Ubuntu 12.04.1 LTS), v3.13 (Ubuntu 12.04.5 LTS) -
-the problem still there.
-Occurs on different computers, with different BT-adapters (in-built, USB
-external).
+That's the only way to set the hci line discipline. And it's the
+consequent ioctl that sets the uart protocol that triggers the warning,
+but only if the tty is a pty master, as I mentioned before.
 
-Not sure if it regression or not. Help.
+> WARN_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+>                 tty->driver->subtype == PTY_TYPE_MASTER);
+> Reference: https://syzkaller.appspot.com/bug?id=2410d22f1d8e5984217329dd0884b01d99e3e48d
+> 
+> The problem started with commit 7721383f4199 ("Bluetooth: hci_uart: Support
+> operational speed during setup") which introduced a new way for how
+> tty_set_termios() could end up being called for a master pty.
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+Please always include reviewers on CC, and especially if you end up
+citing them directly as you do here. Perhaps add quotation marks or at
+least a reference to the discussion where this solution was suggested.
+
+> Fix the problem by preventing setting the HCI line discipline for PTYs
+> from hci_uart_setup() and hci_uart_set_flow_control().
+
+This makes no sense. You've already set the line discpline, you're just
+making the uart protocol ioctl fail when it tries to register the hci
+device.
+
+> The reproducer is used to reproduce the problem and verify the fix.
+> 
+> Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
+> Signed-off-by: Shuah Khan <shuah@kernel.org>
+> ---
+>  drivers/bluetooth/hci_ldisc.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> index fbf7b4df23ab..ce84ca91ca70 100644
+> --- a/drivers/bluetooth/hci_ldisc.c
+> +++ b/drivers/bluetooth/hci_ldisc.c
+> @@ -314,6 +314,11 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+>  		return;
+>  	}
+>  
+> +	/* don't set HCI line discipline on PTYs */
+> +	if (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+> +	    tty->driver->subtype == PTY_TYPE_MASTER)
+> +		return;
+
+I don't think you can ever end up here with the below change.
+
+> +
+>  	if (enable) {
+>  		/* Disable hardware flow control */
+>  		ktermios = tty->termios;
+> @@ -384,11 +389,17 @@ void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
+>  static int hci_uart_setup(struct hci_dev *hdev)
+>  {
+>  	struct hci_uart *hu = hci_get_drvdata(hdev);
+> +	struct tty_struct *tty = hu->tty;
+>  	struct hci_rp_read_local_version *ver;
+>  	struct sk_buff *skb;
+>  	unsigned int speed;
+>  	int err;
+>  
+> +	/* don't set HCI line discipline on PTYs */
+> +	if (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+> +	    tty->driver->subtype == PTY_TYPE_MASTER)
+> +		return -EINVAL;
+
+This is too late for what your patch claim that you try to do. This
+would fail the hci device registration when setting the uart protocol,
+but the line discipline has already been set.
+
+> +
+>  	/* Init speed if any */
+>  	if (hu->init_speed)
+>  		speed = hu->init_speed;
+
+Johan
