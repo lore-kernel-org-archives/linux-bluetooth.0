@@ -2,120 +2,90 @@ Return-Path: <SRS0=OdH+=QI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FB0C282DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 23:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF06C282D8
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 23:20:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11C5521872
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 23:19:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6971214C6
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 23:20:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1549063158;
-	bh=c+CIRAu4FBfC7IKBpa3fgtfdJ9zpErEqRqLBiWnIniA=;
+	s=default; t=1549063241;
+	bh=YEoK6JtB8CT5QIB7wsQwfVDG62jR9l/ofe/ZfI21vZI=;
 	h=Subject:To:Cc:References:From:Date:In-Reply-To:List-ID:From;
-	b=QmBnWh+TzENMLHpTLfW0ZUTiUe/i/1IU+ugIGRsZZD5JiwS6BLzarMLusP8xGQ8ht
-	 DVn7/MckFgTDAb68tUQ7j71STwUJAsL7llV9/Z1ZlOCvtOXYJmEFs5AKIltIIPiO2e
-	 zwvEkSBRq5bch9hHGjgoRJHZYTFwbFypB6aqGibQ=
+	b=J5DYIf+LR7VvV4luwmQxCWfAOsIQ9EKuql1GbJjvsOvIEojiqQTFkTwgsTk7amNLt
+	 o4o1yHLIe4p2ayYBl4610tWVW+YiNKWSQyOZDUFv7fFyBzfdmX4/cqc4FCunjwqIpr
+	 pxk7Y4zAgoYV7v6AhZVib6pysNASAzIoCfQnQ3pw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726193AbfBAXTM (ORCPT
+        id S1727034AbfBAXUh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Feb 2019 18:19:12 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54460 "EHLO mail.kernel.org"
+        Fri, 1 Feb 2019 18:20:37 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55052 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725890AbfBAXTM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Feb 2019 18:19:12 -0500
+        id S1726649AbfBAXUg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 1 Feb 2019 18:20:36 -0500
 Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 899E5214C6;
-        Fri,  1 Feb 2019 23:19:10 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9C289214C6;
+        Fri,  1 Feb 2019 23:20:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1549063151;
-        bh=c+CIRAu4FBfC7IKBpa3fgtfdJ9zpErEqRqLBiWnIniA=;
+        s=default; t=1549063236;
+        bh=YEoK6JtB8CT5QIB7wsQwfVDG62jR9l/ofe/ZfI21vZI=;
         h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=EdfNV68pVHTPXiDVpmkk0t7Va234BzcGaV5DuKfbAn/u4DNlvbim1tI6vpR79v58d
-         4mZLFoJwCH/twvx69lMRrMuSqIpOnIO58l49pcOlRVgbKJ6A2SRmUT0V7WDpMzZ/+3
-         tlfbluaePXVxcpErF7xQvznwt23A1qnxjrA5n6ss=
+        b=zydZOR06u9RihSyn+R29UsIMWaNLdIuS740tC7S2HDOLVpJiteuBE8qDe1Ix1Zs/I
+         HM+tXadQ1E4Gr+dMv2zkhEA9453LHEKZnV5JdZZx3dLEXAfhwR9eCaaneEntidit31
+         2QWb0N9qXXh1UoHN8UWhqjCfzJ0Zohkub+A6sbZk=
 Subject: Re: [PATCH v2] tty: Fix WARNING in tty_set_termios()
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Greg KH <gregkh@linuxfoundation.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Johan Hovold <johan@kernel.org>,
+To:     Johan Hovold <johan@kernel.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        viro@zeniv.linux.org.uk, gregkh@linuxfoundation.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         shuah <shuah@kernel.org>
 References: <20190131232359.27948-1-shuah@kernel.org>
- <2EA87A3C-BC0D-4CDA-998D-BA7A6D829356@holtmann.org>
+ <20190201092843.GA3691@localhost>
 From:   shuah <shuah@kernel.org>
-Message-ID: <7dc2f2b5-95f4-4809-7719-d214443966eb@kernel.org>
-Date:   Fri, 1 Feb 2019 16:18:57 -0700
+Message-ID: <d1388ad8-4607-7b4d-a68c-3c31be476601@kernel.org>
+Date:   Fri, 1 Feb 2019 16:20:35 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <2EA87A3C-BC0D-4CDA-998D-BA7A6D829356@holtmann.org>
+In-Reply-To: <20190201092843.GA3691@localhost>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2/1/19 3:00 AM, Marcel Holtmann wrote:
-> Hi Shuah,
-> 
+On 2/1/19 2:28 AM, Johan Hovold wrote:
+> On Thu, Jan 31, 2019 at 04:23:59PM -0700, Shuah Khan wrote:
 >> tty_set_termios() has the following WARN_ON which can be triggered with a
 >> syscall to invoke TIOCSETD __NR_ioctl.
->>
+> 
+> That's the only way to set the hci line discipline. And it's the
+> consequent ioctl that sets the uart protocol that triggers the warning,
+> but only if the tty is a pty master, as I mentioned before.
+> 
 >> WARN_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY &&
->>                 tty->driver->subtype == PTY_TYPE_MASTER);
+>>                  tty->driver->subtype == PTY_TYPE_MASTER);
 >> Reference: https://syzkaller.appspot.com/bug?id=2410d22f1d8e5984217329dd0884b01d99e3e48d
 >>
 >> The problem started with commit 7721383f4199 ("Bluetooth: hci_uart: Support
 >> operational speed during setup") which introduced a new way for how
 >> tty_set_termios() could end up being called for a master pty.
->>
->> Fix the problem by preventing setting the HCI line discipline for PTYs
->> from hci_uart_setup() and hci_uart_set_flow_control().
->>
->> The reproducer is used to reproduce the problem and verify the fix.
->>
->> Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
->> Signed-off-by: Shuah Khan <shuah@kernel.org>
->> ---
->> drivers/bluetooth/hci_ldisc.c | 11 +++++++++++
->> 1 file changed, 11 insertions(+)
->>
->> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
->> index fbf7b4df23ab..ce84ca91ca70 100644
->> --- a/drivers/bluetooth/hci_ldisc.c
->> +++ b/drivers/bluetooth/hci_ldisc.c
->> @@ -314,6 +314,11 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
->> 		return;
->> 	}
->>
->> +	/* don't set HCI line discipline on PTYs */
->> +	if (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
->> +	    tty->driver->subtype == PTY_TYPE_MASTER)
->> +		return;
->> +
 > 
-> just do it once in hci_uart_tty_open. Actually we already check for ops->write and so lets just ensure all ops we ever call are present. If they are not, then bail out. I wouldn’t even bother with the TTY type. Wouldn’t that be a lot simpler?
+> Please always include reviewers on CC, and especially if you end up
+> citing them directly as you do here. Perhaps add quotation marks or at
+> least a reference to the discussion where this solution was suggested.
 > 
 
-As you said, hci_uart_tty_open()is a good place to check it. I think
-checking tty type is necessary. I couldn't find any missing ops I could
-base the check on to prevent the ldisc set.
-
-I have the patch that does the tty check in hci_uart_tty_open() tested
-and ready for sending.
+Thanks for the feedback. I am folding in your and Marcel's input in my
+v3.
 
 thanks,
 -- Shuah
-
-
-
-
 
