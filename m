@@ -2,74 +2,120 @@ Return-Path: <SRS0=OdH+=QI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB14C282D8
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 21:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FB0C282DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 23:19:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA36520869
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 21:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11C5521872
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 23:19:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1549063158;
+	bh=c+CIRAu4FBfC7IKBpa3fgtfdJ9zpErEqRqLBiWnIniA=;
+	h=Subject:To:Cc:References:From:Date:In-Reply-To:List-ID:From;
+	b=QmBnWh+TzENMLHpTLfW0ZUTiUe/i/1IU+ugIGRsZZD5JiwS6BLzarMLusP8xGQ8ht
+	 DVn7/MckFgTDAb68tUQ7j71STwUJAsL7llV9/Z1ZlOCvtOXYJmEFs5AKIltIIPiO2e
+	 zwvEkSBRq5bch9hHGjgoRJHZYTFwbFypB6aqGibQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726190AbfBAV2h convert rfc822-to-8bit (ORCPT
+        id S1726193AbfBAXTM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Feb 2019 16:28:37 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:58450 "EHLO
-        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725876AbfBAV2g (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Feb 2019 16:28:36 -0500
-Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 0BE4B3306F
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Feb 2019 21:28:36 +0000 (UTC)
-Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 0091D33072; Fri,  1 Feb 2019 21:28:35 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 198699] Kernel regularly logs: Bluetooth: hci0: last event is
- not cmd complete (0x0f)
-Date:   Fri, 01 Feb 2019 21:28:33 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-198699-62941-bdfN5PRW1b@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-198699-62941@https.bugzilla.kernel.org/>
-References: <bug-198699-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Fri, 1 Feb 2019 18:19:12 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54460 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725890AbfBAXTM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 1 Feb 2019 18:19:12 -0500
+Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net [24.9.64.241])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 899E5214C6;
+        Fri,  1 Feb 2019 23:19:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1549063151;
+        bh=c+CIRAu4FBfC7IKBpa3fgtfdJ9zpErEqRqLBiWnIniA=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=EdfNV68pVHTPXiDVpmkk0t7Va234BzcGaV5DuKfbAn/u4DNlvbim1tI6vpR79v58d
+         4mZLFoJwCH/twvx69lMRrMuSqIpOnIO58l49pcOlRVgbKJ6A2SRmUT0V7WDpMzZ/+3
+         tlfbluaePXVxcpErF7xQvznwt23A1qnxjrA5n6ss=
+Subject: Re: [PATCH v2] tty: Fix WARNING in tty_set_termios()
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Greg KH <gregkh@linuxfoundation.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Johan Hovold <johan@kernel.org>,
+        shuah <shuah@kernel.org>
+References: <20190131232359.27948-1-shuah@kernel.org>
+ <2EA87A3C-BC0D-4CDA-998D-BA7A6D829356@holtmann.org>
+From:   shuah <shuah@kernel.org>
+Message-ID: <7dc2f2b5-95f4-4809-7719-d214443966eb@kernel.org>
+Date:   Fri, 1 Feb 2019 16:18:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+In-Reply-To: <2EA87A3C-BC0D-4CDA-998D-BA7A6D829356@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=198699
+On 2/1/19 3:00 AM, Marcel Holtmann wrote:
+> Hi Shuah,
+> 
+>> tty_set_termios() has the following WARN_ON which can be triggered with a
+>> syscall to invoke TIOCSETD __NR_ioctl.
+>>
+>> WARN_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+>>                 tty->driver->subtype == PTY_TYPE_MASTER);
+>> Reference: https://syzkaller.appspot.com/bug?id=2410d22f1d8e5984217329dd0884b01d99e3e48d
+>>
+>> The problem started with commit 7721383f4199 ("Bluetooth: hci_uart: Support
+>> operational speed during setup") which introduced a new way for how
+>> tty_set_termios() could end up being called for a master pty.
+>>
+>> Fix the problem by preventing setting the HCI line discipline for PTYs
+>> from hci_uart_setup() and hci_uart_set_flow_control().
+>>
+>> The reproducer is used to reproduce the problem and verify the fix.
+>>
+>> Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
+>> Signed-off-by: Shuah Khan <shuah@kernel.org>
+>> ---
+>> drivers/bluetooth/hci_ldisc.c | 11 +++++++++++
+>> 1 file changed, 11 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+>> index fbf7b4df23ab..ce84ca91ca70 100644
+>> --- a/drivers/bluetooth/hci_ldisc.c
+>> +++ b/drivers/bluetooth/hci_ldisc.c
+>> @@ -314,6 +314,11 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+>> 		return;
+>> 	}
+>>
+>> +	/* don't set HCI line discipline on PTYs */
+>> +	if (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+>> +	    tty->driver->subtype == PTY_TYPE_MASTER)
+>> +		return;
+>> +
+> 
+> just do it once in hci_uart_tty_open. Actually we already check for ops->write and so lets just ensure all ops we ever call are present. If they are not, then bail out. I wouldn’t even bother with the TTY type. Wouldn’t that be a lot simpler?
+> 
 
-Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
+As you said, hci_uart_tty_open()is a good place to check it. I think
+checking tty type is necessary. I couldn't find any missing ops I could
+base the check on to prevent the ldisc set.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |pmenzel+bugzilla.kernel.org
-                   |                            |@molgen.mpg.de
+I have the patch that does the tty check in hci_uart_tty_open() tested
+and ready for sending.
 
---- Comment #25 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) ---
-Should this be added to the stable series too?
+thanks,
+-- Shuah
 
--- 
-You are receiving this mail because:
-You are the assignee for the bug.
+
+
+
+
