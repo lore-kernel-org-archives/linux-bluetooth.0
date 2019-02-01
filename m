@@ -2,76 +2,74 @@ Return-Path: <SRS0=OdH+=QI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03EF4C282D8
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 21:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB14C282D8
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 21:28:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D144F2146E
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 21:20:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA36520869
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 21:28:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726233AbfBAVUp (ORCPT
+        id S1726190AbfBAV2h convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Feb 2019 16:20:45 -0500
-Received: from mx3.molgen.mpg.de ([141.14.17.11]:51533 "EHLO mx1.molgen.mpg.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725797AbfBAVUp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Feb 2019 16:20:45 -0500
-Received: from [10.4.103.96] (dd5fb4620.static.telenet.be [213.251.70.32])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 19E17201353433;
-        Fri,  1 Feb 2019 22:20:42 +0100 (CET)
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: Bluetooth: hci0: last event is not cmd complete (0x0f) with LG TV
-Message-ID: <47c0a63f-a8d8-17bb-64df-65455da2ea7c@molgen.mpg.de>
-Date:   Fri, 1 Feb 2019 22:20:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        Fri, 1 Feb 2019 16:28:37 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:58450 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725876AbfBAV2g (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 1 Feb 2019 16:28:36 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 0BE4B3306F
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Feb 2019 21:28:36 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 0091D33072; Fri,  1 Feb 2019 21:28:35 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 198699] Kernel regularly logs: Bluetooth: hci0: last event is
+ not cmd complete (0x0f)
+Date:   Fri, 01 Feb 2019 21:28:33 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-198699-62941-bdfN5PRW1b@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-198699-62941@https.bugzilla.kernel.org/>
+References: <bug-198699-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Linux folks,
+https://bugzilla.kernel.org/show_bug.cgi?id=198699
 
+Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
 
-When trying to pair a Dell Latitude E7250 running Debian Sid/unstable 
-with Linux 4.20 and GNOME 3.30 with an LG TV, after starting the pairing 
-process the TV is listed. in Bluetooth dialog of GNOME setting.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |pmenzel+bugzilla.kernel.org
+                   |                            |@molgen.mpg.de
 
-The TV displays the instructions below.
+--- Comment #25 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) ---
+Should this be added to the stable series too?
 
-> Complete the next three steps on your mobile device:
-> 1. Turn ON Bluetooth.
-> 2. Select the TV name from the list of available devices.
->    • TV Name : 679
-> 3. Confirm the connection request.
-
-Selecting the TV in the GNOME dialog, a dialog is shown on my system 
-with a PIN consisting of six numbers. With the dialog, Linux logs the 
-message below.
-
-      Bluetooth: hci0: last event is not cmd complete (0x0f)
-
-But, the TV does not show any PIN. Confirming it anyway, nothing is 
-happening further.
-
-Is that supposed to work? It’d be great if you helped me to set this up.
-
-
-Kind regards,
-
-Paul
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
