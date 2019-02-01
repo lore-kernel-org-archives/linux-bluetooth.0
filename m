@@ -2,68 +2,95 @@ Return-Path: <SRS0=OdH+=QI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.2 required=3.0 tests=DATE_IN_PAST_12_24,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B12F8C282DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:15:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E1A5C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:21:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 80FC621872
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:15:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C26120B1F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:21:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727941AbfBACP4 (ORCPT
+        id S1726784AbfBACVj convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Jan 2019 21:15:56 -0500
-Received: from williampainter.com ([185.53.170.252]:36642 "EHLO
-        plantstandinc.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726798AbfBACP4 (ORCPT
+        Thu, 31 Jan 2019 21:21:39 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:37304 "EHLO
+        mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726507AbfBACVj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Jan 2019 21:15:56 -0500
-X-Greylist: delayed 23894 seconds by postgrey-1.27 at vger.kernel.org; Thu, 31 Jan 2019 21:15:55 EST
+        Thu, 31 Jan 2019 21:21:39 -0500
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 792AE31D91
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Feb 2019 02:21:38 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+        id 6AF1331D93; Fri,  1 Feb 2019 02:21:38 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: Send photos to start working
-Message-ID: <6fd8d6afb4752b466c020a4fd5c8eae0@chutingstar.com>
-Date:   Thu, 31 Jan 2019 13:55:10 +0100
-From:   "Julie" <kaansamtin@verizon.net>
-Reply-To: kuaident@sina.com
+Subject: [Bug 202481] New: lost first keystroke of BT-keyboards after idle
+Date:   Fri, 01 Feb 2019 02:21:37 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: mybigspam@mail.ru
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-202481-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Want to make white background for your images?
+https://bugzilla.kernel.org/show_bug.cgi?id=202481
 
-We can add clipping path, or give retouching for your photos if needed.
+            Bug ID: 202481
+           Summary: lost first keystroke of BT-keyboards after idle
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 4.18
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: high
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: mybigspam@mail.ru
+        Regression: No
 
-Let's start testing for your photos.
-
-Thanks,
-Julie
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+When bluetooth keyboard disconnects itself on 10 min idle timeout(which is
+normal), the first key press just losses, while the keyboard reconnects
+successfully. After ~3-5 sec the operation returns to normal.  
 
 
+It doesn't occurs on the same system with Windows 10 - the key doesn't lost on
+reconnect.
+One of my Android device Asus Zenhone Max with kernel 3.10.108 doesn't have
+this problem, while the other, Sony Xperia Tablet Z2, with 3.4.0 kernel,
+suffers from it.
 
+It was reported earlier:
+https://www.spinics.net/lists/linux-bluetooth/msg42966.html
 
-Bottrop
+Please, help investigate the problem - it's really annoying.
 
-
-Memmingen
-
+-- 
+You are receiving this mail because:
+You are the assignee for the bug.
