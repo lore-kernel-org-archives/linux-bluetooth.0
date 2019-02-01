@@ -5,25 +5,25 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F42DC282D8
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 14:49:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD690C282DA
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 15:04:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ED05E218AC
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 14:49:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A453020870
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 15:04:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729595AbfBAOt4 (ORCPT
+        id S1730043AbfBAPEw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Feb 2019 09:49:56 -0500
-Received: from edealinfo.com ([67.214.189.226]:53803 "EHLO lightningrod.com"
+        Fri, 1 Feb 2019 10:04:52 -0500
+Received: from edealinfo.com ([67.214.189.226]:59110 "EHLO lightningrod.com"
         rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728680AbfBAOt4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Feb 2019 09:49:56 -0500
-X-Greylist: delayed 335 seconds by postgrey-1.27 at vger.kernel.org; Fri, 01 Feb 2019 09:49:55 EST
+        id S1730015AbfBAPEw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 1 Feb 2019 10:04:52 -0500
+X-Greylist: delayed 3641 seconds by postgrey-1.27 at vger.kernel.org; Fri, 01 Feb 2019 10:04:51 EST
 To:     linux-bluetooth@vger.kernel.org
-Subject: Did you send it?
-Message-ID: <02ea4abaafb09391529986ce2cf7f9c5@curballure.com>
-Date:   Fri, 01 Feb 2019 13:53:26 +0100
-From:   "Heather" <trefpanai@verizon.net>
+Subject: Want starting it?
+Message-ID: <358dc211cc1beac58596439fffc11872@pacforest.com>
+Date:   Fri, 01 Feb 2019 14:06:39 +0100
+From:   "Heather" <trepvanai@verizon.net>
 Reply-To: fantecan@sina.com
 MIME-Version: 1.0
 Content-Type: text/plain; format=flowed; charset="UTF-8"
@@ -58,11 +58,8 @@ Heather
 
 
 
+Salzgitter
 
 
-
-Grevenbroich
-
-
-Borken
+Datteln
 
