@@ -2,32 +2,32 @@ Return-Path: <SRS0=OdH+=QI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7256C169C4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:29:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC5AAC169C4
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:59:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8017E20855
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:29:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B49B92184A
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 02:59:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727513AbfBAC3s convert rfc822-to-8bit (ORCPT
+        id S1727552AbfBAC7y convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Jan 2019 21:29:48 -0500
-Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:38548 "EHLO
+        Thu, 31 Jan 2019 21:59:54 -0500
+Received: from mail.wl.linuxfoundation.org ([198.145.29.98]:45468 "EHLO
         mail.wl.linuxfoundation.org" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727502AbfBAC3r (ORCPT
+        by vger.kernel.org with ESMTP id S1725831AbfBAC7y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Jan 2019 21:29:47 -0500
+        Thu, 31 Jan 2019 21:59:54 -0500
 Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
-        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 81B8831896
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Feb 2019 02:29:47 +0000 (UTC)
+        by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 75B2F319B5
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Feb 2019 02:59:53 +0000 (UTC)
 Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
-        id 75FDC318CD; Fri,  1 Feb 2019 02:29:47 +0000 (UTC)
+        id 67CD2319C1; Fri,  1 Feb 2019 02:59:53 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 202481] lost first keystroke of BT-keyboards after idle
-Date:   Fri, 01 Feb 2019 02:29:47 +0000
+Date:   Fri, 01 Feb 2019 02:59:53 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -42,8 +42,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_file_loc
-Message-ID: <bug-202481-62941-t5BBgoc6LR@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-202481-62941-tvIO6pjOeM@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-202481-62941@https.bugzilla.kernel.org/>
 References: <bug-202481-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -59,13 +59,13 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=202481
 
-mybigspam@mail.ru changed:
+--- Comment #1 from mybigspam@mail.ru ---
+Also tested on kernels v3.2 (Ubuntu 12.04.1 LTS), v3.13 (Ubuntu 12.04.5 LTS) -
+the problem still there.
+Occurs on different computers, with different BT-adapters (in-built, USB
+external).
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                URL|                            |https://www.spinics.net/lis
-                   |                            |ts/linux-bluetooth/msg42966
-                   |                            |.html
+Not sure if it regression or not. Help.
 
 -- 
 You are receiving this mail because:
