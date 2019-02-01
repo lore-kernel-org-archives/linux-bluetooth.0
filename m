@@ -2,90 +2,166 @@ Return-Path: <SRS0=OdH+=QI=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73ADFC282DA
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 10:01:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA42C282D8
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 11:40:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43A30218A6
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 10:01:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E1B421872
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Feb 2019 11:40:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="pMg4kouD";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="AgN2AW1f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728201AbfBAKA7 convert rfc822-to-8bit (ORCPT
+        id S1727949AbfBALkO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Feb 2019 05:00:59 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:56325 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726760AbfBAKA7 (ORCPT
+        Fri, 1 Feb 2019 06:40:14 -0500
+Received: from smtp.codeaurora.org ([198.145.29.96]:48564 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726330AbfBALkO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Feb 2019 05:00:59 -0500
-Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0E710CEEB0;
-        Fri,  1 Feb 2019 11:08:46 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v2] tty: Fix WARNING in tty_set_termios()
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190131232359.27948-1-shuah@kernel.org>
-Date:   Fri, 1 Feb 2019 11:00:56 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <2EA87A3C-BC0D-4CDA-998D-BA7A6D829356@holtmann.org>
-References: <20190131232359.27948-1-shuah@kernel.org>
-To:     Shuah Khan <shuah@kernel.org>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Fri, 1 Feb 2019 06:40:14 -0500
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id EB7D160398; Fri,  1 Feb 2019 11:40:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1549021213;
+        bh=IP+poZF0mbxXJzUpkT/Te60hF3Qk4fALjWJMwBcOJZE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=pMg4kouDVbZySoyiHi5zN+iaqLiw9JYVwhgHBlJq87AUkcfUSttRqIad1inIcO6ky
+         yVKJ1T/OWZnwB8YktzOx4DNKh79m8kEMjUq+TZ0Yd7GhSFJ+owWXBLSa6Iij64Erm2
+         +7FwqTUUQCFNCrRtahmRlD4pTsyXe5O8feh/ew+8=
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by smtp.codeaurora.org (Postfix) with ESMTP id EFC0B60398;
+        Fri,  1 Feb 2019 11:40:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1549021212;
+        bh=IP+poZF0mbxXJzUpkT/Te60hF3Qk4fALjWJMwBcOJZE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=AgN2AW1fzVzzz0jvPKZ09fQA4j6E0aO5Ww8ne+8LzBYYS36+f/SHxYz849kgh6oM4
+         OjO6k3hPhR2IxzRyg4pSeRcNAmTBcfFfaWa9B65R19m4IeVqUIILYIYrmoBqYAE9Oz
+         f4ZRtNRFY5xkry6/rOm1EM9x1q1mghnIEeaePuF0=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 01 Feb 2019 17:10:11 +0530
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, johan@kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v9 3/3] Bluetooth: hci_qca: Disable IBS state machine and
+ flush Tx buffer
+In-Reply-To: <20190125005534.GC81583@google.com>
+References: <20190124120808.8275-1-bgodavar@codeaurora.org>
+ <20190124120808.8275-4-bgodavar@codeaurora.org>
+ <20190125005534.GC81583@google.com>
+Message-ID: <75923da910c43e7e5e033f4ff4360a90@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.2.5
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Shuah,
+Hi Matthias,
 
-> tty_set_termios() has the following WARN_ON which can be triggered with a
-> syscall to invoke TIOCSETD __NR_ioctl.
+On 2019-01-25 06:25, Matthias Kaehlcke wrote:
+> On Thu, Jan 24, 2019 at 05:38:08PM +0530, Balakrishna Godavarthi wrote:
+>> During hci down we observed IBS sleep commands are queued in the Tx
+>> buffer and hci_uart_write_work is sending data to the chip which is
+>> not required as the chip is powered off. This patch will disable IBS
+>> and flush the Tx buffer before we turn off the chip.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>> Changes v9:
+>>   * added lock while disabling the IBS state machine.
+>> 
+>> ---
+>>  drivers/bluetooth/hci_qca.c | 17 +++++++++++++++--
+>>  1 file changed, 15 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index 6b5bcd44e24c..99ddc35f08c6 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -771,16 +771,17 @@ static int qca_enqueue(struct hci_uart *hu, 
+>> struct sk_buff *skb)
+>>  	/* Prepend skb with frame type */
+>>  	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+>> 
+>> +	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+>> +
+>>  	/* Don't go to sleep in middle of patch download or
+>>  	 * Out-Of-Band(GPIOs control) sleep is selected.
+>>  	 */
+>>  	if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
+>>  		skb_queue_tail(&qca->txq, skb);
+>> +		spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+>>  		return 0;
+>>  	}
+>> 
+>> -	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+>> -
+>>  	/* Act according to current state */
+>>  	switch (qca->tx_ibs_state) {
+>>  	case HCI_IBS_TX_AWAKE:
+>> @@ -1273,6 +1274,18 @@ static const struct qca_vreg_data qca_soc_data 
+>> = {
+>> 
+>>  static void qca_power_shutdown(struct hci_uart *hu)
+>>  {
+>> +	struct qca_data *qca = hu->priv;
+>> +	unsigned long flags;
+>> +
+>> +	/* From this point we go into power off state. But serial port is
+>> +	 * still open, stop queueing the IBS data and flush all the buffered
+>> +	 * data in skb's.
+>> +	 */
+>> +	spin_lock_irqsave(&qca->hci_ibs_lock, flags);
+>> +	clear_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags);
+>> +	qca_flush(hu);
+>> +	spin_unlock_irqrestore(&qca->hci_ibs_lock, flags);
+>> +
+>>  	host_set_baudrate(hu, 2400);
+>>  	qca_send_power_pulse(hu, QCA_WCN3990_POWEROFF_PULSE);
+>>  	qca_power_setup(hu, false);
 > 
-> WARN_ON(tty->driver->type == TTY_DRIVER_TYPE_PTY &&
->                tty->driver->subtype == PTY_TYPE_MASTER);
-> Reference: https://syzkaller.appspot.com/bug?id=2410d22f1d8e5984217329dd0884b01d99e3e48d
+> I was about to add my 'Reviewed-by' tag, but I'm still left with a
+> doubt. This patch certainly improves the situation by clearing the IBS
+> bit and flushing the buffered data, however IIUC new data could still
+> be added to the TX queue after releasing the spinlock:
 > 
-> The problem started with commit 7721383f4199 ("Bluetooth: hci_uart: Support
-> operational speed during setup") which introduced a new way for how
-> tty_set_termios() could end up being called for a master pty.
+> static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+> {
+> 	...
 > 
-> Fix the problem by preventing setting the HCI line discipline for PTYs
-> from hci_uart_setup() and hci_uart_set_flow_control().
+> 	if (!test_bit(STATE_IN_BAND_SLEEP_ENABLED, &qca->flags)) {
+> 		skb_queue_tail(&qca->txq, skb);
 > 
-> The reproducer is used to reproduce the problem and verify the fix.
+> 	...
+> }
 > 
-> Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
-> Signed-off-by: Shuah Khan <shuah@kernel.org>
-> ---
-> drivers/bluetooth/hci_ldisc.c | 11 +++++++++++
-> 1 file changed, 11 insertions(+)
+> To prevent this a boolean/bit like 'shutting_down' or similar would be
+> needed (I don't think there is something common in the HCI core),
+> which is set in qca_power_shutdown(). If the bit is set qca_enqueue()
+> discards the data.
 > 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index fbf7b4df23ab..ce84ca91ca70 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -314,6 +314,11 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
-> 		return;
-> 	}
+> Not sure how important this is, and I don't want to add necessarily
+> more revisions to this series. If it is preferable to have an empty
+> queue after shutdown maybe it can be done in a follow up patch.
 > 
-> +	/* don't set HCI line discipline on PTYs */
-> +	if (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
-> +	    tty->driver->subtype == PTY_TYPE_MASTER)
-> +		return;
-> +
+> Thanks
+> 
+> Matthias
 
-just do it once in hci_uart_tty_open. Actually we already check for ops->write and so lets just ensure all ops we ever call are present. If they are not, then bail out. I wouldn’t even bother with the TTY type. Wouldn’t that be a lot simpler?
+[Bala]: during shutdown Bt stack will not send any data to the Bt  
+kernel Tx path.
+         so this call may not be called. once we shutdown chip.
 
+-- 
 Regards
-
-Marcel
-
+Balakrishna.
