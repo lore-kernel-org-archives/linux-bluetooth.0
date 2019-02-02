@@ -2,128 +2,77 @@ Return-Path: <SRS0=cdju=QJ=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79D10C282D7
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 Feb 2019 12:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F54AC282D7
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 Feb 2019 14:59:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51E452086C
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 Feb 2019 12:15:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3601D20844
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  2 Feb 2019 14:59:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KEc5ev/V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727449AbfBBMPT convert rfc822-to-8bit (ORCPT
+        id S1727687AbfBBO7n (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 2 Feb 2019 07:15:19 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:43091 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727199AbfBBMPT (ORCPT
+        Sat, 2 Feb 2019 09:59:43 -0500
+Received: from mail-pl1-f181.google.com ([209.85.214.181]:40975 "EHLO
+        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727565AbfBBO7n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 2 Feb 2019 07:15:19 -0500
-Received: from marcel-macpro.fritz.box (p4FF9FD60.dip0.t-ipconnect.de [79.249.253.96])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A8327CEF9A;
-        Sat,  2 Feb 2019 13:23:06 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v2] Bluetooth: hci_uart: Switch pty driver to slave side
- in tty_set_termios()
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20190202072816.GA15630@myunghoj-Precision-5530>
-Date:   Sat, 2 Feb 2019 13:15:16 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <3EC8C1C2-27AE-46B7-A345-860A87B94E6B@holtmann.org>
-References: <20190202072816.GA15630@myunghoj-Precision-5530>
-To:     Myungho Jung <mhjungk@gmail.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Sat, 2 Feb 2019 09:59:43 -0500
+Received: by mail-pl1-f181.google.com with SMTP id u6so4736499plm.8
+        for <linux-bluetooth@vger.kernel.org>; Sat, 02 Feb 2019 06:59:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=LINzcjFoaXatlSdWdLUFrZqYHghV0vLg6gQPF9pKyiQ=;
+        b=KEc5ev/V4NqRVqDOJVavuCjYF4dSRBFXY/HWGnCFHZWafucJhjhnLdNNVQzoamqn1U
+         PKdYnREHlB8lN/hhYo07dq4/CzI7EXMBFpExNtX8e0X8OubvU1MFJKdX2Fh2crwIDC3a
+         RS5X4N/Rs0RGn4B00IqOVuQAXaqCHoMJeKq6eAtsn+TttPSk7jcMCGaE678ADZB5qTRs
+         MKdNAnDEjYKfDXwYx2g7l+Yk46fqZS49ahqtecOU5E/w9DlQuBNbJo34ZFjvZBGPrEs3
+         SgswM0MlA+tEhvfnJpsTfMKzpn1fnHmXU7xg8IrqCXD8ZSl+HkkY/9loM+c4U4ewtVry
+         u8ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=LINzcjFoaXatlSdWdLUFrZqYHghV0vLg6gQPF9pKyiQ=;
+        b=XpcTW410u+DIkqF9dcmhuIOy3GkEuV3WYVpASrk6SvsTsObWhobrXUhdrMaAMioLhp
+         A2ehSZsp0wiSEwWCBf/vJxHgmbGsCGadzjIhsG4ywrbqygUBufCPwCCj6M14GtI3Ju86
+         PMDOmUEMsPo4F7zToaylh7mGdiE8WmfgKl4euDqLNfmgDJvSJx6SCtBSAVmoRzaWwP5a
+         Roah2zTPej3//Wc0DfGmBd5AXiLwd2t8z1PV+Ax7LLR04KkxKeyRxzEqHzgumtvedMRR
+         tVpcOZC+7oiQQ22OjVHEUFyu6Wmg94IsF0T79UGsPstBgq5dOu87Fl/e3nTX7U+iMhwE
+         T+WQ==
+X-Gm-Message-State: AJcUukdX6YGnhGnM5cFy1/2nBldN3upb9arunqL3sjdBPqm0emmUbwVE
+        +4wY7eHkXqt4Bf+CpS2E1DZSiQDUTA0T+pprWct1LQ==
+X-Google-Smtp-Source: ALg8bN4sdwEgQbWFXkGWDPTrQO/iN9Hbl/v8NVsm7AVUfnfw+YbYx7Bk7iu5qcM1qOtXQrWRQA5JR8GkWYbjnpM75tg=
+X-Received: by 2002:a17:902:b282:: with SMTP id u2mr44818968plr.89.1549119582369;
+ Sat, 02 Feb 2019 06:59:42 -0800 (PST)
+MIME-Version: 1.0
+From:   Youssif Saeed <youssif.am.saeed@gmail.com>
+Date:   Sat, 2 Feb 2019 14:59:30 +0000
+Message-ID: <CA+T8qpb8n8oVRfiFsxX7y27LDDpc2CfdPdQLgsdmQH5FBeBQcA@mail.gmail.com>
+Subject: Directed advertisements from the command line
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Myungho,
+Hi
 
-> tty_set_termios() should be called with slave side of pty driver. So, If
-> tty driver is pty master, it needs to be switched to ->link.
-> 
-> Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
-> Signed-off-by: Myungho Jung <mhjungk@gmail.com>
-> ---
-> drivers/bluetooth/hci_ldisc.c | 27 ++++++++++++++++++++++-----
-> 1 file changed, 22 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-> index fbf7b4df23ab..0f6e70ea1dc3 100644
-> --- a/drivers/bluetooth/hci_ldisc.c
-> +++ b/drivers/bluetooth/hci_ldisc.c
-> @@ -299,10 +299,21 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
-> 	return 0;
-> }
-> 
-> +/* If pty master, return slave side */
-> +static struct tty_struct *hci_uart_get_real_tty(struct tty_struct *tty)
-> +{
-> +	if (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
-> +	    tty->driver->subtype == PTY_TYPE_MASTER)
-> +		tty->link;
-> +
-> +	return tty;
-> +}
-> +
-> /* Flow control or un-flow control the device */
-> void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
-> {
-> 	struct tty_struct *tty = hu->tty;
-> +	struct tty_struct *real_tty;
-> 	struct ktermios ktermios;
-> 	int status;
-> 	unsigned int set = 0;
-> @@ -314,11 +325,14 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
-> 		return;
-> 	}
-> 
-> +	/* termios should be set from slave side if tty driver is pty */
-> +	real_tty = hci_uart_get_real_tty(tty);
-> +
-> 	if (enable) {
-> 		/* Disable hardware flow control */
-> -		ktermios = tty->termios;
-> +		ktermios = real_tty->termios;
-> 		ktermios.c_cflag &= ~CRTSCTS;
-> -		status = tty_set_termios(tty, &ktermios);
-> +		status = tty_set_termios(real_tty, &ktermios);
-> 		BT_DBG("Disabling hardware flow control: %s",
-> 		       status ? "failed" : "success");
-> 
-> @@ -350,9 +364,9 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
-> 		BT_DBG("Setting RTS: %s", status ? "failed" : "success");
-> 
-> 		/* Re-enable hardware flow control */
-> -		ktermios = tty->termios;
-> +		ktermios = real_tty->termios;
-> 		ktermios.c_cflag |= CRTSCTS;
-> -		status = tty_set_termios(tty, &ktermios);
-> +		status = tty_set_termios(real_tty, &ktermios);
-> 		BT_DBG("Enabling hardware flow control: %s",
-> 		       status ? "failed" : "success");
-> 	}
-> @@ -367,9 +381,12 @@ void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
-> 
-> void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
-> {
-> -	struct tty_struct *tty = hu->tty;
-> +	struct tty_struct *tty;
-> 	struct ktermios ktermios;
-> 
-> +	/* termios should be set from slave side if tty driver is pty */
-> +	tty = hci_uart_get_real_tty(hu->tty);
-> +
+Is there a tool/utility/option for enabling directed advertising?
+Currently, it seems that the only options available through
+bluetoothctl is undirected advertising. I can see that there is a
+"type" field in the advertising section, but from browsing through the
+source, it looks like the only supported options are "peripheral" and
+"broadcast" (This can be seen in bluez/client/main.c). Is there an
+option or another utility that enables this feature?
 
-didn’t we conclude that allowing the HCI line discipline on a PTY master isn't worth the effort? The ptm_unix98_ops doesn’t have the .set_termios and thus, just check that ops->set_termios is present in hci_uart_tty_open and if not fail with EOPNOTSUPP like we do for missing ops->write.
+I am using BlueZ 5.50 on an Ubuntu machine running Linux 4.15.0-43 generic.
 
-Regards
-
-Marcel
-
+Thanks
+Youssif
