@@ -8,110 +8,168 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB9C6C282D7
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 00:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD33C169C4
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 03:30:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC57B20856
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 00:56:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36F9D2084A
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Feb 2019 03:30:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WwE3jSJ9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MmbLeWl5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727181AbfBCA4k (ORCPT
+        id S1726557AbfBCDag (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 2 Feb 2019 19:56:40 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:38874 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727017AbfBCA4k (ORCPT
+        Sat, 2 Feb 2019 22:30:36 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:35689 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726491AbfBCDag (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 2 Feb 2019 19:56:40 -0500
-Received: by mail-pf1-f195.google.com with SMTP id q1so5109784pfi.5;
-        Sat, 02 Feb 2019 16:56:40 -0800 (PST)
+        Sat, 2 Feb 2019 22:30:36 -0500
+Received: by mail-pg1-f193.google.com with SMTP id s198so4794304pgs.2;
+        Sat, 02 Feb 2019 19:30:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
          :user-agent;
-        bh=ZGcVYn3pyoZQburOYIXpkDXd89ixvABOYmn0RFue96Q=;
-        b=WwE3jSJ9cRc3a+DuR8QJpVLuJbFK8CVHgotiDfWmnIZRqOMLmP8QJBgrlbIcGVUlKg
-         w6gz4XQkqu0V+4nQuQvbANVGHF0SME1d25m06hltmzD1Md2MMkVfkmC+oym4nJfxd5cP
-         BvQV3ZpAxP3f/+rlzxY6yS69NRrrm36DfQ0MRQd3NqTx1KGWYGjlFrgv/TU0mYw5M4rL
-         y/KUY1OLYBMKV9JsUJO8gQX/vj5I7R3cs5yu7vuYKUd19HsUOfttFQMOib0y8D6+kqWd
-         E88P5vnTOLGwhu8AOxf/WNjgRwiA5MiUnyg2lhGkq6wsRZOScxbKAaeFA9HtsfIngxCC
-         CaSA==
+        bh=IhwZrh8KG3wLPMVgZRFj0uWRKgE0nMItZX7H2lN+yUs=;
+        b=MmbLeWl5KImC++p41acG61HIGFFcemopUSbwGonaEYOj6Cch5wfLAEhE00aNsrgLpl
+         m+3632j5iSpEmScj0aJfONDnC+h1qcl9hbn2BxxLf5oliyKMHLogU1SJS2HTVXIFoZFE
+         Oz+vogXKxh09G8CmQYWHUpy7PQAh38MKFwkIrxzztPU8PCOQMzNzb+39tPsP4EqgDsbx
+         ABS/JHewoCykrIzxE/6OOG5MMd5IJdnDdgj2d+zsQZPJ4aqVt9MfkFHLVPQhf4CS6LzU
+         +JJ8AM1ua0yG84n0PcnwecP/89djDLDi5mIGKr5w/ePAiyHmgAM3hy1n/MVCwtEq9jVV
+         xBGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=ZGcVYn3pyoZQburOYIXpkDXd89ixvABOYmn0RFue96Q=;
-        b=ue89l5afjMW1VO1wB2DdZoaURC9xZZriiwuI4xWjsVtruYzUFAM613cFEXi1iHDN9y
-         jay7YGXCczc4hOhc+3idoYAUH8QEEsOYafhX9pFW1taAEFfS2c9ewiR9FM8F73q3oNq6
-         L7QOmbVnHg8XWiKo7ZjkNsQICto8J4IUAc9Tm+dVdrGoBfIdRt69Hod2n72ccHktYBwC
-         h45y7dAHvihib0F+D+G+qqrS25cOLkKbn/NA2ZUphVxZhmjgb+FHkQq84/8NLhgTif17
-         VG1WIIWynGBqmMJt0KtYPCvYs/u03PPfGbehxUdh6vV/vchZlZ0xj43xOy7fMXgsEjDQ
-         QyZA==
-X-Gm-Message-State: AHQUAuZteIp9xyRSdnI/AHnSp3KNJm7ZHLHTbfdfxS5Z9/AuRQJe/Jad
-        zinyp6LAevEl7b0066uGUKE4MPxp/W0=
-X-Google-Smtp-Source: AHgI3Ib93bQ6fDj8FuLfnM32V9L1kcDDu182B8sLRdrauCSlhM0a/ynOcSOIB3pCPSlG6n1aZh4xnQ==
-X-Received: by 2002:a63:1a5f:: with SMTP id a31mr4650129pgm.335.1549155399587;
-        Sat, 02 Feb 2019 16:56:39 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=IhwZrh8KG3wLPMVgZRFj0uWRKgE0nMItZX7H2lN+yUs=;
+        b=ot8A46R3TqAYrCC+rfyIJjMl7Ic2Gxnj1EwEYtHy2S3u9FqX5We+BZ1tsRmp1shYCk
+         ywJdIk/SNqoobe8tCEVFUlYP4EJ1O8Xa8iIHTwXhzJ+IzzMPpa9dwr4C20k+/tPIcWDm
+         QMkKzuzjwcMO3QDKUjIeS3HFYojhMegQKpKxWfHlFaLv7iF9I0Xyv1k+IdHteOnDVpSx
+         XGyqeEvy3iy9UpmDj8GbAjy4joflP0Hw+eTF+afEdB5ARclbucXtbg4y+qWCkYX9xpN2
+         tS/UiyT7W/tQ3w1rCQe9EvWIlzFFTZr7tQGMigVA4c84Zqfxx7POY/It8DDhVhzjpRuh
+         YXHQ==
+X-Gm-Message-State: AJcUukdJ7n5MJOhRgEeOimn5MF6zDr5j4t2YtxEP59A1nk5mDup82qVr
+        YkHH9Mw9OB1vrf9FOow+/uY=
+X-Google-Smtp-Source: ALg8bN4mMIB/Ckgsf7R+sTqCynHPchDxv7LYlabHqalYEnYt/m+Q9tyhlQ+CQZb/0xal7Hilg5ZvMA==
+X-Received: by 2002:a62:1b50:: with SMTP id b77mr46166253pfb.36.1549164635217;
+        Sat, 02 Feb 2019 19:30:35 -0800 (PST)
 Received: from myunghoj-Precision-5530 (cpe-76-176-3-80.san.res.rr.com. [76.176.3.80])
-        by smtp.gmail.com with ESMTPSA id h64sm18341455pfc.142.2019.02.02.16.56.38
+        by smtp.gmail.com with ESMTPSA id z62sm22276974pfi.4.2019.02.02.19.30.34
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 02 Feb 2019 16:56:39 -0800 (PST)
-Date:   Sat, 2 Feb 2019 16:56:36 -0800
+        Sat, 02 Feb 2019 19:30:35 -0800 (PST)
+Date:   Sat, 2 Feb 2019 19:30:32 -0800
 From:   Myungho Jung <mhjungk@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix decrementing reference count twice in
- releasing socket
-Message-ID: <20190203005634.GA19908@myunghoj-Precision-5530>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: hci_uart: Switch pty driver to slave side
+ in tty_set_termios()
+Message-ID: <20190203033032.GA21013@myunghoj-Precision-5530>
+References: <20190202072816.GA15630@myunghoj-Precision-5530>
+ <3EC8C1C2-27AE-46B7-A345-860A87B94E6B@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3EC8C1C2-27AE-46B7-A345-860A87B94E6B@holtmann.org>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-bluetooth-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When releasing socket, it is possible to enter hci_sock_release() and
-hci_sock_dev_event(HCI_DEV_UNREG) at the same time in different thread.
-The reference count of hdev should be decremented only once from one of
-them but if storing hdev to local variable in hci_sock_release() before
-detached from socket and setting to NULL in hci_sock_dev_event(),
-hci_dev_put(hdev) is unexpectedly called twice. This is resolved by
-referencing hdev from socket after bt_sock_unlink() in
-hci_sock_release().
+On Sat, Feb 02, 2019 at 01:15:16PM +0100, Marcel Holtmann wrote:
+> Hi Myungho,
+> 
+> > tty_set_termios() should be called with slave side of pty driver. So, If
+> > tty driver is pty master, it needs to be switched to ->link.
+> > 
+> > Reported-by: syzbot+a950165cbb86bdd023a4@syzkaller.appspotmail.com
+> > Signed-off-by: Myungho Jung <mhjungk@gmail.com>
+> > ---
+> > drivers/bluetooth/hci_ldisc.c | 27 ++++++++++++++++++++++-----
+> > 1 file changed, 22 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+> > index fbf7b4df23ab..0f6e70ea1dc3 100644
+> > --- a/drivers/bluetooth/hci_ldisc.c
+> > +++ b/drivers/bluetooth/hci_ldisc.c
+> > @@ -299,10 +299,21 @@ static int hci_uart_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+> > 	return 0;
+> > }
+> > 
+> > +/* If pty master, return slave side */
+> > +static struct tty_struct *hci_uart_get_real_tty(struct tty_struct *tty)
+> > +{
+> > +	if (tty->driver->type == TTY_DRIVER_TYPE_PTY &&
+> > +	    tty->driver->subtype == PTY_TYPE_MASTER)
+> > +		tty->link;
+> > +
+> > +	return tty;
+> > +}
+> > +
+> > /* Flow control or un-flow control the device */
+> > void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+> > {
+> > 	struct tty_struct *tty = hu->tty;
+> > +	struct tty_struct *real_tty;
+> > 	struct ktermios ktermios;
+> > 	int status;
+> > 	unsigned int set = 0;
+> > @@ -314,11 +325,14 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+> > 		return;
+> > 	}
+> > 
+> > +	/* termios should be set from slave side if tty driver is pty */
+> > +	real_tty = hci_uart_get_real_tty(tty);
+> > +
+> > 	if (enable) {
+> > 		/* Disable hardware flow control */
+> > -		ktermios = tty->termios;
+> > +		ktermios = real_tty->termios;
+> > 		ktermios.c_cflag &= ~CRTSCTS;
+> > -		status = tty_set_termios(tty, &ktermios);
+> > +		status = tty_set_termios(real_tty, &ktermios);
+> > 		BT_DBG("Disabling hardware flow control: %s",
+> > 		       status ? "failed" : "success");
+> > 
+> > @@ -350,9 +364,9 @@ void hci_uart_set_flow_control(struct hci_uart *hu, bool enable)
+> > 		BT_DBG("Setting RTS: %s", status ? "failed" : "success");
+> > 
+> > 		/* Re-enable hardware flow control */
+> > -		ktermios = tty->termios;
+> > +		ktermios = real_tty->termios;
+> > 		ktermios.c_cflag |= CRTSCTS;
+> > -		status = tty_set_termios(tty, &ktermios);
+> > +		status = tty_set_termios(real_tty, &ktermios);
+> > 		BT_DBG("Enabling hardware flow control: %s",
+> > 		       status ? "failed" : "success");
+> > 	}
+> > @@ -367,9 +381,12 @@ void hci_uart_set_speeds(struct hci_uart *hu, unsigned int init_speed,
+> > 
+> > void hci_uart_set_baudrate(struct hci_uart *hu, unsigned int speed)
+> > {
+> > -	struct tty_struct *tty = hu->tty;
+> > +	struct tty_struct *tty;
+> > 	struct ktermios ktermios;
+> > 
+> > +	/* termios should be set from slave side if tty driver is pty */
+> > +	tty = hci_uart_get_real_tty(hu->tty);
+> > +
+> 
+> didn’t we conclude that allowing the HCI line discipline on a PTY master isn't worth the effort? The ptm_unix98_ops doesn’t have the .set_termios and thus, just check that ops->set_termios is present in hci_uart_tty_open and if not fail with EOPNOTSUPP like we do for missing ops->write.
+> 
+> Regards
+> 
+> Marcel
+> 
+Hi Marcel,
 
-Reported-by: syzbot+fdc00003f4efff43bc5b@syzkaller.appspotmail.com
-Signed-off-by: Myungho Jung <mhjungk@gmail.com>
----
- net/bluetooth/hci_sock.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+I thought there might be some cases that reach here even returning error in
+hci_uart_tty_open(). Let me fix it from hci_uart_tty_open.
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 1506e1632394..d4e2a166ae17 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -831,8 +831,6 @@ static int hci_sock_release(struct socket *sock)
- 	if (!sk)
- 		return 0;
- 
--	hdev = hci_pi(sk)->hdev;
--
- 	switch (hci_pi(sk)->channel) {
- 	case HCI_CHANNEL_MONITOR:
- 		atomic_dec(&monitor_promisc);
-@@ -854,6 +852,7 @@ static int hci_sock_release(struct socket *sock)
- 
- 	bt_sock_unlink(&hci_sk_list, sk);
- 
-+	hdev = hci_pi(sk)->hdev;
- 	if (hdev) {
- 		if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
- 			/* When releasing a user channel exclusive access,
--- 
-2.17.1
+Thanks,
+Myungho
 
